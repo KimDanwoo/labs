@@ -5,9 +5,9 @@ const siteMetadata = {
     summary: `웹 프론트엔드 개발자입니다.`
   },
   description: `기록하고 공유합니다`,
-  siteUrl: `https://blog.danwoo.com`,
+  siteUrl: `https://danwoo-dev.netlify.app/`,
   icon: `content/assets/favicon.png`,
-  thumbnail: `https://blog.danwoo.com/og.png`
+  thumbnail: `https://danwoo-dev.netlify.app//og.png`
 }
 
 module.exports = {
