@@ -6,7 +6,7 @@ const siteMetadata = {
   },
   description: `기록하고 공유합니다`,
   siteUrl: `https://danwoo-dev.netlify.app/`,
-  icon: `content/assets/favicon.ico`,
+  icon: `content/assets/favicon.png`,
   thumbnail: `https://danwoo-dev.netlify.app//og.png`
 }
 
