@@ -16,7 +16,7 @@ const Main = ({ data }: PageProps<QueryResult>) => {
           thumbnail:
             thumbnail?.childImageSharp.gatsbyImageData.images.fallback ?? null,
           url: fields.slug,
-          publishedAt: date
+          publishedAt: date,
         })
       ),
     [data]
