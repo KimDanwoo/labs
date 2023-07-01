@@ -1,6 +1,6 @@
 .layout-wrapper {
   width: 100%;
-  max-width: 700px;
+  // max-width: 700px;
   margin: 0 auto;
 
   > * {
@@ -12,46 +12,57 @@
     position: sticky;
     top: 0;
     z-index: 99999999;
-    display: flex;
-    align-items: center;
+
     width: 100%;
-    backdrop-filter: blur(8px);
+    // backdrop-filter: blur(8px);
     background-color: var(--white0);
-    transition: background-color 0.4s, box-shadow 0.4s;
+    // transition: background-color 0.4s, box-shadow 0.4s;
+    border-bottom: 1px solid #eee;
 
-    @media screen and (min-width: 800px) {
-      top: 0.5rem;
-      border-radius: 20px;
-    }
+    // @media screen and (min-width: 800px) {
+    // top: 0.5rem;
+    // border-radius: 20px;
+    // }
 
-    &.scrolled {
-      background-color: var(--white0_t70);
-      box-shadow: 0 1px 15px var(--grey3);
-    }
+    // &.scrolled {
+    //   background-color: var(--white0_t70);
+    //   box-shadow: 0 1px 15px var(--grey3);
+    // }
 
-    > .link-to-home {
-      margin-right: auto;
-      color: var(--grey0);
-      font-size: 1.6rem;
-      font-weight: 700;
-      transition: color 0.15s;
+    > div {
+      max-width: 700px;
+      margin: auto;
+      display: flex;
+      align-items: center;
 
-      &:hover {
-        color: var(--grey1);
+      > .link-to-home {
+        margin-right: auto;
+        color: var(--green0);
+        font-size: 1.6rem;
+        font-weight: 700;
+        transition: color 0.15s;
+
+        &:hover {
+          color: var(--green1);
+        }
+      }
+
+      > .link-to-about {
+        margin-right: 1rem;
+        color: var(--grey0);
+        font-size: 0.9rem;
+        font-weight: 400;
+        transition: color 0.15s;
+
+        &:hover {
+          color: var(--grey1);
+        }
       }
     }
-
-    > .link-to-about {
-      margin-right: 1rem;
-      color: var(--grey0);
-      font-size: 0.9rem;
-      font-weight: 400;
-      transition: color 0.15s;
-
-      &:hover {
-        color: var(--grey1);
-      }
-    }
+  }
+  > main {
+    max-width: 700px;
+    margin: auto;
   }
 
   > footer {
