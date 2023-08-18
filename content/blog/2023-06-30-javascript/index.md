@@ -58,7 +58,7 @@ throttle이란 용어는 다양한 의미가 있지만 일반적으로는 제어
 
 1px스크롤 할때마다 스크롤에 걸린 이벤트 콜백을 다 수행하고 있을 필요는 없습니다.
 
-함수를 일정시간동안 한번씩만 실행시키도록 하는게 throttel입니다.
+함수를 일정시간동안 한번씩만 실행시키도록 하는게 throttle입니다.
 
 아래는 throttle을 구현한 함수입니다.
 
@@ -212,7 +212,7 @@ function calculate(x, y, z) {
   return (x + y) * z
 }
 
-// 마지막 인수(z)만 필요로 하도록 parital이 적용된 함수 버전으로 생성
+// 마지막 인수(z)만 필요로 하도록 partial이 적용된 함수 버전으로 생성
 const multiply5By = partial(calculate, 2, 3)
 
 // 반복 횟수 값을 전달하여 partial이 적용된 함수를 호출
@@ -232,9 +232,9 @@ pipe는 뜻 그대로 여러개의 함수를 연결하고 그 연결고리에서
 reduce() 함수를 사용하여 모든 함수를 왼쪽에서 오른쪽으로 적용합니다.
 
 ```jsx
-function pipe(...funcs) {
+function pipe(...func) {
   return function piped(...args) {
-    return funcs.reduce((result, func) => [func.call(this, ...result)], args)[0]
+    return func.reduce((result, func) => [func.call(this, ...result)], args)[0]
   }
 }
 // 문자열에 추가하는 함수들 정의
@@ -270,9 +270,9 @@ compose함수는 pipe함수와 같지만 주어진 함수들을 모두 적용하
 사용한다는 차이점이 있습니다.
 
 ```jsx
-function compose(...funcs) {
+function compose(...func) {
   return function composed(...args) {
-    return funcs.reduceRight(
+    return func.reduceRight(
       (result, func) => [func.call(this, ...result)],
       args
     )[0]

@@ -67,9 +67,9 @@ thumbnail: ./thumbnail.png
 
 ### 접근성을 고려한 색상 및 대비 사용
 
-### 색상을 신중하게 선택해야 한다.
+### 색상을 신중하게 선택해야 한다
 
-### 읽기 쉬운 글꼴을 사용해야한다.
+### 읽기 쉬운 글꼴을 사용해야한다
 
 ### ARIA 속성을 사용한다. (Accessible Rich Internet Applications)
 
