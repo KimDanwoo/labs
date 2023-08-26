@@ -1,7 +1,7 @@
 import React from 'react'
 
 const IntroPage = () => {
-  return <div>하이루루</div>
+  return <div></div>
 }
 
 export default IntroPage

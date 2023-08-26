@@ -1,10 +1,10 @@
-import React from "react";
-import type { PageProps } from "gatsby";
-import { graphql } from "gatsby";
-import { AppLayout } from "~/components/Layout";
-import { PostList } from "~/components/Main";
-import { Seo } from "~/components/Common";
-import "../styles/pages/index.scss";
+import React from 'react'
+import type { PageProps } from 'gatsby'
+import { graphql } from 'gatsby'
+import { AppLayout } from '~/components/Layout'
+import { PostList } from '~/components/Main'
+import { Seo } from '~/components/Common'
+import '../styles/pages/index.scss'
 
 const Main = ({ data }: PageProps<QueryResult>) => {
   const posts = React.useMemo<Common.Post[]>(
@@ -16,46 +16,46 @@ const Main = ({ data }: PageProps<QueryResult>) => {
           thumbnail:
             thumbnail?.childImageSharp.gatsbyImageData.images.fallback ?? null,
           url: fields.slug,
-          publishedAt: date,
+          publishedAt: date
         })
       ),
     [data]
-  );
+  )
 
   return (
     <AppLayout>
-      <Seo title="김단우 블로그" />
+      <Seo title='김단우 블로그' />
       <PostList posts={posts} />
     </AppLayout>
-  );
-};
+  )
+}
 
 interface QueryResult {
   allMarkdownRemark: {
     nodes: {
       fields: {
-        slug: string;
-      };
+        slug: string
+      }
       frontmatter: {
-        title: string;
-        date: string;
-        description: string;
+        title: string
+        date: string
+        description: string
         thumbnail: {
           childImageSharp: {
             gatsbyImageData: {
               images: {
                 fallback: {
-                  src: string;
-                  srcSet: string;
-                  sizes: string;
-                };
-              };
-            };
-          };
-        } | null;
-      };
-    }[];
-  };
+                  src: string
+                  srcSet: string
+                  sizes: string
+                }
+              }
+            }
+          }
+        } | null
+      }
+    }[]
+  }
 }
 
 export const pageQuery = graphql`
@@ -78,6 +78,6 @@ export const pageQuery = graphql`
       }
     }
   }
-`;
+`
 
-export default Main;
+export default Main
