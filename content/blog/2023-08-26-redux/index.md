@@ -122,13 +122,13 @@ Redux구조는 state의 변경은 Reducer를 통해서 일어나며 state는 sto
 ### Redux의 3가지 원칙
 
 1. Single source of truth (진실은 하나의 근원으로부터)
-   - 동일한 state(데이터)는 항상 같은 곳에서 가지고 온다.
+   - **동일한 state(데이터)는 항상 같은 곳에서 가지고 온다.**
    - 스토어라는 하나뿐인 데이터 공간이 있다는 의미
 2. State is read-only (상태는 읽기 전용이다.)
-   - view에서 일어나는 이벤트는 직접 데이터를 건들지 않고 Action을 통해 요청만 한다.
+   - view에서 일어나는 이벤트는 직접 데이터를 건들지 않고 **Action을 통해 요청**만 한다.
    - 리엑트에서는 setState 메소드를 활용해야만 상태 변경이 가능하듯
-   - 리덕스에서도 Action이라는 객체를 통해서만 변경할 수 있다.
+   - 리덕스에서도 **Action이라는 객체를 통해서만 변경**할 수 있다.
 3. Changes are made with pure functions (변화는 순수 함수로 작성되어야 한다.)
-   - Action에 의해 상태 트리가 어떻게 변화하는 지를 지정하기 위해 순수 함수로 Reducer를 작성한다.
-   - Reducer는 반드시 이전의 state와 Action을 매개변수로 받는다.
-   - Reducer는 결과값으로 이전의 state를 변경시키지 않고 new state를 만들어 변환한다.
+   - Action에 의해 상태 트리가 어떻게 변화하는 지를 지정하기 위해 **순수 함수로 Reducer를 작성**한다.
+   - Reducer는 반드시 이전의 **state와 Action을 매개변수**로 받는다.
+   - Reducer는 결과값으로 이전의 state를 변경시키지 않고 **new state를 만들어 변환**한다.
