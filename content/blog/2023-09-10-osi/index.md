@@ -73,37 +73,25 @@ Source Post Number / Destination Port Number / UDP length / UDP Checksum / Data
 
 | 프로토콜 |     |
 | -------- | --- |
-
-| RPC
-(Remote Procedure Call) | 다른 네트워크에 위치한 컴퓨터에서 실행되는 프로시저나 함수를 local 컴퓨터에서 실행하는 것처럼 사용할 수 있게 하는 통신 방식 |
-| NetBIOS
-(Network Basic Input/Output System) | 별개의 컴퓨터에 있는 애플리케이션들이 근거리 통신망 내에서 서로 통신할 수 있게 해주는 프로그램이다. |
+| RPC (Remote Procedure Call) | 다른 네트워크에 위치한 컴퓨터에서 실행되는 프로시저나 함수를 local 컴퓨터에서 실행하는 것처럼 사용할 수 있게 하는 통신 방식 |
+| NetBIOS (Network Basic Input/Output System) | 별개의 컴퓨터에 있는 애플리케이션들이 근거리 통신망 내에서 서로 통신할 수 있게 해주는 프로그램이다. |
 
 ### **1-4. 표현 계층 (6 계층) 프로토콜**
 
 | 프로토콜 |
 | -------- |
-
-| JPEG
-(이미지 표준 규격) |
-| MPEG
-(멀티미디어 표준 규격) |
+| JPEG (이미지 표준 규격) |
+| MPEG (멀티미디어 표준 규격) |
 
 ### **1-5. 응용 계층 (7 계층) 프로토콜**
 
 | 프로토콜 | 설명 |
 | -------- | ---- |
-
-| HTTP
-(HyperText Transfer Protocol) | 텍스트 기반의 통신 규약 |
-| FTP
-(Transfer Protocol) | TCP/IP 프로토콜을 가지고 서버와 클라이언트 사이의 파일을 전송하기 위한 프로토콜 |
-| SMTP
-(Simple Mail Tranfer Protocol) | 인터넷에서 TCP 포트 번호 25번을 사용하여 이메일을 보내기 위해 이용되는 프로토콜 |
-| POP3
-(Post Office Protocol Version 3) | 응용 계층 인터넷 프로토콜 중 하나로, 원격 서버로부터 TCP/IP 연결을 통해 이메일을 가져오는 데 사용하는 프로토콜 |
-| IMAP
-(Internet Messageing Access Protocol) | 원격 서버로부터 TCP/IP 연결을 통해 이메일을 가져오는 데 사용하는 프로토콜 |
+| HTTP (HyperText Transfer Protocol) | 텍스트 기반의 통신 규약 |
+| FTP (Transfer Protocol) | TCP/IP 프로토콜을 가지고 서버와 클라이언트 사이의 파일을 전송하기 위한 프로토콜 |
+| SMTP (Simple Mail Tranfer Protocol) | 인터넷에서 TCP 포트 번호 25번을 사용하여 이메일을 보내기 위해 이용되는 프로토콜 |
+| POP3 (Post Office Protocol Version 3) | 응용 계층 인터넷 프로토콜 중 하나로, 원격 서버로부터 TCP/IP 연결을 통해 이메일을 가져오는 데 사용하는 프로토콜 |
+| IMAP (Internet Messageing Access Protocol) | 원격 서버로부터 TCP/IP 연결을 통해 이메일을 가져오는 데 사용하는 프로토콜 |
 | Telnet | 인터넷이나 local 영역에서 네트워크 연결에 사용되는 네트워크 프로토콜 |
 
 ## 2. IP (Internet Protocol)
@@ -115,9 +103,7 @@ Source Post Number / Destination Port Number / UDP length / UDP Checksum / Data
 
 | 특징 | 설명 |
 | ---- | ---- |
-
-| 비 신뢰성 (Unreliable)
-비 연결형 (Connection less) | 비 신뢰성은 흐름에 관여하지 않기 때문에 보낸 정보가 제대로 갔는지 보장하지 않는다는 뜻 |
+| 비 신뢰성 (Unreliable) | 비 신뢰성은 흐름에 관여하지 않기 때문에 보낸 정보가 제대로 갔는지 보장하지 않는다는 뜻 |
 | 에러 제어와 흐름 제어가 없음 | 전송이 가장 중요하고, 보낸 내용을 보장하지 않음 |
 | 대표적인 IP 주소 체계 | 현재 인터넷에서 사용하는 표준 프로토콜은 IPv4이고, 주소 공간 고갈 문제를 겪고 있어 IPv6가 점차 확산 |
 | IP 크기 제한 | IP의 크기는 20~40바이트 |
