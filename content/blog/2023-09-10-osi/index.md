@@ -1,6 +1,6 @@
 ---
 title: 'OSI 7계층 알아보기'
-data: 2023-09-10
+date: 2023-09-10
 description: 'OSI 7계층과 IP에 대해서 알아보자'
 thumbnail: ./thumbnail.png
 ---
