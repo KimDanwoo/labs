@@ -1,5 +1,5 @@
 ---
-title: 'SWR 이해하기 -1'
+title: 'SWR 이해하기'
 date: 2023-09-25
 description: 'SWR(Stale-While-Revalidate).'
 thumbnail: './thumbnail.png'
