@@ -1,10 +1,10 @@
-import * as React from "react";
-import { Helmet } from "react-helmet";
-import { useStaticQuery, graphql } from "gatsby";
+import * as React from 'react'
+import { Helmet } from 'react-helmet'
+import { useStaticQuery, graphql } from 'gatsby'
 
-import SeoProps from "./Seo.types";
+import SeoProps from './Seo.types'
 
-const Seo = ({ title, description, thumbnail, url }: SeoProps)=> {
+const Seo = ({ title, description, thumbnail, url }: SeoProps) => {
   const defaultMeta = useStaticQuery(
     graphql`
       query {
@@ -18,14 +18,14 @@ const Seo = ({ title, description, thumbnail, url }: SeoProps)=> {
         }
       }
     `
-  ).site.siteMetadata as Common.SiteMetadata;
+  ).site.siteMetadata as Common.SiteMetadata
 
   const meta = {
     title: title ?? defaultMeta.title,
     description: description ?? defaultMeta.description,
     thumbnail: thumbnail ?? `${defaultMeta.thumbnail}`,
     url: url ?? defaultMeta.siteUrl
-  };
+  }
 
   return (
     <Helmet
@@ -33,60 +33,63 @@ const Seo = ({ title, description, thumbnail, url }: SeoProps)=> {
       titleTemplate={`%s | ${defaultMeta.title}`}
       link={[
         {
-          rel: "canonical",
+          rel: 'canonical',
           href: meta.url
         }
       ]}
       meta={[
         {
-          name: "description",
+          name: 'description',
           content: meta.description
         },
         {
-          property: "og:locale",
-          content: "ko_KR"
+          property: 'og:locale',
+          content: 'ko_KR'
         },
         {
-          property: "og:type",
-          content: "website"
+          property: 'og:type',
+          content: 'website'
         },
         {
-          property: "og:title",
+          property: 'og:title',
           content: meta.title
         },
         {
-          property: "og:description",
+          property: 'og:description',
           content: meta.description
         },
         {
-          property: "og:image",
+          property: 'og:image',
           content: meta.thumbnail
         },
         {
-          property: "og:url",
+          property: 'og:url',
           content: meta.url
         },
 
         {
-          name: "twitter:card",
-          content: "summary_large_image"
+          name: 'twitter:card',
+          content: 'summary_large_image'
         },
         {
-          name: "twitter:title",
+          name: 'twitter:title',
           content: meta.title
         },
         {
-          name: "twitter:description",
+          name: 'twitter:description',
           content: meta.description
         },
         {
-          name: "twitter:image",
+          name: 'twitter:image',
           content: meta.thumbnail
+        },
+        {
+          name: 'google-site-verification',
+          content: '-kohA7qdl_10fMUGOMlZ7EArpE6vOn0DHONUwImizX8'
         }
       ]}
     />
-  );
+  )
 }
-
 
 export default Seo
