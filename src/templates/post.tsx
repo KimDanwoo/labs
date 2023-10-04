@@ -38,15 +38,19 @@ const Post = ({ data }: PageProps<QueryResult>) => {
           </h1>
           <p className='published-at'>{date}</p>
 
-          {thumbnail && (
+          {thumbnail && title !== '프론트엔드 김단우' && (
             <img className='thumbnail' alt='' {...fallbackThumbnail} />
+          )}
+
+          {thumbnail && title === '프론트엔드 김단우' && (
+            <img className='profile' alt='' {...fallbackThumbnail} />
           )}
         </header>
         <section
           dangerouslySetInnerHTML={{ __html: html }}
           itemProp='articleBody'
         />
-        <Utterances />
+        {title !== '프론트엔드 김단우' && <Utterances />}
       </article>
     </AppLayout>
   )

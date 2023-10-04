@@ -25,7 +25,7 @@ const Main = ({ data }: PageProps<QueryResult>) => {
   return (
     <AppLayout>
       <Seo title='김단우 블로그' />
-      <PostList posts={posts} />
+      <PostList posts={posts.filter(p => p.title !== '프론트엔드 김단우')} />
     </AppLayout>
   )
 }

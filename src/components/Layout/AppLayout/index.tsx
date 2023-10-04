@@ -16,6 +16,9 @@ const AppLayout = ({ children }: PropsWithChildren) => {
             <Link className='link-to-home' to='/'>
               Dansoon
             </Link>
+            <Link className='link-to-about' to='/2023-01-01-intro'>
+              ME
+            </Link>
             <a className='link-to-about' href='https://github.com/KimDanwoo'>
               GITHUB
             </a>
