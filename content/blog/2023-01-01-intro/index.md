@@ -22,18 +22,18 @@ thumbnail: './thumbnail.png'
 
 ### 🏙 아이티스노우볼
 
-Frontend Engineer 2021-09 - 23.09
+Frontend Engineer 21.09 - 23.09
 
 </br>
 
 ### 🖥 팜스태프 농가 CMS 웹페이지 풀스택 제작
 
-2023.06 - 2023.09
+23.06 - 23.09
 
 **_개발 환경_**
 
 - vue, strapi, typescript 사용
-- 상태 관리 라이브러리 pinia 사용
+- pinia 상태관리 라이브러리 사용
 
 **_업무 및 성과_**
 
@@ -51,7 +51,9 @@ Frontend Engineer 2021-09 - 23.09
 
 **_개발 환경_**
 
-Nuxt.js, vuex
+- Nuxt.js 사용
+- vuex 상태관리 라이브러리 사용
+- drag & drop 라이브러리 커스텀 작업
 
 **_업무 및 성과_**
 
@@ -69,7 +71,9 @@ Nuxt.js, vuex
 
 **_개발 환경_**
 
-- vue3, strapi vuex
+- vue3
+- strapi headless CMS 사용
+- vuex 상태관리 라이브러리 사용
 
 **_업무 및 성과_**
 
@@ -87,7 +91,9 @@ Nuxt.js, vuex
 
 ### 개발환경
 
-- React, Redux saga
+- React
+- Redux saga 상태관리
+- MUI UI framework 사용
 
 **_업무 및 성과_**
 
@@ -105,7 +111,9 @@ Nuxt.js, vuex
 
 **_개발 환경_**
 
-- React, Redux saga, i18n
+- React
+- Redux saga 상태관리
+- i18n 다국어 관리
 
 **_업무 및 성과_**
 
@@ -122,7 +130,10 @@ Nuxt.js, vuex
 
 **_개발 환경_**
 
-- vue2 strapi, vuex, graphql, apollo
+- vue2 graphql, apollo
+- strapi headless CMS 사용
+- Redux saga 상태관리
+- graphql apollo 클라이언트 사용
 
 **_업무 및 성과_**
 
@@ -136,7 +147,7 @@ Nuxt.js, vuex
 
 🧑‍💻 **Github** : [https://github.com/KimDanwoo](https://github.com/KimDanwoo)
 
-🧑‍🎨 **퍼블리싱** (2021 2월~7월) : [http://danwoo0.com/](http://danwoo0.com/)
+🧑‍🎨 **퍼블리싱** (21.02~21.07) : [http://danwoo0.com/](http://danwoo0.com/)
 
 📧 **Email :** [dudgh9198@gmail.com](mailto:dudgh9198@gmail.com)
 
