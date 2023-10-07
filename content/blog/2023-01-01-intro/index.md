@@ -1,5 +1,5 @@
 ---
-title: '프론트엔드 김단우'
+title: '🧑🏻‍💻 frontend 김단우'
 description: 'frontend 포트폴리오'
 thumbnail: './thumbnail.png'
 ---
