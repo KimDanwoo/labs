@@ -38,11 +38,11 @@ const Post = ({ data }: PageProps<QueryResult>) => {
           </h1>
           <p className='published-at'>{date}</p>
 
-          {thumbnail && title !== '프론트엔드 김단우' && (
+          {thumbnail && title !== '🧑🏻‍💻 frontend 김단우' && (
             <img className='thumbnail' alt='' {...fallbackThumbnail} />
           )}
 
-          {thumbnail && title === '프론트엔드 김단우' && (
+          {thumbnail && title === '🧑🏻‍💻 frontend 김단우' && (
             <img className='profile' alt='' {...fallbackThumbnail} />
           )}
         </header>
@@ -50,7 +50,7 @@ const Post = ({ data }: PageProps<QueryResult>) => {
           dangerouslySetInnerHTML={{ __html: html }}
           itemProp='articleBody'
         />
-        {title !== '프론트엔드 김단우' && <Utterances />}
+        {title !== '🧑🏻‍💻 frontend 김단우' && <Utterances />}
       </article>
     </AppLayout>
   )
