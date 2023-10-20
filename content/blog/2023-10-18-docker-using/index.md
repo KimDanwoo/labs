@@ -140,4 +140,16 @@ Determining fastest mirror
 No packages marked for update
 ```
 
-... 작성중
+- docker build -t 이미지명 : 라벨명
+
+위 명령어로 이미지 파일을 만들 수 있다.
+
+```jsx
+[root@techsmile-26919 doc_build]# docker images
+```
+
+- docker run 실행 및 확인
+
+docker run -it -d -name 컨테이너 명 -p 80:80 -p 443:443 이미지명:라벨명
+
+위 명령어로 docker 실행및 확인 할 수 있다.
