@@ -81,7 +81,6 @@ thumbnail: './thumbnail.png'
 **아토믹 디자인 뿐만 아니라 디자인 시스템의 컴포넌트는 재사용 될 수 있다**. 재사용성을 높이기 위해, 마진 패딩등과 같은 스타일은 아토믹 컴포넌트에서 정의하지 않고 **컴포넌트를 사용하면서 주입하도록 한다.** 아래와 같이 가장 바깥쪽 DOM의 attribute를 인터페이스로 확장한다. 이걸을 구조 분해 할당을 이용하여 사용하는 곳에서 레이아웃을 지정할 수 있도록 한다. 이 간단한 규칙을 통해 재사용성을 높일 수 있다.
 
 ```jsx
-
 function Comment ({name, children, ...props}) {
 	return (
 		<div {...props}>
@@ -99,7 +98,7 @@ function ProductPage ({
 		<div>
 			...
 			{
-				commentList.map(comment => <Comment style={{ margin: '20px 40px', felx: 1}}
+				commentList.map(comment => (<Comment style={{ margin: '20px 40px', flex: 1}} />))
 			}
 		</div>
 	)
