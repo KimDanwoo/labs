@@ -16,6 +16,7 @@ module.exports = {
     `gatsby-plugin-sitemap`,
     `gatsby-plugin-sass`,
     `gatsby-plugin-image`,
+    'gatsby-plugin-netlify',
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -28,6 +29,14 @@ module.exports = {
       options: {
         path: `${__dirname}/content/assets`,
         name: `images`
+      }
+    },
+    {
+      resolve: 'gatsby-plugin-robots-txt',
+      options: {
+        host: 'https://danwoo-dev.netlify.app/',
+        sitemap: 'https://danwoo-dev.netlify.app/sitemap.xml',
+        policy: [{ userAgent: '*', allow: '/' }]
       }
     },
     {
