@@ -34,7 +34,7 @@ module.exports = {
     {
       resolve: 'gatsby-plugin-robots-txt',
       options: {
-        host: 'https://danwoo-dev.netlify.app/',
+        host: 'https://danwoo-dev.netlify.app',
         sitemap: 'https://danwoo-dev.netlify.app/sitemap.xml',
         policy: [{ userAgent: '*', allow: '/' }]
       }
