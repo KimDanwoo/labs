@@ -5,7 +5,7 @@ const siteMetadata = {
     summary: `웹 프론트엔드 개발자입니다.`
   },
   description: `기록하고 공유합니다`,
-  siteUrl: `https://danwoo-dev.netlify.app/`,
+  siteUrl: `https://danwoo-dev.netlify.app`,
   icon: `content/assets/favicon.png`,
   thumbnail: `https://danwoo-dev.netlify.app//og.png`
 }
@@ -16,7 +16,7 @@ module.exports = {
     `gatsby-plugin-sitemap`,
     `gatsby-plugin-sass`,
     `gatsby-plugin-image`,
-    'gatsby-plugin-netlify',
+    `gatsby-plugin-netlify`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -32,11 +32,11 @@ module.exports = {
       }
     },
     {
-      resolve: 'gatsby-plugin-robots-txt',
+      resolve: `gatsby-plugin-robots-txt`,
       options: {
-        host: 'https://danwoo-dev.netlify.app',
-        sitemap: 'https://danwoo-dev.netlify.app/sitemap.xml',
-        policy: [{ userAgent: '*', allow: '/' }]
+        host: `https://danwoo-dev.netlify.app`,
+        sitemap: `https://danwoo-dev.netlify.app/sitemap-index.xml`,
+        policy: [{ userAgent: `*`, allow: `/` }]
       }
     },
     {
