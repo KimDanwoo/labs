@@ -5,9 +5,9 @@ const siteMetadata = {
     summary: `웹 프론트엔드 개발자입니다.`
   },
   description: `기록하고 공유합니다`,
-  siteUrl: `https://danwoo-dev.netlify.app`,
+  siteUrl: process.env.GETSBY_APP_URL,
   icon: `content/assets/favicon.png`,
-  thumbnail: `https://danwoo-dev.netlify.app//og.png`
+  thumbnail: process.env.GETSBY_APP_URL + `/thumbnail.png`
 }
 
 module.exports = {
@@ -34,8 +34,8 @@ module.exports = {
     {
       resolve: `gatsby-plugin-robots-txt`,
       options: {
-        host: `https://danwoo-dev.netlify.app`,
-        sitemap: `https://danwoo-dev.netlify.app/sitemap-index.xml`,
+        host: process.env.GETSBY_APP_URL,
+        sitemap: process.env.GETSBY_APP_URL + `/sitemap.xml`,
         policy: [{ userAgent: `*`, allow: `/` }]
       }
     },
@@ -146,3 +146,7 @@ module.exports = {
     }
   ]
 }
+
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV}`
+})

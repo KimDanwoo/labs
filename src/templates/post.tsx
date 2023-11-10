@@ -20,10 +20,10 @@ const Post = ({ data }: PageProps<QueryResult>) => {
       <Seo
         title={title}
         description={description}
-        url={`https://danwoo-dev.netlify.app/${fields.slug}`}
+        url={`${process.env.GETSBY_APP_URL}/${fields.slug}`}
         thumbnail={
           thumbnail
-            ? `https://danwoo-dev.netlify.app/${thumbnail.publicURL}`
+            ? `${process.env.GETSBY_APP_URL}/${thumbnail.publicURL}`
             : undefined
         }
       />
