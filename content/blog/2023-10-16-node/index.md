@@ -3,6 +3,7 @@ title: 'Node.js 16 지원종료'
 date: 2023-10-16
 description: 'Node.js 16 지원종료'
 thumbnail: './thumbnail.png'
+category: 'node'
 ---
 
 신규 프로젝트에서는 node 18을 사용해야 될 때이다.

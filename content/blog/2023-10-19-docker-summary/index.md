@@ -3,6 +3,7 @@ title: '[Docker] 도커 간략히 요약'
 date: 2023-10-19
 description: '[Docker] 도커 간략히 요약'
 thumbnail: './thumbnail.png'
+category: 'docker'
 ---
 
 ## 1. docker 지시자

@@ -3,6 +3,7 @@ title: '[Git] Git-flow 이해하기'
 date: 2023-10-20
 description: '[Git] Git-flow 이해하기'
 thumbnail: './thumbnail.png'
+category: 'git'
 ---
 
 ## 1. Git-flow

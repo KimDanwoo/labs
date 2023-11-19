@@ -3,6 +3,7 @@ title: '웹접근성 마스터하기'
 date: 2023-10-31
 description: '웹 접근성이랑 모든사람이 쉽게 사용할 수 있는 웹사이트와 웹 앱을 구축하는 기술이다.'
 thumbnail: ./thumbnail.png
+category: 'frontend'
 ---
 
 ## 웹 접근성이란

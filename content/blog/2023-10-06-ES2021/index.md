@@ -3,6 +3,7 @@ title: 'ES2021'
 date: 2023-10-06
 description: 'ES2021 최신 문법 알아보기'
 thumbnail: './thumbnail.png'
+category: 'javascript'
 ---
 
 ## Promise.any

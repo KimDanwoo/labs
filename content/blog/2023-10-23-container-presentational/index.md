@@ -3,6 +3,7 @@ title: 'Container/Presentational 패턴'
 date: 2023-10-23
 description: 'Container/Presentational 패턴 이해하기'
 thumbnail: './thumbnail.png'
+category: 'pattern'
 ---
 
 ## 1. Container/Presentational 패턴이란?

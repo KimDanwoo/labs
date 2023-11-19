@@ -3,6 +3,7 @@ title: '시맨틱 웹(semantic web)'
 date: 2023-09-21
 description: '기복적으로 검색엔진이 웹사이트 정보를 어떻게 수집하는지 아는 것으로 부터 시작된다.'
 thumbnail: './thumbnail.png'
+category: 'frontend'
 ---
 
 ## 개요

@@ -1,18 +1,25 @@
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import type { PageProps } from 'gatsby'
 import { graphql } from 'gatsby'
 import { AppLayout } from '~/components/Layout'
 import { PostList } from '~/components/Main'
 import { Seo } from '~/components/Common'
 import '../styles/pages/index.scss'
+import uniq from 'lodash/uniq'
+import Categories from '~/components/Category'
 
 const Main = ({ data }: PageProps<QueryResult>) => {
+  const [category, setCategory] = useState<string>('ALL')
   const posts = React.useMemo<Common.Post[]>(
     () =>
       data.allMarkdownRemark.nodes.map(
-        ({ frontmatter: { title, description, thumbnail, date }, fields }) => ({
+        ({
+          frontmatter: { title, description, thumbnail, date, category },
+          fields
+        }) => ({
           title,
           description,
+          category,
           thumbnail:
             thumbnail?.childImageSharp.gatsbyImageData.images.fallback ?? null,
           url: fields.slug,
@@ -22,10 +29,31 @@ const Main = ({ data }: PageProps<QueryResult>) => {
     [data]
   )
 
+  const filterPosts =
+    category !== 'ALL' ? posts.filter(p => p.category === category) : posts
+
+  const categories = useMemo(
+    () => ['ALL', ...uniq(posts.filter(p => p.category).map(p => p.category))],
+    [posts]
+  )
+
+  const handleClickCategory = (tag: string) => {
+    if (tag) {
+      setCategory(tag)
+    }
+  }
+
   return (
     <AppLayout>
       <Seo title='김단우 블로그' />
-      <PostList posts={posts.filter(p => p.title !== '🧑🏻‍💻 frontend 김단우')} />
+      <Categories
+        category={category}
+        categories={categories}
+        handleClickCategory={handleClickCategory}
+      />
+      <PostList
+        posts={filterPosts.filter(p => p.title !== '🧑🏻‍💻 frontend 김단우')}
+      />
     </AppLayout>
   )
 }
@@ -40,6 +68,7 @@ interface QueryResult {
         title: string
         date: string
         description: string
+        category: string
         thumbnail: {
           childImageSharp: {
             gatsbyImageData: {
@@ -69,6 +98,7 @@ export const pageQuery = graphql`
           title
           date(formatString: "YYYY년 M월 D일")
           description
+          category
           thumbnail {
             childImageSharp {
               gatsbyImageData

@@ -3,6 +3,7 @@ title: 'SWR 이해하기 -2'
 date: 2023-10-11
 description: 'SWR(Stale-While-Revalidate)'
 thumbnail: './thumbnail.png'
+category: 'react'
 ---
 
 ## SWR이 유용한 이유

@@ -3,6 +3,7 @@ title: '자료구조'
 date: 2023-09-05
 description: '자료구조 개념 및 종류 정리'
 thumbnail: ./thumbnail.png
+category: 'cs'
 ---
 
 # 자료구조 개념 및 종류 정리

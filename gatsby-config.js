@@ -17,6 +17,7 @@ module.exports = {
     `gatsby-plugin-sass`,
     `gatsby-plugin-image`,
     `gatsby-plugin-netlify`,
+    `gatsby-plugin-lodash`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {

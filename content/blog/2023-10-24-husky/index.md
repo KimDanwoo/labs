@@ -3,6 +3,7 @@ title: 'Husky + Lint-Staged를 활용 git hook 걸기'
 date: 2023-10-24
 description: 'Git Hook을 도와주는 Husky와 Link-Staged'
 thumbnail: './thumbnail.png'
+category: 'git'
 ---
 
 ## 1. git Hook을 도와주는 Husky와 link-staged

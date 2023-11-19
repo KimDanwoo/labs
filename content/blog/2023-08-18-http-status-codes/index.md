@@ -3,6 +3,7 @@ title: 'HTTP Status Code'
 date: 2023-08-18
 description: '웹페이지에서 마주칠 수 있는 각 코드들의 의미에 맞는 적절한 사용을 위해 HTTP Status Code를 알아보자. 전체적으로는 조금 더 많은 응답 이 있지만 그중에 사용할만한 응답을 정리했다.'
 thumbnail: ./thumbnail.png
+category: 'frontend'
 ---
 
 ## 개요

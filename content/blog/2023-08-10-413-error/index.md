@@ -3,6 +3,7 @@ title: 'HTTPS 환경에서 413 Error'
 date: 2023-08-10
 description: '내가 만난 413 error'
 thumbnail: ./thumbnail.png
+category: 'frontend'
 ---
 
 # 발생원인

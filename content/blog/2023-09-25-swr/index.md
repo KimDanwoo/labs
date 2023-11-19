@@ -3,6 +3,7 @@ title: 'SWR 이해하기'
 date: 2023-09-25
 description: 'SWR(Stale-While-Revalidate).'
 thumbnail: './thumbnail.png'
+category: 'react'
 ---
 
 ## 1. SWR이란 (Stale-While-Revalidate)

@@ -3,6 +3,7 @@ title: 'Next.js의 Hydrate란?'
 date: 2023-10-04
 description: 'Next.js의 Hydrate 이해하기'
 thumbnail: './thumbnail.png'
+category: 'react'
 ---
 
 ## 1. Hydrate란?

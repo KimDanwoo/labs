@@ -3,6 +3,7 @@ title: '운영체제란?'
 date: 2023-09-29
 description: '운영체제 알아보기'
 thumbnail: './thumbnail.png'
+category: 'cs'
 ---
 
 ## OS란?

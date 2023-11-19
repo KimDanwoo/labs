@@ -3,6 +3,7 @@ title: '[Git] git cherry-pick 이해하기'
 date: 2023-10-25
 description: '[Git] git cherry-pick 이해하기'
 thumbnail: './thumbnail.png'
+category: 'git'
 ---
 
 ## git cherry-pick?

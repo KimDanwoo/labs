@@ -3,6 +3,7 @@ title: '알고리즘의 종류와 개념'
 date: 2023-09-01
 description: '알고리즘의 종류와 개념 및 코드 for Javascript'
 thumbnail: ./자료구조시간복잡도.png
+category: 'algorithm'
 ---
 
 # 자료구조 개념 및 종류 정리

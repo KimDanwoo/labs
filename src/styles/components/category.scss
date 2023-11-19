@@ -1,0 +1,31 @@
+.categories,
+.categories li {
+  list-style: none;
+}
+
+.categories > * {
+  box-sizing: border-box;
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+}
+
+.categories li {
+  margin: 4px 6px;
+  background: none;
+  border-radius: 45px;
+  border: 1px solid #ccc;
+  padding: 2px 12px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.categories li.active {
+  color: white;
+  background: var(--green0);
+  border: 1px solid var(--green0);
+}

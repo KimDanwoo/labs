@@ -3,6 +3,7 @@ title: 'ES2022'
 date: 2023-10-08
 description: 'ES2022 최신 문법 알아보기'
 thumbnail: './thumbnail.png'
+category: 'javascript'
 ---
 
 ## Class: private,static
