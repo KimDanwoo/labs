@@ -1,6 +1,6 @@
 ---
 title: 'CSS 작성 유의사항'
-date: 2023-11-06
+date: 2023-11-08
 description: 'CSS 작성 유의사항'
 thumbnail: './thumbnail.png'
 category: 'css'
