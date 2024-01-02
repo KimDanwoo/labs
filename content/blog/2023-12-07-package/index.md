@@ -1,6 +1,6 @@
 ---
 title: 'package.json 정리'
-date: 2023-11-16
+date: 2023-12-07
 description: 'package.json은 현재 프로젝트에 관한 정보와, 패키지 매니저(npm,yarn)을 통해 설치한 모듈들의 의존성을 관리하는 파일이다. 일반적으로 루트 디렉토리에 위치한다. 직접 작성할 수 있으나, npm init을 통해 생성할 수 있다.'
 thumbnail: ./thumbnail.png
 category: 'javascript'
