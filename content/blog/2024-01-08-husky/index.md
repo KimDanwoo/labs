@@ -16,19 +16,19 @@ category: 'git'
 
 커밋 워크플로 훅은 **git commit 명령으로 커밋을 할 때 실행하는 훅**이고, 이메일 워크플로 훅은 **git am명령으로 이메일을 통해 patch 파일을 적요할 때 실행하는 훅**이다. 기타 훅은 **Rebase, Merge, Push 와 같은 이벤트를 실행할 때 실행하는 훅을 포함**한다.
 
-| 분류               | 훅                 | 설명                                                                                                                          |
-| ------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| 커밋 워크플로 훅   | pre-commit         | commit 을 실행하기 전에 실행                                                                                                  |
-|                    | prepare-commit-msg | commit 메세지를 생성하고 편집기를 실행하기 전에 실행                                                                          |
-|                    | commit-msg         | commit 메세지를 완성한 후 commit을 최종 완료하기 전에 실행                                                                    |
-|                    | post-commit        | commit을 완료한 후 실행                                                                                                       |
-| 이메일 워크플로 훅 | applypatch-msg     | git am 명령 실행 시 가장 먼저 실행                                                                                            |
-|                    | pre-applypatch     | patch 적용 후 실행하며, patch를 중단시킬 수 있음                                                                              |
-|                    | post-applypatch    | git am 명령에서 마지막으로 실행하며, patch를 중단시킬 수 없음                                                                 |
-| 기타 훅            | pre-rebase         | Rabase하기 전에 실행                                                                                                          |
-|                    | post-rewrite       | git commit -amend, git rebase와 같이 커밋을 변경하는 명령을 실행한 후 실행                                                    |
-|                    | post-merge         | Merge가 끝나고 실행                                                                                                           |
-|                    | pre-push           | git push 명령 실행 시 동작하며 리모트 정보를 업데이트 하고 난 후 리모트로 데이터를 전송하기 전에 실행 push를 중단시킬 수 있음 |
+| 분류                   | 훅                 | 설명                                                                                                                          |
+| ---------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| **커밋 워크플로 훅**   | pre-commit         | commit 을 실행하기 전에 실행                                                                                                  |
+|                        | prepare-commit-msg | commit 메세지를 생성하고 편집기를 실행하기 전에 실행                                                                          |
+|                        | commit-msg         | commit 메세지를 완성한 후 commit을 최종 완료하기 전에 실행                                                                    |
+|                        | post-commit        | commit을 완료한 후 실행                                                                                                       |
+| **이메일 워크플로 훅** | applypatch-msg     | git am 명령 실행 시 가장 먼저 실행                                                                                            |
+|                        | pre-applypatch     | patch 적용 후 실행하며, patch를 중단시킬 수 있음                                                                              |
+|                        | post-applypatch    | git am 명령에서 마지막으로 실행하며, patch를 중단시킬 수 없음                                                                 |
+| **기타 훅**            | pre-rebase         | Rabase하기 전에 실행                                                                                                          |
+|                        | post-rewrite       | git commit -amend, git rebase와 같이 커밋을 변경하는 명령을 실행한 후 실행                                                    |
+|                        | post-merge         | Merge가 끝나고 실행                                                                                                           |
+|                        | pre-push           | git push 명령 실행 시 동작하며 리모트 정보를 업데이트 하고 난 후 리모트로 데이터를 전송하기 전에 실행 push를 중단시킬 수 있음 |
 
 ## Git Hooks를 적용하려면?
 
@@ -89,7 +89,7 @@ Git Hooks를 공유하는 효과적인 방법은 다음과 같다.
 
 1. ⚠️ Git Hooks를 설정하는 스크립트 공유
 2. ⚠️ Git Template 활용
-3. ✅ husky 활용
+3. **✅ husky 활용**
 
 ### ⚠️ Git Hooks를 설정하는 스크립트 공유
 
@@ -139,7 +139,7 @@ git clone --template=/home/temp/git_templates https://github.com/[user]/[project
 
 앞에 설명한 두 가지 방법은 유용하지만 치명적인 문제가 있따. 작업자가 실수로든 고의로든 Git Hooks를 적용하지 않을 가능성이 크다.
 
-Git Hooks를 반드시 적용하게끔 강제할 수 없을까? 만약 프로젝트가 모듈 의존성을 관리하기 위해 npm을 사용하고 있다면 husky는 좋은 선택이 될 수 있다.
+Git Hooks를 반드시 적용하게끔 강제할 수 없을까? 만약 **프로젝트가 모듈 의존성을 관리하기 위해 npm을 사용하고 있다면 husky는 좋은 선택이 될 수 있다.**
 
 ```css
 npm install -D husky
@@ -155,13 +155,13 @@ npx husky add .husky/pre-commit "echo 'Hello World!'"
 
 이 방법을 통해 사용자는 프로젝트별로 commit, push등 정책을 관리하고 공유할 수 있다.
 
-또한 작업자가 의존 모듈을 설치하는 것만으로 husky가 적용된다. 더 이상 설치 스크립트를 실행하지 않거나 옵션을 빠뜨려서 Git Hooks를 적용하지 못하는 상황은 발생하지 않는다.
+또한 작업자가 의존 모듈을 설치하는 것만으로 husky가 적용된다. **더 이상 설치 스크립트를 실행하지 않거나 옵션을 빠뜨려서 Git Hooks를 적용하지 못하는 상황은 발생하지 않는다.**
 
 ### Husky의 동작 방식
 
-단지 모듈을 설치하고 정책을 정의했을 뿐인데 git hooks처럼 동작하고 있다. 왜 그럴까? husky의 구조를 살펴보자.
+**단지 모듈을 설치하고 정책을 정의했을 뿐인데 git hooks처럼 동작하고 있다.** 왜 그럴까? husky의 구조를 살펴보자.
 
-설치한 husky 모듈의 package.json을 확인해보면 install스크립트를 정의하고 있음을 알 수 있다.
+설치한 husky 모듈의 package.json을 확인해보면 **install스크립트를 정의하고 있음을 알 수 있다.**
 
 ./node_modules/husky/package.json
 
@@ -176,11 +176,11 @@ npx husky add .husky/pre-commit "echo 'Hello World!'"
 
 install 스크립트는 npm 스크립트 중 하나로서 npm install명령을 통해 해당 모듈을 설치하면 자동으로 실행하는 스크립트이다. husky를 설치하면 install스크립트인 node husky install을 실행한다.
 
-node husky install을 따라가보면 최정적으로는 자체적으로 구현해놓은 Git Hooks를 .git/hooks디렉토리에 쓴다.
+node husky install을 따라가보면 **최종적으로는 자체적으로 구현해놓은 Git Hooks를 .git/hooks디렉토리에 쓴다.**
 
-실제로 husky를 설치한 뒤 .git/hooks디렉토리 안을 살펴보면 hooks가 설정돼 있다. 각 hooks는 husky.sh를 실행하며, husky.sh는 package.json .huskyrc 등에 정의한 훅을 husky모듈로 실행한다.
+실제로 husky를 설치한 뒤 .git/hooks디렉토리 안을 살펴보면 hooks가 설정돼 있다. 각 hooks는 husky.sh를 실행하며, husky.sh는 package.json **.huskyrc 등에 정의한 훅을 husky모듈로 실행한다.**
 
-### husky를 활용하여 master로 직접 push 방지하기
+### **husky를 활용하여 master로 직접 push 방지하기**
 
 husky를 사용하여 master로 직접 push하기를 방지해보자.
 
