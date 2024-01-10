@@ -10,6 +10,7 @@ import Categories from '~/components/Category'
 
 const Main = ({ data }: PageProps<QueryResult>) => {
   const [category, setCategory] = useState<string>('ALL')
+  const [search, setSearch] = useState<string>('')
   const posts = React.useMemo<Common.Post[]>(
     () =>
       data.allMarkdownRemark.nodes.map(
@@ -29,8 +30,12 @@ const Main = ({ data }: PageProps<QueryResult>) => {
     [data]
   )
 
-  const filterPosts =
-    category !== 'ALL' ? posts.filter(p => p.category === category) : posts
+  let filterPosts =
+    category !== 'ALL'
+      ? posts.filter(p => p.category === category)
+      : search !== ''
+      ? posts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()))
+      : posts
 
   const categories = useMemo(
     () => ['ALL', ...uniq(posts.filter(p => p.category).map(p => p.category))],
@@ -43,6 +48,10 @@ const Main = ({ data }: PageProps<QueryResult>) => {
     }
   }
 
+  const onClickSearch = (text: string) => {
+    setSearch(text)
+  }
+
   return (
     <AppLayout>
       <Seo title='김단우 블로그' />
@@ -50,6 +59,7 @@ const Main = ({ data }: PageProps<QueryResult>) => {
         category={category}
         categories={categories}
         handleClickCategory={handleClickCategory}
+        onClickSearch={onClickSearch}
       />
       <PostList
         posts={filterPosts.filter(p => p.title !== '🧑🏻‍💻 frontend 김단우')}
