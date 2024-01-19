@@ -33,7 +33,7 @@ const PostList = ({ posts }: PostListProps) => {
           </li>
         ))
       ) : (
-        <p className='empty-posts'>찾으시는 포스트가 없습니다.</p>
+        <p className='empty-posts'>검색어에 해당하는 글이 없어요 😭</p>
       )}
     </ul>
   )
