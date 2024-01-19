@@ -5,10 +5,11 @@ import { AppLayout } from '~/components/Layout'
 import { PostList } from '~/components/Main'
 import { Seo } from '~/components/Common'
 import '../styles/pages/index.scss'
-import uniq from 'lodash/uniq'
 import Categories from '~/components/Category'
+import Search from '~/components/Search'
+import uniq from 'lodash/uniq'
 
-const Main = ({ data }: PageProps<QueryResult>) => {
+const Main = ({ data }: PageProps<QueryResult>): JSX.Element => {
   const [category, setCategory] = useState<string>('ALL')
   const [search, setSearch] = useState<string>('')
   const posts = React.useMemo<Common.Post[]>(
@@ -55,11 +56,11 @@ const Main = ({ data }: PageProps<QueryResult>) => {
   return (
     <AppLayout>
       <Seo title='김단우 블로그' />
+      <Search onClickSearch={onClickSearch} />
       <Categories
         category={category}
         categories={categories}
         handleClickCategory={handleClickCategory}
-        onClickSearch={onClickSearch}
       />
       <PostList
         posts={filterPosts.filter(p => p.title !== '🧑🏻‍💻 frontend 김단우')}
