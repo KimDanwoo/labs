@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React from 'react'
 import type { PageProps } from 'gatsby'
 import { graphql } from 'gatsby'
 import { AppLayout } from '~/components/Layout'
@@ -7,51 +7,31 @@ import { Seo } from '~/components/Common'
 import '../styles/pages/index.scss'
 import Categories from '~/components/Category'
 import Search from '~/components/Search'
-import uniq from 'lodash/uniq'
+import useFilter from '~/hooks/useFilter'
 
 const Main = ({ data }: PageProps<QueryResult>): JSX.Element => {
-  const [category, setCategory] = useState<string>('ALL')
-  const [search, setSearch] = useState<string>('')
-  const posts = React.useMemo<Common.Post[]>(
-    () =>
-      data.allMarkdownRemark.nodes.map(
-        ({
-          frontmatter: { title, description, thumbnail, date, category },
-          fields
-        }) => ({
-          title,
-          description,
-          category,
-          thumbnail:
-            thumbnail?.childImageSharp.gatsbyImageData.images.fallback ?? null,
-          url: fields.slug,
-          publishedAt: date
-        })
-      ),
-    [data]
+  const posts = data.allMarkdownRemark.nodes.map(
+    ({
+      frontmatter: { title, description, thumbnail, date, category },
+      fields
+    }) => ({
+      title,
+      description,
+      category,
+      thumbnail:
+        thumbnail?.childImageSharp.gatsbyImageData.images.fallback ?? null,
+      url: fields.slug,
+      publishedAt: date
+    })
   )
-
-  let filterPosts =
-    category !== 'ALL'
-      ? posts.filter(p => p.category === category)
-      : search !== ''
-      ? posts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()))
-      : posts
-
-  const categories = useMemo(
-    () => ['ALL', ...uniq(posts.filter(p => p.category).map(p => p.category))],
-    [posts]
-  )
-
-  const handleClickCategory = (tag: string) => {
-    if (tag) {
-      setCategory(tag)
-    }
-  }
-
-  const onClickSearch = (text: string) => {
-    setSearch(text)
-  }
+  
+  const {
+    category,
+    categories,
+    handleClickCategory,
+    onClickSearch,
+    filteredPosts
+  } = useFilter(posts)
 
   return (
     <AppLayout>
@@ -62,9 +42,7 @@ const Main = ({ data }: PageProps<QueryResult>): JSX.Element => {
         categories={categories}
         handleClickCategory={handleClickCategory}
       />
-      <PostList
-        posts={filterPosts.filter(p => p.title !== '🧑🏻‍💻 frontend 김단우')}
-      />
+      <PostList posts={filteredPosts} />
     </AppLayout>
   )
 }
