@@ -5,7 +5,7 @@ thumbnail: './thumbnail.png'
 category: 'frontend'
 ---
 
-## 🎤 소개
+## 🎨 소개
 
 - 무언갈 빠르게 좋아합니다. 그래서 변화가 빠른 FE 개발이 적성에 잘 맞습니다.
 
@@ -13,23 +13,50 @@ category: 'frontend'
 
 - 자기 계발에 관심이 많고 꾸준한 학습과 성장에 큰 재미를 느낍니다.
 
+- 깔끔한 코드를 작성하지 않으면 마음이 편하지 않습니다.
+
 ---
 
 </br>
+
+## ✨ 기술 스택
+
+WEB : React.js, Vue.js, Next.js, Nuxt.js, Javascript, Typescript
+
+기타 관심 : 리팩토링, Fx.js, CleanCode , 컴포넌트설계 , 프론트엔드 디자인패턴
+
+---
 
 ## 📒 경력
 
 </br>
 
-### 🏙 피터팬의 좋은방구하기 (두꺼비세상)
+### 🏙 (주) 두꺼비세상 (피터팬의 좋은방구하기)
+
+#### 매니저 | 개발팀 | 현재
 
 Frontend Engineer 23.10 ~ ing
 
-### 🏙 아이티스노우볼
+- 피터팬 웹 사이트 운영 및 유지 보수
+- 피터팬 아파트 모바일 웹 페이지 신규 제작
+- 피터팬 중개사 관리자 페이지 운영 및 유지보수
+
+### 🏙 (주) 아이티스노우볼
+
+#### 사원 | E-biz 개발팀 | 퇴사
 
 Frontend Engineer 21.09 - 23.09
 
+- 농업경영 및 농업 관련 CMS 웹페이지 제작
+- 메타버스 기반 수업 관리자 페이지 제작
+- 농업 관련 홈페이지 및 CMS 웹페이지 제작
+- 소방안전 문서관리 웹 페이지 제작
+- 신조어 탐험단 웹 페이지 제작
+- 의류 원단 시뮬레이션 쇼핑몰 프로젝트 (MVP)
+
 </br>
+
+## 📽️ 프로젝트
 
 ### 🖥 피터팬의 좋은방 구하기 사이트 운영 및 유지보수
 
@@ -37,6 +64,8 @@ Frontend Engineer 21.09 - 23.09
 **_업무 및 성과_**
 
 - 피터팬 웹 사이트 운영 및 유지 보수
+- 피터팬 아파트 모바일 웹 페이지 신규 제작
+- 피터팬 중개사 관리자 페이지 운영 및 유지보수
 
 ### 🖥 팜스태프 농가 CMS 웹페이지 풀스택 제작
 
@@ -44,8 +73,7 @@ Frontend Engineer 21.09 - 23.09
 
 **_개발 환경_**
 
-- vue, strapi, typescript 사용
-- pinia 상태관리 라이브러리 사용
+- vue, strapi, typescript, pinia
 
 **_업무 및 성과_**
 
@@ -63,13 +91,10 @@ Frontend Engineer 21.09 - 23.09
 
 **_개발 환경_**
 
-- Nuxt.js 사용
-- vuex 상태관리 라이브러리 사용
-- drag & drop 라이브러리 커스텀 작업
+- Nuxt.js, vuex, drag & drop 라이브러리 커스텀
 
 **_업무 및 성과_**
 
-- Nuxt.js 기반 SSR, CSR 을 활용한 페이지 성능개선
 - 수업자료를 트리 구조 설계 및 드래그 방식으로 구현
 - 챗봇 형식의 보조 선생님(npc) 기능 구현
 - 대용량 트리 자료를 스크롤 페이징 처리로 초기 렌더링 속도 향상
@@ -83,9 +108,7 @@ Frontend Engineer 21.09 - 23.09
 
 **_개발 환경_**
 
-- vue3
-- strapi headless CMS 사용
-- vuex 상태관리 라이브러리 사용
+- vue3, strapi, vuex
 
 **_업무 및 성과_**
 
@@ -103,9 +126,7 @@ Frontend Engineer 21.09 - 23.09
 
 ### 개발환경
 
-- React
-- Redux saga 상태관리
-- MUI UI framework 사용
+- React, Redux saga, MUI
 
 **_업무 및 성과_**
 
@@ -123,9 +144,7 @@ Frontend Engineer 21.09 - 23.09
 
 **_개발 환경_**
 
-- React
-- Redux saga 상태관리
-- i18n 다국어 관리
+- React, Redux ,i18n
 
 **_업무 및 성과_**
 
@@ -142,10 +161,7 @@ Frontend Engineer 21.09 - 23.09
 
 **_개발 환경_**
 
-- vue2 graphql, apollo
-- strapi headless CMS 사용
-- Redux saga 상태관리
-- graphql apollo 클라이언트 사용
+- vue2 graphql, apollo, strapi, vuex
 
 **_업무 및 성과_**
 
@@ -159,18 +175,4 @@ Frontend Engineer 21.09 - 23.09
 
 🧑‍💻 **Github** : [https://github.com/KimDanwoo](https://github.com/KimDanwoo)
 
-🧑‍🎨 **퍼블리싱** (21.02~21.07) : [http://danwoo0.com/](http://danwoo0.com/)
-
-📧 **Email :** [dudgh9198@gmail.com](mailto:dudgh9198@gmail.com)
-
----
-
-</br>
-
-## ✨ 기술 스택
-
-WEB : React.js, Vue.js, Next.js, Nuxt.js, Javascript, Typescript
-
-기타 관심 : 리팩토링, Fx.js, CleanCode , 컴포넌트설계 , 프론트엔드 디자인패턴
-
----
+📧 **Email :** [dudgh9198@gmail.com](mailto:supetstardanwoo@kakao.com)
