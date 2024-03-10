@@ -4,6 +4,7 @@ date: 2024-01-04
 description: '새로운 CSS Reset(번역)'
 thumbnail: './thumbnail.png'
 category: 'css'
+isHidden: false
 ---
 
 > 원문: https://piccalil.li/blog/a-more-modern-css-reset/

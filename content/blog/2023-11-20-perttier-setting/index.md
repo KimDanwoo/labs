@@ -4,6 +4,7 @@ date: 2023-11-20
 description: 'visual Studio Code에서 Prettier는 사용자 편의를 위해 코드의 줄 간격이나 행을 자동으로 깔끔하게 정리해주는 확장 프로그램이다.'
 thumbnail: ./thumbnail.png
 category: 'frontend'
+isHidden: false
 ---
 
 ## VSCode -Prettier

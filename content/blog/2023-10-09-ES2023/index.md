@@ -4,6 +4,7 @@ date: 2023-10-09
 description: 'ES2023 최신 문법 알아보기'
 thumbnail: './thumbnail.png'
 category: 'javascript'
+isHidden: false
 ---
 
 ## Array find from last

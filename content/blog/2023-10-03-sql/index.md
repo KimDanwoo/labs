@@ -4,6 +4,7 @@ date: 2023-10-03
 description: 'SQL 전반적으로 이해하기'
 thumbnail: './thumbnail.png'
 category: 'cs'
+isHidden: false
 ---
 
 ## 1. SQL(Structured Query Language) 이란?

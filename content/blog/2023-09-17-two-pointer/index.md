@@ -4,6 +4,7 @@ date: 2023-09-17
 description: '투포인터 알고리즘'
 thumbnail: './thumbnail.png'
 category: 'algorithm'
+isHidden: false
 ---
 
 # 투포인터 (Two Pointers)

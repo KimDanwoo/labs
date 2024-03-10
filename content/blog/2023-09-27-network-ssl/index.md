@@ -4,6 +4,7 @@ date: 2023-09-27
 description: 'Network-SSL,HTTPS,CA 개념 파악하기'
 thumbnail: './thumbnail.png'
 category: 'cs'
+isHidden: false
 ---
 
 ## SSL (secure socket layer)

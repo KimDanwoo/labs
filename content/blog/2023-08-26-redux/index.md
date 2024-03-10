@@ -4,6 +4,7 @@ date: 2023-08-26
 description: 'redux의 도입과 설명'
 thumbnail: ./thumbnail.png
 category: 'redux'
+isHidden: false
 ---
 
 ## Redux란?
@@ -23,7 +24,9 @@ category: 'redux'
 리덕스가 등장하기 전 프론트엔드에서의 데이터 흐름을 관리하는 방식은 MVC 패턴이였다.
 
 - Model
+
   - 데이터의 비즈니스 로직
+
   ```
   class CounterModel {
     constructor() {
@@ -39,8 +42,11 @@ category: 'redux'
     }
   }
   ```
+
 - View
+
   - 사용자 인터페이스 및 표현 로직
+
   ```
   import React from 'react'
 
@@ -53,8 +59,11 @@ category: 'redux'
     )
   }
   ```
+
 - Controller
+
   - 사용자 입력과 상호작용 관리
+
   ```
   import React, { useState } from 'react'
   import CounterModel from './CounterModel'

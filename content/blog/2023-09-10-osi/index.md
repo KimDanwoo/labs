@@ -4,6 +4,7 @@ date: 2023-09-10
 description: 'OSI 7계층과 IP에 대해서 알아보자'
 thumbnail: ./thumbnail.png
 category: 'cs'
+isHidden: false
 ---
 
 ## **1. OSI (Open System Interconnection) 7 계층**

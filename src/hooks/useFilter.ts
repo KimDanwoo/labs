@@ -6,7 +6,9 @@ export default function useFilter(posts: Common.Post[]) {
   const [search, setSearch] = useState<string>('')
 
   const filteredPosts = (posts: Common.Post[]) => {
-    const filteredPosts = posts.filter(p => p.title !== '🧑🏻‍💻 frontend 김단우')
+    const filteredPosts = posts.filter(
+      p => p.title !== '🧑🏻‍💻 frontend 김단우' && !p.isHidden
+    )
     if (category === 'ALL' && search === '') {
       return filteredPosts
     }

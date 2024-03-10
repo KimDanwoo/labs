@@ -4,6 +4,7 @@ date: 2023-09-24
 description: '객체구조를 제거 한다는 의미가 있다.'
 thumbnail: './thumbnail.png'
 category: 'javascript'
+isHidden: false
 ---
 
 ## 1. Destructuring 이란
