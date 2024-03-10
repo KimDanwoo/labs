@@ -4,6 +4,7 @@ date: 2023-09-29
 description: 'Next.js Router.push와 link,a 차이점 이해하기'
 thumbnail: './thumbnail.png'
 category: 'next'
+isHidden: false
 ---
 
 ## 개요

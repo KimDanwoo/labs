@@ -4,6 +4,7 @@ date: 2023-11-29
 description: '컴포넌트 주도 개발은 컴포넌트 주위에 개발 프로세스를 고정하는 개발 방법론이다. 자세히 말하면 컴포넌트 수준에서 시작해 페이지나 화면 수준에서 끝나는 것으로 bottom up UI를 구축하는 과정을 말한다.'
 thumbnail: ./thumbnail.png
 category: 'javascript'
+isHidden: false
 ---
 
 ## 개요

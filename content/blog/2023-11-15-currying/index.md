@@ -5,7 +5,8 @@ description: "함수형 프로그래밍(FP)과 객체지향 프로그래밍(OOP)
 두 패러다임의 특정한 패턴에 대한 추론을 배우면 두가지를 깊이 이해할 수 있다.
 이 글에서는 **커링함수**를 주로 살펴볼 예정이다."
 thumbnail: ./thumbnail.png
-category: 'javascript'
+category: 'javascript' 
+isHidden: false
 ---
 
 ## 개요

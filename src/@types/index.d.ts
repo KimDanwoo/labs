@@ -10,6 +10,7 @@ declare module Common {
     title: string
     description: string
     category: string
+    isHidden: boolean
     thumbnail: {
       src: string
       srcSet: string

@@ -4,6 +4,7 @@ date: 2023-10-11
 description: 'SWR(Stale-While-Revalidate)'
 thumbnail: './thumbnail.png'
 category: 'react'
+isHidden: false
 ---
 
 ## SWR이 유용한 이유

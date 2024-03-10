@@ -4,6 +4,7 @@ date: 2024-01-08
 description: 'husky와  git hook을 알아보자'
 thumbnail: './thumbnail.png'
 category: 'git'
+isHidden: false
 ---
 
 ## Git Hooks 란?

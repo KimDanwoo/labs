@@ -4,6 +4,7 @@ date: 2023-12-27
 description: 'CSS 작성 유의사항'
 thumbnail: './thumbnail.png'
 category: 'css'
+isHidden: false
 ---
 
 ## 취소 스타일 (Undoing styles)

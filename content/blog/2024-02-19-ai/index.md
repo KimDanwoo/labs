@@ -4,6 +4,7 @@ date: 2024-02-19
 description: '원문 https://pchojecki.medium.com/there-will-be-no-programmers-in-5-years-f07cd78c69d5'
 thumbnail: './thumbnail.png'
 category: 'translation'
+isHidden: false
 ---
 
 원문

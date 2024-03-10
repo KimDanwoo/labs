@@ -4,6 +4,7 @@ date: 2023-10-21
 description: '웹 프론트 개발 프레임워크 라이브러리인 Angular,Vue,React는 컴포넌트 단위로 개발을 진행한다. 이러한 컴포넌트를 가장 작은 단위로 설정하고 이를 바탕으로 상위 컴포넌트를 만들어 코드 재사용을 최대화하는 방법론이다. 따라서 아토믹 디자인이 컴포넌트 중심 설계 패턴에서 더욱 주목받게 되었다.'
 thumbnail: './thumbnail.png'
 category: 'pattern'
+isHidden: false
 ---
 
 ## 1. Atomic Design이란?

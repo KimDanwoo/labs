@@ -4,6 +4,7 @@ date: 2023-08-10
 description: '내가 만난 413 error'
 thumbnail: ./thumbnail.png
 category: 'frontend'
+isHidden: false
 ---
 
 # 발생원인

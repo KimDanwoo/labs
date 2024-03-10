@@ -12,19 +12,20 @@ import useFilter from '~/hooks/useFilter'
 const Main = ({ data }: PageProps<QueryResult>): JSX.Element => {
   const posts = data.allMarkdownRemark.nodes.map(
     ({
-      frontmatter: { title, description, thumbnail, date, category },
+      frontmatter: { title, description, thumbnail, date, category, isHidden },
       fields
     }) => ({
       title,
       description,
       category,
+      isHidden,
       thumbnail:
         thumbnail?.childImageSharp.gatsbyImageData.images.fallback ?? null,
       url: fields.slug,
       publishedAt: date
     })
   )
-  
+
   const {
     category,
     categories,
@@ -58,6 +59,7 @@ interface QueryResult {
         date: string
         description: string
         category: string
+        isHidden: boolean
         thumbnail: {
           childImageSharp: {
             gatsbyImageData: {
@@ -88,6 +90,7 @@ export const pageQuery = graphql`
           date(formatString: "YYYY년 M월 D일")
           description
           category
+          isHidden
           thumbnail {
             childImageSharp {
               gatsbyImageData
