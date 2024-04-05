@@ -4,7 +4,7 @@ date: 2024-03-12
 description: 'React Deep Dive - 1'
 thumbnail: './thumbnail.png'
 category: 'react'
-isHidden: true
+isHidden: false
 ---
 
 ## 1. 리액트의 역사
