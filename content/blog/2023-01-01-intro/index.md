@@ -1,7 +1,6 @@
 ---
 title: '🧑🏻‍💻 frontend 김단우'
 description: 'frontend 포트폴리오'
-thumbnail: './thumbnail.png'
 category: 'frontend'
 isHidden: false
 ---
@@ -16,17 +15,15 @@ isHidden: false
 
 - 깔끔한 코드를 작성하지 않으면 마음이 편하지 않습니다.
 
----
-
 </br>
 
 ## ✨ 기술 스택
 
 WEB : React.js, Vue.js, Next.js, Nuxt.js, Javascript, Typescript
 
-기타 관심 : 리팩토링, Fx.js, CleanCode , 컴포넌트설계 , 프론트엔드 디자인패턴
+기타 관심 : 리팩토링, CleanCode , 컴포넌트설계 , 프론트엔드 디자인패턴
 
----
+</br>
 
 ## 📒 경력
 
