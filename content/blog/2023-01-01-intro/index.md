@@ -36,7 +36,7 @@ WEB : React.js, Vue.js, Next.js, Nuxt.js, Javascript, Typescript
 Frontend Engineer 23.10 ~ ing
 
 - 피터팬의 좋은방 구하기 사이트 운영 및 유지 보수
-- 레거시 코드 vue 변경 및 코드 재작성으로 유지 보수 향상
+- 레거시 코드 vue로 변경 및 코드 재작성으로 유지 보수 향상
 - storybook 컴포넌트 개발
 - 아파트 모바일 웹 개발
 
