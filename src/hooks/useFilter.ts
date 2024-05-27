@@ -9,6 +9,7 @@ export default function useFilter(posts: Common.Post[]) {
     const filteredPosts = posts.filter(
       p => p.title !== '🧑🏻‍💻 frontend 김단우' && !p.isHidden
     )
+
     if (category === 'ALL' && search === '') {
       return filteredPosts
     }
