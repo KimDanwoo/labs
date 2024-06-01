@@ -1,6 +1,6 @@
 ---
 title: '[스터디] React Deep Dive - 1'
-date: 2024-03-12
+date: 2024-05-28
 description: 'React Deep Dive - 1'
 thumbnail: './thumbnail.png'
 category: 'react'
