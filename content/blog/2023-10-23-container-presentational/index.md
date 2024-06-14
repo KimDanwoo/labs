@@ -4,7 +4,7 @@ date: 2023-10-23
 description: 'Container/Presentational 패턴 이해하기'
 thumbnail: './thumbnail.png'
 category: 'pattern'
-isHidden: true
+isHidden: false
 ---
 
 ## 1. Container/Presentational 패턴이란?
