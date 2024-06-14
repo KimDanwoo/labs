@@ -4,7 +4,7 @@ date: 2023-08-26
 description: 'redux의 도입과 설명'
 thumbnail: ./thumbnail.png
 category: 'redux'
-isHidden: true
+isHidden: false
 ---
 
 ## Redux란?

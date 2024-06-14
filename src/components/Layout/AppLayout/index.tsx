@@ -27,7 +27,6 @@ const AppLayout = ({ children }: PropsWithChildren) => {
         <main>{children}</main>
         <footer>
           ©<a href='https://github.com/KimDanwoo'>Danwoo</a>, Built with
-          {` `}
           <a href='https://www.gatsbyjs.com'>Gatsby</a>
         </footer>
       </div>

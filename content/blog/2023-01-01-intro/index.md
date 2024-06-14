@@ -2,7 +2,7 @@
 title: '🧑🏻‍💻 frontend 김단우'
 description: 'frontend 포트폴리오'
 category: 'frontend'
-isHidden: false
+isHidden: true
 ---
 
 ## 🎨 소개
