@@ -101,7 +101,7 @@ React, Vue, Next, Nuxt, Javascript, Typescript
 
 - 소방 점검 업체의 편리함을 위한 점검 웹 앱 개발
 - 유저 유형 별 분기 처리 flow 설계 및 권한 별 접근 화면 고려
-- refresh token 도입으로 인한 보안 강화
+- jwt token 도입
 - 공공 api 적용으로 주소 입력 시 건물 정보 자동 입력 구현
 - 작성한 보고서 pdf로 저장기능 구현
 
