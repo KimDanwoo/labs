@@ -1,6 +1,6 @@
 ---
-title: '🧑🏻‍💻 frontend 김단우'
-description: 'frontend 포트폴리오'
+title: '🧑🏻‍💻 Frontend Engineer 김단우'
+description: 'Frontend Engineer 김단우 포트폴리오'
 category: 'frontend'
 isHidden: true
 ---
