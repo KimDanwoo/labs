@@ -3,7 +3,7 @@ title: '[항해99] 1. 항해 플러스를 시작하는 마음가짐!'
 date: 2024-09-21
 description: '항해 플러스를 시작하는 마음가짐!'
 thumbnail: './thumbnail.png'
-category: 'node'
+category: '항해플러스'
 isHidden: false
 ---
 
