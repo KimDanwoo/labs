@@ -5,10 +5,10 @@ category: 'frontend'
 isHidden: true
 ---
 
-🧑‍💻 **Github** : [https://github.com/KimDanwoo](https://github.com/KimDanwoo)</br>
-📧 **Email :** [https:supetstardanwoo@kakao.com](https:supetstardanwoo@kakao.com)</br>
-📧 **LinkedIn :** [https://www.linkedin.com/in/danwoo0](https://www.linkedin.com/in/danwoo0/)
-</br>
+[**GitHub**](https://github.com/KimDanwoo)
+[**Email**](mailto:supetstardanwoo@kakao.com)
+[**LinkedIn**](https://www.linkedin.com/in/danwoo0/)
+
 </br>
 
 ## ✨ 소개
