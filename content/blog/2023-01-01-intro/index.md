@@ -5,7 +5,6 @@ category: 'frontend'
 isHidden: true
 ---
 
-[**GitHub**](https://github.com/KimDanwoo)
 [**Email**](mailto:supetstardanwoo@kakao.com)
 [**LinkedIn**](https://www.linkedin.com/in/danwoo0/)
 
