@@ -12,8 +12,6 @@ isHidden: true
 
 ## ✨ 소개
 
-- 무언갈 빠르게 좋아합니다. 그래서 변화가 빠른 FE 개발이 적성에 잘 맞습니다.
-
 - 주도적으로 업무를 진행할 수 있는 환경을 선호합니다.
 
 - 자기 계발에 관심이 많고 꾸준한 학습과 성장에 큰 재미를 느낍니다.
@@ -24,7 +22,7 @@ isHidden: true
 
 ## ✨ 기술 스택
 
-React, Vue, Next, Nuxt, Javascript, Typescript
+React, Vue, Next, Nuxt, JavaScript, TypeScript
 </br>
 </br>
 
