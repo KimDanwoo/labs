@@ -24,22 +24,22 @@ isHidden: true
 
 ### **⚙️ Frontend Development**
 
-- **Frameworks**: Vue.js (Vue2, Vue3), React.js, Next.js, Nuxt.js
+- **Frameworks**: Vue.js (Vue 2, Vue 3), React, Next.js, Nuxt
 - **State Management**: Redux, Vuex, Pinia, Zustand
-- **Form Management**: React-Hook-Form
+- **Form Management**: React Hook Form
 - **Languages**: JavaScript, TypeScript
 
 ### **⚙️ Styling**
 
 - **CSS Frameworks**: Tailwind CSS, SCSS
-- **UI Libraries**: MUI, Styled-Components
+- **UI Libraries**: MUI, styled-components
 
 ### **⚙️ Version Control & Collaboration**
 
-- **Tools**: Git, GitHub, GitLab, Jira, Confluence, Slack
+- **Tools**: GitHub, GitLab, Jira, Confluence, Slack
 
-  </br>
-  </br>
+</br>
+</br>
 
 ## 🏢 (주) 두꺼비세상 (피터팬의 좋은방구하기)
 
@@ -94,7 +94,7 @@ isHidden: true
 
 - 농가 회계 관리 및 영농일지, 영농 계획서, 유형 자산 등 관리 페이지 제작
 - 백 오피스 환경에 필요한 excel형태 form 제작 및 인쇄기능 및 excel 다운로드 구현
-- 권한 기반 접근 제어를 설계하고 사용자 유형에 따른 맞춤형 메뉴 구현
+- 유저 권한 기반 접근 제어를 설계하고 사용자 유형에 따른 맞춤형 메뉴 구현
 
 </br>
 
