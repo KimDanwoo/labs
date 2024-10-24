@@ -139,7 +139,8 @@ isHidden: true
 **_개발 환경_** : vue2 graphql, apollo, strapi, vuex
 
 - 고객 선택 원단의 의류 시각화 기능 구현 및 원단 관리 백오피스 구축.
-  </br>
+
+</br></br>
 
 ## 📝 자격증
 
