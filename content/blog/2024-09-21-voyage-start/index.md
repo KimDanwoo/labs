@@ -4,7 +4,7 @@ date: 2024-09-21
 description: '항해 플러스를 시작하는 마음가짐!'
 thumbnail: './thumbnail.png'
 category: '항해플러스'
-isHidden: false
+isHidden: true
 ---
 
 ## 지금까지의 회고
