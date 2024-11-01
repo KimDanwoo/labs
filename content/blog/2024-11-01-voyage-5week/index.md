@@ -1,9 +1,9 @@
 ---
-title: '[항해99] 리액트 리팩토링: Context와 Hook을 활용한 상태 관리 개선 [WIL]'
+title: '리액트 리팩토링: Context와 Hook을 활용한 상태 관리 개선'
 date: 2024-11-01
 description: 'Context와 Hook을 활용한 상태 관리 개선'
 thumbnail: './thumbnail.png'
-category: '항해플러스'
+category: 'WIL'
 isHidden: false
 ---
 

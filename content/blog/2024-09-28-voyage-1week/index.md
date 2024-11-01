@@ -1,9 +1,9 @@
 ---
-title: '[항해99] 2. 1주차 과정 회고'
+title: 'Vanilla JavaScript로 SPA 구현하기'
 date: 2024-09-28
-description: '1주차 과정 회고'
+description: 'Vanilla JavaScript로 SPA 구현하기'
 thumbnail: './thumbnail.png'
-category: '항해플러스'
+category: 'WIL'
 isHidden: false
 ---
 

@@ -1,9 +1,9 @@
 ---
-title: '[항해99] 리액트 훅을 처음부터 직접 만들면 어떤 느낌일까? [WIL]'
+title: '리액트 훅을 처음부터 직접 만들면 어떤 느낌일까?'
 date: 2024-10-14
 description: '직접 만들며 이해하는 리액트 훅과 최적화'
 thumbnail: './thumbnail.png'
-category: '항해플러스'
+category: 'WIL'
 isHidden: false
 ---
 
