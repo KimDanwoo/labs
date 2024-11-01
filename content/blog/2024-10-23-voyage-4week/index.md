@@ -1,9 +1,9 @@
 ---
-title: '[항해99] 의미 있는 코드로 성장하기: 리액트 전환기에서 배운 것들 [WIL]'
+title: '의미 있는 코드로 성장하기: 리액트 전환기에서 배운 것들 [WIL]'
 date: 2024-10-23
 description: '의미 있는 코드로 성장하기: 리액트 전환기에서 배운 것들'
 thumbnail: './thumbnail.png'
-category: '항해플러스'
+category: 'WIL'
 isHidden: false
 ---
 

@@ -1,9 +1,9 @@
 ---
-title: '[항해99] 내가 리액트를 직접 만들어봤다? 2주차 성장기 [WIL]'
+title: '내가 리액트를 직접 만들어봤다?'
 date: 2024-10-05
 description: '직접 만들며 이해하는 리액트'
 thumbnail: './thumbnail.png'
-category: '항해플러스'
+category: 'WIL'
 isHidden: false
 ---
 
