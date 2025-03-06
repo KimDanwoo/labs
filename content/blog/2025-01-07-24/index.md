@@ -4,7 +4,6 @@ date: 2025-01-10
 description: '24년을 마치며 한해를 되돌아보는 회고'
 category: 'wil'
 isHidden: false
-thumbnail: './thumbnail.jpeg'
 ---
 
 ## 들어가며

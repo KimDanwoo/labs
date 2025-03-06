@@ -4,7 +4,7 @@ date: 2024-11-02
 description: 'FSD 패턴과 상태 관리 리팩토링'
 thumbnail: './thumbnail.png'
 category: 'WIL'
-isHidden: false
+isHidden: true
 ---
 
 ## **1. 문제**

@@ -4,7 +4,7 @@ date: 2024-10-26
 description: 'Context와 Hook을 활용한 상태 관리 개선'
 thumbnail: './thumbnail.png'
 category: 'WIL'
-isHidden: false
+isHidden: true
 ---
 
 ## **1. 문제**

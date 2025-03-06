@@ -4,7 +4,7 @@ date: 2024-03-06
 description: '덕 타이핑과 구조적 타이핑의 차이 이해하기'
 thumbnail: './thumbnail.png'
 category: 'typescript'
-isHidden: false
+isHidden: true
 ---
 
 ## 🪿 덕 타이핑

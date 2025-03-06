@@ -6,7 +6,7 @@ description: "함수형 프로그래밍(FP)과 객체지향 프로그래밍(OOP)
 이 글에서는 **커링함수**를 주로 살펴볼 예정이다."
 thumbnail: ./thumbnail.png
 category: 'javascript' 
-isHidden: false
+isHidden: true
 ---
 
 ## 개요

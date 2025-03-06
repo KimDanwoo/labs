@@ -3,7 +3,7 @@ title: '내가 보려고 정리한 FSD'
 date: 2024-12-28
 description: '내가 보려고 정리한 FSD'
 category: 'design'
-isHidden: false
+isHidden: true
 thumbnail: './thumbnail.png'
 ---
 

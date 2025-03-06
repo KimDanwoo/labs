@@ -4,7 +4,7 @@ date: 2024-02-19
 description: '원문 https://www.robinwieruch.de/react-trends/'
 thumbnail: './thumbnail.png'
 category: 'translation'
-isHidden: false
+isHidden: true
 ---
 
 원문

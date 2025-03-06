@@ -4,7 +4,7 @@ date: 2023-11-03
 description: 'React Children API 이해하기'
 thumbnail: './thumbnail.png'
 category: 'react'
-isHidden: false
+isHidden: true
 ---
 
 ## Children APi의 필요성
