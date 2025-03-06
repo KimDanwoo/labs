@@ -4,7 +4,7 @@ date: 2024-10-05
 description: '직접 만들며 이해하는 리액트'
 thumbnail: './thumbnail.png'
 category: 'WIL'
-isHidden: false
+isHidden: true
 ---
 
 ## 1. 문제

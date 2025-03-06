@@ -4,7 +4,7 @@ date: 2024-09-28
 description: 'Vanilla JavaScript로 SPA 구현하기'
 thumbnail: './thumbnail.png'
 category: 'WIL'
-isHidden: false
+isHidden: true
 ---
 
 ## 과제 개요

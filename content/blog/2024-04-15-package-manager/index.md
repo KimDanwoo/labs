@@ -4,7 +4,7 @@ date: 2024-04-15
 description: 'npm vs Yarn vs pnpm'
 thumbnail: './thumbnail.png'
 category: 'react'
-isHidden: false
+isHidden: true
 ---
 
 ## Introduction

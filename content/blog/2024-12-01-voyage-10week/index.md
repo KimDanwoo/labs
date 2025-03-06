@@ -4,7 +4,7 @@ date: 2024-12-01
 description: '클라우드 기반 배포 자동화 여정: AWS S3부터 GitHub Actions까지'
 thumbnail: './thumbnail.png'
 category: 'WIL'
-isHidden: false
+isHidden: true
 ---
 
 ## **1. 문제**

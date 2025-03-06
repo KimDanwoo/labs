@@ -4,7 +4,7 @@ date: 2024-12-10
 description: '어느 3년차 개발자의 회고록'
 thumbnail: './thumbnail.png'
 category: 'WIL'
-isHidden: false
+isHidden: true
 ---
 
 ## 신입 시절을 돌아보며

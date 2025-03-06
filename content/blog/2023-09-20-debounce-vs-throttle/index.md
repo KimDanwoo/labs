@@ -4,7 +4,7 @@ date: 2023-09-20
 description: 'Throttle, Debounce with next.js'
 thumbnail: './thumbnail.png'
 category: 'javascript'
-isHidden: false
+isHidden: true
 ---
 
 ## 소개

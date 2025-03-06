@@ -4,7 +4,7 @@ date: 2024-11-23
 description: '테스트 시나리오 작성과 E2E 테스트'
 thumbnail: './thumbnail.png'
 category: 'WIL'
-isHidden: false
+isHidden: true
 ---
 
 ## **1. 문제**
