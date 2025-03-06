@@ -4,7 +4,7 @@ date: 2024-11-13
 description: '테스트 코드 작성, FSD 패턴 리팩토링을 곁들인'
 thumbnail: './thumbnail.png'
 category: 'WIL'
-isHidden: false
+isHidden: true
 ---
 
 ## **1. 문제**

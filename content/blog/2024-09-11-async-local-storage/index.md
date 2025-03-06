@@ -4,7 +4,7 @@ date: 2024-09-11
 description: 'Node.js에서는 AsyncLocalStorage를 통해 비동기 흐름에서 데이터를 안전하게 관리할 수 있다. React는 주로 클라이언트 측 라이브러리지만, AsyncLocalStorage는 서버 사이드 렌더링(SSR) 환경에서 유용하게 사용될 수 있다. 이번 글에서는 React와 AsyncLocalStorage를 연계해 사용하는 방법을 알아보자.'
 thumbnail: './thumbnail.png'
 category: 'node'
-isHidden: false
+isHidden: true
 ---
 
 Node.js에서는 `AsyncLocalStorage`를 통해 비동기 흐름에서 데이터를 안전하게 관리할 수 있다. React는 주로 **클라이언트 측 라이브러리**지만, `AsyncLocalStorage`는 **서버 사이드 렌더링(SSR)** 환경에서 유용하게 사용될 수 있다. 이번 글에서는 React와 `AsyncLocalStorage`를 연계해 사용하는 방법을 알아보자.

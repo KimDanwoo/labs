@@ -4,7 +4,7 @@ date: 2023-10-01
 description: '빌드툴과 SWC 이해하기'
 thumbnail: './thumbnail.png'
 category: 'javascript'
-isHidden: false
+isHidden: true
 ---
 
 ## 1. 바벨 (Babel)

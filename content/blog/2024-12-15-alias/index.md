@@ -3,7 +3,7 @@ title: 'import 경로 관리 알아보기 (alias와 barrel 패턴, FSD)'
 date: 2024-12-15
 description: 'import 경로 관리 알아보기 (alias와 barrel 패턴, FSD)'
 category: 'JavaScript'
-isHidden: false
+isHidden: true
 thumbnail: './thumbnail.png'
 ---
 
