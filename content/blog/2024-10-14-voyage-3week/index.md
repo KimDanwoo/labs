@@ -4,7 +4,7 @@ date: 2024-10-14
 description: '직접 만들며 이해하는 리액트 훅과 최적화'
 thumbnail: './thumbnail.png'
 category: 'WIL'
-isHidden: false
+isHidden: true
 ---
 
 ## 1. 문제

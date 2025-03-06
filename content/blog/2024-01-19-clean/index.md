@@ -4,7 +4,7 @@ date: 2024-01-08
 description: '클린 아키텍쳐는 어플리케이션 도메인과의 근접성에 따라 책임과 기능의 일부를 분리하는 방법이다.'
 thumbnail: './thumbnail.png'
 category: 'architecture'
-isHidden: false
+isHidden: true
 ---
 
 원문 주소:https://bespoyasov.me/blog/clean-architecture-on-frontend/

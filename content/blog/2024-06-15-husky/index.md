@@ -4,7 +4,7 @@ date: 2024-06-15
 description: 'Git Hook을 도와주는 Husky와 Link-Staged'
 thumbnail: './thumbnail.png'
 category: 'git'
-isHidden: false
+isHidden: true
 ---
 
 ## 1. git Hook을 도와주는 Husky와 link-staged
