@@ -30,7 +30,10 @@ export default function useFilter(posts: Common.Post[]) {
   }
 
   const categories = useMemo(
-    () => ['ALL', ...uniq(posts.filter(p => p.category).map(p => p.category))],
+    () => [
+      'ALL',
+      ...uniq(posts.filter(p => p.category && !p.isHidden).map(p => p.category))
+    ],
     [posts]
   )
 
