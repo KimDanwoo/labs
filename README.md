@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TypeScript Sudoku Engine
 
-## Getting Started
+TypeScript로 구현된 고성능 스도쿠 게임 엔진입니다. 무한한 퍼즐 생성, 다양한 난이도 설정, 백트래킹 솔버 등을 제공합니다.
 
-First, run the development server:
+> 🚧 **개발 중인 프로젝트입니다.** 현재 열정을 가지고 개발 중이며, 테스트 단계를 완료한 후 정식 배포할 예정입니다.
+
+## 프로젝트 소개
+
+이 프로젝트는 개인적인 열정과 스도쿠에 대한 관심에서 시작되었습니다. 현대적인 TypeScript를 활용하여 재미있는 스도쿠 게임을 구현하면서도, 깔끔하고 확장 가능한 코드 작성을 목표로 하고 있습니다. 알고리즘과 게임 로직에 대한 이해를 높이고 실제 사용 가능한 완성도 높은 프로젝트를 만들어가는 과정을 즐기고 있습니다.
+
+## 개발 현황
+
+- ✅ 기본 스도쿠 생성 알고리즘 구현
+- ✅ 난이도 조정 시스템 개발
+- ✅ 백트래킹 솔버 구현
+- ✅ 충돌 감지 및 힌트 시스템
+- 🔄 테스트 진행 중
+- 📝 문서화 작업 중
+- 🚀 배포 준비 중
+
+## 주요 기능
+
+- 🎲 무한한 스도쿠 퍼즐 생성
+- 🎚️ 세 가지 난이도 레벨 (쉬움, 중간, 어려움)
+- 💡 지능형 힌트 시스템 및 충돌 감지
+- 🧮 백트래킹 알고리즘 기반 솔버
+- 🔍 단일 솔루션 검증
+- ⏱️ 게임 시간 추적 기능
+- 📝 메모 기능 지원
+
+## 로드맵
+
+- 📱 반응형 UI 구현 
+- 🌙 다크/라이트 테마 지원
+- 🏆 점수 시스템 및 리더보드
+- 💾 게임 저장 및 불러오기 기능
+- 🌐 온라인 멀티플레이어 모드 (장기 목표)
+
+## 설치 및 사용 방법
+
+현재 개발 단계이므로 정식 배포 전까지는 다음 단계를 통해 로컬에서 실행할 수 있습니다:
 
 ```bash
+# 저장소 클론
+git clone https://github.com/yourusername/sudoku-engine.git
+
+# 디렉토리 이동
+cd sudoku-engine
+
+# 의존성 설치
+npm install
+
+# 개발 서버 실행
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
