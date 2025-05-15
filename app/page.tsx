@@ -26,19 +26,19 @@ const GameStatus = dynamic(
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center py-10 bg-gray-100">
-      {/* <h1 className="text-3xl font-bold mb-6">스도쿠 게임</h1> */}
+    <main className="min-h-screen flex flex-col items-center justify-center">
+      <h1 className="text-3xl font-bold mb-6">스도쿠 게임</h1>
       
-      <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-        <GameStatus />
-        <SudokuBoard />
-        <SelectNumber />
-        <Controls />
+      <div className="mx-auto p-6  rounded-lg flex flex-col lg:flex-row">
+        <div>
+          <GameStatus />
+          <SudokuBoard />
+        </div>
+        <div className='lg:max-w-[400px]'>
+          <Controls />
+          <SelectNumber />
+        </div>
       </div>
-      
-      {/* <footer className="mt-8 text-center text-gray-500">
-        <p>Next.js + TypeScript + Zustand + FSD로 구현한 스도쿠</p>
-      </footer> */}
     </main>
   );
 }

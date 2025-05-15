@@ -26,7 +26,7 @@ const NumberButton: React.FC<NumberButtonProps> = ({
 
   return (
     <button
-      className="w-10 h-10 bg-gray-200 rounded-md flex items-center justify-center text-xl font-semibold hover:bg-gray-300 transition-colors"
+      className="lg:w-30 lg:h-30 md:w-10 md:h-10 bg-gray-200 rounded-md flex items-center justify-center text-xl font-semibold hover:bg-gray-300 transition-colors"
       onClick={handleClick}
     >
       {value}
