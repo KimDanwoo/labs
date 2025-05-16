@@ -12,7 +12,11 @@ const GameStatus = dynamic(() => import("@widgets/game-status/ui/GameStatus"), {
 
 export default function Home() {
   return (
-    <main className="min-w-[400px] min-h-screen flex flex-col items-center justify-center">
+    <main className="min-w-[400px] min-h-screen flex flex-col gap-6">
+      <div className="px-2 h-[60px] flex flex-row gap-4">
+        <button>클래식</button>
+        <button>킬러</button>
+      </div>
       <div className="mx-auto p-6  rounded-lg flex flex-col lg:flex-row">
         <div>
           <GameStatus />

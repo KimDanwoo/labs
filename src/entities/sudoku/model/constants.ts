@@ -12,6 +12,9 @@ export const HARD = "hard";
 export const EXPERT = "expert";
 export const IMPOSSIBLE = "impossible";
 
+export const CLASSIC_MODE = "classic";
+export const KILLER_MODE = "killer";
+
 export const DIFFICULTY_RANGES: Record<Difficulty, DifficultyRange> = {
   [EASY]: { min: 28, max: 35 },
   [MEDIUM]: { min: 40, max: 50 },

@@ -1,5 +1,6 @@
-import { EASY, EXPERT, HARD, IMPOSSIBLE, MEDIUM } from "./constants";
+import { CLASSIC_MODE, EASY, EXPERT, HARD, IMPOSSIBLE, KILLER_MODE, MEDIUM } from "./constants";
 
+export type GameMode = typeof CLASSIC_MODE | typeof KILLER_MODE;
 export type Grid = number[][];
 export type GridPosition = [row: number, col: number];
 export type Difficulty = typeof EASY | typeof MEDIUM | typeof HARD | typeof EXPERT | typeof IMPOSSIBLE;
@@ -37,6 +38,7 @@ export interface SudokuState {
   timerActive: boolean;
   difficulty: Difficulty;
   highlightedCells: Record<string, CellHighlight>;
+  numberCounts: Record<number, number>;
 }
 
 export interface CellHighlight {
