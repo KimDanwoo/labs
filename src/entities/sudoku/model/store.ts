@@ -117,13 +117,12 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         if (gameMode === KILLER_MODE) {
           // 킬러 모드 보드 생성
 
-          console.log(difficulty);
-          const killerResult = generateKillerBoard(solution, MEDIUM);
+          const killerResult = generateKillerBoard(solution, difficulty);
           board = killerResult.board;
           cages = killerResult.cages;
         } else {
           // 일반 모드 보드 생성
-          board = generateBoard(solution, MEDIUM);
+          board = generateBoard(solution, difficulty);
         }
 
         set({

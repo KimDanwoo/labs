@@ -2,7 +2,8 @@ import { CLASSIC_MODE, KILLER_MODE, useSudokuStore } from "@entities/sudoku/mode
 import React from "react";
 
 const GameModeSelector: React.FC = () => {
-  const { gameMode, switchGameMode } = useSudokuStore();
+  const gameMode = useSudokuStore((state) => state.gameMode);
+  const switchGameMode = useSudokuStore((state) => state.switchGameMode);
 
   return (
     <div className="game-mode-selector">

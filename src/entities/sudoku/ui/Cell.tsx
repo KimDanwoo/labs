@@ -30,10 +30,10 @@ export const SudokuCell: React.FC<CellProps> = ({ cell, row, col, onSelect }) =>
 
   // 우선순위: 선택된 셀 > 같은 값 > 관련 셀
   if (highlight.selected) {
-    bgColor = "bg-blue-200";
-    textColor = "text-slate-800";
-  } else if (highlight.sameValue) {
     bgColor = "bg-blue-100";
+    textColor = "text-slate-700";
+  } else if (highlight.sameValue) {
+    bgColor = "bg-blue-300";
   } else if (highlight.related) {
     bgColor = "bg-blue-50";
   }
@@ -46,6 +46,7 @@ export const SudokuCell: React.FC<CellProps> = ({ cell, row, col, onSelect }) =>
     <td
       className={`
         relative
+        min-w-10 min-h-10
         w-10 h-10 
         md:w-12 md:h-12
         lg:w-14 lg:h-14
@@ -58,7 +59,6 @@ export const SudokuCell: React.FC<CellProps> = ({ cell, row, col, onSelect }) =>
         text-center align-middle
         cursor-pointer
         transition-colors duration-100
-        hover:bg-blue-50
       `}
       onClick={handleClick}
     >

@@ -5,7 +5,10 @@ import { NumberButton } from "@entities/sudoku/ui/NumberButton";
 import React from "react";
 
 export const SelectNumber: React.FC = () => {
-  const { isNoteMode, fillCell, toggleNote, numberCounts } = useSudokuStore();
+  const isNoteMode = useSudokuStore((state) => state.isNoteMode);
+  const fillCell = useSudokuStore((state) => state.fillCell);
+  const toggleNote = useSudokuStore((state) => state.toggleNote);
+  const numberCounts = useSudokuStore((state) => state.numberCounts);
 
   const handleNumberSelect = (value: number) => {
     fillCell(value);

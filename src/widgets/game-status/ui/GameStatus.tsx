@@ -1,28 +1,14 @@
 "use client";
 
-import { Difficulty, EASY, EXPERT, formatTime, HARD, MEDIUM, useSudokuStore } from "@entities/sudoku/model";
-import React, { useEffect } from "react";
-import { AiOutlinePause } from "react-icons/ai";
-import { VscPlay } from "react-icons/vsc";
+import { Difficulty, EASY, EXPERT, HARD, MEDIUM, useSudokuStore } from "@entities/sudoku/model";
+import { TimerControl } from "@features/timer-control/ui/TimerControl";
+import React from "react";
 
 export const GameStatus: React.FC = () => {
-  const { difficulty, isCompleted, isSuccess, currentTime, timerActive, incrementTimer, initializeGame, toggleTimer } =
-    useSudokuStore();
-
-  // 타이머 로직
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    if (timerActive) {
-      timer = setInterval(() => {
-        incrementTimer();
-      }, 1000);
-    }
-
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [timerActive, incrementTimer]);
+  const difficulty = useSudokuStore((state) => state.difficulty);
+  const isCompleted = useSudokuStore((state) => state.isCompleted);
+  const isSuccess = useSudokuStore((state) => state.isSuccess);
+  const initializeGame = useSudokuStore((state) => state.initializeGame);
 
   return (
     <div className="flex flex-col items-center gap-2 mb-6">
@@ -39,12 +25,7 @@ export const GameStatus: React.FC = () => {
           <option value={EXPERT}>전문가</option>
         </select>
 
-        <div className="flex items-center gap-2">
-          <div className="text-md font-mono">{formatTime(currentTime)}</div>
-          <button className={`p-2 rounded-full transition-colors bg-gray-300`} onClick={() => toggleTimer()}>
-            {timerActive ? <AiOutlinePause className="text-gray-500" /> : <VscPlay className="text-gray-500" />}
-          </button>
-        </div>
+        <TimerControl />
       </div>
 
       {isCompleted && (

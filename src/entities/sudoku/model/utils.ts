@@ -964,6 +964,18 @@ export const validateKillerCages = (board: SudokuBoard, cages: KillerCage[]): Su
   // 케이지 고유 ID를 키로 사용하는 충돌 맵
   const cageConflicts = new Map<number, boolean>();
 
+  // 디버깅을 위한 모든 케이지 합계 출력 (루프 외부에서 한 번만 실행)
+  for (const cage of cages) {
+    const cageSum = cage.sum;
+    let currentSum = 0;
+    for (const [row, col] of cage.cells) {
+      if (board[row][col].value !== null) {
+        currentSum += board[row][col].value;
+      }
+    }
+    console.log(`케이지 ID: ${cage.id}, 지정된 합: ${cageSum}, 현재 합: ${currentSum}`);
+  }
+
   // 각 케이지 검증
   for (const cage of cages) {
     let sum = 0;

@@ -3,7 +3,9 @@ import IconButton from "@entities/sudoku/ui/IconButton";
 import { GoPencil } from "react-icons/go";
 
 export const ToggleNote = () => {
-  const { isNoteMode, toggleNoteMode } = useSudokuStore();
+  const isNoteMode = useSudokuStore((state) => state.isNoteMode);
+  const toggleNoteMode = useSudokuStore((state) => state.toggleNoteMode);
+
   return (
     <IconButton
       className={`${isNoteMode ? "bg-sky-300" : "bg-gray-300"}`}
