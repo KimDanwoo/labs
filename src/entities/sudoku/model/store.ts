@@ -19,6 +19,9 @@ interface SudokuActions {
   // 게임 초기화
   initializeGame: (difficulty?: Difficulty) => void;
 
+  // 사용자 입력 초기화
+  resetUserInputs: () => void;
+
   // 셀 선택
   selectCell: (row: number, col: number) => void;
 
@@ -48,6 +51,9 @@ interface SudokuActions {
 
   // 노트 모드 토글
   toggleNoteMode: () => void;
+
+  // 보드 숫자 카운트
+  countBoardNumbers: () => void;
 }
 
 // 스도쿠 스토어 정의
@@ -67,8 +73,9 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
       timerActive: false,
       difficulty: MEDIUM,
       highlightedCells: createEmptyHighlights(),
+      numberCounts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
 
-      // 액션들
+      // 게임 초기화
       initializeGame: (difficulty = MEDIUM) => {
         const solution = generateSolution();
         const board = generateBoard(solution, difficulty);
@@ -83,9 +90,43 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           timerActive: true,
           difficulty,
           highlightedCells: createEmptyHighlights(),
+          numberCounts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
         });
+        get().countBoardNumbers();
       },
 
+      resetUserInputs: () => {
+        const { board, solution } = get();
+
+        // 새 보드 생성
+        const newBoard = board.map((row) =>
+          row.map((cell) => {
+            if (cell.isInitial) {
+              return {
+                ...cell,
+                isConflict: false,
+                isSelected: false,
+              };
+            }
+
+            // 사용자가 입력한 셀은 초기화 (노트도 함께 초기화)
+            return {
+              ...cell,
+              value: null,
+              notes: [],
+              isConflict: false,
+              isSelected: false,
+            };
+          }),
+        );
+
+        const emptyHighlights = createEmptyHighlights();
+
+        set({ board: newBoard, highlightedCells: emptyHighlights });
+        get().countBoardNumbers();
+      },
+
+      // 셀 선택
       selectCell: (row, col) => {
         const { board } = get();
 
@@ -105,10 +146,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         get().updateHighlights(row, col);
       },
 
-      toggleNoteMode: () => {
-        set((state) => ({ isNoteMode: !state.isNoteMode }));
-      },
-
+      // 셀에 값 입력
       fillCell: (value) => {
         const { board, selectedCell, solution } = get();
 
@@ -137,8 +175,12 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           isSuccess: success,
           timerActive: !completed,
         });
+
+        get().countBoardNumbers();
+        get().updateHighlights(row, col);
       },
 
+      // 노트 토글
       toggleNote: (value) => {
         const { board, selectedCell } = get();
 
@@ -164,6 +206,12 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         set({ board: newBoard });
       },
 
+      // 노트 모드 토글
+      toggleNoteMode: () => {
+        set((state) => ({ isNoteMode: !state.isNoteMode }));
+      },
+
+      // 힌트 표시
       getHint: () => {
         const { board, solution } = get();
         const hint = getHint(board, solution);
@@ -173,6 +221,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         }
       },
 
+      // 정답 확인
       checkSolution: () => {
         const { board, solution } = get();
         const isCorrect = isBoardCorrect(board, solution);
@@ -184,11 +233,13 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         });
       },
 
+      // 게임 재시작
       restartGame: () => {
         const { difficulty } = get();
         get().initializeGame(difficulty);
       },
 
+      // 타이머 증가
       incrementTimer: () => {
         const { currentTime, timerActive } = get();
         if (timerActive) {
@@ -204,6 +255,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         }
       },
 
+      // 하이라이트 업데이트
       updateHighlights: (row, col) => {
         const { board } = get();
         const newHighlights = createEmptyHighlights(); // 모든 하이라이트 초기화
@@ -256,6 +308,22 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
         set({ highlightedCells: newHighlights });
       },
+
+      // 보드 숫자 카운트
+      countBoardNumbers: () => {
+        const { board } = get();
+        const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+
+        board.forEach((row) => {
+          row.forEach((cell) => {
+            if (cell.value !== null) {
+              counts[cell.value as keyof typeof counts]++;
+            }
+          });
+        });
+
+        set({ numberCounts: counts });
+      },
     }),
     {
       name: "sudoku-storage", // 로컬 스토리지 키 이름
@@ -268,6 +336,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         currentTime: state.currentTime,
         timerActive: state.timerActive,
         difficulty: state.difficulty,
+        numberCounts: state.numberCounts,
       }),
     },
   ),

@@ -3,6 +3,6 @@ import IconButton from "@entities/sudoku/ui/IconButton";
 import { IoRefresh } from "react-icons/io5";
 
 export const RestartGame = () => {
-  const { restartGame } = useSudokuStore();
-  return <IconButton icon={<IoRefresh className=" text-lg" />} onClick={restartGame} />;
+  const { resetUserInputs } = useSudokuStore();
+  return <IconButton icon={<IoRefresh className=" text-lg" />} onClick={resetUserInputs} />;
 };
