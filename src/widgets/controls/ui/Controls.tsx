@@ -1,63 +1,47 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useSudokuStore } from '@entities/sudoku/model/store';
+import { useSudokuStore } from "@entities/sudoku/model/store";
+import React from "react";
+import { CiEraser } from "react-icons/ci";
+import { GoLightBulb, GoPencil } from "react-icons/go";
+import { IoRefresh } from "react-icons/io5";
+
+function IconButton({ icon, onClick, className }: { icon: React.ReactNode; onClick: () => void; className?: string }) {
+  return (
+    <button className={`px-4 py-4 rounded-full hover:bg-gray-300 transition-colors ${className}`} onClick={onClick}>
+      {icon}
+    </button>
+  );
+}
 
 export const Controls: React.FC = () => {
-  const { restartGame, checkSolution, initializeGame, toggleTimer, timerActive, getHint } = useSudokuStore();
+  const { isNoteMode, restartGame, fillCell, toggleNoteMode, getHint } = useSudokuStore();
+
+  const handleEraseClick = () => {
+    fillCell(null);
+  };
 
   return (
     <div className="flex flex-wrap justify-center gap-2 mt-6">
-      <button
-        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-        onClick={() => initializeGame('easy')}
-      >
-        쉬움
-      </button>
+      <IconButton className="bg-sky-300" icon={<IoRefresh className="text-white text-lg" />} onClick={restartGame} />
 
-      <button
-        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-        onClick={() => initializeGame('medium')}
-      >
-        중간
-      </button>
+      <IconButton
+        className="bg-sky-300"
+        icon={<CiEraser className="text-white text-lg" />}
+        onClick={handleEraseClick}
+      />
 
-      <button
-        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-        onClick={() => initializeGame('hard')}
-      >
-        어려움
-      </button>
-
-      <button
-        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+      <IconButton
+        className="bg-sky-300"
+        icon={<GoLightBulb className="text-white text-lg" />}
         onClick={() => getHint()}
-      >
-        힌트
-      </button>
+      />
 
-      <button
-        className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
-        onClick={restartGame}
-      >
-        재시작
-      </button>
-
-      <button
-        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
-        onClick={checkSolution}
-      >
-        확인
-      </button>
-
-      <button
-        className={`px-4 py-2 rounded-md transition-colors ${
-          timerActive ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-green-500 text-white hover:bg-green-600'
-        }`}
-        onClick={() => toggleTimer()}
-      >
-        {timerActive ? '타이머 정지' : '타이머 시작'}
-      </button>
+      <IconButton
+        className={`${isNoteMode ? "bg-sky-300" : "bg-gray-300"}`}
+        icon={<GoPencil className="text-white text-lg" />}
+        onClick={toggleNoteMode}
+      />
     </div>
   );
 };

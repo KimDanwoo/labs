@@ -1,4 +1,4 @@
-import { SudokuBoard, Difficulty } from './types';
+import { Difficulty, SudokuBoard } from "./types";
 
 /**
  * 스도쿠 유틸리티 모듈
@@ -19,7 +19,7 @@ const NUMBERS = Array.from({ length: GRID_SIZE }, (_, i) => i + 1);
 const DIFFICULTY_RANGES: Record<Difficulty, DifficultyRange> = {
   easy: { min: 28, max: 35 },
   medium: { min: 40, max: 50 },
-  hard: { min: 52, max: 62 }
+  hard: { min: 52, max: 62 },
 };
 
 /**
@@ -37,15 +37,15 @@ export const generateSolution = (): Grid => {
     [8, 9, 7, 2, 1, 4, 3, 6, 5],
     [5, 3, 1, 6, 4, 2, 9, 7, 8],
     [6, 4, 2, 9, 7, 8, 5, 3, 1],
-    [9, 7, 8, 5, 3, 1, 6, 4, 2]
+    [9, 7, 8, 5, 3, 1, 6, 4, 2],
   ];
 
   // 솔루션 복제
   const solution = structuredClone(baseGrid);
-  
+
   // 변환 파이프라인 적용
   applyTransformations(solution);
-  
+
   return solution;
 };
 
@@ -57,22 +57,22 @@ export const generateSolution = (): Grid => {
 const applyTransformations = (grid: Grid): void => {
   // 1. 숫자 셔플 - 1-9를 무작위로 다른 숫자에 매핑
   const numberMap = createRandomNumberMapping();
-  
+
   // 2. 구조적 변환 (여러 단계)
   const transforms = [
     () => swapRandomRowsWithinBlocks(grid),
     () => swapRandomColumnsWithinBlocks(grid),
     () => swapRandomRowBlocks(grid),
     () => swapRandomColumnBlocks(grid),
-    () => rotateOrReflectGrid(grid)
+    () => rotateOrReflectGrid(grid),
   ];
-  
+
   // 무작위 순서로 여러 번 변환 적용
   for (let i = 0; i < 10; i++) {
     const randomTransform = transforms[Math.floor(Math.random() * transforms.length)];
     randomTransform();
   }
-  
+
   // 숫자 매핑 적용 (마지막에 수행)
   applyNumberMapping(grid, numberMap);
 };
@@ -84,12 +84,12 @@ const applyTransformations = (grid: Grid): void => {
 const createRandomNumberMapping = (): Map<number, number> => {
   const shuffled = [...NUMBERS];
   shuffleArray(shuffled);
-  
+
   const mapping = new Map<number, number>();
   NUMBERS.forEach((num, idx) => {
     mapping.set(num, shuffled[idx]);
   });
-  
+
   return mapping;
 };
 
@@ -111,12 +111,8 @@ const applyNumberMapping = (grid: Grid, mapping: Map<number, number>): void => {
  * @param {Grid} grid - 대상 그리드
  */
 const rotateOrReflectGrid = (grid: Grid): void => {
-  const operations = [
-    () => rotateGrid90(grid),
-    () => reflectHorizontal(grid),
-    () => reflectVertical(grid)
-  ];
-  
+  const operations = [() => rotateGrid90(grid), () => reflectHorizontal(grid), () => reflectVertical(grid)];
+
   // 무작위 작업 선택
   const operation = operations[Math.floor(Math.random() * operations.length)];
   operation();
@@ -129,7 +125,7 @@ const rotateOrReflectGrid = (grid: Grid): void => {
 const rotateGrid90 = (grid: Grid): void => {
   const size = grid.length;
   const temp = structuredClone(grid);
-  
+
   for (let row = 0; row < size; row++) {
     for (let col = 0; col < size; col++) {
       grid[col][size - 1 - row] = temp[row][col];
@@ -164,7 +160,7 @@ const swapRandomRowsWithinBlocks = (grid: Grid): void => {
     const baseRow = block * BLOCK_SIZE;
     const row1 = baseRow + Math.floor(Math.random() * BLOCK_SIZE);
     const row2 = baseRow + Math.floor(Math.random() * BLOCK_SIZE);
-    
+
     if (row1 !== row2) {
       [grid[row1], grid[row2]] = [grid[row2], grid[row1]];
     }
@@ -180,7 +176,7 @@ const swapRandomColumnsWithinBlocks = (grid: Grid): void => {
     const baseCol = block * BLOCK_SIZE;
     const col1 = baseCol + Math.floor(Math.random() * BLOCK_SIZE);
     const col2 = baseCol + Math.floor(Math.random() * BLOCK_SIZE);
-    
+
     if (col1 !== col2) {
       for (let row = 0; row < GRID_SIZE; row++) {
         [grid[row][col1], grid[row][col2]] = [grid[row][col2], grid[row][col1]];
@@ -196,7 +192,7 @@ const swapRandomColumnsWithinBlocks = (grid: Grid): void => {
 const swapRandomRowBlocks = (grid: Grid): void => {
   const block1 = Math.floor(Math.random() * BLOCK_SIZE);
   const block2 = Math.floor(Math.random() * BLOCK_SIZE);
-  
+
   if (block1 !== block2) {
     for (let i = 0; i < BLOCK_SIZE; i++) {
       const row1 = block1 * BLOCK_SIZE + i;
@@ -213,12 +209,12 @@ const swapRandomRowBlocks = (grid: Grid): void => {
 const swapRandomColumnBlocks = (grid: Grid): void => {
   const block1 = Math.floor(Math.random() * BLOCK_SIZE);
   const block2 = Math.floor(Math.random() * BLOCK_SIZE);
-  
+
   if (block1 !== block2) {
     for (let i = 0; i < BLOCK_SIZE; i++) {
       const col1 = block1 * BLOCK_SIZE + i;
       const col2 = block2 * BLOCK_SIZE + i;
-      
+
       for (let row = 0; row < GRID_SIZE; row++) {
         [grid[row][col1], grid[row][col2]] = [grid[row][col2], grid[row][col1]];
       }
@@ -243,20 +239,17 @@ function shuffleArray<T>(array: T[]): void {
  * @param {Difficulty} difficulty - 난이도 설정
  * @returns {SudokuBoard} 생성된 스도쿠 보드
  */
-export const generateBoard = (
-  solution: Grid,
-  difficulty: Difficulty
-): SudokuBoard => {
+export const generateBoard = (solution: Grid, difficulty: Difficulty): SudokuBoard => {
   // 솔루션으로부터 초기 보드 생성
   const board = createInitialBoard(solution);
-  
+
   // 난이도에 따라 셀 제거
   const { min, max } = DIFFICULTY_RANGES[difficulty];
   const cellsToRemove = min + Math.floor(Math.random() * (max - min + 1));
-  
+
   // 난이도 알고리즘 적용
   removeRandomCells(board, solution, cellsToRemove);
-  
+
   return board;
 };
 
@@ -272,8 +265,8 @@ const createInitialBoard = (solution: Grid): SudokuBoard => {
       isInitial: true,
       isSelected: false,
       isConflict: false,
-      notes: []
-    }))
+      notes: [],
+    })),
   );
 };
 
@@ -284,11 +277,7 @@ const createInitialBoard = (solution: Grid): SudokuBoard => {
  * @param {Grid} solution - 원본 솔루션
  * @param {number} count - 제거할 셀 수
  */
-const removeRandomCells = (
-  board: SudokuBoard,
-  solution: Grid,
-  count: number
-): void => {
+const removeRandomCells = (board: SudokuBoard, solution: Grid, count: number): void => {
   // 모든 위치를 배열로 만듦
   const allPositions: Position[] = [];
   for (let row = 0; row < GRID_SIZE; row++) {
@@ -296,22 +285,22 @@ const removeRandomCells = (
       allPositions.push([row, col]);
     }
   }
-  
+
   // 위치 섞기
   shuffleArray(allPositions);
-  
+
   // 무작위 순서로 셀 제거
   let removed = 0;
   for (const [row, col] of allPositions) {
     if (removed >= count) break;
-    
+
     const originalValue = board[row][col].value;
     board[row][col].value = null;
     board[row][col].isInitial = false;
-    
+
     // 고급 구현에서는 여기서 유일 솔루션 검증 가능
     // 간소화를 위해 생략
-    
+
     removed++;
   }
 };
@@ -324,7 +313,7 @@ const removeRandomCells = (
  */
 export const checkConflicts = (board: SudokuBoard): SudokuBoard => {
   const newBoard = structuredClone(board);
-  
+
   // 모든 셀에 대해 충돌 검사
   for (let row = 0; row < GRID_SIZE; row++) {
     for (let col = 0; col < GRID_SIZE; col++) {
@@ -332,11 +321,11 @@ export const checkConflicts = (board: SudokuBoard): SudokuBoard => {
         newBoard[row][col].isConflict = false;
         continue;
       }
-      
+
       newBoard[row][col].isConflict = hasConflict(newBoard, row, col);
     }
   }
-  
+
   return newBoard;
 };
 
@@ -350,16 +339,16 @@ export const checkConflicts = (board: SudokuBoard): SudokuBoard => {
 const hasConflict = (board: SudokuBoard, row: number, col: number): boolean => {
   const value = board[row][col].value;
   if (value === null) return false;
-  
+
   // 행 검사
   if (checkRowConflict(board, row, col, value)) return true;
-  
+
   // 열 검사
   if (checkColConflict(board, row, col, value)) return true;
-  
+
   // 3x3 블록 검사
   if (checkBlockConflict(board, row, col, value)) return true;
-  
+
   return false;
 };
 
@@ -393,7 +382,7 @@ const checkColConflict = (board: SudokuBoard, row: number, col: number, value: n
 const checkBlockConflict = (board: SudokuBoard, row: number, col: number, value: number): boolean => {
   const blockRow = Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE;
   const blockCol = Math.floor(col / BLOCK_SIZE) * BLOCK_SIZE;
-  
+
   for (let r = 0; r < BLOCK_SIZE; r++) {
     for (let c = 0; c < BLOCK_SIZE; c++) {
       const curRow = blockRow + r;
@@ -431,9 +420,7 @@ export const isBoardComplete = (board: SudokuBoard): boolean => {
  * @returns {boolean} 일치 여부
  */
 export const isBoardCorrect = (board: SudokuBoard, solution: Grid): boolean => {
-  return board.every((row, rowIdx) => 
-    row.every((cell, colIdx) => cell.value === solution[rowIdx][colIdx])
-  );
+  return board.every((row, rowIdx) => row.every((cell, colIdx) => cell.value === solution[rowIdx][colIdx]));
 };
 
 /**
@@ -442,13 +429,10 @@ export const isBoardCorrect = (board: SudokuBoard, solution: Grid): boolean => {
  * @param {Grid} solution - 정답 그리드
  * @returns {Position & { value: number }} 힌트 정보
  */
-export const getHint = (
-  board: SudokuBoard, 
-  solution: Grid
-): ({row: number, col: number, value: number}) | null => {
+export const getHint = (board: SudokuBoard, solution: Grid): { row: number; col: number; value: number } | null => {
   // 빈 셀 찾기
   const emptyCells: Position[] = [];
-  
+
   board.forEach((row, rowIdx) => {
     row.forEach((cell, colIdx) => {
       if (cell.value === null) {
@@ -456,16 +440,16 @@ export const getHint = (
       }
     });
   });
-  
+
   if (emptyCells.length === 0) return null;
-  
+
   // 무작위 빈 셀 선택
   const [row, col] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-  
+
   return {
     row,
     col,
-    value: solution[row][col]
+    value: solution[row][col],
   };
 };
 
@@ -477,7 +461,7 @@ export const getHint = (
 export const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 };
 
 /**
@@ -487,14 +471,12 @@ export const formatTime = (seconds: number): string => {
  */
 export const solveSudoku = (board: SudokuBoard): Grid | null => {
   // 보드를 그리드 형식으로 변환
-  const grid: (number | null)[][] = board.map(row => 
-    row.map(cell => cell.value)
-  );
-  
+  const grid: (number | null)[][] = board.map((row) => row.map((cell) => cell.value));
+
   if (solveBacktracking(grid)) {
     return grid as Grid;
   }
-  
+
   return null;
 };
 
@@ -507,22 +489,22 @@ const solveBacktracking = (grid: (number | null)[][]): boolean => {
   // 빈 셀 찾기
   const emptyCell = findEmptyCell(grid);
   if (!emptyCell) return true; // 모든 셀이 채워짐
-  
+
   const [row, col] = emptyCell;
-  
+
   // 1-9 숫자 시도
   for (let num = 1; num <= GRID_SIZE; num++) {
     if (isValidPlacement(grid, row, col, num)) {
       grid[row][col] = num;
-      
+
       if (solveBacktracking(grid)) {
         return true;
       }
-      
+
       grid[row][col] = null; // 백트래킹
     }
   }
-  
+
   return false;
 };
 
@@ -550,32 +532,27 @@ const findEmptyCell = (grid: (number | null)[][]): Position | null => {
  * @param {number} num - 확인할 숫자
  * @returns {boolean} 유효 여부
  */
-const isValidPlacement = (
-  grid: (number | null)[][], 
-  row: number, 
-  col: number, 
-  num: number
-): boolean => {
+const isValidPlacement = (grid: (number | null)[][], row: number, col: number, num: number): boolean => {
   // 행 검사
   for (let c = 0; c < GRID_SIZE; c++) {
     if (grid[row][c] === num) return false;
   }
-  
+
   // 열 검사
   for (let r = 0; r < GRID_SIZE; r++) {
     if (grid[r][col] === num) return false;
   }
-  
+
   // 블록 검사
   const blockRow = Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE;
   const blockCol = Math.floor(col / BLOCK_SIZE) * BLOCK_SIZE;
-  
+
   for (let r = 0; r < BLOCK_SIZE; r++) {
     for (let c = 0; c < BLOCK_SIZE; c++) {
       if (grid[blockRow + r][blockCol + c] === num) return false;
     }
   }
-  
+
   return true;
 };
 
@@ -586,33 +563,33 @@ const isValidPlacement = (
  * @returns {boolean} 단일 솔루션 여부
  */
 export const hasUniqueSolution = (board: SudokuBoard): boolean => {
-  const grid = board.map(row => row.map(cell => cell.value));
+  const grid = board.map((row) => row.map((cell) => cell.value));
   let solutionCount = 0;
-  
+
   const countSolutions = (grid: (number | null)[][]): boolean => {
     const emptyCell = findEmptyCell(grid);
     if (!emptyCell) {
       solutionCount++;
       return solutionCount > 1; // 2개 이상 발견 시 중단
     }
-    
+
     const [row, col] = emptyCell;
-    
+
     for (let num = 1; num <= GRID_SIZE; num++) {
       if (isValidPlacement(grid, row, col, num)) {
         grid[row][col] = num;
-        
+
         if (countSolutions(structuredClone(grid))) {
           return true;
         }
-        
+
         grid[row][col] = null;
       }
     }
-    
+
     return false;
   };
-  
+
   countSolutions(grid);
   return solutionCount === 1;
 };

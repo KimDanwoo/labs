@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: '스도쿠 게임 - Next.js + TypeScript + Zustand',
-  description: 'Feature Sliced Design 구조로 만든 스도쿠 게임',
+  title: "스도쿠 게임",
+  description: "스도쿠 게임",
 };
 
 export default function RootLayout({
@@ -23,12 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="ko">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
     </html>
   );
 }

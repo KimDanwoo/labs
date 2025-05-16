@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useSudokuStore } from '@entities/sudoku/model/store';
+import { useSudokuStore } from "@entities/sudoku/model/store";
+import React from "react";
 
 interface NumberButtonProps {
   value: number;
@@ -10,12 +10,7 @@ interface NumberButtonProps {
   isNoteMode: boolean;
 }
 
-const NumberButton: React.FC<NumberButtonProps> = ({
-  value,
-  onNumberSelect,
-  onNoteToggle,
-  isNoteMode,
-}) => {
+const NumberButton: React.FC<NumberButtonProps> = ({ value, onNumberSelect, onNoteToggle, isNoteMode }) => {
   const handleClick = () => {
     if (isNoteMode) {
       onNoteToggle(value);
@@ -26,7 +21,7 @@ const NumberButton: React.FC<NumberButtonProps> = ({
 
   return (
     <button
-      className="lg:w-30 lg:h-30 md:w-10 md:h-10 bg-gray-200 rounded-md flex items-center justify-center text-xl font-semibold hover:bg-gray-300 transition-colors"
+      className="w-6 h-6 md:w-10 md:h-10 lg:w-30 lg:h-30  rounded-full flex items-center justify-center text-xl font-semibold hover:bg-gray-300 transition-colors"
       onClick={handleClick}
     >
       {value}
@@ -35,19 +30,10 @@ const NumberButton: React.FC<NumberButtonProps> = ({
 };
 
 export const SelectNumber: React.FC = () => {
-  const { fillCell, toggleNote } = useSudokuStore();
-  const [isNoteMode, setIsNoteMode] = useState(false);
+  const { isNoteMode, fillCell, toggleNote } = useSudokuStore();
 
   const handleNumberSelect = (value: number) => {
     fillCell(value);
-  };
-
-  const handleEraseClick = () => {
-    fillCell(null);
-  };
-
-  const handleNoteModeToggle = () => {
-    setIsNoteMode(!isNoteMode);
   };
 
   return (
@@ -62,24 +48,6 @@ export const SelectNumber: React.FC = () => {
             isNoteMode={isNoteMode}
           />
         ))}
-      </div>
-
-      <div className="flex gap-4">
-        <button
-          className={`px-4 py-2 rounded-md transition-colors ${
-            isNoteMode ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
-          }`}
-          onClick={handleNoteModeToggle}
-        >
-          노트 모드
-        </button>
-
-        <button
-          className="px-4 py-2 rounded-md bg-red-100 hover:bg-red-200 transition-colors"
-          onClick={handleEraseClick}
-        >
-          지우기
-        </button>
       </div>
     </div>
   );

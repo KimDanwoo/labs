@@ -15,8 +15,15 @@ export interface Position {
   col: number;
 }
 
+export interface HighlightInfo {
+  selectedCell: Position | null;
+  highlightedCells: Set<string>;
+  sameValueCells: Set<string>;
+}
+
 export interface SudokuState {
   board: SudokuBoard;
+  isNoteMode: boolean;
   solution: number[][];
   selectedCell: Position | null;
   isCompleted: boolean;
@@ -24,4 +31,11 @@ export interface SudokuState {
   currentTime: number;
   timerActive: boolean;
   difficulty: Difficulty;
+  highlightedCells: Record<string, CellHighlight>;
+}
+
+export interface CellHighlight {
+  selected: boolean;
+  related: boolean;
+  sameValue: boolean;
 }
