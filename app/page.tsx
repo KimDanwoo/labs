@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 
-// 동적으로 컴포넌트를 불러와 하이드레이션 오류 방지
 const SudokuBoard = dynamic(() => import("@widgets/sudoku-board/ui/SudokuBoard"), { ssr: false });
 
 const SelectNumber = dynamic(() => import("@features/select-number/ui/SelectNumber"), { ssr: false });
@@ -13,7 +12,7 @@ const GameStatus = dynamic(() => import("@widgets/game-status/ui/GameStatus"), {
 
 export default function Home() {
   return (
-    <main className="min-w-[346px] min-h-screen flex flex-col items-center justify-center">
+    <main className="min-w-[400px] min-h-screen flex flex-col items-center justify-center">
       <div className="mx-auto p-6  rounded-lg flex flex-col lg:flex-row">
         <div>
           <GameStatus />

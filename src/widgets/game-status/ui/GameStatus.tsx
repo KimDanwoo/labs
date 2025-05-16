@@ -1,14 +1,12 @@
 "use client";
 
-import { useSudokuStore } from "@entities/sudoku/model/store";
-import { Difficulty } from "@entities/sudoku/model/types";
-import { formatTime } from "@entities/sudoku/model/utils";
+import { Difficulty, EASY, EXPERT, formatTime, HARD, IMPOSSIBLE, MEDIUM, useSudokuStore } from "@entities/sudoku/model";
 import React, { useEffect } from "react";
 import { AiOutlinePause } from "react-icons/ai";
 import { VscPlay } from "react-icons/vsc";
 
 export const GameStatus: React.FC = () => {
-  const { isCompleted, isSuccess, currentTime, timerActive, incrementTimer, initializeGame, toggleTimer } =
+  const { difficulty, isCompleted, isSuccess, currentTime, timerActive, incrementTimer, initializeGame, toggleTimer } =
     useSudokuStore();
 
   // 타이머 로직
@@ -29,14 +27,21 @@ export const GameStatus: React.FC = () => {
   return (
     <div className="flex flex-col items-center gap-2 mb-6">
       <div className="flex justify-between w-full max-w-md px-4">
-        <select name="difficulty" id="difficulty" onChange={(e) => initializeGame(e.target.value as Difficulty)}>
-          <option value="easy">쉬움</option>
-          <option value="medium">중간</option>
-          <option value="hard">어려움</option>
+        <select
+          name="difficulty"
+          id="difficulty"
+          value={difficulty}
+          onChange={(e) => initializeGame(e.target.value as Difficulty)}
+        >
+          <option value={EASY}>쉬움</option>
+          <option value={MEDIUM}>중간</option>
+          <option value={HARD}>어려움</option>
+          <option value={EXPERT}>전문가</option>
+          <option value={IMPOSSIBLE}>불가능</option>
         </select>
 
         <div className="flex items-center gap-2">
-          <div className="text-xl font-mono">{formatTime(currentTime)}</div>
+          <div className="text-md font-mono">{formatTime(currentTime)}</div>
           <button className={`p-2 rounded-full transition-colors bg-gray-300`} onClick={() => toggleTimer()}>
             {timerActive ? <AiOutlinePause className="text-gray-500" /> : <VscPlay className="text-gray-500" />}
           </button>

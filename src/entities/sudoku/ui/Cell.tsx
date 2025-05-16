@@ -1,7 +1,6 @@
 "use client";
 
-import { useSudokuStore } from "@entities/sudoku/model/store"; // 스토어 경로에 맞게 수정
-import { SudokuCell as SudokuCellType } from "@entities/sudoku/model/types";
+import { KEY_NUMBER, SudokuCell as SudokuCellType, useSudokuStore } from "@entities/sudoku/model";
 import React from "react";
 
 interface CellProps {
@@ -22,49 +21,58 @@ export const SudokuCell: React.FC<CellProps> = ({ cell, row, col, onSelect }) =>
   };
 
   // 테두리 스타일링을 위한 조건
-  const isRightBorder = (col + 1) % 3 === 0 && col < 8;
-  const isBottomBorder = (row + 1) % 3 === 0 && row < 8;
+  const isRightBlockBorder = (col + 1) % 3 === 0 && col < 8;
+  const isBottomBlockBorder = (row + 1) % 3 === 0 && row < 8;
 
   // 하이라이트 스타일 계산
-  let highlightStyle = "";
+  let bgColor = "bg-white";
+  let textColor = "text-slate-700";
 
   // 우선순위: 선택된 셀 > 같은 값 > 관련 셀
   if (highlight.selected) {
-    highlightStyle = "bg-blue-500 text-white"; // 선택된 셀
+    bgColor = "bg-blue-200";
+    textColor = "text-slate-800";
   } else if (highlight.sameValue) {
-    highlightStyle = "bg-blue-300"; // 같은 값
+    bgColor = "bg-blue-100";
   } else if (highlight.related) {
-    highlightStyle = "bg-blue-100"; // 관련 셀 (행, 열, 블록)
+    bgColor = "bg-blue-50";
+  }
+
+  if (cell.isConflict) {
+    textColor = "text-red-600";
   }
 
   return (
-    <div
+    <td
       className={`
-        relative flex items-center justify-center
-        w-8 h-8 border border-gray-300 cursor-pointer
-        md:w-15 md:h-15
-        ${isRightBorder ? "border-r-2 border-r-gray-700" : ""}
-        ${isBottomBorder ? "border-b-2 border-b-gray-700" : ""}
-        ${cell.isConflict ? "text-red-600" : ""}
+        relative
+        w-10 h-10 
+        md:w-12 md:h-12
+        lg:w-14 lg:h-14
+        border border-slate-200
+        ${isRightBlockBorder ? "border-r-2 border-r-slate-800" : ""}
+        ${isBottomBlockBorder ? "border-b-2 border-b-slate-800" : ""}
+        ${bgColor}
+        ${textColor}
         ${cell.isInitial ? "font-bold" : "font-normal"}
-        ${highlightStyle}
-        transition-colors duration-150
+        text-center align-middle
+        cursor-pointer
+        transition-colors duration-100
+        hover:bg-blue-50
       `}
       onClick={handleClick}
     >
       {cell.value ? (
-        <span className={`text-xl ${highlight.selected ? "text-white" : ""}`}>{cell.value}</span>
+        <span className="text-xl md:text-2xl lg:text-2xl">{cell.value}</span>
       ) : (
-        <div className="grid grid-cols-3 gap-0 w-full h-full p-0.5">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-            <div key={num} className="flex items-center justify-center">
-              {cell.notes.includes(num) && (
-                <span className={`text-xs ${highlight.selected ? "text-white" : "text-gray-500"}`}>{num}</span>
-              )}
+        <div className="grid grid-cols-3 grid-rows-3 gap-0 w-full h-full">
+          {KEY_NUMBER.map((num) => (
+            <div key={num} className="flex items-center justify-center w-full h-full">
+              {cell.notes.includes(num) && <span className={`text-[8px] md:text-xs text-slate-500`}>{num}</span>}
             </div>
           ))}
         </div>
       )}
-    </div>
+    </td>
   );
 };
