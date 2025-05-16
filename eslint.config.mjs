@@ -2,7 +2,6 @@ import { resolve } from "node:path";
 
 const project = resolve(process.cwd(), "tsconfig.json");
 
-/** @type {import("eslint").Linter.Config} */
 module.exports = {
   extends: [
     "eslint:recommended",
