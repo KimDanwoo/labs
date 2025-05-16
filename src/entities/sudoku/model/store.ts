@@ -1,14 +1,21 @@
 import {
   checkConflicts,
+  checkKillerConflicts,
+  CLASSIC_MODE,
   createEmptyBoard,
   createEmptyHighlights,
   Difficulty,
+  GameMode,
   generateBoard,
+  generateKillerBoard,
   generateSolution,
-  getHint,
+  HINTS_REMAINING,
   isBoardComplete,
   isBoardCorrect,
+  KILLER_MODE,
+  KillerCage,
   MEDIUM,
+  NUMBER_COUNTS,
   SudokuBoard,
   SudokuState,
 } from "@entities/sudoku/model";
@@ -54,47 +61,90 @@ interface SudokuActions {
 
   // 보드 숫자 카운트
   countBoardNumbers: () => void;
+
+  // 게임 모드 전환
+  switchGameMode: (mode: GameMode, difficulty?: Difficulty) => void;
 }
+
+const initialState: SudokuState = {
+  board: createEmptyBoard(),
+  isNoteMode: false,
+  solution: Array(9)
+    .fill(null)
+    .map(() => Array(9).fill(null)),
+  selectedCell: null,
+  isCompleted: false,
+  isSuccess: false,
+  currentTime: 0,
+  timerActive: false,
+  difficulty: MEDIUM,
+  highlightedCells: createEmptyHighlights(),
+  numberCounts: NUMBER_COUNTS,
+  hintsRemaining: HINTS_REMAINING,
+  gameMode: CLASSIC_MODE,
+  cages: [],
+};
+
+const savedStorageKeys = [
+  "board",
+  "solution",
+  "selectedCell",
+  "isCompleted",
+  "isSuccess",
+  "currentTime",
+  "timerActive",
+  "difficulty",
+  "numberCounts",
+  "hintsRemaining",
+  "gameMode",
+  "cages",
+];
 
 // 스도쿠 스토어 정의
 export const useSudokuStore = create<SudokuState & SudokuActions>()(
   persist(
     (set, get) => ({
-      // 초기 상태
-      board: createEmptyBoard(),
-      isNoteMode: false,
-      solution: Array(9)
-        .fill(null)
-        .map(() => Array(9).fill(null)),
-      selectedCell: null,
-      isCompleted: false,
-      isSuccess: false,
-      currentTime: 0,
-      timerActive: false,
-      difficulty: MEDIUM,
-      highlightedCells: createEmptyHighlights(),
-      numberCounts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
+      ...initialState,
 
       // 게임 초기화
       initializeGame: (difficulty = MEDIUM) => {
         const solution = generateSolution();
-        const board = generateBoard(solution, difficulty);
+        const { gameMode } = get();
+
+        let board: SudokuBoard;
+        let cages: KillerCage[] = [];
+
+        if (gameMode === KILLER_MODE) {
+          // 킬러 모드 보드 생성
+
+          console.log(difficulty);
+          const killerResult = generateKillerBoard(solution, MEDIUM);
+          board = killerResult.board;
+          cages = killerResult.cages;
+        } else {
+          // 일반 모드 보드 생성
+          board = generateBoard(solution, MEDIUM);
+        }
 
         set({
+          ...initialState,
           board,
           solution,
-          selectedCell: null,
-          isCompleted: false,
-          isSuccess: false,
-          currentTime: 0,
-          timerActive: true,
           difficulty,
-          highlightedCells: createEmptyHighlights(),
-          numberCounts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
+          gameMode,
+          cages,
         });
         get().countBoardNumbers();
       },
 
+      // 게임 모드 전환
+      switchGameMode: (mode: GameMode, difficulty?: Difficulty) => {
+        const currentDifficulty = difficulty || get().difficulty;
+        set({ gameMode: mode });
+        get().initializeGame(currentDifficulty);
+      },
+
+      // 사용자 입력 초기화
       resetUserInputs: () => {
         const { board, solution } = get();
 
@@ -122,7 +172,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
         const emptyHighlights = createEmptyHighlights();
 
-        set({ board: newBoard, highlightedCells: emptyHighlights });
+        set({ board: newBoard, highlightedCells: emptyHighlights, hintsRemaining: 3 });
         get().countBoardNumbers();
       },
 
@@ -148,7 +198,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
       // 셀에 값 입력
       fillCell: (value) => {
-        const { board, selectedCell, solution } = get();
+        const { board, selectedCell, solution, gameMode, cages } = get();
 
         if (!selectedCell) return;
 
@@ -162,8 +212,14 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         newBoard[row][col].value = value;
         newBoard[row][col].notes = []; // 값을 입력하면 노트 제거
 
+        let boardWithConflicts: SudokuBoard;
+
         // 충돌 확인
-        const boardWithConflicts = checkConflicts(newBoard);
+        if (gameMode === KILLER_MODE) {
+          boardWithConflicts = checkKillerConflicts(newBoard, cages);
+        } else {
+          boardWithConflicts = checkConflicts(newBoard);
+        }
 
         // 게임 완료 확인
         const completed = isBoardComplete(boardWithConflicts);
@@ -213,24 +269,70 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
       // 힌트 표시
       getHint: () => {
-        const { board, solution } = get();
-        const hint = getHint(board, solution);
-        if (hint) {
-          const { row, col } = hint;
-          get().selectCell(row, col);
+        const { board, solution, hintsRemaining, gameMode, cages } = get();
+
+        // 남은 힌트가 없으면 알림
+        if (hintsRemaining <= 0) {
+          alert("더 이상 힌트를 사용할 수 없습니다!");
+          return;
         }
-      },
 
-      // 정답 확인
-      checkSolution: () => {
-        const { board, solution } = get();
-        const isCorrect = isBoardCorrect(board, solution);
+        // 무작위 빈 셀 선택 (빈 셀 = 값이 null인 셀)
+        const emptyCells: { row: number; col: number }[] = [];
 
+        // 보드를 순회하며 빈 셀 찾기
+        for (let row = 0; row < 9; row++) {
+          for (let col = 0; col < 9; col++) {
+            if (board[row][col].value === null) {
+              emptyCells.push({ row, col });
+            }
+          }
+        }
+
+        // 빈 셀이 없으면 알림
+        if (emptyCells.length === 0) {
+          alert("모든 칸이 이미 채워져 있습니다!");
+          return;
+        }
+
+        // 무작위 빈 셀 선택
+        const randomIndex = Math.floor(Math.random() * emptyCells.length);
+        const { row, col } = emptyCells[randomIndex];
+        const value = solution[row][col];
+
+        // 새 보드 생성 (기존 보드의 깊은 복사)
+        const newBoard = JSON.parse(JSON.stringify(board)) as SudokuBoard;
+
+        // 선택된 셀에 정답 값 입력
+        newBoard[row][col].value = value;
+        newBoard[row][col].notes = []; // 노트 제거
+
+        // 충돌 확인
+        // 게임 모드에 따른 충돌 확인
+        let boardWithConflicts: SudokuBoard;
+
+        if (gameMode === KILLER_MODE) {
+          boardWithConflicts = checkKillerConflicts(newBoard, cages);
+        } else {
+          boardWithConflicts = checkConflicts(newBoard);
+        }
+
+        // 게임 완료 확인
+        const completed = isBoardComplete(boardWithConflicts);
+        const success = completed && isBoardCorrect(boardWithConflicts, solution);
+
+        // 상태 업데이트 (힌트 횟수 감소 포함)
         set({
-          isCompleted: true,
-          isSuccess: isCorrect,
-          timerActive: false,
+          board: boardWithConflicts,
+          isCompleted: completed,
+          isSuccess: success,
+          timerActive: !completed,
+          hintsRemaining: hintsRemaining - 1, // 힌트 횟수 감소
+          selectedCell: { row, col }, // 선택한 셀 업데이트
         });
+
+        get().countBoardNumbers();
+        get().updateHighlights(row, col);
       },
 
       // 게임 재시작
@@ -324,19 +426,32 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
         set({ numberCounts: counts });
       },
+
+      // 정답 확인
+      checkSolution: () => {
+        const { board, solution, gameMode, cages } = get();
+        const isCorrect = isBoardCorrect(board, solution);
+
+        // 게임 모드에 따른 충돌 확인
+        let boardWithConflicts: SudokuBoard;
+
+        if (gameMode === KILLER_MODE) {
+          boardWithConflicts = checkKillerConflicts(board, cages);
+        } else {
+          boardWithConflicts = checkConflicts(board);
+        }
+
+        set({
+          isCompleted: true,
+          isSuccess: isCorrect,
+          timerActive: false,
+        });
+      },
     }),
     {
-      name: "sudoku-storage", // 로컬 스토리지 키 이름
+      name: "awesome-sudoku-storage", // 로컬 스토리지 키 이름
       partialize: (state) => ({
-        board: state.board,
-        solution: state.solution,
-        selectedCell: state.selectedCell,
-        isCompleted: state.isCompleted,
-        isSuccess: state.isSuccess,
-        currentTime: state.currentTime,
-        timerActive: state.timerActive,
-        difficulty: state.difficulty,
-        numberCounts: state.numberCounts,
+        ...Object.fromEntries(savedStorageKeys.map((key) => [key, state[key as keyof SudokuState]])),
       }),
     },
   ),

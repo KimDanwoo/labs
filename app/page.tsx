@@ -10,13 +10,13 @@ const Controls = dynamic(() => import("@widgets/controls/ui/Controls"), { ssr: f
 
 const GameStatus = dynamic(() => import("@widgets/game-status/ui/GameStatus"), { ssr: false });
 
+const GameModeSelector = dynamic(() => import("@features/game-mode-selector/ui/GameModeSelector"), { ssr: false });
+
 export default function Home() {
   return (
     <main className="min-w-[400px] min-h-screen flex flex-col gap-6">
-      <div className="px-2 h-[60px] flex flex-row gap-4">
-        <button>클래식</button>
-        <button>킬러</button>
-      </div>
+      <GameModeSelector />
+
       <div className="mx-auto p-6  rounded-lg flex flex-col lg:flex-row">
         <div>
           <GameStatus />

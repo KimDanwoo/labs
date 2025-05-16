@@ -1,6 +1,6 @@
 "use client";
 
-import { Difficulty, EASY, EXPERT, formatTime, HARD, IMPOSSIBLE, MEDIUM, useSudokuStore } from "@entities/sudoku/model";
+import { Difficulty, EASY, EXPERT, formatTime, HARD, MEDIUM, useSudokuStore } from "@entities/sudoku/model";
 import React, { useEffect } from "react";
 import { AiOutlinePause } from "react-icons/ai";
 import { VscPlay } from "react-icons/vsc";
@@ -37,7 +37,6 @@ export const GameStatus: React.FC = () => {
           <option value={MEDIUM}>중간</option>
           <option value={HARD}>어려움</option>
           <option value={EXPERT}>전문가</option>
-          <option value={IMPOSSIBLE}>불가능</option>
         </select>
 
         <div className="flex items-center gap-2">

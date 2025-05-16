@@ -7,6 +7,8 @@ import {
   Grid,
   GRID_SIZE,
   GridPosition,
+  KILLER_DIFFICULTY_RANGES,
+  KillerCage,
   NUMBERS,
   SudokuBoard,
 } from "@entities/sudoku/model";
@@ -312,15 +314,27 @@ const removeRandomCells = (board: SudokuBoard, solution: Grid, count: number): v
   for (const [row, col] of allPositions) {
     if (removed >= count) break;
 
+    // 원래 값 저장
     const originalValue = board[row][col].value;
+
+    // 셀 제거 시도
     board[row][col].value = null;
     board[row][col].isInitial = false;
 
-    // 고급 구현에서는 여기서 유일 솔루션 검증 가능
-    // 간소화를 위해 생략
+    // 유일 솔루션 검증
+    // 단일 솔루션이 아니면 셀 복원
+    if (!hasUniqueSolution(board)) {
+      board[row][col].value = originalValue;
+      board[row][col].isInitial = true;
+      continue; // 이 셀은 제거하지 않고 다음 셀로 이동
+    }
 
     removed++;
   }
+
+  // 목표한 셀 수를 제거하지 못했다면, 최대한 제거된 상태로 유지
+  // 유일 솔루션 제약으로 인해 count 개수만큼 제거하지 못할 수 있음
+  console.log(`목표 제거 수: ${count}, 실제 제거 수: ${removed}`);
 };
 
 /**
@@ -458,7 +472,6 @@ export const isBoardCorrect = (board: SudokuBoard, solution: Grid): boolean => {
  * @returns {GridPosition & { value: number }} 힌트 정보
  */
 export const getHint = (board: SudokuBoard, solution: Grid): { row: number; col: number; value: number } | null => {
-  // 빈 셀 찾기
   const emptyCells: GridPosition[] = [];
 
   board.forEach((row, rowIdx) => {
@@ -469,10 +482,11 @@ export const getHint = (board: SudokuBoard, solution: Grid): { row: number; col:
     });
   });
 
-  if (emptyCells.length === 0) return null;
+  if (emptyCells.length === 0) return null; // 빈 셀이 없으면 null 반환
 
   // 무작위 빈 셀 선택
-  const [row, col] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  const randomIndex = Math.floor(Math.random() * emptyCells.length);
+  const [row, col] = emptyCells[randomIndex];
 
   return {
     row,
@@ -553,6 +567,190 @@ const findEmptyCell = (grid: (number | null)[][]): GridPosition | null => {
 };
 
 /**
+ * @description 영향받은 셀 정보를 저장할 타입 정의
+ */
+type AffectedCell = [row: number, col: number, num: number];
+
+/**
+ * @description 셀에 값이 입력되었을 때 영향받는 셀들의 후보 업데이트
+ */
+const updateCandidates = (
+  row: number,
+  col: number,
+  num: number,
+  candidates: number[][][],
+  affectedCells: AffectedCell[],
+): void => {
+  // 같은 행, 열, 블록 내의 셀들에서 num을 후보에서 제거
+
+  // 행 처리
+  for (let c = 0; c < GRID_SIZE; c++) {
+    if (c !== col && candidates[row][c].includes(num)) {
+      const idx = candidates[row][c].indexOf(num);
+      if (idx !== -1) {
+        candidates[row][c].splice(idx, 1);
+        affectedCells.push([row, c, num]); // 영향받은 셀 기록 (복원용)
+      }
+    }
+  }
+
+  // 열 처리
+  for (let r = 0; r < GRID_SIZE; r++) {
+    if (r !== row && candidates[r][col].includes(num)) {
+      const idx = candidates[r][col].indexOf(num);
+      if (idx !== -1) {
+        candidates[r][col].splice(idx, 1);
+        affectedCells.push([r, col, num]);
+      }
+    }
+  }
+
+  // 블록 처리
+  const blockRow = Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE;
+  const blockCol = Math.floor(col / BLOCK_SIZE) * BLOCK_SIZE;
+
+  for (let r = 0; r < BLOCK_SIZE; r++) {
+    for (let c = 0; c < BLOCK_SIZE; c++) {
+      const curRow = blockRow + r;
+      const curCol = blockCol + c;
+
+      if ((curRow !== row || curCol !== col) && candidates[curRow][curCol].includes(num)) {
+        const idx = candidates[curRow][curCol].indexOf(num);
+        if (idx !== -1) {
+          candidates[curRow][curCol].splice(idx, 1);
+          affectedCells.push([curRow, curCol, num]);
+        }
+      }
+    }
+  }
+};
+
+/**
+ * @description 백트래킹 시 후보 복원
+ */
+const restoreCandidates = (
+  row: number,
+  col: number,
+  num: number,
+  candidates: number[][][],
+  affectedCells: AffectedCell[],
+): void => {
+  // 영향받은 셀들의 후보를 복원
+  for (const [r, c, n] of affectedCells) {
+    if (!candidates[r][c].includes(n)) {
+      candidates[r][c].push(n);
+    }
+  }
+
+  // 처리된 셀 목록 비우기
+  affectedCells.length = 0;
+};
+
+/**
+ * @description 최적화된 유일 솔루션 검증
+ * @param {SudokuBoard} board - 스도쿠 보드
+ * @returns {boolean} 유일 솔루션 여부
+ */
+const hasUniqueSolution = (board: SudokuBoard): boolean => {
+  // 보드를 그리드 형식으로 변환
+  const grid: (number | null)[][] = board.map((row) => row.map((cell) => cell.value));
+
+  // 솔루션 개수 추적
+  let solutionCount = 0;
+
+  // 각 셀의 가능한 후보 숫자 미리 계산 (성능 향상)
+  const candidates: number[][][] = Array(GRID_SIZE)
+    .fill(null)
+    .map(() =>
+      Array(GRID_SIZE)
+        .fill(null)
+        .map(() => []),
+    );
+
+  // 후보 숫자 초기화
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let col = 0; col < GRID_SIZE; col++) {
+      if (grid[row][col] === null) {
+        for (let num = 1; num <= GRID_SIZE; num++) {
+          if (isValidPlacement(grid, row, col, num)) {
+            candidates[row][col].push(num);
+          }
+        }
+      }
+    }
+  }
+
+  // 가장 후보가 적은 빈 셀 찾기 (최소 후보 휴리스틱)
+  const findBestEmptyCell = (): GridPosition | null => {
+    let minCandidates = Infinity;
+    let bestCell: GridPosition | null = null;
+
+    for (let row = 0; row < GRID_SIZE; row++) {
+      for (let col = 0; col < GRID_SIZE; col++) {
+        if (grid[row][col] === null) {
+          const candidateCount = candidates[row][col].length;
+          if (candidateCount < minCandidates) {
+            minCandidates = candidateCount;
+            bestCell = [row, col];
+
+            // 최적화: 후보가 1개인 셀은 바로 선택 (더 적은 분기 생성)
+            if (minCandidates === 1) {
+              return bestCell;
+            }
+          }
+        }
+      }
+    }
+
+    return bestCell;
+  };
+
+  // 백트래킹으로 솔루션 개수 세기 (최적화 버전)
+  const countSolutions = (): boolean => {
+    const emptyCell = findBestEmptyCell();
+
+    // 빈 셀이 없으면 솔루션 발견
+    if (!emptyCell) {
+      solutionCount++;
+      return solutionCount > 1; // 두 개 이상 발견 시 중단
+    }
+
+    const [row, col] = emptyCell;
+    const cellCandidates = candidates[row][col];
+
+    // 이 셀의 후보에 대해서만 시도
+    for (const num of cellCandidates) {
+      grid[row][col] = num;
+
+      // 후보 숫자 업데이트 (영향 받는 셀들)
+      const affectedCells: AffectedCell[] = [];
+      updateCandidates(row, col, num, candidates, affectedCells);
+
+      // 재귀적으로 다음 셀 확인
+      if (countSolutions()) {
+        return true; // 두 개 이상 발견 시 중단
+      }
+
+      // 백트래킹 - 후보 숫자 복원
+      grid[row][col] = null;
+      restoreCandidates(row, col, num, candidates, affectedCells);
+    }
+
+    return false;
+  };
+
+  // 솔루션 개수 세기 시작
+  const startTime = Date.now();
+  const result = countSolutions();
+  const endTime = Date.now();
+
+  console.log(`유일 솔루션 검증 소요 시간: ${endTime - startTime}ms`);
+
+  // 정확히 하나의 솔루션만 있어야 함
+  return solutionCount === 1;
+};
+
+/**
  * @description 특정 위치에 숫자를 놓을 수 있는지 확인
  * @param {(number | null)[][]} grid - 스도쿠 그리드
  * @param {number} row - 행 인덱스
@@ -584,40 +782,253 @@ const isValidPlacement = (grid: (number | null)[][], row: number, col: number, n
   return true;
 };
 
+// utils.ts에 추가할 함수들
+
 /**
- * @description 단일 솔루션을 가지는지 검증
- * @description 고급 퍼즐링 도구로 사용 가능
- * @param {SudokuBoard} board - 스도쿠 보드
- * @returns {boolean} 단일 솔루션 여부
+ * @description 킬러 스도쿠 케이지 생성
+ * @param {Grid} solution - 스도쿠 솔루션
+ * @param {Difficulty} difficulty - 난이도
+ * @returns {KillerCage[]} 생성된 케이지 목록
  */
-export const hasUniqueSolution = (board: SudokuBoard): boolean => {
-  const grid = board.map((row) => row.map((cell) => cell.value));
-  let solutionCount = 0;
+export const generateKillerCages = (solution: Grid, difficulty: Difficulty): KillerCage[] => {
+  const cages: KillerCage[] = [];
 
-  const countSolutions = (grid: (number | null)[][]): boolean => {
-    const emptyCell = findEmptyCell(grid);
-    if (!emptyCell) {
-      solutionCount++;
-      return solutionCount > 1; // 2개 이상 발견 시 중단
-    }
+  // 이미 케이지에 할당된 셀 추적
+  const assignedCells = new Set<string>();
+  let cageId = 1;
 
-    const [row, col] = emptyCell;
+  console.log(difficulty);
+  // 난이도에 따른 케이지 크기 제한 설정
+  const { maxCageSize } = KILLER_DIFFICULTY_RANGES[difficulty];
 
-    for (let num = 1; num <= GRID_SIZE; num++) {
-      if (isValidPlacement(grid, row, col, num)) {
-        grid[row][col] = num;
+  // 모든 셀이 케이지에 할당될 때까지 반복
+  while (assignedCells.size < GRID_SIZE * GRID_SIZE) {
+    // 시작 셀 선택 (아직 할당되지 않은 셀 중에서)
+    const startCell = findUnassignedCell(assignedCells);
+    if (!startCell) break; // 모든 셀이 할당됨
 
-        if (countSolutions(structuredClone(grid))) {
-          return true;
-        }
+    // 난이도에 따라 케이지 크기 조정
+    // 쉬운 난이도: 작은 케이지 (2-3개), 어려운 난이도: 큰 케이지 (최대 6개)
+    const minSize = 2; // 최소 2개 셀
+    const maxSize = Math.min(minSize + Math.floor(Math.random() * (maxCageSize - 1)), maxCageSize);
+    const targetSize = Math.min(minSize + Math.floor(Math.random() * (maxSize - minSize + 1)), maxSize);
 
-        grid[row][col] = null;
+    // 새 케이지 생성 시작
+    const cage: KillerCage = {
+      cells: [startCell],
+      sum: solution[startCell[0]][startCell[1]],
+      id: cageId++,
+    };
+
+    // 셀 할당 표시
+    assignedCells.add(`${startCell[0]}-${startCell[1]}`);
+
+    // 케이지 확장
+    expandCage(cage, solution, assignedCells, targetSize);
+
+    // 케이지 추가
+    cages.push(cage);
+  }
+
+  return cages;
+};
+
+/**
+ * @description 할당되지 않은 셀 찾기
+ * @param {Set<string>} assignedCells - 이미 할당된 셀 집합
+ * @returns {GridPosition | null} 할당되지 않은 셀 또는 null
+ */
+const findUnassignedCell = (assignedCells: Set<string>): GridPosition | null => {
+  // 무작위 순서로 셀 확인 (자연스러운 케이지 분포를 위해)
+  const positions: GridPosition[] = [];
+
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let col = 0; col < GRID_SIZE; col++) {
+      const key = `${row}-${col}`;
+      if (!assignedCells.has(key)) {
+        positions.push([row, col]);
       }
     }
+  }
 
-    return false;
-  };
+  if (positions.length === 0) return null;
 
-  countSolutions(grid);
-  return solutionCount === 1;
+  // 무작위 선택
+  return positions[Math.floor(Math.random() * positions.length)];
+};
+
+/**
+ * @description 케이지 확장 (인접한 셀 추가)
+ * @param {KillerCage} cage - 확장할 케이지
+ * @param {Grid} solution - 스도쿠 솔루션
+ * @param {Set<string>} assignedCells - 이미 할당된 셀 집합
+ * @param {number} targetSize - 목표 케이지 크기
+ */
+const expandCage = (cage: KillerCage, solution: Grid, assignedCells: Set<string>, targetSize: number): void => {
+  // 케이지가 목표 크기에 도달할 때까지 반복
+  while (cage.cells.length < targetSize) {
+    // 현재 케이지의 모든 셀에 인접한 셀들 찾기
+    const adjacentCells = findAdjacentCells(cage.cells, assignedCells);
+
+    // 더 이상 확장할 수 없으면 중단
+    if (adjacentCells.length === 0) break;
+
+    // 무작위로 인접 셀 선택
+    const nextCell = adjacentCells[Math.floor(Math.random() * adjacentCells.length)];
+
+    // 케이지에 셀 추가 및 합계 업데이트
+    cage.cells.push(nextCell);
+    cage.sum += solution[nextCell[0]][nextCell[1]];
+
+    // 셀 할당 표시
+    assignedCells.add(`${nextCell[0]}-${nextCell[1]}`);
+  }
+};
+
+/**
+ * @description 케이지의 인접 셀 찾기 (아직 할당되지 않은)
+ * @param {GridPosition[]} cageCells - 현재 케이지 셀들
+ * @param {Set<string>} assignedCells - 이미 할당된 셀 집합
+ * @returns {GridPosition[]} 인접한 할당되지 않은 셀 목록
+ */
+const findAdjacentCells = (cageCells: GridPosition[], assignedCells: Set<string>): GridPosition[] => {
+  const adjacentCells: GridPosition[] = [];
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ]; // 상하좌우
+
+  // 각 케이지 셀에 대해 확인
+  for (const [row, col] of cageCells) {
+    // 4방향 확인
+    for (const [dRow, dCol] of directions) {
+      const newRow = row + dRow;
+      const newCol = col + dCol;
+
+      // 유효한 범위 내인지 확인
+      if (newRow >= 0 && newRow < GRID_SIZE && newCol >= 0 && newCol < GRID_SIZE) {
+        const key = `${newRow}-${newCol}`;
+
+        // 아직 할당되지 않은 셀인지 확인
+        if (!assignedCells.has(key)) {
+          adjacentCells.push([newRow, newCol]);
+        }
+      }
+    }
+  }
+
+  // 중복 제거 (같은 셀이 여러 케이지 셀에 인접할 수 있음)
+  return Array.from(new Map(adjacentCells.map((cell) => [`${cell[0]}-${cell[1]}`, cell])).values());
+};
+
+/**
+ * @description 킬러 스도쿠 모드 게임 보드 생성
+ * @param {Grid} solution - 완성된 스도쿠 솔루션
+ * @param {Difficulty} difficulty - 난이도
+ * @returns {{ board: SudokuBoard, cages: KillerCage[] }} 생성된 킬러 스도쿠 보드
+ */
+export const generateKillerBoard = (
+  solution: Grid,
+  difficulty: Difficulty,
+): { board: SudokuBoard; cages: KillerCage[] } => {
+  // 기본 보드 생성
+  const board = createInitialBoard(solution);
+
+  // 케이지 생성
+  const cages = generateKillerCages(solution, difficulty);
+
+  // 난이도에 따른 힌트 셀 수 설정
+  const { hintsKeep } = KILLER_DIFFICULTY_RANGES[difficulty];
+
+  // 킬러 모드는 일반 모드보다 힌트 셀이 적음
+  // 총 81개 셀 중 제거할 셀 수 계산
+  const cellsToRemove = 81 - hintsKeep;
+
+  // 셀 제거 (일반 스도쿠와 동일한 유일 솔루션 보장 로직 사용)
+  removeRandomCells(board, solution, cellsToRemove);
+
+  return { board, cages };
+};
+
+/**
+ * @description 케이지 내 숫자 합계 및 중복 검증
+ * @param {SudokuBoard} board - 현재 스도쿠 보드
+ * @param {KillerCage[]} cages - 케이지 목록
+ * @returns {SudokuBoard} 케이지 검증 상태가 업데이트된 보드
+ */
+export const validateKillerCages = (board: SudokuBoard, cages: KillerCage[]): SudokuBoard => {
+  const newBoard = structuredClone(board);
+
+  // 케이지 고유 ID를 키로 사용하는 충돌 맵
+  const cageConflicts = new Map<number, boolean>();
+
+  // 각 케이지 검증
+  for (const cage of cages) {
+    let sum = 0;
+    const usedNumbers = new Set<number>();
+    let allFilled = true;
+
+    // 케이지 내 모든 셀 순회
+    for (const [row, col] of cage.cells) {
+      const value = newBoard[row][col].value;
+
+      // 빈 셀이 있는 경우
+      if (value === null) {
+        allFilled = false;
+        continue;
+      }
+
+      // 합계 계산
+      sum += value;
+
+      // 케이지 내 중복 숫자 검사
+      if (usedNumbers.has(value)) {
+        cageConflicts.set(cage.id, true);
+        break;
+      }
+
+      usedNumbers.add(value);
+    }
+
+    // 케이지가 모두 채워졌고 합이 맞지 않는 경우
+    if (allFilled && sum !== cage.sum) {
+      cageConflicts.set(cage.id, true);
+    } else if (!cageConflicts.has(cage.id)) {
+      cageConflicts.set(cage.id, false);
+    }
+  }
+
+  // 보드에 케이지 충돌 상태 반영
+  for (const cage of cages) {
+    const hasConflict = cageConflicts.get(cage.id) || false;
+
+    if (hasConflict) {
+      // 케이지 내 모든 셀에 충돌 표시
+      for (const [row, col] of cage.cells) {
+        if (newBoard[row][col].value !== null) {
+          newBoard[row][col].isConflict = true;
+        }
+      }
+    }
+  }
+
+  return newBoard;
+};
+
+/**
+ * @description 킬러 스도쿠 모드의 보드 충돌 확인 (일반 규칙 + 케이지 규칙)
+ * @param {SudokuBoard} board - 스도쿠 보드
+ * @param {KillerCage[]} cages - 케이지 목록
+ * @returns {SudokuBoard} 충돌 상태가 업데이트된 보드
+ */
+export const checkKillerConflicts = (board: SudokuBoard, cages: KillerCage[]): SudokuBoard => {
+  // 1. 일반 스도쿠 규칙 검사 (행, 열, 블록)
+  let newBoard = checkConflicts(board);
+
+  // 2. 킬러 스도쿠 케이지 규칙 검사
+  newBoard = validateKillerCages(newBoard, cages);
+
+  return newBoard;
 };

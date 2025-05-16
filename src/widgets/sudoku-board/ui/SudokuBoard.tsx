@@ -1,11 +1,12 @@
 "use client";
 
-import { MEDIUM, useSudokuStore } from "@entities/sudoku/model";
+import { KILLER_MODE, MEDIUM, useSudokuStore } from "@entities/sudoku/model";
 import { SudokuCell } from "@entities/sudoku/ui/Cell";
+import { KillerCage } from "@features/killer-cage/ui/KillerCage";
 import React, { useEffect } from "react";
 
 export const SudokuBoard: React.FC = () => {
-  const { board, initializeGame, selectCell } = useSudokuStore();
+  const { board, initializeGame, selectCell, gameMode } = useSudokuStore();
 
   useEffect(() => {
     const isEmpty = board.every((row) => row.every((cell) => cell.value === null && !cell.isInitial));
@@ -16,23 +17,27 @@ export const SudokuBoard: React.FC = () => {
   }, [board, initializeGame]);
 
   return (
-    <table className="border-collapse border-2 border-slate-800 bg-white w-fit mx-auto shadow-lg">
-      <tbody>
-        {board.map((row, rowIndex) => (
-          <tr key={`row-${rowIndex}`}>
-            {row.map((cell, colIndex) => (
-              <SudokuCell
-                key={`${rowIndex}-${colIndex}`}
-                cell={cell}
-                row={rowIndex}
-                col={colIndex}
-                onSelect={selectCell}
-              />
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className="relative">
+      {gameMode === KILLER_MODE && <KillerCage />}
+
+      <table className="border-collapse border-2 border-slate-800 bg-white w-fit mx-auto shadow-lg">
+        <tbody>
+          {board.map((row, rowIndex) => (
+            <tr key={`row-${rowIndex}`}>
+              {row.map((cell, colIndex) => (
+                <SudokuCell
+                  key={`${rowIndex}-${colIndex}`}
+                  cell={cell}
+                  row={rowIndex}
+                  col={colIndex}
+                  onSelect={selectCell}
+                />
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

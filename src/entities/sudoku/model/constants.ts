@@ -3,14 +3,15 @@ import { Difficulty, DifficultyRange } from "@entities/sudoku/model";
 export const GRID_SIZE = 9;
 export const BLOCK_SIZE = 3;
 export const NUMBERS = Array.from({ length: GRID_SIZE }, (_, i) => i + 1);
+export const HINTS_REMAINING = 5;
 
 export const KEY_NUMBER = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+export const NUMBER_COUNTS = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
 
 export const EASY = "easy";
 export const MEDIUM = "medium";
 export const HARD = "hard";
 export const EXPERT = "expert";
-export const IMPOSSIBLE = "impossible";
 
 export const CLASSIC_MODE = "classic";
 export const KILLER_MODE = "killer";
@@ -20,7 +21,25 @@ export const DIFFICULTY_RANGES: Record<Difficulty, DifficultyRange> = {
   [MEDIUM]: { min: 40, max: 50 },
   [HARD]: { min: 52, max: 62 },
   [EXPERT]: { min: 63, max: 72 },
-  [IMPOSSIBLE]: { min: 73, max: 81 },
+};
+
+export const KILLER_DIFFICULTY_RANGES = {
+  [EASY]: {
+    hintsKeep: 25, // 유지할 힌트 셀 수
+    maxCageSize: 3, // 최대 케이지 크기
+  },
+  [MEDIUM]: {
+    hintsKeep: 20,
+    maxCageSize: 4,
+  },
+  [HARD]: {
+    hintsKeep: 17,
+    maxCageSize: 5,
+  },
+  [EXPERT]: {
+    hintsKeep: 14,
+    maxCageSize: 6,
+  },
 };
 
 // 기본 패턴 - Latin Square 기반 유효한 스도쿠
