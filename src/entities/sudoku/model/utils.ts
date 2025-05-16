@@ -1,47 +1,28 @@
-import { Difficulty, SudokuBoard } from "./types";
+import {
+  BASE_GRID,
+  BLOCK_SIZE,
+  CellHighlight,
+  Difficulty,
+  DIFFICULTY_RANGES,
+  Grid,
+  GRID_SIZE,
+  GridPosition,
+  NUMBERS,
+  SudokuBoard,
+} from "@entities/sudoku/model";
 
 /**
- * 스도쿠 유틸리티 모듈
- * 고성능 스도쿠 생성 및 검증 알고리즘 제공
+ * @description 스도쿠 유틸리티 모듈
  * @module SudokuEngine
  */
-
-// 타입 정의
-type Grid = number[][];
-type Position = [row: number, col: number];
-type DifficultyRange = { min: number; max: number };
-
-// 상수
-const GRID_SIZE = 9;
-const BLOCK_SIZE = 3;
-const NUMBERS = Array.from({ length: GRID_SIZE }, (_, i) => i + 1);
-
-const DIFFICULTY_RANGES: Record<Difficulty, DifficultyRange> = {
-  easy: { min: 28, max: 35 },
-  medium: { min: 40, max: 50 },
-  hard: { min: 52, max: 62 },
-};
 
 /**
  * 유효한 스도쿠 솔루션 생성
  * @returns {Grid} 완성된 스도쿠 그리드
  */
 export const generateSolution = (): Grid => {
-  // 기본 패턴 - Latin Square 기반 유효한 스도쿠
-  const baseGrid: Grid = [
-    [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    [4, 5, 6, 7, 8, 9, 1, 2, 3],
-    [7, 8, 9, 1, 2, 3, 4, 5, 6],
-    [2, 1, 4, 3, 6, 5, 8, 9, 7],
-    [3, 6, 5, 8, 9, 7, 2, 1, 4],
-    [8, 9, 7, 2, 1, 4, 3, 6, 5],
-    [5, 3, 1, 6, 4, 2, 9, 7, 8],
-    [6, 4, 2, 9, 7, 8, 5, 3, 1],
-    [9, 7, 8, 5, 3, 1, 6, 4, 2],
-  ];
-
   // 솔루션 복제
-  const solution = structuredClone(baseGrid);
+  const solution = structuredClone(BASE_GRID);
 
   // 변환 파이프라인 적용
   applyTransformations(solution);
@@ -49,9 +30,46 @@ export const generateSolution = (): Grid => {
   return solution;
 };
 
+// 빈 스도쿠 보드 생성 헬퍼 함수
+export const createEmptyBoard = (): SudokuBoard =>
+  Array(9)
+    .fill(null)
+    .map(() =>
+      Array(9)
+        .fill(null)
+        .map(() => ({
+          value: null,
+          isInitial: false,
+          isSelected: false,
+          isConflict: false,
+          notes: [],
+        })),
+    );
+
 /**
- * 스도쿠 그리드에 무작위 변환 적용
- * 유효성을 유지하면서 패턴 변형
+ * @description 빈 스도쿠 하이라이트 생성
+ * @returns {Record<string, CellHighlight>} 빈 스도쿠 하이라이트
+ */
+export const createEmptyHighlights = (): Record<string, CellHighlight> => {
+  const highlights: Record<string, CellHighlight> = {};
+
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 9; col++) {
+      const key = `${row}-${col}`;
+      highlights[key] = {
+        selected: false,
+        related: false,
+        sameValue: false,
+      };
+    }
+  }
+
+  return highlights;
+};
+
+/**
+ * @description 스도쿠 그리드에 무작위 변환 적용
+ * @description 유효성을 유지하면서 패턴 변형
  * @param {Grid} grid - 변환할 스도쿠 그리드
  */
 const applyTransformations = (grid: Grid): void => {
@@ -78,7 +96,7 @@ const applyTransformations = (grid: Grid): void => {
 };
 
 /**
- * 무작위 숫자 매핑 생성 (1-9 → 1-9 셔플)
+ * @description 무작위 숫자 매핑 생성 (1-9 → 1-9 셔플)
  * @returns {Map<number, number>} 숫자 매핑 맵
  */
 const createRandomNumberMapping = (): Map<number, number> => {
@@ -94,7 +112,7 @@ const createRandomNumberMapping = (): Map<number, number> => {
 };
 
 /**
- * 숫자 매핑을 그리드에 적용
+ * @description 숫자 매핑을 그리드에 적용
  * @param {Grid} grid - 대상 그리드
  * @param {Map<number, number>} mapping - 숫자 매핑
  */
@@ -107,7 +125,7 @@ const applyNumberMapping = (grid: Grid, mapping: Map<number, number>): void => {
 };
 
 /**
- * 그리드 회전 또는 반사 적용
+ * @description 그리드 회전 또는 반사 적용
  * @param {Grid} grid - 대상 그리드
  */
 const rotateOrReflectGrid = (grid: Grid): void => {
@@ -119,7 +137,7 @@ const rotateOrReflectGrid = (grid: Grid): void => {
 };
 
 /**
- * 그리드를 90도 회전
+ * @description 그리드를 90도 회전
  * @param {Grid} grid - 대상 그리드
  */
 const rotateGrid90 = (grid: Grid): void => {
@@ -134,7 +152,7 @@ const rotateGrid90 = (grid: Grid): void => {
 };
 
 /**
- * 그리드 수평 반사
+ * @description 그리드 수평 반사
  * @param {Grid} grid - 대상 그리드
  */
 const reflectHorizontal = (grid: Grid): void => {
@@ -142,7 +160,7 @@ const reflectHorizontal = (grid: Grid): void => {
 };
 
 /**
- * 그리드 수직 반사
+ * @description 그리드 수직 반사
  * @param {Grid} grid - 대상 그리드
  */
 const reflectVertical = (grid: Grid): void => {
@@ -152,7 +170,7 @@ const reflectVertical = (grid: Grid): void => {
 };
 
 /**
- * 블록 내에서 무작위 행 교환
+ * @description 블록 내에서 무작위 행 교환
  * @param {Grid} grid - 대상 그리드
  */
 const swapRandomRowsWithinBlocks = (grid: Grid): void => {
@@ -168,7 +186,7 @@ const swapRandomRowsWithinBlocks = (grid: Grid): void => {
 };
 
 /**
- * 블록 내에서 무작위 열 교환
+ * @description 블록 내에서 무작위 열 교환
  * @param {Grid} grid - 대상 그리드
  */
 const swapRandomColumnsWithinBlocks = (grid: Grid): void => {
@@ -186,7 +204,7 @@ const swapRandomColumnsWithinBlocks = (grid: Grid): void => {
 };
 
 /**
- * 무작위 행 블록 교환
+ * @description 무작위 행 블록 교환
  * @param {Grid} grid - 대상 그리드
  */
 const swapRandomRowBlocks = (grid: Grid): void => {
@@ -203,7 +221,7 @@ const swapRandomRowBlocks = (grid: Grid): void => {
 };
 
 /**
- * 무작위 열 블록 교환
+ * @description 무작위 열 블록 교환
  * @param {Grid} grid - 대상 그리드
  */
 const swapRandomColumnBlocks = (grid: Grid): void => {
@@ -223,7 +241,7 @@ const swapRandomColumnBlocks = (grid: Grid): void => {
 };
 
 /**
- * 배열을 무작위로 섞는 함수 (Fisher-Yates 알고리즘)
+ * @description 배열을 무작위로 섞는 함수 (Fisher-Yates 알고리즘)
  * @param {T[]} array - 섞을 배열
  */
 function shuffleArray<T>(array: T[]): void {
@@ -234,7 +252,7 @@ function shuffleArray<T>(array: T[]): void {
 }
 
 /**
- * 새 스도쿠 보드 생성
+ * @description 새 스도쿠 보드 생성
  * @param {Grid} solution - 완성된 스도쿠 솔루션
  * @param {Difficulty} difficulty - 난이도 설정
  * @returns {SudokuBoard} 생성된 스도쿠 보드
@@ -254,7 +272,7 @@ export const generateBoard = (solution: Grid, difficulty: Difficulty): SudokuBoa
 };
 
 /**
- * 완성된 솔루션으로부터 초기 보드 생성
+ * @description 완성된 솔루션으로부터 초기 보드 생성
  * @param {Grid} solution - 완성된 스도쿠 솔루션
  * @returns {SudokuBoard} 초기 보드
  */
@@ -271,15 +289,15 @@ const createInitialBoard = (solution: Grid): SudokuBoard => {
 };
 
 /**
- * 무작위 셀 제거 (난이도 설정)
- * 유일 솔루션을 보장하기 위한 알고리즘
+ * @description 무작위 셀 제거 (난이도 설정)
+ * @description 유일 솔루션을 보장하기 위한 알고리즘
  * @param {SudokuBoard} board - 스도쿠 보드
  * @param {Grid} solution - 원본 솔루션
  * @param {number} count - 제거할 셀 수
  */
 const removeRandomCells = (board: SudokuBoard, solution: Grid, count: number): void => {
   // 모든 위치를 배열로 만듦
-  const allPositions: Position[] = [];
+  const allPositions: GridPosition[] = [];
   for (let row = 0; row < GRID_SIZE; row++) {
     for (let col = 0; col < GRID_SIZE; col++) {
       allPositions.push([row, col]);
@@ -306,8 +324,8 @@ const removeRandomCells = (board: SudokuBoard, solution: Grid, count: number): v
 };
 
 /**
- * 스도쿠 보드의 충돌 확인 및 표시
- * 행, 열, 3x3 블록 규칙 검증
+ * @description 스도쿠 보드의 충돌 확인 및 표시
+ * @description 행, 열, 3x3 블록 규칙 검증
  * @param {SudokuBoard} board - 검사할 스도쿠 보드
  * @returns {SudokuBoard} 충돌 정보가 업데이트된 보드
  */
@@ -330,7 +348,7 @@ export const checkConflicts = (board: SudokuBoard): SudokuBoard => {
 };
 
 /**
- * 특정 셀에 충돌이 있는지 확인
+ * @description 특정 셀에 충돌이 있는지 확인
  * @param {SudokuBoard} board - 스도쿠 보드
  * @param {number} row - 행 인덱스
  * @param {number} col - 열 인덱스
@@ -353,7 +371,12 @@ const hasConflict = (board: SudokuBoard, row: number, col: number): boolean => {
 };
 
 /**
- * 행 내 충돌 검사
+ * @description 행 내 충돌 검사
+ * @param {SudokuBoard} board - 스도쿠 보드
+ * @param {number} row - 행 인덱스
+ * @param {number} col - 열 인덱스
+ * @param {number} value - 확인할 숫자
+ * @returns {boolean} 충돌 여부
  */
 const checkRowConflict = (board: SudokuBoard, row: number, col: number, value: number): boolean => {
   for (let c = 0; c < GRID_SIZE; c++) {
@@ -365,7 +388,12 @@ const checkRowConflict = (board: SudokuBoard, row: number, col: number, value: n
 };
 
 /**
- * 열 내 충돌 검사
+ * @description 열 내 충돌 검사
+ * @param {SudokuBoard} board - 스도쿠 보드
+ * @param {number} row - 행 인덱스
+ * @param {number} col - 열 인덱스
+ * @param {number} value - 확인할 숫자
+ * @returns {boolean} 충돌 여부
  */
 const checkColConflict = (board: SudokuBoard, row: number, col: number, value: number): boolean => {
   for (let r = 0; r < GRID_SIZE; r++) {
@@ -396,8 +424,8 @@ const checkBlockConflict = (board: SudokuBoard, row: number, col: number, value:
 };
 
 /**
- * 스도쿠 보드가 완성되었는지 확인
- * 모든 셀이 채워져 있고 충돌이 없어야 함
+ * @description 스도쿠 보드가 완성되었는지 확인
+ * @description 모든 셀이 채워져 있고 충돌이 없어야 함
  * @param {SudokuBoard} board - 확인할 스도쿠 보드
  * @returns {boolean} 완성 여부
  */
@@ -414,7 +442,7 @@ export const isBoardComplete = (board: SudokuBoard): boolean => {
 };
 
 /**
- * 스도쿠 보드가 원본 솔루션과 일치하는지 확인
+ * @description 스도쿠 보드가 원본 솔루션과 일치하는지 확인
  * @param {SudokuBoard} board - 확인할 스도쿠 보드
  * @param {Grid} solution - 원본 솔루션
  * @returns {boolean} 일치 여부
@@ -424,14 +452,14 @@ export const isBoardCorrect = (board: SudokuBoard, solution: Grid): boolean => {
 };
 
 /**
- * 힌트 제공 - 무작위 빈 셀에 정답 채우기
+ * @description 힌트 제공 - 무작위 빈 셀에 정답 채우기
  * @param {SudokuBoard} board - 현재 스도쿠 보드
  * @param {Grid} solution - 정답 그리드
- * @returns {Position & { value: number }} 힌트 정보
+ * @returns {GridPosition & { value: number }} 힌트 정보
  */
 export const getHint = (board: SudokuBoard, solution: Grid): { row: number; col: number; value: number } | null => {
   // 빈 셀 찾기
-  const emptyCells: Position[] = [];
+  const emptyCells: GridPosition[] = [];
 
   board.forEach((row, rowIdx) => {
     row.forEach((cell, colIdx) => {
@@ -454,7 +482,7 @@ export const getHint = (board: SudokuBoard, solution: Grid): { row: number; col:
 };
 
 /**
- * 시간 형식 포맷팅 (초 -> 분:초)
+ * @description 시간 형식 포맷팅 (초 -> 분:초)
  * @param {number} seconds - 초 단위 시간
  * @returns {string} 포맷된 시간 문자열
  */
@@ -465,7 +493,7 @@ export const formatTime = (seconds: number): string => {
 };
 
 /**
- * 백트래킹 알고리즘을 이용한 스도쿠 솔버
+ * @description 백트래킹 알고리즘을 이용한 스도쿠 솔버
  * @param {SudokuBoard} board - 현재 스도쿠 보드
  * @returns {Grid | null} 해결된 솔루션 또는 null
  */
@@ -481,7 +509,7 @@ export const solveSudoku = (board: SudokuBoard): Grid | null => {
 };
 
 /**
- * 백트래킹 알고리즘 구현
+ * @description 백트래킹 알고리즘 구현
  * @param {(number | null)[][]} grid - 스도쿠 그리드
  * @returns {boolean} 해결 성공 여부
  */
@@ -509,11 +537,11 @@ const solveBacktracking = (grid: (number | null)[][]): boolean => {
 };
 
 /**
- * 그리드에서 빈 셀 찾기
+ * @description 그리드에서 빈 셀 찾기
  * @param {(number | null)[][]} grid - 스도쿠 그리드
- * @returns {Position | null} 빈 셀 위치 또는 null
+ * @returns {GridPosition | null} 빈 셀 위치 또는 null
  */
-const findEmptyCell = (grid: (number | null)[][]): Position | null => {
+const findEmptyCell = (grid: (number | null)[][]): GridPosition | null => {
   for (let row = 0; row < GRID_SIZE; row++) {
     for (let col = 0; col < GRID_SIZE; col++) {
       if (grid[row][col] === null) {
@@ -525,7 +553,7 @@ const findEmptyCell = (grid: (number | null)[][]): Position | null => {
 };
 
 /**
- * 특정 위치에 숫자를 놓을 수 있는지 확인
+ * @description 특정 위치에 숫자를 놓을 수 있는지 확인
  * @param {(number | null)[][]} grid - 스도쿠 그리드
  * @param {number} row - 행 인덱스
  * @param {number} col - 열 인덱스
@@ -557,8 +585,8 @@ const isValidPlacement = (grid: (number | null)[][], row: number, col: number, n
 };
 
 /**
- * 단일 솔루션을 가지는지 검증
- * 고급 퍼즐링 도구로 사용 가능
+ * @description 단일 솔루션을 가지는지 검증
+ * @description 고급 퍼즐링 도구로 사용 가능
  * @param {SudokuBoard} board - 스도쿠 보드
  * @returns {boolean} 단일 솔루션 여부
  */

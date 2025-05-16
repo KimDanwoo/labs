@@ -1,7 +1,19 @@
+import {
+  checkConflicts,
+  createEmptyBoard,
+  createEmptyHighlights,
+  Difficulty,
+  generateBoard,
+  generateSolution,
+  getHint,
+  isBoardComplete,
+  isBoardCorrect,
+  MEDIUM,
+  SudokuBoard,
+  SudokuState,
+} from "@entities/sudoku/model";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { CellHighlight, Difficulty, SudokuBoard, SudokuState } from "./types";
-import { checkConflicts, generateBoard, generateSolution, getHint, isBoardComplete, isBoardCorrect } from "./utils";
 
 interface SudokuActions {
   // 게임 초기화
@@ -38,39 +50,6 @@ interface SudokuActions {
   toggleNoteMode: () => void;
 }
 
-// 빈 스도쿠 보드 생성 헬퍼 함수
-const createEmptyBoard = (): SudokuBoard =>
-  Array(9)
-    .fill(null)
-    .map(() =>
-      Array(9)
-        .fill(null)
-        .map(() => ({
-          value: null,
-          isInitial: false,
-          isSelected: false,
-          isConflict: false,
-          notes: [],
-        })),
-    );
-
-const createEmptyHighlights = (): Record<string, CellHighlight> => {
-  const highlights: Record<string, CellHighlight> = {};
-
-  for (let row = 0; row < 9; row++) {
-    for (let col = 0; col < 9; col++) {
-      const key = `${row}-${col}`;
-      highlights[key] = {
-        selected: false,
-        related: false,
-        sameValue: false,
-      };
-    }
-  }
-
-  return highlights;
-};
-
 // 스도쿠 스토어 정의
 export const useSudokuStore = create<SudokuState & SudokuActions>()(
   persist(
@@ -86,11 +65,11 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
       isSuccess: false,
       currentTime: 0,
       timerActive: false,
-      difficulty: "medium",
+      difficulty: MEDIUM,
       highlightedCells: createEmptyHighlights(),
 
       // 액션들
-      initializeGame: (difficulty = "medium") => {
+      initializeGame: (difficulty = MEDIUM) => {
         const solution = generateSolution();
         const board = generateBoard(solution, difficulty);
 
@@ -189,7 +168,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         const { board, solution } = get();
         const hint = getHint(board, solution);
         if (hint) {
-          const { row, col, value } = hint;
+          const { row, col } = hint;
           get().selectCell(row, col);
         }
       },

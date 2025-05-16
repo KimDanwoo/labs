@@ -1,3 +1,10 @@
+import { EASY, EXPERT, HARD, IMPOSSIBLE, MEDIUM } from "./constants";
+
+export type Grid = number[][];
+export type GridPosition = [row: number, col: number];
+export type Difficulty = typeof EASY | typeof MEDIUM | typeof HARD | typeof EXPERT | typeof IMPOSSIBLE;
+export type DifficultyRange = { min: number; max: number };
+
 export interface SudokuCell {
   value: number | null;
   isInitial: boolean;
@@ -7,8 +14,6 @@ export interface SudokuCell {
 }
 
 export type SudokuBoard = SudokuCell[][];
-
-export type Difficulty = "easy" | "medium" | "hard";
 
 export interface Position {
   row: number;
