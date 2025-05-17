@@ -1,6 +1,6 @@
 "use client";
 
-import { KILLER_MODE, MEDIUM, useSudokuStore } from "@entities/sudoku/model";
+import { KILLER_MODE, MEDIUM, useKeyboardControls, useSudokuStore } from "@entities/sudoku/model";
 import { SudokuCell } from "@entities/sudoku/ui/Cell";
 import { KillerCage } from "@features/killer-cage/ui/KillerCage";
 import React, { useEffect } from "react";
@@ -10,6 +10,7 @@ export const SudokuBoard: React.FC = () => {
   const initializeGame = useSudokuStore((state) => state.initializeGame);
   const selectCell = useSudokuStore((state) => state.selectCell);
   const gameMode = useSudokuStore((state) => state.gameMode);
+  useKeyboardControls();
 
   useEffect(() => {
     const isEmpty = board.every((row) => row.every((cell) => cell.value === null && !cell.isInitial));

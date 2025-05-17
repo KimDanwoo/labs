@@ -65,6 +65,9 @@ interface SudokuActions {
 
   // 게임 모드 전환
   switchGameMode: (mode: GameMode, difficulty?: Difficulty) => void;
+
+  // 키 입력 처리
+  handleKeyInput: (key: string) => void;
 }
 
 const initialState: SudokuState = {
@@ -466,9 +469,20 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           timerActive: false,
         });
       },
+
+      handleKeyInput: (key) => {
+        if (key === "Backspace" || key === "Delete") {
+          get().fillCell(null);
+          return;
+        }
+
+        if (/^[1-9]$/.test(key)) {
+          get().fillCell(parseInt(key) as number);
+        }
+      },
     }),
     {
-      name: "awesome-sudoku-storage", // 로컬 스토리지 키 이름
+      name: "awesome-sudoku-storage",
       partialize: (state) => ({
         ...Object.fromEntries(savedStorageKeys.map((key) => [key, state[key as keyof SudokuState]])),
       }),
