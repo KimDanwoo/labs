@@ -6,18 +6,16 @@ import { RestartGame } from "@features/restart-game/ui/RestartGame";
 import { ToggleNote } from "@features/toggle-note/ui/ToggleNote";
 import React from "react";
 
-export const Controls: React.FC = () => {
-  return (
-    <div className="flex flex-wrap justify-center gap-2 mt-6">
-      <RestartGame />
+export const Controls: React.FC = () => (
+  <div className="flex flex-wrap justify-center gap-2 mt-6">
+    <RestartGame />
 
-      <RemoveNumber />
+    <RemoveNumber />
 
-      <GetHint />
+    <GetHint />
 
-      <ToggleNote />
-    </div>
-  );
-};
+    <ToggleNote />
+  </div>
+);
 
 export default Controls;

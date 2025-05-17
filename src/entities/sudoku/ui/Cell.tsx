@@ -11,7 +11,6 @@ interface CellProps {
 }
 
 export const SudokuCell: React.FC<CellProps> = ({ cell, row, col, onSelect }) => {
-  // 스토어에서 하이라이트 정보 가져오기
   const highlightedCells = useSudokuStore((state) => state.highlightedCells);
   const cellKey = `${row}-${col}`;
   const highlight = highlightedCells[cellKey] || { selected: false, related: false, sameValue: false };
@@ -68,7 +67,7 @@ export const SudokuCell: React.FC<CellProps> = ({ cell, row, col, onSelect }) =>
         <div className="grid grid-cols-3 grid-rows-3 gap-0 w-full h-full">
           {KEY_NUMBER.map((num) => (
             <div key={num} className="flex items-center justify-center w-full h-full">
-              {cell.notes.includes(num) && <span className={`text-[8px] md:text-xs text-slate-500`}>{num}</span>}
+              {cell.notes.includes(num) && <span className={"text-[8px] md:text-xs text-slate-500"}>{num}</span>}
             </div>
           ))}
         </div>

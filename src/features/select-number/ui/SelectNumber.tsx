@@ -14,9 +14,7 @@ export const SelectNumber: React.FC = () => {
     fillCell(value);
   };
 
-  const isNumberDisabled = (value: number) => {
-    return numberCounts[value] >= 9;
-  };
+  const isNumberDisabled = (value: number) => numberCounts[value] >= 9;
 
   return (
     <div className="flex flex-col gap-4 items-center mt-6">

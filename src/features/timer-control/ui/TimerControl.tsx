@@ -27,7 +27,7 @@ export const TimerControl = () => {
   return (
     <div className="flex items-center gap-2">
       <div className="text-md font-mono">{formatTime(currentTime)}</div>
-      <button className={`p-2 rounded-full transition-colors bg-gray-300`} onClick={() => toggleTimer()}>
+      <button className={"p-2 rounded-full transition-colors bg-gray-300"} onClick={() => toggleTimer()}>
         {timerActive ? <AiOutlinePause className="text-gray-500" /> : <VscPlay className="text-gray-500" />}
       </button>
     </div>

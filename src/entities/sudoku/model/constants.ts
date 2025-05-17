@@ -20,7 +20,7 @@ export const DIFFICULTY_RANGES: Record<Difficulty, DifficultyRange> = {
   [EASY]: { min: 28, max: 35 },
   [MEDIUM]: { min: 40, max: 50 },
   [HARD]: { min: 52, max: 62 },
-  [EXPERT]: { min: 63, max: 72 },
+  [EXPERT]: { min: 64, max: 69 },
 };
 
 export const KILLER_DIFFICULTY_RANGES = {
@@ -33,11 +33,11 @@ export const KILLER_DIFFICULTY_RANGES = {
     maxCageSize: 4,
   },
   [HARD]: {
-    hintsKeep: 17,
+    hintsKeep: 15,
     maxCageSize: 5,
   },
   [EXPERT]: {
-    hintsKeep: 14,
+    hintsKeep: 10,
     maxCageSize: 6,
   },
 };

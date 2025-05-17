@@ -4,7 +4,8 @@ import { KILLER_MODE, useSudokuStore } from "@entities/sudoku/model";
 import React, { useEffect, useRef, useState } from "react";
 
 export const KillerCage: React.FC = () => {
-  const { cages, gameMode } = useSudokuStore();
+  const cages = useSudokuStore((state) => state.cages);
+  const gameMode = useSudokuStore((state) => state.gameMode);
   const overlayRef = useRef<HTMLDivElement>(null);
   const [cageInfo, setCageInfo] = useState<{
     paths: { id: number; path: string }[];
@@ -80,19 +81,14 @@ export const KillerCage: React.FC = () => {
               const w = cell.width;
               const h = cell.height;
 
-              switch (side) {
-                case "top":
-                  segments.push(`M${x + padding},${y + padding} L${x + w - padding},${y + padding}`);
-                  break;
-                case "right":
-                  segments.push(`M${x + w - padding},${y + padding} L${x + w - padding},${y + h - padding}`);
-                  break;
-                case "bottom":
-                  segments.push(`M${x + padding},${y + h - padding} L${x + w - padding},${y + h - padding}`);
-                  break;
-                case "left":
-                  segments.push(`M${x + padding},${y + padding} L${x + padding},${y + h - padding}`);
-                  break;
+              if (side === "top") {
+                segments.push(`M${x + padding},${y + padding} L${x + w - padding},${y + padding}`);
+              } else if (side === "right") {
+                segments.push(`M${x + w - padding},${y + padding} L${x + w - padding},${y + h - padding}`);
+              } else if (side === "bottom") {
+                segments.push(`M${x + padding},${y + h - padding} L${x + w - padding},${y + h - padding}`);
+              } else if (side === "left") {
+                segments.push(`M${x + padding},${y + padding} L${x + padding},${y + h - padding}`);
               }
             }
           });
@@ -180,7 +176,7 @@ export const KillerCage: React.FC = () => {
             fill="none"
             stroke="#436def"
             strokeWidth={1}
-            strokeDasharray={`3,3`}
+            strokeDasharray={"3,3"}
             strokeLinecap="round"
             strokeLinejoin="round"
             className="opacity-90"
@@ -195,7 +191,7 @@ export const KillerCage: React.FC = () => {
           style={{
             top: `${y}px`,
             left: `${x}px`,
-            fontSize: Math.max(0.5, Math.min(0.65, cellSize / 65)) + "rem",
+            fontSize: `${Math.max(0.5, Math.min(0.65, cellSize / 65))}rem`,
             lineHeight: "1",
             backgroundColor: "white",
           }}

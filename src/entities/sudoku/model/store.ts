@@ -12,6 +12,7 @@ import {
   HINTS_REMAINING,
   isBoardComplete,
   isBoardCorrect,
+  isKillerBoardComplete,
   KILLER_MODE,
   KillerCage,
   MEDIUM,
@@ -221,7 +222,12 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         }
 
         // 게임 완료 확인
-        const completed = isBoardComplete(boardWithConflicts);
+        let completed = false;
+        if (gameMode === KILLER_MODE) {
+          completed = isKillerBoardComplete(boardWithConflicts, cages);
+        } else {
+          completed = isBoardComplete(boardWithConflicts);
+        }
         const success = completed && isBoardCorrect(boardWithConflicts, solution);
 
         set({
@@ -317,7 +323,12 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         }
 
         // 게임 완료 확인
-        const completed = isBoardComplete(boardWithConflicts);
+        let completed = false;
+        if (gameMode === KILLER_MODE) {
+          completed = isKillerBoardComplete(boardWithConflicts, cages);
+        } else {
+          completed = isBoardComplete(boardWithConflicts);
+        }
         const success = completed && isBoardCorrect(boardWithConflicts, solution);
 
         // 상태 업데이트 (힌트 횟수 감소 포함)
@@ -440,9 +451,18 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           boardWithConflicts = checkConflicts(board);
         }
 
+        // 게임 모드에 따른 완료 확인
+        let completed = false;
+        if (gameMode === KILLER_MODE) {
+          completed = isKillerBoardComplete(boardWithConflicts, cages);
+        } else {
+          completed = isBoardComplete(boardWithConflicts);
+        }
+
         set({
-          isCompleted: true,
-          isSuccess: isCorrect,
+          board: boardWithConflicts,
+          isCompleted: completed,
+          isSuccess: isCorrect && completed,
           timerActive: false,
         });
       },
