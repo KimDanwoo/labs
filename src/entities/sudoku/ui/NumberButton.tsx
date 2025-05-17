@@ -22,11 +22,11 @@ export const NumberButton: React.FC<NumberButtonProps> = ({
     onNumberSelect(value);
   };
 
+  const sizeClass = "w-6 h-6 md:w-10 md:h-10 lg:w-30 lg:h-30";
+  const alignClass = "rounded-full flex items-center justify-center text-xl font-semibold";
   return (
     <button
-      className={`w-6 h-6 md:w-10 md:h-10 lg:w-30 lg:h-30  rounded-full flex items-center justify-center text-xl font-semibold ${
-        isDisabled ? "text-gray-100" : "hover:bg-gray-300 transition-colors"
-      }`}
+      className={`${sizeClass} ${alignClass} ${isDisabled ? "text-gray-100" : "hover:bg-gray-300 transition-colors"}`}
       onClick={handleClick}
       disabled={isDisabled}
     >

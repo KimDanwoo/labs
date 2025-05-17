@@ -28,6 +28,18 @@ export interface HighlightInfo {
   sameValueCells: Set<string>;
 }
 
+export interface CellHighlight {
+  selected: boolean;
+  related: boolean;
+  sameValue: boolean;
+}
+
+export interface KillerCage {
+  cells: GridPosition[];
+  sum: number;
+  id: number;
+}
+
 export interface SudokuState {
   board: SudokuBoard;
   isNoteMode: boolean;
@@ -43,16 +55,4 @@ export interface SudokuState {
   hintsRemaining: number;
   gameMode: GameMode;
   cages: KillerCage[];
-}
-
-export interface CellHighlight {
-  selected: boolean;
-  related: boolean;
-  sameValue: boolean;
-}
-
-export interface KillerCage {
-  cells: GridPosition[];
-  sum: number;
-  id: number;
 }

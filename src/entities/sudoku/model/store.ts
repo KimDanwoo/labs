@@ -146,7 +146,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
       // 사용자 입력 초기화
       resetUserInputs: () => {
-        const { board, solution } = get();
+        const { board } = get();
 
         // 새 보드 생성
         const newBoard = board.map((row) =>
