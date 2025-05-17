@@ -1,4 +1,4 @@
-import { CLASSIC_MODE, EASY, EXPERT, HARD, KILLER_MODE, MEDIUM } from "./constants";
+import { CLASSIC_MODE, EASY, EXPERT, HARD, KILLER_MODE, MEDIUM } from "@entities/sudoku/model";
 
 export type GameMode = typeof CLASSIC_MODE | typeof KILLER_MODE;
 export type Grid = number[][];
