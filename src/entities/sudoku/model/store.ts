@@ -1,6 +1,5 @@
 import {
   checkConflicts,
-  checkKillerConflicts,
   CLASSIC_MODE,
   createEmptyBoard,
   createEmptyHighlights,
@@ -12,7 +11,6 @@ import {
   HINTS_REMAINING,
   isBoardComplete,
   isBoardCorrect,
-  isKillerBoardComplete,
   KILLER_MODE,
   KillerCage,
   MEDIUM,
@@ -22,6 +20,7 @@ import {
 } from "@entities/sudoku/model";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { checkKillerConflicts, isKillerBoardComplete } from "./utils/killer";
 
 interface SudokuActions {
   // 게임 초기화
