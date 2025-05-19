@@ -2,6 +2,7 @@
 
 import { KILLER_MODE, MEDIUM, useKeyboardControls, useSudokuStore } from "@entities/sudoku/model";
 import { SudokuCell } from "@entities/sudoku/ui/Cell";
+import { CompleteSudoku } from "@features/complete-sudoku/CompleteSudoku";
 import { KillerCage } from "@features/killer-cage/ui/KillerCage";
 import { PauseOverlay } from "@features/pause-overlay/PauseOverlay";
 import React, { useEffect } from "react";
@@ -23,6 +24,8 @@ export const SudokuBoard: React.FC = () => {
 
   return (
     <div className="relative">
+      <CompleteSudoku />
+
       <PauseOverlay />
 
       {gameMode === KILLER_MODE && <KillerCage />}

@@ -32,6 +32,9 @@ interface SudokuActions {
   // 셀 선택
   selectCell: (row: number, col: number) => void;
 
+  // 셀 선택 해제
+  deselectCell: () => void;
+
   // 선택된 셀에 값 입력
   fillCell: (value: number | null) => void;
 
@@ -136,6 +139,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           gameMode,
           cages,
         });
+        get().toggleTimer(true);
         get().countBoardNumbers();
       },
 
@@ -239,8 +243,20 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           timerActive: !completed,
         });
 
+        if (success) {
+          get().deselectCell();
+          get().toggleTimer(false);
+        }
+
         get().countBoardNumbers();
         get().updateHighlights(row, col);
+      },
+
+      // 셀 선택 해제
+      deselectCell: () => {
+        const { board } = get();
+        const newBoard = board.map((r) => r.map((c) => ({ ...c, isSelected: false })));
+        set({ board: newBoard, selectedCell: null });
       },
 
       // 노트 토글
@@ -279,10 +295,10 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         const { board, solution, hintsRemaining, gameMode, cages } = get();
 
         // 남은 힌트가 없으면 알림
-        if (hintsRemaining <= 0) {
-          alert("더 이상 힌트를 사용할 수 없습니다!");
-          return;
-        }
+        // if (hintsRemaining <= 0) {
+        //   alert("더 이상 힌트를 사용할 수 없습니다!");
+        //   return;
+        // }
 
         // 무작위 빈 셀 선택 (빈 셀 = 값이 null인 셀)
         const emptyCells: { row: number; col: number }[] = [];

@@ -26,11 +26,13 @@ export const SudokuCell: React.FC<CellProps> = ({ cell, row, col, onSelect }) =>
   // 하이라이트 스타일 계산
   let bgColor = "bg-white";
   let textColor = "text-slate-700";
+  let borderColor = "border-slate-200";
 
   // 우선순위: 선택된 셀 > 같은 값 > 관련 셀
   if (highlight.selected) {
     bgColor = "bg-blue-100";
     textColor = "text-slate-700";
+    borderColor = "outline-1 outline-blue-600";
   } else if (highlight.sameValue) {
     bgColor = "bg-blue-300";
   } else if (highlight.related) {
@@ -54,6 +56,7 @@ export const SudokuCell: React.FC<CellProps> = ({ cell, row, col, onSelect }) =>
         ${isBottomBlockBorder ? "border-b-2 border-b-slate-800" : ""}
         ${bgColor}
         ${textColor}
+        ${borderColor}
         ${cell.isInitial ? "font-bold" : "font-normal"}
         text-center align-middle
         cursor-pointer

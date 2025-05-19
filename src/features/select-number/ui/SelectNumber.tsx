@@ -9,6 +9,7 @@ export const SelectNumber: React.FC = () => {
   const fillCell = useSudokuStore((state) => state.fillCell);
   const toggleNote = useSudokuStore((state) => state.toggleNote);
   const numberCounts = useSudokuStore((state) => state.numberCounts);
+  const timerActive = useSudokuStore((state) => state.timerActive);
 
   const handleNumberSelect = (value: number) => {
     fillCell(value);
@@ -26,7 +27,7 @@ export const SelectNumber: React.FC = () => {
             onNumberSelect={handleNumberSelect}
             onNoteToggle={toggleNote}
             isNoteMode={isNoteMode}
-            isDisabled={isNumberDisabled(num)}
+            isDisabled={isNumberDisabled(num) || !timerActive}
           />
         ))}
       </div>
