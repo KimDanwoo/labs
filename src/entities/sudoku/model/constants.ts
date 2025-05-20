@@ -18,9 +18,9 @@ export const KILLER_MODE = "killer";
 
 export const DIFFICULTY_RANGES: Record<Difficulty, DifficultyRange> = {
   [EASY]: { min: 28, max: 35 },
-  [MEDIUM]: { min: 40, max: 50 },
-  [HARD]: { min: 52, max: 62 },
-  [EXPERT]: { min: 64, max: 69 },
+  [MEDIUM]: { min: 40, max: 55 },
+  [HARD]: { min: 60, max: 65 },
+  [EXPERT]: { min: 70, max: 75 },
 };
 
 export const KILLER_DIFFICULTY_RANGES = {
@@ -29,15 +29,15 @@ export const KILLER_DIFFICULTY_RANGES = {
     maxCageSize: 3, // 최대 케이지 크기
   },
   [MEDIUM]: {
-    hintsKeep: 20,
+    hintsKeep: 23,
     maxCageSize: 4,
   },
   [HARD]: {
-    hintsKeep: 15,
+    hintsKeep: 20,
     maxCageSize: 5,
   },
   [EXPERT]: {
-    hintsKeep: 10,
+    hintsKeep: 15,
     maxCageSize: 6,
   },
 };

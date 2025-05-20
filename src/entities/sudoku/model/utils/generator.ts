@@ -184,7 +184,7 @@ const removeRandomCells = (board: SudokuBoard, solution: Grid, count: number): v
 };
 
 /**
- * @description 새 스도쿠 보드 생성
+ * @description 개선된 스도쿠 보드 생성 함수
  * @param {Grid} solution - 완성된 스도쿠 솔루션
  * @param {Difficulty} difficulty - 난이도 설정
  * @returns {SudokuBoard} 생성된 스도쿠 보드
@@ -193,18 +193,32 @@ export const generateBoard = (solution: Grid, difficulty: Difficulty): SudokuBoa
   // 솔루션으로부터 초기 보드 생성
   const board = createInitialBoard(solution);
 
-  // 난이도에 따라 셀 제거
+  // 난이도에 따라 제거할 셀 수 계산
   const { min, max } = DIFFICULTY_RANGES[difficulty];
   const cellsToRemove = min + Math.floor(Math.random() * (max - min + 1));
 
-  // 난이도 알고리즘 적용
-  removeRandomCells(board, solution, cellsToRemove);
+  console.log(`일반 스도쿠: 난이도 ${difficulty}, 제거할 셀 수: ${cellsToRemove}, 남길 힌트 수: ${81 - cellsToRemove}`);
+
+  // 개선된 셀 제거 알고리즘 적용
+  removeRandomCellsImproved(board, solution, cellsToRemove);
+
+  // 최종 힌트 수 확인
+  let actualHintCount = 0;
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (board[r][c].value !== null) {
+        actualHintCount++;
+      }
+    }
+  }
+
+  console.log(`일반 스도쿠: 최종 힌트 수: ${actualHintCount}`);
 
   return board;
 };
 
 /**
- * @description 킬러 스도쿠 모드 게임 보드 생성
+ * @description 킬러 스도쿠 모드 게임 보드 생성 (개선된 함수)
  * @param {Grid} solution - 완성된 스도쿠 솔루션
  * @param {Difficulty} difficulty - 난이도
  * @returns {{ board: SudokuBoard, cages: KillerCage[] }} 생성된 킬러 스도쿠 보드
@@ -222,14 +236,197 @@ export function generateKillerBoard(
   // 난이도에 따른 힌트 셀 수 설정
   const { hintsKeep } = KILLER_DIFFICULTY_RANGES[difficulty];
 
-  // 킬러 모드는 일반 모드보다 힌트 셀이 적음
   // 총 81개 셀 중 제거할 셀 수 계산
   const cellsToRemove = 81 - hintsKeep;
 
-  // 셀 제거 (일반 스도쿠와 동일한 유일 솔루션 보장 로직 사용)
-  removeRandomCells(board, solution, cellsToRemove);
+  console.log(`킬러 스도쿠: 난이도 ${difficulty}, 남길 힌트 수: ${hintsKeep}, 제거할 셀 수: ${cellsToRemove}`);
+
+  // 개선된 셀 제거 알고리즘 적용
+  removeRandomCellsImproved(board, solution, cellsToRemove, cages);
+
+  // 최종 힌트 수 확인
+  let actualHintCount = 0;
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (board[r][c].value !== null) {
+        actualHintCount++;
+      }
+    }
+  }
+
+  console.log(`킬러 스도쿠: 최종 힌트 수: ${actualHintCount}`);
 
   return { board, cages };
+}
+
+/**
+ * @description 개선된 무작위 셀 제거 함수
+ * @param {SudokuBoard} board - 스도쿠 보드
+ * @param {Grid} solution - 원본 솔루션
+ * @param {number} targetRemoveCount - 제거할 셀 수
+ * @param {KillerCage[]} cages - 케이지 목록 (킬러 스도쿠에만 사용)
+ */
+function removeRandomCellsImproved(
+  board: SudokuBoard,
+  solution: Grid,
+  targetRemoveCount: number,
+  cages?: KillerCage[],
+): void {
+  // 모든 위치를 배열로 만듦
+  const allPositions: GridPosition[] = [];
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let col = 0; col < GRID_SIZE; col++) {
+      allPositions.push([row, col]);
+    }
+  }
+
+  // 각 셀의 점수 계산 함수 (낮을수록 제거하기 쉬운 셀)
+  const calculateCellScore = (row: number, col: number): number => {
+    let score = 0;
+
+    // 1. 케이지 관련 점수 (킬러 스도쿠에서만)
+    if (cages) {
+      const cageOfCell = cages.find((cage) => cage.cells.some(([r, c]) => r === row && c === col));
+
+      if (cageOfCell) {
+        const cellValue = solution[row][col];
+
+        // 케이지 내 유일한 숫자인지 확인
+        const hasOtherSameValue = cageOfCell.cells.some(
+          ([r, c]) => (r !== row || c !== col) && solution[r][c] === cellValue,
+        );
+
+        if (!hasOtherSameValue) {
+          score += 4; // 케이지 내 유일한 값이면 제거하기 어려움
+        }
+
+        // 작은 케이지에 있는 숫자는 제거하기 더 어려움
+        if (cageOfCell.cells.length <= 2) {
+          score += 3;
+        } else if (cageOfCell.cells.length <= 3) {
+          score += 2;
+        }
+      }
+    }
+
+    // 2. 중앙 셀에 보너스 (더 많은 제약 조건)
+    const centerDistance = Math.abs(4 - row) + Math.abs(4 - col);
+    score += Math.max(0, 3 - centerDistance) * 0.5; // 중앙에 가까울수록 높은 점수
+
+    // 3. 대각선 셀에 보너스
+    if (row === col || row + col === 8) {
+      score += 1;
+    }
+
+    // 4. 같은 숫자가 행, 열, 블록에 많을수록 보너스
+    const value = solution[row][col];
+    let sameValueCount = 0;
+
+    // 같은 행, 열에서 동일한 숫자 개수 확인
+    for (let i = 0; i < 9; i++) {
+      if (i !== col && solution[row][i] === value) sameValueCount++;
+      if (i !== row && solution[i][col] === value) sameValueCount++;
+    }
+
+    // 같은 블록에서 동일한 숫자 개수 확인
+    const blockRow = Math.floor(row / 3) * 3;
+    const blockCol = Math.floor(col / 3) * 3;
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        const cr = blockRow + r;
+        const cc = blockCol + c;
+        if ((cr !== row || cc !== col) && solution[cr][cc] === value) {
+          sameValueCount++;
+        }
+      }
+    }
+
+    score += sameValueCount * 0.2; // 같은 숫자가 많을수록 약간의 보너스
+
+    // 5. 약간의 무작위성 추가
+    score += Math.random() * 0.5;
+
+    return score;
+  };
+
+  // 각 셀에 점수 할당 및 정렬 (점수가 낮은 셀부터 제거 시도)
+  const scoredPositions = allPositions.map(([row, col]) => ({
+    position: [row, col] as GridPosition,
+    score: calculateCellScore(row, col),
+  }));
+
+  // 제거 시도 순서: 점수가 낮은 셀(제거하기 쉬운 셀)부터 시도
+  scoredPositions.sort((a, b) => a.score - b.score);
+
+  // 임시 그리드 (유일 솔루션 검사용)
+  const tempGrid: (number | null)[][] = [];
+  for (let r = 0; r < GRID_SIZE; r++) {
+    tempGrid[r] = [];
+    for (let c = 0; c < GRID_SIZE; c++) {
+      tempGrid[r][c] = board[r][c].value;
+    }
+  }
+
+  let removedCount = 0;
+  const maxRetries = 3; // 최대 재시도 횟수
+
+  for (let retry = 0; retry < maxRetries; retry++) {
+    if (removedCount >= targetRemoveCount) break;
+
+    // 재시도할 때마다 새로운 순서로 시도
+    if (retry > 0) {
+      // 점수에 무작위성 추가하여 다시 정렬
+      scoredPositions.forEach((pos) => {
+        pos.score = calculateCellScore(pos.position[0], pos.position[1]) + Math.random() * 2;
+      });
+      scoredPositions.sort((a, b) => a.score - b.score);
+    }
+
+    let successfulRemovalsInThisRetry = 0;
+
+    // 모든 위치 시도
+    for (const { position } of scoredPositions) {
+      if (removedCount >= targetRemoveCount) break;
+
+      const [row, col] = position;
+
+      // 이미 제거된 셀은 건너뜀
+      if (board[row][col].value === null) {
+        continue;
+      }
+
+      // 원래 값 저장
+      const originalValue = board[row][col].value;
+
+      // 셀 임시 제거
+      board[row][col].value = null;
+      board[row][col].isInitial = false;
+      tempGrid[row][col] = null;
+
+      // 유일 솔루션 검사
+      if (hasUniqueSolution(tempGrid)) {
+        // 제거 성공
+        removedCount++;
+        successfulRemovalsInThisRetry++;
+      } else {
+        // 제거 실패 - 복원
+        board[row][col].value = originalValue;
+        board[row][col].isInitial = true;
+        tempGrid[row][col] = originalValue;
+      }
+    }
+
+    // 이번 회차에서 제거된 셀이 없으면 더 이상 시도하지 않음
+    if (successfulRemovalsInThisRetry === 0) {
+      break;
+    }
+  }
+
+  if (removedCount < targetRemoveCount) {
+    console.warn(`목표로 한 ${targetRemoveCount}개 셀 제거 중 ${removedCount}개만 제거 가능했습니다.`);
+  } else {
+    console.log(`성공적으로 ${removedCount}개 셀 제거 완료`);
+  }
 }
 
 /**

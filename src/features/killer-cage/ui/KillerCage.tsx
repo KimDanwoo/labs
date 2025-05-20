@@ -1,7 +1,5 @@
-"use client";
-
 import { KILLER_MODE, useSudokuStore } from "@entities/sudoku/model";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const KillerCage: React.FC = () => {
   const cages = useSudokuStore((state) => state.cages);
@@ -49,10 +47,17 @@ export const KillerCage: React.FC = () => {
       }
 
       // 케이지별 경로 및 합계 위치 계산
-      const paths: { id: number; path: string }[] = [];
-      const sums: { id: number; sum: number; x: number; y: number }[] = [];
+      const paths: { id: number; path: string }[] = []; // 중복 제거를 위해 빈 배열로 초기화
+      const sums: { id: number; sum: number; x: number; y: number }[] = []; // 중복 제거를 위해 빈 배열로 초기화
+
+      // 중복 처리 방지를 위한 Set
+      const processedCageIds = new Set<number>();
 
       cages.forEach((cage) => {
+        // 이미 처리한 케이지는 건너뛰기
+        if (processedCageIds.has(cage.id)) return;
+        processedCageIds.add(cage.id);
+
         // 케이지 테두리 생성
         const segments: string[] = [];
         const cageCellKeys = new Set(cage.cells.map(([r, c]) => `${r}-${c}`));
@@ -132,7 +137,7 @@ export const KillerCage: React.FC = () => {
     const table = document.querySelector("table.border-collapse");
     if (table) {
       observer.observe(table, {
-        attributes: true,
+        attributes: true, 
         childList: true,
         subtree: true,
       });

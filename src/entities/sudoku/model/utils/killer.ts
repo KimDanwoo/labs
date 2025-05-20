@@ -186,7 +186,7 @@ export function handleRemainingCells(cages: KillerCage[], assignedCells: Set<str
 }
 
 /**
- * @description 정교한 킬러 스도쿠 케이지 생성 (최적화 버전)
+ * @description 킬러 스도쿠 모드 케이지 생성 (1개짜리 케이지 지원 버전)
  * @param {Grid} solution - 스도쿠 솔루션
  * @param {Difficulty} difficulty - 난이도
  * @returns {KillerCage[]} 생성된 케이지 목록
@@ -198,8 +198,9 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
 
   // 난이도에 따른 케이지 크기 제한
   const { maxCageSize } = KILLER_DIFFICULTY_RANGES[difficulty];
-  const minCageSize = 1;
+  const minCageSize = 1; // 1개짜리 케이지 허용
 
+  // 최대 단일 셀 케이지 수 제한
   const maxSingleCellCages = 3; // 최대 3개의 단일 셀 케이지 허용
   let singleCellCageCount = 0;
 
@@ -225,35 +226,48 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
       }
     }
   }
+
   shuffleArray(remainingCells);
   cellOrder.push(...remainingCells);
+
+  // 단일 셀 케이지에 더 적합한 숫자 (예: 1, 5, 9)
+  const isSuitableForSingleCell = (value: number): boolean => {
+    return value === 1 || value === 5 || value === 9 || Math.random() < 0.1;
+  };
 
   // 모든 셀을 처리
   for (const [startRow, startCol] of cellOrder) {
     const key = `${startRow}-${startCol}`;
     if (assignedCells.has(key)) continue;
 
+    // 현재 값 가져오기
+    const currentValue = solution[startRow][startCol];
+
     // 이 셀부터 새 케이지 시작
     const cage: KillerCage = {
       cells: [[startRow, startCol]],
-      sum: solution[startRow][startCol],
+      sum: currentValue,
       id: cageId,
     };
     assignedCells.add(key);
 
     // 사용된 숫자 추적 (중복 방지)
-    const usedNumbers = new Set<number>([solution[startRow][startCol]]);
+    const usedNumbers = new Set<number>([currentValue]);
 
-    // 목표 크기 설정 (난이도에 따라 다름)
-    // 단일 셀 케이지를 생성할 확률 계산 (최대 개수 제한 고려)
-    const createSingleCellCage = singleCellCageCount < maxSingleCellCages && Math.random() < 0.15; // 15% 확률
+    // 단일 셀 케이지 생성 결정
+    // 적합한 숫자이고 최대 개수를 넘지 않으면 단일 셀 케이지 생성 확률 증가
+    const createSingleCellCage =
+      singleCellCageCount < maxSingleCellCages &&
+      (isSuitableForSingleCell(currentValue) ? Math.random() < 0.7 : Math.random() < 0.15);
 
-    // 목표 크기 설정 (난이도에 따라 다름)
-    const targetSize = Math.min(minCageSize + Math.floor(Math.random() * (maxCageSize - minCageSize + 1)), maxCageSize);
+    // 목표 크기 설정
+    const targetSize = createSingleCellCage
+      ? 1 // 단일 셀 케이지
+      : Math.min(2 + Math.floor(Math.random() * (maxCageSize - 2 + 1)), maxCageSize); // 2개 이상 케이지
 
     // 효율적인 확장 로직
     const expandCage = () => {
-      // 단일 셀 케이지는 확장할 필요 없음
+      // 단일 셀 케이지는 확장하지 않음
       if (targetSize === 1) return;
 
       // 현재 케이지 형태
@@ -364,6 +378,7 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
     // 케이지 확장 실행
     expandCage();
 
+    // 유효한 케이지만 추가 (최소 크기 확인)
     if (cage.cells.length >= minCageSize) {
       // 단일 셀 케이지인 경우 카운터 증가
       if (cage.cells.length === 1) {
@@ -378,24 +393,13 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
         assignedCells.delete(`${row}-${col}`);
       }
     }
-
-    // 유효한 케이지만 추가 (최소 크기 확인)
-    if (cage.cells.length >= minCageSize) {
-      cages.push(cage);
-      cageId++;
-    } else {
-      // 케이지가 너무 작으면 셀 할당 해제
-      for (const [row, col] of cage.cells) {
-        assignedCells.delete(`${row}-${col}`);
-      }
-    }
   }
 
   // 누락된 셀 처리
   if (assignedCells.size < GRID_SIZE * GRID_SIZE) {
     handleRemainingCells(cages, assignedCells, solution);
 
-    // 추가: 모든 셀이 할당되었는지 최종 확인
+    // 모든 셀이 할당되었는지 최종 확인
     if (assignedCells.size < GRID_SIZE * GRID_SIZE) {
       console.warn(
         `킬러 스도쿠 생성 경고: ${GRID_SIZE * GRID_SIZE - assignedCells.size}개의 셀이 할당되지 않았습니다.`,
@@ -418,7 +422,6 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
 
   return cages;
 }
-
 /**
  * @description 케이지 내 숫자 합계 및 중복 검증
  * @param {SudokuBoard} board - 현재 스도쿠 보드
