@@ -226,6 +226,7 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
       }
     }
   }
+
   shuffleArray(remainingCells);
   cellOrder.push(...remainingCells);
 

@@ -137,7 +137,7 @@ export const KillerCage: React.FC = () => {
     const table = document.querySelector("table.border-collapse");
     if (table) {
       observer.observe(table, {
-        attributes: true,
+        attributes: true, 
         childList: true,
         subtree: true,
       });
