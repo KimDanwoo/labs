@@ -41,13 +41,16 @@ export function hasUniqueSolution(grid: (number | null)[][]): boolean {
   let solutionCount = 0;
   const MAX_SOLUTIONS = 2;
 
+  // 원본 그리드 복제
+  const tempGrid = grid.map((row) => [...row]);
+
   // 가장 제약이 많은 빈 셀부터 처리하는 백트래킹
   function countSolutions(index = 0, emptyCells: GridPosition[] = []): boolean {
     // 빈 셀 목록 초기화 (첫 호출 시만)
     if (index === 0 && emptyCells.length === 0) {
       for (let r = 0; r < GRID_SIZE; r++) {
         for (let c = 0; c < GRID_SIZE; c++) {
-          if (grid[r][c] === null) {
+          if (tempGrid[r][c] === null) {
             emptyCells.push([r, c]);
           }
         }
@@ -55,8 +58,8 @@ export function hasUniqueSolution(grid: (number | null)[][]): boolean {
 
       // 제약 많은 셀부터 처리 (후보가 적은 셀)
       emptyCells.sort((a, b) => {
-        const candidatesA = countValidNumbers(grid, a[0], a[1]);
-        const candidatesB = countValidNumbers(grid, b[0], b[1]);
+        const candidatesA = countValidNumbers(tempGrid, a[0], a[1]);
+        const candidatesB = countValidNumbers(tempGrid, b[0], b[1]);
         return candidatesA - candidatesB;
       });
     }
@@ -71,15 +74,15 @@ export function hasUniqueSolution(grid: (number | null)[][]): boolean {
 
     // 이 셀에 가능한 모든 숫자 시도
     for (let num = 1; num <= 9; num++) {
-      if (isValidPlacement(grid, row, col, num)) {
-        grid[row][col] = num;
+      if (isValidPlacement(tempGrid, row, col, num)) {
+        tempGrid[row][col] = num;
 
         // 다음 셀로 재귀 호출
         if (countSolutions(index + 1, emptyCells)) {
           return true; // 두 개 이상의 솔루션 발견
         }
 
-        grid[row][col] = null; // 백트래킹
+        tempGrid[row][col] = null; // 백트래킹
       }
     }
 

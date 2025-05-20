@@ -198,7 +198,10 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
 
   // 난이도에 따른 케이지 크기 제한
   const { maxCageSize } = KILLER_DIFFICULTY_RANGES[difficulty];
-  const minCageSize = 2;
+  const minCageSize = 1;
+
+  const maxSingleCellCages = 3; // 최대 3개의 단일 셀 케이지 허용
+  let singleCellCageCount = 0;
 
   // 격자 순회를 위한 전략 선택
   // 대각선 패턴으로 시작 셀 선택 (더 자연스러운 케이지 분포)
@@ -242,10 +245,17 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
     const usedNumbers = new Set<number>([solution[startRow][startCol]]);
 
     // 목표 크기 설정 (난이도에 따라 다름)
+    // 단일 셀 케이지를 생성할 확률 계산 (최대 개수 제한 고려)
+    const createSingleCellCage = singleCellCageCount < maxSingleCellCages && Math.random() < 0.15; // 15% 확률
+
+    // 목표 크기 설정 (난이도에 따라 다름)
     const targetSize = Math.min(minCageSize + Math.floor(Math.random() * (maxCageSize - minCageSize + 1)), maxCageSize);
 
     // 효율적인 확장 로직
     const expandCage = () => {
+      // 단일 셀 케이지는 확장할 필요 없음
+      if (targetSize === 1) return;
+
       // 현재 케이지 형태
       const currentShape = new Set<string>(cage.cells.map(([r, c]) => `${r}-${c}`));
 
@@ -354,6 +364,21 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
     // 케이지 확장 실행
     expandCage();
 
+    if (cage.cells.length >= minCageSize) {
+      // 단일 셀 케이지인 경우 카운터 증가
+      if (cage.cells.length === 1) {
+        singleCellCageCount++;
+      }
+
+      cages.push(cage);
+      cageId++;
+    } else {
+      // 케이지가 너무 작으면 셀 할당 해제
+      for (const [row, col] of cage.cells) {
+        assignedCells.delete(`${row}-${col}`);
+      }
+    }
+
     // 유효한 케이지만 추가 (최소 크기 확인)
     if (cage.cells.length >= minCageSize) {
       cages.push(cage);
@@ -369,6 +394,26 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
   // 누락된 셀 처리
   if (assignedCells.size < GRID_SIZE * GRID_SIZE) {
     handleRemainingCells(cages, assignedCells, solution);
+
+    // 추가: 모든 셀이 할당되었는지 최종 확인
+    if (assignedCells.size < GRID_SIZE * GRID_SIZE) {
+      console.warn(
+        `킬러 스도쿠 생성 경고: ${GRID_SIZE * GRID_SIZE - assignedCells.size}개의 셀이 할당되지 않았습니다.`,
+      );
+
+      // 할당되지 않은 모든 셀을 찾아 마지막 케이지에 추가
+      for (let row = 0; row < GRID_SIZE; row++) {
+        for (let col = 0; col < GRID_SIZE; col++) {
+          const key = `${row}-${col}`;
+          if (!assignedCells.has(key) && cages.length > 0) {
+            const lastCage = cages[cages.length - 1];
+            lastCage.cells.push([row, col]);
+            lastCage.sum += solution[row][col];
+            assignedCells.add(key);
+          }
+        }
+      }
+    }
   }
 
   return cages;
@@ -438,11 +483,23 @@ export function validateKillerCages(board: SudokuBoard, cages: KillerCage[]): Su
 
   // 보드에 케이지 충돌 상태 반영
   for (const cage of cages) {
+    // 유효한 ID 확인
+    if (cage.id === undefined || !cageConflicts.has(cage.id)) {
+      console.warn(`케이지 ID ${cage.id}가 존재하지 않습니다.`);
+      continue;
+    }
+
     const hasConflictNext = cageConflicts.get(cage.id) || false;
 
     if (hasConflictNext) {
       // 케이지 내 모든 셀에 충돌 표시
       for (const [row, col] of cage.cells) {
+        // 범위 검사 추가
+        if (row < 0 || row >= GRID_SIZE || col < 0 || col >= GRID_SIZE) {
+          console.warn(`유효하지 않은 셀 위치: [${row}, ${col}]`);
+          continue;
+        }
+
         if (newBoard[row][col].value !== null) {
           newBoard[row][col].isConflict = true;
         }

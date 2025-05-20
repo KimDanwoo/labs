@@ -125,6 +125,7 @@ const removeRandomCells = (board: SudokuBoard, solution: Grid, count: number): v
     // 배치로 처리할 셀 선택
     for (let i = 0; i < batchSize && posIndex < sortedPositions.length; i++) {
       const [row, col] = sortedPositions[posIndex++];
+      if (row < 0 || row >= GRID_SIZE || col < 0 || col >= GRID_SIZE) continue; // 범위 체크 추가
       if (board[row][col].value !== null) {
         cellsToTry.push([row, col]);
         originalValues.push(board[row][col].value);
