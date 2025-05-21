@@ -1,4 +1,5 @@
-import { formatTime, useSudokuStore } from "@entities/sudoku/model";
+import { useSudokuStore } from "@entities/sudoku/model/store";
+import { formatTime } from "@entities/sudoku/model/utils";
 import { useEffect } from "react";
 import { AiOutlinePause } from "react-icons/ai";
 import { VscPlay } from "react-icons/vsc";

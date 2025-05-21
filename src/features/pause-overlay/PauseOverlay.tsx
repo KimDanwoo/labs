@@ -1,4 +1,4 @@
-import { useSudokuStore } from "@entities/sudoku/model";
+import { useSudokuStore } from "@entities/sudoku/model/store";
 import { IoPlayCircleOutline } from "react-icons/io5";
 
 export const PauseOverlay = () => {

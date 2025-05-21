@@ -1,4 +1,5 @@
-import { KILLER_MODE, useSudokuStore } from "@entities/sudoku/model";
+import { GAME_MODE } from "@entities/sudoku/model/constants";
+import { useSudokuStore } from "@entities/sudoku/model/store";
 import { useEffect, useRef, useState } from "react";
 
 export const KillerCage: React.FC = () => {
@@ -11,7 +12,7 @@ export const KillerCage: React.FC = () => {
   }>({ paths: [], sums: [] });
 
   useEffect(() => {
-    if (gameMode !== KILLER_MODE) return;
+    if (gameMode !== GAME_MODE.KILLER) return;
 
     // 셀 위치 계산 및 케이지 테두리/합계 위치 설정
     const calcPositions = () => {
@@ -137,7 +138,7 @@ export const KillerCage: React.FC = () => {
     const table = document.querySelector("table.border-collapse");
     if (table) {
       observer.observe(table, {
-        attributes: true, 
+        attributes: true,
         childList: true,
         subtree: true,
       });
@@ -153,7 +154,7 @@ export const KillerCage: React.FC = () => {
     };
   }, [cages, gameMode]);
 
-  if (gameMode !== KILLER_MODE || cageInfo.paths.length === 0) {
+  if (gameMode !== GAME_MODE.KILLER || cageInfo.paths.length === 0) {
     return null;
   }
 

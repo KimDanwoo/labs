@@ -1,6 +1,8 @@
 "use client";
 
-import { Difficulty, EASY, EXPERT, HARD, MEDIUM, useSudokuStore } from "@entities/sudoku/model";
+import { GAME_LEVEL } from "@entities/sudoku/model/constants";
+import { useSudokuStore } from "@entities/sudoku/model/store";
+import { Difficulty } from "@entities/sudoku/model/types";
 import { TimerControl } from "@features/timer-control/ui/TimerControl";
 import React from "react";
 
@@ -19,10 +21,10 @@ export const GameStatus: React.FC = () => {
           value={difficulty}
           onChange={(e) => initializeGame(e.target.value as Difficulty)}
         >
-          <option value={EASY}>쉬움</option>
-          <option value={MEDIUM}>중간</option>
-          <option value={HARD}>어려움</option>
-          <option value={EXPERT}>전문가</option>
+          <option value={GAME_LEVEL.EASY}>쉬움</option>
+          <option value={GAME_LEVEL.MEDIUM}>중간</option>
+          <option value={GAME_LEVEL.HARD}>어려움</option>
+          <option value={GAME_LEVEL.EXPERT}>전문가</option>
         </select>
 
         <TimerControl />

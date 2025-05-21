@@ -1,26 +1,19 @@
+import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING, NUMBER_COUNTS } from "@entities/sudoku/model/constants";
+import { Difficulty, GameMode, KillerCage, SudokuBoard, SudokuState } from "@entities/sudoku/model/types";
 import {
   checkConflicts,
-  CLASSIC_MODE,
+  checkKillerConflicts,
   createEmptyBoard,
   createEmptyHighlights,
-  Difficulty,
-  GameMode,
   generateBoard,
   generateKillerBoard,
   generateSolution,
-  HINTS_REMAINING,
   isBoardComplete,
   isBoardCorrect,
-  KILLER_MODE,
-  KillerCage,
-  MEDIUM,
-  NUMBER_COUNTS,
-  SudokuBoard,
-  SudokuState,
-} from "@entities/sudoku/model";
+  isKillerBoardComplete,
+} from "@entities/sudoku/model/utils";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { checkKillerConflicts, isKillerBoardComplete } from "./utils/killer";
 
 interface SudokuActions {
   // 게임 초기화
@@ -83,11 +76,11 @@ const initialState: SudokuState = {
   isSuccess: false,
   currentTime: 0,
   timerActive: false,
-  difficulty: MEDIUM,
+  difficulty: GAME_LEVEL.MEDIUM,
   highlightedCells: createEmptyHighlights(),
   numberCounts: NUMBER_COUNTS,
   hintsRemaining: HINTS_REMAINING,
-  gameMode: CLASSIC_MODE,
+  gameMode: GAME_MODE.CLASSIC,
   cages: [],
 };
 
@@ -113,14 +106,14 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
       ...initialState,
 
       // 게임 초기화
-      initializeGame: (difficulty = MEDIUM) => {
+      initializeGame: (difficulty = GAME_LEVEL.MEDIUM) => {
         const solution = generateSolution();
         const { gameMode } = get();
 
         let board: SudokuBoard;
         let cages: KillerCage[] = [];
 
-        if (gameMode === KILLER_MODE) {
+        if (gameMode === GAME_MODE.KILLER) {
           // 킬러 모드 보드 생성
 
           const killerResult = generateKillerBoard(solution, difficulty);
@@ -221,7 +214,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         let boardWithConflicts: SudokuBoard;
 
         // 충돌 확인
-        if (gameMode === KILLER_MODE) {
+        if (gameMode === GAME_MODE.KILLER) {
           boardWithConflicts = checkKillerConflicts(newBoard, cages);
         } else {
           boardWithConflicts = checkConflicts(newBoard);
@@ -229,7 +222,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
         // 게임 완료 확인
         let completed = false;
-        if (gameMode === KILLER_MODE) {
+        if (gameMode === GAME_MODE.KILLER) {
           completed = isKillerBoardComplete(boardWithConflicts, cages);
         } else {
           completed = isBoardComplete(boardWithConflicts);
@@ -334,7 +327,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         // 게임 모드에 따른 충돌 확인
         let boardWithConflicts: SudokuBoard;
 
-        if (gameMode === KILLER_MODE) {
+        if (gameMode === GAME_MODE.KILLER) {
           boardWithConflicts = checkKillerConflicts(newBoard, cages);
         } else {
           boardWithConflicts = checkConflicts(newBoard);
@@ -342,7 +335,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
         // 게임 완료 확인
         let completed = false;
-        if (gameMode === KILLER_MODE) {
+        if (gameMode === GAME_MODE.KILLER) {
           completed = isKillerBoardComplete(boardWithConflicts, cages);
         } else {
           completed = isBoardComplete(boardWithConflicts);
@@ -463,7 +456,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         // 게임 모드에 따른 충돌 확인
         let boardWithConflicts: SudokuBoard;
 
-        if (gameMode === KILLER_MODE) {
+        if (gameMode === GAME_MODE.KILLER) {
           boardWithConflicts = checkKillerConflicts(board, cages);
         } else {
           boardWithConflicts = checkConflicts(board);
@@ -471,7 +464,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
         // 게임 모드에 따른 완료 확인
         let completed = false;
-        if (gameMode === KILLER_MODE) {
+        if (gameMode === GAME_MODE.KILLER) {
           completed = isKillerBoardComplete(boardWithConflicts, cages);
         } else {
           completed = isBoardComplete(boardWithConflicts);

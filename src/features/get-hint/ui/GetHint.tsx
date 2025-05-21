@@ -1,4 +1,4 @@
-import { useSudokuStore } from "@entities/sudoku/model";
+import { useSudokuStore } from "@entities/sudoku/model/store";
 import IconButton from "@entities/sudoku/ui/IconButton";
 import { GoLightBulb } from "react-icons/go";
 

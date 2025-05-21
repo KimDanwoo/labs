@@ -1,11 +1,13 @@
 "use client";
 
-import { KILLER_MODE, MEDIUM, useKeyboardControls, useSudokuStore } from "@entities/sudoku/model";
+import { GAME_LEVEL, GAME_MODE } from "@entities/sudoku/model/constants";
+import { useKeyboardControls } from "@entities/sudoku/model/hooks";
+import { useSudokuStore } from "@entities/sudoku/model/store";
 import { SudokuCell } from "@entities/sudoku/ui/Cell";
 import { CompleteSudoku } from "@features/complete-sudoku/CompleteSudoku";
 import { KillerCage } from "@features/killer-cage/ui/KillerCage";
 import { PauseOverlay } from "@features/pause-overlay/PauseOverlay";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 export const SudokuBoard: React.FC = () => {
   const board = useSudokuStore((state) => state.board);
@@ -18,7 +20,7 @@ export const SudokuBoard: React.FC = () => {
     const isEmpty = board.every((row) => row.every((cell) => cell.value === null && !cell.isInitial));
 
     if (isEmpty) {
-      initializeGame(MEDIUM);
+      initializeGame(GAME_LEVEL.MEDIUM);
     }
   }, [board, initializeGame]);
 
@@ -28,7 +30,7 @@ export const SudokuBoard: React.FC = () => {
 
       <PauseOverlay />
 
-      {gameMode === KILLER_MODE && <KillerCage />}
+      {gameMode === GAME_MODE.KILLER && <KillerCage />}
 
       <table className="border-collapse border-2 border-slate-800 bg-white w-fit mx-auto shadow-lg">
         <tbody>

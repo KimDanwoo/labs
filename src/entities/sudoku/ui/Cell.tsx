@@ -1,6 +1,9 @@
 "use client";
 
-import { KEY_NUMBER, SudokuCell as SudokuCellType, useSudokuStore } from "@entities/sudoku/model";
+import { KEY_NUMBER } from "@entities/sudoku/model/constants";
+import { useSudokuStore } from "@entities/sudoku/model/store";
+import { SudokuCell as SudokuCellType } from "@entities/sudoku/model/types";
+
 import React from "react";
 
 interface CellProps {

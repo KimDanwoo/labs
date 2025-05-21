@@ -1,14 +1,6 @@
-import {
-  checkConflicts,
-  Difficulty,
-  Grid,
-  GRID_SIZE,
-  GridPosition,
-  KILLER_DIFFICULTY_RANGES,
-  KillerCage,
-  shuffleArray,
-  SudokuBoard,
-} from "@entities/sudoku/model";
+import { GRID_SIZE, KILLER_DIFFICULTY_RANGES } from "@entities/sudoku/model/constants";
+import { Difficulty, Grid, GridPosition, KillerCage, SudokuBoard } from "@entities/sudoku/model/types";
+import { checkConflicts, shuffleArray } from "@entities/sudoku/model/utils";
 
 /**
  * @description 인접한 셀 그룹화

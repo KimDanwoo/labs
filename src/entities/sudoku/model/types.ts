@@ -1,9 +1,9 @@
-import { CLASSIC_MODE, EASY, EXPERT, HARD, KILLER_MODE, MEDIUM } from "@entities/sudoku/model";
+import { GAME_LEVEL, GAME_MODE } from "@entities/sudoku/model/constants";
 
-export type GameMode = typeof CLASSIC_MODE | typeof KILLER_MODE;
+export type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE];
 export type Grid = number[][];
 export type GridPosition = [row: number, col: number];
-export type Difficulty = typeof EASY | typeof MEDIUM | typeof HARD | typeof EXPERT;
+export type Difficulty = (typeof GAME_LEVEL)[keyof typeof GAME_LEVEL];
 export type DifficultyRange = { min: number; max: number };
 export type AffectedCell = [row: number, col: number, num: number];
 
