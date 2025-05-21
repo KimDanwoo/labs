@@ -1,7 +1,7 @@
 "use client";
 
 import { GAME_LEVEL } from "@entities/sudoku/model/constants";
-import { useSudokuStore } from "@entities/sudoku/model/store";
+import { useSudokuStore } from "@entities/sudoku/model/stores";
 import { Difficulty } from "@entities/sudoku/model/types";
 import { TimerControl } from "@features/timer-control/ui/TimerControl";
 import React from "react";

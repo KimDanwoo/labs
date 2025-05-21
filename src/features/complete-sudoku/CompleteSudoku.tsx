@@ -1,5 +1,5 @@
 import { GAME_LEVEL } from "@entities/sudoku/model/constants";
-import { useSudokuStore } from "@entities/sudoku/model/store";
+import { useSudokuStore } from "@entities/sudoku/model/stores";
 
 const LEVELS = [
   { label: "쉬움", value: GAME_LEVEL.EASY },

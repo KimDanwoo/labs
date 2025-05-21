@@ -1,4 +1,4 @@
-import { useSudokuStore } from "@entities/sudoku/model/store";
+import { useSudokuStore } from "@entities/sudoku/model/stores";
 import IconButton from "@entities/sudoku/ui/IconButton";
 import { IoRefresh } from "react-icons/io5";
 

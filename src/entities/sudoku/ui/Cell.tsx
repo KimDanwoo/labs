@@ -1,7 +1,7 @@
 "use client";
 
 import { KEY_NUMBER } from "@entities/sudoku/model/constants";
-import { useSudokuStore } from "@entities/sudoku/model/store";
+import { useSudokuStore } from "@entities/sudoku/model/stores";
 import { SudokuCell as SudokuCellType } from "@entities/sudoku/model/types";
 
 import React from "react";
