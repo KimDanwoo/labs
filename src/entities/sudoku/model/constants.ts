@@ -1,4 +1,4 @@
-import { Difficulty, DifficultyRange } from "@entities/sudoku/model";
+import { Difficulty, DifficultyRange } from "@entities/sudoku/model/types";
 
 export const GRID_SIZE = 9;
 export const BLOCK_SIZE = 3;
@@ -8,35 +8,39 @@ export const HINTS_REMAINING = 5;
 export const KEY_NUMBER = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 export const NUMBER_COUNTS = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
 
-export const EASY = "easy";
-export const MEDIUM = "medium";
-export const HARD = "hard";
-export const EXPERT = "expert";
+export const GAME_LEVEL = {
+  EASY: "easy",
+  MEDIUM: "medium",
+  HARD: "hard",
+  EXPERT: "expert",
+};
 
-export const CLASSIC_MODE = "classic";
-export const KILLER_MODE = "killer";
+export const GAME_MODE = {
+  CLASSIC: "classic",
+  KILLER: "killer",
+};
 
 export const DIFFICULTY_RANGES: Record<Difficulty, DifficultyRange> = {
-  [EASY]: { min: 28, max: 35 },
-  [MEDIUM]: { min: 40, max: 55 },
-  [HARD]: { min: 60, max: 65 },
-  [EXPERT]: { min: 70, max: 75 },
+  [GAME_LEVEL.EASY]: { min: 28, max: 35 },
+  [GAME_LEVEL.MEDIUM]: { min: 40, max: 55 },
+  [GAME_LEVEL.HARD]: { min: 60, max: 65 },
+  [GAME_LEVEL.EXPERT]: { min: 70, max: 75 },
 };
 
 export const KILLER_DIFFICULTY_RANGES = {
-  [EASY]: {
+  [GAME_LEVEL.EASY]: {
     hintsKeep: 25, // 유지할 힌트 셀 수
     maxCageSize: 3, // 최대 케이지 크기
   },
-  [MEDIUM]: {
+  [GAME_LEVEL.MEDIUM]: {
     hintsKeep: 23,
     maxCageSize: 4,
   },
-  [HARD]: {
+  [GAME_LEVEL.HARD]: {
     hintsKeep: 20,
     maxCageSize: 5,
   },
-  [EXPERT]: {
+  [GAME_LEVEL.EXPERT]: {
     hintsKeep: 15,
     maxCageSize: 6,
   },

@@ -1,18 +1,11 @@
+import { BASE_GRID, DIFFICULTY_RANGES, GRID_SIZE, KILLER_DIFFICULTY_RANGES } from "@entities/sudoku/model/constants";
+import { Difficulty, Grid, GridPosition, KillerCage, SudokuBoard } from "@entities/sudoku/model/types";
 import {
   applyTransformations,
-  BASE_GRID,
-  Difficulty,
-  DIFFICULTY_RANGES,
   generateKillerCages,
-  Grid,
-  GRID_SIZE,
-  GridPosition,
   hasUniqueSolution,
-  KILLER_DIFFICULTY_RANGES,
-  KillerCage,
   shuffleArray,
-  SudokuBoard,
-} from "@entities/sudoku/model";
+} from "@entities/sudoku/model/utils";
 
 /**
  * 유효한 스도쿠 솔루션 생성

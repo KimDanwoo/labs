@@ -1,4 +1,4 @@
-import { CellHighlight, SudokuBoard } from "../types";
+import { CellHighlight, SudokuBoard } from "@entities/sudoku/model/types";
 
 /**
  * @description 배열을 무작위로 섞는 함수 (Fisher-Yates 알고리즘)

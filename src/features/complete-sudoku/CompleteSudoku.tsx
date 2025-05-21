@@ -1,7 +1,14 @@
-import { EASY, EXPERT, HARD, MEDIUM, useSudokuStore } from "@entities/sudoku/model";
+import { GAME_LEVEL } from "@entities/sudoku/model/constants";
+import { useSudokuStore } from "@entities/sudoku/model/store";
+
+const LEVELS = [
+  { label: "쉬움", value: GAME_LEVEL.EASY },
+  { label: "중간", value: GAME_LEVEL.MEDIUM },
+  { label: "어려움", value: GAME_LEVEL.HARD },
+  { label: "매우 어려움", value: GAME_LEVEL.EXPERT },
+];
 
 export const CompleteSudoku = () => {
-  // const currentTime = useSudokuStore((state) => state.currentTime);
   const isCompleted = useSudokuStore((state) => state.isCompleted);
   const initializeGame = useSudokuStore((state) => state.initializeGame);
 
@@ -10,10 +17,11 @@ export const CompleteSudoku = () => {
   return (
     <div className="absolute inset-0 bg-white z-20 flex flex-col items-center justify-center">
       <ul className="flex flex-col gap-2 cursor-pointer">
-        <li onClick={() => initializeGame(EASY)}>쉬움</li>
-        <li onClick={() => initializeGame(MEDIUM)}>중간</li>
-        <li onClick={() => initializeGame(HARD)}>어려움</li>
-        <li onClick={() => initializeGame(EXPERT)}>매우 어려움</li>
+        {LEVELS.map((level) => (
+          <li key={level.value} onClick={() => initializeGame(level.value)}>
+            {level.label}
+          </li>
+        ))}
       </ul>
     </div>
   );
