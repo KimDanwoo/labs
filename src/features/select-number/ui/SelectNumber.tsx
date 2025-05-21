@@ -1,7 +1,7 @@
 "use client";
 
 import { KEY_NUMBER } from "@entities/sudoku/model/constants";
-import { useSudokuStore } from "@entities/sudoku/model/store";
+import { useSudokuStore } from "@entities/sudoku/model/stores";
 import { NumberButton } from "@entities/sudoku/ui/NumberButton";
 import React from "react";
 

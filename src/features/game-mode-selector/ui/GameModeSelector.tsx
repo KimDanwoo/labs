@@ -1,5 +1,5 @@
 import { GAME_MODE } from "@entities/sudoku/model/constants";
-import { useSudokuStore } from "@entities/sudoku/model/store";
+import { useSudokuStore } from "@entities/sudoku/model/stores";
 import React from "react";
 
 const GameModeSelector: React.FC = () => {

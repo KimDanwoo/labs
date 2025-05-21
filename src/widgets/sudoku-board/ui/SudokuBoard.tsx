@@ -1,28 +1,20 @@
 "use client";
 
-import { GAME_LEVEL, GAME_MODE } from "@entities/sudoku/model/constants";
-import { useKeyboardControls } from "@entities/sudoku/model/hooks";
-import { useSudokuStore } from "@entities/sudoku/model/store";
+import { GAME_MODE } from "@entities/sudoku/model/constants";
+import { useInitializeGame, useKeyboardControls } from "@entities/sudoku/model/hooks";
+import { useSudokuStore } from "@entities/sudoku/model/stores";
 import { SudokuCell } from "@entities/sudoku/ui/Cell";
 import { CompleteSudoku } from "@features/complete-sudoku/CompleteSudoku";
 import { KillerCage } from "@features/killer-cage/ui/KillerCage";
 import { PauseOverlay } from "@features/pause-overlay/PauseOverlay";
-import { useEffect } from "react";
 
 export const SudokuBoard: React.FC = () => {
-  const board = useSudokuStore((state) => state.board);
-  const initializeGame = useSudokuStore((state) => state.initializeGame);
   const selectCell = useSudokuStore((state) => state.selectCell);
   const gameMode = useSudokuStore((state) => state.gameMode);
+  const board = useSudokuStore((state) => state.board);
+
   useKeyboardControls();
-
-  useEffect(() => {
-    const isEmpty = board.every((row) => row.every((cell) => cell.value === null && !cell.isInitial));
-
-    if (isEmpty) {
-      initializeGame(GAME_LEVEL.MEDIUM);
-    }
-  }, [board, initializeGame]);
+  useInitializeGame();
 
   return (
     <div className="relative">
