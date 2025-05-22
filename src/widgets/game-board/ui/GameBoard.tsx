@@ -1,12 +1,10 @@
 "use client";
 
-import { GAME_MODE } from "@entities/sudoku/model/constants";
+import { SudokuCell } from "@entities/cell/ui/Cell";
+import { GAME_MODE } from "@entities/game/model/constants";
 import { useInitializeGame, useKeyboardControls } from "@entities/sudoku/model/hooks";
 import { useSudokuStore } from "@entities/sudoku/model/stores";
-import { SudokuCell } from "@entities/sudoku/ui/Cell";
-import { CompleteSudoku } from "@features/complete-sudoku/CompleteSudoku";
 import { KillerCage } from "@features/killer-cage/ui/KillerCage";
-import { PauseOverlay } from "@features/pause-overlay/PauseOverlay";
 
 export const SudokuBoard: React.FC = () => {
   const selectCell = useSudokuStore((state) => state.selectCell);
@@ -17,11 +15,7 @@ export const SudokuBoard: React.FC = () => {
   useInitializeGame();
 
   return (
-    <div className="relative">
-      <CompleteSudoku />
-
-      <PauseOverlay />
-
+    <>
       {gameMode === GAME_MODE.KILLER && <KillerCage />}
 
       <table className="border-collapse border-2 border-slate-800 bg-white w-fit mx-auto shadow-lg">
@@ -41,7 +35,7 @@ export const SudokuBoard: React.FC = () => {
           ))}
         </tbody>
       </table>
-    </div>
+    </>
   );
 };
 

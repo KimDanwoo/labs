@@ -1,4 +1,4 @@
-import { GAME_MODE } from "@entities/sudoku/model/constants";
+import { GAME_MODE } from "@entities/game/model/constants";
 import { useSudokuStore } from "@entities/sudoku/model/stores";
 import { useEffect, useRef, useState } from "react";
 

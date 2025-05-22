@@ -1,12 +1,12 @@
 "use client";
 
-import { GAME_LEVEL } from "@entities/sudoku/model/constants";
+import { GAME_LEVEL } from "@entities/game/model/constants";
+import { Difficulty } from "@entities/game/model/types";
 import { useSudokuStore } from "@entities/sudoku/model/stores";
-import { Difficulty } from "@entities/sudoku/model/types";
 import { TimerControl } from "@features/timer-control/ui/TimerControl";
-import React from "react";
+import { FC } from "react";
 
-export const GameStatus: React.FC = () => {
+export const GameStatus: FC = () => {
   const difficulty = useSudokuStore((state) => state.difficulty);
   const isCompleted = useSudokuStore((state) => state.isCompleted);
   const isSuccess = useSudokuStore((state) => state.isSuccess);

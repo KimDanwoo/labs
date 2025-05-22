@@ -1,5 +1,6 @@
-import { BLOCK_SIZE, GRID_SIZE } from "@entities/sudoku/model/constants";
-import { Grid, GridPosition, SudokuBoard } from "@entities/sudoku/model/types";
+import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
+import { SudokuBoard } from "@entities/board/model/types";
+import { Grid, GridPosition } from "@entities/sudoku/model/types";
 
 /**
  * @description 특정 위치에 숫자를 놓을 수 있는지 확인
@@ -11,12 +12,12 @@ import { Grid, GridPosition, SudokuBoard } from "@entities/sudoku/model/types";
  */
 export function isValidPlacement(grid: (number | null)[][], row: number, col: number, num: number): boolean {
   // 행 검사
-  for (let c = 0; c < GRID_SIZE; c++) {
+  for (let c = 0; c < BOARD_SIZE; c++) {
     if (grid[row][c] === num) return false;
   }
 
   // 열 검사
-  for (let r = 0; r < GRID_SIZE; r++) {
+  for (let r = 0; r < BOARD_SIZE; r++) {
     if (grid[r][col] === num) return false;
   }
 
@@ -49,8 +50,8 @@ export function hasUniqueSolution(grid: (number | null)[][]): boolean {
   function countSolutions(index = 0, emptyCells: GridPosition[] = []): boolean {
     // 빈 셀 목록 초기화 (첫 호출 시만)
     if (index === 0 && emptyCells.length === 0) {
-      for (let r = 0; r < GRID_SIZE; r++) {
-        for (let c = 0; c < GRID_SIZE; c++) {
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
           if (tempGrid[r][c] === null) {
             emptyCells.push([r, c]);
           }
@@ -117,7 +118,7 @@ export function hasUniqueSolution(grid: (number | null)[][]): boolean {
  * @returns {boolean} 충돌 여부
  */
 export function checkRowConflict(board: SudokuBoard, row: number, col: number, value: number): boolean {
-  for (let c = 0; c < GRID_SIZE; c++) {
+  for (let c = 0; c < BOARD_SIZE; c++) {
     if (c !== col && board[row][c].value === value) {
       return true;
     }
@@ -134,7 +135,7 @@ export function checkRowConflict(board: SudokuBoard, row: number, col: number, v
  * @returns {boolean} 충돌 여부
  */
 export function checkColConflict(board: SudokuBoard, row: number, col: number, value: number): boolean {
-  for (let r = 0; r < GRID_SIZE; r++) {
+  for (let r = 0; r < BOARD_SIZE; r++) {
     if (r !== row && board[r][col].value === value) {
       return true;
     }
@@ -199,8 +200,8 @@ export function checkConflicts(board: SudokuBoard): SudokuBoard {
   const newBoard = structuredClone(board);
 
   // 모든 셀에 대해 충돌 검사
-  for (let row = 0; row < GRID_SIZE; row++) {
-    for (let col = 0; col < GRID_SIZE; col++) {
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
       if (newBoard[row][col].value === null) {
         newBoard[row][col].isConflict = false;
         continue;
@@ -220,8 +221,8 @@ export function checkConflicts(board: SudokuBoard): SudokuBoard {
  * @returns {boolean} 완성 여부
  */
 export function isBoardComplete(board: SudokuBoard): boolean {
-  for (let row = 0; row < GRID_SIZE; row++) {
-    for (let col = 0; col < GRID_SIZE; col++) {
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
       const cell = board[row][col];
       if (cell.value === null || cell.isConflict) {
         return false;

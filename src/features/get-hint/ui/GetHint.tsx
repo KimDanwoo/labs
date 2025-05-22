@@ -1,5 +1,5 @@
 import { useSudokuStore } from "@entities/sudoku/model/stores";
-import IconButton from "@entities/sudoku/ui/IconButton";
+import IconButton from "@shared/ui/IconButton";
 import { GoLightBulb } from "react-icons/go";
 
 export const GetHint = () => {

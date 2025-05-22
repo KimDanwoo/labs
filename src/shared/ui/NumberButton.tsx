@@ -26,7 +26,7 @@ export const NumberButton: React.FC<NumberButtonProps> = ({
   const alignClass = "rounded-full flex items-center justify-center text-xl font-semibold";
   return (
     <button
-      className={`${sizeClass} ${alignClass} ${isDisabled ? "text-gray-100" : "hover:bg-gray-300 transition-colors"}`}
+      className={`${sizeClass} ${alignClass} ${isDisabled ? "text-gray-300" : "hover:bg-gray-300 transition-colors"}`}
       onClick={handleClick}
       disabled={isDisabled}
     >

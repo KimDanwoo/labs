@@ -1,4 +1,4 @@
-import { BLOCK_SIZE, GRID_SIZE, NUMBERS } from "@entities/sudoku/model/constants";
+import { BLOCK_SIZE, BOARD_NUMBERS, BOARD_SIZE } from "@entities/board/model/constants";
 import { Grid } from "@entities/sudoku/model/types";
 import { shuffleArray } from "@entities/sudoku/model/utils";
 /**
@@ -6,11 +6,11 @@ import { shuffleArray } from "@entities/sudoku/model/utils";
  * @returns {Map<number, number>} 숫자 매핑 맵
  */
 export function createRandomNumberMapping(): Map<number, number> {
-  const shuffled = [...NUMBERS];
+  const shuffled = [...BOARD_NUMBERS];
   shuffleArray(shuffled);
 
   const mapping = new Map<number, number>();
-  NUMBERS.forEach((num, idx) => {
+  BOARD_NUMBERS.forEach((num, idx) => {
     mapping.set(num, shuffled[idx]);
   });
 
@@ -28,7 +28,7 @@ export function swapRandomColumnsWithinBlocks(grid: Grid): void {
     const col2 = baseCol + Math.floor(Math.random() * BLOCK_SIZE);
 
     if (col1 !== col2) {
-      for (let row = 0; row < GRID_SIZE; row++) {
+      for (let row = 0; row < BOARD_SIZE; row++) {
         [grid[row][col1], grid[row][col2]] = [grid[row][col2], grid[row][col1]];
       }
     }
@@ -65,7 +65,7 @@ export function swapRandomColumnBlocks(grid: Grid): void {
       const col1 = block1 * BLOCK_SIZE + i;
       const col2 = block2 * BLOCK_SIZE + i;
 
-      for (let row = 0; row < GRID_SIZE; row++) {
+      for (let row = 0; row < BOARD_SIZE; row++) {
         [grid[row][col1], grid[row][col2]] = [grid[row][col2], grid[row][col1]];
       }
     }
@@ -100,7 +100,7 @@ export function reflectHorizontal(grid: Grid): void {
  * @param {Grid} grid - 대상 그리드
  */
 export function reflectVertical(grid: Grid): void {
-  for (let row = 0; row < GRID_SIZE; row++) {
+  for (let row = 0; row < BOARD_SIZE; row++) {
     grid[row].reverse();
   }
 }
@@ -123,8 +123,8 @@ export function rotateOrReflectGrid(grid: Grid): void {
  * @param {Map<number, number>} mapping - 숫자 매핑
  */
 export function applyNumberMapping(grid: Grid, mapping: Map<number, number>): void {
-  for (let row = 0; row < GRID_SIZE; row++) {
-    for (let col = 0; col < GRID_SIZE; col++) {
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
       grid[row][col] = mapping.get(grid[row][col]) ?? grid[row][col];
     }
   }

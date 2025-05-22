@@ -1,19 +1,11 @@
 "use client";
 
-import { KEY_NUMBER } from "@entities/sudoku/model/constants";
+import { KEY_NUMBER } from "@entities/board/model/constants";
+import { CellProps } from "@entities/cell/model/types";
 import { useSudokuStore } from "@entities/sudoku/model/stores";
-import { SudokuCell as SudokuCellType } from "@entities/sudoku/model/types";
+import { FC } from "react";
 
-import React from "react";
-
-interface CellProps {
-  cell: SudokuCellType;
-  row: number;
-  col: number;
-  onSelect: (row: number, col: number) => void;
-}
-
-export const SudokuCell: React.FC<CellProps> = ({ cell, row, col, onSelect }) => {
+export const SudokuCell: FC<CellProps> = ({ cell, row, col, onSelect }) => {
   const highlightedCells = useSudokuStore((state) => state.highlightedCells);
   const cellKey = `${row}-${col}`;
   const highlight = highlightedCells[cellKey] || { selected: false, related: false, sameValue: false };

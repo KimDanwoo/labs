@@ -1,8 +1,8 @@
 "use client";
 
-import { KEY_NUMBER } from "@entities/sudoku/model/constants";
+import { KEY_NUMBER } from "@entities/board/model/constants";
 import { useSudokuStore } from "@entities/sudoku/model/stores";
-import { NumberButton } from "@entities/sudoku/ui/NumberButton";
+import { NumberButton } from "@shared/ui/NumberButton";
 import React from "react";
 
 export const SelectNumber: React.FC = () => {

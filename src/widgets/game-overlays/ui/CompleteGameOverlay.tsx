@@ -1,5 +1,6 @@
-import { GAME_LEVEL } from "@entities/sudoku/model/constants";
+import { GAME_LEVEL } from "@entities/game/model/constants";
 import { useSudokuStore } from "@entities/sudoku/model/stores";
+import { FC } from "react";
 
 const LEVELS = [
   { label: "쉬움", value: GAME_LEVEL.EASY },
@@ -8,7 +9,7 @@ const LEVELS = [
   { label: "매우 어려움", value: GAME_LEVEL.EXPERT },
 ];
 
-export const CompleteSudoku = () => {
+export const CompleteGameOverlay: FC = () => {
   const isCompleted = useSudokuStore((state) => state.isCompleted);
   const initializeGame = useSudokuStore((state) => state.initializeGame);
 
@@ -26,3 +27,5 @@ export const CompleteSudoku = () => {
     </div>
   );
 };
+
+export default CompleteGameOverlay;

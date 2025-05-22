@@ -1,5 +1,5 @@
-import { CellHighlight, SudokuBoard } from "@entities/sudoku/model/types";
-
+import { SudokuBoard } from "@entities/board/model/types";
+import { CellHighlight } from "@entities/sudoku/model/types";
 /**
  * @description 배열을 무작위로 섞는 함수 (Fisher-Yates 알고리즘)
  * @param {T[]} array - 섞을 배열

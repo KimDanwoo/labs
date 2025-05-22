@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Rubik, Space_Mono } from "next/font/google";
 import "./globals.css";
 
-// 숫자용 특별 폰트로 Rubik 사용 (둥글고 가독성 높은 숫자)
 const rubik = Rubik({
   variable: "--font-rubik",
   subsets: ["latin"],
@@ -10,7 +9,6 @@ const rubik = Rubik({
   display: "swap",
 });
 
-// 등너비(monospace) 폰트는 Space Mono 사용
 const spaceMono = Space_Mono({
   variable: "--font-space-mono",
   subsets: ["latin"],

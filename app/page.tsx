@@ -2,15 +2,13 @@
 
 import dynamic from "next/dynamic";
 
-const SudokuBoard = dynamic(() => import("@widgets/sudoku-board/ui/SudokuBoard"), { ssr: false });
-
+const SudokuBoard = dynamic(() => import("@widgets/game-board/ui/GameBoard"), { ssr: false });
 const SelectNumber = dynamic(() => import("@features/select-number/ui/SelectNumber"), { ssr: false });
-
-const Controls = dynamic(() => import("@widgets/controls/ui/Controls"), { ssr: false });
-
-const GameStatus = dynamic(() => import("@widgets/game-status/ui/GameStatus"), { ssr: false });
-
+const Controls = dynamic(() => import("@widgets/game-controls/ui/GameControls"), { ssr: false });
+const GameStatus = dynamic(() => import("@widgets/game-header/ui/GameHeader"), { ssr: false });
 const GameModeSelector = dynamic(() => import("@features/game-mode-selector/ui/GameModeSelector"), { ssr: false });
+const CompleteGameOverlay = dynamic(() => import("@widgets/game-overlays/ui/CompleteGameOverlay"), { ssr: false });
+const PauseGameOverlay = dynamic(() => import("@widgets/game-overlays/ui/PauseGameOverlay"), { ssr: false });
 
 export default function Home() {
   return (
@@ -18,12 +16,20 @@ export default function Home() {
       <GameModeSelector />
 
       <div className="mx-auto p-6  rounded-lg flex flex-col lg:flex-row">
-        <div>
+        <div className="relative">
           <GameStatus />
-          <SudokuBoard />
+
+          <div className="relative">
+            <CompleteGameOverlay />
+
+            <PauseGameOverlay />
+
+            <SudokuBoard />
+          </div>
         </div>
         <div className="lg:max-w-[400px]">
           <Controls />
+
           <SelectNumber />
         </div>
       </div>

@@ -1,7 +1,8 @@
 import { useSudokuStore } from "@entities/sudoku/model/stores";
+import { FC } from "react";
 import { IoPlayCircleOutline } from "react-icons/io5";
 
-export const PauseOverlay = () => {
+export const PauseGameOverlay: FC = () => {
   const timerActive = useSudokuStore((state) => state.timerActive);
   const toggleTimer = useSudokuStore((state) => state.toggleTimer);
   const isCompleted = useSudokuStore((state) => state.isCompleted);
@@ -18,3 +19,5 @@ export const PauseOverlay = () => {
     </div>
   );
 };
+
+export default PauseGameOverlay;

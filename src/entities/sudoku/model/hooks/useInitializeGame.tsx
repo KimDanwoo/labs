@@ -1,6 +1,6 @@
+import { GAME_LEVEL } from "@entities/game/model/constants";
 import { useSudokuStore } from "@entities/sudoku/model/stores";
 import { useEffect } from "react";
-import { GAME_LEVEL } from "../constants";
 
 export const useInitializeGame = () => {
   const initializeGame = useSudokuStore((state) => state.initializeGame);
