@@ -2,8 +2,8 @@
 
 import { GAME_LEVEL } from "@entities/game/model/constants";
 import { Difficulty } from "@entities/game/model/types";
-import { useSudokuStore } from "@features/game-controls/model/stores/sudokuStore";
-import { TimerControl } from "@features/game-controls/ui/TimerControl";
+import { useSudokuStore } from "@features/game-controls/model/stores";
+import { TimerControl } from "@features/game-controls/ui";
 import { FC } from "react";
 
 export const GameStatus: FC = () => {

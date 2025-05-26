@@ -1,8 +1,8 @@
 "use client";
 
 import { KEY_NUMBER } from "@entities/board/model/constants";
-import { useSudokuStore } from "@features/game-controls/model/stores/sudokuStore";
-import { NumberButton } from "@shared/ui/NumberButton";
+import { useSudokuStore } from "@features/game-controls/model/stores";
+import { NumberButton } from "@shared/ui";
 import React from "react";
 
 export const SelectNumber: React.FC = () => {

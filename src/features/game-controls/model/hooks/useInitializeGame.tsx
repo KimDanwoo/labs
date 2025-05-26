@@ -1,5 +1,5 @@
 import { GAME_LEVEL } from "@entities/game/model/constants";
-import { useSudokuStore } from "@features/game-controls/model/stores/sudokuStore";
+import { useSudokuStore } from "@features/game-controls/model/stores";
 import { useEffect } from "react";
 
 export const useInitializeGame = () => {

@@ -1,5 +1,5 @@
-import { useSudokuStore } from "@features/game-controls/model/stores/sudokuStore";
-import IconButton from "@shared/ui/IconButton";
+import { useSudokuStore } from "@features/game-controls/model/stores";
+import { IconButton } from "@shared/ui";
 import { GoPencil } from "react-icons/go";
 
 export const ToggleNote = () => {

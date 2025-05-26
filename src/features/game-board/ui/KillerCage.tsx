@@ -1,5 +1,5 @@
 import { GAME_MODE } from "@entities/game/model/constants";
-import { useSudokuStore } from "@features/game-controls/model/stores/sudokuStore";
+import { useSudokuStore } from "@features/game-controls/model/stores";
 import { useEffect, useRef, useState } from "react";
 
 export const KillerCage: React.FC = () => {
