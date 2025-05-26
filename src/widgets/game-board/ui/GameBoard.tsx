@@ -1,10 +1,10 @@
 "use client";
 
-import { SudokuCell } from "@entities/cell/ui/Cell";
+import { SudokuCell } from "@entities/cell/ui";
 import { GAME_MODE } from "@entities/game/model/constants";
 import { KillerCage } from "@features/game-board/ui";
 import { useInitializeGame, useKeyboardControls } from "@features/game-controls/model/hooks";
-import { useSudokuStore } from "@features/game-controls/model/stores/sudokuStore";
+import { useSudokuStore } from "@features/game-controls/model/stores";
 
 export const SudokuBoard: React.FC = () => {
   const selectCell = useSudokuStore((state) => state.selectCell);

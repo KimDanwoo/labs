@@ -262,9 +262,8 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
   cellOrder.push(...remainingCells);
 
   // 단일 셀 케이지에 더 적합한 숫자 (예: 1, 5, 9)
-  const isSuitableForSingleCell = (value: number): boolean => {
-    return value === 1 || value === 5 || value === 9 || Math.random() < 0.1;
-  };
+  const isSuitableForSingleCell = (value: number): boolean =>
+    value === 1 || value === 5 || value === 9 || Math.random() < 0.1;
 
   // 모든 셀을 처리
   for (const [startRow, startCol] of cellOrder) {

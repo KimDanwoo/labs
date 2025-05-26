@@ -1,10 +1,16 @@
 import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
 import { Position, SudokuBoard } from "@entities/board/model/types";
+import { CellHighlight } from "@entities/cell/model/types";
 import { GAME_MODE } from "@entities/game/model/constants";
-import { GameMode, KillerCage } from "@entities/game/model/types";
-import { createEmptyHighlights } from "@features/game-board/model/utils/common";
-import { checkKillerConflicts, isKillerBoardComplete } from "@features/game-board/model/utils/killer";
-import { checkConflicts, isBoardComplete, isBoardCorrect } from "@features/game-board/model/utils/validator";
+import { GameCompletionResult, GameMode, KillerCage } from "@entities/game/model/types";
+import {
+  checkConflicts,
+  checkKillerConflicts,
+  createEmptyHighlights,
+  isBoardComplete,
+  isBoardCorrect,
+  isKillerBoardComplete,
+} from "@features/game-board/model/utils";
 
 /**
  * @description 빈 셀 찾기
@@ -85,7 +91,7 @@ export function calculateHighlights(board: SudokuBoard, row: number, col: number
 /**
  * @description 같은 행, 열, 블록의 셀들을 related로 마킹
  */
-function markRelatedCells(highlights: any, row: number, col: number, selectedKey: string) {
+function markRelatedCells(highlights: Record<string, CellHighlight>, row: number, col: number, selectedKey: string) {
   // 같은 행
   for (let c = 0; c < BOARD_SIZE; c++) {
     const key = `${row}-${c}`;
@@ -123,7 +129,12 @@ function markRelatedCells(highlights: any, row: number, col: number, selectedKey
  * @param selectedValue
  * @param selectedKey
  */
-function markSameValueCells(highlights: any, board: SudokuBoard, selectedValue: number, selectedKey: string) {
+function markSameValueCells(
+  highlights: Record<string, CellHighlight>,
+  board: SudokuBoard,
+  selectedValue: number,
+  selectedKey: string,
+) {
   for (let r = 0; r < BOARD_SIZE; r++) {
     for (let c = 0; c < BOARD_SIZE; c++) {
       const key = `${r}-${c}`;
@@ -211,10 +222,4 @@ export function checkGameCompletion(
     success,
     board,
   };
-}
-
-export interface GameCompletionResult {
-  completed: boolean;
-  success: boolean;
-  board: SudokuBoard;
 }

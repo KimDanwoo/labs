@@ -1,4 +1,4 @@
-import { GridPosition, Position } from "@entities/board/model/types";
+import { GridPosition, Position, SudokuBoard } from "@entities/board/model/types";
 import { CellHighlight, SudokuCell } from "@entities/cell/model/types";
 import { GAME_LEVEL, GAME_MODE } from "@entities/game/model/constants";
 
@@ -27,4 +27,10 @@ export interface SudokuState {
   hintsRemaining: number;
   gameMode: GameMode;
   cages: KillerCage[];
+}
+
+export interface GameCompletionResult {
+  completed: boolean;
+  success: boolean;
+  board: SudokuBoard;
 }
