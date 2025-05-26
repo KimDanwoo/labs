@@ -135,6 +135,8 @@ function markSameValueCells(
   selectedValue: number,
   selectedKey: string,
 ) {
+  if (selectedValue === null) return;
+
   for (let r = 0; r < BOARD_SIZE; r++) {
     for (let c = 0; c < BOARD_SIZE; c++) {
       const key = `${r}-${c}`;

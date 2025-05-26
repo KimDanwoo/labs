@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { BOARD_SIZE } from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";

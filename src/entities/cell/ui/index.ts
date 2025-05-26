@@ -1,1 +1,1 @@
-export * from "./Cell";
+export * from "../../../features/game-board/ui/Cell";
