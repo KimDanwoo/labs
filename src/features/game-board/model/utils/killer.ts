@@ -1,8 +1,8 @@
 import { BOARD_SIZE } from "@entities/board/model/constants";
-import { SudokuBoard } from "@entities/board/model/types";
+import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
-import { Grid, GridPosition, KillerCage } from "@entities/sudoku/model/types";
-import { checkConflicts, shuffleArray } from "@entities/sudoku/model/utils";
+import { Difficulty, KillerCage } from "@entities/game/model/types";
+import { checkConflicts, shuffleArray } from "@features/game-board/model/utils";
 /**
  * @description 인접한 셀 그룹화
  * @param {GridPosition[]} cells - 셀 목록

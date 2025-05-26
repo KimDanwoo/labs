@@ -3,10 +3,10 @@
 import dynamic from "next/dynamic";
 
 const SudokuBoard = dynamic(() => import("@widgets/game-board/ui/GameBoard"), { ssr: false });
-const SelectNumber = dynamic(() => import("@features/select-number/ui/SelectNumber"), { ssr: false });
+const SelectNumber = dynamic(() => import("@features/game-controls/ui/SelectNumber"), { ssr: false });
 const Controls = dynamic(() => import("@widgets/game-controls/ui/GameControls"), { ssr: false });
 const GameStatus = dynamic(() => import("@widgets/game-header/ui/GameHeader"), { ssr: false });
-const GameModeSelector = dynamic(() => import("@features/game-mode-selector/ui/GameModeSelector"), { ssr: false });
+const GameModeSelector = dynamic(() => import("@features/game-controls/ui/GameModeSelector"), { ssr: false });
 const CompleteGameOverlay = dynamic(() => import("@widgets/game-overlays/ui/CompleteGameOverlay"), { ssr: false });
 const PauseGameOverlay = dynamic(() => import("@widgets/game-overlays/ui/PauseGameOverlay"), { ssr: false });
 

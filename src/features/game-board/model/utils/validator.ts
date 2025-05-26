@@ -1,6 +1,5 @@
 import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
-import { SudokuBoard } from "@entities/board/model/types";
-import { Grid, GridPosition } from "@entities/sudoku/model/types";
+import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 
 /**
  * @description 특정 위치에 숫자를 놓을 수 있는지 확인

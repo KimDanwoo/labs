@@ -1,14 +1,13 @@
 import { BASE_GRID, BOARD_SIZE } from "@entities/board/model/constants";
-import { SudokuBoard } from "@entities/board/model/types";
+import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { DIFFICULTY_RANGES, KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
-import { Difficulty } from "@entities/game/model/types";
-import { Grid, GridPosition, KillerCage } from "@entities/sudoku/model/types";
+import { Difficulty, KillerCage } from "@entities/game/model/types";
 import {
   applyTransformations,
   generateKillerCages,
   hasUniqueSolution,
   shuffleArray,
-} from "@entities/sudoku/model/utils";
+} from "@features/game-board/model/utils";
 
 /**
  * 유효한 스도쿠 솔루션 생성
