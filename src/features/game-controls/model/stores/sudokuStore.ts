@@ -3,16 +3,24 @@ import { SudokuBoard } from "@entities/board/model/types";
 import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING } from "@entities/game/model/constants";
 import { Difficulty, GameMode, KillerCage, SudokuState } from "@entities/game/model/types";
 import {
+  calculateHighlights,
+  canFillCell,
   checkConflicts,
+  checkGameCompletion,
   checkKillerConflicts,
   createEmptyBoard,
   createEmptyHighlights,
+  findEmptyCells,
   generateBoard,
   generateKillerBoard,
   generateSolution,
   isBoardComplete,
   isBoardCorrect,
   isKillerBoardComplete,
+  resetInitialBoard,
+  selectBoardCell,
+  updateCellValue,
+  validateBoard,
 } from "@features/game-board/model/utils";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -145,100 +153,45 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         get().initializeGame(currentDifficulty);
       },
 
-      // 사용자 입력 초기화
       resetUserInputs: () => {
         const { board } = get();
-
-        // 새 보드 생성
-        const newBoard = board.map((row) =>
-          row.map((cell) => {
-            if (cell.isInitial) {
-              return {
-                ...cell,
-                isConflict: false,
-                isSelected: false,
-              };
-            }
-
-            // 사용자가 입력한 셀은 초기화 (노트도 함께 초기화)
-            return {
-              ...cell,
-              value: null,
-              notes: [],
-              isConflict: false,
-              isSelected: false,
-            };
-          }),
-        );
-
+        const newBoard = resetInitialBoard(board);
         const emptyHighlights = createEmptyHighlights();
 
-        set({ board: newBoard, highlightedCells: emptyHighlights, hintsRemaining: 3 });
+        set({ board: newBoard, highlightedCells: emptyHighlights, hintsRemaining: HINTS_REMAINING });
         get().countBoardNumbers();
       },
 
-      // 셀 선택
       selectCell: (row, col) => {
         const { board } = get();
 
-        // 새 보드 생성 및 선택 상태 업데이트
-        const newBoard = board.map((r, rowIdx) =>
-          r.map((cell, colIdx) => ({
-            ...cell,
-            isSelected: rowIdx === row && colIdx === col,
-          })),
-        );
+        const newBoard = selectBoardCell(board, row, col);
 
-        set({
-          board: newBoard,
-          selectedCell: { row, col },
-        });
-
+        set({ board: newBoard, selectedCell: { row, col } });
         get().updateHighlights(row, col);
       },
 
-      // 셀에 값 입력
       fillCell: (value) => {
         const { board, selectedCell, solution, gameMode, cages } = get();
 
-        if (!selectedCell) return;
+        if (!canFillCell(selectedCell, board)) return;
 
-        const { row, col } = selectedCell;
+        const { row, col } = selectedCell!;
 
-        // 초기 셀은 수정할 수 없음
-        if (board[row][col].isInitial) return;
+        const updatedBoard = updateCellValue(board, { row, col }, value);
 
-        // 새 보드 복제 및 셀 값 업데이트
-        const newBoard = JSON.parse(JSON.stringify(board)) as SudokuBoard;
-        newBoard[row][col].value = value;
-        newBoard[row][col].notes = []; // 값을 입력하면 노트 제거
+        const boardWithConflicts = validateBoard(updatedBoard, gameMode, cages);
 
-        let boardWithConflicts: SudokuBoard;
-
-        // 충돌 확인
-        if (gameMode === GAME_MODE.KILLER) {
-          boardWithConflicts = checkKillerConflicts(newBoard, cages);
-        } else {
-          boardWithConflicts = checkConflicts(newBoard);
-        }
-
-        // 게임 완료 확인
-        let completed = false;
-        if (gameMode === GAME_MODE.KILLER) {
-          completed = isKillerBoardComplete(boardWithConflicts, cages);
-        } else {
-          completed = isBoardComplete(boardWithConflicts);
-        }
-        const success = completed && isBoardCorrect(boardWithConflicts, solution);
+        const gameResult = checkGameCompletion(boardWithConflicts, solution, gameMode, cages);
 
         set({
           board: boardWithConflicts,
-          isCompleted: completed,
-          isSuccess: success,
-          timerActive: !completed,
+          isCompleted: gameResult.completed,
+          isSuccess: gameResult.success,
+          timerActive: !gameResult.completed,
         });
 
-        if (success) {
+        if (gameResult.success) {
           get().deselectCell();
           get().toggleTimer(false);
         }
@@ -266,7 +219,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         if (board[row][col].isInitial || board[row][col].value !== null) return;
 
         // 새 보드 복제
-        const newBoard = JSON.parse(JSON.stringify(board)) as SudokuBoard;
+        const newBoard = structuredClone(board) as SudokuBoard;
 
         // 노트 토글
         const noteIndex = newBoard[row][col].notes.indexOf(value);
@@ -289,25 +242,13 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
       getHint: () => {
         const { board, solution, hintsRemaining, gameMode, cages } = get();
 
-        // 남은 힌트가 없으면 알림
-        // if (hintsRemaining <= 0) {
-        //   alert("더 이상 힌트를 사용할 수 없습니다!");
-        //   return;
-        // }
-
-        // 무작위 빈 셀 선택 (빈 셀 = 값이 null인 셀)
-        const emptyCells: { row: number; col: number }[] = [];
-
-        // 보드를 순회하며 빈 셀 찾기
-        for (let row = 0; row < 9; row++) {
-          for (let col = 0; col < 9; col++) {
-            if (board[row][col].value === null) {
-              emptyCells.push({ row, col });
-            }
-          }
+        if (hintsRemaining <= 0) {
+          alert("더 이상 힌트를 사용할 수 없습니다!");
+          return;
         }
 
-        // 빈 셀이 없으면 알림
+        const emptyCells = findEmptyCells(board);
+
         if (emptyCells.length === 0) {
           alert("모든 칸이 이미 채워져 있습니다!");
           return;
@@ -319,7 +260,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         const value = solution[row][col];
 
         // 새 보드 생성 (기존 보드의 깊은 복사)
-        const newBoard = JSON.parse(JSON.stringify(board)) as SudokuBoard;
+        const newBoard = structuredClone(board) as SudokuBoard;
 
         // 선택된 셀에 정답 값 입력
         newBoard[row][col].value = value;
@@ -344,14 +285,13 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         }
         const success = completed && isBoardCorrect(boardWithConflicts, solution);
 
-        // 상태 업데이트 (힌트 횟수 감소 포함)
         set({
           board: boardWithConflicts,
           isCompleted: completed,
           isSuccess: success,
           timerActive: !completed,
-          hintsRemaining: hintsRemaining - 1, // 힌트 횟수 감소
-          selectedCell: { row, col }, // 선택한 셀 업데이트
+          hintsRemaining: hintsRemaining - 1,
+          selectedCell: { row, col },
         });
 
         get().countBoardNumbers();
@@ -380,56 +320,10 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         }
       },
 
-      // 하이라이트 업데이트
       updateHighlights: (row, col) => {
         const { board } = get();
-        const newHighlights = createEmptyHighlights(); // 모든 하이라이트 초기화
-        const selectedValue = board[row][col].value;
 
-        // 1. 선택된 셀 표시
-        const selectedKey = `${row}-${col}`;
-        newHighlights[selectedKey].selected = true;
-
-        // 2. 같은 행의 셀들 표시
-        for (let c = 0; c < 9; c++) {
-          const key = `${row}-${c}`;
-          if (key !== selectedKey) {
-            newHighlights[key].related = true;
-          }
-        }
-
-        // 3. 같은 열의 셀들 표시
-        for (let r = 0; r < 9; r++) {
-          const key = `${r}-${col}`;
-          if (key !== selectedKey) {
-            newHighlights[key].related = true;
-          }
-        }
-
-        // 4. 같은 3x3 블록 내 셀들 표시
-        const blockStartRow = Math.floor(row / 3) * 3;
-        const blockStartCol = Math.floor(col / 3) * 3;
-
-        for (let r = blockStartRow; r < blockStartRow + 3; r++) {
-          for (let c = blockStartCol; c < blockStartCol + 3; c++) {
-            const key = `${r}-${c}`;
-            if (key !== selectedKey) {
-              newHighlights[key].related = true;
-            }
-          }
-        }
-
-        // 5. 같은 값을 가진 셀들 표시 (선택 셀의 값이 있을 경우)
-        if (selectedValue !== null) {
-          for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-              const key = `${r}-${c}`;
-              if (key !== selectedKey && board[r][c].value === selectedValue) {
-                newHighlights[key].sameValue = true;
-              }
-            }
-          }
-        }
+        const newHighlights = calculateHighlights(board, row, col);
 
         set({ highlightedCells: newHighlights });
       },
@@ -437,7 +331,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
       // 보드 숫자 카운트
       countBoardNumbers: () => {
         const { board } = get();
-        const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+        const counts = structuredClone(NUMBER_COUNTS);
 
         board.forEach((row) => {
           row.forEach((cell) => {

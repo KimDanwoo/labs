@@ -2,7 +2,7 @@
 
 import { KEY_NUMBER } from "@entities/board/model/constants";
 import { CellProps } from "@entities/cell/model/types";
-import { useSudokuStore } from "@entities/sudoku/model/stores";
+import { useSudokuStore } from "@features/game-controls/model/stores/sudokuStore";
 import { FC } from "react";
 
 export const SudokuCell: FC<CellProps> = ({ cell, row, col, onSelect }) => {

@@ -1,4 +1,4 @@
-import { useSudokuStore } from "@entities/sudoku/model/stores";
+import { useSudokuStore } from "@features/game-controls/model/stores/sudokuStore";
 import { FC } from "react";
 import { IoPlayCircleOutline } from "react-icons/io5";
 
