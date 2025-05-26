@@ -1,6 +1,6 @@
 import { BLOCK_SIZE, BOARD_NUMBERS, BOARD_SIZE } from "@entities/board/model/constants";
-import { Grid } from "@entities/sudoku/model/types";
-import { shuffleArray } from "@entities/sudoku/model/utils";
+import { Grid } from "@entities/board/model/types";
+import { shuffleArray } from "@features/game-board/model/utils";
 /**
  * @description 무작위 숫자 매핑 생성 (1-9 → 1-9 셔플)
  * @returns {Map<number, number>} 숫자 매핑 맵

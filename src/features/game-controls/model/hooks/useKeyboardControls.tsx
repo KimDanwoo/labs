@@ -1,5 +1,5 @@
+import { useSudokuStore } from "@entities/sudoku/model/stores";
 import { useEffect } from "react";
-import { useSudokuStore } from "../stores";
 
 export const useKeyboardControls = () => {
   const handleKeyInput = useSudokuStore((state) => state.handleKeyInput);

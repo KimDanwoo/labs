@@ -1,5 +1,5 @@
 import { useSudokuStore } from "@entities/sudoku/model/stores";
-import { formatTime } from "@entities/sudoku/model/utils";
+import { formatTime } from "@features/game-board/model/utils";
 import { useEffect } from "react";
 import { AiOutlinePause } from "react-icons/ai";
 import { VscPlay } from "react-icons/vsc";

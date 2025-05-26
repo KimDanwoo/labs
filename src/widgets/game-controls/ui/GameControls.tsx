@@ -1,9 +1,9 @@
 "use client";
 
-import { GetHint } from "@features/get-hint/ui/GetHint";
-import { RemoveNumber } from "@features/remove-number/ui/RemoveNumber";
-import { RestartGame } from "@features/restart-game/ui/RestartGame";
-import { ToggleNote } from "@features/toggle-note/ui/ToggleNote";
+import { GetHint } from "@features/game-controls/ui/GetHint";
+import { RemoveNumber } from "@features/game-controls/ui/RemoveNumber";
+import { RestartGame } from "@features/game-controls/ui/RestartGame";
+import { ToggleNote } from "@features/game-controls/ui/ToggleNote";
 import React from "react";
 
 export const Controls: React.FC = () => (
