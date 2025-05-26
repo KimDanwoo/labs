@@ -25,7 +25,8 @@
       "@features/*": ["./src/features/*"],
       "@widgets/*": ["./src/widgets/*"],
       "@views/*": ["./src/views/*"],
-      "@shared/*": ["./src/shared/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@test/*": ["./src/test/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
