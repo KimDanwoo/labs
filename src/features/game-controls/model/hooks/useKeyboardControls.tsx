@@ -1,4 +1,4 @@
-import { useSudokuStore } from "@entities/sudoku/model/stores";
+import { useSudokuStore } from "@features/game-controls/model/stores/sudokuStore";
 import { useEffect } from "react";
 
 export const useKeyboardControls = () => {

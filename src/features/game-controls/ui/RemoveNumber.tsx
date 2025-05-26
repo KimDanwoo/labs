@@ -1,4 +1,4 @@
-import { useSudokuStore } from "@entities/sudoku/model/stores";
+import { useSudokuStore } from "@features/game-controls/model/stores/sudokuStore";
 import IconButton from "@shared/ui/IconButton";
 import { CiEraser } from "react-icons/ci";
 

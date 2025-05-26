@@ -1,4 +1,4 @@
-import { BASE_GRID, BOARD_SIZE } from "@entities/board/model/constants";
+import { BASE_GRID, BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { DIFFICULTY_RANGES, KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
 import { Difficulty, KillerCage } from "@entities/game/model/types";
@@ -14,10 +14,8 @@ import {
  * @returns {Grid} 완성된 스도쿠 그리드
  */
 export function generateSolution(): Grid {
-  // 솔루션 복제
   const solution = structuredClone(BASE_GRID);
 
-  // 변환 파이프라인 적용
   applyTransformations(solution);
 
   return solution;
@@ -48,7 +46,6 @@ export function createInitialBoard(solution: Grid): SudokuBoard {
  * @param {number} count - 제거할 셀 수
  */
 const removeRandomCells = (board: SudokuBoard, solution: Grid, count: number): void => {
-  // 모든 위치를 배열로 만듦
   const allPositions: GridPosition[] = [];
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
@@ -249,8 +246,8 @@ export function generateKillerBoard(
 
   // 최종 힌트 수 확인
   let actualHintCount = 0;
-  for (let r = 0; r < 9; r++) {
-    for (let c = 0; c < 9; c++) {
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    for (let c = 0; c < BOARD_SIZE; c++) {
       if (board[r][c].value !== null) {
         actualHintCount++;
       }
@@ -504,16 +501,16 @@ function removeRandomCellsImproved(
     let sameValueCount = 0;
 
     // 같은 행, 열에서 동일한 숫자 개수 확인
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < BOARD_SIZE; i++) {
       if (i !== col && solution[row][i] === value) sameValueCount++;
       if (i !== row && solution[i][col] === value) sameValueCount++;
     }
 
     // 같은 블록에서 동일한 숫자 개수 확인
-    const blockRow = Math.floor(row / 3) * 3;
-    const blockCol = Math.floor(col / 3) * 3;
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 3; c++) {
+    const blockRow = Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE;
+    const blockCol = Math.floor(col / BLOCK_SIZE) * BLOCK_SIZE;
+    for (let r = 0; r < BLOCK_SIZE; r++) {
+      for (let c = 0; c < BLOCK_SIZE; c++) {
         const cr = blockRow + r;
         const cc = blockCol + c;
         if ((cr !== row || cc !== col) && solution[cr][cc] === value) {
