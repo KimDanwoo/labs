@@ -10,95 +10,31 @@ import {
   PHASE_1_RATIO,
   SUDOKU_CELL_COUNT,
 } from "@entities/board/model/constants";
-import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
+import {
+  CellPriority,
+  Grid,
+  GridPosition,
+  RemovalContext,
+  RemovalStrategy,
+  SudokuBoard,
+} from "@entities/board/model/types";
+import {
+  deepCopyGrid,
+  getBlockCoordinates,
+  getCenterDistance,
+  isCenter,
+  isCorner,
+  isEdge,
+} from "@entities/board/model/utils";
 import { DIFFICULTY_RANGES, KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
 import { Difficulty, KillerCage } from "@entities/game/model/types";
+import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from "@entities/game/model/utils";
 import {
   applyTransformations,
   generateKillerCages,
   hasUniqueSolution,
   shuffleArray,
 } from "@features/game-board/model/utils";
-
-// ============================================================================
-// 상수 및 타입 정의
-// ============================================================================
-
-interface RemovalStrategy {
-  preferCenter: boolean;
-  preferCorners: boolean;
-  preferEdges: boolean;
-  symmetryBonus: number;
-  blockDistribution: boolean;
-}
-
-interface CellPriority {
-  pos: GridPosition;
-  priority: number;
-}
-
-interface RemovalContext {
-  board: SudokuBoard;
-  tempGrid: (number | null)[][];
-  targetRemove: number;
-  difficulty: Difficulty;
-}
-
-// ============================================================================
-// 순수 유틸리티 함수들
-// ============================================================================
-
-/**
- * 깊은 복사 (성능 최적화된 버전)
- */
-const deepCopyGrid = (grid: Grid): Grid => grid.map((row) => [...row]);
-
-/**
- * 좌표 관련 순수 함수들
- */
-const getBlockCoordinates = (row: number, col: number): [number, number] => [
-  Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE,
-  Math.floor(col / BLOCK_SIZE) * BLOCK_SIZE,
-];
-
-const getCenterDistance = (row: number, col: number): number => Math.abs(4 - row) + Math.abs(4 - col);
-
-const isCorner = (row: number, col: number): boolean => (row === 0 || row === 8) && (col === 0 || col === 8);
-
-const isEdge = (row: number, col: number): boolean => row === 0 || row === 8 || col === 0 || col === 8;
-
-const isCenter = (row: number, col: number): boolean => getCenterDistance(row, col) <= 2;
-
-/**
- * 검증 관련 순수 함수들
- */
-const isValidNumberSet = (numbers: readonly number[]): boolean => {
-  if (numbers.length !== BOARD_SIZE) return false;
-  const numberSet = new Set(numbers);
-  return numberSet.size === BOARD_SIZE && KEY_NUMBER.every((n) => numberSet.has(n));
-};
-
-const getRowNumbers = (grid: Grid, row: number): number[] => grid[row];
-
-const getColumnNumbers = (grid: Grid, col: number): number[] => grid.map((row) => row[col]);
-
-const getBlockNumbers = (grid: Grid, blockRow: number, blockCol: number): number[] => {
-  const block: number[] = [];
-  const startRow = blockRow * BLOCK_SIZE;
-  const startCol = blockCol * BLOCK_SIZE;
-
-  for (let r = 0; r < BLOCK_SIZE; r++) {
-    for (let c = 0; c < BLOCK_SIZE; c++) {
-      block.push(grid[startRow + r][startCol + c]);
-    }
-  }
-
-  return block;
-};
-
-// ============================================================================
-// 검증 함수들 (성능 최적화)
-// ============================================================================
 
 /**
  * 최적화된 그리드 검증 함수
