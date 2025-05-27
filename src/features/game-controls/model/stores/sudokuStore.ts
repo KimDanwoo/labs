@@ -117,6 +117,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
       // 게임 초기화
       initializeGame: (difficulty = GAME_LEVEL.MEDIUM) => {
+        console.log("------------------------------", "나 실행됨");
         const solution = generateSolution();
         const { gameMode } = get();
 
