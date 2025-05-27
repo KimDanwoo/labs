@@ -9,6 +9,13 @@ export const GAME_LEVEL = {
   EXPERT: "expert",
 } as const;
 
+export const GAME_LEVEL_LABELS = {
+  [GAME_LEVEL.EASY]: "쉬움",
+  [GAME_LEVEL.MEDIUM]: "중간",
+  [GAME_LEVEL.HARD]: "어려움",
+  [GAME_LEVEL.EXPERT]: "전문가",
+} as const;
+
 export const GAME_MODE = {
   CLASSIC: "classic",
   KILLER: "killer",

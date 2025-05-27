@@ -1,4 +1,4 @@
-import { BOARD_SIZE, NUMBER_COUNTS } from "@entities/board/model/constants";
+import { NUMBER_COUNTS } from "@entities/board/model/constants";
 import { SudokuBoard } from "@entities/board/model/types";
 import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING } from "@entities/game/model/constants";
 import { Difficulty, GameMode, KillerCage, SudokuState } from "@entities/game/model/types";
@@ -115,9 +115,8 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
     (set, get) => ({
       ...initialState,
 
-      // 게임 초기화
+      // 게임 초기화 (개선된 난이도 차별화)
       initializeGame: (difficulty = GAME_LEVEL.MEDIUM) => {
-        console.log("------------------------------", "나 실행됨");
         const solution = generateSolution();
         const { gameMode } = get();
 
@@ -125,37 +124,10 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         let cages: KillerCage[] = [];
 
         if (gameMode === GAME_MODE.KILLER) {
-          // 킬러 모드 보드 생성
           const killerResult = generateKillerBoard(solution, difficulty);
           board = killerResult.board;
           cages = killerResult.cages;
-
-          // 난이도에 따른 힌트 수 검증 및 강제 적용 (Expert 난이도)
-          if (difficulty === GAME_LEVEL.EXPERT) {
-            // 힌트가 있는지 확인
-            let hasHints = false;
-            for (let r = 0; r < BOARD_SIZE; r++) {
-              for (let c = 0; c < BOARD_SIZE; c++) {
-                if (board[r][c].value !== null) {
-                  hasHints = true;
-                  break;
-                }
-              }
-              if (hasHints) break;
-            }
-
-            // 힌트가 있으면 모두 제거
-            if (hasHints) {
-              for (let r = 0; r < BOARD_SIZE; r++) {
-                for (let c = 0; c < BOARD_SIZE; c++) {
-                  board[r][c].value = null;
-                  board[r][c].isInitial = false;
-                }
-              }
-            }
-          }
         } else {
-          // 일반 모드 보드 생성
           board = generateBoard(solution, difficulty);
         }
 
@@ -167,6 +139,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           gameMode,
           cages,
         });
+
         get().toggleTimer(true);
         get().countBoardNumbers();
       },
@@ -183,13 +156,21 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         const newBoard = resetInitialBoard(board);
         const emptyHighlights = createEmptyHighlights();
 
-        set({ board: newBoard, highlightedCells: emptyHighlights, hintsRemaining: HINTS_REMAINING });
+        set({
+          board: newBoard,
+          highlightedCells: emptyHighlights,
+          hintsRemaining: HINTS_REMAINING,
+          currentTime: 0,
+          isCompleted: false,
+          isSuccess: false,
+        });
+
+        get().toggleTimer(true);
         get().countBoardNumbers();
       },
 
       selectCell: (row, col) => {
         const { board } = get();
-
         const newBoard = selectBoardCell(board, row, col);
 
         set({ board: newBoard, selectedCell: { row, col } });
@@ -204,9 +185,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         const { row, col } = selectedCell!;
 
         const updatedBoard = updateCellValue(board, { row, col }, value);
-
         const boardWithConflicts = validateBoard(updatedBoard, gameMode, cages);
-
         const gameResult = checkGameCompletion(boardWithConflicts, solution, gameMode, cages);
 
         set({
@@ -225,14 +204,12 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         get().updateHighlights(row, col);
       },
 
-      // 셀 선택 해제
       deselectCell: () => {
         const { board } = get();
         const newBoard = board.map((r) => r.map((c) => ({ ...c, isSelected: false })));
-        set({ board: newBoard, selectedCell: null });
+        set({ board: newBoard, selectedCell: null, highlightedCells: createEmptyHighlights() });
       },
 
-      // 노트 토글
       toggleNote: (value) => {
         const { board, selectedCell } = get();
 
@@ -243,7 +220,6 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         // 초기 셀이거나 값이 있으면 노트를 사용할 수 없음
         if (board[row][col].isInitial || board[row][col].value !== null) return;
 
-        // 새 보드 복제
         const newBoard = structuredClone(board) as SudokuBoard;
 
         // 노트 토글
@@ -258,12 +234,10 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         set({ board: newBoard });
       },
 
-      // 노트 모드 토글
       toggleNoteMode: () => {
         set((state) => ({ isNoteMode: !state.isNoteMode }));
       },
 
-      // 힌트 표시
       getHint: () => {
         const { board, solution, hintsRemaining, gameMode, cages } = get();
 
@@ -284,17 +258,12 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         const { row, col } = emptyCells[randomIndex];
         const value = solution[row][col];
 
-        // 새 보드 생성 (기존 보드의 깊은 복사)
         const newBoard = structuredClone(board) as SudokuBoard;
-
-        // 선택된 셀에 정답 값 입력
         newBoard[row][col].value = value;
-        newBoard[row][col].notes = []; // 노트 제거
+        newBoard[row][col].notes = [];
 
-        // 충돌 확인
         // 게임 모드에 따른 충돌 확인
         let boardWithConflicts: SudokuBoard;
-
         if (gameMode === GAME_MODE.KILLER) {
           boardWithConflicts = checkKillerConflicts(newBoard, cages);
         } else {
@@ -323,13 +292,11 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         get().updateHighlights(row, col);
       },
 
-      // 게임 재시작
       restartGame: () => {
         const { difficulty } = get();
         get().initializeGame(difficulty);
       },
 
-      // 타이머 증가
       incrementTimer: () => {
         const { currentTime, timerActive } = get();
         if (timerActive) {
@@ -347,13 +314,10 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
       updateHighlights: (row, col) => {
         const { board } = get();
-
         const newHighlights = calculateHighlights(board, row, col);
-
         set({ highlightedCells: newHighlights });
       },
 
-      // 보드 숫자 카운트
       countBoardNumbers: () => {
         const { board } = get();
         const counts = structuredClone(NUMBER_COUNTS);
@@ -369,14 +333,13 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         set({ numberCounts: counts });
       },
 
-      // 정답 확인
       checkSolution: () => {
         const { board, solution, gameMode, cages } = get();
+
         const isCorrect = isBoardCorrect(board, solution);
 
         // 게임 모드에 따른 충돌 확인
         let boardWithConflicts: SudokuBoard;
-
         if (gameMode === GAME_MODE.KILLER) {
           boardWithConflicts = checkKillerConflicts(board, cages);
         } else {
@@ -391,22 +354,66 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           completed = isBoardComplete(boardWithConflicts);
         }
 
+        const success = isCorrect && completed;
+
         set({
           board: boardWithConflicts,
           isCompleted: completed,
-          isSuccess: isCorrect && completed,
-          timerActive: false,
+          isSuccess: success,
+          timerActive: !completed,
         });
       },
 
       handleKeyInput: (key) => {
+        const { isNoteMode } = get();
+
         if (key === "Backspace" || key === "Delete") {
           get().fillCell(null);
           return;
         }
 
         if (/^[1-9]$/.test(key)) {
-          get().fillCell(parseInt(key) as number);
+          const value = parseInt(key) as number;
+          if (isNoteMode) {
+            get().toggleNote(value);
+          } else {
+            get().fillCell(value);
+          }
+        }
+
+        // 방향키 처리
+        if (key.startsWith("Arrow")) {
+          const { selectedCell } = get();
+          if (!selectedCell) return;
+
+          let { row, col } = selectedCell;
+
+          if (key === "ArrowUp") {
+            row = Math.max(0, row - 1);
+          } else if (key === "ArrowDown") {
+            row = Math.min(8, row + 1);
+          } else if (key === "ArrowLeft") {
+            col = Math.max(0, col - 1);
+          } else if (key === "ArrowRight") {
+            col = Math.min(8, col + 1);
+          }
+
+          // switch (key) {
+          //   case "ArrowUp":
+          //     row = Math.max(0, row - 1);
+          //     break;
+          //   case "ArrowDown":
+          //     row = Math.min(8, row + 1);
+          //     break;
+          //   case "ArrowLeft":
+          //     col = Math.max(0, col - 1);
+          //     break;
+          //   case "ArrowRight":
+          //     col = Math.min(8, col + 1);
+          //     break;
+          // }
+
+          get().selectCell(row, col);
         }
       },
     }),
