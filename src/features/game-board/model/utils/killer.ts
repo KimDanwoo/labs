@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
+import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
 import { Difficulty, KillerCage } from "@entities/game/model/types";
@@ -477,7 +477,7 @@ function validateAllCages(cages: KillerCage[], solution: Grid): boolean {
   }
 
   // 모든 셀이 케이지에 속하는지 검사
-  if (allCells.size !== 81) {
+  if (allCells.size !== SUDOKU_CELL_COUNT) {
     console.error(`전체 셀 수 불일치: ${allCells.size} !== 81`);
     return false;
   }
