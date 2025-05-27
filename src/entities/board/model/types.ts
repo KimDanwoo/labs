@@ -8,3 +8,8 @@ export interface Position {
   row: number;
   col: number;
 }
+
+export interface CageInfo {
+  paths: { id: number; path: string }[];
+  sums: { id: number; sum: number; x: number; y: number }[];
+}
