@@ -41,10 +41,10 @@
 
 ```bash
 # 저장소 클론
-git clone https://github.com/yourusername/sudoku-engine.git
+git clone https://github.com/yourusername/awesome-sudoku.git
 
 # 디렉토리 이동
-cd sudoku-engine
+cd awesome-sudoku
 
 # 의존성 설치
 npm install
