@@ -1,16 +1,43 @@
 {
   "printWidth": 120,
+  "_printWidth": "줄 길이 120자 이상 에러",
+
   "tabWidth": 2,
+  "_tabWidth": "들여쓰기 2칸",
+
   "useTabs": false,
+  "_useTabs": "들여쓰기 공백 사용 금지",
+
   "semi": true,
+  "_semi": "세미콜론 사용 권장",
+
   "singleQuote": false,
+  "_singleQuote": "문자열 큰따옴표 사용 권장",
+
   "quoteProps": "preserve",
+  "_quoteProps": "문자열 큰따옴표 사용 권장",
+
   "jsxSingleQuote": false,
+  "_jsxSingleQuote": "JSX 문자열 큰따옴표 사용 권장",
+
   "trailingComma": "all",
+  "_trailingComma": "마지막 쉼표 사용 권장",
+
   "bracketSpacing": true,
+  "_bracketSpacing": "객체 중괄호 공백 사용 권장",
+
   "bracketSameLine": false,
+  "_bracketSameLine": "객체 중괄호 같은 줄 사용 권장",
+
   "formatOnSave": true,
+  "_formatOnSave": "저장 시 자동 포맷팅 사용 권장",
+
   "arrowParens": "always",
+  "_arrowParens": "화살표 함수 괄호 사용 권장",
+
   "requirePragma": false,
-  "plugins": ["prettier-plugin-organize-imports"]
+  "_requirePragma": "저장 시 자동 포맷팅 사용 권장",
+
+  "plugins": ["prettier-plugin-organize-imports"],
+  "_plugins": "임포트 정렬 플러그인 사용 권장"
 }
