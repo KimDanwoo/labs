@@ -1,175 +1,195 @@
 import { GAME_MODE } from "@entities/game/model/constants";
 import { useSudokuStore } from "@features/game-controls/model/stores";
-import { useEffect, useRef, useState } from "react";
+import { debounce } from "@shared/model/utils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+interface CageInfo {
+  paths: { id: number; path: string }[];
+  sums: { id: number; sum: number; x: number; y: number }[];
+}
 
 export const KillerCage: React.FC = () => {
   const cages = useSudokuStore((state) => state.cages);
   const gameMode = useSudokuStore((state) => state.gameMode);
   const overlayRef = useRef<HTMLDivElement>(null);
-  const [cageInfo, setCageInfo] = useState<{
-    paths: { id: number; path: string }[];
-    sums: { id: number; sum: number; x: number; y: number }[];
-  }>({ paths: [], sums: [] });
+  const observerRef = useRef<MutationObserver | null>(null);
+  const isActiveRef = useRef(true);
 
-  useEffect(() => {
-    if (gameMode !== GAME_MODE.KILLER) return;
+  const [cageInfo, setCageInfo] = useState<CageInfo>({ paths: [], sums: [] });
 
-    // 셀 위치 계산 및 케이지 테두리/합계 위치 설정
-    const calcPositions = () => {
-      // 테이블 찾기
-      const table = document.querySelector("table.border-collapse");
-      if (!table) return;
+  const calcPositions = useCallback(() => {
+    if (!isActiveRef.current) return;
 
-      // 테이블 내 모든 셀 찾기
-      const cells = table.querySelectorAll("td");
-      if (cells.length !== 81) return; // 9x9 스도쿠
+    const table = document.querySelector("table.border-collapse");
+    if (!table) return;
 
-      // 셀 위치 정보 저장
-      const cellPositions: Record<string, { x: number; y: number; width: number; height: number }> = {};
-      cells.forEach((cell, index) => {
-        const row = Math.floor(index / 9);
-        const col = index % 9;
-        const rect = cell.getBoundingClientRect();
-        const tableRect = table.getBoundingClientRect();
+    const cells = table.querySelectorAll("td");
+    if (cells.length !== 81) return;
 
-        cellPositions[`${row}-${col}`] = {
-          x: rect.left - tableRect.left,
-          y: rect.top - tableRect.top,
-          width: rect.width,
-          height: rect.height,
-        };
-      });
+    // 셀 위치 정보 저장
+    const cellPositions: Record<string, { x: number; y: number; width: number; height: number }> = {};
+    const tableRect = table.getBoundingClientRect();
 
-      // 테이블 사이즈 기준으로 오버레이 설정
-      if (overlayRef.current) {
-        const tableRect = table.getBoundingClientRect();
-        overlayRef.current.style.width = `${tableRect.width}px`;
-        overlayRef.current.style.height = `${tableRect.height}px`;
-      }
+    cells.forEach((cell, index) => {
+      const row = Math.floor(index / 9);
+      const col = index % 9;
+      const rect = cell.getBoundingClientRect();
 
-      // 케이지별 경로 및 합계 위치 계산
-      const paths: { id: number; path: string }[] = []; // 중복 제거를 위해 빈 배열로 초기화
-      const sums: { id: number; sum: number; x: number; y: number }[] = []; // 중복 제거를 위해 빈 배열로 초기화
+      cellPositions[`${row}-${col}`] = {
+        x: rect.left - tableRect.left,
+        y: rect.top - tableRect.top,
+        width: rect.width,
+        height: rect.height,
+      };
+    });
 
-      // 중복 처리 방지를 위한 Set
-      const processedCageIds = new Set<number>();
+    // 오버레이 크기 설정
+    if (overlayRef.current) {
+      overlayRef.current.style.width = `${tableRect.width}px`;
+      overlayRef.current.style.height = `${tableRect.height}px`;
+    }
 
-      cages.forEach((cage) => {
-        // 이미 처리한 케이지는 건너뛰기
-        if (processedCageIds.has(cage.id)) return;
-        processedCageIds.add(cage.id);
+    // 케이지 경로 및 합계 위치 계산
+    const paths: { id: number; path: string }[] = [];
+    const sums: { id: number; sum: number; x: number; y: number }[] = [];
+    const processedCageIds = new Set<number>();
 
-        // 케이지 테두리 생성
-        const segments: string[] = [];
-        const cageCellKeys = new Set(cage.cells.map(([r, c]) => `${r}-${c}`));
+    cages.forEach((cage) => {
+      if (processedCageIds.has(cage.id)) return;
+      processedCageIds.add(cage.id);
 
-        cage.cells.forEach(([row, col]) => {
-          const cellKey = `${row}-${col}`;
-          const cell = cellPositions[cellKey];
-          if (!cell) return;
+      // 케이지 테두리 생성
+      const segments: string[] = [];
+      const cageCellKeys = new Set(cage.cells.map(([r, c]) => `${r}-${c}`));
 
-          // 패딩 계산
-          const padding = Math.min(cell.width, cell.height) * 0.1;
+      cage.cells.forEach(([row, col]) => {
+        const cell = cellPositions[`${row}-${col}`];
+        if (!cell) return;
 
-          // 상하좌우 인접 셀 확인하여 테두리 생성
-          const edges = [
-            { r: row - 1, c: col, side: "top" },
-            { r: row + 1, c: col, side: "bottom" },
-            { r: row, c: col - 1, side: "left" },
-            { r: row, c: col + 1, side: "right" },
-          ];
+        const padding = Math.min(cell.width, cell.height) * 0.1;
 
-          edges.forEach(({ r, c, side }) => {
-            const adjKey = `${r}-${c}`;
-            if (!cageCellKeys.has(adjKey)) {
-              const x = cell.x;
-              const y = cell.y;
-              const w = cell.width;
-              const h = cell.height;
+        // 인접 셀 확인하여 테두리 생성
+        const edges = [
+          { r: row - 1, c: col, side: "top" as const },
+          { r: row + 1, c: col, side: "bottom" as const },
+          { r: row, c: col - 1, side: "left" as const },
+          { r: row, c: col + 1, side: "right" as const },
+        ];
 
-              if (side === "top") {
-                segments.push(`M${x + padding},${y + padding} L${x + w - padding},${y + padding}`);
-              } else if (side === "right") {
-                segments.push(`M${x + w - padding},${y + padding} L${x + w - padding},${y + h - padding}`);
-              } else if (side === "bottom") {
-                segments.push(`M${x + padding},${y + h - padding} L${x + w - padding},${y + h - padding}`);
-              } else if (side === "left") {
-                segments.push(`M${x + padding},${y + padding} L${x + padding},${y + h - padding}`);
-              }
+        edges.forEach(({ r, c, side }) => {
+          if (!cageCellKeys.has(`${r}-${c}`)) {
+            const { x, y, width: w, height: h } = cell;
+            if (side === "top") {
+              segments.push(`M${x + padding},${y + padding} L${x + w - padding},${y + padding}`);
+            } else if (side === "right") {
+              segments.push(`M${x + w - padding},${y + padding} L${x + w - padding},${y + h - padding}`);
+            } else if (side === "bottom") {
+              segments.push(`M${x + padding},${y + h - padding} L${x + w - padding},${y + h - padding}`);
+            } else if (side === "left") {
+              segments.push(`M${x + padding},${y + padding} L${x + padding},${y + h - padding}`);
             }
-          });
-        });
-
-        paths.push({
-          id: cage.id,
-          path: segments.join(" "),
-        });
-
-        // 케이지의 왼쪽 상단 셀 찾기 (합계 표시 위치)
-        let topRow = 9,
-          leftCol = 9;
-        cage.cells.forEach(([r, c]) => {
-          if (r < topRow || (r === topRow && c < leftCol)) {
-            topRow = r;
-            leftCol = c;
           }
         });
-
-        const sumCell = cellPositions[`${topRow}-${leftCol}`];
-        if (sumCell) {
-          sums.push({
-            id: cage.id,
-            sum: cage.sum,
-            x: sumCell.x + 2,
-            y: sumCell.y + 2,
-          });
-        }
       });
 
-      setCageInfo({ paths, sums });
-    };
+      paths.push({
+        id: cage.id,
+        path: segments.join(" "),
+      });
 
-    // 초기 계산 및 이벤트 설정
-    calcPositions();
-    const timers = [setTimeout(calcPositions, 100), setTimeout(calcPositions, 300), setTimeout(calcPositions, 500)];
+      // 합계 표시 위치 (가장 위쪽, 왼쪽 셀)
+      const topLeftCell = cage.cells.reduce(
+        (topLeft, [r, c]) => {
+          if (r < topLeft[0] || (r === topLeft[0] && c < topLeft[1])) {
+            return [r, c];
+          }
+          return topLeft;
+        },
+        [9, 9],
+      );
 
-    // 테이블 변경 감지
-    const observer = new MutationObserver(calcPositions);
+      const sumCell = cellPositions[`${topLeftCell[0]}-${topLeftCell[1]}`];
+      if (sumCell) {
+        sums.push({
+          id: cage.id,
+          sum: cage.sum,
+          x: sumCell.x + 2,
+          y: sumCell.y + 2,
+        });
+      }
+    });
+
+    setCageInfo({ paths, sums });
+  }, [cages]);
+
+  const cellSize = useMemo(() => {
+    const firstPath = cageInfo.paths[0]?.path || "";
+    const match = firstPath.match(/M([\d.]+),([\d.]+)/);
+
+    if (match && cageInfo.paths.length > 1) {
+      const secondMatch = cageInfo.paths[1]?.path.match(/M([\d.]+),([\d.]+)/);
+      if (secondMatch) {
+        const x1 = parseFloat(match[1]);
+        const x2 = parseFloat(secondMatch[1]);
+        return Math.max(Math.abs(x2 - x1), 40);
+      }
+    }
+    return 40;
+  }, [cageInfo.paths]);
+
+  const debouncedCalcPositions = useRef(debounce(calcPositions, 150));
+
+  useEffect(() => {
+    debouncedCalcPositions.current.cancel();
+    debouncedCalcPositions.current = debounce(calcPositions, 150);
+  }, [calcPositions]);
+
+  useEffect(() => {
+    if (gameMode !== GAME_MODE.KILLER) {
+      setCageInfo({ paths: [], sums: [] });
+      return;
+    }
+
+    isActiveRef.current = true;
+
+    debouncedCalcPositions.current();
+
     const table = document.querySelector("table.border-collapse");
     if (table) {
-      observer.observe(table, {
+      observerRef.current = new MutationObserver(debouncedCalcPositions.current);
+      observerRef.current.observe(table, {
         attributes: true,
         childList: true,
         subtree: true,
       });
     }
 
-    // 브라우저 크기 변경 감지
-    window.addEventListener("resize", calcPositions);
+    window.addEventListener("resize", debouncedCalcPositions.current);
 
     return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", calcPositions);
-      timers.forEach(clearTimeout);
+      isActiveRef.current = false;
+
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+
+      window.removeEventListener("resize", debouncedCalcPositions.current);
+
+      debouncedCalcPositions.current.cancel();
     };
-  }, [cages, gameMode]);
+  }, [gameMode]);
+
+  useEffect(
+    () => () => {
+      isActiveRef.current = false;
+      debouncedCalcPositions.current.cancel();
+    },
+    [],
+  );
 
   if (gameMode !== GAME_MODE.KILLER || cageInfo.paths.length === 0) {
     return null;
-  }
-
-  // 평균 셀 크기 계산 (첫 번째 경로에서 위치 추정)
-  const firstPath = cageInfo.paths[0]?.path || "";
-  const match = firstPath.match(/M([\d.]+),([\d.]+)/);
-  let cellSize = 40; // 기본값
-
-  if (match && cageInfo.paths.length > 1) {
-    const secondMatch = cageInfo.paths[1]?.path.match(/M([\d.]+),([\d.]+)/);
-    if (secondMatch) {
-      const x1 = parseFloat(match[1]);
-      const x2 = parseFloat(secondMatch[1]);
-      cellSize = Math.max(Math.abs(x2 - x1), 40);
-    }
   }
 
   return (
@@ -182,7 +202,7 @@ export const KillerCage: React.FC = () => {
             fill="none"
             stroke="#436def"
             strokeWidth={1}
-            strokeDasharray={"3,3"}
+            strokeDasharray="3,3"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="opacity-90"
