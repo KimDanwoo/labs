@@ -1,4 +1,4 @@
-import { NUMBER_COUNTS } from "@entities/board/model/constants";
+import { BOARD_SIZE, NUMBER_COUNTS } from "@entities/board/model/constants";
 import { SudokuBoard } from "@entities/board/model/types";
 import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING } from "@entities/game/model/constants";
 import { Difficulty, GameMode, KillerCage, SudokuState } from "@entities/game/model/types";
@@ -125,10 +125,34 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
         if (gameMode === GAME_MODE.KILLER) {
           // 킬러 모드 보드 생성
-
           const killerResult = generateKillerBoard(solution, difficulty);
           board = killerResult.board;
           cages = killerResult.cages;
+
+          // 난이도에 따른 힌트 수 검증 및 강제 적용 (Expert 난이도)
+          if (difficulty === GAME_LEVEL.EXPERT) {
+            // 힌트가 있는지 확인
+            let hasHints = false;
+            for (let r = 0; r < BOARD_SIZE; r++) {
+              for (let c = 0; c < BOARD_SIZE; c++) {
+                if (board[r][c].value !== null) {
+                  hasHints = true;
+                  break;
+                }
+              }
+              if (hasHints) break;
+            }
+
+            // 힌트가 있으면 모두 제거
+            if (hasHints) {
+              for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                  board[r][c].value = null;
+                  board[r][c].isInitial = false;
+                }
+              }
+            }
+          }
         } else {
           // 일반 모드 보드 생성
           board = generateBoard(solution, difficulty);

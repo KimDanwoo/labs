@@ -40,35 +40,39 @@ export function isValidPlacement(grid: (number | null)[][], row: number, col: nu
  */
 export function hasUniqueSolution(grid: (number | null)[][]): boolean {
   let solutionCount = 0;
-  const MAX_SOLUTIONS = 2;
+  const MAX_SOLUTIONS = 2; // 2개 이상 발견 시 바로 중단
+  const MAX_ATTEMPTS = 10000; // 무한 루프 방지용 최대 시도 횟수
+  let attempts = 0;
 
   // 원본 그리드 복제
   const tempGrid = grid.map((row) => [...row]);
 
-  // 가장 제약이 많은 빈 셀부터 처리하는 백트래킹
-  function countSolutions(index = 0, emptyCells: GridPosition[] = []): boolean {
-    // 빈 셀 목록 초기화 (첫 호출 시만)
-    if (index === 0 && emptyCells.length === 0) {
-      for (let r = 0; r < BOARD_SIZE; r++) {
-        for (let c = 0; c < BOARD_SIZE; c++) {
-          if (tempGrid[r][c] === null) {
-            emptyCells.push([r, c]);
-          }
-        }
+  // 빈 셀 찾기
+  const emptyCells: GridPosition[] = [];
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    for (let c = 0; c < BOARD_SIZE; c++) {
+      if (tempGrid[r][c] === null) {
+        emptyCells.push([r, c]);
       }
-
-      // 제약 많은 셀부터 처리 (후보가 적은 셀)
-      emptyCells.sort((a, b) => {
-        const candidatesA = countValidNumbers(tempGrid, a[0], a[1]);
-        const candidatesB = countValidNumbers(tempGrid, b[0], b[1]);
-        return candidatesA - candidatesB;
-      });
     }
+  }
+
+  // 제약이 많은 셀부터 처리 (후보가 적은 셀)
+  emptyCells.sort((a, b) => {
+    const candidatesA = countValidNumbers(tempGrid, a[0], a[1]);
+    const candidatesB = countValidNumbers(tempGrid, b[0], b[1]);
+    return candidatesA - candidatesB;
+  });
+
+  // 백트래킹으로 솔루션 찾기
+  function findSolutions(index = 0): boolean {
+    attempts++;
+    if (attempts > MAX_ATTEMPTS) return true; // 안전장치
 
     // 모든 빈 셀이 채워짐 -> 솔루션 발견
     if (index >= emptyCells.length) {
       solutionCount++;
-      return solutionCount >= MAX_SOLUTIONS;
+      return solutionCount >= MAX_SOLUTIONS; // 두 개 이상이면 중단
     }
 
     const [row, col] = emptyCells[index];
@@ -79,8 +83,8 @@ export function hasUniqueSolution(grid: (number | null)[][]): boolean {
         tempGrid[row][col] = num;
 
         // 다음 셀로 재귀 호출
-        if (countSolutions(index + 1, emptyCells)) {
-          return true; // 두 개 이상의 솔루션 발견
+        if (findSolutions(index + 1)) {
+          return true; // 두 개 이상의 솔루션 발견 또는 최대 시도 횟수 초과
         }
 
         tempGrid[row][col] = null; // 백트래킹
@@ -102,7 +106,7 @@ export function hasUniqueSolution(grid: (number | null)[][]): boolean {
   }
 
   // 솔루션 카운트 시작
-  countSolutions();
+  findSolutions();
 
   // 정확히 하나의 솔루션만 있어야 함
   return solutionCount === 1;
