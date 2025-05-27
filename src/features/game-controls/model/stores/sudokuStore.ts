@@ -17,9 +17,11 @@ import {
   isBoardComplete,
   isBoardCorrect,
   isKillerBoardComplete,
-  resetInitialBoard,
-  selectBoardCell,
+  resetUserInputs as resetUserInputsOptimized,
+  updateCellNotes,
+  updateCellSelection,
   updateCellValue,
+  updateSingleCell,
   validateBoard,
 } from "@features/game-board/model/utils";
 import { create } from "zustand";
@@ -153,7 +155,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
       resetUserInputs: () => {
         const { board } = get();
-        const newBoard = resetInitialBoard(board);
+        const newBoard = resetUserInputsOptimized(board);
         const emptyHighlights = createEmptyHighlights();
 
         set({
@@ -171,7 +173,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
       selectCell: (row, col) => {
         const { board } = get();
-        const newBoard = selectBoardCell(board, row, col);
+        const newBoard = updateCellSelection(board, row, col);
 
         set({ board: newBoard, selectedCell: { row, col } });
         get().updateHighlights(row, col);
@@ -184,7 +186,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
         const { row, col } = selectedCell!;
 
-        const updatedBoard = updateCellValue(board, { row, col }, value);
+        const updatedBoard = updateCellValue(board, row, col, value);
         const boardWithConflicts = validateBoard(updatedBoard, gameMode, cages);
         const gameResult = checkGameCompletion(boardWithConflicts, solution, gameMode, cages);
 
@@ -206,7 +208,14 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
       deselectCell: () => {
         const { board } = get();
-        const newBoard = board.map((r) => r.map((c) => ({ ...c, isSelected: false })));
+        const { selectedCell } = get();
+        if (!selectedCell) {
+          set({ highlightedCells: createEmptyHighlights() });
+          return;
+        }
+
+        const newBoard = updateSingleCell(board, selectedCell.row, selectedCell.col, { isSelected: false });
+
         set({ board: newBoard, selectedCell: null, highlightedCells: createEmptyHighlights() });
       },
 
@@ -217,19 +226,19 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
         const { row, col } = selectedCell;
 
-        // 초기 셀이거나 값이 있으면 노트를 사용할 수 없음
         if (board[row][col].isInitial || board[row][col].value !== null) return;
 
-        const newBoard = structuredClone(board) as SudokuBoard;
+        const currentNotes = board[row][col].notes;
+        const noteIndex = currentNotes.indexOf(value);
 
-        // 노트 토글
-        const noteIndex = newBoard[row][col].notes.indexOf(value);
+        let newNotes: number[];
         if (noteIndex === -1) {
-          newBoard[row][col].notes.push(value);
-          newBoard[row][col].notes.sort((a, b) => a - b);
+          newNotes = [...currentNotes, value].sort((a, b) => a - b);
         } else {
-          newBoard[row][col].notes.splice(noteIndex, 1);
+          newNotes = currentNotes.filter((note) => note !== value);
         }
+
+        const newBoard = updateCellNotes(board, row, col, newNotes);
 
         set({ board: newBoard });
       },
@@ -258,10 +267,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         const { row, col } = emptyCells[randomIndex];
         const value = solution[row][col];
 
-        const newBoard = structuredClone(board) as SudokuBoard;
-        newBoard[row][col].value = value;
-        newBoard[row][col].notes = [];
-
+        const newBoard = updateCellValue(board, row, col, value);
         // 게임 모드에 따른 충돌 확인
         let boardWithConflicts: SudokuBoard;
         if (gameMode === GAME_MODE.KILLER) {

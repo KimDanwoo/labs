@@ -479,7 +479,7 @@ export function generateKillerBoard(
   console.log(`킬러 스도쿠: 목표 힌트 ${targetHints}개, 목표 제거: ${targetRemove}개`);
 
   // 킬러 전용 셀 제거 (개선된 버전)
-  const removed = removeKillerCellsImproved(board, solution, cages, targetRemove, difficulty);
+  const removed = removeKillerCellsImproved(board, cages, targetRemove, difficulty);
   const finalHints = 81 - removed;
 
   console.log(`킬러 스도쿠: 실제 제거 ${removed}개, 최종 힌트 ${finalHints}개`);
@@ -492,7 +492,6 @@ export function generateKillerBoard(
  */
 function removeKillerCellsImproved(
   board: SudokuBoard,
-  solution: Grid,
   cages: KillerCage[],
   targetRemove: number,
   difficulty: Difficulty,

@@ -239,7 +239,7 @@ export function checkConflicts(board: SudokuBoard): SudokuBoard {
     }
 
     // 중복된 값들의 위치를 conflicts에 추가
-    for (const [_, positions] of seen) {
+    for (const [, positions] of seen) {
       if (positions.length > 1) {
         positions.forEach((col) => conflicts.add(`${row}-${col}`));
       }
@@ -259,7 +259,7 @@ export function checkConflicts(board: SudokuBoard): SudokuBoard {
       }
     }
 
-    for (const [_, positions] of seen) {
+    for (const [, positions] of seen) {
       if (positions.length > 1) {
         positions.forEach((row) => conflicts.add(`${row}-${col}`));
       }
@@ -286,7 +286,7 @@ export function checkConflicts(board: SudokuBoard): SudokuBoard {
         }
       }
 
-      for (const [_, positions] of seen) {
+      for (const [, positions] of seen) {
         if (positions.length > 1) {
           positions.forEach(([row, col]) => conflicts.add(`${row}-${col}`));
         }
