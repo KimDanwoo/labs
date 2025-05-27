@@ -1,47 +1,437 @@
 /* eslint-disable no-console */
 
-import { BOARD_SIZE } from "@entities/board/model/constants";
+import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
 import { Difficulty, KillerCage } from "@entities/game/model/types";
 import { checkConflicts, shuffleArray } from "@features/game-board/model/utils";
+
 /**
- * @description 인접한 셀 그룹화
- * @param {GridPosition[]} cells - 셀 목록
- * @returns {GridPosition[][]} 그룹화된 셀 목록
+ * 개선된 킬러 스도쿠 케이지 생성기
+ */
+export function generateKillerCages(solution: Grid, difficulty: Difficulty): KillerCage[] {
+  const { maxCageSize } = KILLER_DIFFICULTY_RANGES[difficulty];
+  const minCageSize = 2; // 최소 2개 셀로 케이지 구성
+
+  console.log(`킬러 케이지 생성 시작: 최대 크기 ${maxCageSize}`);
+
+  const cages: KillerCage[] = [];
+  const assignedCells = new Set<string>();
+  let cageId = 1;
+
+  // 개선된 케이지 생성 전략
+  const result = generateCagesWithStrategy(solution, maxCageSize, minCageSize);
+
+  result.forEach((cageData) => {
+    const cage: KillerCage = {
+      id: cageId++,
+      cells: cageData.cells,
+      sum: cageData.sum,
+    };
+    cages.push(cage);
+
+    cageData.cells.forEach(([r, c]) => {
+      assignedCells.add(`${r}-${c}`);
+    });
+  });
+
+  // 누락된 셀 처리
+  handleRemainingCellsImproved(cages, assignedCells, solution);
+
+  // 최종 검증
+  if (!validateAllCages(cages, solution)) {
+    throw new Error("케이지 생성 실패: 유효성 검증 실패");
+  }
+
+  console.log(`킬러 케이지 생성 완료: ${cages.length}개`);
+  return cages;
+}
+
+/**
+ * 전략적 케이지 생성
+ */
+function generateCagesWithStrategy(
+  solution: Grid,
+  maxCageSize: number,
+  minCageSize: number,
+): Array<{ cells: GridPosition[]; sum: number }> {
+  const cages: Array<{ cells: GridPosition[]; sum: number }> = [];
+  const used = new Set<string>();
+
+  // 시드 포인트들을 전략적으로 선택
+  const seedPoints = generateSeedPoints();
+
+  for (const seedPoint of seedPoints) {
+    const [row, col] = seedPoint;
+    const key = `${row}-${col}`;
+
+    if (used.has(key)) continue;
+
+    // 이 시드부터 케이지 확장
+    const cageData = growCageFromSeed(solution, seedPoint, maxCageSize, minCageSize, used);
+
+    if (cageData && cageData.cells.length >= minCageSize) {
+      cages.push(cageData);
+      cageData.cells.forEach(([r, c]) => used.add(`${r}-${c}`));
+    }
+  }
+
+  return cages;
+}
+
+/**
+ * 전략적 시드 포인트 생성
+ */
+function generateSeedPoints(): GridPosition[] {
+  const points: GridPosition[] = [];
+
+  // 격자 패턴으로 시드 포인트 생성 (겹치지 않도록)
+  for (let startRow = 0; startRow < 3; startRow++) {
+    for (let startCol = 0; startCol < 3; startCol++) {
+      // 각 3x3 영역에서 2-3개의 시드 포인트 선택
+      const regionPoints: GridPosition[] = [];
+
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+          regionPoints.push([startRow * 3 + r, startCol * 3 + c]);
+        }
+      }
+
+      shuffleArray(regionPoints);
+
+      // 각 영역에서 2-3개만 선택
+      const numToSelect = 2 + Math.floor(Math.random() * 2);
+      points.push(...regionPoints.slice(0, numToSelect));
+    }
+  }
+
+  shuffleArray(points);
+  return points;
+}
+
+/**
+ * 시드에서 케이지 확장
+ */
+function growCageFromSeed(
+  solution: Grid,
+  seed: GridPosition,
+  maxSize: number,
+  minSize: number,
+  globalUsed: Set<string>,
+): { cells: GridPosition[]; sum: number } | null {
+  const [startRow, startCol] = seed;
+  const startKey = `${startRow}-${startCol}`;
+
+  if (globalUsed.has(startKey)) return null;
+
+  const cage: GridPosition[] = [seed];
+  const used = new Set([startKey]);
+  const usedValues = new Set([solution[startRow][startCol]]);
+
+  // BFS로 케이지 확장
+  const queue: GridPosition[] = [seed];
+  let targetSize = minSize + Math.floor(Math.random() * (maxSize - minSize + 1));
+  targetSize = Math.min(targetSize, maxSize);
+
+  while (queue.length > 0 && cage.length < targetSize) {
+    const current = queue.shift()!;
+    const [row, col] = current;
+
+    // 인접한 셀들 찾기
+    const neighbors = getValidNeighbors(row, col, solution, used, globalUsed, usedValues);
+
+    if (neighbors.length === 0) {
+      // 더 이상 확장할 수 없으면 다른 큐의 셀로 시도
+      continue;
+    }
+
+    // 가장 적합한 이웃 선택
+    neighbors.sort((a, b) => {
+      const scoreA = calculateNeighborScore(a, cage);
+      const scoreB = calculateNeighborScore(b, cage);
+      return scoreB - scoreA;
+    });
+
+    const bestNeighbor = neighbors[0];
+    const [nRow, nCol] = bestNeighbor;
+    const nKey = `${nRow}-${nCol}`;
+    const nValue = solution[nRow][nCol];
+
+    cage.push(bestNeighbor);
+    used.add(nKey);
+    usedValues.add(nValue);
+    queue.push(bestNeighbor);
+  }
+
+  // 최소 크기 확인
+  if (cage.length < minSize) {
+    return null;
+  }
+
+  const sum = cage.reduce((total, [r, c]) => total + solution[r][c], 0);
+
+  return { cells: cage, sum };
+}
+
+/**
+ * 유효한 이웃 셀들 반환
+ */
+function getValidNeighbors(
+  row: number,
+  col: number,
+  solution: Grid,
+  localUsed: Set<string>,
+  globalUsed: Set<string>,
+  usedValues: Set<number>,
+): GridPosition[] {
+  const neighbors: GridPosition[] = [];
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ]; // 상하좌우
+
+  for (const [dRow, dCol] of directions) {
+    const newRow = row + dRow;
+    const newCol = col + dCol;
+
+    if (newRow >= 0 && newRow < BOARD_SIZE && newCol >= 0 && newCol < BOARD_SIZE) {
+      const key = `${newRow}-${newCol}`;
+      const value = solution[newRow][newCol];
+
+      // 사용되지 않았고 중복 값이 아닌 셀만 선택
+      if (!localUsed.has(key) && !globalUsed.has(key) && !usedValues.has(value)) {
+        neighbors.push([newRow, newCol]);
+      }
+    }
+  }
+
+  return neighbors;
+}
+
+/**
+ * 이웃 셀의 적합성 점수 계산
+ */
+function calculateNeighborScore(neighbor: GridPosition, currentCage: GridPosition[]): number {
+  const [row, col] = neighbor;
+  let score = 0;
+
+  // 현재 케이지와의 연결성 점수
+  let connections = 0;
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ];
+
+  for (const [dRow, dCol] of directions) {
+    const checkRow = row + dRow;
+    const checkCol = col + dCol;
+
+    if (currentCage.some(([cR, cC]) => cR === checkRow && cC === checkCol)) {
+      connections++;
+    }
+  }
+
+  score += connections * 2;
+
+  // 케이지 모양의 규칙성 점수 (정사각형에 가까울수록 높은 점수)
+  if (currentCage.length >= 4) {
+    const minRow = Math.min(...currentCage.map(([r]) => r));
+    const maxRow = Math.max(...currentCage.map(([r]) => r));
+    const minCol = Math.min(...currentCage.map(([, c]) => c));
+    const maxCol = Math.max(...currentCage.map(([, c]) => c));
+
+    const width = maxCol - minCol + 1;
+    const height = maxRow - minRow + 1;
+    const aspectRatio = Math.min(width, height) / Math.max(width, height);
+
+    score += aspectRatio;
+  }
+
+  // 블록 경계를 넘나드는 것에 대한 패널티
+  const cageBlocks = new Set();
+  currentCage.forEach(([r, c]) => {
+    const blockId = Math.floor(r / 3) * 3 + Math.floor(c / 3);
+    cageBlocks.add(blockId);
+  });
+
+  const neighborBlock = Math.floor(row / 3) * 3 + Math.floor(col / 3);
+  if (cageBlocks.has(neighborBlock)) {
+    score += 1; // 같은 블록 내 확장은 보너스
+  } else {
+    score -= 0.5; // 블록 경계 넘는 것은 약간의 패널티
+  }
+
+  // 무작위성 추가
+  score += Math.random() * 0.3;
+
+  return score;
+}
+
+/**
+ * 개선된 남은 셀 처리
+ */
+function handleRemainingCellsImproved(cages: KillerCage[], assignedCells: Set<string>, solution: Grid): void {
+  const remainingCells: GridPosition[] = [];
+
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      const key = `${row}-${col}`;
+      if (!assignedCells.has(key)) {
+        remainingCells.push([row, col]);
+      }
+    }
+  }
+
+  if (remainingCells.length === 0) return;
+
+  console.log(`남은 셀 ${remainingCells.length}개 처리 시작`);
+
+  // 인접한 케이지와 합치기 시도
+  const processed = new Set<string>();
+
+  for (const [row, col] of remainingCells) {
+    const key = `${row}-${col}`;
+    if (processed.has(key)) continue;
+
+    const bestCage = findBestAdjacentCage(row, col, cages, solution);
+
+    if (bestCage) {
+      bestCage.cells.push([row, col]);
+      bestCage.sum += solution[row][col];
+      assignedCells.add(key);
+      processed.add(key);
+    }
+  }
+
+  // 여전히 남은 셀들을 새로운 작은 케이지로 그룹화
+  const stillRemaining = remainingCells.filter(([r, c]) => !processed.has(`${r}-${c}`));
+
+  if (stillRemaining.length > 0) {
+    console.log(`여전히 남은 셀 ${stillRemaining.length}개를 새 케이지로 생성`);
+
+    const groups = groupAdjacentCells(stillRemaining);
+    let nextCageId = Math.max(...cages.map((c) => c.id)) + 1;
+
+    groups.forEach((group) => {
+      if (group.length >= 1) {
+        // 단일 셀 케이지도 허용
+        const sum = group.reduce((total, [r, c]) => total + solution[r][c], 0);
+        const newCage: KillerCage = {
+          id: nextCageId++,
+          cells: group,
+          sum: sum,
+        };
+        cages.push(newCage);
+
+        group.forEach(([r, c]) => {
+          assignedCells.add(`${r}-${c}`);
+        });
+      }
+    });
+  }
+}
+
+/**
+ * 인접한 최적의 케이지 찾기
+ */
+function findBestAdjacentCage(row: number, col: number, cages: KillerCage[], solution: Grid): KillerCage | null {
+  const cellValue = solution[row][col];
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ];
+
+  const candidateCages: Array<{ cage: KillerCage; score: number }> = [];
+
+  for (const cage of cages) {
+    // 인접성 검사
+    let isAdjacent = false;
+    for (const [cageRow, cageCol] of cage.cells) {
+      for (const [dRow, dCol] of directions) {
+        if (cageRow + dRow === row && cageCol + dCol === col) {
+          isAdjacent = true;
+          break;
+        }
+      }
+      if (isAdjacent) break;
+    }
+
+    if (!isAdjacent) continue;
+
+    // 중복 값 검사
+    const cageValues = cage.cells.map(([r, c]) => solution[r][c]);
+    if (cageValues.includes(cellValue)) continue;
+
+    // 점수 계산
+    let score = 0;
+
+    // 케이지 크기 (작을수록 높은 점수)
+    score += Math.max(0, 6 - cage.cells.length);
+
+    // 케이지 모양의 규칙성
+    const minRow = Math.min(...cage.cells.map(([r]) => r));
+    const maxRow = Math.max(...cage.cells.map(([r]) => r));
+    const minCol = Math.min(...cage.cells.map(([, c]) => c));
+    const maxCol = Math.max(...cage.cells.map(([, c]) => c));
+
+    const boundingArea = (maxRow - minRow + 1) * (maxCol - minCol + 1);
+    const compactness = cage.cells.length / boundingArea;
+    score += compactness * 2;
+
+    candidateCages.push({ cage, score });
+  }
+
+  if (candidateCages.length === 0) return null;
+
+  // 최고 점수의 케이지 반환
+  candidateCages.sort((a, b) => b.score - a.score);
+  return candidateCages[0].cage;
+}
+
+/**
+ * 인접한 셀들 그룹화 (개선된 버전)
  */
 export function groupAdjacentCells(cells: GridPosition[]): GridPosition[][] {
   const groups: GridPosition[][] = [];
   const visited = new Set<string>();
 
   for (const cell of cells) {
-    const key = `${cell[0]}-${cell[1]}`;
+    const [row, col] = cell;
+    const key = `${row}-${col}`;
+
     if (visited.has(key)) continue;
 
-    // 새 그룹 시작
-    const group: GridPosition[] = [cell];
+    // BFS로 연결된 셀들 찾기
+    const group: GridPosition[] = [];
+    const queue: GridPosition[] = [cell];
     visited.add(key);
 
-    // BFS로 인접 셀 찾기
-    let index = 0;
-    while (index < group.length) {
-      const [currentRow, currentCol] = group[index++];
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      group.push(current);
+
+      const [cRow, cCol] = current;
       const directions = [
         [-1, 0],
         [1, 0],
         [0, -1],
         [0, 1],
-      ]; // 상하좌우
+      ];
 
       for (const [dRow, dCol] of directions) {
-        const adjRow = currentRow + dRow;
-        const adjCol = currentCol + dCol;
-        const adjKey = `${adjRow}-${adjCol}`;
+        const newRow = cRow + dRow;
+        const newCol = cCol + dCol;
+        const newKey = `${newRow}-${newCol}`;
 
-        // 인접한 셀이 남은 셀 목록에 있고 아직 방문하지 않았는지
-        if (!visited.has(adjKey) && cells.some(([r, c]) => r === adjRow && c === adjCol)) {
-          group.push([adjRow, adjCol]);
-          visited.add(adjKey);
+        if (!visited.has(newKey) && cells.some(([r, c]) => r === newRow && c === newCol)) {
+          visited.add(newKey);
+          queue.push([newRow, newCol]);
         }
       }
     }
@@ -53,546 +443,110 @@ export function groupAdjacentCells(cells: GridPosition[]): GridPosition[][] {
 }
 
 /**
- * @description 남은 셀 처리 (최적화 버전)
- * @param {KillerCage[]} cages - 케이지 목록
- * @param {Set<string>} assignedCells - 할당된 셀 목록
- * @param {Grid} solution - 솔루션
- * @returns {void}
+ * 모든 케이지의 유효성 검증
  */
-export function handleRemainingCells(cages: KillerCage[], assignedCells: Set<string>, solution: Grid): void {
-  // 누락된 셀 목록
-  const missingCells: GridPosition[] = [];
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      const key = `${row}-${col}`;
-      if (!assignedCells.has(key)) {
-        missingCells.push([row, col]);
+function validateAllCages(cages: KillerCage[], solution: Grid): boolean {
+  const allCells = new Set<string>();
+
+  for (const cage of cages) {
+    // 케이지 내 중복 숫자 검사
+    const values = cage.cells.map(([r, c]) => solution[r][c]);
+    const uniqueValues = new Set(values);
+
+    if (values.length !== uniqueValues.size) {
+      console.error(`케이지 ${cage.id}에 중복 숫자:`, values);
+      return false;
+    }
+
+    // 합계 검사
+    const actualSum = values.reduce((sum, val) => sum + val, 0);
+    if (actualSum !== cage.sum) {
+      console.error(`케이지 ${cage.id} 합 불일치: ${actualSum} !== ${cage.sum}`);
+      return false;
+    }
+
+    // 셀 중복 검사
+    for (const [r, c] of cage.cells) {
+      const cellKey = `${r}-${c}`;
+      if (allCells.has(cellKey)) {
+        console.error(`셀 [${r}, ${c}]이 여러 케이지에 속함`);
+        return false;
       }
+      allCells.add(cellKey);
     }
   }
 
-  // 누락된 셀이 없으면 종료
-  if (missingCells.length === 0) return;
-
-  // 효율적인 케이지 확장 함수 (클로저 패턴으로 메모리 최적화)
-  const processRemainingCells = () => {
-    // 각 케이지의 셀 맵 (빠른 조회용)
-    const cageCellMaps: Set<string>[] = cages.map((cage) => new Set(cage.cells.map(([r, c]) => `${r}-${c}`)));
-
-    // 인접 케이지 찾기 (메모이제이션으로 계산 줄이기)
-    const getAdjacentCages = (row: number, col: number): number[] => {
-      const adjacentCages: number[] = [];
-      const directions = [
-        [-1, 0],
-        [1, 0],
-        [0, -1],
-        [0, 1],
-      ]; // 상하좌우
-
-      for (let i = 0; i < cages.length; i++) {
-        for (const [dRow, dCol] of directions) {
-          const adjRow = row + dRow;
-          const adjCol = col + dCol;
-          const adjKey = `${adjRow}-${adjCol}`;
-
-          if (cageCellMaps[i].has(adjKey)) {
-            adjacentCages.push(i);
-            break; // 이 케이지는 이미 인접한 것으로 확인됨
-          }
-        }
-      }
-
-      return adjacentCages;
-    };
-
-    // 첫 번째 전략: 인접한 케이지 확장
-    for (const [row, col] of missingCells) {
-      const key = `${row}-${col}`;
-      if (assignedCells.has(key)) continue;
-
-      const adjacentCageIndices = getAdjacentCages(row, col);
-
-      if (adjacentCageIndices.length > 0) {
-        // 인접 케이지 중에서 중복 숫자가 없는 것 우선 선택
-        const cellValue = solution[row][col];
-        let bestCageIndex = -1;
-
-        for (const cageIndex of adjacentCageIndices) {
-          const cage = cages[cageIndex];
-          const cageValues = cage.cells.map(([r, c]) => solution[r][c]);
-
-          // 이 케이지에 같은 숫자가 없는지 확인
-          if (!cageValues.includes(cellValue)) {
-            bestCageIndex = cageIndex;
-            break;
-          }
-        }
-
-        // 중복 숫자가 없는 케이지가 없으면 가장 작은 케이지 선택
-        if (bestCageIndex === -1) {
-          adjacentCageIndices.sort((a, b) => cages[a].cells.length - cages[b].cells.length);
-          bestCageIndex = adjacentCageIndices[0];
-        }
-
-        // 케이지에 셀 추가
-        cages[bestCageIndex].cells.push([row, col]);
-        cages[bestCageIndex].sum += solution[row][col];
-        assignedCells.add(key);
-        cageCellMaps[bestCageIndex].add(key);
-      }
-    }
-
-    // 두 번째 전략: 남은 셀로 새 케이지 형성
-    // 남은 셀끼리 그룹화
-    const remainingCells = missingCells.filter(([r, c]) => !assignedCells.has(`${r}-${c}`));
-
-    if (remainingCells.length >= 2) {
-      // 인접한 셀끼리 그룹화
-      const grouped = groupAdjacentCells(remainingCells);
-
-      // 각 그룹을 별도의 케이지로 만들기
-      for (const group of grouped) {
-        if (group.length >= 2) {
-          // 최소 2개 이상의 셀 필요
-          const newCage: KillerCage = {
-            cells: group,
-            sum: group.reduce((sum, [r, c]) => sum + solution[r][c], 0),
-            id: cages.length + 1,
-          };
-
-          cages.push(newCage);
-          for (const [r, c] of group) {
-            assignedCells.add(`${r}-${c}`);
-          }
-        }
-      }
-    }
-
-    // 세 번째 전략: 남은 고립된 셀 처리
-    // 가장 가까운 케이지에 강제 추가
-    const finalRemainingCells = missingCells.filter(([r, c]) => !assignedCells.has(`${r}-${c}`));
-
-    for (const [row, col] of finalRemainingCells) {
-      let nearestCage = 0;
-      let minDistance = Infinity;
-
-      // 가장 가까운 케이지 찾기
-      for (let i = 0; i < cages.length; i++) {
-        for (const [cageRow, cageCol] of cages[i].cells) {
-          const distance = Math.abs(row - cageRow) + Math.abs(col - cageCol);
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearestCage = i;
-          }
-        }
-      }
-
-      // 가장 가까운 케이지에 추가
-      cages[nearestCage].cells.push([row, col]);
-      cages[nearestCage].sum += solution[row][col];
-      assignedCells.add(`${row}-${col}`);
-    }
-  };
-
-  processRemainingCells();
-}
-
-/**
- * @description 케이지에 셀을 추가할 수 있는지 확인
- * @param {GridPosition[]} cageCells - 현재 케이지의 셀들
- * @param {GridPosition} newCell - 추가하려는 셀
- * @param {Grid} solution - 솔루션
- * @returns {boolean} 추가 가능 여부
- */
-function canAddCellToCage(cageCells: GridPosition[], newCell: GridPosition, solution: Grid): boolean {
-  const [newRow, newCol] = newCell;
-  const newValue = solution[newRow][newCol];
-
-  // 케이지 내에 같은 숫자가 있는지 확인
-  for (const [row, col] of cageCells) {
-    if (solution[row][col] === newValue) {
-      return false; // 같은 숫자가 이미 있으면 추가 불가
-    }
+  // 모든 셀이 케이지에 속하는지 검사
+  if (allCells.size !== 81) {
+    console.error(`전체 셀 수 불일치: ${allCells.size} !== 81`);
+    return false;
   }
 
   return true;
 }
 
 /**
- * @description 킬러 스도쿠 모드 케이지 생성 (개선된 버전)
- * @param {Grid} solution - 스도쿠 솔루션
- * @param {Difficulty} difficulty - 난이도
- * @returns {KillerCage[]} 생성된 케이지 목록
- */
-export function generateKillerCages(solution: Grid, difficulty: Difficulty): KillerCage[] {
-  const cages: KillerCage[] = [];
-  const assignedCells = new Set<string>();
-  let cageId = 1;
-
-  // 난이도에 따른 케이지 크기 제한
-  const { maxCageSize } = KILLER_DIFFICULTY_RANGES[difficulty];
-  const minCageSize = 1; // 1개짜리 케이지 허용
-
-  // 최대 단일 셀 케이지 수 제한
-  const maxSingleCellCages = 3; // 최대 3개의 단일 셀 케이지 허용
-  let singleCellCageCount = 0;
-
-  // 격자 순회를 위한 전략 선택
-  // 대각선 패턴으로 시작 셀 선택 (더 자연스러운 케이지 분포)
-  const cellOrder: GridPosition[] = [];
-
-  // 주 대각선과 부 대각선을 먼저 추가
-  for (let i = 0; i < BOARD_SIZE; i++) {
-    cellOrder.push([i, i]); // 주 대각선
-    if (i !== BOARD_SIZE - 1 - i) {
-      cellOrder.push([i, BOARD_SIZE - 1 - i]); // 부 대각선
-    }
-  }
-
-  // 나머지 셀 추가 (약간의 무작위성 추가)
-  const remainingCells: GridPosition[] = [];
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      const isDiagonal = row === col || row === BOARD_SIZE - 1 - col;
-      if (!isDiagonal) {
-        remainingCells.push([row, col]);
-      }
-    }
-  }
-
-  shuffleArray(remainingCells);
-  cellOrder.push(...remainingCells);
-
-  // 단일 셀 케이지에 더 적합한 숫자 (예: 1, 5, 9)
-  const isSuitableForSingleCell = (value: number): boolean =>
-    value === 1 || value === 5 || value === 9 || Math.random() < 0.1;
-
-  // 모든 셀을 처리
-  for (const [startRow, startCol] of cellOrder) {
-    const key = `${startRow}-${startCol}`;
-    if (assignedCells.has(key)) continue;
-
-    // 현재 값 가져오기
-    const currentValue = solution[startRow][startCol];
-
-    // 이 셀부터 새 케이지 시작
-    const cage: KillerCage = {
-      cells: [[startRow, startCol]],
-      sum: currentValue,
-      id: cageId,
-    };
-    assignedCells.add(key);
-
-    // 사용된 숫자 추적 (중복 방지)
-    const usedNumbers = new Set<number>([currentValue]);
-
-    // 단일 셀 케이지 생성 결정
-    // 적합한 숫자이고 최대 개수를 넘지 않으면 단일 셀 케이지 생성 확률 증가
-    const createSingleCellCage =
-      singleCellCageCount < maxSingleCellCages &&
-      (isSuitableForSingleCell(currentValue) ? Math.random() < 0.7 : Math.random() < 0.15);
-
-    // 목표 크기 설정
-    const targetSize = createSingleCellCage
-      ? 1 // 단일 셀 케이지
-      : Math.min(2 + Math.floor(Math.random() * (maxCageSize - 2 + 1)), maxCageSize); // 2개 이상 케이지
-
-    // 효율적인 확장 로직
-    const expandCage = () => {
-      // 단일 셀 케이지는 확장하지 않음
-      if (targetSize === 1) return;
-
-      // 현재 케이지 형태
-      const currentShape = new Set<string>(cage.cells.map(([r, c]) => `${r}-${c}`));
-
-      // BFS 패턴으로 확장 (메모리 효율적)
-      let attempts = 0;
-      const MAX_ATTEMPTS = 100; // 안전장치
-
-      while (cage.cells.length < targetSize && attempts < MAX_ATTEMPTS) {
-        attempts++;
-
-        // 모든 인접 셀 찾기 (한 번만 계산)
-        const adjacentOptions: Array<{
-          pos: GridPosition;
-          value: number;
-          connections: number;
-          numberFrequency: number;
-          isValidForCage: boolean; // 새로 추가
-        }> = [];
-
-        for (const [cRow, cCol] of cage.cells) {
-          const directions = [
-            [-1, 0],
-            [1, 0],
-            [0, -1],
-            [0, 1],
-          ]; // 상하좌우
-
-          for (const [dRow, dCol] of directions) {
-            const newRow = cRow + dRow;
-            const newCol = cCol + dCol;
-
-            // 유효 범위 확인
-            if (newRow >= 0 && newRow < BOARD_SIZE && newCol >= 0 && newCol < BOARD_SIZE) {
-              const newKey = `${newRow}-${newCol}`;
-
-              // 이미 처리된 셀이 아닌지 확인
-              if (!assignedCells.has(newKey) && !currentShape.has(newKey)) {
-                const value = solution[newRow][newCol];
-
-                // 이 셀이 케이지 내 몇 개의 셀과 인접해 있는지 확인
-                let connections = 0;
-                for (const [checkDRow, checkDCol] of directions) {
-                  const checkRow = newRow + checkDRow;
-                  const checkCol = newCol + checkDCol;
-                  const checkKey = `${checkRow}-${checkCol}`;
-
-                  if (currentShape.has(checkKey)) {
-                    connections++;
-                  }
-                }
-
-                // 이 숫자가 현재 케이지에서 얼마나 자주 사용되는지 확인
-                // (중복 숫자는 피하거나 최소화)
-                const numberFrequency = usedNumbers.has(value) ? 1 : 0;
-
-                // 케이지에 이 셀을 추가할 수 있는지 확인 (중복 숫자 방지)
-                const isValidForCage = canAddCellToCage(cage.cells, [newRow, newCol], solution);
-
-                adjacentOptions.push({
-                  pos: [newRow, newCol],
-                  value,
-                  connections,
-                  numberFrequency,
-                  isValidForCage,
-                });
-              }
-            }
-          }
-        }
-
-        // 인접 셀이 없으면 중단
-        if (adjacentOptions.length === 0) break;
-
-        // 유효한 옵션만 필터링 (중복 숫자 없는 것만)
-        const validOptions = adjacentOptions.filter((opt) => opt.isValidForCage);
-
-        // 유효한 옵션이 없으면 중단
-        if (validOptions.length === 0) break;
-
-        // 옵션 정렬 및 중복 제거
-        const uniqueOptions = Array.from(
-          new Map(validOptions.map((opt) => [`${opt.pos[0]}-${opt.pos[1]}`, opt])).values(),
-        );
-
-        // 최적의 다음 셀 선택 전략:
-        // 1. 중복 숫자 피하기 (numberFrequency가 낮은 것)
-        // 2. 연결성 높이기 (connections가 높은 것)
-        uniqueOptions.sort((a, b) => {
-          // 유효성 우선 (이미 필터링되었으므로 모두 유효함)
-          // 최소 크기에 도달하지 못한 경우 연결성 우선
-          if (cage.cells.length < minCageSize) {
-            return b.connections - a.connections || a.numberFrequency - b.numberFrequency;
-          }
-
-          // 최소 크기 이상일 경우 중복 숫자 회피 우선
-          return a.numberFrequency - b.numberFrequency || b.connections - a.connections;
-        });
-
-        // 최적 옵션 선택 (약간의 무작위성 추가)
-        const bestOption =
-          uniqueOptions.length > 0
-            ? uniqueOptions[Math.floor(Math.random() * Math.min(3, uniqueOptions.length))]
-            : null;
-
-        if (bestOption) {
-          const [newRow, newCol] = bestOption.pos;
-          cage.cells.push([newRow, newCol]);
-          cage.sum += bestOption.value;
-          assignedCells.add(`${newRow}-${newCol}`);
-          currentShape.add(`${newRow}-${newCol}`);
-          usedNumbers.add(bestOption.value);
-        } else {
-          break;
-        }
-      }
-    };
-
-    // 케이지 확장 실행
-    expandCage();
-
-    // 유효한 케이지만 추가 (최소 크기 확인)
-    if (cage.cells.length >= minCageSize) {
-      // 단일 셀 케이지인 경우 카운터 증가
-      if (cage.cells.length === 1) {
-        singleCellCageCount++;
-      }
-
-      cages.push(cage);
-      cageId++;
-    } else {
-      // 케이지가 너무 작으면 셀 할당 해제
-      for (const [row, col] of cage.cells) {
-        assignedCells.delete(`${row}-${col}`);
-      }
-    }
-  }
-
-  // 누락된 셀 처리
-  if (assignedCells.size < BOARD_SIZE * BOARD_SIZE) {
-    handleRemainingCells(cages, assignedCells, solution);
-
-    // 모든 셀이 할당되었는지 최종 확인
-    if (assignedCells.size < BOARD_SIZE * BOARD_SIZE) {
-      console.warn(
-        `킬러 스도쿠 생성 경고: ${BOARD_SIZE * BOARD_SIZE - assignedCells.size}개의 셀이 할당되지 않았습니다.`,
-      );
-
-      // 할당되지 않은 모든 셀을 찾아 마지막 케이지에 추가
-      for (let row = 0; row < BOARD_SIZE; row++) {
-        for (let col = 0; col < BOARD_SIZE; col++) {
-          const key = `${row}-${col}`;
-          if (!assignedCells.has(key) && cages.length > 0) {
-            const lastCage = cages[cages.length - 1];
-            lastCage.cells.push([row, col]);
-            lastCage.sum += solution[row][col];
-            assignedCells.add(key);
-          }
-        }
-      }
-    }
-  }
-
-  console.log(`킬러 스도쿠 케이지 생성 완료: ${cages.length}개 케이지`);
-
-  // 케이지 검증
-  for (const cage of cages) {
-    const values = cage.cells.map(([r, c]) => solution[r][c]);
-    const uniqueValues = new Set(values);
-    if (values.length !== uniqueValues.size) {
-      console.error(`케이지 ${cage.id}에 중복 숫자 발견:`, values);
-    }
-  }
-
-  return cages;
-}
-
-/**
- * @description 케이지 내 숫자 합계 및 중복 검증
- * @param {SudokuBoard} board - 현재 스도쿠 보드
- * @param {KillerCage[]} cages - 케이지 목록
- * @returns {SudokuBoard} 케이지 검증 상태가 업데이트된 보드
+ * 킬러 스도쿠 케이지 유효성 검사 및 충돌 표시
  */
 export function validateKillerCages(board: SudokuBoard, cages: KillerCage[]): SudokuBoard {
   const newBoard = structuredClone(board);
-  const cageConflicts = new Map<number, boolean>();
 
-  // 먼저 모든 셀의 케이지 관련 충돌 플래그를 초기화
-  // 일반 스도쿠 규칙(행, 열, 블록)에 의한 충돌은 유지
-  for (const cage of cages) {
-    for (const [row, col] of cage.cells) {
-      // 일반 규칙 충돌 상태 임시 저장
-      const hasStandardConflict = newBoard[row][col].isConflict;
-      // 충돌 상태 초기화 (케이지 검증 전)
-      newBoard[row][col].isConflict = hasStandardConflict;
-    }
-  }
+  // 먼저 일반 스도쿠 규칙으로 충돌 검사
+  const boardWithBasicConflicts = checkConflicts(newBoard);
 
-  // 각 케이지 검증
+  // 각 케이지별 검증
   for (const cage of cages) {
     let sum = 0;
     const usedNumbers = new Set<number>();
     let allFilled = true;
-    let isConflict = false;
+    let hasConflict = false;
 
-    // 케이지 내 모든 셀 순회
+    // 케이지 내 모든 셀 검사
     for (const [row, col] of cage.cells) {
-      const value = newBoard[row][col].value;
+      const value = boardWithBasicConflicts[row][col].value;
 
-      // 빈 셀이 있는 경우
       if (value === null) {
         allFilled = false;
         continue;
       }
 
-      // 합계 계산
       sum += value;
 
-      // 케이지 내 중복 숫자 검사
+      // 케이지 내 중복 검사
       if (usedNumbers.has(value)) {
-        isConflict = true;
+        hasConflict = true;
       }
-
       usedNumbers.add(value);
     }
 
-    // 케이지가 모두 채워졌고 합이 맞지 않는 경우
+    // 케이지 완성 시 합계 검사
     if (allFilled && sum !== cage.sum) {
-      isConflict = true;
+      hasConflict = true;
     }
 
-    // 합이 이미 케이지 합을 초과하는 경우도 충돌로 처리
+    // 진행 중에도 합이 초과되면 충돌
     if (sum > cage.sum) {
-      isConflict = true;
+      hasConflict = true;
     }
 
-    cageConflicts.set(cage.id, isConflict);
-  }
-
-  // 보드에 케이지 충돌 상태 반영
-  for (const cage of cages) {
-    // 유효한 ID 확인
-    if (cage.id === undefined || !cageConflicts.has(cage.id)) {
-      console.warn(`케이지 ID ${cage.id}가 존재하지 않습니다.`);
-      continue;
-    }
-
-    const hasConflictNext = cageConflicts.get(cage.id) || false;
-
-    if (hasConflictNext) {
-      // 케이지 내 모든 셀에 충돌 표시
+    // 충돌이 있으면 케이지 내 모든 채워진 셀에 충돌 표시
+    if (hasConflict) {
       for (const [row, col] of cage.cells) {
-        // 범위 검사 추가
-        if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
-          console.warn(`유효하지 않은 셀 위치: [${row}, ${col}]`);
-          continue;
-        }
-
-        if (newBoard[row][col].value !== null) {
-          newBoard[row][col].isConflict = true;
+        if (boardWithBasicConflicts[row][col].value !== null) {
+          boardWithBasicConflicts[row][col].isConflict = true;
         }
       }
     }
   }
 
-  return newBoard;
+  return boardWithBasicConflicts;
 }
 
 /**
- * @description 킬러 스도쿠 모드의 보드 충돌 확인 (일반 규칙 + 케이지 규칙)
- * @param {SudokuBoard} board - 스도쿠 보드
- * @param {KillerCage[]} cages - 케이지 목록
- * @returns {SudokuBoard} 충돌 상태가 업데이트된 보드
- */
-export function checkKillerConflicts(board: SudokuBoard, cages: KillerCage[]): SudokuBoard {
-  // 1. 일반 스도쿠 규칙 검사 (행, 열, 블록)
-  let newBoard = checkConflicts(board);
-
-  // 2. 킬러 스도쿠 케이지 규칙 검사
-  newBoard = validateKillerCages(newBoard, cages);
-
-  return newBoard;
-}
-
-/**
- * @description 킬러 스도쿠 보드가 완성되었는지 확인
- * @param {SudokuBoard} board - 확인할 스도쿠 보드
- * @param {KillerCage[]} cages - 케이지 목록
- * @returns {boolean} 완성 여부
+ * 킬러 스도쿠 보드 완성도 검사
  */
 export function isKillerBoardComplete(board: SudokuBoard, cages: KillerCage[]): boolean {
-  // 1. 일반 스도쿠 규칙 확인 (모든 셀이 채워져 있고 충돌이 없는지)
+  // 1. 모든 셀이 채워져 있는지 확인
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
       const cell = board[row][col];
@@ -602,34 +556,227 @@ export function isKillerBoardComplete(board: SudokuBoard, cages: KillerCage[]): 
     }
   }
 
-  // 2. 킬러 스도쿠 케이지 규칙 확인
+  // 2. 모든 케이지 규칙이 만족되는지 확인
   for (const cage of cages) {
     let sum = 0;
     const usedNumbers = new Set<number>();
 
-    // 케이지 내 모든 셀 검사
     for (const [row, col] of cage.cells) {
-      const value = board[row][col].value;
-      if (value === null) {
-        return false;
-      }
-
-      // 합계 계산
+      const value = board[row][col].value!;
       sum += value;
 
-      // 케이지 내 중복 숫자 확인
       if (usedNumbers.has(value)) {
-        return false;
+        return false; // 케이지 내 중복
       }
-
       usedNumbers.add(value);
     }
 
-    // 케이지 합이 정확히 일치하는지 확인
     if (sum !== cage.sum) {
-      return false;
+      return false; // 합계 불일치
     }
   }
 
-  return true; // 모든 조건 충족
+  return true;
+}
+
+/**
+ * 킬러 스도쿠 충돌 검사 (일반 규칙 + 케이지 규칙)
+ */
+export function checkKillerConflicts(board: SudokuBoard, cages: KillerCage[]): SudokuBoard {
+  // 킬러 케이지 규칙 적용
+  return validateKillerCages(board, cages);
+}
+
+/**
+ * 케이지의 현재 상태 정보 반환
+ */
+export function getCageStatus(
+  board: SudokuBoard,
+  cage: KillerCage,
+): {
+  currentSum: number;
+  filledCount: number;
+  remainingSum: number;
+  isEmpty: boolean;
+  isComplete: boolean;
+  hasConflict: boolean;
+  duplicateValues: number[];
+} {
+  let currentSum = 0;
+  let filledCount = 0;
+  const usedValues = new Set<number>();
+  const duplicateValues: number[] = [];
+
+  for (const [row, col] of cage.cells) {
+    const value = board[row][col].value;
+    if (value !== null) {
+      currentSum += value;
+      filledCount++;
+
+      if (usedValues.has(value)) {
+        duplicateValues.push(value);
+      }
+      usedValues.add(value);
+    }
+  }
+
+  const remainingSum = cage.sum - currentSum;
+  const isEmpty = filledCount === 0;
+  const isComplete = filledCount === cage.cells.length;
+  const hasConflict = duplicateValues.length > 0 || currentSum > cage.sum || (isComplete && currentSum !== cage.sum);
+
+  return {
+    currentSum,
+    filledCount,
+    remainingSum,
+    isEmpty,
+    isComplete,
+    hasConflict,
+    duplicateValues: Array.from(new Set(duplicateValues)),
+  };
+}
+
+/**
+ * 케이지에서 가능한 숫자들 반환
+ */
+export function getPossibleValuesForCage(board: SudokuBoard, cage: KillerCage, targetCell: GridPosition): number[] {
+  const [targetRow, targetCol] = targetCell;
+  const possibleValues: number[] = [];
+
+  // 케이지 내 이미 사용된 숫자들
+  const usedInCage = new Set<number>();
+  let currentSum = 0;
+  let emptyCells = 0;
+
+  for (const [row, col] of cage.cells) {
+    const value = board[row][col].value;
+    if (value !== null) {
+      usedInCage.add(value);
+      currentSum += value;
+    } else {
+      emptyCells++;
+    }
+  }
+
+  // 각 숫자 1-9에 대해 검사
+  for (let num = 1; num <= 9; num++) {
+    // 케이지 내에서 이미 사용된 숫자는 제외
+    if (usedInCage.has(num)) continue;
+
+    // 행, 열, 블록에서 충돌하는지 검사
+    let hasBasicConflict = false;
+
+    // 행 검사
+    for (let c = 0; c < BOARD_SIZE; c++) {
+      if (c !== targetCol && board[targetRow][c].value === num) {
+        hasBasicConflict = true;
+        break;
+      }
+    }
+
+    if (hasBasicConflict) continue;
+
+    // 열 검사
+    for (let r = 0; r < BOARD_SIZE; r++) {
+      if (r !== targetRow && board[r][targetCol].value === num) {
+        hasBasicConflict = true;
+        break;
+      }
+    }
+
+    if (hasBasicConflict) continue;
+
+    // 3x3 블록 검사
+    const blockRow = Math.floor(targetRow / BLOCK_SIZE) * BLOCK_SIZE;
+    const blockCol = Math.floor(targetCol / BLOCK_SIZE) * BLOCK_SIZE;
+
+    for (let r = 0; r < BLOCK_SIZE; r++) {
+      for (let c = 0; c < BLOCK_SIZE; c++) {
+        const checkRow = blockRow + r;
+        const checkCol = blockCol + c;
+
+        if ((checkRow !== targetRow || checkCol !== targetCol) && board[checkRow][checkCol].value === num) {
+          hasBasicConflict = true;
+          break;
+        }
+      }
+      if (hasBasicConflict) break;
+    }
+
+    if (hasBasicConflict) continue;
+
+    // 케이지 합계 제약 검사
+    const newSum = currentSum + num;
+    const remainingCells = emptyCells - 1;
+
+    // 현재 숫자를 넣었을 때 합이 초과하지 않는지
+    if (newSum > cage.sum) continue;
+
+    // 남은 셀들로 목표 합을 달성할 수 있는지
+    if (remainingCells > 0) {
+      const stillNeeded = cage.sum - newSum;
+      const minPossible = remainingCells; // 최소 1씩
+      const maxPossible = remainingCells * 9; // 최대 9씩
+
+      if (stillNeeded < minPossible || stillNeeded > maxPossible) {
+        continue;
+      }
+    } else {
+      // 마지막 셀인 경우 정확히 맞아야 함
+      if (newSum !== cage.sum) continue;
+    }
+
+    possibleValues.push(num);
+  }
+
+  return possibleValues;
+}
+
+/**
+ * 케이지 힌트 정보 생성
+ */
+export function generateCageHint(cage: KillerCage): string {
+  const combinations = findSumCombinations(cage.sum, cage.cells.length);
+
+  let hint = `합계: ${cage.sum}`;
+
+  if (combinations.length <= 3) {
+    hint += ` (가능한 조합: ${combinations.map((combo) => combo.join("+")).join(", ")})`;
+  }
+
+  return hint;
+}
+
+/**
+ * 주어진 합과 개수로 가능한 숫자 조합 찾기
+ */
+function findSumCombinations(targetSum: number, count: number): number[][] {
+  const combinations: number[][] = [];
+
+  function backtrack(remaining: number, usedCount: number, current: number[], used: Set<number>) {
+    if (usedCount === count) {
+      if (remaining === 0) {
+        combinations.push([...current]);
+      }
+      return;
+    }
+
+    if (remaining <= 0 || usedCount >= count) return;
+
+    const start = current.length > 0 ? current[current.length - 1] + 1 : 1;
+
+    for (let num = start; num <= 9; num++) {
+      if (used.has(num)) continue;
+      if (remaining - num < 0) break;
+
+      current.push(num);
+      used.add(num);
+      backtrack(remaining - num, usedCount + 1, current, used);
+      current.pop();
+      used.delete(num);
+    }
+  }
+
+  backtrack(targetSum, 0, [], new Set());
+  return combinations;
 }

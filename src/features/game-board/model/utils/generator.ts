@@ -2,7 +2,7 @@
 
 import { BASE_GRID, BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
-import { DIFFICULTY_RANGES, GAME_LEVEL, KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
+import { DIFFICULTY_RANGES, KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
 import { Difficulty, KillerCage } from "@entities/game/model/types";
 import {
   applyTransformations,
@@ -12,13 +12,129 @@ import {
 } from "@features/game-board/model/utils";
 
 /**
+ * @description 기본 그리드 검증
+ * @param {Grid} grid - 검증할 그리드
+ * @returns {boolean} 검증 결과
+ */
+function validateBaseGrid(grid: Grid): boolean {
+  // 행 검증
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    const rowSet = new Set(grid[row]);
+    if (rowSet.size !== BOARD_SIZE || !Array.from({ length: 9 }, (_, i) => i + 1).every((n) => rowSet.has(n))) {
+      console.error(`Invalid row ${row}:`, grid[row]);
+      return false;
+    }
+  }
+
+  // 열 검증
+  for (let col = 0; col < BOARD_SIZE; col++) {
+    const colSet = new Set();
+    for (let row = 0; row < BOARD_SIZE; row++) {
+      colSet.add(grid[row][col]);
+    }
+    if (colSet.size !== BOARD_SIZE || !Array.from({ length: 9 }, (_, i) => i + 1).every((n) => colSet.has(n))) {
+      console.error(`Invalid column ${col}`);
+      return false;
+    }
+  }
+
+  // 3x3 블록 검증
+  for (let blockRow = 0; blockRow < 3; blockRow++) {
+    for (let blockCol = 0; blockCol < 3; blockCol++) {
+      const blockSet = new Set();
+      for (let r = 0; r < BLOCK_SIZE; r++) {
+        for (let c = 0; c < BLOCK_SIZE; c++) {
+          blockSet.add(grid[blockRow * 3 + r][blockCol * 3 + c]);
+        }
+      }
+      if (blockSet.size !== BOARD_SIZE || !Array.from({ length: 9 }, (_, i) => i + 1).every((n) => blockSet.has(n))) {
+        console.error(`Invalid block [${blockRow}, ${blockCol}]`);
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+function generateValidSudoku(): Grid {
+  const grid: Grid = Array(9)
+    .fill(null)
+    .map(() => Array(9).fill(0));
+
+  function fillGrid(row: number, col: number): boolean {
+    if (row === 9) return true;
+    if (col === 9) return fillGrid(row + 1, 0);
+
+    const numbers = Array.from({ length: 9 }, (_, i) => i + 1);
+    shuffleArray(numbers);
+
+    for (const num of numbers) {
+      if (isValidPlacement(grid, row, col, num)) {
+        grid[row][col] = num;
+        if (fillGrid(row, col + 1)) {
+          return true;
+        }
+        grid[row][col] = 0;
+      }
+    }
+
+    return false;
+  }
+
+  function isValidPlacement(gridItem: Grid, row: number, col: number, num: number): boolean {
+    // 행 검사
+    for (let c = 0; c < 9; c++) {
+      if (gridItem[row][c] === num) return false;
+    }
+
+    // 열 검사
+    for (let r = 0; r < 9; r++) {
+      if (gridItem[r][col] === num) return false;
+    }
+
+    // 블록 검사
+    const blockRow = Math.floor(row / 3) * 3;
+    const blockCol = Math.floor(col / 3) * 3;
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        if (gridItem[blockRow + r][blockCol + c] === num) return false;
+      }
+    }
+
+    return true;
+  }
+
+  if (fillGrid(0, 0)) {
+    return grid;
+  }
+
+  // 백트래킹이 실패하면 BASE_GRID 사용
+  console.warn("백트래킹 생성 실패, BASE_GRID 사용");
+  return structuredClone(BASE_GRID);
+}
+
+/**
  * 유효한 스도쿠 솔루션 생성
  * @returns {Grid} 완성된 스도쿠 그리드
  */
 export function generateSolution(): Grid {
-  const solution = structuredClone(BASE_GRID);
+  // BASE_GRID 유효성 검증
+  if (!validateBaseGrid(BASE_GRID)) {
+    console.warn("BASE_GRID가 유효하지 않음, 새로운 그리드 생성");
+    const newGrid = generateValidSudoku();
+    applyTransformations(newGrid);
+    return newGrid;
+  }
 
+  const solution = structuredClone(BASE_GRID);
   applyTransformations(solution);
+
+  // 변환 후에도 유효한지 검증
+  if (!validateBaseGrid(solution)) {
+    console.error("변환 후 그리드가 유효하지 않음, 재생성");
+    return generateValidSudoku();
+  }
 
   return solution;
 }
@@ -40,6 +156,49 @@ export function createInitialBoard(solution: Grid): SudokuBoard {
   );
 }
 
+function isKillerGridValid(grid: (number | null)[][], cages: KillerCage[]): boolean {
+  // 각 케이지별로 검사
+  for (const cage of cages) {
+    const values: number[] = [];
+    let sum = 0;
+    let nullCount = 0;
+
+    for (const [r, c] of cage.cells) {
+      const value = grid[r][c];
+      if (value === null) {
+        nullCount++;
+      } else {
+        values.push(value);
+        sum += value;
+      }
+    }
+
+    // 중복 숫자 검사
+    const uniqueValues = new Set(values);
+    if (values.length !== uniqueValues.size) {
+      return false;
+    }
+
+    // 합이 이미 초과했는지 검사
+    if (sum > cage.sum) {
+      return false;
+    }
+
+    // 남은 빈 칸으로 합을 맞출 수 있는지 검사
+    if (nullCount > 0) {
+      const remainingSum = cage.sum - sum;
+      const minPossibleSum = nullCount; // 최소 1씩
+      const maxPossibleSum = nullCount * 9; // 최대 9씩
+
+      if (remainingSum < minPossibleSum || remainingSum > maxPossibleSum) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 /**
  * @description 개선된 스도쿠 보드 생성 함수
  * @param {Grid} solution - 완성된 스도쿠 솔루션
@@ -47,32 +206,99 @@ export function createInitialBoard(solution: Grid): SudokuBoard {
  * @returns {SudokuBoard} 생성된 스도쿠 보드
  */
 export const generateBoard = (solution: Grid, difficulty: Difficulty): SudokuBoard => {
-  // 솔루션으로부터 초기 보드 생성
   const board = createInitialBoard(solution);
-
-  // 난이도에 따라 제거할 셀 수 계산
   const { min, max } = DIFFICULTY_RANGES[difficulty];
-  const cellsToRemove = min + Math.floor(Math.random() * (max - min + 1));
+  const targetRemove = min + Math.floor(Math.random() * (max - min + 1));
 
-  console.log(`일반 스도쿠: 난이도 ${difficulty}, 제거할 셀 수: ${cellsToRemove}, 남길 힌트 수: ${81 - cellsToRemove}`);
+  console.log(`일반 스도쿠: 난이도 ${difficulty}, 목표 제거: ${targetRemove}개`);
 
-  // 개선된 셀 제거 알고리즘 적용
-  removeRandomCellsImproved(board, solution, cellsToRemove);
+  const removed = removeRandomCellsImproved(board, solution, targetRemove);
+  const finalHints = 81 - removed;
 
-  // 최종 힌트 수 확인
-  let actualHintCount = 0;
-  for (let r = 0; r < 9; r++) {
-    for (let c = 0; c < 9; c++) {
-      if (board[r][c].value !== null) {
-        actualHintCount++;
-      }
-    }
-  }
-
-  console.log(`일반 스도쿠: 최종 힌트 수: ${actualHintCount}`);
+  console.log(`일반 스도쿠: 실제 제거: ${removed}개, 최종 힌트: ${finalHints}개`);
 
   return board;
 };
+
+function removeKillerCells(board: SudokuBoard, solution: Grid, cages: KillerCage[], targetRemove: number): number {
+  // 케이지별 셀 맵핑
+  const cageMap = new Map<string, KillerCage>();
+  cages.forEach((cage) => {
+    cage.cells.forEach(([r, c]) => {
+      cageMap.set(`${r}-${c}`, cage);
+    });
+  });
+
+  const tempGrid = board.map((row) => row.map((cell) => cell.value));
+  let removedCount = 0;
+
+  // 각 케이지에서 최소 1개는 유지하도록 강제 유지 셀 선택
+  const mustKeepCells = new Set<string>();
+  cages.forEach((cage) => {
+    if (cage.cells.length > 1) {
+      // 무작위로 1개 셀 선택하여 유지
+      const keepIndex = Math.floor(Math.random() * cage.cells.length);
+      const [r, c] = cage.cells[keepIndex];
+      mustKeepCells.add(`${r}-${c}`);
+    }
+  });
+
+  // 제거 가능한 셀들을 우선순위 순으로 정렬
+  const removableCells: Array<{ pos: GridPosition; priority: number }> = [];
+
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      const key = `${row}-${col}`;
+
+      if (mustKeepCells.has(key)) continue;
+
+      let priority = 0;
+      const cage = cageMap.get(key);
+
+      if (cage) {
+        // 케이지 크기가 클수록 제거하기 쉬움
+        priority += cage.cells.length * 0.2;
+
+        // 케이지 합이 클수록 제거하기 쉬움
+        priority += cage.sum * 0.01;
+      }
+
+      // 중앙에서 멀수록 제거하기 쉬움
+      const centerDistance = Math.abs(4 - row) + Math.abs(4 - col);
+      priority += centerDistance * 0.1;
+
+      // 무작위성 추가
+      priority += Math.random() * 0.3;
+
+      removableCells.push({ pos: [row, col], priority });
+    }
+  }
+
+  removableCells.sort((a, b) => b.priority - a.priority);
+
+  // 셀 제거 시도
+  for (const { pos } of removableCells) {
+    if (removedCount >= targetRemove) break;
+
+    const [row, col] = pos;
+
+    if (tempGrid[row][col] === null) continue;
+
+    const originalValue = tempGrid[row][col];
+    tempGrid[row][col] = null;
+
+    // 킬러 스도쿠 규칙 검증 (간단한 버전)
+    if (isKillerGridValid(tempGrid, cages)) {
+      board[row][col].value = null;
+      board[row][col].isInitial = false;
+      removedCount++;
+    } else {
+      tempGrid[row][col] = originalValue;
+    }
+  }
+
+  return removedCount;
+}
 
 /**
  * @description 킬러 스도쿠 모드 게임 보드 생성 (개선된 함수)
@@ -84,263 +310,32 @@ export function generateKillerBoard(
   solution: Grid,
   difficulty: Difficulty,
 ): { board: SudokuBoard; cages: KillerCage[] } {
+  console.log(`킬러 스도쿠 생성 시작: 난이도 ${difficulty}`);
+
   // 기본 보드 생성
   const board = createInitialBoard(solution);
 
-  // 케이지 생성 (중복 숫자 방지 로직 포함)
+  // 케이지 생성
   const cages = generateKillerCages(solution, difficulty);
 
   // 케이지 유효성 검증
-  const isValidCages = validateCages(cages, solution);
-  if (!isValidCages) {
-    console.error("케이지 생성 실패: 중복 숫자 발견");
-    // 재시도 로직 또는 에러 처리
-    throw new Error("킬러 스도쿠 케이지 생성에 실패했습니다.");
+  if (!validateCages(cages, solution)) {
+    throw new Error("킬러 스도쿠 케이지 생성 실패");
   }
 
-  // 난이도에 따른 힌트 셀 수 설정
+  // 난이도별 힌트 수 설정
   const { hintsKeep } = KILLER_DIFFICULTY_RANGES[difficulty];
+  const targetRemove = 81 - hintsKeep;
 
-  // 총 81개 셀 중 제거할 셀 수 계산
-  const cellsToRemove = 81 - hintsKeep;
+  console.log(`킬러 스도쿠: 목표 제거 ${targetRemove}개, 유지 ${hintsKeep}개`);
 
-  console.log(`킬러 스도쿠: 난이도 ${difficulty}, 남길 힌트 수: ${hintsKeep}, 제거할 셀 수: ${cellsToRemove}`);
+  // 킬러 전용 셀 제거
+  const removed = removeKillerCells(board, solution, cages, targetRemove);
+  const finalHints = 81 - removed;
 
-  // 힌트 개수가 0일 경우 모든 셀 제거 (expert 난이도)
-  if (hintsKeep === 0) {
-    console.log("전문가 난이도: 모든 셀 제거 시도");
-    forceRemoveAllCells(board);
-  }
-  // 힌트 개수가 매우 적을 경우 (hard 난이도)
-  else if (hintsKeep <= 4) {
-    console.log("어려움 난이도: 대부분의 셀 제거 후 힌트 배치");
-    forceRemoveMostCells(board, solution, cages, hintsKeep);
-  }
-  // 일반적인 경우 (medium, easy 난이도)
-  else {
-    // 킬러 스도쿠 전용 셀 제거 알고리즘 적용
-    removeRandomCellsForKiller(board, solution, cellsToRemove, cages);
-  }
-
-  // 최종 힌트 수 확인 및 강제 조정
-  let actualHintCount = 0;
-  for (let r = 0; r < BOARD_SIZE; r++) {
-    for (let c = 0; c < BOARD_SIZE; c++) {
-      if (board[r][c].value !== null) {
-        actualHintCount++;
-      }
-    }
-  }
-
-  // Expert 난이도인데 힌트가 있으면 강제로 모두 제거
-  if (difficulty === GAME_LEVEL.EXPERT && actualHintCount > 0) {
-    console.log(`전문가 난이도 강제 적용: ${actualHintCount}개 힌트 발견, 모두 제거합니다.`);
-    forceRemoveAllCells(board);
-    actualHintCount = 0;
-  }
-
-  // Hard 난이도인데 힌트가 너무 많으면 강제로 조정
-  if (difficulty === GAME_LEVEL.HARD && actualHintCount > hintsKeep) {
-    console.log(`어려움 난이도 강제 적용: ${actualHintCount}개 힌트 발견, ${hintsKeep}개로 조정합니다.`);
-    adjustHintCount(board, solution, cages, hintsKeep);
-    actualHintCount = hintsKeep;
-  }
-
-  console.log(`킬러 스도쿠: 최종 힌트 수: ${actualHintCount}`);
-
-  // 최종 검증
-  if (difficulty === GAME_LEVEL.EXPERT && actualHintCount !== 0) {
-    console.error("전문가 난이도 적용 실패: 힌트를 모두 제거하지 못했습니다.");
-  }
+  console.log(`킬러 스도쿠: 실제 제거 ${removed}개, 최종 힌트 ${finalHints}개`);
 
   return { board, cages };
-}
-
-function adjustHintCount(board: SudokuBoard, solution: Grid, cages: KillerCage[], targetHints: number): void {
-  // 현재 힌트 셀 찾기
-  const hintCells: GridPosition[] = [];
-  for (let r = 0; r < BOARD_SIZE; r++) {
-    for (let c = 0; c < BOARD_SIZE; c++) {
-      if (board[r][c].value !== null) {
-        hintCells.push([r, c]);
-      }
-    }
-  }
-
-  // 힌트 개수가 목표보다 많으면 초과분 제거
-  if (hintCells.length > targetHints) {
-    // 제거할 힌트 수
-    const hintsToRemove = hintCells.length - targetHints;
-
-    // 힌트 셀 섞기 (무작위 순서로 제거)
-    shuffleArray(hintCells);
-
-    // 초과분 제거
-    for (let i = 0; i < hintsToRemove; i++) {
-      const [r, c] = hintCells[i];
-      board[r][c].value = null;
-      board[r][c].isInitial = false;
-    }
-  }
-}
-
-function forceRemoveAllCells(board: SudokuBoard): void {
-  for (let r = 0; r < BOARD_SIZE; r++) {
-    for (let c = 0; c < BOARD_SIZE; c++) {
-      board[r][c].value = null;
-      board[r][c].isInitial = false;
-    }
-  }
-}
-
-// Hard 난이도를 위한 거의 모든 셀 강제 제거 함수 (최소 힌트 수만 유지)
-function forceRemoveMostCells(board: SudokuBoard, solution: Grid, cages: KillerCage[], targetHints: number): void {
-  // 1. 모든 셀 제거
-  for (let r = 0; r < BOARD_SIZE; r++) {
-    for (let c = 0; c < BOARD_SIZE; c++) {
-      board[r][c].value = null;
-      board[r][c].isInitial = false;
-    }
-  }
-
-  // 2. 각 케이지별로 정보를 수집
-  const cageInfoList = cages.map((cage) => {
-    // 케이지 내 셀들의 점수 계산
-    const cellScores = cage.cells.map(([r, c]) => {
-      // 점수 계산 (낮을수록 힌트로 선택될 가능성 높음)
-      let score = 0;
-
-      // 각 셀 위치별 점수 부여
-      // 중앙에 가까울수록 높은 점수 (힌트로 선택 가능성 낮음)
-      const centerDistance = Math.abs(4 - r) + Math.abs(4 - c);
-      score += Math.max(0, 3 - centerDistance) * 0.5;
-
-      // 대각선 셀은 점수 높음 (힌트로 선택 가능성 낮음)
-      if (r === c || r + c === 8) {
-        score += 0.5;
-      }
-
-      // 같은 숫자가 행/열/블록에 많을수록 점수 높음
-      const value = solution[r][c];
-      let sameValueCount = 0;
-
-      // 행/열에서 같은 숫자 개수
-      for (let i = 0; i < BOARD_SIZE; i++) {
-        if (i !== c && solution[r][i] === value) sameValueCount++;
-        if (i !== r && solution[i][c] === value) sameValueCount++;
-      }
-
-      // 블록에서 같은 숫자 개수
-      const blockRow = Math.floor(r / BLOCK_SIZE) * BLOCK_SIZE;
-      const blockCol = Math.floor(c / BLOCK_SIZE) * BLOCK_SIZE;
-      for (let br = 0; br < BLOCK_SIZE; br++) {
-        for (let bc = 0; bc < BLOCK_SIZE; bc++) {
-          const cr = blockRow + br;
-          const cc = blockCol + bc;
-          if ((cr !== r || cc !== c) && solution[cr][cc] === value) {
-            sameValueCount++;
-          }
-        }
-      }
-
-      score += sameValueCount * 0.2;
-
-      // 무작위성 추가
-      score += Math.random() * 0.5;
-
-      return {
-        position: [r, c] as GridPosition,
-        value: solution[r][c],
-        score,
-      };
-    });
-
-    // 케이지 내 셀 점수 기준으로 정렬 (낮은 점수 = 힌트로 적합)
-    cellScores.sort((a, b) => a.score - b.score);
-
-    return {
-      cage,
-      cellScores,
-    };
-  });
-
-  // 3. 전체 케이지를 힌트 배치 우선순위로 정렬
-  // 작은 케이지가 더 중요하므로 먼저 처리
-  cageInfoList.sort((a, b) => {
-    // 케이지 크기 비교 (작은 것 우선)
-    const sizeCompare = a.cage.cells.length - b.cage.cells.length;
-    if (sizeCompare !== 0) return sizeCompare;
-
-    // 크기가 같으면 케이지 합 비교 (작은 합 우선)
-    return a.cage.sum - b.cage.sum;
-  });
-
-  // 4. 필수 힌트 배치 (targetHints 개수만큼)
-  let hintsAdded = 0;
-
-  // 먼저 각 케이지의 가장 중요한 셀을 후보로 추가
-  const hintCandidates: { position: GridPosition; value: number; score: number }[] = [];
-
-  for (const cageInfo of cageInfoList) {
-    // 각 케이지에서 가장 점수가 낮은 셀 선택
-    if (cageInfo.cellScores.length > 0) {
-      hintCandidates.push(cageInfo.cellScores[0]);
-    }
-  }
-
-  // 후보를 점수 순으로 정렬
-  hintCandidates.sort((a, b) => a.score - b.score);
-
-  // 필요한 힌트 수만큼 배치
-  for (let i = 0; i < Math.min(targetHints, hintCandidates.length); i++) {
-    const { position, value } = hintCandidates[i];
-    const [r, c] = position;
-
-    board[r][c].value = value;
-    board[r][c].isInitial = true;
-    hintsAdded++;
-  }
-
-  // 5. 힌트가 targetHints보다 적으면 추가 힌트 배치
-  if (hintsAdded < targetHints) {
-    // 모든 셀의 점수 계산
-    const allCellScores: { position: GridPosition; value: number; score: number }[] = [];
-
-    for (let r = 0; r < BOARD_SIZE; r++) {
-      for (let c = 0; c < BOARD_SIZE; c++) {
-        if (board[r][c].value === null) {
-          // 아직 힌트가 아닌 셀만
-          // 점수 계산 (낮을수록 힌트로 적합)
-          let score = 0;
-
-          // 중앙에서 멀수록 낮은 점수
-          const centerDistance = Math.abs(4 - r) + Math.abs(4 - c);
-          score += Math.max(0, 3 - centerDistance) * 0.5;
-
-          // 무작위성 추가
-          score += Math.random();
-
-          allCellScores.push({
-            position: [r, c] as GridPosition,
-            value: solution[r][c],
-            score,
-          });
-        }
-      }
-    }
-
-    // 점수 순으로 정렬
-    allCellScores.sort((a, b) => a.score - b.score);
-
-    // 추가 힌트 배치
-    for (let i = 0; i < targetHints - hintsAdded && i < allCellScores.length; i++) {
-      const { position, value } = allCellScores[i];
-      const [r, c] = position;
-
-      board[r][c].value = value;
-      board[r][c].isInitial = true;
-    }
-  }
 }
 
 /**
@@ -356,269 +351,19 @@ function validateCages(cages: KillerCage[], solution: Grid): boolean {
 
     // 중복 숫자 검사
     if (values.length !== uniqueValues.size) {
-      console.error(`케이지 ${cage.id}에 중복 숫자 발견:`, values);
+      console.error(`케이지 ${cage.id}에 중복 숫자:`, values);
       return false;
     }
 
     // 합계 검사
     const actualSum = values.reduce((sum, val) => sum + val, 0);
     if (actualSum !== cage.sum) {
-      console.error(`케이지 ${cage.id}의 합이 맞지 않음: 계산값 ${actualSum}, 저장값 ${cage.sum}`);
+      console.error(`케이지 ${cage.id} 합 불일치: ${actualSum} !== ${cage.sum}`);
       return false;
     }
   }
 
   return true;
-}
-
-/**
- * @description 킬러 스도쿠 전용 셀 제거 함수
- * @param {SudokuBoard} board - 스도쿠 보드
- * @param {Grid} solution - 원본 솔루션
- * @param {number} targetRemoveCount - 제거할 셀 수
- * @param {KillerCage[]} cages - 케이지 목록
- */
-function removeRandomCellsForKiller(
-  board: SudokuBoard,
-  solution: Grid,
-  targetRemoveCount: number,
-  cages: KillerCage[],
-): void {
-  // 케이지별로 셀을 그룹화
-  const cageMap = new Map<string, KillerCage>();
-  for (const cage of cages) {
-    for (const [row, col] of cage.cells) {
-      cageMap.set(`${row}-${col}`, cage);
-    }
-  }
-
-  // 모든 위치를 배열로 만듦
-  const allPositions: GridPosition[] = [];
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      allPositions.push([row, col]);
-    }
-  }
-
-  // 각 셀의 점수 계산 함수 (킬러 스도쿠 특화)
-  const calculateCellScore = (row: number, col: number): number => {
-    let score = 0;
-    const cellKey = `${row}-${col}`;
-    const cage = cageMap.get(cellKey);
-
-    if (cage) {
-      const cellValue = solution[row][col];
-
-      // 케이지 내에서 유일한 숫자인지 확인
-      const cageValues = cage.cells.map(([r, c]) => solution[r][c]);
-      const sameValueCount = cageValues.filter((v) => v === cellValue).length;
-
-      // 케이지 내에서 유일한 값이면 제거하기 어려움
-      if (sameValueCount === 1) {
-        score += 5;
-      }
-
-      // 작은 케이지에 있는 숫자는 제거하기 더 어려움
-      if (cage.cells.length <= 2) {
-        score += 4;
-      } else if (cage.cells.length <= 3) {
-        score += 2;
-      }
-
-      // 케이지의 합이 작을수록 제거하기 어려움
-      if (cage.sum <= 10) {
-        score += 3;
-      } else if (cage.sum <= 15) {
-        score += 1;
-      }
-    }
-
-    // 기존 일반 스도쿠 점수도 포함
-    const centerDistance = Math.abs(4 - row) + Math.abs(4 - col);
-    score += Math.max(0, 3 - centerDistance) * 0.3;
-
-    // 대각선 셀에 보너스
-    if (row === col || row + col === 8) {
-      score += 1;
-    }
-
-    // 약간의 무작위성 추가
-    score += Math.random() * 0.5;
-
-    return score;
-  };
-
-  // 각 셀에 점수 할당 및 정렬 (점수가 낮은 셀부터 제거 시도)
-  const scoredPositions = allPositions.map(([row, col]) => ({
-    position: [row, col] as GridPosition,
-    score: calculateCellScore(row, col),
-  }));
-
-  // 제거 시도 순서: 점수가 낮은 셀(제거하기 쉬운 셀)부터 시도
-  scoredPositions.sort((a, b) => a.score - b.score);
-
-  // 임시 그리드 (유일 솔루션 검사용)
-  const tempGrid: (number | null)[][] = [];
-  for (let r = 0; r < BOARD_SIZE; r++) {
-    tempGrid[r] = [];
-    for (let c = 0; c < BOARD_SIZE; c++) {
-      tempGrid[r][c] = board[r][c].value;
-    }
-  }
-
-  let removedCount = 0;
-  const maxRetries = 10; // 최대 재시도 횟수 증가
-  let forcedKeepCount = 0; // 케이지당 유지해야 하는 힌트 수
-
-  // 난이도에 따른 케이지당 유지해야 하는 최소 힌트 수 설정
-  // 어려운 난이도일수록 더 적은 힌트 유지
-  if (targetRemoveCount >= 75) {
-    // Expert
-    forcedKeepCount = 0;
-  } else if (targetRemoveCount >= 65) {
-    // Hard
-    forcedKeepCount = 0;
-  } else if (targetRemoveCount >= 55) {
-    // Medium
-    forcedKeepCount = 1;
-  } else {
-    // Easy
-    forcedKeepCount = 1;
-  }
-
-  // 케이지별 필수 유지 셀 선택
-  const forcedKeepCells = new Set<string>();
-  if (forcedKeepCount > 0) {
-    for (const cage of cages) {
-      // 케이지 크기가 작으면 힌트를 더 적게 유지
-      const actualKeepCount = Math.min(forcedKeepCount, Math.ceil(cage.cells.length / 3));
-
-      if (actualKeepCount > 0) {
-        // 케이지 셀 복사 및 섞기
-        const cageCells = [...cage.cells];
-        shuffleArray(cageCells);
-
-        // 유지할 셀 선택
-        for (let i = 0; i < actualKeepCount && i < cageCells.length; i++) {
-          const [r, c] = cageCells[i];
-          forcedKeepCells.add(`${r}-${c}`);
-        }
-      }
-    }
-  }
-
-  for (let retry = 0; retry < maxRetries; retry++) {
-    if (removedCount >= targetRemoveCount) break;
-
-    // 재시도할 때마다 새로운 순서로 시도
-    if (retry > 0) {
-      // 점수에 무작위성 추가하여 다시 정렬
-      scoredPositions.forEach((pos) => {
-        pos.score = calculateCellScore(pos.position[0], pos.position[1]) + Math.random() * 2;
-      });
-      scoredPositions.sort((a, b) => a.score - b.score);
-    }
-
-    let successfulRemovalsInThisRetry = 0;
-
-    // 모든 위치 시도
-    for (const { position } of scoredPositions) {
-      if (removedCount >= targetRemoveCount) break;
-
-      const [row, col] = position;
-      const cellKey = `${row}-${col}`;
-
-      // 이미 제거된 셀이나 필수 유지 셀은 건너뜀
-      if (board[row][col].value === null || forcedKeepCells.has(cellKey)) {
-        continue;
-      }
-
-      // 케이지 내에서 마지막 힌트 셀인지 확인
-      const cage = cageMap.get(cellKey);
-      if (cage && forcedKeepCount === 0) {
-        const cageHintCount = cage.cells.filter(([r, c]) => board[r][c].value !== null).length;
-        // 모든 힌트를 제거해도 될 경우 (Expert 난이도)
-        if (cageHintCount <= 1 && Math.random() < 0.8) {
-          continue; // 80% 확률로 마지막 힌트는 유지
-        }
-      }
-
-      // 원래 값 저장
-      const originalValue = board[row][col].value;
-
-      // 셀 임시 제거
-      board[row][col].value = null;
-      board[row][col].isInitial = false;
-      tempGrid[row][col] = null;
-
-      // 유일 솔루션 검사
-      if (hasUniqueSolution(tempGrid)) {
-        // 제거 성공
-        removedCount++;
-        successfulRemovalsInThisRetry++;
-      } else {
-        // 제거 실패 - 복원
-        board[row][col].value = originalValue;
-        board[row][col].isInitial = true;
-        tempGrid[row][col] = originalValue;
-      }
-    }
-
-    // 이번 회차에서 제거된 셀이 없으면 더 이상 시도하지 않음
-    if (successfulRemovalsInThisRetry === 0) {
-      break;
-    }
-  }
-
-  // 마지막 시도: 아직 목표에 도달하지 못했다면, 강제로 더 제거
-  if (removedCount < targetRemoveCount && forcedKeepCount === 0) {
-    // 남은 초기 셀들을 무작위로 섞음
-    const remainingInitialCells: GridPosition[] = [];
-    for (let r = 0; r < BOARD_SIZE; r++) {
-      for (let c = 0; c < BOARD_SIZE; c++) {
-        if (board[r][c].value !== null && board[r][c].isInitial) {
-          remainingInitialCells.push([r, c]);
-        }
-      }
-    }
-
-    shuffleArray(remainingInitialCells);
-
-    // 무작위 순서로 제거 시도
-    for (const [row, col] of remainingInitialCells) {
-      if (removedCount >= targetRemoveCount) break;
-
-      const cellKey = `${row}-${col}`;
-
-      // 필수 유지 셀은 건너뜀
-      if (forcedKeepCells.has(cellKey)) {
-        continue;
-      }
-
-      const originalValue = board[row][col].value;
-      board[row][col].value = null;
-      board[row][col].isInitial = false;
-      tempGrid[row][col] = null;
-
-      if (hasUniqueSolution(tempGrid)) {
-        removedCount++;
-      } else {
-        board[row][col].value = originalValue;
-        board[row][col].isInitial = true;
-        tempGrid[row][col] = originalValue;
-      }
-    }
-  }
-
-  // 최종 결과 로깅
-  const finalHints = 81 - removedCount;
-  console.log(
-    `킬러 스도쿠: 목표 제거 수: ${targetRemoveCount}, 실제 제거 수: ${removedCount}, 최종 힌트 수: ${finalHints}`,
-  );
-
-  if (removedCount < targetRemoveCount * 0.9) {
-    console.warn(`킬러 스도쿠: 목표로 한 ${targetRemoveCount}개 셀 제거 중 ${removedCount}개만 제거 가능했습니다.`);
-  }
 }
 
 /**
@@ -628,190 +373,123 @@ function removeRandomCellsForKiller(
  * @param {number} targetRemoveCount - 제거할 셀 수
  * @param {KillerCage[]} cages - 케이지 목록 (킬러 스도쿠에만 사용)
  */
-function removeRandomCellsImproved(
-  board: SudokuBoard,
-  solution: Grid,
-  targetRemoveCount: number,
-  cages?: KillerCage[],
-): void {
-  // 킬러 스도쿠인 경우 전용 함수 사용
-  if (cages) {
-    removeRandomCellsForKiller(board, solution, targetRemoveCount, cages);
-    return;
-  }
+function removeRandomCellsImproved(board: SudokuBoard, solution: Grid, targetRemove: number): number {
+  const tempGrid = board.map((row) => row.map((cell) => cell.value));
+  let removedCount = 0;
 
-  // 모든 위치를 배열로 만듦
-  const allPositions: GridPosition[] = [];
+  // 제거 우선순위 계산
+  const cells: Array<{ pos: GridPosition; priority: number }> = [];
+
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
-      allPositions.push([row, col]);
+      let priority = 0;
+
+      // 중앙에서 멀수록 높은 우선순위
+      const centerDistance = Math.abs(4 - row) + Math.abs(4 - col);
+      priority += centerDistance * 0.3;
+
+      // 대각선 셀은 낮은 우선순위
+      if (row === col || row + col === 8) {
+        priority -= 0.5;
+      }
+
+      // 무작위성 추가
+      priority += Math.random() * 0.5;
+
+      cells.push({ pos: [row, col], priority });
     }
   }
 
-  // 각 셀의 점수 계산 함수 (낮을수록 제거하기 쉬운 셀)
-  const calculateCellScore = (row: number, col: number): number => {
-    let score = 0;
+  // 우선순위 순으로 정렬
+  cells.sort((a, b) => b.priority - a.priority);
 
-    // 중앙 셀에 보너스 (더 많은 제약 조건)
-    const centerDistance = Math.abs(4 - row) + Math.abs(4 - col);
-    score += Math.max(0, 3 - centerDistance) * 0.5; // 중앙에 가까울수록 높은 점수
+  // 대칭적 제거 시도
+  const pairs: Array<[GridPosition, GridPosition]> = [];
+  const used = new Set<string>();
 
-    // 대각선 셀에 보너스
-    if (row === col || row + col === 8) {
-      score += 1;
+  for (const { pos } of cells) {
+    const [row, col] = pos;
+    const key = `${row}-${col}`;
+
+    if (used.has(key)) continue;
+
+    // 대칭 위치 찾기
+    const symmetricRow = 8 - row;
+    const symmetricCol = 8 - col;
+    const symmetricKey = `${symmetricRow}-${symmetricCol}`;
+
+    if (row === symmetricRow && col === symmetricCol) {
+      // 중앙 셀은 단독으로 처리
+      pairs.push([
+        [row, col],
+        [row, col],
+      ]);
+    } else if (!used.has(symmetricKey)) {
+      pairs.push([
+        [row, col],
+        [symmetricRow, symmetricCol],
+      ]);
+      used.add(symmetricKey);
+    } else {
+      pairs.push([
+        [row, col],
+        [row, col],
+      ]);
     }
 
-    // 같은 숫자가 행, 열, 블록에 많을수록 보너스
-    const value = solution[row][col];
-    let sameValueCount = 0;
+    used.add(key);
+  }
 
-    // 같은 행, 열에서 동일한 숫자 개수 확인
-    for (let i = 0; i < BOARD_SIZE; i++) {
-      if (i !== col && solution[row][i] === value) sameValueCount++;
-      if (i !== row && solution[i][col] === value) sameValueCount++;
-    }
+  // 배치를 무작위로 섞기
+  shuffleArray(pairs);
 
-    // 같은 블록에서 동일한 숫자 개수 확인
-    const blockRow = Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE;
-    const blockCol = Math.floor(col / BLOCK_SIZE) * BLOCK_SIZE;
-    for (let r = 0; r < BLOCK_SIZE; r++) {
-      for (let c = 0; c < BLOCK_SIZE; c++) {
-        const cr = blockRow + r;
-        const cc = blockCol + c;
-        if ((cr !== row || cc !== col) && solution[cr][cc] === value) {
-          sameValueCount++;
+  for (const [pos1, pos2] of pairs) {
+    if (removedCount >= targetRemove) break;
+
+    const [row1, col1] = pos1;
+    const [row2, col2] = pos2;
+
+    const isSameCell = row1 === row2 && col1 === col2;
+
+    // 첫 번째 셀 제거 시도
+    if (tempGrid[row1][col1] !== null) {
+      const originalValue1 = tempGrid[row1][col1];
+      tempGrid[row1][col1] = null;
+
+      let canRemoveSecond = true;
+      if (!isSameCell && tempGrid[row2][col2] !== null) {
+        const originalValue2 = tempGrid[row2][col2];
+        tempGrid[row2][col2] = null;
+
+        if (!hasUniqueSolution(tempGrid)) {
+          tempGrid[row2][col2] = originalValue2;
+          canRemoveSecond = false;
         }
       }
-    }
 
-    score += sameValueCount * 0.2; // 같은 숫자가 많을수록 약간의 보너스
-
-    // 약간의 무작위성 추가
-    score += Math.random() * 0.5;
-
-    return score;
-  };
-
-  // 각 셀에 점수 할당 및 정렬 (점수가 낮은 셀부터 제거 시도)
-  const scoredPositions = allPositions.map(([row, col]) => ({
-    position: [row, col] as GridPosition,
-    score: calculateCellScore(row, col),
-  }));
-
-  // 제거 시도 순서: 점수가 낮은 셀(제거하기 쉬운 셀)부터 시도
-  scoredPositions.sort((a, b) => a.score - b.score);
-
-  // 임시 그리드 (유일 솔루션 검사용)
-  const tempGrid: (number | null)[][] = [];
-  for (let r = 0; r < BOARD_SIZE; r++) {
-    tempGrid[r] = [];
-    for (let c = 0; c < BOARD_SIZE; c++) {
-      tempGrid[r][c] = board[r][c].value;
-    }
-  }
-
-  let removedCount = 0;
-  const maxRetries = 5; // 최대 재시도 횟수 증가
-  let successfulRemovalsInThisRetry = 0;
-
-  for (let retry = 0; retry < maxRetries; retry++) {
-    if (removedCount >= targetRemoveCount) break;
-
-    // 재시도할 때마다 새로운 순서로 시도
-    if (retry > 0) {
-      // 점수에 무작위성 추가하여 다시 정렬 (다양한 시도를 위해)
-      scoredPositions.forEach((pos) => {
-        pos.score = calculateCellScore(pos.position[0], pos.position[1]) + Math.random() * 2;
-      });
-      scoredPositions.sort((a, b) => a.score - b.score);
-    }
-
-    successfulRemovalsInThisRetry = 0;
-
-    // 모든 위치 시도
-    for (const { position } of scoredPositions) {
-      if (removedCount >= targetRemoveCount) break;
-
-      const [row, col] = position;
-
-      // 이미 제거된 셀은 건너뜀
-      if (board[row][col].value === null) {
-        continue;
-      }
-
-      // 원래 값 저장
-      const originalValue = board[row][col].value;
-
-      // 셀 임시 제거
-      board[row][col].value = null;
-      board[row][col].isInitial = false;
-      tempGrid[row][col] = null;
-
-      // 유일 솔루션 검사
       if (hasUniqueSolution(tempGrid)) {
         // 제거 성공
+        board[row1][col1].value = null;
+        board[row1][col1].isInitial = false;
         removedCount++;
-        successfulRemovalsInThisRetry++;
+
+        if (!isSameCell && canRemoveSecond && tempGrid[row2][col2] === null) {
+          board[row2][col2].value = null;
+          board[row2][col2].isInitial = false;
+          removedCount++;
+        }
       } else {
         // 제거 실패 - 복원
-        board[row][col].value = originalValue;
-        board[row][col].isInitial = true;
-        tempGrid[row][col] = originalValue;
-      }
-    }
-
-    // 이번 회차에서 제거된 셀이 없으면 더 이상 시도하지 않음
-    if (successfulRemovalsInThisRetry === 0) {
-      break;
-    }
-  }
-
-  // 마지막 기회: 무작위 순서로 다시 시도
-  if (removedCount < targetRemoveCount) {
-    // 남은 초기 셀들을 무작위로 섞음
-    const remainingInitialCells: GridPosition[] = [];
-    for (let r = 0; r < BOARD_SIZE; r++) {
-      for (let c = 0; c < BOARD_SIZE; c++) {
-        if (board[r][c].value !== null && board[r][c].isInitial) {
-          remainingInitialCells.push([r, c]);
+        tempGrid[row1][col1] = originalValue1;
+        if (!isSameCell && tempGrid[row2][col2] === null) {
+          tempGrid[row2][col2] = solution[row2][col2];
         }
       }
     }
-
-    shuffleArray(remainingInitialCells);
-
-    // 무작위 순서로 제거 시도
-    for (const [row, col] of remainingInitialCells) {
-      if (removedCount >= targetRemoveCount) break;
-
-      const originalValue = board[row][col].value;
-      board[row][col].value = null;
-      board[row][col].isInitial = false;
-      tempGrid[row][col] = null;
-
-      if (hasUniqueSolution(tempGrid)) {
-        removedCount++;
-      } else {
-        board[row][col].value = originalValue;
-        board[row][col].isInitial = true;
-        tempGrid[row][col] = originalValue;
-      }
-    }
   }
 
-  // 최종 결과 로깅
-  const finalHints = 81 - removedCount;
-  console.log(
-    `일반 스도쿠: 목표 제거 수: ${targetRemoveCount}, 실제 제거 수: ${removedCount}, 최종 힌트 수: ${finalHints}`,
-  );
-
-  // 목표 달성 실패 경고
-  if (removedCount < targetRemoveCount * 0.9) {
-    // 목표의 90% 미만일 경우 경고
-    console.warn(`목표로 한 ${targetRemoveCount}개 셀 제거 중 ${removedCount}개만 제거 가능했습니다.`);
-  }
+  return removedCount;
 }
-
 /**
  * @description 힌트 제공 - 무작위 빈 셀에 정답 채우기
  * @param {SudokuBoard} board - 현재 스도쿠 보드
@@ -829,9 +507,8 @@ export function getHint(board: SudokuBoard, solution: Grid): { row: number; col:
     });
   });
 
-  if (emptyCells.length === 0) return null; // 빈 셀이 없으면 null 반환
+  if (emptyCells.length === 0) return null;
 
-  // 무작위 빈 셀 선택
   const randomIndex = Math.floor(Math.random() * emptyCells.length);
   const [row, col] = emptyCells[randomIndex];
 

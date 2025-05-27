@@ -20,10 +20,9 @@ export function isValidPlacement(grid: (number | null)[][], row: number, col: nu
     if (grid[r][col] === num) return false;
   }
 
-  // 블록 검사
+  // 3x3 블록 검사
   const blockRow = Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE;
   const blockCol = Math.floor(col / BLOCK_SIZE) * BLOCK_SIZE;
-
   for (let r = 0; r < BLOCK_SIZE; r++) {
     for (let c = 0; c < BLOCK_SIZE; c++) {
       if (grid[blockRow + r][blockCol + c] === num) return false;
@@ -34,20 +33,58 @@ export function isValidPlacement(grid: (number | null)[][], row: number, col: nu
 }
 
 /**
+ * @description 특정 위치에 놓을 수 있는 숫자 확인
+ * @param {(number | null)[][]} grid - 스도쿠 그리드
+ * @param {number} row - 행 인덱스
+ * @param {number} col - 열 인덱스
+ * @returns {number[]} 유효한 숫자 배열
+ */
+function getValidCandidates(grid: (number | null)[][], row: number, col: number): number[] {
+  const used = new Set<number>();
+
+  // 행 검사
+  for (let c = 0; c < BOARD_SIZE; c++) {
+    if (grid[row][c] !== null) {
+      used.add(grid[row][c]!);
+    }
+  }
+
+  // 열 검사
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    if (grid[r][col] !== null) {
+      used.add(grid[r][col]!);
+    }
+  }
+
+  // 3x3 블록 검사
+  const blockRow = Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE;
+  const blockCol = Math.floor(col / BLOCK_SIZE) * BLOCK_SIZE;
+  for (let r = 0; r < BLOCK_SIZE; r++) {
+    for (let c = 0; c < BLOCK_SIZE; c++) {
+      const value = grid[blockRow + r][blockCol + c];
+      if (value !== null) {
+        used.add(value);
+      }
+    }
+  }
+
+  return [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((n) => !used.has(n));
+}
+
+/**
  * @description 유일 솔루션 검사
  * @param {(number | null)[][]} grid - 스도쿠 그리드
  * @returns {boolean} 유일 솔루션 여부
  */
 export function hasUniqueSolution(grid: (number | null)[][]): boolean {
   let solutionCount = 0;
-  const MAX_SOLUTIONS = 2; // 2개 이상 발견 시 바로 중단
-  const MAX_ATTEMPTS = 10000; // 무한 루프 방지용 최대 시도 횟수
-  let attempts = 0;
+  const MAX_SOLUTIONS = 2;
+  const MAX_ITERATIONS = 50000; // 최대 반복 횟수 제한
+  let iterations = 0;
 
-  // 원본 그리드 복제
   const tempGrid = grid.map((row) => [...row]);
 
-  // 빈 셀 찾기
+  // 빈 셀 찾기 및 제약 조건 순으로 정렬
   const emptyCells: GridPosition[] = [];
   for (let r = 0; r < BOARD_SIZE; r++) {
     for (let c = 0; c < BOARD_SIZE; c++) {
@@ -57,58 +94,46 @@ export function hasUniqueSolution(grid: (number | null)[][]): boolean {
     }
   }
 
-  // 제약이 많은 셀부터 처리 (후보가 적은 셀)
+  // MRV (Most Constraining Variable) 휴리스틱
   emptyCells.sort((a, b) => {
-    const candidatesA = countValidNumbers(tempGrid, a[0], a[1]);
-    const candidatesB = countValidNumbers(tempGrid, b[0], b[1]);
+    const candidatesA = getValidCandidates(tempGrid, a[0], a[1]).length;
+    const candidatesB = getValidCandidates(tempGrid, b[0], b[1]).length;
     return candidatesA - candidatesB;
   });
 
-  // 백트래킹으로 솔루션 찾기
-  function findSolutions(index = 0): boolean {
-    attempts++;
-    if (attempts > MAX_ATTEMPTS) return true; // 안전장치
+  function backtrack(index: number): boolean {
+    iterations++;
+    if (iterations > MAX_ITERATIONS) {
+      return true; // 안전장치
+    }
 
-    // 모든 빈 셀이 채워짐 -> 솔루션 발견
     if (index >= emptyCells.length) {
       solutionCount++;
-      return solutionCount >= MAX_SOLUTIONS; // 두 개 이상이면 중단
+      return solutionCount >= MAX_SOLUTIONS;
     }
 
     const [row, col] = emptyCells[index];
+    const candidates = getValidCandidates(tempGrid, row, col);
 
-    // 이 셀에 가능한 모든 숫자 시도
-    for (let num = 1; num <= 9; num++) {
-      if (isValidPlacement(tempGrid, row, col, num)) {
-        tempGrid[row][col] = num;
+    if (candidates.length === 0) {
+      return false; // 더 이상 진행 불가능
+    }
 
-        // 다음 셀로 재귀 호출
-        if (findSolutions(index + 1)) {
-          return true; // 두 개 이상의 솔루션 발견 또는 최대 시도 횟수 초과
-        }
+    for (const num of candidates) {
+      tempGrid[row][col] = num;
 
-        tempGrid[row][col] = null; // 백트래킹
+      if (backtrack(index + 1)) {
+        return true;
       }
+
+      tempGrid[row][col] = null;
     }
 
     return false;
   }
 
-  // 셀에 넣을 수 있는 유효한 숫자 개수 계산
-  function countValidNumbers(item: (number | null)[][], row: number, col: number): number {
-    let count = 0;
-    for (let num = 1; num <= 9; num++) {
-      if (isValidPlacement(item, row, col, num)) {
-        count++;
-      }
-    }
-    return count;
-  }
+  backtrack(0);
 
-  // 솔루션 카운트 시작
-  findSolutions();
-
-  // 정확히 하나의 솔루션만 있어야 함
   return solutionCount === 1;
 }
 
@@ -181,16 +206,11 @@ export function hasConflict(board: SudokuBoard, row: number, col: number): boole
   const value = board[row][col].value;
   if (value === null) return false;
 
-  // 행 검사
-  if (checkRowConflict(board, row, col, value)) return true;
-
-  // 열 검사
-  if (checkColConflict(board, row, col, value)) return true;
-
-  // 3x3 블록 검사
-  if (checkBlockConflict(board, row, col, value)) return true;
-
-  return false;
+  return (
+    checkRowConflict(board, row, col, value) ||
+    checkColConflict(board, row, col, value) ||
+    checkBlockConflict(board, row, col, value)
+  );
 }
 
 /**
@@ -202,15 +222,82 @@ export function hasConflict(board: SudokuBoard, row: number, col: number): boole
 export function checkConflicts(board: SudokuBoard): SudokuBoard {
   const newBoard = structuredClone(board);
 
-  // 모든 셀에 대해 충돌 검사
+  // 각 행, 열, 블록별로 중복 검사를 한 번에 처리
+  const conflicts = new Set<string>();
+
+  // 행별 중복 검사
   for (let row = 0; row < BOARD_SIZE; row++) {
+    const seen = new Map<number, number[]>();
     for (let col = 0; col < BOARD_SIZE; col++) {
-      if (newBoard[row][col].value === null) {
-        newBoard[row][col].isConflict = false;
-        continue;
+      const value = newBoard[row][col].value;
+      if (value !== null) {
+        if (!seen.has(value)) {
+          seen.set(value, []);
+        }
+        seen.get(value)!.push(col);
+      }
+    }
+
+    // 중복된 값들의 위치를 conflicts에 추가
+    for (const [_, positions] of seen) {
+      if (positions.length > 1) {
+        positions.forEach((col) => conflicts.add(`${row}-${col}`));
+      }
+    }
+  }
+
+  // 열별 중복 검사
+  for (let col = 0; col < BOARD_SIZE; col++) {
+    const seen = new Map<number, number[]>();
+    for (let row = 0; row < BOARD_SIZE; row++) {
+      const value = newBoard[row][col].value;
+      if (value !== null) {
+        if (!seen.has(value)) {
+          seen.set(value, []);
+        }
+        seen.get(value)!.push(row);
+      }
+    }
+
+    for (const [_, positions] of seen) {
+      if (positions.length > 1) {
+        positions.forEach((row) => conflicts.add(`${row}-${col}`));
+      }
+    }
+  }
+
+  // 3x3 블록별 중복 검사
+  for (let blockRow = 0; blockRow < 3; blockRow++) {
+    for (let blockCol = 0; blockCol < 3; blockCol++) {
+      const seen = new Map<number, Array<[number, number]>>();
+
+      for (let r = 0; r < BLOCK_SIZE; r++) {
+        for (let c = 0; c < BLOCK_SIZE; c++) {
+          const row = blockRow * BLOCK_SIZE + r;
+          const col = blockCol * BLOCK_SIZE + c;
+          const value = newBoard[row][col].value;
+
+          if (value !== null) {
+            if (!seen.has(value)) {
+              seen.set(value, []);
+            }
+            seen.get(value)!.push([row, col]);
+          }
+        }
       }
 
-      newBoard[row][col].isConflict = hasConflict(newBoard, row, col);
+      for (const [_, positions] of seen) {
+        if (positions.length > 1) {
+          positions.forEach(([row, col]) => conflicts.add(`${row}-${col}`));
+        }
+      }
+    }
+  }
+
+  // 충돌 정보를 보드에 반영
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      newBoard[row][col].isConflict = conflicts.has(`${row}-${col}`);
     }
   }
 
@@ -242,5 +329,121 @@ export function isBoardComplete(board: SudokuBoard): boolean {
  * @returns {boolean} 일치 여부
  */
 export function isBoardCorrect(board: SudokuBoard, solution: Grid): boolean {
-  return board.every((row, rowIdx) => row.every((cell, colIdx) => cell.value === solution[rowIdx][colIdx]));
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      if (board[row][col].value !== solution[row][col]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function validateSudokuGrid(grid: Grid): boolean {
+  // 행 검증
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    const rowSet = new Set(grid[row]);
+    if (rowSet.size !== BOARD_SIZE) {
+      return false;
+    }
+    for (let num = 1; num <= 9; num++) {
+      if (!rowSet.has(num)) {
+        return false;
+      }
+    }
+  }
+
+  // 열 검증
+  for (let col = 0; col < BOARD_SIZE; col++) {
+    const colSet = new Set();
+    for (let row = 0; row < BOARD_SIZE; row++) {
+      colSet.add(grid[row][col]);
+    }
+    if (colSet.size !== BOARD_SIZE) {
+      return false;
+    }
+    for (let num = 1; num <= 9; num++) {
+      if (!colSet.has(num)) {
+        return false;
+      }
+    }
+  }
+
+  // 3x3 블록 검증
+  for (let blockRow = 0; blockRow < 3; blockRow++) {
+    for (let blockCol = 0; blockCol < 3; blockCol++) {
+      const blockSet = new Set();
+      for (let r = 0; r < BLOCK_SIZE; r++) {
+        for (let c = 0; c < BLOCK_SIZE; c++) {
+          blockSet.add(grid[blockRow * BLOCK_SIZE + r][blockCol * BLOCK_SIZE + c]);
+        }
+      }
+      if (blockSet.size !== BOARD_SIZE) {
+        return false;
+      }
+      for (let num = 1; num <= 9; num++) {
+        if (!blockSet.has(num)) {
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+export function getPossiblePositions(board: SudokuBoard, num: number): GridPosition[] {
+  const positions: GridPosition[] = [];
+
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      if (board[row][col].value === null) {
+        // 임시로 숫자를 놓고 충돌 검사
+        const tempBoard = structuredClone(board);
+        tempBoard[row][col].value = num;
+
+        if (!hasConflict(tempBoard, row, col)) {
+          positions.push([row, col]);
+        }
+      }
+    }
+  }
+
+  return positions;
+}
+
+/**
+ * 최소 후보 수를 가진 빈 셀 찾기 (MRV 휴리스틱)
+ */
+export function findMinimumRemainingValueCell(
+  board: SudokuBoard,
+): { position: GridPosition; candidates: number[] } | null {
+  let minCandidates = 10;
+  let bestPosition: GridPosition | null = null;
+  let bestCandidatesArray: number[] = [];
+
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      if (board[row][col].value === null) {
+        const candidates = [];
+
+        for (let num = 1; num <= 9; num++) {
+          const tempBoard = structuredClone(board);
+          tempBoard[row][col].value = num;
+
+          if (!hasConflict(tempBoard, row, col)) {
+            candidates.push(num);
+          }
+        }
+
+        if (candidates.length < minCandidates) {
+          minCandidates = candidates.length;
+          bestPosition = [row, col];
+          bestCandidatesArray = candidates;
+        }
+      }
+    }
+  }
+
+  return bestPosition ? { position: bestPosition, candidates: bestCandidatesArray } : null;
 }
