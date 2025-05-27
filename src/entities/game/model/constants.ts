@@ -7,53 +7,53 @@ export const GAME_LEVEL = {
   MEDIUM: "medium",
   HARD: "hard",
   EXPERT: "expert",
-};
+} as const;
 
 export const GAME_MODE = {
   CLASSIC: "classic",
   KILLER: "killer",
-};
+} as const;
 
+// 개선된 난이도별 힌트 개수 설정 (더 정확한 범위)
 export const DIFFICULTY_RANGES: Record<Difficulty, DifficultyRange> = {
-  [GAME_LEVEL.EASY]: { min: 45, max: 50 }, // 45-50개 셀 제거 (31-36개 힌트)
-  [GAME_LEVEL.MEDIUM]: { min: 53, max: 58 }, // 53-58개 셀 제거 (23-28개 힌트)
-  [GAME_LEVEL.HARD]: { min: 62, max: 67 }, // 62-67개 셀 제거 (14-19개 힌트)
-  [GAME_LEVEL.EXPERT]: { min: 72, max: 77 }, // 72-77개 셀 제거 (4-9개 힌트)
+  [GAME_LEVEL.EASY]: { min: 36, max: 42 }, // 36-42개 힌트 (39-45개 제거)
+  [GAME_LEVEL.MEDIUM]: { min: 28, max: 34 }, // 28-34개 힌트 (47-53개 제거)
+  [GAME_LEVEL.HARD]: { min: 20, max: 26 }, // 20-26개 힌트 (55-61개 제거)
+  [GAME_LEVEL.EXPERT]: { min: 15, max: 19 }, // 15-19개 힌트 (62-66개 제거)
 };
 
+// 킬러 스도쿠 난이도별 설정 (개선된 버전)
 export const KILLER_DIFFICULTY_RANGES = {
   [GAME_LEVEL.EASY]: {
-    hintsKeep: 15,
+    hintsKeep: 25, // 25개 힌트 유지
     maxCageSize: 3,
   },
   [GAME_LEVEL.MEDIUM]: {
-    hintsKeep: 9,
+    hintsKeep: 18, // 18개 힌트 유지
     maxCageSize: 4,
   },
   [GAME_LEVEL.HARD]: {
-    hintsKeep: 4,
+    hintsKeep: 12, // 12개 힌트 유지
     maxCageSize: 5,
   },
   [GAME_LEVEL.EXPERT]: {
-    hintsKeep: 0,
+    hintsKeep: 8, // 8개 힌트 유지 (0개에서 변경)
     maxCageSize: 6,
   },
 };
 
-// 킬러 스도쿠 케이지 생성 완료: 29개 케이지
-// 킬러 스도쿠: 난이도 hard, 남길 힌트 수: 4, 제거할 셀 수: 77
-// 킬러 스도쿠: 목표 제거 수: 77, 실제 제거 수: 61, 최종 힌트 수: 20
-// 킬러 스도쿠: 목표로 한 77개 셀 제거 중 61개만 제거 가능했습니다.
-// 킬러 스도쿠: 최종 힌트 수: 20
-// 킬러 스도쿠 케이지 생성 완료: 28개 케이지
-// 킬러 스도쿠: 난이도 expert, 남길 힌트 수: 0, 제거할 셀 수: 81
-// 킬러 스도쿠: 목표 제거 수: 81, 실제 제거 수: 59, 최종 힌트 수: 22
-// 킬러 스도쿠: 목표로 한 81개 셀 제거 중 59개만 제거 가능했습니다.
-// 킬러 스도쿠: 최종 힌트 수: 22
+// 난이도별 설명 추가
+export const DIFFICULTY_DESCRIPTIONS = {
+  [GAME_LEVEL.EASY]: "초보자용 - 많은 힌트와 작은 케이지",
+  [GAME_LEVEL.MEDIUM]: "중급자용 - 적당한 힌트와 보통 케이지",
+  [GAME_LEVEL.HARD]: "고급자용 - 적은 힌트와 큰 케이지",
+  [GAME_LEVEL.EXPERT]: "전문가용 - 최소 힌트와 최대 케이지",
+} as const;
 
-// 일반 스도쿠: 난이도 hard, 제거할 셀 수: 67, 남길 힌트 수: 14
-// 일반 스도쿠: 목표 제거 수: 67, 실제 제거 수: 65, 최종 힌트 수: 16
-// 일반 스도쿠: 최종 힌트 수: 16
-// 일반 스도쿠: 난이도 expert, 제거할 셀 수: 72, 남길 힌트 수: 9
-// 일반 스도쿠: 목표 제거 수: 72, 실제 제거 수: 66, 최종 힌트 수: 15
-// 일반 스도쿠: 최종 힌트 수: 15
+// 게임 통계를 위한 목표 시간 (초)
+export const TARGET_TIMES = {
+  [GAME_LEVEL.EASY]: 600, // 10분
+  [GAME_LEVEL.MEDIUM]: 900, // 15분
+  [GAME_LEVEL.HARD]: 1200, // 20분
+  [GAME_LEVEL.EXPERT]: 1800, // 30분
+} as const;
