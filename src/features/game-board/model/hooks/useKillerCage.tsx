@@ -1,3 +1,4 @@
+import { SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
 import { CageInfo } from "@entities/board/model/types";
 import { GAME_MODE } from "@entities/game/model/constants";
 import { useSudokuStore } from "@features/game-controls/model/stores";
@@ -49,7 +50,7 @@ export const useKillerCage = () => {
       }
 
       const cells = table.querySelectorAll("td");
-      if (cells.length !== 81) {
+      if (cells.length !== SUDOKU_CELL_COUNT) {
         setCageInfo({ paths: [], sums: [] });
         return;
       }

@@ -1,6 +1,6 @@
 import { Difficulty, DifficultyRange } from "@entities/game/model/types";
 
-export const HINTS_REMAINING = 81;
+export const HINTS_REMAINING = 3;
 
 export const GAME_LEVEL = {
   EASY: "easy",
