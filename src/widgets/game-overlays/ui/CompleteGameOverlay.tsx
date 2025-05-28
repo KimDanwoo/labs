@@ -9,7 +9,7 @@ export const CompleteGameOverlay: FC = () => {
   if (!isCompleted) return null;
 
   return (
-    <div className="absolute inset-0 bg-white z-20 flex flex-col items-center justify-center">
+    <div className="absolute inset-0 bg-white z-20 flex flex-col items-center justify-center gap-8">
       <CompletedBoard />
 
       <GameDifficultySelector.List />

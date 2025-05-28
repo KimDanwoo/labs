@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
@@ -7,13 +5,14 @@ import { Difficulty, KillerCage } from "@entities/game/model/types";
 import { checkConflicts, shuffleArray } from "@features/game-board/model/utils";
 
 /**
- * 개선된 킬러 스도쿠 케이지 생성기
+ * @description 개선된 킬러 스도쿠 케이지 생성기
+ * @param {Grid} solution - 솔루션
+ * @param {Difficulty} difficulty - 난이도
+ * @returns {KillerCage[]} 케이지 배열
  */
 export function generateKillerCages(solution: Grid, difficulty: Difficulty): KillerCage[] {
   const { maxCageSize } = KILLER_DIFFICULTY_RANGES[difficulty];
-  const minCageSize = 1; // 최소 1개 셀로 케이지 구성
-
-  console.log(`킬러 케이지 생성 시작: 최대 크기 ${maxCageSize}`);
+  const minCageSize = 1;
 
   const cages: KillerCage[] = [];
   const assignedCells = new Set<string>();
@@ -35,15 +34,14 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
     });
   });
 
-  // 누락된 셀 처리
-  handleRemainingCellsImproved(cages, assignedCells, solution);
+  // 누락된 셀 처리 (maxCageSize 전달)
+  handleRemainingCellsImproved(cages, assignedCells, solution, maxCageSize);
 
   // 최종 검증
   if (!validateAllCages(cages, solution)) {
-    throw new Error("케이지 생성 실패: 유효성 검증 실패");
+    generateKillerCages(solution, difficulty);
   }
 
-  console.log(`킬러 케이지 생성 완료: ${cages.length}개`);
   return cages;
 }
 
@@ -272,9 +270,28 @@ function calculateNeighborScore(neighbor: GridPosition, currentCage: GridPositio
 }
 
 /**
+ * @description 배열을 주어진 크기로 분할
+ * @param {T[]} array - 분할할 배열
+ * @param {number} chunkSize - 분할 크기
+ * @returns {T[][]} 분할된 배열
+ */
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
+/**
  * 개선된 남은 셀 처리
  */
-function handleRemainingCellsImproved(cages: KillerCage[], assignedCells: Set<string>, solution: Grid): void {
+function handleRemainingCellsImproved(
+  cages: KillerCage[],
+  assignedCells: Set<string>,
+  solution: Grid,
+  maxCageSize: number, // 매개변수 추가
+): void {
   const remainingCells: GridPosition[] = [];
 
   for (let row = 0; row < BOARD_SIZE; row++) {
@@ -288,16 +305,14 @@ function handleRemainingCellsImproved(cages: KillerCage[], assignedCells: Set<st
 
   if (remainingCells.length === 0) return;
 
-  console.log(`남은 셀 ${remainingCells.length}개 처리 시작`);
-
-  // 인접한 케이지와 합치기 시도
+  // 인접한 케이지와 합치기 시도 (크기 제한 추가)
   const processed = new Set<string>();
 
   for (const [row, col] of remainingCells) {
     const key = `${row}-${col}`;
     if (processed.has(key)) continue;
 
-    const bestCage = findBestAdjacentCage(row, col, cages, solution);
+    const bestCage = findBestAdjacentCage(row, col, cages, solution, maxCageSize);
 
     if (bestCage) {
       bestCage.cells.push([row, col]);
@@ -311,24 +326,26 @@ function handleRemainingCellsImproved(cages: KillerCage[], assignedCells: Set<st
   const stillRemaining = remainingCells.filter(([r, c]) => !processed.has(`${r}-${c}`));
 
   if (stillRemaining.length > 0) {
-    console.log(`여전히 남은 셀 ${stillRemaining.length}개를 새 케이지로 생성`);
-
     const groups = groupAdjacentCells(stillRemaining);
     let nextCageId = Math.max(...cages.map((c) => c.id)) + 1;
 
     groups.forEach((group) => {
       if (group.length >= 1) {
-        // 단일 셀 케이지도 허용
-        const sum = group.reduce((total, [r, c]) => total + solution[r][c], 0);
-        const newCage: KillerCage = {
-          id: nextCageId++,
-          cells: group,
-          sum: sum,
-        };
-        cages.push(newCage);
+        // 그룹이 maxCageSize를 초과하면 분할
+        const chunks = chunkArray(group, maxCageSize);
 
-        group.forEach(([r, c]) => {
-          assignedCells.add(`${r}-${c}`);
+        chunks.forEach((chunk) => {
+          const sum = chunk.reduce((total, [r, c]) => total + solution[r][c], 0);
+          const newCage: KillerCage = {
+            id: nextCageId++,
+            cells: chunk,
+            sum: sum,
+          };
+          cages.push(newCage);
+
+          chunk.forEach(([r, c]) => {
+            assignedCells.add(`${r}-${c}`);
+          });
         });
       }
     });
@@ -336,9 +353,21 @@ function handleRemainingCellsImproved(cages: KillerCage[], assignedCells: Set<st
 }
 
 /**
- * 인접한 최적의 케이지 찾기
+ * @description 인접한 최적의 케이지 찾기
+ * @param {number} row - 행
+ * @param {number} col - 열
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @param {Grid} solution - 솔루션
+ * @param {number} maxCageSize - 최대 케이지 크기
+ * @returns {KillerCage | null} 최적의 케이지
  */
-function findBestAdjacentCage(row: number, col: number, cages: KillerCage[], solution: Grid): KillerCage | null {
+function findBestAdjacentCage(
+  row: number,
+  col: number,
+  cages: KillerCage[],
+  solution: Grid,
+  maxCageSize: number, // 매개변수 추가
+): KillerCage | null {
   const cellValue = solution[row][col];
   const directions = [
     [-1, 0],
@@ -350,6 +379,9 @@ function findBestAdjacentCage(row: number, col: number, cages: KillerCage[], sol
   const candidateCages: Array<{ cage: KillerCage; score: number }> = [];
 
   for (const cage of cages) {
+    // 케이지 크기 제한 확인
+    if (cage.cells.length >= maxCageSize) continue;
+
     // 인접성 검사
     let isAdjacent = false;
     for (const [cageRow, cageCol] of cage.cells) {
@@ -372,7 +404,7 @@ function findBestAdjacentCage(row: number, col: number, cages: KillerCage[], sol
     let score = 0;
 
     // 케이지 크기 (작을수록 높은 점수)
-    score += Math.max(0, 6 - cage.cells.length);
+    score += Math.max(0, maxCageSize - cage.cells.length);
 
     // 케이지 모양의 규칙성
     const minRow = Math.min(...cage.cells.map(([r]) => r));
@@ -454,14 +486,12 @@ function validateAllCages(cages: KillerCage[], solution: Grid): boolean {
     const uniqueValues = new Set(values);
 
     if (values.length !== uniqueValues.size) {
-      console.error(`케이지 ${cage.id}에 중복 숫자:`, values);
       return false;
     }
 
     // 합계 검사
     const actualSum = values.reduce((sum, val) => sum + val, 0);
     if (actualSum !== cage.sum) {
-      console.error(`케이지 ${cage.id} 합 불일치: ${actualSum} !== ${cage.sum}`);
       return false;
     }
 
@@ -469,7 +499,6 @@ function validateAllCages(cages: KillerCage[], solution: Grid): boolean {
     for (const [r, c] of cage.cells) {
       const cellKey = `${r}-${c}`;
       if (allCells.has(cellKey)) {
-        console.error(`셀 [${r}, ${c}]이 여러 케이지에 속함`);
         return false;
       }
       allCells.add(cellKey);
@@ -478,7 +507,6 @@ function validateAllCages(cages: KillerCage[], solution: Grid): boolean {
 
   // 모든 셀이 케이지에 속하는지 검사
   if (allCells.size !== SUDOKU_CELL_COUNT) {
-    console.error(`전체 셀 수 불일치: ${allCells.size} !== 81`);
     return false;
   }
 
