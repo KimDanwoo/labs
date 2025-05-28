@@ -1,4 +1,4 @@
-import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
 import { Difficulty, KillerCage } from "@entities/game/model/types";
@@ -46,7 +46,11 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
 }
 
 /**
- * 전략적 케이지 생성
+ * @description 전략적 케이지 생성
+ * @param {Grid} solution - 솔루션
+ * @param {number} maxCageSize - 최대 케이지 크기
+ * @param {number} minCageSize - 최소 케이지 크기
+ * @returns {Array<{ cells: GridPosition[]; sum: number }>} 케이지 배열
  */
 function generateCagesWithStrategy(
   solution: Grid,
@@ -78,7 +82,8 @@ function generateCagesWithStrategy(
 }
 
 /**
- * 전략적 시드 포인트 생성
+ * @description 전략적 시드 포인트 생성
+ * @returns {GridPosition[]} 시드 포인트 배열
  */
 function generateSeedPoints(): GridPosition[] {
   const points: GridPosition[] = [];
@@ -108,7 +113,13 @@ function generateSeedPoints(): GridPosition[] {
 }
 
 /**
- * 시드에서 케이지 확장
+ * @description 시드에서 케이지 확장
+ * @param {Grid} solution - 솔루션
+ * @param {GridPosition} seed - 시드 포인트
+ * @param {number} maxSize - 최대 케이지 크기
+ * @param {number} minSize - 최소 케이지 크기
+ * @param {Set<string>} globalUsed - 전역 사용된 셀 집합
+ * @returns {Array<{ cells: GridPosition[]; sum: number }> | null} 케이지 데이터 또는 null
  */
 function growCageFromSeed(
   solution: Grid,
@@ -172,7 +183,14 @@ function growCageFromSeed(
 }
 
 /**
- * 유효한 이웃 셀들 반환
+ * @description 유효한 이웃 셀들 반환
+ * @param {number} row - 행
+ * @param {number} col - 열
+ * @param {Grid} solution - 솔루션
+ * @param {Set<string>} localUsed - 로컬 사용된 셀 집합
+ * @param {Set<string>} globalUsed - 전역 사용된 셀 집합
+ * @param {Set<number>} usedValues - 사용된 값 집합
+ * @returns {GridPosition[]} 유효한 이웃 셀들 배열
  */
 function getValidNeighbors(
   row: number,
@@ -209,7 +227,10 @@ function getValidNeighbors(
 }
 
 /**
- * 이웃 셀의 적합성 점수 계산
+ * @description 이웃 셀의 적합성 점수 계산
+ * @param {GridPosition} neighbor - 이웃 셀
+ * @param {GridPosition[]} currentCage - 현재 케이지
+ * @returns {number} 적합성 점수
  */
 function calculateNeighborScore(neighbor: GridPosition, currentCage: GridPosition[]): number {
   const [row, col] = neighbor;
@@ -284,7 +305,11 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 }
 
 /**
- * 개선된 남은 셀 처리
+ * @description 개선된 남은 셀 처리
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @param {Set<string>} assignedCells - 할당된 셀 집합
+ * @param {Grid} solution - 솔루션
+ * @param {number} maxCageSize - 최대 케이지 크기
  */
 function handleRemainingCellsImproved(
   cages: KillerCage[],
@@ -427,7 +452,9 @@ function findBestAdjacentCage(
 }
 
 /**
- * 인접한 셀들 그룹화 (개선된 버전)
+ * @description 인접한 셀들 그룹화 (개선된 버전)
+ * @param {GridPosition[]} cells - 셀 배열
+ * @returns {GridPosition[][]} 그룹화된 셀 배열
  */
 export function groupAdjacentCells(cells: GridPosition[]): GridPosition[][] {
   const groups: GridPosition[][] = [];
@@ -475,13 +502,15 @@ export function groupAdjacentCells(cells: GridPosition[]): GridPosition[][] {
 }
 
 /**
- * 모든 케이지의 유효성 검증
+ * @description 모든 케이지의 유효성 검증
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @param {Grid} solution - 솔루션
+ * @returns {boolean} 유효성 여부
  */
 function validateAllCages(cages: KillerCage[], solution: Grid): boolean {
   const allCells = new Set<string>();
 
   for (const cage of cages) {
-    // 케이지 내 중복 숫자 검사
     const values = cage.cells.map(([r, c]) => solution[r][c]);
     const uniqueValues = new Set(values);
 
@@ -514,7 +543,10 @@ function validateAllCages(cages: KillerCage[], solution: Grid): boolean {
 }
 
 /**
- * 킬러 스도쿠 케이지 유효성 검사 및 충돌 표시
+ * @description 킬러 스도쿠 케이지 유효성 검사 및 충돌 표시
+ * @param {SudokuBoard} board - 보드
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @returns {SudokuBoard} 보드
  */
 export function validateKillerCages(board: SudokuBoard, cages: KillerCage[]): SudokuBoard {
   const newBoard = structuredClone(board);
@@ -571,7 +603,10 @@ export function validateKillerCages(board: SudokuBoard, cages: KillerCage[]): Su
 }
 
 /**
- * 킬러 스도쿠 보드 완성도 검사
+ * @description 킬러 스도쿠 보드 완성도 검사
+ * @param {SudokuBoard} board - 보드
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @returns {boolean} 완성 여부
  */
 export function isKillerBoardComplete(board: SudokuBoard, cages: KillerCage[]): boolean {
   // 1. 모든 셀이 채워져 있는지 확인
@@ -605,206 +640,4 @@ export function isKillerBoardComplete(board: SudokuBoard, cages: KillerCage[]): 
   }
 
   return true;
-}
-
-/**
- * 킬러 스도쿠 충돌 검사 (일반 규칙 + 케이지 규칙)
- */
-export function checkKillerConflicts(board: SudokuBoard, cages: KillerCage[]): SudokuBoard {
-  // 킬러 케이지 규칙 적용
-  return validateKillerCages(board, cages);
-}
-
-/**
- * 케이지의 현재 상태 정보 반환
- */
-export function getCageStatus(
-  board: SudokuBoard,
-  cage: KillerCage,
-): {
-  currentSum: number;
-  filledCount: number;
-  remainingSum: number;
-  isEmpty: boolean;
-  isComplete: boolean;
-  hasConflict: boolean;
-  duplicateValues: number[];
-} {
-  let currentSum = 0;
-  let filledCount = 0;
-  const usedValues = new Set<number>();
-  const duplicateValues: number[] = [];
-
-  for (const [row, col] of cage.cells) {
-    const value = board[row][col].value;
-    if (value !== null) {
-      currentSum += value;
-      filledCount++;
-
-      if (usedValues.has(value)) {
-        duplicateValues.push(value);
-      }
-      usedValues.add(value);
-    }
-  }
-
-  const remainingSum = cage.sum - currentSum;
-  const isEmpty = filledCount === 0;
-  const isComplete = filledCount === cage.cells.length;
-  const hasConflict = duplicateValues.length > 0 || currentSum > cage.sum || (isComplete && currentSum !== cage.sum);
-
-  return {
-    currentSum,
-    filledCount,
-    remainingSum,
-    isEmpty,
-    isComplete,
-    hasConflict,
-    duplicateValues: Array.from(new Set(duplicateValues)),
-  };
-}
-
-/**
- * 케이지에서 가능한 숫자들 반환
- */
-export function getPossibleValuesForCage(board: SudokuBoard, cage: KillerCage, targetCell: GridPosition): number[] {
-  const [targetRow, targetCol] = targetCell;
-  const possibleValues: number[] = [];
-
-  // 케이지 내 이미 사용된 숫자들
-  const usedInCage = new Set<number>();
-  let currentSum = 0;
-  let emptyCells = 0;
-
-  for (const [row, col] of cage.cells) {
-    const value = board[row][col].value;
-    if (value !== null) {
-      usedInCage.add(value);
-      currentSum += value;
-    } else {
-      emptyCells++;
-    }
-  }
-
-  // 각 숫자 1-9에 대해 검사
-  for (let num = 1; num <= 9; num++) {
-    // 케이지 내에서 이미 사용된 숫자는 제외
-    if (usedInCage.has(num)) continue;
-
-    // 행, 열, 블록에서 충돌하는지 검사
-    let hasBasicConflict = false;
-
-    // 행 검사
-    for (let c = 0; c < BOARD_SIZE; c++) {
-      if (c !== targetCol && board[targetRow][c].value === num) {
-        hasBasicConflict = true;
-        break;
-      }
-    }
-
-    if (hasBasicConflict) continue;
-
-    // 열 검사
-    for (let r = 0; r < BOARD_SIZE; r++) {
-      if (r !== targetRow && board[r][targetCol].value === num) {
-        hasBasicConflict = true;
-        break;
-      }
-    }
-
-    if (hasBasicConflict) continue;
-
-    // 3x3 블록 검사
-    const blockRow = Math.floor(targetRow / BLOCK_SIZE) * BLOCK_SIZE;
-    const blockCol = Math.floor(targetCol / BLOCK_SIZE) * BLOCK_SIZE;
-
-    for (let r = 0; r < BLOCK_SIZE; r++) {
-      for (let c = 0; c < BLOCK_SIZE; c++) {
-        const checkRow = blockRow + r;
-        const checkCol = blockCol + c;
-
-        if ((checkRow !== targetRow || checkCol !== targetCol) && board[checkRow][checkCol].value === num) {
-          hasBasicConflict = true;
-          break;
-        }
-      }
-      if (hasBasicConflict) break;
-    }
-
-    if (hasBasicConflict) continue;
-
-    // 케이지 합계 제약 검사
-    const newSum = currentSum + num;
-    const remainingCells = emptyCells - 1;
-
-    // 현재 숫자를 넣었을 때 합이 초과하지 않는지
-    if (newSum > cage.sum) continue;
-
-    // 남은 셀들로 목표 합을 달성할 수 있는지
-    if (remainingCells > 0) {
-      const stillNeeded = cage.sum - newSum;
-      const minPossible = remainingCells; // 최소 1씩
-      const maxPossible = remainingCells * 9; // 최대 9씩
-
-      if (stillNeeded < minPossible || stillNeeded > maxPossible) {
-        continue;
-      }
-    } else {
-      // 마지막 셀인 경우 정확히 맞아야 함
-      if (newSum !== cage.sum) continue;
-    }
-
-    possibleValues.push(num);
-  }
-
-  return possibleValues;
-}
-
-/**
- * 케이지 힌트 정보 생성
- */
-export function generateCageHint(cage: KillerCage): string {
-  const combinations = findSumCombinations(cage.sum, cage.cells.length);
-
-  let hint = `합계: ${cage.sum}`;
-
-  if (combinations.length <= 3) {
-    hint += ` (가능한 조합: ${combinations.map((combo) => combo.join("+")).join(", ")})`;
-  }
-
-  return hint;
-}
-
-/**
- * 주어진 합과 개수로 가능한 숫자 조합 찾기
- */
-function findSumCombinations(targetSum: number, count: number): number[][] {
-  const combinations: number[][] = [];
-
-  function backtrack(remaining: number, usedCount: number, current: number[], used: Set<number>) {
-    if (usedCount === count) {
-      if (remaining === 0) {
-        combinations.push([...current]);
-      }
-      return;
-    }
-
-    if (remaining <= 0 || usedCount >= count) return;
-
-    const start = current.length > 0 ? current[current.length - 1] + 1 : 1;
-
-    for (let num = start; num <= 9; num++) {
-      if (used.has(num)) continue;
-      if (remaining - num < 0) break;
-
-      current.push(num);
-      used.add(num);
-      backtrack(remaining - num, usedCount + 1, current, used);
-      current.pop();
-      used.delete(num);
-    }
-  }
-
-  backtrack(targetSum, 0, [], new Set());
-  return combinations;
 }

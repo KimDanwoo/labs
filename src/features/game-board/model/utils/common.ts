@@ -2,6 +2,7 @@ import { BOARD_SIZE } from "@entities/board/model/constants";
 import { SudokuBoard } from "@entities/board/model/types";
 import { CellHighlight } from "@entities/cell/model/types";
 import { MINUTE } from "@shared/model/constants";
+
 /**
  * @description 배열을 무작위로 섞는 함수 (Fisher-Yates 알고리즘)
  * @param {T[]} array - 섞을 배열
@@ -18,13 +19,16 @@ export function shuffleArray<T>(array: T[]): void {
  * @param {number} seconds - 초 단위 시간
  * @returns {string} 포맷된 시간 문자열
  */
-export const formatTime = (seconds: number): string => {
+export function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / MINUTE);
   const secs = seconds % MINUTE;
   return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-};
+}
 
-// 빈 스도쿠 보드 생성 헬퍼 함수
+/**
+ * 빈 스도쿠 보드 생성
+ * @returns 빈 스도쿠 보드
+ */
 export function createEmptyBoard(): SudokuBoard {
   return Array(BOARD_SIZE)
     .fill(null)

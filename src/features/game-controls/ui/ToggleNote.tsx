@@ -4,8 +4,9 @@ import { GoPencil } from "react-icons/go";
 
 export const ToggleNote = () => {
   const isNoteMode = useSudokuStore((state) => state.isNoteMode);
-  const toggleNoteMode = useSudokuStore((state) => state.toggleNoteMode);
   const timerActive = useSudokuStore((state) => state.timerActive);
+  const toggleNoteMode = useSudokuStore((state) => state.toggleNoteMode);
+
   return (
     <IconButton
       className={`${isNoteMode ? "bg-sky-300" : "bg-gray-300"}`}

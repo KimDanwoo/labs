@@ -7,7 +7,6 @@ import {
   canFillCell,
   checkConflicts,
   checkGameCompletion,
-  checkKillerConflicts,
   createEmptyBoard,
   createEmptyHighlights,
   findEmptyCells,
@@ -23,6 +22,7 @@ import {
   updateCellValue,
   updateSingleCell,
   validateBoard,
+  validateKillerCages,
 } from "@features/game-board/model/utils";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -271,7 +271,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         // 게임 모드에 따른 충돌 확인
         let boardWithConflicts: SudokuBoard;
         if (gameMode === GAME_MODE.KILLER) {
-          boardWithConflicts = checkKillerConflicts(newBoard, cages);
+          boardWithConflicts = validateKillerCages(newBoard, cages);
         } else {
           boardWithConflicts = checkConflicts(newBoard);
         }
@@ -347,7 +347,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         // 게임 모드에 따른 충돌 확인
         let boardWithConflicts: SudokuBoard;
         if (gameMode === GAME_MODE.KILLER) {
-          boardWithConflicts = checkKillerConflicts(board, cages);
+          boardWithConflicts = validateKillerCages(board, cages);
         } else {
           boardWithConflicts = checkConflicts(board);
         }

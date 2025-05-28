@@ -5,11 +5,11 @@ import { GAME_MODE } from "@entities/game/model/constants";
 import { GameCompletionResult, GameMode, KillerCage } from "@entities/game/model/types";
 import {
   checkConflicts,
-  checkKillerConflicts,
   createEmptyHighlights,
   isBoardComplete,
   isBoardCorrect,
   isKillerBoardComplete,
+  validateKillerCages,
 } from "@features/game-board/model/utils";
 
 /**
@@ -32,33 +32,6 @@ export function updateSingleCell(
 }
 
 /**
- * @description 여러 셀을 한 번에 업데이트 (배치 처리)
- * @param {SudokuBoard} board - 업데이트할 보드
- * @param {Array<{ row: number; col: number; updates: Partial<SudokuCell> }>} updates - 업데이트할 셀 정보
- * @returns
- */
-export function updateMultipleCells(
-  board: SudokuBoard,
-  updates: Array<{ row: number; col: number; updates: Partial<SudokuCell> }>,
-): SudokuBoard {
-  //
-  const rowsToUpdate = new Set(updates.map(({ row }) => row));
-
-  return board.map((r, rIdx) => {
-    if (!rowsToUpdate.has(rIdx)) return r;
-
-    const colUpdatesMap = new Map(
-      updates.filter(({ row }) => row === rIdx).map(({ col, updates: cellUpdate }) => [col, cellUpdate]),
-    );
-
-    return r.map((cell, cIdx) => {
-      const cellUpdates = colUpdatesMap.get(cIdx);
-      return cellUpdates ? { ...cell, ...cellUpdates } : cell;
-    });
-  });
-}
-
-/**
  * @description 셀 선택 상태 업데이트 (자주 사용되는 패턴)
  * @param {SudokuBoard} board - 업데이트할 보드
  * @param {number} selectedRow - 선택된 행
@@ -70,21 +43,6 @@ export function updateCellSelection(board: SudokuBoard, selectedRow: number, sel
     r.map((cell, cIdx) => ({
       ...cell,
       isSelected: rIdx === selectedRow && cIdx === selectedCol,
-    })),
-  );
-}
-
-/**
- * @description 충돌 상태만 업데이트
- * @param {SudokuBoard} board - 업데이트할 보드
- * @param {Set<string>} conflicts - 충돌 상태를 가진 셀들의 키 집합
- * @returns
- */
-export function updateConflictStates(board: SudokuBoard, conflicts: Set<string>): SudokuBoard {
-  return board.map((r, rIdx) =>
-    r.map((cell, cIdx) => ({
-      ...cell,
-      isConflict: conflicts.has(`${rIdx}-${cIdx}`),
     })),
   );
 }
@@ -126,28 +84,9 @@ export function resetUserInputs(board: SudokuBoard): SudokuBoard {
 }
 
 /**
- * @description 성능 비교를 위한 기존 방식 래퍼
- * @param {SudokuBoard} board - 업데이트할 보드
- * @param {number} row - 업데이트할 행
- * @param {number} col - 업데이트할 열
- * @param {Partial<SudokuCell>} updates - 업데이트할 셀 정보
- * @returns
- */
-export function updateBoardLegacy(
-  board: SudokuBoard,
-  row: number,
-  col: number,
-  updates: Partial<SudokuCell>,
-): SudokuBoard {
-  const newBoard = structuredClone(board); // 기존 방식 - 비효율적
-  Object.assign(newBoard[row][col], updates);
-  return newBoard;
-}
-
-/**
  * @description 빈 셀 찾기
- * @param board
- * @returns
+ * @param {SudokuBoard} board - 보드
+ * @returns {Position[]} 빈 셀 배열
  */
 export function findEmptyCells(board: SudokuBoard): Position[] {
   const emptyCells: Position[] = board.flatMap((row, rowIndex) =>
@@ -164,6 +103,10 @@ export function findEmptyCells(board: SudokuBoard): Position[] {
 
 /**
  * @description 같은 행, 열, 블록의 셀들을 related로 마킹
+ * @param {Record<string, CellHighlight>} highlights - 하이라이트 객체
+ * @param {number} row - 행
+ * @param {number} col - 열
+ * @param {string} selectedKey - 선택된 셀 키
  */
 function markRelatedCells(highlights: Record<string, CellHighlight>, row: number, col: number, selectedKey: string) {
   // 같은 행
@@ -198,10 +141,10 @@ function markRelatedCells(highlights: Record<string, CellHighlight>, row: number
 
 /**
  * @description 같은 값을 가진 셀들을 sameValue로 마킹
- * @param highlights
- * @param board
- * @param selectedValue
- * @param selectedKey
+ * @param {Record<string, CellHighlight>} highlights - 하이라이트 객체
+ * @param {SudokuBoard} board - 보드
+ * @param {number} selectedValue - 선택된 값
+ * @param {string} selectedKey - 선택된 셀 키
  */
 function markSameValueCells(
   highlights: Record<string, CellHighlight>,
@@ -223,10 +166,10 @@ function markSameValueCells(
 
 /**
  * @description 선택된 셀 기준으로 하이라이트 상태를 계산합니다
- * @param board 현재 스도쿠 보드
- * @param row 선택된 행
- * @param col 선택된 열
- * @returns 계산된 하이라이트 객체
+ * @param {SudokuBoard} board - 현재 스도쿠 보드
+ * @param {number} row - 선택된 행
+ * @param {number} col - 선택된 열
+ * @returns {Record<string, CellHighlight>} 계산된 하이라이트 객체
  */
 export function calculateHighlights(board: SudokuBoard, row: number, col: number) {
   const newHighlights = createEmptyHighlights();
@@ -249,9 +192,9 @@ export function calculateHighlights(board: SudokuBoard, row: number, col: number
 
 /**
  * @description 셀에 값을 입력할 수 있는지 검증
- * @param selectedCell
- * @param board
- * @returns
+ * @param {Position} selectedCell - 선택된 셀
+ * @param {SudokuBoard} board - 보드
+ * @returns {boolean} 셀에 값을 입력할 수 있는지 여부
  */
 export function canFillCell(selectedCell: { row: number; col: number } | null, board: SudokuBoard): boolean {
   if (!selectedCell) return false;
@@ -262,10 +205,11 @@ export function canFillCell(selectedCell: { row: number; col: number } | null, b
 
 /**
  * @description 보드에 값을 입력하고 새로운 보드 반환
- * @param board
- * @param position
- * @param value
- * @returns
+ * @param {SudokuBoard} board - 보드
+ * @param {number} row - 행
+ * @param {number} col - 열
+ * @param {number | null} value - 입력할 값
+ * @returns {SudokuBoard} 업데이트된 보드
  */
 export function updateCellValue(board: SudokuBoard, row: number, col: number, value: number | null): SudokuBoard {
   return updateSingleCell(board, row, col, {
@@ -276,25 +220,25 @@ export function updateCellValue(board: SudokuBoard, row: number, col: number, va
 
 /**
  * @description 게임 모드에 따른 충돌 검사
- * @param board
- * @param gameMode
- * @param cages
- * @returns
+ * @param {SudokuBoard} board - 보드
+ * @param {GameMode} gameMode - 게임 모드
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @returns {SudokuBoard} 충돌 검사된 보드
  */
 export function validateBoard(board: SudokuBoard, gameMode: GameMode, cages: KillerCage[]): SudokuBoard {
   if (gameMode === GAME_MODE.KILLER) {
-    return checkKillerConflicts(board, cages);
+    return validateKillerCages(board, cages);
   }
   return checkConflicts(board);
 }
 
 /**
  * @description 게임 완료 상태 확인
- * @param board
- * @param solution
- * @param gameMode
- * @param cages
- * @returns
+ * @param {SudokuBoard} board - 보드
+ * @param {number[][]} solution - 솔루션
+ * @param {GameMode} gameMode - 게임 모드
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @returns {GameCompletionResult} 게임 완료 결과
  */
 export function checkGameCompletion(
   board: SudokuBoard,

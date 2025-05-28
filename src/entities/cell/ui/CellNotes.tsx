@@ -1,6 +1,8 @@
 import { KEY_NUMBER } from "@entities/board/model/constants";
 
-export function CellNotes({ notes }: { notes: number[] }) {
+import { memo } from "react";
+
+export const CellNotes = memo(function CellNotes({ notes }: { notes: number[] }) {
   return (
     <div className="grid grid-cols-3 grid-rows-3 gap-0 w-full h-full">
       {KEY_NUMBER.map((num) => (
@@ -10,4 +12,4 @@ export function CellNotes({ notes }: { notes: number[] }) {
       ))}
     </div>
   );
-}
+});

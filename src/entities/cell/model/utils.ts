@@ -1,5 +1,11 @@
 import { CellHighlight } from "./types";
 
+/**
+ * 셀 테두리 스타일을 반환
+ * @param row - 행
+ * @param col - 열
+ * @returns 셀 테두리 스타일
+ */
 export function getCellBorderStyles(row: number, col: number) {
   return {
     isRightBlockBorder: (col + 1) % 3 === 0 && col < 8,
@@ -7,6 +13,12 @@ export function getCellBorderStyles(row: number, col: number) {
   };
 }
 
+/**
+ * 셀 하이라이트 스타일을 반환
+ * @param highlight - 셀 하이라이트
+ * @param isConflict - 충돌 여부
+ * @returns 셀 하이라이트 스타일
+ */
 export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boolean) {
   let bgColor = "bg-white";
   let textColor = "text-slate-700";
@@ -28,6 +40,13 @@ export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boo
   return { bgColor, textColor, borderColor };
 }
 
+/**
+ * 셀 클래스 이름을 빌드
+ * @param highlight - 셀 하이라이트
+ * @param borderStyles - 셀 테두리 스타일
+ * @param isInitial - 초기 셀 여부
+ * @returns 셀 클래스 이름
+ */
 export function buildCellClassName(
   { bgColor, textColor, borderColor }: ReturnType<typeof getCellHighlightStyles>,
   { isRightBlockBorder, isBottomBlockBorder }: ReturnType<typeof getCellBorderStyles>,
