@@ -1,36 +1,8 @@
 import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
-
-/**
- * @description 특정 위치에 숫자를 놓을 수 있는지 확인
- * @param {(number | null)[][]} grid - 스도쿠 그리드
- * @param {number} row - 행 인덱스
- * @param {number} col - 열 인덱스
- * @param {number} num - 확인할 숫자
- * @returns {boolean} 유효 여부
- */
-export function isValidPlacement(grid: (number | null)[][], row: number, col: number, num: number): boolean {
-  // 행 검사
-  for (let c = 0; c < BOARD_SIZE; c++) {
-    if (grid[row][c] === num) return false;
-  }
-
-  // 열 검사
-  for (let r = 0; r < BOARD_SIZE; r++) {
-    if (grid[r][col] === num) return false;
-  }
-
-  // 3x3 블록 검사
-  const blockRow = Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE;
-  const blockCol = Math.floor(col / BLOCK_SIZE) * BLOCK_SIZE;
-  for (let r = 0; r < BLOCK_SIZE; r++) {
-    for (let c = 0; c < BLOCK_SIZE; c++) {
-      if (grid[blockRow + r][blockCol + c] === num) return false;
-    }
-  }
-
-  return true;
-}
+import { getBlockCoordinates } from "@entities/board/model/utils";
+import { KillerCage } from "@entities/game/model/types";
+import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from "@entities/game/model/utils";
 
 /**
  * @description 특정 위치에 놓을 수 있는 숫자 확인
@@ -339,52 +311,31 @@ export function isBoardCorrect(board: SudokuBoard, solution: Grid): boolean {
   return true;
 }
 
-export function validateSudokuGrid(grid: Grid): boolean {
-  // 행 검증
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    const rowSet = new Set(grid[row]);
-    if (rowSet.size !== BOARD_SIZE) {
-      return false;
-    }
-    for (let num = 1; num <= 9; num++) {
-      if (!rowSet.has(num)) {
-        return false;
-      }
-    }
-  }
+/**
+ * @description 최적화된 그리드 검증 함수
+ * @param {Grid} grid - 검사할 그리드
+ * @returns {boolean} 유효성 여부
+ */
+export function validateBaseGrid(grid: Grid): boolean {
+  // 행과 열을 동시에 검증
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    const rowNumbers = getRowNumbers(grid, i);
+    const colNumbers = getColumnNumbers(grid, i);
 
-  // 열 검증
-  for (let col = 0; col < BOARD_SIZE; col++) {
-    const colSet = new Set();
-    for (let row = 0; row < BOARD_SIZE; row++) {
-      colSet.add(grid[row][col]);
-    }
-    if (colSet.size !== BOARD_SIZE) {
+    if (!isValidNumberSet(rowNumbers) || !isValidNumberSet(colNumbers)) {
+      throw new Error(`Invalid row ${i} or column ${i}`);
       return false;
-    }
-    for (let num = 1; num <= 9; num++) {
-      if (!colSet.has(num)) {
-        return false;
-      }
     }
   }
 
   // 3x3 블록 검증
-  for (let blockRow = 0; blockRow < 3; blockRow++) {
-    for (let blockCol = 0; blockCol < 3; blockCol++) {
-      const blockSet = new Set();
-      for (let r = 0; r < BLOCK_SIZE; r++) {
-        for (let c = 0; c < BLOCK_SIZE; c++) {
-          blockSet.add(grid[blockRow * BLOCK_SIZE + r][blockCol * BLOCK_SIZE + c]);
-        }
-      }
-      if (blockSet.size !== BOARD_SIZE) {
+  for (let blockRow = 0; blockRow < BLOCK_SIZE; blockRow++) {
+    for (let blockCol = 0; blockCol < BLOCK_SIZE; blockCol++) {
+      const blockNumbers = getBlockNumbers(grid, blockRow, blockCol);
+
+      if (!isValidNumberSet(blockNumbers)) {
+        throw new Error(`Invalid block [${blockRow}, ${blockCol}]`);
         return false;
-      }
-      for (let num = 1; num <= 9; num++) {
-        if (!blockSet.has(num)) {
-          return false;
-        }
       }
     }
   }
@@ -392,58 +343,110 @@ export function validateSudokuGrid(grid: Grid): boolean {
   return true;
 }
 
-export function getPossiblePositions(board: SudokuBoard, num: number): GridPosition[] {
-  const positions: GridPosition[] = [];
+/**
+ * @description 셀 배치 유효성 검사 (수정된 버전)
+ * @param {Grid} grid - 검사할 그리드
+ * @param {number} row - 행
+ * @param {number} col - 열
+ * @param {number} num - 숫자
+ * @returns {boolean} 유효성 여부
+ */
+export function isValidPlacement(grid: Grid, row: number, col: number, num: number): boolean {
+  // 행 검사
+  if (grid[row].includes(num)) return false;
 
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      if (board[row][col].value === null) {
-        // 임시로 숫자를 놓고 충돌 검사
-        const tempBoard = structuredClone(board);
-        tempBoard[row][col].value = num;
+  // 열 검사
+  for (let r = 0; r < 9; r++) {
+    if (grid[r][col] === num) return false;
+  }
 
-        if (!hasConflict(tempBoard, row, col)) {
-          positions.push([row, col]);
-        }
-      }
+  // 블록 검사
+  const [blockStartRow, blockStartCol] = getBlockCoordinates(row, col);
+  for (let r = 0; r < BLOCK_SIZE; r++) {
+    for (let c = 0; c < BLOCK_SIZE; c++) {
+      if (grid[blockStartRow + r][blockStartCol + c] === num) return false;
     }
   }
 
-  return positions;
+  return true;
 }
 
 /**
- * 최소 후보 수를 가진 빈 셀 찾기 (MRV 휴리스틱)
+ * @description 킬러 스도쿠 셀 제거 유효성 검증 (Expert용)
+ * @param {SudokuBoard} board - 보드
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @param {GridPosition} removedPos - 제거할 셀
+ * @returns {boolean} 유효성 여부
  */
-export function findMinimumRemainingValueCell(
+export function isKillerRemovalValidLenient(
   board: SudokuBoard,
-): { position: GridPosition; candidates: number[] } | null {
-  let minCandidates = 10;
-  let bestPosition: GridPosition | null = null;
-  let bestCandidatesArray: number[] = [];
+  cages: KillerCage[],
+  removedPos: GridPosition,
+): boolean {
+  const [removedRow, removedCol] = removedPos;
+  const targetCage = cages.find((cage) => cage.cells.some(([r, c]) => r === removedRow && c === removedCol));
 
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      if (board[row][col].value === null) {
-        const candidates = [];
+  if (!targetCage) return false;
 
-        for (let num = 1; num <= 9; num++) {
-          const tempBoard = structuredClone(board);
-          tempBoard[row][col].value = num;
+  const remainingCells = targetCage.cells.filter(([r, c]) => board[r][c].value !== null);
 
-          if (!hasConflict(tempBoard, row, col)) {
-            candidates.push(num);
-          }
-        }
+  if (remainingCells.length === 0) return true; // Expert에서는 빈 케이지 허용
 
-        if (candidates.length < minCandidates) {
-          minCandidates = candidates.length;
-          bestPosition = [row, col];
-          bestCandidatesArray = candidates;
-        }
-      }
+  const currentSum = remainingCells.reduce((sum, [r, c]) => sum + (board[r][c].value || 0), 0);
+  if (currentSum > targetCage.sum) return false;
+
+  const values = remainingCells.map(([r, c]) => board[r][c].value).filter((v) => v !== null);
+  const uniqueValues = new Set(values);
+
+  return values.length === uniqueValues.size;
+}
+
+/**
+ * @description 킬러 스도쿠 셀 제거 유효성 검증 (일반용)
+ * @param {SudokuBoard} board - 보드
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @param {GridPosition} removedPos - 제거할 셀
+ * @returns {boolean} 유효성 여부
+ */
+export function isKillerRemovalValid(board: SudokuBoard, cages: KillerCage[], removedPos: GridPosition): boolean {
+  const [removedRow, removedCol] = removedPos;
+  const targetCage = cages.find((cage) => cage.cells.some(([r, c]) => r === removedRow && c === removedCol));
+
+  if (!targetCage) return false;
+
+  const remainingCells = targetCage.cells.filter(([r, c]) => board[r][c].value !== null);
+
+  if (remainingCells.length === 0) return false;
+
+  const currentSum = remainingCells.reduce((sum, [r, c]) => sum + (board[r][c].value || 0), 0);
+  if (currentSum > targetCage.sum) return false;
+
+  const values = remainingCells.map(([r, c]) => board[r][c].value).filter((v) => v !== null);
+  const uniqueValues = new Set(values);
+
+  return values.length === uniqueValues.size;
+}
+
+/**
+ * @description 케이지 유효성 검증 (순수 함수)
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @param {Grid} solution - 솔루션
+ * @returns {boolean} 유효성 여부
+ */
+export function validateCages(cages: KillerCage[], solution: Grid): boolean {
+  return cages.every((cage) => {
+    const values = cage.cells.map(([r, c]) => solution[r][c]);
+    const uniqueValues = new Set(values);
+    const actualSum = values.reduce((sum, val) => sum + val, 0);
+
+    if (values.length !== uniqueValues.size) {
+      return false;
     }
-  }
 
-  return bestPosition ? { position: bestPosition, candidates: bestCandidatesArray } : null;
+    if (actualSum !== cage.sum) {
+      return false;
+    }
+
+    return true;
+  });
 }

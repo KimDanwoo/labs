@@ -11,7 +11,7 @@ import { checkConflicts, shuffleArray } from "@features/game-board/model/utils";
  */
 export function generateKillerCages(solution: Grid, difficulty: Difficulty): KillerCage[] {
   const { maxCageSize } = KILLER_DIFFICULTY_RANGES[difficulty];
-  const minCageSize = 2; // 최소 2개 셀로 케이지 구성
+  const minCageSize = 1; // 최소 1개 셀로 케이지 구성
 
   console.log(`킬러 케이지 생성 시작: 최대 크기 ${maxCageSize}`);
 
