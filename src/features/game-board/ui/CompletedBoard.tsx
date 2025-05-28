@@ -10,7 +10,7 @@ export const CompletedBoard = () => {
     <div
       className={`mt-4 p-4 rounded-md ${
         isSuccess ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-      } text-center w-full max-w-md`}
+      } text-center min-w-10/12 max-w-md`}
     >
       {isSuccess
         ? "축하합니다! 스도쿠를 성공적으로 완료했습니다! 🎉"

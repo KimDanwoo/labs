@@ -217,7 +217,7 @@ export const useKillerCage = () => {
     let resizeTimer: NodeJS.Timeout;
     const handleResize = () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(debouncedCalcPositions, 250);
+      resizeTimer = setTimeout(debouncedCalcPositions, 50);
     };
 
     window.addEventListener("resize", handleResize, { passive: true });

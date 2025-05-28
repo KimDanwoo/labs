@@ -10,7 +10,7 @@ export const IconButton = ({
   disabled?: boolean;
 }) => (
   <button
-    className={`px-4 py-4 rounded-full hover:bg-gray-300 transition-colors ${className}`}
+    className={`px-4 py-4 rounded-full hover:bg-gray-100 transition-colors ${className}`}
     onClick={onClick}
     disabled={disabled}
   >

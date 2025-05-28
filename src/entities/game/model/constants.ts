@@ -39,11 +39,11 @@ export const KILLER_DIFFICULTY_RANGES = {
   },
   [GAME_LEVEL.HARD]: {
     hintsKeep: 12,
-    maxCageSize: 5,
+    maxCageSize: 4,
   },
   [GAME_LEVEL.EXPERT]: {
     hintsKeep: 10,
-    maxCageSize: 5,
+    maxCageSize: 4,
   },
 };
 

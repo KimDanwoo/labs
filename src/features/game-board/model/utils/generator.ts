@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import {
   BASE_GRID,
   BLOCK_SIZE,
@@ -75,7 +73,6 @@ function generateValidSudoku(): Grid {
  */
 export function generateSolution(): Grid {
   if (!validateBaseGrid(BASE_GRID)) {
-    console.warn("BASE_GRID가 유효하지 않음, 새로운 그리드 생성");
     const newGrid = generateValidSudoku();
     applyTransformations(newGrid);
     return newGrid;
@@ -85,7 +82,6 @@ export function generateSolution(): Grid {
   applyTransformations(solution);
 
   if (!validateBaseGrid(solution)) {
-    console.error("변환 후 그리드가 유효하지 않음, 재생성");
     return generateValidSudoku();
   }
 
@@ -293,7 +289,6 @@ function executePhase1Removal(context: RemovalContext, cellsToRemove: CellPriori
     removedCount++;
   }
 
-  console.log(`Phase 1 완료: ${removedCount}개 제거됨`);
   return removedCount;
 }
 
@@ -331,7 +326,6 @@ function executePhase2Removal(context: RemovalContext, cellsToRemove: CellPriori
     }
   }
 
-  console.log(`Phase 2 완료: ${additionalRemoved}개 추가 제거됨`);
   return additionalRemoved;
 }
 
@@ -353,7 +347,6 @@ function removeRandomCellsWithStrategy(board: SudokuBoard, targetRemove: number,
   const phase2Removed = executePhase2Removal(context, cellsToRemove, phase1Removed);
 
   const totalRemoved = phase1Removed + phase2Removed;
-  console.log(`총 ${totalRemoved}개 제거됨`);
 
   return totalRemoved;
 }
@@ -400,18 +393,10 @@ export function generateBoard(solution: Grid, difficulty: Difficulty): SudokuBoa
   const targetHints = min + Math.floor(Math.random() * (max - min + 1));
   const targetRemove = SUDOKU_CELL_COUNT - targetHints;
 
-  console.log(`일반 스도쿠: 난이도 ${difficulty}, 목표 힌트: ${targetHints}개, 목표 제거: ${targetRemove}개`);
-
   const removed = removeRandomCellsWithStrategy(board, targetRemove, difficulty);
-  const finalHints = SUDOKU_CELL_COUNT - removed;
 
-  console.log(`일반 스도쿠: 실제 제거: ${removed}개, 최종 힌트: ${finalHints}개`);
-
-  // 목표 미달시 강제 제거
   if (removed < targetRemove - 5) {
-    console.log(`목표 미달로 강제 제거 시작: 추가로 ${targetRemove - removed}개 제거`);
-    const additionalRemoved = forceRemoveAdditionalCells(board, targetRemove - removed);
-    console.log(`강제 제거 완료: ${additionalRemoved}개 추가 제거`);
+    forceRemoveAdditionalCells(board, targetRemove - removed);
   }
 
   return board;
@@ -424,13 +409,11 @@ export function generateBoard(solution: Grid, difficulty: Difficulty): SudokuBoa
  */
 function createCageMap(cages: KillerCage[]): Map<string, KillerCage> {
   const cageMap = new Map<string, KillerCage>();
-  console.log(cages);
   cages.forEach((cage) => {
     cage.cells.forEach(([r, c]) => {
       cageMap.set(`${r}-${c}`, cage);
     });
   });
-  console.log(cageMap);
   return cageMap;
 }
 
@@ -616,25 +599,18 @@ export function generateKillerBoard(
   solution: Grid,
   difficulty: Difficulty,
 ): { board: SudokuBoard; cages: KillerCage[] } {
-  console.log(`킬러 스도쿠 생성 시작: 난이도 ${difficulty}`);
-
   const board = createInitialBoard(solution);
   const cages = generateKillerCages(solution, difficulty);
 
   if (!validateCages(cages, solution)) {
-    throw new Error("킬러 스도쿠 케이지 생성 실패");
+    return generateKillerBoard(solution, difficulty);
   }
 
   const { hintsKeep } = KILLER_DIFFICULTY_RANGES[difficulty];
   const targetHints = difficulty === "expert" ? Math.max(MIN_EXPERT_HINTS, hintsKeep) : hintsKeep;
   const targetRemove = SUDOKU_CELL_COUNT - targetHints;
 
-  console.log(`킬러 스도쿠: 목표 힌트 ${targetHints}개, 목표 제거: ${targetRemove}개`);
-
-  const removed = removeKillerCellsOptimized(board, cages, targetRemove, difficulty);
-  const finalHints = SUDOKU_CELL_COUNT - removed;
-
-  console.log(`킬러 스도쿠: 실제 제거 ${removed}개, 최종 힌트 ${finalHints}개`);
+  removeKillerCellsOptimized(board, cages, targetRemove, difficulty);
 
   return { board, cages };
 }
