@@ -1,36 +1,18 @@
 interface NumberButtonProps {
   value: number;
-  onNumberSelect: (value: number) => void;
-  onNoteToggle: (value: number) => void;
-  isNoteMode: boolean;
+  onClick: () => void;
   isDisabled: boolean;
 }
 
-export const NumberButton: React.FC<NumberButtonProps> = ({
-  value,
-  onNumberSelect,
-  onNoteToggle,
-  isNoteMode,
-  isDisabled,
-}) => {
-  const handleClick = () => {
-    if (isNoteMode) {
-      onNoteToggle(value);
-      return;
-    }
+const sizeClass = "w-6 h-6 md:w-10 md:h-10 lg:w-30 lg:h-30";
+const alignClass = "rounded-full flex items-center justify-center text-xl font-semibold";
 
-    onNumberSelect(value);
-  };
-
-  const sizeClass = "w-6 h-6 md:w-10 md:h-10 lg:w-30 lg:h-30";
-  const alignClass = "rounded-full flex items-center justify-center text-xl font-semibold";
-  return (
-    <button
-      className={`${sizeClass} ${alignClass} ${isDisabled ? "text-gray-300" : "hover:bg-gray-300 transition-colors"}`}
-      onClick={handleClick}
-      disabled={isDisabled}
-    >
-      {value}
-    </button>
-  );
-};
+export const NumberButton: React.FC<NumberButtonProps> = ({ value, onClick, isDisabled }) => (
+  <button
+    className={`${sizeClass} ${alignClass} ${isDisabled ? "text-gray-300" : "hover:bg-gray-300 transition-colors"}`}
+    onClick={onClick}
+    disabled={isDisabled}
+  >
+    {value}
+  </button>
+);

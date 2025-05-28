@@ -1,3 +1,4 @@
+export * from "./GameDifficultySelector";
 export * from "./GameModeSelector";
 export * from "./GetHint";
 export * from "./RemoveNumber";

@@ -1,6 +1,6 @@
 import { CompletedBoard } from "@features/game-board/ui";
 import { useSudokuStore } from "@features/game-controls/model/stores";
-import GameDifficultySelector from "@features/game-settings/ui/GameDifficultySelector";
+import { GameDifficultySelector } from "@features/game-controls/ui";
 import { FC } from "react";
 
 export const CompleteGameOverlay: FC = () => {

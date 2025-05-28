@@ -1,16 +1,11 @@
-"use client";
-
-import { TimerControl } from "@features/game-controls/ui";
-import GameDifficultySelector from "@features/game-settings/ui/GameDifficultySelector";
+import { GameDifficultySelector, TimerControl } from "@features/game-controls/ui";
 import { FC } from "react";
 
 export const GameStatus: FC = () => (
-  <div className="flex flex-col items-center gap-2 mb-6">
-    <div className="flex justify-between w-full max-w-md px-4">
-      <GameDifficultySelector.Select />
+  <div className="w-full flex justify-between py-4">
+    <GameDifficultySelector.Select />
 
-      <TimerControl />
-    </div>
+    <TimerControl />
   </div>
 );
 

@@ -56,4 +56,4 @@ const GameDifficultySelector = Object.assign(() => {}, {
   List: ListSelector,
 });
 
-export default GameDifficultySelector;
+export { GameDifficultySelector };

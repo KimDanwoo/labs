@@ -1,5 +1,5 @@
 import { KillerCageLine } from "@entities/cell/ui";
-import { useKillerCage } from "../model/hooks";
+import { useKillerCage } from "@features/game-board/model/hooks";
 
 export const KillerCage: React.FC = () => {
   const { overlayRef, cageInfo, cellSize } = useKillerCage();

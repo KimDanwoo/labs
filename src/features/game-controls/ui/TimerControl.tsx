@@ -1,6 +1,6 @@
 import { formatTime } from "@features/game-board/model/utils";
 import { useSudokuStore } from "@features/game-controls/model/stores";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { AiOutlinePause } from "react-icons/ai";
 import { VscPlay } from "react-icons/vsc";
 
@@ -26,13 +26,13 @@ export const TimerControl = () => {
     };
   }, [timerActive, incrementTimer]);
 
-  const handleToggleTimer = () => {
+  const handleToggleTimer = useCallback(() => {
     if (timerActive) {
       toggleTimer(false);
     } else {
       toggleTimer();
     }
-  };
+  }, [timerActive, toggleTimer]);
 
   return (
     <div className="flex items-center gap-2">

@@ -4,6 +4,10 @@ import { GAME_MODE } from "@entities/game/model/constants";
 import { useSudokuStore } from "@features/game-controls/model/stores";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+/**
+ * 킬러 케이지 위치 계산 훅
+ * @returns 킬러 케이지 정보
+ */
 export const useKillerCage = () => {
   const cages = useSudokuStore((state) => state.cages);
   const gameMode = useSudokuStore((state) => state.gameMode);
