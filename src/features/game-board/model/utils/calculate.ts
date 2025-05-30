@@ -1,5 +1,5 @@
 import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
-import { CellPriority, RemovalStrategy, SudokuBoard } from "@entities/board/model/types";
+import { CellPriority, GridPosition, RemovalStrategy, SudokuBoard } from "@entities/board/model/types";
 import { getCenterDistance, isCenter, isCorner, isEdge } from "@entities/board/model/utils";
 import { Difficulty, KillerCage } from "@entities/game/model/types";
 import { shuffleArray } from "@features/game-board/model/utils";
@@ -78,7 +78,6 @@ function getIntensity(isHigh: boolean, isMiddle: boolean): number {
 function calculateIntensityBonus(
   row: number,
   col: number,
-  targetRemove: number,
   isHighIntensity: boolean,
   isMediumIntensity: boolean,
 ): number {
@@ -115,7 +114,7 @@ export function calculateCellPriorities(strategy: RemovalStrategy, targetRemove:
     for (let col = 0; col < BOARD_SIZE; col++) {
       const basePriority = Math.random() * (isHighIntensity ? 0.2 : 0.3);
       const positionWeight = calculatePositionWeight(row, col, strategy, intensityMultiplier);
-      const intensityBonus = calculateIntensityBonus(row, col, targetRemove, isHighIntensity, isMediumIntensity);
+      const intensityBonus = calculateIntensityBonus(row, col, isHighIntensity, isMediumIntensity);
 
       const priority = basePriority + positionWeight + intensityBonus;
       cells.push({ pos: [row, col], priority });
@@ -190,4 +189,68 @@ export function calculateKillerCellPriority(
   priority += getCenterDistance(row, col) * 0.05;
 
   return priority;
+}
+
+/**
+ * @description 이웃 셀의 적합성 점수 계산
+ * @param {GridPosition} neighbor - 이웃 셀
+ * @param {GridPosition[]} currentCage - 현재 케이지
+ * @returns {number} 적합성 점수
+ */
+export function calculateNeighborScore(neighbor: GridPosition, currentCage: GridPosition[]): number {
+  const [row, col] = neighbor;
+  let score = 0;
+
+  // 현재 케이지와의 연결성 점수
+  let connections = 0;
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ];
+
+  for (const [dRow, dCol] of directions) {
+    const checkRow = row + dRow;
+    const checkCol = col + dCol;
+
+    if (currentCage.some(([cR, cC]) => cR === checkRow && cC === checkCol)) {
+      connections++;
+    }
+  }
+
+  score += connections * 2;
+
+  // 케이지 모양의 규칙성 점수 (정사각형에 가까울수록 높은 점수)
+  if (currentCage.length >= 4) {
+    const minRow = Math.min(...currentCage.map(([r]) => r));
+    const maxRow = Math.max(...currentCage.map(([r]) => r));
+    const minCol = Math.min(...currentCage.map(([, c]) => c));
+    const maxCol = Math.max(...currentCage.map(([, c]) => c));
+
+    const width = maxCol - minCol + 1;
+    const height = maxRow - minRow + 1;
+    const aspectRatio = Math.min(width, height) / Math.max(width, height);
+
+    score += aspectRatio;
+  }
+
+  // 블록 경계를 넘나드는 것에 대한 패널티
+  const cageBlocks = new Set();
+  currentCage.forEach(([r, c]) => {
+    const blockId = Math.floor(r / 3) * 3 + Math.floor(c / 3);
+    cageBlocks.add(blockId);
+  });
+
+  const neighborBlock = Math.floor(row / 3) * 3 + Math.floor(col / 3);
+  if (cageBlocks.has(neighborBlock)) {
+    score += 1; // 같은 블록 내 확장은 보너스
+  } else {
+    score -= 0.5; // 블록 경계 넘는 것은 약간의 패널티
+  }
+
+  // 무작위성 추가
+  score += Math.random() * 0.3;
+
+  return score;
 }

@@ -1,4 +1,4 @@
-import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
+import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { getBlockCoordinates } from "@entities/board/model/utils";
 import { KillerCage } from "@entities/game/model/types";
@@ -165,24 +165,6 @@ export function checkBlockConflict(board: SudokuBoard, row: number, col: number,
     }
   }
   return false;
-}
-
-/**
- * @description 특정 셀에 충돌이 있는지 확인
- * @param {SudokuBoard} board - 스도쿠 보드
- * @param {number} row - 행 인덱스
- * @param {number} col - 열 인덱스
- * @returns {boolean} 충돌 여부
- */
-export function hasConflict(board: SudokuBoard, row: number, col: number): boolean {
-  const value = board[row][col].value;
-  if (value === null) return false;
-
-  return (
-    checkRowConflict(board, row, col, value) ||
-    checkColConflict(board, row, col, value) ||
-    checkBlockConflict(board, row, col, value)
-  );
 }
 
 /**
@@ -449,4 +431,145 @@ export function validateCages(cages: KillerCage[], solution: Grid): boolean {
 
     return true;
   });
+}
+
+/**
+ * @description 모든 케이지의 유효성 검증
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @param {Grid} solution - 솔루션
+ * @returns {boolean} 유효성 여부
+ */
+export function validateAllCages(cages: KillerCage[], solution: Grid): boolean {
+  const allCells = new Set<string>();
+
+  for (const cage of cages) {
+    const values = cage.cells.map(([r, c]) => solution[r][c]);
+    const uniqueValues = new Set(values);
+
+    if (values.length !== uniqueValues.size) {
+      return false;
+    }
+
+    // 합계 검사
+    const actualSum = values.reduce((sum, val) => sum + val, 0);
+    if (actualSum !== cage.sum) {
+      return false;
+    }
+
+    // 셀 중복 검사
+    for (const [r, c] of cage.cells) {
+      const cellKey = `${r}-${c}`;
+      if (allCells.has(cellKey)) {
+        return false;
+      }
+      allCells.add(cellKey);
+    }
+  }
+
+  // 모든 셀이 케이지에 속하는지 검사
+  if (allCells.size !== SUDOKU_CELL_COUNT) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * @description 킬러 스도쿠 케이지 유효성 검사 및 충돌 표시
+ * @param {SudokuBoard} board - 보드
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @returns {SudokuBoard} 보드
+ */
+export function validateKillerCages(board: SudokuBoard, cages: KillerCage[]): SudokuBoard {
+  const newBoard = structuredClone(board);
+
+  // 먼저 일반 스도쿠 규칙으로 충돌 검사
+  const boardWithBasicConflicts = checkConflicts(newBoard);
+
+  // 각 케이지별 검증
+  for (const cage of cages) {
+    let sum = 0;
+    const usedNumbers = new Set<number>();
+    let allFilled = true;
+    let hasConflict = false;
+
+    // 케이지 내 모든 셀 검사
+    for (const [row, col] of cage.cells) {
+      const value = boardWithBasicConflicts[row][col].value;
+
+      if (value === null) {
+        allFilled = false;
+        continue;
+      }
+
+      sum += value;
+
+      // 케이지 내 중복 검사
+      if (usedNumbers.has(value)) {
+        hasConflict = true;
+      }
+      usedNumbers.add(value);
+    }
+
+    // 케이지 완성 시 합계 검사
+    if (allFilled && sum !== cage.sum) {
+      hasConflict = true;
+    }
+
+    // 진행 중에도 합이 초과되면 충돌
+    if (sum > cage.sum) {
+      hasConflict = true;
+    }
+
+    // 충돌이 있으면 케이지 내 모든 채워진 셀에 충돌 표시
+    if (hasConflict) {
+      for (const [row, col] of cage.cells) {
+        if (boardWithBasicConflicts[row][col].value !== null) {
+          boardWithBasicConflicts[row][col].isConflict = true;
+        }
+      }
+    }
+  }
+
+  return boardWithBasicConflicts;
+}
+
+/**
+ * @description 킬러 스도쿠 보드 완성도 검사
+ * @param {SudokuBoard} board - 보드
+ * @param {KillerCage[]} cages - 케이지 배열
+ * @returns {boolean} 완성 여부
+ */
+export function isKillerBoardComplete(board: SudokuBoard, cages: KillerCage[]): boolean {
+  // 1. 모든 셀이 채워져 있는지 확인
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      const cell = board[row][col];
+      if (cell.value === null || cell.isConflict) {
+        return false;
+      }
+    }
+  }
+
+  // 2. 모든 케이지 규칙이 만족되는지 확인
+  for (const cage of cages) {
+    let sum = 0;
+    const usedNumbers = new Set<number>();
+
+    for (const [row, col] of cage.cells) {
+      const value = board[row][col].value!;
+      sum += value;
+
+      if (usedNumbers.has(value)) {
+        return false; // 케이지 내 중복
+      }
+      usedNumbers.add(value);
+    }
+
+    if (sum !== cage.sum) {
+      return false; // 합계 불일치
+    }
+  }
+
+  return true;
 }

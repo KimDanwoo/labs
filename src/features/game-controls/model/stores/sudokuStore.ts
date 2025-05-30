@@ -3,27 +3,29 @@ import { SudokuBoard } from "@entities/board/model/types";
 import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING } from "@entities/game/model/constants";
 import { Difficulty, GameMode, KillerCage, SudokuState } from "@entities/game/model/types";
 import {
-  calculateHighlights,
-  canFillCell,
   checkConflicts,
-  checkGameCompletion,
   createEmptyBoard,
   createEmptyHighlights,
-  findEmptyCells,
   generateBoard,
   generateKillerBoard,
   generateSolution,
   isBoardComplete,
   isBoardCorrect,
   isKillerBoardComplete,
+  validateKillerCages,
+} from "@features/game-board/model/utils";
+import {
+  calculateHighlights,
+  canFillCell,
+  checkGameCompletion,
+  findEmptyCells,
   resetUserInputs as resetUserInputsOptimized,
   updateCellNotes,
   updateCellSelection,
   updateCellValue,
   updateSingleCell,
   validateBoard,
-  validateKillerCages,
-} from "@features/game-board/model/utils";
+} from "@features/game-controls/model/utils";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

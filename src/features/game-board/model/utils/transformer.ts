@@ -6,7 +6,7 @@ import { shuffleArray } from "@features/game-board/model/utils";
  * @description 무작위 숫자 매핑 생성 (1-9 → 1-9 셔플)
  * @returns {Map<number, number>} 숫자 매핑 맵
  */
-export function createRandomNumberMapping(): Map<number, number> {
+function createRandomNumberMapping(): Map<number, number> {
   const shuffled = [...BOARD_NUMBERS];
   shuffleArray(shuffled);
 
@@ -22,7 +22,7 @@ export function createRandomNumberMapping(): Map<number, number> {
  * @description 블록 내에서 무작위 열 교환
  * @param {Grid} grid - 대상 그리드
  */
-export function swapRandomColumnsWithinBlocks(grid: Grid): void {
+function swapRandomColumnsWithinBlocks(grid: Grid): void {
   for (let block = 0; block < BLOCK_SIZE; block++) {
     const baseCol = block * BLOCK_SIZE;
     const col1 = baseCol + Math.floor(Math.random() * BLOCK_SIZE);
@@ -40,7 +40,7 @@ export function swapRandomColumnsWithinBlocks(grid: Grid): void {
  * @description 무작위 행 블록 교환
  * @param {Grid} grid - 대상 그리드
  */
-export function swapRandomRowBlocks(grid: Grid): void {
+function swapRandomRowBlocks(grid: Grid): void {
   const block1 = Math.floor(Math.random() * BLOCK_SIZE);
   const block2 = Math.floor(Math.random() * BLOCK_SIZE);
 
@@ -57,7 +57,7 @@ export function swapRandomRowBlocks(grid: Grid): void {
  * @description 무작위 열 블록 교환
  * @param {Grid} grid - 대상 그리드
  */
-export function swapRandomColumnBlocks(grid: Grid): void {
+function swapRandomColumnBlocks(grid: Grid): void {
   const block1 = Math.floor(Math.random() * BLOCK_SIZE);
   const block2 = Math.floor(Math.random() * BLOCK_SIZE);
 
@@ -77,7 +77,7 @@ export function swapRandomColumnBlocks(grid: Grid): void {
  * @description 그리드를 90도 회전
  * @param {Grid} grid - 대상 그리드
  */
-export function rotateGrid90(grid: Grid): void {
+function rotateGrid90(grid: Grid): void {
   const size = grid.length;
   const temp = structuredClone(grid);
 
@@ -92,7 +92,7 @@ export function rotateGrid90(grid: Grid): void {
  * @description 그리드 수평 반사
  * @param {Grid} grid - 대상 그리드
  */
-export function reflectHorizontal(grid: Grid): void {
+function reflectHorizontal(grid: Grid): void {
   grid.reverse();
 }
 
@@ -100,7 +100,7 @@ export function reflectHorizontal(grid: Grid): void {
  * @description 그리드 수직 반사
  * @param {Grid} grid - 대상 그리드
  */
-export function reflectVertical(grid: Grid): void {
+function reflectVertical(grid: Grid): void {
   for (let row = 0; row < BOARD_SIZE; row++) {
     grid[row].reverse();
   }
@@ -110,7 +110,7 @@ export function reflectVertical(grid: Grid): void {
  * @description 그리드 회전 또는 반사 적용
  * @param {Grid} grid - 대상 그리드
  */
-export function rotateOrReflectGrid(grid: Grid): void {
+function rotateOrReflectGrid(grid: Grid): void {
   const operations = [() => rotateGrid90(grid), () => reflectHorizontal(grid), () => reflectVertical(grid)];
 
   // 무작위 작업 선택
@@ -123,7 +123,7 @@ export function rotateOrReflectGrid(grid: Grid): void {
  * @param {Grid} grid - 대상 그리드
  * @param {Map<number, number>} mapping - 숫자 매핑
  */
-export function applyNumberMapping(grid: Grid, mapping: Map<number, number>): void {
+function applyNumberMapping(grid: Grid, mapping: Map<number, number>): void {
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
       grid[row][col] = mapping.get(grid[row][col]) ?? grid[row][col];
@@ -135,7 +135,7 @@ export function applyNumberMapping(grid: Grid, mapping: Map<number, number>): vo
  * @description 블록 내에서 무작위 행 교환
  * @param {Grid} grid - 대상 그리드
  */
-export function swapRandomRowsWithinBlocks(grid: Grid): void {
+function swapRandomRowsWithinBlocks(grid: Grid): void {
   for (let block = 0; block < BLOCK_SIZE; block++) {
     const baseRow = block * BLOCK_SIZE;
     const row1 = baseRow + Math.floor(Math.random() * BLOCK_SIZE);
