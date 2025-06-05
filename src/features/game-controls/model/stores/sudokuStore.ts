@@ -5,6 +5,7 @@ import { Difficulty, GameMode, KillerCage, SudokuState } from "@entities/game/mo
 import {
   checkConflicts,
   createEmptyBoard,
+  createEmptyGrid,
   createEmptyHighlights,
   generateBoard,
   generateKillerBoard,
@@ -30,61 +31,43 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface SudokuActions {
-  // 게임 초기화
   initializeGame: (difficulty?: Difficulty) => void;
 
-  // 사용자 입력 초기화
   resetUserInputs: () => void;
 
-  // 셀 선택
   selectCell: (row: number, col: number) => void;
 
-  // 셀 선택 해제
   deselectCell: () => void;
 
-  // 선택된 셀에 값 입력
   fillCell: (value: number | null) => void;
 
-  // 노트 토글
   toggleNote: (value: number) => void;
 
-  // 힌트 표시
   getHint: () => void;
 
-  // 정답 확인
   checkSolution: () => void;
 
-  // 게임 재시작
   restartGame: () => void;
 
-  // 타이머 증가
   incrementTimer: () => void;
 
-  // 타이머 토글
   toggleTimer: (isActive?: boolean) => void;
 
-  // 하이라이트 업데이트
   updateHighlights: (row: number, col: number) => void;
 
-  // 노트 모드 토글
   toggleNoteMode: () => void;
 
-  // 보드 숫자 카운트
   countBoardNumbers: () => void;
 
-  // 게임 모드 전환
   switchGameMode: (mode: GameMode, difficulty?: Difficulty) => void;
 
-  // 키 입력 처리
   handleKeyInput: (key: string) => void;
 }
 
 const initialState: SudokuState = {
   board: createEmptyBoard(),
   isNoteMode: false,
-  solution: Array(9)
-    .fill(null)
-    .map(() => Array(9).fill(null)),
+  solution: createEmptyGrid(),
   selectedCell: null,
   isCompleted: false,
   isSuccess: false,
@@ -113,13 +96,11 @@ const savedStorageKeys = [
   "cages",
 ];
 
-// 스도쿠 스토어 정의
 export const useSudokuStore = create<SudokuState & SudokuActions>()(
   persist(
     (set, get) => ({
       ...initialState,
 
-      // 게임 초기화 (개선된 난이도 차별화)
       initializeGame: (difficulty = GAME_LEVEL.MEDIUM) => {
         const solution = generateSolution();
         const { gameMode } = get();
@@ -148,7 +129,6 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         get().countBoardNumbers();
       },
 
-      // 게임 모드 전환
       switchGameMode: (mode: GameMode, difficulty?: Difficulty) => {
         const currentDifficulty = difficulty || get().difficulty;
         set({ gameMode: mode });
@@ -264,13 +244,12 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           return;
         }
 
-        // 무작위 빈 셀 선택
         const randomIndex = Math.floor(Math.random() * emptyCells.length);
         const { row, col } = emptyCells[randomIndex];
         const value = solution[row][col];
 
         const newBoard = updateCellValue(board, row, col, value);
-        // 게임 모드에 따른 충돌 확인
+
         let boardWithConflicts: SudokuBoard;
         if (gameMode === GAME_MODE.KILLER) {
           boardWithConflicts = validateKillerCages(newBoard, cages);
@@ -278,7 +257,6 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           boardWithConflicts = checkConflicts(newBoard);
         }
 
-        // 게임 완료 확인
         let completed = false;
         if (gameMode === GAME_MODE.KILLER) {
           completed = isKillerBoardComplete(boardWithConflicts, cages);
@@ -346,7 +324,6 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
         const isCorrect = isBoardCorrect(board, solution);
 
-        // 게임 모드에 따른 충돌 확인
         let boardWithConflicts: SudokuBoard;
         if (gameMode === GAME_MODE.KILLER) {
           boardWithConflicts = validateKillerCages(board, cages);
@@ -354,7 +331,6 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           boardWithConflicts = checkConflicts(board);
         }
 
-        // 게임 모드에 따른 완료 확인
         let completed = false;
         if (gameMode === GAME_MODE.KILLER) {
           completed = isKillerBoardComplete(boardWithConflicts, cages);
@@ -389,7 +365,6 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           }
         }
 
-        // 방향키 처리
         if (key.startsWith("Arrow")) {
           const { selectedCell } = get();
           if (!selectedCell) return;
@@ -405,21 +380,6 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
           } else if (key === "ArrowRight") {
             col = Math.min(8, col + 1);
           }
-
-          // switch (key) {
-          //   case "ArrowUp":
-          //     row = Math.max(0, row - 1);
-          //     break;
-          //   case "ArrowDown":
-          //     row = Math.min(8, row + 1);
-          //     break;
-          //   case "ArrowLeft":
-          //     col = Math.max(0, col - 1);
-          //     break;
-          //   case "ArrowRight":
-          //     col = Math.min(8, col + 1);
-          //     break;
-          // }
 
           get().selectCell(row, col);
         }

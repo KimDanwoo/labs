@@ -11,6 +11,7 @@ import { DIFFICULTY_RANGES, KILLER_DIFFICULTY_RANGES } from "@entities/game/mode
 import { Difficulty, KillerCage } from "@entities/game/model/types";
 import {
   applyTransformations,
+  createEmptyGrid,
   isValidPlacement,
   shuffleArray,
   validateAllCages,
@@ -25,9 +26,7 @@ import { forceRemoveAdditionalCells, removeKillerCells, removeRandomCellsWithStr
  * @returns {Grid} 유효한 스도쿠 그리드
  */
 function generateValidSudoku(): Grid {
-  const grid: Grid = Array(9)
-    .fill(null)
-    .map(() => Array(9).fill(0));
+  const grid: Grid = createEmptyGrid();
 
   const fillGrid = (row: number, col: number): boolean => {
     if (row === 9) return true;

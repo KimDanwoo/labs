@@ -1,7 +1,13 @@
 import { BOARD_SIZE } from "@entities/board/model/constants";
-import { SudokuBoard } from "@entities/board/model/types";
+import { Grid, SudokuBoard } from "@entities/board/model/types";
 import { CellHighlight } from "@entities/cell/model/types";
 import { MINUTE } from "@shared/model/constants";
+
+export function createEmptyGrid(): Grid {
+  return Array(BOARD_SIZE)
+    .fill(null)
+    .map(() => Array(BOARD_SIZE).fill(0));
+}
 
 /**
  * @description 배열을 무작위로 섞는 함수 (Fisher-Yates 알고리즘)

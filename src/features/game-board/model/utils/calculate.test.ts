@@ -9,24 +9,6 @@ import {
   calculateNeighborScore,
 } from "./calculate";
 
-// Mock 상수 및 유틸리티 함수들
-vi.mock("@entities/board/model/constants", () => ({
-  BLOCK_SIZE: 3,
-  BOARD_SIZE: 9,
-  SUDOKU_CELL_COUNT: 81,
-}));
-
-vi.mock("@entities/board/model/utils", () => ({
-  getCenterDistance: (row: number, col: number) => Math.abs(row - 4) + Math.abs(col - 4),
-  isCenter: (row: number, col: number) => row >= 3 && row <= 5 && col >= 3 && col <= 5,
-  isCorner: (row: number, col: number) => (row === 0 || row === 8) && (col === 0 || col === 8),
-  isEdge: (row: number, col: number) => row === 0 || row === 8 || col === 0 || col === 8,
-}));
-
-vi.mock("@features/game-board/model/utils", () => ({
-  shuffleArray: vi.fn((arr) => [...arr].reverse()), // 테스트를 위한 고정된 셔플
-}));
-
 describe("스도쿠 셀 우선순위 계산 함수들", () => {
   // 테스트용 헬퍼 함수들
   const createMockSudokuCell = (value: number | null = null): SudokuCell => ({
