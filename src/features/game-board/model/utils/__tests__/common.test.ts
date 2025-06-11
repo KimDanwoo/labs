@@ -1,6 +1,11 @@
 import { BOARD_SIZE } from "@entities/board/model/constants";
+import {
+  createEmptyBoard,
+  createEmptyHighlights,
+  formatTime,
+  shuffleArray,
+} from "@features/game-board/model/utils/common";
 import { describe, expect, test } from "vitest";
-import { createEmptyBoard, createEmptyHighlights, formatTime, shuffleArray } from "./common"; // 실제 파일 경로로 수정하세요
 
 describe("스도쿠 유틸리티 함수 테스트", () => {
   describe("shuffleArray", () => {

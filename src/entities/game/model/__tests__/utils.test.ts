@@ -1,7 +1,7 @@
 import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
 import { Grid } from "@entities/board/model/types";
-import { describe, expect, test } from "vitest"; // 또는 '@jest/globals'
-import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from "./utils";
+import { describe, expect, test } from "vitest";
+import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from "../utils";
 
 // 테스트용 완전한 스도쿠 그리드 (해결된 상태) - 함수로 만들어 매번 새로운 인스턴스 생성
 function createValidSudokuGrid(): Grid {

@@ -1,13 +1,13 @@
 import { CellPriority, GridPosition, RemovalContext, RemovalStrategy, SudokuBoard } from "@entities/board/model/types";
 import { SudokuCell } from "@entities/cell/model/types";
 import { Difficulty, KillerCage } from "@entities/game/model/types";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   calculateCellPriorities,
   calculateKillerCellPriority,
   calculateMustKeepCells,
   calculateNeighborScore,
-} from "./calculate";
+} from "@features/game-board/model/utils/calculate";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("스도쿠 셀 우선순위 계산 함수들", () => {
   // 테스트용 헬퍼 함수들

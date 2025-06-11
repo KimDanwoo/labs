@@ -1,4 +1,4 @@
-import { BOARD_SIZE } from "@entities/board/model/constants";
+import { BOARD_NUMBERS, BOARD_SIZE } from "@entities/board/model/constants";
 import { Grid, SudokuBoard } from "@entities/board/model/types";
 import { CellHighlight } from "@entities/cell/model/types";
 import { MINUTE } from "@shared/model/constants";
@@ -70,4 +70,33 @@ export function createEmptyHighlights(): Record<string, CellHighlight> {
   }
 
   return highlights;
+}
+
+/**
+ * @description 무작위 숫자 매핑 생성 (1-9 → 1-9 셔플)
+ * @returns {Map<number, number>} 숫자 매핑 맵
+ */
+export function createRandomNumberMapping(): Map<number, number> {
+  const shuffled = [...BOARD_NUMBERS];
+  shuffleArray(shuffled);
+
+  const mapping = new Map<number, number>();
+  BOARD_NUMBERS.forEach((num, idx) => {
+    mapping.set(num, shuffled[idx]);
+  });
+
+  return mapping;
+}
+
+/**
+ * @description 숫자 매핑을 그리드에 적용
+ * @param {Grid} grid - 대상 그리드
+ * @param {Map<number, number>} mapping - 숫자 매핑
+ */
+export function applyNumberMapping(grid: Grid, mapping: Map<number, number>): void {
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      grid[row][col] = mapping.get(grid[row][col]) ?? grid[row][col];
+    }
+  }
 }

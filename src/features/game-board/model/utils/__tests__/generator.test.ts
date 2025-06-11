@@ -2,14 +2,14 @@ import { BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
 import { Difficulty } from "@entities/game/model/types";
-import { describe, expect, it } from "vitest";
 import {
   generateBoard,
   generateKillerBoard,
   generateKillerCages,
   generateSolution,
   groupAdjacentCells,
-} from "./generator";
+} from "@features/game-board/model/utils/generator";
+import { describe, expect, it } from "vitest";
 
 // 헬퍼 함수들
 function hasValidStructure(grid: Grid): boolean {
