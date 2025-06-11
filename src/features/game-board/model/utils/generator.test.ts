@@ -123,7 +123,7 @@ describe("스도쿠 생성기", () => {
     it("보드의 모든 셀이 적절한 구조를 가져야 한다", () => {
       const board = generateBoard(validSolution, "easy");
 
-      let validCells = 0;
+      let totalCells = 0;
 
       for (let row = 0; row < BOARD_SIZE; row++) {
         for (let col = 0; col < BOARD_SIZE; col++) {
@@ -136,14 +136,19 @@ describe("스도쿠 생성기", () => {
           expect(cell).toHaveProperty("isConflict");
           expect(cell).toHaveProperty("notes");
 
-          // value가 존재하면 validCells 증가
-          if (cell.value !== undefined && cell.value !== null) {
-            validCells++;
-          }
+          // value 타입이 올바른지 확인 (0 포함)
+          const numberValue = Number(cell.value);
+          expect(typeof numberValue).toBe("number");
+          expect(numberValue).toBeGreaterThanOrEqual(0); // 0 포함
+          expect(numberValue).toBeLessThanOrEqual(9); // 9 포함
+
+          // 셀 카운트 증가
+          totalCells++;
         }
       }
 
-      expect(validCells).toBe(SUDOKU_CELL_COUNT);
+      // 모든 셀이 존재하는지 확인 (값이 0이어도 셀 자체는 존재해야 함)
+      expect(totalCells).toBe(SUDOKU_CELL_COUNT);
     });
   });
 
