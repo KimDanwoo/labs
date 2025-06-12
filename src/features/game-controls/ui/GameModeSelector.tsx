@@ -2,7 +2,7 @@ import { GAME_MODE } from "@entities/game/model/constants";
 import { useSudokuStore } from "@features/game-controls/model/stores";
 import React from "react";
 
-const GameModeSelector: React.FC = () => {
+export const GameModeSelector: React.FC = () => {
   const gameMode = useSudokuStore((state) => state.gameMode);
   const switchGameMode = useSudokuStore((state) => state.switchGameMode);
 
@@ -23,5 +23,3 @@ const GameModeSelector: React.FC = () => {
     </div>
   );
 };
-
-export default GameModeSelector;

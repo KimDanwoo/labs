@@ -1,14 +1,10 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
-const SudokuBoard = dynamic(() => import("@widgets/game-board/ui/GameBoard"), { ssr: false });
-const SelectNumber = dynamic(() => import("@features/game-controls/ui/SelectNumber"), { ssr: false });
-const Controls = dynamic(() => import("@widgets/game-controls/ui/GameControls"), { ssr: false });
-const GameStatus = dynamic(() => import("@widgets/game-header/ui/GameHeader"), { ssr: false });
-const GameModeSelector = dynamic(() => import("@features/game-controls/ui/GameModeSelector"), { ssr: false });
-const CompleteGameOverlay = dynamic(() => import("@widgets/game-overlays/ui/CompleteGameOverlay"), { ssr: false });
-const PauseGameOverlay = dynamic(() => import("@widgets/game-overlays/ui/PauseGameOverlay"), { ssr: false });
+import { GameModeSelector, SelectNumber } from "@features/game-controls/ui";
+import { SudokuBoard } from "@widgets/game-board/ui";
+import { Controls } from "@widgets/game-controls/ui";
+import { GameStatus } from "@widgets/game-header/ui";
+import { CompleteGameOverlay, PauseGameOverlay } from "@widgets/game-overlays/ui";
 
 export default function Home() {
   return (
