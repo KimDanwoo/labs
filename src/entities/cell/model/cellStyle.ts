@@ -64,6 +64,11 @@ export function buildCellClassName(
     "focus:outline-none focus:border-none",
     "focus-visible:outline-none",
 
+    "select-none", // 텍스트 선택 방지
+    "touch-manipulation", // 터치 최적화
+    "-webkit-tap-highlight-color: transparent", // 터치 하이라이트 제거 (Tailwind에서는 직접 적용 필요)
+    "active:outline-none", // 활성 상태 아웃라인 제거
+
     // 동적 스타일
     bgColor,
     textColor,
