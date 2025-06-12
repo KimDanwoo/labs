@@ -23,9 +23,11 @@ export default function Home() {
             <SudokuBoard />
           </div>
         </div>
-        <Controls />
+        <div className="lg:max-w-[320px]">
+          <Controls />
 
-        <SelectNumber />
+          <SelectNumber />
+        </div>
       </div>
     </main>
   );
