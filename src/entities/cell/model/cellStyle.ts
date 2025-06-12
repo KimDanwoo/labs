@@ -25,7 +25,7 @@ export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boo
   const borderColor = "border-slate-200";
 
   if (highlight.selected) {
-    bgColor = "bg-blue-100";
+    bgColor = "bg-blue-200";
   } else if (highlight.sameValue) {
     bgColor = "bg-blue-300";
   } else if (highlight.related) {
