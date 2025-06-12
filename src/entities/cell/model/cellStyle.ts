@@ -57,11 +57,12 @@ export function buildCellClassName(
     "lg:w-14 lg:h-14",
 
     // 기본 스타일
-    "border border-slate-200",
+    "border",
     "text-center align-middle",
     "cursor-pointer",
     "transition-colors duration-100",
-    "focus:outline-none",
+    "focus:outline-none focus:border-none",
+    "focus-visible:outline-none",
 
     // 동적 스타일
     bgColor,
