@@ -6,39 +6,8 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+html,
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-/* 추가 사용자 정의 스타일 */
-@layer components {
-  .btn {
-    @apply px-4 py-2 rounded-md transition-colors;
-  }
-  
-  .btn-primary {
-    @apply bg-blue-500 text-white hover:bg-blue-600;
-  }
-  
-  .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300;
-  }
-  
-  .btn-danger {
-    @apply bg-red-500 text-white hover:bg-red-600;
-  }
-  
-  .btn-success {
-    @apply bg-green-500 text-white hover:bg-green-600;
-  }
-  
-  .btn-warning {
-    @apply bg-yellow-500 text-white hover:bg-yellow-600;
-  }
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
 }

@@ -61,6 +61,7 @@ export function buildCellClassName(
     "text-center align-middle",
     "cursor-pointer",
     "transition-colors duration-100",
+    "focus:outline-none",
     bgColor,
     textColor,
     borderColor,
