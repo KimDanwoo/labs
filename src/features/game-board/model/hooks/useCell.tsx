@@ -10,11 +10,8 @@ export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
   const timerActive = useSudokuStore((state) => state.timerActive);
 
   const cellKey = `${row}-${col}`;
-  const highlight = highlightedCells[cellKey] || {
-    selected: false,
-    related: false,
-    sameValue: false,
-  };
+  const EMPTY_HIGHLIGHT = { selected: false, related: false, sameValue: false } as const;
+  const highlight = highlightedCells[cellKey] ?? EMPTY_HIGHLIGHT;
 
   // 메모화된 스타일 계산
   const borderStyles = useMemo(() => getCellBorderStyles(row, col), [row, col]);
@@ -57,30 +54,31 @@ export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
     (event: KeyboardEvent<HTMLTableCellElement>) => {
       if (!timerActive) return;
 
-      // Enter 또는 Space키로 셀 선택
-      if (event.key === "Enter" || event.key === " ") {
+      const keyPressed = event.key;
+
+      if (keyPressed === "Enter" || keyPressed === " ") {
         event.preventDefault();
         onSelect(row, col);
       }
 
       // 숫자 입력 직접 처리
-      if (/^[1-9]$/.test(event.key)) {
+      if (/^[1-9]$/.test(keyPressed)) {
         event.preventDefault();
         onSelect(row, col);
         // 키 입력을 스토어로 전달 (선택 후 입력)
         setTimeout(() => {
           const store = useSudokuStore.getState();
-          store.handleKeyInput(event.key);
+          store.handleKeyInput(keyPressed);
         }, 0);
       }
 
       // 삭제 키 처리
-      if (event.key === "Backspace" || event.key === "Delete") {
+      if (keyPressed === "Backspace" || keyPressed === "Delete") {
         event.preventDefault();
         onSelect(row, col);
         setTimeout(() => {
           const store = useSudokuStore.getState();
-          store.handleKeyInput(event.key);
+          store.handleKeyInput(keyPressed);
         }, 0);
       }
     },

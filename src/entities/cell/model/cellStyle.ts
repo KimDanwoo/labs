@@ -22,11 +22,10 @@ export function getCellBorderStyles(row: number, col: number) {
 export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boolean) {
   let bgColor = "bg-white";
   let textColor = "text-slate-700";
-  let borderColor = "border-slate-200";
+  const borderColor = "border-slate-200";
 
   if (highlight.selected) {
     bgColor = "bg-blue-100";
-    borderColor = "outline-1 outline-blue-600";
   } else if (highlight.sameValue) {
     bgColor = "bg-blue-300";
   } else if (highlight.related) {

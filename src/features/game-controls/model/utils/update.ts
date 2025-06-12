@@ -13,7 +13,7 @@ import {
 } from "@features/game-board/model/utils";
 
 /**
- * @description 단일 셀만 업데이트 (가장 효율적)
+ * @description 단일 셀만 업데이트
  * @param {SudokuBoard} board - 업데이트할 보드
  * @param {number} row - 업데이트할 행
  * @param {number} col - 업데이트할 열

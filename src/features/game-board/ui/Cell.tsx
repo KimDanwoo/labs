@@ -6,13 +6,9 @@ import { CellValue } from "@entities/cell/ui/CellValue";
 import { useCell } from "@features/game-board/model/hooks";
 import { FC, memo } from "react";
 
-export const SudokuCell: FC<CellProps> = memo(({ cell, row, col, onSelect }) => {
-  const { className, ariaLabel, ariaDescription, handleClick, handleKeyDown, tabIndex, stateClasses } = useCell({
-    cell,
-    row,
-    col,
-    onSelect,
-  });
+export const SudokuCell: FC<CellProps> = memo((props) => {
+  const { cell } = props;
+  const { className, ariaLabel, ariaDescription, handleClick, handleKeyDown, tabIndex, stateClasses } = useCell(props);
 
   return (
     <td
