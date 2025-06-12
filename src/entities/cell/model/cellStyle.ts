@@ -22,11 +22,10 @@ export function getCellBorderStyles(row: number, col: number) {
 export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boolean) {
   let bgColor = "bg-white";
   let textColor = "text-slate-700";
-  let borderColor = "border-slate-200";
+  const borderColor = "border-slate-200";
 
   if (highlight.selected) {
-    bgColor = "bg-blue-100";
-    borderColor = "outline-1 outline-blue-600";
+    bgColor = "bg-blue-200";
   } else if (highlight.sameValue) {
     bgColor = "bg-blue-300";
   } else if (highlight.related) {
@@ -54,8 +53,8 @@ export function buildCellClassName(
 ) {
   const baseClasses = [
     "relative",
-    "min-w-10 min-h-10",
-    "w-10 h-10",
+    "min-w-8 min-h-8",
+    "w-8 h-8",
     "md:w-12 md:h-12",
     "lg:w-14 lg:h-14",
     "border border-slate-200",

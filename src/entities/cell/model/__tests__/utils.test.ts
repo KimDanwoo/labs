@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"; // 또는 '@jest/globals'
+import { buildCellClassName, getCellBorderStyles, getCellHighlightStyles } from "../cellStyle";
 import { CellHighlight } from "../types";
-import { buildCellClassName, getCellBorderStyles, getCellHighlightStyles } from "../utils";
 
 describe("getCellBorderStyles", () => {
   test("3x3 블록의 오른쪽 테두리를 올바르게 감지한다", () => {
