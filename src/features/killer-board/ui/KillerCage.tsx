@@ -19,7 +19,7 @@ export const KillerCage: React.FC = () => {
           style={{
             top: `${y}px`,
             left: `${x}px`,
-            fontSize: `${Math.max(0.5, Math.min(0.65, cellSize / 65))}rem`,
+            fontSize: `${Math.max(0.5, Math.min(0.65, cellSize / 75))}rem`,
             lineHeight: "1",
             backgroundColor: "white",
           }}
