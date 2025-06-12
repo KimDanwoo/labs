@@ -64,6 +64,11 @@ export function buildCellClassName(
     "focus:outline-none focus:border-none",
     "focus-visible:outline-none",
 
+    "select-none",
+    "touch-manipulation",
+    "-webkit-tap-highlight-color: transparent",
+    "active:outline-none",
+
     // 동적 스타일
     bgColor,
     textColor,
