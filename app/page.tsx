@@ -8,10 +8,10 @@ import { CompleteGameOverlay, PauseGameOverlay } from "@widgets/game-overlays/ui
 
 export default function Home() {
   return (
-    <main className="min-w-[380px] min-h-screen flex flex-col gap-6">
+    <main className="min-w-[320px] min-h-screen flex flex-col gap-2">
       <GameModeSelector />
 
-      <div className="mx-auto p-6  rounded-lg flex flex-col lg:flex-row">
+      <div className="mx-auto px-6 rounded-lg flex flex-col lg:flex-row">
         <div className="relative">
           <GameStatus />
 
@@ -23,7 +23,7 @@ export default function Home() {
             <SudokuBoard />
           </div>
         </div>
-        <div className="lg:max-w-[380px]">
+        <div className="lg:max-w-[320px]">
           <Controls />
 
           <SelectNumber />
