@@ -6,11 +6,6 @@ import { Controls } from "@widgets/game-controls/ui";
 import { GameStatus } from "@widgets/game-header/ui";
 import { CompleteGameOverlay, PauseGameOverlay } from "@widgets/game-overlays/ui";
 
-/**
- * Renders the main layout for the Sudoku game interface, composing the game board, controls, overlays, and mode selector.
- *
- * @returns The complete JSX structure for the Sudoku home page.
- */
 export default function Home() {
   return (
     <main className="min-w-[380px] min-h-screen flex flex-col gap-6">
