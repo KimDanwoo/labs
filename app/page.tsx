@@ -10,6 +10,11 @@ const GameModeSelector = dynamic(() => import("@features/game-controls/ui/GameMo
 const CompleteGameOverlay = dynamic(() => import("@widgets/game-overlays/ui/CompleteGameOverlay"), { ssr: false });
 const PauseGameOverlay = dynamic(() => import("@widgets/game-overlays/ui/PauseGameOverlay"), { ssr: false });
 
+/**
+ * Renders the main layout for the Sudoku game interface, composing the game board, controls, overlays, and mode selector.
+ *
+ * @returns The complete JSX structure for the Sudoku home page.
+ */
 export default function Home() {
   return (
     <main className="min-w-[380px] min-h-screen flex flex-col gap-6">
