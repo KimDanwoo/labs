@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Rubik, Space_Mono } from "next/font/google";
+import { ReactNode } from "react";
 import "./globals.css";
 
 const rubik = Rubik({
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="ko">

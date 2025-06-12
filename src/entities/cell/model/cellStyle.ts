@@ -1,3 +1,4 @@
+import { cn } from "@shared/model/utils";
 import { CellHighlight } from "./types";
 
 /**
@@ -20,23 +21,19 @@ export function getCellBorderStyles(row: number, col: number) {
  * @returns 셀 하이라이트 스타일
  */
 export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boolean) {
-  let bgColor = "bg-white";
-  let textColor = "text-slate-700";
-  const borderColor = "border-slate-200";
-
-  if (highlight.selected) {
-    bgColor = "bg-blue-200";
-  } else if (highlight.sameValue) {
-    bgColor = "bg-blue-300";
-  } else if (highlight.related) {
-    bgColor = "bg-blue-50";
-  }
-
-  if (isConflict) {
-    textColor = "text-red-600";
-  }
-
-  return { bgColor, textColor, borderColor };
+  return {
+    bgColor: cn(
+      "bg-white", // 기본 배경색
+      highlight.selected && "bg-blue-200",
+      highlight.sameValue && "bg-blue-300",
+      highlight.related && "bg-blue-50",
+    ),
+    textColor: cn(
+      "text-slate-700", // 기본 텍스트 색상
+      isConflict && "text-red-600",
+    ),
+    borderColor: "border-slate-200",
+  };
 }
 
 /**
@@ -51,29 +48,29 @@ export function buildCellClassName(
   { isRightBlockBorder, isBottomBlockBorder }: ReturnType<typeof getCellBorderStyles>,
   isInitial: boolean,
 ) {
-  const baseClasses = [
+  return cn(
+    // 기본 레이아웃 및 크기
     "relative",
-    "min-w-8 min-h-8",
-    "w-8 h-8",
+    "min-w-8 min-h-8 w-8 h-8",
+    "sm:w-10 sm:h-10",
     "md:w-12 md:h-12",
     "lg:w-14 lg:h-14",
+
+    // 기본 스타일
     "border border-slate-200",
     "text-center align-middle",
     "cursor-pointer",
     "transition-colors duration-100",
     "focus:outline-none",
+
+    // 동적 스타일
     bgColor,
     textColor,
     borderColor,
     isInitial ? "font-bold" : "font-normal",
-  ];
 
-  if (isRightBlockBorder) {
-    baseClasses.push("border-r-2 border-r-slate-800");
-  }
-  if (isBottomBlockBorder) {
-    baseClasses.push("border-b-2 border-b-slate-800");
-  }
-
-  return baseClasses.join(" ");
+    // 조건부 테두리
+    isRightBlockBorder && "border-r-2 border-r-slate-800",
+    isBottomBlockBorder && "border-b-2 border-b-slate-800",
+  );
 }
