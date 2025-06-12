@@ -49,33 +49,25 @@ export function buildCellClassName(
   isInitial: boolean,
 ) {
   return cn(
-    // 기본 레이아웃 및 크기
     "relative",
     "min-w-8 min-h-8 w-8 h-8",
     "sm:w-10 sm:h-10",
     "md:w-12 md:h-12",
     "lg:w-14 lg:h-14",
-
-    // 기본 스타일
     "border",
     "text-center align-middle",
     "cursor-pointer",
     "transition-colors duration-100",
     "focus:outline-none focus:border-none",
     "focus-visible:outline-none",
-
     "select-none",
     "touch-manipulation",
     "-webkit-tap-highlight-color: transparent",
     "active:outline-none",
-
-    // 동적 스타일
     bgColor,
     textColor,
     borderColor,
     isInitial ? "font-bold" : "font-normal",
-
-    // 조건부 테두리
     isRightBlockBorder && "border-r-2 border-r-slate-800",
     isBottomBlockBorder && "border-b-2 border-b-slate-800",
   );

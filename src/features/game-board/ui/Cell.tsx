@@ -22,11 +22,13 @@ export const SudokuCell: FC<CellProps> = memo((props) => {
       aria-selected={cell.isSelected}
       aria-invalid={cell.isConflict}
       aria-readonly={cell.isInitial}
-      // 드래그 방지 및 터치 최적화
       draggable={false}
       style={{
         touchAction: "manipulation",
         userSelect: "none",
+        WebkitTapHighlightColor: "transparent",
+        outline: "none",
+        boxShadow: "none",
       }}
     >
       {cell.value ? <CellValue value={cell.value} /> : <CellNotes notes={cell.notes} />}
