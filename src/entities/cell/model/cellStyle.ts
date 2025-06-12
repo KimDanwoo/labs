@@ -40,11 +40,12 @@ export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boo
 }
 
 /**
- * 셀 클래스 이름을 빌드
- * @param highlight - 셀 하이라이트
- * @param borderStyles - 셀 테두리 스타일
- * @param isInitial - 초기 셀 여부
- * @returns 셀 클래스 이름
+ * Builds the CSS class string for a Sudoku cell based on highlight, border, and initial state.
+ *
+ * Combines base sizing, alignment, and transition classes with dynamic styles for background, text, border, font weight, and block borders.
+ *
+ * @param isInitial - Whether the cell is part of the initial puzzle (renders bold if true).
+ * @returns The concatenated CSS class string for the cell.
  */
 export function buildCellClassName(
   { bgColor, textColor, borderColor }: ReturnType<typeof getCellHighlightStyles>,
