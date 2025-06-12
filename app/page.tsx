@@ -12,16 +12,17 @@ export default function Home() {
       <GameModeSelector />
 
       <div className="mx-auto px-6 rounded-lg flex flex-col lg:flex-row">
-        <GameStatus />
-
         <div className="relative">
-          <CompleteGameOverlay />
+          <GameStatus />
 
-          <PauseGameOverlay />
+          <div className="relative">
+            <CompleteGameOverlay />
 
-          <SudokuBoard />
+            <PauseGameOverlay />
+
+            <SudokuBoard />
+          </div>
         </div>
-
         <Controls />
 
         <SelectNumber />
