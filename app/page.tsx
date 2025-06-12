@@ -12,7 +12,7 @@ const PauseGameOverlay = dynamic(() => import("@widgets/game-overlays/ui/PauseGa
 
 export default function Home() {
   return (
-    <main className="min-w-[400px] min-h-screen flex flex-col gap-6">
+    <main className="min-w-[380px] min-h-screen flex flex-col gap-6">
       <GameModeSelector />
 
       <div className="mx-auto p-6  rounded-lg flex flex-col lg:flex-row">
@@ -27,7 +27,7 @@ export default function Home() {
             <SudokuBoard />
           </div>
         </div>
-        <div className="lg:max-w-[400px]">
+        <div className="lg:max-w-[380px]">
           <Controls />
 
           <SelectNumber />

@@ -54,8 +54,8 @@ export function buildCellClassName(
 ) {
   const baseClasses = [
     "relative",
-    "min-w-10 min-h-10",
-    "w-10 h-10",
+    "min-w-8 min-h-8",
+    "w-8 h-8",
     "md:w-12 md:h-12",
     "lg:w-14 lg:h-14",
     "border border-slate-200",
