@@ -1,3 +1,4 @@
+import { AuthProvider } from "@apps/providers/AuthProvider";
 import type { Metadata } from "next";
 import { Rubik, Space_Mono } from "next/font/google";
 import { ReactNode } from "react";
@@ -29,7 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${rubik.variable} ${spaceMono.variable} antialiased`}>{children}</body>
+      <body className={`${rubik.variable} ${spaceMono.variable} antialiased`}>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

@@ -58,7 +58,6 @@ export function buildCellClassName(
     "text-center align-middle",
     "cursor-pointer",
     "transition-colors duration-100",
-    "focus:outline-none focus:border-none",
     "focus-visible:outline-none",
     "select-none",
     "touch-manipulation",
