@@ -22,10 +22,7 @@ export const GameModeSelector: React.FC = () => {
   return (
     <ul className="flex">
       {gameModes.map(({ value, label }) => (
-        <li
-          key={value}
-          className={cn("border-b-2 hover:bg-blue-100", isActive(value) ? "border-b-blue-400" : "border-b-blue-100")}
-        >
+        <li key={value} className={cn("hover:bg-blue-100", isActive(value) ? "border-b-2 border-b-blue-400" : "")}>
           <button className={`px-4 py-2 ${isActive(value) ? "active" : ""}`} onClick={() => switchGameMode(value)}>
             {label}
           </button>

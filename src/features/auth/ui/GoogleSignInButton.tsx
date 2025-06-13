@@ -18,7 +18,7 @@ export function GoogleSignInButton() {
       )}
     >
       <FcGoogle className="text-xl" />
-      <span className="font-medium text-gray-700">{isLoading ? "로그인 중..." : "구글로 로그인"}</span>
+      <span className="font-medium text-gray-700">{isLoading ? "로그인 중..." : "구글 로그인"}</span>
     </button>
   );
 }

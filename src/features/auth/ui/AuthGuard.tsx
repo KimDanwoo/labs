@@ -21,7 +21,7 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
   if (!isAuthenticated) {
     return (
       fallback || (
-        <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-6 mx-6">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">스도쿠 게임</h2>
             <p className="text-gray-600 mb-6">로그인하여 게임을 시작하세요!</p>
