@@ -3,7 +3,13 @@ import { Position, SudokuBoard } from "@entities/board/model/types";
 import { CellHighlight, SudokuCell } from "@entities/cell/model/types";
 import { GAME_MODE } from "@entities/game/model/constants";
 import { GameCompletionResult, GameMode, KillerCage } from "@entities/game/model/types";
-import { checkConflicts, isBoardComplete, isBoardCorrect, isKillerBoardComplete, validateKillerCages } from "@features/game-board/model/utils";
+import {
+  checkConflicts,
+  isBoardComplete,
+  isBoardCorrect,
+  isKillerBoardComplete,
+  validateKillerCages,
+} from "@features/game-board/model/utils";
 
 /**
  * @description 단일 셀만 업데이트
