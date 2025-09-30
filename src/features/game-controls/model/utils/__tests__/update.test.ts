@@ -8,6 +8,7 @@ import {
   calculateHighlights,
   canFillCell,
   checkGameCompletion,
+  clearHighlights,
   findEmptyCells,
   resetUserInputs,
   updateCellNotes,
@@ -150,6 +151,32 @@ describe("update.ts 유틸리티 함수 테스트", () => {
 
       // 같은 값을 가진 셀이 sameValue로 마킹되어야 함
       expect(highlights["1-1"].sameValue).toBe(true);
+    });
+
+    it("변경되지 않은 셀의 하이라이트 객체는 재사용되어야 합니다", () => {
+      const board = createTestBoard();
+
+      const firstHighlights = calculateHighlights(board, 0, 0);
+      const secondHighlights = calculateHighlights(board, 0, 1, firstHighlights);
+
+      expect(secondHighlights["8-8"]).toBe(firstHighlights["8-8"]);
+      expect(secondHighlights["0-0"]).not.toBe(firstHighlights["0-0"]);
+      expect(secondHighlights["0-1"]).not.toBe(firstHighlights["0-1"]);
+    });
+  });
+
+  describe("clearHighlights", () => {
+    it("기존 하이라이트 객체 중 변경되지 않은 항목은 재사용해야 합니다", () => {
+      const board = createTestBoard();
+      const highlights = calculateHighlights(board, 0, 0);
+
+      const cleared = clearHighlights(highlights);
+
+      expect(cleared["0-0"]).not.toBe(highlights["0-0"]);
+      expect(cleared["8-8"]).toBe(highlights["8-8"]);
+      expect(cleared["0-0"].selected).toBe(false);
+      expect(cleared["0-0"].related).toBe(false);
+      expect(cleared["0-0"].sameValue).toBe(false);
     });
   });
 

@@ -3,14 +3,7 @@ import { Position, SudokuBoard } from "@entities/board/model/types";
 import { CellHighlight, SudokuCell } from "@entities/cell/model/types";
 import { GAME_MODE } from "@entities/game/model/constants";
 import { GameCompletionResult, GameMode, KillerCage } from "@entities/game/model/types";
-import {
-  checkConflicts,
-  createEmptyHighlights,
-  isBoardComplete,
-  isBoardCorrect,
-  isKillerBoardComplete,
-  validateKillerCages,
-} from "@features/game-board/model/utils";
+import { checkConflicts, isBoardComplete, isBoardCorrect, isKillerBoardComplete, validateKillerCages } from "@features/game-board/model/utils";
 
 /**
  * @description 단일 셀만 업데이트
@@ -39,12 +32,31 @@ export function updateSingleCell(
  * @returns
  */
 export function updateCellSelection(board: SudokuBoard, selectedRow: number, selectedCol: number): SudokuBoard {
-  return board.map((r, rIdx) =>
-    r.map((cell, cIdx) => ({
-      ...cell,
-      isSelected: rIdx === selectedRow && cIdx === selectedCol,
-    })),
-  );
+  let hasChanges = false;
+
+  const nextBoard = board.map((row, rowIndex) => {
+    let rowChanged = false;
+
+    const nextRow = row.map((cell, colIndex) => {
+      const shouldSelect = rowIndex === selectedRow && colIndex === selectedCol;
+
+      if (cell.isSelected === shouldSelect) {
+        return cell;
+      }
+
+      rowChanged = true;
+      hasChanges = true;
+
+      return {
+        ...cell,
+        isSelected: shouldSelect,
+      };
+    });
+
+    return rowChanged ? nextRow : row;
+  });
+
+  return hasChanges ? nextBoard : board;
 }
 
 /**
@@ -108,86 +120,84 @@ export function findEmptyCells(board: SudokuBoard): Position[] {
  * @param {number} col - 열
  * @param {string} selectedKey - 선택된 셀 키
  */
-function markRelatedCells(highlights: Record<string, CellHighlight>, row: number, col: number, selectedKey: string) {
-  // 같은 행
-  for (let c = 0; c < BOARD_SIZE; c++) {
-    const key = `${row}-${c}`;
-    if (key !== selectedKey) {
-      highlights[key].related = true;
-    }
-  }
-
-  // 같은 열
-  for (let r = 0; r < BOARD_SIZE; r++) {
-    const key = `${r}-${col}`;
-    if (key !== selectedKey) {
-      highlights[key].related = true;
-    }
-  }
-
-  // 같은 3x3 블록
-  const blockStartRow = Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE;
-  const blockStartCol = Math.floor(col / BLOCK_SIZE) * BLOCK_SIZE;
-
-  for (let r = blockStartRow; r < blockStartRow + BLOCK_SIZE; r++) {
-    for (let c = blockStartCol; c < blockStartCol + BLOCK_SIZE; c++) {
-      const key = `${r}-${c}`;
-      if (key !== selectedKey) {
-        highlights[key].related = true;
-      }
-    }
-  }
-}
-
-/**
- * @description 같은 값을 가진 셀들을 sameValue로 마킹
- * @param {Record<string, CellHighlight>} highlights - 하이라이트 객체
- * @param {SudokuBoard} board - 보드
- * @param {number} selectedValue - 선택된 값
- * @param {string} selectedKey - 선택된 셀 키
- */
-function markSameValueCells(
-  highlights: Record<string, CellHighlight>,
-  board: SudokuBoard,
-  selectedValue: number,
-  selectedKey: string,
-) {
-  if (selectedValue === null) return;
-
-  for (let r = 0; r < BOARD_SIZE; r++) {
-    for (let c = 0; c < BOARD_SIZE; c++) {
-      const key = `${r}-${c}`;
-      if (key !== selectedKey && board[r][c].value === selectedValue) {
-        highlights[key].sameValue = true;
-      }
-    }
-  }
-}
-
 /**
  * @description 선택된 셀 기준으로 하이라이트 상태를 계산합니다
  * @param {SudokuBoard} board - 현재 스도쿠 보드
  * @param {number} row - 선택된 행
  * @param {number} col - 선택된 열
+ * @param {Record<string, CellHighlight>} previousHighlights - 이전 하이라이트 맵
  * @returns {Record<string, CellHighlight>} 계산된 하이라이트 객체
  */
-export function calculateHighlights(board: SudokuBoard, row: number, col: number) {
-  const newHighlights = createEmptyHighlights();
-  const selectedValue = board[row][col].value;
+export function calculateHighlights(
+  board: SudokuBoard,
+  row: number,
+  col: number,
+  previousHighlights?: Record<string, CellHighlight>,
+): Record<string, CellHighlight> {
   const selectedKey = `${row}-${col}`;
+  const selectedValue = board[row][col].value;
+  const blockRow = Math.floor(row / BLOCK_SIZE);
+  const blockCol = Math.floor(col / BLOCK_SIZE);
 
-  // 1. 선택된 셀 표시
-  newHighlights[selectedKey].selected = true;
+  const nextHighlights: Record<string, CellHighlight> = {};
 
-  // 2. 관련 셀들 표시 (행, 열, 블록)
-  markRelatedCells(newHighlights, row, col, selectedKey);
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    const currentBlockRow = Math.floor(r / BLOCK_SIZE);
 
-  // 3. 같은 값을 가진 셀들 표시
-  if (selectedValue !== null) {
-    markSameValueCells(newHighlights, board, selectedValue, selectedKey);
+    for (let c = 0; c < BOARD_SIZE; c++) {
+      const key = `${r}-${c}`;
+      const prevHighlight = previousHighlights?.[key];
+
+      const isSelected = key === selectedKey;
+      const isRelated =
+        !isSelected &&
+        (r === row ||
+          c === col ||
+          (currentBlockRow === blockRow && Math.floor(c / BLOCK_SIZE) === blockCol));
+      const hasSameValue =
+        !isSelected && selectedValue !== null && board[r][c].value === selectedValue;
+
+      if (
+        prevHighlight &&
+        prevHighlight.selected === isSelected &&
+        prevHighlight.related === isRelated &&
+        prevHighlight.sameValue === hasSameValue
+      ) {
+        nextHighlights[key] = prevHighlight;
+      } else {
+        nextHighlights[key] = {
+          selected: isSelected,
+          related: isRelated,
+          sameValue: hasSameValue,
+        };
+      }
+    }
   }
 
-  return newHighlights;
+  return nextHighlights;
+}
+
+export function clearHighlights(previousHighlights?: Record<string, CellHighlight>) {
+  const nextHighlights: Record<string, CellHighlight> = {};
+
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    for (let c = 0; c < BOARD_SIZE; c++) {
+      const key = `${r}-${c}`;
+      const prevHighlight = previousHighlights?.[key];
+
+      if (prevHighlight && !prevHighlight.selected && !prevHighlight.related && !prevHighlight.sameValue) {
+        nextHighlights[key] = prevHighlight;
+      } else {
+        nextHighlights[key] = {
+          selected: false,
+          related: false,
+          sameValue: false,
+        };
+      }
+    }
+  }
+
+  return nextHighlights;
 }
 
 /**
