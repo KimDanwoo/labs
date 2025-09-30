@@ -3,15 +3,15 @@ import { CellProps } from "@entities/cell/model/types";
 import { useSudokuStore } from "@features/game-controls/model/stores";
 import { KeyboardEvent, useCallback, useMemo } from "react";
 
+const EMPTY_HIGHLIGHT = { selected: false, related: false, sameValue: false } as const;
+
 export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
-  const highlightedCells = useSudokuStore((state) => state.highlightedCells);
   const gameMode = useSudokuStore((state) => state.gameMode);
   const isNoteMode = useSudokuStore((state) => state.isNoteMode);
   const timerActive = useSudokuStore((state) => state.timerActive);
 
   const cellKey = `${row}-${col}`;
-  const EMPTY_HIGHLIGHT = { selected: false, related: false, sameValue: false } as const;
-  const highlight = highlightedCells[cellKey] ?? EMPTY_HIGHLIGHT;
+  const highlight = useSudokuStore((state) => state.highlightedCells[cellKey] ?? EMPTY_HIGHLIGHT);
 
   // 메모화된 스타일 계산
   const borderStyles = useMemo(() => getCellBorderStyles(row, col), [row, col]);

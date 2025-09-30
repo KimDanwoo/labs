@@ -17,6 +17,7 @@ import {
 } from "@features/game-board/model/utils";
 import {
   calculateHighlights,
+  clearHighlights,
   canFillCell,
   checkGameCompletion,
   findEmptyCells,
@@ -138,7 +139,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
       resetUserInputs: () => {
         const { board } = get();
         const newBoard = resetUserInputsOptimized(board);
-        const emptyHighlights = createEmptyHighlights();
+        const emptyHighlights = clearHighlights(get().highlightedCells);
 
         set({
           board: newBoard,
@@ -192,13 +193,13 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
         const { board } = get();
         const { selectedCell } = get();
         if (!selectedCell) {
-          set({ highlightedCells: createEmptyHighlights() });
+          set({ highlightedCells: clearHighlights(get().highlightedCells) });
           return;
         }
 
         const newBoard = updateSingleCell(board, selectedCell.row, selectedCell.col, { isSelected: false });
 
-        set({ board: newBoard, selectedCell: null, highlightedCells: createEmptyHighlights() });
+        set({ board: newBoard, selectedCell: null, highlightedCells: clearHighlights(get().highlightedCells) });
       },
 
       toggleNote: (value) => {
@@ -300,7 +301,7 @@ export const useSudokuStore = create<SudokuState & SudokuActions>()(
 
       updateHighlights: (row, col) => {
         const { board } = get();
-        const newHighlights = calculateHighlights(board, row, col);
+        const newHighlights = calculateHighlights(board, row, col, get().highlightedCells);
         set({ highlightedCells: newHighlights });
       },
 
