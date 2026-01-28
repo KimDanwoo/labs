@@ -1,5 +1,4 @@
-import { GridPosition, Position, SudokuBoard } from "@entities/board/model/types";
-import { CellHighlight, SudokuCell } from "@entities/cell/model/types";
+import { GridPosition, Position, SudokuBoard, CellHighlight, SudokuCell } from "@entities/board/model/types";
 import { GAME_LEVEL, GAME_MODE } from "@entities/game/model/constants";
 
 export type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE];

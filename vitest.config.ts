@@ -11,11 +11,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@app": resolve(__dirname, "./src/app"),
+      "@apps": resolve(__dirname, "./src/apps"),
+      "@views": resolve(__dirname, "./src/views"),
       "@entities": resolve(__dirname, "./src/entities"),
       "@features": resolve(__dirname, "./src/features"),
       "@widgets": resolve(__dirname, "./src/widgets"),
-      "@views": resolve(__dirname, "./src/views"),
       "@shared": resolve(__dirname, "./src/shared"),
       "@test": resolve(__dirname, "./src/test"),
     },

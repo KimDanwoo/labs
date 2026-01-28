@@ -21,10 +21,10 @@
     "baseUrl": ".",
     "paths": {
       "@apps/*": ["./src/apps/*"],
+      "@views/*": ["./src/views/*"],
       "@entities/*": ["./src/entities/*"],
       "@features/*": ["./src/features/*"],
       "@widgets/*": ["./src/widgets/*"],
-      "@views/*": ["./src/views/*"],
       "@shared/*": ["./src/shared/*"],
       "@test/*": ["./src/test/*"]
     }
