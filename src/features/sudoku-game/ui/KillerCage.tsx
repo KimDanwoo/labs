@@ -11,13 +11,13 @@ interface CageSumLabelProps {
 
 const CageSumLabel = memo<CageSumLabelProps>(({ sum, x, y, fontSize }) => (
   <div
-    className="absolute font-medium text-blue-600 z-20"
+    className="absolute font-medium text-[rgb(var(--color-accent))] z-20"
     style={{
       top: `${y}px`,
       left: `${x}px`,
       fontSize,
       lineHeight: "1",
-      backgroundColor: "white",
+      backgroundColor: "rgb(var(--color-surface-primary))",
     }}
   >
     {sum}

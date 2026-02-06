@@ -38,7 +38,12 @@ export const SelectNumber: FC = () => {
   );
 
   return (
-    <div className="grid grid-cols-9 md:grid-cols-3 gap-1.5 sm:gap-2 md:gap-2.5 lg:gap-3 h-full place-content-center place-items-center">
+    <div
+      className={
+        "grid grid-cols-9 md:grid-cols-3 gap-1.5 sm:gap-2 md:gap-2.5 lg:gap-3 " +
+        "h-full place-content-center place-items-center"
+      }
+    >
       {KEY_NUMBER.map((num) => (
         <NumberButton
           key={num}

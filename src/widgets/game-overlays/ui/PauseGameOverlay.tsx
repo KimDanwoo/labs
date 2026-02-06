@@ -15,7 +15,7 @@ export const PauseGameOverlay: FC = () => {
       className={cn(
         "absolute inset-0 z-20",
         "flex items-center justify-center",
-        "bg-white/90 backdrop-blur-md rounded-2xl",
+        "bg-[rgb(var(--color-glass))]/[var(--overlay-opacity)] backdrop-blur-md rounded-2xl",
       )}
     >
       <button
@@ -29,16 +29,16 @@ export const PauseGameOverlay: FC = () => {
         <div
           className={cn(
             "w-20 h-20 rounded-full",
-            "bg-gradient-to-b from-blue-500 to-blue-600",
-            "shadow-[0_8px_32px_rgba(59,130,246,0.4)]",
+            "bg-gradient-to-b from-[rgb(var(--color-gradient-from))] to-[rgb(var(--color-gradient-to))]",
+            "shadow-[0_8px_32px_rgba(var(--color-gradient-from),0.4)]",
             "flex items-center justify-center",
             "transition-shadow duration-300",
-            "hover:shadow-[0_12px_40px_rgba(59,130,246,0.5)]",
+            "hover:shadow-[0_12px_40px_rgba(var(--color-gradient-from),0.5)]",
           )}
         >
           <VscPlay className="text-white text-3xl ml-1" />
         </div>
-        <span className="text-sm font-medium text-slate-500">탭하여 계속하기</span>
+        <span className="text-sm font-medium text-[rgb(var(--color-text-secondary))]">탭하여 계속하기</span>
       </button>
     </div>
   );

@@ -18,12 +18,14 @@ export interface SudokuState {
   selectedCell: Position | null;
   isCompleted: boolean;
   isSuccess: boolean;
+  isRecordSaved: boolean;
   currentTime: number;
   timerActive: boolean;
   difficulty: Difficulty;
   highlightedCells: Record<string, CellHighlight>;
   numberCounts: Record<number, number>;
   hintsRemaining: number;
+  mistakeCount: number;
   gameMode: GameMode;
   cages: KillerCage[];
 }

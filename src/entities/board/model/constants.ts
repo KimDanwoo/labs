@@ -14,7 +14,6 @@ export const BASE_GRID = [
   [6, 4, 2, 9, 7, 8, 5, 3, 1],
   [9, 7, 8, 5, 3, 1, 6, 4, 2],
 ];
-export const PHASE_1_RATIO = 0.7;
 export const MAX_REMOVAL_ATTEMPTS = 100;
 export const MIN_EXPERT_HINTS = 8;
 export const SUDOKU_CELL_COUNT = 81;

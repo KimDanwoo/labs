@@ -41,7 +41,6 @@ export { calculateNeighborScore } from "./calculate";
 export {
   removeRandomCellsWithStrategy,
   removeKillerCells,
-  forceRemoveAdditionalCells,
 } from "./remove";
 
 // Transformer

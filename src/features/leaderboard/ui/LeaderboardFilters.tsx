@@ -30,7 +30,7 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
     <div className="flex flex-wrap gap-4 mb-6">
       {/* Difficulty Filter */}
       <div className="flex-1 min-w-[140px]">
-        <label className="block text-xs font-medium text-slate-500 mb-1.5">난이도</label>
+        <label className="block text-xs font-medium text-[rgb(var(--color-text-secondary))] mb-1.5">난이도</label>
         <div className="flex flex-wrap gap-1.5">
           {difficulties.map((d) => (
             <button
@@ -40,8 +40,10 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
               className={cn(
                 "px-3 py-1.5 text-sm rounded-lg transition-all",
                 difficulty === d.value
-                  ? "bg-blue-500 text-white shadow-sm"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200",
+                  ? "bg-[rgb(var(--color-accent))] text-white shadow-sm"
+                  : "bg-[rgb(var(--color-bg-tertiary))]"
+                    + " text-[rgb(var(--color-text-secondary))]"
+                    + " hover:bg-[rgb(var(--color-hover))]",
               )}
             >
               {d.label}
@@ -52,7 +54,7 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
 
       {/* Game Mode Filter */}
       <div className="flex-1 min-w-[140px]">
-        <label className="block text-xs font-medium text-slate-500 mb-1.5">모드</label>
+        <label className="block text-xs font-medium text-[rgb(var(--color-text-secondary))] mb-1.5">모드</label>
         <div className="flex flex-wrap gap-1.5">
           {gameModes.map((m) => (
             <button
@@ -62,8 +64,10 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
               className={cn(
                 "px-3 py-1.5 text-sm rounded-lg transition-all",
                 gameMode === m.value
-                  ? "bg-blue-500 text-white shadow-sm"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200",
+                  ? "bg-[rgb(var(--color-accent))] text-white shadow-sm"
+                  : "bg-[rgb(var(--color-bg-tertiary))]"
+                    + " text-[rgb(var(--color-text-secondary))]"
+                    + " hover:bg-[rgb(var(--color-hover))]",
               )}
             >
               {m.label}

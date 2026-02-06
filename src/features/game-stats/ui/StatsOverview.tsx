@@ -14,14 +14,19 @@ interface StatCardProps {
 }
 
 const colorStyles = {
-  blue: "bg-blue-50 text-blue-600",
-  emerald: "bg-emerald-50 text-emerald-600",
-  amber: "bg-amber-50 text-amber-600",
-  rose: "bg-rose-50 text-rose-600",
+  blue: "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
+  emerald: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400",
+  amber: "bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400",
+  rose: "bg-rose-50 text-rose-600 dark:bg-rose-950 dark:text-rose-400",
 };
 
 const StatCard = memo<StatCardProps>(({ label, value, icon, color }) => (
-  <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
+  <div
+    className={cn(
+      "bg-[rgb(var(--color-surface-primary))] rounded-xl p-4",
+      "shadow-sm border border-[rgb(var(--color-border-light))]",
+    )}
+  >
     <div
       className={cn(
         "w-10 h-10 rounded-lg flex items-center justify-center mb-3",
@@ -30,8 +35,8 @@ const StatCard = memo<StatCardProps>(({ label, value, icon, color }) => (
     >
       {icon}
     </div>
-    <p className="text-2xl font-bold text-slate-800 font-tabular">{value}</p>
-    <p className="text-sm text-slate-500 mt-0.5">{label}</p>
+    <p className="text-2xl font-bold text-[rgb(var(--color-text-primary))] font-tabular">{value}</p>
+    <p className="text-sm text-[rgb(var(--color-text-secondary))] mt-0.5">{label}</p>
   </div>
 ));
 

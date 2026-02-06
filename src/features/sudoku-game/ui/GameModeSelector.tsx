@@ -13,7 +13,7 @@ export const GameModeSelector: React.FC = memo(() => {
   const switchGameMode = useSudokuStore((state) => state.switchGameMode);
 
   return (
-    <div className="flex items-center gap-1 p-1 bg-slate-100/80 rounded-xl backdrop-blur-sm">
+    <div className="flex items-center gap-1 p-1 bg-[rgb(var(--color-bg-tertiary))]/80 rounded-xl backdrop-blur-sm">
       {gameModes.map(({ value, label }) => {
         const isActive = gameMode === value;
         return (
@@ -24,8 +24,8 @@ export const GameModeSelector: React.FC = memo(() => {
               "px-4 py-1.5 rounded-lg text-sm font-medium",
               "transition-all duration-200 ease-out",
               isActive
-                ? "bg-white text-slate-800 shadow-sm"
-                : "text-slate-500 hover:text-slate-700",
+                ? "bg-[rgb(var(--color-surface-primary))] text-[rgb(var(--color-text-primary))] shadow-sm"
+                : "text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))]",
             )}
           >
             {label}

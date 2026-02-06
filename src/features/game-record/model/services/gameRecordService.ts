@@ -30,7 +30,6 @@ export async function getUserRecords(
   const q = query(
     collection(db, COLLECTION_NAME),
     where("userId", "==", userId),
-    where("isSuccess", "==", true),
     orderBy("createdAt", "desc"),
     limit(recordLimit),
   );

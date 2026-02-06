@@ -3,6 +3,7 @@
 import { useAuthStore } from "@features/auth/model/stores/authStore";
 import { useLeaderboard } from "@features/leaderboard/model/hooks/useLeaderboard";
 import { LeaderboardFilters, LeaderboardTable } from "@features/leaderboard/ui";
+import { ThemeToggle } from "@features/theme/ui/ThemeToggle";
 import { cn } from "@shared/model/utils";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -25,18 +26,36 @@ export const LeaderboardPage = () => {
   const { records, isLoading, error } = useLeaderboard(options);
 
   return (
-    <main className="min-h-svh bg-[#f8fafc]">
+    <main className="min-h-svh bg-[rgb(var(--color-surface-secondary))]">
       {/* Header */}
-      <header className="sticky top-0 z-30 backdrop-blur-xl bg-white/70 border-b border-slate-200/50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+      <header
+        className={
+          "sticky top-0 z-30 backdrop-blur-xl " +
+          "bg-[rgb(var(--color-glass))]/[var(--glass-opacity)] " +
+          "border-b border-[rgb(var(--color-border-light))]/50"
+        }
+      >
+        <div
+          className={
+            "max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-3 " +
+            "flex items-center justify-between"
+          }
+        >
           <Link
             href="/"
             className={cn(
-              "flex items-center gap-2 text-slate-600 hover:text-slate-800",
+              "flex items-center gap-2",
+              "text-[rgb(var(--color-text-secondary))]",
+              "hover:text-[rgb(var(--color-text-primary))]",
               "transition-colors",
             )}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -47,14 +66,14 @@ export const LeaderboardPage = () => {
             <span className="text-sm font-medium">게임으로</span>
           </Link>
 
-          <h1 className="text-lg font-bold text-slate-800">랭킹</h1>
+          <h1 className="text-lg font-bold text-[rgb(var(--color-text-primary))]">랭킹</h1>
 
-          <div className="w-20" />
+          <ThemeToggle />
         </div>
       </header>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+      <div className="max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-6">
         {/* Filters */}
         <LeaderboardFilters
           difficulty={difficulty}
@@ -64,9 +83,16 @@ export const LeaderboardPage = () => {
         />
 
         {/* Leaderboard Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/50 overflow-hidden">
+        <div
+          className={
+            "bg-[rgb(var(--color-surface-primary))] " +
+            "rounded-2xl shadow-sm " +
+            "border border-[rgb(var(--color-border-light))]/50 " +
+            "overflow-hidden"
+          }
+        >
           {error ? (
-            <div className="text-center py-12 text-rose-500">
+            <div className="text-center py-12 text-[rgb(var(--color-error))]">
               <p>데이터를 불러오는데 실패했습니다.</p>
               <p className="text-sm mt-1">{error.message}</p>
             </div>

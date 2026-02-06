@@ -10,9 +10,9 @@ import { memo } from "react";
 const RankBadge = memo<{ rank: number }>(({ rank }) => {
   if (rank <= 3) {
     const colors = {
-      1: "from-amber-400 to-yellow-500 text-white shadow-amber-200",
-      2: "from-slate-300 to-slate-400 text-white shadow-slate-200",
-      3: "from-orange-300 to-orange-400 text-white shadow-orange-200",
+      1: "from-amber-400 to-yellow-500 text-white shadow-amber-200 dark:shadow-amber-800",
+      2: "from-slate-300 to-slate-400 text-white shadow-slate-200 dark:shadow-slate-700",
+      3: "from-orange-300 to-orange-400 text-white shadow-orange-200 dark:shadow-orange-800",
     };
 
     return (
@@ -29,7 +29,12 @@ const RankBadge = memo<{ rank: number }>(({ rank }) => {
   }
 
   return (
-    <div className="w-7 h-7 flex items-center justify-center text-sm font-medium text-slate-500">
+    <div
+      className={cn(
+        "w-7 h-7 flex items-center justify-center",
+        "text-sm font-medium text-[rgb(var(--color-text-secondary))]",
+      )}
+    >
       {rank}
     </div>
   );
@@ -48,14 +53,19 @@ export const LeaderboardTable = memo<LeaderboardTableProps>(
     if (isLoading) {
       return (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full" />
+          <div
+            className={cn(
+              "animate-spin w-8 h-8 border-3",
+              "border-[rgb(var(--color-accent))] border-t-transparent rounded-full",
+            )}
+          />
         </div>
       );
     }
 
     if (records.length === 0) {
       return (
-        <div className="text-center py-12 text-slate-500">
+        <div className="text-center py-12 text-[rgb(var(--color-text-secondary))]">
           <p>아직 기록이 없습니다.</p>
           <p className="text-sm mt-1">첫 번째 기록을 남겨보세요!</p>
         </div>
@@ -66,7 +76,12 @@ export const LeaderboardTable = memo<LeaderboardTableProps>(
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="text-left text-xs text-slate-500 border-b border-slate-200">
+            <tr
+              className={cn(
+                "text-left text-xs text-[rgb(var(--color-text-secondary))]",
+                "border-b border-[rgb(var(--color-border-light))]",
+              )}
+            >
               <th className="pb-3 pl-3 font-medium">순위</th>
               <th className="pb-3 font-medium">플레이어</th>
               <th className="pb-3 font-medium">점수</th>
@@ -87,8 +102,8 @@ export const LeaderboardTable = memo<LeaderboardTableProps>(
                 <tr
                   key={record.id}
                   className={cn(
-                    "border-b border-slate-100 hover:bg-slate-50 transition-colors",
-                    isCurrentUser && "bg-blue-50 hover:bg-blue-100",
+                    "border-b border-[rgb(var(--color-divider))] hover:bg-[rgb(var(--color-hover))] transition-colors",
+                    isCurrentUser && "bg-[rgb(var(--color-accent-light))] hover:bg-[rgb(var(--color-accent-light))]",
                   )}
                 >
                   {/* Rank */}
@@ -108,8 +123,9 @@ export const LeaderboardTable = memo<LeaderboardTableProps>(
                       ) : (
                         <div
                           className={cn(
-                            "w-8 h-8 rounded-full bg-slate-200",
-                            "flex items-center justify-center text-slate-500 text-sm font-medium",
+                            "w-8 h-8 rounded-full bg-[rgb(var(--color-bg-tertiary))]",
+                            "flex items-center justify-center",
+                            "text-[rgb(var(--color-text-secondary))] text-sm font-medium",
                           )}
                         >
                           {record.userDisplayName?.charAt(0) || "?"}
@@ -118,12 +134,12 @@ export const LeaderboardTable = memo<LeaderboardTableProps>(
                       <span
                         className={cn(
                           "font-medium truncate max-w-[120px]",
-                          isCurrentUser ? "text-blue-600" : "text-slate-700",
+                          isCurrentUser ? "text-[rgb(var(--color-accent))]" : "text-[rgb(var(--color-text-primary))]",
                         )}
                       >
                         {record.userDisplayName}
                         {isCurrentUser && (
-                          <span className="ml-1 text-xs text-blue-500">(나)</span>
+                          <span className="ml-1 text-xs text-[rgb(var(--color-accent))]">(나)</span>
                         )}
                       </span>
                     </div>
@@ -131,21 +147,21 @@ export const LeaderboardTable = memo<LeaderboardTableProps>(
 
                   {/* Score */}
                   <td className="py-3">
-                    <span className="font-bold font-tabular text-slate-800">
+                    <span className="font-bold font-tabular text-[rgb(var(--color-text-primary))]">
                       {formatScore(record.score)}
                     </span>
                   </td>
 
                   {/* Time */}
                   <td className="py-3 hidden sm:table-cell">
-                    <span className="font-mono text-slate-600 font-tabular">
+                    <span className="font-mono text-[rgb(var(--color-text-secondary))] font-tabular">
                       {formatTime(record.completionTime)}
                     </span>
                   </td>
 
                   {/* Difficulty */}
                   <td className="py-3 hidden md:table-cell">
-                    <span className="text-sm text-slate-600">{difficultyLabel}</span>
+                    <span className="text-sm text-[rgb(var(--color-text-secondary))]">{difficultyLabel}</span>
                   </td>
 
                   {/* Mode */}
@@ -154,8 +170,8 @@ export const LeaderboardTable = memo<LeaderboardTableProps>(
                       className={cn(
                         "text-xs px-2 py-0.5 rounded-full",
                         record.gameMode === GAME_MODE.KILLER
-                          ? "bg-rose-100 text-rose-600"
-                          : "bg-slate-100 text-slate-600",
+                          ? "bg-[rgb(var(--color-error-bg))] text-[rgb(var(--color-error-text))]"
+                          : "bg-[rgb(var(--color-bg-tertiary))] text-[rgb(var(--color-text-secondary))]",
                       )}
                     >
                       {record.gameMode === GAME_MODE.KILLER ? "킬러" : "클래식"}

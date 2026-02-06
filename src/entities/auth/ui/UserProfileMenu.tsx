@@ -20,11 +20,11 @@ export const UserProfileMenu = memo(() => {
         className={cn(
           "flex items-center gap-2 px-2 py-1.5 rounded-xl",
           "transition-all duration-150 ease-out",
-          "hover:bg-[rgb(245,245,247)]",
+          "hover:bg-[rgb(var(--color-hover))]",
           "active:scale-95",
         )}
       >
-        <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-white shadow-sm">
+        <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-[rgb(var(--color-surface-primary))] shadow-sm">
           <Image
             src={user.photoURL || ""}
             alt="Profile"
@@ -33,7 +33,7 @@ export const UserProfileMenu = memo(() => {
             className="object-cover"
           />
         </div>
-        <span className="text-sm font-medium text-[rgb(28,28,30)] hidden sm:inline">
+        <span className="text-sm font-medium text-[rgb(var(--color-text-primary))] hidden sm:inline">
           {user.displayName}
         </span>
       </button>
@@ -44,18 +44,18 @@ export const UserProfileMenu = memo(() => {
           className={cn(
             "absolute right-0 top-full mt-2",
             "min-w-[160px] p-1",
-            "bg-white rounded-xl",
-            "shadow-[0_4px_20px_rgba(0,0,0,0.12)]",
-            "border border-[rgb(229,229,234)]",
+            "bg-[rgb(var(--color-surface-primary))] rounded-xl",
+            "shadow-[0_4px_20px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]",
+            "border border-[rgb(var(--color-border-light))]",
             "z-50",
           )}
         >
           {/* User Info */}
-          <div className="px-3 py-2 border-b border-[rgb(229,229,234)]">
-            <p className="text-sm font-medium text-[rgb(28,28,30)]">
+          <div className="px-3 py-2 border-b border-[rgb(var(--color-border-light))]">
+            <p className="text-sm font-medium text-[rgb(var(--color-text-primary))]">
               {user.displayName}
             </p>
-            <p className="text-xs text-[rgb(142,142,147)] truncate">
+            <p className="text-xs text-[rgb(var(--color-text-tertiary))] truncate">
               {user.email}
             </p>
           </div>
@@ -67,10 +67,10 @@ export const UserProfileMenu = memo(() => {
               onClick={() => setIsOpen(false)}
               className={cn(
                 "block w-full px-3 py-2 text-left",
-                "text-sm text-[rgb(28,28,30)]",
+                "text-sm text-[rgb(var(--color-text-primary))]",
                 "rounded-lg",
                 "transition-colors duration-150",
-                "hover:bg-[rgb(245,245,247)]",
+                "hover:bg-[rgb(var(--color-hover))]",
               )}
             >
               랭킹
@@ -80,10 +80,10 @@ export const UserProfileMenu = memo(() => {
               onClick={() => setIsOpen(false)}
               className={cn(
                 "block w-full px-3 py-2 text-left",
-                "text-sm text-[rgb(28,28,30)]",
+                "text-sm text-[rgb(var(--color-text-primary))]",
                 "rounded-lg",
                 "transition-colors duration-150",
-                "hover:bg-[rgb(245,245,247)]",
+                "hover:bg-[rgb(var(--color-hover))]",
               )}
             >
               프로필
@@ -92,10 +92,10 @@ export const UserProfileMenu = memo(() => {
               onClick={signOut}
               className={cn(
                 "w-full px-3 py-2 text-left",
-                "text-sm text-[rgb(255,59,48)]",
+                "text-sm text-[rgb(var(--color-error-text))]",
                 "rounded-lg",
                 "transition-colors duration-150",
-                "hover:bg-[rgb(255,59,48)]/10",
+                "hover:bg-[rgb(var(--color-error-text))]/10",
               )}
             >
               로그아웃

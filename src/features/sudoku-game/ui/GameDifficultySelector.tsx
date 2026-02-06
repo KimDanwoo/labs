@@ -27,13 +27,13 @@ const SelectSelector = () => {
       onChange={(e) => initializeGame(e.target.value as Difficulty)}
       className={cn(
         "px-3 py-1.5 pr-8",
-        "bg-slate-100/80 backdrop-blur-sm",
+        "bg-[rgb(var(--color-bg-tertiary))]/80 backdrop-blur-sm",
         "border-none rounded-lg",
-        "text-sm font-medium text-slate-700",
+        "text-sm font-medium text-[rgb(var(--color-text-primary))]",
         "cursor-pointer",
         "transition-all duration-200 ease-out",
-        "hover:bg-slate-200/80",
-        "focus:outline-none focus:ring-2 focus:ring-blue-500/40",
+        "hover:bg-[rgb(var(--color-bg-tertiary))]",
+        "focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/40",
         "appearance-none",
         "bg-no-repeat",
       )}
@@ -57,7 +57,7 @@ const ListSelector = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+      <h4 className="text-[11px] font-semibold text-[rgb(var(--color-text-tertiary))] uppercase tracking-wider mb-1">
         새 게임
       </h4>
       <div className="flex flex-wrap gap-2">
@@ -73,9 +73,18 @@ const ListSelector = () => {
                 "transition-all duration-200 ease-out",
                 "active:scale-95",
                 isActive
-                  ? "bg-gradient-to-b from-blue-500 to-blue-600 text-white shadow-[0_4px_12px_rgba(59,130,246,0.3)]"
-                  : "bg-white/80 text-slate-600 shadow-sm",
-                !isActive && "hover:bg-white hover:text-slate-800 hover:shadow-md",
+                  ? "bg-gradient-to-b" +
+                    " from-[rgb(var(--color-gradient-from))]" +
+                    " to-[rgb(var(--color-gradient-to))]" +
+                    " text-white" +
+                    " shadow-[0_4px_12px_rgba(var(--color-gradient-from),0.3)]"
+                  : "bg-[rgb(var(--color-surface-primary))]/80" +
+                    " text-[rgb(var(--color-text-secondary))]" +
+                    " shadow-sm",
+                !isActive &&
+                  "hover:bg-[rgb(var(--color-surface-primary))]" +
+                  " hover:text-[rgb(var(--color-text-primary))]" +
+                  " hover:shadow-md",
               )}
             >
               {option.label}

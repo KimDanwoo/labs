@@ -1,4 +1,5 @@
 import { AuthProvider } from "@apps/providers/AuthProvider";
+import { ThemeProvider } from "@apps/providers/ThemeProvider";
 import type { Metadata } from "next";
 import { Rubik, Space_Mono } from "next/font/google";
 import { ReactNode } from "react";
@@ -29,9 +30,25 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{" +
+              "var s=JSON.parse(localStorage.getItem('awesome-sudoku-theme')||'{}');" +
+              "var t=(s.state&&s.state.theme)||'system';" +
+              "var d=t==='dark'||(t==='system'&&window.matchMedia(" +
+              "'(prefers-color-scheme: dark)').matches);" +
+              "if(d)document.documentElement.classList.add('dark')" +
+              "}catch(e){}})();",
+          }}
+        />
+      </head>
       <body className={`${rubik.variable} ${spaceMono.variable} antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
