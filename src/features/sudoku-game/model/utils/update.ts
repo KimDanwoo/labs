@@ -5,7 +5,6 @@ import { GameCompletionResult, GameMode, KillerCage } from "@entities/game/model
 import {
   checkConflicts,
   isBoardComplete,
-  isBoardCorrect,
   isKillerBoardComplete,
   validateKillerCages,
 } from "@features/sudoku-game/model/utils/validator";
@@ -95,6 +94,7 @@ export function resetUserInputs(board: SudokuBoard): SudokuBoard {
         notes: [],
         isConflict: false,
         isSelected: false,
+        isHint: false,
       };
     }),
   );
@@ -269,7 +269,8 @@ export function checkGameCompletion(
     completed = isBoardComplete(board);
   }
 
-  const success = completed && isBoardCorrect(board, solution);
+  // 유일해가 보장된 퍼즐에서 충돌 없이 모두 채워짐 = 정답
+  const success = completed;
 
   return {
     completed,

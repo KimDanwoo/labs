@@ -10,6 +10,7 @@ export interface GameRecord {
   difficulty: Difficulty;
   completionTime: number;
   hintsUsed: number;
+  mistakesCount: number;
   score: number;
   isSuccess: boolean;
   createdAt: Timestamp;
@@ -17,9 +18,9 @@ export interface GameRecord {
 
 export interface ScoreBreakdown {
   baseScore: number;
-  timeBonus: number;
   timePenalty: number;
   hintPenalty: number;
+  mistakePenalty: number;
   killerBonus: number;
   totalScore: number;
 }
@@ -29,4 +30,5 @@ export interface ScoreInput {
   gameMode: GameMode;
   completionTime: number;
   hintsUsed: number;
+  mistakeCount: number;
 }

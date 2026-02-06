@@ -1,42 +1,54 @@
 import {
-  BASE_SCORES,
-  HINT_PENALTY,
-  KILLER_MODE_MULTIPLIER,
+  HINT_PENALTIES,
+  KILLER_MODE_BONUS,
+  MAX_SCORE,
   MIN_SCORE,
-  TIME_BONUS_PER_SECOND,
-  TIME_PENALTY_PER_SECOND,
+  MISTAKE_PENALTIES,
+  TIME_ALLOWANCES,
+  TIME_PENALTY_RATES,
 } from "@entities/game-record/model/constants";
-import { ScoreBreakdown, ScoreInput } from "@entities/game-record/model/types";
-import { TARGET_TIMES, GAME_MODE } from "@entities/game/model/constants";
+import {
+  ScoreBreakdown, ScoreInput,
+} from "@entities/game-record/model/types";
+import { GAME_MODE } from "@entities/game/model/constants";
 
-export function calculateScore(input: ScoreInput): ScoreBreakdown {
-  const { difficulty, gameMode, completionTime, hintsUsed } = input;
+export function calculateScore(
+  input: ScoreInput,
+): ScoreBreakdown {
+  const {
+    difficulty, gameMode,
+    completionTime, hintsUsed, mistakeCount,
+  } = input;
 
-  const baseScore = BASE_SCORES[difficulty];
-  const targetTime = TARGET_TIMES[difficulty];
+  const baseScore = MAX_SCORE;
+  const timeAllowance = TIME_ALLOWANCES[difficulty];
+  const overtime = Math.max(0, completionTime - timeAllowance);
 
-  const timeDiff = targetTime - completionTime;
-  const timeBonus = timeDiff > 0 ? timeDiff * TIME_BONUS_PER_SECOND : 0;
-  const timePenalty = timeDiff < 0 ? Math.abs(timeDiff) * TIME_PENALTY_PER_SECOND : 0;
-
-  const hintPenalty = hintsUsed * HINT_PENALTY;
+  const timePenalty = overtime * TIME_PENALTY_RATES[difficulty];
+  const hintPenalty = hintsUsed * HINT_PENALTIES[difficulty];
+  const mistakePenalty = mistakeCount
+    * MISTAKE_PENALTIES[difficulty];
 
   const isKillerMode = gameMode === GAME_MODE.KILLER;
-  const subtotal = baseScore + timeBonus - timePenalty - hintPenalty;
-  const killerBonus = isKillerMode ? Math.round(subtotal * (KILLER_MODE_MULTIPLIER - 1)) : 0;
+  const killerBonus = isKillerMode ? KILLER_MODE_BONUS : 0;
 
-  const totalScore = Math.max(MIN_SCORE, subtotal + killerBonus);
+  const raw = baseScore - timePenalty - hintPenalty
+    - mistakePenalty + killerBonus;
+  const totalScore = Math.round(
+    Math.max(MIN_SCORE, Math.min(MAX_SCORE, raw)),
+  );
 
   return {
     baseScore,
-    timeBonus,
-    timePenalty,
-    hintPenalty,
+    timePenalty: Math.round(timePenalty * 10) / 10,
+    hintPenalty: Math.round(hintPenalty * 10) / 10,
+    mistakePenalty: Math.round(mistakePenalty * 10) / 10,
     killerBonus,
     totalScore,
   };
 }
 
 export function formatScore(score: number): string {
-  return score.toLocaleString("ko-KR");
+  if (Number.isInteger(score)) return score.toString();
+  return score.toFixed(1);
 }

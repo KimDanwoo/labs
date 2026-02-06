@@ -13,7 +13,7 @@ import { applyTransformations } from "./transformer";
 import { createEmptyGrid, shuffleArray } from "./common";
 import { isValidPlacement, validateAllCages, validateBaseGrid, validateCages } from "./validator";
 import { calculateNeighborScore } from "./calculate";
-import { forceRemoveAdditionalCells, removeKillerCells, removeRandomCellsWithStrategy } from "./remove";
+import { removeKillerCells, removeRandomCellsWithStrategy } from "./remove";
 
 /**
  * @description 백트래킹을 이용한 스도쿠 생성
@@ -82,6 +82,7 @@ function createInitialBoard(solution: Grid): SudokuBoard {
       isInitial: true,
       isSelected: false,
       isConflict: false,
+      isHint: false,
       notes: [],
     })),
   );
@@ -99,11 +100,7 @@ export function generateBoard(solution: Grid, difficulty: Difficulty): SudokuBoa
   const targetHints = min + Math.floor(Math.random() * (max - min + 1));
   const targetRemove = SUDOKU_CELL_COUNT - targetHints;
 
-  const removed = removeRandomCellsWithStrategy(board, targetRemove, difficulty);
-
-  if (removed < targetRemove - 5) {
-    forceRemoveAdditionalCells(board, targetRemove - removed);
-  }
+  removeRandomCellsWithStrategy(board, solution, targetRemove, difficulty);
 
   return board;
 }

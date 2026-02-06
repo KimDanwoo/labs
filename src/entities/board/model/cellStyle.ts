@@ -14,19 +14,25 @@ export function getCellBorderStyles(row: number, col: number) {
 /**
  * 셀 하이라이트 스타일을 반환 - Jonathan Ive inspired
  */
-export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boolean) {
+export function getCellHighlightStyles(
+  highlight: CellHighlight,
+  isConflict: boolean,
+  isHint: boolean,
+) {
   return {
     bgColor: cn(
-      "bg-white",
-      highlight.related && "bg-[rgb(245,248,255)]",
-      highlight.sameValue && "bg-[rgb(220,235,255)]",
-      highlight.selected && "bg-[rgb(200,225,255)]",
+      "bg-[rgb(var(--color-surface-primary))]",
+      highlight.related && "bg-[rgb(var(--color-cell-related))]",
+      highlight.sameValue && "bg-[rgb(var(--color-cell-selected))]",
+      highlight.selected && "bg-[rgb(var(--color-cell-selected))]",
     ),
     textColor: cn(
-      "text-[rgb(28,28,30)]",
-      isConflict && "text-[rgb(255,59,48)] animate-subtle-pulse",
+      "text-[rgb(var(--color-text-primary))]",
+      isHint && "text-[rgb(var(--color-hint-text))]",
+      isConflict
+        && "text-[rgb(var(--color-error-text))] animate-subtle-pulse",
     ),
-    borderColor: "border-[rgb(229,229,234)]",
+    borderColor: "border-[rgb(var(--color-border-light))]",
   };
 }
 
@@ -64,9 +70,9 @@ export function buildCellClassName(
     // Typography
     isInitial ? "font-semibold" : "font-normal",
     // Block borders - subtle but visible
-    isRightBlockBorder && "border-r-[1.5px] border-r-[rgb(199,199,204)]",
-    isBottomBlockBorder && "border-b-[1.5px] border-b-[rgb(199,199,204)]",
+    isRightBlockBorder && "border-r-[1.5px] border-r-[rgb(var(--color-text-tertiary))]",
+    isBottomBlockBorder && "border-b-[1.5px] border-b-[rgb(var(--color-text-tertiary))]",
     // Hover effect
-    "hover:bg-[rgb(245,248,255)]",
+    "hover:bg-[rgb(var(--color-cell-related))]",
   );
 }

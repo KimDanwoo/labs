@@ -45,6 +45,7 @@ export function createEmptyBoard(): SudokuBoard {
           isInitial: false,
           isSelected: false,
           isConflict: false,
+          isHint: false,
           notes: [],
         })),
     );
