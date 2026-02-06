@@ -7,18 +7,18 @@ import { VscPlay } from "react-icons/vsc";
 
 const getButtonStyles = (isCompleted: boolean, timerActive: boolean) => {
   if (isCompleted) {
-    return "bg-slate-100 text-slate-400 cursor-not-allowed";
+    return "bg-[rgb(var(--color-bg-tertiary))] text-[rgb(var(--color-text-tertiary))] cursor-not-allowed";
   }
   if (timerActive) {
     return [
-      "bg-white/80 text-slate-500 shadow-sm",
-      "hover:bg-white hover:text-slate-700 active:scale-95",
+      "bg-[rgb(var(--color-surface-primary))]/80 text-[rgb(var(--color-text-secondary))] shadow-sm",
+      "hover:bg-[rgb(var(--color-surface-primary))] hover:text-[rgb(var(--color-text-primary))] active:scale-95",
     ].join(" ");
   }
   return [
-    "bg-gradient-to-b from-blue-500 to-blue-600 text-white",
-    "shadow-[0_4px_12px_rgba(59,130,246,0.3)]",
-    "hover:shadow-[0_6px_16px_rgba(59,130,246,0.4)] active:scale-95",
+    "bg-gradient-to-b from-[rgb(var(--color-gradient-from))] to-[rgb(var(--color-gradient-to))] text-white",
+    "shadow-[0_4px_12px_rgba(var(--color-gradient-from),0.3)]",
+    "hover:shadow-[0_6px_16px_rgba(var(--color-gradient-from),0.4)] active:scale-95",
   ].join(" ");
 };
 
@@ -61,9 +61,9 @@ export const TimerControl = memo(() => {
       <div
         className={cn(
           "px-3 py-1.5 rounded-lg",
-          "bg-slate-100/80 backdrop-blur-sm",
+          "bg-[rgb(var(--color-bg-tertiary))]/80 backdrop-blur-sm",
           "text-base font-mono font-semibold tracking-wide",
-          "text-slate-700",
+          "text-[rgb(var(--color-text-primary))]",
           "font-tabular",
         )}
       >
@@ -76,7 +76,7 @@ export const TimerControl = memo(() => {
           "w-8 h-8 rounded-full",
           "flex items-center justify-center",
           "transition-all duration-200 ease-out",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40",
           buttonStyles,
         )}
         disabled={isCompleted}

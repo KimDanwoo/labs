@@ -18,8 +18,15 @@ export const createCellValueActions: SudokuStoreActionCreator<
     if (!canFillCell(selectedCell, board)) return;
 
     const { row, col } = selectedCell!;
+
+    if (value !== null && solution[row][col] !== value) {
+      set({ mistakeCount: get().mistakeCount + 1 });
+    }
+
     const updatedBoard = updateCellValue(board, row, col, value);
-    const { result } = resolveBoardState(updatedBoard, solution, gameMode, cages);
+    const { result } = resolveBoardState(
+      updatedBoard, solution, gameMode, cages,
+    );
 
     set(buildGameResultState(result));
 
@@ -67,9 +74,11 @@ export const createCellValueActions: SudokuStoreActionCreator<
       board: newBoard,
       highlightedCells: emptyHighlights,
       hintsRemaining: HINTS_REMAINING,
+      mistakeCount: 0,
       currentTime: 0,
       isCompleted: false,
       isSuccess: false,
+      isRecordSaved: false,
     });
 
     get().toggleTimer(true);

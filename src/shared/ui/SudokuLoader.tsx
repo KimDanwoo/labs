@@ -36,7 +36,10 @@ export const SudokuLoader = memo<SudokuLoaderProps>(({ size = "md", className })
           width: config.grid,
           height: config.grid,
           gap: config.gap,
-          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+          background:
+            "linear-gradient(135deg," +
+            " rgb(var(--color-surface-secondary)) 0%," +
+            " rgb(var(--color-bg-tertiary)) 100%)",
           padding: config.gap,
         }}
       >
@@ -45,8 +48,8 @@ export const SudokuLoader = memo<SudokuLoaderProps>(({ size = "md", className })
             key={num}
             className={cn(
               "flex items-center justify-center",
-              "bg-white rounded-sm",
-              "font-bold text-blue-600",
+              "bg-[rgb(var(--color-surface-primary))] rounded-sm",
+              "font-bold text-[rgb(var(--color-accent))]",
               config.text,
             )}
             style={{
@@ -63,8 +66,8 @@ export const SudokuLoader = memo<SudokuLoaderProps>(({ size = "md", className })
           className="absolute inset-0 pointer-events-none"
           style={{
             backgroundImage: `
-              linear-gradient(to right, rgba(59, 130, 246, 0.3) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(59, 130, 246, 0.3) 1px, transparent 1px)
+              linear-gradient(to right, rgba(var(--color-accent), 0.3) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(var(--color-accent), 0.3) 1px, transparent 1px)
             `,
             backgroundSize: `${config.grid / 3}px ${config.grid / 3}px`,
           }}

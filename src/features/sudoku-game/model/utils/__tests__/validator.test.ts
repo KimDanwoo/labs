@@ -27,6 +27,7 @@ describe("validator.ts 테스트", () => {
     isInitial,
     isSelected: false,
     isConflict,
+    isHint: false,
     notes: [],
   });
 

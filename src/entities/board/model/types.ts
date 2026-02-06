@@ -1,11 +1,10 @@
-import { Difficulty } from "@entities/game/model/types";
-
 // Cell types (merged from entities/cell)
 export interface SudokuCell {
   value: number | null;
   isInitial: boolean;
   isSelected: boolean;
   isConflict: boolean;
+  isHint: boolean;
   notes: number[];
 }
 
@@ -48,11 +47,4 @@ export interface RemovalStrategy {
 export interface CellPriority {
   pos: GridPosition;
   priority: number;
-}
-
-export interface RemovalContext {
-  board: SudokuBoard;
-  tempGrid: (number | null)[][];
-  targetRemove: number;
-  difficulty: Difficulty;
 }

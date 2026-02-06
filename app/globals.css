@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Jonathan Ive Design System */
 
@@ -41,6 +43,105 @@
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Surface Colors */
+  --color-surface-primary: 255, 255, 255;
+  --color-surface-secondary: 248, 250, 252;
+  --color-surface-tertiary: 241, 245, 249;
+  --color-surface-elevated: 255, 255, 255;
+
+  /* Glass / Overlay */
+  --color-glass: 255, 255, 255;
+  --glass-opacity: 0.7;
+  --overlay-opacity: 0.9;
+
+  /* Interactive States */
+  --color-hover: 248, 250, 252;
+  --color-active: 241, 245, 249;
+
+  /* Gradient Endpoints */
+  --color-gradient-from: 59, 130, 246;
+  --color-gradient-to: 99, 102, 241;
+
+  /* Status Backgrounds */
+  --color-error-bg: 254, 226, 226;
+  --color-error-text: 225, 29, 72;
+  --color-success-bg: 209, 250, 229;
+  --color-success-text: 5, 150, 105;
+
+  /* Hint */
+  --color-hint-text: 16, 185, 129;
+
+  /* Dividers */
+  --color-divider: 241, 245, 249;
+}
+
+.dark {
+  /* Primary Palette - Apple dark mode */
+  --color-bg-primary: 22, 22, 24;
+  --color-bg-secondary: 28, 28, 30;
+  --color-bg-tertiary: 36, 36, 38;
+
+  /* Text */
+  --color-text-primary: 242, 242, 247;
+  --color-text-secondary: 174, 174, 178;
+  --color-text-tertiary: 124, 124, 128;
+
+  /* Accent - slightly brighter for dark readability */
+  --color-accent: 10, 132, 255;
+  --color-accent-light: 20, 40, 70;
+  --color-accent-soft: 15, 25, 50;
+
+  /* Cell Highlights - improved contrast */
+  --color-cell-selected: 30, 60, 110;
+  --color-cell-related: 38, 40, 58;
+  --color-cell-same-value: 28, 55, 100;
+
+  /* Borders */
+  --color-border-light: 48, 48, 52;
+  --color-border-medium: 62, 62, 66;
+  --color-border-strong: 174, 174, 178;
+
+  /* Shadows - deeper in dark mode */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+  /* Status */
+  --color-error: 255, 69, 58;
+  --color-success: 48, 209, 88;
+
+  /* Surfaces */
+  --color-surface-primary: 28, 28, 30;
+  --color-surface-secondary: 22, 22, 24;
+  --color-surface-tertiary: 36, 36, 38;
+  --color-surface-elevated: 44, 44, 46;
+
+  /* Glass */
+  --color-glass: 28, 28, 30;
+  --glass-opacity: 0.8;
+  --overlay-opacity: 0.95;
+
+  /* Interactive */
+  --color-hover: 44, 44, 46;
+  --color-active: 54, 54, 58;
+
+  /* Gradients */
+  --color-gradient-from: 10, 132, 255;
+  --color-gradient-to: 94, 92, 230;
+
+  /* Status Backgrounds */
+  --color-error-bg: 50, 20, 20;
+  --color-error-text: 255, 69, 58;
+  --color-success-bg: 15, 45, 25;
+  --color-success-text: 48, 209, 88;
+
+  /* Hint */
+  --color-hint-text: 52, 211, 153;
+
+  /* Dividers */
+  --color-divider: 44, 44, 46;
 }
 
 html,
@@ -87,7 +188,7 @@ body {
 
 /* Glass effect */
 .glass {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(var(--color-glass), var(--glass-opacity));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -101,4 +202,25 @@ body {
 .focus-ring:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.3);
+}
+
+/* Theme transition animation */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 0.3s ease, color 0.2s ease,
+              border-color 0.3s ease,
+              box-shadow 0.3s ease !important;
+  transition-delay: 0s !important;
+}
+
+/* Preserve toggle's own transitions during theme switch */
+html.theme-transition [data-theme-toggle],
+html.theme-transition [data-theme-toggle] * {
+  transition-property: all !important;
+  transition-duration: 0.5s !important;
+  transition-timing-function: cubic-bezier(
+    0.68, -0.15, 0.27, 1.15
+  ) !important;
 }

@@ -1,6 +1,8 @@
 import { SudokuStoreActionCreator } from "@features/sudoku-game/model/stores/types";
 import { buildGameResultState, resolveBoardState } from "@features/sudoku-game/model/stores/helpers/gameResult";
-import { findEmptyCells, updateCellValue } from "@features/sudoku-game/model/utils";
+import {
+  findEmptyCells, updateCellValue, updateSingleCell,
+} from "@features/sudoku-game/model/utils";
 
 export const createHintActions: SudokuStoreActionCreator<"getHint"> = (set, get) => ({
   getHint: () => {
@@ -22,8 +24,13 @@ export const createHintActions: SudokuStoreActionCreator<"getHint"> = (set, get)
     const { row, col } = emptyCells[randomIndex];
     const value = solution[row][col];
 
-    const updatedBoard = updateCellValue(board, row, col, value);
-    const { result } = resolveBoardState(updatedBoard, solution, gameMode, cages);
+    let updatedBoard = updateCellValue(board, row, col, value);
+    updatedBoard = updateSingleCell(
+      updatedBoard, row, col, { isHint: true },
+    );
+    const { result } = resolveBoardState(
+      updatedBoard, solution, gameMode, cages,
+    );
 
     set({
       ...buildGameResultState(result),

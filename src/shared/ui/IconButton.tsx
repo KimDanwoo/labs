@@ -36,31 +36,34 @@ export const IconButton = ({
       disabled && "opacity-40 cursor-not-allowed",
       // Variants
       variant === "default" && [
-        "bg-gradient-to-b from-slate-50 to-slate-100",
-        "text-slate-500",
+        "bg-gradient-to-b from-[rgb(var(--color-bg-tertiary))] to-[rgb(var(--color-surface-tertiary))]",
+        "text-[rgb(var(--color-text-secondary))]",
         "shadow-sm",
-        "border border-slate-200/50",
-        !disabled && "hover:from-white hover:to-slate-50 hover:text-slate-700",
-        !disabled && "hover:shadow-md hover:border-slate-200",
+        "border border-[rgb(var(--color-border-light))]/50",
+        !disabled &&
+          "hover:from-[rgb(var(--color-surface-primary))]" +
+          " hover:to-[rgb(var(--color-bg-tertiary))]" +
+          " hover:text-[rgb(var(--color-text-primary))]",
+        !disabled && "hover:shadow-md hover:border-[rgb(var(--color-border-light))]",
         !disabled && "active:scale-95",
       ],
       variant === "primary" && [
-        "bg-gradient-to-b from-blue-500 to-indigo-600",
+        "bg-gradient-to-b from-[rgb(var(--color-gradient-from))] to-[rgb(var(--color-gradient-to))]",
         "text-white",
-        "shadow-lg shadow-blue-500/30",
-        "border border-blue-400/20",
-        !disabled && "hover:from-blue-400 hover:to-indigo-500",
-        !disabled && "hover:shadow-xl hover:shadow-blue-500/40",
+        "shadow-lg shadow-[rgb(var(--color-gradient-from))]/30",
+        "border border-[rgb(var(--color-gradient-from))]/20",
+        !disabled && "hover:brightness-110",
+        !disabled && "hover:shadow-xl hover:shadow-[rgb(var(--color-gradient-from))]/40",
         !disabled && "active:scale-95",
       ],
       variant === "subtle" && [
         "bg-transparent",
-        "text-slate-500",
-        !disabled && "hover:bg-slate-100 hover:text-slate-700",
+        "text-[rgb(var(--color-text-secondary))]",
+        !disabled && "hover:bg-[rgb(var(--color-hover))] hover:text-[rgb(var(--color-text-primary))]",
         !disabled && "active:scale-95",
       ],
       // Focus
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40",
       // Relative for badge
       "relative",
       className,
@@ -75,12 +78,12 @@ export const IconButton = ({
         className={cn(
           "absolute -top-1 -right-1",
           "min-w-[20px] h-[20px] px-1.5",
-          "bg-gradient-to-br from-blue-500 to-indigo-600",
+          "bg-gradient-to-br from-[rgb(var(--color-gradient-from))] to-[rgb(var(--color-gradient-to))]",
           "text-white text-[10px] font-bold",
           "rounded-full",
           "flex items-center justify-center",
-          "shadow-lg shadow-blue-500/30",
-          "border-2 border-white",
+          "shadow-lg shadow-[rgb(var(--color-gradient-from))]/30",
+          "border-2 border-[rgb(var(--color-surface-primary))]",
         )}
       >
         {badge}

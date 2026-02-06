@@ -1,7 +1,6 @@
 import {
   CellPriority,
   GridPosition,
-  RemovalContext,
   RemovalStrategy,
   SudokuBoard,
   SudokuCell,
@@ -22,6 +21,7 @@ describe("스도쿠 셀 우선순위 계산 함수들", () => {
     isInitial: false,
     isSelected: false,
     isConflict: false,
+    isHint: false,
     notes: [],
   });
 
@@ -445,16 +445,8 @@ describe("스도쿠 셀 우선순위 계산 함수들", () => {
       });
     });
 
-    it("RemovalContext와 함께 사용할 수 있어야 함", () => {
-      const board = createMockBoard();
-      const tempGrid: (number | null)[][] = Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => null));
-
-      const context: RemovalContext = {
-        board,
-        tempGrid,
-        targetRemove: 30,
-        difficulty: "medium",
-      };
+    it("targetRemove 값에 따라 올바른 수의 우선순위를 반환해야 함", () => {
+      const targetRemove = 30;
 
       const strategy: RemovalStrategy = {
         preferCenter: true,
@@ -464,13 +456,13 @@ describe("스도쿠 셀 우선순위 계산 함수들", () => {
         blockDistribution: false,
       };
 
-      // RemovalContext를 사용한 테스트
-      const priorities = calculateCellPriorities(strategy, context.targetRemove);
+      const priorities = calculateCellPriorities(
+        strategy, targetRemove,
+      );
 
-      expect(priorities.length).toBeLessThanOrEqual(Math.floor(context.targetRemove * 1.5));
-      expect(context.board).toHaveLength(9);
-      expect(context.tempGrid).toHaveLength(9);
-      expect(context.difficulty).toBe("medium");
+      expect(priorities.length).toBeLessThanOrEqual(
+        Math.floor(targetRemove * 1.5),
+      );
     });
   });
 });

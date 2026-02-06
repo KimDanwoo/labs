@@ -3,7 +3,7 @@ import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { useSaveGameRecord } from "@features/game-record/model/hooks/useSaveGameRecord";
 import { ScoreDisplay } from "@features/game-record/ui/ScoreDisplay";
 import { cn } from "@shared/model/utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export const CompletedBoard = () => {
   const isCompleted = useSudokuStore((state) => state.isCompleted);
@@ -11,21 +11,14 @@ export const CompletedBoard = () => {
   const currentTime = useSudokuStore((state) => state.currentTime);
 
   const { save, isSaving, scoreBreakdown } = useSaveGameRecord();
-  const [showDetails, setShowDetails] = useState(false);
-  const hasSaved = useRef(false);
+  const saveRef = useRef(save);
+  saveRef.current = save;
 
   useEffect(() => {
-    if (isCompleted && isSuccess && !hasSaved.current) {
-      hasSaved.current = true;
-      save();
+    if (isCompleted && isSuccess) {
+      saveRef.current();
     }
-  }, [isCompleted, isSuccess, save]);
-
-  useEffect(() => {
-    if (!isCompleted) {
-      hasSaved.current = false;
-    }
-  }, [isCompleted]);
+  }, [isCompleted, isSuccess]);
 
   if (!isCompleted) return null;
 
@@ -58,36 +51,48 @@ export const CompletedBoard = () => {
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">
+          <h2
+            className={cn(
+              "text-2xl font-bold mb-2",
+              "text-[rgb(var(--color-text-primary))]",
+            )}
+          >
             축하합니다!
           </h2>
 
           {/* Time */}
-          <p className="text-slate-500 text-sm mb-1">완료 시간</p>
-          <p className="text-3xl font-mono font-bold text-slate-800 font-tabular mb-4">
+          <p
+            className={cn(
+              "text-sm mb-1",
+              "text-[rgb(var(--color-text-secondary))]",
+            )}
+          >
+            완료 시간
+          </p>
+          <p
+            className={cn(
+              "text-3xl font-mono font-bold font-tabular mb-4",
+              "text-[rgb(var(--color-text-primary))]",
+            )}
+          >
             {formatTime(currentTime)}
           </p>
 
           {/* Score Display */}
           {scoreBreakdown && (
             <div className="mt-4">
-              <ScoreDisplay breakdown={scoreBreakdown} showDetails={showDetails} />
-              <button
-                type="button"
-                onClick={() => setShowDetails((prev) => !prev)}
-                className={cn(
-                  "mt-3 text-sm text-slate-500 hover:text-slate-700",
-                  "transition-colors underline underline-offset-2",
-                )}
-              >
-                {showDetails ? "상세 숨기기" : "점수 상세 보기"}
-              </button>
+              <ScoreDisplay breakdown={scoreBreakdown} />
             </div>
           )}
 
           {/* Saving indicator */}
           {isSaving && (
-            <p className="mt-2 text-xs text-slate-400 animate-pulse">
+            <p
+              className={cn(
+                "mt-2 text-xs animate-pulse",
+                "text-[rgb(var(--color-text-tertiary))]",
+              )}
+            >
               기록 저장 중...
             </p>
           )}
@@ -119,12 +124,17 @@ export const CompletedBoard = () => {
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">
+          <h2
+            className={cn(
+              "text-2xl font-bold mb-2",
+              "text-[rgb(var(--color-text-primary))]",
+            )}
+          >
             아쉽네요
           </h2>
 
           {/* Message */}
-          <p className="text-slate-500">
+          <p className="text-[rgb(var(--color-text-secondary))]">
             일부 셀의 값이 올바르지 않습니다.
             <br />
             다시 시도해보세요!

@@ -6,19 +6,19 @@ describe("getHint", () => {
   // 테스트용 보드와 솔루션 데이터
   const mockBoard: SudokuBoard = [
     [
-      { value: 1, isInitial: true, isSelected: false, isConflict: false, notes: [] },
-      { value: null, isInitial: false, isSelected: false, isConflict: false, notes: [] },
-      { value: 3, isInitial: true, isSelected: false, isConflict: false, notes: [] },
+      { value: 1, isInitial: true, isSelected: false, isConflict: false, isHint: false, notes: [] },
+      { value: null, isInitial: false, isSelected: false, isConflict: false, isHint: false, notes: [] },
+      { value: 3, isInitial: true, isSelected: false, isConflict: false, isHint: false, notes: [] },
     ],
     [
-      { value: null, isInitial: false, isSelected: false, isConflict: false, notes: [] },
-      { value: 5, isInitial: true, isSelected: false, isConflict: false, notes: [] },
-      { value: null, isInitial: false, isSelected: false, isConflict: false, notes: [] },
+      { value: null, isInitial: false, isSelected: false, isConflict: false, isHint: false, notes: [] },
+      { value: 5, isInitial: true, isSelected: false, isConflict: false, isHint: false, notes: [] },
+      { value: null, isInitial: false, isSelected: false, isConflict: false, isHint: false, notes: [] },
     ],
     [
-      { value: 7, isInitial: true, isSelected: false, isConflict: false, notes: [] },
-      { value: null, isInitial: false, isSelected: false, isConflict: false, notes: [] },
-      { value: 9, isInitial: true, isSelected: false, isConflict: false, notes: [] },
+      { value: 7, isInitial: true, isSelected: false, isConflict: false, isHint: false, notes: [] },
+      { value: null, isInitial: false, isSelected: false, isConflict: false, isHint: false, notes: [] },
+      { value: 9, isInitial: true, isSelected: false, isConflict: false, isHint: false, notes: [] },
     ],
   ];
 

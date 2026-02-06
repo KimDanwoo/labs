@@ -9,6 +9,7 @@ import {
   generateSolution,
   groupAdjacentCells,
 } from "@features/sudoku-game/model/utils/generator";
+import { hasUniqueSolution } from "@features/sudoku-game/model/utils/validator";
 import { describe, expect, it } from "vitest";
 
 // 헬퍼 함수들
@@ -150,6 +151,20 @@ describe("스도쿠 생성기", () => {
       // 모든 셀이 존재하는지 확인 (값이 0이어도 셀 자체는 존재해야 함)
       expect(totalCells).toBe(SUDOKU_CELL_COUNT);
     });
+
+    it.each<Difficulty>([
+      "easy", "medium", "hard", "expert",
+    ])(
+      "%s 난이도에서 유일해를 보장해야 한다",
+      (difficulty) => {
+        const board = generateBoard(validSolution, difficulty);
+        const grid = board.map(
+          (row) => row.map((cell) => cell.value),
+        );
+
+        expect(hasUniqueSolution(grid)).toBe(true);
+      },
+    );
   });
 
   describe("generateKillerBoard", () => {

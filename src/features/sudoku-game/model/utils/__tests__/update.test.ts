@@ -31,6 +31,7 @@ describe("update.ts 유틸리티 함수 테스트", () => {
             isInitial: false,
             isSelected: false,
             isConflict: false,
+            isHint: false,
           })),
       );
 
@@ -264,22 +265,25 @@ describe("update.ts 유틸리티 함수 테스트", () => {
       expect(result.success).toBe(true);
     });
 
-    it("보드가 완성되었지만 정확하지 않을 때 success가 false여야 합니다", () => {
+    it("충돌이 있는 보드는 completed와 success가 false여야 합니다", () => {
       const board = createTestBoard();
       const solution = Array(BOARD_SIZE)
         .fill(null)
         .map(() => Array(BOARD_SIZE).fill(1));
 
-      // 보드를 완성되었지만 잘못된 상태로 설정
+      // 보드를 모두 같은 값으로 채우기 (충돌 발생)
       for (let row = 0; row < BOARD_SIZE; row++) {
         for (let col = 0; col < BOARD_SIZE; col++) {
-          board[row][col].value = 2; // 솔루션과 다른 값
+          board[row][col].value = 2;
+          board[row][col].isConflict = true;
         }
       }
 
-      const result = checkGameCompletion(board, solution, GAME_MODE.CLASSIC, []);
+      const result = checkGameCompletion(
+        board, solution, GAME_MODE.CLASSIC, [],
+      );
 
-      expect(result.completed).toBe(true);
+      expect(result.completed).toBe(false);
       expect(result.success).toBe(false);
     });
   });

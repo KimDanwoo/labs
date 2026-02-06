@@ -2,30 +2,71 @@
 
 import { UserProfileMenu } from "@entities/auth/ui";
 import { GameModeSelector, SelectNumber, NewGameButton } from "@features/sudoku-game/ui";
+import { ThemeToggle } from "@features/theme/ui/ThemeToggle";
 import { SudokuBoard } from "@widgets/game-board/ui";
 import { Controls } from "@widgets/game-controls/ui";
 import { GameStatus } from "@widgets/game-header/ui";
 import { CompleteGameOverlay, PauseGameOverlay } from "@widgets/game-overlays/ui";
 
 export const HomePage = () => (
-  <main className="min-h-svh min-w-[320px] bg-[#f8fafc] relative overflow-x-hidden">
+  <main
+    className={
+      "min-h-svh min-w-[320px] " +
+      "bg-[rgb(var(--color-surface-secondary))] " +
+      "relative overflow-x-hidden"
+    }
+  >
     {/* Ambient background */}
     <div className="fixed inset-0 pointer-events-none">
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-indigo-200/20 rounded-full blur-3xl" />
-      <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-purple-200/20 rounded-full blur-3xl" />
+      <div
+        className={
+          "absolute top-0 left-1/4 w-96 h-96 " +
+          "bg-blue-200/30 dark:bg-blue-800/10 " +
+          "rounded-full blur-3xl"
+        }
+      />
+      <div
+        className={
+          "absolute bottom-1/4 right-1/4 w-80 h-80 " +
+          "bg-indigo-200/20 dark:bg-indigo-800/8 " +
+          "rounded-full blur-3xl"
+        }
+      />
+      <div
+        className={
+          "absolute top-1/2 left-1/2 w-64 h-64 " +
+          "bg-purple-200/20 dark:bg-purple-800/8 " +
+          "rounded-full blur-3xl"
+        }
+      />
     </div>
 
     {/* Nav */}
-    <nav className="sticky top-0 z-30 backdrop-blur-xl bg-white/70 border-b border-slate-200/50">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between">
+    <nav
+      className={
+        "sticky top-0 z-30 backdrop-blur-xl " +
+        "bg-[rgb(var(--color-glass))]/[var(--glass-opacity)] " +
+        "border-b border-[rgb(var(--color-border-light))]/50"
+      }
+    >
+      <div
+        className={
+          "mx-auto px-4 sm:px-6 py-2.5 " +
+          "flex items-center justify-between " +
+          "w-full max-w-[360px] " +
+          "lg:max-w-[912px] xl:max-w-[1056px]"
+        }
+      >
         <GameModeSelector />
-        <UserProfileMenu />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <UserProfileMenu />
+        </div>
       </div>
     </nav>
 
     {/* Main content */}
-    <div className="relative max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-10">
+    <div className="relative mx-auto px-4 sm:px-6 py-6 md:py-10">
       {/* Mobile/Tablet: single column, Desktop: 2 columns with grid */}
       <div
         className={
@@ -49,9 +90,9 @@ export const HomePage = () => (
         <div className="hidden lg:flex flex-col pt-[52px]">
           <div
             className={
-              "bg-white/60 backdrop-blur-sm rounded-2xl " +
-              "shadow-[0_8px_32px_rgba(0,0,0,0.08)] " +
-              "ring-1 ring-white/80 " +
+              "bg-[rgb(var(--color-glass))]/60 dark:bg-[rgb(var(--color-glass))]/70 backdrop-blur-sm rounded-2xl " +
+              "shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] " +
+              "ring-1 ring-[rgb(var(--color-surface-primary))]/80 dark:ring-white/5 " +
               "w-[432px] xl:w-[504px] " +
               "h-[432px] xl:h-[504px] " +
               "p-5 " +

@@ -13,7 +13,7 @@ export const CompleteGameOverlay: FC = () => {
       className={cn(
         "absolute inset-0 z-20",
         "flex flex-col items-center justify-center gap-6",
-        "bg-white/90 backdrop-blur-md rounded-2xl",
+        "bg-[rgb(var(--color-glass))]/[var(--overlay-opacity)] backdrop-blur-md rounded-2xl",
       )}
     >
       <CompletedBoard />

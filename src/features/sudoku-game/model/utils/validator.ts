@@ -51,7 +51,7 @@ function getValidCandidates(grid: (number | null)[][], row: number, col: number)
 export function hasUniqueSolution(grid: (number | null)[][]): boolean {
   let solutionCount = 0;
   const MAX_SOLUTIONS = 2;
-  const MAX_ITERATIONS = 50000; // 최대 반복 횟수 제한
+  const MAX_ITERATIONS = 200000;
   let iterations = 0;
 
   const tempGrid = grid.map((row) => [...row]);
@@ -76,7 +76,7 @@ export function hasUniqueSolution(grid: (number | null)[][]): boolean {
   function backtrack(index: number): boolean {
     iterations++;
     if (iterations > MAX_ITERATIONS) {
-      return true; // 안전장치
+      return true; // 탐색 중단 — 2개 이상 찾은 것으로 간주
     }
 
     if (index >= emptyCells.length) {
@@ -105,6 +105,11 @@ export function hasUniqueSolution(grid: (number | null)[][]): boolean {
   }
 
   backtrack(0);
+
+  // 반복 제한 초과 시 유일성 확인 불가 → 안전하게 false
+  if (iterations > MAX_ITERATIONS) {
+    return false;
+  }
 
   return solutionCount === 1;
 }
