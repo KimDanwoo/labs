@@ -1,6 +1,6 @@
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { IconButton } from "@shared/ui";
-import { GoLightBulb } from "react-icons/go";
+import { LuLightbulb } from "react-icons/lu";
 
 export const GetHint = () => {
   const getHint = useSudokuStore((state) => state.getHint);
@@ -9,10 +9,11 @@ export const GetHint = () => {
 
   return (
     <IconButton
-      icon={<GoLightBulb />}
-      label={`Hint (${hintsRemaining})`}
+      icon={<LuLightbulb strokeWidth={2} />}
+      label="힌트"
       onClick={() => getHint()}
       disabled={!timerActive || hintsRemaining <= 0}
+      badge={hintsRemaining}
     />
   );
 };

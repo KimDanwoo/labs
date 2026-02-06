@@ -1,6 +1,6 @@
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { IconButton } from "@shared/ui";
-import { IoRefresh } from "react-icons/io5";
+import { LuRotateCcw } from "react-icons/lu";
 
 export const RestartGame = () => {
   const resetUserInputs = useSudokuStore((state) => state.resetUserInputs);
@@ -8,8 +8,8 @@ export const RestartGame = () => {
 
   return (
     <IconButton
-      icon={<IoRefresh />}
-      label="Restart"
+      icon={<LuRotateCcw strokeWidth={2} />}
+      label="다시"
       onClick={resetUserInputs}
       disabled={!timerActive}
     />
