@@ -16,7 +16,7 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "firebase": "^11.9.1",
-    "next": "15.3.2",
+    "next": "15.3.8",
     "prettier-plugin-organize-imports": "^4.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
