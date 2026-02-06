@@ -12,8 +12,8 @@ export const CompleteGameOverlay: FC = () => {
     <div
       className={cn(
         "absolute inset-0 z-20",
-        "flex flex-col items-center justify-center gap-8",
-        "bg-white/95 backdrop-blur-sm rounded-xl",
+        "flex flex-col items-center justify-center gap-6",
+        "bg-white/90 backdrop-blur-md rounded-2xl",
       )}
     >
       <CompletedBoard />

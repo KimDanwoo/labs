@@ -32,6 +32,8 @@ export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boo
 
 /**
  * 셀 클래스 이름을 빌드 - Refined, minimal design
+ * Cell sizes: 32px (mobile) -> 40px (sm) -> 48px (lg) -> 56px (xl)
+ * Board sizes: 288px -> 360px -> 432px -> 504px
  */
 export function buildCellClassName(
   { bgColor, textColor, borderColor }: ReturnType<typeof getCellHighlightStyles>,
@@ -40,11 +42,11 @@ export function buildCellClassName(
 ) {
   return cn(
     "relative",
-    // Responsive sizes with more generous proportions
-    "w-9 h-9",
-    "sm:w-11 sm:h-11",
-    "md:w-13 md:h-13",
-    "lg:w-14 lg:h-14",
+    // Responsive sizes - fits within 320px min-width
+    "w-8 h-8",         // 32px * 9 = 288px
+    "sm:w-10 sm:h-10", // 40px * 9 = 360px
+    "lg:w-12 lg:h-12", // 48px * 9 = 432px
+    "xl:w-14 xl:h-14", // 56px * 9 = 504px
     // Border styling - subtle and refined
     "border",
     borderColor,

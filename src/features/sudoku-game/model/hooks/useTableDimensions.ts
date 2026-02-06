@@ -13,38 +13,22 @@ interface TableDimensions {
   cellPositions: Record<string, CellPosition>;
 }
 
+const DEBOUNCE_DELAY = 16; // ~1 frame at 60fps for smooth resize
+
 export const useTableDimensions = (
   onDimensionsChange: (dimensions: TableDimensions) => void,
   deps: unknown[],
 ) => {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const timersRef = useRef<NodeJS.Timeout[]>([]);
-  const observerRef = useRef<MutationObserver | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const mutationObserverRef = useRef<MutationObserver | null>(null);
   const [isReady, setIsReady] = useState(false);
 
-  // Use ref to store callback to prevent infinite loops
   const onDimensionsChangeRef = useRef(onDimensionsChange);
   onDimensionsChangeRef.current = onDimensionsChange;
 
-  // Stable dependency key
   const depsKey = JSON.stringify(deps);
-
-  const clearTimers = useCallback(() => {
-    timersRef.current.forEach(clearTimeout);
-    timersRef.current = [];
-  }, []);
-
-  const clearObserver = useCallback(() => {
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-      observerRef.current = null;
-    }
-  }, []);
-
-  const cleanup = useCallback(() => {
-    clearTimers();
-    clearObserver();
-  }, [clearTimers, clearObserver]);
 
   const calculateDimensions = useCallback(() => {
     const table = document.querySelector("table.border-collapse");
@@ -84,19 +68,49 @@ export const useTableDimensions = (
     setIsReady(true);
   }, []);
 
-  const debouncedCalculate = useCallback(() => {
-    clearTimers();
-    const delays = [50, 150, 300];
-    timersRef.current = delays.map((delay) => setTimeout(calculateDimensions, delay));
-  }, [calculateDimensions, clearTimers]);
+  const scheduleCalculation = useCallback(() => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+    }
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      calculateDimensions();
+    });
+  }, [calculateDimensions]);
+
+  const cleanup = useCallback(() => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    if (resizeObserverRef.current) {
+      resizeObserverRef.current.disconnect();
+      resizeObserverRef.current = null;
+    }
+    if (mutationObserverRef.current) {
+      mutationObserverRef.current.disconnect();
+      mutationObserverRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     calculateDimensions();
 
-    const setupObserver = () => {
+    const setupObservers = () => {
       const table = document.querySelector("table.border-collapse");
-      if (table && !observerRef.current) {
-        observerRef.current = new MutationObserver((mutations) => {
+      if (!table) return;
+
+      // ResizeObserver for responsive resize
+      if (!resizeObserverRef.current) {
+        resizeObserverRef.current = new ResizeObserver(() => {
+          scheduleCalculation();
+        });
+        resizeObserverRef.current.observe(table);
+      }
+
+      // MutationObserver for DOM changes
+      if (!mutationObserverRef.current) {
+        mutationObserverRef.current = new MutationObserver((mutations) => {
           const hasRelevantChanges = mutations.some(
             (mutation) =>
               mutation.type === "childList" ||
@@ -104,11 +118,11 @@ export const useTableDimensions = (
           );
 
           if (hasRelevantChanges) {
-            debouncedCalculate();
+            scheduleCalculation();
           }
         });
 
-        observerRef.current.observe(table, {
+        mutationObserverRef.current.observe(table, {
           attributes: true,
           attributeFilter: ["class", "style"],
           childList: true,
@@ -117,23 +131,13 @@ export const useTableDimensions = (
       }
     };
 
-    const observerTimer = setTimeout(setupObserver, 100);
-
-    let resizeTimer: NodeJS.Timeout;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(debouncedCalculate, 50);
-    };
-
-    window.addEventListener("resize", handleResize, { passive: true });
+    const observerTimer = setTimeout(setupObservers, DEBOUNCE_DELAY);
 
     return () => {
       clearTimeout(observerTimer);
-      clearTimeout(resizeTimer);
-      window.removeEventListener("resize", handleResize);
       cleanup();
     };
-  }, [depsKey, cleanup, calculateDimensions, debouncedCalculate]);
+  }, [depsKey, cleanup, calculateDimensions, scheduleCalculation]);
 
   useEffect(() => cleanup, [cleanup]);
 

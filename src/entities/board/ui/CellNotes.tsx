@@ -7,7 +7,7 @@ export const CellNotes = memo(function CellNotes({ notes }: { notes: number[] })
       {KEY_NUMBER.map((num) => (
         <div key={num} className="flex items-center justify-center w-full h-full">
           {notes.includes(num) && (
-            <span className="text-[7px] sm:text-[8px] md:text-[10px] text-[rgb(0,122,255)] font-medium">
+            <span className="text-[6px] sm:text-[8px] lg:text-[10px] text-[rgb(0,122,255)] font-medium">
               {num}
             </span>
           )}

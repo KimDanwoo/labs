@@ -5,7 +5,7 @@ interface KillerCageLineProps {
   color?: string;
 }
 
-export const KillerCageLine: React.FC<KillerCageLineProps> = memo(({ path, color = "#436def" }) => (
+export const KillerCageLine = memo<KillerCageLineProps>(({ path, color = "#436def" }) => (
   <path
     d={path}
     fill="none"
@@ -17,3 +17,5 @@ export const KillerCageLine: React.FC<KillerCageLineProps> = memo(({ path, color
     className="opacity-90"
   />
 ));
+
+KillerCageLine.displayName = "KillerCageLine";
