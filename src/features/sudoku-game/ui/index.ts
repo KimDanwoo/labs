@@ -6,6 +6,7 @@ export { CompletedBoard } from "./CompletedBoard";
 export { GameDifficultySelector } from "./GameDifficultySelector";
 export { GameModeSelector } from "./GameModeSelector";
 export { GetHint } from "./GetHint";
+export { NewGameButton } from "./NewGameButton";
 export { RemoveNumber } from "./RemoveNumber";
 export { RestartGame } from "./RestartGame";
 export { SelectNumber } from "./SelectNumber";

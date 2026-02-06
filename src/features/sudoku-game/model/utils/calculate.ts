@@ -70,9 +70,8 @@ function getIntensity(isHigh: boolean, isMiddle: boolean): number {
  * @description 강도별 보너스 계산
  * @param {number} row - 행
  * @param {number} col - 열
- * @param {number} targetRemove - 제거할 셀 수
- * @param {boolean} isHighIntensity - 강도 여부
- * @param {boolean} isMediumIntensity - 강도 여부
+ * @param {boolean} isHighIntensity - 높은 강도 여부 (Expert급)
+ * @param {boolean} isMediumIntensity - 중간 강도 여부 (Hard급)
  * @returns {number} 보너스
  */
 function calculateIntensityBonus(

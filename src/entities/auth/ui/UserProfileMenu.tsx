@@ -2,6 +2,7 @@ import { useAuth } from "@features/auth/model/hooks/useAuth";
 import { useClickOutside } from "@shared/model/hooks";
 import { cn } from "@shared/model/utils";
 import Image from "next/image";
+import Link from "next/link";
 import { memo, useRef } from "react";
 
 export const UserProfileMenu = memo(() => {
@@ -61,6 +62,32 @@ export const UserProfileMenu = memo(() => {
 
           {/* Menu Items */}
           <div className="py-1">
+            <Link
+              href="/leaderboard"
+              onClick={() => setIsOpen(false)}
+              className={cn(
+                "block w-full px-3 py-2 text-left",
+                "text-sm text-[rgb(28,28,30)]",
+                "rounded-lg",
+                "transition-colors duration-150",
+                "hover:bg-[rgb(245,245,247)]",
+              )}
+            >
+              랭킹
+            </Link>
+            <Link
+              href="/profile"
+              onClick={() => setIsOpen(false)}
+              className={cn(
+                "block w-full px-3 py-2 text-left",
+                "text-sm text-[rgb(28,28,30)]",
+                "rounded-lg",
+                "transition-colors duration-150",
+                "hover:bg-[rgb(245,245,247)]",
+              )}
+            >
+              프로필
+            </Link>
             <button
               onClick={signOut}
               className={cn(
@@ -71,7 +98,7 @@ export const UserProfileMenu = memo(() => {
                 "hover:bg-[rgb(255,59,48)]/10",
               )}
             >
-              Sign Out
+              로그아웃
             </button>
           </div>
         </div>

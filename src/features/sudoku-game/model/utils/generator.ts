@@ -561,7 +561,7 @@ export function generateKillerCages(solution: Grid, difficulty: Difficulty): Kil
 
   // 최종 검증
   if (!validateAllCages(cages, solution)) {
-    generateKillerCages(solution, difficulty);
+    return generateKillerCages(solution, difficulty);
   }
 
   return cages;

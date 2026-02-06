@@ -10,25 +10,28 @@ interface NumberButtonProps {
 export const NumberButton: React.FC<NumberButtonProps> = memo(({ value, onClick, isDisabled }) => (
   <button
     className={cn(
-      // Base sizing - generous touch targets
-      "w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16",
+      // Size - constrained on desktop to fit panel
+      "w-full aspect-square",
+      "max-w-8 sm:max-w-10 lg:max-w-[72px] xl:max-w-[88px]",
       // Shape
-      "rounded-2xl",
+      "rounded-xl md:rounded-2xl",
       // Typography
-      "text-xl md:text-2xl font-medium",
+      "text-lg sm:text-xl md:text-3xl lg:text-4xl font-semibold",
       "font-tabular",
       // Layout
       "flex items-center justify-center",
       // Transitions
-      "transition-all duration-150 ease-out",
+      "transition-all duration-200 ease-out",
       // States
       isDisabled
-        ? "text-[rgb(199,199,204)] cursor-not-allowed"
-        : "text-[rgb(28,28,30)] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)]",
-      !isDisabled && "hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:scale-105",
-      !isDisabled && "active:scale-95 active:shadow-[0_1px_4px_rgba(0,0,0,0.08)]",
+        ? "text-slate-300 cursor-not-allowed bg-slate-50/50 border border-slate-100"
+        : "text-slate-700 bg-gradient-to-b from-white to-slate-50 " +
+          "shadow-sm border border-slate-200/60 " +
+          "hover:from-blue-50 hover:to-white hover:text-blue-600 " +
+          "hover:shadow-md hover:border-blue-200/60 hover:-translate-y-0.5 " +
+          "active:translate-y-0 active:shadow-sm",
       // Focus
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(0,122,255)]/30",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40",
     )}
     onClick={onClick}
     disabled={isDisabled}

@@ -4,11 +4,11 @@ import { GetHint, RemoveNumber, RestartGame, ToggleNote } from "@features/sudoku
 import React from "react";
 
 export const Controls: React.FC = () => (
-  <div className="flex flex-wrap justify-center gap-3">
+  <div className="grid grid-cols-4 gap-2 md:gap-3 lg:gap-4 justify-items-center">
     <RestartGame />
     <RemoveNumber />
-    <GetHint />
     <ToggleNote />
+    <GetHint />
   </div>
 );
 

@@ -1,6 +1,6 @@
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { IconButton } from "@shared/ui";
-import { GoPencil } from "react-icons/go";
+import { LuPencil } from "react-icons/lu";
 
 export const ToggleNote = () => {
   const isNoteMode = useSudokuStore((state) => state.isNoteMode);
@@ -9,8 +9,8 @@ export const ToggleNote = () => {
 
   return (
     <IconButton
-      icon={<GoPencil />}
-      label="Notes"
+      icon={<LuPencil strokeWidth={2} />}
+      label="메모"
       onClick={toggleNoteMode}
       disabled={!timerActive}
       variant={isNoteMode ? "primary" : "default"}

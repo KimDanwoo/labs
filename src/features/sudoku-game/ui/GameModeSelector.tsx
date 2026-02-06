@@ -4,8 +4,8 @@ import { cn } from "@shared/model/utils";
 import React, { memo } from "react";
 
 const gameModes = [
-  { label: "Classic", value: GAME_MODE.CLASSIC },
-  { label: "Killer", value: GAME_MODE.KILLER },
+  { label: "클래식", value: GAME_MODE.CLASSIC },
+  { label: "킬러", value: GAME_MODE.KILLER },
 ];
 
 export const GameModeSelector: React.FC = memo(() => {
@@ -13,7 +13,7 @@ export const GameModeSelector: React.FC = memo(() => {
   const switchGameMode = useSudokuStore((state) => state.switchGameMode);
 
   return (
-    <div className="flex items-center gap-1 p-1 bg-[rgb(245,245,247)] rounded-xl">
+    <div className="flex items-center gap-1 p-1 bg-slate-100/80 rounded-xl backdrop-blur-sm">
       {gameModes.map(({ value, label }) => {
         const isActive = gameMode === value;
         return (
@@ -21,11 +21,11 @@ export const GameModeSelector: React.FC = memo(() => {
             key={value}
             onClick={() => switchGameMode(value)}
             className={cn(
-              "px-4 py-2 rounded-lg text-sm font-medium",
+              "px-4 py-1.5 rounded-lg text-sm font-medium",
               "transition-all duration-200 ease-out",
               isActive
-                ? "bg-white text-[rgb(28,28,30)] shadow-sm"
-                : "text-[rgb(99,99,102)] hover:text-[rgb(28,28,30)]",
+                ? "bg-white text-slate-800 shadow-sm"
+                : "text-slate-500 hover:text-slate-700",
             )}
           >
             {label}

@@ -1,6 +1,6 @@
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { IconButton } from "@shared/ui";
-import { CiEraser } from "react-icons/ci";
+import { LuEraser } from "react-icons/lu";
 
 export const RemoveNumber = () => {
   const timerActive = useSudokuStore((state) => state.timerActive);
@@ -8,8 +8,8 @@ export const RemoveNumber = () => {
 
   return (
     <IconButton
-      icon={<CiEraser />}
-      label="Erase"
+      icon={<LuEraser strokeWidth={2} />}
+      label="지우기"
       onClick={() => fillCell(null)}
       disabled={!timerActive}
     />
