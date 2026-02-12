@@ -28,6 +28,7 @@ export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellI
 
       if (/^[1-9]$/.test(keyPressed)) {
         event.preventDefault();
+        event.stopPropagation();
         onSelect(row, col);
         setTimeout(() => {
           const store = useSudokuStore.getState();
@@ -37,6 +38,7 @@ export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellI
 
       if (keyPressed === "Backspace" || keyPressed === "Delete") {
         event.preventDefault();
+        event.stopPropagation();
         onSelect(row, col);
         setTimeout(() => {
           const store = useSudokuStore.getState();
