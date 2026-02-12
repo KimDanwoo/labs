@@ -7,6 +7,7 @@ import {
 } from "@entities/game/model/constants";
 import { formatTime } from "@features/sudoku-game/model/utils";
 import { cn } from "@shared/model/utils";
+import Image from "next/image";
 import { memo } from "react";
 import { RankBadge } from "./RankBadge";
 
@@ -54,6 +55,9 @@ export const LeaderboardTable = memo<
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
+        <caption className="sr-only">
+          리더보드 순위표
+        </caption>
         <thead>
           <tr
             className={cn(
@@ -114,9 +118,11 @@ export const LeaderboardTable = memo<
                     className="flex items-center gap-2"
                   >
                     {record.userPhotoURL ? (
-                      <img
+                      <Image
                         src={record.userPhotoURL}
-                        alt=""
+                        alt={`${record.userDisplayName} 프로필`}
+                        width={32}
+                        height={32}
                         className={cn(
                           "w-8 h-8 rounded-full",
                           "object-cover",

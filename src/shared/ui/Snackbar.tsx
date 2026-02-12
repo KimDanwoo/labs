@@ -57,6 +57,8 @@ export const Snackbar = memo<SnackbarProps>(
 
     return createPortal(
       <div
+        role="status"
+        aria-live="polite"
         className={cn(
           "fixed bottom-6 left-1/2 -translate-x-1/2",
           "z-[60]",

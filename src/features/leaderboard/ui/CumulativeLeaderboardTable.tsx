@@ -2,6 +2,7 @@
 
 import { CumulativePointsEntry } from "@features/game-record/model/services/gameRecordService";
 import { cn } from "@shared/model/utils";
+import Image from "next/image";
 import { memo } from "react";
 import { RankBadge } from "./RankBadge";
 
@@ -49,6 +50,9 @@ export const CumulativeLeaderboardTable = memo<
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
+        <caption className="sr-only">
+          누적 포인트 순위표
+        </caption>
         <thead>
           <tr
             className={cn(
@@ -99,9 +103,11 @@ export const CumulativeLeaderboardTable = memo<
                     className="flex items-center gap-2"
                   >
                     {entry.userPhotoURL ? (
-                      <img
+                      <Image
                         src={entry.userPhotoURL}
-                        alt=""
+                        alt={`${entry.userDisplayName} 프로필`}
+                        width={32}
+                        height={32}
                         className={cn(
                           "w-8 h-8 rounded-full",
                           "object-cover",
