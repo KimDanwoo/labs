@@ -4,6 +4,9 @@ import {
 import { SudokuStoreActionCreator } from "@features/sudoku-game/model/stores/types";
 import {
   canFillCell,
+  checkBlockConflict,
+  checkColConflict,
+  checkRowConflict,
   clearHighlights,
   resetUserInputs as resetUserInputsOptimized,
   updateCellNotes,
@@ -26,7 +29,13 @@ export const createCellValueActions: SudokuStoreActionCreator<
 
     const { row, col } = selectedCell!;
 
-    if (value !== null && solution[row][col] !== value) {
+    const hasConflict = value !== null && (
+      checkRowConflict(board, row, col, value)
+      || checkColConflict(board, row, col, value)
+      || checkBlockConflict(board, row, col, value)
+    );
+
+    if (hasConflict) {
       const newMistakeCount = get().mistakeCount + 1;
       set({ mistakeCount: newMistakeCount });
 

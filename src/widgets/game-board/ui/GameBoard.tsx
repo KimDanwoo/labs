@@ -6,6 +6,7 @@ import { useInitializeGame, useKeyboardControls } from "@features/sudoku-game/mo
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { KillerCage, Cell as SudokuCell } from "@features/sudoku-game/ui";
 import { cn } from "@shared/model/utils";
+import { useShallow } from "zustand/react/shallow";
 import { memo, useCallback } from "react";
 
 interface BoardRowProps {
@@ -31,9 +32,13 @@ const BoardRow = memo<BoardRowProps>(({ row, rowIndex, onSelect }) => (
 BoardRow.displayName = "BoardRow";
 
 export const SudokuBoard: React.FC = () => {
-  const gameMode = useSudokuStore((state) => state.gameMode);
-  const board = useSudokuStore((state) => state.board);
-  const selectCell = useSudokuStore((state) => state.selectCell);
+  const { gameMode, board, selectCell } = useSudokuStore(
+    useShallow((state) => ({
+      gameMode: state.gameMode,
+      board: state.board,
+      selectCell: state.selectCell,
+    })),
+  );
 
   useKeyboardControls();
   useInitializeGame();

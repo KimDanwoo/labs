@@ -15,12 +15,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     setLoading(true);
+    let unsubscribe: (() => void) | null = null;
+    let cancelled = false;
 
-    const unsubscribe = subscribeToAuthChanges((user) => {
+    subscribeToAuthChanges((user) => {
       setUser(user);
+    }).then((unsub) => {
+      if (cancelled) {
+        unsub();
+      } else {
+        unsubscribe = unsub;
+      }
     });
 
-    return () => unsubscribe();
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
   }, [setUser, setLoading]);
 
   return <AuthGuard>{children}</AuthGuard>;

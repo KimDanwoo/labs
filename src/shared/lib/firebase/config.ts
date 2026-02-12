@@ -1,5 +1,5 @@
 import { getApps, initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import type { Auth } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -13,7 +13,18 @@ const firebaseConfig = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-export const auth = getAuth(app);
+/**
+ * Firebase Auth 인스턴스를 지연 초기화한다.
+ * 홈페이지 초기 로드 시 Auth 번들(~40KB gzip)을 포함하지 않기 위함.
+ */
+let _auth: Auth | null = null;
+export async function getAuthInstance(): Promise<Auth> {
+  if (!_auth) {
+    const { getAuth } = await import("firebase/auth");
+    _auth = getAuth(app);
+  }
+  return _auth;
+}
 
 /**
  * Firestore 인스턴스를 지연 초기화한다.

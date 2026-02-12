@@ -4,23 +4,19 @@ import { create } from "zustand";
 
 const MAX_HISTORY_SIZE = 50;
 
-function cloneBoard(board: SudokuCell[][]): SudokuCell[][] {
-  return board.map((row) =>
-    row.map((cell) => ({
-      ...cell,
-      notes: [...cell.notes],
-    })),
-  );
-}
-
 export const useHistoryStore = create<HistoryState & HistoryActions>((set, get) => ({
   past: [],
   future: [],
   maxSize: MAX_HISTORY_SIZE,
 
+  /**
+   * 보드 스냅샷을 히스토리에 추가한다.
+   * 보드 상태는 불변(immutable)이므로 참조를 직접 저장해도 안전하다.
+   * (모든 store action이 spread로 새 객체를 생성함)
+   */
   pushState: (board: SudokuCell[][]) => {
     const entry: HistoryEntry = {
-      board: cloneBoard(board),
+      board,
       timestamp: Date.now(),
     };
 
@@ -47,7 +43,7 @@ export const useHistoryStore = create<HistoryState & HistoryActions>((set, get) 
 
     set({ past: newPast });
 
-    return cloneBoard(entry.board);
+    return entry.board;
   },
 
   redo: () => {
@@ -60,7 +56,7 @@ export const useHistoryStore = create<HistoryState & HistoryActions>((set, get) 
 
     set({ future: newFuture });
 
-    return cloneBoard(entry.board);
+    return entry.board;
   },
 
   canUndo: () => get().past.length > 0,

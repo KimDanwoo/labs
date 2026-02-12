@@ -8,6 +8,7 @@ import { GameDifficultySelector } from "./GameDifficultySelector";
 import { BottomSheet, Snackbar } from "@shared/ui";
 import { useSnackbar } from "@shared/model/hooks";
 import { cn } from "@shared/model/utils";
+import { useShallow } from "zustand/react/shallow";
 import { memo, useEffect, useRef } from "react";
 
 const SuccessIcon = () => (
@@ -64,15 +65,15 @@ const FailureIcon = () => (
 );
 
 export const GameResultSheet = memo(() => {
-  const isCompleted = useSudokuStore(
-    (s) => s.isCompleted,
-  );
-  const isSuccess = useSudokuStore((s) => s.isSuccess);
-  const currentTime = useSudokuStore(
-    (s) => s.currentTime,
-  );
-  const mistakeCount = useSudokuStore(
-    (s) => s.mistakeCount,
+  const {
+    isCompleted, isSuccess, currentTime, mistakeCount,
+  } = useSudokuStore(
+    useShallow((s) => ({
+      isCompleted: s.isCompleted,
+      isSuccess: s.isSuccess,
+      currentTime: s.currentTime,
+      mistakeCount: s.mistakeCount,
+    })),
   );
 
   const { save, isSaving, pointResult } =

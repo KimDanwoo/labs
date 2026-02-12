@@ -1,17 +1,29 @@
 import { useHistoryStore } from "@features/undo-redo/model/stores/historyStore";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import { useShallow } from "zustand/react/shallow";
 import { useCallback } from "react";
 
 export function useHistory() {
-  const board = useSudokuStore((state) => state.board);
-  const countBoardNumbers = useSudokuStore((state) => state.countBoardNumbers);
+  const { board, countBoardNumbers } = useSudokuStore(
+    useShallow((state) => ({
+      board: state.board,
+      countBoardNumbers: state.countBoardNumbers,
+    })),
+  );
 
-  const pushState = useHistoryStore((state) => state.pushState);
-  const undoHistory = useHistoryStore((state) => state.undo);
-  const redoHistory = useHistoryStore((state) => state.redo);
-  const canUndo = useHistoryStore((state) => state.canUndo);
-  const canRedo = useHistoryStore((state) => state.canRedo);
-  const clearHistory = useHistoryStore((state) => state.clear);
+  const {
+    pushState, undo: undoHistory, redo: redoHistory,
+    canUndo, canRedo, clear: clearHistory,
+  } = useHistoryStore(
+    useShallow((state) => ({
+      pushState: state.pushState,
+      undo: state.undo,
+      redo: state.redo,
+      canUndo: state.canUndo,
+      canRedo: state.canRedo,
+      clear: state.clear,
+    })),
+  );
 
   const saveState = useCallback(() => {
     pushState(board);

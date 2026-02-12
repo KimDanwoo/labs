@@ -6,6 +6,7 @@ import { saveGameRecord } from "@features/game-record/model/services/gameRecordS
 import { useAuthStore } from "@features/auth/model/stores/authStore";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { HINTS_REMAINING } from "@entities/game/model/constants";
+import { useShallow } from "zustand/react/shallow";
 import { useCallback, useRef, useState } from "react";
 
 interface SaveGameRecordResult {
@@ -23,18 +24,19 @@ export function useSaveGameRecord(): SaveGameRecordResult {
   const savingRef = useRef(false);
 
   const user = useAuthStore((state) => state.user);
-  const difficulty = useSudokuStore((s) => s.difficulty);
-  const gameMode = useSudokuStore((s) => s.gameMode);
-  const currentTime = useSudokuStore((s) => s.currentTime);
-  const hintsRemaining = useSudokuStore(
-    (s) => s.hintsRemaining,
-  );
-  const mistakeCount = useSudokuStore(
-    (s) => s.mistakeCount,
-  );
-  const isSuccess = useSudokuStore((s) => s.isSuccess);
-  const isRecordSaved = useSudokuStore(
-    (s) => s.isRecordSaved,
+  const {
+    difficulty, gameMode, currentTime,
+    hintsRemaining, mistakeCount, isSuccess, isRecordSaved,
+  } = useSudokuStore(
+    useShallow((s) => ({
+      difficulty: s.difficulty,
+      gameMode: s.gameMode,
+      currentTime: s.currentTime,
+      hintsRemaining: s.hintsRemaining,
+      mistakeCount: s.mistakeCount,
+      isSuccess: s.isSuccess,
+      isRecordSaved: s.isRecordSaved,
+    })),
   );
 
   const save = useCallback(async (): Promise<

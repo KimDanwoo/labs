@@ -1,14 +1,22 @@
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { cn } from "@shared/model/utils";
+import { useShallow } from "zustand/react/shallow";
 import { FC } from "react";
 import { VscPlay } from "react-icons/vsc";
 
 export const PauseGameOverlay: FC = () => {
-  const timerActive = useSudokuStore((state) => state.timerActive);
-  const isCompleted = useSudokuStore((state) => state.isCompleted);
-  const toggleTimer = useSudokuStore((state) => state.toggleTimer);
-  const initializeGame = useSudokuStore((state) => state.initializeGame);
-  const difficulty = useSudokuStore((state) => state.difficulty);
+  const {
+    timerActive, isCompleted, toggleTimer,
+    initializeGame, difficulty,
+  } = useSudokuStore(
+    useShallow((state) => ({
+      timerActive: state.timerActive,
+      isCompleted: state.isCompleted,
+      toggleTimer: state.toggleTimer,
+      initializeGame: state.initializeGame,
+      difficulty: state.difficulty,
+    })),
+  );
 
   if (timerActive || isCompleted) return null;
 

@@ -5,17 +5,24 @@ import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { useHistoryStore } from "@features/undo-redo/model/stores/historyStore";
 import { cn } from "@shared/model/utils";
 import { NumberButton } from "@shared/ui";
+import { useShallow } from "zustand/react/shallow";
 import { FC, useCallback, useMemo } from "react";
 
 export const SelectNumber: FC = () => {
-  const isNoteMode = useSudokuStore((state) => state.isNoteMode);
-  const numberCounts = useSudokuStore((state) => state.numberCounts);
-  const timerActive = useSudokuStore((state) => state.timerActive);
-  const board = useSudokuStore((state) => state.board);
-  const selectedCell = useSudokuStore((state) => state.selectedCell);
-
-  const fillCell = useSudokuStore((state) => state.fillCell);
-  const toggleNote = useSudokuStore((state) => state.toggleNote);
+  const {
+    isNoteMode, numberCounts, timerActive,
+    board, selectedCell, fillCell, toggleNote,
+  } = useSudokuStore(
+    useShallow((state) => ({
+      isNoteMode: state.isNoteMode,
+      numberCounts: state.numberCounts,
+      timerActive: state.timerActive,
+      board: state.board,
+      selectedCell: state.selectedCell,
+      fillCell: state.fillCell,
+      toggleNote: state.toggleNote,
+    })),
+  );
   const pushState = useHistoryStore((state) => state.pushState);
 
   const isNumberDisabled = useMemo(() => (value: number) => numberCounts[value] >= BOARD_SIZE, [numberCounts]);
