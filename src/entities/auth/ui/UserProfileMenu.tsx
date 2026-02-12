@@ -16,6 +16,7 @@ export const UserProfileMenu = memo(() => {
     <div ref={menuRef} className="relative">
       {/* Profile Button */}
       <button
+        aria-label="프로필 메뉴"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center gap-2 px-2 py-1.5 rounded-xl",

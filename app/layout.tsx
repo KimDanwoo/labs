@@ -30,7 +30,11 @@ export const viewport: Viewport = {
   ],
 };
 
+const BASE_URL = "https://awesome-sudoku.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
+  alternates: { canonical: "/" },
   title: {
     default: "어썸 스도쿠 — 온라인 퍼즐 게임",
     template: "%s | 어썸 스도쿠",

@@ -32,7 +32,7 @@ export const IconButton = ({
       // Shape - softer rounded
       "rounded-2xl",
       // Typography
-      "text-[10px] font-medium tracking-wide",
+      "text-xs font-medium tracking-wide",
       // Transitions
       "transition-all duration-200 ease-out",
       // Disabled state
@@ -83,7 +83,7 @@ export const IconButton = ({
           "absolute -top-1 -right-1",
           "min-w-[20px] h-[20px] px-1.5",
           "bg-gradient-to-br from-[rgb(var(--color-gradient-from))] to-[rgb(var(--color-gradient-to))]",
-          "text-white text-[10px] font-bold",
+          "text-white text-xs font-bold",
           "rounded-full",
           "flex items-center justify-center",
           "shadow-lg shadow-[rgb(var(--color-gradient-from))]/30",

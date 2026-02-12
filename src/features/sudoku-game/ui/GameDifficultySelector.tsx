@@ -58,7 +58,7 @@ const ListSelector = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <h4 className="text-[11px] font-semibold text-[rgb(var(--color-text-tertiary))] uppercase tracking-wider mb-1">
+      <h4 className="text-xs font-semibold text-[rgb(var(--color-text-tertiary))] uppercase tracking-wider mb-1">
         새 게임
       </h4>
       <div className="flex flex-wrap gap-2">

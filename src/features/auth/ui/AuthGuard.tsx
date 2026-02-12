@@ -142,7 +142,7 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
                     className="flex flex-col items-center p-3 rounded-xl bg-[rgb(var(--color-bg-tertiary))]/80"
                   >
                     <span className="text-lg font-bold text-[rgb(var(--color-accent))]">{icon}</span>
-                    <span className="text-[10px] text-[rgb(var(--color-text-secondary))] mt-1">{label}</span>
+                    <span className="text-xs text-[rgb(var(--color-text-secondary))] mt-1">{label}</span>
                   </div>
                 ))}
               </div>
