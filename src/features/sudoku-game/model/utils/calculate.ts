@@ -1,4 +1,4 @@
-import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
+import { BLOCK_SIZE, BOARD_MAX_INDEX, BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
 import { CellPriority, GridPosition, RemovalStrategy, SudokuBoard } from "@entities/board/model/types";
 import { getCenterDistance, isCenter, isCorner, isEdge } from "@entities/board/model/utils";
 import { Difficulty, KillerCage } from "@entities/game/model/types";
@@ -32,8 +32,8 @@ function calculatePositionWeight(
 
   // 대칭성 보너스
   if (strategy.symmetryBonus > 0) {
-    const symmetricRow = 8 - row;
-    const symmetricCol = 8 - col;
+    const symmetricRow = BOARD_MAX_INDEX - row;
+    const symmetricCol = BOARD_MAX_INDEX - col;
     if (row !== symmetricRow || col !== symmetricCol) {
       weight += strategy.symmetryBonus;
     }
@@ -101,10 +101,14 @@ function calculateIntensityBonus(
  * @param {number} targetRemove - 제거할 셀 수
  * @returns {CellPriority[]} 셀 우선순위
  */
+const HIGH_INTENSITY_THRESHOLD = 0.6;
+const MEDIUM_INTENSITY_THRESHOLD = 0.4;
+const CANDIDATE_POOL_MULTIPLIER = 1.5;
+
 export function calculateCellPriorities(strategy: RemovalStrategy, targetRemove: number): CellPriority[] {
   const removalIntensity = targetRemove / SUDOKU_CELL_COUNT;
-  const isHighIntensity = removalIntensity > 0.6;
-  const isMediumIntensity = removalIntensity > 0.4;
+  const isHighIntensity = removalIntensity > HIGH_INTENSITY_THRESHOLD;
+  const isMediumIntensity = removalIntensity > MEDIUM_INTENSITY_THRESHOLD;
   const intensityMultiplier = getIntensity(isHighIntensity, isMediumIntensity);
 
   const cells: CellPriority[] = [];
@@ -120,7 +124,7 @@ export function calculateCellPriorities(strategy: RemovalStrategy, targetRemove:
     }
   }
 
-  return cells.sort((a, b) => b.priority - a.priority).slice(0, Math.floor(targetRemove * 1.5));
+  return cells.sort((a, b) => b.priority - a.priority).slice(0, Math.floor(targetRemove * CANDIDATE_POOL_MULTIPLIER));
 }
 
 /**
@@ -237,11 +241,11 @@ export function calculateNeighborScore(neighbor: GridPosition, currentCage: Grid
   // 블록 경계를 넘나드는 것에 대한 패널티
   const cageBlocks = new Set();
   currentCage.forEach(([r, c]) => {
-    const blockId = Math.floor(r / 3) * 3 + Math.floor(c / 3);
+    const blockId = Math.floor(r / BLOCK_SIZE) * BLOCK_SIZE + Math.floor(c / BLOCK_SIZE);
     cageBlocks.add(blockId);
   });
 
-  const neighborBlock = Math.floor(row / 3) * 3 + Math.floor(col / 3);
+  const neighborBlock = Math.floor(row / BLOCK_SIZE) * BLOCK_SIZE + Math.floor(col / BLOCK_SIZE);
   if (cageBlocks.has(neighborBlock)) {
     score += 1; // 같은 블록 내 확장은 보너스
   } else {

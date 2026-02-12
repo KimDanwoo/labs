@@ -1,7 +1,11 @@
+import { BOARD_SIZE } from "@entities/board/model/constants";
 import { CageInfo } from "@entities/board/model/types";
 import { KillerCage } from "@entities/game/model/types";
 import { useMemo } from "react";
 import { CellPosition } from "./useTableDimensions";
+
+const CAGE_PADDING_RATIO = 0.1;
+const CAGE_SUM_LABEL_OFFSET = 2;
 
 interface UseCagePathCalculatorProps {
   cages: KillerCage[];
@@ -29,7 +33,7 @@ export const useCagePathCalculator = ({ cages, cellPositions }: UseCagePathCalcu
         const cell = cellPositions[`${row}-${col}`];
         if (!cell) return;
 
-        const padding = Math.min(cell.width, cell.height) * 0.1;
+        const padding = Math.min(cell.width, cell.height) * CAGE_PADDING_RATIO;
         const { x, y, width: w, height: h } = cell;
 
         const edges = [
@@ -71,7 +75,7 @@ export const useCagePathCalculator = ({ cages, cellPositions }: UseCagePathCalcu
 
       const topLeftCell = cage.cells.reduce(
         (topLeft, [r, c]) => (r < topLeft[0] || (r === topLeft[0] && c < topLeft[1]) ? [r, c] : topLeft),
-        [9, 9],
+        [BOARD_SIZE, BOARD_SIZE],
       );
 
       const sumCell = cellPositions[`${topLeftCell[0]}-${topLeftCell[1]}`];
@@ -79,8 +83,8 @@ export const useCagePathCalculator = ({ cages, cellPositions }: UseCagePathCalcu
         sums.push({
           id: cage.id,
           sum: cage.sum,
-          x: sumCell.x + 2,
-          y: sumCell.y + 2,
+          x: sumCell.x + CAGE_SUM_LABEL_OFFSET,
+          y: sumCell.y + CAGE_SUM_LABEL_OFFSET,
         });
       }
     });
