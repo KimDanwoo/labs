@@ -40,10 +40,11 @@ export const IconButton = ({
         "text-[rgb(var(--color-text-secondary))]",
         "shadow-sm",
         "border border-[rgb(var(--color-border-light))]/50",
-        !disabled &&
-          "hover:from-[rgb(var(--color-surface-primary))]" +
-          " hover:to-[rgb(var(--color-bg-tertiary))]" +
-          " hover:text-[rgb(var(--color-text-primary))]",
+        !disabled && [
+          "hover:from-[rgb(var(--color-surface-primary))]",
+          "hover:to-[rgb(var(--color-bg-tertiary))]",
+          "hover:text-[rgb(var(--color-text-primary))]",
+        ],
         !disabled && "hover:shadow-md hover:border-[rgb(var(--color-border-light))]",
         !disabled && "active:scale-95",
       ],

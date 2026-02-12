@@ -14,11 +14,7 @@ export function getCellBorderStyles(row: number, col: number) {
 /**
  * 셀 하이라이트 스타일을 반환 - Jonathan Ive inspired
  */
-export function getCellHighlightStyles(
-  highlight: CellHighlight,
-  isConflict: boolean,
-  isHint: boolean,
-) {
+export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boolean, isHint: boolean) {
   return {
     bgColor: cn(
       "bg-[rgb(var(--color-surface-primary))]",
@@ -29,8 +25,7 @@ export function getCellHighlightStyles(
     textColor: cn(
       "text-[rgb(var(--color-text-primary))]",
       isHint && "text-[rgb(var(--color-hint-text))]",
-      isConflict
-        && "text-[rgb(var(--color-error-text))] animate-subtle-pulse",
+      isConflict && "text-[rgb(var(--color-error-text))] animate-subtle-pulse",
     ),
     borderColor: "border-[rgb(var(--color-border-light))]",
   };
@@ -49,8 +44,8 @@ export function buildCellClassName(
   return cn(
     "relative",
     // Responsive sizes - fits within 320px min-width
-    "w-8 h-8",         // 32px * 9 = 288px
-    "sm:w-10 sm:h-10", // 40px * 9 = 360px
+    "w-9 h-9", // 32px * 9 = 288px
+    "xs:w-10 xs:h-10", // 40px * 9 = 360px
     "lg:w-12 lg:h-12", // 48px * 9 = 432px
     "xl:w-14 xl:h-14", // 56px * 9 = 504px
     // Border styling - subtle and refined

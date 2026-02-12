@@ -1,5 +1,6 @@
 import { useAuth } from "@features/auth/model/hooks/useAuth";
 import { GoogleSignInButton } from "@features/auth/ui/GoogleSignInButton";
+import { cn } from "@shared/model/utils";
 import { SudokuLoader } from "@shared/ui/SudokuLoader";
 import { ReactNode } from "react";
 
@@ -14,12 +15,12 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
   if (isLoading) {
     return (
       <div
-        className={
-          "flex flex-col items-center justify-center min-h-screen " +
-          "bg-gradient-to-br from-[rgb(var(--color-bg-primary))] " +
-          "via-[rgb(var(--color-accent-soft))] " +
-          "to-[rgb(var(--color-accent-light))]"
-        }
+        className={cn(
+          "flex flex-col items-center justify-center min-h-screen",
+          "bg-gradient-to-br from-[rgb(var(--color-bg-primary))]",
+          "via-[rgb(var(--color-accent-soft))]",
+          "to-[rgb(var(--color-accent-light))]",
+        )}
       >
         <SudokuLoader size="lg" />
         <p className="mt-4 text-sm text-[rgb(var(--color-text-secondary))] animate-pulse">퍼즐 준비 중</p>
@@ -31,13 +32,13 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
     return (
       fallback || (
         <div
-          className={
-            "relative flex flex-col items-center justify-center min-h-screen " +
-            "overflow-hidden bg-gradient-to-br " +
-            "from-[rgb(var(--color-bg-primary))] " +
-            "via-[rgb(var(--color-accent-soft))] " +
-            "to-[rgb(var(--color-accent-light))]"
-          }
+          className={cn(
+            "relative flex flex-col items-center justify-center min-h-screen",
+            "overflow-hidden bg-gradient-to-br",
+            "from-[rgb(var(--color-bg-primary))]",
+            "via-[rgb(var(--color-accent-soft))]",
+            "to-[rgb(var(--color-accent-light))]",
+          )}
         >
           {/* Animated background grid pattern */}
           <div className="absolute inset-0 opacity-[0.03]">
@@ -74,31 +75,33 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
           {/* Main content card */}
           <div className="relative z-10 w-full max-w-md mx-6 sm:mx-8">
             <div
-              className={
-                "bg-[rgb(var(--color-glass))]/80 backdrop-blur-xl rounded-3xl shadow-2xl " +
-                "shadow-[rgb(var(--color-accent))]/10 p-8 border border-[rgb(var(--color-surface-primary))]/50"
-              }
+              className={cn(
+                "bg-[rgb(var(--color-glass))]/80 backdrop-blur-xl rounded-3xl shadow-2xl",
+                "shadow-[rgb(var(--color-accent))]/10",
+                "p-8 border border-[rgb(var(--color-surface-primary))]/50",
+              )}
             >
               {/* Logo/Icon */}
               <div className="flex justify-center mb-6">
                 <div className="relative">
                   <div
-                    className={
-                      "w-20 h-20 rounded-2xl bg-gradient-to-br " +
-                      "from-[rgb(var(--color-gradient-from))] " +
-                      "to-[rgb(var(--color-gradient-to))] " +
-                      "shadow-lg shadow-[rgb(var(--color-gradient-from))]/30 " +
-                      "flex items-center justify-center"
-                    }
+                    className={cn(
+                      "w-20 h-20 rounded-2xl bg-gradient-to-br",
+                      "from-[rgb(var(--color-gradient-from))]",
+                      "to-[rgb(var(--color-gradient-to))]",
+                      "shadow-lg shadow-[rgb(var(--color-gradient-from))]/30",
+                      "flex items-center justify-center",
+                    )}
                   >
                     <div className="grid grid-cols-3 gap-0.5">
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
                         <div
                           key={n}
-                          className={
-                            "w-4 h-4 bg-white/90 rounded-[2px] flex items-center " +
-                            "justify-center text-[8px] font-bold text-[rgb(var(--color-accent))]"
-                          }
+                          className={cn(
+                            "w-4 h-4 bg-white/90 rounded-[2px]",
+                            "flex items-center justify-center",
+                            "text-[8px] font-bold text-[rgb(var(--color-accent))]",
+                          )}
                         >
                           {n}
                         </div>
@@ -113,12 +116,12 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
               {/* Title */}
               <div className="text-center mb-8">
                 <h1
-                  className={
-                    "text-3xl font-bold bg-gradient-to-r " +
-                    "from-[rgb(var(--color-text-primary))] " +
-                    "to-[rgb(var(--color-text-secondary))] " +
-                    "bg-clip-text text-transparent mb-2"
-                  }
+                  className={cn(
+                    "text-3xl font-bold bg-gradient-to-r",
+                    "from-[rgb(var(--color-text-primary))]",
+                    "to-[rgb(var(--color-text-secondary))]",
+                    "bg-clip-text text-transparent mb-2",
+                  )}
                 >
                   어썸 스도쿠
                 </h1>
