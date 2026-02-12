@@ -3,6 +3,15 @@ import nextPlugin from "@next/eslint-plugin-next";
 import tseslint from "typescript-eslint";
 
 export default [
+  {
+    ignores: [
+      "node_modules/**",
+      ".next/**",
+      "out/**",
+      "coverage/**",
+      "next-env.d.ts",
+    ],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
