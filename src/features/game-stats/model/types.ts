@@ -8,6 +8,7 @@ export interface GameStats {
   averageTime: number;
   bestScore: number;
   totalScore: number;
+  totalPoints: number;
 }
 
 export interface DifficultyStats {

@@ -37,7 +37,7 @@ interface StatsByDifficultyProps {
 export const StatsByDifficulty = memo<StatsByDifficultyProps>(({ stats }) => (
   <div
     className={cn(
-      "bg-[rgb(var(--color-surface-primary))] rounded-xl",
+      "bg-[rgb(var(--color-surface-primary))] rounded-2xl",
       "shadow-sm border border-[rgb(var(--color-border-light))]",
       "overflow-hidden",
     )}
@@ -60,7 +60,7 @@ export const StatsByDifficulty = memo<StatsByDifficultyProps>(({ stats }) => (
             <th className="px-4 py-3 font-medium">완료</th>
             <th className="px-4 py-3 font-medium hidden sm:table-cell">평균 시간</th>
             <th className="px-4 py-3 font-medium hidden sm:table-cell">최고 시간</th>
-            <th className="px-4 py-3 font-medium">최고 점수</th>
+            <th className="px-4 py-3 font-medium">최고 포인트</th>
           </tr>
         </thead>
         <tbody>

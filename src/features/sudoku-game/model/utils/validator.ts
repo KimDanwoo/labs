@@ -1,4 +1,6 @@
-import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
+import {
+  BLOCKS_PER_ROW, BLOCK_SIZE, BOARD_NUMBERS, BOARD_SIZE, SUDOKU_CELL_COUNT,
+} from "@entities/board/model/constants";
 import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
 import { getBlockCoordinates } from "@entities/board/model/utils";
 import { KillerCage } from "@entities/game/model/types";
@@ -40,7 +42,7 @@ function getValidCandidates(grid: (number | null)[][], row: number, col: number)
     }
   }
 
-  return [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((n) => !used.has(n));
+  return BOARD_NUMBERS.filter((n) => !used.has(n));
 }
 
 /**
@@ -48,10 +50,11 @@ function getValidCandidates(grid: (number | null)[][], row: number, col: number)
  * @param {(number | null)[][]} grid - 스도쿠 그리드
  * @returns {boolean} 유일 솔루션 여부
  */
+const MAX_SOLUTIONS = 2;
+const MAX_ITERATIONS = 200_000;
+
 export function hasUniqueSolution(grid: (number | null)[][]): boolean {
   let solutionCount = 0;
-  const MAX_SOLUTIONS = 2;
-  const MAX_ITERATIONS = 200000;
   let iterations = 0;
 
   const tempGrid = grid.map((row) => [...row]);
@@ -226,8 +229,8 @@ export function checkConflicts(board: SudokuBoard): SudokuBoard {
   }
 
   // 3x3 블록별 중복 검사
-  for (let blockRow = 0; blockRow < 3; blockRow++) {
-    for (let blockCol = 0; blockCol < 3; blockCol++) {
+  for (let blockRow = 0; blockRow < BLOCKS_PER_ROW; blockRow++) {
+    for (let blockCol = 0; blockCol < BLOCKS_PER_ROW; blockCol++) {
       const seen = new Map<number, Array<[number, number]>>();
 
       for (let r = 0; r < BLOCK_SIZE; r++) {
@@ -341,7 +344,7 @@ export function isValidPlacement(grid: Grid, row: number, col: number, num: numb
   if (grid[row].includes(num)) return false;
 
   // 열 검사
-  for (let r = 0; r < 9; r++) {
+  for (let r = 0; r < BOARD_SIZE; r++) {
     if (grid[r][col] === num) return false;
   }
 

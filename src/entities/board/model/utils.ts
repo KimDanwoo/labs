@@ -1,4 +1,4 @@
-import { BLOCK_SIZE } from "./constants";
+import { BLOCK_SIZE, BOARD_CENTER, BOARD_MAX_INDEX } from "./constants";
 import { Grid } from "./types";
 
 /**
@@ -27,7 +27,7 @@ export function getBlockCoordinates(row: number, col: number): [number, number] 
  * @returns 중앙 거리
  */
 export function getCenterDistance(row: number, col: number): number {
-  return Math.abs(4 - row) + Math.abs(4 - col);
+  return Math.abs(BOARD_CENTER - row) + Math.abs(BOARD_CENTER - col);
 }
 
 /**
@@ -37,7 +37,7 @@ export function getCenterDistance(row: number, col: number): number {
  * @returns 코너 여부
  */
 export function isCorner(row: number, col: number): boolean {
-  return (row === 0 || row === 8) && (col === 0 || col === 8);
+  return (row === 0 || row === BOARD_MAX_INDEX) && (col === 0 || col === BOARD_MAX_INDEX);
 }
 
 /**
@@ -47,7 +47,7 @@ export function isCorner(row: number, col: number): boolean {
  * @returns 가장자리 여부
  */
 export function isEdge(row: number, col: number): boolean {
-  return row === 0 || row === 8 || col === 0 || col === 8;
+  return row === 0 || row === BOARD_MAX_INDEX || col === 0 || col === BOARD_MAX_INDEX;
 }
 
 /**

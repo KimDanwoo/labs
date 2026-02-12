@@ -60,3 +60,6 @@ export const TARGET_TIMES = {
   [GAME_LEVEL.HARD]: 1200,
   [GAME_LEVEL.EXPERT]: 1800,
 } as const;
+
+/** 최대 실수 허용 횟수 (초과 시 게임 오버) */
+export const MAX_MISTAKES = 5;

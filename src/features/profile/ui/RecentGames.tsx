@@ -1,12 +1,12 @@
 "use client";
 
 import { GameRecord } from "@entities/game-record/model/types";
-import { GAME_LEVEL_LABELS, GAME_MODE } from "@entities/game/model/constants";
+import { getRecordPoint } from "@entities/game-record/model/utils";
 import {
-  calculateScore,
-  formatScore,
-} from "@features/game-record/model/utils/scoreCalculator";
+  GAME_LEVEL_LABELS, GAME_MODE,
+} from "@entities/game/model/constants";
 import { formatTime } from "@features/sudoku-game/model/utils";
+import { GameDetailSheet } from "./GameDetailSheet";
 import { cn } from "@shared/model/utils";
 import { memo, useState } from "react";
 
@@ -54,88 +54,10 @@ const ErrorState = ({ message }: { message: string }) => (
   </div>
 );
 
-interface ScoreDetailProps {
-  game: GameRecord;
-}
-
-const ScoreDetail = memo<ScoreDetailProps>(({ game }) => {
-  const breakdown = calculateScore({
-    difficulty: game.difficulty,
-    gameMode: game.gameMode,
-    completionTime: game.completionTime,
-    hintsUsed: game.hintsUsed,
-    mistakeCount: game.mistakesCount ?? 0,
-  });
-
-  const rows = [
-    { label: "기본 점수", value: breakdown.baseScore },
-    ...(breakdown.timePenalty > 0
-      ? [{ label: "시간 감점", value: -breakdown.timePenalty, isPenalty: true }]
-      : []),
-    ...(breakdown.hintPenalty > 0
-      ? [{ label: "힌트 감점", value: -breakdown.hintPenalty, isPenalty: true }]
-      : []),
-    ...(breakdown.mistakePenalty > 0
-      ? [{ label: "오답 감점", value: -breakdown.mistakePenalty, isPenalty: true }]
-      : []),
-    ...(breakdown.killerBonus > 0
-      ? [{ label: "킬러 보너스", value: breakdown.killerBonus, isBonus: true }]
-      : []),
-  ];
-
-  return (
-    <div
-      className={cn(
-        "mx-4 mb-3 p-3 rounded-lg text-xs",
-        "bg-[rgb(var(--color-bg-tertiary))]",
-      )}
-    >
-      {rows.map((row) => (
-        <div
-          key={row.label}
-          className="flex justify-between py-0.5"
-        >
-          <span className="text-[rgb(var(--color-text-secondary))]">
-            {row.label}
-          </span>
-          <span
-            className={cn(
-              "font-tabular",
-              row.isBonus && "text-[rgb(var(--color-success-text))]",
-              row.isPenalty && "text-[rgb(var(--color-error-text))]",
-              !row.isBonus && !row.isPenalty && "text-[rgb(var(--color-text-primary))]",
-            )}
-          >
-            {row.value >= 0 && !row.isPenalty ? "+" : ""}
-            {formatScore(row.value)}
-          </span>
-        </div>
-      ))}
-      <div
-        className={cn(
-          "flex justify-between pt-1.5 mt-1.5",
-          "border-t border-[rgb(var(--color-border-light))]",
-          "font-semibold",
-        )}
-      >
-        <span className="text-[rgb(var(--color-text-secondary))]">
-          최종 점수
-        </span>
-        <span className="text-[rgb(var(--color-text-primary))] font-tabular">
-          {formatScore(breakdown.totalScore)}
-        </span>
-      </div>
-    </div>
-  );
-});
-
-ScoreDetail.displayName = "ScoreDetail";
-
 export const RecentGames = memo<RecentGamesProps>(
   ({ games, isLoading, error }) => {
-    const [expandedId, setExpandedId] = useState<string | null>(
-      null,
-    );
+    const [selectedGame, setSelectedGame] =
+      useState<GameRecord | null>(null);
 
     const renderContent = () => {
       if (isLoading) return <LoadingState />;
@@ -152,111 +74,110 @@ export const RecentGames = memo<RecentGamesProps>(
           {games.map((game) => {
             const diffLabel =
               GAME_LEVEL_LABELS[
-                game.difficulty as keyof typeof GAME_LEVEL_LABELS
+                game.difficulty as
+                  keyof typeof GAME_LEVEL_LABELS
               ] || game.difficulty;
             const isKiller =
               game.gameMode === GAME_MODE.KILLER;
-            const isExpanded = expandedId === game.id;
+            const point = getRecordPoint(game);
             const mistakes = game.mistakesCount ?? 0;
 
             return (
-              <div key={game.id}>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setExpandedId(isExpanded ? null : game.id!)
-                  }
+              <button
+                key={game.id}
+                type="button"
+                onClick={() => setSelectedGame(game)}
+                className={cn(
+                  "w-full px-4 py-3",
+                  "hover:bg-[rgb(var(--color-hover))]",
+                  "transition-colors",
+                  "flex items-center gap-4",
+                  "text-left",
+                )}
+              >
+                <div
                   className={cn(
-                    "w-full px-4 py-3",
-                    "hover:bg-[rgb(var(--color-hover))]",
-                    "transition-colors",
-                    "flex items-center gap-4",
-                    "text-left",
+                    "w-10 h-10 rounded-full",
+                    "flex-shrink-0",
+                    "flex items-center justify-center",
+                    "bg-[rgb(var(--color-success-bg))]",
+                    "text-[rgb(var(--color-success-text))]",
                   )}
                 >
-                  <div
-                    className={cn(
-                      "w-10 h-10 rounded-full flex-shrink-0",
-                      "flex items-center justify-center",
-                      "bg-[rgb(var(--color-success-bg))]",
-                      "text-[rgb(var(--color-success-text))]",
-                    )}
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          "font-medium",
-                          "text-[rgb(var(--color-text-primary))]",
-                        )}
-                      >
-                        {diffLabel}
-                      </span>
-                      {isKiller && (
-                        <span
-                          className={cn(
-                            "text-xs px-1.5 py-0.5 rounded",
-                            "bg-[rgb(var(--color-error-bg))]",
-                            "text-[rgb(var(--color-error-text))]",
-                          )}
-                        >
-                          킬러
-                        </span>
-                      )}
-                    </div>
-                    <p
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span
                       className={cn(
-                        "text-sm",
-                        "text-[rgb(var(--color-text-secondary))]",
-                      )}
-                    >
-                      {formatTime(game.completionTime)}
-                      {" · "}힌트 {game.hintsUsed}회
-                      {mistakes > 0 && ` · 오답 ${mistakes}회`}
-                    </p>
-                  </div>
-
-                  <div className="text-right flex-shrink-0">
-                    <p
-                      className={cn(
-                        "font-bold font-tabular",
+                        "font-medium",
                         "text-[rgb(var(--color-text-primary))]",
                       )}
                     >
-                      {formatScore(game.score)}
-                    </p>
-                    <p
-                      className={cn(
-                        "text-xs",
-                        "text-[rgb(var(--color-text-tertiary))]",
-                      )}
-                    >
-                      {game.createdAt?.toDate?.()
-                        ? new Date(
-                          game.createdAt.toDate(),
-                        ).toLocaleDateString("ko-KR")
-                        : "-"}
-                    </p>
+                      {diffLabel}
+                    </span>
+                    {isKiller && (
+                      <span
+                        className={cn(
+                          "text-xs px-1.5 py-0.5",
+                          "rounded",
+                          "bg-[rgb(var(--color-error-bg))]",
+                          "text-[rgb(var(--color-error-text))]",
+                        )}
+                      >
+                        킬러
+                      </span>
+                    )}
                   </div>
-                </button>
+                  <p
+                    className={cn(
+                      "text-sm",
+                      "text-[rgb(var(--color-text-secondary))]",
+                    )}
+                  >
+                    {formatTime(game.completionTime)}
+                    {" · "}힌트 {game.hintsUsed}회
+                    {mistakes > 0
+                      && ` · 오답 ${mistakes}회`}
+                  </p>
+                </div>
 
-                {isExpanded && <ScoreDetail game={game} />}
-              </div>
+                <div className="text-right flex-shrink-0">
+                  <p
+                    className={cn(
+                      "font-bold font-tabular",
+                      "text-[rgb(var(--color-text-primary))]",
+                    )}
+                  >
+                    +{point}
+                  </p>
+                  <p
+                    className={cn(
+                      "text-xs",
+                      "text-[rgb(var(--color-text-tertiary))]",
+                    )}
+                  >
+                    {game.createdAt?.toDate?.()
+                      ? new Date(
+                        game.createdAt.toDate(),
+                      ).toLocaleDateString("ko-KR")
+                      : "-"}
+                  </p>
+                </div>
+              </button>
             );
           })}
         </div>
@@ -264,31 +185,40 @@ export const RecentGames = memo<RecentGamesProps>(
     };
 
     return (
-      <div
-        className={cn(
-          "bg-[rgb(var(--color-surface-primary))]",
-          "rounded-2xl shadow-sm",
-          "border border-[rgb(var(--color-border-light))]",
-          "overflow-hidden",
-        )}
-      >
+      <>
         <div
           className={cn(
-            "px-4 py-3 border-b",
+            "bg-[rgb(var(--color-surface-primary))]",
+            "rounded-2xl shadow-sm",
+            "border",
             "border-[rgb(var(--color-border-light))]",
+            "overflow-hidden",
           )}
         >
-          <h3
+          <div
             className={cn(
-              "font-semibold",
-              "text-[rgb(var(--color-text-primary))]",
+              "px-4 py-3 border-b",
+              "border-[rgb(var(--color-border-light))]",
             )}
           >
-            최근 게임
-          </h3>
+            <h3
+              className={cn(
+                "font-semibold",
+                "text-[rgb(var(--color-text-primary))]",
+              )}
+            >
+              최근 게임
+            </h3>
+          </div>
+          {renderContent()}
         </div>
-        {renderContent()}
-      </div>
+
+        <GameDetailSheet
+          game={selectedGame}
+          isOpen={selectedGame !== null}
+          onClose={() => setSelectedGame(null)}
+        />
+      </>
     );
   },
 );

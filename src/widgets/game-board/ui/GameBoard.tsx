@@ -5,6 +5,7 @@ import { GAME_MODE } from "@entities/game/model/constants";
 import { useInitializeGame, useKeyboardControls } from "@features/sudoku-game/model/hooks";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { KillerCage, Cell as SudokuCell } from "@features/sudoku-game/ui";
+import { cn } from "@shared/model/utils";
 import { memo, useCallback } from "react";
 
 interface BoardRowProps {
@@ -46,21 +47,22 @@ export const SudokuBoard: React.FC = () => {
     <div className="relative group flex-shrink-0">
       {/* Outer glow */}
       <div
-        className={
-          "absolute -inset-3 rounded-3xl opacity-60 blur-2xl transition-opacity duration-500 " +
-          "bg-gradient-to-br from-blue-400/20 via-indigo-400/10 to-purple-400/20 " +
-          "dark:from-blue-500/10 dark:via-indigo-500/5 dark:to-purple-500/10 " +
-          "group-hover:opacity-80"
-        }
+        className={cn(
+          "absolute -inset-3 opacity-60 blur-2xl transition-opacity duration-500",
+          "bg-gradient-to-br from-blue-400/20 via-indigo-400/10 to-purple-400/20",
+          "dark:from-blue-500/10 dark:via-indigo-500/5 dark:to-purple-500/10",
+          "group-hover:opacity-80",
+        )}
       />
 
       {/* Board container */}
       <div
-        className={
-          "relative bg-[rgb(var(--color-surface-primary))] rounded-2xl overflow-hidden " +
-          "shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] " +
-          "ring-1 ring-black/[0.03] dark:ring-white/[0.05]"
-        }
+        className={cn(
+          "relative bg-[rgb(var(--color-surface-primary))] overflow-hidden",
+          "shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)]",
+          "dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]",
+          "ring-1 ring-black/[0.03] dark:ring-white/[0.05]",
+        )}
       >
         {gameMode === GAME_MODE.KILLER && <KillerCage />}
 

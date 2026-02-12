@@ -1,5 +1,7 @@
-import { GameRecord, ScoreBreakdown } from "@entities/game-record/model/types";
-import { calculateScore } from "@features/game-record/model/utils/scoreCalculator";
+import {
+  GameRecord, PointResult,
+} from "@entities/game-record/model/types";
+import { calculatePoint } from "@features/game-record/model/utils/scoreCalculator";
 import { saveGameRecord } from "@features/game-record/model/services/gameRecordService";
 import { useAuthStore } from "@features/auth/model/stores/authStore";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
@@ -10,41 +12,41 @@ interface SaveGameRecordResult {
   save: () => Promise<string | null>;
   isSaving: boolean;
   error: Error | null;
-  scoreBreakdown: ScoreBreakdown | null;
+  pointResult: PointResult | null;
 }
 
 export function useSaveGameRecord(): SaveGameRecordResult {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [scoreBreakdown, setScoreBreakdown] =
-    useState<ScoreBreakdown | null>(null);
+  const [pointResult, setPointResult] =
+    useState<PointResult | null>(null);
   const savingRef = useRef(false);
 
   const user = useAuthStore((state) => state.user);
-  const difficulty = useSudokuStore((state) => state.difficulty);
-  const gameMode = useSudokuStore((state) => state.gameMode);
-  const currentTime = useSudokuStore((state) => state.currentTime);
-  const hintsRemaining = useSudokuStore((state) => state.hintsRemaining);
-  const mistakeCount = useSudokuStore((state) => state.mistakeCount);
-  const isSuccess = useSudokuStore((state) => state.isSuccess);
-  const isRecordSaved = useSudokuStore((state) => state.isRecordSaved);
+  const difficulty = useSudokuStore((s) => s.difficulty);
+  const gameMode = useSudokuStore((s) => s.gameMode);
+  const currentTime = useSudokuStore((s) => s.currentTime);
+  const hintsRemaining = useSudokuStore(
+    (s) => s.hintsRemaining,
+  );
+  const mistakeCount = useSudokuStore(
+    (s) => s.mistakeCount,
+  );
+  const isSuccess = useSudokuStore((s) => s.isSuccess);
+  const isRecordSaved = useSudokuStore(
+    (s) => s.isRecordSaved,
+  );
 
-  const save = useCallback(async (): Promise<string | null> => {
+  const save = useCallback(async (): Promise<
+    string | null
+  > => {
     if (savingRef.current) return null;
     if (!user || !isSuccess || isRecordSaved) return null;
     savingRef.current = true;
 
     const hintsUsed = HINTS_REMAINING - hintsRemaining;
-
-    const breakdown = calculateScore({
-      difficulty,
-      gameMode,
-      completionTime: currentTime,
-      hintsUsed,
-      mistakeCount,
-    });
-
-    setScoreBreakdown(breakdown);
+    const result = calculatePoint({ difficulty, gameMode });
+    setPointResult(result);
 
     const record: Omit<GameRecord, "id" | "createdAt"> = {
       userId: user.uid,
@@ -55,7 +57,8 @@ export function useSaveGameRecord(): SaveGameRecordResult {
       completionTime: currentTime,
       hintsUsed,
       mistakesCount: mistakeCount,
-      score: breakdown.totalScore,
+      score: result.totalPoint,
+      point: result.totalPoint,
       isSuccess: true,
     };
 
@@ -80,5 +83,5 @@ export function useSaveGameRecord(): SaveGameRecordResult {
     gameMode, currentTime, hintsRemaining, mistakeCount,
   ]);
 
-  return { save, isSaving, error, scoreBreakdown };
+  return { save, isSaving, error, pointResult };
 }

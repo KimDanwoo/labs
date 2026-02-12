@@ -14,6 +14,9 @@ export const BASE_GRID = [
   [6, 4, 2, 9, 7, 8, 5, 3, 1],
   [9, 7, 8, 5, 3, 1, 6, 4, 2],
 ];
+export const BOARD_MAX_INDEX = BOARD_SIZE - 1;
+export const BOARD_CENTER = Math.floor(BOARD_SIZE / 2);
+export const BLOCKS_PER_ROW = BOARD_SIZE / BLOCK_SIZE;
 export const MAX_REMOVAL_ATTEMPTS = 100;
 export const MIN_EXPERT_HINTS = 8;
 export const SUDOKU_CELL_COUNT = 81;

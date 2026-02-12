@@ -1,3 +1,4 @@
+import { BOARD_MAX_INDEX } from "@entities/board/model/constants";
 import { SudokuStoreActionCreator } from "@features/sudoku-game/model/stores/types";
 
 export const createKeyboardActions: SudokuStoreActionCreator<"handleKeyInput"> = (set, get) => ({
@@ -29,11 +30,11 @@ export const createKeyboardActions: SudokuStoreActionCreator<"handleKeyInput"> =
     if (key === "ArrowUp") {
       row = Math.max(0, row - 1);
     } else if (key === "ArrowDown") {
-      row = Math.min(8, row + 1);
+      row = Math.min(BOARD_MAX_INDEX, row + 1);
     } else if (key === "ArrowLeft") {
       col = Math.max(0, col - 1);
     } else if (key === "ArrowRight") {
-      col = Math.min(8, col + 1);
+      col = Math.min(BOARD_MAX_INDEX, col + 1);
     }
 
     get().selectCell(row, col);

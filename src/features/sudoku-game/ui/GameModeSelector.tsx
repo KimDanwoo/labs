@@ -1,7 +1,8 @@
 import { GAME_MODE } from "@entities/game/model/constants";
+import { GameMode } from "@entities/game/model/types";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { cn } from "@shared/model/utils";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 
 const gameModes = [
   { label: "클래식", value: GAME_MODE.CLASSIC },
@@ -12,6 +13,14 @@ export const GameModeSelector: React.FC = memo(() => {
   const gameMode = useSudokuStore((state) => state.gameMode);
   const switchGameMode = useSudokuStore((state) => state.switchGameMode);
 
+  const handleSwitchGameMode = useCallback(
+    (mode: GameMode) => {
+      if (gameMode === mode) return;
+      switchGameMode(mode);
+    },
+    [switchGameMode, gameMode],
+  );
+
   return (
     <div className="flex items-center gap-1 p-1 bg-[rgb(var(--color-bg-tertiary))]/80 rounded-xl backdrop-blur-sm">
       {gameModes.map(({ value, label }) => {
@@ -19,7 +28,7 @@ export const GameModeSelector: React.FC = memo(() => {
         return (
           <button
             key={value}
-            onClick={() => switchGameMode(value)}
+            onClick={() => handleSwitchGameMode(value)}
             className={cn(
               "px-4 py-1.5 rounded-lg text-sm font-medium",
               "transition-all duration-200 ease-out",

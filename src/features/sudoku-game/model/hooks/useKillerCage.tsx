@@ -5,6 +5,8 @@ import { useCallback, useMemo, useState } from "react";
 import { useTableDimensions, CellPosition } from "./useTableDimensions";
 import { useCagePathCalculator } from "./useCagePathCalculator";
 
+const DEFAULT_CELL_SIZE = 40;
+
 /**
  * 킬러 케이지 위치 계산 훅
  * @returns 킬러 케이지 정보
@@ -35,7 +37,7 @@ export const useKillerCage = () => {
   const hasKillerCage = gameMode === GAME_MODE.KILLER && cageInfo.paths.length > 0;
 
   const cellSize = useMemo(() => {
-    if (!hasKillerCage || cageInfo.paths.length === 0) return 40;
+    if (!hasKillerCage || cageInfo.paths.length === 0) return DEFAULT_CELL_SIZE;
 
     try {
       const firstPath = cageInfo.paths[0]?.path || "";
@@ -46,14 +48,14 @@ export const useKillerCage = () => {
         if (secondMatch) {
           const x1 = parseFloat(match[1]);
           const x2 = parseFloat(secondMatch[1]);
-          return Math.max(Math.abs(x2 - x1), 40);
+          return Math.max(Math.abs(x2 - x1), DEFAULT_CELL_SIZE);
         }
       }
     } catch {
       // Silently handle cell size calculation error
     }
 
-    return 40;
+    return DEFAULT_CELL_SIZE;
   }, [hasKillerCage, cageInfo.paths]);
 
   return {

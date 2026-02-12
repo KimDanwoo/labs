@@ -206,6 +206,9 @@ function processBatchKillerRemoval(
 /**
  * @description 킬러 스도쿠 셀 제거
  */
+const EXPERT_MAX_REMOVAL_ATTEMPTS = 50;
+const REMOVAL_BATCH_SIZE = 10;
+
 export function removeKillerCells(
   board: SudokuBoard,
   cages: KillerCage[],
@@ -215,7 +218,7 @@ export function removeKillerCells(
   const cageMap = createCageMap(cages);
   let removedCount = 0;
   const maxAttempts = difficulty === "expert"
-    ? 50
+    ? EXPERT_MAX_REMOVAL_ATTEMPTS
     : MAX_REMOVAL_ATTEMPTS;
 
   for (
@@ -224,7 +227,7 @@ export function removeKillerCells(
     attempt++
   ) {
     const batchSize = Math.min(
-      10, targetRemove - removedCount,
+      REMOVAL_BATCH_SIZE, targetRemove - removedCount,
     );
     const attemptRemoved = processBatchKillerRemoval(
       board, cageMap, batchSize, difficulty, cages,

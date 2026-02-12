@@ -1,4 +1,4 @@
-import { SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface CellPosition {
@@ -47,8 +47,8 @@ export const useTableDimensions = (
     const cellPositions: Record<string, CellPosition> = {};
 
     Array.from(cells).forEach((cell, index) => {
-      const row = Math.floor(index / 9);
-      const col = index % 9;
+      const row = Math.floor(index / BOARD_SIZE);
+      const col = index % BOARD_SIZE;
       const rect = cell.getBoundingClientRect();
 
       cellPositions[`${row}-${col}`] = {

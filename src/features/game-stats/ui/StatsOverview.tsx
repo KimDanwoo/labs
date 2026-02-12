@@ -23,7 +23,7 @@ const colorStyles = {
 const StatCard = memo<StatCardProps>(({ label, value, icon, color }) => (
   <div
     className={cn(
-      "bg-[rgb(var(--color-surface-primary))] rounded-xl p-4",
+      "bg-[rgb(var(--color-surface-primary))] rounded-2xl p-4",
       "shadow-sm border border-[rgb(var(--color-border-light))]",
     )}
   >
@@ -115,7 +115,7 @@ export const StatsOverview = memo<StatsOverviewProps>(({ stats }) => (
       color="amber"
     />
     <StatCard
-      label="최고 점수"
+      label="최고 포인트"
       value={formatScore(stats.bestScore)}
       icon={<StarIcon />}
       color="rose"

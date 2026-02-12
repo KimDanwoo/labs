@@ -1,8 +1,9 @@
 "use client";
 
-import { KEY_NUMBER } from "@entities/board/model/constants";
+import { BOARD_SIZE, KEY_NUMBER } from "@entities/board/model/constants";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { useHistoryStore } from "@features/undo-redo/model/stores/historyStore";
+import { cn } from "@shared/model/utils";
 import { NumberButton } from "@shared/ui";
 import { FC, useCallback, useMemo } from "react";
 
@@ -17,7 +18,7 @@ export const SelectNumber: FC = () => {
   const toggleNote = useSudokuStore((state) => state.toggleNote);
   const pushState = useHistoryStore((state) => state.pushState);
 
-  const isNumberDisabled = useMemo(() => (value: number) => numberCounts[value] >= 9, [numberCounts]);
+  const isNumberDisabled = useMemo(() => (value: number) => numberCounts[value] >= BOARD_SIZE, [numberCounts]);
 
   const handleNoteToggle = useCallback(
     (value: number) => {
@@ -39,10 +40,10 @@ export const SelectNumber: FC = () => {
 
   return (
     <div
-      className={
-        "grid grid-cols-9 md:grid-cols-3 gap-1.5 sm:gap-2 md:gap-2.5 lg:gap-3 " +
-        "h-full place-content-center place-items-center"
-      }
+      className={cn(
+        "grid grid-cols-9 md:grid-cols-3 gap-1.5 xs:gap-2 md:gap-2.5 lg:gap-3",
+        "h-full place-content-center place-items-center",
+      )}
     >
       {KEY_NUMBER.map((num) => (
         <NumberButton
