@@ -21,6 +21,7 @@ export const PauseGameOverlay: FC = () => {
       )}
     >
       <button
+        aria-label="게임 계속하기"
         onClick={() => toggleTimer()}
         className={cn(
           "flex flex-col items-center gap-4 p-8 rounded-3xl",

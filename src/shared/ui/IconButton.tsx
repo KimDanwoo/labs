@@ -4,6 +4,7 @@ interface IconButtonProps {
   icon: React.ReactNode;
   onClick: () => void;
   label?: string;
+  "aria-label"?: string;
   className?: string;
   disabled?: boolean;
   variant?: "default" | "primary" | "subtle";
@@ -14,12 +15,14 @@ export const IconButton = ({
   icon,
   onClick,
   label,
+  "aria-label": ariaLabel,
   className,
   disabled,
   variant = "default",
   badge,
 }: IconButtonProps) => (
   <button
+    aria-label={ariaLabel ?? label}
     className={cn(
       // Layout
       "flex flex-col items-center justify-center gap-1.5",
@@ -29,7 +32,7 @@ export const IconButton = ({
       // Shape - softer rounded
       "rounded-2xl",
       // Typography
-      "text-[10px] font-medium tracking-wide",
+      "text-xs font-medium tracking-wide",
       // Transitions
       "transition-all duration-200 ease-out",
       // Disabled state
@@ -72,7 +75,7 @@ export const IconButton = ({
     onClick={onClick}
     disabled={disabled}
   >
-    <span className="text-xl">{icon}</span>
+    <span className="text-xl" aria-hidden="true">{icon}</span>
     {label && <span className="whitespace-nowrap">{label}</span>}
     {badge !== undefined && (
       <span
@@ -80,7 +83,7 @@ export const IconButton = ({
           "absolute -top-1 -right-1",
           "min-w-[20px] h-[20px] px-1.5",
           "bg-gradient-to-br from-[rgb(var(--color-gradient-from))] to-[rgb(var(--color-gradient-to))]",
-          "text-white text-[10px] font-bold",
+          "text-white text-xs font-bold",
           "rounded-full",
           "flex items-center justify-center",
           "shadow-lg shadow-[rgb(var(--color-gradient-from))]/30",

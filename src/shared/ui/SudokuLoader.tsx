@@ -73,19 +73,6 @@ export const SudokuLoader = memo<SudokuLoaderProps>(({ size = "md", className })
           }}
         />
       </div>
-
-      <style jsx>{`
-        @keyframes sudokuPulse {
-          0%, 100% {
-            opacity: 0.3;
-            transform: scale(0.85);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      `}</style>
     </div>
   );
 });

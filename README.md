@@ -1,54 +1,84 @@
 # Awesome Sudoku
 
-스도쿠 게임입니다. 퍼즐 생성, 다양한 난이도 설정 등을 제공합니다.
+> 9x9 칸 안에서 벌어지는 두뇌 싸움.
 
-> **개발 중인 프로젝트입니다.** 현재 열정을 가지고 개발 중이며, 테스트 단계를 완료한 후 정식 배포할 예정입니다.
+클래식 스도쿠와 킬러 스도쿠를 지원하는 웹 기반 퍼즐 게임입니다.
+TypeScript + Next.js로 만들었고, 알고리즘부터 UI까지 직접 구현했습니다.
 
-## 프로젝트 소개
+## Preview
 
-이 프로젝트는 스도쿠에 대한 관심에서 시작되었습니다. TypeScript를 활용하여 재미있는 스도쿠 게임을 구현하면서도, 깔끔하고 확장 가능한 코드 작성을 목표로 하고 있습니다. 알고리즘과 게임 로직에 대한 이해를 높이고 실제 사용 가능한 완성도 높은 프로젝트를 만들어가는 과정을 즐기고 있습니다.
+| Light | Dark |
+|-------|------|
+| *coming soon* | *coming soon* |
 
-## 개발 현황
+## Features
 
-- 기본 스도쿠 생성 알고리즘 구현
-- 난이도 조정 시스템 개발
-- 백트래킹 솔버 구현
-- 충돌 감지 및 힌트 시스템 구현
-- 테스트 진행 중
-- 문서화 작업 중
-- 배포 준비 중
+**Game**
+- 4단계 난이도 (Easy / Medium / Hard / Expert)
+- 클래식 모드 & 킬러 모드 (케이지 합산 규칙)
+- 메모 모드, 힌트 시스템, 충돌 감지
+- Undo / Redo
+- 실수 5회 초과 시 게임 오버
+- 게임 결과 바텀시트 (성공/실패 분기)
 
-## 주요 기능
+**Record & Stats**
+- 난이도 기반 포인트 시스템 (4~10점)
+- 게임별 기록 저장 (시간, 힌트, 실수, 포인트)
+- 난이도별 통계, 완료율, 최고 포인트
 
-- 스도쿠 퍼즐 생성
-- 다섯 가지 난이도 레벨 (쉬움, 중간, 어려움, 매우 어려움, 극악)
-- 힌트 시스템 및 충돌 감지
-- 단일 솔루션 검증
-- 게임 시간 추적 기능
-- 메모 기능 지원
+**Social**
+- Google 로그인
+- 최고 기록 리더보드 (난이도/모드 필터)
+- 누적 포인트 리더보드 (1~3위 메달)
+- 프로필 페이지 (게임 상세 바텀시트)
 
-## 로드맵
+**UI/UX**
+- 다크 / 라이트 테마
+- 반응형 레이아웃 (모바일 395px ~ 데스크탑)
+- 드래그로 닫는 바텀시트, 토스트 알림
+- Jonathan Ive 인스파이어드 미니멀 디자인
 
-- 반응형 UI 구현
-- 다크/라이트 테마 지원 (장기 목표)
-- 점수 시스템 및 리더보드 (장기 목표)
-- 게임 저장 및 불러오기 기능 (장기 목표)
-- 온라인 멀티플레이어 모드 (장기 목표)
+## Tech Stack
 
-## 설치 및 사용 방법
+```
+Next.js 15 (App Router + Turbopack)
+React 19 · TypeScript · Tailwind CSS v4
+Zustand v4 (persist middleware)
+Firebase Auth + Firestore
+```
 
-현재 개발 단계이므로 정식 배포 전까지는 다음 단계를 통해 로컬에서 실행할 수 있습니다:
+## Architecture
+
+[Feature-Sliced Design](https://feature-sliced.design/) 기반 구조.
+
+```
+src/
+├── views/        # 페이지 (Home, Profile, Leaderboard)
+├── widgets/      # 조합 UI (GameBoard, GameHeader, Overlays)
+├── features/     # 기능 단위 (sudoku-game, auth, leaderboard...)
+├── entities/     # 도메인 모델 (board, game, game-record)
+├── shared/       # 공통 유틸 & UI (cn, BottomSheet, Snackbar...)
+└── apps/         # 외부 서비스 초기화 (Firebase)
+```
+
+## Getting Started
 
 ```bash
-# 저장소 클론
-git clone https://github.com/yourusername/awesome-sudoku.git
-
-# 디렉토리 이동
+git clone https://github.com/KimDanwoo/awesome-sudoku.git
 cd awesome-sudoku
-
-# 의존성 설치
 npm install
-
-# 개발 서버 실행
 npm run dev
 ```
+
+`http://localhost:3005`에서 확인할 수 있습니다.
+
+## Roadmap
+
+- [ ] PWA 지원
+- [ ] 온라인 멀티플레이어 모드
+- [ ] 퍼즐 공유 기능
+- [ ] 게임 저장 & 이어하기
+
+## License
+
+MIT

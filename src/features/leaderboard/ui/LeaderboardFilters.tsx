@@ -29,9 +29,9 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
   ({ difficulty, gameMode, onDifficultyChange, onGameModeChange }) => (
     <div className="flex flex-wrap gap-4 mb-6">
       {/* Difficulty Filter */}
-      <div className="flex-1 min-w-[140px]">
-        <label className="block text-xs font-medium text-[rgb(var(--color-text-secondary))] mb-1.5">난이도</label>
-        <div className="flex flex-wrap gap-2">
+      <fieldset className="flex-1 min-w-[140px]">
+        <legend className="block text-xs font-medium text-[rgb(var(--color-text-secondary))] mb-1.5">난이도</legend>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="난이도 필터">
           {difficulties.map((d) => (
             <button
               key={d.value}
@@ -50,12 +50,12 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
             </button>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {/* Game Mode Filter */}
-      <div className="flex-1 min-w-[140px]">
-        <label className="block text-xs font-medium text-[rgb(var(--color-text-secondary))] mb-1.5">모드</label>
-        <div className="flex flex-wrap gap-2">
+      <fieldset className="flex-1 min-w-[140px]">
+        <legend className="block text-xs font-medium text-[rgb(var(--color-text-secondary))] mb-1.5">모드</legend>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="게임 모드 필터">
           {gameModes.map((m) => (
             <button
               key={m.value}
@@ -74,7 +74,7 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
             </button>
           ))}
         </div>
-      </div>
+      </fieldset>
     </div>
   ),
 );

@@ -79,6 +79,7 @@ export const TimerControl = memo(() => {
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40",
           buttonStyles,
         )}
+        aria-label={timerActive ? "일시정지" : "재생"}
         disabled={isCompleted}
         onClick={handleToggleTimer}
       >

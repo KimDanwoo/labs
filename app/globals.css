@@ -157,8 +157,8 @@ body {
   color: rgb(var(--color-text-primary));
 }
 
-/* Smooth scrolling */
-* {
+/* Smooth scrolling — only on html, respect user preference */
+html {
   scroll-behavior: smooth;
 }
 
@@ -269,4 +269,40 @@ html.theme-transition [data-theme-toggle] * {
   transition-property: all !important;
   transition-duration: 0.5s !important;
   transition-timing-function: cubic-bezier(0.68, -0.15, 0.27, 1.15) !important;
+}
+
+/* Auth floating numbers */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+/* Sudoku loader cell pulse */
+@keyframes sudokuPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Reduced motion — disable non-essential animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

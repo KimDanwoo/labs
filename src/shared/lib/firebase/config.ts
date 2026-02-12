@@ -1,6 +1,6 @@
 import { getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import type { Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,5 +14,18 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+
+/**
+ * Firestore 인스턴스를 지연 초기화한다.
+ * 홈페이지 초기 로드 시 Firestore 번들을 포함하지 않기 위함.
+ */
+let _db: Firestore | null = null;
+export async function getDb(): Promise<Firestore> {
+  if (!_db) {
+    const { getFirestore } = await import("firebase/firestore");
+    _db = getFirestore(app);
+  }
+  return _db;
+}
+
 export default app;

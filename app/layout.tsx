@@ -1,6 +1,6 @@
 import { AuthProvider } from "@apps/providers/AuthProvider";
 import { ThemeProvider } from "@apps/providers/ThemeProvider";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Rubik, Space_Mono } from "next/font/google";
 import { ReactNode } from "react";
 import "./globals.css";
@@ -19,9 +19,47 @@ const spaceMono = Space_Mono({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#1c1c1e" },
+  ],
+};
+
+const BASE_URL = "https://awesome-sudoku.vercel.app";
+
 export const metadata: Metadata = {
-  title: "스도쿠 게임",
-  description: "스도쿠 게임",
+  metadataBase: new URL(BASE_URL),
+  alternates: { canonical: "/" },
+  title: {
+    default: "어썸 스도쿠 — 온라인 퍼즐 게임",
+    template: "%s | 어썸 스도쿠",
+  },
+  description:
+    "클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임. "
+    + "4단계 난이도, 메모 기능, 포인트 시스템으로 두뇌를 깨우세요.",
+  openGraph: {
+    title: "어썸 스도쿠 — 온라인 퍼즐 게임",
+    description:
+      "클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임.",
+    type: "website",
+    locale: "ko_KR",
+    siteName: "어썸 스도쿠",
+  },
+  twitter: {
+    card: "summary",
+    title: "어썸 스도쿠 — 온라인 퍼즐 게임",
+    description:
+      "클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임.",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

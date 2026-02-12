@@ -5,6 +5,7 @@ import {
   memo,
   useCallback,
   useEffect,
+  useId,
   useRef,
   useState,
 } from "react";
@@ -30,8 +31,10 @@ export const BottomSheet = memo<BottomSheetProps>(
     const [mounted, setMounted] = useState(false);
     const phaseRef = useRef<Phase>("idle");
     const [, rerender] = useState(0);
+    const titleId = useId();
 
     const sheetRef = useRef<HTMLDivElement>(null);
+    const previousFocusRef = useRef<HTMLElement | null>(null);
     const onCloseRef = useRef(onClose);
     onCloseRef.current = onClose;
 
@@ -66,6 +69,8 @@ export const BottomSheet = memo<BottomSheetProps>(
     // ── Mount / Open ──
     useEffect(() => {
       if (isOpen) {
+        previousFocusRef.current =
+          document.activeElement as HTMLElement;
         setMounted(true);
         requestAnimationFrame(() => {
           requestAnimationFrame(() => setPhase("opening"));
@@ -88,13 +93,14 @@ export const BottomSheet = memo<BottomSheetProps>(
       return () => clearTimeout(id);
     }, [phaseRef.current]);
 
-    // closing → unmount
+    // closing → unmount + restore focus
     useEffect(() => {
       if (phaseRef.current !== "closing") return;
       const id = setTimeout(() => {
         setPhase("idle");
         setMounted(false);
         onCloseRef.current();
+        previousFocusRef.current?.focus();
       }, ANIMATION_MS);
       return () => clearTimeout(id);
     }, [phaseRef.current]);
@@ -108,11 +114,31 @@ export const BottomSheet = memo<BottomSheetProps>(
       };
     }, [mounted]);
 
-    // Escape key
+    // Escape key + Focus trap
     useEffect(() => {
       if (!mounted) return;
       const handler = (e: KeyboardEvent) => {
-        if (e.key === "Escape") close();
+        if (e.key === "Escape") {
+          close();
+          return;
+        }
+        if (e.key === "Tab") {
+          const el = sheetRef.current;
+          if (!el) return;
+          const focusable = el.querySelectorAll<HTMLElement>(
+            "button, [href], input, select, textarea, [tabindex]:not([tabindex=\"-1\"])",
+          );
+          if (focusable.length === 0) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       };
       document.addEventListener("keydown", handler);
       return () => {
@@ -233,6 +259,7 @@ export const BottomSheet = memo<BottomSheetProps>(
           ref={sheetRef}
           role="dialog"
           aria-modal="true"
+          aria-labelledby={title ? titleId : undefined}
           className={cn(
             "absolute bottom-0 left-0 right-0",
             "bg-[rgb(var(--color-surface-primary))]",
@@ -271,6 +298,7 @@ export const BottomSheet = memo<BottomSheetProps>(
           {/* Title */}
           {title && (
             <div
+              id={titleId}
               className={cn(
                 "px-6 py-3 text-lg font-bold",
                 "text-[rgb(var(--color-text-primary))]",

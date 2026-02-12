@@ -3,6 +3,7 @@
 import { User } from "@entities/auth/model/types";
 import { GameStats } from "@features/game-stats/model/types";
 import { cn } from "@shared/model/utils";
+import Image from "next/image";
 import { memo } from "react";
 
 interface ProfileCardProps {
@@ -30,9 +31,11 @@ export const ProfileCard = memo<ProfileCardProps>(
       <div className="px-6 pb-6">
         <div className="-mt-12 mb-4">
           {user.photoURL ? (
-            <img
+            <Image
               src={user.photoURL}
               alt={user.displayName || "프로필"}
+              width={96}
+              height={96}
               className={cn(
                 "w-24 h-24 rounded-full object-cover",
                 "ring-4",

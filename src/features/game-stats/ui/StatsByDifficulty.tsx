@@ -47,6 +47,9 @@ export const StatsByDifficulty = memo<StatsByDifficultyProps>(({ stats }) => (
     </div>
     <div className="overflow-x-auto">
       <table className="w-full">
+        <caption className="sr-only">
+          난이도별 통계표
+        </caption>
         <thead>
           <tr
             className={cn(

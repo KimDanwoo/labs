@@ -16,6 +16,7 @@ export const UserProfileMenu = memo(() => {
     <div ref={menuRef} className="relative">
       {/* Profile Button */}
       <button
+        aria-label="프로필 메뉴"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center gap-2 px-2 py-1.5 rounded-xl",
@@ -25,13 +26,26 @@ export const UserProfileMenu = memo(() => {
         )}
       >
         <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-[rgb(var(--color-surface-primary))] shadow-sm">
-          <Image
-            src={user.photoURL || ""}
-            alt="Profile"
-            width={32}
-            height={32}
-            className="object-cover"
-          />
+          {user.photoURL ? (
+            <Image
+              src={user.photoURL}
+              alt="프로필"
+              width={32}
+              height={32}
+              className="object-cover"
+            />
+          ) : (
+            <div
+              className={cn(
+                "w-full h-full flex items-center justify-center",
+                "bg-[rgb(var(--color-bg-tertiary))]",
+                "text-sm font-medium",
+                "text-[rgb(var(--color-text-secondary))]",
+              )}
+            >
+              {user.displayName?.charAt(0) || "?"}
+            </div>
+          )}
         </div>
         <span className="text-sm font-medium text-[rgb(var(--color-text-primary))] hidden sm:inline">
           {user.displayName}
