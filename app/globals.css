@@ -2,6 +2,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --breakpoint-xs: 395px;
+}
+
 :root {
   /* Jonathan Ive Design System */
 
@@ -149,11 +153,7 @@ body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: auto;
   height: 100dvh;
-  background: linear-gradient(
-    180deg,
-    rgb(var(--color-bg-primary)) 0%,
-    rgb(var(--color-bg-secondary)) 100%
-  );
+  background: linear-gradient(180deg, rgb(var(--color-bg-primary)) 0%, rgb(var(--color-bg-secondary)) 100%);
   color: rgb(var(--color-text-primary));
 }
 
@@ -174,7 +174,8 @@ body {
 
 /* Subtle pulse for conflicts */
 @keyframes subtle-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -204,14 +205,61 @@ body {
   box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.3);
 }
 
+/* Bottom Sheet slide-up animation */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Snackbar fade-in animation */
+@keyframes snackbar-in {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes snackbar-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+}
+
+.animate-snackbar-in {
+  animation: snackbar-in 0.25s ease-out forwards;
+}
+
+.animate-snackbar-out {
+  animation: snackbar-out 0.2s ease-in forwards;
+}
+
 /* Theme transition animation */
 html.theme-transition,
 html.theme-transition *,
 html.theme-transition *::before,
 html.theme-transition *::after {
-  transition: background-color 0.3s ease, color 0.2s ease,
-              border-color 0.3s ease,
-              box-shadow 0.3s ease !important;
+  transition:
+    background-color 0.3s ease,
+    color 0.2s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease !important;
   transition-delay: 0s !important;
 }
 
@@ -220,7 +268,5 @@ html.theme-transition [data-theme-toggle],
 html.theme-transition [data-theme-toggle] * {
   transition-property: all !important;
   transition-duration: 0.5s !important;
-  transition-timing-function: cubic-bezier(
-    0.68, -0.15, 0.27, 1.15
-  ) !important;
+  transition-timing-function: cubic-bezier(0.68, -0.15, 0.27, 1.15) !important;
 }
