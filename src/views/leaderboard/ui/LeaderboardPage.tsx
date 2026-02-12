@@ -2,13 +2,32 @@
 
 import { useAuthStore } from "@features/auth/model/stores/authStore";
 import { useLeaderboard } from "@features/leaderboard/model/hooks/useLeaderboard";
-import { LeaderboardFilters, LeaderboardTable } from "@features/leaderboard/ui";
-import { ThemeToggle } from "@features/theme/ui/ThemeToggle";
+import { useCumulativeLeaderboard } from "@features/leaderboard/model/hooks/useCumulativeLeaderboard";
+import {
+  CumulativeLeaderboardTable,
+  LeaderboardFilters,
+  LeaderboardTable,
+} from "@features/leaderboard/ui";
 import { cn } from "@shared/model/utils";
-import Link from "next/link";
+import { SubpageHeader } from "@shared/ui";
 import { useMemo, useState } from "react";
 
+type LeaderboardTab = "best" | "cumulative";
+
+const ErrorMessage = ({ message }: { message: string }) => (
+  <div
+    className={cn(
+      "text-center py-12",
+      "text-[rgb(var(--color-error))]",
+    )}
+  >
+    <p>데이터를 불러오는데 실패했습니다.</p>
+    <p className="text-sm mt-1">{message}</p>
+  </div>
+);
+
 export const LeaderboardPage = () => {
+  const [tab, setTab] = useState<LeaderboardTab>("best");
   const [difficulty, setDifficulty] = useState("");
   const [gameMode, setGameMode] = useState("");
 
@@ -23,85 +42,103 @@ export const LeaderboardPage = () => {
     [difficulty, gameMode],
   );
 
-  const { records, isLoading, error } = useLeaderboard(options);
+  const {
+    records, isLoading: bestLoading, error: bestError,
+  } = useLeaderboard(options);
+
+  const {
+    entries, isLoading: cumLoading, error: cumError,
+  } = useCumulativeLeaderboard();
+
+  const tabs: { key: LeaderboardTab; label: string }[] = [
+    { key: "best", label: "최고 기록" },
+    { key: "cumulative", label: "누적 포인트" },
+  ];
 
   return (
-    <main className="min-h-svh bg-[rgb(var(--color-surface-secondary))]">
-      {/* Header */}
-      <header
-        className={
-          "sticky top-0 z-30 backdrop-blur-xl " +
-          "bg-[rgb(var(--color-glass))]/[var(--glass-opacity)] " +
-          "border-b border-[rgb(var(--color-border-light))]/50"
-        }
-      >
-        <div
-          className={
-            "max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-3 " +
-            "flex items-center justify-between"
-          }
-        >
-          <Link
-            href="/"
-            className={cn(
-              "flex items-center gap-2",
-              "text-[rgb(var(--color-text-secondary))]",
-              "hover:text-[rgb(var(--color-text-primary))]",
-              "transition-colors",
-            )}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            <span className="text-sm font-medium">게임으로</span>
-          </Link>
-
-          <h1 className="text-lg font-bold text-[rgb(var(--color-text-primary))]">랭킹</h1>
-
-          <ThemeToggle />
-        </div>
-      </header>
+    <main
+      className={cn(
+        "min-h-svh",
+        "bg-[rgb(var(--color-surface-secondary))]",
+      )}
+    >
+      <SubpageHeader title="랭킹" />
 
       {/* Content */}
-      <div className="max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-6">
-        {/* Filters */}
-        <LeaderboardFilters
-          difficulty={difficulty}
-          gameMode={gameMode}
-          onDifficultyChange={setDifficulty}
-          onGameModeChange={setGameMode}
-        />
+      <div
+        className={cn(
+          "max-w-5xl xl:max-w-6xl mx-auto",
+          "px-4 sm:px-6 py-6",
+        )}
+      >
+        {/* Tab Switcher */}
+        <div
+          className={cn(
+            "flex gap-1 mb-6 p-1 rounded-xl",
+            "bg-[rgb(var(--color-bg-tertiary))]",
+          )}
+        >
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTab(t.key)}
+              className={cn(
+                "flex-1 py-2 text-sm font-medium",
+                "rounded-lg transition-all",
+                tab === t.key
+                  ? cn(
+                    "bg-[rgb(var(--color-surface-primary))]",
+                    "text-[rgb(var(--color-text-primary))]",
+                    "shadow-sm",
+                  )
+                  : "text-[rgb(var(--color-text-secondary))]",
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Filters (best tab only) */}
+        {tab === "best" && (
+          <LeaderboardFilters
+            difficulty={difficulty}
+            gameMode={gameMode}
+            onDifficultyChange={setDifficulty}
+            onGameModeChange={setGameMode}
+          />
+        )}
 
         {/* Leaderboard Card */}
         <div
-          className={
-            "bg-[rgb(var(--color-surface-primary))] " +
-            "rounded-2xl shadow-sm " +
-            "border border-[rgb(var(--color-border-light))]/50 " +
-            "overflow-hidden"
-          }
+          className={cn(
+            "bg-[rgb(var(--color-surface-primary))]",
+            "rounded-2xl shadow-sm",
+            "border",
+            "border-[rgb(var(--color-border-light))]/50",
+            "overflow-hidden",
+          )}
         >
-          {error ? (
-            <div className="text-center py-12 text-[rgb(var(--color-error))]">
-              <p>데이터를 불러오는데 실패했습니다.</p>
-              <p className="text-sm mt-1">{error.message}</p>
-            </div>
-          ) : (
+          {tab === "best" && !bestError && (
             <LeaderboardTable
               records={records}
-              isLoading={isLoading}
+              isLoading={bestLoading}
               currentUserId={user?.uid}
             />
+          )}
+          {tab === "best" && bestError && (
+            <ErrorMessage message={bestError.message} />
+          )}
+          {tab === "cumulative" && !cumError && (
+            <CumulativeLeaderboardTable
+              entries={entries}
+              isLoading={cumLoading}
+              currentUserId={user?.uid}
+            />
+          )}
+          {tab === "cumulative" && cumError && (
+            <ErrorMessage message={cumError.message} />
           )}
         </div>
       </div>

@@ -1,24 +1,19 @@
 "use client";
 
-import { GameRecord } from "@entities/game-record/model/types";
-import { getRecordPoint } from "@entities/game-record/model/utils";
-import {
-  GAME_LEVEL_LABELS, GAME_MODE,
-} from "@entities/game/model/constants";
-import { formatTime } from "@features/sudoku-game/model/utils";
+import { CumulativePointsEntry } from "@features/game-record/model/services/gameRecordService";
 import { cn } from "@shared/model/utils";
 import { memo } from "react";
 import { RankBadge } from "./RankBadge";
 
-interface LeaderboardTableProps {
-  records: GameRecord[];
+interface CumulativeLeaderboardTableProps {
+  entries: CumulativePointsEntry[];
   isLoading: boolean;
   currentUserId?: string;
 }
 
-export const LeaderboardTable = memo<
-  LeaderboardTableProps
->(({ records, isLoading, currentUserId }) => {
+export const CumulativeLeaderboardTable = memo<
+  CumulativeLeaderboardTableProps
+>(({ entries, isLoading, currentUserId }) => {
   if (isLoading) {
     return (
       <div
@@ -35,7 +30,7 @@ export const LeaderboardTable = memo<
     );
   }
 
-  if (records.length === 0) {
+  if (entries.length === 0) {
     return (
       <div
         className={cn(
@@ -69,32 +64,22 @@ export const LeaderboardTable = memo<
             <th className="pb-3 font-medium">
               플레이어
             </th>
-            <th className="pb-3 font-medium">포인트</th>
+            <th className="pb-3 font-medium">
+              누적 포인트
+            </th>
             <th className="pb-3 font-medium hidden sm:table-cell">
-              시간
-            </th>
-            <th className="pb-3 font-medium hidden md:table-cell">
-              난이도
-            </th>
-            <th className="pb-3 font-medium hidden md:table-cell">
-              모드
+              게임 수
             </th>
           </tr>
         </thead>
         <tbody>
-          {records.map((record, index) => {
+          {entries.map((entry, index) => {
             const rank = index + 1;
-            const isMe = record.userId === currentUserId;
-            const point = getRecordPoint(record);
-            const diffLabel =
-              GAME_LEVEL_LABELS[
-                record.difficulty as
-                  keyof typeof GAME_LEVEL_LABELS
-              ] || record.difficulty;
+            const isMe = entry.userId === currentUserId;
 
             return (
               <tr
-                key={record.id}
+                key={entry.userId}
                 className={cn(
                   "border-b",
                   "border-[rgb(var(--color-divider))]",
@@ -113,9 +98,9 @@ export const LeaderboardTable = memo<
                   <div
                     className="flex items-center gap-2"
                   >
-                    {record.userPhotoURL ? (
+                    {entry.userPhotoURL ? (
                       <img
-                        src={record.userPhotoURL}
+                        src={entry.userPhotoURL}
                         alt=""
                         className={cn(
                           "w-8 h-8 rounded-full",
@@ -132,7 +117,7 @@ export const LeaderboardTable = memo<
                           "text-sm font-medium",
                         )}
                       >
-                        {record.userDisplayName
+                        {entry.userDisplayName
                           ?.charAt(0) || "?"}
                       </div>
                     )}
@@ -145,7 +130,7 @@ export const LeaderboardTable = memo<
                           : "text-[rgb(var(--color-text-primary))]",
                       )}
                     >
-                      {record.userDisplayName}
+                      {entry.userDisplayName}
                       {isMe && (
                         <span
                           className={cn(
@@ -166,47 +151,17 @@ export const LeaderboardTable = memo<
                       "text-[rgb(var(--color-text-primary))]",
                     )}
                   >
-                    {point}
+                    {entry.totalPoints}
                   </span>
                 </td>
                 <td className="py-3 hidden sm:table-cell">
                   <span
                     className={cn(
-                      "font-mono font-tabular",
                       "text-[rgb(var(--color-text-secondary))]",
+                      "font-tabular",
                     )}
                   >
-                    {formatTime(record.completionTime)}
-                  </span>
-                </td>
-                <td className="py-3 hidden md:table-cell">
-                  <span
-                    className={cn(
-                      "text-sm",
-                      "text-[rgb(var(--color-text-secondary))]",
-                    )}
-                  >
-                    {diffLabel}
-                  </span>
-                </td>
-                <td className="py-3 hidden md:table-cell">
-                  <span
-                    className={cn(
-                      "text-xs px-2 py-0.5 rounded-full",
-                      record.gameMode === GAME_MODE.KILLER
-                        ? cn(
-                          "bg-[rgb(var(--color-error-bg))]",
-                          "text-[rgb(var(--color-error-text))]",
-                        )
-                        : cn(
-                          "bg-[rgb(var(--color-bg-tertiary))]",
-                          "text-[rgb(var(--color-text-secondary))]",
-                        ),
-                    )}
-                  >
-                    {record.gameMode === GAME_MODE.KILLER
-                      ? "킬러"
-                      : "클래식"}
+                    {entry.gamesCount}회
                   </span>
                 </td>
               </tr>
@@ -218,4 +173,5 @@ export const LeaderboardTable = memo<
   );
 });
 
-LeaderboardTable.displayName = "LeaderboardTable";
+CumulativeLeaderboardTable.displayName =
+  "CumulativeLeaderboardTable";
