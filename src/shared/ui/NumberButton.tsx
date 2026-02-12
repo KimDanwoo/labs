@@ -47,6 +47,7 @@ export const NumberButton: React.FC<NumberButtonProps> = memo(({ value, onClick,
       // Focus
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40",
     )}
+    aria-label={`숫자 ${value}`}
     onClick={onClick}
     disabled={isDisabled}
   >

@@ -66,7 +66,7 @@ export const SudokuBoard: React.FC = () => {
       >
         {gameMode === GAME_MODE.KILLER && <KillerCage />}
 
-        <table className="border-collapse bg-[rgb(var(--color-surface-primary))]">
+        <table aria-label="스도쿠 보드" className="border-collapse bg-[rgb(var(--color-surface-primary))]">
           <tbody>
             {board.map((row, rowIndex) => (
               <BoardRow

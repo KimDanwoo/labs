@@ -41,7 +41,7 @@ export const KillerCage = memo(() => {
 
   return (
     <div ref={overlayRef} className="absolute top-0 left-0 pointer-events-none z-10">
-      <svg width="100%" height="100%" style={svgStyle}>
+      <svg aria-hidden="true" width="100%" height="100%" style={svgStyle}>
         {cageInfo.paths.map(({ id, path }) => (
           <KillerCageLine key={`cage-${id}`} path={path} />
         ))}

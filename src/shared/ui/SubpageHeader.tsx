@@ -37,6 +37,7 @@ export const SubpageHeader = memo<SubpageHeaderProps>(
           )}
         >
           <svg
+            aria-hidden="true"
             className="w-5 h-5"
             fill="none"
             stroke="currentColor"

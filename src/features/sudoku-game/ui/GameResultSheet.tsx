@@ -21,6 +21,7 @@ const SuccessIcon = () => (
     )}
   >
     <svg
+      aria-hidden="true"
       className="w-8 h-8 text-white"
       fill="none"
       stroke="currentColor"
@@ -46,6 +47,7 @@ const FailureIcon = () => (
     )}
   >
     <svg
+      aria-hidden="true"
       className="w-8 h-8 text-white"
       fill="none"
       stroke="currentColor"

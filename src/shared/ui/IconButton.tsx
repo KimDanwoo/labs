@@ -4,6 +4,7 @@ interface IconButtonProps {
   icon: React.ReactNode;
   onClick: () => void;
   label?: string;
+  "aria-label"?: string;
   className?: string;
   disabled?: boolean;
   variant?: "default" | "primary" | "subtle";
@@ -14,12 +15,14 @@ export const IconButton = ({
   icon,
   onClick,
   label,
+  "aria-label": ariaLabel,
   className,
   disabled,
   variant = "default",
   badge,
 }: IconButtonProps) => (
   <button
+    aria-label={ariaLabel ?? label}
     className={cn(
       // Layout
       "flex flex-col items-center justify-center gap-1.5",
@@ -72,7 +75,7 @@ export const IconButton = ({
     onClick={onClick}
     disabled={disabled}
   >
-    <span className="text-xl">{icon}</span>
+    <span className="text-xl" aria-hidden="true">{icon}</span>
     {label && <span className="whitespace-nowrap">{label}</span>}
     {badge !== undefined && (
       <span

@@ -21,6 +21,7 @@ const SelectSelector = () => {
 
   return (
     <select
+      aria-label="난이도 선택"
       name="difficulty"
       id="difficulty"
       value={difficulty}
