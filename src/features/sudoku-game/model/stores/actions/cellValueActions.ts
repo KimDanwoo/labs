@@ -1,4 +1,6 @@
-import { HINTS_REMAINING } from "@entities/game/model/constants";
+import {
+  HINTS_REMAINING, MAX_MISTAKES,
+} from "@entities/game/model/constants";
 import { SudokuStoreActionCreator } from "@features/sudoku-game/model/stores/types";
 import {
   canFillCell,
@@ -7,23 +9,41 @@ import {
   updateCellNotes,
   updateCellValue,
 } from "@features/sudoku-game/model/utils";
-import { buildGameResultState, resolveBoardState } from "@features/sudoku-game/model/stores/helpers/gameResult";
+import {
+  buildGameResultState,
+  resolveBoardState,
+} from "@features/sudoku-game/model/stores/helpers/gameResult";
 
 export const createCellValueActions: SudokuStoreActionCreator<
   "fillCell" | "toggleNote" | "toggleNoteMode" | "resetUserInputs"
 > = (set, get) => ({
   fillCell: (value) => {
-    const { board, selectedCell, solution, gameMode, cages } = get();
+    const {
+      board, selectedCell, solution, gameMode, cages,
+    } = get();
 
     if (!canFillCell(selectedCell, board)) return;
 
     const { row, col } = selectedCell!;
 
     if (value !== null && solution[row][col] !== value) {
-      set({ mistakeCount: get().mistakeCount + 1 });
+      const newMistakeCount = get().mistakeCount + 1;
+      set({ mistakeCount: newMistakeCount });
+
+      if (newMistakeCount >= MAX_MISTAKES) {
+        set({
+          isCompleted: true,
+          isSuccess: false,
+        });
+        get().deselectCell();
+        get().toggleTimer(false);
+        return;
+      }
     }
 
-    const updatedBoard = updateCellValue(board, row, col, value);
+    const updatedBoard = updateCellValue(
+      board, row, col, value,
+    );
     const { result } = resolveBoardState(
       updatedBoard, solution, gameMode, cages,
     );
@@ -56,7 +76,9 @@ export const createCellValueActions: SudokuStoreActionCreator<
       ? [...currentNotes, value].sort((a, b) => a - b)
       : currentNotes.filter((note) => note !== value);
 
-    const newBoard = updateCellNotes(board, row, col, newNotes);
+    const newBoard = updateCellNotes(
+      board, row, col, newNotes,
+    );
 
     set({ board: newBoard });
   },
@@ -68,7 +90,9 @@ export const createCellValueActions: SudokuStoreActionCreator<
   resetUserInputs: () => {
     const { board, highlightedCells } = get();
     const newBoard = resetUserInputsOptimized(board);
-    const emptyHighlights = clearHighlights(highlightedCells);
+    const emptyHighlights = clearHighlights(
+      highlightedCells,
+    );
 
     set({
       board: newBoard,

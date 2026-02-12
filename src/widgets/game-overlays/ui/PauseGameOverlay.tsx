@@ -7,6 +7,8 @@ export const PauseGameOverlay: FC = () => {
   const timerActive = useSudokuStore((state) => state.timerActive);
   const isCompleted = useSudokuStore((state) => state.isCompleted);
   const toggleTimer = useSudokuStore((state) => state.toggleTimer);
+  const initializeGame = useSudokuStore((state) => state.initializeGame);
+  const difficulty = useSudokuStore((state) => state.difficulty);
 
   if (timerActive || isCompleted) return null;
 
@@ -14,8 +16,8 @@ export const PauseGameOverlay: FC = () => {
     <div
       className={cn(
         "absolute inset-0 z-20",
-        "flex items-center justify-center",
-        "bg-[rgb(var(--color-glass))]/[var(--overlay-opacity)] backdrop-blur-md rounded-2xl",
+        "flex flex-col items-center justify-center gap-6",
+        "bg-[rgb(var(--color-glass))]/[var(--overlay-opacity)] backdrop-blur-md",
       )}
     >
       <button
@@ -39,6 +41,23 @@ export const PauseGameOverlay: FC = () => {
           <VscPlay className="text-white text-3xl ml-1" />
         </div>
         <span className="text-sm font-medium text-[rgb(var(--color-text-secondary))]">탭하여 계속하기</span>
+      </button>
+
+      <button
+        onClick={() => initializeGame(difficulty)}
+        className={cn(
+          "px-6 py-2.5 rounded-xl",
+          "text-sm font-medium",
+          "text-[rgb(var(--color-text-secondary))]",
+          "bg-[rgb(var(--color-surface-primary))]/60",
+          "border border-[rgb(var(--color-border-light))]/50",
+          "transition-all duration-200",
+          "hover:bg-[rgb(var(--color-surface-primary))]",
+          "hover:text-[rgb(var(--color-text-primary))]",
+          "active:scale-95",
+        )}
+      >
+        새 게임
       </button>
     </div>
   );
