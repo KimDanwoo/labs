@@ -4,6 +4,7 @@ import { CellProps } from "@entities/board/model/types";
 import { CellNotes } from "@entities/board/ui/CellNotes";
 import { CellValue } from "@entities/board/ui/CellValue";
 import { useCell } from "@features/sudoku-game/model/hooks";
+import { cn } from "@shared/model/utils";
 import { FC, memo } from "react";
 
 export const SudokuCell: FC<CellProps> = memo((props) => {
@@ -12,7 +13,7 @@ export const SudokuCell: FC<CellProps> = memo((props) => {
 
   return (
     <td
-      className={`${className} ${stateClasses}`}
+      className={cn(className, stateClasses)}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       tabIndex={tabIndex}
