@@ -409,6 +409,9 @@ export function groupAdjacentCells(cells: GridPosition[]): GridPosition[][] {
   const groups: GridPosition[][] = [];
   const visited = new Set<string>();
 
+  // O(1) 조회를 위한 셀 좌표 Set 사전 구축
+  const cellSet = new Set<string>(cells.map(([r, c]) => `${r}-${c}`));
+
   for (const cell of cells) {
     const [row, col] = cell;
     const key = `${row}-${col}`;
@@ -437,7 +440,7 @@ export function groupAdjacentCells(cells: GridPosition[]): GridPosition[][] {
         const newCol = cCol + dCol;
         const newKey = `${newRow}-${newCol}`;
 
-        if (!visited.has(newKey) && cells.some(([r, c]) => r === newRow && c === newCol)) {
+        if (!visited.has(newKey) && cellSet.has(newKey)) {
           visited.add(newKey);
           queue.push([newRow, newCol]);
         }
