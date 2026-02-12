@@ -5,8 +5,9 @@ import {
 } from "@entities/game-record/model/constants";
 import { GameRecord } from "@entities/game-record/model/types";
 import { getRecordPoint } from "@entities/game-record/model/utils";
-import { db } from "@shared/lib/firebase/config";
+import { getDb } from "@shared/lib/firebase/config";
 import {
+  type Firestore,
   addDoc,
   collection,
   getDocs,
@@ -22,6 +23,7 @@ const COLLECTION_NAME = "gameRecords";
 export async function saveGameRecord(
   record: Omit<GameRecord, "id" | "createdAt">,
 ): Promise<string> {
+  const db = await getDb();
   const docRef = await addDoc(
     collection(db, COLLECTION_NAME),
     { ...record, createdAt: Timestamp.now() },
@@ -33,6 +35,7 @@ export async function getUserRecords(
   userId: string,
   recordLimit = DEFAULT_USER_RECORD_LIMIT,
 ): Promise<GameRecord[]> {
+  const db = await getDb();
   const q = query(
     collection(db, COLLECTION_NAME),
     where("userId", "==", userId),
@@ -74,6 +77,7 @@ function deduplicateByUser(
 }
 
 function buildLeaderboardQuery(
+  db: Firestore,
   difficulty?: string,
   gameMode?: string,
   recordLimit = LEADERBOARD_RECORD_LIMIT,
@@ -128,8 +132,9 @@ export async function getLeaderboard(
     difficulty, gameMode, recordLimit = 100,
   } = options;
 
+  const db = await getDb();
   const q = buildLeaderboardQuery(
-    difficulty, gameMode, recordLimit,
+    db, difficulty, gameMode, recordLimit,
   );
 
   const snapshot = await getDocs(q);
@@ -152,6 +157,7 @@ export interface CumulativePointsEntry {
 export async function getCumulativeLeaderboard(
   recordLimit = LEADERBOARD_RECORD_LIMIT,
 ): Promise<CumulativePointsEntry[]> {
+  const db = await getDb();
   const q = query(
     collection(db, COLLECTION_NAME),
     where("isSuccess", "==", true),
