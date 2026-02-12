@@ -12,23 +12,18 @@ export interface GameRecord {
   hintsUsed: number;
   mistakesCount: number;
   score: number;
+  point: number;
   isSuccess: boolean;
   createdAt: Timestamp;
 }
 
-export interface ScoreBreakdown {
-  baseScore: number;
-  timePenalty: number;
-  hintPenalty: number;
-  mistakePenalty: number;
-  killerBonus: number;
-  totalScore: number;
+export interface PointResult {
+  basePoint: number;
+  killerDeduction: number;
+  totalPoint: number;
 }
 
-export interface ScoreInput {
+export interface PointInput {
   difficulty: Difficulty;
   gameMode: GameMode;
-  completionTime: number;
-  hintsUsed: number;
-  mistakeCount: number;
 }
