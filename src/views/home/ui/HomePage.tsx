@@ -1,13 +1,24 @@
 "use client";
 
 import { UserProfileMenu } from "@entities/auth/ui";
-import { GameModeSelector, GameResultSheet, SelectNumber } from "@features/sudoku-game/ui";
+import { GameModeSelector, SelectNumber } from "@features/sudoku-game/ui";
 import { ThemeToggle } from "@features/theme/ui/ThemeToggle";
 import { cn } from "@shared/model/utils";
 import { SudokuBoard } from "@widgets/game-board/ui";
 import { Controls } from "@widgets/game-controls/ui";
 import { GameStatus } from "@widgets/game-header/ui";
-import { PauseGameOverlay } from "@widgets/game-overlays/ui";
+import dynamic from "next/dynamic";
+
+const PauseGameOverlay = dynamic(
+  () => import("@widgets/game-overlays/ui/PauseGameOverlay"),
+  { ssr: false },
+);
+const GameResultSheet = dynamic(
+  () => import("@features/sudoku-game/ui/GameResultSheet").then(
+    (m) => m.GameResultSheet,
+  ),
+  { ssr: false },
+);
 
 export const HomePage = () => (
   <main
