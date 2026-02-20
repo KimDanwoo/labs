@@ -12,16 +12,16 @@
 
 ## Tech Stack
 
-| 영역 | 기술 |
-|------|------|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS, shadcn/ui, Radix UI |
-| Database | Supabase (PostgreSQL + Auth + RLS) |
-| Animation | Framer Motion |
-| Markdown | react-markdown, rehype-highlight, remark-gfm |
-| AI | OpenAI API (질문 자동 생성) |
-| Deploy | Vercel |
+| 영역      | 기술                                         |
+| --------- | -------------------------------------------- |
+| Framework | Next.js 15 (App Router)                      |
+| Language  | TypeScript                                   |
+| Styling   | Tailwind CSS, shadcn/ui, Radix UI            |
+| Database  | Supabase (PostgreSQL + Auth + RLS)           |
+| Animation | Framer Motion                                |
+| Markdown  | react-markdown, rehype-highlight, remark-gfm |
+| AI        | OpenAI API (질문 자동 생성)                  |
+| Deploy    | Vercel                                       |
 
 <br>
 
@@ -73,21 +73,6 @@ categories ─┐
 
 - `categories` / `questions` — 공개 읽기 (RLS)
 - `user_progress` / `bookmarks` / `daily_streaks` — 사용자별 접근 제어
-
-<br>
-
-## 학습 카테고리
-
-| | 카테고리 | 문항 | | 카테고리 | 문항 |
-|---|---------|------|---|---------|------|
-| 🌐 | HTML | 15 | 🖥️ | 브라우저 | 12 |
-| 🎨 | CSS | 14 | 🌍 | 네트워크 | 11 |
-| ⚡ | JavaScript | 16 | 🚀 | 성능 최적화 | 10 |
-| 🔷 | TypeScript | 12 | 🔒 | 보안 | 8 |
-| ⚛️ | React | 15 | 🏗️ | 자료구조 | 7 |
-| ▲ | Next.js | 12 | 🧮 | 알고리즘 | 7 |
-| 🧩 | 디자인패턴 | 8 | 📦 | Git | 7 |
-| 🧪 | 테스트 | 7 | 💻 | CS 기초 | 7 |
 
 <br>
 

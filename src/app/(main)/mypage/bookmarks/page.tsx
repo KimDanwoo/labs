@@ -20,29 +20,24 @@ import {
 
 export default function BookmarksPage() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [bookmarkIds, setBookmarkIds] = useState<string[]>([]);
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[]>([]);
 
   useEffect(() => {
-    getAllCategories().then(setCategories);
-  }, []);
-
-  useEffect(() => {
+    let cancelled = false;
     const ids = getBookmarks();
-    setBookmarkIds(ids);
+    if (ids.length === 0) return;
+    Promise.all([getAllCategories(), getQuestionsByIds(ids)]).then(([cats, qs]) => {
+      if (!cancelled) {
+        setCategories(cats);
+        setBookmarkedQuestions(qs);
+      }
+    });
+    return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => {
-    if (bookmarkIds.length === 0) {
-      setBookmarkedQuestions([]);
-      return;
-    }
-    getQuestionsByIds(bookmarkIds).then(setBookmarkedQuestions);
-  }, [bookmarkIds]);
 
   const handleRemoveBookmark = (questionId: string) => {
     toggleBookmark(questionId);
-    setBookmarkIds((prev) => prev.filter((id) => id !== questionId));
+    setBookmarkedQuestions((prev) => prev.filter((q) => q.id !== questionId));
   };
 
   const getCategoryForQuestion = (categoryId: string) =>
