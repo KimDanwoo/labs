@@ -6,8 +6,6 @@
 
 ## Overview
 
-**168개 질문** / **16개 카테고리** / **3단계 난이도**
-
 프론트엔드 기술면접에 필요한 핵심 개념을 레퍼런스, 플래시카드, 퀴즈 등 다양한 학습 방식으로 제공합니다.
 
 <br>
@@ -107,20 +105,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-`http://localhost:3000`에서 확인할 수 있습니다.
-
-<br>
-
-## Environment Variables
-
-| 변수 | 설명 |
-|------|------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase 프로젝트 URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase 공개 키 |
-| `NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY` | Supabase 서비스 키 (어드민용) |
-| `NEXT_PUBLIC_ADMIN_EMAILS` | 어드민 이메일 목록 |
-| `NEXT_PUBLIC_OPENAI_API_KEY` | OpenAI API 키 (AI 질문 생성) |
-
+`http://localhost:3009`에서 확인할 수 있습니다.
 <br>
 
 ## Scripts
