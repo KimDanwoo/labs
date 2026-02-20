@@ -22,26 +22,20 @@ export default function ProgressPage() {
     Record<string, { mastered: number; learning: number; unseen: number }>
   >({});
 
-  // 1) Load categories
   useEffect(() => {
-    getAllCategories().then(setCategories);
-  }, []);
-
-  // 2) Once categories loaded, compute stats
-  useEffect(() => {
-    if (categories.length === 0) return;
-
     let cancelled = false;
 
-    async function computeStats() {
-      // Fetch questions per category in parallel
+    async function load() {
+      const cats = await getAllCategories();
+      if (cancelled) return;
+      setCategories(cats);
+
       const results = await Promise.all(
-        categories.map(async (cat) => {
+        cats.map(async (cat) => {
           const questions = await getQuestionsByCategory(cat.id);
           return { catId: cat.id, questionIds: questions.map((q) => q.id) };
         })
       );
-
       if (cancelled) return;
 
       const allQuestionIds = results.flatMap((r) => r.questionIds);
@@ -65,11 +59,9 @@ export default function ProgressPage() {
       setCategoryStats(catStats);
     }
 
-    computeStats();
-    return () => {
-      cancelled = true;
-    };
-  }, [categories]);
+    load();
+    return () => { cancelled = true; };
+  }, []);
 
   const overallPercent = stats.total > 0
     ? Math.round(((stats.mastered + stats.learning) / stats.total) * 100)

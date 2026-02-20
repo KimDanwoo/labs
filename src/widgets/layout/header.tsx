@@ -75,7 +75,7 @@ export function Header() {
 					<span className="sm:hidden">프딥</span>
 				</Link>
 
-				<nav className="hidden md:flex items-center space-x-1 flex-1">
+				<nav className="hidden md:flex items-center space-x-1 flex-1" aria-label="메인 네비게이션">
 					{navItems.map((item) => {
 						const Icon = item.icon;
 						const isActive = pathname.startsWith(item.href);
@@ -96,7 +96,7 @@ export function Header() {
 					{user ? (
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button variant="ghost" size="icon" className="rounded-full">
+								<Button variant="ghost" size="icon" className="rounded-full" aria-label="사용자 메뉴">
 									<Avatar className="h-8 w-8">
 										<AvatarImage src={user.user_metadata?.avatar_url} />
 										<AvatarFallback>{user.email?.charAt(0).toUpperCase() ?? 'U'}</AvatarFallback>
@@ -126,9 +126,9 @@ export function Header() {
 							</DropdownMenuContent>
 						</DropdownMenu>
 					) : (
-						<Link href="/auth/login">
+						<Link href="/auth/login" aria-label="로그인">
 							<Button variant="outline" size="sm" className="gap-2">
-								<LogIn className="h-4 w-4" />
+								<LogIn className="h-4 w-4" aria-hidden="true" />
 								<span className="hidden sm:inline">로그인</span>
 							</Button>
 						</Link>
@@ -137,8 +137,8 @@ export function Header() {
 					{/* Mobile menu */}
 					<Sheet open={open} onOpenChange={setOpen}>
 						<SheetTrigger asChild className="md:hidden">
-							<Button variant="ghost" size="icon">
-								<Menu className="h-5 w-5" />
+							<Button variant="ghost" size="icon" aria-label="메뉴 열기">
+								<Menu className="h-5 w-5" aria-hidden="true" />
 							</Button>
 						</SheetTrigger>
 						<SheetContent side="right" className="w-[280px]">

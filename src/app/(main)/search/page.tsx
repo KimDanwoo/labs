@@ -1,5 +1,3 @@
-'use client';
-
 import { Suspense } from 'react';
 import { SearchContent } from './_components/search-content';
 

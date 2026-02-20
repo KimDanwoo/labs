@@ -1,6 +1,6 @@
 import { createClient } from '@/shared/config/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Category, Question, SearchResult } from './model';
+import type { Category, Question, PaginatedResult, SearchResult } from './model';
 
 // ============================================================
 // Supabase data access layer
@@ -81,6 +81,42 @@ export async function getQuestionsByCategorySlug(slug: string, supabase?: Supaba
   return getQuestionsByCategory(category.id, client);
 }
 
+/** 카테고리 slug로 해당 카테고리의 질문들을 페이지네이션하여 반환한다. */
+export async function getQuestionsByCategorySlugPaginated(
+  slug: string,
+  page: number = 1,
+  pageSize: number = 10,
+  supabase?: SupabaseClient
+): Promise<PaginatedResult<Question>> {
+  const client = getClient(supabase);
+  const category = await getCategoryBySlug(slug, client);
+  if (!category) return { data: [], total: 0, page, pageSize, totalPages: 0 };
+
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data, count, error } = await client
+    .from('questions')
+    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags', { count: 'exact' })
+    .eq('category_id', category.id)
+    .order('order_num')
+    .range(from, to);
+
+  if (error) {
+    console.error('getQuestionsByCategorySlugPaginated error:', error);
+    return { data: [], total: 0, page, pageSize, totalPages: 0 };
+  }
+
+  const total = count ?? 0;
+  return {
+    data: (data ?? []) as Question[],
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  };
+}
+
 /** 질문 ID로 단일 질문을 찾는다. */
 export async function getQuestionById(id: string, supabase?: SupabaseClient): Promise<Question | undefined> {
   const client = getClient(supabase);
@@ -137,9 +173,12 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
   const client = getClient(supabase);
   const pattern = `%${query}%`;
 
-  const { data: matchedQuestions, error } = await client
+  const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags')
+    .select(`
+      id, category_id, question, answer, sub_category, difficulty, order_num, tags,
+      categories(id, slug, title, order_num, icon, description)
+    `)
     .or(`question.ilike.${pattern},answer.ilike.${pattern}`);
 
   if (error) {
@@ -147,22 +186,25 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
     return [];
   }
 
-  if (!matchedQuestions || matchedQuestions.length === 0) return [];
+  if (!data || data.length === 0) return [];
 
-  // Fetch categories for matched questions
-  const categoryIds = [...new Set(matchedQuestions.map((q) => q.category_id))];
-  const { data: cats } = await client
-    .from('categories')
-    .select('id, slug, title, order_num, icon, description')
-    .in('id', categoryIds);
-
-  const categoryMap = new Map((cats ?? []).map((c) => [c.id, c as Category]));
   const lowerQuery = query.toLowerCase();
-
   const results: SearchResult[] = [];
-  for (const q of matchedQuestions as Question[]) {
-    const category = categoryMap.get(q.category_id);
+
+  for (const row of data) {
+    const category = row.categories as unknown as Category;
     if (!category) continue;
+
+    const q: Question = {
+      id: row.id as string,
+      category_id: row.category_id as string,
+      question: row.question as string,
+      answer: row.answer as string,
+      sub_category: row.sub_category as string,
+      difficulty: row.difficulty as Question['difficulty'],
+      order_num: row.order_num as number,
+      tags: row.tags as string[],
+    };
 
     if (q.question.toLowerCase().includes(lowerQuery)) {
       results.push({ question: q, category, matchType: 'question' });
@@ -211,9 +253,13 @@ export async function getRandomQuestions(count: number, categorySlug?: string, s
     return [];
   }
 
-  // 2) JS shuffle → pick
-  const shuffled = idRows.sort(() => Math.random() - 0.5);
-  const pickedIds = shuffled.slice(0, count).map((r) => r.id as string);
+  // 2) Fisher-Yates shuffle → pick (균등 분포 보장)
+  const arr = [...idRows];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  const pickedIds = arr.slice(0, count).map((r) => r.id as string);
 
   // 3) 벌크 조회
   return getQuestionsByIds(pickedIds, client);

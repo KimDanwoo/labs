@@ -1,0 +1,150 @@
+/* ── Syntax Highlighting — VS Code Light+ ────────────────── */
+.hljs {
+  background: transparent !important;
+  color: #383a42;
+}
+
+.hljs-keyword,
+.hljs-selector-tag {
+  color: #0000ff;
+}
+
+.hljs-built_in {
+  color: #267f99;
+}
+
+.hljs-name,
+.hljs-tag {
+  color: #800000;
+}
+
+.hljs-string,
+.hljs-symbol,
+.hljs-template-variable {
+  color: #a31515;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #008000;
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-literal {
+  color: #098658;
+}
+
+.hljs-type,
+.hljs-params {
+  color: #267f99;
+}
+
+.hljs-function,
+.hljs-title {
+  color: #795e26;
+}
+
+.hljs-variable,
+.hljs-template-tag {
+  color: #001080;
+}
+
+.hljs-property {
+  color: #001080;
+}
+
+.hljs-attr {
+  color: #e50000;
+}
+
+.hljs-meta,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: #800000;
+}
+
+.hljs-deletion {
+  color: #a31515;
+  background: #fdd;
+}
+
+.hljs-addition {
+  color: #098658;
+  background: #dfd;
+}
+
+/* ── Syntax Highlighting — VS Code Dark+ ─────────────────── */
+.dark .hljs {
+  color: #d4d4d4;
+}
+
+.dark .hljs-keyword,
+.dark .hljs-selector-tag {
+  color: #569cd6;
+}
+
+.dark .hljs-built_in {
+  color: #4ec9b0;
+}
+
+.dark .hljs-name,
+.dark .hljs-tag {
+  color: #569cd6;
+}
+
+.dark .hljs-string,
+.dark .hljs-symbol,
+.dark .hljs-template-variable {
+  color: #ce9178;
+}
+
+.dark .hljs-comment,
+.dark .hljs-quote {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.dark .hljs-number,
+.dark .hljs-literal {
+  color: #b5cea8;
+}
+
+.dark .hljs-type,
+.dark .hljs-params {
+  color: #4ec9b0;
+}
+
+.dark .hljs-function,
+.dark .hljs-title {
+  color: #dcdcaa;
+}
+
+.dark .hljs-variable,
+.dark .hljs-template-tag {
+  color: #9cdcfe;
+}
+
+.dark .hljs-property {
+  color: #9cdcfe;
+}
+
+.dark .hljs-attr {
+  color: #9cdcfe;
+}
+
+.dark .hljs-meta,
+.dark .hljs-selector-id,
+.dark .hljs-selector-class {
+  color: #d7ba7d;
+}
+
+.dark .hljs-deletion {
+  color: #ce9178;
+  background: #72261a40;
+}
+
+.dark .hljs-addition {
+  color: #b5cea8;
+  background: #2ea04340;
+}
