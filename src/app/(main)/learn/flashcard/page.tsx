@@ -25,8 +25,6 @@ import {
   RotateCcw,
   ArrowRight,
   Shuffle,
-  Loader2,
-  Send,
 } from 'lucide-react';
 import type { FlashcardResult } from '@/entities/progress';
 
@@ -42,14 +40,6 @@ export default function FlashcardPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [results, setResults] = useState<FlashcardResult[]>([]);
-  const [userAnswer, setUserAnswer] = useState('');
-  const [isEvaluating, setIsEvaluating] = useState(false);
-  const [evaluation, setEvaluation] = useState<{
-    score: number;
-    feedback: string;
-    passed: boolean;
-  } | null>(null);
-  const [evaluateError, setEvaluateError] = useState<string | null>(null);
 
   useEffect(() => {
     getAllCategories().then((cats) => {
@@ -67,10 +57,6 @@ export default function FlashcardPage() {
     setCurrentIndex(0);
     setResults([]);
     setIsFlipped(false);
-    setUserAnswer('');
-    setIsEvaluating(false);
-    setEvaluation(null);
-    setEvaluateError(null);
     setPhase('study');
   };
 
@@ -88,9 +74,6 @@ export default function FlashcardPage() {
     if (currentIndex + 1 < studyQuestions.length) {
       setCurrentIndex((i) => i + 1);
       setIsFlipped(false);
-      setUserAnswer('');
-      setEvaluation(null);
-      setEvaluateError(null);
     } else {
       setPhase('result');
     }
@@ -100,62 +83,6 @@ export default function FlashcardPage() {
     if (currentIndex + 1 < studyQuestions.length) {
       setCurrentIndex((i) => i + 1);
       setIsFlipped(false);
-      setUserAnswer('');
-      setEvaluation(null);
-      setEvaluateError(null);
-    } else {
-      setPhase('result');
-    }
-  };
-
-  const handleEvaluate = async () => {
-    if (!currentQuestion || !userAnswer.trim()) return;
-
-    setIsEvaluating(true);
-    setEvaluateError(null);
-
-    try {
-      const res = await fetch('/api/evaluate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: currentQuestion.question,
-          correctAnswer: currentQuestion.answer,
-          userAnswer: userAnswer.trim(),
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error ?? `평가 요청 실패 (${res.status})`);
-      }
-
-      const data: { score: number; feedback: string; passed: boolean } =
-        await res.json();
-      setEvaluation(data);
-      setIsFlipped(true);
-
-      updateQuestionProgress(currentQuestion.id, data.passed);
-      setResults((prev) => [
-        ...prev,
-        { questionId: currentQuestion.id, knew: data.passed },
-      ]);
-    } catch (err) {
-      setEvaluateError(
-        err instanceof Error ? err.message : 'AI 평가 중 오류가 발생했습니다.',
-      );
-    } finally {
-      setIsEvaluating(false);
-    }
-  };
-
-  const handleNextAfterEvaluation = () => {
-    if (currentIndex + 1 < studyQuestions.length) {
-      setCurrentIndex((i) => i + 1);
-      setIsFlipped(false);
-      setUserAnswer('');
-      setEvaluation(null);
-      setEvaluateError(null);
     } else {
       setPhase('result');
     }
@@ -324,82 +251,7 @@ export default function FlashcardPage() {
         </motion.div>
       </AnimatePresence>
 
-      {/* AI 평가 결과 */}
-      {evaluation && (
-        <Card className="mt-4 p-4">
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium">점수</span>
-              <div className="flex-1 h-3 rounded-full bg-muted overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    evaluation.score >= 70 ? 'bg-green-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${evaluation.score}%` }}
-                />
-              </div>
-              <span
-                className={`text-lg font-bold ${
-                  evaluation.score >= 70 ? 'text-green-500' : 'text-red-500'
-                }`}
-              >
-                {evaluation.score}점
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">{evaluation.feedback}</p>
-            <Badge variant={evaluation.passed ? 'default' : 'secondary'}>
-              {evaluation.passed ? '학습 완료' : '학습 중'}
-            </Badge>
-          </div>
-        </Card>
-      )}
-
-      {/* AI 평가 에러 */}
-      {evaluateError && (
-        <Card className="mt-4 p-4 border-red-500/30">
-          <p className="text-sm text-red-500">{evaluateError}</p>
-        </Card>
-      )}
-
-      {/* 답변 입력 + AI 평가 (평가 전에만 표시) */}
-      {!evaluation && (
-        <div className="mt-4 space-y-2">
-          <textarea
-            className="w-full min-h-[100px] p-3 rounded-lg border bg-background text-sm resize-y focus:outline-none focus:ring-2 focus:ring-ring"
-            placeholder="답변을 직접 입력해보세요..."
-            value={userAnswer}
-            onChange={(e) => setUserAnswer(e.target.value)}
-            disabled={isEvaluating}
-          />
-          <Button
-            onClick={handleEvaluate}
-            disabled={!userAnswer.trim() || isEvaluating}
-            className="w-full gap-2"
-          >
-            {isEvaluating ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-            {isEvaluating ? 'AI 평가 중...' : 'AI 평가'}
-          </Button>
-        </div>
-      )}
-
-      {/* 평가 후: 다음 문제 버튼 */}
-      {evaluation ? (
-        <div className="flex items-center gap-3 mt-4">
-          <Button
-            size="lg"
-            className="flex-1 gap-2"
-            onClick={handleNextAfterEvaluation}
-          >
-            <ArrowRight className="h-4 w-4" />
-            {currentIndex + 1 < studyQuestions.length ? '다음 문제' : '결과 보기'}
-          </Button>
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 mt-4">
+      <div className="flex items-center gap-3 mt-4">
           <Button
             variant="outline"
             size="lg"
@@ -427,7 +279,6 @@ export default function FlashcardPage() {
             알겠음
           </Button>
         </div>
-      )}
     </div>
   );
 }
