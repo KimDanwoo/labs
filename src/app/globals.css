@@ -1,26 +1,375 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Theme transition */
+  *,
+  *::before,
+  *::after {
+    transition-property: color, background-color, border-color,
+      outline-color, fill, stroke, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 500ms;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Syntax Highlighting — VS Code Light+ ────────────────── */
+.hljs {
+  background: transparent !important;
+  color: #383a42;
+}
+
+.hljs-keyword,
+.hljs-selector-tag {
+  color: #0000ff;
+}
+
+.hljs-built_in {
+  color: #267f99;
+}
+
+.hljs-name,
+.hljs-tag {
+  color: #800000;
+}
+
+.hljs-string,
+.hljs-symbol,
+.hljs-template-variable {
+  color: #a31515;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #008000;
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-literal {
+  color: #098658;
+}
+
+.hljs-type,
+.hljs-params {
+  color: #267f99;
+}
+
+.hljs-function,
+.hljs-title {
+  color: #795e26;
+}
+
+.hljs-variable,
+.hljs-template-tag {
+  color: #001080;
+}
+
+.hljs-property {
+  color: #001080;
+}
+
+.hljs-attr {
+  color: #e50000;
+}
+
+.hljs-meta,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: #800000;
+}
+
+.hljs-deletion {
+  color: #a31515;
+  background: #fdd;
+}
+
+.hljs-addition {
+  color: #098658;
+  background: #dfd;
+}
+
+/* ── Syntax Highlighting — VS Code Dark+ ─────────────────── */
+.dark .hljs {
+  color: #d4d4d4;
+}
+
+.dark .hljs-keyword,
+.dark .hljs-selector-tag {
+  color: #569cd6;
+}
+
+.dark .hljs-built_in {
+  color: #4ec9b0;
+}
+
+.dark .hljs-name,
+.dark .hljs-tag {
+  color: #569cd6;
+}
+
+.dark .hljs-string,
+.dark .hljs-symbol,
+.dark .hljs-template-variable {
+  color: #ce9178;
+}
+
+.dark .hljs-comment,
+.dark .hljs-quote {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.dark .hljs-number,
+.dark .hljs-literal {
+  color: #b5cea8;
+}
+
+.dark .hljs-type,
+.dark .hljs-params {
+  color: #4ec9b0;
+}
+
+.dark .hljs-function,
+.dark .hljs-title {
+  color: #dcdcaa;
+}
+
+.dark .hljs-variable,
+.dark .hljs-template-tag {
+  color: #9cdcfe;
+}
+
+.dark .hljs-property {
+  color: #9cdcfe;
+}
+
+.dark .hljs-attr {
+  color: #9cdcfe;
+}
+
+.dark .hljs-meta,
+.dark .hljs-selector-id,
+.dark .hljs-selector-class {
+  color: #d7ba7d;
+}
+
+.dark .hljs-deletion {
+  color: #ce9178;
+  background: #72261a40;
+}
+
+.dark .hljs-addition {
+  color: #b5cea8;
+  background: #2ea04340;
+}
+
+/* ── Markdown body styles ──────────────────────────────────── */
+
+/* Code blocks */
+.markdown-body pre {
+  @apply rounded-xl border bg-muted/40 p-4 overflow-x-auto my-4;
+  box-shadow: inset 0 1px 2px oklch(0 0 0 / 5%);
+}
+
+.dark .markdown-body pre {
+  @apply bg-muted/20;
+  box-shadow: inset 0 1px 3px oklch(0 0 0 / 20%);
+}
+
+/* Inline code */
+.markdown-body :not(pre) > code {
+  @apply rounded-md px-1.5 py-0.5 text-[0.8125rem] font-mono bg-muted/60 border border-border/50;
+}
+
+.markdown-body pre code {
+  @apply p-0 bg-transparent border-none text-sm leading-relaxed;
+}
+
+/* Lists */
+.markdown-body ul {
+  @apply list-disc pl-6;
+}
+
+.markdown-body ol {
+  @apply list-decimal pl-6;
+}
+
+.markdown-body li::marker {
+  @apply text-muted-foreground/60;
+}
+
+/* Tables */
+.markdown-body .table-wrapper {
+  @apply overflow-x-auto my-4 rounded-lg border;
+}
+
+.markdown-body table {
+  @apply border-collapse whitespace-nowrap;
+}
+
+.markdown-body thead {
+  @apply bg-muted/50;
+}
+
+.markdown-body th {
+  @apply px-4 py-2.5 border-b border-border font-medium text-foreground text-left;
+}
+
+.markdown-body td {
+  @apply px-4 py-2 border-b border-border/50;
+}
+
+.markdown-body tbody tr:last-child td {
+  @apply border-b-0;
+}
+
+.markdown-body tbody tr:hover {
+  @apply bg-muted/20;
+}
+
+/* Blockquotes */
+.markdown-body blockquote {
+  @apply my-4;
+}
+
+.markdown-body blockquote p {
+  @apply text-muted-foreground/80;
+}
+
+/* Horizontal rules */
+.markdown-body hr {
+  @apply border-border/60 my-8;
+}
+
+/* Images */
+.markdown-body img {
+  @apply shadow-sm border;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
