@@ -1,3 +1,5 @@
+export const revalidate = 86400;
+
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
 import { getAllCategories } from '@/entities/question';

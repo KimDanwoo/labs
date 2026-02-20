@@ -1,13 +1,20 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import type { Components } from 'react-markdown';
-import ReactMarkdown from 'react-markdown';
-import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+
+const ReactMarkdown = dynamic(() => import('react-markdown'), {
+  loading: () => <div className="animate-pulse h-20 bg-muted rounded" />,
+});
 
 interface MarkdownRendererProps {
   content: string;
 }
+
+const remarkPlugins = [remarkGfm];
+const rehypePlugins = [rehypeHighlight];
 
 const components: Components = {
   table: ({ children, ...props }) => (
@@ -15,14 +22,19 @@ const components: Components = {
       <table {...props}>{children}</table>
     </div>
   ),
+  pre: ({ children, ...props }) => (
+    <div className="code-block-wrapper">
+      <pre {...props}>{children}</pre>
+    </div>
+  ),
 };
 
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
-    <div className="markdown-body prose prose-sm dark:prose-invert max-w-none prose-headings:text-foreground prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-lg prose-h2:mt-8 prose-h2:mb-3 prose-h3:text-base prose-h3:mt-6 prose-h3:mb-2 prose-p:text-muted-foreground prose-p:leading-7 prose-p:my-3 prose-li:text-muted-foreground prose-li:leading-7 prose-li:my-1 prose-ul:my-3 prose-ol:my-3 prose-strong:text-foreground prose-strong:font-semibold prose-a:text-primary prose-a:underline prose-a:underline-offset-4 prose-a:decoration-primary/40 hover:prose-a:decoration-primary prose-blockquote:border-l-primary/50 prose-blockquote:bg-muted/30 prose-blockquote:rounded-r-lg prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:not-italic prose-blockquote:text-muted-foreground prose-code:text-primary prose-code:before:content-none prose-code:after:content-none prose-hr:border-border prose-hr:my-6 prose-img:rounded-lg prose-table:text-sm prose-th:text-left prose-th:text-foreground prose-td:text-muted-foreground">
+    <div className="markdown-body prose prose-sm dark:prose-invert max-w-none">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeHighlight]}
+        remarkPlugins={remarkPlugins}
+        rehypePlugins={rehypePlugins}
         components={components}
       >
         {content}

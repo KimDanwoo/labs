@@ -1,3 +1,5 @@
+export const revalidate = 86400;
+
 import Link from 'next/link';
 import { Button } from '@/shared/ui/button';
 import { getAllCategories } from '@/entities/question';

@@ -3,12 +3,9 @@ import Link from 'next/link';
 export function Footer() {
   return (
     <footer className="border-t bg-background">
-      <div className="container mx-auto max-w-7xl px-4 py-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold">프딥</span>
-          </div>
-          <nav className="flex gap-6 text-sm text-muted-foreground">
+      <div className="container mx-auto max-w-7xl px-4 h-[52px] flex items-center justify-between">
+          <span className="text-sm font-medium">프딥</span>
+          <nav className="flex gap-5 text-xs text-muted-foreground" aria-label="푸터 네비게이션">
             <Link href="/reference" className="hover:text-foreground transition-colors">
               레퍼런스
             </Link>
@@ -19,10 +16,9 @@ export function Footer() {
               검색
             </Link>
           </nav>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} 프딥
           </p>
-        </div>
       </div>
     </footer>
   );
