@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Question, Category } from '@/entities/question/model';
-import type { QuestionInput } from '../actions';
-import { createQuestion, updateQuestion } from '../actions';
+import type { QuestionInput } from '@/entities/question/model';
+import { createQuestion, updateQuestion } from '@/entities/question/actions';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';

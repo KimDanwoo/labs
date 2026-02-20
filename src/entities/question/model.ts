@@ -30,6 +30,24 @@ export interface QuestionWithCategory extends Question {
   category: Category;
 }
 
+export interface QuestionInput {
+  question: string;
+  answer: string;
+  category_id: string;
+  sub_category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  tags: string[];
+  order_num?: number;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 export interface SearchResult {
   question: Question;
   category: Category;

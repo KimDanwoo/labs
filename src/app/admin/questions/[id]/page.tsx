@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createServerSupabaseClient } from '@/shared/config/supabase/server';
 import { getAllCategories, getQuestionById } from '@/entities/question/api';
-import { QuestionForm } from '../../_components/question-form';
+import { QuestionForm } from '@/widgets/question-form';
 
 interface Props {
   params: Promise<{ id: string }>;

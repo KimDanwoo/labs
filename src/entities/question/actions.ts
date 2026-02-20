@@ -3,17 +3,7 @@
 import { createServerSupabaseClient } from '@/shared/config/supabase/server';
 import { createAdminSupabaseClient } from '@/shared/config/supabase/admin';
 import { isAdmin } from '@/shared/lib/admin';
-import type { Question } from '@/entities/question/model';
-
-export interface QuestionInput {
-  question: string;
-  answer: string;
-  category_id: string;
-  sub_category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  tags: string[];
-  order_num?: number;
-}
+import type { Question, QuestionInput } from '@/entities/question/model';
 
 async function requireAdmin() {
   const supabase = await createServerSupabaseClient();

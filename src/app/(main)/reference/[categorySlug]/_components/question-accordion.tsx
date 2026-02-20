@@ -17,9 +17,10 @@ import type { Question } from '@/entities/question';
 
 interface QuestionAccordionProps {
   questions: Question[];
+  startIndex?: number;
 }
 
-export function QuestionAccordion({ questions }: QuestionAccordionProps) {
+export function QuestionAccordion({ questions, startIndex = 0 }: QuestionAccordionProps) {
   const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({});
   const [progress, setProgress] = useState<Record<string, string>>({});
 
@@ -56,7 +57,7 @@ export function QuestionAccordion({ questions }: QuestionAccordionProps) {
           <AccordionTrigger className="hover:no-underline py-4">
             <div className="flex items-start gap-3 text-left flex-1 mr-4">
               <span className="text-muted-foreground text-sm font-mono mt-0.5 shrink-0">
-                {String(index + 1).padStart(2, '0')}
+                {String(startIndex + index + 1).padStart(2, '0')}
               </span>
               <div className="flex flex-col gap-1.5 min-w-0">
                 <span className="font-medium text-sm leading-relaxed">
