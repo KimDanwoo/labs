@@ -7,8 +7,7 @@ import { Menu, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { getAllCategories, getCategoryBySlug, getQuestionsByCategorySlugPaginated } from '@/entities/question';
 import { createServerSupabaseClient } from '@/shared/config/supabase/server';
-import { CategorySidebar } from './_components/category-sidebar';
-import { QuestionAccordion } from './_components/question-accordion';
+import { CategorySidebar, QuestionAccordion } from '@/views/reference';
 
 export const revalidate = 86400;
 

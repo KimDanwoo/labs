@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Menu, Search, LogIn, User, BookOpen, GraduationCap, Shield, Clock, Calendar } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/shared/ui/sheet';
-import { ThemeToggle } from '@/shared/ui/theme-toggle';
+import { ThemeToggle } from '@/shared/ui/ThemeToggle';
 import { createClient } from '@/shared/config/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import {

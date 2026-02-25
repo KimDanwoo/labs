@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/shared/config/supabase/client';
 import type { Question, Category } from '@/entities/question/model';
-import { useDebounce } from '@/shared/lib/hooks/use-debounce';
+import { useDebounce } from '@/shared/lib/hooks/useDebounce';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
-import { DifficultyBadge } from '@/entities/question/ui/difficulty-badge';
+import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
 import { deleteQuestion } from '@/entities/question/actions';
 import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 

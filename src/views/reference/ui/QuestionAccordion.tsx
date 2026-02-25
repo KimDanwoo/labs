@@ -9,8 +9,8 @@ import {
 } from '@/shared/ui/accordion';
 import { Button } from '@/shared/ui/button';
 import { Bookmark, BookmarkCheck, CheckCircle } from 'lucide-react';
-import { MarkdownRenderer } from '@/shared/ui/markdown-renderer';
-import { DifficultyBadge } from '@/entities/question/ui/difficulty-badge';
+import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
+import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
 import { toggleBookmark, isBookmarked } from '@/features/bookmark';
 import { getProgressForQuestion, updateQuestionProgress } from '@/entities/progress';
 import type { Question } from '@/entities/question';

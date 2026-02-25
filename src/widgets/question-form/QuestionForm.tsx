@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
-import { MarkdownRenderer } from '@/shared/ui/markdown-renderer';
+import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
 
 interface QuestionFormProps {
   categories: Category[];
