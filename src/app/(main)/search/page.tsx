@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { SearchContent } from './_components/search-content';
+import { SearchContent } from '@/views/search';
 
 export const metadata: Metadata = {
   title: '검색',
