@@ -1,5 +1,6 @@
 import { createClient } from '@/shared/config/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { shuffleArray } from '@/shared/lib/shuffle';
 import type { Category, Question, PaginatedResult, SearchResult } from './model';
 
 // ============================================================
@@ -171,7 +172,9 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
   if (!query.trim()) return [];
 
   const client = getClient(supabase);
-  const pattern = `%${query}%`;
+  // ILIKE 특수문자(%_\)를 이스케이프하여 리터럴 검색이 되도록 한다.
+  const escaped = query.replace(/[%_\\]/g, '\\$&');
+  const pattern = `%${escaped}%`;
 
   const { data, error } = await client
     .from('questions')
@@ -254,12 +257,7 @@ export async function getRandomQuestions(count: number, categorySlug?: string, s
   }
 
   // 2) Fisher-Yates shuffle → pick (균등 분포 보장)
-  const arr = [...idRows];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  const pickedIds = arr.slice(0, count).map((r) => r.id as string);
+  const pickedIds = shuffleArray(idRows).slice(0, count).map((r) => r.id as string);
 
   // 3) 벌크 조회
   return getQuestionsByIds(pickedIds, client);

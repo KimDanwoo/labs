@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { Menu, Search, LogIn, User, BookOpen, GraduationCap, Shield } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Menu, Search, LogIn, User, BookOpen, GraduationCap, Shield, Clock, Calendar } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/shared/ui/sheet';
 import { ThemeToggle } from '@/shared/ui/theme-toggle';
@@ -18,9 +18,12 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { cn } from '@/shared/lib/utils';
+import { getDueCardCount, syncProgress } from '@/entities/progress';
+import { clearUserIdCache } from '@/entities/progress/sync';
 
 const navItems = [
 	{ href: '/reference', label: '레퍼런스', icon: BookOpen },
+	{ href: '/learn/daily', label: '오늘의 학습', icon: Calendar },
 	{ href: '/learn/flashcard', label: '플래시카드', icon: GraduationCap },
 	{ href: '/search', label: '검색', icon: Search },
 ];
@@ -30,9 +33,11 @@ export function Header() {
 	const [user, setUser] = useState<SupabaseUser | null>(null);
 	const [mounted, setMounted] = useState(false);
 	const [open, setOpen] = useState(false);
+	const [dueCount, setDueCount] = useState(0);
 
 	useEffect(() => {
 		setMounted(true);
+		setDueCount(getDueCardCount());
 		const supabase = createClient();
 		supabase.auth.getUser().then(({ data: { user } }) => {
 			setUser(user);
@@ -42,19 +47,26 @@ export function Header() {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange((_event, session) => {
 			setUser(session?.user ?? null);
+			clearUserIdCache();
+			// 로그인 시 localStorage ↔ Supabase 양방향 동기화
+			if (session?.user) {
+				syncProgress().then(() => {
+					setDueCount(getDueCardCount());
+				}).catch(() => {});
+			}
 		});
 
 		return () => subscription.unsubscribe();
 	}, []);
 
-	const isAdminUser = (() => {
+	const isAdminUser = useMemo(() => {
 		if (!user?.email) return false;
 		const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? '')
 			.split(',')
 			.map((e) => e.trim().toLowerCase())
 			.filter(Boolean);
 		return adminEmails.includes(user.email.toLowerCase());
-	})();
+	}, [user]);
 
 	const handleSignOut = async () => {
 		const supabase = createClient();
@@ -78,12 +90,19 @@ export function Header() {
 				<nav className="hidden md:flex items-center space-x-1 flex-1" aria-label="메인 네비게이션">
 					{navItems.map((item) => {
 						const Icon = item.icon;
-						const isActive = pathname.startsWith(item.href);
+						const isActive = pathname === item.href || (pathname.startsWith(item.href + '/'));
+						const showDueBadge = mounted && item.href === '/learn/flashcard' && dueCount > 0;
 						return (
 							<Link key={item.href} href={item.href}>
 								<Button variant={isActive ? 'secondary' : 'ghost'} size="sm" className="gap-2">
 									<Icon className="h-4 w-4" />
 									{item.label}
+									{showDueBadge && (
+										<span className="flex items-center gap-0.5 text-xs bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 px-1.5 py-0.5 rounded-full">
+											<Clock className="h-3 w-3" />
+											{dueCount}
+										</span>
+									)}
 								</Button>
 							</Link>
 						);
@@ -146,12 +165,19 @@ export function Header() {
 							<nav className="flex flex-col gap-2 mt-8">
 								{navItems.map((item) => {
 									const Icon = item.icon;
-									const isActive = pathname.startsWith(item.href);
+									const isActive = pathname === item.href || (pathname.startsWith(item.href + '/'));
+									const showDueBadge = mounted && item.href === '/learn/flashcard' && dueCount > 0;
 									return (
 										<Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
 											<Button variant={isActive ? 'secondary' : 'ghost'} className="w-full justify-start gap-3">
 												<Icon className="h-4 w-4" />
 												{item.label}
+												{showDueBadge && (
+													<span className="flex items-center gap-0.5 text-xs bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 px-1.5 py-0.5 rounded-full ml-auto">
+														<Clock className="h-3 w-3" />
+														{dueCount}
+													</span>
+												)}
 											</Button>
 										</Link>
 									);
