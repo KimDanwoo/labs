@@ -25,21 +25,18 @@ export function SearchContent() {
   const [query, setQuery] = useState(initialQuery);
   const debouncedQuery = useDebounce(query, 300);
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  // 마지막으로 검색 완료된 쿼리를 추적하여 isSearching을 파생한다.
+  const [lastSearchedQuery, setLastSearchedQuery] = useState('');
 
   useEffect(() => {
-    if (!debouncedQuery.trim()) {
-      setResults([]);
-      return;
-    }
+    if (!debouncedQuery.trim()) return;
 
     let cancelled = false;
-    setIsSearching(true);
 
     searchQuestions(debouncedQuery).then((data) => {
       if (!cancelled) {
         setResults(data);
-        setIsSearching(false);
+        setLastSearchedQuery(debouncedQuery);
       }
     });
 
@@ -47,6 +44,9 @@ export function SearchContent() {
       cancelled = true;
     };
   }, [debouncedQuery]);
+
+  const displayResults = debouncedQuery.trim() ? results : [];
+  const isSearching = debouncedQuery.trim() !== '' && debouncedQuery !== lastSearchedQuery;
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -68,13 +68,13 @@ export function SearchContent() {
       {debouncedQuery && (
         <p className="text-sm text-muted-foreground mb-4">
           &quot;{debouncedQuery}&quot;에 대한 검색 결과{' '}
-          {isSearching ? '...' : `${results.length}건`}
+          {isSearching ? '...' : `${displayResults.length}건`}
         </p>
       )}
 
-      {results.length > 0 ? (
+      {displayResults.length > 0 ? (
         <Accordion type="multiple" className="space-y-2">
-          {results.map((result) => (
+          {displayResults.map((result) => (
             <AccordionItem
               key={result.question.id}
               value={result.question.id}

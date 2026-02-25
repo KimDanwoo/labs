@@ -66,53 +66,51 @@ function markDailyDone() {
 }
 
 export default function DailyChallengePage() {
-  const [phase, setPhase] = useState<Phase>('loading');
+  // isDailyDone()은 localStorage를 읽으므로 lazy initializer로 초기 상태를 결정한다.
+  const alreadyDone = typeof window !== 'undefined' && isDailyDone();
+  const [phase, setPhase] = useState<Phase>(() => alreadyDone ? 'already-done' : 'loading');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [results, setResults] = useState<FlashcardResult[]>([]);
-  const [streak, setStreak] = useState(0);
+  const [streak, setStreak] = useState(() => alreadyDone ? getCurrentStreak() : 0);
   const isRatingRef = useRef(false);
 
   useEffect(() => {
-    if (isDailyDone()) {
-      setStreak(getCurrentStreak());
-      setPhase('already-done');
-      return;
+    if (alreadyDone) return;
+
+    async function loadDailyQuestions(): Promise<Question[]> {
+      // 복습 카드 우선, 부족하면 새 카드로 채움
+      const dueIds = getDueCardIds();
+      let selected: Question[] = [];
+
+      if (dueIds.length > 0) {
+        const dueQuestions = await getQuestionsByIds(dueIds.slice(0, DAILY_COUNT));
+        selected = dueQuestions;
+      }
+
+      if (selected.length < DAILY_COUNT) {
+        const remaining = DAILY_COUNT - selected.length;
+        const candidates = await getRandomQuestions(remaining * 3);
+        const existingIds = new Set(selected.map((q) => q.id));
+        const allProgress = getLocalProgress();
+        const newCards = candidates
+          .filter((q) => !existingIds.has(q.id) && !allProgress[q.id])
+          .slice(0, remaining);
+        selected = [...selected, ...newCards];
+      }
+
+      return shuffleArray(selected);
     }
+
     loadDailyQuestions().then((qs) => {
       setQuestions(qs);
       setStreak(getCurrentStreak());
       setPhase('ready');
     }).catch(() => {
-      // API 실패 시 빈 상태로 ready 전환 (loading에서 멈추지 않도록)
       setPhase('ready');
     });
-  }, []);
-
-  async function loadDailyQuestions(): Promise<Question[]> {
-    // 복습 카드 우선, 부족하면 새 카드로 채움
-    const dueIds = getDueCardIds();
-    let selected: Question[] = [];
-
-    if (dueIds.length > 0) {
-      const dueQuestions = await getQuestionsByIds(dueIds.slice(0, DAILY_COUNT));
-      selected = dueQuestions;
-    }
-
-    if (selected.length < DAILY_COUNT) {
-      const remaining = DAILY_COUNT - selected.length;
-      const candidates = await getRandomQuestions(remaining * 3);
-      const existingIds = new Set(selected.map((q) => q.id));
-      const allProgress = getLocalProgress();
-      const newCards = candidates
-        .filter((q) => !existingIds.has(q.id) && !allProgress[q.id])
-        .slice(0, remaining);
-      selected = [...selected, ...newCards];
-    }
-
-    return shuffleArray(selected);
-  }
+  }, [alreadyDone]);
 
   const currentQuestion = questions[currentIndex];
   const progressPercent = questions.length > 0

@@ -31,13 +31,11 @@ const navItems = [
 export function Header() {
 	const pathname = usePathname();
 	const [user, setUser] = useState<SupabaseUser | null>(null);
-	const [mounted, setMounted] = useState(false);
+	const [mounted] = useState(() => typeof window !== 'undefined');
 	const [open, setOpen] = useState(false);
-	const [dueCount, setDueCount] = useState(0);
+	const [dueCount, setDueCount] = useState(() => typeof window !== 'undefined' ? getDueCardCount() : 0);
 
 	useEffect(() => {
-		setMounted(true);
-		setDueCount(getDueCardCount());
 		const supabase = createClient();
 		supabase.auth.getUser().then(({ data: { user } }) => {
 			setUser(user);

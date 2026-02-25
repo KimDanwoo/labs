@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -21,20 +21,24 @@ interface QuestionAccordionProps {
 }
 
 export function QuestionAccordion({ questions, startIndex = 0 }: QuestionAccordionProps) {
-  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({});
-  const [progress, setProgress] = useState<Record<string, string>>({});
-
-  useEffect(() => {
+  // useMemo로 초기값을 계산하여 불필요한 리렌더를 방지한다.
+  const initialBookmarks = useMemo(() => {
     const bm: Record<string, boolean> = {};
+    for (const q of questions) bm[q.id] = isBookmarked(q.id);
+    return bm;
+  }, [questions]);
+
+  const initialProgress = useMemo(() => {
     const pg: Record<string, string> = {};
     for (const q of questions) {
-      bm[q.id] = isBookmarked(q.id);
       const p = getProgressForQuestion(q.id);
       if (p) pg[q.id] = p.status;
     }
-    setBookmarks(bm);
-    setProgress(pg);
+    return pg;
   }, [questions]);
+
+  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>(initialBookmarks);
+  const [progress, setProgress] = useState<Record<string, string>>(initialProgress);
 
   const handleBookmarkToggle = (questionId: string) => {
     const result = toggleBookmark(questionId);
