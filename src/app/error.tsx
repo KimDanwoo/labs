@@ -9,6 +9,8 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  console.error(error);
+
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="text-center space-y-4 max-w-md">

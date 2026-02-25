@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { LayoutDashboard, FileText, Plus, ExternalLink } from 'lucide-react';
-import { ThemeToggle } from '@/shared/ui/theme-toggle';
+import { ThemeToggle } from '@/shared/ui/ThemeToggle';
 
 export default function AdminLayout({
   children,

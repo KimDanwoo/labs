@@ -10,6 +10,8 @@ export default function MainError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  console.error(error);
+
   return (
     <div className="container mx-auto max-w-4xl px-4 py-24 text-center">
       <h1 className="text-3xl font-bold mb-4">문제가 발생했습니다</h1>
