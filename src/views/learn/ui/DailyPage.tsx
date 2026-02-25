@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Button } from '@/shared/ui/button';
@@ -12,14 +12,14 @@ import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
 import { getRandomQuestions, getQuestionsByIds } from '@/entities/question';
 import type { Question } from '@/entities/question';
 import {
-  reviewCard,
   getDueCardIds,
   getLocalProgress,
   getCurrentStreak,
   RATING_CONFIG,
 } from '@/entities/progress';
-import type { ReviewRating, FlashcardResult } from '@/entities/progress';
 import { shuffleArray } from '@/shared/lib/shuffle';
+import { useCardStudySession } from '../model';
+import { isDailyDone, markDailyDone } from '../model';
 import {
   Flame,
   Trophy,
@@ -29,58 +29,37 @@ import {
 } from 'lucide-react';
 
 const DAILY_COUNT = 5;
-const DAILY_KEY_PREFIX = 'fe-daily-';
 
 type Phase = 'loading' | 'ready' | 'study' | 'done' | 'already-done';
 
-/** 오늘 날짜를 YYYY-MM-DD로 반환한다. */
-function todayKey(): string {
-  return new Date().toISOString().split('T')[0];
-}
-
-/** 오늘의 데일리 챌린지 완료 여부를 확인한다. */
-function isDailyDone(): boolean {
-  if (typeof window === 'undefined') return false;
-  return localStorage.getItem(DAILY_KEY_PREFIX + todayKey()) === 'done';
-}
-
-/** 오늘의 데일리 챌린지를 완료로 표시한다. 7일 이상 된 기록은 정리한다. */
-function markDailyDone() {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(DAILY_KEY_PREFIX + todayKey(), 'done');
-
-  // 오래된 daily 키 정리
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 7);
-  const cutoffKey = cutoff.toISOString().split('T')[0];
-
-  for (let i = localStorage.length - 1; i >= 0; i--) {
-    const key = localStorage.key(i);
-    if (key?.startsWith(DAILY_KEY_PREFIX)) {
-      const dateStr = key.slice(DAILY_KEY_PREFIX.length);
-      if (dateStr < cutoffKey) {
-        localStorage.removeItem(key);
-      }
-    }
-  }
-}
-
 export function DailyPage() {
-  // isDailyDone()은 localStorage를 읽으므로 lazy initializer로 초기 상태를 결정한다.
   const alreadyDone = typeof window !== 'undefined' && isDailyDone();
   const [phase, setPhase] = useState<Phase>(() => alreadyDone ? 'already-done' : 'loading');
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [results, setResults] = useState<FlashcardResult[]>([]);
   const [streak, setStreak] = useState(() => alreadyDone ? getCurrentStreak() : 0);
-  const isRatingRef = useRef(false);
+
+  const onComplete = useCallback(() => {
+    markDailyDone();
+    setStreak(getCurrentStreak());
+    setPhase('done');
+  }, []);
+
+  const {
+    currentIndex,
+    currentQuestion,
+    isFlipped,
+    setIsFlipped,
+    results,
+    progressPercent,
+    isNewCard,
+    resultCounts,
+    handleRate,
+  } = useCardStudySession({ questions, phase, onComplete });
 
   useEffect(() => {
     if (alreadyDone) return;
 
     async function loadDailyQuestions(): Promise<Question[]> {
-      // 복습 카드 우선, 부족하면 새 카드로 채움
       const dueIds = getDueCardIds();
       let selected: Question[] = [];
 
@@ -111,78 +90,6 @@ export function DailyPage() {
       setPhase('ready');
     });
   }, [alreadyDone]);
-
-  const currentQuestion = questions[currentIndex];
-  const progressPercent = questions.length > 0
-    ? (currentIndex / questions.length) * 100
-    : 0;
-
-  const handleRate = useCallback((rating: ReviewRating) => {
-    if (!currentQuestion || isRatingRef.current) return;
-    isRatingRef.current = true;
-
-    reviewCard(currentQuestion.id, rating);
-    setResults((prev) => [...prev, { questionId: currentQuestion.id, rating }]);
-
-    if (currentIndex + 1 < questions.length) {
-      setCurrentIndex((i) => i + 1);
-      setIsFlipped(false);
-      requestAnimationFrame(() => { isRatingRef.current = false; });
-    } else {
-      markDailyDone();
-      setStreak(getCurrentStreak());
-      isRatingRef.current = false;
-      setPhase('done');
-    }
-  }, [currentQuestion, currentIndex, questions.length]);
-
-  // 키보드 단축키
-  useEffect(() => {
-    if (phase !== 'study') return;
-
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
-      if (!isFlipped) {
-        if (e.key === ' ' || e.key === 'Enter') {
-          e.preventDefault();
-          setIsFlipped(true);
-        }
-      } else {
-        switch (e.key) {
-          case '1': handleRate('again'); break;
-          case '2': handleRate('hard'); break;
-          case '3': handleRate('good'); break;
-          case '4': handleRate('easy'); break;
-        }
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [phase, isFlipped, handleRate]);
-
-  const progressSnapshot = useMemo(() => {
-    if (phase !== 'study') return {};
-    return getLocalProgress();
-  }, [phase]);
-
-  const isNewCard = useMemo(() => {
-    if (!currentQuestion) return true;
-    return !progressSnapshot[currentQuestion.id];
-  }, [currentQuestion, progressSnapshot]);
-
-  const resultCounts = useMemo(() => {
-    let again = 0, hard = 0, good = 0, easy = 0;
-    for (const r of results) {
-      switch (r.rating) {
-        case 'again': again++; break;
-        case 'hard': hard++; break;
-        case 'good': good++; break;
-        case 'easy': easy++; break;
-      }
-    }
-    return { again, hard, good, easy };
-  }, [results]);
 
   // ==================== LOADING ====================
   if (phase === 'loading') {

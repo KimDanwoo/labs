@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/shared/ui/select';
 import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
-import { deleteQuestion } from '@/entities/question/actions';
+import { deleteQuestion } from '@/entities/question/services';
 import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PAGE_SIZE = 10;

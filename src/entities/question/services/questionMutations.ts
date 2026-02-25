@@ -3,7 +3,7 @@
 import { createServerSupabaseClient } from '@/shared/config/supabase/server';
 import { createAdminSupabaseClient } from '@/shared/config/supabase/admin';
 import { isAdmin } from '@/shared/lib/admin';
-import type { Question, QuestionInput } from '@/entities/question/model';
+import type { Question, QuestionInput } from '../model';
 
 async function requireAdmin() {
   const supabase = await createServerSupabaseClient();

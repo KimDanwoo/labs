@@ -1,7 +1,7 @@
 import { createClient } from '@/shared/config/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { shuffleArray } from '@/shared/lib/shuffle';
-import type { Category, Question, PaginatedResult, SearchResult } from './model';
+import type { Category, Question, PaginatedResult, SearchResult } from '../model';
 
 // ============================================================
 // Supabase data access layer

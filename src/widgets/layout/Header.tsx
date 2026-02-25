@@ -19,7 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { cn } from '@/shared/lib/utils';
 import { getDueCardCount, syncProgress } from '@/entities/progress';
-import { clearUserIdCache } from '@/entities/progress/sync';
+import { clearUserIdCache } from '@/entities/progress/services';
 
 const navItems = [
 	{ href: '/reference', label: '레퍼런스', icon: BookOpen },

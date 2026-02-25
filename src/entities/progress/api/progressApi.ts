@@ -1,9 +1,9 @@
 'use client';
 
-import type { ProgressStatus, UserProgress, ReviewRating } from './model';
-import { calculateSM2, todayString, addDays } from './sm2';
+import type { ProgressStatus, UserProgress, ReviewRating } from '../model';
+import { calculateSM2, todayString, addDays } from '../sm2';
 
-export { calculateSM2 } from './sm2';
+export { calculateSM2 } from '../sm2';
 
 const PROGRESS_KEY = 'fe-interview-progress';
 
@@ -103,7 +103,7 @@ export function reviewCard(questionId: string, rating: ReviewRating): UserProgre
   saveLocalProgress(allProgress);
 
   // Supabase write-through (lazy import로 순환 의존성 방지)
-  import('./sync').then(({ syncSingleCard }) => {
+  import('../services/progressSync').then(({ syncSingleCard }) => {
     syncSingleCard(updated).catch(() => {});
   }).catch(() => {});
 
@@ -228,7 +228,7 @@ export function updateQuestionProgress(
   saveLocalProgress(allProgress);
 
   // Supabase write-through (lazy import로 순환 의존성 방지)
-  import('./sync').then(({ syncSingleCard }) => {
+  import('../services/progressSync').then(({ syncSingleCard }) => {
     syncSingleCard(updated).catch(() => {});
   }).catch(() => {});
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/shared/ui/button';
 import { Card } from '@/shared/ui/card';
@@ -18,14 +18,13 @@ import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
 import { getAllCategories, getRandomQuestions, getQuestionsByIds } from '@/entities/question';
 import type { Category, Question } from '@/entities/question';
 import {
-  reviewCard,
   getDueCardIds,
   getDueCardCount,
   getLocalProgress,
   RATING_CONFIG,
 } from '@/entities/progress';
-import type { ReviewRating, FlashcardResult } from '@/entities/progress';
 import { shuffleArray } from '@/shared/lib/shuffle';
+import { useCardStudySession } from '../model';
 import {
   RotateCcw,
   ArrowRight,
@@ -45,14 +44,26 @@ export function FlashcardPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [questionCount, setQuestionCount] = useState(10);
   const [studyMode, setStudyMode] = useState<StudyMode>('review');
-
   const [studyQuestions, setStudyQuestions] = useState<Question[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [results, setResults] = useState<FlashcardResult[]>([]);
-
   const [dueCount, setDueCount] = useState(0);
-  const isRatingRef = useRef(false);
+
+  const onComplete = useCallback(() => {
+    setPhase('result');
+  }, []);
+
+  const {
+    currentIndex,
+    currentQuestion,
+    isFlipped,
+    setIsFlipped,
+    results,
+    progressPercent,
+    isNewCard,
+    currentProgress,
+    resultCounts,
+    handleRate,
+    resetStudy,
+  } = useCardStudySession({ questions: studyQuestions, phase, onComplete });
 
   useEffect(() => {
     getAllCategories().then((cats) => {
@@ -63,37 +74,25 @@ export function FlashcardPage() {
     });
   }, []);
 
-  const resetStudyState = () => {
-    setCurrentIndex(0);
-    setResults([]);
-    setIsFlipped(false);
-    isRatingRef.current = false;
-  };
-
   const startStudy = async () => {
     let questions: Question[] = [];
 
     if (studyMode === 'review') {
-      // 복습 모드: 오늘 복습할 카드
       const dueIds = getDueCardIds();
       if (dueIds.length > 0) {
         const sliced = dueIds.slice(0, questionCount);
         questions = await getQuestionsByIds(sliced);
-        // 인터리빙: 카테고리 섞기
         questions = shuffleArray(questions);
       }
     } else if (studyMode === 'new') {
-      // 새 카드 모드: 아직 안 본 카드
       questions = selectedCategory === 'all'
         ? await getRandomQuestions(questionCount * 2)
         : await getRandomQuestions(questionCount * 2, selectedCategory);
-      // localStorage 한 번만 파싱하여 필터링
       const allProgress = getLocalProgress();
       questions = questions
         .filter((q) => !allProgress[q.id])
         .slice(0, questionCount);
     } else {
-      // 혼합 모드: 복습 + 새 카드
       const dueIds = getDueCardIds();
       const dueQuestions = dueIds.length > 0
         ? await getQuestionsByIds(dueIds.slice(0, Math.ceil(questionCount / 2)))
@@ -117,57 +116,9 @@ export function FlashcardPage() {
     if (questions.length === 0) return;
 
     setStudyQuestions(questions);
-    resetStudyState();
+    resetStudy();
     setPhase('study');
   };
-
-  const currentQuestion = studyQuestions[currentIndex];
-  const progressPercent = studyQuestions.length > 0
-    ? (currentIndex / studyQuestions.length) * 100
-    : 0;
-
-  const handleRate = useCallback((rating: ReviewRating) => {
-    if (!currentQuestion || isRatingRef.current) return;
-    isRatingRef.current = true;
-
-    reviewCard(currentQuestion.id, rating);
-    setResults((prev) => [...prev, { questionId: currentQuestion.id, rating }]);
-
-    if (currentIndex + 1 < studyQuestions.length) {
-      setCurrentIndex((i) => i + 1);
-      setIsFlipped(false);
-      // 다음 렌더 후 가드 해제
-      requestAnimationFrame(() => { isRatingRef.current = false; });
-    } else {
-      setPhase('result');
-    }
-  }, [currentQuestion, currentIndex, studyQuestions.length]);
-
-  // 키보드 단축키
-  useEffect(() => {
-    if (phase !== 'study') return;
-
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
-
-      if (!isFlipped) {
-        if (e.key === ' ' || e.key === 'Enter') {
-          e.preventDefault();
-          setIsFlipped(true);
-        }
-      } else {
-        switch (e.key) {
-          case '1': handleRate('again'); break;
-          case '2': handleRate('hard'); break;
-          case '3': handleRate('good'); break;
-          case '4': handleRate('easy'); break;
-        }
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [phase, isFlipped, handleRate]);
 
   /** "다시" 카드만 모아 즉시 재학습 */
   const retryFailedCards = () => {
@@ -178,34 +129,9 @@ export function FlashcardPage() {
     if (failedQuestions.length === 0) return;
 
     setStudyQuestions(shuffleArray(failedQuestions));
-    resetStudyState();
+    resetStudy();
     setPhase('study');
   };
-
-  // 학습 시작 시점의 progress 스냅샷. 카드마다 getLocalProgress()를 재호출하지 않는다.
-  const progressSnapshot = useMemo(() => {
-    if (phase !== 'study') return {};
-    return getLocalProgress();
-  }, [phase]);
-
-  const { currentProgress, isNewCard } = useMemo(() => {
-    if (!currentQuestion) return { currentProgress: null, isNewCard: true };
-    const cp = progressSnapshot[currentQuestion.id] ?? null;
-    return { currentProgress: cp, isNewCard: !cp };
-  }, [currentQuestion, progressSnapshot]);
-
-  const resultCounts = useMemo(() => {
-    let again = 0, hard = 0, good = 0, easy = 0;
-    for (const r of results) {
-      switch (r.rating) {
-        case 'again': again++; break;
-        case 'hard': hard++; break;
-        case 'good': good++; break;
-        case 'easy': easy++; break;
-      }
-    }
-    return { again, hard, good, easy };
-  }, [results]);
 
   // ==================== SETUP ====================
   if (phase === 'setup') {
