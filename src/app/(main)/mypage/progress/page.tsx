@@ -4,14 +4,13 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Progress } from '@/shared/ui/progress';
 import { Badge } from '@/shared/ui/badge';
-import { getAllCategories, getQuestionsByCategory } from '@/entities/question';
+import { getAllCategories, getAllQuestions } from '@/entities/question';
 import type { Category } from '@/entities/question';
-import { getProgressByCategory, getLocalProgress } from '@/entities/progress';
-import { BookOpen, CheckCircle, Brain, Target } from 'lucide-react';
+import { getProgressByCategory, getLocalProgress, getStudyHeatmap, getCurrentStreak, getDueCardCount } from '@/entities/progress';
+import { BookOpen, CheckCircle, Brain, Target, Flame, Clock } from 'lucide-react';
 
 export default function ProgressPage() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [totalQuestions, setTotalQuestions] = useState(0);
   const [stats, setStats] = useState({
     total: 0,
     mastered: 0,
@@ -21,40 +20,58 @@ export default function ProgressPage() {
   const [categoryStats, setCategoryStats] = useState<
     Record<string, { mastered: number; learning: number; unseen: number }>
   >({});
+  const [heatmap, setHeatmap] = useState<Record<string, number>>({});
+  const [streak, setStreak] = useState(0);
+  const [dueCount, setDueCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
-      const cats = await getAllCategories();
+      // localStorage를 한 번만 파싱하여 heatmap, streak, dueCount, 카테고리 통계에 공유한다.
+      const progress = getLocalProgress();
+      const hm = getStudyHeatmap(progress);
+      setHeatmap(hm);
+      setStreak(getCurrentStreak(hm));
+      setDueCount(getDueCardCount(progress));
+
+      const [cats, allQuestions] = await Promise.all([
+        getAllCategories(),
+        getAllQuestions(),
+      ]);
       if (cancelled) return;
       setCategories(cats);
 
-      const results = await Promise.all(
-        cats.map(async (cat) => {
-          const questions = await getQuestionsByCategory(cat.id);
-          return { catId: cat.id, questionIds: questions.map((q) => q.id) };
-        })
-      );
-      if (cancelled) return;
+      // 카테고리별 질문 ID를 한 번의 순회로 그룹핑 (N+1 쿼리 제거)
+      const questionIdsByCategory = new Map<string, string[]>();
+      for (const q of allQuestions) {
+        const ids = questionIdsByCategory.get(q.category_id);
+        if (ids) {
+          ids.push(q.id);
+        } else {
+          questionIdsByCategory.set(q.category_id, [q.id]);
+        }
+      }
 
-      const allQuestionIds = results.flatMap((r) => r.questionIds);
-      const progress = getLocalProgress();
-      const entries = Object.values(progress);
-      const mastered = entries.filter((p) => p.status === 'mastered').length;
-      const learning = entries.filter((p) => p.status === 'learning').length;
+      const totalQuestions = allQuestions.length;
+      let mastered = 0;
+      let learning = 0;
+      for (const p of Object.values(progress)) {
+        if (p.status === 'mastered') mastered++;
+        else if (p.status === 'learning') learning++;
+      }
 
-      setTotalQuestions(allQuestionIds.length);
       setStats({
-        total: allQuestionIds.length,
+        total: totalQuestions,
         mastered,
         learning,
-        unseen: allQuestionIds.length - mastered - learning,
+        unseen: totalQuestions - mastered - learning,
       });
 
       const catStats: Record<string, { mastered: number; learning: number; unseen: number }> = {};
-      for (const r of results) {
-        catStats[r.catId] = getProgressByCategory(r.questionIds);
+      for (const cat of cats) {
+        const questionIds = questionIdsByCategory.get(cat.id) ?? [];
+        catStats[cat.id] = getProgressByCategory(questionIds, progress);
       }
       setCategoryStats(catStats);
     }
@@ -71,6 +88,36 @@ export default function ProgressPage() {
     <div className="container mx-auto max-w-4xl px-4 py-8">
       <h1 className="text-3xl font-bold mb-2">학습 현황</h1>
       <p className="text-muted-foreground mb-8">전체 학습 진도를 확인하세요.</p>
+
+      {/* Streak & Due */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <Card>
+          <CardContent className="p-4 flex items-center gap-3">
+            <Flame className="h-8 w-8 text-orange-500 shrink-0" />
+            <div>
+              <div className="text-2xl font-bold">{streak}일</div>
+              <div className="text-xs text-muted-foreground">연속 학습</div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-3">
+            <Clock className="h-8 w-8 text-yellow-500 shrink-0" />
+            <div>
+              <div className="text-2xl font-bold">{dueCount}개</div>
+              <div className="text-xs text-muted-foreground">오늘 복습 대기</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Study Heatmap */}
+      <Card className="mb-8">
+        <CardContent className="p-6">
+          <h2 className="text-sm font-medium mb-4">학습 기록</h2>
+          <StudyHeatmap heatmap={heatmap} />
+        </CardContent>
+      </Card>
 
       {/* Overview Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -157,4 +204,81 @@ export default function ProgressPage() {
       </div>
     </div>
   );
+}
+
+/** 최근 15주(~105일)의 학습 히트맵을 GitHub 잔디 스타일로 표시한다. */
+function StudyHeatmap({ heatmap }: { heatmap: Record<string, number> }) {
+  const weeks = 15;
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0=Sun
+
+  // 히트맵 최대값 (색상 강도 계산용). 스프레드 대신 루프로 stack overflow 방지.
+  let maxCount = 1;
+  for (const v of Object.values(heatmap)) {
+    if (v > maxCount) maxCount = v;
+  }
+
+  // 주 단위로 날짜 그리드 생성 (일요일 시작)
+  const grid: { date: string; count: number }[][] = [];
+
+  // 마지막 열(이번 주)의 시작일부터 역산
+  const totalDays = (weeks - 1) * 7 + dayOfWeek + 1;
+  const currentDate = new Date(today);
+  currentDate.setDate(currentDate.getDate() - totalDays + 1);
+
+  for (let w = 0; w < weeks; w++) {
+    const week: { date: string; count: number }[] = [];
+    for (let d = 0; d < 7; d++) {
+      if (w === weeks - 1 && d > dayOfWeek) {
+        week.push({ date: '', count: -1 });
+      } else {
+        const key = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+        week.push({ date: key, count: heatmap[key] ?? 0 });
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    }
+    grid.push(week);
+  }
+
+  const dayLabels = ['일', '', '화', '', '목', '', '토'];
+
+  return (
+    <div className="flex gap-1">
+      <div className="flex flex-col gap-1 mr-1 pt-0">
+        {dayLabels.map((label, i) => (
+          <div key={i} className="h-3 w-4 text-[10px] text-muted-foreground leading-3 text-right">
+            {label}
+          </div>
+        ))}
+      </div>
+      {grid.map((week, wi) => (
+        <div key={wi} className="flex flex-col gap-1">
+          {week.map((day, di) => {
+            if (day.count < 0) {
+              return <div key={di} className="h-3 w-3" />;
+            }
+            const intensity = day.count === 0 ? 0 : Math.ceil((day.count / maxCount) * 4);
+            return (
+              <div
+                key={di}
+                className={`h-3 w-3 rounded-[2px] ${getHeatmapColor(intensity)}`}
+                title={day.date ? `${day.date}: ${day.count}문제` : ''}
+              />
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function getHeatmapColor(intensity: number): string {
+  switch (intensity) {
+    case 0: return 'bg-muted';
+    case 1: return 'bg-green-200 dark:bg-green-900';
+    case 2: return 'bg-green-300 dark:bg-green-700';
+    case 3: return 'bg-green-500 dark:bg-green-500';
+    case 4: return 'bg-green-600 dark:bg-green-400';
+    default: return 'bg-muted';
+  }
 }

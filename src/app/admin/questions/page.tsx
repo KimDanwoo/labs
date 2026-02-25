@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/shared/config/supabase/client';
 import type { Question, Category } from '@/entities/question/model';
+import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
@@ -25,17 +26,11 @@ export default function QuestionsListPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [difficultyFilter, setDifficultyFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-
-  // 검색어 디바운스
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 300);
-    return () => clearTimeout(timer);
-  }, [search]);
 
   // 필터 변경 시 1페이지로 리셋
   useEffect(() => {
