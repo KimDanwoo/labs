@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/shared/config/supabase/middleware';
-import { isAdmin } from '@/shared/lib/admin';
+import { isAdmin } from '@/features/auth';
 import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {

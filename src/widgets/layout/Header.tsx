@@ -20,6 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { cn } from '@/shared/lib/utils';
 import { getDueCardCount, syncProgress } from '@/entities/progress';
 import { clearUserIdCache } from '@/entities/progress/services';
+import { isAdmin } from '@/features/auth';
 
 const navItems = [
 	{ href: '/reference', label: '레퍼런스', icon: BookOpen },
@@ -57,14 +58,7 @@ export function Header() {
 		return () => subscription.unsubscribe();
 	}, []);
 
-	const isAdminUser = useMemo(() => {
-		if (!user?.email) return false;
-		const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? '')
-			.split(',')
-			.map((e) => e.trim().toLowerCase())
-			.filter(Boolean);
-		return adminEmails.includes(user.email.toLowerCase());
-	}, [user]);
+	const isAdminUser = useMemo(() => isAdmin(user?.email), [user]);
 
 	const handleSignOut = async () => {
 		const supabase = createClient();

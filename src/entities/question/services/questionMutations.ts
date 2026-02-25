@@ -2,7 +2,7 @@
 
 import { createServerSupabaseClient } from '@/shared/config/supabase/server';
 import { createAdminSupabaseClient } from '@/shared/config/supabase/admin';
-import { isAdmin } from '@/shared/lib/admin';
+import { isAdmin } from '@/features/auth';
 import type { Question, QuestionInput } from '../model';
 
 async function requireAdmin() {
