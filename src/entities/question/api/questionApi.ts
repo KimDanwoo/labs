@@ -62,7 +62,7 @@ export async function getQuestionsByCategory(categoryId: string, supabase?: Supa
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags')
+    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard')
     .eq('category_id', categoryId)
     .order('order_num');
 
@@ -98,7 +98,7 @@ export async function getQuestionsByCategorySlugPaginated(
 
   const { data, count, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags', { count: 'exact' })
+    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard', { count: 'exact' })
     .eq('category_id', category.id)
     .order('order_num')
     .range(from, to);
@@ -123,7 +123,7 @@ export async function getQuestionById(id: string, supabase?: SupabaseClient): Pr
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags')
+    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard')
     .eq('id', id)
     .single();
 
@@ -141,7 +141,7 @@ export async function getQuestionsByIds(ids: string[], supabase?: SupabaseClient
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags')
+    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard')
     .in('id', ids);
 
   if (error) {
@@ -157,7 +157,7 @@ export async function getAllQuestions(supabase?: SupabaseClient): Promise<Questi
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags');
+    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard');
 
   if (error) {
     console.error('getAllQuestions error:', error);
@@ -179,7 +179,7 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
   const { data, error } = await client
     .from('questions')
     .select(`
-      id, category_id, question, answer, sub_category, difficulty, order_num, tags,
+      id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard,
       categories(id, slug, title, order_num, icon, description)
     `)
     .or(`question.ilike.${pattern},answer.ilike.${pattern}`);
@@ -207,6 +207,8 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
       difficulty: row.difficulty as Question['difficulty'],
       order_num: row.order_num as number,
       tags: row.tags as string[],
+      show_in_daily: row.show_in_daily as boolean,
+      show_in_flashcard: row.show_in_flashcard as boolean,
     };
 
     if (q.question.toLowerCase().includes(lowerQuery)) {
@@ -226,7 +228,7 @@ export async function getQuestionsByDifficulty(difficulty: 'easy' | 'medium' | '
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags')
+    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard')
     .eq('difficulty', difficulty);
 
   if (error) {
@@ -238,7 +240,12 @@ export async function getQuestionsByDifficulty(difficulty: 'easy' | 'medium' | '
 }
 
 /** 랜덤으로 질문을 뽑는다. categorySlug가 주어지면 해당 카테고리에서만 뽑는다. */
-export async function getRandomQuestions(count: number, categorySlug?: string, supabase?: SupabaseClient): Promise<Question[]> {
+export async function getRandomQuestions(
+  count: number,
+  categorySlug?: string,
+  supabase?: SupabaseClient,
+  options?: { visibilityFilter?: 'daily' | 'flashcard' },
+): Promise<Question[]> {
   const client = getClient(supabase);
 
   // 1) ID 목록만 가져온다
@@ -248,6 +255,11 @@ export async function getRandomQuestions(count: number, categorySlug?: string, s
     if (category) {
       query = query.eq('category_id', category.id);
     }
+  }
+  if (options?.visibilityFilter === 'daily') {
+    query = query.eq('show_in_daily', true);
+  } else if (options?.visibilityFilter === 'flashcard') {
+    query = query.eq('show_in_flashcard', true);
   }
 
   const { data: idRows, error: idError } = await query;

@@ -15,7 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
+import { Checkbox } from '@/shared/ui/checkbox';
 import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
+import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 
 interface QuestionFormProps {
   categories: Category[];
@@ -33,10 +35,13 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
     sub_category: question?.sub_category ?? '',
     difficulty: question?.difficulty ?? ('medium' as const),
     tags: question?.tags ?? ([] as string[]),
+    show_in_daily: question?.show_in_daily ?? true,
+    show_in_flashcard: question?.show_in_flashcard ?? true,
   });
   const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   function setField<K extends keyof typeof form>(
     key: K,
@@ -75,14 +80,15 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
         sub_category: form.sub_category,
         difficulty: form.difficulty,
         tags: form.tags,
+        show_in_daily: form.show_in_daily,
+        show_in_flashcard: form.show_in_flashcard,
       };
       if (isEdit) {
         await updateQuestion(question.id, input);
       } else {
         await createQuestion(input);
       }
-      router.push('/admin/questions');
-      router.refresh();
+      setShowSuccess(true);
     } catch (err) {
       alert(err instanceof Error ? err.message : '저장 실패');
     } finally {
@@ -213,6 +219,30 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
         )}
       </div>
 
+      <div className="space-y-3">
+        <label className="text-sm font-medium">학습 노출 설정</label>
+        <div className="flex items-center gap-6">
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox
+              checked={form.show_in_daily}
+              onCheckedChange={(checked) =>
+                setField('show_in_daily', checked === true)
+              }
+            />
+            오늘의 학습에 노출
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox
+              checked={form.show_in_flashcard}
+              onCheckedChange={(checked) =>
+                setField('show_in_flashcard', checked === true)
+              }
+            />
+            플래시카드에 노출
+          </label>
+        </div>
+      </div>
+
       <div className="flex gap-3">
         <Button type="submit" disabled={saving}>
           {saving ? '저장 중...' : isEdit ? '수정' : '추가'}
@@ -225,6 +255,15 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
           취소
         </Button>
       </div>
+      <ConfirmDialog
+        open={showSuccess}
+        title={isEdit ? '수정이 완료되었습니다.' : '등록이 완료되었습니다.'}
+        onConfirm={() => {
+          setShowSuccess(false);
+          router.push('/admin/questions');
+          router.refresh();
+        }}
+      />
     </form>
   );
 }

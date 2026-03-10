@@ -58,33 +58,36 @@ export function FlashcardPage() {
 	const startStudy = async () => {
 		let questions: Question[] = [];
 
+		const visibilityOpts = { visibilityFilter: 'flashcard' as const };
+
 		if (studyMode === 'review') {
 			const dueIds = getDueCardIds();
 			if (dueIds.length > 0) {
 				const sliced = dueIds.slice(0, questionCount);
-				questions = await getQuestionsByIds(sliced);
-				questions = shuffleArray(questions);
+				const fetched = await getQuestionsByIds(sliced);
+				questions = shuffleArray(fetched.filter((q) => q.show_in_flashcard));
 			}
 		} else if (studyMode === 'new') {
 			questions = selectedCategory === 'all'
-				? await getRandomQuestions(questionCount * 2)
-				: await getRandomQuestions(questionCount * 2, selectedCategory);
+				? await getRandomQuestions(questionCount * 2, undefined, undefined, visibilityOpts)
+				: await getRandomQuestions(questionCount * 2, selectedCategory, undefined, visibilityOpts);
 			const allProgress = getLocalProgress();
 			questions = questions
 				.filter((q) => !allProgress[q.id])
 				.slice(0, questionCount);
 		} else {
 			const dueIds = getDueCardIds();
-			const dueQuestions = dueIds.length > 0
+			const dueRaw = dueIds.length > 0
 				? await getQuestionsByIds(dueIds.slice(0, Math.ceil(questionCount / 2)))
 				: [];
+			const dueQuestions = dueRaw.filter((q) => q.show_in_flashcard);
 
 			const remaining = questionCount - dueQuestions.length;
 			let newQuestions: Question[] = [];
 			if (remaining > 0) {
 				const candidates = selectedCategory === 'all'
-					? await getRandomQuestions(remaining * 2)
-					: await getRandomQuestions(remaining * 2, selectedCategory);
+					? await getRandomQuestions(remaining * 2, undefined, undefined, visibilityOpts)
+					: await getRandomQuestions(remaining * 2, selectedCategory, undefined, visibilityOpts);
 				const allProgress = getLocalProgress();
 				newQuestions = candidates
 					.filter((q) => !allProgress[q.id])

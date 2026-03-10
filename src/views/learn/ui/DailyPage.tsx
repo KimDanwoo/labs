@@ -60,12 +60,12 @@ export function DailyPage() {
 
 			if (dueIds.length > 0) {
 				const dueQuestions = await getQuestionsByIds(dueIds.slice(0, DAILY_COUNT));
-				selected = dueQuestions;
+				selected = dueQuestions.filter((q) => q.show_in_daily);
 			}
 
 			if (selected.length < DAILY_COUNT) {
 				const remaining = DAILY_COUNT - selected.length;
-				const candidates = await getRandomQuestions(remaining * 3);
+				const candidates = await getRandomQuestions(remaining * 3, undefined, undefined, { visibilityFilter: 'daily' });
 				const existingIds = new Set(selected.map((q) => q.id));
 				const allProgress = getLocalProgress();
 				const newCards = candidates
