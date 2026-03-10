@@ -17,6 +17,8 @@ export interface Question {
   difficulty: 'easy' | 'medium' | 'hard';
   order_num: number;
   tags: string[];
+  show_in_daily: boolean;
+  show_in_flashcard: boolean;
 }
 
 export interface QuizOption {
@@ -38,6 +40,8 @@ export interface QuestionInput {
   difficulty: 'easy' | 'medium' | 'hard';
   tags: string[];
   order_num?: number;
+  show_in_daily?: boolean;
+  show_in_flashcard?: boolean;
 }
 
 export interface PaginatedResult<T> {

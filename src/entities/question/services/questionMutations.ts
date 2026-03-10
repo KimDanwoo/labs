@@ -1,5 +1,6 @@
 'use server';
 
+import { randomUUID } from 'crypto';
 import { createServerSupabaseClient } from '@/shared/config/supabase/server';
 import { createAdminSupabaseClient } from '@/shared/config/supabase/admin';
 import { isAdmin } from '@/features/auth';
@@ -32,7 +33,7 @@ export async function createQuestion(data: QuestionInput): Promise<Question> {
 
   const { data: created, error } = await admin
     .from('questions')
-    .insert({ ...data, order_num: orderNum })
+    .insert({ id: randomUUID(), ...data, order_num: orderNum })
     .select()
     .single();
 
@@ -64,6 +65,32 @@ export async function deleteQuestion(id: string): Promise<void> {
 
   const { error } = await admin.from('questions').delete().eq('id', id);
   if (error) throw new Error(`질문 삭제 실패: ${error.message}`);
+}
+
+/** 여러 질문을 일괄 삭제한다. */
+export async function deleteQuestions(ids: string[]): Promise<void> {
+  if (ids.length === 0) return;
+  await requireAdmin();
+  const admin = createAdminSupabaseClient();
+
+  const { error } = await admin.from('questions').delete().in('id', ids);
+  if (error) throw new Error(`일괄 삭제 실패: ${error.message}`);
+}
+
+/** 여러 질문의 노출 설정을 일괄 변경한다. */
+export async function updateQuestionsVisibility(
+  ids: string[],
+  fields: { show_in_daily?: boolean; show_in_flashcard?: boolean },
+): Promise<void> {
+  if (ids.length === 0) return;
+  await requireAdmin();
+  const admin = createAdminSupabaseClient();
+
+  const { error } = await admin
+    .from('questions')
+    .update(fields)
+    .in('id', ids);
+  if (error) throw new Error(`노출 설정 변경 실패: ${error.message}`);
 }
 
 export async function reorderQuestions(

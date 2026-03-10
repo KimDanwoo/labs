@@ -6,8 +6,12 @@ import { createClient } from '@/shared/config/supabase/client';
 import type { Question, Category } from '@/entities/question/model';
 import { useDebounce } from '@/shared/lib/hooks/useDebounce';
 import { Button } from '@/shared/ui/button';
-import { deleteQuestion } from '@/entities/question/services';
-import { Plus } from 'lucide-react';
+import {
+	deleteQuestion,
+	deleteQuestions,
+	updateQuestionsVisibility,
+} from '@/entities/question/services';
+import { Plus, Trash2, BookOpen, BookOpenCheck, Layers, Eye, EyeOff } from 'lucide-react';
 import { QuestionFilters } from './_ui/QuestionFilters';
 import { QuestionTable } from './_ui/QuestionTable';
 import { Pagination } from './_ui/Pagination';
@@ -24,11 +28,17 @@ export default function QuestionsListPage() {
 	const [difficultyFilter, setDifficultyFilter] = useState('all');
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
+	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-	// 필터 변경 시 1페이지로 리셋
+	// 페이지·필터 변경 시 선택 초기화
 	useEffect(() => {
 		setPage(1);
+		setSelectedIds(new Set());
 	}, [debouncedSearch, categoryFilter, difficultyFilter]);
+
+	useEffect(() => {
+		setSelectedIds(new Set());
+	}, [page]);
 
 	// 카테고리 최초 로드
 	useEffect(() => {
@@ -49,7 +59,7 @@ export default function QuestionsListPage() {
 			let query = supabase
 				.from('questions')
 				.select(
-					'id, category_id, question, answer, sub_category, difficulty, order_num, tags',
+					'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
 					{ count: 'exact' }
 				)
 				.order('order_num');
@@ -101,11 +111,54 @@ export default function QuestionsListPage() {
 		if (!confirm('정말 삭제하시겠습니까?')) return;
 		try {
 			await deleteQuestion(id);
+			setSelectedIds((prev) => {
+				const next = new Set(prev);
+				next.delete(id);
+				return next;
+			});
 			fetchQuestions(undefined);
 		} catch (e) {
 			alert(e instanceof Error ? e.message : '삭제 실패');
 		}
 	}
+
+	async function handleBulkDelete() {
+		const count = selectedIds.size;
+		if (count === 0) return;
+		if (!confirm(`선택한 ${count}개 질문을 삭제하시겠습니까?`)) return;
+		try {
+			await deleteQuestions(Array.from(selectedIds));
+			setSelectedIds(new Set());
+			fetchQuestions(undefined);
+		} catch (e) {
+			alert(e instanceof Error ? e.message : '일괄 삭제 실패');
+		}
+	}
+
+	async function handleBulkVisibility(
+		field: 'show_in_daily' | 'show_in_flashcard',
+		value: boolean,
+	) {
+		if (selectedIds.size === 0) return;
+		try {
+			await updateQuestionsVisibility(Array.from(selectedIds), {
+				[field]: value,
+			});
+			setSelectedIds(new Set());
+			fetchQuestions(undefined);
+		} catch (e) {
+			alert(e instanceof Error ? e.message : '노출 설정 변경 실패');
+		}
+	}
+
+	const hasSelection = selectedIds.size > 0;
+
+	const selectedQuestions = useMemo(
+		() => questions.filter((q) => selectedIds.has(q.id)),
+		[questions, selectedIds],
+	);
+	const dailyOnCount = selectedQuestions.filter((q) => q.show_in_daily).length;
+	const flashcardOnCount = selectedQuestions.filter((q) => q.show_in_flashcard).length;
 
 	return (
 		<div className="space-y-4">
@@ -128,14 +181,84 @@ export default function QuestionsListPage() {
 				categories={categories}
 			/>
 
-			<p className="text-sm text-muted-foreground">
-				{totalCount}개 질문 (페이지 {page}/{totalPages})
-			</p>
+			<div className="flex items-center justify-between">
+				<p className="text-sm text-muted-foreground">
+					{totalCount}개 질문 (페이지 {page}/{totalPages})
+					{hasSelection && (
+						<span className="ml-2 font-medium text-foreground">
+							· {selectedIds.size}개 선택됨
+						</span>
+					)}
+				</p>
+			</div>
+
+			{hasSelection && (
+				<div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-3">
+					<span className="text-sm font-medium mr-2">
+						일괄 작업:
+					</span>
+					<Button
+						variant="destructive"
+						size="sm"
+						onClick={handleBulkDelete}
+						className="gap-1"
+					>
+						<Trash2 className="size-3.5" />
+						삭제 ({selectedIds.size})
+					</Button>
+					<div className="h-4 w-px bg-border" />
+					<span className="text-xs text-muted-foreground">
+						오늘학습 {dailyOnCount}/{selectedIds.size} ON
+					</span>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => handleBulkVisibility('show_in_daily', true)}
+						className="gap-1"
+					>
+						<BookOpenCheck className="size-3.5" />
+						오늘학습 ON
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => handleBulkVisibility('show_in_daily', false)}
+						className="gap-1"
+					>
+						<EyeOff className="size-3.5" />
+						오늘학습 OFF
+					</Button>
+					<div className="h-4 w-px bg-border" />
+					<span className="text-xs text-muted-foreground">
+						플래시카드 {flashcardOnCount}/{selectedIds.size} ON
+					</span>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => handleBulkVisibility('show_in_flashcard', true)}
+						className="gap-1"
+					>
+						<Eye className="size-3.5" />
+						플래시카드 ON
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => handleBulkVisibility('show_in_flashcard', false)}
+						className="gap-1"
+					>
+						<EyeOff className="size-3.5" />
+						플래시카드 OFF
+					</Button>
+				</div>
+			)}
 
 			<QuestionTable
 				questions={questions}
 				categoryMap={categoryMap}
 				loading={loading}
+				selectedIds={selectedIds}
+				onSelectionChange={setSelectedIds}
 				onDelete={handleDelete}
 			/>
 

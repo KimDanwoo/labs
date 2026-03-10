@@ -1,2 +1,2 @@
 export { questionQueries } from './questionQueries';
-export { createQuestion, updateQuestion, deleteQuestion, reorderQuestions } from './questionMutations';
+export { createQuestion, updateQuestion, deleteQuestion, deleteQuestions, updateQuestionsVisibility, reorderQuestions } from './questionMutations';
