@@ -2,11 +2,11 @@ export const revalidate = 86400;
 
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
+import { createClient } from '@supabase/supabase-js';
 import { getAllCategories } from '@/entities/question';
-import { createServerSupabaseClient } from '@/shared/config/supabase/server';
 
 export default async function ReferencePage() {
-  const supabase = await createServerSupabaseClient();
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
   const categories = await getAllCategories(supabase);
 
   return (

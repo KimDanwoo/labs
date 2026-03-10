@@ -6,7 +6,6 @@ import { Button } from '@/shared/ui/button';
 import { Menu, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { getAllCategories, getCategoryBySlug, getQuestionsByCategorySlugPaginated } from '@/entities/question';
-import { createServerSupabaseClient } from '@/shared/config/supabase/server';
 import { CategorySidebar, QuestionAccordion } from '@/views/reference';
 
 export const revalidate = 86400;
@@ -26,7 +25,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
 	const { categorySlug } = await params;
-	const supabase = await createServerSupabaseClient();
+	const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 	const category = await getCategoryBySlug(categorySlug, supabase);
 	if (!category) return {};
 
@@ -45,7 +44,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 	const { page: pageParam } = await searchParams;
 	const page = Math.max(1, Number(pageParam) || 1);
 
-	const supabase = await createServerSupabaseClient();
+	const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
 	const category = await getCategoryBySlug(categorySlug, supabase);
 	if (!category) notFound();
