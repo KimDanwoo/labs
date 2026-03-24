@@ -6,11 +6,27 @@ import Link from "next/link";
 import { memo, useRef } from "react";
 
 export const UserProfileMenu = memo(() => {
-  const { user, signOut } = useAuth();
+  const { user, signInWithGoogle, signOut } = useAuth();
   const menuRef = useRef<HTMLDivElement>(null);
   const { isOpen, setIsOpen } = useClickOutside(menuRef as React.RefObject<HTMLElement>);
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <button
+        onClick={signInWithGoogle}
+        className={cn(
+          "flex items-center gap-1.5 px-3 py-1.5 rounded-xl",
+          "text-sm font-medium",
+          "text-[rgb(var(--color-accent))]",
+          "transition-all duration-150 ease-out",
+          "hover:bg-[rgb(var(--color-hover))]",
+          "active:scale-95",
+        )}
+      >
+        로그인
+      </button>
+    );
+  }
 
   return (
     <div ref={menuRef} className="relative">

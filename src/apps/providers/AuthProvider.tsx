@@ -2,7 +2,6 @@
 
 import { subscribeToAuthChanges } from "@features/auth/model/services/authService";
 import { useAuthStore } from "@features/auth/model/stores/authStore";
-import { AuthGuard } from "@features/auth/ui";
 import { ReactNode, useEffect } from "react";
 
 interface AuthProviderProps {
@@ -34,5 +33,5 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [setUser, setLoading]);
 
-  return <AuthGuard>{children}</AuthGuard>;
+  return <>{children}</>;
 }

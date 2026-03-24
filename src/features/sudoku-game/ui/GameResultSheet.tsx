@@ -1,6 +1,8 @@
 "use client";
 
 import { MAX_MISTAKES } from "@entities/game/model/constants";
+import { useAuthStore } from "@features/auth/model/stores/authStore";
+import { GoogleSignInButton } from "@features/auth/ui/GoogleSignInButton";
 import { useSaveGameRecord } from "@features/game-record/model/hooks/useSaveGameRecord";
 import { formatTime } from "@features/sudoku-game/model/utils";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
@@ -9,7 +11,7 @@ import { BottomSheet, Snackbar } from "@shared/ui";
 import { useSnackbar } from "@shared/model/hooks";
 import { cn } from "@shared/model/utils";
 import { useShallow } from "zustand/react/shallow";
-import { memo, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 const SuccessIcon = () => (
   <div
@@ -76,26 +78,36 @@ export const GameResultSheet = memo(() => {
     })),
   );
 
+  const user = useAuthStore((state) => state.user);
   const { save, isSaving, pointResult } =
     useSaveGameRecord();
   const saveRef = useRef(save);
   saveRef.current = save;
 
+  const [dismissed, setDismissed] = useState(false);
+  const handleClose = useCallback(() => setDismissed(true), []);
+
+  // 새 게임 시작 시 dismissed 초기화
+  useEffect(() => {
+    if (!isCompleted) setDismissed(false);
+  }, [isCompleted]);
+
   const snackbar = useSnackbar();
 
+  // 로그인 상태에서 게임 완료 시 자동 저장
   useEffect(() => {
-    if (isCompleted && isSuccess) {
+    if (isCompleted && isSuccess && user) {
       saveRef.current().then((id) => {
         if (id) snackbar.show("기록이 저장되었습니다", "success");
       });
     }
-  }, [isCompleted, isSuccess]);
+  }, [isCompleted, isSuccess, user]);
 
   return (
     <>
       <BottomSheet
-        isOpen={isCompleted}
-        onClose={() => {}}
+        isOpen={isCompleted && !dismissed}
+        onClose={handleClose}
         title={isSuccess ? "축하합니다!" : "게임 오버"}
       >
         {isSuccess ? (
@@ -165,6 +177,21 @@ export const GameResultSheet = memo(() => {
               >
                 기록 저장 중...
               </p>
+            )}
+
+            {/* 비로그인 상태: 로그인 유도 */}
+            {!user && !isSaving && (
+              <div className="space-y-3 pt-2">
+                <p
+                  className={cn(
+                    "text-sm",
+                    "text-[rgb(var(--color-text-secondary))]",
+                  )}
+                >
+                  기록을 저장하려면 로그인하세요
+                </p>
+                <GoogleSignInButton />
+              </div>
             )}
           </div>
         ) : (

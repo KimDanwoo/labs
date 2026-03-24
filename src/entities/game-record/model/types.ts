@@ -26,4 +26,5 @@ export interface PointResult {
 export interface PointInput {
   difficulty: Difficulty;
   gameMode: GameMode;
+  completionTime: number;
 }

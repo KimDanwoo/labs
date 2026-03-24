@@ -63,17 +63,25 @@ function deduplicateByUser(
 
   for (const record of records) {
     const existing = best.get(record.userId);
+    if (!existing) {
+      best.set(record.userId, record);
+      continue;
+    }
+    const diff =
+      getRecordPoint(record) - getRecordPoint(existing);
     if (
-      !existing ||
-      getRecordPoint(record) > getRecordPoint(existing)
+      diff > 0 ||
+      (diff === 0 && record.completionTime < existing.completionTime)
     ) {
       best.set(record.userId, record);
     }
   }
 
-  return Array.from(best.values()).sort(
-    (a, b) => getRecordPoint(b) - getRecordPoint(a),
-  );
+  return Array.from(best.values()).sort((a, b) => {
+    const diff = getRecordPoint(b) - getRecordPoint(a);
+    if (diff !== 0) return diff;
+    return a.completionTime - b.completionTime;
+  });
 }
 
 function buildLeaderboardQuery(

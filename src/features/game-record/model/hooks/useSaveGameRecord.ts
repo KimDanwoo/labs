@@ -7,7 +7,7 @@ import { useAuthStore } from "@features/auth/model/stores/authStore";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { HINTS_REMAINING } from "@entities/game/model/constants";
 import { useShallow } from "zustand/react/shallow";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface SaveGameRecordResult {
   save: () => Promise<string | null>;
@@ -16,6 +16,11 @@ interface SaveGameRecordResult {
   pointResult: PointResult | null;
 }
 
+/**
+ * 게임 기록 저장 훅.
+ * 비로그인 상태에서도 pointResult를 계산해 UI에 보여주고,
+ * 로그인 완료 시 자동으로 Firestore에 저장한다.
+ */
 export function useSaveGameRecord(): SaveGameRecordResult {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -39,6 +44,15 @@ export function useSaveGameRecord(): SaveGameRecordResult {
     })),
   );
 
+  // 게임 성공 시 pointResult를 미리 계산 (비로그인도)
+  useEffect(() => {
+    if (isSuccess && !pointResult) {
+      setPointResult(calculatePoint({
+        difficulty, gameMode, completionTime: currentTime,
+      }));
+    }
+  }, [isSuccess, pointResult, difficulty, gameMode, currentTime]);
+
   const save = useCallback(async (): Promise<
     string | null
   > => {
@@ -47,7 +61,9 @@ export function useSaveGameRecord(): SaveGameRecordResult {
     savingRef.current = true;
 
     const hintsUsed = HINTS_REMAINING - hintsRemaining;
-    const result = calculatePoint({ difficulty, gameMode });
+    const result = pointResult ?? calculatePoint({
+      difficulty, gameMode, completionTime: currentTime,
+    });
     setPointResult(result);
 
     const record: Omit<GameRecord, "id" | "createdAt"> = {
@@ -83,7 +99,18 @@ export function useSaveGameRecord(): SaveGameRecordResult {
   }, [
     user, isSuccess, isRecordSaved, difficulty,
     gameMode, currentTime, hintsRemaining, mistakeCount,
+    pointResult,
   ]);
+
+  // 로그인 후 자동 저장: user가 null→유저로 바뀌었을 때
+  const saveRef = useRef(save);
+  saveRef.current = save;
+
+  useEffect(() => {
+    if (user && isSuccess && !isRecordSaved) {
+      saveRef.current();
+    }
+  }, [user, isSuccess, isRecordSaved]);
 
   return { save, isSaving, error, pointResult };
 }
