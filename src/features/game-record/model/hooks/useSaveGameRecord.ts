@@ -3,7 +3,7 @@ import {
 } from "@entities/game-record/model/types";
 import { calculatePoint } from "@features/game-record/model/utils/scoreCalculator";
 import { saveGameRecord } from "@features/game-record/model/services/gameRecordService";
-import { useAuthStore } from "@features/auth/model/stores/authStore";
+import { useAuthStore } from "@features/auth/model/stores";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { HINTS_REMAINING } from "@entities/game/model/constants";
 import { useShallow } from "zustand/react/shallow";
