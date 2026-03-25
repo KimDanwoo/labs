@@ -1,9 +1,9 @@
 "use client";
 
 import { MAX_MISTAKES } from "@entities/game/model/constants";
-import { useAuthStore } from "@features/auth/model/stores/authStore";
+import { useAuthStore } from "@features/auth/model/stores";
 import { GoogleSignInButton } from "@features/auth/ui/GoogleSignInButton";
-import { useSaveGameRecord } from "@features/game-record/model/hooks/useSaveGameRecord";
+import { useSaveGameRecord } from "@features/game-record/model/hooks";
 import { formatTime } from "@features/sudoku-game/model/utils";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
 import { GameDifficultySelector } from "./GameDifficultySelector";
