@@ -1,6 +1,6 @@
 "use client";
 
-import { useThemeStore } from "@features/theme/model/stores/themeStore";
+import { useThemeStore } from "@features/theme/model/stores";
 import { cn } from "@shared/model/utils";
 import { memo, useCallback } from "react";
 import { LuMoon, LuSun } from "react-icons/lu";

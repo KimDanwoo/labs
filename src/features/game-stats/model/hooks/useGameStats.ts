@@ -3,8 +3,8 @@ import { GameRecord } from "@entities/game-record/model/types";
 import { getRecordPoint } from "@entities/game-record/model/utils";
 import { GAME_LEVEL } from "@entities/game/model/constants";
 import { Difficulty } from "@entities/game/model/types";
-import { getUserRecords } from "@features/game-record/model/services/gameRecordService";
-import { useAuthStore } from "@features/auth/model/stores/authStore";
+import { getUserRecords } from "@features/game-record/model/services";
+import { useAuthStore } from "@features/auth/model/stores";
 import {
   GameStats, DifficultyStats,
 } from "@features/game-stats/model/types";

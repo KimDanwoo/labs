@@ -1,8 +1,9 @@
 "use client";
 
-import { useAuthStore } from "@features/auth/model/stores/authStore";
-import { useLeaderboard } from "@features/leaderboard/model/hooks/useLeaderboard";
-import { useCumulativeLeaderboard } from "@features/leaderboard/model/hooks/useCumulativeLeaderboard";
+import { useAuthStore } from "@features/auth/model/stores";
+import {
+  useLeaderboard, useCumulativeLeaderboard,
+} from "@features/leaderboard/model/hooks";
 import {
   CumulativeLeaderboardTable,
   LeaderboardFilters,

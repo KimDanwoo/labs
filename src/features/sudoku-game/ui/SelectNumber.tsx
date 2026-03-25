@@ -2,7 +2,7 @@
 
 import { BOARD_SIZE, KEY_NUMBER } from "@entities/board/model/constants";
 import { useSudokuStore } from "@features/sudoku-game/model/stores";
-import { useHistoryStore } from "@features/undo-redo/model/stores/historyStore";
+import { useHistoryStore } from "@features/undo-redo/model/stores";
 import { cn } from "@shared/model/utils";
 import { NumberButton } from "@shared/ui";
 import { useShallow } from "zustand/react/shallow";

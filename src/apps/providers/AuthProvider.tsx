@@ -1,7 +1,7 @@
 "use client";
 
-import { subscribeToAuthChanges } from "@features/auth/model/services/authService";
-import { useAuthStore } from "@features/auth/model/stores/authStore";
+import { subscribeToAuthChanges } from "@features/auth/model/services";
+import { useAuthStore } from "@features/auth/model/stores";
 import { ReactNode, useEffect } from "react";
 
 interface AuthProviderProps {

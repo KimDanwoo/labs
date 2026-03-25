@@ -1,6 +1,6 @@
 import { GameRecord } from "@entities/game-record/model/types";
-import { getUserRecords } from "@features/game-record/model/services/gameRecordService";
-import { useAuthStore } from "@features/auth/model/stores/authStore";
+import { getUserRecords } from "@features/game-record/model/services";
+import { useAuthStore } from "@features/auth/model/stores";
 import { useCallback, useEffect, useState } from "react";
 
 interface UseProfileResult {

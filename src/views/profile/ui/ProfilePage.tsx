@@ -1,9 +1,9 @@
 "use client";
 
-import { useAuthStore } from "@features/auth/model/stores/authStore";
-import { useGameStats } from "@features/game-stats/model/hooks/useGameStats";
+import { useAuthStore } from "@features/auth/model/stores";
+import { useGameStats } from "@features/game-stats/model/hooks";
 import { StatsOverview, StatsByDifficulty } from "@features/game-stats/ui";
-import { useProfile } from "@features/profile/model/hooks/useProfile";
+import { useProfile } from "@features/profile/model/hooks";
 import { ProfileCard, RecentGames } from "@features/profile/ui";
 import { SubpageHeader } from "@shared/ui";
 import { useRouter } from "next/navigation";
