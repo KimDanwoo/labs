@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { createClient } from '@/shared/config/supabase/client';
 import type { Question, Category } from '@/entities/question/model';
 import { useDebounce } from '@/shared/lib/hooks/useDebounce';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/ui/Button';
 import {
 	deleteQuestion,
 	deleteQuestions,

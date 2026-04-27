@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/ui/badge';
+import { Badge } from '@/shared/ui/Badge';
 
 const difficultyConfig = {
   easy: { label: '쉬움', className: 'bg-green-500/10 text-green-500 hover:bg-green-500/20' },

@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/shared/ui/button';
-import { Badge } from '@/shared/ui/badge';
-import { Checkbox } from '@/shared/ui/checkbox';
+import { Button } from '@/shared/ui/Button';
+import { Badge } from '@/shared/ui/Badge';
+import { Checkbox } from '@/shared/ui/Checkbox';
 import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
 import type { Question, Category } from '@/entities/question/model';
 import { Pencil, Trash2, BookOpen, Layers } from 'lucide-react';
