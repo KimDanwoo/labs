@@ -47,7 +47,7 @@ export function StudyHeatmap({ heatmap }: { heatmap: Record<string, number> }) {
   const dayLabels = ['일', '', '화', '', '목', '', '토'];
 
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-1 overflow-x-auto">
       <div className="flex flex-col gap-1 mr-1 pt-0">
         {dayLabels.map((label, i) => (
           <div key={i} className="h-3 w-4 text-[10px] text-muted-foreground leading-3 text-right">

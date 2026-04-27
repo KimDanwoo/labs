@@ -7,6 +7,7 @@ import { Menu, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { getAllCategories, getCategoryBySlug, getQuestionsByCategorySlugPaginated } from '@/entities/question';
 import { CategorySidebar, QuestionAccordion } from '@/views/reference';
+import { FeedbackForm } from '@/features/feedback';
 
 export const revalidate = 86400;
 
@@ -79,7 +80,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 	};
 
 	return (
-		<div className="container mx-auto max-w-7xl px-4 pt-8 pb-24 animate-fade-in">
+		<div className="container mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in">
 			{faqSchema && (
 				<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 			)}
@@ -116,10 +117,13 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 								<span className="text-2xl">{category.icon}</span>
 								<h1 className="text-2xl font-bold tracking-tight">{category.title}</h1>
 							</div>
-							<p className="text-sm text-muted-foreground leading-relaxed">
-								{category.description}
-								{result.total > 0 && <span className="ml-2 tabular-nums">({result.total}개 질문)</span>}
-							</p>
+							<div className="flex items-center gap-2">
+								<p className="text-sm text-muted-foreground leading-relaxed">
+									{category.description}
+									{result.total > 0 && <span className="ml-2 tabular-nums">({result.total}개 질문)</span>}
+								</p>
+								<FeedbackForm fixedType="add_question" label="질문 추가 요청" />
+							</div>
 						</div>
 					</div>
 

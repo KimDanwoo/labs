@@ -10,8 +10,9 @@ import {
 	deleteQuestion,
 	deleteQuestions,
 	updateQuestionsVisibility,
+	updateCategoryVisibility,
 } from '@/entities/question/services';
-import { Plus, Trash2, BookOpen, BookOpenCheck, Layers, Eye, EyeOff } from 'lucide-react';
+import { Plus, Trash2, BookOpen, BookOpenCheck, Layers, Eye, EyeOff, FolderSync } from 'lucide-react';
 import { QuestionFilters } from './_ui/QuestionFilters';
 import { QuestionTable } from './_ui/QuestionTable';
 import { Pagination } from './_ui/Pagination';
@@ -151,6 +152,27 @@ export default function QuestionsListPage() {
 		}
 	}
 
+	async function handleCategoryVisibility(
+		field: 'show_in_daily' | 'show_in_flashcard',
+		value: boolean,
+	) {
+		if (categoryFilter === 'all') {
+			alert('카테고리를 먼저 선택해 주세요.');
+			return;
+		}
+		const cat = categoryMap.get(categoryFilter);
+		const label = field === 'show_in_daily' ? '오늘학습' : '플래시카드';
+		const action = value ? 'ON' : 'OFF';
+		if (!confirm(`"${cat?.title ?? categoryFilter}" 카테고리 전체 질문을 ${label} ${action}하시겠습니까?`)) return;
+		try {
+			await updateCategoryVisibility(categoryFilter, { [field]: value });
+			setSelectedIds(new Set());
+			fetchQuestions(undefined);
+		} catch (e) {
+			alert(e instanceof Error ? e.message : '카테고리 노출 설정 변경 실패');
+		}
+	}
+
 	const hasSelection = selectedIds.size > 0;
 
 	const selectedQuestions = useMemo(
@@ -191,6 +213,32 @@ export default function QuestionsListPage() {
 					)}
 				</p>
 			</div>
+
+			{categoryFilter !== 'all' && (
+				<div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/20 p-3">
+					<FolderSync className="size-4 text-muted-foreground" />
+					<span className="text-sm font-medium mr-1">
+						카테고리 전체:
+					</span>
+					<Button variant="outline" size="sm" className="gap-1" onClick={() => handleCategoryVisibility('show_in_daily', true)}>
+						<BookOpenCheck className="size-3.5" />
+						오늘학습 ON
+					</Button>
+					<Button variant="outline" size="sm" className="gap-1" onClick={() => handleCategoryVisibility('show_in_daily', false)}>
+						<EyeOff className="size-3.5" />
+						오늘학습 OFF
+					</Button>
+					<div className="h-4 w-px bg-border" />
+					<Button variant="outline" size="sm" className="gap-1" onClick={() => handleCategoryVisibility('show_in_flashcard', true)}>
+						<Eye className="size-3.5" />
+						플래시카드 ON
+					</Button>
+					<Button variant="outline" size="sm" className="gap-1" onClick={() => handleCategoryVisibility('show_in_flashcard', false)}>
+						<EyeOff className="size-3.5" />
+						플래시카드 OFF
+					</Button>
+				</div>
+			)}
 
 			{hasSelection && (
 				<div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-3">

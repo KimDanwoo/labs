@@ -16,7 +16,7 @@ export default async function HomePage() {
       <section className="relative overflow-hidden border-b border-border/50">
         <div className="hero-gradient absolute inset-0" />
         <div className="noise-overlay absolute inset-0" />
-        <div className="container relative z-10 mx-auto max-w-7xl px-4 py-24 md:py-32">
+        <div className="container relative z-10 mx-auto max-w-7xl px-4 py-16 sm:py-24 md:py-32">
           <div className="flex flex-col items-center text-center gap-6 animate-fade-in-up">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary">
               <span className="relative flex h-2 w-2">
@@ -25,7 +25,7 @@ export default async function HomePage() {
               </span>
               프론트엔드 학습 플랫폼
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tighter">
               프<span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">딥</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-md">
@@ -51,7 +51,7 @@ export default async function HomePage() {
       </section>
 
       {/* Categories */}
-      <section className="container mx-auto max-w-4xl px-4 py-16">
+      <section className="container mx-auto max-w-4xl px-4 py-8 sm:py-12">
         <div className="text-center mb-8 animate-fade-in">
           <h2 className="text-xl font-semibold mb-2">학습 카테고리</h2>
           <p className="text-sm text-muted-foreground">관심 있는 주제를 선택해 학습을 시작하세요</p>

@@ -42,7 +42,7 @@ export function StudyCardView({
 	flipHint = 'Space로 뒤집기',
 }: StudyCardViewProps) {
 	return (
-		<div className="container mx-auto max-w-2xl px-4 py-12">
+		<div className="container mx-auto max-w-2xl px-4 py-8 sm:py-12">
 			{/* Progress bar */}
 			<div className="mb-8">
 				<div className="flex items-center justify-between mb-3">

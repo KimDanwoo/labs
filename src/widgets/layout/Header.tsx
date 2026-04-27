@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
-import { Menu, Search, LogIn, User, BookOpen, GraduationCap, Shield, Clock, Calendar } from 'lucide-react';
+import { Menu, Search, LogIn, LogOut, User, BookOpen, GraduationCap, Shield, Clock, Calendar, Settings, Bookmark } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/shared/ui/Sheet';
 import { ThemeToggle } from '@/shared/ui/ThemeToggle';
@@ -109,17 +109,29 @@ export function Header() {
 							<DropdownMenuTrigger asChild>
 								<Button variant="ghost" size="icon" className="rounded-full" aria-label="사용자 메뉴">
 									<Avatar className="h-8 w-8">
-										<AvatarImage src={user.user_metadata?.avatar_url} />
+										<AvatarImage src={user.user_metadata?.avatar_url} alt={`${user.email ?? '사용자'} 프로필`} />
 										<AvatarFallback>{user.email?.charAt(0).toUpperCase() ?? 'U'}</AvatarFallback>
 									</Avatar>
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
 								<DropdownMenuItem asChild>
-									<Link href="/mypage/progress">학습 현황</Link>
+									<Link href="/mypage/progress">
+										<User className="h-4 w-4 mr-2" />
+										학습 현황
+									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem asChild>
-									<Link href="/mypage/bookmarks">북마크</Link>
+									<Link href="/mypage/bookmarks">
+										<Bookmark className="h-4 w-4 mr-2" />
+										북마크
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<Link href="/mypage/account">
+										<Settings className="h-4 w-4 mr-2" />
+										계정 설정
+									</Link>
 								</DropdownMenuItem>
 								{isAdminUser && (
 									<>
@@ -133,7 +145,10 @@ export function Header() {
 									</>
 								)}
 								<DropdownMenuSeparator />
-								<DropdownMenuItem onClick={handleSignOut}>로그아웃</DropdownMenuItem>
+								<DropdownMenuItem onClick={handleSignOut}>
+									<LogOut className="h-4 w-4 mr-2" />
+									로그아웃
+								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					) : (
@@ -185,8 +200,14 @@ export function Header() {
 										</Link>
 										<Link href="/mypage/bookmarks" onClick={() => setOpen(false)}>
 											<Button variant="ghost" className="w-full justify-start gap-3">
-												<BookOpen className="h-4 w-4" />
+												<Bookmark className="h-4 w-4" />
 												북마크
+											</Button>
+										</Link>
+										<Link href="/mypage/account" onClick={() => setOpen(false)}>
+											<Button variant="ghost" className="w-full justify-start gap-3">
+												<Settings className="h-4 w-4" />
+												계정 설정
 											</Button>
 										</Link>
 										{isAdminUser && (
@@ -197,6 +218,15 @@ export function Header() {
 												</Button>
 											</Link>
 										)}
+										<div className="my-2 border-t" />
+										<Button
+											variant="ghost"
+											className="w-full justify-start gap-3"
+											onClick={() => { handleSignOut(); setOpen(false); }}
+										>
+											<LogOut className="h-4 w-4" />
+											로그아웃
+										</Button>
 									</>
 								)}
 							</nav>

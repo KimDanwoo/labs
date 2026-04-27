@@ -15,7 +15,7 @@ export function ResultScoreCard({ resultCounts, totalCount }: ResultScoreCardPro
 
 	return (
 		<Card className="p-6 mb-6 shadow-sm">
-			<div className="grid grid-cols-4 gap-3 text-center">
+			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
 				<div className="p-3 rounded-xl bg-red-500/8 border border-red-500/10">
 					<div className="text-2xl font-bold tabular-nums text-red-500">{resultCounts.again}</div>
 					<div className="text-xs text-muted-foreground mt-1">다시</div>
