@@ -44,7 +44,7 @@ export function SearchContent() {
   const isSearching = debouncedQuery.trim() !== '' && debouncedQuery !== lastSearchedQuery;
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-12 animate-fade-in">
+    <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12 animate-fade-in">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight mb-5">검색</h1>
         <div className="relative">

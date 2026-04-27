@@ -1,6 +1,6 @@
 export type { Category, Question, QuestionInput, QuizOption, QuestionWithCategory, SearchResult, PaginatedResult } from './model';
 export { questionQueries } from './services';
-export { createQuestion, updateQuestion, deleteQuestion, deleteQuestions, updateQuestionsVisibility, reorderQuestions } from './services';
+export { createQuestion, updateQuestion, deleteQuestion, deleteQuestions, updateQuestionsVisibility, updateCategoryVisibility, reorderQuestions } from './services';
 export {
   getAllCategories,
   getCategoryBySlug,

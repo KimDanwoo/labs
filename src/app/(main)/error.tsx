@@ -14,7 +14,7 @@ export default function MainError({
   console.error(error);
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-24 text-center animate-fade-in-up">
+    <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12 text-center animate-fade-in-up">
       <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
         <span className="text-2xl">!</span>
       </div>

@@ -89,7 +89,7 @@ export function DailyPage() {
 	// ==================== LOADING ====================
 	if (phase === 'loading') {
 		return (
-			<div className="container mx-auto max-w-2xl px-4 py-12">
+			<div className="container mx-auto max-w-2xl px-4 py-8 sm:py-12">
 				<div className="text-center text-muted-foreground py-16 animate-fade-in">
 					오늘의 문제를 준비하고 있습니다...
 				</div>
@@ -100,7 +100,7 @@ export function DailyPage() {
 	// ==================== ALREADY DONE ====================
 	if (phase === 'already-done') {
 		return (
-			<div className="container mx-auto max-w-2xl px-4 py-12">
+			<div className="container mx-auto max-w-2xl px-4 py-8 sm:py-12">
 				<div className="text-center py-16 animate-fade-in-up">
 					<Trophy className="h-16 w-16 text-yellow-500 mx-auto mb-5" />
 					<h1 className="text-3xl font-bold tracking-tight mb-3">오늘의 챌린지 완료!</h1>
@@ -136,7 +136,7 @@ export function DailyPage() {
 	// ==================== READY ====================
 	if (phase === 'ready') {
 		return (
-			<div className="container mx-auto max-w-2xl px-4 py-12 animate-fade-in">
+			<div className="container mx-auto max-w-2xl px-4 py-8 sm:py-12 animate-fade-in">
 				<h1 className="text-3xl font-bold tracking-tight mb-2">오늘의 챌린지</h1>
 				<p className="text-muted-foreground mb-8">
 					매일 {DAILY_COUNT}문제, 꾸준히 실력을 쌓으세요.
@@ -184,7 +184,7 @@ export function DailyPage() {
 	// ==================== DONE ====================
 	if (phase === 'done') {
 		return (
-			<div className="container mx-auto max-w-2xl px-4 py-12 animate-fade-in-up">
+			<div className="container mx-auto max-w-2xl px-4 py-8 sm:py-12 animate-fade-in-up">
 				<div className="text-center mb-8">
 					<Trophy className="h-16 w-16 text-yellow-500 mx-auto mb-5" />
 					<h1 className="text-3xl font-bold tracking-tight mb-2">챌린지 완료!</h1>

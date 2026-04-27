@@ -16,9 +16,15 @@ export function Footer() {
               검색
             </Link>
           </nav>
-          <p className="text-xs text-muted-foreground/70">
-            &copy; {new Date().getFullYear()} 프딥
-          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground/70">
+            <Link href="/privacy" className="hover:text-foreground transition-colors duration-200">
+              개인정보 처리방침
+            </Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors duration-200">
+              이용약관
+            </Link>
+            <span>&copy; {new Date().getFullYear()} 프딥</span>
+          </div>
       </div>
     </footer>
   );

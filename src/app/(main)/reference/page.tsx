@@ -10,7 +10,7 @@ export default async function ReferencePage() {
   const categories = await getAllCategories(supabase);
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-12">
+    <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-12">
       <div className="mb-10 animate-fade-in">
         <h1 className="text-3xl font-bold tracking-tight mb-3">레퍼런스</h1>
         <p className="text-muted-foreground">

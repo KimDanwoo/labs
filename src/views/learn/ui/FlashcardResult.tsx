@@ -24,7 +24,7 @@ export function FlashcardResult({
 	const newDueCount = getDueCardCount();
 
 	return (
-		<div className="container mx-auto max-w-2xl px-4 py-12 animate-fade-in-up">
+		<div className="container mx-auto max-w-2xl px-4 py-8 sm:py-12 animate-fade-in-up">
 			<h1 className="text-3xl font-bold tracking-tight mb-2">학습 완료!</h1>
 			<p className="text-muted-foreground mb-8">
 				총 {totalCount}문제를 학습했습니다.

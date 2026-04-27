@@ -30,7 +30,7 @@ export function ConfirmDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="m-auto backdrop:bg-black/50 rounded-lg p-0 border shadow-lg max-w-sm w-full bg-background text-foreground"
+      className="m-auto backdrop:bg-black/50 rounded-lg p-0 border shadow-lg max-w-sm w-[calc(100%-2rem)] bg-background text-foreground"
       onCancel={(e) => {
         e.preventDefault();
         onConfirm();

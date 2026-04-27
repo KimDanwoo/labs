@@ -93,6 +93,21 @@ export async function updateQuestionsVisibility(
   if (error) throw new Error(`노출 설정 변경 실패: ${error.message}`);
 }
 
+/** 카테고리 전체 질문의 노출 설정을 일괄 변경한다. */
+export async function updateCategoryVisibility(
+  categoryId: string,
+  fields: { show_in_daily?: boolean; show_in_flashcard?: boolean },
+): Promise<void> {
+  await requireAdmin();
+  const admin = createAdminSupabaseClient();
+
+  const { error } = await admin
+    .from('questions')
+    .update(fields)
+    .eq('category_id', categoryId);
+  if (error) throw new Error(`카테고리 노출 설정 변경 실패: ${error.message}`);
+}
+
 export async function reorderQuestions(
   categoryId: string,
   orderedIds: string[]

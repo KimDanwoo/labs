@@ -35,7 +35,7 @@ export function FlashcardSetup({
 	onStart,
 }: FlashcardSetupProps) {
 	return (
-		<div className="container mx-auto max-w-2xl px-4 py-12 animate-fade-in">
+		<div className="container mx-auto max-w-2xl px-4 py-8 sm:py-12 animate-fade-in">
 			<h1 className="text-3xl font-bold tracking-tight mb-2">플래시카드</h1>
 			<p className="text-muted-foreground mb-8">
 				간격 반복으로 장기 기억에 남기세요.
@@ -62,7 +62,7 @@ export function FlashcardSetup({
 			<Card className="p-6 space-y-6">
 				<div>
 					<label className="text-sm font-medium mb-3 block">학습 모드</label>
-					<div className="grid grid-cols-3 gap-2">
+					<div className="grid grid-cols-3 gap-1.5">
 						<Button
 							variant={studyMode === 'review' ? 'default' : 'outline'}
 							size="sm"

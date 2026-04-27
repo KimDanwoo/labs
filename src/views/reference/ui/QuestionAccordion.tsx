@@ -7,6 +7,7 @@ import { Bookmark, BookmarkCheck, CheckCircle } from 'lucide-react';
 import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
 import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
 import { toggleBookmark, isBookmarked } from '@/features/bookmark';
+import { FeedbackForm } from '@/features/feedback';
 import { getProgressForQuestion, updateQuestionProgress } from '@/entities/progress';
 import type { Question } from '@/entities/question';
 
@@ -67,7 +68,7 @@ export function QuestionAccordion({ questions, startIndex = 0 }: QuestionAccordi
 						</div>
 					</AccordionTrigger>
 					<AccordionContent className="pb-4">
-						<div className="pl-8">
+						<div className="pl-4 sm:pl-8 overflow-hidden">
 							<MarkdownRenderer content={question.answer} />
 							<div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/50">
 								<Button variant="ghost" size="sm" onClick={() => handleBookmarkToggle(question.id)} className="gap-2 transition-colors duration-200">
@@ -84,6 +85,7 @@ export function QuestionAccordion({ questions, startIndex = 0 }: QuestionAccordi
 										학습 완료
 									</Button>
 								)}
+								<FeedbackForm questionId={question.id} questionText={question.question} fixedType="edit_question" label="수정 요청" />
 							</div>
 						</div>
 					</AccordionContent>

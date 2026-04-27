@@ -86,7 +86,7 @@ export function ProgressPage() {
     : 0;
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-12 animate-fade-in">
+    <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12 animate-fade-in">
       <h1 className="text-3xl font-bold tracking-tight mb-2">학습 현황</h1>
       <p className="text-muted-foreground mb-8">전체 학습 진도를 확인하세요.</p>
 
