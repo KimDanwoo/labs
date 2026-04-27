@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
 import { Menu, Search, LogIn, User, BookOpen, GraduationCap, Shield, Clock, Calendar } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/shared/ui/sheet';
+import { Button } from '@/shared/ui/Button';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/shared/ui/Sheet';
 import { ThemeToggle } from '@/shared/ui/ThemeToggle';
 import { createClient } from '@/shared/config/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
@@ -15,8 +15,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+} from '@/shared/ui/DropdownMenu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
 import { cn } from '@/shared/lib/utils';
 import { getDueCardCount, syncProgress } from '@/entities/progress';
 import { clearUserIdCache } from '@/entities/progress/services';
