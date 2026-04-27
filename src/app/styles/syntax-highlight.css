@@ -27,7 +27,7 @@
 .hljs-comment,
 .hljs-quote {
   color: #008000;
-  font-style: italic;
+  font-style: normal !important;
 }
 
 .hljs-number,
@@ -102,7 +102,7 @@
 .dark .hljs-comment,
 .dark .hljs-quote {
   color: #6a9955;
-  font-style: italic;
+  font-style: normal !important;
 }
 
 .dark .hljs-number,
