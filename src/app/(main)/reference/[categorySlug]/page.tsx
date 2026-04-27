@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/shared/ui/sheet';
-import { Button } from '@/shared/ui/button';
+import { Sheet, SheetTrigger, SheetContent, SheetTitle } from '@/shared/ui/Sheet';
+import { Button } from '@/shared/ui/Button';
 import { Menu, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { getAllCategories, getCategoryBySlug, getQuestionsByCategorySlugPaginated } from '@/entities/question';
@@ -79,27 +79,27 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 	};
 
 	return (
-		<div className="container mx-auto max-w-7xl px-4 pt-6 pb-24">
+		<div className="container mx-auto max-w-7xl px-4 pt-8 pb-24 animate-fade-in">
 			{faqSchema && (
 				<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 			)}
 			<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
-			<div className="flex gap-6">
+			<div className="flex gap-8">
 				{/* Desktop sidebar */}
 				<aside className="hidden lg:block w-64 shrink-0">
-					<div className="sticky top-20 border rounded-lg">
+					<div className="sticky top-20 border border-border/60 rounded-xl shadow-sm">
 						<CategorySidebar categories={categories} />
 					</div>
 				</aside>
 
 				{/* Main content */}
 				<div className="flex-1 min-w-0">
-					<div className="flex items-center gap-3 mb-6">
+					<div className="flex items-center gap-3 mb-8">
 						{/* Mobile sidebar trigger */}
 						<Sheet>
 							<SheetTrigger asChild className="lg:hidden">
-								<Button variant="outline" size="icon" aria-label="카테고리 메뉴 열기">
+								<Button variant="outline" size="icon" aria-label="카테고리 메뉴 열기" className="shadow-sm">
 									<Menu className="h-4 w-4" />
 								</Button>
 							</SheetTrigger>
@@ -112,13 +112,13 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 						</Sheet>
 
 						<div>
-							<div className="flex items-center gap-2 mb-1">
+							<div className="flex items-center gap-2.5 mb-1.5">
 								<span className="text-2xl">{category.icon}</span>
-								<h1 className="text-2xl font-bold">{category.title}</h1>
+								<h1 className="text-2xl font-bold tracking-tight">{category.title}</h1>
 							</div>
-							<p className="text-sm text-muted-foreground">
+							<p className="text-sm text-muted-foreground leading-relaxed">
 								{category.description}
-								{result.total > 0 && <span className="ml-2">({result.total}개 질문)</span>}
+								{result.total > 0 && <span className="ml-2 tabular-nums">({result.total}개 질문)</span>}
 							</p>
 						</div>
 					</div>
@@ -126,9 +126,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 					<QuestionAccordion questions={result.data} startIndex={(page - 1) * PAGE_SIZE} />
 
 					{result.totalPages > 1 && (
-						<nav className="flex items-center justify-center gap-2 mt-8" aria-label="페이지네이션">
+						<nav className="flex items-center justify-center gap-2 mt-10" aria-label="페이지네이션">
 							{page > 1 ? (
-								<Button variant="outline" size="sm" asChild>
+								<Button variant="outline" size="sm" asChild className="shadow-sm">
 									<Link href={`/reference/${categorySlug}?page=${page - 1}`}>
 										<ChevronLeft className="size-4" />
 									</Link>
@@ -158,7 +158,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 											key={item}
 											variant={page === item ? 'default' : 'outline'}
 											size="sm"
-											className="min-w-8"
+											className="min-w-8 tabular-nums shadow-sm"
 											asChild={page !== item}
 										>
 											{page === item ? (
@@ -171,7 +171,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 								)}
 
 							{page < result.totalPages ? (
-								<Button variant="outline" size="sm" asChild>
+								<Button variant="outline" size="sm" asChild className="shadow-sm">
 									<Link href={`/reference/${categorySlug}?page=${page + 1}`}>
 										<ChevronRight className="size-4" />
 									</Link>

@@ -5,19 +5,13 @@ import { useRouter } from 'next/navigation';
 import type { Question, Category } from '@/entities/question/model';
 import type { QuestionInput } from '@/entities/question/model';
 import { createQuestion, updateQuestion } from '@/entities/question/services';
-import { Input } from '@/shared/ui/input';
-import { Button } from '@/shared/ui/button';
-import { Badge } from '@/shared/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui/select';
-import { Checkbox } from '@/shared/ui/checkbox';
+import { Input } from '@/shared/ui/Input';
+import { Button } from '@/shared/ui/Button';
+import { Badge } from '@/shared/ui/Badge';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/shared/ui/Select';
+import { Checkbox } from '@/shared/ui/Checkbox';
 import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
-import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 
 interface QuestionFormProps {
   categories: Category[];

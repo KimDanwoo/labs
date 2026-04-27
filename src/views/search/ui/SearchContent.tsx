@@ -4,20 +4,15 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { Input } from '@/shared/ui/input';
-import { Badge } from '@/shared/ui/badge';
-import { Card } from '@/shared/ui/card';
+import { Input } from '@/shared/ui/Input';
+import { Badge } from '@/shared/ui/Badge';
+import { Card } from '@/shared/ui/Card';
 import { useDebounce } from '@/shared/lib/hooks/useDebounce';
 import { searchQuestions } from '@/entities/question';
 import type { SearchResult } from '@/entities/question';
 import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
 import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/shared/ui/accordion';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/shared/ui/Accordion';
 
 export function SearchContent() {
   const searchParams = useSearchParams();
@@ -49,17 +44,17 @@ export function SearchContent() {
   const isSearching = debouncedQuery.trim() !== '' && debouncedQuery !== lastSearchedQuery;
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
+    <div className="container mx-auto max-w-4xl px-4 py-12 animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">검색</h1>
+        <h1 className="text-3xl font-bold tracking-tight mb-5">검색</h1>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
             placeholder="키워드로 질문, 답변, 태그를 검색하세요..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-10 h-12 text-base"
+            className="pl-11 h-12 text-base shadow-sm border-border/60 focus:shadow transition-shadow duration-200"
             autoFocus
           />
         </div>
@@ -73,12 +68,12 @@ export function SearchContent() {
       )}
 
       {displayResults.length > 0 ? (
-        <Accordion type="multiple" className="space-y-2">
+        <Accordion type="multiple" className="space-y-2.5">
           {displayResults.map((result) => (
             <AccordionItem
               key={result.question.id}
               value={result.question.id}
-              className="border rounded-lg px-4"
+              className="border border-border/60 rounded-xl px-4 shadow-sm"
             >
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex flex-col gap-1.5 text-left flex-1 mr-4">
@@ -102,10 +97,10 @@ export function SearchContent() {
               </AccordionTrigger>
               <AccordionContent className="pb-4">
                 <MarkdownRenderer content={result.question.answer} />
-                <div className="mt-3">
+                <div className="mt-4 pt-3 border-t border-border/50">
                   <Link
                     href={`/reference/${result.category.slug}`}
-                    className="text-sm text-primary hover:underline"
+                    className="text-sm text-primary hover:underline transition-colors duration-200"
                   >
                     {result.category.title}에서 더 보기 →
                   </Link>
@@ -115,14 +110,16 @@ export function SearchContent() {
           ))}
         </Accordion>
       ) : debouncedQuery && !isSearching ? (
-        <Card className="p-12 text-center">
+        <Card className="p-16 text-center shadow-sm">
           <p className="text-muted-foreground">
             검색 결과가 없습니다. 다른 키워드로 검색해보세요.
           </p>
         </Card>
       ) : !debouncedQuery ? (
-        <Card className="p-12 text-center">
-          <Search className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+        <Card className="p-16 text-center shadow-sm">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+            <Search className="h-7 w-7 text-muted-foreground/50" />
+          </div>
           <p className="text-muted-foreground">
             키워드를 입력하면 모든 질문과 답변에서 검색합니다.
           </p>

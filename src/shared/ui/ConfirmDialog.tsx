@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/ui/Button';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -30,7 +30,7 @@ export function ConfirmDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="backdrop:bg-black/50 rounded-lg p-0 border shadow-lg max-w-sm w-full bg-background text-foreground"
+      className="m-auto backdrop:bg-black/50 rounded-lg p-0 border shadow-lg max-w-sm w-full bg-background text-foreground"
       onCancel={(e) => {
         e.preventDefault();
         onConfirm();

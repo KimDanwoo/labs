@@ -1,10 +1,10 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/shared/ui/button';
-import { Card } from '@/shared/ui/card';
-import { Badge } from '@/shared/ui/badge';
-import { Progress } from '@/shared/ui/progress';
+import { Button } from '@/shared/ui/Button';
+import { Card } from '@/shared/ui/Card';
+import { Badge } from '@/shared/ui/Badge';
+import { Progress } from '@/shared/ui/Progress';
 import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
 import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
 import type { Question } from '@/entities/question';
@@ -42,12 +42,12 @@ export function StudyCardView({
 	flipHint = 'Space로 뒤집기',
 }: StudyCardViewProps) {
 	return (
-		<div className="container mx-auto max-w-2xl px-4 py-8">
+		<div className="container mx-auto max-w-2xl px-4 py-12">
 			{/* Progress bar */}
-			<div className="mb-6">
-				<div className="flex items-center justify-between mb-2">
+			<div className="mb-8">
+				<div className="flex items-center justify-between mb-3">
 					<div className="flex items-center gap-2">
-						<span className="text-sm text-muted-foreground">
+						<span className="text-sm font-medium tabular-nums text-muted-foreground">
 							{currentIndex + 1} / {totalCount}
 						</span>
 						{isNewCard && (
@@ -56,33 +56,33 @@ export function StudyCardView({
 					</div>
 					<div className="flex items-center gap-2">
 						{!isFlipped && (
-							<span className="text-xs text-muted-foreground">
+							<span className="text-xs text-muted-foreground/70">
 								{flipHint}
 							</span>
 						)}
 						{isFlipped && (
-							<span className="text-xs text-muted-foreground">
+							<span className="text-xs text-muted-foreground/70">
 								1~4로 평가
 							</span>
 						)}
 						{headerAction}
 					</div>
 				</div>
-				<Progress value={progressPercent} className="h-2" />
+				<Progress value={progressPercent} className="h-1.5" />
 			</div>
 
 			{/* Card */}
 			<AnimatePresence mode="wait">
 				<motion.div
 					key={currentIndex}
-					initial={{ opacity: 0, x: 50 }}
+					initial={{ opacity: 0, x: 40 }}
 					animate={{ opacity: 1, x: 0 }}
-					exit={{ opacity: 0, x: -50 }}
-					transition={{ duration: 0.2 }}
+					exit={{ opacity: 0, x: -40 }}
+					transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
 				>
-					<Card className="min-h-[300px] p-6 relative">
+					<Card className="min-h-[300px] p-6 relative shadow-sm">
 						{/* Meta */}
-						<div className="flex items-center gap-2 mb-4">
+						<div className="flex items-center gap-2 mb-5">
 							<DifficultyBadge difficulty={currentQuestion?.difficulty ?? 'easy'} />
 							{currentQuestion?.sub_category && (
 								<Badge variant="secondary" className="text-xs">
@@ -90,15 +90,15 @@ export function StudyCardView({
 								</Badge>
 							)}
 							{currentProgress && (
-								<span className="text-xs text-muted-foreground ml-auto">
+								<span className="text-xs text-muted-foreground ml-auto tabular-nums">
 									간격: {currentProgress.interval}일
 								</span>
 							)}
 						</div>
 
 						{/* Question */}
-						<div className="flex flex-col items-center justify-center min-h-[120px] mb-4">
-							<p className="text-lg font-medium text-center leading-relaxed">
+						<div className="flex flex-col items-center justify-center min-h-[120px] mb-6">
+							<p className="text-lg font-medium text-center leading-relaxed whitespace-pre-line">
 								{currentQuestion?.question}
 							</p>
 						</div>
@@ -113,7 +113,7 @@ export function StudyCardView({
 									variant="outline"
 									size="lg"
 									onClick={onFlip}
-									className="gap-2"
+									className="gap-2 shadow-sm hover:shadow transition-all duration-200"
 								>
 									<Eye className="h-4 w-4" />
 									답변 확인
@@ -121,11 +121,11 @@ export function StudyCardView({
 							</div>
 						) : (
 							<motion.div
-								initial={{ opacity: 0, y: 10 }}
+								initial={{ opacity: 0, y: 8 }}
 								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.2 }}
+								transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
 							>
-								<div className="border-t pt-4">
+								<div className="border-t border-border/50 pt-5">
 									<MarkdownRenderer content={currentQuestion?.answer ?? ''} />
 								</div>
 							</motion.div>
@@ -137,25 +137,25 @@ export function StudyCardView({
 			{/* Rating buttons */}
 			{isFlipped && (
 				<motion.div
-					initial={{ opacity: 0, y: 10 }}
+					initial={{ opacity: 0, y: 8 }}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.15, delay: 0.1 }}
-					className="mt-4"
+					transition={{ duration: 0.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+					className="mt-5"
 				>
 					<p className="text-xs text-muted-foreground text-center mb-3">
 						얼마나 잘 기억했나요? (키보드: 1~4)
 					</p>
-					<div className="grid grid-cols-4 gap-2">
+					<div className="grid grid-cols-4 gap-2.5">
 						{RATING_CONFIG.map(({ rating, label, color, bgColor }, i) => (
 							<Button
 								key={rating}
 								variant="outline"
 								size="lg"
-								className={`flex-col h-auto py-3 gap-1 ${color} ${bgColor}`}
+								className={`flex-col h-auto py-3 gap-1 transition-all duration-200 hover:scale-[1.02] ${color} ${bgColor}`}
 								onClick={() => onRate(rating)}
 							>
 								<span className="text-sm font-medium">{label}</span>
-								<span className="text-xs opacity-60">{i + 1}</span>
+								<span className="text-xs opacity-50">{i + 1}</span>
 							</Button>
 						))}
 					</div>

@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Button } from '@/shared/ui/button';
-import { Card } from '@/shared/ui/card';
+import { Button } from '@/shared/ui/Button';
+import { Card } from '@/shared/ui/Card';
 import { getRandomQuestions, getQuestionsByIds } from '@/entities/question';
 import type { Question } from '@/entities/question';
 import {
@@ -89,8 +89,8 @@ export function DailyPage() {
 	// ==================== LOADING ====================
 	if (phase === 'loading') {
 		return (
-			<div className="container mx-auto max-w-2xl px-4 py-8">
-				<div className="text-center text-muted-foreground py-12">
+			<div className="container mx-auto max-w-2xl px-4 py-12">
+				<div className="text-center text-muted-foreground py-16 animate-fade-in">
 					오늘의 문제를 준비하고 있습니다...
 				</div>
 			</div>
@@ -100,24 +100,24 @@ export function DailyPage() {
 	// ==================== ALREADY DONE ====================
 	if (phase === 'already-done') {
 		return (
-			<div className="container mx-auto max-w-2xl px-4 py-8">
-				<div className="text-center py-12">
-					<Trophy className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
-					<h1 className="text-3xl font-bold mb-2">오늘의 챌린지 완료!</h1>
+			<div className="container mx-auto max-w-2xl px-4 py-12">
+				<div className="text-center py-16 animate-fade-in-up">
+					<Trophy className="h-16 w-16 text-yellow-500 mx-auto mb-5" />
+					<h1 className="text-3xl font-bold tracking-tight mb-3">오늘의 챌린지 완료!</h1>
 					<p className="text-muted-foreground mb-6">
 						오늘 학습을 이미 마쳤습니다. 내일 다시 도전하세요.
 					</p>
 
 					{streak > 0 && (
-						<div className="flex items-center justify-center gap-2 mb-8">
-							<Flame className="h-6 w-6 text-orange-500" />
-							<span className="text-xl font-bold">{streak}일 연속 학습 중!</span>
+						<div className="inline-flex items-center gap-2 rounded-full bg-orange-500/10 border border-orange-500/20 px-4 py-2 mb-8">
+							<Flame className="h-5 w-5 text-orange-500" />
+							<span className="text-lg font-bold">{streak}일 연속 학습 중!</span>
 						</div>
 					)}
 
 					<div className="flex gap-3 justify-center">
 						<Link href="/learn/flashcard">
-							<Button variant="outline" className="gap-2">
+							<Button variant="outline" className="gap-2 shadow-sm">
 								플래시카드로 더 학습
 								<ArrowRight className="h-4 w-4" />
 							</Button>
@@ -136,14 +136,16 @@ export function DailyPage() {
 	// ==================== READY ====================
 	if (phase === 'ready') {
 		return (
-			<div className="container mx-auto max-w-2xl px-4 py-8">
-				<h1 className="text-3xl font-bold mb-2">오늘의 챌린지</h1>
+			<div className="container mx-auto max-w-2xl px-4 py-12 animate-fade-in">
+				<h1 className="text-3xl font-bold tracking-tight mb-2">오늘의 챌린지</h1>
 				<p className="text-muted-foreground mb-8">
 					매일 {DAILY_COUNT}문제, 꾸준히 실력을 쌓으세요.
 				</p>
 
-				<Card className="p-6 text-center">
-					<Calendar className="h-12 w-12 text-primary mx-auto mb-4" />
+				<Card className="p-8 text-center shadow-sm">
+					<div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+						<Calendar className="h-8 w-8 text-primary" />
+					</div>
 					<p className="text-lg font-medium mb-2">
 						오늘의 {questions.length}문제가 준비되었습니다
 					</p>
@@ -152,20 +154,22 @@ export function DailyPage() {
 					</p>
 
 					{streak > 0 && (
-						<div className="flex items-center justify-center gap-2 mb-6">
-							<Flame className="h-5 w-5 text-orange-500" />
-							<span className="font-medium">{streak}일 연속 학습 중</span>
+						<div className="inline-flex items-center gap-2 rounded-full bg-orange-500/10 border border-orange-500/20 px-3 py-1.5 mb-6">
+							<Flame className="h-4 w-4 text-orange-500" />
+							<span className="text-sm font-medium">{streak}일 연속 학습 중</span>
 						</div>
 					)}
 
-					<Button
-						onClick={() => setPhase('study')}
-						size="lg"
-						className="gap-2"
-						disabled={questions.length === 0}
-					>
-						시작하기
-					</Button>
+					<div>
+						<Button
+							onClick={() => setPhase('study')}
+							size="lg"
+							className="gap-2 h-12 px-8 shadow-md hover:shadow-lg transition-all duration-300"
+							disabled={questions.length === 0}
+						>
+							시작하기
+						</Button>
+					</div>
 
 					{questions.length === 0 && (
 						<p className="text-sm text-muted-foreground mt-4">
@@ -180,15 +184,15 @@ export function DailyPage() {
 	// ==================== DONE ====================
 	if (phase === 'done') {
 		return (
-			<div className="container mx-auto max-w-2xl px-4 py-8">
-				<div className="text-center mb-6">
-					<Trophy className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
-					<h1 className="text-3xl font-bold mb-2">챌린지 완료!</h1>
+			<div className="container mx-auto max-w-2xl px-4 py-12 animate-fade-in-up">
+				<div className="text-center mb-8">
+					<Trophy className="h-16 w-16 text-yellow-500 mx-auto mb-5" />
+					<h1 className="text-3xl font-bold tracking-tight mb-2">챌린지 완료!</h1>
 
 					{streak > 0 && (
-						<div className="flex items-center justify-center gap-2 mt-4">
-							<Flame className="h-6 w-6 text-orange-500" />
-							<span className="text-xl font-bold">{streak}일 연속 학습!</span>
+						<div className="inline-flex items-center gap-2 rounded-full bg-orange-500/10 border border-orange-500/20 px-4 py-2 mt-4">
+							<Flame className="h-5 w-5 text-orange-500" />
+							<span className="text-lg font-bold">{streak}일 연속 학습!</span>
 						</div>
 					)}
 				</div>
@@ -197,7 +201,7 @@ export function DailyPage() {
 
 				<div className="flex gap-3">
 					<Link href="/learn/flashcard" className="flex-1">
-						<Button variant="outline" className="w-full gap-2">
+						<Button variant="outline" className="w-full gap-2 shadow-sm">
 							플래시카드로 더 학습
 							<ArrowRight className="h-4 w-4" />
 						</Button>

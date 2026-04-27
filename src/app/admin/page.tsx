@@ -1,6 +1,6 @@
 import { createServerSupabaseClient } from '@/shared/config/supabase/server';
 import { getAllCategories } from '@/entities/question/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/Card';
 
 export default async function AdminDashboardPage() {
   const supabase = await createServerSupabaseClient();

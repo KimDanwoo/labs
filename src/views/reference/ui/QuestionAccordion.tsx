@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/shared/ui/accordion';
-import { Button } from '@/shared/ui/button';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/shared/ui/Accordion';
+import { Button } from '@/shared/ui/Button';
 import { Bookmark, BookmarkCheck, CheckCircle } from 'lucide-react';
 import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
 import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
@@ -46,12 +46,12 @@ export function QuestionAccordion({ questions, startIndex = 0 }: QuestionAccordi
 	};
 
 	return (
-		<Accordion type="multiple" className="space-y-2">
+		<Accordion type="multiple" className="space-y-2.5">
 			{questions.map((question, index) => (
-				<AccordionItem key={question.id} value={question.id} className="border! rounded-lg px-4">
+				<AccordionItem key={question.id} value={question.id} className="border border-border/60 rounded-xl px-4 shadow-sm">
 					<AccordionTrigger className="hover:no-underline py-4">
 						<div className="flex items-start gap-3 text-left flex-1 mr-4">
-							<span className="text-muted-foreground text-sm font-mono mt-0.5 shrink-0">
+							<span className="text-muted-foreground/60 text-sm font-mono mt-0.5 shrink-0 tabular-nums">
 								{String(startIndex + index + 1).padStart(2, '0')}
 							</span>
 							<div className="flex flex-col gap-1.5 min-w-0">
@@ -69,8 +69,8 @@ export function QuestionAccordion({ questions, startIndex = 0 }: QuestionAccordi
 					<AccordionContent className="pb-4">
 						<div className="pl-8">
 							<MarkdownRenderer content={question.answer} />
-							<div className="flex items-center gap-2 mt-4 pt-4 border-t">
-								<Button variant="ghost" size="sm" onClick={() => handleBookmarkToggle(question.id)} className="gap-2">
+							<div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/50">
+								<Button variant="ghost" size="sm" onClick={() => handleBookmarkToggle(question.id)} className="gap-2 transition-colors duration-200">
 									{bookmarks[question.id] ? (
 										<BookmarkCheck className="h-4 w-4 text-yellow-500" />
 									) : (
@@ -79,7 +79,7 @@ export function QuestionAccordion({ questions, startIndex = 0 }: QuestionAccordi
 									{bookmarks[question.id] ? '북마크됨' : '북마크'}
 								</Button>
 								{progress[question.id] !== 'mastered' && (
-									<Button variant="ghost" size="sm" onClick={() => handleMarkLearned(question.id)} className="gap-2">
+									<Button variant="ghost" size="sm" onClick={() => handleMarkLearned(question.id)} className="gap-2 transition-colors duration-200">
 										<CheckCircle className="h-4 w-4" />
 										학습 완료
 									</Button>

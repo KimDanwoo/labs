@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/ui/Button';
 import { getAllCategories, getRandomQuestions, getQuestionsByIds } from '@/entities/question';
 import type { Category, Question } from '@/entities/question';
 import {
