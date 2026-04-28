@@ -46,46 +46,52 @@ const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`
       content="-kohA7qdl_10fMUGOMlZ7EArpE6vOn0DHONUwImizX8"
     />
   </head>
-  <body>
+  <body class="min-h-screen flex flex-col">
     <div id="scroll-sentinel" class="absolute top-0 h-0 w-full pointer-events-none"></div>
-    <div class="w-full">
-      <header
-        id="main-header"
-        class="sticky top-0 z-[9999] w-full bg-white border-b border-[#eee] transition-shadow duration-150"
-      >
-        <div class="max-w-[700px] mx-auto flex items-center px-4 py-4 box-border">
+
+    <header
+      id="main-header"
+      class="sticky top-0 z-[9999] w-full bg-white/95 backdrop-blur-sm border-b border-grey-3 transition-shadow duration-200"
+    >
+      <div class="max-w-[720px] mx-auto flex items-center px-5 h-14 sm:h-16">
+        <a
+          class="mr-auto text-green-0 text-lg font-bold tracking-tight hover:text-green-1 transition-colors"
+          href="/"
+        >
+          Dansoon
+        </a>
+        <nav class="flex items-center gap-5 sm:gap-7">
           <a
-            class="mr-auto text-green-0 text-[1.6rem] font-bold hover:text-green-1 transition-colors"
-            href="/"
-          >
-            Dansoon
-          </a>
-          <a
-            class="mr-4 text-grey-0 text-sm font-normal hover:text-grey-1 transition-colors"
+            class="text-grey-0 text-sm font-medium hover:text-[#1c1c1c] transition-colors"
             href="https://docs.google.com/document/d/1_oia6H3WisAHsGNJWZAYqru9pHUXovRNAaRJcZn5UBU/preview"
             target="_blank"
             rel="noopener noreferrer"
           >ME</a>
           <a
-            class="mr-4 text-grey-0 text-sm font-normal hover:text-grey-1 transition-colors"
+            class="text-grey-0 text-sm font-medium hover:text-[#1c1c1c] transition-colors"
             href="/"
           >BLOG</a>
           <a
-            class="text-grey-0 text-sm font-normal hover:text-grey-1 transition-colors"
+            class="text-grey-0 text-sm font-medium hover:text-[#1c1c1c] transition-colors"
             href="https://github.com/KimDanwoo"
             target="_blank"
             rel="noopener noreferrer"
           >GITHUB</a>
-        </div>
-      </header>
-      <main class="max-w-[700px] mx-auto px-4 py-4 box-border">
-        <slot />
-      </main>
-      <footer class="w-full text-center text-lg px-4 py-4">
-        ©<a class="font-bold" href="https://github.com/KimDanwoo">Danwoo</a>, Built
-        with&nbsp;<a class="font-bold" href="https://astro.build">Astro</a>
-      </footer>
-    </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-[720px] w-full mx-auto px-5 py-8 sm:py-12">
+      <slot />
+    </main>
+
+    <footer class="border-t border-grey-3">
+      <div class="max-w-[720px] mx-auto px-5 py-8 flex items-center justify-between text-sm text-grey-1">
+        <span>© {new Date().getFullYear()} <a class="font-semibold text-grey-0 hover:text-green-0 transition-colors" href="https://github.com/KimDanwoo">Danwoo</a></span>
+        <span>Built with <a class="font-semibold text-grey-0 hover:text-green-0 transition-colors" href="https://astro.build">Astro</a></span>
+      </div>
+    </footer>
+
     <script>
       const sentinel = document.getElementById('scroll-sentinel')
       const header = document.getElementById('main-header')
