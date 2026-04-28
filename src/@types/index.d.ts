@@ -11,11 +11,7 @@ declare module Common {
     description: string
     category: string
     isHidden: boolean
-    thumbnail: {
-      src: string
-      srcSet: string
-      sizes: string
-    } | null
+    thumbnail: { src: string } | null
     url: string
     publishedAt: string
   }
