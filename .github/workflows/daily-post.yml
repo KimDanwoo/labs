@@ -1,45 +1,71 @@
-name: Daily Tech Post
+name: Daily Tech News
 
 on:
   schedule:
-    - cron: '0 0 * * *' # 매일 오전 9시 KST (UTC 00:00)
-  workflow_dispatch: # 수동 실행 가능
+    - cron: '0 1 * * 1-6' # 월~토 오전 10시 KST (UTC 01:00)
+  workflow_dispatch:
 
 jobs:
   generate:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v4
         with:
-          version: 9
+          fetch-depth: 0
+          ref: main
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Set timezone to KST
+        run: |
+          sudo timedatectl set-timezone Asia/Seoul
+          echo "Current time: $(date)"
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          node-version: '24'
-          cache: 'pnpm'
+          python-version: '3.12'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Install Python dependencies
+        run: pip install requests google-generativeai
 
-      - name: Generate post
-        run: node scripts/generate-post.mjs
+      - name: Fetch tech news
+        run: python scripts/fetch_tech_news.py ${{ steps.date.outputs.date }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
-      - name: Commit and push
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: '✨ feat(${{ steps.date.outputs.date }}): 오늘의 테크 뉴스 추가'
+          title: '✨ feat(${{ steps.date.outputs.date }}): 오늘의 테크 뉴스 추가'
+          body: |
+            ## 📋 변경사항
+            - 날짜: ${{ steps.date.outputs.date }}
+            - 파일: `contents/blog/${{ steps.date.outputs.date }}-tech-news/index.md`
+            - Hacker News Top 5 수집 및 Gemini 한국어 요약
+          branch: 'feature/${{ steps.date.outputs.date }}-tech-news'
+          base: 'main'
+
+      - name: Auto-merge Pull Request
+        if: steps.cpr.outputs.pull-request-operation == 'created'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/content/blog/
-          git diff --staged --quiet && echo "새 포스트 없음" || (
-            git commit -m "✨ feat: 자동 테크 포스트 $(date +'%Y-%m-%d')" &&
-            git push
-          )
+          for i in 1 2 3 4 5; do
+            gh pr merge "${{ steps.cpr.outputs.pull-request-number }}" \
+              --squash --auto --delete-branch && break || sleep 10
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
