@@ -1,4 +1,3 @@
-import uniq from 'lodash/uniq'
 import { useMemo, useState } from 'react'
 
 export default function useFilter(posts: Common.Post[]) {
@@ -6,25 +5,14 @@ export default function useFilter(posts: Common.Post[]) {
   const [search, setSearch] = useState<string>('')
 
   const filteredPosts = (posts: Common.Post[]) => {
-    const filteredPosts = posts.filter(
+    const visible = posts.filter(
       p => p.title !== '🧑🏻‍💻 frontend 김단우' && !p.isHidden
     )
 
-    if (category === 'ALL' && search === '') {
-      return filteredPosts
-    }
-
-    if (category === 'ALL' && search !== '') {
-      return filteredPosts.filter(p =>
-        p.title.toLowerCase().includes(search.toLowerCase())
-      )
-    }
-
-    if (category !== 'ALL' && search === '') {
-      return filteredPosts.filter(p => p.category === category)
-    }
-
-    return filteredPosts
+    if (category === 'ALL' && search === '') return visible
+    if (category === 'ALL') return visible.filter(p => p.title.toLowerCase().includes(search.toLowerCase()))
+    if (search === '') return visible.filter(p => p.category === category)
+    return visible
       .filter(p => p.category === category)
       .filter(p => p.title.toLowerCase().includes(search.toLowerCase()))
   }
@@ -32,26 +20,16 @@ export default function useFilter(posts: Common.Post[]) {
   const categories = useMemo(
     () => [
       'ALL',
-      ...uniq(posts.filter(p => p.category && !p.isHidden).map(p => p.category))
+      ...Array.from(new Set(posts.filter(p => p.category && !p.isHidden).map(p => p.category)))
     ],
     [posts]
   )
 
-  const handleClickCategory = (tag: string) => {
-    if (tag) {
-      setCategory(tag)
-    }
-  }
-
-  const onClickSearch = (text: string) => {
-    setSearch(text)
-  }
-
   return {
     category,
     categories: search !== '' ? [] : categories,
-    handleClickCategory,
+    handleClickCategory: (tag: string) => { if (tag) setCategory(tag) },
     filteredPosts: filteredPosts(posts),
-    onClickSearch
+    onClickSearch: (text: string) => setSearch(text)
   }
 }
