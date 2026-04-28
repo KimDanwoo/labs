@@ -1,0 +1,71 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import { getCollection, render } from 'astro:content'
+import BaseLayout from '~/layouts/BaseLayout.astro'
+import Utterances from '~/components/Common/Utterances'
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog')
+  return posts.map(post => {
+    const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '')
+    return {
+      params: { slug },
+      props: { post }
+    }
+  })
+}
+
+type Props = {
+  post: CollectionEntry<'blog'>
+}
+
+const { post } = Astro.props
+const { Content } = await render(post)
+const { title, description, date, thumbnail } = post.data
+const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '')
+const url = `https://danwoo-dev.netlify.app/${slug}/`
+const isIntroPage = title === '🧑🏻‍💻 frontend 김단우'
+const formattedDate = date.toLocaleDateString('ko-KR', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+})
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  url={url}
+  thumbnail={thumbnail?.src}
+>
+  <article class="w-full" itemscope itemtype="http://schema.org/Article">
+    <header class="w-full mb-10">
+      <h1 class="text-[2rem] font-bold mb-3" itemprop="headline">{title}</h1>
+      <p class="text-grey-0 text-sm mb-3">{formattedDate}</p>
+      {
+        thumbnail && !isIntroPage && (
+          <img
+            class="w-full border border-grey-5 rounded-xl"
+            src={thumbnail.src}
+            alt=""
+          />
+        )
+      }
+      {
+        thumbnail && isIntroPage && (
+          <img
+            class="w-full h-[500px] object-cover border border-grey-5 rounded-xl scale-[0.7]"
+            src={thumbnail.src}
+            alt=""
+          />
+        )
+      }
+    </header>
+    <div
+      class="prose max-w-none prose-a:text-green-0 prose-a:font-bold prose-a:no-underline hover:prose-a:text-green-1 prose-pre:rounded-xl prose-blockquote:bg-grey-4 prose-blockquote:rounded-xl prose-blockquote:border-none prose-img:rounded-md"
+    >
+      <Content />
+    </div>
+    {!isIntroPage && <Utterances client:load />}
+  </article>
+</BaseLayout>

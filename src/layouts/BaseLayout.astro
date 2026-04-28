@@ -1,0 +1,103 @@
+---
+import '~/styles/global.css'
+
+interface Props {
+  title?: string
+  description?: string
+  thumbnail?: string
+  url?: string
+}
+
+const {
+  title = 'blog.danwoo',
+  description = '기록하고 공유합니다',
+  thumbnail,
+  url
+} = Astro.props
+
+const siteTitle = 'blog.danwoo'
+const siteUrl = 'https://danwoo-dev.netlify.app'
+const metaUrl = url ?? siteUrl
+const metaThumbnail = thumbnail ?? `${siteUrl}/og.png`
+const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={metaUrl} />
+    <link rel="icon" href="/favicon.png" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={metaThumbnail} />
+    <meta property="og:url" content={metaUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={metaThumbnail} />
+    <meta
+      name="google-site-verification"
+      content="-kohA7qdl_10fMUGOMlZ7EArpE6vOn0DHONUwImizX8"
+    />
+  </head>
+  <body>
+    <div id="scroll-sentinel" class="absolute top-0 h-0 w-full pointer-events-none"></div>
+    <div class="w-full">
+      <header
+        id="main-header"
+        class="sticky top-0 z-[9999] w-full bg-white border-b border-[#eee] transition-shadow duration-150"
+      >
+        <div class="max-w-[700px] mx-auto flex items-center px-4 py-4 box-border">
+          <a
+            class="mr-auto text-green-0 text-[1.6rem] font-bold hover:text-green-1 transition-colors"
+            href="/"
+          >
+            Dansoon
+          </a>
+          <a
+            class="mr-4 text-grey-0 text-sm font-normal hover:text-grey-1 transition-colors"
+            href="https://docs.google.com/document/d/1_oia6H3WisAHsGNJWZAYqru9pHUXovRNAaRJcZn5UBU/preview"
+            target="_blank"
+            rel="noopener noreferrer"
+          >ME</a>
+          <a
+            class="mr-4 text-grey-0 text-sm font-normal hover:text-grey-1 transition-colors"
+            href="/"
+          >BLOG</a>
+          <a
+            class="text-grey-0 text-sm font-normal hover:text-grey-1 transition-colors"
+            href="https://github.com/KimDanwoo"
+            target="_blank"
+            rel="noopener noreferrer"
+          >GITHUB</a>
+        </div>
+      </header>
+      <main class="max-w-[700px] mx-auto px-4 py-4 box-border">
+        <slot />
+      </main>
+      <footer class="w-full text-center text-lg px-4 py-4">
+        ©<a class="font-bold" href="https://github.com/KimDanwoo">Danwoo</a>, Built
+        with&nbsp;<a class="font-bold" href="https://astro.build">Astro</a>
+      </footer>
+    </div>
+    <script>
+      const sentinel = document.getElementById('scroll-sentinel')
+      const header = document.getElementById('main-header')
+      if (sentinel && header) {
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            header.classList.toggle('shadow-sm', !entry.isIntersecting)
+          },
+          { threshold: 1.0 }
+        )
+        observer.observe(sentinel)
+      }
+    </script>
+  </body>
+</html>
