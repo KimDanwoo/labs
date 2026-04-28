@@ -62,7 +62,7 @@ def summarize_with_gemini(stories: list[dict]) -> str:
 <a href="원문_URL" class="source-link">원문보기 →</a>
 </div>
 
-💡 개발자 관점 한 줄 코멘트
+> 💡 개발자 관점 한 줄 코멘트
 
 3~5문장으로 핵심 내용 요약.
 
@@ -104,6 +104,8 @@ isHidden: false
 ---
 
 ## 오늘의 테크 뉴스 TOP 5
+
+---
 
 """
 
