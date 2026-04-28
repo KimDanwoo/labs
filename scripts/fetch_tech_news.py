@@ -14,11 +14,35 @@ if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY 환경변수가 설정되지 않았습니다.")
 
 
+DEV_KEYWORDS = [
+    "programming", "developer", "software", "engineering", "code", "coding",
+    "open source", "github", "api", "framework", "library", "database", "db",
+    "frontend", "backend", "fullstack", "web", "javascript", "typescript",
+    "python", "rust", "go", "java", "c++", "llm", "ai", "ml", "machine learning",
+    "deep learning", "neural", "gpu", "cpu", "compiler", "runtime", "kernel",
+    "linux", "docker", "kubernetes", "cloud", "devops", "ci/cd", "security",
+    "vulnerability", "cve", "exploit", "crypto", "algorithm", "data structure",
+    "performance", "benchmark", "latency", "scalability", "architecture",
+    "microservice", "serverless", "wasm", "webassembly", "cli", "terminal",
+    "ide", "editor", "vscode", "neovim", "git", "version control", "deploy",
+    "infra", "infrastructure", "networking", "protocol", "http", "tcp", "dns",
+    "browser", "v8", "webkit", "react", "vue", "svelte", "next", "astro",
+    "llama", "gpt", "claude", "gemini", "chatgpt", "openai", "anthropic",
+    "tooling", "debugging", "profiling", "testing", "oss", "release", "sdk",
+]
+
+
+def is_dev_related(title: str) -> bool:
+    """제목이 개발/기술 관련인지 확인합니다."""
+    title_lower = title.lower()
+    return any(kw in title_lower for kw in DEV_KEYWORDS)
+
+
 def fetch_hn_top_stories(limit: int = 5) -> list[dict]:
-    """Hacker News Top Stories에서 상위 기사를 가져옵니다."""
+    """Hacker News Top Stories에서 개발 관련 상위 기사를 가져옵니다."""
     top_ids = requests.get(
         "https://hacker-news.firebaseio.com/v0/topstories.json", timeout=10
-    ).json()[:50]
+    ).json()[:200]
 
     stories = []
     for story_id in top_ids:
@@ -32,6 +56,7 @@ def fetch_hn_top_stories(limit: int = 5) -> list[dict]:
             and item.get("type") == "story"
             and item.get("url")
             and item.get("score", 0) >= 50
+            and is_dev_related(item.get("title", ""))
         ):
             stories.append(item)
 
@@ -59,7 +84,7 @@ def summarize_with_gemini(stories: list[dict]) -> str:
 
 <div class="news-header">
 <h3>뉴스 제목 한국어 번역</h3>
-<a href="원문_URL" class="source-link">원문보기 →</a>
+<a href="원문_URL" class="source-link" target="_blank" rel="noopener noreferrer">원문보기 →</a>
 </div>
 
 > 💡 개발자 관점 한 줄 코멘트
