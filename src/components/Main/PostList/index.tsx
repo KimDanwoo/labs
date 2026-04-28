@@ -6,41 +6,51 @@ const PostList = ({ posts }: PostListProps) => {
     <ul className="w-full flex flex-col m-0 p-0 list-none">
       {posts.length ? (
         posts.map(post => (
-          <li key={post.url} className="py-10 border-b border-grey-3">
-            <a href={post.url} itemProp="url">
+          <li key={post.url} className="border-b border-grey-3 last:border-b-0">
+            <a href={post.url} itemProp="url" className="block py-8 sm:py-10 group">
               <article
-                className="w-full flex flex-col box-border group transition-transform duration-[400ms] md:hover:-translate-y-1"
+                className="w-full flex flex-col gap-2"
                 itemScope
                 itemType="http://schema.org/Article"
               >
-                <header>
-                  {post.thumbnail && (
-                    <div className="relative w-full overflow-hidden mb-6 border border-grey-5 rounded-xl">
-                      <div className="pt-[50%]" />
-                      <div className="absolute inset-0">
-                        <img
-                          className="w-full h-full object-cover transition-transform duration-[400ms] md:group-hover:scale-[1.03]"
-                          src={post.thumbnail.src}
-                          alt=""
-                        />
-                      </div>
+                {post.thumbnail && (
+                  <div className="relative w-full overflow-hidden mb-2 rounded-2xl border border-grey-3 bg-grey-5">
+                    <div className="pt-[52%]" />
+                    <div className="absolute inset-0">
+                      <img
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                        src={post.thumbnail.src}
+                        alt=""
+                      />
                     </div>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-1.5 text-xs">
+                  {post.category && (
+                    <span className="text-green-0 font-semibold">{post.category}</span>
                   )}
-                  <h2 className="m-0 text-[1.6rem] font-bold">
-                    <span itemProp="headline">{post.title}</span>
-                  </h2>
-                  <p className="my-3 text-grey-2 text-sm">{post.publishedAt}</p>
-                </header>
-                <section>
-                  <p className="m-0 text-grey-1 text-lg">{post.description}</p>
-                </section>
+                  {post.category && <span className="text-grey-3">·</span>}
+                  <time className="text-grey-1">{post.publishedAt}</time>
+                </div>
+
+                <h2
+                  className="m-0 text-xl sm:text-2xl font-bold leading-snug tracking-tight group-hover:text-green-0 transition-colors"
+                  itemProp="headline"
+                >
+                  {post.title}
+                </h2>
+
+                <p className="m-0 text-grey-0 text-sm sm:text-base leading-relaxed line-clamp-2">
+                  {post.description}
+                </p>
               </article>
             </a>
           </li>
         ))
       ) : (
-        <p className="py-12 text-base font-bold text-center">
-          검색어에 해당하는 글이 없어요 😭
+        <p className="py-16 text-sm text-grey-1 text-center">
+          검색어에 해당하는 글이 없어요 😔
         </p>
       )}
     </ul>

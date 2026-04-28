@@ -55,15 +55,20 @@ def summarize_with_gemini(stories: list[dict]) -> str:
 
 {stories_info}
 
-각 뉴스마다 아래 형식으로 작성해줘:
+각 뉴스마다 반드시 아래 형식 그대로 작성해줘. 형식을 절대 바꾸지 마:
 
-### [뉴스 제목 (한국어 번역)](원문 URL)
-> 💡 왜 중요한가: 한 줄 코멘트
+<div class="news-header">
+<h3>뉴스 제목 한국어 번역</h3>
+<a href="원문_URL" class="source-link">원문보기 →</a>
+</div>
 
-**요약**
-3~5문장으로 핵심 내용 요약. 개발자 관점에서 왜 주목할만한지 포함.
+💡 개발자 관점 한 줄 코멘트
+
+3~5문장으로 핵심 내용 요약.
 
 ---
+
+중요: href 안에는 반드시 실제 URL을 넣어야 해. h3 태그 안에는 제목만, URL은 절대 넣지 마.
 
 마지막에 이 줄 추가:
 *이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*

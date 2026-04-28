@@ -8,22 +8,21 @@ type Props = {
 
 export default function Categories({ category: c, categories, handleClickCategory }: Props) {
   return (
-    <div>
-      <ul className="flex flex-wrap list-none p-0 m-0">
-        {categories.map((category: string) => (
-          <li
-            key={category}
-            className={`m-1 px-3 py-0.5 rounded-full border cursor-pointer text-xs font-bold shadow-sm transition-colors ${
-              category === c
-                ? 'text-white bg-green-0 border-green-0'
-                : 'bg-transparent border-[#ccc]'
-            }`}
-            onClick={() => handleClickCategory(category)}
-          >
-            {category}
-          </li>
-        ))}
-      </ul>
+    <div className="flex flex-wrap gap-2 mb-2">
+      {categories.map((category: string) => (
+        <button
+          key={category}
+          type="button"
+          className={`px-3.5 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
+            category === c
+              ? 'bg-green-0 text-white border-green-0'
+              : 'bg-transparent text-grey-0 border-grey-3 hover:border-green-0 hover:text-green-0'
+          }`}
+          onClick={() => handleClickCategory(category)}
+        >
+          {category}
+        </button>
+      ))}
     </div>
   )
 }
