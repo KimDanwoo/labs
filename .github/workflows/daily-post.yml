@@ -1,0 +1,45 @@
+name: Daily Tech Post
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 매일 오전 9시 KST (UTC 00:00)
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate post
+        run: node scripts/generate-post.mjs
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/content/blog/
+          git diff --staged --quiet && echo "새 포스트 없음" || (
+            git commit -m "✨ feat: 자동 테크 포스트 $(date +'%Y-%m-%d')" &&
+            git push
+          )
