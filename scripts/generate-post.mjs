@@ -11,7 +11,7 @@ if (!apiKey) throw new Error('GEMINI_API_KEY 환경변수가 설정되지 않았
 
 const genAI = new GoogleGenerativeAI(apiKey)
 const model = genAI.getGenerativeModel({
-  model: 'gemini-2.0-flash',
+  model: 'gemini-2.5-flash',
   tools: [{ googleSearch: {} }]
 })
 
