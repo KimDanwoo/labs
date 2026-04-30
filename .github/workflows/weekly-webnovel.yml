@@ -3,6 +3,7 @@ name: Weekly Webnovel
 on:
   schedule:
     - cron: '0 2 * * 1' # 매주 월요일 오전 11시 KST (UTC 02:00)
+    - cron: '16 9 30 4 *' # 임시: 2026-04-30 09:16 UTC 1회 실행
   workflow_dispatch:
 
 jobs:
