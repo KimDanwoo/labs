@@ -67,9 +67,9 @@ def _extract_next_data(html: str) -> dict:
 # ── 카카오페이지 ─────────────────────────────────────────────
 def fetch_kakaopage(pw_page: Page, limit: int = 20) -> list[dict]:
     urls = [
-        "https://page.kakao.com/landing/novel",
+        "https://page.kakao.com/menu/10011/screen/94",  # 실시간 랭킹
         "https://page.kakao.com/menu/10011",
-        "https://page.kakao.com/home",
+        "https://page.kakao.com/landing/novel",
     ]
     for url in urls:
         try:
@@ -149,7 +149,6 @@ def fetch_naver_series(pw_page: Page, limit: int = 20) -> list[dict]:
     urls = [
         "https://series.naver.com/novel/top100List.series",
         "https://series.naver.com/novel/bestseller.series",
-        "https://series.naver.com/novel/categoryList.series?categoryTypeCode=all",
     ]
     for url in urls:
         try:
@@ -241,9 +240,9 @@ def fetch_naver_series(pw_page: Page, limit: int = 20) -> list[dict]:
 # ── 리디 웹소설 ──────────────────────────────────────────────
 def fetch_ridi_webnovel(pw_page: Page, limit: int = 20) -> list[dict]:
     urls = [
-        "https://ridibooks.com/category/bestsellers/1750",   # 판타지 웹소설
-        "https://ridibooks.com/category/bestsellers/1650",   # 로맨스 웹소설
-        "https://ridibooks.com/category/bestsellers/100",    # 소설 전체
+        "https://ridibooks.com/category/bestsellers/1750",  # 판타지 웹소설
+        "https://ridibooks.com/category/6050",              # 로맨스판타지
+        "https://ridibooks.com/category/1650",              # 로맨스 웹소설
     ]
     for url in urls:
         try:
