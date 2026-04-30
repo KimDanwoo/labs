@@ -3,45 +3,44 @@ import type PostListProps from './PostList.types'
 
 const PostList = ({ posts }: PostListProps) => {
   return (
-    <ul className="w-full flex flex-col m-0 p-0 list-none">
+    <ul className="post-list">
       {posts.length ? (
-        posts.map(post => (
-          <li key={post.url} className="border-b border-grey-3 last:border-b-0">
-            <a href={post.url} itemProp="url" className="block py-8 sm:py-10 group">
+        posts.map((post, index) => (
+          <li
+            key={post.url}
+            className="post-card animate-fade-in-up"
+            style={{ animationDelay: `${Math.min(index * 0.06, 0.36)}s` }}
+          >
+            <a href={post.url} itemProp="url" className="post-card-link">
               <article
-                className="w-full flex flex-col gap-2"
+                className="post-card-inner"
                 itemScope
                 itemType="http://schema.org/Article"
               >
                 {post.thumbnail && (
-                  <div className="relative w-full overflow-hidden mb-2 rounded-2xl border border-grey-3 bg-grey-5">
-                    <div className="pt-[52%]" />
-                    <div className="absolute inset-0">
-                      <img
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                        src={post.thumbnail.src}
-                        alt=""
-                      />
+                  <div className="post-card-thumb">
+                    <div className="post-card-thumb-ratio" />
+                    <div className="post-card-thumb-img-wrap">
+                      <img src={post.thumbnail.src} alt="" loading="lazy" decoding="async" />
                     </div>
                   </div>
                 )}
 
-                <div className="flex items-center gap-1.5 text-xs">
+                <div className="post-card-meta">
                   {post.category && (
-                    <span className="text-green-0 font-semibold">{post.category}</span>
+                    <span className="post-card-category">{post.category}</span>
                   )}
-                  {post.category && <span className="text-grey-3">·</span>}
-                  <time className="text-grey-1">{post.publishedAt}</time>
+                  {post.category && <span className="post-card-dot">·</span>}
+                  <time className="post-card-date" dateTime={post.publishedAt}>
+                    {post.publishedAt}
+                  </time>
                 </div>
 
-                <h2
-                  className="m-0 text-xl sm:text-2xl font-bold leading-snug tracking-tight group-hover:text-green-0 transition-colors"
-                  itemProp="headline"
-                >
+                <h2 className="post-card-title" itemProp="headline">
                   {post.title}
                 </h2>
 
-                <p className="m-0 text-grey-0 text-sm sm:text-base leading-relaxed line-clamp-2">
+                <p className="post-card-desc" itemProp="description">
                   {post.description}
                 </p>
               </article>
@@ -49,9 +48,9 @@ const PostList = ({ posts }: PostListProps) => {
           </li>
         ))
       ) : (
-        <p className="py-16 text-sm text-grey-1 text-center">
-          검색어에 해당하는 글이 없어요 😔
-        </p>
+        <li className="py-20 text-center text-sm text-grey-1">
+          글이 없어요 😔
+        </li>
       )}
     </ul>
   )

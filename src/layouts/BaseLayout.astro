@@ -1,5 +1,6 @@
 ---
 import '~/styles/global.css'
+import { ClientRouter } from 'astro:transitions'
 
 interface Props {
   title?: string
@@ -20,6 +21,7 @@ const siteUrl = 'https://danwoo-dev.netlify.app'
 const metaUrl = url ?? siteUrl
 const metaThumbnail = thumbnail ?? `${siteUrl}/og.png`
 const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`
+const isBookPage = Astro.url.pathname.startsWith('/book')
 ---
 
 <!doctype html>
@@ -42,69 +44,94 @@ const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={metaThumbnail} />
-    <meta
-      name="google-site-verification"
-      content="-kohA7qdl_10fMUGOMlZ7EArpE6vOn0DHONUwImizX8"
-    />
+    <meta name="google-site-verification" content="-kohA7qdl_10fMUGOMlZ7EArpE6vOn0DHONUwImizX8" />
+    <ClientRouter />
+
+    <!-- Anti-flash: apply theme before first paint -->
+    <script is:inline>
+      (function () {
+        const saved = localStorage.getItem('theme')
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const theme = saved ?? (prefersDark ? 'dark' : 'light')
+        document.documentElement.setAttribute('data-theme', theme)
+      })()
+    </script>
   </head>
+
   <body class="min-h-screen flex flex-col">
     <div id="scroll-sentinel" class="absolute top-0 h-0 w-full pointer-events-none"></div>
 
-    <header
-      id="main-header"
-      class="sticky top-0 z-[9999] w-full bg-white/95 backdrop-blur-sm border-b border-grey-3 transition-shadow duration-200"
-    >
-      <div class="max-w-[720px] mx-auto flex items-center px-5 h-14 sm:h-16">
-        <a
-          class="mr-auto text-green-0 text-lg font-bold tracking-tight hover:text-green-1 transition-colors"
-          href="/"
-        >
+    <header id="main-header" class="site-header sticky top-0 z-[9999] w-full">
+      <div class="max-w-[800px] mx-auto flex items-center px-5 h-14 sm:h-16 gap-5">
+        <a class="header-logo mr-auto" href={isBookPage ? '/book' : '/'}>
           Dansoon
         </a>
-        <nav class="flex items-center gap-5 sm:gap-7">
-          <a
-            class="text-grey-0 text-sm font-medium hover:text-[#1c1c1c] transition-colors"
-            href="/book"
-          >BOOK</a>
-          <a
-            class="text-grey-0 text-sm font-medium hover:text-[#1c1c1c] transition-colors"
-            href="https://docs.google.com/document/d/1_oia6H3WisAHsGNJWZAYqru9pHUXovRNAaRJcZn5UBU/preview"
-            target="_blank"
-            rel="noopener noreferrer"
-          >ME</a>
-          <a
-            class="text-grey-0 text-sm font-medium hover:text-[#1c1c1c] transition-colors"
-            href="https://github.com/KimDanwoo"
-            target="_blank"
-            rel="noopener noreferrer"
-          >GITHUB</a>
+        <nav class="flex items-center gap-5">
+          {isBookPage
+            ? <a class="nav-link" href="/">TECH</a>
+            : <a class="nav-link" href="/book">BOOK</a>
+          }
+          <a class="nav-link" href="https://docs.google.com/document/d/1_oia6H3WisAHsGNJWZAYqru9pHUXovRNAaRJcZn5UBU/preview" target="_blank" rel="noopener noreferrer">ME</a>
+          <a class="nav-link" href="https://github.com/KimDanwoo" target="_blank" rel="noopener noreferrer">GITHUB</a>
         </nav>
+        <button id="theme-toggle" class="theme-toggle" aria-label="테마 변경" type="button">
+          <!-- Sun icon (dark mode → switch to light) -->
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <!-- Moon icon (light mode → switch to dark) -->
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
       </div>
     </header>
 
-    <main class="flex-1 max-w-[720px] w-full mx-auto px-5 py-8 sm:py-12">
+    <main class="flex-1 max-w-[800px] w-full mx-auto px-5 py-8 sm:py-12" style="view-transition-name: main-content">
       <slot />
     </main>
 
-    <footer class="border-t border-grey-3">
-      <div class="max-w-[720px] mx-auto px-5 py-8 flex items-center justify-between text-sm text-grey-1">
-        <span>© {new Date().getFullYear()} <a class="font-semibold text-grey-0 hover:text-green-0 transition-colors" href="https://github.com/KimDanwoo">Danwoo</a></span>
-        <span>Built with <a class="font-semibold text-grey-0 hover:text-green-0 transition-colors" href="https://astro.build">Astro</a></span>
+    <footer class="site-footer">
+      <div class="max-w-[800px] mx-auto px-5 py-8 flex items-center justify-between text-sm" style="color: var(--text-muted)">
+        <span>© {new Date().getFullYear()} <a class="footer-link" href="https://github.com/KimDanwoo">Danwoo</a></span>
+        <span>Built with <a class="footer-link" href="https://astro.build">Astro</a></span>
       </div>
     </footer>
 
     <script>
-      const sentinel = document.getElementById('scroll-sentinel')
-      const header = document.getElementById('main-header')
-      if (sentinel && header) {
-        const observer = new IntersectionObserver(
-          ([entry]) => {
-            header.classList.toggle('shadow-sm', !entry.isIntersecting)
-          },
-          { threshold: 1.0 }
-        )
-        observer.observe(sentinel)
+      function init() {
+        // Scroll shadow
+        const sentinel = document.getElementById('scroll-sentinel')
+        const header = document.getElementById('main-header')
+        if (sentinel && header) {
+          new IntersectionObserver(
+            ([e]) => header.classList.toggle('scrolled', !e.isIntersecting),
+            { threshold: 1.0 }
+          ).observe(sentinel)
+        }
+
+        // Theme toggle
+        const btn = document.getElementById('theme-toggle')
+        btn?.addEventListener('click', () => {
+          const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+          const next = isDark ? 'light' : 'dark'
+          document.documentElement.setAttribute('data-theme', next)
+          localStorage.setItem('theme', next)
+        })
       }
+
+      // 첫 로드
+      init()
+      // ViewTransitions 이후 페이지마다 재실행
+      document.addEventListener('astro:after-swap', init)
     </script>
   </body>
 </html>
