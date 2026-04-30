@@ -10,11 +10,12 @@ export async function GET(context: APIContext) {
     .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
     .map(post => {
       const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '')
+      const prefix = post.collection === 'book' ? 'book' : 'tech'
       return {
         title: post.data.title,
         description: post.data.description,
         pubDate: post.data.date,
-        link: `/${slug}/`
+        link: `/${prefix}/${slug}/`
       }
     })
 

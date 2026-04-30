@@ -1,9 +1,13 @@
+#!/usr/bin/env python3
+"""도서 주간 베스트셀러 수집 — 알라딘(API) · 교보문고 · YES24 · 리디"""
+
 import os
 import sys
 import json
 import re
 import pathlib
 import requests
+from playwright.sync_api import sync_playwright, Page
 from google import genai
 from datetime import datetime
 
@@ -18,27 +22,82 @@ if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY 환경변수가 필요합니다.")
 
 GENRES = [
-    {"key": "novel",   "name": "소설",     "emoji": "📖", "aladin_id": 1,     "ridi_keywords": ["소설", "fiction", "novel", "SF", "판타지", "로맨스", "추리", "공포"]},
-    {"key": "economy", "name": "경제경영", "emoji": "💼", "aladin_id": 170,   "ridi_keywords": ["경제", "경영", "비즈니스", "투자", "재테크", "마케팅"]},
-    {"key": "selfdev", "name": "자기계발", "emoji": "🚀", "aladin_id": 336,   "ridi_keywords": ["자기계발", "성공", "습관", "리더십", "동기"]},
-    {"key": "humanit", "name": "인문사회", "emoji": "🌍", "aladin_id": 656,   "ridi_keywords": ["인문", "사회", "철학", "역사", "정치", "교육"]},
-    {"key": "science", "name": "과학기술", "emoji": "🔬", "aladin_id": 987,   "ridi_keywords": ["과학", "기술", "IT", "수학", "물리", "생물"]},
-    {"key": "essay",   "name": "에세이",   "emoji": "✍️", "aladin_id": 55890, "ridi_keywords": ["에세이", "산문", "여행", "일상"]},
+    {"key": "novel",   "name": "소설",     "emoji": "📖", "aladin_id": 1,     "keywords": ["소설", "fiction", "novel", "SF", "판타지", "로맨스", "추리", "공포"]},
+    {"key": "economy", "name": "경제경영", "emoji": "💼", "aladin_id": 170,   "keywords": ["경제", "경영", "비즈니스", "투자", "재테크", "마케팅"]},
+    {"key": "selfdev", "name": "자기계발", "emoji": "🚀", "aladin_id": 336,   "keywords": ["자기계발", "성공", "습관", "리더십", "동기"]},
+    {"key": "humanit", "name": "인문사회", "emoji": "🌍", "aladin_id": 656,   "keywords": ["인문", "사회", "철학", "역사", "정치", "교육"]},
+    {"key": "science", "name": "과학기술", "emoji": "🔬", "aladin_id": 987,   "keywords": ["과학", "기술", "IT", "수학", "물리", "생물"]},
+    {"key": "essay",   "name": "에세이",   "emoji": "✍️", "aladin_id": 55890, "keywords": ["에세이", "산문", "여행", "일상"]},
 ]
 
 
+def classify_genre(text: str) -> str:
+    text_lower = text.lower()
+    for genre in GENRES:
+        if any(kw.lower() in text_lower for kw in genre["keywords"]):
+            return genre["key"]
+    return "etc"
+
+
+def _extract_next_data(html: str) -> dict:
+    match = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(1))
+        except Exception:
+            pass
+    return {}
+
+
+def _find_book_items(obj, depth=0) -> list:
+    if depth > 6:
+        return []
+    if isinstance(obj, list) and obj and isinstance(obj[0], dict):
+        if "book" in obj[0] or ("id" in obj[0] and "title" in obj[0]):
+            return obj
+    if isinstance(obj, dict):
+        for v in obj.values():
+            found = _find_book_items(v, depth + 1)
+            if found:
+                return found
+    return []
+
+
 # ── 알라딘 API ──────────────────────────────────────────────
+def fetch_aladin_overall(limit: int = 20) -> list[dict]:
+    url = "http://www.aladin.co.kr/ttb/api/ItemList.aspx"
+    params = {
+        "ttbkey": ALADIN_TTB_KEY, "QueryType": "Bestseller",
+        "MaxResults": limit, "start": 1, "SearchTarget": "Book",
+        "output": "js", "Version": "20131101", "CategoryId": 0,
+    }
+    try:
+        data = requests.get(url, params=params, timeout=10).json()
+        results = []
+        for i, item in enumerate(data.get("item", []), start=1):
+            cat_name = item.get("categoryName", "")
+            results.append({
+                "rank": i,
+                "title": item["title"].split(" - ")[0].strip(),
+                "author": item["author"].split("(지은이)")[0].strip().split(",")[0].strip(),
+                "cover": item.get("cover", ""),
+                "link": item["link"],
+                "publisher": item.get("publisher", ""),
+                "genre_key": classify_genre(cat_name),
+                "source": "알라딘",
+            })
+        return results
+    except Exception as e:
+        print(f"  ⚠️  알라딘 전체 실패: {e}")
+        return []
+
+
 def fetch_aladin_genre(genre: dict, limit: int = 10) -> list[dict]:
     url = "http://www.aladin.co.kr/ttb/api/ItemList.aspx"
     params = {
-        "ttbkey": ALADIN_TTB_KEY,
-        "QueryType": "Bestseller",
-        "MaxResults": limit,
-        "start": 1,
-        "SearchTarget": "Book",
-        "output": "js",
-        "Version": "20131101",
-        "CategoryId": genre["aladin_id"],
+        "ttbkey": ALADIN_TTB_KEY, "QueryType": "Bestseller",
+        "MaxResults": limit, "start": 1, "SearchTarget": "Book",
+        "output": "js", "Version": "20131101", "CategoryId": genre["aladin_id"],
     }
     try:
         data = requests.get(url, params=params, timeout=10).json()
@@ -60,76 +119,193 @@ def fetch_aladin_genre(genre: dict, limit: int = 10) -> list[dict]:
         return []
 
 
-def fetch_aladin_overall(limit: int = 20) -> list[dict]:
-    url = "http://www.aladin.co.kr/ttb/api/ItemList.aspx"
-    params = {
-        "ttbkey": ALADIN_TTB_KEY,
-        "QueryType": "Bestseller",
-        "MaxResults": limit,
-        "start": 1,
-        "SearchTarget": "Book",
-        "output": "js",
-        "Version": "20131101",
-        "CategoryId": 0,
-    }
-    try:
-        data = requests.get(url, params=params, timeout=10).json()
-        results = []
-        for i, item in enumerate(data.get("item", []), start=1):
-            cat_name = item.get("categoryName", "")
-            genre_key = classify_genre_by_text(cat_name)
-            results.append({
-                "rank": i,
-                "title": item["title"].split(" - ")[0].strip(),
-                "author": item["author"].split("(지은이)")[0].strip().split(",")[0].strip(),
-                "cover": item.get("cover", ""),
-                "link": item["link"],
-                "publisher": item.get("publisher", ""),
-                "genre_key": genre_key,
-                "source": "알라딘",
-            })
-        return results
-    except Exception as e:
-        print(f"  ⚠️  알라딘 전체 실패: {e}")
-        return []
+# ── 교보문고 ────────────────────────────────────────────────
+def fetch_kyobo(pw_page: Page, limit: int = 20) -> list[dict]:
+    urls = [
+        "https://store.kyobobook.co.kr/bestseller/online",
+        "https://store.kyobobook.co.kr/bestseller/total",
+    ]
+    for url in urls:
+        try:
+            print(f"  교보문고 URL={url}")
+            pw_page.goto(url, wait_until="networkidle", timeout=30000)
+            html = pw_page.content()
 
+            # __NEXT_DATA__ 시도
+            data = _extract_next_data(html)
+            if data:
+                items = _find_book_items(data)
+                if items:
+                    results = []
+                    for i, item in enumerate(items[:limit], start=1):
+                        title = item.get("cmdtName") or item.get("title") or item.get("name") or ""
+                        if isinstance(title, dict):
+                            title = title.get("main") or ""
+                        author = item.get("authNm") or item.get("author") or item.get("writerName") or ""
+                        if isinstance(author, list):
+                            author = author[0] if author else ""
+                        thumbnail = item.get("imgPath") or item.get("thumbnail") or item.get("coverImg") or ""
+                        if isinstance(thumbnail, dict):
+                            thumbnail = thumbnail.get("url") or ""
+                        isbn = item.get("isbn") or item.get("barcode") or item.get("id") or ""
+                        link = f"https://product.kyobobook.co.kr/detail/{isbn}" if isbn else url
+                        genre_text = str(item.get("categoryName") or item.get("category") or "")
+                        results.append({
+                            "rank": i,
+                            "title": str(title).strip(),
+                            "author": str(author).strip(),
+                            "cover": str(thumbnail).strip(),
+                            "link": link,
+                            "publisher": str(item.get("pbcmName") or item.get("publisher") or "").strip(),
+                            "genre_key": classify_genre(genre_text + " " + str(title)),
+                            "source": "교보문고",
+                        })
+                    if results:
+                        print(f"  교보문고 items={len(results)}개 발견 (NEXT_DATA)")
+                        return results
 
-# ── 리디 크롤링 ─────────────────────────────────────────────
-def _find_book_items(obj, depth=0) -> list:
-    """JSON 트리에서 book 리스트를 재귀 탐색"""
-    if depth > 6:
-        return []
-    if isinstance(obj, list) and obj and isinstance(obj[0], dict):
-        if "book" in obj[0] or ("id" in obj[0] and "title" in obj[0]):
-            return obj
-    if isinstance(obj, dict):
-        for v in obj.values():
-            found = _find_book_items(v, depth + 1)
-            if found:
-                return found
+            # DOM 직접 추출
+            pw_page.wait_for_selector("[class*='BestSeller'], [class*='bestseller'], ol li, ul li", timeout=10000)
+            # 제목 셀렉터 시도
+            for sel in (
+                "a[href*='/detail/'] span[class*='title']",
+                "a[href*='/detail/']",
+                "[class*='book'] a",
+            ):
+                els = pw_page.query_selector_all(sel)
+                if not els:
+                    continue
+                results = []
+                seen = set()
+                for el in els:
+                    title = el.inner_text().strip()
+                    href = el.get_attribute("href") or ""
+                    if not title or len(title) < 2 or title in seen:
+                        continue
+                    seen.add(title)
+                    results.append({
+                        "rank": len(results) + 1,
+                        "title": title,
+                        "author": "",
+                        "cover": "",
+                        "link": href if href.startswith("http") else f"https://store.kyobobook.co.kr{href}",
+                        "publisher": "",
+                        "genre_key": classify_genre(title),
+                        "source": "교보문고",
+                    })
+                    if len(results) >= limit:
+                        break
+                if results:
+                    print(f"  교보문고 items={len(results)}개 발견 (DOM)")
+                    return results
+
+            print("  ⚠️  교보문고 데이터 없음, 다음 URL 시도")
+        except Exception as e:
+            print(f"  ⚠️  교보문고 {url} 실패: {e}")
+
+    print("  ⚠️  교보문고 모든 URL 실패")
     return []
 
 
-def fetch_ridi(limit: int = 30) -> list[dict]:
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-                      "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "Accept-Language": "ko-KR,ko;q=0.9",
-    }
+# ── YES24 ───────────────────────────────────────────────────
+def fetch_yes24(pw_page: Page, limit: int = 20) -> list[dict]:
+    urls = [
+        "https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001",
+        "https://www.yes24.com/Product/Category/BestSeller",
+    ]
+    for url in urls:
+        try:
+            print(f"  YES24 URL={url}")
+            pw_page.goto(url, wait_until="networkidle", timeout=30000)
+            html = pw_page.content()
+
+            # __NEXT_DATA__ 시도
+            data = _extract_next_data(html)
+            if data:
+                items = _find_book_items(data)
+                if items:
+                    results = []
+                    for i, item in enumerate(items[:limit], start=1):
+                        title = item.get("title") or item.get("goodsNm") or ""
+                        author = item.get("author") or item.get("writerName") or ""
+                        thumbnail = item.get("imgPath") or item.get("thumbnail") or ""
+                        goods_no = item.get("goodsNo") or item.get("id") or ""
+                        link = f"https://www.yes24.com/Product/Goods/{goods_no}" if goods_no else url
+                        genre_text = str(item.get("categoryName") or "")
+                        results.append({
+                            "rank": i,
+                            "title": str(title).strip(),
+                            "author": str(author).strip(),
+                            "cover": str(thumbnail).strip(),
+                            "link": link,
+                            "publisher": str(item.get("publisherName") or "").strip(),
+                            "genre_key": classify_genre(genre_text + " " + str(title)),
+                            "source": "YES24",
+                        })
+                    if results:
+                        print(f"  YES24 items={len(results)}개 발견 (NEXT_DATA)")
+                        return results
+
+            # HTML 파싱 — YES24는 서버사이드 렌더링 비율이 높음
+            # 순위 리스트: ol.bestList li 또는 유사 구조
+            for sel in (
+                "ol.bestList li .info .subject a",
+                "ul.bestList li .info a",
+                "li.item_li .info_row a.gd_name",
+                "a.gd_name",
+                "[class*='best'] a[href*='/Product/Goods/']",
+            ):
+                els = pw_page.query_selector_all(sel)
+                if not els:
+                    continue
+                results = []
+                seen = set()
+                for el in els:
+                    title = el.inner_text().strip()
+                    href = el.get_attribute("href") or ""
+                    if not title or len(title) < 2 or title in seen:
+                        continue
+                    seen.add(title)
+                    link = href if href.startswith("http") else f"https://www.yes24.com{href}"
+                    results.append({
+                        "rank": len(results) + 1,
+                        "title": title,
+                        "author": "",
+                        "cover": "",
+                        "link": link,
+                        "publisher": "",
+                        "genre_key": classify_genre(title),
+                        "source": "YES24",
+                    })
+                    if len(results) >= limit:
+                        break
+                if results:
+                    print(f"  YES24 items={len(results)}개 발견 (DOM:{sel})")
+                    return results
+
+            print("  ⚠️  YES24 데이터 없음, 다음 URL 시도")
+        except Exception as e:
+            print(f"  ⚠️  YES24 {url} 실패: {e}")
+
+    print("  ⚠️  YES24 모든 URL 실패")
+    return []
+
+
+# ── 리디 ────────────────────────────────────────────────────
+def fetch_ridi(pw_page: Page, limit: int = 20) -> list[dict]:
     urls = [
         "https://ridibooks.com/bestsellers",
         "https://ridibooks.com/books/bestsellers",
     ]
     for url in urls:
         try:
-            resp = requests.get(url, headers=headers, timeout=15)
-            print(f"  리디 URL={url} status={resp.status_code}")
-            html = resp.text
-            match = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
-            if not match:
-                print("  ⚠️  __NEXT_DATA__ 없음, 다음 URL 시도")
+            print(f"  리디 URL={url}")
+            pw_page.goto(url, wait_until="networkidle", timeout=30000)
+            html = pw_page.content()
+            data = _extract_next_data(html)
+            if not data:
+                print("  ⚠️  리디 __NEXT_DATA__ 없음, 다음 URL 시도")
                 continue
-            data = json.loads(match.group(1))
             queries = (data.get("props", {})
                            .get("pageProps", {})
                            .get("dehydratedState", {})
@@ -138,7 +314,6 @@ def fetch_ridi(limit: int = 30) -> list[dict]:
             items = []
             for q in queries:
                 q_data = q.get("state", {}).get("data", {})
-                # 알려진 키 우선 탐색
                 for key in ("bestsellers", "chartBooks", "books", "items"):
                     node = q_data.get(key)
                     if isinstance(node, dict) and "items" in node:
@@ -157,43 +332,33 @@ def fetch_ridi(limit: int = 30) -> list[dict]:
                 continue
             results = []
             for i, entry in enumerate(items[:limit], start=1):
-                book = entry.get("book", entry)  # book 키가 없으면 entry 자체가 book
+                book = entry.get("book", entry)
                 title_node = book.get("title", {})
                 title = title_node.get("main", "") if isinstance(title_node, dict) else str(title_node)
+                if not title:
+                    continue
                 authors = book.get("authors", [])
                 author = authors[0].get("name", "") if authors and isinstance(authors[0], dict) else ""
                 book_id = book.get("id", "")
                 thumb = book.get("thumbnail", {})
-                cover = thumb.get("large", "") or thumb.get("small", "") if isinstance(thumb, dict) else ""
+                cover = (thumb.get("large", "") or thumb.get("small", "")) if isinstance(thumb, dict) else ""
                 cats = book.get("categories", [])
                 cat_text = " ".join([c.get("name", "") for c in cats if isinstance(c, dict)])
-                genre_key = classify_genre_by_text(cat_text)
-                if not title:
-                    continue
                 results.append({
                     "rank": i,
-                    "title": title,
-                    "author": author,
+                    "title": title.strip(),
+                    "author": author.strip(),
                     "cover": cover,
                     "link": f"https://ridibooks.com/books/{book_id}",
                     "publisher": "",
-                    "genre_key": genre_key,
+                    "genre_key": classify_genre(cat_text),
                     "source": "리디",
                 })
             return results
         except Exception as e:
             print(f"  ⚠️  리디 {url} 실패: {e}")
-    print("  ⚠️  리디 모든 URL 실패, 알라딘 단독으로 진행")
+    print("  ⚠️  리디 모든 URL 실패")
     return []
-
-
-# ── 장르 분류 ────────────────────────────────────────────────
-def classify_genre_by_text(text: str) -> str:
-    text_lower = text.lower()
-    for genre in GENRES:
-        if any(kw.lower() in text_lower for kw in genre["ridi_keywords"]):
-            return genre["key"]
-    return "etc"
 
 
 # ── 종합 순위 합산 ──────────────────────────────────────────
@@ -204,14 +369,16 @@ def merge_rankings(all_items: list[dict], top_n: int = 15, MAX_RANK: int = 30) -
         return re.sub(r"[\s\W]", "", title).lower()
 
     for item in all_items:
+        if not item.get("title"):
+            continue
         key = normalize(item["title"])
         pts = max(0, MAX_RANK + 1 - item["rank"])
         if key not in scores:
             scores[key] = {
                 "title": item["title"],
                 "author": item["author"],
-                "cover": item["cover"],
-                "link": item["link"],
+                "cover": item.get("cover", ""),
+                "link": item.get("link", ""),
                 "publisher": item.get("publisher", ""),
                 "score": 0,
                 "sources": {},
@@ -219,6 +386,7 @@ def merge_rankings(all_items: list[dict], top_n: int = 15, MAX_RANK: int = 30) -
             }
         scores[key]["score"] += pts
         scores[key]["sources"][item["source"]] = item["rank"]
+        # 알라딘 커버/링크 우선
         if item["source"] == "알라딘" and item.get("cover"):
             scores[key]["cover"] = item["cover"]
             scores[key]["link"] = item["link"]
@@ -238,18 +406,17 @@ def generate_ai_content(overall: list[dict], genre_data: dict[str, list[dict]]) 
     client = genai.Client(api_key=GEMINI_API_KEY)
 
     overall_list = "\n".join(
-        [f"{b['rank']}. {b['title']} - {b['author']} ({', '.join(f'{k} {v}위' for k, v in b['sources'].items())})"
-         for b in overall[:10]]
+        f"{b['rank']}. {b['title']} - {b['author']} ({', '.join(f'{k} {v}위' for k, v in b['sources'].items())})"
+        for b in overall[:10]
     )
-
     genre_summary = ""
     for genre in GENRES:
         books = genre_data.get(genre["key"], [])
         if books:
             genre_summary += f"\n[{genre['name']}]\n"
-            genre_summary += "\n".join([f"  {b['rank']}. {b['title']} - {b['author']}" for b in books[:3]])
+            genre_summary += "\n".join(f"  {b['rank']}. {b['title']} - {b['author']}" for b in books[:3])
 
-    prompt = f"""아래는 알라딘과 리디 베스트셀러를 종합한 데이터입니다.
+    prompt = f"""아래는 알라딘·교보문고·YES24·리디 베스트셀러를 종합한 데이터입니다.
 
 ## 종합 TOP 10
 {overall_list}
@@ -298,14 +465,16 @@ def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], ai_co
 
     rows = []
     for b in overall:
-        aladin = f"{b['sources'].get('알라딘', '-')}위" if b['sources'].get('알라딘') else "-"
-        ridi = f"{b['sources'].get('리디', '-')}위" if b['sources'].get('리디') else "-"
-        genre = next((g["name"] for g in GENRES if g["key"] == b["genre_key"]), "기타")
-        rows.append(f"| **{b['rank']}** | [{b['title']}]({b['link']}) | {b['author']} | {genre} | {aladin} | {ridi} |")
+        aladin = f"{b['sources'].get('알라딘', '')}위" if b['sources'].get('알라딘') else "-"
+        kyobo  = f"{b['sources'].get('교보문고', '')}위" if b['sources'].get('교보문고') else "-"
+        yes24  = f"{b['sources'].get('YES24', '')}위" if b['sources'].get('YES24') else "-"
+        ridi   = f"{b['sources'].get('리디', '')}위" if b['sources'].get('리디') else "-"
+        genre  = next((g["name"] for g in GENRES if g["key"] == b["genre_key"]), "기타")
+        rows.append(f"| **{b['rank']}** | [{b['title']}]({b['link']}) | {b['author']} | {genre} | {aladin} | {kyobo} | {yes24} | {ridi} |")
 
     overall_table = "\n".join([
-        "| 순위 | 책 | 저자 | 장르 | 알라딘 | 리디 |",
-        "|:----:|-----|------|------|:------:|:----:|",
+        "| 순위 | 책 | 저자 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |",
+        "|:----:|-----|------|------|:------:|:-------:|:-----:|:----:|",
         *rows,
     ])
 
@@ -316,13 +485,14 @@ def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], ai_co
             continue
         genre_rows = []
         for b in books:
-            aladin = f"{b['sources'].get('알라딘', '-')}위" if b['sources'].get('알라딘') else "-"
-            ridi = f"{b['sources'].get('리디', '-')}위" if b['sources'].get('리디') else "-"
-            genre_rows.append(f"| **{b['rank']}** | [{b['title']}]({b['link']}) | {b['author']} | {aladin} | {ridi} |")
-
+            aladin = f"{b['sources'].get('알라딘', '')}위" if b['sources'].get('알라딘') else "-"
+            kyobo  = f"{b['sources'].get('교보문고', '')}위" if b['sources'].get('교보문고') else "-"
+            yes24  = f"{b['sources'].get('YES24', '')}위" if b['sources'].get('YES24') else "-"
+            ridi   = f"{b['sources'].get('리디', '')}위" if b['sources'].get('리디') else "-"
+            genre_rows.append(f"| **{b['rank']}** | [{b['title']}]({b['link']}) | {b['author']} | {aladin} | {kyobo} | {yes24} | {ridi} |")
         genre_table = "\n".join([
-            "| 순위 | 책 | 저자 | 알라딘 | 리디 |",
-            "|:----:|-----|------|:------:|:----:|",
+            "| 순위 | 책 | 저자 | 알라딘 | 교보문고 | YES24 | 리디 |",
+            "|:----:|-----|------|:------:|:-------:|:-----:|:----:|",
             *genre_rows,
         ])
         genre_sections += f"\n### {genre['emoji']} {genre['name']}\n\n{genre_table}\n"
@@ -330,7 +500,7 @@ def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], ai_co
     return f"""---
 title: "종합 베스트셀러 ({date_kr})"
 date: {date_str}
-description: "알라딘, 리디 베스트셀러를 종합한 TOP 15와 장르별 베스트셀러입니다."
+description: "알라딘·교보문고·YES24·리디 베스트셀러를 종합한 TOP 15와 장르별 베스트셀러입니다."
 category: "bestseller"
 isHidden: true
 ---
@@ -350,7 +520,7 @@ isHidden: true
 
 ---
 
-*데이터 출처: [알라딘](https://www.aladin.co.kr) · [리디](https://ridibooks.com)*
+*데이터 출처: [알라딘](https://www.aladin.co.kr) · [교보문고](https://store.kyobobook.co.kr) · [YES24](https://www.yes24.com) · [리디](https://ridibooks.com)*
 *Gemini AI가 자동으로 수집·분석한 베스트셀러 리포트입니다.*
 """
 
@@ -359,6 +529,7 @@ isHidden: true
 def main():
     print(f"[{DATE}] 베스트셀러 수집 시작\n")
 
+    # 알라딘 — API (requests)
     print("  📚 알라딘 전체 베스트셀러 수집...")
     aladin_overall = fetch_aladin_overall(20)
     print(f"     → {len(aladin_overall)}개")
@@ -368,20 +539,40 @@ def main():
         print(f"  📚 알라딘 [{genre['name']}] 수집...")
         aladin_by_genre[genre["key"]] = fetch_aladin_genre(genre, limit=10)
 
-    print("  📱 리디 베스트셀러 수집...")
-    ridi_items = fetch_ridi(30)
-    print(f"     → {len(ridi_items)}개")
+    # 교보문고 · YES24 · 리디 — Playwright (브라우저 1개 공유)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        ctx = browser.new_context(locale="ko-KR")
+        pw_page = ctx.new_page()
 
+        print("  🏪 교보문고 수집...")
+        kyobo_items = fetch_kyobo(pw_page, 20)
+        print(f"     → {len(kyobo_items)}개")
+
+        print("  🛒 YES24 수집...")
+        yes24_items = fetch_yes24(pw_page, 20)
+        print(f"     → {len(yes24_items)}개")
+
+        print("  📱 리디 수집...")
+        ridi_items = fetch_ridi(pw_page, 20)
+        print(f"     → {len(ridi_items)}개")
+
+        browser.close()
+
+    # 종합 순위
     print("\n  🔢 종합 순위 계산...")
-    all_items = aladin_overall + ridi_items
+    all_items = aladin_overall + kyobo_items + yes24_items + ridi_items
     overall = merge_rankings(all_items, top_n=15)
     print(f"     → 종합 {len(overall)}개")
 
     genre_data: dict[str, list[dict]] = {}
     for genre in GENRES:
-        genre_items = aladin_by_genre.get(genre["key"], [])
-        ridi_genre = [b for b in ridi_items if b["genre_key"] == genre["key"]]
-        combined = genre_items + ridi_genre
+        combined = (
+            aladin_by_genre.get(genre["key"], []) +
+            [b for b in kyobo_items if b["genre_key"] == genre["key"]] +
+            [b for b in yes24_items  if b["genre_key"] == genre["key"]] +
+            [b for b in ridi_items   if b["genre_key"] == genre["key"]]
+        )
         if combined:
             genre_data[genre["key"]] = merge_genre_rankings(combined, top_n=5)
             print(f"     [{genre['name']}] {len(genre_data[genre['key']])}개")

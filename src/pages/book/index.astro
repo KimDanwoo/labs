@@ -14,7 +14,7 @@ const bookPosts = allPosts
       category: post.data.category ?? '',
       isHidden: false,
       thumbnail: post.data.thumbnail ? { src: post.data.thumbnail.src } : null,
-      url: `/${slug}/`,
+      url: `/book/${slug}/`,
       publishedAt: post.data.date.toLocaleDateString('ko-KR', {
         year: 'numeric',
         month: 'long',
@@ -25,5 +25,14 @@ const bookPosts = allPosts
 ---
 
 <BaseLayout title="베스트셀러 | blog.danwoo" description="알라딘, 리디 베스트셀러 주간 리포트">
+  <div class="page-hero animate-fade-in-up">
+    <p class="page-hero-tag">Weekly Report</p>
+    <h1 class="page-hero-title">베스트셀러</h1>
+    <p class="page-hero-subtitle">
+      알라딘·리디 주간 베스트셀러를 한눈에 — 지금 읽어야 할 책.
+    </p>
+    <div class="page-hero-divider"></div>
+  </div>
+
   <PostList posts={bookPosts} />
 </BaseLayout>

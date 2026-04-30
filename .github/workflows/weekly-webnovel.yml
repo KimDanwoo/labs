@@ -1,8 +1,8 @@
-name: Weekly Bestseller
+name: Weekly Webnovel
 
 on:
   schedule:
-    - cron: '0 1 * * 1' # 매주 월요일 오전 10시 KST (UTC 01:00)
+    - cron: '0 2 * * 1' # 매주 월요일 오전 11시 KST (UTC 02:00)
   workflow_dispatch:
 
 jobs:
@@ -38,21 +38,20 @@ jobs:
           python-version: '3.12'
 
       - name: Install Python dependencies
-        run: pip install requests google-genai playwright
+        run: pip install google-genai playwright
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('**/weekly-bestseller.yml') }}
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('**/weekly-webnovel.yml') }}
 
       - name: Install Playwright browsers
         run: playwright install chromium --with-deps
 
-      - name: Fetch bestseller data
-        run: python scripts/fetch_bestseller.py ${{ steps.date.outputs.date }}
+      - name: Fetch webnovel data
+        run: python scripts/fetch_webnovel.py ${{ steps.date.outputs.date }}
         env:
-          ALADIN_TTB_KEY: ${{ secrets.ALADIN_TTB_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Create Pull Request
@@ -60,14 +59,14 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: '✨ feat(${{ steps.date.outputs.date }}): 주간 베스트셀러 추가'
-          title: '✨ feat(${{ steps.date.outputs.date }}): 주간 베스트셀러 추가'
+          commit-message: '✨ feat(${{ steps.date.outputs.date }}): 주간 웹소설 베스트셀러 추가'
+          title: '✨ feat(${{ steps.date.outputs.date }}): 주간 웹소설 베스트셀러 추가'
           body: |
             ## 📋 변경사항
             - 날짜: ${{ steps.date.outputs.date }}
-            - 파일: `contents/blog/${{ steps.date.outputs.date }}-bestseller/index.md`
-            - 알라딘, 리디 베스트셀러 수집 및 Gemini AI 분석
-          branch: 'feature/${{ steps.date.outputs.date }}-bestseller'
+            - 파일: `contents/book/${{ steps.date.outputs.date }}-webnovel/index.md`
+            - 카카오페이지·네이버 시리즈·리디 웹소설 베스트셀러 수집 및 Gemini AI 분석
+          branch: 'feature/${{ steps.date.outputs.date }}-webnovel'
           base: 'main'
 
       - name: Auto-merge Pull Request
