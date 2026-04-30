@@ -64,6 +64,20 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
   </article>
 </BaseLayout>
 
+<script>
+  function wrapTables() {
+    document.querySelectorAll('.article-body table').forEach(table => {
+      if (table.parentElement?.classList.contains('table-wrap')) return
+      const wrap = document.createElement('div')
+      wrap.className = 'table-wrap'
+      table.parentNode!.insertBefore(wrap, table)
+      wrap.appendChild(table)
+    })
+  }
+  wrapTables()
+  document.addEventListener('astro:after-swap', wrapTables)
+</script>
+
 <style>
   .article-title {
     font-size: clamp(1.5rem, 4vw, 2rem);
@@ -135,13 +149,18 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
     color: var(--text-secondary);
   }
 
-  .article-body :global(table) {
-    display: block;
+  .article-body :global(.table-wrap) {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin: 1.25rem 0;
+  }
+
+  .article-body :global(table) {
+    width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
-    min-width: 100%;
   }
 
   .article-body :global(th) {
