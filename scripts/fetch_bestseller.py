@@ -23,13 +23,37 @@ if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY 환경변수가 필요합니다.")
 
 GENRES = [
-    {"key": "novel",   "name": "소설",     "emoji": "📖", "aladin_id": 1,     "keywords": ["소설", "fiction", "novel", "SF", "판타지", "로맨스", "추리", "공포"]},
-    {"key": "economy", "name": "경제경영", "emoji": "💼", "aladin_id": 170,   "keywords": ["경제", "경영", "비즈니스", "투자", "재테크", "마케팅"]},
-    {"key": "selfdev", "name": "자기계발", "emoji": "🚀", "aladin_id": 336,   "keywords": ["자기계발", "성공", "습관", "리더십", "동기"]},
-    {"key": "humanit", "name": "인문사회", "emoji": "🌍", "aladin_id": 656,   "keywords": ["인문", "사회", "철학", "역사", "정치", "교육"]},
-    {"key": "science", "name": "과학기술", "emoji": "🔬", "aladin_id": 987,   "keywords": ["과학", "기술", "IT", "수학", "물리", "생물"]},
-    {"key": "essay",   "name": "에세이",   "emoji": "✍️", "aladin_id": 55890, "keywords": ["에세이", "산문", "여행", "일상"]},
+    {"key": "novel",   "name": "소설",     "emoji": "📖", "aladin_id": 1,     "keywords": [
+        "소설", "fiction", "novel", "sf", "판타지", "로맨스", "추리", "공포", "미스터리",
+        "스릴러", "시집", "희곡", "단편", "장편", "문학", "이야기", "동화", "동시"
+    ]},
+    {"key": "economy", "name": "경제경영", "emoji": "💼", "aladin_id": 170,   "keywords": [
+        "경제", "경영", "비즈니스", "투자", "재테크", "마케팅", "금융", "주식", "부동산",
+        "창업", "스타트업", "회계", "세금", "절세", "부의", "돈의", "돈을", "자산", "펀드"
+    ]},
+    {"key": "selfdev", "name": "자기계발", "emoji": "🚀", "aladin_id": 336,   "keywords": [
+        "자기계발", "성공", "습관", "리더십", "동기", "긍정", "루틴", "목표", "의지",
+        "잠재력", "변화", "성장", "생산성", "집중력", "시간관리", "마인드", "행복"
+    ]},
+    {"key": "humanit", "name": "인문사회", "emoji": "🌍", "aladin_id": 656,   "keywords": [
+        "인문", "사회", "철학", "역사", "정치", "교육", "심리", "문화", "종교", "예술",
+        "언어", "윤리", "사상", "고전", "지식", "교양", "미학", "법학", "인간"
+    ]},
+    {"key": "science", "name": "과학기술", "emoji": "🔬", "aladin_id": 987,   "keywords": [
+        "과학", "기술", "it", "수학", "물리", "생물", "화학", "의학", "ai", "인공지능",
+        "뇌", "우주", "자연", "환경", "생태", "진화", "건강", "의료", "코딩", "개발"
+    ]},
+    {"key": "essay",   "name": "에세이",   "emoji": "✍️", "aladin_id": 55890, "keywords": [
+        "에세이", "산문", "여행", "일상", "기행", "감성", "힐링", "치유", "사색", "독립",
+        "청춘", "위로", "기억", "이별", "사랑이야기", "수필"
+    ]},
 ]
+
+_GENRE_KR_TO_KEY = {g["name"]: g["key"] for g in GENRES}
+_GENRE_KR_TO_KEY.update({
+    "소설/시/희곡": "novel", "경제/경영": "economy", "인문학": "humanit",
+    "사회과학": "humanit", "자연과학": "science", "기술/공학": "science",
+})
 
 
 def classify_genre(text: str) -> str:
@@ -139,7 +163,8 @@ def _get_page_text(pw_page: Page, url: str) -> str:
 
 
 def _parse_books_with_gemini(client: genai.Client, text: str, source_name: str, limit: int = 20) -> list[dict]:
-    """Gemini AI로 페이지 텍스트에서 도서 순위 추출"""
+    """Gemini AI로 페이지 텍스트에서 도서 순위 + 장르 추출"""
+    genre_names = "·".join(g["name"] for g in GENRES) + "·기타"
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=f"""다음은 "{source_name}" 베스트셀러 페이지의 텍스트입니다.
@@ -150,10 +175,11 @@ def _parse_books_with_gemini(client: genai.Client, text: str, source_name: str, 
 
 실제 책(도서) 순위 목록만 추출하세요.
 - 실제 책 제목·저자만 (UI버튼·메뉴·이벤트배너·"새창보기"·프로모션 문구 등은 제외)
+- genre: 책 내용 기준으로 ({genre_names}) 중 하나 선택
 - 최대 {limit}개
 - JSON 배열로만 응답
 
-[{{"rank": 1, "title": "책 제목", "author": "저자명"}}]""",
+[{{"rank": 1, "title": "책 제목", "author": "저자명", "genre": "소설"}}]""",
         config=genai_types.GenerateContentConfig(response_mime_type="application/json"),
     )
     raw = response.text.strip()
@@ -171,10 +197,13 @@ def _parse_books_with_gemini(client: genai.Client, text: str, source_name: str, 
         title = str(item.get("title", "")).strip()
         if not title or len(title) < 2:
             continue
+        genre_kr = str(item.get("genre", "")).strip()
+        genre_key = _GENRE_KR_TO_KEY.get(genre_kr) or classify_genre(title)
         results.append({
             "rank": item.get("rank", len(results) + 1),
             "title": title,
             "author": str(item.get("author", "")).strip(),
+            "genre_key": genre_key,
         })
     return results
 
@@ -239,15 +268,14 @@ def fetch_kyobo(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
             if gemini_books:
                 results = []
                 for item in gemini_books:
-                    title = item["title"]
                     results.append({
                         "rank": len(results) + 1,
-                        "title": title,
+                        "title": item["title"],
                         "author": item["author"],
                         "cover": "",
                         "link": url,
                         "publisher": "",
-                        "genre_key": classify_genre(title + " " + item["author"]),
+                        "genre_key": item.get("genre_key", "etc"),
                         "source": "교보문고",
                     })
                     if len(results) >= limit:
@@ -310,15 +338,14 @@ def fetch_yes24(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
             if gemini_books:
                 results = []
                 for item in gemini_books:
-                    title = item["title"]
                     results.append({
                         "rank": len(results) + 1,
-                        "title": title,
+                        "title": item["title"],
                         "author": item["author"],
                         "cover": "",
                         "link": url,
                         "publisher": "",
-                        "genre_key": classify_genre(title + " " + item["author"]),
+                        "genre_key": item.get("genre_key", "etc"),
                         "source": "YES24",
                     })
                     if len(results) >= limit:
@@ -336,12 +363,14 @@ def fetch_yes24(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
 
 
 # ── 리디 ────────────────────────────────────────────────────
-def fetch_ridi(pw_page: Page, limit: int = 20) -> list[dict]:
+def fetch_ridi(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
     urls = [
         "https://ridibooks.com/bestsellers",
         "https://ridibooks.com/books/bestsellers",
     ]
+    last_url = urls[0]
     for url in urls:
+        last_url = url
         try:
             print(f"  리디 URL={url}")
             pw_page.goto(url, wait_until="networkidle", timeout=30000)
@@ -398,9 +427,37 @@ def fetch_ridi(pw_page: Page, limit: int = 20) -> list[dict]:
                     "genre_key": classify_genre(cat_text),
                     "source": "리디",
                 })
-            return results
+            if results:
+                return results
         except Exception as e:
             print(f"  ⚠️  리디 {url} 실패: {e}")
+
+    # Gemini fallback
+    print("  📖 리디 Gemini AI 추출 시도...")
+    try:
+        page_text = pw_page.inner_text("body")
+        gemini_books = _parse_books_with_gemini(client, page_text, "리디", limit)
+        if gemini_books:
+            results = []
+            for item in gemini_books:
+                results.append({
+                    "rank": len(results) + 1,
+                    "title": item["title"],
+                    "author": item["author"],
+                    "cover": "",
+                    "link": last_url,
+                    "publisher": "",
+                    "genre_key": item.get("genre_key", "etc"),
+                    "source": "리디",
+                })
+                if len(results) >= limit:
+                    break
+            if results:
+                print(f"  리디 items={len(results)}개 발견 (Gemini)")
+                return results
+    except Exception as e:
+        print(f"  ⚠️  리디 Gemini fallback 실패: {e}")
+
     print("  ⚠️  리디 모든 URL 실패")
     return []
 
@@ -434,6 +491,9 @@ def merge_rankings(all_items: list[dict], top_n: int = 15, MAX_RANK: int = 30) -
         if item["source"] == "알라딘" and item.get("cover"):
             scores[key]["cover"] = item["cover"]
             scores[key]["link"] = item["link"]
+        # etc보다 나은 장르 정보 있으면 업데이트
+        if scores[key]["genre_key"] == "etc" and item.get("genre_key", "etc") != "etc":
+            scores[key]["genre_key"] = item["genre_key"]
 
     ranked = sorted(scores.values(), key=lambda x: x["score"], reverse=True)
     for i, book in enumerate(ranked[:top_n], start=1):
@@ -545,7 +605,7 @@ def main():
         print(f"     → {len(yes24_items)}개")
 
         print("  📱 리디 수집...")
-        ridi_items = fetch_ridi(pw_page, 20)
+        ridi_items = fetch_ridi(pw_page, client, 20)
         print(f"     → {len(ridi_items)}개")
 
         browser.close()
