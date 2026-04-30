@@ -9,6 +9,7 @@ import pathlib
 import requests
 from playwright.sync_api import sync_playwright, Page
 from google import genai
+from google.genai import types as genai_types
 from datetime import datetime
 
 DATE = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y-%m-%d")
@@ -126,8 +127,60 @@ def fetch_aladin_genre(genre: dict, limit: int = 10) -> list[dict]:
         return []
 
 
+# ── Gemini 헬퍼 ─────────────────────────────────────────────
+def _get_page_text(pw_page: Page, url: str) -> str:
+    pw_page.goto(url, wait_until="networkidle", timeout=30000)
+    return pw_page.evaluate("""() => {
+        const el = document.querySelector(
+            'main, [role="main"], #content, #wrap, .container, article'
+        );
+        return (el || document.body).innerText;
+    }""")
+
+
+def _parse_books_with_gemini(client: genai.Client, text: str, source_name: str, limit: int = 20) -> list[dict]:
+    """Gemini AI로 페이지 텍스트에서 도서 순위 추출"""
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=f"""다음은 "{source_name}" 베스트셀러 페이지의 텍스트입니다.
+
+<page_text>
+{text[:9000]}
+</page_text>
+
+실제 책(도서) 순위 목록만 추출하세요.
+- 실제 책 제목·저자만 (UI버튼·메뉴·이벤트배너·"새창보기"·프로모션 문구 등은 제외)
+- 최대 {limit}개
+- JSON 배열로만 응답
+
+[{{"rank": 1, "title": "책 제목", "author": "저자명"}}]""",
+        config=genai_types.GenerateContentConfig(response_mime_type="application/json"),
+    )
+    raw = response.text.strip()
+    try:
+        items = json.loads(raw)
+    except Exception:
+        m = re.search(r"\[.*\]", raw, re.DOTALL)
+        if not m:
+            return []
+        items = json.loads(m.group())
+    if not isinstance(items, list) or len(items) < 2:
+        return []
+    results = []
+    for item in items:
+        title = str(item.get("title", "")).strip()
+        if not title or len(title) < 2:
+            continue
+        results.append({
+            "rank": item.get("rank", len(results) + 1),
+            "title": title,
+            "author": str(item.get("author", "")).strip(),
+        })
+    return results
+
+
 # ── 교보문고 ────────────────────────────────────────────────
-def fetch_kyobo(pw_page: Page, limit: int = 20) -> list[dict]:
+def fetch_kyobo(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
     urls = [
         "https://store.kyobobook.co.kr/bestseller/online",
         "https://store.kyobobook.co.kr/bestseller/total",
@@ -179,42 +232,28 @@ def fetch_kyobo(pw_page: Page, limit: int = 20) -> list[dict]:
                         print(f"  교보문고 items={len(results)}개 발견 (NEXT_DATA)")
                         return results
 
-            # DOM 직접 추출
-            pw_page.wait_for_selector("[class*='BestSeller'], [class*='bestseller'], ol li, ul li", timeout=10000)
-            # 제목 셀렉터 시도
-            for sel in (
-                "a[href*='/detail/'] span[class*='title']",
-                "a[href*='/detail/']",
-                "[class*='book'] a",
-            ):
-                els = pw_page.query_selector_all(sel)
-                if not els:
-                    continue
+            # Gemini AI 기반 추출 (fallback)
+            print("  📖 교보문고 Gemini AI 추출 시도...")
+            page_text = pw_page.inner_text("body")
+            gemini_books = _parse_books_with_gemini(client, page_text, "교보문고", limit)
+            if gemini_books:
                 results = []
-                seen = set()
-                for el in els:
-                    title = el.inner_text().strip()
-                    href = el.get_attribute("href") or ""
-                    # event.kyobobook.co.kr 이벤트 링크 제외
-                    if "event.kyobobook.co.kr" in href:
-                        continue
-                    if not title or len(title) < 2 or title in seen:
-                        continue
-                    seen.add(title)
+                for item in gemini_books:
+                    title = item["title"]
                     results.append({
                         "rank": len(results) + 1,
                         "title": title,
-                        "author": "",
+                        "author": item["author"],
                         "cover": "",
-                        "link": href if href.startswith("http") else f"https://store.kyobobook.co.kr{href}",
+                        "link": url,
                         "publisher": "",
-                        "genre_key": classify_genre(title),
+                        "genre_key": classify_genre(title + " " + item["author"]),
                         "source": "교보문고",
                     })
                     if len(results) >= limit:
                         break
                 if results:
-                    print(f"  교보문고 items={len(results)}개 발견 (DOM)")
+                    print(f"  교보문고 items={len(results)}개 발견 (Gemini)")
                     return results
 
             print("  ⚠️  교보문고 데이터 없음, 다음 URL 시도")
@@ -226,7 +265,7 @@ def fetch_kyobo(pw_page: Page, limit: int = 20) -> list[dict]:
 
 
 # ── YES24 ───────────────────────────────────────────────────
-def fetch_yes24(pw_page: Page, limit: int = 20) -> list[dict]:
+def fetch_yes24(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
     urls = [
         "https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001",
         "https://www.yes24.com/Product/Category/BestSeller",
@@ -264,41 +303,28 @@ def fetch_yes24(pw_page: Page, limit: int = 20) -> list[dict]:
                         print(f"  YES24 items={len(results)}개 발견 (NEXT_DATA)")
                         return results
 
-            # HTML 파싱 — YES24는 서버사이드 렌더링 비율이 높음
-            # 순위 리스트: ol.bestList li 또는 유사 구조
-            for sel in (
-                "ol.bestList li .info .subject a",
-                "ul.bestList li .info a",
-                "li.item_li .info_row a.gd_name",
-                "a.gd_name",
-                "[class*='best'] a[href*='/Product/Goods/']",
-            ):
-                els = pw_page.query_selector_all(sel)
-                if not els:
-                    continue
+            # Gemini AI 기반 추출 (fallback)
+            print("  📖 YES24 Gemini AI 추출 시도...")
+            page_text = pw_page.inner_text("body")
+            gemini_books = _parse_books_with_gemini(client, page_text, "YES24", limit)
+            if gemini_books:
                 results = []
-                seen = set()
-                for el in els:
-                    title = el.inner_text().strip()
-                    href = el.get_attribute("href") or ""
-                    if not title or len(title) < 2 or title in seen:
-                        continue
-                    seen.add(title)
-                    link = href if href.startswith("http") else f"https://www.yes24.com{href}"
+                for item in gemini_books:
+                    title = item["title"]
                     results.append({
                         "rank": len(results) + 1,
                         "title": title,
-                        "author": "",
+                        "author": item["author"],
                         "cover": "",
-                        "link": link,
+                        "link": url,
                         "publisher": "",
-                        "genre_key": classify_genre(title),
+                        "genre_key": classify_genre(title + " " + item["author"]),
                         "source": "YES24",
                     })
                     if len(results) >= limit:
                         break
                 if results:
-                    print(f"  YES24 items={len(results)}개 발견 (DOM:{sel})")
+                    print(f"  YES24 items={len(results)}개 발견 (Gemini)")
                     return results
 
             print("  ⚠️  YES24 데이터 없음, 다음 URL 시도")
@@ -419,76 +445,25 @@ def merge_genre_rankings(items: list[dict], top_n: int = 5) -> list[dict]:
     return merge_rankings(items, top_n=top_n)
 
 
-# ── Gemini AI ────────────────────────────────────────────────
-def generate_ai_content(overall: list[dict], genre_data: dict[str, list[dict]]) -> str:
-    client = genai.Client(api_key=GEMINI_API_KEY)
-
-    overall_list = "\n".join(
-        f"{b['rank']}. {b['title']} - {b['author']} ({', '.join(f'{k} {v}위' for k, v in b['sources'].items())})"
-        for b in overall[:10]
-    )
-    genre_summary = ""
-    for genre in GENRES:
-        books = genre_data.get(genre["key"], [])
-        if books:
-            genre_summary += f"\n[{genre['name']}]\n"
-            genre_summary += "\n".join(f"  {b['rank']}. {b['title']} - {b['author']}" for b in books[:3])
-
-    prompt = f"""아래는 알라딘·교보문고·YES24·리디 베스트셀러를 종합한 데이터입니다.
-
-## 종합 TOP 10
-{overall_list}
-
-## 장르별 TOP 3
-{genre_summary}
-
-위 데이터를 바탕으로 다음을 작성해주세요:
-1. 이번 주 독서 트렌드 분석 (3-4문장)
-2. 주목할 책 TOP 5 각각 한 줄 코멘트
-3. 장르별 트렌드 한 줄씩
-4. 독자층의 현재 분위기를 한 문장으로
-
-형식 (마크다운):
-
-## 📊 이번 주 독서 트렌드
-[트렌드 분석 내용]
-
-## 🏆 이번 주 주목할 책
-
-- **1위 [책제목]** — [한 줄 코멘트]
-- **2위 [책제목]** — [한 줄 코멘트]
-- **3위 [책제목]** — [한 줄 코멘트]
-- **4위 [책제목]** — [한 줄 코멘트]
-- **5위 [책제목]** — [한 줄 코멘트]
-
-## 🗂️ 장르별 트렌드
-
-- **📖 소설** — [한 줄]
-- **💼 경제경영** — [한 줄]
-- **🚀 자기계발** — [한 줄]
-- **🌍 인문사회** — [한 줄]
-- **🔬 과학기술** — [한 줄]
-- **✍️ 에세이** — [한 줄]
-"""
-    response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-    return response.text
-
-
 # ── MD 생성 ──────────────────────────────────────────────────
-def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], ai_content: str, date_str: str) -> str:
+def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], date_str: str) -> str:
     dt = datetime.strptime(date_str, "%Y-%m-%d")
     first_weekday = dt.replace(day=1).weekday()
     week = (dt.day + first_weekday - 1) // 7 + 1
     date_kr = f"{dt.year}년 {dt.month}월 {week}째주"
 
     rows = []
+    rank_display = 0
     for b in overall:
+        if b.get("genre_key") == "etc":
+            continue
+        rank_display += 1
         aladin = f"{b['sources'].get('알라딘', '')}위" if b['sources'].get('알라딘') else "-"
         kyobo  = f"{b['sources'].get('교보문고', '')}위" if b['sources'].get('교보문고') else "-"
         yes24  = f"{b['sources'].get('YES24', '')}위" if b['sources'].get('YES24') else "-"
         ridi   = f"{b['sources'].get('리디', '')}위" if b['sources'].get('리디') else "-"
-        genre  = next((g["name"] for g in GENRES if g["key"] == b["genre_key"]), "기타")
-        rows.append(f"| **{b['rank']}** | [{b['title']}]({b['link']}) | {b['author']} | {genre} | {aladin} | {kyobo} | {yes24} | {ridi} |")
+        genre  = next((g["name"] for g in GENRES if g["key"] == b["genre_key"]), "")
+        rows.append(f"| **{rank_display}** | [{b['title']}]({b['link']}) | {b['author']} | {genre} | {aladin} | {kyobo} | {yes24} | {ridi} |")
 
     overall_table = "\n".join([
         "| 순위 | 책 | 저자 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |",
@@ -516,20 +491,16 @@ def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], ai_co
         genre_sections += f"\n### {genre['emoji']} {genre['name']}\n\n{genre_table}\n"
 
     return f"""---
-title: "종합 베스트셀러 ({date_kr})"
+title: "일반 도서 베스트셀러 ({date_kr})"
 date: {date_str}
 description: "알라딘·교보문고·YES24·리디 베스트셀러를 종합한 TOP 15와 장르별 베스트셀러입니다."
 category: "bestseller"
 isHidden: true
 ---
 
-## 🏅 종합 베스트셀러 TOP 15
+## 🏅 일반 도서 베스트셀러 TOP 15
 
 {overall_table}
-
----
-
-{ai_content}
 
 ---
 
@@ -539,13 +510,15 @@ isHidden: true
 ---
 
 *데이터 출처: [알라딘](https://www.aladin.co.kr) · [교보문고](https://store.kyobobook.co.kr) · [YES24](https://www.yes24.com) · [리디](https://ridibooks.com)*
-*Gemini AI가 자동으로 수집·분석한 베스트셀러 리포트입니다.*
+*매주 자동으로 수집되는 베스트셀러 리포트입니다.*
 """
 
 
 # ── main ─────────────────────────────────────────────────────
 def main():
     print(f"[{DATE}] 베스트셀러 수집 시작\n")
+
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
     # 알라딘 — API (requests)
     print("  📚 알라딘 전체 베스트셀러 수집...")
@@ -564,11 +537,11 @@ def main():
         pw_page = ctx.new_page()
 
         print("  🏪 교보문고 수집...")
-        kyobo_items = fetch_kyobo(pw_page, 20)
+        kyobo_items = fetch_kyobo(pw_page, client, 20)
         print(f"     → {len(kyobo_items)}개")
 
         print("  🛒 YES24 수집...")
-        yes24_items = fetch_yes24(pw_page, 20)
+        yes24_items = fetch_yes24(pw_page, client, 20)
         print(f"     → {len(yes24_items)}개")
 
         print("  📱 리디 수집...")
@@ -580,7 +553,7 @@ def main():
     # 종합 순위
     print("\n  🔢 종합 순위 계산...")
     all_items = aladin_overall + kyobo_items + yes24_items + ridi_items
-    overall = merge_rankings(all_items, top_n=15)
+    overall = merge_rankings(all_items, top_n=20)  # 기타 필터 후 15개 확보용 여유
     print(f"     → 종합 {len(overall)}개")
 
     genre_data: dict[str, list[dict]] = {}
@@ -595,10 +568,7 @@ def main():
             genre_data[genre["key"]] = merge_genre_rankings(combined, top_n=5)
             print(f"     [{genre['name']}] {len(genre_data[genre['key']])}개")
 
-    print("\n  🤖 Gemini AI 분석 중...")
-    ai_content = generate_ai_content(overall, genre_data)
-
-    md = build_markdown(overall, genre_data, ai_content, DATE)
+    md = build_markdown(overall, genre_data, DATE)
     slug = f"{DATE}-bestseller"
     out_dir = pathlib.Path("contents/book") / slug
     out_dir.mkdir(parents=True, exist_ok=True)
