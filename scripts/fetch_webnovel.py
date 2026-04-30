@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""웹소설 주간 베스트셀러 수집 — 카카오페이지 · 네이버 시리즈 · 리디
+"""웹소설 주간 베스트셀러 — 장르별 수집
 
-동작 방식:
-  1단계) 알려진 URL로 시도
-  2단계) 실패 시 사이트 메인에서 Gemini가 랭킹 링크를 자동 탐색
-  3단계) 탐색된 URL로 재시도
-  → URL·DOM 구조가 바뀌어도 자동 적응
+수집 전략:
+  리디  → 장르별 전용 URL에서 각각 수집 (알려진 3개 + 나머지 자동 탐색)
+  카카오 → 전체 랭킹 1회 로드 → Gemini가 장르별 분류
+  네이버 → 전체 랭킹 1회 로드 → Gemini가 장르별 분류
+  → 플랫폼별 장르 데이터를 통합해 장르 내 종합 순위 산출
 """
 
 import os
@@ -26,45 +26,47 @@ if not GEMINI_API_KEY:
 
 GENRES = [
     {"key": "fantasy",    "name": "판타지",       "emoji": "⚔️"},
-    {"key": "romance",    "name": "로맨스",       "emoji": "💕"},
-    {"key": "martial",    "name": "무협",         "emoji": "🥋"},
-    {"key": "modern",     "name": "현대판타지",   "emoji": "🌆"},
     {"key": "romfantasy", "name": "로맨스판타지", "emoji": "🏰"},
+    {"key": "romance",    "name": "로맨스",       "emoji": "💕"},
+    {"key": "modern",     "name": "현대판타지",   "emoji": "🌆"},
+    {"key": "martial",    "name": "무협",         "emoji": "🥋"},
     {"key": "bl",         "name": "BL",           "emoji": "💙"},
 ]
 
-GENRE_KEYWORDS: dict[str, list[str]] = {
-    "fantasy":    ["판타지", "이세계", "마법", "용사", "엘프", "드래곤", "fantasy"],
-    "romance":    ["로맨스", "연애", "순정", "romance"],
-    "martial":    ["무협", "무림", "협객", "강호", "검객"],
-    "modern":     ["현대판타지", "현판", "헌터", "능력자", "회귀", "각성", "던전"],
-    "romfantasy": ["로맨스판타지", "로판", "황제", "공작", "공녀", "황녀", "귀족"],
-    "bl":         ["bl", "boys love", "boys_love"],
+GENRE_KR_TO_KEY = {g["name"]: g["key"] for g in GENRES}
+GENRE_KEY_TO_NAME = {g["key"]: g["name"] for g in GENRES}
+
+# 리디 장르별 알려진 URL (없으면 자동 탐색)
+RIDI_GENRE_URLS: dict[str, list[str]] = {
+    "fantasy":    ["https://ridibooks.com/category/bestsellers/1750"],
+    "romfantasy": ["https://ridibooks.com/category/6050"],
+    "romance":    ["https://ridibooks.com/category/1650"],
+    "modern":     [],  # 자동 탐색
+    "martial":    [],  # 자동 탐색
+    "bl":         [],  # 자동 탐색
+}
+
+# 장르 탐색 힌트
+GENRE_SEARCH_HINTS: dict[str, str] = {
+    "fantasy":    "판타지 웹소설 베스트셀러 (이세계·마법·드래곤 등)",
+    "romfantasy": "로맨스판타지 웹소설 베스트셀러 (귀족·황제·공녀 등 역사판타지 로맨스)",
+    "romance":    "로맨스 웹소설 베스트셀러 (현대 연애·순정 등)",
+    "modern":     "현대판타지 웹소설 베스트셀러 (헌터·각성·던전·회귀물 등)",
+    "martial":    "무협 웹소설 베스트셀러 (무림·검객·협객 등)",
+    "bl":         "BL 웹소설 베스트셀러 (남자끼리 로맨스)",
 }
 
 
-def classify_genre(text: str) -> str:
-    text_lower = text.lower()
-    for key, keywords in GENRE_KEYWORDS.items():
-        if any(kw in text_lower for kw in keywords):
-            return key
-    return "fantasy"
-
-
 # ── URL 자동 탐색 ────────────────────────────────────────────
-def _discover_ranking_url(
+def _discover_url(
     pw_page: Page,
     client: genai.Client,
     base_url: str,
     source_name: str,
     search_hint: str,
 ) -> str | None:
-    """메인/부모 페이지 링크 목록에서 Gemini가 베스트셀러 URL을 찾아냄"""
     try:
-        print(f"  🔍 {source_name} 베이스 페이지 탐색: {base_url}")
         pw_page.goto(base_url, wait_until="networkidle", timeout=30000)
-
-        # 페이지의 모든 고유 링크 수집
         links: list[dict] = pw_page.evaluate("""() => {
             const seen = new Set();
             return Array.from(document.querySelectorAll('a[href]'))
@@ -76,85 +78,277 @@ def _discover_ranking_url(
                     if (!l.text || !l.href.startsWith('http') || seen.has(l.href)) return false;
                     seen.add(l.href);
                     return true;
-                })
-                .slice(0, 200);
+                }).slice(0, 200);
         }""")
-
         if not links:
             return None
 
-        # 랭킹 관련 키워드로 사전 필터링 (Gemini 입력 최소화)
-        RANK_KW = ["베스트", "랭킹", "순위", "best", "rank", "top", "인기", "실시간", "100", "novel", "웹소설"]
+        RANK_KW = ["베스트", "랭킹", "순위", "best", "rank", "top", "인기", "실시간", "100", "웹소설"]
         filtered = [l for l in links if any(kw in (l["text"] + l["href"]).lower() for kw in RANK_KW)]
         candidates = filtered if len(filtered) >= 3 else links[:80]
-
         links_md = "\n".join(f"- [{l['text']}]({l['href']})" for l in candidates[:80])
 
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=f"""{source_name} 사이트에서 "{search_hint}"에 해당하는 페이지 링크를 찾아주세요.
+            contents=f"""{source_name}에서 "{search_hint}"에 해당하는 페이지 URL을 찾아주세요.
 
 후보 링크:
 {links_md}
 
-가장 적합한 URL 하나만 응답하세요 (http로 시작하는 URL만, 다른 텍스트 없이):""",
+가장 적합한 URL 하나만 응답 (http로 시작, 다른 텍스트 없이):""",
         )
-
-        # URL 추출 (응답에서 http URL 파싱)
-        url_match = re.search(r"https?://\S+", response.text)
-        if url_match:
-            discovered = url_match.group().rstrip(".,;)\"'")
-            print(f"  🔍 {source_name} 탐색된 URL: {discovered}")
-            return discovered
-
+        m = re.search(r"https?://\S+", response.text)
+        if m:
+            url = m.group().rstrip(".,;)\"'")
+            print(f"  🔍 {source_name} 탐색된 URL: {url}")
+            return url
     except Exception as e:
         print(f"  ⚠️  {source_name} URL 탐색 실패: {e}")
-
     return None
 
 
-# ── AI 기반 페이지 파싱 ──────────────────────────────────────
-def _parse_page_with_gemini(
-    pw_page: Page,
-    client: genai.Client,
-    url: str,
-    source_name: str,
-    limit: int,
-) -> list[dict]:
-    """이미 열려 있거나 새로 이동한 페이지에서 Gemini로 베스트셀러 추출"""
+# ── 페이지 텍스트 추출 ────────────────────────────────────────
+def _get_page_text(pw_page: Page, url: str) -> str:
     pw_page.goto(url, wait_until="networkidle", timeout=30000)
-
-    text: str = pw_page.evaluate("""() => {
+    return pw_page.evaluate("""() => {
         const el = document.querySelector(
             'main, [role="main"], #content, #wrap, .container, article'
         );
         return (el || document.body).innerText;
     }""")
 
-    if not text or len(text.strip()) < 50:
-        return []
+
+# ── 리디: 장르별 전용 URL 수집 ───────────────────────────────
+def fetch_ridi_by_genre(
+    pw_page: Page,
+    client: genai.Client,
+    limit: int = 15,
+) -> dict[str, list[dict]]:
+    """리디: 장르별 URL에서 각각 수집 → dict[genre_key, items]"""
+    result: dict[str, list[dict]] = {}
+    url_cache: dict[str, str] = {}  # genre_key -> discovered url
+
+    for genre in GENRES:
+        key = genre["key"]
+        name = genre["name"]
+        known = RIDI_GENRE_URLS.get(key, [])
+
+        items = []
+        # 1) 알려진 URL 시도
+        for url in known:
+            try:
+                print(f"  리디 [{name}] URL={url}")
+                text = _get_page_text(pw_page, url)
+                if not text or len(text.strip()) < 50:
+                    continue
+                items = _parse_single_genre(client, text, "리디", name, limit)
+                if items:
+                    break
+            except Exception as e:
+                print(f"  ⚠️  리디 [{name}] {url} 실패: {e}")
+
+        # 2) 알려진 URL 실패 → 자동 탐색
+        if not items:
+            hint = GENRE_SEARCH_HINTS[key]
+            if key in url_cache:
+                disc = url_cache[key]
+            else:
+                print(f"  🔍 리디 [{name}] URL 자동 탐색...")
+                disc = _discover_url(pw_page, client, "https://ridibooks.com", f"리디 {name}", hint)
+                if disc:
+                    url_cache[key] = disc
+            if disc:
+                try:
+                    text = _get_page_text(pw_page, disc)
+                    items = _parse_single_genre(client, text, "리디", name, limit)
+                except Exception as e:
+                    print(f"  ⚠️  리디 [{name}] 탐색 URL 실패: {e}")
+
+        if items:
+            for item in items:
+                item["source"] = "리디"
+                item["genre_key"] = key
+            result[key] = items
+            print(f"  리디 [{name}] {len(items)}개 수집")
+        else:
+            print(f"  ⚠️  리디 [{name}] 수집 실패")
+
+    return result
+
+
+# ── 카카오/네이버: 전체 페이지 로드 → 장르별 분류 ───────────
+def fetch_platform_all_genres(
+    pw_page: Page,
+    client: genai.Client,
+    urls: list[str],
+    base_url: str,
+    source_name: str,
+    limit: int = 10,
+) -> dict[str, list[dict]]:
+    """전체 랭킹 페이지 1회 로드 → Gemini가 장르별 분류"""
+    text = ""
+    for url in urls:
+        try:
+            print(f"  {source_name} URL={url}")
+            text = _get_page_text(pw_page, url)
+            if text and len(text.strip()) > 50:
+                break
+            text = ""
+        except Exception as e:
+            print(f"  ⚠️  {source_name} {url} 실패: {e}")
+
+    # 알려진 URL 모두 실패 → 자동 탐색
+    if not text:
+        print(f"  🔍 {source_name} URL 자동 탐색...")
+        disc = _discover_url(pw_page, client, base_url, source_name, "웹소설 베스트셀러 랭킹")
+        if disc:
+            try:
+                text = _get_page_text(pw_page, disc)
+            except Exception as e:
+                print(f"  ⚠️  {source_name} 탐색 URL 실패: {e}")
+
+    if not text:
+        print(f"  ⚠️  {source_name} 수집 실패")
+        return {}
+
+    # Gemini: 한 번에 전 장르 분류
+    genre_names = [g["name"] for g in GENRES]
+    genre_json_example = {g["name"]: [{"rank": 1, "title": "작품명", "author": "작가명"}] for g in GENRES}
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
-        contents=f"""다음은 "{source_name}" 웹소설 베스트셀러 페이지의 텍스트입니다.
+        contents=f"""다음은 "{source_name}" 웹소설 페이지의 텍스트입니다.
+
+<page_text>
+{text[:9000]}
+</page_text>
+
+위 텍스트에서 웹소설을 장르별로 분류해서 추출하세요.
+
+장르 분류 기준:
+- 판타지: 이세계·마법·용사·드래곤 등
+- 로맨스판타지: 귀족·황제·공녀·환생·빙의 등 (역사/판타지 배경 로맨스)
+- 로맨스: 현대 연애·순정 등
+- 현대판타지: 헌터·각성·던전·회귀물 등 (현대 배경)
+- 무협: 무림·검객·협객 등
+- BL: 남자끼리 로맨스
+
+규칙:
+- 실제 웹소설 작품 제목만 (메뉴·배너·프로모션 문구 제외)
+- 장르당 최대 {limit}개
+- JSON으로만 응답
+
+{json.dumps(genre_json_example, ensure_ascii=False)}""",
+        config=genai_types.GenerateContentConfig(response_mime_type="application/json"),
+    )
+
+    raw = response.text.strip()
+    try:
+        data = json.loads(raw)
+    except Exception:
+        m = re.search(r"\{.*\}", raw, re.DOTALL)
+        if not m:
+            print(f"  ⚠️  {source_name} JSON 파싱 실패")
+            return {}
+        data = json.loads(m.group())
+
+    result: dict[str, list[dict]] = {}
+    for genre in GENRES:
+        name = genre["name"]
+        key = genre["key"]
+        raw_items = data.get(name, [])
+        if not isinstance(raw_items, list):
+            continue
+        items = []
+        for item in raw_items:
+            title = str(item.get("title", "")).strip()
+            if not title or len(title) < 2:
+                continue
+            items.append({
+                "rank": len(items) + 1,
+                "title": title,
+                "author": str(item.get("author", "")).strip(),
+                "cover": "",
+                "link": urls[0] if urls else base_url,
+                "genre_key": key,
+                "source": source_name,
+            })
+        if items:
+            result[key] = items
+            print(f"  {source_name} [{name}] {len(items)}개 분류")
+
+    return result
+
+
+# ── 장르별 플랫폼 데이터 통합 ───────────────────────────────
+def merge_genre_data(
+    *platform_data: dict[str, list[dict]],
+    top_n: int = 10,
+    MAX_RANK: int = 15,
+) -> dict[str, list[dict]]:
+    """여러 플랫폼의 장르별 데이터를 통합해 장르 내 순위 산출"""
+    def normalize(t: str) -> str:
+        return re.sub(r"[\s\W]", "", t).lower()
+
+    genre_result: dict[str, list[dict]] = {}
+
+    for genre in GENRES:
+        key = genre["key"]
+        scores: dict[str, dict] = {}
+
+        for pdata in platform_data:
+            items = pdata.get(key, [])
+            for item in items:
+                if not item.get("title"):
+                    continue
+                nkey = normalize(item["title"])
+                pts = max(0, MAX_RANK + 1 - item["rank"])
+                if nkey not in scores:
+                    scores[nkey] = {
+                        "title": item["title"],
+                        "author": item.get("author", ""),
+                        "cover": item.get("cover", ""),
+                        "link": item.get("link", ""),
+                        "score": 0,
+                        "sources": {},
+                        "genre_key": key,
+                    }
+                scores[nkey]["score"] += pts
+                scores[nkey]["sources"][item["source"]] = item["rank"]
+
+        if scores:
+            ranked = sorted(scores.values(), key=lambda x: x["score"], reverse=True)
+            for i, novel in enumerate(ranked[:top_n], start=1):
+                novel["rank"] = i
+            genre_result[key] = ranked[:top_n]
+
+    return genre_result
+
+
+# ── Gemini: 단일 장르 추출 (리디용) ────────────────────────
+def _parse_single_genre(
+    client: genai.Client,
+    text: str,
+    source_name: str,
+    genre_name: str,
+    limit: int,
+) -> list[dict]:
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=f"""다음은 "{source_name}" "{genre_name}" 웹소설 베스트셀러 페이지의 텍스트입니다.
 
 <page_text>
 {text[:8000]}
 </page_text>
 
-위 텍스트에서 웹소설 베스트셀러 순위를 추출하세요.
-
-규칙:
-- 실제 웹소설 작품 제목만 포함
-- 메뉴·배너·카테고리명·프로모션 문구("추천", "완결", "무료", "타임딜", "이벤트", "NEW" 등) 제외
-- 작가명이 없으면 빈 문자열
+웹소설 베스트셀러 순위를 추출하세요.
+- 실제 웹소설 작품 제목만 (메뉴·배너·프로모션 문구 제외)
 - 최대 {limit}개
-- 반드시 JSON 배열만 응답 (다른 텍스트 없이)
+- JSON 배열로만 응답
 
 [{{"rank": 1, "title": "작품명", "author": "작가명"}}]""",
         config=genai_types.GenerateContentConfig(response_mime_type="application/json"),
     )
-
     raw = response.text.strip()
     try:
         items = json.loads(raw)
@@ -163,10 +357,8 @@ def _parse_page_with_gemini(
         if not m:
             return []
         items = json.loads(m.group())
-
-    if not isinstance(items, list) or len(items) < 3:
+    if not isinstance(items, list) or len(items) < 2:
         return []
-
     results = []
     for item in items:
         title = str(item.get("title", "")).strip()
@@ -177,198 +369,46 @@ def _parse_page_with_gemini(
             "title": title,
             "author": str(item.get("author", "")).strip(),
             "cover": "",
-            "link": url,
-            "genre_key": classify_genre(title),
-            "source": source_name,
+            "link": "",
         })
-
     return results
 
 
-# ── 스마트 수집기 (URL 자동 탐색 포함) ──────────────────────
-def _smart_fetch(
-    pw_page: Page,
-    client: genai.Client,
-    known_urls: list[str],
-    base_url: str,
-    source_name: str,
-    search_hint: str,
-    limit: int = 20,
-) -> list[dict]:
-    """
-    1단계) known_urls 순서대로 시도
-    2단계) 모두 실패 → base_url에서 Gemini가 랭킹 URL 자동 탐색
-    3단계) 탐색 URL로 재시도
-    """
-    # 1단계: 알려진 URL 시도
-    for url in known_urls:
-        try:
-            print(f"  {source_name} URL={url}")
-            results = _parse_page_with_gemini(pw_page, client, url, source_name, limit)
-            if results:
-                print(f"  {source_name} {len(results)}개 수집 완료")
-                return results
-            print(f"  ⚠️  {source_name} 데이터 없음, 다음 URL 시도")
-        except Exception as e:
-            print(f"  ⚠️  {source_name} {url} 실패: {e}")
-
-    # 2단계: URL 자동 탐색
-    print(f"  🔍 {source_name} 알려진 URL 모두 실패 → 자동 탐색 시작")
-    discovered = _discover_ranking_url(pw_page, client, base_url, source_name, search_hint)
-
-    if discovered and discovered not in known_urls:
-        # 3단계: 탐색된 URL로 재시도
-        try:
-            results = _parse_page_with_gemini(pw_page, client, discovered, source_name, limit)
-            if results:
-                print(f"  {source_name} {len(results)}개 수집 완료 (자동 탐색)")
-                return results
-        except Exception as e:
-            print(f"  ⚠️  {source_name} 탐색된 URL 실패: {e}")
-
-    print(f"  ⚠️  {source_name} 최종 실패")
-    return []
-
-
-# ── 각 플랫폼 수집 ───────────────────────────────────────────
-def fetch_kakaopage(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
-    return _smart_fetch(
-        pw_page, client,
-        known_urls=[
-            "https://page.kakao.com/menu/10011/screen/94",  # 실시간 랭킹
-            "https://page.kakao.com/menu/10011",
-        ],
-        base_url="https://page.kakao.com",
-        source_name="카카오페이지",
-        search_hint="웹소설 실시간 베스트셀러·랭킹 페이지",
-        limit=limit,
-    )
-
-
-def fetch_naver_series(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
-    return _smart_fetch(
-        pw_page, client,
-        known_urls=[
-            "https://series.naver.com/novel/top100List.series",
-            "https://series.naver.com/novel/bestseller.series",
-        ],
-        base_url="https://series.naver.com/novel/",
-        source_name="네이버 시리즈",
-        search_hint="웹소설 베스트셀러·TOP100 순위 페이지",
-        limit=limit,
-    )
-
-
-def fetch_ridi_webnovel(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
-    return _smart_fetch(
-        pw_page, client,
-        known_urls=[
-            "https://ridibooks.com/category/bestsellers/1750",  # 판타지
-            "https://ridibooks.com/category/6050",              # 로맨스판타지
-            "https://ridibooks.com/category/1650",              # 로맨스
-        ],
-        base_url="https://ridibooks.com",
-        source_name="리디",
-        search_hint="웹소설(판타지·로맨스판타지·로맨스) 베스트셀러 페이지",
-        limit=limit,
-    )
-
-
-# ── 종합 순위 합산 ──────────────────────────────────────────
-def merge_rankings(all_items: list[dict], top_n: int = 15, MAX_RANK: int = 20) -> list[dict]:
-    scores: dict[str, dict] = {}
-
-    def normalize(title: str) -> str:
-        return re.sub(r"[\s\W]", "", title).lower()
-
-    for item in all_items:
-        if not item.get("title"):
-            continue
-        key = normalize(item["title"])
-        pts = max(0, MAX_RANK + 1 - item["rank"])
-        if key not in scores:
-            scores[key] = {
-                "title": item["title"],
-                "author": item["author"],
-                "cover": item.get("cover", ""),
-                "link": item.get("link", ""),
-                "score": 0,
-                "sources": {},
-                "genre_key": item.get("genre_key", "fantasy"),
-            }
-        scores[key]["score"] += pts
-        scores[key]["sources"][item["source"]] = item["rank"]
-
-    ranked = sorted(scores.values(), key=lambda x: x["score"], reverse=True)
-    for i, novel in enumerate(ranked[:top_n], start=1):
-        novel["rank"] = i
-    return ranked[:top_n]
-
-
-def group_by_genre(all_items: list[dict], top_n: int = 5) -> dict[str, list[dict]]:
-    genre_map: dict[str, list[dict]] = {}
-    for item in all_items:
-        genre_map.setdefault(item.get("genre_key", "fantasy"), []).append(item)
-    result = {}
-    for genre in GENRES:
-        items = sorted(genre_map.get(genre["key"], []), key=lambda x: x["rank"])[:top_n]
-        for i, item in enumerate(items, start=1):
-            item["genre_rank"] = i
-        result[genre["key"]] = items
-    return result
-
-
 # ── Gemini AI 트렌드 분석 ────────────────────────────────────
-def generate_ai_content(client: genai.Client, overall: list[dict], genre_data: dict[str, list[dict]]) -> str:
-    overall_list = "\n".join(
-        f"{b['rank']}. {b['title']} - {b['author']} "
-        f"({', '.join(f'{k} {v}위' for k, v in b['sources'].items())})"
-        for b in overall[:10]
-    )
+def generate_ai_content(client: genai.Client, genre_data: dict[str, list[dict]]) -> str:
     genre_summary = ""
     for genre in GENRES:
         books = genre_data.get(genre["key"], [])
-        if books:
-            genre_summary += f"\n[{genre['name']}]\n"
-            genre_summary += "\n".join(
-                f"  {b.get('genre_rank', b['rank'])}. {b['title']} - {b['author']}"
-                for b in books[:3]
-            )
+        if not books:
+            continue
+        genre_summary += f"\n[{genre['emoji']} {genre['name']}]\n"
+        genre_summary += "\n".join(
+            f"  {b['rank']}. {b['title']} - {b['author']} "
+            f"({', '.join(f'{k} {v}위' for k, v in b['sources'].items())})"
+            for b in books[:5]
+        )
 
-    prompt = f"""아래는 카카오페이지·네이버 시리즈·리디 웹소설 베스트셀러를 종합한 데이터입니다.
+    prompt = f"""아래는 카카오페이지·네이버 시리즈·리디 웹소설 베스트셀러 장르별 데이터입니다.
 
-## 종합 TOP 10
-{overall_list}
-
-## 장르별 TOP 3
 {genre_summary}
 
 위 데이터를 바탕으로 다음을 작성해주세요:
-1. 이번 주 웹소설 트렌드 분석 (3-4문장)
-2. 주목할 웹소설 TOP 5 각각 한 줄 코멘트
-3. 장르별 트렌드 한 줄씩
-4. 독자층의 현재 분위기를 한 문장으로
+1. 이번 주 전체 웹소설 트렌드 분석 (3-4문장)
+2. 장르별 주목할 작품 및 트렌드 한 줄씩
+3. 독자층의 현재 분위기를 한 문장으로
 
 형식 (마크다운):
 
 ## 📊 이번 주 웹소설 트렌드
-[트렌드 분석 내용]
-
-## 🏆 이번 주 주목할 웹소설
-
-- **1위 [작품명]** — [한 줄 코멘트]
-- **2위 [작품명]** — [한 줄 코멘트]
-- **3위 [작품명]** — [한 줄 코멘트]
-- **4위 [작품명]** — [한 줄 코멘트]
-- **5위 [작품명]** — [한 줄 코멘트]
+[트렌드 분석]
 
 ## 🗂️ 장르별 트렌드
 
 - **⚔️ 판타지** — [한 줄]
-- **💕 로맨스** — [한 줄]
-- **🥋 무협** — [한 줄]
-- **🌆 현대판타지** — [한 줄]
 - **🏰 로맨스판타지** — [한 줄]
+- **💕 로맨스** — [한 줄]
+- **🌆 현대판타지** — [한 줄]
+- **🥋 무협** — [한 줄]
 - **💙 BL** — [한 줄]
 """
     response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
@@ -376,86 +416,56 @@ def generate_ai_content(client: genai.Client, overall: list[dict], genre_data: d
 
 
 # ── 마크다운 생성 ─────────────────────────────────────────────
-def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], ai_content: str, date_str: str) -> str:
+def build_markdown(genre_data: dict[str, list[dict]], ai_content: str, date_str: str) -> str:
     dt = datetime.strptime(date_str, "%Y-%m-%d")
     first_weekday = dt.replace(day=1).weekday()
     week = (dt.day + first_weekday - 1) // 7 + 1
     date_kr = f"{dt.year}년 {dt.month}월 {week}째주"
-
-    rows = []
-    for b in overall:
-        kakao = f"{b['sources'].get('카카오페이지')}위" if b['sources'].get('카카오페이지') else "-"
-        naver = f"{b['sources'].get('네이버 시리즈')}위" if b['sources'].get('네이버 시리즈') else "-"
-        ridi  = f"{b['sources'].get('리디')}위" if b['sources'].get('리디') else "-"
-        genre = next((g["name"] for g in GENRES if g["key"] == b["genre_key"]), "기타")
-        rows.append(f"| **{b['rank']}** | [{b['title']}]({b['link']}) | {b['author']} | {genre} | {kakao} | {naver} | {ridi} |")
-
-    overall_table = "\n".join([
-        "| 순위 | 작품 | 작가 | 장르 | 카카오페이지 | 네이버 시리즈 | 리디 |",
-        "|:----:|------|------|------|:----------:|:-----------:|:----:|",
-        *rows,
-    ])
 
     genre_sections = ""
     for genre in GENRES:
         books = genre_data.get(genre["key"], [])
         if not books:
             continue
-        genre_rows = []
+        rows = []
         for b in books:
-            srcs = b.get("sources", {b.get("source", ""): b.get("rank")})
-            kakao = f"{srcs.get('카카오페이지')}위" if srcs.get('카카오페이지') else "-"
-            naver = f"{srcs.get('네이버 시리즈')}위" if srcs.get('네이버 시리즈') else "-"
-            ridi  = f"{srcs.get('리디')}위" if srcs.get('리디') else "-"
-            genre_rows.append(
-                f"| **{b.get('genre_rank', b['rank'])}** | [{b['title']}]({b['link']}) | {b['author']} | {kakao} | {naver} | {ridi} |"
+            kakao = f"{b['sources'].get('카카오페이지')}위" if b['sources'].get('카카오페이지') else "-"
+            naver = f"{b['sources'].get('네이버 시리즈')}위" if b['sources'].get('네이버 시리즈') else "-"
+            ridi  = f"{b['sources'].get('리디')}위" if b['sources'].get('리디') else "-"
+            rows.append(
+                f"| **{b['rank']}** | [{b['title']}]({b['link']}) | {b['author']} | {kakao} | {naver} | {ridi} |"
             )
-        genre_table = "\n".join([
+        table = "\n".join([
             "| 순위 | 작품 | 작가 | 카카오페이지 | 네이버 시리즈 | 리디 |",
             "|:----:|------|------|:----------:|:-----------:|:----:|",
-            *genre_rows,
+            *rows,
         ])
-        genre_sections += f"\n### {genre['emoji']} {genre['name']}\n\n{genre_table}\n"
-
-    sources_available = set()
-    for b in overall:
-        sources_available.update(b["sources"].keys())
-    sources_str = " · ".join(
-        f"[{s}]({'https://page.kakao.com' if s == '카카오페이지' else 'https://series.naver.com' if s == '네이버 시리즈' else 'https://ridibooks.com'})"
-        for s in ["카카오페이지", "네이버 시리즈", "리디"] if s in sources_available
-    )
+        genre_sections += f"\n## {genre['emoji']} {genre['name']}\n\n{table}\n"
 
     return f"""---
 title: "웹소설 베스트셀러 ({date_kr})"
 date: {date_str}
-description: "카카오페이지·네이버 시리즈·리디 웹소설 베스트셀러를 종합한 주간 TOP 15입니다."
+description: "카카오페이지·네이버 시리즈·리디 웹소설 장르별 베스트셀러입니다."
 category: "webnovel"
 isHidden: true
----
-
-## 🏅 종합 베스트셀러 TOP 15
-
-{overall_table}
-
 ---
 
 {ai_content}
 
 ---
 
-## 📚 장르별 베스트셀러
 {genre_sections}
 
 ---
 
-*데이터 출처: {sources_str}*
+*데이터 출처: [카카오페이지](https://page.kakao.com) · [네이버 시리즈](https://series.naver.com) · [리디](https://ridibooks.com)*
 *Gemini AI가 자동으로 수집·분석한 웹소설 베스트셀러 리포트입니다.*
 """
 
 
 # ── main ─────────────────────────────────────────────────────
 def main():
-    print(f"[{DATE}] 웹소설 베스트셀러 수집 시작\n")
+    print(f"[{DATE}] 웹소설 베스트셀러 장르별 수집 시작\n")
 
     client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -467,39 +477,51 @@ def main():
         )
         pw_page = ctx.new_page()
 
-        print("  📱 카카오페이지 수집...")
-        kakao_items = fetch_kakaopage(pw_page, client, 20)
-        print(f"     → {len(kakao_items)}개\n")
+        # 리디: 장르별 전용 URL
+        print("  📘 리디 장르별 수집...")
+        ridi_data = fetch_ridi_by_genre(pw_page, client, limit=15)
+        print(f"     → {sum(len(v) for v in ridi_data.values())}개 ({len(ridi_data)}장르)\n")
 
-        print("  📗 네이버 시리즈 수집...")
-        naver_items = fetch_naver_series(pw_page, client, 20)
-        print(f"     → {len(naver_items)}개\n")
+        # 카카오페이지: 전체 페이지 → Gemini 장르 분류
+        print("  📱 카카오페이지 장르별 수집...")
+        kakao_data = fetch_platform_all_genres(
+            pw_page, client,
+            urls=["https://page.kakao.com/menu/10011/screen/94", "https://page.kakao.com/menu/10011"],
+            base_url="https://page.kakao.com",
+            source_name="카카오페이지",
+            limit=10,
+        )
+        print(f"     → {sum(len(v) for v in kakao_data.values())}개 ({len(kakao_data)}장르)\n")
 
-        print("  📘 리디 웹소설 수집...")
-        ridi_items = fetch_ridi_webnovel(pw_page, client, 20)
-        print(f"     → {len(ridi_items)}개\n")
+        # 네이버 시리즈: 전체 페이지 → Gemini 장르 분류
+        print("  📗 네이버 시리즈 장르별 수집...")
+        naver_data = fetch_platform_all_genres(
+            pw_page, client,
+            urls=["https://series.naver.com/novel/top100List.series", "https://series.naver.com/novel/bestseller.series"],
+            base_url="https://series.naver.com/novel/",
+            source_name="네이버 시리즈",
+            limit=10,
+        )
+        print(f"     → {sum(len(v) for v in naver_data.values())}개 ({len(naver_data)}장르)\n")
 
         browser.close()
 
-    all_items = kakao_items + naver_items + ridi_items
-    if not all_items:
-        print("❌ 수집된 데이터 없음. 종료합니다.")
-        sys.exit(1)
-
-    print("  🔢 종합 순위 계산...")
-    overall = merge_rankings(all_items, top_n=15)
-    print(f"     → 종합 {len(overall)}개")
-
-    genre_data = group_by_genre(all_items, top_n=5)
+    # 장르별 통합 순위
+    print("  🔢 장르별 통합 순위 계산...")
+    genre_data = merge_genre_data(ridi_data, kakao_data, naver_data, top_n=10)
     for genre in GENRES:
         cnt = len(genre_data.get(genre["key"], []))
         if cnt:
-            print(f"     [{genre['name']}] {cnt}개")
+            print(f"     {genre['emoji']} {genre['name']}: {cnt}개")
 
-    print("\n  🤖 Gemini AI 분석 중...")
-    ai_content = generate_ai_content(client, overall, genre_data)
+    if not any(genre_data.values()):
+        print("\n❌ 수집된 데이터 없음. 종료합니다.")
+        sys.exit(1)
 
-    md = build_markdown(overall, genre_data, ai_content, DATE)
+    print("\n  🤖 Gemini AI 트렌드 분석 중...")
+    ai_content = generate_ai_content(client, genre_data)
+
+    md = build_markdown(genre_data, ai_content, DATE)
     slug = f"{DATE}-webnovel"
     out_dir = pathlib.Path("contents/book") / slug
     out_dir.mkdir(parents=True, exist_ok=True)
