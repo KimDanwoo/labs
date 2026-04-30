@@ -11,7 +11,6 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      workflows: write
 
     steps:
       - uses: actions/checkout@v4
@@ -67,6 +66,8 @@ jobs:
             - 날짜: ${{ steps.date.outputs.date }}
             - 파일: `contents/book/${{ steps.date.outputs.date }}-webnovel/index.md`
             - 카카오페이지·네이버 시리즈·리디 웹소설 베스트셀러 수집 및 Gemini AI 분석
+          add-paths: |
+            contents/
           branch: 'feature/${{ steps.date.outputs.date }}-webnovel'
           base: 'main'
 
