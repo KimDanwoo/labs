@@ -264,7 +264,7 @@ def fetch_platform_all_genres(
         contents=f"""다음은 "{source_name}" 웹소설 페이지의 텍스트입니다.
 
 <page_text>
-{text[:9000]}
+{text[:15000]}
 </page_text>
 
 위 텍스트에서 웹소설을 장르별로 분류해서 추출하세요.
@@ -479,8 +479,36 @@ def generate_ai_content(client: genai.Client, genre_data: dict[str, list[dict]])
     return response.text
 
 
+_PLATFORM_TABS = [
+    {"key": "카카오페이지", "label": "카카오"},
+    {"key": "네이버 시리즈", "label": "네이버"},
+    {"key": "리디",         "label": "리디"},
+]
+
+def _platform_table_html(books: list[dict]) -> str:
+    if not books:
+        return '<p class="ptab-empty">데이터 없음</p>'
+    rows = "".join(
+        f'<tr><td><strong>{b["rank"]}</strong></td>'
+        f'<td>{"<a href=" + chr(34) + b["link"] + chr(34) + ">" if b.get("link") else ""}'
+        f'{b["title"]}'
+        f'{"</a>" if b.get("link") else ""}</td>'
+        f'<td>{b.get("author","")}</td></tr>'
+        for b in books
+    )
+    return (
+        '<table class="ptab-table">'
+        '<thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead>'
+        f'<tbody>{rows}</tbody></table>'
+    )
+
+
 # ── 마크다운 생성 ─────────────────────────────────────────────
-def build_markdown(genre_data: dict[str, list[dict]], ai_content: str, date_str: str) -> str:
+def build_markdown(
+    platform_data: dict[str, dict[str, list[dict]]],
+    ai_content: str,
+    date_str: str,
+) -> str:
     dt = datetime.strptime(date_str, "%Y-%m-%d")
     first_weekday = dt.replace(day=1).weekday()
     week = (dt.day + first_weekday - 1) // 7 + 1
@@ -488,23 +516,69 @@ def build_markdown(genre_data: dict[str, list[dict]], ai_content: str, date_str:
 
     genre_sections = ""
     for genre in GENRES:
-        books = genre_data.get(genre["key"], [])
-        if not books:
+        key = genre["key"]
+        # 하나라도 데이터 있는 플랫폼이 있어야 섹션 생성
+        plat_books = {
+            p["key"]: platform_data.get(p["key"], {}).get(key, [])
+            for p in _PLATFORM_TABS
+        }
+        if not any(plat_books.values()):
             continue
-        rows = []
-        for b in books:
-            kakao = f"{b['sources'].get('카카오페이지')}위" if b['sources'].get('카카오페이지') else "-"
-            naver = f"{b['sources'].get('네이버 시리즈')}위" if b['sources'].get('네이버 시리즈') else "-"
-            ridi  = f"{b['sources'].get('리디')}위" if b['sources'].get('리디') else "-"
-            rows.append(
-                f"| **{b['rank']}** | [{b['title']}]({b['link']}) | {b['author']} | {kakao} | {naver} | {ridi} |"
-            )
-        table = "\n".join([
-            "| 순위 | 작품 | 작가 | 카카오페이지 | 네이버 시리즈 | 리디 |",
-            "|:----:|------|------|:----------:|:-----------:|:----:|",
-            *rows,
-        ])
-        genre_sections += f"\n## {genre['emoji']} {genre['name']}\n\n{table}\n"
+
+        # 탭 버튼 + 패널 생성
+        first_active = next((p["key"] for p in _PLATFORM_TABS if plat_books[p["key"]]), None)
+        btns_html = ""
+        panels_html = ""
+        for plat in _PLATFORM_TABS:
+            pk = plat["key"]
+            tab_id = f"t-{key}-{pk.replace(' ','')}"
+            is_active = (pk == first_active)
+            active_cls = " is-active" if is_active else ""
+            hidden_attr = "" if is_active else ' style="display:none"'
+            btns_html += f'<button class="ptab-btn{active_cls}" data-target="{tab_id}">{plat["label"]}</button>'
+            panels_html += f'<div id="{tab_id}" class="ptab-panel"{hidden_attr}>{_platform_table_html(plat_books[pk])}</div>'
+
+        tabs_html = (
+            f'<div class="ptab-wrap">'
+            f'<div class="ptab-nav">{btns_html}</div>'
+            f'{panels_html}'
+            f'</div>'
+        )
+        genre_sections += f"\n## {genre['emoji']} {genre['name']}\n\n{tabs_html}\n"
+
+    tab_script = """
+<script>
+(function(){
+  function init(){
+    document.querySelectorAll('.ptab-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var wrap=btn.closest('.ptab-wrap');
+        wrap.querySelectorAll('.ptab-btn').forEach(function(b){b.classList.remove('is-active');});
+        wrap.querySelectorAll('.ptab-panel').forEach(function(p){p.style.display='none';});
+        btn.classList.add('is-active');
+        document.getElementById(btn.dataset.target).style.display='';
+      });
+    });
+  }
+  init();
+  document.addEventListener('astro:after-swap',init);
+})();
+</script>
+<style>
+.ptab-wrap{margin:0.5rem 0 1.5rem;}
+.ptab-nav{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.ptab-btn{padding:4px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:0.82rem;color:var(--text-secondary);transition:all .15s;}
+.ptab-btn.is-active{background:var(--green);color:#fff;border-color:var(--green);}
+.ptab-table{width:100%;border-collapse:collapse;font-size:0.875rem;}
+.ptab-table th{background:var(--bg-subtle);padding:6px 10px;border:1px solid var(--border);font-weight:600;white-space:nowrap;}
+.ptab-table td{padding:5px 10px;border:1px solid var(--border);}
+.ptab-table tr:nth-child(even) td{background:var(--bg-subtle);}
+.ptab-table a{color:var(--green);text-decoration:none;}
+.ptab-table a:hover{text-decoration:underline;}
+.ptab-empty{color:var(--text-muted);font-size:0.9rem;padding:8px 0;}
+@media(max-width:640px){.ptab-table th,.ptab-table td{padding:4px 6px;font-size:0.78rem;}}
+</style>
+"""
 
     return f"""---
 title: "웹소설 베스트셀러 ({date_kr})"
@@ -523,7 +597,9 @@ isHidden: true
 ---
 
 *데이터 출처: [카카오페이지](https://page.kakao.com) · [네이버 시리즈](https://series.naver.com) · [리디](https://ridibooks.com)*
-*Gemini AI가 자동으로 수집·분석한 웹소설 베스트셀러 리포트입니다.*
+*매주 자동으로 수집되는 웹소설 베스트셀러 리포트입니다.*
+
+{tab_script}
 """
 
 
@@ -587,7 +663,12 @@ def main():
     print("\n  🤖 Gemini AI 트렌드 분석 중...")
     ai_content = generate_ai_content(client, genre_data)
 
-    md = build_markdown(genre_data, ai_content, DATE)
+    platform_data = {
+        "카카오페이지": kakao_data,
+        "네이버 시리즈": naver_data,
+        "리디":         ridi_data,
+    }
+    md = build_markdown(platform_data, ai_content, DATE)
     slug = f"{DATE}-webnovel"
     out_dir = pathlib.Path("contents/book") / slug
     out_dir.mkdir(parents=True, exist_ok=True)
