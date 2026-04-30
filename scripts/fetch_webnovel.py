@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""웹소설 주간 베스트셀러 수집 — 카카오페이지 · 네이버 시리즈 · 리디"""
+"""웹소설 주간 베스트셀러 수집 — 카카오페이지 · 네이버 시리즈 · 리디
+Playwright로 렌더링 후 Gemini AI가 텍스트를 직접 파싱 → 구조 변경에 자동 적응
+"""
 
 import os
 import sys
@@ -8,6 +10,7 @@ import re
 import pathlib
 from playwright.sync_api import sync_playwright, Page
 from google import genai
+from google.genai import types as genai_types
 from datetime import datetime
 
 DATE = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y-%m-%d")
@@ -43,306 +46,120 @@ def classify_genre(text: str) -> str:
     return "fantasy"
 
 
-def _find_list_items(obj, depth=0) -> list:
-    if depth > 8:
-        return []
-    if isinstance(obj, list) and len(obj) >= 3:
-        if isinstance(obj[0], dict) and any(k in obj[0] for k in ("title", "name", "id")):
-            return obj
-    if isinstance(obj, dict):
-        for v in obj.values():
-            found = _find_list_items(v, depth + 1)
-            if found:
-                return found
-    return []
-
-
-def _extract_next_data(html: str) -> dict:
-    match = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
-    if match:
-        return json.loads(match.group(1))
-    return {}
-
-
-# ── 카카오페이지 ─────────────────────────────────────────────
-def fetch_kakaopage(pw_page: Page, limit: int = 20) -> list[dict]:
-    urls = [
-        "https://page.kakao.com/menu/10011/screen/94",  # 실시간 랭킹
-        "https://page.kakao.com/menu/10011",
-        "https://page.kakao.com/landing/novel",
-    ]
+# ── AI 기반 범용 수집기 ──────────────────────────────────────
+def _fetch_page_with_gemini(
+    pw_page: Page,
+    client: genai.Client,
+    urls: list[str],
+    source_name: str,
+    limit: int = 20,
+) -> list[dict]:
+    """Playwright 렌더링 → Gemini AI 파싱. DOM/URL 구조 변경에 자동 적응."""
     for url in urls:
         try:
-            print(f"  카카오페이지 URL={url}")
+            print(f"  {source_name} URL={url}")
             pw_page.goto(url, wait_until="networkidle", timeout=30000)
-            html = pw_page.content()
-            data = _extract_next_data(html)
-            if not data:
-                print("  ⚠️  카카오페이지 __NEXT_DATA__ 없음, 다음 URL 시도")
+
+            # 메인 콘텐츠 텍스트 추출 (main 태그 우선, 없으면 body)
+            text: str = pw_page.evaluate("""() => {
+                const el = document.querySelector(
+                    'main, [role="main"], #content, #wrap, .container, article'
+                );
+                return (el || document.body).innerText;
+            }""")
+
+            if not text or len(text.strip()) < 50:
+                print(f"  ⚠️  {source_name} 페이지 텍스트 없음")
                 continue
 
-            def search_kakao(obj, depth=0):
-                if depth > 10:
-                    return []
-                if isinstance(obj, list) and len(obj) >= 3:
-                    if isinstance(obj[0], dict) and any(
-                        k in obj[0] for k in ("seriesTitle", "seriesId")  # 소설 고유 키 필수
-                    ):
-                        return obj
-                if isinstance(obj, dict):
-                    for key in ("list", "items", "contents", "novels", "works", "seriesList"):
-                        if key in obj and isinstance(obj[key], list) and len(obj[key]) >= 3:
-                            r = search_kakao(obj[key], depth + 1)
-                            if r:
-                                return r
-                    for v in obj.values():
-                        r = search_kakao(v, depth + 1)
-                        if r:
-                            return r
-                return []
+            prompt = f"""다음은 "{source_name}" 웹소설 베스트셀러 페이지의 텍스트입니다.
 
-            items = search_kakao(data)
-            if not items:
-                print("  ⚠️  카카오페이지 items 없음, 다음 URL 시도")
-                continue
+<page_text>
+{text[:8000]}
+</page_text>
 
-            print(f"  카카오페이지 items={len(items)}개 발견")
-            _KAKAO_NAV = {"추천", "웹툰", "웹소설", "책", "소설", "만화", "완결", "manhwa", "novel"}
-            results = []
-            for i, item in enumerate(items[:limit], start=1):
-                title = item.get("seriesTitle") or item.get("title") or item.get("name") or ""
-                if isinstance(title, dict):
-                    title = title.get("main") or title.get("ko") or ""
-                title = str(title).strip()
-                if not title or len(title) < 2 or title.lower() in _KAKAO_NAV:
-                    continue
-                author = item.get("author") or item.get("authorName") or item.get("nickname") or ""
-                if isinstance(author, dict):
-                    author = author.get("name") or ""
-                if isinstance(author, list):
-                    author = author[0].get("name", "") if author else ""
-                thumbnail = item.get("thumbnail") or item.get("thumbnailImage") or item.get("coverImage") or ""
-                if isinstance(thumbnail, dict):
-                    thumbnail = thumbnail.get("url") or thumbnail.get("src") or ""
-                genre_text = str(item.get("genre") or item.get("category") or item.get("tags") or "")
-                series_id = item.get("seriesId") or item.get("id") or ""
-                link = f"https://page.kakao.com/content/{series_id}" if series_id else "https://page.kakao.com"
-                results.append({
-                    "rank": i,
-                    "title": str(title).strip(),
-                    "author": str(author).strip(),
-                    "cover": str(thumbnail).strip(),
-                    "link": link,
-                    "genre_key": classify_genre(genre_text + " " + str(title)),
-                    "source": "카카오페이지",
-                })
-            return results
-        except Exception as e:
-            print(f"  ⚠️  카카오페이지 {url} 실패: {e}")
+위 텍스트에서 웹소설 베스트셀러 순위를 추출하세요.
 
-    print("  ⚠️  카카오페이지 모든 URL 실패")
-    return []
+규칙:
+- 실제 웹소설 작품 제목만 포함
+- 메뉴, 배너, 카테고리명, 프로모션 문구("추천", "완결", "무료", "타임딜", "이벤트", "NEW" 등) 제외
+- 작가명이 없으면 빈 문자열
+- 최대 {limit}개
+- 반드시 JSON 배열로만 응답 (다른 텍스트 없이)
 
+[{{"rank": 1, "title": "작품명", "author": "작가명"}}]"""
 
-# ── 네이버 시리즈 ────────────────────────────────────────────
-def fetch_naver_series(pw_page: Page, limit: int = 20) -> list[dict]:
-    urls = [
-        "https://series.naver.com/novel/top100List.series",
-        "https://series.naver.com/novel/bestseller.series",
-    ]
-    for url in urls:
-        try:
-            print(f"  네이버 시리즈 URL={url}")
-            pw_page.goto(url, wait_until="networkidle", timeout=30000)
-            html = pw_page.content()
-
-            # __NEXT_DATA__ 시도
-            data = _extract_next_data(html)
-            if data:
-                items = _find_list_items(data)
-                if items:
-                    results = []
-                    for i, item in enumerate(items[:limit], start=1):
-                        title = item.get("title") or item.get("name") or ""
-                        if isinstance(title, dict):
-                            title = title.get("main") or ""
-                        author = item.get("author") or item.get("writerName") or ""
-                        if isinstance(author, list):
-                            author = author[0] if author else ""
-                        thumbnail = item.get("thumbnail") or item.get("cover") or ""
-                        if isinstance(thumbnail, dict):
-                            thumbnail = thumbnail.get("url") or ""
-                        genre_text = str(item.get("genre") or item.get("category") or "")
-                        link_id = item.get("productId") or item.get("id") or ""
-                        link = f"https://series.naver.com/novel/detail.series?productNo={link_id}" if link_id else url
-                        results.append({
-                            "rank": i,
-                            "title": str(title).strip(),
-                            "author": str(author).strip(),
-                            "cover": str(thumbnail).strip(),
-                            "link": link,
-                            "genre_key": classify_genre(genre_text + " " + str(title)),
-                            "source": "네이버 시리즈",
-                        })
-                    if results:
-                        print(f"  네이버 시리즈 items={len(results)}개 발견 (NEXT_DATA)")
-                        return results
-
-            # JS 렌더링 후 DOM에서 직접 추출
-            try:
-                pw_page.wait_for_selector(
-                    "a[href*='productNo'], a[href*='detail.series'], li.item_list a, .pic_area a",
-                    timeout=15000,
-                )
-            except Exception:
-                pass  # 타임아웃 시 현재 DOM으로 시도
-            links = pw_page.query_selector_all(
-                "a[href*='productNo'], a[href*='detail.series?productNo']"
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt,
+                config=genai_types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                ),
             )
-            results = []
-            seen = set()
-            for el in links:
-                href = el.get_attribute("href") or ""
-                m = re.search(r'productNo=(\d+)', href)
+
+            # JSON 파싱 (배열 추출 fallback 포함)
+            raw = response.text.strip()
+            try:
+                items = json.loads(raw)
+            except Exception:
+                m = re.search(r"\[.*\]", raw, re.DOTALL)
                 if not m:
+                    print(f"  ⚠️  {source_name} JSON 파싱 실패")
                     continue
-                pid = m.group(1)
-                if pid in seen:
-                    continue
-                seen.add(pid)
-                title = el.inner_text().strip()
-                _NAVER_PROMO = {"무료", "타임딜", "이벤트", "프로모션", "시리즈에디션", "시리즈 에디션", "매일"}
-                if not title or len(title) < 2 or any(kw in title for kw in _NAVER_PROMO):
+                items = json.loads(m.group())
+
+            if not isinstance(items, list) or len(items) < 3:
+                print(f"  ⚠️  {source_name} 추출 결과 부족 ({len(items) if isinstance(items, list) else 0}개), 다음 URL 시도")
+                continue
+
+            results = []
+            for item in items:
+                title = str(item.get("title", "")).strip()
+                if not title or len(title) < 2:
                     continue
                 results.append({
                     "rank": len(results) + 1,
                     "title": title,
-                    "author": "",
+                    "author": str(item.get("author", "")).strip(),
                     "cover": "",
-                    "link": f"https://series.naver.com/novel/detail.series?productNo={pid}",
+                    "link": url,
                     "genre_key": classify_genre(title),
-                    "source": "네이버 시리즈",
+                    "source": source_name,
                 })
-                if len(results) >= limit:
-                    break
+
             if results:
-                print(f"  네이버 시리즈 items={len(results)}개 발견 (DOM)")
+                print(f"  {source_name} {len(results)}개 수집 완료 (AI)")
                 return results
 
-            print("  ⚠️  네이버 시리즈 데이터 없음, 다음 URL 시도")
+            print(f"  ⚠️  {source_name} 유효한 작품 없음, 다음 URL 시도")
         except Exception as e:
-            print(f"  ⚠️  네이버 시리즈 {url} 실패: {e}")
+            print(f"  ⚠️  {source_name} {url} 실패: {e}")
 
-    print("  ⚠️  네이버 시리즈 모든 URL 실패")
+    print(f"  ⚠️  {source_name} 모든 URL 실패")
     return []
 
 
-# ── 리디 웹소설 ──────────────────────────────────────────────
-def fetch_ridi_webnovel(pw_page: Page, limit: int = 20) -> list[dict]:
-    urls = [
-        "https://ridibooks.com/category/bestsellers/1750",  # 판타지 웹소설
+# ── 각 플랫폼 수집 ───────────────────────────────────────────
+def fetch_kakaopage(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
+    return _fetch_page_with_gemini(pw_page, client, [
+        "https://page.kakao.com/menu/10011/screen/94",  # 실시간 랭킹
+        "https://page.kakao.com/menu/10011",
+    ], "카카오페이지", limit)
+
+
+def fetch_naver_series(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
+    return _fetch_page_with_gemini(pw_page, client, [
+        "https://series.naver.com/novel/top100List.series",
+        "https://series.naver.com/novel/bestseller.series",
+    ], "네이버 시리즈", limit)
+
+
+def fetch_ridi_webnovel(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
+    return _fetch_page_with_gemini(pw_page, client, [
+        "https://ridibooks.com/category/bestsellers/1750",  # 판타지
         "https://ridibooks.com/category/6050",              # 로맨스판타지
-        "https://ridibooks.com/category/1650",              # 로맨스 웹소설
-    ]
-    for url in urls:
-        try:
-            print(f"  리디 웹소설 URL={url}")
-            pw_page.goto(url, wait_until="networkidle", timeout=30000)
-            html = pw_page.content()
-            data = _extract_next_data(html)
-            if not data:
-                print("  ⚠️  리디 __NEXT_DATA__ 없음, 다음 URL 시도")
-                continue
-            queries = (data.get("props", {})
-                           .get("pageProps", {})
-                           .get("dehydratedState", {})
-                           .get("queries", []))
-            print(f"  리디 queries={len(queries)}개")
-            items = []
-            for q in queries:
-                q_data = q.get("state", {}).get("data", {})
-                for key in ("bestsellers", "chartBooks", "books", "items", "contents"):
-                    node = q_data.get(key)
-                    if isinstance(node, dict) and "items" in node:
-                        items = node["items"]
-                        break
-                    if isinstance(node, list) and node:
-                        items = node
-                        break
-                if not items:
-                    items = _find_list_items(q_data)
-                if items:
-                    break
-            if not items:
-                # __NEXT_DATA__ 실패 시 DOM에서 직접 추출 시도
-                try:
-                    pw_page.wait_for_selector("a[href*='/books/']", timeout=10000)
-                except Exception:
-                    pass
-                dom_links = pw_page.query_selector_all("li a[href*='/books/']")
-                dom_results = []
-                seen_ids: set[str] = set()
-                _RIDI_CAT = {"소설", "경영/경제", "인문/사회/역사", "자기계발", "에세이/시",
-                             "여행", "종교", "웹툰", "만화", "잡지"}
-                for el in dom_links:
-                    href = el.get_attribute("href") or ""
-                    m = re.search(r'/books/(\d{8,})', href)  # 리디 북 ID는 8자리 이상
-                    if not m:
-                        continue
-                    book_id = m.group(1)
-                    if book_id in seen_ids:
-                        continue
-                    seen_ids.add(book_id)
-                    title_el = el.query_selector("strong, span, p")
-                    title = (title_el.inner_text().strip() if title_el else el.inner_text().strip())
-                    if not title or len(title) < 2 or title in _RIDI_CAT:
-                        continue
-                    dom_results.append({
-                        "rank": len(dom_results) + 1,
-                        "title": title,
-                        "author": "",
-                        "cover": "",
-                        "link": f"https://ridibooks.com/books/{book_id}",
-                        "genre_key": classify_genre(title),
-                        "source": "리디",
-                    })
-                    if len(dom_results) >= limit:
-                        break
-                if dom_results:
-                    print(f"  리디 웹소설 items={len(dom_results)}개 발견 (DOM)")
-                    return dom_results
-                print("  ⚠️  리디 items 없음, 다음 URL 시도")
-                continue
-            print(f"  리디 웹소설 items={len(items)}개 발견")
-            results = []
-            for i, entry in enumerate(items[:limit], start=1):
-                book = entry.get("book", entry)
-                title_node = book.get("title", {})
-                title = title_node.get("main", "") if isinstance(title_node, dict) else str(title_node)
-                if not title:
-                    continue
-                authors = book.get("authors", [])
-                author = authors[0].get("name", "") if authors and isinstance(authors[0], dict) else ""
-                book_id = book.get("id", "")
-                thumb = book.get("thumbnail", {})
-                cover = (thumb.get("large", "") or thumb.get("small", "")) if isinstance(thumb, dict) else ""
-                cats = book.get("categories", [])
-                cat_text = " ".join([c.get("name", "") for c in cats if isinstance(c, dict)])
-                results.append({
-                    "rank": i,
-                    "title": title.strip(),
-                    "author": author.strip(),
-                    "cover": cover,
-                    "link": f"https://ridibooks.com/books/{book_id}",
-                    "genre_key": classify_genre(cat_text + " " + title),
-                    "source": "리디",
-                })
-            return results
-        except Exception as e:
-            print(f"  ⚠️  리디 {url} 실패: {e}")
-
-    print("  ⚠️  리디 웹소설 모든 URL 실패")
-    return []
+        "https://ridibooks.com/category/1650",              # 로맨스
+    ], "리디", limit)
 
 
 # ── 종합 순위 합산 ──────────────────────────────────────────
@@ -389,10 +206,8 @@ def group_by_genre(all_items: list[dict], top_n: int = 5) -> dict[str, list[dict
     return result
 
 
-# ── Gemini AI 분석 ───────────────────────────────────────────
-def generate_ai_content(overall: list[dict], genre_data: dict[str, list[dict]]) -> str:
-    client = genai.Client(api_key=GEMINI_API_KEY)
-
+# ── Gemini AI 트렌드 분석 ────────────────────────────────────
+def generate_ai_content(client: genai.Client, overall: list[dict], genre_data: dict[str, list[dict]]) -> str:
     overall_list = "\n".join(
         f"{b['rank']}. {b['title']} - {b['author']} "
         f"({', '.join(f'{k} {v}위' for k, v in b['sources'].items())})"
@@ -457,9 +272,9 @@ def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], ai_co
 
     rows = []
     for b in overall:
-        kakao = f"{b['sources'].get('카카오페이지', '-')}위" if b['sources'].get('카카오페이지') else "-"
-        naver = f"{b['sources'].get('네이버 시리즈', '-')}위" if b['sources'].get('네이버 시리즈') else "-"
-        ridi  = f"{b['sources'].get('리디', '-')}위" if b['sources'].get('리디') else "-"
+        kakao = f"{b['sources'].get('카카오페이지')}위" if b['sources'].get('카카오페이지') else "-"
+        naver = f"{b['sources'].get('네이버 시리즈')}위" if b['sources'].get('네이버 시리즈') else "-"
+        ridi  = f"{b['sources'].get('리디')}위" if b['sources'].get('리디') else "-"
         genre = next((g["name"] for g in GENRES if g["key"] == b["genre_key"]), "기타")
         rows.append(f"| **{b['rank']}** | [{b['title']}]({b['link']}) | {b['author']} | {genre} | {kakao} | {naver} | {ridi} |")
 
@@ -476,7 +291,7 @@ def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], ai_co
             continue
         genre_rows = []
         for b in books:
-            srcs = b.get('sources', {b.get('source', ''): b.get('rank')})
+            srcs = b.get("sources", {b.get("source", ""): b.get("rank")})
             kakao = f"{srcs.get('카카오페이지')}위" if srcs.get('카카오페이지') else "-"
             naver = f"{srcs.get('네이버 시리즈')}위" if srcs.get('네이버 시리즈') else "-"
             ridi  = f"{srcs.get('리디')}위" if srcs.get('리디') else "-"
@@ -530,21 +345,26 @@ isHidden: true
 def main():
     print(f"[{DATE}] 웹소설 베스트셀러 수집 시작\n")
 
+    client = genai.Client(api_key=GEMINI_API_KEY)
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        ctx = browser.new_context(locale="ko-KR")
+        ctx = browser.new_context(
+            locale="ko-KR",
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        )
         pw_page = ctx.new_page()
 
         print("  📱 카카오페이지 수집...")
-        kakao_items = fetch_kakaopage(pw_page, 20)
+        kakao_items = fetch_kakaopage(pw_page, client, 20)
         print(f"     → {len(kakao_items)}개")
 
         print("  📗 네이버 시리즈 수집...")
-        naver_items = fetch_naver_series(pw_page, 20)
+        naver_items = fetch_naver_series(pw_page, client, 20)
         print(f"     → {len(naver_items)}개")
 
         print("  📘 리디 웹소설 수집...")
-        ridi_items = fetch_ridi_webnovel(pw_page, 20)
+        ridi_items = fetch_ridi_webnovel(pw_page, client, 20)
         print(f"     → {len(ridi_items)}개")
 
         browser.close()
@@ -565,7 +385,7 @@ def main():
             print(f"     [{genre['name']}] {cnt}개")
 
     print("\n  🤖 Gemini AI 분석 중...")
-    ai_content = generate_ai_content(overall, genre_data)
+    ai_content = generate_ai_content(client, overall, genre_data)
 
     md = build_markdown(overall, genre_data, ai_content, DATE)
     slug = f"{DATE}-webnovel"
