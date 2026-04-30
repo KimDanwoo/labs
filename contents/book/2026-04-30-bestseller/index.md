@@ -10,44 +10,46 @@ isHidden: true
 
 | 순위 | 책 | 저자 | 장르 | 알라딘 | 리디 |
 |:----:|-----|------|------|:------:|:----:|
-| **1** | [프로젝트 헤일 메리](https://www.aladin.co.kr) | 앤디 위어 | 소설 | 1위 | 1위 |
-| **2** | [세이노의 가르침](https://www.aladin.co.kr) | 세이노 | 자기계발 | 2위 | 3위 |
-| **3** | [트렌드 코리아 2026](https://www.aladin.co.kr) | 김난도 | 경제경영 | 3위 | 4위 |
-| **4** | [역행자](https://www.aladin.co.kr) | 자청 | 자기계발 | 5위 | 2위 |
-| **5** | [채식주의자](https://www.aladin.co.kr) | 한강 | 소설 | 4위 | 6위 |
-| **6** | [아주 작은 습관의 힘](https://www.aladin.co.kr) | 제임스 클리어 | 자기계발 | 6위 | 5위 |
-| **7** | [불편한 편의점 2](https://www.aladin.co.kr) | 김호연 | 소설 | 7위 | 8위 |
-| **8** | [도파민네이션](https://www.aladin.co.kr) | 애나 렘키 | 과학기술 | 9위 | 7위 |
-| **9** | [돈의 심리학](https://www.aladin.co.kr) | 모건 하우절 | 경제경영 | 8위 | 11위 |
-| **10** | [물고기는 존재하지 않는다](https://www.aladin.co.kr) | 룰루 밀러 | 과학기술 | 11위 | 9위 |
-| **11** | [지적 대화를 위한 넓고 얕은 지식](https://www.aladin.co.kr) | 채사장 | 인문사회 | 10위 | 13위 |
-| **12** | [82년생 김지영](https://www.aladin.co.kr) | 조남주 | 소설 | 13위 | 10위 |
-| **13** | [퓨처 셀프](https://www.aladin.co.kr) | 벤저민 하디 | 자기계발 | 12위 | 15위 |
-| **14** | [나는 나로 살기로 했다](https://www.aladin.co.kr) | 김수현 | 에세이 | 14위 | 14위 |
-| **15** | [파친코](https://www.aladin.co.kr) | 이민진 | 소설 | 16위 | 12위 |
+| **1** | [프로젝트 헤일메리](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=270454373&amp;partner=openAPI&amp;start=api) | 앤디 위어 | 소설 | 1위 | - |
+| **2** | [포켓몬 생태도감](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391764120&amp;partner=openAPI&amp;start=api) | 주식회사 포켓몬 | 과학기술 | 2위 | - |
+| **3** | [안녕이라 그랬어](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=365665217&amp;partner=openAPI&amp;start=api) | 김애란 | 소설 | 3위 | - |
+| **4** | [흔한남매 22](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391347886&amp;partner=openAPI&amp;start=api) | 흔한남매 | 기타 | 4위 | - |
+| **5** | [백지 앞에서](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391370049&amp;partner=openAPI&amp;start=api) | 최은영 | 에세이 | 5위 | - |
+| **6** | [21세기 대군부인 대본집 세트](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391831303&amp;partner=openAPI&amp;start=api) | 유지원 | 기타 | 6위 | - |
+| **7** | [구멍청](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391694882&amp;partner=openAPI&amp;start=api) | 백희나 | 기타 | 7위 | - |
+| **8** | [2026 제17회 젊은작가상 수상작품집](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389894398&amp;partner=openAPI&amp;start=api) | 김채원 | 소설 | 8위 | - |
+| **9** | [무례한 세상에서 나를 지키는 법](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388169547&amp;partner=openAPI&amp;start=api) | 발타사르 그라시안 | 자기계발 | 9위 | - |
+| **10** | [2026 큰별쌤 최태성의 별★별한국사 한국사능력검정시험 심화(1, 2, 3급) 상](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=378969369&amp;partner=openAPI&amp;start=api) | 최태성 | 기타 | 10위 | - |
+| **11** | [2026 큰별쌤 최태성의 별★별한국사 한국사능력검정시험 심화(1, 2, 3급) 하](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=378969617&amp;partner=openAPI&amp;start=api) | 최태성 | 기타 | 11위 | - |
+| **12** | [인생을 위한 최소한의 생각](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=385481121&amp;partner=openAPI&amp;start=api) | 신영준 | 인문사회 | 12위 | - |
+| **13** | [괴테는 모든 것을 말했다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=376765918&amp;partner=openAPI&amp;start=api) | 스즈키 유이 | 소설 | 13위 | - |
+| **14** | [순경씨와 나 1](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391456890&amp;partner=openAPI&amp;start=api) | 나오키 유우 | 기타 | 14위 | - |
+| **15** | [흉담](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391285419&amp;partner=openAPI&amp;start=api) | 전건우 | 소설 | 15위 | - |
 
 ---
 
 ## 📊 이번 주 독서 트렌드
-
-앤디 위어의 SF 소설 『프로젝트 헤일 메리』가 알라딘·리디 양대 플랫폼에서 동시에 1위를 차지하며 압도적인 존재감을 드러냈다. 영화화 소식과 함께 재점화된 관심이 판매로 직결된 모양새로, 국내 독자들의 SF 장르에 대한 수요가 그 어느 때보다 높아졌음을 보여준다. 자기계발 분야에서는 세이노·자청·제임스 클리어 등 검증된 롱셀러들이 굳건히 상위권을 지키고 있으며, 한강 작가의 작품들도 꾸준한 판매세를 이어가고 있다. 전반적으로 실용적 지식과 문학적 감수성을 동시에 추구하는 독자층의 폭넓은 취향이 반영된 한 주였다.
+이번 주 독서 트렌드는 SF 소설의 압도적인 인기 속에서 국내 문학의 깊이 있는 탐구, 그리고 어린이 도서의 꾸준한 강세가 두드러집니다. 독자들은 현실의 바쁜 일상 속에서 흥미로운 이야기로의 몰입과 더불어, 자녀 교육 및 실용적인 삶의 지혜를 구하는 다층적인 독서 욕구를 보여주고 있습니다. 또한, 자기계발과 경제경영 분야에서 고전적 지혜와 현대적 성공 전략을 함께 찾는 경향이 뚜렷하며, 건강과 라이프스타일, 그리고 미래 사회를 조망하는 과학 기술 분야에도 꾸준한 관심을 보입니다.
 
 ## 🏆 이번 주 주목할 책
 
-- **1위 프로젝트 헤일 메리** — 영화화 확정 소식 이후 역주행 폭발, 읽기 시작하면 멈출 수 없는 SF의 교과서
-- **2위 세이노의 가르침** — 수십 년치 현실 조언을 집대성한 책으로 장기 스테디셀러 위상 굳건
-- **3위 트렌드 코리아 2026** — 연초 출간 이후 비즈니스 독자 필독서로 자리잡은 트렌드 바이블
-- **4위 역행자** — 경제적 자유를 향한 역주행 공식, 출간 수년이 지나도 식지 않는 인기
-- **5위 채식주의자** — 노벨문학상 이후 꾸준히 신규 독자 유입 중인 한강의 대표작
+-   **1위 프로젝트 헤일메리** — 유쾌한 유머와 지적인 스릴이 넘치는 SF 어드벤처가 독자들을 완벽하게 사로잡으며 종합 베스트셀러 정상을 차지했습니다.
+-   **2위 포켓몬 생태도감** — 포켓몬 세계관에 대한 상세하고 흥미로운 정보로, 어린이 팬들과 성인 팬 모두에게 큰 인기를 얻고 있습니다.
+-   **3위 안녕이라 그랬어** — 김애란 작가 특유의 따뜻하고 섬세한 시선으로 삶의 단면을 깊이 있게 통찰하며 독자들에게 위로와 공감을 전합니다.
+-   **4위 흔한남매 22** — 어린이 독자들의 변함없는 사랑을 받는 베스트셀러 시리즈로, 유쾌한 에피소드들이 꾸준히 즐거움을 선사합니다.
+-   **5위 백지 앞에서** — 최은영 작가가 던지는 묵직한 질문과 인간관계에 대한 깊은 사유가 독자들에게 큰 울림을 주며 문학적 갈증을 해소합니다.
 
 ## 🗂️ 장르별 트렌드
 
-- **📖 소설** — SF 장르 부활 신호탄, 『프로젝트 헤일 메리』가 국내 문학 전체를 압도하는 이례적 주
-- **💼 경제경영** — 트렌드 예측·투자 심리 서적 양강 구도, 불확실한 경제 속 미래 읽기 수요 지속
-- **🚀 자기계발** — 롱셀러 3인방의 아성 여전히 굳건, 검증된 책 선호 경향 뚜렷
-- **🌍 인문사회** — 채사장 시리즈 꾸준, AI와 사회 변화 교양서 서서히 부상 중
-- **🔬 과학기술** — 뇌과학·SF 접점 도서 강세, 도파민네이션과 물고기는 존재하지 않는다 쌍끌이
-- **✍️ 에세이** — 소강 상태, 위로 에세이보다 실용·여행 에세이로 무게중심 이동
+-   **📖 소설** — SF의 상상력과 국내 문학의 섬세함, 그리고 젊은 작가들의 신선한 목소리에 독자들이 뜨겁게 반응합니다.
+-   **💼 경제경영** — 노후 준비와 주식 투자 등 현실적인 재테크 지식과 부를 쌓는 방법에 대한 독자들의 관심이 매우 높습니다.
+-   **🚀 자기계발** — 고전적 지혜를 통해 내면을 단련하고, 현대적 전략으로 부를 축적하려는 두 가지 욕구가 공존합니다.
+-   **🌍 인문사회** — 인생에 대한 깊이 있는 통찰을 추구하며, 인간 본연의 삶과 사회 현상을 다각도로 이해하려는 노력이 엿보입니다.
+-   **🔬 과학기술** — 인공지능과 우주 탐사 등 첨단 과학에 대한 지적 호기심과 함께, 인간의 본성을 탐구하는 경향이 나타납니다.
+-   **✍️ 에세이** — 육아, 건강, 운동 등 일상과 밀접한 실용적인 조언과 건강한 라이프스타일을 추구하는 목소리가 주목받습니다.
+
+##  독자층의 현재 분위기
+독자들은 흥미로운 이야기로의 몰입과 현실적인 삶의 문제를 해결할 지혜, 그리고 더 나은 자신을 위한 성장을 동시에 추구하고 있습니다.
 
 ---
 
@@ -57,55 +59,62 @@ isHidden: true
 
 | 순위 | 책 | 저자 | 알라딘 | 리디 |
 |:----:|-----|------|:------:|:----:|
-| **1** | [프로젝트 헤일 메리](https://www.aladin.co.kr) | 앤디 위어 | 1위 | 1위 |
-| **2** | [채식주의자](https://www.aladin.co.kr) | 한강 | 4위 | 6위 |
-| **3** | [불편한 편의점 2](https://www.aladin.co.kr) | 김호연 | 7위 | 8위 |
-| **4** | [82년생 김지영](https://www.aladin.co.kr) | 조남주 | 13위 | 10위 |
-| **5** | [파친코](https://www.aladin.co.kr) | 이민진 | 16위 | 12위 |
+| **1** | [프로젝트 헤일메리](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=270454373&amp;partner=openAPI&amp;start=api) | 앤디 위어 | 1위 | - |
+| **2** | [안녕이라 그랬어](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=365665217&amp;partner=openAPI&amp;start=api) | 김애란 | 2위 | - |
+| **3** | [2026 제17회 젊은작가상 수상작품집](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389894398&amp;partner=openAPI&amp;start=api) | 김채원 | 3위 | - |
+| **4** | [괴테는 모든 것을 말했다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=376765918&amp;partner=openAPI&amp;start=api) | 스즈키 유이 | 4위 | - |
+| **5** | [흉담](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391285419&amp;partner=openAPI&amp;start=api) | 전건우 | 5위 | - |
 
 ### 💼 경제경영
 
 | 순위 | 책 | 저자 | 알라딘 | 리디 |
 |:----:|-----|------|:------:|:----:|
-| **1** | [트렌드 코리아 2026](https://www.aladin.co.kr) | 김난도 | 3위 | 4위 |
-| **2** | [돈의 심리학](https://www.aladin.co.kr) | 모건 하우절 | 8위 | 11위 |
-| **3** | [부의 추월차선](https://www.aladin.co.kr) | 엠제이 드마코 | 15위 | 16위 |
-| **4** | [넥스트 이코노미](https://www.aladin.co.kr) | 홍춘욱 | 19위 | 18위 |
-| **5** | [주식투자 무작정 따라하기](https://www.aladin.co.kr) | 윤재수 | 21위 | 20위 |
+| **1** | [부의 사다리에 올라타라](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389340198&amp;partner=openAPI&amp;start=api) | 닉 매기울리 | 1위 | - |
+| **2** | [박곰희 연금 부자 수업](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=366615290&amp;partner=openAPI&amp;start=api) | 박곰희 | 2위 | - |
+| **3** | [주식투자를 잘한다는 것](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391172295&amp;partner=openAPI&amp;start=api) | 육과장 | 3위 | - |
+| **4** | [AI, 신의 탄생 인간의 종말](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389318783&amp;partner=openAPI&amp;start=api) | 엘리에저 유드코스키 | 4위 | - |
+| **5** | [1929](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391000055&amp;partner=openAPI&amp;start=api) | 앤드루 로스 소킨 | 5위 | - |
 
 ### 🚀 자기계발
 
 | 순위 | 책 | 저자 | 알라딘 | 리디 |
 |:----:|-----|------|:------:|:----:|
-| **1** | [세이노의 가르침](https://www.aladin.co.kr) | 세이노 | 2위 | 3위 |
-| **2** | [역행자](https://www.aladin.co.kr) | 자청 | 5위 | 2위 |
-| **3** | [아주 작은 습관의 힘](https://www.aladin.co.kr) | 제임스 클리어 | 6위 | 5위 |
-| **4** | [퓨처 셀프](https://www.aladin.co.kr) | 벤저민 하디 | 12위 | 15위 |
-| **5** | [미라클 모닝](https://www.aladin.co.kr) | 할 엘로드 | 18위 | 17위 |
+| **1** | [무례한 세상에서 나를 지키는 법](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388169547&amp;partner=openAPI&amp;start=api) | 발타사르 그라시안 | 1위 | - |
+| **2** | [완벽한 원시인](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=386947012&amp;partner=openAPI&amp;start=api) | 자청 | 2위 | - |
+| **3** | [부의 사다리에 올라타라](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389340198&amp;partner=openAPI&amp;start=api) | 닉 매기울리 | 3위 | - |
+| **4** | [부처님 말씀대로 살아보니](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=385370551&amp;partner=openAPI&amp;start=api) | 토니 페르난도 | 4위 | - |
+| **5** | [내면 근력](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388955379&amp;partner=openAPI&amp;start=api) | 짐 머피 | 5위 | - |
 
 ### 🌍 인문사회
 
 | 순위 | 책 | 저자 | 알라딘 | 리디 |
 |:----:|-----|------|:------:|:----:|
-| **1** | [지적 대화를 위한 넓고 얕은 지식](https://www.aladin.co.kr) | 채사장 | 10위 | 13위 |
-| **2** | [사피엔스](https://www.aladin.co.kr) | 유발 하라리 | 20위 | 19위 |
-| **3** | [총, 균, 쇠](https://www.aladin.co.kr) | 재레드 다이아몬드 | 22위 | 21위 |
+| **1** | [인생을 위한 최소한의 생각](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=385481121&amp;partner=openAPI&amp;start=api) | 신영준 | 1위 | - |
+| **2** | [완벽한 원시인](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=386947012&amp;partner=openAPI&amp;start=api) | 자청 | 2위 | - |
+| **3** | [이향인](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=387930371&amp;partner=openAPI&amp;start=api) | 라미 카민스키 | 3위 | - |
+| **4** | [캐릭터 심리 사전](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388092141&amp;partner=openAPI&amp;start=api) | 린다 N. 에델스타인 | 4위 | - |
+| **5** | [니체의 초월자](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=375395519&amp;partner=openAPI&amp;start=api) | 프리드리히 니체 | 5위 | - |
 
 ### 🔬 과학기술
 
 | 순위 | 책 | 저자 | 알라딘 | 리디 |
 |:----:|-----|------|:------:|:----:|
-| **1** | [도파민네이션](https://www.aladin.co.kr) | 애나 렘키 | 9위 | 7위 |
-| **2** | [물고기는 존재하지 않는다](https://www.aladin.co.kr) | 룰루 밀러 | 11위 | 9위 |
-| **3** | [이기적 유전자](https://www.aladin.co.kr) | 리처드 도킨스 | 23위 | 22위 |
+| **1** | [완벽한 원시인](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=386947012&amp;partner=openAPI&amp;start=api) | 자청 | 1위 | - |
+| **2** | [코스모스](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=870950&amp;partner=openAPI&amp;start=api) | 칼 세이건 | 2위 | - |
+| **3** | [AI, 신의 탄생 인간의 종말](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389318783&amp;partner=openAPI&amp;start=api) | 엘리에저 유드코스키 | 3위 | - |
+| **4** | [모든 것은 결정되어 있다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388879495&amp;partner=openAPI&amp;start=api) | 로버트 M. 새폴스키 | 4위 | - |
+| **5** | [듀얼 브레인](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=358739031&amp;partner=openAPI&amp;start=api) | 이선 몰릭 | 5위 | - |
 
 ### ✍️ 에세이
 
 | 순위 | 책 | 저자 | 알라딘 | 리디 |
 |:----:|-----|------|:------:|:----:|
-| **1** | [나는 나로 살기로 했다](https://www.aladin.co.kr) | 김수현 | 14위 | 14위 |
-| **2** | [어떻게 살 것인가](https://www.aladin.co.kr) | 유시민 | 24위 | 23위 |
-| **3** | [꽤 괜찮은 해피엔딩](https://www.aladin.co.kr) | 이슬아 | 26위 | 25위 |
+| **1** | [안 아픈 아이 잘 낫는 아이 이렇게 키워라](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391282704&amp;partner=openAPI&amp;start=api) | 엘리사 송 | 1위 | - |
+| **2** | [살찌지 않는 몸](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=387584786&amp;partner=openAPI&amp;start=api) | 우창윤 | 2위 | - |
+| **3** | [운동하면 좋은 걸 누가 모르냐고요](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388860802&amp;partner=openAPI&amp;start=api) | 하주원 | 3위 | - |
+| **4** | [김민식의 내 몸을 바꾸는 평생 루틴](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389508926&amp;partner=openAPI&amp;start=api) | 김민식 | 4위 | - |
+| **5** | [이토록 위대한 몸](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=387058373&amp;partner=openAPI&amp;start=api) | 줄리아 엔더스 | 5위 | - |
+
 
 ---
 
