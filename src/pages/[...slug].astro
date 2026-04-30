@@ -5,8 +5,11 @@ import BaseLayout from '~/layouts/BaseLayout.astro'
 import Utterances from '~/components/Common/Utterances'
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog')
-  return posts.map(post => {
+  const techPosts = await getCollection('tech')
+  const bookPosts = await getCollection('book')
+  const allPosts = [...techPosts, ...bookPosts]
+
+  return allPosts.map(post => {
     const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '')
     return {
       params: { slug },
@@ -16,7 +19,7 @@ export async function getStaticPaths() {
 }
 
 type Props = {
-  post: CollectionEntry<'blog'>
+  post: CollectionEntry<'tech'> | CollectionEntry<'book'>
 }
 
 const { post } = Astro.props
@@ -25,6 +28,7 @@ const { title, description, date, thumbnail, category } = post.data
 const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '')
 const url = `https://danwoo-dev.netlify.app/${slug}/`
 const isIntroPage = title === '🧑🏻‍💻 frontend 김단우'
+const isBook = post.collection === 'book'
 const formattedDate = date.toLocaleDateString('ko-KR', {
   year: 'numeric',
   month: 'long',
@@ -41,7 +45,7 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
   <article class="w-full" itemscope itemtype="http://schema.org/Article">
     <header class="w-full mb-10">
       <a
-        href="/"
+        href={isBook ? '/book' : '/'}
         class="inline-flex items-center gap-1.5 text-sm text-grey-1 hover:text-green-0 transition-colors mb-8"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
