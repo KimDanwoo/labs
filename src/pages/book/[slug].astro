@@ -67,6 +67,9 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
       if (table.parentElement?.classList.contains('table-wrap')) return
       const wrap = document.createElement('div')
       wrap.className = 'table-wrap'
+      wrap.style.overflowX = 'auto'
+      wrap.style.webkitOverflowScrolling = 'touch'
+      wrap.style.margin = '1.25rem 0'
       table.parentNode!.insertBefore(wrap, table)
       wrap.appendChild(table)
     })
@@ -155,7 +158,8 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
   }
 
   .article-body :global(table) {
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
   }
