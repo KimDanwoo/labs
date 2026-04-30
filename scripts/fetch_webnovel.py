@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """웹소설 주간 베스트셀러 수집 — 카카오페이지 · 네이버 시리즈 · 리디
-Playwright로 렌더링 후 Gemini AI가 텍스트를 직접 파싱 → 구조 변경에 자동 적응
+
+동작 방식:
+  1단계) 알려진 URL로 시도
+  2단계) 실패 시 사이트 메인에서 Gemini가 랭킹 링크를 자동 탐색
+  3단계) 탐색된 URL로 재시도
+  → URL·DOM 구조가 바뀌어도 자동 적응
 """
 
 import os
@@ -46,33 +51,92 @@ def classify_genre(text: str) -> str:
     return "fantasy"
 
 
-# ── AI 기반 범용 수집기 ──────────────────────────────────────
-def _fetch_page_with_gemini(
+# ── URL 자동 탐색 ────────────────────────────────────────────
+def _discover_ranking_url(
     pw_page: Page,
     client: genai.Client,
-    urls: list[str],
+    base_url: str,
     source_name: str,
-    limit: int = 20,
+    search_hint: str,
+) -> str | None:
+    """메인/부모 페이지 링크 목록에서 Gemini가 베스트셀러 URL을 찾아냄"""
+    try:
+        print(f"  🔍 {source_name} 베이스 페이지 탐색: {base_url}")
+        pw_page.goto(base_url, wait_until="networkidle", timeout=30000)
+
+        # 페이지의 모든 고유 링크 수집
+        links: list[dict] = pw_page.evaluate("""() => {
+            const seen = new Set();
+            return Array.from(document.querySelectorAll('a[href]'))
+                .map(a => ({
+                    text: a.innerText.trim().replace(/\\s+/g, ' ').slice(0, 60),
+                    href: a.href
+                }))
+                .filter(l => {
+                    if (!l.text || !l.href.startsWith('http') || seen.has(l.href)) return false;
+                    seen.add(l.href);
+                    return true;
+                })
+                .slice(0, 200);
+        }""")
+
+        if not links:
+            return None
+
+        # 랭킹 관련 키워드로 사전 필터링 (Gemini 입력 최소화)
+        RANK_KW = ["베스트", "랭킹", "순위", "best", "rank", "top", "인기", "실시간", "100", "novel", "웹소설"]
+        filtered = [l for l in links if any(kw in (l["text"] + l["href"]).lower() for kw in RANK_KW)]
+        candidates = filtered if len(filtered) >= 3 else links[:80]
+
+        links_md = "\n".join(f"- [{l['text']}]({l['href']})" for l in candidates[:80])
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=f"""{source_name} 사이트에서 "{search_hint}"에 해당하는 페이지 링크를 찾아주세요.
+
+후보 링크:
+{links_md}
+
+가장 적합한 URL 하나만 응답하세요 (http로 시작하는 URL만, 다른 텍스트 없이):""",
+        )
+
+        # URL 추출 (응답에서 http URL 파싱)
+        url_match = re.search(r"https?://\S+", response.text)
+        if url_match:
+            discovered = url_match.group().rstrip(".,;)\"'")
+            print(f"  🔍 {source_name} 탐색된 URL: {discovered}")
+            return discovered
+
+    except Exception as e:
+        print(f"  ⚠️  {source_name} URL 탐색 실패: {e}")
+
+    return None
+
+
+# ── AI 기반 페이지 파싱 ──────────────────────────────────────
+def _parse_page_with_gemini(
+    pw_page: Page,
+    client: genai.Client,
+    url: str,
+    source_name: str,
+    limit: int,
 ) -> list[dict]:
-    """Playwright 렌더링 → Gemini AI 파싱. DOM/URL 구조 변경에 자동 적응."""
-    for url in urls:
-        try:
-            print(f"  {source_name} URL={url}")
-            pw_page.goto(url, wait_until="networkidle", timeout=30000)
+    """이미 열려 있거나 새로 이동한 페이지에서 Gemini로 베스트셀러 추출"""
+    pw_page.goto(url, wait_until="networkidle", timeout=30000)
 
-            # 메인 콘텐츠 텍스트 추출 (main 태그 우선, 없으면 body)
-            text: str = pw_page.evaluate("""() => {
-                const el = document.querySelector(
-                    'main, [role="main"], #content, #wrap, .container, article'
-                );
-                return (el || document.body).innerText;
-            }""")
+    text: str = pw_page.evaluate("""() => {
+        const el = document.querySelector(
+            'main, [role="main"], #content, #wrap, .container, article'
+        );
+        return (el || document.body).innerText;
+    }""")
 
-            if not text or len(text.strip()) < 50:
-                print(f"  ⚠️  {source_name} 페이지 텍스트 없음")
-                continue
+    if not text or len(text.strip()) < 50:
+        return []
 
-            prompt = f"""다음은 "{source_name}" 웹소설 베스트셀러 페이지의 텍스트입니다.
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=f"""다음은 "{source_name}" 웹소설 베스트셀러 페이지의 텍스트입니다.
 
 <page_text>
 {text[:8000]}
@@ -82,84 +146,132 @@ def _fetch_page_with_gemini(
 
 규칙:
 - 실제 웹소설 작품 제목만 포함
-- 메뉴, 배너, 카테고리명, 프로모션 문구("추천", "완결", "무료", "타임딜", "이벤트", "NEW" 등) 제외
+- 메뉴·배너·카테고리명·프로모션 문구("추천", "완결", "무료", "타임딜", "이벤트", "NEW" 등) 제외
 - 작가명이 없으면 빈 문자열
 - 최대 {limit}개
-- 반드시 JSON 배열로만 응답 (다른 텍스트 없이)
+- 반드시 JSON 배열만 응답 (다른 텍스트 없이)
 
-[{{"rank": 1, "title": "작품명", "author": "작가명"}}]"""
+[{{"rank": 1, "title": "작품명", "author": "작가명"}}]""",
+        config=genai_types.GenerateContentConfig(response_mime_type="application/json"),
+    )
 
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt,
-                config=genai_types.GenerateContentConfig(
-                    response_mime_type="application/json"
-                ),
-            )
+    raw = response.text.strip()
+    try:
+        items = json.loads(raw)
+    except Exception:
+        m = re.search(r"\[.*\]", raw, re.DOTALL)
+        if not m:
+            return []
+        items = json.loads(m.group())
 
-            # JSON 파싱 (배열 추출 fallback 포함)
-            raw = response.text.strip()
-            try:
-                items = json.loads(raw)
-            except Exception:
-                m = re.search(r"\[.*\]", raw, re.DOTALL)
-                if not m:
-                    print(f"  ⚠️  {source_name} JSON 파싱 실패")
-                    continue
-                items = json.loads(m.group())
+    if not isinstance(items, list) or len(items) < 3:
+        return []
 
-            if not isinstance(items, list) or len(items) < 3:
-                print(f"  ⚠️  {source_name} 추출 결과 부족 ({len(items) if isinstance(items, list) else 0}개), 다음 URL 시도")
-                continue
+    results = []
+    for item in items:
+        title = str(item.get("title", "")).strip()
+        if not title or len(title) < 2:
+            continue
+        results.append({
+            "rank": len(results) + 1,
+            "title": title,
+            "author": str(item.get("author", "")).strip(),
+            "cover": "",
+            "link": url,
+            "genre_key": classify_genre(title),
+            "source": source_name,
+        })
 
-            results = []
-            for item in items:
-                title = str(item.get("title", "")).strip()
-                if not title or len(title) < 2:
-                    continue
-                results.append({
-                    "rank": len(results) + 1,
-                    "title": title,
-                    "author": str(item.get("author", "")).strip(),
-                    "cover": "",
-                    "link": url,
-                    "genre_key": classify_genre(title),
-                    "source": source_name,
-                })
+    return results
 
+
+# ── 스마트 수집기 (URL 자동 탐색 포함) ──────────────────────
+def _smart_fetch(
+    pw_page: Page,
+    client: genai.Client,
+    known_urls: list[str],
+    base_url: str,
+    source_name: str,
+    search_hint: str,
+    limit: int = 20,
+) -> list[dict]:
+    """
+    1단계) known_urls 순서대로 시도
+    2단계) 모두 실패 → base_url에서 Gemini가 랭킹 URL 자동 탐색
+    3단계) 탐색 URL로 재시도
+    """
+    # 1단계: 알려진 URL 시도
+    for url in known_urls:
+        try:
+            print(f"  {source_name} URL={url}")
+            results = _parse_page_with_gemini(pw_page, client, url, source_name, limit)
             if results:
-                print(f"  {source_name} {len(results)}개 수집 완료 (AI)")
+                print(f"  {source_name} {len(results)}개 수집 완료")
                 return results
-
-            print(f"  ⚠️  {source_name} 유효한 작품 없음, 다음 URL 시도")
+            print(f"  ⚠️  {source_name} 데이터 없음, 다음 URL 시도")
         except Exception as e:
             print(f"  ⚠️  {source_name} {url} 실패: {e}")
 
-    print(f"  ⚠️  {source_name} 모든 URL 실패")
+    # 2단계: URL 자동 탐색
+    print(f"  🔍 {source_name} 알려진 URL 모두 실패 → 자동 탐색 시작")
+    discovered = _discover_ranking_url(pw_page, client, base_url, source_name, search_hint)
+
+    if discovered and discovered not in known_urls:
+        # 3단계: 탐색된 URL로 재시도
+        try:
+            results = _parse_page_with_gemini(pw_page, client, discovered, source_name, limit)
+            if results:
+                print(f"  {source_name} {len(results)}개 수집 완료 (자동 탐색)")
+                return results
+        except Exception as e:
+            print(f"  ⚠️  {source_name} 탐색된 URL 실패: {e}")
+
+    print(f"  ⚠️  {source_name} 최종 실패")
     return []
 
 
 # ── 각 플랫폼 수집 ───────────────────────────────────────────
 def fetch_kakaopage(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
-    return _fetch_page_with_gemini(pw_page, client, [
-        "https://page.kakao.com/menu/10011/screen/94",  # 실시간 랭킹
-        "https://page.kakao.com/menu/10011",
-    ], "카카오페이지", limit)
+    return _smart_fetch(
+        pw_page, client,
+        known_urls=[
+            "https://page.kakao.com/menu/10011/screen/94",  # 실시간 랭킹
+            "https://page.kakao.com/menu/10011",
+        ],
+        base_url="https://page.kakao.com",
+        source_name="카카오페이지",
+        search_hint="웹소설 실시간 베스트셀러·랭킹 페이지",
+        limit=limit,
+    )
 
 
 def fetch_naver_series(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
-    return _fetch_page_with_gemini(pw_page, client, [
-        "https://series.naver.com/novel/top100List.series",
-        "https://series.naver.com/novel/bestseller.series",
-    ], "네이버 시리즈", limit)
+    return _smart_fetch(
+        pw_page, client,
+        known_urls=[
+            "https://series.naver.com/novel/top100List.series",
+            "https://series.naver.com/novel/bestseller.series",
+        ],
+        base_url="https://series.naver.com/novel/",
+        source_name="네이버 시리즈",
+        search_hint="웹소설 베스트셀러·TOP100 순위 페이지",
+        limit=limit,
+    )
 
 
 def fetch_ridi_webnovel(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
-    return _fetch_page_with_gemini(pw_page, client, [
-        "https://ridibooks.com/category/bestsellers/1750",  # 판타지
-        "https://ridibooks.com/category/6050",              # 로맨스판타지
-        "https://ridibooks.com/category/1650",              # 로맨스
-    ], "리디", limit)
+    return _smart_fetch(
+        pw_page, client,
+        known_urls=[
+            "https://ridibooks.com/category/bestsellers/1750",  # 판타지
+            "https://ridibooks.com/category/6050",              # 로맨스판타지
+            "https://ridibooks.com/category/1650",              # 로맨스
+        ],
+        base_url="https://ridibooks.com",
+        source_name="리디",
+        search_hint="웹소설(판타지·로맨스판타지·로맨스) 베스트셀러 페이지",
+        limit=limit,
+    )
 
 
 # ── 종합 순위 합산 ──────────────────────────────────────────
@@ -357,24 +469,24 @@ def main():
 
         print("  📱 카카오페이지 수집...")
         kakao_items = fetch_kakaopage(pw_page, client, 20)
-        print(f"     → {len(kakao_items)}개")
+        print(f"     → {len(kakao_items)}개\n")
 
         print("  📗 네이버 시리즈 수집...")
         naver_items = fetch_naver_series(pw_page, client, 20)
-        print(f"     → {len(naver_items)}개")
+        print(f"     → {len(naver_items)}개\n")
 
         print("  📘 리디 웹소설 수집...")
         ridi_items = fetch_ridi_webnovel(pw_page, client, 20)
-        print(f"     → {len(ridi_items)}개")
+        print(f"     → {len(ridi_items)}개\n")
 
         browser.close()
 
     all_items = kakao_items + naver_items + ridi_items
     if not all_items:
-        print("\n❌ 수집된 데이터 없음. 종료합니다.")
+        print("❌ 수집된 데이터 없음. 종료합니다.")
         sys.exit(1)
 
-    print("\n  🔢 종합 순위 계산...")
+    print("  🔢 종합 순위 계산...")
     overall = merge_rankings(all_items, top_n=15)
     print(f"     → 종합 {len(overall)}개")
 
