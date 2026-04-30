@@ -3,8 +3,9 @@ import { getCollection } from 'astro:content'
 import type { APIContext } from 'astro'
 
 export async function GET(context: APIContext) {
-  const posts = await getCollection('blog')
-  const items = posts
+  const techPosts = await getCollection('tech')
+  const bookPosts = await getCollection('book')
+  const items = [...techPosts, ...bookPosts]
     .filter(post => !post.data.isHidden && post.data.title !== '🧑🏻‍💻 frontend 김단우')
     .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
     .map(post => {

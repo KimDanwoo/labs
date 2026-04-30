@@ -120,7 +120,7 @@ def main():
     date_kr = dt.strftime("%-Y년 %-m월 %-d일")
 
     slug = f"{DATE}-tech-news"
-    output_dir = pathlib.Path("contents/blog") / slug
+    output_dir = pathlib.Path("contents/tech") / slug
     output_dir.mkdir(parents=True, exist_ok=True)
 
     frontmatter = f"""---
