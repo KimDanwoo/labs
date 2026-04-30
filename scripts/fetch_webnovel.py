@@ -112,15 +112,66 @@ def _discover_url(
     return None
 
 
-# ── 페이지 텍스트 추출 ────────────────────────────────────────
-def _get_page_text(pw_page: Page, url: str) -> str:
+# ── 페이지 텍스트 + 링크 추출 ────────────────────────────────
+def _get_page_data(
+    pw_page: Page,
+    url: str,
+    link_pattern: str = "",
+) -> tuple[str, dict[str, str]]:
+    """페이지 텍스트 + (제목→URL) 매핑 반환"""
     pw_page.goto(url, wait_until="networkidle", timeout=30000)
-    return pw_page.evaluate("""() => {
+    text = pw_page.evaluate("""() => {
         const el = document.querySelector(
             'main, [role="main"], #content, #wrap, .container, article'
         );
         return (el || document.body).innerText;
     }""")
+    title_to_url: dict[str, str] = {}
+    if link_pattern:
+        pat_json = json.dumps(link_pattern)
+        links: list[dict] = pw_page.evaluate(f"""() => {{
+            const pat = {pat_json};
+            const seen = new Set();
+            return Array.from(document.querySelectorAll('a[href]'))
+                .filter(a => a.href && a.href.includes(pat))
+                .map(a => ({{
+                    text: a.innerText.trim().replace(/\\s+/g, ' '),
+                    href: a.href
+                }}))
+                .filter(l => {{
+                    if (!l.text || l.text.length < 2 || seen.has(l.href)) return false;
+                    seen.add(l.href);
+                    return true;
+                }});
+        }}""")
+        for link in links:
+            t = link["text"].strip()
+            if t:
+                title_to_url[t] = link["href"]
+    return text, title_to_url
+
+
+def _get_page_text(pw_page: Page, url: str) -> str:
+    text, _ = _get_page_data(pw_page, url)
+    return text
+
+
+def _lookup_link(title: str, title_to_url: dict[str, str]) -> str:
+    """제목으로 URL 검색 (정확→정규화→부분 순서로 매칭)"""
+    if not title_to_url or not title:
+        return ""
+    if title in title_to_url:
+        return title_to_url[title]
+    def norm(t: str) -> str:
+        return re.sub(r"[\s\W]", "", t).lower()
+    nt = norm(title)
+    for t, u in title_to_url.items():
+        if norm(t) == nt:
+            return u
+    for t, u in title_to_url.items():
+        if nt and (nt in norm(t) or norm(t) in nt):
+            return u
+    return ""
 
 
 # ── 리디: 장르별 전용 URL 수집 ───────────────────────────────
@@ -145,10 +196,10 @@ def fetch_ridi_by_genre(
                 continue
             try:
                 print(f"  리디 [{name}] URL={url}")
-                text = _get_page_text(pw_page, url)
+                text, title_to_url = _get_page_data(pw_page, url, link_pattern="/books/")
                 if not text or len(text.strip()) < 50:
                     continue
-                items = _parse_single_genre(client, text, "리디", name, limit)
+                items = _parse_single_genre(client, text, "리디", name, limit, title_to_url)
                 if items:
                     used_urls.add(url)
                     break
@@ -174,14 +225,16 @@ def fetch_platform_all_genres(
     urls: list[str],
     base_url: str,
     source_name: str,
+    link_pattern: str = "",
     limit: int = 10,
 ) -> dict[str, list[dict]]:
     """전체 랭킹 페이지 1회 로드 → Gemini가 장르별 분류"""
     text = ""
+    title_to_url: dict[str, str] = {}
     for url in urls:
         try:
             print(f"  {source_name} URL={url}")
-            text = _get_page_text(pw_page, url)
+            text, title_to_url = _get_page_data(pw_page, url, link_pattern)
             if text and len(text.strip()) > 50:
                 break
             text = ""
@@ -194,7 +247,7 @@ def fetch_platform_all_genres(
         disc = _discover_url(pw_page, client, base_url, source_name, "웹소설 베스트셀러 랭킹")
         if disc:
             try:
-                text = _get_page_text(pw_page, disc)
+                text, title_to_url = _get_page_data(pw_page, disc, link_pattern)
             except Exception as e:
                 print(f"  ⚠️  {source_name} 탐색 URL 실패: {e}")
 
@@ -256,12 +309,13 @@ def fetch_platform_all_genres(
             title = str(item.get("title", "")).strip()
             if not title or len(title) < 2:
                 continue
+            link = _lookup_link(title, title_to_url) or (urls[0] if urls else base_url)
             items.append({
                 "rank": len(items) + 1,
                 "title": title,
                 "author": str(item.get("author", "")).strip(),
                 "cover": "",
-                "link": urls[0] if urls else base_url,
+                "link": link,
                 "genre_key": key,
                 "source": source_name,
             })
@@ -307,6 +361,9 @@ def merge_genre_data(
                     }
                 scores[nkey]["score"] += pts
                 scores[nkey]["sources"][item["source"]] = item["rank"]
+                # 링크 없으면 다른 플랫폼 링크로 업데이트
+                if not scores[nkey]["link"] and item.get("link"):
+                    scores[nkey]["link"] = item["link"]
 
         if scores:
             ranked = sorted(scores.values(), key=lambda x: x["score"], reverse=True)
@@ -334,6 +391,7 @@ def _parse_single_genre(
     source_name: str,
     genre_name: str,
     limit: int,
+    title_to_url: dict[str, str] | None = None,
 ) -> list[dict]:
     criteria = _GENRE_CRITERIA.get(genre_name, genre_name)
     response = client.models.generate_content(
@@ -375,7 +433,7 @@ def _parse_single_genre(
             "title": title,
             "author": str(item.get("author", "")).strip(),
             "cover": "",
-            "link": "",
+            "link": _lookup_link(title, title_to_url or {}),
         })
     return results
 
@@ -495,6 +553,7 @@ def main():
             urls=["https://page.kakao.com/menu/10011/screen/94", "https://page.kakao.com/menu/10011"],
             base_url="https://page.kakao.com",
             source_name="카카오페이지",
+            link_pattern="/content/",
             limit=10,
         )
         print(f"     → {sum(len(v) for v in kakao_data.values())}개 ({len(kakao_data)}장르)\n")
@@ -506,6 +565,7 @@ def main():
             urls=["https://series.naver.com/novel/top100List.series", "https://series.naver.com/novel/bestseller.series"],
             base_url="https://series.naver.com/novel/",
             source_name="네이버 시리즈",
+            link_pattern="productNo",
             limit=10,
         )
         print(f"     → {sum(len(v) for v in naver_data.values())}개 ({len(naver_data)}장르)\n")
