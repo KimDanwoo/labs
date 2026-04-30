@@ -36,6 +36,19 @@ GENRES = [
 GENRE_KR_TO_KEY = {g["name"]: g["key"] for g in GENRES}
 GENRE_KEY_TO_NAME = {g["key"]: g["name"] for g in GENRES}
 
+# 네이버 시리즈 장르별 genreCode 파라미터
+# rankingType=TOTAL&genreCode=XXX 형식 (BL 확인됨)
+NAVER_GENRE_CODES: dict[str, list[str]] = {
+    "fantasy":    ["판타지"],
+    "romfantasy": ["로맨스판타지"],
+    "romance":    ["로맨스"],
+    "modern":     ["현대판타지"],
+    "martial":    ["무협"],
+    "bl":         ["BL"],
+}
+
+_NAVER_BASE = "https://series.naver.com/novel/top100List.series"
+
 # 리디 장르별 알려진 URL
 RIDI_GENRE_URLS: dict[str, list[str]] = {
     "fantasy":    ["https://ridibooks.com/category/bestsellers/1750"],
@@ -63,6 +76,60 @@ GENRE_SEARCH_HINTS: dict[str, str] = {
 
 
 # ── URL 자동 탐색 ────────────────────────────────────────────
+def _discover_genre_urls_bulk(
+    pw_page: Page,
+    client: genai.Client,
+    nav_url: str,
+    source_name: str,
+    genre_keys: list[str],
+) -> dict[str, str]:
+    """메인 페이지에서 여러 장르의 URL을 한 번의 Gemini 호출로 탐색"""
+    try:
+        pw_page.goto(nav_url, wait_until="networkidle", timeout=30000)
+        links: list[dict] = pw_page.evaluate("""() => {
+            const seen = new Set();
+            return Array.from(document.querySelectorAll('a[href]'))
+                .map(a => ({
+                    text: a.innerText.trim().replace(/\\s+/g, ' ').slice(0, 60),
+                    href: a.href
+                }))
+                .filter(l => {
+                    if (!l.text || !l.href.startsWith('http') || seen.has(l.href)) return false;
+                    seen.add(l.href);
+                    return true;
+                }).slice(0, 200);
+        }""")
+        if not links:
+            return {}
+
+        genre_kr_to_key = {GENRE_KEY_TO_NAME[k]: k for k in genre_keys}
+        links_md = "\n".join(f"- [{l['text']}]({l['href']})" for l in links[:150])
+        genre_example = {name: "URL 또는 null" for name in genre_kr_to_key}
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=f"""{source_name} 웹소설 페이지 링크에서 각 장르별 랭킹/베스트셀러 URL을 찾아주세요.
+
+링크 목록:
+{links_md}
+
+각 장르에 해당하는 랭킹 페이지 URL을 JSON으로 응답 (없으면 null):
+{json.dumps(genre_example, ensure_ascii=False)}""",
+            config=genai_types.GenerateContentConfig(response_mime_type="application/json"),
+        )
+        data = json.loads(response.text)
+        result = {}
+        for name, key in genre_kr_to_key.items():
+            val = data.get(name)
+            if val and isinstance(val, str) and val.startswith("http"):
+                result[key] = val
+                print(f"  🔍 {source_name} [{name}] → {val}")
+        return result
+    except Exception as e:
+        print(f"  ⚠️  {source_name} 장르 URL 탐색 실패: {e}")
+        return {}
+
+
 def _discover_url(
     pw_page: Page,
     client: genai.Client,
@@ -214,6 +281,46 @@ def fetch_ridi_by_genre(
             print(f"  리디 [{name}] {len(items)}개 수집")
         else:
             print(f"  ⚠️  리디 [{name}] 수집 실패")
+
+    return result
+
+
+# ── 네이버 시리즈: 장르별 genreCode URL로 개별 수집 ──────────
+def fetch_naver_by_genre(
+    pw_page: Page,
+    client: genai.Client,
+    limit: int = 10,
+) -> dict[str, list[dict]]:
+    """네이버 시리즈: rankingType=TOTAL&genreCode=XXX URL로 장르별 수집"""
+    result: dict[str, list[dict]] = {}
+
+    for genre in GENRES:
+        key = genre["key"]
+        name = genre["name"]
+        codes = NAVER_GENRE_CODES.get(key, [])
+
+        items = []
+        for code in codes:
+            url = f"{_NAVER_BASE}?rankingType=TOTAL&genreCode={code}"
+            try:
+                print(f"  네이버 시리즈 [{name}] URL={url}")
+                text, title_to_url = _get_page_data(pw_page, url, link_pattern="productNo")
+                if not text or len(text.strip()) < 50:
+                    continue
+                items = _parse_single_genre(client, text, "네이버 시리즈", name, limit, title_to_url)
+                if items:
+                    break
+            except Exception as e:
+                print(f"  ⚠️  네이버 [{name}] {url} 실패: {e}")
+
+        if items:
+            for item in items:
+                item["source"] = "네이버 시리즈"
+                item["genre_key"] = key
+            result[key] = items
+            print(f"  네이버 시리즈 [{name}] {len(items)}개 수집")
+        else:
+            print(f"  ⚠️  네이버 시리즈 [{name}] 수집 실패")
 
     return result
 
@@ -634,16 +741,33 @@ def main():
         )
         print(f"     → {sum(len(v) for v in kakao_data.values())}개 ({len(kakao_data)}장르)\n")
 
-        # 네이버 시리즈: 전체 페이지 → Gemini 장르 분류
+        # 카카오페이지: 누락 장르 보충 (장르 탭 URL 자동 탐색)
+        kakao_missing = [g["key"] for g in GENRES if not kakao_data.get(g["key"])]
+        if kakao_missing:
+            print(f"  🔍 카카오페이지 누락 장르 보충: {[GENRE_KEY_TO_NAME[k] for k in kakao_missing]}")
+            kakao_genre_urls = _discover_genre_urls_bulk(
+                pw_page, client,
+                nav_url="https://page.kakao.com/menu/10011/screen/94",
+                source_name="카카오페이지",
+                genre_keys=kakao_missing,
+            )
+            for key, url in kakao_genre_urls.items():
+                try:
+                    text, t2u = _get_page_data(pw_page, url, "/content/")
+                    name = GENRE_KEY_TO_NAME[key]
+                    items = _parse_single_genre(client, text, "카카오페이지", name, 10, t2u)
+                    if items:
+                        for item in items:
+                            item["source"] = "카카오페이지"
+                            item["genre_key"] = key
+                        kakao_data[key] = items
+                        print(f"  카카오페이지 [{name}] 보충 {len(items)}개")
+                except Exception as e:
+                    print(f"  ⚠️  카카오페이지 [{GENRE_KEY_TO_NAME[key]}] 보충 실패: {e}")
+
+        # 네이버 시리즈: 장르별 genreCode URL로 개별 수집
         print("  📗 네이버 시리즈 장르별 수집...")
-        naver_data = fetch_platform_all_genres(
-            pw_page, client,
-            urls=["https://series.naver.com/novel/top100List.series", "https://series.naver.com/novel/bestseller.series"],
-            base_url="https://series.naver.com/novel/",
-            source_name="네이버 시리즈",
-            link_pattern="productNo",
-            limit=10,
-        )
+        naver_data = fetch_naver_by_genre(pw_page, client, limit=10)
         print(f"     → {sum(len(v) for v in naver_data.values())}개 ({len(naver_data)}장르)\n")
 
         browser.close()
