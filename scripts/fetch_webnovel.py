@@ -36,14 +36,19 @@ GENRES = [
 GENRE_KR_TO_KEY = {g["name"]: g["key"] for g in GENRES}
 GENRE_KEY_TO_NAME = {g["key"]: g["name"] for g in GENRES}
 
-# 리디 장르별 알려진 URL (없으면 자동 탐색)
+# 리디 장르별 알려진 URL
 RIDI_GENRE_URLS: dict[str, list[str]] = {
     "fantasy":    ["https://ridibooks.com/category/bestsellers/1750"],
-    "romfantasy": ["https://ridibooks.com/category/6050"],
-    "romance":    ["https://ridibooks.com/category/1650"],
-    "modern":     [],  # 자동 탐색
-    "martial":    [],  # 자동 탐색
-    "bl":         [],  # 자동 탐색
+    "romfantasy": ["https://ridibooks.com/category/bestsellers/6050",
+                   "https://ridibooks.com/category/6050"],
+    "romance":    ["https://ridibooks.com/category/bestsellers/1650",
+                   "https://ridibooks.com/category/1650"],
+    "modern":     ["https://ridibooks.com/category/bestsellers/1753",
+                   "https://ridibooks.com/category/1753"],
+    "martial":    ["https://ridibooks.com/category/bestsellers/1754",
+                   "https://ridibooks.com/category/1754"],
+    "bl":         ["https://ridibooks.com/category/bestsellers/4150",
+                   "https://ridibooks.com/category/4150"],
 }
 
 # 장르 탐색 힌트
@@ -126,7 +131,7 @@ def fetch_ridi_by_genre(
 ) -> dict[str, list[dict]]:
     """리디: 장르별 URL에서 각각 수집 → dict[genre_key, items]"""
     result: dict[str, list[dict]] = {}
-    url_cache: dict[str, str] = {}  # genre_key -> discovered url
+    used_urls: set[str] = set()  # 이미 사용한 URL 재사용 방지
 
     for genre in GENRES:
         key = genre["key"]
@@ -134,8 +139,10 @@ def fetch_ridi_by_genre(
         known = RIDI_GENRE_URLS.get(key, [])
 
         items = []
-        # 1) 알려진 URL 시도
         for url in known:
+            if url in used_urls:
+                print(f"  ⚠️  리디 [{name}] URL 중복, 건너뜀: {url}")
+                continue
             try:
                 print(f"  리디 [{name}] URL={url}")
                 text = _get_page_text(pw_page, url)
@@ -143,26 +150,10 @@ def fetch_ridi_by_genre(
                     continue
                 items = _parse_single_genre(client, text, "리디", name, limit)
                 if items:
+                    used_urls.add(url)
                     break
             except Exception as e:
                 print(f"  ⚠️  리디 [{name}] {url} 실패: {e}")
-
-        # 2) 알려진 URL 실패 → 자동 탐색
-        if not items:
-            hint = GENRE_SEARCH_HINTS[key]
-            if key in url_cache:
-                disc = url_cache[key]
-            else:
-                print(f"  🔍 리디 [{name}] URL 자동 탐색...")
-                disc = _discover_url(pw_page, client, "https://ridibooks.com", f"리디 {name}", hint)
-                if disc:
-                    url_cache[key] = disc
-            if disc:
-                try:
-                    text = _get_page_text(pw_page, disc)
-                    items = _parse_single_genre(client, text, "리디", name, limit)
-                except Exception as e:
-                    print(f"  ⚠️  리디 [{name}] 탐색 URL 실패: {e}")
 
         if items:
             for item in items:
@@ -225,16 +216,17 @@ def fetch_platform_all_genres(
 
 위 텍스트에서 웹소설을 장르별로 분류해서 추출하세요.
 
-장르 분류 기준:
-- 판타지: 이세계·마법·용사·드래곤 등
-- 로맨스판타지: 귀족·황제·공녀·환생·빙의 등 (역사/판타지 배경 로맨스)
-- 로맨스: 현대 연애·순정 등
-- 현대판타지: 헌터·각성·던전·회귀물 등 (현대 배경)
-- 무협: 무림·검객·협객 등
-- BL: 남자끼리 로맨스
+장르 분류 기준 (엄격하게 적용):
+- 판타지: 이세계·마법·용사·드래곤 등 (현대 배경 제외)
+- 로맨스판타지: 귀족·황제·공녀·환생·빙의 등 역사/판타지 배경 이성 로맨스
+- 로맨스: 현대 배경 이성 로맨스·순정 (판타지 배경 제외, BL 제외)
+- 현대판타지: 현대 배경 헌터·각성·던전·회귀물·능력자 등 (로맨스 중심 제외)
+- 무협: 무림·검객·협객 등 중국식 배경
+- BL: 남성 캐릭터 간 로맨스 (Boys Love)
 
 규칙:
 - 실제 웹소설 작품 제목만 (메뉴·배너·프로모션 문구 제외)
+- 각 작품은 반드시 하나의 장르에만 배정 (중복 배정 금지)
 - 장르당 최대 {limit}개
 - JSON으로만 응답
 
@@ -326,6 +318,16 @@ def merge_genre_data(
 
 
 # ── Gemini: 단일 장르 추출 (리디용) ────────────────────────
+_GENRE_CRITERIA: dict[str, str] = {
+    "판타지":       "이세계·마법·용사·드래곤 등 (현대 배경 제외)",
+    "로맨스판타지": "귀족·황제·공녀·환생·빙의 등 역사/판타지 배경 이성 로맨스 (남성 주인공 아님)",
+    "로맨스":       "현대 배경 이성 로맨스·순정 (BL 제외, 판타지 배경 제외)",
+    "현대판타지":   "현대 배경 헌터·각성·던전·회귀물·능력자 등",
+    "무협":         "무림·검객·협객·협녀 등 중국식 배경",
+    "BL":           "남성 캐릭터 간의 로맨스 (Boys Love)",
+}
+
+
 def _parse_single_genre(
     client: genai.Client,
     text: str,
@@ -333,6 +335,7 @@ def _parse_single_genre(
     genre_name: str,
     limit: int,
 ) -> list[dict]:
+    criteria = _GENRE_CRITERIA.get(genre_name, genre_name)
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=f"""다음은 "{source_name}" "{genre_name}" 웹소설 베스트셀러 페이지의 텍스트입니다.
@@ -341,8 +344,11 @@ def _parse_single_genre(
 {text[:8000]}
 </page_text>
 
-웹소설 베스트셀러 순위를 추출하세요.
+"{genre_name}" 장르 정의: {criteria}
+
+이 장르에 해당하는 웹소설 베스트셀러 순위를 추출하세요.
 - 실제 웹소설 작품 제목만 (메뉴·배너·프로모션 문구 제외)
+- 반드시 위 장르 정의에 맞는 작품만 포함 (다른 장르 작품 제외)
 - 최대 {limit}개
 - JSON 배열로만 응답
 
