@@ -145,6 +145,7 @@ def fetch_kakaopage(pw_page: Page, limit: int = 20) -> list[dict]:
 # ── 네이버 시리즈 ────────────────────────────────────────────
 def fetch_naver_series(pw_page: Page, limit: int = 20) -> list[dict]:
     urls = [
+        "https://series.naver.com/novel/top100List.series",
         "https://series.naver.com/novel/bestseller.series",
         "https://series.naver.com/novel/categoryList.series?categoryTypeCode=all",
     ]
@@ -187,8 +188,16 @@ def fetch_naver_series(pw_page: Page, limit: int = 20) -> list[dict]:
                         return results
 
             # JS 렌더링 후 DOM에서 직접 추출
-            pw_page.wait_for_selector("a[href*='productNo']", timeout=10000)
-            links = pw_page.query_selector_all("a[href*='productNo']")
+            try:
+                pw_page.wait_for_selector(
+                    "a[href*='productNo'], a[href*='detail.series'], li.item_list a, .pic_area a",
+                    timeout=15000,
+                )
+            except Exception:
+                pass  # 타임아웃 시 현재 DOM으로 시도
+            links = pw_page.query_selector_all(
+                "a[href*='productNo'], a[href*='detail.series?productNo']"
+            )
             results = []
             seen = set()
             for el in links:
@@ -229,9 +238,9 @@ def fetch_naver_series(pw_page: Page, limit: int = 20) -> list[dict]:
 # ── 리디 웹소설 ──────────────────────────────────────────────
 def fetch_ridi_webnovel(pw_page: Page, limit: int = 20) -> list[dict]:
     urls = [
-        "https://ridibooks.com/category/bestsellers/1",
-        "https://ridibooks.com/category/bestsellers/2",
-        "https://ridibooks.com/books/serial/bestsellers",
+        "https://ridibooks.com/category/bestsellers/1750",   # 판타지 웹소설
+        "https://ridibooks.com/category/bestsellers/1650",   # 로맨스 웹소설
+        "https://ridibooks.com/category/bestsellers/100",    # 소설 전체
     ]
     for url in urls:
         try:
@@ -263,6 +272,41 @@ def fetch_ridi_webnovel(pw_page: Page, limit: int = 20) -> list[dict]:
                 if items:
                     break
             if not items:
+                # __NEXT_DATA__ 실패 시 DOM에서 직접 추출 시도
+                try:
+                    pw_page.wait_for_selector("a[href*='/books/']", timeout=10000)
+                except Exception:
+                    pass
+                dom_links = pw_page.query_selector_all("li a[href*='/books/']")
+                dom_results = []
+                seen_ids: set[str] = set()
+                for el in dom_links:
+                    href = el.get_attribute("href") or ""
+                    m = re.search(r'/books/(\d+)', href)
+                    if not m:
+                        continue
+                    book_id = m.group(1)
+                    if book_id in seen_ids:
+                        continue
+                    seen_ids.add(book_id)
+                    title_el = el.query_selector("strong, span, p")
+                    title = (title_el.inner_text().strip() if title_el else el.inner_text().strip())
+                    if not title or len(title) < 2:
+                        continue
+                    dom_results.append({
+                        "rank": len(dom_results) + 1,
+                        "title": title,
+                        "author": "",
+                        "cover": "",
+                        "link": f"https://ridibooks.com/books/{book_id}",
+                        "genre_key": classify_genre(title),
+                        "source": "리디",
+                    })
+                    if len(dom_results) >= limit:
+                        break
+                if dom_results:
+                    print(f"  리디 웹소설 items={len(dom_results)}개 발견 (DOM)")
+                    return dom_results
                 print("  ⚠️  리디 items 없음, 다음 URL 시도")
                 continue
             print(f"  리디 웹소설 items={len(items)}개 발견")
@@ -428,9 +472,10 @@ def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], ai_co
             continue
         genre_rows = []
         for b in books:
-            kakao = f"{b['sources'].get('카카오페이지', '-')}위" if b['sources'].get('카카오페이지') else "-"
-            naver = f"{b['sources'].get('네이버 시리즈', '-')}위" if b['sources'].get('네이버 시리즈') else "-"
-            ridi  = f"{b['sources'].get('리디', '-')}위" if b['sources'].get('리디') else "-"
+            srcs = b.get('sources', {b.get('source', ''): b.get('rank')})
+            kakao = f"{srcs.get('카카오페이지')}위" if srcs.get('카카오페이지') else "-"
+            naver = f"{srcs.get('네이버 시리즈')}위" if srcs.get('네이버 시리즈') else "-"
+            ridi  = f"{srcs.get('리디')}위" if srcs.get('리디') else "-"
             genre_rows.append(
                 f"| **{b.get('genre_rank', b['rank'])}** | [{b['title']}]({b['link']}) | {b['author']} | {kakao} | {naver} | {ridi} |"
             )
