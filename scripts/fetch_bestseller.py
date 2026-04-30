@@ -73,11 +73,18 @@ def fetch_aladin_overall(limit: int = 20) -> list[dict]:
     }
     try:
         data = requests.get(url, params=params, timeout=10).json()
+        _EXCLUDE_CAT = ("이벤트", "선물", "기획전", "특별")
         results = []
-        for i, item in enumerate(data.get("item", []), start=1):
+        rank = 0
+        for item in data.get("item", []):
             cat_name = item.get("categoryName", "")
+            if any(kw in cat_name for kw in _EXCLUDE_CAT):
+                continue
+            rank += 1
+            if rank > limit:
+                break
             results.append({
-                "rank": i,
+                "rank": rank,
                 "title": item["title"].split(" - ")[0].strip(),
                 "author": item["author"].split("(지은이)")[0].strip().split(",")[0].strip(),
                 "cover": item.get("cover", ""),

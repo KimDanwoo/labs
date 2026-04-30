@@ -86,7 +86,7 @@ def fetch_kakaopage(pw_page: Page, limit: int = 20) -> list[dict]:
                     return []
                 if isinstance(obj, list) and len(obj) >= 3:
                     if isinstance(obj[0], dict) and any(
-                        k in obj[0] for k in ("title", "seriesTitle", "name", "id")
+                        k in obj[0] for k in ("seriesTitle", "seriesId")  # 소설 고유 키 필수
                     ):
                         return obj
                 if isinstance(obj, dict):
@@ -107,12 +107,14 @@ def fetch_kakaopage(pw_page: Page, limit: int = 20) -> list[dict]:
                 continue
 
             print(f"  카카오페이지 items={len(items)}개 발견")
+            _KAKAO_NAV = {"추천", "웹툰", "웹소설", "책", "소설", "만화", "완결", "manhwa", "novel"}
             results = []
             for i, item in enumerate(items[:limit], start=1):
                 title = item.get("seriesTitle") or item.get("title") or item.get("name") or ""
                 if isinstance(title, dict):
                     title = title.get("main") or title.get("ko") or ""
-                if not title:
+                title = str(title).strip()
+                if not title or len(title) < 2 or title.lower() in _KAKAO_NAV:
                     continue
                 author = item.get("author") or item.get("authorName") or item.get("nickname") or ""
                 if isinstance(author, dict):
@@ -210,7 +212,8 @@ def fetch_naver_series(pw_page: Page, limit: int = 20) -> list[dict]:
                     continue
                 seen.add(pid)
                 title = el.inner_text().strip()
-                if not title or len(title) < 2:
+                _NAVER_PROMO = {"무료", "타임딜", "이벤트", "프로모션", "시리즈에디션", "시리즈 에디션", "매일"}
+                if not title or len(title) < 2 or any(kw in title for kw in _NAVER_PROMO):
                     continue
                 results.append({
                     "rank": len(results) + 1,
@@ -280,9 +283,11 @@ def fetch_ridi_webnovel(pw_page: Page, limit: int = 20) -> list[dict]:
                 dom_links = pw_page.query_selector_all("li a[href*='/books/']")
                 dom_results = []
                 seen_ids: set[str] = set()
+                _RIDI_CAT = {"소설", "경영/경제", "인문/사회/역사", "자기계발", "에세이/시",
+                             "여행", "종교", "웹툰", "만화", "잡지"}
                 for el in dom_links:
                     href = el.get_attribute("href") or ""
-                    m = re.search(r'/books/(\d+)', href)
+                    m = re.search(r'/books/(\d{8,})', href)  # 리디 북 ID는 8자리 이상
                     if not m:
                         continue
                     book_id = m.group(1)
@@ -291,7 +296,7 @@ def fetch_ridi_webnovel(pw_page: Page, limit: int = 20) -> list[dict]:
                     seen_ids.add(book_id)
                     title_el = el.query_selector("strong, span, p")
                     title = (title_el.inner_text().strip() if title_el else el.inner_text().strip())
-                    if not title or len(title) < 2:
+                    if not title or len(title) < 2 or title in _RIDI_CAT:
                         continue
                     dom_results.append({
                         "rank": len(dom_results) + 1,
