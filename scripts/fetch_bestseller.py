@@ -95,47 +95,96 @@ def fetch_aladin_overall(limit: int = 20) -> list[dict]:
 
 
 # ── 리디 크롤링 ─────────────────────────────────────────────
-def fetch_ridi(limit: int = 30) -> list[dict]:
-    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
-    try:
-        html = requests.get("https://ridibooks.com/books/bestsellers", headers=headers, timeout=15).text
-        match = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
-        if not match:
-            print("  ⚠️  리디 __NEXT_DATA__ 파싱 실패")
-            return []
-        data = json.loads(match.group(1))
-        queries = data.get("props", {}).get("pageProps", {}).get("dehydratedState", {}).get("queries", [])
-        items = []
-        for q in queries:
-            bs = q.get("state", {}).get("data", {}).get("bestsellers", {})
-            if bs and "items" in bs:
-                items = bs["items"]
-                break
-        results = []
-        for i, entry in enumerate(items[:limit], start=1):
-            book = entry.get("book", {})
-            title = book.get("title", {}).get("main", "")
-            authors = book.get("authors", [])
-            author = authors[0]["name"] if authors else ""
-            book_id = book.get("id", "")
-            cover = book.get("thumbnail", {}).get("large", "") or book.get("thumbnail", {}).get("small", "")
-            cats = book.get("categories", [])
-            cat_text = " ".join([c.get("name", "") for c in cats])
-            genre_key = classify_genre_by_text(cat_text)
-            results.append({
-                "rank": i,
-                "title": title,
-                "author": author,
-                "cover": cover,
-                "link": f"https://ridibooks.com/books/{book_id}",
-                "publisher": "",
-                "genre_key": genre_key,
-                "source": "리디",
-            })
-        return results
-    except Exception as e:
-        print(f"  ⚠️  리디 실패: {e}")
+def _find_book_items(obj, depth=0) -> list:
+    """JSON 트리에서 book 리스트를 재귀 탐색"""
+    if depth > 6:
         return []
+    if isinstance(obj, list) and obj and isinstance(obj[0], dict):
+        if "book" in obj[0] or ("id" in obj[0] and "title" in obj[0]):
+            return obj
+    if isinstance(obj, dict):
+        for v in obj.values():
+            found = _find_book_items(v, depth + 1)
+            if found:
+                return found
+    return []
+
+
+def fetch_ridi(limit: int = 30) -> list[dict]:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept-Language": "ko-KR,ko;q=0.9",
+    }
+    urls = [
+        "https://ridibooks.com/bestsellers",
+        "https://ridibooks.com/books/bestsellers",
+    ]
+    for url in urls:
+        try:
+            resp = requests.get(url, headers=headers, timeout=15)
+            print(f"  리디 URL={url} status={resp.status_code}")
+            html = resp.text
+            match = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
+            if not match:
+                print("  ⚠️  __NEXT_DATA__ 없음, 다음 URL 시도")
+                continue
+            data = json.loads(match.group(1))
+            queries = (data.get("props", {})
+                           .get("pageProps", {})
+                           .get("dehydratedState", {})
+                           .get("queries", []))
+            print(f"  리디 queries={len(queries)}개")
+            items = []
+            for q in queries:
+                q_data = q.get("state", {}).get("data", {})
+                # 알려진 키 우선 탐색
+                for key in ("bestsellers", "chartBooks", "books", "items"):
+                    node = q_data.get(key)
+                    if isinstance(node, dict) and "items" in node:
+                        items = node["items"]
+                        break
+                    if isinstance(node, list) and node:
+                        items = node
+                        break
+                if not items:
+                    items = _find_book_items(q_data)
+                if items:
+                    print(f"  리디 items={len(items)}개 발견")
+                    break
+            if not items:
+                print("  ⚠️  리디 items 없음, 다음 URL 시도")
+                continue
+            results = []
+            for i, entry in enumerate(items[:limit], start=1):
+                book = entry.get("book", entry)  # book 키가 없으면 entry 자체가 book
+                title_node = book.get("title", {})
+                title = title_node.get("main", "") if isinstance(title_node, dict) else str(title_node)
+                authors = book.get("authors", [])
+                author = authors[0].get("name", "") if authors and isinstance(authors[0], dict) else ""
+                book_id = book.get("id", "")
+                thumb = book.get("thumbnail", {})
+                cover = thumb.get("large", "") or thumb.get("small", "") if isinstance(thumb, dict) else ""
+                cats = book.get("categories", [])
+                cat_text = " ".join([c.get("name", "") for c in cats if isinstance(c, dict)])
+                genre_key = classify_genre_by_text(cat_text)
+                if not title:
+                    continue
+                results.append({
+                    "rank": i,
+                    "title": title,
+                    "author": author,
+                    "cover": cover,
+                    "link": f"https://ridibooks.com/books/{book_id}",
+                    "publisher": "",
+                    "genre_key": genre_key,
+                    "source": "리디",
+                })
+            return results
+        except Exception as e:
+            print(f"  ⚠️  리디 {url} 실패: {e}")
+    print("  ⚠️  리디 모든 URL 실패, 알라딘 단독으로 진행")
+    return []
 
 
 # ── 장르 분류 ────────────────────────────────────────────────
