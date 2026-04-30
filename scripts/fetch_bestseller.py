@@ -144,27 +144,35 @@ def fetch_kyobo(pw_page: Page, limit: int = 20) -> list[dict]:
                 items = _find_book_items(data)
                 if items:
                     results = []
-                    for i, item in enumerate(items[:limit], start=1):
+                    rank = 0
+                    for item in items[:limit * 2]:  # 이벤트 항목 필터 여유분
                         title = item.get("cmdtName") or item.get("title") or item.get("name") or ""
                         if isinstance(title, dict):
                             title = title.get("main") or ""
+                        title = str(title).strip()
+                        # ISBN 없는 항목(이벤트/기획전)은 제외
+                        isbn = item.get("isbn") or item.get("barcode") or ""
+                        if not isbn or not title:
+                            continue
+                        rank += 1
+                        if rank > limit:
+                            break
                         author = item.get("authNm") or item.get("author") or item.get("writerName") or ""
                         if isinstance(author, list):
                             author = author[0] if author else ""
                         thumbnail = item.get("imgPath") or item.get("thumbnail") or item.get("coverImg") or ""
                         if isinstance(thumbnail, dict):
                             thumbnail = thumbnail.get("url") or ""
-                        isbn = item.get("isbn") or item.get("barcode") or item.get("id") or ""
-                        link = f"https://product.kyobobook.co.kr/detail/{isbn}" if isbn else url
+                        link = f"https://product.kyobobook.co.kr/detail/{isbn}"
                         genre_text = str(item.get("categoryName") or item.get("category") or "")
                         results.append({
-                            "rank": i,
-                            "title": str(title).strip(),
+                            "rank": rank,
+                            "title": title,
                             "author": str(author).strip(),
                             "cover": str(thumbnail).strip(),
                             "link": link,
                             "publisher": str(item.get("pbcmName") or item.get("publisher") or "").strip(),
-                            "genre_key": classify_genre(genre_text + " " + str(title)),
+                            "genre_key": classify_genre(genre_text + " " + title),
                             "source": "교보문고",
                         })
                     if results:
@@ -187,6 +195,9 @@ def fetch_kyobo(pw_page: Page, limit: int = 20) -> list[dict]:
                 for el in els:
                     title = el.inner_text().strip()
                     href = el.get_attribute("href") or ""
+                    # event.kyobobook.co.kr 이벤트 링크 제외
+                    if "event.kyobobook.co.kr" in href:
+                        continue
                     if not title or len(title) < 2 or title in seen:
                         continue
                     seen.add(title)
