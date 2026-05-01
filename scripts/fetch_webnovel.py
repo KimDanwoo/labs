@@ -37,15 +37,15 @@ GENRES = [
 GENRE_KR_TO_KEY = {g["name"]: g["key"] for g in GENRES}
 GENRE_KEY_TO_NAME = {g["key"]: g["name"] for g in GENRES}
 
-# 네이버 시리즈 장르별 genreCode 파라미터
-# rankingType=TOTAL&genreCode=XXX 형식 (BL 확인됨)
-NAVER_GENRE_CODES: dict[str, list[str]] = {
-    "fantasy":    ["판타지"],
-    "romfantasy": ["로판", "로맨스판타지"],
-    "romance":    ["로맨스"],
-    "modern":     ["현대판타지", "현판"],
-    "martial":    ["무협"],
-    "bl":         ["BL", "bl"],
+# 네이버 시리즈 장르별 categoryCode (숫자)
+# URL: /novel/top100List.series?rankingTypeCode=DAILY&categoryCode=XXX
+NAVER_CATEGORY_CODES: dict[str, int] = {
+    "fantasy":    202,
+    "romfantasy": 207,
+    "romance":    201,
+    "modern":     208,
+    "martial":    206,
+    "bl":         209,
 }
 
 # 카카오페이지 장르별 screen ID
@@ -252,32 +252,24 @@ def _lookup_link(title: str, title_to_url: dict[str, str]) -> str:
     return ""
 
 
-# ── 카카오페이지: 장르별 직접 수집 + 작가명 추출 ──────────────
+# ── 카카오페이지: 장르별 직접 수집 (DOM에서 제목+작가 분리) ───
 def _fetch_kakao_author(pw_page: Page, content_id: str) -> str:
-    """개별 작품 페이지에서 작가명 추출"""
+    """개별 작품 페이지 meta 태그에서 작가명 추출 (리스트뷰 폴백용)"""
     try:
-        url = f"https://page.kakao.com/content/{content_id}"
-        pw_page.goto(url, wait_until="domcontentloaded", timeout=15000)
-        # 페이지 텍스트에서 작가명 추출 시도 (메타데이터 또는 본문)
-        author = pw_page.evaluate(r"""() => {
-            // 방법1: meta 태그
+        pw_page.goto(
+            f"https://page.kakao.com/content/{content_id}",
+            wait_until="domcontentloaded", timeout=15000,
+        )
+        return pw_page.evaluate(r"""() => {
             const meta = document.querySelector('meta[property="og:novel:author"], meta[name="author"]');
-            if (meta) return meta.content || '';
-            // 방법2: 페이지 내 JSON 데이터에서 authors/author 필드 검색
+            if (meta && meta.content) return meta.content;
             const scripts = document.querySelectorAll('script');
             for (const s of scripts) {
-                const t = s.textContent || '';
-                // "authors":"작가명" 또는 "author":"작가명" 패턴
-                const m = t.match(/"authors?"\s*:\s*"([^"]+)"/);
-                if (m && m[1].length < 30) return m[1];
+                const m = (s.textContent || '').match(/"authors?"\s*:\s*"([^"]{1,30})"/);
+                if (m) return m[1];
             }
-            // 방법3: 본문 텍스트에서 작가 영역 추출
-            const body = document.body.innerText;
-            const am = body.match(/작가\s*[:\n]\s*([^\n]{1,20})/);
-            if (am) return am[1].trim();
             return '';
-        }""")
-        return author.strip() if author else ""
+        }""").strip()
     except Exception:
         return ""
 
@@ -286,7 +278,7 @@ def fetch_kakao_by_genre(
     pw_page: Page,
     limit: int = 10,
 ) -> dict[str, list[dict]]:
-    """카카오페이지: 장르별 screen URL에서 직접 수집 + 작가명 추출"""
+    """카카오페이지: 장르별 screen URL에서 제목·작가·링크를 DOM 구조로 직접 추출"""
     result: dict[str, list[dict]] = {}
 
     for genre in GENRES:
@@ -301,36 +293,60 @@ def fetch_kakao_by_genre(
             print(f"  카카오페이지 [{name}] URL={url}")
             pw_page.goto(url, wait_until="networkidle", timeout=30000)
 
-            # /content/ 링크에서 제목과 ID 추출
+            # 카드뷰: span.text-center=제목, div.line-clamp-1=작가
+            # 리스트뷰: div.line-clamp-2=제목 (작가 없음)
             works: list[dict] = pw_page.evaluate("""() => {
                 const seen = new Set();
                 return Array.from(document.querySelectorAll('a[href*="/content/"]'))
                     .map(a => {
                         const m = a.href.match(/\\/content\\/(\\d+)/);
                         if (!m) return null;
-                        const text = a.innerText.trim().replace(/\\s+/g, ' ');
-                        return { id: m[1], text: text, href: a.href };
+                        // 카드뷰: span.text-center + div.line-clamp-1
+                        const titleSpan = a.querySelector('span[class*="text-center"]');
+                        if (titleSpan) {
+                            const authorDiv = a.querySelector('div[class*="line-clamp-1"][class*="text-ellipsis"]');
+                            return {
+                                id: m[1],
+                                title: titleSpan.textContent?.trim() || '',
+                                author: authorDiv?.textContent?.trim() || '',
+                            };
+                        }
+                        // 리스트뷰: div.line-clamp-2 (작가 없음)
+                        const titleDiv = a.querySelector('div[class*="line-clamp-2"]');
+                        if (titleDiv) {
+                            return {
+                                id: m[1],
+                                title: titleDiv.textContent?.trim() || '',
+                                author: '',
+                            };
+                        }
+                        return null;
                     })
                     .filter(x => {
-                        if (!x || !x.text || x.text.length < 2 || seen.has(x.id)) return false;
+                        if (!x || !x.title || x.title.length < 2 || seen.has(x.id)) return false;
                         seen.add(x.id);
                         return true;
                     })
-                    .slice(0, 20);
+                    .slice(0, """ + str(limit) + """);
             }""")
 
             if not works:
                 print(f"  ⚠️  카카오페이지 [{name}] 작품 링크 없음")
                 continue
 
+            # 작가 없는 항목은 개별 페이지에서 추출
+            needs_author = [w for w in works if not w["author"]]
+            if needs_author:
+                print(f"    → 작가명 {len(needs_author)}건 개별 페이지에서 추출 중...")
+                for w in needs_author:
+                    w["author"] = _fetch_kakao_author(pw_page, w["id"])
+
             items = []
-            for i, w in enumerate(works[:limit]):
-                # 개별 작품 페이지에서 작가명 추출
-                author = _fetch_kakao_author(pw_page, w["id"])
+            for i, w in enumerate(works):
                 items.append({
                     "rank": i + 1,
-                    "title": w["text"],
-                    "author": author,
+                    "title": w["title"],
+                    "author": w["author"],
                     "cover": "",
                     "link": f"https://page.kakao.com/content/{w['id']}",
                     "genre_key": key,
@@ -394,45 +410,86 @@ def fetch_ridi_by_genre(
     return result
 
 
-# ── 네이버 시리즈: 장르별 genreCode URL로 개별 수집 ──────────
+# ── 네이버 시리즈: 장르별 categoryCode URL + DOM 파싱 ────────
 def fetch_naver_by_genre(
     pw_page: Page,
-    client: genai.Client,
     limit: int = 10,
 ) -> dict[str, list[dict]]:
-    """네이버 시리즈: rankingType=TOTAL&genreCode=XXX URL로 장르별 수집"""
+    """네이버 시리즈: categoryCode URL에서 DOM 구조로 직접 추출"""
     result: dict[str, list[dict]] = {}
 
     for genre in GENRES:
         key = genre["key"]
         name = genre["name"]
-        codes = NAVER_GENRE_CODES.get(key, [])
+        code = NAVER_CATEGORY_CODES.get(key)
+        if code is None:
+            continue
 
-        items = []
-        for code in codes:
-            url = f"{_NAVER_BASE}?rankingType=TOTAL&genreCode={code}"
-            try:
-                print(f"  네이버 시리즈 [{name}] URL={url}")
-                text, title_to_url = _get_page_data(pw_page, url, link_pattern="productNo")
-                if not text or len(text.strip()) < 50:
-                    continue
-                items = _parse_single_genre(client, text, "네이버 시리즈", name, limit, title_to_url)
-                if items:
-                    break
-            except Exception as e:
-                print(f"  ⚠️  네이버 [{name}] {url} 실패: {e}")
+        url = f"{_NAVER_BASE}?rankingTypeCode=DAILY&categoryCode={code}"
+        try:
+            print(f"  네이버 시리즈 [{name}] URL={url}")
+            pw_page.goto(url, wait_until="networkidle", timeout=30000)
 
-        if items:
-            for item in items:
-                item["source"] = "네이버 시리즈"
-                item["genre_key"] = key
-                # 링크가 없으면 네이버 시리즈 검색 URL로 폴백
-                if not item.get("link"):
-                    item["link"] = f"https://series.naver.com/search/search.series?t=novel&q={quote(item['title'])}"
+            # DOM 구조: productNo 링크가 작품마다 2개 (배지용 + 제목용)
+            # parentText에서 "|" 구분자로 작가명 추출
+            items_raw: list[dict] = pw_page.evaluate("""() => {
+                const seen = new Set();
+                const results = [];
+                const links = document.querySelectorAll('a[href*="productNo"]');
+                for (const a of links) {
+                    const text = a.innerText?.trim() || '';
+                    const href = a.href || '';
+                    // 배지 링크 건너뜀 (제목이 아닌 "매일10시무료" 등)
+                    if (text.includes('무료') || text.includes('딜') || text.includes('패스')
+                        || text.includes('에디션') || text.length < 2) continue;
+                    const m = href.match(/productNo=(\\d+)/);
+                    if (!m || seen.has(m[1])) continue;
+                    seen.add(m[1]);
+                    // 부모 li에서 작가명 추출: "| 작가명 |" 패턴
+                    const parent = a.closest('li') || a.parentElement?.parentElement?.parentElement;
+                    const pt = parent?.innerText || '';
+                    const parts = pt.split('|').map(s => s.trim());
+                    // 작가명은 보통 2번째 파트 (평점 | 작가 | 총N화)
+                    let author = '';
+                    if (parts.length >= 2) {
+                        for (const p of parts) {
+                            if (p && p.length < 20 && !p.includes('평점') && !p.includes('총')
+                                && !p.includes('화') && !p.includes('무료') && !p.match(/^[0-9.]+$/)) {
+                                author = p;
+                                break;
+                            }
+                        }
+                    }
+                    // 제목에서 [독점] 등 태그 제거
+                    const title = text.replace(/\\s*\\[독점\\]\\s*/g, '').replace(/\\s*\\[단독\\]\\s*/g, '').trim();
+                    results.push({title, author, href, productNo: m[1]});
+                    if (results.length >= """ + str(limit) + """) break;
+                }
+                return results;
+            }""")
+
+            if not items_raw:
+                print(f"  ⚠️  네이버 시리즈 [{name}] 작품 없음")
+                continue
+
+            items = []
+            for i, raw in enumerate(items_raw):
+                items.append({
+                    "rank": i + 1,
+                    "title": raw["title"],
+                    "author": raw["author"],
+                    "cover": "",
+                    "link": raw["href"],
+                    "genre_key": key,
+                    "source": "네이버 시리즈",
+                })
+
             result[key] = items
-            print(f"  네이버 시리즈 [{name}] {len(items)}개 수집")
-        else:
-            print(f"  ⚠️  네이버 시리즈 [{name}] 수집 실패")
+            authors_found = sum(1 for it in items if it["author"])
+            print(f"  네이버 시리즈 [{name}] {len(items)}개 수집 (작가 {authors_found}명)")
+
+        except Exception as e:
+            print(f"  ⚠️  네이버 시리즈 [{name}] 실패: {e}")
 
     return result
 
@@ -863,9 +920,9 @@ def main():
         kakao_data = fetch_kakao_by_genre(pw_page, limit=10)
         print(f"     → {sum(len(v) for v in kakao_data.values())}개 ({len(kakao_data)}장르)\n")
 
-        # 네이버 시리즈: 장르별 genreCode URL로 개별 수집
+        # 네이버 시리즈: 장르별 categoryCode URL + DOM 파싱
         print("  📗 네이버 시리즈 장르별 수집...")
-        naver_data = fetch_naver_by_genre(pw_page, client, limit=10)
+        naver_data = fetch_naver_by_genre(pw_page, limit=10)
         print(f"     → {sum(len(v) for v in naver_data.values())}개 ({len(naver_data)}장르)\n")
 
         browser.close()
