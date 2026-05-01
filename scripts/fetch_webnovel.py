@@ -2,9 +2,9 @@
 """웹소설 주간 베스트셀러 — 장르별 수집
 
 수집 전략:
-  리디  → 장르별 전용 URL에서 각각 수집 (알려진 3개 + 나머지 자동 탐색)
-  카카오 → 전체 랭킹 1회 로드 → Gemini가 장르별 분류
-  네이버 → 전체 랭킹 1회 로드 → Gemini가 장르별 분류
+  리디  → 장르별 전용 URL에서 각각 수집
+  카카오 → 장르별 전용 screen URL에서 각각 수집 + 개별 작품 페이지에서 작가명 추출
+  네이버 → 장르별 genreCode URL에서 각각 수집
   → 플랫폼별 장르 데이터를 통합해 장르 내 종합 순위 산출
 """
 
@@ -46,6 +46,16 @@ NAVER_GENRE_CODES: dict[str, list[str]] = {
     "modern":     ["현대판타지", "현판"],
     "martial":    ["무협"],
     "bl":         ["BL", "bl"],
+}
+
+# 카카오페이지 장르별 screen ID
+KAKAO_GENRE_SCREENS: dict[str, int] = {
+    "fantasy":    91,
+    "romfantasy": 92,
+    "romance":    68,
+    "modern":     64,
+    "martial":    70,
+    "bl":         181,
 }
 
 _NAVER_BASE = "https://series.naver.com/novel/top100List.series"
@@ -240,6 +250,104 @@ def _lookup_link(title: str, title_to_url: dict[str, str]) -> str:
         if nt and (nt in norm(t) or norm(t) in nt):
             return u
     return ""
+
+
+# ── 카카오페이지: 장르별 직접 수집 + 작가명 추출 ──────────────
+def _fetch_kakao_author(pw_page: Page, content_id: str) -> str:
+    """개별 작품 페이지에서 작가명 추출"""
+    try:
+        url = f"https://page.kakao.com/content/{content_id}"
+        pw_page.goto(url, wait_until="domcontentloaded", timeout=15000)
+        # 페이지 텍스트에서 작가명 추출 시도 (메타데이터 또는 본문)
+        author = pw_page.evaluate(r"""() => {
+            // 방법1: meta 태그
+            const meta = document.querySelector('meta[property="og:novel:author"], meta[name="author"]');
+            if (meta) return meta.content || '';
+            // 방법2: 페이지 내 JSON 데이터에서 authors/author 필드 검색
+            const scripts = document.querySelectorAll('script');
+            for (const s of scripts) {
+                const t = s.textContent || '';
+                // "authors":"작가명" 또는 "author":"작가명" 패턴
+                const m = t.match(/"authors?"\s*:\s*"([^"]+)"/);
+                if (m && m[1].length < 30) return m[1];
+            }
+            // 방법3: 본문 텍스트에서 작가 영역 추출
+            const body = document.body.innerText;
+            const am = body.match(/작가\s*[:\n]\s*([^\n]{1,20})/);
+            if (am) return am[1].trim();
+            return '';
+        }""")
+        return author.strip() if author else ""
+    except Exception:
+        return ""
+
+
+def fetch_kakao_by_genre(
+    pw_page: Page,
+    limit: int = 10,
+) -> dict[str, list[dict]]:
+    """카카오페이지: 장르별 screen URL에서 직접 수집 + 작가명 추출"""
+    result: dict[str, list[dict]] = {}
+
+    for genre in GENRES:
+        key = genre["key"]
+        name = genre["name"]
+        screen_id = KAKAO_GENRE_SCREENS.get(key)
+        if not screen_id:
+            continue
+
+        url = f"https://page.kakao.com/menu/10011/screen/{screen_id}"
+        try:
+            print(f"  카카오페이지 [{name}] URL={url}")
+            pw_page.goto(url, wait_until="networkidle", timeout=30000)
+
+            # /content/ 링크에서 제목과 ID 추출
+            works: list[dict] = pw_page.evaluate("""() => {
+                const seen = new Set();
+                return Array.from(document.querySelectorAll('a[href*="/content/"]'))
+                    .map(a => {
+                        const m = a.href.match(/\\/content\\/(\\d+)/);
+                        if (!m) return null;
+                        const text = a.innerText.trim().replace(/\\s+/g, ' ');
+                        return { id: m[1], text: text, href: a.href };
+                    })
+                    .filter(x => {
+                        if (!x || !x.text || x.text.length < 2 || seen.has(x.id)) return false;
+                        seen.add(x.id);
+                        return true;
+                    })
+                    .slice(0, 20);
+            }""")
+
+            if not works:
+                print(f"  ⚠️  카카오페이지 [{name}] 작품 링크 없음")
+                continue
+
+            items = []
+            for i, w in enumerate(works[:limit]):
+                # 개별 작품 페이지에서 작가명 추출
+                author = _fetch_kakao_author(pw_page, w["id"])
+                items.append({
+                    "rank": i + 1,
+                    "title": w["text"],
+                    "author": author,
+                    "cover": "",
+                    "link": f"https://page.kakao.com/content/{w['id']}",
+                    "genre_key": key,
+                    "source": "카카오페이지",
+                })
+
+            if items:
+                result[key] = items
+                authors_found = sum(1 for it in items if it["author"])
+                print(f"  카카오페이지 [{name}] {len(items)}개 수집 (작가 {authors_found}명)")
+            else:
+                print(f"  ⚠️  카카오페이지 [{name}] 수집 실패")
+
+        except Exception as e:
+            print(f"  ⚠️  카카오페이지 [{name}] 실패: {e}")
+
+    return result
 
 
 # ── 리디: 장르별 전용 URL 수집 ───────────────────────────────
@@ -750,41 +858,10 @@ def main():
         ridi_data = fetch_ridi_by_genre(pw_page, client, limit=15)
         print(f"     → {sum(len(v) for v in ridi_data.values())}개 ({len(ridi_data)}장르)\n")
 
-        # 카카오페이지: 전체 페이지 → Gemini 장르 분류
+        # 카카오페이지: 장르별 직접 수집 + 작가명 추출
         print("  📱 카카오페이지 장르별 수집...")
-        kakao_data = fetch_platform_all_genres(
-            pw_page, client,
-            urls=["https://page.kakao.com/menu/10011/screen/94", "https://page.kakao.com/menu/10011"],
-            base_url="https://page.kakao.com",
-            source_name="카카오페이지",
-            link_pattern="/content/",
-            limit=10,
-        )
+        kakao_data = fetch_kakao_by_genre(pw_page, limit=10)
         print(f"     → {sum(len(v) for v in kakao_data.values())}개 ({len(kakao_data)}장르)\n")
-
-        # 카카오페이지: 누락 장르 보충 (장르 탭 URL 자동 탐색)
-        kakao_missing = [g["key"] for g in GENRES if not kakao_data.get(g["key"])]
-        if kakao_missing:
-            print(f"  🔍 카카오페이지 누락 장르 보충: {[GENRE_KEY_TO_NAME[k] for k in kakao_missing]}")
-            kakao_genre_urls = _discover_genre_urls_bulk(
-                pw_page, client,
-                nav_url="https://page.kakao.com/menu/10011/screen/94",
-                source_name="카카오페이지",
-                genre_keys=kakao_missing,
-            )
-            for key, url in kakao_genre_urls.items():
-                try:
-                    text, t2u = _get_page_data(pw_page, url, "/content/")
-                    name = GENRE_KEY_TO_NAME[key]
-                    items = _parse_single_genre(client, text, "카카오페이지", name, 10, t2u)
-                    if items:
-                        for item in items:
-                            item["source"] = "카카오페이지"
-                            item["genre_key"] = key
-                        kakao_data[key] = items
-                        print(f"  카카오페이지 [{name}] 보충 {len(items)}개")
-                except Exception as e:
-                    print(f"  ⚠️  카카오페이지 [{GENRE_KEY_TO_NAME[key]}] 보충 실패: {e}")
 
         # 네이버 시리즈: 장르별 genreCode URL로 개별 수집
         print("  📗 네이버 시리즈 장르별 수집...")
