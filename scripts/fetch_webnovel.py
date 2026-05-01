@@ -13,6 +13,7 @@ import sys
 import json
 import re
 import pathlib
+from urllib.parse import quote
 from playwright.sync_api import sync_playwright, Page
 from google import genai
 from google.genai import types as genai_types
@@ -40,11 +41,11 @@ GENRE_KEY_TO_NAME = {g["key"]: g["name"] for g in GENRES}
 # rankingType=TOTAL&genreCode=XXX 형식 (BL 확인됨)
 NAVER_GENRE_CODES: dict[str, list[str]] = {
     "fantasy":    ["판타지"],
-    "romfantasy": ["로맨스판타지"],
+    "romfantasy": ["로판", "로맨스판타지"],
     "romance":    ["로맨스"],
-    "modern":     ["현대판타지"],
+    "modern":     ["현대판타지", "현판"],
     "martial":    ["무협"],
-    "bl":         ["BL"],
+    "bl":         ["BL", "bl"],
 }
 
 _NAVER_BASE = "https://series.naver.com/novel/top100List.series"
@@ -317,6 +318,9 @@ def fetch_naver_by_genre(
             for item in items:
                 item["source"] = "네이버 시리즈"
                 item["genre_key"] = key
+                # 링크가 없으면 네이버 시리즈 검색 URL로 폴백
+                if not item.get("link"):
+                    item["link"] = f"https://series.naver.com/search/search.series?t=novel&q={quote(item['title'])}"
             result[key] = items
             print(f"  네이버 시리즈 [{name}] {len(items)}개 수집")
         else:
@@ -388,6 +392,7 @@ def fetch_platform_all_genres(
 - 실제 웹소설 작품 제목만 (메뉴·배너·프로모션 문구 제외)
 - 각 작품은 반드시 하나의 장르에만 배정 (중복 배정 금지)
 - 장르당 최대 {limit}개
+- author 필드: 페이지에 작가명이 표시되어 있으면 반드시 포함. 찾을 수 없으면 빈 문자열 "" 사용 (절대 "None", "null", "unknown" 사용 금지)
 - JSON으로만 응답
 
 {json.dumps(genre_json_example, ensure_ascii=False)}""",
@@ -416,11 +421,18 @@ def fetch_platform_all_genres(
             title = str(item.get("title", "")).strip()
             if not title or len(title) < 2:
                 continue
-            link = _lookup_link(title, title_to_url) or (urls[0] if urls else base_url)
+            link = _lookup_link(title, title_to_url)
+            if not link and source_name == "카카오페이지":
+                link = f"https://page.kakao.com/search/result?keyword={quote(title)}"
+            elif not link:
+                link = ""
+            author = str(item.get("author", "")).strip()
+            if author.lower() in ("none", "null", "n/a", "없음", "미상", "unknown"):
+                author = ""
             items.append({
                 "rank": len(items) + 1,
                 "title": title,
-                "author": str(item.get("author", "")).strip(),
+                "author": author,
                 "cover": "",
                 "link": link,
                 "genre_key": key,
@@ -515,6 +527,7 @@ def _parse_single_genre(
 - 실제 웹소설 작품 제목만 (메뉴·배너·프로모션 문구 제외)
 - 반드시 위 장르 정의에 맞는 작품만 포함 (다른 장르 작품 제외)
 - 최대 {limit}개
+- author 필드: 페이지에 작가명이 있으면 반드시 포함. 없으면 빈 문자열 "" (절대 "None" 사용 금지)
 - JSON 배열로만 응답
 
 [{{"rank": 1, "title": "작품명", "author": "작가명"}}]""",
@@ -535,10 +548,13 @@ def _parse_single_genre(
         title = str(item.get("title", "")).strip()
         if not title or len(title) < 2:
             continue
+        author = str(item.get("author", "")).strip()
+        if author.lower() in ("none", "null", "n/a", "없음", "미상", "unknown"):
+            author = ""
         results.append({
             "rank": len(results) + 1,
             "title": title,
-            "author": str(item.get("author", "")).strip(),
+            "author": author,
             "cover": "",
             "link": _lookup_link(title, title_to_url or {}),
         })
@@ -592,17 +608,22 @@ _PLATFORM_TABS = [
     {"key": "리디",         "label": "리디"},
 ]
 
+_BASE_URLS = {"https://page.kakao.com", "https://series.naver.com", "https://ridibooks.com"}
+
 def _platform_table_html(books: list[dict]) -> str:
     if not books:
         return '<p class="ptab-empty">데이터 없음</p>'
-    rows = "".join(
-        f'<tr><td><strong>{b["rank"]}</strong></td>'
-        f'<td>{"<a href=" + chr(34) + b["link"] + chr(34) + ">" if b.get("link") else ""}'
-        f'{b["title"]}'
-        f'{"</a>" if b.get("link") else ""}</td>'
-        f'<td>{b.get("author","")}</td></tr>'
-        for b in books
-    )
+
+    def _row(b: dict) -> str:
+        link = b.get("link", "")
+        # 메인 페이지 URL이면 링크 제거 (개별 작품 링크가 아님)
+        if link in _BASE_URLS:
+            link = ""
+        title_html = f'<a href="{link}">{b["title"]}</a>' if link else b["title"]
+        author = b.get("author", "")
+        return f'<tr><td><strong>{b["rank"]}</strong></td><td>{title_html}</td><td>{author}</td></tr>'
+
+    rows = "".join(_row(b) for b in books)
     return (
         '<table class="ptab-table">'
         '<thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead>'
