@@ -1,5 +1,19 @@
 import type { ReviewRating } from './types';
 
+export const SM2_CONSTANTS = {
+  MIN_EASINESS_FACTOR: 1.3,
+  DEFAULT_EASINESS_FACTOR: 2.5,
+  EF_DECREASE: 0.2,
+  INTERVAL_FIRST_REPETITION: 1,
+  INTERVAL_SECOND_REPETITION: 6,
+  HARD_INTERVAL_MULTIPLIER: 1.2,
+  EASY_INTERVAL_MULTIPLIER: 1.3,
+  JITTER_RANGE: 0.1,
+  MASTERED_REPETITION_THRESHOLD: 3,
+  STREAK_LOOKBACK_DAYS: 365,
+  DAILY_CLEANUP_DAYS: 7,
+} as const;
+
 /** 평가 버튼 설정. 플래시카드·데일리 공통. */
 export const RATING_CONFIG: {
   rating: ReviewRating;

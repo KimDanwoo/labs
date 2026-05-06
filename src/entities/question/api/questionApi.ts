@@ -1,7 +1,8 @@
-import { createClient } from '@/shared/config/supabase/client';
+import { createClient } from '@shared/config/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { shuffleArray } from '@/shared/lib/shuffle';
-import type { Category, Question, PaginatedResult, SearchResult } from '../model';
+import { shuffleArray } from '@shared/lib/shuffle';
+import type { Category, Question, PaginatedResult, SearchResult, Difficulty, VisibilityFilter } from '../model';
+import { SUPABASE_ERROR_CODES } from '@shared/constants';
 
 // ============================================================
 // Supabase data access layer
@@ -50,7 +51,7 @@ export async function getCategoryBySlug(slug: string, supabase?: SupabaseClient)
     .single();
 
   if (error || !data) {
-    if (error?.code !== 'PGRST116') console.error('getCategoryBySlug error:', error);
+    if (error?.code !== SUPABASE_ERROR_CODES.NOT_FOUND) console.error('getCategoryBySlug error:', error);
     return undefined;
   }
 
@@ -128,7 +129,7 @@ export async function getQuestionById(id: string, supabase?: SupabaseClient): Pr
     .single();
 
   if (error || !data) {
-    if (error?.code !== 'PGRST116') console.error('getQuestionById error:', error);
+    if (error?.code !== SUPABASE_ERROR_CODES.NOT_FOUND) console.error('getQuestionById error:', error);
     return undefined;
   }
 
@@ -224,7 +225,7 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
 }
 
 /** 난이도별 질문 목록을 반환한다. */
-export async function getQuestionsByDifficulty(difficulty: 'easy' | 'medium' | 'hard', supabase?: SupabaseClient): Promise<Question[]> {
+export async function getQuestionsByDifficulty(difficulty: Difficulty, supabase?: SupabaseClient): Promise<Question[]> {
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
@@ -244,7 +245,7 @@ export async function getRandomQuestions(
   count: number,
   categorySlug?: string,
   supabase?: SupabaseClient,
-  options?: { visibilityFilter?: 'daily' | 'flashcard' },
+  options?: { visibilityFilter?: VisibilityFilter },
 ): Promise<Question[]> {
   const client = getClient(supabase);
 

@@ -1,4 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
+import type { Difficulty } from '../model';
 import {
   getAllCategories,
   getCategoryBySlug,
@@ -72,7 +73,7 @@ export const questionQueries = {
       enabled: query.trim().length > 0,
     }),
 
-  byDifficulty: (difficulty: 'easy' | 'medium' | 'hard') =>
+  byDifficulty: (difficulty: Difficulty) =>
     queryOptions({
       queryKey: ['question', 'byDifficulty', difficulty] as const,
       queryFn: () => getQuestionsByDifficulty(difficulty),
