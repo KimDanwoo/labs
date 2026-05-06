@@ -1,13 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Sheet, SheetTrigger, SheetContent, SheetTitle } from '@/shared/ui/Sheet';
-import { Button } from '@/shared/ui/Button';
+import { Sheet, SheetTrigger, SheetContent, SheetTitle, Button } from '@shared/ui';
 import { Menu, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
-import { getAllCategories, getCategoryBySlug, getQuestionsByCategorySlugPaginated } from '@/entities/question';
-import { CategorySidebar, QuestionAccordion } from '@/views/reference';
-import { FeedbackForm } from '@/features/feedback';
+import { getAllCategories, getCategoryBySlug, getQuestionsByCategorySlugPaginated } from '@entities/question';
+import { CategorySidebar, QuestionAccordion } from '@views/reference';
+import { FeedbackForm } from '@features/feedback';
 
 export const revalidate = 86400;
 
@@ -96,11 +95,11 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
 				{/* Main content */}
 				<div className="flex-1 min-w-0">
-					<div className="flex items-center gap-3 mb-8">
+					<div className="flex items-start gap-3 mb-8">
 						{/* Mobile sidebar trigger */}
 						<Sheet>
 							<SheetTrigger asChild className="lg:hidden">
-								<Button variant="outline" size="icon" aria-label="카테고리 메뉴 열기" className="shadow-sm">
+								<Button variant="outline" size="icon" aria-label="카테고리 메뉴 열기" className="shadow-sm shrink-0 mt-1">
 									<Menu className="h-4 w-4" />
 								</Button>
 							</SheetTrigger>
@@ -112,18 +111,16 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 							</SheetContent>
 						</Sheet>
 
-						<div>
+						<div className="min-w-0">
 							<div className="flex items-center gap-2.5 mb-1.5">
 								<span className="text-2xl">{category.icon}</span>
 								<h1 className="text-2xl font-bold tracking-tight">{category.title}</h1>
 							</div>
-							<div className="flex items-center gap-2">
-								<p className="text-sm text-muted-foreground leading-relaxed">
-									{category.description}
-									{result.total > 0 && <span className="ml-2 tabular-nums">({result.total}개 질문)</span>}
-								</p>
-								<FeedbackForm fixedType="add_question" label="질문 추가 요청" />
-							</div>
+							<p className="text-sm text-muted-foreground leading-relaxed">
+								{category.description}
+								{result.total > 0 && <span className="ml-2 tabular-nums">({result.total}개 질문)</span>}
+							</p>
+							<FeedbackForm fixedType="add_question" label="질문 추가 요청" className="-ml-2 mt-1" />
 						</div>
 					</div>
 

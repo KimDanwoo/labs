@@ -2,25 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect, useMemo } from 'react';
 import { Menu, Search, LogIn, LogOut, User, BookOpen, GraduationCap, Shield, Clock, Calendar, Settings, Bookmark } from 'lucide-react';
-import { Button } from '@/shared/ui/Button';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/shared/ui/Sheet';
-import { ThemeToggle } from '@/shared/ui/ThemeToggle';
-import { createClient } from '@/shared/config/supabase/client';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { Button, Sheet, SheetContent, SheetTrigger, SheetTitle, ThemeToggle, Avatar, AvatarFallback, AvatarImage } from '@shared/ui';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/shared/ui/DropdownMenu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
-import { cn } from '@/shared/lib/utils';
-import { getDueCardCount, syncProgress } from '@/entities/progress';
-import { clearUserIdCache } from '@/entities/progress/services';
-import { isAdmin } from '@/features/auth';
+} from '@shared/ui/DropdownMenu';
+import { cn } from '@shared/lib/utils';
+import { useHeader } from './model/useHeader';
 
 const navItems = [
 	{ href: '/reference', label: '레퍼런스', icon: BookOpen },
@@ -31,40 +23,8 @@ const navItems = [
 
 export function Header() {
 	const pathname = usePathname();
-	const [user, setUser] = useState<SupabaseUser | null>(null);
-	const [mounted] = useState(() => typeof window !== 'undefined');
-	const [open, setOpen] = useState(false);
-	const [dueCount, setDueCount] = useState(() => typeof window !== 'undefined' ? getDueCardCount() : 0);
-
-	useEffect(() => {
-		const supabase = createClient();
-		supabase.auth.getUser().then(({ data: { user } }) => {
-			setUser(user);
-		});
-
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, session) => {
-			setUser(session?.user ?? null);
-			clearUserIdCache();
-			// 로그인 시 localStorage ↔ Supabase 양방향 동기화
-			if (session?.user) {
-				syncProgress().then(() => {
-					setDueCount(getDueCardCount());
-				}).catch(() => {});
-			}
-		});
-
-		return () => subscription.unsubscribe();
-	}, []);
-
-	const isAdminUser = useMemo(() => isAdmin(user?.email), [user]);
-
-	const handleSignOut = async () => {
-		const supabase = createClient();
-		await supabase.auth.signOut();
-		setUser(null);
-	};
+	const mounted = typeof window !== 'undefined';
+	const { user, open, setOpen, dueCount, isAdminUser, handleSignOut } = useHeader();
 
 	return (
 		<header
@@ -110,7 +70,7 @@ export function Header() {
 								<Button variant="ghost" size="icon" className="rounded-full" aria-label="사용자 메뉴">
 									<Avatar className="h-8 w-8">
 										<AvatarImage src={user.user_metadata?.avatar_url} alt={`${user.email ?? '사용자'} 프로필`} />
-										<AvatarFallback>{user.email?.charAt(0).toUpperCase() ?? 'U'}</AvatarFallback>
+										<AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
 									</Avatar>
 								</Button>
 							</DropdownMenuTrigger>
@@ -169,7 +129,7 @@ export function Header() {
 						</SheetTrigger>
 						<SheetContent side="right" className="w-[280px]">
 							<SheetTitle className="sr-only">메뉴</SheetTitle>
-							<nav className="flex flex-col gap-2 mt-8">
+							<nav className="flex flex-col gap-1 mt-8 px-2">
 								{navItems.map((item) => {
 									const Icon = item.icon;
 									const isActive = pathname === item.href || (pathname.startsWith(item.href + '/'));

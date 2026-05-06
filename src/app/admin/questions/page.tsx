@@ -2,16 +2,16 @@
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/shared/config/supabase/client';
-import type { Question, Category } from '@/entities/question/model';
-import { useDebounce } from '@/shared/lib/hooks/useDebounce';
-import { Button } from '@/shared/ui/Button';
+import { createClient } from '@shared/config/supabase/client';
+import type { Question, Category, QuestionVisibilityField } from '@entities/question/model';
+import { useDebounce } from '@shared/lib/hooks';
+import { Button } from '@shared/ui';
 import {
 	deleteQuestion,
 	deleteQuestions,
 	updateQuestionsVisibility,
 	updateCategoryVisibility,
-} from '@/entities/question/services';
+} from '@entities/question/services';
 import { Plus, Trash2, BookOpen, BookOpenCheck, Layers, Eye, EyeOff, FolderSync } from 'lucide-react';
 import { QuestionFilters } from './_ui/QuestionFilters';
 import { QuestionTable } from './_ui/QuestionTable';
@@ -137,7 +137,7 @@ export default function QuestionsListPage() {
 	}
 
 	async function handleBulkVisibility(
-		field: 'show_in_daily' | 'show_in_flashcard',
+		field: QuestionVisibilityField,
 		value: boolean,
 	) {
 		if (selectedIds.size === 0) return;
@@ -153,7 +153,7 @@ export default function QuestionsListPage() {
 	}
 
 	async function handleCategoryVisibility(
-		field: 'show_in_daily' | 'show_in_flashcard',
+		field: QuestionVisibilityField,
 		value: boolean,
 	) {
 		if (categoryFilter === 'all') {

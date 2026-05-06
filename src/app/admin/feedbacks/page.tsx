@@ -1,11 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { getFeedbacks, updateFeedbackStatus } from '@/features/feedback';
-import { Badge } from '@/shared/ui/Badge';
-import { Button } from '@/shared/ui/Button';
-import { Card, CardContent } from '@/shared/ui/Card';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/shared/ui/Select';
+import { getFeedbacks, updateFeedbackStatus } from '@features/feedback';
+import { Badge, Button, Card, CardContent, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@shared/ui';
 import { MessageSquare, CheckCircle, Eye, Clock, Trash2 } from 'lucide-react';
 
 interface Feedback {
