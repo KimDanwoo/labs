@@ -1,89 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/Card';
-import { Progress } from '@/shared/ui/Progress';
-import { Badge } from '@/shared/ui/Badge';
-import { getAllCategories, getAllQuestions } from '@/entities/question';
-import type { Category } from '@/entities/question';
-import { getProgressByCategory, getLocalProgress, getStudyHeatmap, getCurrentStreak, getDueCardCount } from '@/entities/progress';
+import { Card, CardContent, Progress, Badge } from '@shared/ui';
 import { BookOpen, CheckCircle, Brain, Target, Flame, Clock } from 'lucide-react';
 import { StudyHeatmap } from './StudyHeatmap';
+import { useProgressStats } from '../model';
 
 export function ProgressPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [stats, setStats] = useState({
-    total: 0,
-    mastered: 0,
-    learning: 0,
-    unseen: 0,
-  });
-  const [categoryStats, setCategoryStats] = useState<
-    Record<string, { mastered: number; learning: number; unseen: number }>
-  >({});
-  const [heatmap, setHeatmap] = useState<Record<string, number>>({});
-  const [streak, setStreak] = useState(0);
-  const [dueCount, setDueCount] = useState(0);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      // localStorage를 한 번만 파싱하여 heatmap, streak, dueCount, 카테고리 통계에 공유한다.
-      const progress = getLocalProgress();
-      const hm = getStudyHeatmap(progress);
-      setHeatmap(hm);
-      setStreak(getCurrentStreak(hm));
-      setDueCount(getDueCardCount(progress));
-
-      const [cats, allQuestions] = await Promise.all([
-        getAllCategories(),
-        getAllQuestions(),
-      ]);
-      if (cancelled) return;
-      setCategories(cats);
-
-      // 카테고리별 질문 ID를 한 번의 순회로 그룹핑 (N+1 쿼리 제거)
-      const questionIdsByCategory = new Map<string, string[]>();
-      for (const q of allQuestions) {
-        const ids = questionIdsByCategory.get(q.category_id);
-        if (ids) {
-          ids.push(q.id);
-        } else {
-          questionIdsByCategory.set(q.category_id, [q.id]);
-        }
-      }
-
-      const totalQuestions = allQuestions.length;
-      let mastered = 0;
-      let learning = 0;
-      for (const p of Object.values(progress)) {
-        if (p.status === 'mastered') mastered++;
-        else if (p.status === 'learning') learning++;
-      }
-
-      setStats({
-        total: totalQuestions,
-        mastered,
-        learning,
-        unseen: totalQuestions - mastered - learning,
-      });
-
-      const catStats: Record<string, { mastered: number; learning: number; unseen: number }> = {};
-      for (const cat of cats) {
-        const questionIds = questionIdsByCategory.get(cat.id) ?? [];
-        catStats[cat.id] = getProgressByCategory(questionIds, progress);
-      }
-      setCategoryStats(catStats);
-    }
-
-    load();
-    return () => { cancelled = true; };
-  }, []);
-
-  const overallPercent = stats.total > 0
-    ? Math.round(((stats.mastered + stats.learning) / stats.total) * 100)
-    : 0;
+  const { categories, stats, categoryStats, heatmap, streak, dueCount, overallPercent } = useProgressStats();
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12 animate-fade-in">
