@@ -1,15 +1,10 @@
 'use server';
 
-import { createServerSupabaseClient } from '@/shared/config/supabase/server';
-import { createAdminSupabaseClient } from '@/shared/config/supabase/admin';
+import { createServerSupabaseClient } from '@shared/config/supabase/server';
+import { createAdminSupabaseClient } from '@shared/config/supabase/admin';
+import type { FeedbackType, CreateFeedbackInput } from './types';
 
-export type FeedbackType = 'add_question' | 'edit_question';
-
-interface CreateFeedbackInput {
-  type: FeedbackType;
-  content: string;
-  questionId?: string;
-}
+export type { FeedbackType } from './types';
 
 /** 로그인 사용자의 피드백을 생성한다. */
 export async function createFeedback(input: CreateFeedbackInput) {

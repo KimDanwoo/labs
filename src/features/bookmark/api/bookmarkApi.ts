@@ -1,6 +1,6 @@
 'use client';
 
-const BOOKMARKS_KEY = 'fe-interview-bookmarks';
+import { STORAGE_KEYS } from '@shared/constants';
 
 // ============================================================
 // Bookmarks (localStorage)
@@ -10,7 +10,7 @@ const BOOKMARKS_KEY = 'fe-interview-bookmarks';
 export function getBookmarks(): string[] {
   if (typeof window === 'undefined') return [];
   try {
-    const data = localStorage.getItem(BOOKMARKS_KEY);
+    const data = localStorage.getItem(STORAGE_KEYS.BOOKMARKS);
     return data ? JSON.parse(data) : [];
   } catch {
     return [];
@@ -24,11 +24,11 @@ export function toggleBookmark(questionId: string): boolean {
 
   if (index >= 0) {
     bookmarks.splice(index, 1);
-    localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
+    localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(bookmarks));
     return false;
   } else {
     bookmarks.push(questionId);
-    localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
+    localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(bookmarks));
     return true;
   }
 }
