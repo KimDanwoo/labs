@@ -8,13 +8,19 @@ export interface Category {
   question_count?: number;
 }
 
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
+export type VisibilityFilter = 'daily' | 'flashcard';
+
+export type QuestionVisibilityField = 'show_in_daily' | 'show_in_flashcard';
+
 export interface Question {
   id: string;
   category_id: string;
   question: string;
   answer: string;
   sub_category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: Difficulty;
   order_num: number;
   tags: string[];
   show_in_daily: boolean;
@@ -37,7 +43,7 @@ export interface QuestionInput {
   answer: string;
   category_id: string;
   sub_category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: Difficulty;
   tags: string[];
   order_num?: number;
   show_in_daily?: boolean;

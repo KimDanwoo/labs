@@ -2,16 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Button } from '@/shared/ui/Button';
-import { Card } from '@/shared/ui/Card';
-import { getRandomQuestions, getQuestionsByIds } from '@/entities/question';
-import type { Question } from '@/entities/question';
+import { Button, Card } from '@shared/ui';
+import { getRandomQuestions, getQuestionsByIds } from '@entities/question';
+import type { Question } from '@entities/question';
 import {
 	getDueCardIds,
 	getLocalProgress,
 	getCurrentStreak,
-} from '@/entities/progress';
-import { shuffleArray } from '@/shared/lib/shuffle';
+} from '@entities/progress';
+import { shuffleArray } from '@shared/lib/shuffle';
 import { useCardStudySession } from '../model';
 import { isDailyDone, markDailyDone } from '../model';
 import { StudyCardView } from './StudyCardView';

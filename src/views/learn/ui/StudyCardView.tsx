@@ -1,15 +1,11 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/shared/ui/Button';
-import { Card } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
-import { Progress } from '@/shared/ui/Progress';
-import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
-import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
-import type { Question } from '@/entities/question';
-import type { ReviewRating, UserProgress } from '@/entities/progress';
-import { RATING_CONFIG } from '@/entities/progress';
+import { Button, Card, Badge, Progress, MarkdownRenderer } from '@shared/ui';
+import { DifficultyBadge } from '@entities/question/ui';
+import type { Question } from '@entities/question';
+import type { ReviewRating, UserProgress } from '@entities/progress';
+import { RATING_CONFIG } from '@entities/progress';
 import { Eye } from 'lucide-react';
 
 interface StudyCardViewProps {

@@ -1,3 +1,3 @@
-import { FlashcardPage } from '@/views/learn';
+import { FlashcardPage } from '@views/learn';
 
 export default FlashcardPage;

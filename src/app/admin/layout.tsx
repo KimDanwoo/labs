@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, FileText, Plus, ExternalLink, MessageSquare } from 'lucide-react';
-import { ThemeToggle } from '@/shared/ui/ThemeToggle';
-import { cn } from '@/shared/lib/utils';
+import { ThemeToggle } from '@shared/ui';
+import { cn } from '@shared/lib/utils';
 
 const navItems = [
   { href: '/admin', icon: LayoutDashboard, label: '대시보드', exact: true },

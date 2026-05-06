@@ -2,16 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Question, Category } from '@/entities/question/model';
-import type { QuestionInput } from '@/entities/question/model';
-import { createQuestion, updateQuestion } from '@/entities/question/services';
-import { Input } from '@/shared/ui/Input';
-import { Button } from '@/shared/ui/Button';
-import { Badge } from '@/shared/ui/Badge';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/shared/ui/Select';
-import { Checkbox } from '@/shared/ui/Checkbox';
-import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
-import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
+import type { Question, Category, Difficulty } from '@entities/question/model';
+import type { QuestionInput } from '@entities/question/model';
+import { createQuestion, updateQuestion } from '@entities/question/services';
+import { Input, Button, Badge, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, Checkbox, MarkdownRenderer, ConfirmDialog } from '@shared/ui';
 
 interface QuestionFormProps {
   categories: Category[];
@@ -116,7 +110,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
           <Select
             value={form.difficulty}
             onValueChange={(v) =>
-              setField('difficulty', v as 'easy' | 'medium' | 'hard')
+              setField('difficulty', v as Difficulty)
             }
           >
             <SelectTrigger className="w-full">

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/shared/ui/Button';
+import { Button } from '@shared/ui';
 import { RotateCcw, ArrowLeft } from 'lucide-react';
 
 export default function MainError({

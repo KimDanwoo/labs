@@ -1,10 +1,7 @@
 'use client';
 
-import { Button } from '@/shared/ui/Button';
-import { Card } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/shared/ui/Select';
-import type { Category } from '@/entities/question';
+import { Button, Card, Badge, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@shared/ui';
+import type { Category } from '@entities/question';
 import { Clock, Brain, Shuffle } from 'lucide-react';
 
 type StudyMode = 'review' | 'new' | 'mixed';

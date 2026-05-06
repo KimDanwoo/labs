@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/shared/config/supabase/client';
-import { Button } from '@/shared/ui/Button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/shared/ui/Card';
+import { createClient } from '@shared/config/supabase/client';
+import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@shared/ui';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);

@@ -1,8 +1,7 @@
 'use client';
 
-import { Input } from '@/shared/ui/Input';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/shared/ui/Select';
-import type { Category } from '@/entities/question/model';
+import { Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@shared/ui';
+import type { Category } from '@entities/question/model';
 
 interface QuestionFiltersProps {
 	search: string;

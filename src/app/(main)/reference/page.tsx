@@ -1,9 +1,9 @@
 export const revalidate = 86400;
 
 import Link from 'next/link';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/shared/ui/Card';
+import { Card, CardHeader, CardTitle, CardDescription } from '@shared/ui';
 import { createClient } from '@supabase/supabase-js';
-import { getAllCategories } from '@/entities/question';
+import { getAllCategories } from '@entities/question';
 
 export default async function ReferencePage() {
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);

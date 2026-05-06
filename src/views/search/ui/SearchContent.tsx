@@ -1,47 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { Input } from '@/shared/ui/Input';
-import { Badge } from '@/shared/ui/Badge';
-import { Card } from '@/shared/ui/Card';
-import { useDebounce } from '@/shared/lib/hooks/useDebounce';
-import { searchQuestions } from '@/entities/question';
-import type { SearchResult } from '@/entities/question';
-import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
-import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/shared/ui/Accordion';
+import { Input, Badge, Card, MarkdownRenderer, Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@shared/ui';
+import { DifficultyBadge } from '@entities/question/ui';
+import { useSearch } from '../model';
+
+const MATCH_TYPE_LABEL: Record<string, string> = {
+  question: '질문 일치',
+  answer: '답변 일치',
+  tag: '태그 일치',
+};
 
 export function SearchContent() {
-  const searchParams = useSearchParams();
-  const initialQuery = searchParams.get('q') ?? '';
-  const [query, setQuery] = useState(initialQuery);
-  const debouncedQuery = useDebounce(query, 300);
-  const [results, setResults] = useState<SearchResult[]>([]);
-  // 마지막으로 검색 완료된 쿼리를 추적하여 isSearching을 파생한다.
-  const [lastSearchedQuery, setLastSearchedQuery] = useState('');
+  const { query, setQuery, debouncedQuery, displayResults, isSearching } = useSearch();
 
-  useEffect(() => {
-    if (!debouncedQuery.trim()) return;
-
-    let cancelled = false;
-
-    searchQuestions(debouncedQuery).then((data) => {
-      if (!cancelled) {
-        setResults(data);
-        setLastSearchedQuery(debouncedQuery);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [debouncedQuery]);
-
-  const displayResults = debouncedQuery.trim() ? results : [];
-  const isSearching = debouncedQuery.trim() !== '' && debouncedQuery !== lastSearchedQuery;
+  const hasResults = displayResults.length > 0;
+  const showNoResults = !!debouncedQuery && !isSearching && !hasResults;
+  const showEmptyPrompt = !debouncedQuery;
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12 animate-fade-in">
@@ -67,7 +43,7 @@ export function SearchContent() {
         </p>
       )}
 
-      {displayResults.length > 0 ? (
+      {hasResults && (
         <Accordion type="multiple" className="space-y-2.5">
           {displayResults.map((result) => (
             <AccordionItem
@@ -86,11 +62,7 @@ export function SearchContent() {
                     </Badge>
                     <DifficultyBadge difficulty={result.question.difficulty} />
                     <Badge variant="secondary" className="text-xs">
-                      {result.matchType === 'question'
-                        ? '질문 일치'
-                        : result.matchType === 'answer'
-                        ? '답변 일치'
-                        : '태그 일치'}
+                      {MATCH_TYPE_LABEL[result.matchType] ?? '일치'}
                     </Badge>
                   </div>
                 </div>
@@ -109,13 +81,17 @@ export function SearchContent() {
             </AccordionItem>
           ))}
         </Accordion>
-      ) : debouncedQuery && !isSearching ? (
+      )}
+
+      {showNoResults && (
         <Card className="p-16 text-center shadow-sm">
           <p className="text-muted-foreground">
             검색 결과가 없습니다. 다른 키워드로 검색해보세요.
           </p>
         </Card>
-      ) : !debouncedQuery ? (
+      )}
+
+      {showEmptyPrompt && (
         <Card className="p-16 text-center shadow-sm">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <Search className="h-7 w-7 text-muted-foreground/50" />
@@ -124,7 +100,7 @@ export function SearchContent() {
             키워드를 입력하면 모든 질문과 답변에서 검색합니다.
           </p>
         </Card>
-      ) : null}
+      )}
     </div>
   );
 }

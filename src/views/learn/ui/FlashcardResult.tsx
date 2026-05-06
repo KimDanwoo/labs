@@ -1,8 +1,7 @@
 'use client';
 
-import { Button } from '@/shared/ui/Button';
-import { Card } from '@/shared/ui/Card';
-import { getDueCardCount } from '@/entities/progress';
+import { Button, Card } from '@shared/ui';
+import { getDueCardCount } from '@entities/progress';
 import { RotateCcw, ArrowRight } from 'lucide-react';
 import { ResultScoreCard } from './ResultScoreCard';
 

@@ -1,15 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/shared/ui/Accordion';
-import { Button } from '@/shared/ui/Button';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent, Button, MarkdownRenderer } from '@shared/ui';
 import { Bookmark, BookmarkCheck, CheckCircle } from 'lucide-react';
-import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
-import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
-import { toggleBookmark, isBookmarked } from '@/features/bookmark';
-import { FeedbackForm } from '@/features/feedback';
-import { getProgressForQuestion, updateQuestionProgress } from '@/entities/progress';
-import type { Question } from '@/entities/question';
+import { DifficultyBadge } from '@entities/question/ui';
+import { FeedbackForm } from '@features/feedback';
+import type { Question } from '@entities/question';
+import { useQuestionAccordion } from '../model';
 
 interface QuestionAccordionProps {
 	questions: Question[];
@@ -17,34 +13,7 @@ interface QuestionAccordionProps {
 }
 
 export function QuestionAccordion({ questions, startIndex = 0 }: QuestionAccordionProps) {
-	// useMemo로 초기값을 계산하여 불필요한 리렌더를 방지한다.
-	const initialBookmarks = useMemo(() => {
-		const bm: Record<string, boolean> = {};
-		for (const q of questions) bm[q.id] = isBookmarked(q.id);
-		return bm;
-	}, [questions]);
-
-	const initialProgress = useMemo(() => {
-		const pg: Record<string, string> = {};
-		for (const q of questions) {
-			const p = getProgressForQuestion(q.id);
-			if (p) pg[q.id] = p.status;
-		}
-		return pg;
-	}, [questions]);
-
-	const [bookmarks, setBookmarks] = useState<Record<string, boolean>>(initialBookmarks);
-	const [progress, setProgress] = useState<Record<string, string>>(initialProgress);
-
-	const handleBookmarkToggle = (questionId: string) => {
-		const result = toggleBookmark(questionId);
-		setBookmarks((prev) => ({ ...prev, [questionId]: result }));
-	};
-
-	const handleMarkLearned = (questionId: string) => {
-		updateQuestionProgress(questionId, true);
-		setProgress((prev) => ({ ...prev, [questionId]: 'mastered' }));
-	};
+	const { bookmarks, progress, handleBookmarkToggle, handleMarkLearned } = useQuestionAccordion(questions);
 
 	return (
 		<Accordion type="multiple" className="space-y-2.5">

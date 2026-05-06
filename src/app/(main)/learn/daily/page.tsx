@@ -1,3 +1,3 @@
-import { DailyPage } from '@/views/learn';
+import { DailyPage } from '@views/learn';
 
 export default DailyPage;

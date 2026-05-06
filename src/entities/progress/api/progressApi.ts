@@ -1,11 +1,11 @@
 'use client';
 
 import type { ProgressStatus, UserProgress, ReviewRating } from '../model';
+import { SM2_CONSTANTS } from '../model';
 import { calculateSM2, todayString, addDays } from '../sm2';
+import { STORAGE_KEYS } from '@shared/constants';
 
 export { calculateSM2 } from '../sm2';
-
-const PROGRESS_KEY = 'fe-interview-progress';
 
 // ============================================================
 // LocalStorage CRUD
@@ -15,7 +15,7 @@ const PROGRESS_KEY = 'fe-interview-progress';
 export function getLocalProgress(): Record<string, UserProgress> {
   if (typeof window === 'undefined') return {};
   try {
-    const data = localStorage.getItem(PROGRESS_KEY);
+    const data = localStorage.getItem(STORAGE_KEYS.PROGRESS);
     if (!data) return {};
     const parsed = JSON.parse(data) as Record<string, UserProgress>;
 
@@ -39,7 +39,7 @@ export function getLocalProgress(): Record<string, UserProgress> {
 /** 학습 진도 데이터를 localStorage에 저장한다. */
 export function saveLocalProgress(progress: Record<string, UserProgress>) {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+  localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(progress));
 }
 
 /** SM-2 필드가 없는 기존 progress를 마이그레이션한다. */
@@ -54,7 +54,7 @@ function migrateProgress(old: Partial<UserProgress> & { question_id: string }): 
     wrong_count: old.wrong_count ?? 0,
     last_reviewed: old.last_reviewed ?? today,
     easiness_factor: 2.5,
-    interval: old.status === 'mastered' ? 6 : 1,
+    interval: old.status === 'mastered' ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION,
     repetition: old.status === 'mastered' ? 2 : 0,
     next_review: today, // 마이그레이션 시 오늘 복습 대상으로
   };
@@ -81,7 +81,7 @@ export function reviewCard(questionId: string, rating: ReviewRating): UserProgre
 
   // status 결정: repetition 3+ → mastered, 그 외 → learning
   let status: ProgressStatus = 'learning';
-  if (sm2.repetition >= 3) {
+  if (sm2.repetition >= SM2_CONSTANTS.MASTERED_REPETITION_THRESHOLD) {
     status = 'mastered';
   }
 
@@ -172,7 +172,7 @@ export function getCurrentStreak(heatmap?: Record<string, number>): number {
   const d = new Date();
   let streak = 0;
 
-  for (let i = 0; i < 365; i++) {
+  for (let i = 0; i < SM2_CONSTANTS.STREAK_LOOKBACK_DAYS; i++) {
     if (i > 0) d.setDate(d.getDate() - 1);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     if (map[key]) {
@@ -213,9 +213,9 @@ export function updateQuestionProgress(
     wrong_count: (existing?.wrong_count ?? 0) + (knew ? 0 : 1),
     last_reviewed: new Date().toISOString(),
     easiness_factor: existing?.easiness_factor ?? 2.5,
-    interval: existing?.interval ?? (knew ? 6 : 1),
+    interval: existing?.interval ?? (knew ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION),
     repetition: existing?.repetition ?? (knew ? 2 : 0),
-    next_review: existing?.next_review ?? addDays(today, knew ? 6 : 1),
+    next_review: existing?.next_review ?? addDays(today, knew ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION),
   };
 
   if (updated.correct_count >= 3) {

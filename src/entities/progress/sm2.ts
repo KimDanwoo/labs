@@ -1,4 +1,5 @@
 import type { ReviewRating, SM2Result } from './model';
+import { SM2_CONSTANTS } from './model';
 
 /**
  * ReviewRating을 SM-2 quality 점수(0~5)로 변환한다.
@@ -50,16 +51,16 @@ export function calculateSM2(
   // 실패 (again): 처음부터 다시
   if (quality < 3) {
     return {
-      easiness_factor: Math.max(1.3, prevEF - 0.2),
-      interval: 1,
+      easiness_factor: Math.max(SM2_CONSTANTS.MIN_EASINESS_FACTOR, prevEF - SM2_CONSTANTS.EF_DECREASE),
+      interval: SM2_CONSTANTS.INTERVAL_FIRST_REPETITION,
       repetition: 0,
-      next_review: addDays(today, 1),
+      next_review: addDays(today, SM2_CONSTANTS.INTERVAL_FIRST_REPETITION),
     };
   }
 
   // 성공: EF 업데이트
   const newEF = Math.max(
-    1.3,
+    SM2_CONSTANTS.MIN_EASINESS_FACTOR,
     prevEF + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)),
   );
 
@@ -67,9 +68,9 @@ export function calculateSM2(
   const newRepetition = prevRepetition + 1;
 
   if (newRepetition === 1) {
-    newInterval = 1;
+    newInterval = SM2_CONSTANTS.INTERVAL_FIRST_REPETITION;
   } else if (newRepetition === 2) {
-    newInterval = 6;
+    newInterval = SM2_CONSTANTS.INTERVAL_SECOND_REPETITION;
   } else {
     newInterval = Math.round(prevInterval * newEF);
   }
@@ -77,16 +78,15 @@ export function calculateSM2(
   // hard/easy 보정은 표준 간격(rep 1~2)이 지난 이후에만 적용
   if (newRepetition > 2) {
     if (rating === 'hard') {
-      // hard: 간격을 이전 간격의 1.2배로 제한 (Anki 방식)
-      newInterval = Math.max(1, Math.round(prevInterval * 1.2));
+      newInterval = Math.max(1, Math.round(prevInterval * SM2_CONSTANTS.HARD_INTERVAL_MULTIPLIER));
     }
     if (rating === 'easy') {
-      newInterval = Math.round(newInterval * 1.3);
+      newInterval = Math.round(newInterval * SM2_CONSTANTS.EASY_INTERVAL_MULTIPLIER);
     }
   }
 
   // 간격에 ±5% 지터 추가 (카드 클러스터링 방지)
-  const jitter = Math.round(newInterval * (Math.random() * 0.1 - 0.05));
+  const jitter = Math.round(newInterval * (Math.random() * SM2_CONSTANTS.JITTER_RANGE - SM2_CONSTANTS.JITTER_RANGE / 2));
   newInterval = Math.max(1, newInterval + jitter);
 
   return {

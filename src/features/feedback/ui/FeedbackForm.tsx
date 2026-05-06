@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/shared/ui/Button';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/shared/ui/Select';
-import { Sheet, SheetContent, SheetTitle } from '@/shared/ui/Sheet';
-import { createClient } from '@/shared/config/supabase/client';
-import { createFeedback, type FeedbackType } from '../actions';
+import { Button, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, Sheet, SheetContent, SheetTitle } from '@shared/ui';
 import { MessageSquarePlus, Send } from 'lucide-react';
+import { useFeedbackForm } from '../model';
+import { FEEDBACK_TYPE_LABELS } from '../constants';
+import type { FeedbackType } from '../types';
 
 interface FeedbackFormProps {
   questionId?: string;
@@ -14,39 +12,12 @@ interface FeedbackFormProps {
   /** 타입을 고정하면 select가 숨겨진다 */
   fixedType?: FeedbackType;
   label?: string;
+  className?: string;
 }
 
-export function FeedbackForm({ questionId, questionText, fixedType, label }: FeedbackFormProps) {
-  const [open, setOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const defaultType = fixedType ?? (questionId ? 'edit_question' : 'add_question');
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setIsLoggedIn(!!user);
-    });
-  }, []);
-  const [type, setType] = useState<FeedbackType>(defaultType);
-  const [content, setContent] = useState('');
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-  const [errorMsg, setErrorMsg] = useState('');
-
-  const handleSubmit = async () => {
-    if (!content.trim()) return;
-    setStatus('submitting');
-    setErrorMsg('');
-
-    try {
-      await createFeedback({ type, content: content.trim(), questionId });
-      setStatus('success');
-      setContent('');
-      setTimeout(() => { setOpen(false); setStatus('idle'); }, 1500);
-    } catch (e) {
-      setErrorMsg(e instanceof Error ? e.message : '제출에 실패했습니다.');
-      setStatus('error');
-    }
-  };
+export function FeedbackForm({ questionId, questionText, fixedType, label, className }: FeedbackFormProps) {
+  const { isLoggedIn, open, setOpen, type, setType, content, setContent, status, errorMsg, handleSubmit } =
+    useFeedbackForm({ questionId, fixedType });
 
   if (!isLoggedIn) return null;
 
@@ -55,7 +26,7 @@ export function FeedbackForm({ questionId, questionText, fixedType, label }: Fee
       <Button
         variant="ghost"
         size="sm"
-        className="gap-1.5 text-muted-foreground"
+        className={`gap-1.5 text-muted-foreground${className ? ` ${className}` : ''}`}
         onClick={() => setOpen(true)}
       >
         <MessageSquarePlus className="size-3.5" />
@@ -79,13 +50,14 @@ export function FeedbackForm({ questionId, questionText, fixedType, label }: Fee
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="add_question">질문 추가 요청</SelectItem>
-                  <SelectItem value="edit_question">질문 수정 요청</SelectItem>
+                  {Object.entries(FEEDBACK_TYPE_LABELS).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             ) : (
               <p className="text-sm text-muted-foreground">
-                {fixedType === 'add_question' ? '질문 추가 요청' : '질문 수정 요청'}
+                {FEEDBACK_TYPE_LABELS[fixedType]}
               </p>
             )}
 

@@ -1,7 +1,6 @@
 'use client';
 
-import { Card } from '@/shared/ui/Card';
-import { Progress } from '@/shared/ui/Progress';
+import { Card, Progress } from '@shared/ui';
 
 interface ResultScoreCardProps {
 	resultCounts: { again: number; hard: number; good: number; easy: number };

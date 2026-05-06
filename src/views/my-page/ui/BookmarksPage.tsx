@@ -1,42 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Card } from '@/shared/ui/Card';
-import { Badge } from '@/shared/ui/Badge';
-import { Button } from '@/shared/ui/Button';
+import { Card, Badge, Button, MarkdownRenderer, Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@shared/ui';
 import { Bookmark, Trash2 } from 'lucide-react';
-import { getBookmarks, toggleBookmark } from '@/features/bookmark';
-import { getQuestionsByIds, getAllCategories } from '@/entities/question';
-import type { Category, Question } from '@/entities/question';
-import { MarkdownRenderer } from '@/shared/ui/MarkdownRenderer';
-import { DifficultyBadge } from '@/entities/question/ui/DifficultyBadge';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/shared/ui/Accordion';
+import { DifficultyBadge } from '@entities/question/ui';
+import { useBookmarkedQuestions } from '../model';
 
 export function BookmarksPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[]>([]);
-
-  useEffect(() => {
-    let cancelled = false;
-    const ids = getBookmarks();
-    if (ids.length === 0) return;
-    Promise.all([getAllCategories(), getQuestionsByIds(ids)]).then(([cats, qs]) => {
-      if (!cancelled) {
-        setCategories(cats);
-        setBookmarkedQuestions(qs);
-      }
-    });
-    return () => { cancelled = true; };
-  }, []);
-
-  const handleRemoveBookmark = (questionId: string) => {
-    toggleBookmark(questionId);
-    setBookmarkedQuestions((prev) => prev.filter((q) => q.id !== questionId));
-  };
-
-  const getCategoryForQuestion = (categoryId: string) =>
-    categories.find((c) => c.id === categoryId);
+  const { bookmarkedQuestions, handleRemoveBookmark, getCategoryForQuestion } = useBookmarkedQuestions();
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12 animate-fade-in">
