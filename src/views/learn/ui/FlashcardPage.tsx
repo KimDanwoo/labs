@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/shared/ui/Button';
-import { getAllCategories, getRandomQuestions, getQuestionsByIds } from '@/entities/question';
-import type { Category, Question } from '@/entities/question';
+import { Button } from '@shared/ui';
+import { getAllCategories, getRandomQuestions, getQuestionsByIds } from '@entities/question';
+import type { Category, Question } from '@entities/question';
 import {
 	getDueCardIds,
 	getDueCardCount,
 	getLocalProgress,
-} from '@/entities/progress';
-import { shuffleArray } from '@/shared/lib/shuffle';
+} from '@entities/progress';
+import { shuffleArray } from '@shared/lib/shuffle';
 import { useCardStudySession } from '../model';
 import { FlashcardSetup } from './FlashcardSetup';
 import { FlashcardResult } from './FlashcardResult';

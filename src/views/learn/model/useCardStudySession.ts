@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { reviewCard, getLocalProgress } from '@/entities/progress';
-import type { ReviewRating, FlashcardResult, UserProgress } from '@/entities/progress';
-import type { Question } from '@/entities/question';
+import { reviewCard, getLocalProgress } from '@entities/progress';
+import type { ReviewRating, FlashcardResult, UserProgress } from '@entities/progress';
+import type { Question } from '@entities/question';
 
 interface UseCardStudySessionOptions {
   /** 학습할 질문 배열 */
