@@ -18,9 +18,14 @@ export default async function ReferencePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 stagger-children">
-        {categories.map((category) => (
-          <Link key={category.id} href={`/reference/${category.slug}`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {categories.map((category, index) => (
+          <Link
+            key={category.id}
+            href={`/reference/${category.slug}`}
+            className="animate-fade-in-up"
+            style={{ animationDelay: `${index * 60}ms` }}
+          >
             <Card className="card-hover hover:border-primary/30 cursor-pointer h-full group">
               <CardHeader>
                 <div className="flex items-center justify-between mb-3">
