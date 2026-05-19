@@ -1,15 +1,16 @@
 import { ViewTransition } from 'react';
 
-import { Noto_Sans_KR } from 'next/font/google';
+import { Noto_Serif_KR } from 'next/font/google';
 
 import type { Metadata } from 'next';
 
+import { Providers } from './providers';
 import './globals.css';
 
-const notoSansKr = Noto_Sans_KR({
-  variable: '--font-noto-sans-kr',
+const notoSerifKr = Noto_Serif_KR({
+  variable: '--font-noto-serif-kr',
   subsets: ['latin'],
-  weight: ['300', '400', '500', '700'],
+  weight: ['300', '400', '500', '700', '900'],
 });
 
 export const metadata: Metadata = {
@@ -29,9 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${notoSansKr.variable} h-full`}>
+    <html lang="ko" className={`${notoSerifKr.variable} h-full`}>
       <body className="min-h-full flex flex-col relative">
-        <ViewTransition>{children}</ViewTransition>
+        <Providers>
+          <ViewTransition>{children}</ViewTransition>
+        </Providers>
       </body>
     </html>
   );

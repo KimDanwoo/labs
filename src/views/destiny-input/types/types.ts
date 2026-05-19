@@ -5,6 +5,7 @@ export type FormState = {
   gender: Gender;
   birthDate: string;
   shichen: string;
+  unknownTime: boolean;
   region: string;
   note: string;
 };
