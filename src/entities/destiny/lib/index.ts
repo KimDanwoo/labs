@@ -1,4 +1,10 @@
 export { calculateDestiny } from './calculateDestiny';
+export { analyzeBodyStrength } from './bodyStrengthAnalysis';
+export type {
+  BodyStrength,
+  BodyStrengthAnalysis,
+} from './bodyStrengthAnalysis';
+export { parseDestinyInput } from './parseDestinyInput';
 export { analyzeFiveElements } from './fiveElements';
 export type { FiveElementCount, FiveElementAnalysis } from './fiveElements';
 export { getTenGod, analyzeTenGods } from './tenGods';
@@ -40,3 +46,7 @@ export type {
   AnnualLuck,
   LuckAnalysis,
 } from './majorLuck';
+export { analyzeFormat } from './격국Analysis';
+export type { FormatAnalysis } from './격국Analysis';
+export { analyzeYongsin } from './용신Analysis';
+export type { YongsinAnalysis } from './용신Analysis';

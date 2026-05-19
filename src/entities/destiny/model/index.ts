@@ -10,5 +10,7 @@ export type {
   HiddenStem,
   HiddenStems,
   DestinyInput,
+  DestinyFormData,
   DestinyResult,
 } from './types';
+export { destinyFormAtom, destinyResultAtom } from './atoms';

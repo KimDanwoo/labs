@@ -22,7 +22,7 @@
   --color-card-border: var(--card-border);
   --color-input-bg: var(--input-bg);
   --color-muted: var(--muted);
-  --font-sans: var(--font-noto-sans-kr);
+  --font-sans: var(--font-noto-serif-kr);
 }
 
 * {
@@ -37,7 +37,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-noto-sans-kr), 'Noto Sans KR', sans-serif;
+  font-family: var(--font-noto-serif-kr), 'Noto Serif KR', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

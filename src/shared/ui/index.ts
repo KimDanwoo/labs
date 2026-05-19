@@ -1,4 +1,5 @@
 export { Button } from './Button';
+export { ButtonGroup } from './ButtonGroup';
 export { Card } from './Card';
 export { FormField } from './FormField';
 export { Input } from './Input';

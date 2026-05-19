@@ -36,6 +36,12 @@ type DestinyInput = {
   useSolarTime?: boolean;
 };
 
+type DestinyFormData = DestinyInput & {
+  name: string;
+  region?: string;
+  note?: string;
+};
+
 type DestinyResult = {
   fourPillars: FourPillars;
   fiveElements: import('../lib/fiveElements').FiveElementAnalysis;
@@ -44,6 +50,9 @@ type DestinyResult = {
   combinations: import('../lib/combinationsAnalysis').CombinationAnalysis;
   voidAnalysis: import('../lib/voidAnalysis').VoidAnalysis;
   luck: import('../lib/majorLuck').LuckAnalysis;
+  bodyStrength: import('../lib/bodyStrengthAnalysis').BodyStrengthAnalysis;
+  format: import('../lib/격국Analysis').FormatAnalysis;
+  yongsin: import('../lib/용신Analysis').YongsinAnalysis;
   input: DestinyInput;
 };
 
@@ -59,5 +68,6 @@ export type {
   HiddenStem,
   HiddenStems,
   DestinyInput,
+  DestinyFormData,
   DestinyResult,
 };

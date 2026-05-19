@@ -21,6 +21,8 @@ views/destiny-input/
 └── constants/index.ts
 ```
 
+**컴포넌트 분리**: View 파일에 컴포넌트를 인라인 선언 금지. 재사용 여부와 무관하게 모든 컴포넌트는 `ui/` 하위 파일로 분리 후 `ui/index.ts`에서 export.
+
 **Barrel**: `ui/index`, `hooks/index`, `types/index`, `constants/index` 단위. 외부 미사용 index.ts 생성 금지.
 
 **Import 순서**: react/next → 외부 패키지 → @app…@shared → 상대경로
