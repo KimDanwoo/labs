@@ -4,6 +4,10 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { useSetAtom } from 'jotai';
+
+import { destinyFormAtom } from '@entities/destiny/model';
+
 import { INITIAL_STATE, SHICHEN_OPTIONS, STEP_CONFIGS } from '../constants';
 import type { FormState, Step } from '../types';
 
@@ -33,13 +37,16 @@ export function useDestinyForm() {
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const parsed = parseBirthDate(form.birthDate);
-  const isStep0Valid = Boolean(form.name.trim() && parsed);
+  const isStep0Valid = Boolean(
+    form.name.trim() && parsed && (form.shichen || form.unknownTime),
+  );
 
   return { form, setForm, updateField, isStep0Valid };
 }
 
 export function useDestinySteps(form: FormState) {
   const router = useRouter();
+  const setDestinyForm = useSetAtom(destinyFormAtom);
   const [step, setStep] = useState<Step>(0);
   const [showForm, setShowForm] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -48,7 +55,13 @@ export function useDestinySteps(form: FormState) {
   const currentImage = showForm ? config.withoutBubble : config.withBubble;
 
   const handleOpenForm = () => {
-    setShowForm(true);
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setShowForm(true);
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => setIsTransitioning(false)),
+      );
+    }, 200);
   };
 
   const handleStep0Next = () => {
@@ -71,18 +84,17 @@ export function useDestinySteps(form: FormState) {
     const hour = selected ? selected.hour : 12;
     const minute = selected ? selected.minute : 0;
 
-    const params = new URLSearchParams({
-      name: form.name,
-      year: String(parsed.year),
-      month: String(parsed.month),
-      day: String(parsed.day),
-      hour: String(hour),
-      minute: String(minute),
+    setDestinyForm({
+      ...parsed,
+      hour,
+      minute,
       gender: form.gender,
+      name: form.name,
+      ...(form.region.trim() && { region: form.region.trim() }),
+      ...(form.note.trim() && { note: form.note.trim() }),
     });
-    if (form.region.trim()) params.set('region', form.region.trim());
-    if (form.note.trim()) params.set('note', form.note.trim());
-    router.push(`/result?${params.toString()}`);
+
+    router.push('/result');
   };
 
   return {
