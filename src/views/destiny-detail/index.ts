@@ -1,0 +1,1 @@
+export { DestinyDetailView } from './DestinyDetailView';

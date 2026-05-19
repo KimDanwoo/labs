@@ -3,6 +3,7 @@ import type { DestinyInput, DestinyResult } from '@entities/destiny/model';
 import { gregorianToJdn, jdnToGregorian } from '@shared/lib/julianDay';
 import { adjustToHistoricalKst, adjustToSolarTime } from '@shared/lib/timezone';
 
+import { analyzeBodyStrength } from './bodyStrengthAnalysis';
 import { analyzeCombinations } from './combinationsAnalysis';
 import { getDayPillar } from './dayPillar';
 import { analyzeFiveElements } from './fiveElements';
@@ -13,6 +14,8 @@ import { analyzeTenGods } from './tenGods';
 import { analyzeTwelveStages } from './twelveStagesAnalysis';
 import { analyzeVoid } from './voidAnalysis';
 import { getYearPillar } from './yearPillar';
+import { analyzeFormat } from './격국Analysis';
+import { analyzeYongsin } from './용신Analysis';
 
 /**
  * 사주팔자 통합 계산 함수
@@ -115,6 +118,9 @@ const calculateDestiny = (input: DestinyInput): DestinyResult => {
     minute,
     input.gender,
   );
+  const bodyStrength = analyzeBodyStrength(tenGods);
+  const format = analyzeFormat(fourPillars);
+  const yongsin = analyzeYongsin(fiveElements, bodyStrength);
 
   return {
     fourPillars,
@@ -124,6 +130,9 @@ const calculateDestiny = (input: DestinyInput): DestinyResult => {
     combinations,
     voidAnalysis,
     luck,
+    bodyStrength,
+    format,
+    yongsin,
     input,
   };
 };

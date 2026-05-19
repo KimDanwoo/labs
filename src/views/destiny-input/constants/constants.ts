@@ -5,6 +5,7 @@ export const INITIAL_STATE: FormState = {
   gender: 'male',
   birthDate: '',
   shichen: '',
+  unknownTime: false,
   region: '',
   note: '',
 };
