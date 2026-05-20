@@ -1,3 +1,10 @@
+import {
+  BRANCH_KR,
+  ELEMENT_COLOR,
+  STEM_ELEMENT,
+  STEM_KR,
+} from '@views/destiny-result/constants';
+
 import { HIDDEN_STEMS_TABLE } from '@entities/destiny/data/hiddenStems';
 import type {
   TwelveStageAnalysis,
@@ -11,13 +18,6 @@ import type {
   FourPillars,
   HeavenlyStem,
 } from '@entities/destiny/model';
-
-import {
-  BRANCH_KR,
-  ELEMENT_COLOR,
-  STEM_ELEMENT,
-  STEM_KR,
-} from '@views/destiny-result/constants';
 
 import { cn } from '@shared/lib/cn';
 
@@ -136,7 +136,10 @@ export function SajuChart({
         <div className={cn(ROW_STYLE, 'bg-[#f5f3ef]')}>
           <div className={cn(CELL, LABEL)} />
           {PILLAR_LABELS.map((label) => (
-            <div key={label} className={cn(CELL, 'text-xs font-semibold text-[#777]')}>
+            <div
+              key={label}
+              className={cn(CELL, 'text-xs font-semibold text-[#777]')}
+            >
               {label}
             </div>
           ))}
@@ -149,7 +152,9 @@ export function SajuChart({
             <div key={`s-${i}`} className={cn(CELL, 'flex-col gap-0.5')}>
               <span className="text-xl font-black text-[#1a1a2e] leading-none">
                 {STEM_KR[p.stem]}
-                <span className="text-[#999] text-sm font-medium ml-0.5">{p.stem}</span>
+                <span className="text-[#999] text-sm font-medium ml-0.5">
+                  {p.stem}
+                </span>
               </span>
               <span
                 className="text-[10px] font-bold"
@@ -162,7 +167,9 @@ export function SajuChart({
         </div>
 
         {/* 천간 십성 */}
-        <div className={cn(ROW_STYLE, 'border-b border-[#f0ede8] bg-[#faf9f7]')}>
+        <div
+          className={cn(ROW_STYLE, 'border-b border-[#f0ede8] bg-[#faf9f7]')}
+        >
           <div className={cn(CELL, LABEL)}>십성</div>
           {stemGods.map((god, i) => (
             <div
@@ -187,7 +194,9 @@ export function SajuChart({
               <div key={`b-${i}`} className={cn(CELL, 'flex-col gap-0.5')}>
                 <span className="text-xl font-black text-[#1a1a2e] leading-none">
                   {BRANCH_KR[p.branch]}
-                  <span className="text-[#999] text-sm font-medium ml-0.5">{p.branch}</span>
+                  <span className="text-[#999] text-sm font-medium ml-0.5">
+                    {p.branch}
+                  </span>
                 </span>
                 <span
                   className="text-[10px] font-bold"
@@ -201,10 +210,15 @@ export function SajuChart({
         </div>
 
         {/* 지지 십성 */}
-        <div className={cn(ROW_STYLE, 'border-b border-[#f0ede8] bg-[#faf9f7]')}>
+        <div
+          className={cn(ROW_STYLE, 'border-b border-[#f0ede8] bg-[#faf9f7]')}
+        >
           <div className={cn(CELL, LABEL)}>십성</div>
           {branchGods.map((god, i) => (
-            <div key={`bg-${i}`} className={cn(CELL, 'text-xs font-medium text-[#555]')}>
+            <div
+              key={`bg-${i}`}
+              className={cn(CELL, 'text-xs font-medium text-[#555]')}
+            >
               {god}
             </div>
           ))}
@@ -214,17 +228,25 @@ export function SajuChart({
         <div className={cn(ROW_STYLE, 'border-b border-[#f0ede8]')}>
           <div className={cn(CELL, LABEL)}>지장간</div>
           {hiddenStems.map((h, i) => (
-            <div key={`hs-${i}`} className={cn(CELL, 'text-xs font-medium text-[#333]')}>
+            <div
+              key={`hs-${i}`}
+              className={cn(CELL, 'text-xs font-medium text-[#333]')}
+            >
               {h}
             </div>
           ))}
         </div>
 
         {/* 12운성 */}
-        <div className={cn(ROW_STYLE, 'border-b border-[#f0ede8] bg-[#faf9f7]')}>
+        <div
+          className={cn(ROW_STYLE, 'border-b border-[#f0ede8] bg-[#faf9f7]')}
+        >
           <div className={cn(CELL, LABEL)}>12운성</div>
           {stages.map((s, i) => (
-            <div key={`st-${i}`} className={cn(CELL, 'text-xs font-medium text-[#333]')}>
+            <div
+              key={`st-${i}`}
+              className={cn(CELL, 'text-xs font-medium text-[#333]')}
+            >
               {s}
             </div>
           ))}
@@ -234,7 +256,10 @@ export function SajuChart({
         <div className={ROW_STYLE}>
           <div className={cn(CELL, LABEL)}>12신살</div>
           {spirits.map((s, i) => (
-            <div key={`sp-${i}`} className={cn(CELL, 'text-xs font-medium text-[#333]')}>
+            <div
+              key={`sp-${i}`}
+              className={cn(CELL, 'text-xs font-medium text-[#333]')}
+            >
               {s}
             </div>
           ))}
