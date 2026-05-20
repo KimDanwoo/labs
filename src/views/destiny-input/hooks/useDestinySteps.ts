@@ -8,40 +8,19 @@ import { useSetAtom } from 'jotai';
 
 import { destinyFormAtom } from '@entities/destiny/model';
 
-import { INITIAL_STATE, SHICHEN_OPTIONS, STEP_CONFIGS } from '../constants';
+import { REGION_OPTIONS, SHICHEN_OPTIONS, STEP_CONFIGS } from '../constants';
 import type { FormState, Step } from '../types';
 
-function parseBirthDate(raw: string): {
-  year: number;
-  month: number;
-  day: number;
-} | null {
+function parseBirthDate(raw: string) {
   const digits = raw.replace(/\D/g, '');
   if (digits.length !== 8) return null;
-
   const year = Number(digits.slice(0, 4));
   const month = Number(digits.slice(4, 6));
   const day = Number(digits.slice(6, 8));
-
   if (year < 1900 || year > 2100) return null;
   if (month < 1 || month > 12) return null;
   if (day < 1 || day > 31) return null;
-
   return { year, month, day };
-}
-
-export function useDestinyForm() {
-  const [form, setForm] = useState<FormState>(INITIAL_STATE);
-
-  const updateField = (field: keyof FormState) => (value: string) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
-
-  const parsed = parseBirthDate(form.birthDate);
-  const isStep0Valid = Boolean(
-    form.name.trim() && parsed && (form.shichen || form.unknownTime),
-  );
-
-  return { form, setForm, updateField, isStep0Valid };
 }
 
 export function useDestinySteps(form: FormState) {
@@ -49,31 +28,17 @@ export function useDestinySteps(form: FormState) {
   const setDestinyForm = useSetAtom(destinyFormAtom);
   const [step, setStep] = useState<Step>(0);
   const [showForm, setShowForm] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const config = STEP_CONFIGS[step];
   const currentImage = showForm ? config.withoutBubble : config.withBubble;
 
-  const handleOpenForm = () => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setShowForm(true);
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() => setIsTransitioning(false)),
-      );
-    }, 200);
-  };
+  const handleOpenForm = () => setShowForm(true);
 
   const handleStep0Next = () => {
     const parsed = parseBirthDate(form.birthDate);
     if (!form.name.trim() || !parsed) return;
-
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setShowForm(false);
-      setStep(1);
-      setIsTransitioning(false);
-    }, 300);
+    setShowForm(false);
+    setStep(1);
   };
 
   const handleSubmit = () => {
@@ -81,16 +46,15 @@ export function useDestinySteps(form: FormState) {
     if (!parsed) return;
 
     const selected = SHICHEN_OPTIONS.find((s) => s.value === form.shichen);
-    const hour = selected ? selected.hour : 12;
-    const minute = selected ? selected.minute : 0;
+    const region = REGION_OPTIONS.find((r) => r.value === form.region);
 
     setDestinyForm({
       ...parsed,
-      hour,
-      minute,
+      hour: selected ? selected.hour : 12,
+      minute: selected ? selected.minute : 0,
       gender: form.gender,
       name: form.name,
-      ...(form.region.trim() && { region: form.region.trim() }),
+      ...(region && { region: region.label, longitude: region.longitude }),
       ...(form.note.trim() && { note: form.note.trim() }),
     });
 
@@ -100,8 +64,6 @@ export function useDestinySteps(form: FormState) {
   return {
     step,
     showForm,
-    setShowForm,
-    isTransitioning,
     currentImage,
     handleOpenForm,
     handleStep0Next,

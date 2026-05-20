@@ -1,5 +1,6 @@
-import { Button, FormField, Input, Textarea } from '@shared/ui';
+import { Button, FormField, Select, Textarea } from '@shared/ui';
 
+import { REGION_OPTIONS } from '../constants';
 import type { FormState } from '../types';
 
 type Step1FormProps = {
@@ -10,7 +11,7 @@ type Step1FormProps = {
 
 export function Step1Form({ form, updateField, onSubmit }: Step1FormProps) {
   return (
-    <>
+    <div className="flex-1 overflow-y-auto px-5 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
       <div className="text-center mb-5">
         <h2 className="text-lg font-bold text-gold">추가 정보</h2>
         <p className="text-sm text-muted mt-1">
@@ -19,10 +20,14 @@ export function Step1Form({ form, updateField, onSubmit }: Step1FormProps) {
       </div>
 
       <FormField label="출생 지역" hint="지역에 따라 태양시 보정이 적용돼요">
-        <Input
+        <Select
           value={form.region}
           onChange={updateField('region')}
-          placeholder="예: 서울, 부산, 대구"
+          placeholder="선택 안 함"
+          options={REGION_OPTIONS.map((opt) => ({
+            value: opt.value,
+            label: opt.label,
+          }))}
         />
       </FormField>
 
@@ -35,9 +40,9 @@ export function Step1Form({ form, updateField, onSubmit }: Step1FormProps) {
         />
       </FormField>
 
-      <Button fullWidth onClick={onSubmit}>
+      <Button onClick={onSubmit} fullWidth>
         사주 보기 →
       </Button>
-    </>
+    </div>
   );
 }

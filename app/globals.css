@@ -27,14 +27,22 @@
 
 * {
   box-sizing: border-box;
+  touch-action: manipulation;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 html {
   color-scheme: dark;
   overscroll-behavior: none;
+  overflow-x: hidden;
 }
 
 body {
+  overflow-x: hidden;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-noto-serif-kr), 'Noto Serif KR', serif;
@@ -72,4 +80,10 @@ body::before {
 select {
   -webkit-appearance: none;
   appearance: none;
+}
+
+@supports not (height: 100dvh) {
+  .h-dvh {
+    height: -webkit-fill-available;
+  }
 }

@@ -60,7 +60,7 @@ export function LuckSection({
           </span>
         </div>
         <div className="bg-white rounded-xl overflow-hidden shadow-sm overflow-x-auto">
-          <table className="w-full text-sm border-collapse min-w-[420px]">
+          <table className="w-full text-sm border-collapse">
             <tbody>
               <tr className="bg-[#f0ede8]">
                 {luck.majorLuck.slice(0, 8).map((period, i) => {

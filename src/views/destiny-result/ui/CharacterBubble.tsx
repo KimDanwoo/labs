@@ -14,8 +14,8 @@ export function CharacterBubble({ imageSrc, text }: CharacterBubbleProps) {
           className="w-full h-auto block"
           draggable={false}
         />
-        <div className="absolute top-[18%] left-[27%] right-[4%] bottom-[12%] flex items-center justify-center pointer-events-none">
-          <p className="text-[#1a1a2e] font-medium leading-snug whitespace-pre-line text-center text-base">
+        <div className="absolute top-[18%] left-[7%] right-[4%] bottom-[12%] flex items-center justify-center pointer-events-none">
+          <p className="text-[#1a1a2e] text-sm leading-snug whitespace-pre-line text-center">
             {text}
           </p>
         </div>
