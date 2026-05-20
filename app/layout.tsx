@@ -1,5 +1,6 @@
 import { Noto_Serif_KR } from 'next/font/google';
 
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata, Viewport } from 'next';
 
 import { Providers } from './providers';
@@ -31,6 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={notoSerifKr.variable}>
+      <Analytics />
       <body className="h-full flex justify-center bg-[#f5f3ef]">
         <Providers>
           <div className="w-full sm:max-w-[450px] min-h-full flex flex-col relative bg-white">
