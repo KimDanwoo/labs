@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Image from 'next/image';
+
 type WebtoonPanelProps = {
   imageSrc: string;
   children?: React.ReactNode;
@@ -8,10 +10,11 @@ type WebtoonPanelProps = {
 export function WebtoonPanel({ imageSrc, children }: WebtoonPanelProps) {
   return (
     <div className="relative w-full bg-white">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={imageSrc}
         alt=""
+        width={450}
+        height={600}
         className="w-full h-auto block"
         draggable={false}
       />
