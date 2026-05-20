@@ -64,14 +64,14 @@ const calculateDestiny = (input: DestinyInput): DestinyResult => {
   }
 
   // 3. 야자시/조자시 처리: 일주 계산용 날짜 결정
-  // 조자시 모드(기본): 23:00 이후면 다음날 일주 사용
+  // 조자시 모드(기본): 23:30 이후면 다음날 일주 사용
   // 야자시 모드: 당일 일주 유지
   const useNightSubHour = input.useNightSubHour ?? false;
   let dayYear = year;
   let dayMonth = month;
   let dayDay = day;
 
-  if (!useNightSubHour && isEarlySubHour(hour)) {
+  if (!useNightSubHour && isEarlySubHour(hour, minute)) {
     const jdn = gregorianToJdn(year, month, day) + 1;
     const nextDay = jdnToGregorian(jdn);
     dayYear = nextDay.year;
