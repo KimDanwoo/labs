@@ -46,6 +46,15 @@ export type {
   AnnualLuck,
   LuckAnalysis,
 } from './majorLuck';
+export { analyzeTwelveSpirits } from './twelveSpiritAnalysis';
+export type {
+  TwelveSpirit,
+  TwelveSpiritAnalysis,
+} from './twelveSpiritAnalysis';
+export { solarToLunar } from './lunarCalendar';
+export type { LunarDate } from './lunarCalendar';
+export { getZodiacAnimal } from './zodiacAnimal';
+export type { ZodiacAnimal } from './zodiacAnimal';
 export { analyzeFormat } from './격국Analysis';
 export type { FormatAnalysis } from './격국Analysis';
 export { analyzeYongsin } from './용신Analysis';
