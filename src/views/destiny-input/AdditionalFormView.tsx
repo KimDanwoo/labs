@@ -66,6 +66,7 @@ export function AdditionalFormView() {
           alt="추가정보 입력 배경"
           fill
           className="object-cover"
+          preload
         />
         <div className="relative z-10 flex-1 flex flex-col justify-end overflow-y-auto">
           <div className="px-5 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))] bg-background/85 backdrop-blur-sm rounded-t-3xl">

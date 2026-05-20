@@ -11,4 +11,5 @@ export { PillarCardLight } from './PillarCardLight';
 export { PillarSection } from './PillarSection';
 export { SectionTitle } from './SectionTitle';
 export { TenGodSection } from './TenGodSection';
+export { StoryPanel } from './StoryPanel';
 export { WebtoonPanel } from './WebtoonPanel';

@@ -5,9 +5,14 @@ import Image from 'next/image';
 type WebtoonPanelProps = {
   imageSrc: string;
   children?: React.ReactNode;
+  isFirst?: boolean;
 };
 
-export function WebtoonPanel({ imageSrc, children }: WebtoonPanelProps) {
+export function WebtoonPanel({
+  imageSrc,
+  children,
+  isFirst,
+}: WebtoonPanelProps) {
   return (
     <div className="relative w-full bg-white">
       <Image
@@ -17,6 +22,7 @@ export function WebtoonPanel({ imageSrc, children }: WebtoonPanelProps) {
         height={600}
         className="w-full h-auto block"
         draggable={false}
+        preload={isFirst}
       />
       {children && (
         <div className="absolute inset-0 pointer-events-none">{children}</div>
