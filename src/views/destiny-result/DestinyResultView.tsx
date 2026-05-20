@@ -72,7 +72,7 @@ export function DestinyResultView() {
       </Link>
 
       {/* ━━━ 1컷: 인사 ━━━ */}
-      <WebtoonPanel imageSrc="/result_1.png">
+      <WebtoonPanel imageSrc="/result_1.webp">
         <BubbleText
           text={`${displayName}님,\n만나서 반가워요!`}
           top="24%"
@@ -82,7 +82,7 @@ export function DestinyResultView() {
       </WebtoonPanel>
 
       {/* ━━━ 2컷: 자기소개 + 인연 ━━━ */}
-      <WebtoonPanel imageSrc="/result_2.png">
+      <WebtoonPanel imageSrc="/result_2.webp">
         <BubbleText
           text={`저는 청월이에요.\n${displayName}님의 사주를\n함께 풀어볼게요!`}
           top="14%"
@@ -106,7 +106,7 @@ export function DestinyResultView() {
       />
       <ElementSection fiveElements={fiveElements} dayStem={dayStem} />
 
-      <WebtoonPanel imageSrc="/result_3.png" />
+      <WebtoonPanel imageSrc="/result_3.webp" />
 
       <Divider label="성격 · 기질" />
       <PersonalitySection
@@ -116,7 +116,7 @@ export function DestinyResultView() {
         format={format}
       />
 
-      <WebtoonPanel imageSrc="/result_4.png">
+      <WebtoonPanel imageSrc="/result_4.webp">
         <BubbleText
           text={`${displayName}님의 성향을\n더 자세히 볼게요!`}
           top="14%"
@@ -144,7 +144,7 @@ export function DestinyResultView() {
       {/* ━━━ 7컷: 상세 보기 유도 + 버튼 ━━━ */}
       <div className="relative pt-10 bg-white">
         <Image
-          src="/result_7.jpeg"
+          src="/result_7.webp"
           alt="상세 사주 보기 유도"
           width={450}
           height={600}

@@ -50,7 +50,7 @@ export function BasicFormView() {
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
         <Image
-          src="/form_step_1.png"
+          src="/form_step_1.webp"
           alt="사주 입력 배경"
           fill
           className="object-cover"

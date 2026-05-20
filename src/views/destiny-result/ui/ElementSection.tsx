@@ -32,7 +32,7 @@ export function ElementSection({ fiveElements, dayStem }: ElementSectionProps) {
   return (
     <>
       <CharacterBubble
-        imageSrc="/bubble_2.png"
+        imageSrc="/bubble_2.webp"
         text={`오행 에너지 분포를\n함께 분석해볼게요.`}
       />
       <DataSection>
@@ -46,7 +46,7 @@ export function ElementSection({ fiveElements, dayStem }: ElementSectionProps) {
       </DataSection>
 
       <CharacterBubble
-        imageSrc="/bubble_2.png"
+        imageSrc="/bubble_2.webp"
         text={getElementComment(dominantKr, missingKr)}
       />
 
