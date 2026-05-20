@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import { Button } from '@shared/ui';
 
 type GuideScreenProps = {
@@ -13,11 +15,12 @@ export function GuideScreen({
 }: GuideScreenProps) {
   return (
     <div className="relative flex-1 overflow-hidden">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={imageSrc}
         alt="사주 입력 안내"
-        className="w-full h-full object-cover"
+        fill
+        className="object-cover"
+        preload
       />
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-background pointer-events-none" />
 

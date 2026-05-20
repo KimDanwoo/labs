@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 type CharacterBubbleProps = {
   imageSrc: string;
   text: string;
@@ -7,10 +9,11 @@ export function CharacterBubble({ imageSrc, text }: CharacterBubbleProps) {
   return (
     <div className="bg-white px-4 pt-3 pb-1">
       <div className="relative w-[65%] max-w-[240px]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={imageSrc}
           alt=""
+          width={240}
+          height={240}
           className="w-full h-auto block"
           draggable={false}
         />
