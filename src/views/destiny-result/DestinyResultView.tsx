@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -144,10 +145,11 @@ export function DestinyResultView() {
 
       {/* ━━━ 7컷: 상세 보기 유도 + 버튼 ━━━ */}
       <div className="relative mt-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src="/result_7.jpeg"
           alt=""
+          width={450}
+          height={600}
           className="w-full h-auto block"
           draggable={false}
         />
