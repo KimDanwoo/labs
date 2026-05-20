@@ -13,75 +13,57 @@ import type {
 /**
  * 시각 → 시진(時辰) 인덱스 변환 (0=子, 1=丑, ..., 11=亥)
  *
- * 12시진 매핑 (30분 경계):
- *   子=23:30~01:30, 丑=01:30~03:30, 寅=03:30~05:30, 卯=05:30~07:30
- *   辰=07:30~09:30, 巳=09:30~11:30, 午=11:30~13:30, 未=13:30~15:30
- *   申=15:30~17:30, 酉=17:30~19:30, 戌=19:30~21:30, 亥=21:30~23:30
+ * 전통 정시법 12시진 매핑 (정각 기준):
+ *   子=23:00~01:00, 丑=01:00~03:00, 寅=03:00~05:00, 卯=05:00~07:00
+ *   辰=07:00~09:00, 巳=09:00~11:00, 午=11:00~13:00, 未=13:00~15:00
+ *   申=15:00~17:00, 酉=17:00~19:00, 戌=19:00~21:00, 亥=21:00~23:00
  */
-const getShichenIndex = (hour: number, minute: number): number => {
-  const totalMinutes = hour * 60 + minute;
-
-  // 23:30 이상 → 子(0)
-  if (totalMinutes >= 23 * 60 + 30) {
-    return 0;
-  }
-
-  // 01:30 미만 → 子(0)
-  if (totalMinutes < 1 * 60 + 30) {
-    return 0;
-  }
-
-  // 나머지: (totalMinutes - 90) / 120 으로 인덱스 계산
-  // 01:30 = 90분 기준, 2시간(120분) 간격
-  return Math.floor((totalMinutes - 90) / 120) + 1;
+const getShichenIndex = (hour: number): number => {
+  // 23시 이상 → 子(0)
+  if (hour >= 23) return 0;
+  // 01시 미만 → 子(0)
+  if (hour < 1) return 0;
+  // 나머지: 2시간 간격
+  return Math.floor((hour + 1) / 2);
 };
 
 /**
- * 야자시(夜子時, 23:30~00:00) 여부 확인
+ * 야자시(夜子時, 23:00~00:00) 여부 확인
  * 조자시 모드에서 이 시간대면 다음날 일주를 써야 함
- *
- * @param hour 시 (0~23)
- * @param minute 분 (0~59)
  */
-const isEarlySubHour = (hour: number, minute: number): boolean => {
-  return hour === 23 && minute >= 30;
+const isEarlySubHour = (hour: number): boolean => {
+  return hour >= 23;
 };
 
 /**
  * 시주(時柱) 계산
  *
- * 시간 천간 계산:
- *   1. 일간으로 StemGroup 구하기
- *   2. DAY_STEM_TO_HOUR_BASE에서 자시(子時) 천간 가져오기
- *   3. 자시 천간 인덱스에서 해당 시진까지 순차 이동
- *
- * 야자시(夜子時) 옵션:
- *   - 조자시(기본, false): 23:30부터 다음날 일주 적용, 시진은 子
- *   - 야자시(true): 23:30~00:00는 당일 일주 유지, 시진은 子
- *   (일주 교체는 호출자가 담당, 이 함수는 시진만 계산)
- *
- * @param dayStem 일간
- * @param hour 시 (0~23)
- * @param minute 분 (0~59)
- * @param useNightSubHour 야자시 사용 여부 (기본 false = 조자시)
+ * 야자시(夜子時) 처리:
+ *   - 조자시(기본, false): 23:00부터 다음날 일주 적용, 시간 천간도 다음날 기준
+ *   - 야자시(true): 23:00~00:00는 당일 일주 유지, 시간 천간은 당일 기준
+ *   (일주 교체는 호출자 calculateDestiny가 담당)
  */
 const getHourPillar = (
   dayStem: HeavenlyStem,
   hour: number,
-  minute: number,
+  _minute: number,
   useNightSubHour = false,
 ): Pillar => {
-  const shichenIndex = getShichenIndex(hour, minute);
+  const shichenIndex = getShichenIndex(hour);
 
   const stemGroup = getStemGroup(dayStem);
   const ziHourBaseStem = DAY_STEM_TO_HOUR_BASE[stemGroup];
   const ziHourBaseIndex = HEAVENLY_STEMS.indexOf(ziHourBaseStem);
 
-  const stemIndex = (ziHourBaseIndex + shichenIndex) % 10;
+  let stemIndex: number;
 
-  // 야자시 모드에서 23:30~00:00 구간은 시진만 子로 반환
-  // (일주는 호출자가 당일 일주 그대로 유지해야 함)
-  void useNightSubHour;
+  if (useNightSubHour && hour >= 23) {
+    // 야자시 모드: 23:00~24:00는 당일 일간 기준으로 자시 천간 계산
+    // (dayStem은 호출자가 당일 일간을 넘겨줌)
+    stemIndex = ziHourBaseIndex % 10;
+  } else {
+    stemIndex = (ziHourBaseIndex + shichenIndex) % 10;
+  }
 
   const hourBranch: EarthlyBranch = EARTHLY_BRANCHES[shichenIndex];
 

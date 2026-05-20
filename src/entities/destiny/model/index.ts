@@ -13,4 +13,10 @@ export type {
   DestinyFormData,
   DestinyResult,
 } from './types';
-export { destinyFormAtom, destinyResultAtom } from './atoms';
+export {
+  inputFormAtom,
+  INPUT_FORM_INITIAL,
+  destinyFormAtom,
+  destinyResultAtom,
+} from './atoms';
+export type { InputFormState } from './atoms';

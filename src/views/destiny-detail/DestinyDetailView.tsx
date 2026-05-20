@@ -17,10 +17,9 @@ import {
   WEALTH_BY_GOD,
   WEALTH_NONE,
 } from '@views/destiny-detail/constants';
-import { AreaSection, Divider } from '@views/destiny-detail/ui';
+import { AreaSection, Divider, SajuChart } from '@views/destiny-detail/ui';
 import {
   ELEMENT_COLOR,
-  ELEMENT_EMOJI,
   ELEMENT_KR,
   STEM_ELEMENT,
   STEM_KR,
@@ -42,7 +41,15 @@ export function DestinyDetailView() {
 
   if (!form || !result) return null;
 
-  const { fourPillars, fiveElements, tenGods } = result;
+  const {
+    fourPillars,
+    fiveElements,
+    tenGods,
+    twelveStages,
+    twelveSpirits,
+    zodiac,
+    lunar,
+  } = result;
   const displayName = form.name || '회원';
   const dayStem = fourPillars.day.stem;
   const dayEl = STEM_ELEMENT[dayStem];
@@ -104,14 +111,23 @@ export function DestinyDetailView() {
             {displayName}님의 총운
           </h1>
           <p className="text-xs mt-0.5" style={{ color: ELEMENT_COLOR[dayEl] }}>
-            {ELEMENT_EMOJI[dayEl]} {STEM_KR[dayStem]}({dayStem}) 일간
+            {STEM_KR[dayStem]}({dayStem}) 일간 · {ELEMENT_KR[dayEl]}
           </p>
         </div>
       </div>
 
+      <SajuChart
+        form={form}
+        fourPillars={fourPillars}
+        tenGods={tenGods}
+        twelveStages={twelveStages}
+        twelveSpirits={twelveSpirits}
+        zodiac={zodiac}
+        lunar={lunar}
+      />
+
       <Divider />
       <AreaSection
-        emoji="💕"
         title="연애·결혼운"
         godLabel={topRomanceGod}
         godTitle={romance.title}
@@ -120,7 +136,6 @@ export function DestinyDetailView() {
 
       <Divider />
       <AreaSection
-        emoji="💼"
         title="직업·커리어운"
         godLabel={topCareerGod}
         godTitle={career.title}
@@ -129,7 +144,6 @@ export function DestinyDetailView() {
 
       <Divider />
       <AreaSection
-        emoji="💰"
         title="금전·재물운"
         godLabel={topWealthGod}
         godTitle={wealth.title}
@@ -137,39 +151,16 @@ export function DestinyDetailView() {
       />
 
       <Divider />
-      <div className="bg-[#faf9f7] px-5 py-6">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-xl">💪</span>
-          <h3 className="text-base font-black text-[#1a1a2e]">건강운</h3>
-          {missingEl && (
-            <span className="ml-auto text-[11px] text-[#8a8a9a] bg-white border border-gray-100 rounded-full px-2 py-0.5">
-              {ELEMENT_KR[missingEl]} 부족
-            </span>
-          )}
-        </div>
-        <div className="bg-white rounded-xl p-4 shadow-sm">
-          {health ? (
-            <>
-              <p className="text-sm font-bold text-[#1a1a2e] mb-2">
-                {ELEMENT_EMOJI[missingEl!]} {ELEMENT_KR[missingEl!]} —{' '}
-                {health.organ} 주의
-              </p>
-              <p className="text-sm text-[#6b6b7b] leading-[1.8]">
-                {health.desc}
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-sm font-bold text-[#1a1a2e] mb-2">
-                균형 잡힌 건강운
-              </p>
-              <p className="text-sm text-[#6b6b7b] leading-[1.8]">
-                {HEALTH_BALANCED}
-              </p>
-            </>
-          )}
-        </div>
-      </div>
+      <AreaSection
+        title="건강운"
+        godLabel={missingEl ? `${ELEMENT_KR[missingEl]} 부족` : undefined}
+        godTitle={
+          health
+            ? `${ELEMENT_KR[missingEl!]} — ${health.organ} 주의`
+            : '균형 잡힌 건강운'
+        }
+        desc={health ? health.desc : HEALTH_BALANCED}
+      />
 
       {/* 하단 버튼 */}
       <div className="px-5 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-3 bg-white border-t border-gray-100">

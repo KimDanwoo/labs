@@ -3,6 +3,7 @@ export { CharacterBubble } from './CharacterBubble';
 export { DataSection } from './DataSection';
 export { Divider } from './Divider';
 export { ElementBarLight } from './ElementBarLight';
+export { ElementCycleChart } from './ElementCycleChart';
 export { ElementSection } from './ElementSection';
 export { LuckSection } from './LuckSection';
 export { PersonalitySection } from './PersonalitySection';
