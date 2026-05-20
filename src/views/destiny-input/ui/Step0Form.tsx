@@ -21,7 +21,7 @@ export function Step0Form({
   onNext,
 }: Step0FormProps) {
   return (
-    <>
+    <div className="flex-1 overflow-y-auto px-5 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
       <div className="text-center mb-5">
         <h2 className="text-lg font-bold text-gold">기본 정보</h2>
       </div>
@@ -55,12 +55,12 @@ export function Step0Form({
         />
       </FormField>
 
-      <FormField label="태어난 시간" className="mb-6">
+      <FormField label="태어난 시간 (선택)" className="mb-6">
         {!form.unknownTime && (
           <Select
             value={form.shichen}
             onChange={updateField('shichen')}
-            placeholder="시진을 선택해주세요"
+            placeholder="모름 / 선택 안 함"
             options={SHICHEN_OPTIONS.map((opt) => ({
               value: opt.value,
               label: `${opt.label} (${opt.timeRange})`,
@@ -84,9 +84,9 @@ export function Step0Form({
         </label>
       </FormField>
 
-      <Button fullWidth onClick={onNext} disabled={!isStep0Valid}>
+      <Button onClick={onNext} fullWidth disabled={!isStep0Valid}>
         다음 →
       </Button>
-    </>
+    </div>
   );
 }

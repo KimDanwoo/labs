@@ -19,18 +19,20 @@ export function BubbleText({
 }: BubbleTextProps) {
   const isPositioned =
     top !== undefined || left !== undefined || right !== undefined;
-
   return (
     <p
       className={cn(
         'text-[#1a1a2e] font-bold leading-snug whitespace-pre-line',
-        'text-[clamp(14px,4vw,16px)] text-center',
+        'text-center',
         isPositioned && 'absolute flex items-center justify-center',
         className,
       )}
-      style={isPositioned ? { top, left, right, width } : undefined}
+      style={{
+        fontSize: '16px',
+        ...(isPositioned ? { top, left, right, width } : undefined),
+      }}
     >
-      {text}
+      {text.replace(/\\n/g, '\n')}
     </p>
   );
 }

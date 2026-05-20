@@ -1,1 +1,2 @@
-export { useDestinyForm, useDestinySteps } from './hooks';
+export { useDestinyForm } from './useDestinyForm';
+export { useDestinySteps } from './useDestinySteps';

@@ -33,7 +33,7 @@ type DestinyInput = {
   gender: 'male' | 'female';
   isLunar?: boolean;
   useNightSubHour?: boolean;
-  useSolarTime?: boolean;
+  longitude?: number;
 };
 
 type DestinyFormData = DestinyInput & {

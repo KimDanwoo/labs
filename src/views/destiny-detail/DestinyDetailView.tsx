@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -27,17 +29,18 @@ import {
 import { destinyFormAtom, destinyResultAtom } from '@entities/destiny/model';
 import type { TenGod } from '@entities/destiny/model';
 
-import { Button, ButtonGroup } from '@shared/ui';
-
 export function DestinyDetailView() {
   const form = useAtomValue(destinyFormAtom);
   const result = useAtomValue(destinyResultAtom);
   const router = useRouter();
 
-  if (!form || !result) {
-    router.replace('/input');
-    return null;
-  }
+  useEffect(() => {
+    if (!form || !result) {
+      router.replace('/input');
+    }
+  }, [form, result, router]);
+
+  if (!form || !result) return null;
 
   const { fourPillars, fiveElements, tenGods } = result;
   const displayName = form.name || '회원';
@@ -86,23 +89,24 @@ export function DestinyDetailView() {
   const health = missingEl ? HEALTH_BY_ELEMENT[missingEl] : null;
 
   return (
-    <div className="flex flex-col w-full max-w-[500px] mx-auto relative bg-white">
-      <Link
-        href="/result"
-        className="sticky top-4 left-4 z-20 w-10 h-10 ml-4 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm text-gray-600 border border-gray-200 transition-colors hover:bg-gray-50"
-      >
-        ←
-      </Link>
-
+    <div className="flex flex-col w-full bg-white">
       {/* 헤더 */}
-      <div className="bg-white px-6 pt-4 pb-6 text-center">
-        <p className="text-xs text-gray-400 mb-1">총운 풀이</p>
-        <h1 className="text-2xl font-black text-[#1a1a2e]">
-          {displayName}님의 총운
-        </h1>
-        <p className="text-sm mt-1.5" style={{ color: ELEMENT_COLOR[dayEl] }}>
-          {ELEMENT_EMOJI[dayEl]} {STEM_KR[dayStem]}({dayStem}) 일간
-        </p>
+      <div className="relative flex items-center justify-center px-6 pt-4 pb-3 bg-white sticky top-0 z-10">
+        <Link
+          href="/result"
+          className="absolute left-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm text-gray-600 border border-gray-200 transition-colors hover:bg-gray-50"
+        >
+          ←
+        </Link>
+        <div className="text-center">
+          <p className="text-xs text-gray-400">총운 풀이</p>
+          <h1 className="text-lg font-black text-[#1a1a2e]">
+            {displayName}님의 총운
+          </h1>
+          <p className="text-xs mt-0.5" style={{ color: ELEMENT_COLOR[dayEl] }}>
+            {ELEMENT_EMOJI[dayEl]} {STEM_KR[dayStem]}({dayStem}) 일간
+          </p>
+        </div>
       </div>
 
       <Divider />
@@ -167,11 +171,15 @@ export function DestinyDetailView() {
         </div>
       </div>
 
-      <ButtonGroup>
-        <Button variant="ghost" onClick={() => router.push('/result')}>
+      {/* 하단 버튼 */}
+      <div className="px-5 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-3 bg-white border-t border-gray-100">
+        <Link
+          href="/result"
+          className="flex items-center justify-center w-full h-10 px-8 text-sm text-gray-400 rounded-full active:scale-[0.97] transition-all duration-200"
+        >
           ← 사주 결과로
-        </Button>
-      </ButtonGroup>
+        </Link>
+      </div>
     </div>
   );
 }

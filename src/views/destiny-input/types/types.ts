@@ -25,6 +25,12 @@ export type StepConfig = {
   withoutBubble: string;
 };
 
+export type RegionOption = {
+  value: string;
+  label: string;
+  longitude: number;
+};
+
 export type SelectFieldProps = {
   value: string;
   onChange: (value: string) => void;
