@@ -51,7 +51,7 @@ export function AdditionalGuideView() {
         ←
       </Link>
       <GuideScreen
-        imageSrc="/form_step_2.jpeg"
+        imageSrc="/form_step_2.webp"
         href="/input/additional/form"
         onSkip={handleSkip}
       />

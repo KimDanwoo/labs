@@ -25,7 +25,7 @@ export function PillarSection({
   return (
     <>
       <CharacterBubble
-        imageSrc="/bubble_1.png"
+        imageSrc="/bubble_1.webp"
         text={`${displayName}님의 사주팔자를\n살펴볼게요!`}
       />
       <DataSection>
