@@ -1,4 +1,10 @@
-import type { FormState, ShichenOption, Step, StepConfig } from '../types';
+import type {
+  FormState,
+  RegionOption,
+  ShichenOption,
+  Step,
+  StepConfig,
+} from '../types';
 
 export const INITIAL_STATE: FormState = {
   name: '',
@@ -95,6 +101,29 @@ export const SHICHEN_OPTIONS: ShichenOption[] = [
     hour: 22,
     minute: 30,
   },
+];
+
+export const REGION_OPTIONS: RegionOption[] = [
+  { value: 'seoul', label: '서울', longitude: 127.0 },
+  { value: 'busan', label: '부산', longitude: 129.0 },
+  { value: 'daegu', label: '대구', longitude: 128.6 },
+  { value: 'incheon', label: '인천', longitude: 126.7 },
+  { value: 'gwangju', label: '광주', longitude: 126.9 },
+  { value: 'daejeon', label: '대전', longitude: 127.4 },
+  { value: 'ulsan', label: '울산', longitude: 129.3 },
+  { value: 'sejong', label: '세종', longitude: 127.0 },
+  { value: 'suwon', label: '수원', longitude: 127.0 },
+  { value: 'cheongju', label: '청주', longitude: 127.5 },
+  { value: 'jeonju', label: '전주', longitude: 127.1 },
+  { value: 'chuncheon', label: '춘천', longitude: 127.7 },
+  { value: 'gangneung', label: '강릉', longitude: 128.9 },
+  { value: 'jeju', label: '제주', longitude: 126.5 },
+  { value: 'mokpo', label: '목포', longitude: 126.4 },
+  { value: 'andong', label: '안동', longitude: 128.7 },
+  { value: 'wonju', label: '원주', longitude: 127.9 },
+  { value: 'yeosu', label: '여수', longitude: 127.7 },
+  { value: 'pohang', label: '포항', longitude: 129.4 },
+  { value: 'gimhae', label: '김해', longitude: 128.9 },
 ];
 
 export const STEP_CONFIGS: Record<Step, StepConfig> = {

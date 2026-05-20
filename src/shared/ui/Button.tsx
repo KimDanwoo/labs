@@ -42,7 +42,7 @@ export function Button({
       disabled={disabled}
       className={cn(
         'inline-flex items-center justify-center rounded-full',
-        'transition-all duration-200 cursor-pointer',
+        'transition-all duration-200 cursor-pointer touch-manipulation',
         'disabled:opacity-40 disabled:cursor-not-allowed',
         fullWidth && 'w-full',
         VARIANT_STYLES[variant],

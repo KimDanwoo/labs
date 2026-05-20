@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function HomeView() {
   return (
-    <main className="relative w-full max-w-[500px] mx-auto h-dvh overflow-hidden bg-background">
+    <main className="relative w-full h-dvh overflow-hidden bg-background">
       {/* 배경 영상 — 전체 화면 */}
       <video
         src="/intro.mp4"
@@ -12,10 +12,10 @@ export function HomeView() {
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-linear-to-b from-transparent via-background/30 to-background" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-background/30 to-background pointer-events-none" />
 
       {/* 콘텐츠 — 하단 정렬 */}
-      <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-12 pt-6 text-center">
+      <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-[calc(3rem+env(safe-area-inset-bottom))] pt-6 text-center">
         <div className="mb-6 flex items-center gap-3">
           <span className="w-12 h-px bg-gold/60" />
           <span className="text-gold text-xs tracking-[0.4em] uppercase font-medium">

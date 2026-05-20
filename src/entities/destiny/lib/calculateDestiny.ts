@@ -34,14 +34,11 @@ const calculateDestiny = (input: DestinyInput): DestinyResult => {
 
   let { year, month, day, hour, minute } = input;
 
-  // 1. 태양시 보정
-  if (input.useSolarTime) {
-    const solarAdjusted = adjustToSolarTime(hour, minute);
+  // 1. 태양시 보정 (경도가 지정된 경우 자동 적용)
+  if (input.longitude !== undefined) {
+    const solarAdjusted = adjustToSolarTime(hour, minute, input.longitude);
     hour = solarAdjusted.hour;
     minute = solarAdjusted.minute;
-
-    // 태양시 보정에서 dayOffset이 발생하는 경우는 없으나,
-    // adjustToSolarTime은 dayOffset을 반환하지 않으므로 날짜 변화 없음
   }
 
   // 2. 역사적 시간대 보정
