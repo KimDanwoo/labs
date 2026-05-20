@@ -1,105 +1,89 @@
-import type {
-  FormState,
-  RegionOption,
-  ShichenOption,
-  Step,
-  StepConfig,
-} from '../types';
-
-export const INITIAL_STATE: FormState = {
-  name: '',
-  gender: 'male',
-  birthDate: '',
-  shichen: '',
-  unknownTime: false,
-  region: '',
-  note: '',
-};
+import type { RegionOption, ShichenOption } from '../types';
 
 export const SHICHEN_OPTIONS: ShichenOption[] = [
   {
     value: '자',
     label: '子 자시',
-    timeRange: '23:00~01:00',
+    timeRange: '23:30~01:30',
     hour: 0,
     minute: 0,
   },
   {
     value: '축',
     label: '丑 축시',
-    timeRange: '01:00~03:00',
+    timeRange: '01:30~03:30',
     hour: 2,
-    minute: 0,
+    minute: 30,
   },
   {
     value: '인',
     label: '寅 인시',
-    timeRange: '03:00~05:00',
+    timeRange: '03:30~05:30',
     hour: 4,
-    minute: 0,
+    minute: 30,
   },
   {
     value: '묘',
     label: '卯 묘시',
-    timeRange: '05:00~07:00',
+    timeRange: '05:30~07:30',
     hour: 6,
-    minute: 0,
+    minute: 30,
   },
   {
     value: '진',
     label: '辰 진시',
-    timeRange: '07:00~09:00',
+    timeRange: '07:30~09:30',
     hour: 8,
-    minute: 0,
+    minute: 30,
   },
   {
     value: '사',
     label: '巳 사시',
-    timeRange: '09:00~11:00',
+    timeRange: '09:30~11:30',
     hour: 10,
-    minute: 0,
+    minute: 30,
   },
   {
     value: '오',
     label: '午 오시',
-    timeRange: '11:00~13:00',
+    timeRange: '11:30~13:30',
     hour: 12,
-    minute: 0,
+    minute: 30,
   },
   {
     value: '미',
     label: '未 미시',
-    timeRange: '13:00~15:00',
+    timeRange: '13:30~15:30',
     hour: 14,
-    minute: 0,
+    minute: 30,
   },
   {
     value: '신',
     label: '申 신시',
-    timeRange: '15:00~17:00',
+    timeRange: '15:30~17:30',
     hour: 16,
-    minute: 0,
+    minute: 30,
   },
   {
     value: '유',
     label: '酉 유시',
-    timeRange: '17:00~19:00',
+    timeRange: '17:30~19:30',
     hour: 18,
-    minute: 0,
+    minute: 30,
   },
   {
     value: '술',
     label: '戌 술시',
-    timeRange: '19:00~21:00',
+    timeRange: '19:30~21:30',
     hour: 20,
-    minute: 0,
+    minute: 30,
   },
   {
     value: '해',
     label: '亥 해시',
-    timeRange: '21:00~23:00',
+    timeRange: '21:30~23:30',
     hour: 22,
-    minute: 0,
+    minute: 30,
   },
 ];
 
@@ -129,14 +113,3 @@ export const REGION_OPTIONS: RegionOption[] = [
   { value: 'pohang', label: '포항', longitude: 129.4 },
   { value: 'gimhae', label: '김해', longitude: 128.9 },
 ];
-
-export const STEP_CONFIGS: Record<Step, StepConfig> = {
-  0: {
-    withBubble: '/form_step_1.png',
-    withoutBubble: '/form_step_1_empty.png',
-  },
-  1: {
-    withBubble: '/form_step_2.png',
-    withoutBubble: '/form_step_2_empty.png',
-  },
-};

@@ -1,5 +1,4 @@
 import { BRANCH_DATA } from '../data/branches';
-import { HIDDEN_STEMS_TABLE } from '../data/hiddenStems';
 import { STEM_DATA } from '../data/stems';
 import type { FiveElement, FourPillars, YinYang } from '../model/types';
 
@@ -27,20 +26,8 @@ function analyzeFiveElements(fourPillars: FourPillars): FiveElementAnalysis {
   ];
 
   for (const pillar of pillars) {
-    // 천간 오행
     counts[STEM_DATA[pillar.stem].element]++;
-    // 지지 본기 오행
     counts[BRANCH_DATA[pillar.branch].element]++;
-
-    // 장간(지장간) 오행 포함
-    const hidden = HIDDEN_STEMS_TABLE[pillar.branch];
-    if (hidden.initial) {
-      counts[STEM_DATA[hidden.initial.stem].element]++;
-    }
-    if (hidden.middle) {
-      counts[STEM_DATA[hidden.middle.stem].element]++;
-    }
-    counts[STEM_DATA[hidden.main.stem].element]++;
   }
 
   const maxCount = Math.max(...(Object.values(counts) as number[]));

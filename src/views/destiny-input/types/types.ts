@@ -18,13 +18,6 @@ export type ShichenOption = {
   minute: number;
 };
 
-export type Step = 0 | 1;
-
-export type StepConfig = {
-  withBubble: string;
-  withoutBubble: string;
-};
-
 export type RegionOption = {
   value: string;
   label: string;
