@@ -1,6 +1,7 @@
 export type {
   FormState,
   Gender,
+  RegionOption,
   SelectFieldProps,
   ShichenOption,
   Step,
