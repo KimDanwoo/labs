@@ -8,12 +8,15 @@ import { analyzeCombinations } from './combinationsAnalysis';
 import { getDayPillar } from './dayPillar';
 import { analyzeFiveElements } from './fiveElements';
 import { getHourPillar, isEarlySubHour } from './hourPillar';
+import { solarToLunar } from './lunarCalendar';
 import { analyzeLuck } from './majorLuck';
 import { getMonthPillar } from './monthPillar';
 import { analyzeTenGods } from './tenGods';
+import { analyzeTwelveSpirits } from './twelveSpiritAnalysis';
 import { analyzeTwelveStages } from './twelveStagesAnalysis';
 import { analyzeVoid } from './voidAnalysis';
 import { getYearPillar } from './yearPillar';
+import { getZodiacAnimal } from './zodiacAnimal';
 import { analyzeFormat } from './격국Analysis';
 import { analyzeYongsin } from './용신Analysis';
 
@@ -61,14 +64,14 @@ const calculateDestiny = (input: DestinyInput): DestinyResult => {
   }
 
   // 3. 야자시/조자시 처리: 일주 계산용 날짜 결정
-  // 조자시 모드(기본): 23:30 이후면 다음날 일주 사용
+  // 조자시 모드(기본): 23:00 이후면 다음날 일주 사용
   // 야자시 모드: 당일 일주 유지
   const useNightSubHour = input.useNightSubHour ?? false;
   let dayYear = year;
   let dayMonth = month;
   let dayDay = day;
 
-  if (!useNightSubHour && isEarlySubHour(hour, minute)) {
+  if (!useNightSubHour && isEarlySubHour(hour)) {
     const jdn = gregorianToJdn(year, month, day) + 1;
     const nextDay = jdnToGregorian(jdn);
     dayYear = nextDay.year;
@@ -118,18 +121,27 @@ const calculateDestiny = (input: DestinyInput): DestinyResult => {
   const bodyStrength = analyzeBodyStrength(tenGods);
   const format = analyzeFormat(fourPillars);
   const yongsin = analyzeYongsin(fiveElements, bodyStrength);
+  const twelveSpirits = analyzeTwelveSpirits(fourPillars);
+  const zodiac = getZodiacAnimal(
+    fourPillars.year.stem,
+    fourPillars.year.branch,
+  );
+  const lunar = solarToLunar(input.year, input.month, input.day);
 
   return {
     fourPillars,
     fiveElements,
     tenGods,
     twelveStages,
+    twelveSpirits,
     combinations,
     voidAnalysis,
     luck,
     bodyStrength,
     format,
     yongsin,
+    zodiac,
+    lunar,
     input,
   };
 };

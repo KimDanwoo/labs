@@ -12,7 +12,7 @@ export function WebtoonPanel({ imageSrc, children }: WebtoonPanelProps) {
     <div className="relative w-full bg-white">
       <Image
         src={imageSrc}
-        alt=""
+        alt="청월이 웹툰 컷"
         width={450}
         height={600}
         className="w-full h-auto block"

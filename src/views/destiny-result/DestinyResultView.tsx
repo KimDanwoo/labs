@@ -139,16 +139,13 @@ export function DestinyResultView() {
       />
 
       <Divider label="운세 · 흐름" />
-      <div className="relative">
-        <LuckSection luck={luck} dayStem={dayStem} birthYear={form.year} />
-        <div className="absolute bottom-0 left-0 right-0 h-28 bg-linear-to-t from-white to-transparent pointer-events-none" />
-      </div>
+      <LuckSection luck={luck} dayStem={dayStem} birthYear={form.year} />
 
       {/* ━━━ 7컷: 상세 보기 유도 + 버튼 ━━━ */}
-      <div className="relative mt-10">
+      <div className="relative pt-10 bg-white">
         <Image
           src="/result_7.jpeg"
-          alt=""
+          alt="상세 사주 보기 유도"
           width={450}
           height={600}
           className="w-full h-auto block"
@@ -157,13 +154,13 @@ export function DestinyResultView() {
         <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
         <BubbleText
           text={`사실 아직\n반도 못 전했어요…\n${displayName}님만을 위한\n더 깊은 이야기가\n남아있답니다`}
-          top="7%"
+          top="12%"
           left="34%"
           width="52%"
         />
         <BubbleText
           text={`더 알고 싶지\n않으세요?`}
-          top="68%"
+          top="70%"
           right="3%"
           width="40%"
         />

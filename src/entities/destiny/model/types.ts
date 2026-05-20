@@ -47,12 +47,15 @@ type DestinyResult = {
   fiveElements: import('../lib/fiveElements').FiveElementAnalysis;
   tenGods: import('../lib/tenGods').TenGodAnalysis;
   twelveStages: import('../lib/twelveStagesAnalysis').TwelveStageAnalysis;
+  twelveSpirits: import('../lib/twelveSpiritAnalysis').TwelveSpiritAnalysis;
   combinations: import('../lib/combinationsAnalysis').CombinationAnalysis;
   voidAnalysis: import('../lib/voidAnalysis').VoidAnalysis;
   luck: import('../lib/majorLuck').LuckAnalysis;
   bodyStrength: import('../lib/bodyStrengthAnalysis').BodyStrengthAnalysis;
   format: import('../lib/격국Analysis').FormatAnalysis;
   yongsin: import('../lib/용신Analysis').YongsinAnalysis;
+  zodiac: import('../lib/zodiacAnimal').ZodiacAnimal;
+  lunar: import('../lib/lunarCalendar').LunarDate | null;
   input: DestinyInput;
 };
 

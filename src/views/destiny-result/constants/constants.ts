@@ -53,7 +53,7 @@ export const ELEMENT_COLOR: Record<FiveElement, string> = {
   木: '#4ade80',
   火: '#f87171',
   土: '#fbbf24',
-  金: '#e2e8f0',
+  金: '#a0a0b0',
   水: '#60a5fa',
 };
 
