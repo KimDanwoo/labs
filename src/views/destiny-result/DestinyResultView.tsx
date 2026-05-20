@@ -2,21 +2,19 @@
 
 import { useEffect } from 'react';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { useAtomValue } from 'jotai';
 
 import {
-  BubbleText,
   Divider,
   ElementSection,
   LuckSection,
   PersonalitySection,
   PillarSection,
+  StoryPanel,
   TenGodSection,
-  WebtoonPanel,
 } from '@views/destiny-result/ui';
 
 import { destinyFormAtom, destinyResultAtom } from '@entities/destiny/model';
@@ -66,36 +64,26 @@ export function DestinyResultView() {
     <div className="flex flex-col w-full relative">
       <Link
         href="/input"
-        className="sticky top-4 left-4 z-20 w-10 h-10 ml-4 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm text-gray-600 border border-gray-200 transition-colors hover:bg-gray-50"
+        className="absolute top-4 left-4 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm text-gray-600 border border-gray-200 transition-colors hover:bg-gray-50"
       >
         ←
       </Link>
 
-      {/* ━━━ 1컷: 인사 ━━━ */}
-      <WebtoonPanel imageSrc="/result_1.webp">
-        <BubbleText
-          text={`${displayName}님,\n만나서 반가워요!`}
-          top="24%"
-          left="21%"
-          width="62%"
-        />
-      </WebtoonPanel>
+      {/* ━━━ 1컷: 인사 (밝은 표정) ━━━ */}
+      <StoryPanel
+        variant="result_9"
+        texts={[
+          `${displayName}님,\n만나서 반가워요!\n저는 청월이에요.`,
+          `${displayName}님과\n인연이 닿아\n기뻐요!`,
+        ]}
+        isFirst
+      />
 
-      {/* ━━━ 2컷: 자기소개 + 인연 ━━━ */}
-      <WebtoonPanel imageSrc="/result_2.webp">
-        <BubbleText
-          text={`저는 청월이에요.\n${displayName}님의 사주를\n함께 풀어볼게요!`}
-          top="14%"
-          left="10%"
-          width="48%"
-        />
-        <BubbleText
-          text={`${displayName}님과\n인연이 닿아\n정말 기뻐요!`}
-          top="30%"
-          right="17%"
-          width="40%"
-        />
-      </WebtoonPanel>
+      {/* ━━━ 2컷: 사주 풀이 시작 ━━━ */}
+      <StoryPanel
+        variant="result_1"
+        texts={[`${displayName}님의 사주를\n함께 풀어볼게요!`]}
+      />
 
       <Divider label="총론" />
 
@@ -107,7 +95,7 @@ export function DestinyResultView() {
       />
       <ElementSection fiveElements={fiveElements} dayStem={dayStem} />
 
-      <WebtoonPanel imageSrc="/result_3.webp" />
+      <StoryPanel variant="result_3" />
 
       <Divider label="성격 · 기질" />
 
@@ -118,21 +106,19 @@ export function DestinyResultView() {
         format={format}
       />
 
-      <WebtoonPanel imageSrc="/result_4.webp">
-        <BubbleText
-          text={`${displayName}님의 성향을\n더 자세히 볼게요!`}
-          top="14%"
-          left="12%"
-          width="48%"
-        />
+      {/* ━━━ 중간 전환: 깊은 분석 (생각하는 표정) ━━━ */}
+      <StoryPanel
+        variant="result_8"
+        texts={[`잠깐, 여기서\n조금 더 깊이\n생각해볼게요…`]}
+      />
 
-        <BubbleText
-          text="사주 속 관계의\n기운을 읽어볼게요"
-          top="31%"
-          right="27%"
-          width="40%"
-        />
-      </WebtoonPanel>
+      <StoryPanel
+        variant="result_4"
+        texts={[
+          `사주 속에 숨겨진\n인연의 흐름이\n보여요!`,
+          `${displayName}님의\n관계운을\n풀어볼게요.`,
+        ]}
+      />
 
       <Divider label="성향 · 관계" />
 
@@ -148,27 +134,14 @@ export function DestinyResultView() {
 
       {/* ━━━ 7컷: 상세 보기 유도 + 버튼 ━━━ */}
       <div className="relative pt-10 bg-white">
-        <Image
-          src="/result_7.webp"
-          alt="상세 사주 보기 유도"
-          width={450}
-          height={600}
-          className="w-full h-auto block"
-          draggable={false}
+        <StoryPanel
+          variant="result_7"
+          texts={[
+            `사실 아직\n반도 못 전했어요…\n${displayName}님만을 위한\n더 깊은 이야기가\n남아있답니다`,
+            `더 알고 싶지\n않으세요?`,
+          ]}
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
-        <BubbleText
-          text={`사실 아직\n반도 못 전했어요…\n${displayName}님만을 위한\n더 깊은 이야기가\n남아있답니다`}
-          top="12%"
-          left="34%"
-          width="52%"
-        />
-        <BubbleText
-          text={`더 알고 싶지\n않으세요?`}
-          top="70%"
-          right="3%"
-          width="40%"
-        />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center gap-3 pb-10 px-6">
           <Link
             href="/detail"
@@ -176,7 +149,6 @@ export function DestinyResultView() {
           >
             상세 사주보기 →
           </Link>
-
           <Link
             href="/"
             className="inline-flex items-center justify-center h-10 px-8 text-sm text-white/60 rounded-full active:scale-[0.97] transition-all duration-200"

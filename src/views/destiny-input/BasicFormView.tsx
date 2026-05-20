@@ -54,6 +54,7 @@ export function BasicFormView() {
           alt="사주 입력 배경"
           fill
           className="object-cover"
+          preload
         />
         <div className="relative z-10 flex-1 flex flex-col justify-end overflow-y-auto">
           <div className="px-5 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))] bg-background/85 backdrop-blur-sm rounded-t-3xl">
@@ -72,12 +73,17 @@ export function BasicFormView() {
             <FormField label="성별">
               <div className="flex gap-3">
                 {(['male', 'female'] as const).map((g) => (
-                  <label key={g} className="flex items-center gap-1.5 cursor-pointer">
+                  <label
+                    key={g}
+                    className="flex items-center gap-1.5 cursor-pointer"
+                  >
                     <input
                       type="radio"
                       name="gender"
                       checked={form.gender === g}
-                      onChange={() => setForm((prev) => ({ ...prev, gender: g }))}
+                      onChange={() =>
+                        setForm((prev) => ({ ...prev, gender: g }))
+                      }
                       className="w-3.5 h-3.5 accent-gold cursor-pointer"
                     />
                     <span className="text-xs font-medium text-foreground">
