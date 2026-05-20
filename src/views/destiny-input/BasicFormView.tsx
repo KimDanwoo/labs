@@ -56,7 +56,7 @@ export function BasicFormView() {
           className="object-cover"
         />
         <div className="relative z-10 flex-1 flex flex-col justify-end overflow-y-auto">
-          <div className="px-5 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))] bg-background/60 rounded-t-3xl">
+          <div className="px-5 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))] bg-background/85 backdrop-blur-sm rounded-t-3xl">
             <div className="text-center mb-5">
               <h2 className="text-lg font-bold text-gold">기본 정보</h2>
             </div>
