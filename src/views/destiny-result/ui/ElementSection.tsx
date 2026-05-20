@@ -46,7 +46,7 @@ export function ElementSection({ fiveElements, dayStem }: ElementSectionProps) {
       </DataSection>
 
       <CharacterBubble
-        imageSrc="/bubble_2.webp"
+        imageSrc="/bubble_3.webp"
         text={getElementComment(dominantKr, missingKr)}
       />
 
