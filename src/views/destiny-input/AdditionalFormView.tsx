@@ -62,7 +62,7 @@ export function AdditionalFormView() {
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
         <Image
-          src="/form_step_2_empty.jpeg"
+          src="/form_step_2_empty.webp"
           alt="추가정보 입력 배경"
           fill
           className="object-cover"

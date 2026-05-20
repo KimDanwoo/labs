@@ -33,7 +33,7 @@ export function LuckSection({
   return (
     <>
       <CharacterBubble
-        imageSrc="/bubble_3.png"
+        imageSrc="/bubble_3.webp"
         text={`앞으로의 대운 흐름을\n읽어드릴게요.`}
       />
       <DataSection>

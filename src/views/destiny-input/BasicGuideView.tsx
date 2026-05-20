@@ -13,7 +13,7 @@ export function BasicGuideView() {
       >
         ←
       </Link>
-      <GuideScreen imageSrc="/form_step_1.png" href="/input/form" />
+      <GuideScreen imageSrc="/form_step_1.webp" href="/input/form" />
     </div>
   );
 }
