@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -44,7 +45,8 @@ export function DestinyResultView() {
     format,
   } = result;
   const dayStem = fourPillars.day.stem;
-  const displayName = form.name || '회원';
+  const fullName = form.name || '회원';
+  const displayName = fullName.length >= 3 ? fullName.slice(1) : fullName;
 
   const godCounts: Partial<Record<TenGod, number>> = {};
   const allGods: TenGod[] = [
@@ -83,13 +85,13 @@ export function DestinyResultView() {
       <WebtoonPanel imageSrc="/result_2.png">
         <BubbleText
           text={`저는 청월이에요.\n${displayName}님의 사주를\n함께 풀어볼게요!`}
-          top="13%"
+          top="14%"
           left="10%"
           width="48%"
         />
         <BubbleText
           text={`${displayName}님과\n인연이 닿아\n정말 기뻐요!`}
-          top="29%"
+          top="30%"
           right="17%"
           width="40%"
         />
@@ -117,14 +119,14 @@ export function DestinyResultView() {
       <WebtoonPanel imageSrc="/result_4.png">
         <BubbleText
           text={`${displayName}님의 성향을\n더 자세히 볼게요!`}
-          top="13%"
+          top="14%"
           left="12%"
           width="48%"
         />
         <BubbleText
-          text="사주 속 관계의\n기운을 읽어볼게요."
-          top="30%"
-          right="28%"
+          text="사주 속 관계의\n기운을 읽어볼게요"
+          top="31%"
+          right="27%"
           width="40%"
         />
       </WebtoonPanel>
@@ -144,17 +146,18 @@ export function DestinyResultView() {
 
       {/* ━━━ 7컷: 상세 보기 유도 + 버튼 ━━━ */}
       <div className="relative mt-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src="/result_7.jpeg"
           alt=""
+          width={450}
+          height={600}
           className="w-full h-auto block"
           draggable={false}
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
         <BubbleText
-          text={`사실 아직\n절반도 못 말했어요…`}
-          top="12%"
+          text={`사실 아직\n반도 못 전했어요…\n${displayName}님만을 위한\n더 깊은 이야기가\n남아있답니다`}
+          top="7%"
           left="34%"
           width="52%"
         />
