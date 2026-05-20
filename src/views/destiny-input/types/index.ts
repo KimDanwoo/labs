@@ -4,6 +4,4 @@ export type {
   RegionOption,
   SelectFieldProps,
   ShichenOption,
-  Step,
-  StepConfig,
 } from './types';
