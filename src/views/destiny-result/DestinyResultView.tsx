@@ -98,6 +98,7 @@ export function DestinyResultView() {
       </WebtoonPanel>
 
       <Divider label="총론" />
+
       <PillarSection
         fourPillars={fourPillars}
         input={form}
@@ -109,6 +110,7 @@ export function DestinyResultView() {
       <WebtoonPanel imageSrc="/result_3.webp" />
 
       <Divider label="성격 · 기질" />
+
       <PersonalitySection
         dayStem={dayStem}
         bodyStrength={result.bodyStrength.strength}
@@ -123,6 +125,7 @@ export function DestinyResultView() {
           left="12%"
           width="48%"
         />
+
         <BubbleText
           text="사주 속 관계의\n기운을 읽어볼게요"
           top="31%"
@@ -132,6 +135,7 @@ export function DestinyResultView() {
       </WebtoonPanel>
 
       <Divider label="성향 · 관계" />
+
       <TenGodSection
         tenGods={tenGods}
         topGod={topGod}
@@ -139,6 +143,7 @@ export function DestinyResultView() {
       />
 
       <Divider label="운세 · 흐름" />
+
       <LuckSection luck={luck} dayStem={dayStem} birthYear={form.year} />
 
       {/* ━━━ 7컷: 상세 보기 유도 + 버튼 ━━━ */}
