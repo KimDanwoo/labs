@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useReducer, useEffect, useCallback } from 'react';
+import { useState, useReducer, useEffect, useCallback, startTransition } from 'react';
 import type { GameState, GameAction, FoodId, CharacterId } from '@shared/types';
 import {
   INITIAL_GAME_STATE,
@@ -36,6 +36,7 @@ import {
   MINIGAME_HEART_PER_CORRECT,
   MINIGAME_EXP_PER_CORRECT,
 } from '@shared/constants';
+import { DAILY_REWARDS } from '@features/daily-login/constants';
 
 function calculateLevel(exp: number): number {
   for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
@@ -316,6 +317,35 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case 'DISMISS_LEVEL_UP':
       return { ...state, levelUpMessage: null };
 
+    case 'COLLECT_DAILY_REWARD': {
+      const today = new Date().toISOString().slice(0, 10);
+      if (state.dailyRewardCollected && state.lastLoginDate === today) return state;
+
+      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      const isConsecutive = state.lastLoginDate === yesterday;
+      const newStreak = isConsecutive ? state.loginStreak + 1 : 1;
+
+      const rewardIndex = Math.min(newStreak - 1, DAILY_REWARDS.length - 1);
+      const reward = DAILY_REWARDS[rewardIndex];
+
+      const newInventory = { ...state.inventory };
+      if (reward.food) {
+        for (const [foodId, amount] of Object.entries(reward.food)) {
+          newInventory[foodId as FoodId] = (newInventory[foodId as FoodId] || 0) + (amount as number);
+        }
+      }
+
+      return {
+        ...state,
+        coins: state.coins + reward.coins,
+        inventory: newInventory,
+        lastLoginDate: today,
+        loginStreak: newStreak,
+        dailyRewardCollected: true,
+        lastUpdated: now,
+      };
+    }
+
     case 'SET_SLEEPING':
       return { ...state, isSleeping: action.isSleeping, lastUpdated: now };
 
@@ -443,7 +473,7 @@ export function useGameState() {
     } catch {
       // 무시
     }
-    setIsLoaded(true);
+    startTransition(() => setIsLoaded(true));
   }, []);
 
   // 상태 변경 시 저장
@@ -465,6 +495,7 @@ export function useGameState() {
   const giveMedicine = useCallback(() => dispatch({ type: 'GIVE_MEDICINE' }), []);
   const minigameReward = useCallback((correctCount: number) => dispatch({ type: 'MINIGAME_REWARD', correctCount }), []);
   const collectEgg = useCallback(() => dispatch({ type: 'COLLECT_EGG' }), []);
+  const collectDailyReward = useCallback(() => dispatch({ type: 'COLLECT_DAILY_REWARD' }), []);
   const dismissLevelUp = useCallback(() => dispatch({ type: 'DISMISS_LEVEL_UP' }), []);
   const selectCharacter = useCallback(
     (characterId: CharacterId, nickname: string) =>
@@ -486,6 +517,7 @@ export function useGameState() {
     giveMedicine,
     minigameReward,
     collectEgg,
+    collectDailyReward,
     dismissLevelUp,
     selectCharacter,
     reset,

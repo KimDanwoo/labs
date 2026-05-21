@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, startTransition } from 'react';
 import type { CharacterId } from '@shared/types';
 import { SPRITE_MAP, FRAME_SIZE, SHEET_SIZE, WALK_FPS, TOTAL_FRAMES, LEVEL_SCALE_PER_LEVEL } from '@shared/constants';
 
@@ -39,7 +39,7 @@ export default function CharacterSprite({
         setFrame((prev) => (prev + 1) % TOTAL_FRAMES);
       }, 1000 / WALK_FPS);
     } else {
-      setFrame(0);
+      startTransition(() => setFrame(0));
     }
 
     return () => {

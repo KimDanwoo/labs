@@ -7,9 +7,11 @@ type StatusBarProps = {
   cleanliness: number;
   hearts: number;
   level: number;
-  exp: number;
   coins: number;
   isSick: boolean;
+  nickname: string;
+  characterEmoji: string;
+  onSettings: () => void;
 };
 
 type GaugeProps = {
@@ -44,17 +46,26 @@ function Gauge({ value, max, color, icon }: GaugeProps) {
   );
 }
 
-export default function StatusBar({ hunger, cleanliness, hearts, level, exp: _exp, coins, isSick }: StatusBarProps) {
+export default function StatusBar({ hunger, cleanliness, hearts, level, coins, isSick, nickname, characterEmoji, onSettings }: StatusBarProps) {
   return (
     <div className="card p-3 space-y-1.5">
       <div className="flex justify-between items-center pb-1 border-b border-black/5">
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-bold text-white bg-gray-700 px-2 py-0.5 rounded-md">Lv.{level}</span>
-          {isSick && <span className="text-xs animate-pulse">🤒 아파요</span>}
+          <span className="text-xs font-bold text-gray-600">{characterEmoji} {nickname}</span>
+          {isSick && <span className="text-xs animate-pulse">🤒</span>}
         </div>
-        <div className="flex items-center gap-1">
-          <span className="text-xs font-bold text-amber-500">🪙</span>
-          <span className="text-xs font-bold text-gray-600 tabular-nums">{coins}</span>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <span className="text-xs font-bold text-amber-500">🪙</span>
+            <span className="text-xs font-bold text-gray-600 tabular-nums">{coins}</span>
+          </div>
+          <button
+            onClick={onSettings}
+            className="w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 btn-press text-xs"
+          >
+            ⚙️
+          </button>
         </div>
       </div>
 
