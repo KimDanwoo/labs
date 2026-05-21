@@ -1,0 +1,97 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import type { CharacterId } from '@shared/types';
+import { SPRITE_MAP, FRAME_SIZE, SHEET_SIZE, WALK_FPS, TOTAL_FRAMES, LEVEL_SCALE_PER_LEVEL } from '@shared/constants';
+
+type CharacterSpriteProps = {
+  characterId: CharacterId;
+  size?: number;
+  direction?: 'left' | 'right';
+  isMoving?: boolean;
+  isSleeping?: boolean;
+  isSick?: boolean;
+  isDead?: boolean;
+  level?: number;
+};
+
+function getRow(direction: 'left' | 'right'): number {
+  return direction === 'left' ? 2 : 3;
+}
+
+export default function CharacterSprite({
+  characterId,
+  size = 64,
+  direction = 'right',
+  isMoving = false,
+  isSleeping = false,
+  isSick = false,
+  isDead = false,
+  level = 1,
+}: CharacterSpriteProps) {
+  const [frame, setFrame] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // 걷기 애니메이션 프레임 순환
+  useEffect(() => {
+    if (isMoving && !isSleeping && !isDead) {
+      intervalRef.current = setInterval(() => {
+        setFrame((prev) => (prev + 1) % TOTAL_FRAMES);
+      }, 1000 / WALK_FPS);
+    } else {
+      setFrame(0);
+    }
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isMoving, isSleeping, isDead]);
+
+  const scale = 1 + (level - 1) * LEVEL_SCALE_PER_LEVEL;
+  const actualSize = size * scale;
+
+  // idle일 때는 앞모습(row 0), 이동 중에는 방향에 따라 좌/우
+  const row = isMoving ? getRow(direction) : 0;
+  const col = frame;
+
+  const bgX = -(col * FRAME_SIZE);
+  const bgY = -(row * FRAME_SIZE);
+
+  const wrapperClass = isDead
+    ? 'death-animation'
+    : isSleeping
+      ? 'idle'
+      : '';
+
+  return (
+    <div className={`relative ${wrapperClass}`} style={{ width: actualSize, height: actualSize }}>
+      <div
+        className="pixel-art"
+        style={{
+          width: actualSize,
+          height: actualSize,
+          backgroundImage: `url(${SPRITE_MAP[characterId]})`,
+          backgroundSize: `${(SHEET_SIZE / FRAME_SIZE) * actualSize}px ${(SHEET_SIZE / FRAME_SIZE) * actualSize}px`,
+          backgroundPosition: `${(bgX / FRAME_SIZE) * actualSize}px ${(bgY / FRAME_SIZE) * actualSize}px`,
+          backgroundRepeat: 'no-repeat',
+          opacity: isDead ? 0.5 : 1,
+          filter: isSleeping ? 'brightness(0.7)' : undefined,
+        }}
+      />
+
+      {/* 수면 ZZZ */}
+      {isSleeping && (
+        <div className="absolute -top-2 -right-2 text-sm font-bold text-blue-300">
+          <span className="sleep-z inline-block">Z</span>
+          <span className="sleep-z inline-block" style={{ animationDelay: '0.5s' }}>z</span>
+          <span className="sleep-z inline-block" style={{ animationDelay: '1s' }}>z</span>
+        </div>
+      )}
+
+      {/* 질병 표시 */}
+      {isSick && !isSleeping && !isDead && (
+        <div className="absolute -top-3 -left-1 text-lg animate-pulse">💀</div>
+      )}
+    </div>
+  );
+}

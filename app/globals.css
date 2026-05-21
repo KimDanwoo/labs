@@ -1,26 +1,264 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F8F4FF;
+  --foreground: #2D2B3A;
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-hover: rgba(255, 255, 255, 0.92);
+  --surface-strong: rgba(255, 255, 255, 0.95);
+  --border: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px rgba(168, 130, 255, 0.15);
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'Gowun Dodum', sans-serif;
   --font-mono: var(--font-geist-mono);
+  --color-pink: #FF6B9D;
+  --color-blue: #4A90D9;
+  --color-red: #FF4444;
+  --color-yellow: #FFD93D;
+  --color-green: #4ADE80;
+  --color-gauge-hunger: #FFB347;
+  --color-gauge-clean: #7EC8E3;
+  --color-gauge-heart: #FF8FAB;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ===== 기본 ===== */
 body {
   background: var(--background);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 182, 217, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(167, 199, 255, 0.15) 0%, transparent 50%);
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Gowun Dodum', sans-serif;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 디자인 토큰 유틸리티 ===== */
+.surface {
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.surface-strong {
+  background: var(--surface-strong);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-strong);
+}
+
+.shadow-game-sm { box-shadow: var(--shadow-sm); }
+.shadow-game-md { box-shadow: var(--shadow-md); }
+.shadow-game-lg { box-shadow: var(--shadow-lg); }
+.shadow-game-glow { box-shadow: var(--shadow-glow); }
+
+/* ===== 픽셀아트 렌더링 ===== */
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ===== 게이지 바 ===== */
+.gauge-bar {
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 999px;
+}
+
+/* ===== 버튼 시스템 ===== */
+.btn-press {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-press:active {
+  transform: scale(0.94);
+  filter: brightness(0.96);
+}
+
+.btn-press:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+}
+
+.btn-primary {
+  color: white;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  padding: 12px 24px;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.94);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-ghost {
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  color: #9CA3AF;
+  padding: 12px 24px;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background: var(--surface-hover);
+}
+
+.btn-ghost:active {
+  transform: scale(0.94);
+}
+
+/* ===== 카드 시스템 ===== */
+.card {
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.card-elevated {
+  background: var(--surface-strong);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===== 모달 오버레이 ===== */
+.modal-overlay {
+  background: rgba(20, 18, 30, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.modal-content {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.14), 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 바텀시트 모달 (FeedModal, ShopModal) */
+.modal-content.rounded-b-none {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+
+/* ===== 애니메이션 ===== */
+@keyframes bounce-walk {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.walking {
+  animation: bounce-walk 0.4s ease-in-out infinite;
+}
+
+@keyframes idle-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.idle {
+  animation: idle-breathe 2s ease-in-out infinite;
+}
+
+@keyframes sleep-float {
+  0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+  50% { opacity: 1; transform: translateY(-12px) scale(1); }
+}
+
+.sleep-z {
+  animation: sleep-float 2s ease-in-out infinite;
+}
+
+@keyframes poop-pop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.poop-appear {
+  animation: poop-pop 0.3s ease-out;
+}
+
+@keyframes heart-float {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-40px) scale(1.5); }
+}
+
+.heart-effect {
+  animation: heart-float 1s ease-out forwards;
+}
+
+@keyframes fade-out-soul {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-60px); }
+}
+
+.death-animation {
+  animation: fade-out-soul 2s ease-out forwards;
+}
+
+@keyframes egg-shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+.egg-shake {
+  animation: egg-shake 0.3s ease-in-out infinite;
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
