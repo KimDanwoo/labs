@@ -33,7 +33,7 @@ export function useAuth() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: window.location.origin,
       },
     });
     if (error) throw error;
@@ -43,7 +43,7 @@ export function useAuth() {
     const { error } = await supabase.auth.linkIdentity({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: window.location.origin,
       },
     });
     if (error) throw error;
@@ -55,7 +55,7 @@ export function useAuth() {
     setUser(null);
   }, []);
 
-  const isAnonymous = user?.is_anonymous ?? false;
+  const isAnonymous = !user || user.is_anonymous === true || !user.email;
 
   return {
     user,

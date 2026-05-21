@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
 
 :root {
   --background: #F8F4FF;
@@ -42,7 +41,7 @@ body {
     radial-gradient(ellipse at 80% 100%, rgba(167, 199, 255, 0.15) 0%, transparent 50%);
   background-attachment: fixed;
   color: var(--foreground);
-  font-family: 'Gowun Dodum', sans-serif;
+  font-family: inherit;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;

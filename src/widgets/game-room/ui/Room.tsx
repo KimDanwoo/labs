@@ -18,7 +18,6 @@ type RoomProps = {
   hunger: number;
   cleanliness: number;
   onCleanPoop: (poopId: string) => void;
-  nickname: string;
   roomType?: RoomType;
 };
 
@@ -33,7 +32,6 @@ export default function Room({
   hunger,
   cleanliness,
   onCleanPoop,
-  nickname,
   roomType = 'living',
 }: RoomProps) {
   const roomRef = useRef<HTMLDivElement>(null);
@@ -90,12 +88,6 @@ export default function Room({
           isDead={isDead}
           level={level}
         />
-        {/* 이름 */}
-        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-          <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full surface text-gray-600 shadow-game-sm">
-            {nickname}
-          </span>
-        </div>
       </div>
 
       {/* 수면 오버레이 */}

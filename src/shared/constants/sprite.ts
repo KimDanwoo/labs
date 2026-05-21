@@ -1,11 +1,11 @@
 import type { CharacterId } from '@shared/types';
 
 export const SPRITE_MAP: Record<CharacterId, string> = {
-  hako: '/character_1.png',
-  ako: '/character_2.png',
-  eunko: '/character_3.png',
-  yeko: '/character_4.png',
-  bamko: '/character_5.png',
+  hako: '/character_1.webp',
+  ako: '/character_2.webp',
+  eunko: '/character_3.webp',
+  yeko: '/character_4.webp',
+  bamko: '/character_5.webp',
 };
 
 // 4x4 스프라이트시트: 행=방향, 열=프레임

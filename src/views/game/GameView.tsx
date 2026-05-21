@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { HEARTS_PER_MEETING, MEDICINE_PRICE, ALL_CHARACTER_IDS, LEVEL_UP_TOAST_DURATION } from '@shared/constants';
+import { useState, useEffect, startTransition } from 'react';
+import { HEARTS_PER_MEETING, MEDICINE_PRICE, ALL_CHARACTER_IDS, LEVEL_UP_TOAST_DURATION, CHARACTERS } from '@shared/constants';
 import type { ModalType, RoomType } from '@shared/types';
 import { useGameState, useAutoDecay, useCharacterMovement, useSaveSync } from '@entities/game';
 import { useAuth } from '@entities/auth';
@@ -16,6 +16,7 @@ import { MeetingModal } from '@features/meeting';
 import { MiniGameModal } from '@features/minigame';
 import { EggModal } from '@features/egg';
 import { SettingsModal } from '@features/settings';
+import { DailyLoginModal } from '@features/daily-login';
 
 export default function GameView() {
   const {
@@ -31,6 +32,7 @@ export default function GameView() {
     giveMedicine,
     minigameReward,
     collectEgg,
+    collectDailyReward,
     dismissLevelUp,
     selectCharacter,
     reset,
@@ -38,6 +40,8 @@ export default function GameView() {
 
   const { user, isLoading: isAuthLoading, isAnonymous, signInAnonymously, linkWithGoogle } = useAuth();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const [today] = useState(() => new Date().toISOString().slice(0, 10));
+  const [yesterday] = useState(() => new Date(Date.now() - 86400000).toISOString().slice(0, 10));
 
   const isPlaying = state.status === 'playing';
   const position = useCharacterMovement(400, 300, isPlaying && !state.isSleeping);
@@ -52,12 +56,21 @@ export default function GameView() {
     }
   }, [isAuthLoading, user, signInAnonymously]);
 
+  // 출석 보상 체크
+  const [showDailyLogin, setShowDailyLogin] = useState(false);
+  useEffect(() => {
+    if (!isLoaded || state.status !== 'playing') return;
+    if (!state.dailyRewardCollected || state.lastLoginDate !== today) {
+      startTransition(() => setShowDailyLogin(true));
+    }
+  }, [isLoaded, state.status, state.dailyRewardCollected, state.lastLoginDate, today]);
+
   // 알 준비 시 자동 모달
   useEffect(() => {
-    if (state.eggReadyCharacterId && activeModal === null) {
-      setActiveModal('egg');
+    if (state.eggReadyCharacterId && activeModal === null && !showDailyLogin) {
+      startTransition(() => setActiveModal('egg'));
     }
-  }, [state.eggReadyCharacterId, activeModal]);
+  }, [state.eggReadyCharacterId, activeModal, showDailyLogin]);
 
   // 레벨업 토스트 자동 해제
   useEffect(() => {
@@ -107,24 +120,16 @@ export default function GameView() {
 
   return (
     <div className="flex flex-col flex-1 p-2 sm:p-3 gap-2 sm:gap-3">
-      {/* 설정 버튼 */}
-      <div className="flex justify-end">
-        <button
-          onClick={() => setActiveModal('settings')}
-          className="w-8 h-8 flex items-center justify-center rounded-full surface shadow-game-sm btn-press text-gray-400 text-sm"
-        >
-          ⚙️
-        </button>
-      </div>
-
       <StatusBar
         hunger={state.hunger}
         cleanliness={state.cleanliness}
         hearts={state.hearts}
         level={state.level}
-        exp={state.exp}
         coins={state.coins}
         isSick={state.isSick}
+        nickname={state.nickname}
+        characterEmoji={CHARACTERS[state.characterId].emoji}
+        onSettings={() => setActiveModal('settings')}
       />
 
       <Room
@@ -138,7 +143,6 @@ export default function GameView() {
         hunger={state.hunger}
         cleanliness={state.cleanliness}
         onCleanPoop={cleanPoop}
-        nickname={state.nickname}
         roomType={roomType}
       />
 
@@ -209,6 +213,16 @@ export default function GameView() {
           onClose={() => setActiveModal(null)}
           isAnonymous={isAnonymous}
           onLinkGoogle={linkWithGoogle}
+        />
+      )}
+
+      {showDailyLogin && (
+        <DailyLoginModal
+          streak={state.lastLoginDate === yesterday ? state.loginStreak + 1 : 1}
+          onCollect={() => {
+            collectDailyReward();
+            setShowDailyLogin(false);
+          }}
         />
       )}
 

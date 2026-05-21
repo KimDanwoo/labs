@@ -75,10 +75,11 @@ export default function MiniGameModal({ onComplete, onClose }: MiniGameModalProp
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    const pressedRef = keysPressed.current;
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
-      keysPressed.current.clear();
+      pressedRef.clear();
     };
   }, [phase]);
 

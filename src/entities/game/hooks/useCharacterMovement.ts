@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, startTransition } from 'react';
 import type { CharacterPosition } from '@shared/types';
 import { MOVE_SPEED, DIRECTION_CHANGE_INTERVAL, IDLE_CHANCE } from '../constants';
 
@@ -17,29 +17,31 @@ export function useCharacterMovement(
   });
 
   const targetRef = useRef<{ x: number; y: number } | null>(null);
+  const directionRef = useRef<'left' | 'right'>('right');
   const animFrameRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
 
   const pickNewTarget = useCallback(() => {
     if (Math.random() < IDLE_CHANCE) {
       targetRef.current = null;
-      setPosition((prev) => ({ ...prev, isMoving: false }));
+      setPosition((prev) => ({ ...prev, isMoving: false, direction: directionRef.current }));
       return;
     }
 
     const newX = 10 + Math.random() * 80;
     const newY = 55 + Math.random() * 35;
     targetRef.current = { x: newX, y: newY };
-    setPosition((prev) => ({
-      ...prev,
-      isMoving: true,
-      direction: newX > prev.x ? 'right' : 'left',
-    }));
+
+    setPosition((prev) => {
+      const newDir = newX > prev.x ? 'right' : 'left';
+      directionRef.current = newDir;
+      return { ...prev, isMoving: true, direction: newDir };
+    });
   }, []);
 
   useEffect(() => {
     if (!isActive) {
-      setPosition((prev) => ({ ...prev, isMoving: false }));
+      startTransition(() => setPosition((prev) => ({ ...prev, isMoving: false })));
       return;
     }
 
@@ -69,16 +71,17 @@ export function useCharacterMovement(
           const step = MOVE_SPEED * delta;
 
           if (dist < step) {
+            // 목표 도달 — 방향 유지한 채 멈춤
             targetRef.current = null;
-            return { ...prev, x: target.x, y: target.y, isMoving: false };
+            return { ...prev, x: target.x, y: target.y, isMoving: false, direction: directionRef.current };
           }
 
           return {
             ...prev,
             x: prev.x + (dx / dist) * step,
             y: prev.y + (dy / dist) * step,
-            direction: dx > 0 ? 'right' : 'left',
             isMoving: true,
+            direction: directionRef.current,
           };
         });
       }
