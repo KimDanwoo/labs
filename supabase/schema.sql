@@ -106,18 +106,26 @@ create policy "Users can manage own achievements"
   on achievements for all using (auth.uid() = user_id);
 
 -- 프로필 자동 생성 트리거 (회원가입 시)
-create or replace function handle_new_user()
-returns trigger as $$
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
 begin
-  insert into profiles (id)
-  values (new.id);
+  insert into public.profiles (id)
+  values (new.id)
+  on conflict (id) do nothing;
+  return new;
+exception when others then
+  raise warning 'handle_new_user failed for %: %', new.id, sqlerrm;
   return new;
 end;
-$$ language plpgsql security definer;
+$$;
 
 create or replace trigger on_auth_user_created
   after insert on auth.users
-  for each row execute function handle_new_user();
+  for each row execute function public.handle_new_user();
 
 -- updated_at 자동 갱신 트리거
 create or replace function update_updated_at()

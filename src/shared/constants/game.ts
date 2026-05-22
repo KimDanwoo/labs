@@ -71,6 +71,10 @@ export const LEVEL_THRESHOLDS = [0, 100, 300, 600, 1000];
 export const SLEEP_START_HOUR = 23;
 export const SLEEP_END_HOUR = 7;
 
+// 똥 시스템 (1밥당 1똥, 지연 후 생성)
+export const POOP_DELAY_MIN_MS = 90_000;
+export const POOP_DELAY_MAX_MS = 180_000;
+
 // 질병 시스템
 export const SICK_POOP_THRESHOLD = 4;
 export const MEDICINE_PRICE = 15;

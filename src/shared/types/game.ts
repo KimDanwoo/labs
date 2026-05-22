@@ -26,10 +26,12 @@ export type Poop = {
   createdAt: number;
 };
 
+export type SpriteDirection = 'front' | 'left' | 'right';
+
 export type CharacterPosition = {
   x: number;
   y: number;
-  direction: 'left' | 'right';
+  direction: SpriteDirection;
   isMoving: boolean;
 };
 

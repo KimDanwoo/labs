@@ -216,6 +216,27 @@ body {
   animation: heart-float 1s ease-out forwards;
 }
 
+@keyframes tap-jump {
+  0% { transform: translateY(0); }
+  35% { transform: translateY(-14px); }
+  65% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+.tap-jump {
+  animation: tap-jump 0.45s ease-out;
+}
+
+@keyframes heart-pop-up {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.4); }
+  20% { opacity: 1; transform: translate(-50%, -8px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -56px) scale(1.1); }
+}
+
+.heart-pop-up {
+  animation: heart-pop-up 0.9s ease-out forwards;
+}
+
 @keyframes fade-out-soul {
   0% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-60px); }
