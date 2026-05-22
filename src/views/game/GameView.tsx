@@ -44,7 +44,7 @@ export default function GameView() {
   const [yesterday] = useState(() => new Date(Date.now() - 86400000).toISOString().slice(0, 10));
 
   const isPlaying = state.status === 'playing';
-  const position = useCharacterMovement(400, 300, isPlaying && !state.isSleeping);
+  const { position, moveTo } = useCharacterMovement(400, 300, isPlaying && !state.isSleeping);
 
   useAutoDecay(isPlaying, state.isSick, dispatch);
   useSaveSync(user?.id ?? null, state, dispatch);
@@ -143,6 +143,7 @@ export default function GameView() {
         hunger={state.hunger}
         cleanliness={state.cleanliness}
         onCleanPoop={cleanPoop}
+        onMoveTo={moveTo}
         roomType={roomType}
       />
 
