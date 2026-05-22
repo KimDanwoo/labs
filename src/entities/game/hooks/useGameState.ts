@@ -27,6 +27,8 @@ import {
   HEART_EXCHANGE_UNIT,
   HEART_EXCHANGE_COINS,
   MEDICINE_PRICE,
+  POOP_DELAY_MIN_MS,
+  POOP_DELAY_MAX_MS,
   SICK_POOP_THRESHOLD,
   EGG_HEART_THRESHOLD,
   EGG_LEVEL_THRESHOLD,
@@ -110,8 +112,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       const levelUp = applyLevelUp(state, newExp);
       const eggReady = checkEggReady({ ...state, ...levelUp }, newHearts);
 
-      // 30~60초 후에 똥 생성 예약
-      const poopDelay = 30_000 + Math.random() * 30_000;
+      const poopDelay = POOP_DELAY_MIN_MS + Math.random() * (POOP_DELAY_MAX_MS - POOP_DELAY_MIN_MS);
       const pendingPoops = [...(state.pendingPoops ?? []), now + poopDelay];
 
       return {
