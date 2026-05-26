@@ -50,8 +50,8 @@ export default function CharacterSprite({
   const scale = 1 + (level - 1) * LEVEL_SCALE_PER_LEVEL;
   const actualSize = size * scale;
 
-  // idle일 때는 앞모습(row 0), 이동 중에는 방향에 따라 좌/우
-  const row = isMoving ? getRow(direction) : 0;
+  // idle일 때는 앞모습(row 1), 이동 중에는 방향에 따라 좌/우
+  const row = isMoving ? getRow(direction) : 1;
   const col = frame;
 
   const bgX = -(col * FRAME_SIZE);

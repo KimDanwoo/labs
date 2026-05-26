@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
+import { Gowun_Dodum } from "next/font/google";
 import "./globals.css";
+
+const gowunDodum = Gowun_Dodum({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-gowun-dodum",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "플레이브 다마고치",
@@ -12,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="h-full">
+    <html lang="ko" className={`${gowunDodum.variable} h-full`}>
       <body className="min-h-full flex flex-col items-center justify-center">
         <div className="w-full max-w-md md:max-w-lg mx-auto min-h-dvh flex flex-col">
           {children}
