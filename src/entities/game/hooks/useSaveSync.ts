@@ -77,7 +77,7 @@ export function useSaveSync(
         .from('game_saves')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (error || !data) return;
 
