@@ -1,20 +1,15 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import type { CharacterPosition } from '@shared/types';
+import { useEffect, useCallback, useRef } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { MOVE_SPEED, DIRECTION_CHANGE_INTERVAL, IDLE_CHANCE } from '../constants';
+import { characterPositionAtom, isPlayingAtom, isSleepingAtom } from '../store';
 
-export function useCharacterMovement(
-  _roomWidth: number,
-  _roomHeight: number,
-  isActive: boolean,
-) {
-  const [position, setPosition] = useState<CharacterPosition>({
-    x: 50,
-    y: 70,
-    direction: 'right',
-    isMoving: false,
-  });
+export function useCharacterMovement() {
+  const isPlaying = useAtomValue(isPlayingAtom);
+  const isSleeping = useAtomValue(isSleepingAtom);
+  const setPosition = useSetAtom(characterPositionAtom);
+  const isActive = isPlaying && !isSleeping;
 
   const targetRef = useRef<{ x: number; y: number } | null>(null);
   const animFrameRef = useRef<number>(0);
@@ -35,7 +30,7 @@ export function useCharacterMovement(
       isMoving: true,
       direction: newX > prev.x ? 'right' : 'left',
     }));
-  }, []);
+  }, [setPosition]);
 
   useEffect(() => {
     if (!isActive) {
@@ -47,7 +42,7 @@ export function useCharacterMovement(
     pickNewTarget();
 
     return () => clearInterval(directionInterval);
-  }, [isActive, pickNewTarget]);
+  }, [isActive, pickNewTarget, setPosition]);
 
   useEffect(() => {
     if (!isActive) return;
@@ -89,7 +84,5 @@ export function useCharacterMovement(
     lastTimeRef.current = 0;
     animFrameRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animFrameRef.current);
-  }, [isActive]);
-
-  return position;
+  }, [isActive, setPosition]);
 }

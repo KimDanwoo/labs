@@ -1,23 +1,21 @@
 'use client';
 
-type ActionButtonsProps = {
-  onFeed: () => void;
-  onClean: () => void;
-  onMeeting: () => void;
-  onShop: () => void;
-  onMedicine: () => void;
-  onMinigame: () => void;
-  poopCount: number;
-  hasFood: boolean;
-  isSick: boolean;
-  canAffordMedicine: boolean;
-};
+import { useAtomValue } from 'jotai';
+import { MEDICINE_PRICE } from '@shared/constants';
+import {
+  poopsAtom,
+  hasFoodAtom,
+  isSickAtom,
+  coinsAtom,
+  useGameActions,
+  useMeetingStatus,
+} from '@entities/game';
 
 type ActionBtnProps = {
   icon: string;
   label: string;
   onClick: () => void;
-  badge?: number;
+  badge?: number | string;
   disabled?: boolean;
   highlight?: boolean;
 };
@@ -35,8 +33,8 @@ function ActionBtn({ icon, label, onClick, badge, disabled, highlight }: ActionB
     >
       <span className="text-xl sm:text-2xl">{icon}</span>
       <span className="text-[10px] sm:text-xs font-bold text-gray-500">{label}</span>
-      {badge !== undefined && badge > 0 && (
-        <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+      {badge !== undefined && badge !== 0 && badge !== '' && (
+        <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full w-7 h-5 flex items-center justify-center shadow-sm tabular-nums whitespace-nowrap">
           {badge}
         </span>
       )}
@@ -44,28 +42,57 @@ function ActionBtn({ icon, label, onClick, badge, disabled, highlight }: ActionB
   );
 }
 
-export default function ActionButtons({
-  onFeed,
-  onClean,
-  onMeeting,
-  onShop,
-  onMedicine,
-  onMinigame,
-  poopCount,
-  hasFood,
-  isSick,
-  canAffordMedicine,
-}: ActionButtonsProps) {
+function formatCooldown(ms: number): string {
+  const totalSec = Math.ceil(ms / 1000);
+  if (totalSec < 60) return `${totalSec}s`;
+  return `${Math.ceil(totalSec / 60)}m`;
+}
+
+export default function ActionButtons() {
+  const poops = useAtomValue(poopsAtom);
+  const hasFood = useAtomValue(hasFoodAtom);
+  const isSick = useAtomValue(isSickAtom);
+  const coins = useAtomValue(coinsAtom);
+  const { cleanAllPoop, giveMedicine, openModal } = useGameActions();
+  const meeting = useMeetingStatus();
+
+  const poopCount = poops.length;
+  const canAffordMedicine = coins >= MEDICINE_PRICE;
+
+  const meetingBadge = meeting.cooldownRemainingMs > 0
+    ? formatCooldown(meeting.cooldownRemainingMs)
+    : meeting.reachedDailyLimit
+      ? '⛔'
+      : `${meeting.dailyLimit - meeting.meetingsToday}`;
+
   return (
     <div className="flex justify-center gap-1.5 sm:gap-2 flex-wrap">
-      <ActionBtn icon="🍖" label="밥주기" onClick={onFeed} disabled={!hasFood} />
-      <ActionBtn icon="🧹" label="청소" onClick={onClean} badge={poopCount} disabled={poopCount === 0} />
-      <ActionBtn icon="🎮" label="놀기" onClick={onMinigame} />
-      <ActionBtn icon="💌" label="만남" onClick={onMeeting} />
+      <ActionBtn icon="🍖" label="밥주기" onClick={() => openModal('feed')} disabled={!hasFood} />
+      <ActionBtn
+        icon="🧹"
+        label="청소"
+        onClick={cleanAllPoop}
+        badge={poopCount}
+        disabled={poopCount === 0}
+      />
+      <ActionBtn icon="🎮" label="놀기" onClick={() => openModal('minigame')} />
+      <ActionBtn
+        icon="💌"
+        label="만남"
+        onClick={() => openModal('meeting')}
+        badge={meetingBadge}
+        disabled={!meeting.canMeet}
+      />
       {isSick && (
-        <ActionBtn icon="💊" label="약주기" onClick={onMedicine} disabled={!canAffordMedicine} highlight />
+        <ActionBtn
+          icon="💊"
+          label="약주기"
+          onClick={giveMedicine}
+          disabled={!canAffordMedicine}
+          highlight
+        />
       )}
-      <ActionBtn icon="🏪" label="상점" onClick={onShop} />
+      <ActionBtn icon="🏪" label="상점" onClick={() => openModal('shop')} />
     </div>
   );
 }
