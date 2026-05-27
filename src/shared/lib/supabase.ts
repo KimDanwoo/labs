@@ -21,6 +21,7 @@ export type SupabaseGameSave = {
   inventory: Record<string, number>;
   pending_poops: number[];
   is_sleeping: boolean;
+  woke_up_at: number | null;
   is_sick: boolean;
   sick_since: number | null;
   hunger_zero_since: number | null;

@@ -27,6 +27,7 @@ create table if not exists game_saves (
   inventory jsonb not null default '{"bread":3,"riceball":1,"meat":0,"cake":0}',
   pending_poops jsonb not null default '[]',
   is_sleeping boolean not null default false,
+  woke_up_at bigint,
   is_sick boolean not null default false,
   sick_since bigint,
   hunger_zero_since bigint,
