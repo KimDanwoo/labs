@@ -60,20 +60,17 @@ export const DEATH_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000; // 3일 방치 시 �
 
 export const HEARTS_PER_MEETING = 10;
 
-export const EXP_FEED = 3;
-export const EXP_CLEAN = 2;
-export const EXP_MINIGAME_MIN = 5;
-export const EXP_MINIGAME_MAX = 15;
-export const EXP_MEETING = 8;
+export const EXP_FEED = 5;
+export const EXP_CLEAN = 3;
+export const EXP_MINIGAME_MIN = 10;
+export const EXP_MINIGAME_MAX = 30;
+export const EXP_MEETING = 15;
 
-export const LEVEL_THRESHOLDS = [0, 100, 300, 600, 1000];
+export const LEVEL_THRESHOLDS = [0, 50, 150, 300, 500];
 
-export const SLEEP_START_HOUR = 23;
-export const SLEEP_END_HOUR = 7;
-
-// 똥 시스템 (1밥당 1똥, 지연 후 생성)
-export const POOP_DELAY_MIN_MS = 90_000;
-export const POOP_DELAY_MAX_MS = 180_000;
+export const SLEEP_START_HOUR = 22;
+export const SLEEP_END_HOUR = 8;
+export const WAKE_UP_GRACE_MS = 5 * 60_000;
 
 // 질병 시스템
 export const SICK_POOP_THRESHOLD = 4;
@@ -143,13 +140,11 @@ export const INITIAL_GAME_STATE: GameState = {
   hungerZeroSince: null,
   cleanlinessZeroSince: null,
   isSleeping: false,
+  wokeUpAt: null,
   isSick: false,
   sickSince: null,
   unlockedCharacters: [],
   levelUpMessage: null,
   eggReadyCharacterId: null,
   pendingPoops: [],
-  lastLoginDate: null,
-  loginStreak: 0,
-  dailyRewardCollected: false,
 };

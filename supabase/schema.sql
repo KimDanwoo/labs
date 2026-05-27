@@ -27,6 +27,7 @@ create table if not exists game_saves (
   inventory jsonb not null default '{"bread":3,"riceball":1,"meat":0,"cake":0}',
   pending_poops jsonb not null default '[]',
   is_sleeping boolean not null default false,
+  woke_up_at bigint,
   is_sick boolean not null default false,
   sick_since bigint,
   hunger_zero_since bigint,
@@ -106,26 +107,18 @@ create policy "Users can manage own achievements"
   on achievements for all using (auth.uid() = user_id);
 
 -- 프로필 자동 생성 트리거 (회원가입 시)
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
+create or replace function handle_new_user()
+returns trigger as $$
 begin
-  insert into public.profiles (id)
-  values (new.id)
-  on conflict (id) do nothing;
-  return new;
-exception when others then
-  raise warning 'handle_new_user failed for %: %', new.id, sqlerrm;
+  insert into profiles (id)
+  values (new.id);
   return new;
 end;
-$$;
+$$ language plpgsql security definer;
 
 create or replace trigger on_auth_user_created
   after insert on auth.users
-  for each row execute function public.handle_new_user();
+  for each row execute function handle_new_user();
 
 -- updated_at 자동 갱신 트리거
 create or replace function update_updated_at()

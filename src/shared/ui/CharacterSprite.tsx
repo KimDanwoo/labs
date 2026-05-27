@@ -1,93 +1,104 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import type { CharacterId, SpriteDirection } from '@shared/types';
-import {
-	SPRITE_MAP,
-	FRAME_SIZE,
-	SHEET_SIZE,
-	WALK_FPS,
-	WALK_STEP_COLS,
-	IDLE_COL,
-	LEVEL_SCALE_PER_LEVEL,
-	getSpritePose,
-} from '@shared/constants';
+import { useState, useEffect, useRef } from 'react';
+import type { CharacterId } from '@shared/types';
+import { SPRITE_MAP, FRAME_SIZE, SHEET_SIZE, WALK_FPS, TOTAL_FRAMES, LEVEL_SCALE_PER_LEVEL } from '@shared/constants';
 
 type CharacterSpriteProps = {
-	characterId: CharacterId;
-	size?: number;
-	direction?: SpriteDirection;
-	isMoving?: boolean;
-	isSleeping?: boolean;
-	isSick?: boolean;
-	isDead?: boolean;
-	level?: number;
+  characterId: CharacterId;
+  size?: number;
+  direction?: 'left' | 'right';
+  isMoving?: boolean;
+  isSleeping?: boolean;
+  isDrowsy?: boolean;
+  isSick?: boolean;
+  isDead?: boolean;
+  level?: number;
 };
 
-function useWalkCol(active: boolean): number {
-	const [stepIndex, setStepIndex] = useState(0);
-
-	useEffect(() => {
-		if (!active) return;
-		const interval = setInterval(() => {
-			setStepIndex((prev) => (prev + 1) % WALK_STEP_COLS.length);
-		}, 1000 / WALK_FPS);
-		return () => clearInterval(interval);
-	}, [active]);
-
-	return active ? WALK_STEP_COLS[stepIndex] : IDLE_COL;
+function getRow(direction: 'left' | 'right'): number {
+  return direction === 'left' ? 2 : 3;
 }
 
 export default function CharacterSprite({
-	characterId,
-	size = 64,
-	direction = 'front',
-	isMoving = false,
-	isSleeping = false,
-	isSick = false,
-	isDead = false,
-	level = 1,
+  characterId,
+  size = 64,
+  direction = 'right',
+  isMoving = false,
+  isSleeping = false,
+  isDrowsy = false,
+  isSick = false,
+  isDead = false,
+  level = 1,
 }: CharacterSpriteProps) {
-	const isWalking = isMoving && !isSleeping && !isDead;
-	const col = useWalkCol(isWalking);
-	const { row, col: spriteCol } = getSpritePose(direction, col);
+  const [frame, setFrame] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-	const scale = 1 + (level - 1) * LEVEL_SCALE_PER_LEVEL;
-	const actualSize = size * scale;
-	const bgX = -(spriteCol * FRAME_SIZE);
-	const bgY = -(row * FRAME_SIZE);
+  // 걷기 애니메이션 프레임 순환
+  useEffect(() => {
+    if (isMoving && !isSleeping && !isDead) {
+      intervalRef.current = setInterval(() => {
+        setFrame((prev) => (prev + 1) % TOTAL_FRAMES);
+      }, 1000 / WALK_FPS);
+    } else {
+      setFrame(0);
+    }
 
-	const wrapperClass = isDead ? 'death-animation' : isSleeping ? 'idle' : '';
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isMoving, isSleeping, isDead]);
 
-	return (
-		<div className={`relative ${wrapperClass}`} style={{ width: actualSize, height: actualSize }}>
-			<div
-				className="pixel-art"
-				style={{
-					width: actualSize,
-					height: actualSize,
-					backgroundImage: `url(${SPRITE_MAP[characterId]})`,
-					backgroundSize: `${(SHEET_SIZE / FRAME_SIZE) * actualSize}px ${(SHEET_SIZE / FRAME_SIZE) * actualSize}px`,
-					backgroundPosition: `${(bgX / FRAME_SIZE) * actualSize}px ${(bgY / FRAME_SIZE) * actualSize}px`,
-					backgroundRepeat: 'no-repeat',
-					opacity: isDead ? 0.5 : 1,
-					filter: isSleeping ? 'brightness(0.7)' : undefined,
-				}}
-			/>
+  const scale = 1 + (level - 1) * LEVEL_SCALE_PER_LEVEL;
+  const actualSize = size * scale;
 
-			{isSleeping && (
-				<div className="absolute -top-2 -right-2 text-sm font-bold text-blue-300">
-					<span className="sleep-z inline-block">Z</span>
-					<span className="sleep-z inline-block" style={{ animationDelay: '0.5s' }}>
-						z
-					</span>
-					<span className="sleep-z inline-block" style={{ animationDelay: '1s' }}>
-						z
-					</span>
-				</div>
-			)}
+  // idle일 때는 앞모습(row 1), 이동 중에는 방향에 따라 좌/우
+  const row = isMoving ? getRow(direction) : 1;
+  const col = frame;
 
-			{isSick && !isSleeping && !isDead && <div className="absolute -top-3 -left-1 text-lg animate-pulse">💀</div>}
-		</div>
-	);
+  const bgX = -(col * FRAME_SIZE);
+  const bgY = -(row * FRAME_SIZE);
+
+  const wrapperClass = isDead
+    ? 'death-animation'
+    : isSleeping
+      ? 'idle'
+      : '';
+
+  return (
+    <div className={`relative ${wrapperClass}`} style={{ width: actualSize, height: actualSize }}>
+      <div
+        className="pixel-art"
+        style={{
+          width: actualSize,
+          height: actualSize,
+          backgroundImage: `url(${SPRITE_MAP[characterId]})`,
+          backgroundSize: `${(SHEET_SIZE / FRAME_SIZE) * actualSize}px ${(SHEET_SIZE / FRAME_SIZE) * actualSize}px`,
+          backgroundPosition: `${(bgX / FRAME_SIZE) * actualSize}px ${(bgY / FRAME_SIZE) * actualSize}px`,
+          backgroundRepeat: 'no-repeat',
+          opacity: isDead ? 0.5 : 1,
+          filter: isSleeping ? 'brightness(0.7)' : isDrowsy ? 'brightness(0.88)' : undefined,
+        }}
+      />
+
+      {/* 수면/졸림 표시 */}
+      {isSleeping && (
+        <div className="absolute -top-2 -right-2 text-sm font-bold text-blue-300">
+          <span className="sleep-z inline-block">Z</span>
+          <span className="sleep-z inline-block" style={{ animationDelay: '0.5s' }}>z</span>
+          <span className="sleep-z inline-block" style={{ animationDelay: '1s' }}>z</span>
+        </div>
+      )}
+      {isDrowsy && !isSleeping && (
+        <div className="absolute -top-2 -right-1 text-xs font-bold text-blue-300/80">
+          <span className="sleep-z inline-block">z</span>
+        </div>
+      )}
+
+      {/* 질병 표시 */}
+      {isSick && !isSleeping && !isDead && (
+        <div className="absolute -top-3 -left-1 text-lg animate-pulse">💀</div>
+      )}
+    </div>
+  );
 }

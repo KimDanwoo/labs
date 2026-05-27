@@ -1,13 +1,14 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import type { CharacterId, Poop as PoopType, CharacterPosition, RoomType } from '@shared/types';
 import { DANGER_THRESHOLD } from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
 import { ROOM_BACKGROUNDS } from '../constants';
 
-const TAP_REACTION_MS = 900;
+const JUMP_DURATION_MS = 450;
+const HEART_FLOAT_DURATION_MS = 1000;
 
 type RoomProps = {
   characterId: CharacterId;
@@ -15,16 +16,15 @@ type RoomProps = {
   poops: PoopType[];
   level: number;
   isSleeping: boolean;
+  isDrowsy: boolean;
   isSick: boolean;
   isDead: boolean;
   hunger: number;
   cleanliness: number;
   onCleanPoop: (poopId: string) => void;
-  onMoveTo?: (xPercent: number, yPercent: number) => void;
+  onWakeUp: () => void;
   roomType?: RoomType;
 };
-
-type TapReaction = { id: number };
 
 export default function Room({
   characterId,
@@ -32,51 +32,46 @@ export default function Room({
   poops,
   level,
   isSleeping,
+  isDrowsy,
   isSick,
   isDead,
   hunger,
   cleanliness,
   onCleanPoop,
-  onMoveTo,
+  onWakeUp,
   roomType = 'living',
 }: RoomProps) {
   const roomRef = useRef<HTMLDivElement>(null);
-  const tapIdRef = useRef(0);
-  const [reactions, setReactions] = useState<TapReaction[]>([]);
-
   const backgroundSrc = ROOM_BACKGROUNDS[roomType];
   const isDanger = hunger <= DANGER_THRESHOLD || cleanliness <= DANGER_THRESHOLD;
-  const canInteract = !isSleeping && !isDead;
 
-  const handleRoomClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!canInteract || !onMoveTo) return;
-    if (!roomRef.current) return;
-    const rect = roomRef.current.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    const xPct = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPct = ((e.clientY - rect.top) / rect.height) * 100;
-    onMoveTo(xPct, yPct);
-  }, [canInteract, onMoveTo]);
+  const [isJumping, setIsJumping] = useState(false);
+  const [floatingHearts, setFloatingHearts] = useState<number[]>([]);
+  const heartIdRef = useRef(0);
 
-  const handleCharacterTap = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!canInteract) return;
-    const id = ++tapIdRef.current;
-    setReactions((prev) => [...prev, { id }]);
+  const handleCharacterClick = () => {
+    if (isDead) return;
+    if (isSleeping || isDrowsy) {
+      onWakeUp();
+      return;
+    }
+    if (!isJumping) {
+      setIsJumping(true);
+      setTimeout(() => setIsJumping(false), JUMP_DURATION_MS);
+    }
+    const id = heartIdRef.current++;
+    setFloatingHearts((prev) => [...prev, id]);
     setTimeout(() => {
-      setReactions((prev) => prev.filter((r) => r.id !== id));
-    }, TAP_REACTION_MS);
-  }, [canInteract]);
-
-  const latestReactionId = reactions.length > 0 ? reactions[reactions.length - 1].id : null;
+      setFloatingHearts((prev) => prev.filter((h) => h !== id));
+    }, HEART_FLOAT_DURATION_MS);
+  };
 
   return (
     <div
       ref={roomRef}
-      onClick={handleRoomClick}
       className={`relative flex-1 rounded-2xl sm:rounded-3xl overflow-hidden shadow-game-lg ${
         isDanger ? 'ring-2 ring-red-400/60 animate-pulse' : ''
-      } ${canInteract && onMoveTo ? 'cursor-pointer' : ''}`}
+      }`}
       style={{ minHeight: '40dvh' }}
     >
       <Image
@@ -91,10 +86,7 @@ export default function Room({
       {poops.map((poop) => (
         <button
           key={poop.id}
-          onClick={(e) => {
-            e.stopPropagation();
-            onCleanPoop(poop.id);
-          }}
+          onClick={() => onCleanPoop(poop.id)}
           className="absolute poop-appear cursor-pointer text-2xl hover:scale-125 transition-transform z-10 drop-shadow-sm"
           style={{
             left: `${poop.x}%`,
@@ -106,43 +98,39 @@ export default function Room({
       ))}
 
       {/* 캐릭터 */}
-      <div
-        className="absolute z-10"
+      <button
+        type="button"
+        onClick={handleCharacterClick}
+        disabled={isDead}
+        className="absolute z-10 cursor-pointer focus:outline-none"
         style={{
           left: `${position.x}%`,
           top: `${position.y}%`,
           transform: 'translate(-50%, -50%)',
         }}
       >
-        <button
-          type="button"
-          onClick={handleCharacterTap}
-          className="relative bg-transparent border-0 p-0 cursor-pointer focus:outline-none"
-          aria-label="캐릭터와 상호작용"
-        >
-          <div key={latestReactionId ?? 'idle'} className={latestReactionId ? 'tap-jump' : ''}>
-            <CharacterSprite
-              characterId={characterId}
-              size={64}
-              direction={position.direction}
-              isMoving={position.isMoving}
-              isSleeping={isSleeping}
-              isSick={isSick}
-              isDead={isDead}
-              level={level}
-            />
-          </div>
-
-          {reactions.map((reaction) => (
+        <div className={`relative ${isJumping ? 'character-jump' : ''}`}>
+          <CharacterSprite
+            characterId={characterId}
+            size={64}
+            direction={position.direction}
+            isMoving={position.isMoving}
+            isSleeping={isSleeping}
+            isDrowsy={isDrowsy}
+            isSick={isSick}
+            isDead={isDead}
+            level={level}
+          />
+          {floatingHearts.map((id) => (
             <span
-              key={reaction.id}
-              className="heart-pop-up pointer-events-none absolute left-1/2 bottom-full text-2xl"
+              key={id}
+              className="absolute left-1/2 -translate-x-1/2 -top-1 text-xl heart-effect pointer-events-none"
             >
-              💖
+              💕
             </span>
           ))}
-        </button>
-      </div>
+        </div>
+      </button>
 
       {/* 수면 오버레이 */}
       {isSleeping && (
