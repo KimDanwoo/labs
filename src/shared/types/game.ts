@@ -26,12 +26,10 @@ export type Poop = {
   createdAt: number;
 };
 
-export type SpriteDirection = 'front' | 'left' | 'right';
-
 export type CharacterPosition = {
   x: number;
   y: number;
-  direction: SpriteDirection;
+  direction: 'left' | 'right';
   isMoving: boolean;
 };
 
@@ -63,15 +61,13 @@ export type GameState = {
   hungerZeroSince: number | null;
   cleanlinessZeroSince: number | null;
   isSleeping: boolean;
+  wokeUpAt: number | null;
   isSick: boolean;
   sickSince: number | null;
   unlockedCharacters: CharacterId[];
   levelUpMessage: string | null;
   eggReadyCharacterId: CharacterId | null;
   pendingPoops: number[];
-  lastLoginDate: string | null;
-  loginStreak: number;
-  dailyRewardCollected: boolean;
 };
 
 export type GameAction =
@@ -91,9 +87,9 @@ export type GameAction =
   | { type: 'GIVE_MEDICINE' }
   | { type: 'MINIGAME_REWARD'; correctCount: number }
   | { type: 'COLLECT_EGG' }
-  | { type: 'COLLECT_DAILY_REWARD' }
   | { type: 'DISMISS_LEVEL_UP' }
   | { type: 'SET_SLEEPING'; isSleeping: boolean }
+  | { type: 'WAKE_UP' }
   | { type: 'PROCESS_OFFLINE'; now: number }
   | { type: 'DIE' }
   | { type: 'RESET' }

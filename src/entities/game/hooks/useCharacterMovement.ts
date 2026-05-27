@@ -1,27 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, startTransition } from 'react';
-import type { CharacterPosition, SpriteDirection } from '@shared/types';
-import { MOVE_SPEED, IDLE_CHANCE, IDLE_PAUSE_MIN_MS, IDLE_PAUSE_MAX_MS } from '../constants';
-
-const X_MIN = 10;
-const X_MAX = 90;
-const Y_MIN = 55;
-const Y_MAX = 90;
-const DIRECTION_THRESHOLD = 0.5;
-
-const clamp = (value: number, min: number, max: number) =>
-  Math.max(min, Math.min(max, value));
-
-const sideDirection = (
-  fromX: number,
-  toX: number,
-  fallback: SpriteDirection,
-): 'left' | 'right' => {
-  if (toX > fromX + DIRECTION_THRESHOLD) return 'right';
-  if (toX < fromX - DIRECTION_THRESHOLD) return 'left';
-  return fallback === 'left' ? 'left' : 'right';
-};
+import { useState, useEffect, useCallback, useRef } from 'react';
+import type { CharacterPosition } from '@shared/types';
+import { MOVE_SPEED, DIRECTION_CHANGE_INTERVAL, IDLE_CHANCE } from '../constants';
 
 export function useCharacterMovement(
   _roomWidth: number,
@@ -31,65 +12,51 @@ export function useCharacterMovement(
   const [position, setPosition] = useState<CharacterPosition>({
     x: 50,
     y: 70,
-    direction: 'front',
+    direction: 'right',
     isMoving: false,
   });
 
   const targetRef = useRef<{ x: number; y: number } | null>(null);
   const animFrameRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
-  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const clearIdleTimer = useCallback(() => {
-    if (idleTimerRef.current) {
-      clearTimeout(idleTimerRef.current);
-      idleTimerRef.current = null;
-    }
-  }, []);
-
-  const setTarget = useCallback((x: number, y: number) => {
-    const safeX = clamp(x, X_MIN, X_MAX);
-    const safeY = clamp(y, Y_MIN, Y_MAX);
-    targetRef.current = { x: safeX, y: safeY };
-    clearIdleTimer();
-    setPosition((prev) => ({
-      ...prev,
-      isMoving: true,
-      direction: sideDirection(prev.x, safeX, prev.direction),
-    }));
-  }, [clearIdleTimer]);
-
-  const scheduleNextAutoMove = useCallback(() => {
-    clearIdleTimer();
-    const pause = IDLE_PAUSE_MIN_MS + Math.random() * (IDLE_PAUSE_MAX_MS - IDLE_PAUSE_MIN_MS);
-    idleTimerRef.current = setTimeout(() => {
-      if (Math.random() < IDLE_CHANCE) {
-        scheduleNextAutoMove();
-        return;
-      }
-      const nextX = X_MIN + Math.random() * (X_MAX - X_MIN);
-      const nextY = Y_MIN + Math.random() * (Y_MAX - Y_MIN);
-      setTarget(nextX, nextY);
-    }, pause);
-  }, [clearIdleTimer, setTarget]);
-
-  useEffect(() => {
-    if (!isActive) {
-      clearIdleTimer();
+  const pickNewTarget = useCallback(() => {
+    if (Math.random() < IDLE_CHANCE) {
       targetRef.current = null;
-      startTransition(() => setPosition((prev) => ({ ...prev, isMoving: false, direction: 'front' })));
+      setPosition((prev) => ({ ...prev, isMoving: false }));
       return;
     }
 
-    scheduleNextAutoMove();
-    return () => clearIdleTimer();
-  }, [isActive, scheduleNextAutoMove, clearIdleTimer]);
+    const newX = 10 + Math.random() * 80;
+    const newY = 55 + Math.random() * 35;
+    targetRef.current = { x: newX, y: newY };
+    setPosition((prev) => ({
+      ...prev,
+      isMoving: true,
+      direction: newX > prev.x ? 'right' : 'left',
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (!isActive) {
+      setPosition((prev) => ({ ...prev, isMoving: false }));
+      return;
+    }
+
+    const directionInterval = setInterval(pickNewTarget, DIRECTION_CHANGE_INTERVAL);
+    pickNewTarget();
+
+    return () => clearInterval(directionInterval);
+  }, [isActive, pickNewTarget]);
 
   useEffect(() => {
     if (!isActive) return;
 
     const animate = (time: number) => {
-      if (!lastTimeRef.current) lastTimeRef.current = time;
+      if (!lastTimeRef.current) {
+        lastTimeRef.current = time;
+      }
+
       const delta = time - lastTimeRef.current;
       lastTimeRef.current = time;
 
@@ -103,20 +70,14 @@ export function useCharacterMovement(
 
           if (dist < step) {
             targetRef.current = null;
-            scheduleNextAutoMove();
-            return {
-              ...prev,
-              x: target.x,
-              y: target.y,
-              isMoving: false,
-              direction: 'front',
-            };
+            return { ...prev, x: target.x, y: target.y, isMoving: false };
           }
 
           return {
             ...prev,
             x: prev.x + (dx / dist) * step,
             y: prev.y + (dy / dist) * step,
+            direction: dx > 0 ? 'right' : 'left',
             isMoving: true,
           };
         });
@@ -128,7 +89,7 @@ export function useCharacterMovement(
     lastTimeRef.current = 0;
     animFrameRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animFrameRef.current);
-  }, [isActive, scheduleNextAutoMove]);
+  }, [isActive]);
 
-  return { position, moveTo: setTarget };
+  return position;
 }

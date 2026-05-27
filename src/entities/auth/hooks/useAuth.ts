@@ -7,7 +7,7 @@ import { supabase } from '@shared/lib';
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -33,7 +33,7 @@ export function useAuth() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
     if (error) throw error;
@@ -43,7 +43,7 @@ export function useAuth() {
     const { error } = await supabase.auth.linkIdentity({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
     if (error) throw error;
@@ -55,7 +55,7 @@ export function useAuth() {
     setUser(null);
   }, []);
 
-  const isAnonymous = !user || user.is_anonymous === true || !user.email;
+  const isAnonymous = user?.is_anonymous ?? false;
 
   return {
     user,
