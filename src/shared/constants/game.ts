@@ -88,6 +88,18 @@ export const HEART_DECAY_WHEN_SICK = 1;
 export const HEART_HUNGER_BUFF_THRESHOLD = 50;
 export const HEART_HUNGER_BUFF_RATE = 0.8;
 export const HEART_UNHAPPY_DEBUFF_RATE = 1.5;
+export const OVERFEED_HEART_PENALTY = 3;
+export const OVERFEED_TOAST_DURATION = 2500;
+export const OVERFEED_MESSAGE = '이미 배불러요... 토할 것 같아요';
+
+// 만남 규칙
+export const MEETING_COOLDOWN_MS = 5 * 60_000;
+export const MEETING_DAILY_LIMIT = 3;
+export const MEETING_ROUNDS = 3;
+export const MEETING_REWARD_GOOD = 6;
+export const MEETING_REWARD_OK = 3;
+export const MEETING_REWARD_AWKWARD = 0;
+export const MEETING_PERFECT_COIN_BONUS = 10;
 
 // 하트 교환
 export const HEART_EXCHANGE_UNIT = 10;
@@ -145,6 +157,10 @@ export const INITIAL_GAME_STATE: GameState = {
   sickSince: null,
   unlockedCharacters: [],
   levelUpMessage: null,
+  feedingMessage: null,
   eggReadyCharacterId: null,
   pendingPoops: [],
+  lastMeetingAt: null,
+  meetingsToday: 0,
+  meetingDay: null,
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import type { CharacterId } from '@shared/types';
 import { SPRITE_MAP, FRAME_SIZE, SHEET_SIZE, WALK_FPS, TOTAL_FRAMES, LEVEL_SCALE_PER_LEVEL } from '@shared/constants';
 
@@ -32,29 +32,22 @@ export default function CharacterSprite({
   level = 1,
 }: CharacterSpriteProps) {
   const [frame, setFrame] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isWalking = isMoving && !isSleeping && !isDead;
 
-  // 걷기 애니메이션 프레임 순환
   useEffect(() => {
-    if (isMoving && !isSleeping && !isDead) {
-      intervalRef.current = setInterval(() => {
-        setFrame((prev) => (prev + 1) % TOTAL_FRAMES);
-      }, 1000 / WALK_FPS);
-    } else {
-      setFrame(0);
-    }
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isMoving, isSleeping, isDead]);
+    if (!isWalking) return;
+    const id = setInterval(() => {
+      setFrame((prev) => (prev + 1) % TOTAL_FRAMES);
+    }, 1000 / WALK_FPS);
+    return () => clearInterval(id);
+  }, [isWalking]);
 
   const scale = 1 + (level - 1) * LEVEL_SCALE_PER_LEVEL;
   const actualSize = size * scale;
 
   // idle일 때는 앞모습(row 1), 이동 중에는 방향에 따라 좌/우
   const row = isMoving ? getRow(direction) : 1;
-  const col = frame;
+  const col = isWalking ? frame : 0;
 
   const bgX = -(col * FRAME_SIZE);
   const bgY = -(row * FRAME_SIZE);

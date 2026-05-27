@@ -1,2 +1,2 @@
 export { MeetingModal } from './ui';
-export * from './constants';
+export * from './model';
