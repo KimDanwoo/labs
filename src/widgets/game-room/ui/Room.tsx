@@ -2,57 +2,49 @@
 
 import { useRef, useState } from 'react';
 import Image from 'next/image';
-import type { CharacterId, Poop as PoopType, CharacterPosition, RoomType } from '@shared/types';
-import { DANGER_THRESHOLD } from '@shared/constants';
+import { useAtomValue } from 'jotai';
 import { CharacterSprite } from '@shared/ui';
+import {
+  characterIdAtom,
+  characterPositionAtom,
+  poopsAtom,
+  levelAtom,
+  isSleepingAtom,
+  isDrowsyAtom,
+  isSickAtom,
+  isDangerAtom,
+  roomTypeAtom,
+  useGameActions,
+} from '@entities/game';
 import { ROOM_BACKGROUNDS } from '../constants';
 
 const JUMP_DURATION_MS = 450;
 const HEART_FLOAT_DURATION_MS = 1000;
 
-type RoomProps = {
-  characterId: CharacterId;
-  position: CharacterPosition;
-  poops: PoopType[];
-  level: number;
-  isSleeping: boolean;
-  isDrowsy: boolean;
-  isSick: boolean;
-  isDead: boolean;
-  hunger: number;
-  cleanliness: number;
-  onCleanPoop: (poopId: string) => void;
-  onWakeUp: () => void;
-  roomType?: RoomType;
-};
+export default function Room() {
+  const characterId = useAtomValue(characterIdAtom);
+  const position = useAtomValue(characterPositionAtom);
+  const poops = useAtomValue(poopsAtom);
+  const level = useAtomValue(levelAtom);
+  const isSleeping = useAtomValue(isSleepingAtom);
+  const isDrowsy = useAtomValue(isDrowsyAtom);
+  const isSick = useAtomValue(isSickAtom);
+  const isDanger = useAtomValue(isDangerAtom);
+  const roomType = useAtomValue(roomTypeAtom);
+  const { cleanPoop, wakeUp } = useGameActions();
 
-export default function Room({
-  characterId,
-  position,
-  poops,
-  level,
-  isSleeping,
-  isDrowsy,
-  isSick,
-  isDead,
-  hunger,
-  cleanliness,
-  onCleanPoop,
-  onWakeUp,
-  roomType = 'living',
-}: RoomProps) {
   const roomRef = useRef<HTMLDivElement>(null);
   const backgroundSrc = ROOM_BACKGROUNDS[roomType];
-  const isDanger = hunger <= DANGER_THRESHOLD || cleanliness <= DANGER_THRESHOLD;
 
   const [isJumping, setIsJumping] = useState(false);
   const [floatingHearts, setFloatingHearts] = useState<number[]>([]);
   const heartIdRef = useRef(0);
 
+  if (!characterId) return null;
+
   const handleCharacterClick = () => {
-    if (isDead) return;
     if (isSleeping || isDrowsy) {
-      onWakeUp();
+      wakeUp();
       return;
     }
     if (!isJumping) {
@@ -82,26 +74,20 @@ export default function Room({
         priority
       />
 
-      {/* 똥 */}
       {poops.map((poop) => (
         <button
           key={poop.id}
-          onClick={() => onCleanPoop(poop.id)}
+          onClick={() => cleanPoop(poop.id)}
           className="absolute poop-appear cursor-pointer text-2xl hover:scale-125 transition-transform z-10 drop-shadow-sm"
-          style={{
-            left: `${poop.x}%`,
-            top: `${poop.y}%`,
-          }}
+          style={{ left: `${poop.x}%`, top: `${poop.y}%` }}
         >
           💩
         </button>
       ))}
 
-      {/* 캐릭터 */}
       <button
         type="button"
         onClick={handleCharacterClick}
-        disabled={isDead}
         className="absolute z-10 cursor-pointer focus:outline-none"
         style={{
           left: `${position.x}%`,
@@ -118,7 +104,7 @@ export default function Room({
             isSleeping={isSleeping}
             isDrowsy={isDrowsy}
             isSick={isSick}
-            isDead={isDead}
+            isDead={false}
             level={level}
           />
           {floatingHearts.map((id) => (
@@ -132,12 +118,10 @@ export default function Room({
         </div>
       </button>
 
-      {/* 수면 오버레이 */}
       {isSleeping && (
         <div className="absolute inset-0 bg-indigo-950/20 z-20 pointer-events-none" />
       )}
 
-      {/* 질병 오버레이 */}
       {isSick && !isSleeping && (
         <div className="absolute inset-0 bg-green-900/10 z-20 pointer-events-none" />
       )}

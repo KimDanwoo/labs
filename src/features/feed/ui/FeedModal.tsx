@@ -1,24 +1,24 @@
 'use client';
 
-import type { FoodId } from '@shared/types';
+import { useAtomValue } from 'jotai';
 import { FOODS } from '@shared/constants';
-
-type FeedModalProps = {
-  inventory: Record<FoodId, number>;
-  onFeed: (foodId: FoodId) => void;
-  onClose: () => void;
-};
+import { inventoryAtom, useGameActions } from '@entities/game';
 
 const FOOD_LIST = Object.values(FOODS);
 
-export default function FeedModal({ inventory, onFeed, onClose }: FeedModalProps) {
+export default function FeedModal() {
+  const inventory = useAtomValue(inventoryAtom);
+  const { feed, closeModal } = useGameActions();
+
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
-      <div className="absolute inset-0 modal-overlay" onClick={onClose} />
+      <div className="absolute inset-0 modal-overlay" onClick={closeModal} />
       <div className="relative w-full max-w-md modal-content rounded-t-3xl rounded-b-none p-5 sm:p-6 space-y-4 animate-slide-up">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-bold text-gray-700">밥 주기</h3>
-          <button onClick={onClose} className="text-gray-400 text-xl">✕</button>
+          <button onClick={closeModal} className="text-gray-400 text-xl">
+            ✕
+          </button>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -28,8 +28,8 @@ export default function FeedModal({ inventory, onFeed, onClose }: FeedModalProps
               <button
                 key={food.id}
                 onClick={() => {
-                  onFeed(food.id);
-                  onClose();
+                  feed(food.id);
+                  closeModal();
                 }}
                 disabled={count <= 0}
                 className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 btn-press disabled:opacity-30"

@@ -1,17 +1,23 @@
 'use client';
 
-import { MAX_HUNGER, MAX_CLEANLINESS, MAX_HEARTS, WARNING_THRESHOLD, DANGER_THRESHOLD } from '@shared/constants';
-
-type StatusBarProps = {
-  hunger: number;
-  cleanliness: number;
-  hearts: number;
-  level: number;
-  coins: number;
-  isSick: boolean;
-  nickname: string;
-  onOpenSettings: () => void;
-};
+import { useAtomValue } from 'jotai';
+import {
+  MAX_HUNGER,
+  MAX_CLEANLINESS,
+  MAX_HEARTS,
+  WARNING_THRESHOLD,
+  DANGER_THRESHOLD,
+} from '@shared/constants';
+import {
+  hungerAtom,
+  cleanlinessAtom,
+  heartsAtom,
+  levelAtom,
+  coinsAtom,
+  isSickAtom,
+  nicknameAtom,
+  useGameActions,
+} from '@entities/game';
 
 type GaugeProps = {
   value: number;
@@ -36,31 +42,50 @@ function Gauge({ value, max, color, icon }: GaugeProps) {
           style={{ width: `${percent}%`, backgroundColor: barColor }}
         />
       </div>
-      <span className={`text-[11px] font-bold min-w-[24px] text-right tabular-nums ${
-        isDanger ? 'text-red-500' : isWarning ? 'text-amber-500' : 'text-gray-400'
-      }`}>
+      <span
+        className={`text-[11px] font-bold min-w-[24px] text-right tabular-nums ${
+          isDanger
+            ? 'text-red-500'
+            : isWarning
+              ? 'text-amber-500'
+              : 'text-gray-400'
+        }`}
+      >
         {Math.round(value)}
       </span>
     </div>
   );
 }
 
-export default function StatusBar({ hunger, cleanliness, hearts, level, coins, isSick, nickname, onOpenSettings }: StatusBarProps) {
+export default function StatusBar() {
+  const hunger = useAtomValue(hungerAtom);
+  const cleanliness = useAtomValue(cleanlinessAtom);
+  const hearts = useAtomValue(heartsAtom);
+  const level = useAtomValue(levelAtom);
+  const coins = useAtomValue(coinsAtom);
+  const isSick = useAtomValue(isSickAtom);
+  const nickname = useAtomValue(nicknameAtom);
+  const { openModal } = useGameActions();
+
   return (
     <div className="card p-3 space-y-1.5">
       <div className="flex justify-between items-center pb-1 border-b border-black/5">
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-bold text-white bg-gray-700 px-2 py-0.5 rounded-md">Lv.{level}</span>
+          <span className="text-xs font-bold text-white bg-gray-700 px-2 py-0.5 rounded-md">
+            Lv.{level}
+          </span>
           <span className="text-xs font-bold text-gray-700">{nickname}</span>
           {isSick && <span className="text-xs animate-pulse">🤒 아파요</span>}
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
             <span className="text-xs font-bold text-amber-500">🪙</span>
-            <span className="text-xs font-bold text-gray-600 tabular-nums">{coins}</span>
+            <span className="text-xs font-bold text-gray-600 tabular-nums">
+              {coins}
+            </span>
           </div>
           <button
-            onClick={onOpenSettings}
+            onClick={() => openModal('settings')}
             className="text-sm text-gray-400 hover:text-gray-600 transition-colors leading-none"
             aria-label="설정"
           >
@@ -70,7 +95,12 @@ export default function StatusBar({ hunger, cleanliness, hearts, level, coins, i
       </div>
 
       <Gauge value={hunger} max={MAX_HUNGER} color="var(--color-gauge-hunger)" icon="🍖" />
-      <Gauge value={cleanliness} max={MAX_CLEANLINESS} color="var(--color-gauge-clean)" icon="✨" />
+      <Gauge
+        value={cleanliness}
+        max={MAX_CLEANLINESS}
+        color="var(--color-gauge-clean)"
+        icon="✨"
+      />
       <Gauge value={hearts} max={MAX_HEARTS} color="var(--color-gauge-heart)" icon="💕" />
     </div>
   );
