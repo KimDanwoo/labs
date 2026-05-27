@@ -68,8 +68,9 @@ export const EXP_MEETING = 15;
 
 export const LEVEL_THRESHOLDS = [0, 50, 150, 300, 500];
 
-export const SLEEP_START_HOUR = 23;
-export const SLEEP_END_HOUR = 7;
+export const SLEEP_START_HOUR = 22;
+export const SLEEP_END_HOUR = 8;
+export const WAKE_UP_GRACE_MS = 5 * 60_000;
 
 // 질병 시스템
 export const SICK_POOP_THRESHOLD = 4;
@@ -139,6 +140,7 @@ export const INITIAL_GAME_STATE: GameState = {
   hungerZeroSince: null,
   cleanlinessZeroSince: null,
   isSleeping: false,
+  wokeUpAt: null,
   isSick: false,
   sickSince: null,
   unlockedCharacters: [],

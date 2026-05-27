@@ -319,6 +319,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case 'SET_SLEEPING':
       return { ...state, isSleeping: action.isSleeping, lastUpdated: now };
 
+    case 'WAKE_UP':
+      return { ...state, isSleeping: false, wokeUpAt: now, lastUpdated: now };
+
     case 'PROCESS_OFFLINE': {
       const elapsed = action.now - state.lastUpdated;
       const elapsedMinutes = elapsed / 60000;
@@ -472,6 +475,7 @@ export function useGameState() {
     [],
   );
   const reset = useCallback(() => dispatch({ type: 'RESET' }), []);
+  const wakeUp = useCallback(() => dispatch({ type: 'WAKE_UP' }), []);
 
   return {
     state,
@@ -489,5 +493,6 @@ export function useGameState() {
     dismissLevelUp,
     selectCharacter,
     reset,
+    wakeUp,
   };
 }

@@ -61,6 +61,7 @@ export type GameState = {
   hungerZeroSince: number | null;
   cleanlinessZeroSince: number | null;
   isSleeping: boolean;
+  wokeUpAt: number | null;
   isSick: boolean;
   sickSince: number | null;
   unlockedCharacters: CharacterId[];
@@ -88,6 +89,7 @@ export type GameAction =
   | { type: 'COLLECT_EGG' }
   | { type: 'DISMISS_LEVEL_UP' }
   | { type: 'SET_SLEEPING'; isSleeping: boolean }
+  | { type: 'WAKE_UP' }
   | { type: 'PROCESS_OFFLINE'; now: number }
   | { type: 'DIE' }
   | { type: 'RESET' }

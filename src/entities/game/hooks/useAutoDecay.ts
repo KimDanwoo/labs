@@ -7,6 +7,7 @@ import {
   SLEEP_START_HOUR,
   SLEEP_END_HOUR,
   HEART_DECAY_WHEN_SICK,
+  WAKE_UP_GRACE_MS,
 } from '@shared/constants';
 
 function isSleepTime(): boolean {
@@ -14,24 +15,34 @@ function isSleepTime(): boolean {
   return hour >= SLEEP_START_HOUR || hour < SLEEP_END_HOUR;
 }
 
+function shouldBeSleeping(wokeUpAt: number | null, now: number): boolean {
+  if (!isSleepTime()) return false;
+  if (wokeUpAt === null) return true;
+  return now - wokeUpAt > WAKE_UP_GRACE_MS;
+}
+
 export function useAutoDecay(
   isPlaying: boolean,
   isSick: boolean,
+  wokeUpAt: number | null,
   dispatch: React.Dispatch<GameAction>,
 ) {
   // 배고픔 감소 + 수면 체크 + 사망 체크 (10초마다)
   useEffect(() => {
     if (!isPlaying) return;
 
-    const interval = setInterval(() => {
-      const sleeping = isSleepTime();
+    const tick = () => {
+      const sleeping = shouldBeSleeping(wokeUpAt, Date.now());
       dispatch({ type: 'SET_SLEEPING', isSleeping: sleeping });
       dispatch({ type: 'DECAY_HUNGER', amount: HUNGER_DECAY_PER_MINUTE / 6 });
       dispatch({ type: 'TICK' });
-    }, 10_000);
+    };
+
+    tick();
+    const interval = setInterval(tick, 10_000);
 
     return () => clearInterval(interval);
-  }, [isPlaying, dispatch]);
+  }, [isPlaying, wokeUpAt, dispatch]);
 
   // 아플 때 행복도 감소 (10초마다)
   useEffect(() => {

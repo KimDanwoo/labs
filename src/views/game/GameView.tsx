@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { HEARTS_PER_MEETING, MEDICINE_PRICE, ALL_CHARACTER_IDS, LEVEL_UP_TOAST_DURATION } from '@shared/constants';
+import { HEARTS_PER_MEETING, MEDICINE_PRICE, ALL_CHARACTER_IDS, LEVEL_UP_TOAST_DURATION, WAKE_UP_GRACE_MS } from '@shared/constants';
 import type { ModalType, RoomType } from '@shared/types';
 import { useGameState, useAutoDecay, useCharacterMovement, useSaveSync } from '@entities/game';
 import { useAuth } from '@entities/auth';
@@ -34,6 +34,7 @@ export default function GameView() {
 		dismissLevelUp,
 		selectCharacter,
 		reset,
+		wakeUp,
 	} = useGameState();
 
 	const { user, isLoading: isAuthLoading, isAnonymous, signInAnonymously, linkWithGoogle } = useAuth();
@@ -42,7 +43,12 @@ export default function GameView() {
 	const isPlaying = state.status === 'playing';
 	const position = useCharacterMovement(400, 300, isPlaying && !state.isSleeping);
 
-	useAutoDecay(isPlaying, state.isSick, dispatch);
+	const isDrowsy =
+		!state.isSleeping &&
+		state.wokeUpAt !== null &&
+		Date.now() - state.wokeUpAt <= WAKE_UP_GRACE_MS;
+
+	useAutoDecay(isPlaying, state.isSick, state.wokeUpAt, dispatch);
 	useSaveSync(user?.id ?? null, state, dispatch);
 
 	// 자동 익명 로그인
@@ -102,23 +108,15 @@ export default function GameView() {
 	return (
 		<div className="flex flex-col flex-1 p-2 sm:p-3 gap-2 sm:gap-3">
 			{/* 설정 버튼 */}
-			<div className="flex justify-end">
-				<button
-					onClick={() => setActiveModal('settings')}
-					className="w-8 h-8 flex items-center justify-center rounded-full surface shadow-game-sm btn-press text-gray-400 text-sm"
-				>
-					⚙️
-				</button>
-			</div>
-
 			<StatusBar
 				hunger={state.hunger}
 				cleanliness={state.cleanliness}
 				hearts={state.hearts}
 				level={state.level}
-				exp={state.exp}
 				coins={state.coins}
 				isSick={state.isSick}
+				nickname={state.nickname}
+				onOpenSettings={() => setActiveModal('settings')}
 			/>
 
 			<Room
@@ -127,12 +125,13 @@ export default function GameView() {
 				poops={state.poops}
 				level={state.level}
 				isSleeping={state.isSleeping}
+				isDrowsy={isDrowsy}
 				isSick={state.isSick}
 				isDead={false}
 				hunger={state.hunger}
 				cleanliness={state.cleanliness}
 				onCleanPoop={cleanPoop}
-				nickname={state.nickname}
+				onWakeUp={wakeUp}
 				roomType={roomType}
 			/>
 

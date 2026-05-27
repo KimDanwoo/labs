@@ -197,6 +197,13 @@ export default function MiniGameModal({ onComplete, onClose }: MiniGameModalProp
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 modal-overlay" />
       <div className="relative w-full max-w-sm modal-content p-5 mx-4 text-center space-y-4 animate-scale-in">
+        <button
+          onClick={onClose}
+          className="absolute -top-3 -right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white text-gray-500 hover:text-gray-700 hover:bg-gray-50 shadow-game-md text-base leading-none transition-colors"
+          aria-label="닫기"
+        >
+          ✕
+        </button>
 
         {phase === 'ready' && (
           <div className="space-y-5 py-4">
