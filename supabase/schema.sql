@@ -10,31 +10,11 @@ create table if not exists profiles (
   created_at timestamptz default now()
 );
 
--- 게임 세이브 데이터
+-- 게임 세이브 데이터: GameState 전체를 JSON 한 덩어리로 저장
 create table if not exists game_saves (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
-  character_id text not null,
-  nickname text not null default '',
-  status text not null default 'playing',
-  level int not null default 1,
-  exp int not null default 0,
-  hunger real not null default 80,
-  cleanliness real not null default 100,
-  hearts real not null default 0,
-  coins int not null default 50,
-  poops jsonb not null default '[]',
-  inventory jsonb not null default '{"bread":3,"riceball":1,"meat":0,"cake":0}',
-  pending_poops jsonb not null default '[]',
-  is_sleeping boolean not null default false,
-  woke_up_at bigint,
-  is_sick boolean not null default false,
-  sick_since bigint,
-  hunger_zero_since bigint,
-  cleanliness_zero_since bigint,
-  unlocked_characters jsonb not null default '[]',
-  egg_ready_character_id text,
-  level_up_message text,
+  state jsonb not null,
   last_updated bigint not null default (extract(epoch from now()) * 1000)::bigint,
   created_at timestamptz default now(),
   updated_at timestamptz default now(),

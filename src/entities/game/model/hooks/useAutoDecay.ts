@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import type { GameAction } from '@shared/types';
+import { useAtomValue, useSetAtom } from 'jotai';
 import {
   HUNGER_DECAY_PER_MINUTE,
   SLEEP_START_HOUR,
@@ -9,6 +9,12 @@ import {
   HEART_DECAY_WHEN_SICK,
   WAKE_UP_GRACE_MS,
 } from '@shared/constants';
+import {
+  gameAtom,
+  isPlayingAtom,
+  isSickAtom,
+  wokeUpAtAtom,
+} from '../store';
 
 function isSleepTime(): boolean {
   const hour = new Date().getHours();
@@ -21,13 +27,12 @@ function shouldBeSleeping(wokeUpAt: number | null, now: number): boolean {
   return now - wokeUpAt > WAKE_UP_GRACE_MS;
 }
 
-export function useAutoDecay(
-  isPlaying: boolean,
-  isSick: boolean,
-  wokeUpAt: number | null,
-  dispatch: React.Dispatch<GameAction>,
-) {
-  // 배고픔 감소 + 수면 체크 + 사망 체크 (10초마다)
+export function useAutoDecay() {
+  const isPlaying = useAtomValue(isPlayingAtom);
+  const isSick = useAtomValue(isSickAtom);
+  const wokeUpAt = useAtomValue(wokeUpAtAtom);
+  const dispatch = useSetAtom(gameAtom);
+
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -44,7 +49,6 @@ export function useAutoDecay(
     return () => clearInterval(interval);
   }, [isPlaying, wokeUpAt, dispatch]);
 
-  // 아플 때 행복도 감소 (10초마다)
   useEffect(() => {
     if (!isPlaying || !isSick) return;
 

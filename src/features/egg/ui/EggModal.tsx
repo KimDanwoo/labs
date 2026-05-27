@@ -1,22 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { CharacterId } from '@shared/types';
+import { useAtomValue } from 'jotai';
 import { CHARACTERS } from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
-import { EGG_DISPLAY_MS, EGG_HATCHING_MS } from '../constants';
-import type { EggPhase } from '../types';
+import {
+  eggReadyCharacterIdAtom,
+  isAllUnlockedAtom,
+  useGameActions,
+} from '@entities/game';
+import { EGG_DISPLAY_MS, EGG_HATCHING_MS } from '../model';
+import type { EggPhase } from '../model';
 
-type EggModalProps = {
-  characterId: CharacterId;
-  isAllUnlocked: boolean;
-  onCollect: () => void;
-  onClose: () => void;
-};
+export default function EggModal() {
+  const characterId = useAtomValue(eggReadyCharacterIdAtom);
+  const isAllUnlocked = useAtomValue(isAllUnlockedAtom);
+  const { collectEgg, closeModal } = useGameActions();
 
-export default function EggModal({ characterId, isAllUnlocked, onCollect, onClose }: EggModalProps) {
   const [phase, setPhase] = useState<EggPhase>('egg');
-  const character = CHARACTERS[characterId];
 
   useEffect(() => {
     if (phase === 'egg') {
@@ -29,16 +30,18 @@ export default function EggModal({ characterId, isAllUnlocked, onCollect, onClos
     }
   }, [phase]);
 
+  if (!characterId) return null;
+  const character = CHARACTERS[characterId];
+
   const handleCollect = () => {
-    onCollect();
-    onClose();
+    collectEgg();
+    closeModal();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 modal-overlay" />
       <div className="relative w-full max-w-sm modal-content p-8 mx-4 text-center space-y-6 animate-scale-in">
-
         {phase === 'egg' && (
           <>
             <h3 className="text-lg font-bold text-pink-500">알을 발견했어요!</h3>

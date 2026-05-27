@@ -66,8 +66,12 @@ export type GameState = {
   sickSince: number | null;
   unlockedCharacters: CharacterId[];
   levelUpMessage: string | null;
+  feedingMessage: string | null;
   eggReadyCharacterId: CharacterId | null;
   pendingPoops: number[];
+  lastMeetingAt: number | null;
+  meetingsToday: number;
+  meetingDay: string | null;
 };
 
 export type GameAction =
@@ -79,6 +83,12 @@ export type GameAction =
   | { type: 'DECAY_HUNGER'; amount: number }
   | { type: 'DECAY_HEARTS'; amount: number }
   | { type: 'ADD_HEARTS'; amount: number }
+  | {
+      type: 'COMPLETE_MEETING';
+      hearts: number;
+      coins: number;
+      day: string;
+    }
   | { type: 'ADD_COINS'; amount: number }
   | { type: 'ADD_EXP'; amount: number }
   | { type: 'BUY_FOOD'; foodId: FoodId }
@@ -88,6 +98,7 @@ export type GameAction =
   | { type: 'MINIGAME_REWARD'; correctCount: number }
   | { type: 'COLLECT_EGG' }
   | { type: 'DISMISS_LEVEL_UP' }
+  | { type: 'DISMISS_FEEDING_MESSAGE' }
   | { type: 'SET_SLEEPING'; isSleeping: boolean }
   | { type: 'WAKE_UP' }
   | { type: 'PROCESS_OFFLINE'; now: number }
