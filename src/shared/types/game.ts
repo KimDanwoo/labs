@@ -72,6 +72,8 @@ export type GameState = {
   lastMeetingAt: number | null;
   meetingsToday: number;
   meetingDay: string | null;
+  minigamesToday: number;
+  minigameDay: string | null;
 };
 
 export type GameAction =
@@ -95,7 +97,7 @@ export type GameAction =
   | { type: 'EXCHANGE_HEARTS'; amount: number }
   | { type: 'GET_SICK' }
   | { type: 'GIVE_MEDICINE' }
-  | { type: 'MINIGAME_REWARD'; correctCount: number }
+  | { type: 'MINIGAME_REWARD'; correctCount: number; day: string }
   | { type: 'COLLECT_EGG' }
   | { type: 'DISMISS_LEVEL_UP' }
   | { type: 'DISMISS_FEEDING_MESSAGE' }

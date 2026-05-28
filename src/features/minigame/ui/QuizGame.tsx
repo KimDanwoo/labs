@@ -1,172 +1,154 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import {
-  MINIGAME_COIN_PER_CORRECT,
-  MINIGAME_HEART_PER_CORRECT,
-} from '@shared/constants';
+import { useAtomValue } from 'jotai';
+import { MINIGAME_COIN_PER_CORRECT, MINIGAME_HEART_PER_CORRECT } from '@shared/constants';
 import { CHARACTERS } from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
-import { useGameActions } from '@entities/game';
+import { characterIdAtom, useGameActions } from '@entities/game';
 import { pickQuizQuestions, QUIZ_ROUNDS } from '../model';
 import type { QuizPhase } from '../model';
 
-const FEEDBACK_MS = 1400;
+const PICK_DELAY_MS = 350;
 
 type QuizGameProps = {
-  onExitToMenu: () => void;
+	onExitToMenu: () => void;
 };
 
+function todayKey(): string {
+	const d = new Date();
+	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 export default function QuizGame({ onExitToMenu }: QuizGameProps) {
-  const { minigameReward, closeModal } = useGameActions();
-  const [phase, setPhase] = useState<QuizPhase>('ready');
-  const [roundIdx, setRoundIdx] = useState(0);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [picked, setPicked] = useState<number | null>(null);
+	const myCharacterId = useAtomValue(characterIdAtom);
+	const { minigameReward, closeModal } = useGameActions();
+	const [phase, setPhase] = useState<QuizPhase>('ready');
+	const [roundIdx, setRoundIdx] = useState(0);
+	const [correctCount, setCorrectCount] = useState(0);
+	const [picked, setPicked] = useState<number | null>(null);
 
-  const questions = useMemo(() => pickQuizQuestions(QUIZ_ROUNDS), []);
-  const current = questions[roundIdx];
-  const isCorrect = picked !== null && picked === current?.correctIndex;
+	const questions = useMemo(() => pickQuizQuestions(QUIZ_ROUNDS, myCharacterId), [myCharacterId]);
+	const current = questions[roundIdx];
+	const myCharacter = myCharacterId ? CHARACTERS[myCharacterId] : null;
 
-  const handlePick = (index: number) => {
-    if (picked !== null) return;
-    setPicked(index);
-    const correct = index === current.correctIndex;
-    if (correct) setCorrectCount((c) => c + 1);
+	const handlePick = (index: number) => {
+		if (picked !== null) return;
+		setPicked(index);
+		const correct = index === current.correctIndex;
+		if (correct) setCorrectCount((c) => c + 1);
 
-    setTimeout(() => {
-      setPicked(null);
-      if (roundIdx + 1 >= QUIZ_ROUNDS) {
-        setPhase('result');
-      } else {
-        setRoundIdx((i) => i + 1);
-      }
-    }, FEEDBACK_MS);
-  };
+		setTimeout(() => {
+			setPicked(null);
+			if (roundIdx + 1 >= QUIZ_ROUNDS) {
+				setPhase('result');
+			} else {
+				setRoundIdx((i) => i + 1);
+			}
+		}, PICK_DELAY_MS);
+	};
 
-  const handleFinish = () => {
-    minigameReward(correctCount);
-    closeModal();
-  };
+	const handleFinish = () => {
+		minigameReward({ correctCount, day: todayKey() });
+		closeModal();
+	};
 
-  if (phase === 'ready') {
-    return (
-      <div className="space-y-5 py-4">
-        <h3 className="text-lg font-bold text-gray-700">PLAVE 취향 퀴즈</h3>
-        <div className="text-5xl py-2">💡</div>
-        <p className="text-sm text-gray-400 leading-relaxed">
-          PLAVE 멤버들의 진짜 취향을
-          <br />
-          맞춰보세요! 총 {QUIZ_ROUNDS}문제
-        </p>
-        <button
-          onClick={() => setPhase('playing')}
-          className="btn-primary btn-press w-full"
-          style={{ backgroundColor: '#A78BFA' }}
-        >
-          시작!
-        </button>
-        <button
-          onClick={onExitToMenu}
-          className="w-full py-2 text-xs text-gray-400 btn-press"
-        >
-          다른 게임 고르기
-        </button>
-      </div>
-    );
-  }
+	if (phase === 'ready') {
+		return (
+			<div className="space-y-5 py-4">
+				<h3 className="text-lg font-bold text-gray-700">
+					{myCharacter ? `${myCharacter.name} 취향 퀴즈` : 'PLCO 취향 퀴즈'}
+				</h3>
+				{myCharacterId ? (
+					<div className="flex justify-center py-2">
+						<CharacterSprite characterId={myCharacterId} size={72} />
+					</div>
+				) : (
+					<div className="text-5xl py-2">💡</div>
+				)}
+				<p className="text-sm text-gray-400 leading-relaxed">
+					{myCharacter ? `${myCharacter.name}의 진짜 취향을` : 'PLCO 멤버들의 진짜 취향을'}
+					<br />
+					맞춰보세요! 총 {QUIZ_ROUNDS}문제
+				</p>
+				<button
+					onClick={() => setPhase('playing')}
+					className="btn-primary btn-press w-full"
+					style={{ backgroundColor: '#A78BFA' }}
+				>
+					시작!
+				</button>
+				<button onClick={onExitToMenu} className="w-full py-2 text-xs text-gray-400 btn-press">
+					다른 게임 고르기
+				</button>
+			</div>
+		);
+	}
 
-  if (phase === 'playing' && current) {
-    const character = CHARACTERS[current.characterId];
-    return (
-      <div className="space-y-4">
-        <div className="flex justify-between items-center text-xs text-gray-400">
-          <span className="font-bold text-violet-400">
-            {roundIdx + 1} / {QUIZ_ROUNDS}
-          </span>
-          <span>맞춘 문제 {correctCount}</span>
-        </div>
+	if (phase === 'playing' && current) {
+		return (
+			<div className="space-y-4">
+				<div className="flex justify-between items-center text-xs text-gray-400">
+					<span className="font-bold text-violet-400">
+						{roundIdx + 1} / {QUIZ_ROUNDS}
+					</span>
+				</div>
 
-        <div className="flex justify-center">
-          <CharacterSprite characterId={current.characterId} size={64} />
-        </div>
+				<div className="flex justify-center">
+					<CharacterSprite characterId={current.characterId} size={64} />
+				</div>
 
-        <div className="px-4 py-3 rounded-2xl bg-gray-50 text-sm text-gray-700 font-bold min-h-[60px] flex items-center justify-center text-center">
-          {current.question}
-        </div>
+				<div className="px-4 py-3 rounded-2xl bg-gray-50 text-sm text-gray-700 font-bold min-h-[60px] flex items-center justify-center text-center">
+					{current.question}
+				</div>
 
-        <div className="space-y-2">
-          {current.options.map((opt, i) => {
-            const isPicked = picked === i;
-            const isCorrectOption = picked !== null && i === current.correctIndex;
-            const bg = isCorrectOption
-              ? 'bg-green-100 border-green-300 text-green-700'
-              : isPicked
-                ? 'bg-red-100 border-red-300 text-red-600'
-                : 'bg-white border-gray-200 text-gray-700 hover:border-violet-300 hover:bg-violet-50';
+				<div className="space-y-2">
+					{current.options.map((opt, i) => {
+						const isPicked = picked === i;
+						const bg = isPicked
+							? 'bg-violet-100 border-violet-300 text-violet-700'
+							: 'bg-white border-gray-200 text-gray-700 hover:border-violet-300 hover:bg-violet-50';
 
-            return (
-              <button
-                key={i}
-                onClick={() => handlePick(i)}
-                disabled={picked !== null}
-                className={`w-full px-4 py-3 rounded-xl border text-sm font-bold btn-press transition-colors text-left ${bg}`}
-              >
-                {opt}
-              </button>
-            );
-          })}
-        </div>
+						return (
+							<button
+								key={i}
+								onClick={() => handlePick(i)}
+								disabled={picked !== null}
+								className={`w-full px-4 py-3 rounded-xl border text-sm font-bold btn-press transition-colors text-left ${bg}`}
+							>
+								{opt}
+							</button>
+						);
+					})}
+				</div>
+			</div>
+		);
+	}
 
-        {picked !== null && (
-          <div
-            className={`px-4 py-2 rounded-xl text-xs font-bold animate-fade-in-up ${
-              isCorrect
-                ? 'bg-green-50 text-green-600'
-                : 'bg-rose-50 text-rose-600'
-            }`}
-          >
-            {isCorrect ? '정답!' : '땡!'} {character.name}: {current.fact}
-          </div>
-        )}
-      </div>
-    );
-  }
+	if (phase === 'result') {
+		const allCorrect = correctCount === QUIZ_ROUNDS;
+		return (
+			<div className="space-y-5 py-4">
+				<div className="text-5xl">{allCorrect ? '🎉' : correctCount >= 2 ? '😊' : '😅'}</div>
+				<h3 className="text-xl font-bold text-gray-700">
+					{correctCount} / {QUIZ_ROUNDS} 맞췄어요!
+				</h3>
+				<div className="flex justify-center gap-6">
+					<div className="text-center">
+						<div className="text-lg font-bold text-amber-500">🪙 +{correctCount * MINIGAME_COIN_PER_CORRECT}</div>
+						<div className="text-[10px] text-gray-400">코인</div>
+					</div>
+					<div className="text-center">
+						<div className="text-lg font-bold text-pink-400">💕 +{correctCount * MINIGAME_HEART_PER_CORRECT}</div>
+						<div className="text-[10px] text-gray-400">행복도</div>
+					</div>
+				</div>
+				<button onClick={handleFinish} className="btn-primary btn-press w-full" style={{ backgroundColor: '#A78BFA' }}>
+					받기!
+				</button>
+			</div>
+		);
+	}
 
-  if (phase === 'result') {
-    const allCorrect = correctCount === QUIZ_ROUNDS;
-    return (
-      <div className="space-y-5 py-4">
-        <div className="text-5xl">
-          {allCorrect ? '🎉' : correctCount >= 2 ? '😊' : '😅'}
-        </div>
-        <h3 className="text-xl font-bold text-gray-700">
-          {correctCount} / {QUIZ_ROUNDS} 맞췄어요!
-        </h3>
-        <div className="flex justify-center gap-6">
-          <div className="text-center">
-            <div className="text-lg font-bold text-amber-500">
-              🪙 +{correctCount * MINIGAME_COIN_PER_CORRECT}
-            </div>
-            <div className="text-[10px] text-gray-400">코인</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-pink-400">
-              💕 +{correctCount * MINIGAME_HEART_PER_CORRECT}
-            </div>
-            <div className="text-[10px] text-gray-400">행복도</div>
-          </div>
-        </div>
-        <button
-          onClick={handleFinish}
-          className="btn-primary btn-press w-full"
-          style={{ backgroundColor: '#A78BFA' }}
-        >
-          받기!
-        </button>
-      </div>
-    );
-  }
-
-  return null;
+	return null;
 }

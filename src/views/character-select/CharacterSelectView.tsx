@@ -51,7 +51,7 @@ export default function CharacterSelectView() {
 							className="absolute inset-0 rounded-full blur-2xl opacity-25 scale-[2]"
 							style={{ backgroundColor: current.color }}
 						/>
-						<CharacterSprite characterId={current.id} size={120} />
+						<CharacterSprite characterId={current.id} size={120} direction="down" />
 					</div>
 
 					<div className="text-center">
@@ -114,7 +114,7 @@ export default function CharacterSelectView() {
 			<div className="relative flex flex-col items-center gap-6 sm:gap-8 w-full">
 				<div className="text-center space-y-1">
 					<h1 className="text-3xl sm:text-4xl font-black tracking-tight bg-linear-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
-						PLAVE GOTCHI
+						PLCO GOTCHI
 					</h1>
 					<p className="text-xs sm:text-sm text-gray-400">함께할 친구를 골라주세요</p>
 				</div>
@@ -152,7 +152,7 @@ export default function CharacterSelectView() {
 						/>
 
 						<div className="relative">
-							<CharacterSprite characterId={current.id} size={110} />
+							<CharacterSprite characterId={current.id} size={110} direction="down" />
 						</div>
 
 						<div className="text-center space-y-1">
