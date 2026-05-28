@@ -29,6 +29,8 @@ export const eggReadyCharacterIdAtom = selectAtom(
 export const lastMeetingAtAtom = selectAtom(gameAtom, (s) => s.lastMeetingAt);
 export const meetingsTodayAtom = selectAtom(gameAtom, (s) => s.meetingsToday);
 export const meetingDayAtom = selectAtom(gameAtom, (s) => s.meetingDay);
+export const minigamesTodayAtom = selectAtom(gameAtom, (s) => s.minigamesToday);
+export const minigameDayAtom = selectAtom(gameAtom, (s) => s.minigameDay);
 export const levelUpMessageAtom = selectAtom(gameAtom, (s) => s.levelUpMessage);
 export const feedingMessageAtom = selectAtom(gameAtom, (s) => s.feedingMessage);
 export const unlockedCharactersAtom = selectAtom(

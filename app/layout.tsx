@@ -10,8 +10,8 @@ const gowunDodum = Gowun_Dodum({
 });
 
 export const metadata: Metadata = {
-  title: "플레이브 다마고치",
-  description: "플레이브 캐릭터를 키워보세요!",
+  title: "PLCO",
+  description: "PLCO 캐릭터를 키워보세요!",
 };
 
 export default function RootLayout({

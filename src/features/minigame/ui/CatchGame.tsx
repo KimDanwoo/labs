@@ -30,6 +30,11 @@ type CatchGameProps = {
   onExitToMenu: () => void;
 };
 
+function todayKey(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 export default function CatchGame({ onExitToMenu }: CatchGameProps) {
   const { minigameReward, closeModal } = useGameActions();
 
@@ -194,7 +199,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
   }, []);
 
   const handleFinish = useCallback(() => {
-    minigameReward(score);
+    minigameReward({ correctCount: score, day: todayKey() });
     closeModal();
   }, [score, minigameReward, closeModal]);
 
