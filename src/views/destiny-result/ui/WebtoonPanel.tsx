@@ -23,6 +23,8 @@ export function WebtoonPanel({
         className="w-full h-auto block"
         draggable={false}
         preload={isFirst}
+        sizes="(max-width: 480px) 100vw, 450px"
+        unoptimized
       />
       {children && (
         <div className="absolute inset-0 pointer-events-none">{children}</div>
