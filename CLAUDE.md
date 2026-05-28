@@ -1,4 +1,4 @@
-# 플레이브 다마고치 프로젝트
+# PLCO 프로젝트
 
 > **Next.js 주의**: 학습 데이터와 다른 breaking changes가 있을 수 있음. 코드 작성 전 `node_modules/next/dist/docs/` 확인.
 

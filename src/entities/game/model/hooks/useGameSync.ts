@@ -7,7 +7,7 @@ import { INITIAL_GAME_STATE } from '@shared/constants';
 import { supabase } from '@shared/lib';
 import { gameAtom, isLoadedAtom } from '../store';
 
-const STORAGE_KEY = 'plave-damagochi-state';
+const STORAGE_KEY = 'plco-damagochi-state';
 const SYNC_DEBOUNCE_MS = 3000;
 
 function normalize(loaded: Partial<GameState>): GameState {

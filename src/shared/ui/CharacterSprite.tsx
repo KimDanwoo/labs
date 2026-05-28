@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import type { CharacterId } from '@shared/types';
 import { SPRITE_MAP, FRAME_SIZE, SHEET_SIZE, WALK_FPS, TOTAL_FRAMES, LEVEL_SCALE_PER_LEVEL } from '@shared/constants';
 
+type SpriteDirection = 'up' | 'down' | 'left' | 'right';
+
 type CharacterSpriteProps = {
   characterId: CharacterId;
   size?: number;
-  direction?: 'left' | 'right';
+  direction?: SpriteDirection;
   isMoving?: boolean;
   isSleeping?: boolean;
   isDrowsy?: boolean;
@@ -16,9 +18,12 @@ type CharacterSpriteProps = {
   level?: number;
 };
 
-function getRow(direction: 'left' | 'right'): number {
-  return direction === 'left' ? 2 : 3;
-}
+const DIRECTION_ROW: Record<SpriteDirection, number> = {
+  up: 0,
+  down: 1,
+  left: 2,
+  right: 3,
+};
 
 export default function CharacterSprite({
   characterId,
@@ -45,8 +50,8 @@ export default function CharacterSprite({
   const scale = 1 + (level - 1) * LEVEL_SCALE_PER_LEVEL;
   const actualSize = size * scale;
 
-  // idle일 때는 앞모습(row 1), 이동 중에는 방향에 따라 좌/우
-  const row = isMoving ? getRow(direction) : 1;
+  // idle일 때는 앞모습(row 1), 이동 중에는 direction에 해당하는 row 사용
+  const row = isMoving ? DIRECTION_ROW[direction] : 1;
   const col = isWalking ? frame : 0;
 
   const bgX = -(col * FRAME_SIZE);

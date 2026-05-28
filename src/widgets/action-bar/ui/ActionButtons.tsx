@@ -9,6 +9,7 @@ import {
   coinsAtom,
   useGameActions,
   useMeetingStatus,
+  useMinigameStatus,
 } from '@entities/game';
 
 type ActionBtnProps = {
@@ -55,6 +56,7 @@ export default function ActionButtons() {
   const coins = useAtomValue(coinsAtom);
   const { cleanAllPoop, giveMedicine, openModal } = useGameActions();
   const meeting = useMeetingStatus();
+  const minigame = useMinigameStatus();
 
   const poopCount = poops.length;
   const canAffordMedicine = coins >= MEDICINE_PRICE;
@@ -64,6 +66,10 @@ export default function ActionButtons() {
     : meeting.reachedDailyLimit
       ? '⛔'
       : `${meeting.dailyLimit - meeting.meetingsToday}`;
+
+  const minigameBadge = minigame.reachedDailyLimit
+    ? '⛔'
+    : `${minigame.dailyLimit - minigame.minigamesToday}`;
 
   return (
     <div className="flex justify-center gap-1.5 sm:gap-2 flex-wrap">
@@ -75,7 +81,13 @@ export default function ActionButtons() {
         badge={poopCount}
         disabled={poopCount === 0}
       />
-      <ActionBtn icon="🎮" label="놀기" onClick={() => openModal('minigame')} />
+      <ActionBtn
+        icon="🎮"
+        label="놀기"
+        onClick={() => openModal('minigame')}
+        badge={minigameBadge}
+        disabled={!minigame.canPlay}
+      />
       <ActionBtn
         icon="💌"
         label="만남"
