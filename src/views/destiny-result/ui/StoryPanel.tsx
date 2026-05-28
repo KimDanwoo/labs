@@ -77,6 +77,8 @@ export function StoryPanel({ variant, texts = [], isFirst }: StoryPanelProps) {
         className="w-full h-auto block"
         draggable={false}
         preload={isFirst}
+        sizes="(max-width: 480px) 100vw, 450px"
+        unoptimized
       />
       {config.slots.length > 0 && (
         <div className="absolute inset-0 pointer-events-none">
