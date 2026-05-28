@@ -98,6 +98,7 @@ export function SajuChart({
   const fullName = form.name || '회원';
   const yearStemKr = STEM_KR[fourPillars.year.stem];
   const yearBranchKr = BRANCH_KR[fourPillars.year.branch];
+  const hourBranchKr = BRANCH_KR[fourPillars.hour.branch];
 
   const ROW_STYLE = 'grid grid-cols-[2.8rem_1fr_1fr_1fr_1fr]';
   const CELL = 'py-2.5 flex items-center justify-center';
@@ -115,8 +116,7 @@ export function SajuChart({
         <div className="text-xs text-[#999] mt-1.5 leading-relaxed">
           <p>
             양 {form.year}.{String(form.month).padStart(2, '0')}.
-            {String(form.day).padStart(2, '0')} {form.hour}:
-            {String(form.minute).padStart(2, '0')}{' '}
+            {String(form.day).padStart(2, '0')} {hourBranchKr}시{' '}
             {form.gender === 'male' ? '남' : '여'}
             {form.region ? ` · ${form.region}` : ''}
           </p>
