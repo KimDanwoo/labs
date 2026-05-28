@@ -53,7 +53,7 @@ export default function MiniGameModal() {
                   <span className="text-3xl">💡</span>
                   <div>
                     <div className="text-sm font-bold text-violet-600">
-                      PLAVE 취향 퀴즈
+                      PLCO 취향 퀴즈
                     </div>
                     <div className="text-[11px] text-gray-500">
                       멤버 취향 3문제 맞히기

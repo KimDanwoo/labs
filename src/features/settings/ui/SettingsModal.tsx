@@ -86,7 +86,7 @@ export default function SettingsModal() {
           </div>
 
           <div className="surface rounded-2xl p-4">
-            <div className="text-sm font-bold text-gray-700">PLAVE GOTCHI</div>
+            <div className="text-sm font-bold text-gray-700">PLCO GOTCHI</div>
             <div className="text-xs text-gray-400 mt-1">v1.0.0</div>
           </div>
         </div>

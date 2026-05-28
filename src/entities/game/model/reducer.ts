@@ -331,7 +331,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'MINIGAME_REWARD': {
-      const { correctCount } = action;
+      const { correctCount, day } = action;
       const coinsEarned = correctCount * MINIGAME_COIN_PER_CORRECT;
       const heartsEarned = correctCount * MINIGAME_HEART_PER_CORRECT;
       const expEarned = correctCount * MINIGAME_EXP_PER_CORRECT;
@@ -340,12 +340,17 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const levelUp = applyLevelUp(state, newExp);
       const eggReady = checkEggReady({ ...state, ...levelUp }, newHearts);
 
+      const sameDay = state.minigameDay === day;
+      const minigamesToday = sameDay ? state.minigamesToday + 1 : 1;
+
       return {
         ...state,
         ...levelUp,
         coins: levelUp.coins + coinsEarned,
         hearts: newHearts,
         eggReadyCharacterId: eggReady,
+        minigamesToday,
+        minigameDay: day,
         lastUpdated: now,
       };
     }

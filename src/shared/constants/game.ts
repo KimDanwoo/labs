@@ -115,6 +115,7 @@ export const MINIGAME_ROUNDS = 5;
 export const MINIGAME_COIN_PER_CORRECT = 3;
 export const MINIGAME_HEART_PER_CORRECT = 2;
 export const MINIGAME_EXP_PER_CORRECT = 4;
+export const MINIGAME_DAILY_LIMIT = 5;
 
 // UI 타이밍
 export const LEVEL_UP_TOAST_DURATION = 3000;
@@ -163,4 +164,6 @@ export const INITIAL_GAME_STATE: GameState = {
   lastMeetingAt: null,
   meetingsToday: 0,
   meetingDay: null,
+  minigamesToday: 0,
+  minigameDay: null,
 };
