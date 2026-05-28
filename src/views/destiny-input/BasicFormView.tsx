@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -48,16 +47,10 @@ export function BasicFormView() {
         ←
       </Link>
 
-      <div className="relative flex-1 flex flex-col overflow-hidden">
-        <Image
-          src="/form_step_1.webp"
-          alt="사주 입력 배경"
-          fill
-          className="object-cover"
-          preload
-          sizes="100vw"
-          unoptimized
-        />
+      <div
+        className="relative flex-1 flex flex-col overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: 'url(/form_step_1.webp)' }}
+      >
         <div className="relative z-10 flex-1 flex flex-col justify-end overflow-y-auto">
           <div className="px-5 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))] bg-background/85 backdrop-blur-sm rounded-t-3xl">
             <div className="text-center mb-5">
