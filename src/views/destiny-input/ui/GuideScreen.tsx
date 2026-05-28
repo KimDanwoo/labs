@@ -22,6 +22,8 @@ export function GuideScreen({
         fill
         className="object-cover"
         preload
+        sizes="100vw"
+        unoptimized
       />
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-background pointer-events-none" />
 

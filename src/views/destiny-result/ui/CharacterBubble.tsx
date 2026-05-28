@@ -16,6 +16,8 @@ export function CharacterBubble({ imageSrc, text }: CharacterBubbleProps) {
           height={360}
           className="w-full h-auto block"
           draggable={false}
+          sizes="(max-width: 480px) 85vw, 360px"
+          unoptimized
         />
         <div className="absolute top-[18%] left-[7%] right-[4%] bottom-[12%] flex items-center justify-center pointer-events-none overflow-hidden">
           <p className="text-[#1a1a2e] text-[15px] leading-snug whitespace-pre-line text-center font-medium">
