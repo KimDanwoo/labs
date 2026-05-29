@@ -28,10 +28,7 @@ export default function FeedModal() {
             return (
               <button
                 key={food.id}
-                onClick={() => {
-                  feed(food.id);
-                  closeModal();
-                }}
+                onClick={() => feed(food.id)}
                 disabled={count <= 0}
                 className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 btn-press disabled:opacity-30"
               >
