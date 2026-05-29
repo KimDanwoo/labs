@@ -14,8 +14,8 @@ import {
   isSickAtom,
   isDangerAtom,
   roomTypeAtom,
-  useGameActions,
-} from '@entities/game';
+} from '@entities/game/model/store';
+import { useGameActions } from '@entities/game/model/hooks';
 import { ROOM_BACKGROUNDS } from '../constants';
 
 const JUMP_DURATION_MS = 450;
@@ -78,7 +78,8 @@ export default function Room() {
         <button
           key={poop.id}
           onClick={() => cleanPoop(poop.id)}
-          className="absolute poop-appear cursor-pointer text-2xl hover:scale-125 transition-transform z-10 drop-shadow-sm"
+          aria-label="똥 치우기"
+          className="absolute poop-appear cursor-pointer text-sm blur-[3px] hover:blur-none hover:scale-125 transition-all duration-200 z-10 drop-shadow-sm"
           style={{ left: `${poop.x}%`, top: `${poop.y}%` }}
         >
           💩

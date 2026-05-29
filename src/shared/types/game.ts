@@ -1,3 +1,9 @@
+import {
+  GAME_STATUS,
+  MODAL_TYPE,
+  ROOM_TYPE,
+} from '@shared/constants/game';
+
 export type CharacterId = 'yeko' | 'ako' | 'bamko' | 'eunko' | 'hako';
 
 export type CharacterInfo = {
@@ -39,11 +45,13 @@ export type LevelReward = {
   message: string;
 };
 
-export type RoomType = 'living' | 'bedroom' | 'bathroom' | 'outdoor';
+export type RoomType = (typeof ROOM_TYPE)[keyof typeof ROOM_TYPE];
 
-export type ModalType = 'feed' | 'shop' | 'meeting' | 'minigame' | 'egg' | 'settings' | null;
+export type ModalType =
+  | (typeof MODAL_TYPE)[keyof typeof MODAL_TYPE]
+  | null;
 
-export type GameStatus = 'selecting' | 'playing' | 'dead' | 'meeting';
+export type GameStatus = (typeof GAME_STATUS)[keyof typeof GAME_STATUS];
 
 export type GameState = {
   status: GameStatus;
@@ -78,6 +86,7 @@ export type GameState = {
 
 export type GameAction =
   | { type: 'SELECT_CHARACTER'; characterId: CharacterId; nickname: string }
+  | { type: 'SWITCH_CHARACTER'; characterId: CharacterId; nickname: string }
   | { type: 'FEED'; foodId: FoodId }
   | { type: 'CLEAN_POOP'; poopId: string }
   | { type: 'CLEAN_ALL_POOP' }

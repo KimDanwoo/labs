@@ -2,7 +2,8 @@
 
 import { useAtomValue } from 'jotai';
 import { CharacterSprite } from '@shared/ui';
-import { characterIdAtom, nicknameAtom, useGameActions } from '@entities/game';
+import { characterIdAtom, nicknameAtom } from '@entities/game/model/store';
+import { useGameActions } from '@entities/game/model/hooks';
 
 export default function DeathScreen() {
   const characterId = useAtomValue(characterIdAtom);

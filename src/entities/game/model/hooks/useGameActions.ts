@@ -29,6 +29,8 @@ export function useGameActions() {
         dispatch({ type: 'DISMISS_FEEDING_MESSAGE' }),
       selectCharacter: (characterId: CharacterId, nickname: string) =>
         dispatch({ type: 'SELECT_CHARACTER', characterId, nickname }),
+      switchCharacter: (characterId: CharacterId, nickname: string) =>
+        dispatch({ type: 'SWITCH_CHARACTER', characterId, nickname }),
       reset: () => dispatch({ type: 'RESET' }),
       wakeUp: () => dispatch({ type: 'WAKE_UP' }),
       openModal: (modal: ModalType) => setModal(modal),

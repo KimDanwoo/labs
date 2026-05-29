@@ -5,9 +5,10 @@ import { useAtomValue } from 'jotai';
 import { MINIGAME_COIN_PER_CORRECT, MINIGAME_HEART_PER_CORRECT } from '@shared/constants';
 import { CHARACTERS } from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
-import { characterIdAtom, useGameActions } from '@entities/game';
-import { pickQuizQuestions, QUIZ_ROUNDS } from '../model';
-import type { QuizPhase } from '../model';
+import { characterIdAtom } from '@entities/game/model/store';
+import { useGameActions } from '@entities/game/model/hooks';
+import { pickQuizQuestions, QUIZ_PHASE, QUIZ_ROUNDS } from '../model/constants';
+import type { QuizPhase } from '../model/types';
 
 const PICK_DELAY_MS = 350;
 
@@ -23,7 +24,7 @@ function todayKey(): string {
 export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 	const myCharacterId = useAtomValue(characterIdAtom);
 	const { minigameReward, closeModal } = useGameActions();
-	const [phase, setPhase] = useState<QuizPhase>('ready');
+	const [phase, setPhase] = useState<QuizPhase>(QUIZ_PHASE.READY);
 	const [roundIdx, setRoundIdx] = useState(0);
 	const [correctCount, setCorrectCount] = useState(0);
 	const [picked, setPicked] = useState<number | null>(null);
@@ -41,7 +42,7 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 		setTimeout(() => {
 			setPicked(null);
 			if (roundIdx + 1 >= QUIZ_ROUNDS) {
-				setPhase('result');
+				setPhase(QUIZ_PHASE.RESULT);
 			} else {
 				setRoundIdx((i) => i + 1);
 			}
@@ -53,7 +54,7 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 		closeModal();
 	};
 
-	if (phase === 'ready') {
+	if (phase === QUIZ_PHASE.READY) {
 		return (
 			<div className="space-y-5 py-4">
 				<h3 className="text-lg font-bold text-gray-700">
@@ -72,7 +73,7 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 					맞춰보세요! 총 {QUIZ_ROUNDS}문제
 				</p>
 				<button
-					onClick={() => setPhase('playing')}
+					onClick={() => setPhase(QUIZ_PHASE.PLAYING)}
 					className="btn-primary btn-press w-full"
 					style={{ backgroundColor: '#A78BFA' }}
 				>
@@ -85,7 +86,7 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 		);
 	}
 
-	if (phase === 'playing' && current) {
+	if (phase === QUIZ_PHASE.PLAYING && current) {
 		return (
 			<div className="space-y-4">
 				<div className="flex justify-between items-center text-xs text-gray-400">
@@ -125,7 +126,7 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 		);
 	}
 
-	if (phase === 'result') {
+	if (phase === QUIZ_PHASE.RESULT) {
 		const allCorrect = correctCount === QUIZ_ROUNDS;
 		return (
 			<div className="space-y-5 py-4">

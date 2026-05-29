@@ -1,4 +1,5 @@
 import type { CharacterId } from '@shared/types';
+import { QUIZ_PHASE } from '../constants/quiz';
 
 export type QuizQuestion = {
   id: string;
@@ -9,4 +10,4 @@ export type QuizQuestion = {
   fact: string;
 };
 
-export type QuizPhase = 'ready' | 'playing' | 'result';
+export type QuizPhase = (typeof QUIZ_PHASE)[keyof typeof QUIZ_PHASE];

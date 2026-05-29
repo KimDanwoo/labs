@@ -137,8 +137,31 @@ export const LEVEL_REWARDS: Record<number, LevelReward> = {
 
 export const ALL_CHARACTER_IDS: CharacterId[] = ['yeko', 'ako', 'bamko', 'eunko', 'hako'];
 
+export const GAME_STATUS = {
+  SELECTING: 'selecting',
+  PLAYING: 'playing',
+  DEAD: 'dead',
+  MEETING: 'meeting',
+} as const;
+
+export const MODAL_TYPE = {
+  FEED: 'feed',
+  SHOP: 'shop',
+  MEETING: 'meeting',
+  MINIGAME: 'minigame',
+  EGG: 'egg',
+  SETTINGS: 'settings',
+} as const;
+
+export const ROOM_TYPE = {
+  LIVING: 'living',
+  BEDROOM: 'bedroom',
+  BATHROOM: 'bathroom',
+  OUTDOOR: 'outdoor',
+} as const;
+
 export const INITIAL_GAME_STATE: GameState = {
-  status: 'selecting',
+  status: GAME_STATUS.SELECTING,
   characterId: null,
   nickname: '',
   level: 1,

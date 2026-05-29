@@ -12,17 +12,21 @@ import {
   COINS_PER_MEETING,
 } from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
-import { characterIdAtom, useGameActions } from '@entities/game';
+import { characterIdAtom } from '@entities/game/model/store';
+import { useGameActions } from '@entities/game/model/hooks';
 import {
   MEETING_CHARACTERS,
   MEETING_RANDOM_NAMES,
   MEETING_MATCHING_MS,
   MEETING_FOUND_MS,
+  MEETING_PHASE,
   pickScenesForCharacter,
-} from '../model';
-import type { ConversationOption, ConversationOutcome } from '../model';
-
-type Phase = 'searching' | 'found' | 'chat' | 'result';
+} from '../model/constants';
+import type {
+  ConversationOption,
+  ConversationOutcome,
+  MeetingPhase,
+} from '../model/types';
 
 function rewardOf(outcome: ConversationOutcome): number {
   if (outcome === 'good') return MEETING_REWARD_GOOD;
@@ -39,7 +43,7 @@ export default function MeetingModal() {
   const myCharacterId = useAtomValue(characterIdAtom);
   const { completeMeeting, closeModal } = useGameActions();
 
-  const [phase, setPhase] = useState<Phase>('searching');
+  const [phase, setPhase] = useState<MeetingPhase>(MEETING_PHASE.SEARCHING);
   const [metCharacter, setMetCharacter] = useState<CharacterId | null>(null);
   const [metName, setMetName] = useState('');
   const [roundIdx, setRoundIdx] = useState(0);
@@ -64,7 +68,7 @@ export default function MeetingModal() {
         ];
       setMetCharacter(randomChar);
       setMetName(randomName);
-      setPhase('found');
+      setPhase(MEETING_PHASE.FOUND);
     }, MEETING_MATCHING_MS);
 
     return () => clearTimeout(timer);
@@ -72,7 +76,7 @@ export default function MeetingModal() {
 
   useEffect(() => {
     if (phase !== 'found') return;
-    const timer = setTimeout(() => setPhase('chat'), MEETING_FOUND_MS);
+    const timer = setTimeout(() => setPhase(MEETING_PHASE.CHAT), MEETING_FOUND_MS);
     return () => clearTimeout(timer);
   }, [phase]);
 
@@ -84,7 +88,7 @@ export default function MeetingModal() {
     setTimeout(() => {
       setLastReaction(null);
       if (newOutcomes.length >= MEETING_ROUNDS) {
-        setPhase('result');
+        setPhase(MEETING_PHASE.RESULT);
       } else {
         setRoundIdx((i) => i + 1);
       }
@@ -112,10 +116,10 @@ export default function MeetingModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
         className="absolute inset-0 modal-overlay"
-        onClick={phase === 'result' ? handleFinish : undefined}
+        onClick={phase === MEETING_PHASE.RESULT ? handleFinish : undefined}
       />
       <div className="relative w-full max-w-sm modal-content p-6 mx-4 text-center space-y-5 animate-scale-in">
-        {phase === 'searching' && (
+        {phase === MEETING_PHASE.SEARCHING && (
           <>
             <h3 className="text-lg font-bold text-gray-700">만남의 방</h3>
             <div className="text-4xl animate-bounce">💌</div>
@@ -132,7 +136,7 @@ export default function MeetingModal() {
           </>
         )}
 
-        {phase === 'found' && metCharacter && (
+        {phase === MEETING_PHASE.FOUND && metCharacter && (
           <>
             <h3 className="text-lg font-bold text-pink-500">친구를 만났어요!</h3>
             <div className="flex justify-center items-center gap-6">
@@ -150,7 +154,7 @@ export default function MeetingModal() {
           </>
         )}
 
-        {phase === 'chat' && metCharacter && (
+        {phase === MEETING_PHASE.CHAT && metCharacter && (
           <>
             <div className="flex justify-between items-center text-xs text-gray-400">
               <span className="font-bold text-pink-400">
@@ -210,7 +214,7 @@ export default function MeetingModal() {
           </>
         )}
 
-        {phase === 'result' && metCharacter && (
+        {phase === MEETING_PHASE.RESULT && metCharacter && (
           <>
             <h3
               className={`text-lg font-bold ${isPerfect ? 'text-pink-500' : 'text-gray-700'}`}

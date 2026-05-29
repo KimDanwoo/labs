@@ -31,6 +31,27 @@ views/destiny-input/
 
 **Import 순서**: react/next → 외부 패키지 → @app…@shared → 상대경로
 
+**Import 세그먼트**: 세그먼트 하위에 `ui`인지 `model`인지가 import 경로에서 항상 드러나야 한다. **slice 루트(`@widgets/X`, `@views/X`, `@features/X`, `@entities/X`) 직접 import는 금지**.
+- ui 안의 컴포넌트: `from '@widgets/status-bar/ui'`, `from '@features/feed/ui'`, `from '@shared/ui'`
+- views의 메인 뷰(폴더 루트 파일): 파일명까지 명시 — `from '@views/death/DeathScreen'`, `from '@views/game/GameView'`
+- model 하위: `model/hooks`, `model/store`, `model/constants`, `model/types` 까지 명시
+- `shared/constants`, `shared/types`처럼 leaf 폴더인 경우는 그대로 한 단만 명시한다.
+- slice 루트 `index.ts`(예: `src/widgets/status-bar/index.ts`)와 통합 `model/index.ts`는 만들지 않는다. 통합 barrel이 없어야 슬라이스 루트 import가 컴파일 에러로 막힌다.
+
+**Enum-like 매직 스트링 금지**: status, step, phase, modalType 같은 literal union은 `as const` 객체 상수로 빼고 타입을 거기서 파생한다.
+```ts
+export const GAME_STATUS = { SELECTING: 'selecting', PLAYING: 'playing', DEAD: 'dead' } as const;
+export type GameStatus = (typeof GAME_STATUS)[keyof typeof GAME_STATUS];
+```
+사용처는 `status === GAME_STATUS.DEAD` 처럼 상수 참조만. 비교/세팅 둘 다 매직 리터럴 금지.
+
+## 컴포넌트 분리 원칙
+
+- **부모는 분기·합성, 자식은 구독·실행**: 부모 컴포넌트는 화면 분기와 자식 조합만 담당. 자식은 필요한 atom/액션을 직접 구독/호출한다.
+- **표시-only 컴포넌트는 props만 받음**: 토스트, 카드, 아이콘 등 순수 표시 컴포넌트는 `message`/`icon`/`variant` 같은 표시용 데이터만 props로 받는다. 도메인 atom/액션을 알지 않는다.
+- **Container vs Presentational 분리**: atom 구독·dismiss timer·navigate 같은 부수효과는 컨테이너 컴포넌트, 시각 표현은 presentational 컴포넌트로 나눈다.
+- **재사용 판단으로 레이어 결정**: 여러 view에서 쓸 만하면 `shared/ui/`, 특정 view 전용이면 `views/<view>/ui/`. 무리한 추상화는 피한다.
+
 ## 코드 컨벤션
 
 - ESLint + Prettier (singleQuote, trailingComma: all, printWidth: 80)
@@ -48,6 +69,17 @@ views/destiny-input/
   - dispatch / setState 콜백을 prop으로 넘기지 않는다. 이벤트 핸들러 안에서 직접 action을 호출한다.
 - **prop 허용 케이스**: 진짜 부모-자식 간 표시용 데이터(예: 리스트 item의 `item` 자체, 모달의 `onClose` 등 UI-only state)만 prop으로 전달한다.
 - **로컬 상태**: 한 컴포넌트 내에서만 사용되는 UI 상태(애니메이션 phase 등)는 `useState`/`useReducer` 유지.
+- **View flow state도 atom으로**: 현재 step, pendingSelection 같은 화면 흐름 상태는 view 전용 `model/store/`에 jotai atom으로 두고, 그 view의 모든 자식이 직접 구독해서 변경한다. 부모-자식 사이에 setter 콜백을 prop으로 넘기지 않는다.
+
+## 데이터 동기화
+
+- **충돌 시 자동 머지 우선**: 로컬과 원격(localStorage/supabase) 데이터가 충돌하면 사용자 확인 다이얼로그보다 자연스러운 자동 머지를 우선한다. 예: 슬롯별로 `lastUpdated`가 더 큰 것만 유지, 합집합으로 통합. 자동 머지로 해결 불가능한 진짜 모호한 케이스에만 confirm.
+
+## URL 라우팅
+
+- 페이지/스크린 전환은 URL 기반(App Router)으로. atom으로 화면을 전환하지 않는다.
+- 진입 시 URL param(예: `/play/[characterId]`)이 atom을 동기화하는 source of truth.
+- localStorage/supabase sync는 도메인 데이터에만 책임진다. "현재 활성 캐릭터" 같은 화면 컨텍스트는 URL에 위임.
 
 ## Tailwind 색상
 
