@@ -1,5 +1,5 @@
-import { GameView } from '@views/game';
+import CharacterSelectView from '@views/character-select/CharacterSelectView';
 
 export default function Home() {
-  return <GameView />;
+  return <CharacterSelectView />;
 }

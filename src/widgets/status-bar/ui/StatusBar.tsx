@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useAtomValue } from 'jotai';
 import {
   MAX_HUNGER,
@@ -7,6 +8,7 @@ import {
   MAX_HEARTS,
   WARNING_THRESHOLD,
   DANGER_THRESHOLD,
+  MODAL_TYPE,
 } from '@shared/constants';
 import {
   hungerAtom,
@@ -16,8 +18,8 @@ import {
   coinsAtom,
   isSickAtom,
   nicknameAtom,
-  useGameActions,
-} from '@entities/game';
+} from '@entities/game/model/store';
+import { useGameActions } from '@entities/game/model/hooks';
 
 type GaugeProps = {
   value: number;
@@ -66,6 +68,7 @@ export default function StatusBar() {
   const isSick = useAtomValue(isSickAtom);
   const nickname = useAtomValue(nicknameAtom);
   const { openModal } = useGameActions();
+  const router = useRouter();
 
   return (
     <div className="card p-3 space-y-1.5">
@@ -74,7 +77,14 @@ export default function StatusBar() {
           <span className="text-xs font-bold text-white bg-gray-700 px-2 py-0.5 rounded-md">
             Lv.{level}
           </span>
-          <span className="text-xs font-bold text-gray-700">{nickname}</span>
+          <button
+            onClick={() => router.push('/')}
+            className="text-xs font-bold text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1 btn-press"
+            aria-label="캐릭터 선택으로 가기"
+          >
+            {nickname}
+            <span className="text-[10px] text-gray-400">⇄</span>
+          </button>
           {isSick && <span className="text-xs animate-pulse">🤒 아파요</span>}
         </div>
         <div className="flex items-center gap-2">
@@ -85,7 +95,7 @@ export default function StatusBar() {
             </span>
           </div>
           <button
-            onClick={() => openModal('settings')}
+            onClick={() => openModal(MODAL_TYPE.SETTINGS)}
             className="text-sm text-gray-400 hover:text-gray-600 transition-colors leading-none"
             aria-label="설정"
           >

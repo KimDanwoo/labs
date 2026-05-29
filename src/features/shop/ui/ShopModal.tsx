@@ -11,8 +11,8 @@ import {
   coinsAtom,
   heartsAtom,
   inventoryAtom,
-  useGameActions,
-} from '@entities/game';
+} from '@entities/game/model/store';
+import { useGameActions } from '@entities/game/model/hooks';
 
 type Tab = 'food' | 'exchange';
 
