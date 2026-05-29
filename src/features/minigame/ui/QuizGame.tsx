@@ -1,14 +1,18 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useAtomValue } from 'jotai';
-import { MINIGAME_COIN_PER_CORRECT, MINIGAME_HEART_PER_CORRECT } from '@shared/constants';
-import { CHARACTERS } from '@shared/constants';
+import {
+	MINIGAME_COIN_PER_CORRECT,
+	MINIGAME_HEART_PER_CORRECT,
+	CHARACTERS,
+} from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
 import { characterIdAtom } from '@entities/game/model/store';
 import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
-import { pickQuizQuestions, QUIZ_PHASE, QUIZ_ROUNDS } from '../model/constants';
-import type { QuizPhase } from '../model/types';
+import { QUIZ_PHASE, QUIZ_ROUNDS } from '../model/constants';
+import { fetchRandomQuizQuestions } from '../model/services';
+import type { QuizPhase, QuizQuestion } from '../model/types';
 
 const PICK_DELAY_MS = 350;
 
@@ -27,17 +31,19 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 	const myCharacterId = useAtomValue(characterIdAtom);
 	const { minigameReward, markMinigamePlayed, closeModal } = useGameActions();
 	const minigame = useMinigameStatus();
+
 	const [phase, setPhase] = useState<QuizPhase>(QUIZ_PHASE.READY);
+	const [questions, setQuestions] = useState<QuizQuestion[]>([]);
 	const [roundIdx, setRoundIdx] = useState(0);
 	const [correctCount, setCorrectCount] = useState(0);
 	const [picked, setPicked] = useState<number | null>(null);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-	const questions = useMemo(() => pickQuizQuestions(QUIZ_ROUNDS, myCharacterId), [myCharacterId]);
 	const current = questions[roundIdx];
 	const myCharacter = myCharacterId ? CHARACTERS[myCharacterId] : null;
 
 	const handlePick = (index: number) => {
-		if (picked !== null) return;
+		if (picked !== null || !current) return;
 		setPicked(index);
 		const correct = index === current.correctIndex;
 		if (correct) setCorrectCount((c) => c + 1);
@@ -52,13 +58,26 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 		}, PICK_DELAY_MS);
 	};
 
-	const startGame = () => {
-		if (!minigame.canPlay) return;
-		markMinigamePlayed();
-		setRoundIdx(0);
-		setCorrectCount(0);
-		setPicked(null);
-		setPhase(QUIZ_PHASE.PLAYING);
+	const startGame = async () => {
+		if (!minigame.canPlay || !myCharacterId) return;
+		setErrorMessage(null);
+		setPhase(QUIZ_PHASE.LOADING);
+
+		try {
+			const fetched = await fetchRandomQuizQuestions(myCharacterId, QUIZ_ROUNDS);
+			if (fetched.length < QUIZ_ROUNDS) {
+				throw new Error('문제를 충분히 받지 못했어요');
+			}
+			markMinigamePlayed();
+			setQuestions(fetched);
+			setRoundIdx(0);
+			setCorrectCount(0);
+			setPicked(null);
+			setPhase(QUIZ_PHASE.PLAYING);
+		} catch {
+			setErrorMessage('문제를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
+			setPhase(QUIZ_PHASE.READY);
+		}
 	};
 
 	const handleFinish = () => {
@@ -89,6 +108,9 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 						⏳ 다음 플레이까지 {formatRegen(minigame.cooldownRemainingMs)}
 					</div>
 				)}
+				{errorMessage && (
+					<div className="text-[11px] text-red-400">{errorMessage}</div>
+				)}
 				<button
 					onClick={startGame}
 					disabled={!minigame.canPlay}
@@ -100,6 +122,36 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 				<button onClick={onExitToMenu} className="w-full py-2 text-xs text-gray-400 btn-press">
 					다른 게임 고르기
 				</button>
+			</div>
+		);
+	}
+
+	if (phase === QUIZ_PHASE.LOADING) {
+		return (
+			<div className="space-y-4">
+				<div className="flex justify-between items-center text-xs text-gray-400">
+					<span className="font-bold text-violet-300/60">
+						1 / {QUIZ_ROUNDS}
+					</span>
+				</div>
+
+				{myCharacterId && (
+					<div className="flex justify-center">
+						<CharacterSprite characterId={myCharacterId} size={64} />
+					</div>
+				)}
+
+				<div className="px-4 py-3 rounded-2xl bg-gray-100 min-h-[60px] animate-pulse" />
+
+				<div className="space-y-2">
+					{[0, 1, 2, 3].map((i) => (
+						<div
+							key={i}
+							className="w-full h-[46px] rounded-xl bg-gray-100 animate-pulse"
+							style={{ animationDelay: `${i * 0.08}s` }}
+						/>
+					))}
+				</div>
 			</div>
 		);
 	}
