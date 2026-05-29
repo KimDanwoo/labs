@@ -8,12 +8,12 @@ export const RUN_OBSTACLE_SIZE = 30;
 export const RUN_JUMP_VELOCITY = 8.4;
 export const RUN_GRAVITY = 0.42;
 
-export const RUN_OBSTACLE_SPEED_BASE = 2.8;
-export const RUN_OBSTACLE_SPEED_ACCEL = 0.00025;
+export const RUN_OBSTACLE_SPEED_BASE = 1.8;
+export const RUN_OBSTACLE_SPEED_ACCEL = 0.00028;
 
-export const RUN_SPAWN_INTERVAL_BASE = 1700;
+export const RUN_SPAWN_INTERVAL_BASE = 2400;
 export const RUN_SPAWN_INTERVAL_MIN = 900;
-export const RUN_SPAWN_SPEEDUP = 0.012;
+export const RUN_SPAWN_SPEEDUP = 0.02;
 
 export const RUN_OBSTACLE_EMOJIS = ['🌵', '🪨', '🎤'];
 
