@@ -21,6 +21,10 @@ export const cleanlinessAtom = selectAtom(gameAtom, (s) => s.cleanliness);
 export const heartsAtom = selectAtom(gameAtom, (s) => s.hearts);
 export const coinsAtom = selectAtom(gameAtom, (s) => s.coins);
 export const poopsAtom = selectAtom(gameAtom, (s) => s.poops);
+export const pendingPoopsAtom = selectAtom(
+  gameAtom,
+  (s) => s.pendingPoops ?? [],
+);
 export const inventoryAtom = selectAtom(gameAtom, (s) => s.inventory);
 export const isSleepingAtom = selectAtom(gameAtom, (s) => s.isSleeping);
 export const isSickAtom = selectAtom(gameAtom, (s) => s.isSick);
@@ -32,8 +36,10 @@ export const eggReadyCharacterIdAtom = selectAtom(
 export const lastMeetingAtAtom = selectAtom(gameAtom, (s) => s.lastMeetingAt);
 export const meetingsTodayAtom = selectAtom(gameAtom, (s) => s.meetingsToday);
 export const meetingDayAtom = selectAtom(gameAtom, (s) => s.meetingDay);
-export const minigamesTodayAtom = selectAtom(gameAtom, (s) => s.minigamesToday);
-export const minigameDayAtom = selectAtom(gameAtom, (s) => s.minigameDay);
+export const lastMinigameAtAtom = selectAtom(
+  gameAtom,
+  (s) => s.lastMinigameAt ?? null,
+);
 export const levelUpMessageAtom = selectAtom(gameAtom, (s) => s.levelUpMessage);
 export const feedingMessageAtom = selectAtom(gameAtom, (s) => s.feedingMessage);
 export const unlockedCharactersAtom = selectAtom(
@@ -68,11 +74,13 @@ export const isAllUnlockedAtom = atom((get) => {
   return ALL_CHARACTER_IDS.every((id) => unlocked.has(id));
 });
 
+export const bathroomActiveAtom = atom<boolean>(false);
+export const bathroomExitAtAtom = atom<number | null>(null);
+
 export const roomTypeAtom = atom<RoomType>((get) => {
   if (get(isSleepingAtom)) return ROOM_TYPE.BEDROOM;
   if (get(activeModalAtom) === MODAL_TYPE.MEETING) return ROOM_TYPE.OUTDOOR;
-  if (get(cleanlinessAtom) <= 30 && get(poopsAtom).length >= 3)
-    return ROOM_TYPE.BATHROOM;
+  if (get(bathroomActiveAtom)) return ROOM_TYPE.BATHROOM;
   return ROOM_TYPE.LIVING;
 });
 

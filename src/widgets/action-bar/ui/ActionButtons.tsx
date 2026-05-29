@@ -69,9 +69,9 @@ export default function ActionButtons() {
       ? '⛔'
       : `${meeting.dailyLimit - meeting.meetingsToday}`;
 
-  const minigameBadge = minigame.reachedDailyLimit
-    ? '⛔'
-    : `${minigame.dailyLimit - minigame.minigamesToday}`;
+  const minigameBadge = minigame.canPlay
+    ? undefined
+    : formatCooldown(minigame.cooldownRemainingMs);
 
   return (
     <div className="flex justify-center gap-1.5 sm:gap-2 flex-wrap">
