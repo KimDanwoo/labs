@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useGameActions } from '@entities/game';
+import { useGameActions } from '@entities/game/model/hooks';
 import CatchGame from './CatchGame';
+import PlcoRunGame from './PlcoRunGame';
 import QuizGame from './QuizGame';
 
-type Mode = 'select' | 'catch' | 'quiz';
+type Mode = 'select' | 'catch' | 'run' | 'quiz';
 
 export default function MiniGameModal() {
   const { closeModal } = useGameActions();
@@ -46,6 +47,23 @@ export default function MiniGameModal() {
               </button>
 
               <button
+                onClick={() => setMode('run')}
+                className="rounded-2xl p-4 text-left bg-linear-to-br from-emerald-50 to-green-50 border border-emerald-200 btn-press shadow-game-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">🏃</span>
+                  <div>
+                    <div className="text-sm font-bold text-emerald-600">
+                      플코런
+                    </div>
+                    <div className="text-[11px] text-gray-500">
+                      탭으로 점프해서 기록을 세워요
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              <button
                 onClick={() => setMode('quiz')}
                 className="rounded-2xl p-4 text-left bg-linear-to-br from-violet-50 to-purple-50 border border-violet-200 btn-press shadow-game-sm"
               >
@@ -66,6 +84,7 @@ export default function MiniGameModal() {
         )}
 
         {mode === 'catch' && <CatchGame onExitToMenu={exitToMenu} />}
+        {mode === 'run' && <PlcoRunGame onExitToMenu={exitToMenu} />}
         {mode === 'quiz' && <QuizGame onExitToMenu={exitToMenu} />}
       </div>
     </div>

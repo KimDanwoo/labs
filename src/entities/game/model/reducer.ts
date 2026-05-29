@@ -29,6 +29,7 @@ import {
   EGG_LEVEL_THRESHOLD,
   EGG_ALL_UNLOCKED_COINS,
   ALL_CHARACTER_IDS,
+  GAME_STATUS,
   MINIGAME_COIN_PER_CORRECT,
   MINIGAME_HEART_PER_CORRECT,
   MINIGAME_EXP_PER_CORRECT,
@@ -101,12 +102,27 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'SELECT_CHARACTER':
       return {
         ...INITIAL_GAME_STATE,
-        status: 'playing',
+        status: GAME_STATUS.PLAYING,
         characterId: action.characterId,
         nickname: action.nickname,
         unlockedCharacters: state.unlockedCharacters,
         lastUpdated: now,
       };
+
+    case 'SWITCH_CHARACTER': {
+      const previous = state.characterId;
+      const preserved =
+        previous && !(state.unlockedCharacters ?? []).includes(previous)
+          ? [...(state.unlockedCharacters ?? []), previous]
+          : state.unlockedCharacters;
+      return {
+        ...state,
+        characterId: action.characterId,
+        nickname: action.nickname,
+        unlockedCharacters: preserved,
+        lastUpdated: now,
+      };
+    }
 
     case 'FEED': {
       const food = FOODS[action.foodId];
@@ -417,24 +433,27 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         hunger: newHunger,
         hungerZeroSince,
-        status: isDead ? 'dead' : state.status,
+        status: isDead ? GAME_STATUS.DEAD : state.status,
         lastUpdated: action.now,
       };
     }
 
     case 'DIE':
-      return { ...state, status: 'dead', lastUpdated: now };
+      return { ...state, status: GAME_STATUS.DEAD, lastUpdated: now };
 
     case 'RESET':
       return {
         ...INITIAL_GAME_STATE,
+        status: GAME_STATUS.PLAYING,
+        characterId: state.characterId,
+        nickname: state.nickname,
         coins: state.coins,
         unlockedCharacters: state.unlockedCharacters,
         lastUpdated: now,
       };
 
     case 'TICK': {
-      if (state.status !== 'playing') return state;
+      if (state.status !== GAME_STATUS.PLAYING) return state;
 
       let updated = { ...state };
       let changed = false;
@@ -479,7 +498,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           now - updated.cleanlinessZeroSince >= DEATH_THRESHOLD_MS) ||
         (updated.sickSince && now - updated.sickSince >= DEATH_THRESHOLD_MS);
 
-      if (isDead) return { ...updated, status: 'dead', lastUpdated: now };
+      if (isDead) return { ...updated, status: GAME_STATUS.DEAD, lastUpdated: now };
 
       if (changed) return { ...updated, lastUpdated: now };
       return state;

@@ -1,1 +1,0 @@
-export { ShopModal } from './ui';

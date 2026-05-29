@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Gowun_Dodum } from "next/font/google";
 import "./globals.css";
+import SyncProvider from "./sync-provider";
 
 const gowunDodum = Gowun_Dodum({
   weight: "400",
@@ -23,7 +24,7 @@ export default function RootLayout({
     <html lang="ko" className={`${gowunDodum.variable} h-full`}>
       <body className="min-h-full flex flex-col items-center justify-center">
         <div className="w-full max-w-md md:max-w-lg mx-auto min-h-dvh flex flex-col">
-          {children}
+          <SyncProvider>{children}</SyncProvider>
         </div>
       </body>
     </html>
