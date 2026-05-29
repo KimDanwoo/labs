@@ -21,8 +21,9 @@ export function useGameActions() {
       exchangeHearts: (amount: number) =>
         dispatch({ type: 'EXCHANGE_HEARTS', amount }),
       giveMedicine: () => dispatch({ type: 'GIVE_MEDICINE' }),
-      minigameReward: (params: { correctCount: number; day: string }) =>
+      minigameReward: (params: { correctCount: number }) =>
         dispatch({ type: 'MINIGAME_REWARD', ...params }),
+      markMinigamePlayed: () => dispatch({ type: 'MARK_MINIGAME_PLAYED' }),
       collectEgg: () => dispatch({ type: 'COLLECT_EGG' }),
       dismissLevelUp: () => dispatch({ type: 'DISMISS_LEVEL_UP' }),
       dismissFeedingMessage: () =>

@@ -140,7 +140,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const levelUp = applyLevelUp(state, newExp);
       const eggReady = checkEggReady({ ...state, ...levelUp }, newHearts);
 
-      const poopDelay = 30_000 + Math.random() * 30_000;
+      const poopDelay = 20_000;
       const pendingPoops = [...(state.pendingPoops ?? []), now + poopDelay];
 
       return {
@@ -347,7 +347,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'MINIGAME_REWARD': {
-      const { correctCount, day } = action;
+      const { correctCount } = action;
       const coinsEarned = correctCount * MINIGAME_COIN_PER_CORRECT;
       const heartsEarned = correctCount * MINIGAME_HEART_PER_CORRECT;
       const expEarned = correctCount * MINIGAME_EXP_PER_CORRECT;
@@ -356,20 +356,18 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const levelUp = applyLevelUp(state, newExp);
       const eggReady = checkEggReady({ ...state, ...levelUp }, newHearts);
 
-      const sameDay = state.minigameDay === day;
-      const minigamesToday = sameDay ? state.minigamesToday + 1 : 1;
-
       return {
         ...state,
         ...levelUp,
         coins: levelUp.coins + coinsEarned,
         hearts: newHearts,
         eggReadyCharacterId: eggReady,
-        minigamesToday,
-        minigameDay: day,
         lastUpdated: now,
       };
     }
+
+    case 'MARK_MINIGAME_PLAYED':
+      return { ...state, lastMinigameAt: now, lastUpdated: now };
 
     case 'COLLECT_EGG': {
       if (!state.eggReadyCharacterId) return state;
@@ -463,12 +461,18 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const remaining = pending.filter((t) => now < t);
 
       if (ready.length > 0) {
-        const newPoops = ready.map(() => ({
-          id: `poop-${now}-${Math.random().toString(36).slice(2, 6)}`,
-          x: 10 + Math.random() * 80,
-          y: 60 + Math.random() * 25,
-          createdAt: now,
-        }));
+        const charPos = action.characterPosition;
+        const newPoops = ready.map((_, idx) => {
+          const jitter = ready.length > 1 ? (idx - (ready.length - 1) / 2) * 6 : 0;
+          const baseX = charPos ? charPos.x : 10 + Math.random() * 80;
+          const baseY = charPos ? charPos.y : 60 + Math.random() * 25;
+          return {
+            id: `poop-${now}-${idx}-${Math.random().toString(36).slice(2, 6)}`,
+            x: Math.min(Math.max(baseX + jitter, 5), 95),
+            y: Math.min(Math.max(baseY, 55), 90),
+            createdAt: now,
+          };
+        });
         const allPoops = [...state.poops, ...newPoops];
         const lostCleanliness = ready.length * CLEANLINESS_PER_POOP;
         const newCleanliness = Math.max(state.cleanliness - lostCleanliness, 0);

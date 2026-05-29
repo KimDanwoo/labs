@@ -5,7 +5,7 @@ import {
   MINIGAME_COIN_PER_CORRECT,
   MINIGAME_HEART_PER_CORRECT,
 } from '@shared/constants';
-import { useGameActions } from '@entities/game/model/hooks';
+import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
 import {
   MINIGAME_EMOJIS,
   MINIGAME_DURATION,
@@ -31,13 +31,16 @@ type CatchGameProps = {
   onExitToMenu: () => void;
 };
 
-function todayKey(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+function formatRegen(ms: number): string {
+  const totalSec = Math.ceil(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return m > 0 ? `${m}분 ${s}초` : `${s}초`;
 }
 
 export default function CatchGame({ onExitToMenu }: CatchGameProps) {
-  const { minigameReward, closeModal } = useGameActions();
+  const { minigameReward, markMinigamePlayed, closeModal } = useGameActions();
+  const minigame = useMinigameStatus();
 
   const [phase, setPhase] = useState<MinigamePhase>('ready');
   const [score, setScore] = useState(0);
@@ -62,6 +65,8 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
   const lastSpawn = useRef(0);
 
   const startGame = useCallback(() => {
+    if (!minigame.canPlay) return;
+    markMinigamePlayed();
     setPhase(MINIGAME_PHASE.PLAYING);
     setScore(0);
     scoreRef.current = 0;
@@ -73,7 +78,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
     gameStart.current = Date.now();
     nextId.current = 0;
     lastSpawn.current = 0;
-  }, []);
+  }, [markMinigamePlayed, minigame.canPlay]);
 
   useEffect(() => {
     if (phase !== 'playing') return;
@@ -200,7 +205,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
   }, []);
 
   const handleFinish = useCallback(() => {
-    minigameReward({ correctCount: score, day: todayKey() });
+    minigameReward({ correctCount: score });
     closeModal();
   }, [score, minigameReward, closeModal]);
 
@@ -217,12 +222,18 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
           <br />
           떨어지는 하트를 받으세요!
         </p>
+        {!minigame.canPlay && (
+          <div className="text-[11px] text-gray-400">
+            ⏳ 다음 플레이까지 {formatRegen(minigame.cooldownRemainingMs)}
+          </div>
+        )}
         <button
           onClick={startGame}
-          className="btn-primary btn-press w-full"
+          disabled={!minigame.canPlay}
+          className="btn-primary btn-press w-full disabled:opacity-40"
           style={{ backgroundColor: '#FF6B9D' }}
         >
-          시작!
+          {minigame.canPlay ? '시작!' : '에너지 부족'}
         </button>
         <button
           onClick={onExitToMenu}

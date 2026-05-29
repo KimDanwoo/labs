@@ -3,7 +3,11 @@
 import { useAtomValue } from 'jotai';
 import { GAME_STATUS } from '@shared/constants';
 import { statusAtom } from '@entities/game/model/store';
-import { useAutoDecay, useCharacterMovement } from '@entities/game/model/hooks';
+import {
+	useAutoDecay,
+	useBathroomExit,
+	useCharacterMovement,
+} from '@entities/game/model/hooks';
 import DeathScreen from '@views/death/DeathScreen';
 import { StatusBar } from '@widgets/status-bar/ui';
 import { Room } from '@widgets/game-room/ui';
@@ -13,6 +17,7 @@ import { GameMessages, ModalRoot } from '@views/game/ui';
 export default function GameView() {
 	useAutoDecay();
 	useCharacterMovement();
+	useBathroomExit();
 
 	const status = useAtomValue(statusAtom);
 

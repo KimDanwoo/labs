@@ -6,7 +6,7 @@ import { MINIGAME_COIN_PER_CORRECT, MINIGAME_HEART_PER_CORRECT } from '@shared/c
 import { CHARACTERS } from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
 import { characterIdAtom } from '@entities/game/model/store';
-import { useGameActions } from '@entities/game/model/hooks';
+import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
 import { pickQuizQuestions, QUIZ_PHASE, QUIZ_ROUNDS } from '../model/constants';
 import type { QuizPhase } from '../model/types';
 
@@ -16,14 +16,17 @@ type QuizGameProps = {
 	onExitToMenu: () => void;
 };
 
-function todayKey(): string {
-	const d = new Date();
-	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+function formatRegen(ms: number): string {
+	const totalSec = Math.ceil(ms / 1000);
+	const m = Math.floor(totalSec / 60);
+	const s = totalSec % 60;
+	return m > 0 ? `${m}분 ${s}초` : `${s}초`;
 }
 
 export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 	const myCharacterId = useAtomValue(characterIdAtom);
-	const { minigameReward, closeModal } = useGameActions();
+	const { minigameReward, markMinigamePlayed, closeModal } = useGameActions();
+	const minigame = useMinigameStatus();
 	const [phase, setPhase] = useState<QuizPhase>(QUIZ_PHASE.READY);
 	const [roundIdx, setRoundIdx] = useState(0);
 	const [correctCount, setCorrectCount] = useState(0);
@@ -49,8 +52,17 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 		}, PICK_DELAY_MS);
 	};
 
+	const startGame = () => {
+		if (!minigame.canPlay) return;
+		markMinigamePlayed();
+		setRoundIdx(0);
+		setCorrectCount(0);
+		setPicked(null);
+		setPhase(QUIZ_PHASE.PLAYING);
+	};
+
 	const handleFinish = () => {
-		minigameReward({ correctCount, day: todayKey() });
+		minigameReward({ correctCount });
 		closeModal();
 	};
 
@@ -72,12 +84,18 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 					<br />
 					맞춰보세요! 총 {QUIZ_ROUNDS}문제
 				</p>
+				{!minigame.canPlay && (
+					<div className="text-[11px] text-gray-400">
+						⏳ 다음 플레이까지 {formatRegen(minigame.cooldownRemainingMs)}
+					</div>
+				)}
 				<button
-					onClick={() => setPhase(QUIZ_PHASE.PLAYING)}
-					className="btn-primary btn-press w-full"
+					onClick={startGame}
+					disabled={!minigame.canPlay}
+					className="btn-primary btn-press w-full disabled:opacity-40"
 					style={{ backgroundColor: '#A78BFA' }}
 				>
-					시작!
+					{minigame.canPlay ? '시작!' : '에너지 부족'}
 				</button>
 				<button onClick={onExitToMenu} className="w-full py-2 text-xs text-gray-400 btn-press">
 					다른 게임 고르기
