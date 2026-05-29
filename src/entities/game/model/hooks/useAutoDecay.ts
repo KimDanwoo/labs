@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import {
   HUNGER_DECAY_PER_MINUTE,
   SLEEP_START_HOUR,
@@ -10,6 +10,7 @@ import {
   WAKE_UP_GRACE_MS,
 } from '@shared/constants';
 import {
+  characterPositionAtom,
   gameAtom,
   isPlayingAtom,
   isSickAtom,
@@ -32,6 +33,7 @@ export function useAutoDecay() {
   const isSick = useAtomValue(isSickAtom);
   const wokeUpAt = useAtomValue(wokeUpAtAtom);
   const dispatch = useSetAtom(gameAtom);
+  const store = useStore();
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -40,7 +42,11 @@ export function useAutoDecay() {
       const sleeping = shouldBeSleeping(wokeUpAt, Date.now());
       dispatch({ type: 'SET_SLEEPING', isSleeping: sleeping });
       dispatch({ type: 'DECAY_HUNGER', amount: HUNGER_DECAY_PER_MINUTE / 6 });
-      dispatch({ type: 'TICK' });
+      const pos = store.get(characterPositionAtom);
+      dispatch({
+        type: 'TICK',
+        characterPosition: { x: pos.x, y: pos.y },
+      });
     };
 
     tick();

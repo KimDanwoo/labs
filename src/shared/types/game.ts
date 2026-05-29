@@ -80,8 +80,7 @@ export type GameState = {
   lastMeetingAt: number | null;
   meetingsToday: number;
   meetingDay: string | null;
-  minigamesToday: number;
-  minigameDay: string | null;
+  lastMinigameAt: number | null;
 };
 
 export type GameAction =
@@ -106,7 +105,8 @@ export type GameAction =
   | { type: 'EXCHANGE_HEARTS'; amount: number }
   | { type: 'GET_SICK' }
   | { type: 'GIVE_MEDICINE' }
-  | { type: 'MINIGAME_REWARD'; correctCount: number; day: string }
+  | { type: 'MINIGAME_REWARD'; correctCount: number }
+  | { type: 'MARK_MINIGAME_PLAYED' }
   | { type: 'COLLECT_EGG' }
   | { type: 'DISMISS_LEVEL_UP' }
   | { type: 'DISMISS_FEEDING_MESSAGE' }
@@ -115,5 +115,5 @@ export type GameAction =
   | { type: 'PROCESS_OFFLINE'; now: number }
   | { type: 'DIE' }
   | { type: 'RESET' }
-  | { type: 'TICK' }
+  | { type: 'TICK'; characterPosition?: { x: number; y: number } }
   | { type: 'LOAD_STATE'; state: GameState };

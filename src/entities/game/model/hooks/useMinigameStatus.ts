@@ -1,35 +1,30 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useAtomValue } from 'jotai';
-import { MINIGAME_DAILY_LIMIT } from '@shared/constants';
-import { minigameDayAtom, minigamesTodayAtom } from '../store';
-
-function todayKey(now: number): string {
-  const d = new Date(now);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
+import { MINIGAME_COOLDOWN_MS } from '@shared/constants';
+import { lastMinigameAtAtom } from '../store';
 
 export type MinigameStatus = {
   canPlay: boolean;
-  minigamesToday: number;
-  dailyLimit: number;
-  reachedDailyLimit: boolean;
-  today: string;
+  cooldownRemainingMs: number;
 };
 
 export function useMinigameStatus(): MinigameStatus {
-  const minigamesToday = useAtomValue(minigamesTodayAtom);
-  const minigameDay = useAtomValue(minigameDayAtom);
+  const lastAt = useAtomValue(lastMinigameAtAtom);
+  const [now, setNow] = useState(() => Date.now());
 
-  const today = todayKey(Date.now());
-  const todaysCount = minigameDay === today ? minigamesToday : 0;
-  const reachedDailyLimit = todaysCount >= MINIGAME_DAILY_LIMIT;
+  useEffect(() => {
+    if (lastAt === null) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [lastAt]);
+
+  const elapsed = lastAt === null ? Infinity : now - lastAt;
+  const cooldownRemainingMs = Math.max(0, MINIGAME_COOLDOWN_MS - elapsed);
 
   return {
-    canPlay: !reachedDailyLimit,
-    minigamesToday: todaysCount,
-    dailyLimit: MINIGAME_DAILY_LIMIT,
-    reachedDailyLimit,
-    today,
+    canPlay: cooldownRemainingMs === 0,
+    cooldownRemainingMs,
   };
 }

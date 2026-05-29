@@ -8,7 +8,7 @@ import {
 } from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
 import { characterIdAtom } from '@entities/game/model/store';
-import { useGameActions } from '@entities/game/model/hooks';
+import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
 import {
   RUN_BEST_SCORE_KEY,
   RUN_CHAR_SIZE,
@@ -42,12 +42,11 @@ type PlcoRunGameProps = {
   onExitToMenu: () => void;
 };
 
-function todayKey(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
-    2,
-    '0',
-  )}-${String(d.getDate()).padStart(2, '0')}`;
+function formatRegen(ms: number): string {
+  const totalSec = Math.ceil(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return m > 0 ? `${m}분 ${s}초` : `${s}초`;
 }
 
 function loadBestScore(): number {
@@ -63,15 +62,23 @@ function saveBestScore(score: number): void {
 }
 
 export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
-  const { minigameReward, closeModal } = useGameActions();
+  const { minigameReward, markMinigamePlayed, closeModal } = useGameActions();
   const characterId = useAtomValue(characterIdAtom);
+  const minigame = useMinigameStatus();
 
   const [phase, setPhase] = useState<RunPhase>(RUN_PHASE.READY);
   const [score, setScore] = useState(0);
+  const [scorePulseKey, setScorePulseKey] = useState(0);
   const [bestScore, setBestScore] = useState<number>(() => loadBestScore());
   const [charY, setCharY] = useState(0);
+  const [charTilt, setCharTilt] = useState(0);
   const [obstacles, setObstacles] = useState<RunObstacle[]>([]);
   const [hearts, setHearts] = useState<RunHeart[]>([]);
+  const [pickups, setPickups] = useState<
+    { id: number; x: number; y: number }[]
+  >([]);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [isCrashing, setIsCrashing] = useState(false);
 
   const charYRef = useRef(0);
   const charVyRef = useRef(0);
@@ -83,6 +90,7 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
   const lastHeartSpawnRef = useRef(0);
   const gameStartRef = useRef(0);
   const animFrameRef = useRef(0);
+  const countdownTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const finishGame = useCallback(() => {
     setPhase(RUN_PHASE.RESULT);
@@ -97,28 +105,52 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
     });
   }, []);
 
+  const clearCountdownTimers = useCallback(() => {
+    countdownTimersRef.current.forEach((t) => clearTimeout(t));
+    countdownTimersRef.current = [];
+  }, []);
+
   const startGame = useCallback(() => {
+    if (!minigame.canPlay) return;
+    markMinigamePlayed();
     scoreRef.current = 0;
     setScore(0);
     obstaclesRef.current = [];
     setObstacles([]);
     heartsRef.current = [];
     setHearts([]);
+    setPickups([]);
     charYRef.current = 0;
     charVyRef.current = 0;
     setCharY(0);
+    setCharTilt(0);
     nextIdRef.current = 0;
     lastObstacleSpawnRef.current = 0;
     lastHeartSpawnRef.current = 0;
-    gameStartRef.current = Date.now();
+    setIsCrashing(false);
     setPhase(RUN_PHASE.PLAYING);
-  }, []);
+
+    clearCountdownTimers();
+    setCountdown(3);
+    countdownTimersRef.current.push(
+      setTimeout(() => setCountdown(2), 600),
+      setTimeout(() => setCountdown(1), 1200),
+      setTimeout(() => setCountdown(0), 1800),
+      setTimeout(() => {
+        setCountdown(null);
+        gameStartRef.current = Date.now();
+      }, 2200),
+    );
+  }, [clearCountdownTimers, markMinigamePlayed, minigame.canPlay]);
+
+  useEffect(() => clearCountdownTimers, [clearCountdownTimers]);
 
   const jump = useCallback(() => {
+    if (countdown !== null) return;
     if (charYRef.current <= 0.01) {
       charVyRef.current = RUN_JUMP_VELOCITY;
     }
-  }, []);
+  }, [countdown]);
 
   useEffect(() => {
     if (phase !== 'playing') return;
@@ -135,7 +167,7 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
   }, [phase, jump]);
 
   useEffect(() => {
-    if (phase !== 'playing') return;
+    if (phase !== 'playing' || countdown !== null || isCrashing) return;
 
     const loop = () => {
       const now = Date.now();
@@ -145,6 +177,7 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
       charYRef.current = Math.max(0, charYRef.current + charVyRef.current);
       if (charYRef.current <= 0) charVyRef.current = 0;
       setCharY(charYRef.current);
+      setCharTilt(Math.max(-14, Math.min(14, -charVyRef.current * 2.4)));
 
       const speed = RUN_OBSTACLE_SPEED_BASE + elapsed * RUN_OBSTACLE_SPEED_ACCEL;
 
@@ -222,6 +255,7 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
       obstaclesRef.current = nextObstacles;
 
       let caughtThisFrame = 0;
+      const caughtPickups: { id: number; x: number; y: number }[] = [];
       const nextHearts: RunHeart[] = [];
       for (const heart of heartsRef.current) {
         const movedX = heart.x - speed;
@@ -239,6 +273,11 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
 
         if (overlapX && overlapY) {
           caughtThisFrame += 1;
+          caughtPickups.push({
+            id: nextIdRef.current++,
+            x: movedX,
+            y: heart.y,
+          });
           continue;
         }
 
@@ -251,13 +290,24 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
       if (caughtThisFrame > 0) {
         scoreRef.current += caughtThisFrame;
         setScore(scoreRef.current);
+        setScorePulseKey((k) => k + 1);
+        setPickups((prev) => [...prev, ...caughtPickups]);
+        caughtPickups.forEach((p) => {
+          setTimeout(() => {
+            setPickups((prev) => prev.filter((q) => q.id !== p.id));
+          }, 700);
+        });
       }
 
       setObstacles(obstaclesRef.current);
       setHearts(heartsRef.current);
 
       if (collided) {
-        finishGame();
+        setIsCrashing(true);
+        setTimeout(() => {
+          setIsCrashing(false);
+          finishGame();
+        }, 420);
         return;
       }
 
@@ -266,11 +316,11 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
 
     animFrameRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animFrameRef.current);
-  }, [phase, finishGame]);
+  }, [phase, countdown, isCrashing, finishGame]);
 
   const handleFinish = useCallback(() => {
     const reward = Math.min(scoreRef.current, RUN_REWARD_CAP);
-    minigameReward({ correctCount: reward, day: todayKey() });
+    minigameReward({ correctCount: reward });
     closeModal();
   }, [minigameReward, closeModal]);
 
@@ -292,12 +342,18 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
             🏆 최고기록 {bestScore}개
           </div>
         )}
+        {!minigame.canPlay && (
+          <div className="text-[11px] text-gray-400">
+            ⏳ 다음 플레이까지 {formatRegen(minigame.cooldownRemainingMs)}
+          </div>
+        )}
         <button
           onClick={startGame}
-          className="btn-primary btn-press w-full"
+          disabled={!minigame.canPlay}
+          className="btn-primary btn-press w-full disabled:opacity-40"
           style={{ backgroundColor: '#22C55E' }}
         >
-          시작!
+          {minigame.canPlay ? '시작!' : '에너지 부족'}
         </button>
         <button
           onClick={onExitToMenu}
@@ -313,7 +369,12 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
     return (
       <>
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-pink-500">💖 {score}</span>
+          <span
+            key={scorePulseKey}
+            className="text-sm font-bold text-pink-500 run-score-pulse"
+          >
+            💖 {score}
+          </span>
           <span className="text-[11px] font-bold text-gray-400 tabular-nums">
             BEST {bestScore}
           </span>
@@ -325,7 +386,9 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
             e.preventDefault();
             jump();
           }}
-          className="relative mx-auto rounded-2xl overflow-hidden select-none touch-none cursor-pointer"
+          className={`relative mx-auto rounded-2xl overflow-hidden select-none touch-none cursor-pointer ${
+            isCrashing ? 'run-field-shake' : ''
+          }`}
           style={{
             width: RUN_FIELD_WIDTH,
             height: RUN_FIELD_HEIGHT,
@@ -350,6 +413,9 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
               bottom: RUN_GROUND_HEIGHT + charY,
               width: RUN_CHAR_SIZE,
               height: RUN_CHAR_SIZE,
+              transform: `rotate(${charTilt}deg)`,
+              transformOrigin: 'center bottom',
+              transition: 'transform 60ms linear',
             }}
           >
             {characterId ? (
@@ -398,6 +464,38 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
               {RUN_HEART_EMOJI}
             </div>
           ))}
+
+          {pickups.map((p) => (
+            <div
+              key={p.id}
+              className="absolute pointer-events-none run-pickup-text"
+              style={{
+                left: p.x,
+                bottom: RUN_GROUND_HEIGHT + p.y + RUN_HEART_SIZE / 2,
+              }}
+            >
+              +1
+            </div>
+          ))}
+
+          {isCrashing && (
+            <div className="absolute inset-0 pointer-events-none bg-red-400/40 run-collision-flash" />
+          )}
+
+          {countdown !== null && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 bg-white/20 backdrop-blur-[1px]">
+              <span
+                key={countdown}
+                className="text-5xl font-black text-white run-countdown-pop"
+                style={{
+                  textShadow:
+                    '0 2px 4px rgba(0,0,0,0.25), 0 0 8px rgba(236,72,153,0.4)',
+                }}
+              >
+                {countdown === 0 ? 'GO!' : countdown}
+              </span>
+            </div>
+          )}
         </button>
 
         <p className="text-[11px] text-gray-400">
@@ -445,12 +543,19 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
           </div>
         )}
 
+        {!minigame.canPlay && (
+          <div className="text-[11px] text-gray-400">
+            ⏳ 다음 플레이까지 {formatRegen(minigame.cooldownRemainingMs)}
+          </div>
+        )}
+
         <div className="flex gap-2">
           <button
             onClick={startGame}
-            className="flex-1 py-3 rounded-2xl bg-white/80 border border-gray-200 text-gray-600 font-bold btn-press"
+            disabled={!minigame.canPlay}
+            className="flex-1 py-3 rounded-2xl bg-white/80 border border-gray-200 text-gray-600 font-bold btn-press disabled:opacity-40"
           >
-            다시!
+            {minigame.canPlay ? '다시!' : '에너지 부족'}
           </button>
           <button
             onClick={handleFinish}
