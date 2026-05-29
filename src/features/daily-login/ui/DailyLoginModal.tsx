@@ -1,6 +1,6 @@
 'use client';
 
-import { DAILY_REWARDS } from '../model';
+import { DAILY_REWARDS } from '../model/constants';
 
 type DailyLoginModalProps = {
   streak: number;

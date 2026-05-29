@@ -2,7 +2,8 @@
 
 import { useAtomValue } from 'jotai';
 import { FOODS } from '@shared/constants';
-import { inventoryAtom, useGameActions } from '@entities/game';
+import { inventoryAtom } from '@entities/game/model/store';
+import { useGameActions } from '@entities/game/model/hooks';
 
 const FOOD_LIST = Object.values(FOODS);
 

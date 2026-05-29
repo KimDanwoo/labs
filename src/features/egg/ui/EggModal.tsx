@@ -7,25 +7,29 @@ import { CharacterSprite } from '@shared/ui';
 import {
   eggReadyCharacterIdAtom,
   isAllUnlockedAtom,
-  useGameActions,
-} from '@entities/game';
-import { EGG_DISPLAY_MS, EGG_HATCHING_MS } from '../model';
-import type { EggPhase } from '../model';
+} from '@entities/game/model/store';
+import { useGameActions } from '@entities/game/model/hooks';
+import {
+  EGG_DISPLAY_MS,
+  EGG_HATCHING_MS,
+  EGG_PHASE,
+} from '../model/constants';
+import type { EggPhase } from '../model/types';
 
 export default function EggModal() {
   const characterId = useAtomValue(eggReadyCharacterIdAtom);
   const isAllUnlocked = useAtomValue(isAllUnlockedAtom);
   const { collectEgg, closeModal } = useGameActions();
 
-  const [phase, setPhase] = useState<EggPhase>('egg');
+  const [phase, setPhase] = useState<EggPhase>(EGG_PHASE.EGG);
 
   useEffect(() => {
-    if (phase === 'egg') {
-      const timer = setTimeout(() => setPhase('hatching'), EGG_DISPLAY_MS);
+    if (phase === EGG_PHASE.EGG) {
+      const timer = setTimeout(() => setPhase(EGG_PHASE.HATCHING), EGG_DISPLAY_MS);
       return () => clearTimeout(timer);
     }
-    if (phase === 'hatching') {
-      const timer = setTimeout(() => setPhase('reveal'), EGG_HATCHING_MS);
+    if (phase === EGG_PHASE.HATCHING) {
+      const timer = setTimeout(() => setPhase(EGG_PHASE.REVEAL), EGG_HATCHING_MS);
       return () => clearTimeout(timer);
     }
   }, [phase]);
@@ -42,7 +46,7 @@ export default function EggModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 modal-overlay" />
       <div className="relative w-full max-w-sm modal-content p-8 mx-4 text-center space-y-6 animate-scale-in">
-        {phase === 'egg' && (
+        {phase === EGG_PHASE.EGG && (
           <>
             <h3 className="text-lg font-bold text-pink-500">알을 발견했어요!</h3>
             <div className="text-7xl animate-bounce">🥚</div>
@@ -50,7 +54,7 @@ export default function EggModal() {
           </>
         )}
 
-        {phase === 'hatching' && (
+        {phase === EGG_PHASE.HATCHING && (
           <>
             <h3 className="text-lg font-bold text-pink-500">부화 중...</h3>
             <div className="text-7xl egg-shake">🥚</div>
@@ -66,7 +70,7 @@ export default function EggModal() {
           </>
         )}
 
-        {phase === 'reveal' && (
+        {phase === EGG_PHASE.REVEAL && (
           <>
             <h3 className="text-lg font-bold" style={{ color: character.color }}>
               {isAllUnlocked ? '보너스 코인!' : `${character.name} 해금!`}

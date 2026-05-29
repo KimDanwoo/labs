@@ -14,3 +14,9 @@ export const MINIGAME_ITEM_SPEED_RANDOM = 1.5;
 export const MINIGAME_ITEM_SPEED_ACCEL = 0.0003;
 export const MINIGAME_SCORE_GOOD = 15;
 export const MINIGAME_SCORE_OK = 8;
+
+export const MINIGAME_PHASE = {
+  READY: 'ready',
+  PLAYING: 'playing',
+  RESULT: 'result',
+} as const;

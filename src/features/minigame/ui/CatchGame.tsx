@@ -5,7 +5,7 @@ import {
   MINIGAME_COIN_PER_CORRECT,
   MINIGAME_HEART_PER_CORRECT,
 } from '@shared/constants';
-import { useGameActions } from '@entities/game';
+import { useGameActions } from '@entities/game/model/hooks';
 import {
   MINIGAME_EMOJIS,
   MINIGAME_DURATION,
@@ -23,8 +23,9 @@ import {
   MINIGAME_ITEM_SPEED_ACCEL,
   MINIGAME_SCORE_GOOD,
   MINIGAME_SCORE_OK,
-} from '../model';
-import type { MinigamePhase, FallingItem } from '../model';
+  MINIGAME_PHASE,
+} from '../model/constants';
+import type { MinigamePhase, FallingItem } from '../model/types';
 
 type CatchGameProps = {
   onExitToMenu: () => void;
@@ -61,7 +62,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
   const lastSpawn = useRef(0);
 
   const startGame = useCallback(() => {
-    setPhase('playing');
+    setPhase(MINIGAME_PHASE.PLAYING);
     setScore(0);
     scoreRef.current = 0;
     setItems([]);
@@ -105,7 +106,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
       const elapsed = now - gameStart.current;
 
       if (elapsed >= MINIGAME_DURATION) {
-        setPhase('result');
+        setPhase(MINIGAME_PHASE.RESULT);
         setTimeLeft(0);
         setScore(scoreRef.current);
         return;
@@ -204,9 +205,9 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
   }, [score, minigameReward, closeModal]);
 
   const progressPercent = (timeLeft / MINIGAME_DURATION) * 100;
-  const finalScore = phase === 'result' ? score : 0;
+  const finalScore = phase === MINIGAME_PHASE.RESULT ? score : 0;
 
-  if (phase === 'ready') {
+  if (phase === MINIGAME_PHASE.READY) {
     return (
       <div className="space-y-5 py-4">
         <h3 className="text-lg font-bold text-gray-700">하트 캐치!</h3>
@@ -233,7 +234,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
     );
   }
 
-  if (phase === 'playing') {
+  if (phase === MINIGAME_PHASE.PLAYING) {
     return (
       <>
         <div className="flex items-center justify-between">
@@ -327,7 +328,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
     );
   }
 
-  if (phase === 'result') {
+  if (phase === MINIGAME_PHASE.RESULT) {
     return (
       <div className="space-y-5 py-4">
         <div className="text-5xl">

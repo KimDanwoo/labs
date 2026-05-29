@@ -5,6 +5,9 @@ import {
   DANGER_THRESHOLD,
   ALL_CHARACTER_IDS,
   WAKE_UP_GRACE_MS,
+  GAME_STATUS,
+  MODAL_TYPE,
+  ROOM_TYPE,
 } from '@shared/constants';
 import { gameAtom } from './gameAtom';
 import { activeModalAtom } from './modalAtom';
@@ -38,7 +41,7 @@ export const unlockedCharactersAtom = selectAtom(
   (s) => s.unlockedCharacters,
 );
 
-export const isPlayingAtom = atom((get) => get(statusAtom) === 'playing');
+export const isPlayingAtom = atom((get) => get(statusAtom) === GAME_STATUS.PLAYING);
 
 export const isDrowsyAtom = atom((get) => {
   const isSleeping = get(isSleepingAtom);
@@ -66,10 +69,11 @@ export const isAllUnlockedAtom = atom((get) => {
 });
 
 export const roomTypeAtom = atom<RoomType>((get) => {
-  if (get(isSleepingAtom)) return 'bedroom';
-  if (get(activeModalAtom) === 'meeting') return 'outdoor';
-  if (get(cleanlinessAtom) <= 30 && get(poopsAtom).length >= 3) return 'bathroom';
-  return 'living';
+  if (get(isSleepingAtom)) return ROOM_TYPE.BEDROOM;
+  if (get(activeModalAtom) === MODAL_TYPE.MEETING) return ROOM_TYPE.OUTDOOR;
+  if (get(cleanlinessAtom) <= 30 && get(poopsAtom).length >= 3)
+    return ROOM_TYPE.BATHROOM;
+  return ROOM_TYPE.LIVING;
 });
 
 export const characterPositionAtom = atom<CharacterPosition>({
