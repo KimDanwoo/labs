@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import {
   LEVEL_UP_TOAST_DURATION,
   OVERFEED_TOAST_DURATION,
 } from '@shared/constants';
+import { useAutoDismiss } from '@shared/lib';
 import {
   feedingMessageAtom,
   levelUpMessageAtom,
@@ -18,17 +18,12 @@ export default function GameMessages() {
   const feedingMessage = useAtomValue(feedingMessageAtom);
   const { dismissLevelUp, dismissFeedingMessage } = useGameActions();
 
-  useEffect(() => {
-    if (!levelUpMessage) return;
-    const timer = setTimeout(dismissLevelUp, LEVEL_UP_TOAST_DURATION);
-    return () => clearTimeout(timer);
-  }, [levelUpMessage, dismissLevelUp]);
-
-  useEffect(() => {
-    if (!feedingMessage) return;
-    const timer = setTimeout(dismissFeedingMessage, OVERFEED_TOAST_DURATION);
-    return () => clearTimeout(timer);
-  }, [feedingMessage, dismissFeedingMessage]);
+  useAutoDismiss(levelUpMessage, dismissLevelUp, LEVEL_UP_TOAST_DURATION);
+  useAutoDismiss(
+    feedingMessage,
+    dismissFeedingMessage,
+    OVERFEED_TOAST_DURATION,
+  );
 
   return (
     <>

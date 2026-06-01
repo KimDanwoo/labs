@@ -79,7 +79,56 @@ function applyLevelUp(
   };
 }
 
-function checkEggReady(state: GameState, newHearts: number): CharacterId | null {
+function isDeadByNeglect(
+  state: Pick<
+    GameState,
+    'hungerZeroSince' | 'cleanlinessZeroSince' | 'sickSince'
+  >,
+  now: number,
+): boolean {
+  return Boolean(
+    (state.hungerZeroSince &&
+      now - state.hungerZeroSince >= DEATH_THRESHOLD_MS) ||
+      (state.cleanlinessZeroSince &&
+        now - state.cleanlinessZeroSince >= DEATH_THRESHOLD_MS) ||
+      (state.sickSince && now - state.sickSince >= DEATH_THRESHOLD_MS),
+  );
+}
+
+type HeartsReward = Pick<
+  GameState,
+  | 'exp'
+  | 'level'
+  | 'coins'
+  | 'inventory'
+  | 'levelUpMessage'
+  | 'hearts'
+  | 'eggReadyCharacterId'
+>;
+
+function applyHeartsExpCoins(
+  state: GameState,
+  heartsGain: number,
+  expGain: number,
+  coinsGain: number,
+): HeartsReward {
+  const newHearts = Math.min(state.hearts + heartsGain, MAX_HEARTS);
+  const newExp = state.exp + expGain;
+  const levelUp = applyLevelUp(state, newExp);
+  const eggReady = checkEggReady({ ...state, ...levelUp }, newHearts);
+
+  return {
+    ...levelUp,
+    hearts: newHearts,
+    coins: levelUp.coins + coinsGain,
+    eggReadyCharacterId: eggReady,
+  };
+}
+
+function checkEggReady(
+  state: GameState,
+  newHearts: number,
+): CharacterId | null {
   if (newHearts < EGG_HEART_THRESHOLD || state.level < EGG_LEVEL_THRESHOLD)
     return null;
   if (state.eggReadyCharacterId) return state.eggReadyCharacterId;
@@ -247,7 +296,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         hunger: newHunger,
         hungerZeroSince:
-          newHunger === 0 && !state.hungerZeroSince ? now : state.hungerZeroSince,
+          newHunger === 0 && !state.hungerZeroSince
+            ? now
+            : state.hungerZeroSince,
         lastUpdated: now,
       };
     }
@@ -257,37 +308,25 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, hearts: newHearts, lastUpdated: now };
     }
 
-    case 'ADD_HEARTS': {
-      const newHearts = Math.min(state.hearts + action.amount, MAX_HEARTS);
-      const newExp = state.exp + EXP_MEETING;
-      const levelUp = applyLevelUp(state, newExp);
-      const eggReady = checkEggReady({ ...state, ...levelUp }, newHearts);
-
+    case 'ADD_HEARTS':
       return {
         ...state,
-        ...levelUp,
-        hearts: newHearts,
-        coins: levelUp.coins + COINS_PER_MEETING,
-        eggReadyCharacterId: eggReady,
+        ...applyHeartsExpCoins(
+          state,
+          action.amount,
+          EXP_MEETING,
+          COINS_PER_MEETING,
+        ),
         lastUpdated: now,
       };
-    }
 
     case 'COMPLETE_MEETING': {
-      const newHearts = Math.min(state.hearts + action.hearts, MAX_HEARTS);
-      const newExp = state.exp + EXP_MEETING;
-      const levelUp = applyLevelUp(state, newExp);
-      const eggReady = checkEggReady({ ...state, ...levelUp }, newHearts);
-
       const sameDay = state.meetingDay === action.day;
       const meetingsToday = sameDay ? state.meetingsToday + 1 : 1;
 
       return {
         ...state,
-        ...levelUp,
-        hearts: newHearts,
-        coins: levelUp.coins + action.coins,
-        eggReadyCharacterId: eggReady,
+        ...applyHeartsExpCoins(state, action.hearts, EXP_MEETING, action.coins),
         lastMeetingAt: now,
         meetingsToday,
         meetingDay: action.day,
@@ -351,17 +390,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const coinsEarned = correctCount * MINIGAME_COIN_PER_CORRECT;
       const heartsEarned = correctCount * MINIGAME_HEART_PER_CORRECT;
       const expEarned = correctCount * MINIGAME_EXP_PER_CORRECT;
-      const newHearts = Math.min(state.hearts + heartsEarned, MAX_HEARTS);
-      const newExp = state.exp + expEarned;
-      const levelUp = applyLevelUp(state, newExp);
-      const eggReady = checkEggReady({ ...state, ...levelUp }, newHearts);
 
       return {
         ...state,
-        ...levelUp,
-        coins: levelUp.coins + coinsEarned,
-        hearts: newHearts,
-        eggReadyCharacterId: eggReady,
+        ...applyHeartsExpCoins(state, heartsEarned, expEarned, coinsEarned),
         lastUpdated: now,
       };
     }
@@ -421,11 +453,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         hungerZeroSince = state.lastUpdated + minutesToZero * 60000;
       }
 
-      const isDead =
-        (hungerZeroSince && action.now - hungerZeroSince >= DEATH_THRESHOLD_MS) ||
-        (state.cleanlinessZeroSince &&
-          action.now - state.cleanlinessZeroSince >= DEATH_THRESHOLD_MS) ||
-        (state.sickSince && action.now - state.sickSince >= DEATH_THRESHOLD_MS);
+      const isDead = isDeadByNeglect({ ...state, hungerZeroSince }, action.now);
 
       return {
         ...state,
@@ -463,7 +491,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (ready.length > 0) {
         const charPos = action.characterPosition;
         const newPoops = ready.map((_, idx) => {
-          const jitter = ready.length > 1 ? (idx - (ready.length - 1) / 2) * 6 : 0;
+          const jitter =
+            ready.length > 1 ? (idx - (ready.length - 1) / 2) * 6 : 0;
           const baseX = charPos ? charPos.x : 10 + Math.random() * 80;
           const baseY = charPos ? charPos.y : 60 + Math.random() * 25;
           return {
@@ -495,14 +524,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         changed = true;
       }
 
-      const isDead =
-        (updated.hungerZeroSince &&
-          now - updated.hungerZeroSince >= DEATH_THRESHOLD_MS) ||
-        (updated.cleanlinessZeroSince &&
-          now - updated.cleanlinessZeroSince >= DEATH_THRESHOLD_MS) ||
-        (updated.sickSince && now - updated.sickSince >= DEATH_THRESHOLD_MS);
-
-      if (isDead) return { ...updated, status: GAME_STATUS.DEAD, lastUpdated: now };
+      if (isDeadByNeglect(updated, now))
+        return { ...updated, status: GAME_STATUS.DEAD, lastUpdated: now };
 
       if (changed) return { ...updated, lastUpdated: now };
       return state;
@@ -510,7 +533,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'LOAD_STATE': {
       const loaded = { ...INITIAL_GAME_STATE, ...action.state };
-      if (loaded.characterId && !ALL_CHARACTER_IDS.includes(loaded.characterId)) {
+      if (
+        loaded.characterId &&
+        !ALL_CHARACTER_IDS.includes(loaded.characterId)
+      ) {
         return { ...INITIAL_GAME_STATE, lastUpdated: Date.now() };
       }
       return loaded;
