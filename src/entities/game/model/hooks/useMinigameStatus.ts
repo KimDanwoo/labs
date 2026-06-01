@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { MINIGAME_COOLDOWN_MS } from '@shared/constants';
+import { useCooldown } from '@shared/lib';
 import { lastMinigameAtAtom } from '../store';
 
 export type MinigameStatus = {
@@ -12,19 +12,10 @@ export type MinigameStatus = {
 
 export function useMinigameStatus(): MinigameStatus {
   const lastAt = useAtomValue(lastMinigameAtAtom);
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    if (lastAt === null) return;
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, [lastAt]);
-
-  const elapsed = lastAt === null ? Infinity : now - lastAt;
-  const cooldownRemainingMs = Math.max(0, MINIGAME_COOLDOWN_MS - elapsed);
+  const { remainingMs, isReady } = useCooldown(lastAt, MINIGAME_COOLDOWN_MS);
 
   return {
-    canPlay: cooldownRemainingMs === 0,
-    cooldownRemainingMs,
+    canPlay: isReady,
+    cooldownRemainingMs: remainingMs,
   };
 }

@@ -7,6 +7,17 @@ export const RUN_OBSTACLE_SIZE = 30;
 
 export const RUN_JUMP_VELOCITY = 8.4;
 export const RUN_GRAVITY = 0.42;
+export const RUN_GROUND_EPSILON = 0.01;
+
+export const RUN_TILT_FACTOR = 2.4;
+export const RUN_TILT_MAX = 14;
+export const RUN_HITBOX_PADDING = 6;
+export const RUN_MIN_GAP_FACTOR = 3.5;
+
+export const RUN_COUNTDOWN_STEP_MS = 600;
+export const RUN_COUNTDOWN_FINISH_MS = 2200;
+export const RUN_PICKUP_FLOAT_MS = 700;
+export const RUN_CRASH_DURATION_MS = 420;
 
 export const RUN_OBSTACLE_SPEED_BASE = 1.8;
 export const RUN_OBSTACLE_SPEED_ACCEL = 0.00028;
