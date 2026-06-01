@@ -1,5 +1,6 @@
 const RESUME_URL = 'https://docs.google.com/document/d/1_oia6H3WisAHsGNJWZAYqru9pHUXovRNAaRJcZn5UBU/edit';
 const SOUNDCLOUD_URL = 'https://soundcloud.com/danwooking';
+const BLOG_URL = 'https://dansoon-dev.tistory.com/category';
 
 const LINK_CLASS = 'font-medium text-primary underline-offset-4 hover:underline';
 
@@ -16,7 +17,11 @@ export function ProfileHeader() {
       </p>
       <p>
         일 끝나고 나면 그날그날 만들고 싶은 게 생겨요. 분야는 딱히 안 가리고, 꽂히면 주말 안에 배포까지 해버리는
-        편이에요. 요즘은 AI랑 같이 작업하면서 생각한 걸 훨씬 빠르게 현실로 옮기고 있어요.
+        편이에요. 요즘은 AI랑 같이 작업하면서 생각한 걸 훨씬 빠르게 현실로 옮기고 있어요. 만들면서 배운 것들은 가끔{' '}
+        <a href={BLOG_URL} target="_blank" rel="noreferrer" className={LINK_CLASS}>
+          블로그
+        </a>
+        에 글로도 남겨요.
       </p>
       <p>
         운동은 머리 비울 때 좋아서, 하다 보니 6년째 하고 있어요. 음악도 만드는데, 요즘은 AI로 작곡한 곡들을{' '}
