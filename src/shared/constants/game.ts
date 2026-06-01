@@ -1,4 +1,11 @@
-import type { CharacterId, CharacterInfo, FoodId, FoodItem, GameState, LevelReward } from '@shared/types';
+import type {
+  CharacterId,
+  CharacterInfo,
+  FoodId,
+  FoodItem,
+  GameState,
+  LevelReward,
+} from '@shared/types';
 
 export const CHARACTERS: Record<CharacterId, CharacterInfo> = {
   yeko: {
@@ -45,9 +52,21 @@ export const CHARACTERS: Record<CharacterId, CharacterInfo> = {
 
 export const FOODS: Record<FoodId, FoodItem> = {
   bread: { id: 'bread', name: '빵', price: 10, hungerRestore: 10, emoji: '🍞' },
-  riceball: { id: 'riceball', name: '주먹밥', price: 20, hungerRestore: 25, emoji: '🍙' },
+  riceball: {
+    id: 'riceball',
+    name: '주먹밥',
+    price: 20,
+    hungerRestore: 25,
+    emoji: '🍙',
+  },
   meat: { id: 'meat', name: '고기', price: 50, hungerRestore: 50, emoji: '🍖' },
-  cake: { id: 'cake', name: '케이크', price: 100, hungerRestore: 100, emoji: '🎂' },
+  cake: {
+    id: 'cake',
+    name: '케이크',
+    price: 100,
+    hungerRestore: 100,
+    emoji: '🎂',
+  },
 };
 
 export const MAX_HUNGER = 100;
@@ -57,8 +76,6 @@ export const MAX_HEARTS = 100;
 export const HUNGER_DECAY_PER_MINUTE = 1;
 export const CLEANLINESS_PER_POOP = 10;
 export const DEATH_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000; // 3일 방치 시 사망
-
-export const HEARTS_PER_MEETING = 10;
 
 export const EXP_FEED = 5;
 export const EXP_CLEAN = 3;
@@ -129,13 +146,35 @@ export const WARNING_THRESHOLD = 40;
 
 // 레벨업 보상
 export const LEVEL_REWARDS: Record<number, LevelReward> = {
-  2: { coins: 30, food: { bread: 2 }, message: '레벨 2 달성! 빵 2개와 30코인!' },
-  3: { coins: 50, food: { riceball: 2 }, message: '레벨 3 달성! 주먹밥 2개와 50코인!' },
-  4: { coins: 80, food: { meat: 1 }, message: '레벨 4 달성! 고기 1개와 80코인!' },
-  5: { coins: 150, food: { cake: 1 }, message: '레벨 5 달성! 케이크 1개와 150코인!' },
+  2: {
+    coins: 30,
+    food: { bread: 2 },
+    message: '레벨 2 달성! 빵 2개와 30코인!',
+  },
+  3: {
+    coins: 50,
+    food: { riceball: 2 },
+    message: '레벨 3 달성! 주먹밥 2개와 50코인!',
+  },
+  4: {
+    coins: 80,
+    food: { meat: 1 },
+    message: '레벨 4 달성! 고기 1개와 80코인!',
+  },
+  5: {
+    coins: 150,
+    food: { cake: 1 },
+    message: '레벨 5 달성! 케이크 1개와 150코인!',
+  },
 };
 
-export const ALL_CHARACTER_IDS: CharacterId[] = ['yeko', 'ako', 'bamko', 'eunko', 'hako'];
+export const ALL_CHARACTER_IDS: CharacterId[] = [
+  'yeko',
+  'ako',
+  'bamko',
+  'eunko',
+  'hako',
+];
 
 export const GAME_STATUS = {
   SELECTING: 'selecting',
