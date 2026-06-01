@@ -1,0 +1,20 @@
+{
+  "name": "@repo/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "next.eslint.config.mjs",
+    "fsd.config.mjs",
+    "library.eslint.config.mjs"
+  ],
+  "devDependencies": {
+    "@typescript-eslint/parser": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-next": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-import-resolver-typescript": "catalog:",
+    "eslint-plugin-boundaries": "catalog:",
+    "eslint-plugin-prettier": "catalog:",
+    "typescript": "catalog:"
+  }
+}

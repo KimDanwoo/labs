@@ -1,0 +1,25 @@
+{
+  "name": "@tokens/css",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./theme.css": "./generated/theme.css"
+  },
+  "scripts": {
+    "tokens": "tsx scripts/build-tokens.ts",
+    "build": "tsx scripts/build-tokens.ts",
+    "lint": "eslint"
+  },
+  "devDependencies": {
+    "@danwoo/config": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
+  }
+}

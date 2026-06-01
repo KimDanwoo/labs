@@ -1,0 +1,41 @@
+import type { Project } from '@entities/project/model/types';
+
+/** 소개할 내 프로젝트(Labs) 목록. 새 프로젝트는 여기에 추가한다. */
+export const PROJECTS: Project[] = [
+  {
+    title: '플코',
+    description: '함께 키우는 다마고치 게임',
+    href: 'https://plco-tamagochi.vercel.app/',
+    image: '/projects/plco.png',
+  },
+  {
+    title: '청연사주',
+    description: '웹툰 형식의 사주 해석',
+    href: 'https://cheongyeon-saju.vercel.app/',
+    image: '/projects/cheongyeon-saju.png',
+  },
+  {
+    title: 'AI Tech News',
+    description: 'AI 뉴스 큐레이션',
+    href: 'https://danwoo-dev.netlify.app/',
+    image: '/projects/ai-tech-news.png',
+  },
+  {
+    title: 'Best Seller',
+    description: '실시간 베스트셀러 탐색',
+    href: 'https://danwoo-dev.netlify.app/book/',
+    image: '/projects/best-seller.png',
+  },
+  {
+    title: '프딥',
+    description: 'Frontend Deep Dive 아카이브',
+    href: 'https://fe-deep.vercel.app/',
+    image: '/projects/fe-deep.png',
+  },
+  {
+    title: '스도쿠',
+    description: '가볍게 즐기는 퍼즐 게임',
+    href: 'https://awesome-sudoku.vercel.app/',
+    image: '/projects/sudoku.png',
+  },
+];
