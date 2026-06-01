@@ -1,216 +1,41 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  MINIGAME_COIN_PER_CORRECT,
-  MINIGAME_HEART_PER_CORRECT,
-} from '@shared/constants';
-import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
-import {
-  MINIGAME_EMOJIS,
-  MINIGAME_DURATION,
-  MINIGAME_FIELD_WIDTH,
-  MINIGAME_FIELD_HEIGHT,
+  MINIGAME_CATCHER_BOTTOM,
+  MINIGAME_CATCHER_EMOJI_SIZE,
+  MINIGAME_CATCHER_HEIGHT,
   MINIGAME_CATCHER_WIDTH,
+  MINIGAME_FIELD_HEIGHT,
+  MINIGAME_FIELD_WIDTH,
   MINIGAME_ITEM_SIZE,
-  MINIGAME_CATCHER_SPEED,
-  MINIGAME_CATCH_EFFECT_MS,
-  MINIGAME_SPAWN_INTERVAL_BASE,
-  MINIGAME_SPAWN_INTERVAL_MIN,
-  MINIGAME_SPAWN_SPEEDUP,
-  MINIGAME_ITEM_SPEED_BASE,
-  MINIGAME_ITEM_SPEED_RANDOM,
-  MINIGAME_ITEM_SPEED_ACCEL,
+  MINIGAME_PHASE,
   MINIGAME_SCORE_GOOD,
   MINIGAME_SCORE_OK,
-  MINIGAME_PHASE,
 } from '../model/constants';
-import type { MinigamePhase, FallingItem } from '../model/types';
+import { useCatchEngine } from '../model/hooks';
+import MinigameCooldownNotice from './MinigameCooldownNotice';
+import MinigameRewardSummary from './MinigameRewardSummary';
 
 type CatchGameProps = {
   onExitToMenu: () => void;
 };
 
-function formatRegen(ms: number): string {
-  const totalSec = Math.ceil(ms / 1000);
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return m > 0 ? `${m}분 ${s}초` : `${s}초`;
-}
-
 export default function CatchGame({ onExitToMenu }: CatchGameProps) {
-  const { minigameReward, markMinigamePlayed, closeModal } = useGameActions();
-  const minigame = useMinigameStatus();
-
-  const [phase, setPhase] = useState<MinigamePhase>('ready');
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(MINIGAME_DURATION);
-  const [catcherX, setCatcherX] = useState(
-    MINIGAME_FIELD_WIDTH / 2 - MINIGAME_CATCHER_WIDTH / 2,
-  );
-  const [items, setItems] = useState<FallingItem[]>([]);
-  const [catchEffect, setCatchEffect] = useState<{ x: number; y: number } | null>(
-    null,
-  );
-
-  const nextId = useRef(0);
-  const gameStart = useRef(0);
-  const keysPressed = useRef<Set<string>>(new Set());
-  const animFrameRef = useRef<number>(0);
-  const catcherRef = useRef(
-    MINIGAME_FIELD_WIDTH / 2 - MINIGAME_CATCHER_WIDTH / 2,
-  );
-  const itemsRef = useRef<FallingItem[]>([]);
-  const scoreRef = useRef(0);
-  const lastSpawn = useRef(0);
-
-  const startGame = useCallback(() => {
-    if (!minigame.canPlay) return;
-    markMinigamePlayed();
-    setPhase(MINIGAME_PHASE.PLAYING);
-    setScore(0);
-    scoreRef.current = 0;
-    setItems([]);
-    itemsRef.current = [];
-    setTimeLeft(MINIGAME_DURATION);
-    setCatcherX(MINIGAME_FIELD_WIDTH / 2 - MINIGAME_CATCHER_WIDTH / 2);
-    catcherRef.current = MINIGAME_FIELD_WIDTH / 2 - MINIGAME_CATCHER_WIDTH / 2;
-    gameStart.current = Date.now();
-    nextId.current = 0;
-    lastSpawn.current = 0;
-  }, [markMinigamePlayed, minigame.canPlay]);
-
-  useEffect(() => {
-    if (phase !== 'playing') return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        keysPressed.current.add(e.key);
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      keysPressed.current.delete(e.key);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-      keysPressed.current.clear();
-    };
-  }, [phase]);
-
-  useEffect(() => {
-    if (phase !== 'playing') return;
-
-    const loop = () => {
-      const now = Date.now();
-      const elapsed = now - gameStart.current;
-
-      if (elapsed >= MINIGAME_DURATION) {
-        setPhase(MINIGAME_PHASE.RESULT);
-        setTimeLeft(0);
-        setScore(scoreRef.current);
-        return;
-      }
-
-      setTimeLeft(MINIGAME_DURATION - elapsed);
-
-      if (keysPressed.current.has('ArrowLeft')) {
-        catcherRef.current = Math.max(0, catcherRef.current - MINIGAME_CATCHER_SPEED);
-      }
-      if (keysPressed.current.has('ArrowRight')) {
-        catcherRef.current = Math.min(
-          MINIGAME_FIELD_WIDTH - MINIGAME_CATCHER_WIDTH,
-          catcherRef.current + MINIGAME_CATCHER_SPEED,
-        );
-      }
-      setCatcherX(catcherRef.current);
-
-      const spawnInterval = Math.max(
-        MINIGAME_SPAWN_INTERVAL_MIN,
-        MINIGAME_SPAWN_INTERVAL_BASE - elapsed * MINIGAME_SPAWN_SPEEDUP,
-      );
-      if (now - lastSpawn.current > spawnInterval) {
-        const newItem: FallingItem = {
-          id: nextId.current++,
-          x: Math.random() * (MINIGAME_FIELD_WIDTH - MINIGAME_ITEM_SIZE),
-          y: -MINIGAME_ITEM_SIZE,
-          emoji: MINIGAME_EMOJIS[Math.floor(Math.random() * MINIGAME_EMOJIS.length)],
-          speed:
-            MINIGAME_ITEM_SPEED_BASE +
-            Math.random() * MINIGAME_ITEM_SPEED_RANDOM +
-            elapsed * MINIGAME_ITEM_SPEED_ACCEL,
-        };
-        itemsRef.current = [...itemsRef.current, newItem];
-        lastSpawn.current = now;
-      }
-
-      const cx = catcherRef.current;
-      const catcherY = MINIGAME_FIELD_HEIGHT - 44;
-      let caught = 0;
-
-      const alive = itemsRef.current
-        .map((item) => ({ ...item, y: item.y + item.speed }))
-        .filter((item) => {
-          const isColliding =
-            item.y + MINIGAME_ITEM_SIZE >= catcherY &&
-            item.y <= catcherY + 36 &&
-            item.x + MINIGAME_ITEM_SIZE >= cx &&
-            item.x <= cx + MINIGAME_CATCHER_WIDTH;
-
-          if (isColliding) {
-            caught++;
-            setCatchEffect({ x: item.x, y: item.y });
-            setTimeout(() => setCatchEffect(null), MINIGAME_CATCH_EFFECT_MS);
-            return false;
-          }
-
-          if (item.y > MINIGAME_FIELD_HEIGHT + 10) return false;
-
-          return true;
-        });
-
-      if (caught > 0) {
-        scoreRef.current += caught;
-        setScore(scoreRef.current);
-      }
-
-      itemsRef.current = alive;
-      setItems(alive);
-
-      animFrameRef.current = requestAnimationFrame(loop);
-    };
-
-    animFrameRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animFrameRef.current);
-  }, [phase]);
-
-  const handleTouchMove = useCallback((direction: 'left' | 'right') => {
-    if (direction === 'left') {
-      keysPressed.current.add('ArrowLeft');
-      keysPressed.current.delete('ArrowRight');
-    } else {
-      keysPressed.current.add('ArrowRight');
-      keysPressed.current.delete('ArrowLeft');
-    }
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    keysPressed.current.delete('ArrowLeft');
-    keysPressed.current.delete('ArrowRight');
-  }, []);
-
-  const handleFinish = useCallback(() => {
-    minigameReward({ correctCount: score });
-    closeModal();
-  }, [score, minigameReward, closeModal]);
-
-  const progressPercent = (timeLeft / MINIGAME_DURATION) * 100;
-  const finalScore = phase === MINIGAME_PHASE.RESULT ? score : 0;
+  const {
+    minigame,
+    phase,
+    score,
+    timeLeft,
+    catcherX,
+    items,
+    catchEffect,
+    progressPercent,
+    finalScore,
+    startGame,
+    handleTouchMove,
+    handleTouchEnd,
+    handleFinish,
+  } = useCatchEngine();
 
   if (phase === MINIGAME_PHASE.READY) {
     return (
@@ -223,9 +48,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
           떨어지는 하트를 받으세요!
         </p>
         {!minigame.canPlay && (
-          <div className="text-[11px] text-gray-400">
-            ⏳ 다음 플레이까지 {formatRegen(minigame.cooldownRemainingMs)}
-          </div>
+          <MinigameCooldownNotice remainingMs={minigame.cooldownRemainingMs} />
         )}
         <button
           onClick={startGame}
@@ -303,10 +126,10 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
             className="absolute flex items-center justify-center"
             style={{
               left: catcherX,
-              bottom: 8,
+              bottom: MINIGAME_CATCHER_BOTTOM,
               width: MINIGAME_CATCHER_WIDTH,
-              height: 36,
-              fontSize: 28,
+              height: MINIGAME_CATCHER_HEIGHT,
+              fontSize: MINIGAME_CATCHER_EMOJI_SIZE,
             }}
           >
             🧺
@@ -352,20 +175,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
         <h3 className="text-xl font-bold text-gray-700">
           {finalScore}개 잡았어요!
         </h3>
-        <div className="flex justify-center gap-6">
-          <div className="text-center">
-            <div className="text-lg font-bold text-amber-500">
-              🪙 +{finalScore * MINIGAME_COIN_PER_CORRECT}
-            </div>
-            <div className="text-[10px] text-gray-400">코인</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-pink-400">
-              💕 +{finalScore * MINIGAME_HEART_PER_CORRECT}
-            </div>
-            <div className="text-[10px] text-gray-400">행복도</div>
-          </div>
-        </div>
+        <MinigameRewardSummary score={finalScore} />
         <button
           onClick={handleFinish}
           className="btn-primary btn-press w-full"

@@ -1,331 +1,51 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAtomValue } from 'jotai';
-import {
-  MINIGAME_COIN_PER_CORRECT,
-  MINIGAME_HEART_PER_CORRECT,
-} from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
 import { characterIdAtom } from '@entities/game/model/store';
-import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
 import {
-  RUN_BEST_SCORE_KEY,
   RUN_CHAR_SIZE,
   RUN_CHAR_X,
   RUN_FIELD_HEIGHT,
   RUN_FIELD_WIDTH,
-  RUN_GRAVITY,
   RUN_GROUND_HEIGHT,
   RUN_HEART_EMOJI,
   RUN_HEART_SIZE,
-  RUN_HEART_SPAWN_INTERVAL_BASE,
-  RUN_HEART_SPAWN_INTERVAL_MIN,
-  RUN_HEART_Y_MAX,
-  RUN_HEART_Y_MIN,
-  RUN_JUMP_VELOCITY,
-  RUN_OBSTACLE_EMOJIS,
   RUN_OBSTACLE_SIZE,
-  RUN_OBSTACLE_SPEED_ACCEL,
-  RUN_OBSTACLE_SPEED_BASE,
+  RUN_PHASE,
   RUN_REWARD_CAP,
   RUN_SCORE_GOOD,
   RUN_SCORE_OK,
-  RUN_SPAWN_INTERVAL_BASE,
-  RUN_SPAWN_INTERVAL_MIN,
-  RUN_SPAWN_SPEEDUP,
-  RUN_PHASE,
 } from '../model/constants';
-import type { RunHeart, RunObstacle, RunPhase } from '../model/types';
+import { useRunEngine } from '../model/hooks';
+import MinigameCooldownNotice from './MinigameCooldownNotice';
+import MinigameRewardSummary from './MinigameRewardSummary';
 
 type PlcoRunGameProps = {
   onExitToMenu: () => void;
 };
 
-function formatRegen(ms: number): string {
-  const totalSec = Math.ceil(ms / 1000);
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return m > 0 ? `${m}분 ${s}초` : `${s}초`;
-}
-
-function loadBestScore(): number {
-  if (typeof window === 'undefined') return 0;
-  const raw = window.localStorage.getItem(RUN_BEST_SCORE_KEY);
-  const parsed = raw ? Number.parseInt(raw, 10) : 0;
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-}
-
-function saveBestScore(score: number): void {
-  if (typeof window === 'undefined') return;
-  window.localStorage.setItem(RUN_BEST_SCORE_KEY, String(score));
-}
-
 export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
-  const { minigameReward, markMinigamePlayed, closeModal } = useGameActions();
   const characterId = useAtomValue(characterIdAtom);
-  const minigame = useMinigameStatus();
-
-  const [phase, setPhase] = useState<RunPhase>(RUN_PHASE.READY);
-  const [score, setScore] = useState(0);
-  const [scorePulseKey, setScorePulseKey] = useState(0);
-  const [bestScore, setBestScore] = useState<number>(() => loadBestScore());
-  const [charY, setCharY] = useState(0);
-  const [charTilt, setCharTilt] = useState(0);
-  const [obstacles, setObstacles] = useState<RunObstacle[]>([]);
-  const [hearts, setHearts] = useState<RunHeart[]>([]);
-  const [pickups, setPickups] = useState<
-    { id: number; x: number; y: number }[]
-  >([]);
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const [isCrashing, setIsCrashing] = useState(false);
-
-  const charYRef = useRef(0);
-  const charVyRef = useRef(0);
-  const obstaclesRef = useRef<RunObstacle[]>([]);
-  const heartsRef = useRef<RunHeart[]>([]);
-  const scoreRef = useRef(0);
-  const nextIdRef = useRef(0);
-  const lastObstacleSpawnRef = useRef(0);
-  const lastHeartSpawnRef = useRef(0);
-  const gameStartRef = useRef(0);
-  const animFrameRef = useRef(0);
-  const countdownTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  const finishGame = useCallback(() => {
-    setPhase(RUN_PHASE.RESULT);
-    const final = scoreRef.current;
-    setScore(final);
-    setBestScore((prev) => {
-      if (final > prev) {
-        saveBestScore(final);
-        return final;
-      }
-      return prev;
-    });
-  }, []);
-
-  const clearCountdownTimers = useCallback(() => {
-    countdownTimersRef.current.forEach((t) => clearTimeout(t));
-    countdownTimersRef.current = [];
-  }, []);
-
-  const startGame = useCallback(() => {
-    if (!minigame.canPlay) return;
-    markMinigamePlayed();
-    scoreRef.current = 0;
-    setScore(0);
-    obstaclesRef.current = [];
-    setObstacles([]);
-    heartsRef.current = [];
-    setHearts([]);
-    setPickups([]);
-    charYRef.current = 0;
-    charVyRef.current = 0;
-    setCharY(0);
-    setCharTilt(0);
-    nextIdRef.current = 0;
-    lastObstacleSpawnRef.current = 0;
-    lastHeartSpawnRef.current = 0;
-    setIsCrashing(false);
-    setPhase(RUN_PHASE.PLAYING);
-
-    clearCountdownTimers();
-    setCountdown(3);
-    countdownTimersRef.current.push(
-      setTimeout(() => setCountdown(2), 600),
-      setTimeout(() => setCountdown(1), 1200),
-      setTimeout(() => setCountdown(0), 1800),
-      setTimeout(() => {
-        setCountdown(null);
-        gameStartRef.current = Date.now();
-      }, 2200),
-    );
-  }, [clearCountdownTimers, markMinigamePlayed, minigame.canPlay]);
-
-  useEffect(() => clearCountdownTimers, [clearCountdownTimers]);
-
-  const jump = useCallback(() => {
-    if (countdown !== null) return;
-    if (charYRef.current <= 0.01) {
-      charVyRef.current = RUN_JUMP_VELOCITY;
-    }
-  }, [countdown]);
-
-  useEffect(() => {
-    if (phase !== 'playing') return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space' || e.code === 'ArrowUp') {
-        e.preventDefault();
-        jump();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [phase, jump]);
-
-  useEffect(() => {
-    if (phase !== 'playing' || countdown !== null || isCrashing) return;
-
-    const loop = () => {
-      const now = Date.now();
-      const elapsed = now - gameStartRef.current;
-
-      charVyRef.current -= RUN_GRAVITY;
-      charYRef.current = Math.max(0, charYRef.current + charVyRef.current);
-      if (charYRef.current <= 0) charVyRef.current = 0;
-      setCharY(charYRef.current);
-      setCharTilt(Math.max(-14, Math.min(14, -charVyRef.current * 2.4)));
-
-      const speed = RUN_OBSTACLE_SPEED_BASE + elapsed * RUN_OBSTACLE_SPEED_ACCEL;
-
-      const obstacleSpawnInterval = Math.max(
-        RUN_SPAWN_INTERVAL_MIN,
-        RUN_SPAWN_INTERVAL_BASE - elapsed * RUN_SPAWN_SPEEDUP,
-      );
-      if (now - lastObstacleSpawnRef.current > obstacleSpawnInterval) {
-        const lastObs = obstaclesRef.current[obstaclesRef.current.length - 1];
-        const minGap = RUN_OBSTACLE_SIZE * 3.5;
-        if (!lastObs || RUN_FIELD_WIDTH - lastObs.x >= minGap) {
-          obstaclesRef.current = [
-            ...obstaclesRef.current,
-            {
-              id: nextIdRef.current++,
-              x: RUN_FIELD_WIDTH,
-              emoji:
-                RUN_OBSTACLE_EMOJIS[
-                  Math.floor(Math.random() * RUN_OBSTACLE_EMOJIS.length)
-                ],
-            },
-          ];
-          lastObstacleSpawnRef.current = now;
-        }
-      }
-
-      const heartSpawnInterval =
-        RUN_HEART_SPAWN_INTERVAL_MIN +
-        Math.random() *
-          (RUN_HEART_SPAWN_INTERVAL_BASE - RUN_HEART_SPAWN_INTERVAL_MIN);
-      if (now - lastHeartSpawnRef.current > heartSpawnInterval) {
-        const y =
-          RUN_HEART_Y_MIN +
-          Math.random() * (RUN_HEART_Y_MAX - RUN_HEART_Y_MIN);
-        heartsRef.current = [
-          ...heartsRef.current,
-          {
-            id: nextIdRef.current++,
-            x: RUN_FIELD_WIDTH,
-            y,
-          },
-        ];
-        lastHeartSpawnRef.current = now;
-      }
-
-      const charLeft = RUN_CHAR_X;
-      const charRight = RUN_CHAR_X + RUN_CHAR_SIZE;
-      const charBottom = charYRef.current;
-      const charTop = charYRef.current + RUN_CHAR_SIZE;
-      const hitboxPadding = 6;
-
-      let collided = false;
-      const nextObstacles: RunObstacle[] = [];
-      for (const obs of obstaclesRef.current) {
-        const movedX = obs.x - speed;
-        const obsLeft = movedX;
-        const obsRight = movedX + RUN_OBSTACLE_SIZE;
-        const obsTop = RUN_OBSTACLE_SIZE;
-
-        const overlapX =
-          obsLeft + hitboxPadding < charRight - hitboxPadding &&
-          obsRight - hitboxPadding > charLeft + hitboxPadding;
-        const overlapY = charBottom < obsTop - hitboxPadding;
-
-        if (overlapX && overlapY) {
-          collided = true;
-        }
-
-        if (obsRight + RUN_OBSTACLE_SIZE >= 0) {
-          nextObstacles.push({ ...obs, x: movedX });
-        }
-
-        if (collided) break;
-      }
-      obstaclesRef.current = nextObstacles;
-
-      let caughtThisFrame = 0;
-      const caughtPickups: { id: number; x: number; y: number }[] = [];
-      const nextHearts: RunHeart[] = [];
-      for (const heart of heartsRef.current) {
-        const movedX = heart.x - speed;
-        const heartLeft = movedX;
-        const heartRight = movedX + RUN_HEART_SIZE;
-        const heartBottom = heart.y;
-        const heartTop = heart.y + RUN_HEART_SIZE;
-
-        const overlapX =
-          heartLeft < charRight - hitboxPadding &&
-          heartRight > charLeft + hitboxPadding;
-        const overlapY =
-          heartBottom < charTop - hitboxPadding &&
-          heartTop > charBottom + hitboxPadding;
-
-        if (overlapX && overlapY) {
-          caughtThisFrame += 1;
-          caughtPickups.push({
-            id: nextIdRef.current++,
-            x: movedX,
-            y: heart.y,
-          });
-          continue;
-        }
-
-        if (heartRight >= 0) {
-          nextHearts.push({ ...heart, x: movedX });
-        }
-      }
-      heartsRef.current = nextHearts;
-
-      if (caughtThisFrame > 0) {
-        scoreRef.current += caughtThisFrame;
-        setScore(scoreRef.current);
-        setScorePulseKey((k) => k + 1);
-        setPickups((prev) => [...prev, ...caughtPickups]);
-        caughtPickups.forEach((p) => {
-          setTimeout(() => {
-            setPickups((prev) => prev.filter((q) => q.id !== p.id));
-          }, 700);
-        });
-      }
-
-      setObstacles(obstaclesRef.current);
-      setHearts(heartsRef.current);
-
-      if (collided) {
-        setIsCrashing(true);
-        setTimeout(() => {
-          setIsCrashing(false);
-          finishGame();
-        }, 420);
-        return;
-      }
-
-      animFrameRef.current = requestAnimationFrame(loop);
-    };
-
-    animFrameRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animFrameRef.current);
-  }, [phase, countdown, isCrashing, finishGame]);
-
-  const handleFinish = useCallback(() => {
-    const reward = Math.min(scoreRef.current, RUN_REWARD_CAP);
-    minigameReward({ correctCount: reward });
-    closeModal();
-  }, [minigameReward, closeModal]);
-
-  const isNewBest = phase === RUN_PHASE.RESULT && score > 0 && score >= bestScore;
-  const rewardScore = Math.min(score, RUN_REWARD_CAP);
+  const {
+    minigame,
+    phase,
+    score,
+    scorePulseKey,
+    bestScore,
+    charY,
+    charTilt,
+    obstacles,
+    hearts,
+    pickups,
+    countdown,
+    isCrashing,
+    isNewBest,
+    rewardScore,
+    startGame,
+    jump,
+    handleFinish,
+  } = useRunEngine();
 
   if (phase === RUN_PHASE.READY) {
     return (
@@ -343,9 +63,7 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
           </div>
         )}
         {!minigame.canPlay && (
-          <div className="text-[11px] text-gray-400">
-            ⏳ 다음 플레이까지 {formatRegen(minigame.cooldownRemainingMs)}
-          </div>
+          <MinigameCooldownNotice remainingMs={minigame.cooldownRemainingMs} />
         )}
         <button
           onClick={startGame}
@@ -400,8 +118,7 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
             className="absolute left-0 right-0 bottom-0"
             style={{
               height: RUN_GROUND_HEIGHT,
-              background:
-                'linear-gradient(180deg, #A7F3D0 0%, #6EE7B7 100%)',
+              background: 'linear-gradient(180deg, #A7F3D0 0%, #6EE7B7 100%)',
               borderTop: '2px dashed rgba(16,185,129,0.4)',
             }}
           />
@@ -522,20 +239,7 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
           <div className="text-xs text-gray-400">최고기록 {bestScore}개</div>
         )}
 
-        <div className="flex justify-center gap-6">
-          <div className="text-center">
-            <div className="text-lg font-bold text-amber-500">
-              🪙 +{rewardScore * MINIGAME_COIN_PER_CORRECT}
-            </div>
-            <div className="text-[10px] text-gray-400">코인</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-pink-400">
-              💕 +{rewardScore * MINIGAME_HEART_PER_CORRECT}
-            </div>
-            <div className="text-[10px] text-gray-400">행복도</div>
-          </div>
-        </div>
+        <MinigameRewardSummary score={rewardScore} />
 
         {score > RUN_REWARD_CAP && (
           <div className="text-[10px] text-gray-400">
@@ -544,9 +248,7 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
         )}
 
         {!minigame.canPlay && (
-          <div className="text-[11px] text-gray-400">
-            ⏳ 다음 플레이까지 {formatRegen(minigame.cooldownRemainingMs)}
-          </div>
+          <MinigameCooldownNotice remainingMs={minigame.cooldownRemainingMs} />
         )}
 
         <div className="flex gap-2">
