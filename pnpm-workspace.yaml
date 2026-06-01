@@ -1,0 +1,36 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# 의존성 버전 단일 관리(catalog). 각 package.json은 "catalog:"로 참조한다.
+# 버전 변경은 여기 한 곳만 수정 후 `pnpm install`.
+catalog:
+  # framework / runtime
+  next: 16.2.6
+  react: 19.2.4
+  react-dom: 19.2.4
+
+  # styling
+  tailwindcss: ^4
+  '@tailwindcss/postcss': ^4
+
+  # tooling
+  typescript: ^5
+  tsx: ^4.19.2
+  turbo: ^2.5.8
+  prettier: ^3.4.2
+  eslint: ^9
+  eslint-config-next: 16.2.6
+
+  # lint / format 공유 설정(@repo/eslint-config, @repo/prettier-config)에서 사용
+  '@typescript-eslint/parser': ^8.60.0
+  eslint-config-prettier: ^10.1.8
+  eslint-import-resolver-typescript: ^3.10.1
+  eslint-plugin-boundaries: ^6.0.2
+  eslint-plugin-prettier: ^5.5.6
+  prettier-plugin-organize-imports: ^4.3.0
+
+  # types
+  '@types/node': ^20
+  '@types/react': ^19
+  '@types/react-dom': ^19

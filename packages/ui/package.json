@@ -1,0 +1,26 @@
+{
+  "name": "@ui/react",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/ui/index.ts",
+    "./card": "./src/card/compound.ts",
+    "./flat": "./src/flat/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint"
+  },
+  "peerDependencies": {
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@danwoo/config": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  }
+}

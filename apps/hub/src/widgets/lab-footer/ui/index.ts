@@ -1,0 +1,1 @@
+export { LabFooter } from './LabFooter';

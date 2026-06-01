@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+
+/* @tokens/css 가 생성한 디자인 토큰 (색상/폰트/여백 + 다크모드 변수) */
+@import '@tokens/css/theme.css';
+
+/* 모노레포 공통 UI 패키지의 클래스도 스캔 대상에 포함 */
+@source '../../../../packages/ui/src/**/*.{ts,tsx}';
+
+/* 배경에 brand glow 레이어를 얹어 글래스 표면이 떠 보이게 한다(토큰 var 기반). */
+body {
+  background-color: var(--color-background);
+  background-image:
+    radial-gradient(60rem 32rem at 50% -8rem, var(--color-glow), transparent 70%),
+    radial-gradient(40rem 24rem at 100% 0, var(--color-glow), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  /* 한글이 글자 단위로 끊기지 않고 단어(어절) 단위로 줄바꿈되게 한다. */
+  word-break: keep-all;
+  /* 끊을 수 없는 긴 토큰(URL 등)은 넘치지 않게 줄바꿈 허용. */
+  overflow-wrap: anywhere;
+}

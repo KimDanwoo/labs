@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+/* @tokens/css 가 생성한 디자인 토큰 (색상/폰트/여백 + 다크모드 변수) */
+@import '@tokens/css/theme.css';
+
+/* 모노레포 공통 UI 패키지의 클래스도 스캔 대상에 포함 */
+@source '../../../packages/ui/src/**/*.{ts,tsx}';
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
