@@ -119,6 +119,7 @@ export const OVERFEED_MESSAGE = '이미 배불러요... 토할 것 같아요';
 // 만남 규칙
 export const MEETING_COOLDOWN_MS = 5 * 60_000;
 export const MEETING_DAILY_LIMIT = 3;
+export const MEETING_PLAY_SCENE_MS = 5000; // 만남 후 공원에서 함께 노는 시간
 export const MEETING_ROUNDS = 3;
 export const MEETING_REWARD_GOOD = 6;
 export const MEETING_REWARD_OK = 3;
