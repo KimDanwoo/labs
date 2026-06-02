@@ -11,6 +11,7 @@ import {
 } from '@shared/constants';
 import { gameAtom } from './gameAtom';
 import { activeModalAtom } from './modalAtom';
+import { meetingPlayFriendAtom } from './meetingPlayAtom';
 
 export const statusAtom = selectAtom(gameAtom, (s) => s.status);
 export const characterIdAtom = selectAtom(gameAtom, (s) => s.characterId);
@@ -79,7 +80,11 @@ export const bathroomExitAtAtom = atom<number | null>(null);
 
 export const roomTypeAtom = atom<RoomType>((get) => {
   if (get(isSleepingAtom)) return ROOM_TYPE.BEDROOM;
-  if (get(activeModalAtom) === MODAL_TYPE.MEETING) return ROOM_TYPE.OUTDOOR;
+  if (
+    get(activeModalAtom) === MODAL_TYPE.MEETING ||
+    get(meetingPlayFriendAtom)
+  )
+    return ROOM_TYPE.OUTDOOR;
   if (get(bathroomActiveAtom)) return ROOM_TYPE.BATHROOM;
   return ROOM_TYPE.LIVING;
 });
