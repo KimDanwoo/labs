@@ -4,7 +4,7 @@ import type { Project } from '@entities/project/model/types';
 export const PROJECTS: Project[] = [
   {
     title: '플코',
-    description: '함께 키우는 다마고치 게임',
+    description: '아이돌 컨셉 다마고치 게임',
     href: 'https://plco-tamagochi.vercel.app/',
     image: '/projects/plco.png',
   },
@@ -22,7 +22,7 @@ export const PROJECTS: Project[] = [
   },
   {
     title: 'Best Seller',
-    description: '실시간 베스트셀러 탐색',
+    description: '주간 베스트셀러 리포트',
     href: 'https://danwoo-dev.netlify.app/book/',
     image: '/projects/best-seller.png',
   },
@@ -34,7 +34,7 @@ export const PROJECTS: Project[] = [
   },
   {
     title: '스도쿠',
-    description: '가볍게 즐기는 퍼즐 게임',
+    description: '쉽게 즐기는 스도쿠 게임',
     href: 'https://awesome-sudoku.vercel.app/',
     image: '/projects/sudoku.png',
   },
