@@ -159,7 +159,7 @@ export default function MeetingModal() {
             onClick={handleFinish}
             className="w-full py-3 rounded-xl bg-pink-400 text-white font-bold btn-press"
           >
-            받기!
+            {totalHearts > 0 ? '받기!' : '집으로 가기'}
           </button>
         </>
       )}

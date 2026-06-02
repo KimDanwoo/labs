@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import type { CharacterId } from '@shared/types';
 import {
   COINS_PER_MEETING,
@@ -12,7 +12,10 @@ import {
   MEETING_ROUNDS,
 } from '@shared/constants';
 import { formatDateKey } from '@shared/lib';
-import { characterIdAtom } from '@entities/game/model/store';
+import {
+  characterIdAtom,
+  meetingPlayFriendAtom,
+} from '@entities/game/model/store';
 import { useGameActions } from '@entities/game/model/hooks';
 import {
   CONVERSATION_OUTCOME,
@@ -38,6 +41,7 @@ function rewardOf(outcome: ConversationOutcome): number {
 
 export function useMeetingChat() {
   const myCharacterId = useAtomValue(characterIdAtom);
+  const setMeetingPlayFriend = useSetAtom(meetingPlayFriendAtom);
   const { completeMeeting, closeModal } = useGameActions();
 
   const [phase, setPhase] = useState<MeetingPhase>(MEETING_PHASE.SEARCHING);
@@ -102,12 +106,18 @@ export function useMeetingChat() {
   const coinsReward =
     COINS_PER_MEETING + (isPerfect ? MEETING_PERFECT_COIN_BONUS : 0);
 
+  const isAwkward = totalHearts === 0;
+
   const handleFinish = () => {
     completeMeeting({
       hearts: totalHearts,
-      coins: coinsReward,
+      coins: isAwkward ? 0 : coinsReward,
       day: formatDateKey(new Date()),
     });
+    // 보상이 있으면 공원에서 친구와 뛰어노는 장면, 다 싫어요면 바로 집으로
+    if (!isAwkward && metCharacter) {
+      setMeetingPlayFriend(metCharacter);
+    }
     closeModal();
   };
 
