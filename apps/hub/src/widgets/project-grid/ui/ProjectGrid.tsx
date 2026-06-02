@@ -6,9 +6,9 @@ import { ProjectCard } from '@entities/project/ui';
 export function ProjectGrid() {
   return (
     <section className="flex flex-col gap-lg">
-      <div className="flex flex-col gap-xs">
+      <div className="flex flex-col gap-xs fade-up">
         <div className="flex items-center gap-sm">
-          <h2 className="text-2xl font-semibold text-foreground">Labs</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Labs</h2>
           <Badge tone="primary">{PROJECTS.length} projects</Badge>
         </div>
         <p className="text-sm text-muted">작은 아이디어들을 빠르게 만들고 실험하는 공간</p>
