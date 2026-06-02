@@ -88,23 +88,31 @@ select {
   }
 }
 
-/* 스크롤 유도 힌트 (결과 첫 화면) */
-@keyframes scroll-hint-bounce {
-  0%,
-  100% {
+/* 스크롤 유도 힌트 (마우스 휠 도트) */
+@keyframes scroll-wheel-dot {
+  0% {
     transform: translateY(0);
+    opacity: 0;
   }
-  50% {
-    transform: translateY(6px);
+  20% {
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(10px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px);
+    opacity: 0;
   }
 }
 
-.animate-scroll-hint {
-  animation: scroll-hint-bounce 1.4s ease-in-out infinite;
+.animate-scroll-wheel {
+  animation: scroll-wheel-dot 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-scroll-hint {
+  .animate-scroll-wheel {
     animation: none;
   }
 }
