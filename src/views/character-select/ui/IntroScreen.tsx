@@ -2,7 +2,7 @@
 
 import { useSetAtom } from 'jotai';
 import { useAuth, useGoogleConsent } from '@entities/auth/model/hooks';
-import { GoogleIcon } from '@shared/ui';
+import { Disclaimer, GoogleIcon } from '@shared/ui';
 import { CHARACTER_SELECT_STEP } from '../model/constants';
 import { stepAtom } from '../model/store';
 
@@ -53,6 +53,8 @@ export default function IntroScreen() {
 					</p>
 				</div>
 			</div>
+
+			<Disclaimer className="absolute bottom-3 inset-x-0 px-6" />
 		</div>
 	);
 }
