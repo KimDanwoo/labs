@@ -117,7 +117,7 @@ export const HEART_HUNGER_BUFF_RATE = 0.8;
 export const HEART_UNHAPPY_DEBUFF_RATE = 1.5;
 export const OVERFEED_HEART_PENALTY = 3;
 export const OVERFEED_TOAST_DURATION = 2500;
-export const OVERFEED_MESSAGE = '이미 배불러요... 토할 것 같아요';
+export const OVERFEED_MESSAGE = '이제 배가 너무 불러요!';
 
 // 만남 규칙
 export const MEETING_COOLDOWN_MS = 5 * 60_000;
