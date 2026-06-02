@@ -321,7 +321,7 @@ const SCENES_HAKO: ConversationScene[] = [
   },
 ];
 
-const SCENES_BY_CHARACTER: Record<CharacterId, ConversationScene[]> = {
+export const SCENES_BY_CHARACTER: Record<CharacterId, ConversationScene[]> = {
   yeko: SCENES_YEKO,
   ako: SCENES_AKO,
   bamko: SCENES_BAMKO,

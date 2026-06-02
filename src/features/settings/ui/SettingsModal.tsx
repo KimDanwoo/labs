@@ -2,15 +2,21 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@entities/auth/model/hooks';
+import { useAuth, useIsAdmin } from '@entities/auth/model/hooks';
 import { useGameActions } from '@entities/game/model/hooks';
 import { GoogleIcon, ModalShell } from '@shared/ui';
 
 export default function SettingsModal() {
   const router = useRouter();
   const { isAnonymous, linkWithGoogle, signInWithGoogle } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const { reset, closeModal } = useGameActions();
   const [confirmReset, setConfirmReset] = useState(false);
+
+  const handleGoToAdmin = () => {
+    closeModal();
+    router.push('/admin');
+  };
 
   const handleLinkGoogle = () => {
     linkWithGoogle().catch(() => {});
@@ -117,6 +123,22 @@ export default function SettingsModal() {
             {confirmReset ? '정말 초기화할래요?' : '초기화'}
           </button>
         </div>
+        {isAdmin && (
+          <button
+            onClick={handleGoToAdmin}
+            className="w-full surface rounded-xl p-3 text-left btn-press flex items-center justify-between"
+          >
+            <div>
+              <div className="text-xs font-bold text-gray-700">
+                관리자 페이지
+              </div>
+              <div className="text-[11px] text-gray-400 mt-0.5">
+                콘텐츠(대사·캐릭터·퀴즈) 편집
+              </div>
+            </div>
+            <span className="text-gray-400">→</span>
+          </button>
+        )}
       </div>
 
       <div className="text-center text-[10px] text-gray-400">

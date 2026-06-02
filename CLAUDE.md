@@ -71,6 +71,18 @@ export type GameStatus = (typeof GAME_STATUS)[keyof typeof GAME_STATUS];
 - **로컬 상태**: 한 컴포넌트 내에서만 사용되는 UI 상태(애니메이션 phase 등)는 `useState`/`useReducer` 유지.
 - **View flow state도 atom으로**: 현재 step, pendingSelection 같은 화면 흐름 상태는 view 전용 `model/store/`에 jotai atom으로 두고, 그 view의 모든 자식이 직접 구독해서 변경한다. 부모-자식 사이에 setter 콜백을 prop으로 넘기지 않는다.
 
+## 서버 상태 / 데이터 패칭 (React Query)
+
+**원칙**: 서버(DB/API)에서 오는 비동기 데이터는 **TanStack Query(React Query)**로 다룬다. 컴포넌트에서 `fetch` + `useEffect` + `useState`로 직접 패칭/로딩/에러를 굴리지 않는다.
+
+- **쿼리/뮤테이션은 도메인별 훅으로 묶는다**: 예) `app/admin/_lib/hooks.ts`의 `useMeetingScenes()`(목록), `useSaveMeetingScene()`/`useDeleteMeetingScene()`(뮤테이션). 컴포넌트는 이 훅만 쓴다.
+- **query key는 상수로**: `ADMIN_QUERY_KEYS`처럼 도메인별 키 상수를 두고 문자열 배열을 하드코딩하지 않는다.
+- **뮤테이션 성공 시 `invalidateQueries`**로 관련 쿼리를 무효화해 캐시를 갱신한다(수동 refetch·로컬 setState 동기화 금지).
+- **로딩/에러 UI는 `isLoading`/`isPending`/`error`**를 그대로 쓴다. 별도 status useState를 만들지 않는다.
+- **Provider**는 해당 영역 최상위에 둔다(예: 관리자는 `app/admin/_lib/AdminQueryProvider`).
+- **API·라우트 경로는 도메인별 상수로 묶는다**(하드코딩 금지): 예) `ADMIN_API`(서버 API), `ADMIN_ROUTE`(페이지 경로). 매직 스트링 경로 금지.
+- **서버 쓰기 보안**: 콘텐츠 쓰기는 서버 라우트(`/api/admin/*`)에서 세션 토큰을 검증(`requireAdmin`)하고 `service_role`로만 수행한다. service_role 키는 절대 클라이언트(`NEXT_PUBLIC_`)에 노출하지 않는다.
+
 ## 데이터 동기화
 
 - **충돌 시 자동 머지 우선**: 로컬과 원격(localStorage/supabase) 데이터가 충돌하면 사용자 확인 다이얼로그보다 자연스러운 자동 머지를 우선한다. 예: 슬롯별로 `lastUpdated`가 더 큰 것만 유지, 합집합으로 통합. 자동 머지로 해결 불가능한 진짜 모호한 케이스에만 confirm.
