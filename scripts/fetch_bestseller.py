@@ -5,6 +5,7 @@ import os
 import sys
 import json
 import re
+import html as htmllib
 import pathlib
 import requests
 from playwright.sync_api import sync_playwright, Page
@@ -54,6 +55,16 @@ _GENRE_KR_TO_KEY.update({
     "소설/시/희곡": "novel", "경제/경영": "economy", "인문학": "humanit",
     "사회과학": "humanit", "자연과학": "science", "기술/공학": "science",
 })
+
+# 리디 일반도서 장르별 베스트셀러 카테고리 ID
+RIDI_GENRE_CAT: dict[str, int] = {
+    "novel":   100,   # 소설
+    "economy": 200,   # 경영/경제
+    "selfdev": 300,   # 자기계발
+    "humanit": 400,   # 인문/사회/역사
+    "science": 1100,  # 과학
+    "essay":   110,   # 에세이/시
+}
 
 
 def classify_genre(text: str) -> str:
@@ -362,104 +373,78 @@ def fetch_yes24(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
     return []
 
 
-# ── 리디 ────────────────────────────────────────────────────
-def fetch_ridi(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
-    urls = [
-        "https://ridibooks.com/bestsellers",
-        "https://ridibooks.com/books/bestsellers",
-    ]
-    last_url = urls[0]
-    for url in urls:
-        last_url = url
+# ── 리디: SSR HTML 직접 파싱 ─────────────────────────────────
+# 리디는 책 목록을 HTML에 서버사이드 렌더링한다(__NEXT_DATA__엔 없음).
+# 제목 앵커 <a href="/books/{id}?..._rdt_idx={순위-1}...">제목</a> +
+# 직후 작가 링크 <a href="/author/{id}">작가</a>로 파싱한다.
+# 클래스명은 매 배포마다 바뀌므로 href 패턴과 텍스트로만 파싱한다.
+_RIDI_TITLE_RE = re.compile(
+    r'<a href="/books/(\d+)\?[^"]*?_rdt_idx=(\d+)[^"]*?"[^>]*>([^<>][^<]*)</a>'
+)
+# 작가는 제목 앵커 바로 뒤 첫 링크. 등록 작가는 /author/, 미등록은 /search?q= 로 렌더된다.
+_RIDI_AUTHOR_RE = re.compile(r'<a href="/(?:author/\d+|search\?q=[^"]*)"[^>]*>([^<]+)</a>')
+
+
+def _parse_ridi_html(html: str, genre_key: str, limit: int) -> list[dict]:
+    """리디 SSR HTML에서 (순위·제목·작가·링크)를 직접 추출"""
+    seen: set[str] = set()
+    books: list[dict] = []
+    for m in _RIDI_TITLE_RE.finditer(html):
+        book_id, idx = m.group(1), int(m.group(2))
+        if book_id in seen:
+            continue
+        seen.add(book_id)
+        title = htmllib.unescape(m.group(3)).strip()
+        if len(title) < 2:
+            continue
+        author_match = _RIDI_AUTHOR_RE.search(html, m.end(), m.end() + 500)
+        author = htmllib.unescape(author_match.group(1)).strip() if author_match else ""
+        books.append({
+            "rank": idx + 1,
+            "title": title,
+            "author": author,
+            "cover": "",
+            "link": f"https://ridibooks.com/books/{book_id}",
+            "publisher": "",
+            "genre_key": genre_key,
+            "source": "리디",
+        })
+    books.sort(key=lambda b: b["rank"])
+    for i, b in enumerate(books[:limit], start=1):
+        b["rank"] = i
+    return books[:limit]
+
+
+def fetch_ridi_by_genre(pw_page: Page, limit: int = 10) -> dict[str, list[dict]]:
+    """리디: 일반도서 장르별 베스트셀러 SSR HTML을 직접 파싱.
+    networkidle은 리디에서 타임아웃되므로 domcontentloaded + 스크롤 사용."""
+    result: dict[str, list[dict]] = {}
+
+    for genre in GENRES:
+        key = genre["key"]
+        cat_id = RIDI_GENRE_CAT.get(key)
+        if not cat_id:
+            continue
+
+        url = f"https://ridibooks.com/category/bestsellers/{cat_id}"
         try:
-            print(f"  리디 URL={url}")
-            pw_page.goto(url, wait_until="networkidle", timeout=30000)
-            html = pw_page.content()
-            data = _extract_next_data(html)
-            if not data:
-                print("  ⚠️  리디 __NEXT_DATA__ 없음, 다음 URL 시도")
-                continue
-            queries = (data.get("props", {})
-                           .get("pageProps", {})
-                           .get("dehydratedState", {})
-                           .get("queries", []))
-            print(f"  리디 queries={len(queries)}개")
-            items = []
-            for q in queries:
-                q_data = q.get("state", {}).get("data", {})
-                for key in ("bestsellers", "chartBooks", "books", "items"):
-                    node = q_data.get(key)
-                    if isinstance(node, dict) and "items" in node:
-                        items = node["items"]
-                        break
-                    if isinstance(node, list) and node:
-                        items = node
-                        break
-                if not items:
-                    items = _find_book_items(q_data)
-                if items:
-                    print(f"  리디 items={len(items)}개 발견")
-                    break
-            if not items:
-                print("  ⚠️  리디 items 없음, 다음 URL 시도")
-                continue
-            results = []
-            for i, entry in enumerate(items[:limit], start=1):
-                book = entry.get("book", entry)
-                title_node = book.get("title", {})
-                title = title_node.get("main", "") if isinstance(title_node, dict) else str(title_node)
-                if not title:
-                    continue
-                authors = book.get("authors", [])
-                author = authors[0].get("name", "") if authors and isinstance(authors[0], dict) else ""
-                book_id = book.get("id", "")
-                thumb = book.get("thumbnail", {})
-                cover = (thumb.get("large", "") or thumb.get("small", "")) if isinstance(thumb, dict) else ""
-                cats = book.get("categories", [])
-                cat_text = " ".join([c.get("name", "") for c in cats if isinstance(c, dict)])
-                results.append({
-                    "rank": i,
-                    "title": title.strip(),
-                    "author": author.strip(),
-                    "cover": cover,
-                    "link": f"https://ridibooks.com/books/{book_id}",
-                    "publisher": "",
-                    "genre_key": classify_genre(cat_text),
-                    "source": "리디",
-                })
-            if results:
-                return results
+            print(f"  리디 [{genre['name']}] URL={url}")
+            pw_page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            pw_page.wait_for_timeout(1500)
+            for _ in range(3):
+                pw_page.mouse.wheel(0, 4000)
+                pw_page.wait_for_timeout(400)
+            items = _parse_ridi_html(pw_page.content(), key, limit)
+            if items:
+                result[key] = items
+                authors = sum(1 for it in items if it["author"])
+                print(f"  리디 [{genre['name']}] {len(items)}개 수집 (작가 {authors}명)")
+            else:
+                print(f"  ⚠️  리디 [{genre['name']}] 수집 실패")
         except Exception as e:
-            print(f"  ⚠️  리디 {url} 실패: {e}")
+            print(f"  ⚠️  리디 [{genre['name']}] 실패: {e}")
 
-    # Gemini fallback
-    print("  📖 리디 Gemini AI 추출 시도...")
-    try:
-        page_text = pw_page.inner_text("body")
-        gemini_books = _parse_books_with_gemini(client, page_text, "리디", limit)
-        if gemini_books:
-            results = []
-            for item in gemini_books:
-                results.append({
-                    "rank": len(results) + 1,
-                    "title": item["title"],
-                    "author": item["author"],
-                    "cover": "",
-                    "link": last_url,
-                    "publisher": "",
-                    "genre_key": item.get("genre_key", "etc"),
-                    "source": "리디",
-                })
-                if len(results) >= limit:
-                    break
-            if results:
-                print(f"  리디 items={len(results)}개 발견 (Gemini)")
-                return results
-    except Exception as e:
-        print(f"  ⚠️  리디 Gemini fallback 실패: {e}")
-
-    print("  ⚠️  리디 모든 URL 실패")
-    return []
+    return result
 
 
 # ── 종합 순위 합산 ──────────────────────────────────────────
@@ -604,9 +589,10 @@ def main():
         yes24_items = fetch_yes24(pw_page, client, 20)
         print(f"     → {len(yes24_items)}개")
 
-        print("  📱 리디 수집...")
-        ridi_items = fetch_ridi(pw_page, client, 20)
-        print(f"     → {len(ridi_items)}개")
+        print("  📱 리디 장르별 수집...")
+        ridi_by_genre = fetch_ridi_by_genre(pw_page, limit=10)
+        ridi_items = [b for items in ridi_by_genre.values() for b in items]
+        print(f"     → {len(ridi_items)}개 ({len(ridi_by_genre)}장르)")
 
         browser.close()
 
