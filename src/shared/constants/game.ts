@@ -73,8 +73,13 @@ export const MAX_HUNGER = 100;
 export const MAX_CLEANLINESS = 100;
 export const MAX_HEARTS = 100;
 
-export const HUNGER_DECAY_PER_MINUTE = 1;
+// 배고픔: 가득 찬 상태에서 약 2일에 걸쳐 소진되도록 분당 감소량을 파생
+export const HUNGER_FULL_DRAIN_DAYS = 2;
+export const HUNGER_DECAY_PER_MINUTE =
+  MAX_HUNGER / (HUNGER_FULL_DRAIN_DAYS * 24 * 60);
 export const CLEANLINESS_PER_POOP = 10;
+// 먹인 뒤 똥이 나오기까지 지연. 여러 번 먹여도 마지막 먹인 시점 기준 1개만 생성
+export const POOP_DELAY_MS = 20_000;
 export const DEATH_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000; // 3일 방치 시 사망
 
 export const EXP_FEED = 5;
@@ -83,7 +88,9 @@ export const EXP_MINIGAME_MIN = 10;
 export const EXP_MINIGAME_MAX = 30;
 export const EXP_MEETING = 15;
 
-export const LEVEL_THRESHOLDS = [0, 50, 150, 300, 500];
+export const LEVEL_THRESHOLDS = [
+  0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700,
+];
 
 export const SLEEP_START_HOUR = 22;
 export const SLEEP_END_HOUR = 8;
@@ -124,7 +131,7 @@ export const HEART_EXCHANGE_COINS = 15;
 
 // 알 시스템
 export const EGG_HEART_THRESHOLD = 100;
-export const EGG_LEVEL_THRESHOLD = 3;
+export const EGG_LEVEL_THRESHOLD = 7;
 export const EGG_ALL_UNLOCKED_COINS = 100;
 
 // 미니게임
@@ -138,7 +145,8 @@ export const MINIGAME_COOLDOWN_MS = 3 * 60 * 1000;
 export const LEVEL_UP_TOAST_DURATION = 3000;
 
 // 캐릭터 스프라이트
-export const LEVEL_SCALE_PER_LEVEL = 0.05;
+// 10레벨 만렙에서 약 1.22배가 되도록(기존 5레벨 1.2배와 비슷하게) 완만하게 성장
+export const LEVEL_SCALE_PER_LEVEL = 0.025;
 
 // 위험 상태
 export const DANGER_THRESHOLD = 20;
@@ -165,6 +173,31 @@ export const LEVEL_REWARDS: Record<number, LevelReward> = {
     coins: 150,
     food: { cake: 1 },
     message: '레벨 5 달성! 케이크 1개와 150코인!',
+  },
+  6: {
+    coins: 200,
+    food: { meat: 2 },
+    message: '레벨 6 달성! 고기 2개와 200코인!',
+  },
+  7: {
+    coins: 280,
+    food: { riceball: 3, meat: 1 },
+    message: '레벨 7 달성! 주먹밥 3개, 고기 1개와 280코인! 이제 알을 품을 수 있어요 🥚',
+  },
+  8: {
+    coins: 380,
+    food: { cake: 2 },
+    message: '레벨 8 달성! 케이크 2개와 380코인!',
+  },
+  9: {
+    coins: 500,
+    food: { meat: 3, cake: 1 },
+    message: '레벨 9 달성! 고기 3개, 케이크 1개와 500코인!',
+  },
+  10: {
+    coins: 800,
+    food: { cake: 3, meat: 3 },
+    message: '레벨 10 달성! 최고 레벨이에요! 케이크 3개, 고기 3개와 800코인! 🎉',
   },
 };
 
@@ -222,6 +255,7 @@ export const INITIAL_GAME_STATE: GameState = {
   levelUpMessage: null,
   feedingMessage: null,
   eggReadyCharacterId: null,
+  lastEggLevel: null,
   pendingPoops: [],
   lastMeetingAt: null,
   meetingsToday: 0,
