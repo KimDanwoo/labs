@@ -12,6 +12,7 @@ import os
 import sys
 import json
 import re
+import html as htmllib
 import pathlib
 from urllib.parse import quote
 from playwright.sync_api import sync_playwright, Page
@@ -60,19 +61,14 @@ KAKAO_GENRE_SCREENS: dict[str, int] = {
 
 _NAVER_BASE = "https://series.naver.com/novel/top100List.series"
 
-# 리디 장르별 알려진 URL
-RIDI_GENRE_URLS: dict[str, list[str]] = {
-    "fantasy":    ["https://ridibooks.com/category/bestsellers/1750"],
-    "romfantasy": ["https://ridibooks.com/category/bestsellers/6050",
-                   "https://ridibooks.com/category/6050"],
-    "romance":    ["https://ridibooks.com/category/bestsellers/1650",
-                   "https://ridibooks.com/category/1650"],
-    "modern":     ["https://ridibooks.com/category/bestsellers/1753",
-                   "https://ridibooks.com/category/1753"],
-    "martial":    ["https://ridibooks.com/category/bestsellers/1754",
-                   "https://ridibooks.com/category/1754"],
-    "bl":         ["https://ridibooks.com/category/bestsellers/4150",
-                   "https://ridibooks.com/category/4150"],
+# 리디 장르별 베스트셀러 카테고리 ID
+RIDI_GENRE_CAT: dict[str, int] = {
+    "fantasy":    1750,
+    "romfantasy": 6050,
+    "romance":    1650,
+    "modern":     1753,
+    "martial":    1754,
+    "bl":         4150,
 }
 
 # 장르 탐색 힌트
@@ -366,46 +362,86 @@ def fetch_kakao_by_genre(
     return result
 
 
-# ── 리디: 장르별 전용 URL 수집 ───────────────────────────────
+# ── 리디: SSR HTML 직접 파싱 ─────────────────────────────────
+# 리디는 책 목록을 HTML에 서버사이드 렌더링한다. 제목 앵커는
+#   <a href="/books/{id}?..._rdt_idx={순위-1}...">제목</a>
+# 형태이고, 작가 링크 <a href="/author/{id}">작가</a>가 바로 뒤에 온다.
+# 클래스명은 매 배포마다 바뀌므로 href 패턴과 텍스트로만 파싱한다.
+_RIDI_TITLE_RE = re.compile(
+    r'<a href="/books/(\d+)\?[^"]*?_rdt_idx=(\d+)[^"]*?"[^>]*>([^<>][^<]*)</a>'
+)
+# 작가는 제목 앵커 바로 뒤 첫 링크. 등록 작가는 /author/, 미등록은 /search?q= 로 렌더된다.
+_RIDI_AUTHOR_RE = re.compile(r'<a href="/(?:author/\d+|search\?q=[^"]*)"[^>]*>([^<]+)</a>')
+
+
+def _parse_ridi_html(html: str, limit: int) -> list[dict]:
+    """리디 SSR HTML에서 (순위·제목·작가·링크)를 직접 추출"""
+    seen: set[str] = set()
+    books: list[dict] = []
+    for m in _RIDI_TITLE_RE.finditer(html):
+        book_id, idx = m.group(1), int(m.group(2))
+        if book_id in seen:
+            continue
+        seen.add(book_id)
+        title = htmllib.unescape(m.group(3)).strip()
+        if len(title) < 2:
+            continue
+        author_match = _RIDI_AUTHOR_RE.search(html, m.end(), m.end() + 500)
+        author = htmllib.unescape(author_match.group(1)).strip() if author_match else ""
+        books.append({
+            "rank": idx + 1,
+            "title": title,
+            "author": author,
+            "cover": "",
+            "link": f"https://ridibooks.com/books/{book_id}",
+        })
+    books.sort(key=lambda b: b["rank"])
+    for i, b in enumerate(books[:limit], start=1):
+        b["rank"] = i
+    return books[:limit]
+
+
+def _load_ridi_html(pw_page: Page, url: str, scrolls: int = 4) -> str:
+    """리디 페이지 로드 후 raw HTML 반환.
+    networkidle은 리디에서 광고/분석 트래픽 탓에 타임아웃되므로
+    domcontentloaded로 받고, 지연 로딩분은 스크롤로 채운다."""
+    pw_page.goto(url, wait_until="domcontentloaded", timeout=30000)
+    pw_page.wait_for_timeout(1500)
+    for _ in range(scrolls):
+        pw_page.mouse.wheel(0, 4000)
+        pw_page.wait_for_timeout(400)
+    return pw_page.content()
+
+
 def fetch_ridi_by_genre(
     pw_page: Page,
-    client: genai.Client,
     limit: int = 15,
 ) -> dict[str, list[dict]]:
-    """리디: 장르별 URL에서 각각 수집 → dict[genre_key, items]"""
+    """리디: 장르별 베스트셀러 SSR HTML을 직접 파싱 → dict[genre_key, items]"""
     result: dict[str, list[dict]] = {}
-    used_urls: set[str] = set()  # 이미 사용한 URL 재사용 방지
 
     for genre in GENRES:
         key = genre["key"]
         name = genre["name"]
-        known = RIDI_GENRE_URLS.get(key, [])
+        cat_id = RIDI_GENRE_CAT.get(key)
+        if not cat_id:
+            continue
 
-        items = []
-        for url in known:
-            if url in used_urls:
-                print(f"  ⚠️  리디 [{name}] URL 중복, 건너뜀: {url}")
-                continue
-            try:
-                print(f"  리디 [{name}] URL={url}")
-                text, title_to_url = _get_page_data(pw_page, url, link_pattern="/books/")
-                if not text or len(text.strip()) < 50:
-                    continue
-                items = _parse_single_genre(client, text, "리디", name, limit, title_to_url)
-                if items:
-                    used_urls.add(url)
-                    break
-            except Exception as e:
-                print(f"  ⚠️  리디 [{name}] {url} 실패: {e}")
-
-        if items:
+        url = f"https://ridibooks.com/category/bestsellers/{cat_id}"
+        try:
+            print(f"  리디 [{name}] URL={url}")
+            items = _parse_ridi_html(_load_ridi_html(pw_page, url), limit)
             for item in items:
                 item["source"] = "리디"
                 item["genre_key"] = key
-            result[key] = items
-            print(f"  리디 [{name}] {len(items)}개 수집")
-        else:
-            print(f"  ⚠️  리디 [{name}] 수집 실패")
+            if items:
+                result[key] = items
+                authors = sum(1 for it in items if it["author"])
+                print(f"  리디 [{name}] {len(items)}개 수집 (작가 {authors}명)")
+            else:
+                print(f"  ⚠️  리디 [{name}] 수집 실패")
+        except Exception as e:
+            print(f"  ⚠️  리디 [{name}] 실패: {e}")
 
     return result
 
@@ -658,74 +694,6 @@ def merge_genre_data(
     return genre_result
 
 
-# ── Gemini: 단일 장르 추출 (리디용) ────────────────────────
-_GENRE_CRITERIA: dict[str, str] = {
-    "판타지":       "이세계·마법·용사·드래곤 등 (현대 배경 제외)",
-    "로맨스판타지": "귀족·황제·공녀·환생·빙의 등 역사/판타지 배경 이성 로맨스 (남성 주인공 아님)",
-    "로맨스":       "현대 배경 이성 로맨스·순정 (BL 제외, 판타지 배경 제외)",
-    "현대판타지":   "현대 배경 헌터·각성·던전·회귀물·능력자 등",
-    "무협":         "무림·검객·협객·협녀 등 중국식 배경",
-    "BL":           "남성 캐릭터 간의 로맨스 (Boys Love)",
-}
-
-
-def _parse_single_genre(
-    client: genai.Client,
-    text: str,
-    source_name: str,
-    genre_name: str,
-    limit: int,
-    title_to_url: dict[str, str] | None = None,
-) -> list[dict]:
-    criteria = _GENRE_CRITERIA.get(genre_name, genre_name)
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=f"""다음은 "{source_name}" "{genre_name}" 웹소설 베스트셀러 페이지의 텍스트입니다.
-
-<page_text>
-{text[:8000]}
-</page_text>
-
-"{genre_name}" 장르 정의: {criteria}
-
-이 장르에 해당하는 웹소설 베스트셀러 순위를 추출하세요.
-- 실제 웹소설 작품 제목만 (메뉴·배너·프로모션 문구 제외)
-- 반드시 위 장르 정의에 맞는 작품만 포함 (다른 장르 작품 제외)
-- 최대 {limit}개
-- author 필드: 페이지에 작가명이 있으면 반드시 포함. 없으면 빈 문자열 "" (절대 "None" 사용 금지)
-- JSON 배열로만 응답
-
-[{{"rank": 1, "title": "작품명", "author": "작가명"}}]""",
-        config=genai_types.GenerateContentConfig(response_mime_type="application/json"),
-    )
-    raw = response.text.strip()
-    try:
-        items = json.loads(raw)
-    except Exception:
-        m = re.search(r"\[.*\]", raw, re.DOTALL)
-        if not m:
-            return []
-        items = json.loads(m.group())
-    if not isinstance(items, list) or len(items) < 2:
-        return []
-    results = []
-    for item in items:
-        title = str(item.get("title", "")).strip()
-        if not title or len(title) < 2:
-            continue
-        author = str(item.get("author", "")).strip()
-        if author.lower() in ("none", "null", "n/a", "없음", "미상", "unknown"):
-            author = ""
-        results.append({
-            "rank": len(results) + 1,
-            "title": title,
-            "author": author,
-            "cover": "",
-            "link": _lookup_link(title, title_to_url or {}),
-        })
-    return results
-
-
 # ── Gemini AI 트렌드 분석 ────────────────────────────────────
 def generate_ai_content(client: genai.Client, genre_data: dict[str, list[dict]]) -> str:
     genre_summary = ""
@@ -910,9 +878,9 @@ def main():
         )
         pw_page = ctx.new_page()
 
-        # 리디: 장르별 전용 URL
+        # 리디: 장르별 베스트셀러 SSR HTML 직접 파싱
         print("  📘 리디 장르별 수집...")
-        ridi_data = fetch_ridi_by_genre(pw_page, client, limit=15)
+        ridi_data = fetch_ridi_by_genre(pw_page, limit=15)
         print(f"     → {sum(len(v) for v in ridi_data.values())}개 ({len(ridi_data)}장르)\n")
 
         # 카카오페이지: 장르별 직접 수집 + 작가명 추출
