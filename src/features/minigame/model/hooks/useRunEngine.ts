@@ -11,6 +11,7 @@ import {
   RUN_COUNTDOWN_STEP_MS,
   RUN_CRASH_DURATION_MS,
   RUN_FIELD_WIDTH,
+  RUN_FRAME_MS,
   RUN_GRAVITY,
   RUN_GROUND_EPSILON,
   RUN_HEART_SIZE,
@@ -20,6 +21,7 @@ import {
   RUN_HEART_Y_MIN,
   RUN_HITBOX_PADDING,
   RUN_JUMP_VELOCITY,
+  RUN_MAX_FRAME_STEP,
   RUN_MIN_GAP_FACTOR,
   RUN_OBSTACLE_EMOJIS,
   RUN_OBSTACLE_SIZE,
@@ -65,6 +67,7 @@ export function useRunEngine() {
   const lastObstacleSpawnRef = useRef(0);
   const lastHeartSpawnRef = useRef(0);
   const gameStartRef = useRef(0);
+  const lastFrameRef = useRef(0);
   const animFrameRef = useRef(0);
   const countdownTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -148,9 +151,18 @@ export function useRunEngine() {
     const loop = () => {
       const now = Date.now();
       const elapsed = now - gameStartRef.current;
+      // 실제 프레임 간격을 60fps 기준 배율로 환산(탭 복귀 시 폭주 방지 위해 상한).
+      const frame = Math.min(
+        RUN_MAX_FRAME_STEP,
+        (now - lastFrameRef.current) / RUN_FRAME_MS,
+      );
+      lastFrameRef.current = now;
 
-      charVyRef.current -= RUN_GRAVITY;
-      charYRef.current = Math.max(0, charYRef.current + charVyRef.current);
+      charVyRef.current -= RUN_GRAVITY * frame;
+      charYRef.current = Math.max(
+        0,
+        charYRef.current + charVyRef.current * frame,
+      );
       if (charYRef.current <= 0) charVyRef.current = 0;
       setCharY(charYRef.current);
       setCharTilt(
@@ -160,7 +172,8 @@ export function useRunEngine() {
         ),
       );
 
-      const speed = RUN_OBSTACLE_SPEED_BASE + elapsed * RUN_OBSTACLE_SPEED_ACCEL;
+      const speed =
+        (RUN_OBSTACLE_SPEED_BASE + elapsed * RUN_OBSTACLE_SPEED_ACCEL) * frame;
 
       const obstacleSpawnInterval = Math.max(
         RUN_SPAWN_INTERVAL_MIN,
@@ -293,6 +306,7 @@ export function useRunEngine() {
       animFrameRef.current = requestAnimationFrame(loop);
     };
 
+    lastFrameRef.current = Date.now();
     animFrameRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animFrameRef.current);
   }, [phase, countdown, isCrashing, finishGame]);
