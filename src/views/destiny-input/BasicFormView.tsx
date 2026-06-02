@@ -49,12 +49,12 @@ export function BasicFormView() {
 
       <div
         className="relative flex-1 flex flex-col overflow-hidden bg-cover bg-center"
-        style={{ backgroundImage: 'url(/form_step_1.webp)' }}
+        style={{ backgroundImage: 'url(/form_step_1_empty.webp)' }}
       >
         <div className="relative z-10 flex-1 flex flex-col justify-end overflow-y-auto">
           <div className="px-5 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))] bg-background/85 backdrop-blur-sm rounded-t-3xl">
             <div className="text-center mb-5">
-              <h2 className="text-lg font-bold text-gold">기본 정보</h2>
+              <h2 className="text-lg font-bold text-primary">기본 정보</h2>
             </div>
 
             <FormField label="성함">
@@ -79,7 +79,7 @@ export function BasicFormView() {
                       onChange={() =>
                         setForm((prev) => ({ ...prev, gender: g }))
                       }
-                      className="w-3.5 h-3.5 accent-gold cursor-pointer"
+                      className="w-3.5 h-3.5 accent-primary cursor-pointer"
                     />
                     <span className="text-xs font-medium text-foreground">
                       {g === 'male' ? '남자' : '여자'}
@@ -122,7 +122,7 @@ export function BasicFormView() {
                       shichen: e.target.checked ? '' : prev.shichen,
                     }))
                   }
-                  className="w-3.5 h-3.5 accent-gold cursor-pointer"
+                  className="w-3.5 h-3.5 accent-primary cursor-pointer"
                 />
                 <span className="text-xs text-muted">
                   태어난 시간을 모릅니다

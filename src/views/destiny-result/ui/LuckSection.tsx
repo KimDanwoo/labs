@@ -40,7 +40,7 @@ export function LuckSection({
         <SectionTitle title="10년 단위 운의 흐름" sub="대운 — 인생의 큰 물결" />
         <div className="flex items-center gap-2 mb-4 px-1">
           <span className="text-xs text-muted">대운 시작</span>
-          <span className="text-sm font-black text-gold">
+          <span className="text-sm font-black text-primary">
             {luck.startAge}세
           </span>
           <span className="text-xs text-muted">·</span>
@@ -60,14 +60,14 @@ export function LuckSection({
                 className={cn(
                   'rounded-xl p-3 text-center transition-all',
                   isCurrent
-                    ? 'bg-gold/10 ring-1 ring-gold/40'
+                    ? 'bg-primary/10 ring-1 ring-primary/40'
                     : 'bg-white shadow-sm',
                 )}
               >
                 <span
                   className={cn(
                     'block text-[11px] font-semibold',
-                    isCurrent ? 'text-gold' : 'text-muted',
+                    isCurrent ? 'text-primary' : 'text-muted',
                   )}
                 >
                   {i + 1}대운
@@ -75,7 +75,7 @@ export function LuckSection({
                 <span
                   className={cn(
                     'block text-lg font-black mt-1',
-                    isCurrent ? 'text-gold' : 'text-foreground',
+                    isCurrent ? 'text-primary' : 'text-foreground',
                   )}
                 >
                   {pillarToKr(period.pillar)}
@@ -87,7 +87,7 @@ export function LuckSection({
                 <span
                   className={cn(
                     'block text-xs font-semibold mt-1.5',
-                    isCurrent ? 'text-gold' : 'text-[#333]',
+                    isCurrent ? 'text-primary' : 'text-[#333]',
                   )}
                   title={TEN_GOD_FRIENDLY[tenGod]?.split('\n')[0] ?? ''}
                 >
@@ -96,7 +96,7 @@ export function LuckSection({
                 <span
                   className={cn(
                     'block text-[11px] font-medium mt-1',
-                    isCurrent ? 'text-gold font-bold' : 'text-[#555]',
+                    isCurrent ? 'text-primary font-bold' : 'text-[#555]',
                   )}
                 >
                   {period.startAge}~{period.endAge}세

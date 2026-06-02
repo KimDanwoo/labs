@@ -39,8 +39,8 @@ views/destiny-input/
 | CSS 변수 | Tailwind 클래스 |
 |---|---|
 | `--color-background/foreground` | `bg-background` / `text-foreground` |
-| `--color-gold` / `--color-gold-bright` | `text-gold` / `bg-gold` / `border-gold` |
+| `--color-primary` / `--color-primary-bright` | `text-primary` / `bg-primary` / `border-primary` |
 | `--color-card-bg` / `--color-card-border` | `bg-card-bg` / `border-card-border` |
 | `--color-input-bg` / `--color-muted` / `--color-red` | `bg-input-bg` / `text-muted` / `text-red` |
 
-inline style에서 필요 시: `var(--color-gold)` (Tailwind 테마 변수)
+inline style에서 필요 시: `var(--color-primary)` (Tailwind 테마 변수)
