@@ -7,6 +7,9 @@ import type {
   LevelReward,
 } from '@shared/types';
 
+export const GAME_STORAGE_KEY = 'plco-damagochi-saves';
+export const GAME_STORAGE_LEGACY_KEY = 'plco-damagochi-state';
+
 export const CHARACTERS: Record<CharacterId, CharacterInfo> = {
   yeko: {
     id: 'yeko',

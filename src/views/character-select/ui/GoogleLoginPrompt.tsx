@@ -1,16 +1,15 @@
 'use client';
 
-import { useAuth } from '@entities/auth/model/hooks';
+import { useAuth, useGoogleConsent } from '@entities/auth/model/hooks';
 import { GoogleIcon } from '@shared/ui';
 
 export default function GoogleLoginPrompt() {
-	const { isAnonymous, signInWithGoogle } = useAuth();
+	const { isAnonymous } = useAuth();
+	const { requestLogin } = useGoogleConsent();
 
 	if (!isAnonymous) return null;
 
-	const handleLogin = () => {
-		signInWithGoogle().catch(() => {});
-	};
+	const handleLogin = () => requestLogin();
 
 	return (
 		<div className="w-full p-3 rounded-2xl bg-white/85 border border-blue-100 space-y-2 shadow-sm">

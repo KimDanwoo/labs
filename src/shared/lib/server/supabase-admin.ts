@@ -27,10 +27,10 @@ export async function isAdminUser(userId: string): Promise<boolean> {
 }
 
 /**
- * 관리자 쓰기 API 가드. Authorization: Bearer <access_token> 를 검증하고
- * is_admin 인 유저만 통과시킨다. 실패 시 null.
+ * 인증 가드. Authorization: Bearer <access_token> 를 검증하고
+ * 유효한 로그인 유저만 통과시킨다. 실패 시 null.
  */
-export async function requireAdmin(
+export async function requireUser(
   req: Request,
 ): Promise<{ userId: string } | null> {
   const header = req.headers.get('authorization') ?? '';
@@ -48,7 +48,18 @@ export async function requireAdmin(
   });
   const { data, error } = await anon.auth.getUser(token);
   if (error || !data.user) return null;
-  if (!(await isAdminUser(data.user.id))) return null;
 
   return { userId: data.user.id };
+}
+
+/**
+ * 관리자 쓰기 API 가드. 인증을 통과하고 is_admin 인 유저만 통과시킨다. 실패 시 null.
+ */
+export async function requireAdmin(
+  req: Request,
+): Promise<{ userId: string } | null> {
+  const auth = await requireUser(req);
+  if (!auth) return null;
+  if (!(await isAdminUser(auth.userId))) return null;
+  return auth;
 }
