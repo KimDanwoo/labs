@@ -5,6 +5,7 @@ import {
   MINIGAME_CATCHER_EMOJI_SIZE,
   MINIGAME_CATCHER_HEIGHT,
   MINIGAME_CATCHER_WIDTH,
+  MINIGAME_COMBO_SHOW_THRESHOLD,
   MINIGAME_FIELD_HEIGHT,
   MINIGAME_FIELD_WIDTH,
   MINIGAME_ITEM_SIZE,
@@ -25,10 +26,12 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
     minigame,
     phase,
     score,
+    combo,
     timeLeft,
     catcherX,
     items,
-    catchEffect,
+    floats,
+    badFlashKey,
     progressPercent,
     finalScore,
     startGame,
@@ -45,7 +48,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
         <p className="text-sm text-gray-400 leading-relaxed">
           ← → 키 또는 하단 버튼으로
           <br />
-          떨어지는 하트를 받으세요!
+          💖 하트를 받고 💣 폭탄은 피하세요!
         </p>
         {!minigame.canPlay && (
           <MinigameCooldownNotice remainingMs={minigame.cooldownRemainingMs} />
@@ -73,6 +76,14 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
       <>
         <div className="flex items-center justify-between">
           <span className="text-sm font-bold text-pink-500">💖 {score}</span>
+          {combo >= MINIGAME_COMBO_SHOW_THRESHOLD && (
+            <span
+              key={combo}
+              className="text-xs font-black text-rose-500 catch-combo-pop"
+            >
+              🔥 {combo} 콤보
+            </span>
+          )}
           <span className="text-xs font-bold text-gray-400 tabular-nums">
             {Math.ceil(timeLeft / 1000)}초
           </span>
@@ -106,20 +117,35 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
                 top: item.y,
                 fontSize: MINIGAME_ITEM_SIZE,
                 lineHeight: 1,
-                filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.1))',
+                filter:
+                  item.kind === 'bad'
+                    ? 'drop-shadow(0 2px 4px rgba(239,68,68,0.35))'
+                    : 'drop-shadow(0 2px 3px rgba(0,0,0,0.1))',
               }}
             >
               {item.emoji}
             </div>
           ))}
 
-          {catchEffect && (
+          {floats.map((float) => (
             <div
-              className="absolute text-xs font-bold text-pink-400 animate-fade-in-up pointer-events-none"
-              style={{ left: catchEffect.x, top: catchEffect.y }}
+              key={float.id}
+              className={`absolute pointer-events-none ${
+                float.variant === 'bad'
+                  ? 'catch-float catch-float-bad'
+                  : 'catch-float catch-float-good'
+              }`}
+              style={{ left: float.x, top: float.y }}
             >
-              +1
+              {float.text}
             </div>
+          ))}
+
+          {badFlashKey > 0 && (
+            <div
+              key={badFlashKey}
+              className="absolute inset-0 pointer-events-none bg-red-400/40 catch-bad-flash"
+            />
           )}
 
           <div

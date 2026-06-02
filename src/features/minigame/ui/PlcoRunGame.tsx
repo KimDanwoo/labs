@@ -115,13 +115,17 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
           }}
         >
           <div
-            className="absolute left-0 right-0 bottom-0"
+            className="absolute left-0 right-0 bottom-0 overflow-hidden"
             style={{
               height: RUN_GROUND_HEIGHT,
               background: 'linear-gradient(180deg, #A7F3D0 0%, #6EE7B7 100%)',
               borderTop: '2px dashed rgba(16,185,129,0.4)',
             }}
-          />
+          >
+            {countdown === null && !isCrashing && (
+              <div className="absolute inset-0 run-ground-stripes" />
+            )}
+          </div>
 
           <div
             className="absolute"
