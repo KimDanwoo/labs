@@ -70,7 +70,7 @@ export default function SceneEditor({ row, onDone }: SceneEditorProps) {
         <select
           value={form.character_id}
           onChange={(e) => update({ character_id: e.target.value })}
-          className="px-2 py-1.5 rounded-lg bg-input-bg border border-card-border text-xs text-foreground outline-none"
+          className="admin-select px-2 py-1.5 rounded-lg bg-input-bg border border-card-border text-xs text-foreground outline-none"
         >
           {ALL_CHARACTER_IDS.map((id) => (
             <option key={id} value={id}>
@@ -81,7 +81,7 @@ export default function SceneEditor({ row, onDone }: SceneEditorProps) {
         <select
           value={form.category}
           onChange={(e) => update({ category: e.target.value })}
-          className="px-2 py-1.5 rounded-lg bg-input-bg border border-card-border text-xs text-foreground outline-none"
+          className="admin-select px-2 py-1.5 rounded-lg bg-input-bg border border-card-border text-xs text-foreground outline-none"
         >
           {CATEGORIES.map((c) => (
             <option key={c} value={c}>
@@ -118,7 +118,7 @@ export default function SceneEditor({ row, onDone }: SceneEditorProps) {
                     outcome: e.target.value as MeetingOption['outcome'],
                   })
                 }
-                className="px-2 py-1 rounded-md bg-input-bg border border-card-border text-[11px] text-foreground outline-none"
+                className="admin-select px-2 py-1 rounded-md bg-input-bg border border-card-border text-[11px] text-foreground outline-none"
               >
                 {OUTCOMES.map((o) => (
                   <option key={o} value={o}>
