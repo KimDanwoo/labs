@@ -1,4 +1,6 @@
-import type { ReactNode } from 'react';
+'use client';
+
+import { useState, type ReactNode } from 'react';
 
 type ModalVariant = 'dialog' | 'sheet';
 
@@ -7,8 +9,10 @@ type ModalShellProps = {
   onClose?: () => void;
   maxWidth?: string;
   className?: string;
-  children: ReactNode;
+  children: ReactNode | ((close: () => void) => ReactNode);
 };
+
+const CLOSE_ANIM_MS = 200;
 
 const WRAPPER: Record<ModalVariant, string> = {
   dialog: 'fixed inset-0 z-50 flex items-center justify-center',
@@ -16,9 +20,18 @@ const WRAPPER: Record<ModalVariant, string> = {
 };
 
 const PANEL: Record<ModalVariant, string> = {
-  dialog: 'relative w-full modal-content mx-4 animate-scale-in',
-  sheet:
-    'relative w-full modal-content rounded-t-3xl rounded-b-none animate-slide-up',
+  dialog: 'relative w-full modal-content mx-4',
+  sheet: 'relative w-full modal-content rounded-t-3xl rounded-b-none',
+};
+
+const ENTER_ANIM: Record<ModalVariant, string> = {
+  dialog: 'animate-scale-in',
+  sheet: 'animate-slide-up',
+};
+
+const EXIT_ANIM: Record<ModalVariant, string> = {
+  dialog: 'animate-scale-out',
+  sheet: 'animate-slide-down',
 };
 
 const DEFAULT_MAX_WIDTH: Record<ModalVariant, string> = {
@@ -33,13 +46,27 @@ export default function ModalShell({
   className = '',
   children,
 }: ModalShellProps) {
+  const [isClosing, setIsClosing] = useState(false);
+
+  const requestClose = () => {
+    if (isClosing || !onClose) return;
+    setIsClosing(true);
+    setTimeout(onClose, CLOSE_ANIM_MS);
+  };
+
+  const panelAnim = isClosing ? EXIT_ANIM[variant] : ENTER_ANIM[variant];
+  const overlayAnim = isClosing ? 'animate-overlay-out' : 'animate-overlay-in';
+
   return (
     <div className={WRAPPER[variant]}>
-      <div className="absolute inset-0 modal-overlay" onClick={onClose} />
       <div
-        className={`${PANEL[variant]} ${maxWidth ?? DEFAULT_MAX_WIDTH[variant]} ${className}`}
+        className={`absolute inset-0 modal-overlay ${overlayAnim}`}
+        onClick={requestClose}
+      />
+      <div
+        className={`${PANEL[variant]} ${panelAnim} ${maxWidth ?? DEFAULT_MAX_WIDTH[variant]} ${className}`}
       >
-        {children}
+        {typeof children === 'function' ? children(requestClose) : children}
       </div>
     </div>
   );
