@@ -6,16 +6,12 @@ import { CHARACTERS } from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
 import { characterIdAtom } from '@entities/game/model/store';
 import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
-import {
-  QUIZ_OK_THRESHOLD,
-  QUIZ_PHASE,
-  QUIZ_PICK_DELAY_MS,
-  QUIZ_ROUNDS,
-} from '../model/constants';
+import { QUIZ_OK_THRESHOLD, QUIZ_PHASE, QUIZ_ROUNDS } from '../model/constants';
 import { fetchRandomQuizQuestions } from '../model/services';
 import type { QuizPhase, QuizQuestion } from '../model/types';
 import MinigameCooldownNotice from './MinigameCooldownNotice';
 import MinigameRewardSummary from './MinigameRewardSummary';
+import QuizProgressDots from './QuizProgressDots';
 
 type QuizGameProps = {
   onExitToMenu: () => void;
@@ -29,27 +25,30 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
   const [phase, setPhase] = useState<QuizPhase>(QUIZ_PHASE.READY);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [roundIdx, setRoundIdx] = useState(0);
-  const [correctCount, setCorrectCount] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
+  const [results, setResults] = useState<boolean[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const current = questions[roundIdx];
   const myCharacter = myCharacterId ? CHARACTERS[myCharacterId] : null;
+  const isRevealed = picked !== null;
+  const isLastRound = roundIdx + 1 >= QUIZ_ROUNDS;
+  const correctCount = results.filter(Boolean).length;
+  const isCurrentCorrect = isRevealed && picked === current?.correctIndex;
 
   const handlePick = (index: number) => {
-    if (picked !== null || !current) return;
+    if (isRevealed || !current) return;
     setPicked(index);
-    const correct = index === current.correctIndex;
-    if (correct) setCorrectCount((c) => c + 1);
+    setResults((prev) => [...prev, index === current.correctIndex]);
+  };
 
-    setTimeout(() => {
-      setPicked(null);
-      if (roundIdx + 1 >= QUIZ_ROUNDS) {
-        setPhase(QUIZ_PHASE.RESULT);
-      } else {
-        setRoundIdx((i) => i + 1);
-      }
-    }, QUIZ_PICK_DELAY_MS);
+  const goNext = () => {
+    setPicked(null);
+    if (isLastRound) {
+      setPhase(QUIZ_PHASE.RESULT);
+    } else {
+      setRoundIdx((i) => i + 1);
+    }
   };
 
   const startGame = async () => {
@@ -58,17 +57,14 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
     setPhase(QUIZ_PHASE.LOADING);
 
     try {
-      const fetched = await fetchRandomQuizQuestions(
-        myCharacterId,
-        QUIZ_ROUNDS,
-      );
+      const fetched = await fetchRandomQuizQuestions(myCharacterId, QUIZ_ROUNDS);
       if (fetched.length < QUIZ_ROUNDS) {
         throw new Error('문제를 충분히 받지 못했어요');
       }
       markMinigamePlayed();
       setQuestions(fetched);
       setRoundIdx(0);
-      setCorrectCount(0);
+      setResults([]);
       setPicked(null);
       setPhase(QUIZ_PHASE.PLAYING);
     } catch {
@@ -129,11 +125,7 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
   if (phase === QUIZ_PHASE.LOADING) {
     return (
       <div className="space-y-4">
-        <div className="flex justify-between items-center text-xs text-gray-400">
-          <span className="font-bold text-violet-300/60">
-            1 / {QUIZ_ROUNDS}
-          </span>
-        </div>
+        <QuizProgressDots results={[]} currentRound={0} />
 
         {myCharacterId && (
           <div className="flex justify-center">
@@ -159,11 +151,7 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
   if (phase === QUIZ_PHASE.PLAYING && current) {
     return (
       <div className="space-y-4">
-        <div className="flex justify-between items-center text-xs text-gray-400">
-          <span className="font-bold text-violet-400">
-            {roundIdx + 1} / {QUIZ_ROUNDS}
-          </span>
-        </div>
+        <QuizProgressDots results={results} currentRound={roundIdx} />
 
         <div className="flex justify-center">
           <CharacterSprite characterId={current.characterId} size={64} />
@@ -175,23 +163,60 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
 
         <div className="space-y-2">
           {current.options.map((opt, i) => {
+            const isCorrectOption = i === current.correctIndex;
             const isPicked = picked === i;
-            const bg = isPicked
-              ? 'bg-violet-100 border-violet-300 text-violet-700'
-              : 'bg-white border-gray-200 text-gray-700 hover:border-violet-300 hover:bg-violet-50';
+
+            let stateClass =
+              'bg-white border-gray-200 text-gray-700 hover:border-violet-300 hover:bg-violet-50';
+            let mark: string | null = null;
+
+            if (isRevealed) {
+              if (isCorrectOption) {
+                stateClass = 'bg-emerald-50 border-emerald-300 text-emerald-700';
+                mark = '✓';
+              } else if (isPicked) {
+                stateClass = 'bg-rose-50 border-rose-300 text-rose-600';
+                mark = '✗';
+              } else {
+                stateClass = 'bg-white border-gray-100 text-gray-300';
+              }
+            }
 
             return (
               <button
                 key={i}
                 onClick={() => handlePick(i)}
-                disabled={picked !== null}
-                className={`w-full px-4 py-3 rounded-xl border text-sm font-bold btn-press transition-colors text-left ${bg}`}
+                disabled={isRevealed}
+                className={`w-full px-4 py-3 rounded-xl border text-sm font-bold btn-press transition-colors text-left flex items-center justify-between gap-2 ${stateClass}`}
               >
-                {opt}
+                <span>{opt}</span>
+                {mark && <span className="text-base leading-none">{mark}</span>}
               </button>
             );
           })}
         </div>
+
+        {isRevealed && (
+          <div className="space-y-3 animate-fade-in-up">
+            <div
+              className={`text-sm font-bold ${
+                isCurrentCorrect ? 'text-emerald-500' : 'text-rose-400'
+              }`}
+            >
+              {isCurrentCorrect ? '정답이에요! 🎉' : '아쉬워요 😅'}
+            </div>
+            <div className="px-4 py-3 rounded-2xl bg-violet-50 border border-violet-100 text-[12px] text-gray-600 leading-relaxed text-left">
+              💡 {current.fact}
+            </div>
+            <button
+              onClick={goNext}
+              className="btn-primary btn-press w-full"
+              style={{ backgroundColor: '#A78BFA' }}
+            >
+              {isLastRound ? '결과 보기' : '다음 문제'}
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -206,6 +231,7 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
         <h3 className="text-xl font-bold text-gray-700">
           {correctCount} / {QUIZ_ROUNDS} 맞췄어요!
         </h3>
+        <QuizProgressDots results={results} currentRound={-1} />
         <MinigameRewardSummary score={correctCount} />
         <button
           onClick={handleFinish}
