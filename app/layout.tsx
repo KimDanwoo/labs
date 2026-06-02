@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import ReactDOM from "react-dom";
 import { Gowun_Dodum } from "next/font/google";
 import { ROOM_BACKGROUNDS } from "@widgets/game-room/constants";
+import { TermsConsentModal } from "@entities/auth/ui";
 import "./globals.css";
 import SyncProvider from "./sync-provider";
 
@@ -32,6 +33,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col items-center justify-center">
         <div className="w-full max-w-md md:max-w-lg mx-auto min-h-dvh flex flex-col">
           <SyncProvider>{children}</SyncProvider>
+          <TermsConsentModal />
         </div>
       </body>
     </html>
