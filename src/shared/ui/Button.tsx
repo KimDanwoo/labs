@@ -12,16 +12,16 @@ type ButtonProps = {
 
 const VARIANT_STYLES = {
   primary: cn(
-    'h-13 bg-gold text-[#0a0a1a] font-bold tracking-wide',
-    'shadow-lg shadow-gold/20',
-    'hover:bg-gold-bright active:scale-[0.97]',
+    'h-13 bg-primary text-white font-bold tracking-wide',
+    'shadow-lg shadow-primary/20',
+    'hover:bg-primary-bright active:scale-[0.97]',
   ),
   ghost: cn(
     'h-10 px-8 text-sm text-gray-400 bg-transparent',
     'active:scale-[0.97]',
   ),
   outline: cn(
-    'h-11 border border-gold/40 text-gold text-sm font-medium bg-transparent',
+    'h-11 border border-primary/40 text-primary text-sm font-medium bg-transparent',
     'active:scale-[0.97]',
   ),
 };

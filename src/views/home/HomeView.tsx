@@ -17,14 +17,14 @@ export function HomeView() {
       {/* 콘텐츠 — 하단 정렬 */}
       <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-[calc(3rem+env(safe-area-inset-bottom))] pt-6 text-center">
         <div className="mb-6 flex items-center gap-3">
-          <span className="w-12 h-px bg-gold/60" />
-          <span className="text-gold text-xs tracking-[0.4em] uppercase font-medium">
+          <span className="w-12 h-px bg-primary/60" />
+          <span className="text-primary text-xs tracking-[0.4em] uppercase font-medium">
             Destiny
           </span>
-          <span className="w-12 h-px bg-gold/60" />
+          <span className="w-12 h-px bg-primary/60" />
         </div>
 
-        <h1 className="text-5xl font-bold text-gold mb-3 tracking-tight drop-shadow-2xl">
+        <h1 className="text-5xl font-bold text-primary mb-3 tracking-tight drop-shadow-2xl">
           청연사주
         </h1>
 
@@ -34,7 +34,7 @@ export function HomeView() {
 
         <Link
           href="/input"
-          className="w-full max-w-xs h-14 rounded-full text-base font-bold tracking-wide shadow-2xl shadow-gold/30 hover:scale-[1.03] inline-flex items-center justify-center bg-gold text-background hover:bg-gold-bright active:scale-[0.98] transition-all duration-200"
+          className="w-full max-w-xs h-14 rounded-full text-base font-bold tracking-wide shadow-2xl shadow-primary/30 hover:scale-[1.03] inline-flex items-center justify-center bg-primary text-white hover:bg-primary-bright active:scale-[0.98] transition-all duration-200"
         >
           사주 보러가기 →
         </Link>

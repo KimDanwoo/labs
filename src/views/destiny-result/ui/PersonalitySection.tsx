@@ -49,7 +49,7 @@ export function PersonalitySection({
         sub="일간 — 나의 본질적인 성격"
       />
       <div className="bg-card-bg border border-card-border rounded-2xl p-5 mb-3">
-        <p className="text-xs text-gold font-bold mb-1">{format.name}</p>
+        <p className="text-xs text-primary font-bold mb-1">{format.name}</p>
         <p className="text-sm text-foreground/80 leading-[1.8]">
           {format.desc}
         </p>
@@ -59,8 +59,8 @@ export function PersonalitySection({
           {DAY_MASTER_STORY[dayStem]}
         </p>
       </div>
-      <div className="bg-gold/10 border border-gold/20 rounded-2xl p-5 mb-5">
-        <p className="text-xs text-gold font-semibold mb-2">
+      <div className="bg-primary/10 border border-primary/20 rounded-2xl p-5 mb-5">
+        <p className="text-xs text-primary font-semibold mb-2">
           {BODY_STRENGTH_LABEL[bodyStrength]}
         </p>
         <p className="text-sm text-[#1a1a2e] leading-[1.8]">

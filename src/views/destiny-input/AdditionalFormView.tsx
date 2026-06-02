@@ -66,7 +66,7 @@ export function AdditionalFormView() {
         <div className="relative z-10 flex-1 flex flex-col justify-end overflow-y-auto">
           <div className="px-5 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))] bg-background/85 backdrop-blur-sm rounded-t-3xl">
             <div className="text-center mb-5">
-              <h2 className="text-lg font-bold text-gold">추가 정보</h2>
+              <h2 className="text-lg font-bold text-primary">추가 정보</h2>
               <p className="text-sm text-muted mt-1">
                 선택사항이에요. 입력하면 더 정확한 풀이가 가능해요.
               </p>

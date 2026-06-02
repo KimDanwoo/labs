@@ -51,15 +51,17 @@ export function TenGodSection({
         sub="십신 — 사주 속 나의 기질과 관계"
       />
 
-      <div className="bg-gold/10 border border-gold/20 rounded-2xl p-5 mb-3">
-        <p className="text-xs text-gold font-semibold mb-2">{pattern.title}</p>
+      <div className="bg-primary/10 border border-primary/20 rounded-2xl p-5 mb-3">
+        <p className="text-xs text-primary font-semibold mb-2">
+          {pattern.title}
+        </p>
         <p className="text-sm text-[#1a1a2e] leading-[1.8]">{pattern.desc}</p>
       </div>
 
       {topGod && (
         <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-3">
           <p className="text-sm text-[#1a1a2e] font-semibold">
-            가장 강한 기운: <span className="text-gold">{topGod}</span>
+            가장 강한 기운: <span className="text-primary">{topGod}</span>
           </p>
           <p className="text-xs text-[#6b6b7b] mt-1 leading-[1.7]">
             {TEN_GOD_FRIENDLY[topGod]}

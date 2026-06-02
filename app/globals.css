@@ -3,8 +3,8 @@
 :root {
   --background: #0a0a1a;
   --foreground: #e8e0d0;
-  --gold: #d4a574;
-  --gold-bright: #f0c896;
+  --primary: #7c6cff;
+  --primary-bright: #a89aff;
   --red: #c94043;
   --card-bg: #141428;
   --card-border: #2a2a4a;
@@ -15,8 +15,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-gold: var(--gold);
-  --color-gold-bright: var(--gold-bright);
+  --color-primary: var(--primary);
+  --color-primary-bright: var(--primary-bright);
   --color-red: var(--red);
   --color-card-bg: var(--card-bg);
   --color-card-border: var(--card-border);
@@ -56,8 +56,8 @@ body::before {
   position: fixed;
   inset: 0;
   background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(212, 165, 116, 0.04) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(201, 64, 67, 0.04) 0%, transparent 50%);
+    radial-gradient(ellipse at 20% 50%, rgba(124, 108, 255, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(168, 154, 255, 0.05) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
 }
@@ -85,5 +85,26 @@ select {
 @supports not (height: 100dvh) {
   .h-dvh {
     height: -webkit-fill-available;
+  }
+}
+
+/* 스크롤 유도 힌트 (결과 첫 화면) */
+@keyframes scroll-hint-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.animate-scroll-hint {
+  animation: scroll-hint-bounce 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll-hint {
+    animation: none;
   }
 }

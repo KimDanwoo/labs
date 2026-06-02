@@ -13,6 +13,7 @@ import {
   LuckSection,
   PersonalitySection,
   PillarSection,
+  ScrollHint,
   StoryPanel,
   TenGodSection,
 } from '@views/destiny-result/ui';
@@ -68,6 +69,8 @@ export function DestinyResultView() {
       >
         ←
       </Link>
+
+      <ScrollHint />
 
       {/* ━━━ 1컷: 인사 (밝은 표정) ━━━ */}
       <StoryPanel
@@ -145,7 +148,7 @@ export function DestinyResultView() {
         <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center gap-3 pb-10 px-6">
           <Link
             href="/detail"
-            className="flex items-center justify-center w-full h-13 rounded-full bg-gold text-[#0a0a1a] font-bold tracking-wide shadow-lg shadow-gold/20 hover:bg-gold-bright active:scale-[0.97] transition-all duration-200 touch-manipulation"
+            className="flex items-center justify-center w-full h-13 rounded-full bg-primary text-white font-bold tracking-wide shadow-lg shadow-primary/20 hover:bg-primary-bright active:scale-[0.97] transition-all duration-200 touch-manipulation"
           >
             상세 사주보기 →
           </Link>

@@ -177,7 +177,7 @@ export function SajuChart({
               className={cn(
                 CELL,
                 'text-xs font-medium',
-                god === '일간' ? 'text-gold font-bold' : 'text-[#555]',
+                god === '일간' ? 'text-primary font-bold' : 'text-[#555]',
               )}
             >
               {god}
