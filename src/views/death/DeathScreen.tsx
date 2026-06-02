@@ -19,9 +19,11 @@ export default function DeathScreen() {
           <CharacterSprite characterId={characterId} size={80} isDead />
         </div>
         <h2 className="text-xl font-bold text-gray-600">
-          {nickname}(이)가 떠났어요...
+          {nickname}(이)가 별이 되었어요
         </h2>
-        <p className="text-sm text-gray-400">밥을 잘 챙겨주고 청소도 해줘야 해요</p>
+        <p className="text-sm text-gray-400">
+          더 자주 보살펴 주면 오래오래 함께할 수 있어요
+        </p>
       </div>
 
       <button
