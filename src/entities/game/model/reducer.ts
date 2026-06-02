@@ -6,6 +6,7 @@ import {
   MAX_CLEANLINESS,
   MAX_HEARTS,
   CLEANLINESS_PER_POOP,
+  POOP_DELAY_MS,
   DEATH_THRESHOLD_MS,
   LEVEL_THRESHOLDS,
   LEVEL_REWARDS,
@@ -129,9 +130,12 @@ function checkEggReady(
   state: GameState,
   newHearts: number,
 ): CharacterId | null {
+  if (state.eggReadyCharacterId) return state.eggReadyCharacterId;
   if (newHearts < EGG_HEART_THRESHOLD || state.level < EGG_LEVEL_THRESHOLD)
     return null;
-  if (state.eggReadyCharacterId) return state.eggReadyCharacterId;
+  // 한 레벨에 알 1개만: 마지막으로 알을 받은 레벨보다 높아야 새 알이 나옴
+  if (state.lastEggLevel !== null && state.level <= state.lastEggLevel)
+    return null;
 
   const currentCharacter = state.characterId;
   const unlocked = new Set([
@@ -189,8 +193,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const levelUp = applyLevelUp(state, newExp);
       const eggReady = checkEggReady({ ...state, ...levelUp }, newHearts);
 
-      const poopDelay = 20_000;
-      const pendingPoops = [...(state.pendingPoops ?? []), now + poopDelay];
+      const pendingPoops = [now + POOP_DELAY_MS];
 
       return {
         ...state,
@@ -415,6 +418,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         hearts: 0,
         eggReadyCharacterId: null,
+        lastEggLevel: state.level,
         unlockedCharacters: isAlreadyUnlocked
           ? state.unlockedCharacters
           : [...(state.unlockedCharacters ?? []), state.eggReadyCharacterId],

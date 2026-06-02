@@ -76,6 +76,7 @@ export type GameState = {
   levelUpMessage: string | null;
   feedingMessage: string | null;
   eggReadyCharacterId: CharacterId | null;
+  lastEggLevel: number | null;
   pendingPoops: number[];
   lastMeetingAt: number | null;
   meetingsToday: number;
