@@ -54,7 +54,7 @@ export default function QuizEditor({ row, onDone }: QuizEditorProps) {
         <select
           value={form.character_id}
           onChange={(e) => update({ character_id: e.target.value })}
-          className="px-2 py-1.5 rounded-lg bg-input-bg border border-card-border text-xs text-foreground outline-none"
+          className="admin-select px-2 py-1.5 rounded-lg bg-input-bg border border-card-border text-xs text-foreground outline-none"
         >
           {ALL_CHARACTER_IDS.map((id) => (
             <option key={id} value={id}>

@@ -54,6 +54,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* 커스텀 셀렉트: 네이티브 화살표 대신 패딩 안쪽에 chevron 배치 */
+.admin-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C8799' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+  padding-right: 26px;
+}
+
 /* ===== 디자인 토큰 유틸리티 ===== */
 .surface {
   background: var(--surface);
