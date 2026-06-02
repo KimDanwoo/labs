@@ -10,8 +10,9 @@
 body {
   background-color: var(--color-background);
   background-image:
-    radial-gradient(60rem 32rem at 50% -8rem, var(--color-glow), transparent 70%),
-    radial-gradient(40rem 24rem at 100% 0, var(--color-glow), transparent 60%);
+    radial-gradient(60rem 34rem at 50% -10rem, var(--color-glow-strong), transparent 70%),
+    radial-gradient(42rem 26rem at 100% 0, var(--color-glow), transparent 60%),
+    radial-gradient(38rem 26rem at 0 28%, var(--color-glow), transparent 62%);
   background-repeat: no-repeat;
   background-attachment: fixed;
   color: var(--color-foreground);
@@ -20,4 +21,35 @@ body {
   word-break: keep-all;
   /* 끊을 수 없는 긴 토큰(URL 등)은 넘치지 않게 줄바꿈 허용. */
   overflow-wrap: anywhere;
+}
+
+/* 화면 진입 시 콘텐츠가 조용히 떠오르는 등장 모션. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 접근성: 모션 최소화 설정 시 등장/반복 애니메이션을 끈다. */
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

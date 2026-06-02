@@ -10,11 +10,11 @@ import { commonColors as c, themeColors as t } from './palette';
  * primary = indigo[800](#10069f) 앵커.
  */
 export const colors = {
-  // Primary — indigo (#10069f)
-  primary: { light: t.indigo[800], dark: t.indigo[400] },
+  // Primary — sky blue (#0284c7)
+  primary: { light: t.sky[600], dark: t.sky[400] },
   'primary-foreground': { light: c.white, dark: t.gray[900] },
-  'primary-accent': { light: t.indigo[600], dark: t.indigo[300] },
-  'primary-subtle': { light: t.indigo[50], dark: '#1b1340' },
+  'primary-accent': { light: t.sky[500], dark: t.sky[300] },
+  'primary-subtle': { light: t.sky[50], dark: '#0a2a40' },
 
   // Secondary — slate
   secondary: { light: t.slate[600], dark: t.slate[400] },
@@ -49,7 +49,8 @@ export const colors = {
   'card-border': { light: t.gray[200], dark: t.gray[700] },
   glass: { light: 'rgba(255, 255, 255, 0.72)', dark: 'rgba(36, 36, 51, 0.6)' },
   'glass-border': { light: 'rgba(15, 15, 24, 0.08)', dark: 'rgba(255, 255, 255, 0.08)' },
-  glow: { light: 'rgba(100, 80, 234, 0.16)', dark: 'rgba(133, 121, 243, 0.18)' },
+  glow: { light: 'rgba(14, 165, 233, 0.16)', dark: 'rgba(56, 189, 248, 0.18)' },
+  'glow-strong': { light: 'rgba(14, 165, 233, 0.3)', dark: 'rgba(56, 189, 248, 0.32)' },
 } as const;
 
 export type ColorToken = keyof typeof colors;
