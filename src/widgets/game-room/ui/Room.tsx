@@ -14,8 +14,9 @@ import {
   isSickAtom,
   isDangerAtom,
   roomTypeAtom,
+  meetingPlayFriendAtom,
 } from '@entities/game/model/store';
-import { useGameActions } from '@entities/game/model/hooks';
+import { useFriendWander, useGameActions } from '@entities/game/model/hooks';
 import { ROOM_BACKGROUNDS } from '../constants';
 
 const JUMP_DURATION_MS = 450;
@@ -31,6 +32,7 @@ export default function Room() {
   const isSick = useAtomValue(isSickAtom);
   const isDanger = useAtomValue(isDangerAtom);
   const roomType = useAtomValue(roomTypeAtom);
+  const playFriend = useAtomValue(meetingPlayFriendAtom);
   const { cleanPoop, wakeUp } = useGameActions();
 
   const roomRef = useRef<HTMLDivElement>(null);
@@ -39,6 +41,8 @@ export default function Room() {
   const [isJumping, setIsJumping] = useState(false);
   const [floatingHearts, setFloatingHearts] = useState<number[]>([]);
   const heartIdRef = useRef(0);
+
+  const friendPos = useFriendWander(Boolean(playFriend));
 
   if (!characterId) return null;
 
@@ -72,6 +76,7 @@ export default function Room() {
         fill
         className="object-cover transition-opacity duration-500"
         priority
+        unoptimized
       />
 
       {poops.map((poop) => (
@@ -118,6 +123,27 @@ export default function Room() {
           ))}
         </div>
       </button>
+
+      {playFriend && (
+        <div
+          className="absolute z-10 pointer-events-none"
+          style={{
+            left: `${friendPos.x}%`,
+            top: `${friendPos.y}%`,
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <CharacterSprite
+            characterId={playFriend}
+            size={56}
+            direction={friendPos.direction}
+            isMoving={friendPos.isMoving}
+          />
+          <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-base heart-effect">
+            💕
+          </span>
+        </div>
+      )}
 
       {isSleeping && (
         <div className="absolute inset-0 bg-indigo-950/20 z-20 pointer-events-none" />

@@ -7,6 +7,7 @@ import {
 	useAutoDecay,
 	useBathroomExit,
 	useCharacterMovement,
+	useMeetingPlayScene,
 } from '@entities/game/model/hooks';
 import DeathScreen from '@views/death/DeathScreen';
 import { StatusBar } from '@widgets/status-bar/ui';
@@ -18,6 +19,7 @@ export default function GameView() {
 	useAutoDecay();
 	useCharacterMovement();
 	useBathroomExit();
+	useMeetingPlayScene();
 
 	const status = useAtomValue(statusAtom);
 
