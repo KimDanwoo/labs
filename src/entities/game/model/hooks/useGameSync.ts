@@ -3,12 +3,17 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { GameState } from '@shared/types';
-import { INITIAL_GAME_STATE, ALL_CHARACTER_IDS } from '@shared/constants';
+import {
+  INITIAL_GAME_STATE,
+  ALL_CHARACTER_IDS,
+  GAME_STORAGE_KEY,
+  GAME_STORAGE_LEGACY_KEY,
+} from '@shared/constants';
 import { supabase } from '@shared/lib';
 import { characterStatesAtom, isLoadedAtom } from '../store';
 
-const STORAGE_KEY = 'plco-damagochi-saves';
-const LEGACY_STORAGE_KEY = 'plco-damagochi-state';
+const STORAGE_KEY = GAME_STORAGE_KEY;
+const LEGACY_STORAGE_KEY = GAME_STORAGE_LEGACY_KEY;
 const SYNC_DEBOUNCE_MS = 3000;
 
 const VALID_CHARACTER_IDS = new Set<string>(ALL_CHARACTER_IDS);
