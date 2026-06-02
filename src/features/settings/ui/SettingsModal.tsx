@@ -2,28 +2,49 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, useIsAdmin } from '@entities/auth/model/hooks';
+import {
+  useAuth,
+  useIsAdmin,
+  useGoogleConsent,
+} from '@entities/auth/model/hooks';
 import { useGameActions } from '@entities/game/model/hooks';
 import { GoogleIcon, ModalShell } from '@shared/ui';
 
 export default function SettingsModal() {
   const router = useRouter();
-  const { isAnonymous, linkWithGoogle, signInWithGoogle } = useAuth();
+  const { isAnonymous, signOut, deleteAccount } = useAuth();
+  const { requestLogin, requestLink } = useGoogleConsent();
   const { isAdmin } = useIsAdmin();
   const { reset, closeModal } = useGameActions();
   const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleGoToAdmin = () => {
     closeModal();
     router.push('/admin');
   };
 
-  const handleLinkGoogle = () => {
-    linkWithGoogle().catch(() => {});
+  const handleLinkGoogle = () => requestLink();
+
+  const handleSignInGoogle = () => requestLogin();
+
+  const handleLogout = () => {
+    closeModal();
+    signOut()
+      .then(() => router.push('/'))
+      .catch(() => {});
   };
 
-  const handleSignInGoogle = () => {
-    signInWithGoogle().catch(() => {});
+  const handleDeleteAccount = () => {
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
+    deleteAccount()
+      .then(() => {
+        window.location.href = '/';
+      })
+      .catch(() => {});
   };
 
   const handleGoToSelect = () => {
@@ -83,6 +104,29 @@ export default function SettingsModal() {
                 연동: 지금 게스트 진행도를 구글에 보관
                 <br />
                 가져오기: 구글로 다시 로그인해 다른 기기 데이터 불러오기
+              </div>
+            </div>
+          )}
+          {!isAnonymous && (
+            <div className="space-y-1.5">
+              <button
+                onClick={handleLogout}
+                className="w-full py-2 rounded-lg font-bold text-xs btn-press bg-white border border-gray-200 text-gray-700 shadow-game-sm"
+              >
+                로그아웃
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                className={`w-full py-2 rounded-lg font-bold text-xs btn-press transition-colors ${
+                  confirmDelete
+                    ? 'bg-red-500 text-white'
+                    : 'bg-red-50 text-red-400 border border-red-200'
+                }`}
+              >
+                {confirmDelete ? '정말 탈퇴할래요? (되돌릴 수 없어요)' : '회원 탈퇴'}
+              </button>
+              <div className="text-[10px] text-gray-400 leading-relaxed pt-0.5">
+                탈퇴하면 계정과 모든 게임 데이터가 영구 삭제돼요.
               </div>
             </div>
           )}

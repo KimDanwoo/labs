@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { supabase } from '@shared/lib';
+import { supabase, clearLocalGameSaves } from '@shared/lib';
+import { AUTH_API } from '../constants';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -55,6 +56,23 @@ export function useAuth() {
     setUser(null);
   }, []);
 
+  const deleteAccount = useCallback(async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.access_token) throw new Error('세션이 없습니다.');
+
+    const res = await fetch(AUTH_API.ACCOUNT, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    if (!res.ok) throw new Error('탈퇴에 실패했습니다.');
+
+    clearLocalGameSaves();
+    await supabase.auth.signOut();
+    setUser(null);
+  }, []);
+
   const isAnonymous = user?.is_anonymous ?? false;
 
   return {
@@ -65,5 +83,6 @@ export function useAuth() {
     signInWithGoogle,
     linkWithGoogle,
     signOut,
+    deleteAccount,
   };
 }

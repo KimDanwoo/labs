@@ -1,19 +1,18 @@
 'use client';
 
 import { useSetAtom } from 'jotai';
-import { useAuth } from '@entities/auth/model/hooks';
+import { useAuth, useGoogleConsent } from '@entities/auth/model/hooks';
 import { GoogleIcon } from '@shared/ui';
 import { CHARACTER_SELECT_STEP } from '../model/constants';
 import { stepAtom } from '../model/store';
 
 export default function IntroScreen() {
 	const setStep = useSetAtom(stepAtom);
-	const { isAnonymous, signInWithGoogle } = useAuth();
+	const { isAnonymous } = useAuth();
+	const { requestLogin } = useGoogleConsent();
 
 	const handleStartNew = () => setStep(CHARACTER_SELECT_STEP.CAROUSEL);
-	const handleGoogleLogin = () => {
-		signInWithGoogle().catch(() => {});
-	};
+	const handleGoogleLogin = () => requestLogin();
 
 	return (
 		<div className="flex flex-col items-center justify-center flex-1 px-6 relative overflow-hidden">
