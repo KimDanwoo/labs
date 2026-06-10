@@ -5,6 +5,7 @@ import {
   MINIGAME_CATCHER_EMOJI_SIZE,
   MINIGAME_CATCHER_HEIGHT,
   MINIGAME_CATCHER_WIDTH,
+  MINIGAME_COMBO_SCORE_THRESHOLD,
   MINIGAME_COMBO_SHOW_THRESHOLD,
   MINIGAME_FIELD_HEIGHT,
   MINIGAME_FIELD_WIDTH,
@@ -15,11 +16,10 @@ import {
 } from '../model/constants';
 import { useCatchEngine } from '../model/hooks';
 import MinigameCooldownNotice from './MinigameCooldownNotice';
+import MinigameReadyScreen from './MinigameReadyScreen';
 import MinigameRewardSummary from './MinigameRewardSummary';
 
-type CatchGameProps = {
-  onExitToMenu: () => void;
-};
+type CatchGameProps = { onExitToMenu: () => void };
 
 export default function CatchGame({ onExitToMenu }: CatchGameProps) {
   const {
@@ -33,41 +33,32 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
     floats,
     badFlashKey,
     progressPercent,
-    finalScore,
     startGame,
     handleTouchMove,
     handleTouchEnd,
+    handleFieldPointerDown,
+    handleFieldPointerMove,
+    handleFieldPointerUp,
     handleFinish,
   } = useCatchEngine();
 
   if (phase === MINIGAME_PHASE.READY) {
     return (
-      <div className="space-y-5 py-4">
+      <MinigameReadyScreen
+        canPlay={minigame.canPlay}
+        cooldownRemainingMs={minigame.cooldownRemainingMs}
+        onStart={startGame}
+        onExitToMenu={onExitToMenu}
+        accentColor="#FF6B9D"
+      >
         <h3 className="text-lg font-bold text-gray-700">하트 캐치!</h3>
         <div className="text-5xl py-2">💖</div>
         <p className="text-sm text-gray-400 leading-relaxed">
-          ← → 키 또는 하단 버튼으로
+          필드 드래그 또는 ← → 버튼으로
           <br />
           💖 하트를 받고 💣 폭탄은 피하세요!
         </p>
-        {!minigame.canPlay && (
-          <MinigameCooldownNotice remainingMs={minigame.cooldownRemainingMs} />
-        )}
-        <button
-          onClick={startGame}
-          disabled={!minigame.canPlay}
-          className="btn-primary btn-press w-full disabled:opacity-40"
-          style={{ backgroundColor: '#FF6B9D' }}
-        >
-          {minigame.canPlay ? '시작!' : '에너지 부족'}
-        </button>
-        <button
-          onClick={onExitToMenu}
-          className="w-full py-2 text-xs text-gray-400 btn-press"
-        >
-          다른 게임 고르기
-        </button>
-      </div>
+      </MinigameReadyScreen>
     );
   }
 
@@ -81,7 +72,9 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
               key={combo}
               className="text-xs font-black text-rose-500 catch-combo-pop"
             >
-              🔥 {combo} 콤보
+              {combo >= MINIGAME_COMBO_SCORE_THRESHOLD
+                ? `🔥🔥 ${combo} 콤보 +2`
+                : `🔥 ${combo} 콤보`}
             </span>
           )}
           <span className="text-xs font-bold text-gray-400 tabular-nums">
@@ -100,13 +93,17 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
         </div>
 
         <div
-          className="relative mx-auto rounded-2xl overflow-hidden select-none"
+          className="relative mx-auto rounded-2xl overflow-hidden select-none touch-none cursor-grab active:cursor-grabbing"
           style={{
             width: MINIGAME_FIELD_WIDTH,
             height: MINIGAME_FIELD_HEIGHT,
             background:
               'linear-gradient(180deg, #EDE9FE 0%, #FFF0F5 50%, #FCE7F3 100%)',
           }}
+          onPointerDown={handleFieldPointerDown}
+          onPointerMove={handleFieldPointerMove}
+          onPointerUp={handleFieldPointerUp}
+          onPointerCancel={handleFieldPointerUp}
         >
           {items.map((item) => (
             <div
@@ -190,25 +187,35 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
 
   if (phase === MINIGAME_PHASE.RESULT) {
     return (
-      <div className="space-y-5 py-4">
+      <div className="space-y-4 py-3">
         <div className="text-5xl">
-          {finalScore >= MINIGAME_SCORE_GOOD
+          {score >= MINIGAME_SCORE_GOOD
             ? '🎉'
-            : finalScore >= MINIGAME_SCORE_OK
+            : score >= MINIGAME_SCORE_OK
               ? '😊'
               : '😅'}
         </div>
-        <h3 className="text-xl font-bold text-gray-700">
-          {finalScore}개 잡았어요!
-        </h3>
-        <MinigameRewardSummary score={finalScore} />
-        <button
-          onClick={handleFinish}
-          className="btn-primary btn-press w-full"
-          style={{ backgroundColor: '#FF6B9D' }}
-        >
-          받기!
-        </button>
+        <h3 className="text-xl font-bold text-gray-700">{score}개 잡았어요!</h3>
+        <MinigameRewardSummary score={score} />
+        {!minigame.canPlay && (
+          <MinigameCooldownNotice remainingMs={minigame.cooldownRemainingMs} />
+        )}
+        <div className="flex gap-2">
+          <button
+            onClick={startGame}
+            disabled={!minigame.canPlay}
+            className="flex-1 py-3 rounded-2xl bg-white/80 border border-gray-200 text-gray-600 font-bold btn-press disabled:opacity-40"
+          >
+            {minigame.canPlay ? '다시!' : '에너지 부족'}
+          </button>
+          <button
+            onClick={handleFinish}
+            className="flex-1 py-3 rounded-2xl text-white font-bold btn-press"
+            style={{ backgroundColor: '#FF6B9D' }}
+          >
+            받기!
+          </button>
+        </div>
       </div>
     );
   }

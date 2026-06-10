@@ -15,7 +15,11 @@ export default function MiniGameModal() {
   const exitToMenu = () => setMode(MINIGAME_MODE.SELECT);
 
   return (
-    <ModalShell onClose={closeModal} className="p-5 text-center space-y-4">
+    <ModalShell
+      onClose={closeModal}
+      disableBackdropClose={mode !== MINIGAME_MODE.SELECT}
+      className="p-5 text-center space-y-4"
+    >
       {(close) => (
         <>
           <button

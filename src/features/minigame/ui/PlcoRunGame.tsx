@@ -19,6 +19,7 @@ import {
 } from '../model/constants';
 import { useRunEngine } from '../model/hooks';
 import MinigameCooldownNotice from './MinigameCooldownNotice';
+import MinigameReadyScreen from './MinigameReadyScreen';
 import MinigameRewardSummary from './MinigameRewardSummary';
 
 type PlcoRunGameProps = {
@@ -49,7 +50,20 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
 
   if (phase === RUN_PHASE.READY) {
     return (
-      <div className="space-y-4 py-3">
+      <MinigameReadyScreen
+        canPlay={minigame.canPlay}
+        cooldownRemainingMs={minigame.cooldownRemainingMs}
+        onStart={startGame}
+        onExitToMenu={onExitToMenu}
+        accentColor="#22C55E"
+        extra={
+          bestScore > 0 ? (
+            <div className="text-xs text-amber-500 font-bold">
+              🏆 최고기록 {bestScore}개
+            </div>
+          ) : undefined
+        }
+      >
         <h3 className="text-lg font-bold text-gray-700">플코런!</h3>
         <div className="text-5xl py-1">🏃</div>
         <p className="text-sm text-gray-400 leading-relaxed">
@@ -57,29 +71,7 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
           <br />
           💖 하트를 모아 행복도를 채워요
         </p>
-        {bestScore > 0 && (
-          <div className="text-xs text-amber-500 font-bold">
-            🏆 최고기록 {bestScore}개
-          </div>
-        )}
-        {!minigame.canPlay && (
-          <MinigameCooldownNotice remainingMs={minigame.cooldownRemainingMs} />
-        )}
-        <button
-          onClick={startGame}
-          disabled={!minigame.canPlay}
-          className="btn-primary btn-press w-full disabled:opacity-40"
-          style={{ backgroundColor: '#22C55E' }}
-        >
-          {minigame.canPlay ? '시작!' : '에너지 부족'}
-        </button>
-        <button
-          onClick={onExitToMenu}
-          className="w-full py-2 text-xs text-gray-400 btn-press"
-        >
-          다른 게임 고르기
-        </button>
-      </div>
+      </MinigameReadyScreen>
     );
   }
 

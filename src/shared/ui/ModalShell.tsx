@@ -9,6 +9,7 @@ type ModalShellProps = {
   onClose?: () => void;
   maxWidth?: string;
   className?: string;
+  disableBackdropClose?: boolean;
   children: ReactNode | ((close: () => void) => ReactNode);
 };
 
@@ -44,6 +45,7 @@ export default function ModalShell({
   onClose,
   maxWidth,
   className = '',
+  disableBackdropClose = false,
   children,
 }: ModalShellProps) {
   const [isClosing, setIsClosing] = useState(false);
@@ -61,7 +63,7 @@ export default function ModalShell({
     <div className={WRAPPER[variant]}>
       <div
         className={`absolute inset-0 modal-overlay ${overlayAnim}`}
-        onClick={requestClose}
+        onClick={disableBackdropClose ? undefined : requestClose}
       />
       <div
         className={`${PANEL[variant]} ${panelAnim} ${maxWidth ?? DEFAULT_MAX_WIDTH[variant]} ${className}`}
