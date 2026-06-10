@@ -14,12 +14,13 @@ import {
   RUN_FRAME_MS,
   RUN_GRAVITY,
   RUN_GROUND_EPSILON,
+  RUN_HEART_HITBOX_PADDING,
   RUN_HEART_SIZE,
   RUN_HEART_SPAWN_INTERVAL_BASE,
   RUN_HEART_SPAWN_INTERVAL_MIN,
-  RUN_HEART_Y_MAX,
-  RUN_HEART_Y_MIN,
+  RUN_HEART_Y_TIERS,
   RUN_HITBOX_PADDING,
+  RUN_JUMP_BUFFER_MS,
   RUN_JUMP_VELOCITY,
   RUN_MAX_FRAME_STEP,
   RUN_MIN_GAP_FACTOR,
@@ -27,6 +28,7 @@ import {
   RUN_OBSTACLE_SIZE,
   RUN_OBSTACLE_SPEED_ACCEL,
   RUN_OBSTACLE_SPEED_BASE,
+  RUN_OBSTACLE_SPEED_MAX,
   RUN_PHASE,
   RUN_PICKUP_FLOAT_MS,
   RUN_REWARD_CAP,
@@ -36,9 +38,7 @@ import {
   RUN_TILT_FACTOR,
   RUN_TILT_MAX,
 } from '../constants';
-import type { RunHeart, RunObstacle, RunPhase } from '../types';
-
-type RunPickup = { id: number; x: number; y: number };
+import type { RunHeart, RunObstacle, RunPhase, RunPickup } from '../types';
 
 export function useRunEngine() {
   const { minigameReward, markMinigamePlayed, closeModal } = useGameActions();
@@ -70,6 +70,8 @@ export function useRunEngine() {
   const lastFrameRef = useRef(0);
   const animFrameRef = useRef(0);
   const countdownTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const jumpBufferedRef = useRef(false);
+  const jumpBufferTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const finishGame = useCallback(() => {
     setPhase(RUN_PHASE.RESULT);
@@ -107,6 +109,11 @@ export function useRunEngine() {
     lastObstacleSpawnRef.current = 0;
     lastHeartSpawnRef.current = 0;
     setIsCrashing(false);
+    jumpBufferedRef.current = false;
+    if (jumpBufferTimerRef.current) {
+      clearTimeout(jumpBufferTimerRef.current);
+      jumpBufferTimerRef.current = null;
+    }
     setPhase(RUN_PHASE.PLAYING);
 
     clearCountdownTimers();
@@ -124,10 +131,24 @@ export function useRunEngine() {
 
   useEffect(() => clearCountdownTimers, [clearCountdownTimers]);
 
+  useEffect(() => {
+    return () => {
+      if (jumpBufferTimerRef.current) clearTimeout(jumpBufferTimerRef.current);
+    };
+  }, []);
+
   const jump = useCallback(() => {
     if (countdown !== null) return;
     if (charYRef.current <= RUN_GROUND_EPSILON) {
       charVyRef.current = RUN_JUMP_VELOCITY;
+    } else {
+      // 공중에서 탭하면 착지 즉시 점프 발동 (점프 버퍼)
+      jumpBufferedRef.current = true;
+      if (jumpBufferTimerRef.current) clearTimeout(jumpBufferTimerRef.current);
+      jumpBufferTimerRef.current = setTimeout(() => {
+        jumpBufferedRef.current = false;
+        jumpBufferTimerRef.current = null;
+      }, RUN_JUMP_BUFFER_MS);
     }
   }, [countdown]);
 
@@ -163,7 +184,18 @@ export function useRunEngine() {
         0,
         charYRef.current + charVyRef.current * frame,
       );
-      if (charYRef.current <= 0) charVyRef.current = 0;
+      if (charYRef.current <= 0) {
+        if (jumpBufferedRef.current) {
+          jumpBufferedRef.current = false;
+          if (jumpBufferTimerRef.current) {
+            clearTimeout(jumpBufferTimerRef.current);
+            jumpBufferTimerRef.current = null;
+          }
+          charVyRef.current = RUN_JUMP_VELOCITY;
+        } else {
+          charVyRef.current = 0;
+        }
+      }
       setCharY(charYRef.current);
       setCharTilt(
         Math.max(
@@ -172,8 +204,11 @@ export function useRunEngine() {
         ),
       );
 
-      const speed =
-        (RUN_OBSTACLE_SPEED_BASE + elapsed * RUN_OBSTACLE_SPEED_ACCEL) * frame;
+      const speedPerFrame = Math.min(
+        RUN_OBSTACLE_SPEED_BASE + elapsed * RUN_OBSTACLE_SPEED_ACCEL,
+        RUN_OBSTACLE_SPEED_MAX,
+      );
+      const speed = speedPerFrame * frame;
 
       const obstacleSpawnInterval = Math.max(
         RUN_SPAWN_INTERVAL_MIN,
@@ -204,7 +239,9 @@ export function useRunEngine() {
           (RUN_HEART_SPAWN_INTERVAL_BASE - RUN_HEART_SPAWN_INTERVAL_MIN);
       if (now - lastHeartSpawnRef.current > heartSpawnInterval) {
         const y =
-          RUN_HEART_Y_MIN + Math.random() * (RUN_HEART_Y_MAX - RUN_HEART_Y_MIN);
+          RUN_HEART_Y_TIERS[
+            Math.floor(Math.random() * RUN_HEART_Y_TIERS.length)
+          ];
         heartsRef.current = [
           ...heartsRef.current,
           {
@@ -257,11 +294,11 @@ export function useRunEngine() {
         const heartTop = heart.y + RUN_HEART_SIZE;
 
         const overlapX =
-          heartLeft < charRight - RUN_HITBOX_PADDING &&
-          heartRight > charLeft + RUN_HITBOX_PADDING;
+          heartLeft < charRight - RUN_HEART_HITBOX_PADDING &&
+          heartRight > charLeft + RUN_HEART_HITBOX_PADDING;
         const overlapY =
-          heartBottom < charTop - RUN_HITBOX_PADDING &&
-          heartTop > charBottom + RUN_HITBOX_PADDING;
+          heartBottom < charTop - RUN_HEART_HITBOX_PADDING &&
+          heartTop > charBottom + RUN_HEART_HITBOX_PADDING;
 
         if (overlapX && overlapY) {
           caughtThisFrame += 1;

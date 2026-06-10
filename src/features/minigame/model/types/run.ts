@@ -13,3 +13,5 @@ export type RunHeart = {
   x: number;
   y: number;
 };
+
+export type RunPickup = { id: number; x: number; y: number };
