@@ -4,19 +4,10 @@
   "private": true,
   "type": "module",
   "files": [
-    "tsconfig",
-    "vitest"
+    "tsconfig"
   ],
   "exports": {
     "./tsconfig/base.json": "./tsconfig/base.json",
-    "./tsconfig/next.json": "./tsconfig/next.json",
-    "./vitest/base": "./vitest/base.ts",
-    "./vitest/react": "./vitest/react.ts",
-    "./vitest/setup": "./vitest/setup.ts"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "catalog:",
-    "@vitejs/plugin-react": "catalog:",
-    "vitest": "catalog:"
+    "./tsconfig/next.json": "./tsconfig/next.json"
   }
 }
