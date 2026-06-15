@@ -12,7 +12,6 @@
     "lint": "turbo run lint",
     "tokens": "turbo run tokens",
     "new-app": "node scripts/new-app.mjs",
-    "prepare": "husky",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,css,md}\""
@@ -20,15 +19,10 @@
   "prettier": "@repo/prettier-config",
   "devDependencies": {
     "@repo/prettier-config": "workspace:*",
-    "husky": "catalog:",
-    "lint-staged": "catalog:",
     "prettier": "catalog:",
     "tsx": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:"
-  },
-  "lint-staged": {
-    "**/*.{ts,tsx,css,md,json}": "prettier --write"
   },
   "pnpm": {
     "overrides": {
