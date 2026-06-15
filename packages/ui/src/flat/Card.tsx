@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
+import { Button } from '../Button';
 import { CardBody, CardDescription, CardHeader, CardRoot, CardTitle } from '../card/primitives';
-import { Button } from '../ui/Button';
 
 /**
  * Flat Card — 단순·고빈도 케이스용. title/description만으로 바로 쓴다.
