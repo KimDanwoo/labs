@@ -12,14 +12,18 @@
   "scripts": {
     "tokens": "tsx scripts/build-tokens.ts",
     "build": "tsx scripts/build-tokens.ts",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@danwoo/config": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "eslint": "catalog:",
     "tsx": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
