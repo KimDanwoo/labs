@@ -97,28 +97,6 @@ src/
 - URL 라우팅: 화면 전환은 App Router URL 기반으로. atom으로 화면을 전환하지 않는다.
 - 금지: 미사용 코드(YAGNI) · 조급한 추상화 · 흐름 설명 주석(자명한 코드로) · 남은 `console.log` · `any`.
 
-## 테스트 하네스
-
-**스택**: Vitest 3 + @testing-library/react + happy-dom
-
-| 패키지        | 환경      | 테스트 위치           | 대상                               |
-| ------------- | --------- | --------------------- | ---------------------------------- |
-| `@tokens/css` | node      | `src/__tests__/`      | 팔레트 스케일, semantic alias 구조 |
-| `@ui/react`   | happy-dom | `src/__tests__/`      | Button/Badge variant·접근성        |
-| `@danwoo/hub` | happy-dom | slice 내 `__tests__/` | FSD 슬라이스 단위                  |
-
-테스트 파일 위치 규칙: slice 내 `__tests__/` 폴더. slice 루트 import 금지와 동일하게 **자기 slice만 테스트**한다.
-
-**커맨드**:
-
-- `/test` — 전체 테스트 실행
-- `/test-filter <패키지명>` — 특정 패키지만
-- `/coverage` — 커버리지 리포트
-
-**훅**: `*.test.ts(x)` 파일 저장 시 해당 패키지 테스트 자동 실행 (`PostToolUse`).
-
-새 slice를 추가할 때는 `__tests__/` 폴더와 기본 렌더 테스트를 함께 만든다.
-
 ## 스크립트 (루트에서)
 
 | 명령                  | 동작                             |
@@ -126,7 +104,6 @@ src/
 | `pnpm dev`            | `turbo run dev` — 모든 앱 dev    |
 | `pnpm build`          | `turbo run build`                |
 | `pnpm lint`           | `turbo run lint`                 |
-| `pnpm test`           | `turbo run test` — 전체 테스트   |
 | `pnpm tokens`         | 디자인 토큰 → `theme.css` 재생성 |
 | `pnpm new-app <name>` | 새 앱 스캐폴드                   |
 | `pnpm format`         | Prettier 전체 포맷               |

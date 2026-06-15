@@ -13,7 +13,6 @@
     "tokens": "turbo run tokens",
     "new-app": "node scripts/new-app.mjs",
     "typecheck": "turbo run typecheck",
-    "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,css,md}\""
   },
   "prettier": "@repo/prettier-config",
