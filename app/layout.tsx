@@ -4,6 +4,7 @@ import { Gowun_Dodum } from "next/font/google";
 import { ROOM_BACKGROUNDS } from "@widgets/game-room/constants";
 import { TermsConsentModal } from "@entities/auth/ui";
 import "./globals.css";
+import QueryProvider from "./query-provider";
 import SyncProvider from "./sync-provider";
 
 const gowunDodum = Gowun_Dodum({
@@ -32,8 +33,10 @@ export default function RootLayout({
     <html lang="ko" className={`${gowunDodum.variable} h-full`}>
       <body className="min-h-full flex flex-col items-center justify-center">
         <div className="w-full max-w-md md:max-w-lg mx-auto min-h-dvh flex flex-col">
-          <SyncProvider>{children}</SyncProvider>
-          <TermsConsentModal />
+          <QueryProvider>
+            <SyncProvider>{children}</SyncProvider>
+            <TermsConsentModal />
+          </QueryProvider>
         </div>
       </body>
     </html>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { MODAL_TYPE } from '@shared/constants';
 import { ModalShell } from '@shared/ui';
 import { useGameActions } from '@entities/game/model/hooks';
 import { MINIGAME_MODE } from '../model/constants';
@@ -10,7 +11,7 @@ import PlcoRunGame from './PlcoRunGame';
 import QuizGame from './QuizGame';
 
 export default function MiniGameModal() {
-  const { closeModal } = useGameActions();
+  const { closeModal, openModal } = useGameActions();
   const [mode, setMode] = useState<MinigameMode>(MINIGAME_MODE.SELECT);
   const exitToMenu = () => setMode(MINIGAME_MODE.SELECT);
 
@@ -82,6 +83,23 @@ export default function MiniGameModal() {
                       </div>
                       <div className="text-[11px] text-gray-500">
                         멤버 취향 3문제 맞히기
+                      </div>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => openModal(MODAL_TYPE.CHAT)}
+                  className="rounded-2xl p-4 text-left bg-linear-to-br from-sky-50 to-blue-50 border border-sky-200 btn-press shadow-game-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">💬</span>
+                    <div>
+                      <div className="text-sm font-bold text-sky-600">
+                        팬 톡
+                      </div>
+                      <div className="text-[11px] text-gray-500">
+                        다른 팬들과 수다 떨기
                       </div>
                     </div>
                   </div>
