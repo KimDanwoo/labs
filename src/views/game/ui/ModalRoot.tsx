@@ -12,6 +12,7 @@ import { FeedModal } from '@features/feed/ui';
 import { ShopModal } from '@features/shop/ui';
 import { MeetingModal } from '@features/meeting/ui';
 import { MiniGameModal } from '@features/minigame/ui';
+import { ChatModal } from '@features/chat/ui';
 import { EggModal } from '@features/egg/ui';
 import { SettingsModal } from '@features/settings/ui';
 
@@ -34,6 +35,7 @@ export default function ModalRoot() {
       {activeModal === MODAL_TYPE.SHOP && <ShopModal />}
       {activeModal === MODAL_TYPE.MEETING && <MeetingModal />}
       {activeModal === MODAL_TYPE.MINIGAME && <MiniGameModal />}
+      {activeModal === MODAL_TYPE.CHAT && <ChatModal />}
       {activeModal === MODAL_TYPE.SETTINGS && <SettingsModal />}
       {activeModal === MODAL_TYPE.EGG && eggReadyCharacterId && <EggModal />}
     </>

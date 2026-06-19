@@ -225,6 +225,7 @@ export const MODAL_TYPE = {
   SHOP: 'shop',
   MEETING: 'meeting',
   MINIGAME: 'minigame',
+  CHAT: 'chat',
   EGG: 'egg',
   SETTINGS: 'settings',
 } as const;
