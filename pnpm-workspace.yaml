@@ -14,6 +14,14 @@ catalog:
   tailwindcss: ^4
   '@tailwindcss/postcss': ^4
 
+  # 3d (life-simulation 앱)
+  three: 0.184.0
+  '@react-three/fiber': 9.6.1
+  '@react-three/drei': 10.7.7
+  '@react-three/postprocessing': 3.0.4
+  postprocessing: 6.39.1
+  '@types/three': 0.184.1
+
   # tooling
   typescript: ^5
   tsx: ^4.19.2
