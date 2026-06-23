@@ -34,6 +34,10 @@ export function Hud() {
             <KeyCap>D</KeyCap>
             <span className="text-muted">조향</span>
           </div>
+          <div className="flex items-center gap-sm">
+            <KeyCap>드래그</KeyCap>
+            <span className="text-muted">시점 이동</span>
+          </div>
         </div>
       </div>
     </div>
