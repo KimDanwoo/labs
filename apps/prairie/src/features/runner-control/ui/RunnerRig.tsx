@@ -8,6 +8,7 @@ import { useRef } from 'react';
 import { Group, MathUtils, Vector3 } from 'three';
 import { RUNNER_PHYSICS } from '../model/constants';
 import { useRunnerControls } from '../model/hooks/useRunnerControls';
+import { getRunnerInput } from '../model/store/runner-input';
 
 const forwardVec = new Vector3();
 const desiredCam = new Vector3();
@@ -17,7 +18,7 @@ const smoothTarget = new Vector3();
 // 자유 이동: WASD로 가속·방향 전환(말이 진행 방향을 바라봄).
 // 카메라는 말 뒤를 낮게 따라가며 말을 화면 중앙에 둔다(마우스 조작 없음).
 export function RunnerRig() {
-  const input = useRunnerControls();
+  useRunnerControls();
   const camera = useThree((state) => state.camera);
 
   const rootRef = useRef<Group>(null);
@@ -28,7 +29,7 @@ export function RunnerRig() {
 
   useFrame((_state, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05);
-    const { forward, backward, left, right } = input.current;
+    const { forward, backward, left, right } = getRunnerInput();
     const physics = RUNNER_PHYSICS;
 
     let speed = speedRef.current;

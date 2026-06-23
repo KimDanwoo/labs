@@ -8,6 +8,7 @@ type GrassChunkProps = {
   seed: number;
   geometry: BufferGeometry;
   material: ShaderMaterial;
+  bladesPerChunk: number;
 };
 
 // 시드 기반 결정적 PRNG(mulberry32) — 셀마다 항상 같은 잔디 배치.
@@ -28,7 +29,7 @@ function clumpAt(x: number, z: number): number {
 }
 
 // 카메라 주변 한 청크. 셀 좌표(원시값) 의존 → 부모 리렌더로 재생성되지 않는다.
-export function GrassChunk({ cellX, cellZ, seed, geometry, material }: GrassChunkProps) {
+export function GrassChunk({ cellX, cellZ, seed, geometry, material, bladesPerChunk }: GrassChunkProps) {
   const meshRef = useRef<InstancedMesh>(null);
 
   useLayoutEffect(() => {
@@ -38,7 +39,7 @@ export function GrassChunk({ cellX, cellZ, seed, geometry, material }: GrassChun
     const centerZ = cellZ * GRASS_FIELD.tile;
     const rng = makeRng(seed);
     const dummy = new Object3D();
-    for (let i = 0; i < GRASS_FIELD.bladesPerChunk; i += 1) {
+    for (let i = 0; i < bladesPerChunk; i += 1) {
       const x = centerX + (rng() - 0.5) * GRASS_FIELD.tile;
       const z = centerZ + (rng() - 0.5) * GRASS_FIELD.tile;
       dummy.position.set(x, 0, z);
@@ -51,7 +52,7 @@ export function GrassChunk({ cellX, cellZ, seed, geometry, material }: GrassChun
     }
     mesh.instanceMatrix.needsUpdate = true;
     mesh.computeBoundingSphere();
-  }, [cellX, cellZ, seed]);
+  }, [cellX, cellZ, seed, bladesPerChunk]);
 
-  return <instancedMesh ref={meshRef} args={[geometry, material, GRASS_FIELD.bladesPerChunk]} />;
+  return <instancedMesh ref={meshRef} args={[geometry, material, bladesPerChunk]} />;
 }
