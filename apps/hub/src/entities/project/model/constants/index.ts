@@ -3,6 +3,11 @@ import type { Project } from '@entities/project/model/types';
 /** 소개할 내 프로젝트(Labs) 목록. 새 프로젝트는 여기에 추가한다. */
 export const PROJECTS: Project[] = [
   {
+    title: '초원의 말',
+    description: 'three.js로 만든 초원을 달리는 말',
+    href: 'https://danwoo-lab-prairie.vercel.app/',
+  },
+  {
     title: '플코',
     description: '아이돌 컨셉 다마고치 게임',
     href: 'https://plco-tamagochi.vercel.app/',
