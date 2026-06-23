@@ -1,50 +1,83 @@
 'use client';
 
-import type { PointerEvent, ReactNode } from 'react';
-import type { RunnerAction } from '../model/constants';
-import { setRunnerAction } from '../model/store/runner-input';
+import { type PointerEvent, useRef, useState } from 'react';
+import { JOYSTICK } from '../model/constants';
+import { resetRunnerInput, setRunnerAction } from '../model/store/runner-input';
 
-type ControlButtonProps = {
-  action: RunnerAction;
-  label: ReactNode;
-  ariaLabel: string;
-};
+type Vec = { x: number; y: number };
 
-// 누르는 동안 액션을 true로. 포인터 캡처로 손가락이 버튼 밖으로 미끄러져도 release를 놓치지 않는다.
-function ControlButton({ action, label, ariaLabel }: ControlButtonProps) {
-  const press = (event: PointerEvent<HTMLButtonElement>, pressed: boolean) => {
-    if (pressed) event.currentTarget.setPointerCapture(event.pointerId);
-    setRunnerAction(action, pressed);
+// 손 댄 자리에 조이스틱이 생기고, 끄는 방향으로 가속·조향한다(플로팅 조이스틱).
+// (pointer: coarse)에서만 노출 → PC에선 DOM에서 사라져 캔버스 드래그(시점 회전)와 충돌하지 않는다.
+export function TouchControls() {
+  const [origin, setOrigin] = useState<Vec | null>(null);
+  const [knob, setKnob] = useState<Vec>({ x: 0, y: 0 });
+  const originRef = useRef<Vec>({ x: 0, y: 0 });
+  const pointerIdRef = useRef<number | null>(null);
+
+  const applyDirection = (dx: number, dy: number) => {
+    const { deadzone } = JOYSTICK;
+    setRunnerAction('forward', dy < -deadzone); // 화면 위로 = 가속
+    setRunnerAction('backward', dy > deadzone);
+    setRunnerAction('left', dx < -deadzone);
+    setRunnerAction('right', dx > deadzone);
+  };
+
+  const handleDown = (event: PointerEvent<HTMLDivElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    pointerIdRef.current = event.pointerId;
+    originRef.current = { x: event.clientX, y: event.clientY };
+    setOrigin({ x: event.clientX, y: event.clientY });
+    setKnob({ x: 0, y: 0 });
+  };
+
+  const handleMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== event.pointerId) return;
+    let dx = event.clientX - originRef.current.x;
+    let dy = event.clientY - originRef.current.y;
+    const distance = Math.hypot(dx, dy);
+    if (distance > JOYSTICK.maxRadius) {
+      const scale = JOYSTICK.maxRadius / distance;
+      dx *= scale;
+      dy *= scale;
+    }
+    setKnob({ x: dx, y: dy });
+    applyDirection(dx, dy);
+  };
+
+  const handleEnd = (event: PointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== event.pointerId) return;
+    pointerIdRef.current = null;
+    setOrigin(null);
+    resetRunnerInput();
   };
 
   return (
-    <button
-      type="button"
-      aria-label={ariaLabel}
-      className="pointer-events-auto flex h-16 w-16 touch-none select-none items-center justify-center rounded-full bg-background/55 text-2xl text-foreground shadow-glow backdrop-blur-md transition-colors active:bg-primary/80 active:text-primary-foreground"
-      onPointerDown={(event) => press(event, true)}
-      onPointerUp={(event) => press(event, false)}
-      onPointerCancel={(event) => press(event, false)}
-      onLostPointerCapture={() => setRunnerAction(action, false)}
-      onContextMenu={(event) => event.preventDefault()}
-    >
-      {label}
-    </button>
-  );
-}
+    <div className="absolute inset-0 z-30 hidden touch-none select-none pointer-coarse:block">
+      <div
+        className="absolute inset-0"
+        onPointerDown={handleDown}
+        onPointerMove={handleMove}
+        onPointerUp={handleEnd}
+        onPointerCancel={handleEnd}
+        onContextMenu={(event) => event.preventDefault()}
+      />
 
-// 모바일/터치 전용 온스크린 컨트롤. (pointer: coarse) 미디어로만 노출돼 데스크톱에선 DOM에서 사라진다.
-export function TouchControls() {
-  return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 hidden select-none items-end justify-between p-lg pointer-coarse:flex">
-      <div className="flex gap-md">
-        <ControlButton action="left" label="◀" ariaLabel="왼쪽으로 조향" />
-        <ControlButton action="right" label="▶" ariaLabel="오른쪽으로 조향" />
-      </div>
-      <div className="flex flex-col gap-md">
-        <ControlButton action="forward" label="▲" ariaLabel="가속" />
-        <ControlButton action="backward" label="▼" ariaLabel="감속 · 후진" />
-      </div>
+      {origin ? (
+        <>
+          <span
+            className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/60 bg-white/15 shadow-glow backdrop-blur-sm"
+            style={{ left: origin.x, top: origin.y, width: JOYSTICK.maxRadius * 2, height: JOYSTICK.maxRadius * 2 }}
+          />
+          <span
+            className="absolute h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/90 shadow-glow"
+            style={{ left: origin.x + knob.x, top: origin.y + knob.y }}
+          />
+        </>
+      ) : (
+        <p className="absolute inset-x-0 bottom-10 text-center text-sm font-medium text-foreground/70 drop-shadow">
+          화면을 끌어 달려보세요 🐎
+        </p>
+      )}
     </div>
   );
 }
