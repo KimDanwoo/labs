@@ -42,24 +42,32 @@ scripts/new-app.mjs   # 새 앱 생성기
 
 각 앱은 `apps/<app>/src/` 아래에 FSD로 구성한다. **공유 디자인 시스템(`packages/ui`·`packages/tokens`)이 FSD의 `shared` UI 레이어 역할**을 하므로, 앱의 표시 프리미티브는 `@ui/react`에서 가져오고 앱 `src/shared`에는 그 앱 전용 공용 코드만 둔다.
 
+**Next 라우팅과 FSD `app` 레이어는 분리한다 (합치기 금지).**
+
+- **`apps/<app>/app/`** (= `src/` **밖**): Next 라우팅 진입점. `layout.tsx`/`page.tsx`/`route.ts` + 파일 기반 메타데이터(`icon.*`/`opengraph-image.*` 등)만 둔다. **얇게** — 화면은 `views`, 전역 setup은 `src/app`에 위임한다.
+- **`apps/<app>/src/app/`** (= FSD `app` 레이어, **라우팅 아님**): `providers/`(전역 프로바이더 합성 루트), `globals.css`(전역 스타일) 등 앱 전역 setup. 라우팅 파일(page/layout)을 여기에 두지 않는다.
+- 루트 `app/layout.tsx`는 전역 스타일·프로바이더를 `@app`에서 가져온다: `import '@app/globals.css'` + `import { AppProviders } from '@app/providers'`. Next가 라우팅 위치를 강제해도 `src/app`을 라우팅으로 쓰지 않는다.
+
 **레이어 의존성** (단방향, `@repo/eslint-config`의 `fsd.config.mjs` → `eslint-plugin-boundaries`로 **lint 강제**): `app → views → widgets → features → entities → shared`
 
 - 하위 레이어는 상위를 import 불가. cross-import 금지. `packages/ui`·`@tokens/css`는 모든 레이어에서 사용 가능.
 - 위반 시 `pnpm lint`가 에러로 막는다(규칙 위반은 빌드 전에 걸린다).
 
-**경로 별칭** (앱 `tsconfig.json`의 `paths`): `@app/` `@views/` `@widgets/` `@features/` `@entities/` `@shared/` → `./src/<layer>/`
+**경로 별칭** (앱 `tsconfig.json`의 `paths`): `@app/` `@views/` `@widgets/` `@features/` `@entities/` `@shared/` → `./src/<layer>/`. `@app/`은 **FSD app 레이어(`src/app/`)**를 가리킨다 — 루트 라우팅 `app/`은 Next 진입점이라 별칭이 없다.
 
 **slice 구조**: 메인 뷰 파일은 slice 루트에, 나머지는 `ui/` / `model/{hooks,types,constants,store,services}`로 분리.
 
 ```
-src/
-  app/                       # Next 라우팅(layout/page/globals.css)
-  views/home/HomeView.tsx    # 메인 뷰: 위젯 합성
-  widgets/project-grid/ui/   # 위젯: 화면 블록
-  entities/project/
-    model/types/             # 도메인 타입
-    model/constants/         # 도메인 데이터/상수
-    ui/                      # 도메인 표시 컴포넌트(ProjectCard)
+apps/<app>/
+  app/                       # Next 라우팅 진입점(src 밖): layout/page/route + 메타데이터 파일. 얇게.
+  src/
+    app/                     # FSD app 레이어(라우팅 아님): providers/, globals.css 등 전역 setup
+    views/home/HomeView.tsx  # 메인 뷰: 위젯 합성
+    widgets/project-grid/ui/ # 위젯: 화면 블록
+    entities/project/
+      model/types/           # 도메인 타입
+      model/constants/       # 도메인 데이터/상수
+      ui/                    # 도메인 표시 컴포넌트(ProjectCard)
 ```
 
 **컴포넌트 인라인 선언 금지**: 뷰/위젯 파일에 컴포넌트를 인라인 정의하지 않는다. 모든 컴포넌트는 해당 slice의 `ui/` 하위 파일로 분리 후 `ui/index.ts`에서 export.
