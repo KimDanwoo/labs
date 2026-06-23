@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: '시골 자전거 산책',
-  description: '자전거를 타고 시골 마을을 자유롭게 돌아다니는 three.js 인터랙티브 씬',
+  title: '초원을 달리는 말 · Prairie',
+  description: '말을 타고 지브리풍 초원을 자유롭게 달리는 three.js 인터랙티브 씬',
 };
 
 // 첫 페인트 전에 테마 클래스를 적용해 다크모드 깜빡임(FOUC)을 방지한다.
