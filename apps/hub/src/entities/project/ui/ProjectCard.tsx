@@ -14,6 +14,12 @@ const COVERS = [
 /** 카드가 순차적으로 떠오르도록 인덱스마다 더하는 등장 지연(ms). */
 const ENTRANCE_STAGGER_MS = 70;
 
+/** 커버 이미지 정렬(리터럴이라 Tailwind 스캔 가능). */
+const IMAGE_POSITION = {
+  top: 'object-top',
+  center: 'object-center',
+} as const;
+
 type ProjectCardProps = {
   project: Project;
   index: number;
@@ -38,7 +44,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             <img
               src={project.image}
               alt={project.title}
-              className="size-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
+              className={`size-full object-cover ${IMAGE_POSITION[project.imagePosition ?? 'top']} transition-transform duration-500 ease-out group-hover:scale-105`}
             />
           ) : (
             <span className="text-4xl font-bold text-white/95 transition-transform duration-500 ease-out select-none group-hover:scale-110">
