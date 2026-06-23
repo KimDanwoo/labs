@@ -11,7 +11,7 @@ import { Suspense } from 'react';
 export function SceneCanvas() {
   return (
     <Canvas
-      dpr={[1, 1.75]}
+      dpr={[1, 1.5]}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{
         fov: CAMERA.fov,
