@@ -2,9 +2,11 @@
 export const GRASS_MODEL_URL = '/models/grass/iGrass.glb';
 
 // 카메라 주변 청크만 유지(chunk-follow). 멀어진 청크는 언마운트 → 메모리·초기화 절약.
+// viewRadius 3 = 가장자리 56까지 → 그래스가 안개로 사라지는 GRASS_FADE.far(48)를 완전히 덮으면서
+// 안 보이는 바깥 청크는 그리지 않는다(81→49 청크, 근경 밀도·룩은 그대로).
 export const GRASS_FIELD = {
   tile: 16,
-  viewRadius: 4,
+  viewRadius: 3,
   bladesPerChunk: 2500,
   minScale: 1.9,
   maxScale: 3.3,
