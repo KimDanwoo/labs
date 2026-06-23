@@ -1,14 +1,15 @@
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { SCENE_COLORS } from '@shared/config';
+import { useIsCoarsePointer } from '@shared/lib';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { type BufferGeometry, Color, DoubleSide, type Mesh, ShaderMaterial } from 'three';
 import {
   chunkSeed,
-  GRASS_FADE,
   GRASS_FIELD,
   GRASS_FRAGMENT_SHADER,
   GRASS_MODEL_URL,
+  GRASS_QUALITY,
   GRASS_VERTEX_SHADER,
 } from '../model/constants';
 import { GrassChunk } from './GrassChunk';
@@ -17,6 +18,8 @@ type Cell = { x: number; z: number };
 
 // ghibli-grass-v2(MIT, © Wilson Ko) 색/바람 + 실제 glb blade를 카메라 주변 청크로만 유지(chunk-follow).
 export function GrassField() {
+  const coarse = useIsCoarsePointer();
+  const quality = GRASS_QUALITY[coarse ? 'mobile' : 'desktop'];
   const { scene } = useGLTF(GRASS_MODEL_URL);
   const materialRef = useRef<ShaderMaterial | null>(null);
 
@@ -35,8 +38,8 @@ export function GrassField() {
           uTime: { value: 0 },
           uBrightness: { value: 1.12 },
           uHorizonColor: { value: new Color(SCENE_COLORS.fog) },
-          uFadeNear: { value: GRASS_FADE.near },
-          uFadeFar: { value: GRASS_FADE.far },
+          uFadeNear: { value: GRASS_QUALITY.desktop.fadeNear },
+          uFadeFar: { value: GRASS_QUALITY.desktop.fadeFar },
         },
         vertexShader: GRASS_VERTEX_SHADER,
         fragmentShader: GRASS_FRAGMENT_SHADER,
@@ -50,18 +53,25 @@ export function GrassField() {
 
   const cells = useMemo(() => {
     const list: Cell[] = [];
-    const r = GRASS_FIELD.viewRadius;
+    const r = quality.viewRadius;
     for (let dx = -r; dx <= r; dx += 1) {
       for (let dz = -r; dz <= r; dz += 1) {
         list.push({ x: center.x + dx, z: center.z + dz });
       }
     }
     return list;
-  }, [center]);
+  }, [center, quality.viewRadius]);
 
   useLayoutEffect(() => {
     materialRef.current = material;
   }, [material]);
+
+  useLayoutEffect(() => {
+    const mat = materialRef.current;
+    if (!mat) return;
+    mat.uniforms.uFadeNear!.value = quality.fadeNear;
+    mat.uniforms.uFadeFar!.value = quality.fadeFar;
+  }, [quality.fadeNear, quality.fadeFar]);
 
   useFrame((state) => {
     if (materialRef.current) materialRef.current.uniforms.uTime!.value = state.clock.elapsedTime;
@@ -85,6 +95,7 @@ export function GrassField() {
           seed={chunkSeed(cell.x, cell.z)}
           geometry={geometry}
           material={material}
+          bladesPerChunk={quality.bladesPerChunk}
         />
       ))}
     </group>

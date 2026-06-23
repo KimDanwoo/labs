@@ -1,43 +1,30 @@
-import { useEffect, useRef } from 'react';
-import { KEY_BINDINGS, type RunnerAction } from '../constants';
+import { useEffect } from 'react';
+import { KEY_BINDINGS } from '../constants';
+import { resetRunnerInput, setRunnerAction } from '../store/runner-input';
 
-export type RunnerInput = Record<RunnerAction, boolean>;
-
-function createInput(): RunnerInput {
-  return { forward: false, backward: false, left: false, right: false };
-}
-
-// 눌린 키를 ref에 모은다. useFrame 루프가 매 프레임 읽되 리렌더는 일으키지 않는다.
-export function useRunnerControls(): { current: RunnerInput } {
-  const inputRef = useRef<RunnerInput>(createInput());
-
+// 키보드 입력을 공유 스토어에 반영한다(WASD + 방향키). 터치 컨트롤과 동일 스토어를 쓴다.
+export function useRunnerControls(): void {
   useEffect(() => {
-    const setAction = (code: string, pressed: boolean) => {
-      const action = KEY_BINDINGS[code];
-      if (!action) return;
-      inputRef.current[action] = pressed;
-    };
-
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) return;
-      if (event.code in KEY_BINDINGS) event.preventDefault();
-      setAction(event.code, true);
+      const action = KEY_BINDINGS[event.code];
+      if (!action) return;
+      event.preventDefault();
+      setRunnerAction(action, true);
     };
-    const handleKeyUp = (event: KeyboardEvent) => setAction(event.code, false);
-    const reset = () => {
-      inputRef.current = createInput();
+    const handleKeyUp = (event: KeyboardEvent) => {
+      const action = KEY_BINDINGS[event.code];
+      if (action) setRunnerAction(action, false);
     };
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('blur', reset);
+    window.addEventListener('blur', resetRunnerInput);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('blur', reset);
+      window.removeEventListener('blur', resetRunnerInput);
     };
   }, []);
-
-  return inputRef;
 }

@@ -6,12 +6,15 @@ import { Ground } from '@entities/village/ui';
 import { RunnerRig } from '@features/runner-control/ui';
 import { Canvas } from '@react-three/fiber';
 import { CAMERA, FOG, SCENE_COLORS, SUN } from '@shared/config';
+import { useIsCoarsePointer } from '@shared/lib';
 import { Suspense } from 'react';
 
 export function SceneCanvas() {
+  const coarse = useIsCoarsePointer();
+
   return (
     <Canvas
-      dpr={[1, 1.5]}
+      dpr={coarse ? [1, 1.25] : [1, 1.5]}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{
         fov: CAMERA.fov,

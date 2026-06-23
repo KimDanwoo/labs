@@ -2,21 +2,21 @@
 export const GRASS_MODEL_URL = '/models/grass/iGrass.glb';
 
 // 카메라 주변 청크만 유지(chunk-follow). 멀어진 청크는 언마운트 → 메모리·초기화 절약.
-// viewRadius 3 = 가장자리 56까지 → 그래스가 안개로 사라지는 GRASS_FADE.far(48)를 완전히 덮으면서
-// 안 보이는 바깥 청크는 그리지 않는다(81→49 청크, 근경 밀도·룩은 그대로).
 export const GRASS_FIELD = {
   tile: 16,
-  viewRadius: 3,
-  bladesPerChunk: 2500,
   minScale: 1.9,
   maxScale: 3.3,
 } as const;
 
-// 거리 페이드(대기 원근: 멀수록 옅은 haze로 완만하게 사라짐). 청크 경계 전에 끝낸다.
-export const GRASS_FADE = {
-  near: 22,
-  far: 48,
+// 기기별 품질. 거리 페이드(대기 원근)는 청크 경계 전에 끝낸다.
+// 불변식 viewRadius*tile + tile/2 > fadeFar → 안개 너머 빈 고리가 안 생긴다(데스크톱 56>48, 모바일 40>30).
+// mobile은 반경·밀도·페이드를 낮춰 약한 GPU에서도 부드럽게 달릴 수 있게 한다.
+export const GRASS_QUALITY = {
+  desktop: { viewRadius: 3, bladesPerChunk: 2500, fadeNear: 22, fadeFar: 48 },
+  mobile: { viewRadius: 2, bladesPerChunk: 1100, fadeNear: 12, fadeFar: 30 },
 } as const;
+
+export type GrassQuality = keyof typeof GRASS_QUALITY;
 
 // 셀 좌표 → 결정적 시드(재방문해도 같은 배치).
 export function chunkSeed(cellX: number, cellZ: number): number {
