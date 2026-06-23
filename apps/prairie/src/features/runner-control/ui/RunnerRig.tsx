@@ -7,16 +7,18 @@ import { setRideSpeed } from '@shared/r3f';
 import { useRef } from 'react';
 import { Group, MathUtils, Vector3 } from 'three';
 import { RUNNER_PHYSICS } from '../model/constants';
+import { usePointerLook } from '../model/hooks/usePointerLook';
 import { useRunnerControls } from '../model/hooks/useRunnerControls';
 import { getRunnerInput } from '../model/store/runner-input';
 
 const forwardVec = new Vector3();
+const camDirVec = new Vector3();
 const desiredCam = new Vector3();
 const desiredTarget = new Vector3();
 const smoothTarget = new Vector3();
 
-// 자유 이동: WASD로 가속·방향 전환(말이 진행 방향을 바라봄).
-// 카메라는 말 뒤를 낮게 따라가며 말을 화면 중앙에 둔다(마우스 조작 없음).
+// 자유 이동: WASD/터치로 가속·방향 전환(말이 진행 방향을 바라봄).
+// 카메라는 말 뒤를 낮게 따라가며 말을 화면 중앙에 둔다. PC에선 드래그로 좌우 시점(yaw) 회전.
 export function RunnerRig() {
   useRunnerControls();
   const camera = useThree((state) => state.camera);
@@ -24,8 +26,11 @@ export function RunnerRig() {
   const rootRef = useRef<Group>(null);
   const speedRef = useRef(0);
   const headingRef = useRef(0);
+  const viewYawRef = useRef(0);
   const positionRef = useRef(new Vector3(0, 0, 0));
   const initializedRef = useRef(false);
+
+  usePointerLook(viewYawRef);
 
   useFrame((_state, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05);
@@ -55,7 +60,10 @@ export function RunnerRig() {
       root.rotation.y = heading;
     }
 
-    desiredCam.copy(position).addScaledVector(forwardVec, -CAMERA.followDistance).setY(CAMERA.followHeight);
+    // 카메라 방향 = 말의 heading + 마우스 드래그 yaw 오프셋(말은 heading 그대로, 카메라만 좌우로 돈다).
+    const camYaw = heading + viewYawRef.current;
+    camDirVec.set(Math.sin(camYaw), 0, Math.cos(camYaw));
+    desiredCam.copy(position).addScaledVector(camDirVec, -CAMERA.followDistance).setY(CAMERA.followHeight);
     desiredTarget.copy(position).setY(CAMERA.targetHeight);
 
     if (!initializedRef.current) {
