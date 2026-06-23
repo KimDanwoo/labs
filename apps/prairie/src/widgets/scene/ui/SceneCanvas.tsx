@@ -8,12 +8,14 @@ import { Canvas } from '@react-three/fiber';
 import { CAMERA, FOG, SCENE_COLORS, SUN } from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
 import { Suspense } from 'react';
+import { ReadySignal } from './ReadySignal';
 
 export function SceneCanvas() {
   const coarse = useIsCoarsePointer();
 
   return (
     <Canvas
+      className="cursor-grab"
       dpr={coarse ? [1, 1.25] : [1, 1.5]}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{
@@ -33,6 +35,7 @@ export function SceneCanvas() {
         <Ground />
         <GrassField />
         <RunnerRig />
+        <ReadySignal />
       </Suspense>
     </Canvas>
   );
