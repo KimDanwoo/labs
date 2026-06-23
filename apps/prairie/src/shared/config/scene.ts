@@ -1,4 +1,4 @@
-// WebGL 머티리얼 색은 토큰으로 표현 불가 → 지브리풍 파스텔 팔레트를 여기 한곳에 모은다.
+// WebGL 머티리얼 색은 토큰으로 표현 불가 → 파스텔 톤 팔레트를 여기 한곳에 모은다.
 export const SCENE_COLORS = {
   skyTop: '#8ec9ee',
   skyBottom: '#e6f3fb',
