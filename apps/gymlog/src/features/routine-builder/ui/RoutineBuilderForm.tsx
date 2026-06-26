@@ -13,9 +13,11 @@ import { SelectedExerciseList } from './SelectedExerciseList';
 type RoutineBuilderFormProps = {
   initialRoutine: Routine | null;
   onSubmit: (routine: Routine, start: boolean) => void;
+  // 관리자 공용 루틴 편집 등 '시작'이 의미 없는 맥락에서 시작 버튼을 숨긴다.
+  hideStart?: boolean;
 };
 
-export function RoutineBuilderForm({ initialRoutine, onSubmit }: RoutineBuilderFormProps) {
+export function RoutineBuilderForm({ initialRoutine, onSubmit, hideStart }: RoutineBuilderFormProps) {
   const [name, setName] = useState(initialRoutine?.name ?? '');
   const [goal, setGoal] = useState<Goal>(initialRoutine?.goal ?? 'hypertrophy');
   const [selectedIds, setSelectedIds] = useState<string[]>(initialRoutine?.items.map((item) => item.exerciseId) ?? []);
@@ -105,11 +107,18 @@ export function RoutineBuilderForm({ initialRoutine, onSubmit }: RoutineBuilderF
       )}
 
       <div className="sticky bottom-0 flex flex-col gap-sm bg-linear-to-t from-background py-lg">
-        <Button className="h-14 w-full text-base font-semibold" disabled={!canSubmit} onClick={handleSaveAndStart}>
-          저장하고 시작
-        </Button>
-        <Button variant="outline" className="h-12 w-full" disabled={!canSubmit} onClick={handleSave}>
-          저장만 하기
+        {!hideStart && (
+          <Button className="h-14 w-full text-base font-semibold" disabled={!canSubmit} onClick={handleSaveAndStart}>
+            저장하고 시작
+          </Button>
+        )}
+        <Button
+          variant={hideStart ? undefined : 'outline'}
+          className={hideStart ? 'h-14 w-full text-base font-semibold' : 'h-12 w-full'}
+          disabled={!canSubmit}
+          onClick={handleSave}
+        >
+          {hideStart ? '저장' : '저장만 하기'}
         </Button>
       </div>
     </div>
