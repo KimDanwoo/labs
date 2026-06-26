@@ -6,15 +6,14 @@
 /* 모노레포 공통 UI 패키지의 클래스도 스캔 대상에 포함 */
 @source '../../../../packages/ui/src/**/*.{ts,tsx}';
 
-/* 배경에 brand glow 레이어를 얹어 글래스 표면이 떠 보이게 한다(토큰 var 기반). */
+/* ─── Hub 전용 CSS 커스텀 프로퍼티 ───────────────────────────── */
+:root {
+  --font-display: var(--font-display, var(--font-sans));
+}
+
+/* ─── Body / Background ──────────────────────────────────────── */
 body {
   background-color: var(--color-background);
-  background-image:
-    radial-gradient(60rem 34rem at 50% -10rem, var(--color-glow-strong), transparent 70%),
-    radial-gradient(42rem 26rem at 100% 0, var(--color-glow), transparent 60%),
-    radial-gradient(38rem 26rem at 0 28%, var(--color-glow), transparent 62%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
   color: var(--color-foreground);
   font-family: var(--font-sans);
   /* 한글이 글자 단위로 끊기지 않고 단어(어절) 단위로 줄바꿈되게 한다. */
@@ -23,11 +22,30 @@ body {
   overflow-wrap: anywhere;
 }
 
-/* 화면 진입 시 콘텐츠가 조용히 떠오르는 등장 모션. */
+/* ─── 디스플레이 타이포그래피 ─────────────────────────────────── */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* ─── 애니메이션 ─────────────────────────────────────────────── */
+
+/* 기본 페이드업 */
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 히어로 타이틀 — 조금 더 긴 이동거리 */
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -36,13 +54,19 @@ body {
 }
 
 .fade-up {
-  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* 접근성: 모션 최소화 설정 시 등장/반복 애니메이션을 끈다. */
+.hero-enter {
+  animation: hero-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─── 접근성 ─────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .fade-up {
+  .fade-up,
+  .hero-enter {
     animation: none;
+    opacity: 1;
   }
 
   *,

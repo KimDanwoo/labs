@@ -1,7 +1,7 @@
 import '@app/globals.css';
 import { AppProviders } from '@app/providers';
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -11,6 +11,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+});
+
+/** 포트폴리오 허브 전용 디스플레이 폰트 — Geist, Space Grotesk와 뚜렷하게 다른 결 */
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-display',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
 });
 
 // TODO: 실제 배포 도메인으로 교체 (OG 이미지 절대경로 생성에 쓰임)
@@ -56,7 +63,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${plusJakartaSans.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
