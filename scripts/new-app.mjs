@@ -44,4 +44,4 @@ function replaceInTree(dir) {
 replaceInTree(dest);
 
 console.log(`✓ apps/${name} 생성 완료`);
-console.log('  다음 단계: pnpm install && pnpm dev --filter @danwoo/' + name);
+console.log('  다음 단계: pnpm install && pnpm dev --filter ' + name);

@@ -14,7 +14,7 @@ apps/
 packages/
   tokens/  @tokens/css     # 디자인 토큰 → theme.css 생성
   ui/      @ui/react       # 앱 공용 React 컴포넌트
-  config/  @danwoo/config  # 공유 tsconfig
+  config/  @config/tsconfig  # 공유 tsconfig
 templates/app/         # 새 앱 스캐폴드 원본
 scripts/new-app.mjs    # 새 앱 생성기
 ```
@@ -26,7 +26,7 @@ Node 24, pnpm 9 필요(`engine-strict`).
 ```bash
 pnpm install
 pnpm dev                          # 모든 앱 dev
-pnpm --filter @danwoo/hub dev     # hub만 dev
+pnpm --filter hub dev     # hub만 dev
 ```
 
 http://localhost:3000 에서 확인.
@@ -53,5 +53,5 @@ http://localhost:3000 에서 확인.
 ```bash
 pnpm new-app my-site      # apps/my-site 생성 (templates/app 복제)
 pnpm install
-pnpm --filter @danwoo/my-site dev
+pnpm --filter my-site dev
 ```

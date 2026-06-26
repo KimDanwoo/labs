@@ -18,7 +18,7 @@ apps/
 packages/             # 공유 디자인 시스템 + 공유 설정
   tokens/  @tokens/css            # 디자인 토큰(TS) → theme.css 생성
   ui/      @ui/react              # 앱 공용 표시 컴포넌트(Button/Card/ThemeToggle)
-  config/  @danwoo/config         # 공유 tsconfig(base / next)
+  config/  @config/tsconfig         # 공유 tsconfig(base / next)
   eslint-config/  @repo/eslint-config    # 공유 ESLint(flat): next + FSD 경계 강제
   prettier-config/ @repo/prettier-config # 공유 Prettier
 templates/app/        # 새 앱 스캐폴드 원본
@@ -34,9 +34,9 @@ scripts/new-app.mjs   # 새 앱 생성기
    - **색은 2-tier**: atomic 팔레트(`palette.ts`의 `themeColors`/`commonColors`, 스케일 50–900) → semantic alias(`colors.ts`, primary/secondary/success/error/warning/info × base·foreground·subtle, light/dark). semantic은 atomic 스텝을 참조한다.
    - 스타일은 토큰 기반 Tailwind 유틸로만: 색 `bg-primary`/`text-muted`, 간격 `px-lg`/`gap-3xl`, 반경 `rounded-md`, 그림자 `shadow-md`/`shadow-glow` 등. **임의 hex/px 매직값 금지.**
 
-3. **새 앱은 스캐폴드로**: 손으로 만들지 말고 `pnpm new-app <name>`(소문자/숫자/하이픈). `templates/app`을 복제하고 `@danwoo/<name>`으로 채운다.
+3. **새 앱은 스캐폴드로**: 손으로 만들지 말고 `pnpm new-app <name>`(소문자/숫자/하이픈). `templates/app`을 복제하고 `<name>`으로 채운다.
 
-4. **TS 엄격 옵션 준수**(`@danwoo/config`): `verbatimModuleSyntax` → 타입은 `import type`로. `noUncheckedIndexedAccess` → 인덱스 접근 결과는 `undefined` 가능성을 좁힌 뒤 사용. `any` 금지(`unknown`에서 좁히기).
+4. **TS 엄격 옵션 준수**(`@config/tsconfig`): `verbatimModuleSyntax` → 타입은 `import type`로. `noUncheckedIndexedAccess` → 인덱스 접근 결과는 `undefined` 가능성을 좁힌 뒤 사용. `any` 금지(`unknown`에서 좁히기).
 
 ## FSD 아키텍처 (앱 내부)
 
@@ -116,7 +116,7 @@ apps/<app>/
 | `pnpm new-app <name>` | 새 앱 스캐폴드                   |
 | `pnpm format`         | Prettier 전체 포맷               |
 
-- 특정 앱만: `pnpm --filter @danwoo/hub dev`.
+- 특정 앱만: `pnpm --filter hub dev`.
 
 ## 응답 스타일 (사용자 선호)
 
