@@ -22,8 +22,8 @@ export function ExercisePicker({ exercises, selectedIds, onToggle }: Props) {
 
   return (
     <div className="flex flex-col gap-md">
-      {/* 근육 그룹 필터 칩 */}
-      <div className="flex gap-xs overflow-x-auto pb-xs">
+      {/* 근육 그룹 필터 칩 — 가로 스크롤 대신 줄바꿈으로 한눈에(스크롤바·드래그 불필요) */}
+      <div className="flex flex-wrap gap-xs">
         <button
           type="button"
           onClick={() => setActiveFilter('all')}
