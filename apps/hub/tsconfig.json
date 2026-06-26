@@ -1,5 +1,5 @@
 {
-  "extends": "@danwoo/config/tsconfig/next.json",
+  "extends": "@config/tsconfig/next.json",
   "compilerOptions": {
     "paths": {
       "@app/*": ["./src/app/*"],

@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@danwoo/config": "workspace:*",
+    "@config/tsconfig": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",

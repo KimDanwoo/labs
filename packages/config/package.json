@@ -1,5 +1,5 @@
 {
-  "name": "@danwoo/config",
+  "name": "@config/tsconfig",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -7,7 +7,7 @@
     "tsconfig"
   ],
   "exports": {
-    "./tsconfig/base.json": "./tsconfig/base.json",
-    "./tsconfig/next.json": "./tsconfig/next.json"
+    "./base.json": "./tsconfig/base.json",
+    "./next.json": "./tsconfig/next.json"
   }
 }

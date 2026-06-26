@@ -1,5 +1,5 @@
 {
-  "name": "@danwoo/prairie",
+  "name": "prairie",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -22,7 +22,7 @@
     "three": "catalog:"
   },
   "devDependencies": {
-    "@danwoo/config": "workspace:*",
+    "@config/tsconfig": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
     "@tailwindcss/postcss": "catalog:",
