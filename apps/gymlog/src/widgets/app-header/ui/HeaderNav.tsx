@@ -1,6 +1,6 @@
 'use client';
 
-import { HistoryIcon, PlanIcon, RoutineIcon, SettingsIcon } from '@shared/ui';
+import { HistoryIcon, PlanIcon, RankingIcon, RoutineIcon, SettingsIcon } from '@shared/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: '/routines', label: '루틴', Icon: RoutineIcon },
   { href: '/plan', label: '플랜', Icon: PlanIcon },
   { href: '/history', label: '기록', Icon: HistoryIcon },
+  { href: '/ranking', label: '랭킹', Icon: RankingIcon },
   { href: '/settings', label: '설정', Icon: SettingsIcon },
 ] as const;
 
