@@ -2,31 +2,52 @@ import * as Card from '@ui/react/card';
 
 import type { Project } from '@entities/project/model/types';
 
-/** 카드마다 다른 시맨틱 톤 조합의 그라데이션 커버(리터럴이라 Tailwind 스캔 가능). */
-const COVERS = [
-  'bg-linear-to-br from-primary to-primary-accent',
-  'bg-linear-to-br from-success to-primary',
-  'bg-linear-to-br from-success to-info',
-  'bg-linear-to-br from-warning to-error',
-  'bg-linear-to-br from-secondary to-primary',
+/** 이미지 없는 카드의 폴백 단색 배경 (Tailwind 스캔 가능 리터럴) */
+const FALLBACK_BG = [
+  'bg-primary-subtle',
+  'bg-success-subtle',
+  'bg-info-subtle',
+  'bg-warning-subtle',
+  'bg-secondary-subtle',
 ] as const;
 
-/** 카드가 순차적으로 떠오르도록 인덱스마다 더하는 등장 지연(ms). */
-const ENTRANCE_STAGGER_MS = 70;
+/** 폴백 커버의 이니셜 색상 */
+const FALLBACK_FG = ['text-primary', 'text-success', 'text-info', 'text-warning', 'text-secondary'] as const;
 
-/** 커버 이미지 정렬(리터럴이라 Tailwind 스캔 가능). */
+/** 커버 이미지 정렬 */
 const IMAGE_POSITION = {
   top: 'object-top',
   center: 'object-center',
 } as const;
 
+/** ArrowUpRight 아이콘 — 외부 링크 방향성 */
+function ArrowUpRightIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="size-3.5 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+    >
+      <path d="M7 17 17 7M7 7h10v10" />
+    </svg>
+  );
+}
+
 type ProjectCardProps = {
   project: Project;
   index: number;
+  staggerBaseMs: number;
 };
 
-export function ProjectCard({ project, index }: ProjectCardProps) {
-  const cover = COVERS[index % COVERS.length] ?? COVERS[0];
+export function ProjectCard({ project, index, staggerBaseMs }: ProjectCardProps) {
+  const fallbackBg = FALLBACK_BG[index % FALLBACK_BG.length] ?? FALLBACK_BG[0];
+  const fallbackFg = FALLBACK_FG[index % FALLBACK_FG.length] ?? FALLBACK_FG[0];
+  const imagePosition = IMAGE_POSITION[project.imagePosition ?? 'top'];
 
   return (
     <a
@@ -34,45 +55,43 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       target="_blank"
       rel="noreferrer"
       className="group block fade-up"
-      style={{ animationDelay: `${index * ENTRANCE_STAGGER_MS}ms` }}
+      style={{ animationDelay: `${420 + index * staggerBaseMs}ms` }}
     >
-      <Card.Root className="h-full overflow-hidden rounded-xl border-glass-border transition-[transform,box-shadow,border-color] duration-300 ease-out will-change-transform group-hover:-translate-y-1.5 group-hover:border-primary group-hover:shadow-glow-lg">
-        {/* 커버: 음수 마진으로 Card.Root의 p-lg를 상쇄해 가장자리까지 꽉 채운다. */}
-        <div className={`relative -mx-lg -mt-lg flex h-32 items-center justify-center overflow-hidden ${cover}`}>
+      <Card.Root className="h-full overflow-hidden rounded-xl border-card-border bg-card transition-[transform,border-color] duration-250 ease-out will-change-transform group-hover:-translate-y-1.5 group-hover:border-primary/50">
+        {/* ── 커버 영역 ─────────────────────────────────── */}
+        <div className="relative -mx-lg -mt-lg flex h-40 items-center justify-center overflow-hidden sm:h-44">
           {project.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={project.image}
               alt={project.title}
-              className={`size-full object-cover ${IMAGE_POSITION[project.imagePosition ?? 'top']} transition-transform duration-500 ease-out group-hover:scale-105`}
+              className={`size-full object-cover ${imagePosition} transition-transform duration-500 ease-out group-hover:scale-[1.03]`}
             />
           ) : (
-            <span className="text-4xl font-bold text-white/95 transition-transform duration-500 ease-out select-none group-hover:scale-110">
-              {project.title.charAt(0)}
-            </span>
+            <div className={`absolute inset-0 flex items-center justify-center ${fallbackBg}`}>
+              <span
+                className={`font-display text-5xl font-extrabold tracking-tight select-none ${fallbackFg} transition-transform duration-400 ease-out group-hover:scale-105`}
+              >
+                {project.title.charAt(0)}
+              </span>
+            </div>
           )}
-          {/* 상단 시트 + 호버 시 떠오르는 컬러 글로우 */}
-          <span className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-linear-to-b from-white/20 to-transparent" />
-          <span className="pointer-events-none absolute inset-0 bg-linear-to-t from-primary/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         </div>
-        <Card.Header>
-          <Card.Title className="transition-colors duration-200 group-hover:text-primary">{project.title}</Card.Title>
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary-subtle text-primary transition-[background-color,transform] duration-200 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              className="size-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            >
-              <path d="M7 17 17 7M7 7h10v10" />
-            </svg>
+
+        {/* ── 카드 본문 ─────────────────────────────────── */}
+        <Card.Header className="pt-md">
+          <div className="flex flex-col gap-xs">
+            <Card.Title className="font-display text-base font-semibold tracking-[-0.01em] transition-colors duration-200 group-hover:text-primary">
+              {project.title}
+            </Card.Title>
+          </div>
+          {/* 링크 아이콘 */}
+          <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-card-border bg-card text-muted transition-all duration-200 group-hover:border-primary group-hover:text-primary">
+            <ArrowUpRightIcon />
           </span>
         </Card.Header>
-        <Card.Description>{project.description}</Card.Description>
+
+        <Card.Description className="text-xs leading-relaxed sm:text-sm">{project.description}</Card.Description>
       </Card.Root>
     </a>
   );
