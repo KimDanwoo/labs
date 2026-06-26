@@ -1,0 +1,100 @@
+@import 'tailwindcss';
+
+/* @tokens/css 가 생성한 디자인 토큰 (색상/폰트/여백 + 다크모드 변수) */
+@import '@tokens/css/theme.css';
+
+/* 모노레포 공통 UI 패키지의 클래스도 스캔 대상에 포함 */
+@source '../../../../packages/ui/src/**/*.{ts,tsx}';
+
+/* 절제된 모던: 글로우/그라데이션 없이 평평한 배경. 세련됨은 타이포·여백·또렷한 면으로. */
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  /* 한글이 글자 단위로 끊기지 않고 단어(어절) 단위로 줄바꿈되게 한다. */
+  word-break: keep-all;
+  /* 끊을 수 없는 긴 토큰(URL 등)은 넘치지 않게 줄바꿈 허용. */
+  overflow-wrap: anywhere;
+}
+
+/* 헤딩·큰 숫자에 쓰는 디스플레이 폰트(타이트한 자간). */
+.font-display {
+  font-family: var(--font-display), var(--font-sans);
+  letter-spacing: -0.02em;
+}
+
+/* 제목은 디스플레이 폰트로 자동 적용 — 타이포 중심의 정체성. */
+h1,
+h2 {
+  font-family: var(--font-display), var(--font-sans);
+  letter-spacing: -0.02em;
+}
+
+/* 레인지 슬라이더: 브랜드 블루 액센트 + 살짝 큰 트랙(터치 친화). */
+input[type='range'] {
+  accent-color: var(--color-primary);
+  height: 1.5rem;
+  cursor: pointer;
+  /* 세로 스와이프는 페이지 스크롤로 흘려보내고, 가로 드래그만 슬라이더로. */
+  touch-action: pan-y;
+}
+
+/* 카드 hover 시 살짝 떠오르는 인터랙션(글로우 없이 미세 이동 + 보더 강조). */
+.lift {
+  transition:
+    transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.18s ease;
+}
+.lift:hover {
+  transform: translateY(-2px);
+}
+
+/* 레벨업 축하 등장(살짝 튀어오르며). */
+@keyframes pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.pop {
+  animation: pop 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 화면 진입 시 콘텐츠가 조용히 떠오르는 등장 모션. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 접근성: 모션 최소화 설정 시 등장/반복 애니메이션을 끈다. */
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

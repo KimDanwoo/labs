@@ -1,0 +1,18 @@
+rules_version = '2';
+
+// gymlog Firestore 보안 규칙.
+// 본인(request.auth.uid) 문서만 읽기/쓰기 허용. 콘솔 > Firestore > 규칙에 붙여넣거나 firebase CLI로 배포.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 유저 문서 + 그 아래 모든 하위 컬렉션(routines, sessions)을 본인만 접근.
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 공용 기본 루틴: 누구나 읽기, 쓰기는 관리자만.
+    match /sharedRoutines/{routineId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == 'j82JI7FbcMeujIOAk0KrbmPBZ7z2';
+    }
+  }
+}
