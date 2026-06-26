@@ -11,3 +11,7 @@ export const sessionDoc = (uid: string, sessionId: string) => doc(getDb(), 'user
 // 관리자가 관리하는 공용 기본 루틴(읽기 공개 / 쓰기 관리자).
 export const sharedRoutinesCol = () => collection(getDb(), 'sharedRoutines');
 export const sharedRoutineDoc = (routineId: string) => doc(getDb(), 'sharedRoutines', routineId);
+
+// 글로벌 랭킹용 공개 지표(읽기 공개 / 쓰기 본인). 문서 id = uid.
+export const leaderboardCol = () => collection(getDb(), 'leaderboard');
+export const leaderboardDoc = (uid: string) => doc(getDb(), 'leaderboard', uid);
