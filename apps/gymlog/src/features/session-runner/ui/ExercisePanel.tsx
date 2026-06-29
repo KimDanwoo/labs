@@ -44,6 +44,17 @@ export function ExercisePanel({
     setShowAlternatives(false);
   };
 
+  // 무게 0으로 기록하면 볼륨이 0이라 레벨·랭킹에 반영되지 않는다. 맨몸 운동이 아니면 한 번 확인.
+  const handleLog = (input: { reps: number; weight: number }) => {
+    const isBodyweight = exercise?.equipment === 'bodyweight';
+    if (input.weight === 0 && !isBodyweight) {
+      if (!window.confirm('무게 0kg으로 기록할까요? 무게 운동이면 무게를 입력해 주세요.')) {
+        return;
+      }
+    }
+    onLog(input);
+  };
+
   return (
     <div className="flex flex-col gap-lg">
       <button type="button" onClick={onBack} className="self-start text-sm text-muted hover:text-foreground">
@@ -88,7 +99,7 @@ export function ExercisePanel({
           setTotal={performance.sets.length}
           suggestedWeight={suggestedWeight}
           suggestedReps={suggestedReps}
-          onLog={onLog}
+          onLog={handleLog}
           onSkip={onSkip}
           onAddSet={onAddSet}
           onFinish={onFinish}
