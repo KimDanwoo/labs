@@ -5,6 +5,7 @@ import type { UserProfile } from '@entities/profile/model/types';
 import { firebaseUserAtom } from '@entities/user/model/store';
 import { deleteAccount, signOutUser } from '@features/auth/model/hooks';
 import { signInConsentOpenAtom } from '@features/auth/model/store';
+import { enableNotifications } from '@features/notifications/model/hooks';
 import { PrescriptionPreview, ProfileForm } from '@features/profile-setup/ui';
 import { useMounted } from '@shared/lib';
 import { Button } from '@ui/react';
@@ -27,6 +28,16 @@ export function SettingsView() {
   const handleSignIn = () => setConsentOpen(true);
   const handleSignOut = () => {
     void signOutUser().then(() => router.push('/'));
+  };
+  const handleNotifications = () => {
+    if (!user) {
+      return;
+    }
+    enableNotifications(user.uid)
+      .then((ok) =>
+        window.alert(ok ? '운동 알림이 켜졌어요.' : '알림을 켤 수 없어요(브라우저 미지원이거나 권한이 거부됐어요).'),
+      )
+      .catch(() => window.alert('알림 설정에 실패했어요.'));
   };
   const handleDeleteAccount = () => {
     if (!window.confirm('정말 탈퇴할까요? 모든 운동 기록·루틴과 계정이 영구 삭제되며 되돌릴 수 없어요.')) {
@@ -52,7 +63,10 @@ export function SettingsView() {
                 <>
                   <span className="text-sm font-medium text-foreground">{user.email ?? '로그인됨'}</span>
                   <span className="text-xs text-muted">기록이 클라우드에 저장돼 어느 기기에서나 이어져요.</span>
-                  <Button variant="outline" className="mt-sm h-11 w-full" onClick={handleSignOut}>
+                  <Button variant="outline" className="mt-sm h-11 w-full" onClick={handleNotifications}>
+                    운동 알림 받기
+                  </Button>
+                  <Button variant="ghost" className="h-11 w-full text-muted" onClick={handleSignOut}>
                     로그아웃
                   </Button>
                 </>
