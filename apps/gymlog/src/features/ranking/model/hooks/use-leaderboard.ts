@@ -23,6 +23,8 @@ export const useLeaderboard = (): { entries: LeaderboardEntry[]; loading: boolea
         setEntries(
           snapshot.docs.map((entry) => ({ uid: entry.id, ...(entry.data() as Omit<LeaderboardEntry, 'uid'>) })),
         );
+      } catch {
+        // 규칙 미게시·오프라인 등은 빈 랭킹으로 조용히 처리(콘솔 에러 방지).
       } finally {
         if (!cancelled) {
           setLoading(false);
