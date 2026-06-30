@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 
+import { LEVEL_SPRITE_SRC } from '@entities/session/model/constants';
+
 type LevelAvatarProps = {
   level: number;
 };
 
 // 12개 캐릭터가 한 장(4열×3행 그리드)에 담긴 스프라이트. public/levels/characters.png 에 저장.
-const SPRITE_SRC = '/levels/characters.png';
+const SPRITE_SRC = LEVEL_SPRITE_SRC;
 const COLS = 4;
 const ROWS = 3;
 
