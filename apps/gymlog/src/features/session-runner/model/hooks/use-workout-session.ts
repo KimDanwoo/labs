@@ -16,7 +16,7 @@ import {
 import { notify, requestNotifyPermission, REST_DONE_VIBRATION, vibrate } from '@shared/lib';
 import { useAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { buildPerformance, buildSessionFromRoutine } from '../lib';
+import { buildEmptySession, buildPerformance, buildSessionFromRoutine } from '../lib';
 
 export const SESSION_VIEW = {
   list: 'list',
@@ -153,6 +153,16 @@ export const useWorkoutSession = () => {
     },
     [history, profile.defaultSets, profile.restSec, setSession],
   );
+
+  // 루틴 없이 빈 세션을 시작한다 — 자유 로깅의 진입점.
+  const startEmpty = useCallback(() => {
+    setSession(buildEmptySession(profile.goal));
+    setActiveIndex(null);
+    setSummaryOpen(false);
+    setIsResting(false);
+    setRestSecondsLeft(0);
+    requestNotifyPermission();
+  }, [profile.goal, setSession]);
 
   const openExercise = useCallback(
     (index: number) => {
@@ -451,6 +461,7 @@ export const useWorkoutSession = () => {
     allResolved,
     isSetResolved: isResolved,
     startRoutine,
+    startEmpty,
     openExercise,
     startNext,
     backToList,

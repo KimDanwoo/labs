@@ -29,7 +29,7 @@ export function HomeView() {
   const [sharedRoutines] = useAtom(sharedRoutinesAtom);
   const [history] = useAtom(sessionHistoryAtom);
   const [, setRoutineDraft] = useAtom(routineDraftAtom);
-  const { startRoutine } = useWorkoutSession();
+  const { startRoutine, startEmpty } = useWorkoutSession();
 
   const needsOnboarding = mounted && !profile.onboarded;
 
@@ -52,6 +52,11 @@ export function HomeView() {
     startRoutine(routine);
     router.push('/session');
   }
+  // 루틴 없이 빈 세션으로 시작 — 종목을 검색해 추가하며 기록(자유 로깅).
+  const handleStartEmpty = () => {
+    startEmpty();
+    router.push('/session');
+  };
   const handleEdit = (routine: Routine) => router.push(`/routines/${routine.id}/edit`);
   // 빈 새 루틴 — 혹시 남아있는 편집 시드를 비우고 시작.
   const handleNewRoutine = () => {
@@ -114,6 +119,10 @@ export function HomeView() {
       <AppHeader />
       <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-28 pt-lg">
         <LevelCard />
+
+        <Button className="h-14 w-full text-base font-semibold" onClick={handleStartEmpty}>
+          운동 시작
+        </Button>
 
         <TodayWorkout
           weekdayLabel={WEEKDAY_LABELS[weekday] ?? ''}
