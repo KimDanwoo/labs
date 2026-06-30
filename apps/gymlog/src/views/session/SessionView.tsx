@@ -74,13 +74,11 @@ export function SessionView() {
       <main className="mx-auto w-full max-w-content px-lg py-3xl">
         <ExercisePanel
           performance={runner.activePerformance}
-          currentSetIndex={runner.currentSetIndex}
-          suggestedWeight={runner.suggestedWeight}
-          suggestedReps={runner.suggestedReps}
-          onLog={runner.logCurrentSet}
-          onSkip={runner.skipCurrentSet}
-          onFinish={runner.finishExercise}
+          onUpdateSet={runner.updateSet}
+          onRemoveSet={runner.removeSet}
           onAddSet={runner.addSet}
+          onStartRest={runner.startRest}
+          onFinish={runner.finishExercise}
           onBack={runner.backToList}
           onSubstitute={runner.substituteExercise}
         />

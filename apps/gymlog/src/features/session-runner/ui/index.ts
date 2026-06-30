@@ -1,12 +1,8 @@
 export { AddExerciseList } from './AddExerciseList';
 export { AlternativeList } from './AlternativeList';
 export { ExercisePanel } from './ExercisePanel';
-export { RepStepper } from './RepStepper';
 export { RestTimer } from './RestTimer';
 export { RunnerHeader } from './RunnerHeader';
 export { SessionExerciseList } from './SessionExerciseList';
 export { SessionSummaryCard } from './SessionSummaryCard';
-export { SetBoard } from './SetBoard';
-export { SetHistoryList } from './SetHistoryList';
-export { SetInput } from './SetInput';
-export { WeightStepper } from './WeightStepper';
+export { SetTable } from './SetTable';

@@ -79,29 +79,6 @@ export const useWorkoutSession = () => {
     return isResting ? SESSION_VIEW.resting : SESSION_VIEW.exercise;
   }, [session, summaryOpen, activeIndex, activePerformance, isResting]);
 
-  const suggestedWeight = useMemo(() => {
-    if (!activePerformance) {
-      return 0;
-    }
-    if (currentSetIndex === 0) {
-      return activePerformance.startWeight;
-    }
-    const reference = currentSetIndex > 0 ? currentSetIndex - 1 : activePerformance.sets.length - 1;
-    return activePerformance.sets[reference]?.weight ?? activePerformance.startWeight;
-  }, [activePerformance, currentSetIndex]);
-
-  // 첫 세트는 목표 횟수, 이후는 직전 세트에 입력한 횟수를 이어받는다(무게와 동일하게).
-  const suggestedReps = useMemo(() => {
-    if (!activePerformance) {
-      return 0;
-    }
-    if (currentSetIndex <= 0) {
-      return activePerformance.targetReps;
-    }
-    const previousReps = activePerformance.sets[currentSetIndex - 1]?.reps ?? 0;
-    return previousReps > 0 ? previousReps : activePerformance.targetReps;
-  }, [activePerformance, currentSetIndex]);
-
   const doneCount = useMemo(
     () => session?.performances.filter((performance) => performance.status === PERFORMANCE_STATUS.done).length ?? 0,
     [session],
@@ -195,71 +172,61 @@ export const useWorkoutSession = () => {
     }
   }, [nextPendingIndex, openExercise]);
 
-  const logCurrentSet = useCallback(
-    ({ reps, weight }: LogSetInput) => {
-      if (activeIndex === null || !activePerformance || currentSetIndex === -1) {
+  // 표에서 임의 세트의 무게·횟수를 직접 수정한다(메모식 자유 로깅). 횟수가 있으면 완료/부분, 없으면 대기로.
+  const updateSet = useCallback(
+    (setIndex: number, patch: LogSetInput) => {
+      if (activeIndex === null) {
         return;
       }
-      const hasMorePending = activePerformance.sets
-        .slice(currentSetIndex + 1)
-        .some((set) => set.status === SET_STATUS.pending);
-
-      setSession((prev) => {
-        if (!prev) {
-          return prev;
-        }
-        return replacePerformance(prev, activeIndex, (performance) => {
-          const setIndex = performance.sets.findIndex((set) => set.status === SET_STATUS.pending);
-          const target = performance.sets[setIndex];
-          if (!target) {
-            return performance;
-          }
-          const safeReps = Math.max(0, Math.round(reps));
-          const status = resolveSetStatus(safeReps, target.targetReps);
-          const sets = performance.sets.map((set, i) =>
-            i === setIndex ? { ...set, reps: safeReps, weight, status } : set,
-          );
-          const stillPending = sets.some((set) => set.status === SET_STATUS.pending);
-          return { ...performance, sets, status: stillPending ? performance.status : PERFORMANCE_STATUS.done };
-        });
-      });
-
-      if (hasMorePending) {
-        setRestSecondsLeft(activePerformance.restSec);
-        setIsResting(true);
-      } else {
-        backToList();
-      }
+      setSession((prev) =>
+        prev
+          ? replacePerformance(prev, activeIndex, (performance) => ({
+              ...performance,
+              sets: performance.sets.map((set, i) => {
+                if (i !== setIndex) {
+                  return set;
+                }
+                const safeReps = Math.max(0, Math.round(patch.reps));
+                const status = safeReps > 0 ? resolveSetStatus(safeReps, set.targetReps) : SET_STATUS.pending;
+                return { ...set, reps: safeReps, weight: Math.max(0, patch.weight), status };
+              }),
+            }))
+          : prev,
+      );
     },
-    [activeIndex, activePerformance, currentSetIndex, setSession, backToList],
+    [activeIndex, setSession],
   );
 
-  const skipCurrentSet = useCallback(() => {
-    if (activeIndex === null) {
+  // 표에서 세트 한 줄을 삭제한다(마지막 한 줄은 남긴다).
+  const removeSet = useCallback(
+    (setIndex: number) => {
+      if (activeIndex === null) {
+        return;
+      }
+      setSession((prev) =>
+        prev
+          ? replacePerformance(prev, activeIndex, (performance) =>
+              performance.sets.length <= 1
+                ? performance
+                : {
+                    ...performance,
+                    sets: performance.sets.filter((_, i) => i !== setIndex).map((set, i) => ({ ...set, setIndex: i })),
+                  },
+            )
+          : prev,
+      );
+    },
+    [activeIndex, setSession],
+  );
+
+  // 메모식에선 휴식이 강제되지 않는다 — 필요할 때만 직접 휴식 타이머를 시작한다.
+  const startRest = useCallback(() => {
+    if (!activePerformance) {
       return;
     }
-    let finished = false;
-    setSession((prev) => {
-      if (!prev) {
-        return prev;
-      }
-      return replacePerformance(prev, activeIndex, (performance) => {
-        const setIndex = performance.sets.findIndex((set) => set.status === SET_STATUS.pending);
-        if (setIndex === -1) {
-          return performance;
-        }
-        const sets = performance.sets.map((set, i) =>
-          i === setIndex ? { ...set, reps: 0, status: SET_STATUS.skipped } : set,
-        );
-        const stillPending = sets.some((set) => set.status === SET_STATUS.pending);
-        finished = !stillPending;
-        return { ...performance, sets, status: stillPending ? performance.status : PERFORMANCE_STATUS.done };
-      });
-    });
-    if (finished) {
-      backToList();
-    }
-  }, [activeIndex, setSession, backToList]);
+    setRestSecondsLeft(activePerformance.restSec);
+    setIsResting(true);
+  }, [activePerformance]);
 
   const finishExercise = useCallback(() => {
     if (activeIndex === null) {
@@ -295,7 +262,7 @@ export const useWorkoutSession = () => {
                 {
                   setIndex: performance.sets.length,
                   targetReps: performance.targetReps,
-                  reps: performance.targetReps,
+                  reps: last?.reps ?? 0,
                   weight: last?.weight ?? performance.startWeight,
                   status: SET_STATUS.pending,
                   restSec: performance.restSec,
@@ -450,8 +417,6 @@ export const useWorkoutSession = () => {
     view,
     activePerformance,
     currentSetIndex,
-    suggestedWeight,
-    suggestedReps,
     isResting,
     restSecondsLeft,
     doneCount,
@@ -465,8 +430,9 @@ export const useWorkoutSession = () => {
     openExercise,
     startNext,
     backToList,
-    logCurrentSet,
-    skipCurrentSet,
+    updateSet,
+    removeSet,
+    startRest,
     finishExercise,
     addSet,
     substituteExercise,

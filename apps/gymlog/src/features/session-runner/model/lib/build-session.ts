@@ -24,11 +24,12 @@ const lastWeightFor = (exerciseId: string, history: WorkoutSession[]): number | 
   return null;
 };
 
+// 횟수는 비워 두고(0) 사용자가 한 만큼만 입력한다. 무게는 직전 기록값을 힌트로 채운다.
 const buildSets = (targetSets: number, targetReps: number, restSec: number, startWeight: number): SetLog[] =>
   Array.from({ length: targetSets }, (_, setIndex) => ({
     setIndex,
     targetReps,
-    reps: targetReps,
+    reps: 0,
     weight: startWeight,
     status: SET_STATUS.pending,
     restSec,
