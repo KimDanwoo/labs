@@ -72,7 +72,7 @@ export function HomeView() {
     return (
       <>
         <AppHeader />
-        <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
+        <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-28 pt-lg">
           <LevelCard />
           <Card.Root className="border-primary">
             <Card.Header>
@@ -112,7 +112,7 @@ export function HomeView() {
   return (
     <>
       <AppHeader />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
+      <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-28 pt-lg">
         <LevelCard />
 
         <TodayWorkout

@@ -15,7 +15,7 @@ export function RankingView() {
   return (
     <>
       <AppHeader title="랭킹" />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-md px-lg pb-3xl pt-lg">
+      <main className="mx-auto flex w-full max-w-content flex-col gap-md px-lg pb-28 pt-lg">
         <p className="text-sm text-muted">누적 볼륨 · 레벨 · 주간 볼륨을 합산한 종합 점수 순위예요.</p>
 
         {!user && (

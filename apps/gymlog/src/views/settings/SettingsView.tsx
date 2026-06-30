@@ -51,9 +51,24 @@ export function SettingsView() {
   return (
     <>
       <AppHeader title="설정" />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
+      <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-28 pt-lg">
         {mounted ? (
           <>
+            <div className="flex flex-col gap-sm">
+              <Link
+                href="/routines"
+                className="flex h-12 items-center justify-between rounded-lg border border-card-border bg-glass px-lg text-sm font-medium text-foreground transition-colors hover:bg-primary-subtle"
+              >
+                루틴 관리 <span className="text-muted">›</span>
+              </Link>
+              <Link
+                href="/plan"
+                className="flex h-12 items-center justify-between rounded-lg border border-card-border bg-glass px-lg text-sm font-medium text-foreground transition-colors hover:bg-primary-subtle"
+              >
+                주간 플랜 <span className="text-muted">›</span>
+              </Link>
+            </div>
+
             <ProfileForm value={profile} onChange={handleChange} showRest />
             <PrescriptionPreview profile={profile} />
             <p className="text-sm text-muted">변경 사항은 자동 저장돼요.</p>

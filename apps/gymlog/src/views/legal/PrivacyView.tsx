@@ -24,7 +24,7 @@ const SECTIONS = [
 export function PrivacyView() {
   return (
     <>
-      <AppHeader title="개인정보처리방침" showNav={false} />
+      <AppHeader title="개인정보처리방침" />
       <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
         <p className="rounded-lg border border-warning bg-glass p-md text-xs text-muted">
           ⚠️ 아래는 예시 초안입니다. 실제 서비스 공개 전 법률 전문가의 검토·보완이 필요합니다.
