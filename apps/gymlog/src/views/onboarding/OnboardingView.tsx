@@ -2,15 +2,17 @@
 
 import { userProfileAtom } from '@entities/profile/model/store';
 import type { UserProfile } from '@entities/profile/model/types';
+import { firebaseUserAtom } from '@entities/user/model/store';
 import { signInConsentOpenAtom } from '@features/auth/model/store';
 import { OnboardingFlow } from '@features/profile-setup/ui';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
 
 export function OnboardingView() {
   const router = useRouter();
   const [, setProfile] = useAtom(userProfileAtom);
   const setConsentOpen = useSetAtom(signInConsentOpenAtom);
+  const user = useAtomValue(firebaseUserAtom);
 
   const handleComplete = (profile: UserProfile) => {
     setProfile(profile);
@@ -23,7 +25,7 @@ export function OnboardingView() {
 
   return (
     <main className="mx-auto w-full max-w-content px-lg">
-      <OnboardingFlow onComplete={handleComplete} onSignIn={handleSignIn} />
+      <OnboardingFlow onComplete={handleComplete} onSignIn={user ? undefined : handleSignIn} />
     </main>
   );
 }

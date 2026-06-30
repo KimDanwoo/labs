@@ -18,7 +18,8 @@ import { PrescriptionPreview } from './PrescriptionPreview';
 type OnboardingFlowProps = {
   onComplete: (profile: UserProfile) => void;
   // 기존 회원이 로그인으로 바로 가기(상위에서 auth 호출 — FSD 레이어 경계).
-  onSignIn: () => void;
+  // 이미 로그인된 경우 상위가 넘기지 않아 로그인 버튼이 숨는다.
+  onSignIn?: () => void;
 };
 
 const STEPS = ['welcome', 'goal', 'split', 'sets', 'rest'] as const;
@@ -124,13 +125,15 @@ export function OnboardingFlow({ onComplete, onSignIn }: OnboardingFlowProps) {
               gymlog를 쓰기 전에 몇 가지만 여쭤볼게요. 운동을 어떻게 추천하고 기록할지 맞춰드릴게요. 1분이면 끝나고,
               나중에 설정에서 언제든 바꿀 수 있어요.
             </p>
-            <button
-              type="button"
-              onClick={onSignIn}
-              className="mt-sm self-start text-sm font-medium text-primary hover:underline"
-            >
-              이미 계정이 있으신가요? 로그인
-            </button>
+            {onSignIn && (
+              <button
+                type="button"
+                onClick={onSignIn}
+                className="mt-sm self-start text-sm font-medium text-primary hover:underline"
+              >
+                이미 계정이 있으신가요? 로그인
+              </button>
+            )}
           </div>
         )}
 
