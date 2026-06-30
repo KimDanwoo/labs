@@ -2,57 +2,56 @@
 
 import { getExerciseById } from '@entities/exercise/model/constants';
 import { EQUIPMENT } from '@entities/exercise/model/types';
-import type { ExercisePerformance } from '@entities/session/model/types';
+import { SET_STATUS, type ExercisePerformance } from '@entities/session/model/types';
 import { MUSCLE_GROUP } from '@shared/training';
 import { Badge, Button } from '@ui/react';
 import { useState } from 'react';
 import { AlternativeList } from './AlternativeList';
-import { SetBoard } from './SetBoard';
-import { SetHistoryList } from './SetHistoryList';
+import { SetTable } from './SetTable';
 
 type ExercisePanelProps = {
   performance: ExercisePerformance;
-  currentSetIndex: number;
-  suggestedWeight: number;
-  suggestedReps: number;
-  onLog: (input: { reps: number; weight: number }) => void;
-  onSkip: () => void;
-  onFinish: () => void;
+  onUpdateSet: (setIndex: number, patch: { reps: number; weight: number }) => void;
+  onRemoveSet: (setIndex: number) => void;
   onAddSet: () => void;
+  onStartRest: () => void;
+  onFinish: () => void;
   onBack: () => void;
   onSubstitute: (alternativeId: string) => void;
 };
 
 export function ExercisePanel({
   performance,
-  currentSetIndex,
-  suggestedWeight,
-  suggestedReps,
-  onLog,
-  onSkip,
-  onFinish,
+  onUpdateSet,
+  onRemoveSet,
   onAddSet,
+  onStartRest,
+  onFinish,
   onBack,
   onSubstitute,
 }: ExercisePanelProps) {
   const [showAlternatives, setShowAlternatives] = useState(false);
   const exercise = getExerciseById(performance.exerciseId);
-  const isDone = currentSetIndex === -1;
 
   const handleSubstitute = (alternativeId: string) => {
     onSubstitute(alternativeId);
     setShowAlternatives(false);
   };
 
-  // 무게 0으로 기록하면 볼륨이 0이라 레벨·랭킹에 반영되지 않는다. 맨몸 운동이 아니면 한 번 확인.
-  const handleLog = (input: { reps: number; weight: number }) => {
+  // 무게 0으로 기록한 세트가 있으면 볼륨이 0이라 레벨·랭킹에 반영되지 않는다. 맨몸이 아니면 한 번 확인.
+  const handleFinish = () => {
     const isBodyweight = exercise?.equipment === 'bodyweight';
-    if (input.weight === 0 && !isBodyweight) {
-      if (!window.confirm('무게 0kg으로 기록할까요? 무게 운동이면 무게를 입력해 주세요.')) {
+    const hasZeroWeightLog = performance.sets.some(
+      (set) => set.weight === 0 && (set.status === SET_STATUS.done || set.status === SET_STATUS.partial),
+    );
+    if (hasZeroWeightLog && !isBodyweight) {
+      if (
+        !window.confirm('무게 0kg으로 기록된 세트가 있어요. 무게 운동이면 무게를 입력해 주세요. 이대로 완료할까요?')
+      ) {
         return;
       }
     }
-    onLog(input);
+    onFinish();
   };
 
   return (
@@ -80,31 +79,16 @@ export function ExercisePanel({
         )}
       </div>
 
-      {isDone ? (
-        <div className="flex flex-col gap-lg">
-          <SetHistoryList sets={performance.sets} currentSetIndex={performance.sets.length} />
-          <div className="flex flex-col gap-sm">
-            <Button className="h-12 w-full" onClick={onAddSet}>
-              세트 추가
-            </Button>
-            <Button variant="outline" className="h-12 w-full" onClick={onBack}>
-              목록으로
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <SetBoard
-          performance={performance}
-          currentSetIndex={currentSetIndex}
-          setTotal={performance.sets.length}
-          suggestedWeight={suggestedWeight}
-          suggestedReps={suggestedReps}
-          onLog={handleLog}
-          onSkip={onSkip}
-          onAddSet={onAddSet}
-          onFinish={onFinish}
-        />
-      )}
+      <SetTable performance={performance} onUpdate={onUpdateSet} onRemoveSet={onRemoveSet} onAddSet={onAddSet} />
+
+      <div className="flex flex-col gap-sm">
+        <Button variant="ghost" className="h-10 w-full text-sm text-muted" onClick={onStartRest}>
+          휴식 타이머 시작
+        </Button>
+        <Button className="h-12 w-full" onClick={handleFinish}>
+          운동 완료
+        </Button>
+      </div>
     </div>
   );
 }
