@@ -1,1 +1,1 @@
-export { authReadyAtom, firebaseUserAtom } from './auth-store';
+export { authReadyAtom, firebaseUserAtom } from './authStore';

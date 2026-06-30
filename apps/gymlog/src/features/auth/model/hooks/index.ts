@@ -1,1 +1,1 @@
-export { deleteAccount, signInWithGoogle, signOutUser, useAuthListener } from './use-auth';
+export { deleteAccount, signInWithGoogle, signOutUser, useAuthListener } from './useAuth';

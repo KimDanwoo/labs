@@ -1,5 +1,5 @@
 import type { Goal } from './goal';
-import { getGoalScheme } from './rep-schemes';
+import { getGoalScheme } from './repSchemes';
 
 // 목표가 대표 반복 수를 정한다(근력 5 / 근비대 10 / 근지구력 15 / 파워 3).
 export const repsForGoal = (goal: Goal): number => getGoalScheme(goal).reps;

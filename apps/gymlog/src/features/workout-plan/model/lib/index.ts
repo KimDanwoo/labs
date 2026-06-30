@@ -1,1 +1,1 @@
-export * from './build-routine-from-muscles';
+export * from './buildRoutineFromMuscles';

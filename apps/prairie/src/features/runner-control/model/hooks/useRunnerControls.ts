@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { KEY_BINDINGS } from '../constants';
-import { resetRunnerInput, setRunnerAction } from '../store/runner-input';
+import { resetRunnerInput, setRunnerAction } from '../store/runnerInput';
 
 // 키보드 입력을 공유 스토어에 반영한다(WASD + 방향키). 터치 컨트롤과 동일 스토어를 쓴다.
 export function useRunnerControls(): void {

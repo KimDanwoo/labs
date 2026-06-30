@@ -100,7 +100,7 @@ apps/<app>/
   const VARIANT = { primary: '...', outline: '...' } as const;
   export type ButtonVariant = keyof typeof VARIANT;
   ```
-- 네이밍: 변수/함수 camelCase · 컴포넌트/타입 PascalCase · 상수 SCREAMING_SNAKE_CASE · boolean `is/has/should` · 핸들러 `handleXxx`/`onXxx` · 파일 kebab-case(컴포넌트는 PascalCase) · 훅 `useXxx`.
+- 네이밍: 변수/함수 camelCase · 컴포넌트/타입 PascalCase · 상수 SCREAMING_SNAKE_CASE · boolean `is/has/should` · 핸들러 `handleXxx`/`onXxx` · 파일: 비컴포넌트 camelCase·컴포넌트 PascalCase · 디렉토리 kebab-case · 훅 `useXxx`.
 - 함수 1개=책임 1개. early return 적극. 중첩 3단계 초과 금지.
 - URL 라우팅: 화면 전환은 App Router URL 기반으로. atom으로 화면을 전환하지 않는다.
 - 금지: 미사용 코드(YAGNI) · 조급한 추상화 · 흐름 설명 주석(자명한 코드로) · 남은 `console.log` · `any`.

@@ -10,8 +10,8 @@
     "./theme.css": "./generated/theme.css"
   },
   "scripts": {
-    "tokens": "tsx scripts/build-tokens.ts",
-    "build": "tsx scripts/build-tokens.ts",
+    "tokens": "tsx scripts/buildTokens.ts",
+    "build": "tsx scripts/buildTokens.ts",
     "lint": "eslint",
     "typecheck": "tsc --noEmit"
   },

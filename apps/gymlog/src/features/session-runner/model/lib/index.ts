@@ -1,1 +1,1 @@
-export * from './build-session';
+export * from './buildSession';
