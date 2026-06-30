@@ -65,6 +65,18 @@ export const buildPerformance = (
   };
 };
 
+// 루틴 없이 빈 세션을 시작한다(자유 로깅). 종목은 세션 안에서 검색해 추가한다.
+export const buildEmptySession = (goal: Goal): WorkoutSession => ({
+  id: crypto.randomUUID(),
+  routineId: null,
+  routineName: '오늘 운동',
+  goal,
+  status: SESSION_STATUS.active,
+  startedAt: new Date().toISOString(),
+  endedAt: null,
+  performances: [],
+});
+
 export const buildSessionFromRoutine = (
   routine: Routine,
   history: WorkoutSession[] = [],

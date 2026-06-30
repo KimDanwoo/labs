@@ -108,6 +108,7 @@ export function SessionView() {
   const nextName = nextPerformance ? getExerciseById(nextPerformance.exerciseId)?.nameKo : null;
   const allDone = runner.nextPendingIndex < 0;
   const startLabel = nextName ? `${nextName} 시작` : '운동 시작';
+  const isEmpty = session.performances.length === 0;
 
   return (
     <>
@@ -119,18 +120,22 @@ export function SessionView() {
       />
       <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
         <p className="text-sm text-muted">
-          아무 운동이나 눌러 시작하세요. ⠿ 순서 변경 · ✎ 바꾸기 · ✕ 빼기, 아래에서 추가할 수 있어요.
+          {isEmpty
+            ? '오늘 한 운동을 검색해서 추가하세요. 추가한 운동을 눌러 무게·횟수를 기록해요.'
+            : '아무 운동이나 눌러 시작하세요. ⠿ 순서 변경 · ✎ 바꾸기 · ✕ 빼기, 아래에서 추가할 수 있어요.'}
         </p>
-        <SessionExerciseList
-          performances={session.performances}
-          onOpen={runner.openExercise}
-          onRemove={runner.removeExercise}
-          onSwap={(index) => {
-            setSwapIndex(index);
-            setShowAdd(false);
-          }}
-          onReorder={runner.reorderExercise}
-        />
+        {!isEmpty && (
+          <SessionExerciseList
+            performances={session.performances}
+            onOpen={runner.openExercise}
+            onRemove={runner.removeExercise}
+            onSwap={(index) => {
+              setSwapIndex(index);
+              setShowAdd(false);
+            }}
+            onReorder={runner.reorderExercise}
+          />
+        )}
 
         {swapIndex !== null && (
           <div className="flex flex-col gap-sm">
@@ -149,7 +154,7 @@ export function SessionView() {
           </div>
         )}
 
-        {swapIndex === null && showAdd && (
+        {swapIndex === null && (showAdd || isEmpty) && (
           <AddExerciseList
             onAdd={(exerciseId) => {
               runner.addExercise(exerciseId);
@@ -158,24 +163,28 @@ export function SessionView() {
           />
         )}
 
-        {swapIndex === null && !showAdd && (
+        {swapIndex === null && !showAdd && !isEmpty && (
           <Button variant="outline" className="h-12 w-full" onClick={() => setShowAdd(true)}>
             + 운동 추가
           </Button>
         )}
 
-        {!allDone && (
-          <Button className="h-14 w-full text-base font-semibold" onClick={runner.startNext}>
-            {startLabel}
-          </Button>
+        {!isEmpty && (
+          <>
+            {!allDone && (
+              <Button className="h-14 w-full text-base font-semibold" onClick={runner.startNext}>
+                {startLabel}
+              </Button>
+            )}
+            <Button
+              variant={allDone ? undefined : 'outline'}
+              className={allDone ? 'h-14 w-full text-base font-semibold' : 'h-12 w-full'}
+              onClick={runner.openSummary}
+            >
+              운동 끝내기
+            </Button>
+          </>
         )}
-        <Button
-          variant={allDone ? undefined : 'outline'}
-          className={allDone ? 'h-14 w-full text-base font-semibold' : 'h-12 w-full'}
-          onClick={runner.openSummary}
-        >
-          운동 끝내기
-        </Button>
       </main>
     </>
   );
