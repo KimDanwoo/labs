@@ -49,7 +49,7 @@ export function RoutineBuilderView({ routineId }: RoutineBuilderViewProps) {
 
   return (
     <>
-      <AppHeader title={resolveTitle()} showNav={false} />
+      <AppHeader title={resolveTitle()} />
       <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
         {!mounted && <p className="text-muted">불러오는 중…</p>}
 

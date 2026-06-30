@@ -2,6 +2,7 @@ import { AuthBoundary, SignInConsent } from '@features/auth/ui';
 import { DataBoundary } from '@features/cloud-sync/ui';
 import { ForegroundMessages } from '@features/notifications/ui';
 import { LeaderboardSync } from '@features/ranking/ui';
+import { BottomNav } from '@widgets/bottom-nav/ui';
 import { LevelUpCelebration } from '@widgets/level-card/ui';
 import type { ReactNode } from 'react';
 
@@ -17,6 +18,7 @@ export function AppProviders({ children }: AppProvidersProps) {
       <AuthBoundary>
         <DataBoundary>{children}</DataBoundary>
       </AuthBoundary>
+      <BottomNav />
       <SignInConsent />
       <LeaderboardSync />
       <ForegroundMessages />

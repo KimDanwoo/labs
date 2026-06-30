@@ -7,7 +7,8 @@ import { CalendarDayCell } from './CalendarDayCell';
 
 type WorkoutCalendarProps = {
   sessions: WorkoutSession[];
-  selectedDate: Date;
+  // null이면 전체 모드(특정 날짜 선택 없음).
+  selectedDate: Date | null;
   onSelectDate: (date: Date) => void;
 };
 
@@ -28,7 +29,10 @@ const buildCells = (year: number, month: number): (number | null)[] => {
 };
 
 export function WorkoutCalendar({ sessions, selectedDate, onSelectDate }: WorkoutCalendarProps) {
-  const [viewDate, setViewDate] = useState(() => new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
+  const [viewDate, setViewDate] = useState(() => {
+    const base = selectedDate ?? new Date();
+    return new Date(base.getFullYear(), base.getMonth(), 1);
+  });
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
 
@@ -39,7 +43,7 @@ export function WorkoutCalendar({ sessions, selectedDate, onSelectDate }: Workou
 
   const cells = useMemo(() => buildCells(year, month), [year, month]);
   const todayKey = toDateKey(new Date());
-  const selectedKey = toDateKey(selectedDate);
+  const selectedKey = selectedDate ? toDateKey(selectedDate) : null;
 
   const handlePrevMonth = () => setViewDate(new Date(year, month - 1, 1));
   const handleNextMonth = () => setViewDate(new Date(year, month + 1, 1));
@@ -72,7 +76,7 @@ export function WorkoutCalendar({ sessions, selectedDate, onSelectDate }: Workou
               key={cellKey}
               day={day}
               isToday={day !== null && toDateKey(new Date(year, month, day)) === todayKey}
-              isSelected={day !== null && toDateKey(new Date(year, month, day)) === selectedKey}
+              isSelected={day !== null && selectedKey !== null && toDateKey(new Date(year, month, day)) === selectedKey}
               hasWorkout={day !== null && workoutDayKeys.has(toDateKey(new Date(year, month, day)))}
               onSelect={handleSelectDay}
             />

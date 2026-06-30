@@ -1,1 +1,1 @@
-export { BackIcon, HistoryIcon, PlanIcon, RankingIcon, RoutineIcon, SettingsIcon } from './icons';
+export { BackIcon, HistoryIcon, HomeIcon, PlanIcon, RankingIcon, RoutineIcon, SettingsIcon } from './icons';

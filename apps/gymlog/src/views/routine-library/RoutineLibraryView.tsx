@@ -40,7 +40,7 @@ export function RoutineLibraryView() {
   return (
     <>
       <AppHeader title="루틴 관리" />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-2xl px-lg pb-3xl pt-lg">
+      <main className="mx-auto flex w-full max-w-content flex-col gap-2xl px-lg pb-28 pt-lg">
         <section className="flex flex-col gap-md">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-foreground">내 루틴</h2>
