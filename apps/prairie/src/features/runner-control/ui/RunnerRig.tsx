@@ -9,7 +9,7 @@ import { Group, MathUtils, Vector3 } from 'three';
 import { RUNNER_PHYSICS } from '../model/constants';
 import { usePointerLook } from '../model/hooks/usePointerLook';
 import { useRunnerControls } from '../model/hooks/useRunnerControls';
-import { getRunnerInput } from '../model/store/runner-input';
+import { getRunnerInput } from '../model/store/runnerInput';
 
 const forwardVec = new Vector3();
 const camDirVec = new Vector3();

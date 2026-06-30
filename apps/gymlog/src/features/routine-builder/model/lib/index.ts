@@ -1,1 +1,1 @@
-export { filterExercisesByMuscle } from './filter-exercises';
+export { filterExercisesByMuscle } from './filterExercises';

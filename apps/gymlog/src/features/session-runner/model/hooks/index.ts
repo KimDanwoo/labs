@@ -1,1 +1,1 @@
-export * from './use-workout-session';
+export * from './useWorkoutSession';

@@ -1,2 +1,2 @@
 export * from './exercises';
-export * from './weight-increments';
+export * from './weightIncrements';

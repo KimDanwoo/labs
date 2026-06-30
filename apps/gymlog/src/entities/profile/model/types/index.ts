@@ -1,2 +1,2 @@
 export * from './profile';
-export * from './week-plan';
+export * from './weekPlan';

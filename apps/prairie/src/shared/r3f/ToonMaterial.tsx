@@ -1,5 +1,5 @@
 import type { ThreeElements } from '@react-three/fiber';
-import { toonGradient } from './toon-gradient';
+import { toonGradient } from './toonGradient';
 
 type ToonMaterialProps = ThreeElements['meshToonMaterial'];
 

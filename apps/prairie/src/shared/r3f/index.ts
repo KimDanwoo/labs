@@ -1,5 +1,5 @@
 export { GltfModel, preloadGltf } from './GltfModel';
-export { setRideSpeed, useRideSpeed } from './ride-store';
-export { setSceneReady, useSceneReady } from './scene-ready';
-export { toonGradient } from './toon-gradient';
+export { setRideSpeed, useRideSpeed } from './rideStore';
+export { setSceneReady, useSceneReady } from './sceneReady';
+export { toonGradient } from './toonGradient';
 export { ToonMaterial } from './ToonMaterial';

@@ -1,2 +1,2 @@
-export { useLeaderboard } from './use-leaderboard';
-export { useLeaderboardSync } from './use-leaderboard-sync';
+export { useLeaderboard } from './useLeaderboard';
+export { useLeaderboardSync } from './useLeaderboardSync';

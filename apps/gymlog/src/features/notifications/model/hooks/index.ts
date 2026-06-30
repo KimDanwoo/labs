@@ -1,1 +1,1 @@
-export { enableNotifications } from './use-notifications';
+export { enableNotifications } from './useNotifications';

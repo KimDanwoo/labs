@@ -2,7 +2,7 @@
 
 import { type PointerEvent, useRef, useState } from 'react';
 import { JOYSTICK } from '../model/constants';
-import { resetRunnerInput, setRunnerAction } from '../model/store/runner-input';
+import { resetRunnerInput, setRunnerAction } from '../model/store/runnerInput';
 
 type Vec = { x: number; y: number };
 

@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { PROFILE_PARAGRAPHS } from '../model/constants/profile-content';
+import { PROFILE_PARAGRAPHS } from '../model/constants/profileContent';
 import { isProfileLink } from '../model/types/profile';
 
 const LINK_CLASS =

@@ -1,1 +1,1 @@
-export { useIsCoarsePointer } from './use-coarse-pointer';
+export { useIsCoarsePointer } from './useCoarsePointer';
