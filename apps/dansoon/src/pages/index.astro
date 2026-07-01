@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '~/layouts/BaseLayout.astro'
+import PostList from '~/components/Main/PostList'
+
+const posts = await getCollection('tech')
+const sortedPosts = posts
+  .filter(post => !post.data.isHidden && post.data.title !== '🧑🏻‍💻 frontend 김단우')
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .map(post => {
+    const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '')
+    return {
+      title: post.data.title,
+      description: post.data.description,
+      category: post.data.category ?? '',
+      isHidden: post.data.isHidden ?? false,
+      thumbnail: post.data.thumbnail ? { src: post.data.thumbnail.src } : null,
+      url: `/tech/${slug}/`,
+      publishedAt: post.data.date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    }
+  })
+---
+
+<BaseLayout title="김단우 블로그">
+  <div class="page-hero animate-fade-in-up">
+    <p class="page-hero-tag">Tech Notes</p>
+    <h1 class="page-hero-title">오늘의 기술 뉴스</h1>
+    <p class="page-hero-subtitle">
+      매일 주목할 만한 개발·기술 소식을 선별하여 전합니다.
+    </p>
+    <div class="page-hero-divider"></div>
+  </div>
+
+  <PostList posts={sortedPosts} />
+</BaseLayout>
