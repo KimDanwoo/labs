@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 5월 29일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 5월 29일)'
 date: 2026-05-29
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -64,4 +64,5 @@ Hacker News에 'Continue? Y/N'이라는 짧은 게임이 공개되었습니다. 
 Coalton은 Lisp 계열의 언어로, 하스켈과 OCaml에서 영감을 받은 정적 타입 시스템을 특징으로 합니다. 이 언어는 Lisp의 강력한 매크로 시스템과 코드-데이터 동일성 원칙을 유지하면서도, 정적 타입이 제공하는 안정성과 효율성을 결합하고자 합니다. 함수형 프로그래밍 패러다임과 Lisp의 유연성을 동시에 추구하는 개발자들에게 새로운 대안을 제시하며, 타입 안정성이 중요한 프로젝트에서 Lisp의 장점을 활용할 수 있게 합니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._

@@ -1,12 +1,13 @@
 ---
-title: "웹소설 베스트셀러 (2026년 5월 2째주)"
+title: '웹소설 베스트셀러 (2026년 5월 2째주)'
 date: 2026-05-04
-description: "카카오페이지·네이버 시리즈·리디 웹소설 장르별 베스트셀러입니다."
-category: "webnovel"
+description: '카카오페이지·네이버 시리즈·리디 웹소설 장르별 베스트셀러입니다.'
+category: 'webnovel'
 isHidden: true
 ---
 
 ## 📊 이번 주 웹소설 트렌드
+
 이번 주 웹소설 베스트셀러는 카카오페이지, 네이버 시리즈, 리디 등 주요 플랫폼에서 각기 다른 작품들이 상위권을 차지하며 다양한 독자층의 취향을 반영하고 있습니다. 전반적으로 회귀, 빙의, 각성 등 '새로운 기회'를 통해 주인공이 성장하거나 과거를 바로잡고 성공을 쟁취하는 서사가 강세를 보입니다. 특히 압도적인 능력을 바탕으로 역경을 헤쳐나가고 최종적으로는 사회적, 경제적 성공을 거두는 시원한 전개의 '성장형 먼치킨' 또는 '회귀/빙의물'이 큰 인기를 얻고 있습니다.
 
 ## 🗂️ 장르별 트렌드
@@ -19,10 +20,10 @@ isHidden: true
 - **💙 BL** — 오메가버스 세계관을 바탕으로 한 관계 역전 서사 및 계약 관계, 착각 등 다양한 상황 속에서 펼쳐지는 인물들의 감정선이 깊이를 더하며 독자들을 매료시킵니다.
 
 ## 👥 독자층의 현재 분위기
+
 독자들은 현실의 답답함을 해소하고 싶은 욕구를 대리 만족시키는 동시에, 시원하고 통쾌한 전개의 성공 서사를 통해 몰입감과 카타르시스를 느끼는 분위기입니다.
 
 ---
-
 
 ## ⚔️ 판타지
 
@@ -48,12 +49,10 @@ isHidden: true
 
 <div class="ptab-wrap"><div class="ptab-nav"><button class="ptab-btn is-active" data-target="t-bl-카카오페이지">카카오</button><button class="ptab-btn" data-target="t-bl-네이버시리즈">네이버</button><button class="ptab-btn" data-target="t-bl-리디">리디</button></div><div id="t-bl-카카오페이지" class="ptab-panel"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://page.kakao.com/content/65804491">악역 오메가는 드라마에서 탈출하고 싶다</a></td><td>보리수염</td></tr><tr><td><strong>2</strong></td><td><a href="https://page.kakao.com/content/69125747">바람 상대는 내가 아니야!</a></td><td>보리수염</td></tr><tr><td><strong>3</strong></td><td><a href="https://page.kakao.com/content/68522021">던전에서 돌아온 애인이 다정해졌다</a></td><td>복서주</td></tr><tr><td><strong>4</strong></td><td><a href="https://page.kakao.com/content/68906907">미친 황제가 나를 자꾸 울리려 든다 [19세 완전판]</a></td><td>난극도</td></tr><tr><td><strong>5</strong></td><td><a href="https://page.kakao.com/content/68285556">헌터TV: SSS급 에스퍼와 산다 [19세 완전판]</a></td><td>라크메</td></tr><tr><td><strong>6</strong></td><td><a href="https://page.kakao.com/content/69125748">바람 상대는 내가 아니야! [19세 완전판]</a></td><td>보리수염</td></tr><tr><td><strong>7</strong></td><td><a href="https://page.kakao.com/content/68932760">가장 안전한 세계 [19세 완전판]</a></td><td>명란김김</td></tr><tr><td><strong>8</strong></td><td><a href="https://page.kakao.com/content/68697150">SOS! 악역을 강제당하는 중입니다</a></td><td>과실o</td></tr><tr><td><strong>9</strong></td><td><a href="https://page.kakao.com/content/61114566">들키기 전에 제대하는 거야</a></td><td>웹소설BL</td></tr></tbody></table></div><div id="t-bl-네이버시리즈" class="ptab-panel" style="display:none"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://series.naver.com/novel/detail.series?productNo=14084947">권태주의보 [BL]</a></td><td>뾰족가시</td></tr><tr><td><strong>2</strong></td><td><a href="https://series.naver.com/novel/detail.series?productNo=12351672">왜 하필 흑막의 동생이죠? [BL]</a></td><td>흑뿔고래</td></tr><tr><td><strong>3</strong></td><td><a href="https://series.naver.com/novel/detail.series?productNo=2692632">흠뻑 젖은 백의의 순정[개정판] [BL]</a></td><td>하즈키 미야코</td></tr></tbody></table></div><div id="t-bl-리디" class="ptab-panel" style="display:none"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://ridibooks.com/books/2259037155?_rdt_sid=category_bestsellers&_rdt_idx=0&_rdt_arg=4150">착각으로 구원하라</a></td><td>samk</td></tr><tr><td><strong>2</strong></td><td><a href="https://ridibooks.com/books/4869004885?_rdt_sid=category_bestsellers&_rdt_idx=1&_rdt_arg=4150">천운</a></td><td>채팔이</td></tr><tr><td><strong>3</strong></td><td><a href="https://ridibooks.com/books/5269000207?_rdt_sid=category_bestsellers&_rdt_idx=2&_rdt_arg=4150">절친X교환</a></td><td>치율</td></tr><tr><td><strong>4</strong></td><td><a href="https://ridibooks.com/books/6162000001?_rdt_sid=category_bestsellers&_rdt_idx=3&_rdt_arg=4150">꽃길 깔아 주는 선배</a></td><td>모아이</td></tr><tr><td><strong>5</strong></td><td><a href="https://ridibooks.com/books/4163000362?_rdt_sid=category_bestsellers&_rdt_idx=4&_rdt_arg=4150">총총</a></td><td>톨쥬</td></tr><tr><td><strong>6</strong></td><td><a href="https://ridibooks.com/books/3049004830?_rdt_sid=category_bestsellers&_rdt_idx=5&_rdt_arg=4150">터닝(Turning)</a></td><td>쿠유</td></tr><tr><td><strong>7</strong></td><td><a href="https://ridibooks.com/books/2847008233?_rdt_sid=category_bestsellers&_rdt_idx=6&_rdt_arg=4150">어쩌다 메리지</a></td><td>클레어</td></tr><tr><td><strong>8</strong></td><td><a href="https://ridibooks.com/books/2259037883?_rdt_sid=category_bestsellers&_rdt_idx=7&_rdt_arg=4150">공의 형이 된다는 건</a></td><td>8각시계</td></tr><tr><td><strong>9</strong></td><td><a href="https://ridibooks.com/books/2057325278?_rdt_sid=category_bestsellers&_rdt_idx=8&_rdt_arg=4150">풀칠 ; 내 가이드 입에 풀칠하기</a></td><td>원샷</td></tr><tr><td><strong>10</strong></td><td><a href="https://ridibooks.com/books/2404037236?_rdt_sid=category_bestsellers&_rdt_idx=9&_rdt_arg=4150">디플라워 미 이프 유 캔(Deflower Me If You Can)</a></td><td>ZIG</td></tr><tr><td><strong>11</strong></td><td>킵 고잉 크레이지 (Keep Going Crazy)</td><td>김피디</td></tr><tr><td><strong>12</strong></td><td>사이프러스 모자이크</td><td>김다윗</td></tr><tr><td><strong>13</strong></td><td>베이비 스캔들</td><td>소금케이크</td></tr><tr><td><strong>14</strong></td><td>조연을 위한 회귀 지침서</td><td>차선</td></tr><tr><td><strong>15</strong></td><td>헌터물 흑막에 빙의했는데 적성에 너무 잘 맞음</td><td>김크림</td></tr></tbody></table></div></div>
 
-
 ---
 
-*데이터 출처: [카카오페이지](https://page.kakao.com) · [네이버 시리즈](https://series.naver.com) · [리디](https://ridibooks.com)*
-*매주 자동으로 수집되는 웹소설 베스트셀러 리포트입니다.*
-
+_데이터 출처: [카카오페이지](https://page.kakao.com) · [네이버 시리즈](https://series.naver.com) · [리디](https://ridibooks.com)_
+_매주 자동으로 수집되는 웹소설 베스트셀러 리포트입니다._
 
 <script>
 (function(){
@@ -86,4 +85,3 @@ isHidden: true
 .ptab-empty{color:var(--text-muted);font-size:0.9rem;padding:8px 0;}
 @media(max-width:640px){.ptab-table th,.ptab-table td{padding:4px 6px;font-size:0.78rem;}}
 </style>
-

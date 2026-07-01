@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 5월 23일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 5월 23일)'
 date: 2026-05-23
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -64,4 +64,5 @@ KrebsOnSecurity에 따르면, 미국의 사이버 보안 및 인프라 보안국
 이 게시물은 Forth에서 영감을 받아 웹사이트 구축을 위해 특별히 설계된 새로운 프로그래밍 언어를 소개합니다. 이 언어는 간결성과 효율성으로 잘 알려진 Forth의 스택 기반 패러다임을 활용하여 웹 개발에 신선한 접근 방식을 제공합니다. 개발자들에게 웹 애플리케이션을 만들고 웹 스택을 직접 제어할 수 있는 더 직접적이고 잠재적으로 빠른 방법을 제공하여 단순성과 통제에 중점을 둡니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._

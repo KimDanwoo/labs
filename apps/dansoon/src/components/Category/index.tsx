@@ -1,10 +1,8 @@
-import React from 'react'
-
 type Props = {
-  category: string
-  categories: string[]
-  handleClickCategory: (category: string) => void
-}
+  category: string;
+  categories: string[];
+  handleClickCategory: (category: string) => void;
+};
 
 export default function Categories({ category: c, categories, handleClickCategory }: Props) {
   return (
@@ -24,5 +22,5 @@ export default function Categories({ category: c, categories, handleClickCategor
         </button>
       ))}
     </div>
-  )
+  );
 }

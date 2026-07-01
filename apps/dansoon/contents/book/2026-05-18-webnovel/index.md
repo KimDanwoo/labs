@@ -1,28 +1,29 @@
 ---
-title: "웹소설 베스트셀러 (2026년 5월 4째주)"
+title: '웹소설 베스트셀러 (2026년 5월 4째주)'
 date: 2026-05-18
-description: "카카오페이지·네이버 시리즈·리디 웹소설 장르별 베스트셀러입니다."
-category: "webnovel"
+description: '카카오페이지·네이버 시리즈·리디 웹소설 장르별 베스트셀러입니다.'
+category: 'webnovel'
 isHidden: true
 ---
 
 ## 📊 이번 주 웹소설 트렌드
+
 이번 주 웹소설 시장은 각 플랫폼별로 다양한 장르의 작품들이 고르게 인기를 얻으며 견고한 팬덤을 보여주고 있습니다. 특히 회귀, 빙의, 시스템, 능력 각성 등 친숙하면서도 매력적인 설정의 작품들이 다수 포진해 독자들의 꾸준한 사랑을 받고 있습니다. 또한, 평범한 일상에 비현실적 요소를 가미한 현대판타지부터, 강인한 여성 주인공이 이끄는 로맨스 판타지까지 장르별 특색이 뚜렷한 작품들이 주목받고 있습니다. 일부 작품은 여러 플랫폼에서 동시에 순위권에 오르는 등 넓은 독자층에 어필하는 힘을 보여주기도 합니다.
 
 ## 🗂️ 장르별 트렌드
 
--   **⚔️ 판타지** — 회귀, 성장형 능력자, 망나니 변신 등 다채로운 주인공의 서사와 시스템적 요소가 결합된 작품들이 강세입니다.
--   **🏰 로맨스판타지** — 강인하고 주체적인 여성 주인공이 이색적인 배경 속에서 로맨스와 모험을 동시에 이끌어가는 스토리가 인기입니다.
--   **💕 로맨스** — 입체적인 캐릭터들 사이의 복잡하고 강렬한 감정선, 그리고 현대 사회를 배경으로 한 현실감 있는 서사가 돋보입니다.
--   **🌆 현대판타지** — 평범한 직업이나 일상에 특별한 능력이나 시스템이 결합된, 독특한 콘셉트의 현대판타지 작품들이 흥행하고 있습니다.
--   **🥋 무협** — 회귀, 빙의, 그리고 장인 기질 등 전통 무협에 현대적인 요소를 가미하여 색다른 재미를 선사하는 작품들이 독자들을 사로잡고 있습니다.
--   **💙 BL** — 다채로운 관계성 속에서 인물의 매력을 극대화하고 몰입도 높은 서사를 보여주는 BL 작품들이 꾸준한 인기를 얻고 있습니다.
+- **⚔️ 판타지** — 회귀, 성장형 능력자, 망나니 변신 등 다채로운 주인공의 서사와 시스템적 요소가 결합된 작품들이 강세입니다.
+- **🏰 로맨스판타지** — 강인하고 주체적인 여성 주인공이 이색적인 배경 속에서 로맨스와 모험을 동시에 이끌어가는 스토리가 인기입니다.
+- **💕 로맨스** — 입체적인 캐릭터들 사이의 복잡하고 강렬한 감정선, 그리고 현대 사회를 배경으로 한 현실감 있는 서사가 돋보입니다.
+- **🌆 현대판타지** — 평범한 직업이나 일상에 특별한 능력이나 시스템이 결합된, 독특한 콘셉트의 현대판타지 작품들이 흥행하고 있습니다.
+- **🥋 무협** — 회귀, 빙의, 그리고 장인 기질 등 전통 무협에 현대적인 요소를 가미하여 색다른 재미를 선사하는 작품들이 독자들을 사로잡고 있습니다.
+- **💙 BL** — 다채로운 관계성 속에서 인물의 매력을 극대화하고 몰입도 높은 서사를 보여주는 BL 작품들이 꾸준한 인기를 얻고 있습니다.
 
 ## 👥 독자층의 현재 분위기
+
 독자들은 익숙한 클리셰 속에서도 신선한 설정과 매력적인 캐릭터가 돋보이는 작품을 통해 대리만족과 깊은 몰입감을 추구하는 경향을 보입니다.
 
 ---
-
 
 ## ⚔️ 판타지
 
@@ -48,12 +49,10 @@ isHidden: true
 
 <div class="ptab-wrap"><div class="ptab-nav"><button class="ptab-btn is-active" data-target="t-bl-카카오페이지">카카오</button><button class="ptab-btn" data-target="t-bl-네이버시리즈">네이버</button><button class="ptab-btn" data-target="t-bl-리디">리디</button></div><div id="t-bl-카카오페이지" class="ptab-panel"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://page.kakao.com/content/66208792">북극여우의 은밀한 공조수사</a></td><td>정유누</td></tr><tr><td><strong>2</strong></td><td><a href="https://page.kakao.com/content/67918620">담비꺼야</a></td><td>에뷔시</td></tr><tr><td><strong>3</strong></td><td><a href="https://page.kakao.com/content/65521957">성녀인 척 연기합니다</a></td><td>에뷔시</td></tr><tr><td><strong>4</strong></td><td><a href="https://page.kakao.com/content/69263710">올 타임 하이</a></td><td>G바겐</td></tr><tr><td><strong>5</strong></td><td><a href="https://page.kakao.com/content/68877966">레인보우 시티(외전증보판)</a></td><td>채팔이</td></tr><tr><td><strong>6</strong></td><td><a href="https://page.kakao.com/content/69125747">바람 상대는 내가 아니야!</a></td><td>보리수염</td></tr><tr><td><strong>7</strong></td><td><a href="https://page.kakao.com/content/65804507">악역 오메가는 드라마에서 탈출하고 싶다 [19세 완전판]</a></td><td>보리수염</td></tr><tr><td><strong>8</strong></td><td><a href="https://page.kakao.com/content/69125748">바람 상대는 내가 아니야! [19세 완전판]</a></td><td>보리수염</td></tr><tr><td><strong>9</strong></td><td><a href="https://page.kakao.com/content/69133111">탁월한 거짓말</a></td><td>송캐</td></tr><tr><td><strong>10</strong></td><td><a href="https://page.kakao.com/content/67491471">시한폭탄을 가이딩할 생각은 없었다 [19세 완전판]</a></td><td>또맹이</td></tr></tbody></table></div><div id="t-bl-네이버시리즈" class="ptab-panel" style="display:none"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://series.naver.com/novel/detail.series?productNo=14093074">당신의 막내입니다 [BL][선공개]</a></td><td>감자위스키</td></tr><tr><td><strong>2</strong></td><td><a href="https://series.naver.com/novel/detail.series?productNo=9210477">다이아몬드 더스트 [BL]</a></td><td>김다윗</td></tr></tbody></table></div><div id="t-bl-리디" class="ptab-panel" style="display:none"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://ridibooks.com/books/4163000362?_rdt_sid=category_bestsellers&_rdt_idx=0&_rdt_arg=4150">총총</a></td><td>톨쥬</td></tr><tr><td><strong>2</strong></td><td><a href="https://ridibooks.com/books/4869004885?_rdt_sid=category_bestsellers&_rdt_idx=1&_rdt_arg=4150">천운</a></td><td>채팔이</td></tr><tr><td><strong>3</strong></td><td><a href="https://ridibooks.com/books/5269000207?_rdt_sid=category_bestsellers&_rdt_idx=2&_rdt_arg=4150">절친X교환</a></td><td>치율</td></tr><tr><td><strong>4</strong></td><td><a href="https://ridibooks.com/books/3049004830?_rdt_sid=category_bestsellers&_rdt_idx=3&_rdt_arg=4150">터닝(Turning)</a></td><td>쿠유</td></tr><tr><td><strong>5</strong></td><td><a href="https://ridibooks.com/books/3302053018?_rdt_sid=category_bestsellers&_rdt_idx=4&_rdt_arg=4150">유괴는 상냥하게</a></td><td>Dips</td></tr><tr><td><strong>6</strong></td><td><a href="https://ridibooks.com/books/2847008233?_rdt_sid=category_bestsellers&_rdt_idx=5&_rdt_arg=4150">어쩌다 메리지</a></td><td>클레어</td></tr><tr><td><strong>7</strong></td><td><a href="https://ridibooks.com/books/2259037883?_rdt_sid=category_bestsellers&_rdt_idx=6&_rdt_arg=4150">공의 형이 된다는 건</a></td><td>8각시계</td></tr><tr><td><strong>8</strong></td><td><a href="https://ridibooks.com/books/3885046630?_rdt_sid=category_bestsellers&_rdt_idx=7&_rdt_arg=4150">웬 댓 데이 컴즈</a></td><td>빈트후크</td></tr><tr><td><strong>9</strong></td><td><a href="https://ridibooks.com/books/5978000001?_rdt_sid=category_bestsellers&_rdt_idx=8&_rdt_arg=4150">애시드</a></td><td>제노리노</td></tr><tr><td><strong>10</strong></td><td><a href="https://ridibooks.com/books/2404037236?_rdt_sid=category_bestsellers&_rdt_idx=9&_rdt_arg=4150">디플라워 미 이프 유 캔(Deflower Me If You Can)</a></td><td>ZIG</td></tr><tr><td><strong>11</strong></td><td><a href="https://ridibooks.com/books/6062001272?_rdt_sid=category_bestsellers&_rdt_idx=10&_rdt_arg=4150">시한부 헌터를 위한 낭만적 구원 방법</a></td><td>씨솔트</td></tr></tbody></table></div></div>
 
-
 ---
 
-*데이터 출처: [카카오페이지](https://page.kakao.com) · [네이버 시리즈](https://series.naver.com) · [리디](https://ridibooks.com)*
-*매주 자동으로 수집되는 웹소설 베스트셀러 리포트입니다.*
-
+_데이터 출처: [카카오페이지](https://page.kakao.com) · [네이버 시리즈](https://series.naver.com) · [리디](https://ridibooks.com)_
+_매주 자동으로 수집되는 웹소설 베스트셀러 리포트입니다._
 
 <script>
 (function(){
@@ -86,4 +85,3 @@ isHidden: true
 .ptab-empty{color:var(--text-muted);font-size:0.9rem;padding:8px 0;}
 @media(max-width:640px){.ptab-table th,.ptab-table td{padding:4px 6px;font-size:0.78rem;}}
 </style>
-

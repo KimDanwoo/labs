@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 4월 30일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 4월 30일)'
 date: 2026-04-30
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -64,4 +64,5 @@ isHidden: false
 이 기사는 일본 교토의 벚꽃이 지난 1,200년 역사상 가장 이른 시기에 개화했다는 놀라운 사실을 보도합니다. 이는 지구 온난화와 기후 변화가 자연 현상에 미치는 심각한 영향을 보여주는 명확한 증거로 제시됩니다. 벚꽃 개화 시기는 기온 변화에 매우 민감한 지표로, 이번 기록은 기후 위기의 가속화에 대한 경고의 메시지를 담고 있습니다. 개발자로서 환경 모니터링 및 예측 기술의 중요성을 다시 한번 생각하게 됩니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._

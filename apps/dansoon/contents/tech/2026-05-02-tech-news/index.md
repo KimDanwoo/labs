@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 5월 2일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 5월 2일)'
 date: 2026-05-02
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -64,4 +64,5 @@ Whohas는 다양한 리눅스 배포판과 패키지 저장소(예: apt, yum, dn
 'The gay jailbreak technique'는 AI 챗봇의 안전성 필터나 윤리적 제약을 우회하여 특정 금지된 답변을 유도하는 '탈옥(jailbreak)' 기법 중 하나를 설명합니다. 이 기법은 AI에게 특정 페르소나를 부여하거나, 질문의 맥락을 교묘하게 조작하여 AI가 평소에는 거부할 정보를 제공하도록 만드는 방식을 사용합니다. 이는 AI 모델이 의도하지 않은 방식으로 행동하도록 유도할 수 있음을 보여주며, 대규모 언어 모델(LLM)의 안전성과 견고성을 강화하는 것이 얼마나 중요한지 강조합니다. 이 문서는 AI 시스템의 취약점을 탐구하고, 더 강력한 보안 및 윤리적 가드레일 개발의 필요성을 시사합니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._

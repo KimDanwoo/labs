@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 5월 16일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 5월 16일)'
 date: 2026-05-16
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -66,4 +66,5 @@ Mitchell Hashimoto(HashiCorp 공동 설립자)가 현재 많은 회사들이 명
 하버드 과학 시연(Science Demonstrations) 팀이 미세 규모 테르밋 반응을 보여주는 흥미로운 영상을 공개했습니다. 테르밋은 발열 산화-환원 반응을 일으켜 강렬한 열을 방출하는 화약 혼합물입니다. 이 반응을 미세 수준에서 관찰하는 것은 재료 과학 및 화학 공정에 대한 독특한 통찰력을 제공합니다. 직접적으로 소프트웨어와 관련이 없지만, 현대 기술의 근간이 되는 근본적인 과학 원리를 상기시켜 줍니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._

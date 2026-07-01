@@ -1,27 +1,27 @@
 ---
-title: "웹소설 베스트셀러 (2026년 5월 5째주)"
+title: '웹소설 베스트셀러 (2026년 5월 5째주)'
 date: 2026-05-25
-description: "카카오페이지·네이버 시리즈·리디 웹소설 장르별 베스트셀러입니다."
-category: "webnovel"
+description: '카카오페이지·네이버 시리즈·리디 웹소설 장르별 베스트셀러입니다.'
+category: 'webnovel'
 isHidden: true
 ---
 
 ## 📊 이번 주 웹소설 트렌드
+
 이번 주 웹소설 베스트셀러는 다양한 장르가 고르게 인기를 얻는 가운데, 과거 회귀, 시스템 각성, 빙의 등 특별한 능력을 가진 주인공이 역경을 헤쳐나가는 서사가 여전히 강세를 보입니다. 특히, 판타지와 현대판타지에서는 독특한 능력이나 직업을 가진 주인공의 성장이, 로맨스 및 로맨스판타지에서는 강인하고 주체적인 여성 주인공의 이야기가 주목받습니다. 이는 독자들이 다채로운 설정 속에서 통쾌함과 몰입감을 주는 이야기를 선호하는 트렌드를 반영합니다.
 
 ## 🗂️ 장르별 트렌드
 
--   **⚔️ 판타지** — 회귀, 각성, 혹은 특별한 신분으로 다시 시작하는 주인공의 성장 서사가 강세를 보입니다.
--   **🏰 로맨스판타지** — 강인하고 주체적인 여성 주인공이 운명을 개척하거나 복수를 이루는 서사가 독자들의 마음을 사로잡고 있습니다.
--   **💕 로맨스** — 현대 배경의 현실적인 로맨스부터 특별한 상황에 놓인 주인공들의 이야기가 다양하게 사랑받고 있습니다.
--   **🌆 현대판타지** — 평범한 직업을 가진 주인공이 특별한 능력이나 시스템을 통해 현실 문제를 해결하는 이야기가 인기를 끕니다.
--   **🥋 무협** — 회귀, 환생을 통해 무림에서 다시 시작하거나 압도적인 무력을 지닌 주인공의 이야기가 꾸준히 인기를 얻고 있습니다.
--   **💙 BL** — 빙의, 회귀, 독특한 세계관 속에서 펼쳐지는 캐릭터 간의 복잡하고 매력적인 관계 서사가 주목받습니다.
+- **⚔️ 판타지** — 회귀, 각성, 혹은 특별한 신분으로 다시 시작하는 주인공의 성장 서사가 강세를 보입니다.
+- **🏰 로맨스판타지** — 강인하고 주체적인 여성 주인공이 운명을 개척하거나 복수를 이루는 서사가 독자들의 마음을 사로잡고 있습니다.
+- **💕 로맨스** — 현대 배경의 현실적인 로맨스부터 특별한 상황에 놓인 주인공들의 이야기가 다양하게 사랑받고 있습니다.
+- **🌆 현대판타지** — 평범한 직업을 가진 주인공이 특별한 능력이나 시스템을 통해 현실 문제를 해결하는 이야기가 인기를 끕니다.
+- **🥋 무협** — 회귀, 환생을 통해 무림에서 다시 시작하거나 압도적인 무력을 지닌 주인공의 이야기가 꾸준히 인기를 얻고 있습니다.
+- **💙 BL** — 빙의, 회귀, 독특한 세계관 속에서 펼쳐지는 캐릭터 간의 복잡하고 매력적인 관계 서사가 주목받습니다.
 
 독자들은 익숙한 클리셰를 넘어선 독특한 설정과 개성 강한 주인공들이 펼치는 몰입감 있는 서사를 통해 대리 만족과 즐거움을 추구하는 분위기입니다.
 
 ---
-
 
 ## ⚔️ 판타지
 
@@ -47,12 +47,10 @@ isHidden: true
 
 <div class="ptab-wrap"><div class="ptab-nav"><button class="ptab-btn is-active" data-target="t-bl-카카오페이지">카카오</button><button class="ptab-btn" data-target="t-bl-네이버시리즈">네이버</button><button class="ptab-btn" data-target="t-bl-리디">리디</button></div><div id="t-bl-카카오페이지" class="ptab-panel"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://page.kakao.com/content/68697150">SOS! 악역을 강제당하는 중입니다</a></td><td>과실o</td></tr><tr><td><strong>2</strong></td><td><a href="https://page.kakao.com/content/68486750">광공이 나를 오작교로 쓰려고 한다</a></td><td>한아뿐</td></tr><tr><td><strong>3</strong></td><td><a href="https://page.kakao.com/content/66003625">비밀 사이</a></td><td>쏘날개,맥퀸스튜디오</td></tr><tr><td><strong>4</strong></td><td><a href="https://page.kakao.com/content/68932760">가장 안전한 세계 [19세 완전판]</a></td><td>명란김김</td></tr><tr><td><strong>5</strong></td><td><a href="https://page.kakao.com/content/69125748">바람 상대는 내가 아니야! [19세 완전판]</a></td><td>보리수염</td></tr><tr><td><strong>6</strong></td><td><a href="https://page.kakao.com/content/68486811">광공이 나를 오작교로 쓰려고 한다 [19세 완전판]</a></td><td>한아뿐</td></tr><tr><td><strong>7</strong></td><td><a href="https://page.kakao.com/content/68790945">악마 조교 가이드가 사는 법 [19세 완전판]</a></td><td>유우니</td></tr><tr><td><strong>8</strong></td><td><a href="https://page.kakao.com/content/69133111">탁월한 거짓말</a></td><td>송캐</td></tr><tr><td><strong>9</strong></td><td><a href="https://page.kakao.com/content/68013989">듀얼 30만뷰 달성!</a></td><td>웹소설BL</td></tr></tbody></table></div><div id="t-bl-네이버시리즈" class="ptab-panel" style="display:none"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://series.naver.com/novel/detail.series?productNo=12895480">피폐 가이드물에서 연기하는 법 [BL]</a></td><td>진다홍</td></tr><tr><td><strong>2</strong></td><td><a href="https://series.naver.com/novel/detail.series?productNo=13947706">부활한 가이드는 조용히 살고 싶다 [BL]</a></td><td>아인트</td></tr></tbody></table></div><div id="t-bl-리디" class="ptab-panel" style="display:none"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://ridibooks.com/books/4163000362?_rdt_sid=category_bestsellers&_rdt_idx=0&_rdt_arg=4150">총총</a></td><td>톨쥬</td></tr><tr><td><strong>2</strong></td><td><a href="https://ridibooks.com/books/4869004885?_rdt_sid=category_bestsellers&_rdt_idx=1&_rdt_arg=4150">천운</a></td><td>채팔이</td></tr><tr><td><strong>3</strong></td><td><a href="https://ridibooks.com/books/3049004830?_rdt_sid=category_bestsellers&_rdt_idx=2&_rdt_arg=4150">터닝(Turning)</a></td><td>쿠유</td></tr><tr><td><strong>4</strong></td><td><a href="https://ridibooks.com/books/5269000207?_rdt_sid=category_bestsellers&_rdt_idx=3&_rdt_arg=4150">절친X교환</a></td><td>치율</td></tr><tr><td><strong>5</strong></td><td><a href="https://ridibooks.com/books/2847008233?_rdt_sid=category_bestsellers&_rdt_idx=4&_rdt_arg=4150">어쩌다 메리지</a></td><td>클레어</td></tr><tr><td><strong>6</strong></td><td><a href="https://ridibooks.com/books/5978000001?_rdt_sid=category_bestsellers&_rdt_idx=5&_rdt_arg=4150">애시드</a></td><td>제노리노</td></tr><tr><td><strong>7</strong></td><td><a href="https://ridibooks.com/books/3302053018?_rdt_sid=category_bestsellers&_rdt_idx=6&_rdt_arg=4150">유괴는 상냥하게</a></td><td>Dips</td></tr><tr><td><strong>8</strong></td><td><a href="https://ridibooks.com/books/2259037883?_rdt_sid=category_bestsellers&_rdt_idx=7&_rdt_arg=4150">공의 형이 된다는 건</a></td><td>8각시계</td></tr><tr><td><strong>9</strong></td><td><a href="https://ridibooks.com/books/2404037236?_rdt_sid=category_bestsellers&_rdt_idx=8&_rdt_arg=4150">디플라워 미 이프 유 캔(Deflower Me If You Can)</a></td><td>ZIG</td></tr><tr><td><strong>10</strong></td><td><a href="https://ridibooks.com/books/4346000837?_rdt_sid=category_bestsellers&_rdt_idx=9&_rdt_arg=4150">사이프러스 모자이크</a></td><td>김다윗</td></tr><tr><td><strong>11</strong></td><td><a href="https://ridibooks.com/books/2057325278?_rdt_sid=category_bestsellers&_rdt_idx=10&_rdt_arg=4150">풀칠 ; 내 가이드 입에 풀칠하기</a></td><td>원샷</td></tr></tbody></table></div></div>
 
-
 ---
 
-*데이터 출처: [카카오페이지](https://page.kakao.com) · [네이버 시리즈](https://series.naver.com) · [리디](https://ridibooks.com)*
-*매주 자동으로 수집되는 웹소설 베스트셀러 리포트입니다.*
-
+_데이터 출처: [카카오페이지](https://page.kakao.com) · [네이버 시리즈](https://series.naver.com) · [리디](https://ridibooks.com)_
+_매주 자동으로 수집되는 웹소설 베스트셀러 리포트입니다._
 
 <script>
 (function(){
@@ -85,4 +83,3 @@ isHidden: true
 .ptab-empty{color:var(--text-muted);font-size:0.9rem;padding:8px 0;}
 @media(max-width:640px){.ptab-table th,.ptab-table td{padding:4px 6px;font-size:0.78rem;}}
 </style>
-

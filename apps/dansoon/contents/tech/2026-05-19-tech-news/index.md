@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 5월 19일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 5월 19일)'
 date: 2026-05-19
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -64,4 +64,5 @@ isHidden: false
 Andon Labs는 인공지능이 다양한 온라인 라디오 방송국을 전적으로 관리하고 운영하는 실험적인 플랫폼인 Andon.fm을 개발했습니다. AI는 특정 테마나 장르에 따라 음악을 선택하고, 해설을 생성하며, 콘텐츠를 큐레이션하는 역할을 맡습니다. 이 프로젝트는 AI가 미디어 방송을 자동화하고 개인화할 수 있는 잠재력을 탐구하며, 독특하고 끊임없이 진화하는 청취 경험을 제공합니다. 이는 콘텐츠 생성 및 미디어 큐레이션 분야에서 AI의 창의적인 응용 가능성을 보여줍니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._

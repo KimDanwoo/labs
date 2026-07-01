@@ -22,9 +22,13 @@
   },
   "devDependencies": {
     "@google/generative-ai": "catalog:",
+    "@repo/prettier-config": "workspace:*",
     "@types/node": "^24.0.0",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-astro": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
     "typescript": "catalog:"
   },
   "engines": {

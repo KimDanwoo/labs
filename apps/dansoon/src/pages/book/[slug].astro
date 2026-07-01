@@ -1,27 +1,29 @@
 ---
-import type { CollectionEntry } from 'astro:content'
-import { getCollection, render } from 'astro:content'
-import BaseLayout from '~/layouts/BaseLayout.astro'
-import Utterances from '~/components/Common/Utterances'
+import type { CollectionEntry } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Utterances from '~/components/Common/Utterances';
 
 export async function getStaticPaths() {
-  const bookPosts = await getCollection('book')
-  return bookPosts.map(post => {
-    const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '')
-    return { params: { slug }, props: { post } }
-  })
+  const bookPosts = await getCollection('book');
+  return bookPosts.map((post) => {
+    const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '');
+    return { params: { slug }, props: { post } };
+  });
 }
 
-type Props = { post: CollectionEntry<'book'> }
+type Props = { post: CollectionEntry<'book'> };
 
-const { post } = Astro.props
-const { Content } = await render(post)
-const { title, description, date, thumbnail, category } = post.data
-const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '')
-const url = `https://danwoo-dev.netlify.app/book/${slug}/`
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { title, description, date, thumbnail, category } = post.data;
+const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '');
+const url = `https://danwoo-dev.netlify.app/book/${slug}/`;
 const formattedDate = date.toLocaleDateString('ko-KR', {
-  year: 'numeric', month: 'long', day: 'numeric'
-})
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
 ---
 
 <BaseLayout title={title} description={description} url={url} thumbnail={thumbnail?.src}>
@@ -29,7 +31,7 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
     <header class="w-full mb-10">
       <a href="/book" class="article-back inline-flex items-center gap-1.5 text-sm mb-8">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
         </svg>
         목록으로
       </a>
@@ -42,13 +44,9 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
 
       <h1 class="article-title" itemprop="headline">{title}</h1>
 
-      {description && (
-        <p class="article-desc">{description}</p>
-      )}
+      {description && <p class="article-desc">{description}</p>}
 
-      {thumbnail && (
-        <img class="article-thumb" src={thumbnail.src} alt="" />
-      )}
+      {thumbnail && <img class="article-thumb" src={thumbnail.src} alt="" />}
     </header>
 
     <div class="article-body prose max-w-none">
@@ -63,18 +61,18 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
 
 <script>
   function wrapTables() {
-    document.querySelectorAll('.article-body table').forEach(table => {
-      if (table.parentElement?.classList.contains('table-wrap')) return
-      const wrap = document.createElement('div')
-      wrap.className = 'table-wrap'
-      wrap.style.overflowX = 'auto'
-      wrap.style.webkitOverflowScrolling = 'touch'
-      table.parentNode!.insertBefore(wrap, table)
-      wrap.appendChild(table)
-    })
+    document.querySelectorAll('.article-body table').forEach((table) => {
+      if (table.parentElement?.classList.contains('table-wrap')) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'table-wrap';
+      wrap.style.overflowX = 'auto';
+      wrap.style.webkitOverflowScrolling = 'touch';
+      table.parentNode!.insertBefore(wrap, table);
+      wrap.appendChild(table);
+    });
   }
-  wrapTables()
-  document.addEventListener('astro:after-swap', wrapTables)
+  wrapTables();
+  document.addEventListener('astro:after-swap', wrapTables);
 </script>
 
 <style>
@@ -101,21 +99,21 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
   }
 
   .article-body {
-    --tw-prose-body:        var(--text-secondary);
-    --tw-prose-headings:    var(--text-primary);
-    --tw-prose-bold:        var(--text-primary);
-    --tw-prose-links:       var(--green);
-    --tw-prose-code:        var(--green);
-    --tw-prose-pre-bg:      var(--bg-subtle);
-    --tw-prose-pre-code:    var(--text-primary);
-    --tw-prose-hr:          var(--border);
+    --tw-prose-body: var(--text-secondary);
+    --tw-prose-headings: var(--text-primary);
+    --tw-prose-bold: var(--text-primary);
+    --tw-prose-links: var(--green);
+    --tw-prose-code: var(--green);
+    --tw-prose-pre-bg: var(--bg-subtle);
+    --tw-prose-pre-code: var(--text-primary);
+    --tw-prose-hr: var(--border);
     --tw-prose-quote-borders: var(--green);
-    --tw-prose-quotes:      var(--text-primary);
-    --tw-prose-bullets:     var(--border);
-    --tw-prose-counters:    var(--text-muted);
-    --tw-prose-captions:    var(--text-muted);
-    --tw-prose-th-borders:  var(--border);
-    --tw-prose-td-borders:  var(--border);
+    --tw-prose-quotes: var(--text-primary);
+    --tw-prose-bullets: var(--border);
+    --tw-prose-counters: var(--text-muted);
+    --tw-prose-captions: var(--text-muted);
+    --tw-prose-th-borders: var(--border);
+    --tw-prose-td-borders: var(--border);
 
     font-size: 1rem;
     line-height: 1.8;

@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 5월 8일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 5월 8일)'
 date: 2026-05-08
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -68,4 +68,5 @@ Anthropic은 '자연어 오토인코더(NLAEs)'라는 새로운 연구를 통해
 Google DeepMind는 Gemini 기반의 AI 코딩 에이전트 'AlphaEvolve'의 최신 성과를 발표했습니다. AlphaEvolve는 단순한 코드 작성 능력을 넘어, 복잡한 문제 해결 과정을 자율적으로 수행하며 다양한 과학 및 기술 분야에 기여하고 있습니다. 이 에이전트는 진화 알고리즘과 대규모 언어 모델의 결합을 통해 새로운 솔루션을 탐색하고, 개발 프로세스의 효율성을 극대화하는 데 활용될 수 있습니다. 앞으로 AlphaEvolve와 같은 AI 에이전트가 개발자들의 생산성을 혁신하고 연구 발전을 가속화할 잠재력을 보여주고 있습니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._
