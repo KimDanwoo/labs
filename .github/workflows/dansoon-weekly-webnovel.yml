@@ -1,8 +1,8 @@
-name: Daily Tech News
+name: Dansoon Weekly Webnovel
 
 on:
   schedule:
-    - cron: '0 1 * * 1-6' # 월~토 오전 10시 KST (UTC 01:00)
+    - cron: '0 17 * * 0' # 매주 월요일 새벽 2시 KST (일요일 UTC 17:00)
   workflow_dispatch:
 
 jobs:
@@ -38,10 +38,20 @@ jobs:
           python-version: '3.12'
 
       - name: Install Python dependencies
-        run: pip install requests google-generativeai
+        run: pip install google-genai playwright
 
-      - name: Fetch tech news
-        run: python scripts/fetch_tech_news.py ${{ steps.date.outputs.date }}
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('**/dansoon-weekly-webnovel.yml') }}
+
+      - name: Install Playwright browsers
+        run: playwright install chromium --with-deps
+
+      - name: Fetch webnovel data
+        working-directory: apps/dansoon
+        run: python scripts/fetch_webnovel.py ${{ steps.date.outputs.date }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
@@ -50,14 +60,16 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: '✨ feat(${{ steps.date.outputs.date }}): 오늘의 테크 뉴스 추가'
-          title: '✨ feat(${{ steps.date.outputs.date }}): 오늘의 테크 뉴스 추가'
+          commit-message: '✨ feat(${{ steps.date.outputs.date }}): 주간 웹소설 베스트셀러 추가'
+          title: '✨ feat(${{ steps.date.outputs.date }}): 주간 웹소설 베스트셀러 추가'
           body: |
             ## 📋 변경사항
             - 날짜: ${{ steps.date.outputs.date }}
-            - 파일: `contents/blog/${{ steps.date.outputs.date }}-tech-news/index.md`
-            - Hacker News Top 5 수집 및 Gemini 한국어 요약
-          branch: 'feature/${{ steps.date.outputs.date }}-tech-news'
+            - 파일: `apps/dansoon/contents/book/${{ steps.date.outputs.date }}-webnovel/index.md`
+            - 카카오페이지·네이버 시리즈·리디 웹소설 베스트셀러 수집 및 Gemini AI 분석
+          add-paths: |
+            apps/dansoon/contents/
+          branch: 'feature/${{ steps.date.outputs.date }}-webnovel'
           base: 'main'
 
       - name: Auto-merge Pull Request
