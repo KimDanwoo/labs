@@ -87,6 +87,17 @@ catalog:
   # image processing
   sharp: ^0.34.5
 
+  # astro (dansoon)
+  astro: ^6.1.9
+  '@astrojs/react': ^4.2.0
+  '@astrojs/rss': ^4.0.10
+  '@astrojs/sitemap': ^3.2.1
+  '@tailwindcss/typography': ^0.5.15
+  '@tailwindcss/vite': ^4.1.0
+
+  # ai sdk (dansoon)
+  '@google/generative-ai': ^0.24.1
+
 catalogs:
   fb11:
     firebase: ^11.9.1
