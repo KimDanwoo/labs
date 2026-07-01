@@ -1,0 +1,234 @@
+/* ── Markdown body — Typography ───────────────────────────── */
+
+.markdown-body {
+  --md-radius: 0.75rem;
+  --md-accent: oklch(0.55 0.15 250);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.dark .markdown-body {
+  --md-accent: oklch(0.7 0.15 250);
+}
+
+/* Headings */
+.markdown-body h2 {
+  @apply text-lg font-semibold tracking-tight text-foreground mt-8 mb-3;
+}
+
+.markdown-body h3 {
+  @apply text-base font-semibold tracking-tight text-foreground mt-6 mb-2;
+}
+
+.markdown-body h4 {
+  @apply text-sm font-semibold text-foreground mt-5 mb-2;
+}
+
+/* Paragraphs */
+.markdown-body p {
+  @apply text-muted-foreground leading-7 my-3;
+}
+
+/* Strong / Links */
+.markdown-body strong {
+  @apply text-foreground font-semibold;
+}
+
+.markdown-body a {
+  color: var(--md-accent);
+  @apply underline underline-offset-4 decoration-1;
+  text-decoration-color: oklch(0 0 0 / 0.2);
+  transition: text-decoration-color 0.15s;
+}
+
+.markdown-body a:hover {
+  text-decoration-color: var(--md-accent);
+}
+
+/* ── Markdown body — Code blocks ─────────────────────────── */
+
+.markdown-body .code-block-wrapper {
+  @apply relative my-5 rounded-xl overflow-hidden;
+  border: 1px solid oklch(0 0 0 / 8%);
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 4%),
+    inset 0 1px 0 oklch(1 0 0 / 60%);
+}
+
+.dark .markdown-body .code-block-wrapper {
+  border-color: oklch(1 0 0 / 8%);
+  box-shadow:
+    0 2px 8px oklch(0 0 0 / 25%),
+    inset 0 1px 0 oklch(1 0 0 / 4%);
+}
+
+.markdown-body pre {
+  @apply p-4 overflow-x-auto text-sm leading-relaxed m-0;
+  background: oklch(0.975 0 0) !important;
+}
+
+.dark .markdown-body pre {
+  background: oklch(0.16 0 0) !important;
+}
+
+.markdown-body pre code {
+  @apply p-0 bg-transparent border-none text-sm leading-relaxed font-mono;
+}
+
+/* Inline code */
+.markdown-body :not(pre) > code {
+  @apply rounded-md px-1.5 py-0.5 text-[0.8125rem] font-mono font-medium;
+  background: oklch(0.95 0.01 250 / 50%);
+  border: 1px solid oklch(0 0 0 / 6%);
+  color: oklch(0.4 0.08 250);
+}
+
+.dark .markdown-body :not(pre) > code {
+  background: oklch(0.25 0.02 250 / 50%);
+  border-color: oklch(1 0 0 / 8%);
+  color: oklch(0.8 0.08 250);
+}
+
+/* ── Markdown body — Lists ───────────────────────────────── */
+
+.markdown-body ul {
+  @apply list-none pl-5 my-3 space-y-1.5;
+}
+
+.markdown-body ol {
+  @apply list-none pl-5 my-3 space-y-1.5;
+  counter-reset: md-ol;
+}
+
+.markdown-body ul > li {
+  @apply relative text-muted-foreground leading-7;
+  padding-left: 0.5rem;
+}
+
+.markdown-body ul > li::before {
+  content: "";
+  @apply absolute rounded-full;
+  width: 5px;
+  height: 5px;
+  left: -0.75rem;
+  top: 0.75rem;
+  background: var(--md-accent);
+  opacity: 0.6;
+}
+
+.markdown-body ol > li {
+  @apply relative text-muted-foreground leading-7;
+  padding-left: 0.5rem;
+  counter-increment: md-ol;
+}
+
+.markdown-body ol > li::before {
+  content: counter(md-ol) ".";
+  @apply absolute text-xs font-semibold;
+  left: -1.25rem;
+  top: 0.35rem;
+  color: var(--md-accent);
+  opacity: 0.7;
+}
+
+/* Nested lists */
+.markdown-body li > ul,
+.markdown-body li > ol {
+  @apply mt-1.5;
+}
+
+/* ── Markdown body — Tables ──────────────────────────────── */
+
+.markdown-body .table-wrapper {
+  @apply overflow-x-auto my-5 rounded-xl;
+  border: 1px solid oklch(0 0 0 / 8%);
+}
+
+.dark .markdown-body .table-wrapper {
+  border-color: oklch(1 0 0 / 8%);
+}
+
+.markdown-body table {
+  @apply w-full border-collapse text-sm;
+}
+
+.markdown-body thead {
+  background: oklch(0.97 0 0);
+}
+
+.dark .markdown-body thead {
+  background: oklch(0.2 0 0);
+}
+
+.markdown-body th {
+  @apply px-4 py-2.5 font-semibold text-foreground text-left text-xs uppercase tracking-wider;
+  border-bottom: 2px solid oklch(0 0 0 / 8%);
+}
+
+.dark .markdown-body th {
+  border-bottom-color: oklch(1 0 0 / 10%);
+}
+
+.markdown-body td {
+  @apply px-4 py-2.5 text-muted-foreground;
+  border-bottom: 1px solid oklch(0 0 0 / 5%);
+}
+
+.dark .markdown-body td {
+  border-bottom-color: oklch(1 0 0 / 5%);
+}
+
+.markdown-body tbody tr:last-child td {
+  @apply border-b-0;
+}
+
+.markdown-body tbody tr:hover {
+  background: oklch(0 0 0 / 2%);
+}
+
+.dark .markdown-body tbody tr:hover {
+  background: oklch(1 0 0 / 3%);
+}
+
+/* ── Markdown body — Blockquotes ─────────────────────────── */
+
+.markdown-body blockquote {
+  @apply my-5 py-1 px-5 rounded-r-xl relative;
+  border-left: 3px solid var(--md-accent);
+  background: oklch(0 0 0 / 2%);
+}
+
+.dark .markdown-body blockquote {
+  background: oklch(1 0 0 / 3%);
+}
+
+.markdown-body blockquote p {
+  @apply text-muted-foreground/90 not-italic;
+}
+
+/* ── Markdown body — Misc ────────────────────────────────── */
+
+.markdown-body hr {
+  @apply my-8 border-none;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    oklch(0 0 0 / 10%) 20%,
+    oklch(0 0 0 / 10%) 80%,
+    transparent
+  );
+}
+
+.dark .markdown-body hr {
+  background: linear-gradient(
+    to right,
+    transparent,
+    oklch(1 0 0 / 10%) 20%,
+    oklch(1 0 0 / 10%) 80%,
+    transparent
+  );
+}
+
+.markdown-body img {
+  @apply rounded-xl shadow-sm border;
+}

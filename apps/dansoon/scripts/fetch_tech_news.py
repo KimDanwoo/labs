@@ -1,0 +1,147 @@
+import os
+import sys
+import json
+import pathlib
+import requests
+import google.generativeai as genai
+
+DATE = sys.argv[1] if len(sys.argv) > 1 else ""
+if not DATE:
+    raise ValueError("날짜 인자가 필요합니다 (예: 2025-04-28)")
+
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+if not GEMINI_API_KEY:
+    raise ValueError("GEMINI_API_KEY 환경변수가 설정되지 않았습니다.")
+
+
+DEV_KEYWORDS = [
+    "programming", "developer", "software", "engineering", "code", "coding",
+    "open source", "github", "api", "framework", "library", "database", "db",
+    "frontend", "backend", "fullstack", "web", "javascript", "typescript",
+    "python", "rust", "go", "java", "c++", "llm", "ai", "ml", "machine learning",
+    "deep learning", "neural", "gpu", "cpu", "compiler", "runtime", "kernel",
+    "linux", "docker", "kubernetes", "cloud", "devops", "ci/cd", "security",
+    "vulnerability", "cve", "exploit", "crypto", "algorithm", "data structure",
+    "performance", "benchmark", "latency", "scalability", "architecture",
+    "microservice", "serverless", "wasm", "webassembly", "cli", "terminal",
+    "ide", "editor", "vscode", "neovim", "git", "version control", "deploy",
+    "infra", "infrastructure", "networking", "protocol", "http", "tcp", "dns",
+    "browser", "v8", "webkit", "react", "vue", "svelte", "next", "astro",
+    "llama", "gpt", "claude", "gemini", "chatgpt", "openai", "anthropic",
+    "tooling", "debugging", "profiling", "testing", "oss", "release", "sdk",
+]
+
+
+def is_dev_related(title: str) -> bool:
+    """제목이 개발/기술 관련인지 확인합니다."""
+    title_lower = title.lower()
+    return any(kw in title_lower for kw in DEV_KEYWORDS)
+
+
+def fetch_hn_top_stories(limit: int = 5) -> list[dict]:
+    """Hacker News Top Stories에서 개발 관련 상위 기사를 가져옵니다."""
+    top_ids = requests.get(
+        "https://hacker-news.firebaseio.com/v0/topstories.json", timeout=10
+    ).json()[:200]
+
+    stories = []
+    for story_id in top_ids:
+        if len(stories) >= limit:
+            break
+        item = requests.get(
+            f"https://hacker-news.firebaseio.com/v0/item/{story_id}.json", timeout=10
+        ).json()
+        if (
+            item
+            and item.get("type") == "story"
+            and item.get("url")
+            and item.get("score", 0) >= 50
+            and is_dev_related(item.get("title", ""))
+        ):
+            stories.append(item)
+
+    return stories
+
+
+def summarize_with_gemini(stories: list[dict]) -> str:
+    """Gemini로 뉴스를 한국어로 요약합니다."""
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel("gemini-2.5-flash")
+
+    stories_info = "\n".join(
+        [
+            f"{i+1}. 제목: {s['title']}\n   URL: {s.get('url', '')}\n   점수: {s.get('score', 0)}"
+            for i, s in enumerate(stories)
+        ]
+    )
+
+    response = model.generate_content(
+        f"""아래 Hacker News 상위 뉴스 {len(stories)}개를 개발자 블로그용으로 한국어로 정리해줘.
+
+{stories_info}
+
+각 뉴스마다 아래 형식으로 작성해줘. 대괄호 안의 내용은 실제 내용으로 채워야 하는 플레이스홀더야:
+
+<div class="news-header">
+<h3>[뉴스 제목 한국어 번역]</h3>
+<a href="[원문 URL 그대로]" class="source-link" target="_blank" rel="noopener noreferrer">원문보기 →</a>
+</div>
+
+> 💡 [개발자 관점에서 이 뉴스에 대한 실제 한 줄 코멘트 작성]
+
+[뉴스 핵심 내용을 3~5문장으로 요약]
+
+---
+
+규칙:
+- href 안에는 반드시 실제 URL을 넣어야 해
+- h3 태그 안에는 제목만, URL은 절대 넣지 마
+- > 💡 뒤에는 반드시 실제 코멘트 내용을 써야 해 (플레이스홀더 텍스트를 그대로 출력하면 안 돼)
+
+마지막에 이 줄 추가:
+*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+"""
+    )
+
+    return response.text
+
+
+def main():
+    print(f"[{DATE}] Hacker News 뉴스 수집 중...")
+    stories = fetch_hn_top_stories(limit=5)
+    print(f"  → {len(stories)}개 수집 완료")
+
+    print("Gemini로 요약 생성 중...")
+    summary = summarize_with_gemini(stories)
+
+    # 날짜 한국어 포맷
+    from datetime import datetime
+    dt = datetime.strptime(DATE, "%Y-%m-%d")
+    date_kr = dt.strftime("%-Y년 %-m월 %-d일")
+
+    slug = f"{DATE}-tech-news"
+    output_dir = pathlib.Path("contents/tech") / slug
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    frontmatter = f"""---
+title: "오늘의 테크 뉴스 TOP 5 ({date_kr})"
+date: {DATE}
+description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
+category: "news"
+isHidden: false
+---
+
+## 오늘의 테크 뉴스 TOP 5
+
+---
+
+"""
+
+    output_path = output_dir / "index.md"
+    output_path.write_text(frontmatter + summary, encoding="utf-8")
+
+    print(f"✅ 생성 완료: {output_path}")
+
+
+if __name__ == "__main__":
+    main()

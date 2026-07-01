@@ -89,11 +89,12 @@ apps/<app>/
 
 ## 상태 관리 (도입 시)
 
-현재 hub는 정적이라 전역 상태가 없다. **상태가 필요해지면**: 비동기=React Query · 로컬=useState/useReducer · 전역=꼭 필요할 때만 Jotai. 전역 atom은 `entities/<domain>/model/store/`에 두고 컴포넌트가 직접 구독한다. dispatch/setState 콜백을 prop으로 내려보내지 않는다(prop drilling 금지).
+**상태가 필요해지면**: 비동기=React Query · 로컬=useState/useReducer · 전역=꼭 필요할 때만 Jotai. 전역 atom은 `entities/<domain>/model/store/`에 두고 컴포넌트가 직접 구독한다. dispatch/setState 콜백을 prop으로 내려보내지 않는다(prop drilling 금지).
 
 ## 코드 컨벤션
 
 - Lint/포맷은 **공유 설정 패키지**로 통일한다. 앱 `eslint.config.mjs`는 `@repo/eslint-config`의 `next.eslint.config.mjs` + `fsd.config.mjs`를 spread하고, 루트 `package.json`의 `"prettier": "@repo/prettier-config"`로 포맷을 맞춘다. Prettier: singleQuote, trailingComma: all, **printWidth 120**, `prettier-plugin-organize-imports`(import 정렬 자동). 앱별로 규칙을 따로 두지 않는다.
+  - **예외 — `dansoon`(Astro 앱)**: next 기반 공유 eslint·FSD는 프레임워크가 달라 적용하지 않는다. lint는 `astro check`에 맡기고, **포맷만 공유 규칙을 따른다** — 로컬 `prettier.config.cjs`가 `@repo/prettier-config`를 확장하고 `.astro` 파싱용 `prettier-plugin-astro`만 추가한다. Astro 앱이 dansoon 하나뿐이라 공유 eslint 프리셋은 만들지 않는다(YAGNI).
 - 함수 컴포넌트만(`React.FC` 지양). `type` 우선(확장 필요 시만 `interface`).
 - **Enum-like 매직 스트링 금지**: status/variant/step 같은 literal union은 `as const` 객체로 빼고 타입을 거기서 파생. 사용처는 상수 참조만(비교·세팅 둘 다 매직 리터럴 금지).
   ```ts

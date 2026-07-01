@@ -1,0 +1,309 @@
+/* ══════════════════════════════════════════════════════════
+   Design System — 프딥
+   Style Dictionary 연동 시 Primitives 섹션만 교체합니다.
+   ══════════════════════════════════════════════════════════ */
+
+
+/* ── 1. Primitives ──────────────────────────────────────── */
+
+:root {
+  /* Gray scale */
+  --gray-25:  oklch(0.995 0.001 264);
+  --gray-50:  oklch(0.985 0.002 264);
+  --gray-75:  oklch(0.975 0.004 264);
+  --gray-100: oklch(0.96 0.004 264);
+  --gray-200: oklch(0.92 0.006 264);
+  --gray-300: oklch(0.87 0.008 264);
+  --gray-400: oklch(0.70 0.010 264);
+  --gray-500: oklch(0.55 0.012 264);
+  --gray-600: oklch(0.40 0.012 264);
+  --gray-700: oklch(0.30 0.015 264);
+  --gray-800: oklch(0.20 0.018 264);
+  --gray-850: oklch(0.145 0.018 264);
+  --gray-900: oklch(0.12 0.015 264);
+  --gray-950: oklch(0.115 0.015 264);
+
+  /* Indigo */
+  --indigo-50:  oklch(0.95 0.015 264);
+  --indigo-300: oklch(0.72 0.08 264);
+  --indigo-400: oklch(0.60 0.12 264);
+  --indigo-500: oklch(0.50 0.12 264);
+  --indigo-600: oklch(0.37 0.10 264);
+
+  /* Red */
+  --red-400: oklch(0.704 0.191 22);
+  --red-500: oklch(0.577 0.245 27);
+
+  /* Yellow */
+  --yellow-400: oklch(0.828 0.189 84);
+  --yellow-500: oklch(0.769 0.188 70);
+
+  /* Chart accent colors (unique hues) */
+  --teal-500:   oklch(0.6 0.118 185);
+  --blue-600:   oklch(0.398 0.07 227);
+  --teal-400:   oklch(0.696 0.17 162);
+  --purple-500: oklch(0.627 0.265 304);
+  --orange-500: oklch(0.645 0.246 16);
+
+  /* Alpha */
+  --white-10: oklch(1 0.008 264 / 10%);
+  --white-14: oklch(1 0.008 264 / 14%);
+
+  /* Base */
+  --white: oklch(1 0 0);
+  --black: oklch(0 0 0);
+}
+
+
+/* ── 2. Semantic Tokens ─────────────────────────────────── */
+
+:root {
+  --radius: 0.625rem;
+
+  /* Surface */
+  --background:          var(--gray-50);
+  --foreground:          var(--gray-900);
+  --card:                var(--gray-25);
+  --card-foreground:     var(--gray-900);
+  --popover:             var(--gray-25);
+  --popover-foreground:  var(--gray-900);
+
+  /* Brand */
+  --primary:             var(--indigo-600);
+  --primary-foreground:  var(--white);
+  --secondary:           var(--gray-100);
+  --secondary-foreground:var(--gray-700);
+  --muted:               var(--gray-100);
+  --muted-foreground:    var(--gray-600);
+  --accent:              var(--indigo-50);
+  --accent-foreground:   var(--gray-700);
+
+  /* Semantic */
+  --destructive:         var(--red-500);
+  --border:              var(--gray-200);
+  --input:               var(--gray-200);
+  --ring:                var(--indigo-500);
+
+  /* Charts */
+  --chart-1: var(--indigo-500);
+  --chart-2: var(--teal-500);
+  --chart-3: var(--blue-600);
+  --chart-4: var(--yellow-400);
+  --chart-5: var(--yellow-500);
+
+  /* Sidebar */
+  --sidebar:                    var(--gray-75);
+  --sidebar-foreground:         var(--gray-900);
+  --sidebar-primary:            var(--indigo-600);
+  --sidebar-primary-foreground: var(--white);
+  --sidebar-accent:             var(--indigo-50);
+  --sidebar-accent-foreground:  var(--gray-700);
+  --sidebar-border:             var(--gray-200);
+  --sidebar-ring:               var(--indigo-500);
+}
+
+/* Dark mode: semantic 재매핑 */
+.dark {
+  /* Surface */
+  --background:          var(--gray-950);
+  --foreground:          var(--gray-200);
+  --card:                var(--gray-850);
+  --card-foreground:     var(--gray-200);
+  --popover:             var(--gray-850);
+  --popover-foreground:  var(--gray-200);
+
+  /* Brand */
+  --primary:             var(--indigo-300);
+  --primary-foreground:  var(--gray-950);
+  --secondary:           var(--gray-800);
+  --secondary-foreground:var(--gray-200);
+  --muted:               var(--gray-800);
+  --muted-foreground:    var(--gray-500);
+  --accent:              var(--gray-800);
+  --accent-foreground:   var(--gray-200);
+
+  /* Semantic */
+  --destructive:         var(--red-400);
+  --border:              var(--white-10);
+  --input:               var(--white-14);
+  --ring:                var(--indigo-400);
+
+  /* Charts */
+  --chart-1: var(--indigo-400);
+  --chart-2: var(--teal-400);
+  --chart-3: var(--yellow-500);
+  --chart-4: var(--purple-500);
+  --chart-5: var(--orange-500);
+
+  /* Sidebar */
+  --sidebar:                    var(--gray-900);
+  --sidebar-foreground:         var(--gray-200);
+  --sidebar-primary:            var(--indigo-400);
+  --sidebar-primary-foreground: var(--white);
+  --sidebar-accent:             var(--gray-800);
+  --sidebar-accent-foreground:  var(--gray-200);
+  --sidebar-border:             var(--white-10);
+  --sidebar-ring:               var(--indigo-400);
+}
+
+
+/* ── 3. Theme (Tailwind @theme) ─────────────────────────── */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --radius-sm: max(0px, calc(var(--radius) - 4px));
+  --radius-md: max(0px, calc(var(--radius) - 2px));
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --animate-fade-in: fade-in 0.5s ease-out both;
+  --animate-fade-in-up: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ── 4. Typography ──────────────────────────────────────── */
+/* tbd = bold (700), tmd = medium (500), trg = regular (400) */
+
+@utility tbd-40 { font-size: 40px; line-height: 52px; font-weight: 700; letter-spacing: -0.3px; }
+@utility tbd-24 { font-size: 24px; line-height: 36px; font-weight: 700; letter-spacing: -0.3px; }
+@utility tbd-20 { font-size: 20px; line-height: 30px; font-weight: 700; letter-spacing: -0.3px; }
+@utility tbd-18 { font-size: 18px; line-height: 26px; font-weight: 700; letter-spacing: -0.3px; }
+@utility tbd-16 { font-size: 16px; line-height: 24px; font-weight: 700; letter-spacing: -0.3px; }
+
+@utility tmd-24 { font-size: 24px; line-height: 36px; font-weight: 500; letter-spacing: -0.3px; }
+@utility tmd-22 { font-size: 22px; line-height: 32px; font-weight: 500; letter-spacing: -0.3px; }
+@utility tmd-20 { font-size: 20px; line-height: 30px; font-weight: 500; letter-spacing: -0.3px; }
+@utility tmd-18 { font-size: 18px; line-height: 26px; font-weight: 500; letter-spacing: -0.3px; }
+@utility tmd-16 { font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: -0.3px; }
+@utility tmd-16-reading { font-size: 16px; line-height: 26px; font-weight: 500; letter-spacing: -0.3px; }
+@utility tmd-14 { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: -0.3px; }
+@utility tmd-14-reading { font-size: 14px; line-height: 22px; font-weight: 500; letter-spacing: -0.3px; }
+@utility tmd-12 { font-size: 12px; line-height: 18px; font-weight: 500; letter-spacing: -0.3px; }
+@utility tmd-10 { font-size: 10px; line-height: 15px; font-weight: 500; letter-spacing: -0.3px; }
+
+@utility trg-18 { font-size: 18px; line-height: 26px; font-weight: 400; letter-spacing: -0.3px; }
+@utility trg-16 { font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: -0.3px; }
+@utility trg-16-reading { font-size: 16px; line-height: 26px; font-weight: 400; letter-spacing: -0.3px; }
+@utility trg-14 { font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: -0.3px; }
+@utility trg-14-reading { font-size: 14px; line-height: 22px; font-weight: 400; letter-spacing: -0.3px; }
+@utility trg-12 { font-size: 12px; line-height: 18px; font-weight: 400; letter-spacing: -0.3px; }
+@utility trg-10 { font-size: 10px; line-height: 15px; font-weight: 400; letter-spacing: -0.3px; }
+
+@utility text-clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+
+/* ── 5. Utilities ───────────────────────────────────────── */
+
+@utility card-hover {
+  border-color: var(--border);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px oklch(0.37 0.1 264 / 6%), 0 12px 40px oklch(0.37 0.1 264 / 8%);
+    border-color: oklch(0.37 0.1 264 / 15%);
+  }
+  &:is(.dark *):hover {
+    box-shadow: 0 4px 12px oklch(0 0 0 / 30%), 0 12px 40px oklch(0.72 0.12 264 / 8%);
+    border-color: oklch(0.72 0.12 264 / 15%);
+  }
+}
+
+@utility inner-glow {
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 60%), 0 1px 3px oklch(0.37 0.1 264 / 5%);
+  &:is(.dark *) { box-shadow: inset 0 1px 0 oklch(1 0 0 / 5%), 0 1px 3px oklch(0 0 0 / 30%); }
+}
+
+@utility hero-gradient {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 40%, oklch(0.82 0.1 264 / 18%) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 30%, oklch(0.82 0.08 290 / 12%) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 50% 80%, oklch(0.88 0.05 200 / 8%) 0%, transparent 70%);
+  &:is(.dark *) {
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 40%, oklch(0.30 0.12 264 / 25%) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 60% at 80% 30%, oklch(0.28 0.10 290 / 18%) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 50% 80%, oklch(0.22 0.06 200 / 12%) 0%, transparent 70%);
+  }
+}
+
+@utility noise-overlay {
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+  }
+  &:is(.dark *)::before { opacity: 0.04; }
+}
+
+@utility safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@utility stagger-children {
+  & > * { animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  & > *:nth-child(1) { animation-delay: 0ms; }
+  & > *:nth-child(2) { animation-delay: 60ms; }
+  & > *:nth-child(3) { animation-delay: 120ms; }
+  & > *:nth-child(4) { animation-delay: 180ms; }
+  & > *:nth-child(5) { animation-delay: 240ms; }
+  & > *:nth-child(6) { animation-delay: 300ms; }
+  & > *:nth-child(7) { animation-delay: 360ms; }
+  & > *:nth-child(8) { animation-delay: 420ms; }
+  & > *:nth-child(9) { animation-delay: 480ms; }
+  & > *:nth-child(10) { animation-delay: 540ms; }
+  & > *:nth-child(11) { animation-delay: 600ms; }
+  & > *:nth-child(12) { animation-delay: 660ms; }
+}
