@@ -1,4 +1,4 @@
-name: Weekly Bestseller
+name: Dansoon Weekly Bestseller
 
 on:
   schedule:
@@ -44,12 +44,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('**/weekly-bestseller.yml') }}
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('**/dansoon-weekly-bestseller.yml') }}
 
       - name: Install Playwright browsers
         run: playwright install chromium --with-deps
 
       - name: Fetch bestseller data
+        working-directory: apps/dansoon
         run: python scripts/fetch_bestseller.py ${{ steps.date.outputs.date }}
         env:
           ALADIN_TTB_KEY: ${{ secrets.ALADIN_TTB_KEY }}
@@ -65,8 +66,10 @@ jobs:
           body: |
             ## 📋 변경사항
             - 날짜: ${{ steps.date.outputs.date }}
-            - 파일: `contents/blog/${{ steps.date.outputs.date }}-bestseller/index.md`
+            - 파일: `apps/dansoon/contents/book/${{ steps.date.outputs.date }}-bestseller/index.md`
             - 알라딘, 리디 베스트셀러 수집 및 Gemini AI 분석
+          add-paths: |
+            apps/dansoon/contents/
           branch: 'feature/${{ steps.date.outputs.date }}-bestseller'
           base: 'main'
 
