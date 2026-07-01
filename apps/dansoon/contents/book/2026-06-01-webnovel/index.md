@@ -1,27 +1,27 @@
 ---
-title: "웹소설 베스트셀러 (2026년 6월 1째주)"
+title: '웹소설 베스트셀러 (2026년 6월 1째주)'
 date: 2026-06-01
-description: "카카오페이지·네이버 시리즈·리디 웹소설 장르별 베스트셀러입니다."
-category: "webnovel"
+description: '카카오페이지·네이버 시리즈·리디 웹소설 장르별 베스트셀러입니다.'
+category: 'webnovel'
 isHidden: true
 ---
 
 ## 📊 이번 주 웹소설 트렌드
+
 이번 주 웹소설 트렌드는 '환생/빙의/회귀' 클리셰를 기반으로 한 생존 및 성장 서사가 강세를 보입니다. 주요 플랫폼별로 강세를 보이는 작품은 상이하지만, 일부 작품은 여러 플랫폼에서 높은 인기를 누리며 폭넓은 독자층을 확보하고 있습니다. 특히, 약자가 강해지거나 특별한 능력을 얻어 상황을 극복하는 스토리, 혹은 귀여운 존재로 변모하여 주변의 사랑을 받는 스토리가 전반적인 인기를 견인하고 있습니다.
 
 ## 🗂️ 장르별 트렌드
 
--   **⚔️ 판타지** — 빙의, 회귀, 시스템 등의 클리셰를 활용한 '망나니' 혹은 '성좌'류의 강렬한 성장 서사가 주를 이룹니다.
--   **🏰 로맨스판타지** — 시한부 상속녀, 비밀 연애 등 죽음과 로맨스를 넘나드는 설정을 통해 여주인공의 주체적인 서사가 돋보입니다.
--   **💕 로맨스** — 판타지적 요소를 가미한 '아기' 캐릭터의 귀여움과 그를 둘러싼 따뜻한 관계가 독자들의 마음을 사로잡고 있습니다.
--   **🌆 현대판타지** — 아이돌, 직장인, 기업 등 친숙한 현실 배경에 판타지적 요소를 결합하여 몰입감을 높이고 있습니다.
--   **🥋 무협** — 강력한 팬덤을 자랑하는 '화산귀환'을 필두로, 빙의와 같은 현대적 재해석이 가미된 무협이 인기를 얻고 있습니다.
--   **💙 BL** — 주인공 빙의, 회귀 클리셰와 더불어 황제, 악역 등 다채로운 캐릭터 설정으로 폭넓은 스펙트럼을 보여줍니다.
+- **⚔️ 판타지** — 빙의, 회귀, 시스템 등의 클리셰를 활용한 '망나니' 혹은 '성좌'류의 강렬한 성장 서사가 주를 이룹니다.
+- **🏰 로맨스판타지** — 시한부 상속녀, 비밀 연애 등 죽음과 로맨스를 넘나드는 설정을 통해 여주인공의 주체적인 서사가 돋보입니다.
+- **💕 로맨스** — 판타지적 요소를 가미한 '아기' 캐릭터의 귀여움과 그를 둘러싼 따뜻한 관계가 독자들의 마음을 사로잡고 있습니다.
+- **🌆 현대판타지** — 아이돌, 직장인, 기업 등 친숙한 현실 배경에 판타지적 요소를 결합하여 몰입감을 높이고 있습니다.
+- **🥋 무협** — 강력한 팬덤을 자랑하는 '화산귀환'을 필두로, 빙의와 같은 현대적 재해석이 가미된 무협이 인기를 얻고 있습니다.
+- **💙 BL** — 주인공 빙의, 회귀 클리셰와 더불어 황제, 악역 등 다채로운 캐릭터 설정으로 폭넓은 스펙트럼을 보여줍니다.
 
 독자들은 예측 불가능한 상황 속에서 주인공의 성장을 지켜보거나, 매력적인 캐릭터들의 관계를 통해 대리 만족과 함께 따뜻한 위로를 얻는 것에 집중하고 있습니다.
 
 ---
-
 
 ## ⚔️ 판타지
 
@@ -47,12 +47,10 @@ isHidden: true
 
 <div class="ptab-wrap"><div class="ptab-nav"><button class="ptab-btn is-active" data-target="t-bl-카카오페이지">카카오</button><button class="ptab-btn" data-target="t-bl-네이버시리즈">네이버</button><button class="ptab-btn" data-target="t-bl-리디">리디</button></div><div id="t-bl-카카오페이지" class="ptab-panel"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://page.kakao.com/content/65296611">주인공의 악역 형이 되었습니다</a></td><td>카로디</td></tr><tr><td><strong>2</strong></td><td><a href="https://page.kakao.com/content/68084267">폭군 황제의 목줄을 쥐는 법</a></td><td>카로디</td></tr><tr><td><strong>3</strong></td><td><a href="https://page.kakao.com/content/69262703">에스퍼와 매칭률이 폭주 중입니다</a></td><td>카로디</td></tr><tr><td><strong>4</strong></td><td><a href="https://page.kakao.com/content/69262714">에스퍼와 매칭률이 폭주 중입니다 [19세 완전판]</a></td><td>카로디</td></tr><tr><td><strong>5</strong></td><td><a href="https://page.kakao.com/content/68697150">SOS! 악역을 강제당하는 중입니다</a></td><td>과실o</td></tr><tr><td><strong>6</strong></td><td><a href="https://page.kakao.com/content/64904038">집착광공이 아방수에 미치는 이유</a></td><td>한아뿐</td></tr><tr><td><strong>7</strong></td><td><a href="https://page.kakao.com/content/68033996">짝사랑 탈곡기</a></td><td>원해온</td></tr><tr><td><strong>8</strong></td><td><a href="https://page.kakao.com/content/68486811">광공이 나를 오작교로 쓰려고 한다 [19세 완전판]</a></td><td>한아뿐</td></tr><tr><td><strong>9</strong></td><td><a href="https://page.kakao.com/content/69133111">듀얼 20만뷰 돌파!</a></td><td>웹소설BL</td></tr><tr><td><strong>10</strong></td><td><a href="https://page.kakao.com/content/69263710">올 타임 하이</a></td><td>웹소설BL</td></tr></tbody></table></div><div id="t-bl-네이버시리즈" class="ptab-panel" style="display:none"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://series.naver.com/novel/detail.series?productNo=11436482">달이 그린 새벽 [BL]</a></td><td>감서윤</td></tr><tr><td><strong>2</strong></td><td><a href="https://series.naver.com/novel/detail.series?productNo=14183380">러브 오어 낫 [BL][단행본]</a></td><td>흰새</td></tr><tr><td><strong>3</strong></td><td><a href="https://series.naver.com/novel/detail.series?productNo=10040149">당신 아이 아닙니까 [BL]</a></td><td>모리미</td></tr></tbody></table></div><div id="t-bl-리디" class="ptab-panel" style="display:none"><table class="ptab-table"><thead><tr><th>순위</th><th>작품</th><th>작가</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><a href="https://ridibooks.com/books/4163000362?_rdt_sid=category_bestsellers&_rdt_idx=0&_rdt_arg=4150">총총</a></td><td>톨쥬</td></tr><tr><td><strong>2</strong></td><td><a href="https://ridibooks.com/books/4869004885?_rdt_sid=category_bestsellers&_rdt_idx=1&_rdt_arg=4150">천운</a></td><td>채팔이</td></tr><tr><td><strong>3</strong></td><td><a href="https://ridibooks.com/books/3049004830?_rdt_sid=category_bestsellers&_rdt_idx=2&_rdt_arg=4150">터닝(Turning)</a></td><td>쿠유</td></tr><tr><td><strong>4</strong></td><td><a href="https://ridibooks.com/books/5978000001?_rdt_sid=category_bestsellers&_rdt_idx=3&_rdt_arg=4150">애시드</a></td><td>제노리노</td></tr><tr><td><strong>5</strong></td><td><a href="https://ridibooks.com/books/2847008233?_rdt_sid=category_bestsellers&_rdt_idx=4&_rdt_arg=4150">어쩌다 메리지</a></td><td>클레어</td></tr><tr><td><strong>6</strong></td><td><a href="https://ridibooks.com/books/2259037883?_rdt_sid=category_bestsellers&_rdt_idx=5&_rdt_arg=4150">공의 형이 된다는 건</a></td><td>8각시계</td></tr><tr><td><strong>7</strong></td><td><a href="https://ridibooks.com/books/3302053018?_rdt_sid=category_bestsellers&_rdt_idx=6&_rdt_arg=4150">유괴는 상냥하게</a></td><td>Dips</td></tr><tr><td><strong>8</strong></td><td><a href="https://ridibooks.com/books/4346000837?_rdt_sid=category_bestsellers&_rdt_idx=7&_rdt_arg=4150">사이프러스 모자이크</a></td><td>김다윗</td></tr><tr><td><strong>9</strong></td><td><a href="https://ridibooks.com/books/2404037236?_rdt_sid=category_bestsellers&_rdt_idx=8&_rdt_arg=4150">디플라워 미 이프 유 캔(Deflower Me If You Can)</a></td><td>ZIG</td></tr><tr><td><strong>10</strong></td><td><a href="https://ridibooks.com/books/2847008349?_rdt_sid=category_bestsellers&_rdt_idx=9&_rdt_arg=4150">베이비 스캔들</a></td><td>소금케이크</td></tr><tr><td><strong>11</strong></td><td><a href="https://ridibooks.com/books/297089732?_rdt_sid=category_bestsellers&_rdt_idx=10&_rdt_arg=4150">미스 미?(Miss Me!)</a></td><td>파토스</td></tr><tr><td><strong>12</strong></td><td>조연을 위한 회귀 지침서</td><td>차선</td></tr><tr><td><strong>13</strong></td><td>풀칠 ; 내 가이드 입에 풀칠하기</td><td>원샷</td></tr><tr><td><strong>14</strong></td><td>헌터물 흑막에 빙의했는데 적성에 너무 잘 맞음</td><td>김크림</td></tr><tr><td><strong>15</strong></td><td>웬 댓 데이 컴즈</td><td>빈트후크</td></tr></tbody></table></div></div>
 
-
 ---
 
-*데이터 출처: [카카오페이지](https://page.kakao.com) · [네이버 시리즈](https://series.naver.com) · [리디](https://ridibooks.com)*
-*매주 자동으로 수집되는 웹소설 베스트셀러 리포트입니다.*
-
+_데이터 출처: [카카오페이지](https://page.kakao.com) · [네이버 시리즈](https://series.naver.com) · [리디](https://ridibooks.com)_
+_매주 자동으로 수집되는 웹소설 베스트셀러 리포트입니다._
 
 <script>
 (function(){
@@ -85,4 +83,3 @@ isHidden: true
 .ptab-empty{color:var(--text-muted);font-size:0.9rem;padding:8px 0;}
 @media(max-width:640px){.ptab-table th,.ptab-table td{padding:4px 6px;font-size:0.78rem;}}
 </style>
-

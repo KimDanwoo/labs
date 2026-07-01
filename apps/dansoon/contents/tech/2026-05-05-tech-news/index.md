@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 5월 5일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 5월 5일)'
 date: 2026-05-05
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -65,4 +65,4 @@ Stripe 팀이 2,500만 줄에 달하는 방대한 Ruby 코드베이스에 `rubyf
 
 ---
 
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._

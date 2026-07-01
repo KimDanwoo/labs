@@ -1,5 +1,4 @@
-import React from 'react'
-import type PostListProps from './PostList.types'
+import type PostListProps from './PostList.types';
 
 const PostList = ({ posts }: PostListProps) => {
   return (
@@ -12,11 +11,7 @@ const PostList = ({ posts }: PostListProps) => {
             style={{ animationDelay: `${Math.min(index * 0.06, 0.36)}s` }}
           >
             <a href={post.url} itemProp="url" className="post-card-link">
-              <article
-                className="post-card-inner"
-                itemScope
-                itemType="http://schema.org/Article"
-              >
+              <article className="post-card-inner" itemScope itemType="http://schema.org/Article">
                 {post.thumbnail && (
                   <div className="post-card-thumb">
                     <div className="post-card-thumb-ratio" />
@@ -27,9 +22,7 @@ const PostList = ({ posts }: PostListProps) => {
                 )}
 
                 <div className="post-card-meta">
-                  {post.category && (
-                    <span className="post-card-category">{post.category}</span>
-                  )}
+                  {post.category && <span className="post-card-category">{post.category}</span>}
                   {post.category && <span className="post-card-dot">·</span>}
                   <time className="post-card-date" dateTime={post.publishedAt}>
                     {post.publishedAt}
@@ -48,12 +41,10 @@ const PostList = ({ posts }: PostListProps) => {
           </li>
         ))
       ) : (
-        <li className="py-20 text-center text-sm text-grey-1">
-          글이 없어요 😔
-        </li>
+        <li className="py-20 text-center text-sm text-grey-1">글이 없어요 😔</li>
       )}
     </ul>
-  )
-}
+  );
+};
 
-export default PostList
+export default PostList;

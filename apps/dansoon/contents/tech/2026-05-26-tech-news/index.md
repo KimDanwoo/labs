@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 5월 26일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 5월 26일)'
 date: 2026-05-26
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -64,4 +64,5 @@ isHidden: false
 Apple macOS 26.5 커널에서 새로운 취약점(CVE-2026-28952)이 발견되었으며, 특히 이 취약점은 인공지능 모델인 Claude에 의해 식별되었다는 점이 주목할 만합니다. 이는 AI가 소프트웨어 개발 프로세스에서 디버깅 및 보안 분석과 같은 고급 작업에도 활용될 수 있음을 시사합니다. Apple은 이 취약점에 대한 패치를 신속하게 제공하여 사용자들의 보안을 강화하고 있습니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._

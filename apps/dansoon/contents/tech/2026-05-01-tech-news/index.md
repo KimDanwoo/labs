@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 5월 1일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 5월 1일)'
 date: 2026-05-01
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -66,4 +66,5 @@ isHidden: false
 이 기사는 고급 메시징 및 스케줄링 기능을 SQLite 파일 내부에 직접 통합하여 강력한 백엔드 시스템을 구축하는 새로운 접근 방식을 소개합니다. 이 방식은 영구 큐, 데이터 스트림, 발행/구독(Pub/Sub) 패턴, 심지어 크론 스케줄러까지 모두 SQLite의 단순성과 신뢰성을 바탕으로 구현하는 방법을 제안합니다. 이 솔루션은 개발자들이 의존성을 최소화하고 아키텍처를 단순화하려는 경우 매력적인 대안을 제공하며, 별도의 메시지 브로커 없이 메시지 지속성과 이벤트 처리를 위해 SQLite의 트랜잭션 보장을 활용합니다. 이는 SQLite가 이전에 상상했던 것보다 훨씬 강력한 임베디드 데이터베이스가 될 잠재력을 강조합니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._

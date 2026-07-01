@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 6월 2일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 6월 2일)'
 date: 2026-06-02
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -64,4 +64,5 @@ OpenAI는 자사의 최첨단 AI 모델인 프론티어 모델과 코드 생성 
 개인 정보 보호 및 보안에 중점을 둔 모바일 운영체제인 GrapheneOS가 음성 서비스 버전 2를 출시했습니다. 이 업데이트는 강력한 개인 정보 보호 기능을 염두에 두고 설계된 온디바이스 음성-텍스트 및 텍스트-음성 기능에 대한 개선 사항을 제공할 것으로 예상됩니다. GrapheneOS의 핵심 부분으로서, 이 서비스들은 외부의 잠재적으로 개인 정보 침해 우려가 있는 타사 서비스에 의존하지 않고 사용자에게 강력한 음성 기능을 제공하여, OS의 핵심 목표인 향상된 사용자 제어 및 데이터 보안에 기여합니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._

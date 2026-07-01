@@ -1,8 +1,8 @@
 ---
-title: "오늘의 테크 뉴스 TOP 5 (2026년 5월 21일)"
+title: '오늘의 테크 뉴스 TOP 5 (2026년 5월 21일)'
 date: 2026-05-21
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
-category: "news"
+description: '오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다.'
+category: 'news'
 isHidden: false
 ---
 
@@ -66,4 +66,5 @@ GitHub가 악성 VSCode 확장 프로그램을 통해 약 3,800개의 비공개 
 Mozilla의 SpiderMonkey 팀이 asm.js 지원을 중단한다고 공식 발표했습니다. asm.js는 웹에서 고성능 애플리케이션을 실행하기 위한 중요한 기술이었지만, WebAssembly(Wasm)의 등장으로 인해 그 역할이 점차 대체되었습니다. 이는 웹 기술 발전의 자연스러운 과정으로, 새로운 표준이 이전 기술을 대체하며 웹의 성능과 가능성을 확장하는 모습을 보여줍니다. 개발자들에게 WebAssembly의 중요성을 다시 한번 상기시키는 소식입니다.
 
 ---
-*이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다.*
+
+_이 포스트는 Hacker News Top Stories를 기반으로 Gemini AI가 자동으로 수집·정리한 뉴스입니다._
