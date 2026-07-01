@@ -1,0 +1,84 @@
+name: Dansoon Weekly Bestseller
+
+on:
+  schedule:
+    - cron: '0 1 * * 1' # 매주 월요일 오전 10시 KST (UTC 01:00)
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Set timezone to KST
+        run: |
+          sudo timedatectl set-timezone Asia/Seoul
+          echo "Current time: $(date)"
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install requests google-genai playwright
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('**/dansoon-weekly-bestseller.yml') }}
+
+      - name: Install Playwright browsers
+        run: playwright install chromium --with-deps
+
+      - name: Fetch bestseller data
+        working-directory: apps/dansoon
+        run: python scripts/fetch_bestseller.py ${{ steps.date.outputs.date }}
+        env:
+          ALADIN_TTB_KEY: ${{ secrets.ALADIN_TTB_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: '✨ feat(${{ steps.date.outputs.date }}): 주간 베스트셀러 추가'
+          title: '✨ feat(${{ steps.date.outputs.date }}): 주간 베스트셀러 추가'
+          body: |
+            ## 📋 변경사항
+            - 날짜: ${{ steps.date.outputs.date }}
+            - 파일: `apps/dansoon/contents/book/${{ steps.date.outputs.date }}-bestseller/index.md`
+            - 알라딘, 리디 베스트셀러 수집 및 Gemini AI 분석
+          add-paths: |
+            apps/dansoon/contents/
+          branch: 'feature/${{ steps.date.outputs.date }}-bestseller'
+          base: 'main'
+
+      - name: Auto-merge Pull Request
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        run: |
+          for i in 1 2 3 4 5; do
+            gh pr merge "${{ steps.cpr.outputs.pull-request-number }}" \
+              --squash --auto --delete-branch && break || sleep 10
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
