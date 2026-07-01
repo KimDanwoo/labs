@@ -74,6 +74,12 @@ type JoinRoomOptions = {
   onPresenceSync: (users: ChatPresenceUser[]) => void;
 };
 
+type PresencePayload = {
+  userId?: string;
+  nickname?: string;
+  characterId?: string | null;
+};
+
 /**
  * 방에 입장한다. 하나의 채널로 (1) 신규 메시지 수신 (2) 접속자 presence 추적을
  * 함께 처리한다. 로그인 유저(identity 있음)는 본인을 presence에 등록한다.
@@ -110,14 +116,15 @@ export function joinRoom({
       },
     )
     .on('presence', { event: 'sync' }, () => {
-      const state = channel.presenceState<ChatPresenceUser>();
+      const state = channel.presenceState<PresencePayload>();
       const unique = new Map<string, ChatPresenceUser>();
       Object.values(state).forEach((entries) => {
         entries.forEach((entry) => {
           if (entry.userId) {
             unique.set(entry.userId, {
               userId: entry.userId,
-              nickname: entry.nickname,
+              nickname: entry.nickname ?? '',
+              characterId: entry.characterId ?? null,
             });
           }
         });

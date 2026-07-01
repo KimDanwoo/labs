@@ -1,79 +1,94 @@
 'use client';
 
 import { useState } from 'react';
+import { useSetAtom } from 'jotai';
 import { ModalShell } from '@shared/ui';
 import { useGameActions } from '@entities/game/model/hooks';
+import { activeRoomAtom } from '@entities/chat-room/model/store';
 import {
-  useCreateRoom,
+  useJoinRoom,
   useMyInvites,
   useMyRooms,
-  useSendInvite,
+  usePublicRooms,
 } from '@entities/chat-room/model/hooks';
 import type { Room } from '@entities/chat-room/model/types';
-import { useLobbyPresence } from '@features/room-lobby/model/hooks';
-import { OnlineUsersPicker } from '@features/room-lobby/ui';
 import { useChatIdentity } from '@features/chat/model/hooks';
-import { ChatLoginGate, RoomChatView } from '@features/chat/ui';
+import { ChatLoginGate } from '@features/chat/ui';
 import CreateRoomDialog from './CreateRoomDialog';
 import IncomingInvites from './IncomingInvites';
 import MyRoomsList from './MyRoomsList';
+import PublicRoomsList from './PublicRoomsList';
 
-type RoomsView =
-  | { kind: 'list' }
-  | { kind: 'create' }
-  | { kind: 'lobby' }
-  | { kind: 'chat'; room: Room };
+const ROOMS_TAB = {
+  PUBLIC: 'public',
+  MY: 'my',
+  INVITES: 'invites',
+  CREATE: 'create',
+} as const;
+type RoomsTab = (typeof ROOMS_TAB)[keyof typeof ROOMS_TAB];
 
 export default function RoomsModal() {
   const { closeModal } = useGameActions();
+  const setActiveRoom = useSetAtom(activeRoomAtom);
   const { userId, nickname, canChat, linkWithGoogle } = useChatIdentity();
-  const [view, setView] = useState<RoomsView>({ kind: 'list' });
-  const [invitingUserId, setInvitingUserId] = useState<string | null>(null);
+  const [tab, setTab] = useState<RoomsTab>(ROOMS_TAB.PUBLIC);
+  const [joiningRoomId, setJoiningRoomId] = useState<string | null>(null);
 
+  const publicRooms = usePublicRooms();
   const myRooms = useMyRooms();
   const myInvites = useMyInvites(userId);
+  const { mutateAsync: joinRoom } = useJoinRoom();
 
-  const lobbyIdentity = canChat && userId ? { userId, nickname } : null;
-  const onlineUsers = useLobbyPresence(lobbyIdentity);
+  const pendingInviteCount = myInvites.data?.length ?? 0;
 
-  const { mutateAsync: createRoom } = useCreateRoom();
-  const { mutateAsync: sendInvite } = useSendInvite();
+  const enterRoom = (room: Room) => {
+    setActiveRoom(room);
+    closeModal();
+  };
 
-  // 로비에서 초대 = 새 방을 만들고 나는 즉시 그 방에 입장 + 상대에게 초대 발송
-  const handleInviteFromLobby = async (inviteeId: string) => {
+  const handleJoinPublic = async (room: Room) => {
     if (!userId) return;
-    const invitee = onlineUsers.find((u) => u.userId === inviteeId);
-    const roomName = invitee
-      ? `${nickname}, ${invitee.nickname}`
-      : `${nickname}님의 방`;
-    setInvitingUserId(inviteeId);
+    setJoiningRoomId(room.id);
     try {
-      const roomId = await createRoom({ name: roomName, nickname });
-      try {
-        await sendInvite({ roomId, inviteeId });
-      } catch (err) {
-        console.error('초대 발송 실패 (방은 생성됨):', err);
-      }
+      await joinRoom({ roomId: room.id, nickname });
       await myRooms.refetch();
-      setView({
-        kind: 'chat',
-        room: {
-          id: roomId,
-          name: roomName,
-          ownerId: userId,
-          createdAt: new Date().toISOString(),
-        },
-      });
+      enterRoom(room);
+    } catch {
+      // 이미 멤버인 경우도 그냥 입장
+      enterRoom(room);
     } finally {
-      setInvitingUserId(null);
+      setJoiningRoomId(null);
     }
   };
 
-  const pendingInviteCount = myInvites.data?.length ?? 0;
-  const activeTab: 'list' | 'lobby' =
-    view.kind === 'chat' || view.kind === 'create' || view.kind === 'list'
-      ? 'list'
-      : 'lobby';
+  const handleSelectMyRoom = (room: Room) => {
+    enterRoom(room);
+  };
+
+  const handleInviteAccepted = (roomId: string) => {
+    myRooms.refetch().then((res) => {
+      const room = res.data?.find((r) => r.id === roomId);
+      if (room) enterRoom(room);
+    });
+  };
+
+  const handleRoomCreated = async (roomId: string) => {
+    const res = await myRooms.refetch();
+    const room = res.data?.find((r) => r.id === roomId);
+    if (room) {
+      enterRoom(room);
+    } else {
+      // fallback: 방 정보 직접 구성
+      setActiveRoom({
+        id: roomId,
+        name: '내 방',
+        ownerId: userId ?? '',
+        isPublic: false,
+        createdAt: new Date().toISOString(),
+      });
+      closeModal();
+    }
+  };
 
   return (
     <ModalShell
@@ -83,132 +98,117 @@ export default function RoomsModal() {
     >
       {(close) => (
         <div className="flex h-[88vh] max-h-[720px] flex-col">
-          {/* Room chat view — full-height overlay inside the modal */}
-          {view.kind === 'chat' && (
-            <RoomChatView
-              roomId={view.room.id}
-              roomName={view.room.name}
-              onBack={() => setView({ kind: 'list' })}
-            />
-          )}
+          {/* Header */}
+          <header className="flex items-center justify-between border-b border-card-border px-4 py-3">
+            <h3 className="text-base font-bold text-gray-700">채팅방</h3>
+            <button
+              onClick={close}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+              aria-label="닫기"
+            >
+              ✕
+            </button>
+          </header>
 
-          {/* List / Lobby views */}
-          {view.kind !== 'chat' && (
-            <>
-              {/* Header */}
-              <header className="flex items-center justify-between border-b border-card-border px-4 py-3">
-                <h3 className="text-base font-bold text-gray-700">채팅방</h3>
-                <button
-                  onClick={close}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-600"
-                  aria-label="닫기"
-                >
-                  ✕
-                </button>
-              </header>
+          {/* Tab bar */}
+          <div className="flex border-b border-card-border">
+            <button
+              type="button"
+              onClick={() => setTab(ROOMS_TAB.PUBLIC)}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                tab === ROOMS_TAB.PUBLIC
+                  ? 'border-b-2 border-gold text-gold'
+                  : 'text-gray-400'
+              }`}
+            >
+              공개 방
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab(ROOMS_TAB.MY)}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                tab === ROOMS_TAB.MY
+                  ? 'border-b-2 border-gold text-gold'
+                  : 'text-gray-400'
+              }`}
+            >
+              내 방
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab(ROOMS_TAB.INVITES)}
+              className={`relative flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                tab === ROOMS_TAB.INVITES
+                  ? 'border-b-2 border-gold text-gold'
+                  : 'text-gray-400'
+              }`}
+            >
+              초대
+              {pendingInviteCount > 0 && (
+                <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[10px] font-bold text-white">
+                  {pendingInviteCount}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab(ROOMS_TAB.CREATE)}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                tab === ROOMS_TAB.CREATE
+                  ? 'border-b-2 border-gold text-gold'
+                  : 'text-gray-400'
+              }`}
+            >
+              + 만들기
+            </button>
+          </div>
 
-              {/* Tab bar */}
-              <div className="flex border-b border-card-border">
-                {(['list', 'lobby'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => setView({ kind: tab })}
-                    className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-                      activeTab === tab
-                        ? 'border-b-2 border-gold text-gold'
-                        : 'text-gray-400'
-                    }`}
-                  >
-                    {tab === 'list' ? '내 방' : '로비'}
-                    {tab === 'list' && pendingInviteCount > 0 && (
-                      <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[10px] font-bold text-white">
-                        {pendingInviteCount}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
-
-              {/* Body */}
-              <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
-                {!canChat ? (
-                  <ChatLoginGate onLogin={linkWithGoogle} />
-                ) : (
-                  <>
-                    {view.kind === 'list' && (
-                      <>
-                        {pendingInviteCount > 0 && (
-                          <IncomingInvites
-                            invites={myInvites.data ?? []}
-                            defaultNickname={nickname}
-                            onAccepted={(roomId) => {
-                              // refetch 결과값으로 이동 (myRooms.data는 클로저 시점 값이라 stale)
-                              myRooms.refetch().then((res) => {
-                                const room = res.data?.find(
-                                  (r) => r.id === roomId,
-                                );
-                                if (room) setView({ kind: 'chat', room });
-                              });
-                            }}
-                          />
-                        )}
-
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center justify-between">
-                            <p className="text-xs font-semibold text-gray-500">
-                              참여 중인 방
-                            </p>
-                            <button
-                              type="button"
-                              onClick={() => setView({ kind: 'create' })}
-                              className="rounded-full bg-gold px-3 py-1 text-xs font-bold text-white btn-press shadow-game-sm"
-                            >
-                              + 방 만들기
-                            </button>
-                          </div>
-                          <MyRoomsList
-                            rooms={myRooms.data ?? []}
-                            isLoading={myRooms.isLoading}
-                            onSelectRoom={(room) =>
-                              setView({ kind: 'chat', room })
-                            }
-                          />
-                        </div>
-                      </>
-                    )}
-
-                    {view.kind === 'create' && (
-                      <CreateRoomDialog
-                        defaultNickname={nickname}
-                        onCreated={() => setView({ kind: 'list' })}
-                        onCancel={() => setView({ kind: 'list' })}
-                      />
-                    )}
-
-                    {view.kind === 'lobby' && (
-                      <div className="flex flex-col gap-3">
-                        <p className="text-xs font-semibold text-gray-500">
-                          지금 접속 중인 유저
-                        </p>
-                        <p className="text-[11px] text-gray-400">
-                          초대하면 새 방이 만들어지고 바로 입장돼요
-                        </p>
-                        {userId && (
-                          <OnlineUsersPicker
-                            users={onlineUsers}
-                            currentUserId={userId}
-                            onInvite={handleInviteFromLobby}
-                            invitingUserId={invitingUserId}
-                          />
-                        )}
-                      </div>
-                    )}
-                  </>
+          {/* Body */}
+          <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
+            {!canChat ? (
+              <ChatLoginGate onLogin={linkWithGoogle} />
+            ) : (
+              <>
+                {tab === ROOMS_TAB.PUBLIC && (
+                  <PublicRoomsList
+                    rooms={publicRooms.data ?? []}
+                    isLoading={publicRooms.isLoading}
+                    joiningRoomId={joiningRoomId}
+                    onJoin={handleJoinPublic}
+                  />
                 )}
-              </div>
-            </>
-          )}
+
+                {tab === ROOMS_TAB.MY && (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs font-semibold text-gray-500">
+                      참여 중인 방
+                    </p>
+                    <MyRoomsList
+                      rooms={myRooms.data ?? []}
+                      isLoading={myRooms.isLoading}
+                      onSelectRoom={handleSelectMyRoom}
+                    />
+                  </div>
+                )}
+
+                {tab === ROOMS_TAB.INVITES && (
+                  <IncomingInvites
+                    invites={myInvites.data ?? []}
+                    defaultNickname={nickname}
+                    onAccepted={handleInviteAccepted}
+                  />
+                )}
+
+                {tab === ROOMS_TAB.CREATE && (
+                  <CreateRoomDialog
+                    defaultNickname={nickname}
+                    onCreated={handleRoomCreated}
+                    onCancel={() => setTab(ROOMS_TAB.MY)}
+                  />
+                )}
+              </>
+            )}
+          </div>
         </div>
       )}
     </ModalShell>

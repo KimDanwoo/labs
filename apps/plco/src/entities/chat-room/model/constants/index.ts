@@ -7,12 +7,14 @@ export const ROOM_MESSAGES_TABLE = 'chat_messages';
 // ── RPC names ────────────────────────────────────────────────────
 export const RPC_CREATE_ROOM = 'create_room';
 export const RPC_ACCEPT_INVITE = 'accept_invite';
+export const RPC_JOIN_ROOM = 'join_room';
 
 // ── Query key factories ──────────────────────────────────────────
 export const myRoomsQueryKey = () => ['chat-room', 'my-rooms'] as const;
 export const myInvitesQueryKey = () => ['chat-room', 'my-invites'] as const;
 export const roomMessagesQueryKey = (roomId: string) =>
   ['chat-room', 'messages', roomId] as const;
+export const publicRoomsQueryKey = () => ['chat-room', 'public-rooms'] as const;
 
 // ── Realtime channel names ───────────────────────────────────────
 export const invitesChannelName = (userId: string) =>

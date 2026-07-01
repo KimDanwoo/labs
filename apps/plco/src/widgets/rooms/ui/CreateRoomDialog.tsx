@@ -17,6 +17,7 @@ export default function CreateRoomDialog({
 }: CreateRoomDialogProps) {
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState(defaultNickname);
+  const [isPublic, setIsPublic] = useState(false);
   const { mutate, isPending, error } = useCreateRoom();
 
   const handleSubmit = (e: FormEvent) => {
@@ -29,6 +30,7 @@ export default function CreateRoomDialog({
       {
         name: trimmedName.slice(0, ROOM_NAME_MAX),
         nickname: trimmedNick.slice(0, ROOM_NICKNAME_MAX),
+        isPublic,
       },
       { onSuccess: (roomId) => onCreated(roomId) },
     );
@@ -64,6 +66,28 @@ export default function CreateRoomDialog({
           placeholder={defaultNickname}
           className="rounded-xl bg-input-bg px-3 py-2 text-sm text-gray-700 outline-none placeholder:text-gray-400"
         />
+      </label>
+
+      <label className="flex items-center justify-between gap-2 rounded-xl bg-input-bg px-3 py-2">
+        <div>
+          <p className="text-xs font-semibold text-gray-700">공개 방</p>
+          <p className="text-[10px] text-gray-400">누구나 자유롭게 입장할 수 있어요</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isPublic}
+          onClick={() => setIsPublic((prev) => !prev)}
+          className={`relative h-6 w-11 rounded-full transition-colors ${
+            isPublic ? 'bg-gold' : 'bg-gray-200'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+              isPublic ? 'translate-x-5' : 'translate-x-0'
+            }`}
+          />
+        </button>
       </label>
 
       {error && (

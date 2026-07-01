@@ -9,6 +9,7 @@ import type { ChatMessage, ChatPresenceUser } from '../types';
 type ChatRoomIdentity = {
   userId: string | null;
   nickname: string;
+  characterId?: string | null;
 };
 
 function appendUnique(
@@ -25,7 +26,7 @@ function appendUnique(
  */
 export function useChatRoom(roomId: string, identity: ChatRoomIdentity) {
   const queryClient = useQueryClient();
-  const { userId, nickname } = identity;
+  const { userId, nickname, characterId = null } = identity;
   const [onlineUsers, setOnlineUsers] = useState<ChatPresenceUser[]>([]);
 
   const query = useQuery({
@@ -36,7 +37,7 @@ export function useChatRoom(roomId: string, identity: ChatRoomIdentity) {
   useEffect(() => {
     const leave = joinRoom({
       roomId,
-      identity: userId ? { userId, nickname } : null,
+      identity: userId ? { userId, nickname, characterId } : null,
       onInsert: (message) =>
         queryClient.setQueryData<ChatMessage[]>(
           chatQueryKey(roomId),
@@ -50,7 +51,7 @@ export function useChatRoom(roomId: string, identity: ChatRoomIdentity) {
       onPresenceSync: setOnlineUsers,
     });
     return leave;
-  }, [roomId, userId, nickname, queryClient]);
+  }, [roomId, userId, nickname, characterId, queryClient]);
 
   return {
     messages: query.data,
