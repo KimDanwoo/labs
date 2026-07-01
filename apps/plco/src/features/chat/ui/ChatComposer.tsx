@@ -1,24 +1,23 @@
 'use client';
 
 import { useRef, useState, type FormEvent } from 'react';
-import type { CharacterId } from '@shared/types';
 import { CHAT_MESSAGE_MAX, CHAT_SEND_COOLDOWN_MS } from '../model/constants';
 import { useSendChat } from '../model/hooks';
 
 type ChatComposerProps = {
-  characterId: CharacterId;
+  roomId: string;
   userId: string;
   nickname: string;
 };
 
 export default function ChatComposer({
-  characterId,
+  roomId,
   userId,
   nickname,
 }: ChatComposerProps) {
   const [value, setValue] = useState('');
   const lastSentAtRef = useRef(0);
-  const { mutate, isPending } = useSendChat(characterId);
+  const { mutate, isPending } = useSendChat(roomId);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
