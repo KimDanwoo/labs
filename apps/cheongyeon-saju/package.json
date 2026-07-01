@@ -1,5 +1,5 @@
 {
-  "name": "awesome-destiny",
+  "name": "cheongyeon-saju",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,29 +13,29 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@vercel/analytics": "^2.0.1",
-    "clsx": "^2.1.1",
-    "jotai": "^2.20.0",
-    "korean-lunar-calendar": "^0.3.6",
-    "next": "16.2.6",
-    "react": "19.2.6",
-    "react-dom": "19.2.6",
-    "tailwind-merge": "^3.6.0"
+    "@vercel/analytics": "catalog:",
+    "clsx": "catalog:",
+    "jotai": "catalog:",
+    "korean-lunar-calendar": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tailwind-merge": "catalog:"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@tailwindcss/postcss": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@typescript-eslint/parser": "^8.59.3",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.6",
+    "eslint": "catalog:",
+    "eslint-config-next": "catalog:",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import-x": "^4.16.2",
     "eslint-plugin-prettier": "^5.5.5",
-    "prettier": "^3.8.3",
-    "tailwindcss": "^4",
-    "typescript": "^5",
+    "prettier": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
     "vitest": "^4.1.6"
   }
 }
