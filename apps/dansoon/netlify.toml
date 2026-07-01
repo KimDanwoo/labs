@@ -1,6 +1,6 @@
 [build]
-  command = "pnpm build"
-  publish = "dist"
+  command = "pnpm exec turbo run build --filter=dansoon"
+  publish = "apps/dansoon/dist"
 
 [build.environment]
   NODE_VERSION = "24"
