@@ -1,22 +1,20 @@
 import { supabase } from '@shared/lib';
-import type { CharacterId } from '@shared/types';
-import {
-  CHAT_ADMIN_API,
-  CHAT_PAGE_SIZE,
-  CHAT_TABLE,
-  chatChannelName,
-} from '../constants';
-import type {
-  ChatMessage,
-  ChatMessageRow,
-  ChatPresenceUser,
-  SendChatInput,
-} from '../types';
+import { CHAT_ADMIN_API, CHAT_PAGE_SIZE, CHAT_TABLE, chatChannelName } from '../constants';
+import type { ChatMessage, ChatPresenceUser, SendChatInput } from '../types';
+
+type ChatMessageRow = {
+  id: string;
+  room_id: string;
+  user_id: string;
+  nickname: string;
+  message: string;
+  created_at: string;
+};
 
 function toMessage(row: ChatMessageRow): ChatMessage {
   return {
     id: row.id,
-    characterId: row.character_id as CharacterId,
+    roomId: row.room_id,
     userId: row.user_id,
     nickname: row.nickname,
     message: row.message,
@@ -25,13 +23,11 @@ function toMessage(row: ChatMessageRow): ChatMessage {
 }
 
 /** 방의 최근 메시지를 오래된 순으로 반환한다. */
-export async function fetchMessages(
-  characterId: CharacterId,
-): Promise<ChatMessage[]> {
+export async function fetchMessages(roomId: string): Promise<ChatMessage[]> {
   const { data, error } = await supabase
     .from(CHAT_TABLE)
     .select('*')
-    .eq('character_id', characterId)
+    .eq('room_id', roomId)
     .order('created_at', { ascending: false })
     .limit(CHAT_PAGE_SIZE);
 
@@ -43,7 +39,7 @@ export async function sendMessage(input: SendChatInput): Promise<ChatMessage> {
   const { data, error } = await supabase
     .from(CHAT_TABLE)
     .insert({
-      character_id: input.characterId,
+      room_id: input.roomId,
       user_id: input.userId,
       nickname: input.nickname,
       message: input.message,
@@ -71,11 +67,17 @@ export async function deleteMessage(id: string): Promise<void> {
 }
 
 type JoinRoomOptions = {
-  characterId: CharacterId;
+  roomId: string;
   identity: ChatPresenceUser | null;
   onInsert: (message: ChatMessage) => void;
   onDelete: (id: string) => void;
   onPresenceSync: (users: ChatPresenceUser[]) => void;
+};
+
+type PresencePayload = {
+  userId?: string;
+  nickname?: string;
+  characterId?: string | null;
 };
 
 /**
@@ -84,13 +86,13 @@ type JoinRoomOptions = {
  * 정리 함수를 반환한다.
  */
 export function joinRoom({
-  characterId,
+  roomId,
   identity,
   onInsert,
   onDelete,
   onPresenceSync,
 }: JoinRoomOptions): () => void {
-  const channel = supabase.channel(chatChannelName(characterId), {
+  const channel = supabase.channel(chatChannelName(roomId), {
     config: { presence: { key: identity?.userId ?? 'guest' } },
   });
 
@@ -101,14 +103,12 @@ export function joinRoom({
         event: 'INSERT',
         schema: 'public',
         table: CHAT_TABLE,
-        filter: `character_id=eq.${characterId}`,
+        filter: `room_id=eq.${roomId}`,
       },
       (payload) => onInsert(toMessage(payload.new as ChatMessageRow)),
     )
     .on(
       'postgres_changes',
-      // DELETE 는 기본 replica identity 상 old 레코드에 PK(id)만 담겨
-      // character_id 필터가 동작하지 않는다. 필터 없이 받고 id 로 캐시에서 제거한다.
       { event: 'DELETE', schema: 'public', table: CHAT_TABLE },
       (payload) => {
         const oldId = (payload.old as { id?: string }).id;
@@ -116,14 +116,15 @@ export function joinRoom({
       },
     )
     .on('presence', { event: 'sync' }, () => {
-      const state = channel.presenceState<ChatPresenceUser>();
+      const state = channel.presenceState<PresencePayload>();
       const unique = new Map<string, ChatPresenceUser>();
       Object.values(state).forEach((entries) => {
         entries.forEach((entry) => {
           if (entry.userId) {
             unique.set(entry.userId, {
               userId: entry.userId,
-              nickname: entry.nickname,
+              nickname: entry.nickname ?? '',
+              characterId: entry.characterId ?? null,
             });
           }
         });

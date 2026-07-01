@@ -89,7 +89,7 @@ export default function MiniGameModal() {
                 </button>
 
                 <button
-                  onClick={() => openModal(MODAL_TYPE.CHAT)}
+                  onClick={() => openModal(MODAL_TYPE.ROOMS)}
                   className="rounded-2xl p-4 text-left bg-linear-to-br from-sky-50 to-blue-50 border border-sky-200 btn-press shadow-game-sm"
                 >
                   <div className="flex items-center gap-3">

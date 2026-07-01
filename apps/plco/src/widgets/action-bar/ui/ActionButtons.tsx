@@ -82,6 +82,11 @@ export default function ActionButtons() {
         label="상점"
         onClick={() => openModal(MODAL_TYPE.SHOP)}
       />
+      <ActionBtn
+        icon="💬"
+        label="채팅방"
+        onClick={() => openModal(MODAL_TYPE.ROOMS)}
+      />
     </div>
   );
 }
