@@ -14,8 +14,8 @@ catalog:
   tailwindcss: ^4
   '@tailwindcss/postcss': ^4
 
-  # state (gymlog)
-  jotai: ^2.10.0
+  # state
+  jotai: ^2.20.0
 
   # backend (gymlog) — auth / firestore / fcm
   firebase: ^12.15.0
@@ -53,4 +53,41 @@ catalog:
   '@types/node': ^20
   '@types/react': ^19
   '@types/react-dom': ^19
+
+  # ui utilities (shared across apps)
+  clsx: ^2.1.1
+  tailwind-merge: ^3.6.0
+  class-variance-authority: ^0.7.1
+  lucide-react: ^0.563.0
+  radix-ui: ^1.4.3
+  '@radix-ui/react-checkbox': ^1.3.3
+  framer-motion: ^12.33.0
+  next-themes: ^0.4.6
+
+  # content / markdown
+  react-markdown: ^10.1.0
+  rehype-highlight: ^7.0.2
+  remark-gfm: ^4.0.1
+  highlight.js: ^11.11.1
+
+  # icons
+  react-icons: ^5.5.0
+
+  # backend / data
+  '@supabase/ssr': ^0.8.0
+  '@supabase/supabase-js': ^2.106.1
+  '@tanstack/react-query': ^5.100.14
+
+  # analytics
+  '@vercel/analytics': ^2.0.1
+
+  # i18n / locale
+  korean-lunar-calendar: ^0.3.6
+
+  # image processing
+  sharp: ^0.34.5
+
+catalogs:
+  fb11:
+    firebase: ^11.9.1
 
