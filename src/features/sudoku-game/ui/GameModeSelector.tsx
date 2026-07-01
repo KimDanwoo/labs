@@ -1,7 +1,10 @@
 import { GAME_MODE } from "@entities/game/model/constants";
 import { GameMode } from "@entities/game/model/types";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  gameModeAtom, switchGameModeAtom,
+} from "@features/sudoku-game/model/atoms";
 import { cn } from "@shared/model/utils";
+import { useAtomValue, useSetAtom } from "jotai";
 import React, { memo, useCallback } from "react";
 
 const gameModes = [
@@ -10,13 +13,13 @@ const gameModes = [
 ];
 
 export const GameModeSelector: React.FC = memo(() => {
-  const gameMode = useSudokuStore((state) => state.gameMode);
-  const switchGameMode = useSudokuStore((state) => state.switchGameMode);
+  const gameMode = useAtomValue(gameModeAtom);
+  const switchGameMode = useSetAtom(switchGameModeAtom);
 
   const handleSwitchGameMode = useCallback(
     (mode: GameMode) => {
       if (gameMode === mode) return;
-      switchGameMode(mode);
+      switchGameMode({ mode });
     },
     [switchGameMode, gameMode],
   );

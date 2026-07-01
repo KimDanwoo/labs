@@ -1,7 +1,10 @@
 import { GAME_LEVEL, GAME_LEVEL_LABELS } from "@entities/game/model/constants";
 import { Difficulty } from "@entities/game/model/types";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  difficultyAtom, initializeGameAtom,
+} from "@features/sudoku-game/model/atoms";
 import { cn } from "@shared/model/utils";
+import { useAtomValue, useSetAtom } from "jotai";
 
 const options = [
   { label: GAME_LEVEL_LABELS[GAME_LEVEL.EASY], value: GAME_LEVEL.EASY },
@@ -16,8 +19,8 @@ const chevronSvg =
   "stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")";
 
 const SelectSelector = () => {
-  const difficulty = useSudokuStore((state) => state.difficulty);
-  const initializeGame = useSudokuStore((state) => state.initializeGame);
+  const difficulty = useAtomValue(difficultyAtom);
+  const initializeGame = useSetAtom(initializeGameAtom);
 
   return (
     <select
@@ -53,8 +56,8 @@ const SelectSelector = () => {
 };
 
 const ListSelector = () => {
-  const difficulty = useSudokuStore((state) => state.difficulty);
-  const initializeGame = useSudokuStore((state) => state.initializeGame);
+  const difficulty = useAtomValue(difficultyAtom);
+  const initializeGame = useSetAtom(initializeGameAtom);
 
   return (
     <div className="flex flex-col gap-2">

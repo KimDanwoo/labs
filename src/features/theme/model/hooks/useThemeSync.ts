@@ -1,11 +1,12 @@
 "use client";
 
+import { setThemeAtom, themeAtom } from "@features/theme/model/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { useThemeStore } from "../stores/themeStore";
 
 export function useThemeSync() {
-  const theme = useThemeStore((s) => s.theme);
-  const setTheme = useThemeStore((s) => s.setTheme);
+  const theme = useAtomValue(themeAtom);
+  const setTheme = useSetAtom(setThemeAtom);
 
   useEffect(() => {
     if (theme !== "system") return;

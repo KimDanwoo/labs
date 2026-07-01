@@ -1,16 +1,18 @@
 "use client";
 
 import { MAX_MISTAKES } from "@entities/game/model/constants";
-import { useAuthStore } from "@features/auth/model/stores";
+import { userAtom } from "@features/auth/model/atoms";
 import { GoogleSignInButton } from "@features/auth/ui/GoogleSignInButton";
 import { useSaveGameRecord } from "@features/game-record/model/hooks";
 import { formatTime } from "@features/sudoku-game/model/utils";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  isCompletedAtom, isSuccessAtom, currentTimeAtom, mistakeCountAtom,
+} from "@features/sudoku-game/model/atoms";
 import { GameDifficultySelector } from "./GameDifficultySelector";
 import { BottomSheet, Snackbar } from "@shared/ui";
 import { useSnackbar } from "@shared/model/hooks";
 import { cn } from "@shared/model/utils";
-import { useShallow } from "zustand/react/shallow";
+import { useAtomValue } from "jotai";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 const SuccessIcon = () => (
@@ -67,18 +69,12 @@ const FailureIcon = () => (
 );
 
 export const GameResultSheet = memo(() => {
-  const {
-    isCompleted, isSuccess, currentTime, mistakeCount,
-  } = useSudokuStore(
-    useShallow((s) => ({
-      isCompleted: s.isCompleted,
-      isSuccess: s.isSuccess,
-      currentTime: s.currentTime,
-      mistakeCount: s.mistakeCount,
-    })),
-  );
+  const isCompleted = useAtomValue(isCompletedAtom);
+  const isSuccess = useAtomValue(isSuccessAtom);
+  const currentTime = useAtomValue(currentTimeAtom);
+  const mistakeCount = useAtomValue(mistakeCountAtom);
 
-  const user = useAuthStore((state) => state.user);
+  const user = useAtomValue(userAtom);
   const { save, isSaving, pointResult } =
     useSaveGameRecord();
   const saveRef = useRef(save);

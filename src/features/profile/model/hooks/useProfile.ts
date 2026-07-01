@@ -1,6 +1,7 @@
 import { GameRecord } from "@entities/game-record/model/types";
 import { getUserRecords } from "@features/game-record/model/services";
-import { useAuthStore } from "@features/auth/model/stores";
+import { userAtom } from "@features/auth/model/atoms";
+import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 
 interface UseProfileResult {
@@ -15,7 +16,7 @@ export function useProfile(): UseProfileResult {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const user = useAuthStore((state) => state.user);
+  const user = useAtomValue(userAtom);
 
   const fetch = useCallback(async () => {
     if (!user) {

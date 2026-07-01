@@ -3,10 +3,12 @@
 import { SudokuCell as SudokuCellType } from "@entities/board/model/types";
 import { GAME_MODE } from "@entities/game/model/constants";
 import { useInitializeGame, useKeyboardControls } from "@features/sudoku-game/model/hooks";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  gameModeAtom, boardAtom, selectCellAtom,
+} from "@features/sudoku-game/model/atoms";
 import { KillerCage, Cell as SudokuCell } from "@features/sudoku-game/ui";
 import { cn } from "@shared/model/utils";
-import { useShallow } from "zustand/react/shallow";
+import { useAtomValue, useSetAtom } from "jotai";
 import { memo, useCallback } from "react";
 
 interface BoardRowProps {
@@ -32,19 +34,15 @@ const BoardRow = memo<BoardRowProps>(({ row, rowIndex, onSelect }) => (
 BoardRow.displayName = "BoardRow";
 
 export const SudokuBoard: React.FC = () => {
-  const { gameMode, board, selectCell } = useSudokuStore(
-    useShallow((state) => ({
-      gameMode: state.gameMode,
-      board: state.board,
-      selectCell: state.selectCell,
-    })),
-  );
+  const gameMode = useAtomValue(gameModeAtom);
+  const board = useAtomValue(boardAtom);
+  const selectCell = useSetAtom(selectCellAtom);
 
   useKeyboardControls();
   useInitializeGame();
 
   const handleSelectCell = useCallback(
-    (row: number, col: number) => selectCell(row, col),
+    (row: number, col: number) => selectCell({ row, col }),
     [selectCell],
   );
 

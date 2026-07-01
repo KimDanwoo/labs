@@ -4,14 +4,13 @@ import { MAX_MISTAKES } from "@entities/game/model/constants";
 import {
   GameDifficultySelector, TimerControl,
 } from "@features/sudoku-game/ui";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import { mistakeCountAtom } from "@features/sudoku-game/model/atoms";
 import { cn } from "@shared/model/utils";
+import { useAtomValue } from "jotai";
 import { FC } from "react";
 
 const MistakeCounter: FC = () => {
-  const mistakeCount = useSudokuStore(
-    (s) => s.mistakeCount,
-  );
+  const mistakeCount = useAtomValue(mistakeCountAtom);
 
   return (
     <div

@@ -1,4 +1,11 @@
-export { useAuthStore } from "./stores/authStore";
+export {
+  userAtom,
+  isLoadingAtom,
+  isAuthenticatedAtom,
+  setUserAtom,
+  setLoadingAtom,
+  logoutAtom,
+} from "./atoms";
 export {
   subscribeToAuthChanges, signInWithGoogle, signOut,
 } from "./services/authService";

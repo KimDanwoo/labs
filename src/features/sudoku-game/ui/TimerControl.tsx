@@ -1,7 +1,10 @@
 import { formatTime } from "@features/sudoku-game/model/utils";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  currentTimeAtom, timerActiveAtom, incrementTimerAtom,
+  toggleTimerAtom, isCompletedAtom,
+} from "@features/sudoku-game/model/atoms";
 import { cn } from "@shared/model/utils";
-import { useShallow } from "zustand/react/shallow";
+import { useAtomValue, useSetAtom } from "jotai";
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { AiOutlinePause } from "react-icons/ai";
 import { VscPlay } from "react-icons/vsc";
@@ -24,18 +27,11 @@ const getButtonStyles = (isCompleted: boolean, timerActive: boolean) => {
 };
 
 export const TimerControl = memo(() => {
-  const {
-    currentTime, timerActive, incrementTimer,
-    toggleTimer, isCompleted,
-  } = useSudokuStore(
-    useShallow((state) => ({
-      currentTime: state.currentTime,
-      timerActive: state.timerActive,
-      incrementTimer: state.incrementTimer,
-      toggleTimer: state.toggleTimer,
-      isCompleted: state.isCompleted,
-    })),
-  );
+  const currentTime = useAtomValue(currentTimeAtom);
+  const timerActive = useAtomValue(timerActiveAtom);
+  const incrementTimer = useSetAtom(incrementTimerAtom);
+  const toggleTimer = useSetAtom(toggleTimerAtom);
+  const isCompleted = useAtomValue(isCompletedAtom);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 

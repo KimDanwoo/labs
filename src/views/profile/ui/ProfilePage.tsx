@@ -1,6 +1,7 @@
 "use client";
 
-import { useAuthStore } from "@features/auth/model/stores";
+import { isAuthenticatedAtom, userAtom } from "@features/auth/model/atoms";
+import { useAtomValue } from "jotai";
 import { useGameStats } from "@features/game-stats/model/hooks";
 import { StatsOverview, StatsByDifficulty } from "@features/game-stats/ui";
 import { useProfile } from "@features/profile/model/hooks";
@@ -11,8 +12,8 @@ import { useEffect } from "react";
 
 export const ProfilePage = () => {
   const router = useRouter();
-  const user = useAuthStore((state) => state.user);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAtomValue(userAtom);
+  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
 
   const { stats, statsByDifficulty, isLoading: statsLoading } = useGameStats();
   const {

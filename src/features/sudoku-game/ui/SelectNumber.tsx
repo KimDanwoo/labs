@@ -1,29 +1,25 @@
 "use client";
 
 import { BOARD_SIZE, KEY_NUMBER } from "@entities/board/model/constants";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
-import { useHistoryStore } from "@features/undo-redo/model/stores";
+import {
+  isNoteModeAtom, numberCountsAtom, timerActiveAtom,
+  boardAtom, selectedCellAtom, fillCellAtom, toggleNoteAtom,
+} from "@features/sudoku-game/model/atoms";
+import { pushStateAtom } from "@features/undo-redo/model/atoms";
 import { cn } from "@shared/model/utils";
 import { NumberButton } from "@shared/ui";
-import { useShallow } from "zustand/react/shallow";
+import { useAtomValue, useSetAtom } from "jotai";
 import { FC, useCallback, useMemo } from "react";
 
 export const SelectNumber: FC = () => {
-  const {
-    isNoteMode, numberCounts, timerActive,
-    board, selectedCell, fillCell, toggleNote,
-  } = useSudokuStore(
-    useShallow((state) => ({
-      isNoteMode: state.isNoteMode,
-      numberCounts: state.numberCounts,
-      timerActive: state.timerActive,
-      board: state.board,
-      selectedCell: state.selectedCell,
-      fillCell: state.fillCell,
-      toggleNote: state.toggleNote,
-    })),
-  );
-  const pushState = useHistoryStore((state) => state.pushState);
+  const isNoteMode = useAtomValue(isNoteModeAtom);
+  const numberCounts = useAtomValue(numberCountsAtom);
+  const timerActive = useAtomValue(timerActiveAtom);
+  const board = useAtomValue(boardAtom);
+  const selectedCell = useAtomValue(selectedCellAtom);
+  const fillCell = useSetAtom(fillCellAtom);
+  const toggleNote = useSetAtom(toggleNoteAtom);
+  const pushState = useSetAtom(pushStateAtom);
 
   const isNumberDisabled = useMemo(() => (value: number) => numberCounts[value] >= BOARD_SIZE, [numberCounts]);
 

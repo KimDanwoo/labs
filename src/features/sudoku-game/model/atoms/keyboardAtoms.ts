@@ -1,28 +1,33 @@
 import { BOARD_MAX_INDEX } from "@entities/board/model/constants";
-import { SudokuStoreActionCreator } from "@features/sudoku-game/model/stores/types";
+import { atom } from "jotai";
+import { isNoteModeAtom, selectedCellAtom } from "./primitives";
+import { fillCellAtom, toggleNoteAtom } from "./cellValueAtoms";
+import { selectCellAtom } from "./selectionAtoms";
 
-export const createKeyboardActions: SudokuStoreActionCreator<"handleKeyInput"> = (set, get) => ({
-  handleKeyInput: (key) => {
-    const { isNoteMode } = get();
+/** 키보드 입력 처리 */
+export const handleKeyInputAtom = atom(
+  null,
+  (get, set, key: string) => {
+    const isNoteMode = get(isNoteModeAtom);
 
     if (key === "Backspace" || key === "Delete") {
-      get().fillCell(null);
+      set(fillCellAtom, null);
       return;
     }
 
     if (/^[1-9]$/.test(key)) {
       const value = parseInt(key, 10);
       if (isNoteMode) {
-        get().toggleNote(value);
+        set(toggleNoteAtom, value);
       } else {
-        get().fillCell(value);
+        set(fillCellAtom, value);
       }
       return;
     }
 
     if (!key.startsWith("Arrow")) return;
 
-    const { selectedCell } = get();
+    const selectedCell = get(selectedCellAtom);
     if (!selectedCell) return;
 
     let { row, col } = selectedCell;
@@ -37,6 +42,6 @@ export const createKeyboardActions: SudokuStoreActionCreator<"handleKeyInput"> =
       col = Math.min(BOARD_MAX_INDEX, col + 1);
     }
 
-    get().selectCell(row, col);
+    set(selectCellAtom, { row, col });
   },
-});
+);

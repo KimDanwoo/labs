@@ -1,9 +1,10 @@
 "use client";
 
-import { useAuthStore } from "@features/auth/model/stores";
+import { userAtom } from "@features/auth/model/atoms";
 import {
   useLeaderboard, useCumulativeLeaderboard,
 } from "@features/leaderboard/model/hooks";
+import { useAtomValue } from "jotai";
 import {
   CumulativeLeaderboardTable,
   LeaderboardFilters,
@@ -32,7 +33,7 @@ export const LeaderboardPage = () => {
   const [difficulty, setDifficulty] = useState("");
   const [gameMode, setGameMode] = useState("");
 
-  const user = useAuthStore((state) => state.user);
+  const user = useAtomValue(userAtom);
 
   const options = useMemo(
     () => ({

@@ -1,4 +1,5 @@
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import { handleKeyInputAtom } from "@features/sudoku-game/model/atoms";
+import { gameStore } from "@shared/model/store";
 import { KeyboardEvent, useCallback } from "react";
 
 interface UseCellInteractionProps {
@@ -31,8 +32,7 @@ export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellI
         event.stopPropagation();
         onSelect(row, col);
         setTimeout(() => {
-          const store = useSudokuStore.getState();
-          store.handleKeyInput(keyPressed);
+          gameStore.set(handleKeyInputAtom, keyPressed);
         }, 0);
       }
 
@@ -41,8 +41,7 @@ export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellI
         event.stopPropagation();
         onSelect(row, col);
         setTimeout(() => {
-          const store = useSudokuStore.getState();
-          store.handleKeyInput(keyPressed);
+          gameStore.set(handleKeyInputAtom, keyPressed);
         }, 0);
       }
     },

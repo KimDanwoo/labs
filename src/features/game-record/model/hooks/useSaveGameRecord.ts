@@ -3,10 +3,15 @@ import {
 } from "@entities/game-record/model/types";
 import { calculatePoint } from "@features/game-record/model/utils/scoreCalculator";
 import { saveGameRecord } from "@features/game-record/model/services/gameRecordService";
-import { useAuthStore } from "@features/auth/model/stores";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import { userAtom } from "@features/auth/model/atoms";
+import {
+  difficultyAtom, gameModeAtom, currentTimeAtom,
+  hintsRemainingAtom, mistakeCountAtom, isSuccessAtom,
+  isRecordSavedAtom,
+} from "@features/sudoku-game/model/atoms";
+import { gameStore } from "@shared/model/store";
 import { HINTS_REMAINING } from "@entities/game/model/constants";
-import { useShallow } from "zustand/react/shallow";
+import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface SaveGameRecordResult {
@@ -28,21 +33,14 @@ export function useSaveGameRecord(): SaveGameRecordResult {
     useState<PointResult | null>(null);
   const savingRef = useRef(false);
 
-  const user = useAuthStore((state) => state.user);
-  const {
-    difficulty, gameMode, currentTime,
-    hintsRemaining, mistakeCount, isSuccess, isRecordSaved,
-  } = useSudokuStore(
-    useShallow((s) => ({
-      difficulty: s.difficulty,
-      gameMode: s.gameMode,
-      currentTime: s.currentTime,
-      hintsRemaining: s.hintsRemaining,
-      mistakeCount: s.mistakeCount,
-      isSuccess: s.isSuccess,
-      isRecordSaved: s.isRecordSaved,
-    })),
-  );
+  const user = useAtomValue(userAtom);
+  const difficulty = useAtomValue(difficultyAtom);
+  const gameMode = useAtomValue(gameModeAtom);
+  const currentTime = useAtomValue(currentTimeAtom);
+  const hintsRemaining = useAtomValue(hintsRemainingAtom);
+  const mistakeCount = useAtomValue(mistakeCountAtom);
+  const isSuccess = useAtomValue(isSuccessAtom);
+  const isRecordSaved = useAtomValue(isRecordSavedAtom);
 
   // 게임 성공 시 pointResult를 미리 계산 (비로그인도)
   useEffect(() => {
@@ -85,7 +83,7 @@ export function useSaveGameRecord(): SaveGameRecordResult {
 
     try {
       const recordId = await saveGameRecord(record);
-      useSudokuStore.setState({ isRecordSaved: true });
+      gameStore.set(isRecordSavedAtom, true);
       return recordId;
     } catch (err) {
       savingRef.current = false;

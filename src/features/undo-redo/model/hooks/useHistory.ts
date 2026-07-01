@@ -1,29 +1,28 @@
-import { useHistoryStore } from "@features/undo-redo/model/stores/historyStore";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
-import { useShallow } from "zustand/react/shallow";
+import {
+  canRedoAtom,
+  canUndoAtom,
+  clearHistoryAtom,
+  pushStateAtom,
+  redoAtom,
+  undoAtom,
+} from "@features/undo-redo/model/atoms";
+import {
+  boardAtom, countBoardNumbersAtom,
+} from "@features/sudoku-game/model/atoms";
+import { gameStore } from "@shared/model/store";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useCallback } from "react";
 
 export function useHistory() {
-  const { board, countBoardNumbers } = useSudokuStore(
-    useShallow((state) => ({
-      board: state.board,
-      countBoardNumbers: state.countBoardNumbers,
-    })),
-  );
+  const board = useAtomValue(boardAtom);
+  const countBoardNumbers = useSetAtom(countBoardNumbersAtom);
 
-  const {
-    pushState, undo: undoHistory, redo: redoHistory,
-    canUndo, canRedo, clear: clearHistory,
-  } = useHistoryStore(
-    useShallow((state) => ({
-      pushState: state.pushState,
-      undo: state.undo,
-      redo: state.redo,
-      canUndo: state.canUndo,
-      canRedo: state.canRedo,
-      clear: state.clear,
-    })),
-  );
+  const pushState = useSetAtom(pushStateAtom);
+  const undoHistory = useSetAtom(undoAtom);
+  const redoHistory = useSetAtom(redoAtom);
+  const canUndo = useAtomValue(canUndoAtom);
+  const canRedo = useAtomValue(canRedoAtom);
+  const clearHistory = useSetAtom(clearHistoryAtom);
 
   const saveState = useCallback(() => {
     pushState(board);
@@ -32,7 +31,7 @@ export function useHistory() {
   const undo = useCallback(() => {
     const previousBoard = undoHistory();
     if (previousBoard) {
-      useSudokuStore.setState({ board: previousBoard });
+      gameStore.set(boardAtom, previousBoard);
       countBoardNumbers();
     }
   }, [undoHistory, countBoardNumbers]);
@@ -40,7 +39,7 @@ export function useHistory() {
   const redo = useCallback(() => {
     const nextBoard = redoHistory();
     if (nextBoard) {
-      useSudokuStore.setState({ board: nextBoard });
+      gameStore.set(boardAtom, nextBoard);
       countBoardNumbers();
     }
   }, [redoHistory, countBoardNumbers]);
@@ -49,8 +48,8 @@ export function useHistory() {
     saveState,
     undo,
     redo,
-    canUndo: canUndo(),
-    canRedo: canRedo(),
+    canUndo,
+    canRedo,
     clearHistory,
   };
 }

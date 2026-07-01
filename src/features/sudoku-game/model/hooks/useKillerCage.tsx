@@ -1,7 +1,9 @@
 import { CageInfo } from "@entities/board/model/types";
 import { GAME_MODE } from "@entities/game/model/constants";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
-import { useShallow } from "zustand/react/shallow";
+import {
+  cagesAtom, gameModeAtom,
+} from "@features/sudoku-game/model/atoms";
+import { useAtomValue } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 import { useTableDimensions, CellPosition } from "./useTableDimensions";
 import { useCagePathCalculator } from "./useCagePathCalculator";
@@ -13,12 +15,8 @@ const DEFAULT_CELL_SIZE = 40;
  * @returns 킬러 케이지 정보
  */
 export const useKillerCage = () => {
-  const { cages, gameMode } = useSudokuStore(
-    useShallow((state) => ({
-      cages: state.cages,
-      gameMode: state.gameMode,
-    })),
-  );
+  const cages = useAtomValue(cagesAtom);
+  const gameMode = useAtomValue(gameModeAtom);
   const [cellPositions, setCellPositions] = useState<Record<string, CellPosition>>({});
 
   const handleDimensionsChange = useCallback(

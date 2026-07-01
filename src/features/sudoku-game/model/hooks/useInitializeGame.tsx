@@ -1,10 +1,13 @@
 import { GAME_LEVEL } from "@entities/game/model/constants";
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  initializeGameAtom, boardAtom,
+} from "@features/sudoku-game/model/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 
 export const useInitializeGame = () => {
-  const initializeGame = useSudokuStore((state) => state.initializeGame);
-  const board = useSudokuStore((state) => state.board);
+  const initializeGame = useSetAtom(initializeGameAtom);
+  const board = useAtomValue(boardAtom);
 
   useEffect(() => {
     const isEmpty = board.every((row) => row.every((cell) => cell.value === null && !cell.isInitial));

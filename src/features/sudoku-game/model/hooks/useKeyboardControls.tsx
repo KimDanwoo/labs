@@ -1,9 +1,12 @@
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  handleKeyInputAtom, selectedCellAtom,
+} from "@features/sudoku-game/model/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 
 export const useKeyboardControls = () => {
-  const handleKeyInput = useSudokuStore((state) => state.handleKeyInput);
-  const selectedCell = useSudokuStore((state) => state.selectedCell);
+  const handleKeyInput = useSetAtom(handleKeyInputAtom);
+  const selectedCell = useAtomValue(selectedCellAtom);
 
   useEffect(() => {
     // 게임이 활성화되어 있고 선택된 셀이 있을 때만 키보드 이벤트 처리

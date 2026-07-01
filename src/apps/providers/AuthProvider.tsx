@@ -1,7 +1,8 @@
 "use client";
 
+import { setLoadingAtom, setUserAtom } from "@features/auth/model/atoms";
 import { subscribeToAuthChanges } from "@features/auth/model/services";
-import { useAuthStore } from "@features/auth/model/stores";
+import { useSetAtom } from "jotai";
 import { ReactNode, useEffect } from "react";
 
 interface AuthProviderProps {
@@ -9,8 +10,8 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const setUser = useAuthStore((state) => state.setUser);
-  const setLoading = useAuthStore((state) => state.setLoading);
+  const setUser = useSetAtom(setUserAtom);
+  const setLoading = useSetAtom(setLoadingAtom);
 
   useEffect(() => {
     setLoading(true);

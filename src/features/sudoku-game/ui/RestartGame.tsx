@@ -1,10 +1,13 @@
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  resetUserInputsAtom, timerActiveAtom,
+} from "@features/sudoku-game/model/atoms";
 import { IconButton } from "@shared/ui";
+import { useAtomValue, useSetAtom } from "jotai";
 import { LuRotateCcw } from "react-icons/lu";
 
 export const RestartGame = () => {
-  const resetUserInputs = useSudokuStore((state) => state.resetUserInputs);
-  const timerActive = useSudokuStore((state) => state.timerActive);
+  const resetUserInputs = useSetAtom(resetUserInputsAtom);
+  const timerActive = useAtomValue(timerActiveAtom);
 
   return (
     <IconButton

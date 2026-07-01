@@ -1,16 +1,14 @@
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  getHintAtom, timerActiveAtom, hintsRemainingAtom,
+} from "@features/sudoku-game/model/atoms";
 import { IconButton } from "@shared/ui";
-import { useShallow } from "zustand/react/shallow";
+import { useAtomValue, useSetAtom } from "jotai";
 import { LuLightbulb } from "react-icons/lu";
 
 export const GetHint = () => {
-  const { getHint, timerActive, hintsRemaining } = useSudokuStore(
-    useShallow((state) => ({
-      getHint: state.getHint,
-      timerActive: state.timerActive,
-      hintsRemaining: state.hintsRemaining,
-    })),
-  );
+  const getHint = useSetAtom(getHintAtom);
+  const timerActive = useAtomValue(timerActiveAtom);
+  const hintsRemaining = useAtomValue(hintsRemainingAtom);
 
   return (
     <IconButton

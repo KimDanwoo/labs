@@ -1,10 +1,13 @@
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  fillCellAtom, timerActiveAtom,
+} from "@features/sudoku-game/model/atoms";
 import { IconButton } from "@shared/ui";
+import { useAtomValue, useSetAtom } from "jotai";
 import { LuEraser } from "react-icons/lu";
 
 export const RemoveNumber = () => {
-  const timerActive = useSudokuStore((state) => state.timerActive);
-  const fillCell = useSudokuStore((state) => state.fillCell);
+  const timerActive = useAtomValue(timerActiveAtom);
+  const fillCell = useSetAtom(fillCellAtom);
 
   return (
     <IconButton

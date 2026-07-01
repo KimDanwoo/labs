@@ -1,22 +1,18 @@
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  timerActiveAtom, isCompletedAtom, toggleTimerAtom,
+  initializeGameAtom, difficultyAtom,
+} from "@features/sudoku-game/model/atoms";
 import { cn } from "@shared/model/utils";
-import { useShallow } from "zustand/react/shallow";
+import { useAtomValue, useSetAtom } from "jotai";
 import { FC } from "react";
 import { VscPlay } from "react-icons/vsc";
 
 export const PauseGameOverlay: FC = () => {
-  const {
-    timerActive, isCompleted, toggleTimer,
-    initializeGame, difficulty,
-  } = useSudokuStore(
-    useShallow((state) => ({
-      timerActive: state.timerActive,
-      isCompleted: state.isCompleted,
-      toggleTimer: state.toggleTimer,
-      initializeGame: state.initializeGame,
-      difficulty: state.difficulty,
-    })),
-  );
+  const timerActive = useAtomValue(timerActiveAtom);
+  const isCompleted = useAtomValue(isCompletedAtom);
+  const toggleTimer = useSetAtom(toggleTimerAtom);
+  const initializeGame = useSetAtom(initializeGameAtom);
+  const difficulty = useAtomValue(difficultyAtom);
 
   if (timerActive || isCompleted) return null;
 

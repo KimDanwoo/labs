@@ -1,16 +1,14 @@
-import { useSudokuStore } from "@features/sudoku-game/model/stores";
+import {
+  isNoteModeAtom, timerActiveAtom, toggleNoteModeAtom,
+} from "@features/sudoku-game/model/atoms";
 import { IconButton } from "@shared/ui";
-import { useShallow } from "zustand/react/shallow";
+import { useAtomValue, useSetAtom } from "jotai";
 import { LuPencil } from "react-icons/lu";
 
 export const ToggleNote = () => {
-  const { isNoteMode, timerActive, toggleNoteMode } = useSudokuStore(
-    useShallow((state) => ({
-      isNoteMode: state.isNoteMode,
-      timerActive: state.timerActive,
-      toggleNoteMode: state.toggleNoteMode,
-    })),
-  );
+  const isNoteMode = useAtomValue(isNoteModeAtom);
+  const timerActive = useAtomValue(timerActiveAtom);
+  const toggleNoteMode = useSetAtom(toggleNoteModeAtom);
 
   return (
     <IconButton

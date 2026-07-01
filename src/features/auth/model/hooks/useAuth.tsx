@@ -1,9 +1,18 @@
+import {
+  isAuthenticatedAtom,
+  isLoadingAtom,
+  logoutAtom,
+  userAtom,
+} from "@features/auth/model/atoms";
 import { signInWithGoogle, signOut } from "@features/auth/model/services/authService";
-import { useAuthStore } from "@features/auth/model/stores/authStore";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useCallback } from "react";
 
 export function useAuth() {
-  const { user, isLoading, isAuthenticated, logout } = useAuthStore();
+  const user = useAtomValue(userAtom);
+  const isLoading = useAtomValue(isLoadingAtom);
+  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+  const logout = useSetAtom(logoutAtom);
 
   const handleGoogleSignIn = useCallback(async () => {
     try {

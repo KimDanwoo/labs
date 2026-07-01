@@ -1,4 +1,5 @@
 import { AuthProvider } from "@apps/providers/AuthProvider";
+import { JotaiProvider } from "@apps/providers/JotaiProvider";
 import { ThemeProvider } from "@apps/providers/ThemeProvider";
 import type { Metadata, Viewport } from "next";
 import { Rubik, Space_Mono } from "next/font/google";
@@ -74,8 +75,18 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html:
               "(function(){try{" +
-              "var s=JSON.parse(localStorage.getItem('awesome-sudoku-theme')||'{}');" +
-              "var t=(s.state&&s.state.theme)||'system';" +
+              "if(!localStorage.getItem('sudoku:migrated')){" +
+              "var g=localStorage.getItem('awesome-sudoku-storage');" +
+              "if(g){var gs=JSON.parse(g).state;if(gs)Object.keys(gs).forEach(function(k){" +
+              "localStorage.setItem('sudoku:'+k,JSON.stringify(gs[k]))});localStorage.removeItem('awesome-sudoku-storage')}" +
+              "var a=localStorage.getItem('sudoku-auth');" +
+              "if(a){var as=JSON.parse(a).state;if(as&&as.user)localStorage.setItem('sudoku-user',JSON.stringify(as.user));" +
+              "localStorage.removeItem('sudoku-auth')}" +
+              "var th=localStorage.getItem('awesome-sudoku-theme');" +
+              "if(th){var ts=JSON.parse(th).state;if(ts&&ts.theme)localStorage.setItem('sudoku-theme',JSON.stringify(ts.theme));" +
+              "localStorage.removeItem('awesome-sudoku-theme')}" +
+              "localStorage.setItem('sudoku:migrated','true')}" +
+              "var t=JSON.parse(localStorage.getItem('sudoku-theme')||'\"system\"');" +
               "var d=t==='dark'||(t==='system'&&window.matchMedia(" +
               "'(prefers-color-scheme: dark)').matches);" +
               "if(d)document.documentElement.classList.add('dark')" +
@@ -84,9 +95,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${rubik.variable} ${spaceMono.variable} antialiased`}>
-        <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </ThemeProvider>
+        <JotaiProvider>
+          <ThemeProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </ThemeProvider>
+        </JotaiProvider>
       </body>
     </html>
   );

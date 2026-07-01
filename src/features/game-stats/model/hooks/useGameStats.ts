@@ -4,7 +4,8 @@ import { getRecordPoint } from "@entities/game-record/model/utils";
 import { GAME_LEVEL } from "@entities/game/model/constants";
 import { Difficulty } from "@entities/game/model/types";
 import { getUserRecords } from "@features/game-record/model/services";
-import { useAuthStore } from "@features/auth/model/stores";
+import { userAtom } from "@features/auth/model/atoms";
+import { useAtomValue } from "jotai";
 import {
   GameStats, DifficultyStats,
 } from "@features/game-stats/model/types";
@@ -110,7 +111,7 @@ export function useGameStats(): UseGameStatsResult {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const user = useAuthStore((state) => state.user);
+  const user = useAtomValue(userAtom);
 
   const fetch = useCallback(async () => {
     if (!user) {
