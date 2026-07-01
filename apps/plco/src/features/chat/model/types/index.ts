@@ -1,31 +1,14 @@
-import type { CharacterId } from '@shared/types';
-
-export type ChatMessage = {
-  id: string;
-  characterId: CharacterId;
-  userId: string;
-  nickname: string;
-  message: string;
-  createdAt: string;
-};
-
-export type ChatMessageRow = {
-  id: string;
-  character_id: string;
-  user_id: string;
-  nickname: string;
-  message: string;
-  created_at: string;
-};
-
-export type SendChatInput = {
-  characterId: CharacterId;
-  userId: string;
-  nickname: string;
-  message: string;
-};
+// Re-export room-level types for use within the chat feature
+export type { RoomChatMessage as ChatMessage, RoomChatMessage } from '@entities/chat-room/model/types';
 
 export type ChatPresenceUser = {
   userId: string;
   nickname: string;
+};
+
+export type SendChatInput = {
+  roomId: string;
+  userId: string;
+  nickname: string;
+  message: string;
 };
