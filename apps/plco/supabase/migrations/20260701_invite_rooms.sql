@@ -16,8 +16,11 @@ create table if not exists chat_rooms (
   id         uuid primary key default gen_random_uuid(),
   name       text not null check (char_length(name) between 1 and 40),
   owner_id   uuid not null references auth.users(id) on delete cascade,
+  is_public  boolean not null default false,
   created_at timestamptz not null default now()
 );
+-- 이전 버전으로 이미 생성된 경우 대비: create table if not exists는 기존 테이블을 수정하지 않으므로 컬럼을 보강한다.
+alter table chat_rooms add column if not exists is_public boolean not null default false;
 
 -- 멤버십 (내 방 목록의 근거)
 create table if not exists room_members (
@@ -84,7 +87,7 @@ alter table chat_messages enable row level security;
 -- chat_rooms: 멤버만 조회, 비익명 본인이 생성
 drop policy if exists "room select" on chat_rooms;
 create policy "room select" on chat_rooms for select to authenticated
-  using (is_room_member(id, auth.uid()));
+  using (is_room_member(id, auth.uid()) or is_public);
 
 drop policy if exists "room insert" on chat_rooms;
 create policy "room insert" on chat_rooms for insert to authenticated
@@ -127,7 +130,13 @@ create policy "message insert" on chat_messages for insert to authenticated
   );
 
 -- 방 생성 + 소유자 멤버 등록 (원자적)
-create or replace function create_room(p_name text, p_nickname text)
+-- 이전 버전의 2-인자 create_room 제거 (3-인자 default와 오버로드 모호성 방지)
+drop function if exists create_room(text, text);
+create or replace function create_room(
+  p_name text,
+  p_nickname text,
+  p_is_public boolean default false
+)
 returns uuid
 language plpgsql
 security definer
@@ -139,7 +148,9 @@ begin
   if not is_non_anonymous() then
     raise exception 'anonymous users cannot create rooms';
   end if;
-  insert into chat_rooms(name, owner_id) values (p_name, auth.uid()) returning id into v_room;
+  insert into chat_rooms(name, owner_id, is_public)
+    values (p_name, auth.uid(), p_is_public)
+    returning id into v_room;
   insert into room_members(room_id, user_id, nickname) values (v_room, auth.uid(), p_nickname);
   return v_room;
 end;
@@ -168,6 +179,27 @@ begin
     values (v_room, auth.uid(), p_nickname)
     on conflict (room_id, user_id) do nothing;
   return v_room;
+end;
+$$;
+
+-- 공개 방 자유 입장 (초대 없이 멤버 등록). 비익명 + 공개 방만.
+create or replace function join_room(p_room_id uuid, p_nickname text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not is_non_anonymous() then
+    raise exception 'anonymous users cannot join rooms';
+  end if;
+  if not exists (select 1 from chat_rooms where id = p_room_id and is_public) then
+    raise exception 'room not found or not public';
+  end if;
+  insert into room_members(room_id, user_id, nickname)
+    values (p_room_id, auth.uid(), p_nickname)
+    on conflict (room_id, user_id) do nothing;
+  return p_room_id;
 end;
 $$;
 

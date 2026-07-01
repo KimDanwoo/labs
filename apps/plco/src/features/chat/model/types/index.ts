@@ -4,6 +4,7 @@ export type { RoomChatMessage as ChatMessage, RoomChatMessage } from '@entities/
 export type ChatPresenceUser = {
   userId: string;
   nickname: string;
+  characterId: string | null;
 };
 
 export type SendChatInput = {

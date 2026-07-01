@@ -2,6 +2,7 @@ import { supabase } from '@shared/lib';
 import {
   RPC_ACCEPT_INVITE,
   RPC_CREATE_ROOM,
+  RPC_JOIN_ROOM,
   ROOM_INVITES_TABLE,
   ROOM_TABLE,
 } from '../constants';
@@ -19,6 +20,7 @@ function toRoom(row: ChatRoomRow): Room {
     id: row.id,
     name: row.name,
     ownerId: row.owner_id,
+    isPublic: row.is_public,
     createdAt: row.created_at,
   };
 }
@@ -39,10 +41,12 @@ function toInvite(row: RoomInviteRow): Invite {
 export async function createRoom(
   name: string,
   nickname: string,
+  isPublic = false,
 ): Promise<string> {
   const { data, error } = await supabase.rpc(RPC_CREATE_ROOM, {
     p_name: name,
     p_nickname: nickname,
+    p_is_public: isPublic,
   });
   if (error) throw error;
   return data as string;
@@ -57,6 +61,31 @@ export async function fetchMyRooms(): Promise<Room[]> {
 
   if (error) throw error;
   return (data as ChatRoomRow[] | null)?.map(toRoom) ?? [];
+}
+
+/** 공개 방 목록 (is_public = true, RLS로 누구나 읽기 가능) */
+export async function fetchPublicRooms(): Promise<Room[]> {
+  const { data, error } = await supabase
+    .from(ROOM_TABLE)
+    .select('*')
+    .eq('is_public', true)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data as ChatRoomRow[] | null)?.map(toRoom) ?? [];
+}
+
+/** 공개 방 자유 입장 (RPC join_room). 비익명 유저만 호출 가능. */
+export async function joinRoomRpc(
+  roomId: string,
+  nickname: string,
+): Promise<string> {
+  const { data, error } = await supabase.rpc(RPC_JOIN_ROOM, {
+    p_room_id: roomId,
+    p_nickname: nickname,
+  });
+  if (error) throw error;
+  return data as string;
 }
 
 // ── Invite CRUD ──────────────────────────────────────────────────
