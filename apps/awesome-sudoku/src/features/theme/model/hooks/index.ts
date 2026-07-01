@@ -1,0 +1,1 @@
+export { useThemeSync } from "./useThemeSync";

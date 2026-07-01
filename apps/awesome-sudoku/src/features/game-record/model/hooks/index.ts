@@ -1,0 +1,1 @@
+export { useSaveGameRecord } from "./useSaveGameRecord";
