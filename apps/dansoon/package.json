@@ -1,0 +1,40 @@
+{
+  "name": "dansoon",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check && tsc --noEmit"
+  },
+  "dependencies": {
+    "@astrojs/react": "^4.2.0",
+    "@astrojs/rss": "^4.0.10",
+    "@astrojs/sitemap": "^3.2.1",
+    "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/vite": "^4.1.0",
+    "astro": "^6.1.9",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.0"
+  },
+  "devDependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "picomatch": ">=2.3.2",
+      "immutable": ">=4.3.8",
+      "yaml": ">=2.8.3"
+    }
+  }
+}
