@@ -1,0 +1,118 @@
+@import 'tailwindcss';
+
+:root {
+  --background: #0a0a1a;
+  --foreground: #e8e0d0;
+  --primary: #7c6cff;
+  --primary-bright: #a89aff;
+  --red: #c94043;
+  --card-bg: #141428;
+  --card-border: #2a2a4a;
+  --input-bg: #0f0f24;
+  --muted: #8a8aa0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-bright: var(--primary-bright);
+  --color-red: var(--red);
+  --color-card-bg: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-input-bg: var(--input-bg);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-noto-serif-kr);
+}
+
+* {
+  box-sizing: border-box;
+  touch-action: manipulation;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  color-scheme: dark;
+  overscroll-behavior: none;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-noto-serif-kr), 'Noto Serif KR', serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 전통 패턴 배경 텍스처 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(124, 108, 255, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(168, 154, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 2px;
+}
+
+/* Select 기본 화살표 제거 */
+select {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+@supports not (height: 100dvh) {
+  .h-dvh {
+    height: -webkit-fill-available;
+  }
+}
+
+/* 스크롤 유도 힌트 (마우스 휠 도트) */
+@keyframes scroll-wheel-dot {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(10px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+
+.animate-scroll-wheel {
+  animation: scroll-wheel-dot 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll-wheel {
+    animation: none;
+  }
+}

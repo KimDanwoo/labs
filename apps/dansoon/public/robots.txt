@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://danwoo-dev.netlify.app/sitemap-index.xml
