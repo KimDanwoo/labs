@@ -1,10 +1,7 @@
 'use client';
 
-import { useAtomValue } from 'jotai';
-import { CHARACTERS } from '@shared/constants';
 import { ModalShell } from '@shared/ui';
 import { useIsAdmin } from '@entities/auth/model/hooks';
-import { activeCharacterIdAtom } from '@entities/game/model/store';
 import { useGameActions } from '@entities/game/model/hooks';
 import { useChatIdentity, useChatRoom, useDeleteChat } from '../model/hooks';
 import ChatComposer from './ChatComposer';
@@ -12,19 +9,20 @@ import ChatLoginGate from './ChatLoginGate';
 import ChatMessageList from './ChatMessageList';
 import ChatOnlineBar from './ChatOnlineBar';
 
-export default function ChatModal() {
+type ChatModalProps = {
+  roomId: string;
+  roomName: string;
+};
+
+export default function ChatModal({ roomId, roomName }: ChatModalProps) {
   const { closeModal } = useGameActions();
-  const characterId = useAtomValue(activeCharacterIdAtom);
   const { userId, nickname, canChat, linkWithGoogle } = useChatIdentity();
   const { isAdmin } = useIsAdmin();
-  const room = characterId ?? 'yeko';
-  const { messages, isLoading, isError, onlineUsers } = useChatRoom(room, {
+  const { messages, isLoading, isError, onlineUsers } = useChatRoom(roomId, {
     userId,
     nickname,
   });
-  const { mutate: deleteMessage } = useDeleteChat(room);
-
-  if (!characterId) return null;
+  const { mutate: deleteMessage } = useDeleteChat(roomId);
 
   return (
     <ModalShell
@@ -36,9 +34,7 @@ export default function ChatModal() {
         <div className="flex h-[88vh] max-h-[720px] flex-col">
           <header className="flex items-center justify-between border-b border-card-border px-4 py-3">
             <div className="min-w-0">
-              <h3 className="text-base font-bold text-gray-700">
-                {CHARACTERS[characterId].name} 팬 톡
-              </h3>
+              <h3 className="text-base font-bold text-gray-700">{roomName}</h3>
               <ChatOnlineBar users={onlineUsers} />
             </div>
             <button
@@ -62,7 +58,7 @@ export default function ChatModal() {
           <footer className="border-t border-card-border px-4 py-3">
             {canChat && userId ? (
               <ChatComposer
-                characterId={characterId}
+                roomId={roomId}
                 userId={userId}
                 nickname={nickname}
               />
