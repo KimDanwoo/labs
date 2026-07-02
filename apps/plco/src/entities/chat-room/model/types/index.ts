@@ -11,6 +11,7 @@ export type ChatRoomRow = {
   name: string;
   owner_id: string;
   is_public: boolean;
+  has_password: boolean;
   created_at: string;
 };
 
@@ -45,6 +46,7 @@ export type Room = {
   name: string;
   ownerId: string;
   isPublic: boolean;
+  hasPassword: boolean;
   createdAt: string;
 };
 

@@ -12,11 +12,13 @@ export function useCreateRoom() {
       name,
       nickname,
       isPublic = false,
+      password,
     }: {
       name: string;
       nickname: string;
       isPublic?: boolean;
-    }) => createRoom(name, nickname, isPublic),
+      password?: string;
+    }) => createRoom(name, nickname, isPublic, password),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: myRoomsQueryKey() });
     },
