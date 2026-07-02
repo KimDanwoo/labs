@@ -1,7 +1,7 @@
 import { glob } from 'astro/loaders';
-import { defineCollection, z } from 'astro:content';
+import { defineCollection, z, type SchemaContext } from 'astro:content';
 
-const schema = ({ image }: { image: () => z.ZodType }) =>
+const schema = ({ image }: SchemaContext) =>
   z.object({
     title: z.string(),
     date: z.coerce.date().optional().default(new Date('2023-01-01')),

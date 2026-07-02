@@ -1,1 +1,1 @@
-export * from "./PauseGameOverlay";
+export * from './PauseGameOverlay';

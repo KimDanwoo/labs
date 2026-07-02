@@ -1,65 +1,51 @@
 // Generator
-export {
-  generateSolution,
-  generateBoard,
-  generateKillerBoard,
-  generateKillerCages,
-} from "./generator";
+export { generateBoard, generateKillerBoard, generateKillerCages, generateSolution } from './generator';
 
 // Validator
 export {
-  hasUniqueSolution,
-  checkRowConflict,
-  checkColConflict,
   checkBlockConflict,
+  checkColConflict,
   checkConflicts,
+  checkRowConflict,
+  hasUniqueSolution,
   isBoardComplete,
   isBoardCorrect,
-  validateBaseGrid,
-  isValidPlacement,
-  isKillerRemovalValidLenient,
-  isKillerRemovalValid,
-  validateCages,
-  validateAllCages,
-  validateKillerCages,
   isKillerBoardComplete,
-} from "./validator";
+  isKillerRemovalValid,
+  isKillerRemovalValidLenient,
+  isValidPlacement,
+  validateAllCages,
+  validateBaseGrid,
+  validateCages,
+  validateKillerCages,
+} from './validator';
 
 // Common
-export {
-  createEmptyGrid,
-  createEmptyBoard,
-  shuffleArray,
-  createEmptyHighlights,
-  formatTime,
-} from "./common";
+export { createEmptyBoard, createEmptyGrid, createEmptyHighlights, formatTime, shuffleArray } from './common';
 
 // Calculate
-export { calculateNeighborScore } from "./calculate";
+export { calculateNeighborScore } from './calculate';
 
 // Remove
-export {
-  removeRandomCellsWithStrategy,
-  removeKillerCells,
-} from "./remove";
+export { removeKillerCells, removeRandomCellsWithStrategy } from './remove';
 
 // Transformer
-export { applyTransformations } from "./transformer";
+export { applyTransformations } from './transformer';
 
 // Controls
-export { getHint } from "./controls";
+export { getHint } from './controls';
 
 // Update
 export {
-  updateSingleCell,
-  updateCellSelection,
-  updateCellNotes,
-  resetUserInputs,
-  findEmptyCells,
   calculateHighlights,
-  clearHighlights,
   canFillCell,
-  updateCellValue,
-  validateBoard,
   checkGameCompletion,
-} from "./update";
+  clearHighlights,
+  findEmptyCells,
+  resetUserInputs,
+  updateCellNotes,
+  updateCellSelection,
+  updateCellValue,
+  updateSingleCell,
+  validateBoard,
+} from './update';

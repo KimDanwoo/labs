@@ -1,8 +1,6 @@
-import {
-  handleKeyInputAtom, selectedCellAtom,
-} from "@features/sudoku-game/model/atoms";
-import { useAtomValue, useSetAtom } from "jotai";
-import { useEffect } from "react";
+import { handleKeyInputAtom, selectedCellAtom } from '@features/sudoku-game/model/atoms';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useEffect } from 'react';
 
 export const useKeyboardControls = () => {
   const handleKeyInput = useSetAtom(handleKeyInputAtom);
@@ -10,26 +8,26 @@ export const useKeyboardControls = () => {
 
   useEffect(() => {
     // 게임이 활성화되어 있고 선택된 셀이 있을 때만 키보드 이벤트 처리
-    if (!selectedCell) return;
+    if (!selectedCell) return undefined;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // 게임플레이에 관련된 키만 처리
       const validKeys = [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "ArrowUp",
-        "ArrowDown",
-        "ArrowLeft",
-        "ArrowRight",
-        "Backspace",
-        "Delete",
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        'ArrowUp',
+        'ArrowDown',
+        'ArrowLeft',
+        'ArrowRight',
+        'Backspace',
+        'Delete',
       ];
 
       if (validKeys.includes(event.key)) {
@@ -42,11 +40,11 @@ export const useKeyboardControls = () => {
     };
 
     // 키보드 이벤트 리스너 등록
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
 
     // 컴포넌트 언마운트 시 이벤트 리스너 제거
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [selectedCell, handleKeyInput]);
 };

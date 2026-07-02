@@ -1,24 +1,24 @@
-import { Difficulty, DifficultyRange } from "@entities/game/model/types";
+import { Difficulty, DifficultyRange } from '@entities/game/model/types';
 
 export const HINTS_REMAINING = 3;
 
 export const GAME_LEVEL = {
-  EASY: "easy",
-  MEDIUM: "medium",
-  HARD: "hard",
-  EXPERT: "expert",
+  EASY: 'easy',
+  MEDIUM: 'medium',
+  HARD: 'hard',
+  EXPERT: 'expert',
 } as const;
 
 export const GAME_LEVEL_LABELS = {
-  [GAME_LEVEL.EASY]: "쉬움",
-  [GAME_LEVEL.MEDIUM]: "중간",
-  [GAME_LEVEL.HARD]: "어려움",
-  [GAME_LEVEL.EXPERT]: "전문가",
+  [GAME_LEVEL.EASY]: '쉬움',
+  [GAME_LEVEL.MEDIUM]: '중간',
+  [GAME_LEVEL.HARD]: '어려움',
+  [GAME_LEVEL.EXPERT]: '전문가',
 } as const;
 
 export const GAME_MODE = {
-  CLASSIC: "classic",
-  KILLER: "killer",
+  CLASSIC: 'classic',
+  KILLER: 'killer',
 } as const;
 
 export const DIFFICULTY_RANGES: Record<Difficulty, DifficultyRange> = {
@@ -48,10 +48,10 @@ export const KILLER_DIFFICULTY_RANGES = {
 };
 
 export const DIFFICULTY_DESCRIPTIONS = {
-  [GAME_LEVEL.EASY]: "초보자용 - 많은 힌트와 작은 케이지",
-  [GAME_LEVEL.MEDIUM]: "중급자용 - 적당한 힌트와 보통 케이지",
-  [GAME_LEVEL.HARD]: "고급자용 - 적은 힌트와 큰 케이지",
-  [GAME_LEVEL.EXPERT]: "전문가용 - 최소 힌트와 최대 케이지",
+  [GAME_LEVEL.EASY]: '초보자용 - 많은 힌트와 작은 케이지',
+  [GAME_LEVEL.MEDIUM]: '중급자용 - 적당한 힌트와 보통 케이지',
+  [GAME_LEVEL.HARD]: '고급자용 - 적은 힌트와 큰 케이지',
+  [GAME_LEVEL.EXPERT]: '전문가용 - 최소 힌트와 최대 케이지',
 } as const;
 
 export const TARGET_TIMES = {

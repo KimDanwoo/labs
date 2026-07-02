@@ -1,8 +1,8 @@
-import { BOARD_SIZE } from "@entities/board/model/constants";
-import { SudokuBoard, SudokuCell } from "@entities/board/model/types";
-import { GAME_MODE } from "@entities/game/model/constants";
-import { KillerCage } from "@entities/game/model/types";
-import { describe, expect, it } from "vitest";
+import { BOARD_SIZE } from '@entities/board/model/constants';
+import { SudokuBoard, SudokuCell } from '@entities/board/model/types';
+import { GAME_MODE } from '@entities/game/model/constants';
+import { KillerCage } from '@entities/game/model/types';
+import { describe, expect, it } from 'vitest';
 import {
   calculateHighlights,
   canFillCell,
@@ -15,9 +15,9 @@ import {
   updateCellValue,
   updateSingleCell,
   validateBoard,
-} from "../update";
+} from '../update';
 
-describe("update.ts 유틸리티 함수 테스트", () => {
+describe('update.ts 유틸리티 함수 테스트', () => {
   // 테스트용 보드 생성 헬퍼 함수
   const createTestBoard = (): SudokuBoard =>
     Array(BOARD_SIZE)
@@ -35,8 +35,8 @@ describe("update.ts 유틸리티 함수 테스트", () => {
           })),
       );
 
-  describe("updateSingleCell", () => {
-    it("단일 셀을 성공적으로 업데이트해야 합니다", () => {
+  describe('updateSingleCell', () => {
+    it('단일 셀을 성공적으로 업데이트해야 합니다', () => {
       const board = createTestBoard();
       const updates: Partial<SudokuCell> = {
         value: 5,
@@ -56,8 +56,8 @@ describe("update.ts 유틸리티 함수 테스트", () => {
     });
   });
 
-  describe("updateCellSelection", () => {
-    it("선택된 셀만 isSelected가 true가 되어야 합니다", () => {
+  describe('updateCellSelection', () => {
+    it('선택된 셀만 isSelected가 true가 되어야 합니다', () => {
       const board = createTestBoard();
       const updatedBoard = updateCellSelection(board, 2, 3);
 
@@ -75,8 +75,8 @@ describe("update.ts 유틸리티 함수 테스트", () => {
     });
   });
 
-  describe("updateCellNotes", () => {
-    it("셀의 노트를 성공적으로 업데이트해야 합니다", () => {
+  describe('updateCellNotes', () => {
+    it('셀의 노트를 성공적으로 업데이트해야 합니다', () => {
       const board = createTestBoard();
       const notes = [1, 2, 3];
       const updatedBoard = updateCellNotes(board, 1, 1, notes);
@@ -88,8 +88,8 @@ describe("update.ts 유틸리티 함수 테스트", () => {
     });
   });
 
-  describe("resetUserInputs", () => {
-    it("초기 셀은 유지하면서 사용자 입력을 초기화해야 합니다", () => {
+  describe('resetUserInputs', () => {
+    it('초기 셀은 유지하면서 사용자 입력을 초기화해야 합니다', () => {
       const board = createTestBoard();
       // 초기 셀 설정
       board[0][0] = { ...board[0][0], isInitial: true, value: 5 };
@@ -112,8 +112,8 @@ describe("update.ts 유틸리티 함수 테스트", () => {
     });
   });
 
-  describe("findEmptyCells", () => {
-    it("빈 셀의 위치를 모두 찾아야 합니다", () => {
+  describe('findEmptyCells', () => {
+    it('빈 셀의 위치를 모두 찾아야 합니다', () => {
       const board = createTestBoard();
       // 일부 셀에 값 설정
       board[0][0].value = 1;
@@ -130,8 +130,8 @@ describe("update.ts 유틸리티 함수 테스트", () => {
     });
   });
 
-  describe("calculateHighlights", () => {
-    it("선택된 셀과 관련된 셀들을 올바르게 하이라이트해야 합니다", () => {
+  describe('calculateHighlights', () => {
+    it('선택된 셀과 관련된 셀들을 올바르게 하이라이트해야 합니다', () => {
       const board = createTestBoard();
       // 테스트를 위해 일부 셀에 값 설정
       board[0][0].value = 5;
@@ -142,46 +142,46 @@ describe("update.ts 유틸리티 함수 테스트", () => {
       const highlights = calculateHighlights(board, 0, 0);
 
       // 선택된 셀 확인
-      expect(highlights["0-0"].selected).toBe(true);
+      expect(highlights['0-0'].selected).toBe(true);
 
       // 같은 행, 열, 블록의 셀들이 related로 마킹되어야 함
-      expect(highlights["0-1"].related).toBe(true); // 같은 행
-      expect(highlights["1-0"].related).toBe(true); // 같은 열
-      expect(highlights["1-1"].related).toBe(true); // 같은 블록
+      expect(highlights['0-1'].related).toBe(true); // 같은 행
+      expect(highlights['1-0'].related).toBe(true); // 같은 열
+      expect(highlights['1-1'].related).toBe(true); // 같은 블록
 
       // 같은 값을 가진 셀이 sameValue로 마킹되어야 함
-      expect(highlights["1-1"].sameValue).toBe(true);
+      expect(highlights['1-1'].sameValue).toBe(true);
     });
 
-    it("변경되지 않은 셀의 하이라이트 객체는 재사용되어야 합니다", () => {
+    it('변경되지 않은 셀의 하이라이트 객체는 재사용되어야 합니다', () => {
       const board = createTestBoard();
 
       const firstHighlights = calculateHighlights(board, 0, 0);
       const secondHighlights = calculateHighlights(board, 0, 1, firstHighlights);
 
-      expect(secondHighlights["8-8"]).toBe(firstHighlights["8-8"]);
-      expect(secondHighlights["0-0"]).not.toBe(firstHighlights["0-0"]);
-      expect(secondHighlights["0-1"]).not.toBe(firstHighlights["0-1"]);
+      expect(secondHighlights['8-8']).toBe(firstHighlights['8-8']);
+      expect(secondHighlights['0-0']).not.toBe(firstHighlights['0-0']);
+      expect(secondHighlights['0-1']).not.toBe(firstHighlights['0-1']);
     });
   });
 
-  describe("clearHighlights", () => {
-    it("기존 하이라이트 객체 중 변경되지 않은 항목은 재사용해야 합니다", () => {
+  describe('clearHighlights', () => {
+    it('기존 하이라이트 객체 중 변경되지 않은 항목은 재사용해야 합니다', () => {
       const board = createTestBoard();
       const highlights = calculateHighlights(board, 0, 0);
 
       const cleared = clearHighlights(highlights);
 
-      expect(cleared["0-0"]).not.toBe(highlights["0-0"]);
-      expect(cleared["8-8"]).toBe(highlights["8-8"]);
-      expect(cleared["0-0"].selected).toBe(false);
-      expect(cleared["0-0"].related).toBe(false);
-      expect(cleared["0-0"].sameValue).toBe(false);
+      expect(cleared['0-0']).not.toBe(highlights['0-0']);
+      expect(cleared['8-8']).toBe(highlights['8-8']);
+      expect(cleared['0-0'].selected).toBe(false);
+      expect(cleared['0-0'].related).toBe(false);
+      expect(cleared['0-0'].sameValue).toBe(false);
     });
   });
 
-  describe("canFillCell", () => {
-    it("초기 셀이 아닌 경우에만 true를 반환해야 합니다", () => {
+  describe('canFillCell', () => {
+    it('초기 셀이 아닌 경우에만 true를 반환해야 합니다', () => {
       const board = createTestBoard();
       // 초기 셀 설정
       board[0][0].isInitial = true;
@@ -192,8 +192,8 @@ describe("update.ts 유틸리티 함수 테스트", () => {
     });
   });
 
-  describe("updateCellValue", () => {
-    it("셀의 값을 업데이트하고 노트를 초기화해야 합니다", () => {
+  describe('updateCellValue', () => {
+    it('셀의 값을 업데이트하고 노트를 초기화해야 합니다', () => {
       const board = createTestBoard();
       board[0][0].notes = [1, 2, 3];
 
@@ -204,8 +204,8 @@ describe("update.ts 유틸리티 함수 테스트", () => {
     });
   });
 
-  describe("validateBoard", () => {
-    it("일반 모드에서는 충돌만 검사해야 합니다", () => {
+  describe('validateBoard', () => {
+    it('일반 모드에서는 충돌만 검사해야 합니다', () => {
       const board = createTestBoard();
       // 충돌이 있는 보드 설정
       board[0][0].value = 1;
@@ -217,7 +217,7 @@ describe("update.ts 유틸리티 함수 테스트", () => {
       expect(validatedBoard[0][1].isConflict).toBe(true);
     });
 
-    it("킬러 모드에서는 케이지 규칙도 검사해야 합니다", () => {
+    it('킬러 모드에서는 케이지 규칙도 검사해야 합니다', () => {
       const board = createTestBoard();
       const cages: KillerCage[] = [
         {
@@ -241,8 +241,8 @@ describe("update.ts 유틸리티 함수 테스트", () => {
     });
   });
 
-  describe("checkGameCompletion", () => {
-    it("보드가 완성되고 정확할 때 success가 true여야 합니다", () => {
+  describe('checkGameCompletion', () => {
+    it('보드가 완성되고 정확할 때 success가 true여야 합니다', () => {
       const board = createTestBoard();
       const solution = Array(BOARD_SIZE)
         .fill(null)
@@ -265,7 +265,7 @@ describe("update.ts 유틸리티 함수 테스트", () => {
       expect(result.success).toBe(true);
     });
 
-    it("충돌이 있는 보드는 completed와 success가 false여야 합니다", () => {
+    it('충돌이 있는 보드는 completed와 success가 false여야 합니다', () => {
       const board = createTestBoard();
       const solution = Array(BOARD_SIZE)
         .fill(null)
@@ -279,9 +279,7 @@ describe("update.ts 유틸리티 함수 테스트", () => {
         }
       }
 
-      const result = checkGameCompletion(
-        board, solution, GAME_MODE.CLASSIC, [],
-      );
+      const result = checkGameCompletion(board, solution, GAME_MODE.CLASSIC, []);
 
       expect(result.completed).toBe(false);
       expect(result.success).toBe(false);

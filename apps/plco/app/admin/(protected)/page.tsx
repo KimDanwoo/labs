@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ADMIN_ROUTE } from '@app/admin/_lib/api';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
 
 const SECTIONS = [
   {
