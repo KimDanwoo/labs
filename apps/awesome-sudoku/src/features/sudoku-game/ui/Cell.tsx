@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { CellProps } from "@entities/board/model/types";
-import { CellNotes } from "@entities/board/ui/CellNotes";
-import { CellValue } from "@entities/board/ui/CellValue";
-import { useCell } from "@features/sudoku-game/model/hooks";
-import { cn } from "@shared/model/utils";
-import { FC, memo } from "react";
+import { CellProps } from '@entities/board/model/types';
+import { CellNotes } from '@entities/board/ui/CellNotes';
+import { CellValue } from '@entities/board/ui/CellValue';
+import { useCell } from '@features/sudoku-game/model/hooks';
+import { cn } from '@shared/model/utils';
+import { FC, memo } from 'react';
 
 export const SudokuCell: FC<CellProps> = memo((props) => {
   const { cell } = props;
@@ -18,18 +18,17 @@ export const SudokuCell: FC<CellProps> = memo((props) => {
       onKeyDown={handleKeyDown}
       tabIndex={tabIndex}
       role="gridcell"
-      aria-label={ariaLabel}
-      aria-description={ariaDescription}
+      aria-label={ariaDescription ? `${ariaLabel}, ${ariaDescription}` : ariaLabel}
       aria-selected={cell.isSelected}
       aria-invalid={cell.isConflict}
       aria-readonly={cell.isInitial}
       draggable={false}
       style={{
-        touchAction: "manipulation",
-        userSelect: "none",
-        WebkitTapHighlightColor: "transparent",
-        outline: "none",
-        boxShadow: "none",
+        touchAction: 'manipulation',
+        userSelect: 'none',
+        WebkitTapHighlightColor: 'transparent',
+        outline: 'none',
+        boxShadow: 'none',
       }}
     >
       {cell.value ? <CellValue value={cell.value} /> : <CellNotes notes={cell.notes} />}
@@ -37,4 +36,4 @@ export const SudokuCell: FC<CellProps> = memo((props) => {
   );
 });
 
-SudokuCell.displayName = "SudokuCell";
+SudokuCell.displayName = 'SudokuCell';
