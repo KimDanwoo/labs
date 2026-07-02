@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, passthroughImageService } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://danwoo-dev.netlify.app',
+  site: 'https://daily-cron-log.vercel.app',
   integrations: [react(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
