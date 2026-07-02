@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sips -z 800 1280 apps/hub/public/projects/gymlog.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight apps/hub/public/projects/gymlog.png)",
+      "Bash(perl -0pi -e \"s/wrap\\\\.style\\\\.webkitOverflowScrolling = 'touch';/wrap.style.setProperty\\('-webkit-overflow-scrolling', 'touch'\\);/g\" 'src/pages/book/[slug].astro' 'src/pages/tech/[...slug].astro')",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-pkg-manager.sh\""
+          },
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-main-commit.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
