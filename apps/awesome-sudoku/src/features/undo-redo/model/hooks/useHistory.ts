@@ -1,3 +1,4 @@
+import { boardAtom, countBoardNumbersAtom } from '@features/sudoku-game/model/atoms';
 import {
   canRedoAtom,
   canUndoAtom,
@@ -5,13 +6,10 @@ import {
   pushStateAtom,
   redoAtom,
   undoAtom,
-} from "@features/undo-redo/model/atoms";
-import {
-  boardAtom, countBoardNumbersAtom,
-} from "@features/sudoku-game/model/atoms";
-import { gameStore } from "@shared/model/store";
-import { useAtomValue, useSetAtom } from "jotai";
-import { useCallback } from "react";
+} from '@features/undo-redo/model/atoms';
+import { gameStore } from '@shared/model/store';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useCallback } from 'react';
 
 export function useHistory() {
   const board = useAtomValue(boardAtom);

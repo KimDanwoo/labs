@@ -1,6 +1,6 @@
-import { KillerCageLine } from "@entities/board/ui";
-import { useKillerCage } from "@features/sudoku-game/model/hooks";
-import { memo, useMemo } from "react";
+import { KillerCageLine } from '@entities/board/ui';
+import { useKillerCage } from '@features/sudoku-game/model/hooks';
+import { memo, useMemo } from 'react';
 
 interface CageSumLabelProps {
   sum: number;
@@ -16,28 +16,22 @@ const CageSumLabel = memo<CageSumLabelProps>(({ sum, x, y, fontSize }) => (
       top: `${y}px`,
       left: `${x}px`,
       fontSize,
-      lineHeight: "1",
-      backgroundColor: "rgb(var(--color-surface-primary))",
+      lineHeight: '1',
+      backgroundColor: 'rgb(var(--color-surface-primary))',
     }}
   >
     {sum}
   </div>
 ));
 
-CageSumLabel.displayName = "CageSumLabel";
+CageSumLabel.displayName = 'CageSumLabel';
 
 export const KillerCage = memo(() => {
   const { overlayRef, cageInfo, cellSize } = useKillerCage();
 
-  const fontSize = useMemo(
-    () => `${Math.max(0.5, Math.min(0.65, cellSize / 75))}rem`,
-    [cellSize],
-  );
+  const fontSize = useMemo(() => `${Math.max(0.5, Math.min(0.65, cellSize / 75))}rem`, [cellSize]);
 
-  const svgStyle = useMemo(
-    () => ({ position: "absolute" as const, top: 0, left: 0 }),
-    [],
-  );
+  const svgStyle = useMemo(() => ({ position: 'absolute' as const, top: 0, left: 0 }), []);
 
   return (
     <div ref={overlayRef} className="absolute top-0 left-0 pointer-events-none z-10">
@@ -54,4 +48,4 @@ export const KillerCage = memo(() => {
   );
 });
 
-KillerCage.displayName = "KillerCage";
+KillerCage.displayName = 'KillerCage';

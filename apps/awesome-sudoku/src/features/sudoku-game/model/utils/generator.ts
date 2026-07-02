@@ -4,16 +4,16 @@ import {
   KEY_NUMBER,
   MIN_EXPERT_HINTS,
   SUDOKU_CELL_COUNT,
-} from "@entities/board/model/constants";
-import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
-import { deepCopyGrid } from "@entities/board/model/utils";
-import { DIFFICULTY_RANGES, KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
-import { Difficulty, KillerCage } from "@entities/game/model/types";
-import { applyTransformations } from "./transformer";
-import { createEmptyGrid, shuffleArray } from "./common";
-import { isValidPlacement, validateAllCages, validateBaseGrid, validateCages } from "./validator";
-import { calculateNeighborScore } from "./calculate";
-import { removeKillerCells, removeRandomCellsWithStrategy } from "./remove";
+} from '@entities/board/model/constants';
+import { Grid, GridPosition, SudokuBoard } from '@entities/board/model/types';
+import { deepCopyGrid } from '@entities/board/model/utils';
+import { DIFFICULTY_RANGES, KILLER_DIFFICULTY_RANGES } from '@entities/game/model/constants';
+import { Difficulty, KillerCage } from '@entities/game/model/types';
+import { calculateNeighborScore } from './calculate';
+import { createEmptyGrid, shuffleArray } from './common';
+import { removeKillerCells, removeRandomCellsWithStrategy } from './remove';
+import { applyTransformations } from './transformer';
+import { isValidPlacement, validateAllCages, validateBaseGrid, validateCages } from './validator';
 
 /**
  * @description 백트래킹을 이용한 스도쿠 생성
@@ -123,7 +123,7 @@ export function generateKillerBoard(
   }
 
   const { hintsKeep } = KILLER_DIFFICULTY_RANGES[difficulty];
-  const targetHints = difficulty === "expert" ? Math.max(MIN_EXPERT_HINTS, hintsKeep) : hintsKeep;
+  const targetHints = difficulty === 'expert' ? Math.max(MIN_EXPERT_HINTS, hintsKeep) : hintsKeep;
   const targetRemove = SUDOKU_CELL_COUNT - targetHints;
 
   removeKillerCells(board, cages, targetRemove, difficulty);

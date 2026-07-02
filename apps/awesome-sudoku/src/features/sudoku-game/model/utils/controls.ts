@@ -1,4 +1,4 @@
-import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
+import { Grid, GridPosition, SudokuBoard } from '@entities/board/model/types';
 
 /**
  * @description 힌트 제공

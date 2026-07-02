@@ -49,16 +49,8 @@ catalog:
   eslint-plugin-prettier: ^5.5.6
   prettier-plugin-organize-imports: ^4.3.0
 
-  # awesome-sudoku 편입 lint 툴체인 (공유 eslint-config로 이전 전까지 유지)
-  '@eslint/eslintrc': ^3
-  '@eslint/js': ^9.27.0
+  # build 분석 (awesome-sudoku)
   '@next/bundle-analyzer': ^16.1.6
-  '@next/eslint-plugin-next': ^16.1.6
-  '@vercel/style-guide': ^6.0.0
-  eslint-config-turbo: ^2.5.3
-  eslint-plugin-only-warn: ^1.1.0
-  globals: ^16.1.0
-  typescript-eslint: ^8.32.1
 
   # test (vitest)
   vitest: ^4.1.6

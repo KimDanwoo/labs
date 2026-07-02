@@ -1,6 +1,6 @@
-import { buildCellClassName, getCellBorderStyles, getCellHighlightStyles } from "@entities/board/model/cellStyle";
-import { CellHighlight, SudokuCell } from "@entities/board/model/types";
-import { useMemo } from "react";
+import { buildCellClassName, getCellBorderStyles, getCellHighlightStyles } from '@entities/board/model/cellStyle';
+import { CellHighlight, SudokuCell } from '@entities/board/model/types';
+import { useMemo } from 'react';
 
 interface UseCellStylesProps {
   cell: SudokuCell;
@@ -14,9 +14,7 @@ export const useCellStyles = ({ cell, row, col, highlight, timerActive }: UseCel
   const borderStyles = useMemo(() => getCellBorderStyles(row, col), [row, col]);
 
   const highlightStyles = useMemo(
-    () => getCellHighlightStyles(
-      highlight, cell.isConflict, cell.isHint,
-    ),
+    () => getCellHighlightStyles(highlight, cell.isConflict, cell.isHint),
     [highlight, cell.isConflict, cell.isHint],
   );
 
@@ -27,10 +25,10 @@ export const useCellStyles = ({ cell, row, col, highlight, timerActive }: UseCel
 
   const stateClasses = useMemo(() => {
     const classes = [];
-    if (!timerActive) classes.push("opacity-60");
-    if (cell.isSelected) classes.push("ring-2 ring-[rgb(var(--color-accent))]");
-    if (cell.isConflict) classes.push("animate-pulse");
-    return classes.join(" ");
+    if (!timerActive) classes.push('opacity-60');
+    if (cell.isSelected) classes.push('ring-2 ring-[rgb(var(--color-accent))]');
+    if (cell.isConflict) classes.push('animate-pulse');
+    return classes.join(' ');
   }, [timerActive, cell.isSelected, cell.isConflict]);
 
   return {

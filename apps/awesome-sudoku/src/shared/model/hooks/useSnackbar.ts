@@ -1,5 +1,5 @@
-import { SnackbarVariant } from "@shared/ui/Snackbar";
-import { useCallback, useState } from "react";
+import { SnackbarVariant } from '@shared/ui/Snackbar';
+import { useCallback, useState } from 'react';
 
 interface SnackbarState {
   isVisible: boolean;
@@ -10,16 +10,13 @@ interface SnackbarState {
 export function useSnackbar() {
   const [state, setState] = useState<SnackbarState>({
     isVisible: false,
-    message: "",
-    variant: "info",
+    message: '',
+    variant: 'info',
   });
 
-  const show = useCallback(
-    (message: string, variant: SnackbarVariant = "info") => {
-      setState({ isVisible: true, message, variant });
-    },
-    [],
-  );
+  const show = useCallback((message: string, variant: SnackbarVariant = 'info') => {
+    setState({ isVisible: true, message, variant });
+  }, []);
 
   const hide = useCallback(() => {
     setState((prev) => ({ ...prev, isVisible: false }));
