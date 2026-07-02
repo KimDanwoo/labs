@@ -24,13 +24,13 @@ export const PROJECTS: Project[] = [
   {
     title: 'AI Tech News',
     description: 'AI 뉴스 큐레이션',
-    href: 'https://danwoo-dev.netlify.app/',
+    href: 'https://daily-cron-log.vercel.app/',
     image: '/projects/ai-tech-news.png',
   },
   {
     title: 'Best Seller',
     description: '주간 베스트셀러 리포트',
-    href: 'https://danwoo-dev.netlify.app/book/',
+    href: 'https://daily-cron-log.vercel.app/book/',
     image: '/projects/best-seller.png',
   },
   {
