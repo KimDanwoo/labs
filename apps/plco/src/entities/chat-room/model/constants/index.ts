@@ -27,5 +27,6 @@ export const lobbyChannelName = () => 'lobby:presence';
 export const ROOM_MESSAGES_PAGE_SIZE = 50;
 export const ROOM_NAME_MAX = 40;
 export const ROOM_NICKNAME_MAX = 40;
+export const ROOM_PASSWORD_MAX = 20;
 export const ROOM_MESSAGE_MAX = 200;
 export const ROOM_SEND_COOLDOWN_MS = 1500;

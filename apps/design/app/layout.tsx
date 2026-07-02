@@ -1,7 +1,7 @@
 import '@app/globals.css';
 import { AppProviders } from '@app/providers';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Sora } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -13,15 +13,9 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-// 디스플레이 폰트 — prairie 정체성(hub·gymlog와 폰트로 구별). 색은 코발트 공유.
-const sora = Sora({
-  variable: '--font-display',
-  subsets: ['latin'],
-});
-
 export const metadata: Metadata = {
-  title: '초원을 달리는 말 · Prairie',
-  description: '말을 타고 초원을 자유롭게 달리는 three.js 인터랙티브 씬',
+  title: 'Danwoo UI 카탈로그',
+  description: '@ui/react 공통 컴포넌트 + @tokens/css 디자인 토큰 쇼케이스',
 };
 
 // 첫 페인트 전에 테마 클래스를 적용해 다크모드 깜빡임(FOUC)을 방지한다.
@@ -35,7 +29,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} ${sora.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
