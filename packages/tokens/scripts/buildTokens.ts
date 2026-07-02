@@ -3,6 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { colors } from '../src/colors';
+import { rootScalars } from '../src/palette';
 import { shadow } from '../src/shadow';
 import { container, radius, spacing } from '../src/spacing';
 import { fontFamily, fontSize, fontWeight } from '../src/typography';
@@ -21,6 +22,11 @@ function buildColorVars() {
     darkLines.push(`--color-${name}: ${value.dark};`);
   }
   return { rootLines, darkLines };
+}
+
+/** 색이 아닌 :root 스칼라(brand-hue 등). 앱 스킨이 오버라이드하는 지점. */
+function buildRootScalars() {
+  return Object.entries(rootScalars).map(([name, value]) => `--${name}: ${value};`);
 }
 
 /** 테마 무관 토큰(폰트/크기/굵기/여백/반경)을 :root 변수로 만든다. */
@@ -82,6 +88,7 @@ function buildThemeMap() {
 
 function generate() {
   const { rootLines, darkLines } = buildColorVars();
+  const scalarLines = buildRootScalars();
   const staticLines = buildStaticVars();
   const themeLines = buildThemeMap();
 
@@ -93,7 +100,7 @@ function generate() {
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-${indent([...rootLines, '', ...staticLines])}
+${indent([...scalarLines, '', ...rootLines, '', ...staticLines])}
 }
 
 .dark {

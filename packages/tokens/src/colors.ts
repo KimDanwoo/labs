@@ -1,56 +1,73 @@
 import { commonColors as c, themeColors as t } from './palette';
 
 /**
- * Semantic 색상 — atomic 팔레트(palette.ts)를 의미 있는 역할로 alias 한다(2-tier).
- * 이 맵이 codegen의 입력이며 light/dark 두 값을 함께 갖는다.
+ * Semantic 색상 — atomic 팔레트(palette.ts, OKLCH)를 역할로 alias 한다(2-tier).
+ * 이 맵이 codegen 입력이며 light/dark 두 값을 갖는다.
  *
- * 역할: primary / secondary / success / error / warning / info.
- * 각 역할 = base(솔리드) · foreground(위 글자색) · subtle(연한 배경 틴트).
- * 다크는 atomic의 밝은 스텝을 base로 올리고 foreground를 어둡게 뒤집어 대비를 확보한다.
- * primary = indigo[800](#10069f) 앵커.
+ * 역할: primary / secondary / success / error / warning / info + 표면·폼·이펙트.
+ * primary·accent·ring·glow 는 brand 램프를 참조 → `--brand-hue` 회전에 함께 반응(스킨).
+ * 다크는 밝은 스텝을 base로 올리고 foreground를 어둡게 뒤집어 대비를 확보한다.
  */
 export const colors = {
-  // Primary — sky blue (#0284c7)
-  primary: { light: t.sky[600], dark: t.sky[400] },
+  // Primary — brand 램프(기본 코발트, hue 회전으로 리스킨)
+  primary: { light: t.brand[600], dark: t.brand[400] },
   'primary-foreground': { light: c.white, dark: t.gray[900] },
-  'primary-accent': { light: t.sky[500], dark: t.sky[300] },
-  'primary-subtle': { light: t.sky[50], dark: '#0a2a40' },
+  'primary-accent': { light: t.brand[500], dark: t.brand[300] },
+  'primary-subtle': { light: t.brand[50], dark: 'oklch(0.30 0.05 var(--brand-hue))' },
 
-  // Secondary — slate
-  secondary: { light: t.slate[600], dark: t.slate[400] },
+  // Accent 표면 — 브랜드 연한 틴트 표면 + 그 위 글자색(프딥 호환)
+  accent: { light: t.brand[50], dark: 'oklch(0.30 0.05 var(--brand-hue))' },
+  'accent-foreground': { light: t.brand[700], dark: t.brand[200] },
+
+  // Secondary — 중립 gray
+  secondary: { light: t.gray[600], dark: t.gray[400] },
   'secondary-foreground': { light: c.white, dark: t.gray[900] },
-  'secondary-subtle': { light: t.slate[100], dark: t.slate[800] },
+  'secondary-subtle': { light: t.gray[100], dark: t.gray[800] },
 
   // Success — green
   success: { light: t.green[600], dark: t.green[400] },
   'success-foreground': { light: c.white, dark: t.green[900] },
-  'success-subtle': { light: t.green[50], dark: '#0c2a1e' },
+  'success-subtle': { light: t.green[50], dark: 'oklch(0.30 0.05 152)' },
 
   // Error — red
   error: { light: t.red[600], dark: t.red[400] },
-  'error-foreground': { light: c.white, dark: '#2a0a0a' },
-  'error-subtle': { light: t.red[50], dark: '#2c1414' },
+  'error-foreground': { light: c.white, dark: 'oklch(0.25 0.04 27)' },
+  'error-subtle': { light: t.red[50], dark: 'oklch(0.30 0.05 27)' },
 
   // Warning — amber
   warning: { light: t.amber[700], dark: t.amber[400] },
-  'warning-foreground': { light: c.white, dark: '#2a1c02' },
-  'warning-subtle': { light: t.amber[100], dark: '#2a2008' },
+  'warning-foreground': { light: c.white, dark: 'oklch(0.25 0.03 55)' },
+  'warning-subtle': { light: t.amber[100], dark: 'oklch(0.32 0.05 60)' },
 
   // Info — sky
   info: { light: t.sky[600], dark: t.sky[400] },
-  'info-foreground': { light: c.white, dark: '#052437' },
-  'info-subtle': { light: t.sky[100], dark: '#082a3a' },
+  'info-foreground': { light: c.white, dark: 'oklch(0.25 0.04 228)' },
+  'info-subtle': { light: t.sky[100], dark: 'oklch(0.30 0.05 228)' },
 
-  // 중성색 / 표면 (gray 기반, primary와 같은 쿨톤 가족)
+  // 중성색 / 표면 (gray 기반, brand와 같은 쿨톤 가족)
   background: { light: c.white, dark: t.gray[900] },
   foreground: { light: t.gray[900], dark: t.gray[100] },
   muted: { light: t.gray[500], dark: t.gray[400] },
   card: { light: c.white, dark: t.gray[800] },
+  'card-foreground': { light: t.gray[900], dark: t.gray[100] },
   'card-border': { light: t.gray[200], dark: t.gray[700] },
-  glass: { light: 'rgba(255, 255, 255, 0.72)', dark: 'rgba(36, 36, 51, 0.6)' },
-  'glass-border': { light: 'rgba(15, 15, 24, 0.08)', dark: 'rgba(255, 255, 255, 0.08)' },
-  glow: { light: 'rgba(14, 165, 233, 0.16)', dark: 'rgba(56, 189, 248, 0.18)' },
-  'glow-strong': { light: 'rgba(14, 165, 233, 0.3)', dark: 'rgba(56, 189, 248, 0.32)' },
+
+  // 폼/라인
+  border: { light: t.gray[200], dark: t.gray[700] },
+  input: { light: t.gray[200], dark: t.gray[700] },
+  ring: { light: t.brand[600], dark: t.brand[400] },
+
+  // 이펙트 (brand hue 인식)
+  glass: { light: 'oklch(1 0 0 / 0.72)', dark: 'oklch(0.20 0.018 264 / 0.6)' },
+  'glass-border': { light: 'oklch(0.145 0.018 264 / 0.08)', dark: 'oklch(1 0 0 / 0.08)' },
+  glow: {
+    light: 'oklch(0.48 0.20 var(--brand-hue) / 0.16)',
+    dark: 'oklch(0.66 0.16 var(--brand-hue) / 0.18)',
+  },
+  'glow-strong': {
+    light: 'oklch(0.48 0.20 var(--brand-hue) / 0.3)',
+    dark: 'oklch(0.66 0.16 var(--brand-hue) / 0.32)',
+  },
 } as const;
 
 export type ColorToken = keyof typeof colors;

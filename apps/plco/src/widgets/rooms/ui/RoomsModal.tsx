@@ -33,6 +33,7 @@ export default function RoomsModal() {
   const { userId, nickname, canChat, linkWithGoogle } = useChatIdentity();
   const [tab, setTab] = useState<RoomsTab>(ROOMS_TAB.PUBLIC);
   const [joiningRoomId, setJoiningRoomId] = useState<string | null>(null);
+  const [joinError, setJoinError] = useState<string | null>(null);
 
   const publicRooms = usePublicRooms();
   const myRooms = useMyRooms();
@@ -46,16 +47,21 @@ export default function RoomsModal() {
     closeModal();
   };
 
-  const handleJoinPublic = async (room: Room) => {
+  const handleJoinPublic = async (room: Room, password?: string) => {
     if (!userId) return;
+    setJoinError(null);
     setJoiningRoomId(room.id);
     try {
-      await joinRoom({ roomId: room.id, nickname });
+      await joinRoom({ roomId: room.id, nickname, password });
       await myRooms.refetch();
       enterRoom(room);
-    } catch {
-      // 이미 멤버인 경우도 그냥 입장
-      enterRoom(room);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : '';
+      setJoinError(
+        message.includes('wrong password')
+          ? '비밀번호가 틀렸어요'
+          : '입장하지 못했어요. 잠시 후 다시 시도해주세요',
+      );
     } finally {
       setJoiningRoomId(null);
     }
@@ -84,6 +90,7 @@ export default function RoomsModal() {
         name: '내 방',
         ownerId: userId ?? '',
         isPublic: false,
+        hasPassword: false,
         createdAt: new Date().toISOString(),
       });
       closeModal();
@@ -174,6 +181,7 @@ export default function RoomsModal() {
                     rooms={publicRooms.data ?? []}
                     isLoading={publicRooms.isLoading}
                     joiningRoomId={joiningRoomId}
+                    joinError={joinError}
                     onJoin={handleJoinPublic}
                   />
                 )}
