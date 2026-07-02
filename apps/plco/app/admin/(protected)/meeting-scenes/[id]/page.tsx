@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { ALL_CHARACTER_IDS } from '@shared/constants';
-import { ADMIN_ROUTE } from '@app/admin/_lib/api';
-import { useMeetingScenes } from '@app/admin/_lib/hooks';
-import type { MeetingSceneRow } from '@app/admin/_lib/types';
-import SceneEditor from '../SceneEditor';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
+import { useMeetingScenes } from '@features/admin/model/hooks';
+import type { MeetingSceneRow } from '@features/admin/model/types';
+import { SceneEditor } from '@features/admin/ui';
 
 function emptyScene(): MeetingSceneRow {
   return {

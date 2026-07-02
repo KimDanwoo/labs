@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { ALL_CHARACTER_IDS, CHARACTERS } from '@shared/constants';
-import { useDeleteQuiz, useSaveQuiz } from '@app/admin/_lib/hooks';
-import type { QuizRow } from '@app/admin/_lib/types';
+import { useDeleteQuiz, useSaveQuiz } from '@features/admin/model/hooks';
+import type { QuizRow } from '@features/admin/model/types';
 
 type QuizEditorProps = {
   row: QuizRow;

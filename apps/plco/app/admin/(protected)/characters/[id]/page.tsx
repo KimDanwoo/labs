@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { ADMIN_ROUTE } from '@app/admin/_lib/api';
-import { useCharacters } from '@app/admin/_lib/hooks';
-import CharacterEditor from '../CharacterEditor';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
+import { useCharacters } from '@features/admin/model/hooks';
+import { CharacterEditor } from '@features/admin/ui';
 
 export default function CharacterDetailPage() {
   const id = useParams().id as string;
