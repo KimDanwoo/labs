@@ -1,5 +1,5 @@
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@entities/board/model/constants';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface CellPosition {
   x: number;
@@ -15,10 +15,7 @@ interface TableDimensions {
 
 const DEBOUNCE_DELAY = 16; // ~1 frame at 60fps for smooth resize
 
-export const useTableDimensions = (
-  onDimensionsChange: (dimensions: TableDimensions) => void,
-  deps: unknown[],
-) => {
+export const useTableDimensions = (onDimensionsChange: (dimensions: TableDimensions) => void, deps: unknown[]) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
@@ -26,18 +23,20 @@ export const useTableDimensions = (
   const [isReady, setIsReady] = useState(false);
 
   const onDimensionsChangeRef = useRef(onDimensionsChange);
-  onDimensionsChangeRef.current = onDimensionsChange;
+  useEffect(() => {
+    onDimensionsChangeRef.current = onDimensionsChange;
+  }, [onDimensionsChange]);
 
   const depsKey = JSON.stringify(deps);
 
   const calculateDimensions = useCallback(() => {
-    const table = document.querySelector("table.border-collapse");
+    const table = document.querySelector('table.border-collapse');
     if (!table) {
       onDimensionsChangeRef.current({ tableRect: null, cellPositions: {} });
       return;
     }
 
-    const cells = table.querySelectorAll("td");
+    const cells = table.querySelectorAll('td');
     if (cells.length !== SUDOKU_CELL_COUNT) {
       onDimensionsChangeRef.current({ tableRect: null, cellPositions: {} });
       return;
@@ -94,10 +93,10 @@ export const useTableDimensions = (
   }, []);
 
   useEffect(() => {
-    calculateDimensions();
+    scheduleCalculation();
 
     const setupObservers = () => {
-      const table = document.querySelector("table.border-collapse");
+      const table = document.querySelector('table.border-collapse');
       if (!table) return;
 
       // ResizeObserver for responsive resize
@@ -113,8 +112,8 @@ export const useTableDimensions = (
         mutationObserverRef.current = new MutationObserver((mutations) => {
           const hasRelevantChanges = mutations.some(
             (mutation) =>
-              mutation.type === "childList" ||
-              (mutation.type === "attributes" && ["class", "style"].includes(mutation.attributeName || "")),
+              mutation.type === 'childList' ||
+              (mutation.type === 'attributes' && ['class', 'style'].includes(mutation.attributeName || '')),
           );
 
           if (hasRelevantChanges) {
@@ -124,7 +123,7 @@ export const useTableDimensions = (
 
         mutationObserverRef.current.observe(table, {
           attributes: true,
-          attributeFilter: ["class", "style"],
+          attributeFilter: ['class', 'style'],
           childList: true,
           subtree: true,
         });
@@ -137,7 +136,7 @@ export const useTableDimensions = (
       clearTimeout(observerTimer);
       cleanup();
     };
-  }, [depsKey, cleanup, calculateDimensions, scheduleCalculation]);
+  }, [depsKey, cleanup, scheduleCalculation]);
 
   useEffect(() => cleanup, [cleanup]);
 
