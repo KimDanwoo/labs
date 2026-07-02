@@ -1,7 +1,7 @@
-import type { MetadataRoute } from "next";
+import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://awesome-sudoku.vercel.app";
+  const baseUrl = 'https://awesome-sudoku.vercel.app';
 
   return [
     { url: baseUrl, lastModified: new Date(), priority: 1.0 },

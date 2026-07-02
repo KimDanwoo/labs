@@ -1,18 +1,20 @@
+import { GameRecord, PointResult } from '@entities/game-record/model/types';
+import { HINTS_REMAINING } from '@entities/game/model/constants';
+import { userAtom } from '@features/auth/model/atoms';
+import { saveGameRecord } from '@features/game-record/model/services/gameRecordService';
+import { calculatePoint } from '@features/game-record/model/utils/scoreCalculator';
 import {
-  GameRecord, PointResult,
-} from "@entities/game-record/model/types";
-import { calculatePoint } from "@features/game-record/model/utils/scoreCalculator";
-import { saveGameRecord } from "@features/game-record/model/services/gameRecordService";
-import { userAtom } from "@features/auth/model/atoms";
-import {
-  difficultyAtom, gameModeAtom, currentTimeAtom,
-  hintsRemainingAtom, mistakeCountAtom, isSuccessAtom,
+  currentTimeAtom,
+  difficultyAtom,
+  gameModeAtom,
+  hintsRemainingAtom,
   isRecordSavedAtom,
-} from "@features/sudoku-game/model/atoms";
-import { gameStore } from "@shared/model/store";
-import { HINTS_REMAINING } from "@entities/game/model/constants";
-import { useAtomValue } from "jotai";
-import { useCallback, useEffect, useRef, useState } from "react";
+  isSuccessAtom,
+  mistakeCountAtom,
+} from '@features/sudoku-game/model/atoms';
+import { gameStore } from '@shared/model/store';
+import { useAtomValue } from 'jotai';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface SaveGameRecordResult {
   save: () => Promise<string | null>;
@@ -29,8 +31,7 @@ interface SaveGameRecordResult {
 export function useSaveGameRecord(): SaveGameRecordResult {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [pointResult, setPointResult] =
-    useState<PointResult | null>(null);
+  const [pointResult, setPointResult] = useState<PointResult | null>(null);
   const savingRef = useRef(false);
 
   const user = useAtomValue(userAtom);
@@ -42,31 +43,35 @@ export function useSaveGameRecord(): SaveGameRecordResult {
   const isSuccess = useAtomValue(isSuccessAtom);
   const isRecordSaved = useAtomValue(isRecordSavedAtom);
 
-  // 게임 성공 시 pointResult를 미리 계산 (비로그인도)
-  useEffect(() => {
-    if (isSuccess && !pointResult) {
-      setPointResult(calculatePoint({
-        difficulty, gameMode, completionTime: currentTime,
-      }));
-    }
-  }, [isSuccess, pointResult, difficulty, gameMode, currentTime]);
+  // 게임 성공 시 pointResult를 미리 계산 (비로그인도) — 렌더 중 상태 보정
+  if (isSuccess && !pointResult) {
+    setPointResult(
+      calculatePoint({
+        difficulty,
+        gameMode,
+        completionTime: currentTime,
+      }),
+    );
+  }
 
-  const save = useCallback(async (): Promise<
-    string | null
-  > => {
+  const save = useCallback(async (): Promise<string | null> => {
     if (savingRef.current) return null;
     if (!user || !isSuccess || isRecordSaved) return null;
     savingRef.current = true;
 
     const hintsUsed = HINTS_REMAINING - hintsRemaining;
-    const result = pointResult ?? calculatePoint({
-      difficulty, gameMode, completionTime: currentTime,
-    });
+    const result =
+      pointResult ??
+      calculatePoint({
+        difficulty,
+        gameMode,
+        completionTime: currentTime,
+      });
     setPointResult(result);
 
-    const record: Omit<GameRecord, "id" | "createdAt"> = {
+    const record: Omit<GameRecord, 'id' | 'createdAt'> = {
       userId: user.uid,
-      userDisplayName: user.displayName || "익명",
+      userDisplayName: user.displayName || '익명',
       userPhotoURL: user.photoURL,
       gameMode,
       difficulty,
@@ -87,22 +92,18 @@ export function useSaveGameRecord(): SaveGameRecordResult {
       return recordId;
     } catch (err) {
       savingRef.current = false;
-      setError(
-        err instanceof Error ? err : new Error("저장 실패"),
-      );
+      setError(err instanceof Error ? err : new Error('저장 실패'));
       return null;
     } finally {
       setIsSaving(false);
     }
-  }, [
-    user, isSuccess, isRecordSaved, difficulty,
-    gameMode, currentTime, hintsRemaining, mistakeCount,
-    pointResult,
-  ]);
+  }, [user, isSuccess, isRecordSaved, difficulty, gameMode, currentTime, hintsRemaining, mistakeCount, pointResult]);
 
   // 로그인 후 자동 저장: user가 null→유저로 바뀌었을 때
   const saveRef = useRef(save);
-  saveRef.current = save;
+  useEffect(() => {
+    saveRef.current = save;
+  }, [save]);
 
   useEffect(() => {
     if (user && isSuccess && !isRecordSaved) {

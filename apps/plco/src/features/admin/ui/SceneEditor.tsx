@@ -5,8 +5,8 @@ import { ALL_CHARACTER_IDS, CHARACTERS } from '@shared/constants';
 import {
   useDeleteMeetingScene,
   useSaveMeetingScene,
-} from '@app/admin/_lib/hooks';
-import type { MeetingOption, MeetingSceneRow } from '@app/admin/_lib/types';
+} from '@features/admin/model/hooks';
+import type { MeetingOption, MeetingSceneRow } from '@features/admin/model/types';
 
 const CATEGORIES = [
   'food',

@@ -1,15 +1,13 @@
-"use client";
+'use client';
 
-import { SudokuCell as SudokuCellType } from "@entities/board/model/types";
-import { GAME_MODE } from "@entities/game/model/constants";
-import { useInitializeGame, useKeyboardControls } from "@features/sudoku-game/model/hooks";
-import {
-  gameModeAtom, boardAtom, selectCellAtom,
-} from "@features/sudoku-game/model/atoms";
-import { KillerCage, Cell as SudokuCell } from "@features/sudoku-game/ui";
-import { cn } from "@shared/model/utils";
-import { useAtomValue, useSetAtom } from "jotai";
-import { memo, useCallback } from "react";
+import { SudokuCell as SudokuCellType } from '@entities/board/model/types';
+import { GAME_MODE } from '@entities/game/model/constants';
+import { boardAtom, gameModeAtom, selectCellAtom } from '@features/sudoku-game/model/atoms';
+import { useInitializeGame, useKeyboardControls } from '@features/sudoku-game/model/hooks';
+import { KillerCage, Cell as SudokuCell } from '@features/sudoku-game/ui';
+import { cn } from '@shared/model/utils';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { memo, useCallback } from 'react';
 
 interface BoardRowProps {
   row: SudokuCellType[];
@@ -20,18 +18,12 @@ interface BoardRowProps {
 const BoardRow = memo<BoardRowProps>(({ row, rowIndex, onSelect }) => (
   <tr>
     {row.map((cell, colIndex) => (
-      <SudokuCell
-        key={`${rowIndex}-${colIndex}`}
-        cell={cell}
-        row={rowIndex}
-        col={colIndex}
-        onSelect={onSelect}
-      />
+      <SudokuCell key={`${rowIndex}-${colIndex}`} cell={cell} row={rowIndex} col={colIndex} onSelect={onSelect} />
     ))}
   </tr>
 ));
 
-BoardRow.displayName = "BoardRow";
+BoardRow.displayName = 'BoardRow';
 
 export const SudokuBoard: React.FC = () => {
   const gameMode = useAtomValue(gameModeAtom);
@@ -41,30 +33,27 @@ export const SudokuBoard: React.FC = () => {
   useKeyboardControls();
   useInitializeGame();
 
-  const handleSelectCell = useCallback(
-    (row: number, col: number) => selectCell({ row, col }),
-    [selectCell],
-  );
+  const handleSelectCell = useCallback((row: number, col: number) => selectCell({ row, col }), [selectCell]);
 
   return (
     <div className="relative group flex-shrink-0">
       {/* Outer glow */}
       <div
         className={cn(
-          "absolute -inset-3 opacity-60 blur-2xl transition-opacity duration-500",
-          "bg-gradient-to-br from-blue-400/20 via-indigo-400/10 to-purple-400/20",
-          "dark:from-blue-500/10 dark:via-indigo-500/5 dark:to-purple-500/10",
-          "group-hover:opacity-80",
+          'absolute -inset-3 opacity-60 blur-2xl transition-opacity duration-500',
+          'bg-gradient-to-br from-blue-400/20 via-indigo-400/10 to-purple-400/20',
+          'dark:from-blue-500/10 dark:via-indigo-500/5 dark:to-purple-500/10',
+          'group-hover:opacity-80',
         )}
       />
 
       {/* Board container */}
       <div
         className={cn(
-          "relative bg-[rgb(var(--color-surface-primary))] overflow-hidden",
-          "shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)]",
-          "dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]",
-          "ring-1 ring-black/[0.03] dark:ring-white/[0.05]",
+          'relative bg-[rgb(var(--color-surface-primary))] overflow-hidden',
+          'shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)]',
+          'dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]',
+          'ring-1 ring-black/[0.03] dark:ring-white/[0.05]',
         )}
       >
         {gameMode === GAME_MODE.KILLER && <KillerCage />}
@@ -72,12 +61,7 @@ export const SudokuBoard: React.FC = () => {
         <table aria-label="스도쿠 보드" className="border-collapse bg-[rgb(var(--color-surface-primary))]">
           <tbody>
             {board.map((row, rowIndex) => (
-              <BoardRow
-                key={`row-${rowIndex}`}
-                row={row}
-                rowIndex={rowIndex}
-                onSelect={handleSelectCell}
-              />
+              <BoardRow key={`row-${rowIndex}`} row={row} rowIndex={rowIndex} onSelect={handleSelectCell} />
             ))}
           </tbody>
         </table>

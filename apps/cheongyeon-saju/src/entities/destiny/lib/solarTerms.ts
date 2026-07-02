@@ -71,8 +71,7 @@ const norm360 = (x: number): number => ((x % 360) + 360) % 360;
 /**
  * JDN → 율리우스 세기 (J2000.0 기준)
  */
-const jdnToJulianCentury = (jdn: number): number =>
-  (jdn - 2451545.0) / 36525.0;
+const jdnToJulianCentury = (jdn: number): number => (jdn - 2451545.0) / 36525.0;
 
 /**
  * IAU 1980 장동 Δψ 계산 (63항)
@@ -83,30 +82,14 @@ const jdnToJulianCentury = (jdn: number): number =>
 const computeDeltaPsi = (T: number): number => {
   // Meeus eq. 22.2~22.6: 기본 천문 인수 (도 단위)
   const D =
-    297.85036 +
-    445267.11148 * T -
-    0.0019142 * T * T +
-    T ** 3 / 189474.0;
-  const M =
-    357.52772 +
-    35999.05034 * T -
-    0.0001603 * T * T -
-    T ** 3 / 300000.0;
+    297.85036 + 445267.11148 * T - 0.0019142 * T * T + T ** 3 / 189474.0;
+  const M = 357.52772 + 35999.05034 * T - 0.0001603 * T * T - T ** 3 / 300000.0;
   const Mp =
-    134.96298 +
-    477198.867398 * T +
-    0.0086972 * T * T +
-    T ** 3 / 56250.0;
+    134.96298 + 477198.867398 * T + 0.0086972 * T * T + T ** 3 / 56250.0;
   const F =
-    93.27191 +
-    483202.017538 * T -
-    0.0036825 * T * T +
-    T ** 3 / 327270.0;
+    93.27191 + 483202.017538 * T - 0.0036825 * T * T + T ** 3 / 327270.0;
   const Om =
-    125.04452 -
-    1934.136261 * T +
-    0.0020708 * T * T +
-    T ** 3 / 450000.0;
+    125.04452 - 1934.136261 * T + 0.0020708 * T * T + T ** 3 / 450000.0;
 
   let deltaPsi = 0;
   for (const [cD, cM, cMp, cF, cOm, psi0, psi1] of IAU1980_NUTATION) {
@@ -148,8 +131,7 @@ const getSolarLongitude = (jdn: number): number => {
     toDeg((13 * e ** 3) / 12) * Math.sin(3 * Mrad);
 
   // 태양 거리 R (AU, Meeus eq. 25.5)
-  const R =
-    (1.000001018 * (1 - e * e)) / (1 + e * Math.cos(Mrad + toRad(C)));
+  const R = (1.000001018 * (1 - e * e)) / (1 + e * Math.cos(Mrad + toRad(C)));
 
   // IAU 1980 장동 Δψ (도)
   const deltaPsiDeg = computeDeltaPsi(T);

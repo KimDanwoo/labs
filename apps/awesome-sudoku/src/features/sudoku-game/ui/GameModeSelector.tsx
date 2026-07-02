@@ -1,15 +1,13 @@
-import { GAME_MODE } from "@entities/game/model/constants";
-import { GameMode } from "@entities/game/model/types";
-import {
-  gameModeAtom, switchGameModeAtom,
-} from "@features/sudoku-game/model/atoms";
-import { cn } from "@shared/model/utils";
-import { useAtomValue, useSetAtom } from "jotai";
-import React, { memo, useCallback } from "react";
+import { GAME_MODE } from '@entities/game/model/constants';
+import { GameMode } from '@entities/game/model/types';
+import { gameModeAtom, switchGameModeAtom } from '@features/sudoku-game/model/atoms';
+import { cn } from '@shared/model/utils';
+import { useAtomValue, useSetAtom } from 'jotai';
+import React, { memo, useCallback } from 'react';
 
 const gameModes = [
-  { label: "클래식", value: GAME_MODE.CLASSIC },
-  { label: "킬러", value: GAME_MODE.KILLER },
+  { label: '클래식', value: GAME_MODE.CLASSIC },
+  { label: '킬러', value: GAME_MODE.KILLER },
 ];
 
 export const GameModeSelector: React.FC = memo(() => {
@@ -33,11 +31,11 @@ export const GameModeSelector: React.FC = memo(() => {
             key={value}
             onClick={() => handleSwitchGameMode(value)}
             className={cn(
-              "px-4 py-1.5 rounded-lg text-sm font-medium",
-              "transition-all duration-200 ease-out",
+              'px-4 py-1.5 rounded-lg text-sm font-medium',
+              'transition-all duration-200 ease-out',
               isActive
-                ? "bg-[rgb(var(--color-surface-primary))] text-[rgb(var(--color-text-primary))] shadow-sm"
-                : "text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))]",
+                ? 'bg-[rgb(var(--color-surface-primary))] text-[rgb(var(--color-text-primary))] shadow-sm'
+                : 'text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))]',
             )}
           >
             {label}
@@ -48,4 +46,4 @@ export const GameModeSelector: React.FC = memo(() => {
   );
 });
 
-GameModeSelector.displayName = "GameModeSelector";
+GameModeSelector.displayName = 'GameModeSelector';

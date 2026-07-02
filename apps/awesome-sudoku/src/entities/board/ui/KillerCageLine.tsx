@@ -1,11 +1,11 @@
-import { memo } from "react";
+import { memo } from 'react';
 
 interface KillerCageLineProps {
   path: string;
   color?: string;
 }
 
-export const KillerCageLine = memo<KillerCageLineProps>(({ path, color = "#436def" }) => (
+export const KillerCageLine = memo<KillerCageLineProps>(({ path, color = '#436def' }) => (
   <path
     d={path}
     fill="none"
@@ -18,4 +18,4 @@ export const KillerCageLine = memo<KillerCageLineProps>(({ path, color = "#436de
   />
 ));
 
-KillerCageLine.displayName = "KillerCageLine";
+KillerCageLine.displayName = 'KillerCageLine';

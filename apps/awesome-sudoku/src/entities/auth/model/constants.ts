@@ -1,1 +1,1 @@
-export const AUTH_STORAGE_KEY = "sudoku-auth-user";
+export const AUTH_STORAGE_KEY = 'sudoku-auth-user';

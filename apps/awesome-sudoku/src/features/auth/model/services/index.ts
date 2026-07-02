@@ -1,3 +1,1 @@
-export {
-  subscribeToAuthChanges, signInWithGoogle, signOut,
-} from "./authService";
+export { signInWithGoogle, signOut, subscribeToAuthChanges } from './authService';

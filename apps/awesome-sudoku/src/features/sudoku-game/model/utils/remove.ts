@@ -1,30 +1,15 @@
-import { BOARD_SIZE, MAX_REMOVAL_ATTEMPTS } from "@entities/board/model/constants";
-import {
-  CellPriority,
-  Grid,
-  RemovalStrategy,
-  SudokuBoard,
-} from "@entities/board/model/types";
-import { Difficulty, KillerCage } from "@entities/game/model/types";
-import {
-  hasUniqueSolution,
-  isKillerRemovalValid,
-  isKillerRemovalValidLenient,
-} from "./validator";
-import {
-  calculateCellPriorities,
-  calculateKillerCellPriority,
-  calculateMustKeepCells,
-} from "./calculate";
+import { BOARD_SIZE, MAX_REMOVAL_ATTEMPTS } from '@entities/board/model/constants';
+import { CellPriority, Grid, RemovalStrategy, SudokuBoard } from '@entities/board/model/types';
+import { Difficulty, KillerCage } from '@entities/game/model/types';
+import { calculateCellPriorities, calculateKillerCellPriority, calculateMustKeepCells } from './calculate';
+import { hasUniqueSolution, isKillerRemovalValid, isKillerRemovalValidLenient } from './validator';
 
 /**
  * @description 난이도별 제거 전략 반환
  * @param {Difficulty} difficulty - 난이도
  * @returns {RemovalStrategy} 제거 전략
  */
-function getRemovalStrategy(
-  difficulty: Difficulty,
-): RemovalStrategy {
+function getRemovalStrategy(difficulty: Difficulty): RemovalStrategy {
   const strategies: Record<Difficulty, RemovalStrategy> = {
     easy: {
       preferCenter: false,
@@ -74,14 +59,9 @@ export function removeRandomCellsWithStrategy(
   difficulty: Difficulty,
 ): number {
   const strategy = getRemovalStrategy(difficulty);
-  const cellsToRemove = calculateCellPriorities(
-    strategy,
-    targetRemove,
-  );
+  const cellsToRemove = calculateCellPriorities(strategy, targetRemove);
 
-  const tempGrid: (number | null)[][] = solution.map(
-    (row) => [...row],
-  );
+  const tempGrid: (number | null)[][] = solution.map((row) => [...row]);
   let removedCount = 0;
 
   for (const { pos } of cellsToRemove) {
@@ -110,9 +90,7 @@ export function removeRandomCellsWithStrategy(
  * @param {KillerCage[]} cages - 케이지 배열
  * @returns {Map<string, KillerCage>} 케이지 맵
  */
-function createCageMap(
-  cages: KillerCage[],
-): Map<string, KillerCage> {
+function createCageMap(cages: KillerCage[]): Map<string, KillerCage> {
   const cageMap = new Map<string, KillerCage>();
   cages.forEach((cage) => {
     cage.cells.forEach(([r, c]) => {
@@ -136,23 +114,16 @@ function findRemovableKillerCells(
     for (let col = 0; col < BOARD_SIZE; col++) {
       const key = `${row}-${col}`;
 
-      if (
-        mustKeepCells.has(key) ||
-        board[row][col].value === null
-      ) {
+      if (mustKeepCells.has(key) || board[row][col].value === null) {
         continue;
       }
 
-      const priority = calculateKillerCellPriority(
-        row, col, cageMap, board,
-      );
+      const priority = calculateKillerCellPriority(row, col, cageMap, board);
       removableCells.push({ pos: [row, col], priority });
     }
   }
 
-  return removableCells.sort(
-    (a, b) => b.priority - a.priority,
-  );
+  return removableCells.sort((a, b) => b.priority - a.priority);
 }
 
 /**
@@ -165,17 +136,11 @@ function processBatchKillerRemoval(
   difficulty: Difficulty,
   cages: KillerCage[],
 ): number {
-  const mustKeepCells = calculateMustKeepCells(
-    cages, difficulty,
-  );
-  const removableCells = findRemovableKillerCells(
-    board, cageMap, mustKeepCells,
-  );
+  const mustKeepCells = calculateMustKeepCells(cages, difficulty);
+  const removableCells = findRemovableKillerCells(board, cageMap, mustKeepCells);
   let batchRemoved = 0;
 
-  const cellsToTry = Math.min(
-    removableCells.length, batchSize,
-  );
+  const cellsToTry = Math.min(removableCells.length, batchSize);
 
   for (let i = 0; i < cellsToTry; i++) {
     const { pos } = removableCells[i];
@@ -187,9 +152,7 @@ function processBatchKillerRemoval(
     board[row][col].value = null;
     board[row][col].isInitial = false;
 
-    const validate = difficulty === "expert"
-      ? isKillerRemovalValidLenient
-      : isKillerRemovalValid;
+    const validate = difficulty === 'expert' ? isKillerRemovalValidLenient : isKillerRemovalValid;
     const isValid = validate(board, cages, [row, col]);
 
     if (isValid) {
@@ -217,21 +180,11 @@ export function removeKillerCells(
 ): number {
   const cageMap = createCageMap(cages);
   let removedCount = 0;
-  const maxAttempts = difficulty === "expert"
-    ? EXPERT_MAX_REMOVAL_ATTEMPTS
-    : MAX_REMOVAL_ATTEMPTS;
+  const maxAttempts = difficulty === 'expert' ? EXPERT_MAX_REMOVAL_ATTEMPTS : MAX_REMOVAL_ATTEMPTS;
 
-  for (
-    let attempt = 1;
-    attempt <= maxAttempts && removedCount < targetRemove;
-    attempt++
-  ) {
-    const batchSize = Math.min(
-      REMOVAL_BATCH_SIZE, targetRemove - removedCount,
-    );
-    const attemptRemoved = processBatchKillerRemoval(
-      board, cageMap, batchSize, difficulty, cages,
-    );
+  for (let attempt = 1; attempt <= maxAttempts && removedCount < targetRemove; attempt++) {
+    const batchSize = Math.min(REMOVAL_BATCH_SIZE, targetRemove - removedCount);
+    const attemptRemoved = processBatchKillerRemoval(board, cageMap, batchSize, difficulty, cages);
     removedCount += attemptRemoved;
 
     if (attemptRemoved === 0) break;

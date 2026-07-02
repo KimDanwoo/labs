@@ -1,5 +1,5 @@
-import { BLOCK_SIZE, BOARD_SIZE, KEY_NUMBER } from "@entities/board/model/constants";
-import { Grid } from "@entities/board/model/types";
+import { BLOCK_SIZE, BOARD_SIZE, KEY_NUMBER } from '@entities/board/model/constants';
+import { Grid } from '@entities/board/model/types';
 
 /**
  * 숫자 세트가 유효한지 확인

@@ -1,6 +1,6 @@
-import { SudokuBoard } from "@entities/board/model/types";
-import { GameMode, GameCompletionResult, KillerCage } from "@entities/game/model/types";
-import { checkGameCompletion, validateBoard } from "@features/sudoku-game/model/utils";
+import { SudokuBoard } from '@entities/board/model/types';
+import { GameCompletionResult, GameMode, KillerCage } from '@entities/game/model/types';
+import { checkGameCompletion, validateBoard } from '@features/sudoku-game/model/utils';
 
 export const buildGameResultState = (result: GameCompletionResult) => ({
   board: result.board,

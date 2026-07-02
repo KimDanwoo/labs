@@ -1,8 +1,1 @@
-export {
-  userAtom,
-  isLoadingAtom,
-  isAuthenticatedAtom,
-  setUserAtom,
-  setLoadingAtom,
-  logoutAtom,
-} from "./authAtoms";
+export { isAuthenticatedAtom, isLoadingAtom, logoutAtom, setLoadingAtom, setUserAtom, userAtom } from './authAtoms';
