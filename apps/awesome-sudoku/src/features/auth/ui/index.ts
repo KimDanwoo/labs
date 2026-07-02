@@ -1,1 +1,2 @@
-export * from "./GoogleSignInButton";
+export * from './GoogleSignInButton';
+export * from './UserProfileMenu';

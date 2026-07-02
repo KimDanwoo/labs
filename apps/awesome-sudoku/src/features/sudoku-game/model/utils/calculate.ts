@@ -1,8 +1,8 @@
-import { BLOCK_SIZE, BOARD_MAX_INDEX, BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
-import { CellPriority, GridPosition, RemovalStrategy, SudokuBoard } from "@entities/board/model/types";
-import { getCenterDistance, isCenter, isCorner, isEdge } from "@entities/board/model/utils";
-import { Difficulty, KillerCage } from "@entities/game/model/types";
-import { shuffleArray } from "./common";
+import { BLOCK_SIZE, BOARD_MAX_INDEX, BOARD_SIZE, SUDOKU_CELL_COUNT } from '@entities/board/model/constants';
+import { CellPriority, GridPosition, RemovalStrategy, SudokuBoard } from '@entities/board/model/types';
+import { getCenterDistance, isCenter, isCorner, isEdge } from '@entities/board/model/utils';
+import { Difficulty, KillerCage } from '@entities/game/model/types';
+import { shuffleArray } from './common';
 
 /**
  * @description 위치별 가중치 계산
@@ -143,7 +143,7 @@ export function calculateMustKeepCells(cages: KillerCage[], difficulty: Difficul
 
     if (cage.cells.length > 1) {
       const keepCount =
-        difficulty === "expert"
+        difficulty === 'expert'
           ? Math.max(0, Math.floor(cage.cells.length / 4))
           : Math.max(1, Math.floor(cage.cells.length / 3));
 

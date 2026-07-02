@@ -1,6 +1,6 @@
-import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
-import { Grid } from "@entities/board/model/types";
-import { applyNumberMapping, createRandomNumberMapping } from "./common";
+import { BLOCK_SIZE, BOARD_SIZE } from '@entities/board/model/constants';
+import { Grid } from '@entities/board/model/types';
+import { applyNumberMapping, createRandomNumberMapping } from './common';
 
 /**
  * @description 블록 내에서 무작위 열 교환

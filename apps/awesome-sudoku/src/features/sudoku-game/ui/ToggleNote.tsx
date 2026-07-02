@@ -1,9 +1,7 @@
-import {
-  isNoteModeAtom, timerActiveAtom, toggleNoteModeAtom,
-} from "@features/sudoku-game/model/atoms";
-import { IconButton } from "@shared/ui";
-import { useAtomValue, useSetAtom } from "jotai";
-import { LuPencil } from "react-icons/lu";
+import { isNoteModeAtom, timerActiveAtom, toggleNoteModeAtom } from '@features/sudoku-game/model/atoms';
+import { IconButton } from '@shared/ui';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { LuPencil } from 'react-icons/lu';
 
 export const ToggleNote = () => {
   const isNoteMode = useAtomValue(isNoteModeAtom);
@@ -16,7 +14,7 @@ export const ToggleNote = () => {
       label="메모"
       onClick={toggleNoteMode}
       disabled={!timerActive}
-      variant={isNoteMode ? "primary" : "default"}
+      variant={isNoteMode ? 'primary' : 'default'}
     />
   );
 };

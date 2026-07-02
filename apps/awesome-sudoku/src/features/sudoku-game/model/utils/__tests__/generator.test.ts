@@ -1,16 +1,16 @@
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from "@entities/board/model/constants";
-import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
-import { KILLER_DIFFICULTY_RANGES } from "@entities/game/model/constants";
-import { Difficulty } from "@entities/game/model/types";
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@entities/board/model/constants';
+import { Grid, GridPosition, SudokuBoard } from '@entities/board/model/types';
+import { KILLER_DIFFICULTY_RANGES } from '@entities/game/model/constants';
+import { Difficulty } from '@entities/game/model/types';
 import {
   generateBoard,
   generateKillerBoard,
   generateKillerCages,
   generateSolution,
   groupAdjacentCells,
-} from "@features/sudoku-game/model/utils/generator";
-import { hasUniqueSolution } from "@features/sudoku-game/model/utils/validator";
-import { describe, expect, it } from "vitest";
+} from '@features/sudoku-game/model/utils/generator';
+import { hasUniqueSolution } from '@features/sudoku-game/model/utils/validator';
+import { describe, expect, it } from 'vitest';
 
 // 헬퍼 함수들
 function hasValidStructure(grid: Grid): boolean {
@@ -20,7 +20,7 @@ function hasValidStructure(grid: Grid): boolean {
     if (!grid[row] || grid[row].length !== BOARD_SIZE) return false;
     for (let col = 0; col < BOARD_SIZE; col++) {
       const num = grid[row][col];
-      if (typeof num !== "number" || num < 0 || num > 9) return false;
+      if (typeof num !== 'number' || num < 0 || num > 9) return false;
     }
   }
   return true;
@@ -45,9 +45,9 @@ function isCompleteSudoku(grid: Grid): boolean {
   return hasValidStructure(grid);
 }
 
-describe("스도쿠 생성기", () => {
-  describe("generateSolution", () => {
-    it("완전한 스도쿠 솔루션을 생성해야 한다", () => {
+describe('스도쿠 생성기', () => {
+  describe('generateSolution', () => {
+    it('완전한 스도쿠 솔루션을 생성해야 한다', () => {
       const solution = generateSolution();
 
       expect(solution).toBeDefined();
@@ -56,13 +56,13 @@ describe("스도쿠 생성기", () => {
       expect(isCompleteSudoku(solution)).toBe(true);
     });
 
-    it("생성된 솔루션이 올바른 구조를 가져야 한다", () => {
+    it('생성된 솔루션이 올바른 구조를 가져야 한다', () => {
       const solution = generateSolution();
 
       expect(hasValidStructure(solution)).toBe(true);
     });
 
-    it("매번 호출할 때마다 솔루션을 반환해야 한다", () => {
+    it('매번 호출할 때마다 솔루션을 반환해야 한다', () => {
       const solution1 = generateSolution();
       const solution2 = generateSolution();
 
@@ -71,7 +71,7 @@ describe("스도쿠 생성기", () => {
     });
   });
 
-  describe("generateBoard", () => {
+  describe('generateBoard', () => {
     const validSolution: Grid = [
       [5, 3, 4, 6, 7, 8, 9, 1, 2],
       [6, 7, 2, 1, 9, 5, 3, 4, 8],
@@ -84,7 +84,7 @@ describe("스도쿠 생성기", () => {
       [3, 4, 5, 2, 8, 6, 1, 7, 9],
     ];
 
-    it.each<Difficulty>(["easy", "medium", "hard", "expert"])("%s 난이도 보드를 생성해야 한다", (difficulty) => {
+    it.each<Difficulty>(['easy', 'medium', 'hard', 'expert'])('%s 난이도 보드를 생성해야 한다', (difficulty) => {
       const board = generateBoard(validSolution, difficulty);
 
       expect(board).toBeDefined();
@@ -92,27 +92,27 @@ describe("스도쿠 생성기", () => {
       expect(board[0].length).toBe(BOARD_SIZE);
     });
 
-    it("보드의 모든 셀이 올바른 구조를 가져야 한다", () => {
-      const board = generateBoard(validSolution, "medium");
+    it('보드의 모든 셀이 올바른 구조를 가져야 한다', () => {
+      const board = generateBoard(validSolution, 'medium');
 
       for (let row = 0; row < BOARD_SIZE; row++) {
         for (let col = 0; col < BOARD_SIZE; col++) {
           const cell = board[row][col];
-          expect(cell).toHaveProperty("value");
-          expect(cell).toHaveProperty("isInitial");
-          expect(cell).toHaveProperty("isSelected");
-          expect(cell).toHaveProperty("isConflict");
-          expect(cell).toHaveProperty("notes");
+          expect(cell).toHaveProperty('value');
+          expect(cell).toHaveProperty('isInitial');
+          expect(cell).toHaveProperty('isSelected');
+          expect(cell).toHaveProperty('isConflict');
+          expect(cell).toHaveProperty('notes');
           expect(Array.isArray(cell.notes)).toBe(true);
-          expect(typeof cell.isInitial).toBe("boolean");
-          expect(typeof cell.isSelected).toBe("boolean");
-          expect(typeof cell.isConflict).toBe("boolean");
+          expect(typeof cell.isInitial).toBe('boolean');
+          expect(typeof cell.isSelected).toBe('boolean');
+          expect(typeof cell.isConflict).toBe('boolean');
         }
       }
     });
 
-    it("보드가 올바른 셀 개수를 가져야 한다", () => {
-      const difficulty: Difficulty = "medium";
+    it('보드가 올바른 셀 개수를 가져야 한다', () => {
+      const difficulty: Difficulty = 'medium';
       const board = generateBoard(validSolution, difficulty);
       const filledCells = countFilledCells(board);
 
@@ -121,8 +121,8 @@ describe("스도쿠 생성기", () => {
       expect(filledCells).toBeLessThanOrEqual(SUDOKU_CELL_COUNT);
     });
 
-    it("보드의 모든 셀이 적절한 구조를 가져야 한다", () => {
-      const board = generateBoard(validSolution, "easy");
+    it('보드의 모든 셀이 적절한 구조를 가져야 한다', () => {
+      const board = generateBoard(validSolution, 'easy');
 
       let totalCells = 0;
 
@@ -131,15 +131,15 @@ describe("스도쿠 생성기", () => {
           const cell = board[row][col];
 
           // cell이 올바른 구조를 가지는지 확인
-          expect(cell).toHaveProperty("value");
-          expect(cell).toHaveProperty("isInitial");
-          expect(cell).toHaveProperty("isSelected");
-          expect(cell).toHaveProperty("isConflict");
-          expect(cell).toHaveProperty("notes");
+          expect(cell).toHaveProperty('value');
+          expect(cell).toHaveProperty('isInitial');
+          expect(cell).toHaveProperty('isSelected');
+          expect(cell).toHaveProperty('isConflict');
+          expect(cell).toHaveProperty('notes');
 
           // value 타입이 올바른지 확인 (0 포함)
           const numberValue = Number(cell.value);
-          expect(typeof numberValue).toBe("number");
+          expect(typeof numberValue).toBe('number');
           expect(numberValue).toBeGreaterThanOrEqual(0); // 0 포함
           expect(numberValue).toBeLessThanOrEqual(9); // 9 포함
 
@@ -152,22 +152,15 @@ describe("스도쿠 생성기", () => {
       expect(totalCells).toBe(SUDOKU_CELL_COUNT);
     });
 
-    it.each<Difficulty>([
-      "easy", "medium", "hard", "expert",
-    ])(
-      "%s 난이도에서 유일해를 보장해야 한다",
-      (difficulty) => {
-        const board = generateBoard(validSolution, difficulty);
-        const grid = board.map(
-          (row) => row.map((cell) => cell.value),
-        );
+    it.each<Difficulty>(['easy', 'medium', 'hard', 'expert'])('%s 난이도에서 유일해를 보장해야 한다', (difficulty) => {
+      const board = generateBoard(validSolution, difficulty);
+      const grid = board.map((row) => row.map((cell) => cell.value));
 
-        expect(hasUniqueSolution(grid)).toBe(true);
-      },
-    );
+      expect(hasUniqueSolution(grid)).toBe(true);
+    });
   });
 
-  describe("generateKillerBoard", () => {
+  describe('generateKillerBoard', () => {
     const validSolution: Grid = [
       [5, 3, 4, 6, 7, 8, 9, 1, 2],
       [6, 7, 2, 1, 9, 5, 3, 4, 8],
@@ -180,7 +173,7 @@ describe("스도쿠 생성기", () => {
       [3, 4, 5, 2, 8, 6, 1, 7, 9],
     ];
 
-    it.each<Difficulty>(["easy", "medium", "hard", "expert"])("%s 난이도 킬러 보드를 생성해야 한다", (difficulty) => {
+    it.each<Difficulty>(['easy', 'medium', 'hard', 'expert'])('%s 난이도 킬러 보드를 생성해야 한다', (difficulty) => {
       const result = generateKillerBoard(validSolution, difficulty);
 
       expect(result).toBeDefined();
@@ -190,22 +183,22 @@ describe("스도쿠 생성기", () => {
       expect(result.cages.length).toBeGreaterThan(0);
     });
 
-    it("생성된 케이지들이 올바른 구조를 가져야 한다", () => {
-      const result = generateKillerBoard(validSolution, "medium");
+    it('생성된 케이지들이 올바른 구조를 가져야 한다', () => {
+      const result = generateKillerBoard(validSolution, 'medium');
 
       for (const cage of result.cages) {
-        expect(cage).toHaveProperty("id");
-        expect(cage).toHaveProperty("cells");
-        expect(cage).toHaveProperty("sum");
-        expect(typeof cage.id).toBe("number");
+        expect(cage).toHaveProperty('id');
+        expect(cage).toHaveProperty('cells');
+        expect(cage).toHaveProperty('sum');
+        expect(typeof cage.id).toBe('number');
         expect(Array.isArray(cage.cells)).toBe(true);
-        expect(typeof cage.sum).toBe("number");
+        expect(typeof cage.sum).toBe('number');
         expect(cage.cells.length).toBeGreaterThan(0);
       }
     });
 
-    it("케이지 크기가 난이도별 제한을 준수해야 한다", () => {
-      const difficulty: Difficulty = "hard";
+    it('케이지 크기가 난이도별 제한을 준수해야 한다', () => {
+      const difficulty: Difficulty = 'hard';
       const result = generateKillerBoard(validSolution, difficulty);
       const { maxCageSize } = KILLER_DIFFICULTY_RANGES[difficulty];
 
@@ -215,8 +208,8 @@ describe("스도쿠 생성기", () => {
       }
     });
 
-    it("모든 셀이 정확히 하나의 케이지에 속해야 한다", () => {
-      const result = generateKillerBoard(validSolution, "easy");
+    it('모든 셀이 정확히 하나의 케이지에 속해야 한다', () => {
+      const result = generateKillerBoard(validSolution, 'easy');
       const cellsInCages = new Set<string>();
 
       for (const cage of result.cages) {
@@ -235,7 +228,7 @@ describe("스도쿠 생성기", () => {
     });
   });
 
-  describe("generateKillerCages", () => {
+  describe('generateKillerCages', () => {
     const validSolution: Grid = [
       [5, 3, 4, 6, 7, 8, 9, 1, 2],
       [6, 7, 2, 1, 9, 5, 3, 4, 8],
@@ -248,15 +241,15 @@ describe("스도쿠 생성기", () => {
       [3, 4, 5, 2, 8, 6, 1, 7, 9],
     ];
 
-    it("올바른 케이지 배열을 생성해야 한다", () => {
-      const cages = generateKillerCages(validSolution, "medium");
+    it('올바른 케이지 배열을 생성해야 한다', () => {
+      const cages = generateKillerCages(validSolution, 'medium');
 
       expect(Array.isArray(cages)).toBe(true);
       expect(cages.length).toBeGreaterThan(0);
     });
 
-    it("케이지의 합이 셀 값들의 합과 일치해야 한다", () => {
-      const cages = generateKillerCages(validSolution, "easy");
+    it('케이지의 합이 셀 값들의 합과 일치해야 한다', () => {
+      const cages = generateKillerCages(validSolution, 'easy');
 
       for (const cage of cages) {
         const actualSum = cage.cells.reduce((sum, [row, col]) => sum + validSolution[row][col], 0);
@@ -264,15 +257,15 @@ describe("스도쿠 생성기", () => {
       }
     });
 
-    it("각 케이지가 고유한 ID를 가져야 한다", () => {
-      const cages = generateKillerCages(validSolution, "hard");
+    it('각 케이지가 고유한 ID를 가져야 한다', () => {
+      const cages = generateKillerCages(validSolution, 'hard');
       const ids = new Set(cages.map((cage) => cage.id));
 
       expect(ids.size).toBe(cages.length);
     });
 
-    it("모든 셀이 케이지에 할당되어야 한다", () => {
-      const cages = generateKillerCages(validSolution, "medium");
+    it('모든 셀이 케이지에 할당되어야 한다', () => {
+      const cages = generateKillerCages(validSolution, 'medium');
       const cellsInCages = new Set<string>();
 
       for (const cage of cages) {
@@ -285,8 +278,8 @@ describe("스도쿠 생성기", () => {
     });
   });
 
-  describe("groupAdjacentCells", () => {
-    it("인접한 셀들을 올바르게 그룹화해야 한다", () => {
+  describe('groupAdjacentCells', () => {
+    it('인접한 셀들을 올바르게 그룹화해야 한다', () => {
       const cells: GridPosition[] = [
         [0, 0],
         [0, 1],
@@ -305,18 +298,18 @@ describe("스도쿠 생성기", () => {
       expect(groupSizes).toEqual([1, 2, 3]);
     });
 
-    it("빈 배열에 대해 빈 그룹을 반환해야 한다", () => {
+    it('빈 배열에 대해 빈 그룹을 반환해야 한다', () => {
       const groups = groupAdjacentCells([]);
       expect(groups).toEqual([]);
     });
 
-    it("단일 셀에 대해 하나의 그룹을 반환해야 한다", () => {
+    it('단일 셀에 대해 하나의 그룹을 반환해야 한다', () => {
       const groups = groupAdjacentCells([[3, 3]]);
       expect(groups.length).toBe(1);
       expect(groups[0]).toEqual([[3, 3]]);
     });
 
-    it("모든 셀이 연결되어 있으면 하나의 그룹을 반환해야 한다", () => {
+    it('모든 셀이 연결되어 있으면 하나의 그룹을 반환해야 한다', () => {
       const cells: GridPosition[] = [
         [1, 1],
         [1, 2],
@@ -329,7 +322,7 @@ describe("스도쿠 생성기", () => {
       expect(groups[0].length).toBe(4);
     });
 
-    it("대각선으로만 연결된 셀들은 별도 그룹으로 처리해야 한다", () => {
+    it('대각선으로만 연결된 셀들은 별도 그룹으로 처리해야 한다', () => {
       const cells: GridPosition[] = [
         [0, 0],
         [1, 1],
@@ -341,10 +334,10 @@ describe("스도쿠 생성기", () => {
     });
   });
 
-  describe("통합 테스트", () => {
-    it("전체 킬러 스도쿠 생성 과정이 정상적으로 작동해야 한다", () => {
+  describe('통합 테스트', () => {
+    it('전체 킬러 스도쿠 생성 과정이 정상적으로 작동해야 한다', () => {
       const solution = generateSolution();
-      const { board, cages } = generateKillerBoard(solution, "medium");
+      const { board, cages } = generateKillerBoard(solution, 'medium');
 
       // 솔루션의 기본 구조가 유효한지 확인
       expect(hasValidStructure(solution)).toBe(true);
@@ -361,8 +354,8 @@ describe("스도쿠 생성기", () => {
       expect(totalCells).toBe(SUDOKU_CELL_COUNT);
     });
 
-    it("여러 난이도에서 일관된 결과를 생성해야 한다", () => {
-      const difficulties: Difficulty[] = ["easy", "medium", "hard", "expert"];
+    it('여러 난이도에서 일관된 결과를 생성해야 한다', () => {
+      const difficulties: Difficulty[] = ['easy', 'medium', 'hard', 'expert'];
 
       for (const difficulty of difficulties) {
         const solution = generateSolution();
@@ -376,7 +369,7 @@ describe("스도쿠 생성기", () => {
       }
     });
 
-    it("성능 테스트 - 솔루션 생성이 합리적인 시간 내에 완료되어야 한다", () => {
+    it('성능 테스트 - 솔루션 생성이 합리적인 시간 내에 완료되어야 한다', () => {
       const start = Date.now();
       generateSolution();
       const end = Date.now();

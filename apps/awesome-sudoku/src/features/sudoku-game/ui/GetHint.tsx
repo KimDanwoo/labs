@@ -1,9 +1,7 @@
-import {
-  getHintAtom, timerActiveAtom, hintsRemainingAtom,
-} from "@features/sudoku-game/model/atoms";
-import { IconButton } from "@shared/ui";
-import { useAtomValue, useSetAtom } from "jotai";
-import { LuLightbulb } from "react-icons/lu";
+import { getHintAtom, hintsRemainingAtom, timerActiveAtom } from '@features/sudoku-game/model/atoms';
+import { IconButton } from '@shared/ui';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { LuLightbulb } from 'react-icons/lu';
 
 export const GetHint = () => {
   const getHint = useSetAtom(getHintAtom);

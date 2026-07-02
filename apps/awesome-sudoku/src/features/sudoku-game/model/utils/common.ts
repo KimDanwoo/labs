@@ -1,6 +1,6 @@
-import { BOARD_NUMBERS, BOARD_SIZE } from "@entities/board/model/constants";
-import { CellHighlight, Grid, SudokuBoard } from "@entities/board/model/types";
-import { MINUTE } from "@shared/model/constants";
+import { BOARD_NUMBERS, BOARD_SIZE } from '@entities/board/model/constants';
+import { CellHighlight, Grid, SudokuBoard } from '@entities/board/model/types';
+import { MINUTE } from '@shared/model/constants';
 
 export function createEmptyGrid(): Grid {
   return Array(BOARD_SIZE)
@@ -27,7 +27,7 @@ export function shuffleArray<T>(array: T[]): void {
 export function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / MINUTE);
   const secs = seconds % MINUTE;
-  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
 /**

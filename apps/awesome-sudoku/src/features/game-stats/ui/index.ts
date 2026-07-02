@@ -1,2 +1,2 @@
-export { StatsOverview } from "./StatsOverview";
-export { StatsByDifficulty } from "./StatsByDifficulty";
+export { StatsByDifficulty } from './StatsByDifficulty';
+export { StatsOverview } from './StatsOverview';
