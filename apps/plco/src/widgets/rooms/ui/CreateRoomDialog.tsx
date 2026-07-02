@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { ROOM_NAME_MAX, ROOM_NICKNAME_MAX } from '@entities/chat-room/model/constants';
+import {
+  ROOM_NAME_MAX,
+  ROOM_NICKNAME_MAX,
+  ROOM_PASSWORD_MAX,
+} from '@entities/chat-room/model/constants';
 import { useCreateRoom } from '@entities/chat-room/model/hooks';
 
 type CreateRoomDialogProps = {
@@ -18,6 +22,7 @@ export default function CreateRoomDialog({
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState(defaultNickname);
   const [isPublic, setIsPublic] = useState(false);
+  const [password, setPassword] = useState('');
   const { mutate, isPending, error } = useCreateRoom();
 
   const handleSubmit = (e: FormEvent) => {
@@ -26,11 +31,13 @@ export default function CreateRoomDialog({
     const trimmedNick = nickname.trim() || defaultNickname;
     if (!trimmedName || isPending) return;
 
+    const trimmedPassword = password.trim();
     mutate(
       {
         name: trimmedName.slice(0, ROOM_NAME_MAX),
         nickname: trimmedNick.slice(0, ROOM_NICKNAME_MAX),
         isPublic,
+        password: isPublic && trimmedPassword ? trimmedPassword : undefined,
       },
       { onSuccess: (roomId) => onCreated(roomId) },
     );
@@ -89,6 +96,24 @@ export default function CreateRoomDialog({
           />
         </button>
       </label>
+
+      {isPublic && (
+        <label className="flex flex-col gap-1">
+          <span className="text-xs text-gray-500">비밀번호 (선택)</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            maxLength={ROOM_PASSWORD_MAX}
+            placeholder="입장 시 물어볼 비밀번호"
+            autoComplete="new-password"
+            className="rounded-xl bg-input-bg px-3 py-2 text-sm text-gray-700 outline-none placeholder:text-gray-400"
+          />
+          <span className="text-[10px] text-gray-400">
+            비워두면 누구나 자유롭게 입장할 수 있어요
+          </span>
+        </label>
+      )}
 
       {error && (
         <p className="text-xs text-red">{(error as Error).message}</p>

@@ -21,6 +21,7 @@ function toRoom(row: ChatRoomRow): Room {
     name: row.name,
     ownerId: row.owner_id,
     isPublic: row.is_public,
+    hasPassword: row.has_password,
     createdAt: row.created_at,
   };
 }
@@ -42,11 +43,13 @@ export async function createRoom(
   name: string,
   nickname: string,
   isPublic = false,
+  password?: string,
 ): Promise<string> {
   const { data, error } = await supabase.rpc(RPC_CREATE_ROOM, {
     p_name: name,
     p_nickname: nickname,
     p_is_public: isPublic,
+    p_password: password ?? null,
   });
   if (error) throw error;
   return data as string;
@@ -75,14 +78,16 @@ export async function fetchPublicRooms(): Promise<Room[]> {
   return (data as ChatRoomRow[] | null)?.map(toRoom) ?? [];
 }
 
-/** 공개 방 자유 입장 (RPC join_room). 비익명 유저만 호출 가능. */
+/** 공개 방 입장 (RPC join_room). 비익명 유저만, 잠긴 방은 비밀번호 검증. */
 export async function joinRoomRpc(
   roomId: string,
   nickname: string,
+  password?: string,
 ): Promise<string> {
   const { data, error } = await supabase.rpc(RPC_JOIN_ROOM, {
     p_room_id: roomId,
     p_nickname: nickname,
+    p_password: password ?? null,
   });
   if (error) throw error;
   return data as string;
