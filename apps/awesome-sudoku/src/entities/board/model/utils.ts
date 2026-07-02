@@ -1,5 +1,5 @@
-import { BLOCK_SIZE, BOARD_CENTER, BOARD_MAX_INDEX } from "./constants";
-import { Grid } from "./types";
+import { BLOCK_SIZE, BOARD_CENTER, BOARD_MAX_INDEX } from './constants';
+import { Grid } from './types';
 
 /**
  * 그리드를 깊은 복사하여 반환

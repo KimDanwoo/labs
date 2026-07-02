@@ -1,8 +1,8 @@
-import { Grid, SudokuBoard } from "@entities/board/model/types";
-import { describe, expect, it } from "vitest";
-import { getHint } from "../controls";
+import { Grid, SudokuBoard } from '@entities/board/model/types';
+import { describe, expect, it } from 'vitest';
+import { getHint } from '../controls';
 
-describe("getHint", () => {
+describe('getHint', () => {
   // 테스트용 보드와 솔루션 데이터
   const mockBoard: SudokuBoard = [
     [
@@ -28,19 +28,19 @@ describe("getHint", () => {
     [7, 8, 9],
   ];
 
-  it("빈 셀이 없는 경우 null을 반환해야 합니다", () => {
+  it('빈 셀이 없는 경우 null을 반환해야 합니다', () => {
     const fullBoard: SudokuBoard = mockBoard.map((row) => row.map((cell) => ({ ...cell, value: 1 })));
     const result = getHint(fullBoard, mockSolution);
     expect(result).toBeNull();
   });
 
-  it("빈 셀이 있는 경우 유효한 힌트를 반환해야 합니다", () => {
+  it('빈 셀이 있는 경우 유효한 힌트를 반환해야 합니다', () => {
     const result = getHint(mockBoard, mockSolution);
 
     // 반환된 힌트가 유효한 형식인지 확인
-    expect(result).toHaveProperty("row");
-    expect(result).toHaveProperty("col");
-    expect(result).toHaveProperty("value");
+    expect(result).toHaveProperty('row');
+    expect(result).toHaveProperty('col');
+    expect(result).toHaveProperty('value');
 
     if (result) {
       // 반환된 위치가 실제로 빈 셀인지 확인
@@ -57,7 +57,7 @@ describe("getHint", () => {
     }
   });
 
-  it("여러 번 실행해도 항상 유효한 힌트를 반환해야 합니다", () => {
+  it('여러 번 실행해도 항상 유효한 힌트를 반환해야 합니다', () => {
     const results = new Set<string>();
 
     // 여러 번 실행하여 다양한 결과가 나오는지 확인

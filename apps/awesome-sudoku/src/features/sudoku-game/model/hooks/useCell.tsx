@@ -1,12 +1,10 @@
-import { CellProps } from "@entities/board/model/types";
-import {
-  gameModeAtom, isNoteModeAtom, timerActiveAtom, highlightedCellsAtom,
-} from "@features/sudoku-game/model/atoms";
-import { useAtomValue } from "jotai";
-import { useMemo } from "react";
-import { useCellStyles } from "./useCellStyles";
-import { useCellAccessibility } from "./useCellAccessibility";
-import { useCellInteraction } from "./useCellInteraction";
+import { CellProps } from '@entities/board/model/types';
+import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom } from '@features/sudoku-game/model/atoms';
+import { useAtomValue } from 'jotai';
+import { useMemo } from 'react';
+import { useCellAccessibility } from './useCellAccessibility';
+import { useCellInteraction } from './useCellInteraction';
+import { useCellStyles } from './useCellStyles';
 
 const EMPTY_HIGHLIGHT = { selected: false, related: false, sameValue: false } as const;
 
@@ -17,10 +15,7 @@ export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
   const isNoteMode = useAtomValue(isNoteModeAtom);
   const timerActive = useAtomValue(timerActiveAtom);
   const highlightedCells = useAtomValue(highlightedCellsAtom);
-  const highlight = useMemo(
-    () => highlightedCells[cellKey] ?? EMPTY_HIGHLIGHT,
-    [highlightedCells, cellKey],
-  );
+  const highlight = useMemo(() => highlightedCells[cellKey] ?? EMPTY_HIGHLIGHT, [highlightedCells, cellKey]);
 
   const { className, stateClasses } = useCellStyles({
     cell,

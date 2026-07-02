@@ -1,1 +1,1 @@
-export { useThemeSync } from "./useThemeSync";
+export { useThemeSync } from './useThemeSync';

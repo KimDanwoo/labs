@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 
 const envContent = readFileSync('.env.local', 'utf-8');
 for (const line of envContent.split('\n')) {

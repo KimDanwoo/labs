@@ -1,11 +1,10 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { adminFetch } from './adminFetch';
-import { ADMIN_API } from './api';
-import type { CharacterRow, MeetingSceneRow, QuizRow } from './types';
+import { adminFetch } from '../services/adminFetch';
+import { ADMIN_API } from '../services/api';
+import type { CharacterRow, MeetingSceneRow, QuizRow } from '../types';
 
-/** React Query 키 (도메인별). */
 export const ADMIN_QUERY_KEYS = {
   characters: ['admin', 'characters'] as const,
   meetingScenes: ['admin', 'meeting-scenes'] as const,
@@ -24,12 +23,7 @@ async function postUpsert<T>(path: string, body: T): Promise<void> {
     method: 'POST',
     body: JSON.stringify(body),
   });
-  if (!res.ok) {
-    const payload = (await res.json().catch(() => null)) as {
-      error?: string;
-    } | null;
-    throw new Error(payload?.error ?? '저장에 실패했어요.');
-  }
+  if (!res.ok) throw new Error('저장에 실패했어요.');
 }
 
 async function deleteById(path: string, id: string): Promise<void> {
@@ -39,7 +33,6 @@ async function deleteById(path: string, id: string): Promise<void> {
   if (!res.ok) throw new Error('삭제에 실패했어요.');
 }
 
-// ── 캐릭터 ────────────────────────────────────────────────
 export function useCharacters() {
   return useQuery({
     queryKey: ADMIN_QUERY_KEYS.characters,
@@ -56,7 +49,6 @@ export function useSaveCharacter() {
   });
 }
 
-// ── 만남 대사 ─────────────────────────────────────────────
 export function useMeetingScenes() {
   return useQuery({
     queryKey: ADMIN_QUERY_KEYS.meetingScenes,
@@ -83,7 +75,6 @@ export function useDeleteMeetingScene() {
   });
 }
 
-// ── 퀴즈 ──────────────────────────────────────────────────
 export function useQuizQuestions() {
   return useQuery({
     queryKey: ADMIN_QUERY_KEYS.quiz,

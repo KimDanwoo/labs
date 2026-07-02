@@ -5,7 +5,7 @@ export const PROJECTS: Project[] = [
   {
     title: '초원을 달리는 말',
     description: 'three.js로 만든 인터랙티브 3D 씬',
-    href: 'https://danwoo-lab-prairie.vercel.app/',
+    href: 'https://d-prairie.vercel.app/',
     image: '/projects/prairie.png',
     imagePosition: 'center',
   },
@@ -44,5 +44,11 @@ export const PROJECTS: Project[] = [
     description: '쉽게 즐기는 스도쿠 게임',
     href: 'https://awesome-sudoku.vercel.app/',
     image: '/projects/sudoku.png',
+  },
+  {
+    title: 'gymlog',
+    description: '헬스장에서 루틴을 따라가고 세트를 기록하는 운동 동행 PWA',
+    href: 'https://d-gymlog.vercel.app/',
+    image: '/projects/gymlog.png',
   },
 ];

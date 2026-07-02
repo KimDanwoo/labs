@@ -1,4 +1,4 @@
-import { SudokuCell } from "@entities/board/model/types";
+import { SudokuCell } from '@entities/board/model/types';
 
 export interface HistoryEntry {
   board: SudokuCell[][];

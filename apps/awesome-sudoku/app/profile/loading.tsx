@@ -1,4 +1,4 @@
-import { cn } from "@shared/model/utils";
+import { cn } from '@shared/model/utils';
 
 export default function ProfileLoading() {
   return (
@@ -6,11 +6,11 @@ export default function ProfileLoading() {
       {/* Header skeleton */}
       <div
         className={cn(
-          "sticky top-0 z-30",
-          "bg-[rgb(var(--color-glass))]/[var(--glass-opacity)]",
-          "backdrop-blur-xl",
-          "border-b border-[rgb(var(--color-border-light))]/50",
-          "px-4 py-4",
+          'sticky top-0 z-30',
+          'bg-[rgb(var(--color-glass))]/[var(--glass-opacity)]',
+          'backdrop-blur-xl',
+          'border-b border-[rgb(var(--color-border-light))]/50',
+          'px-4 py-4',
         )}
       >
         <div className="h-6 w-16 rounded-md bg-[rgb(var(--color-bg-tertiary))] animate-pulse" />
@@ -20,10 +20,10 @@ export default function ProfileLoading() {
         {/* Profile card skeleton */}
         <div
           className={cn(
-            "bg-[rgb(var(--color-surface-primary))]",
-            "rounded-2xl shadow-sm",
-            "border border-[rgb(var(--color-border-light))]",
-            "overflow-hidden",
+            'bg-[rgb(var(--color-surface-primary))]',
+            'rounded-2xl shadow-sm',
+            'border border-[rgb(var(--color-border-light))]',
+            'overflow-hidden',
           )}
         >
           <div className="h-24 bg-gradient-to-r from-blue-500/50 to-indigo-600/50 animate-pulse" />
@@ -31,9 +31,9 @@ export default function ProfileLoading() {
             <div className="-mt-12 mb-4">
               <div
                 className={cn(
-                  "w-24 h-24 rounded-full animate-pulse",
-                  "bg-[rgb(var(--color-bg-tertiary))]",
-                  "ring-4 ring-[rgb(var(--color-surface-primary))]",
+                  'w-24 h-24 rounded-full animate-pulse',
+                  'bg-[rgb(var(--color-bg-tertiary))]',
+                  'ring-4 ring-[rgb(var(--color-surface-primary))]',
                 )}
               />
             </div>
@@ -45,10 +45,10 @@ export default function ProfileLoading() {
         {/* Stats skeleton */}
         <div
           className={cn(
-            "bg-[rgb(var(--color-surface-primary))]",
-            "rounded-2xl shadow-sm",
-            "border border-[rgb(var(--color-border-light))]",
-            "p-6",
+            'bg-[rgb(var(--color-surface-primary))]',
+            'rounded-2xl shadow-sm',
+            'border border-[rgb(var(--color-border-light))]',
+            'p-6',
           )}
         >
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

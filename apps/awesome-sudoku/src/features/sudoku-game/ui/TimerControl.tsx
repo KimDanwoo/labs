@@ -1,29 +1,32 @@
-import { formatTime } from "@features/sudoku-game/model/utils";
 import {
-  currentTimeAtom, timerActiveAtom, incrementTimerAtom,
-  toggleTimerAtom, isCompletedAtom,
-} from "@features/sudoku-game/model/atoms";
-import { cn } from "@shared/model/utils";
-import { useAtomValue, useSetAtom } from "jotai";
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
-import { AiOutlinePause } from "react-icons/ai";
-import { VscPlay } from "react-icons/vsc";
+  currentTimeAtom,
+  incrementTimerAtom,
+  isCompletedAtom,
+  timerActiveAtom,
+  toggleTimerAtom,
+} from '@features/sudoku-game/model/atoms';
+import { formatTime } from '@features/sudoku-game/model/utils';
+import { cn } from '@shared/model/utils';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import { AiOutlinePause } from 'react-icons/ai';
+import { VscPlay } from 'react-icons/vsc';
 
 const getButtonStyles = (isCompleted: boolean, timerActive: boolean) => {
   if (isCompleted) {
-    return "bg-[rgb(var(--color-bg-tertiary))] text-[rgb(var(--color-text-tertiary))] cursor-not-allowed";
+    return 'bg-[rgb(var(--color-bg-tertiary))] text-[rgb(var(--color-text-tertiary))] cursor-not-allowed';
   }
   if (timerActive) {
     return [
-      "bg-[rgb(var(--color-surface-primary))]/80 text-[rgb(var(--color-text-secondary))] shadow-sm",
-      "hover:bg-[rgb(var(--color-surface-primary))] hover:text-[rgb(var(--color-text-primary))] active:scale-95",
-    ].join(" ");
+      'bg-[rgb(var(--color-surface-primary))]/80 text-[rgb(var(--color-text-secondary))] shadow-sm',
+      'hover:bg-[rgb(var(--color-surface-primary))] hover:text-[rgb(var(--color-text-primary))] active:scale-95',
+    ].join(' ');
   }
   return [
-    "bg-gradient-to-b from-[rgb(var(--color-gradient-from))] to-[rgb(var(--color-gradient-to))] text-white",
-    "shadow-[0_4px_12px_rgba(var(--color-gradient-from),0.3)]",
-    "hover:shadow-[0_6px_16px_rgba(var(--color-gradient-from),0.4)] active:scale-95",
-  ].join(" ");
+    'bg-gradient-to-b from-[rgb(var(--color-gradient-from))] to-[rgb(var(--color-gradient-to))] text-white',
+    'shadow-[0_4px_12px_rgba(var(--color-gradient-from),0.3)]',
+    'hover:shadow-[0_6px_16px_rgba(var(--color-gradient-from),0.4)] active:scale-95',
+  ].join(' ');
 };
 
 export const TimerControl = memo(() => {
@@ -54,21 +57,18 @@ export const TimerControl = memo(() => {
 
   const formattedTime = useMemo(() => formatTime(currentTime), [currentTime]);
 
-  const buttonStyles = useMemo(
-    () => getButtonStyles(isCompleted, timerActive),
-    [isCompleted, timerActive],
-  );
+  const buttonStyles = useMemo(() => getButtonStyles(isCompleted, timerActive), [isCompleted, timerActive]);
 
   return (
     <div className="flex items-center gap-2.5">
       {/* Timer Display */}
       <div
         className={cn(
-          "px-3 py-1.5 rounded-lg",
-          "bg-[rgb(var(--color-bg-tertiary))]/80 backdrop-blur-sm",
-          "text-base font-mono font-semibold tracking-wide",
-          "text-[rgb(var(--color-text-primary))]",
-          "font-tabular",
+          'px-3 py-1.5 rounded-lg',
+          'bg-[rgb(var(--color-bg-tertiary))]/80 backdrop-blur-sm',
+          'text-base font-mono font-semibold tracking-wide',
+          'text-[rgb(var(--color-text-primary))]',
+          'font-tabular',
         )}
       >
         {formattedTime}
@@ -77,13 +77,13 @@ export const TimerControl = memo(() => {
       {/* Play/Pause Button */}
       <button
         className={cn(
-          "w-8 h-8 rounded-full",
-          "flex items-center justify-center",
-          "transition-all duration-200 ease-out",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40",
+          'w-8 h-8 rounded-full',
+          'flex items-center justify-center',
+          'transition-all duration-200 ease-out',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40',
           buttonStyles,
         )}
-        aria-label={timerActive ? "일시정지" : "재생"}
+        aria-label={timerActive ? '일시정지' : '재생'}
         disabled={isCompleted}
         onClick={handleToggleTimer}
       >
@@ -93,4 +93,4 @@ export const TimerControl = memo(() => {
   );
 });
 
-TimerControl.displayName = "TimerControl";
+TimerControl.displayName = 'TimerControl';

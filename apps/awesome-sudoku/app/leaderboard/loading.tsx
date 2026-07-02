@@ -1,21 +1,16 @@
-import { cn } from "@shared/model/utils";
+import { cn } from '@shared/model/utils';
 
 export default function LeaderboardLoading() {
   return (
-    <main
-      className={cn(
-        "min-h-svh",
-        "bg-[rgb(var(--color-surface-secondary))]",
-      )}
-    >
+    <main className={cn('min-h-svh', 'bg-[rgb(var(--color-surface-secondary))]')}>
       {/* Header skeleton */}
       <div
         className={cn(
-          "sticky top-0 z-30",
-          "bg-[rgb(var(--color-glass))]/[var(--glass-opacity)]",
-          "backdrop-blur-xl",
-          "border-b border-[rgb(var(--color-border-light))]/50",
-          "px-4 py-4",
+          'sticky top-0 z-30',
+          'bg-[rgb(var(--color-glass))]/[var(--glass-opacity)]',
+          'backdrop-blur-xl',
+          'border-b border-[rgb(var(--color-border-light))]/50',
+          'px-4 py-4',
         )}
       >
         <div className="h-6 w-16 rounded-md bg-[rgb(var(--color-bg-tertiary))] animate-pulse" />
@@ -31,10 +26,10 @@ export default function LeaderboardLoading() {
         {/* Table skeleton */}
         <div
           className={cn(
-            "bg-[rgb(var(--color-surface-primary))]",
-            "rounded-2xl shadow-sm",
-            "border border-[rgb(var(--color-border-light))]/50",
-            "p-4 space-y-4",
+            'bg-[rgb(var(--color-surface-primary))]',
+            'rounded-2xl shadow-sm',
+            'border border-[rgb(var(--color-border-light))]/50',
+            'p-4 space-y-4',
           )}
         >
           {Array.from({ length: 6 }).map((_, i) => (
