@@ -12,7 +12,7 @@ interface Props {
 const { title = 'blog.danwoo', description = '기록하고 공유합니다', thumbnail, url } = Astro.props;
 
 const siteTitle = 'blog.danwoo';
-const siteUrl = 'https://danwoo-dev.netlify.app';
+const siteUrl = 'https://daily-cron-log.vercel.app';
 const metaUrl = url ?? siteUrl;
 const metaThumbnail = thumbnail ?? `${siteUrl}/og.png`;
 const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
