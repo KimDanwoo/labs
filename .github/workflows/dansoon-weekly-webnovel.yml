@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -55,29 +54,19 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: '✨ feat(${{ steps.date.outputs.date }}): 주간 웹소설 베스트셀러 추가'
-          title: '✨ feat(${{ steps.date.outputs.date }}): 주간 웹소설 베스트셀러 추가'
-          body: |
-            ## 📋 변경사항
-            - 날짜: ${{ steps.date.outputs.date }}
-            - 파일: `apps/dansoon/contents/book/${{ steps.date.outputs.date }}-webnovel/index.md`
-            - 카카오페이지·네이버 시리즈·리디 웹소설 베스트셀러 수집 및 Gemini AI 분석
-          add-paths: |
-            apps/dansoon/contents/
-          branch: 'feature/${{ steps.date.outputs.date }}-webnovel'
-          base: 'main'
-
-      - name: Auto-merge Pull Request
-        if: steps.cpr.outputs.pull-request-operation == 'created'
+      - name: Commit and push branch
         run: |
-          for i in 1 2 3 4 5; do
-            gh pr merge "${{ steps.cpr.outputs.pull-request-number }}" \
-              --squash --auto --delete-branch && break || sleep 10
-          done
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH="feature/${{ steps.date.outputs.date }}-webnovel"
+          git add apps/dansoon/contents/
+          if git diff --cached --quiet; then
+            echo "생성된 변경이 없어 종료합니다."
+            exit 0
+          fi
+          git switch -c "$BRANCH"
+          git commit -m '✨ feat(${{ steps.date.outputs.date }}): 주간 웹소설 베스트셀러 추가'
+          git push -f origin "$BRANCH"
+          {
+            echo "### 🌱 브랜치 푸시 완료"
+            echo ""
+            echo "PR 열기: https://github.com/${{ github.repository }}/pull/new/$BRANCH"
+          } >> "$GITHUB_STEP_SUMMARY"
