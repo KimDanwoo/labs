@@ -1,5 +1,9 @@
 import { SudokuBoard } from "@entities/board/model/types";
-import { GAME_LEVEL, GAME_MODE } from "@entities/game/model/constants";
+import {
+  GAME_LEVEL,
+  GAME_MODE,
+  HINTS_REMAINING,
+} from "@entities/game/model/constants";
 import { Difficulty, GameMode, KillerCage } from "@entities/game/model/types";
 import {
   createEmptyHighlights,
@@ -26,7 +30,6 @@ import {
 } from "./primitives";
 import { countBoardNumbersAtom } from "./statusAtoms";
 import { toggleTimerAtom } from "./timerAtoms";
-import { HINTS_REMAINING } from "@entities/game/model/constants";
 
 /** 새 게임 초기화 */
 export const initializeGameAtom = atom(
