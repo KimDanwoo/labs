@@ -24,7 +24,7 @@ function buildYearGrid(year: number, heatmap: Record<string, number>, today: Dat
 
   const weeks: Cell[][] = [];
   const monthStartCols: { label: string; col: number }[] = [];
-  let seenMonths = new Set<number>();
+  const seenMonths = new Set<number>();
 
   while (cursor <= end) {
     const week: Cell[] = [];

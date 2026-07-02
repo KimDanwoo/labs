@@ -34,24 +34,6 @@ function findFiles(dir) {
   return result;
 }
 
-// Parse a single import statement that may span multiple lines
-function parseImports(content) {
-  // Matches: import { ... } from 'path' or import type { ... } from 'path'
-  const re = /^(import\s+(?:type\s+)?\{[^}]*\})\s+from\s+'([^']+)';?$/gm;
-  const results = [];
-  let m;
-  while ((m = re.exec(content)) !== null) {
-    results.push({ full: m[0], names: m[1], from: m[2], index: m.index });
-  }
-  return results;
-}
-
-function extractNamedImports(namesStr) {
-  // "import { A, B, C }" or "import type { A, B }"
-  const inner = namesStr.replace(/import\s+(?:type\s+)?\{/, '').replace(/\}$/, '');
-  return inner.split(',').map(s => s.trim()).filter(Boolean);
-}
-
 function transformFile(filePath) {
   let content = fs.readFileSync(filePath, 'utf-8');
   const original = content;
