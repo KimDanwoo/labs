@@ -1,7 +1,7 @@
 export { colors } from './colors';
 export type { ColorToken, ThemeMode } from './colors';
 
-export { commonColors, themeColors } from './palette';
+export { commonColors, rootScalars, themeColors } from './palette';
 export type { ThemeColorScale } from './palette';
 
 export { fontFamily, fontSize, fontWeight } from './typography';
@@ -14,7 +14,7 @@ export { shadow } from './shadow';
 export type { ShadowToken } from './shadow';
 
 import { colors } from './colors';
-import { commonColors, themeColors } from './palette';
+import { commonColors, rootScalars, themeColors } from './palette';
 import { shadow } from './shadow';
 import { container, radius, spacing } from './spacing';
 import { fontFamily, fontSize, fontWeight } from './typography';
@@ -23,6 +23,7 @@ import { fontFamily, fontSize, fontWeight } from './typography';
 export const tokens = {
   themeColors,
   commonColors,
+  rootScalars,
   colors,
   fontFamily,
   fontSize,
