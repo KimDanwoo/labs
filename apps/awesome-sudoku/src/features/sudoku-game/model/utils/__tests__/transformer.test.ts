@@ -1,9 +1,9 @@
-import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
-import { Grid } from "@entities/board/model/types";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { applyTransformations } from "../transformer";
+import { BLOCK_SIZE, BOARD_SIZE } from '@entities/board/model/constants';
+import { Grid } from '@entities/board/model/types';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { applyTransformations } from '../transformer';
 
-describe("transformer.ts 테스트", () => {
+describe('transformer.ts 테스트', () => {
   // 헬퍼 함수들
   const createTestGrid = (): Grid =>
     Array.from({ length: BOARD_SIZE }, (_, row) =>
@@ -29,7 +29,7 @@ describe("transformer.ts 테스트", () => {
       if (!grid[row] || grid[row].length !== BOARD_SIZE) return false;
       for (let col = 0; col < BOARD_SIZE; col++) {
         const value = grid[row][col];
-        if (typeof value !== "number" || value < 1 || value > 9) return false;
+        if (typeof value !== 'number' || value < 1 || value > 9) return false;
       }
     }
     return true;
@@ -84,14 +84,14 @@ describe("transformer.ts 테스트", () => {
 
     // Math.random을 예측 가능한 값으로 모킹
     let callCount = 0;
-    vi.spyOn(Math, "random").mockImplementation(() => {
+    vi.spyOn(Math, 'random').mockImplementation(() => {
       const values = [0.1, 0.3, 0.5, 0.7, 0.9, 0.2, 0.4, 0.6, 0.8, 0.15, 0.35, 0.55, 0.75, 0.95];
       return values[callCount++ % values.length];
     });
   });
 
-  describe("applyTransformations", () => {
-    it("그리드의 기본 구조를 유지해야 한다", () => {
+  describe('applyTransformations', () => {
+    it('그리드의 기본 구조를 유지해야 한다', () => {
       const grid = createValidSudokuGrid();
       const originalGrid = structuredClone(grid);
 
@@ -107,7 +107,7 @@ describe("transformer.ts 테스트", () => {
       expect(differences).toBeGreaterThan(0);
     });
 
-    it("숫자 분포를 유지해야 한다", () => {
+    it('숫자 분포를 유지해야 한다', () => {
       const grid = createValidSudokuGrid();
 
       applyTransformations(grid);
@@ -116,7 +116,7 @@ describe("transformer.ts 테스트", () => {
       expect(hasValidNumberDistribution(grid)).toBe(true);
     });
 
-    it("여러 번 실행해도 안정적이어야 한다", () => {
+    it('여러 번 실행해도 안정적이어야 한다', () => {
       const grids = Array.from({ length: 5 }, () => createValidSudokuGrid());
 
       grids.forEach((grid) => {
@@ -134,7 +134,7 @@ describe("transformer.ts 테스트", () => {
       }
     });
 
-    it("모든 유효한 숫자 범위를 유지해야 한다", () => {
+    it('모든 유효한 숫자 범위를 유지해야 한다', () => {
       const grid = createValidSudokuGrid();
 
       applyTransformations(grid);
@@ -148,7 +148,7 @@ describe("transformer.ts 테스트", () => {
       });
     });
 
-    it("빈 그리드가 아닌 채워진 그리드로 작동해야 한다", () => {
+    it('빈 그리드가 아닌 채워진 그리드로 작동해야 한다', () => {
       const grid = createTestGrid();
 
       applyTransformations(grid);
@@ -165,7 +165,7 @@ describe("transformer.ts 테스트", () => {
       });
     });
 
-    it("변환 후에도 9x9 구조를 유지해야 한다", () => {
+    it('변환 후에도 9x9 구조를 유지해야 한다', () => {
       const grid = createValidSudokuGrid();
 
       applyTransformations(grid);
@@ -176,7 +176,7 @@ describe("transformer.ts 테스트", () => {
       });
     });
 
-    it("동일한 입력에 대해 다른 결과를 생성해야 한다", () => {
+    it('동일한 입력에 대해 다른 결과를 생성해야 한다', () => {
       const grid1 = createValidSudokuGrid();
       const grid2 = structuredClone(grid1);
 
@@ -193,8 +193,8 @@ describe("transformer.ts 테스트", () => {
     });
   });
 
-  describe("변환 효과 검증", () => {
-    it("상당한 변화를 만들어야 한다", () => {
+  describe('변환 효과 검증', () => {
+    it('상당한 변화를 만들어야 한다', () => {
       const grid = createValidSudokuGrid();
       const originalGrid = structuredClone(grid);
 
@@ -206,7 +206,7 @@ describe("transformer.ts 테스트", () => {
       expect(differences).toBeGreaterThan(40);
     });
 
-    it("변환이 복합적으로 적용되어야 한다", () => {
+    it('변환이 복합적으로 적용되어야 한다', () => {
       const grid = createValidSudokuGrid();
       const originalGrid = structuredClone(grid);
 
@@ -237,7 +237,7 @@ describe("transformer.ts 테스트", () => {
       expect(transformedAtSamePositions).toHaveLength(9);
     });
 
-    it("3x3 블록 구조 변환이 적용되어야 한다", () => {
+    it('3x3 블록 구조 변환이 적용되어야 한다', () => {
       const grid = createValidSudokuGrid();
       const originalGrid = structuredClone(grid);
 
@@ -272,8 +272,8 @@ describe("transformer.ts 테스트", () => {
     });
   });
 
-  describe("성능 및 안정성", () => {
-    it("대용량 처리를 빠르게 해야 한다", () => {
+  describe('성능 및 안정성', () => {
+    it('대용량 처리를 빠르게 해야 한다', () => {
       const grid = createValidSudokuGrid();
       const startTime = Date.now();
 
@@ -289,7 +289,7 @@ describe("transformer.ts 테스트", () => {
       expect(duration).toBeLessThan(2000);
     });
 
-    it("메모리 효율적이어야 한다", () => {
+    it('메모리 효율적이어야 한다', () => {
       const grid = createValidSudokuGrid();
       const originalSize = JSON.stringify(grid).length;
 
@@ -301,7 +301,7 @@ describe("transformer.ts 테스트", () => {
       expect(Math.abs(finalSize - originalSize)).toBeLessThan(originalSize * 0.1);
     });
 
-    it("반복 적용해도 안정적이어야 한다", () => {
+    it('반복 적용해도 안정적이어야 한다', () => {
       const grid = createValidSudokuGrid();
 
       // 여러 번 연속으로 변환 적용
@@ -313,7 +313,7 @@ describe("transformer.ts 테스트", () => {
       }
     });
 
-    it("극한 케이스를 처리해야 한다", () => {
+    it('극한 케이스를 처리해야 한다', () => {
       // 모든 값이 1인 그리드
       const grid1 = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(1));
 
@@ -328,8 +328,8 @@ describe("transformer.ts 테스트", () => {
     });
   });
 
-  describe("변환 무작위성", () => {
-    it("반복 변환으로 다양한 출력을 생성해야 한다", () => {
+  describe('변환 무작위성', () => {
+    it('반복 변환으로 다양한 출력을 생성해야 한다', () => {
       const results: Grid[] = [];
 
       for (let i = 0; i < 5; i++) {
@@ -358,7 +358,7 @@ describe("transformer.ts 테스트", () => {
       expect(differences).toBeGreaterThan(0);
     });
 
-    it("충분한 엔트로피를 가져야 한다", () => {
+    it('충분한 엔트로피를 가져야 한다', () => {
       const grid = createValidSudokuGrid();
       const originalGrid = structuredClone(grid);
 
@@ -373,7 +373,7 @@ describe("transformer.ts 테스트", () => {
       expect(originalFirstCol).not.toEqual(transformedFirstCol);
     });
 
-    it("모든 숫자가 다양한 위치에 분포되어야 한다", () => {
+    it('모든 숫자가 다양한 위치에 분포되어야 한다', () => {
       const grid = createValidSudokuGrid();
 
       applyTransformations(grid);

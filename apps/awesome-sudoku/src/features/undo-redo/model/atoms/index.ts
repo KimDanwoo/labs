@@ -1,10 +1,10 @@
 export {
-  pastAtom,
-  futureAtom,
-  canUndoAtom,
   canRedoAtom,
-  pushStateAtom,
-  undoAtom,
-  redoAtom,
+  canUndoAtom,
   clearHistoryAtom,
-} from "./historyAtoms";
+  futureAtom,
+  pastAtom,
+  pushStateAtom,
+  redoAtom,
+  undoAtom,
+} from './historyAtoms';

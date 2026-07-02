@@ -1,1 +1,1 @@
-export { useHistory } from "./useHistory";
+export { useHistory } from './useHistory';

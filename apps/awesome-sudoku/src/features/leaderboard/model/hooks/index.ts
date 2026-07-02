@@ -1,2 +1,2 @@
-export { useLeaderboard } from "./useLeaderboard";
-export { useCumulativeLeaderboard } from "./useCumulativeLeaderboard";
+export { useCumulativeLeaderboard } from './useCumulativeLeaderboard';
+export { useLeaderboard } from './useLeaderboard';

@@ -1,15 +1,20 @@
-"use client";
+'use client';
 
-import { BOARD_SIZE, KEY_NUMBER } from "@entities/board/model/constants";
+import { BOARD_SIZE, KEY_NUMBER } from '@entities/board/model/constants';
 import {
-  isNoteModeAtom, numberCountsAtom, timerActiveAtom,
-  boardAtom, selectedCellAtom, fillCellAtom, toggleNoteAtom,
-} from "@features/sudoku-game/model/atoms";
-import { pushStateAtom } from "@features/undo-redo/model/atoms";
-import { cn } from "@shared/model/utils";
-import { NumberButton } from "@shared/ui";
-import { useAtomValue, useSetAtom } from "jotai";
-import { FC, useCallback, useMemo } from "react";
+  boardAtom,
+  fillCellAtom,
+  isNoteModeAtom,
+  numberCountsAtom,
+  selectedCellAtom,
+  timerActiveAtom,
+  toggleNoteAtom,
+} from '@features/sudoku-game/model/atoms';
+import { pushStateAtom } from '@features/undo-redo/model/atoms';
+import { cn } from '@shared/model/utils';
+import { NumberButton } from '@shared/ui';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { FC, useCallback, useMemo } from 'react';
 
 export const SelectNumber: FC = () => {
   const isNoteMode = useAtomValue(isNoteModeAtom);
@@ -44,8 +49,8 @@ export const SelectNumber: FC = () => {
   return (
     <div
       className={cn(
-        "grid grid-cols-9 md:grid-cols-3 gap-1.5 xs:gap-2 md:gap-2.5 lg:gap-3",
-        "h-full place-content-center place-items-center",
+        'grid grid-cols-9 md:grid-cols-3 gap-1.5 xs:gap-2 md:gap-2.5 lg:gap-3',
+        'h-full place-content-center place-items-center',
       )}
     >
       {KEY_NUMBER.map((num) => (

@@ -1,12 +1,3 @@
-export {
-  userAtom,
-  isLoadingAtom,
-  isAuthenticatedAtom,
-  setUserAtom,
-  setLoadingAtom,
-  logoutAtom,
-} from "./atoms";
-export {
-  subscribeToAuthChanges, signInWithGoogle, signOut,
-} from "./services/authService";
-export { useAuth } from "./hooks/useAuth";
+export { isAuthenticatedAtom, isLoadingAtom, logoutAtom, setLoadingAtom, setUserAtom, userAtom } from './atoms';
+export { useAuth } from './hooks/useAuth';
+export { signInWithGoogle, signOut, subscribeToAuthChanges } from './services/authService';

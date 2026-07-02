@@ -1,5 +1,5 @@
-import { KEY_NUMBER } from "@entities/board/model/constants";
-import { memo } from "react";
+import { KEY_NUMBER } from '@entities/board/model/constants';
+import { memo } from 'react';
 
 export const CellNotes = memo(function CellNotes({ notes }: { notes: number[] }) {
   return (

@@ -1,12 +1,10 @@
-import { CageInfo } from "@entities/board/model/types";
-import { GAME_MODE } from "@entities/game/model/constants";
-import {
-  cagesAtom, gameModeAtom,
-} from "@features/sudoku-game/model/atoms";
-import { useAtomValue } from "jotai";
-import { useCallback, useMemo, useState } from "react";
-import { useTableDimensions, CellPosition } from "./useTableDimensions";
-import { useCagePathCalculator } from "./useCagePathCalculator";
+import { CageInfo } from '@entities/board/model/types';
+import { GAME_MODE } from '@entities/game/model/constants';
+import { cagesAtom, gameModeAtom } from '@features/sudoku-game/model/atoms';
+import { useAtomValue } from 'jotai';
+import { useCallback, useMemo, useState } from 'react';
+import { useCagePathCalculator } from './useCagePathCalculator';
+import { CellPosition, useTableDimensions } from './useTableDimensions';
 
 const DEFAULT_CELL_SIZE = 40;
 
@@ -43,7 +41,7 @@ export const useKillerCage = () => {
     if (!hasKillerCage || cageInfo.paths.length === 0) return DEFAULT_CELL_SIZE;
 
     try {
-      const firstPath = cageInfo.paths[0]?.path || "";
+      const firstPath = cageInfo.paths[0]?.path || '';
       const match = firstPath.match(/M([\d.]+),([\d.]+)/);
 
       if (match && cageInfo.paths.length > 1) {

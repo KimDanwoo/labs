@@ -1,10 +1,8 @@
-import { GAME_LEVEL, GAME_LEVEL_LABELS } from "@entities/game/model/constants";
-import { Difficulty } from "@entities/game/model/types";
-import {
-  difficultyAtom, initializeGameAtom,
-} from "@features/sudoku-game/model/atoms";
-import { cn } from "@shared/model/utils";
-import { useAtomValue, useSetAtom } from "jotai";
+import { GAME_LEVEL, GAME_LEVEL_LABELS } from '@entities/game/model/constants';
+import { Difficulty } from '@entities/game/model/types';
+import { difficultyAtom, initializeGameAtom } from '@features/sudoku-game/model/atoms';
+import { cn } from '@shared/model/utils';
+import { useAtomValue, useSetAtom } from 'jotai';
 
 const options = [
   { label: GAME_LEVEL_LABELS[GAME_LEVEL.EASY], value: GAME_LEVEL.EASY },
@@ -30,20 +28,20 @@ const SelectSelector = () => {
       value={difficulty}
       onChange={(e) => initializeGame(e.target.value as Difficulty)}
       className={cn(
-        "px-3 py-1.5 pr-8",
-        "bg-[rgb(var(--color-bg-tertiary))]/80 backdrop-blur-sm",
-        "border-none rounded-lg",
-        "text-sm font-medium text-[rgb(var(--color-text-primary))]",
-        "cursor-pointer",
-        "transition-all duration-200 ease-out",
-        "hover:bg-[rgb(var(--color-bg-tertiary))]",
-        "focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/40",
-        "appearance-none",
-        "bg-no-repeat",
+        'px-3 py-1.5 pr-8',
+        'bg-[rgb(var(--color-bg-tertiary))]/80 backdrop-blur-sm',
+        'border-none rounded-lg',
+        'text-sm font-medium text-[rgb(var(--color-text-primary))]',
+        'cursor-pointer',
+        'transition-all duration-200 ease-out',
+        'hover:bg-[rgb(var(--color-bg-tertiary))]',
+        'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/40',
+        'appearance-none',
+        'bg-no-repeat',
       )}
       style={{
         backgroundImage: chevronSvg,
-        backgroundPosition: "right 10px center",
+        backgroundPosition: 'right 10px center',
       }}
     >
       {options.map((option) => (
@@ -72,27 +70,27 @@ const ListSelector = () => {
               key={option.value}
               onClick={() => initializeGame(option.value as Difficulty)}
               className={cn(
-                "px-4 py-2 rounded-xl",
-                "text-sm font-medium",
-                "transition-all duration-200 ease-out",
-                "active:scale-95",
+                'px-4 py-2 rounded-xl',
+                'text-sm font-medium',
+                'transition-all duration-200 ease-out',
+                'active:scale-95',
                 isActive
                   ? [
-                    "bg-gradient-to-b",
-                    "from-[rgb(var(--color-gradient-from))]",
-                    "to-[rgb(var(--color-gradient-to))]",
-                    "text-white",
-                    "shadow-[0_4px_12px_rgba(var(--color-gradient-from),0.3)]",
-                  ]
+                      'bg-gradient-to-b',
+                      'from-[rgb(var(--color-gradient-from))]',
+                      'to-[rgb(var(--color-gradient-to))]',
+                      'text-white',
+                      'shadow-[0_4px_12px_rgba(var(--color-gradient-from),0.3)]',
+                    ]
                   : [
-                    "bg-[rgb(var(--color-surface-primary))]/80",
-                    "text-[rgb(var(--color-text-secondary))]",
-                    "shadow-sm",
-                  ],
+                      'bg-[rgb(var(--color-surface-primary))]/80',
+                      'text-[rgb(var(--color-text-secondary))]',
+                      'shadow-sm',
+                    ],
                 !isActive && [
-                  "hover:bg-[rgb(var(--color-surface-primary))]",
-                  "hover:text-[rgb(var(--color-text-primary))]",
-                  "hover:shadow-md",
+                  'hover:bg-[rgb(var(--color-surface-primary))]',
+                  'hover:text-[rgb(var(--color-text-primary))]',
+                  'hover:shadow-md',
                 ],
               )}
             >

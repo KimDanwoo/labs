@@ -1,1 +1,1 @@
-export * from "./gameRecordService";
+export * from './gameRecordService';

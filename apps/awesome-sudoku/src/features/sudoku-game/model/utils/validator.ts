@@ -1,10 +1,14 @@
 import {
-  BLOCKS_PER_ROW, BLOCK_SIZE, BOARD_NUMBERS, BOARD_SIZE, SUDOKU_CELL_COUNT,
-} from "@entities/board/model/constants";
-import { Grid, GridPosition, SudokuBoard } from "@entities/board/model/types";
-import { getBlockCoordinates } from "@entities/board/model/utils";
-import { KillerCage } from "@entities/game/model/types";
-import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from "@entities/game/model/utils";
+  BLOCKS_PER_ROW,
+  BLOCK_SIZE,
+  BOARD_NUMBERS,
+  BOARD_SIZE,
+  SUDOKU_CELL_COUNT,
+} from '@entities/board/model/constants';
+import { Grid, GridPosition, SudokuBoard } from '@entities/board/model/types';
+import { getBlockCoordinates } from '@entities/board/model/utils';
+import { KillerCage } from '@entities/game/model/types';
+import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from '@entities/game/model/utils';
 
 /**
  * @description 특정 위치에 놓을 수 있는 숫자 확인
