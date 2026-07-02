@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useSaveCharacter } from '@app/admin/_lib/hooks';
-import type { CharacterRow } from '@app/admin/_lib/types';
+import { useSaveCharacter } from '@features/admin/model/hooks';
+import type { CharacterRow } from '@features/admin/model/types';
 
 const COLOR_FIELDS = [
   { key: 'color', label: '본문' },
