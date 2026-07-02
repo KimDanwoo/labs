@@ -1,7 +1,7 @@
 import '@app/globals.css';
 import { AppProviders } from '@app/providers';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Sora } from 'next/font/google';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -10,6 +10,12 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
+
+// 디스플레이 폰트 — prairie 정체성(hub·gymlog와 폰트로 구별). 색은 코발트 공유.
+const sora = Sora({
+  variable: '--font-display',
   subsets: ['latin'],
 });
 
@@ -29,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${sora.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

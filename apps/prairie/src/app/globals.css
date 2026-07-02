@@ -11,3 +11,15 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans);
 }
+
+/* 헤딩에 쓰는 디스플레이 폰트(Sora) — prairie 정체성. 색은 코발트 공유. */
+.font-display {
+  font-family: var(--font-display), var(--font-sans);
+  letter-spacing: -0.02em;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display), var(--font-sans);
+  letter-spacing: -0.02em;
+}
