@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@shared/config/supabase/client';
-import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@shared/ui';
+import { Button, Card, CardHeader, CardDescription, CardContent } from '@shared/ui';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
