@@ -9,7 +9,7 @@ export function RadiusSection() {
           <div key={name} className="flex flex-col items-center gap-xs">
             <div className="h-3xl w-3xl border border-primary bg-primary-subtle" style={{ borderRadius: value }} />
             <span className="text-xs text-foreground">{name}</span>
-            <span className="text-xs text-muted">{value}</span>
+            <span className="text-xs text-muted-foreground">{value}</span>
           </div>
         ))}
       </div>

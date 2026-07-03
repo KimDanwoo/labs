@@ -8,7 +8,7 @@ export function ShadowSection() {
         {Object.entries(shadow).map(([name, value]) => (
           <div key={name} className="flex flex-col items-center gap-sm">
             <div className="h-3xl w-full rounded-lg border border-card-border bg-card" style={{ boxShadow: value }} />
-            <span className="text-xs text-muted">shadow-{name}</span>
+            <span className="text-xs text-muted-foreground">shadow-{name}</span>
           </div>
         ))}
       </div>

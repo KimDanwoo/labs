@@ -14,7 +14,7 @@ export function PaletteSection() {
     >
       {SCALES.map((scale) => (
         <div key={scale} className="flex flex-col gap-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-widest text-muted">{scale}</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{scale}</h3>
           <div className="grid grid-cols-5 gap-sm sm:grid-cols-10">
             {Object.entries(themeColors[scale]).map(([step, hex]) => (
               <Swatch key={step} color={hex} label={step} sub={hex} />
