@@ -118,13 +118,21 @@ function findBranchSixCombinations(
   return results;
 }
 
-function findBranchTripleCombinations(
+// 삼합·방합은 왕지(旺支, 배열 가운데 子午卯酉)를 중심으로 성립한다.
+// 3개 모두 → 완전한 합, 왕지 포함 2개 → 반(半)합, 왕지 없는 2개 → 합 불성립.
+function findTripleLikeCombinations(
   fourPillars: FourPillars,
+  combos: readonly {
+    branches: readonly [EarthlyBranch, EarthlyBranch, EarthlyBranch];
+    resultElement: FiveElement;
+  }[],
+  fullType: string,
+  halfType: string,
 ): BranchCombinationResult[] {
   const branches = getBranchesWithPositions(fourPillars);
   const results: BranchCombinationResult[] = [];
 
-  for (const combo of BRANCH_TRIPLE_COMBINATIONS) {
+  for (const combo of combos) {
     const matched = combo.branches
       .map((b) => branches.find((br) => br.branch === b))
       .filter(
@@ -132,11 +140,18 @@ function findBranchTripleCombinations(
           m !== undefined,
       );
 
-    if (matched.length >= 2) {
+    const peakBranch = combo.branches[1];
+    const hasPeak = matched.some((m) => m.branch === peakBranch);
+
+    let type: string | null = null;
+    if (matched.length === 3) type = fullType;
+    else if (matched.length === 2 && hasPeak) type = halfType;
+
+    if (type !== null) {
       results.push({
         branches: matched.map((m) => m.branch),
         element: combo.resultElement,
-        type: '삼합',
+        type,
         positions: matched.map((m) => m.position),
       });
     }
@@ -145,31 +160,26 @@ function findBranchTripleCombinations(
   return results;
 }
 
+function findBranchTripleCombinations(
+  fourPillars: FourPillars,
+): BranchCombinationResult[] {
+  return findTripleLikeCombinations(
+    fourPillars,
+    BRANCH_TRIPLE_COMBINATIONS,
+    '삼합',
+    '반합',
+  );
+}
+
 function findBranchDirectionCombinations(
   fourPillars: FourPillars,
 ): BranchCombinationResult[] {
-  const branches = getBranchesWithPositions(fourPillars);
-  const results: BranchCombinationResult[] = [];
-
-  for (const combo of BRANCH_DIRECTION_COMBINATIONS) {
-    const matched = combo.branches
-      .map((b) => branches.find((br) => br.branch === b))
-      .filter(
-        (m): m is { branch: EarthlyBranch; position: PillarPosition } =>
-          m !== undefined,
-      );
-
-    if (matched.length >= 2) {
-      results.push({
-        branches: matched.map((m) => m.branch),
-        element: combo.resultElement,
-        type: '방합',
-        positions: matched.map((m) => m.position),
-      });
-    }
-  }
-
-  return results;
+  return findTripleLikeCombinations(
+    fourPillars,
+    BRANCH_DIRECTION_COMBINATIONS,
+    '방합',
+    '반방합',
+  );
 }
 
 function findBranchConflicts(fourPillars: FourPillars): BranchConflictResult[] {
