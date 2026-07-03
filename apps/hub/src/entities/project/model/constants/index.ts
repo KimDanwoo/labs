@@ -16,6 +16,12 @@ export const PROJECTS: Project[] = [
     imagePosition: 'center',
   },
   {
+    title: '프딥',
+    description: 'Frontend Deep Dive 아카이브',
+    href: 'https://fe-deep.vercel.app/',
+    image: '/projects/fe-deep.png',
+  },
+  {
     title: '플코',
     description: '아이돌 컨셉 다마고치 게임',
     href: 'https://plco-tamagochi.vercel.app/',
@@ -40,9 +46,9 @@ export const PROJECTS: Project[] = [
     image: '/projects/best-seller.png',
   },
   {
-    title: '프딥',
-    description: 'Frontend Deep Dive 아카이브',
-    href: 'https://fe-deep.vercel.app/',
-    image: '/projects/fe-deep.png',
+    title: 'gymlog',
+    description: '루틴 따라 기록하는 운동 PWA',
+    href: 'https://d-gymlog.vercel.app/',
+    image: '/projects/gymlog.png',
   },
 ];

@@ -1,6 +1,8 @@
 'use client';
 
-import { type SVGProps, useSyncExternalStore } from 'react';
+import { Moon, Sun } from 'lucide-react';
+import { useSyncExternalStore } from 'react';
+import { cn } from './lib/cn';
 
 const THEME_CHANGE_EVENT = 'danwoo:themechange';
 
@@ -17,32 +19,11 @@ function getServerSnapshot() {
   return false;
 }
 
-function SunIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-    </svg>
-  );
-}
-
-function MoonIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
-    </svg>
-  );
-}
-
+/**
+ * 라이트/다크 토글 — 전 앱 공용. 프레임워크 무관: `document.documentElement`의 `dark` 클래스와
+ * `localStorage 'theme'`를 직접 다루고 커스텀 이벤트로 동기화한다(hub·gymlog·design의 init 스크립트와
+ * 동일 계약, fe-deep의 next-themes(class+theme)와도 호환).
+ */
 export function ThemeToggle() {
   const isDark = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
@@ -61,26 +42,63 @@ export function ThemeToggle() {
       aria-label="라이트/다크 모드 전환"
       onClick={toggle}
       suppressHydrationWarning
-      data-dark={isDark}
-      className="relative inline-flex h-7 w-[52px] shrink-0 cursor-pointer items-center rounded-full border transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background data-[dark=true]:border-primary data-[dark=true]:bg-primary data-[dark=false]:border-card-border data-[dark=false]:bg-card"
+      className={cn(
+        'group relative flex h-7 w-[52px] shrink-0 items-center rounded-full p-[3px]',
+        'transition-shadow hover:shadow-md active:scale-95',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
+      )}
     >
+      {/* 라이트 트랙 */}
       <span
         suppressHydrationWarning
-        data-dark={isDark}
-        className="absolute top-0.5 left-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-background text-foreground shadow-sm transition-transform duration-300 ease-out data-[dark=true]:translate-x-6 data-[dark=false]:translate-x-0"
+        className={cn(
+          'absolute inset-0 rounded-full bg-gradient-to-r from-toggle-day-start to-toggle-day-end transition-opacity duration-500',
+          isDark ? 'opacity-0' : 'opacity-100',
+        )}
+      />
+      {/* 다크 트랙 */}
+      <span
+        suppressHydrationWarning
+        className={cn(
+          'absolute inset-0 rounded-full bg-toggle-night transition-opacity duration-500',
+          isDark ? 'shadow-toggle-night/50 opacity-100 shadow-inner' : 'opacity-0',
+        )}
+      />
+      {/* 별 오버레이 (다크) */}
+      <span
+        suppressHydrationWarning
+        className={cn(
+          'absolute inset-0 overflow-hidden rounded-full transition-opacity duration-700',
+          isDark ? 'opacity-100' : 'opacity-0',
+        )}
       >
-        <span className="relative h-3.5 w-3.5">
-          <SunIcon
-            suppressHydrationWarning
-            data-dark={isDark}
-            className="absolute inset-0 h-full w-full transition-all duration-300 data-[dark=true]:scale-50 data-[dark=true]:rotate-90 data-[dark=true]:opacity-0 data-[dark=false]:scale-100 data-[dark=false]:rotate-0 data-[dark=false]:opacity-100"
-          />
-          <MoonIcon
-            suppressHydrationWarning
-            data-dark={isDark}
-            className="absolute inset-0 h-full w-full transition-all duration-300 data-[dark=true]:scale-100 data-[dark=true]:rotate-0 data-[dark=true]:opacity-100 data-[dark=false]:-rotate-90 data-[dark=false]:scale-50 data-[dark=false]:opacity-0"
-          />
-        </span>
+        <span className="absolute rounded-full bg-white/70" style={{ width: 3, height: 3, top: 5, left: 10 }} />
+        <span className="absolute rounded-full bg-white/40" style={{ width: 2, height: 2, top: 17, left: 17 }} />
+        <span className="absolute rounded-full bg-white/50" style={{ width: 2, height: 2, top: 7, left: 24 }} />
+      </span>
+      {/* 슬라이딩 썸 */}
+      <span
+        suppressHydrationWarning
+        className={cn(
+          'relative z-10 flex h-[22px] w-[22px] items-center justify-center rounded-full shadow-md',
+          'transition-all duration-500 ease-[cubic-bezier(0.68,-0.15,0.27,1.15)]',
+          isDark ? 'translate-x-[24px] bg-toggle-thumb-night' : 'translate-x-0 bg-toggle-thumb',
+        )}
+      >
+        <Sun
+          size={13}
+          className={cn(
+            'absolute text-toggle-sun transition-all duration-500',
+            isDark ? 'scale-0 -rotate-90 opacity-0' : 'scale-100 rotate-0 opacity-100',
+          )}
+        />
+        <Moon
+          size={13}
+          className={cn(
+            'absolute text-toggle-moon transition-all duration-500',
+            isDark ? 'scale-100 rotate-0 opacity-100' : 'scale-0 rotate-90 opacity-0',
+          )}
+        />
       </span>
     </button>
   );

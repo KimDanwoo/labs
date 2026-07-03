@@ -72,6 +72,16 @@ export const colors = {
     light: 'oklch(0.48 0.20 var(--brand-hue) / 0.3)',
     dark: 'oklch(0.66 0.16 var(--brand-hue) / 0.32)',
   },
+
+  // 테마 토글 장식색 — 스위치의 낮/밤 상태에 고정(앱 테마와 무관 → light=dark 동일값).
+  // 값은 Tailwind 팔레트 oklch(sky/amber/indigo). 여기 한 곳만 바꾸면 전 앱 토글이 함께 바뀐다.
+  'toggle-day-start': { light: 'oklch(0.901 0.058 230.902)', dark: 'oklch(0.901 0.058 230.902)' }, // sky-200
+  'toggle-day-end': { light: 'oklch(0.924 0.12 95.746)', dark: 'oklch(0.924 0.12 95.746)' }, // amber-200
+  'toggle-night': { light: 'oklch(0.257 0.09 281.288)', dark: 'oklch(0.257 0.09 281.288)' }, // indigo-950
+  'toggle-thumb': { light: c.white, dark: c.white }, // 낮 썸
+  'toggle-thumb-night': { light: 'oklch(0.93 0.034 272.788)', dark: 'oklch(0.93 0.034 272.788)' }, // indigo-100
+  'toggle-sun': { light: 'oklch(0.769 0.188 70.08)', dark: 'oklch(0.769 0.188 70.08)' }, // amber-500
+  'toggle-moon': { light: 'oklch(0.511 0.262 276.966)', dark: 'oklch(0.511 0.262 276.966)' }, // indigo-600
 } as const;
 
 export type ColorToken = keyof typeof colors;
