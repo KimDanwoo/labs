@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ALL_CHARACTER_IDS } from '@shared/constants';
-import { ADMIN_ROUTE } from '@app/admin/_lib/api';
-import { useQuizQuestions } from '@app/admin/_lib/hooks';
-import CharacterTabs from '@app/admin/_components/CharacterTabs';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
+import { useQuizQuestions } from '@features/admin/model/hooks';
+import { CharacterTabs } from '@features/admin/ui';
 
 export default function QuizAdminPage() {
   const { data, isLoading, isError } = useQuizQuestions();

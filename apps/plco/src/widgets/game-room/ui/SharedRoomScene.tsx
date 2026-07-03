@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { characterIdAtom } from '@entities/game/model/store';
@@ -69,15 +69,15 @@ export default function SharedRoomScene({ room }: SharedRoomSceneProps) {
 
   // 입장 시 로드된 과거 메시지는 말풍선으로 띄우지 않는다.
   // 첫 로드 메시지 id를 기록해두고, 이후 실시간으로 들어온(=새로 입력된) 것만 말풍선 표시.
-  const initialIdsRef = useRef<Set<string> | null>(null);
-  if (initialIdsRef.current === null && messages) {
-    initialIdsRef.current = new Set(messages.map((m) => m.id));
+  const [initialIds, setInitialIds] = useState<Set<string> | null>(null);
+  if (initialIds === null && messages) {
+    setInitialIds(new Set(messages.map((m) => m.id)));
   }
 
-  // 유저별 최신 "신규" 메시지 (히스토리 제외)
+  // 유저별 최신 "신규" 메시지 (히스토리 제외 — initialIds 확정 전엔 전부 히스토리 취급)
   const latestMessageByUser = new Map<string, string>();
   (messages ?? []).forEach((m) => {
-    if (initialIdsRef.current?.has(m.id)) return;
+    if (!initialIds || initialIds.has(m.id)) return;
     latestMessageByUser.set(m.userId, m.message);
   });
 

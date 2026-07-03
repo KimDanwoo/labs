@@ -11,7 +11,7 @@ export const PROJECTS: Project[] = [
   {
     title: '초원을 달리는 말',
     description: 'three.js로 만든 인터랙티브 3D 씬',
-    href: 'https://danwoo-lab-prairie.vercel.app/',
+    href: 'https://d-prairie.vercel.app/',
     image: '/projects/prairie.png',
     imagePosition: 'center',
   },

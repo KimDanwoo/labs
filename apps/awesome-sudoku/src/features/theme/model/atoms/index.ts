@@ -1,6 +1,1 @@
-export {
-  themeAtom,
-  resolvedThemeAtom,
-  setThemeAtom,
-  initThemeAtom,
-} from "./themeAtoms";
+export { initThemeAtom, resolvedThemeAtom, setThemeAtom, themeAtom } from './themeAtoms';

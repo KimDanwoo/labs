@@ -1,4 +1,4 @@
-import type PostListProps from './PostList.types';
+import type { PostListProps } from './PostList.types';
 
 const PostList = ({ posts }: PostListProps) => {
   return (

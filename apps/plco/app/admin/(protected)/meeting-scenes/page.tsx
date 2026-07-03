@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ALL_CHARACTER_IDS } from '@shared/constants';
-import { ADMIN_ROUTE } from '@app/admin/_lib/api';
-import { useMeetingScenes } from '@app/admin/_lib/hooks';
-import CharacterTabs from '@app/admin/_components/CharacterTabs';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
+import { useMeetingScenes } from '@features/admin/model/hooks';
+import { CharacterTabs } from '@features/admin/ui';
 
 export default function MeetingScenesAdminPage() {
   const { data, isLoading, isError } = useMeetingScenes();

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getFeedbacks, updateFeedbackStatus } from '@features/feedback';
 import { Badge, Button, Card, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@shared/ui';
 import { MessageSquare, CheckCircle, Eye, Clock, Trash2 } from 'lucide-react';
@@ -23,28 +24,21 @@ const STATUS_CONFIG: Record<string, { label: string; icon: typeof Clock; variant
 };
 
 export default function FeedbacksPage() {
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [filter, setFilter] = useState('pending');
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
+  const { data: feedbacks = [], isLoading: loading } = useQuery<Feedback[]>({
+    queryKey: ['admin-feedbacks', filter],
+    queryFn: async () => {
       const data = await getFeedbacks(filter);
-      setFeedbacks(data as Feedback[]);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }, [filter]);
-
-  useEffect(() => { load(); }, [load]);
+      return data as Feedback[];
+    },
+  });
 
   const handleStatusChange = async (id: string, status: string) => {
     try {
       await updateFeedbackStatus(id, status);
-      load();
+      queryClient.invalidateQueries({ queryKey: ['admin-feedbacks', filter] });
     } catch (e) {
       alert(e instanceof Error ? e.message : '상태 변경 실패');
     }

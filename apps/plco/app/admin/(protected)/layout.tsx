@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@shared/lib';
-import AdminQueryProvider from '@app/admin/_lib/AdminQueryProvider';
+import { AdminQueryProvider } from '@features/admin/ui';
 
 type GuardState = 'checking' | 'authed';
 

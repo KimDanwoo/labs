@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { ADMIN_ROUTE } from '@app/admin/_lib/api';
-import { useCharacters } from '@app/admin/_lib/hooks';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
+import { useCharacters } from '@features/admin/model/hooks';
 
 export default function CharactersAdminPage() {
   const { data, isLoading, isError } = useCharacters();
