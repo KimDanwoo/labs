@@ -13,7 +13,7 @@ export function RoutineSplitSection({ splitLabel, routines, onStart, tag }: Prop
   return (
     <section className="flex flex-col gap-md">
       <div className="flex items-center gap-sm">
-        <h2 className="text-base font-semibold text-muted">{splitLabel}</h2>
+        <h2 className="text-base font-semibold text-muted-foreground">{splitLabel}</h2>
         {tag && <Badge>{tag}</Badge>}
       </div>
       <div className="flex flex-col gap-md">

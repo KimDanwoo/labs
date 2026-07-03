@@ -53,7 +53,7 @@ export function BookmarksPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleRemoveBookmark(question.id)}
-                      className="gap-2 text-destructive"
+                      className="gap-2 text-error"
                     >
                       <Trash2 className="h-4 w-4" />
                       북마크 삭제

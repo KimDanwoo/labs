@@ -11,7 +11,7 @@ export function Swatch({ color, label, sub }: SwatchProps) {
       <div className="h-3xl w-full rounded-md border border-card-border" style={{ background: color }} />
       <div className="flex flex-col">
         <span className="text-xs font-medium text-foreground">{label}</span>
-        {sub ? <span className="text-xs text-muted">{sub}</span> : null}
+        {sub ? <span className="text-xs text-muted-foreground">{sub}</span> : null}
       </div>
     </div>
   );

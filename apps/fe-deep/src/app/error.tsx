@@ -14,8 +14,8 @@ export default function GlobalError({
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="text-center space-y-6 max-w-md animate-fade-in-up">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
+      <div className="text-center space-y-6 max-w-[28rem] animate-fade-in-up">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-error/10">
           <span className="text-2xl">!</span>
         </div>
         <div className="space-y-2">

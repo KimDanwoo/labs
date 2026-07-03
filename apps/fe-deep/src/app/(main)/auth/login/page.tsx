@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@shared/config/supabase/client';
-import { Button, Card, CardHeader, CardDescription, CardContent } from '@shared/ui';
+import { Button, Card } from '@shared/ui';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,17 +20,17 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4">
-      <div className="w-full max-w-sm animate-fade-in-up">
+      <div className="w-full max-w-[24rem] animate-fade-in-up">
         <Card className="shadow-lg border-border/50">
-          <CardHeader className="text-center pb-2">
+          <Card.Header className="text-center pb-2">
             <div className="mx-auto mb-4 text-3xl font-bold tracking-tighter">
               프<span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">딥</span>
             </div>
-            <CardDescription className="text-sm leading-relaxed">
+            <Card.Description className="text-sm leading-relaxed">
               로그인하면 학습 진도와 북마크를 저장할 수 있습니다.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            </Card.Description>
+          </Card.Header>
+          <Card.Content className="space-y-4">
             <Button
               variant="outline"
               className="w-full gap-3 h-12 shadow-sm hover:shadow transition-all duration-200"
@@ -69,7 +69,7 @@ export default function LoginPage() {
               <a href="/privacy" className="underline hover:text-foreground transition-colors">개인정보 처리방침</a>
               에 동의하는 것으로 간주합니다.
             </p>
-          </CardContent>
+          </Card.Content>
         </Card>
       </div>
     </div>

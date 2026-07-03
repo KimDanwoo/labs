@@ -14,11 +14,11 @@ export function RestTimer({ restSecondsLeft, nextSetIndex, onAddRest, onSkipRest
   return (
     <div className="flex flex-col items-center gap-xl">
       <div className="flex flex-col items-center gap-sm">
-        <span className="text-sm font-medium tracking-widest text-muted uppercase">Rest</span>
+        <span className="text-sm font-medium tracking-widest text-muted-foreground uppercase">Rest</span>
         <span className="font-display text-7xl font-bold tabular-nums text-foreground">
           {formatClock(restSecondsLeft)}
         </span>
-        <span className="text-sm text-muted">다음: {nextSetIndex}번째 세트</span>
+        <span className="text-sm text-muted-foreground">다음: {nextSetIndex}번째 세트</span>
       </div>
 
       <div className="flex gap-md">

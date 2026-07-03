@@ -31,7 +31,7 @@ export function ExercisePicker({ exercises, selectedIds, onToggle }: Props) {
             'shrink-0 rounded-full px-lg py-xs text-sm font-medium transition-colors',
             activeFilter === 'all'
               ? 'bg-primary text-primary-foreground'
-              : 'bg-glass border border-card-border text-muted',
+              : 'bg-glass border border-card-border text-muted-foreground',
           ].join(' ')}
         >
           전체
@@ -45,7 +45,7 @@ export function ExercisePicker({ exercises, selectedIds, onToggle }: Props) {
               'shrink-0 rounded-full px-lg py-xs text-sm font-medium transition-colors',
               activeFilter === m
                 ? 'bg-primary text-primary-foreground'
-                : 'bg-glass border border-card-border text-muted',
+                : 'bg-glass border border-card-border text-muted-foreground',
             ].join(' ')}
           >
             {MUSCLE_GROUP[m]}
@@ -71,12 +71,12 @@ export function ExercisePicker({ exercises, selectedIds, onToggle }: Props) {
                 <span className={['text-base font-medium', isSelected ? 'text-primary' : 'text-foreground'].join(' ')}>
                   {exercise.nameKo}
                 </span>
-                <Badge tone={isSelected ? 'primary' : 'secondary'}>{EQUIPMENT[exercise.equipment]}</Badge>
+                <Badge variant={isSelected ? 'primary' : 'secondary'}>{EQUIPMENT[exercise.equipment]}</Badge>
               </div>
               <span
                 className={[
                   'flex size-6 shrink-0 items-center justify-center rounded-full text-sm font-bold',
-                  isSelected ? 'bg-primary text-primary-foreground' : 'border border-card-border text-muted',
+                  isSelected ? 'bg-primary text-primary-foreground' : 'border border-card-border text-muted-foreground',
                 ].join(' ')}
               >
                 {isSelected ? '✓' : '+'}

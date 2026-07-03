@@ -10,7 +10,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@shared/ui/DropdownMenu';
+} from '@shared/ui';
 import { cn } from '@shared/lib/utils';
 import { useHeader } from './model/useHeader';
 

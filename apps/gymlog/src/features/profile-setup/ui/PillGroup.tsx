@@ -25,7 +25,7 @@ export function PillGroup<T extends string | number>({
 }: PillGroupProps<T>) {
   return (
     <div className="flex flex-col gap-sm">
-      <span className="text-sm font-medium text-muted">{label}</span>
+      <span className="text-sm font-medium text-muted-foreground">{label}</span>
       <div className={`grid ${COLS[columns]} gap-sm`}>
         {options.map((option) => {
           const isSelected = option === value;

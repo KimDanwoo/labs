@@ -4,8 +4,7 @@ import { getExerciseById } from '@entities/exercise/model/constants';
 import { summarizeSession } from '@entities/session/model/lib';
 import { SET_STATUS, type WorkoutSession } from '@entities/session/model/types';
 import { formatDuration, formatNumber } from '@shared/lib';
-import { Button } from '@ui/react';
-import * as Card from '@ui/react/card';
+import { Button, Card } from '@ui/react';
 
 type SessionSummaryCardProps = {
   session: WorkoutSession;
@@ -17,12 +16,12 @@ export function SessionSummaryCard({ session, onCommit }: SessionSummaryCardProp
 
   return (
     <div className="flex flex-col gap-lg">
-      <Card.Root>
+      <Card>
         <Card.Header>
           <Card.Title>운동 완료!</Card.Title>
           <Card.Description>{session.routineName}</Card.Description>
         </Card.Header>
-        <Card.Body>
+        <Card.Content>
           <div className="grid grid-cols-2 gap-sm">
             <StatItem label="총 운동 수" value={`${summary.exerciseCount}개`} />
             <StatItem label="총 세트" value={`${summary.completedSets}세트`} />
@@ -31,8 +30,8 @@ export function SessionSummaryCard({ session, onCommit }: SessionSummaryCardProp
             <StatItem label="총 휴식" value={formatDuration(summary.totalRestSec)} />
             <StatItem label="총 소요" value={formatDuration(summary.durationSec)} />
           </div>
-        </Card.Body>
-      </Card.Root>
+        </Card.Content>
+      </Card>
 
       <div className="flex flex-col gap-sm">
         {session.performances.map((performance, i) => {
@@ -42,18 +41,18 @@ export function SessionSummaryCard({ session, onCommit }: SessionSummaryCardProp
           );
 
           return (
-            <Card.Root key={i}>
+            <Card key={i}>
               <Card.Header>
                 <Card.Title className="text-base">{exercise?.nameKo ?? performance.exerciseId}</Card.Title>
               </Card.Header>
-              <Card.Body>
+              <Card.Content>
                 {doneSets.length === 0 ? (
-                  <p className="text-sm text-muted">완료한 세트 없음</p>
+                  <p className="text-sm text-muted-foreground">완료한 세트 없음</p>
                 ) : (
                   <ul className="flex flex-col gap-xs">
                     {doneSets.map((set, j) => (
                       <li key={j} className="flex justify-between text-sm">
-                        <span className="text-muted">{j + 1}세트</span>
+                        <span className="text-muted-foreground">{j + 1}세트</span>
                         <span className="font-medium text-foreground">
                           {set.reps}회 × {set.weight}kg
                         </span>
@@ -61,8 +60,8 @@ export function SessionSummaryCard({ session, onCommit }: SessionSummaryCardProp
                     ))}
                   </ul>
                 )}
-              </Card.Body>
-            </Card.Root>
+              </Card.Content>
+            </Card>
           );
         })}
       </div>
@@ -82,7 +81,7 @@ type StatItemProps = {
 function StatItem({ label, value }: StatItemProps) {
   return (
     <div className="flex flex-col gap-xs rounded-md bg-primary-subtle p-md">
-      <span className="text-xs text-muted">{label}</span>
+      <span className="text-xs text-muted-foreground">{label}</span>
       <span className="font-display text-xl font-semibold text-foreground">{value}</span>
     </div>
   );

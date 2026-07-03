@@ -52,20 +52,20 @@ export function WorkoutCalendar({ sessions, selectedDate, onSelectDate }: Workou
   return (
     <div className="flex flex-col gap-md rounded-lg border border-card-border bg-glass p-lg shadow-md backdrop-blur-md">
       <div className="flex items-center justify-between">
-        <button type="button" onClick={handlePrevMonth} className="px-sm text-muted hover:text-foreground">
+        <button type="button" onClick={handlePrevMonth} className="px-sm text-muted-foreground hover:text-foreground">
           ‹
         </button>
         <span className="text-lg font-semibold text-foreground">
           {year}년 {month + 1}월
         </span>
-        <button type="button" onClick={handleNextMonth} className="px-sm text-muted hover:text-foreground">
+        <button type="button" onClick={handleNextMonth} className="px-sm text-muted-foreground hover:text-foreground">
           ›
         </button>
       </div>
 
       <div className="grid grid-cols-7 gap-xs">
         {WEEKDAYS.map((weekday) => (
-          <div key={weekday} className="py-xs text-center text-xs text-muted">
+          <div key={weekday} className="py-xs text-center text-xs text-muted-foreground">
             {weekday}
           </div>
         ))}

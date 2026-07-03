@@ -185,7 +185,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
               }
             }}
             placeholder="태그 입력 후 Enter"
-            className="max-w-xs"
+            className="max-w-[20rem]"
           />
           <Button type="button" variant="outline" size="sm" onClick={addTag}>
             추가

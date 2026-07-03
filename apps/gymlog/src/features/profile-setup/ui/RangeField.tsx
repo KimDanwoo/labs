@@ -17,7 +17,7 @@ export function RangeField({ label, options, value, getLabel, onSelect }: RangeF
   return (
     <div className="flex flex-col gap-sm">
       <div className="flex items-baseline justify-between">
-        <span className="text-sm font-medium text-muted">{label}</span>
+        <span className="text-sm font-medium text-muted-foreground">{label}</span>
         <span className="font-display text-2xl font-bold text-foreground">{getLabel(value)}</span>
       </div>
       <input
@@ -30,7 +30,7 @@ export function RangeField({ label, options, value, getLabel, onSelect }: RangeF
         aria-label={label}
         className="w-full"
       />
-      <div className="flex justify-between text-xs text-muted">
+      <div className="flex justify-between text-xs text-muted-foreground">
         <span>{getLabel(first)}</span>
         <span>{getLabel(last)}</span>
       </div>

@@ -7,8 +7,8 @@ export function SpacingSection() {
       <div className="flex flex-col gap-sm">
         {Object.entries(spacing).map(([name, value]) => (
           <div key={name} className="flex items-center gap-md">
-            <span className="w-3xl shrink-0 text-xs text-muted">{name}</span>
-            <span className="w-3xl shrink-0 text-xs text-muted">{value}</span>
+            <span className="w-3xl shrink-0 text-xs text-muted-foreground">{name}</span>
+            <span className="w-3xl shrink-0 text-xs text-muted-foreground">{value}</span>
             <span className="h-md rounded-sm bg-primary" style={{ width: value }} />
           </div>
         ))}

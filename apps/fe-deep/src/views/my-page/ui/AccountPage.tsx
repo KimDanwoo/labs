@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, Button, Avatar, AvatarFallback, AvatarImage, Sheet, SheetContent, SheetTitle } from '@shared/ui';
+import { Card, Button, Avatar, AvatarFallback, AvatarImage, Sheet, SheetContent, SheetTitle } from '@shared/ui';
 import { Mail, User } from 'lucide-react';
 import { useAccount } from '../model';
 
@@ -13,7 +13,7 @@ export function AccountPage() {
       <p className="text-muted-foreground mb-8">계정 정보를 관리합니다.</p>
 
       <Card className="shadow-sm mb-8">
-        <CardContent className="p-6">
+        <Card.Content className="p-6">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
               <AvatarImage src={avatarUrl} alt={`${displayName} 프로필`} />
@@ -33,12 +33,12 @@ export function AccountPage() {
               <p className="text-xs text-muted-foreground">Google 계정으로 로그인 중</p>
             </div>
           </div>
-        </CardContent>
+        </Card.Content>
       </Card>
 
       <div className="border-t pt-6">
         <button
-          className="text-xs text-muted-foreground/60 hover:text-destructive transition-colors"
+          className="text-xs text-muted-foreground/60 hover:text-error transition-colors"
           onClick={() => handleOpenChange(true)}
         >
           회원 탈퇴
@@ -46,7 +46,7 @@ export function AccountPage() {
       </div>
 
       <Sheet open={open} onOpenChange={handleOpenChange}>
-        <SheetContent side="bottom" className="rounded-t-2xl px-6 pb-8 pt-6 max-w-lg mx-auto">
+        <SheetContent side="bottom" className="rounded-t-2xl px-6 pb-8 pt-6 max-w-[32rem] mx-auto">
           <SheetTitle className="text-base font-semibold mb-1">정말 탈퇴하시겠습니까?</SheetTitle>
           <div className="text-xs text-muted-foreground space-y-0.5 mb-5">
             <p>탈퇴 시 아래 데이터가 즉시 영구 삭제되며 복구할 수 없습니다.</p>
@@ -57,7 +57,7 @@ export function AccountPage() {
             </ul>
           </div>
 
-          {error && <p className="text-sm text-destructive mb-3">{error}</p>}
+          {error && <p className="text-sm text-error mb-3">{error}</p>}
 
           <div className="flex gap-2 justify-end">
             <Button variant="ghost" size="sm" onClick={() => handleOpenChange(false)} disabled={deleting}>

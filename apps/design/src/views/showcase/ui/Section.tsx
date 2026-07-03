@@ -11,7 +11,7 @@ export function Section({ title, description, children }: SectionProps) {
     <section className="flex flex-col gap-lg">
       <div className="flex flex-col gap-xs">
         <h2 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h2>
-        {description ? <p className="text-sm text-muted">{description}</p> : null}
+        {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
       </div>
       {children}
     </section>

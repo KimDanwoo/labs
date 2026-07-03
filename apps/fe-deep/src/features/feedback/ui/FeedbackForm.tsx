@@ -34,7 +34,7 @@ export function FeedbackForm({ questionId, questionText, fixedType, label, class
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="rounded-t-2xl px-6 pb-8 pt-6 max-w-lg mx-auto">
+        <SheetContent side="bottom" className="rounded-t-2xl px-6 pb-8 pt-6 max-w-[32rem] mx-auto">
           <SheetTitle className="text-base font-semibold mb-4">피드백 보내기</SheetTitle>
 
           <div className="space-y-4">
@@ -74,7 +74,7 @@ export function FeedbackForm({ questionId, questionText, fixedType, label, class
               <p className="text-sm text-green-600">피드백이 제출되었습니다. 감사합니다!</p>
             )}
             {status === 'error' && (
-              <p className="text-sm text-destructive">{errorMsg}</p>
+              <p className="text-sm text-error">{errorMsg}</p>
             )}
 
             <div className="flex justify-end gap-2">

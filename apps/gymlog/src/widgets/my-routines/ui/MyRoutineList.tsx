@@ -3,8 +3,7 @@
 import { getExerciseById } from '@entities/exercise/model/constants';
 import type { Routine } from '@entities/routine/model/types';
 import { GOAL } from '@shared/training';
-import { Badge, Button } from '@ui/react';
-import * as Card from '@ui/react/card';
+import { Badge, Button, Card } from '@ui/react';
 
 type MyRoutineListProps = {
   routines: Routine[];
@@ -25,7 +24,7 @@ export function MyRoutineList({ routines, onStart, onEdit, onDelete, editLabel }
   return (
     <div className="flex flex-col gap-md">
       {routines.map((routine) => (
-        <Card.Root key={routine.id}>
+        <Card key={routine.id}>
           <Card.Header>
             <Card.Title>{routine.name}</Card.Title>
             <Badge>{GOAL[routine.goal]}</Badge>
@@ -33,7 +32,7 @@ export function MyRoutineList({ routines, onStart, onEdit, onDelete, editLabel }
           <Card.Description>
             {routine.items.length}개 운동 · {previewExercises(routine)}
           </Card.Description>
-          <Card.Body>
+          <Card.Content>
             <div className="flex gap-sm">
               <Button className="h-12 flex-1 font-semibold" onClick={() => onStart(routine)}>
                 시작
@@ -47,8 +46,8 @@ export function MyRoutineList({ routines, onStart, onEdit, onDelete, editLabel }
                 </Button>
               )}
             </div>
-          </Card.Body>
-        </Card.Root>
+          </Card.Content>
+        </Card>
       ))}
     </div>
   );
