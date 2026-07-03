@@ -20,18 +20,19 @@ export const themeColors = {
     800: 'oklch(0.20 0.018 264)',
     900: 'oklch(0.145 0.018 264)',
   },
-  // 브랜드 — hue는 var로 회전(기본 코발트). L·C만 스케일이 고정.
+  // 브랜드 — hue는 var로 회전(기본 코발트), 채도는 var 배율로 조절(기본 1).
+  // L은 고정, C는 `--brand-chroma`를 곱해 앱이 톤을 가라앉힐 수 있다(예: 읽기 앱).
   brand: {
-    50: 'oklch(0.97 0.02 var(--brand-hue))',
-    100: 'oklch(0.93 0.045 var(--brand-hue))',
-    200: 'oklch(0.87 0.08 var(--brand-hue))',
-    300: 'oklch(0.78 0.12 var(--brand-hue))',
-    400: 'oklch(0.66 0.16 var(--brand-hue))',
-    500: 'oklch(0.56 0.19 var(--brand-hue))',
-    600: 'oklch(0.48 0.20 var(--brand-hue))',
-    700: 'oklch(0.41 0.18 var(--brand-hue))',
-    800: 'oklch(0.34 0.15 var(--brand-hue))',
-    900: 'oklch(0.27 0.11 var(--brand-hue))',
+    50: 'oklch(0.97 calc(0.02 * var(--brand-chroma)) var(--brand-hue))',
+    100: 'oklch(0.93 calc(0.045 * var(--brand-chroma)) var(--brand-hue))',
+    200: 'oklch(0.87 calc(0.08 * var(--brand-chroma)) var(--brand-hue))',
+    300: 'oklch(0.78 calc(0.12 * var(--brand-chroma)) var(--brand-hue))',
+    400: 'oklch(0.66 calc(0.16 * var(--brand-chroma)) var(--brand-hue))',
+    500: 'oklch(0.56 calc(0.19 * var(--brand-chroma)) var(--brand-hue))',
+    600: 'oklch(0.48 calc(0.20 * var(--brand-chroma)) var(--brand-hue))',
+    700: 'oklch(0.41 calc(0.18 * var(--brand-chroma)) var(--brand-hue))',
+    800: 'oklch(0.34 calc(0.15 * var(--brand-chroma)) var(--brand-hue))',
+    900: 'oklch(0.27 calc(0.11 * var(--brand-chroma)) var(--brand-hue))',
   },
   // 성공 — green(hue 152)
   green: {
@@ -95,10 +96,12 @@ export const commonColors = {
 
 /**
  * :root 스칼라 — 색이 아닌 루트 변수. 앱 스킨이 오버라이드하는 지점.
- * brand-hue: 브랜드 램프 hue(기본 코발트 265). 앱 globals.css에서 이 값만 바꾸면 리스킨된다.
+ * brand-hue: 브랜드 램프 hue(기본 sky 블루 240). 앱 globals.css에서 이 값만 바꾸면 리스킨된다.
+ * brand-chroma: 브랜드 램프 채도 배율(기본 0.8, 절제된 톤). 더 낮추면 톤이 더 가라앉는다(읽기 앱 등).
  */
 export const rootScalars = {
-  'brand-hue': '265',
+  'brand-hue': '240',
+  'brand-chroma': '0.8',
 } as const;
 
 export type ThemeColorScale = keyof typeof themeColors;
