@@ -6,7 +6,7 @@ export function LabFooter() {
         <span className="font-display text-xs font-semibold tracking-widest text-foreground/40 uppercase">
           Danwoo Lab
         </span>
-        <span className="text-xs text-muted/60">© 2026 · 김단우</span>
+        <span className="text-xs text-muted-foreground/60">© 2026 · 김단우</span>
       </div>
     </footer>
   );

@@ -10,8 +10,7 @@ import {
   SessionExerciseList,
   SessionSummaryCard,
 } from '@features/session-runner/ui';
-import { Button } from '@ui/react';
-import * as Card from '@ui/react/card';
+import { Button, Card } from '@ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -25,18 +24,18 @@ export function SessionView() {
 
   if (!session) {
     return (
-      <main className="mx-auto flex w-full max-w-content flex-1 flex-col items-center justify-center gap-lg px-lg py-3xl">
-        <Card.Root className="w-full">
+      <main className="mx-auto flex w-full max-w-mobile flex-1 flex-col items-center justify-center gap-lg px-lg py-3xl">
+        <Card className="w-full">
           <Card.Header>
             <Card.Title>진행 중인 운동이 없어요</Card.Title>
           </Card.Header>
-          <Card.Body>
-            <p className="text-sm text-muted">루틴을 선택해서 운동을 시작해보세요.</p>
+          <Card.Content>
+            <p className="text-sm text-muted-foreground">루틴을 선택해서 운동을 시작해보세요.</p>
             <Link href="/">
               <Button className="h-14 w-full">홈으로</Button>
             </Link>
-          </Card.Body>
-        </Card.Root>
+          </Card.Content>
+        </Card>
       </main>
     );
   }
@@ -60,9 +59,13 @@ export function SessionView() {
 
   if (view === SESSION_VIEW.summary) {
     return (
-      <main className="mx-auto w-full max-w-content px-lg py-3xl">
+      <main className="mx-auto w-full max-w-mobile px-lg py-3xl">
         <SessionSummaryCard session={session} onCommit={handleCommit} />
-        <Button variant="ghost" className="mt-md h-12 w-full text-sm text-muted" onClick={runner.closeSummary}>
+        <Button
+          variant="ghost"
+          className="mt-md h-12 w-full text-sm text-muted-foreground"
+          onClick={runner.closeSummary}
+        >
           계속 운동하기
         </Button>
       </main>
@@ -71,7 +74,7 @@ export function SessionView() {
 
   if (view === SESSION_VIEW.exercise && runner.activePerformance) {
     return (
-      <main className="mx-auto w-full max-w-content px-lg py-3xl">
+      <main className="mx-auto w-full max-w-mobile px-lg py-3xl">
         <ExercisePanel
           performance={runner.activePerformance}
           currentSetIndex={runner.currentSetIndex}
@@ -90,14 +93,14 @@ export function SessionView() {
 
   if (view === SESSION_VIEW.resting) {
     return (
-      <main className="mx-auto flex w-full max-w-content flex-col gap-3xl px-lg py-3xl">
+      <main className="mx-auto flex w-full max-w-mobile flex-col gap-3xl px-lg py-3xl">
         <RestTimer
           restSecondsLeft={runner.restSecondsLeft}
           nextSetIndex={runner.currentSetIndex + 1}
           onAddRest={runner.addRest}
           onSkipRest={runner.skipRest}
         />
-        <Button variant="ghost" className="h-10 w-full text-sm text-muted" onClick={runner.backToList}>
+        <Button variant="ghost" className="h-10 w-full text-sm text-muted-foreground" onClick={runner.backToList}>
           목록으로
         </Button>
       </main>
@@ -118,8 +121,8 @@ export function SessionView() {
         total={runner.total}
         onExit={handleExit}
       />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
-        <p className="text-sm text-muted">
+      <main className="mx-auto flex w-full max-w-mobile flex-col gap-lg px-lg pb-3xl pt-lg">
+        <p className="text-sm text-muted-foreground">
           {isEmpty
             ? '오늘 한 운동을 검색해서 추가하세요. 추가한 운동을 눌러 무게·횟수를 기록해요.'
             : '아무 운동이나 눌러 시작하세요. ⠿ 순서 변경 · ✎ 바꾸기 · ✕ 빼기, 아래에서 추가할 수 있어요.'}
@@ -141,7 +144,11 @@ export function SessionView() {
           <div className="flex flex-col gap-sm">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">운동 바꾸기</span>
-              <Button variant="ghost" className="h-8 px-md text-sm text-muted" onClick={() => setSwapIndex(null)}>
+              <Button
+                variant="ghost"
+                className="h-8 px-md text-sm text-muted-foreground"
+                onClick={() => setSwapIndex(null)}
+              >
                 취소
               </Button>
             </div>

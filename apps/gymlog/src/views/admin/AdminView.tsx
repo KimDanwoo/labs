@@ -55,8 +55,8 @@ export function AdminView() {
     return (
       <>
         <AppHeader title="관리자" />
-        <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-3xl text-center">
-          <p className="text-muted">관리자만 접근할 수 있어요.</p>
+        <main className="mx-auto flex w-full max-w-mobile flex-col gap-lg px-lg pb-3xl pt-3xl text-center">
+          <p className="text-muted-foreground">관리자만 접근할 수 있어요.</p>
         </main>
       </>
     );
@@ -66,14 +66,18 @@ export function AdminView() {
     return (
       <>
         <AppHeader title={editing === 'new' ? '새 공용 루틴' : '공용 루틴 수정'} />
-        <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
+        <main className="mx-auto flex w-full max-w-mobile flex-col gap-lg px-lg pb-3xl pt-lg">
           <RoutineBuilderForm
             key={editing === 'new' ? 'new' : editing.id}
             initialRoutine={editing === 'new' ? null : editing}
             hideStart
             onSubmit={(routine) => upsertShared(routine)}
           />
-          <Button variant="ghost" className="h-10 w-full text-sm text-muted" onClick={() => setEditing(null)}>
+          <Button
+            variant="ghost"
+            className="h-10 w-full text-sm text-muted-foreground"
+            onClick={() => setEditing(null)}
+          >
             취소
           </Button>
         </main>
@@ -84,7 +88,7 @@ export function AdminView() {
   return (
     <>
       <AppHeader title="루틴 관리(관리자)" />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-2xl px-lg pb-3xl pt-lg">
+      <main className="mx-auto flex w-full max-w-mobile flex-col gap-2xl px-lg pb-3xl pt-lg">
         <section className="flex flex-col gap-md">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-foreground">공용 루틴 ({shared.length})</h2>
@@ -92,13 +96,13 @@ export function AdminView() {
               <Button variant="outline" className="h-9 px-md text-sm" onClick={() => setEditing('new')}>
                 + 새 루틴
               </Button>
-              <Button variant="ghost" className="h-9 px-md text-sm text-muted" onClick={handleSeedPresets}>
+              <Button variant="ghost" className="h-9 px-md text-sm text-muted-foreground" onClick={handleSeedPresets}>
                 PRESET 시드
               </Button>
             </div>
           </div>
           {shared.length === 0 ? (
-            <p className="rounded-lg border border-card-border bg-glass p-lg text-sm text-muted">
+            <p className="rounded-lg border border-card-border bg-glass p-lg text-sm text-muted-foreground">
               공용 루틴이 없어요. + 새 루틴으로 만들거나 PRESET 시드하세요.
             </p>
           ) : (
@@ -126,7 +130,7 @@ export function AdminView() {
         <section className="flex flex-col gap-md">
           <h2 className="text-base font-semibold text-foreground">내 루틴을 공용으로</h2>
           {saved.length === 0 ? (
-            <p className="rounded-lg border border-card-border bg-glass p-lg text-sm text-muted">
+            <p className="rounded-lg border border-card-border bg-glass p-lg text-sm text-muted-foreground">
               먼저 루틴을 만들면 여기서 공용으로 올릴 수 있어요.
             </p>
           ) : (

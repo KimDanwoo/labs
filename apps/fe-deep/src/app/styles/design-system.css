@@ -1,13 +1,25 @@
 /* ══════════════════════════════════════════════════════════
-   Design System — 프딥
-   Style Dictionary 연동 시 Primitives 섹션만 교체합니다.
+   Design System — 프딥 (공유 베이스 스킨 + opt-in 확장)
+
+   코어 토큰(primitives·brand·status·surface 계약)은 @tokens/css 가 제공한다.
+   이 파일은 그 위에 프딥 전용만 덧입힌다:
+     · 스킨      : --brand-hue(코발트) + --brand-chroma(차분한 톤) + radius 밀도
+     · 표면 미세 : 배경/카드를 살짝 가라앉힌 gray 표면으로 (읽기 편의)
+     · opt-in    : chart / sidebar / 확장 gray 스텝 / 읽기 타이포 / 이펙트 / 애니메이션
    ══════════════════════════════════════════════════════════ */
 
 
-/* ── 1. Primitives ──────────────────────────────────────── */
+/* ── 1. 스킨 + opt-in primitives ────────────────────────── */
 
 :root {
-  /* Gray scale */
+  /* 스킨: 공유 브랜드 램프를 프딥 톤으로. hue는 sky 블루(공유 기본과 동일 = 색 통일),
+     채도는 공유 기본(0.8)보다 더 낮춰 장문 읽기에 편한 차분한 파랑으로. */
+  --brand-hue: 240;
+  --brand-chroma: 0.6;
+
+  /* gray 램프 — 공유는 gray를 semantic 값에 인라인하고 --gray-* 변수를 노출하지 않는다.
+     프딥은 표면 미세조정에 gray 스텝을 직접 참조하므로 여기서 자립적으로 정의한다.
+     값은 공유 팔레트(hue 264)와 동일 + 프딥 전용 추가 스텝(25/75/850/950). */
   --gray-25:  oklch(0.995 0.001 264);
   --gray-50:  oklch(0.985 0.002 264);
   --gray-75:  oklch(0.975 0.004 264);
@@ -23,151 +35,62 @@
   --gray-900: oklch(0.12 0.015 264);
   --gray-950: oklch(0.115 0.015 264);
 
-  /* Indigo */
-  --indigo-50:  oklch(0.95 0.015 264);
-  --indigo-300: oklch(0.72 0.08 264);
-  --indigo-400: oklch(0.60 0.12 264);
-  --indigo-500: oklch(0.50 0.12 264);
-  --indigo-600: oklch(0.37 0.10 264);
-
-  /* Red */
-  --red-400: oklch(0.704 0.191 22);
-  --red-500: oklch(0.577 0.245 27);
-
-  /* Yellow */
+  /* 차트 전용 hue (opt-in). chart-1 은 브랜드를 재사용한다. */
+  --teal-500:   oklch(0.6 0.118 185);
+  --teal-400:   oklch(0.696 0.17 162);
+  --blue-600:   oklch(0.398 0.07 227);
   --yellow-400: oklch(0.828 0.189 84);
   --yellow-500: oklch(0.769 0.188 70);
-
-  /* Chart accent colors (unique hues) */
-  --teal-500:   oklch(0.6 0.118 185);
-  --blue-600:   oklch(0.398 0.07 227);
-  --teal-400:   oklch(0.696 0.17 162);
   --purple-500: oklch(0.627 0.265 304);
   --orange-500: oklch(0.645 0.246 16);
 
-  /* Alpha */
+  /* 다크 sidebar 경계용 알파 화이트 */
   --white-10: oklch(1 0.008 264 / 10%);
-  --white-14: oklch(1 0.008 264 / 14%);
 
-  /* Base */
-  --white: oklch(1 0 0);
-  --black: oklch(0 0 0);
-}
-
-
-/* ── 2. Semantic Tokens ─────────────────────────────────── */
-
-:root {
+  /* radius 밀도 (프딥 정체성) */
   --radius: 0.625rem;
 
-  /* Surface */
-  --background:          var(--gray-50);
-  --foreground:          var(--gray-900);
-  --card:                var(--gray-25);
-  --card-foreground:     var(--gray-900);
-  --popover:             var(--gray-25);
-  --popover-foreground:  var(--gray-900);
+  /* 표면 미세조정 — 공유는 순백 배경이지만 프딥은 은은한 gray 배경 + 밝은 카드 */
+  --color-background: var(--gray-50);
+  --color-card:       var(--gray-25);
+  --color-popover:    var(--gray-25);
 
-  /* Brand */
-  --primary:             var(--indigo-600);
-  --primary-foreground:  var(--white);
-  --secondary:           var(--gray-100);
-  --secondary-foreground:var(--gray-700);
-  --muted:               var(--gray-100);
-  --muted-foreground:    var(--gray-600);
-  --accent:              var(--indigo-50);
-  --accent-foreground:   var(--gray-700);
-
-  /* Semantic */
-  --destructive:         var(--red-500);
-  --border:              var(--gray-200);
-  --input:               var(--gray-200);
-  --ring:                var(--indigo-500);
-
-  /* Charts */
-  --chart-1: var(--indigo-500);
+  /* Charts (opt-in) */
+  --chart-1: var(--color-primary);
   --chart-2: var(--teal-500);
   --chart-3: var(--blue-600);
   --chart-4: var(--yellow-400);
   --chart-5: var(--yellow-500);
 
-  /* Sidebar */
+  /* Sidebar (opt-in) */
   --sidebar:                    var(--gray-75);
-  --sidebar-foreground:         var(--gray-900);
-  --sidebar-primary:            var(--indigo-600);
-  --sidebar-primary-foreground: var(--white);
-  --sidebar-accent:             var(--indigo-50);
-  --sidebar-accent-foreground:  var(--gray-700);
-  --sidebar-border:             var(--gray-200);
-  --sidebar-ring:               var(--indigo-500);
+  --sidebar-foreground:         var(--color-foreground);
+  --sidebar-primary:            var(--color-primary);
+  --sidebar-primary-foreground: var(--color-primary-foreground);
+  --sidebar-accent:             var(--color-accent);
+  --sidebar-accent-foreground:  var(--color-accent-foreground);
+  --sidebar-border:             var(--color-border);
+  --sidebar-ring:               var(--color-ring);
 }
 
-/* Dark mode: semantic 재매핑 */
 .dark {
-  /* Surface */
-  --background:          var(--gray-950);
-  --foreground:          var(--gray-200);
-  --card:                var(--gray-850);
-  --card-foreground:     var(--gray-200);
-  --popover:             var(--gray-850);
-  --popover-foreground:  var(--gray-200);
+  --color-background: var(--gray-950);
+  --color-card:       var(--gray-850);
+  --color-popover:    var(--gray-850);
 
-  /* Brand */
-  --primary:             var(--indigo-300);
-  --primary-foreground:  var(--gray-950);
-  --secondary:           var(--gray-800);
-  --secondary-foreground:var(--gray-200);
-  --muted:               var(--gray-800);
-  --muted-foreground:    var(--gray-500);
-  --accent:              var(--gray-800);
-  --accent-foreground:   var(--gray-200);
-
-  /* Semantic */
-  --destructive:         var(--red-400);
-  --border:              var(--white-10);
-  --input:               var(--white-14);
-  --ring:                var(--indigo-400);
-
-  /* Charts */
-  --chart-1: var(--indigo-400);
   --chart-2: var(--teal-400);
   --chart-3: var(--yellow-500);
   --chart-4: var(--purple-500);
   --chart-5: var(--orange-500);
 
-  /* Sidebar */
-  --sidebar:                    var(--gray-900);
-  --sidebar-foreground:         var(--gray-200);
-  --sidebar-primary:            var(--indigo-400);
-  --sidebar-primary-foreground: var(--white);
-  --sidebar-accent:             var(--gray-800);
-  --sidebar-accent-foreground:  var(--gray-200);
-  --sidebar-border:             var(--white-10);
-  --sidebar-ring:               var(--indigo-400);
+  --sidebar:            var(--gray-900);
+  --sidebar-border:     var(--white-10);
 }
 
 
-/* ── 3. Theme (Tailwind @theme) ─────────────────────────── */
+/* ── 2. Theme (opt-in 토큰만 Tailwind 유틸로 등록) ──────── */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -181,9 +104,6 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 
   --radius-sm: max(0px, calc(var(--radius) - 4px));
   --radius-md: max(0px, calc(var(--radius) - 2px));
@@ -207,7 +127,7 @@
 }
 
 
-/* ── 4. Typography ──────────────────────────────────────── */
+/* ── 3. Typography (읽기 타이포 — opt-in) ───────────────── */
 /* tbd = bold (700), tmd = medium (500), trg = regular (400) */
 
 @utility tbd-40 { font-size: 40px; line-height: 52px; font-weight: 700; letter-spacing: -0.3px; }
@@ -238,10 +158,10 @@
 @utility text-clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 
-/* ── 5. Utilities ───────────────────────────────────────── */
+/* ── 4. Utilities (이펙트 — opt-in) ─────────────────────── */
 
 @utility card-hover {
-  border-color: var(--border);
+  border-color: var(--color-border);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.3s ease;

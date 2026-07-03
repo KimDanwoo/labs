@@ -40,7 +40,7 @@ export function RoutineLibraryView() {
   return (
     <>
       <AppHeader title="루틴 관리" />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-2xl px-lg pb-28 pt-lg">
+      <main className="mx-auto flex w-full max-w-mobile flex-col gap-2xl px-lg pb-28 pt-lg">
         <section className="flex flex-col gap-md">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-foreground">내 루틴</h2>
@@ -48,12 +48,12 @@ export function RoutineLibraryView() {
               + 새 루틴
             </button>
           </div>
-          {!mounted && <p className="text-muted">불러오는 중…</p>}
+          {!mounted && <p className="text-muted-foreground">불러오는 중…</p>}
           {mounted && saved.length > 0 && (
             <MyRoutineList routines={saved} onStart={handleStart} onEdit={handleEdit} onDelete={handleDelete} />
           )}
           {mounted && saved.length === 0 && (
-            <p className="rounded-lg border border-card-border bg-glass p-lg text-sm text-muted">
+            <p className="rounded-lg border border-card-border bg-glass p-lg text-sm text-muted-foreground">
               아직 만든 루틴이 없어요. 아래 기본 루틴을 담거나 새로 만들어 보세요.
             </p>
           )}

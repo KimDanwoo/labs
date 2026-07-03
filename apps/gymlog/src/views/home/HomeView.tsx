@@ -10,8 +10,7 @@ import { useWorkoutSession } from '@features/session-runner/model/hooks';
 import { buildRoutineFromMuscles } from '@features/workout-plan/model/lib';
 import { TodayWorkout } from '@features/workout-plan/ui';
 import { isSameDay, useMounted } from '@shared/lib';
-import { Badge, Button } from '@ui/react';
-import * as Card from '@ui/react/card';
+import { Badge, Button, Card } from '@ui/react';
 import { AppHeader } from '@widgets/app-header/ui';
 import { LevelCard } from '@widgets/level-card/ui';
 import { MyRoutineList } from '@widgets/my-routines/ui';
@@ -70,29 +69,29 @@ export function HomeView() {
   };
 
   if (!mounted || needsOnboarding) {
-    return <main className="mx-auto w-full max-w-content px-lg py-3xl text-muted">불러오는 중…</main>;
+    return <main className="mx-auto w-full max-w-mobile px-lg py-3xl text-muted-foreground">불러오는 중…</main>;
   }
 
   if (todayCompleted) {
     return (
       <>
         <AppHeader />
-        <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-28 pt-lg">
+        <main className="mx-auto flex w-full max-w-mobile flex-col gap-lg px-lg pb-28 pt-lg">
           <LevelCard />
-          <Card.Root className="border-primary">
+          <Card>
             <Card.Header>
               <Badge>오늘 완료</Badge>
             </Card.Header>
             <Card.Title>오늘의 운동을 완료했어요 💪</Card.Title>
             <Card.Description>푹 쉬고 회복하는 것도 운동의 일부예요.</Card.Description>
-            <Card.Body>
+            <Card.Content>
               <Link href="/history">
                 <Button variant="outline" className="h-12 w-full">
                   기록 보기
                 </Button>
               </Link>
-            </Card.Body>
-          </Card.Root>
+            </Card.Content>
+          </Card>
         </main>
       </>
     );
@@ -117,12 +116,8 @@ export function HomeView() {
   return (
     <>
       <AppHeader />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-28 pt-lg">
+      <main className="mx-auto flex w-full max-w-mobile flex-col gap-lg px-lg pb-28 pt-lg">
         <LevelCard />
-
-        <Button className="h-14 w-full text-base font-semibold" onClick={handleStartEmpty}>
-          운동 시작
-        </Button>
 
         <TodayWorkout
           weekdayLabel={WEEKDAY_LABELS[weekday] ?? ''}
@@ -132,6 +127,14 @@ export function HomeView() {
           onEdit={dayPlan.type === 'routine' ? handleEdit : handleEditToday}
           onPickFree={handleNewRoutine}
         />
+
+        <Button
+          variant="ghost"
+          className="h-11 w-full text-sm font-medium text-muted-foreground"
+          onClick={handleStartEmpty}
+        >
+          루틴 없이 바로 기록하기
+        </Button>
 
         <div className="flex flex-col gap-md">
           <div className="flex items-center justify-between">

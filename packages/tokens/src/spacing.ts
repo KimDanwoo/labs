@@ -22,12 +22,30 @@ export const radius = {
 } as const;
 
 /**
- * 컨테이너(최대 폭) 토큰 — 읽기 좋은 본문 폭 등.
- * spacing 토큰이 Tailwind의 `max-w-{sm~3xl}` 이름을 가리므로, 충돌 없는 이름으로 둔다.
- * `--container-content` → `max-w-content` 유틸 생성.
+ * 컨테이너(최대 폭) 토큰 → `max-w-*` 유틸.
+ *
+ * ⚠️ Tailwind v4 함정(검증됨): spacing 토큰과 **이름이 겹치는** container 키
+ * (xs·sm·md·lg·xl·2xl·3xl)는 `--container-*`를 정의해도 `max-w-md` 등이 여전히
+ * `--spacing-md`(아주 작은 값)로 해석돼 폭이 붕괴한다. 즉 max-w 유틸로 안전하게
+ * 쓸 수 있는 건 **spacing과 겹치지 않는 이름뿐**이다: `content`(읽기 폭 42rem),
+ * `mobile`(폰 앱 폭 448rem) 등. 겹치는 스텝은 아래에 값으로만 남겨두되 max-w엔 쓰지 않는다.
  */
 export const container = {
-  content: '42rem',
+  '3xs': '16rem',
+  '2xs': '18rem',
+  xs: '20rem',
+  sm: '24rem',
+  md: '28rem',
+  lg: '32rem',
+  xl: '36rem',
+  '2xl': '42rem',
+  '3xl': '48rem',
+  '4xl': '56rem',
+  '5xl': '64rem',
+  '6xl': '72rem',
+  '7xl': '80rem',
+  mobile: '28rem', // 폰 앱(gymlog 등) 콘텐츠 폭 — spacing과 안 겹쳐 max-w-mobile로 안전.
+  content: '42rem', // 읽기 앱(fe-deep·hub) 본문 폭.
 } as const;
 
 export type SpacingToken = keyof typeof spacing;

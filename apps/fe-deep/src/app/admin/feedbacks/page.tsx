@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getFeedbacks, updateFeedbackStatus } from '@features/feedback';
-import { Badge, Button, Card, CardContent, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@shared/ui';
+import { Badge, Button, Card, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@shared/ui';
 import { MessageSquare, CheckCircle, Eye, Clock, Trash2 } from 'lucide-react';
 
 interface Feedback {
@@ -78,7 +78,7 @@ export default function FeedbacksPage() {
             const StatusIcon = statusConf.icon;
             return (
               <Card key={fb.id} className="shadow-sm">
-                <CardContent className="p-4 space-y-2">
+                <Card.Content className="p-4 space-y-2">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2 flex-wrap">
                       <Badge variant={fb.type === 'add_question' ? 'default' : 'secondary'} className="text-xs">
@@ -120,7 +120,7 @@ export default function FeedbacksPage() {
                             대기로
                           </Button>
                         )}
-                        <Button variant="ghost" size="xs" className="text-destructive ml-auto" onClick={() => handleStatusChange(fb.id, 'deleted')}>
+                        <Button variant="ghost" size="xs" className="text-error ml-auto" onClick={() => handleStatusChange(fb.id, 'deleted')}>
                           <Trash2 className="size-3" />
                           삭제
                         </Button>
@@ -132,7 +132,7 @@ export default function FeedbacksPage() {
                       </Button>
                     )}
                   </div>
-                </CardContent>
+                </Card.Content>
               </Card>
             );
           })}

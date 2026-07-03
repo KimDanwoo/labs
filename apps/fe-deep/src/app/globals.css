@@ -1,12 +1,15 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+/* 공유 디자인 토큰(코어 primitives·brand·status·surface 계약). 프딥 스킨은 다음 줄에서 덮어씀. */
+@import "@tokens/css/theme.css";
 @import "./styles/design-system.css";
 @import "./styles/reset.css";
 @import "./styles/syntax-highlight.css";
 @import "./styles/markdown.css";
 
-@custom-variant dark (&:is(.dark *));
+/* @ui/react 공용 컴포넌트의 Tailwind 클래스를 스캔 대상에 포함 (없으면 Button 간격 등 유틸이 생성 안 됨) */
+@source '../../../../packages/ui/src/**/*.{ts,tsx}';
 
 @layer base {
   * {

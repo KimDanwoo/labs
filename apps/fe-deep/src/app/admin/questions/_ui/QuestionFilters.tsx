@@ -28,7 +28,7 @@ export function QuestionFilters({
 				placeholder="질문 검색..."
 				value={search}
 				onChange={(e) => onSearchChange(e.target.value)}
-				className="max-w-xs"
+				className="max-w-[20rem]"
 			/>
 			<Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
 				<SelectTrigger className="w-44">

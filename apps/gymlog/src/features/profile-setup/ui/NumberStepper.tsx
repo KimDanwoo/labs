@@ -24,20 +24,20 @@ export function NumberStepper({ value, min, max, step = 1, suffix = '', onChange
         onClick={decrement}
         disabled={atMin}
         aria-label="감소"
-        className={`${BTN} ${atMin ? 'text-muted opacity-40' : 'text-foreground hover:bg-primary-subtle'}`}
+        className={`${BTN} ${atMin ? 'text-muted-foreground opacity-40' : 'text-foreground hover:bg-primary-subtle'}`}
       >
         −
       </button>
       <span className="font-display text-2xl font-bold text-foreground">
         {value}
-        {suffix && <span className="ml-xs text-base font-medium text-muted">{suffix}</span>}
+        {suffix && <span className="ml-xs text-base font-medium text-muted-foreground">{suffix}</span>}
       </span>
       <button
         type="button"
         onClick={increment}
         disabled={atMax}
         aria-label="증가"
-        className={`${BTN} ${atMax ? 'text-muted opacity-40' : 'text-foreground hover:bg-primary-subtle'}`}
+        className={`${BTN} ${atMax ? 'text-muted-foreground opacity-40' : 'text-foreground hover:bg-primary-subtle'}`}
       >
         +
       </button>

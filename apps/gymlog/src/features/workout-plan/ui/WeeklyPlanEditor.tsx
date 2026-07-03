@@ -62,7 +62,7 @@ export function WeeklyPlanEditor({ weekPlan, routines, onChange }: WeeklyPlanEdi
           const isActive = plan.type === 'focus' || plan.type === 'routine';
           const tone = isSelected
             ? 'border-primary bg-primary text-primary-foreground'
-            : `border-card-border ${isActive ? 'bg-primary-subtle text-primary' : 'bg-glass text-muted'}`;
+            : `border-card-border ${isActive ? 'bg-primary-subtle text-primary' : 'bg-glass text-muted-foreground'}`;
           return (
             <button
               key={weekday}
@@ -79,7 +79,7 @@ export function WeeklyPlanEditor({ weekPlan, routines, onChange }: WeeklyPlanEdi
       <div className="flex flex-col gap-md rounded-lg border border-card-border bg-glass p-lg backdrop-blur-md">
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold text-foreground">{WEEKDAY_LABELS[selectedDay]}요일</span>
-          <span className="text-sm text-muted">{daySummary(selectedPlan, routines)}</span>
+          <span className="text-sm text-muted-foreground">{daySummary(selectedPlan, routines)}</span>
         </div>
 
         <div className="flex gap-sm">
@@ -104,7 +104,7 @@ export function WeeklyPlanEditor({ weekPlan, routines, onChange }: WeeklyPlanEdi
 
         {selectedPlan.type === 'focus' && (
           <div className="flex flex-col gap-sm">
-            <span className="text-sm text-muted">운동할 부위 (여러 개 선택)</span>
+            <span className="text-sm text-muted-foreground">운동할 부위 (여러 개 선택)</span>
             <div className="flex flex-wrap gap-sm">
               {MUSCLE_OPTIONS.map((muscle) => {
                 const isOn = selectedPlan.muscles.includes(muscle);
@@ -129,9 +129,9 @@ export function WeeklyPlanEditor({ weekPlan, routines, onChange }: WeeklyPlanEdi
 
         {selectedPlan.type === 'routine' && (
           <div className="flex flex-col gap-sm">
-            <span className="text-sm text-muted">이 요일에 할 루틴</span>
+            <span className="text-sm text-muted-foreground">이 요일에 할 루틴</span>
             {routines.length === 0 ? (
-              <span className="rounded-lg border border-card-border bg-glass p-md text-sm text-muted">
+              <span className="rounded-lg border border-card-border bg-glass p-md text-sm text-muted-foreground">
                 저장된 루틴이 없어요. 먼저 루틴을 만들어 주세요.
               </span>
             ) : (

@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 export default function NotFound() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="text-center space-y-6 max-w-md animate-fade-in-up">
+      <div className="text-center space-y-6 max-w-[28rem] animate-fade-in-up">
         <div className="space-y-2">
           <h1 className="text-8xl font-bold tracking-tighter bg-gradient-to-b from-foreground to-muted-foreground/50 bg-clip-text text-transparent">
             404

@@ -1,4 +1,4 @@
-import * as Card from '@ui/react/card';
+import { Card } from '@ui/react';
 
 import type { Project } from '@entities/project/model/types';
 
@@ -12,7 +12,7 @@ const FALLBACK_BG = [
 ] as const;
 
 /** 폴백 커버의 이니셜 색상 */
-const FALLBACK_FG = ['text-primary', 'text-success', 'text-info', 'text-warning', 'text-secondary'] as const;
+const FALLBACK_FG = ['text-primary', 'text-success', 'text-info', 'text-warning', 'text-muted-foreground'] as const;
 
 /** 커버 이미지 정렬 */
 const IMAGE_POSITION = {
@@ -57,7 +57,7 @@ export function ProjectCard({ project, index, staggerBaseMs }: ProjectCardProps)
       className="group block fade-up"
       style={{ animationDelay: `${420 + index * staggerBaseMs}ms` }}
     >
-      <Card.Root className="h-full overflow-hidden rounded-xl border-card-border bg-card transition-[transform,border-color] duration-250 ease-out will-change-transform group-hover:-translate-y-1.5 group-hover:border-primary/50">
+      <Card className="h-full overflow-hidden rounded-xl border-card-border bg-card transition-[transform,border-color] duration-250 ease-out will-change-transform group-hover:-translate-y-1.5 group-hover:border-primary/50">
         {/* ── 커버 영역 ─────────────────────────────────── */}
         <div className="relative -mx-lg -mt-lg flex h-40 items-center justify-center overflow-hidden sm:h-44">
           {project.image ? (
@@ -86,13 +86,13 @@ export function ProjectCard({ project, index, staggerBaseMs }: ProjectCardProps)
             </Card.Title>
           </div>
           {/* 링크 아이콘 */}
-          <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-card-border bg-card text-muted transition-all duration-200 group-hover:border-primary group-hover:text-primary">
+          <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-card-border bg-card text-muted-foreground transition-all duration-200 group-hover:border-primary group-hover:text-primary">
             <ArrowUpRightIcon />
           </span>
         </Card.Header>
 
         <Card.Description className="text-xs leading-relaxed sm:text-sm">{project.description}</Card.Description>
-      </Card.Root>
+      </Card>
     </a>
   );
 }
