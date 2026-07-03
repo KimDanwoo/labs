@@ -19,10 +19,10 @@ export const colors = {
   accent: { light: t.brand[50], dark: 'oklch(0.30 0.05 var(--brand-hue))' },
   'accent-foreground': { light: t.brand[700], dark: t.brand[200] },
 
-  // Secondary — 중립 gray
-  secondary: { light: t.gray[600], dark: t.gray[400] },
-  'secondary-foreground': { light: c.white, dark: t.gray[900] },
-  'secondary-subtle': { light: t.gray[100], dark: t.gray[800] },
+  // Secondary — 중립 gray. shadcn 규칙: secondary=연한 표면, foreground=그 위 텍스트.
+  secondary: { light: t.gray[100], dark: t.gray[800] },
+  'secondary-foreground': { light: t.gray[700], dark: t.gray[200] },
+  'secondary-subtle': { light: t.gray[50], dark: t.gray[900] },
 
   // Success — green
   success: { light: t.green[600], dark: t.green[400] },
@@ -45,12 +45,16 @@ export const colors = {
   'info-subtle': { light: t.sky[100], dark: 'oklch(0.30 0.05 228)' },
 
   // 중성색 / 표면 (gray 기반, brand와 같은 쿨톤 가족)
+  // muted 계열은 shadcn 규칙: muted=흐린 표면, muted-foreground=그 위 흐린 텍스트.
   background: { light: c.white, dark: t.gray[900] },
   foreground: { light: t.gray[900], dark: t.gray[100] },
-  muted: { light: t.gray[500], dark: t.gray[400] },
+  muted: { light: t.gray[100], dark: t.gray[800] },
+  'muted-foreground': { light: t.gray[600], dark: t.gray[400] },
   card: { light: c.white, dark: t.gray[800] },
   'card-foreground': { light: t.gray[900], dark: t.gray[100] },
   'card-border': { light: t.gray[200], dark: t.gray[700] },
+  popover: { light: c.white, dark: t.gray[800] },
+  'popover-foreground': { light: t.gray[900], dark: t.gray[100] },
 
   // 폼/라인
   border: { light: t.gray[200], dark: t.gray[700] },
