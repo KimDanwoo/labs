@@ -5,6 +5,7 @@ import {
   STEM_KR,
 } from '@views/destiny-result/constants';
 
+import { BRANCH_HOUR_RANGE } from '@entities/destiny/data/branches';
 import { HIDDEN_STEMS_TABLE } from '@entities/destiny/data/hiddenStems';
 import type {
   TwelveStageAnalysis,
@@ -116,7 +117,8 @@ export function SajuChart({
         <div className="text-xs text-[#999] mt-1.5 leading-relaxed">
           <p>
             양 {form.year}.{String(form.month).padStart(2, '0')}.
-            {String(form.day).padStart(2, '0')} {hourBranchKr}시{' '}
+            {String(form.day).padStart(2, '0')} {hourBranchKr}시(
+            {BRANCH_HOUR_RANGE[fourPillars.hour.branch]}){' '}
             {form.gender === 'male' ? '남' : '여'}
             {form.region ? ` · ${form.region}` : ''}
           </p>

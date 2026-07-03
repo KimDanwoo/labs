@@ -1,6 +1,6 @@
 import { HIDDEN_STEMS_TABLE } from '../data/hiddenStems';
 import { STEM_DATA } from '../data/stems';
-import type { FourPillars, TenGod } from '../model/types';
+import type { FourPillars, HeavenlyStem, TenGod } from '../model/types';
 
 import { getTenGod } from './tenGods';
 
@@ -49,27 +49,40 @@ const FORMAT_DESCS: Record<string, string> = {
 function analyzeFormat(fourPillars: FourPillars): FormatAnalysis {
   const dayStem = fourPillars.day.stem;
   const monthBranch = fourPillars.month.branch;
-  const mainStem = HIDDEN_STEMS_TABLE[monthBranch].main.stem;
+  const hidden = HIDDEN_STEMS_TABLE[monthBranch];
+  const mainStem = hidden.main.stem;
 
-  // 일간 음양 확인: 비견(양)이면 건록격, 겁재(음)이면 양인격 구분은 getTenGod이 처리
-  const tenGod = getTenGod(dayStem, mainStem);
-
-  // 월지 본기가 일간과 같은 오행인지 확인해서 건록/양인 구분
   const dayElement = STEM_DATA[dayStem].element;
   const mainElement = STEM_DATA[mainStem].element;
-  let resolvedTenGod = tenGod;
 
-  // 비견이 나오면 실제 음양 비교로 건록/양인 재확인
+  // 건록·양인격: 월지 본기가 일간과 같은 오행(비겁)이면 투출과 무관하게 성립
   if (dayElement === mainElement) {
     const dayYinYang = STEM_DATA[dayStem].yinYang;
     const mainYinYang = STEM_DATA[mainStem].yinYang;
-    resolvedTenGod = dayYinYang === mainYinYang ? '비견' : '겁재';
+    const resolvedTenGod = dayYinYang === mainYinYang ? '비견' : '겁재';
+    const name = FORMAT_NAMES[resolvedTenGod];
+    return { name, tenGod: resolvedTenGod, desc: FORMAT_DESCS[name] };
   }
 
-  const name = FORMAT_NAMES[resolvedTenGod];
-  const desc = FORMAT_DESCS[name];
+  // 투출(透出) 원칙: 월지 지장간(정기→중기→초기) 중 천간(년·월·시)에 드러난 간을
+  // 격국으로 우선하고, 투출된 간이 없으면 본기(정기)를 쓴다. 일간은 격의 주체라 제외.
+  const revealedStems = new Set<HeavenlyStem>([
+    fourPillars.year.stem,
+    fourPillars.month.stem,
+    fourPillars.hour.stem,
+  ]);
+  const candidateStems: HeavenlyStem[] = [
+    hidden.main,
+    hidden.middle,
+    hidden.initial,
+  ].flatMap((h) => (h ? [h.stem] : []));
+  const resolvedStem =
+    candidateStems.find((stem) => revealedStems.has(stem)) ?? mainStem;
 
-  return { name, tenGod: resolvedTenGod, desc };
+  const tenGod = getTenGod(dayStem, resolvedStem);
+  const name = FORMAT_NAMES[tenGod];
+
+  return { name, tenGod, desc: FORMAT_DESCS[name] };
 }
 
 export { analyzeFormat };

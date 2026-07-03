@@ -56,7 +56,7 @@ const getMonthPillar = (
   hour: number,
   minute: number,
 ): Pillar => {
-  const { branch: monthBranch, termYear } = getMonthBranchForDate(
+  const { branch: monthBranch } = getMonthBranchForDate(
     year,
     month,
     day,
@@ -64,11 +64,8 @@ const getMonthPillar = (
     minute,
   );
 
-  // 입춘 이전이면 termYear가 전년도 → 전년도 년간 기준으로 월간 계산
-  const effectiveYearStem: HeavenlyStem =
-    termYear === year ? yearStem : yearStem; // 호출자가 이미 입춘 보정된 yearStem을 넘겨주므로 그대로 사용
-
-  const stemGroup = getStemGroup(effectiveYearStem);
+  // 호출자(getYearPillar)가 이미 입춘 경계로 보정한 yearStem을 넘겨주므로 그대로 사용
+  const stemGroup = getStemGroup(yearStem);
   const inMonthBaseStem = YEAR_STEM_TO_MONTH_BASE[stemGroup];
   const inMonthBaseIndex = HEAVENLY_STEMS.indexOf(inMonthBaseStem);
 
