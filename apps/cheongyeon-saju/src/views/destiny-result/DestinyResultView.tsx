@@ -129,6 +129,7 @@ export function DestinyResultView() {
         tenGods={tenGods}
         topGod={topGod}
         combinations={result.combinations}
+        gender={form.gender}
       />
 
       <Divider label="운세 · 흐름" />

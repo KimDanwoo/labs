@@ -145,6 +145,48 @@ const getSolarLongitude = (jdn: number): number => {
 };
 
 /**
+ * 평균 황도경사각 ε₀ (Meeus eq. 22.2, 도)
+ */
+const getMeanObliquity = (T: number): number => {
+  const seconds = 21.448 - 46.815 * T - 0.00059 * T * T + 0.001813 * T * T * T;
+  return 23 + 26 / 60 + seconds / 3600;
+};
+
+/**
+ * 균시차(均時差, Equation of Time) 계산 — Meeus eq. 28.1
+ *
+ * 진태양시 = 평균태양시 + 균시차. 날짜에 따라 약 −14~+16분 변동한다.
+ * 검증값: JDE 2448908.5(1992-10-13) → +13분 42.7초.
+ *
+ * @param jdn Julian Day Number
+ * @returns 균시차 (분 단위, 양수면 진태양시가 평균태양시보다 빠름)
+ */
+const getEquationOfTimeMinutes = (jdn: number): number => {
+  const T = jdnToJulianCentury(jdn);
+
+  // 태양 평균 경도 (Meeus eq. 25.2)
+  const L0 = norm360(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
+  // 태양 겉보기황경 (장동·광행차 포함)
+  const lambda = getSolarLongitude(jdn);
+  const epsRad = toRad(getMeanObliquity(T));
+  const lamRad = toRad(lambda);
+
+  // 겉보기 적경 α (Meeus eq. 25.6)
+  const alpha = norm360(
+    toDeg(Math.atan2(Math.cos(epsRad) * Math.sin(lamRad), Math.cos(lamRad))),
+  );
+
+  // Meeus eq. 28.1: E = L0 − 0.0057183° − α + Δψ·cos ε (도)
+  let e = L0 - 0.0057183 - alpha + computeDeltaPsi(T) * Math.cos(epsRad);
+  // 작은 각으로 정규화: [−180°, 180°)
+  e = ((e % 360) + 360) % 360;
+  if (e > 180) e -= 360;
+
+  // 1° = 4분
+  return e * 4;
+};
+
+/**
  * 황경 차이 계산 (360° 랩어라운드 처리)
  * 반환값: -180 ~ +180 범위
  */
@@ -226,17 +268,25 @@ const jdnToKstDateTime = (
 
   const kstTotal = utHour + 9;
   const kstDayOffset = kstTotal >= 24 ? 1 : 0;
-  const kstHour = Math.floor(kstTotal % 24);
-  const kstMinute = Math.round(((kstTotal % 24) - kstHour) * 60);
 
-  const greg = jdnToGregorian(intJdn + dayOffset + kstDayOffset);
+  // 분 단위로 반올림하되 60분/24시 올림을 안전하게 처리 (정각 근처 엣지케이스)
+  let kstMinuteOfDay = Math.round((kstTotal % 24) * 60);
+  let rolloverDay = 0;
+  if (kstMinuteOfDay >= 1440) {
+    kstMinuteOfDay -= 1440;
+    rolloverDay = 1;
+  }
+  const kstHour = Math.floor(kstMinuteOfDay / 60);
+  const kstMinute = kstMinuteOfDay % 60;
+
+  const greg = jdnToGregorian(intJdn + dayOffset + kstDayOffset + rolloverDay);
 
   return {
     year: greg.year,
     month: greg.month,
     day: greg.day,
     hour: kstHour,
-    minute: kstMinute === 60 ? 0 : kstMinute,
+    minute: kstMinute,
   };
 };
 
@@ -267,6 +317,7 @@ const getSolarTermsForYear = (year: number): SolarTermEntry[] => {
 export {
   jdnToJulianCentury,
   getSolarLongitude,
+  getEquationOfTimeMinutes,
   findSolarTermJdn,
   getSolarTermsForYear,
   jdnToKstDateTime,

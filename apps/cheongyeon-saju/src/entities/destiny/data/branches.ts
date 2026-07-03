@@ -49,5 +49,21 @@ const EARTHLY_BRANCHES: readonly EarthlyBranch[] = [
   '亥',
 ] as const;
 
-export { BRANCH_DATA, EARTHLY_BRANCHES };
+// 지지별 시진 시각 범위 (한국 표준시 30분 보정 기준, 입력 SHICHEN_OPTIONS와 동일)
+const BRANCH_HOUR_RANGE: Record<EarthlyBranch, string> = {
+  子: '23:30~01:30',
+  丑: '01:30~03:30',
+  寅: '03:30~05:30',
+  卯: '05:30~07:30',
+  辰: '07:30~09:30',
+  巳: '09:30~11:30',
+  午: '11:30~13:30',
+  未: '13:30~15:30',
+  申: '15:30~17:30',
+  酉: '17:30~19:30',
+  戌: '19:30~21:30',
+  亥: '21:30~23:30',
+} as const;
+
+export { BRANCH_DATA, EARTHLY_BRANCHES, BRANCH_HOUR_RANGE };
 export type { EarthlyBranch, BranchInfo };
