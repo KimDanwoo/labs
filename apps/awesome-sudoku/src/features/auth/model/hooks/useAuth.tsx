@@ -1,12 +1,7 @@
-import {
-  isAuthenticatedAtom,
-  isLoadingAtom,
-  logoutAtom,
-  userAtom,
-} from "@features/auth/model/atoms";
-import { signInWithGoogle, signOut } from "@features/auth/model/services/authService";
-import { useAtomValue, useSetAtom } from "jotai";
-import { useCallback } from "react";
+import { isAuthenticatedAtom, isLoadingAtom, logoutAtom, userAtom } from '@features/auth/model/atoms';
+import { signInWithGoogle, signOut } from '@features/auth/model/services/authService';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useCallback } from 'react';
 
 export function useAuth() {
   const user = useAtomValue(userAtom);
@@ -41,4 +36,4 @@ export function useAuth() {
 }
 
 // src/features/auth/model/hooks/index.ts
-export * from "./useAuth";
+export * from './useAuth';

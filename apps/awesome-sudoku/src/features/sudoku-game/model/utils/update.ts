@@ -1,13 +1,13 @@
-import { BLOCK_SIZE, BOARD_SIZE } from "@entities/board/model/constants";
-import { CellHighlight, Position, SudokuBoard, SudokuCell } from "@entities/board/model/types";
-import { GAME_MODE } from "@entities/game/model/constants";
-import { GameCompletionResult, GameMode, KillerCage } from "@entities/game/model/types";
+import { BLOCK_SIZE, BOARD_SIZE } from '@entities/board/model/constants';
+import { CellHighlight, Position, SudokuBoard, SudokuCell } from '@entities/board/model/types';
+import { GAME_MODE } from '@entities/game/model/constants';
+import { GameCompletionResult, GameMode, KillerCage } from '@entities/game/model/types';
 import {
   checkConflicts,
   isBoardComplete,
   isKillerBoardComplete,
   validateKillerCages,
-} from "@features/sudoku-game/model/utils/validator";
+} from '@features/sudoku-game/model/utils/validator';
 
 /**
  * @description 단일 셀만 업데이트
@@ -156,11 +156,8 @@ export function calculateHighlights(
       const isSelected = key === selectedKey;
       const isRelated =
         !isSelected &&
-        (r === row ||
-          c === col ||
-          (currentBlockRow === blockRow && Math.floor(c / BLOCK_SIZE) === blockCol));
-      const hasSameValue =
-        !isSelected && selectedValue !== null && board[r][c].value === selectedValue;
+        (r === row || c === col || (currentBlockRow === blockRow && Math.floor(c / BLOCK_SIZE) === blockCol));
+      const hasSameValue = !isSelected && selectedValue !== null && board[r][c].value === selectedValue;
 
       if (
         prevHighlight &&

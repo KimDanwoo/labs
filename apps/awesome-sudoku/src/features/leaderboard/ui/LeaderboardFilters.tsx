@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { GAME_LEVEL, GAME_LEVEL_LABELS, GAME_MODE } from "@entities/game/model/constants";
-import { cn } from "@shared/model/utils";
-import { memo } from "react";
+import { GAME_LEVEL, GAME_LEVEL_LABELS, GAME_MODE } from '@entities/game/model/constants';
+import { cn } from '@shared/model/utils';
+import { memo } from 'react';
 
 interface LeaderboardFiltersProps {
   difficulty: string;
@@ -12,7 +12,7 @@ interface LeaderboardFiltersProps {
 }
 
 const difficulties = [
-  { value: "", label: "전체" },
+  { value: '', label: '전체' },
   { value: GAME_LEVEL.EASY, label: GAME_LEVEL_LABELS[GAME_LEVEL.EASY] },
   { value: GAME_LEVEL.MEDIUM, label: GAME_LEVEL_LABELS[GAME_LEVEL.MEDIUM] },
   { value: GAME_LEVEL.HARD, label: GAME_LEVEL_LABELS[GAME_LEVEL.HARD] },
@@ -20,9 +20,9 @@ const difficulties = [
 ];
 
 const gameModes = [
-  { value: "", label: "전체" },
-  { value: GAME_MODE.CLASSIC, label: "클래식" },
-  { value: GAME_MODE.KILLER, label: "킬러" },
+  { value: '', label: '전체' },
+  { value: GAME_MODE.CLASSIC, label: '클래식' },
+  { value: GAME_MODE.KILLER, label: '킬러' },
 ];
 
 export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
@@ -38,12 +38,12 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
               type="button"
               onClick={() => onDifficultyChange(d.value)}
               className={cn(
-                "px-3 py-1.5 text-sm rounded-lg transition-all",
+                'px-3 py-1.5 text-sm rounded-lg transition-all',
                 difficulty === d.value
-                  ? "bg-[rgb(var(--color-accent))] text-white shadow-sm"
-                  : "bg-[rgb(var(--color-bg-tertiary))]"
-                    + " text-[rgb(var(--color-text-secondary))]"
-                    + " hover:bg-[rgb(var(--color-hover))]",
+                  ? 'bg-[rgb(var(--color-accent))] text-white shadow-sm'
+                  : 'bg-[rgb(var(--color-bg-tertiary))]' +
+                      ' text-[rgb(var(--color-text-secondary))]' +
+                      ' hover:bg-[rgb(var(--color-hover))]',
               )}
             >
               {d.label}
@@ -62,12 +62,12 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
               type="button"
               onClick={() => onGameModeChange(m.value)}
               className={cn(
-                "px-3 py-1.5 text-sm rounded-lg transition-all",
+                'px-3 py-1.5 text-sm rounded-lg transition-all',
                 gameMode === m.value
-                  ? "bg-[rgb(var(--color-accent))] text-white shadow-sm"
-                  : "bg-[rgb(var(--color-bg-tertiary))]"
-                    + " text-[rgb(var(--color-text-secondary))]"
-                    + " hover:bg-[rgb(var(--color-hover))]",
+                  ? 'bg-[rgb(var(--color-accent))] text-white shadow-sm'
+                  : 'bg-[rgb(var(--color-bg-tertiary))]' +
+                      ' text-[rgb(var(--color-text-secondary))]' +
+                      ' hover:bg-[rgb(var(--color-hover))]',
               )}
             >
               {m.label}
@@ -79,4 +79,4 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
   ),
 );
 
-LeaderboardFilters.displayName = "LeaderboardFilters";
+LeaderboardFilters.displayName = 'LeaderboardFilters';

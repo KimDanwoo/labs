@@ -1,4 +1,4 @@
-import { Difficulty, GameMode } from "@entities/game/model/types";
+import { Difficulty, GameMode } from '@entities/game/model/types';
 
 export interface GameStats {
   totalGames: number;

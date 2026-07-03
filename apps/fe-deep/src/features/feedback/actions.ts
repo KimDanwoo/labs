@@ -2,7 +2,7 @@
 
 import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { createAdminSupabaseClient } from '@shared/config/supabase/admin';
-import type { FeedbackType, CreateFeedbackInput } from './types';
+import type { CreateFeedbackInput } from './types';
 
 export type { FeedbackType } from './types';
 

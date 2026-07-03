@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { ALL_CHARACTER_IDS } from '@shared/constants';
-import { ADMIN_ROUTE } from '@app/admin/_lib/api';
-import { useQuizQuestions } from '@app/admin/_lib/hooks';
-import type { QuizRow } from '@app/admin/_lib/types';
-import QuizEditor from '../QuizEditor';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
+import { useQuizQuestions } from '@features/admin/model/hooks';
+import type { QuizRow } from '@features/admin/model/types';
+import { QuizEditor } from '@features/admin/ui';
 
 function emptyQuiz(): QuizRow {
   return {

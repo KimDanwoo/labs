@@ -1,6 +1,6 @@
-import { User } from "@entities/auth/model/types";
-import { getAuthInstance } from "@shared/lib/firebase/config";
-import type { User as FirebaseUser } from "firebase/auth";
+import { User } from '@entities/auth/model/types';
+import { getAuthInstance } from '@shared/lib/firebase/config';
+import type { User as FirebaseUser } from 'firebase/auth';
 
 /**
  * @description Firebase User를 앱의 User 타입으로 변환
@@ -26,12 +26,12 @@ export function mapFirebaseUserToUser(firebaseUser: FirebaseUser | null): User |
 export async function signInWithGoogle(): Promise<User | null> {
   try {
     const auth = await getAuthInstance();
-    const { GoogleAuthProvider, signInWithPopup } = await import("firebase/auth");
+    const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
     const provider = new GoogleAuthProvider();
 
     // 추가 스코프 설정 (선택사항)
-    provider.addScope("profile");
-    provider.addScope("email");
+    provider.addScope('profile');
+    provider.addScope('email');
 
     const result = await signInWithPopup(auth, provider);
     return mapFirebaseUserToUser(result.user);
@@ -47,7 +47,7 @@ export async function signInWithGoogle(): Promise<User | null> {
 export async function signOut(): Promise<void> {
   try {
     const auth = await getAuthInstance();
-    const { signOut: firebaseSignOut } = await import("firebase/auth");
+    const { signOut: firebaseSignOut } = await import('firebase/auth');
     await firebaseSignOut(auth);
   } catch (error) {
     throw new Error(error as string);
@@ -59,11 +59,9 @@ export async function signOut(): Promise<void> {
  * @param callback
  * @returns
  */
-export async function subscribeToAuthChanges(
-  callback: (user: User | null) => void,
-): Promise<() => void> {
+export async function subscribeToAuthChanges(callback: (user: User | null) => void): Promise<() => void> {
   const auth = await getAuthInstance();
-  const { onAuthStateChanged } = await import("firebase/auth");
+  const { onAuthStateChanged } = await import('firebase/auth');
   return onAuthStateChanged(auth, (firebaseUser) => {
     const user = mapFirebaseUserToUser(firebaseUser);
     callback(user);

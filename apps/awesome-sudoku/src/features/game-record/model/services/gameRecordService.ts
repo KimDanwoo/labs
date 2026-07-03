@@ -2,10 +2,10 @@ import {
   CUMULATIVE_RECORD_LIMIT,
   DEFAULT_USER_RECORD_LIMIT,
   LEADERBOARD_RECORD_LIMIT,
-} from "@entities/game-record/model/constants";
-import { GameRecord } from "@entities/game-record/model/types";
-import { getRecordPoint } from "@entities/game-record/model/utils";
-import { getDb } from "@shared/lib/firebase/config";
+} from '@entities/game-record/model/constants';
+import { GameRecord } from '@entities/game-record/model/types';
+import { getRecordPoint } from '@entities/game-record/model/utils';
+import { getDb } from '@shared/lib/firebase/config';
 import {
   type Firestore,
   addDoc,
@@ -16,30 +16,22 @@ import {
   query,
   Timestamp,
   where,
-} from "firebase/firestore";
+} from 'firebase/firestore';
 
-const COLLECTION_NAME = "gameRecords";
+const COLLECTION_NAME = 'gameRecords';
 
-export async function saveGameRecord(
-  record: Omit<GameRecord, "id" | "createdAt">,
-): Promise<string> {
+export async function saveGameRecord(record: Omit<GameRecord, 'id' | 'createdAt'>): Promise<string> {
   const db = await getDb();
-  const docRef = await addDoc(
-    collection(db, COLLECTION_NAME),
-    { ...record, createdAt: Timestamp.now() },
-  );
+  const docRef = await addDoc(collection(db, COLLECTION_NAME), { ...record, createdAt: Timestamp.now() });
   return docRef.id;
 }
 
-export async function getUserRecords(
-  userId: string,
-  recordLimit = DEFAULT_USER_RECORD_LIMIT,
-): Promise<GameRecord[]> {
+export async function getUserRecords(userId: string, recordLimit = DEFAULT_USER_RECORD_LIMIT): Promise<GameRecord[]> {
   const db = await getDb();
   const q = query(
     collection(db, COLLECTION_NAME),
-    where("userId", "==", userId),
-    orderBy("createdAt", "desc"),
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc'),
     limit(recordLimit),
   );
 
@@ -56,9 +48,7 @@ export interface LeaderboardQuery {
   recordLimit?: number;
 }
 
-function deduplicateByUser(
-  records: GameRecord[],
-): GameRecord[] {
+function deduplicateByUser(records: GameRecord[]): GameRecord[] {
   const best = new Map<string, GameRecord>();
 
   for (const record of records) {
@@ -67,12 +57,8 @@ function deduplicateByUser(
       best.set(record.userId, record);
       continue;
     }
-    const diff =
-      getRecordPoint(record) - getRecordPoint(existing);
-    if (
-      diff > 0 ||
-      (diff === 0 && record.completionTime < existing.completionTime)
-    ) {
+    const diff = getRecordPoint(record) - getRecordPoint(existing);
+    if (diff > 0 || (diff === 0 && record.completionTime < existing.completionTime)) {
       best.set(record.userId, record);
     }
   }
@@ -90,19 +76,15 @@ function buildLeaderboardQuery(
   gameMode?: string,
   recordLimit = LEADERBOARD_RECORD_LIMIT,
 ) {
-  const constraints = [
-    where("isSuccess", "==", true),
-    orderBy("score", "desc"),
-    limit(recordLimit),
-  ];
+  const constraints = [where('isSuccess', '==', true), orderBy('score', 'desc'), limit(recordLimit)];
 
   if (difficulty && gameMode) {
     return query(
       collection(db, COLLECTION_NAME),
-      where("isSuccess", "==", true),
-      where("difficulty", "==", difficulty),
-      where("gameMode", "==", gameMode),
-      orderBy("score", "desc"),
+      where('isSuccess', '==', true),
+      where('difficulty', '==', difficulty),
+      where('gameMode', '==', gameMode),
+      orderBy('score', 'desc'),
       limit(recordLimit),
     );
   }
@@ -110,9 +92,9 @@ function buildLeaderboardQuery(
   if (difficulty) {
     return query(
       collection(db, COLLECTION_NAME),
-      where("isSuccess", "==", true),
-      where("difficulty", "==", difficulty),
-      orderBy("score", "desc"),
+      where('isSuccess', '==', true),
+      where('difficulty', '==', difficulty),
+      orderBy('score', 'desc'),
       limit(recordLimit),
     );
   }
@@ -120,30 +102,21 @@ function buildLeaderboardQuery(
   if (gameMode) {
     return query(
       collection(db, COLLECTION_NAME),
-      where("isSuccess", "==", true),
-      where("gameMode", "==", gameMode),
-      orderBy("score", "desc"),
+      where('isSuccess', '==', true),
+      where('gameMode', '==', gameMode),
+      orderBy('score', 'desc'),
       limit(recordLimit),
     );
   }
 
-  return query(
-    collection(db, COLLECTION_NAME),
-    ...constraints,
-  );
+  return query(collection(db, COLLECTION_NAME), ...constraints);
 }
 
-export async function getLeaderboard(
-  options: LeaderboardQuery = {},
-): Promise<GameRecord[]> {
-  const {
-    difficulty, gameMode, recordLimit = 100,
-  } = options;
+export async function getLeaderboard(options: LeaderboardQuery = {}): Promise<GameRecord[]> {
+  const { difficulty, gameMode, recordLimit = 100 } = options;
 
   const db = await getDb();
-  const q = buildLeaderboardQuery(
-    db, difficulty, gameMode, recordLimit,
-  );
+  const q = buildLeaderboardQuery(db, difficulty, gameMode, recordLimit);
 
   const snapshot = await getDocs(q);
   const allRecords = snapshot.docs.map((doc) => ({
@@ -168,15 +141,13 @@ export async function getCumulativeLeaderboard(
   const db = await getDb();
   const q = query(
     collection(db, COLLECTION_NAME),
-    where("isSuccess", "==", true),
-    orderBy("createdAt", "desc"),
+    where('isSuccess', '==', true),
+    orderBy('createdAt', 'desc'),
     limit(CUMULATIVE_RECORD_LIMIT),
   );
 
   const snapshot = await getDocs(q);
-  const records = snapshot.docs.map(
-    (doc) => doc.data() as GameRecord,
-  );
+  const records = snapshot.docs.map((doc) => doc.data() as GameRecord);
 
   const userMap = new Map<string, CumulativePointsEntry>();
 

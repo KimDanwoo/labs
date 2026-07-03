@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-/** 포트폴리오 허브 전용 디스플레이 폰트 — Geist, Space Grotesk와 뚜렷하게 다른 결 */
+/** 프로젝트 허브 전용 디스플레이 폰트 — Geist, Space Grotesk와 뚜렷하게 다른 결 */
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: '--font-display',
   subsets: ['latin'],

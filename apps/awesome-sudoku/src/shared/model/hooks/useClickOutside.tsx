@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export function useClickOutside(ref: React.RefObject<HTMLElement>) {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,10 +10,10 @@ export function useClickOutside(ref: React.RefObject<HTMLElement>) {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [ref, isOpen]);
 

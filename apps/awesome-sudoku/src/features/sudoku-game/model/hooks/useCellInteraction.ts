@@ -1,6 +1,6 @@
-import { handleKeyInputAtom } from "@features/sudoku-game/model/atoms";
-import { gameStore } from "@shared/model/store";
-import { KeyboardEvent, useCallback } from "react";
+import { handleKeyInputAtom } from '@features/sudoku-game/model/atoms';
+import { gameStore } from '@shared/model/store';
+import { KeyboardEvent, useCallback } from 'react';
 
 interface UseCellInteractionProps {
   row: number;
@@ -22,7 +22,7 @@ export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellI
 
       const keyPressed = event.key;
 
-      if (keyPressed === "Enter" || keyPressed === " ") {
+      if (keyPressed === 'Enter' || keyPressed === ' ') {
         event.preventDefault();
         onSelect(row, col);
       }
@@ -36,7 +36,7 @@ export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellI
         }, 0);
       }
 
-      if (keyPressed === "Backspace" || keyPressed === "Delete") {
+      if (keyPressed === 'Backspace' || keyPressed === 'Delete') {
         event.preventDefault();
         event.stopPropagation();
         onSelect(row, col);

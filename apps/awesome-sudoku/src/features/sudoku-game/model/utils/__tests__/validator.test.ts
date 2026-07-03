@@ -1,7 +1,7 @@
-import { BOARD_SIZE } from "@entities/board/model/constants";
-import { Grid, GridPosition, SudokuBoard, SudokuCell } from "@entities/board/model/types";
-import { KillerCage } from "@entities/game/model/types";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BOARD_SIZE } from '@entities/board/model/constants';
+import { Grid, GridPosition, SudokuBoard, SudokuCell } from '@entities/board/model/types';
+import { KillerCage } from '@entities/game/model/types';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   checkBlockConflict,
   checkColConflict,
@@ -18,9 +18,9 @@ import {
   validateBaseGrid,
   validateCages,
   validateKillerCages,
-} from "../validator";
+} from '../validator';
 
-describe("validator.ts 테스트", () => {
+describe('validator.ts 테스트', () => {
   // 헬퍼 함수들
   const createMockSudokuCell = (value: number | null = null, isInitial = false, isConflict = false): SudokuCell => ({
     value,
@@ -61,9 +61,9 @@ describe("validator.ts 테스트", () => {
     vi.clearAllMocks();
   });
 
-  describe("충돌 검사 함수들", () => {
-    describe("checkRowConflict", () => {
-      it("행에 동일한 값이 있으면 충돌을 감지해야 한다", () => {
+  describe('충돌 검사 함수들', () => {
+    describe('checkRowConflict', () => {
+      it('행에 동일한 값이 있으면 충돌을 감지해야 한다', () => {
         const board = createEmptyBoard();
         board[0][0] = createMockSudokuCell(5);
         board[0][3] = createMockSudokuCell(5); // 같은 행에 중복
@@ -72,7 +72,7 @@ describe("validator.ts 테스트", () => {
         expect(hasConflict).toBe(true);
       });
 
-      it("행에 동일한 값이 없으면 충돌을 감지하지 않아야 한다", () => {
+      it('행에 동일한 값이 없으면 충돌을 감지하지 않아야 한다', () => {
         const board = createEmptyBoard();
         board[0][0] = createMockSudokuCell(5);
         board[0][3] = createMockSudokuCell(3);
@@ -81,7 +81,7 @@ describe("validator.ts 테스트", () => {
         expect(hasConflict).toBe(false);
       });
 
-      it("같은 위치는 검사하지 않아야 한다", () => {
+      it('같은 위치는 검사하지 않아야 한다', () => {
         const board = createEmptyBoard();
         board[0][1] = createMockSudokuCell(5);
 
@@ -89,7 +89,7 @@ describe("validator.ts 테스트", () => {
         expect(hasConflict).toBe(false);
       });
 
-      it("null 값은 충돌을 일으키지 않아야 한다", () => {
+      it('null 값은 충돌을 일으키지 않아야 한다', () => {
         const board = createEmptyBoard();
         board[0][0] = createMockSudokuCell(null);
         board[0][3] = createMockSudokuCell(null);
@@ -99,8 +99,8 @@ describe("validator.ts 테스트", () => {
       });
     });
 
-    describe("checkColConflict", () => {
-      it("열에 동일한 값이 있으면 충돌을 감지해야 한다", () => {
+    describe('checkColConflict', () => {
+      it('열에 동일한 값이 있으면 충돌을 감지해야 한다', () => {
         const board = createEmptyBoard();
         board[0][1] = createMockSudokuCell(5);
         board[3][1] = createMockSudokuCell(5); // 같은 열에 중복
@@ -109,7 +109,7 @@ describe("validator.ts 테스트", () => {
         expect(hasConflict).toBe(true);
       });
 
-      it("열에 동일한 값이 없으면 충돌을 감지하지 않아야 한다", () => {
+      it('열에 동일한 값이 없으면 충돌을 감지하지 않아야 한다', () => {
         const board = createEmptyBoard();
         board[0][1] = createMockSudokuCell(5);
         board[3][1] = createMockSudokuCell(3);
@@ -118,7 +118,7 @@ describe("validator.ts 테스트", () => {
         expect(hasConflict).toBe(false);
       });
 
-      it("같은 위치는 검사하지 않아야 한다", () => {
+      it('같은 위치는 검사하지 않아야 한다', () => {
         const board = createEmptyBoard();
         board[2][1] = createMockSudokuCell(5);
 
@@ -127,8 +127,8 @@ describe("validator.ts 테스트", () => {
       });
     });
 
-    describe("checkBlockConflict", () => {
-      it("3x3 블록에 동일한 값이 있으면 충돌을 감지해야 한다", () => {
+    describe('checkBlockConflict', () => {
+      it('3x3 블록에 동일한 값이 있으면 충돌을 감지해야 한다', () => {
         const board = createEmptyBoard();
         board[0][0] = createMockSudokuCell(5);
         board[1][1] = createMockSudokuCell(5); // 같은 블록에 중복
@@ -137,7 +137,7 @@ describe("validator.ts 테스트", () => {
         expect(hasConflict).toBe(true);
       });
 
-      it("3x3 블록에 동일한 값이 없으면 충돌을 감지하지 않아야 한다", () => {
+      it('3x3 블록에 동일한 값이 없으면 충돌을 감지하지 않아야 한다', () => {
         const board = createEmptyBoard();
         board[0][0] = createMockSudokuCell(5);
         board[1][1] = createMockSudokuCell(3);
@@ -146,7 +146,7 @@ describe("validator.ts 테스트", () => {
         expect(hasConflict).toBe(false);
       });
 
-      it("다른 블록은 검사하지 않아야 한다", () => {
+      it('다른 블록은 검사하지 않아야 한다', () => {
         const board = createEmptyBoard();
         board[0][0] = createMockSudokuCell(5); // 첫 번째 블록 (0,0)
         board[3][3] = createMockSudokuCell(5); // 중앙 블록 (1,1)
@@ -160,7 +160,7 @@ describe("validator.ts 테스트", () => {
         expect(hasConflictThirdBlock).toBe(false);
       });
 
-      it("모든 9개 블록에서 올바르게 작동해야 한다", () => {
+      it('모든 9개 블록에서 올바르게 작동해야 한다', () => {
         const board = createEmptyBoard();
 
         // 각 블록에서 테스트
@@ -182,8 +182,8 @@ describe("validator.ts 테스트", () => {
       });
     });
 
-    describe("checkConflicts", () => {
-      it("충돌이 없는 보드에서는 모든 셀이 conflict: false여야 한다", () => {
+    describe('checkConflicts', () => {
+      it('충돌이 없는 보드에서는 모든 셀이 conflict: false여야 한다', () => {
         const board = createValidSudokuBoard();
 
         const result = checkConflicts(board);
@@ -195,7 +195,7 @@ describe("validator.ts 테스트", () => {
         });
       });
 
-      it("행 충돌을 감지하고 표시해야 한다", () => {
+      it('행 충돌을 감지하고 표시해야 한다', () => {
         const board = createEmptyBoard();
         board[0][0] = createMockSudokuCell(5, true);
         board[0][5] = createMockSudokuCell(5, true); // 같은 행에 중복
@@ -207,7 +207,7 @@ describe("validator.ts 테스트", () => {
         expect(result[0][1].isConflict).toBe(false);
       });
 
-      it("열 충돌을 감지하고 표시해야 한다", () => {
+      it('열 충돌을 감지하고 표시해야 한다', () => {
         const board = createEmptyBoard();
         board[0][1] = createMockSudokuCell(3, true);
         board[5][1] = createMockSudokuCell(3, true); // 같은 열에 중복
@@ -219,7 +219,7 @@ describe("validator.ts 테스트", () => {
         expect(result[1][1].isConflict).toBe(false);
       });
 
-      it("블록 충돌을 감지하고 표시해야 한다", () => {
+      it('블록 충돌을 감지하고 표시해야 한다', () => {
         const board = createEmptyBoard();
         board[0][0] = createMockSudokuCell(8, true);
         board[2][2] = createMockSudokuCell(8, true); // 같은 블록에 중복
@@ -231,7 +231,7 @@ describe("validator.ts 테스트", () => {
         expect(result[1][1].isConflict).toBe(false);
       });
 
-      it("여러 종류의 충돌을 동시에 감지해야 한다", () => {
+      it('여러 종류의 충돌을 동시에 감지해야 한다', () => {
         const board = createEmptyBoard();
         board[0][0] = createMockSudokuCell(1, true);
         board[0][1] = createMockSudokuCell(1, true); // 행 충돌
@@ -244,7 +244,7 @@ describe("validator.ts 테스트", () => {
         expect(result[1][0].isConflict).toBe(true);
       });
 
-      it("null 값은 충돌 검사에서 제외해야 한다", () => {
+      it('null 값은 충돌 검사에서 제외해야 한다', () => {
         const board = createEmptyBoard();
         board[0][0] = createMockSudokuCell(null, false);
         board[0][1] = createMockSudokuCell(null, false);
@@ -257,16 +257,16 @@ describe("validator.ts 테스트", () => {
     });
   });
 
-  describe("보드 완성도 및 정확성 검사", () => {
-    describe("isBoardComplete", () => {
-      it("모든 셀이 채워지고 충돌이 없으면 완성으로 판단해야 한다", () => {
+  describe('보드 완성도 및 정확성 검사', () => {
+    describe('isBoardComplete', () => {
+      it('모든 셀이 채워지고 충돌이 없으면 완성으로 판단해야 한다', () => {
         const board = createValidSudokuBoard();
 
         const isComplete = isBoardComplete(board);
         expect(isComplete).toBe(true);
       });
 
-      it("빈 셀이 있으면 미완성으로 판단해야 한다", () => {
+      it('빈 셀이 있으면 미완성으로 판단해야 한다', () => {
         const board = createValidSudokuBoard();
         board[0][0] = createMockSudokuCell(null);
 
@@ -274,7 +274,7 @@ describe("validator.ts 테스트", () => {
         expect(isComplete).toBe(false);
       });
 
-      it("충돌이 있으면 미완성으로 판단해야 한다", () => {
+      it('충돌이 있으면 미완성으로 판단해야 한다', () => {
         const board = createValidSudokuBoard();
         board[0][0] = createMockSudokuCell(5, true, true); // 충돌 있음
 
@@ -282,7 +282,7 @@ describe("validator.ts 테스트", () => {
         expect(isComplete).toBe(false);
       });
 
-      it("빈 보드는 미완성으로 판단해야 한다", () => {
+      it('빈 보드는 미완성으로 판단해야 한다', () => {
         const board = createEmptyBoard();
 
         const isComplete = isBoardComplete(board);
@@ -290,8 +290,8 @@ describe("validator.ts 테스트", () => {
       });
     });
 
-    describe("isBoardCorrect", () => {
-      it("보드가 솔루션과 일치하면 true를 반환해야 한다", () => {
+    describe('isBoardCorrect', () => {
+      it('보드가 솔루션과 일치하면 true를 반환해야 한다', () => {
         const solution = createValidSudokuGrid();
         const board = createValidSudokuBoard();
 
@@ -299,7 +299,7 @@ describe("validator.ts 테스트", () => {
         expect(isCorrect).toBe(true);
       });
 
-      it("보드가 솔루션과 다르면 false를 반환해야 한다", () => {
+      it('보드가 솔루션과 다르면 false를 반환해야 한다', () => {
         const solution = createValidSudokuGrid();
         const board = createValidSudokuBoard();
         board[0][0] = createMockSudokuCell(9); // 다른 값으로 변경
@@ -308,7 +308,7 @@ describe("validator.ts 테스트", () => {
         expect(isCorrect).toBe(false);
       });
 
-      it("부분적으로 채워진 보드도 올바르게 검사해야 한다", () => {
+      it('부분적으로 채워진 보드도 올바르게 검사해야 한다', () => {
         const solution = createValidSudokuGrid();
         const board = createEmptyBoard();
 
@@ -323,30 +323,30 @@ describe("validator.ts 테스트", () => {
     });
   });
 
-  describe("그리드 검증", () => {
-    describe("validateBaseGrid", () => {
-      it("유효한 스도쿠 그리드를 검증해야 한다", () => {
+  describe('그리드 검증', () => {
+    describe('validateBaseGrid', () => {
+      it('유효한 스도쿠 그리드를 검증해야 한다', () => {
         const grid = createValidSudokuGrid();
 
         const isValid = validateBaseGrid(grid);
         expect(isValid).toBe(true);
       });
 
-      it("잘못된 행이 있는 그리드를 거부해야 한다", () => {
+      it('잘못된 행이 있는 그리드를 거부해야 한다', () => {
         const grid = createValidSudokuGrid();
         grid[0][1] = grid[0][0]; // 첫 번째 행에 중복 생성
 
         expect(() => validateBaseGrid(grid)).toThrow();
       });
 
-      it("잘못된 열이 있는 그리드를 거부해야 한다", () => {
+      it('잘못된 열이 있는 그리드를 거부해야 한다', () => {
         const grid = createValidSudokuGrid();
         grid[1][0] = grid[0][0]; // 첫 번째 열에 중복 생성
 
         expect(() => validateBaseGrid(grid)).toThrow();
       });
 
-      it("잘못된 블록이 있는 그리드를 거부해야 한다", () => {
+      it('잘못된 블록이 있는 그리드를 거부해야 한다', () => {
         const grid = createValidSudokuGrid();
         grid[1][1] = grid[0][0]; // 첫 번째 블록에 중복 생성
 
@@ -354,15 +354,15 @@ describe("validator.ts 테스트", () => {
       });
     });
 
-    describe("isValidPlacement", () => {
-      it("유효한 위치에 숫자를 배치할 수 있어야 한다", () => {
+    describe('isValidPlacement', () => {
+      it('유효한 위치에 숫자를 배치할 수 있어야 한다', () => {
         const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
 
         const isValid = isValidPlacement(grid, 0, 0, 5);
         expect(isValid).toBe(true);
       });
 
-      it("같은 행에 이미 있는 숫자는 배치할 수 없어야 한다", () => {
+      it('같은 행에 이미 있는 숫자는 배치할 수 없어야 한다', () => {
         const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
         grid[0][5] = 5; // 같은 행에 5가 이미 있음
 
@@ -370,7 +370,7 @@ describe("validator.ts 테스트", () => {
         expect(isValid).toBe(false);
       });
 
-      it("같은 열에 이미 있는 숫자는 배치할 수 없어야 한다", () => {
+      it('같은 열에 이미 있는 숫자는 배치할 수 없어야 한다', () => {
         const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
         grid[5][0] = 5; // 같은 열에 5가 이미 있음
 
@@ -378,7 +378,7 @@ describe("validator.ts 테스트", () => {
         expect(isValid).toBe(false);
       });
 
-      it("같은 블록에 이미 있는 숫자는 배치할 수 없어야 한다", () => {
+      it('같은 블록에 이미 있는 숫자는 배치할 수 없어야 한다', () => {
         const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
         grid[1][1] = 5; // 같은 블록에 5가 이미 있음
 
@@ -386,7 +386,7 @@ describe("validator.ts 테스트", () => {
         expect(isValid).toBe(false);
       });
 
-      it("모든 블록에서 올바르게 작동해야 한다", () => {
+      it('모든 블록에서 올바르게 작동해야 한다', () => {
         // 각 블록의 첫 번째 셀에 1을 배치
         for (let blockRow = 0; blockRow < 3; blockRow++) {
           for (let blockCol = 0; blockCol < 3; blockCol++) {
@@ -405,9 +405,9 @@ describe("validator.ts 테스트", () => {
     });
   });
 
-  describe("킬러 스도쿠 검증", () => {
-    describe("validateCages", () => {
-      it("유효한 케이지들을 검증해야 한다", () => {
+  describe('킬러 스도쿠 검증', () => {
+    describe('validateCages', () => {
+      it('유효한 케이지들을 검증해야 한다', () => {
         const solution = createValidSudokuGrid();
         const cages: KillerCage[] = [
           createMockKillerCage(
@@ -433,7 +433,7 @@ describe("validator.ts 테스트", () => {
         expect(isValid).toBe(true);
       });
 
-      it("잘못된 합계를 가진 케이지를 거부해야 한다", () => {
+      it('잘못된 합계를 가진 케이지를 거부해야 한다', () => {
         const solution = createValidSudokuGrid();
         const cages: KillerCage[] = [
           createMockKillerCage(
@@ -450,7 +450,7 @@ describe("validator.ts 테스트", () => {
         expect(isValid).toBe(false);
       });
 
-      it("케이지 내 중복 값을 거부해야 한다", () => {
+      it('케이지 내 중복 값을 거부해야 한다', () => {
         const solution = createValidSudokuGrid();
         // 첫 번째 행의 처음 두 셀이 같은 값을 가지도록 조작
         solution[0][1] = solution[0][0];
@@ -471,8 +471,8 @@ describe("validator.ts 테스트", () => {
       });
     });
 
-    describe("validateAllCages", () => {
-      it("모든 셀이 케이지에 속해야 한다", () => {
+    describe('validateAllCages', () => {
+      it('모든 셀이 케이지에 속해야 한다', () => {
         const solution = createValidSudokuGrid();
         const cages: KillerCage[] = [];
 
@@ -488,7 +488,7 @@ describe("validator.ts 테스트", () => {
         expect(isValid).toBe(true);
       });
 
-      it("셀이 누락되면 false를 반환해야 한다", () => {
+      it('셀이 누락되면 false를 반환해야 한다', () => {
         const solution = createValidSudokuGrid();
         const cages: KillerCage[] = [
           createMockKillerCage(1, [[0, 0]], solution[0][0]),
@@ -499,7 +499,7 @@ describe("validator.ts 테스트", () => {
         expect(isValid).toBe(false);
       });
 
-      it("중복된 셀이 있으면 false를 반환해야 한다", () => {
+      it('중복된 셀이 있으면 false를 반환해야 한다', () => {
         const solution = createValidSudokuGrid();
         const cages: KillerCage[] = [
           createMockKillerCage(1, [[0, 0]], solution[0][0]),
@@ -511,8 +511,8 @@ describe("validator.ts 테스트", () => {
       });
     });
 
-    describe("isKillerRemovalValid & isKillerRemovalValidLenient", () => {
-      it("유효한 제거를 허용해야 한다", () => {
+    describe('isKillerRemovalValid & isKillerRemovalValidLenient', () => {
+      it('유효한 제거를 허용해야 한다', () => {
         const board = createValidSudokuBoard();
         const cages: KillerCage[] = [
           createMockKillerCage(
@@ -535,7 +535,7 @@ describe("validator.ts 테스트", () => {
         expect(isValidLenient).toBe(true);
       });
 
-      it("합계를 초과하는 제거를 거부해야 한다", () => {
+      it('합계를 초과하는 제거를 거부해야 한다', () => {
         const board = createValidSudokuBoard();
         const cages: KillerCage[] = [
           createMockKillerCage(
@@ -558,7 +558,7 @@ describe("validator.ts 테스트", () => {
         expect(isValidLenient).toBe(false);
       });
 
-      it("Expert 모드에서는 빈 케이지를 허용해야 한다", () => {
+      it('Expert 모드에서는 빈 케이지를 허용해야 한다', () => {
         const board = createValidSudokuBoard();
         const cages: KillerCage[] = [createMockKillerCage(1, [[0, 0]], 5)];
 
@@ -573,8 +573,8 @@ describe("validator.ts 테스트", () => {
       });
     });
 
-    describe("validateKillerCages", () => {
-      it("킬러 스도쿠 보드의 케이지 규칙을 검증해야 한다", () => {
+    describe('validateKillerCages', () => {
+      it('킬러 스도쿠 보드의 케이지 규칙을 검증해야 한다', () => {
         const board = createValidSudokuBoard();
         const cages: KillerCage[] = [
           createMockKillerCage(
@@ -602,7 +602,7 @@ describe("validator.ts 테스트", () => {
         expect(result[0][1].isConflict).toBe(false);
       });
 
-      it("케이지 합계 오류를 감지해야 한다", () => {
+      it('케이지 합계 오류를 감지해야 한다', () => {
         const board = createValidSudokuBoard();
         const cages: KillerCage[] = [
           createMockKillerCage(
@@ -622,8 +622,8 @@ describe("validator.ts 테스트", () => {
       });
     });
 
-    describe("isKillerBoardComplete", () => {
-      it("올바르게 완성된 킬러 보드를 인식해야 한다", () => {
+    describe('isKillerBoardComplete', () => {
+      it('올바르게 완성된 킬러 보드를 인식해야 한다', () => {
         const board = createValidSudokuBoard();
         const cages: KillerCage[] = [
           createMockKillerCage(
@@ -659,7 +659,7 @@ describe("validator.ts 테스트", () => {
         expect(isComplete).toBe(true);
       });
 
-      it("빈 셀이 있는 킬러 보드를 미완성으로 판단해야 한다", () => {
+      it('빈 셀이 있는 킬러 보드를 미완성으로 판단해야 한다', () => {
         const board = createValidSudokuBoard();
         board[0][0] = createMockSudokuCell(null); // 빈 셀 생성
 
@@ -671,22 +671,22 @@ describe("validator.ts 테스트", () => {
     });
   });
 
-  describe("hasUniqueSolution", () => {
-    it("완성된 스도쿠는 유일한 솔루션을 가져야 한다", () => {
+  describe('hasUniqueSolution', () => {
+    it('완성된 스도쿠는 유일한 솔루션을 가져야 한다', () => {
       const grid = createValidSudokuGrid().map((row) => row.map((val) => val as number | null));
 
       const hasUnique = hasUniqueSolution(grid);
       expect(hasUnique).toBe(true);
     });
 
-    it("빈 그리드는 여러 솔루션을 가져야 한다", () => {
+    it('빈 그리드는 여러 솔루션을 가져야 한다', () => {
       const grid = Array.from({ length: 9 }, () => Array(9).fill(null));
 
       const hasUnique = hasUniqueSolution(grid);
       expect(hasUnique).toBe(false);
     });
 
-    it("부분적으로 채워진 유효한 그리드를 처리해야 한다", () => {
+    it('부분적으로 채워진 유효한 그리드를 처리해야 한다', () => {
       const grid = Array.from({ length: 9 }, () => Array(9).fill(null));
 
       // 첫 번째 행만 부분적으로 채우기
@@ -700,8 +700,8 @@ describe("validator.ts 테스트", () => {
     });
   });
 
-  describe("통합 테스트", () => {
-    it("전체 검증 파이프라인이 올바르게 작동해야 한다", () => {
+  describe('통합 테스트', () => {
+    it('전체 검증 파이프라인이 올바르게 작동해야 한다', () => {
       const solution = createValidSudokuGrid();
       const board = createValidSudokuBoard();
 
@@ -720,7 +720,7 @@ describe("validator.ts 테스트", () => {
       expect(hasAnyConflict).toBe(false);
     });
 
-    it("잘못된 보드는 모든 검증 단계에서 감지되어야 한다", () => {
+    it('잘못된 보드는 모든 검증 단계에서 감지되어야 한다', () => {
       const board = createValidSudokuBoard();
 
       // 의도적으로 오류 생성
@@ -736,8 +736,8 @@ describe("validator.ts 테스트", () => {
     });
   });
 
-  describe("에지 케이스", () => {
-    it("경계값들을 올바르게 처리해야 한다", () => {
+  describe('에지 케이스', () => {
+    it('경계값들을 올바르게 처리해야 한다', () => {
       const board = createEmptyBoard();
 
       // 모든 경계 위치에서 테스트
@@ -760,7 +760,7 @@ describe("validator.ts 테스트", () => {
       });
     });
 
-    it("모든 숫자 범위를 올바르게 처리해야 한다", () => {
+    it('모든 숫자 범위를 올바르게 처리해야 한다', () => {
       const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
 
       for (let num = 1; num <= 9; num++) {
