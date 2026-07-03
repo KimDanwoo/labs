@@ -18,7 +18,7 @@ export function DataBoundary({ children }: DataBoundaryProps) {
 
   if (!loaded) {
     return (
-      <main className="mx-auto flex min-h-dvh w-full max-w-content items-center justify-center px-lg text-muted">
+      <main className="mx-auto flex min-h-dvh w-full max-w-mobile items-center justify-center px-lg text-muted-foreground">
         불러오는 중…
       </main>
     );

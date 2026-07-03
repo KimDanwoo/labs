@@ -33,7 +33,7 @@ export function OptionList<T extends string | number>({
           >
             <span className="flex flex-col gap-xs">
               <span className="text-lg font-semibold text-foreground">{getLabel(option)}</span>
-              {hint && <span className="text-sm text-muted">{hint}</span>}
+              {hint && <span className="text-sm text-muted-foreground">{hint}</span>}
             </span>
             <span
               className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs ${

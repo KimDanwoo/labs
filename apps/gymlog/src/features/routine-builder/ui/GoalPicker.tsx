@@ -12,7 +12,7 @@ const GOAL_OPTIONS = Object.keys(GOAL) as Goal[];
 export function GoalPicker({ goal, onChange }: Props) {
   return (
     <div className="flex flex-col gap-sm">
-      <span className="text-sm font-medium text-muted">목표</span>
+      <span className="text-sm font-medium text-muted-foreground">목표</span>
       <div className="grid grid-cols-2 gap-sm">
         {GOAL_OPTIONS.map((option) => {
           const isSelected = goal === option;

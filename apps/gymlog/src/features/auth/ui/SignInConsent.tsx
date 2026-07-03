@@ -34,10 +34,10 @@ export function SignInConsent() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 px-lg pb-3xl backdrop-blur-sm">
-      <div className="pop flex w-full max-w-content flex-col gap-lg rounded-xl border border-card-border bg-glass p-xl">
+      <div className="pop flex w-full max-w-mobile flex-col gap-lg rounded-xl border border-card-border bg-glass p-xl">
         <div className="flex flex-col gap-sm">
           <h2 className="text-lg font-bold text-foreground">시작하기 전에</h2>
-          <p className="text-sm text-muted">서비스 이용을 위해 약관에 동의해 주세요.</p>
+          <p className="text-sm text-muted-foreground">서비스 이용을 위해 약관에 동의해 주세요.</p>
         </div>
 
         <div className="flex gap-lg">
@@ -63,7 +63,7 @@ export function SignInConsent() {
           <Button disabled={!agreed} className="h-12 w-full" onClick={handleAgree}>
             동의하고 Google로 로그인
           </Button>
-          <Button variant="ghost" className="h-10 w-full text-sm text-muted" onClick={close}>
+          <Button variant="ghost" className="h-10 w-full text-sm text-muted-foreground" onClick={close}>
             취소
           </Button>
         </div>

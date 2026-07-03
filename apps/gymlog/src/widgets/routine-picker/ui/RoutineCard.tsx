@@ -3,8 +3,7 @@
 import { getExerciseById } from '@entities/exercise/model/constants';
 import type { Routine } from '@entities/routine/model/types';
 import { GOAL } from '@shared/training';
-import { Badge, Button } from '@ui/react';
-import * as Card from '@ui/react/card';
+import { Badge, Button, Card } from '@ui/react';
 
 type Props = {
   routine: Routine;
@@ -26,25 +25,25 @@ export function RoutineCard({ routine, onStart }: Props) {
   const preview = buildPreview(routine);
 
   return (
-    <Card.Root>
+    <Card>
       <Card.Header>
         <div className="flex flex-col gap-xs">
           <Card.Title>{routine.name}</Card.Title>
           <Card.Description>{routine.dayLabel}</Card.Description>
         </div>
       </Card.Header>
-      <Card.Body>
+      <Card.Content className="flex flex-col gap-sm">
         <div className="flex flex-wrap gap-xs">
-          <Badge tone="primary">{GOAL[routine.goal]}</Badge>
-          <Badge tone="secondary">{routine.items.length}개 운동</Badge>
+          <Badge variant="primary">{GOAL[routine.goal]}</Badge>
+          <Badge variant="secondary">{routine.items.length}개 운동</Badge>
         </div>
-        {preview && <p className="text-sm text-muted">{preview}</p>}
-      </Card.Body>
+        {preview && <p className="text-sm text-muted-foreground">{preview}</p>}
+      </Card.Content>
       <Card.Footer>
         <Button className="w-full" onClick={() => onStart(routine)}>
           시작
         </Button>
       </Card.Footer>
-    </Card.Root>
+    </Card>
   );
 }

@@ -44,7 +44,7 @@ export function AddExerciseList({ onAdd }: AddExerciseListProps) {
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="운동 검색 (예: 벤치프레스, squat)"
-        className="h-11 w-full rounded-md border border-card-border bg-background px-md text-sm text-foreground outline-none placeholder:text-muted focus:border-primary"
+        className="h-11 w-full rounded-md border border-card-border bg-background px-md text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary"
       />
 
       <div className="flex flex-wrap gap-sm">
@@ -68,7 +68,7 @@ export function AddExerciseList({ onAdd }: AddExerciseListProps) {
       </div>
 
       {results.length === 0 ? (
-        <p className="py-md text-center text-sm text-muted">검색 결과가 없어요.</p>
+        <p className="py-md text-center text-sm text-muted-foreground">검색 결과가 없어요.</p>
       ) : (
         <ul className="flex flex-col gap-sm">
           {results.map((exercise) => (
@@ -79,7 +79,7 @@ export function AddExerciseList({ onAdd }: AddExerciseListProps) {
                 className="flex w-full items-center justify-between rounded-md border border-card-border bg-glass px-lg py-md text-left hover:border-primary"
               >
                 <span className="text-sm font-medium text-foreground">{exercise.nameKo}</span>
-                <Badge tone="secondary">{EQUIPMENT[exercise.equipment]}</Badge>
+                <Badge variant="secondary">{EQUIPMENT[exercise.equipment]}</Badge>
               </button>
             </li>
           ))}

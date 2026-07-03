@@ -35,7 +35,7 @@ export function HistoryStats({ sessions }: HistoryStatsProps) {
           className="flex flex-col items-center gap-xs rounded-lg border border-card-border bg-glass p-lg shadow-md"
         >
           <span className="text-3xl font-bold text-primary">{item.value}</span>
-          <span className="text-sm text-muted">{item.label}</span>
+          <span className="text-sm text-muted-foreground">{item.label}</span>
         </div>
       ))}
     </div>

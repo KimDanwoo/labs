@@ -34,7 +34,7 @@ export function BottomNav() {
         aria-label={label}
         aria-current={isActive ? 'page' : undefined}
         className={`flex flex-1 flex-col items-center gap-0.5 py-sm text-xs font-medium transition-colors ${
-          isActive ? 'text-primary' : 'text-muted hover:text-foreground'
+          isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
         }`}
       >
         <Icon className="size-6" />
@@ -45,7 +45,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-card-border bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-content items-end justify-around px-sm">
+      <div className="mx-auto flex w-full max-w-mobile items-end justify-around px-sm">
         {LEFT.map(sideTab)}
 
         <Link

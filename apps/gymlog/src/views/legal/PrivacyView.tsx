@@ -25,14 +25,14 @@ export function PrivacyView() {
   return (
     <>
       <AppHeader title="개인정보처리방침" />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
-        <p className="rounded-lg border border-warning bg-glass p-md text-xs text-muted">
+      <main className="mx-auto flex w-full max-w-mobile flex-col gap-lg px-lg pb-3xl pt-lg">
+        <p className="rounded-lg border border-warning bg-glass p-md text-xs text-muted-foreground">
           ⚠️ 아래는 예시 초안입니다. 실제 서비스 공개 전 법률 전문가의 검토·보완이 필요합니다.
         </p>
         {SECTIONS.map((section) => (
           <section key={section.title} className="flex flex-col gap-xs">
             <h2 className="text-base font-semibold text-foreground">{section.title}</h2>
-            <p className="text-sm leading-relaxed text-muted">{section.body}</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">{section.body}</p>
           </section>
         ))}
       </main>

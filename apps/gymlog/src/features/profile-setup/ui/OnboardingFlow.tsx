@@ -101,10 +101,14 @@ export function OnboardingFlow({ onComplete, onSignIn }: OnboardingFlowProps) {
       {step !== 'welcome' && (
         <div className="flex flex-col gap-md">
           <div className="flex items-center gap-md">
-            <button type="button" onClick={goPrev} className="text-muted transition-colors hover:text-foreground">
+            <button
+              type="button"
+              onClick={goPrev}
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
               ←
             </button>
-            <span className="text-sm text-muted">
+            <span className="text-sm text-muted-foreground">
               {stepIndex} / {QUESTION_TOTAL}
             </span>
           </div>
@@ -121,7 +125,7 @@ export function OnboardingFlow({ onComplete, onSignIn }: OnboardingFlowProps) {
         {step === 'welcome' && (
           <div className="flex flex-1 flex-col justify-center gap-md">
             <p className="text-4xl font-bold text-foreground">안녕하세요 👋</p>
-            <p className="text-base text-muted">
+            <p className="text-base text-muted-foreground">
               gymlog를 쓰기 전에 몇 가지만 여쭤볼게요. 운동을 어떻게 추천하고 기록할지 맞춰드릴게요. 1분이면 끝나고,
               나중에 설정에서 언제든 바꿀 수 있어요.
             </p>
@@ -156,7 +160,7 @@ export function OnboardingFlow({ onComplete, onSignIn }: OnboardingFlowProps) {
         {step === 'split' && (
           <>
             <h1 className="text-2xl font-bold text-foreground">운동을 어떻게 나눠서 하세요?</h1>
-            <p className="text-sm text-muted">분할 방식이에요. 잘 모르겠으면 무분할이 가장 무난해요.</p>
+            <p className="text-sm text-muted-foreground">분할 방식이에요. 잘 모르겠으면 무분할이 가장 무난해요.</p>
             <OptionList
               options={SELECTABLE_SPLITS}
               value={draft.split ?? null}
@@ -174,7 +178,7 @@ export function OnboardingFlow({ onComplete, onSignIn }: OnboardingFlowProps) {
           <div className="flex flex-col gap-lg">
             <div className="flex flex-col gap-sm">
               <h1 className="text-2xl font-bold text-foreground">한 종목에 몇 세트 하세요?</h1>
-              <p className="text-sm text-muted">보통 3~4세트가 무난해요. 운동마다 다시 조절할 수 있어요.</p>
+              <p className="text-sm text-muted-foreground">보통 3~4세트가 무난해요. 운동마다 다시 조절할 수 있어요.</p>
             </div>
             <NumberStepper
               value={draft.defaultSets}
