@@ -16,7 +16,7 @@ export function ShowcaseView() {
         <div className="flex flex-col gap-xs">
           <span className="font-mono text-xs uppercase tracking-widest text-primary">Design System</span>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Danwoo UI 카탈로그</h1>
-          <p className="text-sm text-muted">
+          <p className="text-sm text-muted-foreground">
             @ui/react 공통 컴포넌트 + @tokens/css 디자인 토큰 전량. 전 앱 적용 판단용 참고 화면.
           </p>
         </div>

@@ -31,12 +31,12 @@ export function ColorSemanticSection() {
     >
       {SEMANTIC_ROLES.map((role) => (
         <div key={role} className="flex flex-col gap-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-widest text-muted">{role}</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{role}</h3>
           <SwatchGrid names={roleTokens(role)} />
         </div>
       ))}
       <div className="flex flex-col gap-sm">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-muted">surface & effect</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">surface & effect</h3>
         <SwatchGrid names={surfaceTokens} />
       </div>
     </Section>
