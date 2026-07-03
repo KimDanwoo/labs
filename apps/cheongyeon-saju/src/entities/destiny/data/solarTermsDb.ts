@@ -92,13 +92,10 @@ const getMonthBranchForDate = (
     ...termsNextYear,
   ]
     .map((t) => {
-      const termJdnInt = Math.floor(t.jdn);
-      const utHours = ((t.jdn - termJdnInt + 0.5) * 24) % 24;
-      const kstHours = utHours + 9;
-      const dayOffset = kstHours >= 24 ? 1 : 0;
-      // 절기 시각을 분 단위 타임스탬프로 변환
-      const termTimestamp =
-        (termJdnInt + dayOffset) * 1440 + t.hour * 60 + t.minute;
+      // t.jdn은 UT 기준 소수 JDN. inputTimestamp(= UT-JD × 1440)와 동일 축으로
+      // 통일해야 비교가 성립한다. KST 시각(t.hour/t.minute)으로 재구성하면
+      // 축이 어긋나 절기 직전 최대 3시간 출생자의 월주가 오판된다.
+      const termTimestamp = t.jdn * 1440;
       const boundary = MONTH_BOUNDARY_TERMS.find(
         (b) => b.longitude === t.longitude,
       ) as MonthBoundaryTerm;
