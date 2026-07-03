@@ -22,7 +22,7 @@ export function ProfileHeader() {
 
       {/* ── 본문 소개 ────────────────────────────────────────── */}
       <div
-        className="flex flex-col gap-md text-sm leading-[1.75] text-muted sm:text-base fade-up"
+        className="flex flex-col gap-md text-sm leading-[1.75] text-muted-foreground sm:text-base fade-up"
         style={{ animationDelay: '300ms' }}
       >
         {PROFILE_PARAGRAPHS.map((paragraph, paragraphIndex) => (
