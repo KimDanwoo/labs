@@ -11,6 +11,7 @@ import { getHourPillar, isEarlySubHour } from './hourPillar';
 import { solarToLunar } from './lunarCalendar';
 import { analyzeLuck } from './majorLuck';
 import { getMonthPillar } from './monthPillar';
+import { getEquationOfTimeMinutes } from './solarTerms';
 import { analyzeTenGods } from './tenGods';
 import { analyzeTwelveSpirits } from './twelveSpiritAnalysis';
 import { analyzeTwelveStages } from './twelveStagesAnalysis';
@@ -37,9 +38,17 @@ const calculateDestiny = (input: DestinyInput): DestinyResult => {
 
   let { year, month, day, hour, minute } = input;
 
-  // 1. 태양시 보정 (경도가 지정된 경우 자동 적용)
+  // 1. 진태양시 보정 (경도가 지정된 경우 자동 적용): 경도차 + 균시차
   if (input.longitude !== undefined) {
-    const solarAdjusted = adjustToSolarTime(hour, minute, input.longitude);
+    const eotMinutes = getEquationOfTimeMinutes(
+      gregorianToJdn(year, month, day),
+    );
+    const solarAdjusted = adjustToSolarTime(
+      hour,
+      minute,
+      input.longitude,
+      eotMinutes,
+    );
     hour = solarAdjusted.hour;
     minute = solarAdjusted.minute;
   }
