@@ -1,4 +1,7 @@
-import { TEN_GOD_FRIENDLY } from '@views/destiny-result/constants';
+import {
+  TEN_GOD_FRIENDLY,
+  TEN_GOD_RELATION,
+} from '@views/destiny-result/constants';
 import {
   analyzeTenGodPattern,
   getCombinationNarrative,
@@ -17,6 +20,7 @@ type TenGodSectionProps = {
   tenGods: TenGodAnalysis;
   topGod: TenGod | null;
   combinations: CombinationAnalysis;
+  gender: 'male' | 'female';
 };
 
 const PILLAR_LABELS = [
@@ -30,6 +34,7 @@ export function TenGodSection({
   tenGods,
   topGod,
   combinations,
+  gender,
 }: TenGodSectionProps) {
   const allGods: TenGod[] = [
     tenGods.yearStem,
@@ -43,6 +48,7 @@ export function TenGodSection({
 
   const pattern = analyzeTenGodPattern(allGods);
   const combinationNarrative = getCombinationNarrative(combinations);
+  const relationOf = (god: TenGod) => TEN_GOD_RELATION[gender][god];
 
   return (
     <DataSection>
@@ -66,6 +72,11 @@ export function TenGodSection({
           <p className="text-xs text-[#6b6b7b] mt-1 leading-[1.7]">
             {TEN_GOD_FRIENDLY[topGod]}
           </p>
+          {relationOf(topGod) && (
+            <p className="text-xs text-primary mt-1.5 leading-[1.7]">
+              {relationOf(topGod)}
+            </p>
+          )}
         </div>
       )}
 
@@ -91,6 +102,11 @@ export function TenGodSection({
               <p className="text-xs text-[#6b6b7b] mt-1 leading-[1.7]">
                 {TEN_GOD_FRIENDLY[god]}
               </p>
+              {relationOf(god) && (
+                <p className="text-xs text-primary mt-1.5 leading-[1.7]">
+                  {relationOf(god)}
+                </p>
+              )}
             </div>
           );
         })}

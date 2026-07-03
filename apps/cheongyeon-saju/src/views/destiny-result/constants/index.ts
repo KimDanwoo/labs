@@ -7,5 +7,6 @@ export {
   STEM_ELEMENT,
   STEM_KR,
   TEN_GOD_FRIENDLY,
+  TEN_GOD_RELATION,
   TWELVE_STAGE_FRIENDLY,
 } from './constants';
