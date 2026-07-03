@@ -32,7 +32,7 @@ export function FlashcardSetup({
 	onStart,
 }: FlashcardSetupProps) {
 	return (
-		<div className="container mx-auto max-w-2xl px-4 py-8 sm:py-12 animate-fade-in">
+		<div className="container mx-auto max-w-[42rem] px-4 py-8 sm:py-12 animate-fade-in">
 			<h1 className="text-3xl font-bold tracking-tight mb-2">플래시카드</h1>
 			<p className="text-muted-foreground mb-8">
 				간격 반복으로 장기 기억에 남기세요.

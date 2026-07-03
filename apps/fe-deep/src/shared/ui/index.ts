@@ -1,9 +1,9 @@
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion';
-export { Avatar, AvatarImage, AvatarFallback, AvatarBadge, AvatarGroup } from './Avatar';
-export { Badge, badgeVariants } from './Badge';
-export { Button, buttonVariants } from './Button';
-export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent } from './Card';
-export { Checkbox } from './Checkbox';
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@ui/react';
+export { Avatar, AvatarImage, AvatarFallback, AvatarBadge, AvatarGroup } from '@ui/react';
+export { Badge, badgeVariants } from '@ui/react';
+export { Button, buttonVariants } from '@ui/react';
+export { Card } from '@ui/react';
+export { Checkbox } from '@ui/react';
 export { ConfirmDialog } from './ConfirmDialog';
 export {
   DropdownMenu,
@@ -21,12 +21,12 @@ export {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-} from './DropdownMenu';
-export { Input } from './Input';
+} from '@ui/react';
+export { Input } from '@ui/react';
 export { MarkdownRenderer } from './MarkdownRenderer';
-export { Progress } from './Progress';
+export { Progress } from '@ui/react';
 export { Providers } from './Providers';
-export { ScrollArea, ScrollBar } from './ScrollArea';
+export { ScrollArea, ScrollBar } from '@ui/react';
 export {
   Select,
   SelectContent,
@@ -38,7 +38,7 @@ export {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from './Select';
+} from '@ui/react';
 export {
   Sheet,
   SheetTrigger,
@@ -48,5 +48,5 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-} from './Sheet';
+} from '@ui/react';
 export { ThemeToggle } from './ThemeToggle';
