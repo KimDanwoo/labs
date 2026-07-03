@@ -123,19 +123,27 @@ type AdjustedSolarTime = {
 };
 
 /**
- * 태양시 보정을 적용합니다.
- * 기본 경도는 서울 기준 127°이며, 표준시 경도(135°)와의 차이로 보정합니다.
- * 경도 1° 당 4분 차이: (135 - 127) × 4 = 32분 차감
+ * 진태양시(眞太陽時) 보정을 적용합니다.
+ *
+ * 두 가지 보정:
+ * 1. 경도차: 표준시 경도(135°)와 출생지 경도의 차이. 경도 1°당 4분.
+ * 2. 균시차: 진태양시 − 평균태양시 (날짜별 −14~+16분). 호출자가 계산해 전달.
+ *
+ * 진태양시 = 표준시 − 경도차 + 균시차
+ *
+ * @param equationOfTimeMinutes 균시차(분). 미지정 시 0(경도 보정만).
  */
 const adjustToSolarTime = (
   hour: number,
   minute: number,
   longitudeDegrees: number = SEOUL_LONGITUDE_DEGREES,
+  equationOfTimeMinutes: number = 0,
 ): AdjustedSolarTime => {
   const diffMinutes =
     (STANDARD_MERIDIAN_DEGREES - longitudeDegrees) * MINUTES_PER_DEGREE;
 
-  const totalMinutes = hour * 60 + minute - diffMinutes;
+  const totalMinutes =
+    hour * 60 + minute - diffMinutes + Math.round(equationOfTimeMinutes);
   const MINUTES_PER_DAY = 24 * 60;
 
   const normalizedMinutes =
