@@ -24,7 +24,7 @@ export function OnboardingView() {
   const handleSignIn = () => setConsentOpen(true);
 
   return (
-    <main className="mx-auto w-full max-w-content px-lg">
+    <main className="mx-auto w-full max-w-mobile px-lg">
       <OnboardingFlow onComplete={handleComplete} onSignIn={user ? undefined : handleSignIn} />
     </main>
   );

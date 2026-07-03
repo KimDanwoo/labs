@@ -17,8 +17,8 @@ const STATUS_LABEL: Record<string, string> = {
 const STATUS_COLOR: Record<string, string> = {
   [SET_STATUS.done]: 'text-success',
   [SET_STATUS.partial]: 'text-warning',
-  [SET_STATUS.skipped]: 'text-muted',
-  [SET_STATUS.pending]: 'text-muted',
+  [SET_STATUS.skipped]: 'text-muted-foreground',
+  [SET_STATUS.pending]: 'text-muted-foreground',
 };
 
 // 현재 세트 이전까지 완료된 세트들을 컴팩트하게 표시한다.
@@ -30,12 +30,12 @@ export function SetHistoryList({ sets, currentSetIndex }: SetHistoryListProps) {
   return (
     <ul className="flex flex-col gap-xs">
       {resolvedSets.map((set, i) => {
-        const statusColor = STATUS_COLOR[set.status] ?? 'text-muted';
+        const statusColor = STATUS_COLOR[set.status] ?? 'text-muted-foreground';
         const statusLabel = STATUS_LABEL[set.status] ?? set.status;
 
         return (
           <li key={i} className="flex items-center justify-between rounded-md px-lg py-sm bg-primary-subtle">
-            <span className="text-sm text-muted">{i + 1}세트</span>
+            <span className="text-sm text-muted-foreground">{i + 1}세트</span>
             <span className="text-sm font-medium text-foreground">
               {set.weight}kg × {set.reps}회
             </span>

@@ -61,7 +61,7 @@ export function ExercisePanel({
 
   return (
     <div className="flex flex-col gap-lg">
-      <button type="button" onClick={onBack} className="self-start text-sm text-muted hover:text-foreground">
+      <button type="button" onClick={onBack} className="self-start text-sm text-muted-foreground hover:text-foreground">
         ← 목록
       </button>
 
@@ -70,7 +70,7 @@ export function ExercisePanel({
         {exercise && (
           <div className="flex gap-sm">
             <Badge>{MUSCLE_GROUP[exercise.primaryMuscle]}</Badge>
-            <Badge tone="secondary">{EQUIPMENT[exercise.equipment]}</Badge>
+            <Badge variant="secondary">{EQUIPMENT[exercise.equipment]}</Badge>
           </div>
         )}
       </div>
@@ -97,7 +97,7 @@ export function ExercisePanel({
       ) : (
         <div className="flex flex-col gap-lg">
           <div className="flex flex-col gap-md rounded-lg border border-card-border bg-glass p-lg shadow-md">
-            <p className="text-sm font-medium text-muted">무게 (kg)</p>
+            <p className="text-sm font-medium text-muted-foreground">무게 (kg)</p>
             <WeightCell
               key={`weight-${currentSetIndex}`}
               initial={suggestedWeight}
@@ -107,7 +107,7 @@ export function ExercisePanel({
           </div>
 
           <div className="flex flex-col gap-md rounded-lg border border-card-border bg-glass p-lg shadow-md">
-            <p className="text-sm font-medium text-muted">횟수</p>
+            <p className="text-sm font-medium text-muted-foreground">횟수</p>
             <RepsCell
               key={`reps-${currentSetIndex}`}
               initial={suggestedReps}
@@ -129,7 +129,7 @@ export function ExercisePanel({
             </Button>
           </div>
 
-          <Button variant="ghost" className="h-10 w-full text-sm text-muted" onClick={onFinish}>
+          <Button variant="ghost" className="h-10 w-full text-sm text-muted-foreground" onClick={onFinish}>
             운동 끝내기
           </Button>
         </div>

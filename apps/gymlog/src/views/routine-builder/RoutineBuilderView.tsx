@@ -50,12 +50,12 @@ export function RoutineBuilderView({ routineId }: RoutineBuilderViewProps) {
   return (
     <>
       <AppHeader title={resolveTitle()} />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
-        {!mounted && <p className="text-muted">불러오는 중…</p>}
+      <main className="mx-auto flex w-full max-w-mobile flex-col gap-lg px-lg pb-3xl pt-lg">
+        {!mounted && <p className="text-muted-foreground">불러오는 중…</p>}
 
         {isMissing && (
           <div className="flex flex-col items-center gap-lg pt-3xl text-center">
-            <p className="text-muted">루틴을 찾을 수 없어요. 삭제됐거나 주소가 바뀌었어요.</p>
+            <p className="text-muted-foreground">루틴을 찾을 수 없어요. 삭제됐거나 주소가 바뀌었어요.</p>
             <Button className="h-12 w-full" onClick={() => router.push('/')}>
               홈으로
             </Button>

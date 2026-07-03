@@ -36,14 +36,14 @@ export function TermsView() {
   return (
     <>
       <AppHeader title="이용약관" />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-3xl pt-lg">
-        <p className="rounded-lg border border-warning bg-glass p-md text-xs text-muted">
+      <main className="mx-auto flex w-full max-w-mobile flex-col gap-lg px-lg pb-3xl pt-lg">
+        <p className="rounded-lg border border-warning bg-glass p-md text-xs text-muted-foreground">
           ⚠️ 아래는 예시 초안입니다. 실제 서비스 공개 전 법률 전문가의 검토·보완이 필요합니다.
         </p>
         {ARTICLES.map((article) => (
           <section key={article.title} className="flex flex-col gap-xs">
             <h2 className="text-base font-semibold text-foreground">{article.title}</h2>
-            <p className="text-sm leading-relaxed text-muted">{article.body}</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">{article.body}</p>
           </section>
         ))}
       </main>

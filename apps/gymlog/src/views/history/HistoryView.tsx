@@ -26,9 +26,9 @@ export function HistoryView() {
   return (
     <>
       <AppHeader title="기록" />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-lg px-lg pb-28 pt-lg">
+      <main className="mx-auto flex w-full max-w-mobile flex-col gap-lg px-lg pb-28 pt-lg">
         {!mounted ? (
-          <p className="text-muted">불러오는 중…</p>
+          <p className="text-muted-foreground">불러오는 중…</p>
         ) : (
           <>
             <HistoryStats sessions={history} />
@@ -50,7 +50,7 @@ export function HistoryView() {
                 )}
               </div>
               {sessions.length === 0 ? (
-                <p className="rounded-lg border border-card-border bg-glass p-lg text-sm text-muted">
+                <p className="rounded-lg border border-card-border bg-glass p-lg text-sm text-muted-foreground">
                   {selectedDate ? '이 날은 기록이 없어요.' : '아직 운동 기록이 없어요. 첫 운동을 시작해보세요.'}
                 </p>
               ) : (

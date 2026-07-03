@@ -15,19 +15,19 @@ export function RankingView() {
   return (
     <>
       <AppHeader title="랭킹" />
-      <main className="mx-auto flex w-full max-w-content flex-col gap-md px-lg pb-28 pt-lg">
-        <p className="text-sm text-muted">누적 볼륨 · 레벨 · 주간 볼륨을 합산한 종합 점수 순위예요.</p>
+      <main className="mx-auto flex w-full max-w-mobile flex-col gap-md px-lg pb-28 pt-lg">
+        <p className="text-sm text-muted-foreground">누적 볼륨 · 레벨 · 주간 볼륨을 합산한 종합 점수 순위예요.</p>
 
         {!user && (
-          <p className="rounded-lg border border-card-border bg-glass p-md text-sm text-muted">
+          <p className="rounded-lg border border-card-border bg-glass p-md text-sm text-muted-foreground">
             로그인하면 랭킹에 참여할 수 있어요.
           </p>
         )}
 
-        {loading && <p className="text-muted">불러오는 중…</p>}
+        {loading && <p className="text-muted-foreground">불러오는 중…</p>}
 
         {!loading && entries.length === 0 && (
-          <p className="rounded-lg border border-card-border bg-glass p-lg text-sm text-muted">
+          <p className="rounded-lg border border-card-border bg-glass p-lg text-sm text-muted-foreground">
             아직 랭킹이 없어요. 첫 기록의 주인공이 되어보세요.
           </p>
         )}
@@ -47,7 +47,7 @@ export function RankingView() {
                 </span>
                 <div className="flex min-w-0 flex-1 flex-col">
                   <span className="truncate text-sm font-semibold text-foreground">{entry.displayName}</span>
-                  <span className="text-xs text-muted">
+                  <span className="text-xs text-muted-foreground">
                     Lv.{entry.level} · {formatVolume(entry.totalVolume)}
                   </span>
                 </div>

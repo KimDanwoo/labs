@@ -20,7 +20,7 @@ export function LevelCard() {
           <span className="font-display text-lg font-bold text-foreground">
             Lv.{proficiency.level} {proficiency.name}
           </span>
-          <span className="shrink-0 text-xs text-muted">
+          <span className="shrink-0 text-xs text-muted-foreground">
             {proficiency.isMax ? '최고 레벨' : `${formatVolume(proficiency.toNext ?? 0)} 남음`}
           </span>
         </div>
@@ -30,7 +30,7 @@ export function LevelCard() {
             style={{ width: `${percent}%` }}
           />
         </div>
-        <span className="text-xs text-muted">
+        <span className="text-xs text-muted-foreground">
           {proficiency.isMax
             ? `머슬킹 달성! 👑 누적 ${formatVolume(proficiency.totalVolume)}`
             : `누적 ${formatVolume(proficiency.totalVolume)} · 무게를 늘릴수록 빨리 자라요`}

@@ -34,7 +34,7 @@ export function ProfileForm({ value, onChange, showRest = false }: ProfileFormPr
         onSelect={(split) => onChange({ split })}
       />
       <div className="flex flex-col gap-sm">
-        <span className="text-sm font-medium text-muted">기본 세트 수</span>
+        <span className="text-sm font-medium text-muted-foreground">기본 세트 수</span>
         <NumberStepper
           value={value.defaultSets}
           min={SET_COUNT_MIN}

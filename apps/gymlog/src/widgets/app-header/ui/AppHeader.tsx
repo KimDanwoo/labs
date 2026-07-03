@@ -23,14 +23,14 @@ export function AppHeader({ title }: AppHeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-card-border bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-md">
-      <div className="mx-auto flex h-14 w-full max-w-content items-center gap-sm px-lg">
+      <div className="mx-auto flex h-14 w-full max-w-mobile items-center gap-sm px-lg">
         {title ? (
           <>
             <button
               type="button"
               onClick={handleBack}
               aria-label="뒤로"
-              className="-ml-sm flex size-9 shrink-0 items-center justify-center rounded-md text-muted transition-colors hover:bg-primary-subtle hover:text-foreground"
+              className="-ml-sm flex size-9 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-primary-subtle hover:text-foreground"
             >
               <BackIcon className="size-5" />
             </button>

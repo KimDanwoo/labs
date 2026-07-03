@@ -32,7 +32,7 @@ function SortableRow({ exercise, index, onRemove }: RowProps) {
       <button
         type="button"
         aria-label="순서 드래그"
-        className={`${ICON_BTN} cursor-grab touch-none text-muted active:cursor-grabbing`}
+        className={`${ICON_BTN} cursor-grab touch-none text-muted-foreground active:cursor-grabbing`}
         {...attributes}
         {...listeners}
       >
@@ -45,7 +45,7 @@ function SortableRow({ exercise, index, onRemove }: RowProps) {
       <button
         type="button"
         onClick={() => onRemove(exercise.id)}
-        className={`${ICON_BTN} text-muted hover:bg-error-subtle hover:text-error`}
+        className={`${ICON_BTN} text-muted-foreground hover:bg-error-subtle hover:text-error`}
         aria-label={`${exercise.nameKo} 제거`}
       >
         ✕
@@ -58,7 +58,7 @@ export function SelectedExerciseList({ selectedExercises, onRemove, onReorder }:
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   if (selectedExercises.length === 0) {
-    return <p className="py-3xl text-center text-sm text-muted">종목을 선택하면 여기에 표시됩니다</p>;
+    return <p className="py-3xl text-center text-sm text-muted-foreground">종목을 선택하면 여기에 표시됩니다</p>;
   }
 
   const handleDragEnd = (event: DragEndEvent) => {

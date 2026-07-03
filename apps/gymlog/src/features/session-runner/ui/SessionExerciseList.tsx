@@ -6,7 +6,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { getExerciseById } from '@entities/exercise/model/constants';
 import { PERFORMANCE_STATUS, SET_STATUS, type ExercisePerformance } from '@entities/session/model/types';
 import { MUSCLE_GROUP } from '@shared/training';
-import { Badge, type BadgeTone } from '@ui/react';
+import { Badge, type BadgeVariant } from '@ui/react';
 
 type SessionExerciseListProps = {
   performances: ExercisePerformance[];
@@ -16,10 +16,10 @@ type SessionExerciseListProps = {
   onReorder: (from: number, to: number) => void;
 };
 
-const STATUS: Record<string, { label: string; tone: BadgeTone }> = {
-  [PERFORMANCE_STATUS.done]: { label: '완료', tone: 'success' },
-  [PERFORMANCE_STATUS.active]: { label: '진행 중', tone: 'info' },
-  [PERFORMANCE_STATUS.pending]: { label: '대기', tone: 'secondary' },
+const STATUS: Record<string, { label: string; variant: BadgeVariant }> = {
+  [PERFORMANCE_STATUS.done]: { label: '완료', variant: 'success' },
+  [PERFORMANCE_STATUS.active]: { label: '진행 중', variant: 'info' },
+  [PERFORMANCE_STATUS.pending]: { label: '대기', variant: 'secondary' },
 };
 
 const resolvedCount = (performance: ExercisePerformance): number =>
@@ -59,7 +59,7 @@ function SortableRow({ id, index, performance, onOpen, onRemove, onSwap }: RowPr
       <button
         type="button"
         aria-label="순서 드래그"
-        className={`${ICON_BTN} cursor-grab touch-none text-muted active:cursor-grabbing`}
+        className={`${ICON_BTN} cursor-grab touch-none text-muted-foreground active:cursor-grabbing`}
         {...attributes}
         {...listeners}
       >
@@ -69,11 +69,11 @@ function SortableRow({ id, index, performance, onOpen, onRemove, onSwap }: RowPr
       <button type="button" onClick={() => onOpen(index)} className="flex flex-1 flex-col gap-xs text-left">
         <span className="text-base font-semibold text-foreground">{exercise?.nameKo ?? performance.exerciseId}</span>
         <span className="flex items-center gap-sm">
-          <span className="text-sm text-muted">
+          <span className="text-sm text-muted-foreground">
             {exercise ? MUSCLE_GROUP[exercise.primaryMuscle] : ''} · {resolvedCount(performance)}/
             {performance.sets.length}세트
           </span>
-          <Badge tone={status?.tone ?? 'secondary'}>{status?.label ?? '대기'}</Badge>
+          <Badge variant={status?.variant ?? 'secondary'}>{status?.label ?? '대기'}</Badge>
         </span>
       </button>
 
@@ -81,7 +81,7 @@ function SortableRow({ id, index, performance, onOpen, onRemove, onSwap }: RowPr
         type="button"
         onClick={() => onSwap(index)}
         aria-label="운동 바꾸기"
-        className={`${ICON_BTN} text-muted hover:bg-primary-subtle hover:text-primary`}
+        className={`${ICON_BTN} text-muted-foreground hover:bg-primary-subtle hover:text-primary`}
       >
         ✎
       </button>
@@ -90,7 +90,7 @@ function SortableRow({ id, index, performance, onOpen, onRemove, onSwap }: RowPr
         type="button"
         onClick={() => onRemove(index)}
         aria-label="운동 빼기"
-        className={`${ICON_BTN} text-muted hover:bg-error-subtle hover:text-error`}
+        className={`${ICON_BTN} text-muted-foreground hover:bg-error-subtle hover:text-error`}
       >
         ✕
       </button>

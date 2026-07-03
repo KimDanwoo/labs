@@ -4,8 +4,7 @@ import { getExerciseById } from '@entities/exercise/model/constants';
 import { summarizeSession } from '@entities/session/model/lib';
 import { SESSION_STATUS, type WorkoutSession } from '@entities/session/model/types';
 import { formatDuration, formatNumber, formatTime } from '@shared/lib';
-import { Badge } from '@ui/react';
-import * as Card from '@ui/react/card';
+import { Badge, Card } from '@ui/react';
 
 type SessionLogCardProps = {
   session: WorkoutSession;
@@ -25,17 +24,17 @@ export function SessionLogCard({ session }: SessionLogCardProps) {
   const extra = names.length > PREVIEW_LIMIT ? ` 외 ${names.length - PREVIEW_LIMIT}` : '';
 
   return (
-    <Card.Root>
+    <Card>
       <Card.Header>
         <Card.Title>{session.routineName}</Card.Title>
-        <Badge tone={isDone ? 'success' : 'warning'}>{isDone ? '완료' : '중단'}</Badge>
+        <Badge variant={isDone ? 'success' : 'warning'}>{isDone ? '완료' : '중단'}</Badge>
       </Card.Header>
       <Card.Description>
         {startedAt.getMonth() + 1}월 {startedAt.getDate()}일 · {formatTime(startedAt)}
       </Card.Description>
-      <Card.Body>
+      <Card.Content>
         {preview && (
-          <p className="truncate text-xs text-muted">
+          <p className="truncate text-xs text-muted-foreground">
             {preview}
             {extra}
           </p>
@@ -43,18 +42,18 @@ export function SessionLogCard({ session }: SessionLogCardProps) {
         <div className="grid grid-cols-3 gap-sm text-center">
           <div className="flex flex-col gap-xs">
             <span className="text-lg font-semibold text-foreground">{summary.completedSets}</span>
-            <span className="text-xs text-muted">세트</span>
+            <span className="text-xs text-muted-foreground">세트</span>
           </div>
           <div className="flex flex-col gap-xs">
             <span className="text-lg font-semibold text-foreground">{formatNumber(summary.totalVolumeKg)}</span>
-            <span className="text-xs text-muted">볼륨(kg)</span>
+            <span className="text-xs text-muted-foreground">볼륨(kg)</span>
           </div>
           <div className="flex flex-col gap-xs">
             <span className="text-lg font-semibold text-foreground">{formatDuration(summary.durationSec)}</span>
-            <span className="text-xs text-muted">소요</span>
+            <span className="text-xs text-muted-foreground">소요</span>
           </div>
         </div>
-      </Card.Body>
-    </Card.Root>
+      </Card.Content>
+    </Card>
   );
 }

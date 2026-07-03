@@ -3,8 +3,7 @@
 import { EXERCISES, getExerciseById } from '@entities/exercise/model/constants';
 import { ROUTINE_SOURCE, type Routine } from '@entities/routine/model/types';
 import { type Goal } from '@shared/training';
-import { Button } from '@ui/react';
-import * as Card from '@ui/react/card';
+import { Button, Card } from '@ui/react';
 import { useState } from 'react';
 import { ExercisePicker } from './ExercisePicker';
 import { GoalPicker } from './GoalPicker';
@@ -62,7 +61,7 @@ export function RoutineBuilderForm({ initialRoutine, onSubmit, hideStart }: Rout
   return (
     <div className="flex flex-col gap-lg">
       <div className="flex flex-col gap-sm">
-        <span className="text-sm font-medium text-muted">루틴 이름</span>
+        <span className="text-sm font-medium text-muted-foreground">루틴 이름</span>
         <input
           type="text"
           value={name}
@@ -72,38 +71,38 @@ export function RoutineBuilderForm({ initialRoutine, onSubmit, hideStart }: Rout
         />
       </div>
 
-      <Card.Root>
+      <Card>
         <Card.Header>
           <Card.Title>목표</Card.Title>
         </Card.Header>
-        <Card.Body>
+        <Card.Content>
           <GoalPicker goal={goal} onChange={setGoal} />
-        </Card.Body>
-      </Card.Root>
+        </Card.Content>
+      </Card>
 
-      <Card.Root>
+      <Card>
         <Card.Header>
           <Card.Title>종목 선택</Card.Title>
         </Card.Header>
-        <Card.Body>
+        <Card.Content>
           <ExercisePicker exercises={EXERCISES} selectedIds={selectedIds} onToggle={handleToggle} />
-        </Card.Body>
-      </Card.Root>
+        </Card.Content>
+      </Card>
 
       {selectedExercises.length > 0 && (
-        <Card.Root>
+        <Card>
           <Card.Header>
             <Card.Title>선택한 종목 ({selectedExercises.length})</Card.Title>
             <Card.Description>순서가 우선순위가 됩니다</Card.Description>
           </Card.Header>
-          <Card.Body>
+          <Card.Content>
             <SelectedExerciseList
               selectedExercises={selectedExercises}
               onRemove={handleRemove}
               onReorder={handleReorder}
             />
-          </Card.Body>
-        </Card.Root>
+          </Card.Content>
+        </Card>
       )}
 
       <div className="sticky bottom-0 flex flex-col gap-sm bg-linear-to-t from-background py-lg">
