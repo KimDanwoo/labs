@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@tokens/css": "workspace:*",
+    "@ui/react": "workspace:*",
     "@radix-ui/react-checkbox": "catalog:",
     "@supabase/ssr": "catalog:",
     "@supabase/supabase-js": "catalog:",

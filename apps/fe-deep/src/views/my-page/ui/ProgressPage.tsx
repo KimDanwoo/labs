@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, Progress, Badge } from '@shared/ui';
+import { Card, Progress, Badge } from '@shared/ui';
 import { BookOpen, CheckCircle, Brain, Target, Flame, Clock } from 'lucide-react';
 import { StudyHeatmap } from './StudyHeatmap';
 import { useProgressStats } from '../model';
@@ -16,7 +16,7 @@ export function ProgressPage() {
       {/* Streak & Due */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Card className="shadow-sm">
-          <CardContent className="p-5 flex items-center gap-4">
+          <Card.Content className="p-5 flex items-center gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-500/10">
               <Flame className="h-6 w-6 text-orange-500" />
             </div>
@@ -24,10 +24,10 @@ export function ProgressPage() {
               <div className="text-2xl font-bold tabular-nums">{streak}일</div>
               <div className="text-xs text-muted-foreground">연속 학습</div>
             </div>
-          </CardContent>
+          </Card.Content>
         </Card>
         <Card className="shadow-sm">
-          <CardContent className="p-5 flex items-center gap-4">
+          <Card.Content className="p-5 flex items-center gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10">
               <Clock className="h-6 w-6 text-primary" />
             </div>
@@ -35,67 +35,67 @@ export function ProgressPage() {
               <div className="text-2xl font-bold tabular-nums">{dueCount}개</div>
               <div className="text-xs text-muted-foreground">오늘 복습 대기</div>
             </div>
-          </CardContent>
+          </Card.Content>
         </Card>
       </div>
 
       {/* Study Heatmap */}
       <Card className="mb-8 shadow-sm">
-        <CardContent className="p-6">
+        <Card.Content className="p-6">
           <h2 className="text-sm font-medium mb-4">학습 기록</h2>
           <StudyHeatmap heatmap={heatmap} />
-        </CardContent>
+        </Card.Content>
       </Card>
 
       {/* Overview Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 stagger-children">
         <Card className="shadow-sm">
-          <CardContent className="p-5 text-center">
+          <Card.Content className="p-5 text-center">
             <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/10">
               <BookOpen className="h-5 w-5 text-blue-500" />
             </div>
             <div className="text-2xl font-bold tabular-nums">{stats.total}</div>
             <div className="text-xs text-muted-foreground mt-0.5">전체 문제</div>
-          </CardContent>
+          </Card.Content>
         </Card>
         <Card className="shadow-sm">
-          <CardContent className="p-5 text-center">
+          <Card.Content className="p-5 text-center">
             <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-green-500/10">
               <CheckCircle className="h-5 w-5 text-green-500" />
             </div>
             <div className="text-2xl font-bold tabular-nums">{stats.mastered}</div>
             <div className="text-xs text-muted-foreground mt-0.5">마스터</div>
-          </CardContent>
+          </Card.Content>
         </Card>
         <Card className="shadow-sm">
-          <CardContent className="p-5 text-center">
+          <Card.Content className="p-5 text-center">
             <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500/10">
               <Brain className="h-5 w-5 text-yellow-500" />
             </div>
             <div className="text-2xl font-bold tabular-nums">{stats.learning}</div>
             <div className="text-xs text-muted-foreground mt-0.5">학습 중</div>
-          </CardContent>
+          </Card.Content>
         </Card>
         <Card className="shadow-sm">
-          <CardContent className="p-5 text-center">
+          <Card.Content className="p-5 text-center">
             <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
               <Target className="h-5 w-5 text-muted-foreground" />
             </div>
             <div className="text-2xl font-bold tabular-nums">{stats.unseen}</div>
             <div className="text-xs text-muted-foreground mt-0.5">미학습</div>
-          </CardContent>
+          </Card.Content>
         </Card>
       </div>
 
       {/* Overall Progress */}
       <Card className="mb-8 shadow-sm">
-        <CardContent className="p-6">
+        <Card.Content className="p-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium">전체 진도</span>
             <span className="text-sm font-medium tabular-nums text-primary">{overallPercent}%</span>
           </div>
           <Progress value={overallPercent} className="h-2" />
-        </CardContent>
+        </Card.Content>
       </Card>
 
       {/* Category Progress */}
@@ -110,7 +110,7 @@ export function ProgressPage() {
 
           return (
             <Card key={cat.id} className="shadow-sm">
-              <CardContent className="p-4">
+              <Card.Content className="p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-xl">{cat.icon}</span>
                   <div className="flex-1 min-w-0">
@@ -133,7 +133,7 @@ export function ProgressPage() {
                     <Progress value={percent} className="h-1.5 mt-2" />
                   </div>
                 </div>
-              </CardContent>
+              </Card.Content>
             </Card>
           );
         })}

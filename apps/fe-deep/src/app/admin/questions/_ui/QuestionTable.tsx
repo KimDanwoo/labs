@@ -108,7 +108,7 @@ export function QuestionTable({
 									<td className="p-3 whitespace-nowrap">
 										{cat ? `${cat.icon} ${cat.title}` : q.category_id}
 									</td>
-									<td className="p-3 max-w-md">
+									<td className="p-3 max-w-[28rem]">
 										<span className="line-clamp-1">{q.question}</span>
 									</td>
 									<td className="p-3 whitespace-nowrap text-muted-foreground">
@@ -161,7 +161,7 @@ export function QuestionTable({
 												size="icon"
 												onClick={() => onDelete(q.id)}
 											>
-												<Trash2 className="size-4 text-destructive" />
+												<Trash2 className="size-4 text-error" />
 											</Button>
 										</div>
 									</td>
@@ -237,7 +237,7 @@ export function QuestionTable({
 										className="size-8"
 										onClick={() => onDelete(q.id)}
 									>
-										<Trash2 className="size-3.5 text-destructive" />
+										<Trash2 className="size-3.5 text-error" />
 									</Button>
 								</div>
 							</div>

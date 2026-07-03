@@ -15,7 +15,7 @@ export default function MainError({
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12 text-center animate-fade-in-up">
-      <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
+      <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-error/10">
         <span className="text-2xl">!</span>
       </div>
       <h1 className="text-3xl font-bold tracking-tight mb-3">문제가 발생했습니다</h1>
