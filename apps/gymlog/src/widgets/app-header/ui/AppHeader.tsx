@@ -1,6 +1,7 @@
 'use client';
 
 import { BackIcon } from '@shared/ui';
+import { ThemeToggle } from '@ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -41,6 +42,9 @@ export function AppHeader({ title }: AppHeaderProps) {
             gymlog
           </Link>
         )}
+        <div className="ml-auto">
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

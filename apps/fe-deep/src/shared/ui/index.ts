@@ -49,4 +49,4 @@ export {
   SheetTitle,
   SheetDescription,
 } from '@ui/react';
-export { ThemeToggle } from './ThemeToggle';
+export { ThemeToggle } from '@ui/react';
