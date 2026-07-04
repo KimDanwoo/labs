@@ -1,1 +1,0 @@
-export { DestinyResultView } from './DestinyResultView';
