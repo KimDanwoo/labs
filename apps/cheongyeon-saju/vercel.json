@@ -1,5 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm exec turbo run build --filter=cheongyeon-saju",
-  "ignoreCommand": "npx turbo-ignore cheongyeon-saju"
-}

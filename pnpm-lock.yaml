@@ -84,9 +84,6 @@ catalogs:
     '@typescript-eslint/parser':
       specifier: ^8.60.0
       version: 8.60.0
-    '@vercel/analytics':
-      specifier: ^2.0.1
-      version: 2.0.1
     '@vitejs/plugin-react':
       specifier: ^4.5.0
       version: 4.7.0
@@ -111,9 +108,6 @@ catalogs:
     eslint-plugin-boundaries:
       specifier: ^6.0.2
       version: 6.0.2
-    eslint-plugin-import-x:
-      specifier: ^4.16.2
-      version: 4.17.1
     eslint-plugin-prettier:
       specifier: ^5.5.6
       version: 5.5.6
@@ -132,9 +126,6 @@ catalogs:
     jsdom:
       specifier: ^26.1.0
       version: 26.1.0
-    korean-lunar-calendar:
-      specifier: ^0.3.6
-      version: 0.3.6
     lucide-react:
       specifier: ^0.563.0
       version: 0.563.0
@@ -302,76 +293,6 @@ importers:
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.8.3)(typescript@5.9.3)
-      tailwindcss:
-        specifier: 'catalog:'
-        version: 4.3.0
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-      vitest:
-        specifier: 'catalog:'
-        version: 4.1.9(@types/node@24.13.2)(jsdom@26.1.0)(msw@2.14.6(@types/node@24.13.2)(typescript@5.9.3))(vite@7.3.6(@types/node@24.13.2)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.22.4)(yaml@2.9.0))
-
-  apps/cheongyeon-saju:
-    dependencies:
-      '@vercel/analytics':
-        specifier: 'catalog:'
-        version: 2.0.1(next@16.2.6(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
-      jotai:
-        specifier: 'catalog:'
-        version: 2.20.1(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.15)(react@19.2.4)
-      korean-lunar-calendar:
-        specifier: 'catalog:'
-        version: 0.3.6
-      next:
-        specifier: 16.2.6
-        version: 16.2.6(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react:
-        specifier: 'catalog:'
-        version: 19.2.4
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.2.4(react@19.2.4)
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.6.0
-    devDependencies:
-      '@tailwindcss/postcss':
-        specifier: 'catalog:'
-        version: 4.3.0
-      '@types/node':
-        specifier: 'catalog:'
-        version: 24.13.2
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.15
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.2.3(@types/react@19.2.15)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
-      eslint:
-        specifier: 'catalog:'
-        version: 9.39.4(jiti@2.7.0)
-      eslint-config-next:
-        specifier: 16.2.6
-        version: 16.2.6(@typescript-eslint/parser@8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint-import-resolver-node@0.3.10)(eslint@9.39.4(jiti@2.7.0)))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@9.39.4(jiti@2.7.0))
-      eslint-plugin-import-x:
-        specifier: 'catalog:'
-        version: 4.17.1(@typescript-eslint/utils@8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint-import-resolver-node@0.3.10)(eslint@9.39.4(jiti@2.7.0))
-      eslint-plugin-prettier:
-        specifier: 'catalog:'
-        version: 5.5.6(eslint-config-prettier@10.1.8(eslint@9.39.4(jiti@2.7.0)))(eslint@9.39.4(jiti@2.7.0))(prettier@3.8.3)
-      prettier:
-        specifier: 'catalog:'
-        version: 3.8.3
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.0
@@ -569,7 +490,7 @@ importers:
         version: 9.39.4(jiti@2.7.0)
       eslint-config-next:
         specifier: 16.2.6
-        version: 16.2.6(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint-import-resolver-node@0.3.10)(eslint@9.39.4(jiti@2.7.0)))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
+        version: 16.2.6(@typescript-eslint/parser@8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint-import-resolver-node@0.3.10)(eslint@9.39.4(jiti@2.7.0)))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
       shadcn:
         specifier: 'catalog:'
         version: 3.8.5(@types/node@24.13.2)(typescript@5.9.3)
@@ -4049,35 +3970,6 @@ packages:
     peerDependencies:
       react: '>= 16.8.0'
 
-  '@vercel/analytics@2.0.1':
-    resolution: {integrity: sha512-MTQG6V9qQrt1tsDeF+2Uoo5aPjqbVPys1xvnIftXSJYG2SrwXRHnqEvVoYID7BTruDz4lCd2Z7rM1BdkUehk2g==}
-    peerDependencies:
-      '@remix-run/react': ^2
-      '@sveltejs/kit': ^1 || ^2
-      next: 16.2.6
-      nuxt: '>= 3'
-      react: ^18 || ^19 || ^19.0.0-rc
-      svelte: '>= 4'
-      vue: ^3
-      vue-router: ^4
-    peerDependenciesMeta:
-      '@remix-run/react':
-        optional: true
-      '@sveltejs/kit':
-        optional: true
-      next:
-        optional: true
-      nuxt:
-        optional: true
-      react:
-        optional: true
-      svelte:
-        optional: true
-      vue:
-        optional: true
-      vue-router:
-        optional: true
-
   '@vitejs/plugin-react@4.7.0':
     resolution: {integrity: sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -5903,10 +5795,6 @@ packages:
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
-
-  korean-lunar-calendar@0.3.6:
-    resolution: {integrity: sha512-9jpZUH8ph6GsBgIGy8al6z6OfG6TdSIDB99Zj73B35ohtG12EFj3CGE5NzjBsXFiJUUjEr08/XCjfh+flXZVPw==}
-    engines: {node: '>= 16.14.0'}
 
   language-subtag-registry@0.3.23:
     resolution: {integrity: sha512-0K65Lea881pHotoGEa5gDlMxt3pctLi2RplBb7Ezh4rRdLEOtgi7n4EwK9lamnUCkKBqaeKRVebTq6BAxSkpXQ==}
@@ -11319,11 +11207,6 @@ snapshots:
       '@use-gesture/core': 10.3.1
       react: 19.2.4
 
-  '@vercel/analytics@2.0.1(next@16.2.6(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
-    optionalDependencies:
-      next: 16.2.6(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react: 19.2.4
-
   '@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@24.13.2)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@babel/core': 7.29.7
@@ -11858,7 +11741,8 @@ snapshots:
 
   commander@7.2.0: {}
 
-  comment-parser@1.4.7: {}
+  comment-parser@1.4.7:
+    optional: true
 
   common-ancestor-path@2.0.0: {}
 
@@ -12390,6 +12274,7 @@ snapshots:
       stable-hash-x: 0.2.0
     optionalDependencies:
       unrs-resolver: 1.12.2
+    optional: true
 
   eslint-import-resolver-node@0.3.10:
     dependencies:
@@ -12477,6 +12362,7 @@ snapshots:
       eslint-import-resolver-node: 0.3.10
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@2.7.0)):
     dependencies:
@@ -13616,8 +13502,6 @@ snapshots:
   kleur@3.0.3: {}
 
   kleur@4.1.5: {}
-
-  korean-lunar-calendar@0.3.6: {}
 
   language-subtag-registry@0.3.23: {}
 
@@ -15240,7 +15124,8 @@ snapshots:
 
   space-separated-tokens@2.0.2: {}
 
-  stable-hash-x@0.2.0: {}
+  stable-hash-x@0.2.0:
+    optional: true
 
   stable-hash@0.0.5: {}
 
