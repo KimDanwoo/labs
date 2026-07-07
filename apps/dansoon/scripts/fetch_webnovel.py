@@ -15,6 +15,7 @@ import re
 import html as htmllib
 import pathlib
 from urllib.parse import quote
+from curl_cffi import requests as cffi_requests
 from playwright.sync_api import sync_playwright, Page
 from google import genai
 from google.genai import types as genai_types
@@ -401,20 +402,16 @@ def _parse_ridi_html(html: str, limit: int) -> list[dict]:
     return books[:limit]
 
 
-def _load_ridi_html(pw_page: Page, url: str, scrolls: int = 4) -> str:
-    """리디 페이지 로드 후 raw HTML 반환.
-    networkidle은 리디에서 광고/분석 트래픽 탓에 타임아웃되므로
-    domcontentloaded로 받고, 지연 로딩분은 스크롤로 채운다."""
-    pw_page.goto(url, wait_until="domcontentloaded", timeout=30000)
-    pw_page.wait_for_timeout(1500)
-    for _ in range(scrolls):
-        pw_page.mouse.wheel(0, 4000)
-        pw_page.wait_for_timeout(400)
-    return pw_page.content()
+# 리디는 Cloudflare 봇 차단(JS 챌린지)을 걸어 headless 브라우저를 막는다.
+# 실제 Chrome TLS 핑거프린트가 필요하므로 curl_cffi(impersonate)로 SSR HTML을 받는다.
+def _load_ridi_html(url: str) -> str:
+    """리디 페이지의 raw HTML 반환 (Cloudflare 우회용 Chrome 위장)."""
+    resp = cffi_requests.get(url, impersonate="chrome", timeout=20)
+    resp.raise_for_status()
+    return resp.text
 
 
 def fetch_ridi_by_genre(
-    pw_page: Page,
     limit: int = 15,
 ) -> dict[str, list[dict]]:
     """리디: 장르별 베스트셀러 SSR HTML을 직접 파싱 → dict[genre_key, items]"""
@@ -430,7 +427,7 @@ def fetch_ridi_by_genre(
         url = f"https://ridibooks.com/category/bestsellers/{cat_id}"
         try:
             print(f"  리디 [{name}] URL={url}")
-            items = _parse_ridi_html(_load_ridi_html(pw_page, url), limit)
+            items = _parse_ridi_html(_load_ridi_html(url), limit)
             for item in items:
                 item["source"] = "리디"
                 item["genre_key"] = key
@@ -880,7 +877,7 @@ def main():
 
         # 리디: 장르별 베스트셀러 SSR HTML 직접 파싱
         print("  📘 리디 장르별 수집...")
-        ridi_data = fetch_ridi_by_genre(pw_page, limit=15)
+        ridi_data = fetch_ridi_by_genre(limit=15)
         print(f"     → {sum(len(v) for v in ridi_data.values())}개 ({len(ridi_data)}장르)\n")
 
         # 카카오페이지: 장르별 직접 수집 + 작가명 추출
