@@ -38,7 +38,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install Python dependencies
-        run: pip install google-genai playwright
+        run: pip install curl_cffi google-genai playwright
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
