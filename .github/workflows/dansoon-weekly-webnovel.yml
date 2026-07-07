@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -54,19 +55,19 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
-      - name: Commit and push branch
+      - name: Commit, open PR, and merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BRANCH="feature/${{ steps.date.outputs.date }}-webnovel"
+          TITLE='✨ feat(${{ steps.date.outputs.date }}): 주간 웹소설 베스트셀러 추가'
           git add apps/dansoon/contents/
           if git diff --cached --quiet; then
             echo "생성된 변경이 없어 종료합니다."
             exit 0
           fi
           git switch -c "$BRANCH"
-          git commit -m '✨ feat(${{ steps.date.outputs.date }}): 주간 웹소설 베스트셀러 추가'
+          git commit -m "$TITLE"
           git push -f origin "$BRANCH"
-          {
-            echo "### 🌱 브랜치 푸시 완료"
-            echo ""
-            echo "PR 열기: https://github.com/${{ github.repository }}/pull/new/$BRANCH"
-          } >> "$GITHUB_STEP_SUMMARY"
+          gh pr create --base main --head "$BRANCH" --title "$TITLE" --body '자동 생성된 주간 웹소설 베스트셀러입니다.'
+          gh pr merge "$BRANCH" --squash --delete-branch
