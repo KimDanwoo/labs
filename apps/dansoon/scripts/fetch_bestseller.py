@@ -8,6 +8,7 @@ import re
 import html as htmllib
 import pathlib
 import requests
+from curl_cffi import requests as cffi_requests
 from playwright.sync_api import sync_playwright, Page
 from google import genai
 from google.genai import types as genai_types
@@ -415,9 +416,17 @@ def _parse_ridi_html(html: str, genre_key: str, limit: int) -> list[dict]:
     return books[:limit]
 
 
-def fetch_ridi_by_genre(pw_page: Page, limit: int = 10) -> dict[str, list[dict]]:
+# 리디는 Cloudflare 봇 차단(JS 챌린지)을 걸어 headless 브라우저를 막는다.
+# 실제 Chrome TLS 핑거프린트가 필요하므로 curl_cffi(impersonate)로 SSR HTML을 받는다.
+def _fetch_ridi_html(url: str) -> str:
+    resp = cffi_requests.get(url, impersonate="chrome", timeout=20)
+    resp.raise_for_status()
+    return resp.text
+
+
+def fetch_ridi_by_genre(limit: int = 10) -> dict[str, list[dict]]:
     """리디: 일반도서 장르별 베스트셀러 SSR HTML을 직접 파싱.
-    networkidle은 리디에서 타임아웃되므로 domcontentloaded + 스크롤 사용."""
+    Cloudflare 챌린지 탓에 Playwright headless는 차단되므로 curl_cffi로 받는다."""
     result: dict[str, list[dict]] = {}
 
     for genre in GENRES:
@@ -429,12 +438,7 @@ def fetch_ridi_by_genre(pw_page: Page, limit: int = 10) -> dict[str, list[dict]]
         url = f"https://ridibooks.com/category/bestsellers/{cat_id}"
         try:
             print(f"  리디 [{genre['name']}] URL={url}")
-            pw_page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            pw_page.wait_for_timeout(1500)
-            for _ in range(3):
-                pw_page.mouse.wheel(0, 4000)
-                pw_page.wait_for_timeout(400)
-            items = _parse_ridi_html(pw_page.content(), key, limit)
+            items = _parse_ridi_html(_fetch_ridi_html(url), key, limit)
             if items:
                 result[key] = items
                 authors = sum(1 for it in items if it["author"])
@@ -590,7 +594,7 @@ def main():
         print(f"     → {len(yes24_items)}개")
 
         print("  📱 리디 장르별 수집...")
-        ridi_by_genre = fetch_ridi_by_genre(pw_page, limit=10)
+        ridi_by_genre = fetch_ridi_by_genre(limit=10)
         ridi_items = [b for items in ridi_by_genre.values() for b in items]
         print(f"     → {len(ridi_items)}개 ({len(ridi_by_genre)}장르)")
 
