@@ -1,8 +1,11 @@
 /**
  * 여백 토큰 — padding/margin/gap 등에 쓰이는 스케일 맵.
+ *
+ * ⚠️ `none` 키 금지: `--spacing-none`을 정의하면 Tailwind v4가 `none`을 spacing 값으로
+ * 등록해 `max-w-none`이 `max-width: var(--spacing-none)`(=0)로 재생성되어 코어의
+ * `max-width: none`(제한 없음)을 덮어쓴다 → 폭 붕괴. 0 여백은 `-0` 유틸을 쓴다.
  */
 export const spacing = {
-  none: '0px',
   xs: '4px',
   sm: '8px',
   md: '16px',
