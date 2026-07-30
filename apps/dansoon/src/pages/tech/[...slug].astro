@@ -156,9 +156,11 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
     -webkit-overflow-scrolling: touch;
   }
 
+  /* max-content는 셀을 절대 줄바꿈하지 않아, 긴 제목 하나로 표가 컨테이너를 넘어간다.
+     넓어진 폭을 실제로 쓰려면 컨테이너를 채우고 셀이 줄바꿈되게 해야 한다. */
   .article-body :global(table) {
-    width: max-content;
-    min-width: 100%;
+    width: 100%;
+    min-width: var(--table-min-width);
     border-collapse: collapse;
     font-size: 0.9rem;
   }
@@ -177,6 +179,17 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
     border: 1px solid var(--border);
     padding: 0.55rem 0.9rem;
     color: var(--text-secondary);
+    /* 한글은 어절 단위로 끊고, 끊을 수 없는 긴 문자열만 강제 줄바꿈 */
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* 순위·서점 순위처럼 짧은 숫자 칸은 넓어진 폭을 차지하지 않게 눌러둔다 */
+  .article-body :global(th:first-child),
+  .article-body :global(td:first-child) {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
   }
 
   .article-body :global(tr:nth-child(even) td) {
