@@ -1,6 +1,6 @@
 import os
+import re
 import sys
-import json
 import pathlib
 import requests
 import google.generativeai as genai
@@ -26,16 +26,29 @@ DEV_KEYWORDS = [
     "microservice", "serverless", "wasm", "webassembly", "cli", "terminal",
     "ide", "editor", "vscode", "neovim", "git", "version control", "deploy",
     "infra", "infrastructure", "networking", "protocol", "http", "tcp", "dns",
-    "browser", "v8", "webkit", "react", "vue", "svelte", "next", "astro",
+    "browser", "v8", "webkit", "react", "vue", "svelte", "next.js", "astro",
     "llama", "gpt", "claude", "gemini", "chatgpt", "openai", "anthropic",
     "tooling", "debugging", "profiling", "testing", "oss", "release", "sdk",
 ]
 
 
+def _build_keyword_pattern(keywords: list[str]) -> re.Pattern[str]:
+    """단어 경계를 붙여 컴파일. 부분 문자열 매칭이면 "ai"가 Ukraine·chairs·Email에,
+    "go"가 algorithm에 걸려 필터가 사실상 무력화된다."""
+    parts = []
+    for keyword in keywords:
+        prefix = r"\b" if keyword[0].isalnum() else ""
+        suffix = r"\b" if keyword[-1].isalnum() else ""
+        parts.append(f"{prefix}{re.escape(keyword)}{suffix}")
+    return re.compile("|".join(parts), re.IGNORECASE)
+
+
+DEV_KEYWORD_PATTERN = _build_keyword_pattern(DEV_KEYWORDS)
+
+
 def is_dev_related(title: str) -> bool:
     """제목이 개발/기술 관련인지 확인합니다."""
-    title_lower = title.lower()
-    return any(kw in title_lower for kw in DEV_KEYWORDS)
+    return bool(DEV_KEYWORD_PATTERN.search(title))
 
 
 def fetch_hn_top_stories(limit: int = 5) -> list[dict]:
@@ -111,6 +124,10 @@ def main():
     stories = fetch_hn_top_stories(limit=5)
     print(f"  → {len(stories)}개 수집 완료")
 
+    if not stories:
+        print("❌ 수집된 기사가 없습니다. 파일을 생성하지 않고 종료합니다.")
+        sys.exit(1)
+
     print("Gemini로 요약 생성 중...")
     summary = summarize_with_gemini(stories)
 
@@ -123,15 +140,16 @@ def main():
     output_dir = pathlib.Path("contents/tech") / slug
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    count = len(stories)
     frontmatter = f"""---
-title: "오늘의 테크 뉴스 TOP 5 ({date_kr})"
+title: "오늘의 테크 뉴스 TOP {count} ({date_kr})"
 date: {DATE}
-description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 5가지를 AI가 정리했습니다."
+description: "오늘 Hacker News에서 가장 주목받은 테크 뉴스 {count}가지를 AI가 정리했습니다."
 category: "news"
 isHidden: false
 ---
 
-## 오늘의 테크 뉴스 TOP 5
+## 오늘의 테크 뉴스 TOP {count}
 
 ---
 
