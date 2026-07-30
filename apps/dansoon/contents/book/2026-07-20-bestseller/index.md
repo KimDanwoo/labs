@@ -18,7 +18,7 @@ isHidden: true
 | **6** | [나의 첫 번째 부동산 교과서](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=394433203&amp;partner=openAPI&amp;start=api) | 송희구 | 경제경영 | 16위 | 5위 | 13위 | - |
 | **7** | [오늘 단 2시간만](https://ridibooks.com/books/3414000104) | 이마이 다카시 | 자기계발 | - | - | - | 2위 |
 | **8** | [말하지 않고 말하기](https://ridibooks.com/books/222003881) | 김정운 | 자기계발 | - | - | - | 6위 |
-| **9** | [개정판 | 빅터 프랭클의 죽음의 수용소에서](https://ridibooks.com/books/969000280) | 빅터 프랭클 | 인문사회 | - | - | - | 1위 |
+| **9** | [개정판 \| 빅터 프랭클의 죽음의 수용소에서](https://ridibooks.com/books/969000280) | 빅터 프랭클 | 인문사회 | - | - | - | 1위 |
 | **10** | [내면 근력](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001) | 짐 머피 | 자기계발 | - | - | 12위 | 2위 |
 | **11** | [프로젝트 헤일메리](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001) | 앤디 위어 | 소설 | - | - | 16위 | 7위 |
 | **12** | [혼자 남아도 외로워하지 말 것](https://ridibooks.com/books/5322000003) | 경민선 | 소설 | - | - | - | 1위 |
@@ -85,7 +85,7 @@ isHidden: true
 | 순위 | 책 | 저자 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:------:|:-------:|:-----:|:----:|
 | **1** | [마음이 단단해지는 하루 한 문장 일본어 필사](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397217574&amp;partner=openAPI&amp;start=api) | 안은미 | 1위 | - | - | - |
-| **2** | [개정판 | 빅터 프랭클의 죽음의 수용소에서](https://ridibooks.com/books/969000280) | 빅터 프랭클 | - | - | - | 1위 |
+| **2** | [개정판 \| 빅터 프랭클의 죽음의 수용소에서](https://ridibooks.com/books/969000280) | 빅터 프랭클 | - | - | - | 1위 |
 | **3** | [콩팥 대회복](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397822060&amp;partner=openAPI&amp;start=api) | 고즈키 마사히로 | 2위 | - | - | - |
 | **4** | [유럽 도시 기행 3 마드리드, 바르셀로나, 리스본, 뽀르투 편](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001) | 유시민 | - | - | 2위 | - |
 | **5** | [오늘 단 2시간만](https://ridibooks.com/books/3414000104) | 이마이 다카시 | - | - | - | 2위 |
