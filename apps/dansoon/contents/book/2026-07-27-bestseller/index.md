@@ -16,7 +16,7 @@ isHidden: true
 | **4** | [질문의 격](https://ridibooks.com/books/3901000036) | 유선경 | 자기계발 | - | - | - | 4위 |
 | **5** | [유럽 도시 기행 3](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397155927&amp;partner=openAPI&amp;start=api) | 유시민 | 소설 | 1위 | 5위 | - | - |
 | **6** | [독하게 돈 공부](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397270202&amp;partner=openAPI&amp;start=api) | 박소연 | 경제경영 | 8위 | - | - | 1위 |
-| **7** | [개정판 | 빅터 프랭클의 죽음의 수용소에서](https://ridibooks.com/books/969000280) | 빅터 프랭클 | 인문사회 | - | - | - | 2위 |
+| **7** | [개정판 \| 빅터 프랭클의 죽음의 수용소에서](https://ridibooks.com/books/969000280) | 빅터 프랭클 | 인문사회 | - | - | - | 2위 |
 | **8** | [어떻게 살아낼 것인가](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397822311&amp;partner=openAPI&amp;start=api) | 짐 콜린스 | 자기계발 | 10위 | 7위 | - | - |
 | **9** | [내면 근력](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001) | 짐 머피 | 자기계발 | - | - | 15위 | 4위 |
 | **10** | [코스모스 (100만 부 기념판)](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396765073&amp;partner=openAPI&amp;start=api) | 칼 세이건 | 소설 | 12위 | 8위 | - | - |
@@ -93,7 +93,7 @@ isHidden: true
 | **2** | [새는 날아가면서 뒤돌아보지 않는다](https://ridibooks.com/books/754020384) | 류시화 | - | - | - | 1위 |
 | **3** | [머도쿠](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=395486703&amp;partner=openAPI&amp;start=api) | 마누엘 가란드 | 2위 | - | - | - |
 | **4** | [유럽 도시 기행 3 마드리드, 바르셀로나, 리스본, 뽀르투 편 [ 인쇄 사인본 (초판 한정) ]](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001) | 유시민 | - | - | 2위 | - |
-| **5** | [개정판 | 빅터 프랭클의 죽음의 수용소에서](https://ridibooks.com/books/969000280) | 빅터 프랭클 | - | - | - | 2위 |
+| **5** | [개정판 \| 빅터 프랭클의 죽음의 수용소에서](https://ridibooks.com/books/969000280) | 빅터 프랭클 | - | - | - | 2위 |
 
 
 ---
