@@ -57,7 +57,7 @@ const isBookPage = Astro.url.pathname.startsWith('/book');
     <div id="scroll-sentinel" class="absolute top-0 h-0 w-full pointer-events-none"></div>
 
     <header id="main-header" class="site-header sticky top-0 z-[9999] w-full">
-      <div class="max-w-[800px] mx-auto flex items-center px-5 h-14 sm:h-16 gap-5">
+      <div class="max-w-[var(--content-width)] mx-auto flex items-center px-5 h-14 sm:h-16 gap-5">
         <a class="header-logo mr-auto" href={isBookPage ? '/book' : '/'}> Dansoon </a>
         <nav class="flex items-center gap-5">
           {
@@ -120,13 +120,13 @@ const isBookPage = Astro.url.pathname.startsWith('/book');
       </div>
     </header>
 
-    <main class="flex-1 max-w-[800px] w-full mx-auto px-5 py-8 sm:py-12" style="view-transition-name: main-content">
+    <main class="flex-1 max-w-[var(--content-width)] w-full mx-auto px-5 py-8 sm:py-12" style="view-transition-name: main-content">
       <slot />
     </main>
 
     <footer class="site-footer">
       <div
-        class="max-w-[800px] mx-auto px-5 py-8 flex items-center justify-between text-sm"
+        class="max-w-[var(--content-width)] mx-auto px-5 py-8 flex items-center justify-between text-sm"
         style="color: var(--text-muted)"
       >
         <span>© {new Date().getFullYear()} <a class="footer-link" href="https://github.com/KimDanwoo">Danwoo</a></span>

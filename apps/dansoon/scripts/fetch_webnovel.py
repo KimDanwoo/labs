@@ -39,6 +39,23 @@ GENRES = [
 GENRE_KR_TO_KEY = {g["name"]: g["key"] for g in GENRES}
 GENRE_KEY_TO_NAME = {g["key"]: g["name"] for g in GENRES}
 
+# 페이지 텍스트를 Gemini로 추출하면 UI 문구가 작품·작가로 새어 들어온다.
+# (실제 사례: 제목 "카카오페이지 등장", 작가 "작품 보러가기 >")
+_UI_NOISE_EXACT = frozenset({
+    "카카오페이지", "카카오페이지 등장", "네이버 시리즈", "리디", "리디북스",
+    "전체보기", "더보기", "미리보기", "첫화보기", "첫화 보기", "작품 보러가기",
+    "이벤트", "랭킹", "베스트", "신작", "완결", "무료", "웹툰", "웹소설",
+    "로그인", "선물함", "공지사항", "실시간", "일간", "주간", "월간",
+})
+_UI_NOISE_SUBSTR = ("보러가기", "바로가기", "전체보기", "더보기")
+
+
+def _is_ui_noise(text: str) -> bool:
+    stripped = text.strip().strip("›»>→ \t")
+    if not stripped or stripped in _UI_NOISE_EXACT:
+        return True
+    return any(marker in stripped for marker in _UI_NOISE_SUBSTR)
+
 # 네이버 시리즈 장르별 categoryCode (숫자)
 # URL: /novel/top100List.series?rankingTypeCode=DAILY&categoryCode=XXX
 NAVER_CATEGORY_CODES: dict[str, int] = {
@@ -617,7 +634,7 @@ def fetch_platform_all_genres(
         items = []
         for item in raw_items:
             title = str(item.get("title", "")).strip()
-            if not title or len(title) < 2:
+            if not title or len(title) < 2 or _is_ui_noise(title):
                 continue
             link = _lookup_link(title, title_to_url)
             if not link and source_name == "카카오페이지":
@@ -625,7 +642,7 @@ def fetch_platform_all_genres(
             elif not link:
                 link = ""
             author = str(item.get("author", "")).strip()
-            if author.lower() in ("none", "null", "n/a", "없음", "미상", "unknown"):
+            if author.lower() in ("none", "null", "n/a", "없음", "미상", "unknown") or _is_ui_noise(author):
                 author = ""
             items.append({
                 "rank": len(items) + 1,
@@ -644,10 +661,12 @@ def fetch_platform_all_genres(
 
 
 # ── 장르별 플랫폼 데이터 통합 ───────────────────────────────
+MAX_RANK = 15
+
+
 def merge_genre_data(
     *platform_data: dict[str, list[dict]],
     top_n: int = 10,
-    MAX_RANK: int = 15,
 ) -> dict[str, list[dict]]:
     """여러 플랫폼의 장르별 데이터를 통합해 장르 내 순위 산출"""
     def normalize(t: str) -> str:
@@ -665,7 +684,6 @@ def merge_genre_data(
                 if not item.get("title"):
                     continue
                 nkey = normalize(item["title"])
-                pts = max(0, MAX_RANK + 1 - item["rank"])
                 if nkey not in scores:
                     scores[nkey] = {
                         "title": item["title"],
@@ -676,14 +694,26 @@ def merge_genre_data(
                         "sources": {},
                         "genre_key": key,
                     }
-                scores[nkey]["score"] += pts
-                scores[nkey]["sources"][item["source"]] = item["rank"]
-                # 링크 없으면 다른 플랫폼 링크로 업데이트
-                if not scores[nkey]["link"] and item.get("link"):
-                    scores[nkey]["link"] = item["link"]
+                novel = scores[nkey]
+                # 한 플랫폼에 같은 작품이 두 번 잡히면 더 높은(작은) 순위만 남긴다.
+                # 순위를 덮어쓰거나 점수를 이중 가산하지 않기 위함이다.
+                best_rank = novel["sources"].get(item["source"])
+                if best_rank is None or item["rank"] < best_rank:
+                    novel["sources"][item["source"]] = item["rank"]
+                # 작가·링크는 먼저 확보된 값을 쓰고, 비어 있으면 다른 플랫폼 값으로 채운다
+                if not novel["author"] and item.get("author"):
+                    novel["author"] = item["author"]
+                if not novel["link"] and item.get("link"):
+                    novel["link"] = item["link"]
 
         if scores:
-            ranked = sorted(scores.values(), key=lambda x: x["score"], reverse=True)
+            for novel in scores.values():
+                # 점수는 플랫폼별 최종 순위에서 한 번만 계산한다
+                novel["score"] = sum(max(0, MAX_RANK + 1 - r) for r in novel["sources"].values())
+            ranked = sorted(
+                scores.values(),
+                key=lambda n: (-n["score"], -len(n["sources"]), min(n["sources"].values())),
+            )
             for i, novel in enumerate(ranked[:top_n], start=1):
                 novel["rank"] = i
             genre_result[key] = ranked[:top_n]
@@ -740,18 +770,31 @@ _PLATFORM_TABS = [
 
 _BASE_URLS = {"https://page.kakao.com", "https://series.naver.com", "https://ridibooks.com"}
 
+# 리디는 통합 순위 품질을 위해 15개까지 수집하지만, 탭마다 행 수가 다르면
+# 플랫폼 간 비교가 어긋나 보이므로 표시는 공통 개수로 맞춘다.
+PLATFORM_TAB_ROWS = 10
+
+def _safe_link(link: str) -> str:
+    """플랫폼 도메인의 http(s) URL만 허용. javascript: 등 스킴 주입을 막는다."""
+    if not link or link in _BASE_URLS:
+        return ""
+    if not any(link.startswith(base) for base in _BASE_URLS):
+        return ""
+    return htmllib.escape(link, quote=True)
+
+
 def _platform_table_html(books: list[dict]) -> str:
     if not books:
         return '<p class="ptab-empty">데이터 없음</p>'
 
     def _row(b: dict) -> str:
-        link = b.get("link", "")
-        # 메인 페이지 URL이면 링크 제거 (개별 작품 링크가 아님)
-        if link in _BASE_URLS:
-            link = ""
-        title_html = f'<a href="{link}">{b["title"]}</a>' if link else b["title"]
-        author = b.get("author", "")
-        return f'<tr><td><strong>{b["rank"]}</strong></td><td>{title_html}</td><td>{author}</td></tr>'
+        # 제목·작가는 외부 페이지에서 스크랩한 값이라 그대로 넣으면 마크업이 깨지거나
+        # 스크립트가 주입된다(이 MD는 원시 HTML로 렌더된다). 반드시 이스케이프한다.
+        title = htmllib.escape(b["title"])
+        author = htmllib.escape(b.get("author", ""))
+        link = _safe_link(b.get("link", ""))
+        title_html = f'<a href="{link}">{title}</a>' if link else title
+        return f'<tr><td><strong>{int(b["rank"])}</strong></td><td>{title_html}</td><td>{author}</td></tr>'
 
     rows = "".join(_row(b) for b in books)
     return (
@@ -777,7 +820,7 @@ def build_markdown(
         key = genre["key"]
         # 하나라도 데이터 있는 플랫폼이 있어야 섹션 생성
         plat_books = {
-            p["key"]: platform_data.get(p["key"], {}).get(key, [])
+            p["key"]: platform_data.get(p["key"], {}).get(key, [])[:PLATFORM_TAB_ROWS]
             for p in _PLATFORM_TABS
         }
         if not any(plat_books.values()):
