@@ -1,8 +1,8 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  --background: #F8F4FF;
-  --foreground: #2D2B3A;
+  --background: #f8f4ff;
+  --foreground: #2d2b3a;
   --surface: rgba(255, 255, 255, 0.85);
   --surface-hover: rgba(255, 255, 255, 0.92);
   --surface-strong: rgba(255, 255, 255, 0.95);
@@ -23,20 +23,20 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-gowun-dodum), sans-serif;
   --font-mono: var(--font-geist-mono);
-  --color-pink: #FF6B9D;
-  --color-blue: #4A90D9;
-  --color-red: #FF4444;
-  --color-yellow: #FFD93D;
-  --color-green: #4ADE80;
-  --color-gauge-hunger: #FFB347;
-  --color-gauge-clean: #7EC8E3;
-  --color-gauge-heart: #FF8FAB;
-  --color-gold: #D8A93B;
-  --color-gold-bright: #F0C766;
+  --color-pink: #ff6b9d;
+  --color-blue: #4a90d9;
+  --color-red: #ff4444;
+  --color-yellow: #ffd93d;
+  --color-green: #4ade80;
+  --color-gauge-hunger: #ffb347;
+  --color-gauge-clean: #7ec8e3;
+  --color-gauge-heart: #ff8fab;
+  --color-gold: #d8a93b;
+  --color-gold-bright: #f0c766;
   --color-card-bg: rgba(255, 255, 255, 0.85);
   --color-card-border: rgba(0, 0, 0, 0.08);
   --color-input-bg: rgba(255, 255, 255, 0.65);
-  --color-muted: #8C8799;
+  --color-muted: #8c8799;
 }
 
 /* ===== 기본 ===== */
@@ -80,10 +80,18 @@ body {
   border: 1px solid var(--border-strong);
 }
 
-.shadow-game-sm { box-shadow: var(--shadow-sm); }
-.shadow-game-md { box-shadow: var(--shadow-md); }
-.shadow-game-lg { box-shadow: var(--shadow-lg); }
-.shadow-game-glow { box-shadow: var(--shadow-glow); }
+.shadow-game-sm {
+  box-shadow: var(--shadow-sm);
+}
+.shadow-game-md {
+  box-shadow: var(--shadow-md);
+}
+.shadow-game-lg {
+  box-shadow: var(--shadow-lg);
+}
+.shadow-game-glow {
+  box-shadow: var(--shadow-glow);
+}
 
 /* ===== 픽셀아트 렌더링 ===== */
 .pixel-art {
@@ -99,7 +107,10 @@ body {
 
 /* ===== 버튼 시스템 ===== */
 .btn-press {
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
   cursor: pointer;
 }
 
@@ -119,7 +130,9 @@ body {
   border-radius: var(--radius-md);
   padding: 12px 24px;
   box-shadow: var(--shadow-md);
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
 }
 
 .btn-primary:active {
@@ -133,9 +146,11 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   font-weight: 600;
-  color: #9CA3AF;
+  color: #9ca3af;
   padding: 12px 24px;
-  transition: transform 0.15s ease, background 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease;
 }
 
 .btn-ghost:hover {
@@ -144,6 +159,25 @@ body {
 
 .btn-ghost:active {
   transform: scale(0.94);
+}
+
+/* 고급 골드 버튼: 그라디언트 + 은은한 글로우 (btn-press 와 함께 사용) */
+.btn-gold {
+  color: #fff;
+  background-image: linear-gradient(135deg, var(--color-gold-bright), var(--color-gold));
+  box-shadow:
+    0 2px 8px rgba(216, 169, 59, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.btn-gold:disabled {
+  filter: saturate(0.5);
+}
+
+/* 아기자기한 아바타: 골드→핑크 파스텔 그라디언트 + 안쪽 하이라이트 */
+.avatar-soft {
+  background-image: linear-gradient(140deg, rgba(240, 199, 102, 0.28), rgba(255, 107, 157, 0.18));
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 /* ===== 카드 시스템 ===== */
@@ -173,10 +207,12 @@ body {
 }
 
 .modal-content {
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: var(--radius-xl);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.14), 0 8px 16px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.14),
+    0 8px 16px rgba(0, 0, 0, 0.08);
 }
 
 /* 바텀시트 모달 (FeedModal, ShopModal) */
@@ -186,10 +222,32 @@ body {
   border-bottom: none;
 }
 
+/* 모달 안 인터랙티브 요소 키보드 포커스 링 (마우스 클릭엔 안 뜸) */
+.modal-content :focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* 모션 최소화 선호 시 애니메이션 비활성화 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ===== 애니메이션 ===== */
 @keyframes bounce-walk {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .walking {
@@ -197,8 +255,13 @@ body {
 }
 
 @keyframes idle-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.03); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
 }
 
 .idle {
@@ -206,8 +269,15 @@ body {
 }
 
 @keyframes sleep-float {
-  0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
-  50% { opacity: 1; transform: translateY(-12px) scale(1); }
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-12px) scale(1);
+  }
 }
 
 .sleep-z {
@@ -215,9 +285,15 @@ body {
 }
 
 @keyframes poop-pop {
-  0% { transform: scale(0); }
-  70% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .poop-appear {
@@ -225,8 +301,14 @@ body {
 }
 
 @keyframes heart-float {
-  0% { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(-40px) scale(1.5); }
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(1.5);
+  }
 }
 
 .heart-effect {
@@ -234,9 +316,15 @@ body {
 }
 
 @keyframes character-jump {
-  0% { transform: translateY(0); }
-  40% { transform: translateY(-22%); }
-  100% { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-22%);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .character-jump {
@@ -244,8 +332,14 @@ body {
 }
 
 @keyframes fade-out-soul {
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-60px); }
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px);
+  }
 }
 
 .death-animation {
@@ -253,9 +347,16 @@ body {
 }
 
 @keyframes egg-shake {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-10deg); }
-  75% { transform: rotate(10deg); }
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
 }
 
 .egg-shake {
@@ -263,17 +364,41 @@ body {
 }
 
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.3s ease-out;
+  animation: fade-in-up 0.3s ease-out both;
+}
+
+@keyframes soft-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-soft-float {
+  animation: soft-float 2.8s ease-in-out infinite;
 }
 
 @keyframes slide-up {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .animate-slide-up {
@@ -281,8 +406,14 @@ body {
 }
 
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .animate-scale-in {
@@ -290,8 +421,14 @@ body {
 }
 
 @keyframes scale-out {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.9); }
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
 }
 
 .animate-scale-out {
@@ -299,8 +436,12 @@ body {
 }
 
 @keyframes slide-down {
-  from { transform: translateY(0); }
-  to { transform: translateY(100%); }
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
 }
 
 .animate-slide-down {
@@ -308,8 +449,12 @@ body {
 }
 
 @keyframes overlay-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-overlay-in {
@@ -317,8 +462,12 @@ body {
 }
 
 @keyframes overlay-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 .animate-overlay-out {
@@ -326,9 +475,18 @@ body {
 }
 
 @keyframes run-countdown-pop {
-  0% { opacity: 0; transform: scale(0.4); }
-  20% { opacity: 1; transform: scale(1.25); }
-  100% { opacity: 0; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
 }
 
 .run-countdown-pop {
@@ -336,22 +494,42 @@ body {
 }
 
 @keyframes run-pickup-text {
-  0% { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(-26px) scale(1.4); }
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(1.4);
+  }
 }
 
 .run-pickup-text {
   font-size: 13px;
   font-weight: 800;
   color: #ec4899;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
   animation: run-pickup-text 0.7s ease-out forwards;
 }
 
 @keyframes run-field-shake {
-  0%, 100% { transform: translate(0, 0); }
-  10%, 30%, 50%, 70%, 90% { transform: translate(-3px, 1px); }
-  20%, 40%, 60%, 80% { transform: translate(3px, -1px); }
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translate(-3px, 1px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translate(3px, -1px);
+  }
 }
 
 .run-field-shake {
@@ -359,8 +537,12 @@ body {
 }
 
 @keyframes run-collision-flash {
-  0% { opacity: 0.7; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .run-collision-flash {
@@ -368,9 +550,18 @@ body {
 }
 
 @keyframes run-score-pulse {
-  0% { transform: scale(1); color: #ec4899; }
-  40% { transform: scale(1.3); color: #f43f5e; }
-  100% { transform: scale(1); color: #ec4899; }
+  0% {
+    transform: scale(1);
+    color: #ec4899;
+  }
+  40% {
+    transform: scale(1.3);
+    color: #f43f5e;
+  }
+  100% {
+    transform: scale(1);
+    color: #ec4899;
+  }
 }
 
 .run-score-pulse {
@@ -380,22 +571,28 @@ body {
 }
 
 @keyframes run-ground-scroll {
-  from { background-position-x: 0; }
-  to { background-position-x: -24px; }
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -24px;
+  }
 }
 
 .run-ground-stripes {
-  background-image: repeating-linear-gradient(
-    90deg,
-    rgba(16, 185, 129, 0.28) 0 2px,
-    transparent 2px 24px
-  );
+  background-image: repeating-linear-gradient(90deg, rgba(16, 185, 129, 0.28) 0 2px, transparent 2px 24px);
   animation: run-ground-scroll 0.45s linear infinite;
 }
 
 @keyframes catch-float-up {
-  0% { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(-24px) scale(1.4); }
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) scale(1.4);
+  }
 }
 
 .catch-float {
@@ -414,8 +611,12 @@ body {
 }
 
 @keyframes catch-bad-flash {
-  0% { opacity: 0.7; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .catch-bad-flash {
@@ -423,9 +624,18 @@ body {
 }
 
 @keyframes catch-combo-pop {
-  0% { transform: scale(0.6); opacity: 0; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .catch-combo-pop {

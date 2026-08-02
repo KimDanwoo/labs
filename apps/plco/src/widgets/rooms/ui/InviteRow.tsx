@@ -10,11 +10,7 @@ type InviteRowProps = {
   onAccepted: (roomId: string) => void;
 };
 
-export default function InviteRow({
-  invite,
-  defaultNickname,
-  onAccepted,
-}: InviteRowProps) {
+export default function InviteRow({ invite, defaultNickname, onAccepted }: InviteRowProps) {
   const { accept, decline } = useRespondInvite();
 
   const handleAccept = () => {
@@ -32,16 +28,15 @@ export default function InviteRow({
   };
 
   return (
-    <li className="flex items-center justify-between rounded-xl bg-white px-3 py-2.5 shadow-game-sm">
-      <p className="min-w-0 flex-1 truncate text-sm text-gray-700">
-        채팅방 초대가 왔어요
-      </p>
-      <div className="ml-2 flex shrink-0 gap-1.5">
+    <li className="flex items-center gap-3 rounded-2xl bg-white px-3 py-2.5 shadow-game-sm">
+      <span className="avatar-soft flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg">✉️</span>
+      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-gray-700">채팅방 초대가 왔어요</p>
+      <div className="flex shrink-0 gap-1.5">
         <button
           type="button"
           onClick={handleDecline}
           disabled={decline.isPending}
-          className="rounded-full border border-card-border px-3 py-1 text-xs font-bold text-gray-500 btn-press disabled:opacity-40"
+          className="rounded-full border border-card-border px-3 py-1.5 text-xs font-bold text-gray-500 btn-press disabled:opacity-40"
         >
           거절
         </button>
@@ -49,7 +44,7 @@ export default function InviteRow({
           type="button"
           onClick={handleAccept}
           disabled={accept.isPending}
-          className="rounded-full bg-gold px-3 py-1 text-xs font-bold text-white btn-press shadow-game-sm disabled:opacity-40"
+          className="btn-gold rounded-full px-3 py-1.5 text-xs font-bold btn-press disabled:opacity-40"
         >
           수락
         </button>
