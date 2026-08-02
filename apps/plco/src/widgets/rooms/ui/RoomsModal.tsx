@@ -1,19 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { useSetAtom } from 'jotai';
-import { ModalShell } from '@shared/ui';
-import { useGameActions } from '@entities/game/model/hooks';
+import { useDeleteRoom, useJoinRoom, useMyInvites, useMyRooms, usePublicRooms } from '@entities/chat-room/model/hooks';
 import { activeRoomAtom } from '@entities/chat-room/model/store';
-import {
-  useJoinRoom,
-  useMyInvites,
-  useMyRooms,
-  usePublicRooms,
-} from '@entities/chat-room/model/hooks';
 import type { Room } from '@entities/chat-room/model/types';
+import { useGameActions } from '@entities/game/model/hooks';
 import { useChatIdentity } from '@features/chat/model/hooks';
 import { ChatLoginGate } from '@features/chat/ui';
+import { ModalShell } from '@shared/ui';
+import { useAtom } from 'jotai';
+import { useState } from 'react';
 import CreateRoomDialog from './CreateRoomDialog';
 import IncomingInvites from './IncomingInvites';
 import MyRoomsList from './MyRoomsList';
@@ -27,9 +22,16 @@ const ROOMS_TAB = {
 } as const;
 type RoomsTab = (typeof ROOMS_TAB)[keyof typeof ROOMS_TAB];
 
+const ROOMS_TABS = [
+  { key: ROOMS_TAB.PUBLIC, label: '공개 방', accent: false },
+  { key: ROOMS_TAB.MY, label: '내 방', accent: false },
+  { key: ROOMS_TAB.INVITES, label: '초대', accent: false },
+  { key: ROOMS_TAB.CREATE, label: '+ 만들기', accent: true },
+] as const;
+
 export default function RoomsModal() {
   const { closeModal } = useGameActions();
-  const setActiveRoom = useSetAtom(activeRoomAtom);
+  const [activeRoom, setActiveRoom] = useAtom(activeRoomAtom);
   const { userId, nickname, canChat, linkWithGoogle } = useChatIdentity();
   const [tab, setTab] = useState<RoomsTab>(ROOMS_TAB.PUBLIC);
   const [joiningRoomId, setJoiningRoomId] = useState<string | null>(null);
@@ -39,6 +41,13 @@ export default function RoomsModal() {
   const myRooms = useMyRooms();
   const myInvites = useMyInvites(userId);
   const { mutateAsync: joinRoom } = useJoinRoom();
+  const {
+    mutate: deleteRoom,
+    isPending: isDeleting,
+    isError: isDeleteError,
+    error: deleteError,
+    variables: deletingRoomId,
+  } = useDeleteRoom();
 
   const pendingInviteCount = myInvites.data?.length ?? 0;
 
@@ -58,9 +67,7 @@ export default function RoomsModal() {
     } catch (e) {
       const message = e instanceof Error ? e.message : '';
       setJoinError(
-        message.includes('wrong password')
-          ? '비밀번호가 틀렸어요'
-          : '입장하지 못했어요. 잠시 후 다시 시도해주세요',
+        message.includes('wrong password') ? '비밀번호가 틀렸어요' : '입장하지 못했어요. 잠시 후 다시 시도해주세요',
       );
     } finally {
       setJoiningRoomId(null);
@@ -69,6 +76,14 @@ export default function RoomsModal() {
 
   const handleSelectMyRoom = (room: Room) => {
     enterRoom(room);
+  };
+
+  const handleDeleteRoom = (room: Room) => {
+    deleteRoom(room.id, {
+      onSuccess: () => {
+        if (activeRoom?.id === room.id) setActiveRoom(null);
+      },
+    });
   };
 
   const handleInviteAccepted = (roomId: string) => {
@@ -98,80 +113,61 @@ export default function RoomsModal() {
   };
 
   return (
-    <ModalShell
-      onClose={closeModal}
-      maxWidth="max-w-lg"
-      className="flex flex-col overflow-hidden p-0"
-    >
+    <ModalShell onClose={closeModal} maxWidth="max-w-lg" className="flex flex-col overflow-hidden p-0">
       {(close) => (
         <div className="flex h-[88vh] max-h-[720px] flex-col">
           {/* Header */}
-          <header className="flex items-center justify-between border-b border-card-border px-4 py-3">
-            <h3 className="text-base font-bold text-gray-700">채팅방</h3>
+          <header className="flex items-center justify-between px-5 pb-1 pt-4">
+            <div className="flex items-center gap-2.5">
+              <span className="avatar-soft flex h-9 w-9 items-center justify-center rounded-full text-lg">💬</span>
+              <div>
+                <h3 className="text-base font-bold leading-tight text-gray-800">채팅방</h3>
+                <p className="text-[11px] text-gray-400">친구들과 도란도란 수다 떨어요</p>
+              </div>
+            </div>
             <button
               onClick={close}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
               aria-label="닫기"
             >
               ✕
             </button>
           </header>
 
-          {/* Tab bar */}
-          <div className="flex border-b border-card-border">
-            <button
-              type="button"
-              onClick={() => setTab(ROOMS_TAB.PUBLIC)}
-              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-                tab === ROOMS_TAB.PUBLIC
-                  ? 'border-b-2 border-gold text-gold'
-                  : 'text-gray-400'
-              }`}
-            >
-              공개 방
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab(ROOMS_TAB.MY)}
-              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-                tab === ROOMS_TAB.MY
-                  ? 'border-b-2 border-gold text-gold'
-                  : 'text-gray-400'
-              }`}
-            >
-              내 방
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab(ROOMS_TAB.INVITES)}
-              className={`relative flex-1 py-2.5 text-sm font-semibold transition-colors ${
-                tab === ROOMS_TAB.INVITES
-                  ? 'border-b-2 border-gold text-gold'
-                  : 'text-gray-400'
-              }`}
-            >
-              초대
-              {pendingInviteCount > 0 && (
-                <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[10px] font-bold text-white">
-                  {pendingInviteCount}
-                </span>
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab(ROOMS_TAB.CREATE)}
-              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-                tab === ROOMS_TAB.CREATE
-                  ? 'border-b-2 border-gold text-gold'
-                  : 'text-gray-400'
-              }`}
-            >
-              + 만들기
-            </button>
+          {/* Tab bar (segmented) */}
+          <div role="group" aria-label="채팅방 메뉴" className="mx-4 mt-2 flex gap-1 rounded-2xl bg-input-bg p-1">
+            {ROOMS_TABS.map((t) => {
+              const isActive = tab === t.key;
+              const showBadge = t.key === ROOMS_TAB.INVITES && pendingInviteCount > 0;
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => setTab(t.key)}
+                  aria-pressed={isActive}
+                  className={`flex flex-1 items-center justify-center gap-1 rounded-xl py-2 text-xs font-bold transition-all ${
+                    isActive
+                      ? t.accent
+                        ? 'btn-gold'
+                        : 'bg-white text-gray-800 shadow-game-sm'
+                      : t.accent
+                        ? 'text-gold'
+                        : 'text-gray-400'
+                  }`}
+                >
+                  {t.label}
+                  {showBadge && (
+                    <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[10px] font-bold text-white">
+                      {pendingInviteCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* Body */}
-          <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
+          <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-4 pt-3">
             {!canChat ? (
               <ChatLoginGate onLogin={linkWithGoogle} />
             ) : (
@@ -183,20 +179,23 @@ export default function RoomsModal() {
                     joiningRoomId={joiningRoomId}
                     joinError={joinError}
                     onJoin={handleJoinPublic}
+                    onCreate={() => setTab(ROOMS_TAB.CREATE)}
                   />
                 )}
 
                 {tab === ROOMS_TAB.MY && (
-                  <div className="flex flex-col gap-2">
-                    <p className="text-xs font-semibold text-gray-500">
-                      참여 중인 방
-                    </p>
-                    <MyRoomsList
-                      rooms={myRooms.data ?? []}
-                      isLoading={myRooms.isLoading}
-                      onSelectRoom={handleSelectMyRoom}
-                    />
-                  </div>
+                  <MyRoomsList
+                    rooms={myRooms.data ?? []}
+                    isLoading={myRooms.isLoading}
+                    currentUserId={userId}
+                    deletingRoomId={isDeleting ? (deletingRoomId ?? null) : null}
+                    errorRoomId={isDeleteError ? (deletingRoomId ?? null) : null}
+                    errorMessage={deleteError ? (deleteError as Error).message : null}
+                    onSelectRoom={handleSelectMyRoom}
+                    onDeleteRoom={handleDeleteRoom}
+                    onCreate={() => setTab(ROOMS_TAB.CREATE)}
+                    onBrowsePublic={() => setTab(ROOMS_TAB.PUBLIC)}
+                  />
                 )}
 
                 {tab === ROOMS_TAB.INVITES && (
