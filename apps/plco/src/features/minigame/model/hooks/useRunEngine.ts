@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { readLocalInt, writeLocalInt } from '@shared/lib';
 import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
+import { readLocalInt, writeLocalInt } from '@shared/lib';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   RUN_BEST_SCORE_KEY,
   RUN_CHAR_SIZE,
@@ -12,7 +12,8 @@ import {
   RUN_CRASH_DURATION_MS,
   RUN_FIELD_WIDTH,
   RUN_FRAME_MS,
-  RUN_GRAVITY,
+  RUN_GRAVITY_FALL,
+  RUN_GRAVITY_RISE,
   RUN_GROUND_EPSILON,
   RUN_HEART_HITBOX_PADDING,
   RUN_HEART_SIZE,
@@ -21,6 +22,8 @@ import {
   RUN_HEART_Y_TIERS,
   RUN_HITBOX_PADDING,
   RUN_JUMP_BUFFER_MS,
+  RUN_JUMP_CUT_VELOCITY,
+  RUN_JUMP_FORGIVE_HEIGHT,
   RUN_JUMP_VELOCITY,
   RUN_MAX_FRAME_STEP,
   RUN_MIN_GAP_FACTOR,
@@ -47,9 +50,7 @@ export function useRunEngine() {
   const [phase, setPhase] = useState<RunPhase>(RUN_PHASE.READY);
   const [score, setScore] = useState(0);
   const [scorePulseKey, setScorePulseKey] = useState(0);
-  const [bestScore, setBestScore] = useState<number>(() =>
-    readLocalInt(RUN_BEST_SCORE_KEY),
-  );
+  const [bestScore, setBestScore] = useState<number>(() => readLocalInt(RUN_BEST_SCORE_KEY));
   const [charY, setCharY] = useState(0);
   const [charTilt, setCharTilt] = useState(0);
   const [obstacles, setObstacles] = useState<RunObstacle[]>([]);
@@ -72,6 +73,7 @@ export function useRunEngine() {
   const countdownTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const jumpBufferedRef = useRef(false);
   const jumpBufferTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const jumpHeldRef = useRef(false);
 
   const finishGame = useCallback(() => {
     setPhase(RUN_PHASE.RESULT);
@@ -110,6 +112,7 @@ export function useRunEngine() {
     lastHeartSpawnRef.current = 0;
     setIsCrashing(false);
     jumpBufferedRef.current = false;
+    jumpHeldRef.current = false;
     if (jumpBufferTimerRef.current) {
       clearTimeout(jumpBufferTimerRef.current);
       jumpBufferTimerRef.current = null;
@@ -139,7 +142,11 @@ export function useRunEngine() {
 
   const jump = useCallback(() => {
     if (countdown !== null) return;
-    if (charYRef.current <= RUN_GROUND_EPSILON) {
+    jumpHeldRef.current = true;
+    // 땅에 있거나 착지 직전(관용 높이 이하로 내려오는 중)이면 즉시 점프.
+    const grounded =
+      charYRef.current <= RUN_GROUND_EPSILON || (charYRef.current <= RUN_JUMP_FORGIVE_HEIGHT && charVyRef.current <= 0);
+    if (grounded) {
       charVyRef.current = RUN_JUMP_VELOCITY;
     } else {
       // 공중에서 탭하면 착지 즉시 점프 발동 (점프 버퍼)
@@ -152,6 +159,14 @@ export function useRunEngine() {
     }
   }, [countdown]);
 
+  // 버튼/키를 떼면 호출. 아직 상승 중이면 속도를 깎아 점프를 짧게 만든다(가변 높이).
+  const releaseJump = useCallback(() => {
+    jumpHeldRef.current = false;
+    if (charVyRef.current > RUN_JUMP_CUT_VELOCITY) {
+      charVyRef.current = RUN_JUMP_CUT_VELOCITY;
+    }
+  }, []);
+
   useEffect(() => {
     if (phase !== RUN_PHASE.PLAYING) return;
 
@@ -161,10 +176,20 @@ export function useRunEngine() {
         jump();
       }
     };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space' || e.code === 'ArrowUp') {
+        e.preventDefault();
+        releaseJump();
+      }
+    };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [phase, jump]);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [phase, jump, releaseJump]);
 
   useEffect(() => {
     if (phase !== RUN_PHASE.PLAYING || countdown !== null || isCrashing) return;
@@ -173,17 +198,13 @@ export function useRunEngine() {
       const now = Date.now();
       const elapsed = now - gameStartRef.current;
       // 실제 프레임 간격을 60fps 기준 배율로 환산(탭 복귀 시 폭주 방지 위해 상한).
-      const frame = Math.min(
-        RUN_MAX_FRAME_STEP,
-        (now - lastFrameRef.current) / RUN_FRAME_MS,
-      );
+      const frame = Math.min(RUN_MAX_FRAME_STEP, (now - lastFrameRef.current) / RUN_FRAME_MS);
       lastFrameRef.current = now;
 
-      charVyRef.current -= RUN_GRAVITY * frame;
-      charYRef.current = Math.max(
-        0,
-        charYRef.current + charVyRef.current * frame,
-      );
+      // 비대칭 중력: 상승 중엔 약하게, 하강 중엔 강하게 → 경쾌하고 반응 좋은 아크.
+      const gravity = charVyRef.current > 0 ? RUN_GRAVITY_RISE : RUN_GRAVITY_FALL;
+      charVyRef.current -= gravity * frame;
+      charYRef.current = Math.max(0, charYRef.current + charVyRef.current * frame);
       if (charYRef.current <= 0) {
         if (jumpBufferedRef.current) {
           jumpBufferedRef.current = false;
@@ -191,18 +212,16 @@ export function useRunEngine() {
             clearTimeout(jumpBufferTimerRef.current);
             jumpBufferTimerRef.current = null;
           }
-          charVyRef.current = RUN_JUMP_VELOCITY;
+          // 버퍼 점프도 손을 뗀 상태면 짧은 홉으로 나간다.
+          charVyRef.current = jumpHeldRef.current
+            ? RUN_JUMP_VELOCITY
+            : Math.min(RUN_JUMP_VELOCITY, RUN_JUMP_CUT_VELOCITY);
         } else {
           charVyRef.current = 0;
         }
       }
       setCharY(charYRef.current);
-      setCharTilt(
-        Math.max(
-          -RUN_TILT_MAX,
-          Math.min(RUN_TILT_MAX, -charVyRef.current * RUN_TILT_FACTOR),
-        ),
-      );
+      setCharTilt(Math.max(-RUN_TILT_MAX, Math.min(RUN_TILT_MAX, -charVyRef.current * RUN_TILT_FACTOR)));
 
       const speedPerFrame = Math.min(
         RUN_OBSTACLE_SPEED_BASE + elapsed * RUN_OBSTACLE_SPEED_ACCEL,
@@ -223,10 +242,7 @@ export function useRunEngine() {
             {
               id: nextIdRef.current++,
               x: RUN_FIELD_WIDTH,
-              emoji:
-                RUN_OBSTACLE_EMOJIS[
-                  Math.floor(Math.random() * RUN_OBSTACLE_EMOJIS.length)
-                ],
+              emoji: RUN_OBSTACLE_EMOJIS[Math.floor(Math.random() * RUN_OBSTACLE_EMOJIS.length)],
             },
           ];
           lastObstacleSpawnRef.current = now;
@@ -234,14 +250,9 @@ export function useRunEngine() {
       }
 
       const heartSpawnInterval =
-        RUN_HEART_SPAWN_INTERVAL_MIN +
-        Math.random() *
-          (RUN_HEART_SPAWN_INTERVAL_BASE - RUN_HEART_SPAWN_INTERVAL_MIN);
+        RUN_HEART_SPAWN_INTERVAL_MIN + Math.random() * (RUN_HEART_SPAWN_INTERVAL_BASE - RUN_HEART_SPAWN_INTERVAL_MIN);
       if (now - lastHeartSpawnRef.current > heartSpawnInterval) {
-        const y =
-          RUN_HEART_Y_TIERS[
-            Math.floor(Math.random() * RUN_HEART_Y_TIERS.length)
-          ];
+        const y = RUN_HEART_Y_TIERS[Math.floor(Math.random() * RUN_HEART_Y_TIERS.length)];
         heartsRef.current = [
           ...heartsRef.current,
           {
@@ -294,11 +305,9 @@ export function useRunEngine() {
         const heartTop = heart.y + RUN_HEART_SIZE;
 
         const overlapX =
-          heartLeft < charRight - RUN_HEART_HITBOX_PADDING &&
-          heartRight > charLeft + RUN_HEART_HITBOX_PADDING;
+          heartLeft < charRight - RUN_HEART_HITBOX_PADDING && heartRight > charLeft + RUN_HEART_HITBOX_PADDING;
         const overlapY =
-          heartBottom < charTop - RUN_HEART_HITBOX_PADDING &&
-          heartTop > charBottom + RUN_HEART_HITBOX_PADDING;
+          heartBottom < charTop - RUN_HEART_HITBOX_PADDING && heartTop > charBottom + RUN_HEART_HITBOX_PADDING;
 
         if (overlapX && overlapY) {
           caughtThisFrame += 1;
@@ -354,8 +363,7 @@ export function useRunEngine() {
     closeModal();
   }, [minigameReward, closeModal]);
 
-  const isNewBest =
-    phase === RUN_PHASE.RESULT && score > 0 && score >= bestScore;
+  const isNewBest = phase === RUN_PHASE.RESULT && score > 0 && score >= bestScore;
   const rewardScore = Math.min(score, RUN_REWARD_CAP);
 
   return {
@@ -375,6 +383,7 @@ export function useRunEngine() {
     rewardScore,
     startGame,
     jump,
+    releaseJump,
     handleFinish,
   };
 }

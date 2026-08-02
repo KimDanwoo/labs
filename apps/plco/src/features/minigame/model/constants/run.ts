@@ -9,12 +9,20 @@ export const RUN_OBSTACLE_SIZE = 30;
 export const RUN_FRAME_MS = 1000 / 60;
 export const RUN_MAX_FRAME_STEP = 2.5;
 
-export const RUN_JUMP_VELOCITY = 9;
-// gravity 0.35: 체공 850ms, 최고점 111px. 장애물 접근 시간(848ms)보다 짧아
-// "뛰면 넘는다"는 직관이 속도와 일치한다.
-export const RUN_GRAVITY = 0.35;
+// 점프 물리(60fps 기준). 잘 만든 러너처럼 "가변 높이 + 비대칭 중력"을 쓴다.
+// - 초기 속도 8.4 / 상승 중력 0.42 → 풀점프 최고점 ~84px, 상승 333ms.
+// - 하강 중력 0.62(상승보다 빠름) → 낙하 274ms. 총 체공 ~607ms(기존 857ms보다 경쾌).
+// - 장애물은 실질 ~22px만 넘으면 되므로, 넘치던 높이를 줄여 "붕 뜨는" 느낌을 없앤다.
+export const RUN_JUMP_VELOCITY = 8.4;
+export const RUN_GRAVITY_RISE = 0.42;
+export const RUN_GRAVITY_FALL = 0.62;
+// 버튼을 떼면 상승 속도를 이 값으로 깎아 짧은 홉을 만든다(가변 점프 높이).
+// 5.5 → 즉시 떼면 최고점 ~36px(장애물은 넘고 낮은 하트만), 계속 누르면 풀점프.
+export const RUN_JUMP_CUT_VELOCITY = 5.5;
 export const RUN_GROUND_EPSILON = 0.01;
 export const RUN_JUMP_BUFFER_MS = 120;
+// 착지 직전(이 높이 이하)에 누르면 바로 다음 점프가 나가는 여유(coyote-ish 입력 관용).
+export const RUN_JUMP_FORGIVE_HEIGHT = 6;
 
 export const RUN_TILT_FACTOR = 2.4;
 export const RUN_TILT_MAX = 14;
