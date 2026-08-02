@@ -78,6 +78,20 @@ export async function fetchPublicRooms(): Promise<Room[]> {
   return (data as ChatRoomRow[] | null)?.map(toRoom) ?? [];
 }
 
+/** 방 삭제 (소유자만, RLS로 강제). 멤버·메시지·초대·비밀번호는 cascade 로 함께 삭제된다.
+ *  RLS가 비소유자·미적용 정책일 때 에러 없이 0행이 지워질 수 있으므로 삭제된 행을 확인한다. */
+export async function deleteRoom(roomId: string): Promise<void> {
+  const { data, error } = await supabase
+    .from(ROOM_TABLE)
+    .delete()
+    .eq('id', roomId)
+    .select('id');
+  if (error) throw error;
+  if (!data || data.length === 0) {
+    throw new Error('삭제 권한이 없거나 이미 삭제된 방이에요');
+  }
+}
+
 /** 공개 방 입장 (RPC join_room). 비익명 유저만, 잠긴 방은 비밀번호 검증. */
 export async function joinRoomRpc(
   roomId: string,
