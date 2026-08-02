@@ -17,11 +17,7 @@ type RoomChatViewProps = {
  * 방 채팅 뷰 — ModalShell 없이 부모 레이아웃 안에 삽입되는 버전.
  * RoomsModal 내부에서 사용한다.
  */
-export default function RoomChatView({
-  roomId,
-  roomName,
-  onBack,
-}: RoomChatViewProps) {
+export default function RoomChatView({ roomId, roomName, onBack }: RoomChatViewProps) {
   const { userId, nickname, canChat, linkWithGoogle } = useChatIdentity();
   const { isAdmin } = useIsAdmin();
   const { messages, isLoading, isError, onlineUsers } = useChatRoom(roomId, {
@@ -36,15 +32,13 @@ export default function RoomChatView({
         <button
           type="button"
           onClick={onBack}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-600"
           aria-label="뒤로"
         >
           ‹
         </button>
         <div className="min-w-0 flex-1">
-          <h4 className="truncate text-sm font-bold text-gray-700">
-            {roomName}
-          </h4>
+          <h4 className="truncate text-sm font-bold text-gray-800">{roomName}</h4>
           <ChatOnlineBar users={onlineUsers} />
         </div>
       </div>

@@ -4,6 +4,7 @@ export {
   formatCooldownKo,
   formatCooldownShort,
   formatChatTime,
+  formatChatDateLabel,
   formatDateKey,
 } from './time';
 export { readLocalInt, writeLocalInt, clearLocalGameSaves } from './storage';
