@@ -62,7 +62,7 @@ jobs:
         run: |
           BRANCH="feature/${{ steps.date.outputs.date }}-bestseller"
           TITLE='✨ feat(${{ steps.date.outputs.date }}): 주간 베스트셀러 추가'
-          git add apps/dansoon/contents/
+          git add apps/dansoon/contents/ apps/dansoon/data/
           if git diff --cached --quiet; then
             echo "생성된 변경이 없어 종료합니다."
             exit 0
