@@ -1,12 +1,8 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
-import {
-  ROOM_NAME_MAX,
-  ROOM_NICKNAME_MAX,
-  ROOM_PASSWORD_MAX,
-} from '@entities/chat-room/model/constants';
+import { ROOM_NAME_MAX, ROOM_NICKNAME_MAX, ROOM_PASSWORD_MAX } from '@entities/chat-room/model/constants';
 import { useCreateRoom } from '@entities/chat-room/model/hooks';
+import { useState, type FormEvent } from 'react';
 
 type CreateRoomDialogProps = {
   defaultNickname: string;
@@ -14,11 +10,7 @@ type CreateRoomDialogProps = {
   onCancel: () => void;
 };
 
-export default function CreateRoomDialog({
-  defaultNickname,
-  onCreated,
-  onCancel,
-}: CreateRoomDialogProps) {
+export default function CreateRoomDialog({ defaultNickname, onCreated, onCancel }: CreateRoomDialogProps) {
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState(defaultNickname);
   const [isPublic, setIsPublic] = useState(false);
@@ -44,11 +36,11 @@ export default function CreateRoomDialog({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-game-sm"
-    >
-      <h4 className="text-sm font-bold text-gray-700">새 채팅방 만들기</h4>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-game-sm">
+      <div className="flex items-center gap-2">
+        <span className="avatar-soft flex h-8 w-8 items-center justify-center rounded-full text-base">✨</span>
+        <h4 className="text-sm font-bold text-gray-800">새 채팅방 만들기</h4>
+      </div>
 
       <label className="flex flex-col gap-1">
         <span className="text-xs text-gray-500">방 이름</span>
@@ -58,7 +50,7 @@ export default function CreateRoomDialog({
           onChange={(e) => setName(e.target.value)}
           maxLength={ROOM_NAME_MAX}
           placeholder="방 이름을 입력하세요"
-          className="rounded-xl bg-input-bg px-3 py-2 text-sm text-gray-700 outline-none placeholder:text-gray-400"
+          className="rounded-xl border border-black/5 bg-input-bg px-3 py-2 text-sm text-gray-700 outline-none transition-colors placeholder:text-gray-400 focus:border-gold/40 focus:bg-white"
           autoFocus
         />
       </label>
@@ -71,7 +63,7 @@ export default function CreateRoomDialog({
           onChange={(e) => setNickname(e.target.value)}
           maxLength={ROOM_NICKNAME_MAX}
           placeholder={defaultNickname}
-          className="rounded-xl bg-input-bg px-3 py-2 text-sm text-gray-700 outline-none placeholder:text-gray-400"
+          className="rounded-xl border border-black/5 bg-input-bg px-3 py-2 text-sm text-gray-700 outline-none transition-colors placeholder:text-gray-400 focus:border-gold/40 focus:bg-white"
         />
       </label>
 
@@ -85,9 +77,7 @@ export default function CreateRoomDialog({
           role="switch"
           aria-checked={isPublic}
           onClick={() => setIsPublic((prev) => !prev)}
-          className={`relative h-6 w-11 rounded-full transition-colors ${
-            isPublic ? 'bg-gold' : 'bg-gray-200'
-          }`}
+          className={`relative h-6 w-11 rounded-full transition-colors ${isPublic ? 'bg-gold' : 'bg-gray-200'}`}
         >
           <span
             className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
@@ -107,16 +97,16 @@ export default function CreateRoomDialog({
             maxLength={ROOM_PASSWORD_MAX}
             placeholder="입장 시 물어볼 비밀번호"
             autoComplete="new-password"
-            className="rounded-xl bg-input-bg px-3 py-2 text-sm text-gray-700 outline-none placeholder:text-gray-400"
+            className="rounded-xl border border-black/5 bg-input-bg px-3 py-2 text-sm text-gray-700 outline-none transition-colors placeholder:text-gray-400 focus:border-gold/40 focus:bg-white"
           />
-          <span className="text-[10px] text-gray-400">
-            비워두면 누구나 자유롭게 입장할 수 있어요
-          </span>
+          <span className="text-[10px] text-gray-400">비워두면 누구나 자유롭게 입장할 수 있어요</span>
         </label>
       )}
 
       {error && (
-        <p className="text-xs text-red">{(error as Error).message}</p>
+        <p role="alert" className="text-xs text-red">
+          {(error as Error).message}
+        </p>
       )}
 
       <div className="flex gap-2">
@@ -130,7 +120,7 @@ export default function CreateRoomDialog({
         <button
           type="submit"
           disabled={!name.trim() || isPending}
-          className="flex-1 rounded-full bg-gold py-2 text-sm font-bold text-white btn-press shadow-game-sm disabled:opacity-40"
+          className="btn-gold flex-1 rounded-full py-2 text-sm font-bold btn-press disabled:opacity-40"
         >
           {isPending ? '생성 중…' : '만들기'}
         </button>
