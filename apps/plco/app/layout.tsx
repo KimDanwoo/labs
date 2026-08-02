@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import ReactDOM from "react-dom";
 import { Gowun_Dodum } from "next/font/google";
 import { ROOM_BACKGROUNDS } from "@widgets/game-room/constants";
@@ -17,6 +17,14 @@ const gowunDodum = Gowun_Dodum({
 export const metadata: Metadata = {
   title: "PLCO",
   description: "PLCO 캐릭터를 키워보세요!",
+};
+
+// 모바일에서 input 포커스 시 자동 확대/핀치 줌 방지
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

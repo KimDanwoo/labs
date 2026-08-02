@@ -105,6 +105,72 @@ def classify_genre(text: str) -> str:
     return "etc"
 
 
+# ── 제목 정규화 (동일 도서 판정) ─────────────────────────────
+# 같은 책의 서점별 표기 차이를 흡수한다.
+_TITLE_BADGE_RE = re.compile(r"^[^|]{1,12}\|")            # "개정판 | 죽음의 수용소에서"
+_TITLE_BRACKET_RE = re.compile(r"[\(\[\{][^\)\]\}]*[\)\]\}]")  # "(100만 부 기념판)", "[ 사인본 ]"
+_TITLE_EDITION_RE = re.compile(r"개정판|특별판|기념판|스페셜에디션|에디션|양장본|사인본|초판한정|한정판|리커버")
+# 부제까지 붙은 표기("유럽 도시 기행 3 마드리드…편")를 짧은 표기와 묶으려면
+# 접두사 일치를 봐야 하는데, 짧은 제목에서 오병합이 나므로 최소 길이를 둔다.
+_PREFIX_MATCH_MIN_LEN = 6
+
+
+def _normalize(text: str) -> str:
+    return re.sub(r"[\s\W_]", "", text).lower()
+
+
+def _title_key(title: str) -> str:
+    stripped = _TITLE_BRACKET_RE.sub(" ", _TITLE_BADGE_RE.sub("", title))
+    return _TITLE_EDITION_RE.sub("", _normalize(stripped))
+
+
+def _is_same_work(short_key: str, long_key: str) -> bool:
+    """접두사가 겹치는 두 제목이 같은 책인지 판정.
+
+    "유럽도시기행3" ⊂ "유럽도시기행3마드리드…편"은 부제가 붙은 같은 책이지만,
+    "달러구트꿈백화점" ⊂ "달러구트꿈백화점2"는 다른 권이다. 접두사 뒤가 숫자로
+    시작하면 권수가 갈린 것으로 보고 합치지 않는다(오병합이 미병합보다 해롭다).
+    """
+    if len(short_key) < _PREFIX_MATCH_MIN_LEN or not long_key.startswith(short_key):
+        return False
+    remainder = long_key[len(short_key):]
+    return bool(remainder) and not remainder[0].isdigit()
+
+
+def _matches_any(key: str, reference_keys: set[str]) -> bool:
+    if key in reference_keys:
+        return True
+    return any(_is_same_work(ref, key) or _is_same_work(key, ref) for ref in reference_keys)
+
+
+# 서로 다른 서점의 베스트셀러 상위 20위는 상당 부분 겹친다(2026-07-27 수집 기준
+# 알라딘∩교보 6권, 알라딘∩YES24 5권). 겹침이 이 수준에도 못 미치면 순위 목록이
+# 아니라 추천 캐러셀·기획전 배열을 잡은 것으로 보고 폐기한다.
+_SANITY_MIN_OVERLAP = 3
+
+
+def _is_plausible_list(items: list[dict], reference_keys: set[str], source_name: str) -> bool:
+    if not reference_keys or not items:
+        return True
+    hits = sum(1 for b in items if _matches_any(_title_key(b["title"]), reference_keys))
+    if hits >= _SANITY_MIN_OVERLAP:
+        return True
+    print(f"  ⚠️  {source_name} 목록이 알라딘 베스트셀러와 {hits}권만 겹칩니다 — 베스트셀러 목록이 아닌 것으로 보고 폐기")
+    return False
+
+
+def _stamp_depth(items: list[dict]) -> list[dict]:
+    """정규화 점수의 기준이 될 목록 깊이를 각 항목에 새긴다.
+
+    서점마다 확인 가능한 순위 범위가 달라(알라딘·교보·YES24 20위, 리디 전체 11위,
+    장르별 10위) 순위를 그대로 더하면 얕게 수집되는 서점이 과대평가된다.
+    """
+    depth = len(items)
+    for item in items:
+        item["depth"] = depth
+    return items
+
+
 def _extract_next_data(html: str) -> dict:
     match = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
     if match:
@@ -159,7 +225,7 @@ def fetch_aladin_overall(limit: int = 20) -> list[dict]:
                 "genre_key": classify_genre(cat_name),
                 "source": "알라딘",
             })
-        return results
+        return _stamp_depth(results)
     except Exception as e:
         print(f"  ⚠️  알라딘 전체 실패: {e}")
         return []
@@ -186,7 +252,7 @@ def fetch_aladin_genre(genre: dict, limit: int = 10) -> list[dict]:
                 "genre_key": genre["key"],
                 "source": "알라딘",
             })
-        return results
+        return _stamp_depth(results)
     except Exception as e:
         print(f"  ⚠️  알라딘 {genre['name']} 실패: {e}")
         return []
@@ -250,7 +316,9 @@ def _parse_books_with_gemini(client: genai.Client, text: str, source_name: str, 
 
 
 # ── 교보문고 ────────────────────────────────────────────────
-def fetch_kyobo(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
+def fetch_kyobo(
+    pw_page: Page, client: genai.Client, reference_keys: set[str], limit: int = 20
+) -> list[dict]:
     urls = [
         "https://store.kyobobook.co.kr/bestseller/online",
         "https://store.kyobobook.co.kr/bestseller/total",
@@ -298,9 +366,9 @@ def fetch_kyobo(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
                             "genre_key": classify_genre(genre_text + " " + title),
                             "source": "교보문고",
                         })
-                    if results:
+                    if results and _is_plausible_list(results, reference_keys, "교보문고(NEXT_DATA)"):
                         print(f"  교보문고 items={len(results)}개 발견 (NEXT_DATA)")
-                        return results
+                        return _stamp_depth(results)
 
             # Gemini AI 기반 추출 (fallback)
             print("  📖 교보문고 Gemini AI 추출 시도...")
@@ -321,9 +389,9 @@ def fetch_kyobo(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
                     })
                     if len(results) >= limit:
                         break
-                if results:
+                if results and _is_plausible_list(results, reference_keys, "교보문고(Gemini)"):
                     print(f"  교보문고 items={len(results)}개 발견 (Gemini)")
-                    return results
+                    return _stamp_depth(results)
 
             print("  ⚠️  교보문고 데이터 없음, 다음 URL 시도")
         except Exception as e:
@@ -334,7 +402,9 @@ def fetch_kyobo(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
 
 
 # ── YES24 ───────────────────────────────────────────────────
-def fetch_yes24(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
+def fetch_yes24(
+    pw_page: Page, client: genai.Client, reference_keys: set[str], limit: int = 20
+) -> list[dict]:
     urls = [
         "https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001",
         "https://www.yes24.com/Product/Category/BestSeller",
@@ -368,9 +438,9 @@ def fetch_yes24(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
                             "genre_key": classify_genre(genre_text + " " + str(title)),
                             "source": "YES24",
                         })
-                    if results:
+                    if results and _is_plausible_list(results, reference_keys, "YES24(NEXT_DATA)"):
                         print(f"  YES24 items={len(results)}개 발견 (NEXT_DATA)")
-                        return results
+                        return _stamp_depth(results)
 
             # Gemini AI 기반 추출 (fallback)
             print("  📖 YES24 Gemini AI 추출 시도...")
@@ -391,9 +461,9 @@ def fetch_yes24(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
                     })
                     if len(results) >= limit:
                         break
-                if results:
+                if results and _is_plausible_list(results, reference_keys, "YES24(Gemini)"):
                     print(f"  YES24 items={len(results)}개 발견 (Gemini)")
-                    return results
+                    return _stamp_depth(results)
 
             print("  ⚠️  YES24 데이터 없음, 다음 URL 시도")
         except Exception as e:
@@ -440,9 +510,10 @@ def _parse_ridi_html(html: str, genre_key: str, limit: int) -> list[dict]:
             "source": "리디",
         })
     books.sort(key=lambda b: b["rank"])
-    for i, b in enumerate(books[:limit], start=1):
+    books = books[:limit]
+    for i, b in enumerate(books, start=1):
         b["rank"] = i
-    return books[:limit]
+    return _stamp_depth(books)
 
 
 # 리디는 Cloudflare 봇 차단(JS 챌린지)을 걸어 headless 브라우저를 막는다.
@@ -498,40 +569,6 @@ def fetch_ridi_by_genre(limit: int = 10) -> dict[str, list[dict]]:
     return result
 
 
-# ── 제목 정규화 (동일 도서 판정) ─────────────────────────────
-MAX_RANK = 30
-# 같은 책의 서점별 표기 차이를 흡수한다.
-_TITLE_BADGE_RE = re.compile(r"^[^|]{1,12}\|")            # "개정판 | 죽음의 수용소에서"
-_TITLE_BRACKET_RE = re.compile(r"[\(\[\{][^\)\]\}]*[\)\]\}]")  # "(100만 부 기념판)", "[ 사인본 ]"
-_TITLE_EDITION_RE = re.compile(r"개정판|특별판|기념판|스페셜에디션|에디션|양장본|사인본|초판한정|한정판|리커버")
-# 부제까지 붙은 표기("유럽 도시 기행 3 마드리드…편")를 짧은 표기와 묶으려면
-# 접두사 일치를 봐야 하는데, 짧은 제목에서 오병합이 나므로 최소 길이를 둔다.
-_PREFIX_MATCH_MIN_LEN = 6
-
-
-def _normalize(text: str) -> str:
-    return re.sub(r"[\s\W_]", "", text).lower()
-
-
-def _title_key(title: str) -> str:
-    stripped = _TITLE_BRACKET_RE.sub(" ", _TITLE_BADGE_RE.sub("", title))
-    return _TITLE_EDITION_RE.sub("", _normalize(stripped))
-
-
-def _resolve_key(scores: dict[str, dict], key: str, author_key: str) -> str:
-    """이미 담긴 책 중 같은 저자 + 접두사 일치가 있으면 그 키로 합친다."""
-    if key in scores or not author_key:
-        return key
-    for existing_key, book in scores.items():
-        if book["author_key"] != author_key:
-            continue
-        if min(len(existing_key), len(key)) < _PREFIX_MATCH_MIN_LEN:
-            continue
-        if existing_key.startswith(key) or key.startswith(existing_key):
-            return existing_key
-    return key
-
-
 # 교보/YES24는 Gemini 폴백 시 개별 책 링크를 못 얻어 목록 URL이 들어온다.
 _LIST_URL_MARKERS = ("/bestseller", "bestseller?", "BestSeller", "/category/")
 
@@ -541,39 +578,77 @@ def _is_detail_link(link: str) -> bool:
 
 
 # ── 종합 순위 합산 ──────────────────────────────────────────
-def merge_rankings(
-    all_items: list[dict],
-    top_n: int = 15,
-    genre_lookup: dict[str, str] | None = None,
-) -> list[dict]:
-    scores: dict[str, dict] = {}
+def _canonical_keys(all_items: list[dict]) -> dict[str, str]:
+    """제목 키 → 대표 키 매핑. 같은 저자 + 부제 확장 관계면 하나로 묶는다.
+
+    한 건씩 순회하며 병합하면 어떤 서점을 먼저 읽었는지에 따라 결과가 달라지므로,
+    전체 키 집합을 모은 뒤 짧은 키(기본 표기)를 대표로 정해 결정적으로 매핑한다.
+    """
+    authors: dict[str, set[str]] = {}
+    for item in all_items:
+        key = _title_key(item.get("title", ""))
+        if key:
+            authors.setdefault(key, set()).add(_normalize(item.get("author", "")))
+
+    by_length = sorted(authors, key=lambda k: (len(k), k))
+    canonical = {key: key for key in authors}
+    for long_key in reversed(by_length):
+        for short_key in by_length:
+            if short_key == long_key:
+                break
+            shared_author = (authors[long_key] & authors[short_key]) - {""}
+            if shared_author and _is_same_work(short_key, long_key):
+                canonical[long_key] = short_key
+                break
+    return canonical
+
+
+def _source_score(rank: int, depth: int) -> float:
+    """한 서점의 기여도를 0~1로 정규화. 1위=1.0, 수집 범위 밖=0.
+
+    서점마다 수집 깊이가 달라(리디 11위 · 나머지 20위) 순위를 그대로 더하면
+    얕게 수집되는 서점의 하위권이 과대평가된다.
+    """
+    if depth <= 0 or rank > depth:
+        return 0.0
+    return (depth + 1 - rank) / depth
+
+
+def merge_rankings(all_items: list[dict], genre_lookup: dict[str, str] | None = None) -> list[dict]:
+    """서점별 목록을 한 권 단위로 합치고 정규화 점수로 정렬한다(자르기는 호출자 몫)."""
+    canonical = _canonical_keys(all_items)
+    books: dict[str, dict] = {}
 
     for item in all_items:
-        if not item.get("title"):
+        raw_key = _title_key(item.get("title", ""))
+        if not raw_key:
             continue
-        author_key = _normalize(item.get("author", ""))
-        key = _resolve_key(scores, _title_key(item["title"]), author_key)
-        if key not in scores:
-            scores[key] = {
+        key = canonical[raw_key]
+        book = books.get(key)
+        if book is None:
+            book = books[key] = {
                 "title": item["title"],
-                "author": item["author"],
-                "author_key": author_key,
-                "cover": item.get("cover", ""),
-                "link": item["link"] if _is_detail_link(item.get("link", "")) else "",
+                "author": item.get("author", ""),
+                "cover": "",
+                "link": "",
                 "publisher": item.get("publisher", ""),
-                "score": 0,
+                "raw_keys": set(),
                 "sources": {},
-                "genre_key": item.get("genre_key", "etc"),
+                "genre_key": "etc",
+                "score": 0.0,
             }
-        book = scores[key]
+        book["raw_keys"].add(raw_key)
         # 한 서점에 같은 책의 에디션이 둘 이상 잡히면 더 높은(작은) 순위만 남긴다.
         # 순위를 덮어쓰거나 점수를 이중 가산하지 않기 위함이다.
-        best_rank = book["sources"].get(item["source"])
-        if best_rank is None or item["rank"] < best_rank:
-            book["sources"][item["source"]] = item["rank"]
+        prev = book["sources"].get(item["source"])
+        if prev is None or item["rank"] < prev["rank"]:
+            book["sources"][item["source"]] = {"rank": item["rank"], "depth": item.get("depth", 0)}
         # 에디션·부제가 붙은 표기보다 짧은 표기를 대표 제목으로 쓴다
         if len(item["title"]) < len(book["title"]):
             book["title"] = item["title"]
+        # 저자는 알라딘 표기를 우선(리디는 미등록 작가 시 비어 온다)
+        if item.get("author") and (not book["author"] or item["source"] == "알라딘"):
+            book["author"] = item["author"]
         # 알라딘 커버/링크 우선, 그다음 아무 상세 링크
         if item["source"] == "알라딘" and item.get("cover"):
             book["cover"] = item["cover"]
@@ -581,45 +656,45 @@ def merge_rankings(
                 book["link"] = item["link"]
         elif not book["link"] and _is_detail_link(item.get("link", "")):
             book["link"] = item["link"]
-        if book["genre_key"] == "etc" and item.get("genre_key", "etc") != "etc":
-            book["genre_key"] = item["genre_key"]
+        if book["genre_key"] == "etc":
+            book["genre_key"] = item.get("genre_key", "etc")
 
-    for key, book in scores.items():
-        # 점수는 서점별 최종 순위에서 한 번만 계산한다
-        book["score"] = sum(max(0, MAX_RANK + 1 - rank) for rank in book["sources"].values())
-        # 장르별 수집에서 확인된 장르가 있으면 그것을 신뢰한다(종합표·장르별표 표기 일치)
-        if genre_lookup and key in genre_lookup:
-            book["genre_key"] = genre_lookup[key]
+    for book in books.values():
+        book["score"] = sum(_source_score(s["rank"], s["depth"]) for s in book["sources"].values())
+        # 장르별 수집에서 확인된 장르가 있으면 그것을 신뢰한다(종합표·장르별표 표기 일치).
+        # 병합 전 키 전부를 조회해야 부제 표기만 다른 판본에서도 장르가 붙는다.
+        if genre_lookup:
+            for raw_key in sorted(book["raw_keys"]):
+                if raw_key in genre_lookup:
+                    book["genre_key"] = genre_lookup[raw_key]
+                    break
 
-    ranked = sorted(
-        scores.values(),
-        key=lambda b: (-b["score"], -len(b["sources"]), min(b["sources"].values())),
+    return sorted(
+        books.values(),
+        key=lambda b: (
+            -b["score"],
+            -len(b["sources"]),
+            min(s["rank"] / max(1, s["depth"]) for s in b["sources"].values()),
+        ),
     )
-    for i, book in enumerate(ranked[:top_n], start=1):
+
+
+def take_charted(books: list[dict], top_n: int) -> tuple[list[dict], list[dict]]:
+    """상위 top_n을 뽑아 1위부터 번호를 매긴다. 장르 미판정(etc) 도서는 제외하고 돌려준다."""
+    charted: list[dict] = []
+    dropped: list[dict] = []
+    for book in books:
+        if len(charted) >= top_n:
+            break
+        (dropped if book["genre_key"] == "etc" else charted).append(book)
+    for i, book in enumerate(charted, start=1):
         book["rank"] = i
-    return ranked[:top_n]
-
-
-def merge_genre_rankings(items: list[dict], top_n: int = 5) -> list[dict]:
-    return merge_rankings(items, top_n=top_n)
-
-
-def rerank_within_genre(items: list[dict]) -> list[dict]:
-    """전체 순위로 수집된 목록을 장르 부분집합 내 순위로 다시 매긴다.
-
-    장르별 표에서 알라딘·리디는 장르 내 순위인데 교보·YES24만 전체 순위여서
-    같은 행의 컬럼끼리 기준이 달라지는 문제를 막는다.
-    """
-    reranked = []
-    for i, book in enumerate(sorted(items, key=lambda b: b["rank"]), start=1):
-        clone = dict(book)
-        clone["rank"] = i
-        reranked.append(clone)
-    return reranked
+    return charted, dropped
 
 
 # ── MD 생성 ──────────────────────────────────────────────────
 TOP_N_OVERALL = 15
+TOP_N_GENRE = 5
 SOURCE_NAMES = ("알라딘", "교보문고", "YES24", "리디")
 
 
@@ -633,27 +708,31 @@ def _title_cell(book: dict) -> str:
     return f"[{title}]({book['link']})" if book.get("link") else title
 
 
-def _source_cells(sources: dict[str, int]) -> str:
-    return " | ".join(f"{sources[name]}위" if sources.get(name) else "-" for name in SOURCE_NAMES)
+def _source_cells(sources: dict[str, dict]) -> str:
+    return " | ".join(f"{sources[name]['rank']}위" if sources.get(name) else "-" for name in SOURCE_NAMES)
 
 
-def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], date_str: str) -> str:
+def _index_cell(book: dict) -> str:
+    """정규화 점수(0~서점 수)를 0~100 지수로 환산. 네 서점 모두 1위면 100."""
+    return str(round(book["score"] / len(SOURCE_NAMES) * 100))
+
+
+def build_markdown(charted: list[dict], genre_data: dict[str, list[dict]], date_str: str) -> str:
     dt = datetime.strptime(date_str, "%Y-%m-%d")
     first_weekday = dt.replace(day=1).weekday()
     week = (dt.day + first_weekday - 1) // 7 + 1
     date_kr = f"{dt.year}년 {dt.month}월 {week}째주"
 
-    charted = [b for b in overall if b.get("genre_key") != "etc"][:TOP_N_OVERALL]
-    rows = []
-    for rank, b in enumerate(charted, start=1):
-        genre = next((g["name"] for g in GENRES if g["key"] == b["genre_key"]), "")
-        rows.append(
-            f"| **{rank}** | {_title_cell(b)} | {_md_cell(b['author'])} | {genre} | {_source_cells(b['sources'])} |"
-        )
+    rows = [
+        f"| **{b['rank']}** | {_title_cell(b)} | {_md_cell(b['author'])} "
+        f"| {next((g['name'] for g in GENRES if g['key'] == b['genre_key']), '')} "
+        f"| {_index_cell(b)} | {_source_cells(b['sources'])} |"
+        for b in charted
+    ]
 
     overall_table = "\n".join([
-        "| 순위 | 책 | 저자 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |",
-        "|:----:|-----|------|------|:------:|:-------:|:-----:|:----:|",
+        "| 순위 | 책 | 저자 | 장르 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |",
+        "|:----:|-----|------|------|:----:|:------:|:-------:|:-----:|:----:|",
         *rows,
     ])
 
@@ -663,12 +742,13 @@ def build_markdown(overall: list[dict], genre_data: dict[str, list[dict]], date_
         if not books:
             continue
         genre_rows = [
-            f"| **{b['rank']}** | {_title_cell(b)} | {_md_cell(b['author'])} | {_source_cells(b['sources'])} |"
+            f"| **{b['rank']}** | {_title_cell(b)} | {_md_cell(b['author'])} "
+            f"| {_index_cell(b)} | {_source_cells(b['sources'])} |"
             for b in books
         ]
         genre_table = "\n".join([
-            "| 순위 | 책 | 저자 | 알라딘 | 교보문고 | YES24 | 리디 |",
-            "|:----:|-----|------|:------:|:-------:|:-----:|:----:|",
+            "| 순위 | 책 | 저자 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |",
+            "|:----:|-----|------|:----:|:------:|:-------:|:-----:|:----:|",
             *genre_rows,
         ])
         genre_sections += f"\n### {genre['emoji']} {genre['name']}\n\n{genre_table}\n"
@@ -685,13 +765,18 @@ isHidden: true
 
 각 서점의 **전체 베스트셀러 순위**입니다. 리디는 제공 범위상 {RIDI_OVERALL_MAX}위까지만 집계됩니다.
 
+**지수**는 서점별 순위를 그 서점의 수집 범위 기준으로 0~100 환산해 평균한 값입니다.
+네 서점 모두 1위면 100이고, 순위에 없는 서점은 0점으로 계산합니다. 서점마다 확인
+가능한 순위 깊이가 달라(알라딘·교보문고·YES24 20위, 리디 {RIDI_OVERALL_MAX}위) 순위를 그대로 더하지 않습니다.
+
 {overall_table}
 
 ---
 
 ## 📚 장르별 베스트셀러
 
-각 서점의 **해당 장르 내 순위**입니다. 위 종합표의 전체 순위와는 기준이 다릅니다.
+알라딘·리디는 **해당 장르 베스트셀러 순위**, 교보문고·YES24는 장르별 목록을 제공하지 않아
+**전체 순위**를 그대로 씁니다(그래서 두 서점은 상위 20위에 든 책만 표시됩니다).
 {genre_sections}
 
 ---
@@ -699,6 +784,27 @@ isHidden: true
 *데이터 출처: [알라딘](https://www.aladin.co.kr) · [교보문고](https://store.kyobobook.co.kr) · [YES24](https://www.yes24.com) · [리디](https://ridibooks.com)*
 *매주 자동으로 수집되는 베스트셀러 리포트입니다.*
 """
+
+
+# ── 수집 원본 보관 ───────────────────────────────────────────
+DEBUG_DUMP_DIR = pathlib.Path("data/bestseller")
+
+
+def write_debug_dump(raw_sources: dict, merged: list[dict]) -> pathlib.Path:
+    """수집 원본과 점수 내역을 남긴다. 결과 MD만으로는 "왜 이 순위인지"를 사후에 알 수 없다."""
+    DEBUG_DUMP_DIR.mkdir(parents=True, exist_ok=True)
+    path = DEBUG_DUMP_DIR / f"{DATE}.json"
+    payload = {
+        "date": DATE,
+        "sources": raw_sources,
+        "merged": [
+            {k: v for k, v in book.items() if k not in ("raw_keys", "cover")}
+            | {"index": round(book["score"] / len(SOURCE_NAMES) * 100)}
+            for book in merged
+        ],
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return path
 
 
 # ── main ─────────────────────────────────────────────────────
@@ -723,12 +829,16 @@ def main():
         ctx = browser.new_context(locale="ko-KR")
         pw_page = ctx.new_page()
 
+        # 알라딘은 공식 API라 가장 믿을 만하다. 스크레이핑 결과가 이것과 전혀
+        # 겹치지 않으면 순위 목록이 아닌 배열을 잡은 것으로 보고 버린다.
+        reference_keys = {_title_key(b["title"]) for b in aladin_overall}
+
         print("  🏪 교보문고 수집...")
-        kyobo_items = fetch_kyobo(pw_page, client, 20)
+        kyobo_items = fetch_kyobo(pw_page, client, reference_keys, 20)
         print(f"     → {len(kyobo_items)}개")
 
         print("  🛒 YES24 수집...")
-        yes24_items = fetch_yes24(pw_page, client, 20)
+        yes24_items = fetch_yes24(pw_page, client, reference_keys, 20)
         print(f"     → {len(yes24_items)}개")
 
         print("  📱 리디 전체 수집...")
@@ -740,40 +850,61 @@ def main():
 
         browser.close()
 
-    # 장르별 수집에서 확인된 장르(알라딘 CID·리디 카테고리 기준)를 종합표 장르 컬럼의 기준으로 삼는다
+    # 장르별 수집에서 확인된 장르(알라딘 CID·리디 카테고리 기준)를 장르 판정의 기준으로 삼는다.
+    # 교보·YES24는 카테고리 문자열 키워드 추측이라 여기서 확인되면 덮어쓴다.
     genre_lookup: dict[str, str] = {}
     for items in list(aladin_by_genre.values()) + list(ridi_by_genre.values()):
         for b in items:
             genre_lookup.setdefault(_title_key(b["title"]), b["genre_key"])
+    for b in kyobo_items + yes24_items:
+        resolved = genre_lookup.get(_title_key(b["title"]))
+        if resolved:
+            b["genre_key"] = resolved
 
     # 종합 순위 — 리디는 전체 순위만 넣는다.
     # 장르별 순위(장르마다 1위 존재)를 섞으면 만점이 중복 발생해 종합 순위가 왜곡된다.
     print("\n  🔢 종합 순위 계산...")
     all_items = aladin_overall + kyobo_items + yes24_items + ridi_overall
-    overall = merge_rankings(all_items, top_n=TOP_N_OVERALL * 3, genre_lookup=genre_lookup)
-    print(f"     → 종합 {len(overall)}개 (기타 장르 제외 후 상위 {TOP_N_OVERALL}개 게시)")
+    overall = merge_rankings(all_items, genre_lookup=genre_lookup)
+    charted, dropped = take_charted(overall, TOP_N_OVERALL)
+    print(f"     → 병합 {len(overall)}권 중 상위 {len(charted)}권 게시")
+    for b in dropped:
+        print(f"     ⏭️  장르 미판정으로 제외: {b['title']} (지수 {_index_cell(b)})")
 
     genre_data: dict[str, list[dict]] = {}
     for genre in GENRES:
         key = genre["key"]
         combined = (
             aladin_by_genre.get(key, []) +
-            rerank_within_genre([b for b in kyobo_items if b["genre_key"] == key]) +
-            rerank_within_genre([b for b in yes24_items if b["genre_key"] == key]) +
+            [b for b in kyobo_items if b["genre_key"] == key] +
+            [b for b in yes24_items if b["genre_key"] == key] +
             ridi_by_genre.get(key, [])
         )
         if combined:
-            genre_data[key] = merge_genre_rankings(combined, top_n=5)
+            genre_data[key], _ = take_charted(merge_rankings(combined), TOP_N_GENRE)
             print(f"     [{genre['name']}] {len(genre_data[key])}개")
 
-    md = build_markdown(overall, genre_data, DATE)
+    md = build_markdown(charted, genre_data, DATE)
     slug = f"{DATE}-bestseller"
     out_dir = pathlib.Path("contents/book") / slug
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "index.md"
     out_path.write_text(md, encoding="utf-8")
 
+    dump_path = write_debug_dump(
+        {
+            "aladin_overall": aladin_overall,
+            "aladin_by_genre": aladin_by_genre,
+            "kyobo": kyobo_items,
+            "yes24": yes24_items,
+            "ridi_overall": ridi_overall,
+            "ridi_by_genre": ridi_by_genre,
+        },
+        overall,
+    )
+
     print(f"\n✅ 완료: {out_path}")
+    print(f"   수집 원본·점수 내역: {dump_path}")
 
 
 if __name__ == "__main__":

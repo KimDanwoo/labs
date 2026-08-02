@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { GoogleIcon } from '@shared/ui';
+import { useState } from 'react';
 
 type ChatLoginGateProps = {
   onLogin: () => Promise<void>;
@@ -22,9 +22,7 @@ export default function ChatLoginGate({ onLogin }: ChatLoginGateProps) {
 
   return (
     <div className="flex flex-col items-center gap-2 pt-1">
-      <p className="text-[11px] text-gray-400">
-        구글 로그인하면 톡을 남길 수 있어요
-      </p>
+      <p className="text-[11px] text-gray-400">구글 로그인하면 톡을 남길 수 있어요</p>
       <button
         type="button"
         onClick={handleClick}
