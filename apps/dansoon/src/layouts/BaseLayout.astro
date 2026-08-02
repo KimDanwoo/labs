@@ -14,7 +14,11 @@ const { title = 'blog.danwoo', description = '기록하고 공유합니다', thu
 const siteTitle = 'blog.danwoo';
 const siteUrl = 'https://daily-cron-log.vercel.app';
 const metaUrl = url ?? siteUrl;
-const metaThumbnail = thumbnail ?? `${siteUrl}/og.png`;
+// og.png 교체 시 v를 올려야 SNS 캐시가 갱신된다
+const defaultThumbnail = `${siteUrl}/og.png?v=2`;
+// og:image는 절대 URL이어야 한다 — 포스트 썸네일은 /_astro/... 상대경로로 들어온다
+const metaThumbnail = thumbnail ? new URL(thumbnail, siteUrl).href : defaultThumbnail;
+const isDefaultThumbnail = metaThumbnail === defaultThumbnail;
 const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
 const isBookPage = Astro.url.pathname.startsWith('/book');
 ---
@@ -31,9 +35,19 @@ const isBookPage = Astro.url.pathname.startsWith('/book');
     <link rel="icon" href="/favicon.png" type="image/png" />
     <meta property="og:locale" content="ko_KR" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteTitle} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={metaThumbnail} />
+    <meta property="og:image:alt" content={title} />
+    {
+      isDefaultThumbnail && (
+        <>
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+        </>
+      )
+    }
     <meta property="og:url" content={metaUrl} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
