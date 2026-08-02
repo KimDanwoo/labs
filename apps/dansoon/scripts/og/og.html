@@ -1,0 +1,129 @@
+<!--
+  public/og.png 원본(1200x630). 수정 후 dansoon 앱 루트에서 아래 명령으로 다시 렌더한다.
+
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu \
+    --hide-scrollbars --virtual-time-budget=4000 --window-size=1200,630 \
+    --screenshot="public/og.png" "file://$PWD/scripts/og/og.html"
+
+  이미지를 바꾸면 BaseLayout.astro의 og.png?v= 값을 올려야 SNS 캐시가 갱신된다.
+-->
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;900&display=swap" rel="stylesheet" />
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      :root{
+        --bg:#ffffff; --bg-subtle:#fafafa; --bg-hover:#f4f4f5;
+        --border:#e4e4e7; --border-subtle:#f4f4f5;
+        --text-primary:#18181b; --text-secondary:#52525b; --text-muted:#a1a1aa;
+        --green:#16a34a; --green-bg:#f0fdf4; --green-border:#bbf7d0;
+        --sans:Pretendard,-apple-system,'Apple SD Gothic Neo',sans-serif;
+        --serif:'Noto Serif KR','Apple SD Gothic Neo',serif;
+      }
+      body{ width:1200px; height:630px; background:var(--bg); font-family:var(--sans); overflow:hidden; }
+      .frame{ position:relative; width:100%; height:100%; overflow:hidden; }
+      .mark svg{ width:44px; height:44px; display:block; }
+      .wordmark{ font-size:20px; font-weight:800; letter-spacing:-0.03em; color:var(--text-primary); }
+      .brand{ display:flex; align-items:center; gap:14px; }
+      .serif{ font-family:var(--serif); }
+
+      body { background: #f6f7f6; }
+      .frame { padding: 46px; }
+      .blob {
+        position: absolute; right: -200px; top: -200px; width: 700px; height: 700px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(22, 163, 74, 0.14) 0%, rgba(22, 163, 74, 0) 66%);
+      }
+      .blob-2 {
+        position: absolute; left: -220px; bottom: -260px; width: 640px; height: 640px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(22, 163, 74, 0.08) 0%, rgba(22, 163, 74, 0) 68%);
+      }
+      .card {
+        position: relative; width: 100%; height: 100%; background: #fff;
+        border: 1px solid var(--border); border-radius: 22px;
+        box-shadow: 0 28px 64px -28px rgba(24, 24, 27, 0.22), 0 2px 6px rgba(24, 24, 27, 0.04);
+        padding: 48px 56px 38px; display: flex; flex-direction: column; overflow: hidden;
+      }
+      .card::before {
+        content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 4px;
+        background: linear-gradient(to right, #15803d, #16a34a 38%, #4ade80 72%, rgba(74, 222, 128, 0));
+      }
+      .top { display: flex; align-items: center; justify-content: space-between; }
+      .chip {
+        padding: 7px 15px; border-radius: 999px; background: var(--green-bg);
+        border: 1px solid var(--green-border); color: var(--green);
+        font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+      }
+      .body { margin: auto 0; }
+      .title {
+        font-family: var(--serif); font-size: 88px; font-weight: 700; line-height: 1;
+        letter-spacing: -0.045em; color: var(--text-primary);
+      }
+      .subtitle { margin-top: 20px; font-size: 24px; letter-spacing: -0.012em; color: var(--text-secondary); }
+      .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 36px; }
+      .mini {
+        position: relative; border: 1px solid var(--border); border-radius: 12px;
+        background: var(--bg-subtle); padding: 15px 17px 15px 19px; overflow: hidden;
+      }
+      .mini::before {
+        content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 3px;
+        border-radius: 0 3px 3px 0; background: var(--green);
+      }
+      .mini-cat {
+        font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
+        text-transform: uppercase; color: var(--green);
+      }
+      .mini-title {
+        margin-top: 7px; font-family: var(--serif); font-size: 17px; font-weight: 700;
+        line-height: 1.35; letter-spacing: -0.02em; color: var(--text-primary); word-break: keep-all;
+      }
+      .foot {
+        margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--border-subtle);
+        display: flex; justify-content: space-between; align-items: center;
+        font-size: 13px; font-weight: 600; letter-spacing: 0.16em;
+        text-transform: uppercase; color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <div class="blob"></div>
+      <div class="blob-2"></div>
+      <div class="card">
+        <div class="top">
+          <div class="brand">
+            <span class="mark"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" rx="8" fill="#008c4e"/><path d="M10 8h5.5c4.694 0 7.5 2.9 7.5 8s-2.806 8-7.5 8H10V8zm3 2.8v10.4h2.3c2.9 0 4.6-1.8 4.6-5.2s-1.7-5.2-4.6-5.2H13z" fill="white"/></svg></span>
+            <span class="wordmark">Dansoon</span>
+          </div>
+          <span class="chip">Tech &amp; Book Log</span>
+        </div>
+
+        <div class="body">
+          <h1 class="title">blog.danwoo</h1>
+          <p class="subtitle">기록하고 공유합니다</p>
+          <div class="cards">
+            <div class="mini">
+              <p class="mini-cat">News</p>
+              <p class="mini-title">오늘의 테크 뉴스 TOP 5</p>
+            </div>
+            <div class="mini">
+              <p class="mini-cat">Bestseller</p>
+              <p class="mini-title">일반 도서 베스트셀러</p>
+            </div>
+            <div class="mini">
+              <p class="mini-cat">Webnovel</p>
+              <p class="mini-title">웹소설 베스트셀러</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="foot">
+          <span>daily-cron-log.vercel.app</span>
+          <span>github.com/KimDanwoo</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
