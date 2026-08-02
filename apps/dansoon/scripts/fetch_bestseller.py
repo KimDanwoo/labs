@@ -786,6 +786,27 @@ isHidden: true
 """
 
 
+# ── 수집 원본 보관 ───────────────────────────────────────────
+DEBUG_DUMP_DIR = pathlib.Path("data/bestseller")
+
+
+def write_debug_dump(raw_sources: dict, merged: list[dict]) -> pathlib.Path:
+    """수집 원본과 점수 내역을 남긴다. 결과 MD만으로는 "왜 이 순위인지"를 사후에 알 수 없다."""
+    DEBUG_DUMP_DIR.mkdir(parents=True, exist_ok=True)
+    path = DEBUG_DUMP_DIR / f"{DATE}.json"
+    payload = {
+        "date": DATE,
+        "sources": raw_sources,
+        "merged": [
+            {k: v for k, v in book.items() if k not in ("raw_keys", "cover")}
+            | {"index": round(book["score"] / len(SOURCE_NAMES) * 100)}
+            for book in merged
+        ],
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return path
+
+
 # ── main ─────────────────────────────────────────────────────
 def main():
     print(f"[{DATE}] 베스트셀러 수집 시작\n")
@@ -870,7 +891,20 @@ def main():
     out_path = out_dir / "index.md"
     out_path.write_text(md, encoding="utf-8")
 
+    dump_path = write_debug_dump(
+        {
+            "aladin_overall": aladin_overall,
+            "aladin_by_genre": aladin_by_genre,
+            "kyobo": kyobo_items,
+            "yes24": yes24_items,
+            "ridi_overall": ridi_overall,
+            "ridi_by_genre": ridi_by_genre,
+        },
+        overall,
+    )
+
     print(f"\n✅ 완료: {out_path}")
+    print(f"   수집 원본·점수 내역: {dump_path}")
 
 
 if __name__ == "__main__":
