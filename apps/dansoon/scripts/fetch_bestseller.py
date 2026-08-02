@@ -137,6 +137,28 @@ def _is_same_work(short_key: str, long_key: str) -> bool:
     return bool(remainder) and not remainder[0].isdigit()
 
 
+def _matches_any(key: str, reference_keys: set[str]) -> bool:
+    if key in reference_keys:
+        return True
+    return any(_is_same_work(ref, key) or _is_same_work(key, ref) for ref in reference_keys)
+
+
+# 서로 다른 서점의 베스트셀러 상위 20위는 상당 부분 겹친다(2026-07-27 수집 기준
+# 알라딘∩교보 6권, 알라딘∩YES24 5권). 겹침이 이 수준에도 못 미치면 순위 목록이
+# 아니라 추천 캐러셀·기획전 배열을 잡은 것으로 보고 폐기한다.
+_SANITY_MIN_OVERLAP = 3
+
+
+def _is_plausible_list(items: list[dict], reference_keys: set[str], source_name: str) -> bool:
+    if not reference_keys or not items:
+        return True
+    hits = sum(1 for b in items if _matches_any(_title_key(b["title"]), reference_keys))
+    if hits >= _SANITY_MIN_OVERLAP:
+        return True
+    print(f"  ⚠️  {source_name} 목록이 알라딘 베스트셀러와 {hits}권만 겹칩니다 — 베스트셀러 목록이 아닌 것으로 보고 폐기")
+    return False
+
+
 def _stamp_depth(items: list[dict]) -> list[dict]:
     """정규화 점수의 기준이 될 목록 깊이를 각 항목에 새긴다.
 
@@ -294,7 +316,9 @@ def _parse_books_with_gemini(client: genai.Client, text: str, source_name: str, 
 
 
 # ── 교보문고 ────────────────────────────────────────────────
-def fetch_kyobo(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
+def fetch_kyobo(
+    pw_page: Page, client: genai.Client, reference_keys: set[str], limit: int = 20
+) -> list[dict]:
     urls = [
         "https://store.kyobobook.co.kr/bestseller/online",
         "https://store.kyobobook.co.kr/bestseller/total",
@@ -342,7 +366,7 @@ def fetch_kyobo(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
                             "genre_key": classify_genre(genre_text + " " + title),
                             "source": "교보문고",
                         })
-                    if results:
+                    if results and _is_plausible_list(results, reference_keys, "교보문고(NEXT_DATA)"):
                         print(f"  교보문고 items={len(results)}개 발견 (NEXT_DATA)")
                         return _stamp_depth(results)
 
@@ -365,7 +389,7 @@ def fetch_kyobo(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
                     })
                     if len(results) >= limit:
                         break
-                if results:
+                if results and _is_plausible_list(results, reference_keys, "교보문고(Gemini)"):
                     print(f"  교보문고 items={len(results)}개 발견 (Gemini)")
                     return _stamp_depth(results)
 
@@ -378,7 +402,9 @@ def fetch_kyobo(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
 
 
 # ── YES24 ───────────────────────────────────────────────────
-def fetch_yes24(pw_page: Page, client: genai.Client, limit: int = 20) -> list[dict]:
+def fetch_yes24(
+    pw_page: Page, client: genai.Client, reference_keys: set[str], limit: int = 20
+) -> list[dict]:
     urls = [
         "https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001",
         "https://www.yes24.com/Product/Category/BestSeller",
@@ -412,7 +438,7 @@ def fetch_yes24(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
                             "genre_key": classify_genre(genre_text + " " + str(title)),
                             "source": "YES24",
                         })
-                    if results:
+                    if results and _is_plausible_list(results, reference_keys, "YES24(NEXT_DATA)"):
                         print(f"  YES24 items={len(results)}개 발견 (NEXT_DATA)")
                         return _stamp_depth(results)
 
@@ -435,7 +461,7 @@ def fetch_yes24(pw_page: Page, client: genai.Client, limit: int = 20) -> list[di
                     })
                     if len(results) >= limit:
                         break
-                if results:
+                if results and _is_plausible_list(results, reference_keys, "YES24(Gemini)"):
                     print(f"  YES24 items={len(results)}개 발견 (Gemini)")
                     return _stamp_depth(results)
 
@@ -782,12 +808,16 @@ def main():
         ctx = browser.new_context(locale="ko-KR")
         pw_page = ctx.new_page()
 
+        # 알라딘은 공식 API라 가장 믿을 만하다. 스크레이핑 결과가 이것과 전혀
+        # 겹치지 않으면 순위 목록이 아닌 배열을 잡은 것으로 보고 버린다.
+        reference_keys = {_title_key(b["title"]) for b in aladin_overall}
+
         print("  🏪 교보문고 수집...")
-        kyobo_items = fetch_kyobo(pw_page, client, 20)
+        kyobo_items = fetch_kyobo(pw_page, client, reference_keys, 20)
         print(f"     → {len(kyobo_items)}개")
 
         print("  🛒 YES24 수집...")
-        yes24_items = fetch_yes24(pw_page, client, 20)
+        yes24_items = fetch_yes24(pw_page, client, reference_keys, 20)
         print(f"     → {len(yes24_items)}개")
 
         print("  📱 리디 전체 수집...")
