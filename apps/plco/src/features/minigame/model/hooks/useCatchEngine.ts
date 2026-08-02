@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   MINIGAME_BAD_EMOJIS,
   MINIGAME_BAD_PENALTY,
@@ -31,16 +31,12 @@ import {
 import type { CatchFloat, FallingItem, MinigamePhase } from '../types';
 
 const CATCHER_START_X = MINIGAME_FIELD_WIDTH / 2 - MINIGAME_CATCHER_WIDTH / 2;
-const CATCHER_Y =
-  MINIGAME_FIELD_HEIGHT - (MINIGAME_CATCHER_BOTTOM + MINIGAME_CATCHER_HEIGHT);
+const CATCHER_Y = MINIGAME_FIELD_HEIGHT - (MINIGAME_CATCHER_BOTTOM + MINIGAME_CATCHER_HEIGHT);
 
 const toCatcherX = (clientX: number, rect: DOMRect): number =>
   Math.max(
     0,
-    Math.min(
-      MINIGAME_FIELD_WIDTH - MINIGAME_CATCHER_WIDTH,
-      clientX - rect.left - MINIGAME_CATCHER_WIDTH / 2,
-    ),
+    Math.min(MINIGAME_FIELD_WIDTH - MINIGAME_CATCHER_WIDTH, clientX - rect.left - MINIGAME_CATCHER_WIDTH / 2),
   );
 
 type CatchTouchDirection = 'left' | 'right';
@@ -71,6 +67,8 @@ export function useCatchEngine() {
   const lastFrameRef = useRef(0);
   const lastSpawnXRef = useRef(-1);
   const fieldPointerActiveRef = useRef(false);
+  // 드래그 중 필드 위치. pointerdown 때 한 번만 측정해 캐시(매 move 레이아웃 읽기 방지).
+  const fieldRectRef = useRef<DOMRect | null>(null);
 
   const startGame = useCallback(() => {
     if (!minigame.canPlay) return;
@@ -133,10 +131,7 @@ export function useCatchEngine() {
     const loop = () => {
       const now = Date.now();
       // dt: 프레임 간격을 60fps 기준 배율로 환산 (탭 복귀 시 폭주 방지)
-      const dt =
-        lastFrameRef.current > 0
-          ? Math.min((now - lastFrameRef.current) / MINIGAME_FRAME_MS, 3)
-          : 1;
+      const dt = lastFrameRef.current > 0 ? Math.min((now - lastFrameRef.current) / MINIGAME_FRAME_MS, 3) : 1;
       lastFrameRef.current = now;
 
       const elapsed = now - gameStart.current;
@@ -151,10 +146,7 @@ export function useCatchEngine() {
       setTimeLeft(MINIGAME_DURATION - elapsed);
 
       if (keysPressed.current.has('ArrowLeft')) {
-        catcherRef.current = Math.max(
-          0,
-          catcherRef.current - MINIGAME_CATCHER_SPEED * dt,
-        );
+        catcherRef.current = Math.max(0, catcherRef.current - MINIGAME_CATCHER_SPEED * dt);
       }
       if (keysPressed.current.has('ArrowRight')) {
         catcherRef.current = Math.min(
@@ -175,14 +167,8 @@ export function useCatchEngine() {
         // 직전 스폰 위치에서 최소 간격 이상 떨어진 곳에 배치
         const maxX = MINIGAME_FIELD_WIDTH - MINIGAME_ITEM_SIZE;
         let spawnX = Math.random() * maxX;
-        if (
-          lastSpawnXRef.current >= 0 &&
-          Math.abs(spawnX - lastSpawnXRef.current) < MINIGAME_SPAWN_SPREAD_MIN
-        ) {
-          const offset =
-            MINIGAME_SPAWN_SPREAD_MIN *
-            (Math.random() < 0.5 ? 1 : -1) *
-            (1 + Math.random() * 0.5);
+        if (lastSpawnXRef.current >= 0 && Math.abs(spawnX - lastSpawnXRef.current) < MINIGAME_SPAWN_SPREAD_MIN) {
+          const offset = MINIGAME_SPAWN_SPREAD_MIN * (Math.random() < 0.5 ? 1 : -1) * (1 + Math.random() * 0.5);
           spawnX = Math.max(0, Math.min(maxX, lastSpawnXRef.current + offset));
         }
         lastSpawnXRef.current = spawnX;
@@ -194,9 +180,7 @@ export function useCatchEngine() {
           emoji: pool[Math.floor(Math.random() * pool.length)],
           kind: isBad ? 'bad' : 'good',
           speed:
-            MINIGAME_ITEM_SPEED_BASE +
-            Math.random() * MINIGAME_ITEM_SPEED_RANDOM +
-            elapsed * MINIGAME_ITEM_SPEED_ACCEL,
+            MINIGAME_ITEM_SPEED_BASE + Math.random() * MINIGAME_ITEM_SPEED_RANDOM + elapsed * MINIGAME_ITEM_SPEED_ACCEL,
         };
         itemsRef.current = [...itemsRef.current, newItem];
         lastSpawn.current = now;
@@ -219,8 +203,7 @@ export function useCatchEngine() {
           if (isColliding) {
             if (item.kind === 'good') {
               // combo 5+ 이상이면 +2, 아니면 +1
-              const bonus =
-                comboRef.current >= MINIGAME_COMBO_SCORE_THRESHOLD ? 1 : 0;
+              const bonus = comboRef.current >= MINIGAME_COMBO_SCORE_THRESHOLD ? 1 : 0;
               const gained = 1 + bonus;
               scoreDelta += gained;
               comboRef.current += 1;
@@ -291,30 +274,27 @@ export function useCatchEngine() {
   }, []);
 
   // 필드 직접 드래그 — 캐처가 손가락을 따라온다
-  const handleFieldPointerDown = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      e.currentTarget.setPointerCapture(e.pointerId);
-      fieldPointerActiveRef.current = true;
-      keysPressed.current.clear();
-      const rect = e.currentTarget.getBoundingClientRect();
-      catcherRef.current = toCatcherX(e.clientX, rect);
-      setCatcherX(catcherRef.current);
-    },
-    [],
-  );
+  const handleFieldPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    fieldPointerActiveRef.current = true;
+    keysPressed.current.clear();
+    const rect = e.currentTarget.getBoundingClientRect();
+    fieldRectRef.current = rect;
+    catcherRef.current = toCatcherX(e.clientX, rect);
+    setCatcherX(catcherRef.current);
+  }, []);
 
-  const handleFieldPointerMove = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!fieldPointerActiveRef.current) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      catcherRef.current = toCatcherX(e.clientX, rect);
-      setCatcherX(catcherRef.current);
-    },
-    [],
-  );
+  const handleFieldPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!fieldPointerActiveRef.current) return;
+    // 캐시된 rect 재사용(없으면 1회 측정). 매 move 레이아웃 읽기를 없애 드래그가 부드럽다.
+    const rect = fieldRectRef.current ?? e.currentTarget.getBoundingClientRect();
+    catcherRef.current = toCatcherX(e.clientX, rect);
+    setCatcherX(catcherRef.current);
+  }, []);
 
   const handleFieldPointerUp = useCallback(() => {
     fieldPointerActiveRef.current = false;
+    fieldRectRef.current = null;
   }, []);
 
   const handleFinish = useCallback(() => {
