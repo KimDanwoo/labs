@@ -1,7 +1,31 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;900&display=swap');
 @import 'tailwindcss';
 @plugin "@tailwindcss/typography";
+
+/* ── 마루부리 (네이버, 자체 임베드) ──
+   공식 배포본(hangeul.naver.com)의 OTF를 woff2로 변환해 public/fonts에 둔다.
+   CDN(@import)을 쓰면 외부 장애·차단에 렌더링이 묶이므로 직접 호스팅한다.
+   제공 굵기는 200/300/400/600/700이며 앱이 쓰는 400·600·700만 담았다. */
+@font-face {
+  font-family: 'MaruBuri';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/MaruBuri-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'MaruBuri';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/MaruBuri-SemiBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'MaruBuri';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/MaruBuri-Bold.woff2') format('woff2');
+}
 
 /* ── Theme tokens (zinc palette) ── */
 :root {
@@ -44,10 +68,10 @@
 }
 
 @theme {
-  --font-sans:
-    Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo',
-    'Noto Sans KR', sans-serif;
-  --font-serif: 'Noto Serif KR', 'Nanum Myeongjo', 'Apple SD Gothic Neo', ui-serif, Georgia, 'Times New Roman', serif;
+  /* 본문·제목 모두 마루부리. 두 역할을 남겨둔 건 기존 사용처(var(--font-sans) /
+     var(--font-serif))를 그대로 두고 서체만 갈아끼우기 위함이다. */
+  --font-sans: 'MaruBuri', 'Apple SD Gothic Neo', 'Noto Serif KR', ui-serif, Georgia, serif;
+  --font-serif: 'MaruBuri', 'Nanum Myeongjo', 'Apple SD Gothic Neo', ui-serif, Georgia, 'Times New Roman', serif;
   --color-green-0: #16a34a;
   --color-grey-0: #52525b;
   --color-grey-1: #71717a;
@@ -127,7 +151,7 @@ a {
 
 .header-logo {
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.04em;
   color: var(--text-primary);
   transition: color 0.15s;
