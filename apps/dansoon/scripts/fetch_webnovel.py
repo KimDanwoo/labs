@@ -267,6 +267,16 @@ def _lookup_link(title: str, title_to_url: dict[str, str]) -> str:
 
 
 # ── 카카오페이지: 장르별 직접 수집 (DOM에서 제목+작가 분리) ───
+_KAKAO_AUTHOR_META = 'meta[property="og:novel:author"], meta[name="author"]'
+# 작가 meta는 하이드레이션 이후 주입된다. domcontentloaded 직후 읽으면 아직 비어 있어
+# 빈 문자열이 된다(2026-08-03 발행분에서 카카오 작가 59%가 이 때문에 비었다).
+_KAKAO_AUTHOR_READY_JS = (
+    "() => { const m = document.querySelector('"
+    + _KAKAO_AUTHOR_META
+    + "'); return !!(m && m.content && m.content.trim()); }"
+)
+
+
 def _fetch_kakao_author(pw_page: Page, content_id: str) -> str:
     """개별 작품 페이지 meta 태그에서 작가명 추출 (리스트뷰 폴백용)"""
     try:
@@ -274,9 +284,18 @@ def _fetch_kakao_author(pw_page: Page, content_id: str) -> str:
             f"https://page.kakao.com/content/{content_id}",
             wait_until="domcontentloaded", timeout=15000,
         )
+    except Exception:
+        return ""
+
+    try:
+        pw_page.wait_for_function(_KAKAO_AUTHOR_READY_JS, timeout=8000)
+    except Exception:
+        pass  # 채워지지 않아도 아래에서 한 번 더 시도한다
+
+    try:
         return pw_page.evaluate(r"""() => {
             const meta = document.querySelector('meta[property="og:novel:author"], meta[name="author"]');
-            if (meta && meta.content) return meta.content;
+            if (meta && meta.content && meta.content.trim()) return meta.content.trim();
             const scripts = document.querySelectorAll('script');
             for (const s of scripts) {
                 const m = (s.textContent || '').match(/"authors?"\s*:\s*"([^"]{1,30})"/);

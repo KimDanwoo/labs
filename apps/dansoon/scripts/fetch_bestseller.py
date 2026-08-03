@@ -316,6 +316,95 @@ def _parse_books_with_gemini(client: genai.Client, text: str, source_name: str, 
 
 
 # ── 교보문고 ────────────────────────────────────────────────
+# 렌더된 DOM에서 목록을 직접 읽는다. 페이지 텍스트를 LLM에 넘겨 추출하던 방식은
+# 개별 도서 링크를 얻지 못해(목록 URL이 그대로 들어갔다) 저자·순위도 흔들렸다.
+_KYOBO_DOM_JS = """
+() => {
+  const lists = [...document.querySelectorAll('ol')]
+    .filter((ol) => ol.querySelectorAll('li a[href*="/detail/"]').length >= 5);
+  const out = [];
+  for (const ol of lists) {
+    for (const li of [...ol.children]) {
+      const a = li.querySelector('a.prod_link.font-medium')
+        || [...li.querySelectorAll('a[href*="/detail/"]')]
+             .find((x) => x.textContent.trim() && !/새창보기|미리보기/.test(x.textContent));
+      if (!a) continue;
+      const title = a.textContent.trim();
+      if (!title) continue;
+      const href = a.getAttribute('href') || '';
+      const lines = li.innerText.split('\\n').map((s) => s.trim()).filter(Boolean);
+      const ti = lines.indexOf(title);
+      let author = '';
+      if (ti >= 0) {
+        for (let i = ti + 1; i < lines.length; i++) {
+          const l = lines[i];
+          if (l && l !== '·' && !/^[\\d,]/.test(l)) { author = l; break; }
+        }
+      }
+      out.push({
+        title,
+        author,
+        link: href.startsWith('http') ? href : 'https://product.kyobobook.co.kr' + href,
+      });
+    }
+  }
+  return out;
+}
+"""
+
+_YES24_DOM_JS = """
+() => {
+  const root = document.querySelector('#yesBestList');
+  if (!root) return [];
+  const lis = [...root.querySelectorAll('li')].filter((li) => li.querySelector('a.gd_name'));
+  const leaf = lis.filter((li) => !lis.some((o) => o !== li && li.contains(o)));
+  return leaf.map((li) => {
+    const a = li.querySelector('a.gd_name');
+    const href = a.getAttribute('href') || '';
+    const lines = li.innerText.split('\\n').map((s) => s.trim()).filter(Boolean);
+    let author = (li.querySelector('.info_auth, .authPub') || {}).innerText || '';
+    if (!author) author = lines.find((l) => / 저(\\/|$| )/.test(l)) || '';
+    author = author.split('/')[0].replace(/\\s*(글그림|편역|엮음|지음|저|편|역|글|그림)\\s*$/, '').trim();
+    return {
+      title: a.textContent.trim(),
+      author,
+      link: href.startsWith('http') ? href : 'https://www.yes24.com' + href,
+      rankText: (li.querySelector('.saleNum') || {}).textContent || '',
+    };
+  });
+}
+"""
+
+
+def _rows_from_dom(pw_page: Page, script: str, source_name: str, limit: int) -> list[dict]:
+    """DOM 추출 결과를 표준 항목으로 변환. 순위는 목록 순서를 쓴다.
+
+    교보는 1위에 순위 배지가 없어 배지 파싱이 어긋난다. 목록 순서가 곧 순위다.
+    """
+    raw = pw_page.evaluate(script) or []
+    results: list[dict] = []
+    seen: set[str] = set()
+    for entry in raw:
+        title = str(entry.get("title", "")).strip()
+        key = _title_key(title)
+        if not title or not key or key in seen:
+            continue
+        seen.add(key)
+        results.append({
+            "rank": len(results) + 1,
+            "title": title,
+            "author": str(entry.get("author", "")).strip(),
+            "cover": "",
+            "link": str(entry.get("link", "")).strip(),
+            "publisher": "",
+            "genre_key": classify_genre(title),
+            "source": source_name,
+        })
+        if len(results) >= limit:
+            break
+    return results
+
+
 def fetch_kyobo(
     pw_page: Page, client: genai.Client, reference_keys: set[str], limit: int = 20
 ) -> list[dict]:
@@ -370,7 +459,13 @@ def fetch_kyobo(
                         print(f"  교보문고 items={len(results)}개 발견 (NEXT_DATA)")
                         return _stamp_depth(results)
 
-            # Gemini AI 기반 추출 (fallback)
+            # 렌더된 DOM 직접 파싱
+            dom_results = _rows_from_dom(pw_page, _KYOBO_DOM_JS, "교보문고", limit)
+            if dom_results and _is_plausible_list(dom_results, reference_keys, "교보문고(DOM)"):
+                print(f"  교보문고 items={len(dom_results)}개 발견 (DOM)")
+                return _stamp_depth(dom_results)
+
+            # Gemini AI 기반 추출 (마지막 폴백)
             print("  📖 교보문고 Gemini AI 추출 시도...")
             page_text = pw_page.inner_text("body")
             gemini_books = _parse_books_with_gemini(client, page_text, "교보문고", limit)
@@ -442,7 +537,13 @@ def fetch_yes24(
                         print(f"  YES24 items={len(results)}개 발견 (NEXT_DATA)")
                         return _stamp_depth(results)
 
-            # Gemini AI 기반 추출 (fallback)
+            # 렌더된 DOM 직접 파싱
+            dom_results = _rows_from_dom(pw_page, _YES24_DOM_JS, "YES24", limit)
+            if dom_results and _is_plausible_list(dom_results, reference_keys, "YES24(DOM)"):
+                print(f"  YES24 items={len(dom_results)}개 발견 (DOM)")
+                return _stamp_depth(dom_results)
+
+            # Gemini AI 기반 추출 (마지막 폴백)
             print("  📖 YES24 Gemini AI 추출 시도...")
             page_text = pw_page.inner_text("body")
             gemini_books = _parse_books_with_gemini(client, page_text, "YES24", limit)
@@ -712,21 +813,40 @@ def _source_cells(sources: dict[str, dict]) -> str:
     return " | ".join(f"{sources[name]['rank']}위" if sources.get(name) else "-" for name in SOURCE_NAMES)
 
 
-def _index_cell(book: dict) -> str:
-    """정규화 점수(0~서점 수)를 0~100 지수로 환산. 네 서점 모두 1위면 100."""
-    return str(round(book["score"] / len(SOURCE_NAMES) * 100))
+def _index_cell(book: dict, source_count: int = len(SOURCE_NAMES)) -> str:
+    """정규화 점수를 0~100 지수로 환산. 수집에 성공한 서점 모두 1위면 100.
+
+    항상 4로 나누면 서점 하나가 실패한 주에 지수 상한이 75로 묶여, 설명과 어긋나고
+    주 간 비교도 깨진다. 실제로 수집된 서점 수로 나눠 기준을 맞춘다.
+    """
+    return str(round(book["score"] / max(1, source_count) * 100))
 
 
-def build_markdown(charted: list[dict], genre_data: dict[str, list[dict]], date_str: str) -> str:
+def build_markdown(
+    charted: list[dict],
+    genre_data: dict[str, list[dict]],
+    date_str: str,
+    collected_sources: tuple[str, ...] = SOURCE_NAMES,
+) -> str:
     dt = datetime.strptime(date_str, "%Y-%m-%d")
     first_weekday = dt.replace(day=1).weekday()
     week = (dt.day + first_weekday - 1) // 7 + 1
     date_kr = f"{dt.year}년 {dt.month}월 {week}째주"
+    source_count = len(collected_sources)
+    missing = [name for name in SOURCE_NAMES if name not in collected_sources]
+    # 서점이 빠진 주는 순위가 그만큼 부분적이다. 숨기지 않고 표에 명시한다.
+    missing_note = (
+        f"\n> ⚠️ 이번 주는 **{'·'.join(missing)}** 수집에 실패해 "
+        f"{'·'.join(collected_sources)} {source_count}개 서점만으로 집계했습니다. "
+        "해당 서점에만 오르는 책은 순위에 반영되지 않습니다.\n"
+        if missing
+        else ""
+    )
 
     rows = [
         f"| **{b['rank']}** | {_title_cell(b)} | {_md_cell(b['author'])} "
         f"| {next((g['name'] for g in GENRES if g['key'] == b['genre_key']), '')} "
-        f"| {_index_cell(b)} | {_source_cells(b['sources'])} |"
+        f"| {_index_cell(b, source_count)} | {_source_cells(b['sources'])} |"
         for b in charted
     ]
 
@@ -743,7 +863,7 @@ def build_markdown(charted: list[dict], genre_data: dict[str, list[dict]], date_
             continue
         genre_rows = [
             f"| **{b['rank']}** | {_title_cell(b)} | {_md_cell(b['author'])} "
-            f"| {_index_cell(b)} | {_source_cells(b['sources'])} |"
+            f"| {_index_cell(b, source_count)} | {_source_cells(b['sources'])} |"
             for b in books
         ]
         genre_table = "\n".join([
@@ -764,10 +884,11 @@ isHidden: true
 ## 🏅 일반 도서 베스트셀러 TOP {len(charted)}
 
 각 서점의 **전체 베스트셀러 순위**입니다. 리디는 제공 범위상 {RIDI_OVERALL_MAX}위까지만 집계됩니다.
-
+{missing_note}
 **지수**는 서점별 순위를 그 서점의 수집 범위 기준으로 0~100 환산해 평균한 값입니다.
-네 서점 모두 1위면 100이고, 순위에 없는 서점은 0점으로 계산합니다. 서점마다 확인
-가능한 순위 깊이가 달라(알라딘·교보문고·YES24 20위, 리디 {RIDI_OVERALL_MAX}위) 순위를 그대로 더하지 않습니다.
+집계에 쓰인 {source_count}개 서점에서 모두 1위면 100이고, 순위에 없는 서점은 0점으로
+계산합니다. 서점마다 확인 가능한 순위 깊이가 달라(알라딘·교보문고·YES24 20위,
+리디 {RIDI_OVERALL_MAX}위) 순위를 그대로 더하지 않습니다.
 
 {overall_table}
 
@@ -867,9 +988,21 @@ def main():
     all_items = aladin_overall + kyobo_items + yes24_items + ridi_overall
     overall = merge_rankings(all_items, genre_lookup=genre_lookup)
     charted, dropped = take_charted(overall, TOP_N_OVERALL)
+    # 지수 기준을 실제 수집된 서점 수에 맞춘다. 실패한 서점을 분모에 넣으면
+    # 지수 상한이 100에 못 미쳐 설명과 어긋나고 주 간 비교도 깨진다.
+    collected_sources = tuple(
+        name for name, items in (
+            ("알라딘", aladin_overall), ("교보문고", kyobo_items),
+            ("YES24", yes24_items), ("리디", ridi_overall),
+        ) if items
+    )
     print(f"     → 병합 {len(overall)}권 중 상위 {len(charted)}권 게시")
+    print(f"     → 집계 서점 {len(collected_sources)}개: {'·'.join(collected_sources)}")
+    if len(collected_sources) < len(SOURCE_NAMES):
+        missing = [n for n in SOURCE_NAMES if n not in collected_sources]
+        print(f"     ⚠️  수집 실패: {'·'.join(missing)} — 순위가 부분 집계임을 리포트에 명시합니다")
     for b in dropped:
-        print(f"     ⏭️  장르 미판정으로 제외: {b['title']} (지수 {_index_cell(b)})")
+        print(f"     ⏭️  장르 미판정으로 제외: {b['title']} (지수 {_index_cell(b, len(collected_sources))})")
 
     genre_data: dict[str, list[dict]] = {}
     for genre in GENRES:
@@ -884,27 +1017,31 @@ def main():
             genre_data[key], _ = take_charted(merge_rankings(combined), TOP_N_GENRE)
             print(f"     [{genre['name']}] {len(genre_data[key])}개")
 
-    md = build_markdown(charted, genre_data, DATE)
+    md = build_markdown(charted, genre_data, DATE, collected_sources)
     slug = f"{DATE}-bestseller"
     out_dir = pathlib.Path("contents/book") / slug
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "index.md"
     out_path.write_text(md, encoding="utf-8")
-
-    dump_path = write_debug_dump(
-        {
-            "aladin_overall": aladin_overall,
-            "aladin_by_genre": aladin_by_genre,
-            "kyobo": kyobo_items,
-            "yes24": yes24_items,
-            "ridi_overall": ridi_overall,
-            "ridi_by_genre": ridi_by_genre,
-        },
-        overall,
-    )
-
     print(f"\n✅ 완료: {out_path}")
-    print(f"   수집 원본·점수 내역: {dump_path}")
+
+    # 덤프는 사후 추적용 부가 산출물이다. 여기서 예외가 나면 스크립트가 비정상 종료해
+    # 워크플로의 커밋 단계가 실행되지 않고, 이미 만든 리포트까지 발행되지 못한다.
+    try:
+        dump_path = write_debug_dump(
+            {
+                "aladin_overall": aladin_overall,
+                "aladin_by_genre": aladin_by_genre,
+                "kyobo": kyobo_items,
+                "yes24": yes24_items,
+                "ridi_overall": ridi_overall,
+                "ridi_by_genre": ridi_by_genre,
+            },
+            overall,
+        )
+        print(f"   수집 원본·점수 내역: {dump_path}")
+    except Exception as e:
+        print(f"   ⚠️  수집 원본 보관 실패(리포트 발행은 계속): {type(e).__name__}: {e}")
 
 
 if __name__ == "__main__":

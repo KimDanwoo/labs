@@ -13,7 +13,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: main
@@ -33,7 +33,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -41,7 +41,7 @@ jobs:
         run: pip install requests curl_cffi google-genai playwright
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ hashFiles('**/dansoon-weekly-bestseller.yml') }}
@@ -62,7 +62,10 @@ jobs:
         run: |
           BRANCH="feature/${{ steps.date.outputs.date }}-bestseller"
           TITLE='✨ feat(${{ steps.date.outputs.date }}): 주간 베스트셀러 추가'
-          git add apps/dansoon/contents/ apps/dansoon/data/
+          # data/는 덤프가 생성되지 않으면 존재하지 않는다. 없는 경로를 넘기면
+          # git add가 실패해 리포트 발행까지 함께 막히므로 있는 경로만 넘긴다.
+          git add apps/dansoon/contents/
+          if [ -d apps/dansoon/data ]; then git add apps/dansoon/data/; fi
           if git diff --cached --quiet; then
             echo "생성된 변경이 없어 종료합니다."
             exit 0
