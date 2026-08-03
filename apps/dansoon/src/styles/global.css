@@ -18,8 +18,11 @@
   --green-border: #bbf7d0;
   --shadow-sm: 0 1px 6px rgba(0, 0, 0, 0.06);
 
-  /* 컨테이너 폭 — header·main·footer가 같은 값을 공유한다.
-     베스트셀러 종합표가 8열이라 800px에서는 PC에서도 가로 스크롤이 생겼다. */
+  /* 헤더·푸터 폭은 페이지와 무관하게 고정한다. 본문 폭을 따라가면 목록↔상세를
+     오갈 때 nav가 좌우로 움직여 흔들리게 보인다. */
+  --shell-width: 1120px;
+  /* 본문 폭은 페이지가 정한다(BaseLayout의 contentWidth). 베스트셀러 종합표가
+     8열이라 상세는 넓어야 하고, 목록은 좁은 한 줄 흐름이 읽기 좋다. */
   --content-width: 1120px;
   /* 이보다 좁아지면 표는 .table-wrap 안에서 가로 스크롤된다(모바일) */
   --table-min-width: 640px;
