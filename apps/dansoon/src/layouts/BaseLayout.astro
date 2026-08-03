@@ -47,6 +47,8 @@ const isBookPage = Astro.url.pathname.startsWith('/book');
     <link rel="canonical" href={metaUrl} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.png" type="image/png" />
+    <!-- 본문에 바로 쓰이는 굵기만 미리 받는다. 나머지는 필요할 때 로드된다. -->
+    <link rel="preload" href="/fonts/MaruBuri-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <meta property="og:locale" content="ko_KR" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteTitle} />
