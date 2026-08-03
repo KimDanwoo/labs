@@ -2,14 +2,28 @@
 import '~/styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 
+// 목록은 모바일 폭의 한 줄 흐름으로 읽히게, 상세는 넓은 표를 담을 수 있게 나눈다.
+const CONTENT_WIDTH = {
+  wide: '1120px',
+  narrow: '640px',
+} as const;
+type ContentWidth = keyof typeof CONTENT_WIDTH;
+
 interface Props {
   title?: string;
   description?: string;
   thumbnail?: string;
   url?: string;
+  contentWidth?: ContentWidth;
 }
 
-const { title = 'blog.danwoo', description = '기록하고 공유합니다', thumbnail, url } = Astro.props;
+const {
+  title = 'blog.danwoo',
+  description = '기록하고 공유합니다',
+  thumbnail,
+  url,
+  contentWidth = 'wide',
+} = Astro.props;
 
 const siteTitle = 'blog.danwoo';
 const siteUrl = 'https://daily-cron-log.vercel.app';
@@ -67,11 +81,11 @@ const isBookPage = Astro.url.pathname.startsWith('/book');
     </script>
   </head>
 
-  <body class="min-h-screen flex flex-col">
+  <body class="min-h-screen flex flex-col" style={`--content-width: ${CONTENT_WIDTH[contentWidth]}`}>
     <div id="scroll-sentinel" class="absolute top-0 h-0 w-full pointer-events-none"></div>
 
     <header id="main-header" class="site-header sticky top-0 z-[9999] w-full">
-      <div class="max-w-[var(--content-width)] mx-auto flex items-center px-5 h-14 sm:h-16 gap-5">
+      <div class="max-w-(--shell-width) mx-auto flex items-center px-5 h-14 sm:h-16 gap-5">
         <a class="header-logo mr-auto" href={isBookPage ? '/book' : '/'}> Dansoon </a>
         <nav class="flex items-center gap-5">
           {
@@ -134,13 +148,13 @@ const isBookPage = Astro.url.pathname.startsWith('/book');
       </div>
     </header>
 
-    <main class="flex-1 max-w-[var(--content-width)] w-full mx-auto px-5 py-8 sm:py-12" style="view-transition-name: main-content">
+    <main class="flex-1 max-w-(--content-width) w-full mx-auto px-5 py-8 sm:py-12" style="view-transition-name: main-content">
       <slot />
     </main>
 
     <footer class="site-footer">
       <div
-        class="max-w-[var(--content-width)] mx-auto px-5 py-8 flex items-center justify-between text-sm"
+        class="max-w-(--shell-width) mx-auto px-5 py-8 flex items-center justify-between text-sm"
         style="color: var(--text-muted)"
       >
         <span>© {new Date().getFullYear()} <a class="footer-link" href="https://github.com/KimDanwoo">Danwoo</a></span>
