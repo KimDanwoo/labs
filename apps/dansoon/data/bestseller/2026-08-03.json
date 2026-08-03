@@ -1,0 +1,2901 @@
+{
+  "date": "2026-08-03",
+  "sources": {
+    "aladin_overall": [
+      {
+        "rank": 1,
+        "title": "투명한 나선",
+        "author": "히가시노 게이고",
+        "cover": "https://image.aladin.co.kr/product/39802/11/coversum/k082130602_3.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398021172&amp;partner=openAPI&amp;start=api",
+        "publisher": "북다",
+        "genre_key": "novel",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 2,
+        "title": "세네카, 오늘을 빼앗기고 있는 당신에게",
+        "author": "루키우스 안나이우스 세네카",
+        "cover": "https://image.aladin.co.kr/product/39640/49/coversum/k872130175_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396404956&amp;partner=openAPI&amp;start=api",
+        "publisher": "논픽션",
+        "genre_key": "humanit",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 3,
+        "title": "싯다르타",
+        "author": "헤르만 헤세",
+        "cover": "https://image.aladin.co.kr/product/32/95/coversum/s062934786_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api",
+        "publisher": "민음사",
+        "genre_key": "novel",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 4,
+        "title": "매거진 조이 Vol.3 : 가비지타임",
+        "author": "2사장",
+        "cover": "https://image.aladin.co.kr/product/39906/75/coversum/k592130021_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=399067587&amp;partner=openAPI&amp;start=api",
+        "publisher": "다산코믹스",
+        "genre_key": "etc",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 5,
+        "title": "빵충 사육 준수 사항",
+        "author": "김혜영",
+        "cover": "https://image.aladin.co.kr/product/39872/66/coversum/k242130313_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398726639&amp;partner=openAPI&amp;start=api",
+        "publisher": "안전가옥",
+        "genre_key": "novel",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 6,
+        "title": "2026년 제1회 김학철문학상 수상 작품집",
+        "author": "황정은",
+        "cover": "https://image.aladin.co.kr/product/39668/68/coversum/k332130293_2.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396686864&amp;partner=openAPI&amp;start=api",
+        "publisher": "도서출판 아시아",
+        "genre_key": "novel",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 7,
+        "title": "수족관",
+        "author": "유래혁",
+        "cover": "https://image.aladin.co.kr/product/33081/18/coversum/k582937507_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330811810&amp;partner=openAPI&amp;start=api",
+        "publisher": "포스터샵",
+        "genre_key": "novel",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 8,
+        "title": "얼굴만으론 좋아할 수 없어요 17 (한정판)",
+        "author": "안자이 카린",
+        "cover": "https://image.aladin.co.kr/product/39940/30/coversum/k342130224_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=399403043&amp;partner=openAPI&amp;start=api",
+        "publisher": "서울미디어코믹스(서울문화사)",
+        "genre_key": "etc",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 9,
+        "title": "유럽 도시 기행 3",
+        "author": "유시민",
+        "cover": "https://image.aladin.co.kr/product/39715/59/coversum/8965138310_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397155927&amp;partner=openAPI&amp;start=api",
+        "publisher": "생각의길",
+        "genre_key": "humanit",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 10,
+        "title": "태양 아래 올리브",
+        "author": "김초엽",
+        "cover": "https://image.aladin.co.kr/product/39890/8/coversum/k512130727_2.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398900892&amp;partner=openAPI&amp;start=api",
+        "publisher": "자이언트북스",
+        "genre_key": "novel",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 11,
+        "title": "코스모스 (100만 부 기념판)",
+        "author": "칼 세이건",
+        "cover": "https://image.aladin.co.kr/product/39676/50/coversum/k382130398_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396765073&amp;partner=openAPI&amp;start=api",
+        "publisher": "사이언스북스",
+        "genre_key": "science",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 12,
+        "title": "명탐정 코난 108",
+        "author": "아오야마 고쇼",
+        "cover": "https://image.aladin.co.kr/product/39953/99/coversum/k362130528_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=399539936&amp;partner=openAPI&amp;start=api",
+        "publisher": "서울미디어코믹스(서울문화사)",
+        "genre_key": "etc",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 13,
+        "title": "악의",
+        "author": "히가시노 게이고",
+        "cover": "https://image.aladin.co.kr/product/19822/35/coversum/8972750034_2.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=198223504&amp;partner=openAPI&amp;start=api",
+        "publisher": "현대문학",
+        "genre_key": "novel",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 14,
+        "title": "프로젝트 헤일메리 (알라딘 리커버 특별판)",
+        "author": "앤디 위어",
+        "cover": "https://image.aladin.co.kr/product/39679/83/coversum/8925568640_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396798366&amp;partner=openAPI&amp;start=api",
+        "publisher": "알에이치코리아(RHK)",
+        "genre_key": "novel",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 15,
+        "title": "독하게 돈 공부",
+        "author": "박소연",
+        "cover": "https://image.aladin.co.kr/product/39727/2/coversum/k042130706_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397270202&amp;partner=openAPI&amp;start=api",
+        "publisher": "메이븐",
+        "genre_key": "economy",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 16,
+        "title": "지푸라기 왕관을 쓴 여자",
+        "author": "박상영",
+        "cover": "https://image.aladin.co.kr/product/39834/40/coversum/k032130812_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398344057&amp;partner=openAPI&amp;start=api",
+        "publisher": "래빗홀",
+        "genre_key": "novel",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 17,
+        "title": "니체의 초월자",
+        "author": "프리드리히 니체",
+        "cover": "https://image.aladin.co.kr/product/37539/55/coversum/k392032120_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=375395519&amp;partner=openAPI&amp;start=api",
+        "publisher": "히읏",
+        "genre_key": "humanit",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 18,
+        "title": "독서의 기술",
+        "author": "고명환",
+        "cover": "https://image.aladin.co.kr/product/39656/35/coversum/k292130198_3.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396563552&amp;partner=openAPI&amp;start=api",
+        "publisher": "라곰",
+        "genre_key": "selfdev",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 19,
+        "title": "모순",
+        "author": "양귀자",
+        "cover": "https://image.aladin.co.kr/product/2584/37/coversum/8998441012_3.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&amp;partner=openAPI&amp;start=api",
+        "publisher": "쓰다",
+        "genre_key": "novel",
+        "source": "알라딘",
+        "depth": 20
+      },
+      {
+        "rank": 20,
+        "title": "명탐정 코난 108 (특장판)",
+        "author": "아오야마 고쇼",
+        "cover": "https://image.aladin.co.kr/product/39958/39/coversum/k912130526_1.jpg",
+        "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=399583956&amp;partner=openAPI&amp;start=api",
+        "publisher": "서울미디어코믹스(서울문화사)",
+        "genre_key": "etc",
+        "source": "알라딘",
+        "depth": 20
+      }
+    ],
+    "aladin_by_genre": {
+      "novel": [
+        {
+          "rank": 1,
+          "title": "투명한 나선",
+          "author": "히가시노 게이고",
+          "cover": "https://image.aladin.co.kr/product/39802/11/coversum/k082130602_3.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398021172&amp;partner=openAPI&amp;start=api",
+          "publisher": "북다",
+          "genre_key": "novel",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "싯다르타",
+          "author": "헤르만 헤세",
+          "cover": "https://image.aladin.co.kr/product/32/95/coversum/s062934786_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api",
+          "publisher": "민음사",
+          "genre_key": "novel",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "빵충 사육 준수 사항",
+          "author": "김혜영",
+          "cover": "https://image.aladin.co.kr/product/39872/66/coversum/k242130313_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398726639&amp;partner=openAPI&amp;start=api",
+          "publisher": "안전가옥",
+          "genre_key": "novel",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "2026년 제1회 김학철문학상 수상 작품집",
+          "author": "황정은",
+          "cover": "https://image.aladin.co.kr/product/39668/68/coversum/k332130293_2.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396686864&amp;partner=openAPI&amp;start=api",
+          "publisher": "도서출판 아시아",
+          "genre_key": "novel",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "수족관",
+          "author": "유래혁",
+          "cover": "https://image.aladin.co.kr/product/33081/18/coversum/k582937507_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330811810&amp;partner=openAPI&amp;start=api",
+          "publisher": "포스터샵",
+          "genre_key": "novel",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "태양 아래 올리브",
+          "author": "김초엽",
+          "cover": "https://image.aladin.co.kr/product/39890/8/coversum/k512130727_2.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398900892&amp;partner=openAPI&amp;start=api",
+          "publisher": "자이언트북스",
+          "genre_key": "novel",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "악의",
+          "author": "히가시노 게이고",
+          "cover": "https://image.aladin.co.kr/product/19822/35/coversum/8972750034_2.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=198223504&amp;partner=openAPI&amp;start=api",
+          "publisher": "현대문학",
+          "genre_key": "novel",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "프로젝트 헤일메리 (알라딘 리커버 특별판)",
+          "author": "앤디 위어",
+          "cover": "https://image.aladin.co.kr/product/39679/83/coversum/8925568640_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396798366&amp;partner=openAPI&amp;start=api",
+          "publisher": "알에이치코리아(RHK)",
+          "genre_key": "novel",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "지푸라기 왕관을 쓴 여자",
+          "author": "박상영",
+          "cover": "https://image.aladin.co.kr/product/39834/40/coversum/k032130812_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398344057&amp;partner=openAPI&amp;start=api",
+          "publisher": "래빗홀",
+          "genre_key": "novel",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "모순",
+          "author": "양귀자",
+          "cover": "https://image.aladin.co.kr/product/2584/37/coversum/8998441012_3.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&amp;partner=openAPI&amp;start=api",
+          "publisher": "쓰다",
+          "genre_key": "novel",
+          "source": "알라딘",
+          "depth": 10
+        }
+      ],
+      "economy": [
+        {
+          "rank": 1,
+          "title": "독하게 돈 공부",
+          "author": "박소연",
+          "cover": "https://image.aladin.co.kr/product/39727/2/coversum/k042130706_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397270202&amp;partner=openAPI&amp;start=api",
+          "publisher": "메이븐",
+          "genre_key": "economy",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "나의 첫 번째 부동산 교과서",
+          "author": "송희구",
+          "cover": "https://image.aladin.co.kr/product/39443/32/coversum/k392139397_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=394433203&amp;partner=openAPI&amp;start=api",
+          "publisher": "서삼독",
+          "genre_key": "economy",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "부의 갈림길",
+          "author": "오건영",
+          "cover": "https://image.aladin.co.kr/product/39443/89/coversum/k232139499_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=394438909&amp;partner=openAPI&amp;start=api",
+          "publisher": "포레스트북스",
+          "genre_key": "economy",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "돈, 뜨겁게 사랑하고 차갑게 다루어라",
+          "author": "앙드레 코스톨라니",
+          "cover": "https://image.aladin.co.kr/product/32489/85/coversum/k942935503_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=324898598&amp;partner=openAPI&amp;start=api",
+          "publisher": "미래의창",
+          "genre_key": "economy",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "돈의 심리학 (50만 부 기념 뉴 에디션)",
+          "author": "모건 하우절",
+          "cover": "https://image.aladin.co.kr/product/38331/50/coversum/k192034444_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=383315006&amp;partner=openAPI&amp;start=api",
+          "publisher": "인플루엔셜(주)",
+          "genre_key": "economy",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "생각에 관한 생각",
+          "author": "대니얼 카너먼",
+          "cover": "https://image.aladin.co.kr/product/14013/55/coversum/8934981210_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=140135544&amp;partner=openAPI&amp;start=api",
+          "publisher": "김영사",
+          "genre_key": "economy",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "투자에 대한 생각",
+          "author": "하워드 막스",
+          "cover": "https://image.aladin.co.kr/product/1990/58/coversum/s342534700_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=19905832&amp;partner=openAPI&amp;start=api",
+          "publisher": "비즈니스맵",
+          "genre_key": "economy",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "박곰희 연금 부자 수업 (25만 부 기념 리미티드 에디션)",
+          "author": "박곰희",
+          "cover": "https://image.aladin.co.kr/product/39410/64/coversum/k342139095_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=394106481&amp;partner=openAPI&amp;start=api",
+          "publisher": "인플루엔셜(주)",
+          "genre_key": "economy",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "인간을 인간답게 만드는 불완전함에 대하여",
+          "author": "팀 하포드",
+          "cover": "https://image.aladin.co.kr/product/39153/34/coversum/k062138867_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391533418&amp;partner=openAPI&amp;start=api",
+          "publisher": "윌마",
+          "genre_key": "economy",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "박태웅의 AI 강의 2026",
+          "author": "박태웅",
+          "cover": "https://image.aladin.co.kr/product/38808/31/coversum/k552137982_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388083105&amp;partner=openAPI&amp;start=api",
+          "publisher": "한빛비즈",
+          "genre_key": "economy",
+          "source": "알라딘",
+          "depth": 10
+        }
+      ],
+      "selfdev": [
+        {
+          "rank": 1,
+          "title": "독서의 기술",
+          "author": "고명환",
+          "cover": "https://image.aladin.co.kr/product/39656/35/coversum/k292130198_3.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396563552&amp;partner=openAPI&amp;start=api",
+          "publisher": "라곰",
+          "genre_key": "selfdev",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "어떻게 살아낼 것인가",
+          "author": "짐 콜린스",
+          "cover": "https://image.aladin.co.kr/product/39782/23/coversum/k192130202_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397822311&amp;partner=openAPI&amp;start=api",
+          "publisher": "필름(Feelm)",
+          "genre_key": "selfdev",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "내면 근력",
+          "author": "짐 머피",
+          "cover": "https://image.aladin.co.kr/product/38895/53/coversum/k602137608_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388955379&amp;partner=openAPI&amp;start=api",
+          "publisher": "윌북",
+          "genre_key": "selfdev",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "사고외주",
+          "author": "홍진기",
+          "cover": "https://image.aladin.co.kr/product/39608/96/coversum/k552130873_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396089663&amp;partner=openAPI&amp;start=api",
+          "publisher": "어크로스",
+          "genre_key": "selfdev",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "공감 능력 UP 감정카드",
+          "author": "(주)한국콘텐츠미디어 (부설)한국진로교육센터",
+          "cover": "https://image.aladin.co.kr/product/18679/52/coversum/k712635560_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=186795241&amp;partner=openAPI&amp;start=api",
+          "publisher": "한국콘텐츠미디어(매일넷앤드비즈)",
+          "genre_key": "selfdev",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "항상 기분 좋은 사람은 이렇게 말한다",
+          "author": "오노 모에코",
+          "cover": "https://image.aladin.co.kr/product/39933/13/coversum/k772130126_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=399331389&amp;partner=openAPI&amp;start=api",
+          "publisher": "알토북스",
+          "genre_key": "selfdev",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "나는 왜 네 말이 힘들까",
+          "author": "박재연",
+          "cover": "https://image.aladin.co.kr/product/39872/77/coversum/k742130313_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398727715&amp;partner=openAPI&amp;start=api",
+          "publisher": "한빛라이프",
+          "genre_key": "selfdev",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "질문의 격",
+          "author": "유선경",
+          "cover": "https://image.aladin.co.kr/product/36419/32/coversum/k542039095_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=364193237&amp;partner=openAPI&amp;start=api",
+          "publisher": "앤의서재",
+          "genre_key": "selfdev",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "손자병법",
+          "author": "손무",
+          "cover": "https://image.aladin.co.kr/product/37298/6/coversum/k292031545_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=372980631&amp;partner=openAPI&amp;start=api",
+          "publisher": "현대지성",
+          "genre_key": "selfdev",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "무례한 세상에서 나를 지키는 법",
+          "author": "발타사르 그라시안",
+          "cover": "https://image.aladin.co.kr/product/38816/95/coversum/k382137182_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388169547&amp;partner=openAPI&amp;start=api",
+          "publisher": "논픽션",
+          "genre_key": "selfdev",
+          "source": "알라딘",
+          "depth": 10
+        }
+      ],
+      "humanit": [
+        {
+          "rank": 1,
+          "title": "세네카, 오늘을 빼앗기고 있는 당신에게",
+          "author": "루키우스 안나이우스 세네카",
+          "cover": "https://image.aladin.co.kr/product/39640/49/coversum/k872130175_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396404956&amp;partner=openAPI&amp;start=api",
+          "publisher": "논픽션",
+          "genre_key": "humanit",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "유럽 도시 기행 3",
+          "author": "유시민",
+          "cover": "https://image.aladin.co.kr/product/39715/59/coversum/8965138310_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397155927&amp;partner=openAPI&amp;start=api",
+          "publisher": "생각의길",
+          "genre_key": "humanit",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "니체의 초월자",
+          "author": "프리드리히 니체",
+          "cover": "https://image.aladin.co.kr/product/37539/55/coversum/k392032120_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=375395519&amp;partner=openAPI&amp;start=api",
+          "publisher": "히읏",
+          "genre_key": "humanit",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "독서의 기술",
+          "author": "고명환",
+          "cover": "https://image.aladin.co.kr/product/39656/35/coversum/k292130198_3.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396563552&amp;partner=openAPI&amp;start=api",
+          "publisher": "라곰",
+          "genre_key": "humanit",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "번역의 철학",
+          "author": "데이미언 설스",
+          "cover": "https://image.aladin.co.kr/product/39725/96/coversum/k312130704_2.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397259637&amp;partner=openAPI&amp;start=api",
+          "publisher": "유유",
+          "genre_key": "humanit",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "죽음의 수용소 이후",
+          "author": "빅터 프랭클",
+          "cover": "https://image.aladin.co.kr/product/39582/2/coversum/k482139340_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=395820209&amp;partner=openAPI&amp;start=api",
+          "publisher": "북하우스",
+          "genre_key": "humanit",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "문해내공",
+          "author": "신종호",
+          "cover": "https://image.aladin.co.kr/product/39876/18/coversum/k752130413_2.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398761872&amp;partner=openAPI&amp;start=api",
+          "publisher": "상상스퀘어",
+          "genre_key": "humanit",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "빅터 프랭클의 죽음의 수용소에서",
+          "author": "빅터 프랭클",
+          "cover": "https://image.aladin.co.kr/product/38224/38/coversum/8936812629_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=382243812&amp;partner=openAPI&amp;start=api",
+          "publisher": "청아출판사",
+          "genre_key": "humanit",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "오뒷세이아",
+          "author": "호메로스",
+          "cover": "https://image.aladin.co.kr/product/68/68/coversum/s262036392_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=686827&amp;partner=openAPI&amp;start=api",
+          "publisher": "도서출판 숲",
+          "genre_key": "humanit",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "품격 있는 대화를 위한 지식 브리핑",
+          "author": "김진",
+          "cover": "https://image.aladin.co.kr/product/39244/75/coversum/k782138107_2.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=392447560&amp;partner=openAPI&amp;start=api",
+          "publisher": "북플레저",
+          "genre_key": "humanit",
+          "source": "알라딘",
+          "depth": 10
+        }
+      ],
+      "science": [
+        {
+          "rank": 1,
+          "title": "코스모스 (100만 부 기념판)",
+          "author": "칼 세이건",
+          "cover": "https://image.aladin.co.kr/product/39676/50/coversum/k382130398_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396765073&amp;partner=openAPI&amp;start=api",
+          "publisher": "사이언스북스",
+          "genre_key": "science",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "지능 파산",
+          "author": "한소원",
+          "cover": "https://image.aladin.co.kr/product/39842/84/coversum/k892130219_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398428444&amp;partner=openAPI&amp;start=api",
+          "publisher": "바다출판사",
+          "genre_key": "science",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "세상이 그대를 속일지라도",
+          "author": "김상욱",
+          "cover": "https://image.aladin.co.kr/product/39423/32/coversum/8962627140_2.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=394233247&amp;partner=openAPI&amp;start=api",
+          "publisher": "동아시아",
+          "genre_key": "science",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "코스모스",
+          "author": "칼 세이건",
+          "cover": "https://image.aladin.co.kr/product/87/9/coversum/s412032094_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=870950&amp;partner=openAPI&amp;start=api",
+          "publisher": "사이언스북스",
+          "genre_key": "science",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "완벽한 원시인",
+          "author": "자청",
+          "cover": "https://image.aladin.co.kr/product/38694/70/coversum/k612136721_2.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=386947012&amp;partner=openAPI&amp;start=api",
+          "publisher": "필로틱",
+          "genre_key": "science",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "원소 원정대",
+          "author": "아게도리도리",
+          "cover": "https://image.aladin.co.kr/product/39352/62/coversum/k602138534_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=393526281&amp;partner=openAPI&amp;start=api",
+          "publisher": "윌북주니어",
+          "genre_key": "science",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "초지능 시대 생존을 위한 AI 교양 수업",
+          "author": "바오쿤",
+          "cover": "https://image.aladin.co.kr/product/39876/31/coversum/k952130414_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398763112&amp;partner=openAPI&amp;start=api",
+          "publisher": "지니의서재",
+          "genre_key": "science",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "화성에 도시를 세운다면",
+          "author": "잭 와이너스미스",
+          "cover": "https://image.aladin.co.kr/product/39517/42/coversum/8925569280_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=395174298&amp;partner=openAPI&amp;start=api",
+          "publisher": "알에이치코리아(RHK)",
+          "genre_key": "science",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "이기적 유전자",
+          "author": "리처드 도킨스",
+          "cover": "https://image.aladin.co.kr/product/17048/25/coversum/8932473900_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=170482558&amp;partner=openAPI&amp;start=api",
+          "publisher": "을유문화사",
+          "genre_key": "science",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "AI, 신의 탄생 인간의 종말",
+          "author": "엘리에저 유드코스키",
+          "cover": "https://image.aladin.co.kr/product/38931/87/coversum/k032137816_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389318783&amp;partner=openAPI&amp;start=api",
+          "publisher": "상상스퀘어",
+          "genre_key": "science",
+          "source": "알라딘",
+          "depth": 10
+        }
+      ],
+      "essay": [
+        {
+          "rank": 1,
+          "title": "살아라, 타락하라",
+          "author": "다자이 오사무",
+          "cover": "https://image.aladin.co.kr/product/39701/65/coversum/k782130490_3.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397016516&amp;partner=openAPI&amp;start=api",
+          "publisher": "덤불프레스",
+          "genre_key": "essay",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "아메리칸 서바이벌",
+          "author": "올리버 그랜트",
+          "cover": "https://image.aladin.co.kr/product/39928/93/coversum/k542130027_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=399289325&amp;partner=openAPI&amp;start=api",
+          "publisher": "21세기북스",
+          "genre_key": "essay",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "불화하는 마음",
+          "author": "이지",
+          "cover": "https://image.aladin.co.kr/product/39653/9/coversum/k032130096_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396530936&amp;partner=openAPI&amp;start=api",
+          "publisher": "마요네즈",
+          "genre_key": "essay",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "악수도 없이 헤어졌다",
+          "author": "피천득",
+          "cover": "https://image.aladin.co.kr/product/38195/3/coversum/8937464691_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=381950320&amp;partner=openAPI&amp;start=api",
+          "publisher": "민음사",
+          "genre_key": "essay",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "너는 원래 괜찮은 사람이야",
+          "author": "윤지영(오뚝이샘)",
+          "cover": "https://image.aladin.co.kr/product/39899/87/coversum/k492130923_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398998730&amp;partner=openAPI&amp;start=api",
+          "publisher": "터닝페이지",
+          "genre_key": "essay",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "사춘기 엄마의 오장육부",
+          "author": "나민애",
+          "cover": "https://image.aladin.co.kr/product/39067/21/coversum/k662137858_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=390672114&amp;partner=openAPI&amp;start=api",
+          "publisher": "서교책방",
+          "genre_key": "essay",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "유럽 도시 기행 1",
+          "author": "유시민",
+          "cover": "https://image.aladin.co.kr/product/19654/27/coversum/8965135583_3.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=196542784&amp;partner=openAPI&amp;start=api",
+          "publisher": "생각의길",
+          "genre_key": "essay",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "누구에게나 가슴을 후벼파는 대사 한마디가 있다",
+          "author": "정덕현",
+          "cover": "https://image.aladin.co.kr/product/39828/45/coversum/k682130712_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398284528&amp;partner=openAPI&amp;start=api",
+          "publisher": "서교책방",
+          "genre_key": "essay",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "휴대폰과 독화살",
+          "author": "장준호",
+          "cover": "https://image.aladin.co.kr/product/39789/57/coversum/k732130303_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397895727&amp;partner=openAPI&amp;start=api",
+          "publisher": "시월",
+          "genre_key": "essay",
+          "source": "알라딘",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "일상주의자의 감각",
+          "author": "김이나",
+          "cover": "https://image.aladin.co.kr/product/39605/37/coversum/k192130878_1.jpg",
+          "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396053798&amp;partner=openAPI&amp;start=api",
+          "publisher": "이야기장수",
+          "genre_key": "essay",
+          "source": "알라딘",
+          "depth": 10
+        }
+      ]
+    },
+    "kyobo": [
+      {
+        "rank": 1,
+        "title": "세네카, 오늘을 빼앗기고 있는 당신에게",
+        "author": "세네카",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220308313",
+        "publisher": "",
+        "genre_key": "humanit",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 2,
+        "title": "반골",
+        "author": "권민창",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220622564",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 3,
+        "title": "나의 첫 번째 부동산 교과서",
+        "author": "송희구",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220119415",
+        "publisher": "",
+        "genre_key": "economy",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 4,
+        "title": "투명한 나선",
+        "author": "히가시노 게이고",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220515357",
+        "publisher": "",
+        "genre_key": "novel",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 5,
+        "title": "싯다르타",
+        "author": "헤르만 헤세",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000000620195",
+        "publisher": "",
+        "genre_key": "novel",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 6,
+        "title": "유럽 도시 기행 3",
+        "author": "유시민",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220429584",
+        "publisher": "",
+        "genre_key": "humanit",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 7,
+        "title": "수족관",
+        "author": "유래혁",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000211748790",
+        "publisher": "",
+        "genre_key": "novel",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 8,
+        "title": "코스모스(100만부 기념판)",
+        "author": "칼 세이건",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220340903",
+        "publisher": "",
+        "genre_key": "science",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 9,
+        "title": "오디세이아(고대 그리스어 완역본)",
+        "author": "호메로스",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000216292200",
+        "publisher": "",
+        "genre_key": "humanit",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 10,
+        "title": "테오",
+        "author": "앨런 레비",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220307771",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 11,
+        "title": "어떻게 살아낼 것인가",
+        "author": "짐 콜린스",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220500994",
+        "publisher": "",
+        "genre_key": "selfdev",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 12,
+        "title": "니체의 초월자",
+        "author": "프리드리히 니체",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000218278239",
+        "publisher": "",
+        "genre_key": "humanit",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 13,
+        "title": "빵충 사육 준수 사항",
+        "author": "김혜영",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220587963",
+        "publisher": "",
+        "genre_key": "novel",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 14,
+        "title": "독서의 기술",
+        "author": "고명환",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220340900",
+        "publisher": "",
+        "genre_key": "selfdev",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 15,
+        "title": "모순",
+        "author": "양귀자",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000001632467",
+        "publisher": "",
+        "genre_key": "novel",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 16,
+        "title": "명탐정 코난 108",
+        "author": "Gosho Aoyama",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220704921",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 17,
+        "title": "ETS 토익 정기시험 기출문제집 1000 Vol 5 RC",
+        "author": "ETS",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000218791163",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 18,
+        "title": "프로젝트 헤일메리",
+        "author": "앤디 위어",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000000479333",
+        "publisher": "",
+        "genre_key": "novel",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 19,
+        "title": "독하게 돈 공부",
+        "author": "박소연",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220452240",
+        "publisher": "",
+        "genre_key": "economy",
+        "source": "교보문고",
+        "depth": 20
+      },
+      {
+        "rank": 20,
+        "title": "ETS 토익 정기시험 기출문제집 1000 Vol 5 LC",
+        "author": "ETS",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000218791156",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "교보문고",
+        "depth": 20
+      }
+    ],
+    "yes24": [
+      {
+        "rank": 1,
+        "title": "세네카, 오늘을 빼앗기고 있는 당신에게",
+        "author": "루키우스 안나이우스 세네카",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/192474512",
+        "publisher": "",
+        "genre_key": "humanit",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 2,
+        "title": "투명한 나선",
+        "author": "히가시노 게이고",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/193807963",
+        "publisher": "",
+        "genre_key": "novel",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 3,
+        "title": "2027 공단기 소방단기 써니 행정법총론 핵심집약",
+        "author": "박준철 편",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/194332699",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 4,
+        "title": "매거진 조이 Vol.3 : 가비지타임",
+        "author": "2사장",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/194382691",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 5,
+        "title": "니체의 초월자",
+        "author": "프리드리히 니체",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/161401496",
+        "publisher": "",
+        "genre_key": "humanit",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 6,
+        "title": "싯다르타",
+        "author": "헤르만 헤세",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/257435",
+        "publisher": "",
+        "genre_key": "novel",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 7,
+        "title": "독서의 기술",
+        "author": "고명환",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/192555379",
+        "publisher": "",
+        "genre_key": "selfdev",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 8,
+        "title": "파동 눌림목 매매법",
+        "author": "파동마스터",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/193347163",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 9,
+        "title": "유럽 도시 기행 3",
+        "author": "유시민",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/193040623",
+        "publisher": "",
+        "genre_key": "humanit",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 10,
+        "title": "수족관",
+        "author": "유래혁",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/124235834",
+        "publisher": "",
+        "genre_key": "novel",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 11,
+        "title": "2027 유휘운 행정법총론 요약노트+기출문제 (요.플.)",
+        "author": "유휘운 편",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/193701241",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 12,
+        "title": "2027 공단기 소방단기 써니 행정법총론 기본서",
+        "author": "박준철 편",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/193686487",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 13,
+        "title": "ETS 토익 정기시험 기출문제집 1000 Vol. 5 RC",
+        "author": "ETS",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/168776448",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 14,
+        "title": "ETS 토익 정기시험 기출문제집 1000 Vol. 5 LC",
+        "author": "ETS",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/168776455",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 15,
+        "title": "2026 큰별쌤 최태성의 별별한국사 기출 500제 한국사능력검정시험 심화(1,2,3급)",
+        "author": "최태성",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/168393009",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 16,
+        "title": "공부가 결국 너를 지켜줄 거야",
+        "author": "임민찬",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/192978800",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 17,
+        "title": "명탐정 코난 108 일반판",
+        "author": "아오야마 고쇼",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/194606732",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 18,
+        "title": "나의 첫 번째 부동산 교과서",
+        "author": "송희구",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/190813759",
+        "publisher": "",
+        "genre_key": "economy",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 19,
+        "title": "독하게 돈 공부",
+        "author": "박소연",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/193154549",
+        "publisher": "",
+        "genre_key": "economy",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 20,
+        "title": "내면 근력",
+        "author": "짐 머피",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/183809488",
+        "publisher": "",
+        "genre_key": "selfdev",
+        "source": "YES24",
+        "depth": 20
+      }
+    ],
+    "ridi_overall": [
+      {
+        "rank": 1,
+        "title": "십이국기 시리즈 세트 (전 14권)",
+        "author": "오노 후유미",
+        "cover": "",
+        "link": "https://ridibooks.com/books/111143856",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 2,
+        "title": "혼자 남아도 외로워하지 말 것",
+        "author": "경민선",
+        "cover": "",
+        "link": "https://ridibooks.com/books/5322000003",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 3,
+        "title": "종점은 아직 멀어서",
+        "author": "권혁일",
+        "cover": "",
+        "link": "https://ridibooks.com/books/5134000006",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 4,
+        "title": "밸런스 게임",
+        "author": "박하루",
+        "cover": "",
+        "link": "https://ridibooks.com/books/4927000003",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 5,
+        "title": "천막 너머",
+        "author": "이규락",
+        "cover": "",
+        "link": "https://ridibooks.com/books/6286000001",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 6,
+        "title": "바이바이 스트레인지니스",
+        "author": "이산화",
+        "cover": "",
+        "link": "https://ridibooks.com/books/4583000004",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 7,
+        "title": "용의자 X의 헌신",
+        "author": "히가시노 게이고",
+        "cover": "",
+        "link": "https://ridibooks.com/books/3954000026",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 8,
+        "title": "무진기행",
+        "author": "김승옥",
+        "cover": "",
+        "link": "https://ridibooks.com/books/509001695",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 9,
+        "title": "싯다르타",
+        "author": "헤르만 헤세",
+        "cover": "",
+        "link": "https://ridibooks.com/books/509000551",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 10,
+        "title": "프로젝트 헤일메리",
+        "author": "앤디 위어",
+        "cover": "",
+        "link": "https://ridibooks.com/books/510001099",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 11,
+        "title": "경의원",
+        "author": "이도현",
+        "cover": "",
+        "link": "https://ridibooks.com/books/4999000617",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      }
+    ],
+    "ridi_by_genre": {
+      "novel": [
+        {
+          "rank": 1,
+          "title": "십이국기 시리즈 세트 (전 14권)",
+          "author": "오노 후유미",
+          "cover": "",
+          "link": "https://ridibooks.com/books/111143856",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "혼자 남아도 외로워하지 말 것",
+          "author": "경민선",
+          "cover": "",
+          "link": "https://ridibooks.com/books/5322000003",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "종점은 아직 멀어서",
+          "author": "권혁일",
+          "cover": "",
+          "link": "https://ridibooks.com/books/5134000006",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "밸런스 게임",
+          "author": "박하루",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4927000003",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "천막 너머",
+          "author": "이규락",
+          "cover": "",
+          "link": "https://ridibooks.com/books/6286000001",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "바이바이 스트레인지니스",
+          "author": "이산화",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4583000004",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "용의자 X의 헌신",
+          "author": "히가시노 게이고",
+          "cover": "",
+          "link": "https://ridibooks.com/books/3954000026",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "무진기행",
+          "author": "김승옥",
+          "cover": "",
+          "link": "https://ridibooks.com/books/509001695",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "싯다르타",
+          "author": "헤르만 헤세",
+          "cover": "",
+          "link": "https://ridibooks.com/books/509000551",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "프로젝트 헤일메리",
+          "author": "앤디 위어",
+          "cover": "",
+          "link": "https://ridibooks.com/books/510001099",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        }
+      ],
+      "economy": [
+        {
+          "rank": 1,
+          "title": "독하게 돈 공부",
+          "author": "박소연",
+          "cover": "",
+          "link": "https://ridibooks.com/books/2823000045",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "부의 갈림길",
+          "author": "오건영",
+          "cover": "",
+          "link": "https://ridibooks.com/books/3397000224",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "돈의 심리학",
+          "author": "모건 하우절",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1691000246",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "생각에 관한 생각",
+          "author": "대니얼 카너먼",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1546001153",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "돈, 뜨겁게 사랑하고 차갑게 다루어라",
+          "author": "앙드레 코스톨라니",
+          "cover": "",
+          "link": "https://ridibooks.com/books/754044361",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "AI, 신의 탄생 인간의 종말",
+          "author": "엘리에저 유드코스키",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4698000117",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "주식시장 흐름 읽는 법",
+          "author": "우라가미 구니오",
+          "cover": "",
+          "link": "https://ridibooks.com/books/703000963",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "행운에 속지 마라",
+          "author": "나심 니콜라스 탈레브",
+          "cover": "",
+          "link": "https://ridibooks.com/books/902000095",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "주식 투자의 그릇",
+          "author": "후지모토 시게루",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4803002830",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "박태웅의 AI 강의 2026",
+          "author": "박태웅",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1890000411",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        }
+      ],
+      "selfdev": [
+        {
+          "rank": 1,
+          "title": "아주 작은 습관의 힘(50만 부 기념 스페셜 에디션)",
+          "author": "제임스 클리어",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1780000157",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "질문의 격",
+          "author": "유선경",
+          "cover": "",
+          "link": "https://ridibooks.com/books/3901000036",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "내면 근력",
+          "author": "짐 머피",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1046000311",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "운명을 보는 기술",
+          "author": "박성준",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4139000111",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "말하지 않고 말하기",
+          "author": "김정운",
+          "cover": "",
+          "link": "https://ridibooks.com/books/222003881",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "불변의 법칙",
+          "author": "모건 하우절",
+          "cover": "",
+          "link": "https://ridibooks.com/books/5464000017",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "나는 다시 나를 설계하기로 했다",
+          "author": "마르틴 베를레",
+          "cover": "",
+          "link": "https://ridibooks.com/books/2823000041",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "창조적 행위",
+          "author": "릭 루빈",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4262000007",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "데일 카네기 인간관계론 (50만부 돌파 초판 무삭제 완역본)",
+          "author": "데일 카네기",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1883000099",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "원씽",
+          "author": "게리 캘러",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1780000407",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        }
+      ],
+      "humanit": [
+        {
+          "rank": 1,
+          "title": "사고외주",
+          "author": "홍진기",
+          "cover": "",
+          "link": "https://ridibooks.com/books/280000286",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "개정판 | 오디세이아",
+          "author": "호메로스",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1480000055",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "아라키 히로히코의 만화술",
+          "author": "아라키 히로히코",
+          "cover": "",
+          "link": "https://ridibooks.com/books/371003963",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "오디세이아 (영화 <오디세이> 원작)",
+          "author": "호메로스",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1883000305",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "오뒷세이아",
+          "author": "호메로스",
+          "cover": "",
+          "link": "https://ridibooks.com/books/754040388",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "이향인",
+          "author": "라미 카민스키",
+          "cover": "",
+          "link": "https://ridibooks.com/books/222003852",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "개정판 | 빅터 프랭클의 죽음의 수용소에서",
+          "author": "빅터 프랭클",
+          "cover": "",
+          "link": "https://ridibooks.com/books/969000280",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "손자병법",
+          "author": "손자",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1883000328",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "유럽 도시 기행 1권",
+          "author": "유시민",
+          "cover": "",
+          "link": "https://ridibooks.com/books/169000255",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "최소한의 삼국지",
+          "author": "최태성",
+          "cover": "",
+          "link": "https://ridibooks.com/books/5016000021",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        }
+      ],
+      "science": [
+        {
+          "rank": 1,
+          "title": "코스모스",
+          "author": "칼 세이건",
+          "cover": "",
+          "link": "https://ridibooks.com/books/786000077",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "한국전문소생술",
+          "author": "대한심폐소생협회",
+          "cover": "",
+          "link": "https://ridibooks.com/books/2218000077",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "물고기는 존재하지 않는다",
+          "author": "룰루 밀러",
+          "cover": "",
+          "link": "https://ridibooks.com/books/852001243",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "우리는 어쩌다 과학을 믿게 되었을까 : 노벨 물리학상으로 읽는 의심과 논쟁, 합의의 역사",
+          "author": "이근희",
+          "cover": "",
+          "link": "https://ridibooks.com/books/754049595",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "인간 생존 연구소",
+          "author": "박치욱",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1546001510",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "화성에 도시를 세운다면",
+          "author": "잭 와이너스미스",
+          "cover": "",
+          "link": "https://ridibooks.com/books/510001667",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "우울할 땐 뇌 과학",
+          "author": "알렉스 코브",
+          "cover": "",
+          "link": "https://ridibooks.com/books/2189000124",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "기억을 바꾸는 법",
+          "author": "스티브 라미레스",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1546001512",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "퀀텀 2.0",
+          "author": "폴 데이비스",
+          "cover": "",
+          "link": "https://ridibooks.com/books/2016000281",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "의약품 살인사건",
+          "author": "백승만",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1287000344",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        }
+      ],
+      "essay": [
+        {
+          "rank": 1,
+          "title": "싫어하는 사람을 사라지게 하는 방법",
+          "author": "호리 모토코",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4507000031",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "개정판 | 빅터 프랭클의 죽음의 수용소에서",
+          "author": "빅터 프랭클",
+          "cover": "",
+          "link": "https://ridibooks.com/books/969000280",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "새는 날아가면서 뒤돌아보지 않는다",
+          "author": "류시화",
+          "cover": "",
+          "link": "https://ridibooks.com/books/754020384",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "우울은 초록의 마음",
+          "author": "반혜린",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1780000545",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "단 한 번의 삶",
+          "author": "김영하",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4271000043",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "채소의 기분, 바다표범의 키스",
+          "author": "무라카미 하루키",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1570000336",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "악수도 없이 헤어졌다",
+          "author": "피천득",
+          "cover": "",
+          "link": "https://ridibooks.com/books/509002191",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "진짜 게으른 사람이 쓴 게으름 탈출법",
+          "author": "지이",
+          "cover": "",
+          "link": "https://ridibooks.com/books/3414000012",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "숨결이 바람 될 때",
+          "author": "폴 칼라니티",
+          "cover": "",
+          "link": "https://ridibooks.com/books/745000075",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "자기만의 방",
+          "author": "버지니아 울프",
+          "cover": "",
+          "link": "https://ridibooks.com/books/998000484",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        }
+      ]
+    }
+  },
+  "merged": [
+    {
+      "title": "세네카, 오늘을 빼앗기고 있는 당신에게",
+      "author": "루키우스 안나이우스 세네카",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396404956&amp;partner=openAPI&amp;start=api",
+      "publisher": "논픽션",
+      "sources": {
+        "알라딘": {
+          "rank": 2,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 1,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 1,
+          "depth": 20
+        }
+      },
+      "genre_key": "humanit",
+      "score": 2.95,
+      "rank": 1,
+      "index": 74
+    },
+    {
+      "title": "투명한 나선",
+      "author": "히가시노 게이고",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398021172&amp;partner=openAPI&amp;start=api",
+      "publisher": "북다",
+      "sources": {
+        "알라딘": {
+          "rank": 1,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 4,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 2,
+          "depth": 20
+        }
+      },
+      "genre_key": "novel",
+      "score": 2.8,
+      "rank": 2,
+      "index": 70
+    },
+    {
+      "title": "싯다르타",
+      "author": "헤르만 헤세",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api",
+      "publisher": "민음사",
+      "sources": {
+        "알라딘": {
+          "rank": 3,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 5,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 6,
+          "depth": 20
+        },
+        "리디": {
+          "rank": 9,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 2.7227272727272727,
+      "rank": 3,
+      "index": 68
+    },
+    {
+      "title": "유럽 도시 기행 3",
+      "author": "유시민",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397155927&amp;partner=openAPI&amp;start=api",
+      "publisher": "생각의길",
+      "sources": {
+        "알라딘": {
+          "rank": 9,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 6,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 9,
+          "depth": 20
+        }
+      },
+      "genre_key": "humanit",
+      "score": 1.95,
+      "rank": 4,
+      "index": 49
+    },
+    {
+      "title": "수족관",
+      "author": "유래혁",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330811810&amp;partner=openAPI&amp;start=api",
+      "publisher": "포스터샵",
+      "sources": {
+        "알라딘": {
+          "rank": 7,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 7,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 10,
+          "depth": 20
+        }
+      },
+      "genre_key": "novel",
+      "score": 1.95,
+      "rank": 5,
+      "index": 49
+    },
+    {
+      "title": "매거진 조이 Vol.3 : 가비지타임",
+      "author": "2사장",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=399067587&amp;partner=openAPI&amp;start=api",
+      "publisher": "다산코믹스",
+      "sources": {
+        "알라딘": {
+          "rank": 4,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 4,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 1.7,
+      "index": 42
+    },
+    {
+      "title": "니체의 초월자",
+      "author": "프리드리히 니체",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=375395519&amp;partner=openAPI&amp;start=api",
+      "publisher": "히읏",
+      "sources": {
+        "알라딘": {
+          "rank": 17,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 12,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 5,
+          "depth": 20
+        }
+      },
+      "genre_key": "humanit",
+      "score": 1.4500000000000002,
+      "rank": 6,
+      "index": 36
+    },
+    {
+      "title": "빵충 사육 준수 사항",
+      "author": "김혜영",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398726639&amp;partner=openAPI&amp;start=api",
+      "publisher": "안전가옥",
+      "sources": {
+        "알라딘": {
+          "rank": 5,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 13,
+          "depth": 20
+        }
+      },
+      "genre_key": "novel",
+      "score": 1.2000000000000002,
+      "rank": 7,
+      "index": 30
+    },
+    {
+      "title": "독서의 기술",
+      "author": "고명환",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396563552&amp;partner=openAPI&amp;start=api",
+      "publisher": "라곰",
+      "sources": {
+        "알라딘": {
+          "rank": 18,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 14,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 7,
+          "depth": 20
+        }
+      },
+      "genre_key": "selfdev",
+      "score": 1.2,
+      "rank": 8,
+      "index": 30
+    },
+    {
+      "title": "코스모스(100만부 기념판)",
+      "author": "칼 세이건",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396765073&amp;partner=openAPI&amp;start=api",
+      "publisher": "사이언스북스",
+      "sources": {
+        "알라딘": {
+          "rank": 11,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 8,
+          "depth": 20
+        }
+      },
+      "genre_key": "science",
+      "score": 1.15,
+      "rank": 9,
+      "index": 29
+    },
+    {
+      "title": "나의 첫 번째 부동산 교과서",
+      "author": "송희구",
+      "link": "https://product.kyobobook.co.kr/detail/S000220119415",
+      "publisher": "",
+      "sources": {
+        "교보문고": {
+          "rank": 3,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 18,
+          "depth": 20
+        }
+      },
+      "genre_key": "economy",
+      "score": 1.05,
+      "rank": 10,
+      "index": 26
+    },
+    {
+      "title": "십이국기 시리즈 세트 (전 14권)",
+      "author": "오노 후유미",
+      "link": "https://ridibooks.com/books/111143856",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 1,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 1.0,
+      "rank": 11,
+      "index": 25
+    },
+    {
+      "title": "반골",
+      "author": "권민창",
+      "link": "https://product.kyobobook.co.kr/detail/S000220622564",
+      "publisher": "",
+      "sources": {
+        "교보문고": {
+          "rank": 2,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.95,
+      "index": 24
+    },
+    {
+      "title": "혼자 남아도 외로워하지 말 것",
+      "author": "경민선",
+      "link": "https://ridibooks.com/books/5322000003",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 2,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.9090909090909091,
+      "rank": 12,
+      "index": 23
+    },
+    {
+      "title": "명탐정 코난 108",
+      "author": "아오야마 고쇼",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=399583956&amp;partner=openAPI&amp;start=api",
+      "publisher": "서울미디어코믹스(서울문화사)",
+      "sources": {
+        "알라딘": {
+          "rank": 12,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 16,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 17,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.9,
+      "index": 22
+    },
+    {
+      "title": "2027 공단기 소방단기 써니 행정법총론 핵심집약",
+      "author": "박준철 편",
+      "link": "https://www.yes24.com/product/goods/194332699",
+      "publisher": "",
+      "sources": {
+        "YES24": {
+          "rank": 3,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.9,
+      "index": 22
+    },
+    {
+      "title": "종점은 아직 멀어서",
+      "author": "권혁일",
+      "link": "https://ridibooks.com/books/5134000006",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 3,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.8181818181818182,
+      "rank": 13,
+      "index": 20
+    },
+    {
+      "title": "2026년 제1회 김학철문학상 수상 작품집",
+      "author": "황정은",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396686864&amp;partner=openAPI&amp;start=api",
+      "publisher": "도서출판 아시아",
+      "sources": {
+        "알라딘": {
+          "rank": 6,
+          "depth": 20
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.75,
+      "rank": 14,
+      "index": 19
+    },
+    {
+      "title": "밸런스 게임",
+      "author": "박하루",
+      "link": "https://ridibooks.com/books/4927000003",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 4,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.7272727272727273,
+      "rank": 15,
+      "index": 18
+    },
+    {
+      "title": "프로젝트 헤일메리",
+      "author": "앤디 위어",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396798366&amp;partner=openAPI&amp;start=api",
+      "publisher": "알에이치코리아(RHK)",
+      "sources": {
+        "알라딘": {
+          "rank": 14,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 18,
+          "depth": 20
+        },
+        "리디": {
+          "rank": 10,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.6818181818181818,
+      "index": 17
+    },
+    {
+      "title": "얼굴만으론 좋아할 수 없어요 17 (한정판)",
+      "author": "안자이 카린",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=399403043&amp;partner=openAPI&amp;start=api",
+      "publisher": "서울미디어코믹스(서울문화사)",
+      "sources": {
+        "알라딘": {
+          "rank": 8,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.65,
+      "index": 16
+    },
+    {
+      "title": "파동 눌림목 매매법",
+      "author": "파동마스터",
+      "link": "https://www.yes24.com/product/goods/193347163",
+      "publisher": "",
+      "sources": {
+        "YES24": {
+          "rank": 8,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.65,
+      "index": 16
+    },
+    {
+      "title": "천막 너머",
+      "author": "이규락",
+      "link": "https://ridibooks.com/books/6286000001",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 5,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.6363636363636364,
+      "index": 16
+    },
+    {
+      "title": "ETS 토익 정기시험 기출문제집 1000 Vol 5 RC",
+      "author": "ETS",
+      "link": "https://product.kyobobook.co.kr/detail/S000218791163",
+      "publisher": "",
+      "sources": {
+        "교보문고": {
+          "rank": 17,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 13,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.6000000000000001,
+      "index": 15
+    },
+    {
+      "title": "오디세이아(고대 그리스어 완역본)",
+      "author": "호메로스",
+      "link": "https://product.kyobobook.co.kr/detail/S000216292200",
+      "publisher": "",
+      "sources": {
+        "교보문고": {
+          "rank": 9,
+          "depth": 20
+        }
+      },
+      "genre_key": "humanit",
+      "score": 0.6,
+      "index": 15
+    },
+    {
+      "title": "태양 아래 올리브",
+      "author": "김초엽",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398900892&amp;partner=openAPI&amp;start=api",
+      "publisher": "자이언트북스",
+      "sources": {
+        "알라딘": {
+          "rank": 10,
+          "depth": 20
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.55,
+      "index": 14
+    },
+    {
+      "title": "테오",
+      "author": "앨런 레비",
+      "link": "https://product.kyobobook.co.kr/detail/S000220307771",
+      "publisher": "",
+      "sources": {
+        "교보문고": {
+          "rank": 10,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.55,
+      "index": 14
+    },
+    {
+      "title": "바이바이 스트레인지니스",
+      "author": "이산화",
+      "link": "https://ridibooks.com/books/4583000004",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 6,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.5454545454545454,
+      "index": 14
+    },
+    {
+      "title": "독하게 돈 공부",
+      "author": "박소연",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397270202&amp;partner=openAPI&amp;start=api",
+      "publisher": "메이븐",
+      "sources": {
+        "알라딘": {
+          "rank": 15,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 19,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 19,
+          "depth": 20
+        }
+      },
+      "genre_key": "economy",
+      "score": 0.5,
+      "index": 12
+    },
+    {
+      "title": "어떻게 살아낼 것인가",
+      "author": "짐 콜린스",
+      "link": "https://product.kyobobook.co.kr/detail/S000220500994",
+      "publisher": "",
+      "sources": {
+        "교보문고": {
+          "rank": 11,
+          "depth": 20
+        }
+      },
+      "genre_key": "selfdev",
+      "score": 0.5,
+      "index": 12
+    },
+    {
+      "title": "2027 유휘운 행정법총론 요약노트+기출문제 (요.플.)",
+      "author": "유휘운 편",
+      "link": "https://www.yes24.com/product/goods/193701241",
+      "publisher": "",
+      "sources": {
+        "YES24": {
+          "rank": 11,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.5,
+      "index": 12
+    },
+    {
+      "title": "용의자 X의 헌신",
+      "author": "히가시노 게이고",
+      "link": "https://ridibooks.com/books/3954000026",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 7,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.45454545454545453,
+      "index": 11
+    },
+    {
+      "title": "2027 공단기 소방단기 써니 행정법총론 기본서",
+      "author": "박준철 편",
+      "link": "https://www.yes24.com/product/goods/193686487",
+      "publisher": "",
+      "sources": {
+        "YES24": {
+          "rank": 12,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.45,
+      "index": 11
+    },
+    {
+      "title": "모순",
+      "author": "양귀자",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&amp;partner=openAPI&amp;start=api",
+      "publisher": "쓰다",
+      "sources": {
+        "알라딘": {
+          "rank": 19,
+          "depth": 20
+        },
+        "교보문고": {
+          "rank": 15,
+          "depth": 20
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.4,
+      "index": 10
+    },
+    {
+      "title": "악의",
+      "author": "히가시노 게이고",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=198223504&amp;partner=openAPI&amp;start=api",
+      "publisher": "현대문학",
+      "sources": {
+        "알라딘": {
+          "rank": 13,
+          "depth": 20
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.4,
+      "index": 10
+    },
+    {
+      "title": "ETS 토익 정기시험 기출문제집 1000 Vol 5 LC",
+      "author": "ETS",
+      "link": "https://product.kyobobook.co.kr/detail/S000218791156",
+      "publisher": "",
+      "sources": {
+        "교보문고": {
+          "rank": 20,
+          "depth": 20
+        },
+        "YES24": {
+          "rank": 14,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.39999999999999997,
+      "index": 10
+    },
+    {
+      "title": "무진기행",
+      "author": "김승옥",
+      "link": "https://ridibooks.com/books/509001695",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 8,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.36363636363636365,
+      "index": 9
+    },
+    {
+      "title": "2026 큰별쌤 최태성의 별별한국사 기출 500제 한국사능력검정시험 심화(1,2,3급)",
+      "author": "최태성",
+      "link": "https://www.yes24.com/product/goods/168393009",
+      "publisher": "",
+      "sources": {
+        "YES24": {
+          "rank": 15,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.3,
+      "index": 8
+    },
+    {
+      "title": "지푸라기 왕관을 쓴 여자",
+      "author": "박상영",
+      "link": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398344057&amp;partner=openAPI&amp;start=api",
+      "publisher": "래빗홀",
+      "sources": {
+        "알라딘": {
+          "rank": 16,
+          "depth": 20
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.25,
+      "index": 6
+    },
+    {
+      "title": "공부가 결국 너를 지켜줄 거야",
+      "author": "임민찬",
+      "link": "https://www.yes24.com/product/goods/192978800",
+      "publisher": "",
+      "sources": {
+        "YES24": {
+          "rank": 16,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.25,
+      "index": 6
+    },
+    {
+      "title": "경의원",
+      "author": "이도현",
+      "link": "https://ridibooks.com/books/4999000617",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 11,
+          "depth": 11
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.09090909090909091,
+      "index": 2
+    },
+    {
+      "title": "내면 근력",
+      "author": "짐 머피",
+      "link": "https://www.yes24.com/product/goods/183809488",
+      "publisher": "",
+      "sources": {
+        "YES24": {
+          "rank": 20,
+          "depth": 20
+        }
+      },
+      "genre_key": "selfdev",
+      "score": 0.05,
+      "index": 1
+    }
+  ]
+}
