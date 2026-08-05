@@ -1,0 +1,70 @@
+<div class="adfit-slot" aria-hidden="true"></div>
+
+<script>
+  // 화면 폭에 맞는 단위 하나만 삽입한다 — 둘 다 넣고 CSS로 숨기면 노출 집계가 왜곡돼 제재 사유가 된다
+  const UNITS = {
+    pc: { unit: 'DAN-8vKsCr57ivUR97pn', width: 728, height: 90 },
+    mobile: { unit: 'DAN-QHiQQni8uspeE4y8', width: 320, height: 100 },
+  } as const;
+  // 728 배너 + 좌우 패딩(px-5)이 들어가는 최소 폭
+  const PC_MIN_WIDTH = 768;
+
+  function renderAd() {
+    document.querySelectorAll('.adfit-slot').forEach((slot) => {
+      const { unit, width, height } = window.innerWidth < PC_MIN_WIDTH ? UNITS.mobile : UNITS.pc;
+      const ins = document.createElement('ins');
+      ins.className = 'kakao_ad_area';
+      ins.style.display = 'none';
+      ins.dataset.adUnit = unit;
+      ins.dataset.adWidth = String(width);
+      ins.dataset.adHeight = String(height);
+      const loader = document.createElement('script');
+      loader.async = true;
+      loader.src = '//t1.kakaocdn.net/kas/static/ba.min.js';
+      // ba.min.js는 로드 시점의 .kakao_ad_area만 처리하므로, 페이지 전환마다 ins와 함께 새로 넣는다
+      slot.replaceChildren(ins, loader);
+    });
+  }
+
+  renderAd();
+  document.addEventListener('astro:after-swap', renderAd);
+</script>
+
+<style>
+  /* 광고 로드 전 공간을 예약해 본문이 밀리는 것(CLS)을 막는다 */
+  .adfit-slot {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+    margin-top: 3rem;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    background: var(--bg-subtle);
+  }
+
+  .adfit-slot::before {
+    content: 'AD';
+    position: absolute;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+  }
+
+  /* 광고가 실제로 렌더링되면(iframe 삽입) 플레이스홀더를 걷어낸다 */
+  .adfit-slot:has(iframe) {
+    border: none;
+    background: none;
+  }
+
+  .adfit-slot:has(iframe)::before {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .adfit-slot {
+      min-height: 90px;
+    }
+  }
+</style>

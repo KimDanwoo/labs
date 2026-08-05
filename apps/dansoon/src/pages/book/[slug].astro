@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import AdFit from '~/components/Common/AdFit.astro';
 import Utterances from '~/components/Common/Utterances';
 
 export async function getStaticPaths() {
@@ -50,6 +51,8 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
     <div class="article-body prose max-w-none">
       <Content />
     </div>
+
+    <AdFit />
 
     <div class="mt-16 pt-10" style="border-top:1px solid var(--border)">
       <Utterances client:load />
