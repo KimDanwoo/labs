@@ -2,7 +2,7 @@
 
 AI 기술 뉴스 큐레이션과 주간 베스트셀러 리포트를 제공하는 개인 블로그. Astro 기반 정적 사이트.
 
-**라이브:** [danwoo-dev.netlify.app](https://danwoo-dev.netlify.app)
+**라이브:** [daily-cron-log.vercel.app](https://daily-cron-log.vercel.app)
 
 ## 개요
 
@@ -19,7 +19,7 @@ AI 기술 뉴스 큐레이션과 주간 베스트셀러 리포트를 제공하�
 | UI | React 19 (인터랙티브 컴포넌트만) |
 | 스타일 | Tailwind CSS 4 + Typography 플러그인 |
 | 콘텐츠 | Astro Content Collections (Markdown) |
-| 배포 | Netlify |
+| 배포 | Vercel |
 | 콘텐츠 자동화 | Python + `google-genai` (Gemini 2.5 Flash) |
 
 ## 구조
