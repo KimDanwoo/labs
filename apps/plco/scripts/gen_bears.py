@@ -1,4 +1,4 @@
-"""곰 마스코트 스프라이트 생성기 → public/character_1..5.webp (4x4 워크시트, 1024px).
+"""곰 마스코트 스프라이트 생성기 → public/character_6..10.webp (4x4 워크시트, 1024px).
 
 플코의 다섯 캐릭터(yeko/ako/bamko/hako/eunko)에서 파생한 오리지널 마스코트.
 지오메트리: 논리 64 그리드를 4배 확대. 외곽선 상단 lp8(=y32), 하단 lp60(=y243).
@@ -34,6 +34,9 @@ VARIANTS = {
     5: dict(**WHITE_BODY, ear=(248, 166, 194, 255), eye=(148, 82, 208, 255),
             mouth="caret", brow=None, mark=("diamond", (206, 74, 74, 255))),         # bamko bear
 }
+
+# variant → public 파일 번호 (기존 public/character_6..10 배치를 따른다)
+OUT_ID = {1: 9, 2: 7, 3: 10, 4: 6, 5: 8}
 
 DY = 1
 
@@ -109,12 +112,12 @@ def face_front(d, px, v):
 
 
 def face_side(d, px, v):
-    ell(d, (15, 28, 26, 37), v["muzzle"])
+    ell(d, (14, 28, 25, 37), v["muzzle"])
     if v["brow"]:
         put(px, [(x, 20) for x in range(17, 24)], v["brow"])
     open_eye(d, px, 21, v["eye"])
-    put(px, [(16, 32), (17, 32), (18, 32), (17, 33)], DARK)  # nose
-    put(px, [(20, 35), (21, 35), (22, 36)], DARK)
+    put(px, [(15, 32), (16, 32), (17, 32), (16, 33)], DARK)  # nose
+    put(px, [(19, 35), (20, 35), (21, 36)], DARK)
     put(px, [(27 + dx, 31 + dy) for dx in range(4) for dy in range(2)], BLUSH)
 
 
@@ -158,27 +161,27 @@ def bear(v, view, frame):
     front = view == "front"
 
     if view in ("front", "back"):
-        ell(d, (22, 38, 42, 57), body)
-        arm_l = 40 - (1 if frame == 3 else 0)
-        arm_r = 40 - (1 if frame == 1 else 0)
-        limb(d, (17, arm_l, 23, arm_l + 11), v["shade"])
-        limb(d, (41, arm_r, 47, arm_r + 11), v["shade"])
-        ell(d, (27, 42, 37, 53), v["muzzle"] if front else v["far"])  # 배 / 꼬리
-        foot(d, (23, 52, 31, 58 - lift_l), v["shade"])
-        foot(d, (33, 52, 41, 58 - lift_r), v["shade"])
-        ear(d, v, (13, 8, 26, 20), inner=front)
-        ear(d, v, (38, 8, 51, 20), inner=front)
-        ell(d, (15, 10, 49, 41), body)
+        ell(d, (24, 41, 40, 57), body)
+        arm_l = 44 - (1 if frame == 3 else 0)
+        arm_r = 44 - (1 if frame == 1 else 0)
+        limb(d, (20, arm_l, 25, arm_l + 8), v["shade"])
+        limb(d, (39, arm_r, 44, arm_r + 8), v["shade"])
+        ell(d, (28, 45, 36, 54), v["muzzle"] if front else v["far"])  # 배 / 꼬리
+        foot(d, (24, 52, 31, 58 - lift_l), v["shade"])
+        foot(d, (33, 52, 40, 58 - lift_r), v["shade"])
+        ear(d, v, (12, 8, 23, 19), inner=front)
+        ear(d, v, (41, 8, 52, 19), inner=front)
+        ell(d, (13, 10, 51, 43), body)
         if front:
             face_front(d, px, v)
     else:  # left profile; right row is mirrored by caller
         swing = -2 if frame == 1 else (2 if frame == 3 else 0)
-        ell(d, (22, 38, 42, 57), body)
+        ell(d, (24, 41, 40, 57), body)
         foot(d, (32 - swing, 52, 40 - swing, 58 - lift_r), darken(v["shade"]))
         foot(d, (23 + swing, 52, 31 + swing, 58 - lift_l), v["shade"])
-        limb(d, (19 + swing, 40, 26 + swing, 51), v["shade"])
-        ear(d, v, (34, 8, 46, 20))
-        ell(d, (16, 12, 48, 41), body)
+        limb(d, (22 + swing, 44, 28 + swing, 52), v["shade"])
+        ear(d, v, (36, 8, 47, 19))
+        ell(d, (15, 11, 49, 43), body)
         face_side(d, px, v)
     outline_pass(img)
     return img
@@ -201,20 +204,26 @@ def sheet_for(cid):
 def build(out_dir=PUBLIC_DIR):
     out_dir = Path(out_dir)
     for cid in VARIANTS:
-        path = out_dir / f"character_{cid}.webp"
+        path = out_dir / f"character_{OUT_ID[cid]}.webp"
         sheet_for(cid).save(path, lossless=True, method=6)
         print(f"saved {path}")
 
 
 def verify(out_dir=PUBLIC_DIR):
-    """모든 시트가 인간 캐릭터 시트와 같은 규격(상단 y=32, 하단 y≈243)인지 확인."""
-    for cid in VARIANTS:
+    """모든 시트가 인간 캐릭터 시트와 같은 규격(상단 y=32, 하단 y≈243)인지 16프레임 전부 확인."""
+    for cid in sorted(OUT_ID.values()):
         img = Image.open(Path(out_dir) / f"character_{cid}.webp").convert("RGBA")
         assert img.size == (1024, 1024), f"char_{cid} size={img.size}"
-        boxes = [img.crop((0, r * 256, 256, (r + 1) * 256)).split()[3].getbbox() for r in range(4)]
-        assert all(b[1] == 32 for b in boxes), f"char_{cid} top misaligned: {boxes}"
-        assert all(240 <= b[3] <= 244 for b in boxes), f"char_{cid} bottom misaligned: {boxes}"
-        print(f"char_{cid}: tops={[b[1] for b in boxes]} bottoms={[b[3] for b in boxes]} OK")
+        boxes = [
+            img.crop((f * 256, r * 256, (f + 1) * 256, (r + 1) * 256)).split()[3].getbbox()
+            for r in range(4)
+            for f in range(4)
+        ]
+        assert all(b[1] == 32 for b in boxes), f"char_{cid} top misaligned: {[b[1] for b in boxes]}"
+        assert all(240 <= b[3] <= 244 for b in boxes), f"char_{cid} bottom misaligned: {[b[3] for b in boxes]}"
+        alpha = {a for _, _, _, a in img.getdata()}
+        assert alpha <= {0, 255}, f"char_{cid} semi-alpha pixels: {sorted(alpha - {0, 255})[:5]}"
+        print(f"char_{cid}: 16 frames y=[32..{max(b[3] for b in boxes)}] colors={len(set(img.getdata()))} OK")
 
 
 if __name__ == "__main__":
