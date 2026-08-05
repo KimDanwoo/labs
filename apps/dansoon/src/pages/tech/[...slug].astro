@@ -17,8 +17,6 @@ type Props = { post: CollectionEntry<'tech'> };
 const { post } = Astro.props;
 const { Content } = await render(post);
 const { title, description, date, thumbnail, category } = post.data;
-const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '');
-const url = `https://daily-cron-log.vercel.app/tech/${slug}/`;
 const isIntroPage = title === '🧑🏻‍💻 frontend 김단우';
 const formattedDate = date.toLocaleDateString('ko-KR', {
   year: 'numeric',
@@ -27,7 +25,7 @@ const formattedDate = date.toLocaleDateString('ko-KR', {
 });
 ---
 
-<BaseLayout title={title} description={description} url={url} thumbnail={thumbnail?.src}>
+<BaseLayout title={title} description={description} thumbnail={thumbnail?.src}>
   <article class="w-full" itemscope itemtype="http://schema.org/Article">
     <header class="w-full mb-10">
       <a href="/" class="article-back inline-flex items-center gap-1.5 text-sm mb-8">
