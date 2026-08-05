@@ -13,21 +13,15 @@ interface Props {
   title?: string;
   description?: string;
   thumbnail?: string;
-  url?: string;
   contentWidth?: ContentWidth;
 }
 
-const {
-  title = 'blog.danwoo',
-  description = '기록하고 공유합니다',
-  thumbnail,
-  url,
-  contentWidth = 'wide',
-} = Astro.props;
+const { title = 'blog.danwoo', description = '기록하고 공유합니다', thumbnail, contentWidth = 'wide' } = Astro.props;
 
 const siteTitle = 'blog.danwoo';
-const siteUrl = 'https://daily-cron-log.vercel.app';
-const metaUrl = url ?? siteUrl;
+// 배포 도메인은 astro.config의 site 하나로 관리한다 — origin이라 뒤에 슬래시가 붙지 않는다
+const siteUrl = Astro.site!.origin;
+const metaUrl = new URL(Astro.url.pathname, Astro.site!).href;
 // og.png 교체 시 v를 올려야 SNS 캐시가 갱신된다
 const defaultThumbnail = `${siteUrl}/og.png?v=2`;
 // og:image는 절대 URL이어야 한다 — 포스트 썸네일은 /_astro/... 상대경로로 들어온다
@@ -101,12 +95,7 @@ const isBookPage = Astro.url.pathname.startsWith('/book');
               </a>
             )
           }
-          <a
-            class="nav-link"
-            href="https://docs.google.com/document/d/1_oia6H3WisAHsGNJWZAYqru9pHUXovRNAaRJcZn5UBU/preview"
-            target="_blank"
-            rel="noopener noreferrer">ME</a
-          >
+          <a class="nav-link" href="https://danwoo-lab.vercel.app" target="_blank" rel="noopener noreferrer">LABS</a>
           <a class="nav-link" href="https://github.com/KimDanwoo" target="_blank" rel="noopener noreferrer">GITHUB</a>
         </nav>
         <button id="theme-toggle" class="theme-toggle" aria-label="테마 변경" type="button">
@@ -150,7 +139,10 @@ const isBookPage = Astro.url.pathname.startsWith('/book');
       </div>
     </header>
 
-    <main class="flex-1 max-w-(--content-width) w-full mx-auto px-5 py-8 sm:py-12" style="view-transition-name: main-content">
+    <main
+      class="flex-1 max-w-(--content-width) w-full mx-auto px-5 py-8 sm:py-12"
+      style="view-transition-name: main-content"
+    >
       <slot />
     </main>
 
