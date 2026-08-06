@@ -1,0 +1,1 @@
+export { StardokuPage } from './StardokuPage';
