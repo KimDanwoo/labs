@@ -3,7 +3,9 @@
 .markdown-body {
   --md-radius: 0.75rem;
   --md-accent: oklch(0.55 0.15 250);
-  font-feature-settings: "kern" 1, "liga" 1;
+  font-feature-settings:
+    'kern' 1,
+    'liga' 1;
 }
 
 .dark .markdown-body {
@@ -105,7 +107,7 @@
 }
 
 .markdown-body ul > li::before {
-  content: "";
+  content: '';
   @apply absolute rounded-full;
   width: 5px;
   height: 5px;
@@ -122,7 +124,7 @@
 }
 
 .markdown-body ol > li::before {
-  content: counter(md-ol) ".";
+  content: counter(md-ol) '.';
   @apply absolute text-xs font-semibold;
   left: -1.25rem;
   top: 0.35rem;
@@ -141,14 +143,22 @@
 .markdown-body .table-wrapper {
   @apply overflow-x-auto my-5 rounded-xl;
   border: 1px solid oklch(0 0 0 / 8%);
+  overscroll-behavior-x: contain;
 }
 
 .dark .markdown-body .table-wrapper {
   border-color: oklch(1 0 0 / 8%);
 }
 
+/* w-full로 강제하면 래퍼 폭에 갇혀 셀만 좁아진다. 하한만 주고 내용에 따라 넘치게 둔다. */
 .markdown-body table {
-  @apply w-full border-collapse text-sm;
+  @apply min-w-full border-collapse text-sm;
+  width: auto;
+}
+
+.markdown-body th,
+.markdown-body td {
+  min-width: 7rem;
 }
 
 .markdown-body thead {
@@ -210,23 +220,11 @@
 .markdown-body hr {
   @apply my-8 border-none;
   height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    oklch(0 0 0 / 10%) 20%,
-    oklch(0 0 0 / 10%) 80%,
-    transparent
-  );
+  background: linear-gradient(to right, transparent, oklch(0 0 0 / 10%) 20%, oklch(0 0 0 / 10%) 80%, transparent);
 }
 
 .dark .markdown-body hr {
-  background: linear-gradient(
-    to right,
-    transparent,
-    oklch(1 0 0 / 10%) 20%,
-    oklch(1 0 0 / 10%) 80%,
-    transparent
-  );
+  background: linear-gradient(to right, transparent, oklch(1 0 0 / 10%) 20%, oklch(1 0 0 / 10%) 80%, transparent);
 }
 
 .markdown-body img {
