@@ -64,7 +64,11 @@ export const BottomSheet = memo<BottomSheetProps>(({ isOpen, onClose, children, 
     if (!isOpen && phase !== 'idle' && phase !== 'closing') setPhase('closing');
   }
 
+  /** 사용자가 닫은 경우에만 onClose를 통지 — 부모가 isOpen=false로 내려 닫힌 경우 통지하면 무한 루프/상태 오염 */
+  const closedByUserRef = useRef(false);
+
   const close = useCallback(() => {
+    closedByUserRef.current = true;
     setPhase((p) => (p === 'idle' || p === 'closing' ? p : 'closing'));
   }, []);
 
@@ -100,8 +104,11 @@ export const BottomSheet = memo<BottomSheetProps>(({ isOpen, onClose, children, 
     }
     const id = setTimeout(() => {
       setPhase('idle');
-      onCloseRef.current();
-      previousFocusRef.current?.focus();
+      if (closedByUserRef.current) {
+        closedByUserRef.current = false;
+        onCloseRef.current();
+        previousFocusRef.current?.focus();
+      }
     }, ANIMATION_MS);
     return () => clearTimeout(id);
   }, [phase, isDesktop]);
@@ -188,6 +195,7 @@ export const BottomSheet = memo<BottomSheetProps>(({ isOpen, onClose, children, 
     if (shouldClose) {
       el.style.transition = `transform ${ANIMATION_MS}ms ${SPRING}`;
       el.style.transform = 'translateY(100%)';
+      closedByUserRef.current = true;
       setPhase('closing');
     } else {
       el.style.transition = `transform ${ANIMATION_MS}ms ${SPRING}`;
