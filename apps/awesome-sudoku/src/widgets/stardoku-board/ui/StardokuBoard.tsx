@@ -1,10 +1,18 @@
 'use client';
 
+import { CELL_MARK, STAR_POP_STAGGER_MS } from '@entities/stardoku/model/constants';
 import { regionAt } from '@entities/stardoku/model/solver';
-import { regionColorClass } from '@entities/stardoku/model/utils';
+import { cellKey, regionColorClass } from '@entities/stardoku/model/utils';
 import { StardokuCell } from '@entities/stardoku/ui';
-import { marksAtom, puzzleAtom, tapCellAtom } from '@features/stardoku-game/model/atoms';
-import { useBoardGestures, useInitializeStage, useWrongFlash } from '@features/stardoku-game/model/hooks';
+import {
+  isClearedAtom,
+  marksAtom,
+  puzzleAtom,
+  stageAtom,
+  tapCellAtom,
+  violatingKeysAtom,
+} from '@features/stardoku-game/model/atoms';
+import { useBoardGestures, useInitializeStage } from '@features/stardoku-game/model/hooks';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
@@ -12,8 +20,10 @@ import { useCallback } from 'react';
 export const StardokuBoard = () => {
   const puzzle = useAtomValue(puzzleAtom);
   const marks = useAtomValue(marksAtom);
+  const stage = useAtomValue(stageAtom);
+  const violatingKeys = useAtomValue(violatingKeysAtom);
+  const isCleared = useAtomValue(isClearedAtom);
   const tapCell = useSetAtom(tapCellAtom);
-  const wrongFlash = useWrongFlash();
   const { handlePointerDown, handlePointerMove, handlePointerUp, handlePointerCancel } = useBoardGestures();
 
   useInitializeStage();
@@ -50,6 +60,7 @@ export const StardokuBoard = () => {
       />
 
       <div
+        key={stage}
         role="grid"
         aria-label={`별도쿠 보드 ${size}×${size}`}
         style={{ gridTemplateColumns: `repeat(${size}, 1fr)`, gridTemplateRows: `repeat(${size}, 1fr)` }}
@@ -59,6 +70,7 @@ export const StardokuBoard = () => {
         onPointerCancel={handlePointerCancel}
         className={cn(
           'relative grid aspect-square w-full touch-none select-none overflow-hidden rounded-xl',
+          'animate-board-in',
           'border-2 border-[rgb(var(--color-text-primary))]/60',
           'bg-[rgb(var(--color-surface-primary))]',
           'shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)]',
@@ -68,16 +80,18 @@ export const StardokuBoard = () => {
         {marks.map((rowMarks, row) =>
           rowMarks.map((mark, col) => {
             const regionId = regionAt(regions, row, col);
+            const isStar = mark === CELL_MARK.STAR;
             return (
               <StardokuCell
-                key={`${row}-${col}`}
+                key={cellKey(row, col)}
                 row={row}
                 col={col}
                 mark={mark}
                 colorClass={regionColorClass(regionId, size)}
                 hasRegionBorderTop={row > 0 && regionAt(regions, row - 1, col) !== regionId}
                 hasRegionBorderLeft={col > 0 && regionAt(regions, row, col - 1) !== regionId}
-                isWrong={wrongFlash?.row === row && wrongFlash?.col === col}
+                isViolating={violatingKeys.has(cellKey(row, col))}
+                popDelayMs={isCleared && isStar ? row * STAR_POP_STAGGER_MS : null}
                 onKeyboardTap={handleKeyboardTap}
               />
             );

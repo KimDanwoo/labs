@@ -15,6 +15,10 @@ export interface LogicSolveResult {
   stars: CellPosition[];
   /** 완주에 쓴 최고 기법 티어 — T1만: easy / T2 소거 필요: medium / T3 가정 필요: hard */
   difficulty: PuzzleDifficulty;
+  /** T2(줄↔구역 소거)가 필요했던 라운드 수 — 최고 티어만으로는 안 잡히는 "얼마나 자주"를 잰다 */
+  t2Rounds: number;
+  /** T3(한 수 앞 모순)가 필요했던 라운드 수 */
+  t3Rounds: number;
 }
 
 export const regionAt = (regions: RegionGrid, row: number, col: number): number => regions[row]?.[col] ?? -1;
@@ -68,17 +72,27 @@ export const solveByLogic = (regions: RegionGrid): LogicSolveResult => {
   const starredRows = (): Set<number> => new Set(stars.map((s) => s.row));
   const starredCols = (): Set<number> => new Set(stars.map((s) => s.col));
 
-  let usedT2 = false;
-  let usedT3 = false;
+  let t2Rounds = 0;
+  let t3Rounds = 0;
   const currentDifficulty = (): PuzzleDifficulty => {
-    if (usedT3) return PUZZLE_DIFFICULTY.HARD;
-    if (usedT2) return PUZZLE_DIFFICULTY.MEDIUM;
+    if (t3Rounds > 0) return PUZZLE_DIFFICULTY.HARD;
+    if (t2Rounds > 0) return PUZZLE_DIFFICULTY.MEDIUM;
     return PUZZLE_DIFFICULTY.EASY;
   };
+  const fail = (): LogicSolveResult => ({
+    solved: false,
+    rules,
+    stars,
+    difficulty: currentDifficulty(),
+    t2Rounds,
+    t3Rounds,
+  });
 
   let progress = true;
   while (progress && stars.length < size) {
     progress = false;
+    let usedT2 = false;
+    let usedT3 = false;
     const doneRegions = starredRegions();
     const doneRows = starredRows();
     const doneCols = starredCols();
@@ -87,7 +101,7 @@ export const solveByLogic = (regions: RegionGrid): LogicSolveResult => {
     for (let regionId = 0; regionId < size && !progress; regionId++) {
       if (doneRegions.has(regionId)) continue;
       const cells = candidatesOfRegion(regionId);
-      if (cells.length === 0) return { solved: false, rules, stars, difficulty: currentDifficulty() };
+      if (cells.length === 0) return fail();
       const only = cells[0];
       if (cells.length === 1 && only) {
         placeStar(only, LOGIC_RULE.REGION_SINGLE);
@@ -101,7 +115,7 @@ export const solveByLogic = (regions: RegionGrid): LogicSolveResult => {
       if (doneRows.has(row)) continue;
       const cells: CellPosition[] = [];
       for (let col = 0; col < size; col++) if (isCandidate(row, col)) cells.push({ row, col });
-      if (cells.length === 0) return { solved: false, rules, stars, difficulty: currentDifficulty() };
+      if (cells.length === 0) return fail();
       const only = cells[0];
       if (cells.length === 1 && only) {
         placeStar(only, LOGIC_RULE.ROW_SINGLE);
@@ -112,7 +126,7 @@ export const solveByLogic = (regions: RegionGrid): LogicSolveResult => {
       if (doneCols.has(col)) continue;
       const cells: CellPosition[] = [];
       for (let row = 0; row < size; row++) if (isCandidate(row, col)) cells.push({ row, col });
-      if (cells.length === 0) return { solved: false, rules, stars, difficulty: currentDifficulty() };
+      if (cells.length === 0) return fail();
       const only = cells[0];
       if (cells.length === 1 && only) {
         placeStar(only, LOGIC_RULE.COL_SINGLE);
@@ -174,7 +188,10 @@ export const solveByLogic = (regions: RegionGrid): LogicSolveResult => {
           usedT2 = true;
         }
     }
-    if (progress) continue;
+    if (progress) {
+      if (usedT2) t2Rounds++;
+      continue;
+    }
 
     // (e) 한 수 앞 모순 확인: 별을 뒀다고 가정했을 때 미완 행/열/구역의 후보가 전멸하면 그 칸 소거
     const wouldContradict = (star: CellPosition): boolean => {
@@ -212,9 +229,10 @@ export const solveByLogic = (regions: RegionGrid): LogicSolveResult => {
           progress = true;
           usedT3 = true;
         }
+    if (usedT3) t3Rounds++;
   }
 
-  return { solved: stars.length === size, rules, stars, difficulty: currentDifficulty() };
+  return { solved: stars.length === size, rules, stars, difficulty: currentDifficulty(), t2Rounds, t3Rounds };
 };
 
 /** 브루트포스 해 카운터 (2개 발견 시 조기 종료) — 논리 솔버 이중 검증용 */
