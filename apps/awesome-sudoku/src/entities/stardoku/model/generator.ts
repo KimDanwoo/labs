@@ -1,19 +1,25 @@
 import {
   BIG_BOARD_SIZE,
   BIG_STAGE_STEP,
-  FREE_STAR_FROM_SIZE,
   GENERATION_MAX_ATTEMPTS,
-  PUZZLE_DIFFICULTY,
-  RANDOM_SIZE_MAX,
-  RANDOM_SIZE_MIN,
+  MIN_LOGIC_DEPTH_BY_STAGE,
+  SIZE_BY_STAGE,
+  logicDepthScore,
 } from '@entities/stardoku/model/constants';
 import { solveByLogic } from '@entities/stardoku/model/solver';
-import { PuzzleDifficulty, RegionGrid, Rng, StardokuPuzzle } from '@entities/stardoku/model/types';
+import { RegionGrid, Rng, StardokuPuzzle } from '@entities/stardoku/model/types';
 
-export const boardSizeForStage = (stage: number, rng: Rng = Math.random): number => {
-  if (stage % BIG_STAGE_STEP === 0) return BIG_BOARD_SIZE;
-  return RANDOM_SIZE_MIN + Math.floor(rng() * (RANDOM_SIZE_MAX - RANDOM_SIZE_MIN + 1));
+const atStage = <T>(table: readonly T[], stage: number): T => {
+  const value = table[Math.min(Math.max(stage, 1), table.length) - 1];
+  if (value === undefined) throw new Error('stardoku: 빈 스테이지 테이블');
+  return value;
 };
+
+/** 스테이지에 따라 단조 증가 — 5의 배수는 대형판 이벤트 */
+export const boardSizeForStage = (stage: number): number =>
+  stage % BIG_STAGE_STEP === 0 ? BIG_BOARD_SIZE : atStage(SIZE_BY_STAGE, stage);
+
+export const minLogicDepthForStage = (stage: number): number => atStage(MIN_LOGIC_DEPTH_BY_STAGE, stage);
 
 const shuffle = <T>(items: T[], rng: Rng): T[] => {
   for (let i = items.length - 1; i > 0; i--) {
@@ -60,12 +66,11 @@ const ORTHOGONAL: ReadonlyArray<readonly [number, number]> = [
 
 /**
  * 별 칸을 씨앗으로 랜덤 flood-fill.
- * singletonCount만큼의 구역은 1칸(공짜 별 엔트리)으로 동결하고,
- * 나머지는 1페이즈에서 1회씩 확장해 최소 2칸을 구조적으로 보장한 뒤
+ * 1페이즈에서 모든 구역을 1회씩 확장해 최소 2칸을 구조적으로 보장한 뒤
  * 2페이즈에서 크기³ 비례(rich-get-richer)로 성장시켜 "큰 구역 소수 + 작은 구역 다수" 편차를 만든다 —
  * 작은/한 줄 구역이 제약을 강하게 걸어 유일해 확률이 크게 올라간다.
  */
-export const growRegions = (size: number, stars: number[], rng: Rng, singletonCount = 0): RegionGrid | null => {
+export const growRegions = (size: number, stars: number[], rng: Rng): RegionGrid | null => {
   const regions: number[][] = Array.from({ length: size }, () => Array<number>(size).fill(-1));
   const counts = Array<number>(size).fill(1);
   stars.forEach((col, row) => {
@@ -74,8 +79,6 @@ export const growRegions = (size: number, stars: number[], rng: Rng, singletonCo
   });
 
   const dead = new Set<number>();
-  const frozenSingletons = new Set<number>(shuffle([...Array(size).keys()], rng).slice(0, singletonCount));
-  frozenSingletons.forEach((id) => dead.add(id));
   let remaining = size * size - size;
 
   const neighborsOf = (regionId: number): Array<[number, number]> => {
@@ -110,9 +113,8 @@ export const growRegions = (size: number, stars: number[], rng: Rng, singletonCo
     return weights.length - 1;
   };
 
-  // 1페이즈: 동결 구역을 뺀 모든 구역을 랜덤 순서로 1회씩 확장 — 최소 2칸 보장
+  // 1페이즈: 모든 구역을 랜덤 순서로 1회씩 확장 — 최소 2칸 보장
   for (const id of shuffle([...Array(size).keys()], rng)) {
-    if (frozenSingletons.has(id)) continue;
     const options = neighborsOf(id);
     const pick = options[Math.floor(rng() * options.length)];
     if (!pick) return null; // 씨앗이 포위된 드문 경우 — 재시도
@@ -162,42 +164,39 @@ export const growRegions = (size: number, stars: number[], rng: Rng, singletonCo
   return regions;
 };
 
-const countSingletonRegions = (regions: RegionGrid): number => {
-  const size = regions.length;
-  const counts = Array<number>(size).fill(0);
+const hasSingletonRegion = (regions: RegionGrid): boolean => {
+  const counts = Array<number>(regions.length).fill(0);
   for (const row of regions) for (const id of row) counts[id] = (counts[id] ?? 0) + 1;
-  return counts.filter((count) => count === 1).length;
+  return counts.some((count) => count === 1);
 };
 
-/**
- * 크기별 난이도 밴드: EASY(T1 연쇄 자동 진행)는 전부 폐기.
- * 소형(≤6)은 MEDIUM만(작은 판에 T3 가정까지는 과함), 대형(≥7)은 MEDIUM·HARD 허용.
- */
-const isAcceptableDifficulty = (size: number, difficulty: PuzzleDifficulty): boolean => {
-  if (difficulty === PUZZLE_DIFFICULTY.MEDIUM) return true;
-  return difficulty === PUZZLE_DIFFICULTY.HARD && size >= FREE_STAR_FROM_SIZE;
-};
-
-/**
- * 퍼즐 생성: 별 배치 → 구역 성장 → 논리 완주 검증(= 유일해·노게싱 보장) → 난이도 밴드 필터.
- * 크기별 엔트리 정책 — 6 이하: 1칸 구역 금지(시시해짐) / 7 이상: 1칸 구역 정확히 1개(공짜 별 시작점 없이는 못 푼다).
- */
-export const generatePuzzle = (size: number, rng: Rng = Math.random): StardokuPuzzle => {
-  const singletonCount = size >= FREE_STAR_FROM_SIZE ? 1 : 0;
-
+const tryGenerate = (size: number, minLogicDepth: number, rng: Rng): StardokuPuzzle | null => {
   for (let attempt = 0; attempt < GENERATION_MAX_ATTEMPTS; attempt++) {
     const solution = generateStarPlacement(size, rng);
     if (!solution) continue;
-    const regions = growRegions(size, solution, rng, singletonCount);
+    const regions = growRegions(size, solution, rng);
     if (!regions) continue;
-    if (countSingletonRegions(regions) !== singletonCount) continue; // 강제 편입이 동결 구역을 키운 예외 케이스
+    if (hasSingletonRegion(regions)) continue;
 
     const result = solveByLogic(regions);
-    if (!result.solved) continue;
-    if (!isAcceptableDifficulty(size, result.difficulty)) continue;
+    if (!result.solved) continue; // 논리 완주 실패 = 유일해·노게싱 미보장
+    if (logicDepthScore(result.t2Rounds, result.t3Rounds) < minLogicDepth) continue;
 
     return { size, regions, solution };
   }
+  return null;
+};
 
-  throw new Error(`stardoku: ${size}×${size} 퍼즐 생성 실패 (${GENERATION_MAX_ATTEMPTS}회 시도)`);
+/**
+ * 퍼즐 생성: 별 배치 → 구역 성장 → 논리 완주 검증(= 유일해·노게싱 보장) → 논리깊이 게이트.
+ * 요구 깊이를 못 채우면 1씩 낮춰 재시도한다 — 깊은 판은 희소해서(9×9 깊이 5는 0.5%)
+ * 한 게이트에 매달리면 생성이 실패할 수 있다. 쉬운 판을 주는 게 판을 못 주는 것보다 낫다.
+ */
+export const generatePuzzle = (size: number, minLogicDepth = 0, rng: Rng = Math.random): StardokuPuzzle => {
+  for (let required = minLogicDepth; required >= 0; required--) {
+    const puzzle = tryGenerate(size, required, rng);
+    if (puzzle) return puzzle;
+  }
+
+  throw new Error(`stardoku: ${size}×${size} 퍼즐 생성 실패 (게이트당 ${GENERATION_MAX_ATTEMPTS}회 시도)`);
 };

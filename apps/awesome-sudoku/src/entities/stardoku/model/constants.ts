@@ -14,9 +14,11 @@ export const MAX_HINTS = 3;
 /** 게임 오버(목숨 소진) 감점 — 이전 스테이지로 후퇴 */
 export const GAME_OVER_PENALTY = 3;
 
-/** 일반 스테이지 보드 크기 랜덤 범위 — 4×4 이하는 자명하거나 해가 없음 */
-export const RANDOM_SIZE_MIN = 5;
-export const RANDOM_SIZE_MAX = 8;
+/**
+ * 일반 스테이지 보드 크기 — 스테이지에 따라 단조 증가한다(랜덤 아님).
+ * index = min(stage, length) - 1. 4×4 이하는 자명하거나 해가 없어서 5부터.
+ */
+export const SIZE_BY_STAGE = [5, 5, 6, 6, 7, 7, 8] as const;
 /** 5의 배수 스테이지는 대형판 */
 export const BIG_STAGE_STEP = 5;
 export const BIG_BOARD_SIZE = 9;
@@ -31,14 +33,31 @@ export const PUZZLE_DIFFICULTY = {
   HARD: 'hard',
 } as const;
 
-/** 1칸 구역 금지 — 공짜 별이 되어 퍼즐이 시시해진다 (FREE_STAR_FROM_SIZE 미만 보드에 적용) */
+/**
+ * 논리깊이 = T2 라운드 + 3 × T3 라운드. 최고 티어(difficulty)만으로는
+ * "T3를 마지막에 한 번 쓴 판"과 "계속 쓴 판"이 동급이 되어 커브를 못 만든다.
+ * 3배 가중은 T3(한 수 앞 모순)가 T2보다 확실히 어렵다는 판단 — 깊이 4 = T3 최소 1회.
+ */
+export const logicDepthScore = (t2Rounds: number, t3Rounds: number): number => t2Rounds + t3Rounds * 3;
+
+/**
+ * 스테이지별 최소 논리깊이. index = min(stage, length) - 1.
+ * 측정 기반(9×9 평균 생성시간): 1→2.3ms · 2→7.6ms · 4→8.1ms · 5→47.5ms.
+ * 깊이 7(T3 2회)은 9×9에서 356ms라 커브에서 제외했다.
+ */
+export const MIN_LOGIC_DEPTH_BY_STAGE = [1, 1, 2, 2, 2, 4, 4, 4, 4, 4, 4, 5] as const;
+
+/** 1칸 구역 금지 — 공짜 별이 되면 상당수 판이 T1만으로 풀려버린다(측정: T3 필요 비율 31.8%→22.2%) */
 export const MIN_REGION_SIZE = 2;
-/** 이 크기부터는 1칸 구역(공짜 별)을 정확히 1개 포함 — 시작 엔트리 없이는 못 푼다 */
-export const FREE_STAR_FROM_SIZE = 7;
-export const GENERATION_MAX_ATTEMPTS = 500;
+/** 한 난이도 게이트당 생성 시도 한도. 소진 시 깊이를 1 낮춰 재시도한다 */
+export const GENERATION_MAX_ATTEMPTS = 2000;
 
 export const DOUBLE_TAP_MS = 400;
 export const WRONG_FLASH_MS = 650;
+/** 클리어 연출(별 순차 팝) 길이 — 끝나면 다음 스테이지로 자동 진행 */
+export const CLEAR_CELEBRATION_MS = 1100;
+/** 별 하나당 팝 지연 — 연출 총 길이가 CLEAR_CELEBRATION_MS를 넘지 않도록 */
+export const STAR_POP_STAGGER_MS = 70;
 
 /**
  * 구역 배경색 팔레트 (라이트/다크 쌍) — 색각이상(CVD) 검증 완료.
