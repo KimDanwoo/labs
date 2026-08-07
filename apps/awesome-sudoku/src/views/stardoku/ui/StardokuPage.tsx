@@ -1,11 +1,12 @@
 'use client';
 
 import { UserProfileMenu } from '@features/auth/ui';
-import { useSyncStardokuScore } from '@features/stardoku-game/model/hooks';
+import { useStageClearFlow, useSyncStardokuScore } from '@features/stardoku-game/model/hooks';
 import { StardokuControls, StardokuStatus } from '@features/stardoku-game/ui';
 import { GameModeSelector } from '@features/sudoku-game/ui';
 import { ThemeToggle } from '@features/theme/ui/ThemeToggle';
 import { cn } from '@shared/model/utils';
+import { Snackbar } from '@shared/ui';
 import { StardokuBoard } from '@widgets/stardoku-board/ui';
 import dynamic from 'next/dynamic';
 
@@ -16,6 +17,7 @@ const StardokuResultSheet = dynamic(
 
 export const StardokuPage = () => {
   useSyncStardokuScore();
+  const { toast, hideToast } = useStageClearFlow();
 
   return (
     <main
@@ -73,13 +75,14 @@ export const StardokuPage = () => {
           <StardokuStatus />
           <StardokuBoard />
           <p className={cn('text-xs', 'text-[rgb(var(--color-text-secondary))]')}>
-            탭 1번 ✕ · 연속 2번 ⭐ · 드래그로 ✕ 일괄 · 틀린 별은 ❤️ −1
+            탭 1번 ✕ · 연속 2번 ⭐ · 드래그로 ✕ 일괄 · 규칙 위반 별은 ❤️ −1
           </p>
           <StardokuControls />
         </div>
       </div>
 
       <StardokuResultSheet />
+      <Snackbar message={toast ?? ''} isVisible={toast !== null} onClose={hideToast} variant="success" />
     </main>
   );
 };

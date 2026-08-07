@@ -53,7 +53,6 @@ export const MIN_REGION_SIZE = 2;
 export const GENERATION_MAX_ATTEMPTS = 2000;
 
 export const DOUBLE_TAP_MS = 400;
-export const WRONG_FLASH_MS = 650;
 /** 클리어 연출(별 순차 팝) 길이 — 끝나면 다음 스테이지로 자동 진행 */
 export const CLEAR_CELEBRATION_MS = 1100;
 /** 별 하나당 팝 지연 — 연출 총 길이가 CLEAR_CELEBRATION_MS를 넘지 않도록 */

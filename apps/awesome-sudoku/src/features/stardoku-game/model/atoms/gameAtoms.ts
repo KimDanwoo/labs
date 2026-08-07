@@ -1,7 +1,14 @@
 import { CELL_MARK, DOUBLE_TAP_MS, GAME_OVER_PENALTY, MAX_HINTS, MAX_LIVES } from '@entities/stardoku/model/constants';
-import { boardSizeForStage, generatePuzzle } from '@entities/stardoku/model/generator';
-import { CellPosition, MarkGrid } from '@entities/stardoku/model/types';
-import { countStars, createEmptyMarks, markAt, withMark } from '@entities/stardoku/model/utils';
+import { boardSizeForStage, generatePuzzle, minLogicDepthForStage } from '@entities/stardoku/model/generator';
+import { CellPosition, MarkGrid, StardokuPuzzle } from '@entities/stardoku/model/types';
+import {
+  cellKey,
+  countStars,
+  createEmptyMarks,
+  markAt,
+  violatingStarKeys,
+  withMark,
+} from '@entities/stardoku/model/utils';
 import {
   hintsRemainingAtom,
   lastXTapAtom,
@@ -10,7 +17,6 @@ import {
   puzzleAtom,
   scoreAtom,
   stageAtom,
-  wrongFlashAtom,
 } from '@features/stardoku-game/model/atoms/primitives';
 import { isClearedAtom, isGameOverAtom } from '@features/stardoku-game/model/atoms/statusAtoms';
 import { Getter, Setter, atom } from 'jotai';
@@ -20,23 +26,25 @@ interface TapPayload extends CellPosition {
   time: number;
 }
 
+const isSolved = (marks: MarkGrid, puzzle: StardokuPuzzle): boolean =>
+  countStars(marks) === puzzle.size && violatingStarKeys(marks, puzzle.regions).size === 0;
+
 /** 클리어 순간 1회 정산: 획득 점수 = 남은 힌트 */
-const settleIfCleared = (get: Getter, set: Setter, marks: MarkGrid, size: number): void => {
-  if (countStars(marks) !== size) return;
+const settleIfCleared = (get: Getter, set: Setter, marks: MarkGrid, puzzle: StardokuPuzzle): void => {
+  if (!isSolved(marks, puzzle)) return;
   set(scoreAtom, get(scoreAtom) + get(hintsRemainingAtom));
 };
 
 /** 스테이지 시작: 퍼즐 생성 + 마킹·목숨·힌트 초기화 (누적 점수는 유지) */
 export const initializeStageAtom = atom(null, (get, set, stage?: number) => {
   const targetStage = stage ?? get(stageAtom);
-  const puzzle = generatePuzzle(boardSizeForStage(targetStage));
+  const puzzle = generatePuzzle(boardSizeForStage(targetStage), minLogicDepthForStage(targetStage));
 
   set(stageAtom, targetStage);
   set(puzzleAtom, puzzle);
   set(marksAtom, createEmptyMarks(puzzle.size));
   set(livesAtom, MAX_LIVES);
   set(hintsRemainingAtom, MAX_HINTS);
-  set(wrongFlashAtom, null);
   set(lastXTapAtom, null);
 });
 
@@ -69,14 +77,28 @@ export const restartBoardAtom = atom(null, (get, set) => {
   set(marksAtom, createEmptyMarks(puzzle.size));
   set(livesAtom, MAX_LIVES);
   set(hintsRemainingAtom, MAX_HINTS);
-  set(wrongFlashAtom, null);
   set(lastXTapAtom, null);
 });
 
 /**
- * 셀 탭: 빈칸 → ✕ / ✕ 연속 탭 → 별 배치 시도 / ✕ 단독 탭 → 제거 / 별 탭 → 제거.
- * 오답 별은 거부되고 목숨 −1, 목숨 소진 시 게임 오버 감점.
+ * 별을 놓는다. 정답 여부는 판정하지 않는다 — 게임이 대신 검증해주면 시행착오로 풀 수 있어 논리 퍼즐이 아니게 된다.
+ * 규칙 위반(행·열·구역 중복 / 인접) 배치만 목숨 1을 깎는다. 별 자체는 남고 붉게 표시되어 사용자가 직접 고친다.
  */
+const placeStar = (get: Getter, set: Setter, marks: MarkGrid, puzzle: StardokuPuzzle, at: CellPosition): void => {
+  const nextMarks = withMark(marks, at.row, at.col, CELL_MARK.STAR);
+  set(marksAtom, nextMarks);
+
+  if (violatingStarKeys(nextMarks, puzzle.regions).has(cellKey(at.row, at.col))) {
+    const nextLives = Math.max(0, get(livesAtom) - 1);
+    set(livesAtom, nextLives);
+    if (nextLives === 0) set(scoreAtom, get(scoreAtom) - GAME_OVER_PENALTY);
+    return;
+  }
+
+  settleIfCleared(get, set, nextMarks, puzzle);
+};
+
+/** 셀 탭: 빈칸 → ✕ / ✕ 연속 탭 → 별 / ✕ 단독 탭 → 제거 / 별 탭 → 제거 */
 export const tapCellAtom = atom(null, (get, set, { row, col, time }: TapPayload) => {
   const puzzle = get(puzzleAtom);
   if (!puzzle || get(isGameOverAtom) || get(isClearedAtom)) return;
@@ -106,21 +128,13 @@ export const tapCellAtom = atom(null, (get, set, { row, col, time }: TapPayload)
     return;
   }
 
-  if (puzzle.solution[row] === col) {
-    const nextMarks = withMark(marks, row, col, CELL_MARK.STAR);
-    set(marksAtom, nextMarks);
-    settleIfCleared(get, set, nextMarks, puzzle.size);
-    return;
-  }
-
-  set(marksAtom, withMark(marks, row, col, CELL_MARK.EMPTY));
-  const nextLives = Math.max(0, get(livesAtom) - 1);
-  set(livesAtom, nextLives);
-  set(wrongFlashAtom, { row, col });
-  if (nextLives === 0) set(scoreAtom, get(scoreAtom) - GAME_OVER_PENALTY);
+  placeStar(get, set, marks, puzzle, { row, col });
 });
 
-/** 힌트: 아직 없는 정답 별 하나를 공개하고 힌트 1개 소모 */
+/**
+ * 힌트: 아직 없는 정답 별 하나를 공개하고 힌트 1개 소모.
+ * 그 자리를 막고 있던 잘못된 별은 함께 치운다 — 힌트가 규칙 위반을 새로 만들면 안 된다.
+ */
 export const applyHintAtom = atom(null, (get, set) => {
   const puzzle = get(puzzleAtom);
   if (!puzzle || get(isGameOverAtom) || get(isClearedAtom)) return;
@@ -135,10 +149,19 @@ export const applyHintAtom = atom(null, (get, set) => {
   const target = targets[Math.floor(Math.random() * targets.length)];
   if (!target) return;
 
-  const nextMarks = withMark(marks, target.row, target.col, CELL_MARK.STAR);
+  const revealed = withMark(marks, target.row, target.col, CELL_MARK.STAR);
+  const conflicting = violatingStarKeys(revealed, puzzle.regions);
+  const nextMarks = revealed.map((rowMarks, row) =>
+    rowMarks.map((mark, col) => {
+      const isRevealed = row === target.row && col === target.col;
+      if (isRevealed || !conflicting.has(cellKey(row, col))) return mark;
+      return CELL_MARK.EMPTY;
+    }),
+  );
+
   set(marksAtom, nextMarks);
   set(hintsRemainingAtom, hintsRemaining - 1);
-  settleIfCleared(get, set, nextMarks, puzzle.size);
+  settleIfCleared(get, set, nextMarks, puzzle);
 });
 
 /** 드래그 페인트: 빈칸에만 ✕ (더블탭 승격 대상 아님) */
