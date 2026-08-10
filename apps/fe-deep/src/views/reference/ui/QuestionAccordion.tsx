@@ -11,7 +11,7 @@ interface QuestionAccordionProps {
 
 export function QuestionAccordion({ questions, startIndex = 0 }: QuestionAccordionProps) {
   return (
-    <Accordion type="multiple" className="space-y-2.5">
+    <Accordion type="single" collapsible className="space-y-2.5">
       {questions.map((question, index) => (
         <QuestionAccordionItem key={question.id} question={question} number={startIndex + index + 1} />
       ))}
