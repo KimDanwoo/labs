@@ -44,7 +44,7 @@ export const Snackbar = memo<SnackbarProps>(({ message, isVisible, onClose, vari
       role="status"
       aria-live="polite"
       className={cn(
-        'fixed bottom-6 left-1/2 -translate-x-1/2',
+        'fixed bottom-[max(1.5rem,calc(env(safe-area-inset-bottom)+1.5rem))] left-1/2 -translate-x-1/2',
         'z-[60]',
         isLeaving ? 'animate-snackbar-out' : 'animate-snackbar-in',
       )}
