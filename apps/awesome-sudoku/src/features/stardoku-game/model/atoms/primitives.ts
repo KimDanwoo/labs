@@ -5,13 +5,19 @@ import { atomWithStorage } from 'jotai/utils';
 
 // ── 영속 atoms (localStorage) ──────────────────────────────
 
-export const stageAtom = atomWithStorage<number>('stardoku:stage', 1);
-export const puzzleAtom = atomWithStorage<StardokuPuzzle | null>('stardoku:puzzle', null);
-export const marksAtom = atomWithStorage<MarkGrid>('stardoku:marks', []);
-export const livesAtom = atomWithStorage<number>('stardoku:lives', MAX_LIVES);
-export const hintsRemainingAtom = atomWithStorage<number>('stardoku:hints', MAX_HINTS);
+/**
+ * 저장 키 버전. 판 크기 커브·판정 규칙·구역 생성이 바뀌면 올린다 —
+ * 옛 저장분은 지금 규칙과 안 맞는 퍼즐이라 이어받으면 안 된다. 키가 바뀌면 기존 값은 그대로 버려진다.
+ */
+const STORAGE_PREFIX = 'stardoku:v2';
+
+export const stageAtom = atomWithStorage<number>(`${STORAGE_PREFIX}:stage`, 1);
+export const puzzleAtom = atomWithStorage<StardokuPuzzle | null>(`${STORAGE_PREFIX}:puzzle`, null);
+export const marksAtom = atomWithStorage<MarkGrid>(`${STORAGE_PREFIX}:marks`, []);
+export const livesAtom = atomWithStorage<number>(`${STORAGE_PREFIX}:lives`, MAX_LIVES);
+export const hintsRemainingAtom = atomWithStorage<number>(`${STORAGE_PREFIX}:hints`, MAX_HINTS);
 /** 누적 점수 — 랭킹의 기반. 게임 오버 감점으로 음수도 가능 */
-export const scoreAtom = atomWithStorage<number>('stardoku:score', 0);
+export const scoreAtom = atomWithStorage<number>(`${STORAGE_PREFIX}:score`, 0);
 
 // ── 비영속 atoms ───────────────────────────────────────────
 

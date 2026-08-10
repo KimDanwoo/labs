@@ -1,5 +1,5 @@
+import { FIXED_PUZZLE_6 as PUZZLE } from '@entities/stardoku/model/__tests__/fixtures';
 import { CELL_MARK, GAME_OVER_PENALTY, MAX_HINTS, MAX_LIVES } from '@entities/stardoku/model/constants';
-import { StardokuPuzzle } from '@entities/stardoku/model/types';
 import { cellKey, createEmptyMarks, markAt } from '@entities/stardoku/model/utils';
 import {
   applyHintAtom,
@@ -17,15 +17,6 @@ import {
 } from '@features/stardoku-game/model/atoms';
 import { createStore } from 'jotai';
 import { describe, expect, it } from 'vitest';
-
-const toRegions = (rows: string[]): number[][] => rows.map((row) => [...row].map((ch) => ch.charCodeAt(0) - 65));
-
-/** 유일해가 검증된 고정 6×6 퍼즐 (솔버 테스트와 동일) */
-const PUZZLE: StardokuPuzzle = {
-  size: 6,
-  regions: toRegions(['CAAAAA', 'CAABBB', 'CCEEBB', 'CCEEDF', 'CCEEFF', 'CEEEEF']),
-  solution: [1, 3, 0, 4, 2, 5],
-};
 
 const setupStore = () => {
   const store = createStore();
@@ -123,7 +114,7 @@ describe('별도쿠 점수 시스템', () => {
     expect(store.get(violatingKeysAtom).size).toBe(0);
   });
 
-  it('규칙 위반 3번이면 게임 오버 + 감점, 이어서 이전 스테이지로 후퇴한다', () => {
+  it('규칙 위반 3번이면 게임 오버 + 감점, 이어서 이전 스테이지로 후퇴한다', async () => {
     const store = setupStore();
     placeStar(store, 0, 0);
     placeStar(store, 0, 2); // 위반 1
@@ -134,9 +125,43 @@ describe('별도쿠 점수 시스템', () => {
     expect(store.get(isGameOverAtom)).toBe(true);
     expect(store.get(scoreAtom)).toBe(-GAME_OVER_PENALTY);
 
-    store.set(restartBoardAtom); // 게임 오버 상태의 모든 탈출구는 후퇴로 수렴
+    await store.set(restartBoardAtom); // 게임 오버 상태의 모든 탈출구는 후퇴로 수렴
     expect(store.get(stageAtom)).toBe(2);
     expect(store.get(livesAtom)).toBe(MAX_LIVES);
     expect(store.get(scoreAtom)).toBe(-GAME_OVER_PENALTY); // 감점은 1회만
+  });
+});
+
+describe('랭킹 무결성', () => {
+  it('다시 시작은 마킹만 지운다 — 힌트를 복구해주면 답을 파악한 뒤 리셋해 만점을 받을 수 있다', () => {
+    const store = setupStore();
+    // 힌트는 정답 별을 무작위로 고른다 — 어디에 놓였는지에 따라 아래 배치가 위반이 되기도 해서
+    // 실제 호출 대신 "1개 쓴 상태"를 직접 만든다
+    store.set(hintsRemainingAtom, MAX_HINTS - 1);
+    placeStar(store, 0, 0);
+    placeStar(store, 0, 4); // 규칙 위반 — 목숨 1 소모
+    expect(store.get(hintsRemainingAtom)).toBe(MAX_HINTS - 1);
+    expect(store.get(livesAtom)).toBe(MAX_LIVES - 1);
+
+    store.set(restartBoardAtom);
+
+    expect(
+      store
+        .get(marksAtom)
+        .flat()
+        .every((mark) => mark === CELL_MARK.EMPTY),
+    ).toBe(true);
+    expect(store.get(hintsRemainingAtom)).toBe(MAX_HINTS - 1); // 소모된 채 유지
+    expect(store.get(livesAtom)).toBe(MAX_LIVES - 1);
+  });
+
+  it('다시 시작 후 클리어해도 이미 쓴 힌트만큼만 점수를 준다', () => {
+    const store = setupStore();
+    store.set(applyHintAtom);
+    store.set(restartBoardAtom);
+    solve(store);
+
+    expect(store.get(isClearedAtom)).toBe(true);
+    expect(store.get(scoreAtom)).toBe(MAX_HINTS - 1);
   });
 });

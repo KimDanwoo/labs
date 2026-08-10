@@ -6,11 +6,11 @@ import { GoogleSignInButton } from '@features/auth/ui/GoogleSignInButton';
 import { useSaveGameRecord } from '@features/game-record/model/hooks';
 import { currentTimeAtom, isCompletedAtom, isSuccessAtom, mistakeCountAtom } from '@features/sudoku-game/model/atoms';
 import { formatTime } from '@features/sudoku-game/model/utils';
-import { useSnackbar } from '@shared/model/hooks';
+import { useDismissible, useSnackbar } from '@shared/model/hooks';
 import { cn } from '@shared/model/utils';
 import { BottomSheet, Snackbar } from '@shared/ui';
 import { useAtomValue } from 'jotai';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { GameDifficultySelector } from './GameDifficultySelector';
 
 const SuccessIcon = () => (
@@ -57,15 +57,7 @@ export const GameResultSheet = memo(() => {
     saveRef.current = save;
   }, [save]);
 
-  const [dismissed, setDismissed] = useState(false);
-  const handleClose = useCallback(() => setDismissed(true), []);
-
-  // 새 게임 시작 시 dismissed 초기화 — 렌더 중 상태 보정
-  const [prevCompleted, setPrevCompleted] = useState(isCompleted);
-  if (prevCompleted !== isCompleted) {
-    setPrevCompleted(isCompleted);
-    if (!isCompleted) setDismissed(false);
-  }
+  const { isOpen: isSheetOpen, dismiss } = useDismissible(isCompleted);
 
   const snackbar = useSnackbar();
   const { show: showSnackbar } = snackbar;
@@ -81,11 +73,7 @@ export const GameResultSheet = memo(() => {
 
   return (
     <>
-      <BottomSheet
-        isOpen={isCompleted && !dismissed}
-        onClose={handleClose}
-        title={isSuccess ? '축하합니다!' : '게임 오버'}
-      >
+      <BottomSheet isOpen={isSheetOpen} onClose={dismiss} title={isSuccess ? '축하합니다!' : '게임 오버'}>
         {isSuccess ? (
           <div className="text-center space-y-4">
             <SuccessIcon />

@@ -20,13 +20,7 @@ export const StardokuPage = () => {
   const { toast, hideToast } = useStageClearFlow();
 
   return (
-    <main
-      className={cn(
-        'min-h-svh min-w-[360px]',
-        'bg-[rgb(var(--color-surface-secondary))]',
-        'relative overflow-x-hidden',
-      )}
-    >
+    <main className={cn('min-h-svh', 'bg-[rgb(var(--color-surface-secondary))]', 'relative overflow-x-hidden')}>
       {/* Ambient background */}
       <div className="pointer-events-none fixed inset-0">
         <div
@@ -57,7 +51,7 @@ export const StardokuPage = () => {
           className={cn(
             'mx-auto py-3',
             'flex items-center justify-between',
-            'w-full max-w-[360px]',
+            'w-full max-w-[400px] px-3 sm:px-0',
             'lg:max-w-[912px] xl:max-w-[1056px]',
           )}
         >
@@ -69,13 +63,13 @@ export const StardokuPage = () => {
         </div>
       </header>
 
-      {/* Main content */}
-      <div className="relative mx-auto px-4 py-6 sm:px-6 md:py-10">
-        <div className="mx-auto flex w-full max-w-[360px] flex-col items-center gap-4 lg:max-w-[456px]">
+      {/* Main content — 모바일에서 스크롤 없이 한 화면에 들어가야 한다(컨트롤이 밀리면 조작이 끊긴다) */}
+      <div className="relative mx-auto px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6 md:py-10">
+        <div className="mx-auto flex w-full max-w-[400px] flex-col items-center gap-3 lg:max-w-[464px] lg:gap-4">
           <StardokuStatus />
           <StardokuBoard />
-          <p className={cn('text-xs', 'text-[rgb(var(--color-text-secondary))]')}>
-            탭 1번 ✕ · 연속 2번 ⭐ · 드래그로 ✕ 일괄 · 규칙 위반 별은 ❤️ −1
+          <p className={cn('text-center text-xs', 'text-[rgb(var(--color-text-secondary))]')}>
+            탭 ✕ · 연속 탭 ⭐ · 드래그로 일괄 ✕/지우기
           </p>
           <StardokuControls />
         </div>

@@ -2,10 +2,11 @@
 
 import { GAME_OVER_PENALTY } from '@entities/stardoku/model/constants';
 import { isGameOverAtom, retreatStageAtom, scoreAtom, stageAtom } from '@features/stardoku-game/model/atoms';
+import { useDismissible } from '@shared/model/hooks';
 import { cn } from '@shared/model/utils';
 import { BottomSheet } from '@shared/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { memo, useCallback, useState } from 'react';
+import { memo } from 'react';
 
 const GameOverIcon = () => (
   <div
@@ -28,18 +29,10 @@ export const StardokuResultSheet = memo(() => {
   const score = useAtomValue(scoreAtom);
   const retreatStage = useSetAtom(retreatStageAtom);
 
-  const [dismissed, setDismissed] = useState(false);
-  const handleClose = useCallback(() => setDismissed(true), []);
-
-  // 새 판 시작 시 dismissed 초기화 — 렌더 중 상태 보정
-  const [prevGameOver, setPrevGameOver] = useState(isGameOver);
-  if (prevGameOver !== isGameOver) {
-    setPrevGameOver(isGameOver);
-    if (!isGameOver) setDismissed(false);
-  }
+  const { isOpen, dismiss } = useDismissible(isGameOver);
 
   return (
-    <BottomSheet isOpen={isGameOver && !dismissed} onClose={handleClose} title="게임 오버">
+    <BottomSheet isOpen={isOpen} onClose={dismiss} title="게임 오버">
       <div className="space-y-4 text-center">
         <GameOverIcon />
         <p className={cn('text-sm', 'text-[rgb(var(--color-text-secondary))]')}>

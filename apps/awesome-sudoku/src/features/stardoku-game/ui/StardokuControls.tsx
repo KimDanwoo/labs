@@ -1,9 +1,4 @@
-import {
-  applyHintAtom,
-  hintsRemainingAtom,
-  regeneratePuzzleAtom,
-  restartBoardAtom,
-} from '@features/stardoku-game/model/atoms';
+import { applyHintAtom, hintsRemainingAtom, restartBoardAtom } from '@features/stardoku-game/model/atoms';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo } from 'react';
@@ -17,11 +12,11 @@ const controlButtonClass = cn(
   'disabled:pointer-events-none disabled:opacity-40',
 );
 
+/** 같은 스테이지에서 판을 다시 뽑는 수단은 두지 않는다 — 누적 점수가 랭킹이라 쉬운 판이 나올 때까지 돌릴 수 있다 */
 export const StardokuControls = memo(() => {
   const hintsRemaining = useAtomValue(hintsRemainingAtom);
   const applyHint = useSetAtom(applyHintAtom);
   const restartBoard = useSetAtom(restartBoardAtom);
-  const regeneratePuzzle = useSetAtom(regeneratePuzzleAtom);
 
   return (
     <div className="flex w-full gap-2.5">
@@ -30,9 +25,6 @@ export const StardokuControls = memo(() => {
       </button>
       <button type="button" onClick={() => restartBoard()} className={controlButtonClass}>
         다시 시작
-      </button>
-      <button type="button" onClick={() => regeneratePuzzle()} className={controlButtonClass}>
-        새 퍼즐
       </button>
     </div>
   );

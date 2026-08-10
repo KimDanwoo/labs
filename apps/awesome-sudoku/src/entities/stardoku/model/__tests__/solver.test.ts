@@ -1,9 +1,7 @@
+import { toRegions } from '@entities/stardoku/model/__tests__/fixtures';
 import { PUZZLE_DIFFICULTY } from '@entities/stardoku/model/constants';
 import { LOGIC_RULE, countSolutions, solveByLogic } from '@entities/stardoku/model/solver';
-import { RegionGrid } from '@entities/stardoku/model/types';
 import { describe, expect, it } from 'vitest';
-
-const toRegions = (rows: string[]): RegionGrid => rows.map((row) => [...row].map((ch) => ch.charCodeAt(0) - 65));
 
 /** 1칸 구역(D) 엔트리 + 기본 기법만으로 완주되는 유일해 퍼즐 (생성기 프로토타입 산출물) */
 const SOLVABLE_MAP = toRegions(['CAAAAA', 'CAABBB', 'CCEEBB', 'CCEEDF', 'CCEEFF', 'CEEEEF']);

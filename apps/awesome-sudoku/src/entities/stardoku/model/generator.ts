@@ -1,8 +1,10 @@
 import {
   BIG_BOARD_SIZE,
   BIG_STAGE_STEP,
+  DEFAULT_REGION_GROWTH_EXPONENT,
   GENERATION_MAX_ATTEMPTS,
   MIN_LOGIC_DEPTH_BY_STAGE,
+  REGION_GROWTH_EXPONENT_BY_SIZE,
   SIZE_BY_STAGE,
   logicDepthScore,
 } from '@entities/stardoku/model/constants';
@@ -20,6 +22,9 @@ export const boardSizeForStage = (stage: number): number =>
   stage % BIG_STAGE_STEP === 0 ? BIG_BOARD_SIZE : atStage(SIZE_BY_STAGE, stage);
 
 export const minLogicDepthForStage = (stage: number): number => atStage(MIN_LOGIC_DEPTH_BY_STAGE, stage);
+
+export const growthExponentForSize = (size: number): number =>
+  REGION_GROWTH_EXPONENT_BY_SIZE[size] ?? DEFAULT_REGION_GROWTH_EXPONENT;
 
 const shuffle = <T>(items: T[], rng: Rng): T[] => {
   for (let i = items.length - 1; i > 0; i--) {
@@ -67,10 +72,23 @@ const ORTHOGONAL: ReadonlyArray<readonly [number, number]> = [
 /**
  * 별 칸을 씨앗으로 랜덤 flood-fill.
  * 1페이즈에서 모든 구역을 1회씩 확장해 최소 2칸을 구조적으로 보장한 뒤
- * 2페이즈에서 크기³ 비례(rich-get-richer)로 성장시켜 "큰 구역 소수 + 작은 구역 다수" 편차를 만든다 —
+ * 2페이즈에서 크기^지수 비례(rich-get-richer)로 성장시켜 "큰 구역 소수 + 작은 구역 다수" 편차를 만든다 —
  * 작은/한 줄 구역이 제약을 강하게 걸어 유일해 확률이 크게 올라간다.
+ * 지수는 크기별로 다르다(REGION_GROWTH_EXPONENT_BY_SIZE) — 낮출수록 크기가 고르게 퍼져 판이 다채로워지지만
+ * 유일해가 희소해져 생성이 느려지므로, 생성 예산 안에서 가장 낮은 값을 실측으로 잡았다.
+ *
+ * 편차는 취향이 아니라 유일해의 필요조건이다. 10×10에서 모든 구역에 하한을 걸고 6000판을 뽑아본 결과
+ * 유일해 비율은 하한 2칸 8.17% → 3칸 0.10% → 4칸 0.00%. 2칸짜리 조각이 만드는 강한 제약이 없으면
+ * 1별-1구역 규칙에서 해가 하나로 좁혀지지 않는다. 균등 구역으로 시작해 경계를 옮기는 국소 탐색도
+ * 시도했으나 10×10 성공률 0~5%·1.2초로 실패했다.
+ * 판이 한 구역에 잠식돼 보이는 건 이 대가이고, 큰 구역에 무채색을 주는 색 배정(regionColorIndexes)으로 상쇄한다.
  */
-export const growRegions = (size: number, stars: number[], rng: Rng): RegionGrid | null => {
+export const growRegions = (
+  size: number,
+  stars: number[],
+  rng: Rng,
+  growthExponent = DEFAULT_REGION_GROWTH_EXPONENT,
+): RegionGrid | null => {
   const regions: number[][] = Array.from({ length: size }, () => Array<number>(size).fill(-1));
   const counts = Array<number>(size).fill(1);
   stars.forEach((col, row) => {
@@ -100,7 +118,7 @@ export const growRegions = (size: number, stars: number[], rng: Rng): RegionGrid
     const weights: number[] = [];
     for (let id = 0; id < size; id++) {
       const count = counts[id] ?? 1;
-      const weight = dead.has(id) ? 0 : count ** 3;
+      const weight = dead.has(id) ? 0 : count ** growthExponent;
       weights.push(weight);
       total += weight;
     }
@@ -164,17 +182,19 @@ export const growRegions = (size: number, stars: number[], rng: Rng): RegionGrid
   return regions;
 };
 
-const hasSingletonRegion = (regions: RegionGrid): boolean => {
+const countRegionCells = (regions: RegionGrid): number[] => {
   const counts = Array<number>(regions.length).fill(0);
   for (const row of regions) for (const id of row) counts[id] = (counts[id] ?? 0) + 1;
-  return counts.some((count) => count === 1);
+  return counts;
 };
+
+const hasSingletonRegion = (regions: RegionGrid): boolean => countRegionCells(regions).some((count) => count === 1);
 
 const tryGenerate = (size: number, minLogicDepth: number, rng: Rng): StardokuPuzzle | null => {
   for (let attempt = 0; attempt < GENERATION_MAX_ATTEMPTS; attempt++) {
     const solution = generateStarPlacement(size, rng);
     if (!solution) continue;
-    const regions = growRegions(size, solution, rng);
+    const regions = growRegions(size, solution, rng, growthExponentForSize(size));
     if (!regions) continue;
     if (hasSingletonRegion(regions)) continue;
 
