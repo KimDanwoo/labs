@@ -49,8 +49,33 @@ export const violatingStarKeys = (marks: MarkGrid, regions: RegionGrid): Set<str
   return keys;
 };
 
-/** 보드 크기에 맞춰 팔레트 전체에 균등 분산 — 작은 판에서도 색 간격이 최대가 되게 */
-export const regionColorClass = (regionId: number, boardSize: number): string => {
-  const spread = Math.floor((regionId * REGION_COLORS.length) / Math.max(boardSize, 1));
-  return REGION_COLORS[spread % REGION_COLORS.length] ?? '';
+/**
+ * 클리어 판정 — 별이 size개이고 규칙 위반이 하나도 없으면 정답이다.
+ * size개 별이 행·열·구역·인접 제약을 모두 만족하면 비둘기집 원리로 유일해와 일치하므로 solution 대조가 필요 없다.
+ * 파생 atom(화면 표시)과 정산 로직(커밋 전 marks 평가) 양쪽이 이 함수만 본다 — 조건이 갈라지면 안 된다.
+ */
+export const isPuzzleSolved = (marks: MarkGrid, size: number, regions: RegionGrid): boolean =>
+  countStars(marks) === size && violatingStarKeys(marks, regions).size === 0;
+
+/**
+ * 구역 id → 팔레트 인덱스. **넓은 구역일수록 앞쪽(저채도)** 을 받는다.
+ * 생성기가 판의 절반 이상을 차지하는 구역을 구조적으로 만들기 때문에(유일해 조건 — generator.ts),
+ * 면적에 비례해 채도를 주면 판 전체가 그 색으로 물든다. 면적-채도를 반비례시켜 상쇄한다.
+ * 보드 크기가 팔레트보다 작으면 남는 색을 건너뛰며 균등 분산해 색 간격을 최대로 벌린다.
+ */
+export const regionColorIndexes = (regions: RegionGrid): number[] => {
+  const size = regions.length;
+  const counts = Array<number>(size).fill(0);
+  for (const row of regions) for (const id of row) counts[id] = (counts[id] ?? 0) + 1;
+
+  const indexes = Array<number>(size).fill(0);
+  counts
+    .map((count, id) => ({ count, id }))
+    .sort((a, b) => b.count - a.count || a.id - b.id)
+    .forEach(({ id }, rank) => {
+      indexes[id] = Math.floor((rank * REGION_COLORS.length) / Math.max(size, 1)) % REGION_COLORS.length;
+    });
+  return indexes;
 };
+
+export const regionColorClass = (colorIndex: number): string => REGION_COLORS[colorIndex] ?? '';
