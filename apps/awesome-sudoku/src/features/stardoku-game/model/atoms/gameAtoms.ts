@@ -1,10 +1,9 @@
 import { CELL_MARK, DOUBLE_TAP_MS, GAME_OVER_PENALTY, MAX_HINTS, MAX_LIVES } from '@entities/stardoku/model/constants';
-import { boardSizeForStage, generatePuzzle, minLogicDepthForStage } from '@entities/stardoku/model/generator';
 import { CellPosition, MarkGrid, StardokuPuzzle } from '@entities/stardoku/model/types';
 import {
   cellKey,
-  countStars,
   createEmptyMarks,
+  isPuzzleSolved,
   markAt,
   violatingStarKeys,
   withMark,
@@ -19,6 +18,7 @@ import {
   stageAtom,
 } from '@features/stardoku-game/model/atoms/primitives';
 import { isClearedAtom, isGameOverAtom } from '@features/stardoku-game/model/atoms/statusAtoms';
+import { requestStagePuzzle } from '@features/stardoku-game/model/services/puzzleGenerator';
 import { Getter, Setter, atom } from 'jotai';
 
 interface TapPayload extends CellPosition {
@@ -26,19 +26,19 @@ interface TapPayload extends CellPosition {
   time: number;
 }
 
-const isSolved = (marks: MarkGrid, puzzle: StardokuPuzzle): boolean =>
-  countStars(marks) === puzzle.size && violatingStarKeys(marks, puzzle.regions).size === 0;
-
 /** 클리어 순간 1회 정산: 획득 점수 = 남은 힌트 */
 const settleIfCleared = (get: Getter, set: Setter, marks: MarkGrid, puzzle: StardokuPuzzle): void => {
-  if (!isSolved(marks, puzzle)) return;
+  if (!isPuzzleSolved(marks, puzzle.size, puzzle.regions)) return;
   set(scoreAtom, get(scoreAtom) + get(hintsRemainingAtom));
 };
 
-/** 스테이지 시작: 퍼즐 생성 + 마킹·목숨·힌트 초기화 (누적 점수는 유지) */
-export const initializeStageAtom = atom(null, (get, set, stage?: number) => {
+/**
+ * 스테이지 시작: 퍼즐 생성 + 마킹·목숨·힌트 초기화 (누적 점수는 유지).
+ * 생성은 워커에서 돌아 비동기다 — 도착 전까지 보드는 로딩 자리표시를 띄운다.
+ */
+export const initializeStageAtom = atom(null, async (get, set, stage?: number) => {
   const targetStage = stage ?? get(stageAtom);
-  const puzzle = generatePuzzle(boardSizeForStage(targetStage), minLogicDepthForStage(targetStage));
+  const puzzle = await requestStagePuzzle(targetStage);
 
   set(stageAtom, targetStage);
   set(puzzleAtom, puzzle);
@@ -48,36 +48,24 @@ export const initializeStageAtom = atom(null, (get, set, stage?: number) => {
   set(lastXTapAtom, null);
 });
 
-export const nextStageAtom = atom(null, (get, set) => {
-  set(initializeStageAtom, get(stageAtom) + 1);
-});
+export const nextStageAtom = atom(null, (get, set) => set(initializeStageAtom, get(stageAtom) + 1));
 
 /** 게임 오버 후퇴: 이전 스테이지로 (감점은 목숨 소진 순간 이미 반영됨) */
-export const retreatStageAtom = atom(null, (get, set) => {
-  set(initializeStageAtom, Math.max(1, get(stageAtom) - 1));
-});
+export const retreatStageAtom = atom(null, (get, set) => set(initializeStageAtom, Math.max(1, get(stageAtom) - 1)));
 
-/** 같은 스테이지에서 새 퍼즐 재생성. 게임 오버 상태면 후퇴가 우선(감점 회피 방지) */
-export const regeneratePuzzleAtom = atom(null, (get, set) => {
-  if (get(isGameOverAtom)) {
-    set(retreatStageAtom);
-    return;
-  }
-  set(initializeStageAtom, get(stageAtom));
-});
-
-/** 현재 퍼즐 그대로 마킹·목숨·힌트만 리셋. 게임 오버 상태면 후퇴가 우선 */
+/**
+ * 마킹만 지운다 — 꼬인 판을 정리하는 용도. 게임 오버 상태면 후퇴가 우선.
+ *
+ * 목숨·힌트는 **일부러 복구하지 않는다.** 점수 = 클리어 시 남은 힌트라서, 힌트를 쓰고 답을 파악한 뒤
+ * 리셋해 만점을 받는 파밍이 가능했다. 누적 점수가 랭킹이므로 회차 내 자원은 회차가 끝날 때까지 유지한다.
+ */
 export const restartBoardAtom = atom(null, (get, set) => {
   const puzzle = get(puzzleAtom);
-  if (!puzzle) return;
-  if (get(isGameOverAtom)) {
-    set(retreatStageAtom);
-    return;
-  }
+  if (!puzzle) return undefined;
+  if (get(isGameOverAtom)) return set(retreatStageAtom);
   set(marksAtom, createEmptyMarks(puzzle.size));
-  set(livesAtom, MAX_LIVES);
-  set(hintsRemainingAtom, MAX_HINTS);
   set(lastXTapAtom, null);
+  return undefined;
 });
 
 /**
@@ -170,4 +158,12 @@ export const paintXCellAtom = atom(null, (get, set, { row, col }: CellPosition) 
   const marks = get(marksAtom);
   if (markAt(marks, row, col) !== CELL_MARK.EMPTY) return;
   set(marksAtom, withMark(marks, row, col, CELL_MARK.X));
+});
+
+/** 드래그 지우개: ✕만 지운다. 별은 건드리지 않는다 — 손가락 한 번에 쓸려나가면 안 된다 */
+export const eraseXCellAtom = atom(null, (get, set, { row, col }: CellPosition) => {
+  if (get(isGameOverAtom) || get(isClearedAtom)) return;
+  const marks = get(marksAtom);
+  if (markAt(marks, row, col) !== CELL_MARK.X) return;
+  set(marksAtom, withMark(marks, row, col, CELL_MARK.EMPTY));
 });
