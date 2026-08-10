@@ -1,5 +1,5 @@
-import { STORAGE_KEYS } from '@shared/constants';
 import { SM2_CONSTANTS } from '@entities/progress/model';
+import { STORAGE_KEYS } from '@shared/constants';
 
 /** 오늘 날짜를 YYYY-MM-DD로 반환한다. */
 export function todayKey(): string {
