@@ -3,6 +3,9 @@ import { CellMark } from '@entities/stardoku/model/types';
 import { cn } from '@shared/model/utils';
 import { memo } from 'react';
 
+/** iOS 롱프레스 콜아웃·회색 탭 플래시 제거 — 둘 다 드래그 도중 끼어들어 제스처를 끊는다 */
+const IOS_TOUCH_RESET = { WebkitTouchCallout: 'none', WebkitTapHighlightColor: 'transparent' } as const;
+
 interface StardokuCellProps {
   row: number;
   col: number;
@@ -29,8 +32,9 @@ export const StardokuCell = memo<StardokuCellProps>(
         // 포인터 탭은 보드 제스처가 처리 — 키보드(Enter/Space, detail 0)만 여기서
         if (event.detail === 0) onKeyboardTap(row, col, event.timeStamp);
       }}
+      style={IOS_TOUCH_RESET}
       className={cn(
-        'relative flex items-center justify-center overflow-hidden select-none',
+        'relative flex items-center justify-center overflow-hidden touch-none select-none',
         'border-r border-b border-black/10 dark:border-white/10',
         colorClass,
         hasRegionBorderTop && 'border-t-2 border-t-[rgb(var(--color-text-primary))]/85',
