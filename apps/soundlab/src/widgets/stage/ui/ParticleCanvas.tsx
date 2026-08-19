@@ -1,0 +1,117 @@
+'use client';
+
+import { TRACKS } from '@entities/track/model/constants/tracks';
+import { artworkUrl } from '@entities/track/model/services';
+import { currentIndexAtom, frameState } from '@entities/track/model/store';
+import { useFrame } from '@shared/lib/frame';
+import { useAtomValue } from 'jotai';
+import { useEffect, useRef, type RefObject } from 'react';
+import { createRenderer, type Renderer } from '../lib/renderer';
+
+/** 아트워크는 다른 오리진이므로 crossOrigin 없이는 텍스처 업로드가 보안 오류로 막힌다. */
+const images = new Map<number, HTMLImageElement>();
+
+function loadArtwork(index: number): Promise<HTMLImageElement> {
+  const cached = images.get(index);
+  if (cached) return Promise.resolve(cached);
+  const track = TRACKS[index];
+  if (!track) return Promise.reject(new Error('트랙이 없습니다'));
+
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = 'anonymous';
+    image.onload = () => {
+      images.set(index, image);
+      resolve(image);
+    };
+    image.onerror = () => reject(new Error('아트워크를 불러오지 못했습니다'));
+    image.src = artworkUrl(track, 't500x500');
+  });
+}
+
+type ParticleCanvasProps = {
+  slotRef: RefObject<HTMLDivElement | null>;
+  onReady: (ready: boolean) => void;
+};
+
+export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
+  const index = useAtomValue(currentIndexAtom);
+  const canvas = useRef<HTMLCanvasElement | null>(null);
+  const renderer = useRef<Renderer | null>(null);
+
+  // 전환 상태 기계. 완전히 흩어진 뒤 텍스처를 갈고 다시 모은다.
+  const morph = useRef(0.001);
+  const want = useRef(0);
+  const pending = useRef<number | null>(null);
+  const ready = useRef<HTMLImageElement | null>(null);
+  const prevMorph = useRef(0);
+  const trail = useRef(0);
+
+  useEffect(() => {
+    const node = canvas.current;
+    const slot = slotRef.current;
+    if (!node || !slot) return undefined;
+
+    const instance = createRenderer(node);
+    if (!instance) {
+      // WebGL2를 못 쓰면 Stage의 img 폴백이 그대로 남는다.
+      onReady(false);
+      return undefined;
+    }
+    renderer.current = instance;
+    instance.layout(slot.getBoundingClientRect());
+    onReady(true);
+
+    const relayout = () => {
+      const rect = slotRef.current?.getBoundingClientRect();
+      if (rect) instance.layout(rect);
+    };
+    const observer = new ResizeObserver(relayout);
+    observer.observe(slot);
+    window.addEventListener('resize', relayout);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', relayout);
+      renderer.current = null;
+      instance.dispose();
+    };
+  }, [onReady, slotRef]);
+
+  // 곡이 바뀌면 흩어짐부터 시작한다.
+  useEffect(() => {
+    pending.current = index;
+    want.current = 0;
+    ready.current = null;
+    loadArtwork(index)
+      .then((image) => {
+        if (pending.current === index) ready.current = image;
+      })
+      .catch(() => undefined);
+  }, [index]);
+
+  useFrame((delta) => {
+    const instance = renderer.current;
+    if (!instance) return;
+    const step = Math.min(3, delta / 16.7);
+
+    const target = want.current;
+    morph.current += (target - morph.current) * (target > morph.current ? 0.038 : 0.075) * step;
+
+    if (target === 0 && morph.current < 0.02 && pending.current !== null && ready.current) {
+      instance.setArtwork(ready.current);
+      pending.current = null;
+      ready.current = null;
+      want.current = 1;
+    }
+
+    // 트레일은 움직일 때만 남긴다. 집결이 끝나면 감쇠를 0으로 보내 선명해진다.
+    const speed = Math.abs(morph.current - prevMorph.current) / Math.max(0.2, step);
+    prevMorph.current = morph.current;
+    trail.current += (Math.min(1, speed * 140) - trail.current) * 0.14 * step;
+
+    instance.render({ morph: morph.current, level: frameState.level, decay: trail.current * 0.86 });
+  });
+
+  return <canvas ref={canvas} aria-hidden className="pointer-events-none fixed inset-0 -z-10 size-full" />;
+}
