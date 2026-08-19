@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+/* @tokens/css 가 생성한 디자인 토큰 */
+@import '@tokens/css/theme.css';
+
+@source '../../../../packages/ui/src/**/*.{ts,tsx}';
+
+/*
+ * soundlab은 의도적으로 단일 다크 테마다. 공유 semantic 토큰(primary/muted…)으로는
+ * 이 화면의 색을 표현할 수 없어 앱 전용 토큰을 여기서 정의한다.
+ * 공유 토큰 패키지는 건드리지 않는다 — brass는 semantic 역할이 아니라 이 앱의 액센트다.
+ */
+@theme {
+  --color-void: #050607;
+  --color-paper: #f2f3f5;
+  --color-dim: #f2f3f59e;
+  --color-mute: #f2f3f56b;
+  --color-hairline: #f2f3f521;
+  --color-hairline-soft: #f2f3f512;
+  --color-brass: #c8a97e;
+
+  --font-display: var(--font-gothic-a1), 'Apple SD Gothic Neo', system-ui, sans-serif;
+  --font-label: var(--font-plex-mono), ui-monospace, monospace;
+
+  --spacing-2xs: 2px;
+
+  --tracking-label: 0.18em;
+  --tracking-wide-label: 0.24em;
+  --tracking-mark: 0.42em;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-void);
+  color: var(--color-paper);
+  font-family: var(--font-display);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
