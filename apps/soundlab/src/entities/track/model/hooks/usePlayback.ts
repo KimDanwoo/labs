@@ -21,6 +21,9 @@ import type { Track } from '../types';
 const validDuration = (value: unknown, fallback: number) =>
   typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : fallback;
 
+/** 준비 전에 눌린 재생 요청. toggle은 의존성 없이 만들어져 인덱스를 모르므로 소진 시점에 해석한다. */
+const PLAY_CURRENT = -1;
+
 const EVENTS = {
   ready: 'ready',
   play: 'play',
@@ -57,6 +60,10 @@ export function usePlayback(tracks: readonly Track[]): Playback {
   // 세트에 실린 곡 순서(위치 → 트랙 id). 위젯은 프로필의 최신 20곡만 주고 순서 보장도 없어서
   // skip 대상과 현재 곡 하이라이트를 위치가 아니라 id로 맞춘다.
   const soundIds = useRef<number[]>([]);
+  // 위젯이 준비되기 전에 누른 곡. 버리면 제목·하이라이트만 바뀌고 소리는 영원히 안 나서
+  // "눌렀는데 재생이 안 된다"가 된다(엔진 로드가 늦을수록 잘 걸린다). ready에서 소진한다.
+  const queued = useRef<number | null>(null);
+  const flushQueued = useRef<() => void>(() => {});
 
   useEffect(() => {
     playing.current = isPlaying;
@@ -89,6 +96,8 @@ export function usePlayback(tracks: readonly Track[]): Playback {
               : [];
             holdsSet.current = soundIds.current.length > 1;
             setEngineMode(holdsSet.current ? 'set' : 'single');
+            // soundIds가 채워진 뒤에 소진해야 skip 경로가 올바른 위치를 찾는다.
+            flushQueued.current();
           });
           instance.getDuration((ms) => {
             frameState.durationMs = validDuration(ms, frameState.durationMs);
@@ -130,7 +139,10 @@ export function usePlayback(tracks: readonly Track[]): Playback {
 
   const goTo = useCallback((next: number, track: Track) => {
     const instance = widget.current;
-    if (!instance) return;
+    if (!instance) {
+      queued.current = next;
+      return;
+    }
     reported.current = { ms: 0, at: performance.now() };
     frameState.position = 0;
     frameState.durationMs = track.durationMs;
@@ -140,7 +152,12 @@ export function usePlayback(tracks: readonly Track[]): Playback {
 
     if (soundIndex >= 0 && holdsSet.current) {
       // 이미 재생 중인 플레이어 안에서 옮겨간다 — 새 재생을 시작하지 않는 게 핵심이다.
-      instance.skip(soundIndex);
+      // 단, 위젯이 이미 그 사운드를 들고 있으면 skip은 아무 일도 하지 않는다(멈춰 있으면 계속 멈춘 채다).
+      // 곡을 고른 건 듣겠다는 뜻이므로 그때는 play로 깨운다.
+      instance.getCurrentSoundIndex((current) => {
+        if (current === soundIndex) instance.play();
+        else instance.skip(soundIndex);
+      });
       return;
     }
 
@@ -183,8 +200,13 @@ export function usePlayback(tracks: readonly Track[]): Playback {
       if (!track) return;
       if (next === index) {
         // 같은 곡을 다시 누르면 재생/정지 토글
-        if (playing.current) widget.current?.pause();
-        else widget.current?.play();
+        const instance = widget.current;
+        if (!instance) {
+          queued.current = next;
+          return;
+        }
+        if (playing.current) instance.pause();
+        else instance.play();
         return;
       }
       setIndex(next);
@@ -194,8 +216,13 @@ export function usePlayback(tracks: readonly Track[]): Playback {
   );
 
   const toggle = useCallback(() => {
-    if (playing.current) widget.current?.pause();
-    else widget.current?.play();
+    const instance = widget.current;
+    if (!instance) {
+      queued.current = PLAY_CURRENT;
+      return;
+    }
+    if (playing.current) instance.pause();
+    else instance.play();
   }, []);
 
   const step = useCallback(
@@ -212,6 +239,18 @@ export function usePlayback(tracks: readonly Track[]): Playback {
     },
     [index, select, shuffle, tracks.length],
   );
+
+  // 준비 전에 눌린 요청을 ready 직후 실행한다. index를 봐야 하므로 ref로 갱신한다.
+  useEffect(() => {
+    flushQueued.current = () => {
+      const target = queued.current;
+      queued.current = null;
+      if (target === null) return;
+      const resolved = target === PLAY_CURRENT ? index : target;
+      const track = tracks[resolved];
+      if (track) goTo(resolved, track);
+    };
+  }, [goTo, index, tracks]);
 
   // 곡이 끝났을 때의 행동은 최신 shuffle/repeat 값을 봐야 하므로 ref로 갱신한다.
   useEffect(() => {
