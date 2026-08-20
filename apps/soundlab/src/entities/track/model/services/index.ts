@@ -109,3 +109,8 @@ export async function fetchWaveform(url: string): Promise<Float32Array> {
   for (let i = 0; i < samples.length; i++) normalized[i] = Math.min(1, (samples[i] ?? 0) / peak);
   return normalized;
 }
+
+/** 공유 링크는 곡 id로 만든다. 제목을 고쳐도, 목록 순서가 바뀌어도 살아있다. */
+export function trackPath(track: Track): string {
+  return `/t/${track.id}`;
+}

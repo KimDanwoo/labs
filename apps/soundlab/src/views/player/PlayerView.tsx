@@ -4,6 +4,7 @@ import { TRACKS } from '@entities/track/model/constants/tracks';
 import { useKeyboard } from '@entities/track/model/hooks/useKeyboard';
 import { usePlayback } from '@entities/track/model/hooks/usePlayback';
 import { PlaybackProvider } from '@entities/track/model/hooks/usePlaybackControls';
+import { useTrackUrl } from '@entities/track/model/hooks/useTrackUrl';
 import { useWaveform } from '@entities/track/model/hooks/useWaveform';
 import { currentIndexAtom, engineModeAtom, isPlayingAtom } from '@entities/track/model/store';
 import { isPlaylistCollapsedAtom } from '@widgets/playlist/model/store';
@@ -12,7 +13,14 @@ import { Stage } from '@widgets/stage/ui';
 import { Transport } from '@widgets/transport/ui';
 import { useAtomValue } from 'jotai';
 
-export function PlayerView() {
+type PlayerViewProps = {
+  /** 공유 링크(/t/[id])로 들어왔을 때 시작할 곡. 없으면 첫 곡. */
+  initialTrackId?: number;
+};
+
+export function PlayerView({ initialTrackId }: PlayerViewProps) {
+  useTrackUrl(TRACKS, initialTrackId);
+
   const index = useAtomValue(currentIndexAtom);
   const isPlaying = useAtomValue(isPlayingAtom);
   const engineMode = useAtomValue(engineModeAtom);

@@ -24,14 +24,17 @@ const OUT = join(
   'tracks.ts',
 );
 
+// ImageResponse가 process.cwd() 기준으로 읽는다. 앱 루트의 assets/ 에 둔다.
+const FONT_OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'og-title.ttf');
+
 const warn = (message) => console.warn(`[sync-tracks] ${message}`);
 
 // 생성물이 Prettier(singleQuote)와 어긋나면 커밋마다 포맷 diff가 난다
 const q = (value) =>
   `'${String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n')}'`;
 
-async function get(url) {
-  const res = await fetch(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(TIMEOUT_MS) });
+async function get(url, userAgent = UA) {
+  const res = await fetch(url, { headers: { 'user-agent': userAgent }, signal: AbortSignal.timeout(TIMEOUT_MS) });
   if (!res.ok) throw new Error(`${res.status} ${url}`);
   return res;
 }
@@ -98,6 +101,28 @@ ${body}
 `;
 }
 
+/**
+ * OG 카드에 곡 제목을 그리려면 폰트를 바이너리로 넣어야 한다(Satori는 시스템 폰트를 안 쓴다).
+ * 한글 폰트 원본은 수 MB라 ImageResponse의 500KB 한도를 넘는다. Google Fonts는 `text=`로
+ * 요청한 글자만 담은 서브셋을 주고, 25곡 제목에 쓰인 글자 전체가 20KB대로 떨어진다.
+ * 제목이 바뀌면 필요한 글자도 바뀌므로 곡 목록과 같은 시점에 다시 만든다.
+ */
+async function writeOgFont(tracks) {
+  // 카드에 실제로 그리는 문자만 모은다 — 제목·장르 + 고정 문구·숫자.
+  const used = tracks.map((t) => `${t.title}${t.genre}`).join('');
+  const chars = [...new Set(`${used}SOUNDLABDANWOO 0123456789:·`.split(''))].sort().join('');
+  const api = `https://fonts.googleapis.com/css2?family=Gothic+A1:wght@700&text=${encodeURIComponent(chars)}`;
+  // 구형 UA로 요청해야 woff2 대신 ttf를 준다. ImageResponse는 woff2를 못 읽는다.
+  const css = await (await get(api, 'Mozilla/4.0')).text();
+  const found = css.match(/src:\s*url\(([^)]+)\)\s*format\('truetype'\)/);
+  if (!found) throw new Error('구글 폰트 응답에서 ttf URL을 찾지 못했습니다');
+
+  const font = Buffer.from(await (await get(found[1])).arrayBuffer());
+  mkdirSync(dirname(FONT_OUT), { recursive: true });
+  writeFileSync(FONT_OUT, font);
+  console.log(`[sync-tracks] OG 폰트 서브셋 ${(font.length / 1024).toFixed(1)}KB (${chars.length}자) → ${FONT_OUT.replace(process.cwd(), '.')}`);
+}
+
 try {
   const clientId = await findClientId();
   const url = `https://api-v2.soundcloud.com/users/${USER_ID}/tracks?client_id=${clientId}&limit=50`;
@@ -110,6 +135,13 @@ try {
   const tracks = collection.map(toTrack);
   writeFileSync(OUT, render(tracks), 'utf8');
   console.log(`[sync-tracks] ${tracks.length}곡 생성 → ${OUT.replace(process.cwd(), '.')}`);
+
+  // 폰트만 실패해도 곡 목록 갱신은 살린다. 커밋된 서브셋에 없는 글자만 두부로 나온다.
+  try {
+    await writeOgFont(tracks);
+  } catch (fontError) {
+    warn(`OG 폰트 갱신 실패: ${fontError.message}. 기존 서브셋을 그대로 사용합니다.`);
+  }
 } catch (error) {
   warn(`갱신 실패: ${error.message}`);
   try {

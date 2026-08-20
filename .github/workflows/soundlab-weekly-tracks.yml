@@ -44,7 +44,8 @@ jobs:
         run: |
           BRANCH="feature/${{ steps.date.outputs.date }}-soundlab-tracks"
           TITLE='chore(soundlab): 곡 목록 동기화 (${{ steps.date.outputs.date }})'
-          git add apps/soundlab/src/entities/track/model/constants/tracks.ts
+          # OG 카드용 폰트 서브셋은 제목에 쓰인 글자만 담으므로 곡 목록과 함께 바뀐다.
+          git add apps/soundlab/src/entities/track/model/constants/tracks.ts apps/soundlab/assets/og-title.ttf
           if git diff --cached --quiet; then
             echo "곡 목록에 변경이 없어 종료합니다."
             exit 0

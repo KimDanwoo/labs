@@ -9,6 +9,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import { useRef } from 'react';
 import { NextIcon, PauseIcon, PlayIcon, PrevIcon, RepeatIcon, RepeatOneIcon, ShuffleIcon } from './icons';
 import { Scrubber } from './Scrubber';
+import { ShareButton } from './ShareButton';
 
 // 켜짐 표시를 hover/focus가 덮지 않게 변형을 겹쳐 특정도를 올린다.
 // (hover:text-paper 와 aria-[pressed=true]:text-brass 는 특정도가 같아 순서에 좌우된다 —
@@ -106,7 +107,8 @@ export function Transport() {
             {repeatMode === REPEAT_MODE.one ? <RepeatOneIcon /> : <RepeatIcon />}
           </button>
         </div>
-        <span className="text-right">
+        <span className="flex items-center justify-end gap-xs text-right">
+          <ShareButton className={ICON_BUTTON} />
           {track ? clock(track.durationMs / 1000) : '0:00'}{' '}
           {track ? (
             <a
