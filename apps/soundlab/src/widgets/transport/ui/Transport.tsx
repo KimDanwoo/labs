@@ -9,7 +9,6 @@ import { useAtom, useAtomValue } from 'jotai';
 import { useRef } from 'react';
 import { NextIcon, PauseIcon, PlayIcon, PrevIcon, RepeatIcon, RepeatOneIcon, ShuffleIcon } from './icons';
 import { Scrubber } from './Scrubber';
-import { ShareButton } from './ShareButton';
 
 // 켜짐 표시를 hover/focus가 덮지 않게 변형을 겹쳐 특정도를 올린다.
 // (hover:text-paper 와 aria-[pressed=true]:text-brass 는 특정도가 같아 순서에 좌우된다 —
@@ -52,13 +51,15 @@ export function Transport() {
   return (
     <div className="border-t-hairline-soft order-3 col-span-full flex flex-col gap-sm border-t bg-void/95 px-md pt-md pb-md backdrop-blur-md">
       <Scrubber />
-      <div className="font-label text-mute grid grid-cols-[1fr_auto_1fr] items-center gap-sm text-[10px] tracking-label tabular-nums uppercase">
-        <span>
+      {/* 좁은 화면에선 시간 / 컨트롤 / 링크를 3행으로 접는다 — 한 줄에 넣으면 44px 터치 타깃
+          5개를 min-content로도 못 담아 그리드가 넘치고 오른쪽이 잘린다. */}
+      <div className="font-label text-mute grid grid-cols-[1fr_auto] items-center gap-sm text-[10px] tracking-label tabular-nums uppercase min-[820px]:grid-cols-[1fr_auto_1fr]">
+        <span className="col-start-1 row-start-1">
           <b ref={elapsed} className="text-paper font-normal">
             0:00
           </b>
         </span>
-        <div className="flex items-center justify-center gap-xs">
+        <div className="col-start-1 col-end-3 row-start-2 flex items-center justify-center gap-xs min-[820px]:col-start-2 min-[820px]:row-start-1">
           <button
             type="button"
             aria-pressed={shuffle}
@@ -107,19 +108,25 @@ export function Transport() {
             {repeatMode === REPEAT_MODE.one ? <RepeatOneIcon /> : <RepeatIcon />}
           </button>
         </div>
-        <span className="flex items-center justify-end gap-xs text-right">
-          <ShareButton className={ICON_BUTTON} />
-          {track ? clock(track.durationMs / 1000) : '0:00'}{' '}
-          {track ? (
-            <a
-              href={track.permalinkUrl}
-              target="_blank"
-              rel="noopener"
-              className="decoration-hairline hover:text-paper focus-visible:text-paper underline underline-offset-[3px]"
-            >
-              SoundCloud
-            </a>
-          ) : null}
+        {/* 모바일에선 길이는 시간 행 오른쪽, 사운드클라우드 링크는 맨 아래 행으로 흩어져야 한다.
+            래퍼를 contents로 지워 자식이 직접 그리드 아이템이 되게 하고, 820px부터 래퍼를 되살려 한 줄로 묶는다. */}
+        <span className="contents min-[820px]:col-start-3 min-[820px]:row-start-1 min-[820px]:flex min-[820px]:items-center min-[820px]:justify-end min-[820px]:gap-xs min-[820px]:text-right">
+          <span className="col-start-2 row-start-1 justify-self-end">
+            {track ? clock(track.durationMs / 1000) : '0:00'}
+          </span>
+          <span className="col-start-1 col-end-3 row-start-3 flex items-center justify-center">
+            {track ? (
+              <a
+                href={track.permalinkUrl}
+                target="_blank"
+                rel="noopener"
+                // py-sm: 링크 하나만 남은 행이라 최소 터치 타깃(24px)을 패딩으로 확보한다.
+                className="decoration-hairline hover:text-paper focus-visible:text-paper py-sm underline underline-offset-[3px] min-[820px]:py-0"
+              >
+                SoundCloud
+              </a>
+            ) : null}
+          </span>
         </span>
       </div>
     </div>
