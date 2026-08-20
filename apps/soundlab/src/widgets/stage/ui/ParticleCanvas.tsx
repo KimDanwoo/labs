@@ -6,7 +6,7 @@ import { currentIndexAtom, frameState } from '@entities/track/model/store';
 import { useFrame } from '@shared/lib/frame';
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, type RefObject } from 'react';
-import { createRenderer, type Renderer } from '../lib/renderer';
+import { createRenderer, RIPPLE_SLOTS, type Renderer } from '../lib/renderer';
 
 /** 아트워크는 다른 오리진이므로 crossOrigin 없이는 텍스처 업로드가 보안 오류로 막힌다. */
 const images = new Map<number, HTMLImageElement>();
@@ -28,6 +28,18 @@ function loadArtwork(index: number): Promise<HTMLImageElement> {
     image.src = artworkUrl(track, 't500x500');
   });
 }
+
+/** 파동 수명. 짧으면 튕기고, 길면 그림이 계속 일렁여 아트워크가 안 읽힌다. */
+const RIPPLE_MS = 900;
+
+/**
+ * 파동 풀. store의 frameState와 같은 이유로 React 밖에 둔다 — 매 프레임 변하는 값이라
+ * ref에 담으면 60fps 리렌더가 나고, effect가 참조하는 ref의 중첩 객체 변형은 컴파일러가 막는다.
+ * 무대 캔버스는 앱에 하나뿐이라(위 images 맵과 같은 전제) 모듈 스코프로 충분하다.
+ * age >= 1 이 꺼진 슬롯이다.
+ */
+const ripples = Array.from({ length: RIPPLE_SLOTS }, () => ({ x: 0, y: 0, age: 1 }));
+const rippleBuffer = new Float32Array(RIPPLE_SLOTS * 3);
 
 type ParticleCanvasProps = {
   slotRef: RefObject<HTMLDivElement | null>;
@@ -73,8 +85,21 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
     if (slot.parentElement) observer.observe(slot.parentElement);
     window.addEventListener('resize', relayout);
 
+    // 캔버스는 pointer-events-none이라 클릭은 슬롯(아트워크 영역)이 받는다.
+    // 셰이더 좌표계는 캔버스 중심 기준·y 위쪽이므로 그에 맞춰 변환한다.
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handlePointerDown = (event: PointerEvent) => {
+      if (calm.matches) return;
+      const oldest = ripples.reduce((a, b) => (b.age > a.age ? b : a));
+      oldest.x = event.clientX - node.clientWidth / 2;
+      oldest.y = node.clientHeight / 2 - event.clientY;
+      oldest.age = 0;
+    };
+    slot.addEventListener('pointerdown', handlePointerDown);
+
     return () => {
       observer.disconnect();
+      slot.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('resize', relayout);
       renderer.current = null;
       instance.dispose();
@@ -113,7 +138,24 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
     prevMorph.current = morph.current;
     trail.current += (Math.min(1, speed * 140) - trail.current) * 0.14 * step;
 
-    instance.render({ morph: morph.current, level: frameState.level, decay: trail.current * 0.86 });
+    let energy = 0;
+    let slot = 0;
+    for (const ripple of ripples) {
+      if (ripple.age < 1) {
+        ripple.age = Math.min(1, ripple.age + delta / RIPPLE_MS);
+        energy += 1 - ripple.age;
+      }
+      rippleBuffer.set([ripple.x, ripple.y, ripple.age], slot);
+      slot += 3;
+    }
+
+    instance.render({
+      morph: morph.current,
+      level: frameState.level,
+      // 파동이 살아 있는 동안만 트레일을 얹어 물결이 빛 자국을 남기게 한다. 상한은 무한 번짐 방지.
+      decay: Math.min(0.88, trail.current * 0.86 + energy * 0.24),
+      ripples: rippleBuffer,
+    });
   });
 
   return <canvas ref={canvas} aria-hidden className="pointer-events-none fixed inset-0 -z-10 size-full" />;
