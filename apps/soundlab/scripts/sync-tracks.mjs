@@ -54,17 +54,21 @@ function splitArtwork(url) {
   return { base: parts[1], ext: parts[2] };
 }
 
+// SoundCloud가 주는 한글 제목은 상당수가 NFD(자모 분해형)다. 브라우저는 알아서 합쳐 그리지만
+// Satori(OG 카드)는 합치지 않아 '바다'가 'ㅂㅏㄷㅏ'로 나온다. 들어올 때 한 번 NFC로 고정한다.
+const nfc = (value) => String(value).normalize('NFC');
+
 function toTrack(raw) {
   const { base, ext } = splitArtwork(raw.artwork_url);
   return {
     id: raw.id,
-    title: raw.title,
+    title: nfc(raw.title),
     permalinkUrl: raw.permalink_url,
     artworkBase: base,
     artworkExt: ext,
     waveformUrl: raw.waveform_url,
     durationMs: raw.duration,
-    genre: raw.genre || 'Unclassified',
+    genre: nfc(raw.genre || 'Unclassified'),
   };
 }
 
