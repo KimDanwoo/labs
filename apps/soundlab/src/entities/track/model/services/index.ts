@@ -1,3 +1,4 @@
+import { PLAYER_SCREEN, type PlayerScreen } from '../constants/playerScreen';
 import type { ArtworkSize, Track } from '../types';
 
 const WIDGET_API_SRC = 'https://w.soundcloud.com/player/api.js';
@@ -113,4 +114,15 @@ export async function fetchWaveform(url: string): Promise<Float32Array> {
 /** 공유 링크는 곡 id로 만든다. 제목을 고쳐도, 목록 순서가 바뀌어도 살아있다. */
 export function trackPath(track: Track): string {
   return `/t/${track.id}`;
+}
+
+export const QUEUE_SEGMENT = '/queue';
+
+/** 주소는 "무슨 곡 + 어떤 화면"을 담는다. 새로고침·공유로 그 화면에 그대로 들어올 수 있다. */
+export function playerPath(track: Track, screen: PlayerScreen): string {
+  return screen === PLAYER_SCREEN.queue ? `${trackPath(track)}${QUEUE_SEGMENT}` : trackPath(track);
+}
+
+export function screenFromPath(pathname: string): PlayerScreen {
+  return pathname.endsWith(QUEUE_SEGMENT) ? PLAYER_SCREEN.queue : PLAYER_SCREEN.nowPlaying;
 }

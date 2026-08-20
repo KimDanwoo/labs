@@ -39,9 +39,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   // 단일 다크 테마라 테마 토글 스크립트를 두지 않는다.
+  // 높이는 dvh — 100%/100vh는 모바일에서 주소창까지 포함해 하단 재생바가 브라우저 UI 뒤로 잘린다.
   return (
-    <html lang="ko" className={`${display.variable} ${label.variable} h-full`}>
-      <body className="h-full">
+    <html lang="ko" className={`${display.variable} ${label.variable} h-dvh`}>
+      <body className="h-dvh">
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

@@ -72,22 +72,18 @@ void main() {
     for (int i = 0; i < ${RIPPLE_SLOTS}; i++) {
       float age = uRipples[i].z;
       if (age >= 1.0) continue;
-      vec2 delta = world - uRipples[i].xy;
-      float dist = length(delta);
+      float dist = length(world - uRipples[i].xy);
       // 파면은 수명 동안 액자 반대편까지 간다(반대각선 0.707 < 0.8).
       float x = (dist - age * uSide * 0.8) / (uSide * 0.1);
       // 가우시안 미분 — 파면 앞뒤로 부호가 뒤집혀 마루와 골이 생긴다.
       float swing = -2.0 * x * exp(-x * x);
-      float envelope = (1.0 - age) * (1.0 - age) * inside;
-      // 물결은 수면이 오르내리는 횡파다. 옆으로 밀어내는 양이 크면 파면 안쪽이 비어
-      // 검은 구멍이 뚫린다 — 가로는 살짝만 주고 높이로 출렁이게 한다.
-      rp += (dist > 0.001 ? delta / dist : vec2(0.0)) * swing * envelope * uSide * 0.035;
-      lift += swing * envelope;
+      // 순수 횡파 — 높이만 출렁인다. xy를 옆으로 밀면 파면 안쪽 밀도가 빠져 구멍이 뚫린다.
+      lift += swing * (1.0 - age) * (1.0 - age) * inside;
     }
   }
 
-  // 밀림과 함께 앞으로 솟아야 수면처럼 읽힌다. 밀림만 주면 그냥 벌어졌다 닫힌다.
-  float z = (lum - 0.45) * uDepth * m + clamp(lift, -1.5, 1.5) * uDepth * 5.0;
+  // 마루는 앞으로 솟고 골은 뒤로 꺼진다 — 원근 배율이 그걸 렌즈처럼 부풀려 수면으로 읽힌다.
+  float z = (lum - 0.45) * uDepth * m + clamp(lift, -1.5, 1.5) * uDepth * 7.0;
   float persp = uFocal / max(1.0, uFocal - z);
 
   gl_Position = vec4((origin + rp * persp) / (uRes * 0.5), 0.0, 1.0);

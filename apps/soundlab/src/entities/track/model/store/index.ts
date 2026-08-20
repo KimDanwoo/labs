@@ -1,4 +1,5 @@
 import { atom } from 'jotai';
+import { PLAYER_SCREEN, type PlayerScreen } from '../constants/playerScreen';
 import { REPEAT_MODE, type RepeatMode } from '../constants/repeatMode';
 
 export const currentIndexAtom = atom(0);
@@ -9,6 +10,12 @@ export const repeatModeAtom = atom<RepeatMode>(REPEAT_MODE.off);
 
 /** 재생 엔진 로드 실패는 콘솔이 아니라 화면에 드러낸다. */
 export const engineErrorAtom = atom<string | null>(null);
+
+/**
+ * 어떤 화면인가 — 진실은 주소창이고 이 원자는 그걸 읽는 창구다(useTrackUrl이 양방향으로 맞춘다).
+ * 전환은 pushState로 한다. Next 라우터를 타면 트리가 리마운트되고, 그러면 재생 엔진 iframe이 사라진다.
+ */
+export const playerScreenAtom = atom<PlayerScreen>(PLAYER_SCREEN.nowPlaying);
 
 /** 'set' = 24곡을 한 번에 올려 skip으로 전환(빠름), 'single' = 곡별 load 폴백(느림). */
 export const engineModeAtom = atom<'set' | 'single' | 'unknown'>('unknown');

@@ -9,10 +9,10 @@ export const PROJECTS: Project[] = [
     image: '/projects/cheongyeon-saju.webp',
   },
   {
-    title: '초원을 달리는 말',
-    description: 'three.js로 만든 인터랙티브 3D 씬',
-    href: 'https://d-prairie.vercel.app/',
-    image: '/projects/prairie.webp',
+    title: 'soundlab',
+    description: '내가 만든 노래를 듣는 플레이어 — WebGL 픽셀 파티클 비주얼라이저',
+    href: 'https://labs-sound.vercel.app/',
+    image: '/projects/soundlab.webp',
     imagePosition: 'center',
   },
   {
@@ -26,6 +26,13 @@ export const PROJECTS: Project[] = [
     description: '아이돌 컨셉 다마고치 게임',
     href: 'https://plco-tamagochi.vercel.app/',
     image: '/projects/plco.webp',
+    imagePosition: 'center',
+  },
+  {
+    title: '초원을 달리는 말',
+    description: 'three.js로 만든 인터랙티브 3D 씬',
+    href: 'https://d-prairie.vercel.app/',
+    image: '/projects/prairie.webp',
     imagePosition: 'center',
   },
   {
@@ -47,12 +54,5 @@ export const PROJECTS: Project[] = [
     description: '루틴 따라 기록하는 운동 PWA',
     href: 'https://d-gymlog.vercel.app/',
     image: '/projects/gymlog.webp',
-  },
-  {
-    title: 'soundlab',
-    description: 'WebGL 픽셀 파티클로 듣는 자작곡 플레이어',
-    href: 'https://labs-sound.vercel.app/',
-    image: '/projects/soundlab.webp',
-    imagePosition: 'center',
   },
 ];
