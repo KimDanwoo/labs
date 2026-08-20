@@ -1,10 +1,11 @@
 import { atom } from 'jotai';
+import { REPEAT_MODE, type RepeatMode } from '../constants/repeatMode';
 
 export const currentIndexAtom = atom(0);
 export const isPlayingAtom = atom(false);
 export const isReadyAtom = atom(false);
 export const shuffleAtom = atom(false);
-export const repeatOneAtom = atom(false);
+export const repeatModeAtom = atom<RepeatMode>(REPEAT_MODE.off);
 
 /** 재생 엔진 로드 실패는 콘솔이 아니라 화면에 드러낸다. */
 export const engineErrorAtom = atom<string | null>(null);

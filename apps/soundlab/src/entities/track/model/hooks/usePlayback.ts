@@ -3,6 +3,7 @@
 import { useFrame } from '@shared/lib/frame';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useRef } from 'react';
+import { REPEAT_MODE } from '../constants/repeatMode';
 import { loadWidgetApi, setUrl, soundId, trackUrl, widgetSrc, type ScWidget } from '../services';
 import {
   currentIndexAtom,
@@ -11,7 +12,7 @@ import {
   frameState,
   isPlayingAtom,
   isReadyAtom,
-  repeatOneAtom,
+  repeatModeAtom,
   shuffleAtom,
 } from '../store';
 import type { Track } from '../types';
@@ -43,7 +44,7 @@ export function usePlayback(tracks: readonly Track[]): Playback {
   const setEngineError = useSetAtom(engineErrorAtom);
   const setEngineMode = useSetAtom(engineModeAtom);
   const shuffle = useAtomValue(shuffleAtom);
-  const repeatOne = useAtomValue(repeatOneAtom);
+  const repeatMode = useAtomValue(repeatModeAtom);
 
   const widget = useRef<ScWidget | null>(null);
   // PLAY_PROGRESS는 수백 ms 간격이라 60fps에 부족하다. 마지막 보고값과 시각을 남겨 rAF에서 보간한다.
@@ -215,7 +216,7 @@ export function usePlayback(tracks: readonly Track[]): Playback {
   // 곡이 끝났을 때의 행동은 최신 shuffle/repeat 값을 봐야 하므로 ref로 갱신한다.
   useEffect(() => {
     advance.current = () => {
-      if (repeatOne) {
+      if (repeatMode === REPEAT_MODE.one) {
         widget.current?.seekTo(0);
         widget.current?.play();
         return;
@@ -229,9 +230,12 @@ export function usePlayback(tracks: readonly Track[]): Playback {
         holdsSet.current && !shuffle && soundIndex >= 0 && soundIndex < soundIds.current.length - 1;
       if (widgetAdvances) return;
 
+      // step(1)은 목록 끝에서 첫 곡으로 되돌아간다. 반복이 꺼져 있으면 거기서 멈춰야 한다.
+      const isLastTrack = index === tracks.length - 1;
+      if (isLastTrack && repeatMode === REPEAT_MODE.off) return;
       step(1);
     };
-  }, [index, repeatOne, shuffle, step, tracks]);
+  }, [index, repeatMode, shuffle, step, tracks]);
 
   const seek = useCallback((ratio: number) => {
     const clamped = Math.min(1, Math.max(0, ratio));
