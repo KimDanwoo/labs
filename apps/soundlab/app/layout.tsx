@@ -15,9 +15,26 @@ const label = IBM_Plex_Mono({
   weight: ['400', '500'],
 });
 
+const SITE_URL = 'https://labs-sound.vercel.app';
+const SITE_NAME = 'soundlab';
+const SITE_DESCRIPTION = 'DANWOO의 곡을 픽셀 파티클로 듣는 플레이어';
+
 export const metadata: Metadata = {
-  title: 'soundlab',
-  description: 'DANWOO의 곡을 픽셀 파티클로 듣는 플레이어',
+  // 없으면 og:image가 상대경로로 나가 크롤러가 이미지를 못 읽는다.
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  // images는 두지 않는다 — app/opengraph-image.png 파일 컨벤션이 채운다.
+  openGraph: {
+    type: 'website',
+    locale: 'ko_KR',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
+  // twitter-image 파일은 두지 않는다. 트위터는 twitter:image가 없으면 og:image로 폴백한다.
+  twitter: { card: 'summary_large_image', title: SITE_NAME, description: SITE_DESCRIPTION },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

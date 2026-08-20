@@ -11,6 +11,11 @@
 const LUM = 'vec3(0.2126, 0.7152, 0.0722)';
 const BACKGROUND: readonly [number, number, number] = [5 / 255, 6 / 255, 7 / 255];
 
+/** 동시에 살아 있는 클릭 파동 수. 1개면 연타할 때 앞 파동이 잘려 튄다. */
+export const RIPPLE_SLOTS = 3;
+/** 꺼진 슬롯(z >= 1)로 채운 기본값. ripples를 안 넘기는 호출자를 위해 쓴다. */
+const IDLE_RIPPLES = new Float32Array(Array.from({ length: RIPPLE_SLOTS }, () => [0, 0, 1]).flat());
+
 const GRID_MIN = 120;
 const GRID_MAX = 288;
 const BLOOM_THRESHOLD = 0.7;
@@ -22,6 +27,8 @@ in vec2 a_uv;
 uniform sampler2D uTex;
 uniform vec2 uRes, uCenter;
 uniform float uMorph, uLevel, uSize, uSide, uDepth, uFocal;
+/** 파동 슬롯: xy = 원점(캔버스 중심 기준 CSS px), z = 진행도 0~1. z >= 1 이면 꺼진 슬롯. */
+uniform vec3 uRipples[${RIPPLE_SLOTS}];
 out vec3 v_color;
 out float v_alpha;
 
@@ -55,7 +62,32 @@ void main() {
   vec2 rp = mix(away, rel, m) * (1.0 + uLevel * 0.009 * m);
   vec2 origin = mix(vec2(0.0), uCenter, m);
 
-  float z = (lum - 0.45) * uDepth * m;
+  // 클릭 파동. 액자 가장자리로 갈수록 변위를 0으로 죽인다 — 안 그러면 밀려난 픽셀이
+  // 정사각 실루엣 밖으로 새어 테두리가 터진다. m을 곱해 흩어진 동안은 반응하지 않는다.
+  vec2 fromEdge = min(a_uv, 1.0 - a_uv);
+  float inside = smoothstep(0.0, 0.12, min(fromEdge.x, fromEdge.y)) * m;
+  float lift = 0.0;
+  if (inside > 0.001) {
+    vec2 world = origin + rp;
+    for (int i = 0; i < ${RIPPLE_SLOTS}; i++) {
+      float age = uRipples[i].z;
+      if (age >= 1.0) continue;
+      vec2 delta = world - uRipples[i].xy;
+      float dist = length(delta);
+      // 파면은 수명 동안 액자 반대편까지 간다(반대각선 0.707 < 0.8).
+      float x = (dist - age * uSide * 0.8) / (uSide * 0.1);
+      // 가우시안 미분 — 파면 앞뒤로 부호가 뒤집혀 마루와 골이 생긴다.
+      float swing = -2.0 * x * exp(-x * x);
+      float envelope = (1.0 - age) * (1.0 - age) * inside;
+      // 물결은 수면이 오르내리는 횡파다. 옆으로 밀어내는 양이 크면 파면 안쪽이 비어
+      // 검은 구멍이 뚫린다 — 가로는 살짝만 주고 높이로 출렁이게 한다.
+      rp += (dist > 0.001 ? delta / dist : vec2(0.0)) * swing * envelope * uSide * 0.035;
+      lift += swing * envelope;
+    }
+  }
+
+  // 밀림과 함께 앞으로 솟아야 수면처럼 읽힌다. 밀림만 주면 그냥 벌어졌다 닫힌다.
+  float z = (lum - 0.45) * uDepth * m + clamp(lift, -1.5, 1.5) * uDepth * 5.0;
   float persp = uFocal / max(1.0, uFocal - z);
 
   gl_Position = vec4((origin + rp * persp) / (uRes * 0.5), 0.0, 1.0);
@@ -135,7 +167,13 @@ void main() {
 type Program = { program: WebGLProgram; uniforms: Record<string, WebGLUniformLocation | null> };
 type Target = { texture: WebGLTexture; framebuffer: WebGLFramebuffer; width: number; height: number };
 
-export type RenderInput = { morph: number; level: number; decay: number };
+export type RenderInput = {
+  morph: number;
+  level: number;
+  decay: number;
+  /** RIPPLE_SLOTS × (x, y, 진행도). 생략하면 파동 없음. */
+  ripples?: Float32Array;
+};
 
 export type Renderer = {
   /** 캔버스 크기와 .slot 위치를 다시 읽는다. */
@@ -202,6 +240,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     'uSide',
     'uDepth',
     'uFocal',
+    'uRipples[0]',
   ]);
   const fade = link(VERT_QUAD, FRAG_FADE, ['uSrc', 'uDecay']);
   const bright = link(VERT_QUAD, FRAG_BRIGHT, ['uSrc', 'uThreshold']);
@@ -313,7 +352,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
-  function render({ morph, level, decay }: RenderInput) {
+  function render({ morph, level, decay, ripples }: RenderInput) {
     if (!accum || !bloom || count === 0) return;
     const source = accum[accumIndex];
     const destination = accum[accumIndex ^ 1];
@@ -347,6 +386,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     gl.uniform1f(points.uniforms.uSize ?? null, Math.max(1.5, (side / grid) * dpr * 1.72));
     gl.uniform1f(points.uniforms.uDepth ?? null, side * 0.12);
     gl.uniform1f(points.uniforms.uFocal ?? null, 1600);
+    gl.uniform3fv(points.uniforms['uRipples[0]'] ?? null, ripples ?? IDLE_RIPPLES);
     gl.bindVertexArray(pointsVao);
     gl.drawArrays(gl.POINTS, 0, count);
     gl.disable(gl.BLEND);

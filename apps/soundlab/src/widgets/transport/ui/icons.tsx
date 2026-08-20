@@ -50,11 +50,39 @@ export function PauseIcon() {
   );
 }
 
+const REPEAT_LOOP =
+  'M17 3.5l2.8 2.8L17 9.1M19.8 6.3H7.6a4 4 0 00-4 4v1.2M7 20.5l-2.8-2.8L7 14.9M4.2 17.7h12.2a4 4 0 004-4v-1.2';
+
+export function RepeatIcon() {
+  return (
+    <svg {...OUTLINE} className="size-[19px]">
+      <path d={REPEAT_LOOP} />
+    </svg>
+  );
+}
+
 export function RepeatOneIcon() {
   return (
     <svg {...OUTLINE} className="size-[19px]">
-      <path d="M17 3.5l2.8 2.8L17 9.1M19.8 6.3H7.6a4 4 0 00-4 4v1.2M7 20.5l-2.8-2.8L7 14.9M4.2 17.7h12.2a4 4 0 004-4v-1.2" />
+      <path d={REPEAT_LOOP} />
       <path d="M11.1 10.9l1.3-.7v3.6" />
+    </svg>
+  );
+}
+
+export function LinkIcon() {
+  return (
+    <svg {...OUTLINE} className="size-[18px]">
+      <path d="M10 13.5a3.5 3.5 0 005 0l3.5-3.5a3.5 3.5 0 00-5-5L11.8 6.7" />
+      <path d="M14 10.5a3.5 3.5 0 00-5 0L5.5 14a3.5 3.5 0 005 5l1.7-1.7" />
+    </svg>
+  );
+}
+
+export function CheckIcon() {
+  return (
+    <svg {...OUTLINE} className="size-[18px]">
+      <path d="M5 12.5l4.5 4.5L19 7" />
     </svg>
   );
 }

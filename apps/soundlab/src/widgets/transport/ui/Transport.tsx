@@ -1,16 +1,33 @@
 'use client';
 
+import { REPEAT_LABEL, REPEAT_MODE, nextRepeatMode } from '@entities/track/model/constants/repeatMode';
 import { TRACKS } from '@entities/track/model/constants/tracks';
 import { usePlaybackControls } from '@entities/track/model/hooks/usePlaybackControls';
-import { currentIndexAtom, frameState, isPlayingAtom, repeatOneAtom, shuffleAtom } from '@entities/track/model/store';
+import { currentIndexAtom, frameState, isPlayingAtom, repeatModeAtom, shuffleAtom } from '@entities/track/model/store';
 import { useFrame } from '@shared/lib/frame';
 import { useAtom, useAtomValue } from 'jotai';
 import { useRef } from 'react';
-import { NextIcon, PauseIcon, PlayIcon, PrevIcon, RepeatOneIcon, ShuffleIcon } from './icons';
+import { NextIcon, PauseIcon, PlayIcon, PrevIcon, RepeatIcon, RepeatOneIcon, ShuffleIcon } from './icons';
 import { Scrubber } from './Scrubber';
+import { ShareButton } from './ShareButton';
 
-const ICON_BUTTON =
-  'text-dim hover:text-paper hover:bg-hairline-soft focus-visible:text-paper focus-visible:bg-hairline-soft aria-[pressed=true]:text-brass grid size-[38px] place-items-center rounded-full transition-colors duration-200 outline-none';
+// 켜짐 표시를 hover/focus가 덮지 않게 변형을 겹쳐 특정도를 올린다.
+// (hover:text-paper 와 aria-[pressed=true]:text-brass 는 특정도가 같아 순서에 좌우된다 —
+//  클릭 직후엔 커서가 버튼 위에 있으므로 그때 정확히 꺼진 것처럼 보였다.)
+const ICON_BUTTON = [
+  'grid size-11 place-items-center rounded-full outline-none',
+  'transition-[color,background-color,transform] duration-150 active:scale-90',
+  'text-dim hover:text-paper hover:bg-hairline-soft focus-visible:text-paper focus-visible:bg-hairline-soft',
+  'aria-[pressed=true]:text-brass aria-[pressed=true]:bg-brass/15',
+  'aria-[pressed=true]:hover:text-brass aria-[pressed=true]:hover:bg-brass/25',
+  'aria-[pressed=true]:focus-visible:text-brass aria-[pressed=true]:focus-visible:bg-brass/25',
+].join(' ');
+
+const PLAY_BUTTON = [
+  'text-void bg-paper grid size-[54px] place-items-center rounded-full outline-none',
+  'transition-[background-color,transform] duration-150 active:scale-90',
+  'hover:bg-white focus-visible:bg-white',
+].join(' ');
 
 // 위젯이 길이를 알려주기 전이나 콜백이 undefined를 줬을 때 NaN:NaN이 뜨지 않게 한다.
 const clock = (seconds: number) => {
@@ -23,7 +40,7 @@ export function Transport() {
   const isPlaying = useAtomValue(isPlayingAtom);
   const index = useAtomValue(currentIndexAtom);
   const [shuffle, setShuffle] = useAtom(shuffleAtom);
-  const [repeatOne, setRepeatOne] = useAtom(repeatOneAtom);
+  const [repeatMode, setRepeatMode] = useAtom(repeatModeAtom);
   const elapsed = useRef<HTMLElement | null>(null);
   const track = TRACKS[index];
 
@@ -45,8 +62,8 @@ export function Transport() {
           <button
             type="button"
             aria-pressed={shuffle}
-            aria-label="임의재생"
-            title="임의재생"
+            aria-label={`임의재생 ${shuffle ? '켬' : '끔'}`}
+            title={`임의재생 ${shuffle ? '켬' : '끔'}`}
             className={ICON_BUTTON}
             onClick={() => setShuffle((value) => !value)}
           >
@@ -64,8 +81,8 @@ export function Transport() {
           <button
             type="button"
             aria-label={isPlaying ? '일시정지' : '재생'}
-            title="재생 · Space / K"
-            className="text-void bg-paper hover:bg-white focus-visible:bg-white grid size-[46px] place-items-center rounded-full transition-colors duration-200 outline-none"
+            title={`${isPlaying ? '일시정지' : '재생'} · Space / K`}
+            className={PLAY_BUTTON}
             onClick={toggle}
           >
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
@@ -81,16 +98,17 @@ export function Transport() {
           </button>
           <button
             type="button"
-            aria-pressed={repeatOne}
-            aria-label="한곡 반복"
-            title="한곡 반복"
+            aria-pressed={repeatMode !== REPEAT_MODE.off}
+            aria-label={`반복: ${REPEAT_LABEL[repeatMode]}`}
+            title={`${REPEAT_LABEL[repeatMode]} · 눌러서 전환`}
             className={ICON_BUTTON}
-            onClick={() => setRepeatOne((value) => !value)}
+            onClick={() => setRepeatMode(nextRepeatMode)}
           >
-            <RepeatOneIcon />
+            {repeatMode === REPEAT_MODE.one ? <RepeatOneIcon /> : <RepeatIcon />}
           </button>
         </div>
-        <span className="text-right">
+        <span className="flex items-center justify-end gap-xs text-right">
+          <ShareButton className={ICON_BUTTON} />
           {track ? clock(track.durationMs / 1000) : '0:00'}{' '}
           {track ? (
             <a

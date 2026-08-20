@@ -1,0 +1,57 @@
+name: Soundlab Weekly Tracks
+
+on:
+  schedule:
+    - cron: '0 2 * * 1' # 매주 월요일 오전 11시 KST (UTC 02:00) — dansoon 잡과 한 시간 띄운다
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Get current date (KST)
+        id: date
+        run: echo "date=$(TZ=Asia/Seoul date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Git
+        run: |
+          git config --global user.name 'KimDanwoo'
+          git config --global user.email '84695769+KimDanwoo@users.noreply.github.com'
+
+      # sync-tracks.mjs는 node: 내장 모듈과 fetch만 쓴다. 의존성 설치가 필요 없다.
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      # 익명 client_id 경로가 깨지면 스크립트가 경고만 남기고 0으로 끝난다.
+      # 그 경우 tracks.ts가 그대로라 아래 diff 검사에서 조용히 종료된다.
+      - name: Sync tracks
+        run: node apps/soundlab/scripts/sync-tracks.mjs
+
+      - name: Commit, open PR, and merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="feature/${{ steps.date.outputs.date }}-soundlab-tracks"
+          TITLE='chore(soundlab): 곡 목록 동기화 (${{ steps.date.outputs.date }})'
+          # OG 카드용 폰트 서브셋은 제목에 쓰인 글자만 담으므로 곡 목록과 함께 바뀐다.
+          git add apps/soundlab/src/entities/track/model/constants/tracks.ts apps/soundlab/assets/og-title.ttf
+          if git diff --cached --quiet; then
+            echo "곡 목록에 변경이 없어 종료합니다."
+            exit 0
+          fi
+          git switch -c "$BRANCH"
+          git commit -m "$TITLE"
+          git push -f origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" --title "$TITLE" --body 'SoundCloud 프로필에서 자동 동기화된 곡 목록입니다.'
+          gh pr merge "$BRANCH" --squash --delete-branch

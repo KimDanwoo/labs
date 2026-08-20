@@ -52,11 +52,24 @@ export function trackUrl(track: Track): string {
 }
 
 /**
- * 24곡을 한 번에 올린다. 성공하면 곡 전환이 widget.skip()으로 끝나 iframe 재탐색이 사라진다.
- * 이 형식이 받아들여지는지는 런타임에 getSounds로 확인하고, 아니면 곡별 load로 폴백한다.
+ * 곡 전체를 한 플레이어에 올린다. 성공하면 전환이 widget.skip()으로 끝나 새 재생 시작이 사라진다
+ * — 백그라운드에서 다음 곡으로 넘어가려면 이게 필요하다.
+ *
+ * 콤마로 이어붙인 `tracks/id1,id2,...`는 위젯이 404로 거절한다. 프로필 URL은 받는다.
+ * permalinkUrl에서 뽑아 쓰므로 계정이 바뀌어도 따라간다.
  */
-export function multiTrackUrl(tracks: readonly Track[]): string {
-  return `https://api.soundcloud.com/tracks/${tracks.map((track) => track.id).join(',')}`;
+export function setUrl(tracks: readonly Track[]): string | null {
+  const first = tracks[0];
+  if (!first) return null;
+  const [scheme, , host, user] = first.permalinkUrl.split('/');
+  if (!scheme || !host || !user) return null;
+  return `${scheme}//${host}/${user}`;
+}
+
+/** 위젯이 준 sound 객체에서 트랙 id를 꺼낸다. 형식이 다르면 매핑에서 제외한다. */
+export function soundId(sound: unknown): number | null {
+  if (typeof sound !== 'object' || sound === null || !('id' in sound)) return null;
+  return typeof sound.id === 'number' ? sound.id : null;
 }
 
 export function widgetSrc(url: string): string {
@@ -95,4 +108,9 @@ export async function fetchWaveform(url: string): Promise<Float32Array> {
   const normalized = new Float32Array(samples.length);
   for (let i = 0; i < samples.length; i++) normalized[i] = Math.min(1, (samples[i] ?? 0) / peak);
   return normalized;
+}
+
+/** 공유 링크는 곡 id로 만든다. 제목을 고쳐도, 목록 순서가 바뀌어도 살아있다. */
+export function trackPath(track: Track): string {
+  return `/t/${track.id}`;
 }

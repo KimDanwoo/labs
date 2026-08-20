@@ -48,4 +48,11 @@ export const PROJECTS: Project[] = [
     href: 'https://d-gymlog.vercel.app/',
     image: '/projects/gymlog.webp',
   },
+  {
+    title: 'soundlab',
+    description: 'WebGL 픽셀 파티클로 듣는 자작곡 플레이어',
+    href: 'https://labs-sound.vercel.app/',
+    image: '/projects/soundlab.webp',
+    imagePosition: 'center',
+  },
 ];
