@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "sync-tracks": "node scripts/sync-tracks.mjs"
+    "sync-tracks": "node scripts/sync-tracks.mjs",
+    "og": "node scripts/shoot-og.mjs"
   },
   "dependencies": {
     "@tokens/css": "workspace:*",
