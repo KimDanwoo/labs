@@ -22,21 +22,23 @@ export function Stage() {
   const handleReady = useCallback((ready: boolean) => setCanvasReady(ready), []);
 
   return (
-    <section className="order-1 flex min-h-0 flex-col items-center justify-center gap-lg p-md min-[820px]:order-2">
+    // overflow-hidden: 아트워크는 shrink-0라, 남는 높이가 부족해도 목록·재생바 위로 삐져나오지 않게 가둔다.
+    <section className="order-1 flex min-h-0 flex-col items-center justify-center gap-lg overflow-hidden p-md min-[820px]:order-2">
       <ParticleCanvas slotRef={slot} onReady={handleReady} />
-      <div ref={slot} className="aspect-square w-[min(78%,32vh)] shrink-0 min-[820px]:w-[min(72%,54vh)]">
+      {/* 목록이 따로 화면을 가져가 무대가 넓어졌으니 커버를 폭 상한까지 키운다.
+          dvh 천장은 세로가 짧은 기기에서만 걸린다 — vh는 모바일에서 주소창까지 포함해 실제보다 크다. */}
+      <div ref={slot} className="aspect-square w-[min(84%,46dvh)] shrink-0 min-[820px]:w-[min(64%,58vh)]">
         {track && !canvasReady ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={artworkUrl(track, 't500x500')} alt="" className="size-full object-cover" draggable={false} />
         ) : null}
       </div>
+      {/* 제목이 먼저, 장르가 아래 — 순번(01/25)은 목록 화면의 각 행이 이미 들고 있어 여기선 뺀다. */}
       <div className="flex max-w-[34ch] flex-col items-center gap-xs text-center">
-        <span className="font-label text-mute text-[10px] tracking-wide-label tabular-nums uppercase">
-          {track ? `${String(index + 1).padStart(2, '0')} / ${TRACKS.length} · ${track.genre}` : ''}
-        </span>
         <h2 className="text-[clamp(22px,2.7vw,38px)] leading-tight font-extrabold tracking-tight break-keep text-balance">
           {track?.title ?? ''}
         </h2>
+        <span className="font-label text-mute text-[10px] tracking-wide-label uppercase">{track?.genre ?? ''}</span>
         {engineError ? (
           <p role="alert" className="font-label text-error text-[10px] tracking-label">
             재생 엔진을 불러오지 못했습니다: {engineError}
