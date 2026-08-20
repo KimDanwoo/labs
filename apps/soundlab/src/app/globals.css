@@ -29,11 +29,6 @@
   --tracking-mark: 0.42em;
 }
 
-html,
-body {
-  height: 100%;
-}
-
 body {
   background: var(--color-void);
   color: var(--color-paper);
