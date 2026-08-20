@@ -68,6 +68,9 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
     };
     const observer = new ResizeObserver(relayout);
     observer.observe(slot);
+    // 슬롯은 크기가 그대로인 채 위치만 바뀔 수 있다(재생목록 접기 → 무대 열이 넓어짐).
+    // ResizeObserver는 위치 변화로는 안 울리므로, 크기가 실제로 변하는 무대 영역도 함께 본다.
+    if (slot.parentElement) observer.observe(slot.parentElement);
     window.addEventListener('resize', relayout);
 
     return () => {
