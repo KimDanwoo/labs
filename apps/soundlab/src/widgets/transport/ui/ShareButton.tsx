@@ -3,17 +3,21 @@
 import { TRACKS } from '@entities/track/model/constants/tracks';
 import { trackPath } from '@entities/track/model/services';
 import { currentIndexAtom } from '@entities/track/model/store';
+import { FLOATING_BUTTON } from '@shared/lib/floatingButton';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { CheckIcon, LinkIcon } from './icons';
 
 const COPIED_MS = 1600;
 
-type ShareButtonProps = {
-  className: string;
-};
+// 보조 동작이라 목록 버튼보다 한 단계 가라앉힌다. 복사 완료는 aria-pressed에 묶는다.
+const SHARE_BUTTON = [
+  FLOATING_BUTTON,
+  'bg-void/60 text-dim hover:text-paper hover:bg-void/85 focus-visible:text-paper focus-visible:bg-void/85',
+  'aria-[pressed=true]:text-brass aria-[pressed=true]:hover:text-brass',
+].join(' ');
 
-export function ShareButton({ className }: ShareButtonProps) {
+export function ShareButton() {
   const index = useAtomValue(currentIndexAtom);
   const [isCopied, setIsCopied] = useState(false);
   const track = TRACKS[index];
@@ -41,7 +45,7 @@ export function ShareButton({ className }: ShareButtonProps) {
       aria-label={isCopied ? '링크 복사됨' : '이 곡 링크 복사'}
       title={isCopied ? '복사됨' : '이 곡 링크 복사'}
       aria-pressed={isCopied}
-      className={className}
+      className={SHARE_BUTTON}
       onClick={handleClick}
     >
       {isCopied ? <CheckIcon /> : <LinkIcon />}

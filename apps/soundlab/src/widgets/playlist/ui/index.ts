@@ -1,2 +1,2 @@
 export { Playlist } from './Playlist';
-export { PlaylistToggle } from './PlaylistToggle';
+export { QueueToggle } from './QueueToggle';
