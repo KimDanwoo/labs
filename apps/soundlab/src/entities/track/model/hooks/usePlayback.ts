@@ -52,6 +52,13 @@ const FADE_MS = 220;
 const FADE_STEP_MS = 20;
 const FULL_VOLUME = 100;
 
+/**
+ * 위젯 위치 보고의 지터 흡수. 보고값을 그대로 좇으면 시계가 앞뒤로 잔튀고 비트 격자가 같이 튄다.
+ * 프레임당 보정을 경과시간의 이 비율로 묶어 단조로 흘리고, 문턱을 넘는 차이는 시킹으로 보고 점프한다.
+ */
+const DRIFT_CORRECT_RATIO = 0.3;
+const DRIFT_SNAP_MS = 250;
+
 /** 이어 듣기 기록. 자주 쓰면 낭비, 드물게 쓰면 마지막 몇 초를 잃는다. */
 const SAVE_INTERVAL_MS = 5000;
 /** 끝자락에서 나갔다면 이어 들을 게 없다 — 처음부터 틀어준다. */
@@ -79,6 +86,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   // live = 그 보고가 "지금 흐르는 소리"의 것인가. play 이벤트는 버퍼링 전에 오므로
   // 첫 보고를 받기 전까지 보간을 세워둔다 — 안 세우면 소리 없이 시간이 흐르다 0으로 되돌아간다.
   const reported = useRef({ ms: 0, at: 0, live: false });
+  // 화면에 실제로 내보낸 시계. 보고값과의 차이를 조금씩만 좁혀 비트 격자가 튀지 않게 한다.
+  const smoothMs = useRef(0);
   const playing = useRef(false);
   const advance = useRef<() => void>(() => {});
   // 위젯이 지금 세트를 들고 있는가. 들고 있으면 전환이 skip으로 끝나 새 재생을 시작하지 않는다
@@ -473,6 +482,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     const ms = clamped * frameState.durationMs;
     // 스크럽은 즉시 반응해야 하므로 live로 둔다. 실제 위치와의 오차는 다음 보고가 잡는다.
     reported.current = { ms, at: performance.now(), live: true };
+    smoothMs.current = ms;
     frameState.position = clamped;
     widget.current?.seekTo(ms);
   }, []);
@@ -492,12 +502,21 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     if (track) frameState.durationMs = validDuration(frameState.durationMs, track.durationMs);
   }, [index, tracks]);
 
-  useFrame(() => {
+  useFrame((delta) => {
     const { durationMs } = frameState;
     if (!Number.isFinite(durationMs) || durationMs <= 0) return;
-    const { at, live } = reported.current;
-    const elapsed = playing.current && live ? performance.now() - at : 0;
-    frameState.position = Math.min(1, (reported.current.ms + elapsed) / durationMs);
+    const { ms, at, live } = reported.current;
+    if (!(playing.current && live)) {
+      smoothMs.current = ms;
+      frameState.position = Math.min(1, ms / durationMs);
+      return;
+    }
+    const target = ms + (performance.now() - at);
+    const drift = target - (smoothMs.current + delta);
+    const bound = delta * DRIFT_CORRECT_RATIO;
+    smoothMs.current =
+      Math.abs(drift) > DRIFT_SNAP_MS ? target : smoothMs.current + delta + Math.min(bound, Math.max(-bound, drift));
+    frameState.position = Math.min(1, smoothMs.current / durationMs);
   });
 
   return { select, toggle, step, seek, seekBy };
