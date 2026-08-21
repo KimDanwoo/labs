@@ -41,11 +41,17 @@ export function Transport() {
   const [shuffle, setShuffle] = useAtom(shuffleAtom);
   const [repeatMode, setRepeatMode] = useAtom(repeatModeAtom);
   const elapsed = useRef<HTMLElement | null>(null);
+  const shownSeconds = useRef(-1);
   const track = TRACKS[index];
 
+  // 표시는 초 단위다. 매 프레임 쓰면 초당 60번 문자열을 만들고 그 줄을 다시 레이아웃한다 — 초가 바뀔 때만.
   useFrame(() => {
-    if (!elapsed.current) return;
-    elapsed.current.textContent = clock((frameState.position * frameState.durationMs) / 1000);
+    const node = elapsed.current;
+    if (!node) return;
+    const seconds = Math.floor((frameState.position * frameState.durationMs) / 1000);
+    if (!Number.isFinite(seconds) || seconds === shownSeconds.current) return;
+    shownSeconds.current = seconds;
+    node.textContent = clock(seconds);
   });
 
   return (
