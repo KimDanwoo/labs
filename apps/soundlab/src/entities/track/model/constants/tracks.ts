@@ -189,8 +189,8 @@ export const TRACKS: readonly Track[] = [
     permalinkUrl: 'https://soundcloud.com/danwooking/blv7zxvbj0gs',
     artworkBase: 'https://i1.sndcdn.com/artworks-8hi2DF7fytLS7voJ-lCUAtA',
     artworkExt: '.jpg',
-    waveformUrl: 'https://wave.sndcdn.com/wSR6WZgl0Ecc_m.json',
-    durationMs: 209209,
+    waveformUrl: 'https://wave.sndcdn.com/N8tAFhIrH3Py_m.json',
+    durationMs: 209206,
     genre: 'pop',
   },
   {
