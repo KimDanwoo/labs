@@ -170,6 +170,25 @@ export function trackPath(track: Track): string {
 
 export const QUEUE_SEGMENT = '/queue';
 
+/** 공유 링크가 시작 지점을 싣는 이름. 유튜브와 같게 둔다 — 손으로 고쳐 쓸 수 있어야 한다. */
+const TIME_PARAM = 't';
+
+/** 지금 듣는 자리까지 담은 공유 링크. 맨 앞이면 초를 붙이지 않는다 — 곡 링크가 더 깔끔하다. */
+export function shareUrl(track: Track, ms: number, origin: string): string {
+  const url = new URL(trackPath(track), origin);
+  const seconds = Math.floor(ms / 1000);
+  if (Number.isFinite(seconds) && seconds > 0) url.searchParams.set(TIME_PARAM, String(seconds));
+  return url.toString();
+}
+
+/** 공유 링크가 지목한 시작 지점(ms). 없거나 해석이 안 되면 null. */
+export function readSharedStartMs(search: string): number | null {
+  const raw = new URLSearchParams(search).get(TIME_PARAM);
+  if (raw === null) return null;
+  const seconds = Number(raw);
+  return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : null;
+}
+
 /** 주소는 "무슨 곡 + 어떤 화면"을 담는다. 새로고침·공유로 그 화면에 그대로 들어올 수 있다. */
 export function playerPath(track: Track, screen: PlayerScreen): string {
   return screen === PLAYER_SCREEN.queue ? `${trackPath(track)}${QUEUE_SEGMENT}` : trackPath(track);

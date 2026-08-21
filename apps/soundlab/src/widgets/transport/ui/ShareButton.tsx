@@ -1,8 +1,8 @@
 'use client';
 
 import { TRACKS } from '@entities/track/model/constants/tracks';
-import { trackPath } from '@entities/track/model/services';
-import { currentIndexAtom } from '@entities/track/model/store';
+import { shareUrl } from '@entities/track/model/services';
+import { currentIndexAtom, frameState } from '@entities/track/model/store';
 import { FLOATING_BUTTON } from '@shared/lib/floatingButton';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
@@ -32,7 +32,8 @@ export function ShareButton() {
     if (!track) return;
     // clipboard는 비보안 컨텍스트나 권한 거부로 실패할 수 있다. 실패를 삼키지 않고 표시를 안 바꾼다.
     try {
-      await navigator.clipboard.writeText(new URL(trackPath(track), window.location.origin).toString());
+      const at = frameState.position * frameState.durationMs;
+      await navigator.clipboard.writeText(shareUrl(track, at, window.location.origin));
       setIsCopied(true);
     } catch {
       setIsCopied(false);
@@ -42,8 +43,8 @@ export function ShareButton() {
   return (
     <button
       type="button"
-      aria-label={isCopied ? '링크 복사됨' : '이 곡 링크 복사'}
-      title={isCopied ? '복사됨' : '이 곡 링크 복사'}
+      aria-label={isCopied ? '링크 복사됨' : '이 곡 링크 복사 · 지금 위치부터'}
+      title={isCopied ? '복사됨' : '이 곡 링크 복사 · 지금 위치부터'}
       aria-pressed={isCopied}
       className={SHARE_BUTTON}
       onClick={handleClick}

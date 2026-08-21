@@ -7,6 +7,7 @@ import { REPEAT_MODE } from '../constants/repeatMode';
 import {
   loadWidgetApi,
   readLastPlayed,
+  readSharedStartMs,
   setUrl,
   soundId,
   trackUrl,
@@ -160,20 +161,29 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     return () => window.removeEventListener('pagehide', onHide);
   }, [remember]);
 
-  // 나갔다 들어오면 마지막 곡·자리에서 잇는다. 주소가 곡을 지목했으면(공유 링크) 주소가 이긴다.
+  // 어디서부터 들을 것인가. 주소가 곡을 지목했으면(공유 링크) 그 링크의 ?t가, 아니면 지난 방문 기록이 정한다.
   // 소리를 자동으로 내지는 않는다 — 브라우저가 제스처 없는 재생을 막는다. 첫 재생 조작에서 이어진다.
   useEffect(() => {
-    if (initialTrackId !== undefined) return;
-    const last = readLastPlayed();
-    if (!last) return;
-    const next = tracks.findIndex((track) => track.id === last.id);
-    const track = tracks[next];
-    if (!track) return;
-    setIndex(next);
-    if (track.durationMs - last.ms < RESUME_TAIL_MS) return;
-    resume.current = { index: next, ms: last.ms };
+    const shared = () => {
+      const ms = readSharedStartMs(window.location.search);
+      const at = tracks.findIndex((track) => track.id === initialTrackId);
+      return ms === null || at < 0 ? null : { index: at, ms };
+    };
+    const remembered = () => {
+      const last = readLastPlayed();
+      if (!last) return null;
+      const at = tracks.findIndex((track) => track.id === last.id);
+      return at < 0 ? null : { index: at, ms: last.ms };
+    };
+
+    const point = initialTrackId !== undefined ? shared() : remembered();
+    const track = point && tracks[point.index];
+    if (!point || !track) return;
+    setIndex(point.index);
+    if (track.durationMs - point.ms < RESUME_TAIL_MS) return;
+    resume.current = point;
     frameState.durationMs = track.durationMs;
-    reported.current = { ms: last.ms, at: performance.now(), live: false };
+    reported.current = { ms: point.ms, at: performance.now(), live: false };
     // 진입 시 한 번만. tracks·setIndex는 앱 수명 동안 안 바뀐다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
