@@ -3,7 +3,8 @@ import type { ArtworkSize, Track } from '../types';
 
 const WIDGET_API_SRC = 'https://w.soundcloud.com/player/api.js';
 
-type WidgetPayload = { currentPosition?: number; relativePosition?: number };
+/** loadedProgress는 loadProgress와 playProgress 양쪽에 실려 온다. 한쪽이 안 와도 버퍼 표시가 살아남는다. */
+type WidgetPayload = { currentPosition?: number; relativePosition?: number; loadedProgress?: number };
 
 export type ScWidget = {
   bind(event: string, callback: (payload: WidgetPayload) => void): void;
@@ -12,6 +13,8 @@ export type ScWidget = {
   play(): void;
   pause(): void;
   seekTo(milliseconds: number): void;
+  /** 0–100. 페이드에 쓴다 — 위젯 오디오는 cross-origin이라 이게 유일한 음량 손잡이다. */
+  setVolume(volume: number): void;
   getDuration(callback: (milliseconds: number) => void): void;
   /** 여러 곡이 실린 경우에만 의미가 있다. iframe 재탐색 없이 즉시 전환된다. */
   skip(soundIndex: number): void;
@@ -111,6 +114,55 @@ export async function fetchWaveform(url: string): Promise<Float32Array> {
   return normalized;
 }
 
+/**
+ * scripts/analyze-audio.mjs가 구운 대역 신호. 곡마다 있을 수도 없을 수도 있다 —
+ * 없으면 앱은 사클 파형 폴백으로 돈다(신호가 있는 곡만 확장 시각).
+ * 대역은 Uint8을 base64로 담는다(43Hz × 3채널을 평문 배열로 두면 3배가 된다).
+ */
+export type BandSignals = {
+  fps: number;
+  audioMs: number;
+  low: string;
+  mid: string;
+  high: string;
+  bpm: number | null;
+  /** [시각ms, 세기 0–255] — 실제 타격이 있는 격자선만 담긴다. */
+  beats: [number, number][];
+};
+
+const decodeBand = (base64: string) => {
+  const binary = atob(base64);
+  const out = new Float32Array(binary.length);
+  for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i) / 255;
+  return out;
+};
+
+let manifest: Promise<Set<number>> | null = null;
+
+/** 신호가 있는 곡 목록. 곡마다 404를 두드리지 않으려고 한 번만 받는다. */
+export function fetchSignalManifest(): Promise<Set<number>> {
+  manifest ??= fetch('/signals/index.json')
+    .then((response) => (response.ok ? (response.json() as Promise<number[]>) : []))
+    .then((ids) => new Set(ids))
+    .catch(() => new Set<number>());
+  return manifest;
+}
+
+export async function fetchBands(trackId: number) {
+  if (!(await fetchSignalManifest()).has(trackId)) return null;
+  const response = await fetch(`/signals/${trackId}.json`);
+  if (!response.ok) return null;
+  const raw = (await response.json()) as BandSignals;
+  if (!Number.isFinite(raw.fps) || raw.fps <= 0) return null;
+  return {
+    fps: raw.fps,
+    low: decodeBand(raw.low),
+    mid: decodeBand(raw.mid),
+    high: decodeBand(raw.high),
+    beats: Array.isArray(raw.beats) ? raw.beats : [],
+  };
+}
+
 /** 공유 링크는 곡 id로 만든다. 제목을 고쳐도, 목록 순서가 바뀌어도 살아있다. */
 export function trackPath(track: Track): string {
   return `/t/${track.id}`;
@@ -125,4 +177,33 @@ export function playerPath(track: Track, screen: PlayerScreen): string {
 
 export function screenFromPath(pathname: string): PlayerScreen {
   return pathname.endsWith(QUEUE_SEGMENT) ? PLAYER_SCREEN.queue : PLAYER_SCREEN.nowPlaying;
+}
+
+const LAST_PLAYED_KEY = 'soundlab:last-played';
+
+/** 나갔다 들어왔을 때 이어 들을 자리. 곡 하나만 기억한다. */
+export type LastPlayed = { id: number; ms: number };
+
+/** 저장을 막는 환경(시크릿·저장 거부)이나 낡은 형식이면 이어 듣기만 포기한다. */
+export function readLastPlayed(): LastPlayed | null {
+  try {
+    const raw = localStorage.getItem(LAST_PLAYED_KEY);
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (typeof parsed !== 'object' || parsed === null) return null;
+    const { id, ms } = parsed as Record<string, unknown>;
+    if (typeof id !== 'number' || !Number.isInteger(id)) return null;
+    if (typeof ms !== 'number' || !Number.isFinite(ms) || ms < 0) return null;
+    return { id, ms };
+  } catch {
+    return null;
+  }
+}
+
+export function writeLastPlayed(last: LastPlayed): void {
+  try {
+    localStorage.setItem(LAST_PLAYED_KEY, JSON.stringify(last));
+  } catch {
+    return;
+  }
 }
