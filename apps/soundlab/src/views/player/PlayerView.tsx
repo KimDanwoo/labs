@@ -3,6 +3,7 @@
 import { PLAYER_SCREEN, type PlayerScreen } from '@entities/track/model/constants/playerScreen';
 import { TRACKS } from '@entities/track/model/constants/tracks';
 import { useKeyboard } from '@entities/track/model/hooks/useKeyboard';
+import { useMediaSession } from '@entities/track/model/hooks/useMediaSession';
 import { usePlayback } from '@entities/track/model/hooks/usePlayback';
 import { PlaybackProvider } from '@entities/track/model/hooks/usePlaybackControls';
 import { useTrackUrl } from '@entities/track/model/hooks/useTrackUrl';
@@ -31,6 +32,7 @@ export function PlayerView({ initialTrackId, initialScreen }: PlayerViewProps) {
   const playback = usePlayback(TRACKS, initialTrackId);
   useWaveform(TRACKS[index], TRACKS[(index + 1) % TRACKS.length], isPlaying);
   useKeyboard(playback);
+  useMediaSession(TRACKS[index], isPlaying, playback);
 
   const isQueue = screen === PLAYER_SCREEN.queue;
 
