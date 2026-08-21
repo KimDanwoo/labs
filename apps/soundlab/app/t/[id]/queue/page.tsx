@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 
 type Params = { id: string };
 
-// 곡 화면과 같은 25개를 빌드 타임에 만든다. 앱 안에서는 pushState로 오지만,
+// 곡 화면과 같은 목록을 빌드 타임에 만든다. 앱 안에서는 pushState로 오지만,
 // 공유 링크·새로고침·직접 진입은 이 라우트로 들어온다.
 export function generateStaticParams(): Params[] {
   return TRACKS.map((track) => ({ id: String(track.id) }));

@@ -10,6 +10,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "sync-tracks": "node scripts/sync-tracks.mjs",
+    "analyze-audio": "node scripts/analyze-audio.mjs",
     "og": "node scripts/shoot-og.mjs"
   },
   "dependencies": {
