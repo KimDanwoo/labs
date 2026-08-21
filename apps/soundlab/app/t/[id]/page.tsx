@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 
 type Params = { id: string };
 
-// 25곡 전부 빌드 타임에 만든다. 런타임 렌더가 없어 공유 링크가 즉시 뜬다.
+// 곡 전부를 빌드 타임에 만든다. 런타임 렌더가 없어 공유 링크가 즉시 뜬다.
 export function generateStaticParams(): Params[] {
   return TRACKS.map((track) => ({ id: String(track.id) }));
 }
