@@ -43,6 +43,8 @@ const SWELL_SMOOTHING = 0.04;
  */
 const BEAT_HIT = 0.25;
 const BEAT_RELEASE_MS = 220;
+/** 이보다 오래 지난 비트는 발화 없이 넘긴다 — 랙·탭 복귀 뒤 밀린 비트가 몰아 터지면 전부 엇박이다. */
+const BEAT_STALE_MS = 150;
 
 export type Signals = {
   /** 초당 샘플 수. 두 출처의 해상도가 달라 인덱싱은 절대 시각으로 한다. */
@@ -214,9 +216,11 @@ export function useWaveform(track: Track | undefined, next: Track | undefined, i
     while (beat.current.cursor < data.beats.length) {
       const line = data.beats[beat.current.cursor];
       if (!line || line[0] > nowMs) break;
-      const strength = line[1] / 255;
-      beat.current.value = Math.max(beat.current.value, strength * BEAT_HIT);
-      struck = Math.max(struck, strength);
+      if (nowMs - line[0] <= BEAT_STALE_MS) {
+        const strength = line[1] / 255;
+        beat.current.value = Math.max(beat.current.value, strength * BEAT_HIT);
+        struck = Math.max(struck, strength);
+      }
       beat.current.cursor++;
     }
     // 사건을 카운터로 알린다 — 무대가 이걸 보고 파동을 쏜다.
