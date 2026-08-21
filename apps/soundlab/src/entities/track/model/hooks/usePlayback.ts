@@ -34,6 +34,9 @@ const validDuration = (value: unknown, fallback: number) =>
 /** 준비 전에 눌린 재생 요청. toggle은 의존성 없이 만들어져 인덱스를 모르므로 소진 시점에 해석한다. */
 const PLAY_CURRENT = -1;
 
+/** 위젯이 준 사운드 목록을 위치 그대로 id 배열로 옮긴다. 자리를 지우지 않는 게 핵심이다. */
+const readSoundIds = (sounds: unknown[]) => (Array.isArray(sounds) ? sounds.map(soundId) : []);
+
 const EVENTS = {
   ready: 'ready',
   play: 'play',
@@ -81,9 +84,9 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   // 위젯이 지금 세트를 들고 있는가. 들고 있으면 전환이 skip으로 끝나 새 재생을 시작하지 않는다
   // — 백그라운드 자동 전환의 조건이다. 세트 밖 곡을 load하면 세트를 잃고 false가 된다.
   const holdsSet = useRef(false);
-  // 세트에 실린 곡 순서(위치 → 트랙 id). 위젯은 프로필의 최신 20곡만 주고 순서 보장도 없어서
-  // skip 대상과 현재 곡 하이라이트를 위치가 아니라 id로 맞춘다.
-  const soundIds = useRef<number[]>([]);
+  // 세트에 실린 곡 순서(위치 → 트랙 id). skip 대상과 현재 곡 하이라이트를 위치가 아니라 id로 맞춘다.
+  // id를 아직 모르는 자리는 null로 남긴다 — 빼버리면 그 뒤가 한 칸씩 밀려 skip이 엉뚱한 곡으로 간다.
+  const soundIds = useRef<(number | null)[]>([]);
   // 위젯이 지금 물고 있는 트랙. 딥링크로 들어오면 화면은 그 곡인데 위젯은 세트의 첫 곡을 물고 있어서
   // 그냥 play를 부르면 첫 곡이 난다 — 재개 전에 같은 곡인지 본다.
   const heldIndex = useRef(-1);
@@ -210,9 +213,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         instance.bind(EVENTS.ready, () => {
           // 세트 URL이 실제로 먹혔는지 런타임에 확인한다. 곡 수는 위젯이 정하므로 일치를 요구하지 않는다.
           instance.getSounds((sounds) => {
-            soundIds.current = Array.isArray(sounds)
-              ? sounds.map(soundId).filter((id): id is number => id !== null)
-              : [];
+            soundIds.current = readSoundIds(sounds);
             holdsSet.current = soundIds.current.length > 1;
             setEngineMode(holdsSet.current ? 'set' : 'single');
             // soundIds가 채워진 뒤에 소진해야 skip 경로가 올바른 위치를 찾는다.
@@ -249,7 +250,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
             // 위젯이 스스로 다음 곡으로 넘어간 경우도 여기로 들어온다 — 목록 하이라이트를 여기서 맞춘다.
             instance.getCurrentSoundIndex((soundIndex) => {
               const id = soundIds.current[soundIndex];
-              if (id === undefined) return;
+              if (typeof id !== 'number') return;
               const next = tracks.findIndex((track) => track.id === id);
               if (next < 0) return;
               heldIndex.current = next;
@@ -316,48 +317,53 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     volume.current = 0;
     instance.setVolume(0);
 
-    // 위젯 안의 위치로 변환한다. TRACKS 인덱스를 그대로 넘기면 다른 곡이 걸린다.
-    const soundIndex = soundIds.current.indexOf(track.id);
-
-    if (soundIndex >= 0 && holdsSet.current) {
-      // 이미 재생 중인 플레이어 안에서 옮겨간다 — 새 재생을 시작하지 않는 게 핵심이다.
-      // 단, 위젯이 이미 그 사운드를 들고 있으면 skip은 아무 일도 하지 않는다(멈춰 있으면 계속 멈춘 채다).
-      // 곡을 고른 건 듣겠다는 뜻이므로 그때는 play로 깨운다.
-      instance.getCurrentSoundIndex((current) => {
-        if (current === soundIndex) instance.play();
-        else instance.skip(soundIndex);
-      });
-      return;
-    }
-
     const readDuration = () =>
       instance.getDuration((ms) => {
         frameState.durationMs = validDuration(ms, track.durationMs);
       });
 
-    // 세트 밖 곡(위젯이 주는 20곡에 없는 오래된 곡)을 틀면 위젯이 세트를 잃는다.
-    // 다시 세트 안 곡으로 돌아올 땐 세트를 복구해야 skip과 백그라운드 전환이 살아난다.
-    const target = soundIndex >= 0 ? setUrl(tracks) : null;
-    if (target) {
-      instance.load(target, {
-        auto_play: true,
-        callback: () => {
-          holdsSet.current = true;
-          setEngineMode('set');
-          instance.skip(soundIndex);
-          readDuration();
-        },
-      });
-      return;
-    }
+    // 목록은 ready 시점의 것이 끝이 아니다 — 위젯이 프로필 곡을 나눠 싣는다(실측 20개 → 25개).
+    // 전환할 때마다 다시 읽어야 위치가 맞는다. 우리 목록에 없는 사운드(최근 업로드)가 섞여 있어도 마찬가지다.
+    instance.getSounds((sounds) => {
+      soundIds.current = readSoundIds(sounds);
+      // 위젯 안의 위치로 변환한다. TRACKS 인덱스를 그대로 넘기면 다른 곡이 걸린다.
+      const soundIndex = soundIds.current.indexOf(track.id);
 
-    holdsSet.current = false;
-    setEngineMode('single');
-    instance.load(trackUrl(track), {
-      auto_play: true,
-      show_artwork: false,
-      show_comments: false,
-      callback: readDuration,
+      if (soundIndex >= 0 && holdsSet.current) {
+        // 이미 재생 중인 플레이어 안에서 옮겨간다 — 새 재생을 시작하지 않는 게 핵심이다.
+        // 단, 위젯이 이미 그 사운드를 들고 있으면 skip은 아무 일도 하지 않는다(멈춰 있으면 계속 멈춘 채다).
+        // 곡을 고른 건 듣겠다는 뜻이므로 그때는 play로 깨운다.
+        instance.getCurrentSoundIndex((current) => {
+          if (current === soundIndex) instance.play();
+          else instance.skip(soundIndex);
+        });
+        return;
+      }
+
+      // 세트 밖 곡을 틀면 위젯이 세트를 잃는다.
+      // 다시 세트 안 곡으로 돌아올 땐 세트를 복구해야 skip과 백그라운드 전환이 살아난다.
+      const target = soundIndex >= 0 ? setUrl(tracks) : null;
+      if (target) {
+        instance.load(target, {
+          auto_play: true,
+          callback: () => {
+            holdsSet.current = true;
+            setEngineMode('set');
+            instance.skip(soundIndex);
+            readDuration();
+          },
+        });
+        return;
+      }
+
+      holdsSet.current = false;
+      setEngineMode('single');
+      instance.load(trackUrl(track), {
+        auto_play: true,
+        show_artwork: false,
+        show_comments: false,
+        callback: readDuration,
+      });
     });
     // tracks·setEngineMode는 앱 수명 동안 안 바뀐다. 엔진과 함께 한 번만 만든다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
