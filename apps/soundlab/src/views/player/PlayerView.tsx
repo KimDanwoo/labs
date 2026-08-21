@@ -28,8 +28,8 @@ export function PlayerView({ initialTrackId, initialScreen }: PlayerViewProps) {
   const engineMode = useAtomValue(engineModeAtom);
   const screen = useAtomValue(playerScreenAtom);
 
-  const playback = usePlayback(TRACKS);
-  useWaveform(TRACKS[index], isPlaying);
+  const playback = usePlayback(TRACKS, initialTrackId);
+  useWaveform(TRACKS[index], TRACKS[(index + 1) % TRACKS.length], isPlaying);
   useKeyboard(playback);
 
   const isQueue = screen === PLAYER_SCREEN.queue;
