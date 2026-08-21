@@ -246,7 +246,6 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
       swell: frameState.swell,
       pre: frameState.pre,
       hit: frameState.hit,
-      bass: frameState.bass,
       air: frameState.air,
       // 파동이 살아 있는 동안만 트레일을 얹어 물결이 빛 자국을 남기게 한다. 상한은 무한 번짐 방지.
       decay: Math.min(0.88, trail.current * 0.86 + energy * 0.24),

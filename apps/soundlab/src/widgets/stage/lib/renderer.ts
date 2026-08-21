@@ -37,19 +37,11 @@ const DEPTH_BASE = 0.12;
 const DEPTH_PER_SWELL = 0.06;
 const SIZE_PER_HIT = 0.34;
 /**
- * 대역 채널(원곡 분석 신호가 있는 곡에서만 0이 아니다).
- * 저역=킥·베이스는 깊이를 밀어 액자가 앞뒤로 숨쉬고, 고역=하이햇·공기감은 블룸으로 번진다.
- * 대역 간 상관이 거의 0이라(실측 -0.004~0.29) 서로 다른 채널에 물릴 때 각각이 따로 읽힌다.
+ * 고역 채널 = 하이햇·공기감(원곡 분석 신호가 있는 곡에서만 0이 아니다). 블룸으로 번진다.
+ * 0.45에서 평상 변동 96%(0.61~1.20). 절정+비트가 겹친 이론상 최대는 1.80.
+ * 저역(킥)은 어느 채널에도 안 물린다 — 깊이에 물렸을 땐 커버가 앞뒤로 튕겨 뺐다.
  */
-const DEPTH_PER_BASS = 0.3;
 const BLOOM_PER_AIR = 0.45;
-/*
- * 위 두 값의 근거(실측, 액자 반경 300px 기준):
- *   깊이 0.05→3.3px  0.12→8.1px  0.3→21px  0.45→32.7px
- *   0.3에서 최대 원근 배율 ×1.11 — 밝은 부분이 33px까지 부푼다. 여기서부터 액자 테두리가 숨쉬는 게 보인다.
- *   0.45를 넘으면 밝은 픽셀만 15% 넘게 나가 정사각 실루엣의 가장자리가 울퉁불퉁해진다.
- *   블룸 0.45에서 평상 변동 96%(0.61~1.20). 절정+비트가 겹친 이론상 최대는 1.80.
- */
 /**
  * 파티클 균일 확대(level)와 들이쉼 수축(pre).
  * PRD §6은 확대 2%였는데 재매핑 뒤에도 폭이 5.2px뿐이라 3.5%(9.1px)로 올렸다 — PRD에서 의도적으로 벗어난 값이다.
@@ -268,8 +260,6 @@ export type RenderInput = {
   pre?: number;
   /** 피크 직후 릴리스(0–1). 블룸 문턱이 낮아지고 점이 커진다. */
   hit?: number;
-  /** 저역 = 킥·베이스(0–1). 원근 깊이를 밀어 액자가 앞뒤로 숨쉰다. 원곡 분석 신호가 없으면 0. */
-  bass?: number;
   /** 고역 = 하이햇·공기감(0–1). 블룸으로 번진다. 원곡 분석 신호가 없으면 0. */
   air?: number;
   /** RIPPLE_SLOTS × (x, y, 진행도, 진폭). 생략하면 파동 없음. */
@@ -487,18 +477,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     return Math.abs(level - drawnLevel) <= LEVEL_EPSILON;
   }
 
-  function render({
-    morph,
-    level,
-    decay,
-    swell = 0,
-    pre = 0,
-    hit = 0,
-    bass = 0,
-    air = 0,
-    ripples,
-    rippleSeeds,
-  }: RenderInput) {
+  function render({ morph, level, decay, swell = 0, pre = 0, hit = 0, air = 0, ripples, rippleSeeds }: RenderInput) {
     if (!accum || !bloom || count === 0) return;
 
     let rippleAlive = false;
@@ -511,7 +490,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     // 끝난 직후 한 프레임도 그려야 수축·블룸이 화면에서 지워진다(hadRipple과 같은 이유).
     const accented = pre > 0 || hit > 0;
     // 연속 채널은 한 스칼라로 합쳐 문턱을 잡는다 — 어느 하나가 움직이면 그 프레임을 그린다.
-    const continuous = level + swell + bass + air;
+    const continuous = level + swell + air;
     if (!accented && !hadAccent && isRedundant(morph, continuous, decay, rippleAlive)) return;
     dirty = false;
     drawnMorph = morph;
@@ -550,7 +529,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     gl.uniform1f(points.uniforms.uLevel ?? null, level);
     gl.uniform1f(points.uniforms.uPre ?? null, pre);
     gl.uniform1f(points.uniforms.uSize ?? null, Math.max(1.5, (side / grid) * dpr * 1.72) * (1 + hit * SIZE_PER_HIT));
-    gl.uniform1f(points.uniforms.uDepth ?? null, side * (DEPTH_BASE + swell * DEPTH_PER_SWELL + bass * DEPTH_PER_BASS));
+    gl.uniform1f(points.uniforms.uDepth ?? null, side * (DEPTH_BASE + swell * DEPTH_PER_SWELL));
     gl.uniform1f(points.uniforms.uFocal ?? null, 1600);
     gl.uniform4fv(points.uniforms['uRipples[0]'] ?? null, ripples ?? IDLE_RIPPLES);
     gl.uniform1fv(points.uniforms['uRippleSeeds[0]'] ?? null, rippleSeeds ?? IDLE_SEEDS);
