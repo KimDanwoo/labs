@@ -9,8 +9,8 @@
 //
 // 사용: node scripts/analyze-audio.mjs <오디오폴더>
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
-import { dirname, extname, join } from 'node:path';
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { basename, dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -70,7 +70,8 @@ const AUDIO_EXT = new Set(['.mp3', '.wav', '.m4a', '.flac', '.aiff', '.aif', '.o
  * 파일명 꼬리의 버전 표기. 같은 곡의 마스터가 여러 개 있을 수 있어(리마스터를 올린 곡이 있다)
  * 표기를 떼고 같은 곡으로 묶은 뒤, 어느 파일을 쓸지는 길이로 고른다.
  */
-const VERSION_TAG = /[\s_-]*[([{]?\s*(remaster(ed)?|리마스터|master(ing)?|마스터링|final|fin|v\d+|\d{1,2})\s*[)\]}]?$/gi;
+const VERSION_TAG =
+  /[\s_-]*[([{]?\s*(remaster(ed)?|리마스터|master(ing)?|마스터링|final|fin|vers?on\s*\d*|version\s*\d*|v\d+|\d{1,2})\s*[)\]}]?$/gi;
 
 const normalizeStem = (stem) => {
   let out = stem.trim();
@@ -82,6 +83,23 @@ const normalizeStem = (stem) => {
   } while (out !== previous && out.length > 0);
   return out || stem.trim();
 };
+
+/**
+ * 곡을 묶는 열쇠. 파일명과 사클 제목의 표기가 자주 다르다 —
+ * 파일은 `걸어.mp3`인데 사클 제목은 `걸어 (Walk Through Neon Rain)`이고, `low tide`와 `Low tide`처럼
+ * 대소문자만 다르기도 하다. 괄호 부제·버전 표기·공백·문장부호를 다 지우고 비교한다.
+ * 열쇠가 겹치는 곡이 있으면 길이로 가른다.
+ */
+const titleKey = (value) =>
+  normalizeStem(String(value).normalize('NFC'))
+    .replace(/[([{][^)\]}]*[)\]}]/g, '')
+    .toLowerCase()
+    .replace(/[\s_\-–—.,!?'"·]/g, '');
+
+/** 같은 곡의 파일이 여럿이고 길이도 같을 때의 우선순위. 리마스터를 올렸다는 게 사용자의 규칙이다. */
+const versionRank = (stem) => (/remaster|리마스터/i.test(stem) ? 2 : /v\d|verson|version|\d$/i.test(stem) ? 1 : 0);
+/** 이 차이 안이면 길이로는 못 가른다고 보고 위 우선순위로 넘긴다. */
+const DRIFT_TIE_MS = 150;
 
 /** 디코드는 곡당 1초쯤 걸린다. 후보를 고를 때는 길이만 빠르게 묻는다. */
 function probeDurationMs(file) {
@@ -375,25 +393,59 @@ if (!folder || !existsSync(folder)) {
 
 const tracks = parseTracks();
 const byTitle = new Map(tracks.map((track) => [track.title, track]));
-const files = readdirSync(folder).filter((name) => AUDIO_EXT.has(extname(name).toLowerCase()));
+/** 곡별 하위 폴더로 정리된 경우가 많다. 아래까지 훑는다(파일명만 매칭에 쓰므로 깊이는 상관없다). */
+function collectAudio(root, depth = 0) {
+  if (depth > 4) return [];
+  const out = [];
+  for (const entry of readdirSync(root)) {
+    if (entry.startsWith('.')) continue;
+    const full = join(root, entry);
+    if (statSync(full).isDirectory()) out.push(...collectAudio(full, depth + 1));
+    else if (AUDIO_EXT.has(extname(entry).toLowerCase())) out.push(full);
+  }
+  return out;
+}
+const files = collectAudio(folder);
 
 mkdirSync(OUT_DIR, { recursive: true });
 const skipped = [];
 const mismatched = [];
 
-const resolve = (stem) => byTitle.get(TITLE_ALIAS[stem] ?? stem) ?? byTitle.get(TITLE_ALIAS[normalizeStem(stem)] ?? normalizeStem(stem));
+// 열쇠 하나에 곡이 여럿일 수 있어 배열로 담는다.
+const byKey = new Map();
+for (const track of tracks) {
+  const key = titleKey(track.title);
+  if (!byKey.has(key)) byKey.set(key, []);
+  byKey.get(key).push(track);
+}
+
+const resolve = (stem, file) => {
+  const direct = byTitle.get(TITLE_ALIAS[stem] ?? stem);
+  if (direct) return direct;
+  const found = byKey.get(titleKey(TITLE_ALIAS[stem] ?? stem)) ?? [];
+  if (found.length <= 1) return found[0];
+  // 열쇠가 겹치면 길이가 가장 가까운 곡으로 붙인다.
+  let ms = Number.NaN;
+  try {
+    ms = probeDurationMs(file);
+  } catch {
+    return found[0];
+  }
+  return found.reduce((a, b) => (Math.abs(b.durationMs - ms) < Math.abs(a.durationMs - ms) ? b : a));
+};
 
 // 곡 하나에 파일이 여러 개일 수 있다(원본 + 리마스터). 곡별로 묶는다.
 const candidates = new Map();
-for (const name of files) {
+for (const full of files) {
+  const name = basename(full);
   const stem = name.slice(0, -extname(name).length);
-  const track = resolve(stem);
+  const track = resolve(stem, full);
   if (!track) {
     skipped.push(stem);
     continue;
   }
   if (!candidates.has(track.id)) candidates.set(track.id, { track, files: [] });
-  candidates.get(track.id).files.push(name);
+  candidates.get(track.id).files.push(full);
 }
 
 /**
@@ -404,7 +456,7 @@ function pickMaster(entry) {
   const measured = entry.files.map((name) => {
     let drift = Number.NaN;
     try {
-      drift = probeDurationMs(join(folder, name)) - entry.track.durationMs;
+      drift = probeDurationMs(name) - entry.track.durationMs;
     } catch {
       drift = Number.NaN;
     }
@@ -412,7 +464,12 @@ function pickMaster(entry) {
   });
   const usable = measured.filter((m) => Number.isFinite(m.drift));
   if (usable.length === 0) return { measured };
-  usable.sort((a, b) => Math.abs(a.drift) - Math.abs(b.drift));
+  // 길이로 먼저 고르고, 길이가 같으면(원본과 리마스터가 같은 길이인 경우가 흔하다) 리마스터를 집는다.
+  usable.sort((a, b) => {
+    const gap = Math.abs(a.drift) - Math.abs(b.drift);
+    if (Math.abs(gap) > DRIFT_TIE_MS) return gap;
+    return versionRank(basename(b.name)) - versionRank(basename(a.name)) || gap;
+  });
   return { measured, best: usable[0] };
 }
 
@@ -426,9 +483,9 @@ for (const entry of candidates.values()) {
   const name = best.name;
   const others = measured.length > 1 ? `  (후보 ${measured.length}개 중 길이가 맞는 것)` : '';
   try {
-    const { payload, report, mismatch } = analyze(join(folder, name), track);
+    const { payload, report, mismatch } = analyze(name, track);
     if (mismatch !== undefined) {
-      mismatched.push({ title: track.title, drift: mismatch, tried: measured.map((m) => m.name) });
+      mismatched.push({ title: track.title, drift: mismatch, tried: measured.map((m) => basename(m.name)) });
       // 낡은 신호가 남아 있으면 틀린 박에 계속 뛴다. 지운다.
       const stale = join(OUT_DIR, `${track.id}.json`);
       if (existsSync(stale)) unlinkSync(stale);
@@ -442,7 +499,7 @@ for (const entry of candidates.values()) {
         : `비트 없음(신뢰도 ${(report.confidence * 100).toFixed(0)}% < ${GRID_MIN_CONFIDENCE * 100}%)`;
     console.log(`✓ ${track.title} — ${report.frames}프레임 ${size}KB, 온셋 ${report.onsets}개, ${beat}${others}`);
   } catch (error) {
-    console.error(`✗ ${name}: ${error.message}`);
+    console.error(`✗ ${basename(name)}: ${error.message}`);
   }
 }
 
