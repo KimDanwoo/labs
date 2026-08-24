@@ -62,7 +62,7 @@ export function Header() {
         <nav className="hidden md:flex items-center space-x-1 flex-1" aria-label="메인 네비게이션">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             const showDueBadge = item.href === '/learn/flashcard' && dueCount > 0;
             return (
               <Link key={item.href} href={item.href}>
@@ -154,7 +154,7 @@ export function Header() {
               <nav className="flex flex-col gap-1 mt-8 px-2">
                 {navItems.map((item) => {
                   const Icon = item.icon;
-                  const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                  const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                   const showDueBadge = item.href === '/learn/flashcard' && dueCount > 0;
                   return (
                     <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>

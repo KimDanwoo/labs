@@ -14,7 +14,8 @@ const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_P
 const slugs = ['typescript', 'react', 'javascript'];
 for (const slug of slugs) {
   const { data: cat } = await sb.from('categories').select('id, title').eq('slug', slug).single();
-  const { data: qs } = await sb.from('questions')
+  const { data: qs } = await sb
+    .from('questions')
     .select('id, question, answer, difficulty, sub_category, order_num, tags')
     .eq('category_id', cat.id)
     .order('order_num');

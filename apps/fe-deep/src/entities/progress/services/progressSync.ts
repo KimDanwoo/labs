@@ -1,8 +1,8 @@
 'use client';
 
 import { createClient } from '@shared/config/supabase/client';
-import type { UserProgress } from '../model';
 import { getLocalProgress, saveLocalProgress } from '../api';
+import type { UserProgress } from '../model';
 
 // ============================================================
 // Supabase 동기화
@@ -25,7 +25,9 @@ function getClient() {
 /** 현재 로그인된 사용자 ID를 반환한다. 비로그인 시 null. 결과를 캐시한다. */
 export async function getCurrentUserId(): Promise<string | null> {
   if (cachedUserId !== undefined) return cachedUserId;
-  const { data: { user } } = await getClient().auth.getUser();
+  const {
+    data: { user },
+  } = await getClient().auth.getUser();
   cachedUserId = user?.id ?? null;
   return cachedUserId;
 }
@@ -47,10 +49,7 @@ export async function syncProgress(): Promise<void> {
   const localData = getLocalProgress();
 
   // Supabase에서 전체 진도 가져오기
-  const { data: remoteRows, error } = await supabase
-    .from('user_progress')
-    .select('*')
-    .eq('user_id', userId);
+  const { data: remoteRows, error } = await supabase.from('user_progress').select('*').eq('user_id', userId);
 
   if (error) {
     console.error('syncProgress fetch error:', error);
@@ -75,10 +74,7 @@ export async function syncProgress(): Promise<void> {
   }
 
   // 머지: 모든 question_id를 모아서 최신 데이터 채택
-  const allQuestionIds = new Set([
-    ...Object.keys(localData),
-    ...remoteMap.keys(),
-  ]);
+  const allQuestionIds = new Set([...Object.keys(localData), ...remoteMap.keys()]);
 
   const merged: Record<string, UserProgress> = {};
   const toUpsert: UserProgress[] = [];
@@ -145,9 +141,8 @@ export async function syncSingleCard(progress: UserProgress): Promise<void> {
   if (!userId) return;
 
   const supabase = getClient();
-  const { error } = await supabase
-    .from('user_progress')
-    .upsert({
+  const { error } = await supabase.from('user_progress').upsert(
+    {
       user_id: userId,
       question_id: progress.question_id,
       status: progress.status,
@@ -158,7 +153,9 @@ export async function syncSingleCard(progress: UserProgress): Promise<void> {
       interval: progress.interval,
       repetition: progress.repetition,
       next_review: progress.next_review,
-    }, { onConflict: 'user_id,question_id' });
+    },
+    { onConflict: 'user_id,question_id' },
+  );
 
   if (error) {
     console.error('syncSingleCard error:', error);

@@ -1,9 +1,19 @@
 'use client';
 
-import { Button, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, Sheet, SheetContent, SheetTitle } from '@shared/ui';
+import {
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Sheet,
+  SheetContent,
+  SheetTitle,
+} from '@shared/ui';
 import { MessageSquarePlus, Send } from 'lucide-react';
-import { useFeedbackForm } from '../model';
 import { FEEDBACK_TYPE_LABELS } from '../constants';
+import { useFeedbackForm } from '../model';
 import type { FeedbackType } from '../types';
 
 interface FeedbackFormProps {
@@ -39,9 +49,7 @@ export function FeedbackForm({ questionId, questionText, fixedType, label, class
 
           <div className="space-y-4">
             {questionText && (
-              <p className="text-xs text-muted-foreground line-clamp-2 p-3 rounded-lg bg-muted/50">
-                {questionText}
-              </p>
+              <p className="text-xs text-muted-foreground line-clamp-2 p-3 rounded-lg bg-muted/50">{questionText}</p>
             )}
 
             {!fixedType ? (
@@ -51,14 +59,14 @@ export function FeedbackForm({ questionId, questionText, fixedType, label, class
                 </SelectTrigger>
                 <SelectContent>
                   {Object.entries(FEEDBACK_TYPE_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                {FEEDBACK_TYPE_LABELS[fixedType]}
-              </p>
+              <p className="text-sm text-muted-foreground">{FEEDBACK_TYPE_LABELS[fixedType]}</p>
             )}
 
             <textarea
@@ -70,12 +78,8 @@ export function FeedbackForm({ questionId, questionText, fixedType, label, class
               autoFocus
             />
 
-            {status === 'success' && (
-              <p className="text-sm text-green-600">피드백이 제출되었습니다. 감사합니다!</p>
-            )}
-            {status === 'error' && (
-              <p className="text-sm text-error">{errorMsg}</p>
-            )}
+            {status === 'success' && <p className="text-sm text-green-600">피드백이 제출되었습니다. 감사합니다!</p>}
+            {status === 'error' && <p className="text-sm text-error">{errorMsg}</p>}
 
             <div className="flex justify-end gap-2">
               <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>

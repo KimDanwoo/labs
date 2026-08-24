@@ -2,13 +2,13 @@
 
 import { queryOptions } from '@tanstack/react-query';
 import {
-  getLocalProgress,
-  getProgressForQuestion,
-  getProgressByCategory,
-  getDueCardIds,
-  getDueCardCount,
-  getStudyHeatmap,
   getCurrentStreak,
+  getDueCardCount,
+  getDueCardIds,
+  getLocalProgress,
+  getProgressByCategory,
+  getProgressForQuestion,
+  getStudyHeatmap,
 } from '../api';
 
 /** Progress 도메인 조회 쿼리 (TanStack Query queryOptions) */

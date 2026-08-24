@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { Button } from '@shared/ui';
+import { useEffect, useRef } from 'react';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -11,13 +11,7 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
 }
 
-export function ConfirmDialog({
-  open,
-  title,
-  description,
-  confirmLabel = '확인',
-  onConfirm,
-}: ConfirmDialogProps) {
+export function ConfirmDialog({ open, title, description, confirmLabel = '확인', onConfirm }: ConfirmDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -38,9 +32,7 @@ export function ConfirmDialog({
     >
       <div className="p-6 space-y-4">
         <h2 className="text-lg font-semibold">{title}</h2>
-        {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="text-sm text-muted-foreground">{description}</p>}
         <div className="flex justify-end">
           <Button size="sm" onClick={onConfirm}>
             {confirmLabel}

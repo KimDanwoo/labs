@@ -1,1 +1,1 @@
-export { getBookmarks, toggleBookmark, isBookmarked } from './bookmarkApi';
+export { getBookmarks, isBookmarked, toggleBookmark } from './bookmarkApi';

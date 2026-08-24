@@ -1,15 +1,12 @@
-import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { getAllCategories } from '@entities/question/api';
+import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { Card } from '@shared/ui';
 
 export default async function AdminDashboardPage() {
   const supabase = await createServerSupabaseClient();
   const categories = await getAllCategories(supabase);
 
-  const totalQuestions = categories.reduce(
-    (sum, c) => sum + (c.question_count ?? 0),
-    0
-  );
+  const totalQuestions = categories.reduce((sum, c) => sum + (c.question_count ?? 0), 0);
 
   return (
     <div className="space-y-6">
@@ -18,9 +15,7 @@ export default async function AdminDashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <Card.Header className="pb-2">
-            <Card.Title className="text-sm font-medium text-muted-foreground">
-              전체 질문 수
-            </Card.Title>
+            <Card.Title className="text-sm font-medium text-muted-foreground">전체 질문 수</Card.Title>
           </Card.Header>
           <Card.Content>
             <p className="text-3xl font-bold">{totalQuestions}</p>
@@ -28,9 +23,7 @@ export default async function AdminDashboardPage() {
         </Card>
         <Card>
           <Card.Header className="pb-2">
-            <Card.Title className="text-sm font-medium text-muted-foreground">
-              카테고리 수
-            </Card.Title>
+            <Card.Title className="text-sm font-medium text-muted-foreground">카테고리 수</Card.Title>
           </Card.Header>
           <Card.Content>
             <p className="text-3xl font-bold">{categories.length}</p>
@@ -48,9 +41,7 @@ export default async function AdminDashboardPage() {
                   <span>{category.icon}</span>
                   {category.title}
                 </span>
-                <span className="text-sm font-semibold">
-                  {category.question_count ?? 0}개
-                </span>
+                <span className="text-sm font-semibold">{category.question_count ?? 0}개</span>
               </Card.Content>
             </Card>
           ))}

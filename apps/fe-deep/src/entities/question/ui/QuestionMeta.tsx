@@ -1,6 +1,6 @@
+import type { Difficulty } from '@entities/question/model';
 import { CheckCircle } from 'lucide-react';
 import { DifficultyBadge } from './DifficultyBadge';
-import type { Difficulty } from '@entities/question/model';
 
 interface QuestionMetaProps {
   difficulty: Difficulty;

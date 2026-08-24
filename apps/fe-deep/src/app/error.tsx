@@ -3,13 +3,7 @@
 import { Button } from '@shared/ui';
 import { RotateCcw } from 'lucide-react';
 
-export default function GlobalError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   console.error(error);
 
   return (

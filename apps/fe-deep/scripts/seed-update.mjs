@@ -75,9 +75,7 @@ try {
 
     const nextJs15Note = `\n\n> **Next.js 15 변경사항:** fetch()의 기본 캐싱 동작이 변경되었습니다.\n> - 이전(Next.js 14 이하): \`cache: 'force-cache'\` (기본적으로 캐시됨)\n> - 현재(Next.js 15+): \`cache: 'no-store'\` (기본적으로 캐시하지 않음)\n> - 캐싱을 원하면 \`cache: 'force-cache'\` 또는 \`next: { revalidate: N }\`을 명시적으로 설정해야 합니다.`;
 
-    const newAnswer = data.answer.includes('Next.js 15')
-      ? data.answer
-      : data.answer + nextJs15Note;
+    const newAnswer = data.answer.includes('Next.js 15') ? data.answer : data.answer + nextJs15Note;
 
     const { error: upErr } = await sbAdmin.from('questions').update({ answer: newAnswer }).eq('id', 'q-36');
     if (upErr) throw upErr;
@@ -100,9 +98,7 @@ try {
 
     const imgNote = `\n\n**대체 인라인 요소 (Replaced Inline Element)**\n\`<img>\`, \`<input>\`, \`<video>\` 등은 인라인 요소이지만 예외적으로 \`width\`·\`height\` 설정이 가능합니다. 외부 콘텐츠(이미지, 미디어)로 대체(replace)되는 특성 때문에 일반 인라인 요소와 달리 박스 크기를 가집니다.`;
 
-    const newAnswer = data.answer.includes('대체 인라인')
-      ? data.answer
-      : data.answer + imgNote;
+    const newAnswer = data.answer.includes('대체 인라인') ? data.answer : data.answer + imgNote;
 
     const { error: upErr } = await sbAdmin.from('questions').update({ answer: newAnswer }).eq('id', 'q-3');
     if (upErr) throw upErr;
@@ -121,12 +117,13 @@ try {
   // 카테고리 ID 매핑
   const { data: cats, error: catErr } = await sbAdmin.from('categories').select('id, slug').order('order_num');
   if (catErr) throw catErr;
-  const catMap = Object.fromEntries(cats.map(c => [c.slug, c.id]));
+  const catMap = Object.fromEntries(cats.map((c) => [c.slug, c.id]));
 
   // 각 카테고리의 현재 최대 order_num 조회
   const orderMap = {};
   for (const c of cats) {
-    const { data } = await sbAdmin.from('questions')
+    const { data } = await sbAdmin
+      .from('questions')
       .select('order_num')
       .eq('category_id', c.id)
       .order('order_num', { ascending: false })
@@ -141,8 +138,11 @@ try {
   const newQuestions = [
     // === HTML (q-77 ~ q-79) ===
     {
-      id: 'q-77', category_id: catMap['html'], difficulty: 'easy',
-      sub_category: '폼', order_num: nextOrder('html'),
+      id: 'q-77',
+      category_id: catMap['html'],
+      difficulty: 'easy',
+      sub_category: '폼',
+      order_num: nextOrder('html'),
       question: 'HTML 폼 유효성 검사(Form Validation) 방법은?',
       tags: ['html', 'form', 'validation'],
       answer: `HTML5는 별도의 JavaScript 없이도 폼 유효성 검사를 지원합니다.
@@ -168,11 +168,14 @@ input.setCustomValidity('메시지'); // 커스텀 오류 메시지
 input.reportValidity();          // 오류 메시지 표시
 \`\`\`
 
-HTML 네이티브 검사로 기본을 잡고, 복잡한 로직은 JavaScript로 보완하는 것이 일반적입니다.`
+HTML 네이티브 검사로 기본을 잡고, 복잡한 로직은 JavaScript로 보완하는 것이 일반적입니다.`,
     },
     {
-      id: 'q-78', category_id: catMap['html'], difficulty: 'medium',
-      sub_category: 'HTML5', order_num: nextOrder('html'),
+      id: 'q-78',
+      category_id: catMap['html'],
+      difficulty: 'medium',
+      sub_category: 'HTML5',
+      order_num: nextOrder('html'),
       question: 'data-* 속성의 용도와 사용법은?',
       tags: ['html', 'data-attribute', 'dataset'],
       answer: `\`data-*\` 속성은 HTML 요소에 사용자 정의 데이터를 저장하는 표준 방법입니다.
@@ -201,11 +204,14 @@ article::before { content: attr(data-author); }
 **주의사항:**
 - 민감한 데이터(비밀번호, 개인정보)는 저장하지 않아야 합니다 — 소스 보기로 노출됩니다.
 - 대량의 데이터 저장에는 적합하지 않으며, 간단한 메타데이터 전달에 사용합니다.
-- React에서는 \`data-testid\` 등 테스트 식별자로도 활용됩니다.`
+- React에서는 \`data-testid\` 등 테스트 식별자로도 활용됩니다.`,
     },
     {
-      id: 'q-79', category_id: catMap['html'], difficulty: 'medium',
-      sub_category: 'HTML5', order_num: nextOrder('html'),
+      id: 'q-79',
+      category_id: catMap['html'],
+      difficulty: 'medium',
+      sub_category: 'HTML5',
+      order_num: nextOrder('html'),
       question: '<dialog> 요소를 이용한 네이티브 모달 구현 방법은?',
       tags: ['html', 'dialog', 'modal'],
       answer: `\`<dialog>\`는 HTML5에서 제공하는 네이티브 대화 상자 요소입니다.
@@ -238,12 +244,15 @@ dialog::backdrop {
 - ESC 키 닫기 기본 지원
 - \`close\` 이벤트로 닫힘 감지 가능
 - 접근성(ARIA role=dialog) 내장
-- 별도 라이브러리 없이 모달 패턴 구현 가능`
+- 별도 라이브러리 없이 모달 패턴 구현 가능`,
     },
     // === CSS (q-80 ~ q-82) ===
     {
-      id: 'q-80', category_id: catMap['css'], difficulty: 'medium',
-      sub_category: 'CSS 변수', order_num: nextOrder('css'),
+      id: 'q-80',
+      category_id: catMap['css'],
+      difficulty: 'medium',
+      sub_category: 'CSS 변수',
+      order_num: nextOrder('css'),
       question: 'CSS Custom Properties(변수)란 무엇이고 어떻게 사용하나요?',
       tags: ['css', 'custom-properties', 'variables'],
       answer: `CSS Custom Properties(CSS 변수)는 재사용 가능한 값을 정의하는 기능입니다.
@@ -280,11 +289,14 @@ color: var(--undefined-var, #333); /* 변수가 없으면 #333 사용 */
 document.documentElement.style.setProperty('--primary-color', '#ef4444');
 \`\`\`
 
-**대표 활용 사례:** 다크모드 전환, 테마 시스템, 반응형 간격 조정 등.`
+**대표 활용 사례:** 다크모드 전환, 테마 시스템, 반응형 간격 조정 등.`,
     },
     {
-      id: 'q-81', category_id: catMap['css'], difficulty: 'medium',
-      sub_category: '레이아웃', order_num: nextOrder('css'),
+      id: 'q-81',
+      category_id: catMap['css'],
+      difficulty: 'medium',
+      sub_category: '레이아웃',
+      order_num: nextOrder('css'),
       question: 'z-index와 쌓임 맥락(Stacking Context)을 설명해주세요.',
       tags: ['css', 'z-index', 'stacking-context'],
       answer: `**z-index**는 요소의 쌓임 순서(z축 위치)를 지정하며, \`position\`이 \`static\`이 아닌 요소에서 동작합니다.
@@ -313,11 +325,14 @@ document.documentElement.style.setProperty('--primary-color', '#ef4444');
 **디버깅 팁:**
 - z-index가 안 먹힌다면 \`position\` 확인
 - 원하는 순서가 안 된다면 부모의 쌓임 맥락 확인
-- \`isolation: isolate\`로 의도적 맥락 분리 가능`
+- \`isolation: isolate\`로 의도적 맥락 분리 가능`,
     },
     {
-      id: 'q-82', category_id: catMap['css'], difficulty: 'medium',
-      sub_category: '애니메이션', order_num: nextOrder('css'),
+      id: 'q-82',
+      category_id: catMap['css'],
+      difficulty: 'medium',
+      sub_category: '애니메이션',
+      order_num: nextOrder('css'),
       question: 'CSS transition과 animation의 차이점은?',
       tags: ['css', 'transition', 'animation'],
       answer: `**transition** — 상태 변화를 부드럽게 전환:
@@ -357,12 +372,15 @@ document.documentElement.style.setProperty('--primary-color', '#ef4444');
 | 반복 | 불가 | 가능 (infinite) |
 | 복잡도 | 단순 전환 | 복잡한 시퀀스 |
 
-**성능 팁:** \`transform\`과 \`opacity\`만 애니메이션하면 GPU 가속으로 60fps 유지 가능합니다.`
+**성능 팁:** \`transform\`과 \`opacity\`만 애니메이션하면 GPU 가속으로 60fps 유지 가능합니다.`,
     },
     // === JavaScript (q-83 ~ q-85) ===
     {
-      id: 'q-83', category_id: catMap['javascript'], difficulty: 'medium',
-      sub_category: '객체', order_num: nextOrder('javascript'),
+      id: 'q-83',
+      category_id: catMap['javascript'],
+      difficulty: 'medium',
+      sub_category: '객체',
+      order_num: nextOrder('javascript'),
       question: '깊은 복사(Deep Copy)와 얕은 복사(Shallow Copy)의 차이점은?',
       tags: ['javascript', 'deep-copy', 'shallow-copy', 'object'],
       answer: `**얕은 복사(Shallow Copy):**
@@ -391,11 +409,14 @@ console.log(original.nested.b); // 2 — 독립!
 | \`JSON.parse(JSON.stringify())\` | 간단 | 함수·undefined·순환 참조 불가 |
 | lodash \`cloneDeep\` | 완벽 | 외부 라이브러리 의존 |
 
-**권장:** 브라우저·Node.js 모두 지원하는 \`structuredClone()\`을 기본으로 사용합니다.`
+**권장:** 브라우저·Node.js 모두 지원하는 \`structuredClone()\`을 기본으로 사용합니다.`,
     },
     {
-      id: 'q-84', category_id: catMap['javascript'], difficulty: 'medium',
-      sub_category: '모듈', order_num: nextOrder('javascript'),
+      id: 'q-84',
+      category_id: catMap['javascript'],
+      difficulty: 'medium',
+      sub_category: '모듈',
+      order_num: nextOrder('javascript'),
       question: 'ES Modules과 CommonJS의 차이점은?',
       tags: ['javascript', 'esm', 'commonjs', 'modules'],
       answer: `**CommonJS (CJS):**
@@ -429,11 +450,14 @@ import { add } from './math.js';
 | 순환 참조 | 부분 로딩 | 라이브 바인딩 |
 | 브라우저 | 불가 (번들러 필요) | 네이티브 지원 |
 
-**트렌드:** Node.js도 ESM을 기본으로 전환 중이며, 프론트엔드 빌드 도구(Vite 등)는 ESM 기반입니다.`
+**트렌드:** Node.js도 ESM을 기본으로 전환 중이며, 프론트엔드 빌드 도구(Vite 등)는 ESM 기반입니다.`,
     },
     {
-      id: 'q-85', category_id: catMap['javascript'], difficulty: 'medium',
-      sub_category: '메모리', order_num: nextOrder('javascript'),
+      id: 'q-85',
+      category_id: catMap['javascript'],
+      difficulty: 'medium',
+      sub_category: '메모리',
+      order_num: nextOrder('javascript'),
       question: 'WeakMap과 WeakSet은 무엇이고 언제 사용하나요?',
       tags: ['javascript', 'weakmap', 'weakset', 'memory'],
       answer: `**WeakMap**과 **WeakSet**은 키(WeakMap) 또는 값(WeakSet)이 **약한 참조(weak reference)**로 유지되어 가비지 컬렉션을 방해하지 않는 컬렉션입니다.
@@ -469,12 +493,15 @@ function track(node) {
 **주요 사용 사례:**
 - DOM 노드에 메타데이터 연결 (노드 제거 시 자동 정리)
 - 객체별 캐시 (메모리 누수 방지)
-- 순환 참조 탐지 (방문한 객체 추적)`
+- 순환 참조 탐지 (방문한 객체 추적)`,
     },
     // === TypeScript (q-86 ~ q-87) ===
     {
-      id: 'q-86', category_id: catMap['typescript'], difficulty: 'medium',
-      sub_category: '고급', order_num: nextOrder('typescript'),
+      id: 'q-86',
+      category_id: catMap['typescript'],
+      difficulty: 'medium',
+      sub_category: '고급',
+      order_num: nextOrder('typescript'),
       question: 'satisfies 연산자란 무엇이며 어떻게 활용하나요?',
       tags: ['typescript', 'satisfies', 'type-checking'],
       answer: `\`satisfies\`는 TypeScript 4.9에서 도입된 연산자로, 타입 호환성을 검증하면서도 **추론된 타입을 유지**합니다.
@@ -510,11 +537,14 @@ const routes = {
   about: { path: '/about', component: About },
 } satisfies Record<string, RouteConfig>;
 // routes.home.path는 '/'로 추론 (string이 아님)
-\`\`\``
+\`\`\``,
     },
     {
-      id: 'q-87', category_id: catMap['typescript'], difficulty: 'medium',
-      sub_category: '고급', order_num: nextOrder('typescript'),
+      id: 'q-87',
+      category_id: catMap['typescript'],
+      difficulty: 'medium',
+      sub_category: '고급',
+      order_num: nextOrder('typescript'),
       question: '템플릿 리터럴 타입(Template Literal Type)을 설명해주세요.',
       tags: ['typescript', 'template-literal', 'type-system'],
       answer: `템플릿 리터럴 타입은 문자열 리터럴 타입을 조합하여 새로운 문자열 타입을 생성합니다.
@@ -548,12 +578,15 @@ type Result = ExtractParam<'/:id'>; // 'id'
 
 **주의사항:**
 - 유니온 타입 조합 시 경우의 수가 급격히 증가할 수 있어 컴파일 성능에 주의합니다.
-- 너무 복잡한 템플릿 리터럴 타입은 가독성을 해칠 수 있으므로 적절한 수준에서 사용합니다.`
+- 너무 복잡한 템플릿 리터럴 타입은 가독성을 해칠 수 있으므로 적절한 수준에서 사용합니다.`,
     },
     // === React (q-88 ~ q-90) ===
     {
-      id: 'q-88', category_id: catMap['react'], difficulty: 'medium',
-      sub_category: 'Hooks', order_num: nextOrder('react'),
+      id: 'q-88',
+      category_id: catMap['react'],
+      difficulty: 'medium',
+      sub_category: 'Hooks',
+      order_num: nextOrder('react'),
       question: 'useRef의 다양한 용도와 사용법을 설명해주세요.',
       tags: ['react', 'useRef', 'hooks', 'dom'],
       answer: `\`useRef\`는 렌더링 간에 유지되지만 변경 시 리렌더를 일으키지 않는 값을 저장합니다.
@@ -596,11 +629,14 @@ useEffect(() => {
 | 값 접근 | \`.current\` | 직접 |
 | 용도 | DOM 참조, 변경 추적 | UI에 반영할 데이터 |
 
-**주의:** \`ref.current\` 변경은 렌더 결과에 반영되지 않으므로, 화면에 표시할 데이터는 \`useState\`를 사용해야 합니다.`
+**주의:** \`ref.current\` 변경은 렌더 결과에 반영되지 않으므로, 화면에 표시할 데이터는 \`useState\`를 사용해야 합니다.`,
     },
     {
-      id: 'q-89', category_id: catMap['react'], difficulty: 'easy',
-      sub_category: '핵심 개념', order_num: nextOrder('react'),
+      id: 'q-89',
+      category_id: catMap['react'],
+      difficulty: 'easy',
+      sub_category: '핵심 개념',
+      order_num: nextOrder('react'),
       question: 'Controlled Component와 Uncontrolled Component의 차이점은?',
       tags: ['react', 'controlled', 'uncontrolled', 'form'],
       answer: `**Controlled Component:**
@@ -635,11 +671,14 @@ function Form() {
 | 초기값 | \`value\` | \`defaultValue\` |
 | 사용 시기 | 대부분의 폼 | 파일 입력, 간단한 폼 |
 
-**권장:** React 공식 문서는 대부분의 경우 Controlled Component를 권장합니다.`
+**권장:** React 공식 문서는 대부분의 경우 Controlled Component를 권장합니다.`,
     },
     {
-      id: 'q-90', category_id: catMap['react'], difficulty: 'medium',
-      sub_category: '에러 처리', order_num: nextOrder('react'),
+      id: 'q-90',
+      category_id: catMap['react'],
+      difficulty: 'medium',
+      sub_category: '에러 처리',
+      order_num: nextOrder('react'),
       question: 'React의 Error Boundary와 Suspense를 설명해주세요.',
       tags: ['react', 'error-boundary', 'suspense'],
       answer: `**Error Boundary:**
@@ -687,12 +726,15 @@ const LazyPage = React.lazy(() => import('./HeavyPage'));
 | 구현 | 클래스 컴포넌트 | 내장 컴포넌트 |
 | 폴백 | 에러 UI | 로딩 UI |
 
-**주의:** Error Boundary는 이벤트 핸들러, 비동기 코드(setTimeout 등)의 에러는 잡지 못합니다.`
+**주의:** Error Boundary는 이벤트 핸들러, 비동기 코드(setTimeout 등)의 에러는 잡지 못합니다.`,
     },
     // === Next.js (q-91 ~ q-92) ===
     {
-      id: 'q-91', category_id: catMap['nextjs'], difficulty: 'hard',
-      sub_category: 'App Router', order_num: nextOrder('nextjs'),
+      id: 'q-91',
+      category_id: catMap['nextjs'],
+      difficulty: 'hard',
+      sub_category: 'App Router',
+      order_num: nextOrder('nextjs'),
       question: 'Parallel Routes와 Intercepting Routes를 설명해주세요.',
       tags: ['nextjs', 'parallel-routes', 'intercepting-routes', 'app-router'],
       answer: `**Parallel Routes (@슬롯):**
@@ -736,11 +778,14 @@ app/
 \`\`\`
 - \`(.)\`: 같은 레벨, \`(..)\`: 한 레벨 위, \`(...)\`: 루트에서
 - 모달 패턴 구현: 소프트 네비게이션 시 모달, 직접 URL 접근 시 전체 페이지
-- Instagram 스타일 피드 → 사진 모달이 대표 사례`
+- Instagram 스타일 피드 → 사진 모달이 대표 사례`,
     },
     {
-      id: 'q-92', category_id: catMap['nextjs'], difficulty: 'medium',
-      sub_category: '렌더링', order_num: nextOrder('nextjs'),
+      id: 'q-92',
+      category_id: catMap['nextjs'],
+      difficulty: 'medium',
+      sub_category: '렌더링',
+      order_num: nextOrder('nextjs'),
       question: 'Streaming SSR과 React Suspense의 관계를 설명해주세요.',
       tags: ['nextjs', 'streaming', 'ssr', 'suspense'],
       answer: `**Streaming SSR**은 HTML을 한 번에 보내지 않고 준비된 부분부터 점진적으로 전송하는 기법입니다. React 18의 \`Suspense\`가 이를 가능하게 합니다.
@@ -776,12 +821,15 @@ export default function Page() {
 **장점:**
 - TTFB / FCP 크게 개선
 - 느린 API 하나가 전체 페이지를 블록하지 않음
-- Next.js App Router에서는 \`loading.tsx\`가 자동으로 Suspense 경계 생성`
+- Next.js App Router에서는 \`loading.tsx\`가 자동으로 Suspense 경계 생성`,
     },
     // === 브라우저 (q-93 ~ q-94) ===
     {
-      id: 'q-93', category_id: catMap['browser'], difficulty: 'medium',
-      sub_category: 'API', order_num: nextOrder('browser'),
+      id: 'q-93',
+      category_id: catMap['browser'],
+      difficulty: 'medium',
+      sub_category: 'API',
+      order_num: nextOrder('browser'),
       question: 'Intersection Observer API란 무엇이고 어떻게 사용하나요?',
       tags: ['browser', 'intersection-observer', 'lazy-loading', 'infinite-scroll'],
       answer: `**Intersection Observer API**는 대상 요소가 뷰포트(또는 특정 조상 요소)와 교차하는지를 비동기적으로 감시합니다.
@@ -820,11 +868,14 @@ if (entry.isIntersecting) {
 **scroll 이벤트 대비 장점:**
 - 메인 스레드를 블록하지 않음 (비동기)
 - \`getBoundingClientRect()\` 호출 불필요
-- 브라우저가 최적화 (reflow 최소화)`
+- 브라우저가 최적화 (reflow 최소화)`,
     },
     {
-      id: 'q-94', category_id: catMap['browser'], difficulty: 'hard',
-      sub_category: '동작 원리', order_num: nextOrder('browser'),
+      id: 'q-94',
+      category_id: catMap['browser'],
+      difficulty: 'hard',
+      sub_category: '동작 원리',
+      order_num: nextOrder('browser'),
       question: 'Service Worker와 PWA(Progressive Web App)를 설명해주세요.',
       tags: ['browser', 'service-worker', 'pwa', 'offline'],
       answer: `**Service Worker:**
@@ -862,12 +913,15 @@ self.addEventListener('fetch', (e) => {
 **제한사항:**
 - DOM 접근 불가 (별도 스레드)
 - HTTPS 필수 (localhost 제외)
-- iOS Safari에서 일부 기능 제한`
+- iOS Safari에서 일부 기능 제한`,
     },
     // === 네트워크 (q-95 ~ q-96) ===
     {
-      id: 'q-95', category_id: catMap['network'], difficulty: 'medium',
-      sub_category: 'HTTP', order_num: nextOrder('network'),
+      id: 'q-95',
+      category_id: catMap['network'],
+      difficulty: 'medium',
+      sub_category: 'HTTP',
+      order_num: nextOrder('network'),
       question: 'HTTP/1.1, HTTP/2, HTTP/3의 차이점은 무엇인가요?',
       tags: ['network', 'http', 'http2', 'http3', 'protocol'],
       answer: `**HTTP/1.1 (1997):**
@@ -892,11 +946,14 @@ self.addEventListener('fetch', (e) => {
 
 **프론트엔드 영향:**
 - HTTP/2+ 환경에서는 도메인 샤딩, 스프라이트 이미지 등 기존 최적화가 불필요
-- HTTP/3는 모바일 환경에서 큰 성능 이점`
+- HTTP/3는 모바일 환경에서 큰 성능 이점`,
     },
     {
-      id: 'q-96', category_id: catMap['network'], difficulty: 'medium',
-      sub_category: 'API', order_num: nextOrder('network'),
+      id: 'q-96',
+      category_id: catMap['network'],
+      difficulty: 'medium',
+      sub_category: 'API',
+      order_num: nextOrder('network'),
       question: 'GraphQL과 REST의 차이점을 설명해주세요.',
       tags: ['network', 'graphql', 'rest', 'api'],
       answer: `**REST:**
@@ -927,12 +984,15 @@ query {
 | 학습 곡선 | 낮음 | 높음 |
 
 **GraphQL의 장점:** 복잡한 관계형 데이터, 다양한 클라이언트(웹/모바일)가 같은 API 사용 시
-**REST의 장점:** 단순 CRUD, HTTP 캐싱 활용, 파일 업로드, 팀 러닝 커브 고려 시`
+**REST의 장점:** 단순 CRUD, HTTP 캐싱 활용, 파일 업로드, 팀 러닝 커브 고려 시`,
     },
     // === 성능 최적화 (q-97 ~ q-99) ===
     {
-      id: 'q-97', category_id: catMap['performance'], difficulty: 'medium',
-      sub_category: '최적화', order_num: nextOrder('performance'),
+      id: 'q-97',
+      category_id: catMap['performance'],
+      difficulty: 'medium',
+      sub_category: '최적화',
+      order_num: nextOrder('performance'),
       question: 'Tree Shaking이란 무엇인가요?',
       tags: ['performance', 'tree-shaking', 'bundler', 'webpack'],
       answer: `**Tree Shaking**은 번들러가 사용되지 않는 코드(dead code)를 최종 번들에서 제거하는 최적화 기법입니다.
@@ -963,11 +1023,14 @@ used();
 - \`package.json\`의 \`"sideEffects": false\`로 사이드 이펙트 없음 명시
 - 배럴 파일(\`index.ts\`) 사용 시 주의 — 전체 모듈이 포함될 수 있음
 - named export 사용 (default export보다 Tree Shaking 친화적)
-- lodash → \`lodash-es\`처럼 ESM 버전 사용`
+- lodash → \`lodash-es\`처럼 ESM 버전 사용`,
     },
     {
-      id: 'q-98', category_id: catMap['performance'], difficulty: 'medium',
-      sub_category: '최적화', order_num: nextOrder('performance'),
+      id: 'q-98',
+      category_id: catMap['performance'],
+      difficulty: 'medium',
+      sub_category: '최적화',
+      order_num: nextOrder('performance'),
       question: '리스트 가상화(Virtualization/Windowing)를 설명해주세요.',
       tags: ['performance', 'virtualization', 'windowing', 'list'],
       answer: `**리스트 가상화**는 화면에 보이는 항목만 렌더링하고 나머지는 DOM에서 제거하는 기법입니다.
@@ -996,11 +1059,14 @@ used();
 **고려사항:**
 - 고정 높이 vs 가변 높이 항목
 - 검색 엔진은 가상화된 항목을 크롤링하지 못함 → SEO 중요 시 SSR 초기 렌더 병행
-- 키보드 네비게이션, 접근성 지원 확인 필요`
+- 키보드 네비게이션, 접근성 지원 확인 필요`,
     },
     {
-      id: 'q-99', category_id: catMap['performance'], difficulty: 'easy',
-      sub_category: '최적화', order_num: nextOrder('performance'),
+      id: 'q-99',
+      category_id: catMap['performance'],
+      difficulty: 'easy',
+      sub_category: '최적화',
+      order_num: nextOrder('performance'),
       question: 'preload, prefetch, preconnect의 차이점은?',
       tags: ['performance', 'preload', 'prefetch', 'preconnect', 'resource-hints'],
       answer: `브라우저에게 리소스 로딩 우선순위를 알려주는 리소스 힌트입니다.
@@ -1035,12 +1101,15 @@ used();
 |---|---|---|---|
 | preload | 현재 | 높음 | 필수 리소스 조기 로딩 |
 | prefetch | 미래 | 낮음 | 다음 내비게이션 준비 |
-| preconnect | 현재 | 중간 | 외부 도메인 연결 준비 |`
+| preconnect | 현재 | 중간 | 외부 도메인 연결 준비 |`,
     },
     // === 보안 (q-100 ~ q-101) ===
     {
-      id: 'q-100', category_id: catMap['security'], difficulty: 'hard',
-      sub_category: '보안 정책', order_num: nextOrder('security'),
+      id: 'q-100',
+      category_id: catMap['security'],
+      difficulty: 'hard',
+      sub_category: '보안 정책',
+      order_num: nextOrder('security'),
       question: 'Content Security Policy(CSP)를 심층적으로 설명해주세요.',
       tags: ['security', 'csp', 'xss', 'policy'],
       answer: `**CSP(Content Security Policy)**는 XSS, 데이터 삽입 등의 공격을 방지하기 위한 보안 정책입니다. 브라우저에게 허용된 리소스 출처를 명시합니다.
@@ -1076,11 +1145,14 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.examp
 \`next.config.js\`의 headers 설정이나 미들웨어에서 nonce 기반 CSP를 구성합니다.
 
 **Report-Only 모드:**
-\`Content-Security-Policy-Report-Only\` 헤더로 차단 없이 위반 사항만 보고하여 정책을 테스트할 수 있습니다.`
+\`Content-Security-Policy-Report-Only\` 헤더로 차단 없이 위반 사항만 보고하여 정책을 테스트할 수 있습니다.`,
     },
     {
-      id: 'q-101', category_id: catMap['security'], difficulty: 'medium',
-      sub_category: '무결성', order_num: nextOrder('security'),
+      id: 'q-101',
+      category_id: catMap['security'],
+      difficulty: 'medium',
+      sub_category: '무결성',
+      order_num: nextOrder('security'),
       question: 'Subresource Integrity(SRI)란 무엇인가요?',
       tags: ['security', 'sri', 'integrity', 'cdn'],
       answer: `**SRI(Subresource Integrity)**는 CDN 등 외부에서 로드하는 리소스가 변조되지 않았음을 검증하는 보안 기능입니다.
@@ -1120,12 +1192,15 @@ shasum -b -a 384 lib.js | awk '{print $1}' | xxd -r -p | base64
 
 **주의사항:**
 - CDN 리소스 업데이트 시 해시도 함께 갱신해야 합니다.
-- \`crossorigin="anonymous"\` 속성이 필요합니다.`
+- \`crossorigin="anonymous"\` 속성이 필요합니다.`,
     },
     // === 자료구조 (q-102 ~ q-103) ===
     {
-      id: 'q-102', category_id: catMap['data-structure'], difficulty: 'medium',
-      sub_category: '해시', order_num: nextOrder('data-structure'),
+      id: 'q-102',
+      category_id: catMap['data-structure'],
+      difficulty: 'medium',
+      sub_category: '해시',
+      order_num: nextOrder('data-structure'),
       question: '해시 테이블(Hash Table)의 원리와 충돌 해결 방법은?',
       tags: ['data-structure', 'hash-table', 'collision'],
       answer: `**해시 테이블**은 키(key)를 해시 함수로 변환하여 값(value)을 저장·조회하는 자료구조입니다. 평균 O(1) 시간 복잡도로 접근합니다.
@@ -1162,11 +1237,14 @@ bucket[3] = [["name", "Kim"], ["age", 30]] // 같은 인덱스에 여러 항목
 const map = new Map();
 map.set({ id: 1 }, 'value'); // 객체도 키로 사용 가능
 map.size; // 1
-\`\`\``
+\`\`\``,
     },
     {
-      id: 'q-103', category_id: catMap['data-structure'], difficulty: 'medium',
-      sub_category: '연결 리스트', order_num: nextOrder('data-structure'),
+      id: 'q-103',
+      category_id: catMap['data-structure'],
+      difficulty: 'medium',
+      sub_category: '연결 리스트',
+      order_num: nextOrder('data-structure'),
       question: '연결 리스트(Linked List)를 JavaScript로 구현해주세요.',
       tags: ['data-structure', 'linked-list', 'implementation'],
       answer: `**연결 리스트**는 각 노드가 데이터와 다음 노드 포인터를 가지는 선형 자료구조입니다.
@@ -1230,12 +1308,15 @@ class LinkedList {
 | 인덱스 접근 | O(1) | O(n) |
 | 앞에 삽입 | O(n) | O(1) |
 | 중간 삽입 | O(n) | O(1) (노드 알 때) |
-| 메모리 | 연속 | 비연속 (포인터 추가) |`
+| 메모리 | 연속 | 비연속 (포인터 추가) |`,
     },
     // === 알고리즘 (q-104 ~ q-105) ===
     {
-      id: 'q-104', category_id: catMap['algorithm'], difficulty: 'medium',
-      sub_category: 'DP', order_num: nextOrder('algorithm'),
+      id: 'q-104',
+      category_id: catMap['algorithm'],
+      difficulty: 'medium',
+      sub_category: 'DP',
+      order_num: nextOrder('algorithm'),
       question: '동적 프로그래밍(Dynamic Programming)의 기초를 설명해주세요.',
       tags: ['algorithm', 'dynamic-programming', 'memoization'],
       answer: `**동적 프로그래밍(DP)**은 큰 문제를 작은 부분 문제로 나누고, 결과를 저장(memoization)하여 중복 계산을 피하는 기법입니다.
@@ -1275,11 +1356,14 @@ function fibTab(n) {
 | 장점 | 직관적 | 스택 오버플로 없음 |
 | 단점 | 콜 스택 제한 | 점화식 도출 필요 |
 
-**대표 DP 문제:** 배낭 문제, 최장 공통 부분 수열(LCS), 계단 오르기, 동전 교환`
+**대표 DP 문제:** 배낭 문제, 최장 공통 부분 수열(LCS), 계단 오르기, 동전 교환`,
     },
     {
-      id: 'q-105', category_id: catMap['algorithm'], difficulty: 'easy',
-      sub_category: '기법', order_num: nextOrder('algorithm'),
+      id: 'q-105',
+      category_id: catMap['algorithm'],
+      difficulty: 'easy',
+      sub_category: '기법',
+      order_num: nextOrder('algorithm'),
       question: '투 포인터(Two Pointer) 기법이란?',
       tags: ['algorithm', 'two-pointer', 'technique'],
       answer: `**투 포인터**는 배열에서 두 개의 포인터를 사용하여 조건을 만족하는 쌍이나 구간을 효율적으로 찾는 기법입니다.
@@ -1328,12 +1412,15 @@ function hasCycle(head) {
 }
 \`\`\`
 
-**핵심:** 브루트포스 O(n²)를 O(n)으로 줄이는 것이 목표입니다.`
+**핵심:** 브루트포스 O(n²)를 O(n)으로 줄이는 것이 목표입니다.`,
     },
     // === 디자인패턴 (q-106 ~ q-107) ===
     {
-      id: 'q-106', category_id: catMap['design-pattern'], difficulty: 'medium',
-      sub_category: '생성 패턴', order_num: nextOrder('design-pattern'),
+      id: 'q-106',
+      category_id: catMap['design-pattern'],
+      difficulty: 'medium',
+      sub_category: '생성 패턴',
+      order_num: nextOrder('design-pattern'),
       question: '팩토리 패턴(Factory Pattern)을 설명해주세요.',
       tags: ['design-pattern', 'factory', 'creational'],
       answer: `**팩토리 패턴**은 객체 생성 로직을 별도의 함수/클래스로 분리하여, 사용하는 쪽이 구체적인 생성 과정을 알 필요 없게 하는 생성 패턴입니다.
@@ -1380,11 +1467,14 @@ function createField(config: FieldConfig) {
 **장점:**
 - 생성 로직 중앙화 → 변경 시 한 곳만 수정
 - 사용하는 쪽의 코드가 단순해짐
-- 조건부 객체 생성을 깔끔하게 처리`
+- 조건부 객체 생성을 깔끔하게 처리`,
     },
     {
-      id: 'q-107', category_id: catMap['design-pattern'], difficulty: 'medium',
-      sub_category: '행위 패턴', order_num: nextOrder('design-pattern'),
+      id: 'q-107',
+      category_id: catMap['design-pattern'],
+      difficulty: 'medium',
+      sub_category: '행위 패턴',
+      order_num: nextOrder('design-pattern'),
       question: '전략 패턴(Strategy Pattern)과 프론트엔드 적용 사례는?',
       tags: ['design-pattern', 'strategy', 'behavioral'],
       answer: `**전략 패턴**은 알고리즘(전략)을 캡슐화하여 런타임에 교체할 수 있게 하는 행위 패턴입니다.
@@ -1438,12 +1528,15 @@ function calcPrice(price: number, type: keyof typeof discountStrategies) {
 3. **렌더링 전략:** 리스트/그리드/카드 뷰 전환
 4. **인증 전략:** OAuth/이메일/SSO 로그인 방식 전환
 
-**장점:** if-else/switch 분기 제거, 전략 추가가 기존 코드 변경 없이 가능 (개방-폐쇄 원칙)`
+**장점:** if-else/switch 분기 제거, 전략 추가가 기존 코드 변경 없이 가능 (개방-폐쇄 원칙)`,
     },
     // === Git (q-108 ~ q-109) ===
     {
-      id: 'q-108', category_id: catMap['git'], difficulty: 'medium',
-      sub_category: '명령어', order_num: nextOrder('git'),
+      id: 'q-108',
+      category_id: catMap['git'],
+      difficulty: 'medium',
+      sub_category: '명령어',
+      order_num: nextOrder('git'),
       question: 'git cherry-pick의 용도와 사용법은?',
       tags: ['git', 'cherry-pick', 'commit'],
       answer: `**git cherry-pick**은 다른 브랜치의 특정 커밋을 현재 브랜치에 복사(적용)하는 명령입니다.
@@ -1478,11 +1571,14 @@ git cherry-pick --abort     # cherry-pick 취소
 **주의사항:**
 - cherry-pick은 새로운 커밋을 생성합니다 (해시가 다름)
 - 같은 변경을 여러 브랜치에 cherry-pick하면 나중에 merge 시 충돌 가능
-- 의존성이 있는 커밋은 순서대로 cherry-pick해야 합니다`
+- 의존성이 있는 커밋은 순서대로 cherry-pick해야 합니다`,
     },
     {
-      id: 'q-109', category_id: catMap['git'], difficulty: 'medium',
-      sub_category: '도구', order_num: nextOrder('git'),
+      id: 'q-109',
+      category_id: catMap['git'],
+      difficulty: 'medium',
+      sub_category: '도구',
+      order_num: nextOrder('git'),
       question: 'Git Hooks와 Husky를 이용한 코드 품질 관리 방법은?',
       tags: ['git', 'hooks', 'husky', 'lint-staged'],
       answer: `**Git Hooks**는 Git 이벤트(commit, push 등) 발생 시 자동으로 실행되는 스크립트입니다.
@@ -1534,12 +1630,15 @@ export default { extends: ['@commitlint/config-conventional'] };
 npx --no -- commitlint --edit $1
 \`\`\`
 
-이 조합으로 커밋 시점에 자동으로 코드 품질과 커밋 규칙을 강제할 수 있습니다.`
+이 조합으로 커밋 시점에 자동으로 코드 품질과 커밋 규칙을 강제할 수 있습니다.`,
     },
     // === 테스트 (q-110 ~ q-111) ===
     {
-      id: 'q-110', category_id: catMap['testing'], difficulty: 'medium',
-      sub_category: '방법론', order_num: nextOrder('testing'),
+      id: 'q-110',
+      category_id: catMap['testing'],
+      difficulty: 'medium',
+      sub_category: '방법론',
+      order_num: nextOrder('testing'),
       question: 'TDD(테스트 주도 개발)의 원칙과 프론트엔드 적용법은?',
       tags: ['testing', 'tdd', 'methodology'],
       answer: `**TDD(Test-Driven Development)**는 테스트를 먼저 작성하고, 테스트를 통과하는 최소한의 코드를 구현한 뒤 리팩토링하는 개발 방법론입니다.
@@ -1580,11 +1679,14 @@ function formatPrice(price: number): string {
 **실천 팁:**
 - 작은 단위로 빠르게 사이클을 반복 (5~10분)
 - 한 번에 하나의 행동만 테스트
-- 구현 세부사항이 아닌 동작(behavior)을 테스트`
+- 구현 세부사항이 아닌 동작(behavior)을 테스트`,
     },
     {
-      id: 'q-111', category_id: catMap['testing'], difficulty: 'medium',
-      sub_category: '도구', order_num: nextOrder('testing'),
+      id: 'q-111',
+      category_id: catMap['testing'],
+      difficulty: 'medium',
+      sub_category: '도구',
+      order_num: nextOrder('testing'),
       question: 'MSW(Mock Service Worker)란 무엇이고 어떻게 사용하나요?',
       tags: ['testing', 'msw', 'mocking', 'api'],
       answer: `**MSW(Mock Service Worker)**는 Service Worker를 이용해 네트워크 요청을 가로채고 모의 응답을 반환하는 API 모킹 라이브러리입니다.
@@ -1633,12 +1735,15 @@ export const worker = setupWorker(...handlers);
 - 실제 \`fetch\`/\`axios\` 코드를 변경하지 않고 모킹
 - 테스트·개발·Storybook에서 동일한 핸들러 재사용
 - 요청/응답 형태가 실제 API와 동일하여 신뢰도 높음
-- 네트워크 수준 모킹으로 구현 세부사항에 의존하지 않음`
+- 네트워크 수준 모킹으로 구현 세부사항에 의존하지 않음`,
     },
     // === CS 기초 (q-112 ~ q-113) ===
     {
-      id: 'q-112', category_id: catMap['cs-fundamentals'], difficulty: 'medium',
-      sub_category: '메모리', order_num: nextOrder('cs-fundamentals'),
+      id: 'q-112',
+      category_id: catMap['cs-fundamentals'],
+      difficulty: 'medium',
+      sub_category: '메모리',
+      order_num: nextOrder('cs-fundamentals'),
       question: '콜 스택(Call Stack)과 힙(Heap) 메모리를 설명해주세요.',
       tags: ['cs', 'call-stack', 'heap', 'memory'],
       answer: `JavaScript 엔진의 메모리는 크게 **콜 스택**과 **힙**으로 나뉩니다.
@@ -1676,11 +1781,14 @@ const obj = { name: 'Kim' };
 | 관리 | 자동 (LIFO) | GC가 관리 |
 | 크기 | 제한적 | 상대적 큼 |
 
-**실무 관련:** 메모리 누수는 주로 힙에서 발생합니다 — 이벤트 리스너 미해제, 클로저의 의도치 않은 참조 유지 등.`
+**실무 관련:** 메모리 누수는 주로 힙에서 발생합니다 — 이벤트 리스너 미해제, 클로저의 의도치 않은 참조 유지 등.`,
     },
     {
-      id: 'q-113', category_id: catMap['cs-fundamentals'], difficulty: 'medium',
-      sub_category: '동시성', order_num: nextOrder('cs-fundamentals'),
+      id: 'q-113',
+      category_id: catMap['cs-fundamentals'],
+      difficulty: 'medium',
+      sub_category: '동시성',
+      order_num: nextOrder('cs-fundamentals'),
       question: '동시성(Concurrency)과 병렬성(Parallelism)의 차이점은?',
       tags: ['cs', 'concurrency', 'parallelism'],
       answer: `**동시성(Concurrency):**
@@ -1725,7 +1833,7 @@ worker.onmessage = (e) => console.log(e.data);
 | JS 예시 | async/await, Promise | Web Worker, Node Worker Threads |
 | 적합 | I/O 바운드 작업 | CPU 바운드 작업 |
 
-JavaScript는 싱글 스레드이므로 기본적으로 동시성 모델이며, 병렬성이 필요할 때 Web Worker를 활용합니다.`
+JavaScript는 싱글 스레드이므로 기본적으로 동시성 모델이며, 병렬성이 필요할 때 Web Worker를 활용합니다.`,
     },
   ];
 
@@ -1737,7 +1845,6 @@ JavaScript는 싱글 스레드이므로 기본적으로 동시성 모델이며, 
   if (insertErr) throw insertErr;
   console.log(`\n=== Part 2 완료: 새 질문 ${inserted.length}건 추가 ===`);
   console.log(`\n총 결과: 수정 ${count}건 + 추가 ${inserted.length}건`);
-
 } catch (err) {
   console.error('❌ Part 2 오류:', err.message);
   process.exit(1);

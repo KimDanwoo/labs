@@ -1,9 +1,18 @@
 'use client';
 
-import Link from 'next/link';
-import { Card, Badge, Button, MarkdownRenderer, Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@shared/ui';
-import { Bookmark, Trash2 } from 'lucide-react';
 import { DifficultyBadge } from '@entities/question/ui';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Badge,
+  Button,
+  Card,
+  MarkdownRenderer,
+} from '@shared/ui';
+import { Bookmark, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 import { useBookmarkedQuestions } from '../model';
 
 export function BookmarksPage() {
@@ -17,9 +26,7 @@ export function BookmarksPage() {
         </div>
         <h1 className="text-3xl font-bold tracking-tight">북마크</h1>
       </div>
-      <p className="text-muted-foreground mb-8">
-        북마크한 질문을 모아서 학습하세요. ({bookmarkedQuestions.length}개)
-      </p>
+      <p className="text-muted-foreground mb-8">북마크한 질문을 모아서 학습하세요. ({bookmarkedQuestions.length}개)</p>
 
       {bookmarkedQuestions.length > 0 ? (
         <Accordion type="multiple" className="space-y-2.5">
@@ -33,9 +40,7 @@ export function BookmarksPage() {
               >
                 <AccordionTrigger className="hover:no-underline py-4">
                   <div className="flex flex-col gap-1.5 text-left flex-1 mr-4">
-                    <span className="font-medium text-sm leading-relaxed">
-                      {question.question}
-                    </span>
+                    <span className="font-medium text-sm leading-relaxed">{question.question}</span>
                     <div className="flex items-center gap-2 flex-wrap">
                       {category && (
                         <Badge variant="outline" className="text-xs">
@@ -76,9 +81,7 @@ export function BookmarksPage() {
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <Bookmark className="h-8 w-8 text-muted-foreground/50" />
           </div>
-          <p className="text-muted-foreground">
-            아직 북마크한 질문이 없습니다.
-          </p>
+          <p className="text-muted-foreground">아직 북마크한 질문이 없습니다.</p>
           <Link href="/reference">
             <Button variant="link" className="mt-3">
               레퍼런스에서 질문 북마크하기 →

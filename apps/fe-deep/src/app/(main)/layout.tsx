@@ -1,10 +1,6 @@
-import { Header, Footer } from '@widgets/layout';
+import { Footer, Header } from '@widgets/layout';
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen min-w-[340px]">
       <a
@@ -14,7 +10,9 @@ export default function MainLayout({
         본문으로 건너뛰기
       </a>
       <Header />
-      <main id="main-content" className="flex-1">{children}</main>
+      <main id="main-content" className="flex-1">
+        {children}
+      </main>
       <Footer />
     </div>
   );

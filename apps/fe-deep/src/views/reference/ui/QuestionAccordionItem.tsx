@@ -1,8 +1,8 @@
 'use client';
 
-import { AccordionContent, AccordionItem, AccordionTrigger } from '@shared/ui';
-import { QuestionAnswer, QuestionMeta } from '@entities/question/ui';
 import type { Question } from '@entities/question';
+import { QuestionAnswer, QuestionMeta } from '@entities/question/ui';
+import { AccordionContent, AccordionItem, AccordionTrigger } from '@shared/ui';
 import { useQuestionActions } from '../model';
 import { QuestionActions } from './QuestionActions';
 
@@ -23,7 +23,11 @@ export function QuestionAccordionItem({ question, number }: QuestionAccordionIte
           </span>
           <div className="flex flex-col gap-1.5 min-w-0">
             <span className="font-medium text-sm leading-relaxed">{question.question}</span>
-            <QuestionMeta difficulty={question.difficulty} subCategory={question.sub_category} isMastered={isMastered} />
+            <QuestionMeta
+              difficulty={question.difficulty}
+              subCategory={question.sub_category}
+              isMastered={isMastered}
+            />
           </div>
         </div>
       </AccordionTrigger>

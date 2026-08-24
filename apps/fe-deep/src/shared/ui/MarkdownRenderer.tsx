@@ -2,8 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import type { Components } from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
+import remarkGfm from 'remark-gfm';
 
 const ReactMarkdown = dynamic(() => import('react-markdown'), {
   loading: () => <div className="animate-pulse h-20 bg-muted rounded" />,
@@ -32,11 +32,7 @@ const components: Components = {
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <div className="markdown-body">
-      <ReactMarkdown
-        remarkPlugins={remarkPlugins}
-        rehypePlugins={rehypePlugins}
-        components={components}
-      >
+      <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components}>
         {content}
       </ReactMarkdown>
     </div>

@@ -16,8 +16,8 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">제1조 (목적)</h2>
           <p>
-            본 약관은 프딥(이하 &quot;서비스&quot;)의 이용과 관련하여
-            서비스 제공자와 이용자 간의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.
+            본 약관은 프딥(이하 &quot;서비스&quot;)의 이용과 관련하여 서비스 제공자와 이용자 간의 권리, 의무 및 책임
+            사항을 규정함을 목적으로 합니다.
           </p>
         </section>
 
@@ -64,7 +64,8 @@ export default function TermsPage() {
           <ul className="list-disc pl-5 space-y-1">
             <li>회원은 언제든지 마이페이지에서 회원 탈퇴를 요청할 수 있습니다.</li>
             <li>탈퇴 시 회원의 개인정보 및 학습 데이터는 즉시 삭제되며 복구할 수 없습니다.</li>
-            <li>서비스 제공자는 다음의 경우 회원 자격을 제한할 수 있습니다:
+            <li>
+              서비스 제공자는 다음의 경우 회원 자격을 제한할 수 있습니다:
               <ul className="list-disc pl-5 space-y-1 mt-1">
                 <li>서비스 운영을 고의로 방해한 경우</li>
                 <li>타인의 정보를 도용한 경우</li>
@@ -95,8 +96,8 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">제9조 (분쟁 해결)</h2>
           <p>
-            서비스 이용과 관련하여 분쟁이 발생한 경우, 서비스 제공자와
-            이용자 간의 합의에 의해 해결하는 것을 원칙으로 합니다.
+            서비스 이용과 관련하여 분쟁이 발생한 경우, 서비스 제공자와 이용자 간의 합의에 의해 해결하는 것을 원칙으로
+            합니다.
           </p>
         </section>
       </div>

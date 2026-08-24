@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { createClient } from '@shared/config/supabase/client';
 import { Button, Card } from '@shared/ui';
+import { useState } from 'react';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -64,9 +64,13 @@ export default function LoginPage() {
             </p>
             <p className="text-xs text-center text-muted-foreground/70 leading-relaxed">
               로그인 시{' '}
-              <a href="/terms" className="underline hover:text-foreground transition-colors">이용약관</a>
-              {' '}및{' '}
-              <a href="/privacy" className="underline hover:text-foreground transition-colors">개인정보 처리방침</a>
+              <a href="/terms" className="underline hover:text-foreground transition-colors">
+                이용약관
+              </a>{' '}
+              및{' '}
+              <a href="/privacy" className="underline hover:text-foreground transition-colors">
+                개인정보 처리방침
+              </a>
               에 동의하는 것으로 간주합니다.
             </p>
           </Card.Content>

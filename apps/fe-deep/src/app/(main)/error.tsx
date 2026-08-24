@@ -1,16 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { Button } from '@shared/ui';
-import { RotateCcw, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RotateCcw } from 'lucide-react';
+import Link from 'next/link';
 
-export default function MainError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+export default function MainError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   console.error(error);
 
   return (
@@ -19,9 +13,7 @@ export default function MainError({
         <span className="text-2xl">!</span>
       </div>
       <h1 className="text-3xl font-bold tracking-tight mb-3">문제가 발생했습니다</h1>
-      <p className="text-muted-foreground mb-8 leading-relaxed">
-        페이지를 불러오는 중 오류가 발생했습니다.
-      </p>
+      <p className="text-muted-foreground mb-8 leading-relaxed">페이지를 불러오는 중 오류가 발생했습니다.</p>
       <div className="flex gap-3 justify-center">
         <Button onClick={reset} className="gap-2 shadow-md">
           <RotateCcw className="h-4 w-4" />
