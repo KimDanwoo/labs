@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 
-import { PROFILE_PARAGRAPHS } from '../model/constants/profileContent';
-import { isProfileLink } from '../model/types/profile';
+import { PROFILE_PARAGRAPHS } from '../model/constants';
+import { isProfileLink } from '../model/types';
 
 const LINK_CLASS =
   'font-medium text-primary underline-offset-4 hover:underline transition-colors duration-150 hover:text-primary-accent';
