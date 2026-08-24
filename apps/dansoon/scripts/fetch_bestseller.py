@@ -197,7 +197,7 @@ def _find_book_items(obj, depth=0) -> list:
 
 # ── 알라딘 API ──────────────────────────────────────────────
 def fetch_aladin_overall(limit: int = 20) -> list[dict]:
-    url = "http://www.aladin.co.kr/ttb/api/ItemList.aspx"
+    url = "https://www.aladin.co.kr/ttb/api/ItemList.aspx"
     params = {
         "ttbkey": ALADIN_TTB_KEY, "QueryType": "Bestseller",
         "MaxResults": limit, "start": 1, "SearchTarget": "Book",
@@ -237,7 +237,7 @@ def fetch_aladin_publisher(title: str, author: str) -> str:
     출판사는 알라딘 API에서만 온다(교보·YES24는 DOM 파싱, 리디는 SSR HTML 파싱이라 없다).
     타 서점 단독 진입 도서는 베스트셀러 목록 어디에도 없어 제목 검색으로 따로 찾는다.
     """
-    url = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx"
+    url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx"
     params = {
         "ttbkey": ALADIN_TTB_KEY, "Query": title, "QueryType": "Title",
         "MaxResults": 5, "start": 1, "SearchTarget": "Book",
@@ -266,7 +266,7 @@ def fetch_aladin_publisher(title: str, author: str) -> str:
 
 
 def fetch_aladin_genre(genre: dict, limit: int = 10) -> list[dict]:
-    url = "http://www.aladin.co.kr/ttb/api/ItemList.aspx"
+    url = "https://www.aladin.co.kr/ttb/api/ItemList.aspx"
     params = {
         "ttbkey": ALADIN_TTB_KEY, "QueryType": "Bestseller",
         "MaxResults": limit, "start": 1, "SearchTarget": "Book",
