@@ -59,6 +59,9 @@ const FULL_VOLUME = 100;
 const DRIFT_CORRECT_RATIO = 0.3;
 const DRIFT_SNAP_MS = 250;
 
+/** ready가 이 안에 안 오면 엔진이 막힌 것으로 본다 — w.soundcloud.com은 광고 차단기가 흔히 막는다. */
+const READY_TIMEOUT_MS = 10_000;
+
 /** 이어 듣기 기록. 자주 쓰면 낭비, 드물게 쓰면 마지막 몇 초를 잃는다. */
 const SAVE_INTERVAL_MS = 5000;
 /** 끝자락에서 나갔다면 이어 들을 게 없다 — 처음부터 틀어준다. */
@@ -216,6 +219,11 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     frame.src = widgetSrc(setUrl(tracks) ?? (first ? trackUrl(first) : ''));
     document.body.append(frame);
 
+    const readyTimer = setTimeout(
+      () => setEngineError('재생 엔진이 응답하지 않습니다. 광고 차단기가 soundcloud.com을 막고 있는지 확인해 주세요.'),
+      READY_TIMEOUT_MS,
+    );
+
     loadWidgetApi()
       .then((sc) => {
         if (disposed) return;
@@ -223,6 +231,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         widget.current = instance;
 
         instance.bind(EVENTS.ready, () => {
+          clearTimeout(readyTimer);
+          setEngineError(null);
           // 세트 URL이 실제로 먹혔는지 런타임에 확인한다. 곡 수는 위젯이 정하므로 일치를 요구하지 않는다.
           instance.getSounds((sounds) => {
             soundIds.current = readSoundIds(sounds);
@@ -258,6 +268,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
           // 어느 경로로 시작했든(토글·곡 전환·위젯 자체 전환) 여기서 볼륨을 되올린다.
           rampTo(instance, FULL_VOLUME);
           setIsPlaying(true);
+          // 소리가 났다 = 엔진은 살아 있다. 이전 곡의 에러 배너가 남지 않게 지운다.
+          setEngineError(null);
           if (holdsSet.current) {
             // 위젯이 스스로 다음 곡으로 넘어간 경우도 여기로 들어온다 — 목록 하이라이트를 여기서 맞춘다.
             instance.getCurrentSoundIndex((soundIndex) => {
@@ -299,11 +311,15 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
           advance.current();
         });
       })
-      .catch((error: Error) => setEngineError(error.message));
+      .catch((error: Error) => {
+        clearTimeout(readyTimer);
+        setEngineError(error.message);
+      });
 
     return () => {
       disposed = true;
       widget.current = null;
+      clearTimeout(readyTimer);
       if (fade.current !== null) clearInterval(fade.current);
       frame.remove();
     };
