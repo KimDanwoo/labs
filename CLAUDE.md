@@ -72,7 +72,7 @@ apps/<app>/
 
 **컴포넌트 인라인 선언 금지**: 뷰/위젯 파일에 컴포넌트를 인라인 정의하지 않는다. 모든 컴포넌트는 해당 slice의 `ui/` 하위 파일로 분리 후 `ui/index.ts`에서 export.
 
-**Import 세그먼트 규칙**: import 경로에 `ui`인지 `model`인지가 항상 드러나야 한다. **slice 루트(`@widgets/x`, `@entities/x`) 직접 import 금지.**
+**Import 세그먼트 규칙** (`fsd.config.mjs`의 `no-restricted-imports`로 **lint 강제**): import 경로에 `ui`인지 `model`인지가 항상 드러나야 한다. 세그먼트보다 깊이 파고들지 않는다 — `ui`는 `ui`까지, `model` 하위는 `model/<세그먼트>`까지. **slice 루트(`@widgets/x`, `@entities/x`) 직접 import 금지.** (`@shared/**`와 테스트 파일은 대상 아님)
 
 - ui 컴포넌트: `from '@widgets/project-grid/ui'`, `from '@entities/project/ui'`, `from '@ui/react'`
 - 메인 뷰(폴더 루트 파일): 파일명까지 — `from '@views/home/HomeView'`
