@@ -1,6 +1,6 @@
 import { boardSizeForStage, generatePuzzle, minLogicDepthForStage } from '@entities/stardoku/model/generator';
 import { StardokuPuzzle } from '@entities/stardoku/model/types';
-import type { PuzzleRequest, PuzzleResponse } from '@features/stardoku-game/model/services/puzzle.worker';
+import type { PuzzleRequest, PuzzleResponse } from './puzzle.worker';
 
 interface Pending {
   resolve: (puzzle: StardokuPuzzle) => void;

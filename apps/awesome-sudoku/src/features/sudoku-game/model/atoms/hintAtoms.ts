@@ -1,6 +1,6 @@
-import { buildGameResultState, resolveBoardState } from '@features/sudoku-game/model/helpers/gameResult';
 import { findEmptyCells, updateCellValue, updateSingleCell } from '@features/sudoku-game/model/utils';
 import { atom } from 'jotai';
+import { buildGameResultState, resolveBoardState } from '../helpers/gameResult';
 import {
   boardAtom,
   cagesAtom,

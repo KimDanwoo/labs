@@ -1,8 +1,7 @@
 'use client';
 
 import { CellProps } from '@entities/board/model/types';
-import { CellNotes } from '@entities/board/ui/CellNotes';
-import { CellValue } from '@entities/board/ui/CellValue';
+import { CellNotes, CellValue } from '@entities/board/ui';
 import { useCell } from '@features/sudoku-game/model/hooks';
 import { cn } from '@shared/model/utils';
 import { FC, memo } from 'react';

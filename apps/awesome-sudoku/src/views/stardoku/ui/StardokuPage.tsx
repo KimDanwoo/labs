@@ -4,7 +4,7 @@ import { UserProfileMenu } from '@features/auth/ui';
 import { useStageClearFlow, useSyncStardokuScore } from '@features/stardoku-game/model/hooks';
 import { StardokuControls, StardokuStatus } from '@features/stardoku-game/ui';
 import { GameModeSelector } from '@features/sudoku-game/ui';
-import { ThemeToggle } from '@features/theme/ui/ThemeToggle';
+import { ThemeToggle } from '@features/theme/ui';
 import { cn } from '@shared/model/utils';
 import { Snackbar } from '@shared/ui';
 import { StardokuBoard } from '@widgets/stardoku-board/ui';

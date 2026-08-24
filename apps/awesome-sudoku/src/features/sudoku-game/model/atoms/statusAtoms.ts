@@ -1,6 +1,6 @@
 import { NUMBER_COUNTS } from '@entities/board/model/constants';
-import { buildGameResultState, resolveBoardState } from '@features/sudoku-game/model/helpers/gameResult';
 import { atom } from 'jotai';
+import { buildGameResultState, resolveBoardState } from '../helpers/gameResult';
 import {
   boardAtom,
   cagesAtom,

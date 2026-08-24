@@ -8,18 +8,10 @@ import {
   violatingStarKeys,
   withMark,
 } from '@entities/stardoku/model/utils';
-import {
-  hintsRemainingAtom,
-  lastXTapAtom,
-  livesAtom,
-  marksAtom,
-  puzzleAtom,
-  scoreAtom,
-  stageAtom,
-} from '@features/stardoku-game/model/atoms/primitives';
-import { isClearedAtom, isGameOverAtom } from '@features/stardoku-game/model/atoms/statusAtoms';
-import { requestStagePuzzle } from '@features/stardoku-game/model/services/puzzleGenerator';
 import { Getter, Setter, atom } from 'jotai';
+import { requestStagePuzzle } from '../services/puzzleGenerator';
+import { hintsRemainingAtom, lastXTapAtom, livesAtom, marksAtom, puzzleAtom, scoreAtom, stageAtom } from './primitives';
+import { isClearedAtom, isGameOverAtom } from './statusAtoms';
 
 interface TapPayload extends CellPosition {
   /** 이벤트 timeStamp — 연속 탭(더블탭) 판정용 */
