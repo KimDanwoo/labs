@@ -1,22 +1,22 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import Image from 'next/image';
-import { useAtomValue } from 'jotai';
-import { CharacterSprite } from '@shared/ui';
+import { useFriendWander, useGameActions } from '@entities/game/model/hooks';
 import {
   characterIdAtom,
   characterPositionAtom,
-  poopsAtom,
-  levelAtom,
-  isSleepingAtom,
+  isDangerAtom,
   isDrowsyAtom,
   isSickAtom,
-  isDangerAtom,
-  roomTypeAtom,
+  isSleepingAtom,
+  levelAtom,
   meetingPlayFriendAtom,
+  poopsAtom,
+  roomTypeAtom,
 } from '@entities/game/model/store';
-import { useFriendWander, useGameActions } from '@entities/game/model/hooks';
+import { CharacterSprite } from '@shared/ui';
+import { useAtomValue } from 'jotai';
+import Image from 'next/image';
+import { useRef, useState } from 'react';
 import { ROOM_BACKGROUNDS } from '../constants';
 
 const JUMP_DURATION_MS = 450;
@@ -139,19 +139,13 @@ export default function Room() {
             direction={friendPos.direction}
             isMoving={friendPos.isMoving}
           />
-          <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-base heart-effect">
-            💕
-          </span>
+          <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-base heart-effect">💕</span>
         </div>
       )}
 
-      {isSleeping && (
-        <div className="absolute inset-0 bg-indigo-950/20 z-20 pointer-events-none" />
-      )}
+      {isSleeping && <div className="absolute inset-0 bg-indigo-950/20 z-20 pointer-events-none" />}
 
-      {isSick && !isSleeping && (
-        <div className="absolute inset-0 bg-green-900/10 z-20 pointer-events-none" />
-      )}
+      {isSick && !isSleeping && <div className="absolute inset-0 bg-green-900/10 z-20 pointer-events-none" />}
     </div>
   );
 }

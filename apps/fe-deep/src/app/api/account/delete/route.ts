@@ -1,10 +1,12 @@
-import { NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { createAdminSupabaseClient } from '@shared/config/supabase/admin';
+import { createServerSupabaseClient } from '@shared/config/supabase/server';
+import { NextResponse } from 'next/server';
 
 export async function DELETE() {
   const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: '인증되지 않은 요청입니다.' }, { status: 401 });

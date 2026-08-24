@@ -336,10 +336,7 @@ function shuffleOptions(scene: ConversationScene): ConversationScene {
   };
 }
 
-export function pickScenesForCharacter(
-  characterId: CharacterId,
-  count: number,
-): ConversationScene[] {
+export function pickScenesForCharacter(characterId: CharacterId, count: number): ConversationScene[] {
   const pool = SCENES_BY_CHARACTER[characterId] ?? [];
   return [...pool]
     .sort(() => Math.random() - 0.5)

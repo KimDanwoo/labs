@@ -1,10 +1,10 @@
 'use client';
 
-import { useAtomValue } from 'jotai';
+import { useGameActions } from '@entities/game/model/hooks';
+import { inventoryAtom } from '@entities/game/model/store';
 import { FOODS } from '@shared/constants';
 import { ModalShell } from '@shared/ui';
-import { inventoryAtom } from '@entities/game/model/store';
-import { useGameActions } from '@entities/game/model/hooks';
+import { useAtomValue } from 'jotai';
 
 const FOOD_LIST = Object.values(FOODS);
 
@@ -13,11 +13,7 @@ export default function FeedModal() {
   const { feed, closeModal } = useGameActions();
 
   return (
-    <ModalShell
-      variant="sheet"
-      onClose={closeModal}
-      className="p-5 sm:p-6 space-y-4"
-    >
+    <ModalShell variant="sheet" onClose={closeModal} className="p-5 sm:p-6 space-y-4">
       {(close) => (
         <>
           <div className="flex justify-between items-center">
@@ -39,15 +35,9 @@ export default function FeedModal() {
                 >
                   <span className="text-3xl">{food.emoji}</span>
                   <div className="text-left">
-                    <div className="text-sm font-bold text-gray-700">
-                      {food.name}
-                    </div>
-                    <div className="text-xs text-gray-400">
-                      +{food.hungerRestore} 배고픔
-                    </div>
-                    <div className="text-xs text-orange-400 font-bold">
-                      {count}개
-                    </div>
+                    <div className="text-sm font-bold text-gray-700">{food.name}</div>
+                    <div className="text-xs text-gray-400">+{food.hungerRestore} 배고픔</div>
+                    <div className="text-xs text-orange-400 font-bold">{count}개</div>
                   </div>
                 </button>
               );

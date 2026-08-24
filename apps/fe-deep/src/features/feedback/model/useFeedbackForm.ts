@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { createClient } from '@shared/config/supabase/client';
+import { useEffect, useState } from 'react';
 import { createFeedback } from '../actions';
 import type { FeedbackType, SubmitStatus } from '../types';
 
@@ -40,7 +40,10 @@ export function useFeedbackForm({ questionId, fixedType }: UseFeedbackFormOption
       await createFeedback({ type, content: content.trim(), questionId });
       setStatus('success');
       setContent('');
-      setTimeout(() => { setOpen(false); setStatus('idle'); }, 1500);
+      setTimeout(() => {
+        setOpen(false);
+        setStatus('idle');
+      }, 1500);
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : '제출에 실패했습니다.');
       setStatus('error');

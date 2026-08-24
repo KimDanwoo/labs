@@ -1,18 +1,18 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { Difficulty } from '../model';
 import {
   getAllCategories,
+  getAllQuestions,
   getCategoryBySlug,
+  getQuestionById,
   getQuestionsByCategory,
   getQuestionsByCategorySlug,
   getQuestionsByCategorySlugPaginated,
-  getQuestionById,
-  getQuestionsByIds,
-  getAllQuestions,
-  searchQuestions,
   getQuestionsByDifficulty,
+  getQuestionsByIds,
   getRandomQuestions,
+  searchQuestions,
 } from '../api';
+import type { Difficulty } from '../model';
 
 /** Question 도메인 조회 쿼리 (TanStack Query queryOptions) */
 export const questionQueries = {

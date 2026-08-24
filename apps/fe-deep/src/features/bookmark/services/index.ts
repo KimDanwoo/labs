@@ -1,2 +1,2 @@
-export { bookmarkQueries } from './bookmarkQueries';
 export { bookmarkMutations } from './bookmarkMutations';
+export { bookmarkQueries } from './bookmarkQueries';

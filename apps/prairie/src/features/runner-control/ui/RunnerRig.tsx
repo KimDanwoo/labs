@@ -7,9 +7,8 @@ import { setRideSpeed } from '@shared/r3f';
 import { useRef } from 'react';
 import { Group, MathUtils, Vector3 } from 'three';
 import { RUNNER_PHYSICS } from '../model/constants';
-import { usePointerLook } from '../model/hooks/usePointerLook';
-import { useRunnerControls } from '../model/hooks/useRunnerControls';
-import { getRunnerInput } from '../model/store/runnerInput';
+import { usePointerLook, useRunnerControls } from '../model/hooks';
+import { getRunnerInput } from '../model/store';
 
 const forwardVec = new Vector3();
 const camDirVec = new Vector3();

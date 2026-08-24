@@ -2,8 +2,8 @@
 
 import { getDueCardCount, syncProgress } from '@entities/progress';
 import { clearUserIdCache } from '@entities/progress/services';
-import { isAdmin } from '@features/auth';
 import { createClient } from '@shared/config/supabase/client';
+import { isAdmin } from '@shared/lib/isAdmin';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 

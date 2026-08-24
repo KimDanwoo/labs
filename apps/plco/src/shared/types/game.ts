@@ -1,8 +1,4 @@
-import {
-  GAME_STATUS,
-  MODAL_TYPE,
-  ROOM_TYPE,
-} from '@shared/constants/game';
+import { GAME_STATUS, MODAL_TYPE, ROOM_TYPE } from '@shared/constants/game';
 
 export type CharacterId = 'yeko' | 'ako' | 'bamko' | 'eunko' | 'hako';
 
@@ -47,9 +43,7 @@ export type LevelReward = {
 
 export type RoomType = (typeof ROOM_TYPE)[keyof typeof ROOM_TYPE];
 
-export type ModalType =
-  | (typeof MODAL_TYPE)[keyof typeof MODAL_TYPE]
-  | null;
+export type ModalType = (typeof MODAL_TYPE)[keyof typeof MODAL_TYPE] | null;
 
 export type GameStatus = (typeof GAME_STATUS)[keyof typeof GAME_STATUS];
 

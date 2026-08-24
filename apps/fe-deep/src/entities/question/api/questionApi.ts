@@ -1,8 +1,8 @@
 import { createClient } from '@shared/config/supabase/client';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { shuffleArray } from '@shared/lib/shuffle';
-import type { Category, Question, PaginatedResult, SearchResult, Difficulty, VisibilityFilter } from '../model';
 import { SUPABASE_ERROR_CODES } from '@shared/constants';
+import { shuffleArray } from '@shared/lib/shuffle';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Category, Difficulty, PaginatedResult, Question, SearchResult, VisibilityFilter } from '../model';
 
 // ============================================================
 // Supabase data access layer
@@ -63,7 +63,9 @@ export async function getQuestionsByCategory(categoryId: string, supabase?: Supa
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard')
+    .select(
+      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
+    )
     .eq('category_id', categoryId)
     .order('order_num');
 
@@ -88,7 +90,7 @@ export async function getQuestionsByCategorySlugPaginated(
   slug: string,
   page: number = 1,
   pageSize: number = 10,
-  supabase?: SupabaseClient
+  supabase?: SupabaseClient,
 ): Promise<PaginatedResult<Question>> {
   const client = getClient(supabase);
   const category = await getCategoryBySlug(slug, client);
@@ -99,7 +101,10 @@ export async function getQuestionsByCategorySlugPaginated(
 
   const { data, count, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard', { count: 'exact' })
+    .select(
+      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
+      { count: 'exact' },
+    )
     .eq('category_id', category.id)
     .order('order_num')
     .range(from, to);
@@ -124,7 +129,9 @@ export async function getQuestionById(id: string, supabase?: SupabaseClient): Pr
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard')
+    .select(
+      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
+    )
     .eq('id', id)
     .single();
 
@@ -142,7 +149,9 @@ export async function getQuestionsByIds(ids: string[], supabase?: SupabaseClient
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard')
+    .select(
+      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
+    )
     .in('id', ids);
 
   if (error) {
@@ -158,7 +167,9 @@ export async function getAllQuestions(supabase?: SupabaseClient): Promise<Questi
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard');
+    .select(
+      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
+    );
 
   if (error) {
     console.error('getAllQuestions error:', error);
@@ -179,10 +190,12 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
 
   const { data, error } = await client
     .from('questions')
-    .select(`
+    .select(
+      `
       id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard,
       categories(id, slug, title, order_num, icon, description)
-    `)
+    `,
+    )
     .or(`question.ilike.${pattern},answer.ilike.${pattern}`);
 
   if (error) {
@@ -229,7 +242,9 @@ export async function getQuestionsByDifficulty(difficulty: Difficulty, supabase?
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select('id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard')
+    .select(
+      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
+    )
     .eq('difficulty', difficulty);
 
   if (error) {
@@ -270,7 +285,9 @@ export async function getRandomQuestions(
   }
 
   // 2) Fisher-Yates shuffle → pick (균등 분포 보장)
-  const pickedIds = shuffleArray(idRows).slice(0, count).map((r) => r.id as string);
+  const pickedIds = shuffleArray(idRows)
+    .slice(0, count)
+    .map((r) => r.id as string);
 
   // 3) 벌크 조회
   return getQuestionsByIds(pickedIds, client);

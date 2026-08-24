@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { randomUUID } from 'node:crypto';
 import { ALL_CHARACTER_IDS } from '@shared/constants';
 import { getAdminSupabase, requireAdmin } from '@shared/lib/server/supabase-admin';
+import { NextResponse } from 'next/server';
+import { randomUUID } from 'node:crypto';
 
 const OUTCOMES = ['good', 'ok', 'awkward'];
 
@@ -30,13 +30,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '잘못된 요청입니다.' }, { status: 400 });
   }
 
-  const { id, character_id, category, prompt, options, is_active, sort_order } =
-    (body ?? {}) as Record<string, unknown>;
+  const { id, character_id, category, prompt, options, is_active, sort_order } = (body ?? {}) as Record<
+    string,
+    unknown
+  >;
 
-  if (
-    typeof character_id !== 'string' ||
-    !(ALL_CHARACTER_IDS as readonly string[]).includes(character_id)
-  ) {
+  if (typeof character_id !== 'string' || !(ALL_CHARACTER_IDS as readonly string[]).includes(character_id)) {
     return NextResponse.json({ error: '잘못된 캐릭터입니다.' }, { status: 400 });
   }
   if (typeof category !== 'string' || !category.trim()) {
@@ -57,17 +56,11 @@ export async function POST(req: Request) {
       typeof o.outcome !== 'string' ||
       !OUTCOMES.includes(o.outcome)
     ) {
-      return NextResponse.json(
-        { error: '선택지 형식이 올바르지 않습니다.' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: '선택지 형식이 올바르지 않습니다.' }, { status: 400 });
     }
   }
 
-  const rowId =
-    typeof id === 'string' && id
-      ? id
-      : `${character_id}-${randomUUID().slice(0, 8)}`;
+  const rowId = typeof id === 'string' && id ? id : `${character_id}-${randomUUID().slice(0, 8)}`;
 
   const { error } = await getAdminSupabase()
     .from('meeting_scenes')
@@ -96,10 +89,7 @@ export async function DELETE(req: Request) {
   if (!id) {
     return NextResponse.json({ error: 'id 가 필요합니다.' }, { status: 400 });
   }
-  const { error } = await getAdminSupabase()
-    .from('meeting_scenes')
-    .delete()
-    .eq('id', id);
+  const { error } = await getAdminSupabase().from('meeting_scenes').delete().eq('id', id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

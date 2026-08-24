@@ -2,7 +2,7 @@
 
 import { MAX_MISTAKES } from '@entities/game/model/constants';
 import { userAtom } from '@features/auth/model/atoms';
-import { GoogleSignInButton } from '@features/auth/ui/GoogleSignInButton';
+import { GoogleSignInButton } from '@features/auth/ui';
 import { useSaveGameRecord } from '@features/game-record/model/hooks';
 import { currentTimeAtom, isCompletedAtom, isSuccessAtom, mistakeCountAtom } from '@features/sudoku-game/model/atoms';
 import { formatTime } from '@features/sudoku-game/model/utils';

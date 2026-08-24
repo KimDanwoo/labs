@@ -5,7 +5,7 @@ import { useGameStats } from '@features/game-stats/model/hooks';
 import { StatsByDifficulty, StatsOverview } from '@features/game-stats/ui';
 import { useProfile } from '@features/profile/model/hooks';
 import { ProfileCard, RecentGames } from '@features/profile/ui';
-import { ThemeToggle } from '@features/theme/ui/ThemeToggle';
+import { ThemeToggle } from '@features/theme/ui';
 import { SubpageHeader } from '@shared/ui';
 import { useAtomValue } from 'jotai';
 import { useRouter } from 'next/navigation';

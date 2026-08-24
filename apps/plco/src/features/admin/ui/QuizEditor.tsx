@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { ALL_CHARACTER_IDS, CHARACTERS } from '@shared/constants';
 import { useDeleteQuiz, useSaveQuiz } from '@features/admin/model/hooks';
 import type { QuizRow } from '@features/admin/model/types';
+import { ALL_CHARACTER_IDS, CHARACTERS } from '@shared/constants';
+import { useState } from 'react';
 
 type QuizEditorProps = {
   row: QuizRow;
@@ -15,8 +15,7 @@ export default function QuizEditor({ row, onDone }: QuizEditorProps) {
   const saveMutation = useSaveQuiz();
   const deleteMutation = useDeleteQuiz();
   const isNew = !row.id;
-  const errorMessage =
-    saveMutation.error?.message ?? deleteMutation.error?.message ?? null;
+  const errorMessage = saveMutation.error?.message ?? deleteMutation.error?.message ?? null;
 
   const update = (patch: Partial<QuizRow>) => {
     setForm((prev) => ({ ...prev, ...patch }));
@@ -29,12 +28,8 @@ export default function QuizEditor({ row, onDone }: QuizEditorProps) {
 
   const removeOption = (index: number) => {
     const options = form.options.filter((_, i) => i !== index);
-    const correct_index =
-      form.correct_index === index
-        ? 0
-        : form.correct_index > index
-          ? form.correct_index - 1
-          : form.correct_index;
+    const shifted = form.correct_index > index ? form.correct_index - 1 : form.correct_index;
+    const correct_index = form.correct_index === index ? 0 : shifted;
     update({ options, correct_index });
   };
 
@@ -63,11 +58,7 @@ export default function QuizEditor({ row, onDone }: QuizEditorProps) {
           ))}
         </select>
         <label className="flex items-center gap-1 text-[11px] text-muted ml-auto">
-          <input
-            type="checkbox"
-            checked={form.is_active}
-            onChange={(e) => update({ is_active: e.target.checked })}
-          />
+          <input type="checkbox" checked={form.is_active} onChange={(e) => update({ is_active: e.target.checked })} />
           활성
         </label>
       </div>
@@ -97,18 +88,12 @@ export default function QuizEditor({ row, onDone }: QuizEditorProps) {
               placeholder={`보기 ${i + 1}`}
               className="w-full px-2 py-1.5 rounded-md bg-input-bg border border-card-border text-xs text-foreground outline-none focus:border-gold"
             />
-            <button
-              onClick={() => removeOption(i)}
-              className="text-[11px] text-red btn-press shrink-0"
-            >
+            <button onClick={() => removeOption(i)} className="text-[11px] text-red btn-press shrink-0">
               삭제
             </button>
           </div>
         ))}
-        <button
-          onClick={addOption}
-          className="text-[11px] text-muted hover:text-foreground btn-press"
-        >
+        <button onClick={addOption} className="text-[11px] text-muted hover:text-foreground btn-press">
           + 보기 추가
         </button>
       </div>
@@ -122,9 +107,7 @@ export default function QuizEditor({ row, onDone }: QuizEditorProps) {
       />
 
       <div className="flex items-center justify-end gap-2">
-        {errorMessage && (
-          <span className="text-[11px] text-red">{errorMessage}</span>
-        )}
+        {errorMessage && <span className="text-[11px] text-red">{errorMessage}</span>}
         <button
           onClick={remove}
           disabled={deleteMutation.isPending}

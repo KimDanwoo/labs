@@ -7,4 +7,12 @@ export const SEMANTIC_ROLES = ['primary', 'secondary', 'success', 'error', 'warn
 export const BUTTON_VARIANTS: ButtonVariant[] = ['default', 'secondary', 'outline', 'ghost', 'destructive', 'link'];
 
 /** @ui/react Badge 변형(대표) — solid + 시맨틱 상태 톤. */
-export const BADGE_VARIANTS: BadgeVariant[] = ['default', 'secondary', 'destructive', 'outline', 'success', 'warning', 'info'];
+export const BADGE_VARIANTS: BadgeVariant[] = [
+  'default',
+  'secondary',
+  'destructive',
+  'outline',
+  'success',
+  'warning',
+  'info',
+];

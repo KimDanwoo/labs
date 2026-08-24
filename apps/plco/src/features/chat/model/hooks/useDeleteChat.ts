@@ -12,10 +12,7 @@ export function useDeleteChat(roomId: string) {
   return useMutation({
     mutationFn: (id: string) => deleteMessage(id),
     onSuccess: (_data, id) => {
-      queryClient.setQueryData<ChatMessage[]>(
-        chatQueryKey(roomId),
-        (prev) => (prev ?? []).filter((m) => m.id !== id),
-      );
+      queryClient.setQueryData<ChatMessage[]>(chatQueryKey(roomId), (prev) => (prev ?? []).filter((m) => m.id !== id));
     },
   });
 }

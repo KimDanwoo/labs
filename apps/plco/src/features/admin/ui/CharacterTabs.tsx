@@ -17,9 +17,7 @@ export default function CharacterTabs({ value, onChange }: CharacterTabsProps) {
             key={id}
             onClick={() => onChange(id)}
             className={`px-2.5 py-1.5 rounded-lg text-xs font-bold btn-press transition-colors ${
-              isActive
-                ? 'bg-gold text-white'
-                : 'bg-input-bg text-muted border border-card-border'
+              isActive ? 'bg-gold text-white' : 'bg-input-bg text-muted border border-card-border'
             }`}
           >
             {CHARACTERS[id].emoji} {CHARACTERS[id].name}

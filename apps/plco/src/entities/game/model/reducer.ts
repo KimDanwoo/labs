@@ -1,42 +1,42 @@
-import type { GameState, GameAction, FoodId, CharacterId } from '@shared/types';
 import {
-  INITIAL_GAME_STATE,
-  FOODS,
-  MAX_HUNGER,
-  MAX_CLEANLINESS,
-  MAX_HEARTS,
+  ALL_CHARACTER_IDS,
   CLEANLINESS_PER_POOP,
-  POOP_DELAY_MS,
-  DEATH_THRESHOLD_MS,
-  LEVEL_THRESHOLDS,
-  LEVEL_REWARDS,
-  EXP_FEED,
-  EXP_CLEAN,
-  EXP_MEETING,
-  HUNGER_DECAY_PER_MINUTE,
-  COINS_PER_CLEAN,
   COINS_CLEAN_ALL_BONUS,
+  COINS_PER_CLEAN,
   COINS_PER_MEETING,
-  HEARTS_PER_FEED,
-  HEARTS_PER_CLEAN,
-  HEART_HUNGER_BUFF_THRESHOLD,
-  HEART_HUNGER_BUFF_RATE,
-  HEART_UNHAPPY_DEBUFF_RATE,
-  HEART_EXCHANGE_UNIT,
-  HEART_EXCHANGE_COINS,
-  MEDICINE_PRICE,
-  SICK_POOP_THRESHOLD,
+  DEATH_THRESHOLD_MS,
+  EGG_ALL_UNLOCKED_COINS,
   EGG_HEART_THRESHOLD,
   EGG_LEVEL_THRESHOLD,
-  EGG_ALL_UNLOCKED_COINS,
-  ALL_CHARACTER_IDS,
+  EXP_CLEAN,
+  EXP_FEED,
+  EXP_MEETING,
+  FOODS,
   GAME_STATUS,
+  HEARTS_PER_CLEAN,
+  HEARTS_PER_FEED,
+  HEART_EXCHANGE_COINS,
+  HEART_EXCHANGE_UNIT,
+  HEART_HUNGER_BUFF_RATE,
+  HEART_HUNGER_BUFF_THRESHOLD,
+  HEART_UNHAPPY_DEBUFF_RATE,
+  HUNGER_DECAY_PER_MINUTE,
+  INITIAL_GAME_STATE,
+  LEVEL_REWARDS,
+  LEVEL_THRESHOLDS,
+  MAX_CLEANLINESS,
+  MAX_HEARTS,
+  MAX_HUNGER,
+  MEDICINE_PRICE,
   MINIGAME_COIN_PER_CORRECT,
-  MINIGAME_HEART_PER_CORRECT,
   MINIGAME_EXP_PER_CORRECT,
+  MINIGAME_HEART_PER_CORRECT,
   OVERFEED_HEART_PENALTY,
   OVERFEED_MESSAGE,
+  POOP_DELAY_MS,
+  SICK_POOP_THRESHOLD,
 } from '@shared/constants';
+import type { CharacterId, FoodId, GameAction, GameState } from '@shared/types';
 
 function calculateLevel(exp: number): number {
   for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
@@ -66,8 +66,7 @@ function applyLevelUp(
   const newInventory = { ...state.inventory };
   if (reward.food) {
     for (const [foodId, amount] of Object.entries(reward.food)) {
-      newInventory[foodId as FoodId] =
-        (newInventory[foodId as FoodId] || 0) + (amount ?? 0);
+      newInventory[foodId as FoodId] = (newInventory[foodId as FoodId] || 0) + (amount ?? 0);
     }
   }
 
@@ -81,38 +80,22 @@ function applyLevelUp(
 }
 
 function isDeadByNeglect(
-  state: Pick<
-    GameState,
-    'hungerZeroSince' | 'cleanlinessZeroSince' | 'sickSince'
-  >,
+  state: Pick<GameState, 'hungerZeroSince' | 'cleanlinessZeroSince' | 'sickSince'>,
   now: number,
 ): boolean {
   return Boolean(
-    (state.hungerZeroSince &&
-      now - state.hungerZeroSince >= DEATH_THRESHOLD_MS) ||
-      (state.cleanlinessZeroSince &&
-        now - state.cleanlinessZeroSince >= DEATH_THRESHOLD_MS) ||
-      (state.sickSince && now - state.sickSince >= DEATH_THRESHOLD_MS),
+    (state.hungerZeroSince && now - state.hungerZeroSince >= DEATH_THRESHOLD_MS) ||
+    (state.cleanlinessZeroSince && now - state.cleanlinessZeroSince >= DEATH_THRESHOLD_MS) ||
+    (state.sickSince && now - state.sickSince >= DEATH_THRESHOLD_MS),
   );
 }
 
 type HeartsReward = Pick<
   GameState,
-  | 'exp'
-  | 'level'
-  | 'coins'
-  | 'inventory'
-  | 'levelUpMessage'
-  | 'hearts'
-  | 'eggReadyCharacterId'
+  'exp' | 'level' | 'coins' | 'inventory' | 'levelUpMessage' | 'hearts' | 'eggReadyCharacterId'
 >;
 
-function applyHeartsExpCoins(
-  state: GameState,
-  heartsGain: number,
-  expGain: number,
-  coinsGain: number,
-): HeartsReward {
+function applyHeartsExpCoins(state: GameState, heartsGain: number, expGain: number, coinsGain: number): HeartsReward {
   const newHearts = Math.min(state.hearts + heartsGain, MAX_HEARTS);
   const newExp = state.exp + expGain;
   const levelUp = applyLevelUp(state, newExp);
@@ -126,22 +109,14 @@ function applyHeartsExpCoins(
   };
 }
 
-function checkEggReady(
-  state: GameState,
-  newHearts: number,
-): CharacterId | null {
+function checkEggReady(state: GameState, newHearts: number): CharacterId | null {
   if (state.eggReadyCharacterId) return state.eggReadyCharacterId;
-  if (newHearts < EGG_HEART_THRESHOLD || state.level < EGG_LEVEL_THRESHOLD)
-    return null;
+  if (newHearts < EGG_HEART_THRESHOLD || state.level < EGG_LEVEL_THRESHOLD) return null;
   // 한 레벨에 알 1개만: 마지막으로 알을 받은 레벨보다 높아야 새 알이 나옴
-  if (state.lastEggLevel !== null && state.level <= state.lastEggLevel)
-    return null;
+  if (state.lastEggLevel !== null && state.level <= state.lastEggLevel) return null;
 
   const currentCharacter = state.characterId;
-  const unlocked = new Set([
-    ...(state.unlockedCharacters ?? []),
-    currentCharacter,
-  ]);
+  const unlocked = new Set([...(state.unlockedCharacters ?? []), currentCharacter]);
   const available = ALL_CHARACTER_IDS.filter((id) => !unlocked.has(id));
 
   if (available.length === 0) return null;
@@ -214,10 +189,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'CLEAN_POOP': {
       const newPoops = state.poops.filter((p) => p.id !== action.poopId);
-      const newCleanliness = Math.min(
-        state.cleanliness + CLEANLINESS_PER_POOP,
-        MAX_CLEANLINESS,
-      );
+      const newCleanliness = Math.min(state.cleanliness + CLEANLINESS_PER_POOP, MAX_CLEANLINESS);
       const newHearts = Math.min(state.hearts + HEARTS_PER_CLEAN, MAX_HEARTS);
       const newExp = state.exp + EXP_CLEAN;
       const levelUp = applyLevelUp(state, newExp);
@@ -229,8 +201,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         cleanliness: newCleanliness,
         hearts: newHearts,
         coins: levelUp.coins + COINS_PER_CLEAN,
-        cleanlinessZeroSince:
-          newCleanliness > 0 ? null : state.cleanlinessZeroSince,
+        cleanlinessZeroSince: newCleanliness > 0 ? null : state.cleanlinessZeroSince,
         lastUpdated: now,
       };
     }
@@ -238,14 +209,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'CLEAN_ALL_POOP': {
       const poopCount = state.poops.length;
       if (poopCount === 0) return state;
-      const newCleanliness = Math.min(
-        state.cleanliness + poopCount * CLEANLINESS_PER_POOP,
-        MAX_CLEANLINESS,
-      );
-      const newHearts = Math.min(
-        state.hearts + HEARTS_PER_CLEAN * poopCount,
-        MAX_HEARTS,
-      );
+      const newCleanliness = Math.min(state.cleanliness + poopCount * CLEANLINESS_PER_POOP, MAX_CLEANLINESS);
+      const newHearts = Math.min(state.hearts + HEARTS_PER_CLEAN * poopCount, MAX_HEARTS);
       const newExp = state.exp + EXP_CLEAN * poopCount;
       const levelUp = applyLevelUp(state, newExp);
 
@@ -255,28 +220,20 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         poops: [],
         cleanliness: newCleanliness,
         hearts: newHearts,
-        coins:
-          levelUp.coins + poopCount * COINS_PER_CLEAN + COINS_CLEAN_ALL_BONUS,
-        cleanlinessZeroSince:
-          newCleanliness > 0 ? null : state.cleanlinessZeroSince,
+        coins: levelUp.coins + poopCount * COINS_PER_CLEAN + COINS_CLEAN_ALL_BONUS,
+        cleanlinessZeroSince: newCleanliness > 0 ? null : state.cleanlinessZeroSince,
         lastUpdated: now,
       };
     }
 
     case 'ADD_POOP': {
       const newPoops = [...state.poops, action.poop];
-      const newCleanliness = Math.max(
-        state.cleanliness - CLEANLINESS_PER_POOP,
-        0,
-      );
+      const newCleanliness = Math.max(state.cleanliness - CLEANLINESS_PER_POOP, 0);
       return {
         ...state,
         poops: newPoops,
         cleanliness: newCleanliness,
-        cleanlinessZeroSince:
-          newCleanliness === 0 && !state.cleanlinessZeroSince
-            ? now
-            : state.cleanlinessZeroSince,
+        cleanlinessZeroSince: newCleanliness === 0 && !state.cleanlinessZeroSince ? now : state.cleanlinessZeroSince,
         lastUpdated: now,
       };
     }
@@ -298,10 +255,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         hunger: newHunger,
-        hungerZeroSince:
-          newHunger === 0 && !state.hungerZeroSince
-            ? now
-            : state.hungerZeroSince,
+        hungerZeroSince: newHunger === 0 && !state.hungerZeroSince ? now : state.hungerZeroSince,
         lastUpdated: now,
       };
     }
@@ -314,12 +268,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'ADD_HEARTS':
       return {
         ...state,
-        ...applyHeartsExpCoins(
-          state,
-          action.amount,
-          EXP_MEETING,
-          COINS_PER_MEETING,
-        ),
+        ...applyHeartsExpCoins(state, action.amount, EXP_MEETING, COINS_PER_MEETING),
         lastUpdated: now,
       };
 
@@ -408,10 +357,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (!state.eggReadyCharacterId) return state;
 
       const currentCharacter = state.characterId;
-      const unlocked = new Set([
-        ...(state.unlockedCharacters ?? []),
-        currentCharacter,
-      ]);
+      const unlocked = new Set([...(state.unlockedCharacters ?? []), currentCharacter]);
       const isAlreadyUnlocked = unlocked.has(state.eggReadyCharacterId);
 
       return {
@@ -422,9 +368,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         unlockedCharacters: isAlreadyUnlocked
           ? state.unlockedCharacters
           : [...(state.unlockedCharacters ?? []), state.eggReadyCharacterId],
-        coins: isAlreadyUnlocked
-          ? state.coins + EGG_ALL_UNLOCKED_COINS
-          : state.coins,
+        coins: isAlreadyUnlocked ? state.coins + EGG_ALL_UNLOCKED_COINS : state.coins,
         lastUpdated: now,
       };
     }
@@ -495,8 +439,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (ready.length > 0) {
         const charPos = action.characterPosition;
         const newPoops = ready.map((_, idx) => {
-          const jitter =
-            ready.length > 1 ? (idx - (ready.length - 1) / 2) * 6 : 0;
+          const jitter = ready.length > 1 ? (idx - (ready.length - 1) / 2) * 6 : 0;
           const baseX = charPos ? charPos.x : 10 + Math.random() * 80;
           const baseY = charPos ? charPos.y : 60 + Math.random() * 25;
           return {
@@ -515,10 +458,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           poops: allPoops,
           pendingPoops: remaining,
           cleanliness: newCleanliness,
-          cleanlinessZeroSince:
-            newCleanliness === 0 && !state.cleanlinessZeroSince
-              ? now
-              : state.cleanlinessZeroSince,
+          cleanlinessZeroSince: newCleanliness === 0 && !state.cleanlinessZeroSince ? now : state.cleanlinessZeroSince,
         };
         changed = true;
       }
@@ -528,8 +468,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         changed = true;
       }
 
-      if (isDeadByNeglect(updated, now))
-        return { ...updated, status: GAME_STATUS.DEAD, lastUpdated: now };
+      if (isDeadByNeglect(updated, now)) return { ...updated, status: GAME_STATUS.DEAD, lastUpdated: now };
 
       if (changed) return { ...updated, lastUpdated: now };
       return state;
@@ -537,10 +476,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'LOAD_STATE': {
       const loaded = { ...INITIAL_GAME_STATE, ...action.state };
-      if (
-        loaded.characterId &&
-        !ALL_CHARACTER_IDS.includes(loaded.characterId)
-      ) {
+      if (loaded.characterId && !ALL_CHARACTER_IDS.includes(loaded.characterId)) {
         return { ...INITIAL_GAME_STATE, lastUpdated: Date.now() };
       }
       return loaded;

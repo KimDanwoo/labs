@@ -8,7 +8,7 @@ import {
   LeaderboardTable,
   StardokuLeaderboardTable,
 } from '@features/leaderboard/ui';
-import { ThemeToggle } from '@features/theme/ui/ThemeToggle';
+import { ThemeToggle } from '@features/theme/ui';
 import { cn } from '@shared/model/utils';
 import { SubpageHeader } from '@shared/ui';
 import { useAtomValue } from 'jotai';

@@ -80,9 +80,7 @@ function YearHeatmap({ year, heatmap, maxCount, today }: YearHeatmapProps) {
           const monthLabel = monthStartCols.find((m) => m.col === wi)?.label ?? '';
           return (
             <div key={wi} className="flex flex-col gap-1">
-              <div className="h-4 text-[10px] text-muted-foreground leading-4 whitespace-nowrap">
-                {monthLabel}
-              </div>
+              <div className="h-4 text-[10px] text-muted-foreground leading-4 whitespace-nowrap">{monthLabel}</div>
               {week.map((day, di) => {
                 if (day.count === -1) return <div key={di} className="h-3 w-3" />;
                 if (day.count === -2) return <div key={di} className="h-3 w-3 rounded-[2px] bg-muted/40" />;
@@ -125,13 +123,7 @@ export function StudyHeatmap({ heatmap }: { heatmap: Record<string, number> }) {
   return (
     <div className="overflow-x-auto">
       {displayYears.map((year) => (
-        <YearHeatmap
-          key={year}
-          year={year}
-          heatmap={heatmap}
-          maxCount={maxCount}
-          today={today}
-        />
+        <YearHeatmap key={year} year={year} heatmap={heatmap} maxCount={maxCount} today={today} />
       ))}
     </div>
   );

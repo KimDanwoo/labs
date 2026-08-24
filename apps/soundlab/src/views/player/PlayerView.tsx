@@ -1,13 +1,14 @@
 'use client';
 
-import { PLAYER_SCREEN, type PlayerScreen } from '@entities/track/model/constants/playerScreen';
-import { TRACKS } from '@entities/track/model/constants/tracks';
-import { useKeyboard } from '@entities/track/model/hooks/useKeyboard';
-import { useMediaSession } from '@entities/track/model/hooks/useMediaSession';
-import { usePlayback } from '@entities/track/model/hooks/usePlayback';
-import { PlaybackProvider } from '@entities/track/model/hooks/usePlaybackControls';
-import { useTrackUrl } from '@entities/track/model/hooks/useTrackUrl';
-import { useWaveform } from '@entities/track/model/hooks/useWaveform';
+import { PLAYER_SCREEN, TRACKS, type PlayerScreen } from '@entities/track/model/constants';
+import {
+  PlaybackProvider,
+  useKeyboard,
+  useMediaSession,
+  usePlayback,
+  useTrackUrl,
+  useWaveform,
+} from '@entities/track/model/hooks';
 import { currentIndexAtom, engineModeAtom, isPlayingAtom, playerScreenAtom } from '@entities/track/model/store';
 import { Playlist, QueueToggle } from '@widgets/playlist/ui';
 import { Stage } from '@widgets/stage/ui';

@@ -1,13 +1,13 @@
 export {
   getAllCategories,
+  getAllQuestions,
   getCategoryBySlug,
+  getQuestionById,
   getQuestionsByCategory,
   getQuestionsByCategorySlug,
   getQuestionsByCategorySlugPaginated,
-  getQuestionById,
-  getQuestionsByIds,
-  getAllQuestions,
-  searchQuestions,
   getQuestionsByDifficulty,
+  getQuestionsByIds,
   getRandomQuestions,
+  searchQuestions,
 } from './questionApi';

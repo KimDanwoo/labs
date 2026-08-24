@@ -1,19 +1,16 @@
-import type { ReviewRating, SM2Result } from './model';
-import { SM2_CONSTANTS } from './model';
+import { type ReviewRating, SM2_CONSTANTS, type SM2Result } from './model';
 
 /**
- * ReviewRating을 SM-2 quality 점수(0~5)로 변환한다.
+ * ReviewRating별 SM-2 quality 점수(0~5).
  * hard는 quality 3으로 매핑하여 성공 경로(질 3 이상)에 진입시킨다.
  * hard 전용 간격 보정은 calculateSM2 내부에서 별도 적용된다.
  */
-function ratingToQuality(rating: ReviewRating): number {
-  switch (rating) {
-    case 'again': return 0;
-    case 'hard': return 3;
-    case 'good': return 4;
-    case 'easy': return 5;
-  }
-}
+const RATING_QUALITY: Record<ReviewRating, number> = {
+  again: 0,
+  hard: 3,
+  good: 4,
+  easy: 5,
+};
 
 /** 오늘 날짜를 "YYYY-MM-DD" 형식으로 반환한다. */
 export function todayString(): string {
@@ -45,7 +42,7 @@ export function calculateSM2(
   prevRepetition: number,
   rating: ReviewRating,
 ): SM2Result {
-  const quality = ratingToQuality(rating);
+  const quality = RATING_QUALITY[rating];
   const today = todayString();
 
   // 실패 (again): 처음부터 다시
@@ -86,7 +83,9 @@ export function calculateSM2(
   }
 
   // 간격에 ±5% 지터 추가 (카드 클러스터링 방지)
-  const jitter = Math.round(newInterval * (Math.random() * SM2_CONSTANTS.JITTER_RANGE - SM2_CONSTANTS.JITTER_RANGE / 2));
+  const jitter = Math.round(
+    newInterval * (Math.random() * SM2_CONSTANTS.JITTER_RANGE - SM2_CONSTANTS.JITTER_RANGE / 2),
+  );
   newInterval = Math.max(1, newInterval + jitter);
 
   return {

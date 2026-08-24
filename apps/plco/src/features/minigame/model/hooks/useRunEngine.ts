@@ -134,11 +134,12 @@ export function useRunEngine() {
 
   useEffect(() => clearCountdownTimers, [clearCountdownTimers]);
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (jumpBufferTimerRef.current) clearTimeout(jumpBufferTimerRef.current);
-    };
-  }, []);
+    },
+    [],
+  );
 
   const jump = useCallback(() => {
     if (countdown !== null) return;
@@ -168,7 +169,7 @@ export function useRunEngine() {
   }, []);
 
   useEffect(() => {
-    if (phase !== RUN_PHASE.PLAYING) return;
+    if (phase !== RUN_PHASE.PLAYING) return undefined;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space' || e.code === 'ArrowUp') {
@@ -192,7 +193,7 @@ export function useRunEngine() {
   }, [phase, jump, releaseJump]);
 
   useEffect(() => {
-    if (phase !== RUN_PHASE.PLAYING || countdown !== null || isCrashing) return;
+    if (phase !== RUN_PHASE.PLAYING || countdown !== null || isCrashing) return undefined;
 
     const loop = () => {
       const now = Date.now();

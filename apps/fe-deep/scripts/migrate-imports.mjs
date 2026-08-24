@@ -62,7 +62,10 @@ function transformFile(filePath) {
     if (!m) continue;
 
     const isType = !!m[1];
-    const names = m[2].split(',').map(s => s.trim()).filter(Boolean);
+    const names = m[2]
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
     const from = m[3];
 
     let barrel = null;
@@ -74,7 +77,10 @@ function transformFile(filePath) {
       // Check exact BARREL_MAP entries
       for (const [key, val] of Object.entries(BARREL_MAP)) {
         if (key.endsWith('/')) continue; // already handled above
-        if (from === key) { barrel = val; break; }
+        if (from === key) {
+          barrel = val;
+          break;
+        }
       }
     }
 

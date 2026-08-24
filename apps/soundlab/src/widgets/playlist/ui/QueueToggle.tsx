@@ -1,7 +1,6 @@
 'use client';
 
-import { PLAYER_SCREEN } from '@entities/track/model/constants/playerScreen';
-import { TRACKS } from '@entities/track/model/constants/tracks';
+import { PLAYER_SCREEN, TRACKS } from '@entities/track/model/constants';
 import { playerPath } from '@entities/track/model/services';
 import { currentIndexAtom, playerScreenAtom } from '@entities/track/model/store';
 import { FLOATING_BUTTON } from '@shared/lib/floatingButton';

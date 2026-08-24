@@ -93,41 +93,43 @@ export default function MyRoomsList({
                 </div>
               </button>
 
-              {isOwner ? (
-                isConfirming ? (
-                  <div className="flex shrink-0 items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onDeleteRoom(room);
-                        setConfirmRoomId(null);
-                      }}
-                      disabled={isDeleting}
-                      className="rounded-full bg-red px-3 py-1.5 text-xs font-bold text-white btn-press disabled:opacity-40"
-                    >
-                      {isDeleting ? '삭제 중…' : '삭제'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setConfirmRoomId(null)}
-                      disabled={isDeleting}
-                      className="rounded-full border border-card-border px-3 py-1.5 text-xs font-bold text-gray-500 btn-press disabled:opacity-40"
-                    >
-                      취소
-                    </button>
-                  </div>
-                ) : (
+              {isOwner && isConfirming && (
+                <div className="flex shrink-0 items-center gap-1">
                   <button
                     type="button"
-                    onClick={() => setConfirmRoomId(room.id)}
+                    onClick={() => {
+                      onDeleteRoom(room);
+                      setConfirmRoomId(null);
+                    }}
                     disabled={isDeleting}
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base text-gray-300 transition-colors hover:bg-red/10 hover:text-red disabled:opacity-40"
-                    aria-label="방 삭제"
+                    className="rounded-full bg-red px-3 py-1.5 text-xs font-bold text-white btn-press disabled:opacity-40"
                   >
-                    🗑
+                    {isDeleting ? '삭제 중…' : '삭제'}
                   </button>
-                )
-              ) : (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmRoomId(null)}
+                    disabled={isDeleting}
+                    className="rounded-full border border-card-border px-3 py-1.5 text-xs font-bold text-gray-500 btn-press disabled:opacity-40"
+                  >
+                    취소
+                  </button>
+                </div>
+              )}
+
+              {isOwner && !isConfirming && (
+                <button
+                  type="button"
+                  onClick={() => setConfirmRoomId(room.id)}
+                  disabled={isDeleting}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base text-gray-300 transition-colors hover:bg-red/10 hover:text-red disabled:opacity-40"
+                  aria-label="방 삭제"
+                >
+                  🗑
+                </button>
+              )}
+
+              {!isOwner && (
                 <span className="shrink-0 pr-1 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gold">
                   ›
                 </span>

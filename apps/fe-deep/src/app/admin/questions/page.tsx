@@ -1,22 +1,22 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
-import { createClient } from '@shared/config/supabase/client';
-import type { Question, Category, QuestionVisibilityField } from '@entities/question/model';
-import { useDebounce } from '@shared/lib/hooks';
-import { Button } from '@shared/ui';
+import type { Category, Question, QuestionVisibilityField } from '@entities/question/model';
 import {
   deleteQuestion,
   deleteQuestions,
-  updateQuestionsVisibility,
   updateCategoryVisibility,
+  updateQuestionsVisibility,
 } from '@entities/question/services';
-import { Plus, Trash2, BookOpenCheck, Eye, EyeOff, FolderSync } from 'lucide-react';
+import { createClient } from '@shared/config/supabase/client';
+import { useDebounce } from '@shared/lib/hooks';
+import { Button } from '@shared/ui';
+import { useQuery } from '@tanstack/react-query';
+import { BookOpenCheck, Eye, EyeOff, FolderSync, Plus, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useCallback, useMemo, useState } from 'react';
+import { Pagination } from './_ui/Pagination';
 import { QuestionFilters } from './_ui/QuestionFilters';
 import { QuestionTable } from './_ui/QuestionTable';
-import { Pagination } from './_ui/Pagination';
 
 const PAGE_SIZE = 10;
 
@@ -72,7 +72,7 @@ export default function QuestionsListPage() {
         .from('questions')
         .select(
           'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
-          { count: 'exact' }
+          { count: 'exact' },
         )
         .order('order_num');
 
@@ -83,9 +83,7 @@ export default function QuestionsListPage() {
         query = query.eq('difficulty', difficultyFilter);
       }
       if (debouncedSearch) {
-        query = query.or(
-          `question.ilike.%${debouncedSearch}%,tags.cs.{${debouncedSearch}}`
-        );
+        query = query.or(`question.ilike.%${debouncedSearch}%,tags.cs.{${debouncedSearch}}`);
       }
 
       const from = (page - 1) * PAGE_SIZE;
@@ -102,10 +100,7 @@ export default function QuestionsListPage() {
   const totalCount = questionsData?.totalCount ?? 0;
   const loading = !questionsData;
 
-  const categoryMap = useMemo(
-    () => new Map(categories.map((c) => [c.id, c])),
-    [categories]
-  );
+  const categoryMap = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
@@ -137,10 +132,7 @@ export default function QuestionsListPage() {
     }
   }
 
-  async function handleBulkVisibility(
-    field: QuestionVisibilityField,
-    value: boolean,
-  ) {
+  async function handleBulkVisibility(field: QuestionVisibilityField, value: boolean) {
     if (selectedIds.size === 0) return;
     try {
       await updateQuestionsVisibility(Array.from(selectedIds), {
@@ -153,10 +145,7 @@ export default function QuestionsListPage() {
     }
   }
 
-  async function handleCategoryVisibility(
-    field: QuestionVisibilityField,
-    value: boolean,
-  ) {
+  async function handleCategoryVisibility(field: QuestionVisibilityField, value: boolean) {
     if (categoryFilter === 'all') {
       alert('카테고리를 먼저 선택해 주세요.');
       return;
@@ -176,10 +165,7 @@ export default function QuestionsListPage() {
 
   const hasSelection = selectedIds.size > 0;
 
-  const selectedQuestions = useMemo(
-    () => questions.filter((q) => selectedIds.has(q.id)),
-    [questions, selectedIds],
-  );
+  const selectedQuestions = useMemo(() => questions.filter((q) => selectedIds.has(q.id)), [questions, selectedIds]);
   const dailyOnCount = selectedQuestions.filter((q) => q.show_in_daily).length;
   const flashcardOnCount = selectedQuestions.filter((q) => q.show_in_flashcard).length;
 
@@ -207,34 +193,48 @@ export default function QuestionsListPage() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           {totalCount}개 질문 (페이지 {page}/{totalPages})
-          {hasSelection && (
-            <span className="ml-2 font-medium text-foreground">
-              · {selectedIds.size}개 선택됨
-            </span>
-          )}
+          {hasSelection && <span className="ml-2 font-medium text-foreground">· {selectedIds.size}개 선택됨</span>}
         </p>
       </div>
 
       {categoryFilter !== 'all' && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/20 p-3">
           <FolderSync className="size-4 text-muted-foreground" />
-          <span className="text-sm font-medium mr-1">
-            카테고리 전체:
-          </span>
-          <Button variant="outline" size="sm" className="gap-1" onClick={() => handleCategoryVisibility('show_in_daily', true)}>
+          <span className="text-sm font-medium mr-1">카테고리 전체:</span>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            onClick={() => handleCategoryVisibility('show_in_daily', true)}
+          >
             <BookOpenCheck className="size-3.5" />
             오늘학습 ON
           </Button>
-          <Button variant="outline" size="sm" className="gap-1" onClick={() => handleCategoryVisibility('show_in_daily', false)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            onClick={() => handleCategoryVisibility('show_in_daily', false)}
+          >
             <EyeOff className="size-3.5" />
             오늘학습 OFF
           </Button>
           <div className="h-4 w-px bg-border" />
-          <Button variant="outline" size="sm" className="gap-1" onClick={() => handleCategoryVisibility('show_in_flashcard', true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            onClick={() => handleCategoryVisibility('show_in_flashcard', true)}
+          >
             <Eye className="size-3.5" />
             플래시카드 ON
           </Button>
-          <Button variant="outline" size="sm" className="gap-1" onClick={() => handleCategoryVisibility('show_in_flashcard', false)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            onClick={() => handleCategoryVisibility('show_in_flashcard', false)}
+          >
             <EyeOff className="size-3.5" />
             플래시카드 OFF
           </Button>
@@ -243,15 +243,8 @@ export default function QuestionsListPage() {
 
       {hasSelection && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-3">
-          <span className="text-sm font-medium mr-2">
-            일괄 작업:
-          </span>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleBulkDelete}
-            className="gap-1"
-          >
+          <span className="text-sm font-medium mr-2">일괄 작업:</span>
+          <Button variant="destructive" size="sm" onClick={handleBulkDelete} className="gap-1">
             <Trash2 className="size-3.5" />
             삭제 ({selectedIds.size})
           </Button>
@@ -311,11 +304,7 @@ export default function QuestionsListPage() {
         onDelete={handleDelete}
       />
 
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+      <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
     </div>
   );
 }

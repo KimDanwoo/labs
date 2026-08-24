@@ -1,6 +1,7 @@
 export type Project = {
   title: string;
-  description: string;
+  /** 없으면 카드에서 설명 줄을 생략한다(고도화 중인 프로젝트). */
+  description?: string;
   href: string;
   /** 카드 커버에 쓸 실제 스크린샷(예: /public 경로). 없으면 그라데이션+favicon 커버를 쓴다. */
   image?: string;

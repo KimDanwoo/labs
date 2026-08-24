@@ -1,8 +1,8 @@
 'use client';
 
-import { useAtomValue } from 'jotai';
 import { MINIGAME_COOLDOWN_MS } from '@shared/constants';
 import { useCooldown } from '@shared/lib';
+import { useAtomValue } from 'jotai';
 import { lastMinigameAtAtom } from '../store';
 
 export type MinigameStatus = {

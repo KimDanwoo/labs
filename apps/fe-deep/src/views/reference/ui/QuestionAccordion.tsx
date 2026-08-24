@@ -1,7 +1,7 @@
 'use client';
 
-import { Accordion } from '@shared/ui';
 import type { Question } from '@entities/question';
+import { Accordion } from '@shared/ui';
 import { QuestionAccordionItem } from './QuestionAccordionItem';
 
 interface QuestionAccordionProps {

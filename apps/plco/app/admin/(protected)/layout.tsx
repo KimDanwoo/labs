@@ -1,18 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { AdminQueryProvider } from '@features/admin/ui';
+import { supabase } from '@shared/lib';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@shared/lib';
-import { AdminQueryProvider } from '@features/admin/ui';
+import { useEffect, useState } from 'react';
 
 type GuardState = 'checking' | 'authed';
 
-export default function ProtectedAdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [state, setState] = useState<GuardState>('checking');
 
@@ -29,11 +25,7 @@ export default function ProtectedAdminLayout({
         return;
       }
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single();
+      const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
 
       if (!active) return;
 
@@ -51,11 +43,7 @@ export default function ProtectedAdminLayout({
   }, [router]);
 
   if (state !== 'authed') {
-    return (
-      <div className="w-full px-4 py-12 text-center text-xs text-muted">
-        확인 중...
-      </div>
-    );
+    return <div className="w-full px-4 py-12 text-center text-xs text-muted">확인 중...</div>;
   }
 
   return (
@@ -63,10 +51,7 @@ export default function ProtectedAdminLayout({
       <div className="w-full px-4 py-5 space-y-4">
         <header className="flex items-center justify-between">
           <span className="text-sm font-bold text-foreground">PLCO 관리자</span>
-          <Link
-            href="/"
-            className="text-[11px] font-bold text-muted hover:text-foreground transition-colors btn-press"
-          >
+          <Link href="/" className="text-[11px] font-bold text-muted hover:text-foreground transition-colors btn-press">
             ← 게임으로
           </Link>
         </header>

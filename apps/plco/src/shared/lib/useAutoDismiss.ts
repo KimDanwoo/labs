@@ -2,13 +2,9 @@
 
 import { useEffect } from 'react';
 
-export function useAutoDismiss(
-  active: unknown,
-  dismiss: () => void,
-  durationMs: number,
-): void {
+export function useAutoDismiss(active: unknown, dismiss: () => void, durationMs: number): void {
   useEffect(() => {
-    if (!active) return;
+    if (!active) return undefined;
     const timer = setTimeout(dismiss, durationMs);
     return () => clearTimeout(timer);
   }, [active, dismiss, durationMs]);

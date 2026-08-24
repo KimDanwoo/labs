@@ -1,9 +1,9 @@
 export const revalidate = 86400;
 
-import Link from 'next/link';
+import { getAllCategories } from '@entities/question';
 import { Card } from '@shared/ui';
 import { createClient } from '@supabase/supabase-js';
-import { getAllCategories } from '@entities/question';
+import Link from 'next/link';
 
 export default async function ReferencePage() {
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
@@ -13,9 +13,7 @@ export default async function ReferencePage() {
     <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-12">
       <div className="mb-10 animate-fade-in">
         <h1 className="text-3xl font-bold tracking-tight mb-3">레퍼런스</h1>
-        <p className="text-muted-foreground">
-          카테고리별 프론트엔드 핵심 개념을 탐색하세요.
-        </p>
+        <p className="text-muted-foreground">카테고리별 프론트엔드 핵심 개념을 탐색하세요.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -29,14 +27,14 @@ export default async function ReferencePage() {
             <Card className="card-hover hover:border-primary/30 cursor-pointer h-full group">
               <Card.Header>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-3xl group-hover:scale-110 transition-transform duration-300">{category.icon}</span>
+                  <span className="text-3xl group-hover:scale-110 transition-transform duration-300">
+                    {category.icon}
+                  </span>
                 </div>
                 <Card.Title className="group-hover:text-primary transition-colors duration-200">
                   {category.title}
                 </Card.Title>
-                <Card.Description className="text-sm leading-relaxed">
-                  {category.description}
-                </Card.Description>
+                <Card.Description className="text-sm leading-relaxed">{category.description}</Card.Description>
               </Card.Header>
             </Card>
           </Link>

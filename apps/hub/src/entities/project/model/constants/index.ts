@@ -22,20 +22,6 @@ export const PROJECTS: Project[] = [
     image: '/projects/fe-deep.webp',
   },
   {
-    title: '플코',
-    description: '아이돌 컨셉 다마고치 게임',
-    href: 'https://plco-tamagochi.vercel.app/',
-    image: '/projects/plco.webp',
-    imagePosition: 'center',
-  },
-  {
-    title: '초원을 달리는 말',
-    description: 'three.js로 만든 인터랙티브 3D 씬',
-    href: 'https://d-prairie.vercel.app/',
-    image: '/projects/prairie.webp',
-    imagePosition: 'center',
-  },
-  {
     title: '스도쿠',
     description: '쉽게 즐기는 스도쿠 게임',
     href: 'https://awesome-sudoku.vercel.app/',
@@ -50,9 +36,9 @@ export const PROJECTS: Project[] = [
     imagePosition: 'center',
   },
   {
-    title: 'gymlog',
-    description: '루틴 따라 기록하는 운동 PWA',
-    href: 'https://d-gymlog.vercel.app/',
-    image: '/projects/gymlog.webp',
+    title: '초원을 달리는 말',
+    href: 'https://d-prairie.vercel.app/',
+    image: '/projects/prairie.webp',
+    imagePosition: 'center',
   },
 ];

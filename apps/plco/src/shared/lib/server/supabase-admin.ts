@@ -8,20 +8,14 @@ export function getAdminSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceKey) {
-    throw new Error(
-      'NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 가 필요합니다.',
-    );
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 가 필요합니다.');
   }
   return createClient(url, serviceKey, { auth: { persistSession: false } });
 }
 
 /** profiles.is_admin 확인 (service_role 로 RLS 우회). */
 export async function isAdminUser(userId: string): Promise<boolean> {
-  const { data, error } = await getAdminSupabase()
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', userId)
-    .single();
+  const { data, error } = await getAdminSupabase().from('profiles').select('is_admin').eq('id', userId).single();
   if (error) return false;
   return data?.is_admin === true;
 }
@@ -30,13 +24,9 @@ export async function isAdminUser(userId: string): Promise<boolean> {
  * 인증 가드. Authorization: Bearer <access_token> 를 검증하고
  * 유효한 로그인 유저만 통과시킨다. 실패 시 null.
  */
-export async function requireUser(
-  req: Request,
-): Promise<{ userId: string } | null> {
+export async function requireUser(req: Request): Promise<{ userId: string } | null> {
   const header = req.headers.get('authorization') ?? '';
-  const token = header.toLowerCase().startsWith('bearer ')
-    ? header.slice(7).trim()
-    : null;
+  const token = header.toLowerCase().startsWith('bearer ') ? header.slice(7).trim() : null;
   if (!token) return null;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -55,9 +45,7 @@ export async function requireUser(
 /**
  * 관리자 쓰기 API 가드. 인증을 통과하고 is_admin 인 유저만 통과시킨다. 실패 시 null.
  */
-export async function requireAdmin(
-  req: Request,
-): Promise<{ userId: string } | null> {
+export async function requireAdmin(req: Request): Promise<{ userId: string } | null> {
   const auth = await requireUser(req);
   if (!auth) return null;
   if (!(await isAdminUser(auth.userId))) return null;

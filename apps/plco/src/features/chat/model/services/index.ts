@@ -59,9 +59,7 @@ export async function deleteMessage(id: string): Promise<void> {
 
   const res = await fetch(`${CHAT_ADMIN_API}?id=${encodeURIComponent(id)}`, {
     method: 'DELETE',
-    headers: session?.access_token
-      ? { Authorization: `Bearer ${session.access_token}` }
-      : undefined,
+    headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
   });
   if (!res.ok) throw new Error('메시지 삭제에 실패했습니다.');
 }
@@ -85,13 +83,7 @@ type PresencePayload = {
  * 함께 처리한다. 로그인 유저(identity 있음)는 본인을 presence에 등록한다.
  * 정리 함수를 반환한다.
  */
-export function joinRoom({
-  roomId,
-  identity,
-  onInsert,
-  onDelete,
-  onPresenceSync,
-}: JoinRoomOptions): () => void {
+export function joinRoom({ roomId, identity, onInsert, onDelete, onPresenceSync }: JoinRoomOptions): () => void {
   const channel = supabase.channel(chatChannelName(roomId), {
     config: { presence: { key: identity?.userId ?? 'guest' } },
   });
@@ -107,14 +99,10 @@ export function joinRoom({
       },
       (payload) => onInsert(toMessage(payload.new as ChatMessageRow)),
     )
-    .on(
-      'postgres_changes',
-      { event: 'DELETE', schema: 'public', table: CHAT_TABLE },
-      (payload) => {
-        const oldId = (payload.old as { id?: string }).id;
-        if (oldId) onDelete(oldId);
-      },
-    )
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: CHAT_TABLE }, (payload) => {
+      const oldId = (payload.old as { id?: string }).id;
+      if (oldId) onDelete(oldId);
+    })
     .on('presence', { event: 'sync' }, () => {
       const state = channel.presenceState<PresencePayload>();
       const unique = new Map<string, ChatPresenceUser>();

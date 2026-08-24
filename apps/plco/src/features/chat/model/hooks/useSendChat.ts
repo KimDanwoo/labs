@@ -17,15 +17,10 @@ export function useSendChat(roomId: string) {
   return useMutation({
     mutationFn: (args: SendArgs) => sendMessage({ roomId, ...args }),
     onSuccess: (message) => {
-      queryClient.setQueryData<ChatMessage[]>(
-        chatQueryKey(roomId),
-        (prev) => {
-          const list = prev ?? [];
-          return list.some((m) => m.id === message.id)
-            ? list
-            : [...list, message];
-        },
-      );
+      queryClient.setQueryData<ChatMessage[]>(chatQueryKey(roomId), (prev) => {
+        const list = prev ?? [];
+        return list.some((m) => m.id === message.id) ? list : [...list, message];
+      });
     },
   });
 }

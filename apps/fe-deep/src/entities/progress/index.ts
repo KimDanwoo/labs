@@ -1,17 +1,16 @@
-export type { ProgressStatus, UserProgress, DailyStreak, FlashcardResult, ReviewRating, SM2Result } from './model';
-export { RATING_CONFIG } from './model';
-export { calculateSM2 } from './sm2';
-export { progressQueries, progressMutations } from './services';
-export { syncProgress } from './services';
 export {
-  getLocalProgress,
-  saveLocalProgress,
-  reviewCard,
-  getDueCardIds,
-  getDueCardCount,
-  getStudyHeatmap,
   getCurrentStreak,
-  updateQuestionProgress,
-  getProgressForQuestion,
+  getDueCardCount,
+  getDueCardIds,
+  getLocalProgress,
   getProgressByCategory,
+  getProgressForQuestion,
+  getStudyHeatmap,
+  reviewCard,
+  saveLocalProgress,
+  updateQuestionProgress,
 } from './api';
+export { RATING_CONFIG } from './model';
+export type { DailyStreak, FlashcardResult, ProgressStatus, ReviewRating, SM2Result, UserProgress } from './model';
+export { progressMutations, progressQueries, syncProgress } from './services';
+export { calculateSM2 } from './sm2';

@@ -24,6 +24,8 @@ export const metadata: Metadata = {
   title: { default: 'gymlog', template: '%s · gymlog' },
   description: '헬스장에서 폰 하나로 루틴을 따라가고 기록하는 운동 동행 앱',
   applicationName: 'gymlog',
+  // 고도화 전까지 검색 노출 차단(허브·README에서도 링크를 내렸다).
+  robots: { index: false, follow: false },
   // 아이콘 자산은 public/icons 한 곳에 모으고 여기서 명시 선언한다(app/ 파일 컨벤션 대신).
   icons: {
     icon: '/icons/icon-256.png',

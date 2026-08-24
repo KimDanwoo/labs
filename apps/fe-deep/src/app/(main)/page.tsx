@@ -1,10 +1,10 @@
 export const revalidate = 86400;
 
-import Link from 'next/link';
-import { Button } from '@shared/ui';
 import { getAllCategories } from '@entities/question';
 import { createServerSupabaseClient } from '@shared/config/supabase/server';
-import { BookOpen, GraduationCap, ArrowRight } from 'lucide-react';
+import { Button } from '@shared/ui';
+import { ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
+import Link from 'next/link';
 
 export default async function HomePage() {
   const supabase = await createServerSupabaseClient();
@@ -40,7 +40,11 @@ export default async function HomePage() {
                 </Button>
               </Link>
               <Link href="/learn/flashcard">
-                <Button size="lg" variant="outline" className="gap-2 h-12 px-6 hover:shadow-md transition-all duration-300">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="gap-2 h-12 px-6 hover:shadow-md transition-all duration-300"
+                >
                   <GraduationCap className="h-4 w-4" />
                   학습 시작
                 </Button>
@@ -67,7 +71,6 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
-
     </div>
   );
 }

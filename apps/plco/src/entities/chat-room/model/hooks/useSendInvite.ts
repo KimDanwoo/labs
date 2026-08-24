@@ -5,12 +5,6 @@ import { sendInvite } from '../services';
 
 export function useSendInvite() {
   return useMutation({
-    mutationFn: ({
-      roomId,
-      inviteeId,
-    }: {
-      roomId: string;
-      inviteeId: string;
-    }) => sendInvite(roomId, inviteeId),
+    mutationFn: ({ roomId, inviteeId }: { roomId: string; inviteeId: string }) => sendInvite(roomId, inviteeId),
   });
 }

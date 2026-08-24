@@ -1,5 +1,5 @@
-import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { getAllCategories } from '@entities/question/api';
+import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { QuestionForm } from '@widgets/question-form';
 
 export default async function NewQuestionPage() {

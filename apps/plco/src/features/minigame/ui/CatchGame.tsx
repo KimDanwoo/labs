@@ -19,6 +19,12 @@ import MinigameCooldownNotice from './MinigameCooldownNotice';
 import MinigameReadyScreen from './MinigameReadyScreen';
 import MinigameRewardSummary from './MinigameRewardSummary';
 
+function scoreEmoji(score: number): string {
+  if (score >= MINIGAME_SCORE_GOOD) return '🎉';
+  if (score >= MINIGAME_SCORE_OK) return '😊';
+  return '😅';
+}
+
 type CatchGameProps = { onExitToMenu: () => void };
 
 export default function CatchGame({ onExitToMenu }: CatchGameProps) {
@@ -68,18 +74,11 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
         <div className="flex items-center justify-between">
           <span className="text-sm font-bold text-pink-500">💖 {score}</span>
           {combo >= MINIGAME_COMBO_SHOW_THRESHOLD && (
-            <span
-              key={combo}
-              className="text-xs font-black text-rose-500 catch-combo-pop"
-            >
-              {combo >= MINIGAME_COMBO_SCORE_THRESHOLD
-                ? `🔥🔥 ${combo} 콤보 +2`
-                : `🔥 ${combo} 콤보`}
+            <span key={combo} className="text-xs font-black text-rose-500 catch-combo-pop">
+              {combo >= MINIGAME_COMBO_SCORE_THRESHOLD ? `🔥🔥 ${combo} 콤보 +2` : `🔥 ${combo} 콤보`}
             </span>
           )}
-          <span className="text-xs font-bold text-gray-400 tabular-nums">
-            {Math.ceil(timeLeft / 1000)}초
-          </span>
+          <span className="text-xs font-bold text-gray-400 tabular-nums">{Math.ceil(timeLeft / 1000)}초</span>
         </div>
 
         <div className="w-full h-1.5 bg-black/5 rounded-full overflow-hidden">
@@ -97,8 +96,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
           style={{
             width: MINIGAME_FIELD_WIDTH,
             height: MINIGAME_FIELD_HEIGHT,
-            background:
-              'linear-gradient(180deg, #EDE9FE 0%, #FFF0F5 50%, #FCE7F3 100%)',
+            background: 'linear-gradient(180deg, #EDE9FE 0%, #FFF0F5 50%, #FCE7F3 100%)',
           }}
           onPointerDown={handleFieldPointerDown}
           onPointerMove={handleFieldPointerMove}
@@ -128,9 +126,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
             <div
               key={float.id}
               className={`absolute pointer-events-none ${
-                float.variant === 'bad'
-                  ? 'catch-float catch-float-bad'
-                  : 'catch-float catch-float-good'
+                float.variant === 'bad' ? 'catch-float catch-float-bad' : 'catch-float catch-float-good'
               }`}
               style={{ left: float.x, top: float.y }}
             >
@@ -139,10 +135,7 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
           ))}
 
           {badFlashKey > 0 && (
-            <div
-              key={badFlashKey}
-              className="absolute inset-0 pointer-events-none bg-red-400/40 catch-bad-flash"
-            />
+            <div key={badFlashKey} className="absolute inset-0 pointer-events-none bg-red-400/40 catch-bad-flash" />
           )}
 
           <div
@@ -188,18 +181,10 @@ export default function CatchGame({ onExitToMenu }: CatchGameProps) {
   if (phase === MINIGAME_PHASE.RESULT) {
     return (
       <div className="space-y-4 py-3">
-        <div className="text-5xl">
-          {score >= MINIGAME_SCORE_GOOD
-            ? '🎉'
-            : score >= MINIGAME_SCORE_OK
-              ? '😊'
-              : '😅'}
-        </div>
+        <div className="text-5xl">{scoreEmoji(score)}</div>
         <h3 className="text-xl font-bold text-gray-700">{score}개 잡았어요!</h3>
         <MinigameRewardSummary score={score} />
-        {!minigame.canPlay && (
-          <MinigameCooldownNotice remainingMs={minigame.cooldownRemainingMs} />
-        )}
+        {!minigame.canPlay && <MinigameCooldownNotice remainingMs={minigame.cooldownRemainingMs} />}
         <div className="flex gap-2">
           <button
             onClick={startGame}

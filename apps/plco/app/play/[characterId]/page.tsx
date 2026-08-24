@@ -1,17 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { activeCharacterIdAtom, characterStatesAtom, isLoadedAtom } from '@entities/game/model/store';
 import { ALL_CHARACTER_IDS } from '@shared/constants';
 import type { CharacterId } from '@shared/types';
-import {
-  activeCharacterIdAtom,
-  characterStatesAtom,
-  isLoadedAtom,
-} from '@entities/game/model/store';
 import { EggLoading } from '@shared/ui';
 import GameView from '@views/game/GameView';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const VALID_IDS = new Set<string>(ALL_CHARACTER_IDS);
 

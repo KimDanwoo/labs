@@ -2,7 +2,7 @@
 
 import { UserProfileMenu } from '@features/auth/ui';
 import { GameModeSelector, SelectNumber } from '@features/sudoku-game/ui';
-import { ThemeToggle } from '@features/theme/ui/ThemeToggle';
+import { ThemeToggle } from '@features/theme/ui';
 import { cn } from '@shared/model/utils';
 import { SudokuBoard } from '@widgets/game-board/ui';
 import { Controls } from '@widgets/game-controls/ui';

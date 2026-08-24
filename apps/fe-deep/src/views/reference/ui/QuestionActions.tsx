@@ -1,8 +1,8 @@
 'use client';
 
-import { Bookmark, BookmarkCheck, CheckCircle } from 'lucide-react';
-import { Button } from '@shared/ui';
 import { FeedbackForm } from '@features/feedback';
+import { Button } from '@shared/ui';
+import { Bookmark, BookmarkCheck, CheckCircle } from 'lucide-react';
 import { useQuestionActions } from '../model';
 
 interface QuestionActionsProps {

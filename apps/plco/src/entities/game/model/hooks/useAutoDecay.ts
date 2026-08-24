@@ -1,21 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import {
-  HUNGER_DECAY_PER_MINUTE,
-  SLEEP_START_HOUR,
-  SLEEP_END_HOUR,
   HEART_DECAY_WHEN_SICK,
+  HUNGER_DECAY_PER_MINUTE,
+  SLEEP_END_HOUR,
+  SLEEP_START_HOUR,
   WAKE_UP_GRACE_MS,
 } from '@shared/constants';
-import {
-  characterPositionAtom,
-  gameAtom,
-  isPlayingAtom,
-  isSickAtom,
-  wokeUpAtAtom,
-} from '../store';
+import { useAtomValue, useSetAtom, useStore } from 'jotai';
+import { useEffect } from 'react';
+import { characterPositionAtom, gameAtom, isPlayingAtom, isSickAtom, wokeUpAtAtom } from '../store';
 
 function isSleepTime(): boolean {
   const hour = new Date().getHours();
@@ -36,7 +30,7 @@ export function useAutoDecay() {
   const store = useStore();
 
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying) return undefined;
 
     const tick = () => {
       const sleeping = shouldBeSleeping(wokeUpAt, Date.now());
@@ -53,10 +47,10 @@ export function useAutoDecay() {
     const interval = setInterval(tick, 10_000);
 
     return () => clearInterval(interval);
-  }, [isPlaying, wokeUpAt, dispatch]);
+  }, [isPlaying, wokeUpAt, dispatch, store]);
 
   useEffect(() => {
-    if (!isPlaying || !isSick) return;
+    if (!isPlaying || !isSick) return undefined;
 
     const interval = setInterval(() => {
       dispatch({ type: 'DECAY_HEARTS', amount: HEART_DECAY_WHEN_SICK });

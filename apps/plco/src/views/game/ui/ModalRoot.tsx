@@ -1,20 +1,17 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useAtomValue } from 'jotai';
-import { MODAL_TYPE } from '@shared/constants';
-import {
-  activeModalAtom,
-  eggReadyCharacterIdAtom,
-} from '@entities/game/model/store';
 import { useGameActions } from '@entities/game/model/hooks';
+import { activeModalAtom, eggReadyCharacterIdAtom } from '@entities/game/model/store';
+import { EggModal } from '@features/egg/ui';
 import { FeedModal } from '@features/feed/ui';
-import { ShopModal } from '@features/shop/ui';
 import { MeetingModal } from '@features/meeting/ui';
 import { MiniGameModal } from '@features/minigame/ui';
-import { EggModal } from '@features/egg/ui';
 import { SettingsModal } from '@features/settings/ui';
+import { ShopModal } from '@features/shop/ui';
+import { MODAL_TYPE } from '@shared/constants';
 import { RoomsModal } from '@widgets/rooms/ui';
+import { useAtomValue } from 'jotai';
+import { useEffect } from 'react';
 
 const EGG_AUTO_OPEN_DELAY = 100;
 
@@ -24,7 +21,7 @@ export default function ModalRoot() {
   const { openModal } = useGameActions();
 
   useEffect(() => {
-    if (!eggReadyCharacterId || activeModal !== null) return;
+    if (!eggReadyCharacterId || activeModal !== null) return undefined;
     const timer = setTimeout(() => openModal(MODAL_TYPE.EGG), EGG_AUTO_OPEN_DELAY);
     return () => clearTimeout(timer);
   }, [eggReadyCharacterId, activeModal, openModal]);

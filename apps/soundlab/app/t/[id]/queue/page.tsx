@@ -1,5 +1,4 @@
-import { PLAYER_SCREEN } from '@entities/track/model/constants/playerScreen';
-import { TRACKS } from '@entities/track/model/constants/tracks';
+import { PLAYER_SCREEN, TRACKS } from '@entities/track/model/constants';
 import { PlayerView } from '@views/player/PlayerView';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';

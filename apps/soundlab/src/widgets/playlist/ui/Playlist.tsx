@@ -1,7 +1,7 @@
 'use client';
 
-import { TRACKS } from '@entities/track/model/constants/tracks';
-import { usePlaybackControls } from '@entities/track/model/hooks/usePlaybackControls';
+import { TRACKS } from '@entities/track/model/constants';
+import { usePlaybackControls } from '@entities/track/model/hooks';
 import { currentIndexAtom } from '@entities/track/model/store';
 import { TrackRow } from '@entities/track/ui';
 import { ScrollArea } from '@ui/react';

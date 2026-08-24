@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { myInvitesQueryKey } from '../constants';
 import { fetchMyInvites, joinInvitesChannel } from '../services';
 import type { Invite } from '../types';
@@ -20,16 +20,14 @@ export function useMyInvites(userId: string | null) {
   });
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) return undefined;
 
     const unsubscribe = joinInvitesChannel({
       userId,
       onInvite: (invite) => {
         queryClient.setQueryData<Invite[]>(myInvitesQueryKey(), (prev) => {
           const list = prev ?? [];
-          return list.some((i) => i.id === invite.id)
-            ? list
-            : [invite, ...list];
+          return list.some((i) => i.id === invite.id) ? list : [invite, ...list];
         });
       },
     });

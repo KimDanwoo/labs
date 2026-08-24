@@ -1,8 +1,8 @@
 'use client';
 
-import { useAuth } from '@features/auth/model/hooks/useAuth';
 import { cn } from '@shared/model/utils';
 import { FcGoogle } from 'react-icons/fc';
+import { useAuth } from '../model/hooks';
 
 export function GoogleSignInButton() {
   const { signInWithGoogle, isLoading } = useAuth();

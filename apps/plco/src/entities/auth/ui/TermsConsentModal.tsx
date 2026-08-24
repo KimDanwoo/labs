@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { useAtomValue } from 'jotai';
 import { MIN_AGE } from '@shared/constants';
 import { GoogleIcon, ModalShell } from '@shared/ui';
+import { useAtomValue } from 'jotai';
+import { useState } from 'react';
 import { useGoogleConsent } from '../model/hooks';
 import { googleAuthIntentAtom } from '../model/store';
-import TermsDocument from './TermsDocument';
 import PrivacyDocument from './PrivacyDocument';
+import TermsDocument from './TermsDocument';
 
 const CONSENT_DOCS = [
   { key: 'terms', label: '이용약관 (필수)', Doc: TermsDocument },
@@ -52,8 +52,7 @@ export default function TermsConsentModal() {
 
   if (!intent) return null;
 
-  const toggle = (key: ConsentKey) =>
-    setChecked((prev) => ({ ...prev, [key]: !prev[key] }));
+  const toggle = (key: ConsentKey) => setChecked((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const toggleAll = () => {
     const next = !allChecked;
@@ -74,30 +73,20 @@ export default function TermsConsentModal() {
 
   return (
     <>
-      <ModalShell
-        onClose={handleCancel}
-        maxWidth="max-w-xs"
-        className="p-6 space-y-4"
-      >
+      <ModalShell onClose={handleCancel} maxWidth="max-w-xs" className="p-6 space-y-4">
         {(close) => (
           <>
             <div className="space-y-1.5">
               <h3 className="text-base font-bold text-gray-700">약관 동의</h3>
               <p className="text-[11px] text-gray-400 leading-relaxed">
-                구글로 로그인하면 계정 식별을 위해 이메일이 수집돼요. 아래 약관에
-                모두 동의해야 진행할 수 있어요.
+                구글로 로그인하면 계정 식별을 위해 이메일이 수집돼요. 아래 약관에 모두 동의해야 진행할 수 있어요.
               </p>
             </div>
 
             <div className="surface rounded-xl p-4 space-y-3">
-              <button
-                onClick={toggleAll}
-                className="w-full flex items-center gap-2.5 btn-press text-left"
-              >
+              <button onClick={toggleAll} className="w-full flex items-center gap-2.5 btn-press text-left">
                 <CheckBox checked={allChecked} />
-                <span className="text-sm font-bold text-gray-700">
-                  전체 동의
-                </span>
+                <span className="text-sm font-bold text-gray-700">전체 동의</span>
               </button>
 
               <div className="border-t border-gray-100" />
@@ -110,9 +99,7 @@ export default function TermsConsentModal() {
                       className="flex items-center gap-2.5 btn-press flex-1 text-left"
                     >
                       <CheckBox checked={checked[item.key]} />
-                      <span className="text-xs text-gray-600">
-                        {item.label}
-                      </span>
+                      <span className="text-xs text-gray-600">{item.label}</span>
                     </button>
                     <button
                       onClick={() => setViewing(item.key)}
@@ -123,14 +110,9 @@ export default function TermsConsentModal() {
                   </div>
                 ))}
 
-                <button
-                  onClick={() => toggle('age')}
-                  className="flex items-center gap-2.5 btn-press w-full text-left"
-                >
+                <button onClick={() => toggle('age')} className="flex items-center gap-2.5 btn-press w-full text-left">
                   <CheckBox checked={checked.age} />
-                  <span className="text-xs text-gray-600">
-                    만 {MIN_AGE}세 이상입니다 (필수)
-                  </span>
+                  <span className="text-xs text-gray-600">만 {MIN_AGE}세 이상입니다 (필수)</span>
                 </button>
               </div>
             </div>

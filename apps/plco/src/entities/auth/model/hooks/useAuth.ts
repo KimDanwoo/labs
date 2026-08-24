@@ -1,25 +1,25 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { clearLocalGameSaves, supabase } from '@shared/lib';
 import type { User } from '@supabase/supabase-js';
-import { supabase, clearLocalGameSaves } from '@shared/lib';
+import { useCallback, useEffect, useState } from 'react';
 import { AUTH_API } from '../constants';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setIsLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      },
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
 
     return () => subscription.unsubscribe();
   }, []);

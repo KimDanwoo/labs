@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@shared/config/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 /**
  * 계정 설정 페이지의 유저 정보 로드, 탈퇴 처리, 바텀시트 상태를 관리한다.

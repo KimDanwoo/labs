@@ -1,14 +1,16 @@
 'use server';
 
-import { randomUUID } from 'crypto';
-import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { createAdminSupabaseClient } from '@shared/config/supabase/admin';
-import { isAdmin } from '@features/auth';
+import { createServerSupabaseClient } from '@shared/config/supabase/server';
+import { isAdmin } from '@shared/lib/isAdmin';
+import { randomUUID } from 'crypto';
 import type { Question, QuestionInput } from '../model';
 
 async function requireAdmin() {
   const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user || !isAdmin(user.email)) {
     throw new Error('관리자 권한이 필요합니다.');
   }
@@ -20,7 +22,7 @@ export async function createQuestion(data: QuestionInput): Promise<Question> {
 
   // order_num이 없으면 해당 카테고리 내 마지막 + 1
   let orderNum = data.order_num;
-  if (orderNum == null) {
+  if (orderNum === null || orderNum === undefined) {
     const { data: last } = await admin
       .from('questions')
       .select('order_num')
@@ -41,19 +43,11 @@ export async function createQuestion(data: QuestionInput): Promise<Question> {
   return created as Question;
 }
 
-export async function updateQuestion(
-  id: string,
-  data: Partial<QuestionInput>
-): Promise<Question> {
+export async function updateQuestion(id: string, data: Partial<QuestionInput>): Promise<Question> {
   await requireAdmin();
   const admin = createAdminSupabaseClient();
 
-  const { data: updated, error } = await admin
-    .from('questions')
-    .update(data)
-    .eq('id', id)
-    .select()
-    .single();
+  const { data: updated, error } = await admin.from('questions').update(data).eq('id', id).select().single();
 
   if (error) throw new Error(`질문 수정 실패: ${error.message}`);
   return updated as Question;
@@ -86,10 +80,7 @@ export async function updateQuestionsVisibility(
   await requireAdmin();
   const admin = createAdminSupabaseClient();
 
-  const { error } = await admin
-    .from('questions')
-    .update(fields)
-    .in('id', ids);
+  const { error } = await admin.from('questions').update(fields).in('id', ids);
   if (error) throw new Error(`노출 설정 변경 실패: ${error.message}`);
 }
 
@@ -101,17 +92,11 @@ export async function updateCategoryVisibility(
   await requireAdmin();
   const admin = createAdminSupabaseClient();
 
-  const { error } = await admin
-    .from('questions')
-    .update(fields)
-    .eq('category_id', categoryId);
+  const { error } = await admin.from('questions').update(fields).eq('category_id', categoryId);
   if (error) throw new Error(`카테고리 노출 설정 변경 실패: ${error.message}`);
 }
 
-export async function reorderQuestions(
-  categoryId: string,
-  orderedIds: string[]
-): Promise<void> {
+export async function reorderQuestions(categoryId: string, orderedIds: string[]): Promise<void> {
   await requireAdmin();
   const admin = createAdminSupabaseClient();
 
@@ -120,7 +105,7 @@ export async function reorderQuestions(
       .from('questions')
       .update({ order_num: index + 1 })
       .eq('id', id)
-      .eq('category_id', categoryId)
+      .eq('category_id', categoryId),
   );
 
   await Promise.all(updates);

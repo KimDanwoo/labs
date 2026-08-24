@@ -1,14 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAtomValue } from 'jotai';
+import { useGameActions } from '@entities/game/model/hooks';
+import { eggReadyCharacterIdAtom, isAllUnlockedAtom } from '@entities/game/model/store';
 import { CHARACTERS } from '@shared/constants';
 import { CharacterSprite, ModalShell } from '@shared/ui';
-import {
-  eggReadyCharacterIdAtom,
-  isAllUnlockedAtom,
-} from '@entities/game/model/store';
-import { useGameActions } from '@entities/game/model/hooks';
+import { useAtomValue } from 'jotai';
+import { useEffect, useState } from 'react';
 import { EGG_DISPLAY_MS, EGG_HATCHING_MS, EGG_PHASE } from '../model/constants';
 import type { EggPhase } from '../model/types';
 
@@ -21,19 +18,14 @@ export default function EggModal() {
 
   useEffect(() => {
     if (phase === EGG_PHASE.EGG) {
-      const timer = setTimeout(
-        () => setPhase(EGG_PHASE.HATCHING),
-        EGG_DISPLAY_MS,
-      );
+      const timer = setTimeout(() => setPhase(EGG_PHASE.HATCHING), EGG_DISPLAY_MS);
       return () => clearTimeout(timer);
     }
     if (phase === EGG_PHASE.HATCHING) {
-      const timer = setTimeout(
-        () => setPhase(EGG_PHASE.REVEAL),
-        EGG_HATCHING_MS,
-      );
+      const timer = setTimeout(() => setPhase(EGG_PHASE.REVEAL), EGG_HATCHING_MS);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [phase]);
 
   if (!characterId) return null;
@@ -50,9 +42,7 @@ export default function EggModal() {
         <>
           {phase === EGG_PHASE.EGG && (
             <>
-              <h3 className="text-lg font-bold text-pink-500">
-                알을 발견했어요!
-              </h3>
+              <h3 className="text-lg font-bold text-pink-500">알을 발견했어요!</h3>
               <div className="text-7xl animate-bounce">🥚</div>
               <p className="text-sm text-gray-500">두근두근... 뭐가 나올까?</p>
             </>
@@ -76,23 +66,17 @@ export default function EggModal() {
 
           {phase === EGG_PHASE.REVEAL && (
             <>
-              <h3
-                className="text-lg font-bold"
-                style={{ color: character.color }}
-              >
+              <h3 className="text-lg font-bold" style={{ color: character.color }}>
                 {isAllUnlocked ? '보너스 코인!' : `${character.name} 해금!`}
               </h3>
               <div className="flex justify-center">
                 <CharacterSprite characterId={characterId} size={80} />
               </div>
               {isAllUnlocked ? (
-                <p className="text-sm text-yellow-500 font-bold">
-                  이미 모두 해금! 🪙 +100 코인
-                </p>
+                <p className="text-sm text-yellow-500 font-bold">이미 모두 해금! 🪙 +100 코인</p>
               ) : (
                 <p className="text-sm text-gray-500">
-                  {character.emoji} {character.name}을(를) 키울 수 있게
-                  되었어요!
+                  {character.emoji} {character.name}을(를) 키울 수 있게 되었어요!
                 </p>
               )}
               <button

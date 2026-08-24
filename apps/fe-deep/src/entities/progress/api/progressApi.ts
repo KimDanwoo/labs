@@ -1,9 +1,8 @@
 'use client';
 
-import type { ProgressStatus, UserProgress, ReviewRating } from '../model';
-import { SM2_CONSTANTS } from '../model';
-import { calculateSM2, todayString, addDays } from '../sm2';
 import { STORAGE_KEYS } from '@shared/constants';
+import { type ProgressStatus, type ReviewRating, SM2_CONSTANTS, type UserProgress } from '../model';
+import { addDays, calculateSM2, todayString } from '../sm2';
 
 export { calculateSM2 } from '../sm2';
 
@@ -54,7 +53,8 @@ function migrateProgress(old: Partial<UserProgress> & { question_id: string }): 
     wrong_count: old.wrong_count ?? 0,
     last_reviewed: old.last_reviewed ?? today,
     easiness_factor: 2.5,
-    interval: old.status === 'mastered' ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION,
+    interval:
+      old.status === 'mastered' ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION,
     repetition: old.status === 'mastered' ? 2 : 0,
     next_review: today, // 마이그레이션 시 오늘 복습 대상으로
   };
@@ -103,9 +103,11 @@ export function reviewCard(questionId: string, rating: ReviewRating): UserProgre
   saveLocalProgress(allProgress);
 
   // Supabase write-through (lazy import로 순환 의존성 방지)
-  import('../services/progressSync').then(({ syncSingleCard }) => {
-    syncSingleCard(updated).catch(() => {});
-  }).catch(() => {});
+  import('../services/progressSync')
+    .then(({ syncSingleCard }) => {
+      syncSingleCard(updated).catch(() => {});
+    })
+    .catch(() => {});
 
   return updated;
 }
@@ -196,10 +198,7 @@ export function getCurrentStreak(heatmap?: Record<string, number>): number {
  * 레퍼런스 페이지의 "학습 완료" 버튼에서 사용한다.
  * SM-2 스케줄링 없이 상태만 반영한다.
  */
-export function updateQuestionProgress(
-  questionId: string,
-  knew: boolean
-): UserProgress {
+export function updateQuestionProgress(questionId: string, knew: boolean): UserProgress {
   const allProgress = getLocalProgress();
   const existing = allProgress[questionId];
   const today = todayString();
@@ -213,9 +212,12 @@ export function updateQuestionProgress(
     wrong_count: (existing?.wrong_count ?? 0) + (knew ? 0 : 1),
     last_reviewed: new Date().toISOString(),
     easiness_factor: existing?.easiness_factor ?? 2.5,
-    interval: existing?.interval ?? (knew ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION),
+    interval:
+      existing?.interval ?? (knew ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION),
     repetition: existing?.repetition ?? (knew ? 2 : 0),
-    next_review: existing?.next_review ?? addDays(today, knew ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION),
+    next_review:
+      existing?.next_review ??
+      addDays(today, knew ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION),
   };
 
   if (updated.correct_count >= 3) {
@@ -228,9 +230,11 @@ export function updateQuestionProgress(
   saveLocalProgress(allProgress);
 
   // Supabase write-through (lazy import로 순환 의존성 방지)
-  import('../services/progressSync').then(({ syncSingleCard }) => {
-    syncSingleCard(updated).catch(() => {});
-  }).catch(() => {});
+  import('../services/progressSync')
+    .then(({ syncSingleCard }) => {
+      syncSingleCard(updated).catch(() => {});
+    })
+    .catch(() => {});
 
   return updated;
 }

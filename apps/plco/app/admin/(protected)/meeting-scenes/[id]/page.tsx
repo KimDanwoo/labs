@@ -1,12 +1,12 @@
 'use client';
 
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import { ALL_CHARACTER_IDS } from '@shared/constants';
-import { ADMIN_ROUTE } from '@features/admin/model/services';
 import { useMeetingScenes } from '@features/admin/model/hooks';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
 import type { MeetingSceneRow } from '@features/admin/model/types';
 import { SceneEditor } from '@features/admin/ui';
+import { ALL_CHARACTER_IDS } from '@shared/constants';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 
 function emptyScene(): MeetingSceneRow {
   return {
@@ -36,23 +36,14 @@ export default function SceneDetailPage() {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <Link
-          href={ADMIN_ROUTE.meetingScenes}
-          className="text-xs text-muted btn-press"
-        >
+        <Link href={ADMIN_ROUTE.meetingScenes} className="text-xs text-muted btn-press">
           ←
         </Link>
-        <h1 className="text-sm font-bold text-foreground">
-          {isNew ? '새 시나리오' : '시나리오 편집'}
-        </h1>
+        <h1 className="text-sm font-bold text-foreground">{isNew ? '새 시나리오' : '시나리오 편집'}</h1>
       </div>
 
-      {!isNew && isLoading && (
-        <p className="text-xs text-muted text-center py-8">불러오는 중...</p>
-      )}
-      {!isNew && !isLoading && !row && (
-        <p className="text-xs text-red text-center py-8">찾을 수 없어요</p>
-      )}
+      {!isNew && isLoading && <p className="text-xs text-muted text-center py-8">불러오는 중...</p>}
+      {!isNew && !isLoading && !row && <p className="text-xs text-red text-center py-8">찾을 수 없어요</p>}
       {row && <SceneEditor row={row} onDone={back} />}
     </div>
   );

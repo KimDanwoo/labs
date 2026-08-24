@@ -15,16 +15,14 @@ export default function PrivacyDocument() {
           <li>서비스 이용 시: 게임 진행 데이터(캐릭터 상태, 코인, 해금 정보)</li>
         </ul>
         <p className="text-xs leading-relaxed text-gray-500">
-          게스트(로그인 전)로 이용하는 경우 이메일 등 개인을 식별할 수 있는
-          정보는 수집하지 않습니다.
+          게스트(로그인 전)로 이용하는 경우 이메일 등 개인을 식별할 수 있는 정보는 수집하지 않습니다.
         </p>
       </section>
 
       <section className="space-y-1.5">
         <h2 className="text-sm font-bold">2. 수집 방법</h2>
         <p className="text-xs leading-relaxed text-gray-500">
-          이용자가 구글 OAuth 로그인에 동의하는 시점에 구글로부터 이메일을
-          제공받습니다.
+          이용자가 구글 OAuth 로그인에 동의하는 시점에 구글로부터 이메일을 제공받습니다.
         </p>
       </section>
 
@@ -38,24 +36,21 @@ export default function PrivacyDocument() {
       <section className="space-y-1.5">
         <h2 className="text-sm font-bold">4. 보유 및 파기</h2>
         <p className="text-xs leading-relaxed text-gray-500">
-          수집한 정보는 회원 탈퇴 시 즉시 파기됩니다. 이용자는 설정 화면에서
-          언제든지 탈퇴할 수 있습니다.
+          수집한 정보는 회원 탈퇴 시 즉시 파기됩니다. 이용자는 설정 화면에서 언제든지 탈퇴할 수 있습니다.
         </p>
       </section>
 
       <section className="space-y-1.5">
         <h2 className="text-sm font-bold">5. 처리 위탁</h2>
         <p className="text-xs leading-relaxed text-gray-500">
-          데이터 저장 및 인증을 위해 Supabase(데이터베이스·인증) 및 Google
-          (소셜 로그인)을 이용합니다.
+          데이터 저장 및 인증을 위해 Supabase(데이터베이스·인증) 및 Google (소셜 로그인)을 이용합니다.
         </p>
       </section>
 
       <section className="space-y-1.5">
         <h2 className="text-sm font-bold">6. 이용자의 권리</h2>
         <p className="text-xs leading-relaxed text-gray-500">
-          이용자는 자신의 개인정보에 대한 열람, 정정, 삭제(탈퇴)를 요청할 수
-          있습니다.
+          이용자는 자신의 개인정보에 대한 열람, 정정, 삭제(탈퇴)를 요청할 수 있습니다.
         </p>
       </section>
     </div>

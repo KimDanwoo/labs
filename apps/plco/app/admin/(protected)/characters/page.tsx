@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { ADMIN_ROUTE } from '@features/admin/model/services';
 import { useCharacters } from '@features/admin/model/hooks';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
+import Link from 'next/link';
 
 export default function CharactersAdminPage() {
   const { data, isLoading, isError } = useCharacters();
@@ -16,12 +16,8 @@ export default function CharactersAdminPage() {
         <h1 className="text-sm font-bold text-foreground">캐릭터</h1>
       </div>
 
-      {isLoading && (
-        <p className="text-xs text-muted text-center py-8">불러오는 중...</p>
-      )}
-      {isError && (
-        <p className="text-xs text-red text-center py-8">불러오기 실패</p>
-      )}
+      {isLoading && <p className="text-xs text-muted text-center py-8">불러오는 중...</p>}
+      {isError && <p className="text-xs text-red text-center py-8">불러오기 실패</p>}
 
       {data?.map((c) => (
         <Link

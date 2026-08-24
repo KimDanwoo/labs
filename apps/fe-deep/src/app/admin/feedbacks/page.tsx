@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getFeedbacks, updateFeedbackStatus } from '@features/feedback';
-import { Badge, Button, Card, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@shared/ui';
-import { MessageSquare, CheckCircle, Eye, Clock, Trash2 } from 'lucide-react';
+import { Badge, Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { CheckCircle, Clock, Eye, MessageSquare, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Feedback {
   id: string;
@@ -16,7 +16,10 @@ interface Feedback {
   created_at: string;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; icon: typeof Clock; variant: 'default' | 'secondary' | 'outline' }> = {
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; icon: typeof Clock; variant: 'default' | 'secondary' | 'outline' }
+> = {
   pending: { label: '대기', icon: Clock, variant: 'outline' },
   reviewed: { label: '확인됨', icon: Eye, variant: 'secondary' },
   resolved: { label: '완료', icon: CheckCircle, variant: 'default' },
@@ -62,16 +65,18 @@ export default function FeedbacksPage() {
         </Select>
       </div>
 
-      {loading ? (
-        <div className="p-8 text-center text-muted-foreground">불러오는 중...</div>
-      ) : feedbacks.length === 0 ? (
+      {loading && <div className="p-8 text-center text-muted-foreground">불러오는 중...</div>}
+
+      {!loading && feedbacks.length === 0 && (
         <Card className="p-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
             <MessageSquare className="h-7 w-7 text-muted-foreground/50" />
           </div>
           <p className="text-muted-foreground">피드백이 없습니다.</p>
         </Card>
-      ) : (
+      )}
+
+      {!loading && feedbacks.length > 0 && (
         <div className="space-y-3">
           {feedbacks.map((fb) => {
             const statusConf = STATUS_CONFIG[fb.status] ?? STATUS_CONFIG.pending;
@@ -96,11 +101,7 @@ export default function FeedbacksPage() {
 
                   <ContentToggle text={fb.content} />
 
-                  {fb.question_id && (
-                    <p className="text-xs text-muted-foreground">
-                      질문 ID: {fb.question_id}
-                    </p>
-                  )}
+                  {fb.question_id && <p className="text-xs text-muted-foreground">질문 ID: {fb.question_id}</p>}
 
                   <div className="flex gap-1.5 pt-1">
                     {fb.status !== 'deleted' && (
@@ -120,7 +121,12 @@ export default function FeedbacksPage() {
                             대기로
                           </Button>
                         )}
-                        <Button variant="ghost" size="xs" className="text-error ml-auto" onClick={() => handleStatusChange(fb.id, 'deleted')}>
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          className="text-error ml-auto"
+                          onClick={() => handleStatusChange(fb.id, 'deleted')}
+                        >
                           <Trash2 className="size-3" />
                           삭제
                         </Button>
@@ -154,17 +160,11 @@ function ContentToggle({ text }: { text: string }) {
 
   return (
     <div>
-      <p
-        ref={ref}
-        className={`text-sm whitespace-pre-wrap ${expanded ? '' : 'line-clamp-2'}`}
-      >
+      <p ref={ref} className={`text-sm whitespace-pre-wrap ${expanded ? '' : 'line-clamp-2'}`}>
         {text}
       </p>
       {clamped && (
-        <button
-          className="text-xs text-primary hover:underline mt-1"
-          onClick={() => setExpanded(!expanded)}
-        >
+        <button className="text-xs text-primary hover:underline mt-1" onClick={() => setExpanded(!expanded)}>
           {expanded ? '접기' : '더보기'}
         </button>
       )}

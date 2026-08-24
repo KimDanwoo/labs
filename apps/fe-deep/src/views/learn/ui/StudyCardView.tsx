@@ -1,7 +1,6 @@
 'use client';
 
-import type { ReviewRating, UserProgress } from '@entities/progress';
-import { RATING_CONFIG } from '@entities/progress';
+import { RATING_CONFIG, type ReviewRating, type UserProgress } from '@entities/progress';
 import type { Question } from '@entities/question';
 import { DifficultyBadge } from '@entities/question/ui';
 import { Badge, Button, Card, MarkdownRenderer, Progress } from '@shared/ui';

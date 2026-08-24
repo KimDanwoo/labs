@@ -1,6 +1,6 @@
 import { countStars, isPuzzleSolved, violatingStarKeys } from '@entities/stardoku/model/utils';
-import { livesAtom, marksAtom, puzzleAtom } from '@features/stardoku-game/model/atoms/primitives';
 import { atom } from 'jotai';
+import { livesAtom, marksAtom, puzzleAtom } from './primitives';
 
 export const starCountAtom = atom((get) => countStars(get(marksAtom)));
 

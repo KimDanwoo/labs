@@ -44,8 +44,7 @@ export function useSaveCharacter() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (row: CharacterRow) => postUpsert(ADMIN_API.characters, row),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ADMIN_QUERY_KEYS.characters }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ADMIN_QUERY_KEYS.characters }),
   });
 }
 
@@ -59,10 +58,8 @@ export function useMeetingScenes() {
 export function useSaveMeetingScene() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (row: MeetingSceneRow) =>
-      postUpsert(ADMIN_API.meetingScenes, row),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ADMIN_QUERY_KEYS.meetingScenes }),
+    mutationFn: (row: MeetingSceneRow) => postUpsert(ADMIN_API.meetingScenes, row),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ADMIN_QUERY_KEYS.meetingScenes }),
   });
 }
 
@@ -70,8 +67,7 @@ export function useDeleteMeetingScene() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteById(ADMIN_API.meetingScenes, id),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ADMIN_QUERY_KEYS.meetingScenes }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ADMIN_QUERY_KEYS.meetingScenes }),
   });
 }
 

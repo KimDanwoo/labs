@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Button, Avatar, AvatarFallback, AvatarImage, Sheet, SheetContent, SheetTitle } from '@shared/ui';
+import { Avatar, AvatarFallback, AvatarImage, Button, Card, Sheet, SheetContent, SheetTitle } from '@shared/ui';
 import { Mail, User } from 'lucide-react';
 import { useAccount } from '../model';
 

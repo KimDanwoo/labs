@@ -1,9 +1,18 @@
 'use client';
 
-import Link from 'next/link';
-import { Search } from 'lucide-react';
-import { Input, Badge, Card, MarkdownRenderer, Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@shared/ui';
 import { DifficultyBadge } from '@entities/question/ui';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Badge,
+  Card,
+  Input,
+  MarkdownRenderer,
+} from '@shared/ui';
+import { Search } from 'lucide-react';
+import Link from 'next/link';
 import { useSearch } from '../model';
 
 const MATCH_TYPE_LABEL: Record<string, string> = {
@@ -38,8 +47,7 @@ export function SearchContent() {
 
       {debouncedQuery && (
         <p className="text-sm text-muted-foreground mb-4">
-          &quot;{debouncedQuery}&quot;에 대한 검색 결과{' '}
-          {isSearching ? '...' : `${displayResults.length}건`}
+          &quot;{debouncedQuery}&quot;에 대한 검색 결과 {isSearching ? '...' : `${displayResults.length}건`}
         </p>
       )}
 
@@ -53,9 +61,7 @@ export function SearchContent() {
             >
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex flex-col gap-1.5 text-left flex-1 mr-4">
-                  <span className="font-medium text-sm leading-relaxed">
-                    {result.question.question}
-                  </span>
+                  <span className="font-medium text-sm leading-relaxed">{result.question.question}</span>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge variant="outline" className="text-xs">
                       {result.category.icon} {result.category.title}
@@ -85,9 +91,7 @@ export function SearchContent() {
 
       {showNoResults && (
         <Card className="p-16 text-center shadow-sm">
-          <p className="text-muted-foreground">
-            검색 결과가 없습니다. 다른 키워드로 검색해보세요.
-          </p>
+          <p className="text-muted-foreground">검색 결과가 없습니다. 다른 키워드로 검색해보세요.</p>
         </Card>
       )}
 
@@ -96,9 +100,7 @@ export function SearchContent() {
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <Search className="h-7 w-7 text-muted-foreground/50" />
           </div>
-          <p className="text-muted-foreground">
-            키워드를 입력하면 모든 질문과 답변에서 검색합니다.
-          </p>
+          <p className="text-muted-foreground">키워드를 입력하면 모든 질문과 답변에서 검색합니다.</p>
         </Card>
       )}
     </div>

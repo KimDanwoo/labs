@@ -1,3 +1,3 @@
+export { getBookmarks, isBookmarked, toggleBookmark } from './api';
 export type { Bookmark } from './model';
-export { bookmarkQueries, bookmarkMutations } from './services';
-export { getBookmarks, toggleBookmark, isBookmarked } from './api';
+export { bookmarkMutations, bookmarkQueries } from './services';

@@ -1,5 +1,4 @@
-import { getProgressForQuestion, updateQuestionProgress } from '@entities/progress';
-import type { ProgressStatus } from '@entities/progress';
+import { getProgressForQuestion, type ProgressStatus, updateQuestionProgress } from '@entities/progress';
 import { isBookmarked, toggleBookmark } from '@features/bookmark';
 
 const MASTERED: ProgressStatus = 'mastered';

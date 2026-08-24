@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 import { useAuth } from '@entities/auth/model/hooks';
 import { useGameSync } from '@entities/game/model/hooks';
+import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 
 type SyncProviderProps = {
   children: React.ReactNode;

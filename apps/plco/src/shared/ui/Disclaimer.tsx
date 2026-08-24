@@ -5,11 +5,5 @@ type DisclaimerProps = {
 };
 
 export default function Disclaimer({ className = '' }: DisclaimerProps) {
-  return (
-    <p
-      className={`text-center text-[10px] leading-relaxed text-gray-400 ${className}`}
-    >
-      {DISCLAIMER_SHORT}
-    </p>
-  );
+  return <p className={`text-center text-[10px] leading-relaxed text-gray-400 ${className}`}>{DISCLAIMER_SHORT}</p>;
 }

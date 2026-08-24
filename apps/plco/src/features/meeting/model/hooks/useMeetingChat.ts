@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
-import type { CharacterId } from '@shared/types';
+import { useGameActions } from '@entities/game/model/hooks';
+import { characterIdAtom, meetingPlayFriendAtom } from '@entities/game/model/store';
 import {
   COINS_PER_MEETING,
   MEETING_PERFECT_COIN_BONUS,
@@ -12,11 +11,9 @@ import {
   MEETING_ROUNDS,
 } from '@shared/constants';
 import { formatDateKey } from '@shared/lib';
-import {
-  characterIdAtom,
-  meetingPlayFriendAtom,
-} from '@entities/game/model/store';
-import { useGameActions } from '@entities/game/model/hooks';
+import type { CharacterId } from '@shared/types';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useEffect, useMemo, useState } from 'react';
 import {
   CONVERSATION_OUTCOME,
   MEETING_CHARACTERS,
@@ -27,11 +24,7 @@ import {
   MEETING_REACTION_MS,
   pickScenesForCharacter,
 } from '../constants';
-import type {
-  ConversationOption,
-  ConversationOutcome,
-  MeetingPhase,
-} from '../types';
+import type { ConversationOption, ConversationOutcome, MeetingPhase } from '../types';
 
 function rewardOf(outcome: ConversationOutcome): number {
   if (outcome === CONVERSATION_OUTCOME.GOOD) return MEETING_REWARD_GOOD;
@@ -52,21 +45,16 @@ export function useMeetingChat() {
   const [lastReaction, setLastReaction] = useState<string | null>(null);
 
   const scenes = useMemo(
-    () =>
-      metCharacter ? pickScenesForCharacter(metCharacter, MEETING_ROUNDS) : [],
+    () => (metCharacter ? pickScenesForCharacter(metCharacter, MEETING_ROUNDS) : []),
     [metCharacter],
   );
 
   useEffect(() => {
-    if (!myCharacterId) return;
+    if (!myCharacterId) return undefined;
     const candidates = MEETING_CHARACTERS.filter((c) => c !== myCharacterId);
     const timer = setTimeout(() => {
-      const randomChar =
-        candidates[Math.floor(Math.random() * candidates.length)];
-      const randomName =
-        MEETING_RANDOM_NAMES[
-          Math.floor(Math.random() * MEETING_RANDOM_NAMES.length)
-        ];
+      const randomChar = candidates[Math.floor(Math.random() * candidates.length)];
+      const randomName = MEETING_RANDOM_NAMES[Math.floor(Math.random() * MEETING_RANDOM_NAMES.length)];
       setMetCharacter(randomChar);
       setMetName(randomName);
       setPhase(MEETING_PHASE.FOUND);
@@ -76,11 +64,8 @@ export function useMeetingChat() {
   }, [myCharacterId]);
 
   useEffect(() => {
-    if (phase !== MEETING_PHASE.FOUND) return;
-    const timer = setTimeout(
-      () => setPhase(MEETING_PHASE.CHAT),
-      MEETING_FOUND_MS,
-    );
+    if (phase !== MEETING_PHASE.FOUND) return undefined;
+    const timer = setTimeout(() => setPhase(MEETING_PHASE.CHAT), MEETING_FOUND_MS);
     return () => clearTimeout(timer);
   }, [phase]);
 
@@ -100,11 +85,8 @@ export function useMeetingChat() {
   };
 
   const totalHearts = outcomes.reduce((sum, o) => sum + rewardOf(o), 0);
-  const isPerfect =
-    outcomes.length === MEETING_ROUNDS &&
-    outcomes.every((o) => o === CONVERSATION_OUTCOME.GOOD);
-  const coinsReward =
-    COINS_PER_MEETING + (isPerfect ? MEETING_PERFECT_COIN_BONUS : 0);
+  const isPerfect = outcomes.length === MEETING_ROUNDS && outcomes.every((o) => o === CONVERSATION_OUTCOME.GOOD);
+  const coinsReward = COINS_PER_MEETING + (isPerfect ? MEETING_PERFECT_COIN_BONUS : 0);
 
   const isAwkward = totalHearts === 0;
 

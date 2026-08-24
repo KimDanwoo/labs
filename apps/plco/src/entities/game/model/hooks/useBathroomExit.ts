@@ -1,13 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
-import {
-  bathroomActiveAtom,
-  bathroomExitAtAtom,
-  pendingPoopsAtom,
-  poopsAtom,
-} from '../store';
+import { useEffect } from 'react';
+import { bathroomActiveAtom, bathroomExitAtAtom, pendingPoopsAtom, poopsAtom } from '../store';
 
 const BATHROOM_EXIT_DELAY_MS = 5000;
 
@@ -39,7 +34,7 @@ export function useBathroomExit() {
   }, [active, exitAt, poopsCount, pendingPoopsCount, setExitAt]);
 
   useEffect(() => {
-    if (exitAt === null) return;
+    if (exitAt === null) return undefined;
     const timer = setTimeout(() => {
       setExitAt(null);
       setActive(false);

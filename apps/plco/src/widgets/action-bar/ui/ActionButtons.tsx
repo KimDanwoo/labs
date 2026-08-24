@@ -1,19 +1,10 @@
 'use client';
 
-import { useAtomValue } from 'jotai';
+import { useGameActions, useMeetingStatus, useMinigameStatus } from '@entities/game/model/hooks';
+import { coinsAtom, hasFoodAtom, isSickAtom, poopsAtom } from '@entities/game/model/store';
 import { MEDICINE_PRICE, MODAL_TYPE } from '@shared/constants';
 import { formatCooldownShort } from '@shared/lib';
-import {
-  poopsAtom,
-  hasFoodAtom,
-  isSickAtom,
-  coinsAtom,
-} from '@entities/game/model/store';
-import {
-  useGameActions,
-  useMeetingStatus,
-  useMinigameStatus,
-} from '@entities/game/model/hooks';
+import { useAtomValue } from 'jotai';
 import ActionBtn from './ActionBtn';
 
 export default function ActionButtons() {
@@ -28,32 +19,16 @@ export default function ActionButtons() {
   const poopCount = poops.length;
   const canAffordMedicine = coins >= MEDICINE_PRICE;
 
+  const meetingRemainingBadge = meeting.reachedDailyLimit ? '⛔' : `${meeting.dailyLimit - meeting.meetingsToday}`;
   const meetingBadge =
-    meeting.cooldownRemainingMs > 0
-      ? formatCooldownShort(meeting.cooldownRemainingMs)
-      : meeting.reachedDailyLimit
-        ? '⛔'
-        : `${meeting.dailyLimit - meeting.meetingsToday}`;
+    meeting.cooldownRemainingMs > 0 ? formatCooldownShort(meeting.cooldownRemainingMs) : meetingRemainingBadge;
 
-  const minigameBadge = minigame.canPlay
-    ? undefined
-    : formatCooldownShort(minigame.cooldownRemainingMs);
+  const minigameBadge = minigame.canPlay ? undefined : formatCooldownShort(minigame.cooldownRemainingMs);
 
   return (
     <div className="flex justify-center gap-1.5 sm:gap-2 flex-wrap">
-      <ActionBtn
-        icon="🍖"
-        label="밥주기"
-        onClick={() => openModal(MODAL_TYPE.FEED)}
-        disabled={!hasFood}
-      />
-      <ActionBtn
-        icon="🧹"
-        label="청소"
-        onClick={cleanAllPoop}
-        badge={poopCount}
-        disabled={poopCount === 0}
-      />
+      <ActionBtn icon="🍖" label="밥주기" onClick={() => openModal(MODAL_TYPE.FEED)} disabled={!hasFood} />
+      <ActionBtn icon="🧹" label="청소" onClick={cleanAllPoop} badge={poopCount} disabled={poopCount === 0} />
       <ActionBtn
         icon="🎮"
         label="놀기"
@@ -68,25 +43,9 @@ export default function ActionButtons() {
         badge={meetingBadge}
         disabled={!meeting.canMeet}
       />
-      {isSick && (
-        <ActionBtn
-          icon="💊"
-          label="약주기"
-          onClick={giveMedicine}
-          disabled={!canAffordMedicine}
-          highlight
-        />
-      )}
-      <ActionBtn
-        icon="🏪"
-        label="상점"
-        onClick={() => openModal(MODAL_TYPE.SHOP)}
-      />
-      <ActionBtn
-        icon="💬"
-        label="채팅방"
-        onClick={() => openModal(MODAL_TYPE.ROOMS)}
-      />
+      {isSick && <ActionBtn icon="💊" label="약주기" onClick={giveMedicine} disabled={!canAffordMedicine} highlight />}
+      <ActionBtn icon="🏪" label="상점" onClick={() => openModal(MODAL_TYPE.SHOP)} />
+      <ActionBtn icon="💬" label="채팅방" onClick={() => openModal(MODAL_TYPE.ROOMS)} />
     </div>
   );
 }

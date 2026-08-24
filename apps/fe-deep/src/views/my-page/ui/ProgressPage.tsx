@@ -1,9 +1,9 @@
 'use client';
 
-import { Card, Progress, Badge } from '@shared/ui';
-import { BookOpen, CheckCircle, Brain, Target, Flame, Clock } from 'lucide-react';
-import { StudyHeatmap } from './StudyHeatmap';
+import { Badge, Card, Progress } from '@shared/ui';
+import { BookOpen, Brain, CheckCircle, Clock, Flame, Target } from 'lucide-react';
 import { useProgressStats } from '../model';
+import { StudyHeatmap } from './StudyHeatmap';
 
 export function ProgressPage() {
   const { categories, stats, categoryStats, heatmap, streak, dueCount, overallPercent } = useProgressStats();
@@ -104,9 +104,7 @@ export function ProgressPage() {
         {categories.map((cat) => {
           const cs = categoryStats[cat.id] ?? { mastered: 0, learning: 0, unseen: 0 };
           const total = cs.mastered + cs.learning + cs.unseen;
-          const percent = total > 0
-            ? Math.round(((cs.mastered + cs.learning) / total) * 100)
-            : 0;
+          const percent = total > 0 ? Math.round(((cs.mastered + cs.learning) / total) * 100) : 0;
 
           return (
             <Card key={cat.id} className="shadow-sm">
@@ -115,9 +113,7 @@ export function ProgressPage() {
                   <span className="text-xl">{cat.icon}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium truncate">
-                        {cat.title}
-                      </span>
+                      <span className="text-sm font-medium truncate">{cat.title}</span>
                       <div className="flex items-center gap-2 ml-2 shrink-0">
                         <Badge variant="outline" className="text-xs text-green-500 tabular-nums">
                           {cs.mastered}
@@ -125,9 +121,7 @@ export function ProgressPage() {
                         <Badge variant="outline" className="text-xs text-yellow-500 tabular-nums">
                           {cs.learning}
                         </Badge>
-                        <span className="text-xs text-muted-foreground tabular-nums">
-                          {percent}%
-                        </span>
+                        <span className="text-xs text-muted-foreground tabular-nums">{percent}%</span>
                       </div>
                     </div>
                     <Progress value={percent} className="h-1.5 mt-2" />
@@ -141,4 +135,3 @@ export function ProgressPage() {
     </div>
   );
 }
-

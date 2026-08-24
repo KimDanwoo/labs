@@ -12,9 +12,9 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { createInterface } from 'readline';
 import { readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { dirname, resolve } from 'path';
+import { createInterface } from 'readline';
 import { fileURLToPath } from 'url';
 
 // ── .env.local 자동 로드 ────────────────────────────────────────
@@ -99,11 +99,7 @@ async function getNextOrderNum(categoryId) {
 }
 
 async function insertQuestion(q) {
-  const { data, error } = await supabase
-    .from('questions')
-    .insert(q)
-    .select('id')
-    .single();
+  const { data, error } = await supabase.from('questions').insert(q).select('id').single();
   if (error) throw error;
   return data.id;
 }
@@ -137,9 +133,7 @@ async function callGemini(prompt) {
 // ── 프롬프트 생성 ──────────────────────────────────────────────
 
 function buildPrompt(category, existingQuestions, topic) {
-  const existingList = existingQuestions
-    .map((q) => `- ${q.question}`)
-    .join('\n');
+  const existingList = existingQuestions.map((q) => `- ${q.question}`).join('\n');
 
   const topicClause = topic
     ? `특히 "${topic}" 주제에 집중하여`
@@ -192,9 +186,7 @@ async function main() {
 
   // 카테고리 선택
   console.log('\n📂 카테고리 목록:');
-  const sorted = [...categories].sort(
-    (a, b) => a.question_count - b.question_count
-  );
+  const sorted = [...categories].sort((a, b) => a.question_count - b.question_count);
   sorted.forEach((c, i) => {
     console.log(`  [${i + 1}] ${c.icon} ${c.title} (${c.question_count}개)`);
   });
@@ -208,9 +200,7 @@ async function main() {
   }
   const selectedCategory = sorted[catIndex];
 
-  console.log(
-    `\n📝 "${selectedCategory.title}" 카테고리 질문 후보 생성 중...\n`
-  );
+  console.log(`\n📝 "${selectedCategory.title}" 카테고리 질문 후보 생성 중...\n`);
 
   const existing = await fetchQuestionsByCategory(selectedCategory.id);
   const prompt = buildPrompt(selectedCategory, existing, topic);
@@ -233,9 +223,7 @@ async function main() {
   let addedCount = 0;
   for (let i = 0; i < candidates.length; i++) {
     const c = candidates[i];
-    console.log(
-      `[후보 ${i + 1}] ${c.difficulty} | ${c.question}`
-    );
+    console.log(`[후보 ${i + 1}] ${c.difficulty} | ${c.question}`);
     console.log(`  소분류: ${c.sub_category} | 태그: ${c.tags.join(', ')}`);
 
     const choice = await ask('  승인? (y/n/e=편집): ');

@@ -2,12 +2,7 @@ import { BLOCK_SIZE, BOARD_SIZE } from '@entities/board/model/constants';
 import { CellHighlight, Position, SudokuBoard, SudokuCell } from '@entities/board/model/types';
 import { GAME_MODE } from '@entities/game/model/constants';
 import { GameCompletionResult, GameMode, KillerCage } from '@entities/game/model/types';
-import {
-  checkConflicts,
-  isBoardComplete,
-  isKillerBoardComplete,
-  validateKillerCages,
-} from '@features/sudoku-game/model/utils/validator';
+import { checkConflicts, isBoardComplete, isKillerBoardComplete, validateKillerCages } from './validator';
 
 /**
  * @description 단일 셀만 업데이트

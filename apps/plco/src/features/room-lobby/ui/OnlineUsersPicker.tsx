@@ -9,12 +9,7 @@ type OnlineUsersPickerProps = {
   invitingUserId: string | null;
 };
 
-export default function OnlineUsersPicker({
-  users,
-  currentUserId,
-  onInvite,
-  invitingUserId,
-}: OnlineUsersPickerProps) {
+export default function OnlineUsersPicker({ users, currentUserId, onInvite, invitingUserId }: OnlineUsersPickerProps) {
   const others = users.filter((u) => u.userId !== currentUserId);
 
   if (others.length === 0) {
@@ -35,9 +30,7 @@ export default function OnlineUsersPicker({
         >
           <div className="flex items-center gap-2">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
-            <span className="text-sm font-medium text-gray-700">
-              {user.nickname}
-            </span>
+            <span className="text-sm font-medium text-gray-700">{user.nickname}</span>
           </div>
           <button
             type="button"

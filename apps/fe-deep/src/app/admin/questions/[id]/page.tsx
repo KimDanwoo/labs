@@ -1,7 +1,7 @@
-import { notFound } from 'next/navigation';
-import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { getAllCategories, getQuestionById } from '@entities/question/api';
+import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { QuestionForm } from '@widgets/question-form';
+import { notFound } from 'next/navigation';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -11,10 +11,7 @@ export default async function EditQuestionPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createServerSupabaseClient();
 
-  const [question, categories] = await Promise.all([
-    getQuestionById(id, supabase),
-    getAllCategories(supabase),
-  ]);
+  const [question, categories] = await Promise.all([getQuestionById(id, supabase), getAllCategories(supabase)]);
 
   if (!question) notFound();
 

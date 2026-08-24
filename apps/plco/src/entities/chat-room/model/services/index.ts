@@ -1,18 +1,6 @@
 import { supabase } from '@shared/lib';
-import {
-  RPC_ACCEPT_INVITE,
-  RPC_CREATE_ROOM,
-  RPC_JOIN_ROOM,
-  ROOM_INVITES_TABLE,
-  ROOM_TABLE,
-} from '../constants';
-import { INVITE_STATUS } from '../types';
-import type {
-  ChatRoomRow,
-  Invite,
-  Room,
-  RoomInviteRow,
-} from '../types';
+import { ROOM_INVITES_TABLE, ROOM_TABLE, RPC_ACCEPT_INVITE, RPC_CREATE_ROOM, RPC_JOIN_ROOM } from '../constants';
+import { type ChatRoomRow, type Invite, INVITE_STATUS, type Room, type RoomInviteRow } from '../types';
 
 // ── Mappers ──────────────────────────────────────────────────────
 function toRoom(row: ChatRoomRow): Room {
@@ -39,12 +27,7 @@ function toInvite(row: RoomInviteRow): Invite {
 
 // ── Room CRUD ────────────────────────────────────────────────────
 /** 방 생성 + 소유자 멤버 등록 (RPC). 비익명 유저만 호출 가능. */
-export async function createRoom(
-  name: string,
-  nickname: string,
-  isPublic = false,
-  password?: string,
-): Promise<string> {
+export async function createRoom(name: string, nickname: string, isPublic = false, password?: string): Promise<string> {
   const { data, error } = await supabase.rpc(RPC_CREATE_ROOM, {
     p_name: name,
     p_nickname: nickname,
@@ -57,10 +40,7 @@ export async function createRoom(
 
 /** 내가 멤버인 방 목록 (chat_rooms RLS가 is_room_member로 이미 제한) */
 export async function fetchMyRooms(): Promise<Room[]> {
-  const { data, error } = await supabase
-    .from(ROOM_TABLE)
-    .select('*')
-    .order('created_at', { ascending: false });
+  const { data, error } = await supabase.from(ROOM_TABLE).select('*').order('created_at', { ascending: false });
 
   if (error) throw error;
   return (data as ChatRoomRow[] | null)?.map(toRoom) ?? [];
@@ -81,11 +61,7 @@ export async function fetchPublicRooms(): Promise<Room[]> {
 /** 방 삭제 (소유자만, RLS로 강제). 멤버·메시지·초대·비밀번호는 cascade 로 함께 삭제된다.
  *  RLS가 비소유자·미적용 정책일 때 에러 없이 0행이 지워질 수 있으므로 삭제된 행을 확인한다. */
 export async function deleteRoom(roomId: string): Promise<void> {
-  const { data, error } = await supabase
-    .from(ROOM_TABLE)
-    .delete()
-    .eq('id', roomId)
-    .select('id');
+  const { data, error } = await supabase.from(ROOM_TABLE).delete().eq('id', roomId).select('id');
   if (error) throw error;
   if (!data || data.length === 0) {
     throw new Error('삭제 권한이 없거나 이미 삭제된 방이에요');
@@ -93,11 +69,7 @@ export async function deleteRoom(roomId: string): Promise<void> {
 }
 
 /** 공개 방 입장 (RPC join_room). 비익명 유저만, 잠긴 방은 비밀번호 검증. */
-export async function joinRoomRpc(
-  roomId: string,
-  nickname: string,
-  password?: string,
-): Promise<string> {
+export async function joinRoomRpc(roomId: string, nickname: string, password?: string): Promise<string> {
   const { data, error } = await supabase.rpc(RPC_JOIN_ROOM, {
     p_room_id: roomId,
     p_nickname: nickname,
@@ -109,10 +81,7 @@ export async function joinRoomRpc(
 
 // ── Invite CRUD ──────────────────────────────────────────────────
 /** 초대 발송 */
-export async function sendInvite(
-  roomId: string,
-  inviteeId: string,
-): Promise<void> {
+export async function sendInvite(roomId: string, inviteeId: string): Promise<void> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -145,10 +114,7 @@ export async function fetchMyInvites(): Promise<Invite[]> {
 }
 
 /** 초대 수락 (RPC — 멤버십까지 원자적 처리). 반환값은 room uuid. */
-export async function acceptInvite(
-  inviteId: string,
-  nickname: string,
-): Promise<string> {
+export async function acceptInvite(inviteId: string, nickname: string): Promise<string> {
   const { data, error } = await supabase.rpc(RPC_ACCEPT_INVITE, {
     p_invite_id: inviteId,
     p_nickname: nickname,
@@ -174,10 +140,7 @@ type JoinInvitesOptions = {
 };
 
 /** 내 초대 수신 채널 구독. 정리 함수 반환. */
-export function joinInvitesChannel({
-  userId,
-  onInvite,
-}: JoinInvitesOptions): () => void {
+export function joinInvitesChannel({ userId, onInvite }: JoinInvitesOptions): () => void {
   const channel = supabase.channel(`invites:${userId}`);
 
   channel

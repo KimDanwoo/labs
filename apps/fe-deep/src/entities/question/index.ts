@@ -1,17 +1,36 @@
-export type { Category, Question, QuestionInput, QuizOption, QuestionWithCategory, SearchResult, PaginatedResult, Difficulty, VisibilityFilter, QuestionVisibilityField } from './model';
-export { DIFFICULTY_CONFIG, DIFFICULTY_VALUES } from './model';
-export { questionQueries } from './services';
-export { createQuestion, updateQuestion, deleteQuestion, deleteQuestions, updateQuestionsVisibility, updateCategoryVisibility, reorderQuestions } from './services';
 export {
   getAllCategories,
+  getAllQuestions,
   getCategoryBySlug,
+  getQuestionById,
   getQuestionsByCategory,
   getQuestionsByCategorySlug,
   getQuestionsByCategorySlugPaginated,
-  getQuestionById,
-  getQuestionsByIds,
-  getAllQuestions,
-  searchQuestions,
   getQuestionsByDifficulty,
+  getQuestionsByIds,
   getRandomQuestions,
+  searchQuestions,
 } from './api';
+export { DIFFICULTY_CONFIG, DIFFICULTY_VALUES } from './model';
+export type {
+  Category,
+  Difficulty,
+  PaginatedResult,
+  Question,
+  QuestionInput,
+  QuestionVisibilityField,
+  QuestionWithCategory,
+  QuizOption,
+  SearchResult,
+  VisibilityFilter,
+} from './model';
+export {
+  createQuestion,
+  deleteQuestion,
+  deleteQuestions,
+  questionQueries,
+  reorderQuestions,
+  updateCategoryVisibility,
+  updateQuestion,
+  updateQuestionsVisibility,
+} from './services';

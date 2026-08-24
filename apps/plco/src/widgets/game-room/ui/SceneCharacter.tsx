@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { CharacterSprite } from '@shared/ui';
 import type { CharacterId } from '@shared/types';
+import { CharacterSprite } from '@shared/ui';
+import { useEffect, useState } from 'react';
 import SpeechBubble from './SpeechBubble';
 
 const BUBBLE_DURATION_MS = 3000;
@@ -34,16 +34,12 @@ export default function SceneCharacter({
       }}
     >
       <div className="relative">
-        {latestMessage && (
-          <BubbleTimer key={latestMessage} message={latestMessage} />
-        )}
+        {latestMessage && <BubbleTimer key={latestMessage} message={latestMessage} />}
         <CharacterSprite characterId={characterId} size={isMe ? 64 : 52} />
       </div>
       <span
         className={`mt-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold leading-tight ${
-          isMe
-            ? 'bg-gold/80 text-white'
-            : 'bg-white/70 text-gray-600 border border-card-border'
+          isMe ? 'bg-gold/80 text-white' : 'bg-white/70 text-gray-600 border border-card-border'
         }`}
       >
         {nickname}

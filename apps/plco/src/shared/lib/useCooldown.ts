@@ -8,15 +8,12 @@ export type Cooldown = {
   isReady: boolean;
 };
 
-export function useCooldown(
-  lastAt: number | null,
-  cooldownMs: number,
-): Cooldown {
+export function useCooldown(lastAt: number | null, cooldownMs: number): Cooldown {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (lastAt === null) return;
-    if (Date.now() - lastAt >= cooldownMs) return;
+    if (lastAt === null) return undefined;
+    if (Date.now() - lastAt >= cooldownMs) return undefined;
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [lastAt, cooldownMs]);
