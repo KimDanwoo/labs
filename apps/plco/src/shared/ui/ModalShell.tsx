@@ -65,9 +65,7 @@ export default function ModalShell({
         className={`absolute inset-0 modal-overlay ${overlayAnim}`}
         onClick={disableBackdropClose ? undefined : requestClose}
       />
-      <div
-        className={`${PANEL[variant]} ${panelAnim} ${maxWidth ?? DEFAULT_MAX_WIDTH[variant]} ${className}`}
-      >
+      <div className={`${PANEL[variant]} ${panelAnim} ${maxWidth ?? DEFAULT_MAX_WIDTH[variant]} ${className}`}>
         {typeof children === 'function' ? children(requestClose) : children}
       </div>
     </div>

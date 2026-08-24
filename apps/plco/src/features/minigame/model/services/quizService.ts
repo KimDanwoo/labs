@@ -11,10 +11,7 @@ type QuizRpcRow = {
   fact: string;
 };
 
-export async function fetchRandomQuizQuestions(
-  characterId: CharacterId,
-  count: number,
-): Promise<QuizQuestion[]> {
+export async function fetchRandomQuizQuestions(characterId: CharacterId, count: number): Promise<QuizQuestion[]> {
   const { data, error } = await supabase.rpc('get_random_quiz_questions', {
     p_character_id: characterId,
     p_count: count,

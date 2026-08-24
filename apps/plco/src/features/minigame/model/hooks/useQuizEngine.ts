@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { useAtomValue } from 'jotai';
-import { CHARACTERS } from '@shared/constants';
-import { characterIdAtom } from '@entities/game/model/store';
 import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
+import { characterIdAtom } from '@entities/game/model/store';
+import { CHARACTERS } from '@shared/constants';
+import { useAtomValue } from 'jotai';
+import { useCallback, useState } from 'react';
 import { QUIZ_PHASE, QUIZ_ROUNDS } from '../constants';
 import { fetchRandomQuizQuestions } from '../services';
 import type { QuizPhase, QuizQuestion } from '../types';

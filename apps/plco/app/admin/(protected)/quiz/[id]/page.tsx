@@ -1,12 +1,12 @@
 'use client';
 
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import { ALL_CHARACTER_IDS } from '@shared/constants';
-import { ADMIN_ROUTE } from '@features/admin/model/services';
 import { useQuizQuestions } from '@features/admin/model/hooks';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
 import type { QuizRow } from '@features/admin/model/types';
 import { QuizEditor } from '@features/admin/ui';
+import { ALL_CHARACTER_IDS } from '@shared/constants';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 
 function emptyQuiz(): QuizRow {
   return {
@@ -36,17 +36,11 @@ export default function QuizDetailPage() {
         <Link href={ADMIN_ROUTE.quiz} className="text-xs text-muted btn-press">
           ←
         </Link>
-        <h1 className="text-sm font-bold text-foreground">
-          {isNew ? '새 문제' : '문제 편집'}
-        </h1>
+        <h1 className="text-sm font-bold text-foreground">{isNew ? '새 문제' : '문제 편집'}</h1>
       </div>
 
-      {!isNew && isLoading && (
-        <p className="text-xs text-muted text-center py-8">불러오는 중...</p>
-      )}
-      {!isNew && !isLoading && !row && (
-        <p className="text-xs text-red text-center py-8">찾을 수 없어요</p>
-      )}
+      {!isNew && isLoading && <p className="text-xs text-muted text-center py-8">불러오는 중...</p>}
+      {!isNew && !isLoading && !row && <p className="text-xs text-red text-center py-8">찾을 수 없어요</p>}
       {row && <QuizEditor row={row} onDone={back} />}
     </div>
   );

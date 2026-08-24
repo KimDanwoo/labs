@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { ALL_CHARACTER_IDS } from '@shared/constants';
-import { ADMIN_ROUTE } from '@features/admin/model/services';
 import { useMeetingScenes } from '@features/admin/model/hooks';
+import { ADMIN_ROUTE } from '@features/admin/model/services';
 import { CharacterTabs } from '@features/admin/ui';
+import { ALL_CHARACTER_IDS } from '@shared/constants';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export default function MeetingScenesAdminPage() {
   const { data, isLoading, isError } = useMeetingScenes();
@@ -31,23 +31,13 @@ export default function MeetingScenesAdminPage() {
         + 새 시나리오
       </Link>
 
-      {isLoading && (
-        <p className="text-xs text-muted text-center py-8">불러오는 중...</p>
-      )}
-      {isError && (
-        <p className="text-xs text-red text-center py-8">불러오기 실패</p>
-      )}
+      {isLoading && <p className="text-xs text-muted text-center py-8">불러오는 중...</p>}
+      {isError && <p className="text-xs text-red text-center py-8">불러오기 실패</p>}
 
       {visible.map((r) => (
-        <Link
-          key={r.id}
-          href={`${ADMIN_ROUTE.meetingScenes}/${r.id}`}
-          className="card p-3 block btn-press"
-        >
+        <Link key={r.id} href={`${ADMIN_ROUTE.meetingScenes}/${r.id}`} className="card p-3 block btn-press">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-input-bg text-muted">
-              {r.category}
-            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-input-bg text-muted">{r.category}</span>
             {!r.is_active && <span className="text-[10px] text-red">비활성</span>}
             <span className="ml-auto text-muted text-xs">→</span>
           </div>
@@ -56,9 +46,7 @@ export default function MeetingScenesAdminPage() {
       ))}
 
       {!isLoading && visible.length === 0 && (
-        <p className="text-xs text-muted text-center py-6">
-          아직 시나리오가 없어요
-        </p>
+        <p className="text-xs text-muted text-center py-6">아직 시나리오가 없어요</p>
       )}
     </div>
   );

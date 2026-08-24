@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useGameActions } from '@entities/game/model/hooks';
 import { MODAL_TYPE } from '@shared/constants';
 import { ModalShell } from '@shared/ui';
-import { useGameActions } from '@entities/game/model/hooks';
+import { useState } from 'react';
 import { MINIGAME_MODE } from '../model/constants';
 import type { MinigameMode } from '../model/types';
 import CatchGame from './CatchGame';
@@ -44,12 +44,8 @@ export default function MiniGameModal() {
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">💖</span>
                     <div>
-                      <div className="text-sm font-bold text-pink-600">
-                        하트 캐치
-                      </div>
-                      <div className="text-[11px] text-gray-500">
-                        떨어지는 하트를 받아요
-                      </div>
+                      <div className="text-sm font-bold text-pink-600">하트 캐치</div>
+                      <div className="text-[11px] text-gray-500">떨어지는 하트를 받아요</div>
                     </div>
                   </div>
                 </button>
@@ -61,12 +57,8 @@ export default function MiniGameModal() {
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">🏃</span>
                     <div>
-                      <div className="text-sm font-bold text-emerald-600">
-                        플코런
-                      </div>
-                      <div className="text-[11px] text-gray-500">
-                        탭으로 점프해서 기록을 세워요
-                      </div>
+                      <div className="text-sm font-bold text-emerald-600">플코런</div>
+                      <div className="text-[11px] text-gray-500">탭으로 점프해서 기록을 세워요</div>
                     </div>
                   </div>
                 </button>
@@ -78,12 +70,8 @@ export default function MiniGameModal() {
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">💡</span>
                     <div>
-                      <div className="text-sm font-bold text-violet-600">
-                        PLCO 취향 퀴즈
-                      </div>
-                      <div className="text-[11px] text-gray-500">
-                        멤버 취향 3문제 맞히기
-                      </div>
+                      <div className="text-sm font-bold text-violet-600">PLCO 취향 퀴즈</div>
+                      <div className="text-[11px] text-gray-500">멤버 취향 3문제 맞히기</div>
                     </div>
                   </div>
                 </button>
@@ -95,12 +83,8 @@ export default function MiniGameModal() {
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">💬</span>
                     <div>
-                      <div className="text-sm font-bold text-sky-600">
-                        팬 톡
-                      </div>
-                      <div className="text-[11px] text-gray-500">
-                        다른 팬들과 수다 떨기
-                      </div>
+                      <div className="text-sm font-bold text-sky-600">팬 톡</div>
+                      <div className="text-[11px] text-gray-500">다른 팬들과 수다 떨기</div>
                     </div>
                   </div>
                 </button>
@@ -108,12 +92,8 @@ export default function MiniGameModal() {
             </div>
           )}
 
-          {mode === MINIGAME_MODE.CATCH && (
-            <CatchGame onExitToMenu={exitToMenu} />
-          )}
-          {mode === MINIGAME_MODE.RUN && (
-            <PlcoRunGame onExitToMenu={exitToMenu} />
-          )}
+          {mode === MINIGAME_MODE.CATCH && <CatchGame onExitToMenu={exitToMenu} />}
+          {mode === MINIGAME_MODE.RUN && <PlcoRunGame onExitToMenu={exitToMenu} />}
           {mode === MINIGAME_MODE.QUIZ && <QuizGame onExitToMenu={exitToMenu} />}
         </>
       )}

@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import type { CharacterId, FoodId, ModalType } from '@shared/types';
 import { useSetAtom } from 'jotai';
-import type { FoodId, CharacterId, ModalType } from '@shared/types';
-import { gameAtom, activeModalAtom } from '../store';
+import { useMemo } from 'react';
+import { activeModalAtom, gameAtom } from '../store';
 
 export function useGameActions() {
   const dispatch = useSetAtom(gameAtom);
@@ -18,16 +18,13 @@ export function useGameActions() {
       completeMeeting: (params: { hearts: number; coins: number; day: string }) =>
         dispatch({ type: 'COMPLETE_MEETING', ...params }),
       buyFood: (foodId: FoodId) => dispatch({ type: 'BUY_FOOD', foodId }),
-      exchangeHearts: (amount: number) =>
-        dispatch({ type: 'EXCHANGE_HEARTS', amount }),
+      exchangeHearts: (amount: number) => dispatch({ type: 'EXCHANGE_HEARTS', amount }),
       giveMedicine: () => dispatch({ type: 'GIVE_MEDICINE' }),
-      minigameReward: (params: { correctCount: number }) =>
-        dispatch({ type: 'MINIGAME_REWARD', ...params }),
+      minigameReward: (params: { correctCount: number }) => dispatch({ type: 'MINIGAME_REWARD', ...params }),
       markMinigamePlayed: () => dispatch({ type: 'MARK_MINIGAME_PLAYED' }),
       collectEgg: () => dispatch({ type: 'COLLECT_EGG' }),
       dismissLevelUp: () => dispatch({ type: 'DISMISS_LEVEL_UP' }),
-      dismissFeedingMessage: () =>
-        dispatch({ type: 'DISMISS_FEEDING_MESSAGE' }),
+      dismissFeedingMessage: () => dispatch({ type: 'DISMISS_FEEDING_MESSAGE' }),
       selectCharacter: (characterId: CharacterId, nickname: string) =>
         dispatch({ type: 'SELECT_CHARACTER', characterId, nickname }),
       switchCharacter: (characterId: CharacterId, nickname: string) =>

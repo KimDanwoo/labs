@@ -15,10 +15,7 @@ const LOBBY_CHANNEL = 'lobby:presence';
  * 비익명 로그인 유저만 track하고, 모든 구독자는 onlineUsers 목록을 수신한다.
  * 정리 함수를 반환한다.
  */
-export function joinLobby({
-  identity,
-  onSync,
-}: JoinLobbyOptions): () => void {
+export function joinLobby({ identity, onSync }: JoinLobbyOptions): () => void {
   const channel = supabase.channel(LOBBY_CHANNEL, {
     config: { presence: { key: identity.userId } },
   });

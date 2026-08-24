@@ -1,21 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { ALL_CHARACTER_IDS, CHARACTERS } from '@shared/constants';
-import {
-  useDeleteMeetingScene,
-  useSaveMeetingScene,
-} from '@features/admin/model/hooks';
+import { useDeleteMeetingScene, useSaveMeetingScene } from '@features/admin/model/hooks';
 import type { MeetingOption, MeetingSceneRow } from '@features/admin/model/types';
+import { ALL_CHARACTER_IDS, CHARACTERS } from '@shared/constants';
+import { useState } from 'react';
 
-const CATEGORIES = [
-  'food',
-  'hobby',
-  'compliment',
-  'comfort',
-  'plan',
-  'small-talk',
-];
+const CATEGORIES = ['food', 'hobby', 'compliment', 'comfort', 'plan', 'small-talk'];
 
 const OUTCOMES: MeetingOption['outcome'][] = ['good', 'ok', 'awkward'];
 const OUTCOME_LABEL: Record<MeetingOption['outcome'], string> = {
@@ -34,8 +24,7 @@ export default function SceneEditor({ row, onDone }: SceneEditorProps) {
   const saveMutation = useSaveMeetingScene();
   const deleteMutation = useDeleteMeetingScene();
   const isNew = !row.id;
-  const errorMessage =
-    saveMutation.error?.message ?? deleteMutation.error?.message ?? null;
+  const errorMessage = saveMutation.error?.message ?? deleteMutation.error?.message ?? null;
 
   const update = (patch: Partial<MeetingSceneRow>) => {
     setForm((prev) => ({ ...prev, ...patch }));
@@ -51,8 +40,7 @@ export default function SceneEditor({ row, onDone }: SceneEditorProps) {
       options: [...form.options, { text: '', outcome: 'ok', reaction: '' }],
     });
 
-  const removeOption = (index: number) =>
-    update({ options: form.options.filter((_, i) => i !== index) });
+  const removeOption = (index: number) => update({ options: form.options.filter((_, i) => i !== index) });
 
   const save = () => saveMutation.mutate(form, { onSuccess: onDone });
 
@@ -90,11 +78,7 @@ export default function SceneEditor({ row, onDone }: SceneEditorProps) {
           ))}
         </select>
         <label className="flex items-center gap-1 text-[11px] text-muted ml-auto">
-          <input
-            type="checkbox"
-            checked={form.is_active}
-            onChange={(e) => update({ is_active: e.target.checked })}
-          />
+          <input type="checkbox" checked={form.is_active} onChange={(e) => update({ is_active: e.target.checked })} />
           활성
         </label>
       </div>
@@ -126,10 +110,7 @@ export default function SceneEditor({ row, onDone }: SceneEditorProps) {
                   </option>
                 ))}
               </select>
-              <button
-                onClick={() => removeOption(i)}
-                className="ml-auto text-[11px] text-red btn-press"
-              >
+              <button onClick={() => removeOption(i)} className="ml-auto text-[11px] text-red btn-press">
                 삭제
               </button>
             </div>
@@ -147,18 +128,13 @@ export default function SceneEditor({ row, onDone }: SceneEditorProps) {
             />
           </div>
         ))}
-        <button
-          onClick={addOption}
-          className="text-[11px] text-muted hover:text-foreground btn-press"
-        >
+        <button onClick={addOption} className="text-[11px] text-muted hover:text-foreground btn-press">
           + 선택지 추가
         </button>
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        {errorMessage && (
-          <span className="text-[11px] text-red">{errorMessage}</span>
-        )}
+        {errorMessage && <span className="text-[11px] text-red">{errorMessage}</span>}
         <button
           onClick={remove}
           disabled={deleteMutation.isPending}

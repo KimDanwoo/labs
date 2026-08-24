@@ -1,8 +1,5 @@
+import { getAdminSupabase, requireUser } from '@shared/lib/server/supabase-admin';
 import { NextResponse } from 'next/server';
-import {
-  getAdminSupabase,
-  requireUser,
-} from '@shared/lib/server/supabase-admin';
 
 /**
  * 회원 탈퇴. 본인 인증 후 auth.users 를 삭제하면

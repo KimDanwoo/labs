@@ -1,11 +1,4 @@
-import type {
-  CharacterId,
-  CharacterInfo,
-  FoodId,
-  FoodItem,
-  GameState,
-  LevelReward,
-} from '@shared/types';
+import type { CharacterId, CharacterInfo, FoodId, FoodItem, GameState, LevelReward } from '@shared/types';
 
 export const GAME_STORAGE_KEY = 'plco-damagochi-saves';
 export const GAME_STORAGE_LEGACY_KEY = 'plco-damagochi-state';
@@ -78,8 +71,7 @@ export const MAX_HEARTS = 100;
 
 // 배고픔: 가득 찬 상태에서 약 2일에 걸쳐 소진되도록 분당 감소량을 파생
 export const HUNGER_FULL_DRAIN_DAYS = 2;
-export const HUNGER_DECAY_PER_MINUTE =
-  MAX_HUNGER / (HUNGER_FULL_DRAIN_DAYS * 24 * 60);
+export const HUNGER_DECAY_PER_MINUTE = MAX_HUNGER / (HUNGER_FULL_DRAIN_DAYS * 24 * 60);
 export const CLEANLINESS_PER_POOP = 10;
 // 먹인 뒤 똥이 나오기까지 지연. 여러 번 먹여도 마지막 먹인 시점 기준 1개만 생성
 export const POOP_DELAY_MS = 20_000;
@@ -91,9 +83,7 @@ export const EXP_MINIGAME_MIN = 10;
 export const EXP_MINIGAME_MAX = 30;
 export const EXP_MEETING = 15;
 
-export const LEVEL_THRESHOLDS = [
-  0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700,
-];
+export const LEVEL_THRESHOLDS = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
 
 export const SLEEP_START_HOUR = 22;
 export const SLEEP_END_HOUR = 8;
@@ -205,13 +195,7 @@ export const LEVEL_REWARDS: Record<number, LevelReward> = {
   },
 };
 
-export const ALL_CHARACTER_IDS: CharacterId[] = [
-  'yeko',
-  'ako',
-  'bamko',
-  'eunko',
-  'hako',
-];
+export const ALL_CHARACTER_IDS: CharacterId[] = ['yeko', 'ako', 'bamko', 'eunko', 'hako'];
 
 export const GAME_STATUS = {
   SELECTING: 'selecting',

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { useSaveCharacter } from '@features/admin/model/hooks';
 import type { CharacterRow } from '@features/admin/model/types';
+import { useState } from 'react';
 
 const COLOR_FIELDS = [
   { key: 'color', label: '본문' },
@@ -19,8 +19,7 @@ export default function CharacterEditor({ row, onDone }: CharacterEditorProps) {
   const [form, setForm] = useState<CharacterRow>(row);
   const saveMutation = useSaveCharacter();
 
-  const update = (patch: Partial<CharacterRow>) =>
-    setForm((prev) => ({ ...prev, ...patch }));
+  const update = (patch: Partial<CharacterRow>) => setForm((prev) => ({ ...prev, ...patch }));
 
   const save = () => saveMutation.mutate(form, { onSuccess: onDone });
 
@@ -72,11 +71,7 @@ export default function CharacterEditor({ row, onDone }: CharacterEditorProps) {
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        {saveMutation.error && (
-          <span className="text-[11px] text-red">
-            {saveMutation.error.message}
-          </span>
-        )}
+        {saveMutation.error && <span className="text-[11px] text-red">{saveMutation.error.message}</span>}
         <button
           onClick={save}
           disabled={saveMutation.isPending}

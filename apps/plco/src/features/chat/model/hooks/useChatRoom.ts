@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { chatQueryKey } from '../constants';
 import { fetchMessages, joinRoom } from '../services';
 import type { ChatMessage, ChatPresenceUser } from '../types';
@@ -12,10 +12,7 @@ type ChatRoomIdentity = {
   characterId?: string | null;
 };
 
-function appendUnique(
-  prev: ChatMessage[] | undefined,
-  message: ChatMessage,
-): ChatMessage[] {
+function appendUnique(prev: ChatMessage[] | undefined, message: ChatMessage): ChatMessage[] {
   const list = prev ?? [];
   return list.some((m) => m.id === message.id) ? list : [...list, message];
 }
@@ -39,14 +36,10 @@ export function useChatRoom(roomId: string, identity: ChatRoomIdentity) {
       roomId,
       identity: userId ? { userId, nickname, characterId } : null,
       onInsert: (message) =>
-        queryClient.setQueryData<ChatMessage[]>(
-          chatQueryKey(roomId),
-          (prev) => appendUnique(prev, message),
-        ),
+        queryClient.setQueryData<ChatMessage[]>(chatQueryKey(roomId), (prev) => appendUnique(prev, message)),
       onDelete: (id) =>
-        queryClient.setQueryData<ChatMessage[]>(
-          chatQueryKey(roomId),
-          (prev) => (prev ?? []).filter((m) => m.id !== id),
+        queryClient.setQueryData<ChatMessage[]>(chatQueryKey(roomId), (prev) =>
+          (prev ?? []).filter((m) => m.id !== id),
         ),
       onPresenceSync: setOnlineUsers,
     });

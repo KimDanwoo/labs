@@ -8,11 +8,11 @@
  * .env.local 이 있으면 자동으로 읽는다. service_role 키는 절대 클라이언트
  * 번들에 들어가지 않도록 이 스크립트(서버/로컬)에서만 사용한다.
  */
+import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { createClient } from '@supabase/supabase-js';
-import { ALL_CHARACTER_IDS, CHARACTERS } from '../src/shared/constants/game';
 import { SCENES_BY_CHARACTER } from '../src/features/meeting/model/constants/scenes';
+import { ALL_CHARACTER_IDS, CHARACTERS } from '../src/shared/constants/game';
 
 function loadEnvLocal(): void {
   try {
@@ -23,7 +23,10 @@ function loadEnvLocal(): void {
       const eq = trimmed.indexOf('=');
       if (eq === -1) continue;
       const key = trimmed.slice(0, eq).trim();
-      const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
+      const value = trimmed
+        .slice(eq + 1)
+        .trim()
+        .replace(/^["']|["']$/g, '');
       if (!(key in process.env)) process.env[key] = value;
     }
   } catch {
@@ -37,9 +40,7 @@ async function main() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceKey) {
-    throw new Error(
-      'NEXT_PUBLIC_SUPABASE_URL 와 SUPABASE_SERVICE_ROLE_KEY 가 필요합니다.',
-    );
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL 와 SUPABASE_SERVICE_ROLE_KEY 가 필요합니다.');
   }
 
   const supabase = createClient(url, serviceKey, {
@@ -72,15 +73,11 @@ async function main() {
     })),
   );
 
-  const { error: charErr } = await supabase
-    .from('characters')
-    .upsert(characterRows, { onConflict: 'id' });
+  const { error: charErr } = await supabase.from('characters').upsert(characterRows, { onConflict: 'id' });
   if (charErr) throw charErr;
   console.log(`✓ characters upsert: ${characterRows.length}`);
 
-  const { error: sceneErr } = await supabase
-    .from('meeting_scenes')
-    .upsert(sceneRows, { onConflict: 'id' });
+  const { error: sceneErr } = await supabase.from('meeting_scenes').upsert(sceneRows, { onConflict: 'id' });
   if (sceneErr) throw sceneErr;
   console.log(`✓ meeting_scenes upsert: ${sceneRows.length}`);
 

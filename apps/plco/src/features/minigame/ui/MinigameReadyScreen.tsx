@@ -29,9 +29,7 @@ export default function MinigameReadyScreen({
       {children}
       {extra}
       {!canPlay && <MinigameCooldownNotice remainingMs={cooldownRemainingMs} />}
-      {errorMessage && (
-        <p className="text-[11px] text-red-400">{errorMessage}</p>
-      )}
+      {errorMessage && <p className="text-[11px] text-red-400">{errorMessage}</p>}
       <button
         onClick={onStart}
         disabled={!canPlay}
@@ -40,10 +38,7 @@ export default function MinigameReadyScreen({
       >
         {canPlay ? '시작!' : '에너지 부족'}
       </button>
-      <button
-        onClick={onExitToMenu}
-        className="w-full py-2 text-xs text-gray-400 btn-press"
-      >
+      <button onClick={onExitToMenu} className="w-full py-2 text-xs text-gray-400 btn-press">
         다른 게임 고르기
       </button>
     </div>

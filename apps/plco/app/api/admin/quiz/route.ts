@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { randomUUID } from 'node:crypto';
 import { ALL_CHARACTER_IDS } from '@shared/constants';
 import { getAdminSupabase, requireAdmin } from '@shared/lib/server/supabase-admin';
+import { NextResponse } from 'next/server';
+import { randomUUID } from 'node:crypto';
 
 export async function GET(req: Request) {
   if (!(await requireAdmin(req))) {
@@ -28,54 +28,28 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '잘못된 요청입니다.' }, { status: 400 });
   }
 
-  const {
-    id,
-    character_id,
-    question,
-    options,
-    correct_index,
-    fact,
-    is_active,
-    sort_order,
-  } = (body ?? {}) as Record<string, unknown>;
+  const { id, character_id, question, options, correct_index, fact, is_active, sort_order } = (body ?? {}) as Record<
+    string,
+    unknown
+  >;
 
-  if (
-    typeof character_id !== 'string' ||
-    !(ALL_CHARACTER_IDS as readonly string[]).includes(character_id)
-  ) {
+  if (typeof character_id !== 'string' || !(ALL_CHARACTER_IDS as readonly string[]).includes(character_id)) {
     return NextResponse.json({ error: '잘못된 캐릭터입니다.' }, { status: 400 });
   }
   if (typeof question !== 'string' || !question.trim()) {
     return NextResponse.json({ error: '문제가 비어 있습니다.' }, { status: 400 });
   }
-  if (
-    !Array.isArray(options) ||
-    options.length < 2 ||
-    options.some((o) => typeof o !== 'string' || !o.trim())
-  ) {
-    return NextResponse.json(
-      { error: '보기는 2개 이상, 모두 채워야 합니다.' },
-      { status: 400 },
-    );
+  if (!Array.isArray(options) || options.length < 2 || options.some((o) => typeof o !== 'string' || !o.trim())) {
+    return NextResponse.json({ error: '보기는 2개 이상, 모두 채워야 합니다.' }, { status: 400 });
   }
-  if (
-    typeof correct_index !== 'number' ||
-    correct_index < 0 ||
-    correct_index >= options.length
-  ) {
-    return NextResponse.json(
-      { error: '정답 보기를 선택하세요.' },
-      { status: 400 },
-    );
+  if (typeof correct_index !== 'number' || correct_index < 0 || correct_index >= options.length) {
+    return NextResponse.json({ error: '정답 보기를 선택하세요.' }, { status: 400 });
   }
   if (typeof fact !== 'string' || !fact.trim()) {
     return NextResponse.json({ error: '해설이 비어 있습니다.' }, { status: 400 });
   }
 
-  const rowId =
-    typeof id === 'string' && id
-      ? id
-      : `${character_id}-${randomUUID().slice(0, 8)}`;
+  const rowId = typeof id === 'string' && id ? id : `${character_id}-${randomUUID().slice(0, 8)}`;
 
   const { error } = await getAdminSupabase()
     .from('quiz_questions')
@@ -105,10 +79,7 @@ export async function DELETE(req: Request) {
   if (!id) {
     return NextResponse.json({ error: 'id 가 필요합니다.' }, { status: 400 });
   }
-  const { error } = await getAdminSupabase()
-    .from('quiz_questions')
-    .delete()
-    .eq('id', id);
+  const { error } = await getAdminSupabase().from('quiz_questions').delete().eq('id', id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

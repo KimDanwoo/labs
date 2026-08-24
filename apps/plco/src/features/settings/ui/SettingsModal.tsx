@@ -1,16 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  useAuth,
-  useIsAdmin,
-  useGoogleConsent,
-} from '@entities/auth/model/hooks';
+import { useAuth, useGoogleConsent, useIsAdmin } from '@entities/auth/model/hooks';
 import { useGameActions } from '@entities/game/model/hooks';
 import { APP_NAME, APP_VERSION } from '@shared/constants';
 import { clearLocalGameSaves } from '@shared/lib';
 import { Disclaimer, GoogleIcon, ModalShell } from '@shared/ui';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function SettingsModal() {
   const router = useRouter();
@@ -71,10 +67,7 @@ export default function SettingsModal() {
         <>
           <div className="flex justify-between items-center">
             <h3 className="text-base font-bold text-gray-700">설정</h3>
-            <button
-              onClick={close}
-              className="text-gray-400 text-lg leading-none btn-press"
-            >
+            <button onClick={close} className="text-gray-400 text-lg leading-none btn-press">
               ✕
             </button>
           </div>
@@ -83,9 +76,7 @@ export default function SettingsModal() {
             <div className="surface rounded-xl p-3 space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <div className="text-xs font-bold text-gray-700">계정</div>
-                <div className="text-[11px] text-gray-400">
-                  {isAnonymous ? '게스트' : '구글 연동됨 ✓'}
-                </div>
+                <div className="text-[11px] text-gray-400">{isAnonymous ? '게스트' : '구글 연동됨 ✓'}</div>
               </div>
               {isAnonymous && (
                 <div className="space-y-1.5">
@@ -120,18 +111,14 @@ export default function SettingsModal() {
                   <button
                     onClick={handleDeleteAccount}
                     className={`w-full py-2 rounded-lg font-bold text-xs btn-press transition-colors ${
-                      confirmDelete
-                        ? 'bg-red-500 text-white'
-                        : 'bg-red-50 text-red-400 border border-red-200'
+                      confirmDelete ? 'bg-red-500 text-white' : 'bg-red-50 text-red-400 border border-red-200'
                     }`}
                   >
-                    {confirmDelete
-                      ? '정말 탈퇴할래요? (되돌릴 수 없어요)'
-                      : '회원 탈퇴'}
+                    {confirmDelete ? '정말 탈퇴할래요? (되돌릴 수 없어요)' : '회원 탈퇴'}
                   </button>
                   <div className="text-[10px] text-gray-400 leading-relaxed pt-0.5">
-                    로그아웃하면 이 기기의 게임 데이터를 지우고 처음부터
-                    시작해요. 탈퇴하면 계정과 모든 게임 데이터가 영구 삭제돼요.
+                    로그아웃하면 이 기기의 게임 데이터를 지우고 처음부터 시작해요. 탈퇴하면 계정과 모든 게임 데이터가
+                    영구 삭제돼요.
                   </div>
                 </div>
               )}
@@ -139,12 +126,8 @@ export default function SettingsModal() {
 
             <div className="surface rounded-xl p-3 space-y-2">
               <div>
-                <div className="text-xs font-bold text-gray-700">
-                  다른 친구 키우러 가기
-                </div>
-                <div className="text-[11px] text-gray-400 mt-0.5">
-                  지금 친구는 그대로 두고 캐릭터 선택으로
-                </div>
+                <div className="text-xs font-bold text-gray-700">다른 친구 키우러 가기</div>
+                <div className="text-[11px] text-gray-400 mt-0.5">지금 친구는 그대로 두고 캐릭터 선택으로</div>
               </div>
               <button
                 onClick={handleGoToSelect}
@@ -157,16 +140,12 @@ export default function SettingsModal() {
             <div className="surface rounded-xl p-3 space-y-2">
               <div>
                 <div className="text-xs font-bold text-gray-700">게임 초기화</div>
-                <div className="text-[11px] text-gray-400 mt-0.5">
-                  처음부터 다시 키우기 · 코인/해금은 유지
-                </div>
+                <div className="text-[11px] text-gray-400 mt-0.5">처음부터 다시 키우기 · 코인/해금은 유지</div>
               </div>
               <button
                 onClick={handleReset}
                 className={`w-full py-2 rounded-lg font-bold text-xs btn-press transition-colors ${
-                  confirmReset
-                    ? 'bg-red-500 text-white'
-                    : 'bg-red-50 text-red-400 border border-red-200'
+                  confirmReset ? 'bg-red-500 text-white' : 'bg-red-50 text-red-400 border border-red-200'
                 }`}
               >
                 {confirmReset ? '정말 초기화할래요?' : '초기화'}
@@ -178,12 +157,8 @@ export default function SettingsModal() {
                 className="w-full surface rounded-xl p-3 text-left btn-press flex items-center justify-between"
               >
                 <div>
-                  <div className="text-xs font-bold text-gray-700">
-                    관리자 페이지
-                  </div>
-                  <div className="text-[11px] text-gray-400 mt-0.5">
-                    콘텐츠(대사·캐릭터·퀴즈) 편집
-                  </div>
+                  <div className="text-xs font-bold text-gray-700">관리자 페이지</div>
+                  <div className="text-[11px] text-gray-400 mt-0.5">콘텐츠(대사·캐릭터·퀴즈) 편집</div>
                 </div>
                 <span className="text-gray-400">→</span>
               </button>

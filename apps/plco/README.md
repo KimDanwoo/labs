@@ -2,7 +2,6 @@
 
 아이돌 컨셉 다마고치 게임. 캐릭터를 선택해 육성하고, 팬끼리 채팅 룸에서 미니게임을 즐기는 Next.js + Supabase 앱.
 
-**라이브:** [plco-tamagochi.vercel.app](https://plco-tamagochi.vercel.app)
 
 ## 개요
 
