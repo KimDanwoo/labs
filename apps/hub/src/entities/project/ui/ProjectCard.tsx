@@ -91,7 +91,9 @@ export function ProjectCard({ project, index, staggerBaseMs }: ProjectCardProps)
           </span>
         </Card.Header>
 
-        <Card.Description className="text-xs leading-relaxed sm:text-sm">{project.description}</Card.Description>
+        {project.description && (
+          <Card.Description className="text-xs leading-relaxed sm:text-sm">{project.description}</Card.Description>
+        )}
       </Card>
     </a>
   );
