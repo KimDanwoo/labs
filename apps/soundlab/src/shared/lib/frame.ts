@@ -10,7 +10,14 @@ function tick(now: number) {
   // 탭이 백그라운드에 있었다면 delta가 수 초로 튄다. 보간이 폭주하지 않게 상한을 둔다.
   const delta = last === 0 ? 16.7 : Math.min(64, now - last);
   last = now;
-  for (const callback of callbacks) callback(delta);
+  for (const callback of callbacks) {
+    // 콜백 하나가 던지면 다음 rAF 예약에 못 가 앱 전체의 시계·비주얼이 영구 정지한다. 격리하고 계속 돈다.
+    try {
+      callback(delta);
+    } catch (error) {
+      reportError(error);
+    }
+  }
   handle = requestAnimationFrame(tick);
 }
 

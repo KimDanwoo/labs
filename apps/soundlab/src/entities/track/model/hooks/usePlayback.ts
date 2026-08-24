@@ -59,6 +59,11 @@ const FULL_VOLUME = 100;
 const DRIFT_CORRECT_RATIO = 0.3;
 const DRIFT_SNAP_MS = 250;
 
+/** ready가 이 안에 안 오면 엔진이 막힌 것으로 본다 — w.soundcloud.com은 광고 차단기가 흔히 막는다. */
+const READY_TIMEOUT_MS = 10_000;
+/** 재생 중 위치 보고가 이보다 오래 끊기면 시계 전진을 세운다 — 소리는 멈췄는데 진행바만 달리지 않게. */
+const STALL_MS = 3000;
+
 /** 이어 듣기 기록. 자주 쓰면 낭비, 드물게 쓰면 마지막 몇 초를 잃는다. */
 const SAVE_INTERVAL_MS = 5000;
 /** 끝자락에서 나갔다면 이어 들을 게 없다 — 처음부터 틀어준다. */
@@ -106,6 +111,9 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   // 지난 방문에서 듣던 자리. 그 곡을 시작할 때 한 번만 쓰고 비운다(다른 곡을 고르면 버린다).
   const resume = useRef<{ index: number; ms: number } | null>(null);
   const savedAt = useRef(0);
+  // 전환 요청의 세대. 위젯 콜백은 postMessage 왕복이라 빠른 연속 선택 시 낡은 응답이 늦게 도착한다
+  // — 그대로 두면 나중에 온 이전 곡의 skip이 이겨서 "누른 곡이 아니라 아까 곡"이 난다.
+  const goSeq = useRef(0);
   // 위젯이 준비되기 전에 누른 곡. 버리면 제목·하이라이트만 바뀌고 소리는 영원히 안 나서
   // "눌렀는데 재생이 안 된다"가 된다(엔진 로드가 늦을수록 잘 걸린다). ready에서 소진한다.
   const queued = useRef<number | null>(null);
@@ -213,6 +221,11 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     frame.src = widgetSrc(setUrl(tracks) ?? (first ? trackUrl(first) : ''));
     document.body.append(frame);
 
+    const readyTimer = setTimeout(
+      () => setEngineError('재생 엔진이 응답하지 않습니다. 광고 차단기가 soundcloud.com을 막고 있는지 확인해 주세요.'),
+      READY_TIMEOUT_MS,
+    );
+
     loadWidgetApi()
       .then((sc) => {
         if (disposed) return;
@@ -220,6 +233,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         widget.current = instance;
 
         instance.bind(EVENTS.ready, () => {
+          clearTimeout(readyTimer);
+          setEngineError(null);
           // 세트 URL이 실제로 먹혔는지 런타임에 확인한다. 곡 수는 위젯이 정하므로 일치를 요구하지 않는다.
           instance.getSounds((sounds) => {
             soundIds.current = readSoundIds(sounds);
@@ -239,7 +254,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         };
         const interpolated = () => {
           const { ms, at, live } = reported.current;
-          return live && playing.current ? ms + (performance.now() - at) : ms;
+          return live && playing.current ? ms + Math.min(STALL_MS, performance.now() - at) : ms;
         };
 
         instance.bind(EVENTS.play, () => {
@@ -255,6 +270,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
           // 어느 경로로 시작했든(토글·곡 전환·위젯 자체 전환) 여기서 볼륨을 되올린다.
           rampTo(instance, FULL_VOLUME);
           setIsPlaying(true);
+          // 소리가 났다 = 엔진은 살아 있다. 이전 곡의 에러 배너가 남지 않게 지운다.
+          setEngineError(null);
           if (holdsSet.current) {
             // 위젯이 스스로 다음 곡으로 넘어간 경우도 여기로 들어온다 — 목록 하이라이트를 여기서 맞춘다.
             instance.getCurrentSoundIndex((soundIndex) => {
@@ -296,11 +313,15 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
           advance.current();
         });
       })
-      .catch((error: Error) => setEngineError(error.message));
+      .catch((error: Error) => {
+        clearTimeout(readyTimer);
+        setEngineError(error.message);
+      });
 
     return () => {
       disposed = true;
       widget.current = null;
+      clearTimeout(readyTimer);
       if (fade.current !== null) clearInterval(fade.current);
       frame.remove();
     };
@@ -314,6 +335,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       queued.current = next;
       return;
     }
+    const seq = ++goSeq.current;
+    const stale = () => goSeq.current !== seq;
     reported.current = { ms: 0, at: performance.now(), live: false };
     // 고른 곡은 처음부터다 — 이어 들을 자리가 그 곡의 것일 때만 남긴다.
     shouldRewind.current = true;
@@ -328,12 +351,14 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
 
     const readDuration = () =>
       instance.getDuration((ms) => {
+        if (stale()) return;
         frameState.durationMs = validDuration(ms, track.durationMs);
       });
 
     // 목록은 ready 시점의 것이 끝이 아니다 — 위젯이 프로필 곡을 나눠 싣는다(실측 20개 → 25개).
     // 전환할 때마다 다시 읽어야 위치가 맞는다. 우리 목록에 없는 사운드(최근 업로드)가 섞여 있어도 마찬가지다.
     instance.getSounds((sounds) => {
+      if (stale()) return;
       soundIds.current = readSoundIds(sounds);
       // 위젯 안의 위치로 변환한다. TRACKS 인덱스를 그대로 넘기면 다른 곡이 걸린다.
       const soundIndex = soundIds.current.indexOf(track.id);
@@ -343,6 +368,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         // 단, 위젯이 이미 그 사운드를 들고 있으면 skip은 아무 일도 하지 않는다(멈춰 있으면 계속 멈춘 채다).
         // 곡을 고른 건 듣겠다는 뜻이므로 그때는 play로 깨운다.
         instance.getCurrentSoundIndex((current) => {
+          if (stale()) return;
           if (current === soundIndex) instance.play();
           else instance.skip(soundIndex);
         });
@@ -356,6 +382,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         instance.load(target, {
           auto_play: true,
           callback: () => {
+            if (stale()) return;
             holdsSet.current = true;
             setEngineMode('set');
             instance.skip(soundIndex);
@@ -511,7 +538,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       frameState.position = Math.min(1, ms / durationMs);
       return;
     }
-    const target = ms + (performance.now() - at);
+    // 보고가 끊긴 지 오래면 전진을 멈춘다. 다음 보고가 오면 DRIFT_SNAP이 실제 위치로 데려간다.
+    const target = ms + Math.min(STALL_MS, performance.now() - at);
     const drift = target - (smoothMs.current + delta);
     const bound = delta * DRIFT_CORRECT_RATIO;
     smoothMs.current =
