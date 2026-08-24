@@ -197,7 +197,7 @@ def _find_book_items(obj, depth=0) -> list:
 
 # ── 알라딘 API ──────────────────────────────────────────────
 def fetch_aladin_overall(limit: int = 20) -> list[dict]:
-    url = "http://www.aladin.co.kr/ttb/api/ItemList.aspx"
+    url = "https://www.aladin.co.kr/ttb/api/ItemList.aspx"
     params = {
         "ttbkey": ALADIN_TTB_KEY, "QueryType": "Bestseller",
         "MaxResults": limit, "start": 1, "SearchTarget": "Book",
@@ -231,8 +231,42 @@ def fetch_aladin_overall(limit: int = 20) -> list[dict]:
         return []
 
 
+def fetch_aladin_publisher(title: str, author: str) -> str:
+    """알라딘 검색으로 출판사만 보강.
+
+    출판사는 알라딘 API에서만 온다(교보·YES24는 DOM 파싱, 리디는 SSR HTML 파싱이라 없다).
+    타 서점 단독 진입 도서는 베스트셀러 목록 어디에도 없어 제목 검색으로 따로 찾는다.
+    """
+    url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx"
+    params = {
+        "ttbkey": ALADIN_TTB_KEY, "Query": title, "QueryType": "Title",
+        "MaxResults": 5, "start": 1, "SearchTarget": "Book",
+        "output": "js", "Version": "20131101",
+    }
+    try:
+        items = requests.get(url, params=params, timeout=10).json().get("item", [])
+    except Exception as e:
+        print(f"  ⚠️  알라딘 출판사 검색 실패({title}): {e}")
+        return ""
+
+    target_key = _title_key(title)
+    target_author = _normalize(author)
+    fallback = ""
+    for item in items:
+        publisher = str(item.get("publisher", "")).strip()
+        if not publisher:
+            continue
+        found_key = _title_key(str(item.get("title", "")).split(" - ")[0])
+        if not (found_key == target_key or _is_same_work(target_key, found_key)):
+            continue
+        if target_author and target_author in _normalize(str(item.get("author", ""))):
+            return publisher
+        fallback = fallback or publisher
+    return fallback
+
+
 def fetch_aladin_genre(genre: dict, limit: int = 10) -> list[dict]:
-    url = "http://www.aladin.co.kr/ttb/api/ItemList.aspx"
+    url = "https://www.aladin.co.kr/ttb/api/ItemList.aspx"
     params = {
         "ttbkey": ALADIN_TTB_KEY, "QueryType": "Bestseller",
         "MaxResults": limit, "start": 1, "SearchTarget": "Book",
@@ -715,7 +749,11 @@ def _source_score(rank: int, depth: int) -> float:
     return (depth + 1 - rank) / depth
 
 
-def merge_rankings(all_items: list[dict], genre_lookup: dict[str, str] | None = None) -> list[dict]:
+def merge_rankings(
+    all_items: list[dict],
+    genre_lookup: dict[str, str] | None = None,
+    publisher_lookup: dict[str, str] | None = None,
+) -> list[dict]:
     """서점별 목록을 한 권 단위로 합치고 정규화 점수로 정렬한다(자르기는 호출자 몫)."""
     canonical = _canonical_keys(all_items)
     books: dict[str, dict] = {}
@@ -750,6 +788,9 @@ def merge_rankings(all_items: list[dict], genre_lookup: dict[str, str] | None = 
         # 저자는 알라딘 표기를 우선(리디는 미등록 작가 시 비어 온다)
         if item.get("author") and (not book["author"] or item["source"] == "알라딘"):
             book["author"] = item["author"]
+        # 출판사는 알라딘만 채워 준다. 첫 항목이 교보·리디면 비어 있으므로 뒤늦게라도 채운다.
+        if item.get("publisher") and not book["publisher"]:
+            book["publisher"] = item["publisher"]
         # 알라딘 커버/링크 우선, 그다음 아무 상세 링크
         if item["source"] == "알라딘" and item.get("cover"):
             book["cover"] = item["cover"]
@@ -768,6 +809,13 @@ def merge_rankings(all_items: list[dict], genre_lookup: dict[str, str] | None = 
             for raw_key in sorted(book["raw_keys"]):
                 if raw_key in genre_lookup:
                     book["genre_key"] = genre_lookup[raw_key]
+                    break
+        # 종합 순위에는 알라딘 전체 목록만 넣으므로(장르별을 섞으면 점수가 왜곡된다)
+        # 장르별 수집에서 확인된 출판사는 여기서 따로 채운다.
+        if publisher_lookup and not book["publisher"]:
+            for raw_key in sorted(book["raw_keys"]):
+                if raw_key in publisher_lookup:
+                    book["publisher"] = publisher_lookup[raw_key]
                     break
 
     return sorted(
@@ -822,6 +870,10 @@ def _index_cell(book: dict, source_count: int = len(SOURCE_NAMES)) -> str:
     return str(round(book["score"] / max(1, source_count) * 100))
 
 
+def _publisher_cell(book: dict) -> str:
+    return _md_cell(book["publisher"]) if book.get("publisher") else "-"
+
+
 def build_markdown(
     charted: list[dict],
     genre_data: dict[str, list[dict]],
@@ -845,14 +897,15 @@ def build_markdown(
 
     rows = [
         f"| **{b['rank']}** | {_title_cell(b)} | {_md_cell(b['author'])} "
+        f"| {_publisher_cell(b)} "
         f"| {next((g['name'] for g in GENRES if g['key'] == b['genre_key']), '')} "
-        f"| {_index_cell(b, source_count)} | {_source_cells(b['sources'])} |"
+        f"| {_source_cells(b['sources'])} |"
         for b in charted
     ]
 
     overall_table = "\n".join([
-        "| 순위 | 책 | 저자 | 장르 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |",
-        "|:----:|-----|------|------|:----:|:------:|:-------:|:-----:|:----:|",
+        "| 순위 | 책 | 저자 | 출판사 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |",
+        "|:----:|-----|------|--------|------|:------:|:-------:|:-----:|:----:|",
         *rows,
     ])
 
@@ -863,12 +916,12 @@ def build_markdown(
             continue
         genre_rows = [
             f"| **{b['rank']}** | {_title_cell(b)} | {_md_cell(b['author'])} "
-            f"| {_index_cell(b, source_count)} | {_source_cells(b['sources'])} |"
+            f"| {_publisher_cell(b)} | {_source_cells(b['sources'])} |"
             for b in books
         ]
         genre_table = "\n".join([
-            "| 순위 | 책 | 저자 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |",
-            "|:----:|-----|------|:----:|:------:|:-------:|:-----:|:----:|",
+            "| 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |",
+            "|:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|",
             *genre_rows,
         ])
         genre_sections += f"\n### {genre['emoji']} {genre['name']}\n\n{genre_table}\n"
@@ -885,10 +938,10 @@ isHidden: true
 
 각 서점의 **전체 베스트셀러 순위**입니다. 리디는 제공 범위상 {RIDI_OVERALL_MAX}위까지만 집계됩니다.
 {missing_note}
-**지수**는 서점별 순위를 그 서점의 수집 범위 기준으로 0~100 환산해 평균한 값입니다.
-집계에 쓰인 {source_count}개 서점에서 모두 1위면 100이고, 순위에 없는 서점은 0점으로
-계산합니다. 서점마다 확인 가능한 순위 깊이가 달라(알라딘·교보문고·YES24 20위,
-리디 {RIDI_OVERALL_MAX}위) 순위를 그대로 더하지 않습니다.
+**순위**는 서점별 순위를 그 서점의 수집 범위 기준으로 0~100 환산해 합산한 점수로 정합니다.
+집계에 쓰인 {source_count}개 서점에서 모두 1위면 만점이고, 순위에 없는 서점은 0점입니다.
+서점마다 확인 가능한 순위 깊이가 달라(알라딘·교보문고·YES24 20위, 리디 {RIDI_OVERALL_MAX}위)
+순위를 그대로 더하지 않습니다. **출판사**는 알라딘 정보 기준이며, 알라딘에 없는 책은 `-`입니다.
 
 {overall_table}
 
@@ -982,11 +1035,19 @@ def main():
         if resolved:
             b["genre_key"] = resolved
 
+    # 출판사는 알라딘 항목에만 있다. 종합 순위 병합에는 알라딘 전체 목록만 들어가므로
+    # 장르별에서만 확인된 출판사를 잃지 않도록 별도 조회표로 넘긴다.
+    publisher_lookup: dict[str, str] = {}
+    for items in [aladin_overall] + list(aladin_by_genre.values()):
+        for b in items:
+            if b.get("publisher"):
+                publisher_lookup.setdefault(_title_key(b["title"]), b["publisher"])
+
     # 종합 순위 — 리디는 전체 순위만 넣는다.
     # 장르별 순위(장르마다 1위 존재)를 섞으면 만점이 중복 발생해 종합 순위가 왜곡된다.
     print("\n  🔢 종합 순위 계산...")
     all_items = aladin_overall + kyobo_items + yes24_items + ridi_overall
-    overall = merge_rankings(all_items, genre_lookup=genre_lookup)
+    overall = merge_rankings(all_items, genre_lookup=genre_lookup, publisher_lookup=publisher_lookup)
     charted, dropped = take_charted(overall, TOP_N_OVERALL)
     # 지수 기준을 실제 수집된 서점 수에 맞춘다. 실패한 서점을 분모에 넣으면
     # 지수 상한이 100에 못 미쳐 설명과 어긋나고 주 간 비교도 깨진다.
@@ -1014,8 +1075,23 @@ def main():
             ridi_by_genre.get(key, [])
         )
         if combined:
-            genre_data[key], _ = take_charted(merge_rankings(combined), TOP_N_GENRE)
+            genre_data[key], _ = take_charted(
+                merge_rankings(combined, publisher_lookup=publisher_lookup), TOP_N_GENRE
+            )
             print(f"     [{genre['name']}] {len(genre_data[key])}개")
+
+    # 타 서점 단독 진입 도서는 알라딘 목록에 없어 출판사가 비어 있다. 책에서 출판사는
+    # 저자만큼 중요한 정보라 게시되는 책에 한해 제목 검색으로 채운다(주당 수 건).
+    print("\n  🏷  출판사 미확보 도서 보강...")
+    searched: dict[str, str] = {}
+    for book in charted + [b for books in genre_data.values() for b in books]:
+        if book["publisher"]:
+            continue
+        key = _title_key(book["title"])
+        if key not in searched:
+            searched[key] = fetch_aladin_publisher(book["title"], book["author"])
+            print(f"     {book['title'][:30]} → {searched[key] or '미확보'}")
+        book["publisher"] = searched[key]
 
     md = build_markdown(charted, genre_data, DATE, collected_sources)
     slug = f"{DATE}-bestseller"
