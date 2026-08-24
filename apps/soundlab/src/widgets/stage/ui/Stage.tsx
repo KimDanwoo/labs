@@ -1,6 +1,6 @@
 'use client';
 
-import { TRACKS } from '@entities/track/model/constants/tracks';
+import { TRACKS } from '@entities/track/model/constants';
 import { artworkUrl } from '@entities/track/model/services';
 import { currentIndexAtom, engineErrorAtom } from '@entities/track/model/store';
 import { useAtomValue } from 'jotai';

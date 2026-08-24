@@ -1,4 +1,4 @@
-import { hueOf } from '../model/constants/genreHue';
+import { hueOf } from '../model/constants';
 import type { Track } from '../model/types';
 import { LevelMeter } from './LevelMeter';
 

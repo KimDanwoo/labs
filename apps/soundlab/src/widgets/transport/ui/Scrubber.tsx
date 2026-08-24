@@ -1,6 +1,6 @@
 'use client';
 
-import { usePlaybackControls } from '@entities/track/model/hooks/usePlaybackControls';
+import { usePlaybackControls } from '@entities/track/model/hooks';
 import { frameState } from '@entities/track/model/store';
 import { useFrame } from '@shared/lib/frame';
 import { useEffect, useRef } from 'react';
