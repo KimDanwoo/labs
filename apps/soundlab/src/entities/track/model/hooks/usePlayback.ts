@@ -106,6 +106,9 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   // 지난 방문에서 듣던 자리. 그 곡을 시작할 때 한 번만 쓰고 비운다(다른 곡을 고르면 버린다).
   const resume = useRef<{ index: number; ms: number } | null>(null);
   const savedAt = useRef(0);
+  // 전환 요청의 세대. 위젯 콜백은 postMessage 왕복이라 빠른 연속 선택 시 낡은 응답이 늦게 도착한다
+  // — 그대로 두면 나중에 온 이전 곡의 skip이 이겨서 "누른 곡이 아니라 아까 곡"이 난다.
+  const goSeq = useRef(0);
   // 위젯이 준비되기 전에 누른 곡. 버리면 제목·하이라이트만 바뀌고 소리는 영원히 안 나서
   // "눌렀는데 재생이 안 된다"가 된다(엔진 로드가 늦을수록 잘 걸린다). ready에서 소진한다.
   const queued = useRef<number | null>(null);
@@ -314,6 +317,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       queued.current = next;
       return;
     }
+    const seq = ++goSeq.current;
+    const stale = () => goSeq.current !== seq;
     reported.current = { ms: 0, at: performance.now(), live: false };
     // 고른 곡은 처음부터다 — 이어 들을 자리가 그 곡의 것일 때만 남긴다.
     shouldRewind.current = true;
@@ -328,12 +333,14 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
 
     const readDuration = () =>
       instance.getDuration((ms) => {
+        if (stale()) return;
         frameState.durationMs = validDuration(ms, track.durationMs);
       });
 
     // 목록은 ready 시점의 것이 끝이 아니다 — 위젯이 프로필 곡을 나눠 싣는다(실측 20개 → 25개).
     // 전환할 때마다 다시 읽어야 위치가 맞는다. 우리 목록에 없는 사운드(최근 업로드)가 섞여 있어도 마찬가지다.
     instance.getSounds((sounds) => {
+      if (stale()) return;
       soundIds.current = readSoundIds(sounds);
       // 위젯 안의 위치로 변환한다. TRACKS 인덱스를 그대로 넘기면 다른 곡이 걸린다.
       const soundIndex = soundIds.current.indexOf(track.id);
@@ -343,6 +350,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         // 단, 위젯이 이미 그 사운드를 들고 있으면 skip은 아무 일도 하지 않는다(멈춰 있으면 계속 멈춘 채다).
         // 곡을 고른 건 듣겠다는 뜻이므로 그때는 play로 깨운다.
         instance.getCurrentSoundIndex((current) => {
+          if (stale()) return;
           if (current === soundIndex) instance.play();
           else instance.skip(soundIndex);
         });
@@ -356,6 +364,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         instance.load(target, {
           auto_play: true,
           callback: () => {
+            if (stale()) return;
             holdsSet.current = true;
             setEngineMode('set');
             instance.skip(soundIndex);
