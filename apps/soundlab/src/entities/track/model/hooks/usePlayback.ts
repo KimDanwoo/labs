@@ -61,6 +61,8 @@ const DRIFT_SNAP_MS = 250;
 
 /** ready가 이 안에 안 오면 엔진이 막힌 것으로 본다 — w.soundcloud.com은 광고 차단기가 흔히 막는다. */
 const READY_TIMEOUT_MS = 10_000;
+/** 재생 중 위치 보고가 이보다 오래 끊기면 시계 전진을 세운다 — 소리는 멈췄는데 진행바만 달리지 않게. */
+const STALL_MS = 3000;
 
 /** 이어 듣기 기록. 자주 쓰면 낭비, 드물게 쓰면 마지막 몇 초를 잃는다. */
 const SAVE_INTERVAL_MS = 5000;
@@ -252,7 +254,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         };
         const interpolated = () => {
           const { ms, at, live } = reported.current;
-          return live && playing.current ? ms + (performance.now() - at) : ms;
+          return live && playing.current ? ms + Math.min(STALL_MS, performance.now() - at) : ms;
         };
 
         instance.bind(EVENTS.play, () => {
@@ -536,7 +538,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       frameState.position = Math.min(1, ms / durationMs);
       return;
     }
-    const target = ms + (performance.now() - at);
+    // 보고가 끊긴 지 오래면 전진을 멈춘다. 다음 보고가 오면 DRIFT_SNAP이 실제 위치로 데려간다.
+    const target = ms + Math.min(STALL_MS, performance.now() - at);
     const drift = target - (smoothMs.current + delta);
     const bound = delta * DRIFT_CORRECT_RATIO;
     smoothMs.current =
