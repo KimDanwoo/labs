@@ -1,11 +1,22 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import type { Question, Category, Difficulty } from '@entities/question/model';
-import type { QuestionInput } from '@entities/question/model';
+import type { Category, Difficulty, Question, QuestionInput } from '@entities/question/model';
 import { createQuestion, updateQuestion } from '@entities/question/services';
-import { Input, Button, Badge, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, Checkbox, MarkdownRenderer, ConfirmDialog } from '@shared/ui';
+import {
+  Badge,
+  Button,
+  Checkbox,
+  ConfirmDialog,
+  Input,
+  MarkdownRenderer,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/ui';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface QuestionFormProps {
   categories: Category[];
@@ -15,6 +26,7 @@ interface QuestionFormProps {
 export function QuestionForm({ categories, question }: QuestionFormProps) {
   const router = useRouter();
   const isEdit = !!question;
+  const submitLabel = isEdit ? '수정' : '추가';
 
   const [form, setForm] = useState({
     question: question?.question ?? '',
@@ -31,10 +43,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
   const [showPreview, setShowPreview] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  function setField<K extends keyof typeof form>(
-    key: K,
-    value: (typeof form)[K]
-  ) {
+  function setField<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -49,7 +58,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
   function removeTag(tag: string) {
     setField(
       'tags',
-      form.tags.filter((t) => t !== tag)
+      form.tags.filter((t) => t !== tag),
     );
   }
 
@@ -89,10 +98,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <label className="text-sm font-medium">카테고리</label>
-          <Select
-            value={form.category_id}
-            onValueChange={(v) => setField('category_id', v)}
-          >
+          <Select value={form.category_id} onValueChange={(v) => setField('category_id', v)}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
@@ -107,12 +113,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
         </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium">난이도</label>
-          <Select
-            value={form.difficulty}
-            onValueChange={(v) =>
-              setField('difficulty', v as Difficulty)
-            }
-          >
+          <Select value={form.difficulty} onValueChange={(v) => setField('difficulty', v as Difficulty)}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
@@ -148,12 +149,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium">답변 (Markdown)</label>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowPreview((p) => !p)}
-          >
+          <Button type="button" variant="ghost" size="sm" onClick={() => setShowPreview((p) => !p)}>
             {showPreview ? '편집' : '미리보기'}
           </Button>
         </div>
@@ -194,12 +190,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
         {form.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
             {form.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="secondary"
-                className="cursor-pointer"
-                onClick={() => removeTag(tag)}
-              >
+              <Badge key={tag} variant="secondary" className="cursor-pointer" onClick={() => removeTag(tag)}>
                 {tag} &times;
               </Badge>
             ))}
@@ -213,18 +204,14 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
           <label className="flex items-center gap-2 text-sm">
             <Checkbox
               checked={form.show_in_daily}
-              onCheckedChange={(checked) =>
-                setField('show_in_daily', checked === true)
-              }
+              onCheckedChange={(checked) => setField('show_in_daily', checked === true)}
             />
             오늘의 학습에 노출
           </label>
           <label className="flex items-center gap-2 text-sm">
             <Checkbox
               checked={form.show_in_flashcard}
-              onCheckedChange={(checked) =>
-                setField('show_in_flashcard', checked === true)
-              }
+              onCheckedChange={(checked) => setField('show_in_flashcard', checked === true)}
             />
             플래시카드에 노출
           </label>
@@ -233,13 +220,9 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
 
       <div className="flex gap-3">
         <Button type="submit" disabled={saving}>
-          {saving ? '저장 중...' : isEdit ? '수정' : '추가'}
+          {saving ? '저장 중...' : submitLabel}
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push('/admin/questions')}
-        >
+        <Button type="button" variant="outline" onClick={() => router.push('/admin/questions')}>
           취소
         </Button>
       </div>

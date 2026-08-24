@@ -1,7 +1,12 @@
 'use client';
 
-import type { FlashcardResult, ReviewRating, UserProgress } from '@entities/progress';
-import { getLocalProgress, reviewCard } from '@entities/progress';
+import {
+  type FlashcardResult,
+  getLocalProgress,
+  reviewCard,
+  type ReviewRating,
+  type UserProgress,
+} from '@entities/progress';
 import type { Question } from '@entities/question';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -82,7 +87,7 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
 
   // 키보드 단축키: Space/Enter로 뒤집기, 1~4로 평가
   useEffect(() => {
-    if (phase !== 'study') return;
+    if (phase !== 'study') return undefined;
 
     function handleKeyDown(e: KeyboardEvent) {
       if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;

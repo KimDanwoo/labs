@@ -1,8 +1,13 @@
 'use client';
 
 import { getDueCardCount, getDueCardIds, getLocalProgress } from '@entities/progress';
-import type { Category, Question } from '@entities/question';
-import { getAllCategories, getQuestionsByIds, getRandomQuestions } from '@entities/question';
+import {
+  type Category,
+  getAllCategories,
+  getQuestionsByIds,
+  getRandomQuestions,
+  type Question,
+} from '@entities/question';
 import { shuffleArray } from '@shared/lib/shuffle';
 import { Button } from '@shared/ui';
 import { useCallback, useEffect, useState } from 'react';

@@ -1,8 +1,7 @@
 'use client';
 
 import { getCurrentStreak, getDueCardIds, getLocalProgress } from '@entities/progress';
-import type { Question } from '@entities/question';
-import { getQuestionsByIds, getRandomQuestions } from '@entities/question';
+import { getQuestionsByIds, getRandomQuestions, type Question } from '@entities/question';
 import { shuffleArray } from '@shared/lib/shuffle';
 import { Button, Card } from '@shared/ui';
 import { ArrowRight, Calendar, Flame, Trophy } from 'lucide-react';
