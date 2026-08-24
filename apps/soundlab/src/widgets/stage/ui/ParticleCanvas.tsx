@@ -1,6 +1,4 @@
-'use client';
-
-import { TRACKS } from '@entities/track/model/constants/tracks';
+import { TRACKS } from '@entities/track/model/constants';
 import { artworkUrl } from '@entities/track/model/services';
 import { currentIndexAtom, frameState } from '@entities/track/model/store';
 import { useFrame } from '@shared/lib/frame';

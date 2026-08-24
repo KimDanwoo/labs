@@ -1,5 +1,3 @@
-'use client';
-
 import { hueOf } from '../model/constants/genreHue';
 import type { Track } from '../model/types';
 import { LevelMeter } from './LevelMeter';
