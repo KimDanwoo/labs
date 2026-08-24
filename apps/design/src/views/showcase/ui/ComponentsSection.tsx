@@ -41,7 +41,9 @@ export function ComponentsSection() {
               <Card.Action>
                 <Badge variant="info">new</Badge>
               </Card.Action>
-              <Card.Description>Card·Card.Header·Card.Title·Card.Description·Card.Content·Card.Footer dot-access 조합.</Card.Description>
+              <Card.Description>
+                Card·Card.Header·Card.Title·Card.Description·Card.Content·Card.Footer dot-access 조합.
+              </Card.Description>
             </Card.Header>
             <Card.Content>
               <p className="text-sm text-foreground">Card.Content — 자유 구성.</p>
