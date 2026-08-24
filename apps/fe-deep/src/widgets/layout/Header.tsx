@@ -26,6 +26,7 @@ import {
   LogIn,
   LogOut,
   Menu,
+  NotebookPen,
   Search,
   Settings,
   Shield,
@@ -42,9 +43,13 @@ const navItems = [
   { href: '/search', label: '검색', icon: Search },
 ];
 
+/** 관리자만 접근 가능한 경로(미들웨어에서 강제). 링크도 관리자에게만 보인다. */
+const adminNavItems = [{ href: '/study', label: '면접 학습', icon: NotebookPen }];
+
 export function Header() {
   const pathname = usePathname();
   const { user, open, setOpen, dueCount, isAdminUser, handleSignOut } = useHeader();
+  const visibleNavItems = isAdminUser ? [...navItems, ...adminNavItems] : navItems;
 
   return (
     <header
@@ -60,7 +65,7 @@ export function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center space-x-1 flex-1" aria-label="메인 네비게이션">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             const showDueBadge = item.href === '/learn/flashcard' && dueCount > 0;
@@ -152,7 +157,7 @@ export function Header() {
             <SheetContent side="right" className="w-[280px]">
               <SheetTitle className="sr-only">메뉴</SheetTitle>
               <nav className="flex flex-col gap-1 mt-8 px-2">
-                {navItems.map((item) => {
+                {visibleNavItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                   const showDueBadge = item.href === '/learn/flashcard' && dueCount > 0;
