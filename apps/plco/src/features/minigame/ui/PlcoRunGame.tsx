@@ -22,6 +22,12 @@ import MinigameCooldownNotice from './MinigameCooldownNotice';
 import MinigameReadyScreen from './MinigameReadyScreen';
 import MinigameRewardSummary from './MinigameRewardSummary';
 
+function scoreEmoji(score: number): string {
+  if (score >= RUN_SCORE_GOOD) return '🏆';
+  if (score >= RUN_SCORE_OK) return '🎉';
+  return '😅';
+}
+
 type PlcoRunGameProps = {
   onExitToMenu: () => void;
 };
@@ -206,7 +212,7 @@ export default function PlcoRunGame({ onExitToMenu }: PlcoRunGameProps) {
   if (phase === RUN_PHASE.RESULT) {
     return (
       <div className="space-y-4 py-3">
-        <div className="text-5xl">{score >= RUN_SCORE_GOOD ? '🏆' : score >= RUN_SCORE_OK ? '🎉' : '😅'}</div>
+        <div className="text-5xl">{scoreEmoji(score)}</div>
         <h3 className="text-xl font-bold text-gray-700">💖 {score}개 모았어요!</h3>
         {isNewBest && score > 0 ? (
           <div className="text-sm font-bold text-amber-500">🌟 새 최고기록!</div>

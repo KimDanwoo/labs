@@ -1,10 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { FRAME_SIZE, LEVEL_SCALE_PER_LEVEL, SHEET_SIZE, SPRITE_MAP, TOTAL_FRAMES, WALK_FPS } from '@shared/constants';
 import type { CharacterId } from '@shared/types';
-import { SPRITE_MAP, FRAME_SIZE, SHEET_SIZE, WALK_FPS, TOTAL_FRAMES, LEVEL_SCALE_PER_LEVEL } from '@shared/constants';
+import { useEffect, useState } from 'react';
 
 type SpriteDirection = 'up' | 'down' | 'left' | 'right';
+
+function brightnessFilter(isSleeping: boolean, isDrowsy: boolean): string | undefined {
+  if (isSleeping) return 'brightness(0.7)';
+  if (isDrowsy) return 'brightness(0.88)';
+  return undefined;
+}
 
 type CharacterSpriteProps = {
   characterId: CharacterId;
@@ -40,7 +46,7 @@ export default function CharacterSprite({
   const isWalking = isMoving && !isSleeping && !isDead;
 
   useEffect(() => {
-    if (!isWalking) return;
+    if (!isWalking) return undefined;
     const id = setInterval(() => {
       setFrame((prev) => (prev + 1) % TOTAL_FRAMES);
     }, 1000 / WALK_FPS);
@@ -57,11 +63,8 @@ export default function CharacterSprite({
   const bgX = -(col * FRAME_SIZE);
   const bgY = -(row * FRAME_SIZE);
 
-  const wrapperClass = isDead
-    ? 'death-animation'
-    : isSleeping
-      ? 'idle'
-      : '';
+  const sleepingClass = isSleeping ? 'idle' : '';
+  const wrapperClass = isDead ? 'death-animation' : sleepingClass;
 
   return (
     <div className={`relative ${wrapperClass}`} style={{ width: actualSize, height: actualSize }}>
@@ -75,7 +78,7 @@ export default function CharacterSprite({
           backgroundPosition: `${(bgX / FRAME_SIZE) * actualSize}px ${(bgY / FRAME_SIZE) * actualSize}px`,
           backgroundRepeat: 'no-repeat',
           opacity: isDead ? 0.5 : 1,
-          filter: isSleeping ? 'brightness(0.7)' : isDrowsy ? 'brightness(0.88)' : undefined,
+          filter: brightnessFilter(isSleeping, isDrowsy),
         }}
       />
 
@@ -83,8 +86,12 @@ export default function CharacterSprite({
       {isSleeping && (
         <div className="absolute -top-2 -right-2 text-sm font-bold text-blue-300">
           <span className="sleep-z inline-block">Z</span>
-          <span className="sleep-z inline-block" style={{ animationDelay: '0.5s' }}>z</span>
-          <span className="sleep-z inline-block" style={{ animationDelay: '1s' }}>z</span>
+          <span className="sleep-z inline-block" style={{ animationDelay: '0.5s' }}>
+            z
+          </span>
+          <span className="sleep-z inline-block" style={{ animationDelay: '1s' }}>
+            z
+          </span>
         </div>
       )}
       {isDrowsy && !isSleeping && (
@@ -94,9 +101,7 @@ export default function CharacterSprite({
       )}
 
       {/* 질병 표시 */}
-      {isSick && !isSleeping && !isDead && (
-        <div className="absolute -top-3 -left-1 text-lg animate-pulse">💀</div>
-      )}
+      {isSick && !isSleeping && !isDead && <div className="absolute -top-3 -left-1 text-lg animate-pulse">💀</div>}
     </div>
   );
 }

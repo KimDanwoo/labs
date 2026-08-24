@@ -1,12 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CharacterPosition } from '@shared/types';
-import {
-  DIRECTION_CHANGE_INTERVAL,
-  IDLE_CHANCE,
-  MOVE_SPEED,
-} from '../constants';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { DIRECTION_CHANGE_INTERVAL, IDLE_CHANCE, MOVE_SPEED } from '../constants';
 
 const INITIAL: CharacterPosition = {
   x: 40,
@@ -39,7 +35,7 @@ export function useFriendWander(active: boolean): CharacterPosition {
   }, []);
 
   useEffect(() => {
-    if (!active) return;
+    if (!active) return undefined;
     const kickoff = setTimeout(pickNewTarget, 0);
     const interval = setInterval(pickNewTarget, DIRECTION_CHANGE_INTERVAL);
     return () => {
@@ -49,7 +45,7 @@ export function useFriendWander(active: boolean): CharacterPosition {
   }, [active, pickNewTarget]);
 
   useEffect(() => {
-    if (!active) return;
+    if (!active) return undefined;
 
     const animate = (time: number) => {
       if (!lastTimeRef.current) lastTimeRef.current = time;

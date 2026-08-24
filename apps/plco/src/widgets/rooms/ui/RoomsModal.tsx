@@ -139,6 +139,8 @@ export default function RoomsModal() {
             {ROOMS_TABS.map((t) => {
               const isActive = tab === t.key;
               const showBadge = t.key === ROOMS_TAB.INVITES && pendingInviteCount > 0;
+              const activeClass = t.accent ? 'btn-gold' : 'bg-white text-gray-800 shadow-game-sm';
+              const inactiveClass = t.accent ? 'text-gold' : 'text-gray-400';
               return (
                 <button
                   key={t.key}
@@ -146,13 +148,7 @@ export default function RoomsModal() {
                   onClick={() => setTab(t.key)}
                   aria-pressed={isActive}
                   className={`flex flex-1 items-center justify-center gap-1 rounded-xl py-2 text-xs font-bold transition-all ${
-                    isActive
-                      ? t.accent
-                        ? 'btn-gold'
-                        : 'bg-white text-gray-800 shadow-game-sm'
-                      : t.accent
-                        ? 'text-gold'
-                        : 'text-gray-400'
+                    isActive ? activeClass : inactiveClass
                   }`}
                 >
                   {t.label}

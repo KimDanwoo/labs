@@ -1,21 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { characterIdAtom } from '@entities/game/model/store';
 import { activeRoomAtom } from '@entities/chat-room/model/store';
 import type { Room } from '@entities/chat-room/model/types';
-import {
-  useChatIdentity,
-  useChatRoom,
-  useDeleteChat,
-} from '@features/chat/model/hooks';
-import ChatComposer from '@features/chat/ui/ChatComposer';
-import ChatLoginGate from '@features/chat/ui/ChatLoginGate';
-import ChatMessageList from '@features/chat/ui/ChatMessageList';
-import type { CharacterId } from '@shared/types';
+import { characterIdAtom } from '@entities/game/model/store';
+import { useChatIdentity, useChatRoom, useDeleteChat } from '@features/chat/model/hooks';
+import { ChatComposer, ChatLoginGate, ChatMessageList } from '@features/chat/ui';
 import { ALL_CHARACTER_IDS } from '@shared/constants';
+import type { CharacterId } from '@shared/types';
+import { useAtomValue, useSetAtom } from 'jotai';
+import Image from 'next/image';
+import { useState } from 'react';
 import { ROOM_BACKGROUNDS } from '../constants';
 import SceneCharacter from './SceneCharacter';
 
@@ -61,9 +55,7 @@ export default function SharedRoomScene({ room }: SharedRoomSceneProps) {
   const { mutate: deleteMessage } = useDeleteChat(room.id);
 
   // presence 유저를 userId 정렬해 결정적 위치 배정
-  const sortedUsers = [...onlineUsers].sort((a, b) =>
-    a.userId.localeCompare(b.userId),
-  );
+  const sortedUsers = [...onlineUsers].sort((a, b) => a.userId.localeCompare(b.userId));
   const visibleUsers = sortedUsers.slice(0, MAX_VISIBLE_USERS);
   const extraCount = Math.max(0, sortedUsers.length - MAX_VISIBLE_USERS);
 
@@ -84,18 +76,8 @@ export default function SharedRoomScene({ room }: SharedRoomSceneProps) {
   return (
     <div className="flex flex-1 flex-col overflow-hidden rounded-2xl shadow-game-lg sm:rounded-3xl">
       {/* 상단: 씬 사진 (절반 고정) */}
-      <div
-        className="relative shrink-0 overflow-hidden"
-        style={{ height: '40dvh' }}
-      >
-        <Image
-          src={SHARED_ROOM_BACKGROUND}
-          alt="공유 방 배경"
-          fill
-          className="object-cover"
-          priority
-          unoptimized
-        />
+      <div className="relative shrink-0 overflow-hidden" style={{ height: '40dvh' }}>
+        <Image src={SHARED_ROOM_BACKGROUND} alt="공유 방 배경" fill className="object-cover" priority unoptimized />
 
         {/* 나가기 버튼 */}
         <button
@@ -108,9 +90,7 @@ export default function SharedRoomScene({ room }: SharedRoomSceneProps) {
 
         {/* 방 이름 */}
         <div className="absolute left-2 top-2 z-30 max-w-[60%] rounded-full border border-card-border bg-white/80 px-3 py-1 shadow-game-sm">
-          <p className="truncate text-[11px] font-bold text-gray-700">
-            {room.name}
-          </p>
+          <p className="truncate text-[11px] font-bold text-gray-700">{room.name}</p>
         </div>
 
         {/* 캐릭터들 */}
@@ -139,10 +119,7 @@ export default function SharedRoomScene({ room }: SharedRoomSceneProps) {
       </div>
 
       {/* 하단: 채팅 영역 (사진과 반반 고정, 히스토리는 내부 스크롤) */}
-      <div
-        className="flex shrink-0 flex-col border-t border-card-border bg-card-bg"
-        style={{ height: '40dvh' }}
-      >
+      <div className="flex shrink-0 flex-col border-t border-card-border bg-card-bg" style={{ height: '40dvh' }}>
         <div className="flex min-h-0 flex-1 flex-col">
           <ChatMessageList
             messages={messages}
@@ -155,11 +132,7 @@ export default function SharedRoomScene({ room }: SharedRoomSceneProps) {
         </div>
         <div className="shrink-0 border-t border-card-border px-3 py-2">
           {canChat && userId ? (
-            <ChatComposer
-              roomId={room.id}
-              userId={userId}
-              nickname={nickname}
-            />
+            <ChatComposer roomId={room.id} userId={userId} nickname={nickname} />
           ) : (
             <ChatLoginGate onLogin={linkWithGoogle} />
           )}

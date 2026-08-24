@@ -95,7 +95,7 @@ export function useCatchEngine() {
   }, [markMinigamePlayed, minigame.canPlay]);
 
   useEffect(() => {
-    if (phase !== MINIGAME_PHASE.PLAYING) return;
+    if (phase !== MINIGAME_PHASE.PLAYING) return undefined;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -119,7 +119,7 @@ export function useCatchEngine() {
   }, [phase]);
 
   useEffect(() => {
-    if (phase !== MINIGAME_PHASE.PLAYING) return;
+    if (phase !== MINIGAME_PHASE.PLAYING) return undefined;
 
     const spawnFloat = (float: CatchFloat) => {
       setFloats((prev) => [...prev, float]);

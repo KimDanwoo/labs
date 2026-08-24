@@ -5,6 +5,24 @@ import { CharacterSprite, ModalShell } from '@shared/ui';
 import { CONVERSATION_OUTCOME, MEETING_PHASE } from '../model/constants';
 import { useMeetingChat } from '../model/hooks';
 
+type ConversationOutcome = (typeof CONVERSATION_OUTCOME)[keyof typeof CONVERSATION_OUTCOME];
+
+const OUTCOME_COLOR: Record<ConversationOutcome, string> = {
+  [CONVERSATION_OUTCOME.GOOD]: 'bg-pink-400',
+  [CONVERSATION_OUTCOME.OK]: 'bg-amber-300',
+  [CONVERSATION_OUTCOME.AWKWARD]: 'bg-gray-300',
+};
+
+/** 아직 치르지 않은 라운드. */
+const OUTCOME_COLOR_PENDING = 'bg-gray-100';
+
+function resultMessage(isPerfect: boolean, totalHearts: number): string {
+  if (isPerfect) return '완벽한 만남이었어요! ✨';
+  if (totalHearts >= MEETING_REWARD_GOOD * 2) return '즐거운 시간을 보냈어요!';
+  if (totalHearts > 0) return '나쁘지 않은 만남이었어요';
+  return '어색했어요... 😅';
+}
+
 export default function MeetingModal() {
   const {
     myCharacterId,
@@ -50,9 +68,7 @@ export default function MeetingModal() {
 
           {phase === MEETING_PHASE.FOUND && metCharacter && (
             <>
-              <h3 className="text-lg font-bold text-pink-500">
-                친구를 만났어요!
-              </h3>
+              <h3 className="text-lg font-bold text-pink-500">친구를 만났어요!</h3>
               <div className="flex justify-center items-center gap-6">
                 <div className="flex flex-col items-center gap-1">
                   <CharacterSprite characterId={myCharacterId} size={56} />
@@ -61,9 +77,7 @@ export default function MeetingModal() {
                 <div className="text-2xl heart-effect">💕</div>
                 <div className="flex flex-col items-center gap-1">
                   <CharacterSprite characterId={metCharacter} size={56} />
-                  <span className="text-xs font-bold text-gray-500">
-                    {metName}
-                  </span>
+                  <span className="text-xs font-bold text-gray-500">{metName}</span>
                 </div>
               </div>
               <p className="text-xs text-gray-400">잠시 후 대화가 시작돼요</p>
@@ -73,9 +87,7 @@ export default function MeetingModal() {
           {phase === MEETING_PHASE.CHAT && metCharacter && (
             <>
               <div className="flex justify-between items-center text-xs text-gray-400">
-                <span className="font-bold text-pink-400">
-                  {metName}와의 대화
-                </span>
+                <span className="font-bold text-pink-400">{metName}와의 대화</span>
                 <span>
                   {roundIdx + 1} / {MEETING_ROUNDS}
                 </span>
@@ -114,17 +126,8 @@ export default function MeetingModal() {
               <div className="flex justify-center gap-1.5 pt-1">
                 {Array.from({ length: MEETING_ROUNDS }).map((_, i) => {
                   const o = outcomes[i];
-                  const color =
-                    o === CONVERSATION_OUTCOME.GOOD
-                      ? 'bg-pink-400'
-                      : o === CONVERSATION_OUTCOME.OK
-                        ? 'bg-amber-300'
-                        : o === CONVERSATION_OUTCOME.AWKWARD
-                          ? 'bg-gray-300'
-                          : 'bg-gray-100';
-                  return (
-                    <div key={i} className={`w-6 h-1.5 rounded-full ${color}`} />
-                  );
+                  const color = o ? OUTCOME_COLOR[o] : OUTCOME_COLOR_PENDING;
+                  return <div key={i} className={`w-6 h-1.5 rounded-full ${color}`} />;
                 })}
               </div>
             </>
@@ -132,16 +135,8 @@ export default function MeetingModal() {
 
           {phase === MEETING_PHASE.RESULT && metCharacter && (
             <>
-              <h3
-                className={`text-lg font-bold ${isPerfect ? 'text-pink-500' : 'text-gray-700'}`}
-              >
-                {isPerfect
-                  ? '완벽한 만남이었어요! ✨'
-                  : totalHearts >= MEETING_REWARD_GOOD * 2
-                    ? '즐거운 시간을 보냈어요!'
-                    : totalHearts > 0
-                      ? '나쁘지 않은 만남이었어요'
-                      : '어색했어요... 😅'}
+              <h3 className={`text-lg font-bold ${isPerfect ? 'text-pink-500' : 'text-gray-700'}`}>
+                {resultMessage(isPerfect, totalHearts)}
               </h3>
 
               <div className="flex justify-center items-center gap-6">
@@ -152,25 +147,16 @@ export default function MeetingModal() {
 
               <div className="flex justify-center gap-6 text-sm">
                 <div>
-                  <div className="font-bold text-pink-400">
-                    💕 +{totalHearts}
-                  </div>
+                  <div className="font-bold text-pink-400">💕 +{totalHearts}</div>
                   <div className="text-[10px] text-gray-400">행복도</div>
                 </div>
                 <div>
-                  <div className="font-bold text-amber-500">
-                    🪙 +{coinsReward}
-                  </div>
-                  <div className="text-[10px] text-gray-400">
-                    {isPerfect ? '+보너스' : '코인'}
-                  </div>
+                  <div className="font-bold text-amber-500">🪙 +{coinsReward}</div>
+                  <div className="text-[10px] text-gray-400">{isPerfect ? '+보너스' : '코인'}</div>
                 </div>
               </div>
 
-              <button
-                onClick={close}
-                className="w-full py-3 rounded-xl bg-pink-400 text-white font-bold btn-press"
-              >
+              <button onClick={close} className="w-full py-3 rounded-xl bg-pink-400 text-white font-bold btn-press">
                 {totalHearts > 0 ? '받기!' : '집으로 가기'}
               </button>
             </>

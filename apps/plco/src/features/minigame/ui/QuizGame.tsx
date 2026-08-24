@@ -7,6 +7,12 @@ import MinigameReadyScreen from './MinigameReadyScreen';
 import MinigameRewardSummary from './MinigameRewardSummary';
 import QuizProgressDots from './QuizProgressDots';
 
+function scoreEmoji(correctCount: number, allCorrect: boolean): string {
+  if (allCorrect) return '🎉';
+  if (correctCount >= QUIZ_OK_THRESHOLD) return '😊';
+  return '😅';
+}
+
 type QuizGameProps = { onExitToMenu: () => void };
 
 export default function QuizGame({ onExitToMenu }: QuizGameProps) {
@@ -51,9 +57,7 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
           <div className="text-5xl py-2">💡</div>
         )}
         <p className="text-sm text-gray-400 leading-relaxed">
-          {myCharacter
-            ? `${myCharacter.name}의 진짜 취향을`
-            : 'PLCO 멤버들의 진짜 취향을'}
+          {myCharacter ? `${myCharacter.name}의 진짜 취향을` : 'PLCO 멤버들의 진짜 취향을'}
           <br />
           맞춰보세요! 총 {QUIZ_ROUNDS}문제
         </p>
@@ -99,8 +103,7 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
             const isCorrectOption = i === current.correctIndex;
             const isPicked = picked === i;
 
-            let stateClass =
-              'bg-white border-gray-200 text-gray-700 hover:border-violet-300 hover:bg-violet-50';
+            let stateClass = 'bg-white border-gray-200 text-gray-700 hover:border-violet-300 hover:bg-violet-50';
             let mark: string | null = null;
 
             if (isRevealed) {
@@ -130,21 +133,13 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
         </div>
         {isRevealed && (
           <div className="space-y-3 animate-fade-in-up">
-            <div
-              className={`text-sm font-bold ${
-                isCurrentCorrect ? 'text-emerald-500' : 'text-rose-400'
-              }`}
-            >
+            <div className={`text-sm font-bold ${isCurrentCorrect ? 'text-emerald-500' : 'text-rose-400'}`}>
               {isCurrentCorrect ? '정답이에요! 🎉' : '아쉬워요 😅'}
             </div>
             <div className="px-4 py-3 rounded-2xl bg-violet-50 border border-violet-100 text-[12px] text-gray-600 leading-relaxed text-left">
               💡 {current.fact}
             </div>
-            <button
-              onClick={goNext}
-              className="btn-primary btn-press w-full"
-              style={{ backgroundColor: '#A78BFA' }}
-            >
+            <button onClick={goNext} className="btn-primary btn-press w-full" style={{ backgroundColor: '#A78BFA' }}>
               {isLastRound ? '결과 보기' : '다음 문제'}
             </button>
           </div>
@@ -157,19 +152,13 @@ export default function QuizGame({ onExitToMenu }: QuizGameProps) {
     const allCorrect = correctCount === QUIZ_ROUNDS;
     return (
       <div className="space-y-5 py-4">
-        <div className="text-5xl">
-          {allCorrect ? '🎉' : correctCount >= QUIZ_OK_THRESHOLD ? '😊' : '😅'}
-        </div>
+        <div className="text-5xl">{scoreEmoji(correctCount, allCorrect)}</div>
         <h3 className="text-xl font-bold text-gray-700">
           {correctCount} / {QUIZ_ROUNDS} 맞췄어요!
         </h3>
         <QuizProgressDots results={results} currentRound={-1} />
         <MinigameRewardSummary score={correctCount} />
-        <button
-          onClick={handleFinish}
-          className="btn-primary btn-press w-full"
-          style={{ backgroundColor: '#A78BFA' }}
-        >
+        <button onClick={handleFinish} className="btn-primary btn-press w-full" style={{ backgroundColor: '#A78BFA' }}>
           받기!
         </button>
       </div>

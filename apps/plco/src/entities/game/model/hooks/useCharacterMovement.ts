@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useCallback, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { MOVE_SPEED, DIRECTION_CHANGE_INTERVAL, IDLE_CHANCE } from '../constants';
+import { useCallback, useEffect, useRef } from 'react';
+import { DIRECTION_CHANGE_INTERVAL, IDLE_CHANCE, MOVE_SPEED } from '../constants';
 import { characterPositionAtom, isPlayingAtom, isSleepingAtom } from '../store';
 
 export function useCharacterMovement() {
@@ -35,7 +35,7 @@ export function useCharacterMovement() {
   useEffect(() => {
     if (!isActive) {
       setPosition((prev) => ({ ...prev, isMoving: false }));
-      return;
+      return undefined;
     }
 
     const directionInterval = setInterval(pickNewTarget, DIRECTION_CHANGE_INTERVAL);
@@ -45,7 +45,7 @@ export function useCharacterMovement() {
   }, [isActive, pickNewTarget, setPosition]);
 
   useEffect(() => {
-    if (!isActive) return;
+    if (!isActive) return undefined;
 
     const animate = (time: number) => {
       if (!lastTimeRef.current) {
