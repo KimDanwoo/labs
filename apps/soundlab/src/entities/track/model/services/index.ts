@@ -37,17 +37,23 @@ let pending: Promise<ScGlobal> | null = null;
 /** api.js를 한 번만 로드한다. 이미 있으면 즉시 반환. */
 export function loadWidgetApi(): Promise<ScGlobal> {
   if (globalThis.SC) return Promise.resolve(globalThis.SC);
-  pending ??= new Promise<ScGlobal>((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = WIDGET_API_SRC;
-    script.async = true;
-    script.onload = () => {
-      if (globalThis.SC) resolve(globalThis.SC);
-      else reject(new Error('api.js를 불러왔지만 SC 전역이 없습니다'));
-    };
-    script.onerror = () => reject(new Error('SoundCloud Widget API 로드 실패'));
-    document.head.append(script);
-  });
+  if (!pending) {
+    pending = new Promise<ScGlobal>((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = WIDGET_API_SRC;
+      script.async = true;
+      script.onload = () => {
+        if (globalThis.SC) resolve(globalThis.SC);
+        else reject(new Error('api.js를 불러왔지만 SC 전역이 없습니다'));
+      };
+      script.onerror = () => reject(new Error('SoundCloud Widget API 로드 실패'));
+      document.head.append(script);
+    });
+    // 실패까지 캐시하면 새로고침 전엔 재시도가 불가능하다. 다음 호출이 다시 시도하게 비운다.
+    pending.catch(() => {
+      pending = null;
+    });
+  }
   return pending;
 }
 
