@@ -24,6 +24,8 @@ interface CardStudySession {
   progressPercent: number;
   isNewCard: boolean;
   handleNext: () => void;
+  /** 현재 카드를 안 뒤집힌 상태로 되돌려 다시 풀게 한다. */
+  handleRetry: () => void;
   resetStudy: () => void;
 }
 
@@ -69,6 +71,12 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
     }
   }, [currentQuestion, currentIndex, questions.length, onComplete]);
 
+  /** 현재 카드를 처음부터 다시 푼다. 입력을 비우고 질문 상태로 되돌린다. */
+  const handleRetry = useCallback(() => {
+    setIsFlipped(false);
+    setRecallInput('');
+  }, []);
+
   // 키보드 단축키: Space/Enter로 뒤집기 → 다음
   useEffect(() => {
     if (phase !== 'study') return undefined;
@@ -107,6 +115,7 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
     progressPercent,
     isNewCard,
     handleNext,
+    handleRetry,
     resetStudy,
   };
 }

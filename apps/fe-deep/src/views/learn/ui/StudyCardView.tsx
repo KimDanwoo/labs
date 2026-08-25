@@ -4,7 +4,7 @@ import type { Question } from '@entities/question';
 import { DifficultyBadge } from '@entities/question/ui';
 import { Badge, Button, Card, MarkdownRenderer, Progress } from '@shared/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Eye } from 'lucide-react';
+import { ArrowRight, Eye, RotateCcw } from 'lucide-react';
 
 interface StudyCardViewProps {
   currentIndex: number;
@@ -15,6 +15,7 @@ interface StudyCardViewProps {
   progressPercent: number;
   isNewCard: boolean;
   onNext: () => void;
+  onRetry: () => void;
   /** 답을 보기 전에 스스로 적어보는 인출 입력 */
   recallInput: string;
   onRecallChange: (v: string) => void;
@@ -31,6 +32,7 @@ export function StudyCardView({
   progressPercent,
   isNewCard,
   onNext,
+  onRetry,
   recallInput,
   onRecallChange,
   headerAction,
@@ -150,8 +152,12 @@ export function StudyCardView({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-5 text-center"
+          className="mt-5 flex justify-center gap-2.5"
         >
+          <Button variant="outline" size="lg" onClick={onRetry} className="gap-2 h-12 px-6 shadow-sm">
+            <RotateCcw className="h-4 w-4" />
+            다시 풀기
+          </Button>
           <Button size="lg" onClick={onNext} className="gap-2 h-12 px-8 shadow-md">
             다음
             <ArrowRight className="h-4 w-4" />
