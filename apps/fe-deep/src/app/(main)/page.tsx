@@ -39,7 +39,7 @@ export default async function HomePage() {
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/learn/flashcard">
+              <Link href="/learn">
                 <Button
                   size="lg"
                   variant="outline"

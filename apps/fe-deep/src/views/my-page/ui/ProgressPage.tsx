@@ -1,43 +1,30 @@
 'use client';
 
 import { Badge, Card, Progress } from '@shared/ui';
-import { BookOpen, Brain, CheckCircle, Clock, Flame, Target } from 'lucide-react';
+import { BookOpen, Brain, CheckCircle, Flame, Target } from 'lucide-react';
 import { useProgressStats } from '../model';
 import { StudyHeatmap } from './StudyHeatmap';
 
 export function ProgressPage() {
-  const { categories, stats, categoryStats, heatmap, streak, dueCount, overallPercent } = useProgressStats();
+  const { categories, stats, categoryStats, heatmap, streak, overallPercent } = useProgressStats();
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12 animate-fade-in">
       <h1 className="text-3xl font-bold tracking-tight mb-2">학습 현황</h1>
       <p className="text-muted-foreground mb-8">전체 학습 진도를 확인하세요.</p>
 
-      {/* Streak & Due */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <Card className="shadow-sm">
-          <Card.Content className="p-5 flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-500/10">
-              <Flame className="h-6 w-6 text-orange-500" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold tabular-nums">{streak}일</div>
-              <div className="text-xs text-muted-foreground">연속 학습</div>
-            </div>
-          </Card.Content>
-        </Card>
-        <Card className="shadow-sm">
-          <Card.Content className="p-5 flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <Clock className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold tabular-nums">{dueCount}개</div>
-              <div className="text-xs text-muted-foreground">오늘 복습 대기</div>
-            </div>
-          </Card.Content>
-        </Card>
-      </div>
+      {/* Streak */}
+      <Card className="shadow-sm mb-6">
+        <Card.Content className="p-5 flex items-center gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-500/10">
+            <Flame className="h-6 w-6 text-orange-500" />
+          </div>
+          <div>
+            <div className="text-2xl font-bold tabular-nums">{streak}일</div>
+            <div className="text-xs text-muted-foreground">연속 학습</div>
+          </div>
+        </Card.Content>
+      </Card>
 
       {/* Study Heatmap */}
       <Card className="mb-8 shadow-sm">

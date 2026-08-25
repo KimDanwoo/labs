@@ -1,25 +1,18 @@
 'use client';
 
-import { getDueCardCount, syncProgress } from '@entities/progress';
+import { syncProgress } from '@entities/progress';
 import { clearUserIdCache } from '@entities/progress/services';
 import { createClient } from '@shared/config/supabase/client';
 import { isAdmin } from '@shared/lib/isAdmin';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
-
-const subscribeNever = () => () => {};
-const getServerDueCount = () => 0;
+import { useEffect, useMemo, useState } from 'react';
 
 /**
- * Header의 인증 상태, 복습 대기 수, 모바일 메뉴 오픈 상태를 관리한다.
+ * Header의 인증 상태와 모바일 메뉴 오픈 상태를 관리한다.
  */
 export function useHeader() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [open, setOpen] = useState(false);
-  // localStorage는 서버에 없으므로 하이드레이션 후에 읽는다. 서버 스냅샷 0 → 마크업 불일치 없음.
-  const localDueCount = useSyncExternalStore(subscribeNever, getDueCardCount, getServerDueCount);
-  const [syncedDueCount, setSyncedDueCount] = useState<number | null>(null);
-  const dueCount = syncedDueCount ?? localDueCount;
 
   useEffect(() => {
     const supabase = createClient();
@@ -33,11 +26,7 @@ export function useHeader() {
       setUser(session?.user ?? null);
       clearUserIdCache();
       if (session?.user) {
-        syncProgress()
-          .then(() => {
-            setSyncedDueCount(getDueCardCount());
-          })
-          .catch(() => {});
+        syncProgress().catch(() => {});
       }
     });
 
@@ -52,5 +41,5 @@ export function useHeader() {
     setUser(null);
   };
 
-  return { user, open, setOpen, dueCount, isAdminUser, handleSignOut };
+  return { user, open, setOpen, isAdminUser, handleSignOut };
 }

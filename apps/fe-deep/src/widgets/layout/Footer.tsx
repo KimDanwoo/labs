@@ -9,7 +9,7 @@ export function Footer() {
           <Link href="/reference" className="hover:text-foreground transition-colors duration-200">
             레퍼런스
           </Link>
-          <Link href="/learn/flashcard" className="hover:text-foreground transition-colors duration-200">
+          <Link href="/learn" className="hover:text-foreground transition-colors duration-200">
             학습하기
           </Link>
           <Link href="/search" className="hover:text-foreground transition-colors duration-200">

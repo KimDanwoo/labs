@@ -1,2 +1,1 @@
-export { DailyPage } from './ui/DailyPage';
-export { FlashcardPage } from './ui/FlashcardPage';
+export { LearnPage } from './ui/LearnPage';

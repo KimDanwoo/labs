@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  type FlashcardResult,
-  getLocalProgress,
-  reviewCard,
-  type ReviewRating,
-  type UserProgress,
-} from '@entities/progress';
+import { getLocalProgress, updateQuestionProgress } from '@entities/progress';
 import type { Question } from '@entities/question';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -15,7 +9,7 @@ interface UseCardStudySessionOptions {
   questions: Question[];
   /** 현재 Phase. 'study'일 때만 키보드 단축키와 progressSnapshot이 활성화된다. */
   phase: string;
-  /** 마지막 카드 평가 완료 시 호출되는 콜백 */
+  /** 마지막 카드를 넘긴 뒤 호출되는 콜백 */
   onComplete: () => void;
 }
 
@@ -27,27 +21,22 @@ interface CardStudySession {
   /** 답을 보기 전에 스스로 적어보는 인출 입력. 카드마다 초기화된다. */
   recallInput: string;
   setRecallInput: (v: string) => void;
-  results: FlashcardResult[];
   progressPercent: number;
   isNewCard: boolean;
-  currentProgress: UserProgress | null;
-  resultCounts: { again: number; hard: number; good: number; easy: number };
-  handleRate: (rating: ReviewRating) => void;
+  handleNext: () => void;
   resetStudy: () => void;
 }
 
 /**
- * 카드 학습 세션의 공통 상태·로직을 관리하는 훅.
- * FlashcardPage와 DailyPage에서 공유한다.
- * - 카드 넘기기, 평가, 키보드 단축키(1~4, Space/Enter)
- * - 진도 스냅샷, 새 카드 여부, 결과 집계
+ * 카드 학습 세션의 상태·로직을 관리하는 훅.
+ * - 타이핑 인출 → 답 확인 → 다음 흐름. 평가 없이 "봤다" 기록만 남긴다.
+ * - 키보드 단축키: Space/Enter로 확인·다음
  */
 export function useCardStudySession({ questions, phase, onComplete }: UseCardStudySessionOptions): CardStudySession {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [recallInput, setRecallInput] = useState('');
-  const [results, setResults] = useState<FlashcardResult[]>([]);
-  const isRatingRef = useRef(false);
+  const isAdvancingRef = useRef(false);
 
   const currentQuestion = questions[currentIndex];
   const progressPercent = questions.length > 0 ? (currentIndex / questions.length) * 100 : 0;
@@ -55,69 +44,47 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
   /** 학습 상태를 초기화한다. 새 세션 시작 시 호출. */
   const resetStudy = useCallback(() => {
     setCurrentIndex(0);
-    setResults([]);
     setIsFlipped(false);
     setRecallInput('');
-    isRatingRef.current = false;
+    isAdvancingRef.current = false;
   }, []);
 
-  /** 현재 카드를 평가하고 다음 카드로 이동한다. 마지막 카드면 onComplete를 호출한다. */
-  const handleRate = useCallback(
-    (rating: ReviewRating) => {
-      if (!currentQuestion || isRatingRef.current) return;
-      isRatingRef.current = true;
+  /** 현재 카드를 학습 기록에 남기고 다음 카드로 이동한다. 마지막 카드면 onComplete를 호출한다. */
+  const handleNext = useCallback(() => {
+    if (!currentQuestion || isAdvancingRef.current) return;
+    isAdvancingRef.current = true;
 
-      reviewCard(currentQuestion.id, rating);
-      setResults((prev) => [...prev, { questionId: currentQuestion.id, rating }]);
+    updateQuestionProgress(currentQuestion.id, true);
 
-      if (currentIndex + 1 < questions.length) {
-        setCurrentIndex((i) => i + 1);
-        setIsFlipped(false);
-        setRecallInput('');
-        requestAnimationFrame(() => {
-          isRatingRef.current = false;
-        });
-      } else {
-        isRatingRef.current = false;
-        onComplete();
-      }
-    },
-    [currentQuestion, currentIndex, questions.length, onComplete],
-  );
+    if (currentIndex + 1 < questions.length) {
+      setCurrentIndex((i) => i + 1);
+      setIsFlipped(false);
+      setRecallInput('');
+      requestAnimationFrame(() => {
+        isAdvancingRef.current = false;
+      });
+    } else {
+      isAdvancingRef.current = false;
+      onComplete();
+    }
+  }, [currentQuestion, currentIndex, questions.length, onComplete]);
 
-  // 키보드 단축키: Space/Enter로 뒤집기, 1~4로 평가
+  // 키보드 단축키: Space/Enter로 뒤집기 → 다음
   useEffect(() => {
     if (phase !== 'study') return undefined;
 
     function handleKeyDown(e: KeyboardEvent) {
       if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
+      if (e.key !== ' ' && e.key !== 'Enter') return;
 
-      if (!isFlipped) {
-        if (e.key === ' ' || e.key === 'Enter') {
-          e.preventDefault();
-          setIsFlipped(true);
-        }
-      } else {
-        switch (e.key) {
-          case '1':
-            handleRate('again');
-            break;
-          case '2':
-            handleRate('hard');
-            break;
-          case '3':
-            handleRate('good');
-            break;
-          case '4':
-            handleRate('easy');
-            break;
-        }
-      }
+      e.preventDefault();
+      if (isFlipped) handleNext();
+      else setIsFlipped(true);
     }
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [phase, isFlipped, handleRate]);
+  }, [phase, isFlipped, handleNext]);
 
   // 학습 시작 시점의 progress 스냅샷. 카드마다 getLocalProgress()를 재호출하지 않는다.
   const progressSnapshot = useMemo(() => {
@@ -130,35 +97,6 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
     return !progressSnapshot[currentQuestion.id];
   }, [currentQuestion, progressSnapshot]);
 
-  const currentProgress = useMemo(() => {
-    if (!currentQuestion) return null;
-    return progressSnapshot[currentQuestion.id] ?? null;
-  }, [currentQuestion, progressSnapshot]);
-
-  const resultCounts = useMemo(() => {
-    let again = 0,
-      hard = 0,
-      good = 0,
-      easy = 0;
-    for (const r of results) {
-      switch (r.rating) {
-        case 'again':
-          again++;
-          break;
-        case 'hard':
-          hard++;
-          break;
-        case 'good':
-          good++;
-          break;
-        case 'easy':
-          easy++;
-          break;
-      }
-    }
-    return { again, hard, good, easy };
-  }, [results]);
-
   return {
     currentIndex,
     currentQuestion,
@@ -166,12 +104,9 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
     setIsFlipped,
     recallInput,
     setRecallInput,
-    results,
     progressPercent,
     isNewCard,
-    currentProgress,
-    resultCounts,
-    handleRate,
+    handleNext,
     resetStudy,
   };
 }

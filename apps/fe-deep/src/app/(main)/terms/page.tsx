@@ -44,7 +44,7 @@ export default function TermsPage() {
           <p>서비스는 다음의 기능을 제공합니다.</p>
           <ul className="list-disc pl-5 space-y-1 mt-2">
             <li>프론트엔드 면접 질문 레퍼런스 열람</li>
-            <li>플래시카드 기반 학습</li>
+            <li>카드 기반 인출 학습</li>
             <li>데일리 학습 및 진도 관리</li>
             <li>북마크 및 검색 기능</li>
           </ul>

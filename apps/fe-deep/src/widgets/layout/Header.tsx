@@ -20,8 +20,6 @@ import {
 import {
   Bookmark,
   BookOpen,
-  Calendar,
-  Clock,
   GraduationCap,
   LogIn,
   LogOut,
@@ -38,8 +36,7 @@ import { useHeader } from './model/useHeader';
 
 const navItems = [
   { href: '/reference', label: '레퍼런스', icon: BookOpen },
-  { href: '/learn/daily', label: '오늘의 학습', icon: Calendar },
-  { href: '/learn/flashcard', label: '플래시카드', icon: GraduationCap },
+  { href: '/learn', label: '학습', icon: GraduationCap },
   { href: '/search', label: '검색', icon: Search },
 ];
 
@@ -48,7 +45,7 @@ const adminNavItems = [{ href: '/study', label: '면접 학습', icon: NotebookP
 
 export function Header() {
   const pathname = usePathname();
-  const { user, open, setOpen, dueCount, isAdminUser, handleSignOut } = useHeader();
+  const { user, open, setOpen, isAdminUser, handleSignOut } = useHeader();
   const visibleNavItems = isAdminUser ? [...navItems, ...adminNavItems] : navItems;
 
   return (
@@ -68,18 +65,11 @@ export function Header() {
           {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const showDueBadge = item.href === '/learn/flashcard' && dueCount > 0;
             return (
               <Link key={item.href} href={item.href}>
                 <Button variant={isActive ? 'secondary' : 'ghost'} size="sm" className="gap-2">
                   <Icon className="h-4 w-4" />
                   {item.label}
-                  {showDueBadge && (
-                    <span className="flex items-center gap-0.5 text-xs bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 px-1.5 py-0.5 rounded-full">
-                      <Clock className="h-3 w-3" />
-                      {dueCount}
-                    </span>
-                  )}
                 </Button>
               </Link>
             );
@@ -160,18 +150,11 @@ export function Header() {
                 {visibleNavItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                  const showDueBadge = item.href === '/learn/flashcard' && dueCount > 0;
                   return (
                     <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
                       <Button variant={isActive ? 'secondary' : 'ghost'} className="w-full justify-start gap-3">
                         <Icon className="h-4 w-4" />
                         {item.label}
-                        {showDueBadge && (
-                          <span className="flex items-center gap-0.5 text-xs bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 px-1.5 py-0.5 rounded-full ml-auto">
-                            <Clock className="h-3 w-3" />
-                            {dueCount}
-                          </span>
-                        )}
                       </Button>
                     </Link>
                   );
