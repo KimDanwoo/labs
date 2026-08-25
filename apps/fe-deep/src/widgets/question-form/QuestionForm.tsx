@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@shared/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -25,6 +26,7 @@ interface QuestionFormProps {
 
 export function QuestionForm({ categories, question }: QuestionFormProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const isEdit = !!question;
   const submitLabel = isEdit ? '수정' : '추가';
 
@@ -222,7 +224,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
         <Button type="submit" disabled={saving}>
           {saving ? '저장 중...' : submitLabel}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.push('/admin/questions')}>
+        <Button type="button" variant="outline" onClick={() => router.back()}>
           취소
         </Button>
       </div>
@@ -231,8 +233,8 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
         title={isEdit ? '수정이 완료되었습니다.' : '등록이 완료되었습니다.'}
         onConfirm={() => {
           setShowSuccess(false);
-          router.push('/admin/questions');
-          router.refresh();
+          queryClient.invalidateQueries({ queryKey: ['admin-questions'] });
+          router.back();
         }}
       />
     </form>
