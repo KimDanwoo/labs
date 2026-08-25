@@ -209,3 +209,15 @@ test('코드펜스 안의 # 은 제목으로 오해하지 않는다', () => {
   assert.equal(doc.topics.length, 1);
   assert.match(doc.topics[0].steps[0].reveal, /# 주석입니다/);
 });
+
+test('꼬꼬무 안의 주의류 제목은 질문이 아니라 직전 답변에 붙는다', () => {
+  const doc = parseStudyDoc(
+    'x',
+    '# 문서\n\n# 1. 주제\n\n## 답변\n\n내용.\n\n## 예상 꼬리\n\n### 진짜 질문?\n\n답.\n\n### 주의\n\n깎아내리지 않는다.\n',
+  );
+  const followUps = doc.topics[0].steps.filter((s) => s.kind === 'followUp');
+  assert.equal(followUps.length, 1);
+  assert.equal(followUps[0].prompt, '진짜 질문?');
+  assert.match(followUps[0].reveal, /\*\*주의\*\*/);
+  assert.match(followUps[0].reveal, /깎아내리지 않는다/);
+});

@@ -71,6 +71,8 @@ const TRAILING_RULE_PATTERN = /\n*[-*_]{3,}\s*$/;
 const LIST_MARKER_PATTERN = /^[-*+]\s+/;
 const ORDERED_MARKER_PATTERN = /^\d+\.\s+/;
 const ARROW_PREFIX_PATTERN = /^→\s*/;
+/** 꼬꼬무 안의 주의·참고류 제목은 질문이 아니라 직전 답변에 붙는 경고다. */
+const FOLLOW_UP_NOTE_PATTERN = /^(주의|위험|경고|금지|참고|중요)/;
 
 function matchHeading(line: string): Pick<Block, 'level' | 'heading'> | null {
   const matched = ANY_HEADING_PATTERN.exec(line);
@@ -168,6 +170,10 @@ function splitFollowUps(body: string, questionLevel: number): FollowUp[] {
 
     const question = isInFence ? null : questionPattern.exec(line)?.[1];
     if (question) {
+      if (FOLLOW_UP_NOTE_PATTERN.test(question)) {
+        answerLines.push(`**${question}**`);
+        continue;
+      }
       flush();
       current = { question, answer: '' };
       continue;
