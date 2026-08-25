@@ -68,6 +68,15 @@ export function useStudyRun(topics: StudyTopic[]) {
     [resetStep],
   );
 
+  /** 현재 단계를 답 가리고 처음부터 다시 푼다. */
+  const retryStep = useCallback(() => resetStep(), [resetStep]);
+
+  /** 남은 단계를 건너뛰고 다음 주제의 첫 단계로 간다. */
+  const goNextTopic = useCallback(() => {
+    if (isLastTopic) return;
+    jumpToTopic(topicIndex + 1);
+  }, [isLastTopic, topicIndex, jumpToTopic]);
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
@@ -108,6 +117,8 @@ export function useStudyRun(topics: StudyTopic[]) {
     reveal,
     goNext,
     goPrev,
+    retryStep,
+    goNextTopic,
     jumpToTopic,
     doneSteps,
     totalSteps,

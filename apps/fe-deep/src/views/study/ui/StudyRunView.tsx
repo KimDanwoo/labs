@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, MarkdownRenderer, Progress, Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui';
-import { ChevronLeft, ChevronRight, List } from 'lucide-react';
+import { ChevronLeft, ChevronRight, List, RotateCcw, SkipForward } from 'lucide-react';
 import Link from 'next/link';
 import { useStudyRun, type StudyDoc } from '../model';
 import { StepCard } from './StepCard';
@@ -82,15 +82,27 @@ export function StudyRunView({ doc }: StudyRunViewProps) {
           onReveal={run.reveal}
         />
 
-        <div className="mt-5 flex items-center gap-2">
+        <div className="mt-5 flex flex-wrap items-center gap-2">
           <Button variant="ghost" size="lg" onClick={run.goPrev} disabled={run.isFirstStep} className="gap-1">
             <ChevronLeft className="size-4" />
             이전
           </Button>
+          {run.isRevealed && (
+            <Button variant="outline" size="lg" onClick={run.retryStep} className="gap-1.5">
+              <RotateCcw className="size-4" />
+              다시 풀기
+            </Button>
+          )}
           <Button size="lg" onClick={run.goNext} disabled={run.isFinished} className="flex-1 gap-1">
             {getNextLabel(run.isRevealed, run.isLastStep, run.isLastTopic)}
             <ChevronRight className="size-4" />
           </Button>
+          {!run.isLastTopic && (
+            <Button variant="ghost" size="lg" onClick={run.goNextTopic} className="gap-1">
+              다음 주제
+              <SkipForward className="size-4" />
+            </Button>
+          )}
         </div>
 
         {run.topic.notes && (
