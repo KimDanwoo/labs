@@ -1,8 +1,12 @@
 /**
  * 면접 핸드북 마크다운을 학습 단계로 분해한다.
- * `# N. 주제` = 주제, 그 아래 H2는 제목으로 역할을 판별한다.
- *   키워드/암기 → 키워드 카드 · 답변/한 줄/설명/개념 → 모범 답변 · 꼬꼬무 → 꼬리질문 · 나머지 → 참고 자료
- * 특수 문법은 없다. 평범한 마크다운이면 그대로 학습 화면이 된다.
+ *
+ * 계층은 "주제 레벨"을 기준으로 상대적으로 읽는다. 문서가 `#`을 주제로 쓰든 `##`을 쓰든 따라간다.
+ *   주제        번호가 붙은 제목 (`## 1. 자기소개`) — 문서에서 처음 번호가 붙은 제목의 레벨이 기준이 된다
+ *   역할 섹션   주제보다 한 단계 깊은 제목. 키워드 / 답변 / 꼬꼬무 / 나머지(참고 자료)로 갈린다
+ *   꼬리질문    주제보다 두 단계 깊은 제목. 꼬꼬무 섹션 안에서만 질문으로 읽는다
+ *
+ * 특수 문법은 없다. 제목 텍스트만으로 역할을 판별한다.
  */
 
 export const STEP_KIND = {
@@ -20,7 +24,7 @@ export type StudyStep = {
   prompt: string;
   /** 키워드 카드에서 곧바로 노출할 키워드들 */
   keywords: string[];
-  /** 답 확인 시 펼칠 마크다운. 꼬리질문은 비어 있다. */
+  /** 답 확인 시 펼칠 마크다운 */
   reveal: string;
 };
 
@@ -45,7 +49,7 @@ type Section = { heading: string; body: string };
 
 type FollowUp = { question: string; answer: string };
 
-type Block = { level: 1 | 2; heading: string; body: string };
+type Block = { level: number; heading: string; body: string };
 
 type TopicDraft = {
   title: string;
@@ -56,14 +60,46 @@ type TopicDraft = {
   notes: Section[];
 };
 
+const MAX_HEADING_LEVEL = 6;
+const DEFAULT_TOPIC_LEVEL = 2;
+
 const FENCE_PATTERN = /^\s*(?:```|~~~)/;
-const HEADING_PATTERN = /^(#{1,2})\s+(.+?)\s*#*\s*$/;
+const ANY_HEADING_PATTERN = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
+const TOPIC_NUMBER_PATTERN = /^\d+[.)]\s+/;
 const TRAILING_RULE_PATTERN = /\n*[-*_]{3,}\s*$/;
 const FENCE_WRAPPER_PATTERN = /^```[a-z]*\n|\n?```$/g;
 const LIST_MARKER_PATTERN = /^[-*+]\s+/;
-const ARROW_PREFIX_PATTERN = /^→\s*/;
 const ORDERED_MARKER_PATTERN = /^\d+\.\s+/;
-const FOLLOWUP_HEADING_PATTERN = /^###\s+(.+?)\s*#*\s*$/;
+const ARROW_PREFIX_PATTERN = /^→\s*/;
+
+function matchHeading(line: string): Pick<Block, 'level' | 'heading'> | null {
+  const matched = ANY_HEADING_PATTERN.exec(line);
+  if (!matched) return null;
+
+  const hashes = matched[1];
+  const heading = matched[2];
+  if (!hashes || !heading) return null;
+
+  return { level: hashes.length, heading };
+}
+
+/** 문서에서 처음으로 번호가 붙은 제목의 레벨이 주제 레벨이다. */
+function findTopicLevel(markdown: string): number {
+  let isInFence = false;
+
+  for (const line of markdown.split('\n')) {
+    if (FENCE_PATTERN.test(line)) {
+      isInFence = !isInFence;
+      continue;
+    }
+    if (isInFence) continue;
+
+    const heading = matchHeading(line);
+    if (heading && TOPIC_NUMBER_PATTERN.test(heading.heading)) return heading.level;
+  }
+
+  return DEFAULT_TOPIC_LEVEL;
+}
 
 function classifySection(heading: string): SectionRole {
   const text = heading.replace(/\s+/g, '');
@@ -72,6 +108,16 @@ function classifySection(heading: string): SectionRole {
   if (text.includes('나쁜')) return 'note';
   if (text.includes('답변') || text.includes('한줄') || text === '설명' || text === '개념') return 'answer';
   return 'note';
+}
+
+/** 목록 마커가 붙은 줄만 뽑는다. 섹션 안내 문장이 질문으로 섞이는 걸 막는다. */
+function extractListItems(body: string): string[] {
+  return body
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => LIST_MARKER_PATTERN.test(line) || ORDERED_MARKER_PATTERN.test(line))
+    .map((line) => line.replace(LIST_MARKER_PATTERN, '').replace(ORDERED_MARKER_PATTERN, '').trim())
+    .filter(Boolean);
 }
 
 /** 불릿 목록이든 코드펜스 안의 화살표 흐름이든 항목 배열로 만든다. */
@@ -89,8 +135,9 @@ function extractItems(body: string): string[] {
     .filter(Boolean);
 }
 
-/** 꼬꼬무 섹션: `### 질문` + 답변이면 답까지, 불릿 목록이면 질문만 뽑는다. */
-function splitFollowUps(body: string): FollowUp[] {
+/** 꼬꼬무 섹션: 질문 제목이 있으면 답까지, 불릿 목록이면 질문만 뽑는다. */
+function splitFollowUps(body: string, questionLevel: number): FollowUp[] {
+  const questionPattern = new RegExp(`^#{${Math.min(questionLevel, MAX_HEADING_LEVEL)}}\\s+(.+?)\\s*#*\\s*$`);
   const items: FollowUp[] = [];
   let current: FollowUp | null = null;
   let answerLines: string[] = [];
@@ -104,7 +151,7 @@ function splitFollowUps(body: string): FollowUp[] {
   for (const line of body.split('\n')) {
     if (FENCE_PATTERN.test(line)) isInFence = !isInFence;
 
-    const question = isInFence ? null : FOLLOWUP_HEADING_PATTERN.exec(line)?.[1];
+    const question = isInFence ? null : questionPattern.exec(line)?.[1];
     if (question) {
       flush();
       current = { question, answer: '' };
@@ -115,21 +162,11 @@ function splitFollowUps(body: string): FollowUp[] {
   flush();
 
   if (items.length > 0) return items;
-  return extractItems(body).map((question) => ({ question, answer: '' }));
+  return extractListItems(body).map((question) => ({ question, answer: '' }));
 }
 
-function matchHeading(line: string): Pick<Block, 'level' | 'heading'> | null {
-  const matched = HEADING_PATTERN.exec(line);
-  if (!matched) return null;
-
-  const hashes = matched[1];
-  const heading = matched[2];
-  if (!hashes || !heading) return null;
-
-  return { level: hashes.length as 1 | 2, heading };
-}
-
-function splitBlocks(markdown: string): { intro: string; blocks: Block[] } {
+/** 역할 섹션보다 깊은 제목은 그 섹션의 본문으로 남긴다. */
+function splitBlocks(markdown: string, maxLevel: number): { intro: string; blocks: Block[] } {
   const blocks: Block[] = [];
   const introLines: string[] = [];
   let current: Pick<Block, 'level' | 'heading'> | null = null;
@@ -145,7 +182,7 @@ function splitBlocks(markdown: string): { intro: string; blocks: Block[] } {
     if (FENCE_PATTERN.test(line)) isInFence = !isInFence;
 
     const heading = isInFence ? null : matchHeading(line);
-    if (heading) {
+    if (heading && heading.level <= maxLevel) {
       flush();
       current = heading;
       continue;
@@ -163,14 +200,14 @@ function createDraft(title: string, lead: string): TopicDraft {
   return { title, lead, keywordItems: [], answers: [], followUps: [], notes: [] };
 }
 
-function addSection(draft: TopicDraft, section: Section): void {
+function addSection(draft: TopicDraft, section: Section, followUpLevel: number): void {
   const role = classifySection(section.heading);
   if (role === 'keyword') {
     draft.keywordItems.push(...extractItems(section.body));
     return;
   }
   if (role === 'followUp') {
-    draft.followUps.push(...splitFollowUps(section.body));
+    draft.followUps.push(...splitFollowUps(section.body, followUpLevel));
     return;
   }
   if (role === 'answer') {
@@ -222,7 +259,11 @@ function buildTopic(draft: TopicDraft, index: number): StudyTopic {
 }
 
 export function parseStudyDoc(slug: string, markdown: string): StudyDoc {
-  const { intro, blocks } = splitBlocks(markdown);
+  const topicLevel = findTopicLevel(markdown);
+  const sectionLevel = topicLevel + 1;
+  const followUpLevel = topicLevel + 2;
+
+  const { intro, blocks } = splitBlocks(markdown, sectionLevel);
 
   const introParts = intro ? [intro] : [];
   const drafts: TopicDraft[] = [];
@@ -230,22 +271,25 @@ export function parseStudyDoc(slug: string, markdown: string): StudyDoc {
   let current: TopicDraft | null = null;
 
   for (const block of blocks) {
-    if (block.level === 1) {
-      if (!title) {
-        title = block.heading;
-        if (block.body) introParts.push(block.body);
-        continue;
-      }
+    const isTopic = block.level <= topicLevel && TOPIC_NUMBER_PATTERN.test(block.heading);
+
+    if (isTopic) {
       current = createDraft(block.heading, block.body);
       drafts.push(current);
       continue;
     }
 
-    if (!current) {
-      introParts.push(`### ${block.heading}\n\n${block.body}`);
+    if (!current && !title && block.level <= topicLevel) {
+      title = block.heading;
+      if (block.body) introParts.push(block.body);
       continue;
     }
-    addSection(current, { heading: block.heading, body: block.body });
+
+    if (!current) {
+      introParts.push(`${'#'.repeat(sectionLevel)} ${block.heading}\n\n${block.body}`);
+      continue;
+    }
+    addSection(current, { heading: block.heading, body: block.body }, followUpLevel);
   }
 
   return {
