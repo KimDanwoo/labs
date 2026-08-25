@@ -51,6 +51,7 @@ export function LearnPage() {
     progressPercent,
     isNewCard,
     handleNext,
+    handleRetry,
     resetStudy,
   } = useCardStudySession({ questions, phase, onComplete });
 
@@ -242,6 +243,7 @@ export function LearnPage() {
       progressPercent={progressPercent}
       isNewCard={isNewCard}
       onNext={handleNext}
+      onRetry={handleRetry}
       recallInput={recallInput}
       onRecallChange={setRecallInput}
       headerAction={

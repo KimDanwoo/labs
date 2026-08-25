@@ -13,43 +13,79 @@ import { Button } from '@shared/ui';
 import { useQuery } from '@tanstack/react-query';
 import { BookOpenCheck, Eye, EyeOff, FolderSync, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useMemo, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Pagination } from './_ui/Pagination';
 import { QuestionFilters } from './_ui/QuestionFilters';
 import { QuestionTable } from './_ui/QuestionTable';
 
 const PAGE_SIZE = 10;
 
-export default function QuestionsListPage() {
-  const [search, setSearch] = useState('');
+/** 목록 상태(검색·필터·페이지)는 URL 쿼리에 둔다 — 편집 후 돌아와도 보던 위치가 유지되게. */
+function QuestionsListPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const urlSearch = searchParams.get('q') ?? '';
+  const categoryFilter = searchParams.get('category') ?? 'all';
+  const difficultyFilter = searchParams.get('difficulty') ?? 'all';
+  const page = Math.max(1, Number(searchParams.get('page')) || 1);
+
+  const [search, setSearch] = useState(urlSearch);
   const debouncedSearch = useDebounce(search, 300);
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [difficultyFilter, setDifficultyFilter] = useState('all');
-  const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const updateParams = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams);
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === null || value === '' || value === 'all' || (key === 'page' && value === '1')) {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+      }
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [searchParams, pathname, router],
+  );
+
+  // 디바운스된 검색어를 URL에 반영한다 — 편집 후 뒤로 왔을 때 복원용
+  useEffect(() => {
+    if (debouncedSearch === urlSearch) return;
+    updateParams({ q: debouncedSearch, page: null });
+  }, [debouncedSearch, urlSearch, updateParams]);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
-    setPage(1);
     setSelectedIds(new Set());
   }, []);
 
-  const handleCategoryFilterChange = useCallback((value: string) => {
-    setCategoryFilter(value);
-    setPage(1);
-    setSelectedIds(new Set());
-  }, []);
+  const handleCategoryFilterChange = useCallback(
+    (value: string) => {
+      updateParams({ category: value, page: null });
+      setSelectedIds(new Set());
+    },
+    [updateParams],
+  );
 
-  const handleDifficultyFilterChange = useCallback((value: string) => {
-    setDifficultyFilter(value);
-    setPage(1);
-    setSelectedIds(new Set());
-  }, []);
+  const handleDifficultyFilterChange = useCallback(
+    (value: string) => {
+      updateParams({ difficulty: value, page: null });
+      setSelectedIds(new Set());
+    },
+    [updateParams],
+  );
 
-  const handlePageChange = useCallback((newPage: number) => {
-    setPage(newPage);
-    setSelectedIds(new Set());
-  }, []);
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      updateParams({ page: String(newPage) });
+      setSelectedIds(new Set());
+    },
+    [updateParams],
+  );
 
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ['admin-categories'],
@@ -306,5 +342,13 @@ export default function QuestionsListPage() {
 
       <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
     </div>
+  );
+}
+
+export default function QuestionsListPageWithBoundary() {
+  return (
+    <Suspense fallback={null}>
+      <QuestionsListPage />
+    </Suspense>
   );
 }
