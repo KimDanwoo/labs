@@ -73,35 +73,64 @@ test('꼬꼬무는 H3면 답까지, 불릿이면 질문만 가져온다', () => 
   assert.equal(bulletOnly[0].reveal, '');
 });
 
-test('주제가 H2 번호 제목이어도(역할 섹션과 같은 레벨) 갈라낸다', () => {
+test('주제 레벨은 첫 번호 제목이 정하고, 그 레벨 제목은 번호가 없어도 주제다', () => {
   const doc = parseStudyDoc(
     'x',
     `# 핸드북
 
 ## 1. 자기소개
 
-## 핵심 키워드
-
-- 프론트엔드
-
-## 30초 답변
+### 30초 답변
 
 안녕하세요.
 
 ## 2. 다음 주제
 
-## 설명
+### 설명
 
 내용.
+
+## 마지막 원칙
+
+번호가 없어도 주제다.
 `,
   );
 
   assert.deepEqual(
     doc.topics.map((topic) => topic.title),
-    ['1. 자기소개', '2. 다음 주제'],
+    ['1. 자기소개', '2. 다음 주제', '마지막 원칙'],
   );
-  assert.deepEqual(doc.topics[0].steps[0].keywords, ['프론트엔드']);
-  assert.equal(doc.topics[0].steps[0].reveal, '안녕하세요.');
+});
+
+test('물음표로 끝나는 섹션 제목은 그 자체가 꼬리질문이고 본문이 답이다', () => {
+  const doc = parseStudyDoc(
+    'x',
+    `# 핸드북
+
+## 1. 주제
+
+### 기본 답변
+
+기본입니다.
+
+### Why 1 — 왜 리팩터링이 아니었나요?
+
+리스크가 컸습니다.
+
+### 꼬리
+
+- 무엇을 남겼나?
+- 무엇을 새로 했나?
+`,
+  );
+
+  const topic = doc.topics[0];
+  assert.deepEqual(
+    topic.steps.map((step) => step.prompt),
+    ['1. 주제', 'Why 1 — 왜 리팩터링이 아니었나요?', '무엇을 남겼나?', '무엇을 새로 했나?'],
+  );
+  assert.equal(topic.steps[1].reveal, '리스크가 컸습니다.');
+  assert.equal(topic.steps[2].reveal, '');
 });
 
 test('4단 계층(##주제 / ###섹션 / ####꼬리질문)을 상대 깊이로 읽는다', () => {
