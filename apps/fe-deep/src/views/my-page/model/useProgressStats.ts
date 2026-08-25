@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  getCurrentStreak,
-  getDueCardCount,
-  getLocalProgress,
-  getProgressByCategory,
-  getStudyHeatmap,
-} from '@entities/progress';
+import { getCurrentStreak, getLocalProgress, getProgressByCategory, getStudyHeatmap } from '@entities/progress';
 import { type Category, getAllCategories, getAllQuestions } from '@entities/question';
 import { useEffect, useState } from 'react';
 
@@ -29,7 +23,6 @@ export function useProgressStats() {
   const [categoryStats, setCategoryStats] = useState<CategoryStats>({});
   const [heatmap, setHeatmap] = useState<Record<string, number>>({});
   const [streak, setStreak] = useState(0);
-  const [dueCount, setDueCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -39,7 +32,6 @@ export function useProgressStats() {
       const hm = getStudyHeatmap(progress);
       setHeatmap(hm);
       setStreak(getCurrentStreak(hm));
-      setDueCount(getDueCardCount(progress));
 
       const [cats, allQuestions] = await Promise.all([getAllCategories(), getAllQuestions()]);
       if (cancelled) return;
@@ -76,5 +68,5 @@ export function useProgressStats() {
 
   const overallPercent = stats.total > 0 ? Math.round(((stats.mastered + stats.learning) / stats.total) * 100) : 0;
 
-  return { categories, stats, categoryStats, heatmap, streak, dueCount, overallPercent };
+  return { categories, stats, categoryStats, heatmap, streak, overallPercent };
 }

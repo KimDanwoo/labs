@@ -1,11 +1,10 @@
 'use client';
 
-import { RATING_CONFIG, type ReviewRating, type UserProgress } from '@entities/progress';
 import type { Question } from '@entities/question';
 import { DifficultyBadge } from '@entities/question/ui';
 import { Badge, Button, Card, MarkdownRenderer, Progress } from '@shared/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Eye } from 'lucide-react';
+import { ArrowRight, Eye } from 'lucide-react';
 
 interface StudyCardViewProps {
   currentIndex: number;
@@ -15,8 +14,7 @@ interface StudyCardViewProps {
   onFlip: () => void;
   progressPercent: number;
   isNewCard: boolean;
-  currentProgress: UserProgress | null;
-  onRate: (rating: ReviewRating) => void;
+  onNext: () => void;
   /** 답을 보기 전에 스스로 적어보는 인출 입력 */
   recallInput: string;
   onRecallChange: (v: string) => void;
@@ -32,8 +30,7 @@ export function StudyCardView({
   onFlip,
   progressPercent,
   isNewCard,
-  currentProgress,
-  onRate,
+  onNext,
   recallInput,
   onRecallChange,
   headerAction,
@@ -62,7 +59,7 @@ export function StudyCardView({
           </div>
           <div className="flex items-center gap-2">
             {!isFlipped && <span className="text-xs text-muted-foreground/70">Space 또는 ⌘/Ctrl+Enter</span>}
-            {isFlipped && <span className="text-xs text-muted-foreground/70">1~4로 평가</span>}
+            {isFlipped && <span className="text-xs text-muted-foreground/70">Space/Enter로 다음</span>}
             {headerAction}
           </div>
         </div>
@@ -86,11 +83,6 @@ export function StudyCardView({
                 <Badge variant="secondary" className="text-xs">
                   {currentQuestion.sub_category}
                 </Badge>
-              )}
-              {currentProgress && (
-                <span className="text-xs text-muted-foreground ml-auto tabular-nums">
-                  간격: {currentProgress.interval}일
-                </span>
               )}
             </div>
 
@@ -152,29 +144,18 @@ export function StudyCardView({
         </motion.div>
       </AnimatePresence>
 
-      {/* Rating buttons */}
+      {/* Next button */}
       {isFlipped && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-5"
+          className="mt-5 text-center"
         >
-          <p className="text-xs text-muted-foreground text-center mb-3">얼마나 잘 기억했나요? (키보드: 1~4)</p>
-          <div className="grid grid-cols-4 gap-2.5">
-            {RATING_CONFIG.map(({ rating, label, color, bgColor }, i) => (
-              <Button
-                key={rating}
-                variant="outline"
-                size="lg"
-                className={`flex-col h-auto py-3 gap-1 transition-all duration-200 hover:scale-[1.02] ${color} ${bgColor}`}
-                onClick={() => onRate(rating)}
-              >
-                <span className="text-sm font-medium">{label}</span>
-                <span className="text-xs opacity-50">{i + 1}</span>
-              </Button>
-            ))}
-          </div>
+          <Button size="lg" onClick={onNext} className="gap-2 h-12 px-8 shadow-md">
+            다음
+            <ArrowRight className="h-4 w-4" />
+          </Button>
         </motion.div>
       )}
     </div>

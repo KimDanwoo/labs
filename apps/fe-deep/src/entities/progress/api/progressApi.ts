@@ -1,10 +1,19 @@
 'use client';
 
 import { STORAGE_KEYS } from '@shared/constants';
-import { type ProgressStatus, type ReviewRating, SM2_CONSTANTS, type UserProgress } from '../model';
-import { addDays, calculateSM2, todayString } from '../sm2';
+import { SM2_CONSTANTS, type UserProgress } from '../model';
 
-export { calculateSM2 } from '../sm2';
+/** 오늘 날짜를 YYYY-MM-DD 문자열로 반환한다. */
+function todayString(): string {
+  return new Date().toISOString().split('T')[0] ?? '';
+}
+
+/** 기준일에 일수를 더한 YYYY-MM-DD 문자열을 반환한다. */
+function addDays(dateString: string, days: number): string {
+  const d = new Date(dateString);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0] ?? '';
+}
 
 // ============================================================
 // LocalStorage CRUD
@@ -58,87 +67,6 @@ function migrateProgress(old: Partial<UserProgress> & { question_id: string }): 
     repetition: old.status === 'mastered' ? 2 : 0,
     next_review: today, // 마이그레이션 시 오늘 복습 대상으로
   };
-}
-
-// ============================================================
-// 플래시카드 복습 (SM-2 기반)
-// ============================================================
-
-/**
- * SM-2 평가 결과로 카드의 학습 진도를 업데이트한다.
- * 플래시카드 학습에서 사용한다.
- */
-export function reviewCard(questionId: string, rating: ReviewRating): UserProgress {
-  const allProgress = getLocalProgress();
-  const existing = allProgress[questionId];
-
-  const prevEF = existing?.easiness_factor ?? 2.5;
-  const prevInterval = existing?.interval ?? 0;
-  const prevRepetition = existing?.repetition ?? 0;
-
-  const sm2 = calculateSM2(prevEF, prevInterval, prevRepetition, rating);
-  const isCorrect = rating !== 'again';
-
-  // status 결정: repetition 3+ → mastered, 그 외 → learning
-  let status: ProgressStatus = 'learning';
-  if (sm2.repetition >= SM2_CONSTANTS.MASTERED_REPETITION_THRESHOLD) {
-    status = 'mastered';
-  }
-
-  const updated: UserProgress = {
-    id: existing?.id ?? questionId,
-    user_id: existing?.user_id ?? 'local',
-    question_id: questionId,
-    status,
-    correct_count: (existing?.correct_count ?? 0) + (isCorrect ? 1 : 0),
-    wrong_count: (existing?.wrong_count ?? 0) + (isCorrect ? 0 : 1),
-    last_reviewed: new Date().toISOString(),
-    easiness_factor: sm2.easiness_factor,
-    interval: sm2.interval,
-    repetition: sm2.repetition,
-    next_review: sm2.next_review,
-  };
-
-  allProgress[questionId] = updated;
-  saveLocalProgress(allProgress);
-
-  // Supabase write-through (lazy import로 순환 의존성 방지)
-  import('../services/progressSync')
-    .then(({ syncSingleCard }) => {
-      syncSingleCard(updated).catch(() => {});
-    })
-    .catch(() => {});
-
-  return updated;
-}
-
-/**
- * 오늘 복습해야 할 카드의 question ID 목록을 반환한다.
- * next_review가 오늘 이전인 카드들을 선택한다.
- */
-export function getDueCardIds(): string[] {
-  const allProgress = getLocalProgress();
-  const today = todayString();
-
-  return Object.values(allProgress)
-    .filter((p) => p.next_review <= today)
-    .sort((a, b) => a.next_review.localeCompare(b.next_review))
-    .map((p) => p.question_id);
-}
-
-/**
- * 복습 대기 카드 수를 반환한다.
- * getDueCardIds()와 달리 정렬 없이 카운트만 반환하므로 더 빠르다.
- * preloaded를 넘기면 localStorage 재파싱을 피한다.
- */
-export function getDueCardCount(preloaded?: Record<string, UserProgress>): number {
-  const allProgress = preloaded ?? getLocalProgress();
-  const today = todayString();
-  let count = 0;
-  for (const p of Object.values(allProgress)) {
-    if (p.next_review <= today) count++;
-  }
-  return count;
 }
 
 // ============================================================

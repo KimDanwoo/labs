@@ -3,8 +3,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import {
   getCurrentStreak,
-  getDueCardCount,
-  getDueCardIds,
   getLocalProgress,
   getProgressByCategory,
   getProgressForQuestion,
@@ -31,20 +29,6 @@ export const progressQueries = {
     queryOptions({
       queryKey: ['progress', 'byCategory', questionIds] as const,
       queryFn: () => getProgressByCategory(questionIds),
-      staleTime: 0,
-    }),
-
-  dueCardIds: () =>
-    queryOptions({
-      queryKey: ['progress', 'dueCardIds'] as const,
-      queryFn: () => getDueCardIds(),
-      staleTime: 0,
-    }),
-
-  dueCardCount: () =>
-    queryOptions({
-      queryKey: ['progress', 'dueCardCount'] as const,
-      queryFn: () => getDueCardCount(),
       staleTime: 0,
     }),
 

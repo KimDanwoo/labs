@@ -1,4 +1,11 @@
-import { getAllCategories, getCategoryBySlug, getQuestionsByCategorySlugPaginated } from '@entities/question';
+import {
+  DIFFICULTY_CONFIG,
+  DIFFICULTY_VALUES,
+  type Difficulty,
+  getAllCategories,
+  getCategoryBySlug,
+  getQuestionsByCategorySlugPaginated,
+} from '@entities/question';
 import { FeedbackForm } from '@features/feedback';
 import { Button, Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui';
 import { createClient } from '@supabase/supabase-js';
@@ -14,7 +21,19 @@ const PAGE_SIZE = 10;
 
 interface CategoryPageProps {
   params: Promise<{ categorySlug: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; difficulty?: string }>;
+}
+
+function isDifficulty(value: string | undefined): value is Difficulty {
+  return DIFFICULTY_VALUES.includes(value as Difficulty);
+}
+
+function buildHref(categorySlug: string, page: number, difficulty?: Difficulty): string {
+  const query = new URLSearchParams();
+  if (page > 1) query.set('page', String(page));
+  if (difficulty) query.set('difficulty', difficulty);
+  const qs = query.toString();
+  return `/reference/${categorySlug}${qs ? `?${qs}` : ''}`;
 }
 
 export async function generateStaticParams() {
@@ -41,8 +60,9 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { categorySlug } = await params;
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, difficulty: difficultyParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
+  const difficulty = isDifficulty(difficultyParam) ? difficultyParam : undefined;
 
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
@@ -50,11 +70,19 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   if (!category) notFound();
 
   const [result, categories] = await Promise.all([
-    getQuestionsByCategorySlugPaginated(categorySlug, page, PAGE_SIZE, supabase),
+    getQuestionsByCategorySlugPaginated(categorySlug, page, PAGE_SIZE, supabase, difficulty),
     getAllCategories(supabase),
   ]);
 
   if (page > 1 && result.data.length === 0) notFound();
+
+  const difficultyFilters: { value: Difficulty | undefined; label: string }[] = [
+    { value: undefined, label: '전체' },
+    ...DIFFICULTY_VALUES.map((value) => ({
+      value: value as Difficulty | undefined,
+      label: DIFFICULTY_CONFIG[value].label,
+    })),
+  ];
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fedeep.kr';
 
@@ -132,13 +160,35 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             </div>
           </div>
 
-          <QuestionAccordion questions={result.data} startIndex={(page - 1) * PAGE_SIZE} />
+          <div className="flex flex-wrap gap-1.5 mb-5" role="group" aria-label="난이도 필터">
+            {difficultyFilters.map(({ value, label }) => (
+              <Button
+                key={label}
+                variant={difficulty === value ? 'default' : 'outline'}
+                size="sm"
+                asChild={difficulty !== value}
+                className="shadow-sm"
+              >
+                {difficulty === value ? (
+                  <span>{label}</span>
+                ) : (
+                  <Link href={buildHref(categorySlug, 1, value)}>{label}</Link>
+                )}
+              </Button>
+            ))}
+          </div>
+
+          {result.data.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-10 text-center">이 난이도의 질문이 없습니다.</p>
+          ) : (
+            <QuestionAccordion questions={result.data} startIndex={(page - 1) * PAGE_SIZE} />
+          )}
 
           {result.totalPages > 1 && (
             <nav className="flex items-center justify-center gap-2 mt-10" aria-label="페이지네이션">
               {page > 1 ? (
                 <Button variant="outline" size="sm" asChild className="shadow-sm">
-                  <Link href={`/reference/${categorySlug}?page=${page - 1}`}>
+                  <Link href={buildHref(categorySlug, page - 1, difficulty)}>
                     <ChevronLeft className="size-4" />
                   </Link>
                 </Button>
@@ -173,7 +223,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                       {page === item ? (
                         <span>{item}</span>
                       ) : (
-                        <Link href={`/reference/${categorySlug}${item === 1 ? '' : `?page=${item}`}`}>{item}</Link>
+                        <Link href={buildHref(categorySlug, item, difficulty)}>{item}</Link>
                       )}
                     </Button>
                   ),
@@ -181,7 +231,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
               {page < result.totalPages ? (
                 <Button variant="outline" size="sm" asChild className="shadow-sm">
-                  <Link href={`/reference/${categorySlug}?page=${page + 1}`}>
+                  <Link href={buildHref(categorySlug, page + 1, difficulty)}>
                     <ChevronRight className="size-4" />
                   </Link>
                 </Button>

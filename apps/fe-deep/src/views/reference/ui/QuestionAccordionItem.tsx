@@ -15,7 +15,8 @@ export function QuestionAccordionItem({ question, number }: QuestionAccordionIte
   const { isMastered } = useQuestionActions(question.id);
 
   return (
-    <AccordionItem value={question.id} className="border border-border/60 rounded-xl px-4 shadow-sm">
+    // 베이스의 last:border-b-0이 마지막 카드의 바텀 보더를 지우므로 복원한다 — 각 아이템이 독립 카드라서
+    <AccordionItem value={question.id} className="border border-border/60 last:border-b rounded-xl px-4 shadow-sm">
       <AccordionTrigger className="hover:no-underline py-4">
         <div className="flex items-start gap-3 text-left flex-1 mr-4">
           <span className="text-muted-foreground/60 text-sm font-mono mt-0.5 shrink-0 tabular-nums">

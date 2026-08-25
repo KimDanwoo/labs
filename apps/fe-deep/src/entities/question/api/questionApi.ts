@@ -91,6 +91,7 @@ export async function getQuestionsByCategorySlugPaginated(
   page: number = 1,
   pageSize: number = 10,
   supabase?: SupabaseClient,
+  difficulty?: Difficulty,
 ): Promise<PaginatedResult<Question>> {
   const client = getClient(supabase);
   const category = await getCategoryBySlug(slug, client);
@@ -99,15 +100,16 @@ export async function getQuestionsByCategorySlugPaginated(
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const { data, count, error } = await client
+  let query = client
     .from('questions')
     .select(
       'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
       { count: 'exact' },
     )
-    .eq('category_id', category.id)
-    .order('order_num')
-    .range(from, to);
+    .eq('category_id', category.id);
+  if (difficulty) query = query.eq('difficulty', difficulty);
+
+  const { data, count, error } = await query.order('order_num').range(from, to);
 
   if (error) {
     console.error('getQuestionsByCategorySlugPaginated error:', error);
