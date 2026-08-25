@@ -177,6 +177,33 @@ test('4단 계층(##주제 / ###섹션 / ####꼬리질문)을 상대 깊이로 �
   assert.match(topic.notes, /배경 설명/);
 });
 
+test('키워드 섹션의 펜스 마커와 안내 문장은 칩으로 섞이지 않는다', () => {
+  const doc = parseStudyDoc(
+    'x',
+    `# 핸드북
+
+## 1. 주제
+
+### 키워드
+
+\`\`\`text
+신규 구축
+→ AI Agent
+\`\`\`
+
+너무 많이 던지지 않는다.
+
+- Monorepo
+
+### 답변
+
+내용.
+`,
+  );
+
+  assert.deepEqual(doc.topics[0].steps[0].keywords, ['신규 구축', 'AI Agent', 'Monorepo']);
+});
+
 test('코드펜스 안의 # 은 제목으로 오해하지 않는다', () => {
   const doc = parseStudyDoc('x', '# 문서\n\n# 1. 주제\n\n## 설명\n\n```bash\n# 주석입니다\n```\n');
   assert.equal(doc.topics.length, 1);

@@ -68,7 +68,6 @@ const ANY_HEADING_PATTERN = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
 const TOPIC_NUMBER_PATTERN = /^\d+[.)]\s+/;
 const QUESTION_HEADING_PATTERN = /[?？]\s*$/;
 const TRAILING_RULE_PATTERN = /\n*[-*_]{3,}\s*$/;
-const FENCE_WRAPPER_PATTERN = /^```[a-z]*\n|\n?```$/g;
 const LIST_MARKER_PATTERN = /^[-*+]\s+/;
 const ORDERED_MARKER_PATTERN = /^\d+\.\s+/;
 const ARROW_PREFIX_PATTERN = /^→\s*/;
@@ -125,19 +124,30 @@ function extractListItems(body: string): string[] {
     .filter(Boolean);
 }
 
-/** 불릿 목록이든 코드펜스 안의 화살표 흐름이든 항목 배열로 만든다. */
+/**
+ * 불릿 목록이든 코드펜스 안의 화살표 흐름이든 항목 배열로 만든다.
+ * 펜스 안은 한 줄이 항목 하나, 펜스 밖은 목록 마커가 붙은 줄만 — 안내 문장이 항목으로 섞이지 않게.
+ */
 function extractItems(body: string): string[] {
-  return body
-    .replace(FENCE_WRAPPER_PATTERN, '')
-    .split('\n')
-    .map((line) =>
-      line
-        .replace(LIST_MARKER_PATTERN, '')
-        .replace(ORDERED_MARKER_PATTERN, '')
-        .replace(ARROW_PREFIX_PATTERN, '')
-        .trim(),
-    )
-    .filter(Boolean);
+  const items: string[] = [];
+  let isInFence = false;
+
+  for (const raw of body.split('\n')) {
+    if (FENCE_PATTERN.test(raw)) {
+      isInFence = !isInFence;
+      continue;
+    }
+    const line = raw.trim();
+    if (!line) continue;
+
+    if (isInFence) {
+      items.push(line.replace(ARROW_PREFIX_PATTERN, '').trim());
+    } else if (LIST_MARKER_PATTERN.test(line) || ORDERED_MARKER_PATTERN.test(line)) {
+      items.push(line.replace(LIST_MARKER_PATTERN, '').replace(ORDERED_MARKER_PATTERN, '').trim());
+    }
+  }
+
+  return items.filter(Boolean);
 }
 
 /** 꼬꼬무 섹션: 질문 제목이 있으면 답까지, 불릿 목록이면 질문만 뽑는다. */
