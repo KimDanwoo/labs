@@ -53,10 +53,13 @@ test('H1은 주제, H2는 역할별 섹션으로 갈린다', () => {
   const topic = doc.topics[0];
   assert.deepEqual(
     topic.steps.map((step) => step.kind),
-    [STEP_KIND.keywords, STEP_KIND.answer, STEP_KIND.followUp, STEP_KIND.followUp],
+    [STEP_KIND.keywords, STEP_KIND.followUp, STEP_KIND.followUp],
   );
   assert.deepEqual(topic.steps[0].keywords, ['프론트엔드', '0→1']);
-  assert.equal(topic.steps[0].reveal, '안녕하세요.');
+  // 답변 섹션이 여러 개면 별도 카드 없이 첫 카드 공개 내용에 합친다
+  assert.match(topic.steps[0].reveal, /\*\*30초 답변\*\*/);
+  assert.match(topic.steps[0].reveal, /안녕하세요\./);
+  assert.match(topic.steps[0].reveal, /길게 말하기\./);
   assert.match(topic.notes, /과장하지 않는다/);
 });
 

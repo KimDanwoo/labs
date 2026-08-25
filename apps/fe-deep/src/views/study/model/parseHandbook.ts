@@ -248,25 +248,26 @@ function buildTopic(draft: TopicDraft, index: number): StudyTopic {
     steps.push({ id: `topic-${index}-step-${steps.length}`, kind, prompt, reveal, keywords });
   };
 
-  const [firstAnswer, ...restAnswers] = draft.answers;
-
   const noteParts = draft.notes.map((note) => `### ${note.heading}\n\n${note.body}`);
   if (draft.lead) noteParts.unshift(draft.lead);
   const notes = noteParts.join('\n\n');
 
+  // 답변 섹션이 여러 개여도 카드는 하나다 — 질문 형태가 아닌 제목이 카드로 노출되지 않게
+  // 전부 첫 카드의 공개 내용으로 합친다.
+  const answerBody =
+    draft.answers.length > 1
+      ? draft.answers.map((answer) => `**${answer.heading}**\n\n${answer.body}`).join('\n\n')
+      : (draft.answers[0]?.body ?? '');
+
   // 첫 카드는 항상 주제 자체를 묻는다. 모범 답변 섹션이 없으면 배경 섹션이 사실상 답이므로
   // 참고 자료로 미뤄두지 않고 답으로 올린다.
-  const openingReveal = firstAnswer?.body || notes;
-  const isNotesConsumed = !firstAnswer?.body && Boolean(notes);
+  const openingReveal = answerBody || notes;
+  const isNotesConsumed = !answerBody && Boolean(notes);
 
   if (draft.keywordItems.length > 0) {
     push(STEP_KIND.keywords, draft.title, openingReveal, draft.keywordItems);
   } else if (openingReveal) {
     push(STEP_KIND.answer, draft.title, openingReveal);
-  }
-
-  for (const answer of restAnswers) {
-    push(STEP_KIND.answer, `${draft.title} — ${answer.heading}`, answer.body);
   }
 
   for (const followUp of draft.followUps) {
