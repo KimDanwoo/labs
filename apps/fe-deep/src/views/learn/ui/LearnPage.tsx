@@ -3,6 +3,9 @@
 import { getCurrentStreak } from '@entities/progress';
 import {
   type Category,
+  type Difficulty,
+  DIFFICULTY_CONFIG,
+  DIFFICULTY_VALUES,
   getAllCategories,
   getAllQuestions,
   getQuestionsByCategorySlug,
@@ -27,6 +30,8 @@ export function LearnPage() {
   const [phase, setPhase] = useState<Phase>('setup');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [order, setOrder] = useState<StudyOrder>(STUDY_ORDER.sequential);
+  /** 포함할 난이도. 빈 배열 = 전체. */
+  const [difficulties, setDifficulties] = useState<Difficulty[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [streak, setStreak] = useState(0);
   const [isEmpty, setIsEmpty] = useState(false);
@@ -63,6 +68,10 @@ export function LearnPage() {
     let loaded =
       selectedCategory === 'all' ? await getAllQuestions() : await getQuestionsByCategorySlug(selectedCategory);
 
+    if (difficulties.length > 0) {
+      loaded = loaded.filter((q) => difficulties.includes(q.difficulty));
+    }
+
     if (loaded.length === 0) {
       setIsEmpty(true);
       setPhase('setup');
@@ -83,6 +92,10 @@ export function LearnPage() {
     setQuestions(loaded);
     resetStudy();
     setPhase('study');
+  };
+
+  const toggleDifficulty = (value: Difficulty) => {
+    setDifficulties((prev) => (prev.includes(value) ? prev.filter((d) => d !== value) : [...prev, value]));
   };
 
   const backToSetup = () => {
@@ -140,6 +153,31 @@ export function LearnPage() {
             </div>
           </div>
 
+          <div>
+            <label className="text-sm font-medium mb-3 block">난이도</label>
+            <div className="grid grid-cols-4 gap-1.5">
+              <Button
+                variant={difficulties.length === 0 ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setDifficulties([])}
+                className="transition-all duration-200"
+              >
+                전체
+              </Button>
+              {DIFFICULTY_VALUES.map((value) => (
+                <Button
+                  key={value}
+                  variant={difficulties.includes(value) ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => toggleDifficulty(value)}
+                  className="transition-all duration-200"
+                >
+                  {DIFFICULTY_CONFIG[value].label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           <Button
             onClick={startStudy}
             size="lg"
@@ -149,7 +187,7 @@ export function LearnPage() {
             {phase === 'loading' ? '문제 불러오는 중...' : '학습 시작'}
           </Button>
 
-          {isEmpty && <p className="text-sm text-muted-foreground text-center">이 카테고리에는 문제가 없습니다.</p>}
+          {isEmpty && <p className="text-sm text-muted-foreground text-center">조건에 맞는 문제가 없습니다.</p>}
         </Card>
 
         <div className="mt-6 p-4 rounded-xl bg-muted/40 border border-border/50">

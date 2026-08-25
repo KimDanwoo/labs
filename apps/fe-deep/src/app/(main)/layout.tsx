@@ -1,4 +1,5 @@
-import { Footer, Header } from '@widgets/layout';
+import { Footer, Header, ScrollToTop } from '@widgets/layout';
+import { Suspense } from 'react';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       >
         본문으로 건너뛰기
       </a>
+      <Suspense fallback={null}>
+        <ScrollToTop />
+      </Suspense>
       <Header />
       <main id="main-content" className="flex-1">
         {children}
