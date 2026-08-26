@@ -7,4 +7,6 @@ export {
   type StudyStep,
   type StudyTopic,
 } from './parseHandbook';
+export { STUDY_FILTER, filterTopics, parseStudyFilter, type StudyFilter } from './studyFilter';
 export { useStudyRun } from './useStudyRun';
+export { useUnderstoodTopics } from './useUnderstoodTopics';
