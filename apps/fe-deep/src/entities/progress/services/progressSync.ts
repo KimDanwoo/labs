@@ -76,10 +76,25 @@ export async function syncProgress(): Promise<void> {
   // 머지: 모든 question_id를 모아서 최신 데이터 채택
   const allQuestionIds = new Set([...Object.keys(localData), ...remoteMap.keys()]);
 
+  // 삭제된 질문의 로컬 진도가 섞이면 FK 위반으로 upsert 배치 전체가 실패하므로,
+  // 실재하는 질문만 남기고 유령 id는 로컬에서도 정리한다.
+  const { data: validRows, error: validError } = await supabase
+    .from('questions')
+    .select('id')
+    .in('id', [...allQuestionIds]);
+
+  if (validError) {
+    console.error('syncProgress valid ids fetch error:', validError);
+    return;
+  }
+
+  const validIds = new Set((validRows ?? []).map((row) => row.id as string));
+
   const merged: Record<string, UserProgress> = {};
   const toUpsert: UserProgress[] = [];
 
   for (const qId of allQuestionIds) {
+    if (!validIds.has(qId)) continue;
     const local = localData[qId];
     const remote = remoteMap.get(qId);
 
@@ -157,7 +172,8 @@ export async function syncSingleCard(progress: UserProgress): Promise<void> {
     { onConflict: 'user_id,question_id' },
   );
 
-  if (error) {
+  // 23503(FK 위반) = 삭제된 질문의 진도 — 다음 syncProgress가 로컬을 정리하므로 조용히 넘긴다.
+  if (error && error.code !== '23503') {
     console.error('syncSingleCard error:', error);
   }
 }
