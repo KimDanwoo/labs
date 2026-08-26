@@ -1,6 +1,7 @@
 import { StudyRunView } from '@views/study';
 import { getStudyDoc, getStudyDocSlugs } from '@views/study/model/studyDocs';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 export const dynamicParams = false;
 
@@ -26,7 +27,9 @@ export default async function StudyDocPage({ params }: StudyDocPageProps) {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-10">
-      <StudyRunView doc={doc} />
+      <Suspense>
+        <StudyRunView doc={doc} />
+      </Suspense>
     </div>
   );
 }
