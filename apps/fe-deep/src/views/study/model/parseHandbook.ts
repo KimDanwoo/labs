@@ -265,7 +265,7 @@ function buildTopic(draft: TopicDraft, index: number): StudyTopic {
   const isNotesConsumed = !answerBody && Boolean(notes);
 
   if (draft.keywordItems.length > 0) {
-    push(STEP_KIND.keywords, draft.title, openingReveal, draft.keywordItems);
+    push(STEP_KIND.keywords, draft.title, openingReveal, [...new Set(draft.keywordItems)]);
   } else if (openingReveal) {
     push(STEP_KIND.answer, draft.title, openingReveal);
   }
