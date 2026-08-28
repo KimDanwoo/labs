@@ -73,6 +73,28 @@ const ORDERED_MARKER_PATTERN = /^\d+\.\s+/;
 const ARROW_PREFIX_PATTERN = /^→\s*/;
 /** 꼬꼬무 안의 주의·참고류 제목은 질문이 아니라 직전 답변에 붙는 경고다. */
 const FOLLOW_UP_NOTE_PATTERN = /^(주의|위험|경고|금지|참고|중요)/;
+/** 꼬리질문 답변 첫 줄의 `키워드: a, b, c`는 본문이 아니라 그 질문의 키워드 목록이다. */
+const KEYWORD_LINE_PATTERN = /^키워드\s*[:：]\s*(.+)$/;
+
+/** 답변 첫 비어있지 않은 줄이 키워드 줄이면 분리해서 반환한다. */
+function extractKeywordLine(answer: string): { keywords: string[]; body: string } {
+  const lines = answer.split('\n');
+  const firstIndex = lines.findIndex((line) => line.trim());
+  const first = firstIndex >= 0 ? lines[firstIndex]?.trim() : undefined;
+  const matched = first ? KEYWORD_LINE_PATTERN.exec(first) : null;
+  if (!matched?.[1]) return { keywords: [], body: answer };
+
+  return {
+    keywords: matched[1]
+      .split(/[,·]/)
+      .map((keyword) => keyword.trim())
+      .filter(Boolean),
+    body: lines
+      .slice(firstIndex + 1)
+      .join('\n')
+      .trim(),
+  };
+}
 
 function matchHeading(line: string): Pick<Block, 'level' | 'heading'> | null {
   const matched = ANY_HEADING_PATTERN.exec(line);
@@ -271,7 +293,8 @@ function buildTopic(draft: TopicDraft, index: number): StudyTopic {
   }
 
   for (const followUp of draft.followUps) {
-    push(STEP_KIND.followUp, followUp.question, followUp.answer);
+    const { keywords, body } = extractKeywordLine(followUp.answer);
+    push(STEP_KIND.followUp, followUp.question, body, [...new Set(keywords)]);
   }
 
   return { id: `topic-${index}`, title: draft.title, steps, notes: isNotesConsumed ? '' : notes };

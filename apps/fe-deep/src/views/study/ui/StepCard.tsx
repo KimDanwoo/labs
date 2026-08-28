@@ -1,9 +1,10 @@
 'use client';
 
 import { cn } from '@shared/lib/utils';
-import { Badge, Button, Card, MarkdownRenderer } from '@shared/ui';
-import { Eye, Lightbulb } from 'lucide-react';
+import { Badge, Card, MarkdownRenderer } from '@shared/ui';
+import { Lightbulb } from 'lucide-react';
 import { STEP_KIND, type StudyStep } from '../model';
+import { KeywordCheck } from './KeywordCheck';
 
 /** 문서의 "꼬꼬무 공통 프레임" — 모범 답변이 없는 질문에서 스스로 정리할 때 쓴다. */
 const ANSWER_FRAME = ['왜?', '대안?', '왜 안 골랐나?', '단점?', '결과?', '다시 한다면?'];
@@ -53,7 +54,7 @@ export function StepCard({ step, stepIndex, stepCount, isRevealed, recall, onRec
 
       <p className="break-keep text-lg font-semibold leading-relaxed sm:text-xl">{step.prompt}</p>
 
-      {step.keywords.length > 0 && (
+      {step.keywords.length > 0 && !(isRevealed && recall.trim()) && (
         <details className="mt-4">
           <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
             키워드 힌트 보기 ({step.keywords.length})
@@ -76,6 +77,7 @@ export function StepCard({ step, stepIndex, stepCount, isRevealed, recall, onRec
               <p className="whitespace-pre-wrap text-sm leading-relaxed">{recall}</p>
             </div>
           )}
+          {recall.trim() && step.keywords.length > 0 && <KeywordCheck keywords={step.keywords} recall={recall} />}
           {step.reveal ? (
             <MarkdownRenderer content={step.reveal} />
           ) : (
@@ -102,9 +104,6 @@ export function StepCard({ step, stepIndex, stepCount, isRevealed, recall, onRec
             rows={3}
             className="w-full resize-y rounded-lg border border-border/60 bg-transparent px-3 py-2 text-sm leading-relaxed outline-none transition-colors placeholder:text-muted-foreground/60 focus-visible:border-primary/50 focus-visible:ring-[3px] focus-visible:ring-ring/50"
           />
-          <Button variant="outline" size="lg" onClick={onReveal} className="mt-4 w-full gap-2 sm:w-auto">
-            <Eye className="size-4" />답 확인
-          </Button>
         </div>
       )}
     </Card>
