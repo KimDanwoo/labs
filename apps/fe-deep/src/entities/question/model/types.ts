@@ -14,6 +14,14 @@ export type VisibilityFilter = 'daily' | 'flashcard';
 
 export type QuestionVisibilityField = 'show_in_daily' | 'show_in_flashcard';
 
+/** 답 확인 후 이어서 묻는 꼬리질문(꼬꼬무). */
+export type FollowUp = {
+  question: string;
+  /** 답을 떠올릴 때 쓰는 힌트. 답변 후 언급 여부를 체크한다. */
+  keywords: string[];
+  answer: string;
+};
+
 export interface Question {
   id: string;
   category_id: string;
@@ -25,6 +33,7 @@ export interface Question {
   tags: string[];
   show_in_daily: boolean;
   show_in_flashcard: boolean;
+  follow_ups: FollowUp[];
 }
 
 export interface QuizOption {

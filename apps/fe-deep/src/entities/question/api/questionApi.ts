@@ -8,6 +8,10 @@ import type { Category, Difficulty, PaginatedResult, Question, SearchResult, Vis
 // Supabase data access layer
 // ============================================================
 
+/** questions 조회 시 공통으로 가져오는 컬럼. 컬럼이 늘면 여기만 고친다. */
+const QUESTION_COLUMNS =
+  'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard, follow_ups';
+
 /**
  * Supabase 클라이언트를 반환한다.
  * Server Component에서는 createServerSupabaseClient() 결과를 전달하고,
@@ -63,9 +67,7 @@ export async function getQuestionsByCategory(categoryId: string, supabase?: Supa
   const client = getClient(supabase);
   const { data, error } = await client
     .from('questions')
-    .select(
-      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
-    )
+    .select(QUESTION_COLUMNS)
     .eq('category_id', categoryId)
     .order('order_num');
 
@@ -100,13 +102,7 @@ export async function getQuestionsByCategorySlugPaginated(
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  let query = client
-    .from('questions')
-    .select(
-      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
-      { count: 'exact' },
-    )
-    .eq('category_id', category.id);
+  let query = client.from('questions').select(QUESTION_COLUMNS, { count: 'exact' }).eq('category_id', category.id);
   if (difficulty) query = query.eq('difficulty', difficulty);
 
   const { data, count, error } = await query.order('order_num').range(from, to);
@@ -129,13 +125,7 @@ export async function getQuestionsByCategorySlugPaginated(
 /** 질문 ID로 단일 질문을 찾는다. */
 export async function getQuestionById(id: string, supabase?: SupabaseClient): Promise<Question | undefined> {
   const client = getClient(supabase);
-  const { data, error } = await client
-    .from('questions')
-    .select(
-      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
-    )
-    .eq('id', id)
-    .single();
+  const { data, error } = await client.from('questions').select(QUESTION_COLUMNS).eq('id', id).single();
 
   if (error || !data) {
     if (error?.code !== SUPABASE_ERROR_CODES.NOT_FOUND) console.error('getQuestionById error:', error);
@@ -149,12 +139,7 @@ export async function getQuestionById(id: string, supabase?: SupabaseClient): Pr
 export async function getQuestionsByIds(ids: string[], supabase?: SupabaseClient): Promise<Question[]> {
   if (ids.length === 0) return [];
   const client = getClient(supabase);
-  const { data, error } = await client
-    .from('questions')
-    .select(
-      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
-    )
-    .in('id', ids);
+  const { data, error } = await client.from('questions').select(QUESTION_COLUMNS).in('id', ids);
 
   if (error) {
     console.error('getQuestionsByIds error:', error);
@@ -167,11 +152,7 @@ export async function getQuestionsByIds(ids: string[], supabase?: SupabaseClient
 /** 전체 질문 목록을 반환한다. */
 export async function getAllQuestions(supabase?: SupabaseClient): Promise<Question[]> {
   const client = getClient(supabase);
-  const { data, error } = await client
-    .from('questions')
-    .select(
-      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
-    );
+  const { data, error } = await client.from('questions').select(QUESTION_COLUMNS);
 
   if (error) {
     console.error('getAllQuestions error:', error);
@@ -192,12 +173,7 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
 
   const { data, error } = await client
     .from('questions')
-    .select(
-      `
-      id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard,
-      categories(id, slug, title, order_num, icon, description)
-    `,
-    )
+    .select(`${QUESTION_COLUMNS}, categories(id, slug, title, order_num, icon, description)`)
     .or(`question.ilike.${pattern},answer.ilike.${pattern}`);
 
   if (error) {
@@ -225,6 +201,7 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
       tags: row.tags as string[],
       show_in_daily: row.show_in_daily as boolean,
       show_in_flashcard: row.show_in_flashcard as boolean,
+      follow_ups: (row.follow_ups ?? []) as Question['follow_ups'],
     };
 
     if (q.question.toLowerCase().includes(lowerQuery)) {
@@ -242,12 +219,7 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
 /** 난이도별 질문 목록을 반환한다. */
 export async function getQuestionsByDifficulty(difficulty: Difficulty, supabase?: SupabaseClient): Promise<Question[]> {
   const client = getClient(supabase);
-  const { data, error } = await client
-    .from('questions')
-    .select(
-      'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard',
-    )
-    .eq('difficulty', difficulty);
+  const { data, error } = await client.from('questions').select(QUESTION_COLUMNS).eq('difficulty', difficulty);
 
   if (error) {
     console.error('getQuestionsByDifficulty error:', error);

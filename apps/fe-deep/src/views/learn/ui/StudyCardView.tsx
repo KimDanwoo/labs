@@ -1,8 +1,9 @@
 'use client';
 
-import type { Question } from '@entities/question';
+import type { FollowUp, Question } from '@entities/question';
 import { DifficultyBadge } from '@entities/question/ui';
-import { Badge, Button, Card, MarkdownRenderer, Progress } from '@shared/ui';
+import { cn } from '@shared/lib/utils';
+import { Badge, Button, Card, KeywordCheck, MarkdownRenderer, Progress } from '@shared/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Eye, RotateCcw, SkipForward } from 'lucide-react';
 
@@ -10,6 +11,10 @@ interface StudyCardViewProps {
   currentIndex: number;
   totalCount: number;
   currentQuestion: Question | undefined;
+  /** 현재 단계의 꼬리질문. 없으면 원 질문 단계다. */
+  currentFollowUp: FollowUp | undefined;
+  stepIndex: number;
+  stepCount: number;
   isFlipped: boolean;
   onFlip: () => void;
   progressPercent: number;
@@ -29,6 +34,9 @@ export function StudyCardView({
   currentIndex,
   totalCount,
   currentQuestion,
+  currentFollowUp,
+  stepIndex,
+  stepCount,
   isFlipped,
   onFlip,
   progressPercent,
@@ -40,6 +48,11 @@ export function StudyCardView({
   onRecallChange,
   headerAction,
 }: StudyCardViewProps) {
+  const prompt = currentFollowUp?.question ?? currentQuestion?.question ?? '';
+  const answer = currentFollowUp?.answer ?? currentQuestion?.answer ?? '';
+  const keywords = currentFollowUp?.keywords ?? currentQuestion?.tags ?? [];
+  const isLastStep = stepIndex + 1 >= stepCount;
+
   const handleRecallKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
@@ -74,7 +87,7 @@ export function StudyCardView({
       {/* Card */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={currentIndex}
+          key={`${currentIndex}-${stepIndex}`}
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -40 }}
@@ -83,31 +96,49 @@ export function StudyCardView({
           <Card className="min-h-[300px] p-6 relative shadow-sm">
             {/* Meta */}
             <div className="flex items-center gap-2 mb-5">
-              <DifficultyBadge difficulty={currentQuestion?.difficulty ?? 'easy'} />
-              {currentQuestion?.sub_category && (
+              {currentFollowUp ? (
+                <Badge className="text-xs">꼬꼬무</Badge>
+              ) : (
+                <DifficultyBadge difficulty={currentQuestion?.difficulty ?? 'easy'} />
+              )}
+              {!currentFollowUp && currentQuestion?.sub_category && (
                 <Badge variant="secondary" className="text-xs">
                   {currentQuestion.sub_category}
                 </Badge>
+              )}
+              {stepCount > 1 && (
+                <div
+                  className="ml-auto flex items-center gap-1.5"
+                  aria-label={`${stepIndex + 1}단계 / 총 ${stepCount}단계`}
+                >
+                  {Array.from({ length: stepCount }, (_, index) => (
+                    <span
+                      key={index}
+                      className={cn(
+                        'size-1.5 rounded-full transition-colors',
+                        index <= stepIndex ? 'bg-primary' : 'bg-muted-foreground/25',
+                      )}
+                    />
+                  ))}
+                </div>
               )}
             </div>
 
             {/* Question */}
             <div className="flex flex-col items-center justify-center min-h-[120px] mb-6">
-              <p className="text-lg font-medium text-center leading-relaxed whitespace-pre-line">
-                {currentQuestion?.question}
-              </p>
+              <p className="text-lg font-medium text-center leading-relaxed whitespace-pre-line">{prompt}</p>
             </div>
 
-            {/* Keyword hint (study 화면과 동일한 패턴) */}
-            {(currentQuestion?.tags.length ?? 0) > 0 && (
+            {/* Keyword hint — 답 확인 + 인출 입력이 있으면 언급 체크로 대체된다 */}
+            {keywords.length > 0 && !(isFlipped && recallInput.trim()) && (
               <details className="mb-5">
                 <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
-                  키워드 힌트 보기 ({currentQuestion?.tags.length})
+                  키워드 힌트 보기 ({keywords.length})
                 </summary>
                 <ul className="mt-2 flex flex-wrap gap-1.5">
-                  {currentQuestion?.tags.map((tag) => (
-                    <li key={tag} className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
-                      {tag}
+                  {keywords.map((keyword) => (
+                    <li key={keyword} className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
+                      {keyword}
                     </li>
                   ))}
                 </ul>
@@ -143,9 +174,12 @@ export function StudyCardView({
                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{recallInput}</p>
                     </div>
                   )}
+                  {recallInput.trim() && keywords.length > 0 && (
+                    <KeywordCheck keywords={keywords} recall={recallInput} />
+                  )}
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-2">모범 답변</p>
-                    <MarkdownRenderer content={currentQuestion?.answer ?? ''} />
+                    <MarkdownRenderer content={answer} />
                   </div>
                 </div>
               </motion.div>
@@ -163,7 +197,7 @@ export function StudyCardView({
         <Button size="lg" onClick={isFlipped ? onNext : onFlip} className="flex-1 gap-2 shadow-md">
           {isFlipped ? (
             <>
-              다음
+              {isLastStep ? '다음' : '꼬꼬무'}
               <ArrowRight className="h-4 w-4" />
             </>
           ) : (

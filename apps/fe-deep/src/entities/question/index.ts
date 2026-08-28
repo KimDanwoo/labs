@@ -15,6 +15,7 @@ export { DIFFICULTY_CONFIG, DIFFICULTY_VALUES } from './model';
 export type {
   Category,
   Difficulty,
+  FollowUp,
   PaginatedResult,
   Question,
   QuestionInput,

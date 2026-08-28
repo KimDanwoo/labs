@@ -1,7 +1,7 @@
 'use client';
 
 import { getLocalProgress, updateQuestionProgress } from '@entities/progress';
-import type { Question } from '@entities/question';
+import type { FollowUp, Question } from '@entities/question';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface UseCardStudySessionOptions {
@@ -16,6 +16,11 @@ interface UseCardStudySessionOptions {
 interface CardStudySession {
   currentIndex: number;
   currentQuestion: Question | undefined;
+  /** 현재 단계의 꼬리질문. 0단계(원 질문)면 undefined. */
+  currentFollowUp: FollowUp | undefined;
+  stepIndex: number;
+  /** 원 질문 1 + 꼬리질문 수. */
+  stepCount: number;
   isFlipped: boolean;
   setIsFlipped: (v: boolean) => void;
   /** 답을 보기 전에 스스로 적어보는 인출 입력. 카드마다 초기화된다. */
@@ -38,16 +43,21 @@ interface CardStudySession {
  */
 export function useCardStudySession({ questions, phase, onComplete }: UseCardStudySessionOptions): CardStudySession {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [stepIndex, setStepIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [recallInput, setRecallInput] = useState('');
   const isAdvancingRef = useRef(false);
 
   const currentQuestion = questions[currentIndex];
+  const followUps = currentQuestion?.follow_ups ?? [];
+  const stepCount = 1 + followUps.length;
+  const currentFollowUp = stepIndex > 0 ? followUps[stepIndex - 1] : undefined;
   const progressPercent = questions.length > 0 ? (currentIndex / questions.length) * 100 : 0;
 
   /** 학습 상태를 초기화한다. 새 세션 시작 시 호출. */
   const resetStudy = useCallback(() => {
     setCurrentIndex(0);
+    setStepIndex(0);
     setIsFlipped(false);
     setRecallInput('');
     isAdvancingRef.current = false;
@@ -57,6 +67,7 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
   const advance = useCallback(() => {
     if (currentIndex + 1 < questions.length) {
       setCurrentIndex((i) => i + 1);
+      setStepIndex(0);
       setIsFlipped(false);
       setRecallInput('');
       requestAnimationFrame(() => {
@@ -68,14 +79,21 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
     }
   }, [currentIndex, questions.length, onComplete]);
 
-  /** 현재 카드를 학습 기록에 남기고 다음 카드로 이동한다. */
+  /** 꼬리질문이 남았으면 다음 단계로, 마지막 단계면 기록을 남기고 다음 카드로 이동한다. */
   const handleNext = useCallback(() => {
     if (!currentQuestion || isAdvancingRef.current) return;
-    isAdvancingRef.current = true;
 
+    if (stepIndex + 1 < stepCount) {
+      setStepIndex((i) => i + 1);
+      setIsFlipped(false);
+      setRecallInput('');
+      return;
+    }
+
+    isAdvancingRef.current = true;
     updateQuestionProgress(currentQuestion.id, true);
     advance();
-  }, [currentQuestion, advance]);
+  }, [currentQuestion, stepIndex, stepCount, advance]);
 
   const handleSkip = useCallback(() => {
     if (!currentQuestion || isAdvancingRef.current) return;
@@ -120,6 +138,9 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
   return {
     currentIndex,
     currentQuestion,
+    currentFollowUp,
+    stepIndex,
+    stepCount,
     isFlipped,
     setIsFlipped,
     recallInput,

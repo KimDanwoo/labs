@@ -1,5 +1,4 @@
 export { AiFeedback } from './AiFeedback';
-export { KeywordCheck } from './KeywordCheck';
 export { StepCard } from './StepCard';
 export { StudyDevReload } from './StudyDevReload';
 export { StudyFilterBar } from './StudyFilterBar';
