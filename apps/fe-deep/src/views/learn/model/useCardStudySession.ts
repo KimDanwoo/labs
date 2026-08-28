@@ -24,6 +24,8 @@ interface CardStudySession {
   progressPercent: number;
   isNewCard: boolean;
   handleNext: () => void;
+  /** 답을 확인하지 않고 다음 카드로 건너뛴다. 학습 기록을 남기지 않는다. */
+  handleSkip: () => void;
   /** 현재 카드를 안 뒤집힌 상태로 되돌려 다시 풀게 한다. */
   handleRetry: () => void;
   resetStudy: () => void;
@@ -51,13 +53,8 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
     isAdvancingRef.current = false;
   }, []);
 
-  /** 현재 카드를 학습 기록에 남기고 다음 카드로 이동한다. 마지막 카드면 onComplete를 호출한다. */
-  const handleNext = useCallback(() => {
-    if (!currentQuestion || isAdvancingRef.current) return;
-    isAdvancingRef.current = true;
-
-    updateQuestionProgress(currentQuestion.id, true);
-
+  /** 다음 카드로 이동한다. 마지막 카드면 onComplete를 호출한다. */
+  const advance = useCallback(() => {
     if (currentIndex + 1 < questions.length) {
       setCurrentIndex((i) => i + 1);
       setIsFlipped(false);
@@ -69,7 +66,22 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
       isAdvancingRef.current = false;
       onComplete();
     }
-  }, [currentQuestion, currentIndex, questions.length, onComplete]);
+  }, [currentIndex, questions.length, onComplete]);
+
+  /** 현재 카드를 학습 기록에 남기고 다음 카드로 이동한다. */
+  const handleNext = useCallback(() => {
+    if (!currentQuestion || isAdvancingRef.current) return;
+    isAdvancingRef.current = true;
+
+    updateQuestionProgress(currentQuestion.id, true);
+    advance();
+  }, [currentQuestion, advance]);
+
+  const handleSkip = useCallback(() => {
+    if (!currentQuestion || isAdvancingRef.current) return;
+    isAdvancingRef.current = true;
+    advance();
+  }, [currentQuestion, advance]);
 
   /** 현재 카드를 처음부터 다시 푼다. 입력을 비우고 질문 상태로 되돌린다. */
   const handleRetry = useCallback(() => {
@@ -115,6 +127,7 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
     progressPercent,
     isNewCard,
     handleNext,
+    handleSkip,
     handleRetry,
     resetStudy,
   };

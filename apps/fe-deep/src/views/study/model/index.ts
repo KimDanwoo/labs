@@ -1,3 +1,4 @@
+export { matchKeywords, type KeywordMatch } from './matchKeywords';
 export {
   STEP_KIND,
   countSteps,

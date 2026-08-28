@@ -51,6 +51,7 @@ export function LearnPage() {
     progressPercent,
     isNewCard,
     handleNext,
+    handleSkip,
     handleRetry,
     resetStudy,
   } = useCardStudySession({ questions, phase, onComplete });
@@ -107,7 +108,7 @@ export function LearnPage() {
   // ==================== SETUP ====================
   if (phase === 'setup' || phase === 'loading') {
     return (
-      <div className="container mx-auto max-w-[42rem] px-4 py-8 sm:py-12 animate-fade-in">
+      <div className="container mx-auto max-w-168 px-4 py-8 sm:py-12 animate-fade-in">
         <h1 className="text-3xl font-bold tracking-tight mb-2">학습</h1>
         <p className="text-muted-foreground mb-8">질문을 보고 답을 먼저 적어본 뒤, 모범 답변과 비교하세요.</p>
 
@@ -204,7 +205,7 @@ export function LearnPage() {
   // ==================== DONE ====================
   if (phase === 'done') {
     return (
-      <div className="container mx-auto max-w-[42rem] px-4 py-8 sm:py-12 animate-fade-in-up">
+      <div className="container mx-auto max-w-168 px-4 py-8 sm:py-12 animate-fade-in-up">
         <div className="text-center py-16">
           <Trophy className="h-16 w-16 text-yellow-500 mx-auto mb-5" />
           <h1 className="text-3xl font-bold tracking-tight mb-3">학습 완료!</h1>
@@ -243,6 +244,7 @@ export function LearnPage() {
       progressPercent={progressPercent}
       isNewCard={isNewCard}
       onNext={handleNext}
+      onSkip={handleSkip}
       onRetry={handleRetry}
       recallInput={recallInput}
       onRecallChange={setRecallInput}

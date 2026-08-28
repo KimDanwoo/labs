@@ -4,7 +4,7 @@ import type { Question } from '@entities/question';
 import { DifficultyBadge } from '@entities/question/ui';
 import { Badge, Button, Card, MarkdownRenderer, Progress } from '@shared/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Eye, RotateCcw } from 'lucide-react';
+import { ArrowRight, Eye, RotateCcw, SkipForward } from 'lucide-react';
 
 interface StudyCardViewProps {
   currentIndex: number;
@@ -15,6 +15,8 @@ interface StudyCardViewProps {
   progressPercent: number;
   isNewCard: boolean;
   onNext: () => void;
+  /** 답을 확인하지 않고 다음 질문으로 건너뛴다. */
+  onSkip: () => void;
   onRetry: () => void;
   /** 답을 보기 전에 스스로 적어보는 인출 입력 */
   recallInput: string;
@@ -32,6 +34,7 @@ export function StudyCardView({
   progressPercent,
   isNewCard,
   onNext,
+  onSkip,
   onRetry,
   recallInput,
   onRecallChange,
@@ -45,7 +48,7 @@ export function StudyCardView({
   };
 
   return (
-    <div className="container mx-auto max-w-[42rem] px-4 py-8 sm:py-12">
+    <div className="container mx-auto max-w-168 px-4 py-8 sm:py-12">
       {/* Progress bar */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">
@@ -95,6 +98,22 @@ export function StudyCardView({
               </p>
             </div>
 
+            {/* Keyword hint (study 화면과 동일한 패턴) */}
+            {(currentQuestion?.tags.length ?? 0) > 0 && (
+              <details className="mb-5">
+                <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
+                  키워드 힌트 보기 ({currentQuestion?.tags.length})
+                </summary>
+                <ul className="mt-2 flex flex-wrap gap-1.5">
+                  {currentQuestion?.tags.map((tag) => (
+                    <li key={tag} className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+
             {/* Answer or prompt */}
             {!isFlipped ? (
               <div>
@@ -110,17 +129,6 @@ export function StudyCardView({
                   rows={3}
                   className="w-full resize-y rounded-lg border border-border/60 bg-transparent px-3 py-2 text-sm leading-relaxed outline-none transition-colors placeholder:text-muted-foreground/60 focus-visible:border-primary/50 focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 />
-                <div className="text-center mt-4">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={onFlip}
-                    className="gap-2 shadow-sm hover:shadow transition-all duration-200"
-                  >
-                    <Eye className="h-4 w-4" />
-                    답변 확인
-                  </Button>
-                </div>
               </div>
             ) : (
               <motion.div
@@ -146,24 +154,30 @@ export function StudyCardView({
         </motion.div>
       </AnimatePresence>
 
-      {/* Next button */}
-      {isFlipped && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-5 flex justify-center gap-2.5"
-        >
-          <Button variant="outline" size="lg" onClick={onRetry} className="gap-2 h-12 px-6 shadow-sm">
-            <RotateCcw className="h-4 w-4" />
-            다시 풀기
-          </Button>
-          <Button size="lg" onClick={onNext} className="gap-2 h-12 px-8 shadow-md">
-            다음
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </motion.div>
-      )}
+      {/* Actions — 버튼은 항상 같은 자리, 상태는 라벨·disabled로만 바뀐다 */}
+      <div className="mt-5 flex flex-wrap items-center gap-2.5">
+        <Button variant="outline" size="lg" onClick={onRetry} disabled={!isFlipped} className="gap-2 shadow-sm">
+          <RotateCcw className="h-4 w-4" />
+          다시 풀기
+        </Button>
+        <Button size="lg" onClick={isFlipped ? onNext : onFlip} className="flex-1 gap-2 shadow-md">
+          {isFlipped ? (
+            <>
+              다음
+              <ArrowRight className="h-4 w-4" />
+            </>
+          ) : (
+            <>
+              <Eye className="h-4 w-4" />
+              답변 확인
+            </>
+          )}
+        </Button>
+        <Button variant="ghost" size="lg" onClick={onSkip} className="gap-2">
+          건너뛰기
+          <SkipForward className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 }
