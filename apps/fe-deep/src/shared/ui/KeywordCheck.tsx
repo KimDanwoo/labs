@@ -1,8 +1,8 @@
 'use client';
 
+import { matchKeywords } from '@shared/lib';
 import { cn } from '@shared/lib/utils';
 import { Check, X } from 'lucide-react';
-import { matchKeywords } from '../model';
 
 interface KeywordCheckProps {
   keywords: string[];

@@ -1,10 +1,10 @@
 'use client';
 
 import { cn } from '@shared/lib/utils';
-import { Badge, Card, MarkdownRenderer } from '@shared/ui';
+import { Badge, Card, KeywordCheck, MarkdownRenderer } from '@shared/ui';
 import { Lightbulb } from 'lucide-react';
 import { STEP_KIND, type StudyStep } from '../model';
-import { KeywordCheck } from './KeywordCheck';
+import { AiFeedback } from './AiFeedback';
 
 /** 문서의 "꼬꼬무 공통 프레임" — 모범 답변이 없는 질문에서 스스로 정리할 때 쓴다. */
 const ANSWER_FRAME = ['왜?', '대안?', '왜 안 골랐나?', '단점?', '결과?', '다시 한다면?'];
@@ -78,6 +78,9 @@ export function StepCard({ step, stepIndex, stepCount, isRevealed, recall, onRec
             </div>
           )}
           {recall.trim() && step.keywords.length > 0 && <KeywordCheck keywords={step.keywords} recall={recall} />}
+          {recall.trim() && (
+            <AiFeedback key={step.id} question={step.prompt} modelAnswer={step.reveal} recall={recall} />
+          )}
           {step.reveal ? (
             <MarkdownRenderer content={step.reveal} />
           ) : (

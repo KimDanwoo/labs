@@ -1,6 +1,7 @@
 import { Card } from '@shared/ui';
 import { countSteps } from '@views/study/model/parseHandbook';
 import { getStudyDocs } from '@views/study/model/studyDocs';
+import { StudyDevReload } from '@views/study/ui';
 import { BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
@@ -11,6 +12,7 @@ export default async function AdminStudyListPage() {
 
   return (
     <div className="container mx-auto max-w-7xl space-y-6 px-4 py-8 sm:py-12">
+      <StudyDevReload />
       <div>
         <h1 className="text-2xl font-bold">면접 학습</h1>
         <p className="mt-1 text-sm text-muted-foreground">

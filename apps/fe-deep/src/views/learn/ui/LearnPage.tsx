@@ -44,6 +44,9 @@ export function LearnPage() {
   const {
     currentIndex,
     currentQuestion,
+    currentFollowUp,
+    stepIndex,
+    stepCount,
     isFlipped,
     setIsFlipped,
     recallInput,
@@ -239,6 +242,9 @@ export function LearnPage() {
       currentIndex={currentIndex}
       totalCount={questions.length}
       currentQuestion={currentQuestion}
+      currentFollowUp={currentFollowUp}
+      stepIndex={stepIndex}
+      stepCount={stepCount}
       isFlipped={isFlipped}
       onFlip={() => setIsFlipped(true)}
       progressPercent={progressPercent}

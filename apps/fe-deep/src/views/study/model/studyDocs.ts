@@ -1,4 +1,4 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { parseStudyDoc, type StudyDoc } from './parseHandbook';
 
@@ -28,6 +28,19 @@ export async function getStudyDoc(slug: string): Promise<StudyDoc | null> {
     return parseStudyDoc(slug, raw);
   } catch {
     return null;
+  }
+}
+
+/** 학습 문서들의 최신 수정 시각. dev에서 md 저장을 감지해 화면을 갱신하는 데 쓴다. */
+export async function getStudyContentStamp(): Promise<number> {
+  try {
+    const files = await readdir(CONTENT_DIR);
+    const stats = await Promise.all(
+      files.filter((file) => file.endsWith(MD_EXTENSION)).map((file) => stat(path.join(CONTENT_DIR, file))),
+    );
+    return Math.max(0, ...stats.map((fileStat) => fileStat.mtimeMs));
+  } catch {
+    return 0;
   }
 }
 
