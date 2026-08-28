@@ -107,9 +107,10 @@ function matchHeading(line: string): Pick<Block, 'level' | 'heading'> | null {
   return { level: hashes.length, heading };
 }
 
-/** 문서에서 처음으로 번호가 붙은 제목의 레벨이 주제 레벨이다. */
+/** 처음으로 번호가 붙은 제목의 레벨이 주제 레벨이다. 번호 제목이 없으면 문서 첫 제목의 레벨을 따른다. */
 function findTopicLevel(markdown: string): number {
   let isInFence = false;
+  let firstHeadingLevel: number | null = null;
 
   for (const line of markdown.split('\n')) {
     if (FENCE_PATTERN.test(line)) {
@@ -119,10 +120,12 @@ function findTopicLevel(markdown: string): number {
     if (isInFence) continue;
 
     const heading = matchHeading(line);
-    if (heading && TOPIC_NUMBER_PATTERN.test(heading.heading)) return heading.level;
+    if (!heading) continue;
+    if (TOPIC_NUMBER_PATTERN.test(heading.heading)) return heading.level;
+    firstHeadingLevel ??= heading.level;
   }
 
-  return DEFAULT_TOPIC_LEVEL;
+  return firstHeadingLevel ?? DEFAULT_TOPIC_LEVEL;
 }
 
 const ANSWER_HEADINGS = ['설명', '개념', '첫문장'];
