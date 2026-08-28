@@ -39,104 +39,92 @@ export function StudyRunner({ docTitle, topics, understood, onToggleUnderstood }
   );
 
   return (
-    <div className="flex gap-8">
-      <aside className="hidden w-64 shrink-0 lg:block">
-        <div className="sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto rounded-xl border border-border/60 shadow-sm">
-          {toc}
-        </div>
-      </aside>
-
-      <div className="min-w-0 flex-1">
-        <div className="mb-3 flex items-center gap-2">
-          <Sheet>
-            <SheetTrigger asChild className="lg:hidden">
-              <Button variant="outline" size="icon" aria-label="주제 목차 열기" className="shrink-0">
-                <List className="size-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 overflow-y-auto p-0">
-              <SheetTitle className="sr-only">주제 목차</SheetTitle>
-              <div className="pt-8">{toc}</div>
-            </SheetContent>
-          </Sheet>
-
-          <div className="min-w-0">
-            <Link href="/study" className="text-xs text-muted-foreground hover:text-foreground">
-              {docTitle}
-            </Link>
-            <p className="truncate text-sm font-medium">
-              <span className="tabular-nums text-muted-foreground">
-                {run.topicIndex + 1}/{topics.length}
-              </span>{' '}
-              {run.topic.title}
-            </p>
-          </div>
-
-          <span className="ml-auto shrink-0 text-xs tabular-nums text-muted-foreground">
-            {run.doneSteps}/{run.totalSteps}
-          </span>
-        </div>
-
-        <Progress value={run.progressPercent} className="mb-6 h-1.5" />
-
-        <StepCard
-          step={run.step}
-          stepIndex={run.stepIndex}
-          stepCount={run.stepCount}
-          isRevealed={run.isRevealed}
-          recall={run.recall}
-          onRecallChange={run.setRecall}
-          onReveal={run.reveal}
-        />
-
-        <div className="mt-5 flex flex-wrap items-center gap-2">
-          <Button variant="ghost" size="lg" onClick={run.goPrev} disabled={run.isFirstStep} className="gap-1">
-            <ChevronLeft className="size-4" />
-            이전
-          </Button>
-          {run.isRevealed && (
-            <Button variant="outline" size="lg" onClick={run.retryStep} className="gap-1.5">
-              <RotateCcw className="size-4" />
-              다시 풀기
+    <div className="min-w-0">
+      <div className="mb-3 flex items-center gap-2">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="icon" aria-label="주제 목차 열기" className="shrink-0">
+              <List className="size-4" />
             </Button>
-          )}
-          <Button size="lg" onClick={run.goNext} disabled={run.isFinished} className="flex-1 gap-1">
-            {getNextLabel(run.isRevealed, run.isLastStep, run.isLastTopic)}
-            <ChevronRight className="size-4" />
-          </Button>
-          {!run.isLastTopic && (
-            <Button variant="ghost" size="lg" onClick={run.goNextTopic} className="gap-1">
-              다음 주제
-              <SkipForward className="size-4" />
-            </Button>
-          )}
-          <Button
-            variant={isUnderstood ? 'secondary' : 'outline'}
-            size="lg"
-            onClick={() => onToggleUnderstood(currentTopic.title)}
-            aria-pressed={isUnderstood}
-            className="gap-1.5"
-          >
-            <CheckCircle2 className={isUnderstood ? 'size-4 text-primary' : 'size-4'} />
-            이해됨
-          </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-72 overflow-y-auto p-0">
+            <SheetTitle className="sr-only">주제 목차</SheetTitle>
+            <div className="pt-8">{toc}</div>
+          </SheetContent>
+        </Sheet>
+
+        <div className="min-w-0">
+          <Link href="/study" className="text-xs text-muted-foreground hover:text-foreground">
+            {docTitle}
+          </Link>
+          <p className="truncate text-sm font-medium">
+            <span className="tabular-nums text-muted-foreground">
+              {run.topicIndex + 1}/{topics.length}
+            </span>{' '}
+            {run.topic.title}
+          </p>
         </div>
 
-        {run.topic.notes && (
-          <details className="mt-6 rounded-xl border border-border/60">
-            <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground">
-              참고 자료 — {run.topic.title}
-            </summary>
-            <div className="border-t border-border/60 px-4 py-4">
-              <MarkdownRenderer content={run.topic.notes} />
-            </div>
-          </details>
-        )}
-
-        <p className="mt-4 hidden text-xs text-muted-foreground/70 lg:block">
-          Space 또는 → 다음 · ← 이전 · ⌘/Ctrl + Enter 답 확인
-        </p>
+        <span className="ml-auto shrink-0 text-xs tabular-nums text-muted-foreground">
+          {run.doneSteps}/{run.totalSteps}
+        </span>
       </div>
+
+      <Progress value={run.progressPercent} className="mb-6 h-1.5" />
+
+      <StepCard
+        step={run.step}
+        stepIndex={run.stepIndex}
+        stepCount={run.stepCount}
+        isRevealed={run.isRevealed}
+        recall={run.recall}
+        onRecallChange={run.setRecall}
+        onReveal={run.reveal}
+      />
+
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        <Button variant="ghost" size="lg" onClick={run.goPrev} disabled={run.isFirstStep} className="gap-1">
+          <ChevronLeft className="size-4" />
+          이전
+        </Button>
+        <Button variant="outline" size="lg" onClick={run.retryStep} disabled={!run.isRevealed} className="gap-1.5">
+          <RotateCcw className="size-4" />
+          다시 풀기
+        </Button>
+        <Button size="lg" onClick={run.goNext} disabled={run.isFinished} className="flex-1 gap-1">
+          {getNextLabel(run.isRevealed, run.isLastStep, run.isLastTopic)}
+          <ChevronRight className="size-4" />
+        </Button>
+        <Button variant="ghost" size="lg" onClick={run.goNextTopic} disabled={run.isLastTopic} className="gap-1">
+          건너뛰기
+          <SkipForward className="size-4" />
+        </Button>
+        <Button
+          variant={isUnderstood ? 'secondary' : 'outline'}
+          size="lg"
+          onClick={() => onToggleUnderstood(currentTopic.title)}
+          aria-pressed={isUnderstood}
+          className="gap-1.5"
+        >
+          <CheckCircle2 className={isUnderstood ? 'size-4 text-primary' : 'size-4'} />
+          이해됨
+        </Button>
+      </div>
+
+      {run.topic.notes && (
+        <details className="mt-6 rounded-xl border border-border/60">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground">
+            참고 자료 — {run.topic.title}
+          </summary>
+          <div className="border-t border-border/60 px-4 py-4">
+            <MarkdownRenderer content={run.topic.notes} />
+          </div>
+        </details>
+      )}
+
+      <p className="mt-4 hidden text-xs text-muted-foreground/70 lg:block">
+        Space 또는 → 다음 · ← 이전 · ⌘/Ctrl + Enter 답 확인
+      </p>
     </div>
   );
 }

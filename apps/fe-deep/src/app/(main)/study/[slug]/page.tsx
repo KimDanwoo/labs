@@ -26,7 +26,7 @@ export default async function StudyDocPage({ params }: StudyDocPageProps) {
   if (!doc) notFound();
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-10">
+    <div className="container mx-auto max-w-168 px-4 py-6 sm:py-10">
       <Suspense>
         <StudyRunView doc={doc} />
       </Suspense>
