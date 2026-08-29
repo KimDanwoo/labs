@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@shared/lib/utils';
-import { Badge, Card, KeywordCheck, MarkdownRenderer } from '@shared/ui';
+import { Badge, Card, KeywordCheck, MarkdownRenderer, SpeakButton } from '@shared/ui';
 import { Lightbulb } from 'lucide-react';
 import { STEP_KIND, type StudyStep } from '../model';
 import { AiFeedback } from './AiFeedback';
@@ -82,7 +82,12 @@ export function StepCard({ step, stepIndex, stepCount, isRevealed, recall, onRec
             <AiFeedback key={step.id} question={step.prompt} modelAnswer={step.reveal} recall={recall} />
           )}
           {step.reveal ? (
-            <MarkdownRenderer content={step.reveal} />
+            <div>
+              <div className="mb-2 flex justify-end">
+                <SpeakButton text={step.reveal} />
+              </div>
+              <MarkdownRenderer content={step.reveal} />
+            </div>
           ) : (
             <div className="flex items-start gap-2.5 rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
               <Lightbulb className="mt-0.5 size-4 shrink-0" />

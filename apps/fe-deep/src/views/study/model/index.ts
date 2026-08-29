@@ -19,7 +19,10 @@ export {
   serializeStudyTiers,
   type StudyFilter,
   type StudyTier,
+  type TopicMarks,
 } from './studyFilter';
 export { useAiFeedback, type AiFeedbackInput } from './useAiFeedback';
+export { useReviewTopics } from './useReviewTopics';
 export { useStudyRun } from './useStudyRun';
+export { useTopicMarks } from './useTopicMarks';
 export { useUnderstoodTopics } from './useUnderstoodTopics';

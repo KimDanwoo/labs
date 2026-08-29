@@ -5,6 +5,7 @@ export const STUDY_FILTER = {
   all: 'all',
   todo: 'todo',
   done: 'done',
+  review: 'review',
 } as const;
 
 export type StudyFilter = (typeof STUDY_FILTER)[keyof typeof STUDY_FILTER];
@@ -60,7 +61,7 @@ const TIER_TITLES: Record<Exclude<StudyTier, 'c'>, readonly string[]> = {
 const TIER_SEPARATOR = ',';
 
 export function parseStudyFilter(raw: string | null): StudyFilter {
-  if (raw === STUDY_FILTER.todo || raw === STUDY_FILTER.done) return raw;
+  if (raw === STUDY_FILTER.todo || raw === STUDY_FILTER.done || raw === STUDY_FILTER.review) return raw;
   return STUDY_FILTER.all;
 }
 
@@ -98,15 +99,21 @@ function warnMissingTierTitles(topics: StudyTopic[]): void {
   if (missing.length > 0) console.warn('[study] 티어 제목이 핸드북과 일치하지 않습니다:', missing);
 }
 
+export interface TopicMarks {
+  understood: Set<string>;
+  review: Set<string>;
+}
+
 export function filterTopics(
   topics: StudyTopic[],
   tiers: Set<StudyTier>,
   filter: StudyFilter,
-  understood: Set<string>,
+  marks: TopicMarks,
 ): StudyTopic[] {
   warnMissingTierTitles(topics);
   const byTier = tiers.size === 0 ? topics : topics.filter((topic) => tiers.has(getTopicTier(topic)));
-  if (filter === STUDY_FILTER.done) return byTier.filter((topic) => understood.has(topic.title));
-  if (filter === STUDY_FILTER.todo) return byTier.filter((topic) => !understood.has(topic.title));
+  if (filter === STUDY_FILTER.done) return byTier.filter((topic) => marks.understood.has(topic.title));
+  if (filter === STUDY_FILTER.todo) return byTier.filter((topic) => !marks.understood.has(topic.title));
+  if (filter === STUDY_FILTER.review) return byTier.filter((topic) => marks.review.has(topic.title));
   return byTier;
 }

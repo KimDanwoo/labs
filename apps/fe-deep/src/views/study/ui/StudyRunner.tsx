@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, MarkdownRenderer, Progress, Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui';
-import { CheckCircle2, ChevronLeft, ChevronRight, List, RotateCcw, SkipForward } from 'lucide-react';
+import { BookmarkPlus, CheckCircle2, ChevronLeft, ChevronRight, List, RotateCcw, SkipForward } from 'lucide-react';
 import Link from 'next/link';
 import { useStudyRun, type StudyTopic } from '../model';
 import { StepCard } from './StepCard';
@@ -11,7 +11,9 @@ interface StudyRunnerProps {
   docTitle: string;
   topics: StudyTopic[];
   understood: Set<string>;
+  review: Set<string>;
   onToggleUnderstood: (topicTitle: string) => void;
+  onToggleReview: (topicTitle: string) => void;
 }
 
 function getNextLabel(isRevealed: boolean, isLastStep: boolean, isLastTopic: boolean): string {
@@ -21,7 +23,14 @@ function getNextLabel(isRevealed: boolean, isLastStep: boolean, isLastTopic: boo
   return '마지막';
 }
 
-export function StudyRunner({ docTitle, topics, understood, onToggleUnderstood }: StudyRunnerProps) {
+export function StudyRunner({
+  docTitle,
+  topics,
+  understood,
+  review,
+  onToggleUnderstood,
+  onToggleReview,
+}: StudyRunnerProps) {
   const run = useStudyRun(topics);
 
   if (!run.topic || !run.step) {
@@ -34,8 +43,15 @@ export function StudyRunner({ docTitle, topics, understood, onToggleUnderstood }
 
   const currentTopic = run.topic;
   const isUnderstood = understood.has(currentTopic.title);
+  const isInReview = review.has(currentTopic.title);
   const toc = (
-    <TopicToc topics={topics} activeIndex={run.topicIndex} understood={understood} onSelect={run.jumpToTopic} />
+    <TopicToc
+      topics={topics}
+      activeIndex={run.topicIndex}
+      understood={understood}
+      review={review}
+      onSelect={run.jumpToTopic}
+    />
   );
 
   return (
@@ -108,6 +124,16 @@ export function StudyRunner({ docTitle, topics, understood, onToggleUnderstood }
         >
           <CheckCircle2 className={isUnderstood ? 'size-4 text-primary' : 'size-4'} />
           이해됨
+        </Button>
+        <Button
+          variant={isInReview ? 'secondary' : 'outline'}
+          size="lg"
+          onClick={() => onToggleReview(currentTopic.title)}
+          aria-pressed={isInReview}
+          className="gap-1.5"
+        >
+          <BookmarkPlus className={isInReview ? 'size-4 text-warning' : 'size-4'} />
+          오답노트
         </Button>
       </div>
 
