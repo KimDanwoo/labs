@@ -4,4 +4,5 @@ export const STORAGE_KEYS = {
   DAILY_PREFIX: 'fe-daily-',
   STUDY_UNDERSTOOD: 'fe-study-understood',
   STUDY_REVIEW: 'fe-study-review',
+  SPEECH_VOICE: 'fe-speech-voice',
 } as const;

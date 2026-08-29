@@ -1,7 +1,17 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage, Button, Card, Sheet, SheetContent, SheetTitle } from '@shared/ui';
-import { Mail, User } from 'lucide-react';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Card,
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  VoiceSetting,
+} from '@shared/ui';
+import { Mail, User, Volume2 } from 'lucide-react';
 import { useAccount } from '../model';
 
 export function AccountPage() {
@@ -33,6 +43,19 @@ export function AccountPage() {
               <p className="text-xs text-muted-foreground">Google 계정으로 로그인 중</p>
             </div>
           </div>
+        </Card.Content>
+      </Card>
+
+      <Card className="shadow-sm mb-8">
+        <Card.Content className="p-6">
+          <div className="mb-1 flex items-center gap-2">
+            <Volume2 className="h-4 w-4 text-muted-foreground" />
+            <h2 className="font-medium">답변 읽어주기 음성</h2>
+          </div>
+          <p className="mb-4 text-sm text-muted-foreground">
+            학습·레퍼런스 화면에서 답변을 읽어줄 목소리입니다. 이 브라우저에만 저장됩니다.
+          </p>
+          <VoiceSetting />
         </Card.Content>
       </Card>
 
