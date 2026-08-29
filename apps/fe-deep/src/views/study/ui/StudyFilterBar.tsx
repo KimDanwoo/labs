@@ -7,9 +7,10 @@ const FILTER_LABELS: Record<StudyFilter, string> = {
   [STUDY_FILTER.all]: '전체',
   [STUDY_FILTER.todo]: '이해 안 됨',
   [STUDY_FILTER.done]: '이해됨',
+  [STUDY_FILTER.review]: '오답노트',
 };
 
-const FILTER_ORDER: StudyFilter[] = [STUDY_FILTER.all, STUDY_FILTER.todo, STUDY_FILTER.done];
+const FILTER_ORDER: StudyFilter[] = [STUDY_FILTER.all, STUDY_FILTER.todo, STUDY_FILTER.done, STUDY_FILTER.review];
 
 const TIER_LABELS: Record<StudyTier, string> = {
   [STUDY_TIER.a]: 'A',
