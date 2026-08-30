@@ -17,7 +17,7 @@
     "clsx": "catalog:",
     "firebase": "catalog:fb11",
     "jotai": "catalog:",
-    "next": "16.3.3",
+    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-icons": "catalog:",

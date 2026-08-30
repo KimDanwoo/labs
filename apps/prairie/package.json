@@ -13,7 +13,7 @@
     "@react-three/drei": "catalog:",
     "@react-three/fiber": "catalog:",
     "@tokens/css": "workspace:*",
-    "next": "16.3.3",
+    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "three": "catalog:"

@@ -11,7 +11,7 @@
   "devDependencies": {
     "@typescript-eslint/parser": "catalog:",
     "eslint": "catalog:",
-    "eslint-config-next": "16.3.3",
+    "eslint-config-next": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-import-resolver-typescript": "catalog:",
     "eslint-plugin-boundaries": "catalog:",
