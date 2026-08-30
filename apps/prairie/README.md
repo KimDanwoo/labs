@@ -26,14 +26,14 @@ React Three Fiber 기반의 실시간 3D 씬. 러너 캐릭터가 무한 초원�
 
 ## 기술 스택
 
-| 분류 | 라이브러리 |
-| --- | --- |
-| 렌더링 | three.js, `@react-three/fiber` |
-| 3D 유틸 | `@react-three/drei` (useGLTF, useAnimations, Sky) |
-| 프레임워크 | Next.js (App Router) |
-| 상태 | Jotai (`rideStore` — 씬 준비 상태) |
-| 스타일 | Tailwind CSS 4, `@tokens/css` |
-| 언어 | TypeScript 5 |
+| 분류       | 라이브러리                                        |
+| ---------- | ------------------------------------------------- |
+| 렌더링     | three.js, `@react-three/fiber`                    |
+| 3D 유틸    | `@react-three/drei` (useGLTF, useAnimations, Sky) |
+| 프레임워크 | Next.js (App Router)                              |
+| 상태       | Jotai (`rideStore` — 씬 준비 상태)                |
+| 스타일     | Tailwind CSS 4, `@tokens/css`                     |
+| 언어       | TypeScript 5                                      |
 
 ---
 

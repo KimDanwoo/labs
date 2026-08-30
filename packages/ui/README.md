@@ -6,19 +6,19 @@
 
 ```ts
 import { Button, Badge, ThemeToggle } from '@ui/react';
-import * as Card from '@ui/react/card';   // Compound API
-import { Card } from '@ui/react/flat';    // Flat API (단순 사용)
+import * as Card from '@ui/react/card'; // Compound API
+import { Card } from '@ui/react/flat'; // Flat API (단순 사용)
 ```
 
 ## export 목록
 
-| 이름 | 설명 |
-| --- | --- |
-| `Button` | 주요 액션 버튼. `ButtonVariant` 타입 포함 |
-| `Badge` | 상태·분류 레이블. `BadgeTone` 타입 포함 |
-| `ThemeToggle` | 라이트/다크 테마 전환 버튼 |
+| 이름               | 설명                                                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `Button`           | 주요 액션 버튼. `ButtonVariant` 타입 포함                                                                           |
+| `Badge`            | 상태·분류 레이블. `BadgeTone` 타입 포함                                                                             |
+| `ThemeToggle`      | 라이트/다크 테마 전환 버튼                                                                                          |
 | `Card` (namespace) | Compound API — `<Card.Root>`, `<Card.Header>`, `<Card.Body>`, `<Card.Footer>`, `<Card.Title>`, `<Card.Description>` |
-| `Card` (flat) | Flat API — `import { Card } from '@ui/react/flat'` |
+| `Card` (flat)      | Flat API — `import { Card } from '@ui/react/flat'`                                                                  |
 
 ## 원칙
 

@@ -1,0 +1,9 @@
+# 자동 생성 콘텐츠 — 생성기(scripts/fetch_*.py)가 frontmatter를 큰따옴표로 쓴다.
+# Prettier가 작은따옴표로 바꾸면 다음 크론 실행 때 되돌아가며 매번 충돌한다.
+apps/dansoon/contents/
+
+# 빌드 산출물
+**/.next/
+**/dist/
+**/generated/
+pnpm-lock.yaml

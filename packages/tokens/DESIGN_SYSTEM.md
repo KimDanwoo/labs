@@ -7,7 +7,7 @@
 
 - **하나의 잘 만든 시스템을 돌려쓴다.** 소스 오브 트루스는 `packages/tokens`(→ `@tokens/css`).
 - **"베이스 + 스킨"으로 클론화 방지.** 과거 실패("앱이 다 hub 같고 AI스럽다")를 구조로 차단한다.
-  - **베이스(공유)**: 구조·중립 스케일·상태색·시맨틱 토큰 *이름 계약*·`@ui/react` 컴포넌트. 기본 브랜드 = 코발트.
+  - **베이스(공유)**: 구조·중립 스케일·상태색·시맨틱 토큰 _이름 계약_·`@ui/react` 컴포넌트. 기본 브랜드 = 코발트.
   - **스킨(앱별, 최소)**: ① 브랜드 **hue 1개** ② **디스플레이 폰트** ③ (선택) 밀도. 이 이상은 오버라이드하지 않는다.
 - **절제된 모던 유지**: 그라데이션·큰 글로우·grain·shimmer 지양. 강조는 단색 브랜드 1곳.
 
@@ -34,9 +34,9 @@ oklch(L C H) 스케일       --color-primary 등          --brand-hue / --font-d
 ```css
 /* theme.css (생성물) — 개념 예시 */
 :root {
-  --brand-hue: 265;               /* 코발트 기본값 */
-  --brand-600: oklch(0.47 0.22 var(--brand-hue));   /* primary(light) 앵커 */
-  --brand-400: oklch(0.66 0.18 var(--brand-hue));   /* primary(dark) */
+  --brand-hue: 265; /* 코발트 기본값 */
+  --brand-600: oklch(0.47 0.22 var(--brand-hue)); /* primary(light) 앵커 */
+  --brand-400: oklch(0.66 0.18 var(--brand-hue)); /* primary(dark) */
   /* …50–900 램프 전부 hue만 변수 참조 */
 }
 ```
@@ -47,7 +47,7 @@ oklch(L C H) 스케일       --color-primary 등          --brand-hue / --font-d
 /* apps/<app>/src/app/globals.css */
 @import '@tokens/css/theme.css';
 :root {
-  --brand-hue: 150;               /* 예: 이 앱은 그린 계열 */
+  --brand-hue: 150; /* 예: 이 앱은 그린 계열 */
   --font-display: var(--font-space-grotesk);
 }
 ```
@@ -60,24 +60,26 @@ oklch(L C H) 스케일       --color-primary 등          --brand-hue / --font-d
 현재 공유 토큰 + 프딥 계약을 병합한 **상위집합**. 이름은 고정, 값은 primitives 참조.
 
 ### Core (모든 앱 필수)
-| 그룹 | 토큰 |
-|---|---|
-| Surface | `background` `foreground` `card` `card-foreground` `card-border` `popover` `popover-foreground` `muted` `muted-foreground` |
-| Brand | `primary` `primary-foreground` `primary-subtle` `primary-accent` |
-| Accent 표면 | `accent` `accent-foreground` (= 브랜드 연한 틴트 표면; 프딥 호환) |
-| Secondary | `secondary` `secondary-foreground` `secondary-subtle` |
-| Form/Line | `border` `input` `ring` |
-| Status | `success` `error`(=destructive) `warning` `info` + 각 `-foreground` `-subtle` |
-| Effect | `glass` `glass-border` `glow` `glow-strong` |
+
+| 그룹        | 토큰                                                                                                                       |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Surface     | `background` `foreground` `card` `card-foreground` `card-border` `popover` `popover-foreground` `muted` `muted-foreground` |
+| Brand       | `primary` `primary-foreground` `primary-subtle` `primary-accent`                                                           |
+| Accent 표면 | `accent` `accent-foreground` (= 브랜드 연한 틴트 표면; 프딥 호환)                                                          |
+| Secondary   | `secondary` `secondary-foreground` `secondary-subtle`                                                                      |
+| Form/Line   | `border` `input` `ring`                                                                                                    |
+| Status      | `success` `error`(=destructive) `warning` `info` + 각 `-foreground` `-subtle`                                              |
+| Effect      | `glass` `glass-border` `glow` `glow-strong`                                                                                |
 
 > **이름 규칙 = shadcn 표준.** `muted`·`secondary`는 **연한 표면**, 그 위 텍스트는 `-foreground`. (`text-muted`처럼 muted를 텍스트로 쓰던 앱은 `text-muted-foreground`로 이관 완료.) 프딥의 `destructive`는 CSS에서 `error`로 매핑(variant API 이름 `destructive`는 관례상 유지), `accent`는 브랜드 subtle 표면으로 정렬.
 
 ### Opt-in (성격 맞는 앱만)
-| 그룹 | 토큰 | 대상 |
-|---|---|---|
-| Charts | `chart-1`…`chart-5` (고유 hue) | 데이터 시각화(프딥) |
-| Sidebar | `sidebar-*` | 관리자/대시보드(프딥 admin) |
-| Reading | 본문 17px·프로즈 measure 스케일 | 장문 콘텐츠(프딥) |
+
+| 그룹    | 토큰                            | 대상                        |
+| ------- | ------------------------------- | --------------------------- |
+| Charts  | `chart-1`…`chart-5` (고유 hue)  | 데이터 시각화(프딥)         |
+| Sidebar | `sidebar-*`                     | 관리자/대시보드(프딥 admin) |
+| Reading | 본문 17px·프로즈 measure 스케일 | 장문 콘텐츠(프딥)           |
 
 - 게임·3D 앱(plco·prairie)은 opt-in 미사용. 베이스는 이들에게 짐이 되지 않는다.
 
@@ -88,12 +90,12 @@ oklch(L C H) 스케일       --color-primary 등          --brand-hue / --font-d
 
 ## 7. 스킨 계약 (앱이 오버라이드하는 것 — 이게 전부)
 
-| 변수 | 의미 | 기본값 |
-|---|---|---|
-| `--brand-hue` | 브랜드 램프 hue 회전 | `265`(코발트) |
-| `--brand-chroma` | 브랜드 램프 채도 배율(낮추면 톤이 가라앉음) | `1` |
-| `--font-display` | 제목용 디스플레이 폰트 | `var(--font-sans)` |
-| `--density`(선택) | 여백 배율 | `1` |
+| 변수              | 의미                                        | 기본값             |
+| ----------------- | ------------------------------------------- | ------------------ |
+| `--brand-hue`     | 브랜드 램프 hue 회전                        | `265`(코발트)      |
+| `--brand-chroma`  | 브랜드 램프 채도 배율(낮추면 톤이 가라앉음) | `1`                |
+| `--font-display`  | 제목용 디스플레이 폰트                      | `var(--font-sans)` |
+| `--density`(선택) | 여백 배율                                   | `1`                |
 
 - 예) fe-deep(읽기 앱)은 `--brand-chroma: 0.6`으로 코발트를 차분하게. hue는 공유값 유지 = 색 통일.
 
@@ -108,12 +110,12 @@ oklch(L C H) 스케일       --color-primary 등          --brand-hue / --font-d
 
 ## 9. 마이그레이션 단계
 
-| 단계 | 내용 | 리스크 |
-|---|---|---|
-| **P0** | 이 스펙 확정 | — |
-| **P1** | `packages/tokens` OKLCH 재작성 + hue seam. **시맨틱 이름 하위호환 유지**(hub/gymlog/prairie 안 깨지게). `apps/design` 카탈로그로 검증 | 중 — 값 변화, 이름 유지로 완화 |
-| **P2** | hub/gymlog/prairie에 스킨(hue+디스플레이 폰트) 부여 | 저 |
-| **P3** | ✅ 이름 규칙 shadcn 통일 + fe-deep 이관(charts/sidebar/reading opt-in 유지, 코발트 hue·채도 0.6). cheongyeon-saju는 테마 one-off로 제외. 전 앱 build 통과 | 중 — 시각 QA 권장 |
+| 단계   | 내용                                                                                                                                                      | 리스크                         |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| **P0** | 이 스펙 확정                                                                                                                                              | —                              |
+| **P1** | `packages/tokens` OKLCH 재작성 + hue seam. **시맨틱 이름 하위호환 유지**(hub/gymlog/prairie 안 깨지게). `apps/design` 카탈로그로 검증                     | 중 — 값 변화, 이름 유지로 완화 |
+| **P2** | hub/gymlog/prairie에 스킨(hue+디스플레이 폰트) 부여                                                                                                       | 저                             |
+| **P3** | ✅ 이름 규칙 shadcn 통일 + fe-deep 이관(charts/sidebar/reading opt-in 유지, 코발트 hue·채도 0.6). cheongyeon-saju는 테마 one-off로 제외. 전 앱 build 통과 | 중 — 시각 QA 권장              |
 
 - 각 단계 후 `pnpm --filter <app> build`로 검증. 실제 적용은 사용자 확인 후 진행.
 

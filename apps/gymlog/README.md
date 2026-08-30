@@ -17,15 +17,15 @@
 
 ## 기술 스택
 
-| 영역 | 선택 |
-|---|---|
-| 프레임워크 | Next.js (App Router) + React 19 |
-| 언어 | TypeScript 5 |
-| 스타일 | Tailwind CSS 4 |
-| 상태관리 | Jotai + localStorage (로컬 우선) |
-| 백엔드 | Firebase (Auth + Firestore + Cloud Messaging) |
-| 드래그 앤 드롭 | @dnd-kit |
-| 공용 패키지 | `@ui/react`, `@tokens/css` |
+| 영역           | 선택                                          |
+| -------------- | --------------------------------------------- |
+| 프레임워크     | Next.js (App Router) + React 19               |
+| 언어           | TypeScript 5                                  |
+| 스타일         | Tailwind CSS 4                                |
+| 상태관리       | Jotai + localStorage (로컬 우선)              |
+| 백엔드         | Firebase (Auth + Firestore + Cloud Messaging) |
+| 드래그 앤 드롭 | @dnd-kit                                      |
+| 공용 패키지    | `@ui/react`, `@tokens/css`                    |
 
 ## 구조
 
