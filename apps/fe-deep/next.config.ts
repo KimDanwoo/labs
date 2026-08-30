@@ -16,6 +16,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  transpilePackages: ['@ui/react', '@tokens/css'],
+
   async headers() {
     return [
       {
