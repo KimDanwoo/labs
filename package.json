@@ -10,6 +10,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
+    "test": "turbo run test",
     "tokens": "turbo run tokens",
     "new-app": "node scripts/new-app.mjs",
     "typecheck": "turbo run typecheck",
@@ -20,7 +21,7 @@
     "@repo/prettier-config": "workspace:*",
     "prettier": "catalog:",
     "tsx": "catalog:",
-    "turbo": "^2.5.8",
+    "turbo": "^2.10.12",
     "typescript": "catalog:"
   },
   "pnpm": {

@@ -7,17 +7,19 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "seed:content": "tsx scripts/seed-content.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-query": "catalog:",
     "jotai": "catalog:",
-    "next": "catalog:",
+    "next": "16.3.3",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@config/tsconfig": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
     "@tailwindcss/postcss": "catalog:",
