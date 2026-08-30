@@ -1,9 +1,9 @@
 'use client';
 
 import { firebaseUserAtom } from '@entities/user/model/store';
+import { useDataPersistence, useSharedRoutines } from '@features/cloud-sync/model/hooks';
 import { useAtomValue } from 'jotai';
 import type { ReactNode } from 'react';
-import { useDataPersistence, useSharedRoutines } from '../model/hooks';
 
 type DataBoundaryProps = {
   children: ReactNode;

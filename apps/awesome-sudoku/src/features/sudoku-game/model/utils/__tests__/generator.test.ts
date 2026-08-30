@@ -1,7 +1,7 @@
 import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@entities/board/model/constants';
-import { Grid, GridPosition, SudokuBoard } from '@entities/board/model/types';
+import type { Grid, GridPosition, SudokuBoard } from '@entities/board/model/types';
 import { KILLER_DIFFICULTY_RANGES } from '@entities/game/model/constants';
-import { Difficulty } from '@entities/game/model/types';
+import type { Difficulty } from '@entities/game/model/types';
 import {
   generateBoard,
   generateKillerBoard,

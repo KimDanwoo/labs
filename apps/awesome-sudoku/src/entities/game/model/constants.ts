@@ -1,4 +1,4 @@
-import { Difficulty, DifficultyRange } from '@entities/game/model/types';
+import type { Difficulty, DifficultyRange } from '@entities/game/model/types';
 
 export const HINTS_REMAINING = 3;
 
@@ -46,20 +46,6 @@ export const KILLER_DIFFICULTY_RANGES = {
     maxCageSize: 4,
   },
 };
-
-export const DIFFICULTY_DESCRIPTIONS = {
-  [GAME_LEVEL.EASY]: '초보자용 - 많은 힌트와 작은 케이지',
-  [GAME_LEVEL.MEDIUM]: '중급자용 - 적당한 힌트와 보통 케이지',
-  [GAME_LEVEL.HARD]: '고급자용 - 적은 힌트와 큰 케이지',
-  [GAME_LEVEL.EXPERT]: '전문가용 - 최소 힌트와 최대 케이지',
-} as const;
-
-export const TARGET_TIMES = {
-  [GAME_LEVEL.EASY]: 600,
-  [GAME_LEVEL.MEDIUM]: 900,
-  [GAME_LEVEL.HARD]: 1200,
-  [GAME_LEVEL.EXPERT]: 1800,
-} as const;
 
 /** 최대 실수 허용 횟수 (초과 시 게임 오버) */
 export const MAX_MISTAKES = 5;

@@ -1,6 +1,6 @@
+import type { QuizQuestion } from '@features/minigame/model/types';
 import { supabase } from '@shared/lib';
 import type { CharacterId } from '@shared/types';
-import type { QuizQuestion } from '../types';
 
 type QuizRpcRow = {
   id: string;

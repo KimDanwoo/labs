@@ -1,4 +1,4 @@
-import { StardokuScoreEntry, getStardokuLeaderboard } from '@features/stardoku-game/model/services';
+import { type StardokuScoreEntry, getStardokuLeaderboard } from '@features/stardoku-game/model/services';
 import { useCallback, useEffect, useState } from 'react';
 
 interface UseStardokuLeaderboardResult {

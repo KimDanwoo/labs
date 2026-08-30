@@ -1,6 +1,6 @@
 'use client';
 
-import { StardokuScoreEntry } from '@features/stardoku-game/model/services';
+import type { StardokuScoreEntry } from '@features/stardoku-game/model/services';
 import { cn } from '@shared/model/utils';
 import Image from 'next/image';
 import { memo } from 'react';

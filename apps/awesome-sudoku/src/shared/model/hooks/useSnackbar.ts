@@ -1,4 +1,4 @@
-import { SnackbarVariant } from '@shared/ui/Snackbar';
+import type { SnackbarVariant } from '@shared/ui/Snackbar';
 import { useCallback, useState } from 'react';
 
 interface SnackbarState {

@@ -2,9 +2,9 @@
 
 import { useAuth, useGoogleConsent } from '@entities/auth/model/hooks';
 import { Disclaimer, GoogleIcon } from '@shared/ui';
+import { CHARACTER_SELECT_STEP } from '@views/character-select/model/constants';
+import { stepAtom } from '@views/character-select/model/store';
 import { useSetAtom } from 'jotai';
-import { CHARACTER_SELECT_STEP } from '../model/constants';
-import { stepAtom } from '../model/store';
 
 export default function IntroScreen() {
   const setStep = useSetAtom(stepAtom);

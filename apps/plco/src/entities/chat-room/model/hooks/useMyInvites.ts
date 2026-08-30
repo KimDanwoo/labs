@@ -1,10 +1,10 @@
 'use client';
 
+import { myInvitesQueryKey } from '@entities/chat-room/model/constants';
+import { fetchMyInvites, joinInvitesChannel } from '@entities/chat-room/model/services';
+import type { Invite } from '@entities/chat-room/model/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { myInvitesQueryKey } from '../constants';
-import { fetchMyInvites, joinInvitesChannel } from '../services';
-import type { Invite } from '../types';
 
 /**
  * 나에게 온 pending 초대 목록 (React Query).

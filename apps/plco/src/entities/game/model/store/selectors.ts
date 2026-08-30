@@ -34,7 +34,7 @@ export const meetingDayAtom = selectAtom(gameAtom, (s) => s.meetingDay);
 export const lastMinigameAtAtom = selectAtom(gameAtom, (s) => s.lastMinigameAt ?? null);
 export const levelUpMessageAtom = selectAtom(gameAtom, (s) => s.levelUpMessage);
 export const feedingMessageAtom = selectAtom(gameAtom, (s) => s.feedingMessage);
-export const unlockedCharactersAtom = selectAtom(gameAtom, (s) => s.unlockedCharacters);
+const unlockedCharactersAtom = selectAtom(gameAtom, (s) => s.unlockedCharacters);
 
 export const isPlayingAtom = atom((get) => get(statusAtom) === GAME_STATUS.PLAYING);
 

@@ -1,9 +1,9 @@
 'use client';
 
 import { Button, MarkdownRenderer, Progress, Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui';
+import { useStudyRun, type StudyTopic } from '@views/study/model';
 import { BookmarkPlus, CheckCircle2, ChevronLeft, ChevronRight, List, RotateCcw, SkipForward } from 'lucide-react';
 import Link from 'next/link';
-import { useStudyRun, type StudyTopic } from '../model';
 import { StepCard } from './StepCard';
 import { TopicToc } from './TopicToc';
 

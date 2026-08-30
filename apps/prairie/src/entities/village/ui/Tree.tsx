@@ -1,5 +1,5 @@
+import { VILLAGE_COLORS, type TreePlacement } from '@entities/village/model/constants';
 import { ToonMaterial } from '@shared/r3f';
-import { VILLAGE_COLORS, type TreePlacement } from '../model/constants';
 
 type TreeProps = TreePlacement;
 

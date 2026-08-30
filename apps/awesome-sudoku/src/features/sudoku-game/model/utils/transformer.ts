@@ -1,5 +1,5 @@
 import { BLOCK_SIZE, BOARD_SIZE } from '@entities/board/model/constants';
-import { Grid } from '@entities/board/model/types';
+import type { Grid } from '@entities/board/model/types';
 import { applyNumberMapping, createRandomNumberMapping } from './common';
 
 /**

@@ -1,4 +1,4 @@
-import type { Routine, RoutineItem } from '../types/routine';
+import type { Routine, RoutineItem } from '@entities/routine/model/types';
 
 const toItems = (exerciseIds: readonly string[]): RoutineItem[] =>
   exerciseIds.map((exerciseId, index) => ({ exerciseId, order: index + 1 }));

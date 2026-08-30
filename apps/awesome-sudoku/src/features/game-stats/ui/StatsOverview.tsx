@@ -1,7 +1,7 @@
 'use client';
 
 import { formatScore } from '@features/game-record/model/utils';
-import { GameStats } from '@features/game-stats/model/types';
+import type { GameStats } from '@features/game-stats/model/types';
 import { formatTime } from '@features/sudoku-game/model/utils';
 import { cn } from '@shared/model/utils';
 import { memo } from 'react';

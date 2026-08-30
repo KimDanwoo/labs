@@ -1,9 +1,9 @@
 'use client';
 
+import { chatQueryKey } from '@features/chat/model/constants';
+import { sendMessage } from '@features/chat/model/services';
+import type { ChatMessage } from '@features/chat/model/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { chatQueryKey } from '../constants';
-import { sendMessage } from '../services';
-import type { ChatMessage } from '../types';
 
 type SendArgs = {
   userId: string;

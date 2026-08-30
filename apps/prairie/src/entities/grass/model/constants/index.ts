@@ -16,8 +16,6 @@ export const GRASS_QUALITY = {
   mobile: { viewRadius: 2, bladesPerChunk: 1100, fadeNear: 12, fadeFar: 30 },
 } as const;
 
-export type GrassQuality = keyof typeof GRASS_QUALITY;
-
 // 셀 좌표 → 결정적 시드(재방문해도 같은 배치).
 export function chunkSeed(cellX: number, cellZ: number): number {
   return (Math.imul(cellX, 73856093) ^ Math.imul(cellZ, 19349663)) >>> 0;

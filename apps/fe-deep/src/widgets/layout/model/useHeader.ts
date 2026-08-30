@@ -1,7 +1,6 @@
 'use client';
 
-import { syncProgress } from '@entities/progress';
-import { clearUserIdCache } from '@entities/progress/services';
+import { clearUserIdCache, syncProgress } from '@entities/progress/services';
 import { createClient } from '@shared/config/supabase/client';
 import { isAdmin } from '@shared/lib/isAdmin';
 import type { User as SupabaseUser } from '@supabase/supabase-js';

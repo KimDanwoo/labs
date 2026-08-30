@@ -1,9 +1,3 @@
-import { useGLTF } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
-import { SCENE_COLORS } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { type BufferGeometry, Color, DoubleSide, type Mesh, ShaderMaterial } from 'three';
 import {
   chunkSeed,
   GRASS_FIELD,
@@ -11,7 +5,13 @@ import {
   GRASS_MODEL_URL,
   GRASS_QUALITY,
   GRASS_VERTEX_SHADER,
-} from '../model/constants';
+} from '@entities/grass/model/constants';
+import { useGLTF } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { SCENE_COLORS } from '@shared/config';
+import { useIsCoarsePointer } from '@shared/lib';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { type BufferGeometry, Color, DoubleSide, type Mesh, ShaderMaterial } from 'three';
 import { GrassChunk } from './GrassChunk';
 
 type Cell = { x: number; z: number };

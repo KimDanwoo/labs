@@ -1,5 +1,5 @@
+import { VILLAGE_COLORS, type HaystackPlacement } from '@entities/village/model/constants';
 import { ToonMaterial } from '@shared/r3f';
-import { VILLAGE_COLORS, type HaystackPlacement } from '../model/constants';
 
 type HaystackProps = HaystackPlacement;
 

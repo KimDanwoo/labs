@@ -1,7 +1,5 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
 import {
   STUDY_FILTER,
   countByTier,
@@ -16,7 +14,9 @@ import {
   type StudyFilter,
   type StudyTier,
   type TopicMarks,
-} from '../model';
+} from '@views/study/model';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import { StudyFilterBar } from './StudyFilterBar';
 import { StudyRunner } from './StudyRunner';
 

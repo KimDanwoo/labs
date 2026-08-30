@@ -6,7 +6,7 @@ export const ROUTINE_SOURCE = {
   group: 'group',
 } as const;
 
-export type RoutineSource = keyof typeof ROUTINE_SOURCE;
+type RoutineSource = keyof typeof ROUTINE_SOURCE;
 
 export type RoutineItem = {
   // exercise 엔티티의 id 문자열(FSD cross-import 금지로 ExerciseId 타입을 직접 참조하지 않는다).

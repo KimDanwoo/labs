@@ -1,5 +1,5 @@
-import { PLAYER_SCREEN, type PlayerScreen } from '../constants/playerScreen';
-import type { ArtworkSize, Track } from '../types';
+import { PLAYER_SCREEN, type PlayerScreen } from '@entities/track/model/constants';
+import type { ArtworkSize, Track } from '@entities/track/model/types';
 
 const WIDGET_API_SRC = 'https://w.soundcloud.com/player/api.js';
 
@@ -125,7 +125,7 @@ export async function fetchWaveform(url: string): Promise<Float32Array> {
  * 없으면 앱은 사클 파형 폴백으로 돈다(신호가 있는 곡만 확장 시각).
  * 대역은 Uint8을 base64로 담는다(43Hz × 3채널을 평문 배열로 두면 3배가 된다).
  */
-export type BandSignals = {
+type BandSignals = {
   fps: number;
   audioMs: number;
   low: string;
@@ -146,7 +146,7 @@ const decodeBand = (base64: string) => {
 let manifest: Promise<Set<number>> | null = null;
 
 /** 신호가 있는 곡 목록. 곡마다 404를 두드리지 않으려고 한 번만 받는다. */
-export function fetchSignalManifest(): Promise<Set<number>> {
+function fetchSignalManifest(): Promise<Set<number>> {
   manifest ??= fetch('/signals/index.json')
     .then((response) => (response.ok ? (response.json() as Promise<number[]>) : []))
     .then((ids) => new Set(ids))
@@ -170,11 +170,11 @@ export async function fetchBands(trackId: number) {
 }
 
 /** 공유 링크는 곡 id로 만든다. 제목을 고쳐도, 목록 순서가 바뀌어도 살아있다. */
-export function trackPath(track: Track): string {
+function trackPath(track: Track): string {
   return `/t/${track.id}`;
 }
 
-export const QUEUE_SEGMENT = '/queue';
+const QUEUE_SEGMENT = '/queue';
 
 /** 공유 링크가 시작 지점을 싣는 이름. 유튜브와 같게 둔다 — 손으로 고쳐 쓸 수 있어야 한다. */
 const TIME_PARAM = 't';
@@ -207,7 +207,7 @@ export function screenFromPath(pathname: string): PlayerScreen {
 const LAST_PLAYED_KEY = 'soundlab:last-played';
 
 /** 나갔다 들어왔을 때 이어 들을 자리. 곡 하나만 기억한다. */
-export type LastPlayed = { id: number; ms: number };
+type LastPlayed = { id: number; ms: number };
 
 /** 저장을 막는 환경(시크릿·저장 거부)이나 낡은 형식이면 이어 듣기만 포기한다. */
 export function readLastPlayed(): LastPlayed | null {

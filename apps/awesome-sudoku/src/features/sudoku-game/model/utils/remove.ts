@@ -1,6 +1,6 @@
 import { BOARD_SIZE, MAX_REMOVAL_ATTEMPTS } from '@entities/board/model/constants';
-import { CellPriority, Grid, RemovalStrategy, SudokuBoard } from '@entities/board/model/types';
-import { Difficulty, KillerCage } from '@entities/game/model/types';
+import type { CellPriority, Grid, RemovalStrategy, SudokuBoard } from '@entities/board/model/types';
+import type { Difficulty, KillerCage } from '@entities/game/model/types';
 import { calculateCellPriorities, calculateKillerCellPriority, calculateMustKeepCells } from './calculate';
 import { hasUniqueSolution, isKillerRemovalValid, isKillerRemovalValidLenient } from './validator';
 

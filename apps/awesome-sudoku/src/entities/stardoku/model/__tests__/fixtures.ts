@@ -1,4 +1,4 @@
-import { Rng, StardokuPuzzle } from '@entities/stardoku/model/types';
+import type { Rng, StardokuPuzzle } from '@entities/stardoku/model/types';
 
 /** 'A'~ 문자로 그린 구역 맵을 id 격자로. 테스트에서 판 모양을 눈으로 읽히게 쓰기 위한 것 */
 export const toRegions = (rows: string[]): number[][] => rows.map((row) => [...row].map((ch) => ch.charCodeAt(0) - 65));

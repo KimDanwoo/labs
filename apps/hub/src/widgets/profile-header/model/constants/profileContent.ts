@@ -1,4 +1,4 @@
-import type { ProfileParagraph } from '../types/profile';
+import type { ProfileParagraph } from '@widgets/profile-header/model/types';
 
 const RESUME_URL = 'https://docs.google.com/document/d/1_oia6H3WisAHsGNJWZAYqru9pHUXovRNAaRJcZn5UBU/edit';
 const SOUNDCLOUD_URL = 'https://soundcloud.com/danwooking';

@@ -1,4 +1,4 @@
-import type { RunnerAction } from '../constants';
+import type { RunnerAction } from '@features/runner-control/model/constants';
 
 export type RunnerInput = Record<RunnerAction, boolean>;
 

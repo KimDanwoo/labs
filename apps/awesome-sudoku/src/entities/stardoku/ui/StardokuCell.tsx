@@ -1,5 +1,5 @@
 import { CELL_MARK, STAR_ICON, X_ICON } from '@entities/stardoku/model/constants';
-import { CellMark } from '@entities/stardoku/model/types';
+import type { CellMark } from '@entities/stardoku/model/types';
 import { cn } from '@shared/model/utils';
 import { memo } from 'react';
 

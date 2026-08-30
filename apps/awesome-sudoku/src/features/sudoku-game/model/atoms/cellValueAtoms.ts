@@ -1,4 +1,5 @@
 import { HINTS_REMAINING, MAX_MISTAKES } from '@entities/game/model/constants';
+import { buildGameResultState, resolveBoardState } from '@features/sudoku-game/model/helpers';
 import {
   canFillCell,
   checkBlockConflict,
@@ -10,7 +11,6 @@ import {
   updateCellValue,
 } from '@features/sudoku-game/model/utils';
 import { atom } from 'jotai';
-import { buildGameResultState, resolveBoardState } from '../helpers/gameResult';
 import {
   boardAtom,
   cagesAtom,

@@ -1,6 +1,6 @@
 export const revalidate = 86400;
 
-import { getAllCategories } from '@entities/question';
+import { getAllCategories } from '@entities/question/api';
 import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { Button } from '@shared/ui';
 import { ArrowRight, BookOpen, GraduationCap } from 'lucide-react';

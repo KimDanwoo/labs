@@ -11,9 +11,9 @@ import {
   Input,
   MarkdownRenderer,
 } from '@shared/ui';
+import { useSearch } from '@views/search/model';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
-import { useSearch } from '../model';
 
 const MATCH_TYPE_LABEL: Record<string, string> = {
   question: '질문 일치',

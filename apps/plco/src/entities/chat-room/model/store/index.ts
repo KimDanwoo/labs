@@ -1,5 +1,5 @@
+import type { Room } from '@entities/chat-room/model/types';
 import { atom } from 'jotai';
-import type { Room } from '../types';
 
 /**
  * 현재 진입한 공유 방 씬. null이면 개인 타마고치 방.

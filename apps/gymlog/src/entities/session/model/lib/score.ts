@@ -1,4 +1,4 @@
-import type { WorkoutSession } from '../types/session';
+import type { WorkoutSession } from '@entities/session/model/types';
 import { computeProficiency } from './level';
 import { computeTotalVolume } from './stats';
 
@@ -11,7 +11,7 @@ const FULL = {
   weekly: 100_000, // 주간 볼륨(kg) — 고강도 한 주 기준
 } as const;
 
-export type RankingScore = {
+type RankingScore = {
   score: number; // 세 지표 정규화 후 평균(0~100)
   totalVolume: number;
   level: number;

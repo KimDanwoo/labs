@@ -1,9 +1,9 @@
 'use client';
 
+import { myInvitesQueryKey, myRoomsQueryKey } from '@entities/chat-room/model/constants';
+import { acceptInvite, declineInvite } from '@entities/chat-room/model/services';
+import { type Invite, INVITE_STATUS } from '@entities/chat-room/model/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { myInvitesQueryKey, myRoomsQueryKey } from '../constants';
-import { acceptInvite, declineInvite } from '../services';
-import { type Invite, INVITE_STATUS } from '../types';
 
 /** 초대 수락 or 거절. 성공 시 캐시에서 해당 초대 제거 + (수락이면) 방 목록 갱신. */
 export function useRespondInvite() {

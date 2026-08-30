@@ -9,7 +9,7 @@ import {
   logicDepthScore,
 } from '@entities/stardoku/model/constants';
 import { solveByLogic } from '@entities/stardoku/model/solver';
-import { RegionGrid, Rng, StardokuPuzzle } from '@entities/stardoku/model/types';
+import type { RegionGrid, Rng, StardokuPuzzle } from '@entities/stardoku/model/types';
 
 const atStage = <T>(table: readonly T[], stage: number): T => {
   const value = table[Math.min(Math.max(stage, 1), table.length) - 1];
@@ -40,7 +40,7 @@ const shuffle = <T>(items: T[], rng: Rng): T[] => {
 };
 
 /** 유효한 별 배치: 행별 열 순열 + 인접 행 열 차 ≥ 2 (대각 인접 배제) */
-export const generateStarPlacement = (size: number, rng: Rng): number[] | null => {
+const generateStarPlacement = (size: number, rng: Rng): number[] | null => {
   const cols: number[] = [];
   const used = new Set<number>();
 

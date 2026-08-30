@@ -3,7 +3,7 @@ import {
   DEFAULT_USER_RECORD_LIMIT,
   LEADERBOARD_RECORD_LIMIT,
 } from '@entities/game-record/model/constants';
-import { GameRecord } from '@entities/game-record/model/types';
+import type { GameRecord } from '@entities/game-record/model/types';
 import { getRecordPoint } from '@entities/game-record/model/utils';
 import { getDb } from '@shared/lib/firebase/config';
 import {

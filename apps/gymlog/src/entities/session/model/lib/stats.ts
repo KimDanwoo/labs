@@ -1,4 +1,4 @@
-import { SET_STATUS, type WorkoutSession } from '../types/session';
+import { SET_STATUS, type WorkoutSession } from '@entities/session/model/types';
 
 const isCounted = (status: WorkoutSession['performances'][number]['sets'][number]['status']): boolean =>
   status === SET_STATUS.done || status === SET_STATUS.partial;

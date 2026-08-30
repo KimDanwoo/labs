@@ -1,9 +1,9 @@
 'use client';
 
+import { activeModalAtom, gameAtom } from '@entities/game/model/store';
 import type { CharacterId, FoodId, ModalType } from '@shared/types';
 import { useSetAtom } from 'jotai';
 import { useMemo } from 'react';
-import { activeModalAtom, gameAtom } from '../store';
 
 export function useGameActions() {
   const dispatch = useSetAtom(gameAtom);

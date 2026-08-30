@@ -1,8 +1,8 @@
 'use client';
 
+import { publicRoomsQueryKey } from '@entities/chat-room/model/constants';
+import { fetchPublicRooms } from '@entities/chat-room/model/services';
 import { useQuery } from '@tanstack/react-query';
-import { publicRoomsQueryKey } from '../constants';
-import { fetchPublicRooms } from '../services';
 
 export function usePublicRooms() {
   return useQuery({

@@ -1,6 +1,6 @@
 'use client';
 
-import { SudokuCell as SudokuCellType } from '@entities/board/model/types';
+import type { SudokuCell as SudokuCellType } from '@entities/board/model/types';
 import { GAME_MODE } from '@entities/game/model/constants';
 import { boardAtom, gameModeAtom, selectCellAtom } from '@features/sudoku-game/model/atoms';
 import { useInitializeGame, useKeyboardControls } from '@features/sudoku-game/model/hooks';

@@ -1,4 +1,4 @@
-import { CumulativePointsEntry, getCumulativeLeaderboard } from '@features/game-record/model/services';
+import { type CumulativePointsEntry, getCumulativeLeaderboard } from '@features/game-record/model/services';
 import { useCallback, useEffect, useState } from 'react';
 
 interface UseCumulativeLeaderboardResult {

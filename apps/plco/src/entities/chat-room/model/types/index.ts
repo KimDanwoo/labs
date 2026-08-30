@@ -3,7 +3,7 @@ export const INVITE_STATUS = {
   ACCEPTED: 'accepted',
   DECLINED: 'declined',
 } as const;
-export type InviteStatus = (typeof INVITE_STATUS)[keyof typeof INVITE_STATUS];
+type InviteStatus = (typeof INVITE_STATUS)[keyof typeof INVITE_STATUS];
 
 // ── DB row shapes ───────────────────────────────────────────────
 export type ChatRoomRow = {
@@ -13,13 +13,6 @@ export type ChatRoomRow = {
   is_public: boolean;
   has_password: boolean;
   created_at: string;
-};
-
-export type RoomMemberRow = {
-  room_id: string;
-  user_id: string;
-  nickname: string;
-  joined_at: string;
 };
 
 export type RoomInviteRow = {
@@ -48,13 +41,6 @@ export type Room = {
   isPublic: boolean;
   hasPassword: boolean;
   createdAt: string;
-};
-
-export type RoomMember = {
-  roomId: string;
-  userId: string;
-  nickname: string;
-  joinedAt: string;
 };
 
 export type Invite = {

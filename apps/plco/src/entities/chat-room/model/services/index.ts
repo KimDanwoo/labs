@@ -1,6 +1,18 @@
+import {
+  ROOM_INVITES_TABLE,
+  ROOM_TABLE,
+  RPC_ACCEPT_INVITE,
+  RPC_CREATE_ROOM,
+  RPC_JOIN_ROOM,
+} from '@entities/chat-room/model/constants';
+import {
+  type ChatRoomRow,
+  type Invite,
+  INVITE_STATUS,
+  type Room,
+  type RoomInviteRow,
+} from '@entities/chat-room/model/types';
 import { supabase } from '@shared/lib';
-import { ROOM_INVITES_TABLE, ROOM_TABLE, RPC_ACCEPT_INVITE, RPC_CREATE_ROOM, RPC_JOIN_ROOM } from '../constants';
-import { type ChatRoomRow, type Invite, INVITE_STATUS, type Room, type RoomInviteRow } from '../types';
 
 // ── Mappers ──────────────────────────────────────────────────────
 function toRoom(row: ChatRoomRow): Room {

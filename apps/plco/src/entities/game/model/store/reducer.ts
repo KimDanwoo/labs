@@ -40,7 +40,8 @@ import type { CharacterId, FoodId, GameAction, GameState } from '@shared/types';
 
 function calculateLevel(exp: number): number {
   for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
-    if (exp >= LEVEL_THRESHOLDS[i]) return i + 1;
+    const threshold = LEVEL_THRESHOLDS[i];
+    if (threshold !== undefined && exp >= threshold) return i + 1;
   }
   return 1;
 }
@@ -120,7 +121,7 @@ function checkEggReady(state: GameState, newHearts: number): CharacterId | null 
   const available = ALL_CHARACTER_IDS.filter((id) => !unlocked.has(id));
 
   if (available.length === 0) return null;
-  return available[Math.floor(Math.random() * available.length)];
+  return available[Math.floor(Math.random() * available.length)] ?? null;
 }
 
 export function gameReducer(state: GameState, action: GameAction): GameState {

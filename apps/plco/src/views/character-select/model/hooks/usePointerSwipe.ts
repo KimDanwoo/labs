@@ -1,7 +1,7 @@
 'use client';
 
+import { SWIPE_THRESHOLD } from '@views/character-select/model/constants';
 import { useCallback, useRef } from 'react';
-import { SWIPE_THRESHOLD } from '../constants';
 
 type SwipeHandlers = {
   onSwipeLeft?: () => void;

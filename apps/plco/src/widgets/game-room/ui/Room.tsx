@@ -14,10 +14,10 @@ import {
   roomTypeAtom,
 } from '@entities/game/model/store';
 import { CharacterSprite } from '@shared/ui';
+import { ROOM_BACKGROUNDS } from '@widgets/game-room/constants';
 import { useAtomValue } from 'jotai';
 import Image from 'next/image';
 import { useRef, useState } from 'react';
-import { ROOM_BACKGROUNDS } from '../constants';
 
 const JUMP_DURATION_MS = 450;
 const HEART_FLOAT_DURATION_MS = 1000;

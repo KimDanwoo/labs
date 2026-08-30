@@ -1,6 +1,6 @@
-import { SudokuBoard } from '@entities/board/model/types';
+import type { SudokuBoard } from '@entities/board/model/types';
 import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING } from '@entities/game/model/constants';
-import { Difficulty, GameMode, KillerCage } from '@entities/game/model/types';
+import type { Difficulty, GameMode, KillerCage } from '@entities/game/model/types';
 import {
   createEmptyHighlights,
   generateBoard,

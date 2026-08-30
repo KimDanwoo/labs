@@ -1,4 +1,4 @@
-import { GameRecord } from '@entities/game-record/model/types';
+import type { GameRecord } from '@entities/game-record/model/types';
 import { userAtom } from '@features/auth/model/atoms';
 import { getUserRecords } from '@features/game-record/model/services';
 import { useAtomValue } from 'jotai';

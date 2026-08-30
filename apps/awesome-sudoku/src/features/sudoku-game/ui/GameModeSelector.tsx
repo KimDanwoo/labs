@@ -1,5 +1,5 @@
 import { GAME_MODE } from '@entities/game/model/constants';
-import { GameMode } from '@entities/game/model/types';
+import type { GameMode } from '@entities/game/model/types';
 import { gameModeAtom, switchGameModeAtom } from '@features/sudoku-game/model/atoms';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';

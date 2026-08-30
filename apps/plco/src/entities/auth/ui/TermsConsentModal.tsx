@@ -1,11 +1,11 @@
 'use client';
 
+import { useGoogleConsent } from '@entities/auth/model/hooks';
+import { googleAuthIntentAtom } from '@entities/auth/model/store';
 import { MIN_AGE } from '@shared/constants';
 import { GoogleIcon, ModalShell } from '@shared/ui';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
-import { useGoogleConsent } from '../model/hooks';
-import { googleAuthIntentAtom } from '../model/store';
 import PrivacyDocument from './PrivacyDocument';
 import TermsDocument from './TermsDocument';
 

@@ -1,4 +1,4 @@
-import { StardokuPage } from '@views/stardoku';
+import { StardokuPage } from '@views/stardoku/ui';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {

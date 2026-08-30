@@ -6,7 +6,7 @@ export const SESSION_STATUS = {
   aborted: 'aborted',
 } as const;
 
-export type SessionStatus = keyof typeof SESSION_STATUS;
+type SessionStatus = keyof typeof SESSION_STATUS;
 
 export const PERFORMANCE_STATUS = {
   pending: 'pending',
@@ -16,7 +16,7 @@ export const PERFORMANCE_STATUS = {
   substituted: 'substituted',
 } as const;
 
-export type PerformanceStatus = keyof typeof PERFORMANCE_STATUS;
+type PerformanceStatus = keyof typeof PERFORMANCE_STATUS;
 
 export const SET_STATUS = {
   pending: 'pending',
@@ -32,8 +32,6 @@ export const WEIGHT_PROGRESSION = {
   maintain: '유지',
 } as const;
 
-export type WeightProgression = keyof typeof WEIGHT_PROGRESSION;
-
 export const INPUT_SOURCE = {
   manual: 'manual',
   'auto-button': 'auto-button',
@@ -41,7 +39,7 @@ export const INPUT_SOURCE = {
   'auto-motion': 'auto-motion',
 } as const;
 
-export type InputSource = keyof typeof INPUT_SOURCE;
+type InputSource = keyof typeof INPUT_SOURCE;
 
 export type SetLog = {
   setIndex: number;

@@ -1,4 +1,4 @@
-import { Difficulty, GameMode } from '@entities/game/model/types';
+import type { Difficulty, GameMode } from '@entities/game/model/types';
 import type { Timestamp } from 'firebase/firestore';
 
 export interface GameRecord {

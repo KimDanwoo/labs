@@ -1,4 +1,4 @@
-import { User } from '@entities/auth/model/types';
+import type { User } from '@entities/auth/model/types';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 

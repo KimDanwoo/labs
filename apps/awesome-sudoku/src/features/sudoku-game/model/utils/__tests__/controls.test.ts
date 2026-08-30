@@ -1,4 +1,4 @@
-import { Grid, SudokuBoard } from '@entities/board/model/types';
+import type { Grid, SudokuBoard } from '@entities/board/model/types';
 import { describe, expect, it } from 'vitest';
 import { getHint } from '../controls';
 

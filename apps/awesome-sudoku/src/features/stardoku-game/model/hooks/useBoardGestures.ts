@@ -1,5 +1,5 @@
 import { CELL_MARK, DRAG_THRESHOLD_PX } from '@entities/stardoku/model/constants';
-import { CellPosition } from '@entities/stardoku/model/types';
+import type { CellPosition } from '@entities/stardoku/model/types';
 import { cellKey, markAt } from '@entities/stardoku/model/utils';
 import { eraseXCellAtom, marksAtom, paintXCellAtom, tapCellAtom } from '@features/stardoku-game/model/atoms';
 import { useSetAtom } from 'jotai';

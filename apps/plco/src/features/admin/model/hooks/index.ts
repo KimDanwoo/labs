@@ -1,11 +1,10 @@
 'use client';
 
+import { ADMIN_API, adminFetch } from '@features/admin/model/services';
+import type { CharacterRow, MeetingSceneRow, QuizRow } from '@features/admin/model/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { adminFetch } from '../services/adminFetch';
-import { ADMIN_API } from '../services/api';
-import type { CharacterRow, MeetingSceneRow, QuizRow } from '../types';
 
-export const ADMIN_QUERY_KEYS = {
+const ADMIN_QUERY_KEYS = {
   characters: ['admin', 'characters'] as const,
   meetingScenes: ['admin', 'meeting-scenes'] as const,
   quiz: ['admin', 'quiz'] as const,

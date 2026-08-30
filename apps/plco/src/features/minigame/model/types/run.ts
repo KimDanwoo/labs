@@ -1,4 +1,4 @@
-import { RUN_PHASE } from '../constants/run';
+import { RUN_PHASE } from '@features/minigame/model/constants';
 
 export type RunPhase = (typeof RUN_PHASE)[keyof typeof RUN_PHASE];
 

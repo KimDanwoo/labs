@@ -1,5 +1,5 @@
 import { MAX_HINTS, MAX_LIVES } from '@entities/stardoku/model/constants';
-import { MarkGrid, StardokuPuzzle } from '@entities/stardoku/model/types';
+import type { MarkGrid, StardokuPuzzle } from '@entities/stardoku/model/types';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 

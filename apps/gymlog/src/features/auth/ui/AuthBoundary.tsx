@@ -1,9 +1,9 @@
 'use client';
 
 import { authReadyAtom } from '@entities/user/model/store';
+import { useAuthListener } from '@features/auth/model/hooks';
 import { useAtomValue } from 'jotai';
 import type { ReactNode } from 'react';
-import { useAuthListener } from '../model/hooks';
 
 type AuthBoundaryProps = {
   children: ReactNode;

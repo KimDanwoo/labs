@@ -1,5 +1,5 @@
+import { POND, VILLAGE_COLORS } from '@entities/village/model/constants';
 import { ToonMaterial } from '@shared/r3f';
-import { POND, VILLAGE_COLORS } from '../model/constants';
 
 export function Pond() {
   return (

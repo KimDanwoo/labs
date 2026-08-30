@@ -1,15 +1,9 @@
-import {
-  DIFFICULTY_CONFIG,
-  DIFFICULTY_VALUES,
-  type Difficulty,
-  getAllCategories,
-  getCategoryBySlug,
-  getQuestionsByCategorySlugPaginated,
-} from '@entities/question';
-import { FeedbackForm } from '@features/feedback';
+import { getAllCategories, getCategoryBySlug, getQuestionsByCategorySlugPaginated } from '@entities/question/api';
+import { DIFFICULTY_CONFIG, DIFFICULTY_VALUES, type Difficulty } from '@entities/question/model';
+import { FeedbackForm } from '@features/feedback/ui';
 import { Button, Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui';
 import { createClient } from '@supabase/supabase-js';
-import { CategorySidebar, QuestionAccordion } from '@views/reference';
+import { CategorySidebar, QuestionAccordion } from '@views/reference/ui';
 import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';

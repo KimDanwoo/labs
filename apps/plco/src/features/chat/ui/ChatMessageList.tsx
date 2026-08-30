@@ -1,9 +1,9 @@
 'use client';
 
+import type { ChatMessage } from '@features/chat/model/types';
 import { formatChatDateLabel, formatDateKey } from '@shared/lib';
 import { Skeleton } from '@shared/ui';
 import { Fragment, useEffect, useRef } from 'react';
-import type { ChatMessage } from '../model/types';
 import ChatDateSeparator from './ChatDateSeparator';
 import ChatMessageItem from './ChatMessageItem';
 

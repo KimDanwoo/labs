@@ -1,5 +1,6 @@
 'use client';
 
+/* eslint-disable no-restricted-imports -- 이 슬라이스는 types/constants/actions가 세그먼트 폴더가 아니라 루트 파일이라 alias로 가리킬 수 없다. 구조 정리 후 제거할 것. */
 import { createClient } from '@shared/config/supabase/client';
 import { useEffect, useState } from 'react';
 import { createFeedback } from '../actions';

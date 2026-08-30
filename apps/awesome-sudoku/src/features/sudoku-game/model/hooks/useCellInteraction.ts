@@ -1,6 +1,6 @@
 import { handleKeyInputAtom } from '@features/sudoku-game/model/atoms';
 import { gameStore } from '@shared/model/store';
-import { KeyboardEvent, useCallback } from 'react';
+import { type KeyboardEvent, useCallback } from 'react';
 
 interface UseCellInteractionProps {
   row: number;

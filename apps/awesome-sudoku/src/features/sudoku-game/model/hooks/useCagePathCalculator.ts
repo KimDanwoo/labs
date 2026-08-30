@@ -1,8 +1,8 @@
 import { BOARD_SIZE } from '@entities/board/model/constants';
-import { CageInfo } from '@entities/board/model/types';
-import { KillerCage } from '@entities/game/model/types';
+import type { CageInfo } from '@entities/board/model/types';
+import type { KillerCage } from '@entities/game/model/types';
 import { useMemo } from 'react';
-import { CellPosition } from './useTableDimensions';
+import type { CellPosition } from './useTableDimensions';
 
 const CAGE_PADDING_RATIO = 0.1;
 const CAGE_SUM_LABEL_OFFSET = 2;

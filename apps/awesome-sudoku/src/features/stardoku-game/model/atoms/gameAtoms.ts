@@ -1,5 +1,5 @@
 import { CELL_MARK, DOUBLE_TAP_MS, GAME_OVER_PENALTY, MAX_HINTS, MAX_LIVES } from '@entities/stardoku/model/constants';
-import { CellPosition, MarkGrid, StardokuPuzzle } from '@entities/stardoku/model/types';
+import type { CellPosition, MarkGrid, StardokuPuzzle } from '@entities/stardoku/model/types';
 import {
   cellKey,
   createEmptyMarks,
@@ -8,8 +8,8 @@ import {
   violatingStarKeys,
   withMark,
 } from '@entities/stardoku/model/utils';
-import { Getter, Setter, atom } from 'jotai';
-import { requestStagePuzzle } from '../services/puzzleGenerator';
+import { requestStagePuzzle } from '@features/stardoku-game/model/services';
+import { type Getter, type Setter, atom } from 'jotai';
 import { hintsRemainingAtom, lastXTapAtom, livesAtom, marksAtom, puzzleAtom, scoreAtom, stageAtom } from './primitives';
 import { isClearedAtom, isGameOverAtom } from './statusAtoms';
 

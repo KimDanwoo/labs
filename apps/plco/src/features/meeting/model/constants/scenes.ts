@@ -1,5 +1,5 @@
+import type { ConversationScene } from '@features/meeting/model/types';
 import type { CharacterId } from '@shared/types';
-import type { ConversationScene } from '../types';
 
 // 예준 (yeko 💜) — 팥/양고기/커피/매운 음식, 작곡/기타/러닝, 크아, 다정/열정
 const SCENES_YEKO: ConversationScene[] = [

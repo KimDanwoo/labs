@@ -13,7 +13,7 @@ import {
   minLogicDepthForStage,
 } from '@entities/stardoku/model/generator';
 import { countSolutions, solveByLogic } from '@entities/stardoku/model/solver';
-import { StardokuPuzzle } from '@entities/stardoku/model/types';
+import type { StardokuPuzzle } from '@entities/stardoku/model/types';
 import { regionColorIndexes } from '@entities/stardoku/model/utils';
 import { describe, expect, it } from 'vitest';
 

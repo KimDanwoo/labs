@@ -1,16 +1,16 @@
-import type { WorkoutSession } from '../types/session';
+import type { WorkoutSession } from '@entities/session/model/types';
 import { computeTotalVolume } from './stats';
 
-export const MAX_LEVEL = 12;
+const MAX_LEVEL = 12;
 
 // 레벨 도달에 필요한 누적 볼륨(kg = 무게×횟수).
 // 세트만 채우는 게 아니라 점진적 과부하로 무게·양을 쌓아야 오른다. 뒤로 갈수록 급격히 가팔라진다.
-export const LEVEL_THRESHOLDS = [
+const LEVEL_THRESHOLDS = [
   0, 8_000, 25_000, 55_000, 100_000, 170_000, 270_000, 420_000, 650_000, 950_000, 1_400_000, 2_000_000,
 ] as const;
 
 // 레벨별 이름(허약 → 머슬킹).
-export const LEVEL_NAMES = [
+const LEVEL_NAMES = [
   '헬린이',
   '운동 새싹',
   '초보 트레이니',
@@ -25,7 +25,7 @@ export const LEVEL_NAMES = [
   '머슬킹',
 ] as const;
 
-export type Proficiency = {
+type Proficiency = {
   // 누적 볼륨(kg).
   totalVolume: number;
   level: number;

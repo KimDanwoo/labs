@@ -1,6 +1,6 @@
 export const revalidate = 86400;
 
-import { getAllCategories } from '@entities/question';
+import { getAllCategories } from '@entities/question/api';
 import { Card } from '@shared/ui';
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';

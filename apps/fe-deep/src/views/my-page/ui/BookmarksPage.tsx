@@ -11,9 +11,9 @@ import {
   Card,
   MarkdownRenderer,
 } from '@shared/ui';
+import { useBookmarkedQuestions } from '@views/my-page/model';
 import { Bookmark, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { useBookmarkedQuestions } from '../model';
 
 export function BookmarksPage() {
   const { bookmarkedQuestions, handleRemoveBookmark, getCategoryForQuestion } = useBookmarkedQuestions();

@@ -1,5 +1,5 @@
 import { generatePuzzle } from '@entities/stardoku/model/generator';
-import { StardokuPuzzle } from '@entities/stardoku/model/types';
+import type { StardokuPuzzle } from '@entities/stardoku/model/types';
 
 export interface PuzzleRequest {
   id: number;

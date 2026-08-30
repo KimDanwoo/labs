@@ -1,5 +1,5 @@
 import { BOARD_NUMBERS, BOARD_SIZE } from '@entities/board/model/constants';
-import { CellHighlight, Grid, SudokuBoard } from '@entities/board/model/types';
+import type { CellHighlight, Grid, SudokuBoard } from '@entities/board/model/types';
 import { MINUTE } from '@shared/model/constants';
 
 export function createEmptyGrid(): Grid {

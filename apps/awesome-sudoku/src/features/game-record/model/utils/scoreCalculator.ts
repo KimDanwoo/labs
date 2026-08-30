@@ -1,5 +1,5 @@
 import { KILLER_MODE_DEDUCTION, POINT_RANGES, TIME_THRESHOLDS } from '@entities/game-record/model/constants';
-import { PointInput, PointResult } from '@entities/game-record/model/types';
+import type { PointInput, PointResult } from '@entities/game-record/model/types';
 import { GAME_MODE } from '@entities/game/model/constants';
 
 /**
@@ -24,12 +24,6 @@ export function calculatePoint(input: PointInput): PointResult {
   return { basePoint, killerDeduction, totalPoint };
 }
 
-export function formatPoint(point: number): string {
-  if (Number.isInteger(point)) return point.toString();
-  return point.toFixed(1);
-}
-
-/** @deprecated Use formatPoint instead */
 export function formatScore(score: number): string {
   if (Number.isInteger(score)) return score.toString();
   return score.toFixed(1);

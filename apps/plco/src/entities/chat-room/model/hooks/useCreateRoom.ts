@@ -1,8 +1,8 @@
 'use client';
 
+import { myRoomsQueryKey } from '@entities/chat-room/model/constants';
+import { createRoom } from '@entities/chat-room/model/services';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { myRoomsQueryKey } from '../constants';
-import { createRoom } from '../services';
 
 export function useCreateRoom() {
   const queryClient = useQueryClient();

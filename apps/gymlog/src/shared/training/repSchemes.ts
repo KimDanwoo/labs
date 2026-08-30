@@ -1,6 +1,6 @@
 import type { Goal } from './goal';
 
-export type GoalScheme = {
+type GoalScheme = {
   // 목표별 대표 반복 수와 권장 휴식(초). 난이도는 쓰지 않는다 — 세트수·종목수는 사용자가 직접 조절.
   readonly reps: number;
   readonly restSec: number;

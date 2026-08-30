@@ -1,8 +1,8 @@
 'use client';
 
+import { frameState } from '@entities/track/model/store';
 import { useFrame } from '@shared/lib/frame';
 import { useRef } from 'react';
-import { frameState } from '../model/store';
 
 /**
  * 현재 곡 행에만 붙는 3바 미터. 파형 진폭을 CSS 변수로 흘려 리렌더 없이 움직인다.

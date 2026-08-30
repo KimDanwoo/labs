@@ -1,6 +1,8 @@
-import { GameRecord, PointResult } from '@entities/game-record/model/types';
+import type { GameRecord, PointResult } from '@entities/game-record/model/types';
 import { HINTS_REMAINING } from '@entities/game/model/constants';
 import { userAtom } from '@features/auth/model/atoms';
+import { saveGameRecord } from '@features/game-record/model/services';
+import { calculatePoint } from '@features/game-record/model/utils';
 import {
   currentTimeAtom,
   difficultyAtom,
@@ -13,8 +15,6 @@ import {
 import { gameStore } from '@shared/model/store';
 import { useAtomValue } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { saveGameRecord } from '../services/gameRecordService';
-import { calculatePoint } from '../utils/scoreCalculator';
 
 interface SaveGameRecordResult {
   save: () => Promise<string | null>;

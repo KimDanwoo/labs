@@ -13,10 +13,10 @@ import {
   type SetStatus,
   type WorkoutSession,
 } from '@entities/session/model/types';
+import { buildEmptySession, buildPerformance, buildSessionFromRoutine } from '@features/session-runner/model/lib';
 import { notify, requestNotifyPermission, REST_DONE_VIBRATION, vibrate } from '@shared/lib';
 import { useAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { buildEmptySession, buildPerformance, buildSessionFromRoutine } from '../lib';
 
 export const SESSION_VIEW = {
   list: 'list',

@@ -22,7 +22,7 @@ function tick(now: number) {
 }
 
 /** 위젯마다 rAF 루프를 만들지 않는다. 앱 전체가 한 루프를 공유한다. */
-export function subscribeFrame(callback: FrameCallback) {
+function subscribeFrame(callback: FrameCallback) {
   callbacks.add(callback);
   if (!handle) {
     last = 0;

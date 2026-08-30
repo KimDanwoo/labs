@@ -1,7 +1,7 @@
 'use client';
 
-import { getLocalProgress, updateQuestionProgress } from '@entities/progress';
-import type { FollowUp, Question } from '@entities/question';
+import { getLocalProgress, updateQuestionProgress } from '@entities/progress/api';
+import type { FollowUp, Question } from '@entities/question/model';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface UseCardStudySessionOptions {

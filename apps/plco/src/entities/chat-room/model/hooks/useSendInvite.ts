@@ -1,7 +1,7 @@
 'use client';
 
+import { sendInvite } from '@entities/chat-room/model/services';
 import { useMutation } from '@tanstack/react-query';
-import { sendInvite } from '../services';
 
 export function useSendInvite() {
   return useMutation({

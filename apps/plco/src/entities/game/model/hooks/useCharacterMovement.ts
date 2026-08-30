@@ -1,9 +1,9 @@
 'use client';
 
+import { DIRECTION_CHANGE_INTERVAL, IDLE_CHANCE, MOVE_SPEED } from '@entities/game/model/constants';
+import { characterPositionAtom, isPlayingAtom, isSleepingAtom } from '@entities/game/model/store';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useRef } from 'react';
-import { DIRECTION_CHANGE_INTERVAL, IDLE_CHANCE, MOVE_SPEED } from '../constants';
-import { characterPositionAtom, isPlayingAtom, isSleepingAtom } from '../store';
 
 export function useCharacterMovement() {
   const isPlaying = useAtomValue(isPlayingAtom);

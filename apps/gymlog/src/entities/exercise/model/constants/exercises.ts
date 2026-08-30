@@ -1,4 +1,4 @@
-import type { Exercise } from '../types/exercise';
+import type { Exercise } from '@entities/exercise/model/types';
 
 // 종목 마스터 데이터(시드). 부위·기구·대체관계를 담아 추천과 대체운동 제안의 토대가 된다.
 // 사용자가 직접 입력한 루틴이 쌓이면 빈도 기반 추천이 이 시드를 보강한다(PRD 5장).
@@ -567,7 +567,7 @@ for (const exercise of EXERCISES) {
   exerciseById[exercise.id] = exercise;
 }
 
-export const EXERCISE_BY_ID = exerciseById as Record<ExerciseId, Exercise>;
+const EXERCISE_BY_ID = exerciseById as Record<ExerciseId, Exercise>;
 
 // 런타임 문자열(세션·루틴의 exerciseId)로 안전 조회. 없는 id면 undefined.
 export const getExerciseById = (id: string): Exercise | undefined => EXERCISE_BY_ID[id as ExerciseId];

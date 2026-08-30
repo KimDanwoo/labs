@@ -1,11 +1,11 @@
 'use client';
 
+import { characterStatesAtom, isLoadedAtom } from '@entities/game/model/store';
 import { ALL_CHARACTER_IDS, GAME_STORAGE_KEY, GAME_STORAGE_LEGACY_KEY, INITIAL_GAME_STATE } from '@shared/constants';
 import { supabase } from '@shared/lib';
 import type { GameState } from '@shared/types';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useRef } from 'react';
-import { characterStatesAtom, isLoadedAtom } from '../store';
 
 const STORAGE_KEY = GAME_STORAGE_KEY;
 const LEGACY_STORAGE_KEY = GAME_STORAGE_LEGACY_KEY;

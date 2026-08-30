@@ -1,5 +1,5 @@
 import { GAME_LEVEL, GAME_LEVEL_LABELS } from '@entities/game/model/constants';
-import { Difficulty } from '@entities/game/model/types';
+import type { Difficulty } from '@entities/game/model/types';
 import { difficultyAtom, initializeGameAtom } from '@features/sudoku-game/model/atoms';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';

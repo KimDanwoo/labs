@@ -1,10 +1,10 @@
 'use server';
 
+import type { Question, QuestionInput } from '@entities/question/model';
 import { createAdminSupabaseClient } from '@shared/config/supabase/admin';
 import { createServerSupabaseClient } from '@shared/config/supabase/server';
 import { isAdmin } from '@shared/lib/isAdmin';
 import { randomUUID } from 'crypto';
-import type { Question, QuestionInput } from '../model';
 
 async function requireAdmin() {
   const supabase = await createServerSupabaseClient();

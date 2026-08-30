@@ -1,4 +1,4 @@
-import { Difficulty, GameMode } from '@entities/game/model/types';
+import type { Difficulty } from '@entities/game/model/types';
 
 export interface GameStats {
   totalGames: number;
@@ -17,13 +17,5 @@ export interface DifficultyStats {
   completedGames: number;
   averageTime: number;
   bestTime: number;
-  bestScore: number;
-}
-
-export interface StatsByMode {
-  gameMode: GameMode;
-  gamesPlayed: number;
-  completedGames: number;
-  averageTime: number;
   bestScore: number;
 }

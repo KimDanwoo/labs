@@ -1,10 +1,15 @@
 'use client';
 
+import {
+  RUNNER_ANIM,
+  RUNNER_ANIM_TUNING,
+  RUNNER_MODEL_TRANSFORM,
+  RUNNER_MODEL_URL,
+} from '@entities/runner/model/constants';
 import { useAnimations, useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { Group, MathUtils, type AnimationAction } from 'three';
-import { RUNNER_ANIM, RUNNER_ANIM_TUNING, RUNNER_MODEL_TRANSFORM, RUNNER_MODEL_URL } from '../model/constants';
 
 type RunnerProps = {
   speedRef: { current: number };

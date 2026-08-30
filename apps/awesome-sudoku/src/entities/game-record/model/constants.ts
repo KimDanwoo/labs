@@ -1,5 +1,5 @@
 import { GAME_LEVEL } from '@entities/game/model/constants';
-import { Difficulty } from '@entities/game/model/types';
+import type { Difficulty } from '@entities/game/model/types';
 
 /** 난이도별 포인트 범위 (시간에 따라 min~max 선형 보간) */
 export const POINT_RANGES: Record<Difficulty, { min: number; max: number }> = {

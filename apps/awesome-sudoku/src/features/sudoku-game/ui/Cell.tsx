@@ -1,10 +1,10 @@
 'use client';
 
-import { CellProps } from '@entities/board/model/types';
+import type { CellProps } from '@entities/board/model/types';
 import { CellNotes, CellValue } from '@entities/board/ui';
 import { useCell } from '@features/sudoku-game/model/hooks';
 import { cn } from '@shared/model/utils';
-import { FC, memo } from 'react';
+import { type FC, memo } from 'react';
 
 export const SudokuCell: FC<CellProps> = memo((props) => {
   const { cell } = props;

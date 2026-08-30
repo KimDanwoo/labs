@@ -1,6 +1,6 @@
+import { CHAT_ADMIN_API, CHAT_PAGE_SIZE, CHAT_TABLE, chatChannelName } from '@features/chat/model/constants';
+import type { ChatMessage, ChatPresenceUser, SendChatInput } from '@features/chat/model/types';
 import { supabase } from '@shared/lib';
-import { CHAT_ADMIN_API, CHAT_PAGE_SIZE, CHAT_TABLE, chatChannelName } from '../constants';
-import type { ChatMessage, ChatPresenceUser, SendChatInput } from '../types';
 
 type ChatMessageRow = {
   id: string;

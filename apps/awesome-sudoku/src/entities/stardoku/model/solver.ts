@@ -1,5 +1,5 @@
 import { PUZZLE_DIFFICULTY } from '@entities/stardoku/model/constants';
-import { CellPosition, PuzzleDifficulty, RegionGrid } from '@entities/stardoku/model/types';
+import type { CellPosition, PuzzleDifficulty, RegionGrid } from '@entities/stardoku/model/types';
 
 export const LOGIC_RULE = {
   REGION_SINGLE: 'region-single',
@@ -7,9 +7,9 @@ export const LOGIC_RULE = {
   COL_SINGLE: 'col-single',
 } as const;
 
-export type LogicRule = (typeof LOGIC_RULE)[keyof typeof LOGIC_RULE];
+type LogicRule = (typeof LOGIC_RULE)[keyof typeof LOGIC_RULE];
 
-export interface LogicSolveResult {
+interface LogicSolveResult {
   solved: boolean;
   rules: LogicRule[];
   stars: CellPosition[];

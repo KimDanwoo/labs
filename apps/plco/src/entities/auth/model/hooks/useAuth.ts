@@ -1,9 +1,9 @@
 'use client';
 
+import { AUTH_API } from '@entities/auth/model/constants';
 import { clearLocalGameSaves, supabase } from '@shared/lib';
 import type { User } from '@supabase/supabase-js';
 import { useCallback, useEffect, useState } from 'react';
-import { AUTH_API } from '../constants';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);

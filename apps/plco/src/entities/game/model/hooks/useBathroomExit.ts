@@ -1,8 +1,8 @@
 'use client';
 
+import { bathroomActiveAtom, bathroomExitAtAtom, pendingPoopsAtom, poopsAtom } from '@entities/game/model/store';
 import { useAtom, useAtomValue } from 'jotai';
 import { useEffect } from 'react';
-import { bathroomActiveAtom, bathroomExitAtAtom, pendingPoopsAtom, poopsAtom } from '../store';
 
 const BATHROOM_EXIT_DELAY_MS = 5000;
 

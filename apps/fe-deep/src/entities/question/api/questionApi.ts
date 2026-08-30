@@ -1,8 +1,15 @@
+import type {
+  Category,
+  Difficulty,
+  PaginatedResult,
+  Question,
+  SearchResult,
+  VisibilityFilter,
+} from '@entities/question/model';
 import { createClient } from '@shared/config/supabase/client';
 import { SUPABASE_ERROR_CODES } from '@shared/constants';
 import { shuffleArray } from '@shared/lib/shuffle';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Category, Difficulty, PaginatedResult, Question, SearchResult, VisibilityFilter } from '../model';
 
 // ============================================================
 // Supabase data access layer

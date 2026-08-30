@@ -1,7 +1,7 @@
 import { BOARD_SIZE } from '@entities/board/model/constants';
-import { SudokuBoard, SudokuCell } from '@entities/board/model/types';
+import type { SudokuBoard, SudokuCell } from '@entities/board/model/types';
 import { GAME_MODE } from '@entities/game/model/constants';
-import { KillerCage } from '@entities/game/model/types';
+import type { KillerCage } from '@entities/game/model/types';
 import { describe, expect, it } from 'vitest';
 import {
   calculateHighlights,
