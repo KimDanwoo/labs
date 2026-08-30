@@ -29,8 +29,9 @@ export default function QuizEditor({ row, onDone }: QuizEditorProps) {
   const removeOption = (index: number) => {
     const options = form.options.filter((_, i) => i !== index);
     const shifted = form.correct_index > index ? form.correct_index - 1 : form.correct_index;
-    const correct_index = form.correct_index === index ? 0 : shifted;
-    update({ options, correct_index });
+    // correct_index는 DB 컬럼명이라 키만 snake_case를 유지한다.
+    const nextCorrectIndex = form.correct_index === index ? 0 : shifted;
+    update({ options, correct_index: nextCorrectIndex });
   };
 
   const save = () => saveMutation.mutate(form, { onSuccess: onDone });

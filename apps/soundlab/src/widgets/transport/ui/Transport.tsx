@@ -6,7 +6,7 @@ import { currentIndexAtom, frameState, isPlayingAtom, repeatModeAtom, shuffleAto
 import { useFrame } from '@shared/lib/frame';
 import { useAtom, useAtomValue } from 'jotai';
 import { useRef } from 'react';
-import { NextIcon, PauseIcon, PlayIcon, PrevIcon, RepeatIcon, RepeatOneIcon, ShuffleIcon } from './icons';
+import { NextIcon, PauseIcon, PlayIcon, PrevIcon, RepeatIcon, RepeatOneIcon, ShuffleIcon } from './Icons';
 import { Scrubber } from './Scrubber';
 
 // 켜짐 표시를 hover/focus가 덮지 않게 변형을 겹쳐 특정도를 올린다.

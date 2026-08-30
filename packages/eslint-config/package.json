@@ -5,12 +5,13 @@
   "files": [
     "next.eslint.config.mjs",
     "fsd.config.mjs",
+    "naming.config.mjs",
     "library.eslint.config.mjs"
   ],
   "devDependencies": {
     "@typescript-eslint/parser": "catalog:",
     "eslint": "catalog:",
-    "eslint-config-next": "catalog:",
+    "eslint-config-next": "16.3.3",
     "eslint-config-prettier": "catalog:",
     "eslint-import-resolver-typescript": "catalog:",
     "eslint-plugin-boundaries": "catalog:",

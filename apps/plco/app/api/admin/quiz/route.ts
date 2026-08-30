@@ -1,5 +1,5 @@
 import { ALL_CHARACTER_IDS } from '@shared/constants';
-import { getAdminSupabase, requireAdmin } from '@shared/lib/server/supabase-admin';
+import { getAdminSupabase, requireAdmin } from '@shared/lib/server/supabaseAdmin';
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 

@@ -5,7 +5,7 @@ import { playerPath } from '@entities/track/model/services';
 import { currentIndexAtom, playerScreenAtom } from '@entities/track/model/store';
 import { FLOATING_BUTTON } from '@shared/lib/floatingButton';
 import { useAtom, useAtomValue } from 'jotai';
-import { QueueIcon } from './icons';
+import { QueueIcon } from './Icons';
 
 /**
  * 재생목록 화면과 현재 재생 화면을 오간다.
