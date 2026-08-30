@@ -8,7 +8,7 @@
  * 2. 주제 직접 입력 — 사용자가 지정한 키워드로 생성
  *
  * 사용법: node scripts/suggest-questions.mjs
- * 환경 변수: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY, GEMINI_API_KEY
+ * 환경 변수: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, GEMINI_API_KEY
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -39,11 +39,11 @@ try {
 // ── 환경 변수 확인 ──────────────────────────────────────────────
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.error('❌ NEXT_PUBLIC_SUPABASE_URL 또는 NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY가 설정되지 않았습니다.');
+  console.error('❌ NEXT_PUBLIC_SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY가 설정되지 않았습니다.');
   process.exit(1);
 }
 if (!GEMINI_KEY) {
