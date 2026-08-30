@@ -1,5 +1,5 @@
 import { cn } from '@shared/model/utils';
-import { CellHighlight } from './types';
+import type { CellHighlight } from './types';
 
 /**
  * 셀 테두리 스타일을 반환

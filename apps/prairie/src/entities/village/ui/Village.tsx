@@ -1,4 +1,4 @@
-import { HAYSTACKS, HOUSES, TREES } from '../model/constants';
+import { HAYSTACKS, HOUSES, TREES } from '@entities/village/model/constants';
 import { Ground } from './Ground';
 import { Haystack } from './Haystack';
 import { House } from './House';

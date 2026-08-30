@@ -7,7 +7,7 @@ export const repsForGoal = (goal: Goal): number => getGoalScheme(goal).reps;
 // 자동 구성 시 부위당·총 종목 수(고정). 사용자가 세션에서 자유롭게 빼고/추가/교체한다.
 export const VOLUME = { perMuscle: 2, maxTotal: 6 } as const;
 
-export type Prescription = {
+type Prescription = {
   sets: number;
   reps: number;
   restSec: number;

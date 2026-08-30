@@ -5,9 +5,9 @@ import {
   BOARD_SIZE,
   SUDOKU_CELL_COUNT,
 } from '@entities/board/model/constants';
-import { Grid, GridPosition, SudokuBoard } from '@entities/board/model/types';
+import type { Grid, GridPosition, SudokuBoard } from '@entities/board/model/types';
 import { getBlockCoordinates } from '@entities/board/model/utils';
-import { KillerCage } from '@entities/game/model/types';
+import type { KillerCage } from '@entities/game/model/types';
 import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from '@entities/game/model/utils';
 
 /**

@@ -1,7 +1,8 @@
 'use client';
 
-import { type Category, getAllCategories, getQuestionsByIds, type Question } from '@entities/question';
-import { getBookmarks, toggleBookmark } from '@features/bookmark';
+import { getAllCategories, getQuestionsByIds } from '@entities/question/api';
+import { type Category, type Question } from '@entities/question/model';
+import { getBookmarks, toggleBookmark } from '@features/bookmark/api';
 import { useEffect, useState } from 'react';
 
 /**

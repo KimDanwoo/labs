@@ -1,8 +1,8 @@
 'use client';
 
+import { DIRECTION_CHANGE_INTERVAL, IDLE_CHANCE, MOVE_SPEED } from '@entities/game/model/constants';
 import type { CharacterPosition } from '@shared/types';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { DIRECTION_CHANGE_INTERVAL, IDLE_CHANCE, MOVE_SPEED } from '../constants';
 
 const INITIAL: CharacterPosition = {
   x: 40,

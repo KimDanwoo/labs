@@ -1,9 +1,9 @@
 'use client';
 
+import { lastMeetingAtAtom, meetingDayAtom, meetingsTodayAtom } from '@entities/game/model/store';
 import { MEETING_COOLDOWN_MS, MEETING_DAILY_LIMIT } from '@shared/constants';
 import { formatDateKey, useCooldown } from '@shared/lib';
 import { useAtomValue } from 'jotai';
-import { lastMeetingAtAtom, meetingDayAtom, meetingsTodayAtom } from '../store';
 
 export type MeetingStatus = {
   canMeet: boolean;

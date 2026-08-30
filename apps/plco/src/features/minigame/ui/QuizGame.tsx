@@ -1,8 +1,8 @@
 'use client';
 
+import { QUIZ_OK_THRESHOLD, QUIZ_PHASE, QUIZ_ROUNDS } from '@features/minigame/model/constants';
+import { useQuizEngine } from '@features/minigame/model/hooks';
 import { CharacterSprite } from '@shared/ui';
-import { QUIZ_OK_THRESHOLD, QUIZ_PHASE, QUIZ_ROUNDS } from '../model/constants';
-import { useQuizEngine } from '../model/hooks';
 import MinigameReadyScreen from './MinigameReadyScreen';
 import MinigameRewardSummary from './MinigameRewardSummary';
 import QuizProgressDots from './QuizProgressDots';

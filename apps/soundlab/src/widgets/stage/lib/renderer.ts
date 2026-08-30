@@ -245,7 +245,7 @@ void main() {
 type Program = { program: WebGLProgram; uniforms: Record<string, WebGLUniformLocation | null> };
 type Target = { texture: WebGLTexture; framebuffer: WebGLFramebuffer; width: number; height: number };
 
-export type RenderInput = {
+type RenderInput = {
   morph: number;
   level: number;
   decay: number;

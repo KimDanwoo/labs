@@ -1,5 +1,5 @@
 import { buildCellClassName, getCellBorderStyles, getCellHighlightStyles } from '@entities/board/model/cellStyle';
-import { CellHighlight, SudokuCell } from '@entities/board/model/types';
+import type { CellHighlight, SudokuCell } from '@entities/board/model/types';
 import { useMemo } from 'react';
 
 interface UseCellStylesProps {

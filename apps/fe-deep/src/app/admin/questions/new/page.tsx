@@ -1,6 +1,6 @@
 import { getAllCategories } from '@entities/question/api';
 import { createServerSupabaseClient } from '@shared/config/supabase/server';
-import { QuestionForm } from '@widgets/question-form';
+import { QuestionForm } from '@widgets/question-form/ui';
 
 export default async function NewQuestionPage() {
   const supabase = await createServerSupabaseClient();

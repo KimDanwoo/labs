@@ -1,6 +1,5 @@
 // ── Table names ─────────────────────────────────────────────────
 export const ROOM_TABLE = 'chat_rooms';
-export const ROOM_MEMBERS_TABLE = 'room_members';
 export const ROOM_INVITES_TABLE = 'room_invites';
 export const ROOM_MESSAGES_TABLE = 'chat_messages';
 
@@ -15,11 +14,7 @@ export const myInvitesQueryKey = () => ['chat-room', 'my-invites'] as const;
 export const roomMessagesQueryKey = (roomId: string) => ['chat-room', 'messages', roomId] as const;
 export const publicRoomsQueryKey = () => ['chat-room', 'public-rooms'] as const;
 
-// ── Realtime channel names ───────────────────────────────────────
-export const invitesChannelName = (userId: string) => `invites:${userId}`;
 export const roomChatChannelName = (roomId: string) => `room-chat:${roomId}`;
-export const lobbyChannelName = () => 'lobby:presence';
-
 // ── Pagination ───────────────────────────────────────────────────
 export const ROOM_MESSAGES_PAGE_SIZE = 50;
 export const ROOM_NAME_MAX = 40;

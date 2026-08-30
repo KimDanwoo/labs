@@ -1,14 +1,14 @@
 'use client';
 
 import { Runner } from '@entities/runner/ui';
+import { RUNNER_PHYSICS } from '@features/runner-control/model/constants';
+import { usePointerLook, useRunnerControls } from '@features/runner-control/model/hooks';
+import { getRunnerInput } from '@features/runner-control/model/store';
 import { useFrame, useThree } from '@react-three/fiber';
 import { CAMERA } from '@shared/config';
 import { setRideSpeed } from '@shared/r3f';
 import { useRef } from 'react';
 import { Group, MathUtils, Vector3 } from 'three';
-import { RUNNER_PHYSICS } from '../model/constants';
-import { usePointerLook, useRunnerControls } from '../model/hooks';
-import { getRunnerInput } from '../model/store';
 
 const forwardVec = new Vector3();
 const camDirVec = new Vector3();

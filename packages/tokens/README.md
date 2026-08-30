@@ -17,14 +17,14 @@ import '@tokens/css';
 
 ## src/ 구조
 
-| 파일 | 역할 |
-| --- | --- |
-| `palette.ts` | Atomic 팔레트 — gray / indigo / slate / green / red / amber / sky 스케일(50–900) |
-| `colors.ts` | Semantic alias — primary / secondary / success / error / warning / info × base·foreground·subtle, light/dark 분리 |
-| `typography.ts` | 폰트 크기·행간·폰트 패밀리 |
-| `spacing.ts` | 간격 스케일 |
-| `shadow.ts` | 그림자 스케일 |
-| `index.ts` | 전체 re-export |
+| 파일            | 역할                                                                                                              |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `palette.ts`    | Atomic 팔레트 — gray / indigo / slate / green / red / amber / sky 스케일(50–900)                                  |
+| `colors.ts`     | Semantic alias — primary / secondary / success / error / warning / info × base·foreground·subtle, light/dark 분리 |
+| `typography.ts` | 폰트 크기·행간·폰트 패밀리                                                                                        |
+| `spacing.ts`    | 간격 스케일                                                                                                       |
+| `shadow.ts`     | 그림자 스케일                                                                                                     |
+| `index.ts`      | 전체 re-export                                                                                                    |
 
 ## 색상 2-tier 구조
 

@@ -1,8 +1,6 @@
 'use client';
 
 import { characterIdAtom } from '@entities/game/model/store';
-import { CharacterSprite } from '@shared/ui';
-import { useAtomValue } from 'jotai';
 import {
   RUN_CHAR_SIZE,
   RUN_CHAR_X,
@@ -16,8 +14,10 @@ import {
   RUN_REWARD_CAP,
   RUN_SCORE_GOOD,
   RUN_SCORE_OK,
-} from '../model/constants';
-import { useRunEngine } from '../model/hooks';
+} from '@features/minigame/model/constants';
+import { useRunEngine } from '@features/minigame/model/hooks';
+import { CharacterSprite } from '@shared/ui';
+import { useAtomValue } from 'jotai';
 import MinigameCooldownNotice from './MinigameCooldownNotice';
 import MinigameReadyScreen from './MinigameReadyScreen';
 import MinigameRewardSummary from './MinigameRewardSummary';

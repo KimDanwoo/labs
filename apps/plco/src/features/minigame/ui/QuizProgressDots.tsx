@@ -1,4 +1,4 @@
-import { QUIZ_ROUNDS } from '../model/constants';
+import { QUIZ_ROUNDS } from '@features/minigame/model/constants';
 
 type QuizProgressDotsProps = {
   results: boolean[];

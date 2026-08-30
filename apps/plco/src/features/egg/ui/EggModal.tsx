@@ -2,12 +2,12 @@
 
 import { useGameActions } from '@entities/game/model/hooks';
 import { eggReadyCharacterIdAtom, isAllUnlockedAtom } from '@entities/game/model/store';
+import { EGG_DISPLAY_MS, EGG_HATCHING_MS, EGG_PHASE } from '@features/egg/model/constants';
+import type { EggPhase } from '@features/egg/model/types';
 import { CHARACTERS } from '@shared/constants';
 import { CharacterSprite, ModalShell } from '@shared/ui';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
-import { EGG_DISPLAY_MS, EGG_HATCHING_MS, EGG_PHASE } from '../model/constants';
-import type { EggPhase } from '../model/types';
 
 export default function EggModal() {
   const characterId = useAtomValue(eggReadyCharacterIdAtom);

@@ -1,5 +1,5 @@
+import type { Routine } from '@entities/routine/model/types';
 import { atom } from 'jotai';
-import type { Routine } from '../types/routine';
 
 // 사용자가 만들어 저장한 내 루틴들. 영속은 data-persistence가 담당.
 export const savedRoutinesAtom = atom<Routine[]>([]);

@@ -1,6 +1,6 @@
+import { GRASS_FIELD } from '@entities/grass/model/constants';
 import { useLayoutEffect, useRef } from 'react';
 import { type BufferGeometry, type InstancedMesh, Object3D, type ShaderMaterial } from 'three';
-import { GRASS_FIELD } from '../model/constants';
 
 type GrassChunkProps = {
   cellX: number;

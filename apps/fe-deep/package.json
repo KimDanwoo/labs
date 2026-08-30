@@ -6,23 +6,20 @@
     "dev": "next dev --port 3009",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@tokens/css": "workspace:*",
-    "@ui/react": "workspace:*",
-    "@radix-ui/react-checkbox": "catalog:",
     "@supabase/ssr": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-query": "catalog:",
-    "class-variance-authority": "catalog:",
+    "@tokens/css": "workspace:*",
+    "@ui/react": "workspace:*",
     "clsx": "catalog:",
     "framer-motion": "catalog:",
-    "highlight.js": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",
-    "radix-ui": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-markdown": "catalog:",
@@ -31,6 +28,7 @@
     "tailwind-merge": "catalog:"
   },
   "devDependencies": {
+    "@config/tsconfig": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
     "@tailwindcss/postcss": "catalog:",

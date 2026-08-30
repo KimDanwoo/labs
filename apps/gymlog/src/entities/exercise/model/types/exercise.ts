@@ -12,12 +12,7 @@ export const EQUIPMENT = {
 
 export type Equipment = keyof typeof EQUIPMENT;
 
-export const MOVEMENT_TYPE = {
-  compound: '복합',
-  isolation: '고립',
-} as const;
-
-export type MovementType = keyof typeof MOVEMENT_TYPE;
+type MovementType = 'compound' | 'isolation';
 
 export type Exercise = {
   readonly id: string;

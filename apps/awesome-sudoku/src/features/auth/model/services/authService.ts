@@ -1,4 +1,4 @@
-import { User } from '@entities/auth/model/types';
+import type { User } from '@entities/auth/model/types';
 import { getAuthInstance } from '@shared/lib/firebase/config';
 import type { User as FirebaseUser } from 'firebase/auth';
 
@@ -7,7 +7,7 @@ import type { User as FirebaseUser } from 'firebase/auth';
  * @param firebaseUser
  * @returns
  */
-export function mapFirebaseUserToUser(firebaseUser: FirebaseUser | null): User | null {
+function mapFirebaseUserToUser(firebaseUser: FirebaseUser | null): User | null {
   if (!firebaseUser) return null;
 
   return {

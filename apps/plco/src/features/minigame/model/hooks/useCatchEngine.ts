@@ -1,7 +1,6 @@
 'use client';
 
 import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   MINIGAME_BAD_EMOJIS,
   MINIGAME_BAD_PENALTY,
@@ -27,8 +26,10 @@ import {
   MINIGAME_SPAWN_INTERVAL_MIN,
   MINIGAME_SPAWN_SPEEDUP,
   MINIGAME_SPAWN_SPREAD_MIN,
-} from '../constants';
-import type { CatchFloat, FallingItem, MinigamePhase } from '../types';
+} from '@features/minigame/model/constants';
+import type { CatchFloat, FallingItem, MinigamePhase } from '@features/minigame/model/types';
+import { pickRandom } from '@shared/lib';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const CATCHER_START_X = MINIGAME_FIELD_WIDTH / 2 - MINIGAME_CATCHER_WIDTH / 2;
 const CATCHER_Y = MINIGAME_FIELD_HEIGHT - (MINIGAME_CATCHER_BOTTOM + MINIGAME_CATCHER_HEIGHT);
@@ -173,11 +174,14 @@ export function useCatchEngine() {
         }
         lastSpawnXRef.current = spawnX;
 
+        const emoji = pickRandom(pool);
+        if (!emoji) return;
+
         const newItem: FallingItem = {
           id: nextId.current++,
           x: spawnX,
           y: -MINIGAME_ITEM_SIZE,
-          emoji: pool[Math.floor(Math.random() * pool.length)],
+          emoji,
           kind: isBad ? 'bad' : 'good',
           speed:
             MINIGAME_ITEM_SPEED_BASE + Math.random() * MINIGAME_ITEM_SPEED_RANDOM + elapsed * MINIGAME_ITEM_SPEED_ACCEL,

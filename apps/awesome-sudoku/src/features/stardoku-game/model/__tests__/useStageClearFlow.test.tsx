@@ -13,7 +13,7 @@ import {
 import { useStageClearFlow } from '@features/stardoku-game/model/hooks';
 import { act, renderHook } from '@testing-library/react';
 import { Provider, createStore } from 'jotai';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const solvedMarks = () =>

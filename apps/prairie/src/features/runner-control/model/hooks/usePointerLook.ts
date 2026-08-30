@@ -1,9 +1,9 @@
 'use client';
 
+import { VIEW_LOOK } from '@features/runner-control/model/constants';
 import { useThree } from '@react-three/fiber';
 import { useIsCoarsePointer } from '@shared/lib';
 import { useEffect } from 'react';
-import { VIEW_LOOK } from '../constants';
 
 // PC(마우스)에서 캔버스를 좌우로 끌어 카메라 yaw 오프셋을 누적한다. 터치 기기에선 비활성(조이스틱이 대신).
 // 카메라 배치 로직(useFrame)이 매 프레임 yawRef를 읽으므로 리렌더는 일으키지 않는다.

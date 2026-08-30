@@ -1,8 +1,8 @@
 'use client';
 
+import { GOOGLE_AUTH_INTENT, googleAuthIntentAtom } from '@entities/auth/model/store';
 import { useAtom } from 'jotai';
 import { useCallback } from 'react';
-import { GOOGLE_AUTH_INTENT, googleAuthIntentAtom } from '../store';
 import { useAuth } from './useAuth';
 
 /**

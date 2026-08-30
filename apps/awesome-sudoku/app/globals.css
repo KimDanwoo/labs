@@ -187,11 +187,15 @@ html {
   animation: subtle-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Glass effect */
-.glass {
+/* 상단 고정 반투명 헤더. 화면마다 복붙되던 sticky + glass 배경 + 하단 보더 조합을 한곳에 둔다. */
+@utility glass-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   background: rgba(var(--color-glass), var(--glass-opacity));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px);
+  border-bottom-width: 1px;
+  border-bottom-color: rgba(var(--color-border-light), 0.5);
 }
 
 /* Pressed state */

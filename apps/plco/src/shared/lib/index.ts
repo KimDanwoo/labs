@@ -1,3 +1,4 @@
+export { pickRandom } from './random';
 export { clearLocalGameSaves, readLocalInt, writeLocalInt } from './storage';
 export { supabase } from './supabase';
 export type { SupabaseGameSave } from './supabase';

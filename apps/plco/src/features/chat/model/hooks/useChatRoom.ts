@@ -1,10 +1,10 @@
 'use client';
 
+import { chatQueryKey } from '@features/chat/model/constants';
+import { fetchMessages, joinRoom } from '@features/chat/model/services';
+import type { ChatMessage, ChatPresenceUser } from '@features/chat/model/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { chatQueryKey } from '../constants';
-import { fetchMessages, joinRoom } from '../services';
-import type { ChatMessage, ChatPresenceUser } from '../types';
 
 type ChatRoomIdentity = {
   userId: string | null;

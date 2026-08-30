@@ -1,9 +1,6 @@
 'use client';
 
-import { useFrame } from '@shared/lib/frame';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useCallback, useEffect, useRef } from 'react';
-import { REPEAT_MODE } from '../constants/repeatMode';
+import { REPEAT_MODE } from '@entities/track/model/constants';
 import {
   loadWidgetApi,
   readLastPlayed,
@@ -14,7 +11,7 @@ import {
   widgetSrc,
   writeLastPlayed,
   type ScWidget,
-} from '../services';
+} from '@entities/track/model/services';
 import {
   currentIndexAtom,
   engineErrorAtom,
@@ -24,8 +21,11 @@ import {
   isReadyAtom,
   repeatModeAtom,
   shuffleAtom,
-} from '../store';
-import type { Track } from '../types';
+} from '@entities/track/model/store';
+import type { Track } from '@entities/track/model/types';
+import { useFrame } from '@shared/lib/frame';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useCallback, useEffect, useRef } from 'react';
 
 /** 위젯 콜백은 undefined를 줄 수 있다. 비유한값이 frameState로 새면 시간 표시가 NaN이 된다. */
 const validDuration = (value: unknown, fallback: number) =>

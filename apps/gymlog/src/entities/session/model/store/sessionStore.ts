@@ -1,5 +1,5 @@
+import type { WorkoutSession } from '@entities/session/model/types';
 import { atom } from 'jotai';
-import type { WorkoutSession } from '../types/session';
 
 // 진행 중 세션(라우트를 넘나들어도 유지). 없으면 null. 영속은 data-persistence가 담당.
 export const activeSessionAtom = atom<WorkoutSession | null>(null);
@@ -8,5 +8,5 @@ export const activeSessionAtom = atom<WorkoutSession | null>(null);
 export const sessionHistoryAtom = atom<WorkoutSession[]>([]);
 
 // 방금 레벨업한 정보(축하 오버레이용). 닫으면 null. 영속 안 함.
-export type LevelUp = { level: number; name: string };
+type LevelUp = { level: number; name: string };
 export const levelUpAtom = atom<LevelUp | null>(null);

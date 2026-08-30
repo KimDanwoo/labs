@@ -2,7 +2,6 @@
 
 아이돌 컨셉 다마고치 게임. 캐릭터를 선택해 육성하고, 팬끼리 채팅 룸에서 미니게임을 즐기는 Next.js + Supabase 앱.
 
-
 ## 개요
 
 PLAVE 멤버를 모티프로 한 5인 캐릭터 중 하나를 선택해 밥 주기, 씻기기, 놀아주기 등 돌봄 루프를 반복하며 레벨을 올린다. 캐릭터가 죽으면 리셋. 익명 로그인으로 시작해 Google 계정을 연동하면 멀티 디바이스 저장이 된다. 친구와 같은 채팅 룸에 입장해 미니게임 대결을 즐길 수 있다.
@@ -18,16 +17,16 @@ PLAVE 멤버를 모티프로 한 5인 캐릭터 중 하나를 선택해 밥 주�
 
 ## 기술 스택
 
-| 영역 | 선택 |
-|---|---|
-| 프레임워크 | Next.js (App Router) + React 19 |
-| 언어 | TypeScript 5 |
-| 스타일 | Tailwind CSS 4 |
-| 상태관리 | Jotai (`atomWithReducer` + `selectAtom`) |
+| 영역          | 선택                                         |
+| ------------- | -------------------------------------------- |
+| 프레임워크    | Next.js (App Router) + React 19              |
+| 언어          | TypeScript 5                                 |
+| 스타일        | Tailwind CSS 4                               |
+| 상태관리      | Jotai (`atomWithReducer` + `selectAtom`)     |
 | 데이터 동기화 | LocalStorage + Supabase (`game_saves` JSONB) |
-| 인증 | Supabase Auth (Anonymous → Google OAuth) |
-| 실시간 | Supabase Realtime (채팅·온라인 유저) |
-| 서버 캐시 | TanStack Query |
+| 인증          | Supabase Auth (Anonymous → Google OAuth)     |
+| 실시간        | Supabase Realtime (채팅·온라인 유저)         |
+| 서버 캐시     | TanStack Query                               |
 
 ## 구조
 

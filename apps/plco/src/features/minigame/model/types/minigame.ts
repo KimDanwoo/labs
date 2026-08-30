@@ -1,9 +1,9 @@
-import { MINIGAME_MODE, MINIGAME_PHASE } from '../constants/minigame';
+import { MINIGAME_MODE, MINIGAME_PHASE } from '@features/minigame/model/constants';
 
 export type MinigamePhase = (typeof MINIGAME_PHASE)[keyof typeof MINIGAME_PHASE];
 export type MinigameMode = (typeof MINIGAME_MODE)[keyof typeof MINIGAME_MODE];
-export type FallingItemKind = 'good' | 'bad';
-export type CatchFloatVariant = 'good' | 'bad';
+type FallingItemKind = 'good' | 'bad';
+type CatchFloatVariant = 'good' | 'bad';
 
 export type FallingItem = {
   id: number;

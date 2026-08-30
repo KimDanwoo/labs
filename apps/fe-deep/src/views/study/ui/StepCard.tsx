@@ -2,8 +2,8 @@
 
 import { cn } from '@shared/lib/utils';
 import { Badge, Card, KeywordCheck, MarkdownRenderer, SpeakButton } from '@shared/ui';
+import { STEP_KIND, type StudyStep } from '@views/study/model';
 import { Lightbulb } from 'lucide-react';
-import { STEP_KIND, type StudyStep } from '../model';
 import { AiFeedback } from './AiFeedback';
 
 /** 문서의 "꼬꼬무 공통 프레임" — 모범 답변이 없는 질문에서 스스로 정리할 때 쓴다. */

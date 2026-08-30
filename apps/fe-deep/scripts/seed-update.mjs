@@ -9,7 +9,7 @@ for (const line of envContent.split('\n')) {
   if (i > 0) process.env[t.slice(0, i)] = t.slice(i + 1);
 }
 
-const sbAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY);
+const sbAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 // === Part 1: 기존 질문 수정 ===
 let count = 0;

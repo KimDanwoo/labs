@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Grid } from '../types';
+import type { Grid } from '../types';
 import { deepCopyGrid, getBlockCoordinates, getCenterDistance, isCenter, isCorner, isEdge } from '../utils';
 
 describe('스도쿠 유틸리티 함수 테스트', () => {

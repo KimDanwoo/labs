@@ -1,8 +1,8 @@
 'use client';
 
+import { myRoomsQueryKey } from '@entities/chat-room/model/constants';
+import { fetchMyRooms } from '@entities/chat-room/model/services';
 import { useQuery } from '@tanstack/react-query';
-import { myRoomsQueryKey } from '../constants';
-import { fetchMyRooms } from '../services';
 
 export function useMyRooms() {
   return useQuery({

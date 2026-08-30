@@ -2,7 +2,7 @@
 
 import { cn } from '@shared/model/utils';
 import Link from 'next/link';
-import { memo, ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 
 interface SubpageHeaderProps {
   title: string;
@@ -10,14 +10,7 @@ interface SubpageHeaderProps {
 }
 
 export const SubpageHeader = memo<SubpageHeaderProps>(({ title, rightAction }) => (
-  <header
-    className={cn(
-      'sticky top-0 z-30 backdrop-blur-xl',
-      'bg-[rgb(var(--color-glass))]/[var(--glass-opacity)]',
-      'border-b',
-      'border-[rgb(var(--color-border-light))]/50',
-    )}
-  >
+  <header className={cn('glass-header')}>
     <div
       className={cn(
         'relative max-w-5xl xl:max-w-6xl mx-auto',

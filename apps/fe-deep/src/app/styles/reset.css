@@ -1,12 +1,12 @@
 /* ── Reset — Tailwind Preflight 보완 ──────────────────────── */
 
 button,
-[role="button"],
+[role='button'],
 a,
 summary,
-[type="button"],
-[type="submit"],
-[type="reset"] {
+[type='button'],
+[type='submit'],
+[type='reset'] {
   cursor: pointer;
 }
 

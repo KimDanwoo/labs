@@ -1,9 +1,9 @@
 'use client';
 
+import type { LeaderboardEntry } from '@features/ranking/model/types';
 import { leaderboardCol } from '@shared/firebase';
 import { getDocs, limit, orderBy, query } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import type { LeaderboardEntry } from '../types';
 
 const TOP_LIMIT = 100;
 

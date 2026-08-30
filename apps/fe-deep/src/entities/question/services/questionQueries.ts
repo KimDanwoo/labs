@@ -1,4 +1,3 @@
-import { queryOptions } from '@tanstack/react-query';
 import {
   getAllCategories,
   getAllQuestions,
@@ -11,8 +10,9 @@ import {
   getQuestionsByIds,
   getRandomQuestions,
   searchQuestions,
-} from '../api';
-import type { Difficulty } from '../model';
+} from '@entities/question/api';
+import type { Difficulty } from '@entities/question/model';
+import { queryOptions } from '@tanstack/react-query';
 
 /** Question 도메인 조회 쿼리 (TanStack Query queryOptions) */
 export const questionQueries = {

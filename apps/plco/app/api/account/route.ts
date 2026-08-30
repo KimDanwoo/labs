@@ -1,4 +1,4 @@
-import { getAdminSupabase, requireUser } from '@shared/lib/server/supabase-admin';
+import { getAdminSupabase, requireUser } from '@shared/lib/server/supabaseAdmin';
 import { NextResponse } from 'next/server';
 
 /**

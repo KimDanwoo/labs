@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Checkbox } from '@shared/ui';
-import { STUDY_FILTER, STUDY_TIER, STUDY_TIER_ORDER, type StudyFilter, type StudyTier } from '../model';
+import { STUDY_FILTER, STUDY_TIER, STUDY_TIER_ORDER, type StudyFilter, type StudyTier } from '@views/study/model';
 
 const FILTER_LABELS: Record<StudyFilter, string> = {
   [STUDY_FILTER.all]: '전체',

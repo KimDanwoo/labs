@@ -1,6 +1,5 @@
+import { PLAYER_SCREEN, REPEAT_MODE, type PlayerScreen, type RepeatMode } from '@entities/track/model/constants';
 import { atom } from 'jotai';
-import { PLAYER_SCREEN, type PlayerScreen } from '../constants/playerScreen';
-import { REPEAT_MODE, type RepeatMode } from '../constants/repeatMode';
 
 export const currentIndexAtom = atom(0);
 export const isPlayingAtom = atom(false);

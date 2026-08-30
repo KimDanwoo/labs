@@ -21,7 +21,7 @@ export type FoodItem = {
   emoji: string;
 };
 
-export type Poop = {
+type Poop = {
   id: string;
   x: number;
   y: number;
@@ -45,7 +45,7 @@ export type RoomType = (typeof ROOM_TYPE)[keyof typeof ROOM_TYPE];
 
 export type ModalType = (typeof MODAL_TYPE)[keyof typeof MODAL_TYPE] | null;
 
-export type GameStatus = (typeof GAME_STATUS)[keyof typeof GAME_STATUS];
+type GameStatus = (typeof GAME_STATUS)[keyof typeof GAME_STATUS];
 
 export type GameState = {
   status: GameStatus;

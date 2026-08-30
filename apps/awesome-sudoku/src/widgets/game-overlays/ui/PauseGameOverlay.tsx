@@ -7,7 +7,7 @@ import {
 } from '@features/sudoku-game/model/atoms';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { FC } from 'react';
+import type { FC } from 'react';
 import { VscPlay } from 'react-icons/vsc';
 
 export const PauseGameOverlay: FC = () => {
@@ -24,7 +24,7 @@ export const PauseGameOverlay: FC = () => {
       className={cn(
         'absolute inset-0 z-20',
         'flex flex-col items-center justify-center gap-6',
-        'bg-[rgb(var(--color-glass))]/[var(--overlay-opacity)] backdrop-blur-md',
+        'bg-[rgb(var(--color-glass))]/(--overlay-opacity) backdrop-blur-md',
       )}
     >
       <button

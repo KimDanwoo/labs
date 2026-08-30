@@ -1,6 +1,6 @@
 import { CELL_MARK, REGION_COLORS } from '@entities/stardoku/model/constants';
 import { regionAt } from '@entities/stardoku/model/solver';
-import { CellMark, CellPosition, MarkGrid, RegionGrid } from '@entities/stardoku/model/types';
+import type { CellMark, CellPosition, MarkGrid, RegionGrid } from '@entities/stardoku/model/types';
 
 export const createEmptyMarks = (size: number): MarkGrid =>
   Array.from({ length: size }, () => Array<CellMark>(size).fill(CELL_MARK.EMPTY));
@@ -15,7 +15,7 @@ export const countStars = (marks: MarkGrid): number =>
 
 export const cellKey = (row: number, col: number): string => `${row}-${col}`;
 
-export const starPositions = (marks: MarkGrid): CellPosition[] => {
+const starPositions = (marks: MarkGrid): CellPosition[] => {
   const stars: CellPosition[] = [];
   marks.forEach((rowMarks, row) =>
     rowMarks.forEach((mark, col) => {

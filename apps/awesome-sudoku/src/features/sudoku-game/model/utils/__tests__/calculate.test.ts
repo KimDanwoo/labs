@@ -1,5 +1,5 @@
-import { CellPriority, GridPosition, RemovalStrategy, SudokuBoard, SudokuCell } from '@entities/board/model/types';
-import { Difficulty, KillerCage } from '@entities/game/model/types';
+import type { CellPriority, GridPosition, RemovalStrategy, SudokuBoard, SudokuCell } from '@entities/board/model/types';
+import type { Difficulty, KillerCage } from '@entities/game/model/types';
 import {
   calculateCellPriorities,
   calculateKillerCellPriority,

@@ -1,5 +1,6 @@
 'use client';
 
+import { characterPositionAtom, gameAtom, isPlayingAtom, isSickAtom, wokeUpAtAtom } from '@entities/game/model/store';
 import {
   HEART_DECAY_WHEN_SICK,
   HUNGER_DECAY_PER_MINUTE,
@@ -9,7 +10,6 @@ import {
 } from '@shared/constants';
 import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import { useEffect } from 'react';
-import { characterPositionAtom, gameAtom, isPlayingAtom, isSickAtom, wokeUpAtAtom } from '../store';
 
 function isSleepTime(): boolean {
   const hour = new Date().getHours();

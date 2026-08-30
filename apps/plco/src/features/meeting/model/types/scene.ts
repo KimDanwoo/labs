@@ -1,4 +1,4 @@
-import { CONVERSATION_OUTCOME, MEETING_PHASE } from '../constants/meeting';
+import { CONVERSATION_OUTCOME, MEETING_PHASE } from '@features/meeting/model/constants';
 
 export type MeetingPhase = (typeof MEETING_PHASE)[keyof typeof MEETING_PHASE];
 

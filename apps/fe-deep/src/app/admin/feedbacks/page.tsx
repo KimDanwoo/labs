@@ -1,6 +1,6 @@
 'use client';
 
-import { getFeedbacks, updateFeedbackStatus } from '@features/feedback';
+import { getFeedbacks, updateFeedbackStatus } from '@features/feedback/actions';
 import { Badge, Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle, Clock, Eye, MessageSquare, Trash2 } from 'lucide-react';
@@ -16,15 +16,17 @@ interface Feedback {
   created_at: string;
 }
 
-const STATUS_CONFIG: Record<
-  string,
-  { label: string; icon: typeof Clock; variant: 'default' | 'secondary' | 'outline' }
-> = {
+const STATUS_CONFIG = {
   pending: { label: '대기', icon: Clock, variant: 'outline' },
   reviewed: { label: '확인됨', icon: Eye, variant: 'secondary' },
   resolved: { label: '완료', icon: CheckCircle, variant: 'default' },
   deleted: { label: '삭제됨', icon: Trash2, variant: 'outline' },
-};
+} satisfies Record<string, { label: string; icon: typeof Clock; variant: 'default' | 'secondary' | 'outline' }>;
+
+type FeedbackStatus = keyof typeof STATUS_CONFIG;
+
+// status는 DB에서 오는 string이라 알려진 키인지 확인한 뒤 인덱싱한다.
+const isFeedbackStatus = (value: string): value is FeedbackStatus => value in STATUS_CONFIG;
 
 export default function FeedbacksPage() {
   const [filter, setFilter] = useState('pending');
@@ -79,7 +81,7 @@ export default function FeedbacksPage() {
       {!loading && feedbacks.length > 0 && (
         <div className="space-y-3">
           {feedbacks.map((fb) => {
-            const statusConf = STATUS_CONFIG[fb.status] ?? STATUS_CONFIG.pending;
+            const statusConf = STATUS_CONFIG[isFeedbackStatus(fb.status) ? fb.status : 'pending'];
             const StatusIcon = statusConf.icon;
             return (
               <Card key={fb.id} className="shadow-sm">

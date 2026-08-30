@@ -1,8 +1,8 @@
 'use client';
 
+import { CHAT_MESSAGE_MAX, CHAT_SEND_COOLDOWN_MS } from '@features/chat/model/constants';
+import { useSendChat } from '@features/chat/model/hooks';
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { CHAT_MESSAGE_MAX, CHAT_SEND_COOLDOWN_MS } from '../model/constants';
-import { useSendChat } from '../model/hooks';
 
 type ChatComposerProps = {
   roomId: string;

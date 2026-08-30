@@ -3,12 +3,12 @@
 import { useGameActions } from '@entities/game/model/hooks';
 import { CHARACTERS } from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
+import { CHARACTER_SELECT_STEP } from '@views/character-select/model/constants';
+import { useVisibleCharacters } from '@views/character-select/model/hooks';
+import { pendingCharacterAtom, stepAtom } from '@views/character-select/model/store';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { CHARACTER_SELECT_STEP } from '../model/constants';
-import { useVisibleCharacters } from '../model/hooks';
-import { pendingCharacterAtom, stepAtom } from '../model/store';
 
 export default function NicknameScreen() {
   const router = useRouter();

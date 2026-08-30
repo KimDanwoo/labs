@@ -1,9 +1,9 @@
 'use client';
 
+import { chatQueryKey } from '@features/chat/model/constants';
+import { deleteMessage } from '@features/chat/model/services';
+import type { ChatMessage } from '@features/chat/model/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { chatQueryKey } from '../constants';
-import { deleteMessage } from '../services';
-import type { ChatMessage } from '../types';
 
 /** 관리자 메시지 삭제. 성공 시 캐시에서 즉시 제거하고, Realtime 으로 다른 클라이언트에도 반영된다. */
 export function useDeleteChat(roomId: string) {

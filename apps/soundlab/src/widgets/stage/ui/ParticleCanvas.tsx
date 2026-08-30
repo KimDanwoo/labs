@@ -2,9 +2,9 @@ import { TRACKS } from '@entities/track/model/constants';
 import { artworkUrl } from '@entities/track/model/services';
 import { currentIndexAtom, frameState } from '@entities/track/model/store';
 import { useFrame } from '@shared/lib/frame';
+import { createRenderer, RIPPLE_SLOTS, type Renderer } from '@widgets/stage/lib';
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, type RefObject } from 'react';
-import { createRenderer, RIPPLE_SLOTS, type Renderer } from '../lib/renderer';
 
 /**
  * 아트워크는 다른 오리진이므로 crossOrigin 없이는 텍스처 업로드가 보안 오류로 막힌다.

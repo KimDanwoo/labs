@@ -1,6 +1,6 @@
-import { SET_STATUS, type WorkoutSession } from '../types/session';
+import { SET_STATUS, type WorkoutSession } from '@entities/session/model/types';
 
-export type SessionSummary = {
+type SessionSummary = {
   exerciseCount: number;
   completedSets: number;
   totalReps: number;

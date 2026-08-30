@@ -1,9 +1,9 @@
-import { AuthProvider } from '@apps/providers/AuthProvider';
-import { JotaiProvider } from '@apps/providers/JotaiProvider';
-import { ThemeProvider } from '@apps/providers/ThemeProvider';
+import { AuthProvider } from '@app/providers/AuthProvider';
+import { JotaiProvider } from '@app/providers/JotaiProvider';
+import { ThemeProvider } from '@app/providers/ThemeProvider';
 import type { Metadata, Viewport } from 'next';
 import { Rubik, Space_Mono } from 'next/font/google';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import './globals.css';
 
 const rubik = Rubik({

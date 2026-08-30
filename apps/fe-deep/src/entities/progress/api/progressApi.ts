@@ -1,7 +1,7 @@
 'use client';
 
+import { SM2_CONSTANTS, type UserProgress } from '@entities/progress/model';
 import { STORAGE_KEYS } from '@shared/constants';
-import { SM2_CONSTANTS, type UserProgress } from '../model';
 
 /** 오늘 날짜를 YYYY-MM-DD 문자열로 반환한다. */
 function todayString(): string {
@@ -84,7 +84,8 @@ export function getStudyHeatmap(preloaded?: Record<string, UserProgress>): Recor
 
   for (const entry of Object.values(allProgress)) {
     if (!entry.last_reviewed) continue;
-    const date = entry.last_reviewed.split('T')[0];
+    const [date] = entry.last_reviewed.split('T');
+    if (!date) continue;
     heatmap[date] = (heatmap[date] ?? 0) + 1;
   }
 

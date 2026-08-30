@@ -11,8 +11,8 @@ import {
   SheetTitle,
   VoiceSetting,
 } from '@shared/ui';
+import { useAccount } from '@views/my-page/model';
 import { Mail, User, Volume2 } from 'lucide-react';
-import { useAccount } from '../model';
 
 export function AccountPage() {
   const { displayName, email, avatarUrl, open, deleting, error, handleDelete, handleOpenChange } = useAccount();

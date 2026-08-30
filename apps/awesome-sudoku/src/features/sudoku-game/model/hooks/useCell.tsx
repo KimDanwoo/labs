@@ -1,4 +1,4 @@
-import { CellProps } from '@entities/board/model/types';
+import type { CellProps } from '@entities/board/model/types';
 import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom } from '@features/sudoku-game/model/atoms';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';

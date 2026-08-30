@@ -1,6 +1,6 @@
 import { BOARD_SIZE } from '@entities/board/model/constants';
-import { Grid, SudokuBoard, SudokuCell } from '@entities/board/model/types';
-import { Difficulty } from '@entities/game/model/types';
+import type { Grid, SudokuBoard, SudokuCell } from '@entities/board/model/types';
+import type { Difficulty } from '@entities/game/model/types';
 import { removeRandomCellsWithStrategy } from '@features/sudoku-game/model/utils/remove';
 import { hasUniqueSolution } from '@features/sudoku-game/model/utils/validator';
 import { describe, expect, it } from 'vitest';

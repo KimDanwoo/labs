@@ -2,11 +2,11 @@
 
 import { CHARACTERS } from '@shared/constants';
 import { CharacterSprite } from '@shared/ui';
+import { CHARACTER_SELECT_STEP } from '@views/character-select/model/constants';
+import { usePointerSwipe } from '@views/character-select/model/hooks';
+import { pendingCharacterAtom, stepAtom } from '@views/character-select/model/store';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
-import { CHARACTER_SELECT_STEP } from '../model/constants';
-import { usePointerSwipe } from '../model/hooks';
-import { pendingCharacterAtom, stepAtom } from '../model/store';
 
 const ALL_CHARACTER_LIST = Object.values(CHARACTERS);
 
@@ -28,6 +28,9 @@ export default function CharacterCarousel() {
     onSwipeLeft: handleNext,
     onSwipeRight: handlePrev,
   });
+
+  // index는 modulo로 항상 범위 안이지만 타입상 좁혀준다. 훅 호출 뒤에 둔다.
+  if (!current) return null;
 
   const handleBack = () => setStep(CHARACTER_SELECT_STEP.INTRO);
 

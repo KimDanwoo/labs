@@ -1,10 +1,10 @@
-import { CageInfo } from '@entities/board/model/types';
+import type { CageInfo } from '@entities/board/model/types';
 import { GAME_MODE } from '@entities/game/model/constants';
 import { cagesAtom, gameModeAtom } from '@features/sudoku-game/model/atoms';
 import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useState } from 'react';
 import { useCagePathCalculator } from './useCagePathCalculator';
-import { CellPosition, useTableDimensions } from './useTableDimensions';
+import { type CellPosition, useTableDimensions } from './useTableDimensions';
 
 const DEFAULT_CELL_SIZE = 40;
 

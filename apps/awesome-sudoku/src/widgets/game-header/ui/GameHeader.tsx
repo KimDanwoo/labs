@@ -5,7 +5,7 @@ import { mistakeCountAtom } from '@features/sudoku-game/model/atoms';
 import { GameDifficultySelector, TimerControl } from '@features/sudoku-game/ui';
 import { cn } from '@shared/model/utils';
 import { useAtomValue } from 'jotai';
-import { FC } from 'react';
+import type { FC } from 'react';
 
 const MistakeCounter: FC = () => {
   const mistakeCount = useAtomValue(mistakeCountAtom);

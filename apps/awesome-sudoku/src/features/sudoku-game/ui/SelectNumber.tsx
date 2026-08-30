@@ -14,7 +14,7 @@ import { pushStateAtom } from '@features/undo-redo/model/atoms';
 import { cn } from '@shared/model/utils';
 import { NumberButton } from '@shared/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { FC, useCallback, useMemo } from 'react';
+import { type FC, useCallback, useMemo } from 'react';
 
 export const SelectNumber: FC = () => {
   const isNoteMode = useAtomValue(isNoteModeAtom);

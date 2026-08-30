@@ -2,11 +2,11 @@
 
 import { useGameActions } from '@entities/game/model/hooks';
 import { characterStatesAtom } from '@entities/game/model/store';
+import { CHARACTER_SELECT_STEP } from '@views/character-select/model/constants';
+import { useVisibleCharacters } from '@views/character-select/model/hooks';
+import { pendingCharacterAtom, stepAtom } from '@views/character-select/model/store';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
-import { CHARACTER_SELECT_STEP } from '../model/constants';
-import { useVisibleCharacters } from '../model/hooks';
-import { pendingCharacterAtom, stepAtom } from '../model/store';
 import FriendCard from './FriendCard';
 import GoogleLoginPrompt from './GoogleLoginPrompt';
 

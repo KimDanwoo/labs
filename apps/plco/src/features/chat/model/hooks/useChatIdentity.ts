@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@entities/auth/model/hooks';
-import { CHAT_NICKNAME_MAX, DEFAULT_NICKNAME } from '../constants';
+import { CHAT_NICKNAME_MAX, DEFAULT_NICKNAME } from '@features/chat/model/constants';
 
 function resolveNickname(metadata: Record<string, unknown> | undefined): string {
   const raw = (metadata?.full_name as string | undefined) ?? (metadata?.name as string | undefined) ?? DEFAULT_NICKNAME;

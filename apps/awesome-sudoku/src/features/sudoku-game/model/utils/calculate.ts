@@ -1,7 +1,7 @@
 import { BLOCK_SIZE, BOARD_MAX_INDEX, BOARD_SIZE, SUDOKU_CELL_COUNT } from '@entities/board/model/constants';
-import { CellPriority, GridPosition, RemovalStrategy, SudokuBoard } from '@entities/board/model/types';
+import type { CellPriority, GridPosition, RemovalStrategy, SudokuBoard } from '@entities/board/model/types';
 import { getCenterDistance, isCenter, isCorner, isEdge } from '@entities/board/model/utils';
-import { Difficulty, KillerCage } from '@entities/game/model/types';
+import type { Difficulty, KillerCage } from '@entities/game/model/types';
 import { shuffleArray } from './common';
 
 /**

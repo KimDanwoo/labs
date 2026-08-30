@@ -40,13 +40,7 @@ export const StardokuPage = () => {
       </div>
 
       {/* Header */}
-      <header
-        className={cn(
-          'sticky top-0 z-30 backdrop-blur-xl',
-          'bg-[rgb(var(--color-glass))]/[var(--glass-opacity)]',
-          'border-b border-[rgb(var(--color-border-light))]/50',
-        )}
-      >
+      <header className={cn('glass-header')}>
         <div
           className={cn(
             'mx-auto py-3',

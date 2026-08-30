@@ -1,6 +1,5 @@
-import { StudyRunView } from '@views/study';
 import { getStudyDoc, getStudyDocSlugs } from '@views/study/model/studyDocs';
-import { StudyDevReload } from '@views/study/ui';
+import { StudyDevReload, StudyRunView } from '@views/study/ui';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 

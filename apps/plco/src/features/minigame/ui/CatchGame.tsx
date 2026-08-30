@@ -13,8 +13,8 @@ import {
   MINIGAME_PHASE,
   MINIGAME_SCORE_GOOD,
   MINIGAME_SCORE_OK,
-} from '../model/constants';
-import { useCatchEngine } from '../model/hooks';
+} from '@features/minigame/model/constants';
+import { useCatchEngine } from '@features/minigame/model/hooks';
 import MinigameCooldownNotice from './MinigameCooldownNotice';
 import MinigameReadyScreen from './MinigameReadyScreen';
 import MinigameRewardSummary from './MinigameRewardSummary';

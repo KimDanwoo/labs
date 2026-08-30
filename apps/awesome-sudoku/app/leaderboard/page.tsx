@@ -1,4 +1,4 @@
-import { LeaderboardPage } from '@views/leaderboard';
+import { LeaderboardPage } from '@views/leaderboard/ui';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {

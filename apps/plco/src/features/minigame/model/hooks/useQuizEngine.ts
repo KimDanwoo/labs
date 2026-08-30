@@ -2,12 +2,12 @@
 
 import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
 import { characterIdAtom } from '@entities/game/model/store';
+import { QUIZ_PHASE, QUIZ_ROUNDS } from '@features/minigame/model/constants';
+import { fetchRandomQuizQuestions } from '@features/minigame/model/services';
+import type { QuizPhase, QuizQuestion } from '@features/minigame/model/types';
 import { CHARACTERS } from '@shared/constants';
 import { useAtomValue } from 'jotai';
 import { useCallback, useState } from 'react';
-import { QUIZ_PHASE, QUIZ_ROUNDS } from '../constants';
-import { fetchRandomQuizQuestions } from '../services';
-import type { QuizPhase, QuizQuestion } from '../types';
 
 export function useQuizEngine() {
   const myCharacterId = useAtomValue(characterIdAtom);

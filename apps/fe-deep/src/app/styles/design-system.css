@@ -8,7 +8,6 @@
      · opt-in    : chart / sidebar / 확장 gray 스텝 / 읽기 타이포 / 이펙트 / 애니메이션
    ══════════════════════════════════════════════════════════ */
 
-
 /* ── 1. 스킨 + opt-in primitives ────────────────────────── */
 
 :root {
@@ -20,25 +19,25 @@
   /* gray 램프 — 공유는 gray를 semantic 값에 인라인하고 --gray-* 변수를 노출하지 않는다.
      프딥은 표면 미세조정에 gray 스텝을 직접 참조하므로 여기서 자립적으로 정의한다.
      값은 공유 팔레트(hue 264)와 동일 + 프딥 전용 추가 스텝(25/75/850/950). */
-  --gray-25:  oklch(0.995 0.001 264);
-  --gray-50:  oklch(0.985 0.002 264);
-  --gray-75:  oklch(0.975 0.004 264);
+  --gray-25: oklch(0.995 0.001 264);
+  --gray-50: oklch(0.985 0.002 264);
+  --gray-75: oklch(0.975 0.004 264);
   --gray-100: oklch(0.96 0.004 264);
   --gray-200: oklch(0.92 0.006 264);
   --gray-300: oklch(0.87 0.008 264);
-  --gray-400: oklch(0.70 0.010 264);
+  --gray-400: oklch(0.7 0.01 264);
   --gray-500: oklch(0.55 0.012 264);
-  --gray-600: oklch(0.40 0.012 264);
-  --gray-700: oklch(0.30 0.015 264);
-  --gray-800: oklch(0.20 0.018 264);
+  --gray-600: oklch(0.4 0.012 264);
+  --gray-700: oklch(0.3 0.015 264);
+  --gray-800: oklch(0.2 0.018 264);
   --gray-850: oklch(0.145 0.018 264);
   --gray-900: oklch(0.12 0.015 264);
   --gray-950: oklch(0.115 0.015 264);
 
   /* 차트 전용 hue (opt-in). chart-1 은 브랜드를 재사용한다. */
-  --teal-500:   oklch(0.6 0.118 185);
-  --teal-400:   oklch(0.696 0.17 162);
-  --blue-600:   oklch(0.398 0.07 227);
+  --teal-500: oklch(0.6 0.118 185);
+  --teal-400: oklch(0.696 0.17 162);
+  --blue-600: oklch(0.398 0.07 227);
   --yellow-400: oklch(0.828 0.189 84);
   --yellow-500: oklch(0.769 0.188 70);
   --purple-500: oklch(0.627 0.265 304);
@@ -52,8 +51,8 @@
 
   /* 표면 미세조정 — 공유는 순백 배경이지만 프딥은 은은한 gray 배경 + 밝은 카드 */
   --color-background: var(--gray-50);
-  --color-card:       var(--gray-25);
-  --color-popover:    var(--gray-25);
+  --color-card: var(--gray-25);
+  --color-popover: var(--gray-25);
 
   /* Charts (opt-in) */
   --chart-1: var(--color-primary);
@@ -63,30 +62,29 @@
   --chart-5: var(--yellow-500);
 
   /* Sidebar (opt-in) */
-  --sidebar:                    var(--gray-75);
-  --sidebar-foreground:         var(--color-foreground);
-  --sidebar-primary:            var(--color-primary);
+  --sidebar: var(--gray-75);
+  --sidebar-foreground: var(--color-foreground);
+  --sidebar-primary: var(--color-primary);
   --sidebar-primary-foreground: var(--color-primary-foreground);
-  --sidebar-accent:             var(--color-accent);
-  --sidebar-accent-foreground:  var(--color-accent-foreground);
-  --sidebar-border:             var(--color-border);
-  --sidebar-ring:               var(--color-ring);
+  --sidebar-accent: var(--color-accent);
+  --sidebar-accent-foreground: var(--color-accent-foreground);
+  --sidebar-border: var(--color-border);
+  --sidebar-ring: var(--color-ring);
 }
 
 .dark {
   --color-background: var(--gray-950);
-  --color-card:       var(--gray-850);
-  --color-popover:    var(--gray-850);
+  --color-card: var(--gray-850);
+  --color-popover: var(--gray-850);
 
   --chart-2: var(--teal-400);
   --chart-3: var(--yellow-500);
   --chart-4: var(--purple-500);
   --chart-5: var(--orange-500);
 
-  --sidebar:            var(--gray-900);
-  --sidebar-border:     var(--white-10);
+  --sidebar: var(--gray-900);
+  --sidebar-border: var(--white-10);
 }
-
 
 /* ── 2. Theme (opt-in 토큰만 Tailwind 유틸로 등록) ──────── */
 
@@ -118,67 +116,202 @@
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
 
 /* ── 3. Typography (읽기 타이포 — opt-in) ───────────────── */
 /* tbd = bold (700), tmd = medium (500), trg = regular (400) */
 
-@utility tbd-40 { font-size: 40px; line-height: 52px; font-weight: 700; letter-spacing: -0.3px; }
-@utility tbd-24 { font-size: 24px; line-height: 36px; font-weight: 700; letter-spacing: -0.3px; }
-@utility tbd-20 { font-size: 20px; line-height: 30px; font-weight: 700; letter-spacing: -0.3px; }
-@utility tbd-18 { font-size: 18px; line-height: 26px; font-weight: 700; letter-spacing: -0.3px; }
-@utility tbd-16 { font-size: 16px; line-height: 24px; font-weight: 700; letter-spacing: -0.3px; }
+@utility tbd-40 {
+  font-size: 40px;
+  line-height: 52px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+@utility tbd-24 {
+  font-size: 24px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+@utility tbd-20 {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+@utility tbd-18 {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+@utility tbd-16 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
 
-@utility tmd-24 { font-size: 24px; line-height: 36px; font-weight: 500; letter-spacing: -0.3px; }
-@utility tmd-22 { font-size: 22px; line-height: 32px; font-weight: 500; letter-spacing: -0.3px; }
-@utility tmd-20 { font-size: 20px; line-height: 30px; font-weight: 500; letter-spacing: -0.3px; }
-@utility tmd-18 { font-size: 18px; line-height: 26px; font-weight: 500; letter-spacing: -0.3px; }
-@utility tmd-16 { font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: -0.3px; }
-@utility tmd-16-reading { font-size: 16px; line-height: 26px; font-weight: 500; letter-spacing: -0.3px; }
-@utility tmd-14 { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: -0.3px; }
-@utility tmd-14-reading { font-size: 14px; line-height: 22px; font-weight: 500; letter-spacing: -0.3px; }
-@utility tmd-12 { font-size: 12px; line-height: 18px; font-weight: 500; letter-spacing: -0.3px; }
-@utility tmd-10 { font-size: 10px; line-height: 15px; font-weight: 500; letter-spacing: -0.3px; }
+@utility tmd-24 {
+  font-size: 24px;
+  line-height: 36px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+@utility tmd-22 {
+  font-size: 22px;
+  line-height: 32px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+@utility tmd-20 {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+@utility tmd-18 {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+@utility tmd-16 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+@utility tmd-16-reading {
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+@utility tmd-14 {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+@utility tmd-14-reading {
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+@utility tmd-12 {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+@utility tmd-10 {
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
 
-@utility trg-18 { font-size: 18px; line-height: 26px; font-weight: 400; letter-spacing: -0.3px; }
-@utility trg-16 { font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: -0.3px; }
-@utility trg-16-reading { font-size: 16px; line-height: 26px; font-weight: 400; letter-spacing: -0.3px; }
-@utility trg-14 { font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: -0.3px; }
-@utility trg-14-reading { font-size: 14px; line-height: 22px; font-weight: 400; letter-spacing: -0.3px; }
-@utility trg-12 { font-size: 12px; line-height: 18px; font-weight: 400; letter-spacing: -0.3px; }
-@utility trg-10 { font-size: 10px; line-height: 15px; font-weight: 400; letter-spacing: -0.3px; }
+@utility trg-18 {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+@utility trg-16 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+@utility trg-16-reading {
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+@utility trg-14 {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+@utility trg-14-reading {
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+@utility trg-12 {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+@utility trg-10 {
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
 
-@utility text-clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
+@utility text-clip {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* ── 4. Utilities (이펙트 — opt-in) ─────────────────────── */
 
 @utility card-hover {
   border-color: var(--color-border);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.3s ease;
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease;
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px oklch(0.37 0.1 264 / 6%), 0 12px 40px oklch(0.37 0.1 264 / 8%);
+    box-shadow:
+      0 4px 12px oklch(0.37 0.1 264 / 6%),
+      0 12px 40px oklch(0.37 0.1 264 / 8%);
     border-color: oklch(0.37 0.1 264 / 15%);
   }
   &:is(.dark *):hover {
-    box-shadow: 0 4px 12px oklch(0 0 0 / 30%), 0 12px 40px oklch(0.72 0.12 264 / 8%);
+    box-shadow:
+      0 4px 12px oklch(0 0 0 / 30%),
+      0 12px 40px oklch(0.72 0.12 264 / 8%);
     border-color: oklch(0.72 0.12 264 / 15%);
   }
 }
 
 @utility inner-glow {
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 60%), 0 1px 3px oklch(0.37 0.1 264 / 5%);
-  &:is(.dark *) { box-shadow: inset 0 1px 0 oklch(1 0 0 / 5%), 0 1px 3px oklch(0 0 0 / 30%); }
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 60%),
+    0 1px 3px oklch(0.37 0.1 264 / 5%);
+  &:is(.dark *) {
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 5%),
+      0 1px 3px oklch(0 0 0 / 30%);
+  }
 }
 
 @utility hero-gradient {
@@ -188,8 +321,8 @@
     radial-gradient(ellipse 40% 40% at 50% 80%, oklch(0.88 0.05 200 / 8%) 0%, transparent 70%);
   &:is(.dark *) {
     background:
-      radial-gradient(ellipse 60% 50% at 20% 40%, oklch(0.30 0.12 264 / 25%) 0%, transparent 70%),
-      radial-gradient(ellipse 50% 60% at 80% 30%, oklch(0.28 0.10 290 / 18%) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 50% at 20% 40%, oklch(0.3 0.12 264 / 25%) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 60% at 80% 30%, oklch(0.28 0.1 290 / 18%) 0%, transparent 70%),
       radial-gradient(ellipse 40% 40% at 50% 80%, oklch(0.22 0.06 200 / 12%) 0%, transparent 70%);
   }
 }
@@ -205,7 +338,9 @@
     pointer-events: none;
     z-index: 1;
   }
-  &:is(.dark *)::before { opacity: 0.04; }
+  &:is(.dark *)::before {
+    opacity: 0.04;
+  }
 }
 
 @utility safe-area-bottom {
@@ -213,17 +348,43 @@
 }
 
 @utility stagger-children {
-  & > * { animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-  & > *:nth-child(1) { animation-delay: 0ms; }
-  & > *:nth-child(2) { animation-delay: 60ms; }
-  & > *:nth-child(3) { animation-delay: 120ms; }
-  & > *:nth-child(4) { animation-delay: 180ms; }
-  & > *:nth-child(5) { animation-delay: 240ms; }
-  & > *:nth-child(6) { animation-delay: 300ms; }
-  & > *:nth-child(7) { animation-delay: 360ms; }
-  & > *:nth-child(8) { animation-delay: 420ms; }
-  & > *:nth-child(9) { animation-delay: 480ms; }
-  & > *:nth-child(10) { animation-delay: 540ms; }
-  & > *:nth-child(11) { animation-delay: 600ms; }
-  & > *:nth-child(12) { animation-delay: 660ms; }
+  & > * {
+    animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  & > *:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  & > *:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  & > *:nth-child(3) {
+    animation-delay: 120ms;
+  }
+  & > *:nth-child(4) {
+    animation-delay: 180ms;
+  }
+  & > *:nth-child(5) {
+    animation-delay: 240ms;
+  }
+  & > *:nth-child(6) {
+    animation-delay: 300ms;
+  }
+  & > *:nth-child(7) {
+    animation-delay: 360ms;
+  }
+  & > *:nth-child(8) {
+    animation-delay: 420ms;
+  }
+  & > *:nth-child(9) {
+    animation-delay: 480ms;
+  }
+  & > *:nth-child(10) {
+    animation-delay: 540ms;
+  }
+  & > *:nth-child(11) {
+    animation-delay: 600ms;
+  }
+  & > *:nth-child(12) {
+    animation-delay: 660ms;
+  }
 }

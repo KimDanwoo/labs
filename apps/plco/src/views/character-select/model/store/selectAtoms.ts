@@ -1,6 +1,6 @@
+import { CHARACTER_SELECT_STEP } from '@views/character-select/model/constants';
+import type { CharacterSelectStep, PendingCharacter } from '@views/character-select/model/types';
 import { atom } from 'jotai';
-import { CHARACTER_SELECT_STEP } from '../constants';
-import type { CharacterSelectStep, PendingCharacter } from '../types';
 
 export const stepAtom = atom<CharacterSelectStep>(CHARACTER_SELECT_STEP.INTRO);
 

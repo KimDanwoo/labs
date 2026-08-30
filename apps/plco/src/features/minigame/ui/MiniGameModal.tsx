@@ -1,11 +1,11 @@
 'use client';
 
 import { useGameActions } from '@entities/game/model/hooks';
+import { MINIGAME_MODE } from '@features/minigame/model/constants';
+import type { MinigameMode } from '@features/minigame/model/types';
 import { MODAL_TYPE } from '@shared/constants';
 import { ModalShell } from '@shared/ui';
 import { useState } from 'react';
-import { MINIGAME_MODE } from '../model/constants';
-import type { MinigameMode } from '../model/types';
 import CatchGame from './CatchGame';
 import PlcoRunGame from './PlcoRunGame';
 import QuizGame from './QuizGame';

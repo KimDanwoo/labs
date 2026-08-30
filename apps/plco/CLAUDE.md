@@ -32,6 +32,7 @@ views/destiny-input/
 **Import 순서**: react/next → 외부 패키지 → @app…@shared → 상대경로
 
 **Import 세그먼트**: 세그먼트 하위에 `ui`인지 `model`인지가 import 경로에서 항상 드러나야 한다. **slice 루트(`@widgets/X`, `@views/X`, `@features/X`, `@entities/X`) 직접 import는 금지**.
+
 - ui 안의 컴포넌트: `from '@widgets/status-bar/ui'`, `from '@features/feed/ui'`, `from '@shared/ui'`
 - views의 메인 뷰(폴더 루트 파일): 파일명까지 명시 — `from '@views/death/DeathScreen'`, `from '@views/game/GameView'`
 - model 하위: `model/hooks`, `model/store`, `model/constants`, `model/types` 까지 명시
@@ -39,10 +40,12 @@ views/destiny-input/
 - slice 루트 `index.ts`(예: `src/widgets/status-bar/index.ts`)와 통합 `model/index.ts`는 만들지 않는다. 통합 barrel이 없어야 슬라이스 루트 import가 컴파일 에러로 막힌다.
 
 **Enum-like 매직 스트링 금지**: status, step, phase, modalType 같은 literal union은 `as const` 객체 상수로 빼고 타입을 거기서 파생한다.
+
 ```ts
 export const GAME_STATUS = { SELECTING: 'selecting', PLAYING: 'playing', DEAD: 'dead' } as const;
 export type GameStatus = (typeof GAME_STATUS)[keyof typeof GAME_STATUS];
 ```
+
 사용처는 `status === GAME_STATUS.DEAD` 처럼 상수 참조만. 비교/세팅 둘 다 매직 리터럴 금지.
 
 ## 컴포넌트 분리 원칙
@@ -81,7 +84,7 @@ export type GameStatus = (typeof GAME_STATUS)[keyof typeof GAME_STATUS];
 - **로딩/에러 UI는 `isLoading`/`isPending`/`error`**를 그대로 쓴다. 별도 status useState를 만들지 않는다.
 - **Provider**는 해당 영역 최상위에 둔다(예: 관리자는 `app/admin/_lib/AdminQueryProvider`).
 - **API·라우트 경로는 도메인별 상수로 묶는다**(하드코딩 금지): 예) `ADMIN_API`(서버 API), `ADMIN_ROUTE`(페이지 경로). 매직 스트링 경로 금지.
-- **서버 쓰기 보안**: 콘텐츠 쓰기는 서버 라우트(`/api/admin/*`)에서 세션 토큰을 검증(`requireAdmin`)하고 `service_role`로만 수행한다. service_role 키는 절대 클라이언트(`NEXT_PUBLIC_`)에 노출하지 않는다.
+- **서버 쓰기 보안**: 콘텐츠 쓰기는 서버 라우트(`/api/admin/*`)에서 세션 토큰을 검증(`requireAdmin`)하고 `service_role`로만 수행한다. service*role 키는 절대 클라이언트(`NEXT_PUBLIC*`)에 노출하지 않는다.
 
 ## 데이터 동기화
 

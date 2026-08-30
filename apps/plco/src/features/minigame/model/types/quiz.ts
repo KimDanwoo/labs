@@ -1,5 +1,5 @@
+import { QUIZ_PHASE } from '@features/minigame/model/constants';
 import type { CharacterId } from '@shared/types';
-import { QUIZ_PHASE } from '../constants/quiz';
 
 export type QuizQuestion = {
   id: string;

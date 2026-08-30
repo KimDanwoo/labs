@@ -1,8 +1,6 @@
 'use client';
 
 import { useGameActions, useMinigameStatus } from '@entities/game/model/hooks';
-import { readLocalInt, writeLocalInt } from '@shared/lib';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   RUN_BEST_SCORE_KEY,
   RUN_CHAR_SIZE,
@@ -40,8 +38,10 @@ import {
   RUN_SPAWN_SPEEDUP,
   RUN_TILT_FACTOR,
   RUN_TILT_MAX,
-} from '../constants';
-import type { RunHeart, RunObstacle, RunPhase, RunPickup } from '../types';
+} from '@features/minigame/model/constants';
+import type { RunHeart, RunObstacle, RunPhase, RunPickup } from '@features/minigame/model/types';
+import { pickRandom, readLocalInt, writeLocalInt } from '@shared/lib';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useRunEngine() {
   const { minigameReward, markMinigamePlayed, closeModal } = useGameActions();
@@ -237,14 +237,11 @@ export function useRunEngine() {
       if (now - lastObstacleSpawnRef.current > obstacleSpawnInterval) {
         const lastObs = obstaclesRef.current[obstaclesRef.current.length - 1];
         const minGap = RUN_OBSTACLE_SIZE * RUN_MIN_GAP_FACTOR;
-        if (!lastObs || RUN_FIELD_WIDTH - lastObs.x >= minGap) {
+        const obstacleEmoji = pickRandom(RUN_OBSTACLE_EMOJIS);
+        if (obstacleEmoji && (!lastObs || RUN_FIELD_WIDTH - lastObs.x >= minGap)) {
           obstaclesRef.current = [
             ...obstaclesRef.current,
-            {
-              id: nextIdRef.current++,
-              x: RUN_FIELD_WIDTH,
-              emoji: RUN_OBSTACLE_EMOJIS[Math.floor(Math.random() * RUN_OBSTACLE_EMOJIS.length)],
-            },
+            { id: nextIdRef.current++, x: RUN_FIELD_WIDTH, emoji: obstacleEmoji },
           ];
           lastObstacleSpawnRef.current = now;
         }
@@ -253,15 +250,9 @@ export function useRunEngine() {
       const heartSpawnInterval =
         RUN_HEART_SPAWN_INTERVAL_MIN + Math.random() * (RUN_HEART_SPAWN_INTERVAL_BASE - RUN_HEART_SPAWN_INTERVAL_MIN);
       if (now - lastHeartSpawnRef.current > heartSpawnInterval) {
-        const y = RUN_HEART_Y_TIERS[Math.floor(Math.random() * RUN_HEART_Y_TIERS.length)];
-        heartsRef.current = [
-          ...heartsRef.current,
-          {
-            id: nextIdRef.current++,
-            x: RUN_FIELD_WIDTH,
-            y,
-          },
-        ];
+        const y = pickRandom(RUN_HEART_Y_TIERS);
+        if (y === undefined) return;
+        heartsRef.current = [...heartsRef.current, { id: nextIdRef.current++, x: RUN_FIELD_WIDTH, y }];
         lastHeartSpawnRef.current = now;
       }
 

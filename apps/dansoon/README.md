@@ -13,13 +13,13 @@ AI 기술 뉴스 큐레이션과 주간 베스트셀러 리포트를 제공하�
 
 ## 기술 스택
 
-| 영역 | 선택 |
-|---|---|
-| 프레임워크 | Astro 5 |
-| UI | React 19 (인터랙티브 컴포넌트만) |
-| 스타일 | Tailwind CSS 4 + Typography 플러그인 |
-| 콘텐츠 | Astro Content Collections (Markdown) |
-| 배포 | Vercel |
+| 영역          | 선택                                       |
+| ------------- | ------------------------------------------ |
+| 프레임워크    | Astro 5                                    |
+| UI            | React 19 (인터랙티브 컴포넌트만)           |
+| 스타일        | Tailwind CSS 4 + Typography 플러그인       |
+| 콘텐츠        | Astro Content Collections (Markdown)       |
+| 배포          | Vercel                                     |
 | 콘텐츠 자동화 | Python + `google-genai` (Gemini 2.5 Flash) |
 
 ## 구조

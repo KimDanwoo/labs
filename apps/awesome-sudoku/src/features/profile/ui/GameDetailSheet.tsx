@@ -1,6 +1,6 @@
 'use client';
 
-import { GameRecord } from '@entities/game-record/model/types';
+import type { GameRecord } from '@entities/game-record/model/types';
 import { getRecordPoint } from '@entities/game-record/model/utils';
 import { GAME_LEVEL_LABELS, GAME_MODE } from '@entities/game/model/constants';
 import { formatTime } from '@features/sudoku-game/model/utils';

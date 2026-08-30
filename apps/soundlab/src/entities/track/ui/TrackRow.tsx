@@ -1,5 +1,5 @@
-import { hueOf } from '../model/constants';
-import type { Track } from '../model/types';
+import { hueOf } from '@entities/track/model/constants';
+import type { Track } from '@entities/track/model/types';
 import { LevelMeter } from './LevelMeter';
 
 type TrackRowProps = {

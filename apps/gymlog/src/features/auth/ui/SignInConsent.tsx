@@ -1,12 +1,12 @@
 'use client';
 
+import { signInWithGoogle } from '@features/auth/model/hooks';
+import { signInConsentOpenAtom } from '@features/auth/model/store';
 import { Button } from '@ui/react';
 import { useAtom } from 'jotai';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { signInWithGoogle } from '../model/hooks';
-import { signInConsentOpenAtom } from '../model/store';
 
 // 로그인 전 약관 동의 시트(전역). 동의해야 실제 Google 로그인이 진행된다.
 export function SignInConsent() {

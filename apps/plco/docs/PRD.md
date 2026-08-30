@@ -15,15 +15,15 @@
 
 ### 기술 스택
 
-| 영역 | 사용 라이브러리 |
-|------|-----------------|
-| 프레임워크 | Next.js 16 (App Router) + React 19 |
-| 언어 | TypeScript 5 |
-| 스타일 | Tailwind CSS 4 (`@theme inline` 토큰) |
-| 상태관리 | Jotai (`atomWithReducer` + `selectAtom` 패턴) |
-| 데이터 동기화 | LocalStorage + Supabase (`game_saves` JSONB) |
-| 인증 | Supabase Auth (Anonymous → Google OAuth Link) |
-| 패키지 매니저 | pnpm |
+| 영역          | 사용 라이브러리                               |
+| ------------- | --------------------------------------------- |
+| 프레임워크    | Next.js 16 (App Router) + React 19            |
+| 언어          | TypeScript 5                                  |
+| 스타일        | Tailwind CSS 4 (`@theme inline` 토큰)         |
+| 상태관리      | Jotai (`atomWithReducer` + `selectAtom` 패턴) |
+| 데이터 동기화 | LocalStorage + Supabase (`game_saves` JSONB)  |
+| 인증          | Supabase Auth (Anonymous → Google OAuth Link) |
+| 패키지 매니저 | pnpm                                          |
 
 ---
 
@@ -31,13 +31,13 @@
 
 ### 2.1 선택 가능 캐릭터 (5인 PLAVE 멤버 모티프)
 
-| ID | 표시명 | 시그니처 컬러 | 이모지 | 본명 모티프 |
-|----|--------|---------------|--------|-------------|
-| `yeko` | 예코 | `#2D2D5E` (네이비-퍼플) | 💜 | 남예준 / 돌고래 |
-| `ako` | 아코 | `#FFD93D` (옐로) | 💛 | — |
-| `bamko` | 밤코 | `#FF6B9D` (핑크) | 🩷 | — |
-| `eunko` | 은코 | `#B0C4DE` (라이트블루) | 🤍 | — |
-| `hako` | 하코 | `#4A90D9` (블루) | 💙 | — |
+| ID      | 표시명 | 시그니처 컬러           | 이모지 | 본명 모티프     |
+| ------- | ------ | ----------------------- | ------ | --------------- |
+| `yeko`  | 예코   | `#2D2D5E` (네이비-퍼플) | 💜     | 남예준 / 돌고래 |
+| `ako`   | 아코   | `#FFD93D` (옐로)        | 💛     | —               |
+| `bamko` | 밤코   | `#FF6B9D` (핑크)        | 🩷     | —               |
+| `eunko` | 은코   | `#B0C4DE` (라이트블루)  | 🤍     | —               |
+| `hako`  | 하코   | `#4A90D9` (블루)        | 💙     | —               |
 
 > 초기 PRD에 있었던 “양갈래(아기 캐릭터)” 시스템은 제거되고, **알 → 미해금 멤버 해금** 메커닉으로 대체됨.
 
@@ -91,12 +91,12 @@
 
 #### 4.2.1 룸 전환 규칙 (`roomTypeAtom`)
 
-| 조건 | 룸 | 배경 |
-|------|------|------|
-| `isSleeping` | `bedroom` | `room_2.webp` |
-| 만남 모달 오픈 | `outdoor` | `room_4.webp` |
+| 조건                                | 룸         | 배경          |
+| ----------------------------------- | ---------- | ------------- |
+| `isSleeping`                        | `bedroom`  | `room_2.webp` |
+| 만남 모달 오픈                      | `outdoor`  | `room_4.webp` |
 | 똥 1개 이상 → 모두 청소 후 5초 유예 | `bathroom` | `room_3.webp` |
-| 그 외 | `living` | `room_1.webp` |
+| 그 외                               | `living`   | `room_1.webp` |
 
 #### 4.2.2 캐릭터 클릭 인터랙션
 
@@ -105,11 +105,11 @@
 
 ### 4.3 게이지 시스템
 
-| 게이지 | 최대 | 자동 감소 | 회복 트리거 |
-|--------|------|-----------|--------------|
-| 배고픔(`hunger`) | 100 | 매 분당 1 (수면 시 ×0.5, 행복≥50 ×0.8, 행복=0 ×1.5, 아플 때 ×2) | 음식 섭취 |
-| 청결(`cleanliness`) | 100 | 똥 1개당 −10 | 청소(똥 클릭/일괄 청소) |
-| 행복(`hearts`) | 100 | 아플 때 10초당 −1 | 밥주기 +3 / 청소 +2 / 만남 / 미니게임 / 상호작용 |
+| 게이지              | 최대 | 자동 감소                                                       | 회복 트리거                                      |
+| ------------------- | ---- | --------------------------------------------------------------- | ------------------------------------------------ |
+| 배고픔(`hunger`)    | 100  | 매 분당 1 (수면 시 ×0.5, 행복≥50 ×0.8, 행복=0 ×1.5, 아플 때 ×2) | 음식 섭취                                        |
+| 청결(`cleanliness`) | 100  | 똥 1개당 −10                                                    | 청소(똥 클릭/일괄 청소)                          |
+| 행복(`hearts`)      | 100  | 아플 때 10초당 −1                                               | 밥주기 +3 / 청소 +2 / 만남 / 미니게임 / 상호작용 |
 
 추가 메커닉:
 
@@ -132,14 +132,14 @@
 
 ### 4.6 액션 바 (`widgets/action-bar`)
 
-| 버튼 | 기능 | 비활성 조건 | 뱃지 |
-|------|------|--------------|------|
-| 🍖 밥주기 | FeedModal 오픈 | 인벤토리 식료품 0 | — |
-| 🧹 청소 | 즉시 일괄 청소 | 똥 0개 | 똥 개수 |
-| 🎮 놀기 | MiniGameModal 오픈 | 쿨다운 중 | 남은 시간 |
-| 💌 만남 | MeetingModal 오픈 | 쿨다운/일일 3회 소진 | 남은 횟수 또는 ⛔ |
-| 💊 약주기 | 즉시 GIVE_MEDICINE | 코인<15 또는 정상 | 아플 때만 노출 |
-| 🏪 상점 | ShopModal 오픈 | — | — |
+| 버튼      | 기능               | 비활성 조건          | 뱃지              |
+| --------- | ------------------ | -------------------- | ----------------- |
+| 🍖 밥주기 | FeedModal 오픈     | 인벤토리 식료품 0    | —                 |
+| 🧹 청소   | 즉시 일괄 청소     | 똥 0개               | 똥 개수           |
+| 🎮 놀기   | MiniGameModal 오픈 | 쿨다운 중            | 남은 시간         |
+| 💌 만남   | MeetingModal 오픈  | 쿨다운/일일 3회 소진 | 남은 횟수 또는 ⛔ |
+| 💊 약주기 | 즉시 GIVE_MEDICINE | 코인<15 또는 정상    | 아플 때만 노출    |
+| 🏪 상점   | ShopModal 오픈     | —                    | —                 |
 
 ### 4.7 만남 시스템 (`features/meeting`)
 
@@ -153,11 +153,11 @@
 
 3개 모드를 단일 모달 내 선택형으로 제공한다. 모드 진입 = 별도 게임 컴포넌트 마운트.
 
-| 모드 | 설명 | 보상 |
-|------|------|------|
-| 💖 하트 캐치 | 떨어지는 이모지(💖⭐🌟💕🎵)를 좌우 이동으로 받기 + 폭탄 회피 | `correctCount` 비례 코인/행복/경험치 |
-| 🏃 플코런 | 탭 점프로 장애물 회피, 하트 픽업으로 점수 누적, 베스트 점수 LocalStorage 저장 | 동일 |
-| 💡 PLCO 취향 퀴즈 | 활성 멤버 전용 문제 풀(예코:30+/멤버별)에서 3문제 랜덤, 객관식 4지선다 + 정답 후 fact 노출 | 동일 |
+| 모드              | 설명                                                                                       | 보상                                 |
+| ----------------- | ------------------------------------------------------------------------------------------ | ------------------------------------ |
+| 💖 하트 캐치      | 떨어지는 이모지(💖⭐🌟💕🎵)를 좌우 이동으로 받기 + 폭탄 회피                               | `correctCount` 비례 코인/행복/경험치 |
+| 🏃 플코런         | 탭 점프로 장애물 회피, 하트 픽업으로 점수 누적, 베스트 점수 LocalStorage 저장              | 동일                                 |
+| 💡 PLCO 취향 퀴즈 | 활성 멤버 전용 문제 풀(예코:30+/멤버별)에서 3문제 랜덤, 객관식 4지선다 + 정답 후 fact 노출 | 동일                                 |
 
 - **쿨다운**: 미니게임 클리어 시 `lastMinigameAt` 갱신, 다음 플레이까지 `MINIGAME_COOLDOWN_MS = 3분`.
 - 정답/획득 1개당: 코인 +3 / 행복 +2 / 경험치 +4.
@@ -202,25 +202,32 @@
 
 ```ts
 type GameState = {
-  status: GameStatus;            // selecting | playing | dead | meeting
+  status: GameStatus; // selecting | playing | dead | meeting
   characterId: CharacterId | null;
   nickname: string;
-  level: number; exp: number;
-  hunger: number; cleanliness: number; hearts: number; coins: number;
+  level: number;
+  exp: number;
+  hunger: number;
+  cleanliness: number;
+  hearts: number;
+  coins: number;
   poops: Poop[];
   inventory: Record<FoodId, number>;
-  pendingPoops: number[];        // 곧 떨어질 똥의 출현 예정 시각
+  pendingPoops: number[]; // 곧 떨어질 똥의 출현 예정 시각
   lastUpdated: number;
   hungerZeroSince: number | null;
   cleanlinessZeroSince: number | null;
-  isSleeping: boolean; wokeUpAt: number | null;
-  isSick: boolean; sickSince: number | null;
+  isSleeping: boolean;
+  wokeUpAt: number | null;
+  isSick: boolean;
+  sickSince: number | null;
   unlockedCharacters: CharacterId[];
   levelUpMessage: string | null;
   feedingMessage: string | null;
   eggReadyCharacterId: CharacterId | null;
   lastMeetingAt: number | null;
-  meetingsToday: number; meetingDay: string | null;
+  meetingsToday: number;
+  meetingDay: string | null;
   lastMinigameAt: number | null;
 };
 ```
@@ -258,12 +265,12 @@ type GameState = {
 
 ### 6.4 Supabase 스키마 (`supabase/schema.sql`)
 
-| 테이블 | 용도 |
-|--------|------|
-| `profiles` | auth.users → 닉네임 등 프로필 |
-| `game_saves` | `state` JSONB(`{ characterStates }`) + `last_updated` |
-| `daily_logins` | 출석 기록 (date / streak / 보상) |
-| `achievements` | 캐릭터별 누적 통계 (피드/청소/만남/육성 횟수 등) |
+| 테이블         | 용도                                                  |
+| -------------- | ----------------------------------------------------- |
+| `profiles`     | auth.users → 닉네임 등 프로필                         |
+| `game_saves`   | `state` JSONB(`{ characterStates }`) + `last_updated` |
+| `daily_logins` | 출석 기록 (date / streak / 보상)                      |
+| `achievements` | 캐릭터별 누적 통계 (피드/청소/만남/육성 횟수 등)      |
 
 RLS 정책: 본인 데이터만 access. 회원가입 시 `handle_new_user` 트리거로 profiles 자동 생성.
 
@@ -271,11 +278,11 @@ RLS 정책: 본인 데이터만 access. 회원가입 시 `handle_new_user` 트�
 
 ## 7. 라우팅 / 화면 구조
 
-| 경로 | 컴포넌트 | 설명 |
-|------|----------|------|
-| `/` | `CharacterSelectView` | 인트로 / 캐러셀 / 닉네임 / 친구 목록 분기 |
-| `/play/[characterId]` | `GameView` | 활성 슬롯의 메인 룸 + 모달들 |
-| `/auth/callback` | route handler | OAuth 콜백 |
+| 경로                  | 컴포넌트              | 설명                                      |
+| --------------------- | --------------------- | ----------------------------------------- |
+| `/`                   | `CharacterSelectView` | 인트로 / 캐러셀 / 닉네임 / 친구 목록 분기 |
+| `/play/[characterId]` | `GameView`            | 활성 슬롯의 메인 룸 + 모달들              |
+| `/auth/callback`      | route handler         | OAuth 콜백                                |
 
 URL 파라미터가 atom의 source of truth. 잘못된 `characterId` 또는 미존재 슬롯은 `/`로 replace.
 
@@ -317,44 +324,44 @@ src/
 
 ## 9. 밸런스 상수 (`src/shared/constants/game.ts`)
 
-| 상수 | 값 | 비고 |
-|------|------|------|
-| `MAX_HUNGER` / `MAX_CLEANLINESS` / `MAX_HEARTS` | 100 | |
-| `HUNGER_DECAY_PER_MINUTE` | 1 | 수면 ×0.5, 행복≥50 ×0.8, 행복=0 ×1.5, 아픔 ×2 |
-| `CLEANLINESS_PER_POOP` | 10 | |
-| `DEATH_THRESHOLD_MS` | 3일 | hunger/cleanliness/sick 공통 |
-| `SICK_POOP_THRESHOLD` | 4 | |
-| `MEDICINE_PRICE` | 15 | |
-| `COINS_PER_CLEAN` | 2 | 일괄청소 보너스 +3 |
-| `COINS_PER_MEETING` | 5 | 완벽 보너스 +10 |
-| `HEARTS_PER_FEED` / `HEARTS_PER_CLEAN` | 3 / 2 | |
-| `HEART_DECAY_WHEN_SICK` | 1 / 10s | |
-| `OVERFEED_HEART_PENALTY` | 3 | |
-| `MEETING_COOLDOWN_MS` | 5분 | |
-| `MEETING_DAILY_LIMIT` | 3 | |
-| `MEETING_ROUNDS` | 3 | |
-| `MEETING_REWARD_GOOD/OK/AWKWARD` | 6 / 3 / 0 | 라운드당 행복 |
-| `HEART_EXCHANGE_UNIT/COINS` | 10 / 15 | |
-| `EGG_HEART_THRESHOLD` | 100 | |
-| `EGG_LEVEL_THRESHOLD` | 3 | |
-| `EGG_ALL_UNLOCKED_COINS` | 100 | 5명 모두 해금 시 보너스 |
-| `MINIGAME_COIN_PER_CORRECT` | 3 | |
-| `MINIGAME_HEART_PER_CORRECT` | 2 | |
-| `MINIGAME_EXP_PER_CORRECT` | 4 | |
-| `MINIGAME_COOLDOWN_MS` | 3분 | |
-| `LEVEL_SCALE_PER_LEVEL` | 0.05 | 캐릭터 사이즈 보정 |
-| `SLEEP_START_HOUR` / `SLEEP_END_HOUR` | 22 / 8 | |
-| `WAKE_UP_GRACE_MS` | 5분 | 졸림 유예 |
-| `DANGER_THRESHOLD` / `WARNING_THRESHOLD` | 20 / 40 | 게이지 색 변경 |
+| 상수                                            | 값        | 비고                                          |
+| ----------------------------------------------- | --------- | --------------------------------------------- |
+| `MAX_HUNGER` / `MAX_CLEANLINESS` / `MAX_HEARTS` | 100       |                                               |
+| `HUNGER_DECAY_PER_MINUTE`                       | 1         | 수면 ×0.5, 행복≥50 ×0.8, 행복=0 ×1.5, 아픔 ×2 |
+| `CLEANLINESS_PER_POOP`                          | 10        |                                               |
+| `DEATH_THRESHOLD_MS`                            | 3일       | hunger/cleanliness/sick 공통                  |
+| `SICK_POOP_THRESHOLD`                           | 4         |                                               |
+| `MEDICINE_PRICE`                                | 15        |                                               |
+| `COINS_PER_CLEAN`                               | 2         | 일괄청소 보너스 +3                            |
+| `COINS_PER_MEETING`                             | 5         | 완벽 보너스 +10                               |
+| `HEARTS_PER_FEED` / `HEARTS_PER_CLEAN`          | 3 / 2     |                                               |
+| `HEART_DECAY_WHEN_SICK`                         | 1 / 10s   |                                               |
+| `OVERFEED_HEART_PENALTY`                        | 3         |                                               |
+| `MEETING_COOLDOWN_MS`                           | 5분       |                                               |
+| `MEETING_DAILY_LIMIT`                           | 3         |                                               |
+| `MEETING_ROUNDS`                                | 3         |                                               |
+| `MEETING_REWARD_GOOD/OK/AWKWARD`                | 6 / 3 / 0 | 라운드당 행복                                 |
+| `HEART_EXCHANGE_UNIT/COINS`                     | 10 / 15   |                                               |
+| `EGG_HEART_THRESHOLD`                           | 100       |                                               |
+| `EGG_LEVEL_THRESHOLD`                           | 3         |                                               |
+| `EGG_ALL_UNLOCKED_COINS`                        | 100       | 5명 모두 해금 시 보너스                       |
+| `MINIGAME_COIN_PER_CORRECT`                     | 3         |                                               |
+| `MINIGAME_HEART_PER_CORRECT`                    | 2         |                                               |
+| `MINIGAME_EXP_PER_CORRECT`                      | 4         |                                               |
+| `MINIGAME_COOLDOWN_MS`                          | 3분       |                                               |
+| `LEVEL_SCALE_PER_LEVEL`                         | 0.05      | 캐릭터 사이즈 보정                            |
+| `SLEEP_START_HOUR` / `SLEEP_END_HOUR`           | 22 / 8    |                                               |
+| `WAKE_UP_GRACE_MS`                              | 5분       | 졸림 유예                                     |
+| `DANGER_THRESHOLD` / `WARNING_THRESHOLD`        | 20 / 40   | 게이지 색 변경                                |
 
 ### 레벨업 보상 (`LEVEL_REWARDS`)
 
-| 레벨 | 보상 |
-|------|------|
-| 2 | 빵 ×2, 30코인 |
-| 3 | 주먹밥 ×2, 50코인 |
-| 4 | 고기 ×1, 80코인 |
-| 5 | 케이크 ×1, 150코인 |
+| 레벨 | 보상               |
+| ---- | ------------------ |
+| 2    | 빵 ×2, 30코인      |
+| 3    | 주먹밥 ×2, 50코인  |
+| 4    | 고기 ×1, 80코인    |
+| 5    | 케이크 ×1, 150코인 |
 
 레벨 임계값 (`LEVEL_THRESHOLDS`): `[0, 50, 150, 300, 500]`.
 
@@ -429,11 +436,11 @@ src/
 
 ## 13. 성공 지표 (제안)
 
-| 지표 | 목표 |
-|------|------|
-| 일일 재접속률 | 활성 슬롯 보유자 기준 60% 이상 |
-| 평균 세션 시간 | 4분 이상 |
-| 미니게임 이용률 | 활성 세션 중 50% 이상 |
-| 만남 일일 이용률 | 30% 이상 |
-| 멤버 해금 완주율(5/5) | 신규 진입 후 30일 내 15% |
-| 구글 연동율 | 게스트 진입자 중 25% 이상 |
+| 지표                  | 목표                           |
+| --------------------- | ------------------------------ |
+| 일일 재접속률         | 활성 슬롯 보유자 기준 60% 이상 |
+| 평균 세션 시간        | 4분 이상                       |
+| 미니게임 이용률       | 활성 세션 중 50% 이상          |
+| 만남 일일 이용률      | 30% 이상                       |
+| 멤버 해금 완주율(5/5) | 신규 진입 후 30일 내 15%       |
+| 구글 연동율           | 게스트 진입자 중 25% 이상      |

@@ -1,5 +1,5 @@
-import { SudokuCell } from '@entities/board/model/types';
-import { HistoryEntry } from '@features/undo-redo/model/types';
+import type { SudokuCell } from '@entities/board/model/types';
+import type { HistoryEntry } from '@features/undo-redo/model/types';
 import { atom } from 'jotai';
 
 const MAX_HISTORY_SIZE = 50;

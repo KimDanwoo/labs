@@ -1,6 +1,6 @@
 import { BOARD_SIZE } from '@entities/board/model/constants';
-import { Grid, GridPosition, SudokuBoard, SudokuCell } from '@entities/board/model/types';
-import { KillerCage } from '@entities/game/model/types';
+import type { Grid, GridPosition, SudokuBoard, SudokuCell } from '@entities/board/model/types';
+import type { KillerCage } from '@entities/game/model/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   checkBlockConflict,

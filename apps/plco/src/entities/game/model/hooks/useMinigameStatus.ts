@@ -1,9 +1,9 @@
 'use client';
 
+import { lastMinigameAtAtom } from '@entities/game/model/store';
 import { MINIGAME_COOLDOWN_MS } from '@shared/constants';
 import { useCooldown } from '@shared/lib';
 import { useAtomValue } from 'jotai';
-import { lastMinigameAtAtom } from '../store';
 
 export type MinigameStatus = {
   canPlay: boolean;

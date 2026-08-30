@@ -1,7 +1,7 @@
 import { INITIAL_GAME_STATE } from '@shared/constants';
 import type { CharacterId, GameAction, GameState } from '@shared/types';
 import { atom } from 'jotai';
-import { gameReducer } from '../reducer';
+import { gameReducer } from './reducer';
 
 export const characterStatesAtom = atom<Record<string, GameState>>({});
 

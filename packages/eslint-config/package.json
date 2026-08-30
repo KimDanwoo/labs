@@ -5,6 +5,7 @@
   "files": [
     "next.eslint.config.mjs",
     "fsd.config.mjs",
+    "naming.config.mjs",
     "library.eslint.config.mjs"
   ],
   "devDependencies": {

@@ -1,7 +1,7 @@
 import { NUMBER_COUNTS } from '@entities/board/model/constants';
-import { CellHighlight, Position, SudokuCell } from '@entities/board/model/types';
+import type { CellHighlight, Position, SudokuCell } from '@entities/board/model/types';
 import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING } from '@entities/game/model/constants';
-import { Difficulty, GameMode, KillerCage } from '@entities/game/model/types';
+import type { Difficulty, GameMode, KillerCage } from '@entities/game/model/types';
 import { createEmptyBoard, createEmptyGrid, createEmptyHighlights } from '@features/sudoku-game/model/utils';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';

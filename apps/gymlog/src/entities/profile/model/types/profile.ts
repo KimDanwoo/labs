@@ -1,7 +1,7 @@
 import type { Goal, Split } from '@shared/training';
 import { buildWeeklyPlanForSplit, type WeekPlan } from './weekPlan';
 
-export const DEFAULT_REST_SEC = 60;
+const DEFAULT_REST_SEC = 60;
 export const DEFAULT_SETS = 3;
 
 export type UserProfile = {

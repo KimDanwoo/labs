@@ -1,9 +1,9 @@
 'use client';
 
+import { meetingPlayFriendAtom } from '@entities/game/model/store';
 import { MEETING_PLAY_SCENE_MS } from '@shared/constants';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
-import { meetingPlayFriendAtom } from '../store';
 
 /** 공원 놀기 장면이 시작되면 일정 시간 후 자동 종료(집으로 복귀). */
 export function useMeetingPlayScene() {

@@ -1,10 +1,10 @@
 'use client';
 
+import { fetchBands, fetchWaveform } from '@entities/track/model/services';
+import { frameState } from '@entities/track/model/store';
+import type { Track } from '@entities/track/model/types';
 import { useFrame } from '@shared/lib/frame';
 import { useEffect, useRef } from 'react';
-import { fetchBands, fetchWaveform } from '../services';
-import { frameState } from '../store';
-import type { Track } from '../types';
 
 /**
  * PRD §6 "음악 악센트 — 신호 설계".
@@ -46,7 +46,7 @@ const BEAT_RELEASE_MS = 220;
 /** 이보다 오래 지난 비트는 발화 없이 넘긴다 — 랙·탭 복귀 뒤 밀린 비트가 몰아 터지면 전부 엇박이다. */
 const BEAT_STALE_MS = 150;
 
-export type Signals = {
+type Signals = {
   /** 초당 샘플 수. 두 출처의 해상도가 달라 인덱싱은 절대 시각으로 한다. */
   fps: number;
   /** 0–1. 원곡 분석이면 중역, 폴백이면 재매핑된 진폭. */
@@ -92,7 +92,7 @@ function pickPeaks(swell: Float32Array, msPerSample: number) {
 }
 
 /** 포화된 진폭을 곡별 백분위로 다시 편다. */
-export function remap(raw: Float32Array) {
+function remap(raw: Float32Array) {
   const sorted = Float32Array.from(raw).sort();
   const floor = percentile(sorted, FLOOR_PERCENTILE);
   const span = Math.max(1e-6, percentile(sorted, CEIL_PERCENTILE) - floor);
@@ -105,13 +105,13 @@ function withDerived(level: Float32Array, fps: number, extra: Pick<Signals, 'bas
   return { fps, level, swell, peakMs: pickPeaks(swell, msPerSample), ...extra };
 }
 
-export function deriveSignals(raw: Float32Array, durationMs: number): Signals {
+function deriveSignals(raw: Float32Array, durationMs: number): Signals {
   const fps = raw.length / (durationMs / 1000);
   return withDerived(remap(raw), fps, { bass: null, air: null, beats: [] });
 }
 
 /** 피크 앞에서 차오르고(pre) 피크를 지나며 풀린다(hit). 릴리스는 제곱으로 떨어져 꼬리가 남는다. */
-export function accentAt(peakMs: readonly number[], nowMs: number) {
+function accentAt(peakMs: readonly number[], nowMs: number) {
   let pre = 0;
   let hit = 0;
   for (const peak of peakMs) {
