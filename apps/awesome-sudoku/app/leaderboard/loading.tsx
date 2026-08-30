@@ -4,15 +4,7 @@ export default function LeaderboardLoading() {
   return (
     <main className={cn('min-h-svh', 'bg-[rgb(var(--color-surface-secondary))]')}>
       {/* Header skeleton */}
-      <div
-        className={cn(
-          'sticky top-0 z-30',
-          'bg-[rgb(var(--color-glass))]/[var(--glass-opacity)]',
-          'backdrop-blur-xl',
-          'border-b border-[rgb(var(--color-border-light))]/50',
-          'px-4 py-4',
-        )}
-      >
+      <div className={cn('glass-header', 'px-4 py-4')}>
         <div className="h-6 w-16 rounded-md bg-[rgb(var(--color-bg-tertiary))] animate-pulse" />
       </div>
 
