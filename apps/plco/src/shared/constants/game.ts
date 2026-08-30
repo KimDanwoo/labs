@@ -70,7 +70,7 @@ export const MAX_CLEANLINESS = 100;
 export const MAX_HEARTS = 100;
 
 // 배고픔: 가득 찬 상태에서 약 2일에 걸쳐 소진되도록 분당 감소량을 파생
-export const HUNGER_FULL_DRAIN_DAYS = 2;
+const HUNGER_FULL_DRAIN_DAYS = 2;
 export const HUNGER_DECAY_PER_MINUTE = MAX_HUNGER / (HUNGER_FULL_DRAIN_DAYS * 24 * 60);
 export const CLEANLINESS_PER_POOP = 10;
 // 먹인 뒤 똥이 나오기까지 지연. 여러 번 먹여도 마지막 먹인 시점 기준 1개만 생성
@@ -79,8 +79,6 @@ export const DEATH_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000; // 3일 방치 시 �
 
 export const EXP_FEED = 5;
 export const EXP_CLEAN = 3;
-export const EXP_MINIGAME_MIN = 10;
-export const EXP_MINIGAME_MAX = 30;
 export const EXP_MEETING = 15;
 
 export const LEVEL_THRESHOLDS = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
@@ -128,8 +126,6 @@ export const EGG_HEART_THRESHOLD = 100;
 export const EGG_LEVEL_THRESHOLD = 7;
 export const EGG_ALL_UNLOCKED_COINS = 100;
 
-// 미니게임
-export const MINIGAME_ROUNDS = 5;
 export const MINIGAME_COIN_PER_CORRECT = 3;
 export const MINIGAME_HEART_PER_CORRECT = 2;
 export const MINIGAME_EXP_PER_CORRECT = 4;
@@ -195,7 +191,7 @@ export const LEVEL_REWARDS: Record<number, LevelReward> = {
   },
 };
 
-export const ALL_CHARACTER_IDS: CharacterId[] = ['yeko', 'ako', 'bamko', 'eunko', 'hako'];
+export const ALL_CHARACTER_IDS = ['yeko', 'ako', 'bamko', 'eunko', 'hako'] as const satisfies readonly CharacterId[];
 
 export const GAME_STATUS = {
   SELECTING: 'selecting',

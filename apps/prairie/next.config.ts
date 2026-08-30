@@ -14,15 +14,7 @@ const nextConfig: NextConfig = {
     return [{ source: '/(.*)', headers: SECURITY_HEADERS }];
   },
 
-  transpilePackages: [
-    '@ui/react',
-    '@tokens/css',
-    'three',
-    '@react-three/fiber',
-    '@react-three/drei',
-    '@react-three/postprocessing',
-    'postprocessing',
-  ],
+  transpilePackages: ['@tokens/css', 'three', '@react-three/fiber', '@react-three/drei'],
 };
 
 export default nextConfig;
