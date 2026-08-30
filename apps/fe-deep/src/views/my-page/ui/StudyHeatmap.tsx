@@ -1,4 +1,17 @@
-const MONTH_LABELS = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+const MONTH_LABELS: readonly string[] = [
+  '1월',
+  '2월',
+  '3월',
+  '4월',
+  '5월',
+  '6월',
+  '7월',
+  '8월',
+  '9월',
+  '10월',
+  '11월',
+  '12월',
+];
 const DAY_LABELS = ['일', '', '화', '', '목', '', '토'];
 
 /** 강도(0~4)를 히트맵 색상 클래스로 변환한다. */
@@ -38,7 +51,7 @@ function buildYearGrid(year: number, heatmap: Record<string, number>, today: Dat
         const month = cursor.getMonth();
         if (!seenMonths.has(month)) {
           seenMonths.add(month);
-          monthStartCols.push({ label: MONTH_LABELS[month], col: weeks.length });
+          monthStartCols.push({ label: MONTH_LABELS[month] ?? '', col: weeks.length });
         }
       } else {
         week.push({ date: '', count: -1 });

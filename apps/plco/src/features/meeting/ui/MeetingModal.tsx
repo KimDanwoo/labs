@@ -1,9 +1,9 @@
 'use client';
 
+import { CONVERSATION_OUTCOME, MEETING_PHASE } from '@features/meeting/model/constants';
+import { useMeetingChat } from '@features/meeting/model/hooks';
 import { MEETING_REWARD_GOOD, MEETING_ROUNDS } from '@shared/constants';
 import { CharacterSprite, ModalShell } from '@shared/ui';
-import { CONVERSATION_OUTCOME, MEETING_PHASE } from '../model/constants';
-import { useMeetingChat } from '../model/hooks';
 
 type ConversationOutcome = (typeof CONVERSATION_OUTCOME)[keyof typeof CONVERSATION_OUTCOME];
 
@@ -41,6 +41,8 @@ export default function MeetingModal() {
   } = useMeetingChat();
 
   if (!myCharacterId) return null;
+
+  const scene = scenes[roundIdx];
 
   return (
     <ModalShell
@@ -106,11 +108,11 @@ export default function MeetingModal() {
               ) : (
                 <>
                   <div className="px-4 py-3 rounded-2xl bg-gray-50 text-sm text-gray-700 font-medium min-h-[60px] flex items-center justify-center">
-                    {scenes[roundIdx].prompt}
+                    {scene?.prompt}
                   </div>
 
                   <div className="space-y-2">
-                    {scenes[roundIdx].options.map((opt, i) => (
+                    {scene?.options.map((opt, i) => (
                       <button
                         key={i}
                         onClick={() => handlePick(opt)}

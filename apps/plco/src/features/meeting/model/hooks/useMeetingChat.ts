@@ -3,18 +3,6 @@
 import { useGameActions } from '@entities/game/model/hooks';
 import { characterIdAtom, meetingPlayFriendAtom } from '@entities/game/model/store';
 import {
-  COINS_PER_MEETING,
-  MEETING_PERFECT_COIN_BONUS,
-  MEETING_REWARD_AWKWARD,
-  MEETING_REWARD_GOOD,
-  MEETING_REWARD_OK,
-  MEETING_ROUNDS,
-} from '@shared/constants';
-import { formatDateKey } from '@shared/lib';
-import type { CharacterId } from '@shared/types';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect, useMemo, useState } from 'react';
-import {
   CONVERSATION_OUTCOME,
   MEETING_CHARACTERS,
   MEETING_FOUND_MS,
@@ -23,8 +11,20 @@ import {
   MEETING_RANDOM_NAMES,
   MEETING_REACTION_MS,
   pickScenesForCharacter,
-} from '../constants';
-import type { ConversationOption, ConversationOutcome, MeetingPhase } from '../types';
+} from '@features/meeting/model/constants';
+import type { ConversationOption, ConversationOutcome, MeetingPhase } from '@features/meeting/model/types';
+import {
+  COINS_PER_MEETING,
+  MEETING_PERFECT_COIN_BONUS,
+  MEETING_REWARD_AWKWARD,
+  MEETING_REWARD_GOOD,
+  MEETING_REWARD_OK,
+  MEETING_ROUNDS,
+} from '@shared/constants';
+import { formatDateKey, pickRandom } from '@shared/lib';
+import type { CharacterId } from '@shared/types';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useEffect, useMemo, useState } from 'react';
 
 function rewardOf(outcome: ConversationOutcome): number {
   if (outcome === CONVERSATION_OUTCOME.GOOD) return MEETING_REWARD_GOOD;
@@ -53,8 +53,9 @@ export function useMeetingChat() {
     if (!myCharacterId) return undefined;
     const candidates = MEETING_CHARACTERS.filter((c) => c !== myCharacterId);
     const timer = setTimeout(() => {
-      const randomChar = candidates[Math.floor(Math.random() * candidates.length)];
-      const randomName = MEETING_RANDOM_NAMES[Math.floor(Math.random() * MEETING_RANDOM_NAMES.length)];
+      const randomChar = pickRandom(candidates);
+      const randomName = pickRandom(MEETING_RANDOM_NAMES);
+      if (!randomChar || !randomName) return;
       setMetCharacter(randomChar);
       setMetName(randomName);
       setPhase(MEETING_PHASE.FOUND);

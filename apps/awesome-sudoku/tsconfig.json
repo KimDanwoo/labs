@@ -1,34 +1,18 @@
 {
+  "extends": "@config/tsconfig/next.json",
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "baseUrl": ".",
+    // 스도쿠 보드 인덱싱(board[r][c])이 424곳이라 한 번에 켤 수 없다. 별도 작업으로 제거할 것.
+    "noUncheckedIndexedAccess": false,
     "paths": {
-      "@apps/*": ["./src/apps/*"],
+      "@app/*": ["./src/app/*"],
       "@views/*": ["./src/views/*"],
-      "@entities/*": ["./src/entities/*"],
-      "@features/*": ["./src/features/*"],
       "@widgets/*": ["./src/widgets/*"],
+      "@features/*": ["./src/features/*"],
+      "@entities/*": ["./src/entities/*"],
       "@shared/*": ["./src/shared/*"],
       "@test/*": ["./src/test/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

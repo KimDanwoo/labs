@@ -7,10 +7,10 @@ import { useChatIdentity, useChatRoom, useDeleteChat } from '@features/chat/mode
 import { ChatComposer, ChatLoginGate, ChatMessageList } from '@features/chat/ui';
 import { ALL_CHARACTER_IDS } from '@shared/constants';
 import type { CharacterId } from '@shared/types';
+import { ROOM_BACKGROUNDS } from '@widgets/game-room/constants';
 import { useAtomValue, useSetAtom } from 'jotai';
 import Image from 'next/image';
 import { useState } from 'react';
-import { ROOM_BACKGROUNDS } from '../constants';
 import SceneCharacter from './SceneCharacter';
 
 const SHARED_ROOM_BACKGROUND = ROOM_BACKGROUNDS.outdoor;
@@ -32,7 +32,7 @@ const MAX_VISIBLE_USERS = POSITION_PRESETS.length;
 const DEFAULT_CHARACTER_ID: CharacterId = 'yeko';
 
 function toCharacterId(raw: string | null | undefined): CharacterId {
-  if (raw && (ALL_CHARACTER_IDS as string[]).includes(raw)) {
+  if (raw && (ALL_CHARACTER_IDS as readonly string[]).includes(raw)) {
     return raw as CharacterId;
   }
   return DEFAULT_CHARACTER_ID;
