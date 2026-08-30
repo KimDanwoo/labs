@@ -30,6 +30,7 @@ export default function SettingsModal() {
     signOut()
       .then(() => {
         clearLocalGameSaves();
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- 인증 경계: 전체 리로드로 Jotai atom과 auth 인메모리 상태를 비운다.
         window.location.href = '/';
       })
       .catch(() => {});
@@ -42,6 +43,7 @@ export default function SettingsModal() {
     }
     deleteAccount()
       .then(() => {
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- 인증 경계: 전체 리로드로 Jotai atom과 auth 인메모리 상태를 비운다.
         window.location.href = '/';
       })
       .catch(() => {});

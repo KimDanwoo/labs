@@ -11,13 +11,23 @@ const FSD_ELEMENTS = [
 ];
 
 // 상위 → 하위 단방향. 각 레이어가 import 가능한 하위 레이어 목록.
-const DEPENDENCY_RULES = [
-  { from: { type: 'app' }, allow: { to: { type: ['app', 'views', 'widgets', 'features', 'entities', 'shared'] } } },
-  { from: { type: 'views' }, allow: { to: { type: ['widgets', 'features', 'entities', 'shared'] } } },
-  { from: { type: 'widgets' }, allow: { to: { type: ['features', 'entities', 'shared'] } } },
-  { from: { type: 'features' }, allow: { to: { type: ['entities', 'shared'] } } },
-  { from: { type: 'entities' }, allow: { to: { type: ['shared'] } } },
-  { from: { type: 'shared' }, allow: { to: { type: ['shared'] } } },
+// eslint-plugin-boundaries v7 policies 문법(구 `rules` 옵션은 deprecated).
+const DEPENDENCY_POLICIES = [
+  {
+    from: { element: { type: 'app' } },
+    allow: { to: { element: { types: { anyOf: ['app', 'views', 'widgets', 'features', 'entities', 'shared'] } } } },
+  },
+  {
+    from: { element: { type: 'views' } },
+    allow: { to: { element: { types: { anyOf: ['widgets', 'features', 'entities', 'shared'] } } } },
+  },
+  {
+    from: { element: { type: 'widgets' } },
+    allow: { to: { element: { types: { anyOf: ['features', 'entities', 'shared'] } } } },
+  },
+  { from: { element: { type: 'features' } }, allow: { to: { element: { types: { anyOf: ['entities', 'shared'] } } } } },
+  { from: { element: { type: 'entities' } }, allow: { to: { element: { type: 'shared' } } } },
+  { from: { element: { type: 'shared' } }, allow: { to: { element: { type: 'shared' } } } },
 ];
 
 /**
@@ -103,7 +113,7 @@ const eslintConfig = [
       },
     },
     rules: {
-      'boundaries/dependencies': ['error', { default: 'disallow', rules: DEPENDENCY_RULES }],
+      'boundaries/dependencies': ['error', { default: 'disallow', policies: DEPENDENCY_POLICIES }],
       'fsd/slice-structure': 'error',
       'no-restricted-imports': ['error', { patterns: SEGMENT_DEPTH_PATTERNS }],
     },
