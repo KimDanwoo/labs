@@ -3,7 +3,7 @@
 import { setLoadingAtom, setUserAtom } from '@features/auth/model/atoms';
 import { subscribeToAuthChanges } from '@features/auth/model/services';
 import { useSetAtom } from 'jotai';
-import { ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect } from 'react';
 
 interface AuthProviderProps {
   children: ReactNode;

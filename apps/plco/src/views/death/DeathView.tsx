@@ -5,7 +5,7 @@ import { characterIdAtom, nicknameAtom } from '@entities/game/model/store';
 import { CharacterSprite } from '@shared/ui';
 import { useAtomValue } from 'jotai';
 
-export default function DeathScreen() {
+export default function DeathView() {
   const characterId = useAtomValue(characterIdAtom);
   const nickname = useAtomValue(nicknameAtom);
   const { reset } = useGameActions();
