@@ -1,1 +1,23 @@
-export { CAMERA, CLOUDS, FOG, HILLS, MOUNTAIN_LAYERS, SCENE_COLORS, SKY, SUN, WORLD } from './scene';
+export { RIVER_GLSL } from './riverGlsl';
+export {
+  CAMERA,
+  CLOUDS,
+  FOG,
+  HAZE,
+  HILLS,
+  MOUNTAIN_LAYERS,
+  RIVER,
+  RIVER_BEARINGS,
+  RIVER_TRENCH_HALF_WIDTH,
+  SCENE_COLORS,
+  SKY,
+  SUN,
+  WORLD,
+  distanceToRiver,
+  nearestRiverX,
+  riverBearing,
+  riverBedDepthAt,
+  riverWaterDepthAt,
+  type FogQuality,
+  type RiverBearing,
+} from './scene';
