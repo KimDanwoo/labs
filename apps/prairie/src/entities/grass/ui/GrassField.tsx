@@ -2,42 +2,61 @@ import {
   chunkSeed,
   GRASS_FIELD,
   GRASS_FRAGMENT_SHADER,
-  GRASS_MODEL_URL,
   GRASS_QUALITY,
   GRASS_VERTEX_SHADER,
+  grassLodForRing,
+  grassViewRadius,
+  GUST,
+  makeBladeGeometry,
+  type GrassQuality,
 } from '@entities/grass/model/constants';
-import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { SCENE_COLORS } from '@shared/config';
+import { FOG, SCENE_COLORS } from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
+import { runnerState } from '@shared/r3f';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { type BufferGeometry, Color, DoubleSide, type Mesh, ShaderMaterial } from 'three';
+import { Color, DoubleSide, ShaderMaterial, Vector2, type BufferGeometry } from 'three';
 import { GrassChunk } from './GrassChunk';
 
 type Cell = { x: number; z: number };
 
-// ghibli-grass-v2(MIT, © Wilson Ko) 색/바람 + 실제 glb blade를 카메라 주변 청크로만 유지(chunk-follow).
+const runnerXZUniform = new Vector2();
+const gustOriginUniform = new Vector2();
+
+// ghibli-grass-v2(MIT, © Wilson Ko) 색/바람 셰이더 + 절차적 blade를 카메라 주변 청크로만 유지(chunk-follow).
+// 링은 blade 풀·분할 수만, 보이는 밀도·크기는 셰이더가 거리로 연속 계산(팝 없음). 마지막 링 너머는 Ground의 잔디 무늬가 인상을 이어간다.
 export function GrassField() {
   const coarse = useIsCoarsePointer();
-  const quality = GRASS_QUALITY[coarse ? 'mobile' : 'desktop'];
-  const { scene } = useGLTF(GRASS_MODEL_URL);
+  const quality: GrassQuality = coarse ? 'mobile' : 'desktop';
+  const { fadeNear, fadeFar } = GRASS_QUALITY[quality];
+  const viewRadius = grassViewRadius(quality);
+  const fullPool = GRASS_QUALITY[quality].rings[0]!.blades;
   const materialRef = useRef<ShaderMaterial | null>(null);
 
-  const geometry = useMemo(() => {
-    let geo: BufferGeometry | null = null;
-    scene.traverse((object) => {
-      if (!geo && (object as Mesh).isMesh) geo = (object as Mesh).geometry;
+  // segments별 blade 지오메트리 캐시(링마다 다른 분할 수).
+  const geometries = useMemo(() => {
+    const map = new Map<number, BufferGeometry>();
+    GRASS_QUALITY[quality].rings.forEach((lod) => {
+      if (!map.has(lod.segments)) map.set(lod.segments, makeBladeGeometry(lod.segments));
     });
-    return geo;
-  }, [scene]);
+    return map;
+  }, [quality]);
 
   const material = useMemo(
     () =>
       new ShaderMaterial({
         uniforms: {
           uTime: { value: 0 },
+          uRunnerXZ: { value: runnerXZUniform },
+          uRunnerAir: { value: 0 },
+          uGustOrigin: { value: gustOriginUniform },
+          // 음수 = 돌풍 없음. 끝난 돌풍은 duration으로 잘라 무한대 유니폼을 피한다.
+          uGustAge: { value: -1 },
           uBrightness: { value: 1.12 },
           uHorizonColor: { value: new Color(SCENE_COLORS.fog) },
+          uGroundColor: { value: new Color(SCENE_COLORS.grass) },
+          uFogNear: { value: FOG.desktop.near },
+          uFogFar: { value: FOG.desktop.far },
           uFadeNear: { value: GRASS_QUALITY.desktop.fadeNear },
           uFadeFar: { value: GRASS_QUALITY.desktop.fadeFar },
         },
@@ -52,15 +71,14 @@ export function GrassField() {
   const centerRef = useRef<Cell>({ x: 0, z: 0 });
 
   const cells = useMemo(() => {
-    const list: Cell[] = [];
-    const r = quality.viewRadius;
-    for (let dx = -r; dx <= r; dx += 1) {
-      for (let dz = -r; dz <= r; dz += 1) {
-        list.push({ x: center.x + dx, z: center.z + dz });
+    const list: (Cell & { ring: number })[] = [];
+    for (let dx = -viewRadius; dx <= viewRadius; dx += 1) {
+      for (let dz = -viewRadius; dz <= viewRadius; dz += 1) {
+        list.push({ x: center.x + dx, z: center.z + dz, ring: Math.max(Math.abs(dx), Math.abs(dz)) });
       }
     }
     return list;
-  }, [center, quality.viewRadius]);
+  }, [center, viewRadius]);
 
   useLayoutEffect(() => {
     materialRef.current = material;
@@ -69,12 +87,23 @@ export function GrassField() {
   useLayoutEffect(() => {
     const mat = materialRef.current;
     if (!mat) return;
-    mat.uniforms.uFadeNear!.value = quality.fadeNear;
-    mat.uniforms.uFadeFar!.value = quality.fadeFar;
-  }, [quality.fadeNear, quality.fadeFar]);
+    mat.uniforms.uFadeNear!.value = fadeNear;
+    mat.uniforms.uFadeFar!.value = fadeFar;
+    mat.uniforms.uFogNear!.value = FOG[quality].near;
+    mat.uniforms.uFogFar!.value = FOG[quality].far;
+  }, [fadeNear, fadeFar, quality]);
 
   useFrame((state) => {
-    if (materialRef.current) materialRef.current.uniforms.uTime!.value = state.clock.elapsedTime;
+    const mat = materialRef.current;
+    if (mat) {
+      const elapsed = state.clock.elapsedTime;
+      mat.uniforms.uTime!.value = elapsed;
+      runnerXZUniform.set(runnerState.position.x, runnerState.position.z);
+      mat.uniforms.uRunnerAir!.value = runnerState.airborneHeight;
+      gustOriginUniform.copy(runnerState.gustOrigin);
+      const gustAge = runnerState.gustStartedAt < 0 ? -1 : elapsed - runnerState.gustStartedAt;
+      mat.uniforms.uGustAge!.value = gustAge > GUST.duration ? -1 : gustAge;
+    }
     const cx = Math.round(state.camera.position.x / GRASS_FIELD.tile);
     const cz = Math.round(state.camera.position.z / GRASS_FIELD.tile);
     if (cx !== centerRef.current.x || cz !== centerRef.current.z) {
@@ -83,23 +112,23 @@ export function GrassField() {
     }
   });
 
-  if (!geometry) return null;
-
   return (
     <group>
-      {cells.map((cell) => (
-        <GrassChunk
-          key={`${cell.x}:${cell.z}`}
-          cellX={cell.x}
-          cellZ={cell.z}
-          seed={chunkSeed(cell.x, cell.z)}
-          geometry={geometry}
-          material={material}
-          bladesPerChunk={quality.bladesPerChunk}
-        />
-      ))}
+      {cells.map((cell) => {
+        const lod = grassLodForRing(quality, cell.ring);
+        return (
+          <GrassChunk
+            key={`${cell.x}:${cell.z}`}
+            cellX={cell.x}
+            cellZ={cell.z}
+            seed={chunkSeed(cell.x, cell.z)}
+            geometry={geometries.get(lod.segments)!}
+            material={material}
+            bladesPerChunk={lod.blades}
+            fullPool={fullPool}
+          />
+        );
+      })}
     </group>
   );
 }
-
-useGLTF.preload(GRASS_MODEL_URL);
