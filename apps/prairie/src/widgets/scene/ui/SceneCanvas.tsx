@@ -2,8 +2,7 @@
 
 import { GrassField } from '@entities/grass/ui';
 import { River } from '@entities/river/ui';
-import { Scenery } from '@entities/scenery/ui';
-import { Ground } from '@entities/village/ui';
+import { Ground, Scenery } from '@entities/scenery/ui';
 import { RunnerRig } from '@features/runner-control/ui';
 import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';

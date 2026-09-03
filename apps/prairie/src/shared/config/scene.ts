@@ -9,9 +9,6 @@ export const SCENE_COLORS = {
   ambient: '#dbe8f3',
   // unlit 지면색 = 잔디 blade가 멀어지며 녹아드는 색. 하상 강둑 블렌드도 이 값.
   grass: '#3f8f3a',
-  grassDark: '#2f6628',
-  dirt: '#caa37c',
-  dirtEdge: '#b1885f',
   waterDeep: '#5c9db5',
   waterShallow: '#a6cfd8',
   pebbleDark: '#8a7f72',
@@ -93,27 +90,6 @@ export function riverBearing(x: number, camYaw: number): RiverBearing {
   return right > 0 ? 'right' : 'left';
 }
 
-// 뒤로 갈수록 푸르스름·흐릿하게(안개와 함께 원근감). 각 레이어는 360° 링으로 배치한다.
-export const MOUNTAIN_LAYERS = [
-  { color: '#9bb9a2', radius: 250, height: 46, width: 86, count: 16 },
-  { color: '#87a591', radius: 312, height: 66, width: 118, count: 14 },
-  { color: '#74917f', radius: 374, height: 88, width: 150, count: 12 },
-] as const;
-
-export const HILLS = {
-  color: '#79b566',
-  radius: 150,
-  count: 9,
-} as const;
-
-export const CLOUDS = {
-  count: 18,
-  size: 130,
-  areaXZ: 360,
-  minY: 88,
-  maxY: 150,
-} as const;
-
 export const SUN = {
   position: [70, 85, 35] as [number, number, number],
   intensity: 1.35,
@@ -139,10 +115,6 @@ export const HAZE = {
   bottomY: -80,
   fadeStartY: 0,
   fadeTopY: 70,
-} as const;
-
-export const SKY = {
-  radius: 500,
 } as const;
 
 export const CAMERA = {

@@ -22,7 +22,6 @@ React Three Fiber 기반의 실시간 3D 씬. 러너 캐릭터가 무한 초원�
 - **GLTF 러너 애니메이션**: `useGLTF` + `useAnimations`로 캐릭터 로드. 이동 속도(`speedRef`)에 따라 idle↔run 가중치를 `useFrame` 루프에서 실시간으로 혼합한다(리렌더 없음).
 - **모바일/데스크톱 품질 분기**: `pointer: coarse` 미디어 쿼리로 기기를 감지해 DPR과 잔디 블레이드 수를 각각 조정한다.
 - **터치 조이스틱**: 손 댄 자리에 조이스틱이 생기는 방식(`onPointerDown` 기준점 동적 생성). `pointer-coarse` 환경에서만 렌더링.
-- **씬 구성 오브젝트**: Ground, Pond, House, Tree, Haystack 등 마을 요소를 상수 배열로 선언적 배치. 큐브맵 스카이박스.
 - **무한 반복 강**: Z축으로 무한한 강 골. 하상·수면 메시가 Z로 카메라를 따라가고 X는 가장 가까운 강 중심에 스냅한다 — 반복 주기(220)가 안개 시야(105×2)보다 넓어 화면에 강이 둘 이상 들어오지 않는 덕에 한 세트로 무한 반복이 성립한다. 강 기하(위치·하상 프로파일)는 `RIVER_GLSL` 하나를 Ground 구멍(`onBeforeCompile` discard), 하상 변위, 수심 계산이 공유하고, JS 쪽 같은 식(`riverBedDepthAt`)을 말의 y와 감속에 쓴다(중앙 수심 1.5m, 수심 비례 감속). 유니폼 갱신 없이 순수 수식. 물속을 달리면 수면이 말에 반응한다 — 물 셰이더가 말 위치·방향·속도 유니폼으로 뱃머리 파도(높이)와 V자 거품 항적(색·알파)을 그리고, `WadeSplash`가 속도 방향으로 늘어난 물보라(InstancedMesh 256개, 포물선 낙하, 수면 아래 소멸)와 퍼져나가는 파문 링을 얹는다. 말 상태는 `runnerState`(r3f 내부 공유 객체, 리렌더 없음)로 흘린다.
 - **물 셰이더**: 하늘 큐브맵(`scene.background`)을 `samplerCube`로 받아 슐릭 프레넬로 비춘다 — 내려다보면 맑아 자갈이 비치고, 스치는 각에서는 하늘·구름이 반사된다. 추가 렌더 패스 없음. 파도 세 겹이 하류로 흐르고 유한차분 노멀로 태양 글린트, 수심 0 근처엔 거품선. 자갈 하상은 3×3 보로노이 프로시저럴(텍스처 없음) + 깊이 AO + 젖은 띠 + 물속 커스틱.
 - **강 방위 HUD**: 강은 안개 밖에선 보이지 않아 화면 안내가 유일한 길잡이다. 카메라 yaw에서 화면 기준 방위(앞·뒤·좌·우)와 거리를 계산해 `rideStore`(외부 스토어)로 DOM HUD에 넘긴다 — r3f 루트와 DOM 루트가 달라 컨텍스트를 쓸 수 없다.
@@ -32,14 +31,14 @@ React Three Fiber 기반의 실시간 3D 씬. 러너 캐릭터가 무한 초원�
 
 ## 기술 스택
 
-| 분류       | 라이브러리                                        |
-| ---------- | ------------------------------------------------- |
-| 렌더링     | three.js, `@react-three/fiber`                    |
-| 3D 유틸    | `@react-three/drei` (useGLTF, useAnimations, Sky) |
-| 프레임워크 | Next.js (App Router)                              |
-| 상태       | Jotai (`sceneReady`), 외부 스토어 (`rideStore`)   |
-| 스타일     | Tailwind CSS 4, `@tokens/css`                     |
-| 언어       | TypeScript 5                                      |
+| 분류       | 라이브러리                                                    |
+| ---------- | ------------------------------------------------------------- |
+| 렌더링     | three.js, `@react-three/fiber`                                |
+| 3D 유틸    | `@react-three/drei` (useGLTF, useAnimations, Sky)             |
+| 프레임워크 | Next.js (App Router)                                          |
+| 상태       | 모듈 외부 스토어 (`sceneReady` · `rideStore` · `runnerState`) |
+| 스타일     | Tailwind CSS 4, `@tokens/css`                                 |
+| 언어       | TypeScript 5                                                  |
 
 ---
 
@@ -60,12 +59,11 @@ src/
     grass/                # GrassField (청크 관리), GrassChunk (InstancedMesh)
     river/                # River (무한 반복 강 — 물 셰이더 + 강변)
     runner/               # Runner (GLTF + 애니메이션 블렌딩)
-    scenery/              # Scenery (Sky + 환경), Sky
-    village/              # Ground, Pond, House, Tree, Haystack, Village
+    scenery/              # Sky(큐브맵), Haze(지평선), Ground(무한 바닥 + 강 구멍 + 잔디 무늬)
   shared/
     config/               # 씬 상수 (카메라·안개·조명·색)
     lib/                  # useCoarsePointer 훅
-    r3f/                  # GltfModel 공용 래퍼, rideStore
+    r3f/                  # rideStore(HUD), runnerState(말 상태), sceneReady
 ```
 
 ---

@@ -30,7 +30,7 @@ const horizonColor = new Color(SCENE_COLORS.fog);
 const runnerPosUniform = new Vector3();
 const runnerDirUniform = new Vector2(0, 1);
 
-// 강은 씬에 한 개뿐이라 머티리얼도 모듈 싱글턴으로 둔다(toonGradient와 동일한 방식).
+// 강은 씬에 한 개뿐이라 머티리얼도 모듈 싱글턴으로 둔다.
 const waterMaterial = new ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },

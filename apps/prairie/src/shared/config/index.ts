@@ -1,16 +1,12 @@
 export { RIVER_GLSL } from './riverGlsl';
 export {
   CAMERA,
-  CLOUDS,
   FOG,
   HAZE,
-  HILLS,
-  MOUNTAIN_LAYERS,
   RIVER,
   RIVER_BEARINGS,
   RIVER_TRENCH_HALF_WIDTH,
   SCENE_COLORS,
-  SKY,
   SUN,
   WORLD,
   distanceToRiver,
