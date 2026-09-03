@@ -2,7 +2,7 @@
 
 3D 초원 위를 달리는 인터랙티브 비주얼 실험 — 기술 시연 목적의 단일 페이지 앱.
 
-**라이브:** https://d-prairie.vercel.app
+**라이브:** https://prairie.danwoo.dev
 
 ---
 

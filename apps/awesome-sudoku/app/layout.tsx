@@ -31,7 +31,7 @@ export const viewport: Viewport = {
   ],
 };
 
-const BASE_URL = 'https://awesome-sudoku.vercel.app';
+const BASE_URL = 'https://sudoku.danwoo.dev';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

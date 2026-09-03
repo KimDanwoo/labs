@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://awesome-sudoku.vercel.app/sitemap.xml',
+    sitemap: 'https://sudoku.danwoo.dev/sitemap.xml',
   };
 }

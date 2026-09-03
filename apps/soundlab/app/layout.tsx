@@ -21,7 +21,7 @@ const label = IBM_Plex_Mono({
   weight: ['400', '500'],
 });
 
-const SITE_URL = 'https://labs-sound.vercel.app';
+const SITE_URL = 'https://sound.danwoo.dev';
 const SITE_NAME = 'soundlab';
 const SITE_DESCRIPTION = 'DANWOO의 곡을 픽셀 파티클로 듣는 플레이어';
 
