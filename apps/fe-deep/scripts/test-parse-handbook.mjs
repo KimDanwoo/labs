@@ -224,3 +224,47 @@ test('꼬꼬무 안의 주의류 제목은 질문이 아니라 직전 답변에 
   assert.match(followUps[0].reveal, /\*\*주의\*\*/);
   assert.match(followUps[0].reveal, /깎아내리지 않는다/);
 });
+
+test('오답·보완할 점은 정답 뒤·꼬꼬무 앞뒤로 각각 카드가 된다', () => {
+  const doc = parseStudyDoc(
+    'mistakes',
+    `# 오답노트
+
+# 1. 4분을 썼다
+
+## 키워드
+
+- 결론 먼저
+
+## 답변
+
+네 문장으로 끝낸다.
+
+## 오답 — 실제 발화 08:35
+
+같은 말을 네 번 했다.
+
+## 꼬리
+
+### 왜 그랬나요?
+
+준비가 안 됐다.
+
+## 보완할 점 — 다음엔 이렇게
+
+두 번째 되물음에서 멈춘다.
+`,
+  );
+
+  const topic = doc.topics[0];
+  assert.deepEqual(
+    topic.steps.map((step) => step.kind),
+    [STEP_KIND.keywords, STEP_KIND.mistake, STEP_KIND.followUp, STEP_KIND.improve],
+  );
+  assert.equal(topic.steps[1].prompt, '오답 — 실제 발화 08:35');
+  assert.equal(topic.steps[1].reveal, '같은 말을 네 번 했다.');
+  assert.equal(topic.steps[3].prompt, '보완할 점 — 다음엔 이렇게');
+  assert.equal(topic.steps[3].reveal, '두 번째 되물음에서 멈춘다.');
+  // 오답·보완은 카드로 올라갔으니 참고 자료에 중복되지 않는다
+  assert.doesNotMatch(topic.notes, /같은 말을 네 번 했다/);
+});

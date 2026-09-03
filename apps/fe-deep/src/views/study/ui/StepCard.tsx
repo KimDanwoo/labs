@@ -2,6 +2,7 @@
 
 import { cn } from '@shared/lib/utils';
 import { Badge, Card, KeywordCheck, MarkdownRenderer, SpeakButton } from '@shared/ui';
+import type { BadgeVariant } from '@ui/react';
 import { STEP_KIND, type StudyStep } from '@views/study/model';
 import { Lightbulb } from 'lucide-react';
 import { AiFeedback } from './AiFeedback';
@@ -9,10 +10,12 @@ import { AiFeedback } from './AiFeedback';
 /** 문서의 "꼬꼬무 공통 프레임" — 모범 답변이 없는 질문에서 스스로 정리할 때 쓴다. */
 const ANSWER_FRAME = ['왜?', '대안?', '왜 안 골랐나?', '단점?', '결과?', '다시 한다면?'];
 
-const STEP_LABEL: Record<StudyStep['kind'], string> = {
-  [STEP_KIND.keywords]: '키워드만 보고 말하기',
-  [STEP_KIND.answer]: '모범 답변',
-  [STEP_KIND.followUp]: '꼬꼬무',
+const STEP_BADGE: Record<StudyStep['kind'], { label: string; variant: BadgeVariant }> = {
+  [STEP_KIND.keywords]: { label: '키워드만 보고 말하기', variant: 'secondary' },
+  [STEP_KIND.answer]: { label: '모범 답변', variant: 'secondary' },
+  [STEP_KIND.mistake]: { label: '내 오답', variant: 'destructive' },
+  [STEP_KIND.followUp]: { label: '꼬꼬무', variant: 'default' },
+  [STEP_KIND.improve]: { label: '보완할 점', variant: 'warning' },
 };
 
 interface StepCardProps {
@@ -36,8 +39,8 @@ export function StepCard({ step, stepIndex, stepCount, isRevealed, recall, onRec
   return (
     <Card className="p-5 shadow-sm sm:p-6">
       <div className="mb-5 flex items-center gap-2">
-        <Badge variant={step.kind === STEP_KIND.followUp ? 'default' : 'secondary'} className="text-xs">
-          {STEP_LABEL[step.kind]}
+        <Badge variant={STEP_BADGE[step.kind].variant} className="text-xs">
+          {STEP_BADGE[step.kind].label}
         </Badge>
         <div className="ml-auto flex items-center gap-1.5" aria-label={`${stepIndex + 1}단계 / 총 ${stepCount}단계`}>
           {Array.from({ length: stepCount }, (_, index) => (
