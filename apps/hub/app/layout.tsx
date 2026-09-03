@@ -21,7 +21,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 // TODO: 실제 배포 도메인으로 교체 (OG 이미지 절대경로 생성에 쓰임)
-const SITE_URL = 'https://danwoo-lab.vercel.app';
+const SITE_URL = 'https://danwoo.dev';
 const SITE_NAME = 'Danwoo Lab';
 const SITE_DESCRIPTION = 'AI로 아이디어를 현실로 만드는 프론트엔드 개발자의 실험실';
 

@@ -2,7 +2,7 @@
 
 AI 기술 뉴스 큐레이션과 주간 베스트셀러 리포트를 제공하는 개인 블로그. Astro 기반 정적 사이트.
 
-**라이브:** [daily-cron-log.vercel.app](https://daily-cron-log.vercel.app)
+**라이브:** [log.danwoo.dev](https://log.danwoo.dev)
 
 ## 개요
 

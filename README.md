@@ -18,15 +18,15 @@
 
 ## 앱 카탈로그
 
-| 앱                  | 설명                                                     | 주요 스택                            | 라이브                                                           |
-| ------------------- | -------------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------- |
-| **hub**             | 프로젝트 갤러리 허브                                     | Next.js, Tailwind CSS                | [danwoo-lab.vercel.app](https://danwoo-lab.vercel.app)           |
-| **cheongyeon-saju** | 사주팔자 계산·해석                                       | Next.js                              | [cheongyeon-saju.vercel.app](https://cheongyeon-saju.vercel.app) |
-| **soundlab**        | 내 노래를 듣는 플레이어 + WebGL 픽셀 파티클 비주얼라이저 | Next.js, WebGL, Jotai                | [labs-sound.vercel.app](https://labs-sound.vercel.app)           |
-| **fe-deep**         | 프론트엔드 학습 플랫폼                                   | Next.js, Supabase                    | [fe-deep.vercel.app](https://fe-deep.vercel.app)                 |
-| **awesome-sudoku**  | 온라인 스도쿠 게임                                       | Next.js, Firebase                    | [awesome-sudoku.vercel.app](https://awesome-sudoku.vercel.app)   |
-| **dansoon**         | AI 기술 뉴스·베스트셀러 리포트 블로그                    | Astro                                | [danwoo-dev.netlify.app](https://danwoo-dev.netlify.app)         |
-| **prairie**         | 인터랙티브 3D 초원 달리기 씬                             | Next.js, React Three Fiber, three.js | [d-prairie.vercel.app](https://d-prairie.vercel.app)             |
+| 앱                  | 설명                                                     | 주요 스택                            | 라이브                                           |
+| ------------------- | -------------------------------------------------------- | ------------------------------------ | ------------------------------------------------ |
+| **hub**             | 프로젝트 갤러리 허브                                     | Next.js, Tailwind CSS                | [danwoo.dev](https://danwoo.dev)                 |
+| **cheongyeon-saju** | 사주팔자 계산·해석                                       | Next.js                              | [saju.danwoo.dev](https://saju.danwoo.dev)       |
+| **soundlab**        | 내 노래를 듣는 플레이어 + WebGL 픽셀 파티클 비주얼라이저 | Next.js, WebGL, Jotai                | [sound.danwoo.dev](https://sound.danwoo.dev)     |
+| **fe-deep**         | 프론트엔드 학습 플랫폼                                   | Next.js, Supabase                    | [fe-deep.danwoo.dev](https://fe-deep.danwoo.dev) |
+| **awesome-sudoku**  | 온라인 스도쿠 게임                                       | Next.js, Firebase                    | [sudoku.danwoo.dev](https://sudoku.danwoo.dev)   |
+| **dansoon**         | AI 기술 뉴스·베스트셀러 리포트 블로그                    | Astro                                | [log.danwoo.dev](https://log.danwoo.dev)         |
+| **prairie**         | 인터랙티브 3D 초원 달리기 씬                             | Next.js, React Three Fiber, three.js | [prairie.danwoo.dev](https://prairie.danwoo.dev) |
 
 `apps/plco`·`apps/gymlog`는 리포에 남아 있지만 완성도가 낮아 카탈로그·허브에서 노출하지 않는다. 고도화 후 재등록한다.
 

@@ -2,7 +2,7 @@
 
 개인 프로젝트 갤러리를 한 곳에서 보여주는 허브 Next.js 앱.
 
-**라이브:** [danwoo-lab.vercel.app](https://danwoo-lab.vercel.app)
+**라이브:** [danwoo.dev](https://danwoo.dev)
 
 ## 개요
 
