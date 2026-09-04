@@ -10,6 +10,7 @@ import { GameStatus } from '@widgets/game-header/ui';
 import dynamic from 'next/dynamic';
 
 const PauseGameOverlay = dynamic(() => import('@widgets/game-overlays/ui/PauseGameOverlay'), { ssr: false });
+const GeneratingOverlay = dynamic(() => import('@widgets/game-overlays/ui/GeneratingOverlay'), { ssr: false });
 const GameResultSheet = dynamic(
   () => import('@features/sudoku-game/ui/GameResultSheet').then((m) => m.GameResultSheet),
   { ssr: false },
@@ -78,6 +79,7 @@ export const HomePage = () => (
           </div>
           <div className="relative">
             <PauseGameOverlay />
+            <GeneratingOverlay />
             <SudokuBoard />
           </div>
         </div>

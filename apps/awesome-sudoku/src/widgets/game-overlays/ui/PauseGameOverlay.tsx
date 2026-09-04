@@ -2,6 +2,7 @@ import {
   difficultyAtom,
   initializeGameAtom,
   isCompletedAtom,
+  isGeneratingAtom,
   timerActiveAtom,
   toggleTimerAtom,
 } from '@features/sudoku-game/model/atoms';
@@ -13,11 +14,12 @@ import { VscPlay } from 'react-icons/vsc';
 export const PauseGameOverlay: FC = () => {
   const timerActive = useAtomValue(timerActiveAtom);
   const isCompleted = useAtomValue(isCompletedAtom);
+  const isGenerating = useAtomValue(isGeneratingAtom);
   const toggleTimer = useSetAtom(toggleTimerAtom);
   const initializeGame = useSetAtom(initializeGameAtom);
   const difficulty = useAtomValue(difficultyAtom);
 
-  if (timerActive || isCompleted) return null;
+  if (timerActive || isCompleted || isGenerating) return null;
 
   return (
     <div
