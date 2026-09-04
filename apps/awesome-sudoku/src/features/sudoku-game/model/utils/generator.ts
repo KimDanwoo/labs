@@ -1,85 +1,65 @@
-import {
-  BASE_GRID,
-  BOARD_SIZE,
-  KEY_NUMBER,
-  MIN_EXPERT_HINTS,
-  SUDOKU_CELL_COUNT,
-} from '@entities/board/model/constants';
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@entities/board/model/constants';
 import type { Grid, GridPosition, SudokuBoard } from '@entities/board/model/types';
 import { deepCopyGrid } from '@entities/board/model/utils';
-import { DIFFICULTY_RANGES, KILLER_DIFFICULTY_RANGES } from '@entities/game/model/constants';
-import type { Difficulty, KillerCage } from '@entities/game/model/types';
-import { calculateNeighborScore } from './calculate';
-import { createEmptyGrid, shuffleArray } from './common';
-import { removeKillerCells, removeRandomCellsWithStrategy } from './remove';
-import { applyTransformations } from './transformer';
-import { isValidPlacement, validateAllCages, validateBaseGrid, validateCages } from './validator';
+import { CLASSIC_DIFFICULTY, KILLER_DIFFICULTY } from '@entities/game/model/constants';
+import type { Difficulty, GradedDifficultySpec, KillerCage, Technique } from '@entities/game/model/types';
+import { shuffleArray } from './common';
+import { generateRandomSolution, gradePuzzle, staysUniqueWithout } from './solver';
+
+const EMPTY = 0;
+const MIN_CAGE_SIZE = 2;
+/** 1칸 케이지(값이 그대로 드러남)가 없는 레이아웃을 찾기 위한 시도 수 */
+const CAGE_LAYOUT_ATTEMPTS = 20;
+/**
+ * 킬러 유일해 검사 1회당 탐색 노드 상한. 예산 안에 유일함을 증명 못 한 칸은 힌트로 남긴다(안전한 쪽).
+ * ponytail: 생성은 워커에서 돌지만 첫 판은 기다려야 한다. 예산 5천은 힌트 0.5칸 감소에 시간 2배, 5만은 expert p95 1초.
+ */
+const KILLER_SEARCH_NODE_BUDGET = 2_000;
+
+const ORTHOGONAL: GridPosition[] = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
+
+const shuffledPositions = (): GridPosition[] => {
+  const positions: GridPosition[] = [];
+  for (let r = 0; r < BOARD_SIZE; r++) for (let c = 0; c < BOARD_SIZE; c++) positions.push([r, c]);
+  shuffleArray(positions);
+  return positions;
+};
+
+const randomInt = (maxExclusive: number): number => Math.floor(Math.random() * maxExclusive);
 
 /**
- * @description 백트래킹을 이용한 스도쿠 생성
- * @returns {Grid} 유효한 스도쿠 그리드
+ * @description 완성된 솔루션 그리드 생성
  */
-function generateValidSudoku(): Grid {
-  const grid: Grid = createEmptyGrid();
+export const generateSolution = (): Grid => generateRandomSolution();
 
-  const fillGrid = (row: number, col: number): boolean => {
-    if (row === 9) return true;
-    if (col === 9) return fillGrid(row + 1, 0);
+/**
+ * @description 솔루션에서 칸을 하나씩 파내되 유일해가 깨지면 되돌린다. targetClues에 닿으면 멈추고,
+ * 그 전에 더 파낼 칸이 없으면(최소 퍼즐) 그대로 반환한다.
+ */
+function digCells(solution: Grid, targetClues: number, cages?: KillerCage[], nodeBudget?: number): Grid {
+  const puzzle = deepCopyGrid(solution);
+  let clues = SUDOKU_CELL_COUNT;
 
-    const numbers = [...KEY_NUMBER];
-    shuffleArray(numbers);
-
-    for (const num of numbers) {
-      if (isValidPlacement(grid, row, col, num)) {
-        grid[row][col] = num;
-        if (fillGrid(row, col + 1)) {
-          return true;
-        }
-        grid[row][col] = 0;
-      }
-    }
-
-    return false;
-  };
-
-  if (fillGrid(0, 0)) {
-    return grid;
+  for (const [r, c] of shuffledPositions()) {
+    if (clues <= targetClues) break;
+    if (!staysUniqueWithout(puzzle, [r, c], puzzle[r][c], cages, nodeBudget)) continue;
+    puzzle[r][c] = EMPTY;
+    clues--;
   }
 
-  return deepCopyGrid(BASE_GRID);
+  return puzzle;
 }
 
-/**
- * @description 솔루션 생성
- * @returns {Grid} 유효한 스도쿠 그리드
- */
-export function generateSolution(): Grid {
-  if (!validateBaseGrid(BASE_GRID)) {
-    const newGrid = generateValidSudoku();
-    applyTransformations(newGrid);
-    return newGrid;
-  }
-
-  const solution = deepCopyGrid(BASE_GRID);
-  applyTransformations(solution);
-
-  if (!validateBaseGrid(solution)) {
-    return generateValidSudoku();
-  }
-
-  return solution;
-}
-
-/**
- * @description 초기 보드 생성
- * @param {Grid} solution - 솔루션 그리드
- * @returns {SudokuBoard} 초기 보드
- */
-function createInitialBoard(solution: Grid): SudokuBoard {
-  return solution.map((row) =>
+function toBoard(puzzle: Grid): SudokuBoard {
+  return puzzle.map((row) =>
     row.map((value) => ({
-      value,
-      isInitial: true,
+      value: value === EMPTY ? null : value,
+      isInitial: value !== EMPTY,
       isSelected: false,
       isConflict: false,
       isHint: false,
@@ -88,481 +68,148 @@ function createInitialBoard(solution: Grid): SudokuBoard {
   );
 }
 
+/** expert(ADVANCED 전용)는 무작위 최소 퍼즐의 ~10%만 해당해 60회면 99.8% 적중한다 */
+const CLASSIC_GRADE_ATTEMPTS = 60;
+/** 킬러는 케이지 조합·45규칙으로 대부분 범위에 들어 적게 시도해도 된다 */
+const KILLER_GRADE_ATTEMPTS = 10;
+
 /**
- * @description 일반 스도쿠 보드 생성
- * @param {Grid} solution - 솔루션
- * @param {Difficulty} difficulty - 난이도
- * @returns {SudokuBoard} 보드
+ * @description 후보를 만들어 채점하고, 기법 범위에 들면 바로 반환한다. 끝까지 못 들면 가장 가까운 후보를 쓴다.
+ * 같은 거리면 추측이 필요한(범위 위) 쪽보다 풀 수 있는(범위 아래) 쪽을 택한다.
  */
-export function generateBoard(solution: Grid, difficulty: Difficulty): SudokuBoard {
-  const board = createInitialBoard(solution);
-  const { min, max } = DIFFICULTY_RANGES[difficulty];
-  const targetHints = min + Math.floor(Math.random() * (max - min + 1));
-  const targetRemove = SUDOKU_CELL_COUNT - targetHints;
+function retryUntilGraded<T>(
+  attempts: number,
+  { minTechnique, maxTechnique }: GradedDifficultySpec,
+  produce: () => T,
+  gradeOf: (candidate: T) => Technique,
+): T {
+  const distanceToRange = (grade: number): number => {
+    if (grade < minTechnique) return minTechnique - grade;
+    if (grade > maxTechnique) return grade - maxTechnique + 0.5;
+    return 0;
+  };
 
-  removeRandomCellsWithStrategy(board, solution, targetRemove, difficulty);
+  let best: T | null = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
 
-  return board;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    const candidate = produce();
+    const distance = distanceToRange(gradeOf(candidate));
+    if (distance === 0) return candidate;
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = candidate;
+    }
+  }
+
+  return best!;
 }
 
 /**
- * @description 킬러 스도쿠 보드 생성
- * @param {Grid} solution - 솔루션
- * @param {Difficulty} difficulty - 난이도
- * @returns {SudokuBoard} 보드
+ * @description 클래식 보드 생성 — 힌트 수를 맞춘 뒤 사람 기법으로 채점해 난이도 범위에 들 때까지 다시 판다.
+ * (한 칸씩 파고 되돌리는 "걷기"도 시험했으나 등급은 칸 수가 아니라 어느 칸이 비었는지에 좌우되어
+ * SINGLE↔GUESS로 진동했고, 최소 퍼즐에서는 더 팔 수 없어 폴백이 크게 늘었다. 새로 파는 쪽이 낫다.)
+ */
+export function generateBoard(solution: Grid, difficulty: Difficulty): SudokuBoard {
+  const spec = CLASSIC_DIFFICULTY[difficulty];
+  const puzzle = retryUntilGraded(CLASSIC_GRADE_ATTEMPTS, spec, () => digCells(solution, spec.clues), gradePuzzle);
+  return toBoard(puzzle);
+}
+
+// ── 킬러 케이지 ────────────────────────────────────────────────
+
+const key = (r: number, c: number): number => r * BOARD_SIZE + c;
+
+const neighborsOf = ([r, c]: GridPosition): GridPosition[] =>
+  ORTHOGONAL.map(([dr, dc]): GridPosition => [r + dr, c + dc]).filter(
+    ([nr, nc]) => nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE,
+  );
+
+/**
+ * @description 무작위 시작점에서 인접 칸으로 케이지를 키운다. 같은 값은 한 케이지에 넣지 않는다(킬러 규칙).
+ * 키우다 막혀 1칸으로 남은 케이지는 값이 겹치지 않는 인접 케이지에 붙여 본다.
+ */
+function layoutCages(solution: Grid, maxCageSize: number): GridPosition[][] {
+  const cageOf = new Array<number>(SUDOKU_CELL_COUNT).fill(-1);
+  const cages: GridPosition[][] = [];
+  const valueAt = ([r, c]: GridPosition): number => solution[r][c];
+  const hasValue = (cage: GridPosition[], value: number): boolean => cage.some((p) => valueAt(p) === value);
+
+  for (const start of shuffledPositions()) {
+    if (cageOf[key(...start)] !== -1) continue;
+
+    const cage: GridPosition[] = [start];
+    const cageIndex = cages.length;
+    cageOf[key(...start)] = cageIndex;
+    const targetSize = MIN_CAGE_SIZE + randomInt(maxCageSize - MIN_CAGE_SIZE + 1);
+
+    while (cage.length < targetSize) {
+      const frontier = cage.flatMap(neighborsOf).filter((p) => cageOf[key(...p)] === -1 && !hasValue(cage, valueAt(p)));
+      if (frontier.length === 0) break;
+      const next = frontier[randomInt(frontier.length)];
+      cage.push(next);
+      cageOf[key(...next)] = cageIndex;
+    }
+
+    cages.push(cage);
+  }
+
+  for (const cage of cages) {
+    if (cage.length !== 1) continue;
+    const cell = cage[0];
+    const host = neighborsOf(cell)
+      .map((p) => cages[cageOf[key(...p)]])
+      .find((other) => other !== cage && other.length < maxCageSize && !hasValue(other, valueAt(cell)));
+    if (!host) continue;
+    host.push(cell);
+    cageOf[key(...cell)] = cages.indexOf(host);
+    cage.length = 0;
+  }
+
+  return cages.filter((cage) => cage.length > 0);
+}
+
+/**
+ * @description 케이지 레이아웃 생성 — 몇 번 뽑아 1칸 케이지(값이 그대로 드러나는 케이지)가 가장 적은 것을 고른다.
+ */
+export function generateKillerCages(solution: Grid, maxCageSize: number): KillerCage[] {
+  let best: GridPosition[][] | null = null;
+  let bestSingles = Number.POSITIVE_INFINITY;
+
+  for (let attempt = 0; attempt < CAGE_LAYOUT_ATTEMPTS; attempt++) {
+    const layout = layoutCages(solution, maxCageSize);
+    const singles = layout.filter((cage) => cage.length === 1).length;
+    if (singles < bestSingles) {
+      bestSingles = singles;
+      best = layout;
+    }
+  }
+
+  return best!.map((cells, index) => ({
+    id: index + 1,
+    cells,
+    sum: cells.reduce((total, [r, c]) => total + solution[r][c], 0),
+  }));
+}
+
+/**
+ * @description 킬러 보드 생성 — 케이지를 깔고 케이지 제약 포함 유일해를 유지하며 힌트를 목표 수까지 파낸 뒤,
+ * 킬러 기법(케이지 조합·45규칙)까지 포함한 채점이 범위에 들 때까지 케이지부터 다시 뽑는다.
  */
 export function generateKillerBoard(
   solution: Grid,
   difficulty: Difficulty,
 ): { board: SudokuBoard; cages: KillerCage[] } {
-  const board = createInitialBoard(solution);
-  const cages = generateKillerCages(solution, difficulty);
-
-  if (!validateCages(cages, solution)) {
-    return generateKillerBoard(solution, difficulty);
-  }
-
-  const { hintsKeep } = KILLER_DIFFICULTY_RANGES[difficulty];
-  const targetHints = difficulty === 'expert' ? Math.max(MIN_EXPERT_HINTS, hintsKeep) : hintsKeep;
-  const targetRemove = SUDOKU_CELL_COUNT - targetHints;
-
-  removeKillerCells(board, cages, targetRemove, difficulty);
-
-  return { board, cages };
-}
-
-/**
- * @description 전략적 시드 포인트 생성
- * @returns {GridPosition[]} 시드 포인트 배열
- */
-function generateSeedPoints(): GridPosition[] {
-  const points: GridPosition[] = [];
-
-  // 격자 패턴으로 시드 포인트 생성 (겹치지 않도록)
-  for (let startRow = 0; startRow < 3; startRow++) {
-    for (let startCol = 0; startCol < 3; startCol++) {
-      // 각 3x3 영역에서 2-3개의 시드 포인트 선택
-      const regionPoints: GridPosition[] = [];
-
-      for (let r = 0; r < 3; r++) {
-        for (let c = 0; c < 3; c++) {
-          regionPoints.push([startRow * 3 + r, startCol * 3 + c]);
-        }
-      }
-
-      shuffleArray(regionPoints);
-
-      // 각 영역에서 2-3개만 선택
-      const numToSelect = 2 + Math.floor(Math.random() * 2);
-      points.push(...regionPoints.slice(0, numToSelect));
-    }
-  }
-
-  shuffleArray(points);
-  return points;
-}
-
-/**
- * @description 유효한 이웃 셀들 반환
- * @param {number} row - 행
- * @param {number} col - 열
- * @param {Grid} solution - 솔루션
- * @param {Set<string>} localUsed - 로컬 사용된 셀 집합
- * @param {Set<string>} globalUsed - 전역 사용된 셀 집합
- * @param {Set<number>} usedValues - 사용된 값 집합
- * @returns {GridPosition[]} 유효한 이웃 셀들 배열
- */
-function getValidNeighbors(
-  row: number,
-  col: number,
-  solution: Grid,
-  localUsed: Set<string>,
-  globalUsed: Set<string>,
-  usedValues: Set<number>,
-): GridPosition[] {
-  const neighbors: GridPosition[] = [];
-  const directions = [
-    [-1, 0],
-    [1, 0],
-    [0, -1],
-    [0, 1],
-  ]; // 상하좌우
-
-  for (const [dRow, dCol] of directions) {
-    const newRow = row + dRow;
-    const newCol = col + dCol;
-
-    if (newRow >= 0 && newRow < BOARD_SIZE && newCol >= 0 && newCol < BOARD_SIZE) {
-      const key = `${newRow}-${newCol}`;
-      const value = solution[newRow][newCol];
-
-      // 사용되지 않았고 중복 값이 아닌 셀만 선택
-      if (!localUsed.has(key) && !globalUsed.has(key) && !usedValues.has(value)) {
-        neighbors.push([newRow, newCol]);
-      }
-    }
-  }
-
-  return neighbors;
-}
-
-/**
- * @description 시드에서 케이지 확장
- * @param {Grid} solution - 솔루션
- * @param {GridPosition} seed - 시드 포인트
- * @param {number} maxSize - 최대 케이지 크기
- * @param {number} minSize - 최소 케이지 크기
- * @param {Set<string>} globalUsed - 전역 사용된 셀 집합
- * @returns {Array<{ cells: GridPosition[]; sum: number }> | null} 케이지 데이터 또는 null
- */
-function growCageFromSeed(
-  solution: Grid,
-  seed: GridPosition,
-  maxSize: number,
-  minSize: number,
-  globalUsed: Set<string>,
-): { cells: GridPosition[]; sum: number } | null {
-  const [startRow, startCol] = seed;
-  const startKey = `${startRow}-${startCol}`;
-
-  if (globalUsed.has(startKey)) return null;
-
-  const cage: GridPosition[] = [seed];
-  const used = new Set([startKey]);
-  const usedValues = new Set([solution[startRow][startCol]]);
-
-  // BFS로 케이지 확장
-  const queue: GridPosition[] = [seed];
-  let targetSize = minSize + Math.floor(Math.random() * (maxSize - minSize + 1));
-  targetSize = Math.min(targetSize, maxSize);
-
-  while (queue.length > 0 && cage.length < targetSize) {
-    const current = queue.shift()!;
-    const [row, col] = current;
-
-    // 인접한 셀들 찾기
-    const neighbors = getValidNeighbors(row, col, solution, used, globalUsed, usedValues);
-
-    if (neighbors.length === 0) {
-      // 더 이상 확장할 수 없으면 다른 큐의 셀로 시도
-      continue;
-    }
-
-    // 가장 적합한 이웃 선택
-    neighbors.sort((a, b) => {
-      const scoreA = calculateNeighborScore(a, cage);
-      const scoreB = calculateNeighborScore(b, cage);
-      return scoreB - scoreA;
-    });
-
-    const bestNeighbor = neighbors[0];
-    const [nRow, nCol] = bestNeighbor;
-    const nKey = `${nRow}-${nCol}`;
-    const nValue = solution[nRow][nCol];
-
-    cage.push(bestNeighbor);
-    used.add(nKey);
-    usedValues.add(nValue);
-    queue.push(bestNeighbor);
-  }
-
-  // 최소 크기 확인
-  if (cage.length < minSize) {
-    return null;
-  }
-
-  const sum = cage.reduce((total, [r, c]) => total + solution[r][c], 0);
-
-  return { cells: cage, sum };
-}
-
-/**
- * @description 전략적 케이지 생성
- * @param {Grid} solution - 솔루션
- * @param {number} maxCageSize - 최대 케이지 크기
- * @param {number} minCageSize - 최소 케이지 크기
- * @returns {Array<{ cells: GridPosition[]; sum: number }>} 케이지 배열
- */
-function generateCagesWithStrategy(
-  solution: Grid,
-  maxCageSize: number,
-  minCageSize: number,
-): Array<{ cells: GridPosition[]; sum: number }> {
-  const cages: Array<{ cells: GridPosition[]; sum: number }> = [];
-  const used = new Set<string>();
-
-  // 시드 포인트들을 전략적으로 선택
-  const seedPoints = generateSeedPoints();
-
-  for (const seedPoint of seedPoints) {
-    const [row, col] = seedPoint;
-    const key = `${row}-${col}`;
-
-    if (used.has(key)) continue;
-
-    // 이 시드부터 케이지 확장
-    const cageData = growCageFromSeed(solution, seedPoint, maxCageSize, minCageSize, used);
-
-    if (cageData && cageData.cells.length >= minCageSize) {
-      cages.push(cageData);
-      cageData.cells.forEach(([r, c]) => used.add(`${r}-${c}`));
-    }
-  }
-
-  return cages;
-}
-
-/**
- * @description 배열을 주어진 크기로 분할
- * @param {T[]} array - 분할할 배열
- * @param {number} chunkSize - 분할 크기
- * @returns {T[][]} 분할된 배열
- */
-function chunkArray<T>(array: T[], chunkSize: number): T[][] {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += chunkSize) {
-    chunks.push(array.slice(i, i + chunkSize));
-  }
-  return chunks;
-}
-
-/**
- * @description 인접한 최적의 케이지 찾기
- * @param {number} row - 행
- * @param {number} col - 열
- * @param {KillerCage[]} cages - 케이지 배열
- * @param {Grid} solution - 솔루션
- * @param {number} maxCageSize - 최대 케이지 크기
- * @returns {KillerCage | null} 최적의 케이지
- */
-function findBestAdjacentCage(
-  row: number,
-  col: number,
-  cages: KillerCage[],
-  solution: Grid,
-  maxCageSize: number, // 매개변수 추가
-): KillerCage | null {
-  const cellValue = solution[row][col];
-  const directions = [
-    [-1, 0],
-    [1, 0],
-    [0, -1],
-    [0, 1],
-  ];
-
-  const candidateCages: Array<{ cage: KillerCage; score: number }> = [];
-
-  for (const cage of cages) {
-    // 케이지 크기 제한 확인
-    if (cage.cells.length >= maxCageSize) continue;
-
-    // 인접성 검사
-    let isAdjacent = false;
-    for (const [cageRow, cageCol] of cage.cells) {
-      for (const [dRow, dCol] of directions) {
-        if (cageRow + dRow === row && cageCol + dCol === col) {
-          isAdjacent = true;
-          break;
-        }
-      }
-      if (isAdjacent) break;
-    }
-
-    if (!isAdjacent) continue;
-
-    // 중복 값 검사
-    const cageValues = cage.cells.map(([r, c]) => solution[r][c]);
-    if (cageValues.includes(cellValue)) continue;
-
-    // 점수 계산
-    let score = 0;
-
-    // 케이지 크기 (작을수록 높은 점수)
-    score += Math.max(0, maxCageSize - cage.cells.length);
-
-    // 케이지 모양의 규칙성
-    const minRow = Math.min(...cage.cells.map(([r]) => r));
-    const maxRow = Math.max(...cage.cells.map(([r]) => r));
-    const minCol = Math.min(...cage.cells.map(([, c]) => c));
-    const maxCol = Math.max(...cage.cells.map(([, c]) => c));
-
-    const boundingArea = (maxRow - minRow + 1) * (maxCol - minCol + 1);
-    const compactness = cage.cells.length / boundingArea;
-    score += compactness * 2;
-
-    candidateCages.push({ cage, score });
-  }
-
-  if (candidateCages.length === 0) return null;
-
-  // 최고 점수의 케이지 반환
-  candidateCages.sort((a, b) => b.score - a.score);
-  return candidateCages[0].cage;
-}
-
-/**
- * @description 인접한 셀들 그룹화 (개선된 버전)
- * @param {GridPosition[]} cells - 셀 배열
- * @returns {GridPosition[][]} 그룹화된 셀 배열
- */
-export function groupAdjacentCells(cells: GridPosition[]): GridPosition[][] {
-  const groups: GridPosition[][] = [];
-  const visited = new Set<string>();
-
-  // O(1) 조회를 위한 셀 좌표 Set 사전 구축
-  const cellSet = new Set<string>(cells.map(([r, c]) => `${r}-${c}`));
-
-  for (const cell of cells) {
-    const [row, col] = cell;
-    const key = `${row}-${col}`;
-
-    if (visited.has(key)) continue;
-
-    // BFS로 연결된 셀들 찾기
-    const group: GridPosition[] = [];
-    const queue: GridPosition[] = [cell];
-    visited.add(key);
-
-    while (queue.length > 0) {
-      const current = queue.shift()!;
-      group.push(current);
-
-      const [cRow, cCol] = current;
-      const directions = [
-        [-1, 0],
-        [1, 0],
-        [0, -1],
-        [0, 1],
-      ];
-
-      for (const [dRow, dCol] of directions) {
-        const newRow = cRow + dRow;
-        const newCol = cCol + dCol;
-        const newKey = `${newRow}-${newCol}`;
-
-        if (!visited.has(newKey) && cellSet.has(newKey)) {
-          visited.add(newKey);
-          queue.push([newRow, newCol]);
-        }
-      }
-    }
-
-    groups.push(group);
-  }
-
-  return groups;
-}
-
-/**
- * @description 개선된 남은 셀 처리
- * @param {KillerCage[]} cages - 케이지 배열
- * @param {Set<string>} assignedCells - 할당된 셀 집합
- * @param {Grid} solution - 솔루션
- * @param {number} maxCageSize - 최대 케이지 크기
- */
-function handleRemainingCellsImproved(
-  cages: KillerCage[],
-  assignedCells: Set<string>,
-  solution: Grid,
-  maxCageSize: number, // 매개변수 추가
-): void {
-  const remainingCells: GridPosition[] = [];
-
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      const key = `${row}-${col}`;
-      if (!assignedCells.has(key)) {
-        remainingCells.push([row, col]);
-      }
-    }
-  }
-
-  if (remainingCells.length === 0) return;
-
-  // 인접한 케이지와 합치기 시도 (크기 제한 추가)
-  const processed = new Set<string>();
-
-  for (const [row, col] of remainingCells) {
-    const key = `${row}-${col}`;
-    if (processed.has(key)) continue;
-
-    const bestCage = findBestAdjacentCage(row, col, cages, solution, maxCageSize);
-
-    if (bestCage) {
-      bestCage.cells.push([row, col]);
-      bestCage.sum += solution[row][col];
-      assignedCells.add(key);
-      processed.add(key);
-    }
-  }
-
-  // 여전히 남은 셀들을 새로운 작은 케이지로 그룹화
-  const stillRemaining = remainingCells.filter(([r, c]) => !processed.has(`${r}-${c}`));
-
-  if (stillRemaining.length > 0) {
-    const groups = groupAdjacentCells(stillRemaining);
-    let nextCageId = Math.max(...cages.map((c) => c.id)) + 1;
-
-    groups.forEach((group) => {
-      if (group.length >= 1) {
-        // 그룹이 maxCageSize를 초과하면 분할
-        const chunks = chunkArray(group, maxCageSize);
-
-        chunks.forEach((chunk) => {
-          const sum = chunk.reduce((total, [r, c]) => total + solution[r][c], 0);
-          const newCage: KillerCage = {
-            id: nextCageId++,
-            cells: chunk,
-            sum: sum,
-          };
-          cages.push(newCage);
-
-          chunk.forEach(([r, c]) => {
-            assignedCells.add(`${r}-${c}`);
-          });
-        });
-      }
-    });
-  }
-}
-
-/**
- * @description 개선된 킬러 스도쿠 케이지 생성기
- * @param {Grid} solution - 솔루션
- * @param {Difficulty} difficulty - 난이도
- * @returns {KillerCage[]} 케이지 배열
- */
-export function generateKillerCages(solution: Grid, difficulty: Difficulty): KillerCage[] {
-  const { maxCageSize } = KILLER_DIFFICULTY_RANGES[difficulty];
-  const minCageSize = 1;
-
-  const cages: KillerCage[] = [];
-  const assignedCells = new Set<string>();
-  let cageId = 1;
-
-  // 개선된 케이지 생성 전략
-  const result = generateCagesWithStrategy(solution, maxCageSize, minCageSize);
-
-  result.forEach((cageData) => {
-    const cage: KillerCage = {
-      id: cageId++,
-      cells: cageData.cells,
-      sum: cageData.sum,
-    };
-    cages.push(cage);
-
-    cageData.cells.forEach(([r, c]) => {
-      assignedCells.add(`${r}-${c}`);
-    });
-  });
-
-  // 누락된 셀 처리 (maxCageSize 전달)
-  handleRemainingCellsImproved(cages, assignedCells, solution, maxCageSize);
-
-  // 최종 검증
-  if (!validateAllCages(cages, solution)) {
-    return generateKillerCages(solution, difficulty);
-  }
-
-  return cages;
+  const spec = KILLER_DIFFICULTY[difficulty];
+  const { puzzle, cages } = retryUntilGraded(
+    KILLER_GRADE_ATTEMPTS,
+    spec,
+    () => {
+      const cages = generateKillerCages(solution, spec.maxCageSize);
+      return { cages, puzzle: digCells(solution, spec.clues, cages, KILLER_SEARCH_NODE_BUDGET) };
+    },
+    (candidate) => gradePuzzle(candidate.puzzle, candidate.cages),
+  );
+
+  return { board: toBoard(puzzle), cages };
 }

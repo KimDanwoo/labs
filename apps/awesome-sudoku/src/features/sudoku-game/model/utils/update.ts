@@ -1,8 +1,14 @@
 import { BLOCK_SIZE, BOARD_SIZE } from '@entities/board/model/constants';
-import type { CellHighlight, Position, SudokuBoard, SudokuCell } from '@entities/board/model/types';
+import type { CellHighlight, Grid, SudokuBoard, SudokuCell } from '@entities/board/model/types';
 import { GAME_MODE } from '@entities/game/model/constants';
 import type { GameCompletionResult, GameMode, KillerCage } from '@entities/game/model/types';
-import { checkConflicts, isBoardComplete, isKillerBoardComplete, validateKillerCages } from './validator';
+import {
+  checkConflicts,
+  isBoardComplete,
+  isKillerBoardComplete,
+  markWrongValues,
+  validateKillerCages,
+} from './validator';
 
 /**
  * @description 단일 셀만 업데이트
@@ -93,24 +99,6 @@ export function resetUserInputs(board: SudokuBoard): SudokuBoard {
       };
     }),
   );
-}
-
-/**
- * @description 빈 셀 찾기
- * @param {SudokuBoard} board - 보드
- * @returns {Position[]} 빈 셀 배열
- */
-export function findEmptyCells(board: SudokuBoard): Position[] {
-  const emptyCells: Position[] = board.flatMap((row, rowIndex) =>
-    row.reduce<Position[]>((acc, cell, colIndex) => {
-      if (cell.value === null) {
-        acc.push({ row: rowIndex, col: colIndex });
-      }
-      return acc;
-    }, []),
-  );
-
-  return emptyCells;
 }
 
 /**
@@ -226,47 +214,32 @@ export function updateCellValue(board: SudokuBoard, row: number, col: number, va
 }
 
 /**
- * @description 게임 모드에 따른 충돌 검사
+ * @description 규칙 충돌(행·열·블록, 킬러면 케이지까지) + 정답과 다른 값을 충돌로 표시
  * @param {SudokuBoard} board - 보드
+ * @param {Grid} solution - 정답
  * @param {GameMode} gameMode - 게임 모드
  * @param {KillerCage[]} cages - 케이지 배열
  * @returns {SudokuBoard} 충돌 검사된 보드
  */
-export function validateBoard(board: SudokuBoard, gameMode: GameMode, cages: KillerCage[]): SudokuBoard {
-  if (gameMode === GAME_MODE.KILLER) {
-    return validateKillerCages(board, cages);
-  }
-  return checkConflicts(board);
+export function validateBoard(
+  board: SudokuBoard,
+  solution: Grid,
+  gameMode: GameMode,
+  cages: KillerCage[],
+): SudokuBoard {
+  const ruleChecked = gameMode === GAME_MODE.KILLER ? validateKillerCages(board, cages) : checkConflicts(board);
+  return markWrongValues(ruleChecked, solution);
 }
 
 /**
- * @description 게임 완료 상태 확인
- * @param {SudokuBoard} board - 보드
- * @param {number[][]} solution - 솔루션
+ * @description 게임 완료 상태 확인 — validateBoard를 거친 보드여야 한다(충돌 표시가 정답 판정의 근거).
+ * @param {SudokuBoard} board - 충돌 검사된 보드
  * @param {GameMode} gameMode - 게임 모드
  * @param {KillerCage[]} cages - 케이지 배열
  * @returns {GameCompletionResult} 게임 완료 결과
  */
-export function checkGameCompletion(
-  board: SudokuBoard,
-  solution: number[][],
-  gameMode: GameMode,
-  cages: KillerCage[],
-): GameCompletionResult {
-  let completed = false;
+export function checkGameCompletion(board: SudokuBoard, gameMode: GameMode, cages: KillerCage[]): GameCompletionResult {
+  const completed = gameMode === GAME_MODE.KILLER ? isKillerBoardComplete(board, cages) : isBoardComplete(board);
 
-  if (gameMode === GAME_MODE.KILLER) {
-    completed = isKillerBoardComplete(board, cages);
-  } else {
-    completed = isBoardComplete(board);
-  }
-
-  // 유일해가 보장된 퍼즐에서 충돌 없이 모두 채워짐 = 정답
-  const success = completed;
-
-  return {
-    completed,
-    success,
-    board,
-  };
+  return { completed, success: completed, board };
 }

@@ -1,39 +1,21 @@
 // Generator
 export { generateBoard, generateKillerBoard, generateKillerCages, generateSolution } from './generator';
 
+// Solver
+export { countSolutions, generateRandomSolution, gradePuzzle, hasUniqueSolution, solveLogically } from './solver';
+
 // Validator
 export {
-  checkBlockConflict,
-  checkColConflict,
   checkConflicts,
-  checkRowConflict,
-  hasUniqueSolution,
   isBoardComplete,
-  isBoardCorrect,
   isKillerBoardComplete,
-  isKillerRemovalValid,
-  isKillerRemovalValidLenient,
-  isValidPlacement,
-  validateAllCages,
-  validateBaseGrid,
-  validateCages,
+  isValidSolution,
+  markWrongValues,
   validateKillerCages,
 } from './validator';
 
 // Common
 export { createEmptyBoard, createEmptyGrid, createEmptyHighlights, formatTime, shuffleArray } from './common';
-
-// Calculate
-export { calculateNeighborScore } from './calculate';
-
-// Remove
-export { removeKillerCells, removeRandomCellsWithStrategy } from './remove';
-
-// Transformer
-export { applyTransformations } from './transformer';
-
-// Controls
-export { getHint } from './controls';
 
 // Update
 export {
@@ -41,7 +23,6 @@ export {
   canFillCell,
   checkGameCompletion,
   clearHighlights,
-  findEmptyCells,
   resetUserInputs,
   updateCellNotes,
   updateCellSelection,

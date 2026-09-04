@@ -8,7 +8,6 @@ import {
   canFillCell,
   checkGameCompletion,
   clearHighlights,
-  findEmptyCells,
   resetUserInputs,
   updateCellNotes,
   updateCellSelection,
@@ -34,6 +33,18 @@ describe('update.ts 유틸리티 함수 테스트', () => {
             isHint: false,
           })),
       );
+
+  const createTestSolution = (): number[][] => [
+    [5, 3, 4, 6, 7, 8, 9, 1, 2],
+    [6, 7, 2, 1, 9, 5, 3, 4, 8],
+    [1, 9, 8, 3, 4, 2, 5, 6, 7],
+    [8, 5, 9, 7, 6, 1, 4, 2, 3],
+    [4, 2, 6, 8, 5, 3, 7, 9, 1],
+    [7, 1, 3, 9, 2, 4, 8, 5, 6],
+    [9, 6, 1, 5, 3, 7, 2, 8, 4],
+    [2, 8, 7, 4, 1, 9, 6, 3, 5],
+    [3, 4, 5, 2, 8, 6, 1, 7, 9],
+  ];
 
   describe('updateSingleCell', () => {
     it('단일 셀을 성공적으로 업데이트해야 합니다', () => {
@@ -112,24 +123,6 @@ describe('update.ts 유틸리티 함수 테스트', () => {
     });
   });
 
-  describe('findEmptyCells', () => {
-    it('빈 셀의 위치를 모두 찾아야 합니다', () => {
-      const board = createTestBoard();
-      // 일부 셀에 값 설정
-      board[0][0].value = 1;
-      board[1][1].value = 2;
-
-      const emptyCells = findEmptyCells(board);
-
-      // 빈 셀 개수 확인 (전체 셀 - 채워진 셀)
-      expect(emptyCells.length).toBe(BOARD_SIZE * BOARD_SIZE - 2);
-      // 빈 셀의 위치가 올바른지 확인
-      expect(emptyCells).not.toContainEqual({ row: 0, col: 0 });
-      expect(emptyCells).not.toContainEqual({ row: 1, col: 1 });
-      expect(emptyCells).toContainEqual({ row: 0, col: 1 });
-    });
-  });
-
   describe('calculateHighlights', () => {
     it('선택된 셀과 관련된 셀들을 올바르게 하이라이트해야 합니다', () => {
       const board = createTestBoard();
@@ -205,16 +198,26 @@ describe('update.ts 유틸리티 함수 테스트', () => {
   });
 
   describe('validateBoard', () => {
-    it('일반 모드에서는 충돌만 검사해야 합니다', () => {
+    it('일반 모드에서는 행·열·블록 충돌을 검사해야 합니다', () => {
       const board = createTestBoard();
       // 충돌이 있는 보드 설정
       board[0][0].value = 1;
       board[0][1].value = 1; // 같은 행에 중복
 
-      const validatedBoard = validateBoard(board, GAME_MODE.CLASSIC, []);
+      const validatedBoard = validateBoard(board, createTestSolution(), GAME_MODE.CLASSIC, []);
 
       expect(validatedBoard[0][0].isConflict).toBe(true);
       expect(validatedBoard[0][1].isConflict).toBe(true);
+    });
+
+    it('규칙 충돌이 없어도 정답과 다른 값은 충돌로 표시해야 합니다', () => {
+      const board = createTestBoard();
+      const solution = createTestSolution();
+      board[0][0].value = solution[0][0] === 9 ? 1 : 9;
+
+      const validatedBoard = validateBoard(board, solution, GAME_MODE.CLASSIC, []);
+
+      expect(validatedBoard[0][0].isConflict).toBe(true);
     });
 
     it('킬러 모드에서는 케이지 규칙도 검사해야 합니다', () => {
@@ -234,7 +237,7 @@ describe('update.ts 유틸리티 함수 테스트', () => {
       board[0][0].value = 1;
       board[0][1].value = 3; // 합이 4가 되어 규칙 위반
 
-      const validatedBoard = validateBoard(board, GAME_MODE.KILLER, cages);
+      const validatedBoard = validateBoard(board, createTestSolution(), GAME_MODE.KILLER, cages);
 
       expect(validatedBoard[0][0].isConflict).toBe(true);
       expect(validatedBoard[0][1].isConflict).toBe(true);
@@ -242,15 +245,9 @@ describe('update.ts 유틸리티 함수 테스트', () => {
   });
 
   describe('checkGameCompletion', () => {
-    it('보드가 완성되고 정확할 때 success가 true여야 합니다', () => {
+    it('보드가 모두 채워지고 충돌이 없으면 success가 true여야 합니다', () => {
       const board = createTestBoard();
-      const solution = Array(BOARD_SIZE)
-        .fill(null)
-        .map(() =>
-          Array(BOARD_SIZE)
-            .fill(null)
-            .map(() => 2),
-        );
+      const solution = createTestSolution();
 
       // 보드를 완성된 상태로 설정
       for (let row = 0; row < BOARD_SIZE; row++) {
@@ -259,7 +256,7 @@ describe('update.ts 유틸리티 함수 테스트', () => {
         }
       }
 
-      const result = checkGameCompletion(board, solution, GAME_MODE.CLASSIC, []);
+      const result = checkGameCompletion(board, GAME_MODE.CLASSIC, []);
 
       expect(result.completed).toBe(true);
       expect(result.success).toBe(true);
@@ -267,9 +264,6 @@ describe('update.ts 유틸리티 함수 테스트', () => {
 
     it('충돌이 있는 보드는 completed와 success가 false여야 합니다', () => {
       const board = createTestBoard();
-      const solution = Array(BOARD_SIZE)
-        .fill(null)
-        .map(() => Array(BOARD_SIZE).fill(1));
 
       // 보드를 모두 같은 값으로 채우기 (충돌 발생)
       for (let row = 0; row < BOARD_SIZE; row++) {
@@ -279,7 +273,7 @@ describe('update.ts 유틸리티 함수 테스트', () => {
         }
       }
 
-      const result = checkGameCompletion(board, solution, GAME_MODE.CLASSIC, []);
+      const result = checkGameCompletion(board, GAME_MODE.CLASSIC, []);
 
       expect(result.completed).toBe(false);
       expect(result.success).toBe(false);
