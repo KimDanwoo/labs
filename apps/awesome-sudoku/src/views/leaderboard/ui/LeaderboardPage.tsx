@@ -1,20 +1,15 @@
 'use client';
 
 import { userAtom } from '@features/auth/model/atoms';
-import { useCumulativeLeaderboard, useLeaderboard, useStardokuLeaderboard } from '@features/leaderboard/model/hooks';
-import {
-  CumulativeLeaderboardTable,
-  LeaderboardFilters,
-  LeaderboardTable,
-  StardokuLeaderboardTable,
-} from '@features/leaderboard/ui';
+import { useCumulativeLeaderboard, useLeaderboard } from '@features/leaderboard/model/hooks';
+import { CumulativeLeaderboardTable, LeaderboardFilters, LeaderboardTable } from '@features/leaderboard/ui';
 import { ThemeToggle } from '@features/theme/ui';
 import { cn } from '@shared/model/utils';
 import { SubpageHeader } from '@shared/ui';
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
 
-type LeaderboardTab = 'best' | 'cumulative' | 'stardoku';
+type LeaderboardTab = 'best' | 'cumulative';
 
 const ErrorMessage = ({ message }: { message: string }) => (
   <div className={cn('text-center py-12', 'text-[rgb(var(--color-error))]')}>
@@ -43,12 +38,9 @@ export const LeaderboardPage = () => {
 
   const { entries, isLoading: cumLoading, error: cumError } = useCumulativeLeaderboard();
 
-  const { entries: stardokuEntries, isLoading: stardokuLoading, error: stardokuError } = useStardokuLeaderboard();
-
   const tabs: { key: LeaderboardTab; label: string }[] = [
     { key: 'best', label: '최고 기록' },
     { key: 'cumulative', label: '누적 포인트' },
-    { key: 'stardoku', label: '별도쿠' },
   ];
 
   return (
@@ -105,10 +97,6 @@ export const LeaderboardPage = () => {
             <CumulativeLeaderboardTable entries={entries} isLoading={cumLoading} currentUserId={user?.uid} />
           )}
           {tab === 'cumulative' && cumError && <ErrorMessage message={cumError.message} />}
-          {tab === 'stardoku' && !stardokuError && (
-            <StardokuLeaderboardTable entries={stardokuEntries} isLoading={stardokuLoading} currentUserId={user?.uid} />
-          )}
-          {tab === 'stardoku' && stardokuError && <ErrorMessage message={stardokuError.message} />}
         </div>
       </div>
     </main>
