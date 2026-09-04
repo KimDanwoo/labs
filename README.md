@@ -20,7 +20,7 @@
 
 | 앱                  | 설명                                                     | 주요 스택                            | 라이브                                           |
 | ------------------- | -------------------------------------------------------- | ------------------------------------ | ------------------------------------------------ |
-| **hub**             | 프로젝트 갤러리 허브                                     | Next.js, Tailwind CSS                | [danwoo.dev](https://danwoo.dev)                 |
+| **hub**             | 프로젝트 갤러리 허브                                     | Next.js, Tailwind CSS                | [lab.danwoo.dev](https://lab.danwoo.dev)         |
 | **cheongyeon-saju** | 사주팔자 계산·해석                                       | Next.js                              | [saju.danwoo.dev](https://saju.danwoo.dev)       |
 | **soundlab**        | 내 노래를 듣는 플레이어 + WebGL 픽셀 파티클 비주얼라이저 | Next.js, WebGL, Jotai                | [sound.danwoo.dev](https://sound.danwoo.dev)     |
 | **fe-deep**         | 프론트엔드 학습 플랫폼                                   | Next.js, Supabase                    | [fe-deep.danwoo.dev](https://fe-deep.danwoo.dev) |

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [{ url: 'https://danwoo.dev', priority: 1.0 }];
+  return [{ url: 'https://lab.danwoo.dev', priority: 1.0 }];
 }
