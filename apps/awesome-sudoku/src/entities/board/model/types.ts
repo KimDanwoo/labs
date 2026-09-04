@@ -35,16 +35,3 @@ export interface CageInfo {
   paths: { id: number; path: string }[];
   sums: { id: number; sum: number; x: number; y: number }[];
 }
-
-export interface RemovalStrategy {
-  preferCenter: boolean;
-  preferCorners: boolean;
-  preferEdges: boolean;
-  symmetryBonus: number;
-  blockDistribution: boolean;
-}
-
-export interface CellPriority {
-  pos: GridPosition;
-  priority: number;
-}

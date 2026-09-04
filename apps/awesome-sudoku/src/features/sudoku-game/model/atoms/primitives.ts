@@ -26,4 +26,6 @@ export const cagesAtom = atomWithStorage<KillerCage[]>('sudoku:cages', []);
 // ── 비영속 atoms ───────────────────────────────────────────
 
 export const isNoteModeAtom = atom(false);
+/** 새 판 생성 중(워커 응답 대기) — 보드 위에 로더를 띄우고 입력을 막는다 */
+export const isGeneratingAtom = atom(false);
 export const highlightedCellsAtom = atom<Record<string, CellHighlight>>(createEmptyHighlights());

@@ -8,6 +8,7 @@ export {
   highlightedCellsAtom,
   hintsRemainingAtom,
   isCompletedAtom,
+  isGeneratingAtom,
   isNoteModeAtom,
   isRecordSavedAtom,
   isSuccessAtom,

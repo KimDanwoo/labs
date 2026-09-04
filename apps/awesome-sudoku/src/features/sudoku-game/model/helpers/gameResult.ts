@@ -15,8 +15,8 @@ export const resolveBoardState = (
   gameMode: GameMode,
   cages: KillerCage[],
 ) => {
-  const boardWithConflicts = validateBoard(board, gameMode, cages);
-  const result = checkGameCompletion(boardWithConflicts, solution, gameMode, cages);
+  const boardWithConflicts = validateBoard(board, solution, gameMode, cages);
+  const result = checkGameCompletion(boardWithConflicts, gameMode, cages);
 
   return { boardWithConflicts, result };
 };

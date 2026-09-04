@@ -2,9 +2,6 @@ import { HINTS_REMAINING, MAX_MISTAKES } from '@entities/game/model/constants';
 import { buildGameResultState, resolveBoardState } from '@features/sudoku-game/model/helpers';
 import {
   canFillCell,
-  checkBlockConflict,
-  checkColConflict,
-  checkRowConflict,
   clearHighlights,
   resetUserInputs as resetUserInputsOptimized,
   updateCellNotes,
@@ -39,14 +36,14 @@ export const fillCellAtom = atom(null, (get, set, value: number | null) => {
   if (!canFillCell(selectedCell, board)) return;
 
   const { row, col } = selectedCell!;
+  if (board[row][col].value === value) return;
 
-  const hasConflict =
-    value !== null &&
-    (checkRowConflict(board, row, col, value) ||
-      checkColConflict(board, row, col, value) ||
-      checkBlockConflict(board, row, col, value));
+  const solution = get(solutionAtom);
 
-  if (hasConflict) {
+  // 퍼즐은 유일해라 정답과 다른 값은 곧 오답이다 — 킬러의 케이지 규칙 위반까지 한 기준으로 잡힌다.
+  const isMistake = value !== null && value !== solution[row][col];
+
+  if (isMistake) {
     const newMistakeCount = get(mistakeCountAtom) + 1;
     set(mistakeCountAtom, newMistakeCount);
 
@@ -59,7 +56,6 @@ export const fillCellAtom = atom(null, (get, set, value: number | null) => {
     }
   }
 
-  const solution = get(solutionAtom);
   const gameMode = get(gameModeAtom);
   const cages = get(cagesAtom);
   const updatedBoard = updateCellValue(board, row, col, value);
