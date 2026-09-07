@@ -4,6 +4,26 @@ import type { Track } from '@entities/track/model/types';
 
 export const TRACKS: readonly Track[] = [
   {
+    id: 2393574927,
+    title: 'Coffee',
+    permalinkUrl: 'https://soundcloud.com/danwooking/coffee',
+    artworkBase: 'https://i1.sndcdn.com/artworks-8SeJptXKhYOuawr1-byzZEQ',
+    artworkExt: '.jpg',
+    waveformUrl: 'https://wave.sndcdn.com/91WLRzB8lDrv_m.json',
+    durationMs: 192046,
+    genre: 'R&B & Soul',
+  },
+  {
+    id: 2393574345,
+    title: 'Dive Into Summer',
+    permalinkUrl: 'https://soundcloud.com/danwooking/dive-into-summer',
+    artworkBase: 'https://i1.sndcdn.com/artworks-4PNqzERbTWYGhUhi-DQDbgg',
+    artworkExt: '.jpg',
+    waveformUrl: 'https://wave.sndcdn.com/J5pNZXj5G72X_m.json',
+    durationMs: 224246,
+    genre: 'Dance & EDM',
+  },
+  {
     id: 2385589986,
     title: '그냥 네 옆이면',
     permalinkUrl: 'https://soundcloud.com/danwooking/he2yjhk95jre',
@@ -89,7 +109,7 @@ export const TRACKS: readonly Track[] = [
     permalinkUrl: 'https://soundcloud.com/danwooking/free-1',
     artworkBase: 'https://i1.sndcdn.com/artworks-eQaJTN13fEFEq3OP-kNsizw',
     artworkExt: '.jpg',
-    waveformUrl: 'https://wave.sndcdn.com/VEl1hseTwZtP_m.json',
+    waveformUrl: 'https://wave.sndcdn.com/gz4YUvwbAeOh_m.json',
     durationMs: 216726,
     genre: 'Pop',
   },
