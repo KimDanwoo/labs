@@ -2,6 +2,13 @@ name: CI
 
 on:
   pull_request:
+    # 봇 워크플로우가 PR 생성 직후 머지해 CI가 뜨기 전 PR이 닫힌다 → startup failure만 남는다.
+    # 봇이 커밋하는 경로는 CI 대상에서 제외한다.
+    paths-ignore:
+      - 'apps/dansoon/contents/**'
+      - 'apps/dansoon/data/**'
+      - 'apps/soundlab/src/entities/track/model/constants/tracks.ts'
+      - 'apps/soundlab/assets/og-title.ttf'
   push:
     branches: [main]
 
