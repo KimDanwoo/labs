@@ -18,14 +18,9 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Set timezone to KST
-        run: |
-          sudo timedatectl set-timezone Asia/Seoul
-          echo "Current time: $(date)"
-
       - name: Get current date
         id: date
-        run: echo "date=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+        run: echo "date=$(TZ=Asia/Seoul date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
 
       - name: Setup Git
         run: |
