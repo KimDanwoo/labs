@@ -4,7 +4,7 @@ import { currentIndexAtom, frameState } from '@entities/track/model/store';
 import { useFrame } from '@shared/lib/frame';
 import { createRenderer, RIPPLE_SLOTS, type Renderer } from '@widgets/stage/lib';
 import { useAtomValue } from 'jotai';
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 
 /**
  * 아트워크는 다른 오리진이므로 crossOrigin 없이는 텍스처 업로드가 보안 오류로 막힌다.
@@ -35,6 +35,24 @@ function loadArtwork(index: number): Promise<HTMLImageElement> {
 function warmNeighbors(index: number) {
   for (const offset of [1, -1]) {
     loadArtwork((index + offset + TRACKS.length) % TRACKS.length).catch(() => undefined);
+  }
+}
+
+/**
+ * 셰이더 컴파일·링크는 드라이버와 컨텍스트 상태에 달렸다 — 같은 코드가 어떤 환경에선 실패한다.
+ * 무대는 시각 효과일 뿐이니 실패를 플레이어까지 끌고 내려가지 않는다. 폴백은 WebGL2가 없을 때와 같다.
+ *
+ * 실패한 컨텍스트는 여기서 놓아준다. 안 놓으면 브라우저 컨텍스트 한도를 야금야금 먹어서
+ * (개발 중 핫리로드가 특히 그렇다) 원인이 사라진 뒤에도 계속 실패한다.
+ */
+function createRendererOrFallback(canvas: HTMLCanvasElement): Renderer | null {
+  try {
+    return createRenderer(canvas);
+  } catch {
+    // 조용히 내려간다. console.error는 Next dev 오버레이를 띄워 화면을 덮는다 —
+    // 폴백이 멀쩡히 도는 상황에서 흰 오버레이가 뜨는 게 더 나쁘다.
+    canvas.getContext('webgl2')?.getExtension('WEBGL_lose_context')?.loseContext();
+    return null;
   }
 }
 
@@ -104,6 +122,9 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
   const index = useAtomValue(currentIndexAtom);
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const renderer = useRef<Renderer | null>(null);
+  // 렌더러가 안 서면 캔버스를 화면에서 뺀다. alpha:false로 만든 컨텍스트라 한 번도 안 그린 캔버스가
+  // 투명이 아니라 불투명으로 합성되는데, 이 캔버스는 뷰포트 전체를 덮으므로 body 배경이 통째로 가려진다.
+  const [isDead, setIsDead] = useState(false);
 
   // 전환 상태 기계. 완전히 흩어진 뒤 텍스처를 갈고 다시 모은다.
   const morph = useRef(0.001);
@@ -122,9 +143,10 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
     const slot = slotRef.current;
     if (!node || !slot) return undefined;
 
-    const instance = createRenderer(node);
+    const instance = createRendererOrFallback(node);
     if (!instance) {
-      // WebGL2를 못 쓰면 Stage의 img 폴백이 그대로 남는다.
+      // WebGL2를 못 쓰거나 셰이더가 안 서면 Stage의 img 폴백이 그대로 남는다.
+      setIsDead(true);
       onReady(false);
       return undefined;
     }
@@ -252,5 +274,7 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
     });
   });
 
-  return <canvas ref={canvas} aria-hidden className="pointer-events-none fixed inset-0 -z-10 size-full" />;
+  return (
+    <canvas ref={canvas} aria-hidden hidden={isDead} className="pointer-events-none fixed inset-0 -z-10 size-full" />
+  );
 }
