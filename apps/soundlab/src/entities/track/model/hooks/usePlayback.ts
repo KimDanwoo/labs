@@ -87,6 +87,9 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   const repeatMode = useAtomValue(repeatModeAtom);
 
   const widget = useRef<ScWidget | null>(null);
+  // api.js가 로드되면 widget.current는 곧바로 채워지지만, iframe이 ready를 보내기 전까지
+  // 메서드 호출(postMessage)은 받는 쪽이 없어 그대로 사라진다 — 첫 클릭이 삼켜지는 창이다.
+  const ready = useRef(false);
   // PLAY_PROGRESS는 수백 ms 간격이라 60fps에 부족하다. 마지막 보고값과 시각을 남겨 rAF에서 보간한다.
   // live = 그 보고가 "지금 흐르는 소리"의 것인가. play 이벤트는 버퍼링 전에 오므로
   // 첫 보고를 받기 전까지 보간을 세워둔다 — 안 세우면 소리 없이 시간이 흐르다 0으로 되돌아간다.
@@ -240,7 +243,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
             soundIds.current = readSoundIds(sounds);
             holdsSet.current = soundIds.current.length > 1;
             setEngineMode(holdsSet.current ? 'set' : 'single');
-            // soundIds가 채워진 뒤에 소진해야 skip 경로가 올바른 위치를 찾는다.
+            // soundIds가 채워진 뒤에 열어야 skip 경로가 올바른 위치를 찾는다.
+            ready.current = true;
             flushQueued.current();
           });
           instance.getDuration((ms) => {
@@ -331,7 +335,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
 
   const goTo = useCallback((next: number, track: Track) => {
     const instance = widget.current;
-    if (!instance) {
+    if (!instance || !ready.current) {
       queued.current = next;
       return;
     }
@@ -425,7 +429,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       if (next === index) {
         // 같은 곡을 다시 누르면 재생/정지 토글
         const instance = widget.current;
-        if (!instance) {
+        if (!instance || !ready.current) {
           queued.current = next;
           return;
         }
@@ -441,7 +445,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
 
   const toggle = useCallback(() => {
     const instance = widget.current;
-    if (!instance) {
+    if (!instance || !ready.current) {
       queued.current = PLAY_CURRENT;
       return;
     }
