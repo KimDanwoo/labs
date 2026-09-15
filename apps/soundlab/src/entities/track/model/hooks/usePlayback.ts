@@ -119,7 +119,12 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   const goSeq = useRef(0);
   // 위젯이 준비되기 전에 누른 곡. 버리면 제목·하이라이트만 바뀌고 소리는 영원히 안 나서
   // "눌렀는데 재생이 안 된다"가 된다(엔진 로드가 늦을수록 잘 걸린다). ready에서 소진한다.
-  const queued = useRef<number | null>(null);
+  //
+  // 진입 재생도 같은 통로를 쓴다 — 미리 한 개 넣어두면 ready에서 현재 곡이 그대로 시작한다.
+  // 제스처 없는 재생은 브라우저가 막을 수 있고, 그때는 아무 일도 일어나지 않는다(막혀도
+  // play 이벤트가 안 오므로 isPlaying은 false로 남는다 — 화면이 거짓말하지 않는다).
+  // 준비 전에 사용자가 다른 곡을 누르면 그 곡이 이 값을 덮어쓴다 — 사용자의 선택이 이긴다.
+  const queued = useRef<number | null>(PLAY_CURRENT);
   const flushQueued = useRef<() => void>(() => {});
   // 위젯은 볼륨 램프를 안 해준다. 안 감싸면 재생이 툭 시작하고 정지가 툭 끊긴다.
   const volume = useRef(FULL_VOLUME);
