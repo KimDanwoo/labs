@@ -4,6 +4,26 @@ import type { Track } from '@entities/track/model/types';
 
 export const TRACKS: readonly Track[] = [
   {
+    id: 2405750145,
+    title: 'close friends',
+    permalinkUrl: 'https://soundcloud.com/danwooking/close-friends',
+    artworkBase: 'https://i1.sndcdn.com/artworks-l3icoXaJvDoOlL5t-7b9GEg',
+    artworkExt: '.jpg',
+    waveformUrl: 'https://wave.sndcdn.com/f6EYShPiLP3A_m.json',
+    durationMs: 205726,
+    genre: 'R&B & Soul',
+  },
+  {
+    id: 2405720733,
+    title: '립밤',
+    permalinkUrl: 'https://soundcloud.com/danwooking/3g80dqiltlla',
+    artworkBase: 'https://i1.sndcdn.com/artworks-5i78JWPe9t8bQUzx-VCZeBQ',
+    artworkExt: '.jpg',
+    waveformUrl: 'https://wave.sndcdn.com/93Z701sux3NW_m.json',
+    durationMs: 188446,
+    genre: 'R&B & Soul',
+  },
+  {
     id: 2404365123,
     title: '일교차',
     permalinkUrl: 'https://soundcloud.com/danwooking/ui7ltertiuf9',
