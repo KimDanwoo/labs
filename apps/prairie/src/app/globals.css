@@ -23,3 +23,8 @@ h2 {
   font-family: var(--font-display), var(--font-sans);
   letter-spacing: -0.02em;
 }
+
+/* 씬 위 비네트 — 가장자리를 살짝 어둡게 해 시선을 중앙(말)으로 모은다. 포스트프로세싱 없이 CSS 한 겹. 검정 알파라 테마 무관. */
+.scene-vignette {
+  background: radial-gradient(ellipse at center, transparent 58%, rgb(0 0 0 / 0.28) 100%);
+}
