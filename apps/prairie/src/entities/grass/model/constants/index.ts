@@ -169,6 +169,7 @@ export const GRASS_VERTEX_SHADER = `
 
 // 밑동 진초록 → 끝 싱그러운 생초록 + blade별 색 변주. 거리에 따라 "그 자리 지면색(안개 적용)"으로 페이드해
 // blade가 끝나는 곳이 보이지 않는다 — 안개색으로 직접 페이드하면 아직 안개가 덜 낀 지면과 어긋나 띠가 생긴다.
+// 색은 선형 공간에서 섞고 마지막에 내장 머티리얼과 같은 tonemapping/colorspace include를 탄다 → Ground 평면과 정확히 같은 색에 녹는다.
 export const GRASS_FRAGMENT_SHADER = `
   uniform float uBrightness;
   uniform vec3 uHorizonColor;
@@ -182,8 +183,9 @@ export const GRASS_FRAGMENT_SHADER = `
   varying float vTint;
   varying vec2 vWorldXZ;
   void main() {
-    vec3 baseColor = vec3(0.09, 0.36, 0.14);
-    vec3 tipColor = vec3(0.42, 0.78, 0.30);
+    // 표시색 기준 밑동 (0.16,0.44,0.18) / 끝 (0.36,0.72,0.27)을 선형으로 바꾼 값.
+    vec3 baseColor = vec3(0.0220, 0.1626, 0.0272);
+    vec3 tipColor = vec3(0.1065, 0.4770, 0.0593);
     vec3 col = mix(baseColor, tipColor, vFrc) * uBrightness * vTint;
 
     // 광역 색 얼룩(초원의 옅고 진한 패치)
@@ -194,5 +196,8 @@ export const GRASS_FRAGMENT_SHADER = `
     float fade = smoothstep(uFadeNear, uFadeFar, vDist);
     col = mix(col, groundHere, fade);
     gl_FragColor = vec4(col, 1.0);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+
   }
 `;

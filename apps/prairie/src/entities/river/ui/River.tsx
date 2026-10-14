@@ -16,8 +16,6 @@ import { Color, CubeTexture, DoubleSide, Group, ShaderMaterial, Vector2, Vector3
 const TRENCH_WIDTH = RIVER_TRENCH_HALF_WIDTH * 2;
 // 자갈 한 알이 대략 60cm — world 좌표에 곱하는 셀 밀도.
 const PEBBLE_SCALE = 1.7;
-// 큐브맵이 sRGB 내부 포맷으로 올라가면 샘플이 선형으로 나온다 → 다시 인코딩. 반사가 하늘보다 어둡거나 밝으면 이 값을 만진다.
-const SKY_GAMMA = 2.2;
 // 반사 샘플의 밉맵 LOD 바이어스. 클수록 구름이 뭉개져 잔잔한 반사가 된다.
 const SKY_BLUR = 3.5;
 // 골 가장자리에서 자갈이 잔디색으로 녹는 폭(m).
@@ -40,7 +38,6 @@ const waterMaterial = new ShaderMaterial({
     uRunnerSplash: { value: 0 },
     uSky: { value: null },
     uSkyMix: { value: 0 },
-    uSkyGamma: { value: SKY_GAMMA },
     uSkyBlur: { value: SKY_BLUR },
     uSunDir: { value: new Vector3(...SUN.position).normalize() },
     uDeepColor: { value: new Color(SCENE_COLORS.waterDeep) },
