@@ -32,7 +32,7 @@ export function grassKeepAt(distance: number): number {
 }
 
 // 진짜 blade는 마지막 링까지만. 그 너머는 Ground 셰이더의 잔디 무늬가 인상을 이어가고 안개가 닫는다.
-// 불변식 1: fadeFar < (마지막 maxRing + 0.5) * tile → blade가 청크 끝보다 먼저 지면색에 녹아 경계가 없다(데스크톱 130 < 136, 모바일 34 < 40).
+// 불변식 1: fadeFar < (마지막 maxRing + 0.5) * tile → blade가 청크 끝보다 먼저 지면색에 녹아 경계가 없다(데스크톱 130 < 136, 모바일 66 < 72).
 // 불변식 2: 각 링 풀 ≥ 첫 링 풀 × keep(링 안쪽 경계 거리) → 링 경계에서 blade가 튀지 않는다(테스트로 고정).
 // 데스크톱 바깥 링(5~8)은 1분할 blade(삼각형 2개) — 공중에서 내려다볼 때 원반 끝이 안개 안쪽에서 드러나지 않게 136m까지 민다.
 export const GRASS_QUALITY = {
@@ -49,9 +49,10 @@ export const GRASS_QUALITY = {
     rings: [
       { maxRing: 1, blades: 1000, segments: 3 },
       { maxRing: 2, blades: 950, segments: 1 },
+      { maxRing: 4, blades: 700, segments: 1 },
     ] as GrassLodRing[],
-    fadeNear: 10,
-    fadeFar: 34,
+    fadeNear: 20,
+    fadeFar: 66,
   },
 } as const;
 

@@ -100,7 +100,7 @@ export const SUN = {
 // 안개는 그 너머 평지를 능선 밑동에 닿기 전에 닫는 역할. 강 불변식: RIVER.period/2 > far, RIVER.length > 2×far.
 export const FOG = {
   desktop: { near: 50, far: 200 },
-  mobile: { near: 16, far: 50 },
+  mobile: { near: 24, far: 90 },
 } as const;
 
 export type FogQuality = keyof typeof FOG;
