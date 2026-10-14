@@ -42,6 +42,7 @@ function shadeGround(shader: WebGLProgramParametersWithUniforms): void {
     .replace(
       '#include <color_fragment>',
       `#include <color_fragment>
+      // fogNear/fogFar는 three의 선형 Fog 청크가 선언하는 유니폼 — 씬을 FogExp2로 바꾸면 여기가 컴파일에 실패한다.
       float blur = smoothstep(fogNear * 0.8, fogFar * 0.9, vFogDepth);
       float meadow = sin(vGroundWorldXZ.x * 0.13) * sin(vGroundWorldXZ.y * 0.17) * 0.5 + 0.5;
       // 풀 다발 인상: z로 길쭉한 값 노이즈(가는 줄기 결) × 넓은 얼룩. 부드러운 보간이라 공중에서 내려다봐도 격자가 안 보인다.
