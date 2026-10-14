@@ -94,9 +94,6 @@ export const SUN = {
   position: [70, 85, 35] as [number, number, number],
   intensity: 1.35,
   ambientIntensity: 0.95,
-  hemisphereIntensity: 0.6,
-  shadowMapSize: 1536,
-  shadowExtent: 110,
 };
 
 // 기기별 안개. 잔디 blade는 fadeFar에서 지면색에 완전히 녹으므로(데스크톱 66 < 청크 끝 72) 안개가 청크 끝을 가릴 필요는 없다 —
