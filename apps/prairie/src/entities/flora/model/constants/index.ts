@@ -10,21 +10,29 @@ export const FLORA = {
   riverMargin: 10,
   // 스폰 지점 주변은 비워 둔다.
   spawnClearRadius: 30,
-  trunk: { radiusTop: 0.16, radiusBottom: 0.34, height: 2.6, segments: 6 },
-  canopy: { radius: 1.7, detail: 1, blobs: 3 },
+  trunk: { radiusTop: 0.14, radiusBottom: 0.36, height: 2.8, segments: 7 },
+  // 활엽수 캐노피: 크기 다른 덩어리를 불규칙하게 쌓는다(blobs개, 반지름은 radius × 0.55~1).
+  canopy: { radius: 1.9, detail: 1, blobs: 5 },
+  // 침엽수: 원뿔 tiers단. 아래가 넓고 위로 좁아진다.
+  conifer: { radius: 1.6, tierHeight: 2.2, tiers: 3, segments: 7 },
   rock: { radius: 0.9, detail: 0 },
+  // 캐노피 바람 흔들림(m)과 세로 명암(아래 어둡게 → 위 밝게).
+  sway: 0.07,
+  shadeBottom: 0.72,
+  shadeTop: 1.1,
   // 말 충돌 반경(줄기 반지름에 더한다).
   runnerRadius: 0.8,
   maxTrees: 600,
   maxRocks: 400,
   colors: {
-    trunk: '#6b4a2e',
-    canopy: ['#3e8a3c', '#4f9a3f', '#2f7a3a'],
+    trunk: '#4e3620',
+    canopy: ['#3f8f3c', '#56a040', '#2f7a3a', '#6aa844'],
+    conifer: ['#2f6e3c', '#3a7d44'],
     rock: '#8d8779',
   },
 } as const;
 
-export type FloraKind = 'tree' | 'rock';
+export type FloraKind = 'tree' | 'conifer' | 'rock';
 
 export type FloraPlacement = {
   kind: FloraKind;
@@ -52,12 +60,14 @@ export function floraInCell(cellX: number, cellZ: number): FloraPlacement[] {
   const origin = { x: cellX * FLORA.cell, z: cellZ * FLORA.cell };
   const grove = hash2(cellX, cellZ, 1);
   const treeCount = grove < 0.5 ? 0 : 1 + Math.floor((grove - 0.5) * 8);
+  // 군락 단위로 수종이 갈린다 — 섞이면 숲이 아니라 잡동사니로 보인다.
+  const kind: FloraKind = hash2(cellX, cellZ, 3) < 0.65 ? 'tree' : 'conifer';
   for (let i = 0; i < treeCount; i += 1) {
     const x = origin.x + (hash2(cellX, cellZ, 10 + i * 3) - 0.5) * FLORA.cell;
     const z = origin.z + (hash2(cellX, cellZ, 11 + i * 3) - 0.5) * FLORA.cell;
     if (isBlocked(x, z)) continue;
     const r = hash2(cellX, cellZ, 12 + i * 3);
-    out.push({ kind: 'tree', x, z, yaw: r * Math.PI * 2, scale: 0.8 + r * 0.7, variant: Math.floor(r * 3) % 3 });
+    out.push({ kind, x, z, yaw: r * Math.PI * 2, scale: 0.8 + r * 0.8, variant: Math.floor(r * 97) % 4 });
   }
   const rockCount = Math.floor(hash2(cellX, cellZ, 2) * 3);
   for (let i = 0; i < rockCount; i += 1) {
@@ -82,7 +92,7 @@ export function pushOutOfFlora(position: { x: number; z: number }): number {
   for (let dx = -1; dx <= 1; dx += 1) {
     for (let dz = -1; dz <= 1; dz += 1) {
       for (const item of floraInCell(cx + dx, cz + dz)) {
-        const solid = item.kind === 'tree' ? FLORA.trunk.radiusBottom * item.scale : FLORA.rock.radius * item.scale;
+        const solid = item.kind === 'rock' ? FLORA.rock.radius * item.scale : FLORA.trunk.radiusBottom * item.scale;
         const minDist = solid + FLORA.runnerRadius;
         const ox = position.x - item.x;
         const oz = position.z - item.z;
