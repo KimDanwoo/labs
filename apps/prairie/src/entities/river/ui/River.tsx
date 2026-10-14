@@ -94,8 +94,8 @@ export function River() {
     waterMaterial.uniforms.uTime!.value = time;
     bedMaterial.uniforms.uTime!.value = time;
 
-    // 말이 물속에서 움직일 때만 수면이 반응한다(세기 = 속도 비례). 급변하지 않게 보간.
-    const isInWater = runnerState.waterDepth > RUNNER_SPLASH_MIN_DEPTH;
+    // 말이 물속에서 움직일 때만 수면이 반응한다(세기 = 속도 비례). 공중에선 물 위를 지나도 항적이 없다. 급변하지 않게 보간.
+    const isInWater = runnerState.waterDepth > RUNNER_SPLASH_MIN_DEPTH && runnerState.airborneHeight <= 0;
     const targetSplash = isInWater ? Math.min(Math.abs(runnerState.speed) / RUNNER_SPLASH_FULL_SPEED, 1) : 0;
     const splash = waterMaterial.uniforms.uRunnerSplash!;
     splash.value += (targetSplash - splash.value) * 0.15;

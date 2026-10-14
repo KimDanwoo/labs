@@ -53,10 +53,13 @@ export function RunnerRig() {
     const physics = RUNNER_PHYSICS;
     const now = state.clock.elapsedTime;
 
-    // 말은 하상 프로파일을 따라 골로 내려가고, 수심에 비례해 최고속도가 떨어진다.
+    const air = airborneRef.current;
+    const isGrounded = air.height <= 0;
+
+    // 말은 하상 프로파일을 따라 골로 내려가고, 수심에 비례해 최고속도가 떨어진다. 공중에선 물이 발에 안 닿으니 감속 없음.
     const riverDist = distanceToRiver(positionRef.current.x);
     const waterDepth = riverWaterDepthAt(riverDist);
-    const wade = Math.min(waterDepth / RIVER.wadeDepthRef, 1);
+    const wade = isGrounded ? Math.min(waterDepth / RIVER.wadeDepthRef, 1) : 0;
     const maxSpeed = physics.maxSpeed * MathUtils.lerp(1, RIVER.wadeSpeedScale, wade);
     const groundY = terrainHeightAt(positionRef.current.x, positionRef.current.z) - riverBedDepthAt(riverDist);
 
@@ -78,8 +81,6 @@ export function RunnerRig() {
     speedRef.current = speed;
 
     // 점프·비행: 지면에서 Space = 점프, 공중에서 Space 유지 = 상승. 놓으면 활공 속도로 하강, 고도 상한.
-    const air = airborneRef.current;
-    const isGrounded = air.height <= 0;
     const jumpPressed = jump && !wasJumpPressedRef.current;
     wasJumpPressedRef.current = jump;
     if (jumpPressed && isGrounded) air.velocity = physics.jumpSpeed;
