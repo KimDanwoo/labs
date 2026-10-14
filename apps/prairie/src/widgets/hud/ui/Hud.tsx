@@ -3,7 +3,7 @@
 import { useRideRiver } from '@shared/r3f';
 import { KeyCap } from './KeyCap';
 
-// 강까지의 방향 안내. 강은 안개(FOG.far) 밖에선 보이지 않아 화면 표시가 유일한 길잡이다.
+// 강까지의 방향 안내. 강은 멀면 안개(FOG.far)에 묻히고 가까워도 잔디에 가려 보이지 않을 때가 많아 화면 표시가 길잡이다.
 const BEARING_LABEL = {
   ahead: '↑ 앞',
   behind: '↓ 뒤',

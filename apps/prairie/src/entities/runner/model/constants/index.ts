@@ -119,3 +119,16 @@ export const SPRINT_TRAIL = {
   flyingHeight: 0.5,
   color: '#ffd27a',
 } as const;
+
+// 접지 그림자: 말 크기(scale 1.5)에 맞춘 타원. 지면보다 hover만큼 띄워 z-fight를 피하고, fadeHeight 고도에서 완전히 사라진다.
+export const GROUND_SHADOW = {
+  width: 1.6,
+  length: 3.2,
+  core: 0.3,
+  opacity: 0.32,
+  hover: 0.04,
+  fadeHeight: 8,
+  airSpread: 0.6,
+  // 투명 패스에서 물 다음에 그린다 — 하상 위 그림자가 물을 통해 비친다.
+  renderOrder: 1,
+} as const;

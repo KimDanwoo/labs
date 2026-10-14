@@ -16,8 +16,6 @@ import { Color, CubeTexture, DoubleSide, Group, ShaderMaterial, Vector2, Vector3
 const TRENCH_WIDTH = RIVER_TRENCH_HALF_WIDTH * 2;
 // 자갈 한 알이 대략 60cm — world 좌표에 곱하는 셀 밀도.
 const PEBBLE_SCALE = 1.7;
-// 큐브맵이 sRGB 내부 포맷으로 올라가면 샘플이 선형으로 나온다 → 다시 인코딩. 반사가 하늘보다 어둡거나 밝으면 이 값을 만진다.
-const SKY_GAMMA = 2.2;
 // 반사 샘플의 밉맵 LOD 바이어스. 클수록 구름이 뭉개져 잔잔한 반사가 된다.
 const SKY_BLUR = 3.5;
 // 골 가장자리에서 자갈이 잔디색으로 녹는 폭(m).
@@ -40,7 +38,6 @@ const waterMaterial = new ShaderMaterial({
     uRunnerSplash: { value: 0 },
     uSky: { value: null },
     uSkyMix: { value: 0 },
-    uSkyGamma: { value: SKY_GAMMA },
     uSkyBlur: { value: SKY_BLUR },
     uSunDir: { value: new Vector3(...SUN.position).normalize() },
     uDeepColor: { value: new Color(SCENE_COLORS.waterDeep) },
@@ -97,8 +94,8 @@ export function River() {
     waterMaterial.uniforms.uTime!.value = time;
     bedMaterial.uniforms.uTime!.value = time;
 
-    // 말이 물속에서 움직일 때만 수면이 반응한다(세기 = 속도 비례). 급변하지 않게 보간.
-    const isInWater = runnerState.waterDepth > RUNNER_SPLASH_MIN_DEPTH;
+    // 말이 물속에서 움직일 때만 수면이 반응한다(세기 = 속도 비례). 공중에선 물 위를 지나도 항적이 없다. 급변하지 않게 보간.
+    const isInWater = runnerState.waterDepth > RUNNER_SPLASH_MIN_DEPTH && runnerState.airborneHeight <= 0;
     const targetSplash = isInWater ? Math.min(Math.abs(runnerState.speed) / RUNNER_SPLASH_FULL_SPEED, 1) : 0;
     const splash = waterMaterial.uniforms.uRunnerSplash!;
     splash.value += (targetSplash - splash.value) * 0.15;

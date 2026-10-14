@@ -49,7 +49,6 @@ export const RIVER_VERTEX_SHADER = `
 export const RIVER_FRAGMENT_SHADER = `
   uniform samplerCube uSky;
   uniform float uSkyMix;
-  uniform float uSkyGamma;
   uniform float uSkyBlur;
   uniform vec3 uSunDir;
   uniform vec3 uDeepColor;
@@ -73,7 +72,7 @@ export const RIVER_FRAGMENT_SHADER = `
     float fresnel = 0.04 + 0.56 * pow(1.0 - max(dot(n, toCam), 0.0), 5.0);
     vec3 refl = reflect(-toCam, n);
     refl.y = abs(refl.y);
-    vec3 sky = pow(textureCube(uSky, refl, uSkyBlur).rgb, vec3(1.0 / uSkyGamma));
+    vec3 sky = textureCube(uSky, refl, uSkyBlur).rgb;
     sky = mix(uHorizonColor, sky, uSkyMix);
     col = mix(col, sky, fresnel);
     alpha = mix(alpha, 1.0, fresnel);
@@ -86,6 +85,9 @@ export const RIVER_FRAGMENT_SHADER = `
     float fade = smoothstep(uFadeNear, uFadeFar, vViewDepth);
     col = mix(col, uHorizonColor, fade);
     gl_FragColor = vec4(col, mix(alpha, 1.0, fade));
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+
   }
 `;
 
@@ -169,5 +171,8 @@ export const RIVER_BED_FRAGMENT_SHADER = `
 
     float fade = smoothstep(uFadeNear, uFadeFar, vViewDepth);
     gl_FragColor = vec4(mix(col, uHorizonColor, fade), 1.0);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+
   }
 `;

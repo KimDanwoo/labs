@@ -1,5 +1,6 @@
 'use client';
 
+import { FloraField } from '@entities/flora/ui';
 import { GrassField } from '@entities/grass/ui';
 import { River } from '@entities/river/ui';
 import { Ground, Scenery } from '@entities/scenery/ui';
@@ -47,6 +48,7 @@ export function SceneCanvas() {
         <Ground />
         <River />
         <GrassField />
+        <FloraField />
         <RunnerRig />
         <ReadySignal />
       </Suspense>

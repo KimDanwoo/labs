@@ -1,11 +1,20 @@
 'use client';
 
-import { Runner, SprintTrail, WadeSplash } from '@entities/runner/ui';
+import { FLORA, pushOutOfFlora } from '@entities/flora/model/constants';
+import { GroundShadow, Runner, SprintTrail, WadeSplash } from '@entities/runner/ui';
 import { RUNNER_PHYSICS } from '@features/runner-control/model/constants';
 import { usePointerLook, useRunnerControls } from '@features/runner-control/model/hooks';
 import { getRunnerInput } from '@features/runner-control/model/store';
 import { useFrame, useThree } from '@react-three/fiber';
-import { CAMERA, distanceToRiver, RIVER, riverBearing, riverBedDepthAt, riverWaterDepthAt } from '@shared/config';
+import {
+  CAMERA,
+  distanceToRiver,
+  RIVER,
+  riverBearing,
+  riverBedDepthAt,
+  riverWaterDepthAt,
+  terrainHeightAt,
+} from '@shared/config';
 import { runnerState, setRideRiver } from '@shared/r3f';
 import { useRef } from 'react';
 import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three';
@@ -44,12 +53,15 @@ export function RunnerRig() {
     const physics = RUNNER_PHYSICS;
     const now = state.clock.elapsedTime;
 
-    // 말은 하상 프로파일을 따라 골로 내려가고, 수심에 비례해 최고속도가 떨어진다.
+    const air = airborneRef.current;
+    const isGrounded = air.height <= 0;
+
+    // 말은 하상 프로파일을 따라 골로 내려가고, 수심에 비례해 최고속도가 떨어진다. 공중에선 물이 발에 안 닿으니 감속 없음.
     const riverDist = distanceToRiver(positionRef.current.x);
     const waterDepth = riverWaterDepthAt(riverDist);
-    const wade = Math.min(waterDepth / RIVER.wadeDepthRef, 1);
+    const wade = isGrounded ? Math.min(waterDepth / RIVER.wadeDepthRef, 1) : 0;
     const maxSpeed = physics.maxSpeed * MathUtils.lerp(1, RIVER.wadeSpeedScale, wade);
-    const groundY = -riverBedDepthAt(riverDist);
+    const groundY = terrainHeightAt(positionRef.current.x, positionRef.current.z) - riverBedDepthAt(riverDist);
 
     // 질주: 최고속도·가속 배율. 발동 순간 돌풍 파동 원점을 기록한다.
     const isSprinting = sprint && forward;
@@ -69,8 +81,6 @@ export function RunnerRig() {
     speedRef.current = speed;
 
     // 점프·비행: 지면에서 Space = 점프, 공중에서 Space 유지 = 상승. 놓으면 활공 속도로 하강, 고도 상한.
-    const air = airborneRef.current;
-    const isGrounded = air.height <= 0;
     const jumpPressed = jump && !wasJumpPressedRef.current;
     wasJumpPressedRef.current = jump;
     if (jumpPressed && isGrounded) air.velocity = physics.jumpSpeed;
@@ -97,6 +107,8 @@ export function RunnerRig() {
     forwardVec.set(Math.sin(heading), 0, Math.cos(heading));
     const position = positionRef.current;
     position.addScaledVector(forwardVec, speed * delta);
+    // 줄기·바위 충돌: 밀어내고 속도를 깎는다. 줄기 높이 위로 날면 통과.
+    if (air.height < FLORA.trunk.height && pushOutOfFlora(position) > 0) speedRef.current = speed * 0.5;
 
     const root = rootRef.current;
     if (root) {
@@ -128,7 +140,9 @@ export function RunnerRig() {
     desiredCam
       .copy(position)
       .addScaledVector(camDirVec, -CAMERA.followDistance)
-      .setY(CAMERA.followHeight + air.height);
+      .setY(visualY + CAMERA.followHeight);
+    // 말 뒤 언덕이 솟아 있으면 카메라가 지면 아래로 묻힌다 → 그 자리 지형 위 최소 높이를 보장.
+    desiredCam.y = Math.max(desiredCam.y, terrainHeightAt(desiredCam.x, desiredCam.z) + CAMERA.groundClearance);
     desiredTarget.copy(position).setY(CAMERA.targetHeight + visualY);
 
     if (!initializedRef.current) {
@@ -149,6 +163,7 @@ export function RunnerRig() {
       <group ref={rootRef}>
         <Runner speedRef={speedRef} />
       </group>
+      <GroundShadow />
       <WadeSplash />
       <SprintTrail />
     </>

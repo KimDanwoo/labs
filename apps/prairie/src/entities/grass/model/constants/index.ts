@@ -5,6 +5,9 @@ export const GRASS_FIELD = {
   tile: 16,
   minScale: 1.9,
   maxScale: 3.3,
+  // blade 기울기(rad). 위에서 내려다볼 때도 면이 보이도록 수직에서 살짝 눕힌다.
+  minLean: 0.15,
+  maxLean: 0.45,
 } as const;
 
 // 거리별 LOD 링. ring = 카메라 셀에서의 체비쇼프 거리. 링은 blade "풀" 크기와 분할 수만 정한다 —
@@ -29,24 +32,27 @@ export function grassKeepAt(distance: number): number {
 }
 
 // 진짜 blade는 마지막 링까지만. 그 너머는 Ground 셰이더의 잔디 무늬가 인상을 이어가고 안개가 닫는다.
-// 불변식 1: fadeFar < (마지막 maxRing + 0.5) * tile → blade가 청크 끝보다 먼저 지면색에 녹아 경계가 없다(데스크톱 66 < 72, 모바일 34 < 40).
+// 불변식 1: fadeFar < (마지막 maxRing + 0.5) * tile → blade가 청크 끝보다 먼저 지면색에 녹아 경계가 없다(데스크톱 130 < 136, 모바일 66 < 72).
 // 불변식 2: 각 링 풀 ≥ 첫 링 풀 × keep(링 안쪽 경계 거리) → 링 경계에서 blade가 튀지 않는다(테스트로 고정).
+// 데스크톱 바깥 링(5~8)은 1분할 blade(삼각형 2개) — 공중에서 내려다볼 때 원반 끝이 안개 안쪽에서 드러나지 않게 136m까지 민다.
 export const GRASS_QUALITY = {
   desktop: {
     rings: [
       { maxRing: 2, blades: 2200, segments: 5 },
       { maxRing: 4, blades: 1500, segments: 2 },
+      { maxRing: 8, blades: 800, segments: 1 },
     ] as GrassLodRing[],
-    fadeNear: 28,
-    fadeFar: 66,
+    fadeNear: 60,
+    fadeFar: 130,
   },
   mobile: {
     rings: [
       { maxRing: 1, blades: 1000, segments: 3 },
       { maxRing: 2, blades: 950, segments: 1 },
+      { maxRing: 4, blades: 700, segments: 1 },
     ] as GrassLodRing[],
-    fadeNear: 10,
-    fadeFar: 34,
+    fadeNear: 20,
+    fadeFar: 66,
   },
 } as const;
 
@@ -164,6 +170,7 @@ export const GRASS_VERTEX_SHADER = `
 
 // 밑동 진초록 → 끝 싱그러운 생초록 + blade별 색 변주. 거리에 따라 "그 자리 지면색(안개 적용)"으로 페이드해
 // blade가 끝나는 곳이 보이지 않는다 — 안개색으로 직접 페이드하면 아직 안개가 덜 낀 지면과 어긋나 띠가 생긴다.
+// 색은 선형 공간에서 섞고 마지막에 내장 머티리얼과 같은 tonemapping/colorspace include를 탄다 → Ground 평면과 정확히 같은 색에 녹는다.
 export const GRASS_FRAGMENT_SHADER = `
   uniform float uBrightness;
   uniform vec3 uHorizonColor;
@@ -177,8 +184,9 @@ export const GRASS_FRAGMENT_SHADER = `
   varying float vTint;
   varying vec2 vWorldXZ;
   void main() {
-    vec3 baseColor = vec3(0.09, 0.36, 0.14);
-    vec3 tipColor = vec3(0.42, 0.78, 0.30);
+    // 표시색 기준 밑동 (0.16,0.44,0.18) / 끝 (0.36,0.72,0.27)을 선형으로 바꾼 값.
+    vec3 baseColor = vec3(0.0220, 0.1626, 0.0272);
+    vec3 tipColor = vec3(0.1065, 0.4770, 0.0593);
     vec3 col = mix(baseColor, tipColor, vFrc) * uBrightness * vTint;
 
     // 광역 색 얼룩(초원의 옅고 진한 패치)
@@ -189,5 +197,8 @@ export const GRASS_FRAGMENT_SHADER = `
     float fade = smoothstep(uFadeNear, uFadeFar, vDist);
     col = mix(col, groundHere, fade);
     gl_FragColor = vec4(col, 1.0);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+
   }
 `;
