@@ -1,6 +1,6 @@
 'use client';
 
-import { Runner, SprintTrail, WadeSplash } from '@entities/runner/ui';
+import { GroundShadow, Runner, SprintTrail, WadeSplash } from '@entities/runner/ui';
 import { RUNNER_PHYSICS } from '@features/runner-control/model/constants';
 import { usePointerLook, useRunnerControls } from '@features/runner-control/model/hooks';
 import { getRunnerInput } from '@features/runner-control/model/store';
@@ -149,6 +149,7 @@ export function RunnerRig() {
       <group ref={rootRef}>
         <Runner speedRef={speedRef} />
       </group>
+      <GroundShadow />
       <WadeSplash />
       <SprintTrail />
     </>
