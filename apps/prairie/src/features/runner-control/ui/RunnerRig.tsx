@@ -1,5 +1,6 @@
 'use client';
 
+import { FLORA, pushOutOfFlora } from '@entities/flora/model/constants';
 import { GroundShadow, Runner, SprintTrail, WadeSplash } from '@entities/runner/ui';
 import { RUNNER_PHYSICS } from '@features/runner-control/model/constants';
 import { usePointerLook, useRunnerControls } from '@features/runner-control/model/hooks';
@@ -97,6 +98,8 @@ export function RunnerRig() {
     forwardVec.set(Math.sin(heading), 0, Math.cos(heading));
     const position = positionRef.current;
     position.addScaledVector(forwardVec, speed * delta);
+    // 줄기·바위 충돌: 밀어내고 속도를 깎는다. 줄기 높이 위로 날면 통과.
+    if (air.height < FLORA.trunk.height && pushOutOfFlora(position) > 0) speedRef.current = speed * 0.5;
 
     const root = rootRef.current;
     if (root) {
