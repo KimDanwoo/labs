@@ -1,4 +1,4 @@
-import { RIVER, RIVER_TRENCH_HALF_WIDTH } from './scene';
+import { RIVER, RIVER_TRENCH_HALF_WIDTH, TERRAIN } from './scene';
 
 const glslFloat = (value: number): string => value.toFixed(4);
 
@@ -19,5 +19,18 @@ export const RIVER_GLSL = `
 
   float riverBedDepth(float dist) {
     return RIVER_DEPTH * (1.0 - smoothstep(RIVER_SLOPE_START, RIVER_TRENCH_HALF, dist));
+  }
+`;
+
+// RIVER_GLSL(riverDist, RIVER_TRENCH_HALF) 뒤에 넣는다.
+export const TERRAIN_GLSL = `
+  float terrainHeight(vec2 p) {
+    float mask = smoothstep(RIVER_TRENCH_HALF + ${glslFloat(TERRAIN.maskNear)}, RIVER_TRENCH_HALF + ${glslFloat(TERRAIN.maskFar)}, riverDist(p.x));
+    float h = ${TERRAIN.waves
+      .map(
+        (w) => `${glslFloat(w.amp)} * sin(p.x * ${glslFloat(w.kx)} + p.y * ${glslFloat(w.kz)} + ${glslFloat(w.phase)})`,
+      )
+      .join('\n      + ')};
+    return mask * h;
   }
 `;

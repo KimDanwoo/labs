@@ -1,5 +1,5 @@
 import { GRASS_FIELD } from '@entities/grass/model/constants';
-import { distanceToRiver, RIVER, RIVER_TRENCH_HALF_WIDTH, riverBedDepthAt } from '@shared/config';
+import { distanceToRiver, RIVER, RIVER_TRENCH_HALF_WIDTH, riverBedDepthAt, terrainHeightAt } from '@shared/config';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import {
   type BufferGeometry,
@@ -72,7 +72,7 @@ export const GrassChunk = memo(function GrassChunk({
       const x = centerX + (rng() - 0.5) * GRASS_FIELD.tile;
       const z = centerZ + (rng() - 0.5) * GRASS_FIELD.tile;
       const riverDist = distanceToRiver(x);
-      dummy.position.set(x, -riverBedDepthAt(riverDist), z);
+      dummy.position.set(x, terrainHeightAt(x, z) - riverBedDepthAt(riverDist), z);
       // 기울기(X) 뒤에 방향(Y) — 평면 blade가 수직이면 공중에서 내려다볼 때 모서리만 보여 사라진다. 기울여 위에서도 면이 보이게.
       const lean = GRASS_FIELD.minLean + rng() * (GRASS_FIELD.maxLean - GRASS_FIELD.minLean);
       dummy.rotation.set(lean, rng() * Math.PI * 2, 0, 'YXZ');

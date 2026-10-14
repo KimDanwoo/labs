@@ -8,16 +8,18 @@ import {
   grassViewRadius,
 } from '../src/entities/grass/model/constants/index.ts';
 import {
+  distanceToRiver,
   FOG,
   HAZE,
+  nearestRiverX,
   RIDGES,
   RIVER,
   RIVER_TRENCH_HALF_WIDTH,
-  distanceToRiver,
-  nearestRiverX,
   riverBearing,
   riverBedDepthAt,
   riverWaterDepthAt,
+  TERRAIN,
+  terrainHeightAt,
 } from '../src/shared/config/scene.ts';
 
 test('스폰 지점에서 첫 강까지 firstX만큼 떨어져 있다', () => {
@@ -41,6 +43,17 @@ test('강 사이 중간 지점에서 어느 강도 안개 시야 안에 들어�
   const midpoint = RIVER.firstX - RIVER.period / 2;
   assert.equal(distanceToRiver(midpoint), RIVER.period / 2);
   for (const fog of Object.values(FOG)) assert.equal(RIVER.period / 2 > fog.far, true);
+});
+
+// 강 골과 그 주변 maskNear 폭은 평지여야 하상·수면·강둑 전제가 맞는다. 최대 경사는 말이 미끄러지지 않을 만큼 완만하게.
+test('지형 기복은 강 주변에서 0이고 경사가 완만하다', () => {
+  for (const z of [0, 37, -120]) {
+    assert.equal(terrainHeightAt(RIVER.firstX, z), 0);
+    assert.equal(terrainHeightAt(RIVER.firstX + RIVER_TRENCH_HALF_WIDTH + TERRAIN.maskNear, z), 0);
+  }
+  const maxSlope = TERRAIN.waves.reduce((sum, w) => sum + w.amp * Math.hypot(w.kx, w.kz), 0);
+  assert.ok(maxSlope < 0.25, `최대 경사 ${maxSlope.toFixed(3)} < 0.25`);
+  assert.notEqual(terrainHeightAt(0, 0), 0);
 });
 
 // 강 평면 한 장이 앞뒤 안개 시야를 덮어야 끝이 안 보인다.

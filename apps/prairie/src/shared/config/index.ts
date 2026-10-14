@@ -1,4 +1,4 @@
-export { RIVER_GLSL } from './riverGlsl';
+export { RIVER_GLSL, TERRAIN_GLSL } from './riverGlsl';
 export {
   CAMERA,
   FOG,
@@ -9,12 +9,14 @@ export {
   RIVER_TRENCH_HALF_WIDTH,
   SCENE_COLORS,
   SUN,
+  TERRAIN,
   WORLD,
   distanceToRiver,
   nearestRiverX,
   riverBearing,
   riverBedDepthAt,
   riverWaterDepthAt,
+  terrainHeightAt,
   type FogQuality,
   type RiverBearing,
 } from './scene';

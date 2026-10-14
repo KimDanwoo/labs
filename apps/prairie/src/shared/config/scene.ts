@@ -133,8 +133,34 @@ export const CAMERA = {
   // 말 뒤를 낮게 따라가는 고정 추적 카메라.
   followDistance: 15,
   followHeight: 3.8,
+  // 카메라 자리의 지형 위로 최소 이만큼 띄운다(언덕 뒤에서 땅에 묻히지 않게).
+  groundClearance: 2.4,
   // 카메라가 바라보는 지점의 높이(말 몸통) → 말이 화면 중앙에 온다.
   targetHeight: 1.6,
   positionLerp: 0.1,
   targetLerp: 0.14,
 } as const;
+
+// 완만한 지형 기복. 사인 세 겹의 합이라 JS와 GLSL이 같은 식을 쓴다(상수를 GLSL로 굽는다).
+// 강 골 주변(maskNear~maskFar)은 0으로 눌러 강·하상·물의 평지 전제를 지킨다. 최대 경사 ≈ Σ amp·k ≈ 0.2(11°).
+export const TERRAIN = {
+  waves: [
+    { amp: 4, kx: 0.021, kz: 0.013, phase: 0 },
+    { amp: 2.5, kx: -0.011, kz: 0.027, phase: 1.7 },
+    { amp: 1.2, kx: 0.047, kz: -0.031, phase: 0.6 },
+  ],
+  maskNear: 25,
+  maskFar: 70,
+} as const;
+
+export function terrainHeightAt(x: number, z: number): number {
+  const mask = smoothstep(
+    RIVER_TRENCH_HALF_WIDTH + TERRAIN.maskNear,
+    RIVER_TRENCH_HALF_WIDTH + TERRAIN.maskFar,
+    distanceToRiver(x),
+  );
+  if (mask === 0) return 0;
+  let h = 0;
+  for (const wave of TERRAIN.waves) h += wave.amp * Math.sin(x * wave.kx + z * wave.kz + wave.phase);
+  return mask * h;
+}

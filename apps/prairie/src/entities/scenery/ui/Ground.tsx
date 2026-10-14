@@ -1,7 +1,7 @@
 'use client';
 
 import { useFrame, useThree } from '@react-three/fiber';
-import { RIVER_GLSL, SCENE_COLORS, WORLD } from '@shared/config';
+import { RIVER_GLSL, SCENE_COLORS, TERRAIN_GLSL, WORLD } from '@shared/config';
 import { useRef } from 'react';
 import { Mesh, type WebGLProgramParametersWithUniforms } from 'three';
 
@@ -24,11 +24,14 @@ const GROUND_NOISE_GLSL = `
 // 지면은 unlit이라 색이 SCENE_COLORS.grass 그대로 → 잔디 blade가 멀어지며 정확히 이 색에 녹는다.
 // 그 위에 잔디 인상: 가늘고 긴 셀(멀리서 본 풀 다발) + 저주파 얼룩 + 미세 반점. 무늬는 안개 범위에 맞춰 멀어지면 흐려진다(에일리어싱 방지).
 function shadeGround(shader: WebGLProgramParametersWithUniforms): void {
+  // 지형 기복: 월드 XZ로 높이를 구해 평면 법선(로컬 +z = 월드 +y) 방향으로 올린다. fog 깊이는 변위 뒤 정점으로 계산된다.
   shader.vertexShader = shader.vertexShader
-    .replace('#include <common>', '#include <common>\nvarying vec2 vGroundWorldXZ;')
+    .replace('#include <common>', `#include <common>\nvarying vec2 vGroundWorldXZ;\n${RIVER_GLSL}\n${TERRAIN_GLSL}`)
     .replace(
       '#include <begin_vertex>',
-      '#include <begin_vertex>\nvGroundWorldXZ = (modelMatrix * vec4(transformed, 1.0)).xz;',
+      `#include <begin_vertex>
+      vGroundWorldXZ = (modelMatrix * vec4(transformed, 1.0)).xz;
+      transformed.z += terrainHeight(vGroundWorldXZ);`,
     );
   shader.fragmentShader = shader.fragmentShader
     .replace(
@@ -53,7 +56,10 @@ function shadeGround(shader: WebGLProgramParametersWithUniforms): void {
     );
 }
 
+const GRID_STEP = WORLD.groundSize / WORLD.groundSegments;
+
 // 바닥 평면이 카메라 XZ를 따라다녀 가장자리에 닿지 않는다 → 무한 들판.
+// 정점 간격으로 스냅해야 정점이 항상 같은 월드 지점의 높이를 샘플링한다(안 하면 기복이 카메라를 따라 꿈틀댄다).
 export function Ground() {
   const meshRef = useRef<Mesh>(null);
   const camera = useThree((state) => state.camera);
@@ -61,8 +67,8 @@ export function Ground() {
   useFrame(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
-    mesh.position.x = camera.position.x;
-    mesh.position.z = camera.position.z;
+    mesh.position.x = Math.round(camera.position.x / GRID_STEP) * GRID_STEP;
+    mesh.position.z = Math.round(camera.position.z / GRID_STEP) * GRID_STEP;
   });
 
   return (

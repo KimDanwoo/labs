@@ -2,7 +2,7 @@
 
 import { FLORA, floraCellOf, floraInCell, type FloraPlacement } from '@entities/flora/model/constants';
 import { useFrame } from '@react-three/fiber';
-import { distanceToRiver, riverBedDepthAt } from '@shared/config';
+import { distanceToRiver, riverBedDepthAt, terrainHeightAt } from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { Color, InstancedMesh, Object3D } from 'three';
@@ -46,7 +46,7 @@ export function FloraField() {
     let blobs = 0;
     let rocks = 0;
     for (const item of items) {
-      const groundY = -riverBedDepthAt(distanceToRiver(item.x));
+      const groundY = terrainHeightAt(item.x, item.z) - riverBedDepthAt(distanceToRiver(item.x));
       if (item.kind === 'rock') {
         if (rocks >= FLORA.maxRocks) continue;
         dummy.position.set(item.x, groundY - 0.2 * item.scale, item.z);

@@ -6,7 +6,15 @@ import { RUNNER_PHYSICS } from '@features/runner-control/model/constants';
 import { usePointerLook, useRunnerControls } from '@features/runner-control/model/hooks';
 import { getRunnerInput } from '@features/runner-control/model/store';
 import { useFrame, useThree } from '@react-three/fiber';
-import { CAMERA, distanceToRiver, RIVER, riverBearing, riverBedDepthAt, riverWaterDepthAt } from '@shared/config';
+import {
+  CAMERA,
+  distanceToRiver,
+  RIVER,
+  riverBearing,
+  riverBedDepthAt,
+  riverWaterDepthAt,
+  terrainHeightAt,
+} from '@shared/config';
 import { runnerState, setRideRiver } from '@shared/r3f';
 import { useRef } from 'react';
 import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three';
@@ -50,7 +58,7 @@ export function RunnerRig() {
     const waterDepth = riverWaterDepthAt(riverDist);
     const wade = Math.min(waterDepth / RIVER.wadeDepthRef, 1);
     const maxSpeed = physics.maxSpeed * MathUtils.lerp(1, RIVER.wadeSpeedScale, wade);
-    const groundY = -riverBedDepthAt(riverDist);
+    const groundY = terrainHeightAt(positionRef.current.x, positionRef.current.z) - riverBedDepthAt(riverDist);
 
     // 질주: 최고속도·가속 배율. 발동 순간 돌풍 파동 원점을 기록한다.
     const isSprinting = sprint && forward;
@@ -131,7 +139,9 @@ export function RunnerRig() {
     desiredCam
       .copy(position)
       .addScaledVector(camDirVec, -CAMERA.followDistance)
-      .setY(CAMERA.followHeight + air.height);
+      .setY(visualY + CAMERA.followHeight);
+    // 말 뒤 언덕이 솟아 있으면 카메라가 지면 아래로 묻힌다 → 그 자리 지형 위 최소 높이를 보장.
+    desiredCam.y = Math.max(desiredCam.y, terrainHeightAt(desiredCam.x, desiredCam.z) + CAMERA.groundClearance);
     desiredTarget.copy(position).setY(CAMERA.targetHeight + visualY);
 
     if (!initializedRef.current) {
