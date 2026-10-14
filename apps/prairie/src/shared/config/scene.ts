@@ -23,16 +23,16 @@ export const WORLD = {
 } as const;
 
 // 강은 Z축으로 무한한 띠. X로 period마다 반복 → 좌우 어느 쪽으로 달려도 만난다(정면 +Z는 순수 초원).
-// 불변식 period/2 > FOG.far → 화면에 강이 둘 이상 들어오지 않는다(110 > 105) → 평면 한 장으로 충분.
+// 불변식 period/2 > FOG.far → 화면에 강이 둘 이상 들어오지 않는다(220 > 200) → 평면 한 장으로 충분.
 export const RIVER = {
   firstX: 110,
-  period: 220,
+  period: 440,
   // 수면 명목 반폭. HUD의 물속 판정·잔디 기준이며, 하상 프로파일이 이 지점에서 수면과 만나도록 아래 값을 맞춘다(테스트로 고정).
   halfWidth: 16,
   // 수면 밖 강둑(자갈) 폭. 골 전체 반폭 = halfWidth + bankWidth.
   bankWidth: 3.2,
-  // Z 길이는 안개 시야(FOG.far)를 앞뒤로 덮으면 된다(2×105 < 260).
-  length: 260,
+  // Z 길이는 안개 시야(FOG.far)를 앞뒤로 덮으면 된다(2×200 < 440).
+  length: 440,
   // 하상 프로파일: 중앙은 지면 아래 depth까지 파이고, slopeStart부터 골 가장자리까지 완만하게 올라온다.
   depth: 1.8,
   slopeStart: 6.8,
@@ -99,10 +99,10 @@ export const SUN = {
   shadowExtent: 110,
 };
 
-// 기기별 안개. 잔디 페이드(GRASS_QUALITY fadeNear/fadeFar)보다 살짝 뒤에서 닫혀야 잔디가 끝나는 곳에 색 띠가 안 생기고,
-// far는 잔디 청크 커버 반경보다 작아야 한다(데스크톱 105 < 120, 모바일 50 < 56). 강 불변식: RIVER.period/2 > far.
+// 기기별 안개. 잔디 blade는 fadeFar에서 지면색에 완전히 녹으므로(데스크톱 66 < 청크 끝 72) 안개가 청크 끝을 가릴 필요는 없다 —
+// 안개는 그 너머 평지를 능선 밑동에 닿기 전에 닫는 역할. 강 불변식: RIVER.period/2 > far, RIVER.length > 2×far.
 export const FOG = {
-  desktop: { near: 36, far: 105 },
+  desktop: { near: 50, far: 200 },
   mobile: { near: 16, far: 50 },
 } as const;
 
@@ -115,7 +115,8 @@ export type FogQuality = keyof typeof FOG;
 export const HAZE = {
   radius: 1000,
   bottomY: -80,
-  topY: 170,
+  // 가장 높은 능선(baseY + ampY)보다 높아야 봉우리가 잘리지 않는다(테스트로 고정).
+  topY: 200,
   fadeStartY: 0,
   fadeTopY: 70,
 } as const;

@@ -5,6 +5,9 @@ export const GRASS_FIELD = {
   tile: 16,
   minScale: 1.9,
   maxScale: 3.3,
+  // blade 기울기(rad). 위에서 내려다볼 때도 면이 보이도록 수직에서 살짝 눕힌다.
+  minLean: 0.15,
+  maxLean: 0.45,
 } as const;
 
 // 거리별 LOD 링. ring = 카메라 셀에서의 체비쇼프 거리. 링은 blade "풀" 크기와 분할 수만 정한다 —
@@ -29,16 +32,18 @@ export function grassKeepAt(distance: number): number {
 }
 
 // 진짜 blade는 마지막 링까지만. 그 너머는 Ground 셰이더의 잔디 무늬가 인상을 이어가고 안개가 닫는다.
-// 불변식 1: fadeFar < (마지막 maxRing + 0.5) * tile → blade가 청크 끝보다 먼저 지면색에 녹아 경계가 없다(데스크톱 66 < 72, 모바일 34 < 40).
+// 불변식 1: fadeFar < (마지막 maxRing + 0.5) * tile → blade가 청크 끝보다 먼저 지면색에 녹아 경계가 없다(데스크톱 130 < 136, 모바일 34 < 40).
 // 불변식 2: 각 링 풀 ≥ 첫 링 풀 × keep(링 안쪽 경계 거리) → 링 경계에서 blade가 튀지 않는다(테스트로 고정).
+// 데스크톱 바깥 링(5~8)은 1분할 blade(삼각형 2개) — 공중에서 내려다볼 때 원반 끝이 안개 안쪽에서 드러나지 않게 136m까지 민다.
 export const GRASS_QUALITY = {
   desktop: {
     rings: [
       { maxRing: 2, blades: 2200, segments: 5 },
       { maxRing: 4, blades: 1500, segments: 2 },
+      { maxRing: 8, blades: 800, segments: 1 },
     ] as GrassLodRing[],
-    fadeNear: 28,
-    fadeFar: 66,
+    fadeNear: 60,
+    fadeFar: 130,
   },
   mobile: {
     rings: [

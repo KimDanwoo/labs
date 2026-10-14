@@ -9,6 +9,8 @@ import {
 } from '../src/entities/grass/model/constants/index.ts';
 import {
   FOG,
+  HAZE,
+  RIDGES,
   RIVER,
   RIVER_TRENCH_HALF_WIDTH,
   distanceToRiver,
@@ -39,6 +41,18 @@ test('강 사이 중간 지점에서 어느 강도 안개 시야 안에 들어�
   const midpoint = RIVER.firstX - RIVER.period / 2;
   assert.equal(distanceToRiver(midpoint), RIVER.period / 2);
   for (const fog of Object.values(FOG)) assert.equal(RIVER.period / 2 > fog.far, true);
+});
+
+// 강 평면 한 장이 앞뒤 안개 시야를 덮어야 끝이 안 보인다.
+test('강 평면 길이가 안개 시야를 앞뒤로 덮는다', () => {
+  for (const fog of Object.values(FOG)) assert.ok(RIVER.length > fog.far * 2, `${RIVER.length} > ${fog.far * 2}`);
+});
+
+// 헤이즈 원통 위 끝이 가장 높은 능선보다 높아야 봉우리가 평평하게 잘리지 않는다.
+test('능선 최고 높이가 헤이즈 원통 안에 든다', () => {
+  for (const ridge of RIDGES) {
+    assert.ok(ridge.baseY + ridge.ampY < HAZE.topY, `${ridge.baseY + ridge.ampY} < ${HAZE.topY}`);
+  }
 });
 
 // blade는 청크 커버 끝보다 먼저 지면색에 완전히 녹아야 청크 경계가 안 보인다. 안개는 그 뒤에 닫힌다.
