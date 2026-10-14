@@ -110,12 +110,23 @@ export type FogQuality = keyof typeof FOG;
 
 // 지평선 헤이즈: 카메라를 따라다니는 원통. 지평선 아래는 안개색으로 덮고 위로 fadeTopY까지 투명해져
 // 단색 안개 바닥과 그라데이션 큐브맵 하늘 사이의 선을 녹인다. radius < CAMERA.far.
+// 같은 원통에 먼 능선 실루엣을 그린다(절차 노이즈, topY까지). 원통이 카메라를 따라다니되 회전은 안 하므로
+// 능선은 월드 방위에 고정되고 시차가 0 → 수 km 밖 산으로 읽힌다.
 export const HAZE = {
   radius: 1000,
   bottomY: -80,
+  topY: 170,
   fadeStartY: 0,
   fadeTopY: 70,
 } as const;
+
+// 능선 겹. 먼 겹부터 그린다 — 멀수록 높고 하늘색에 가깝게 바래고(대기 원근), 가까울수록 낮고 짙다.
+// baseY/ampY는 월드 m(원통 반경 1000 기준). cells는 원통 한 바퀴의 노이즈 셀 수(정수 → 이음새 없음).
+export const RIDGES = [
+  { baseY: 30, ampY: 150, cells: 4, seed: 0.17, color: '#6f98ab' },
+  { baseY: 18, ampY: 95, cells: 7, seed: 0.53, color: '#4f8582' },
+  { baseY: 10, ampY: 70, cells: 12, seed: 0.81, color: '#2f6b4e' },
+] as const;
 
 export const CAMERA = {
   fov: 64,
