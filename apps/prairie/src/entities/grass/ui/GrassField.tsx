@@ -53,6 +53,8 @@ export function GrassField() {
           // 음수 = 돌풍 없음. 끝난 돌풍은 duration으로 잘라 무한대 유니폼을 피한다.
           uGustAge: { value: -1 },
           uBrightness: { value: 0.95 },
+          uGrassBase: { value: new Color(SCENE_COLORS.grassBase) },
+          uGrassTip: { value: new Color(SCENE_COLORS.grassTip) },
           uHorizonColor: { value: new Color(SCENE_COLORS.fog) },
           uGroundColor: { value: new Color(SCENE_COLORS.grass) },
           uFogNear: { value: FOG.desktop.near },

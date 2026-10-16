@@ -4,11 +4,13 @@ export const SCENE_COLORS = {
   skyBottom: '#e6f3fb',
   // 먼 들판이 대기에 희미해진 색. 잔디 페이드·물·자갈의 원경색이 전부 이 값을 쓴다.
   // 하늘과의 이음은 Haze가 맡으므로 큐브맵 지평선색에 맞출 필요가 없다 — 하늘색이면 잔디 너머가 '하늘 띠'로 읽힌다.
-  fog: '#86c3a4',
+  fog: '#bac8ac',
   sunLight: '#fff3da',
   ambient: '#dbe8f3',
   // unlit 지면색 = 잔디 blade가 멀어지며 녹아드는 색. 하상 강둑 블렌드도 이 값.
-  grass: '#3f8f3a',
+  grass: '#788754',
+  grassBase: '#354f32',
+  grassTip: '#afbd78',
   waterDeep: '#5c9db5',
   waterShallow: '#a6cfd8',
   pebbleDark: '#8a7f72',
@@ -121,18 +123,18 @@ export const HAZE = {
 // 능선 겹. 먼 겹부터 그린다 — 멀수록 높고 하늘색에 가깝게 바래고(대기 원근), 가까울수록 낮고 짙다.
 // baseY/ampY는 월드 m(원통 반경 1000 기준). cells는 원통 한 바퀴의 노이즈 셀 수(정수 → 이음새 없음).
 export const RIDGES = [
-  { baseY: 30, ampY: 150, cells: 4, seed: 0.17, color: '#6f98ab' },
-  { baseY: 18, ampY: 95, cells: 7, seed: 0.53, color: '#4f8582' },
-  { baseY: 10, ampY: 70, cells: 12, seed: 0.81, color: '#2f6b4e' },
+  { baseY: 30, ampY: 150, cells: 4, seed: 0.17, color: '#9aafb0' },
+  { baseY: 18, ampY: 95, cells: 7, seed: 0.53, color: '#819b8b' },
+  { baseY: 10, ampY: 70, cells: 12, seed: 0.81, color: '#667f63' },
 ] as const;
 
 export const CAMERA = {
-  fov: 64,
+  fov: 60,
   near: 0.1,
   far: 1200,
   // 말 뒤를 낮게 따라가는 고정 추적 카메라.
-  followDistance: 15,
-  followHeight: 3.8,
+  followDistance: 19,
+  followHeight: 5,
   // 카메라 자리의 지형 위로 최소 이만큼 띄운다(언덕 뒤에서 땅에 묻히지 않게).
   groundClearance: 2.4,
   // 카메라가 바라보는 지점의 높이(말 몸통) → 말이 화면 중앙에 온다.

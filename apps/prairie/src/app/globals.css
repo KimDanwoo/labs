@@ -1,30 +1,67 @@
 @import 'tailwindcss';
-
-/* @tokens/css 가 생성한 디자인 토큰 (색상/폰트/여백 + 다크모드 변수) */
 @import '@tokens/css/theme.css';
 
-/* 모노레포 공통 UI 패키지의 클래스도 스캔 대상에 포함 */
 @source '../../../../packages/ui/src/**/*.{ts,tsx}';
 
 body {
-  background: var(--color-background);
-  color: var(--color-foreground);
+  background: var(--color-prairie-ink);
+  color: var(--color-prairie-paper);
   font-family: var(--font-sans);
 }
 
-/* 헤딩에 쓰는 디스플레이 폰트(Sora) — prairie 정체성. 색은 코발트 공유. */
-.font-display {
-  font-family: var(--font-display), var(--font-sans);
-  letter-spacing: -0.02em;
-}
-
+.font-display,
 h1,
 h2 {
   font-family: var(--font-display), var(--font-sans);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
 }
 
-/* 씬 위 비네트 — 가장자리를 살짝 어둡게 해 시선을 중앙(말)으로 모은다. 포스트프로세싱 없이 CSS 한 겹. 검정 알파라 테마 무관. */
 .scene-vignette {
-  background: radial-gradient(ellipse at center, transparent 58%, rgb(0 0 0 / 0.28) 100%);
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-prairie-ink) 36%, transparent),
+      transparent 25%,
+      transparent 50%,
+      color-mix(in srgb, var(--color-prairie-ink) 85%, transparent)
+    ),
+    radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--color-prairie-ink) 25%, transparent));
+}
+
+.prairie-hud {
+  padding-top: max(var(--spacing-xl), env(safe-area-inset-top));
+  padding-right: max(var(--spacing-xl), env(safe-area-inset-right));
+  padding-bottom: max(var(--spacing-lg), env(safe-area-inset-bottom));
+  padding-left: max(var(--spacing-xl), env(safe-area-inset-left));
+}
+
+.prairie-loader {
+  background-image: radial-gradient(
+    ellipse at 50% 35%,
+    color-mix(in srgb, var(--color-prairie-paper) 9%, transparent),
+    transparent 65%
+  );
+}
+
+.prairie-loader-orbit {
+  outline: 1px solid color-mix(in srgb, var(--color-prairie-paper) 8%, transparent);
+  outline-offset: var(--spacing-md);
+}
+
+.prairie-touch-actions {
+  bottom: max(var(--spacing-lg), env(safe-area-inset-bottom));
+  right: max(var(--spacing-md), env(safe-area-inset-right));
+}
+
+@media (max-width: 640px) {
+  .prairie-hud {
+    padding-inline: max(var(--spacing-md), env(safe-area-inset-left)) max(var(--spacing-md), env(safe-area-inset-right));
+    padding-top: max(var(--spacing-lg), env(safe-area-inset-top));
+  }
+}
+
+@media (pointer: coarse) {
+  .prairie-hud footer {
+    padding-bottom: var(--spacing-3xl);
+  }
 }

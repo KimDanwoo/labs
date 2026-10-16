@@ -1,8 +1,9 @@
 'use client';
 
 import { JOYSTICK } from '@features/runner-control/model/constants';
-import { resetRunnerInput, setRunnerAction } from '@features/runner-control/model/store';
+import { setRunnerAction } from '@features/runner-control/model/store';
 import { type PointerEvent, useRef, useState } from 'react';
+import { TouchActions } from './TouchActions';
 
 type Vec = { x: number; y: number };
 
@@ -23,6 +24,7 @@ export function TouchControls() {
   };
 
   const handleDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== null) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     pointerIdRef.current = event.pointerId;
     originRef.current = { x: event.clientX, y: event.clientY };
@@ -48,7 +50,10 @@ export function TouchControls() {
     if (pointerIdRef.current !== event.pointerId) return;
     pointerIdRef.current = null;
     setOrigin(null);
-    resetRunnerInput();
+    setRunnerAction('forward', false);
+    setRunnerAction('backward', false);
+    setRunnerAction('left', false);
+    setRunnerAction('right', false);
   };
 
   return (
@@ -65,19 +70,16 @@ export function TouchControls() {
       {origin ? (
         <>
           <span
-            className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/60 bg-white/15 shadow-glow backdrop-blur-sm"
+            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-prairie-paper/50 bg-prairie-ink/20 backdrop-blur-sm"
             style={{ left: origin.x, top: origin.y, width: JOYSTICK.maxRadius * 2, height: JOYSTICK.maxRadius * 2 }}
           />
           <span
-            className="absolute h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/90 shadow-glow"
+            className="pointer-events-none absolute size-12 -translate-x-1/2 -translate-y-1/2 rounded-full border border-prairie-paper/60 bg-prairie-paper/60"
             style={{ left: origin.x + knob.x, top: origin.y + knob.y }}
           />
         </>
-      ) : (
-        <p className="absolute inset-x-0 bottom-10 text-center text-sm font-medium text-foreground/70 drop-shadow">
-          화면을 끌어 달려보세요 🐎
-        </p>
-      )}
+      ) : null}
+      <TouchActions />
     </div>
   );
 }
