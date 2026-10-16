@@ -6,7 +6,7 @@ type KeyCapProps = {
 
 export function KeyCap({ children }: KeyCapProps) {
   return (
-    <kbd className="inline-flex min-w-xl items-center justify-center rounded-md bg-foreground/10 px-sm py-xs text-sm font-medium text-foreground">
+    <kbd className="inline-flex min-w-lg items-center justify-center rounded-sm border border-prairie-paper/30 bg-prairie-paper/10 px-sm py-xs font-mono text-xs text-prairie-paper">
       {children}
     </kbd>
   );

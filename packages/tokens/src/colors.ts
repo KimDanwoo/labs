@@ -9,6 +9,11 @@ import { commonColors as c, themeColors as t } from './palette';
  * 다크는 밝은 스텝을 base로 올리고 foreground를 어둡게 뒤집어 대비를 확보한다.
  */
 export const colors = {
+  // Prairie 씬 오버레이는 OS 테마와 무관하게 같은 대비를 유지한다.
+  'prairie-paper': { light: t.amber[50], dark: t.amber[50] },
+  'prairie-ink': { light: t.green[900], dark: t.green[900] },
+  'prairie-accent': { light: t.amber[200], dark: t.amber[200] },
+
   // Primary — brand 램프(기본 코발트, hue 회전으로 리스킨)
   primary: { light: t.brand[600], dark: t.brand[400] },
   'primary-foreground': { light: c.white, dark: t.gray[900] },

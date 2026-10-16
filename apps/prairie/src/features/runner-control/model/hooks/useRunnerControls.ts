@@ -7,6 +7,10 @@ export function useRunnerControls(): void {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) return;
+      if (event.target instanceof Element) {
+        if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+        if (event.code === 'Space' && event.target.closest('button, a, summary')) return;
+      }
       const action = KEY_BINDINGS[event.code];
       if (!action) return;
       event.preventDefault();

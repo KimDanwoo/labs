@@ -26,8 +26,8 @@ export const FLORA = {
   maxRocks: 400,
   colors: {
     trunk: '#4e3620',
-    canopy: ['#3f8f3c', '#56a040', '#2f7a3a', '#6aa844'],
-    conifer: ['#2f6e3c', '#3a7d44'],
+    canopy: ['#657947', '#829354', '#506b45', '#98a360'],
+    conifer: ['#48654b', '#5d7953'],
     rock: '#8d8779',
   },
 } as const;

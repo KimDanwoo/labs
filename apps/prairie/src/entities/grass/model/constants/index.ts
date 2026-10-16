@@ -3,8 +3,8 @@ import { BufferGeometry, Float32BufferAttribute } from 'three';
 // 카메라 주변 청크만 유지(chunk-follow). 멀어진 청크는 언마운트 → 메모리·초기화 절약.
 export const GRASS_FIELD = {
   tile: 16,
-  minScale: 1.9,
-  maxScale: 3.3,
+  minScale: 1.2,
+  maxScale: 2.2,
   // blade 기울기(rad). 위에서 내려다볼 때도 면이 보이도록 수직에서 살짝 눕힌다.
   minLean: 0.15,
   maxLean: 0.45,
@@ -175,6 +175,8 @@ export const GRASS_FRAGMENT_SHADER = `
   uniform float uBrightness;
   uniform vec3 uHorizonColor;
   uniform vec3 uGroundColor;
+  uniform vec3 uGrassBase;
+  uniform vec3 uGrassTip;
   uniform float uFogNear;
   uniform float uFogFar;
   uniform float uFadeNear;
@@ -184,10 +186,8 @@ export const GRASS_FRAGMENT_SHADER = `
   varying float vTint;
   varying vec2 vWorldXZ;
   void main() {
-    // 표시색 기준 밑동 (0.16,0.44,0.18) / 끝 (0.36,0.72,0.27)을 선형으로 바꾼 값.
-    vec3 baseColor = vec3(0.0220, 0.1626, 0.0272);
-    vec3 tipColor = vec3(0.1065, 0.4770, 0.0593);
-    vec3 col = mix(baseColor, tipColor, vFrc) * uBrightness * vTint;
+    // SCENE_COLORS의 밑동·끝 색을 Three Color가 선형 공간으로 변환해 전달한다.
+    vec3 col = mix(uGrassBase, uGrassTip, vFrc) * uBrightness * vTint;
 
     // 광역 색 얼룩(초원의 옅고 진한 패치)
     float meadow = sin(vWorldXZ.x * 0.045) * sin(vWorldXZ.y * 0.045) * 0.5 + 0.5;

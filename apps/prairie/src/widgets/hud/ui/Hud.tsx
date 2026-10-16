@@ -1,67 +1,51 @@
 'use client';
 
-import { useRideRiver } from '@shared/r3f';
-import { KeyCap } from './KeyCap';
-
-// 강까지의 방향 안내. 강은 멀면 안개(FOG.far)에 묻히고 가까워도 잔디에 가려 보이지 않을 때가 많아 화면 표시가 길잡이다.
-const BEARING_LABEL = {
-  ahead: '↑ 앞',
-  behind: '↓ 뒤',
-  left: '← 왼쪽',
-  right: '→ 오른쪽',
-} as const;
+import { useState } from 'react';
+import { PrairieMark } from './PrairieMark';
+import { RideControls } from './RideControls';
+import { RiverGuide } from './RiverGuide';
 
 export function Hud() {
-  const { riverDistance, riverBearing } = useRideRiver();
-  const isCrossing = riverBearing === 'crossing';
+  const [isVisible, setIsVisible] = useState(true);
 
   return (
-    <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-lg">
-      <div className="self-start rounded-lg bg-background/65 px-lg py-md text-foreground shadow-glow backdrop-blur-md">
-        {isCrossing ? (
-          <p className="text-lg font-semibold">강을 건너는 중</p>
-        ) : (
-          <div className="flex items-baseline gap-sm">
-            <span className="text-lg font-semibold">{BEARING_LABEL[riverBearing]}</span>
-            <span className="text-4xl font-bold tabular-nums tracking-tight">{riverDistance}</span>
-            <span className="text-sm text-muted-foreground">m</span>
-          </div>
-        )}
-        <p className="text-xs text-muted-foreground">강</p>
-      </div>
-
-      {/* 키보드 안내는 터치 기기에선 의미가 없어 fine 포인터(데스크톱)에서만 노출. 모바일은 터치 컨트롤이 대체. */}
-      <div className="hidden self-end rounded-lg bg-background/65 px-lg py-md text-foreground shadow-glow backdrop-blur-md pointer-fine:block">
-        <div className="flex flex-col gap-sm text-sm">
-          <div className="flex items-center gap-sm">
-            <KeyCap>W</KeyCap>
-            <KeyCap>↑</KeyCap>
-            <span className="text-muted-foreground">가속</span>
-          </div>
-          <div className="flex items-center gap-sm">
-            <KeyCap>S</KeyCap>
-            <KeyCap>↓</KeyCap>
-            <span className="text-muted-foreground">감속 · 후진</span>
-          </div>
-          <div className="flex items-center gap-sm">
-            <KeyCap>A</KeyCap>
-            <KeyCap>D</KeyCap>
-            <span className="text-muted-foreground">조향</span>
-          </div>
-          <div className="flex items-center gap-sm">
-            <KeyCap>Shift</KeyCap>
-            <span className="text-muted-foreground">질주 · 돌풍</span>
-          </div>
-          <div className="flex items-center gap-sm">
-            <KeyCap>Space</KeyCap>
-            <span className="text-muted-foreground">점프 · 누르면 비행</span>
-          </div>
-          <div className="flex items-center gap-sm">
-            <KeyCap>드래그</KeyCap>
-            <span className="text-muted-foreground">시점 이동</span>
-          </div>
+    <div className="prairie-hud pointer-events-none absolute inset-0 z-40 flex flex-col justify-between gap-lg text-prairie-paper">
+      <header className="flex items-start justify-between gap-md">
+        {isVisible && <PrairieMark />}
+        <div className="ml-auto flex flex-col items-end gap-md">
+          {isVisible && <RiverGuide />}
+          <button
+            type="button"
+            onClick={() => setIsVisible((visible) => !visible)}
+            aria-pressed={!isVisible}
+            aria-label={isVisible ? '안내를 숨기고 풍경만 보기' : '화면 안내 다시 보기'}
+            className="pointer-events-auto rounded-full border border-prairie-paper/25 bg-prairie-ink/55 px-md py-sm text-xs backdrop-blur-md transition-colors hover:bg-prairie-ink/80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-prairie-accent"
+          >
+            {isVisible ? '풍경만 보기 ↗' : '안내 보기 +'}
+          </button>
         </div>
-      </div>
+      </header>
+
+      {isVisible && (
+        <footer className="flex flex-col gap-lg">
+          <div className="flex items-end justify-between gap-lg">
+            <div>
+              <p className="mb-sm text-xs tracking-widest text-prairie-accent">WANDER AT YOUR OWN PACE</p>
+              <h1 className="text-3xl font-medium leading-tight sm:text-5xl">바람이 이끄는 대로.</h1>
+              <p className="mt-md text-sm text-prairie-paper/80">정해진 길도, 서두를 이유도 없는 곳.</p>
+            </div>
+            <p className="hidden text-right font-mono text-xs leading-loose tracking-widest text-prairie-paper/60 md:block">
+              OPEN FIELDS
+              <br />
+              OPEN POSSIBILITIES
+            </p>
+          </div>
+          <div className="flex items-center justify-between gap-lg border-t border-prairie-paper/25 pt-md">
+            <RideControls />
+            <span className="hidden shrink-0 text-xs text-prairie-paper/60 lg:block">그저, 달려도 좋아요.</span>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }
