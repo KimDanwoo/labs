@@ -13,6 +13,8 @@ import { useIsCoarsePointer } from '@shared/lib';
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { Color, InstancedMesh, Object3D, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
 
+import { MeadowFlowers } from './MeadowFlowers';
+
 const dummy = new Object3D();
 const tint = new Color();
 const up = new Vector3(0, 1, 0);
@@ -220,6 +222,7 @@ export function FloraField() {
 
   return (
     <group>
+      <MeadowFlowers />
       <instancedMesh ref={trunkRef} args={[geometry.trunk, undefined, FLORA.maxTrees * (FLORA.branches + 1)]}>
         <meshLambertMaterial color={FLORA.colors.trunk} />
       </instancedMesh>

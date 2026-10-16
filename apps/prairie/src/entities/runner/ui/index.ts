@@ -1,3 +1,4 @@
+export { FlowingHair } from './FlowingHair';
 export { GroundShadow } from './GroundShadow';
 export { Runner } from './Runner';
 export { SprintTrail } from './SprintTrail';
