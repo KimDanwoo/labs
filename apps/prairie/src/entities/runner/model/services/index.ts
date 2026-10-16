@@ -1,2 +1,2 @@
-export { makeWingGeometry } from './makeWingGeometry';
 export { gaitWeights } from './gaitWeights';
+export { makeWingGeometry } from './makeWingGeometry';
