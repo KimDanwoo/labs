@@ -8,9 +8,10 @@ export const SCENE_COLORS = {
   sunLight: '#fff3da',
   ambient: '#dbe8f3',
   // unlit 지면색 = 잔디 blade가 멀어지며 녹아드는 색. 하상 강둑 블렌드도 이 값.
-  grass: '#788754',
-  grassBase: '#354f32',
-  grassTip: '#afbd78',
+  grass: '#657646',
+  grassBase: '#31452b',
+  grassTip: '#8d9f5b',
+  grassDry: '#bca66f',
   waterDeep: '#5c9db5',
   waterShallow: '#a6cfd8',
   pebbleDark: '#8a7f72',
@@ -94,8 +95,8 @@ export function riverBearing(x: number, camYaw: number): RiverBearing {
 
 export const SUN = {
   position: [70, 85, 35] as [number, number, number],
-  intensity: 1.35,
-  ambientIntensity: 0.95,
+  intensity: 1.8,
+  ambientIntensity: 0.9,
 };
 
 // 기기별 안개. 잔디 blade는 fadeFar에서 지면색에 완전히 녹으므로(데스크톱 66 < 청크 끝 72) 안개가 청크 끝을 가릴 필요는 없다 —
@@ -129,16 +130,16 @@ export const RIDGES = [
 ] as const;
 
 export const CAMERA = {
-  fov: 60,
+  fov: 55,
   near: 0.1,
   far: 1200,
   // 말 뒤를 낮게 따라가는 고정 추적 카메라.
-  followDistance: 19,
-  followHeight: 5,
+  followDistance: 9.5,
+  followHeight: 3.1,
   // 카메라 자리의 지형 위로 최소 이만큼 띄운다(언덕 뒤에서 땅에 묻히지 않게).
   groundClearance: 2.4,
   // 카메라가 바라보는 지점의 높이(말 몸통) → 말이 화면 중앙에 온다.
-  targetHeight: 1.6,
+  targetHeight: 1.35,
   positionLerp: 0.1,
   targetLerp: 0.14,
 } as const;

@@ -16,11 +16,11 @@ export const KEY_BINDINGS: Record<string, RunnerAction> = {
 };
 
 export const RUNNER_PHYSICS = {
-  accel: 22,
-  brake: 30,
-  coastDecel: 14,
-  maxSpeed: 22,
-  maxReverse: 6,
+  accel: 9,
+  brake: 14,
+  coastDecel: 6,
+  maxSpeed: 12,
+  maxReverse: 3,
   steerRate: 2.8,
   // 멈춰 있어도 이 정도는 제자리에서 방향을 틀 수 있다(사람은 회전 가능).
   turnFloor: 0.3,

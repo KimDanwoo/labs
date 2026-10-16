@@ -1,75 +1,71 @@
-// 말 모델(Quaternius LowPoly Animated Animals, CC0). public/models/runner.glb 에 둔다.
-export const RUNNER_MODEL_URL = '/models/runner.glb';
+// Quaternius(CC0) 원본에 곡면 세분화·꼬리 털 다발을 적용한 파생 모델. scripts/refine-runner.mjs로 재생성한다.
+export const RUNNER_MODEL_URL = '/models/unicorn.glb';
 
 // 외부 모델 보정(앱 기준: +Z가 정면, 바닥 y=0). 모델마다 달라 여기서 튜닝한다.
 // 모델 정면이 진행 방향과 반대면 rotationY를 Math.PI로 뒤집는다.
 export const RUNNER_MODEL_TRANSFORM = {
-  scale: 1.5,
+  scale: 0.55,
   rotationY: 0,
   position: [0, 0, 0] as [number, number, number],
 };
 
-// useAnimations 클립 키(= glTF 클립 이름). 속도에 따라 idle↔gallop을 섞는다.
+// 원본 리그의 대기·걷기·갤럽·공중 포즈를 가중치로 혼합한다.
 export const RUNNER_ANIM = {
   idle: 'AnimalArmature|Idle',
+  walk: 'AnimalArmature|Walk',
+  flight: 'AnimalArmature|Gallop_Jump',
   run: 'AnimalArmature|Gallop',
 } as const;
 
 // 천마 룩: 모델 머티리얼 이름별 색 덮어쓰기(원본 glb는 그대로).
 export const UNICORN_TINT: Record<string, string> = {
-  Main: '#f6f3ff',
-  Main_Light: '#ffffff',
-  Hair: '#c9b8ff',
-  Hooves: '#d9c9ff',
+  Main: '#e4ddd0',
+  Main_Light: '#dfd3bd',
+  Hair: '#b1a18a',
+  Muzzle: '#978c7e',
+  Hooves: '#4c4841',
+  Eye_Black: '#211e1b',
+  Eye_White: '#c9bfae',
 };
 
 // 뿔: Head 뼈에 붙인다. 뼈에 스케일 100이 들어 있어 자식은 boneScaleFix로 보정.
 // 위치·회전은 Head 로컬(+Z = 위·앞, +Y = 코 방향) 기준 모델 단위. 실측: 뼈 원점(0,4.18,2.53) → 이마 위(0,4.6,2.9).
 export const HORN = {
   boneScaleFix: 0.01,
-  position: [0, 0.05, 0.56] as [number, number, number],
-  tiltForward: -0.1,
-  radius: 0.11,
-  height: 1.1,
-  color: '#fff3c9',
-  glowColor: '#ffd98a',
-  glowScale: 1.6,
+  position: [0, 0.18, 0.4] as [number, number, number],
+  tiltForward: 0.18,
+  radius: 0.085,
+  height: 0.64,
+  bend: 0.045,
+  color: '#cbb991',
+  ridgeColor: '#a38d62',
 } as const;
 
-// 빛의 날개: 말 루트에 좌우 한 쌍. 지상에선 접혀 희미하고, 공중·질주 시 펼쳐진다.
-// 실측(모델 단위): 등 최고점 y 3.61, 몸통 z -1.94~3.47 → 어깨 위(±0.55, 3.45, 0.9)에서 시작.
-// 끝이 처지는 곡면(droop)이라 카메라가 아래·뒤에 있어도 면이 보인다. 뒤로 젖힘(sweep).
 export const WINGS = {
-  span: 5.2,
-  chord: 2.3,
-  root: [0.55, 3.45, 0.9] as [number, number, number],
-  droop: 1.4,
-  sweep: 0.35,
-  foldedAngle: 1.2,
-  foldedScale: 0.35,
-  foldedOpacity: 0.1,
-  openAngleBase: 0.2,
-  flapAmplitude: 0.45,
-  flapSpeedGround: 1.6,
-  flapSpeedSprint: 3.2,
-  flapSpeedAir: 5,
-  flapSpeedRising: 10,
-  openLerp: 0.08,
-  colorRoot: '#fffaf0',
-  colorTip: '#ffd27a',
+  root: [0.42, 0.18, -0.35] as [number, number, number],
+  span: 4,
+  feathers: 20,
+  foldedAngle: 1.35,
+  foldedScale: 0.1,
+  openAngleBase: 0.45,
+  flapAmplitude: 0.65,
+  flapSpeedAir: 3.2,
+  flapSpeedRising: 5.5,
+  color: '#ded6c4',
 } as const;
 
 // 달리기 모션 튜닝값.
 export const RUNNER_ANIM_TUNING = {
-  // 이 속도(m/s) 이상이면 달리는 것으로 본다.
-  moveThreshold: 0.4,
   // 달리기 클립이 자연스러운 기준 속도(m/s). 실제 속도 ÷ 이 값 = 재생 배속.
-  runRefSpeed: 6,
+  runRefSpeed: 8.5,
   // 재생 배속 하한·상한(너무 느리거나 빠르지 않게).
   minRunScale: 0.6,
-  maxRunScale: 1.8,
-  // idle↔run 가중치 전환 부드러움.
-  fadeLerp: 0.18,
+  maxRunScale: 2.2,
+  // 프레임 시간에 독립적인 포즈 전환과 걷기↔갤럽 구간.
+  blendRate: 9,
+  walkRefSpeed: 2.6,
+  gallopBlendStart: 4,
+  gallopBlendEnd: 7,
 } as const;
 
 // 물속을 달릴 때의 물보라·파문. 세기(0~1)는 속도 ÷ fullSplashSpeed, 수심 minDepth 이상일 때만.
@@ -107,8 +103,8 @@ export const SPRINT_TRAIL = {
   maxMotes: 120,
   emitPerSecond: 90,
   minSpeed: 5,
-  sizeMin: 0.06,
-  sizeMax: 0.16,
+  sizeMin: 0.025,
+  sizeMax: 0.07,
   lifeMin: 0.5,
   lifeMax: 1,
   backwardCarry: 0.12,
@@ -120,7 +116,7 @@ export const SPRINT_TRAIL = {
   color: '#ffd27a',
 } as const;
 
-// 접지 그림자: 말 크기(scale 1.5)에 맞춘 타원. 지면보다 hover만큼 띄워 z-fight를 피하고, fadeHeight 고도에서 완전히 사라진다.
+// 접지 그림자: 정규화한 말 크기에 맞춘 타원. 지면보다 hover만큼 띄워 z-fight를 피하고, fadeHeight 고도에서 완전히 사라진다.
 export const GROUND_SHADOW = {
   width: 1.6,
   length: 3.2,

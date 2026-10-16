@@ -3,11 +3,11 @@ import { BufferGeometry, Float32BufferAttribute } from 'three';
 // 카메라 주변 청크만 유지(chunk-follow). 멀어진 청크는 언마운트 → 메모리·초기화 절약.
 export const GRASS_FIELD = {
   tile: 16,
-  minScale: 1.2,
-  maxScale: 2.2,
+  minScale: 0.55,
+  maxScale: 1.15,
   // blade 기울기(rad). 위에서 내려다볼 때도 면이 보이도록 수직에서 살짝 눕힌다.
-  minLean: 0.15,
-  maxLean: 0.45,
+  minLean: 0.08,
+  maxLean: 0.38,
 } as const;
 
 // 거리별 LOD 링. ring = 카메라 셀에서의 체비쇼프 거리. 링은 blade "풀" 크기와 분할 수만 정한다 —
@@ -38,18 +38,18 @@ export function grassKeepAt(distance: number): number {
 export const GRASS_QUALITY = {
   desktop: {
     rings: [
-      { maxRing: 2, blades: 2200, segments: 5 },
-      { maxRing: 4, blades: 1500, segments: 2 },
-      { maxRing: 8, blades: 800, segments: 1 },
+      { maxRing: 2, blades: 1200, segments: 3 },
+      { maxRing: 4, blades: 850, segments: 2 },
+      { maxRing: 8, blades: 450, segments: 1 },
     ] as GrassLodRing[],
     fadeNear: 60,
     fadeFar: 130,
   },
   mobile: {
     rings: [
-      { maxRing: 1, blades: 1000, segments: 3 },
-      { maxRing: 2, blades: 950, segments: 1 },
-      { maxRing: 4, blades: 700, segments: 1 },
+      { maxRing: 1, blades: 650, segments: 2 },
+      { maxRing: 2, blades: 650, segments: 1 },
+      { maxRing: 4, blades: 450, segments: 1 },
     ] as GrassLodRing[],
     fadeNear: 20,
     fadeFar: 66,
@@ -71,28 +71,39 @@ export function grassLodForRing(quality: GrassQuality, ring: number): GrassLodRi
 // 절차적 blade: 밑동 폭 → 끝 0으로 좁아지는 띠를 segments개로 나누고, 위로 갈수록 -z로 굽힌다(원본 glb 실루엣과 비슷).
 // uv.y 0(밑동)→1(끝)은 셰이더의 바람·색 그라데이션이 쓴다. 노멀 없음(unlit).
 export function makeBladeGeometry(segments: number): BufferGeometry {
-  // 폭은 밑동에서 선형으로 좁아지고 끝은 한 번 더 조여 뾰족하게. 넓게 두면 잎사귀처럼 보인다.
-  const BASE_HALF_WIDTH = 0.055;
-  const HEIGHT = 0.83;
-  const BEND = 0.18;
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
-  for (let i = 0; i <= segments; i += 1) {
-    const t = i / segments;
-    const halfWidth = BASE_HALF_WIDTH * (1 - t) * (1 - 0.35 * t);
-    const y = HEIGHT * t;
-    const z = -BEND * t * t;
-    positions.push(-halfWidth, y, z, halfWidth, y, z);
-    uvs.push(0, t, 1, t);
-  }
-  for (let i = 0; i < segments; i += 1) {
-    const a = i * 2;
-    indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+  const detail: number[] = [];
+  const leaves = segments >= 3 ? 5 : 2;
+  for (let leaf = 0; leaf < leaves; leaf += 1) {
+    const angle = leaf * 1.9;
+    const height = 0.72 - leaf * 0.075;
+    const offset = positions.length / 3;
+    for (let i = 0; i <= segments; i += 1) {
+      const t = i / segments;
+      const halfWidth = 0.032 * (1 - t) * (0.7 + Math.sin(t * Math.PI) * 0.6);
+      const bend = (leaf === 0 ? 0.26 : 0.2) * t * t;
+      for (const side of [-1, 1]) {
+        const x = side * halfWidth;
+        positions.push(
+          x * Math.cos(angle) - bend * Math.sin(angle),
+          height * t,
+          -x * Math.sin(angle) - bend * Math.cos(angle),
+        );
+        uvs.push(side === -1 ? 0 : 1, t);
+        detail.push(leaf < 2 ? 0 : 1);
+      }
+    }
+    for (let i = 0; i < segments; i += 1) {
+      const a = offset + i * 2;
+      indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+    }
   }
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
   geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+  geometry.setAttribute('aDetail', new Float32BufferAttribute(detail, 1));
   geometry.setIndex(indices);
   return geometry;
 }
@@ -111,13 +122,14 @@ export const GUST = {
 } as const;
 
 // 말 주변 잔디가 말을 피해 눕는 반경과 세기.
-const RUNNER_PUSH = { radius: 2.6, bend: 2.2 } as const;
+const RUNNER_PUSH = { radius: 1.1, bend: 0.55 } as const;
 
 // 바람: 끝(uv.y=1)일수록 더 흔들리고, 완만한 돌풍(gust)으로 세기가 출렁인다.
 // blade별 위치 해시로 색·바람 위상을 흩어 군집감을 준다.
 // 말 위치·질주 돌풍 유니폼으로 잔디가 말에 반응한다(끝일수록 많이 밀림 = dispPower).
 export const GRASS_VERTEX_SHADER = `
   attribute float aLodIndex;
+  attribute float aDetail;
   uniform float uTime;
   uniform vec2 uRunnerXZ;
   uniform float uRunnerAir;
@@ -135,23 +147,25 @@ export const GRASS_VERTEX_SHADER = `
     float keep = exp(-max(camDist - ${GRASS_LOD.nearFull.toFixed(1)}, 0.0) / ${GRASS_LOD.falloff.toFixed(1)});
     float alive = 1.0 - smoothstep(keep * ${GRASS_LOD.growBand.toFixed(2)}, keep, aLodIndex);
     float lodScale = mix(1.0, ${GRASS_LOD.farScale.toFixed(2)}, smoothstep(${GRASS_LOD.scaleNear.toFixed(1)}, ${GRASS_LOD.scaleFar.toFixed(1)}, camDist));
-    vec4 world = instanceMatrix * vec4(position * lodScale * alive, 1.0);
+    float detailScale = 1.0 - aDetail * smoothstep(24.0, 36.0, camDist);
+    vec4 world = instanceMatrix * vec4(position * lodScale * alive * detailScale, 1.0);
     vWorldXZ = world.xz;
     float hash = fract(sin(dot(floor(world.xz), vec2(12.9898, 78.233))) * 43758.5453);
-    vTint = 0.86 + hash * 0.28;
+    vTint = 0.88 + hash * 0.24;
 
-    float dispPower = (1.0 - cos(uv.y * 1.5708)) * 0.35;
-    float gust = sin(uTime * 0.6 + world.x * 0.05 + world.z * 0.05) * 0.5 + 0.5;
-    float windAmt = 0.12 * dispPower * (0.7 + 0.7 * gust);
-    float disp = sin(world.z * 0.6 + uTime * 2.2 + hash * 6.28) * windAmt
-               + cos(world.x * 0.5 + uTime * 1.6) * windAmt * 0.5;
+    float dispPower = uv.y * uv.y;
+    float gust = sin(uTime * 0.55 + basePos.x * 0.06 + basePos.y * 0.04) * 0.5 + 0.5;
+    float wave = sin(uTime * 1.4 + basePos.x * 0.22 + basePos.y * 0.14);
+    float flutter = sin(uTime * 3.0 + hash * 6.28 + uv.y * 3.0) * 0.025;
+    float disp = (wave * (0.08 + gust * 0.14) + flutter) * dispPower;
     world.x += disp;
-    world.z += disp * 0.5;
+    world.z += disp * 0.55;
+    world.y -= abs(disp) * 0.2;
 
     vec2 away = world.xz - uRunnerXZ;
     float awayDist = max(length(away), 0.001);
     float grounded = 1.0 - smoothstep(0.5, 3.0, uRunnerAir);
-    float push = smoothstep(${RUNNER_PUSH.radius.toFixed(2)}, 0.4, awayDist) * dispPower * ${RUNNER_PUSH.bend.toFixed(2)} * grounded;
+    float push = (1.0 - smoothstep(0.4, ${RUNNER_PUSH.radius.toFixed(2)}, awayDist)) * dispPower * ${RUNNER_PUSH.bend.toFixed(2)} * grounded;
     world.xz += (away / awayDist) * push;
 
     vec2 fromGust = world.xz - uGustOrigin;
@@ -177,6 +191,7 @@ export const GRASS_FRAGMENT_SHADER = `
   uniform vec3 uGroundColor;
   uniform vec3 uGrassBase;
   uniform vec3 uGrassTip;
+  uniform vec3 uGrassDry;
   uniform float uFogNear;
   uniform float uFogFar;
   uniform float uFadeNear;
@@ -187,7 +202,9 @@ export const GRASS_FRAGMENT_SHADER = `
   varying vec2 vWorldXZ;
   void main() {
     // SCENE_COLORS의 밑동·끝 색을 Three Color가 선형 공간으로 변환해 전달한다.
-    vec3 col = mix(uGrassBase, uGrassTip, vFrc) * uBrightness * vTint;
+    float dry = smoothstep(0.7, 0.95, sin(vWorldXZ.x * 0.11 + vWorldXZ.y * 0.07) * 0.5 + 0.5);
+    vec3 tip = mix(uGrassTip, uGrassDry, dry * 0.5);
+    vec3 col = mix(uGrassBase, tip, pow(vFrc, 0.75)) * uBrightness * vTint;
 
     // 광역 색 얼룩(초원의 옅고 진한 패치)
     float meadow = sin(vWorldXZ.x * 0.045) * sin(vWorldXZ.y * 0.045) * 0.5 + 0.5;

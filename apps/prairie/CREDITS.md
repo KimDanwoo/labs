@@ -7,7 +7,7 @@
 
 ## 가져온 것
 
-- **잔디 blade 모델**: 원본 `iGrass.glb`(144삼각형/blade)는 성능 때문에 절차적 blade(2~12삼각형)로 대체해 더 이상 포함하지 않는다. 실루엣(폭·굽음)만 참고했다.
+- **잔디 blade 모델**: 원본 `iGrass.glb`(144삼각형/blade)는 성능 때문에 절차적 blade(4~30삼각형)로 대체해 더 이상 포함하지 않는다. 실루엣(폭·굽음)만 참고했다.
 - **잔디 색/바람**: 원본 `BGrass.fs`의 밑동→끝 그라데이션(rgb 61,114,73 → 143,172,103 기반)과
   바람 버텍스 셰이더를 Next/Turbopack용 인라인 셰이더로 이식. 거리 페이드·돌풍·색 얼룩은 추가 튜닝.
 - **하늘 큐브맵 스카이박스**: `public/assets/cubeMap/{px,nx,py,ny,pz,nz}.png` (원본 day 큐브맵).
@@ -20,3 +20,8 @@
 MIT License — Copyright (c) 2024 Wilson Ko
 ... (전문은 원본 저장소 LICENSE 참조)
 ```
+
+## 유니콘
+
+- 원본 `runner.glb`: Quaternius LowPoly Animated Animals, CC0.
+- 파생 `unicorn.glb`: 원본 리그·애니메이션을 보존한 곡면 세분화 및 꼬리 털 다발. 생성 소스는 `scripts/refine-runner.mjs`. 뿔과 깃털 날개는 코드로 생성한다.

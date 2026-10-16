@@ -77,7 +77,7 @@ export const GrassChunk = memo(function GrassChunk({
       const lean = GRASS_FIELD.minLean + rng() * (GRASS_FIELD.maxLean - GRASS_FIELD.minLean);
       dummy.rotation.set(lean, rng() * Math.PI * 2, 0, 'YXZ');
       const scale = GRASS_FIELD.minScale + rng() * (GRASS_FIELD.maxScale - GRASS_FIELD.minScale);
-      const clump = 0.65 + clumpAt(x, z) * 0.7;
+      const clump = 0.45 + clumpAt(x, z) * 1.05;
       const jitter = 0.85 + rng() * 0.4;
       // 강둑 경사 윗부분(grassOverhang)까지 잔디가 넘어오고, 거기서 grassFade 폭에 걸쳐 성겨지며 키도 낮아진다.
       // 골 안쪽은 비운다. 지우는 대신 크기 0(인스턴스 수 고정).
@@ -85,7 +85,7 @@ export const GrassChunk = memo(function GrassChunk({
       const isBare = rng() > riverward;
       const height = scale * clump * jitter * MathUtils.lerp(RIVER.grassMinHeight, 1, MathUtils.clamp(riverward, 0, 1));
       if (isBare) dummy.scale.set(0, 0, 0);
-      else dummy.scale.set(scale, height, scale);
+      else dummy.scale.set(scale * (0.7 + clump * 0.3), height, scale);
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
     }
