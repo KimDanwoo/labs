@@ -28,7 +28,7 @@ export function MagicWings({ anchor }: MagicWingsProps) {
     const target = MathUtils.smoothstep(runnerState.airborneHeight, 0.2, 1.2);
     openRef.current = MathUtils.damp(openRef.current, target, 6, delta);
     const open = openRef.current;
-    root.visible = open > 0.025;
+    root.visible = true;
     phaseRef.current +=
       MathUtils.lerp(WINGS.flapSpeedAir, WINGS.flapSpeedRising, Math.max(0, runnerState.verticalSpeed / 6)) * delta;
     const flap = WINGS.openAngleBase + Math.sin(phaseRef.current) * WINGS.flapAmplitude;
@@ -36,10 +36,14 @@ export function MagicWings({ anchor }: MagicWingsProps) {
     const size = MathUtils.lerp(WINGS.foldedScale, 1, open);
     if (leftRef.current) {
       leftRef.current.rotation.z = -angle;
+      leftRef.current.rotation.x = (-Math.PI / 2) * (1 - open);
+      leftRef.current.rotation.y = -1.25 * (1 - open);
       leftRef.current.scale.setScalar(size);
     }
     if (rightRef.current) {
       rightRef.current.rotation.z = angle;
+      rightRef.current.rotation.x = (-Math.PI / 2) * (1 - open);
+      rightRef.current.rotation.y = 1.25 * (1 - open);
       rightRef.current.scale.setScalar(size);
     }
   });
@@ -47,14 +51,14 @@ export function MagicWings({ anchor }: MagicWingsProps) {
   const [rootX, rootY, rootZ] = WINGS.root;
   return (
     <group ref={rootRef} visible={false}>
-      <group ref={leftRef} position={[-rootX, rootY, rootZ]}>
+      <group ref={leftRef} position={[-rootX, rootY, rootZ]} rotation={[0, 0, 0, 'YXZ']}>
         <mesh geometry={geometry} scale={[-1, 1, 1]}>
-          <meshStandardMaterial color={WINGS.color} roughness={0.9} side={DoubleSide} />
+          <meshLambertMaterial color={WINGS.color} side={DoubleSide} />
         </mesh>
       </group>
-      <group ref={rightRef} position={[rootX, rootY, rootZ]}>
+      <group ref={rightRef} position={[rootX, rootY, rootZ]} rotation={[0, 0, 0, 'YXZ']}>
         <mesh geometry={geometry}>
-          <meshStandardMaterial color={WINGS.color} roughness={0.9} side={DoubleSide} />
+          <meshLambertMaterial color={WINGS.color} side={DoubleSide} />
         </mesh>
       </group>
     </group>

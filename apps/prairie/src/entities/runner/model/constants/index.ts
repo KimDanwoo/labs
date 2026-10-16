@@ -19,10 +19,10 @@ export const RUNNER_ANIM = {
 
 // 천마 룩: 모델 머티리얼 이름별 색 덮어쓰기(원본 glb는 그대로).
 export const UNICORN_TINT: Record<string, string> = {
-  Main: '#e4ddd0',
-  Main_Light: '#dfd3bd',
-  Hair: '#b1a18a',
-  Muzzle: '#978c7e',
+  Main: '#f0ebe2',
+  Main_Light: '#e8dfce',
+  Hair: '#d9dfdf',
+  Muzzle: '#aaa4a1',
   Hooves: '#4c4841',
   Eye_Black: '#211e1b',
   Eye_White: '#c9bfae',
@@ -35,23 +35,23 @@ export const HORN = {
   position: [0, 0.18, 0.4] as [number, number, number],
   tiltForward: 0.18,
   radius: 0.085,
-  height: 0.64,
-  bend: 0.045,
-  color: '#cbb991',
-  ridgeColor: '#a38d62',
+  height: 0.86,
+  bend: 0.07,
+  color: '#e4c17f',
+  ridgeColor: '#fff0c7',
 } as const;
 
 export const WINGS = {
-  root: [0.42, 0.18, -0.35] as [number, number, number],
-  span: 4,
-  feathers: 20,
-  foldedAngle: 1.35,
-  foldedScale: 0.1,
+  root: [0.42, 0.5, -0.35] as [number, number, number],
+  span: 4.4,
+  feathers: 26,
+  foldedAngle: -0.12,
+  foldedScale: 0.65,
   openAngleBase: 0.45,
   flapAmplitude: 0.65,
   flapSpeedAir: 3.2,
   flapSpeedRising: 5.5,
-  color: '#ded6c4',
+  color: '#eee9df',
 } as const;
 
 // 달리기 모션 튜닝값.

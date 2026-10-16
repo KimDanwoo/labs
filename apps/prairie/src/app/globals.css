@@ -20,12 +20,12 @@ h2 {
   background:
     linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--color-prairie-ink) 36%, transparent),
+      color-mix(in srgb, var(--color-prairie-ink) 18%, transparent),
       transparent 25%,
       transparent 50%,
-      color-mix(in srgb, var(--color-prairie-ink) 85%, transparent)
+      color-mix(in srgb, var(--color-prairie-ink) 65%, transparent)
     ),
-    radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--color-prairie-ink) 25%, transparent));
+    radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--color-prairie-ink) 12%, transparent));
 }
 
 .prairie-hud {

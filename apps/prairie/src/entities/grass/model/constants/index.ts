@@ -3,8 +3,8 @@ import { BufferGeometry, Float32BufferAttribute } from 'three';
 // 카메라 주변 청크만 유지(chunk-follow). 멀어진 청크는 언마운트 → 메모리·초기화 절약.
 export const GRASS_FIELD = {
   tile: 16,
-  minScale: 0.55,
-  maxScale: 1.15,
+  minScale: 0.65,
+  maxScale: 1.25,
   // blade 기울기(rad). 위에서 내려다볼 때도 면이 보이도록 수직에서 살짝 눕힌다.
   minLean: 0.08,
   maxLean: 0.38,
@@ -19,8 +19,8 @@ export type GrassLodRing = { maxRing: number; blades: number; segments: number }
 // 각 blade는 인덱스 비율 aLodIndex = i / 첫 링 풀을 갖고, aLodIndex ≤ keep이면 보인다. 풀이 바뀌어도 보이는 집합이 같아 링 경계 팝이 없고,
 // 임계 근처(keep×growBand~keep)는 크기를 줄여 다가갈수록 자라나듯 나타난다. 살아남는 blade는 farScale까지 커진다.
 export const GRASS_LOD = {
-  nearFull: 20,
-  falloff: 50,
+  nearFull: 16,
+  falloff: 30,
   growBand: 0.85,
   farScale: 2,
   scaleNear: 20,
@@ -38,18 +38,18 @@ export function grassKeepAt(distance: number): number {
 export const GRASS_QUALITY = {
   desktop: {
     rings: [
-      { maxRing: 2, blades: 1200, segments: 3 },
-      { maxRing: 4, blades: 850, segments: 2 },
-      { maxRing: 8, blades: 450, segments: 1 },
+      { maxRing: 2, blades: 3000, segments: 3 },
+      { maxRing: 4, blades: 1400, segments: 2 },
+      { maxRing: 8, blades: 500, segments: 1 },
     ] as GrassLodRing[],
     fadeNear: 60,
     fadeFar: 130,
   },
   mobile: {
     rings: [
-      { maxRing: 1, blades: 650, segments: 2 },
-      { maxRing: 2, blades: 650, segments: 1 },
-      { maxRing: 4, blades: 450, segments: 1 },
+      { maxRing: 1, blades: 1600, segments: 2 },
+      { maxRing: 2, blades: 1250, segments: 1 },
+      { maxRing: 4, blades: 800, segments: 1 },
     ] as GrassLodRing[],
     fadeNear: 20,
     fadeFar: 66,
@@ -75,14 +75,16 @@ export function makeBladeGeometry(segments: number): BufferGeometry {
   const uvs: number[] = [];
   const indices: number[] = [];
   const detail: number[] = [];
-  const leaves = segments >= 3 ? 5 : 2;
+  let leaves = 2;
+  if (segments === 2) leaves = 4;
+  if (segments >= 3) leaves = 9;
   for (let leaf = 0; leaf < leaves; leaf += 1) {
     const angle = leaf * 1.9;
-    const height = 0.72 - leaf * 0.075;
+    const height = 0.58 + (Math.sin(leaf * 2.4) * 0.5 + 0.5) * 0.2;
     const offset = positions.length / 3;
     for (let i = 0; i <= segments; i += 1) {
       const t = i / segments;
-      const halfWidth = 0.032 * (1 - t) * (0.7 + Math.sin(t * Math.PI) * 0.6);
+      const halfWidth = 0.055 * (1 - t) * (0.7 + Math.sin(t * Math.PI) * 0.6);
       const bend = (leaf === 0 ? 0.26 : 0.2) * t * t;
       for (const side of [-1, 1]) {
         const x = side * halfWidth;
@@ -92,7 +94,7 @@ export function makeBladeGeometry(segments: number): BufferGeometry {
           -x * Math.sin(angle) - bend * Math.cos(angle),
         );
         uvs.push(side === -1 ? 0 : 1, t);
-        detail.push(leaf < 2 ? 0 : 1);
+        detail.push(leaf < 4 ? 0 : 1);
       }
     }
     for (let i = 0; i < segments; i += 1) {

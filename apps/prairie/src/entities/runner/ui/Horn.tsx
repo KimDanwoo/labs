@@ -26,11 +26,15 @@ export function Horn() {
   return (
     <group scale={HORN.boneScaleFix}>
       <group position={HORN.position} rotation={[Math.PI / 2 - HORN.tiltForward, 0, 0]}>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[HORN.radius * 1.06, 0.013, 8, 32]} />
+          <meshStandardMaterial color={HORN.color} roughness={0.25} metalness={0.65} />
+        </mesh>
         <mesh geometry={geometry.body}>
-          <meshStandardMaterial color={HORN.color} roughness={0.64} metalness={0.08} />
+          <meshStandardMaterial color={HORN.color} roughness={0.3} metalness={0.55} />
         </mesh>
         <mesh geometry={geometry.ridge}>
-          <meshStandardMaterial color={HORN.ridgeColor} roughness={0.8} />
+          <meshStandardMaterial color={HORN.ridgeColor} roughness={0.35} metalness={0.35} />
         </mesh>
       </group>
     </group>

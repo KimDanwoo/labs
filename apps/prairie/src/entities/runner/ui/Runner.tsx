@@ -7,12 +7,14 @@ import {
   RUNNER_MODEL_URL,
   UNICORN_TINT,
 } from '@entities/runner/model/constants';
+import { gaitWeights } from '@entities/runner/model/services';
 import { useAnimations, useGLTF } from '@react-three/drei';
 import { createPortal, useFrame } from '@react-three/fiber';
 import { runnerState } from '@shared/r3f';
 import { useEffect, useMemo, useRef } from 'react';
 import { Group, MathUtils, Mesh, MeshStandardMaterial, type AnimationAction } from 'three';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { FlowingHair } from './FlowingHair';
 import { Horn } from './Horn';
 import { MagicWings } from './MagicWings';
 
@@ -44,8 +46,10 @@ export function Runner({ speedRef }: RunnerProps) {
         const tint = UNICORN_TINT[copy.name];
         if (tint) copy.color.set(tint);
         copy.metalness = 0;
-        copy.roughness = copy.name === 'Eye_Black' ? 0.24 : 0.88;
-        copy.envMapIntensity = 0.3;
+        copy.roughness = 0.66;
+        if (copy.name === 'Hair') copy.roughness = 0.48;
+        if (copy.name === 'Eye_Black') copy.roughness = 0.16;
+        copy.envMapIntensity = 0.5;
         copy.flatShading = false;
         if (copy.name === 'Hair') {
           copy.onBeforeCompile = (shader) => {
@@ -101,16 +105,18 @@ export function Runner({ speedRef }: RunnerProps) {
     if (!idle || !walk || !run || !flight) return;
     const speed = Math.abs(speedRef.current);
     const tune = RUNNER_ANIM_TUNING;
-    const moving = MathUtils.smoothstep(speed, 0.1, 0.9);
-    const gallop = MathUtils.smoothstep(speed, tune.gallopBlendStart, tune.gallopBlendEnd);
-    const airborne = MathUtils.smoothstep(runnerState.airborneHeight, 0.15, 0.8);
-    const targets = [1 - moving, moving * (1 - gallop), moving * gallop];
-    [idle, walk, run].forEach((action, index) => {
-      action.weight = MathUtils.damp(action.weight, targets[index]! * (1 - airborne), tune.blendRate, delta);
-    });
-    flight.weight = MathUtils.damp(flight.weight, airborne, tune.blendRate, delta);
+    const weights = gaitWeights(speed, runnerState.airborneHeight, tune.gallopBlendStart, tune.gallopBlendEnd);
+    const { airborne } = weights;
+    for (const name of ['idle', 'walk', 'run', 'flight'] as const) {
+      const action = gaitRef.current[name];
+      if (action) action.weight = MathUtils.damp(action.weight, weights[name], tune.blendRate, delta);
+    }
     walk.timeScale = (speedRef.current < 0 ? -1 : 1) * MathUtils.clamp(speed / tune.walkRefSpeed, 0.45, 1.7);
-    run.timeScale = MathUtils.clamp(speed / tune.runRefSpeed, tune.minRunScale, tune.maxRunScale);
+    run.timeScale = MathUtils.clamp(
+      speed / tune.runRefSpeed,
+      airborne > 0.5 ? 0.8 : tune.minRunScale,
+      tune.maxRunScale,
+    );
     if (timeRef.current) timeRef.current.value = state.clock.elapsedTime;
     if (root.current) {
       const turn = MathUtils.euclideanModulo(runnerState.heading - headingRef.current + Math.PI, Math.PI * 2) - Math.PI;
@@ -127,11 +133,16 @@ export function Runner({ speedRef }: RunnerProps) {
   });
 
   const head = prepared.model.getObjectByName('Head');
+  const tailRoot = prepared.model.getObjectByName('Tail1');
+  const tailTip = prepared.model.getObjectByName('Tail7_end');
+  const neck = prepared.model.getObjectByName('Neck1');
   const shoulder = prepared.model.getObjectByName('Torso3');
   return (
     <group ref={root} scale={scale} rotation={[0, rotationY, 0]} position={position}>
       <primitive object={prepared.model} />
       {shoulder && <MagicWings anchor={shoulder} />}
+      {tailRoot && tailTip && <FlowingHair head={tailRoot} neck={tailTip} speedRef={speedRef} isTail />}
+      {head && neck && <FlowingHair head={head} neck={neck} speedRef={speedRef} />}
       {head && createPortal(<Horn />, head)}
     </group>
   );
