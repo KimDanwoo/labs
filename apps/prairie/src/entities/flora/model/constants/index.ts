@@ -10,11 +10,12 @@ export const FLORA = {
   riverMargin: 10,
   // 스폰 지점 주변은 비워 둔다.
   spawnClearRadius: 30,
-  trunk: { radiusTop: 0.14, radiusBottom: 0.36, height: 2.8, segments: 7 },
-  // 활엽수 캐노피: 크기 다른 덩어리를 불규칙하게 쌓는다(blobs개, 반지름은 radius × 0.55~1).
-  canopy: { radius: 1.9, detail: 1, blobs: 5 },
+  trunk: { radiusTop: 0.14, radiusBottom: 0.36, height: 4.1, segments: 9 },
+  // 활엽수 수관: 거친 곡면 잎 군집을 비대칭으로 분산하고 일부 군집까지 가지를 뻗는다.
+  canopy: { radius: 2.2, detail: 2, blobs: 11 },
+  branches: 5,
   // 침엽수: 원뿔 tiers단. 아래가 넓고 위로 좁아진다.
-  conifer: { radius: 1.6, tierHeight: 2.2, tiers: 3, segments: 7 },
+  conifer: { radius: 2.1, tierHeight: 1.8, tiers: 6, segments: 13 },
   rock: { radius: 0.9, detail: 0 },
   // 캐노피 바람 흔들림(m)과 세로 명암(아래 어둡게 → 위 밝게).
   sway: 0.07,
@@ -25,8 +26,8 @@ export const FLORA = {
   maxTrees: 600,
   maxRocks: 400,
   colors: {
-    trunk: '#4e3620',
-    canopy: ['#657947', '#829354', '#506b45', '#98a360'],
+    trunk: '#66513b',
+    canopy: ['#536b39', '#6d8047', '#455e35', '#829055'],
     conifer: ['#48654b', '#5d7953'],
     rock: '#8d8779',
   },

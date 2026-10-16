@@ -55,6 +55,7 @@ export function GrassField() {
           uBrightness: { value: 0.95 },
           uGrassBase: { value: new Color(SCENE_COLORS.grassBase) },
           uGrassTip: { value: new Color(SCENE_COLORS.grassTip) },
+          uGrassDry: { value: new Color(SCENE_COLORS.grassDry) },
           uHorizonColor: { value: new Color(SCENE_COLORS.fog) },
           uGroundColor: { value: new Color(SCENE_COLORS.grass) },
           uFogNear: { value: FOG.desktop.near },

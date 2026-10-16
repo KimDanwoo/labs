@@ -40,7 +40,7 @@ export function SceneCanvas() {
       <PerformanceMonitor onDecline={() => setDpr(dprRange.min)} onIncline={() => setDpr(dprRange.max)} />
       <fog attach="fog" args={[SCENE_COLORS.fog, fog.near, fog.far]} />
 
-      <ambientLight color={SCENE_COLORS.ambient} intensity={SUN.ambientIntensity} />
+      <hemisphereLight color={SCENE_COLORS.ambient} groundColor={SCENE_COLORS.grass} intensity={SUN.ambientIntensity} />
       <directionalLight color={SCENE_COLORS.sunLight} intensity={SUN.intensity} position={SUN.position} />
 
       <Suspense fallback={null}>
