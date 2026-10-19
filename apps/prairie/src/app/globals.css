@@ -20,19 +20,19 @@ h2 {
   background:
     linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--color-prairie-ink) 18%, transparent),
+      color-mix(in srgb, var(--color-prairie-ink) 6%, transparent),
       transparent 25%,
-      transparent 50%,
-      color-mix(in srgb, var(--color-prairie-ink) 65%, transparent)
+      transparent 72%,
+      color-mix(in srgb, var(--color-prairie-ink) 28%, transparent)
     ),
-    radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--color-prairie-ink) 12%, transparent));
+    radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--color-prairie-ink) 4%, transparent));
 }
 
 .prairie-hud {
-  padding-top: max(var(--spacing-xl), env(safe-area-inset-top));
-  padding-right: max(var(--spacing-xl), env(safe-area-inset-right));
+  padding-top: max(var(--spacing-2xl), env(safe-area-inset-top));
+  padding-right: max(var(--spacing-2xl), env(safe-area-inset-right));
   padding-bottom: max(var(--spacing-lg), env(safe-area-inset-bottom));
-  padding-left: max(var(--spacing-xl), env(safe-area-inset-left));
+  padding-left: max(var(--spacing-2xl), env(safe-area-inset-left));
 }
 
 .prairie-loader {

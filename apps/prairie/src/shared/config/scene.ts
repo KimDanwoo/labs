@@ -1,19 +1,19 @@
 // WebGL 머티리얼 색은 토큰으로 표현 불가 → 파스텔 톤 팔레트를 여기 한곳에 모은다.
 export const SCENE_COLORS = {
-  skyTop: '#609fcb',
-  skyBottom: '#f3d7b0',
+  skyTop: '#85bce0',
+  skyBottom: '#fff0d4',
   // 먼 들판이 대기에 희미해진 색. 잔디 페이드·물·자갈의 원경색이 전부 이 값을 쓴다.
   // 하늘과의 이음은 Haze가 맡으므로 큐브맵 지평선색에 맞출 필요가 없다 — 하늘색이면 잔디 너머가 '하늘 띠'로 읽힌다.
-  fog: '#bac8ac',
-  sunLight: '#ffe4b8',
-  ambient: '#dbe8f3',
+  fog: '#d1dcc0',
+  sunLight: '#fff0d6',
+  ambient: '#edf4ff',
   // unlit 지면색 = 잔디 blade가 멀어지며 녹아드는 색. 하상 강둑 블렌드도 이 값.
-  grass: '#527344',
-  grassBase: '#284330',
-  grassTip: '#a2b96f',
-  grassDry: '#bca66f',
-  waterDeep: '#5c9db5',
-  waterShallow: '#a6cfd8',
+  grass: '#668650',
+  grassBase: '#3e5d3b',
+  grassTip: '#bed28a',
+  grassDry: '#d3be87',
+  waterDeep: '#72b4c7',
+  waterShallow: '#bde1e4',
   pebbleDark: '#8a7f72',
   pebbleLight: '#d9cdb9',
 } as const;
@@ -96,7 +96,7 @@ export function riverBearing(x: number, camYaw: number): RiverBearing {
 export const SUN = {
   position: [-60, 30, 120] as [number, number, number],
   intensity: 1.8,
-  ambientIntensity: 0.9,
+  ambientIntensity: 1.15,
 };
 
 // 기기별 안개. 잔디 blade는 fadeFar에서 지면색에 완전히 녹으므로(데스크톱 66 < 청크 끝 72) 안개가 청크 끝을 가릴 필요는 없다 —
@@ -124,9 +124,9 @@ export const HAZE = {
 // 능선 겹. 먼 겹부터 그린다 — 멀수록 높고 하늘색에 가깝게 바래고(대기 원근), 가까울수록 낮고 짙다.
 // baseY/ampY는 월드 m(원통 반경 1000 기준). cells는 원통 한 바퀴의 노이즈 셀 수(정수 → 이음새 없음).
 export const RIDGES = [
-  { baseY: 30, ampY: 220, cells: 4, seed: 0.17, color: '#aab9bb' },
-  { baseY: 18, ampY: 140, cells: 7, seed: 0.53, color: '#849f95' },
-  { baseY: 10, ampY: 90, cells: 12, seed: 0.81, color: '#667f63' },
+  { baseY: 30, ampY: 220, cells: 4, seed: 0.17, color: '#c0cfd0' },
+  { baseY: 18, ampY: 140, cells: 7, seed: 0.53, color: '#a0baaa' },
+  { baseY: 10, ampY: 90, cells: 12, seed: 0.81, color: '#829b78' },
 ] as const;
 
 export const CAMERA = {

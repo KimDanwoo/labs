@@ -26,7 +26,7 @@ void main() {
   vec2 p = d.xz / (elevation + 0.24) * 0.13;
   float noise = texture2D(uClouds, p).r * 0.75 + texture2D(uClouds, p * 2.7 + 0.21).r * 0.25;
   float cloud = smoothstep(0.43, 0.64, noise) * smoothstep(0.02, 0.16, elevation);
-  color = mix(color, mix(vec3(0.66, 0.73, 0.75), vec3(1.0, 0.91, 0.77), pow(sun, 6.0)), cloud * 0.78);
+  color = mix(color, mix(vec3(0.82, 0.87, 0.89), vec3(1.0, 0.97, 0.88), pow(sun, 6.0)), cloud * 0.64);
   float disc = smoothstep(cos(0.012), cos(0.009), sun);
   color += vec3(1.0, 0.77, 0.43) * (pow(sun, 360.0) * 0.32 + disc * 1.8) * (1.0 - cloud * 0.8);
   gl_FragColor = vec4(color, 1.0);

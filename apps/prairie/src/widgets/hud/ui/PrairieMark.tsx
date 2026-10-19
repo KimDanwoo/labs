@@ -13,10 +13,9 @@ export function PrairieMark() {
         <path d="M20 31V10m0 12c-7 0-9-5-9-8 6 0 9 4 9 8Zm0-5c6 0 8-4 8-7-5 0-8 3-8 7Zm0 10c6 0 9-4 9-7-6 0-9 3-9 7Z" />
       </svg>
       <div>
-        <p className="font-display text-xl font-medium tracking-tight sm:text-2xl">
+        <p className="font-display text-2xl font-medium tracking-tight sm:text-3xl">
           prairie<span className="text-prairie-accent">.</span>
         </p>
-        <p className="hidden text-xs tracking-widest text-prairie-paper/70 sm:block">A LITTLE ESCAPE</p>
       </div>
     </div>
   );
