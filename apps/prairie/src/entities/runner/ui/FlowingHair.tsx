@@ -5,6 +5,7 @@ import { runnerState } from '@shared/r3f';
 import { useEffect, useMemo, useRef } from 'react';
 import {
   BufferGeometry,
+  Color,
   Float32BufferAttribute,
   Mesh,
   Vector3,
@@ -23,6 +24,7 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
   }, [uniforms]);
   const geometry = useMemo(() => {
     const p: number[] = [],
+      colors: number[] = [],
       lengths: number[] = [],
       strands: number[] = [],
       indices: number[] = [];
@@ -30,14 +32,12 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
       const offset = p.length / 3;
       for (let ring = 0; ring <= 12; ring += 1) {
         const t = ring / 12;
-        const radius = 0.035 * (1 - t * 0.93);
+        const radius = 0.032 * Math.pow(1 - t * 0.97, 0.8);
         for (let side = 0; side < 6; side += 1) {
           const angle = (side / 6) * Math.PI * 2;
-          p.push(
-            Math.cos(angle) * radius + (strand / 27 - 0.5) * 0.44,
-            t,
-            Math.sin(angle) * radius + Math.cos(strand * 2.4) * 0.08,
-          );
+          p.push(Math.cos(angle) * radius, t, Math.sin(angle) * radius);
+          const color = new Color('#8595ac').lerp(new Color('#eee5d5'), 0.3 + t * 0.5 + Math.sin(strand * 2.4) * 0.12);
+          colors.push(color.r, color.g, color.b);
           lengths.push(t);
           strands.push(strand);
         }
@@ -52,6 +52,7 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
     }
     const g = new BufferGeometry();
     g.setAttribute('position', new Float32BufferAttribute(p, 3));
+    g.setAttribute('color', new Float32BufferAttribute(colors, 3));
     g.setAttribute('aLength', new Float32BufferAttribute(lengths, 1));
     g.setAttribute('aStrand', new Float32BufferAttribute(strands, 1));
     g.setIndex(indices);
@@ -66,28 +67,44 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
         `#include <common>
       attribute float aLength, aStrand;
       uniform vec3 uTop, uBottom;
-      uniform float uTime, uFlow, uTail;`,
+      uniform float uTime, uFlow, uTail;
+      vec3 hairCenter(float t, float strand) {
+        float rootT = strand / 27.0;
+        float phase = strand * 2.39996;
+        vec3 center;
+        if (uTail > 0.5) {
+          float spread = sqrt((strand + 0.5) / 28.0);
+          center = mix(uTop, uBottom, t);
+          center.x += cos(phase) * spread * (0.08 + sin(t * 2.4) * 0.22);
+          center.z += sin(phase) * spread * 0.1;
+          center.z -= t * t * (0.35 + uFlow * 0.5);
+          center.y -= t * t * (0.12 + 0.16 * sin(phase));
+        } else {
+          center = mix(uTop, uBottom, rootT);
+          float length = 0.72 + sin(rootT * 3.14159) * 0.28;
+          center += vec3(0.32 + rootT * 0.18, -length, -0.14 - uFlow * 0.38) * t;
+          center.x += sin(t * 3.14159) * 0.2;
+          center.y += sin(phase) * 0.08 * t * t;
+        }
+        center.x += sin(uTime * 2.8 - t * 5.0 + strand * 0.3) * (0.025 + uFlow * 0.07) * t * t;
+        center.y += sin(uTime * 2.0 + strand * 0.25) * 0.025 * t;
+        return center;
+      }
+      mat3 hairFrame(float t, float strand) {
+        vec3 tangent = normalize(hairCenter(t + 0.002, strand) - hairCenter(t - 0.002, strand));
+        vec3 across = normalize(cross(vec3(1.0, 0.0, 0.0), tangent));
+        return mat3(normalize(cross(tangent, across)), tangent, across);
+      }`,
+      )
+      .replace(
+        '#include <beginnormal_vertex>',
+        `#include <beginnormal_vertex>
+        objectNormal = hairFrame(aLength, aStrand) * objectNormal;`,
       )
       .replace(
         '#include <begin_vertex>',
-        `#include <begin_vertex>
-      vec3 axis = normalize(uBottom - uTop);
-      vec3 across = normalize(cross(vec3(1.0, 0.0, 0.0), axis));
-      float t = aLength;
-      if (uTail > 0.5) {
-        transformed = mix(uTop, uBottom, t) + vec3(position.x * (1.0 + t), 0.0, 0.0) + across * position.z;
-        transformed.z -= t * t * (0.4 + uFlow * 0.55);
-      } else {
-        float rootT = aStrand / 27.0;
-        vec3 hairRoot = mix(uTop, uBottom, rootT);
-        float radialX = position.x - (rootT - 0.5) * 0.44;
-        vec3 fall = vec3(0.45 + rootT * 0.25, -0.65 - sin(rootT * 3.14159) * 0.3, -0.18 - uFlow * 0.4);
-        transformed = hairRoot + fall * t + vec3(radialX, 0.0, 0.0) + across * position.z;
-        transformed.x += sin(t * 3.14159) * 0.12;
-      }
-      transformed.x += sin(uTime * 2.8 - t * 5.0 + aStrand * 0.3) * (0.035 + uFlow * 0.08) * t * t;
-      transformed.y += sin(aStrand * 1.7) * 0.14 * t * t;
-      transformed.y += sin(uTime * 2.0 + aStrand * 0.25) * 0.035 * t;`,
+        `vec3 transformed = hairCenter(aLength, aStrand)
+          + hairFrame(aLength, aStrand) * vec3(position.x, 0.0, position.z);`,
       );
   };
   useFrame(({ clock }) => {
@@ -108,7 +125,15 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
   });
   return (
     <mesh ref={mesh} geometry={geometry} frustumCulled={false}>
-      <meshStandardMaterial color="#9ba9c5" roughness={0.43} metalness={0.12} onBeforeCompile={shade} />
+      <meshPhysicalMaterial
+        vertexColors
+        roughness={0.48}
+        metalness={0.04}
+        sheen={0.65}
+        sheenColor="#f7eee1"
+        sheenRoughness={0.5}
+        onBeforeCompile={shade}
+      />
     </mesh>
   );
 }
