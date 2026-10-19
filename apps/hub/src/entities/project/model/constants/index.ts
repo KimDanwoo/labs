@@ -39,7 +39,7 @@ export const PROJECTS: Project[] = [
     title: 'Unicorn Rush',
     description: '유니콘과 함께하는 3D 비행 · 공중 회전과 제로백 가속',
     href: 'https://prairie.danwoo.dev/',
-    image: '/projects/prairie.webp',
+    image: '/projects/unicorn-rush.webp',
     imagePosition: 'center',
   },
 ];
