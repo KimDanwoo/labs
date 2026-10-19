@@ -13,15 +13,23 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-// 디스플레이 폰트 — prairie 정체성(hub·gymlog와 폰트로 구별). 색은 코발트 공유.
+// Unicorn Rush 디스플레이 폰트.
 const sora = Sora({
   variable: '--font-display',
   subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: '초원을 달리는 말 · Prairie',
-  description: '말을 타고 초원을 자유롭게 달리는 three.js 인터랙티브 씬',
+  title: '유니콘 러시 · Unicorn Rush',
+  applicationName: 'Unicorn Rush',
+  description: '유니콘을 타고 초원과 하늘을 탐험하는 3D 비행 플레이그라운드. 공중 회전과 제로백 스킬을 즐겨보세요.',
+  openGraph: {
+    title: '유니콘 러시 · Unicorn Rush',
+    siteName: 'Unicorn Rush',
+    description: '유니콘과 함께하는 3D 비행. 공중 회전, 별가루, 제로백 가속.',
+    locale: 'ko_KR',
+    type: 'website',
+  },
 };
 
 // 첫 페인트 전에 테마 클래스를 적용해 다크모드 깜빡임(FOUC)을 방지한다.

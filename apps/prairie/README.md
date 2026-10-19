@@ -1,6 +1,8 @@
-# prairie
+# 유니콘 러시 · Unicorn Rush
 
-3D 초원 위를 달리는 인터랙티브 비주얼 실험 — 기술 시연 목적의 단일 페이지 앱.
+유니콘을 타고 초원과 하늘을 탐험하는 3D 비행 플레이그라운드.
+
+사이트 표시 이름은 Unicorn Rush이며, 내부 앱 식별자와 배포 주소는 `prairie`를 유지한다.
 
 **라이브:** https://prairie.danwoo.dev
 
