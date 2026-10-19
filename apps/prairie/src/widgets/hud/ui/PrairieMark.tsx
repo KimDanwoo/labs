@@ -9,14 +9,14 @@ export function PrairieMark() {
         stroke="currentColor"
         strokeWidth="1.2"
       >
-        <circle cx="20" cy="20" r="18" />
-        <path d="M20 31V10m0 12c-7 0-9-5-9-8 6 0 9 4 9 8Zm0-5c6 0 8-4 8-7-5 0-8 3-8 7Zm0 10c6 0 9-4 9-7-6 0-9 3-9 7Z" />
+        <path d="M21 4 25 15 36 19 25 23 21 34 17 23 6 19 17 15Z" fill="currentColor" stroke="none" />
+        <path d="M6 32c7 3 20-1 28-12" strokeLinecap="round" />
+        <circle cx="33" cy="7" r="2" fill="currentColor" stroke="none" />
       </svg>
       <div>
-        <p className="font-display text-xl font-medium tracking-tight sm:text-2xl">
-          prairie<span className="text-prairie-accent">.</span>
+        <p className="font-display text-xl font-medium tracking-tight sm:text-3xl">
+          unicorn rush<span className="text-prairie-accent">.</span>
         </p>
-        <p className="hidden text-xs tracking-widest text-prairie-paper/70 sm:block">A LITTLE ESCAPE</p>
       </div>
     </div>
   );

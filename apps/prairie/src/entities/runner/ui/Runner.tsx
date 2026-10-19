@@ -12,7 +12,7 @@ import { useAnimations, useGLTF } from '@react-three/drei';
 import { createPortal, useFrame } from '@react-three/fiber';
 import { runnerState } from '@shared/r3f';
 import { useEffect, useMemo, useRef } from 'react';
-import { Group, MathUtils, Mesh, MeshStandardMaterial, type AnimationAction } from 'three';
+import { Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type AnimationAction } from 'three';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { FlowingHair } from './FlowingHair';
 import { Horn } from './Horn';
@@ -42,11 +42,15 @@ export function Runner({ speedRef }: RunnerProps) {
       const source = Array.isArray(object.material) ? object.material : [object.material];
       const copies = source.map((material) => {
         if (!(material instanceof MeshStandardMaterial)) return material;
-        const copy = material.clone();
+        const copy = new MeshPhysicalMaterial();
+        MeshStandardMaterial.prototype.copy.call(copy, material);
+        copy.sheen = copy.name === 'Main' || copy.name === 'Main_Light' ? 0.3 : 0;
+        copy.sheenColor.set('#fff1db');
+        copy.sheenRoughness = 0.75;
         const tint = UNICORN_TINT[copy.name];
         if (tint) copy.color.set(tint);
         copy.metalness = 0;
-        copy.roughness = 0.66;
+        copy.roughness = 0.72;
         if (copy.name === 'Hair') copy.roughness = 0.48;
         if (copy.name === 'Eye_Black') copy.roughness = 0.16;
         copy.envMapIntensity = 0.5;

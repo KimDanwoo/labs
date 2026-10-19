@@ -14,7 +14,7 @@ export function RiverGuide() {
   const isCrossing = riverBearing === 'crossing';
 
   return (
-    <div className="flex items-center gap-sm rounded-full border border-prairie-paper/20 bg-prairie-ink/55 px-md py-sm backdrop-blur-md sm:gap-md sm:px-lg">
+    <div className="flex items-center gap-sm rounded-2xl border border-prairie-paper/20 bg-prairie-ink/35 px-md py-md backdrop-blur-md sm:gap-md sm:px-lg">
       <svg
         aria-hidden
         viewBox="0 0 24 24"
@@ -29,7 +29,7 @@ export function RiverGuide() {
         <p className="text-xs text-prairie-paper/70">{isCrossing ? '물결 사이를 지나는 중' : '가까운 강까지'}</p>
         <p className="flex items-baseline gap-sm text-sm">
           {isCrossing ? (
-            <span>천천히 건너가 보세요</span>
+            <span>강을 건너는 중</span>
           ) : (
             <>
               <span className="font-mono text-lg tabular-nums">

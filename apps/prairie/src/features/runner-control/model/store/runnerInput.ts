@@ -3,7 +3,16 @@ import type { RunnerAction } from '@features/runner-control/model/constants';
 export type RunnerInput = Record<RunnerAction, boolean>;
 
 // 키보드 핸들러와 터치 컨트롤이 함께 쓰는 입력 싱글턴. useFrame 루프가 매 프레임 읽되 리렌더는 없다.
-const input: RunnerInput = { forward: false, backward: false, left: false, right: false, sprint: false, jump: false };
+const input: RunnerInput = {
+  forward: false,
+  backward: false,
+  left: false,
+  right: false,
+  sprint: false,
+  jump: false,
+  spin: false,
+  dash: false,
+};
 
 export function setRunnerAction(action: RunnerAction, pressed: boolean): void {
   input[action] = pressed;

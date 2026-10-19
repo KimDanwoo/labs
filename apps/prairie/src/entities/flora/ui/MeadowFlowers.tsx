@@ -77,7 +77,7 @@ export function MeadowFlowers() {
         <meshLambertMaterial color="#526b38" />
       </instancedMesh>
       <instancedMesh ref={flowers} args={[geometry, undefined, capacity]}>
-        <meshLambertMaterial />
+        <meshLambertMaterial vertexColors />
       </instancedMesh>
     </group>
   );

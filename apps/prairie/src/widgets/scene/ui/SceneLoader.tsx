@@ -37,13 +37,11 @@ export function SceneLoader() {
           stroke="currentColor"
           strokeWidth="1"
         >
-          <path d="M32 54V10M32 32C18 32 14 22 14 16c12 0 18 8 18 16Zm0-9c12 0 16-8 16-14-10 0-16 6-16 14Zm0 19c12 0 18-8 18-14-12 0-18 6-18 14Z" />
+          <path d="M32 8 38 24 54 30 38 36 32 52 26 36 10 30 26 24ZM10 52c12 4 31-4 44-20" />
         </svg>
       </div>
       <div className="text-center">
-        <p className="mb-md text-xs tracking-widest text-prairie-accent">A LITTLE ESCAPE</p>
-        <p className="font-display text-6xl font-medium tracking-tight">prairie.</p>
-        <p className="mt-lg text-sm text-prairie-paper/70">잠시, 바람을 따라 떠나볼까요.</p>
+        <p className="font-display text-4xl font-medium tracking-tight sm:text-6xl">unicorn rush.</p>
       </div>
       <div className="w-56">
         <div
@@ -61,9 +59,6 @@ export function SceneLoader() {
           <span>{percent}%</span>
         </p>
       </div>
-      <p className="absolute bottom-xl text-xs tracking-widest text-prairie-paper/40">
-        NO DESTINATION. JUST THE JOURNEY.
-      </p>
     </div>
   );
 }

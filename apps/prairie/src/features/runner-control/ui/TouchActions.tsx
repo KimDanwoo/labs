@@ -12,7 +12,7 @@ function handlePress(event: PointerEvent<HTMLButtonElement>, action: RunnerActio
 
 export function TouchActions() {
   return (
-    <div className="prairie-touch-actions absolute right-md bottom-lg z-40 hidden gap-sm text-prairie-paper pointer-coarse:flex">
+    <div className="prairie-touch-actions absolute right-md bottom-lg z-40 hidden gap-xs text-prairie-paper pointer-coarse:flex">
       <button
         type="button"
         aria-label="길게 눌러 질주"
@@ -26,6 +26,34 @@ export function TouchActions() {
           »
         </span>
         질주
+      </button>
+      <button
+        type="button"
+        aria-label="비행 중 제로백 가속"
+        onPointerDown={(event) => handlePress(event, 'dash')}
+        onPointerUp={() => setRunnerAction('dash', false)}
+        onPointerCancel={() => setRunnerAction('dash', false)}
+        onLostPointerCapture={() => setRunnerAction('dash', false)}
+        className="flex size-16 touch-none flex-col items-center justify-center gap-xs rounded-full border border-prairie-paper/30 bg-prairie-ink/65 text-xs backdrop-blur-md active:bg-prairie-ink focus-visible:outline-2 focus-visible:outline-prairie-accent"
+      >
+        <span aria-hidden className="text-xl">
+          ⚡
+        </span>
+        제로백
+      </button>
+      <button
+        type="button"
+        aria-label="비행 중 회전 (충분히 높이 오른 뒤 사용)"
+        onPointerDown={(event) => handlePress(event, 'spin')}
+        onPointerUp={() => setRunnerAction('spin', false)}
+        onPointerCancel={() => setRunnerAction('spin', false)}
+        onLostPointerCapture={() => setRunnerAction('spin', false)}
+        className="flex size-16 touch-none flex-col items-center justify-center gap-xs rounded-full border border-prairie-paper/30 bg-prairie-ink/65 text-xs backdrop-blur-md active:bg-prairie-ink focus-visible:outline-2 focus-visible:outline-prairie-accent"
+      >
+        <span aria-hidden className="text-xl">
+          ↻
+        </span>
+        회전
       </button>
       <button
         type="button"
