@@ -20,8 +20,10 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://prairie.danwoo.dev'),
   title: '유니콘 러시 · Unicorn Rush',
   applicationName: 'Unicorn Rush',
+  twitter: { card: 'summary_large_image' },
   description: '유니콘을 타고 초원과 하늘을 탐험하는 3D 비행 플레이그라운드. 공중 회전과 제로백 스킬을 즐겨보세요.',
   openGraph: {
     title: '유니콘 러시 · Unicorn Rush',
