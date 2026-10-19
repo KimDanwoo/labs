@@ -9,6 +9,9 @@ export const runnerState = {
   speed: 0,
   waterDepth: 0,
   isSprinting: false,
+  isSpinning: false,
+  dashStrength: 0,
+  spinAngle: 0,
   airborneHeight: 0,
   // 수직 속도(m/s). 날개짓 직후 양수 → 날개가 세게 내려친다.
   verticalSpeed: 0,

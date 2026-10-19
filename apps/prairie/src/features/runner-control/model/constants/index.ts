@@ -1,10 +1,12 @@
-export type RunnerAction = 'forward' | 'backward' | 'left' | 'right' | 'sprint' | 'jump';
+export type RunnerAction = 'forward' | 'backward' | 'left' | 'right' | 'sprint' | 'jump' | 'spin' | 'dash';
 
 // event.code → 이동 액션. WASD + 방향키 동시 지원. Shift 질주, Space 점프.
 export const KEY_BINDINGS: Record<string, RunnerAction> = {
   ShiftLeft: 'sprint',
   ShiftRight: 'sprint',
   Space: 'jump',
+  KeyE: 'spin',
+  KeyQ: 'dash',
   KeyW: 'forward',
   ArrowUp: 'forward',
   KeyS: 'backward',

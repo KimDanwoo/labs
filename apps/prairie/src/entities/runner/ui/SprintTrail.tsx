@@ -65,7 +65,9 @@ export function SprintTrail() {
 
       const t = life[i]! > 0 ? life[i]! / maxLife[i]! : 0;
       dummy.position.set(position[p]!, position[p + 1]!, position[p + 2]!);
-      dummy.scale.setScalar(size[i]! * t);
+      const stretch = 1 + runnerState.dashStrength * 8;
+      dummy.rotation.y = runnerState.heading;
+      dummy.scale.set(size[i]! * t, size[i]! * t, size[i]! * t * stretch);
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
     }
