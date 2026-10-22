@@ -4,6 +4,7 @@ import { FloraField } from '@entities/flora/ui';
 import { GrassField } from '@entities/grass/ui';
 import { River } from '@entities/river/ui';
 import { Ground, Scenery } from '@entities/scenery/ui';
+import { Grazers, WingedLife } from '@entities/wildlife/ui';
 import { RunnerRig } from '@features/runner-control/ui';
 import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
@@ -55,6 +56,9 @@ export function SceneCanvas() {
         <GrassField />
         <FloraField />
         <RunnerRig />
+        <Grazers />
+        <WingedLife kind="bird" />
+        <WingedLife kind="dragonfly" />
         <ReadySignal />
       </Suspense>
     </Canvas>
