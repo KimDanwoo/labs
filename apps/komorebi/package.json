@@ -1,0 +1,26 @@
+{
+  "name": "komorebi",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3011",
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test scripts/*.test.ts"
+  },
+  "dependencies": {
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "three": "catalog:"
+  },
+  "devDependencies": {
+    "@config/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/three": "catalog:",
+    "typescript": "catalog:",
+    "tsx": "catalog:"
+  }
+}
