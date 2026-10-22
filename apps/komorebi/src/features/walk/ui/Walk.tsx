@@ -102,7 +102,8 @@ export function Walk() {
   useEffect(() => {
     setVisited(readDiscoveries());
     let cancelled = false;
-    void createScene(canvasRef.current!, setStatus)
+    const controller = new AbortController();
+    void createScene(canvasRef.current!, setStatus, controller.signal)
       .then((instance) => {
         if (cancelled) {
           instance.dispose();
@@ -119,6 +120,7 @@ export function Walk() {
       });
     return () => {
       cancelled = true;
+      controller.abort();
       engine.current?.dispose();
       engine.current = null;
       audio.current?.dispose();

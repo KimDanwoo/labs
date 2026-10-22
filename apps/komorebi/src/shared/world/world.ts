@@ -78,7 +78,7 @@ export const WORLDS: Record<
   }
 > = {
   village: {
-    image: '/art/village-game.png',
+    image: '/art/village-game.webp',
     name: '파란 지붕 아래 논길',
     nodes: [
       { id: 'start', x: 50, z: 82 },
@@ -111,7 +111,7 @@ export const WORLDS: Record<
     ],
   },
   river: {
-    image: '/art/river-game.png',
+    image: '/art/river-game.webp',
     name: '졸졸, 물소리 다리',
     nodes: [
       { id: 'back', x: 4, z: 48 },
@@ -138,7 +138,7 @@ export const WORLDS: Record<
     ],
   },
   coast: {
-    image: '/art/coast-game.png',
+    image: '/art/coast-game.webp',
     name: '바람 부는 바닷길',
     nodes: [
       { id: 'back', x: 4, z: 60 },
@@ -156,7 +156,7 @@ export const WORLDS: Record<
     portals: [{ node: 'back', to: 'river', spawn: { x: 85, z: 47 }, label: '강가로' }],
   },
   forest: {
-    image: '/art/forest-game.png',
+    image: '/art/forest-game.webp',
     name: '나뭇잎 사이의 산길',
     nodes: [
       { id: 'back', x: 50, z: 96 },
@@ -178,7 +178,7 @@ export const WORLDS: Record<
     portals: [{ node: 'back', to: 'village', spawn: { x: 16, z: 41 }, label: '마을로' }],
   },
   school: {
-    image: '/art/school-game.png',
+    image: '/art/school-game.webp',
     name: '방학 중인 작은 학교',
     nodes: [
       { id: 'gate', x: 50, z: 96 },
@@ -199,7 +199,7 @@ export const WORLDS: Record<
     portals: [{ node: 'gate', to: 'shops', spawn: { x: 14, z: 59 }, label: '상점가로' }],
   },
   shops: {
-    image: '/art/shops-game.png',
+    image: '/art/shops-game.webp',
     name: '소소한 여름 상점가',
     nodes: [
       { id: 'villagegate', x: 50, z: 36 },
@@ -247,18 +247,29 @@ export function distanceToSegment(p: Point, a: Point, b: Point) {
   const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / (dx * dx + dz * dz || 1)));
   return Math.hypot(p.x - a.x - t * dx, p.z - a.z - t * dz);
 }
+// Resolve endpoints once; collision is queried repeatedly for every movement substep.
+const collisionLanes = Object.fromEntries(
+  Object.entries(WORLDS).map(([region, world]) => [
+    region,
+    world.routes.map((route) => {
+      const a = world.nodes.find((node) => node.id === route.a)!;
+      const b = world.nodes.find((node) => node.id === route.b)!;
+      const dx = b.x - a.x,
+        dz = b.z - a.z;
+      return { x: a.x, z: a.z, dx, dz, lengthSquared: dx * dx + dz * dz || 1, radiusSquared: route.width ** 2 };
+    }),
+  ]),
+) as Record<Region, { x: number; z: number; dx: number; dz: number; lengthSquared: number; radiusSquared: number }[]>;
+
 export function canWalk(x: number, z: number, region: Region = 'village') {
   if (x < 3 || x > 97 || z < 30 || z > 98) return false;
-  const world = WORLDS[region];
-  if (world.areas?.some((a) => x >= a.minX && x <= a.maxX && z >= a.minZ && z <= a.maxZ)) return true;
-  return world.routes.some(
-    (route) =>
-      distanceToSegment(
-        { x, z },
-        world.nodes.find((n) => n.id === route.a)!,
-        world.nodes.find((n) => n.id === route.b)!,
-      ) <= route.width,
-  );
+  if (WORLDS[region].areas?.some((a) => x >= a.minX && x <= a.maxX && z >= a.minZ && z <= a.maxZ)) return true;
+  return collisionLanes[region].some((lane) => {
+    const px = x - lane.x,
+      pz = z - lane.z;
+    const t = Math.max(0, Math.min(1, (px * lane.dx + pz * lane.dz) / lane.lengthSquared));
+    return (px - t * lane.dx) ** 2 + (pz - t * lane.dz) ** 2 <= lane.radiusSquared;
+  });
 }
 export function movePlayer(position: Point, dx: number, dz: number, region: Region = 'village') {
   const steps = Math.max(1, Math.ceil(Math.hypot(dx, dz) / 0.3));

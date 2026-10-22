@@ -39,7 +39,7 @@ pnpm --filter komorebi typecheck
 pnpm --filter komorebi build
 ```
 
-`output: 'export'`를 사용하므로 빌드 결과인 `apps/komorebi/out/`을 정적 호스팅에 올릴 수 있습니다. 외부 배포는 하지 않았습니다.
+`output: 'export'`를 사용하므로 빌드 결과인 `apps/komorebi/out/`을 정적 호스팅에 올릴 수 있습니다.
 
 ```bash
 python3 -m http.server 3011 --directory apps/komorebi/out
@@ -73,3 +73,14 @@ WebGL이 필요하며 기기 화면 배율을 최대 2로 제한합니다. 시�
 캐릭터 원화: `public/art/child-atlas.png` (4방향 × 6프레임). 생성 도구와 프롬프트: [CHARACTER-PROMPT.txt](public/art/CHARACTER-PROMPT.txt).
 
 보행 개선 시트: `public/art/child-walk-atlas.png` (4방향 × 8열: 정지 1 + 보행 6 + 공중 1). RGB 시트의 중성 체크 배경은 Three.js 렌더러에서 제거합니다. [보행 개선 프롬프트](public/art/CHARACTER-WALK-PROMPTS.txt).
+
+## 성능 관리
+
+- 런타임 배경은 같은 해상도의 WebP(quality 88, effort 6), 캐릭터 시트는 픽셀이 동일한 lossless WebP(effort 6)를 사용합니다. PNG는 원본 보관용입니다.
+- 최초 이미지 7장 합계: 22,527,608 → 4,956,996 bytes. 요청은 병렬 처리하며 하나라도 실패하면 완료된 텍스처를 정리합니다.
+- 캐릭터 프레임은 원본 셀 해상도에 맞춘 160×256, 32장입니다. RGBA 픽셀 저장량은 20 MiB → 5 MiB (캔버스와 GPU 각각, 실제 브라우저 총 메모리와는 다름).
+- 배경 mipmap을 만들지 않고, 터치 기기의 DPR 상한은 1.5입니다. 숨긴 탭에서는 RAF를 중단하고 복귀 시 시간 기준을 초기화합니다.
+- 움직이지 않아 상태가 같으면 React 상태를 재발행하지 않습니다. 충돌 판정은 미리 계산한 선분과 거리의 제곱을 사용하며 기존 길 경계와의 동등성을 검사합니다.
+- 사진 저장은 직전에 렌더링한 캔버스를 동기 복사하므로 상시 drawing buffer 보존이 필요하지 않습니다.
+
+검증: 테스트 20개, 타입 검사, 프로덕션 빌드. 로컬 CPU 측정에서 충돌 판정 20만 회 중앙값은 97.46 ms → 38.03 ms였으며 기기별 FPS 향상을 의미하지 않습니다. 실기기 모바일 프레임 시간과 사진 저장은 별도 확인이 필요합니다.

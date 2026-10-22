@@ -36,33 +36,52 @@ export type WalkEngine = {
 export async function createScene(
   container: HTMLElement,
   onStatus: (status: SceneStatus) => void,
+  signal?: AbortSignal,
 ): Promise<WalkEngine> {
   const loader = new THREE.TextureLoader();
   const plates = {} as Record<Region, THREE.Texture>;
   const loaded: THREE.Texture[] = [];
-  let childAtlas: THREE.Texture;
+  const regions = Object.keys(WORLDS) as Region[];
+  // Load concurrently, but settle every request before cleaning up a failed load.
+  const results = await Promise.allSettled(
+    [...regions.map((region) => WORLDS[region].image), '/art/child-walk-atlas.webp'].map((url) =>
+      loader.loadAsync(url),
+    ),
+  );
+  for (const result of results) {
+    if (result.status !== 'fulfilled') continue;
+    result.value.colorSpace = THREE.SRGBColorSpace;
+    result.value.generateMipmaps = false;
+    result.value.minFilter = THREE.LinearFilter;
+    loaded.push(result.value);
+  }
+  const failure = results.find((result) => result.status === 'rejected');
+  if (failure || signal?.aborted) {
+    loaded.forEach((texture) => texture.dispose());
+    throw failure?.reason ?? new DOMException('Scene cancelled', 'AbortError');
+  }
+  regions.forEach((region, index) => {
+    plates[region] = loaded[index]!;
+  });
+  const childAtlas = loaded[regions.length]!;
+  let character: ReturnType<typeof createChild>;
   try {
-    for (const region of Object.keys(WORLDS) as Region[]) {
-      const map = await loader.loadAsync(WORLDS[region].image);
-      map.colorSpace = THREE.SRGBColorSpace;
-      plates[region] = map;
-      loaded.push(map);
-    }
-    childAtlas = await loader.loadAsync('/art/child-walk-atlas.png');
-    childAtlas.colorSpace = THREE.SRGBColorSpace;
-    loaded.push(childAtlas);
+    character = createChild(childAtlas);
   } catch (error) {
-    loaded.forEach((t) => t.dispose());
+    loaded.forEach((texture) => texture.dispose());
     throw error;
   }
   let renderer: THREE.WebGLRenderer;
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: false });
   } catch (error) {
+    character.dispose();
     loaded.forEach((t) => t.dispose());
     throw error;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // Cap fill rate on touch devices without changing the CSS viewport.
+  const pixelRatioLimit = window.matchMedia('(pointer: coarse)').matches ? 1.5 : 2;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioLimit));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor('#1b352b');
   renderer.domElement.setAttribute('aria-label', '햇빛이 비치는 시골길. 길을 클릭하거나 방향키를 눌러 걸어 보세요.');
@@ -100,13 +119,8 @@ export async function createScene(
       }`,
   });
   scene.add(new THREE.Mesh(geo, background));
-  const character = createChild(childAtlas);
   const child = character.group;
   scene.add(child);
-  scene.add(new THREE.HemisphereLight('#fff5db', '#577a87', 2.1));
-  const sunlight = new THREE.DirectionalLight('#fff2cd', 2.3);
-  sunlight.position.set(-20, 30, 40);
-  scene.add(sunlight);
   const shadowTexture = canvasTexture(128, 64, (c) => {
     const g = c.createRadialGradient(64, 32, 2, 64, 32, 53);
     g.addColorStop(0, '#17332b77');
@@ -243,7 +257,7 @@ export async function createScene(
   let halfWidth = 60,
     halfHeight = 40;
   const resize = () => {
-    const w = container.clientWidth,
+    const w = Math.max(container.clientWidth, 1),
       h = Math.max(container.clientHeight, 1),
       aspect = w / h;
     const fullHeight = Math.min(80, 120 / aspect);
@@ -303,10 +317,16 @@ export async function createScene(
       destination = null;
     }
   };
+  let previousStatus: SceneStatus | undefined;
   const keyUp = (event: KeyboardEvent) => keys.delete(gameKey(event));
   const clear = () => {
     keys.clear();
     last = 0;
+  };
+  const visibility = () => {
+    clear();
+    cancelAnimationFrame(animation);
+    if (!document.hidden && !disposed) animation = requestAnimationFrame(tick);
   };
   const click = (event: PointerEvent) => {
     if (document.querySelector('dialog[open]')) return;
@@ -332,10 +352,10 @@ export async function createScene(
   window.addEventListener('keydown', keyDown);
   window.addEventListener('keyup', keyUp);
   window.addEventListener('blur', clear);
-  document.addEventListener('visibilitychange', clear);
+  document.addEventListener('visibilitychange', visibility);
   renderer.domElement.addEventListener('pointerdown', click);
   function tick(time: number) {
-    if (disposed) return;
+    if (disposed || document.hidden) return;
     const dt = last ? Math.min((time - last) / 1000, 0.05) : 0;
     last = time;
     elapsed += dt;
@@ -402,7 +422,6 @@ export async function createScene(
       jump.velocity,
       jump.landing,
     );
-    sunlight.color.set('#fff2cd').lerp(new THREE.Color('#f5b074'), warmth);
     child.position.set(position.x * 1.2 - 60, 40 - position.z * 0.8 + jump.height * scale, 2);
     shadow.position.set(child.position.x + scale * 0.3, 40 - position.z * 0.8 - 0.08, 1);
     const shadowSize = 1 - Math.min(jump.height * 0.12, 0.3);
@@ -458,13 +477,25 @@ export async function createScene(
     }
     if (elapsed - statusTime > 0.12) {
       container.dataset.motion = jump.height > 0 ? 'jumping' : walking ? (running ? 'running' : 'walking') : 'idle';
-      onStatus({
+      const nextStatus: SceneStatus = {
         ...position,
         region,
         walking,
         nearby: closestLandmark(position.x, position.z, region),
         steps: Math.floor(distance * 5),
-      });
+      };
+      if (
+        !previousStatus ||
+        nextStatus.x !== previousStatus.x ||
+        nextStatus.z !== previousStatus.z ||
+        nextStatus.region !== previousStatus.region ||
+        nextStatus.walking !== previousStatus.walking ||
+        nextStatus.nearby !== previousStatus.nearby ||
+        nextStatus.steps !== previousStatus.steps
+      ) {
+        previousStatus = nextStatus;
+        onStatus(nextStatus);
+      }
       statusTime = elapsed;
     }
     renderer.render(scene, camera);
@@ -525,13 +556,14 @@ export async function createScene(
       });
     },
     dispose() {
+      if (disposed) return;
       disposed = true;
       cancelAnimationFrame(animation);
       observer.disconnect();
       window.removeEventListener('keydown', keyDown);
       window.removeEventListener('keyup', keyUp);
       window.removeEventListener('blur', clear);
-      document.removeEventListener('visibilitychange', clear);
+      document.removeEventListener('visibilitychange', visibility);
       renderer.domElement.removeEventListener('pointerdown', click);
       geo.dispose();
       dustGeo.dispose();

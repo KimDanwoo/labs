@@ -16,15 +16,16 @@ export function createChild(atlas: THREE.Texture) {
     source.width,
     source.height,
   );
-  const width = 320,
-    height = 512,
-    baseline = 499;
+  // Source cells are about 150 x 250: larger canvases only upscale the same pixels.
+  const width = 160,
+    height = 256,
+    baseline = 249.5;
   // One shared scale preserves proportions and avoids frame-by-frame size pulsing.
   const maxRadius = Math.max(...extracted.map((f) => Math.max(f.anchorX, f.width - f.anchorX)));
   const scale = Math.min(
     height / (source.height / 4),
-    (width / 2 - 12) / maxRadius,
-    (baseline - 12) / Math.max(...extracted.map((f) => f.height)),
+    (width / 2 - 6) / maxRadius,
+    (baseline - 6) / Math.max(...extracted.map((f) => f.height)),
   );
   const frames = extracted.map((f, index) => {
     const cell = document.createElement('canvas');

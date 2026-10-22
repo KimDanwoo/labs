@@ -6,6 +6,7 @@ import {
   WORLDS,
   canWalk,
   closestLandmark,
+  distanceToSegment,
   findRoute,
   movePlayer,
   nextRegionStep,
@@ -101,5 +102,25 @@ test('bridge collision stays between painted railings, including diagonal input'
   for (const dz of [-20, 20]) {
     const next = movePlayer({ x: 50, z: 47.7 }, 8, dz, 'river');
     assert.ok(next.z >= 46 && next.z <= 49);
+  }
+});
+
+test('cached collision matches the authored lane geometry throughout all six maps', () => {
+  for (const region of Object.keys(WORLDS) as Region[]) {
+    const world = WORLDS[region];
+    for (let x = 0.17; x <= 100; x += 0.7) {
+      for (let z = 28.13; z <= 100; z += 0.7) {
+        const inBounds = x >= 3 && x <= 97 && z >= 30 && z <= 98;
+        const expected =
+          inBounds &&
+          (world.areas?.some((a) => x >= a.minX && x <= a.maxX && z >= a.minZ && z <= a.maxZ) ||
+            world.routes.some((route) => {
+              const a = world.nodes.find((n) => n.id === route.a)!;
+              const b = world.nodes.find((n) => n.id === route.b)!;
+              return distanceToSegment({ x, z }, a, b) <= route.width;
+            }));
+        assert.equal(canWalk(x, z, region), Boolean(expected), `${region}: ${x},${z}`);
+      }
+    }
   }
 });
