@@ -946,6 +946,9 @@ dialog::backdrop {
   }
 }
 @media (max-height: 550px) {
+  .walk {
+    min-height: 0;
+  }
   .title-block {
     top: 100px;
   }
@@ -1516,6 +1519,10 @@ dialog::backdrop {
   pointer-events: none;
 }
 @media (max-width: 700px), (any-pointer: coarse) {
+  .interact {
+    top: max(150px, calc(env(safe-area-inset-top) + 135px));
+    bottom: auto;
+  }
   .mobile-controls {
     display: flex;
     position: fixed;
@@ -1532,6 +1539,9 @@ dialog::backdrop {
   }
 }
 @media (max-height: 550px) and (any-pointer: coarse) {
+  .interact {
+    top: max(76px, calc(env(safe-area-inset-top) + 60px));
+  }
   .mobile-controls {
     bottom: max(52px, calc(env(safe-area-inset-bottom) + 35px));
   }

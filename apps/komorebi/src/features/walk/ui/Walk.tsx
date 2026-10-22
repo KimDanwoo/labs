@@ -2,6 +2,7 @@
 
 import { Joystick } from './Joystick';
 
+import { getWorldPortals } from '@shared/world/portals';
 import { LANDMARKS, SPAWN, WORLDS, type Landmark } from '@shared/world/world';
 import { useEffect, useRef, useState } from 'react';
 import { createAmbience } from '../lib/audio';
@@ -64,6 +65,7 @@ function Icon({ name }: { name: IconName }) {
 }
 
 const STORAGE_KEY = 'komorebi-discoveries-v1';
+const CONTROLS_SEEN_KEY = 'komorebi-controls-seen-v1';
 function readDiscoveries(): string[] {
   try {
     const parsed: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
@@ -97,6 +99,7 @@ export function Walk() {
   const [toast, setToast] = useState('');
   const [sprint, setSprint] = useState(false);
   const [started, setStarted] = useState(false);
+  const [showControlsHint, setShowControlsHint] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -127,6 +130,19 @@ export function Walk() {
       if (toastTimer.current) clearTimeout(toastTimer.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    try {
+      if (localStorage.getItem(CONTROLS_SEEN_KEY)) return;
+      localStorage.setItem(CONTROLS_SEEN_KEY, '1');
+    } catch {
+      /* Show the introduction for this visit when storage is unavailable. */
+    }
+    setShowControlsHint(true);
+    const timer = setTimeout(() => setShowControlsHint(false), 8000);
+    return () => clearTimeout(timer);
+  }, [ready]);
 
   useEffect(() => {
     engine.current?.setEvening(evening);
@@ -280,7 +296,7 @@ export function Walk() {
 
       {!started && ready && (
         <div className="start-hint">
-          <span className="hint-spark">✧</span> 어디로 가 볼까? 이동 패드를 끌거나 길을 눌러 봐!{' '}
+          <span className="hint-spark">✧</span> 어디로 가 볼까? 길을 눌러 걸어 보고, 길 끝을 넘어 이웃 마을로 가 봐!{' '}
           <span className="hint-spark">✧</span>
         </div>
       )}
@@ -303,22 +319,24 @@ export function Walk() {
             <strong>{status.nearby?.short ?? WORLDS[status.region].name}</strong>
           </div>
         </div>
-        <div className="keyboard-help">
-          <span>
-            <kbd>W</kbd>
-            <span className="key-row">
-              <kbd>A</kbd>
-              <kbd>S</kbd>
-              <kbd>D</kbd>
+        {showControlsHint && !started && (
+          <div className="keyboard-help">
+            <span>
+              <kbd>W</kbd>
+              <span className="key-row">
+                <kbd>A</kbd>
+                <kbd>S</kbd>
+                <kbd>D</kbd>
+              </span>
             </span>
-          </span>
-          <span className="control-copy">방향키 / 길 클릭</span>
-          <i />
-          <kbd className="wide-key">Shift</kbd>
-          <span className="control-copy">달리기</span>
-          <kbd className="wide-key">Space</kbd>
-          <span className="control-copy">점프</span>
-        </div>
+            <span className="control-copy">방향키 / 길 클릭</span>
+            <i />
+            <kbd className="wide-key">Shift</kbd>
+            <span className="control-copy">전력 질주</span>
+            <kbd className="wide-key">Space</kbd>
+            <span className="control-copy">점프</span>
+          </div>
+        )}
         <button className="journal-button" onClick={() => mapRef.current?.showModal()}>
           <span className="journal-dots">
             {LANDMARKS.map((p) => (
@@ -347,7 +365,7 @@ export function Walk() {
             점프 ↑
           </button>
           <button className="run-button" aria-pressed={sprint} onClick={() => setSprint((v) => !v)}>
-            {sprint ? '걷기' : '달리기'}
+            {sprint ? '달리기로 전환' : '전력 질주'}
           </button>
         </div>
       </div>
@@ -427,6 +445,14 @@ export function Walk() {
               </g>
             );
           })}
+          {getWorldPortals(status.region).map((portal) => (
+            <g key={portal.node} transform={`translate(${mapX(portal.center.x)}, ${mapY(portal.center.z)})`}>
+              <title>{`${portal.label} 출구`}</title>
+              <text textAnchor="middle" dominantBaseline="central" fill="#47745b" fontSize="10">
+                {portal.label}
+              </text>
+            </g>
+          ))}
           <circle cx={mapX(mapPosition.x)} cy={mapY(mapPosition.z)} r="10" fill="#e99b4e" opacity="0.4" />
           <circle
             cx={mapX(mapPosition.x)}

@@ -47,11 +47,14 @@ test('jump has a consistent apex, cannot double-jump, and lands back at ground h
     assert.ok(startJump(jump));
     assert.equal(startJump(jump), false);
     let highest = 0;
+    let airborneFrames = 0;
     for (let i = 0; i < fps; i++) {
       advanceJump(jump, 1 / fps);
       highest = Math.max(highest, jump.height);
+      if (jump.height > 0) airborneFrames++;
     }
-    assert.ok(Math.abs(highest - 2.25) < 0.01);
+    assert.ok(Math.abs(highest - 0.8) < 0.01);
+    assert.ok(Math.abs(airborneFrames / fps - 0.4) <= 1 / fps + 1e-8);
     assert.equal(jump.height, 0);
     assert.equal(jump.velocity, 0);
     assert.ok(startJump(jump));

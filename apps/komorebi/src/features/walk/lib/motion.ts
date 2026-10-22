@@ -37,13 +37,9 @@ export function solveLeg(forward: number, lift: number, hipHeight = 1.62) {
   const down = hipHeight - 0.24 - lift;
   const distance = Math.min(upper + lower - 0.001, Math.hypot(down, forward));
   const knee = Math.acos(
-    Math.max(
-      -1,
-      Math.min(1, (distance * distance - upper * upper - lower * lower) / (2 * upper * lower)),
-    ),
+    Math.max(-1, Math.min(1, (distance * distance - upper * upper - lower * lower) / (2 * upper * lower))),
   );
-  const hip =
-    Math.atan2(-forward, down) - Math.atan2(lower * Math.sin(knee), upper + lower * Math.cos(knee));
+  const hip = Math.atan2(-forward, down) - Math.atan2(lower * Math.sin(knee), upper + lower * Math.cos(knee));
   return { hip, knee, ankle: -hip - knee };
 }
 
@@ -53,15 +49,15 @@ export function createJump(): JumpMotion {
 }
 export function startJump(jump: JumpMotion) {
   if (jump.height > 0 || jump.velocity > 0) return false;
-  jump.velocity = 12;
+  jump.velocity = 8;
   jump.landing = 0;
   return true;
 }
 export function advanceJump(jump: JumpMotion, dt: number) {
   jump.landing *= Math.exp(-dt * 12);
   if (jump.height > 0 || jump.velocity > 0) {
-    jump.height += jump.velocity * dt - 16 * dt * dt;
-    jump.velocity -= 32 * dt;
+    jump.height += jump.velocity * dt - 20 * dt * dt;
+    jump.velocity -= 40 * dt;
     if (jump.height <= 0 && jump.velocity < 0) {
       jump.height = 0;
       jump.velocity = 0;

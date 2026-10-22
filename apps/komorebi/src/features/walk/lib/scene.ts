@@ -1,9 +1,12 @@
+import { FOREGROUNDS, isForegroundInFront } from '@shared/world/foreground';
+import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '@shared/world/portals';
 import {
   LANDMARKS,
   SPAWN,
   WORLDS,
   canWalk,
   closestLandmark,
+  createSlideMotion,
   findRoute,
   movePlayer,
   nextRegionStep,
@@ -13,9 +16,13 @@ import {
 } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
+import { constrainCameraAxis } from './cameraBounds';
 import { createChild } from './child';
 import { gameKey } from './input';
 import { advanceJump, createJump, startJump } from './motion';
+import { characterScale } from './perspective';
+import { createPortals } from './portals';
+import { nextRenderTime, renderPixelRatio, shouldRenderFrame } from './renderBudget';
 
 export type SceneStatus = Point & {
   region: Region;
@@ -44,7 +51,7 @@ export async function createScene(
   const regions = Object.keys(WORLDS) as Region[];
   // Load concurrently, but settle every request before cleaning up a failed load.
   const results = await Promise.allSettled(
-    [...regions.map((region) => WORLDS[region].image), '/art/child-walk-atlas.webp'].map((url) =>
+    [...regions.map((region) => WORLDS[region].image), '/art/child-motion-v2-ready.webp'].map((url) =>
       loader.loadAsync(url),
     ),
   );
@@ -80,8 +87,7 @@ export async function createScene(
     throw error;
   }
   // Cap fill rate on touch devices without changing the CSS viewport.
-  const pixelRatioLimit = window.matchMedia('(pointer: coarse)').matches ? 1.5 : 2;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioLimit));
+  const touchDevice = window.matchMedia('(pointer: coarse)').matches;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor('#1b352b');
   renderer.domElement.setAttribute('aria-label', '햇빛이 비치는 시골길. 길을 클릭하거나 방향키를 눌러 걸어 보세요.');
@@ -110,7 +116,9 @@ export async function createScene(
         vec3 c=tex.rgb;
         float blue=step(c.r*1.35,c.b)*step(c.g*.92,c.b);
         float waterMask=(1.-smoothstep(.45,.65,uv.y))*smoothstep(.55,.7,uv.x)*blue;
-        c+=waterMask*pow(max(0.,sin(uv.x*550.+uv.y*140.+time*1.2)),26.)*.035;
+        float ripple=sin(uv.y*700.+sin(uv.x*80.+time*.2)*2.+time*1.2);
+        float sparkle=smoothstep(.65,.95,sin(uv.x*240.+sin(uv.y*80.)*4.-time*.4));
+        c+=waterMask*pow(max(0.,ripple),24.)*sparkle*.018;
         vec3 warm=c*vec3(1.09,.79,.67)+vec3(.025,.005,.018);
         c=mix(c,warm,evening*.65);
         gl_FragColor=vec4(c*fade,1.);
@@ -121,6 +129,31 @@ export async function createScene(
   scene.add(new THREE.Mesh(geo, background));
   const child = character.group;
   scene.add(child);
+  // Group order sorts before mesh order: keep the group at the scene default
+  // so the foreground can render after the character's individual sprites.
+  child.children.forEach((part) => {
+    part.renderOrder = 4;
+  });
+  // Reuse the painting shader and its live uniforms so lighting and transitions match.
+  const foregroundMaterial = background.clone();
+  foregroundMaterial.uniforms = background.uniforms;
+  foregroundMaterial.transparent = true;
+  foregroundMaterial.depthTest = false;
+  foregroundMaterial.depthWrite = false;
+  const foregrounds = FOREGROUNDS.map((layer) => {
+    const shape = new THREE.Shape(
+      layer.outline.map(([x, y]) => new THREE.Vector2((x / 1536) * 120 - 60, 40 - (y / 1024) * 80)),
+    );
+    const geometry = new THREE.ShapeGeometry(shape);
+    const vertices = geometry.getAttribute('position');
+    const uv = geometry.getAttribute('uv');
+    for (let i = 0; i < vertices.count; i++) uv.setXY(i, (vertices.getX(i) + 60) / 120, (vertices.getY(i) + 40) / 80);
+    const mesh = new THREE.Mesh(geometry, foregroundMaterial);
+    mesh.renderOrder = 4.5;
+    mesh.visible = false;
+    scene.add(mesh);
+    return { ...layer, mesh };
+  });
   const shadowTexture = canvasTexture(128, 64, (c) => {
     const g = c.createRadialGradient(64, 32, 2, 64, 32, 53);
     g.addColorStop(0, '#17332b77');
@@ -189,39 +222,7 @@ export async function createScene(
     scene.add(s);
     return s;
   });
-  const exitSigns: { region: Region; sprite: THREE.Sprite }[] = [];
-  const exitMaterials: THREE.SpriteMaterial[] = [];
-  for (const [key, world] of Object.entries(WORLDS))
-    for (const portal of world.portals) {
-      const node = world.nodes.find((n) => n.id === portal.node)!;
-      const texture = canvasTexture(256, 80, (c) => {
-        c.fillStyle = '#fff8dfed';
-        c.beginPath();
-        c.roundRect(4, 8, 248, 64, 18);
-        c.fill();
-        c.strokeStyle = '#9b9e78';
-        c.lineWidth = 2;
-        c.stroke();
-        c.fillStyle = '#536a48';
-        c.font = 'bold 27px sans-serif';
-        c.textAlign = 'center';
-        c.textBaseline = 'middle';
-        c.fillText(`${node.x < 15 ? '← ' : ''}${portal.label}${node.x > 85 ? ' →' : node.z > 90 ? ' ↓' : ''}`, 128, 42);
-      });
-      loaded.push(texture);
-      const material = new THREE.SpriteMaterial({
-        map: texture,
-        transparent: true,
-        depthTest: false,
-      });
-      exitMaterials.push(material);
-      const sprite = new THREE.Sprite(material);
-      sprite.scale.set(8, 2.5, 1);
-      sprite.position.set(THREE.MathUtils.clamp(node.x, 8, 92) * 1.2 - 60, 40 - Math.min(node.z, 91) * 0.8 + 2.5, 1);
-      sprite.renderOrder = 2;
-      scene.add(sprite);
-      exitSigns.push({ region: key as Region, sprite });
-    }
+  const portalVisuals = createPortals(scene);
   const targetMat = new THREE.SpriteMaterial({
     map: markerMap,
     color: '#fff9cf',
@@ -240,18 +241,20 @@ export async function createScene(
     destination: string | null = null;
   let elapsed = 0,
     last = 0,
+    nextFrame = 0,
     statusTime = -1,
     distance = 0,
     animation = 0,
     disposed = false,
     evening = false,
     warmth = 0,
-    transition = 1,
-    portalCooldown = 0;
+    transition = 1;
+  let blockedPortal: WorldPortal | null = null;
   let heading = 0,
     moveSpeed = 0,
     touchSprint = false;
   const jump = createJump();
+  const slide = createSlideMotion();
   const keys = new Set<string>();
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let halfWidth = 60,
@@ -269,6 +272,7 @@ export async function createScene(
     camera.top = halfHeight;
     camera.bottom = -halfHeight;
     camera.updateProjectionMatrix();
+    renderer.setPixelRatio(renderPixelRatio(w, h, window.devicePixelRatio, touchDevice));
     renderer.setSize(w, h);
   };
   const observer = new ResizeObserver(resize);
@@ -280,12 +284,8 @@ export async function createScene(
     if (!point) return;
     if (point.region === region) route = findRoute(position, point, region);
     else {
-      const portal = WORLDS[region].portals.find((p) => p.to === nextRegionStep(region, point.region))!;
-      route = findRoute(
-        position,
-        WORLDS[region].nodes.find((n) => n.id === portal.node)!,
-        region,
-      );
+      const portal = getWorldPortals(region).find((p) => p.to === nextRegionStep(region, point.region))!;
+      route = findRoute(position, portal.center, region);
     }
   };
   const switchRegion = (next: Region, spawn: Point) => {
@@ -293,11 +293,13 @@ export async function createScene(
     jump.velocity = 0;
     jump.landing = 0;
     region = next;
+    slide.direction = null;
+    slide.input = null;
     position = { ...spawn };
     route = [];
     background.uniforms.map!.value = plates[region];
     transition = reducedMotion ? 1 : 0.25;
-    portalCooldown = 2.5;
+    blockedPortal = portalAt(position, region);
     plan();
     container.dataset.region = next;
   };
@@ -322,6 +324,7 @@ export async function createScene(
   const clear = () => {
     keys.clear();
     last = 0;
+    nextFrame = 0;
   };
   const visibility = () => {
     clear();
@@ -340,6 +343,12 @@ export async function createScene(
       ),
       camera,
     );
+    const portal = portalVisuals.pick(ray, region);
+    if (portal) {
+      destination = null;
+      route = findRoute(position, portal.center, region);
+      return;
+    }
     const v = new THREE.Vector3();
     if (!ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), v)) return;
     const point = { x: (v.x + 60) / 1.2, z: (40 - v.y) / 0.8 };
@@ -348,7 +357,7 @@ export async function createScene(
     route = findRoute(position, point, region);
   };
   renderer.domElement.tabIndex = 0;
-  renderer.domElement.setAttribute('aria-label', '산책 게임. 방향키 또는 WASD로 이동, Shift로 달리기, Space로 점프');
+  renderer.domElement.setAttribute('aria-label', '산책 게임. 방향키 또는 WASD로 이동, Shift로 전력 질주, Space로 점프');
   window.addEventListener('keydown', keyDown);
   window.addEventListener('keyup', keyUp);
   window.addEventListener('blur', clear);
@@ -356,67 +365,75 @@ export async function createScene(
   renderer.domElement.addEventListener('pointerdown', click);
   function tick(time: number) {
     if (disposed || document.hidden) return;
+    const active = keys.size > 0 || route.length > 0 || jump.height > 0 || moveSpeed > 0.05;
+    if (!shouldRenderFrame(time, nextFrame, active)) {
+      animation = requestAnimationFrame(tick);
+      return;
+    }
+    nextFrame = active ? time : nextRenderTime(Math.max(time, nextFrame), nextFrame);
     const dt = last ? Math.min((time - last) / 1000, 0.05) : 0;
     last = time;
     elapsed += dt;
-    portalCooldown -= dt;
     const paused = !!document.querySelector('dialog[open]') || document.hidden;
     if (paused) keys.clear();
     else advanceJump(jump, dt);
     let dx = Number(keys.has('d') || keys.has('arrowright')) - Number(keys.has('a') || keys.has('arrowleft'));
     let dz = Number(keys.has('s') || keys.has('arrowdown')) - Number(keys.has('w') || keys.has('arrowup'));
     const keyboardWalking = Math.hypot(dx, dz) > 0;
-    if (!paused && !keyboardWalking && route.length) {
-      const next = route[0]!;
-      const d = Math.hypot(next.x - position.x, next.z - position.z);
-      if (d < 0.45) {
-        route.shift();
-        if (!route.length && destination && LANDMARKS.find((p) => p.id === destination)?.region === region)
-          destination = null;
-      } else {
-        dx = (next.x - position.x) / d;
-        dz = (next.z - position.z) / d;
+    if (!keyboardWalking || paused) {
+      slide.direction = null;
+      slide.input = null;
+    }
+    let routeDistance = Infinity;
+    if (!paused && !keyboardWalking) {
+      // Reach bends before turning, and consume reached waypoints without pausing a frame.
+      while (route.length && Math.hypot(route[0]!.x - position.x, route[0]!.z - position.z) < 0.02) route.shift();
+      if (route.length) {
+        const next = route[0]!;
+        routeDistance = Math.hypot(next.x - position.x, next.z - position.z);
+        dx = (next.x - position.x) / routeDistance;
+        dz = (next.z - position.z) / routeDistance;
+      } else if (destination && LANDMARKS.find((p) => p.id === destination)?.region === region) {
+        destination = null;
       }
     }
-    const running = keys.has('shift') || touchSprint;
+    const sprinting = keys.has('shift') || touchSprint;
     const magnitude = Math.hypot(dx, dz);
     let walking = magnitude > 0 && !paused;
     let frameTravel = 0;
-    moveSpeed = THREE.MathUtils.damp(moveSpeed, walking ? (running ? 24 : 14) : 0, 24, dt);
+    moveSpeed = THREE.MathUtils.damp(moveSpeed, walking ? (sprinting ? 36 : 24) : 0, 24, dt);
     if (walking) {
       dx /= magnitude;
       dz /= magnitude;
-      // Perspective: distant steps cover less picture space than foreground steps.
+      // Keep distant paths responsive while retaining perspective in the gait.
       const perspective = THREE.MathUtils.clamp((position.z - 15) / 70, 0.45, 1);
-      const speed = moveSpeed * perspective;
-      const next = movePlayer(position, dx * speed * dt, dz * speed * dt, region);
+      const speed = moveSpeed * Math.max(perspective, 0.75);
+      const step = Math.min(speed * dt, routeDistance);
+      const next = movePlayer(position, dx * step, dz * step, region, keyboardWalking ? slide : undefined);
       const moved = Math.hypot(next.x - position.x, next.z - position.z);
       distance += moved;
       frameTravel = moved / Math.max(perspective, 0.45);
       walking = moved > 0.0001;
+      if (walking) heading = Math.atan2(next.x - position.x, next.z - position.z);
       position = next;
-      if (walking) heading = Math.atan2(dx, dz);
       if (moved < 0.0001 && route.length && dt > 0) {
         route = [];
         destination = null;
       }
     }
-    if (!paused && portalCooldown <= 0)
-      for (const portal of WORLDS[region].portals) {
-        const point = WORLDS[region].nodes.find((n) => n.id === portal.node)!;
-        if (Math.hypot(position.x - point.x, position.z - point.z) < 1.6) {
-          switchRegion(portal.to, portal.spawn);
-          break;
-        }
-      }
-    const scale = THREE.MathUtils.clamp((position.z - 15) / 70, 0.45, 1);
+    if (!paused) {
+      if (blockedPortal && !isInsidePortal(position, blockedPortal)) blockedPortal = null;
+      const portal = portalAt(position, region);
+      if (portal && portal !== blockedPortal) switchRegion(portal.to, portal.spawn);
+    }
+    const scale = characterScale(position.z);
     child.scale.setScalar(scale * 1.65);
     character.update(
       paused ? 0 : dt,
       jump.height > 0 ? frameTravel * 0.2 : frameTravel,
       heading,
       walking,
-      running,
+      true,
       reducedMotion,
       jump.height,
       jump.velocity,
@@ -427,36 +444,37 @@ export async function createScene(
     const shadowSize = 1 - Math.min(jump.height * 0.12, 0.3);
     shadow.scale.set(6.3 * scale * shadowSize, 1.8 * scale * shadowSize, 1);
     shadowMat.opacity = 1 - Math.min(jump.height * 0.22, 0.55);
+    foregrounds.forEach((layer) => {
+      layer.mesh.visible = isForegroundInFront(layer, position, region);
+    });
     const maxX = Math.max(0, 60 - halfWidth),
       maxY = Math.max(0, 40 - halfHeight);
     const cameraX = THREE.MathUtils.clamp(child.position.x * (halfWidth < 35 ? 1 : 0), -maxX, maxX);
     const cameraY = THREE.MathUtils.clamp(Math.min(0, child.position.y + halfHeight - 7), -maxY, maxY);
     camera.position.x = THREE.MathUtils.damp(camera.position.x, cameraX, reducedMotion ? 100 : 3, dt);
     camera.position.y = THREE.MathUtils.damp(camera.position.y, cameraY, reducedMotion ? 100 : 3, dt);
-    // Constrain by the character's head/feet, not only its ground position.
-    // The old lower-edge-only camera could crop the hood on narrow screens.
-    const visibleHalfHeight = halfHeight * 0.98;
-    const visibleHalfWidth = halfWidth * 0.98;
     const characterHeight = 10.4 * scale * 1.65;
-    const characterHalfWidth = 3.25 * scale * 1.65;
-    camera.position.x = THREE.MathUtils.clamp(
+    const characterHalfWidth = 3.9 * scale * 1.65;
+    camera.position.x = constrainCameraAxis(
       camera.position.x,
-      child.position.x + characterHalfWidth - visibleHalfWidth,
-      child.position.x - characterHalfWidth + visibleHalfWidth,
+      halfWidth,
+      60,
+      child.position.x - characterHalfWidth,
+      child.position.x + characterHalfWidth,
     );
-    camera.position.y = THREE.MathUtils.clamp(
+    camera.position.y = constrainCameraAxis(
       camera.position.y,
-      child.position.y + characterHeight - visibleHalfHeight,
-      child.position.y - 1 + visibleHalfHeight,
+      halfHeight,
+      40,
+      child.position.y - 1,
+      child.position.y + characterHeight,
     );
     markers.forEach((marker, i) => {
       const point = LANDMARKS[i]!;
       marker.visible = point.region === region;
       marker.position.y = 40 - point.z * 0.8 + 2 + (reducedMotion ? 0 : Math.sin(elapsed * 1.5 + i) * 0.17);
     });
-    exitSigns.forEach((sign) => {
-      sign.sprite.visible = sign.region === region;
-    });
+    portalVisuals.update(region);
     targetMarker.visible = route.length > 0;
     if (route.length) {
       const target = route[route.length - 1]!;
@@ -476,7 +494,7 @@ export async function createScene(
       dustGeo.attributes.position!.needsUpdate = true;
     }
     if (elapsed - statusTime > 0.12) {
-      container.dataset.motion = jump.height > 0 ? 'jumping' : walking ? (running ? 'running' : 'walking') : 'idle';
+      container.dataset.motion = jump.height > 0 ? 'jumping' : walking ? (sprinting ? 'sprinting' : 'running') : 'idle';
       const nextStatus: SceneStatus = {
         ...position,
         region,
@@ -565,9 +583,12 @@ export async function createScene(
       window.removeEventListener('blur', clear);
       document.removeEventListener('visibilitychange', visibility);
       renderer.domElement.removeEventListener('pointerdown', click);
+      foregrounds.forEach(({ mesh }) => mesh.geometry.dispose());
+      foregroundMaterial.dispose();
+      portalVisuals.dispose();
       geo.dispose();
       dustGeo.dispose();
-      [background, shadowMat, dustMat, targetMat, ...markerMats, ...exitMaterials].forEach((m) => m.dispose());
+      [background, shadowMat, dustMat, targetMat, ...markerMats].forEach((m) => m.dispose());
       loaded.forEach((t) => t.dispose());
       character.dispose();
       renderer.dispose();
