@@ -21,11 +21,17 @@ export function useRunnerControls(): void {
       if (action) setRunnerAction(action, false);
     };
 
+    const handleVisibility = () => {
+      if (document.hidden) resetRunnerInput();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     window.addEventListener('blur', resetRunnerInput);
 
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      resetRunnerInput();
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('blur', resetRunnerInput);
