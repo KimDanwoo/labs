@@ -10,7 +10,9 @@ import { Canvas } from '@react-three/fiber';
 import { CAMERA, FOG, SCENE_COLORS, SUN, type FogQuality } from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
 import { Suspense, useState } from 'react';
+import { PCFShadowMap } from 'three';
 import { ReadySignal } from './ReadySignal';
+import { RideSun } from './RideSun';
 
 const DPR = {
   desktop: { max: 1.5, min: 1 },
@@ -29,6 +31,7 @@ export function SceneCanvas() {
     <Canvas
       className="cursor-grab"
       dpr={dpr}
+      shadows={{ type: PCFShadowMap }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{
         fov: CAMERA.fov,
@@ -41,7 +44,7 @@ export function SceneCanvas() {
       <fog attach="fog" args={[SCENE_COLORS.fog, fog.near, fog.far]} />
 
       <hemisphereLight color={SCENE_COLORS.ambient} groundColor={SCENE_COLORS.grass} intensity={SUN.ambientIntensity} />
-      <directionalLight color={SCENE_COLORS.sunLight} intensity={SUN.intensity} position={SUN.position} />
+      <RideSun mobile={coarse} />
 
       <Suspense fallback={null}>
         <Scenery />

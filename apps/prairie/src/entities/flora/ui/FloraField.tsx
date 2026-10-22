@@ -97,6 +97,11 @@ export function FloraField() {
       for (let dz = -viewRadius; dz <= viewRadius; dz += 1) items.push(...floraInCell(cx + dx, cz + dz));
     }
 
+    // 넓어진 시야에서도 가까운 식생부터 예산을 배정한다.
+    const centerX = cx * FLORA.cell;
+    const centerZ = cz * FLORA.cell;
+    items.sort((a, b) => (a.x - centerX) ** 2 + (a.z - centerZ) ** 2 - ((b.x - centerX) ** 2 + (b.z - centerZ) ** 2));
+
     let trunks = 0;
     let trees = 0;
     let shadows = 0;

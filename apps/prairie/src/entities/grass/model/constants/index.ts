@@ -38,8 +38,8 @@ export function grassKeepAt(distance: number): number {
 export const GRASS_QUALITY = {
   desktop: {
     rings: [
-      { maxRing: 2, blades: 3000, segments: 3 },
-      { maxRing: 4, blades: 1400, segments: 2 },
+      { maxRing: 2, blades: 2300, segments: 3 },
+      { maxRing: 4, blades: 1200, segments: 2 },
       { maxRing: 8, blades: 500, segments: 1 },
     ] as GrassLodRing[],
     fadeNear: 60,
@@ -47,8 +47,8 @@ export const GRASS_QUALITY = {
   },
   mobile: {
     rings: [
-      { maxRing: 1, blades: 1600, segments: 2 },
-      { maxRing: 2, blades: 1250, segments: 1 },
+      { maxRing: 1, blades: 1100, segments: 2 },
+      { maxRing: 2, blades: 900, segments: 1 },
       { maxRing: 4, blades: 800, segments: 1 },
     ] as GrassLodRing[],
     fadeNear: 20,
@@ -77,14 +77,14 @@ export function makeBladeGeometry(segments: number): BufferGeometry {
   const detail: number[] = [];
   let leaves = 2;
   if (segments === 2) leaves = 4;
-  if (segments >= 3) leaves = 9;
+  if (segments >= 3) leaves = 5;
   for (let leaf = 0; leaf < leaves; leaf += 1) {
     const angle = leaf * 1.9;
-    const height = 0.58 + (Math.sin(leaf * 2.4) * 0.5 + 0.5) * 0.2;
+    const height = 0.32 + (Math.sin(leaf * 2.4) * 0.5 + 0.5) * 0.22;
     const offset = positions.length / 3;
     for (let i = 0; i <= segments; i += 1) {
       const t = i / segments;
-      const halfWidth = 0.055 * (1 - t) * (0.7 + Math.sin(t * Math.PI) * 0.6);
+      const halfWidth = 0.028 * (1 - t) * (0.7 + Math.sin(t * Math.PI) * 0.6);
       const bend = (leaf === 0 ? 0.26 : 0.2) * t * t;
       for (const side of [-1, 1]) {
         const x = side * halfWidth;
@@ -94,7 +94,7 @@ export function makeBladeGeometry(segments: number): BufferGeometry {
           -x * Math.sin(angle) - bend * Math.cos(angle),
         );
         uvs.push(side === -1 ? 0 : 1, t);
-        detail.push(leaf < 4 ? 0 : 1);
+        detail.push(leaf < 2 ? 0 : 1);
       }
     }
     for (let i = 0; i < segments; i += 1) {
@@ -124,7 +124,7 @@ export const GUST = {
 } as const;
 
 // 말 주변 잔디가 말을 피해 눕는 반경과 세기.
-const RUNNER_PUSH = { radius: 1.1, bend: 0.55 } as const;
+const RUNNER_PUSH = { radius: 2.4, bend: 0.85 } as const;
 
 // 바람: 끝(uv.y=1)일수록 더 흔들리고, 완만한 돌풍(gust)으로 세기가 출렁인다.
 // blade별 위치 해시로 색·바람 위상을 흩어 군집감을 준다.
@@ -205,7 +205,7 @@ export const GRASS_FRAGMENT_SHADER = `
   void main() {
     // SCENE_COLORS의 밑동·끝 색을 Three Color가 선형 공간으로 변환해 전달한다.
     float dry = smoothstep(0.7, 0.95, sin(vWorldXZ.x * 0.11 + vWorldXZ.y * 0.07) * 0.5 + 0.5);
-    vec3 tip = mix(uGrassTip, uGrassDry, dry * 0.5);
+    vec3 tip = mix(uGrassTip, uGrassDry, dry * 0.28);
     vec3 col = mix(uGrassBase, tip, pow(vFrc, 0.75)) * uBrightness * vTint;
 
     // 광역 색 얼룩(초원의 옅고 진한 패치)

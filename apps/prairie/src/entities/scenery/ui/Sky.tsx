@@ -26,7 +26,7 @@ void main() {
   vec2 p = d.xz / (elevation + 0.24) * 0.13;
   float noise = texture2D(uClouds, p).r * 0.75 + texture2D(uClouds, p * 2.7 + 0.21).r * 0.25;
   float cloud = smoothstep(0.43, 0.64, noise) * smoothstep(0.02, 0.16, elevation);
-  color = mix(color, mix(vec3(0.82, 0.87, 0.89), vec3(1.0, 0.97, 0.88), pow(sun, 6.0)), cloud * 0.64);
+  color = mix(color, mix(vec3(0.82, 0.87, 0.89), vec3(1.0, 0.97, 0.88), pow(sun, 6.0)), cloud * 0.42);
   float disc = smoothstep(cos(0.012), cos(0.009), sun);
   color += vec3(1.0, 0.77, 0.43) * (pow(sun, 360.0) * 0.32 + disc * 1.8) * (1.0 - cloud * 0.8);
   gl_FragColor = vec4(color, 1.0);
@@ -50,7 +50,13 @@ export function Sky() {
   useFrame(({ camera }) => meshRef.current?.position.copy(camera.position));
   return (
     <>
-      <Environment background backgroundBlurriness={0.025} path="/assets/cubeMap/" files={CUBE_FACES} />
+      <Environment
+        environmentIntensity={0.3}
+        background
+        backgroundBlurriness={0.025}
+        path="/assets/cubeMap/"
+        files={CUBE_FACES}
+      />
       <mesh ref={meshRef} renderOrder={-10}>
         <sphereGeometry args={[1100, 32, 16]} />
         <shaderMaterial

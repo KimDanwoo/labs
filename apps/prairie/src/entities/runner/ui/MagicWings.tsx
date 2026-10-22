@@ -29,9 +29,14 @@ export function MagicWings({ anchor }: MagicWingsProps) {
     openRef.current = MathUtils.damp(openRef.current, target, 6, delta);
     const open = openRef.current;
     root.visible = true;
-    phaseRef.current +=
-      MathUtils.lerp(WINGS.flapSpeedAir, WINGS.flapSpeedRising, Math.max(0, runnerState.verticalSpeed / 6)) * delta;
-    const flap = WINGS.openAngleBase + Math.sin(phaseRef.current) * WINGS.flapAmplitude;
+    const rising = MathUtils.smoothstep(runnerState.verticalSpeed, -0.3, 2);
+    const flare =
+      (1 - MathUtils.smoothstep(runnerState.airborneHeight, 0.4, 3)) * (runnerState.verticalSpeed < 0 ? 1 : 0);
+    phaseRef.current += MathUtils.lerp(1.4, WINGS.flapSpeedRising, rising) * delta;
+    const flap =
+      MathUtils.lerp(0.16, WINGS.openAngleBase, rising) +
+      Math.sin(phaseRef.current) * MathUtils.lerp(0.1, WINGS.flapAmplitude, rising) +
+      flare * 0.22;
     const angle = MathUtils.lerp(WINGS.foldedAngle, flap, open);
     const size = MathUtils.lerp(WINGS.foldedScale, 1, open);
     if (leftRef.current) {
@@ -52,13 +57,25 @@ export function MagicWings({ anchor }: MagicWingsProps) {
   return (
     <group ref={rootRef} visible={false}>
       <group ref={leftRef} position={[-rootX, rootY, rootZ]} rotation={[0, 0, 0, 'YXZ']}>
-        <mesh geometry={geometry} scale={[-1, 1, 1]}>
-          <meshLambertMaterial color={WINGS.color} side={DoubleSide} />
+        <mesh castShadow receiveShadow geometry={geometry} scale={[-1, 1, 1]}>
+          <meshPhysicalMaterial
+            color={WINGS.color}
+            side={DoubleSide}
+            roughness={0.65}
+            sheen={0.35}
+            sheenColor="#fff0d6"
+          />
         </mesh>
       </group>
       <group ref={rightRef} position={[rootX, rootY, rootZ]} rotation={[0, 0, 0, 'YXZ']}>
-        <mesh geometry={geometry}>
-          <meshLambertMaterial color={WINGS.color} side={DoubleSide} />
+        <mesh castShadow receiveShadow geometry={geometry}>
+          <meshPhysicalMaterial
+            color={WINGS.color}
+            side={DoubleSide}
+            roughness={0.65}
+            sheen={0.35}
+            sheenColor="#fff0d6"
+          />
         </mesh>
       </group>
     </group>

@@ -1,16 +1,16 @@
 // WebGL 머티리얼 색은 토큰으로 표현 불가 → 파스텔 톤 팔레트를 여기 한곳에 모은다.
 export const SCENE_COLORS = {
-  skyTop: '#85bce0',
-  skyBottom: '#fff0d4',
+  skyTop: '#74abc6',
+  skyBottom: '#f5dfbb',
   // 먼 들판이 대기에 희미해진 색. 잔디 페이드·물·자갈의 원경색이 전부 이 값을 쓴다.
   // 하늘과의 이음은 Haze가 맡으므로 큐브맵 지평선색에 맞출 필요가 없다 — 하늘색이면 잔디 너머가 '하늘 띠'로 읽힌다.
-  fog: '#d1dcc0',
-  sunLight: '#fff0d6',
-  ambient: '#edf4ff',
+  fog: '#c9d2b7',
+  sunLight: '#ffe3b0',
+  ambient: '#afcddd',
   // unlit 지면색 = 잔디 blade가 멀어지며 녹아드는 색. 하상 강둑 블렌드도 이 값.
-  grass: '#668650',
-  grassBase: '#3e5d3b',
-  grassTip: '#bed28a',
+  grass: '#607c49',
+  grassBase: '#304b36',
+  grassTip: '#9eb96e',
   grassDry: '#d3be87',
   waterDeep: '#72b4c7',
   waterShallow: '#bde1e4',
@@ -19,23 +19,23 @@ export const SCENE_COLORS = {
 } as const;
 
 export const WORLD = {
-  groundSize: 900,
-  // fog 깊이는 정점에서 계산돼 삼각형 안에서 선형 보간된다. 900m 평면이 삼각형 2개면 원경이 덜 안개 낀 채
+  groundSize: 1400,
+  // fog 깊이는 정점에서 계산돼 삼각형 안에서 선형 보간된다. 1400m 평면이 삼각형 2개면 원경이 덜 안개 낀 채
   // 대각선 경계가 보이므로(특히 공중에서) 충분히 분할한다.
-  groundSegments: 64,
+  groundSegments: 100,
 } as const;
 
 // 강은 Z축으로 무한한 띠. X로 period마다 반복 → 좌우 어느 쪽으로 달려도 만난다(정면 +Z는 순수 초원).
-// 불변식 period/2 > FOG.far → 화면에 강이 둘 이상 들어오지 않는다(220 > 200) → 평면 한 장으로 충분.
+// 불변식 period/2 > FOG.far → 화면에 강이 둘 이상 들어오지 않는다(400 > 360) → 평면 한 장으로 충분.
 export const RIVER = {
   firstX: 110,
-  period: 440,
+  period: 800,
   // 수면 명목 반폭. HUD의 물속 판정·잔디 기준이며, 하상 프로파일이 이 지점에서 수면과 만나도록 아래 값을 맞춘다(테스트로 고정).
   halfWidth: 16,
   // 수면 밖 강둑(자갈) 폭. 골 전체 반폭 = halfWidth + bankWidth.
   bankWidth: 3.2,
-  // Z 길이는 안개 시야(FOG.far)를 앞뒤로 덮으면 된다(2×200 < 440).
-  length: 440,
+  // Z 길이는 안개 시야(FOG.far)를 앞뒤로 덮으면 된다(2×360 < 800).
+  length: 800,
   // 하상 프로파일: 중앙은 지면 아래 depth까지 파이고, slopeStart부터 골 가장자리까지 완만하게 올라온다.
   depth: 1.8,
   slopeStart: 6.8,
@@ -94,16 +94,16 @@ export function riverBearing(x: number, camYaw: number): RiverBearing {
 }
 
 export const SUN = {
-  position: [-60, 30, 120] as [number, number, number],
-  intensity: 1.8,
-  ambientIntensity: 1.15,
+  position: [-65, 65, -35] as [number, number, number],
+  intensity: 2.6,
+  ambientIntensity: 0.65,
 };
 
 // 기기별 안개. 잔디 blade는 fadeFar에서 지면색에 완전히 녹으므로(데스크톱 66 < 청크 끝 72) 안개가 청크 끝을 가릴 필요는 없다 —
 // 안개는 그 너머 평지를 능선 밑동에 닿기 전에 닫는 역할. 강 불변식: RIVER.period/2 > far, RIVER.length > 2×far.
 export const FOG = {
-  desktop: { near: 50, far: 200 },
-  mobile: { near: 24, far: 90 },
+  desktop: { near: 85, far: 360 },
+  mobile: { near: 36, far: 140 },
 } as const;
 
 export type FogQuality = keyof typeof FOG;
@@ -124,9 +124,9 @@ export const HAZE = {
 // 능선 겹. 먼 겹부터 그린다 — 멀수록 높고 하늘색에 가깝게 바래고(대기 원근), 가까울수록 낮고 짙다.
 // baseY/ampY는 월드 m(원통 반경 1000 기준). cells는 원통 한 바퀴의 노이즈 셀 수(정수 → 이음새 없음).
 export const RIDGES = [
-  { baseY: 30, ampY: 220, cells: 4, seed: 0.17, color: '#c0cfd0' },
-  { baseY: 18, ampY: 140, cells: 7, seed: 0.53, color: '#a0baaa' },
-  { baseY: 10, ampY: 90, cells: 12, seed: 0.81, color: '#829b78' },
+  { baseY: 30, ampY: 180, cells: 9, seed: 0.17, color: '#b6c8ce' },
+  { baseY: 18, ampY: 115, cells: 17, seed: 0.53, color: '#92ada8' },
+  { baseY: 10, ampY: 65, cells: 29, seed: 0.81, color: '#779586' },
 ] as const;
 
 export const CAMERA = {
@@ -135,7 +135,7 @@ export const CAMERA = {
   far: 1200,
   // 말 뒤를 낮게 따라가는 고정 추적 카메라.
   followDistance: 9.5,
-  followHeight: 3.1,
+  followHeight: 3.6,
   // 카메라 자리의 지형 위로 최소 이만큼 띄운다(언덕 뒤에서 땅에 묻히지 않게).
   groundClearance: 2.4,
   // 카메라가 바라보는 지점의 높이(말 몸통) → 말이 화면 중앙에 온다.
