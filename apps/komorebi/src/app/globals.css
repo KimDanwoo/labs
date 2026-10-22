@@ -92,13 +92,7 @@ button:hover {
   pointer-events: none;
   z-index: -1;
   background:
-    linear-gradient(
-      180deg,
-      rgba(245, 245, 220, 0.38),
-      transparent 27%,
-      transparent 70%,
-      rgba(241, 238, 208, 0.3)
-    ),
+    linear-gradient(180deg, rgba(245, 245, 220, 0.38), transparent 27%, transparent 70%, rgba(241, 238, 208, 0.3)),
     linear-gradient(90deg, rgba(245, 242, 217, 0.3), transparent 45%);
 }
 .header {
@@ -1469,4 +1463,80 @@ dialog::backdrop {
 .jump-button:active {
   transform: translateY(2px);
   box-shadow: none;
+}
+
+/* A captured thumbstick allows continuous turns without lifting the finger. */
+.joystick {
+  position: relative;
+  flex: 0 0 128px;
+  width: 128px;
+  height: 128px;
+  border: 2px solid #fff8dfcc;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff9df55, #71836b50);
+  box-shadow:
+    inset 0 2px 12px #35473325,
+    0 4px 20px #35473320;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.joystick-arrows {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 105px;
+  color: #fff9e899;
+  line-height: 1;
+  pointer-events: none;
+}
+.joystick-thumb {
+  position: absolute;
+  left: 38px;
+  top: 38px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff5d9ed;
+  border: 2px solid #fffdf0;
+  box-shadow: 0 3px 8px #364b3d40;
+  pointer-events: none;
+}
+.joystick-label {
+  position: absolute;
+  bottom: -22px;
+  width: 100%;
+  text-align: center;
+  font: 700 11px var(--sans);
+  color: #fffdf0;
+  text-shadow: 0 1px 3px #263d29;
+  pointer-events: none;
+}
+@media (max-width: 700px), (any-pointer: coarse) {
+  .mobile-controls {
+    display: flex;
+    position: fixed;
+    left: max(18px, env(safe-area-inset-left));
+    right: max(18px, env(safe-area-inset-right));
+    bottom: max(88px, calc(env(safe-area-inset-bottom) + 70px));
+    justify-content: space-between;
+    align-items: flex-end;
+    pointer-events: none;
+    z-index: 30;
+  }
+  .action-buttons {
+    gap: 10px;
+  }
+}
+@media (max-height: 550px) and (any-pointer: coarse) {
+  .mobile-controls {
+    bottom: max(52px, calc(env(safe-area-inset-bottom) + 35px));
+  }
+  .joystick {
+    scale: 0.8;
+    transform-origin: bottom left;
+  }
 }
