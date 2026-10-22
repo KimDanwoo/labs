@@ -26,7 +26,7 @@ export function createChild(atlas: THREE.Texture) {
     (width / 2 - 12) / maxRadius,
     (baseline - 12) / Math.max(...extracted.map((f) => f.height)),
   );
-  const frames = extracted.map((f) => {
+  const frames = extracted.map((f, index) => {
     const cell = document.createElement('canvas');
     cell.width = f.width;
     cell.height = f.height;
@@ -34,9 +34,46 @@ export function createChild(atlas: THREE.Texture) {
     const aligned = document.createElement('canvas');
     aligned.width = width;
     aligned.height = height;
-    aligned
-      .getContext('2d')!
-      .drawImage(cell, width / 2 - f.anchorX * scale, baseline - f.height * scale, f.width * scale, f.height * scale);
+    const ctx = aligned.getContext('2d')!;
+    const x = width / 2 - f.anchorX * scale;
+    const y = baseline - f.height * scale;
+    // The sheet's front/back hoods overlap their neighbours. Keep the complete
+    // idle hood for that direction and animate the independently drawn body.
+    // Side profiles do not overlap and retain their original arm/face motion.
+    const row = Math.floor(index / 8);
+    if ((row === 0 || row === 2) && index % 8 !== 0) {
+      const idle = extracted[row * 8]!;
+      const head = document.createElement('canvas');
+      head.width = idle.width;
+      head.height = idle.height;
+      head.getContext('2d')!.putImageData(new ImageData(idle.pixels, idle.width, idle.height), 0, 0);
+      const cut = Math.round(f.height * 0.6);
+      const headCut = Math.round(idle.height * 0.6);
+      ctx.drawImage(
+        cell,
+        0,
+        cut,
+        f.width,
+        f.height - cut,
+        x,
+        y + cut * scale,
+        f.width * scale,
+        (f.height - cut) * scale,
+      );
+      ctx.drawImage(
+        head,
+        0,
+        0,
+        idle.width,
+        headCut,
+        width / 2 - idle.anchorX * scale,
+        y,
+        idle.width * scale,
+        cut * scale,
+      );
+    } else {
+      ctx.drawImage(cell, x, y, f.width * scale, f.height * scale);
+    }
     const texture = new THREE.CanvasTexture(aligned);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.minFilter = texture.magFilter = THREE.LinearFilter;
