@@ -41,6 +41,8 @@ export type StudyTopic = {
 export type StudyDoc = {
   slug: string;
   title: string;
+  /** frontmatter `date: YYYY-MM-DD`. 목록 정렬 기준이며 없으면 null. */
+  date: string | null;
   intro: string;
   topics: StudyTopic[];
 };
@@ -75,6 +77,8 @@ const TRAILING_RULE_PATTERN = /\n*[-*_]{3,}\s*$/;
 const LIST_MARKER_PATTERN = /^[-*+]\s+/;
 const ORDERED_MARKER_PATTERN = /^\d+\.\s+/;
 const ARROW_PREFIX_PATTERN = /^→\s*/;
+const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
+const DATE_FIELD_PATTERN = /^date:\s*(\d{4}-\d{2}-\d{2})\s*$/m;
 /** 꼬꼬무 안의 주의·참고류 제목은 질문이 아니라 직전 답변에 붙는 경고다. */
 const FOLLOW_UP_NOTE_PATTERN = /^(주의|위험|경고|금지|참고|중요)/;
 /** 꼬리질문 답변 첫 줄의 `키워드: a, b, c`는 본문이 아니라 그 질문의 키워드 목록이다. */
@@ -327,7 +331,17 @@ function buildTopic(draft: TopicDraft, index: number): StudyTopic {
   return { id: `topic-${index}`, title: draft.title, steps, notes: isNotesConsumed ? '' : notes };
 }
 
-export function parseStudyDoc(slug: string, markdown: string): StudyDoc {
+/** 문서 맨 앞의 frontmatter를 떼어내고 date 필드만 읽는다. */
+function splitFrontmatter(raw: string): { date: string | null; markdown: string } {
+  const matched = FRONTMATTER_PATTERN.exec(raw);
+  if (!matched) return { date: null, markdown: raw };
+
+  const date = DATE_FIELD_PATTERN.exec(matched[1] ?? '')?.[1] ?? null;
+  return { date, markdown: raw.slice(matched[0].length) };
+}
+
+export function parseStudyDoc(slug: string, raw: string): StudyDoc {
+  const { date, markdown } = splitFrontmatter(raw);
   const topicLevel = findTopicLevel(markdown);
   const sectionLevel = topicLevel + 1;
   const followUpLevel = topicLevel + 2;
@@ -365,6 +379,7 @@ export function parseStudyDoc(slug: string, markdown: string): StudyDoc {
   return {
     slug,
     title: title || slug,
+    date,
     intro: introParts.join('\n\n'),
     topics: drafts.map(buildTopic).filter((topic) => topic.steps.length > 0),
   };

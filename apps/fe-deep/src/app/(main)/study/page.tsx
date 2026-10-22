@@ -1,23 +1,29 @@
 import { Card } from '@shared/ui';
-import { countSteps } from '@views/study/model/parseHandbook';
 import { getStudyDocs } from '@views/study/model/studyDocs';
-import { StudyDevReload } from '@views/study/ui';
-import { BookOpen } from 'lucide-react';
-import Link from 'next/link';
+import { parseStudySort, sortStudyDocs } from '@views/study/model/studySort';
+import { StudyDevReload, StudyDocTable, StudySortTabs } from '@views/study/ui';
 
 export const metadata = { title: '면접 학습' };
 
-export default async function AdminStudyListPage() {
-  const docs = await getStudyDocs();
+interface AdminStudyListPageProps {
+  searchParams: Promise<{ sort?: string }>;
+}
+
+export default async function AdminStudyListPage({ searchParams }: AdminStudyListPageProps) {
+  const sort = parseStudySort((await searchParams).sort);
+  const docs = sortStudyDocs(await getStudyDocs(), sort);
 
   return (
-    <div className="container mx-auto max-w-7xl space-y-6 px-4 py-8 sm:py-12">
+    <div className="container mx-auto max-w-4xl space-y-6 px-4 py-8 sm:py-12">
       <StudyDevReload />
-      <div>
-        <h1 className="text-2xl font-bold">면접 학습</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          <code>content/study/</code>에 마크다운을 넣으면 학습 화면이 생깁니다.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">면접 학습</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            문서 {docs.length}개 · <code>content/study/</code> 마크다운, 맨 위 <code>date: YYYY-MM-DD</code>로 정렬
+          </p>
+        </div>
+        {docs.length > 0 && <StudySortTabs current={sort} />}
       </div>
 
       {docs.length === 0 ? (
@@ -27,23 +33,7 @@ export default async function AdminStudyListPage() {
           </Card.Content>
         </Card>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {docs.map((doc) => (
-            <Link key={doc.slug} href={`/study/${doc.slug}`} className="group">
-              <Card className="h-full transition-colors group-hover:border-primary/40">
-                <Card.Content className="flex items-start gap-3 py-5">
-                  <BookOpen className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                  <div className="min-w-0">
-                    <p className="break-keep font-medium">{doc.title}</p>
-                    <p className="mt-1 text-xs tabular-nums text-muted-foreground">
-                      주제 {doc.topics.length}개 · 단계 {countSteps(doc)}개
-                    </p>
-                  </div>
-                </Card.Content>
-              </Card>
-            </Link>
-          ))}
-        </div>
+        <StudyDocTable docs={docs} />
       )}
     </div>
   );
