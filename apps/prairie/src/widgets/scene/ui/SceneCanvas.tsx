@@ -13,6 +13,7 @@ import { Suspense, useState } from 'react';
 import { PCFShadowMap } from 'three';
 import { ReadySignal } from './ReadySignal';
 import { RideSun } from './RideSun';
+import { SceneFailure } from './SceneBoundary';
 
 const DPR = {
   desktop: { max: 1.5, min: 1 },
@@ -30,6 +31,7 @@ export function SceneCanvas() {
   return (
     <Canvas
       className="cursor-grab"
+      fallback={<SceneFailure />}
       dpr={dpr}
       shadows={{ type: PCFShadowMap }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
