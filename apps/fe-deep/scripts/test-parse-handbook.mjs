@@ -268,3 +268,11 @@ test('오답·보완할 점은 정답 뒤·꼬꼬무 앞뒤로 각각 카드가 
   // 오답·보완은 카드로 올라갔으니 참고 자료에 중복되지 않는다
   assert.doesNotMatch(topic.notes, /같은 말을 네 번 했다/);
 });
+
+test('frontmatter date를 읽고 본문 파싱에서 제외한다', () => {
+  const doc = parseStudyDoc('dated', `---\ndate: 2026-10-22\n---\n\n${SAMPLE}`);
+  assert.equal(doc.date, '2026-10-22');
+  assert.equal(doc.title, '핸드북');
+  assert.equal(doc.topics.length, 2);
+  assert.equal(parseStudyDoc('plain', SAMPLE).date, null);
+});
