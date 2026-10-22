@@ -1,18 +1,19 @@
 import { distanceToRiver, RIVER_TRENCH_HALF_WIDTH } from '@shared/config';
+import { isExplorationClearing } from '@shared/exploration/world';
 
 // 나무·바위 배치. 셀 좌표 해시만으로 결정되므로 어디서 다시 와도 같은 자리에 같은 나무가 선다(저장 없음).
 // 렌더(FloraField)와 충돌(RunnerRig)이 같은 함수를 쓴다.
 export const FLORA = {
   cell: 32,
   // 안개 너머는 어차피 안 보인다. 기기별 셀 반경(cell 단위).
-  viewRadius: { desktop: 7, mobile: 3 },
+  viewRadius: { desktop: 12, mobile: 5 },
   // 강 골 가장자리에서 이만큼은 비운다(강둑·범람원).
   riverMargin: 10,
   // 스폰 지점 주변은 비워 둔다.
   spawnClearRadius: 30,
   trunk: { radiusTop: 0.14, radiusBottom: 0.36, height: 4.1, segments: 9 },
   // 활엽수 수관: 거친 곡면 잎 군집을 비대칭으로 분산하고 일부 군집까지 가지를 뻗는다.
-  canopy: { radius: 2.2, detail: 2, blobs: 11 },
+  canopy: { radius: 2.2, detail: 3, blobs: 15 },
   branches: 5,
   // 침엽수: 원뿔 tiers단. 아래가 넓고 위로 좁아진다.
   conifer: { radius: 2.1, tierHeight: 1.8, tiers: 6, segments: 13 },
@@ -27,7 +28,7 @@ export const FLORA = {
   maxRocks: 400,
   colors: {
     trunk: '#66513b',
-    canopy: ['#536b39', '#6d8047', '#455e35', '#829055'],
+    canopy: ['#45654e', '#63825a', '#365643', '#809064'],
     conifer: ['#48654b', '#5d7953'],
     rock: '#8d8779',
   },
@@ -51,6 +52,7 @@ function hash2(cellX: number, cellZ: number, salt: number): number {
 }
 
 function isBlocked(x: number, z: number): boolean {
+  if (isExplorationClearing(x, z)) return true;
   if (distanceToRiver(x) < RIVER_TRENCH_HALF_WIDTH + FLORA.riverMargin) return true;
   return Math.hypot(x, z) < FLORA.spawnClearRadius;
 }

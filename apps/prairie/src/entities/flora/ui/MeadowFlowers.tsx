@@ -47,7 +47,7 @@ export function MeadowFlowers() {
             z = patchZ + Math.sin(angle) * spread;
           if (distanceToRiver(x) < RIVER_TRENCH_HALF_WIDTH + 5) continue;
           const y = terrainHeightAt(x, z);
-          const height = 0.55 + hash(seed + i * 1.1) * 0.5;
+          const height = 0.22 + hash(seed + i * 1.1) * 0.34;
           dummy.position.set(x, y, z);
           dummy.rotation.set(0, angle, 0);
           dummy.scale.set(1, height, 1);
@@ -55,7 +55,7 @@ export function MeadowFlowers() {
           stem.setMatrixAt(count, dummy.matrix);
           dummy.position.y += height;
           dummy.rotation.set(0.12, angle, 0.16);
-          dummy.scale.setScalar(0.75 + hash(seed + i * 5.3) * 0.65);
+          dummy.scale.setScalar(0.5 + hash(seed + i * 5.3) * 0.5);
           dummy.updateMatrix();
           flower.setMatrixAt(count, dummy.matrix);
           flower.setColorAt(count, COLORS[Math.floor(hash(seed + i * 6.1) * COLORS.length)]!);

@@ -62,6 +62,6 @@ h2 {
 
 @media (pointer: coarse) {
   .prairie-hud footer {
-    padding-bottom: var(--spacing-3xl);
+    padding-bottom: calc(10.5rem + var(--spacing-lg));
   }
 }

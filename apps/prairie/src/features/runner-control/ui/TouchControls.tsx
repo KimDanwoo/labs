@@ -64,6 +64,7 @@ export function TouchControls() {
         onPointerMove={handleMove}
         onPointerUp={handleEnd}
         onPointerCancel={handleEnd}
+        onLostPointerCapture={handleEnd}
         onContextMenu={(event) => event.preventDefault()}
       />
 

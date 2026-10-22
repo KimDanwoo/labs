@@ -12,6 +12,7 @@ const input: RunnerInput = {
   jump: false,
   spin: false,
   dash: false,
+  descend: false,
 };
 
 export function setRunnerAction(action: RunnerAction, pressed: boolean): void {

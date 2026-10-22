@@ -3,7 +3,7 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { RIVER_GLSL, SCENE_COLORS, TERRAIN_GLSL, WORLD } from '@shared/config';
 import { useRef } from 'react';
-import { Mesh, type WebGLProgramParametersWithUniforms } from 'three';
+import { Group, type WebGLProgramParametersWithUniforms } from 'three';
 
 // 2D 값 노이즈(해시 + 부드러운 보간). 0..1.
 const GROUND_NOISE_GLSL = `
@@ -61,7 +61,7 @@ const GRID_STEP = WORLD.groundSize / WORLD.groundSegments;
 // 바닥 평면이 카메라 XZ를 따라다녀 가장자리에 닿지 않는다 → 무한 들판.
 // 정점 간격으로 스냅해야 정점이 항상 같은 월드 지점의 높이를 샘플링한다(안 하면 기복이 카메라를 따라 꿈틀댄다).
 export function Ground() {
-  const meshRef = useRef<Mesh>(null);
+  const meshRef = useRef<Group>(null);
   const camera = useThree((state) => state.camera);
 
   useFrame(() => {
@@ -72,9 +72,15 @@ export function Ground() {
   });
 
   return (
-    <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[WORLD.groundSize, WORLD.groundSize, WORLD.groundSegments, WORLD.groundSegments]} />
-      <meshBasicMaterial color={SCENE_COLORS.grass} onBeforeCompile={shadeGround} />
-    </mesh>
+    <group ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh>
+        <planeGeometry args={[WORLD.groundSize, WORLD.groundSize, WORLD.groundSegments, WORLD.groundSegments]} />
+        <meshBasicMaterial color={SCENE_COLORS.grass} onBeforeCompile={shadeGround} />
+      </mesh>
+      <mesh receiveShadow position={[0, 0, 0.02]}>
+        <planeGeometry args={[WORLD.groundSize, WORLD.groundSize, WORLD.groundSegments, WORLD.groundSegments]} />
+        <shadowMaterial transparent opacity={0.3} depthWrite={false} onBeforeCompile={shadeGround} />
+      </mesh>
+    </group>
   );
 }

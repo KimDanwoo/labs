@@ -26,7 +26,9 @@ const RIDGE_GLSL = RIDGES.map(
       // 해 쪽(+u) 사면은 밝게, 반대 사면은 어둡게 — 기울기 부호로 간단히.
       float slope = ridgeNoise(u + SLOPE_DU, ${glslFloat(ridge.cells)}) - ridgeNoise(u - SLOPE_DU, ${glslFloat(ridge.cells)});
       float lit = 1.0 + SLOPE_SHADE * clamp(slope * ${glslFloat(ridge.ampY)} / SLOPE_SCALE, -1.0, 1.0);
-      vec3 tint = ${glslColor(ridge.color)} * lit;
+      float folds = sin(u * 410.0 + y * 0.022 + periodicNoise(u, 32.0) * 8.0);
+      float detail = periodicNoise(u + y * 0.00012, 128.0);
+      vec3 tint = ${glslColor(ridge.color)} * (lit + folds * 0.045 + (detail - 0.5) * 0.08);
       // 대기 원근: 밑동(능선 높이의 35%까지)은 안개가 절반쯤 덮는다. 겹 사이 거리감은 겹 색 자체가 낸다.
       vec3 ridgeColor = mix(tint, uFog, BASE_FOG * (1.0 - smoothstep(0.0, 0.35 * h, y)));
       color = mix(color, ridgeColor, cover);
@@ -59,7 +61,7 @@ const hazeMaterial = new ShaderMaterial({
     // 사면 음영: 둘레 좌표 차분 폭과 음영 세기.
     const float SLOPE_DU = 0.004;
     const float SLOPE_SCALE = 12.0;
-    const float SLOPE_SHADE = 0.1;
+    const float SLOPE_SHADE = 0.24;
     const float BASE_FOG = 0.5;
 
     float hash(float n) { return fract(sin(n * 127.1) * 43758.5453); }
@@ -119,7 +121,7 @@ export function Haze() {
 
   return (
     <mesh ref={meshRef} position={[0, CENTER_Y, 0]} material={hazeMaterial}>
-      <cylinderGeometry args={[HAZE.radius, HAZE.radius, HEIGHT, 96, 1, true]} />
+      <cylinderGeometry args={[HAZE.radius, HAZE.radius, HEIGHT, 256, 1, true]} />
     </mesh>
   );
 }

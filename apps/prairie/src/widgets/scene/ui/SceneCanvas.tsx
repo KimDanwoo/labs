@@ -4,13 +4,18 @@ import { FloraField } from '@entities/flora/ui';
 import { GrassField } from '@entities/grass/ui';
 import { River } from '@entities/river/ui';
 import { Ground, Scenery } from '@entities/scenery/ui';
+import { Grazers, WingedLife } from '@entities/wildlife/ui';
+import { ExplorationScene } from '@features/exploration/ui';
 import { RunnerRig } from '@features/runner-control/ui';
 import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { CAMERA, FOG, SCENE_COLORS, SUN, type FogQuality } from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
 import { Suspense, useState } from 'react';
+import { PCFShadowMap } from 'three';
 import { ReadySignal } from './ReadySignal';
+import { RideSun } from './RideSun';
+import { SceneFailure } from './SceneBoundary';
 
 const DPR = {
   desktop: { max: 1.5, min: 1 },
@@ -28,7 +33,9 @@ export function SceneCanvas() {
   return (
     <Canvas
       className="cursor-grab"
+      fallback={<SceneFailure />}
       dpr={dpr}
+      shadows={{ type: PCFShadowMap }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{
         fov: CAMERA.fov,
@@ -41,7 +48,7 @@ export function SceneCanvas() {
       <fog attach="fog" args={[SCENE_COLORS.fog, fog.near, fog.far]} />
 
       <hemisphereLight color={SCENE_COLORS.ambient} groundColor={SCENE_COLORS.grass} intensity={SUN.ambientIntensity} />
-      <directionalLight color={SCENE_COLORS.sunLight} intensity={SUN.intensity} position={SUN.position} />
+      <RideSun mobile={coarse} />
 
       <Suspense fallback={null}>
         <Scenery />
@@ -50,6 +57,10 @@ export function SceneCanvas() {
         <GrassField />
         <FloraField />
         <RunnerRig />
+        <ExplorationScene />
+        <Grazers />
+        <WingedLife kind="bird" />
+        <WingedLife kind="dragonfly" />
         <ReadySignal />
       </Suspense>
     </Canvas>

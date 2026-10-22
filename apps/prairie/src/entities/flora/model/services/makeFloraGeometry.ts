@@ -13,7 +13,7 @@ export function makeCanopyGeometry(detail: number) {
     const x = position.getX(i),
       y = position.getY(i),
       z = position.getZ(i);
-    const ripple = 1 + Math.sin(x * 5 + z * 3) * Math.cos(y * 4 - z * 2) * 0.13 + Math.sin(z * 8 + y * 6) * 0.045;
+    const ripple = 1 + Math.sin(x * 5 + z * 3) * Math.cos(y * 4 - z * 2) * 0.055 + Math.sin(z * 8 + y * 6) * 0.025;
     position.setXYZ(i, x * ripple, y * ripple, z * ripple);
   }
   geometry.computeVertexNormals();
@@ -21,7 +21,7 @@ export function makeCanopyGeometry(detail: number) {
 }
 
 export function makeConiferGeometry() {
-  const geometry = new ConeGeometry(FLORA.conifer.radius, FLORA.conifer.tierHeight, 13, 5);
+  const geometry = new ConeGeometry(FLORA.conifer.radius, FLORA.conifer.tierHeight, 20, 8);
   const position = geometry.getAttribute('position');
   for (let i = 0; i < position.count; i += 1) {
     const x = position.getX(i),
