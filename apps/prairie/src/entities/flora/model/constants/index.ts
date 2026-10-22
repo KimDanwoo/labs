@@ -1,4 +1,5 @@
 import { distanceToRiver, RIVER_TRENCH_HALF_WIDTH } from '@shared/config';
+import { isExplorationClearing } from '@shared/exploration/world';
 
 // 나무·바위 배치. 셀 좌표 해시만으로 결정되므로 어디서 다시 와도 같은 자리에 같은 나무가 선다(저장 없음).
 // 렌더(FloraField)와 충돌(RunnerRig)이 같은 함수를 쓴다.
@@ -51,6 +52,7 @@ function hash2(cellX: number, cellZ: number, salt: number): number {
 }
 
 function isBlocked(x: number, z: number): boolean {
+  if (isExplorationClearing(x, z)) return true;
   if (distanceToRiver(x) < RIVER_TRENCH_HALF_WIDTH + FLORA.riverMargin) return true;
   return Math.hypot(x, z) < FLORA.spawnClearRadius;
 }
