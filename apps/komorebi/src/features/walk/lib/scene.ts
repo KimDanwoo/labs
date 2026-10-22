@@ -68,7 +68,8 @@ export async function createScene(
   renderer.domElement.setAttribute('aria-label', '햇빛이 비치는 시골길. 길을 클릭하거나 방향키를 눌러 걸어 보세요.');
   container.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(43.6, 1.5, 0.1, 200);
+  // Every layer shares the painted map coordinates; depth must not shift feet off the path.
+  const camera = new THREE.OrthographicCamera(-60, 60, 40, -40, 0.1, 200);
   camera.position.set(0, 0, 100);
   const geo = new THREE.PlaneGeometry(120, 80, 1, 1);
   const background = new THREE.ShaderMaterial({
@@ -249,8 +250,10 @@ export async function createScene(
     // A modest crop allows the illustration to drift with the walker.
     halfHeight = fullHeight * 0.47;
     halfWidth = halfHeight * aspect;
-    camera.aspect = aspect;
-    camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(halfHeight / 100));
+    camera.left = -halfWidth;
+    camera.right = halfWidth;
+    camera.top = halfHeight;
+    camera.bottom = -halfHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
   };

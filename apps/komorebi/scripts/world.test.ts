@@ -16,8 +16,7 @@ test('spawn, every landmark and every portal arrival are on walkable lanes', () 
   assert.ok(canWalk(SPAWN.x, SPAWN.z));
   for (const point of LANDMARKS) assert.ok(canWalk(point.x, point.z, point.region), point.id);
   for (const world of Object.values(WORLDS))
-    for (const portal of world.portals)
-      assert.ok(canWalk(portal.spawn.x, portal.spawn.z, portal.to));
+    for (const portal of world.portals) assert.ok(canWalk(portal.spawn.x, portal.spawn.z, portal.to));
 });
 test('water, sky and off-map coordinates are not walkable', () => {
   for (const point of [
@@ -48,11 +47,7 @@ test('all lane graph routes can actually be followed without leaving walkable gr
         assert.ok(route.length, `${region}: ${from.id} -> ${to.id}`);
         let position = { x: from.x, z: from.z };
         for (const target of route) {
-          for (
-            let i = 0;
-            i < 1200 && Math.hypot(target.x - position.x, target.z - position.z) > 0.05;
-            i++
-          ) {
+          for (let i = 0; i < 1200 && Math.hypot(target.x - position.x, target.z - position.z) > 0.05; i++) {
             const dx = target.x - position.x,
               dz = target.z - position.z,
               d = Math.hypot(dx, dz),
@@ -69,8 +64,7 @@ test('all lane graph routes can actually be followed without leaving walkable gr
   }
 });
 test('discoveries require the correct region and proximity', () => {
-  for (const point of LANDMARKS)
-    assert.equal(closestLandmark(point.x, point.z, point.region)?.id, point.id);
+  for (const point of LANDMARKS) assert.equal(closestLandmark(point.x, point.z, point.region)?.id, point.id);
   assert.equal(closestLandmark(SPAWN.x, SPAWN.z), null);
   assert.equal(closestLandmark(64, 82, 'forest'), null);
 });
@@ -89,4 +83,23 @@ test('every region can guide the walker to every other region without loops', ()
         current = next;
       }
     }
+});
+
+test('bridge collision stays between painted railings, including diagonal input', () => {
+  // Bounds traced from the 1536 x 1024 background artwork, in map percentages.
+  for (let x = 36; x <= 66; x += 0.5) {
+    for (let z = 40; z <= 55; z += 0.1) {
+      if (canWalk(x, z, 'river')) assert.ok(z >= 46 && z <= 49, `river ${x},${z}`);
+    }
+  }
+  for (let x = 84; x <= 94; x += 0.25) {
+    const deck = 42.8 + ((x - 82) / 14) * (39.5 - 42.8);
+    for (const offset of [-2, -1.2, 1.2, 2])
+      assert.equal(canWalk(x, deck + offset, 'village'), false, `village ${x},${offset}`);
+    assert.ok(canWalk(x, deck, 'village'));
+  }
+  for (const dz of [-20, 20]) {
+    const next = movePlayer({ x: 50, z: 47.7 }, 8, dz, 'river');
+    assert.ok(next.z >= 46 && next.z <= 49);
+  }
 });

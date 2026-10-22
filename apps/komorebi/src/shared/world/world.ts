@@ -20,7 +20,7 @@ export const LANDMARKS = [
     name: '물소리 다리',
     short: '강',
     x: 50,
-    z: 47,
+    z: 47.7,
     icon: '川',
     text: '다리 아래로 여름이 흘러간다. 반짝이는 물결 속에 오늘의 구름이 잠깐 쉬어 간다.',
   },
@@ -89,8 +89,8 @@ export const WORLDS: Record<
       { id: 'house', x: 17, z: 41 },
       { id: 'forestgate', x: 4, z: 35 },
       { id: 'fields', x: 62, z: 51 },
-      { id: 'bridge', x: 82, z: 43 },
-      { id: 'rivergate', x: 96, z: 39 },
+      { id: 'bridge', x: 82, z: 42.8 },
+      { id: 'rivergate', x: 96, z: 39.5 },
     ],
     routes: [
       { a: 'bottom', b: 'start', width: 7 },
@@ -100,8 +100,9 @@ export const WORLDS: Record<
       { a: 'left', b: 'house', width: 2.8 },
       { a: 'house', b: 'forestgate', width: 2.7 },
       { a: 'fork', b: 'fields', width: 3 },
-      { a: 'fields', b: 'bridge', width: 2.5 },
-      { a: 'bridge', b: 'rivergate', width: 2 },
+      { a: 'fields', b: 'bridge', width: 1.2 },
+      // Narrow diagonal deck, measured between the painted railings.
+      { a: 'bridge', b: 'rivergate', width: 0.65 },
     ],
     portals: [
       { node: 'bottom', to: 'shops', spawn: { x: 50, z: 46 }, label: '상점가로' },
@@ -116,7 +117,7 @@ export const WORLDS: Record<
       { id: 'back', x: 4, z: 48 },
       { id: 'entry', x: 14, z: 48 },
       { id: 'bank', x: 28, z: 48 },
-      { id: 'river', x: 50, z: 47 },
+      { id: 'river', x: 50, z: 47.7 },
       { id: 'east', x: 76, z: 47 },
       { id: 'coastgate', x: 96, z: 46 },
       { id: 'pathbend', x: 23, z: 68 },
@@ -125,14 +126,14 @@ export const WORLDS: Record<
     routes: [
       { a: 'back', b: 'entry', width: 3 },
       { a: 'entry', b: 'bank', width: 3 },
-      { a: 'bank', b: 'river', width: 2.3 },
-      { a: 'river', b: 'east', width: 2.3 },
+      { a: 'bank', b: 'river', width: 1.1 },
+      { a: 'river', b: 'east', width: 1.1 },
       { a: 'east', b: 'coastgate', width: 3 },
       { a: 'bank', b: 'pathbend', width: 3.7 },
       { a: 'pathbend', b: 'picnic', width: 3.8 },
     ],
     portals: [
-      { node: 'back', to: 'village', spawn: { x: 84, z: 43 }, label: '마을로' },
+      { node: 'back', to: 'village', spawn: { x: 84, z: 42.33 }, label: '마을로' },
       { node: 'coastgate', to: 'coast', spawn: { x: 12, z: 62 }, label: '바다로' },
     ],
   },
@@ -243,17 +244,13 @@ export function nextRegionStep(from: Region, to: Region): Region | null {
 export function distanceToSegment(p: Point, a: Point, b: Point) {
   const dx = b.x - a.x,
     dz = b.z - a.z;
-  const t = Math.max(
-    0,
-    Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / (dx * dx + dz * dz || 1)),
-  );
+  const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / (dx * dx + dz * dz || 1)));
   return Math.hypot(p.x - a.x - t * dx, p.z - a.z - t * dz);
 }
 export function canWalk(x: number, z: number, region: Region = 'village') {
   if (x < 3 || x > 97 || z < 30 || z > 98) return false;
   const world = WORLDS[region];
-  if (world.areas?.some((a) => x >= a.minX && x <= a.maxX && z >= a.minZ && z <= a.maxZ))
-    return true;
+  if (world.areas?.some((a) => x >= a.minX && x <= a.maxX && z >= a.minZ && z <= a.maxZ)) return true;
   return world.routes.some(
     (route) =>
       distanceToSegment(
@@ -286,18 +283,14 @@ export function closestLandmark(x: number, z: number, region: Region = 'village'
 export function findRoute(start: Point, target: Point, region: Region): Point[] {
   const world = WORLDS[region];
   const nearest = (p: Point) =>
-    world.nodes.reduce((a, b) =>
-      Math.hypot(a.x - p.x, a.z - p.z) < Math.hypot(b.x - p.x, b.z - p.z) ? a : b,
-    );
+    world.nodes.reduce((a, b) => (Math.hypot(a.x - p.x, a.z - p.z) < Math.hypot(b.x - p.x, b.z - p.z) ? a : b));
   const from = nearest(start),
     to = nearest(target);
   const costs = new Map<string, number>([[from.id, 0]]),
     previous = new Map<string, string>(),
     unvisited = new Set(world.nodes.map((n) => n.id));
   while (unvisited.size) {
-    const current = [...unvisited].sort(
-      (a, b) => (costs.get(a) ?? Infinity) - (costs.get(b) ?? Infinity),
-    )[0]!;
+    const current = [...unvisited].sort((a, b) => (costs.get(a) ?? Infinity) - (costs.get(b) ?? Infinity))[0]!;
     if (!Number.isFinite(costs.get(current))) break;
     unvisited.delete(current);
     if (current === to.id) break;
