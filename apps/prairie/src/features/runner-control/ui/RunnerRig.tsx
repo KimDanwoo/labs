@@ -6,10 +6,12 @@ import { RUNNER_PHYSICS } from '@features/runner-control/model/constants';
 import { usePointerLook, useRunnerControls } from '@features/runner-control/model/hooks';
 import {
   createDashState,
+  createFlightState,
   createSpinState,
   DASH_SKILL,
   SPIN_SKILL,
   updateDash,
+  updateFlight,
   updateSpin,
 } from '@features/runner-control/model/services';
 import { getRunnerInput } from '@features/runner-control/model/store';
@@ -51,7 +53,7 @@ export function RunnerRig() {
   const headingRef = useRef(0);
   const viewYawRef = useRef(0);
   const positionRef = useRef(new Vector3(0, 0, 0));
-  const airborneRef = useRef({ height: 0, velocity: 0 });
+  const airborneRef = useRef(createFlightState());
   const wasSprintingRef = useRef(false);
   const wasJumpPressedRef = useRef(false);
   const initializedRef = useRef(false);
@@ -60,7 +62,7 @@ export function RunnerRig() {
 
   useFrame((state, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05);
-    const { forward, backward, left, right, sprint, jump, spin, dash } = getRunnerInput();
+    const { forward, backward, left, right, sprint, jump, spin, dash, descend } = getRunnerInput();
     const physics = RUNNER_PHYSICS;
     const now = state.clock.elapsedTime;
 
@@ -78,7 +80,6 @@ export function RunnerRig() {
     const waterDepth = riverWaterDepthAt(riverDist);
     const wade = isGrounded ? Math.min(waterDepth / RIVER.wadeDepthRef, 1) : 0;
     const maxSpeed = physics.maxSpeed * MathUtils.lerp(1, RIVER.wadeSpeedScale, wade);
-    const groundY = terrainHeightAt(positionRef.current.x, positionRef.current.z) - riverBedDepthAt(riverDist);
 
     // 질주: 최고속도·가속 배율. 발동 순간 돌풍 파동 원점을 기록한다.
     const isSprinting = sprint && forward;
@@ -102,26 +103,6 @@ export function RunnerRig() {
     speed = MathUtils.clamp(speed, -physics.maxReverse, speedLimit);
     speedRef.current = speed;
 
-    // 점프·비행: 지면에서 Space = 점프, 공중에서 Space 유지 = 상승. 놓으면 활공 속도로 하강, 고도 상한.
-    const jumpPressed = jump && !wasJumpPressedRef.current;
-    wasJumpPressedRef.current = jump;
-    if (jumpPressed && isGrounded) air.velocity = physics.jumpSpeed;
-    if (!isGrounded || air.velocity > 0) {
-      const isLifting = jump && !isGrounded;
-      air.velocity = isLifting
-        ? Math.min(air.velocity + physics.liftAccel * delta, physics.climbSpeed)
-        : Math.max(air.velocity - physics.jumpGravity * delta, -physics.glideFallSpeed);
-      // 회전하는 동안 고도를 유지해 날개가 지면에 닿지 않게 한다.
-      if (spinRef.current.active || dashRef.current.active) air.velocity = Math.max(0, air.velocity);
-      air.height = MathUtils.clamp(air.height + air.velocity * delta, 0, physics.maxFlightHeight);
-      if (air.height === physics.maxFlightHeight) air.velocity = Math.min(air.velocity, 0);
-      if (air.height === 0 && air.velocity < 0) {
-        air.velocity = 0;
-        runnerState.landedAt = now;
-      }
-    }
-    const visualY = groundY + air.height;
-
     const steer = (left ? 1 : 0) - (right ? 1 : 0);
     const direction = speed < 0 ? -1 : 1;
     const turnAuthority = MathUtils.clamp(Math.abs(speed) / 4, physics.turnFloor, 1);
@@ -135,6 +116,27 @@ export function RunnerRig() {
     // 줄기·바위 충돌: 밀어내고 속도를 깎는다. 줄기 높이 위로 날면 통과.
     if (air.height < FLORA.trunk.height && pushOutOfFlora(position) > 0) speedRef.current = speed * 0.5;
 
+    // 이동과 충돌 보정 뒤의 위치에서 지면을 샘플링해 발이 언덕에 묻히지 않게 한다.
+    const currentRiverDist = distanceToRiver(position.x);
+    const groundY = terrainHeightAt(position.x, position.z) - riverBedDepthAt(currentRiverDist);
+    const impact = updateFlight(
+      air,
+      {
+        lift: jump,
+        launch: jump && !wasJumpPressedRef.current,
+        descend,
+        holdAltitude: spinRef.current.active || dashRef.current.active,
+        speed: speedRef.current,
+      },
+      groundY,
+      delta,
+    );
+    wasJumpPressedRef.current = jump;
+    if (impact !== null) {
+      runnerState.landedAt = now;
+      runnerState.landingImpact = impact;
+    }
+    const visualY = groundY + air.height;
     const root = rootRef.current;
     if (root) {
       root.position.copy(position).setY(visualY);
@@ -143,8 +145,8 @@ export function RunnerRig() {
 
     runnerState.position.copy(position).setY(visualY);
     runnerState.heading = heading;
-    runnerState.speed = speed;
-    runnerState.waterDepth = waterDepth;
+    runnerState.speed = speedRef.current;
+    runnerState.waterDepth = riverWaterDepthAt(currentRiverDist);
     runnerState.isSprinting = isSprinting;
     runnerState.airborneHeight = air.height;
     runnerState.verticalSpeed = air.velocity;
@@ -163,22 +165,30 @@ export function RunnerRig() {
     // 카메라 방향 = 말의 heading + 마우스 드래그 yaw 오프셋(말은 heading 그대로, 카메라만 좌우로 돈다).
     const camYaw = heading + viewYawRef.current;
     camDirVec.set(Math.sin(camYaw), 0, Math.cos(camYaw));
+    const speedFraming = MathUtils.clamp(Math.abs(speed) / 24, 0, 1);
     desiredCam
       .copy(position)
-      .addScaledVector(camDirVec, -CAMERA.followDistance)
-      .setY(visualY + CAMERA.followHeight);
+      .addScaledVector(camDirVec, -(CAMERA.followDistance + speedFraming * 2))
+      .setY(visualY + CAMERA.followHeight + speedFraming * 0.7);
     // 말 뒤 언덕이 솟아 있으면 카메라가 지면 아래로 묻힌다 → 그 자리 지형 위 최소 높이를 보장.
     desiredCam.y = Math.max(desiredCam.y, terrainHeightAt(desiredCam.x, desiredCam.z) + CAMERA.groundClearance);
-    desiredTarget.copy(position).setY(CAMERA.targetHeight + visualY);
+    desiredTarget
+      .copy(position)
+      .addScaledVector(forwardVec, speedFraming * 2)
+      .setY(CAMERA.targetHeight + visualY);
 
     if (!initializedRef.current) {
       camera.position.copy(desiredCam);
       smoothTarget.copy(desiredTarget);
       initializedRef.current = true;
     } else {
-      camera.position.lerp(desiredCam, CAMERA.positionLerp);
-      smoothTarget.lerp(desiredTarget, CAMERA.targetLerp);
+      camera.position.lerp(desiredCam, 1 - Math.pow(1 - CAMERA.positionLerp, delta * 60));
+      smoothTarget.lerp(desiredTarget, 1 - Math.pow(1 - CAMERA.targetLerp, delta * 60));
     }
+    // Smoothing must never move the actual camera through a hill.
+    camera.position.setY(
+      Math.max(camera.position.y, terrainHeightAt(camera.position.x, camera.position.z) + CAMERA.groundClearance),
+    );
     camera.lookAt(smoothTarget);
 
     setRideRiver(distanceToRiver(position.x), riverBearing(position.x, camYaw));

@@ -1,4 +1,4 @@
-export type RunnerAction = 'forward' | 'backward' | 'left' | 'right' | 'sprint' | 'jump' | 'spin' | 'dash';
+export type RunnerAction = 'forward' | 'backward' | 'left' | 'right' | 'sprint' | 'jump' | 'spin' | 'dash' | 'descend';
 
 // event.code → 이동 액션. WASD + 방향키 동시 지원. Shift 질주, Space 점프.
 export const KEY_BINDINGS: Record<string, RunnerAction> = {
@@ -7,6 +7,7 @@ export const KEY_BINDINGS: Record<string, RunnerAction> = {
   Space: 'jump',
   KeyE: 'spin',
   KeyQ: 'dash',
+  KeyC: 'descend',
   KeyW: 'forward',
   ArrowUp: 'forward',
   KeyS: 'backward',
@@ -29,14 +30,6 @@ export const RUNNER_PHYSICS = {
   // 질주(Shift): 최고속도·가속 배율.
   sprintMaxMultiplier: 1.6,
   sprintAccelMultiplier: 1.5,
-  // 점프(Space): 초속·중력. 높이 = v²/2g ≈ 1.4m, 체공 ≈ 0.8s.
-  jumpSpeed: 7,
-  jumpGravity: 18,
-  // 비행: 공중에서 Space를 누르고 있으면 상승(가속 → 최대 상승속도), 놓으면 활공 속도로 천천히 하강. 고도 상한.
-  liftAccel: 16,
-  climbSpeed: 6,
-  glideFallSpeed: 5,
-  maxFlightHeight: 14,
 } as const;
 
 // PC: 캔버스를 마우스로 끌어 카메라를 좌우로 회전(yaw). px 이동량 × 감도(rad).

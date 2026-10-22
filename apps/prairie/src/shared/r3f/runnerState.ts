@@ -17,6 +17,7 @@ export const runnerState = {
   verticalSpeed: 0,
   // 마지막 착지 시각(초). 물속 착지 시 물보라 폭발 트리거.
   landedAt: -1,
+  landingImpact: 0,
   // 질주 발동 지점·시각 — 잔디를 쓸고 지나가는 돌풍 파동의 원점.
   gustOrigin: new Vector2(),
   gustStartedAt: -1,
