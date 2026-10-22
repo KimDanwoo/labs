@@ -1,0 +1,75 @@
+# 코모레비 — 여름빛 산책
+
+작은 배낭을 멘 2등신 아이가 여름 시골을 돌아다니는 작은 탐험 게임입니다. 정교한 2D 배경화, Three.js 위에 합성한 선화 2D 캐릭터, 장소별 고정 카메라를 결합했습니다. 논길과 강이 있는 마을에서 길 끝으로 걸어가면 바닷길과 숲속 신사, 학교 운동장과 상점가로 이어집니다.
+
+## 실행
+
+저장소 루트에서 Node.js 24와 pnpm 9를 사용합니다.
+
+```bash
+pnpm install
+pnpm --filter komorebi dev
+```
+
+http://localhost:3011 에 접속합니다. 다른 앱과 별도로 실행하는 신규 앱입니다.
+
+## 조작
+
+| 입력               | 동작                                     |
+| ------------------ | ---------------------------------------- |
+| WASD / 방향키      | 화면 기준 걷기                           |
+| 길 클릭 / 터치     | 연결된 길을 따라 목적지로 걷기           |
+| Shift              | 달리기                                   |
+| Space              | 점프                                     |
+| E / 장소 안내 버튼 | 가까운 장소의 추억 수집                  |
+| M / 지도 버튼      | 지도와 그림일기 열기                     |
+| 지도 내 장소 선택  | 해당 장소까지 길안내 이동, 방향키로 중단 |
+| Escape             | 지도 / 추억 닫기                         |
+| 해 / 달 버튼       | 한낮과 노을 전환                         |
+| 스피커 버튼        | 합성한 바람·새소리 켜기                  |
+| 카메라 버튼        | 현재 풍경을 PNG로 저장                   |
+
+모바일에서는 방향 패드와 달리기·점프 버튼을 사용할 수 있습니다. 지도에서 마을 입구로 돌아갈 수 있습니다. 여섯 장소의 발견 기록은 브라우저의 localStorage에 저장됩니다. 대화창과 지도에서는 이동이 멈춥니다.
+
+## 검증과 배포 준비
+
+```bash
+pnpm --filter komorebi test
+pnpm --filter komorebi typecheck
+pnpm --filter komorebi build
+```
+
+`output: 'export'`를 사용하므로 빌드 결과인 `apps/komorebi/out/`을 정적 호스팅에 올릴 수 있습니다. 외부 배포는 하지 않았습니다.
+
+```bash
+python3 -m http.server 3011 --directory apps/komorebi/out
+```
+
+정적 내보내기 앱이므로 `next start`를 사용하지 않습니다.
+
+## 구조와 표현 방식
+
+- `src/app`: Next.js 진입점, 게임 HUD 스타일
+- `src/features/walk/ui`: 지도, 그림일기, 설정, 터치 조작
+- `src/features/walk/lib/scene.ts`: 배경화 평면과 방향별 캐릭터 합성, 카메라, 이동, 지역 전환
+- `src/features/walk/lib/child.ts`: 승인된 후드 아이 원화의 4방향의 정지·보행·공중 원화 애니메이션
+- `src/features/walk/lib/audio.ts`: Web Audio 바람과 새소리
+- `src/shared/world`: 그림 속 길에 맞춘 이동 영역, 지역 연결, 최단 경로
+- `public/art`: 내장 이미지 생성 도구로 새로 제작한 여섯 장의 배경화
+- `scripts/world.test.ts`: 이동 가능 영역, 강 진입 차단, 모든 경로의 도달 가능성 검증
+
+배경은 자유 회전하는 완전한 3D 지형이 아니라 고정 시점의 배경화입니다. 아이는 원화 스프라이트 시트를 사용하는 2D 캐릭터이며 거리별 크기, 옆모습·뒷모습, 움직이는 그림자로 입체감을 표현합니다. 모바일에서는 좁은 화면 밖으로 아이가 나가지 않게 가로 카메라가 따라갑니다. 논길과 다리처럼 화면에 보이는 길로 이동 범위를 제한합니다.
+
+WebGL이 필요하며 기기 화면 배율을 최대 2로 제한합니다. 시스템의 동작 줄이기 설정을 지원합니다. 게임 이미지와 오디오는 외부 API 없이 로컬 자산과 합성으로 동작합니다. Google Fonts가 연결되지 않으면 시스템 글꼴을 사용합니다.
+
+배경 제작 도구와 프롬프트는 [GAME-ART-PROMPTS.txt](public/art/GAME-ART-PROMPTS.txt)에 기록했습니다. 참고 게임의 원본 이미지나 모델을 사용하지 않습니다.
+
+캐릭터는 실제 이동 거리로 보행 위상을 계산합니다. 정지 자세와 방향별 보행 프레임을 분리하고, 후드 중심과 발 높이를 정렬해 프레임 전환의 떨림을 줄였습니다. 달리기는 재생 속도와 상체 기울기가 달라집니다. 점프는 중력과 착지 반동을 사용하고, 공중에서 다시 점프할 수 없습니다. 학교 운동장에서는 넓은 영역을 자유롭게 뛰어다닐 수 있습니다.
+
+학교·상점가 배경의 생성 프롬프트는 [EXTRA-ART-PROMPTS.txt](public/art/EXTRA-ART-PROMPTS.txt)에 있습니다.
+
+캐릭터 동작 확인 영상: [걷기·달리기·점프](docs/character-motion.webm).
+
+캐릭터 원화: `public/art/child-atlas.png` (4방향 × 6프레임). 생성 도구와 프롬프트: [CHARACTER-PROMPT.txt](public/art/CHARACTER-PROMPT.txt).
+
+보행 개선 시트: `public/art/child-walk-atlas.png` (4방향 × 8열: 정지 1 + 보행 6 + 공중 1). RGB 시트의 중성 체크 배경은 Three.js 렌더러에서 제거합니다. [보행 개선 프롬프트](public/art/CHARACTER-WALK-PROMPTS.txt).

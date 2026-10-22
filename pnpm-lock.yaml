@@ -601,6 +601,43 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  apps/komorebi:
+    dependencies:
+      next:
+        specifier: 16.3.8
+        version: 16.3.8(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.8
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.8(react@19.2.8)
+      three:
+        specifier: 'catalog:'
+        version: 0.185.1
+    devDependencies:
+      '@config/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.4.0
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.15
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.15)
+      '@types/three':
+        specifier: 'catalog:'
+        version: 0.185.4
+      tsx:
+        specifier: 'catalog:'
+        version: 4.22.4
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
   apps/plco:
     dependencies:
       '@supabase/supabase-js':

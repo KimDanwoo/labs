@@ -1,0 +1,22 @@
+Tool: built-in image_gen
+
+Use case: identity-preserve.
+Edit target: supplied approved game character sprite atlas.
+KEEP THIS EXACT ADORABLE CHILD DESIGN: cream hood, little cocoa fringe, oval eyes, w smile, pink cheeks, peach shorts, yellow shoes, sage backpack. Preserve illustration quality, face and colors. Do not redesign.
+CHANGE ONLY THE ANIMATION POSES AND ATLAS LAYOUT. We need a genuinely alternating walk and a neutral idle pose, not repeated identical poses.
+Create a transparent PNG sprite atlas in a strict FOUR rows by EIGHT columns grid, square canvas. No labels, shadows, borders, or text.
+Row 1 faces FRONT, row 2 faces RIGHT, row 3 faces BACK, row 4 faces LEFT.
+Column 1: NEUTRAL IDLE, both feet flat side by side directly under hips, arms relaxed down. Calm standing still.
+Columns 2 through 7: a proper SIX-PHASE alternating WALK cycle:
+2 LEFT foot ahead contacting ground, RIGHT foot behind, RIGHT arm ahead.
+3 LEFT leg supporting weight vertically, RIGHT knee swings forward with foot lifted off ground.
+4 LEFT leg behind, RIGHT foot reaching ahead ready for contact.
+5 RIGHT foot ahead contacting ground, LEFT foot behind, LEFT arm ahead.
+6 RIGHT leg supporting weight vertically, LEFT knee swings forward with foot lifted off ground.
+7 RIGHT leg behind, LEFT foot reaching ahead ready for contact.
+Column 8: playful RUN airborne passing pose, both feet just off ground, knees bent, arms bent, slight forward lean.
+Critical: column 2 and column 5 must clearly show OPPOSITE legs forward, not duplicate poses. Same with 3 versus 6, 4 versus 7. Right-facing and left-facing views show distinct silhouettes for contact vs passing. Front and back views show legs clearly alternating left and right rather than moving together.
+The exact head art and the hood dimensions are identical across each row, no expression change, no head distortion or wobble, no scaling between frames. A professional 2D sprite artist's clean cohesive hand animation. Feet ground baseline exactly 90% down each cell. All sprites center-aligned, same head center x per cell and same head top height per cell except a very tiny 2px natural vertical bounce. Full body with transparent margins, no neighbouring sprites touching. Truly transparent alpha background.
+
+Background extraction attempt (output retained RGB; game renderer keys neutral matte):
+Use case: background-extraction. Edit this exact sprite sheet ONLY to remove the gray-and-white checkerboard background and replace it with ACTUAL transparent alpha. The input checkerboard is baked RGB, that is incorrect. Output an RGBA PNG with alpha=0 everywhere outside each character. Preserve all 32 character sprites EXACTLY: their positions, sizes, poses, colors and every detail unchanged. Do not redraw, rearrange, rescale, add a checkerboard, or change any character. Keep the 8-column 4-row layout. Background extraction only, true transparent PNG alpha, not a visual checkerboard.
