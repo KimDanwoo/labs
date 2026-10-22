@@ -6,7 +6,7 @@ packages:
 # 버전 변경은 여기 한 곳만 수정 후 `pnpm install`.
 catalog:
   # framework / runtime
-  next: 16.3.3
+  next: 16.3.8
   react: 19.2.8
   react-dom: 19.2.8
 
@@ -38,7 +38,7 @@ catalog:
   prettier: ^3.4.2
   # ESLint 10은 eslint-config-next가 번들하는 eslint-plugin-react가 미지원(2026-08-30 확인).
   eslint: ^9
-  eslint-config-next: 16.3.3
+  eslint-config-next: 16.3.8
 
   # lint / format 공유 설정(@repo/eslint-config, @repo/prettier-config)에서 사용
   '@typescript-eslint/parser': ^8.68.0
@@ -94,7 +94,8 @@ catalog:
   korean-lunar-calendar: ^0.3.6
 
   # image processing
-  sharp: ^0.35.4
+  sharp: ^0.35.5
+  devalue: ^5.9.3
 
   # astro (dansoon)
   astro: ^7.2.9
