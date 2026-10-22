@@ -1,10 +1,12 @@
 'use client';
 
-import { gameKey } from '../lib/input';
-import { useEffect, useRef, useState } from 'react';
+import { Joystick } from './Joystick';
+
 import { LANDMARKS, SPAWN, WORLDS, type Landmark } from '@shared/world/world';
-import { createScene, type SceneStatus, type WalkEngine } from '../lib/scene';
+import { useEffect, useRef, useState } from 'react';
 import { createAmbience } from '../lib/audio';
+import { gameKey } from '../lib/input';
+import { createScene, type SceneStatus, type WalkEngine } from '../lib/scene';
 
 type IconName = 'sun' | 'moon' | 'sound' | 'mute' | 'camera' | 'map' | 'close' | 'arrow' | 'home';
 function Icon({ name }: { name: IconName }) {
@@ -66,9 +68,7 @@ function readDiscoveries(): string[] {
   try {
     const parsed: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
     return Array.isArray(parsed)
-      ? parsed.filter(
-          (id): id is string => typeof id === 'string' && LANDMARKS.some((p) => p.id === id),
-        )
+      ? parsed.filter((id): id is string => typeof id === 'string' && LANDMARKS.some((p) => p.id === id))
       : [];
   } catch {
     return [];
@@ -114,9 +114,7 @@ export function Walk() {
       .catch((e) => {
         if (!cancelled) {
           console.error(e);
-          setError(
-            '풍경을 불러오지 못했어요. 페이지를 새로고침하거나 브라우저의 하드웨어 가속 설정을 확인해 주세요.',
-          );
+          setError('풍경을 불러오지 못했어요. 페이지를 새로고침하거나 브라우저의 하드웨어 가속 설정을 확인해 주세요.');
         }
       });
     return () => {
@@ -280,7 +278,7 @@ export function Walk() {
 
       {!started && ready && (
         <div className="start-hint">
-          <span className="hint-spark">✧</span> 어디로 가 볼까? 방향키 또는 길을 클릭해 봐!{' '}
+          <span className="hint-spark">✧</span> 어디로 가 볼까? 이동 패드를 끌거나 길을 눌러 봐!{' '}
           <span className="hint-spark">✧</span>
         </div>
       )}
@@ -289,9 +287,7 @@ export function Walk() {
           <kbd>E</kbd>
           <span>
             {status.nearby.name}
-            <small>
-              {visited.includes(status.nearby.id) ? '추억 다시 읽기' : '잠깐 머물러 보기'}
-            </small>
+            <small>{visited.includes(status.nearby.id) ? '추억 다시 읽기' : '잠깐 머물러 보기'}</small>
           </span>
           <Icon name="arrow" />
         </button>
@@ -338,30 +334,7 @@ export function Walk() {
       </footer>
 
       <div className="mobile-controls" aria-label="터치 이동">
-        <div className="dpad">
-          {[
-            { key: 'w', label: '앞으로', symbol: '↑' },
-            { key: 'a', label: '왼쪽으로', symbol: '←' },
-            { key: 's', label: '뒤로', symbol: '↓' },
-            { key: 'd', label: '오른쪽으로', symbol: '→' },
-          ].map(({ key, label, symbol }) => (
-            <button
-              key={key}
-              className={`direction direction-${key}`}
-              aria-label={label}
-              onPointerDown={(e) => {
-                e.preventDefault();
-                e.currentTarget.setPointerCapture(e.pointerId);
-                engine.current?.setInput(key, true);
-              }}
-              onPointerUp={() => engine.current?.setInput(key, false)}
-              onPointerCancel={() => engine.current?.setInput(key, false)}
-              onLostPointerCapture={() => engine.current?.setInput(key, false)}
-            >
-              {symbol}
-            </button>
-          ))}
-        </div>
+        <Joystick disabled={!ready} onInput={(key, pressed) => engine.current?.setInput(key, pressed)} />
         <div className="action-buttons">
           <button
             className="jump-button"
@@ -400,11 +373,7 @@ export function Walk() {
             <span className="eyebrow">YOUR LITTLE ADVENTURE</span>
             <h2>여름을 걷는 지도</h2>
           </div>
-          <button
-            className="tool"
-            aria-label="지도 닫기"
-            onClick={() => closeDialog(mapRef.current)}
-          >
+          <button className="tool" aria-label="지도 닫기" onClick={() => closeDialog(mapRef.current)}>
             <Icon name="close" />
           </button>
         </div>
@@ -417,13 +386,7 @@ export function Walk() {
           role="img"
           aria-label={`산책 지도. 현재 좌표 ${Math.round(status.x)}, ${Math.round(status.z)}`}
         >
-          <image
-            href={WORLDS[status.region].image}
-            width="400"
-            height="300"
-            preserveAspectRatio="none"
-            opacity=".75"
-          />
+          <image href={WORLDS[status.region].image} width="400" height="300" preserveAspectRatio="none" opacity=".75" />
           {WORLDS[status.region].routes.map((edge) => {
             const a = WORLDS[status.region].nodes.find((n) => n.id === edge.a)!;
             const b = WORLDS[status.region].nodes.find((n) => n.id === edge.b)!;
@@ -444,17 +407,8 @@ export function Walk() {
             const point = p;
             return (
               <g key={p.id} transform={`translate(${mapX(point.x)}, ${mapY(point.z)})`}>
-                <circle
-                  r="12"
-                  fill={visited.includes(p.id) ? '#526b49' : '#faf4de'}
-                  stroke="#8a9a71"
-                />
-                <text
-                  textAnchor="middle"
-                  dy="5"
-                  fontSize="13"
-                  fill={visited.includes(p.id) ? '#fff8df' : '#526b49'}
-                >
+                <circle r="12" fill={visited.includes(p.id) ? '#526b49' : '#faf4de'} stroke="#8a9a71" />
+                <text textAnchor="middle" dy="5" fontSize="13" fill={visited.includes(p.id) ? '#fff8df' : '#526b49'}>
                   {visited.includes(p.id) ? '✓' : p.icon}
                 </text>
                 <text
@@ -471,13 +425,7 @@ export function Walk() {
               </g>
             );
           })}
-          <circle
-            cx={mapX(mapPosition.x)}
-            cy={mapY(mapPosition.z)}
-            r="10"
-            fill="#e99b4e"
-            opacity="0.4"
-          />
+          <circle cx={mapX(mapPosition.x)} cy={mapY(mapPosition.z)} r="10" fill="#e99b4e" opacity="0.4" />
           <circle
             cx={mapX(mapPosition.x)}
             cy={mapY(mapPosition.z)}
@@ -493,9 +441,7 @@ export function Walk() {
               <span className={`stamp ${visited.includes(p.id) ? 'collected' : ''}`}>{p.icon}</span>
               <div>
                 <strong>{p.name}</strong>
-                <small>
-                  {visited.includes(p.id) ? '추억을 간직했어요' : '아직 만나지 않은 풍경'}
-                </small>
+                <small>{visited.includes(p.id) ? '추억을 간직했어요' : '아직 만나지 않은 풍경'}</small>
               </div>
               <span className="discovery-check">{visited.includes(p.id) ? '✓' : '→'}</span>
             </button>
@@ -526,11 +472,7 @@ export function Walk() {
           if (e.target === e.currentTarget) closeDialog(memoryRef.current);
         }}
       >
-        <button
-          className="tool memory-close"
-          aria-label="추억 닫기"
-          onClick={() => closeDialog(memoryRef.current)}
-        >
+        <button className="tool memory-close" aria-label="추억 닫기" onClick={() => closeDialog(memoryRef.current)}>
           <Icon name="close" />
         </button>
         <span className="memory-symbol">{memory?.icon}</span>
