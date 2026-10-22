@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import {
   LANDMARKS,
   SPAWN,
@@ -12,6 +11,7 @@ import {
   type Point,
   type Region,
 } from '@shared/world/world';
+import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { createChild } from './child';
 import { gameKey } from './input';
@@ -65,10 +65,7 @@ export async function createScene(
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor('#1b352b');
-  renderer.domElement.setAttribute(
-    'aria-label',
-    '햇빛이 비치는 시골길. 길을 클릭하거나 방향키를 눌러 걸어 보세요.',
-  );
+  renderer.domElement.setAttribute('aria-label', '햇빛이 비치는 시골길. 길을 클릭하거나 방향키를 눌러 걸어 보세요.');
   container.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(43.6, 1.5, 0.1, 200);
@@ -194,11 +191,7 @@ export async function createScene(
         c.font = 'bold 27px sans-serif';
         c.textAlign = 'center';
         c.textBaseline = 'middle';
-        c.fillText(
-          `${node.x < 15 ? '← ' : ''}${portal.label}${node.x > 85 ? ' →' : node.z > 90 ? ' ↓' : ''}`,
-          128,
-          42,
-        );
+        c.fillText(`${node.x < 15 ? '← ' : ''}${portal.label}${node.x > 85 ? ' →' : node.z > 90 ? ' ↓' : ''}`, 128, 42);
       });
       loaded.push(texture);
       const material = new THREE.SpriteMaterial({
@@ -209,11 +202,7 @@ export async function createScene(
       exitMaterials.push(material);
       const sprite = new THREE.Sprite(material);
       sprite.scale.set(8, 2.5, 1);
-      sprite.position.set(
-        THREE.MathUtils.clamp(node.x, 8, 92) * 1.2 - 60,
-        40 - Math.min(node.z, 91) * 0.8 + 2.5,
-        1,
-      );
+      sprite.position.set(THREE.MathUtils.clamp(node.x, 8, 92) * 1.2 - 60, 40 - Math.min(node.z, 91) * 0.8 + 2.5, 1);
       sprite.renderOrder = 2;
       scene.add(sprite);
       exitSigns.push({ region: key as Region, sprite });
@@ -274,10 +263,12 @@ export async function createScene(
     if (!point) return;
     if (point.region === region) route = findRoute(position, point, region);
     else {
-      const portal = WORLDS[region].portals.find(
-        (p) => p.to === nextRegionStep(region, point.region),
-      )!;
-      route = findRoute(position, WORLDS[region].nodes.find((n) => n.id === portal.node)!, region);
+      const portal = WORLDS[region].portals.find((p) => p.to === nextRegionStep(region, point.region))!;
+      route = findRoute(
+        position,
+        WORLDS[region].nodes.find((n) => n.id === portal.node)!,
+        region,
+      );
     }
   };
   const switchRegion = (next: Region, spawn: Point) => {
@@ -301,8 +292,7 @@ export async function createScene(
     )
       return;
     const key = gameKey(event);
-    if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key))
-      event.preventDefault();
+    if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) event.preventDefault();
     if (key === ' ' && !event.repeat) startJump(jump);
     keys.add(key);
     if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
@@ -335,10 +325,7 @@ export async function createScene(
     route = findRoute(position, point, region);
   };
   renderer.domElement.tabIndex = 0;
-  renderer.domElement.setAttribute(
-    'aria-label',
-    '산책 게임. 방향키 또는 WASD로 이동, Shift로 달리기, Space로 점프',
-  );
+  renderer.domElement.setAttribute('aria-label', '산책 게임. 방향키 또는 WASD로 이동, Shift로 달리기, Space로 점프');
   window.addEventListener('keydown', keyDown);
   window.addEventListener('keyup', keyUp);
   window.addEventListener('blur', clear);
@@ -353,22 +340,15 @@ export async function createScene(
     const paused = !!document.querySelector('dialog[open]') || document.hidden;
     if (paused) keys.clear();
     else advanceJump(jump, dt);
-    let dx =
-      Number(keys.has('d') || keys.has('arrowright')) -
-      Number(keys.has('a') || keys.has('arrowleft'));
-    let dz =
-      Number(keys.has('s') || keys.has('arrowdown')) - Number(keys.has('w') || keys.has('arrowup'));
+    let dx = Number(keys.has('d') || keys.has('arrowright')) - Number(keys.has('a') || keys.has('arrowleft'));
+    let dz = Number(keys.has('s') || keys.has('arrowdown')) - Number(keys.has('w') || keys.has('arrowup'));
     const keyboardWalking = Math.hypot(dx, dz) > 0;
     if (!paused && !keyboardWalking && route.length) {
       const next = route[0]!;
       const d = Math.hypot(next.x - position.x, next.z - position.z);
       if (d < 0.45) {
         route.shift();
-        if (
-          !route.length &&
-          destination &&
-          LANDMARKS.find((p) => p.id === destination)?.region === region
-        )
+        if (!route.length && destination && LANDMARKS.find((p) => p.id === destination)?.region === region)
           destination = null;
       } else {
         dx = (next.x - position.x) / d;
@@ -428,28 +408,29 @@ export async function createScene(
     const maxX = Math.max(0, 60 - halfWidth),
       maxY = Math.max(0, 40 - halfHeight);
     const cameraX = THREE.MathUtils.clamp(child.position.x * (halfWidth < 35 ? 1 : 0), -maxX, maxX);
-    const cameraY = THREE.MathUtils.clamp(
-      Math.min(0, child.position.y + halfHeight - 7),
-      -maxY,
-      maxY,
-    );
-    camera.position.x = THREE.MathUtils.damp(
+    const cameraY = THREE.MathUtils.clamp(Math.min(0, child.position.y + halfHeight - 7), -maxY, maxY);
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, cameraX, reducedMotion ? 100 : 3, dt);
+    camera.position.y = THREE.MathUtils.damp(camera.position.y, cameraY, reducedMotion ? 100 : 3, dt);
+    // Constrain by the character's head/feet, not only its ground position.
+    // The old lower-edge-only camera could crop the hood on narrow screens.
+    const visibleHalfHeight = halfHeight * 0.98;
+    const visibleHalfWidth = halfWidth * 0.98;
+    const characterHeight = 10.4 * scale * 1.65;
+    const characterHalfWidth = 3.25 * scale * 1.65;
+    camera.position.x = THREE.MathUtils.clamp(
       camera.position.x,
-      cameraX,
-      reducedMotion ? 100 : 3,
-      dt,
+      child.position.x + characterHalfWidth - visibleHalfWidth,
+      child.position.x - characterHalfWidth + visibleHalfWidth,
     );
-    camera.position.y = THREE.MathUtils.damp(
+    camera.position.y = THREE.MathUtils.clamp(
       camera.position.y,
-      cameraY,
-      reducedMotion ? 100 : 3,
-      dt,
+      child.position.y + characterHeight - visibleHalfHeight,
+      child.position.y - 1 + visibleHalfHeight,
     );
     markers.forEach((marker, i) => {
       const point = LANDMARKS[i]!;
       marker.visible = point.region === region;
-      marker.position.y =
-        40 - point.z * 0.8 + 2 + (reducedMotion ? 0 : Math.sin(elapsed * 1.5 + i) * 0.17);
+      marker.position.y = 40 - point.z * 0.8 + 2 + (reducedMotion ? 0 : Math.sin(elapsed * 1.5 + i) * 0.17);
     });
     exitSigns.forEach((sign) => {
       sign.sprite.visible = sign.region === region;
@@ -473,8 +454,7 @@ export async function createScene(
       dustGeo.attributes.position!.needsUpdate = true;
     }
     if (elapsed - statusTime > 0.12) {
-      container.dataset.motion =
-        jump.height > 0 ? 'jumping' : walking ? (running ? 'running' : 'walking') : 'idle';
+      container.dataset.motion = jump.height > 0 ? 'jumping' : walking ? (running ? 'running' : 'walking') : 'idle';
       onStatus({
         ...position,
         region,
@@ -552,9 +532,7 @@ export async function createScene(
       renderer.domElement.removeEventListener('pointerdown', click);
       geo.dispose();
       dustGeo.dispose();
-      [background, shadowMat, dustMat, targetMat, ...markerMats, ...exitMaterials].forEach((m) =>
-        m.dispose(),
-      );
+      [background, shadowMat, dustMat, targetMat, ...markerMats, ...exitMaterials].forEach((m) => m.dispose());
       loaded.forEach((t) => t.dispose());
       character.dispose();
       renderer.dispose();
