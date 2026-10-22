@@ -27,7 +27,9 @@
   "pnpm": {
     "overrides": {
       "next": "catalog:",
-      "eslint-config-next": "catalog:"
+      "eslint-config-next": "catalog:",
+      "devalue@<5.9.3": "catalog:",
+      "sharp@<0.35.5": "catalog:"
     }
   }
 }
