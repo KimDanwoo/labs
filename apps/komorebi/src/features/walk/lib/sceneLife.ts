@@ -2,6 +2,7 @@ import type { Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { FLIGHT, startFlight, stepButterfly, stepDragonfly, type Bounds, type Flight } from './flight';
+import { lampGlowAt, lightSprite } from './nightLights';
 import { characterScale } from './perspective';
 
 const CAT_URL = '/art/cat-sleeping.webp';
@@ -109,6 +110,10 @@ function drawGull(c: CanvasRenderingContext2D) {
 
 const SIZE = { butterfly: 3.2, dragonfly: 3.8, gull: 3.2 };
 /** Height above the painted ground, in scene units, while flying and while settled. */
+/** Darkness over which flyers fade out and head home, rather than vanishing all at once. */
+const DUSK = [0.25, 0.55] as const;
+/** How quickly an insect drops to its perch or rises off it (higher is quicker). */
+const LANDING_EASE = 8;
 const ALTITUDE = { butterfly: [1.6, 0.5], dragonfly: [3.4, 1.2] } satisfies Record<Insect, [number, number]>;
 
 type Scene = { region: Region; dt: number; elapsed: number; darkness: number; isStill: boolean; isRaining: boolean };
@@ -121,6 +126,8 @@ type Life = {
   material: THREE.SpriteMaterial;
   size: number;
   bob: number;
+  /** Height above the ground right now, eased toward the flying or settled height. */
+  lift: number;
 };
 
 const between = (min: number, max: number) => min + Math.random() * (max - min);
@@ -157,6 +164,7 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
           ...sprite(texture),
           size: SIZE[kind] * between(0.8, 1.2),
           bob: Math.random() * 10,
+          lift: ALTITUDE[kind][0],
         };
       }),
     ),
@@ -199,13 +207,14 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
     })
     .catch(() => undefined);
 
-  function drawInsect(life: Life, elapsed: number) {
+  function drawInsect(life: Life, elapsed: number, dt: number) {
     const { flight, kind, sprite: s, material, size } = life;
     const isSettled = flight.mode === FLIGHT.rest;
     const depth = characterScale(flight.z) * 2.4 * size;
     const [flying, settled] = ALTITUDE[kind];
+    life.lift = THREE.MathUtils.damp(life.lift, isSettled ? settled : flying, LANDING_EASE, dt);
     const bob = isSettled ? 0 : Math.sin(elapsed * 3.1 + life.bob) * 0.5 + Math.sin(elapsed * 7.3 + life.bob) * 0.2;
-    s.position.set(flight.x * 1.2 - 60, 40 - flight.z * 0.8 + (isSettled ? settled : flying + bob), 1);
+    s.position.set(flight.x * 1.2 - 60, 40 - flight.z * 0.8 + life.lift + bob, 1);
     if (kind === INSECT.butterfly) {
       s.scale.set(depth * (0.2 + 0.8 * Math.abs(Math.cos(flight.wing))), depth, 1);
       material.rotation = isSettled ? 0 : Math.sin(elapsed * 2 + life.bob) * 0.25;
@@ -218,14 +227,15 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
 
   return {
     update({ region, dt, elapsed, darkness, isStill, isRaining }: Scene) {
-      const isFlying = !isStill && !isRaining && darkness < 0.5;
+      const dusk = THREE.MathUtils.smoothstep(darkness, DUSK[0], DUSK[1]);
+      const isFlying = !isStill && !isRaining && dusk < 1;
       for (const life of insects) {
         life.sprite.visible = isFlying && life.region === region;
         if (!life.sprite.visible) continue;
         const step = life.kind === INSECT.butterfly ? stepButterfly : stepDragonfly;
         life.flight = step(life.flight, dt, life.bounds, Math.random);
-        life.material.opacity = 1 - darkness;
-        drawInsect(life, elapsed);
+        life.material.opacity = 1 - dusk;
+        drawInsect(life, elapsed, dt);
       }
       for (const gull of gulls) {
         gull.sprite.visible = isFlying && gull.region === region;
@@ -236,12 +246,13 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
         const flap = 0.35 + 0.65 * Math.abs(Math.sin(elapsed * 2.2 + gull.phase));
         gull.sprite.position.set(x * 1.2 - 60, 40 - z * 0.8, 1);
         gull.sprite.scale.set(SIZE.gull, SIZE.gull * flap, 1);
+        gull.material.opacity = 1 - dusk;
       }
       cat.visible = catTexture !== null && region === CAT_SPOT.region;
       if (!cat.visible) return;
       const breath = isStill ? 0 : Math.sin(elapsed * 1.6) * 0.025;
       cat.scale.set(catWidth, catWidth * catAspect * (1 + breath), 1);
-      catMaterial.color.setRGB(1 - darkness * 0.5, 1 - darkness * 0.42, 1 - darkness * 0.2);
+      lightSprite(catMaterial.color, darkness, lampGlowAt(CAT_SPOT.region, CAT_SPOT));
     },
     dispose() {
       isDisposed = true;

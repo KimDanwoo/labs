@@ -1,4 +1,4 @@
-import type { Region } from '@shared/world/world';
+import type { Point, Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
 
@@ -60,7 +60,46 @@ export function lampUniforms(region: Region) {
   return { values, count: lamps.length };
 }
 
+const POOL_REACH = 2.2;
+const POOL_STRENGTH = 0.85;
+const smoothstep = (edge0: number, edge1: number, x: number) => {
+  const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+};
+
+/** How much lamplight falls at a point (0–0.9), with the same falloff the painting shader uses for its pools. */
+export function lampGlowAt(region: Region, point: Point) {
+  const pool = LAMPS[region]
+    .slice(0, MAX_LAMPS)
+    .reduce(
+      (sum, lamp) =>
+        sum +
+        1 -
+        smoothstep(0, lamp.reach * POOL_REACH, Math.hypot(((point.x - lamp.x) / 100) * 1.5, (point.z - lamp.z) / 100)),
+      0,
+    );
+  return Math.min(0.9, pool * POOL_STRENGTH);
+}
+
+const MOONLIT = new THREE.Color(0.5, 0.58, 0.8);
+const LAMPLIT = new THREE.Color(1, 0.86, 0.64);
+const DAYLIT = new THREE.Color(1, 1, 1);
+
+/** Tints a sprite standing in the painting: moonlit blue after dark, warmed back where lamplight falls on it. */
+export function lightSprite(color: THREE.Color, darkness: number, glow: number) {
+  color.copy(MOONLIT).lerp(LAMPLIT, glow);
+  color.lerp(DAYLIT, 1 - darkness);
+}
+
 const toScene = (x: number, z: number) => new THREE.Vector3(x * 1.2 - 60, 40 - z * 0.8, 1);
+
+/** Brightness over time: a lantern flame breathes gently, far-off lights twinkle, windows hold steady. */
+const FLICKER = {
+  steady: () => 1,
+  flame: (t: number) => 0.94 + 0.06 * Math.sin(t * 2.6) * Math.sin(t * 1.1),
+  twinkle: (t: number) => 0.82 + 0.18 * Math.sin(t * 7) * Math.sin(t * 2.3),
+} satisfies Record<string, (t: number) => number>;
+type Flicker = (typeof FLICKER)[keyof typeof FLICKER];
 
 /** Warm halos over each lamp and tiny far-off twinkles, added on top of the painting only after dark. */
 export function createNightLights(scene: THREE.Scene) {
@@ -72,7 +111,7 @@ export function createNightLights(scene: THREE.Scene) {
     c.fillStyle = g;
     c.fillRect(0, 0, 64, 64);
   });
-  const make = (region: Region, x: number, z: number, size: number, flicker: boolean) => {
+  const make = (region: Region, x: number, z: number, size: number, flicker: Flicker) => {
     const material = new THREE.SpriteMaterial({
       map: glow,
       transparent: true,
@@ -88,10 +127,12 @@ export function createNightLights(scene: THREE.Scene) {
     return { region, sprite, material, size, flicker, phase: x * 1.7 + z };
   };
   const halos = (Object.keys(LAMPS) as Region[]).flatMap((region) =>
-    LAMPS[region].map((lamp) => make(region, lamp.x, lamp.z, lamp.reach * 60, lamp.flicker ?? false)),
+    LAMPS[region].map((lamp) =>
+      make(region, lamp.x, lamp.z, lamp.reach * 60, lamp.flicker ? FLICKER.flame : FLICKER.steady),
+    ),
   );
   const twinkles = (Object.keys(TWINKLES) as Region[]).flatMap((region) =>
-    (TWINKLES[region] ?? []).map((t) => make(region, t.x, t.z, 1.1, true)),
+    (TWINKLES[region] ?? []).map((t) => make(region, t.x, t.z, 1.1, FLICKER.twinkle)),
   );
   const all = [...halos, ...twinkles];
   return {
@@ -99,10 +140,7 @@ export function createNightLights(scene: THREE.Scene) {
       for (const light of all) {
         light.sprite.visible = darkness > 0.01 && light.region === region;
         if (!light.sprite.visible) continue;
-        const wobble =
-          light.flicker && !isStill
-            ? 0.82 + 0.18 * Math.sin(elapsed * 7 + light.phase) * Math.sin(elapsed * 2.3 + light.phase)
-            : 1;
+        const wobble = isStill ? 1 : light.flicker(elapsed + light.phase);
         light.material.opacity = darkness * wobble;
       }
     },

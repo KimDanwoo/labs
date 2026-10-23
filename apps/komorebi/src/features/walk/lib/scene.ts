@@ -24,7 +24,7 @@ import { createChild } from './child';
 import { createFireflies } from './fireflies';
 import { gameKey, isControlTarget } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
-import { MAX_LAMPS, createNightLights, lampUniforms } from './nightLights';
+import { MAX_LAMPS, createNightLights, lampGlowAt, lampUniforms } from './nightLights';
 import { characterScale } from './perspective';
 import { createPlaceEffects } from './placeEffects';
 import { createPortals } from './portals';
@@ -181,7 +181,7 @@ export async function createScene(
         c=mix(c,lamplit,clamp(pool*.85+carry*.35,0.,.9)*night);
         float edge=1.-smoothstep(.3,.95,length((uv-vec2(.5,.45))*vec2(1.1,1.35)));
         c*=mix(1.,.55+.45*edge,night);
-        vec3 overcast=mix(c,grey,.5)*vec3(.6,.66,.72);
+        vec3 overcast=mix(c,vec3(dot(c,vec3(.3,.59,.11))),.5)*vec3(.6,.66,.72);
         c=mix(c,overcast,rain*.8);
         gl_FragColor=vec4(c*fade,1.);
         #include <tonemapping_fragment>
@@ -654,7 +654,7 @@ export async function createScene(
       layer.mesh.visible = order !== null;
       layer.mesh.renderOrder = order ?? 0;
     });
-    character.setDarkness(darkness);
+    character.setLight(darkness, lampGlowAt(region, position));
     transition = Math.min(1, transition + dt * 1.8);
     background.uniforms.time!.value = reducedMotion ? 0 : elapsed;
     background.uniforms.evening!.value = warmth;

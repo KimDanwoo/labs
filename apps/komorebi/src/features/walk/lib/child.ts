@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { childFacing } from './atlas';
 import { advanceMotion, createMotion, crossedFootfall } from './motion';
+import { lightSprite } from './nightLights';
 
 /** Authored 4-direction artwork with idle, six walk poses and an airborne pose. Identity never morphs when turning. */
 export function createChild(atlas: THREE.Texture) {
@@ -50,8 +51,9 @@ export function createChild(atlas: THREE.Texture) {
       return { hasStepped: walking && jumpHeight <= 0 && crossedFootfall(previousPhase, m.phase) };
     },
     /** Moonlight on the sprite, so the child sits in the night painting rather than on top of it. */
-    setDarkness(darkness: number) {
-      material.color.setRGB(1 - darkness * 0.5, 1 - darkness * 0.42, 1 - darkness * 0.2);
+    /** Moonlit after dark, warmed by `glow` (0–0.9) where lamplight falls on the child. */
+    setLight(darkness: number, glow: number) {
+      lightSprite(material.color, darkness, glow);
     },
     dispose() {
       material.dispose();

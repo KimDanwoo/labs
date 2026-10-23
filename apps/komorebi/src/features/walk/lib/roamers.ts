@@ -1,8 +1,9 @@
 import type { Point, Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
+import { lampGlowAt, lightSprite } from './nightLights';
 import { characterScale } from './perspective';
-import { passingRoute, strollOn, type Stroll } from './roam';
+import { passingRoute, presence, routeLength, startGait, walkOn, type Gait } from './roam';
 
 const FRAMES = 4;
 const ANIMAL = {
@@ -17,6 +18,12 @@ const NEXT_VISIT = [18, 45] as const;
 const NIGHT_CAT_SHARE = 0.8;
 const DAY_CAT_SHARE = 0.5;
 const PAUSE_CHANCE = 0.35;
+const PAUSE_SECONDS = 1.6;
+/** Lane distance over which an animal steps out of a lane end or melts into the far one. */
+const FADE_IN = 3;
+const FADE_OUT = 4;
+/** Seconds an animal takes to slip away once rain starts. */
+const LEAVE_SECONDS = 0.8;
 /** Render order around the child's sprites (4): drawn over them when nearer the viewer, under them otherwise. */
 const ORDER = { front: 4.2, behind: 3.8 } as const;
 
@@ -71,10 +78,12 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
   let visitor: {
     animal: Animal;
     region: Region;
-    stroll: Stroll;
-    walked: number;
+    gait: Gait;
+    length: number;
     pause: number;
     pauseAt: number;
+    /** Seconds spent slipping away once rain has started; null while it strolls on. */
+    leaving: number | null;
   } | null = null;
   let standing: (Point & { order: number }) | null = null;
 
@@ -89,11 +98,35 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     visitor = {
       animal,
       region,
-      stroll: { path, leg: 0, along: 0 },
-      walked: 0,
+      gait: startGait(path),
+      length: routeLength(path),
       pause: 0,
       pauseAt: Math.random() < PAUSE_CHANCE ? between([10, 30]) : Infinity,
+      leaving: null,
     };
+  }
+
+  function hide() {
+    visitor = null;
+    standing = null;
+    sprite.visible = false;
+    shadow.visible = false;
+  }
+
+  function draw(gait: Gait, frame: number, spec: (typeof ANIMAL)[Animal], { childZ, darkness, region }: Scene) {
+    // Sprites drop a negative scale's sign, so a left-facing walk mirrors the atlas instead.
+    material.map!.repeat.set((gait.isFacingLeft ? -1 : 1) / FRAMES, 1);
+    material.map!.offset.set((frame + (gait.isFacingLeft ? 1 : 0)) / FRAMES, 0);
+    const height = spec.height * characterScale(gait.at.z) * 1.65;
+    sprite.scale.set(height * spec.aspect, height, 1);
+    sprite.position.set(gait.at.x * 1.2 - 60, 40 - gait.at.z * 0.8, 2);
+    sprite.renderOrder = gait.at.z > childZ ? ORDER.front : ORDER.behind;
+    standing = { ...gait.at, order: sprite.renderOrder };
+    lightSprite(material.color, darkness, lampGlowAt(region, gait.at));
+    shadow.position.set(sprite.position.x, sprite.position.y - 0.05, 1);
+    shadow.scale.set(height * spec.aspect * 0.9, height * 0.28, 1);
+    sprite.visible = true;
+    shadow.visible = true;
   }
 
   return {
@@ -104,51 +137,35 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     get standing() {
       return standing;
     },
-    update({ region, dt, darkness, isStill, isRaining, childZ }: Scene) {
-      const isWelcome = !isStill && !isRaining;
-      if (visitor && (visitor.region !== region || !isWelcome)) visitor = null;
+    update(now: Scene) {
+      const { region, dt, darkness, isStill, isRaining } = now;
+      if (visitor?.region !== region) hide();
       if (!visitor) {
-        standing = null;
-        sprite.visible = false;
-        shadow.visible = false;
         wait -= dt;
-        if (wait <= 0 && isWelcome) {
-          wait = between(NEXT_VISIT);
-          arrive(region, darkness);
-        }
+        if (wait > 0 || isStill || isRaining) return;
+        wait = between(NEXT_VISIT);
+        arrive(region, darkness);
         if (!visitor) return;
       }
+      if (isRaining) visitor.leaving ??= 0;
+      if (visitor.leaving !== null) visitor.leaving += dt;
       const spec = ANIMAL[visitor.animal];
-      if (visitor.walked >= visitor.pauseAt && visitor.pause < 1.6) visitor.pause += dt;
-      const isPausing = visitor.walked >= visitor.pauseAt && visitor.pause < 1.6;
-      const perspective = Math.min(1, Math.max(0.45, (visitor.stroll.path[visitor.stroll.leg]!.z - 15) / 70));
-      const distance = isPausing ? 0 : spec.speed * perspective * dt;
-      const moved = strollOn(visitor.stroll, distance);
-      if (!moved) {
-        visitor = null;
-        standing = null;
-        sprite.visible = false;
-        shadow.visible = false;
+      const isPausing = visitor.gait.walked >= visitor.pauseAt && visitor.pause < PAUSE_SECONDS;
+      if (isPausing) visitor.pause += dt;
+      // With reduced motion the animal simply stands where it is, and nobody new comes along.
+      const strolled = isPausing || isStill ? visitor.gait : walkOn(visitor.gait, spec, dt);
+      const isGone = !strolled || (visitor.leaving ?? 0) >= LEAVE_SECONDS;
+      if (isGone) {
+        hide();
         return;
       }
-      visitor.stroll = moved.stroll;
-      visitor.walked += distance;
-      const frame = isPausing ? 0 : Math.floor(visitor.walked / (spec.stride * perspective)) % FRAMES;
-      // Sprites drop a negative scale's sign, so a left-facing walk mirrors the atlas instead.
-      const isFacingLeft = moved.dx < 0;
-      material.map!.repeat.set((isFacingLeft ? -1 : 1) / FRAMES, 1);
-      material.map!.offset.set((frame + (isFacingLeft ? 1 : 0)) / FRAMES, 0);
-      const height = spec.height * characterScale(moved.at.z) * 1.65;
-      sprite.scale.set(height * spec.aspect, height, 1);
-      sprite.position.set(moved.at.x * 1.2 - 60, 40 - moved.at.z * 0.8, 2);
-      sprite.renderOrder = moved.at.z > childZ ? ORDER.front : ORDER.behind;
-      standing = { ...moved.at, order: sprite.renderOrder };
-      material.color.setRGB(1 - darkness * 0.5, 1 - darkness * 0.42, 1 - darkness * 0.2);
-      sprite.visible = true;
-      shadow.position.set(sprite.position.x, sprite.position.y - 0.05, 1);
-      shadow.scale.set(height * spec.aspect * 0.9, height * 0.28, 1);
-      shadowMaterial.opacity = 1 - darkness * 0.6;
-      shadow.visible = true;
+      visitor.gait = strolled;
+      const frame = isPausing ? 0 : Math.floor(strolled.phase) % FRAMES;
+      draw(strolled, frame, spec, now);
+      const slippingAway = 1 - (visitor.leaving ?? 0) / LEAVE_SECONDS;
+      const opacity = presence(strolled.walked, visitor.length, FADE_IN, FADE_OUT) * slippingAway;
+      material.opacity = opacity;
+      shadowMaterial.opacity = opacity * (1 - darkness * 0.6);
     },
     dispose() {
       isDisposed = true;
