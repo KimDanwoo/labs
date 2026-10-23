@@ -41,6 +41,8 @@ pnpm --filter komorebi build
 pnpm --filter komorebi test:e2e   # 브라우저 테스트 — build 후, 설치된 Chrome 사용
 ```
 
+스타일 변경 전후 화면 비교: `SHOT_DIR=<폴더> pnpm --filter komorebi test:e2e e2e/visual.spec.ts`로 동작 줄이기 상태의 고정 화면 6장을 저장해 비교합니다. 색은 `src/app/globals.css`의 `:root` 팔레트(RGB 채널)를 `rgb(var(--이름) / 알파)`로만 씁니다.
+
 `output: 'export'`를 사용하므로 빌드 결과인 `apps/komorebi/out/`을 정적 호스팅에 올릴 수 있습니다.
 
 ```bash

@@ -30,29 +30,23 @@ export function WalkMap({ region, position, visited }: Props) {
             y1={mapY(a.z)}
             x2={mapX(b.x)}
             y2={mapY(b.z)}
-            stroke="#fff4c6"
-            strokeWidth="2"
-            strokeDasharray="3 3"
+            className="map-route"
           />
         );
       })}
       {LANDMARKS.filter((p) => p.region === region).map((p) => {
         const isCollected = visited.includes(p.id);
         return (
-          <g key={p.id} transform={`translate(${mapX(p.x)}, ${mapY(p.z)})`}>
-            <circle r="12" fill={isCollected ? '#526b49' : '#faf4de'} stroke="#8a9a71" />
-            <text textAnchor="middle" dy="5" fontSize="13" fill={isCollected ? '#fff8df' : '#526b49'}>
+          <g
+            key={p.id}
+            className={`map-landmark ${isCollected ? 'is-collected' : ''}`}
+            transform={`translate(${mapX(p.x)}, ${mapY(p.z)})`}
+          >
+            <circle r="12" />
+            <text className="map-landmark-icon" textAnchor="middle" dy="5" fontSize="13">
               {isCollected ? '✓' : p.icon}
             </text>
-            <text
-              textAnchor="middle"
-              y="27"
-              fontSize="10"
-              fill="#fffbe7"
-              stroke="#304431"
-              strokeWidth="2"
-              paintOrder="stroke"
-            >
+            <text className="map-landmark-label" textAnchor="middle" y="27" fontSize="10" paintOrder="stroke">
               {p.short}
             </text>
           </g>
@@ -61,13 +55,13 @@ export function WalkMap({ region, position, visited }: Props) {
       {getWorldPortals(region).map((portal) => (
         <g key={portal.node} transform={`translate(${mapX(portal.center.x)}, ${mapY(portal.center.z)})`}>
           <title>{`${portal.label} 출구`}</title>
-          <text textAnchor="middle" dominantBaseline="central" fill="#47745b" fontSize="10">
+          <text className="map-exit" textAnchor="middle" dominantBaseline="central" fontSize="10">
             {portal.label}
           </text>
         </g>
       ))}
-      <circle cx={mapX(position.x)} cy={mapY(position.z)} r="10" fill="#e99b4e" opacity="0.4" />
-      <circle cx={mapX(position.x)} cy={mapY(position.z)} r="5" fill="#e99b4e" stroke="#fff7e8" strokeWidth="2" />
+      <circle className="map-player-halo" cx={mapX(position.x)} cy={mapY(position.z)} r="10" />
+      <circle className="map-player" cx={mapX(position.x)} cy={mapY(position.z)} r="5" />
     </svg>
   );
 }
