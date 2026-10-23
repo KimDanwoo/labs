@@ -1,5 +1,5 @@
 import { TIME, WEATHER, type TimeOfDay, type Weather } from '@features/walk/model/constants';
-import { FOREGROUNDS, isForegroundInFront } from '@shared/world/foreground';
+import { FOREGROUNDS, foregroundOrder } from '@shared/world/foreground';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '@shared/world/portals';
 import { surfaceAt, type Surface } from '@shared/world/surfaces';
 import {
@@ -38,6 +38,7 @@ const CHILD_ATLAS_URL = '/art/child-motion-v2-ready.webp';
 const START_REGION: Region = 'village';
 const CAMERA_EPSILON = 0.01;
 const WARMTH_EPSILON = 0.002;
+const CHILD_ORDER = 4;
 /** How much dusk colour each time of day keeps; night adds its own blue on top. */
 const WARMTH_BY_TIME = { day: 0, evening: 1, night: 0.35 } satisfies Record<TimeOfDay, number>;
 const MOVE_KEYS = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
@@ -173,12 +174,12 @@ export async function createScene(
         for(int i=0;i<${MAX_LAMPS};i++){
           if(i>=lampCount) break;
           vec2 d=(uv-lamps[i].xy)*vec2(1.5,1.);
-          pool+=smoothstep(lamps[i].z*2.2,0.,length(d));
+          pool+=1.-smoothstep(0.,lamps[i].z*2.2,length(d));
         }
-        float carry=smoothstep(.13,0.,length((uv-walker)*vec2(1.5,1.)));
+        float carry=1.-smoothstep(0.,.13,length((uv-walker)*vec2(1.5,1.)));
         vec3 lamplit=base*vec3(1.05,.84,.58);
         c=mix(c,lamplit,clamp(pool*.85+carry*.35,0.,.9)*night);
-        float edge=smoothstep(.95,.3,length((uv-vec2(.5,.45))*vec2(1.1,1.35)));
+        float edge=1.-smoothstep(.3,.95,length((uv-vec2(.5,.45))*vec2(1.1,1.35)));
         c*=mix(1.,.55+.45*edge,night);
         vec3 overcast=mix(c,grey,.5)*vec3(.6,.66,.72);
         c=mix(c,overcast,rain*.8);
@@ -193,7 +194,7 @@ export async function createScene(
   // Group order sorts before mesh order: keep the group at the scene default
   // so the foreground can render after the character's individual sprites.
   child.children.forEach((part) => {
-    part.renderOrder = 4;
+    part.renderOrder = CHILD_ORDER;
   });
   // Reuse the painting shader and its live uniforms so lighting and transitions match.
   const foregroundMaterial = background.clone();
@@ -210,7 +211,6 @@ export async function createScene(
     const uv = geometry.getAttribute('uv');
     for (let i = 0; i < vertices.count; i++) uv.setXY(i, (vertices.getX(i) + 60) / 120, (vertices.getY(i) + 40) / 80);
     const mesh = new THREE.Mesh(geometry, foregroundMaterial);
-    mesh.renderOrder = 4.5;
     mesh.visible = false;
     scene.add(mesh);
     return { ...layer, mesh };
@@ -588,9 +588,6 @@ export async function createScene(
     const shadowSize = 1 - Math.min(jump.height * 0.12, 0.3);
     shadow.scale.set(6.3 * scale * shadowSize, 1.8 * scale * shadowSize, 1);
     shadowMat.opacity = 1 - Math.min(jump.height * 0.22, 0.55);
-    foregrounds.forEach((layer) => {
-      layer.mesh.visible = isForegroundInFront(layer, position, region);
-    });
     const maxX = Math.max(0, 60 - halfWidth),
       maxY = Math.max(0, 40 - halfHeight);
     const cameraX = THREE.MathUtils.clamp(child.position.x * (halfWidth < 35 ? 1 : 0), -maxX, maxX);
@@ -651,6 +648,12 @@ export async function createScene(
       childZ: position.z,
     });
     container.dataset.visitor = roamers.visitor;
+    const walkers = [{ ...position, order: CHILD_ORDER }, roamers.standing].filter((walker) => walker !== null);
+    foregrounds.forEach((layer) => {
+      const order = foregroundOrder(layer, walkers, region);
+      layer.mesh.visible = order !== null;
+      layer.mesh.renderOrder = order ?? 0;
+    });
     character.setDarkness(darkness);
     transition = Math.min(1, transition + dt * 1.8);
     background.uniforms.time!.value = reducedMotion ? 0 : elapsed;

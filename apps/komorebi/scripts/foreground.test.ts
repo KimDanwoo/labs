@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { FOREGROUNDS, isForegroundInFront } from '../src/shared/world/foreground';
+import { FOREGROUNDS, foregroundOrder, isForegroundInFront } from '../src/shared/world/foreground';
 import type { Region } from '../src/shared/world/world';
 
 function covered(region: Region, x: number, y: number, feetDepth: number) {
@@ -66,4 +66,21 @@ test('every occluder switches at its own ground contact across its full width', 
       assert.equal(isForegroundInFront(layer, { x, z: (y - 1) / 10.24 }, layer.region), true);
     }
   }
+});
+
+test('a foreground layer sits just above whoever is behind it and under whoever is in front', () => {
+  const bridgeRail = FOREGROUNDS.find(
+    (layer) => layer.region === 'river' && isForegroundInFront(layer, { x: 650 / 15.36, z: 47.7 }, 'river'),
+  )!;
+  const onBridge = { x: 650 / 15.36, z: 47.7 };
+  const onPathBelow = { x: 650 / 15.36, z: 70 };
+  const child = (at: { x: number; z: number }) => ({ ...at, order: 4 });
+  const cat = (at: { x: number; z: number }, order: number) => ({ ...at, order });
+
+  assert.equal(foregroundOrder(bridgeRail, [child(onPathBelow)], 'river'), null);
+  const catBehind = foregroundOrder(bridgeRail, [child(onPathBelow), cat(onBridge, 3.8)], 'river');
+  assert.ok(catBehind !== null && catBehind > 3.8 && catBehind < 4);
+  const childBehind = foregroundOrder(bridgeRail, [child(onBridge), cat(onPathBelow, 4.2)], 'river');
+  assert.ok(childBehind !== null && childBehind > 4 && childBehind < 4.2);
+  assert.equal(foregroundOrder(bridgeRail, [child(onBridge)], 'village'), null);
 });

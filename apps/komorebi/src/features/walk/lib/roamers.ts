@@ -1,4 +1,4 @@
-import type { Region } from '@shared/world/world';
+import type { Point, Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { characterScale } from './perspective';
@@ -17,6 +17,8 @@ const NEXT_VISIT = [18, 45] as const;
 const NIGHT_CAT_SHARE = 0.8;
 const DAY_CAT_SHARE = 0.5;
 const PAUSE_CHANCE = 0.35;
+/** Render order around the child's sprites (4): drawn over them when nearer the viewer, under them otherwise. */
+const ORDER = { front: 4.2, behind: 3.8 } as const;
 
 type Scene = {
   region: Region;
@@ -43,7 +45,6 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
           return;
         }
         texture.colorSpace = THREE.SRGBColorSpace;
-        texture.repeat.set(1 / FRAMES, 1);
         textures[animal] = texture;
       })
       .catch(() => undefined);
@@ -75,6 +76,7 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     pause: number;
     pauseAt: number;
   } | null = null;
+  let standing: (Point & { order: number }) | null = null;
 
   function arrive(region: Region, darkness: number) {
     const share = darkness > 0.5 ? NIGHT_CAT_SHARE : DAY_CAT_SHARE;
@@ -98,10 +100,15 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     get visitor() {
       return visitor?.animal ?? '';
     },
+    /** Where the visiting animal's feet are, so foreground objects can hide it like they hide the child. */
+    get standing() {
+      return standing;
+    },
     update({ region, dt, darkness, isStill, isRaining, childZ }: Scene) {
       const isWelcome = !isStill && !isRaining;
       if (visitor && (visitor.region !== region || !isWelcome)) visitor = null;
       if (!visitor) {
+        standing = null;
         sprite.visible = false;
         shadow.visible = false;
         wait -= dt;
@@ -119,6 +126,7 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
       const moved = strollOn(visitor.stroll, distance);
       if (!moved) {
         visitor = null;
+        standing = null;
         sprite.visible = false;
         shadow.visible = false;
         return;
@@ -126,12 +134,15 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
       visitor.stroll = moved.stroll;
       visitor.walked += distance;
       const frame = isPausing ? 0 : Math.floor(visitor.walked / (spec.stride * perspective)) % FRAMES;
-      material.map!.offset.set(frame / FRAMES, 0);
+      // Sprites drop a negative scale's sign, so a left-facing walk mirrors the atlas instead.
+      const isFacingLeft = moved.dx < 0;
+      material.map!.repeat.set((isFacingLeft ? -1 : 1) / FRAMES, 1);
+      material.map!.offset.set((frame + (isFacingLeft ? 1 : 0)) / FRAMES, 0);
       const height = spec.height * characterScale(moved.at.z) * 1.65;
-      const facing = moved.dx < 0 ? -1 : 1;
-      sprite.scale.set(height * spec.aspect * facing, height, 1);
+      sprite.scale.set(height * spec.aspect, height, 1);
       sprite.position.set(moved.at.x * 1.2 - 60, 40 - moved.at.z * 0.8, 2);
-      sprite.renderOrder = moved.at.z > childZ ? 4.2 : 3.8;
+      sprite.renderOrder = moved.at.z > childZ ? ORDER.front : ORDER.behind;
+      standing = { ...moved.at, order: sprite.renderOrder };
       material.color.setRGB(1 - darkness * 0.5, 1 - darkness * 0.42, 1 - darkness * 0.2);
       sprite.visible = true;
       shadow.position.set(sprite.position.x, sprite.position.y - 0.05, 1);
