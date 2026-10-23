@@ -12,6 +12,7 @@ export type AmbienceMix = {
 type Layers = Pick<AmbienceMix, 'water' | 'waves' | 'cicadas'>;
 
 const REGION_LAYERS = {
+  home: { water: 0, waves: 0, cicadas: 0.035 },
   village: { water: 0, waves: 0, cicadas: 0.25 },
   river: { water: 1, waves: 0, cicadas: 0.15 },
   coast: { water: 0, waves: 1, cicadas: 0 },
@@ -26,6 +27,13 @@ const RAIN_INSECT_SHARE = 0.3;
 /** Each place keeps its own sound; at dusk birds give way to crickets, and at night the cicadas fall silent. */
 export function ambienceMix(region: Region, time: TimeOfDay, weather: Weather = WEATHER.clear): AmbienceMix {
   const clear = timeMix(region, time);
+  if (region === 'home')
+    return {
+      ...clear,
+      birds: clear.birds * 0.12,
+      crickets: clear.crickets * 0.15,
+      rain: weather === WEATHER.rain ? 0.18 : 0,
+    };
   if (weather === WEATHER.clear) return clear;
   // A shower hushes the birds and insects under the patter.
   return {

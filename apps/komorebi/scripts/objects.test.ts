@@ -51,7 +51,7 @@ test('holding movement against a gate pillar slides around it without crossing t
 });
 
 test('each pillar silhouette hides a character behind it, never one in front', () => {
-  for (const object of WORLD_OBJECTS) {
+  for (const object of WORLD_OBJECTS.filter((object) => object.region === 'forest')) {
     const layer = FOREGROUNDS.find((candidate) => candidate.outline === object.outline);
     assert.ok(layer);
     const x = object.footprint[0]![0] + 10;

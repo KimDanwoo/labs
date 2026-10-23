@@ -5,7 +5,7 @@ import { createRegionPlates, nearbyRegions } from '../src/features/walk/lib/regi
 import { WORLDS, type Region } from '../src/shared/world/world';
 
 test('nearby regions are the current painting and the ones its exits lead to', () => {
-  assert.deepEqual(nearbyRegions('village').sort(), ['forest', 'river', 'shops', 'village']);
+  assert.deepEqual(nearbyRegions('village').sort(), ['forest', 'home', 'river', 'shops', 'village']);
   assert.equal(nearbyRegions('river')[0], 'river');
   assert.ok(!nearbyRegions('forest').includes('coast'));
 });

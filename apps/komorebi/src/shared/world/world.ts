@@ -1,10 +1,21 @@
 import { hasGroundBetween, isOnGround } from './ground';
 
-export type Region = 'village' | 'river' | 'coast' | 'forest' | 'school' | 'shops';
+export type Region = 'village' | 'river' | 'coast' | 'forest' | 'school' | 'shops' | 'home';
 export type Point = { x: number; z: number };
 export type RouteNode = Point & { id: string };
 export type Route = { a: string; b: string; width: number };
 export const SPAWN: Point = { x: 50, z: 82 };
+export const HOME = {
+  id: 'home',
+  region: 'home',
+  name: '파란 지붕 우리 집',
+  short: '우리 집',
+  icon: '⌂',
+  x: 36,
+  z: 70,
+} as const;
+export const HOME_DOOR = { x: 15, z: 38 };
+export const HOME_BED = { name: '포근한 잠자리', x: 70, z: 76 };
 /** A small thing to do at each place once its memory for this time of day is kept. */
 export const PLACE_ACTION = {
   gust: 'gust',
@@ -100,6 +111,7 @@ export const LANDMARKS = [
   },
 ] as const;
 export type Landmark = (typeof LANDMARKS)[number];
+export const DESTINATIONS = [...LANDMARKS, HOME];
 export const WORLDS: Record<
   Region,
   {
@@ -110,6 +122,30 @@ export const WORLDS: Record<
     portals: { node: string; to: Region; spawn: Point; label: string }[];
   }
 > = {
+  home: {
+    image: '/art/home-interior-scaled-roof.webp',
+    name: '파란 지붕 우리 집',
+    nodes: [
+      { id: 'door', x: 23.5, z: 65 },
+      { id: 'entry', x: 30, z: 66 },
+      { id: 'home', x: HOME.x, z: HOME.z },
+      { id: 'middle', x: 51, z: 77 },
+      { id: 'bed', x: HOME_BED.x, z: HOME_BED.z },
+      { id: 'window', x: 54, z: 59 },
+      { id: 'desk', x: 40, z: 57 },
+      { id: 'front', x: 53, z: 91 },
+    ],
+    routes: [
+      { a: 'door', b: 'entry', width: 3 },
+      { a: 'entry', b: 'home', width: 4 },
+      { a: 'home', b: 'middle', width: 5 },
+      { a: 'middle', b: 'bed', width: 4 },
+      { a: 'middle', b: 'window', width: 4 },
+      { a: 'window', b: 'desk', width: 3 },
+      { a: 'middle', b: 'front', width: 5 },
+    ],
+    portals: [{ node: 'door', to: 'village', spawn: { x: 17, z: 41 }, label: '마을' }],
+  },
   village: {
     image: '/art/village-game.webp',
     name: '파란 지붕 아래 논길',
@@ -120,6 +156,7 @@ export const WORLDS: Record<
       { id: 'fork', x: 50, z: 56 },
       { id: 'left', x: 32, z: 47 },
       { id: 'house', x: 17, z: 41 },
+      { id: HOME.id, x: HOME_DOOR.x, z: HOME_DOOR.z },
       { id: 'forestgate', x: 4, z: 36 },
       { id: 'fields', x: 62, z: 51 },
       { id: 'bridge', x: 82, z: 42.8 },
@@ -132,12 +169,14 @@ export const WORLDS: Record<
       { a: 'fork', b: 'left', width: 3.3 },
       { a: 'left', b: 'house', width: 2.8 },
       { a: 'house', b: 'forestgate', width: 2.7 },
+      { a: 'house', b: HOME.id, width: 1.2 },
       { a: 'fork', b: 'fields', width: 3 },
       { a: 'fields', b: 'bridge', width: 1.2 },
       // Narrow diagonal deck, measured between the painted railings.
       { a: 'bridge', b: 'rivergate', width: 0.65 },
     ],
     portals: [
+      { node: HOME.id, to: 'home', spawn: { x: 30, z: 66 }, label: '우리 집' },
       { node: 'bottom', to: 'shops', spawn: { x: 50, z: 46 }, label: '상점가' },
       { node: 'forestgate', to: 'forest', spawn: { x: 50, z: 88 }, label: '산길' },
       { node: 'rivergate', to: 'river', spawn: { x: 12, z: 48 }, label: '강가' },

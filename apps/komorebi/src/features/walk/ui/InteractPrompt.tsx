@@ -1,7 +1,6 @@
-import type { Landmark } from '@shared/world/world';
 import { Icon } from './Icon';
 
-type Props = { landmark: Landmark; hint: string; onInteract: () => void };
+type Props = { landmark: { name: string }; hint: string; onInteract: () => void };
 
 export function InteractPrompt({ landmark, hint, onInteract }: Props) {
   return (

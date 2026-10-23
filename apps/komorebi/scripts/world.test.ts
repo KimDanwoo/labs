@@ -152,7 +152,7 @@ test('holding movement toward the pictured shop hedge stops on the road even at 
 
 test('click routes from lane edges do not cut through the new ground boundaries', () => {
   for (const region of Object.keys(WORLDS) as Region[]) {
-    const destination = LANDMARKS.find((point) => point.region === region)!;
+    const destination = WORLDS[region].nodes[0]!;
     for (let x = 1; x < 100; x += 3) {
       for (let z = 22; z < 100; z += 3) {
         if (!canWalk(x, z, region)) continue;

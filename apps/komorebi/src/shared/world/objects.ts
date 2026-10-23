@@ -11,6 +11,23 @@ type WorldObject = {
 /** Separate the solid base from the visible silhouette of each painted object. */
 export const WORLD_OBJECTS: WorldObject[] = [
   {
+    id: 'home-futon',
+    region: 'home',
+    groundY: 774,
+    footprint: [
+      [1078, 667],
+      [1178, 654],
+      [1256, 765],
+      [1120, 774],
+    ],
+    outline: [
+      [1078, 667],
+      [1178, 654],
+      [1256, 765],
+      [1120, 774],
+    ],
+  },
+  {
     id: 'shrine-gate-left',
     region: 'forest',
     groundY: 442,

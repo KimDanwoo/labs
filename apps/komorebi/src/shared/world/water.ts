@@ -17,6 +17,7 @@ const water = (kind: WaterKind, flow: [number, number], speed: number, outline: 
 });
 
 export const WATER: Record<Region, Water[]> = {
+  home: [],
   village: [
     water(WATER_KIND.stream, [0.6, 0.8], 0.45, [
       [82, 29],

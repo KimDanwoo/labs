@@ -1613,3 +1613,74 @@ dialog::backdrop {
   stroke: rgb(var(--cream));
   stroke-width: 2;
 }
+
+/* Home belongs to the same painted world; controls sit beside the things they act on. */
+.weather-indicator {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: rgb(var(--ochre));
+}
+.weather-indicator svg {
+  width: 22px;
+  height: 22px;
+}
+.home-guide {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  text-align: left;
+  padding: 16px 20px;
+  margin: 16px 0;
+  background: rgb(var(--honey) / 0.65);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.home-guide span {
+  flex: 1;
+}
+.home-guide strong,
+.home-guide small {
+  display: block;
+}
+.home-guide small {
+  margin-top: 4px;
+  color: var(--muted);
+}
+.sleep-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgb(var(--deep));
+  color: rgb(var(--cream));
+  animation: sleep-fade 2.3s ease-in-out both;
+}
+.sleep-transition span {
+  font: 28px var(--serif);
+  letter-spacing: 0.2em;
+}
+.sleep-transition small {
+  color: rgb(var(--mist));
+}
+@keyframes sleep-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  35%,
+  65% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sleep-transition {
+    animation: none;
+  }
+}

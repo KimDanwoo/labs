@@ -150,6 +150,10 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     },
     update(now: Scene) {
       const { region, dt, darkness, isStill, isRaining } = now;
+      if (region === 'home') {
+        hide();
+        return;
+      }
       if (visitor?.region !== region) hide();
       if (!visitor) {
         wait -= dt;

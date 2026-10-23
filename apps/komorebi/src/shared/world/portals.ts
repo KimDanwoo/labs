@@ -8,12 +8,14 @@ export type WorldPortal = {
   center: Point;
   edge: 'left' | 'right' | 'top' | 'bottom';
   boundary: number;
+  extent?: number;
   lateralRange: readonly [number, number];
 };
 
 // Exit spans follow the painted connecting road, not every path touching that screen edge.
 const EXIT_SPANS: Record<Region, Record<string, readonly [number, number]>> = {
-  village: { bottom: [33, 65], forestgate: [32, 39], rivergate: [37, 42] },
+  home: { door: [61, 70] },
+  village: { home: [13.5, 16.5], bottom: [33, 65], forestgate: [32, 39], rivergate: [37, 42] },
   river: { back: [45, 52], coastgate: [43, 54] },
   coast: { back: [52, 62] },
   forest: { back: [40, 61] },
@@ -41,6 +43,20 @@ const portals = Object.fromEntries(
     region,
     WORLDS[region].portals.map((portal): WorldPortal => {
       const end = WORLDS[region].nodes.find((node) => node.id === portal.node)!;
+      // Doorways are small thresholds inside a painting, unlike the road exits at its edges.
+      if (region === 'village' && portal.to === 'home') {
+        return {
+          ...portal,
+          edge: 'top',
+          boundary: 38.5,
+          center: { x: 15, z: 38 },
+          lateralRange: [13.5, 16.5],
+          extent: 2,
+        };
+      }
+      if (region === 'home') {
+        return { ...portal, edge: 'left', boundary: 24, center: { x: 23.5, z: 65 }, lateralRange: [61, 70], extent: 3 };
+      }
       const edge = portalEdge(end);
       const { boundary, center } = EDGE_GEOMETRY[edge](end);
       return { ...portal, edge, boundary, center, lateralRange: EXIT_SPANS[region][portal.node]! };
@@ -63,6 +79,8 @@ const BEYOND_BOUNDARY = {
 export function isInsidePortal(position: Point, portal: WorldPortal) {
   const lateral = portal.edge === 'left' || portal.edge === 'right' ? position.z : position.x;
   if (lateral < portal.lateralRange[0] || lateral > portal.lateralRange[1]) return false;
+  const axial = portal.edge === 'left' || portal.edge === 'right' ? position.x : position.z;
+  if (portal.extent !== undefined && Math.abs(axial - portal.boundary) > portal.extent) return false;
   return BEYOND_BOUNDARY[portal.edge](position, portal.boundary);
 }
 

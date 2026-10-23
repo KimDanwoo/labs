@@ -1,15 +1,7 @@
 'use client';
 
 import { diaryMemory, liveMemory } from '@features/walk/lib/memory';
-import {
-  DIALOG,
-  TIME,
-  TIME_ORDER,
-  WEATHER,
-  type Dialog,
-  type TimeOfDay,
-  type Weather,
-} from '@features/walk/model/constants';
+import { DIALOG, TIME, TIME_ORDER, WEATHER, type Dialog, type TimeOfDay } from '@features/walk/model/constants';
 import {
   useAmbience,
   useAmbienceScene,
@@ -17,11 +9,12 @@ import {
   useIsFirstVisit,
   useShortcuts,
   useToast,
+  useVillageDay,
   useWalkEngine,
 } from '@features/walk/model/hooks';
 import { pageStores } from '@features/walk/model/store';
 import type { Memory } from '@features/walk/model/types';
-import { LANDMARKS, WORLDS, type Landmark } from '@shared/world/world';
+import { HOME_BED, LANDMARKS, WORLDS, type Landmark } from '@shared/world/world';
 import { useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { BottomBar } from './BottomBar';
@@ -31,6 +24,7 @@ import { LoadingOverlay } from './LoadingOverlay';
 import { MapDialog } from './MapDialog';
 import { MemoryDialog } from './MemoryDialog';
 import { MobileControls } from './MobileControls';
+import { SleepTransition } from './SleepTransition';
 import { ToolBar } from './ToolBar';
 
 const FIRST_LOOK = {
@@ -39,18 +33,18 @@ const FIRST_LOOK = {
   night: '밤의 풍경 바라보기',
 } satisfies Record<TimeOfDay, string>;
 
-const nextTime = (time: TimeOfDay) => TIME_ORDER[(TIME_ORDER.indexOf(time) + 1) % TIME_ORDER.length]!;
-
 export function Walk() {
   const landscapeRef = useRef<HTMLDivElement>(null);
-  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(TIME.day);
-  const [weather, setWeather] = useState<Weather>(WEATHER.clear);
-  const isRaining = weather === WEATHER.rain;
   const [isSprinting, setIsSprinting] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(DIALOG.none);
   const [memory, setMemory] = useState<Memory | null>(null);
   const [hasGuided, setHasGuided] = useState(false);
-  const isPaused = dialog !== DIALOG.none;
+  const [isSleeping, setIsSleeping] = useState(false);
+  const isPaused = dialog !== DIALOG.none || isSleeping;
+  const today = useVillageDay(isPaused);
+  const timeOfDay = today.time;
+  const weather = today.weather;
+  const isRaining = weather === WEATHER.rain;
   const toast = useToast();
   const collection = useCollection();
   const isFirstVisit = useIsFirstVisit();
@@ -65,8 +59,13 @@ export function Walk() {
   });
   useAmbienceScene(ambience.setScene, { region: status.region, time: timeOfDay, weather });
   const hasStarted = hasWalked || hasGuided;
+  const isNearBed = status.region === 'home' && Math.hypot(status.x - HOME_BED.x, status.z - HOME_BED.z) < 4.5;
 
   function interact() {
+    if (isNearBed) {
+      setIsSleeping(true);
+      return;
+    }
     const landmark = status.nearby;
     if (!landmark) return;
     if (collection.pages[timeOfDay].includes(landmark.id)) {
@@ -122,7 +121,7 @@ export function Walk() {
       <div className="paper-grain" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
 
-      <GameHeader timeOfDay={timeOfDay} />
+      <GameHeader timeOfDay={timeOfDay} day={today.day} />
       <p className="sr-only" aria-live="polite">
         {WORLDS[status.region].name}
       </p>
@@ -131,12 +130,9 @@ export function Walk() {
       </div>
       <ToolBar
         timeOfDay={timeOfDay}
-        nextTimeOfDay={nextTime(timeOfDay)}
         isRaining={isRaining}
         isSoundOn={ambience.isOn}
         isReady={isReady}
-        onNextTime={() => setTimeOfDay(nextTime)}
-        onToggleRain={() => setWeather(isRaining ? WEATHER.clear : WEATHER.rain)}
         onToggleSound={ambience.toggle}
         onPhoto={takePhoto}
         onOpenMap={() => setDialog(DIALOG.map)}
@@ -147,6 +143,13 @@ export function Walk() {
           <span className="hint-spark">✧</span> 어디로 가 볼까? 길을 눌러 걸어 보고, 길 끝을 넘어 이웃 마을로 가 봐!{' '}
           <span className="hint-spark">✧</span>
         </div>
+      )}
+      {isNearBed && !isPaused && (
+        <InteractPrompt
+          landmark={HOME_BED}
+          hint={timeOfDay === TIME.night ? '아침까지 푹 자기' : '잠깐 눈 붙이기'}
+          onInteract={interact}
+        />
       )}
       {status.nearby && !isPaused && (
         <InteractPrompt landmark={status.nearby} hint={promptHint(status.nearby)} onInteract={interact} />
@@ -183,6 +186,15 @@ export function Walk() {
         onRead={readMemory}
         onReset={returnHome}
       />
+      {isSleeping && (
+        <SleepTransition
+          onWake={today.wakeUp}
+          onDone={() => {
+            setIsSleeping(false);
+            landscapeRef.current?.querySelector('canvas')?.focus({ preventScroll: true });
+          }}
+        />
+      )}
       <MemoryDialog
         isOpen={dialog === DIALOG.memory}
         memory={memory}

@@ -24,9 +24,11 @@ test('desktop states', async ({ page }) => {
   await page.waitForTimeout(500);
   await page.screenshot({ path: `${DIR}/memory.png` });
   await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: /해 질 녘으로 바꾸기/ }).click();
+  await page.getByRole('button', { name: '산책 지도 열기' }).click();
+  await page.locator('.home-guide').click();
+  await page.locator('.landscape[data-region=home]').waitFor({ timeout: 25_000 });
   await page.waitForTimeout(800);
-  await page.screenshot({ path: `${DIR}/evening.png` });
+  await page.screenshot({ path: `${DIR}/home.png` });
 });
 
 test.describe('phone', () => {

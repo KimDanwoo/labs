@@ -10,6 +10,7 @@ type Twinkle = { x: number; z: number };
 export const MAX_LAMPS = 8;
 
 export const LAMPS: Record<Region, Lamp[]> = {
+  home: [{ x: 54, z: 42, reach: 0.3 }],
   village: [
     { x: 31, z: 30, reach: 0.07 },
     { x: 36.5, z: 30, reach: 0.06 },

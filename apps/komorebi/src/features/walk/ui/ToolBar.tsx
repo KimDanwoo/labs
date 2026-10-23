@@ -2,44 +2,29 @@ import { TIME_LABEL, type TimeOfDay } from '@features/walk/model/constants';
 import { Icon } from './Icon';
 import { TIME_ICON } from './timeIcon';
 
-const TIME_TO = { day: '한낮으로', evening: '해 질 녘으로', night: '밤으로' } satisfies Record<TimeOfDay, string>;
-
 type Props = {
   timeOfDay: TimeOfDay;
-  nextTimeOfDay: TimeOfDay;
   isRaining: boolean;
   isSoundOn: boolean;
   isReady: boolean;
-  onNextTime: () => void;
-  onToggleRain: () => void;
   onToggleSound: () => void;
   onPhoto: () => void;
   onOpenMap: () => void;
 };
 
-export function ToolBar({
-  timeOfDay,
-  nextTimeOfDay,
-  isRaining,
-  isSoundOn,
-  isReady,
-  onNextTime,
-  onToggleRain,
-  onToggleSound,
-  onPhoto,
-  onOpenMap,
-}: Props) {
-  const timeLabel = `${TIME_TO[nextTimeOfDay]} 바꾸기 (지금 ${TIME_LABEL[timeOfDay]})`;
-  const rainLabel = isRaining ? '비 그치게 하기' : '소나기 내리게 하기';
+export function ToolBar({ timeOfDay, isRaining, isSoundOn, isReady, onToggleSound, onPhoto, onOpenMap }: Props) {
   const soundLabel = isSoundOn ? '자연 소리 끄기' : '자연 소리 켜기';
   return (
     <nav className="tools" aria-label="산책 설정">
-      <button className="tool" title={timeLabel} aria-label={timeLabel} onClick={onNextTime}>
-        <Icon name={TIME_ICON[timeOfDay]} />
-      </button>
-      <button className="tool" title={rainLabel} aria-label={rainLabel} aria-pressed={isRaining} onClick={onToggleRain}>
-        <Icon name="rain" />
-      </button>
+      <span
+        className="weather-indicator"
+        title={`${TIME_LABEL[timeOfDay]} · ${isRaining ? '지나가는 소나기' : '맑음'}`}
+      >
+        <Icon name={isRaining ? 'rain' : TIME_ICON[timeOfDay]} />
+        <span className="sr-only">
+          {TIME_LABEL[timeOfDay]} · {isRaining ? '비' : '맑음'}
+        </span>
+      </span>
       <button
         className="tool"
         title={soundLabel}

@@ -1,5 +1,5 @@
 import { getWorldPortals } from '@shared/world/portals';
-import { LANDMARKS, WORLDS, type Point, type Region } from '@shared/world/world';
+import { DESTINATIONS, WORLDS, type Point, type Region } from '@shared/world/world';
 
 type Props = { region: Region; position: Point; visited: readonly string[] };
 
@@ -34,7 +34,7 @@ export function WalkMap({ region, position, visited }: Props) {
           />
         );
       })}
-      {LANDMARKS.filter((p) => p.region === region).map((p) => {
+      {DESTINATIONS.filter((p) => p.region === region).map((p) => {
         const isCollected = visited.includes(p.id);
         return (
           <g

@@ -5,3 +5,5 @@ export { useModal } from './useModal';
 export { useShortcuts } from './useShortcuts';
 export { useToast } from './useToast';
 export { useWalkEngine } from './useWalkEngine';
+
+export { useVillageDay } from './useVillageDay';

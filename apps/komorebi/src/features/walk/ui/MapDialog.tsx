@@ -1,6 +1,6 @@
 import { TIME_ORDER } from '@features/walk/model/constants';
 import { useModal, type Collection } from '@features/walk/model/hooks';
-import { LANDMARKS, type Point, type Region } from '@shared/world/world';
+import { HOME, LANDMARKS, type Point, type Region } from '@shared/world/world';
 import { useId } from 'react';
 import { DiscoveryList } from './DiscoveryList';
 import { Icon } from './Icon';
@@ -68,6 +68,14 @@ export function MapDialog({
         목적지를 누르면 길을 따라 걸어가요. 도착하면 <kbd>E</kbd>로 추억을 간직하세요.
       </p>
       <WalkMap region={region} position={position} visited={collection.visited} />
+      <button className="home-guide" onClick={() => onGuide(HOME.id)} disabled={!isReady}>
+        <Icon name="home" />
+        <span>
+          <strong>{HOME.name}</strong>
+          <small>집에 돌아가 쉬어 가기</small>
+        </span>
+        <Icon name="arrow" />
+      </button>
       <DiscoveryList pages={collection.pages} isReady={isReady} onGuide={onGuide} onRead={onRead} />
       <div className="map-footer">
         <span>{journeyLine(collection.visited.length, collection.pageCount, steps)}</span>

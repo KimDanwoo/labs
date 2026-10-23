@@ -3,7 +3,7 @@ import { FOREGROUNDS, foregroundOrder } from '@shared/world/foreground';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '@shared/world/portals';
 import { surfaceAt, type Surface } from '@shared/world/surfaces';
 import {
-  LANDMARKS,
+  DESTINATIONS,
   SPAWN,
   WORLDS,
   canWalk,
@@ -154,13 +154,14 @@ export async function createScene(
       foam: waterMaps.foam,
       glitter: waterMaps.glitter,
       isSea: { value: 0 },
+      isHome: { value: 0 },
       renderDpr: { value: 1 },
       fade: { value: 1 },
     },
     vertexShader:
       'varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float rain; uniform float fade;
-      uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform sampler2D foam; uniform sampler2D glitter; uniform float isSea; 
+      uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform sampler2D foam; uniform sampler2D glitter; uniform float isSea; uniform float isHome;
       // Sun glitter on the sea (designed by Codex): painted glints, each fading in and out on its own beat.
       ${SEA_ATMOSPHERE_GLSL}
       // The painted sea itself sways and rolls shoreward, and the moored boat bobs with it (designed by Codex).
@@ -384,7 +385,7 @@ export async function createScene(
         vec2 uv=vUv;
         // Tiny local leaf motion, not a global distortion of architecture.
         float canopy=smoothstep(.45,.82,uv.y)*(1.-smoothstep(.08,.34,uv.x));
-        uv.x+=sin(time*.6+uv.y*32.)*.00045*canopy;
+        uv.x+=sin(time*.6+uv.y*32.)*.00045*canopy*(1.-isHome);
         // Rivers carry broken foam downstream and spray off the rocks (designed by Codex); the sea's waves are
         // painted sprites (see waves.ts).
         const float W_TAU = 6.28318530718;
@@ -875,10 +876,10 @@ export async function createScene(
     c.fill();
   });
   loaded.push(markerMap);
-  const markerMats = LANDMARKS.map(
+  const markerMats = DESTINATIONS.map(
     () => new THREE.SpriteMaterial({ map: markerMap, transparent: true, depthTest: false }),
   );
-  const markers = LANDMARKS.map((p, i) => {
+  const markers = DESTINATIONS.map((p, i) => {
     const s = new THREE.Sprite(markerMats[i]);
     s.position.set(p.x * 1.2 - 60, 40 - p.z * 0.8 + 2, 1);
     s.scale.set(1.7, 1.7, 1);
@@ -975,7 +976,7 @@ export async function createScene(
   /** Routes toward the destination and returns the exit it heads for, if it leaves this region. */
   const plan = (): WorldPortal | null => {
     if (!destination) return null;
-    const point = LANDMARKS.find((p) => p.id === destination);
+    const point = DESTINATIONS.find((p) => p.id === destination);
     if (!point) return null;
     if (point.region === region) {
       route = findRoute(position, point, region);
@@ -1011,6 +1012,7 @@ export async function createScene(
     background.uniforms.lamps!.value = lamps.values;
     background.uniforms.waterMap!.value = waterMaps.of(next);
     background.uniforms.isSea!.value = next === SEA_REGION ? 1 : 0;
+    background.uniforms.isHome!.value = next === 'home' ? 1 : 0;
     background.uniforms.lampCount!.value = lamps.count;
     // Home stays loaded for the reset button; everything beyond the next exits is freed.
     const nearby = [...new Set([START_REGION, ...nearbyRegions(next)])];
@@ -1134,7 +1136,7 @@ export async function createScene(
         routeDistance = Math.hypot(next.x - position.x, next.z - position.z);
         dx = (next.x - position.x) / routeDistance;
         dz = (next.z - position.z) / routeDistance;
-      } else if (destination && LANDMARKS.find((p) => p.id === destination)?.region === region) {
+      } else if (destination && DESTINATIONS.find((p) => p.id === destination)?.region === region) {
         destination = null;
       }
     }
@@ -1224,7 +1226,7 @@ export async function createScene(
       settle(THREE.MathUtils.damp(camera.position.y, targetY, cameraLag, dt), targetY, CAMERA_EPSILON),
     );
     markers.forEach((marker, i) => {
-      const point = LANDMARKS[i]!;
+      const point = DESTINATIONS[i]!;
       marker.visible = point.region === region;
       marker.position.y = 40 - point.z * 0.8 + 2 + (reducedMotion ? 0 : Math.sin(elapsed * 1.5 + i) * 0.17);
     });
@@ -1239,14 +1241,14 @@ export async function createScene(
     const targetDarkness = timeOfDay === TIME.night ? 1 : 0;
     darkness = settle(THREE.MathUtils.damp(darkness, targetDarkness, 2, dt), targetDarkness, WARMTH_EPSILON);
     background.uniforms.night!.value = darkness;
-    fireflies.update(elapsed, darkness, reducedMotion);
+    fireflies.update(elapsed, region === 'home' ? 0 : darkness, reducedMotion);
     nightLights.update(region, darkness, elapsed, reducedMotion);
     background.uniforms.walker!.value.set((child.position.x + 60) / 120, (child.position.y + 40 + 1.8 * size) / 80);
     placeEffects.update(paused ? 0 : dt);
     const targetWetness = weather === WEATHER.rain ? 1 : 0;
     wetness = settle(THREE.MathUtils.damp(wetness, targetWetness, 1.5, dt), targetWetness, WARMTH_EPSILON);
-    background.uniforms.rain!.value = wetness;
-    rain.update(paused ? 0 : dt, wetness, camera.position, reducedMotion);
+    background.uniforms.rain!.value = region === 'home' ? 0 : wetness;
+    rain.update(paused ? 0 : dt, region === 'home' ? 0 : wetness, camera.position, reducedMotion);
     life.update({ region, dt: paused ? 0 : dt, elapsed, darkness, isStill: reducedMotion, isRaining: wetness > 0.5 });
     waves.update({ region, dt: paused ? 0 : dt, darkness, isStill: reducedMotion, rain: wetness });
     boats.update({ region, dt: paused ? 0 : dt, darkness, isStill: reducedMotion });

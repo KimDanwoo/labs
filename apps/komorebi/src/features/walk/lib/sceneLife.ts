@@ -27,6 +27,7 @@ const patch = (
   count,
 });
 const PATCHES: Record<Region, Patch[]> = {
+  home: [],
   village: [
     patch(INSECT.butterfly, 4, 34, 44, 66, [2, 3]),
     patch(INSECT.butterfly, 62, 90, 52, 70, [0, 1]),

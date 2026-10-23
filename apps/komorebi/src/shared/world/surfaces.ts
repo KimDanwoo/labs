@@ -7,6 +7,7 @@ type Zone = { surface: Surface; minX: number; maxX: number; minZ: number; maxZ: 
 
 /** What the painted ground underfoot is made of: a default per painting, with zones for bridges and paths. */
 const SURFACES: Record<Region, { base: Surface; zones: Zone[] }> = {
+  home: { base: SURFACE.wood, zones: [] },
   village: { base: SURFACE.dirt, zones: [{ surface: SURFACE.wood, minX: 80, maxX: 96, minZ: 37, maxZ: 46 }] },
   river: { base: SURFACE.dirt, zones: [{ surface: SURFACE.wood, minX: 25, maxX: 72, minZ: 41, maxZ: 55 }] },
   coast: { base: SURFACE.stone, zones: [] },
