@@ -1,6 +1,5 @@
 import type { Region } from '@shared/world/world';
 import * as THREE from 'three';
-import { canvasTexture } from './art';
 import { FLIGHT, flyFor, startFlight, stepButterfly, stepDragonfly, type Bounds, type Flight } from './flight';
 import { lampGlowAt, lightSprite } from './nightLights';
 import { characterScale } from './perspective';
@@ -47,68 +46,17 @@ const GULL_PATHS: Partial<Record<Region, { x: number; z: number; spread: number 
   ],
 };
 
-type Colours = { wing: string; edge: string };
-const BUTTERFLY_COLOURS: Colours[] = [
-  { wing: '#ffd94a', edge: '#a5681f' },
-  { wing: '#f8f6ee', edge: '#5f5a50' },
-  { wing: '#f29b4b', edge: '#5e3216' },
-  { wing: '#9cc3ea', edge: '#3f5f86' },
-];
-const DRAGONFLY_BODIES = ['#c4542f', '#3f6f9e', '#6f8f3a', '#b23a2a'];
+/** Painted sprite sheets, one creature or flap pose per equal cell; `aspect` is a cell's width over its height. */
+const ATLAS = {
+  butterfly: { url: '/art/butterflies.webp', frames: 4, aspect: 160 / 128 },
+  dragonfly: { url: '/art/dragonflies.webp', frames: 4, aspect: 160 / 128 },
+  gull: { url: '/art/gull.webp', frames: 3, aspect: 256 / 128 },
+} as const;
+type Flyer = keyof typeof ATLAS;
+/** Gull wing poses in order through one wingbeat: up, level, down, level. */
+const WINGBEAT = [0, 1, 2, 1];
 
-function drawButterfly({ wing, edge }: Colours, c: CanvasRenderingContext2D) {
-  c.fillStyle = wing;
-  c.strokeStyle = edge;
-  c.lineWidth = 2.5;
-  c.beginPath();
-  c.ellipse(21, 22, 12, 13, -0.45, 0, Math.PI * 2);
-  c.ellipse(43, 22, 12, 13, 0.45, 0, Math.PI * 2);
-  c.ellipse(24, 40, 8, 9, 0.5, 0, Math.PI * 2);
-  c.ellipse(40, 40, 8, 9, -0.5, 0, Math.PI * 2);
-  c.fill();
-  c.stroke();
-  c.fillStyle = edge;
-  c.fillRect(30, 14, 4, 30);
-}
-
-function drawDragonfly(body: string, c: CanvasRenderingContext2D) {
-  c.fillStyle = '#e6f4fb70';
-  c.strokeStyle = '#8fb0ba90';
-  c.lineWidth = 1;
-  c.beginPath();
-  c.ellipse(20, 19, 12, 3.6, -0.12, 0, Math.PI * 2);
-  c.ellipse(44, 19, 12, 3.6, 0.12, 0, Math.PI * 2);
-  c.ellipse(21, 26, 10.5, 3.2, 0.18, 0, Math.PI * 2);
-  c.ellipse(43, 26, 10.5, 3.2, -0.18, 0, Math.PI * 2);
-  c.fill();
-  c.stroke();
-  c.fillStyle = body;
-  c.beginPath();
-  c.ellipse(32, 12, 4.5, 4.5, 0, 0, Math.PI * 2);
-  c.ellipse(32, 22, 3.6, 6, 0, 0, Math.PI * 2);
-  c.fill();
-  c.fillRect(30, 26, 4, 34);
-  c.fillStyle = '#00000030';
-  for (let y = 32; y < 58; y += 6) c.fillRect(30, y, 4, 1.5);
-}
-
-function drawGull(c: CanvasRenderingContext2D) {
-  c.lineCap = 'round';
-  for (const [style, width] of [
-    ['#55606a', 9],
-    ['#fbfcfa', 5],
-  ] as const) {
-    c.strokeStyle = style;
-    c.lineWidth = width;
-    c.beginPath();
-    c.moveTo(4, 30);
-    c.quadraticCurveTo(18, 12, 32, 28);
-    c.quadraticCurveTo(46, 12, 60, 30);
-    c.stroke();
-  }
-}
-
-const SIZE = { butterfly: 3.2, dragonfly: 3.8, gull: 3.2 };
+const SIZE = { butterfly: 2.9, dragonfly: 3.4, gull: 2.6 };
 /** Height above the painted ground, in scene units, while flying and while settled. */
 /** Darkness over which flyers fade out and head home, rather than vanishing all at once. */
 const DUSK = [0.25, 0.55] as const;
@@ -135,7 +83,6 @@ type Life = {
 };
 
 const between = (min: number, max: number) => min + Math.random() * (max - min);
-const pick = <T>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)]!;
 
 /**
  * Small life in each painting: butterflies that wander and settle, dragonflies that hover and dart, gulls over
@@ -143,29 +90,35 @@ const pick = <T>(list: readonly T[]) => list[Math.floor(Math.random() * list.len
  * reduced motion, and never wake the 60 fps budget.
  */
 export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader) {
-  const butterflyTextures = BUTTERFLY_COLOURS.map((colours) => canvasTexture(64, 64, (c) => drawButterfly(colours, c)));
-  const dragonflyTextures = DRAGONFLY_BODIES.map((body) => canvasTexture(64, 64, (c) => drawDragonfly(body, c)));
-  const gullTexture = canvasTexture(64, 64, drawGull);
-  const sprite = (texture: THREE.Texture) => {
-    const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false });
+  const sheets: THREE.Texture[] = [];
+  const cells: THREE.Texture[] = [];
+  const waiting: { kind: Flyer; frame: number; material: THREE.SpriteMaterial }[] = [];
+  let isDisposed = false;
+  /** A sprite showing one cell of its sheet; it stays hidden until the sheet has loaded. */
+  const sprite = (kind: Flyer, frame: number) => {
+    const material = new THREE.SpriteMaterial({ transparent: true, depthTest: false });
     const created = new THREE.Sprite(material);
     created.renderOrder = FLYER_ORDER;
     created.visible = false;
     scene.add(created);
+    waiting.push({ kind, frame, material });
     return { sprite: created, material };
+  };
+  const showCell = (map: THREE.Texture, frame: number, frames: number) => {
+    map.repeat.set(1 / frames, 1);
+    map.offset.set(frame / frames, 0);
   };
 
   const insects: Life[] = (Object.keys(PATCHES) as Region[]).flatMap((region) =>
     PATCHES[region].flatMap(({ kind, bounds, count }) =>
       Array.from({ length: Math.round(between(count[0], count[1])) }, () => {
-        const texture = kind === INSECT.butterfly ? pick(butterflyTextures) : pick(dragonflyTextures);
         const mode = kind === INSECT.butterfly ? FLIGHT.flutter : FLIGHT.hover;
         return {
           region,
           kind,
           bounds,
           flight: startFlight(bounds, Math.random, mode),
-          ...sprite(texture),
+          ...sprite(kind, Math.floor(Math.random() * ATLAS[kind].frames)),
           size: SIZE[kind] * between(0.8, 1.2),
           bob: Math.random() * 10,
           lift: ALTITUDE[kind][0],
@@ -181,9 +134,31 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
       path,
       rate: between(0.05, 0.11),
       phase: Math.random() * 10,
-      ...sprite(gullTexture),
+      ...sprite('gull', 0),
     })),
   );
+
+  // Creatures are a nicety: if a sheet fails to load the walk simply goes on without them.
+  (Object.keys(ATLAS) as Flyer[]).forEach((kind) => {
+    loader
+      .loadAsync(ATLAS[kind].url)
+      .then((sheet) => {
+        if (isDisposed) {
+          sheet.dispose();
+          return;
+        }
+        sheet.colorSpace = THREE.SRGBColorSpace;
+        sheets.push(sheet);
+        for (const { frame, material } of waiting.filter((entry) => entry.kind === kind)) {
+          const cell = sheet.clone();
+          showCell(cell, frame, ATLAS[kind].frames);
+          cells.push(cell);
+          material.map = cell;
+          material.needsUpdate = true;
+        }
+      })
+      .catch(() => undefined);
+  });
 
   const catMaterial = new THREE.SpriteMaterial({ transparent: true, depthTest: false });
   const cat = new THREE.Sprite(catMaterial);
@@ -194,7 +169,6 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
   let catTexture: THREE.Texture | null = null;
   let catWidth = 0;
   let catAspect = 1;
-  let isDisposed = false;
   // The cat is a nicety: if its picture fails to load the walk simply goes on without it.
   loader
     .loadAsync(CAT_URL)
@@ -223,13 +197,13 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
     const bob = life.aloft * (Math.sin(elapsed * 3.1 + life.bob) * 0.5 + Math.sin(elapsed * 7.3 + life.bob) * 0.2);
     s.position.set(flight.x * 1.2 - 60, 40 - flight.z * 0.8 + life.lift + bob, 1);
     if (kind === INSECT.butterfly) {
-      s.scale.set(depth * (0.2 + 0.8 * Math.abs(Math.cos(flight.wing))), depth, 1);
+      s.scale.set(depth * ATLAS.butterfly.aspect * (0.2 + 0.8 * Math.abs(Math.cos(flight.wing))), depth, 1);
       material.rotation = isSettled ? 0 : Math.sin(elapsed * 2 + life.bob) * 0.25;
       return;
     }
     const screenAngle = Math.atan2(-Math.sin(flight.heading) * 0.8, Math.cos(flight.heading) * 1.2);
     material.rotation = screenAngle - Math.PI / 2;
-    s.scale.set(depth * (0.88 + 0.12 * Math.abs(Math.sin(flight.wing))), depth, 1);
+    s.scale.set(depth * ATLAS.dragonfly.aspect * (0.88 + 0.12 * Math.abs(Math.sin(flight.wing))), depth, 1);
   }
 
   return {
@@ -237,7 +211,7 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
       const dusk = THREE.MathUtils.smoothstep(darkness, DUSK[0], DUSK[1]);
       const isFlying = !isStill && !isRaining && dusk < 1;
       for (const life of insects) {
-        life.sprite.visible = isFlying && life.region === region;
+        life.sprite.visible = isFlying && life.region === region && life.material.map !== null;
         if (!life.sprite.visible) continue;
         const step = life.kind === INSECT.butterfly ? stepButterfly : stepDragonfly;
         ({ flight: life.flight, clock: life.clock } = flyFor(
@@ -252,14 +226,15 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
         drawInsect(life, elapsed, dt);
       }
       for (const gull of gulls) {
-        gull.sprite.visible = isFlying && gull.region === region;
+        gull.sprite.visible = isFlying && gull.region === region && gull.material.map !== null;
         if (!gull.sprite.visible) continue;
         const t = elapsed * gull.rate + gull.phase;
         const x = gull.path.x + Math.sin(t) * gull.path.spread + Math.sin(t * 2.3) * gull.path.spread * 0.25;
         const z = gull.path.z + Math.sin(t * 1.7 + 1) * 3;
-        const flap = 0.35 + 0.65 * Math.abs(Math.sin(elapsed * 2.2 + gull.phase));
+        const beat = WINGBEAT[Math.floor((elapsed * 3 + gull.phase) * WINGBEAT.length) % WINGBEAT.length]!;
+        showCell(gull.material.map!, beat, ATLAS.gull.frames);
         gull.sprite.position.set(x * 1.2 - 60, 40 - z * 0.8, 1);
-        gull.sprite.scale.set(SIZE.gull, SIZE.gull * flap, 1);
+        gull.sprite.scale.set(SIZE.gull * ATLAS.gull.aspect, SIZE.gull, 1);
         gull.material.opacity = 1 - dusk;
       }
       cat.visible = catTexture !== null && region === CAT_SPOT.region;
@@ -274,7 +249,7 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
         scene.remove(s);
         material.dispose();
       }
-      [...butterflyTextures, ...dragonflyTextures, gullTexture].forEach((texture) => texture.dispose());
+      [...sheets, ...cells].forEach((texture) => texture.dispose());
       scene.remove(cat);
       catMaterial.dispose();
       catTexture?.dispose();
