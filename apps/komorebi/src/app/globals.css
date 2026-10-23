@@ -518,10 +518,10 @@ dialog::backdrop {
   gap: 20px 12px;
   margin: 24px 0;
 }
-.discovery-list > div {
+.discovery-item {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 4px;
 }
 .stamp {
   display: grid;
@@ -1044,7 +1044,7 @@ dialog::backdrop {
 .vertical-note {
   color: #fff8e5a8;
 }
-.discovery-list > button {
+.discovery-guide {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -1053,10 +1053,10 @@ dialog::backdrop {
   padding: 5px 2px;
   border-radius: 8px;
 }
-.discovery-list > button:hover {
+.discovery-guide:hover {
   background: #e9edda;
 }
-.discovery-list > button > div {
+.discovery-guide > div {
   flex: 1;
 }
 .landscape {
@@ -1560,4 +1560,31 @@ dialog::backdrop {
     opacity: 0;
     visibility: hidden;
   }
+}
+
+.discovery-guide {
+  flex: 1;
+  min-width: 0;
+}
+.discovery-read {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border: 1px solid #aab195;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 9px;
+  color: var(--muted);
+}
+.discovery-read:hover {
+  background: #e9edda;
+}
+.stamp.evening {
+  box-shadow: 0 0 0 2px #f2c48d;
+}
+.memory-time {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
 }

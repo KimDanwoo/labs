@@ -308,15 +308,24 @@ export async function createScene(
   const observer = new ResizeObserver(resize);
   observer.observe(container);
   resize();
-  const plan = () => {
-    if (!destination) return;
+  /** Routes toward the destination and returns the exit it heads for, if it leaves this region. */
+  const plan = (): WorldPortal | null => {
+    if (!destination) return null;
     const point = LANDMARKS.find((p) => p.id === destination);
-    if (!point) return;
-    if (point.region === region) route = findRoute(position, point, region);
-    else {
-      const portal = getWorldPortals(region).find((p) => p.to === nextRegionStep(region, point.region))!;
-      route = findRoute(position, portal.center, region);
+    if (!point) return null;
+    if (point.region === region) {
+      route = findRoute(position, point, region);
+      return null;
     }
+    const portal = getWorldPortals(region).find((p) => p.to === nextRegionStep(region, point.region))!;
+    route = findRoute(position, portal.center, region);
+    return portal;
+  };
+  /** A new heading elsewhere cancels the wait at a loading exit until the child steps out of it. */
+  const redirect = (exit: WorldPortal | null) => {
+    if (!waitingPortal || waitingPortal === exit) return;
+    blockedPortal = waitingPortal;
+    waitingPortal = null;
   };
   const switchRegion = (next: Region, spawn: Point, plate: THREE.Texture) => {
     jump.height = 0;
@@ -374,6 +383,7 @@ export async function createScene(
     const portal = portalVisuals.pick(ray, region);
     if (portal) {
       destination = null;
+      redirect(portal);
       route = findRoute(position, portal.center, region);
       return;
     }
@@ -382,6 +392,7 @@ export async function createScene(
     const point = { x: (v.x + 60) / 1.2, z: (40 - v.y) / 0.8 };
     if (!canWalk(point.x, point.z, region)) return;
     destination = null;
+    redirect(null);
     route = findRoute(position, point, region);
   };
   renderer.domElement.tabIndex = 0;
@@ -552,7 +563,7 @@ export async function createScene(
       camera.position.y !== targetY ||
       warmth !== targetWarmth ||
       transition < 1 ||
-      jump.landing > 0.01;
+      (!paused && jump.landing > 0.01);
     if (elapsed - statusTime > 0.12) {
       container.dataset.motion = motionLabel(jump.height > 0, walking, sprinting);
       const nextStatus: SceneStatus = {
@@ -611,7 +622,7 @@ export async function createScene(
     },
     travelTo(id) {
       destination = id;
-      plan();
+      redirect(plan());
     },
     reset() {
       destination = null;

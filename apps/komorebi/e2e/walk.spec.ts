@@ -96,3 +96,37 @@ test('a failed neighbouring painting keeps the child in the current region', asy
   await expect(page.getByRole('status')).toContainText('불러오지 못했어요', { timeout: 15_000 });
   await expect(landscape(page)).toHaveAttribute('data-region', 'village');
 });
+
+test('choosing a new destination while an exit is loading cancels that crossing', async ({ page }) => {
+  let release = () => {};
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route('**/art/river-game.webp', async (route) => {
+    await held;
+    await route.continue();
+  });
+  await openWalk(page);
+  await guideTo(page, '물소리 다리');
+  await expect(page.getByRole('status')).toContainText('풍경을 펼치고 있어요', { timeout: 15_000 });
+  await guideTo(page, '바람이 머무는 논');
+  release();
+  await expect(page.locator('.interact')).toContainText('바람이 머무는 논', { timeout: 15_000 });
+  await expect(landscape(page)).toHaveAttribute('data-region', 'village');
+});
+
+test('a place found at dusk keeps a dusk page that the diary can reread', async ({ page }) => {
+  await openWalk(page);
+  await page.getByRole('button', { name: '노을로 바꾸기' }).click();
+  await guideTo(page, '바람이 머무는 논');
+  await expect(page.locator('.interact')).toContainText('노을빛으로 머물러 보기', { timeout: 15_000 });
+  await page.locator('.interact').click();
+  const memory = page.getByRole('dialog', { name: '바람이 머무는 논' });
+  await expect(memory).toContainText('노을이 논물 위에 길게 눕는다');
+  await memory.getByRole('button', { name: '추억 닫기' }).click();
+  await page.getByRole('button', { name: '산책 지도 열기' }).click();
+  await page.getByRole('button', { name: '바람이 머무는 논 추억 다시 읽기' }).click();
+  await expect(memory).toContainText('초록빛 파도가 발끝까지 밀려온다');
+  await expect(memory).toContainText('노을이 논물 위에 길게 눕는다');
+  await expect(page.locator('.journal-button b')).toHaveText('1 / 6');
+});

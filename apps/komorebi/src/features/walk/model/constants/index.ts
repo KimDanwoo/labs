@@ -1,4 +1,5 @@
 export const DISCOVERY_STORAGE_KEY = 'komorebi-discoveries-v1';
+export const EVENING_DISCOVERY_STORAGE_KEY = 'komorebi-evening-discoveries-v1';
 export const CONTROLS_SEEN_STORAGE_KEY = 'komorebi-controls-seen-v1';
 
 export const DIALOG = { none: 'none', map: 'map', memory: 'memory' } as const;

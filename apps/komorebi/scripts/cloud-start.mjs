@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { openSync, closeSync } from 'node:fs';
+import { closeSync, openSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';

@@ -1,5 +1,6 @@
 'use client';
 
+import { diaryMemory, liveMemory } from '@features/walk/lib/memory';
 import { DIALOG, type Dialog } from '@features/walk/model/constants';
 import {
   useAmbience,
@@ -9,9 +10,11 @@ import {
   useToast,
   useWalkEngine,
 } from '@features/walk/model/hooks';
-import { addDiscovery } from '@features/walk/model/store';
-import { WORLDS, type Landmark } from '@shared/world/world';
+import { dayDiscoveries, eveningDiscoveries } from '@features/walk/model/store';
+import type { Memory } from '@features/walk/model/types';
+import { LANDMARKS, WORLDS } from '@shared/world/world';
 import { useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { BottomBar } from './BottomBar';
 import { GameHeader } from './GameHeader';
 import { InteractPrompt } from './InteractPrompt';
@@ -26,29 +29,47 @@ export function Walk() {
   const [isEvening, setIsEvening] = useState(false);
   const [isSprinting, setIsSprinting] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(DIALOG.none);
-  const [memory, setMemory] = useState<Landmark | null>(null);
+  const [memory, setMemory] = useState<Memory | null>(null);
   const [hasGuided, setHasGuided] = useState(false);
   const isPaused = dialog !== DIALOG.none;
   const toast = useToast();
-  const visited = useDiscoveries();
+  const visited = useDiscoveries(dayDiscoveries);
+  const eveningVisited = useDiscoveries(eveningDiscoveries);
   const isFirstVisit = useIsFirstVisit();
-  const ambience = useAmbience(() => toast.notify('이 브라우저에서는 소리를 재생할 수 없어요.'));
   const { engine, isReady, error, status, hasWalked } = useWalkEngine(landscapeRef, {
     isEvening,
     isSprinting,
     isPaused,
     onNotice: toast.notify,
   });
+  const ambience = useAmbience({
+    region: status.region,
+    isEvening,
+    onUnavailable: () => toast.notify('이 브라우저에서는 소리를 재생할 수 없어요.'),
+  });
   const hasStarted = hasWalked || hasGuided;
 
   function openMemory() {
-    if (!status.nearby) return;
-    setMemory(status.nearby);
-    addDiscovery(status.nearby.id);
+    const landmark = status.nearby;
+    if (!landmark) return;
+    setMemory(liveMemory(landmark, isEvening));
+    dayDiscoveries.add(landmark.id);
+    if (isEvening) eveningDiscoveries.add(landmark.id);
     setDialog(DIALOG.memory);
   }
+  function readMemory(id: string) {
+    const landmark = LANDMARKS.find((p) => p.id === id);
+    if (!landmark) return;
+    setMemory(diaryMemory(landmark, eveningVisited.includes(id)));
+    setDialog(DIALOG.memory);
+  }
+  function promptHint(id: string) {
+    if (isEvening && !eveningVisited.includes(id)) return '노을빛으로 머물러 보기';
+    return visited.includes(id) ? '추억 다시 읽기' : '잠깐 머물러 보기';
+  }
   function closeDialog(which: Dialog) {
-    setDialog((current) => (current === which ? DIALOG.none : current));
+    // Commit now: window-level shortcuts read this state and must not see a dialog the browser already closed.
+    flushSync(() => setDialog((current) => (current === which ? DIALOG.none : current)));
     landscapeRef.current?.querySelector('canvas')?.focus({ preventScroll: true });
   }
   function guideTo(id: string) {
@@ -97,11 +118,7 @@ export function Walk() {
         </div>
       )}
       {status.nearby && !isPaused && (
-        <InteractPrompt
-          landmark={status.nearby}
-          isCollected={visited.includes(status.nearby.id)}
-          onInteract={openMemory}
-        />
+        <InteractPrompt landmark={status.nearby} hint={promptHint(status.nearby.id)} onInteract={openMemory} />
       )}
 
       <BottomBar
@@ -112,6 +129,7 @@ export function Walk() {
       />
       <MobileControls
         isReady={isReady}
+        isPaused={isPaused}
         isSprinting={isSprinting}
         onInput={(key, pressed) => engine.current?.setInput(key, pressed)}
         onToggleSprint={() => setIsSprinting((value) => !value)}
@@ -129,8 +147,10 @@ export function Walk() {
         position={status}
         steps={status.steps}
         visited={visited}
+        eveningVisited={eveningVisited}
         onClose={() => closeDialog(DIALOG.map)}
         onGuide={guideTo}
+        onRead={readMemory}
         onReset={returnHome}
       />
       <MemoryDialog

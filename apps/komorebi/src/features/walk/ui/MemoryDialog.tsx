@@ -1,18 +1,21 @@
 import { useModal } from '@features/walk/model/hooks';
-import { LANDMARKS, type Landmark } from '@shared/world/world';
+import type { Memory } from '@features/walk/model/types';
+import { LANDMARKS } from '@shared/world/world';
 import { useId } from 'react';
 import { Icon } from './Icon';
 
-type Props = { isOpen: boolean; memory: Landmark | null; collectedCount: number; onClose: () => void };
+type Props = { isOpen: boolean; memory: Memory | null; collectedCount: number; onClose: () => void };
 
 export function MemoryDialog({ isOpen, memory, collectedCount, onClose }: Props) {
   const ref = useModal(isOpen);
   const titleId = useId();
+  const hasSeveralPages = (memory?.pages.length ?? 0) > 1;
   return (
     <dialog
       className="memory-dialog"
       ref={ref}
       aria-labelledby={titleId}
+      onCancel={onClose}
       onClose={onClose}
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
@@ -21,10 +24,15 @@ export function MemoryDialog({ isOpen, memory, collectedCount, onClose }: Props)
       <button className="tool memory-close" aria-label="추억 닫기" onClick={onClose}>
         <Icon name="close" />
       </button>
-      <span className="memory-symbol">{memory?.icon}</span>
+      <span className="memory-symbol">{memory?.landmark.icon}</span>
       <span className="eyebrow">A PIECE OF SUMMER</span>
-      <h2 id={titleId}>{memory?.name}</h2>
-      <p>{memory?.text}</p>
+      <h2 id={titleId}>{memory?.landmark.name}</h2>
+      {memory?.pages.map((page) => (
+        <p key={page.label}>
+          {hasSeveralPages && <small className="memory-time">{page.label}</small>}
+          {page.text}
+        </p>
+      ))}
       <span className="memory-line" />
       <span className="memory-count">
         여름의 조각 {collectedCount} / {LANDMARKS.length}

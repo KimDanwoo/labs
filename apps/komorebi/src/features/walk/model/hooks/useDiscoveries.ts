@@ -1,6 +1,6 @@
-import { getDiscoveries, getServerDiscoveries, subscribeDiscoveries } from '@features/walk/model/store';
+import type { DiscoveryStore } from '@features/walk/model/store';
 import { useSyncExternalStore } from 'react';
 
-export function useDiscoveries(): readonly string[] {
-  return useSyncExternalStore(subscribeDiscoveries, getDiscoveries, getServerDiscoveries);
+export function useDiscoveries(store: DiscoveryStore): readonly string[] {
+  return useSyncExternalStore(store.subscribe, store.get, store.getServer);
 }
