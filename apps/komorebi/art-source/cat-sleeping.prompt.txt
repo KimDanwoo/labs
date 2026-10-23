@@ -1,7 +1,0 @@
-Tool: Codex image generation (codexgen), 2026-10-23
-Runtime asset: public/art/cat-sleeping.webp (magenta keyed, despilled, trimmed, 320px wide)
-
-A small calico cat curled up asleep, seen from a slightly elevated three-quarter view, in the style of a lush
-hand-painted Japanese summer countryside anime background (soft cel shading, warm sunlight, gentle outlines).
-The cat alone, centered, filling about 70% of the frame, no ground, no shadow, no props. Perfectly flat solid
-pure magenta (#FF00FF) background everywhere around the cat, no gradient, no texture. Square 1:1.
