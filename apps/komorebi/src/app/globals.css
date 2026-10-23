@@ -1588,3 +1588,13 @@ dialog::backdrop {
   letter-spacing: 0.08em;
   color: var(--muted);
 }
+
+/* Read by screen readers only: announces the region after each crossing. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

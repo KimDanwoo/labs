@@ -98,7 +98,10 @@ export function Walk() {
       <div className="vignette" aria-hidden="true" />
 
       <GameHeader isEvening={isEvening} />
-      <div className="scene-caption" key={status.region}>
+      <p className="sr-only" aria-live="polite">
+        {WORLDS[status.region].name}
+      </p>
+      <div className="scene-caption" key={status.region} aria-hidden="true">
         <span>—</span> {WORLDS[status.region].name} <span>—</span>
       </div>
       <ToolBar
