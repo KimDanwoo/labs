@@ -42,4 +42,11 @@ export const PROJECTS: Project[] = [
     image: '/projects/unicorn-rush.webp',
     imagePosition: 'center',
   },
+  {
+    title: '여름빛 산책',
+    description: '2등신 아이와 걷는 여름 시골 — 손그림 배경화와 Three.js, 낮·노을 추억 모으기',
+    href: 'https://komorebi.danwoo.dev/',
+    image: '/projects/komorebi.webp',
+    imagePosition: 'center',
+  },
 ];
