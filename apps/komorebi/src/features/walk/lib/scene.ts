@@ -1,4 +1,4 @@
-import { TIME, type TimeOfDay } from '@features/walk/model/constants';
+import { TIME, WEATHER, type TimeOfDay, type Weather } from '@features/walk/model/constants';
 import { FOREGROUNDS, isForegroundInFront } from '@shared/world/foreground';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '@shared/world/portals';
 import { surfaceAt, type Surface } from '@shared/world/surfaces';
@@ -27,6 +27,7 @@ import { advanceJump, createJump, isAirborne, startJump } from './motion';
 import { characterScale } from './perspective';
 import { createPlaceEffects } from './placeEffects';
 import { createPortals } from './portals';
+import { createRain } from './rain';
 import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './regionPlates';
 import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
 import { createSceneLife } from './sceneLife';
@@ -68,6 +69,7 @@ export type WalkEngine = {
   /** While paused (a dialog is open) the child stands still and new movement input is ignored. */
   setPaused: (value: boolean) => void;
   setTimeOfDay: (value: TimeOfDay) => void;
+  setWeather: (value: Weather) => void;
   setInput: (key: string, pressed: boolean) => void;
   reset: () => void;
   /** Resolves false when the browser could not encode the picture. */
@@ -133,11 +135,12 @@ export async function createScene(
       time: { value: 0 },
       evening: { value: 0 },
       night: { value: 0 },
+      rain: { value: 0 },
       fade: { value: 1 },
     },
     vertexShader:
       'varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float fade; 
+    fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float rain; uniform float fade; 
       void main(){
         vec2 uv=vUv;
         // Tiny local leaf motion, not a global distortion of architecture.
@@ -156,6 +159,8 @@ export async function createScene(
         vec3 grey=vec3(dot(c,vec3(.3,.59,.11)));
         vec3 moonlit=mix(c,grey,.45)*vec3(.09,.12,.24)+vec3(.0,.003,.015);
         c=mix(c,moonlit,night*.9);
+        vec3 overcast=mix(c,grey,.5)*vec3(.6,.66,.72);
+        c=mix(c,overcast,rain*.8);
         gl_FragColor=vec4(c*fade,1.);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -261,6 +266,7 @@ export async function createScene(
   const fireflies = createFireflies(scene);
   const placeEffects = createPlaceEffects(scene);
   const life = createSceneLife(scene, loader);
+  const rain = createRain(scene);
   const targetMat = new THREE.SpriteMaterial({
     map: markerMap,
     color: '#fff9cf',
@@ -286,6 +292,8 @@ export async function createScene(
     disposed = false,
     timeOfDay: TimeOfDay = TIME.day,
     darkness = 0,
+    weather: Weather = WEATHER.clear,
+    wetness = 0,
     paused = false,
     isSettling = true,
     warmth = 0,
@@ -599,7 +607,11 @@ export async function createScene(
     background.uniforms.night!.value = darkness;
     fireflies.update(elapsed, darkness, reducedMotion);
     placeEffects.update(paused ? 0 : dt);
-    life.update({ region, elapsed, darkness, isStill: reducedMotion, isRaining: false });
+    const targetWetness = weather === WEATHER.rain ? 1 : 0;
+    wetness = settle(THREE.MathUtils.damp(wetness, targetWetness, 1.5, dt), targetWetness, WARMTH_EPSILON);
+    background.uniforms.rain!.value = wetness;
+    rain.update(paused ? 0 : dt, wetness, camera.position, reducedMotion);
+    life.update({ region, elapsed, darkness, isStill: reducedMotion, isRaining: wetness > 0.5 });
     character.setDarkness(darkness);
     transition = Math.min(1, transition + dt * 1.8);
     background.uniforms.time!.value = reducedMotion ? 0 : elapsed;
@@ -618,6 +630,7 @@ export async function createScene(
       camera.position.y !== targetY ||
       warmth !== targetWarmth ||
       darkness !== targetDarkness ||
+      wetness !== targetWetness ||
       placeEffects.isPlaying ||
       transition < 1 ||
       (!paused && jump.landing > 0.01);
@@ -650,6 +663,10 @@ export async function createScene(
   animation = requestAnimationFrame(tick);
   plates.focus(nearbyRegions(START_REGION));
   return {
+    setWeather(value) {
+      weather = value;
+      wake();
+    },
     setTimeOfDay(value) {
       timeOfDay = value;
       wake();
@@ -738,6 +755,7 @@ export async function createScene(
       fireflies.dispose();
       placeEffects.dispose();
       life.dispose();
+      rain.dispose();
       geo.dispose();
       dustGeo.dispose();
       [background, shadowMat, dustMat, targetMat, ...markerMats].forEach((m) => m.dispose());

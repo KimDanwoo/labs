@@ -214,8 +214,9 @@ test('once a page is kept, the place offers its little action instead', async ({
   await openWalk(page);
   await page.getByRole('button', { name: '자연 소리 켜기' }).click();
   await guideTo(page, '물소리 다리');
-  const prompt = page.locator('.interact');
-  await expect(prompt).toContainText('잠깐 머물러 보기', { timeout: 15_000 });
+  // The guided route passes the rice field first, so wait for the bridge's own prompt.
+  const prompt = page.locator('.interact', { hasText: '물소리 다리' });
+  await expect(prompt).toContainText('잠깐 머물러 보기', { timeout: 30_000 });
   await prompt.click();
   await page.getByRole('dialog', { name: '물소리 다리' }).getByRole('button', { name: '추억 닫기' }).click();
   await expect(prompt).toContainText('물수제비 뜨기');
@@ -223,5 +224,19 @@ test('once a page is kept, the place offers its little action instead', async ({
   await expect(page.getByRole('status')).toContainText('돌이 세 번 튀었다');
   await expect(page.getByRole('dialog', { name: '물소리 다리' })).toBeHidden();
   await expect(page.locator('.journal-button b')).toHaveText('1 / 6');
+  expect(errors).toEqual([]);
+});
+
+test('a shower can start and stop, with sound on, without errors', async ({ page }) => {
+  const errors: Error[] = [];
+  page.on('pageerror', (error) => errors.push(error));
+  await openWalk(page);
+  await page.getByRole('button', { name: '자연 소리 켜기' }).click();
+  await page.getByRole('button', { name: '소나기 내리게 하기' }).click();
+  await expect(page.locator('main.walk')).toHaveClass(/is-raining/);
+  await expect(page.getByRole('button', { name: '비 그치게 하기' })).toHaveAttribute('aria-pressed', 'true');
+  await page.waitForTimeout(1000);
+  await page.getByRole('button', { name: '비 그치게 하기' }).click();
+  await expect(page.locator('main.walk')).not.toHaveClass(/is-raining/);
   expect(errors).toEqual([]);
 });

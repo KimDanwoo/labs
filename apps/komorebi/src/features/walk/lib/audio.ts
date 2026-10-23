@@ -1,10 +1,10 @@
-import { TIME, type TimeOfDay } from '@features/walk/model/constants';
+import { TIME, type TimeOfDay, type Weather } from '@features/walk/model/constants';
 import { SURFACE, type Surface } from '@shared/world/surfaces';
 import { PLACE_ACTION, type PlaceAction, type Region } from '@shared/world/world';
 import { ambienceMix, type AmbienceMix } from './ambienceMix';
 
 const MASTER_VOLUME = 0.22;
-const LAYER_VOLUME = { water: 0.5, waves: 0.9, cicadas: 0.012 } as const;
+const LAYER_VOLUME = { water: 0.5, waves: 0.9, cicadas: 0.012, rain: 0.7 } as const;
 const FADE_SECONDS = 1.2;
 const CALL_INTERVAL_MS = 6_500;
 const STEP_VOLUME = 0.55;
@@ -124,11 +124,14 @@ export function createAmbience() {
   nodes.push(pulseDepth);
   oscillator('square', 28, pulseDepth);
 
+  const rainfall = layer(LAYER_VOLUME.rain);
+  filteredNoise('highpass', 1_800, rainfall.gain);
+
   let mix: AmbienceMix = ambienceMix('village', TIME.day);
   const callTimer = window.setInterval(() => {
     if (context.state !== 'running') return;
     if (mix.birds) call(context, master, { pitch: 1_800, count: 3, gap: 0.19 });
-    if (mix.crickets) call(context, master, { pitch: 4_200, count: 6, gap: 0.09 });
+    if (mix.crickets > 0.5) call(context, master, { pitch: 4_200, count: 6, gap: 0.09 });
   }, CALL_INTERVAL_MS);
   void context.resume();
 
@@ -232,13 +235,14 @@ export function createAmbience() {
   return {
     step,
     cue,
-    setScene(region: Region, time: TimeOfDay) {
-      mix = ambienceMix(region, time);
+    setScene(region: Region, time: TimeOfDay, weather: Weather) {
+      mix = ambienceMix(region, time, weather);
       const now = context.currentTime;
       for (const [{ gain, volume }, level] of [
         [water, mix.water],
         [waves, mix.waves],
         [cicadas, mix.cicadas],
+        [rainfall, mix.rain],
       ] as const) {
         gain.gain.setTargetAtTime(volume * level, now, FADE_SECONDS / 3);
       }

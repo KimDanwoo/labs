@@ -93,6 +93,9 @@ button:hover {
 .walk.is-evening {
   background: linear-gradient(180deg, rgb(var(--stone)) 0%, rgb(var(--blush)) 50%, rgb(var(--peach)) 100%);
 }
+.walk.is-raining {
+  background: linear-gradient(180deg, rgb(var(--stone)) 0%, rgb(var(--reed)) 100%);
+}
 .walk.is-night {
   background: linear-gradient(180deg, rgb(var(--night)) 0%, rgb(var(--twilight)) 55%, rgb(var(--deep)) 100%);
 }

@@ -1,7 +1,15 @@
 'use client';
 
 import { diaryMemory, liveMemory } from '@features/walk/lib/memory';
-import { DIALOG, TIME, TIME_ORDER, type Dialog, type TimeOfDay } from '@features/walk/model/constants';
+import {
+  DIALOG,
+  TIME,
+  TIME_ORDER,
+  WEATHER,
+  type Dialog,
+  type TimeOfDay,
+  type Weather,
+} from '@features/walk/model/constants';
 import {
   useAmbience,
   useAmbienceScene,
@@ -36,6 +44,8 @@ const nextTime = (time: TimeOfDay) => TIME_ORDER[(TIME_ORDER.indexOf(time) + 1) 
 export function Walk() {
   const landscapeRef = useRef<HTMLDivElement>(null);
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(TIME.day);
+  const [weather, setWeather] = useState<Weather>(WEATHER.clear);
+  const isRaining = weather === WEATHER.rain;
   const [isSprinting, setIsSprinting] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(DIALOG.none);
   const [memory, setMemory] = useState<Memory | null>(null);
@@ -47,12 +57,13 @@ export function Walk() {
   const ambience = useAmbience(() => toast.notify('이 브라우저에서는 소리를 재생할 수 없어요.'));
   const { engine, isReady, error, status, hasWalked } = useWalkEngine(landscapeRef, {
     timeOfDay,
+    weather,
     isSprinting,
     isPaused,
     onNotice: toast.notify,
     onStep: ambience.step,
   });
-  useAmbienceScene(ambience.setScene, status.region, timeOfDay);
+  useAmbienceScene(ambience.setScene, { region: status.region, time: timeOfDay, weather });
   const hasStarted = hasWalked || hasGuided;
 
   function interact() {
@@ -106,7 +117,7 @@ export function Walk() {
   useShortcuts({ isEnabled: !isPaused, onDiscover: interact, onOpenMap: () => setDialog(DIALOG.map) });
 
   return (
-    <main className={`walk is-${timeOfDay} ${hasStarted ? 'has-started' : ''}`}>
+    <main className={`walk is-${timeOfDay} ${isRaining ? 'is-raining' : ''} ${hasStarted ? 'has-started' : ''}`}>
       <div className="landscape" ref={landscapeRef} />
       <div className="paper-grain" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
@@ -121,9 +132,11 @@ export function Walk() {
       <ToolBar
         timeOfDay={timeOfDay}
         nextTimeOfDay={nextTime(timeOfDay)}
+        isRaining={isRaining}
         isSoundOn={ambience.isOn}
         isReady={isReady}
         onNextTime={() => setTimeOfDay(nextTime)}
+        onToggleRain={() => setWeather(isRaining ? WEATHER.clear : WEATHER.rain)}
         onToggleSound={ambience.toggle}
         onPhoto={takePhoto}
         onOpenMap={() => setDialog(DIALOG.map)}

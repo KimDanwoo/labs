@@ -16,3 +16,11 @@ test('each place has its own sound and dusk swaps birds for crickets', () => {
   assert.equal(night.crickets, 1);
   assert.equal(night.water, 1, 'the river still runs at night');
 });
+
+test('a shower adds rain and hushes birds and insects', () => {
+  const wet = ambienceMix('forest', 'day', 'rain');
+  assert.equal(wet.rain, 1);
+  assert.equal(wet.birds, 0);
+  assert.ok(wet.cicadas < ambienceMix('forest', 'day').cicadas);
+  assert.equal(ambienceMix('forest', 'day').rain, 0);
+});

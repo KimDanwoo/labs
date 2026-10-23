@@ -14,4 +14,7 @@ export type TimeOfDay = (typeof TIME)[keyof typeof TIME];
 export const TIME_ORDER: readonly TimeOfDay[] = [TIME.day, TIME.evening, TIME.night];
 export const TIME_LABEL = { day: '한낮', evening: '해 질 녘', night: '밤' } satisfies Record<TimeOfDay, string>;
 
+export const WEATHER = { clear: 'clear', rain: 'rain' } as const;
+export type Weather = (typeof WEATHER)[keyof typeof WEATHER];
+
 export const TOAST_DURATION_MS = 3_500;
