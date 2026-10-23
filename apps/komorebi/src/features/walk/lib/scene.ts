@@ -29,6 +29,7 @@ import { createPlaceEffects } from './placeEffects';
 import { createPortals } from './portals';
 import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './regionPlates';
 import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
+import { createSceneLife } from './sceneLife';
 
 const CHILD_ATLAS_URL = '/art/child-motion-v2-ready.webp';
 const START_REGION: Region = 'village';
@@ -259,6 +260,7 @@ export async function createScene(
   const portalVisuals = createPortals(scene);
   const fireflies = createFireflies(scene);
   const placeEffects = createPlaceEffects(scene);
+  const life = createSceneLife(scene, loader);
   const targetMat = new THREE.SpriteMaterial({
     map: markerMap,
     color: '#fff9cf',
@@ -597,6 +599,7 @@ export async function createScene(
     background.uniforms.night!.value = darkness;
     fireflies.update(elapsed, darkness, reducedMotion);
     placeEffects.update(paused ? 0 : dt);
+    life.update({ region, elapsed, darkness, isStill: reducedMotion, isRaining: false });
     character.setDarkness(darkness);
     transition = Math.min(1, transition + dt * 1.8);
     background.uniforms.time!.value = reducedMotion ? 0 : elapsed;
@@ -734,6 +737,7 @@ export async function createScene(
       portalVisuals.dispose();
       fireflies.dispose();
       placeEffects.dispose();
+      life.dispose();
       geo.dispose();
       dustGeo.dispose();
       [background, shadowMat, dustMat, targetMat, ...markerMats].forEach((m) => m.dispose());
