@@ -2,19 +2,19 @@ import type { Point, Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { lampGlowAt, lightSprite } from './nightLights';
-import { characterScale } from './perspective';
+import { CHILD_SIZE, characterScale } from './perspective';
 import { passingRoute, presence, routeLength, startGait, walkOn, type Gait } from './roam';
 
 const FRAMES = 4;
 const ANIMAL = {
-  cat: { url: '/art/cat-walk.webp', speed: 7, stride: 1.6, height: 4.4, aspect: 198 / 160 },
-  dog: { url: '/art/dog-walk.webp', speed: 9, stride: 2, height: 5.2, aspect: 222 / 160 },
+  cat: { url: '/art/cat-walk.webp', speed: 11, stride: 2.2, height: 6.2, aspect: 198 / 160 },
+  dog: { url: '/art/dog-walk.webp', speed: 13, stride: 2.6, height: 7.2, aspect: 222 / 160 },
 } as const;
 type Animal = keyof typeof ANIMAL;
 
 /** Seconds between visitors; the first one shows up sooner. */
-const FIRST_VISIT = [5, 14] as const;
-const NEXT_VISIT = [18, 45] as const;
+const FIRST_VISIT = [3, 8] as const;
+const NEXT_VISIT = [10, 25] as const;
 const NIGHT_CAT_SHARE = 0.8;
 const DAY_CAT_SHARE = 0.5;
 const PAUSE_CHANCE = 0.35;
@@ -128,7 +128,7 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     // Sprites drop a negative scale's sign, so a left-facing walk mirrors the atlas instead.
     material.map!.repeat.set((gait.isFacingLeft ? -1 : 1) / FRAMES, 1);
     material.map!.offset.set((frame + (gait.isFacingLeft ? 1 : 0)) / FRAMES, 0);
-    const height = spec.height * characterScale(gait.at.z) * 1.65;
+    const height = spec.height * characterScale(gait.at.z) * CHILD_SIZE;
     sprite.scale.set(height * spec.aspect, height, 1);
     sprite.position.set(gait.at.x * 1.2 - 60, 40 - gait.at.z * 0.8, 2);
     sprite.renderOrder = gait.at.z > childZ ? ORDER.front : ORDER.behind;

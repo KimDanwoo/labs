@@ -25,7 +25,7 @@ import { createFireflies } from './fireflies';
 import { gameKey, isControlTarget } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
 import { MAX_LAMPS, createNightLights, lampGlowAt, lampUniforms } from './nightLights';
-import { characterScale } from './perspective';
+import { CHILD_SIZE, characterScale } from './perspective';
 import { createPlaceEffects } from './placeEffects';
 import { createPortals } from './portals';
 import { createRain } from './rain';
@@ -33,9 +33,11 @@ import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './reg
 import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
 import { createRoamers } from './roamers';
 import { createSceneLife } from './sceneLife';
+import { createWaterMaps } from './water';
 
 const CHILD_ATLAS_URL = '/art/child-motion-v2-ready.webp';
 const START_REGION: Region = 'village';
+const SEA_REGION: Region = 'coast';
 const CAMERA_EPSILON = 0.01;
 const WARMTH_EPSILON = 0.002;
 const CHILD_ORDER = 4;
@@ -134,6 +136,7 @@ export async function createScene(
   const camera = new THREE.OrthographicCamera(-60, 60, 40, -40, 0.1, 200);
   camera.position.set(0, 0, 100);
   const geo = new THREE.PlaneGeometry(120, 80, 1, 1);
+  const waterMaps = createWaterMaps(loader);
   const background = new THREE.ShaderMaterial({
     uniforms: {
       map: { value: startPlate.value },
@@ -144,24 +147,215 @@ export async function createScene(
       lamps: { value: lampUniforms(START_REGION).values },
       lampCount: { value: lampUniforms(START_REGION).count },
       walker: { value: new THREE.Vector2(0.5, 0.2) },
+      waterMap: { value: waterMaps.of(START_REGION) },
+      isSea: { value: START_REGION === SEA_REGION ? 1 : 0 },
+      shoreMap: { value: waterMaps.shoreOf(START_REGION) },
+      foam: waterMaps.foam,
       fade: { value: 1 },
     },
     vertexShader:
       'varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float rain; uniform float fade;
-      uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; 
+      uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform float isSea; uniform sampler2D shoreMap; uniform sampler2D foam; 
       void main(){
         vec2 uv=vUv;
         // Tiny local leaf motion, not a global distortion of architecture.
         float canopy=smoothstep(.45,.82,uv.y)*(1.-smoothstep(.08,.34,uv.x));
         uv.x+=sin(time*.6+uv.y*32.)*.00045*canopy;
-        vec4 tex=texture2D(map,uv);
-        vec3 c=tex.rgb;
-        float blue=step(c.r*1.35,c.b)*step(c.g*.92,c.b);
-        float waterMask=(1.-smoothstep(.45,.65,uv.y))*smoothstep(.55,.7,uv.x)*blue;
-        float ripple=sin(uv.y*700.+sin(uv.x*80.+time*.2)*2.+time*1.2);
-        float sparkle=smoothstep(.65,.95,sin(uv.x*240.+sin(uv.y*80.)*4.-time*.4));
-        c+=waterMask*pow(max(0.,ripple),24.)*sparkle*.018;
+        // Rivers carry broken foam downstream and spray off the rocks; the sea rolls a few soft crests in and
+        // breaks each wave into lace along its shores, which then drains away. Designed by Codex.
+        const float W_TAU = 6.28318530718;
+
+        vec4 water = texture2D(waterMap, vUv);                  // 1
+        vec4 shore = texture2D(shoreMap, vUv);                  // 2
+
+        float sea = clamp(isSea, 0., 1.);
+        float nearWater = 1. - vUv.y;
+        float wt = time * (1. + rain * .20);
+        vec2 p = vec2(vUv.x * 1.5, nearWater);
+
+        float wet = smoothstep(.12, .78, water.r);
+        vec2 flow = (water.gb * 255. - 128.) / 127.;
+        float pace = length(flow);
+        float speed = clamp(pace, 0., 1.);
+        float river = (1. - sea) * smoothstep(.025, .12, pace);
+
+        vec2 riverDir = vec2(0., 1.);
+        if (pace > .025) {
+          riverDir = normalize(flow * vec2(1.5, 1.));
+        }
+
+        float shoreDistance = (shore.r - .5) * .12;
+        float shoreStrength = clamp(shore.a, 0., 1.);
+
+        // Offshore waves keep one direction. Shore normals do not define phase.
+        vec2 seaDir = normalize(vec2(.16, 1.));
+        vec2 advectDir = mix(riverDir, seaDir, sea);
+        float velocity = mix(.012 + .027 * speed, .0045, sea);
+
+        // Fixed texture coordinates; the flow field only offsets the lookup.
+        float phaseA = fract(wt / 4.8);
+        float phaseB = fract(phaseA + .5);
+        float weightA = .5 - .5 * cos(W_TAU * phaseA);
+        vec2 backA = p - advectDir * velocity * (phaseA * 4.8);
+        vec2 backB = p - advectDir * velocity * (phaseB * 4.8);
+
+        // The supplied image already contains elongated lace.
+        // Keep individual holes visible instead of shrinking them into lines.
+        vec2 foamScale = mix(vec2(13., 4.5), vec2(9., 11.), sea);
+        float foamA = texture2D(
+          foam, backA * foamScale + vec2(.17, .31)
+        ).r;                                                     // 3
+        float foamB = texture2D(
+          foam, backB * foamScale + vec2(.17, .31)
+        ).r;                                                     // 4
+
+        float lace = mix(
+          smoothstep(.20, .72, foamB),
+          smoothstep(.20, .72, foamA),
+          weightA
+        );
+        float tips = mix(
+          smoothstep(.58, .92, foamB),
+          smoothstep(.58, .92, foamA),
+          weightA
+        );
+
+        // A separate, broad mask breaks up the foam coverage.
+        float patchMask = texture2D(
+          foam, p * vec2(2.1, 2.7) + vec2(-wt * .0015, .43)
+        ).r;                                                     // 5
+        float islands = smoothstep(.22, .68, patchMask);
+
+        uv = mix(uv, vUv, wet);
+        vec4 tex = texture2D(map, uv);                            // 6
+
+        float waterColour =
+          smoothstep(.008, .080, max(tex.g, tex.b) - tex.r) *
+          smoothstep(.70, .98, tex.b / max(tex.g, .001));
+        float waterEffect = wet * waterColour;
+
+        // Fixed-distance probes avoid the old resetting wake sweep.
+        vec2 riverUv = vec2(riverDir.x / 1.5, -riverDir.y);
+        vec2 nearUv = clamp(
+          vUv - riverUv * .0035, vec2(.001), vec2(.999)
+        );
+        vec2 farUv = clamp(
+          vUv - riverUv * (.010 + .010 * speed),
+          vec2(.001), vec2(.999)
+        );
+        vec3 nearTex = texture2D(map, nearUv).rgb;                 // 7
+        vec3 farTex = texture2D(map, farUv).rgb;                   // 8
+
+        float nearColour =
+          smoothstep(.008, .080, max(nearTex.g, nearTex.b) - nearTex.r) *
+          smoothstep(.70, .98, nearTex.b / max(nearTex.g, .001));
+        float farColour =
+          smoothstep(.008, .080, max(farTex.g, farTex.b) - farTex.r) *
+          smoothstep(.70, .98, farTex.b / max(farTex.g, .001));
+
+        float contact = (1. - nearColour) * waterColour;
+        float wake = (1. - farColour) * waterColour;
+
+        // Broad, intermittent foam fragments travelling down the river.
+        float riverSurface = river * lace * islands * (.035 + .065 * speed);
+        float riverSpray = river * (
+          contact * (.24 + .64 * lace) +
+          wake * lace * (.15 + .30 * islands)
+        ) * (.65 + .55 * speed);
+
+        // One front approaches the shore, breaks, and leaves a fading wash.
+        // Spatial variation changes arrival time, never the local period.
+        float coastOffset =
+          .09 * sin(p.x * 8. + p.y * 3.) +
+          .04 * sin(p.x * 17. - p.y * 5.);
+        float cycle = fract(wt / 7.2 + .29 + coastOffset);
+
+        float approach = smoothstep(.04, .52, cycle);
+        float retreat = smoothstep(.57, .96, cycle);
+        float frontDistance =
+          mix(.020, .0015, approach) + .006 * retreat;
+
+        float frontWidth = .0028 + .0018 * approach;
+        float front = 1. - smoothstep(
+          frontWidth * .30,
+          frontWidth,
+          abs(shoreDistance - frontDistance)
+        );
+        float frontLife =
+          smoothstep(.00, .12, cycle) *
+          (1. - smoothstep(.64, .91, cycle));
+
+        // Water-side clipping, softened for the encoded distance resolution.
+        float shoreBand =
+          smoothstep(-.0015, .0015, shoreDistance) *
+          (1. - smoothstep(.022, .029, shoreDistance));
+
+        // Residual lace occupies the water between the coast and the front.
+        float washArea =
+          1. - smoothstep(
+            frontDistance + .001,
+            frontDistance + .006,
+            shoreDistance
+          );
+        float washLife =
+          smoothstep(.24, .53, cycle) *
+          (1. - smoothstep(.65, .99, cycle));
+
+        float coastLace =
+          front * frontLife * (.10 + .90 * lace) +
+          washArea * washLife * lace * .38;
+
+        // A little attached foam remains between breaking waves.
+        float attached =
+          (1. - smoothstep(.0015, .0055, shoreDistance)) *
+          lace * .16;
+
+        float seaFoam =
+          sea * shoreBand *
+          mix(.65, 1., shoreStrength) *
+          (coastLace + attached);
+
+        // A few broad, broken offshore crests.
+        // Fixed direction and wavelength prevent the curved phase-field artifact.
+        float swellPhase = W_TAU * (
+          dot(p, seaDir) / .145 - wt / 12.0
+        );
+        swellPhase += .24 * sin(p.x * 9.);
+        float swell = .5 + .5 * cos(swellPhase);
+        float crest = smoothstep(.88, .995, swell);
+        float offshore = smoothstep(.025, .055, shoreDistance);
+        float seaDepth = smoothstep(.16, .34, nearWater);
+        float openCrest =
+          sea * seaDepth * offshore * crest * lace *
+          (.12 + .88 * islands);
+
+        // Rain changes existing irregular shapes instead of adding scanlines.
+        float rainTexture =
+          rain * tips * islands * (.025 * sea + .045 * river);
+
+        float waterHighlights = waterEffect * (
+          riverSurface +
+          openCrest * .11 +
+          rainTexture
+        );
+
+        // Shore foam must survive over the painting's pale water.
+        // Accurate water polygons remain necessary to protect land and objects.
+        float shoreCoverage = wet * mix(.30, 1., waterColour);
+        float waterFoam = clamp(
+          shoreCoverage * seaFoam * (1. + rain * .15) +
+          waterEffect * (
+            openCrest * .30 +
+            riverSpray * (1. + rain * .20)
+          ),
+          0., .88
+        );
+
+        vec3 c = tex.rgb;
+        float trough =
+          sea * seaDepth * offshore * (1. - swell) * .012;
+        c *= 1. - waterEffect * trough * (1. - night * .9);
         vec3 warm=c*vec3(1.09,.79,.67)+vec3(.025,.005,.018);
         c=mix(c,warm,evening*.65);
         // Linear light: these factors read about twice as bright once converted for the screen.
@@ -179,6 +373,42 @@ export async function createScene(
         float carry=1.-smoothstep(0.,.13,length((uv-walker)*vec2(1.5,1.)));
         vec3 lamplit=base*vec3(1.05,.84,.58);
         c=mix(c,lamplit,clamp(pool*.85+carry*.35,0.,.9)*night);
+        // Highlights and foam take the light of the hour: paint-white by day, moon and lamps by night.
+        float moonCentre = .64 + .018 * sin(vUv.y * 17.);
+        float moonWidth = mix(.035, .15, nearWater);
+        float moon = 1. - smoothstep(
+          moonWidth * .25, moonWidth, abs(vUv.x - moonCentre)
+        );
+        moon *= smoothstep(.06, .22, vUv.y) *
+                (1. - smoothstep(.86, .98, vUv.y));
+
+        float lampLight = clamp(pool * .65, 0., 1.);
+        float moonLight = moon * (1. - rain * .85);
+
+        vec3 daylightColour = mix(
+          vec3(.78, .91, .96),
+          vec3(1., .79, .53),
+          evening * .65
+        );
+        vec3 reflectedLight = mix(
+          daylightColour * (.42 * (1. - rain * .20)),
+          vec3(.40, .58, .90) * moonLight * .075 +
+            vec3(1., .76, .43) * lampLight * .35,
+          night
+        );
+        c += waterHighlights * reflectedLight;
+
+        vec3 foamDay = mix(
+          vec3(.84, .90, .86),
+          vec3(.94, .78, .57),
+          evening * .55
+        );
+        vec3 foamNight =
+          vec3(.004, .008, .015) +
+          vec3(.40, .58, .86) * moonLight * .095 +
+          vec3(1., .76, .44) * lampLight * .42;
+        vec3 foamColour = mix(foamDay, foamNight, night);
+        c = mix(c, foamColour, waterFoam);
         float edge=1.-smoothstep(.3,.95,length((uv-vec2(.5,.45))*vec2(1.1,1.35)));
         c*=mix(1.,.55+.45*edge,night);
         vec3 overcast=mix(c,vec3(dot(c,vec3(.3,.59,.11))),.5)*vec3(.6,.66,.72);
@@ -403,6 +633,9 @@ export async function createScene(
     background.uniforms.map!.value = plate;
     const lamps = lampUniforms(next);
     background.uniforms.lamps!.value = lamps.values;
+    background.uniforms.waterMap!.value = waterMaps.of(next);
+    background.uniforms.shoreMap!.value = waterMaps.shoreOf(next);
+    background.uniforms.isSea!.value = next === SEA_REGION ? 1 : 0;
     background.uniforms.lampCount!.value = lamps.count;
     // Home stays loaded for the reset button; everything beyond the next exits is freed.
     const nearby = [...new Set([START_REGION, ...nearbyRegions(next)])];
@@ -565,7 +798,8 @@ export async function createScene(
       else if (portal !== blockedPortal) enterPortal(portal);
     }
     const scale = characterScale(position.z);
-    child.scale.setScalar(scale * 1.65);
+    const size = scale * CHILD_SIZE;
+    child.scale.setScalar(size);
     const { hasStepped } = character.update(
       paused ? 0 : dt,
       jump.height > 0 ? frameTravel * 0.2 : frameTravel,
@@ -586,14 +820,14 @@ export async function createScene(
     child.position.set(position.x * 1.2 - 60, 40 - position.z * 0.8 + jump.height * scale, 2);
     shadow.position.set(child.position.x + scale * 0.3, 40 - position.z * 0.8 - 0.08, 1);
     const shadowSize = 1 - Math.min(jump.height * 0.12, 0.3);
-    shadow.scale.set(6.3 * scale * shadowSize, 1.8 * scale * shadowSize, 1);
+    shadow.scale.set(3.8 * size * shadowSize, 1.1 * size * shadowSize, 1);
     shadowMat.opacity = 1 - Math.min(jump.height * 0.22, 0.55);
     const maxX = Math.max(0, 60 - halfWidth),
       maxY = Math.max(0, 40 - halfHeight);
     const cameraX = THREE.MathUtils.clamp(child.position.x * (halfWidth < 35 ? 1 : 0), -maxX, maxX);
     const cameraY = THREE.MathUtils.clamp(Math.min(0, child.position.y + halfHeight - 7), -maxY, maxY);
-    const characterHeight = 10.4 * scale * 1.65;
-    const characterHalfWidth = 3.9 * scale * 1.65;
+    const characterHeight = 10.4 * size;
+    const characterHalfWidth = 3.9 * size;
     const keepX = (x: number) =>
       constrainCameraAxis(
         x,
@@ -632,7 +866,7 @@ export async function createScene(
     background.uniforms.night!.value = darkness;
     fireflies.update(elapsed, darkness, reducedMotion);
     nightLights.update(region, darkness, elapsed, reducedMotion);
-    background.uniforms.walker!.value.set((child.position.x + 60) / 120, (child.position.y + 40 + 3 * scale) / 80);
+    background.uniforms.walker!.value.set((child.position.x + 60) / 120, (child.position.y + 40 + 1.8 * size) / 80);
     placeEffects.update(paused ? 0 : dt);
     const targetWetness = weather === WEATHER.rain ? 1 : 0;
     wetness = settle(THREE.MathUtils.damp(wetness, targetWetness, 1.5, dt), targetWetness, WARMTH_EPSILON);
@@ -803,6 +1037,7 @@ export async function createScene(
       nightLights.dispose();
       life.dispose();
       roamers.dispose();
+      waterMaps.dispose();
       rain.dispose();
       geo.dispose();
       dustGeo.dispose();
