@@ -466,7 +466,7 @@ export async function createScene(
             seaBodyNoise(seaOutputPainting, 0.);
 
           float carrier = seaCarrier(seaOutputPainting, time);
-          float amplitudePx = mix(.30, 2.60, depth) *
+          float amplitudePx = mix(.80, 6.00, depth) *
             mix(1., 1.12, clamp(rain, 0., 1.));
 
           vec2 displacementPx = amplitudePx * vec2(
@@ -534,8 +534,8 @@ export async function createScene(
 
           seaSwellValue =
             (
-              .035 * seaCarrier(seaOutputPainting, time) +
-              .025 * seaNoiseDelta.y
+              .09 * seaCarrier(seaOutputPainting, time) +
+              .05 * seaNoiseDelta.y
             ) * mix(.35, 1., swellDepth);
 
           // Cloud shadows stay put on the world.
@@ -603,7 +603,7 @@ export async function createScene(
           evening
         );
         vec3 glitterLight = mix(
-          glitterDayColour * sunBand * .52,
+          glitterDayColour * sunBand * .85,
           vec3(.40, .59, .86) * seaMoonBand * .055,
           night
         );
@@ -670,7 +670,7 @@ export async function createScene(
             seaNoise(seaSourcePainting * vec2(31., 53.));
 
           float paintedTwinkleGain =
-            .24 *
+            .40 *
             mix(1., .45, clamp(night, 0., 1.)) *
             mix(1., .20, clamp(rain, 0., 1.));
 
