@@ -1,7 +1,5 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { nearestShore } from '../src/features/walk/lib/water';
-import { SHORES } from '../src/shared/world/shore';
 import { WATER } from '../src/shared/world/water';
 import { WORLDS, type Region } from '../src/shared/world/world';
 
@@ -36,14 +34,4 @@ test('no lane the child walks is painted as water', () => {
       assert.equal(wet, undefined, `${region} ${node.id} at ${node.x},${node.z}`);
     }
   }
-});
-
-test('the shore map measures out to sea as positive and onto land as negative', () => {
-  const coast = SHORES.coast!;
-  const square = ([x, z]: [number, number]): [number, number] => [(x / 100) * 1.5, z / 100];
-  const atSea = nearestShore(square([75, 35]), coast);
-  const onLand = nearestShore(square([75, 62]), coast);
-  assert.ok(atSea.distance > 0, `sea ${atSea.distance}`);
-  assert.ok(onLand.distance < 0, `land ${onLand.distance}`);
-  assert.ok(atSea.strength > 0 && atSea.strength <= 1);
 });
