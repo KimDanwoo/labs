@@ -1,6 +1,6 @@
-import { useId } from 'react';
 import { useModal } from '@features/walk/model/hooks';
 import { LANDMARKS, type Landmark } from '@shared/world/world';
+import { useId } from 'react';
 import { Icon } from './Icon';
 
 type Props = { isOpen: boolean; memory: Landmark | null; collectedCount: number; onClose: () => void };

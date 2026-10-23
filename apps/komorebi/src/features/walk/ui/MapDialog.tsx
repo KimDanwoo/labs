@@ -1,6 +1,6 @@
-import { useId } from 'react';
 import { useModal } from '@features/walk/model/hooks';
 import { LANDMARKS, type Point, type Region } from '@shared/world/world';
+import { useId } from 'react';
 import { Icon } from './Icon';
 import { WalkMap } from './WalkMap';
 

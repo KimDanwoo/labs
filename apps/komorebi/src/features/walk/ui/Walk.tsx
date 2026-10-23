@@ -1,6 +1,5 @@
 'use client';
 
-import { useRef, useState } from 'react';
 import { DIALOG, type Dialog } from '@features/walk/model/constants';
 import {
   useAmbience,
@@ -12,6 +11,7 @@ import {
 } from '@features/walk/model/hooks';
 import { addDiscovery } from '@features/walk/model/store';
 import { WORLDS, type Landmark } from '@shared/world/world';
+import { useRef, useState } from 'react';
 import { BottomBar } from './BottomBar';
 import { GameHeader } from './GameHeader';
 import { InteractPrompt } from './InteractPrompt';

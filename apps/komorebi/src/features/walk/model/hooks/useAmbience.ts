@@ -1,5 +1,5 @@
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { createAmbience } from '@features/walk/lib/audio';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 
 type Ambience = ReturnType<typeof createAmbience>;
 

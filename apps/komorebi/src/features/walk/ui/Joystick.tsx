@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useEffectEvent, useRef, useState, type PointerEvent } from 'react';
 import { padDirection } from '@features/walk/lib/input';
+import { useEffect, useEffectEvent, useRef, useState, type PointerEvent } from 'react';
 
 const directions = ['w', 'a', 's', 'd'] as const;
 export function Joystick({

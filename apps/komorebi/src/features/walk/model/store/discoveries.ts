@@ -1,5 +1,5 @@
-import { LANDMARKS } from '@shared/world/world';
 import { DISCOVERY_STORAGE_KEY } from '@features/walk/model/constants';
+import { LANDMARKS } from '@shared/world/world';
 
 const NO_DISCOVERIES: readonly string[] = [];
 const listeners = new Set<() => void>();

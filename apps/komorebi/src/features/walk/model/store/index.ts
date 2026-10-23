@@ -1,3 +1,4 @@
+export { wasControlsHintSeen } from './controlsHint';
 export {
   addDiscovery,
   getDiscoveries,
@@ -5,4 +6,3 @@ export {
   parseDiscoveries,
   subscribeDiscoveries,
 } from './discoveries';
-export { wasControlsHintSeen } from './controlsHint';

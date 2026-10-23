@@ -1,6 +1,6 @@
-import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
-import { SPAWN } from '@shared/world/world';
 import { createScene, type SceneStatus, type WalkEngine } from '@features/walk/lib/scene';
+import { SPAWN } from '@shared/world/world';
+import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
 
 type EngineSettings = { isEvening: boolean; isSprinting: boolean };
 
