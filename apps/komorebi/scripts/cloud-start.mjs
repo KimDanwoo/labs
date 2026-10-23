@@ -18,7 +18,10 @@ const child = spawn('npx', ['--yes', 'pnpm@9.12.1', '--filter', 'komorebi', 'dev
   detached: true,
   stdio: ['ignore', log, log],
 });
-child.on('error', error => { console.error(error); process.exitCode = 1; });
+child.on('error', (error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
 child.unref();
 closeSync(log);
 console.log(`Starting Komorebi on port 3011. Logs: ${logPath}`);

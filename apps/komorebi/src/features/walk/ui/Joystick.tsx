@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState, type PointerEvent } from 'react';
-import { padDirection } from '../lib/input';
+import { useEffect, useEffectEvent, useRef, useState, type PointerEvent } from 'react';
+import { padDirection } from '@features/walk/lib/input';
 
 const directions = ['w', 'a', 's', 'd'] as const;
 export function Joystick({
@@ -12,27 +12,23 @@ export function Joystick({
   disabled: boolean;
 }) {
   const pointer = useRef<number | null>(null);
-  const input = useRef(onInput);
-  input.current = onInput;
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   function stop() {
     pointer.current = null;
     setOffset({ x: 0, y: 0 });
-    directions.forEach((key) => input.current(key, false));
+    directions.forEach((key) => onInput(key, false));
   }
+  const handleLeave = useEffectEvent(stop);
+  const releaseKeys = useEffectEvent(() => directions.forEach((key) => onInput(key, false)));
   useEffect(() => {
-    const clear = () => stop();
-    window.addEventListener('blur', clear);
-    document.addEventListener('visibilitychange', clear);
+    window.addEventListener('blur', handleLeave);
+    document.addEventListener('visibilitychange', handleLeave);
     return () => {
-      window.removeEventListener('blur', clear);
-      document.removeEventListener('visibilitychange', clear);
-      directions.forEach((key) => input.current(key, false));
+      window.removeEventListener('blur', handleLeave);
+      document.removeEventListener('visibilitychange', handleLeave);
+      releaseKeys();
     };
   }, []);
-  useEffect(() => {
-    if (disabled) stop();
-  }, [disabled]);
   function move(event: PointerEvent<HTMLDivElement>) {
     if (pointer.current !== event.pointerId) return;
     event.preventDefault();
@@ -43,7 +39,7 @@ export function Joystick({
     const ratio = Math.min(1, radius / Math.max(1, Math.hypot(x, y)));
     setOffset({ x: x * ratio, y: y * ratio });
     const active = padDirection(x / radius, y / radius);
-    directions.forEach((key) => input.current(key, active.includes(key)));
+    directions.forEach((key) => onInput(key, active.includes(key)));
   }
   return (
     <div

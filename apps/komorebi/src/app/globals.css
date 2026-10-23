@@ -1550,3 +1550,14 @@ dialog::backdrop {
     transform-origin: bottom left;
   }
 }
+
+/* The first-visit controls hint leaves on its own after a short look. */
+.keyboard-help {
+  animation: hint-leave 0.4s ease 8s forwards;
+}
+@keyframes hint-leave {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

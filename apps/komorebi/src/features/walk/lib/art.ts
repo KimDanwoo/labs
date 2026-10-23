@@ -1,10 +1,6 @@
 import * as THREE from 'three';
 
-export function canvasTexture(
-  width: number,
-  height: number,
-  paint: (ctx: CanvasRenderingContext2D) => void,
-) {
+export function canvasTexture(width: number, height: number, paint: (ctx: CanvasRenderingContext2D) => void) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -15,4 +11,3 @@ export function canvasTexture(
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
 }
-

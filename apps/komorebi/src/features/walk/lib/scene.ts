@@ -24,6 +24,15 @@ import { characterScale } from './perspective';
 import { createPortals } from './portals';
 import { nextRenderTime, renderPixelRatio, shouldRenderFrame } from './renderBudget';
 
+const RUN_SPEED = 24;
+const SPRINT_SPEED = 36;
+
+function motionLabel(isAirborne: boolean, isMoving: boolean, isSprinting: boolean) {
+  if (isAirborne) return 'jumping';
+  if (!isMoving) return 'idle';
+  return isSprinting ? 'sprinting' : 'running';
+}
+
 export type SceneStatus = Point & {
   region: Region;
   walking: boolean;
@@ -306,7 +315,10 @@ export async function createScene(
   };
   container.dataset.region = region;
   const keyDown = (event: KeyboardEvent) => {
-    if ((event.target instanceof HTMLElement && isControlTarget(event.target)) || document.querySelector('dialog[open]'))
+    if (
+      (event.target instanceof HTMLElement && isControlTarget(event.target)) ||
+      document.querySelector('dialog[open]')
+    )
       return;
     const key = gameKey(event);
     if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) event.preventDefault();
@@ -399,7 +411,8 @@ export async function createScene(
     const magnitude = Math.hypot(dx, dz);
     let walking = magnitude > 0 && !paused;
     let frameTravel = 0;
-    moveSpeed = THREE.MathUtils.damp(moveSpeed, walking ? (sprinting ? 36 : 24) : 0, 24, dt);
+    const targetSpeed = sprinting ? SPRINT_SPEED : RUN_SPEED;
+    moveSpeed = THREE.MathUtils.damp(moveSpeed, walking ? targetSpeed : 0, 24, dt);
     if (walking) {
       dx /= magnitude;
       dz /= magnitude;
@@ -492,7 +505,7 @@ export async function createScene(
       dustGeo.attributes.position!.needsUpdate = true;
     }
     if (elapsed - statusTime > 0.12) {
-      container.dataset.motion = jump.height > 0 ? 'jumping' : walking ? (sprinting ? 'sprinting' : 'running') : 'idle';
+      container.dataset.motion = motionLabel(jump.height > 0, walking, sprinting);
       const nextStatus: SceneStatus = {
         ...position,
         region,
@@ -563,7 +576,10 @@ export async function createScene(
       ctx.fillText('木漏れ日  /  여름빛 산책', canvas.width * 0.04, canvas.height * 0.95);
       return new Promise<boolean>((resolve) => {
         canvas.toBlob((blob) => {
-          if (!blob) return resolve(false);
+          if (!blob) {
+            resolve(false);
+            return;
+          }
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.download = `komorebi-${region}-${Date.now()}.png`;

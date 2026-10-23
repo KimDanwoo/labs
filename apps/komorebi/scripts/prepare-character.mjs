@@ -67,7 +67,8 @@ try {
     if (!message.id) return;
     const callback = pending.get(message.id);
     pending.delete(message.id);
-    message.error ? callback.reject(message.error) : callback.resolve(message.result);
+    if (message.error) callback.reject(message.error);
+    else callback.resolve(message.result);
   });
   const send = (method, params) =>
     new Promise((resolve, reject) => {

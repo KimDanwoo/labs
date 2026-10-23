@@ -619,6 +619,12 @@ importers:
       '@config/tsconfig':
         specifier: workspace:*
         version: link:../../packages/config
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@repo/prettier-config':
+        specifier: workspace:*
+        version: link:../../packages/prettier-config
       '@types/node':
         specifier: 'catalog:'
         version: 26.4.0
@@ -631,6 +637,9 @@ importers:
       '@types/three':
         specifier: 'catalog:'
         version: 0.185.4
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.5(jiti@2.7.0)
       tsx:
         specifier: 'catalog:'
         version: 4.22.4

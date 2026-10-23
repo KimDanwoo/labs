@@ -1,0 +1,24 @@
+import { Joystick } from './Joystick';
+
+type Props = {
+  isReady: boolean;
+  isSprinting: boolean;
+  onInput: (key: string, pressed: boolean) => void;
+  onToggleSprint: () => void;
+};
+
+export function MobileControls({ isReady, isSprinting, onInput, onToggleSprint }: Props) {
+  return (
+    <div className="mobile-controls" aria-label="터치 이동">
+      <Joystick disabled={!isReady} onInput={onInput} />
+      <div className="action-buttons">
+        <button className="jump-button" aria-label="점프" disabled={!isReady} onClick={() => onInput(' ', true)}>
+          점프 ↑
+        </button>
+        <button className="run-button" aria-pressed={isSprinting} onClick={onToggleSprint}>
+          {isSprinting ? '달리기로 전환' : '전력 질주'}
+        </button>
+      </div>
+    </div>
+  );
+}

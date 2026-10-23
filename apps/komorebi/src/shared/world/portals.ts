@@ -21,21 +21,28 @@ const EXIT_SPANS: Record<Region, Record<string, readonly [number, number]>> = {
   shops: { schoolgate: [50, 66], villagegate: [49, 59] },
 };
 
+type Edge = WorldPortal['edge'];
+
+function portalEdge(end: Point): Edge {
+  if (end.x < 10) return 'left';
+  if (end.x > 90) return 'right';
+  return end.z > 80 ? 'bottom' : 'top';
+}
+
+const EDGE_GEOMETRY = {
+  left: (end) => ({ boundary: 4, center: { x: 3.5, z: end.z } }),
+  right: (end) => ({ boundary: 97, center: { x: 97.5, z: end.z } }),
+  bottom: (end) => ({ boundary: 96, center: { x: end.x, z: 96.5 } }),
+  top: () => ({ boundary: 28, center: { x: 52, z: 27.5 } }),
+} satisfies Record<Edge, (end: Point) => { boundary: number; center: Point }>;
+
 const portals = Object.fromEntries(
   (Object.keys(WORLDS) as Region[]).map((region) => [
     region,
     WORLDS[region].portals.map((portal): WorldPortal => {
       const end = WORLDS[region].nodes.find((node) => node.id === portal.node)!;
-      const edge = end.x < 10 ? 'left' : end.x > 90 ? 'right' : end.z > 80 ? 'bottom' : 'top';
-      const boundary = edge === 'left' ? 4 : edge === 'right' ? 97 : edge === 'bottom' ? 96 : 28;
-      const center =
-        edge === 'left'
-          ? { x: 3.5, z: end.z }
-          : edge === 'right'
-            ? { x: 97.5, z: end.z }
-            : edge === 'bottom'
-              ? { x: end.x, z: 96.5 }
-              : { x: 52, z: 27.5 };
+      const edge = portalEdge(end);
+      const { boundary, center } = EDGE_GEOMETRY[edge](end);
       return { ...portal, edge, boundary, center, lateralRange: EXIT_SPANS[region][portal.node]! };
     }),
   ]),
@@ -45,20 +52,18 @@ export function getWorldPortals(region: Region) {
   return portals[region];
 }
 
+const BEYOND_BOUNDARY = {
+  left: (position, boundary) => position.x <= boundary,
+  right: (position, boundary) => position.x >= boundary,
+  top: (position, boundary) => position.z <= boundary,
+  bottom: (position, boundary) => position.z >= boundary,
+} satisfies Record<Edge, (position: Point, boundary: number) => boolean>;
+
 /** The whole road beyond the exit boundary transfers, regardless of lateral position. */
 export function isInsidePortal(position: Point, portal: WorldPortal) {
   const lateral = portal.edge === 'left' || portal.edge === 'right' ? position.z : position.x;
   if (lateral < portal.lateralRange[0] || lateral > portal.lateralRange[1]) return false;
-  switch (portal.edge) {
-    case 'left':
-      return position.x <= portal.boundary;
-    case 'right':
-      return position.x >= portal.boundary;
-    case 'top':
-      return position.z <= portal.boundary;
-    case 'bottom':
-      return position.z >= portal.boundary;
-  }
+  return BEYOND_BOUNDARY[portal.edge](position, portal.boundary);
 }
 
 export function portalAt(position: Point, region: Region) {
