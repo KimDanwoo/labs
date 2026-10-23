@@ -33,7 +33,7 @@ function brownNoise(context: AudioContext, seconds: number) {
 function call(
   context: AudioContext,
   output: AudioNode,
-  { pitch, count, gap }: { pitch: number; count: number; gap: number },
+  { pitch, count, gap, level }: { pitch: number; count: number; gap: number; level: number },
 ) {
   for (let i = 0; i < count; i++) {
     const now = context.currentTime + i * gap;
@@ -44,7 +44,7 @@ function call(
     tone.frequency.exponentialRampToValueAtTime(pitch * 1.7, now + 0.07);
     tone.frequency.exponentialRampToValueAtTime(pitch * 0.95, now + 0.15);
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.07, now + 0.025);
+    gain.gain.linearRampToValueAtTime(0.07 * level, now + 0.025);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.17);
     tone.connect(gain);
     gain.connect(output);
@@ -130,8 +130,8 @@ export function createAmbience() {
   let mix: AmbienceMix = ambienceMix('village', TIME.day);
   const callTimer = window.setInterval(() => {
     if (context.state !== 'running') return;
-    if (mix.birds) call(context, master, { pitch: 1_800, count: 3, gap: 0.19 });
-    if (mix.crickets > 0.5) call(context, master, { pitch: 4_200, count: 6, gap: 0.09 });
+    if (mix.birds > 0) call(context, master, { pitch: 1_800, count: 3, gap: 0.19, level: mix.birds });
+    if (mix.crickets > 0) call(context, master, { pitch: 4_200, count: 6, gap: 0.09, level: mix.crickets });
   }, CALL_INTERVAL_MS);
   void context.resume();
 

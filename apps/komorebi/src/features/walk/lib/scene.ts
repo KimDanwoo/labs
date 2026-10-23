@@ -41,6 +41,8 @@ const WARMTH_BY_TIME = { day: 0, evening: 1, night: 0.35 } satisfies Record<Time
 const MOVE_KEYS = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
 const LANDING_LOUDNESS = 1.6;
 const NEAREST_SCALE = characterScale(100);
+/** One place action at a time, sound included; the longest cue (the shrine bell) rings about this long. */
+const ACTION_LOCK_MS = 2_200;
 const RUN_SPEED = 24;
 const SPRINT_SPEED = 36;
 
@@ -300,6 +302,7 @@ export async function createScene(
     transition = 1;
   let blockedPortal: WorldPortal | null = null;
   let waitingPortal: WorldPortal | null = null;
+  let actionEndsAt = 0;
   /** An exit the player turned away from while it loaded; choosing it again lifts the block (a failed load does not). */
   let cancelledPortal: WorldPortal | null = null;
   let heading = 0,
@@ -317,6 +320,7 @@ export async function createScene(
   let reducedMotion = motionQuery.matches;
   const motionPreference = (event: MediaQueryListEvent) => {
     reducedMotion = event.matches;
+    if (reducedMotion) placeEffects.clear();
     wake();
   };
   let halfWidth = 60,
@@ -631,7 +635,7 @@ export async function createScene(
       warmth !== targetWarmth ||
       darkness !== targetDarkness ||
       wetness !== targetWetness ||
-      placeEffects.isPlaying ||
+      (!paused && placeEffects.isPlaying) ||
       transition < 1 ||
       (!paused && jump.landing > 0.01);
     if (elapsed - statusTime > 0.12) {
@@ -674,6 +678,8 @@ export async function createScene(
     setPaused(value) {
       paused = value;
       keys.clear();
+      // A dialog covers the scenery, so a half-played action is dropped rather than frozen under it.
+      if (value) placeEffects.clear();
       wake();
     },
     setInput(key, pressed) {
@@ -695,7 +701,9 @@ export async function createScene(
       } else keys.delete(key);
     },
     playAction(kind, at) {
-      if (placeEffects.isPlaying) return false;
+      const now = performance.now();
+      if (now < actionEndsAt) return false;
+      actionEndsAt = now + ACTION_LOCK_MS;
       if (!reducedMotion) placeEffects.play(kind, at);
       wake();
       return true;

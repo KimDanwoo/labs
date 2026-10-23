@@ -83,3 +83,53 @@ test('screen readers hear the region name after a crossing', async ({ page }) =>
     .click();
   await expect(live).toHaveText('졸졸, 물소리 다리', { timeout: 15_000 });
 });
+
+async function guideToFields(page: Page) {
+  await page.getByRole('button', { name: '산책 지도 열기' }).click();
+  await page
+    .getByRole('dialog', { name: '여름을 걷는 지도' })
+    .getByRole('button', { name: /바람이 머무는 논/ })
+    .first()
+    .click();
+  const prompt = page.locator('.interact', { hasText: '바람이 머무는 논' });
+  await expect(prompt).toContainText('바람 불어 보기', { timeout: 30_000 });
+  return prompt;
+}
+
+test('opening the map right after a place action lets rendering settle back to 30 fps', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('komorebi-day-pages-v1', '["fields"]'));
+  await openWalk(page);
+  const prompt = await guideToFields(page);
+  await expect.poll(() => rendersPerSecond(page, 1), { timeout: 15_000 }).toBeLessThan(36);
+  await prompt.click();
+  await page.getByRole('button', { name: '산책 지도 열기' }).click();
+  await page.waitForTimeout(500);
+  expect(await rendersPerSecond(page)).toBeLessThan(36);
+});
+
+test.describe('reduced motion', () => {
+  test.use({ reducedMotion: 'reduce' });
+
+  test('a place action cannot be stacked by pressing again while it still sounds', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('komorebi-day-pages-v1', '["fields"]');
+      const counted = window as unknown as { sources: number };
+      counted.sources = 0;
+      const create = AudioContext.prototype.createBufferSource;
+      AudioContext.prototype.createBufferSource = function () {
+        counted.sources++;
+        return create.call(this);
+      };
+    });
+    await openWalk(page);
+    await page.getByRole('button', { name: '자연 소리 켜기' }).click();
+    const prompt = await guideToFields(page);
+    const sources = () => page.evaluate(() => (window as unknown as { sources: number }).sources);
+    await page.waitForTimeout(500);
+    const before = await sources();
+    await prompt.click();
+    await prompt.click();
+    await prompt.click();
+    expect((await sources()) - before).toBe(1);
+  });
+});
