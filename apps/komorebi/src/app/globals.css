@@ -392,25 +392,6 @@ kbd {
 .journal-dots .filled {
   background: rgb(var(--leaf));
 }
-.start-hint {
-  position: absolute;
-  left: 50%;
-  bottom: 155px;
-  transform: translateX(-50%);
-  background: rgb(var(--paper) / 0.78);
-  border: 1px solid rgb(var(--paper) / 0.53);
-  border-radius: 30px;
-  padding: 12px 23px;
-  backdrop-filter: blur(10px);
-  font-size: 11px;
-  white-space: nowrap;
-  box-shadow: 0 3px 20px rgb(var(--grass) / 0.1);
-  animation: arrive 0.8s ease-out;
-}
-.hint-spark {
-  color: rgb(var(--fern));
-  margin: 0 5px;
-}
 .interact {
   position: absolute;
   left: 50%;
@@ -833,11 +814,6 @@ dialog::backdrop {
   .keyboard-help {
     display: none;
   }
-  .start-hint {
-    bottom: 235px;
-    font-size: 10px;
-    padding: 11px 15px;
-  }
   .interact {
     bottom: 235px;
     padding: 11px 14px;
@@ -995,7 +971,6 @@ dialog::backdrop {
     bottom: 12px;
     padding: 10px 15px;
   }
-  .start-hint,
   .interact {
     bottom: 100px;
   }
@@ -1101,9 +1076,6 @@ dialog::backdrop {
 .tools {
   background: rgb(var(--paper) / 0.72);
 }
-.start-hint {
-  bottom: 135px;
-}
 .interact {
   bottom: 135px;
 }
@@ -1115,7 +1087,6 @@ dialog::backdrop {
   .title-block h1 {
     font-size: 38px;
   }
-  .start-hint,
   .interact {
     bottom: 220px;
   }
@@ -1263,15 +1234,6 @@ dialog::backdrop {
 .journal-dots {
   display: flex;
 }
-.start-hint {
-  bottom: 104px;
-  background: rgb(var(--paper) / 0.94);
-  border: 2px solid rgb(var(--cream));
-  box-shadow: 2px 4px 0 rgb(var(--pine) / 0.2);
-  font: 13px var(--serif);
-  border-radius: 13px 5px 15px 6px;
-  padding: 13px 22px;
-}
 .interact {
   bottom: 108px;
 }
@@ -1369,15 +1331,6 @@ dialog::backdrop {
   .journal-button svg {
     width: 13px;
   }
-  .start-hint {
-    bottom: 205px;
-    font-size: 11px;
-    padding: 12px 13px;
-    max-width: 90%;
-    white-space: normal;
-    text-align: center;
-    width: max-content;
-  }
   .interact {
     bottom: 205px;
   }
@@ -1399,7 +1352,6 @@ dialog::backdrop {
     top: 28px;
     font-size: 13px;
   }
-  .start-hint,
   .interact {
     bottom: 85px;
   }

@@ -138,12 +138,6 @@ export function Walk() {
         onOpenMap={() => setDialog(DIALOG.map)}
       />
 
-      {!hasStarted && isReady && (
-        <div className="start-hint">
-          <span className="hint-spark">✧</span> 어디로 가 볼까? 길을 눌러 걸어 보고, 길 끝을 넘어 이웃 마을로 가 봐!{' '}
-          <span className="hint-spark">✧</span>
-        </div>
-      )}
       {isNearBed && !isPaused && (
         <InteractPrompt
           landmark={HOME_BED}
