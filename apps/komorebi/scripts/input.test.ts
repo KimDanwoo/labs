@@ -29,3 +29,13 @@ test('thumbstick supports all directions, a dead zone and a neutral release', as
   assert.deepEqual(padDirection(1, -1), ['d', 'w']);
   assert.deepEqual(padDirection(-1, 1), ['a', 's']);
 });
+
+test('keys on focused controls are left to the control', async () => {
+  const { isControlTarget } = await import('../src/features/walk/lib/input');
+  for (const tagName of ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'A']) {
+    assert.equal(isControlTarget({ tagName, isContentEditable: false }), true);
+  }
+  assert.equal(isControlTarget({ tagName: 'DIV', isContentEditable: true }), true);
+  assert.equal(isControlTarget({ tagName: 'CANVAS', isContentEditable: false }), false);
+  assert.equal(isControlTarget({ tagName: 'BODY', isContentEditable: false }), false);
+});

@@ -4,6 +4,22 @@ import type { Point, Region } from './world';
 type PixelPoint = readonly [number, number];
 /** Ground boundaries traced on the 1536 × 1024 paintings, separate from navigation routes. */
 const GROUND: Record<Region, readonly PixelPoint[][]> = {
+  home: [
+    [
+      [330, 615],
+      [500, 575],
+      [750, 560],
+      [1250, 560],
+      [1320, 590],
+      [1430, 610],
+      [1510, 680],
+      [1510, 1000],
+      [350, 1000],
+      [350, 780],
+      [280, 730],
+      [300, 690],
+    ],
+  ],
   shops: [
     // Cleared school approach: continuous pavement across the whole left branch.
     [
@@ -567,6 +583,7 @@ function prepareGeometry(polygons: readonly PixelPoint[][]) {
   }));
 }
 const GROUND_GEOMETRY = {
+  home: prepareGeometry(GROUND.home),
   village: prepareGeometry(GROUND.village),
   river: prepareGeometry(GROUND.river),
   coast: prepareGeometry(GROUND.coast),

@@ -35,6 +35,7 @@ catalog:
   # TS 7은 코드상 통과하지만 typescript-eslint가 아직 미지원이라 보류(2026-08-30 확인).
   typescript: ^5
   tsx: ^4.19.2
+  '@playwright/test': 1.64.0
   prettier: ^3.4.2
   # ESLint 10은 eslint-config-next가 번들하는 eslint-plugin-react가 미지원(2026-08-30 확인).
   eslint: ^9

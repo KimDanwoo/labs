@@ -1,9 +1,11 @@
 import * as THREE from 'three';
 import { childFacing } from './atlas';
-import { advanceMotion, createMotion } from './motion';
+import { advanceMotion, createMotion, crossedFootfall } from './motion';
+import { lightSprite } from './nightLights';
 
 /** Authored 4-direction artwork with idle, six walk poses and an airborne pose. Identity never morphs when turning. */
-export function createChild(atlas: THREE.Texture) {
+export function createChild(initialAtlas: THREE.Texture) {
+  let atlas = initialAtlas;
   const group = new THREE.Group();
   atlas.repeat.set(1 / 8, 1 / 4);
   atlas.offset.set(0, 3 / 4);
@@ -18,6 +20,18 @@ export function createChild(atlas: THREE.Texture) {
   let frame = -1;
   return {
     group,
+    setAtlas(next: THREE.Texture) {
+      atlas = next;
+      atlas.repeat.set(1 / 8, 1 / 4);
+      atlas.offset.set(0, (3 - facing) / 4);
+      material.map = atlas;
+      material.needsUpdate = true;
+      frame = -1;
+    },
+    setOpacity(value: number) {
+      material.opacity = value;
+      sprite.visible = value > 0.001;
+    },
     update(
       dt: number,
       travel: number,
@@ -30,12 +44,12 @@ export function createChild(atlas: THREE.Texture) {
       landing = 0,
     ) {
       time += dt;
+      const previousPhase = motion.phase;
       const m = advanceMotion(motion, dt, travel, heading, running, walking);
       // Discrete artwork must follow the requested direction immediately. Smoothing
       // a 180-degree turn displays unrelated side frames while walking backwards.
       facing = childFacing(facing, heading);
-      const column =
-        jumpHeight > 0 ? 7 : !walking || reducedMotion ? 0 : 1 + (Math.floor((m.phase / (Math.PI * 2)) * 6) % 6);
+      const column = atlasColumn(jumpHeight > 0, walking && !reducedMotion, m.phase);
       const nextFrame = facing * 8 + column;
       if (frame !== nextFrame) {
         atlas.offset.set(column / 8, (3 - facing) / 4);
@@ -47,9 +61,25 @@ export function createChild(atlas: THREE.Texture) {
       sprite.scale.set(7.8 * (1 + squash * 0.4), 10.4 * (1 - squash), 1);
       sprite.position.y = reducedMotion ? 0 : Math.sin(time * 2.2) * 0.015 * (1 - m.energy);
       void jumpVelocity;
+      return { hasStepped: walking && jumpHeight <= 0 && crossedFootfall(previousPhase, m.phase) };
+    },
+    /** Moonlight on the sprite, so the child sits in the night painting rather than on top of it. */
+    /** Moonlit after dark, warmed by `glow` (0–0.9) where lamplight falls on the child. */
+    setLight(darkness: number, glow: number) {
+      lightSprite(material.color, darkness, glow);
     },
     dispose() {
       material.dispose();
     },
   };
+}
+
+const AIR_COLUMN = 7;
+const STAND_COLUMN = 0;
+const WALK_FRAMES = 6;
+
+function atlasColumn(isAirborne: boolean, isStepping: boolean, phase: number) {
+  if (isAirborne) return AIR_COLUMN;
+  if (!isStepping) return STAND_COLUMN;
+  return 1 + (Math.floor((phase / (Math.PI * 2)) * WALK_FRAMES) % WALK_FRAMES);
 }

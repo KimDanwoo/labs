@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { openSync, closeSync } from 'node:fs';
+import { closeSync, openSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,7 +18,10 @@ const child = spawn('npx', ['--yes', 'pnpm@9.12.1', '--filter', 'komorebi', 'dev
   detached: true,
   stdio: ['ignore', log, log],
 });
-child.on('error', error => { console.error(error); process.exitCode = 1; });
+child.on('error', (error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
 child.unref();
 closeSync(log);
 console.log(`Starting Komorebi on port 3011. Logs: ${logPath}`);

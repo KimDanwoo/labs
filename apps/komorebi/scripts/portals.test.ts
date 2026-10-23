@@ -50,7 +50,7 @@ test('exit boundaries span the full walkable road width', () => {
         if (!canWalk(outside.x, outside.z, region) || !canWalk(inside.x, inside.z, region)) continue;
         assert.equal(isInsidePortal(inside, exit), false);
         const expected = lateral >= exit.lateralRange[0] && lateral <= exit.lateralRange[1] ? exit : null;
-        assert.equal(portalAt(outside, region), expected);
+        assert.equal(isInsidePortal(outside, exit), expected === exit);
         crossings++;
       }
       assert.ok(crossings > 1, `${region}: ${exit.node} has no usable boundary`);

@@ -1,10 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
 
 :root {
-  --ink: #344a3b;
-  --muted: #72816b;
-  --paper: #faf7e9;
-  --line: rgba(66, 87, 59, 0.18);
+  /* Painterly summer palette as RGB channels: rgb(var(--name) / alpha). */
+  --cream: 255 249 227;
+  --paper: 250 247 233;
+  --mist: 232 236 217;
+  --lichen: 220 229 198;
+  --butter: 242 217 138;
+  --peach: 242 200 150;
+  --sky: 169 208 212;
+  --stone: 183 182 187;
+  --sage: 168 175 147;
+  --fern: 135 154 109;
+  --reed: 138 145 119;
+  --amber: 192 138 66;
+  --rust: 184 109 67;
+  --moss: 116 130 107;
+  --leaf: 109 135 90;
+  --forest: 85 107 78;
+  --pine: 63 86 52;
+  --ink: 52 74 59;
+  --deep: 28 58 50;
+  --sun: 233 155 78;
+  --twilight: 43 53 82;
+  --night: 14 47 58;
+  --ochre: 163 136 75;
+  --honey: 251 239 184;
+  --blush: 231 199 174;
+  --grass: 75 102 53;
+  --muted: rgb(var(--moss));
+  --line: rgb(var(--forest) / 0.18);
   --serif: 'Gowun Batang', Georgia, serif;
   --sans: 'Noto Sans KR', Arial, sans-serif;
 }
@@ -20,8 +45,8 @@ body {
 }
 body {
   font-family: var(--sans);
-  color: var(--ink);
-  background: #dce5c6;
+  color: rgb(var(--ink));
+  background: rgb(var(--lichen));
 }
 button,
 a {
@@ -38,7 +63,7 @@ button:disabled {
 }
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid #b86d43;
+  outline: 2px solid rgb(var(--rust));
   outline-offset: 5px;
 }
 button {
@@ -62,11 +87,17 @@ button:hover {
   height: 100dvh;
   min-height: 420px;
   isolation: isolate;
-  background: linear-gradient(180deg, #a9d0d4 0%, #d6e5d5 48%, #f0eaca 100%);
+  background: linear-gradient(180deg, rgb(var(--sky)) 0%, rgb(var(--mist)) 48%, rgb(var(--lichen)) 100%);
   transition: background 2s;
 }
 .walk.is-evening {
-  background: linear-gradient(180deg, #b7b6bb 0%, #e7c7ae 50%, #f6d5a5 100%);
+  background: linear-gradient(180deg, rgb(var(--stone)) 0%, rgb(var(--blush)) 50%, rgb(var(--peach)) 100%);
+}
+.walk.is-raining {
+  background: linear-gradient(180deg, rgb(var(--stone)) 0%, rgb(var(--reed)) 100%);
+}
+.walk.is-night {
+  background: linear-gradient(180deg, rgb(var(--night)) 0%, rgb(var(--twilight)) 55%, rgb(var(--deep)) 100%);
 }
 .landscape {
   position: absolute;
@@ -92,8 +123,8 @@ button:hover {
   pointer-events: none;
   z-index: -1;
   background:
-    linear-gradient(180deg, rgba(245, 245, 220, 0.38), transparent 27%, transparent 70%, rgba(241, 238, 208, 0.3)),
-    linear-gradient(90deg, rgba(245, 242, 217, 0.3), transparent 45%);
+    linear-gradient(180deg, rgb(var(--cream) / 0.38), transparent 27%, transparent 70%, rgb(var(--cream) / 0.3)),
+    linear-gradient(90deg, rgb(var(--cream) / 0.3), transparent 45%);
 }
 .header {
   position: absolute;
@@ -118,7 +149,7 @@ button:hover {
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 1px solid #60745c88;
+  border: 1px solid rgb(var(--forest) / 0.53);
   border-radius: 50%;
   font: 27px var(--serif);
 }
@@ -143,7 +174,7 @@ button:hover {
 .season-dot {
   width: 5px;
   height: 5px;
-  background: #748c55;
+  background: rgb(var(--leaf));
   border-radius: 50%;
 }
 .edition {
@@ -164,13 +195,13 @@ button:hover {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #52684f;
+  color: rgb(var(--forest));
 }
 .eyebrow > span {
   display: block;
   width: 22px;
   height: 1px;
-  background: #6a805f;
+  background: rgb(var(--moss));
 }
 .title-block h1 {
   font: 700 clamp(38px, 4.6vw, 70px)/1.25 var(--serif);
@@ -178,7 +209,7 @@ button:hover {
   margin: 16px 0 17px;
 }
 .title-dot {
-  color: #b5834f;
+  color: rgb(var(--amber));
 }
 .title-block p {
   font-family: var(--serif);
@@ -186,7 +217,7 @@ button:hover {
   line-height: 1.95;
   letter-spacing: 0.1px;
   margin: 0;
-  color: #4f644d;
+  color: rgb(var(--forest));
 }
 .weather {
   display: flex;
@@ -194,7 +225,7 @@ button:hover {
   gap: 10px;
   font-size: 10px;
   margin-top: 24px;
-  color: #52664e;
+  color: rgb(var(--forest));
 }
 .weather svg {
   width: 18px;
@@ -203,7 +234,7 @@ button:hover {
 .weather-divider {
   width: 1px;
   height: 10px;
-  background: #5e75573d;
+  background: rgb(var(--forest) / 0.24);
   margin: 0 2px;
 }
 .temperature {
@@ -221,11 +252,11 @@ button:hover {
   gap: 8px;
   align-items: center;
   padding: 10px 6px;
-  background: #faf8e9a3;
-  border: 1px solid #fff8de9c;
+  background: rgb(var(--paper) / 0.64);
+  border: 1px solid rgb(var(--cream) / 0.61);
   backdrop-filter: blur(12px);
   border-radius: 40px;
-  box-shadow: 0 5px 22px #4d61300b;
+  box-shadow: 0 5px 22px rgb(var(--grass) / 0.04);
 }
 .tool {
   height: 39px;
@@ -238,7 +269,7 @@ button:hover {
 }
 .tool:hover,
 .tool[aria-pressed='true'] {
-  background: #4f6d4e16;
+  background: rgb(var(--forest) / 0.09);
 }
 .tool-divider {
   height: 1px;
@@ -254,7 +285,7 @@ button:hover {
   font-family: var(--serif);
   font-size: 11px;
   letter-spacing: 4px;
-  color: #486448a6;
+  color: rgb(var(--forest) / 0.65);
 }
 .bottom-bar {
   position: absolute;
@@ -265,12 +296,12 @@ button:hover {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  border: 1px solid #ffffe788;
+  border: 1px solid rgb(var(--cream) / 0.53);
   border-radius: 13px;
   padding: 18px 24px;
-  background: #f6f5e3dc;
+  background: rgb(var(--paper) / 0.86);
   backdrop-filter: blur(18px);
-  box-shadow: 0 8px 40px #37502c0c;
+  box-shadow: 0 8px 40px rgb(var(--pine) / 0.05);
 }
 .location {
   display: flex;
@@ -281,12 +312,12 @@ button:hover {
 .location-marker {
   font-size: 30px;
   line-height: 1;
-  color: #7b8c60;
+  color: rgb(var(--leaf));
 }
 .small-label {
   display: block;
   font-size: 9px;
-  color: #7d876f;
+  color: rgb(var(--moss));
   letter-spacing: 1px;
   margin-bottom: 4px;
 }
@@ -299,7 +330,7 @@ button:hover {
   align-items: center;
   gap: 10px;
   font-size: 10px;
-  color: #748069;
+  color: rgb(var(--moss));
 }
 .keyboard-help > span:first-child {
   display: flex;
@@ -313,15 +344,15 @@ button:hover {
 }
 kbd {
   font: 9px var(--sans);
-  border: 1px solid #7c8b6b55;
-  background: #fffdf15c;
+  border: 1px solid rgb(var(--reed) / 0.33);
+  background: rgb(var(--paper) / 0.36);
   border-radius: 4px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 19px;
   height: 19px;
-  box-shadow: 0 1px 0 #6b79531c;
+  box-shadow: 0 1px 0 rgb(var(--leaf) / 0.11);
 }
 .wide-key {
   width: 38px;
@@ -355,30 +386,11 @@ kbd {
 .journal-dots span {
   height: 6px;
   width: 6px;
-  border: 1px solid #8f9a78;
+  border: 1px solid rgb(var(--reed));
   border-radius: 50%;
 }
 .journal-dots .filled {
-  background: #789064;
-}
-.start-hint {
-  position: absolute;
-  left: 50%;
-  bottom: 155px;
-  transform: translateX(-50%);
-  background: #faf8e7c7;
-  border: 1px solid #fffff388;
-  border-radius: 30px;
-  padding: 12px 23px;
-  backdrop-filter: blur(10px);
-  font-size: 11px;
-  white-space: nowrap;
-  box-shadow: 0 3px 20px #4b68371a;
-  animation: arrive 0.8s ease-out;
-}
-.hint-spark {
-  color: #8b9b6c;
-  margin: 0 5px;
+  background: rgb(var(--leaf));
 }
 .interact {
   position: absolute;
@@ -388,11 +400,11 @@ kbd {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: #faf8e9f2;
-  border: 1px solid #fff7df;
+  background: rgb(var(--paper) / 0.95);
+  border: 1px solid rgb(var(--cream));
   padding: 14px 19px;
   border-radius: 10px;
-  box-shadow: 0 5px 22px #34523022;
+  box-shadow: 0 5px 22px rgb(var(--pine) / 0.13);
   white-space: nowrap;
 }
 .interact > kbd {
@@ -408,7 +420,7 @@ kbd {
   display: block;
   font-size: 9px;
   margin-top: 5px;
-  color: #7b856d;
+  color: rgb(var(--moss));
 }
 .interact > svg {
   width: 17px;
@@ -421,8 +433,8 @@ kbd {
   transform: translate(-50%, -10px);
   padding: 11px 22px;
   border-radius: 30px;
-  background: #344a3bed;
-  color: #fff8df;
+  background: rgb(var(--ink) / 0.93);
+  color: rgb(var(--cream));
   font-size: 11px;
   opacity: 0;
   transition:
@@ -443,14 +455,10 @@ kbd {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #e9ead5;
+  background: rgb(var(--mist));
   z-index: 10;
   padding: 30px;
   text-align: center;
-}
-.loading-mark {
-  font: 55px var(--serif);
-  color: #697f55;
 }
 .loading p {
   font: 16px var(--serif);
@@ -460,20 +468,20 @@ kbd {
 .loading button {
   padding: 12px 30px;
   border-radius: 8px;
-  background: #536b4d;
-  color: var(--paper);
+  background: rgb(var(--forest));
+  color: rgb(var(--paper));
 }
 .mobile-controls {
   display: none;
 }
 .map-dialog,
 .memory-dialog {
-  border: 1px solid #fff9e5;
-  background: var(--paper);
-  color: var(--ink);
+  border: 1px solid rgb(var(--cream));
+  background: rgb(var(--paper));
+  color: rgb(var(--ink));
   padding: 30px;
   border-radius: 18px;
-  box-shadow: 0 25px 100px #253b3640;
+  box-shadow: 0 25px 100px rgb(var(--deep) / 0.25);
   max-height: calc(100dvh - 40px);
   overflow: auto;
 }
@@ -481,7 +489,7 @@ kbd {
   width: min(470px, calc(100% - 30px));
 }
 dialog::backdrop {
-  background: #253b394a;
+  background: rgb(var(--deep) / 0.29);
   backdrop-filter: blur(6px);
 }
 .dialog-heading {
@@ -499,7 +507,7 @@ dialog::backdrop {
 }
 .dialog-intro {
   font-size: 10px;
-  color: #7b826e;
+  color: rgb(var(--moss));
   line-height: 1.9;
   margin: 6px 0 18px;
 }
@@ -509,7 +517,7 @@ dialog::backdrop {
 .village-map {
   width: 100%;
   display: block;
-  border: 1px solid #a5ad8b44;
+  border: 1px solid rgb(var(--sage) / 0.27);
   border-radius: 14px;
 }
 .discovery-list {
@@ -518,10 +526,10 @@ dialog::backdrop {
   gap: 20px 12px;
   margin: 24px 0;
 }
-.discovery-list > div {
+.discovery-item {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 4px;
 }
 .stamp {
   display: grid;
@@ -529,15 +537,15 @@ dialog::backdrop {
   flex-shrink: 0;
   width: 33px;
   height: 33px;
-  border: 1px dashed #aab195;
+  border: 1px dashed rgb(var(--sage));
   border-radius: 50%;
   font: 16px var(--serif);
-  color: #a6ac94;
+  color: rgb(var(--sage));
 }
 .stamp.collected {
-  color: #60794e;
-  border: 1px solid #8a9e73;
-  background: #e8ecd9;
+  color: rgb(var(--leaf));
+  border: 1px solid rgb(var(--fern));
+  background: rgb(var(--mist));
 }
 .discovery-list strong {
   font-size: 10px;
@@ -546,11 +554,11 @@ dialog::backdrop {
 .discovery-list small {
   display: block;
   font-size: 8px;
-  color: #909780;
+  color: rgb(var(--reed));
   margin-top: 4px;
 }
 .discovery-check {
-  color: #8b9c71;
+  color: rgb(var(--fern));
   font-size: 12px;
   margin-left: auto;
 }
@@ -562,7 +570,7 @@ dialog::backdrop {
   justify-content: space-between;
   gap: 14px;
   font-size: 9px;
-  color: #7a846b;
+  color: rgb(var(--moss));
 }
 .map-footer button {
   display: flex;
@@ -592,12 +600,12 @@ dialog::backdrop {
   place-items: center;
   width: 80px;
   height: 80px;
-  border: 1px solid #9eae82;
+  border: 1px solid rgb(var(--fern));
   border-radius: 50%;
   margin: 0 auto 28px;
   font: 36px var(--serif);
-  color: #708b5b;
-  background: #e7ecd6;
+  color: rgb(var(--leaf));
+  background: rgb(var(--mist));
 }
 .memory-dialog .eyebrow {
   justify-content: center;
@@ -610,20 +618,20 @@ dialog::backdrop {
 .memory-dialog p {
   font: 15px/2.2 var(--serif);
   word-break: keep-all;
-  color: #66765c;
+  color: rgb(var(--moss));
 }
 .memory-line {
   display: block;
   width: 30px;
   height: 1px;
-  background: #9da88b;
+  background: rgb(var(--sage));
   margin: 24px auto 16px;
 }
 .memory-count {
   display: block;
   font-size: 10px;
   letter-spacing: 2px;
-  color: #879374;
+  color: rgb(var(--reed));
 }
 .continue-button {
   display: flex;
@@ -632,8 +640,8 @@ dialog::backdrop {
   gap: 20px;
   width: 100%;
   padding: 15px 18px;
-  background: #536d4d;
-  color: #faf6df;
+  background: rgb(var(--forest));
+  color: rgb(var(--cream));
   border-radius: 8px;
   font-size: 11px;
   margin-top: 28px;
@@ -806,11 +814,6 @@ dialog::backdrop {
   .keyboard-help {
     display: none;
   }
-  .start-hint {
-    bottom: 235px;
-    font-size: 10px;
-    padding: 11px 15px;
-  }
   .interact {
     bottom: 235px;
     padding: 11px 14px;
@@ -838,14 +841,14 @@ dialog::backdrop {
   .direction {
     touch-action: none;
     user-select: none;
-    background: #faf8e6b8;
-    border: 1px solid #fff6ddba;
+    background: rgb(var(--paper) / 0.72);
+    border: 1px solid rgb(var(--cream) / 0.73);
     backdrop-filter: blur(5px);
     border-radius: 12px;
     font-size: 21px;
   }
   .direction:active {
-    background: #d9dfbe;
+    background: rgb(var(--lichen));
   }
   .direction-w {
     grid-column: 2;
@@ -867,14 +870,14 @@ dialog::backdrop {
     width: 57px;
     height: 57px;
     border-radius: 50%;
-    background: #faf8e6ba;
-    border: 1px solid #fff6ddb5;
+    background: rgb(var(--paper) / 0.73);
+    border: 1px solid rgb(var(--cream) / 0.71);
     font-size: 10px;
     backdrop-filter: blur(5px);
   }
   .run-button[aria-pressed='true'] {
-    background: #536d4d;
-    color: #fff8df;
+    background: rgb(var(--forest));
+    color: rgb(var(--cream));
   }
   .toast {
     top: 80px;
@@ -914,7 +917,7 @@ dialog::backdrop {
   }
   .direction {
     touch-action: none;
-    background: #faf8e6ba;
+    background: rgb(var(--paper) / 0.73);
     border-radius: 12px;
     font-size: 22px;
   }
@@ -938,7 +941,7 @@ dialog::backdrop {
     height: 55px;
     width: 55px;
     border-radius: 50%;
-    background: #faf8e6ba;
+    background: rgb(var(--paper) / 0.73);
     font-size: 10px;
   }
   .keyboard-help {
@@ -968,7 +971,6 @@ dialog::backdrop {
     bottom: 12px;
     padding: 10px 15px;
   }
-  .start-hint,
   .interact {
     bottom: 100px;
   }
@@ -996,34 +998,40 @@ dialog::backdrop {
 .header,
 .title-block,
 .vertical-note {
-  color: #fff8e5;
-  text-shadow: 0 2px 15px #142f35a0;
+  color: rgb(var(--cream));
+  text-shadow: 0 2px 15px rgb(var(--night) / 0.63);
 }
 .header .brand-symbol {
-  border-color: #fff8dc88;
+  border-color: rgb(var(--cream) / 0.53);
 }
 .header .season-dot {
-  background: #f0dc8c;
+  background: rgb(var(--butter));
 }
 .header .edition {
-  border-color: #fff8df55;
+  border-color: rgb(var(--cream) / 0.33);
 }
 .title-block .eyebrow,
 .title-block p,
 .title-block .weather {
-  color: #fff9e5;
+  color: rgb(var(--cream));
 }
 .title-block .eyebrow > span {
-  background: #fff2bc;
+  background: rgb(var(--honey));
 }
 .title-block .title-dot {
-  color: #f6d58b;
+  color: rgb(var(--butter));
 }
 .weather-divider {
-  background: #fff7d966;
+  background: rgb(var(--cream) / 0.4);
 }
 .vignette {
-  background: linear-gradient(180deg, #082e402b, transparent 20%, transparent 80%, #17312b22);
+  background: linear-gradient(
+    180deg,
+    rgb(var(--night) / 0.17),
+    transparent 20%,
+    transparent 80%,
+    rgb(var(--deep) / 0.13)
+  );
 }
 .paper-grain {
   opacity: 0.025;
@@ -1042,9 +1050,9 @@ dialog::backdrop {
   transform: translateY(-10px);
 }
 .vertical-note {
-  color: #fff8e5a8;
+  color: rgb(var(--cream) / 0.66);
 }
-.discovery-list > button {
+.discovery-guide {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -1053,10 +1061,10 @@ dialog::backdrop {
   padding: 5px 2px;
   border-radius: 8px;
 }
-.discovery-list > button:hover {
-  background: #e9edda;
+.discovery-guide:hover {
+  background: rgb(var(--mist));
 }
-.discovery-list > button > div {
+.discovery-guide > div {
   flex: 1;
 }
 .landscape {
@@ -1066,10 +1074,7 @@ dialog::backdrop {
   cursor: crosshair;
 }
 .tools {
-  background: #faf8e9b8;
-}
-.start-hint {
-  bottom: 135px;
+  background: rgb(var(--paper) / 0.72);
 }
 .interact {
   bottom: 135px;
@@ -1082,7 +1087,6 @@ dialog::backdrop {
   .title-block h1 {
     font-size: 38px;
   }
-  .start-hint,
   .interact {
     bottom: 220px;
   }
@@ -1101,67 +1105,37 @@ dialog::backdrop {
   }
 }
 
-/* In-game HUD: a little calendar, a diary and controls at the screen edges. */
+/* In-game HUD: just the walk's name and the hour, set lightly on the scene. */
 .game-header {
   position: absolute;
-  top: 24px;
-  left: 28px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  top: 30px;
+  left: 34px;
   pointer-events: none;
+  color: rgb(var(--cream));
+  text-shadow:
+    0 0 2px rgb(var(--ink) / 0.5),
+    0 1px 12px rgb(var(--ink) / 0.6);
 }
-.day-card {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 12px 18px 13px 14px;
-  border: 2px solid #fff7dc;
-  border-radius: 5px 18px 7px 17px;
-  background: #fffbebed;
-  box-shadow: 2px 4px 0 #435a3730;
-  transform: rotate(-2deg);
-  color: #566048;
-}
-.day-sun {
-  display: grid;
-  place-items: center;
-  width: 35px;
-  height: 35px;
-  color: #c58b3b;
-}
-.day-sun svg {
-  width: 32px;
-  height: 32px;
-  stroke-width: 1.6;
-}
-.day-label {
-  font-size: 9px;
-  letter-spacing: 2px;
-  color: #899173;
-}
-.day-card strong {
-  display: block;
-  font: 700 23px/1.5 var(--serif);
-  letter-spacing: 1px;
-}
-.day-card small {
-  display: block;
-  font-size: 9px;
-  color: #8a9076;
+/* A soft shade in the corner keeps the words legible without boxing them in. */
+.game-header::before {
+  content: '';
+  position: absolute;
+  inset: -90px -140px -70px -120px;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgb(var(--ink) / 0.32), transparent);
 }
 .game-name {
-  font: 700 16px var(--serif);
-  color: #fff9e7;
-  text-shadow: 0 2px 8px #244430;
   margin: 0;
+  font: 600 17px var(--serif);
+  letter-spacing: 6px;
 }
-.game-name span {
-  display: block;
-  font: 10px var(--serif);
-  letter-spacing: 3px;
-  margin-top: 5px;
-  opacity: 0.8;
+.game-time {
+  margin: 10px 0 0;
+  padding-top: 9px;
+  border-top: 1px solid rgb(var(--cream) / 0.6);
+  width: fit-content;
+  font: 12px var(--serif);
+  letter-spacing: 5px;
 }
 .scene-caption {
   position: absolute;
@@ -1169,8 +1143,8 @@ dialog::backdrop {
   left: 50%;
   transform: translateX(-50%);
   font: 700 18px var(--serif);
-  color: #fff9e3;
-  text-shadow: 0 2px 7px #163b34;
+  color: rgb(var(--cream));
+  text-shadow: 0 2px 7px rgb(var(--deep));
   letter-spacing: 2px;
   pointer-events: none;
   animation: caption-fade 7s ease forwards;
@@ -1187,9 +1161,9 @@ dialog::backdrop {
   border-radius: 30px;
   padding: 5px 8px;
   gap: 3px;
-  background: #fffae5de;
-  border: 2px solid #fff8e2;
-  box-shadow: 2px 3px 0 #435a3729;
+  background: rgb(var(--cream) / 0.87);
+  border: 2px solid rgb(var(--cream));
+  box-shadow: 2px 3px 0 rgb(var(--pine) / 0.16);
 }
 .tool-divider {
   width: 1px;
@@ -1211,10 +1185,10 @@ dialog::backdrop {
 }
 .location {
   padding: 10px 15px;
-  background: #fffae6e8;
-  border: 2px solid #fff9de;
+  background: rgb(var(--cream) / 0.91);
+  border: 2px solid rgb(var(--cream));
   border-radius: 4px 13px 5px 14px;
-  box-shadow: 2px 3px 0 #435a3729;
+  box-shadow: 2px 3px 0 rgb(var(--pine) / 0.16);
   min-width: 0;
 }
 .location strong {
@@ -1225,30 +1199,30 @@ dialog::backdrop {
 }
 .location-marker {
   font-size: 25px;
-  color: #819564;
+  color: rgb(var(--fern));
 }
 .keyboard-help {
-  color: #fff9e1;
-  text-shadow: 0 1px 6px #183b30;
+  color: rgb(var(--cream));
+  text-shadow: 0 1px 6px rgb(var(--deep));
   padding: 7px 14px;
-  background: #244b3652;
+  background: rgb(var(--ink) / 0.32);
   border-radius: 9px;
   backdrop-filter: blur(5px);
 }
 .keyboard-help kbd {
-  background: #fffbeaeb;
-  color: #52634a;
+  background: rgb(var(--paper) / 0.92);
+  color: rgb(var(--forest));
   text-shadow: none;
 }
 .keyboard-help i {
-  background: #fff9db66;
+  background: rgb(var(--cream) / 0.4);
 }
 .journal-button {
   pointer-events: auto;
-  background: #fff9e6ed;
-  border: 2px solid #fff9dd;
+  background: rgb(var(--cream) / 0.93);
+  border: 2px solid rgb(var(--cream));
   border-radius: 13px 4px 14px 5px;
-  box-shadow: 2px 3px 0 #435a3729;
+  box-shadow: 2px 3px 0 rgb(var(--pine) / 0.16);
   padding: 14px 18px;
   transform: rotate(1deg);
   font-family: var(--serif);
@@ -1260,15 +1234,6 @@ dialog::backdrop {
 .journal-dots {
   display: flex;
 }
-.start-hint {
-  bottom: 104px;
-  background: #fffae9ef;
-  border: 2px solid #fff9df;
-  box-shadow: 2px 4px 0 #38503133;
-  font: 13px var(--serif);
-  border-radius: 13px 5px 15px 6px;
-  padding: 13px 22px;
-}
 .interact {
   bottom: 108px;
 }
@@ -1276,7 +1241,7 @@ dialog::backdrop {
   top: 110px;
 }
 .vignette {
-  background: linear-gradient(0deg, #153a322b, transparent 13%, transparent);
+  background: linear-gradient(0deg, rgb(var(--deep) / 0.17), transparent 13%, transparent);
 }
 @keyframes caption-fade {
   0% {
@@ -1293,9 +1258,6 @@ dialog::backdrop {
   }
 }
 @media (max-width: 1000px) {
-  .game-name {
-    display: none;
-  }
   .scene-caption {
     font-size: 14px;
     top: 95px;
@@ -1320,24 +1282,6 @@ dialog::backdrop {
   .game-header {
     left: 16px;
     top: 18px;
-  }
-  .day-card {
-    padding: 8px 12px;
-    gap: 7px;
-  }
-  .day-card strong {
-    font-size: 19px;
-  }
-  .day-sun {
-    width: 25px;
-  }
-  .day-sun svg {
-    width: 25px;
-    height: 25px;
-  }
-  .day-label,
-  .day-card small {
-    font-size: 8px;
   }
   .tools {
     right: 14px;
@@ -1387,15 +1331,6 @@ dialog::backdrop {
   .journal-button svg {
     width: 13px;
   }
-  .start-hint {
-    bottom: 205px;
-    font-size: 11px;
-    padding: 12px 13px;
-    max-width: 90%;
-    white-space: normal;
-    text-align: center;
-    width: max-content;
-  }
   .interact {
     bottom: 205px;
   }
@@ -1405,22 +1340,10 @@ dialog::backdrop {
   .toast {
     top: 110px;
   }
-  .game-name {
-    display: none;
-  }
 }
 @media (max-height: 550px) {
   .game-header {
     top: 12px;
-  }
-  .day-card {
-    padding: 5px 10px;
-  }
-  .day-card strong {
-    font-size: 18px;
-  }
-  .game-name {
-    display: none;
   }
   .tools {
     top: 15px;
@@ -1429,7 +1352,6 @@ dialog::backdrop {
     top: 28px;
     font-size: 13px;
   }
-  .start-hint,
   .interact {
     bottom: 85px;
   }
@@ -1455,11 +1377,11 @@ dialog::backdrop {
 .jump-button {
   width: 60px;
   height: 60px;
-  border: 2px solid #fff8df;
+  border: 2px solid rgb(var(--cream));
   border-radius: 50%;
-  background: #f4d974eb;
-  box-shadow: 0 3px 0 #9c8a4e66;
-  color: #596044;
+  background: rgb(var(--butter) / 0.92);
+  box-shadow: 0 3px 0 rgb(var(--ochre) / 0.4);
+  color: rgb(var(--forest));
   font: 700 12px var(--sans);
   touch-action: manipulation;
 }
@@ -1474,12 +1396,12 @@ dialog::backdrop {
   flex: 0 0 128px;
   width: 128px;
   height: 128px;
-  border: 2px solid #fff8dfcc;
+  border: 2px solid rgb(var(--cream) / 0.8);
   border-radius: 50%;
-  background: radial-gradient(circle, #fff9df55, #71836b50);
+  background: radial-gradient(circle, rgb(var(--cream) / 0.33), rgb(var(--moss) / 0.31));
   box-shadow:
-    inset 0 2px 12px #35473325,
-    0 4px 20px #35473320;
+    inset 0 2px 12px rgb(var(--ink) / 0.15),
+    0 4px 20px rgb(var(--ink) / 0.13);
   pointer-events: auto;
   touch-action: none;
   user-select: none;
@@ -1492,7 +1414,7 @@ dialog::backdrop {
   display: grid;
   place-items: center;
   font-size: 105px;
-  color: #fff9e899;
+  color: rgb(var(--paper) / 0.6);
   line-height: 1;
   pointer-events: none;
 }
@@ -1503,9 +1425,9 @@ dialog::backdrop {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #fff5d9ed;
-  border: 2px solid #fffdf0;
-  box-shadow: 0 3px 8px #364b3d40;
+  background: rgb(var(--cream) / 0.93);
+  border: 2px solid rgb(var(--paper));
+  box-shadow: 0 3px 8px rgb(var(--ink) / 0.25);
   pointer-events: none;
 }
 .joystick-label {
@@ -1514,8 +1436,8 @@ dialog::backdrop {
   width: 100%;
   text-align: center;
   font: 700 11px var(--sans);
-  color: #fffdf0;
-  text-shadow: 0 1px 3px #263d29;
+  color: rgb(var(--paper));
+  text-shadow: 0 1px 3px rgb(var(--ink));
   pointer-events: none;
 }
 @media (max-width: 700px), (any-pointer: coarse) {
@@ -1548,5 +1470,312 @@ dialog::backdrop {
   .joystick {
     scale: 0.8;
     transform-origin: bottom left;
+  }
+}
+
+/* The first-visit controls hint leaves on its own after a short look. */
+.keyboard-help {
+  animation: hint-leave 0.4s ease 8s forwards;
+}
+@keyframes hint-leave {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.discovery-guide {
+  flex: 1;
+  min-width: 0;
+}
+.discovery-read {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border: 1px solid rgb(var(--sage));
+  border-radius: 999px;
+  background: transparent;
+  font-size: 9px;
+  color: var(--muted);
+}
+.discovery-read:hover {
+  background: rgb(var(--mist));
+}
+/* One ring per time of day the page was kept: dusk inside, night outside. */
+.stamp.kept-evening {
+  box-shadow: 0 0 0 2px rgb(var(--peach));
+}
+.stamp.kept-night {
+  box-shadow: 0 0 0 4px rgb(var(--twilight) / 0.7);
+}
+.stamp.kept-evening.kept-night {
+  box-shadow:
+    0 0 0 2px rgb(var(--peach)),
+    0 0 0 4px rgb(var(--twilight) / 0.7);
+}
+.memory-time {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* Read by screen readers only: announces the region after each crossing. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Painted map overlay inside the walk map dialog. */
+.map-route {
+  stroke: rgb(var(--honey));
+  stroke-width: 2;
+  stroke-dasharray: 3 3;
+}
+.map-landmark circle {
+  fill: rgb(var(--paper));
+  stroke: rgb(var(--fern));
+}
+.map-landmark-icon {
+  fill: rgb(var(--forest));
+}
+.map-landmark.is-collected circle {
+  fill: rgb(var(--forest));
+}
+.map-landmark.is-collected .map-landmark-icon {
+  fill: rgb(var(--cream));
+}
+.map-landmark-label {
+  fill: rgb(var(--cream));
+  stroke: rgb(var(--ink));
+  stroke-width: 2;
+}
+.map-exit {
+  fill: rgb(var(--leaf));
+}
+.map-player-halo {
+  fill: rgb(var(--sun) / 0.4);
+}
+.map-player {
+  fill: rgb(var(--sun));
+  stroke: rgb(var(--cream));
+  stroke-width: 2;
+}
+
+/* Home belongs to the same painted world; controls sit beside the things they act on. */
+.weather-indicator {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: rgb(var(--ochre));
+}
+.weather-indicator svg {
+  width: 22px;
+  height: 22px;
+}
+.home-guide {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  text-align: left;
+  padding: 16px 20px;
+  margin: 16px 0;
+  background: rgb(var(--honey) / 0.65);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.home-guide span {
+  flex: 1;
+}
+.home-guide strong,
+.home-guide small {
+  display: block;
+}
+.home-guide small {
+  margin-top: 4px;
+  color: var(--muted);
+}
+.sleep-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgb(var(--deep));
+  color: rgb(var(--cream));
+  animation: sleep-fade 4.5s ease-in-out both;
+}
+.sleep-transition span {
+  font: 28px var(--serif);
+  letter-spacing: 0.2em;
+}
+.sleep-transition small {
+  color: rgb(var(--mist));
+}
+@keyframes sleep-fade {
+  0%,
+  42%,
+  87%,
+  100% {
+    opacity: 0;
+  }
+  58%,
+  72% {
+    opacity: 1;
+  }
+}
+.wardrobe-dialog {
+  width: min(780px, calc(100vw - 32px));
+}
+.wardrobe-body {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 28px;
+  align-items: center;
+}
+.character-preview {
+  display: block;
+  width: 90px;
+  aspect-ratio: 3 / 4;
+  background-size: 800% 400%;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+}
+.wardrobe-mirror {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 330px;
+  border: 1px solid rgb(var(--sage) / 0.25);
+  border-radius: 120px 120px 24px 24px;
+  background: linear-gradient(160deg, rgb(var(--cream)), rgb(var(--sage) / 0.14));
+}
+.wardrobe-mirror .character-preview {
+  width: 180px;
+}
+.wardrobe-mirror > span:last-child {
+  margin: 10px 0 24px;
+  font: 15px var(--serif);
+  color: var(--muted);
+  letter-spacing: 0.15em;
+}
+.wardrobe-choices {
+  display: grid;
+  gap: 22px;
+}
+.wardrobe-choices fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.wardrobe-choices legend {
+  margin-bottom: 10px;
+  font: 18px var(--serif);
+}
+.wardrobe-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.wardrobe-options button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px 14px;
+  border: 1px solid rgb(var(--sage) / 0.25);
+  border-radius: 14px;
+  background: rgb(var(--cream) / 0.5);
+  color: inherit;
+}
+.wardrobe-options button[aria-pressed='true'] {
+  border-color: currentColor;
+  background: rgb(var(--sage) / 0.13);
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+.wardrobe-options button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+.wardrobe-options strong {
+  font: 15px var(--serif);
+}
+.wardrobe-options small {
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 5px;
+}
+.wardrobe-status {
+  min-height: 1.5em;
+  margin: 22px 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+.wardrobe-done {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: auto;
+  padding: 12px 22px;
+  border-radius: 99px;
+  border: 1px solid rgb(var(--sage) / 0.4);
+  background: rgb(var(--cream));
+  color: inherit;
+  font: 16px var(--serif);
+}
+.wardrobe-done svg {
+  width: 20px;
+  height: 20px;
+}
+@media (max-width: 600px) {
+  .wardrobe-body {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .wardrobe-mirror {
+    min-height: 0;
+    border-radius: 18px;
+    flex-direction: row;
+    padding: 4px 14px;
+    gap: 20px;
+  }
+  .wardrobe-mirror .character-preview {
+    width: 84px;
+  }
+  .wardrobe-mirror > span:last-child {
+    margin: 0;
+  }
+  .wardrobe-choices {
+    gap: 14px;
+  }
+  .wardrobe-options .character-preview {
+    width: 62px;
+  }
+  .wardrobe-options small {
+    font-size: 9px;
+  }
+  .wardrobe-options button {
+    padding: 5px 4px 10px;
+  }
+  .wardrobe-status {
+    margin-top: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sleep-transition {
+    animation-timing-function: steps(1, end);
   }
 }

@@ -28,3 +28,10 @@ export function padDirection(x: number, y: number): string[] {
   if (Math.abs(y) / length > threshold) keys.push(y > 0 ? 's' : 'w');
   return keys;
 }
+
+const CONTROL_TAGS = new Set(['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'A']);
+
+/** Keys pressed on a focused control (Space on a button, typing in a field) belong to that control, not the walk. */
+export function isControlTarget(target: { tagName: string; isContentEditable: boolean }): boolean {
+  return CONTROL_TAGS.has(target.tagName) || target.isContentEditable;
+}

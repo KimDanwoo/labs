@@ -37,6 +37,20 @@ export function isForegroundInFront(layer: Foreground, position: Point, region: 
   return position.z * 10.24 < groundY;
 }
 
+/** Something standing in the painting, with the render order its sprite draws at. */
+export type Walker = Point & { order: number };
+const LIFT = 0.05;
+
+/**
+ * Render order for a foreground layer: just above everyone standing behind it, so it still draws under anyone in
+ * front (nearer walkers always carry a higher order). Null when it hides nobody and need not draw at all.
+ */
+export function foregroundOrder(layer: Foreground, walkers: Walker[], region: Region): number | null {
+  const hidden = walkers.filter((walker) => isForegroundInFront(layer, walker, region));
+  if (hidden.length === 0) return null;
+  return Math.max(...hidden.map((walker) => walker.order)) + LIFT;
+}
+
 for (const object of WORLD_OBJECTS) polygon(object.region, object.groundY, object.outline);
 
 // River bridge: front handrail, lower beam, and individual posts.
