@@ -10,7 +10,7 @@ export default defineConfig({
   workers: 1,
   use: { baseURL: `http://127.0.0.1:${PORT}`, channel: 'chrome', viewport: { width: 1280, height: 800 } },
   webServer: {
-    command: `python3 -m http.server ${PORT} --bind 127.0.0.1 --directory out`,
+    command: `node e2e/serve.mjs out ${PORT}`,
     url: `http://127.0.0.1:${PORT}`,
     reuseExistingServer: false,
     stdout: 'ignore',
