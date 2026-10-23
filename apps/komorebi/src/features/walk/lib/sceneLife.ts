@@ -128,6 +128,8 @@ type Life = {
   bob: number;
   /** Height above the ground right now, eased toward the flying or settled height. */
   lift: number;
+  /** 1 in the air, 0 on a perch, eased between so the hovering bob fades rather than snaps. */
+  aloft: number;
 };
 
 const between = (min: number, max: number) => min + Math.random() * (max - min);
@@ -165,6 +167,7 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
           size: SIZE[kind] * between(0.8, 1.2),
           bob: Math.random() * 10,
           lift: ALTITUDE[kind][0],
+          aloft: 1,
         };
       }),
     ),
@@ -213,7 +216,8 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
     const depth = characterScale(flight.z) * 2.4 * size;
     const [flying, settled] = ALTITUDE[kind];
     life.lift = THREE.MathUtils.damp(life.lift, isSettled ? settled : flying, LANDING_EASE, dt);
-    const bob = isSettled ? 0 : Math.sin(elapsed * 3.1 + life.bob) * 0.5 + Math.sin(elapsed * 7.3 + life.bob) * 0.2;
+    life.aloft = THREE.MathUtils.damp(life.aloft, isSettled ? 0 : 1, LANDING_EASE, dt);
+    const bob = life.aloft * (Math.sin(elapsed * 3.1 + life.bob) * 0.5 + Math.sin(elapsed * 7.3 + life.bob) * 0.2);
     s.position.set(flight.x * 1.2 - 60, 40 - flight.z * 0.8 + life.lift + bob, 1);
     if (kind === INSECT.butterfly) {
       s.scale.set(depth * (0.2 + 0.8 * Math.abs(Math.cos(flight.wing))), depth, 1);

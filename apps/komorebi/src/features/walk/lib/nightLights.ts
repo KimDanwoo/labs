@@ -96,7 +96,7 @@ const toScene = (x: number, z: number) => new THREE.Vector3(x * 1.2 - 60, 40 - z
 /** Brightness over time: a lantern flame breathes gently, far-off lights twinkle, windows hold steady. */
 const FLICKER = {
   steady: () => 1,
-  flame: (t: number) => 0.94 + 0.06 * Math.sin(t * 2.6) * Math.sin(t * 1.1),
+  flame: (t: number) => 0.97 + 0.03 * Math.sin(t * 2.6) * Math.sin(t * 1.1),
   twinkle: (t: number) => 0.82 + 0.18 * Math.sin(t * 7) * Math.sin(t * 2.3),
 } satisfies Record<string, (t: number) => number>;
 type Flicker = (typeof FLICKER)[keyof typeof FLICKER];

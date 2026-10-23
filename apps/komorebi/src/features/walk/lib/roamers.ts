@@ -82,8 +82,10 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     length: number;
     pause: number;
     pauseAt: number;
-    /** Seconds spent slipping away once rain has started; null while it strolls on. */
-    leaving: number | null;
+    frame: number;
+    opacity: number;
+    /** Once rain starts: how visible it was then and how many seconds it has spent slipping away since. */
+    leaving: { from: number; seconds: number } | null;
   } | null = null;
   let standing: (Point & { order: number }) | null = null;
 
@@ -102,8 +104,17 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
       length: routeLength(path),
       pause: 0,
       pauseAt: Math.random() < PAUSE_CHANCE ? between([10, 30]) : Infinity,
+      frame: 0,
+      opacity: 0,
       leaving: null,
     };
+  }
+
+  /** Fades in and out at the lane ends; once leaving, only ever fades further from where it was. */
+  function fadeFor({ length, leaving }: NonNullable<typeof visitor>, gait: Gait) {
+    const along = presence(gait.walked, length, FADE_IN, FADE_OUT);
+    if (!leaving) return along;
+    return Math.min(along, leaving.from * (1 - leaving.seconds / LEAVE_SECONDS));
   }
 
   function hide() {
@@ -147,25 +158,24 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
         arrive(region, darkness);
         if (!visitor) return;
       }
-      if (isRaining) visitor.leaving ??= 0;
-      if (visitor.leaving !== null) visitor.leaving += dt;
+      if (isRaining) visitor.leaving ??= { from: visitor.opacity, seconds: 0 };
+      if (visitor.leaving) visitor.leaving.seconds += dt;
       const spec = ANIMAL[visitor.animal];
-      const isPausing = visitor.gait.walked >= visitor.pauseAt && visitor.pause < PAUSE_SECONDS;
+      // With reduced motion the animal holds its pose where it stands, and nobody new comes along.
+      const isPausing = !isStill && visitor.gait.walked >= visitor.pauseAt && visitor.pause < PAUSE_SECONDS;
       if (isPausing) visitor.pause += dt;
-      // With reduced motion the animal simply stands where it is, and nobody new comes along.
       const strolled = isPausing || isStill ? visitor.gait : walkOn(visitor.gait, spec, dt);
-      const isGone = !strolled || (visitor.leaving ?? 0) >= LEAVE_SECONDS;
+      const isGone = !strolled || (visitor.leaving?.seconds ?? 0) >= LEAVE_SECONDS;
       if (isGone) {
         hide();
         return;
       }
       visitor.gait = strolled;
-      const frame = isPausing ? 0 : Math.floor(strolled.phase) % FRAMES;
-      draw(strolled, frame, spec, now);
-      const slippingAway = 1 - (visitor.leaving ?? 0) / LEAVE_SECONDS;
-      const opacity = presence(strolled.walked, visitor.length, FADE_IN, FADE_OUT) * slippingAway;
-      material.opacity = opacity;
-      shadowMaterial.opacity = opacity * (1 - darkness * 0.6);
+      if (!isStill) visitor.frame = isPausing ? 0 : Math.floor(strolled.phase) % FRAMES;
+      draw(strolled, visitor.frame, spec, now);
+      visitor.opacity = fadeFor(visitor, strolled);
+      material.opacity = visitor.opacity;
+      shadowMaterial.opacity = visitor.opacity * (1 - darkness * 0.6);
     },
     dispose() {
       isDisposed = true;
