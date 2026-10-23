@@ -6,7 +6,7 @@ import { getWorldPortals } from '@shared/world/portals';
 import { LANDMARKS, SPAWN, WORLDS, type Landmark } from '@shared/world/world';
 import { useEffect, useRef, useState } from 'react';
 import { createAmbience } from '../lib/audio';
-import { gameKey } from '../lib/input';
+import { gameKey, isControlTarget } from '../lib/input';
 import { createScene, type SceneStatus, type WalkEngine } from '../lib/scene';
 
 type IconName = 'sun' | 'moon' | 'sound' | 'mute' | 'camera' | 'map' | 'close' | 'arrow' | 'home';
@@ -190,7 +190,7 @@ export function Walk() {
         event.repeat ||
         mapRef.current?.open ||
         memoryRef.current?.open ||
-        (event.target instanceof HTMLElement && /BUTTON|INPUT|TEXTAREA/.test(event.target.tagName))
+        (event.target instanceof HTMLElement && isControlTarget(event.target))
       )
         return;
       if (gameKey(event) === 'e') discover();
@@ -277,9 +277,9 @@ export function Walk() {
           title="풍경 사진 저장"
           aria-label="풍경 사진 저장"
           disabled={!ready}
-          onClick={() => {
-            engine.current?.photo();
-            notify('오늘의 여름을 사진으로 간직했어요.');
+          onClick={async () => {
+            const saved = await engine.current?.photo();
+            notify(saved ? '오늘의 여름을 사진으로 간직했어요.' : '사진을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.');
           }}
         >
           <Icon name="camera" />

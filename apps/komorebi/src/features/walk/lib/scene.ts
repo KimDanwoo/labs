@@ -18,7 +18,7 @@ import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { constrainCameraAxis } from './cameraBounds';
 import { createChild } from './child';
-import { gameKey } from './input';
+import { gameKey, isControlTarget } from './input';
 import { advanceJump, createJump, startJump } from './motion';
 import { characterScale } from './perspective';
 import { createPortals } from './portals';
@@ -35,7 +35,8 @@ export type WalkEngine = {
   setEvening: (value: boolean) => void;
   setInput: (key: string, pressed: boolean) => void;
   reset: () => void;
-  photo: () => void;
+  /** Resolves false when the browser could not encode the picture. */
+  photo: () => Promise<boolean>;
   travelTo: (id: string) => void;
 };
 
@@ -305,10 +306,7 @@ export async function createScene(
   };
   container.dataset.region = region;
   const keyDown = (event: KeyboardEvent) => {
-    if (
-      (event.target instanceof HTMLElement && /INPUT|TEXTAREA/.test(event.target.tagName)) ||
-      document.querySelector('dialog[open]')
-    )
+    if ((event.target instanceof HTMLElement && isControlTarget(event.target)) || document.querySelector('dialog[open]'))
       return;
     const key = gameKey(event);
     if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) event.preventDefault();
@@ -556,21 +554,24 @@ export async function createScene(
       canvas.width = renderer.domElement.width;
       canvas.height = renderer.domElement.height;
       const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      if (!ctx) return Promise.resolve(false);
       ctx.drawImage(renderer.domElement, 0, 0);
       ctx.fillStyle = '#fff9e8';
       ctx.font = `${Math.max(20, canvas.width / 55)}px serif`;
       ctx.shadowColor = '#18372c';
       ctx.shadowBlur = 5;
       ctx.fillText('木漏れ日  /  여름빛 산책', canvas.width * 0.04, canvas.height * 0.95);
-      canvas.toBlob((blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.download = `komorebi-${region}-${Date.now()}.png`;
-        a.href = url;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      return new Promise<boolean>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (!blob) return resolve(false);
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.download = `komorebi-${region}-${Date.now()}.png`;
+          a.href = url;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          resolve(true);
+        });
       });
     },
     dispose() {
