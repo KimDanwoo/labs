@@ -17,7 +17,7 @@ const SHEETS = {
     fps: 8,
     width: 20,
     heightRatio: 0.5,
-    opacity: 0.95,
+    opacity: 0.28,
     contact: 0.7,
     isLoop: false,
   },
@@ -27,7 +27,7 @@ const SHEETS = {
     fps: 3,
     width: 30,
     heightRatio: 0.3,
-    opacity: 0.6,
+    opacity: 0.24,
     contact: 0.5,
     isLoop: false,
   },
@@ -43,7 +43,7 @@ const SHEETS = {
   },
 } as const;
 /** How far a swell rolls toward the shore over one showing, as a share of its width. */
-const CREST_TRAVEL = 0.12;
+const CREST_TRAVEL = 0.2;
 type Kind = keyof typeof SHEETS;
 const COLUMNS = 4;
 const ROWS = 3;
@@ -77,23 +77,8 @@ const wave = (
   [phase, period]: [number, number],
 ): Wave => ({ kind, x, z, scale, isFlipped, degrees, phase, period });
 
-/** Where the sea moves, in painting percent, each wave on its own rhythm. Placed by Codex. */
+/** Keep painted foam at the near shoreline; offshore water is animated by the surface shader. */
 const WAVES: Wave[] = [
-  wave('break', [64.0, 32.2], 0.95, false, 5, [0.18, 3.8]),
-  wave('break', [65.6, 31.4], 0.7, true, 3, [0.62, 4.6]),
-  wave('break', [71.6, 20.5], 0.9, false, -7, [0.12, 5.2]),
-  wave('break', [75.2, 20.8], 0.8, true, 2, [0.47, 6.1]),
-  wave('break', [78.6, 20.7], 1.1, true, 3, [0.82, 5.6]),
-  wave('break', [82.6, 20.4], 0.85, false, -1, [0.33, 6.4]),
-  wave('break', [86.5, 20.5], 1.0, false, -2, [0.66, 5.0]),
-  wave('break', [93.0, 20.9], 0.75, true, -3, [0.05, 5.8]),
-  // Swells share one period, staggered so they arrive one after another.
-  wave('crest', [58.0, 17.2], 0.8, false, 0, [0.0, 7.2]),
-  wave('crest', [94.0, 15.3], 0.65, true, 0, [0.33, 7.2]),
-  wave('crest', [75.0, 28.0], 1.0, false, 2, [0.17, 7.2]),
-  wave('crest', [87.5, 37.0], 1.05, true, -2, [0.5, 7.2]),
-  wave('crest', [68.0, 23.5], 0.9, true, 1, [0.67, 7.2]),
-  wave('crest', [80.0, 44.0], 1.1, false, -1, [0.83, 7.2]),
   wave('lace', [69.0, 52.8], 0.8, false, 178, [0.15, 6.4]),
   wave('lace', [80.0, 53.2], 0.75, true, 178, [0.65, 7.0]),
   wave('lace', [88.1, 50.6], 0.7, false, 209, [0.4, 6.8]),
@@ -135,6 +120,28 @@ export function createWaves(scene: THREE.Scene, loader: THREE.TextureLoader) {
   const waves = WAVES.map((spec) => {
     const sheet = SHEETS[spec.kind];
     const material = new THREE.SpriteMaterial({ transparent: true, depthTest: false, depthWrite: false });
+    // Blend adjacent atlas cells on the GPU instead of stepping at 3–8 fps.
+    const blend = { value: 0 };
+    const nextOffset = { value: new THREE.Vector2() };
+    material.onBeforeCompile = (shader) => {
+      shader.uniforms.waveBlend = blend;
+      shader.uniforms.waveNextOffset = nextOffset;
+      shader.fragmentShader = shader.fragmentShader
+        .replace('void main() {', 'uniform float waveBlend; uniform vec2 waveNextOffset; void main() {')
+        .replace(
+          '#include <map_fragment>',
+          `
+          #ifdef USE_MAP
+            vec4 a = texture2D(map, vMapUv);
+            vec4 b = texture2D(map, vMapUv + waveNextOffset);
+            float alpha = mix(a.a, b.a, waveBlend);
+            vec3 rgb = mix(a.rgb * a.a, b.rgb * b.a, waveBlend) / max(alpha, .00001);
+            diffuseColor *= vec4(rgb, alpha);
+          #endif
+        `,
+        );
+    };
+    material.customProgramCacheKey = () => 'wave-atlas-blend-v1';
     material.rotation = THREE.MathUtils.degToRad(spec.degrees);
     const sprite = new THREE.Sprite(material);
     const width = sheet.width * spec.scale * (characterScale(spec.z) / characterScale(REFERENCE_DEPTH));
@@ -143,12 +150,12 @@ export function createWaves(scene: THREE.Scene, loader: THREE.TextureLoader) {
     sprite.renderOrder = WAVE_ORDER;
     sprite.visible = false;
     scene.add(sprite);
-    return { spec, sprite, material, clock: spec.phase * spec.period };
+    return { spec, sprite, material, blend, nextOffset, width, clock: spec.phase * spec.period };
   });
   const sheets: THREE.Texture[] = [];
   let isDisposed = false;
   // Waves are a nicety: if a sheet fails to load the sea simply stays as painted there.
-  (Object.keys(SHEETS) as Kind[]).forEach((kind) => {
+  [...new Set(WAVES.map(({ kind }) => kind))].forEach((kind) => {
     loader
       .loadAsync(SHEETS[kind].url)
       .then((texture) => {
@@ -185,9 +192,25 @@ export function createWaves(scene: THREE.Scene, loader: THREE.TextureLoader) {
         sprite.visible = frame !== null;
         if (frame === null) continue;
         showFrame(map, frame, spec.isFlipped);
+        const sheet = SHEETS[spec.kind];
+        const frameTime = sheet.isLoop ? (entry.clock / spec.period) * sheet.frames : entry.clock * sheet.fps;
+        const nextFrame = sheet.isLoop ? (frame + 1) % sheet.frames : Math.min(frame + 1, sheet.frames - 1);
+        entry.blend.value = isStill ? 0 : frameTime - Math.floor(frameTime);
+        entry.nextOffset.value.set(
+          ((nextFrame % COLUMNS) - (frame % COLUMNS)) / COLUMNS,
+          (Math.floor(frame / COLUMNS) - Math.floor(nextFrame / COLUMNS)) / ROWS,
+        );
         const progress = isStill ? STILL_FRAME / (SHEETS[spec.kind].frames - 1) : progressOf(spec, entry.clock);
         // Swells roll shoreward, square to their own crest line.
-        const travel = spec.kind === 'crest' ? sprite.scale.x * CREST_TRAVEL * progress : 0;
+        const wash = Math.sin(Math.PI * progress) ** 2;
+        let travel = 0;
+        if (spec.kind === 'crest') travel = entry.width * CREST_TRAVEL * progress;
+        if (spec.kind === 'lace') travel = entry.width * 0.045 * wash;
+        sprite.scale.set(
+          entry.width * (1 + (spec.kind === 'crest' ? 0.1 * progress : 0.035 * wash)),
+          entry.width * sheet.heightRatio * (1 + 0.12 * wash),
+          1,
+        );
         sprite.position.set(
           spec.x * 1.2 - 60 + Math.sin(material.rotation) * travel,
           40 - spec.z * 0.8 - Math.cos(material.rotation) * travel,

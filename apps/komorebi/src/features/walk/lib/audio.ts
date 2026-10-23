@@ -4,7 +4,7 @@ import { PLACE_ACTION, type PlaceAction, type Region } from '@shared/world/world
 import { ambienceMix, type AmbienceMix } from './ambienceMix';
 
 const MASTER_VOLUME = 0.22;
-const LAYER_VOLUME = { water: 0.5, waves: 0.9, cicadas: 0.012, rain: 0.7 } as const;
+const LAYER_VOLUME = { water: 0.5, waves: 0.65, cicadas: 0.012, rain: 0.7 } as const;
 const FADE_SECONDS = 1.2;
 const CALL_INTERVAL_MS = 6_500;
 const STEP_VOLUME = 0.4;
@@ -67,6 +67,10 @@ export function createAmbience() {
   master.gain.value = MASTER_VOLUME;
   master.connect(context.destination);
   const noise = brownNoise(context, 4);
+  // A broad surf hiss has no sub-bass rumble; a longer bed avoids an obvious short repeat.
+  const surfNoise = context.createBuffer(1, context.sampleRate * 12, context.sampleRate);
+  const surfSamples = surfNoise.getChannelData(0);
+  for (let i = 0; i < surfSamples.length; i++) surfSamples[i] = (Math.random() * 2 - 1) * 0.35;
   const nodes: AudioNode[] = [master];
   const sources: (AudioBufferSourceNode | OscillatorNode)[] = [];
 
@@ -77,9 +81,9 @@ export function createAmbience() {
     nodes.push(gain);
     return { gain, volume };
   };
-  const filteredNoise = (type: BiquadFilterType, frequency: number, output: AudioNode) => {
+  const filteredNoise = (type: BiquadFilterType, frequency: number, output: AudioNode, buffer = noise) => {
     const source = context.createBufferSource();
-    source.buffer = noise;
+    source.buffer = buffer;
     source.loop = true;
     const filter = context.createBiquadFilter();
     filter.type = type;
@@ -101,20 +105,35 @@ export function createAmbience() {
     return source;
   };
 
-  filteredNoise('lowpass', 650, master);
+  const wind = context.createGain();
+  wind.gain.value = 0.35;
+  wind.connect(master);
+  const windLowCut = context.createBiquadFilter();
+  windLowCut.type = 'highpass';
+  windLowCut.frequency.value = 180;
+  windLowCut.Q.value = 0.5;
+  windLowCut.connect(wind);
+  nodes.push(wind, windLowCut);
+  filteredNoise('lowpass', 650, windLowCut);
   const water = layer(LAYER_VOLUME.water);
   filteredNoise('bandpass', 1_400, water.gain);
   const waves = layer(LAYER_VOLUME.waves);
   const swell = context.createGain();
-  swell.gain.value = 0.5;
+  swell.gain.value = 0.55;
   swell.connect(waves.gain);
   nodes.push(swell);
-  filteredNoise('lowpass', 380, swell);
+  const surfSoftness = context.createBiquadFilter();
+  surfSoftness.type = 'lowpass';
+  surfSoftness.frequency.value = 2600;
+  surfSoftness.Q.value = 0.5;
+  surfSoftness.connect(swell);
+  nodes.push(surfSoftness);
+  filteredNoise('highpass', 240, surfSoftness, surfNoise);
   const swellDepth = context.createGain();
-  swellDepth.gain.value = 0.45;
+  swellDepth.gain.value = 0.22;
   swellDepth.connect(swell.gain);
   nodes.push(swellDepth);
-  oscillator('sine', 0.09, swellDepth);
+  oscillator('sine', 1 / 7.2, swellDepth);
   const cicadas = layer(LAYER_VOLUME.cicadas);
   const buzz = context.createGain();
   buzz.gain.value = 0.5;

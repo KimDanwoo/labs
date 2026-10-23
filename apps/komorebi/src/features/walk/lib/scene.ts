@@ -19,6 +19,7 @@ import {
 } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
+import { createBoats } from './boats';
 import { constrainCameraAxis } from './cameraBounds';
 import { createChild } from './child';
 import { createFireflies } from './fireflies';
@@ -193,9 +194,23 @@ export async function createScene(
         return smoothstep(0., 2., max(t, 0.));
       }
 
-      // One 7.2 s swell; no high-frequency ripples.
+      // Crossing swells build uneven sets, with sharper crests and broad troughs.
       float seaCarrier(vec2 p, float t) {
-        return sin(seaWavePhase(p, t)) * seaMotionStart(t);
+        float phase = seaWavePhase(p, t);
+        float crossing = seaDepthCoordinate(p.y) * 13. + p.x * 9. - t * 1.17;
+        float set = .82 + .18 * sin(t * .19 + p.x * 3.);
+        return (sin(phase) * .68 + sin(phase * 2. + .6) * .12
+          + sin(crossing) * .20) * set * seaMotionStart(t);
+      }
+
+      // Short wind ripples share the shoreward flow without marching in straight lines.
+      float seaRipple(vec2 p, float t) {
+        float depth = seaDepthCoordinate(p.y);
+        float bend = sin(p.x * 19. + depth * 3. - t * .31);
+        float phase = depth * 58. + p.x * 13. + bend * 1.4 - t * 2.7;
+        float secondary = depth * 93. - p.x * 31. - t * 3.6;
+        float aa = 1. - smoothstep(.6, 2.5, fwidth(phase));
+        return (sin(phase) * .7 + sin(secondary) * .3) * aa;
       }
 
       // Two low-frequency noises, no texture samples.
@@ -272,11 +287,11 @@ export async function createScene(
         float phase = seaWavePhase(BOAT_PIVOT, t);
         float start = seaMotionStart(t);
 
-        float heavePx = sin(phase) * start;
+        float heavePx = (sin(phase) * 2.8 + sin(phase * 1.71) * .55) * start;
         float halfHullPx = max(.056 / cssPixel.x, 1.);
-        float angle = cos(phase) * start * .25 / halfHullPx;
+        float angle = (cos(phase) * 1.35 + sin(phase * .73) * .35) * start / halfHullPx;
 
-        localPx -= vec2(0., heavePx);
+        localPx -= vec2(sin(phase * .65) * .65 * start, heavePx);
         float cs = cos(angle);
         float sn = sin(angle);
         vec2 sourcePx = vec2(
@@ -318,7 +333,7 @@ export async function createScene(
         vec3 rnd = glitterHash(id + vec2(seed * 71., seed * 19.));
         vec3 groupRnd = glitterHash(floor(id / vec2(4., 3.)) + seed * 37.);
 
-        float period = mix(2.8, 5.8, rnd.y);
+        float period = mix(1.1, 3.2, rnd.y);
         float phase = fract(time / period + rnd.x);
         float pulse =
           smoothstep(.06, .24, phase) *
@@ -328,14 +343,14 @@ export async function createScene(
         float groupPulse =
           smoothstep(.0, .30, groupPhase) *
           (1. - smoothstep(.50, 1., groupPhase));
-        float groupGain = mix(.45, 1., groupPulse);
+        float groupGain = mix(.18, 1., groupPulse);
 
         float depthMix = smoothstep(.14, .53, painting.y);
-        float keep = 1. - step(mix(.78, .48, depthMix), rnd.z);
+        float keep = 1. - step(mix(.67, .58, depthMix), rnd.z);
 
         // The motif stays within its cell, including drift and jitter.
         // Phase resets only while the motif is invisible.
-        vec2 jitter = (rnd.xy - .5) * .22;
+        vec2 jitter = (rnd.xy - .5) * .68;
         vec2 drift = vec2(.10, .055) * (phase - .4);
         vec2 stamp = local - jitter - drift;
         if (rnd.z > .5) stamp.x = 1. - stamp.x;
@@ -355,19 +370,15 @@ export async function createScene(
         atlasUv.y = 1. - atlasUv.y;
 
         float ink = texture2D(glitter, atlasUv).r;
-
-        // Fade marks that become too small to resolve on a small viewport.
-        // Derivatives use continuous painting coordinates, not floor/fract.
-        float pixelsAcross =
-          cellWidth / max(fwidth(painting.x), .000001);
-        float pixelsDown =
-          cellHeight / max(fwidth(painting.y), .000001);
-        float resolved =
-          smoothstep(3., 7., pixelsAcross) *
-          smoothstep(2., 4., pixelsDown);
-
-        return ink * inside * keep * pulse * groupGain *
-          mix(.65, 1., rnd.y) * resolved;
+        vec2 facet = stamp - .5;
+        float aa = max(fwidth(painting.y) / cellHeight, .025);
+        float width = mix(.10, .34, rnd.x);
+        float glint = (1. - smoothstep(width * .55, width, abs(facet.x))) *
+          (1. - smoothstep(.025, .065 + aa, abs(facet.y + sin(facet.x * 14. + rnd.y * 7.) * .035)));
+        float pixelsAcross = cellWidth / max(fwidth(painting.x), .000001);
+        float resolved = smoothstep(1., 3., pixelsAcross);
+        return max(ink * .45, glint) * inside * keep * pulse * pulse * groupGain *
+          mix(.8, 1.4, rnd.y) * resolved;
       }
       void main(){
         vec2 uv=vUv;
@@ -466,12 +477,12 @@ export async function createScene(
             seaBodyNoise(seaOutputPainting, 0.);
 
           float carrier = seaCarrier(seaOutputPainting, time);
-          float amplitudePx = mix(.80, 6.00, depth) *
+          float amplitudePx = mix(1.0, 8.0, depth) *
             mix(1., 1.12, clamp(rain, 0., 1.));
 
           vec2 displacementPx = amplitudePx * vec2(
-            .65 * seaNoiseDelta.x,
-            .75 * seaNoiseDelta.y + .25 * carrier
+            .30 * seaNoiseDelta.x + .22 * carrier,
+            .28 * seaNoiseDelta.y + .65 * carrier
           );
 
           // Inside the boat patch the painting moves rigidly; only the open sea sways.
@@ -534,8 +545,9 @@ export async function createScene(
 
           seaSwellValue =
             (
-              .09 * seaCarrier(seaOutputPainting, time) +
-              .05 * seaNoiseDelta.y
+              .16 * seaCarrier(seaOutputPainting, time) +
+              .035 * seaRipple(seaOutputPainting, time) +
+              .035 * seaNoiseDelta.y
             ) * mix(.35, 1., swellDepth);
 
           // Cloud shadows stay put on the world.
@@ -567,7 +579,7 @@ export async function createScene(
           (1. - smoothstep(.49, .555, nearWater));
 
         float sunCentre = mix(.66, .78, glitterDepth);
-        float sunWidth = mix(.05, .14, glitterDepth);
+        float sunWidth = mix(.07, .19, glitterDepth);
         float sunBand = 1. - smoothstep(
           sunWidth * .18, sunWidth, abs(vUv.x - sunCentre)
         );
@@ -590,6 +602,12 @@ export async function createScene(
         float glitterAmount =
           seaMask * glitterExtent * glitterClear *
           min(1., glitterFine + glitterScatter * .55);
+        if (isSea > .5) {
+          // Reflections catch the moving faces of the waves.
+          glitterAmount *= .65 + .35 * smoothstep(
+            -.4, .65, seaRipple(seaOutputPainting, time)
+          );
+        }
 
         // Do not repeatedly bleach the highlights already painted into the sea.
         float paintedBright = max(tex.r, max(tex.g, tex.b));
@@ -603,8 +621,8 @@ export async function createScene(
           evening
         );
         vec3 glitterLight = mix(
-          glitterDayColour * sunBand * .85,
-          vec3(.40, .59, .86) * seaMoonBand * .055,
+          glitterDayColour * (.08 + sunBand * 1.8),
+          vec3(.40, .59, .86) * (.06 + seaMoonBand * .65),
           night
         );
 
@@ -875,6 +893,7 @@ export async function createScene(
   const life = createSceneLife(scene, loader);
   const roamers = createRoamers(scene, loader);
   const waves = createWaves(scene, loader);
+  const boats = createBoats(scene);
   const rain = createRain(scene);
   const targetMat = new THREE.SpriteMaterial({
     map: markerMap,
@@ -1230,6 +1249,7 @@ export async function createScene(
     rain.update(paused ? 0 : dt, wetness, camera.position, reducedMotion);
     life.update({ region, dt: paused ? 0 : dt, elapsed, darkness, isStill: reducedMotion, isRaining: wetness > 0.5 });
     waves.update({ region, dt: paused ? 0 : dt, darkness, isStill: reducedMotion, rain: wetness });
+    boats.update({ region, dt: paused ? 0 : dt, darkness, isStill: reducedMotion });
     roamers.update({
       region,
       dt: paused ? 0 : dt,
@@ -1395,6 +1415,7 @@ export async function createScene(
       life.dispose();
       roamers.dispose();
       waves.dispose();
+      boats.dispose();
       waterMaps.dispose();
       rain.dispose();
       geo.dispose();
