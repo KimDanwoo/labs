@@ -22,6 +22,7 @@ import { canvasTexture } from './art';
 import { createBoats } from './boats';
 import { constrainCameraAxis } from './cameraBounds';
 import { createChild } from './child';
+import { createCountryside } from './countryside';
 import { createFireflies } from './fireflies';
 import { gameKey, isControlTarget } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
@@ -154,6 +155,7 @@ export async function createScene(
       foam: waterMaps.foam,
       glitter: waterMaps.glitter,
       isSea: { value: 0 },
+      isVillage: { value: 1 },
       isHome: { value: 0 },
       renderDpr: { value: 1 },
       fade: { value: 1 },
@@ -161,7 +163,7 @@ export async function createScene(
     vertexShader:
       'varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float rain; uniform float fade;
-      uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform sampler2D foam; uniform sampler2D glitter; uniform float isSea; uniform float isHome;
+      uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform sampler2D foam; uniform sampler2D glitter; uniform float isSea; uniform float isVillage; uniform float isHome;
       // Sun glitter on the sea (designed by Codex): painted glints, each fading in and out on its own beat.
       ${SEA_ATMOSPHERE_GLSL}
       // The painted sea itself sways and rolls shoreward, and the moored boat bobs with it (designed by Codex).
@@ -457,6 +459,16 @@ export async function createScene(
         float seaBoatWeight = 0.;
 
         uv = mix(uv, vUv, wet);
+        float riceBend = 0.;
+        if (isVillage > .5) {
+          vec3 stalk = texture2D(map, vUv).rgb;
+          float green = smoothstep(.025, .13, stalk.g - max(stalk.r * .85, stalk.b));
+          float paddy = smoothstep(.90, .999, water.r) * (1. - river) * green;
+          float gust = .55 + .45 * sin(time * .43 - vUv.x * 8.);
+          riceBend = sin(vUv.x * 39. + vUv.y * 17. - time * 1.55) * gust * paddy;
+          uv.x += riceBend * .0016;
+          uv.y += riceBend * .00035;
+        }
 
         if (isSea > .5) {
           seaBoatWeight = seaBoatPatch(seaOutputPainting);
@@ -668,7 +680,7 @@ export async function createScene(
 
         float waterFoam = clamp(waterEffect * riverSpray * (1. + rain * .20), 0., .88);
 
-        vec3 c = tex.rgb;
+        vec3 c = tex.rgb * (1. + riceBend * .045);
         // The painted glints brighten and dim as the surface moves.
         if (isSea > .5) {
           float brightPaint = smoothstep(
@@ -895,6 +907,7 @@ export async function createScene(
   const roamers = createRoamers(scene, loader);
   const waves = createWaves(scene, loader);
   const boats = createBoats(scene);
+  const countryside = createCountryside(scene);
   const rain = createRain(scene);
   const targetMat = new THREE.SpriteMaterial({
     map: markerMap,
@@ -1012,6 +1025,7 @@ export async function createScene(
     background.uniforms.lamps!.value = lamps.values;
     background.uniforms.waterMap!.value = waterMaps.of(next);
     background.uniforms.isSea!.value = next === SEA_REGION ? 1 : 0;
+    background.uniforms.isVillage!.value = next === 'village' ? 1 : 0;
     background.uniforms.isHome!.value = next === 'home' ? 1 : 0;
     background.uniforms.lampCount!.value = lamps.count;
     // Home stays loaded for the reset button; everything beyond the next exits is freed.
@@ -1252,6 +1266,14 @@ export async function createScene(
     life.update({ region, dt: paused ? 0 : dt, elapsed, darkness, isStill: reducedMotion, isRaining: wetness > 0.5 });
     waves.update({ region, dt: paused ? 0 : dt, darkness, isStill: reducedMotion, rain: wetness });
     boats.update({ region, dt: paused ? 0 : dt, darkness, isStill: reducedMotion });
+    countryside.update({
+      region,
+      dt: paused ? 0 : dt,
+      darkness,
+      isStill: reducedMotion,
+      isRaining: wetness > 0.5,
+      player: position,
+    });
     roamers.update({
       region,
       dt: paused ? 0 : dt,
@@ -1418,6 +1440,7 @@ export async function createScene(
       roamers.dispose();
       waves.dispose();
       boats.dispose();
+      countryside.dispose();
       waterMaps.dispose();
       rain.dispose();
       geo.dispose();
