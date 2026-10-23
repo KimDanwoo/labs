@@ -53,6 +53,8 @@ const REFERENCE_DEPTH = 40;
 const STILL_FRAME = 6;
 const STILL_FADE = 0.4;
 const RAIN_HURRY = 0.25;
+/** Foam only catches moonlight after dark, so it fades back rather than glowing white. */
+const NIGHT_DIM = 0.6;
 const WAVE_ORDER = 1;
 const SEA: Region = 'coast';
 
@@ -184,7 +186,10 @@ export function createWaves(scene: THREE.Scene, loader: THREE.TextureLoader) {
           40 - spec.z * 0.8 - Math.cos(material.rotation) * travel,
           0.5,
         );
-        material.opacity = SHEETS[spec.kind].opacity * (isStill ? STILL_FADE : envelopeOf(spec.kind, progress));
+        material.opacity =
+          SHEETS[spec.kind].opacity *
+          (isStill ? STILL_FADE : envelopeOf(spec.kind, progress)) *
+          (1 - darkness * NIGHT_DIM);
         lightSprite(material.color, darkness, lampGlowAt(SEA, spec));
       }
     },

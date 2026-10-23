@@ -153,6 +153,7 @@ export async function createScene(
       foam: waterMaps.foam,
       glitter: waterMaps.glitter,
       isSea: { value: 0 },
+      renderDpr: { value: 1 },
       fade: { value: 1 },
     },
     vertexShader:
@@ -161,6 +162,129 @@ export async function createScene(
       uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform sampler2D foam; uniform sampler2D glitter; uniform float isSea; 
       // Sun glitter on the sea (designed by Codex): painted glints, each fading in and out on its own beat.
       ${SEA_ATMOSPHERE_GLSL}
+      // The painted sea itself sways and rolls shoreward, and the moored boat bobs with it (designed by Codex).
+      uniform float renderDpr;
+
+      const float SEA_TAU = 6.28318530718;
+      const vec2 BOAT_PIVOT = vec2(.581, .430);
+
+      vec2 seaPainting(vec2 uv) {
+        return vec2(uv.x, 1. - uv.y);
+      }
+
+      vec2 seaUv(vec2 painting) {
+        return vec2(painting.x, 1. - painting.y);
+      }
+
+      // Log perspective: the same phase shift reads smaller and slower far away.
+      float seaDepthCoordinate(float y) {
+        return log(1. + max(y - .12, 0.) * 8.);
+      }
+
+      float seaWavePhase(vec2 p, float t) {
+        float distanceFromBoat =
+          (seaDepthCoordinate(p.y) -
+           seaDepthCoordinate(BOAT_PIVOT.y)) * 4.0 +
+          (p.x - BOAT_PIVOT.x) * .6;
+        return SEA_TAU * t / 7.2 - distanceFromBoat;
+      }
+
+      float seaMotionStart(float t) {
+        return smoothstep(0., 2., max(t, 0.));
+      }
+
+      // One 7.2 s swell; no high-frequency ripples.
+      float seaCarrier(vec2 p, float t) {
+        return sin(seaWavePhase(p, t)) * seaMotionStart(t);
+      }
+
+      // Two low-frequency noises, no texture samples.
+      vec2 seaBodyNoise(vec2 p, float t) {
+        vec2 q = vec2(p.x * 6., seaDepthCoordinate(p.y) * 6.);
+        return vec2(
+          seaNoise(q + vec2(-t * .024, -t * .14)),
+          seaNoise(q * vec2(.79, 1.13) +
+            vec2(8.7 + t * .018, 3.2 - t * .12))
+        );
+      }
+
+      float seaSegmentDistance(vec2 p, vec2 a, vec2 b) {
+        vec2 d = b - a;
+        float h = clamp(dot(p - a, d) / max(dot(d, d), 1e-8), 0., 1.);
+        return length(p - a - d * h);
+      }
+
+      void seaBoatEdge(
+        vec2 p, vec2 a, vec2 b,
+        inout float distanceToEdge, inout float inside
+      ) {
+        distanceToEdge = min(distanceToEdge, seaSegmentDistance(p, a, b));
+        if ((a.y > p.y) != (b.y > p.y)) {
+          float crossingX = a.x + (p.y - a.y) * (b.x - a.x) / (b.y - a.y);
+          if (p.x < crossingX) inside = 1. - inside;
+        }
+      }
+
+      float seaBoatPatch(vec2 p) {
+        float d = 1.;
+        float inside = 0.;
+
+        seaBoatEdge(p, vec2(.523,.406), vec2(.548,.411), d, inside);
+        seaBoatEdge(p, vec2(.548,.411), vec2(.562,.409), d, inside);
+        seaBoatEdge(p, vec2(.562,.409), vec2(.562,.396), d, inside);
+        seaBoatEdge(p, vec2(.562,.396), vec2(.570,.391), d, inside);
+        seaBoatEdge(p, vec2(.570,.391), vec2(.592,.392), d, inside);
+        seaBoatEdge(p, vec2(.592,.392), vec2(.598,.399), d, inside);
+        seaBoatEdge(p, vec2(.598,.399), vec2(.599,.407), d, inside);
+        seaBoatEdge(p, vec2(.599,.407), vec2(.627,.398), d, inside);
+        seaBoatEdge(p, vec2(.627,.398), vec2(.635,.398), d, inside);
+        seaBoatEdge(p, vec2(.635,.398), vec2(.635,.414), d, inside);
+        seaBoatEdge(p, vec2(.635,.414), vec2(.627,.429), d, inside);
+        seaBoatEdge(p, vec2(.627,.429), vec2(.605,.441), d, inside);
+        seaBoatEdge(p, vec2(.605,.441), vec2(.573,.451), d, inside);
+        seaBoatEdge(p, vec2(.573,.451), vec2(.545,.452), d, inside);
+        seaBoatEdge(p, vec2(.545,.452), vec2(.535,.443), d, inside);
+        seaBoatEdge(p, vec2(.535,.443), vec2(.528,.425), d, inside);
+        seaBoatEdge(p, vec2(.528,.425), vec2(.523,.406), d, inside);
+
+        // The hull moves rigidly; only the water around it eases out.
+        float hull = 1. - smoothstep(.003, .012, mix(d, -d, inside));
+
+        vec2 reflection = p - vec2(.581, .459);
+        reflection.y += reflection.x * .18;
+        float reflectedPatch = 1. - smoothstep(
+          .65, 1., length(reflection / vec2(.068, .024))
+        );
+
+        // The mast, traced by eye from the painting.
+        float mast = 1. - smoothstep(
+          .002, .005,
+          seaSegmentDistance(p, vec2(.594, .350), vec2(.594, .408))
+        );
+
+        return max(hull, max(reflectedPatch, mast));
+      }
+
+      // Inverse map from where a pixel is drawn to where it is read from the painting;
+      // rotation works in CSS pixels so the aspect ratio cannot skew it.
+      vec2 seaBoatSource(vec2 p, vec2 cssPixel, float t) {
+        vec2 localPx = (p - BOAT_PIVOT) / cssPixel;
+        float phase = seaWavePhase(BOAT_PIVOT, t);
+        float start = seaMotionStart(t);
+
+        float heavePx = sin(phase) * start;
+        float halfHullPx = max(.056 / cssPixel.x, 1.);
+        float angle = cos(phase) * start * .25 / halfHullPx;
+
+        localPx -= vec2(0., heavePx);
+        float cs = cos(angle);
+        float sn = sin(angle);
+        vec2 sourcePx = vec2(
+          cs * localPx.x + sn * localPx.y,
+          -sn * localPx.x + cs * localPx.y
+        );
+        return BOAT_PIVOT + sourcePx * cssPixel;
+      }
       vec3 glitterHash(vec2 p) {
         vec3 h = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
         h += dot(h, h.yxz + 33.33);
@@ -307,14 +431,88 @@ export async function createScene(
         ).r;                                                     // 5
         float islands = smoothstep(.22, .68, patchMask);
 
+        // Derivatives outside any branch; one framebuffer pixel converted to one CSS pixel.
+        vec2 seaCssPixel = max(
+          vec2(length(vec2(dFdx(vUv.x), dFdy(vUv.x))),
+               length(vec2(dFdx(vUv.y), dFdy(vUv.y)))) *
+            max(renderDpr, .001),
+          vec2(1e-7)
+        );
+
+        vec2 seaOutputPainting = seaPainting(vUv);
+        vec2 seaSourcePainting = seaOutputPainting;
+        vec2 seaNoiseDelta = vec2(0.);
+        float seaBoatWeight = 0.;
+
         uv = mix(uv, vUv, wet);
-        vec4 tex = texture2D(map, uv);                            // 6
+
+        if (isSea > .5) {
+          seaBoatWeight = seaBoatPatch(seaOutputPainting);
+
+          // The water map has a hole where the boat is, so the boat's own motion is not masked by it.
+          vec2 rigidBoatSource = seaBoatSource(
+            seaOutputPainting, seaCssPixel, time
+          );
+          vec2 boatSource = mix(
+            seaOutputPainting, rigidBoatSource, seaBoatWeight
+          );
+
+          // Extra water-map sample 1: keep the mask with the moved boat.
+          vec4 boatWater = texture2D(waterMap, seaUv(boatSource));
+
+          float depth = smoothstep(.13, .55, seaOutputPainting.y);
+          seaNoiseDelta =
+            seaBodyNoise(seaOutputPainting, time) -
+            seaBodyNoise(seaOutputPainting, 0.);
+
+          float carrier = seaCarrier(seaOutputPainting, time);
+          float amplitudePx = mix(.30, 2.60, depth) *
+            mix(1., 1.12, clamp(rain, 0., 1.));
+
+          vec2 displacementPx = amplitudePx * vec2(
+            .65 * seaNoiseDelta.x,
+            .75 * seaNoiseDelta.y + .25 * carrier
+          );
+
+          // Inside the boat patch the painting moves rigidly; only the open sea sways.
+          float sourceGate =
+            smoothstep(.94, .999, boatWater.r) *
+            (1. - river) *
+            (1. - seaBoatWeight);
+
+          // Reading backwards: a positive on-screen shift samples the painting the other way.
+          vec2 candidate =
+            boatSource - displacementPx * seaCssPixel * sourceGate;
+          vec2 candidateUv = seaUv(candidate);
+
+          // Extra water-map sample 2: the shifted read must still be open water, or it is cancelled.
+          vec4 candidateWater = texture2D(waterMap, candidateUv);
+
+          float inBounds =
+            step(0., candidateUv.x) * step(candidateUv.x, 1.) *
+            step(0., candidateUv.y) * step(candidateUv.y, 1.);
+
+          float destinationSafe =
+            inBounds * step(.94, candidateWater.r);
+
+          seaSourcePainting = mix(boatSource, candidate, destinationSafe);
+          water = mix(boatWater, candidateWater, destinationSafe);
+          wet = smoothstep(.12, .78, water.r);
+
+          uv = seaUv(seaSourcePainting);
+        }
+
+        vec4 tex = texture2D(map, uv);
 
         float waterColour =
           smoothstep(.008, .080, max(tex.g, tex.b) - tex.r) *
           smoothstep(.70, .98, tex.b / max(tex.g, .001));
         float waterEffect = wet * waterColour;
-        vec2 glitterPainting = vec2(vUv.x, nearWater);
+        vec2 glitterPainting = mix(
+          vec2(vUv.x, nearWater),
+          seaSourcePainting,
+          step(.5, isSea)
+        );
         // Keep low-frequency body motion separate from painted bright foam.
         float seaBodyMask =
           isSea *
@@ -332,10 +530,23 @@ export async function createScene(
         );
 
         if (isSea > .5) {
-          seaSwellValue = seaSwell(glitterPainting, time);
-          seaCloudValue = seaCloud(glitterPainting, time);
+          float swellDepth = smoothstep(.13, .55, seaOutputPainting.y);
+
+          seaSwellValue =
+            (
+              .035 * seaCarrier(seaOutputPainting, time) +
+              .025 * seaNoiseDelta.y
+            ) * mix(.35, 1., swellDepth);
+
+          // Cloud shadows stay put on the world.
+          seaCloudValue = seaCloud(seaOutputPainting, time);
+
+          // Hull rings follow the boat's 7.2 s bob,
+          // and move with it.
           seaBoatValue = seaBoatRipples(
-            glitterPainting, time, seaBoatAA
+            seaSourcePainting,
+            time * (6.8 / 7.2),
+            seaBoatAA
           );
         }
 
@@ -439,6 +650,33 @@ export async function createScene(
         float waterFoam = clamp(waterEffect * riverSpray * (1. + rain * .20), 0., .88);
 
         vec3 c = tex.rgb;
+        // The painted glints brighten and dim as the surface moves.
+        if (isSea > .5) {
+          float brightPaint = smoothstep(
+            .58, .90, max(tex.r, max(tex.g, tex.b))
+          );
+
+          float waterOnly =
+            smoothstep(.94, .999, water.r) *
+            (1. - river) *
+            (1. - seaBoatWeight);
+
+                    // Exactly zero at time 0; no texture samples.
+          float paintedTwinkle =
+            seaNoise(
+              seaSourcePainting * vec2(31., 53.) +
+              vec2(time * .13, -time * .19)
+            ) -
+            seaNoise(seaSourcePainting * vec2(31., 53.));
+
+          float paintedTwinkleGain =
+            .24 *
+            mix(1., .45, clamp(night, 0., 1.)) *
+            mix(1., .20, clamp(rain, 0., 1.));
+
+          c *= 1. +
+            waterOnly * brightPaint * paintedTwinkle * paintedTwinkleGain;
+        }
 
         // 1. Broad changes in reflected light, before time-of-day grading.
         // Preserve contrast in the foam already painted into the image.
@@ -708,6 +946,7 @@ export async function createScene(
     camera.bottom = -halfHeight;
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(renderPixelRatio(w, h, window.devicePixelRatio, touchDevice));
+    background.uniforms.renderDpr!.value = renderer.getPixelRatio();
     renderer.setSize(w, h);
     wake();
   };
