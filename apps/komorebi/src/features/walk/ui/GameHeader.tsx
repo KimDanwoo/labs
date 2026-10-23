@@ -1,18 +1,22 @@
+import type { TimeOfDay } from '@features/walk/model/constants';
 import { Icon } from './Icon';
+import { TIME_ICON } from './timeIcon';
 
-type Props = { isEvening: boolean };
+type Props = { timeOfDay: TimeOfDay };
 
-export function GameHeader({ isEvening }: Props) {
+const CLOCK = { day: '오후 2시 30분', evening: '해 질 녘', night: '밤 8시' } satisfies Record<TimeOfDay, string>;
+
+export function GameHeader({ timeOfDay }: Props) {
   return (
     <header className="game-header">
       <div className="day-card">
         <span className="day-sun">
-          <Icon name={isEvening ? 'moon' : 'sun'} />
+          <Icon name={TIME_ICON[timeOfDay]} />
         </span>
         <div>
           <span className="day-label">여름방학</span>
           <strong>첫째 날</strong>
-          <small>{isEvening ? '해 질 녘' : '오후 2시 30분'}</small>
+          <small>{CLOCK[timeOfDay]}</small>
         </div>
       </div>
       <h1 className="game-name">

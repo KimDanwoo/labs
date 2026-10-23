@@ -1,7 +1,14 @@
-import { DISCOVERY_STORAGE_KEY, EVENING_DISCOVERY_STORAGE_KEY } from '@features/walk/model/constants';
+import {
+  DAY_PAGE_STORAGE_KEY,
+  EVENING_DISCOVERY_STORAGE_KEY,
+  LEGACY_DISCOVERY_STORAGE_KEY,
+  NIGHT_PAGE_STORAGE_KEY,
+  TIME,
+  type TimeOfDay,
+} from '@features/walk/model/constants';
 import { LANDMARKS } from '@shared/world/world';
 
-const NO_DISCOVERIES: readonly string[] = [];
+const NO_PAGES: readonly string[] = [];
 
 /** Untrusted storage: keep known landmark ids once each, in their original order. */
 export function parseDiscoveries(raw: string | null): string[] {
@@ -15,6 +22,14 @@ export function parseDiscoveries(raw: string | null): string[] {
   }
 }
 
+/**
+ * Day pages come from their own key once it exists. Until then they start from the legacy list, which held every
+ * place visited at any time, so earlier players keep every page they could already read.
+ */
+export function parseDayPages(dayRaw: string | null, legacyRaw: string | null): string[] {
+  return parseDiscoveries(dayRaw ?? legacyRaw);
+}
+
 export type DiscoveryStore = {
   get: () => readonly string[];
   getServer: () => readonly string[];
@@ -22,23 +37,21 @@ export type DiscoveryStore = {
   add: (id: string) => void;
 };
 
-function createDiscoveryStore(storageKey: string): DiscoveryStore {
+function createDiscoveryStore(storageKey: string, read: () => string[]): DiscoveryStore {
   const listeners = new Set<() => void>();
   let ids: readonly string[] | null = null;
-  const load = () => {
-    try {
-      return parseDiscoveries(localStorage.getItem(storageKey));
-    } catch {
-      return NO_DISCOVERIES;
-    }
-  };
   const get = () => {
-    ids ??= load();
+    if (ids) return ids;
+    try {
+      ids = read();
+    } catch {
+      ids = NO_PAGES;
+    }
     return ids;
   };
   return {
     get,
-    getServer: () => NO_DISCOVERIES,
+    getServer: () => NO_PAGES,
     subscribe(listener) {
       listeners.add(listener);
       return () => listeners.delete(listener);
@@ -57,6 +70,15 @@ function createDiscoveryStore(storageKey: string): DiscoveryStore {
   };
 }
 
-/** Memories kept at any time of day; the evening set records the same places seen at dusk. */
-export const dayDiscoveries = createDiscoveryStore(DISCOVERY_STORAGE_KEY);
-export const eveningDiscoveries = createDiscoveryStore(EVENING_DISCOVERY_STORAGE_KEY);
+/** One page per place and time of day: the same field reads differently at noon, at dusk and at night. */
+export const pageStores = {
+  [TIME.day]: createDiscoveryStore(DAY_PAGE_STORAGE_KEY, () =>
+    parseDayPages(localStorage.getItem(DAY_PAGE_STORAGE_KEY), localStorage.getItem(LEGACY_DISCOVERY_STORAGE_KEY)),
+  ),
+  [TIME.evening]: createDiscoveryStore(EVENING_DISCOVERY_STORAGE_KEY, () =>
+    parseDiscoveries(localStorage.getItem(EVENING_DISCOVERY_STORAGE_KEY)),
+  ),
+  [TIME.night]: createDiscoveryStore(NIGHT_PAGE_STORAGE_KEY, () =>
+    parseDiscoveries(localStorage.getItem(NIGHT_PAGE_STORAGE_KEY)),
+  ),
+} satisfies Record<TimeOfDay, DiscoveryStore>;

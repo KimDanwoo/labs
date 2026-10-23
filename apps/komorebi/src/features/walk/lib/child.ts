@@ -49,6 +49,10 @@ export function createChild(atlas: THREE.Texture) {
       void jumpVelocity;
       return { hasStepped: walking && jumpHeight <= 0 && crossedFootfall(previousPhase, m.phase) };
     },
+    /** Moonlight on the sprite, so the child sits in the night painting rather than on top of it. */
+    setDarkness(darkness: number) {
+      material.color.setRGB(1 - darkness * 0.5, 1 - darkness * 0.42, 1 - darkness * 0.2);
+    },
     dispose() {
       material.dispose();
     },

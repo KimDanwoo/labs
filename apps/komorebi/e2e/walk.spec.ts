@@ -20,10 +20,11 @@ test('the walk loads and walks with the keyboard', async ({ page }) => {
 
 test('Space on a focused button presses the button instead of jumping', async ({ page }) => {
   await openWalk(page);
-  const evening = page.getByRole('button', { name: '노을로 바꾸기' });
+  const evening = page.getByRole('button', { name: /해 질 녘으로 바꾸기/ });
   await evening.focus();
   await page.keyboard.press('Space');
-  await expect(page.getByRole('button', { name: '한낮으로 바꾸기' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /밤으로 바꾸기/ })).toBeVisible();
+  await expect(page.locator('main.walk')).toHaveClass(/is-evening/);
   await expect(landscape(page)).not.toHaveAttribute('data-motion', 'jumping');
 });
 
@@ -117,17 +118,24 @@ test('choosing a new destination while an exit is loading cancels that crossing'
 
 test('a place found at dusk keeps a dusk page that the diary can reread', async ({ page }) => {
   await openWalk(page);
-  await page.getByRole('button', { name: '노을로 바꾸기' }).click();
+  await page.getByRole('button', { name: /해 질 녘으로 바꾸기/ }).click();
   await guideTo(page, '바람이 머무는 논');
   await expect(page.locator('.interact')).toContainText('노을빛으로 머물러 보기', { timeout: 15_000 });
   await page.locator('.interact').click();
   const memory = page.getByRole('dialog', { name: '바람이 머무는 논' });
   await expect(memory).toContainText('노을이 논물 위에 길게 눕는다');
   await memory.getByRole('button', { name: '추억 닫기' }).click();
+  await page.getByRole('button', { name: /밤으로 바꾸기/ }).click();
+  await page.getByRole('button', { name: /한낮으로 바꾸기/ }).click();
+  await expect(page.locator('.interact')).toContainText('잠깐 머물러 보기');
+  await page.locator('.interact').click();
+  await expect(memory).toContainText('초록빛 파도가 발끝까지 밀려온다');
+  await memory.getByRole('button', { name: '추억 닫기' }).click();
   await page.getByRole('button', { name: '산책 지도 열기' }).click();
   await page.getByRole('button', { name: '바람이 머무는 논 추억 다시 읽기' }).click();
   await expect(memory).toContainText('초록빛 파도가 발끝까지 밀려온다');
   await expect(memory).toContainText('노을이 논물 위에 길게 눕는다');
+  await expect(memory).toContainText('여름의 조각 2 / 18');
   await expect(page.locator('.journal-button b')).toHaveText('1 / 6');
 });
 
@@ -162,4 +170,40 @@ test('footfalls follow the ground: dirt in the village, wood on the river bridge
   await expect(landscape(page)).toHaveAttribute('data-region', 'river', { timeout: 15_000 });
   await expect(landscape(page)).toHaveAttribute('data-surface', 'wood', { timeout: 15_000 });
   expect(errors).toEqual([]);
+});
+
+test('the sun button walks through dusk and night, and a night visit keeps a night page', async ({ page }) => {
+  await openWalk(page);
+  await page.getByRole('button', { name: /해 질 녘으로 바꾸기/ }).click();
+  await page.getByRole('button', { name: /밤으로 바꾸기/ }).click();
+  await expect(page.locator('main.walk')).toHaveClass(/is-night/);
+  await guideTo(page, '바람이 머무는 논');
+  await expect(page.locator('.interact')).toContainText('밤의 풍경 바라보기', { timeout: 15_000 });
+  await page.locator('.interact').click();
+  const memory = page.getByRole('dialog', { name: '바람이 머무는 논' });
+  await expect(memory).toContainText('논물에 별이 하나씩 내려앉는다');
+  await expect(memory).toContainText('여름의 조각 1 / 18');
+  await memory.getByRole('button', { name: '추억 닫기' }).click();
+  await page.getByRole('button', { name: '산책 지도 열기' }).click();
+  await page.getByRole('button', { name: '바람이 머무는 논 추억 다시 읽기' }).click();
+  await expect(memory).toContainText('논물에 별이 하나씩 내려앉는다');
+  await expect(memory).not.toContainText('초록빛 파도가 발끝까지 밀려온다');
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: /한낮으로 바꾸기/ }).click();
+  await expect(page.locator('main.walk')).toHaveClass(/is-day/);
+});
+
+test('players from before the day pages keep every page they could read', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('komorebi-discoveries-v1', JSON.stringify(['fields', 'river']));
+    localStorage.setItem('komorebi-evening-discoveries-v1', JSON.stringify(['fields']));
+  });
+  await openWalk(page);
+  await expect(page.locator('.journal-button b')).toHaveText('2 / 6');
+  await page.getByRole('button', { name: '산책 지도 열기' }).click();
+  await page.getByRole('button', { name: '바람이 머무는 논 추억 다시 읽기' }).click();
+  const memory = page.getByRole('dialog', { name: '바람이 머무는 논' });
+  await expect(memory).toContainText('초록빛 파도가 발끝까지 밀려온다');
+  await expect(memory).toContainText('노을이 논물 위에 길게 눕는다');
+  await expect(memory).toContainText('여름의 조각 3 / 18');
 });

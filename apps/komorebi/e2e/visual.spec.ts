@@ -24,7 +24,7 @@ test('desktop states', async ({ page }) => {
   await page.waitForTimeout(500);
   await page.screenshot({ path: `${DIR}/memory.png` });
   await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: '노을로 바꾸기' }).click();
+  await page.getByRole('button', { name: /해 질 녘으로 바꾸기/ }).click();
   await page.waitForTimeout(800);
   await page.screenshot({ path: `${DIR}/evening.png` });
 });

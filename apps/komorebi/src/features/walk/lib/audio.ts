@@ -1,3 +1,4 @@
+import { TIME, type TimeOfDay } from '@features/walk/model/constants';
 import { SURFACE, type Surface } from '@shared/world/surfaces';
 import type { Region } from '@shared/world/world';
 import { ambienceMix, type AmbienceMix } from './ambienceMix';
@@ -123,7 +124,7 @@ export function createAmbience() {
   nodes.push(pulseDepth);
   oscillator('square', 28, pulseDepth);
 
-  let mix: AmbienceMix = ambienceMix('village', false);
+  let mix: AmbienceMix = ambienceMix('village', TIME.day);
   const callTimer = window.setInterval(() => {
     if (context.state !== 'running') return;
     if (mix.birds) call(context, master, { pitch: 1_800, count: 3, gap: 0.19 });
@@ -170,8 +171,8 @@ export function createAmbience() {
 
   return {
     step,
-    setScene(region: Region, isEvening: boolean) {
-      mix = ambienceMix(region, isEvening);
+    setScene(region: Region, time: TimeOfDay) {
+      mix = ambienceMix(region, time);
       const now = context.currentTime;
       for (const [{ gain, volume }, level] of [
         [water, mix.water],

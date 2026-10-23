@@ -1,6 +1,17 @@
 import type { ReactNode } from 'react';
 
-export type IconName = 'sun' | 'moon' | 'sound' | 'mute' | 'camera' | 'map' | 'close' | 'arrow' | 'home';
+export type IconName =
+  | 'sun'
+  | 'sunset'
+  | 'rain'
+  | 'moon'
+  | 'sound'
+  | 'mute'
+  | 'camera'
+  | 'map'
+  | 'close'
+  | 'arrow'
+  | 'home';
 type Props = { name: IconName };
 
 export function Icon({ name }: Props) {
@@ -9,6 +20,17 @@ export function Icon({ name }: Props) {
       <>
         <circle cx="12" cy="12" r="4" />
         <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" />
+      </>
+    ),
+    sunset: (
+      <>
+        <path d="M5 17a7 7 0 0 1 14 0M2 17h20M12 4v3m-7 1.5 2 2m12-2-2 2M6 21h12" />
+      </>
+    ),
+    rain: (
+      <>
+        <path d="M7 15a4.5 4.5 0 1 1 1.3-8.8A5.5 5.5 0 0 1 18.6 9 3 3 0 0 1 18 15H7Z" />
+        <path d="m8 18-1 3m5-3-1 3m5-3-1 3" />
       </>
     ),
     moon: <path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z" />,

@@ -1,12 +1,13 @@
+import { TIME_ORDER } from '@features/walk/model/constants';
 import { useModal } from '@features/walk/model/hooks';
 import type { Memory } from '@features/walk/model/types';
 import { LANDMARKS } from '@shared/world/world';
 import { useId } from 'react';
 import { Icon } from './Icon';
 
-type Props = { isOpen: boolean; memory: Memory | null; collectedCount: number; onClose: () => void };
+type Props = { isOpen: boolean; memory: Memory | null; pageCount: number; onClose: () => void };
 
-export function MemoryDialog({ isOpen, memory, collectedCount, onClose }: Props) {
+export function MemoryDialog({ isOpen, memory, pageCount, onClose }: Props) {
   const ref = useModal(isOpen);
   const titleId = useId();
   const hasSeveralPages = (memory?.pages.length ?? 0) > 1;
@@ -38,7 +39,7 @@ export function MemoryDialog({ isOpen, memory, collectedCount, onClose }: Props)
       ))}
       <span className="memory-line" />
       <span className="memory-count">
-        여름의 조각 {collectedCount} / {LANDMARKS.length}
+        여름의 조각 {pageCount} / {LANDMARKS.length * TIME_ORDER.length}
       </span>
       <button className="continue-button" onClick={onClose}>
         조금 더 걸어 볼까 <Icon name="arrow" />

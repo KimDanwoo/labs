@@ -1,20 +1,21 @@
-import type { Memory, MemoryPage } from '@features/walk/model/types';
+import { TIME, TIME_LABEL, TIME_ORDER, type TimeOfDay } from '@features/walk/model/constants';
+import type { Memory } from '@features/walk/model/types';
 import type { Landmark } from '@shared/world/world';
 
-const DAY_LABEL = '한낮';
-const EVENING_LABEL = '해 질 녘';
+const TEXT_BY_TIME = {
+  [TIME.day]: (landmark: Landmark) => landmark.text,
+  [TIME.evening]: (landmark: Landmark) => landmark.eveningText,
+  [TIME.night]: (landmark: Landmark) => landmark.nightText,
+} satisfies Record<TimeOfDay, (landmark: Landmark) => string>;
+
+const page = (landmark: Landmark, time: TimeOfDay) => ({ label: TIME_LABEL[time], text: TEXT_BY_TIME[time](landmark) });
 
 /** The moment of discovery shows what is seen right now. */
-export function liveMemory(landmark: Landmark, isEvening: boolean): Memory {
-  const page = isEvening
-    ? { label: EVENING_LABEL, text: landmark.eveningText }
-    : { label: DAY_LABEL, text: landmark.text };
-  return { landmark, pages: [page] };
+export function liveMemory(landmark: Landmark, time: TimeOfDay): Memory {
+  return { landmark, pages: [page(landmark, time)] };
 }
 
-/** Re-reading from the diary shows the day page, plus the dusk page once it has been seen. */
-export function diaryMemory(landmark: Landmark, hasEveningPage: boolean): Memory {
-  const pages: MemoryPage[] = [{ label: DAY_LABEL, text: landmark.text }];
-  if (hasEveningPage) pages.push({ label: EVENING_LABEL, text: landmark.eveningText });
-  return { landmark, pages };
+/** Re-reading from the diary shows only the pages actually kept, in the order of the day. */
+export function diaryMemory(landmark: Landmark, keptAt: readonly TimeOfDay[]): Memory {
+  return { landmark, pages: TIME_ORDER.filter((time) => keptAt.includes(time)).map((time) => page(landmark, time)) };
 }

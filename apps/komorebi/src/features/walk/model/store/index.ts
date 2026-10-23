@@ -1,2 +1,2 @@
 export { wasControlsHintSeen } from './controlsHint';
-export { dayDiscoveries, eveningDiscoveries, parseDiscoveries, type DiscoveryStore } from './discoveries';
+export { pageStores, parseDayPages, parseDiscoveries, type DiscoveryStore } from './discoveries';

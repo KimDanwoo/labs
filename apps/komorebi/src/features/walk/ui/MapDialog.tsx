@@ -1,4 +1,5 @@
-import { useModal } from '@features/walk/model/hooks';
+import { TIME_ORDER } from '@features/walk/model/constants';
+import { useModal, type Collection } from '@features/walk/model/hooks';
 import { LANDMARKS, type Point, type Region } from '@shared/world/world';
 import { useId } from 'react';
 import { DiscoveryList } from './DiscoveryList';
@@ -11,17 +12,18 @@ type Props = {
   region: Region;
   position: Point;
   steps: number;
-  visited: readonly string[];
-  eveningVisited: readonly string[];
+  collection: Collection;
   onClose: () => void;
   onGuide: (id: string) => void;
   onRead: (id: string) => void;
   onReset: () => void;
 };
 
-function journeyLine(dayCount: number, eveningCount: number, steps: number) {
-  if (eveningCount === LANDMARKS.length) return '열두 장의 여름, 낮도 노을도 모두 모았어요.';
-  if (dayCount === LANDMARKS.length) return '여섯 조각의 여름을 모았어요. 노을빛으로도 걸어 볼까요?';
+const ALL_PAGES = LANDMARKS.length * TIME_ORDER.length;
+
+function journeyLine(placeCount: number, pageCount: number, steps: number) {
+  if (pageCount === ALL_PAGES) return '열여덟 장의 여름, 낮도 노을도 밤도 모두 모았어요.';
+  if (placeCount === LANDMARKS.length) return '여섯 곳을 모두 걸었어요. 다른 시간에도 와 볼까요?';
   return `${steps.toLocaleString()} 걸음만큼 쌓인 여름`;
 }
 
@@ -31,8 +33,7 @@ export function MapDialog({
   region,
   position,
   steps,
-  visited,
-  eveningVisited,
+  collection,
   onClose,
   onGuide,
   onRead,
@@ -66,16 +67,10 @@ export function MapDialog({
       <p className="dialog-intro">
         목적지를 누르면 길을 따라 걸어가요. 도착하면 <kbd>E</kbd>로 추억을 간직하세요.
       </p>
-      <WalkMap region={region} position={position} visited={visited} />
-      <DiscoveryList
-        visited={visited}
-        eveningVisited={eveningVisited}
-        isReady={isReady}
-        onGuide={onGuide}
-        onRead={onRead}
-      />
+      <WalkMap region={region} position={position} visited={collection.visited} />
+      <DiscoveryList pages={collection.pages} isReady={isReady} onGuide={onGuide} onRead={onRead} />
       <div className="map-footer">
-        <span>{journeyLine(visited.length, eveningVisited.length, steps)}</span>
+        <span>{journeyLine(collection.visited.length, collection.pageCount, steps)}</span>
         <button onClick={onReset}>
           <Icon name="home" /> 마을 입구로
         </button>

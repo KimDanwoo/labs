@@ -1,17 +1,17 @@
 'use client';
 
 import { diaryMemory, liveMemory } from '@features/walk/lib/memory';
-import { DIALOG, type Dialog } from '@features/walk/model/constants';
+import { DIALOG, TIME, TIME_ORDER, type Dialog, type TimeOfDay } from '@features/walk/model/constants';
 import {
   useAmbience,
   useAmbienceScene,
-  useDiscoveries,
+  useCollection,
   useIsFirstVisit,
   useShortcuts,
   useToast,
   useWalkEngine,
 } from '@features/walk/model/hooks';
-import { dayDiscoveries, eveningDiscoveries } from '@features/walk/model/store';
+import { pageStores } from '@features/walk/model/store';
 import type { Memory } from '@features/walk/model/types';
 import { LANDMARKS, WORLDS } from '@shared/world/world';
 import { useRef, useState } from 'react';
@@ -25,46 +25,52 @@ import { MemoryDialog } from './MemoryDialog';
 import { MobileControls } from './MobileControls';
 import { ToolBar } from './ToolBar';
 
+const FIRST_LOOK = {
+  day: '잠깐 머물러 보기',
+  evening: '노을빛으로 머물러 보기',
+  night: '밤의 풍경 바라보기',
+} satisfies Record<TimeOfDay, string>;
+
+const nextTime = (time: TimeOfDay) => TIME_ORDER[(TIME_ORDER.indexOf(time) + 1) % TIME_ORDER.length]!;
+
 export function Walk() {
   const landscapeRef = useRef<HTMLDivElement>(null);
-  const [isEvening, setIsEvening] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(TIME.day);
   const [isSprinting, setIsSprinting] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(DIALOG.none);
   const [memory, setMemory] = useState<Memory | null>(null);
   const [hasGuided, setHasGuided] = useState(false);
   const isPaused = dialog !== DIALOG.none;
   const toast = useToast();
-  const visited = useDiscoveries(dayDiscoveries);
-  const eveningVisited = useDiscoveries(eveningDiscoveries);
+  const collection = useCollection();
   const isFirstVisit = useIsFirstVisit();
   const ambience = useAmbience(() => toast.notify('이 브라우저에서는 소리를 재생할 수 없어요.'));
   const { engine, isReady, error, status, hasWalked } = useWalkEngine(landscapeRef, {
-    isEvening,
+    timeOfDay,
     isSprinting,
     isPaused,
     onNotice: toast.notify,
     onStep: ambience.step,
   });
-  useAmbienceScene(ambience.setScene, status.region, isEvening);
+  useAmbienceScene(ambience.setScene, status.region, timeOfDay);
   const hasStarted = hasWalked || hasGuided;
 
   function openMemory() {
     const landmark = status.nearby;
     if (!landmark) return;
-    setMemory(liveMemory(landmark, isEvening));
-    dayDiscoveries.add(landmark.id);
-    if (isEvening) eveningDiscoveries.add(landmark.id);
+    setMemory(liveMemory(landmark, timeOfDay));
+    pageStores[timeOfDay].add(landmark.id);
     setDialog(DIALOG.memory);
   }
   function readMemory(id: string) {
     const landmark = LANDMARKS.find((p) => p.id === id);
     if (!landmark) return;
-    setMemory(diaryMemory(landmark, eveningVisited.includes(id)));
+    const keptAt = TIME_ORDER.filter((time) => collection.pages[time].includes(id));
+    setMemory(diaryMemory(landmark, keptAt));
     setDialog(DIALOG.memory);
   }
   function promptHint(id: string) {
-    if (isEvening && !eveningVisited.includes(id)) return '노을빛으로 머물러 보기';
-    return visited.includes(id) ? '추억 다시 읽기' : '잠깐 머물러 보기';
+    return collection.pages[timeOfDay].includes(id) ? '추억 다시 읽기' : FIRST_LOOK[timeOfDay];
   }
   function closeDialog(which: Dialog) {
     // Commit now: window-level shortcuts read this state and must not see a dialog the browser already closed.
@@ -91,12 +97,12 @@ export function Walk() {
   useShortcuts({ isEnabled: !isPaused, onDiscover: openMemory, onOpenMap: () => setDialog(DIALOG.map) });
 
   return (
-    <main className={`walk ${isEvening ? 'is-evening' : ''} ${hasStarted ? 'has-started' : ''}`}>
+    <main className={`walk is-${timeOfDay} ${hasStarted ? 'has-started' : ''}`}>
       <div className="landscape" ref={landscapeRef} />
       <div className="paper-grain" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
 
-      <GameHeader isEvening={isEvening} />
+      <GameHeader timeOfDay={timeOfDay} />
       <p className="sr-only" aria-live="polite">
         {WORLDS[status.region].name}
       </p>
@@ -104,10 +110,11 @@ export function Walk() {
         <span>—</span> {WORLDS[status.region].name} <span>—</span>
       </div>
       <ToolBar
-        isEvening={isEvening}
+        timeOfDay={timeOfDay}
+        nextTimeOfDay={nextTime(timeOfDay)}
         isSoundOn={ambience.isOn}
         isReady={isReady}
-        onToggleEvening={() => setIsEvening((value) => !value)}
+        onNextTime={() => setTimeOfDay(nextTime)}
         onToggleSound={ambience.toggle}
         onPhoto={takePhoto}
         onOpenMap={() => setDialog(DIALOG.map)}
@@ -125,7 +132,7 @@ export function Walk() {
 
       <BottomBar
         place={status.nearby?.short ?? WORLDS[status.region].name}
-        visited={visited}
+        visited={collection.visited}
         shouldShowHint={isFirstVisit && isReady && !hasStarted}
         onOpenJournal={() => setDialog(DIALOG.map)}
       />
@@ -148,8 +155,7 @@ export function Walk() {
         region={status.region}
         position={status}
         steps={status.steps}
-        visited={visited}
-        eveningVisited={eveningVisited}
+        collection={collection}
         onClose={() => closeDialog(DIALOG.map)}
         onGuide={guideTo}
         onRead={readMemory}
@@ -158,7 +164,7 @@ export function Walk() {
       <MemoryDialog
         isOpen={dialog === DIALOG.memory}
         memory={memory}
-        collectedCount={visited.length}
+        pageCount={collection.pageCount}
         onClose={() => closeDialog(DIALOG.memory)}
       />
     </main>

@@ -1,5 +1,5 @@
 export { useAmbience, useAmbienceScene } from './useAmbience';
-export { useDiscoveries } from './useDiscoveries';
+export { useCollection, type Collection } from './useCollection';
 export { useIsFirstVisit } from './useIsFirstVisit';
 export { useModal } from './useModal';
 export { useShortcuts } from './useShortcuts';

@@ -6,22 +6,25 @@ import { LANDMARKS } from '../src/shared/world/world';
 const landmark = LANDMARKS[0]!;
 
 test('a discovery shows what the place looks like right now', () => {
-  assert.deepEqual(liveMemory(landmark, false).pages, [{ label: '한낮', text: landmark.text }]);
-  assert.deepEqual(liveMemory(landmark, true).pages, [{ label: '해 질 녘', text: landmark.eveningText }]);
+  assert.deepEqual(liveMemory(landmark, 'day').pages, [{ label: '한낮', text: landmark.text }]);
+  assert.deepEqual(liveMemory(landmark, 'evening').pages, [{ label: '해 질 녘', text: landmark.eveningText }]);
+  assert.deepEqual(liveMemory(landmark, 'night').pages, [{ label: '밤', text: landmark.nightText }]);
 });
 
-test('the diary adds the dusk page only once it has been seen', () => {
-  assert.equal(diaryMemory(landmark, false).pages.length, 1);
+test('the diary shows only the pages kept, in the order of the day', () => {
   assert.deepEqual(
-    diaryMemory(landmark, true).pages.map((page) => page.text),
-    [landmark.text, landmark.eveningText],
+    diaryMemory(landmark, ['night', 'day']).pages.map((page) => page.label),
+    ['한낮', '밤'],
+  );
+  assert.deepEqual(
+    diaryMemory(landmark, ['night']).pages.map((page) => page.text),
+    [landmark.nightText],
   );
 });
 
-test('every place has its own dusk text', () => {
+test('every place reads differently at each time of day', () => {
   for (const place of LANDMARKS) {
-    const dusk: string = place.eveningText;
-    assert.ok(dusk.length > 0);
-    assert.notEqual(dusk, place.text);
+    const texts: string[] = [place.text, place.eveningText, place.nightText];
+    assert.equal(new Set(texts).size, 3);
   }
 });

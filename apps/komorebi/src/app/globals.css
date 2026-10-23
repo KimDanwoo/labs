@@ -22,6 +22,7 @@
   --ink: 52 74 59;
   --deep: 28 58 50;
   --sun: 233 155 78;
+  --twilight: 43 53 82;
   --night: 14 47 58;
   --ochre: 163 136 75;
   --honey: 251 239 184;
@@ -91,6 +92,9 @@ button:hover {
 }
 .walk.is-evening {
   background: linear-gradient(180deg, rgb(var(--stone)) 0%, rgb(var(--blush)) 50%, rgb(var(--peach)) 100%);
+}
+.walk.is-night {
+  background: linear-gradient(180deg, rgb(var(--night)) 0%, rgb(var(--twilight)) 55%, rgb(var(--deep)) 100%);
 }
 .landscape {
   position: absolute;
@@ -1608,8 +1612,17 @@ dialog::backdrop {
 .discovery-read:hover {
   background: rgb(var(--mist));
 }
-.stamp.evening {
+/* One ring per time of day the page was kept: dusk inside, night outside. */
+.stamp.kept-evening {
   box-shadow: 0 0 0 2px rgb(var(--peach));
+}
+.stamp.kept-night {
+  box-shadow: 0 0 0 4px rgb(var(--twilight) / 0.7);
+}
+.stamp.kept-evening.kept-night {
+  box-shadow:
+    0 0 0 2px rgb(var(--peach)),
+    0 0 0 4px rgb(var(--twilight) / 0.7);
 }
 .memory-time {
   display: block;

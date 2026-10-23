@@ -1,9 +1,10 @@
 import { createScene, type SceneOptions, type SceneStatus, type WalkEngine } from '@features/walk/lib/scene';
+import type { TimeOfDay } from '@features/walk/model/constants';
 import { SPAWN } from '@shared/world/world';
 import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
 
 type EngineSettings = {
-  isEvening: boolean;
+  timeOfDay: TimeOfDay;
   isSprinting: boolean;
   isPaused: boolean;
   onNotice: SceneOptions['onNotice'];
@@ -21,7 +22,7 @@ export function useWalkEngine(containerRef: RefObject<HTMLDivElement | null>, se
   const [status, setStatus] = useState<SceneStatus>(INITIAL_STATUS);
   const [hasWalked, setHasWalked] = useState(false);
   const applySettings = useEffectEvent((instance: WalkEngine) => {
-    instance.setEvening(settings.isEvening);
+    instance.setTimeOfDay(settings.timeOfDay);
     instance.setInput('shift', settings.isSprinting);
     instance.setPaused(settings.isPaused);
   });
@@ -62,8 +63,8 @@ export function useWalkEngine(containerRef: RefObject<HTMLDivElement | null>, se
     };
   }, [containerRef]);
   useEffect(() => {
-    engine.current?.setEvening(settings.isEvening);
-  }, [settings.isEvening]);
+    engine.current?.setTimeOfDay(settings.timeOfDay);
+  }, [settings.timeOfDay]);
   useEffect(() => {
     engine.current?.setInput('shift', settings.isSprinting);
   }, [settings.isSprinting]);

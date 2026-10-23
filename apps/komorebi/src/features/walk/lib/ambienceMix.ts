@@ -1,3 +1,4 @@
+import { TIME, type TimeOfDay } from '@features/walk/model/constants';
 import type { Region } from '@shared/world/world';
 
 export type AmbienceMix = { water: number; waves: number; cicadas: number; birds: number; crickets: number };
@@ -14,9 +15,10 @@ const REGION_LAYERS = {
 
 const EVENING_CICADA_SHARE = 0.3;
 
-/** Each place keeps its own sound; at dusk birds give way to crickets and the cicadas quieten. */
-export function ambienceMix(region: Region, isEvening: boolean): AmbienceMix {
+/** Each place keeps its own sound; at dusk birds give way to crickets, and at night the cicadas fall silent. */
+export function ambienceMix(region: Region, time: TimeOfDay): AmbienceMix {
   const layers = REGION_LAYERS[region];
-  if (!isEvening) return { ...layers, birds: 1, crickets: 0 };
-  return { ...layers, cicadas: layers.cicadas * EVENING_CICADA_SHARE, birds: 0, crickets: 1 };
+  if (time === TIME.day) return { ...layers, birds: 1, crickets: 0 };
+  const cicadas = time === TIME.evening ? layers.cicadas * EVENING_CICADA_SHARE : 0;
+  return { ...layers, cicadas, birds: 0, crickets: 1 };
 }

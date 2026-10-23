@@ -1,3 +1,4 @@
+import { TIME, type TimeOfDay } from '@features/walk/model/constants';
 import { FOREGROUNDS, isForegroundInFront } from '@shared/world/foreground';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '@shared/world/portals';
 import { surfaceAt, type Surface } from '@shared/world/surfaces';
@@ -19,6 +20,7 @@ import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { constrainCameraAxis } from './cameraBounds';
 import { createChild } from './child';
+import { createFireflies } from './fireflies';
 import { gameKey, isControlTarget } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
 import { characterScale } from './perspective';
@@ -30,6 +32,8 @@ const CHILD_ATLAS_URL = '/art/child-motion-v2-ready.webp';
 const START_REGION: Region = 'village';
 const CAMERA_EPSILON = 0.01;
 const WARMTH_EPSILON = 0.002;
+/** How much dusk colour each time of day keeps; night adds its own blue on top. */
+const WARMTH_BY_TIME = { day: 0, evening: 1, night: 0.35 } satisfies Record<TimeOfDay, number>;
 const MOVE_KEYS = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
 const LANDING_LOUDNESS = 1.6;
 const NEAREST_SCALE = characterScale(100);
@@ -60,7 +64,7 @@ export type WalkEngine = {
   dispose: () => void;
   /** While paused (a dialog is open) the child stands still and new movement input is ignored. */
   setPaused: (value: boolean) => void;
-  setEvening: (value: boolean) => void;
+  setTimeOfDay: (value: TimeOfDay) => void;
   setInput: (key: string, pressed: boolean) => void;
   reset: () => void;
   /** Resolves false when the browser could not encode the picture. */
@@ -123,11 +127,12 @@ export async function createScene(
       map: { value: startPlate.value },
       time: { value: 0 },
       evening: { value: 0 },
+      night: { value: 0 },
       fade: { value: 1 },
     },
     vertexShader:
       'varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float fade; 
+    fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float fade; 
       void main(){
         vec2 uv=vUv;
         // Tiny local leaf motion, not a global distortion of architecture.
@@ -142,6 +147,10 @@ export async function createScene(
         c+=waterMask*pow(max(0.,ripple),24.)*sparkle*.018;
         vec3 warm=c*vec3(1.09,.79,.67)+vec3(.025,.005,.018);
         c=mix(c,warm,evening*.65);
+        // Linear light: these factors read about twice as bright once converted for the screen.
+        vec3 grey=vec3(dot(c,vec3(.3,.59,.11)));
+        vec3 moonlit=mix(c,grey,.45)*vec3(.09,.12,.24)+vec3(.0,.003,.015);
+        c=mix(c,moonlit,night*.9);
         gl_FragColor=vec4(c*fade,1.);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -244,6 +253,7 @@ export async function createScene(
     return s;
   });
   const portalVisuals = createPortals(scene);
+  const fireflies = createFireflies(scene);
   const targetMat = new THREE.SpriteMaterial({
     map: markerMap,
     color: '#fff9cf',
@@ -267,7 +277,8 @@ export async function createScene(
     distance = 0,
     animation = 0,
     disposed = false,
-    evening = false,
+    timeOfDay: TimeOfDay = TIME.day,
+    darkness = 0,
     paused = false,
     isSettling = true,
     warmth = 0,
@@ -573,8 +584,13 @@ export async function createScene(
       const target = route[route.length - 1]!;
       targetMarker.position.set(target.x * 1.2 - 60, 40 - target.z * 0.8 + 0.5, 1);
     }
-    const targetWarmth = evening ? 1 : 0;
+    const targetWarmth = WARMTH_BY_TIME[timeOfDay];
     warmth = settle(THREE.MathUtils.damp(warmth, targetWarmth, 2, dt), targetWarmth, WARMTH_EPSILON);
+    const targetDarkness = timeOfDay === TIME.night ? 1 : 0;
+    darkness = settle(THREE.MathUtils.damp(darkness, targetDarkness, 2, dt), targetDarkness, WARMTH_EPSILON);
+    background.uniforms.night!.value = darkness;
+    fireflies.update(elapsed, darkness, reducedMotion);
+    character.setDarkness(darkness);
     transition = Math.min(1, transition + dt * 1.8);
     background.uniforms.time!.value = reducedMotion ? 0 : elapsed;
     background.uniforms.evening!.value = warmth;
@@ -591,6 +607,7 @@ export async function createScene(
       camera.position.x !== targetX ||
       camera.position.y !== targetY ||
       warmth !== targetWarmth ||
+      darkness !== targetDarkness ||
       transition < 1 ||
       (!paused && jump.landing > 0.01);
     if (elapsed - statusTime > 0.12) {
@@ -622,8 +639,8 @@ export async function createScene(
   animation = requestAnimationFrame(tick);
   plates.focus(nearbyRegions(START_REGION));
   return {
-    setEvening(value) {
-      evening = value;
+    setTimeOfDay(value) {
+      timeOfDay = value;
       wake();
     },
     setPaused(value) {
@@ -701,6 +718,7 @@ export async function createScene(
       foregrounds.forEach(({ mesh }) => mesh.geometry.dispose());
       foregroundMaterial.dispose();
       portalVisuals.dispose();
+      fireflies.dispose();
       geo.dispose();
       dustGeo.dispose();
       [background, shadowMat, dustMat, targetMat, ...markerMats].forEach((m) => m.dispose());
