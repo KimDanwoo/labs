@@ -247,3 +247,29 @@ test('a cat or a dog strolls through now and then, but stays home in the rain', 
   await page.getByRole('button', { name: '소나기 내리게 하기' }).click();
   await expect(landscape(page)).toHaveAttribute('data-visitor', '', { timeout: 5_000 });
 });
+
+test('footsteps play recorded takes for the ground underfoot, never the same take twice running', async ({ page }) => {
+  await page.addInitScript(() => {
+    const played: string[] = [];
+    Object.assign(window, { played });
+    const start = AudioBufferSourceNode.prototype.start;
+    AudioBufferSourceNode.prototype.start = function (...args) {
+      if (this.buffer && this.buffer.duration < 1.5) played.push(this.buffer.duration.toFixed(4));
+      return start.apply(this, args);
+    };
+  });
+  const fetched: string[] = [];
+  page.on('response', (response) => {
+    if (response.url().includes('/sounds/steps/') && response.ok()) fetched.push(response.url());
+  });
+  await openWalk(page);
+  await page.getByRole('button', { name: '자연 소리 켜기' }).click();
+  await expect.poll(() => fetched.length, { timeout: 15_000 }).toBeGreaterThanOrEqual(20);
+  await page.locator('.landscape canvas').focus();
+  await page.keyboard.down('ArrowUp');
+  await page.waitForTimeout(2500);
+  await page.keyboard.up('ArrowUp');
+  const played = await page.evaluate(() => (window as unknown as { played: string[] }).played);
+  expect(played.length).toBeGreaterThanOrEqual(3);
+  played.slice(1).forEach((take, i) => expect(take).not.toBe(played[i]));
+});

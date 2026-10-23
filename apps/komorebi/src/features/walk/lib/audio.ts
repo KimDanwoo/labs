@@ -7,16 +7,19 @@ const MASTER_VOLUME = 0.22;
 const LAYER_VOLUME = { water: 0.5, waves: 0.9, cicadas: 0.012, rain: 0.7 } as const;
 const FADE_SECONDS = 1.2;
 const CALL_INTERVAL_MS = 6_500;
-const STEP_VOLUME = 0.55;
+const STEP_VOLUME = 0.4;
 
-type StepSound = { filter: BiquadFilterType; frequency: number; q: number; seconds: number; knock?: number };
-/** Each ground answers a footfall differently: crunch, click, hollow knock or soft hiss. */
-const STEP_SOUNDS = {
-  [SURFACE.dirt]: { filter: 'lowpass', frequency: 900, q: 0.7, seconds: 0.09 },
-  [SURFACE.stone]: { filter: 'bandpass', frequency: 2_300, q: 1.4, seconds: 0.05 },
-  [SURFACE.wood]: { filter: 'bandpass', frequency: 420, q: 2.5, seconds: 0.11, knock: 170 },
-  [SURFACE.sand]: { filter: 'highpass', frequency: 2_800, q: 0.5, seconds: 0.12 },
-} satisfies Record<Surface, StepSound>;
+/** Recorded footsteps (Kenney Impact Sounds, CC0), a few takes per ground so steps never repeat exactly. */
+const STEP_TAKES = 5;
+const STEP_SURFACES = Object.values(SURFACE);
+const stepUrl = (surface: Surface, take: number) => `/sounds/steps/${surface}-${take}.m4a`;
+/** Evens out the recordings: the soft dirt takes are about 8 dB quieter than the rest. */
+const STEP_GAIN = { [SURFACE.dirt]: 2, [SURFACE.stone]: 1, [SURFACE.wood]: 1, [SURFACE.sand]: 1 } satisfies Record<
+  Surface,
+  number
+>;
+/** Each step plays a touch faster or slower, as real strides do. */
+const STEP_PITCH_SPREAD = 0.16;
 
 function brownNoise(context: AudioContext, seconds: number) {
   const buffer = context.createBuffer(1, context.sampleRate * seconds, context.sampleRate);
@@ -135,41 +138,37 @@ export function createAmbience() {
   }, CALL_INTERVAL_MS);
   void context.resume();
 
-  const whiteNoise = context.createBuffer(1, context.sampleRate * 0.2, context.sampleRate);
-  const whiteData = whiteNoise.getChannelData(0);
-  for (let i = 0; i < whiteData.length; i++) whiteData[i] = Math.random() * 2 - 1;
+  // Footsteps stay silent until their recordings have loaded; a failed one just leaves that ground quiet.
+  const steps = new Map<Surface, AudioBuffer[]>();
+  STEP_SURFACES.forEach((surface) => {
+    const takes = Array.from({ length: STEP_TAKES }, (_, take) =>
+      fetch(stepUrl(surface, take))
+        .then((response) => response.arrayBuffer())
+        .then((data) => context.decodeAudioData(data)),
+    );
+    Promise.all(takes)
+      .then((buffers) => steps.set(surface, buffers))
+      .catch(() => undefined);
+  });
+  let lastTake = -1;
 
   const step = (surface: Surface, loudness: number) => {
-    if (context.state !== 'running') return;
-    const sound: StepSound = STEP_SOUNDS[surface];
-    const now = context.currentTime;
-    const peak = STEP_VOLUME * Math.min(loudness, 2) * (0.8 + Math.random() * 0.4);
+    const takes = steps.get(surface);
+    if (context.state !== 'running' || !takes) return;
+    const take = (lastTake + 1 + Math.floor(Math.random() * (takes.length - 1))) % takes.length;
+    lastTake = take;
     const source = context.createBufferSource();
-    source.buffer = whiteNoise;
-    source.playbackRate.value = 0.85 + Math.random() * 0.3;
-    const filter = context.createBiquadFilter();
-    filter.type = sound.filter;
-    filter.frequency.value = sound.frequency;
-    filter.Q.value = sound.q;
+    source.buffer = takes[take]!;
+    source.playbackRate.value = 1 + (Math.random() - 0.5) * STEP_PITCH_SPREAD;
     const gain = context.createGain();
-    gain.gain.setValueAtTime(peak, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + sound.seconds);
-    source.connect(filter);
-    filter.connect(gain);
+    gain.gain.value = STEP_VOLUME * STEP_GAIN[surface] * Math.min(loudness, 2) * (0.8 + Math.random() * 0.4);
+    source.connect(gain);
     gain.connect(master);
-    source.start(now);
-    source.stop(now + sound.seconds);
-    const parts: AudioNode[] = [source, filter, gain];
-    if (sound.knock) {
-      const knock = context.createOscillator();
-      knock.frequency.setValueAtTime(sound.knock, now);
-      knock.frequency.exponentialRampToValueAtTime(sound.knock * 0.7, now + sound.seconds);
-      knock.connect(gain);
-      knock.start(now);
-      knock.stop(now + sound.seconds);
-      parts.push(knock);
-    }
-    source.onended = () => parts.forEach((part) => part.disconnect());
+    source.onended = () => {
+      source.disconnect();
+      gain.disconnect();
+    };
+    source.start();
   };
 
   /** A single decaying sine, the building block of plops, bells and chimes. */
