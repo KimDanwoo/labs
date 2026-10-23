@@ -7,6 +7,7 @@ const SIZE = { width: 384, height: 256 };
 const STILL = 'rgb(0, 128, 128)';
 const EDGE_BLUR = 'blur(2px)';
 const FOAM_URL = '/art/sea-foam.webp';
+const GLITTER_URL = '/art/sea-glitter.webp';
 
 const channel = (value: number) => Math.round(128 + 127 * value);
 
@@ -40,7 +41,22 @@ export function createWaterMaps(loader: THREE.TextureLoader) {
   const blank = new THREE.DataTexture(new Uint8Array(4), 1, 1);
   blank.needsUpdate = true;
   const foam = { value: blank as THREE.Texture };
+  const glitter = { value: blank as THREE.Texture };
   let isDisposed = false;
+  loader
+    .loadAsync(GLITTER_URL)
+    .then((texture) => {
+      if (isDisposed) {
+        texture.dispose();
+        return;
+      }
+      // Grayscale glint shapes, black where there is none; cells must not blur into each other.
+      texture.colorSpace = THREE.NoColorSpace;
+      texture.generateMipmaps = false;
+      texture.minFilter = THREE.LinearFilter;
+      glitter.value = texture;
+    })
+    .catch(() => undefined);
   loader
     .loadAsync(FOAM_URL)
     .then((texture) => {
@@ -60,13 +76,15 @@ export function createWaterMaps(loader: THREE.TextureLoader) {
       maps.set(region, map);
       return map;
     },
-    /** Shared uniform for the foam texture, swapped in once it has loaded. */
+    /** Shared uniforms for the foam and sun-glitter textures, swapped in once they have loaded. */
     foam,
+    glitter,
     dispose() {
       isDisposed = true;
       maps.forEach((map) => map.dispose());
       blank.dispose();
       if (foam.value !== blank) foam.value.dispose();
+      if (glitter.value !== blank) glitter.value.dispose();
     },
   };
 }

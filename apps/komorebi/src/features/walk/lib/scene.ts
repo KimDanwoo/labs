@@ -38,6 +38,7 @@ import { createWaves } from './waves';
 
 const CHILD_ATLAS_URL = '/art/child-motion-v2-ready.webp';
 const START_REGION: Region = 'village';
+const SEA_REGION: Region = 'coast';
 const CAMERA_EPSILON = 0.01;
 const WARMTH_EPSILON = 0.002;
 const CHILD_ORDER = 4;
@@ -149,12 +150,99 @@ export async function createScene(
       walker: { value: new THREE.Vector2(0.5, 0.2) },
       waterMap: { value: waterMaps.of(START_REGION) },
       foam: waterMaps.foam,
+      glitter: waterMaps.glitter,
+      isSea: { value: 0 },
       fade: { value: 1 },
     },
     vertexShader:
       'varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float rain; uniform float fade;
-      uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform sampler2D foam; 
+      uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform sampler2D foam; uniform sampler2D glitter; uniform float isSea; 
+      // Sun glitter on the sea (designed by Codex): painted glints, each fading in and out on its own beat.
+      vec3 glitterHash(vec2 p) {
+        vec3 h = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
+        h += dot(h, h.yxz + 33.33);
+        return fract((h.xxy + h.yzz) * h.zyx);
+      }
+
+      float glitterLayer(vec2 painting, float seed) {
+        vec2 p = painting + vec2(seed * .0031, seed * .0017);
+
+        // Rows increase in height toward the viewer.
+        // Each row also increases horizontal spacing by the same ratio.
+        const float growth = .018;
+        const float farHeight = .004;
+        float depth = max(p.y - .12, 0.);
+        float rowCoord =
+          log(1. + depth * growth / farHeight) / log(1. + growth);
+        float row = floor(rowCoord);
+        float rowScale = pow(1. + growth, row);
+        float rowStart = farHeight * (rowScale - 1.) / growth;
+        float cellHeight = farHeight * rowScale;
+        float cellWidth = .009 * rowScale;
+
+        float rowShift = glitterHash(vec2(row, seed + 41.)).x;
+        float columnCoord = p.x / cellWidth + rowShift;
+        vec2 id = vec2(floor(columnCoord), row);
+        vec2 local = vec2(
+          fract(columnCoord),
+          (depth - rowStart) / cellHeight
+        );
+
+        vec3 rnd = glitterHash(id + vec2(seed * 71., seed * 19.));
+        vec3 groupRnd = glitterHash(floor(id / vec2(4., 3.)) + seed * 37.);
+
+        float period = mix(2.8, 5.8, rnd.y);
+        float phase = fract(time / period + rnd.x);
+        float pulse =
+          smoothstep(.06, .24, phase) *
+          (1. - smoothstep(.38, .76, phase));
+
+        float groupPhase = fract(time / 8.7 + groupRnd.x);
+        float groupPulse =
+          smoothstep(.0, .30, groupPhase) *
+          (1. - smoothstep(.50, 1., groupPhase));
+        float groupGain = mix(.45, 1., groupPulse);
+
+        float depthMix = smoothstep(.14, .53, painting.y);
+        float keep = 1. - step(mix(.78, .48, depthMix), rnd.z);
+
+        // The motif stays within its cell, including drift and jitter.
+        // Phase resets only while the motif is invisible.
+        vec2 jitter = (rnd.xy - .5) * .22;
+        vec2 drift = vec2(.10, .055) * (phase - .4);
+        vec2 stamp = local - jitter - drift;
+        if (rnd.z > .5) stamp.x = 1. - stamp.x;
+
+        float inside =
+          step(0., stamp.x) * step(stamp.x, 1.) *
+          step(0., stamp.y) * step(stamp.y, 1.);
+
+        float motif = floor(
+          glitterHash(id + vec2(93., seed * 53.)).x * 16.
+        );
+        vec2 tile = vec2(mod(motif, 4.), floor(motif / 4.));
+
+        // Image coordinates run downward; texture UVs run upward.
+        vec2 atlasUv =
+          (tile + clamp(stamp, vec2(.002), vec2(.998))) / 4.;
+        atlasUv.y = 1. - atlasUv.y;
+
+        float ink = texture2D(glitter, atlasUv).r;
+
+        // Fade marks that become too small to resolve on a small viewport.
+        // Derivatives use continuous painting coordinates, not floor/fract.
+        float pixelsAcross =
+          cellWidth / max(fwidth(painting.x), .000001);
+        float pixelsDown =
+          cellHeight / max(fwidth(painting.y), .000001);
+        float resolved =
+          smoothstep(3., 7., pixelsAcross) *
+          smoothstep(2., 4., pixelsDown);
+
+        return ink * inside * keep * pulse * groupGain *
+          mix(.65, 1., rnd.y) * resolved;
+      }
       void main(){
         vec2 uv=vUv;
         // Tiny local leaf motion, not a global distortion of architecture.
@@ -224,6 +312,58 @@ export async function createScene(
           smoothstep(.008, .080, max(tex.g, tex.b) - tex.r) *
           smoothstep(.70, .98, tex.b / max(tex.g, .001));
         float waterEffect = wet * waterColour;
+        vec2 glitterPainting = vec2(vUv.x, nearWater);
+
+        // Exactly two additional texture samples.
+        float glitterFine = glitterLayer(glitterPainting, 0.);
+        float glitterScatter = glitterLayer(glitterPainting, 1.);
+
+        float glitterDepth = clamp((nearWater - .14) / .38, 0., 1.);
+        float glitterExtent =
+          smoothstep(.125, .16, nearWater) *
+          (1. - smoothstep(.49, .555, nearWater));
+
+        float sunCentre = mix(.66, .78, glitterDepth);
+        float sunWidth = mix(.05, .14, glitterDepth);
+        float sunBand = 1. - smoothstep(
+          sunWidth * .18, sunWidth, abs(vUv.x - sunCentre)
+        );
+
+        float seaMoonCentre = mix(.88, .81, glitterDepth);
+        float seaMoonWidth = mix(.02, .05, glitterDepth);
+        float seaMoonBand = 1. - smoothstep(
+          seaMoonWidth * .15,
+          seaMoonWidth,
+          abs(vUv.x - seaMoonCentre)
+        );
+
+        float seaMask =
+          isSea *
+          smoothstep(.72, .98, water.r) *
+          (1. - river) *
+          mix(.30, 1., waterColour);
+
+        float glitterClear = pow(1. - clamp(rain, 0., 1.), 3.);
+        float glitterAmount =
+          seaMask * glitterExtent * glitterClear *
+          min(1., glitterFine + glitterScatter * .55);
+
+        // Do not repeatedly bleach the highlights already painted into the sea.
+        float paintedBright = max(tex.r, max(tex.g, tex.b));
+        glitterAmount *= mix(
+          1., .40, smoothstep(.65, .95, paintedBright)
+        );
+
+        vec3 glitterDayColour = mix(
+          vec3(1., .94, .77),
+          vec3(1., .57, .20),
+          evening
+        );
+        vec3 glitterLight = mix(
+          glitterDayColour * sunBand * .52,
+          vec3(.40, .59, .86) * seaMoonBand * .055,
+          night
+        );
 
         // Fixed-distance probes avoid the old resetting wake sweep.
         vec2 riverUv = vec2(riverDir.x / 1.5, -riverDir.y);
@@ -320,6 +460,7 @@ export async function createScene(
           vec3(1., .76, .44) * lampLight * .42;
         vec3 foamColour = mix(foamDay, foamNight, night);
         c = mix(c, foamColour, waterFoam);
+        c += glitterAmount * glitterLight * (vec3(1.) - clamp(c, 0., 1.));
         float edge=1.-smoothstep(.3,.95,length((uv-vec2(.5,.45))*vec2(1.1,1.35)));
         c*=mix(1.,.55+.45*edge,night);
         vec3 overcast=mix(c,vec3(dot(c,vec3(.3,.59,.11))),.5)*vec3(.6,.66,.72);
@@ -546,6 +687,7 @@ export async function createScene(
     const lamps = lampUniforms(next);
     background.uniforms.lamps!.value = lamps.values;
     background.uniforms.waterMap!.value = waterMaps.of(next);
+    background.uniforms.isSea!.value = next === SEA_REGION ? 1 : 0;
     background.uniforms.lampCount!.value = lamps.count;
     // Home stays loaded for the reset button; everything beyond the next exits is freed.
     const nearby = [...new Set([START_REGION, ...nearbyRegions(next)])];
