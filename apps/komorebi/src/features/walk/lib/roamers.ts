@@ -7,8 +7,8 @@ import { passingRoute, presence, routeLength, startGait, walkOn, type Gait } fro
 
 const FRAMES = 4;
 const ANIMAL = {
-  cat: { url: '/art/cat-walk.webp', speed: 11, stride: 2.2, height: 6.2, aspect: 198 / 160 },
-  dog: { url: '/art/dog-walk.webp', speed: 13, stride: 2.6, height: 7.2, aspect: 222 / 160 },
+  cat: { url: '/art/cat-walk.webp', speed: 11, stride: 2.2, height: 3.6, aspect: 198 / 160 },
+  dog: { url: '/art/dog-walk.webp', speed: 13, stride: 2.6, height: 4.6, aspect: 222 / 160 },
 } as const;
 type Animal = keyof typeof ANIMAL;
 
