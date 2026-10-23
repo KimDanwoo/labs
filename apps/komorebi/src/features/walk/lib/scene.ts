@@ -13,6 +13,7 @@ import {
   movePlayer,
   nextRegionStep,
   type Landmark,
+  type PlaceAction,
   type Point,
   type Region,
 } from '@shared/world/world';
@@ -24,6 +25,7 @@ import { createFireflies } from './fireflies';
 import { gameKey, isControlTarget } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
 import { characterScale } from './perspective';
+import { createPlaceEffects } from './placeEffects';
 import { createPortals } from './portals';
 import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './regionPlates';
 import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
@@ -70,6 +72,8 @@ export type WalkEngine = {
   /** Resolves false when the browser could not encode the picture. */
   photo: () => Promise<boolean>;
   travelTo: (id: string) => void;
+  /** Plays a place's little action; false while an earlier one is still playing. */
+  playAction: (kind: PlaceAction, at: Point) => boolean;
 };
 
 /** Painted scenery on depth-separated Three.js planes, with a hand-inked directional child and a connected walkable lane graph. */
@@ -254,6 +258,7 @@ export async function createScene(
   });
   const portalVisuals = createPortals(scene);
   const fireflies = createFireflies(scene);
+  const placeEffects = createPlaceEffects(scene);
   const targetMat = new THREE.SpriteMaterial({
     map: markerMap,
     color: '#fff9cf',
@@ -368,6 +373,7 @@ export async function createScene(
     blockedPortal = portalAt(position, region);
     waitingPortal = null;
     cancelledPortal = null;
+    placeEffects.clear();
     plan();
     wake();
     container.dataset.region = next;
@@ -590,6 +596,7 @@ export async function createScene(
     darkness = settle(THREE.MathUtils.damp(darkness, targetDarkness, 2, dt), targetDarkness, WARMTH_EPSILON);
     background.uniforms.night!.value = darkness;
     fireflies.update(elapsed, darkness, reducedMotion);
+    placeEffects.update(paused ? 0 : dt);
     character.setDarkness(darkness);
     transition = Math.min(1, transition + dt * 1.8);
     background.uniforms.time!.value = reducedMotion ? 0 : elapsed;
@@ -608,6 +615,7 @@ export async function createScene(
       camera.position.y !== targetY ||
       warmth !== targetWarmth ||
       darkness !== targetDarkness ||
+      placeEffects.isPlaying ||
       transition < 1 ||
       (!paused && jump.landing > 0.01);
     if (elapsed - statusTime > 0.12) {
@@ -666,6 +674,12 @@ export async function createScene(
         }
       } else keys.delete(key);
     },
+    playAction(kind, at) {
+      if (placeEffects.isPlaying) return false;
+      if (!reducedMotion) placeEffects.play(kind, at);
+      wake();
+      return true;
+    },
     travelTo(id) {
       destination = id;
       redirect(plan());
@@ -719,6 +733,7 @@ export async function createScene(
       foregroundMaterial.dispose();
       portalVisuals.dispose();
       fireflies.dispose();
+      placeEffects.dispose();
       geo.dispose();
       dustGeo.dispose();
       [background, shadowMat, dustMat, targetMat, ...markerMats].forEach((m) => m.dispose());

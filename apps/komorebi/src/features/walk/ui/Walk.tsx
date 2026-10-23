@@ -13,7 +13,7 @@ import {
 } from '@features/walk/model/hooks';
 import { pageStores } from '@features/walk/model/store';
 import type { Memory } from '@features/walk/model/types';
-import { LANDMARKS, WORLDS } from '@shared/world/world';
+import { LANDMARKS, WORLDS, type Landmark } from '@shared/world/world';
 import { useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { BottomBar } from './BottomBar';
@@ -55,12 +55,21 @@ export function Walk() {
   useAmbienceScene(ambience.setScene, status.region, timeOfDay);
   const hasStarted = hasWalked || hasGuided;
 
-  function openMemory() {
+  function interact() {
     const landmark = status.nearby;
     if (!landmark) return;
+    if (collection.pages[timeOfDay].includes(landmark.id)) {
+      playAction(landmark);
+      return;
+    }
     setMemory(liveMemory(landmark, timeOfDay));
     pageStores[timeOfDay].add(landmark.id);
     setDialog(DIALOG.memory);
+  }
+  function playAction(landmark: Landmark) {
+    if (!engine.current?.playAction(landmark.action.kind, landmark)) return;
+    ambience.cue(landmark.action.kind);
+    toast.notify(landmark.action.caption);
   }
   function readMemory(id: string) {
     const landmark = LANDMARKS.find((p) => p.id === id);
@@ -69,8 +78,8 @@ export function Walk() {
     setMemory(diaryMemory(landmark, keptAt));
     setDialog(DIALOG.memory);
   }
-  function promptHint(id: string) {
-    return collection.pages[timeOfDay].includes(id) ? '추억 다시 읽기' : FIRST_LOOK[timeOfDay];
+  function promptHint(landmark: Landmark) {
+    return collection.pages[timeOfDay].includes(landmark.id) ? landmark.action.label : FIRST_LOOK[timeOfDay];
   }
   function closeDialog(which: Dialog) {
     // Commit now: window-level shortcuts read this state and must not see a dialog the browser already closed.
@@ -94,7 +103,7 @@ export function Walk() {
       isSaved ? '오늘의 여름을 사진으로 간직했어요.' : '사진을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.',
     );
   }
-  useShortcuts({ isEnabled: !isPaused, onDiscover: openMemory, onOpenMap: () => setDialog(DIALOG.map) });
+  useShortcuts({ isEnabled: !isPaused, onDiscover: interact, onOpenMap: () => setDialog(DIALOG.map) });
 
   return (
     <main className={`walk is-${timeOfDay} ${hasStarted ? 'has-started' : ''}`}>
@@ -127,7 +136,7 @@ export function Walk() {
         </div>
       )}
       {status.nearby && !isPaused && (
-        <InteractPrompt landmark={status.nearby} hint={promptHint(status.nearby.id)} onInteract={openMemory} />
+        <InteractPrompt landmark={status.nearby} hint={promptHint(status.nearby)} onInteract={interact} />
       )}
 
       <BottomBar

@@ -13,6 +13,7 @@ export function useAmbience(onUnavailable: () => void) {
   const [isOn, setIsOn] = useState(false);
   const [sound] = useState(() => ({
     step: (...args: Parameters<Ambience['step']>) => audio.current?.step(...args),
+    cue: (...args: Parameters<Ambience['cue']>) => audio.current?.cue(...args),
     setScene(next: Scene) {
       scene.current = next;
       audio.current?.setScene(next.region, next.time);

@@ -1,6 +1,6 @@
 import { TIME, type TimeOfDay } from '@features/walk/model/constants';
 import { SURFACE, type Surface } from '@shared/world/surfaces';
-import type { Region } from '@shared/world/world';
+import { PLACE_ACTION, type PlaceAction, type Region } from '@shared/world/world';
 import { ambienceMix, type AmbienceMix } from './ambienceMix';
 
 const MASTER_VOLUME = 0.22;
@@ -169,8 +169,69 @@ export function createAmbience() {
     source.onended = () => parts.forEach((part) => part.disconnect());
   };
 
+  /** A single decaying sine, the building block of plops, bells and chimes. */
+  const tone = (frequency: number, { at = 0, seconds = 0.6, volume = 0.12, glideTo = frequency } = {}) => {
+    const start = context.currentTime + at;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.frequency.setValueAtTime(frequency, start);
+    oscillator.frequency.exponentialRampToValueAtTime(glideTo, start + seconds);
+    gain.gain.setValueAtTime(volume, start);
+    gain.gain.exponentialRampToValueAtTime(0.0005, start + seconds);
+    oscillator.connect(gain);
+    gain.connect(master);
+    oscillator.start(start);
+    oscillator.stop(start + seconds);
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gain.disconnect();
+    };
+  };
+  const whoosh = (seconds: number, from: number, to: number, volume: number) => {
+    const start = context.currentTime;
+    const source = context.createBufferSource();
+    source.buffer = noise;
+    const filter = context.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(from, start);
+    filter.frequency.exponentialRampToValueAtTime(to, start + seconds);
+    const gain = context.createGain();
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(volume, start + seconds * 0.4);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + seconds);
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(master);
+    source.start(start);
+    source.stop(start + seconds);
+    source.onended = () => [source, filter, gain].forEach((node) => node.disconnect());
+  };
+  const CUES = {
+    [PLACE_ACTION.skip]: () =>
+      [0, 0.3, 0.55].forEach((at, i) => tone(620 - i * 60, { at, seconds: 0.12, glideTo: 180 })),
+    [PLACE_ACTION.gust]: () => whoosh(1.6, 400, 1_600, 1.4),
+    [PLACE_ACTION.shell]: () => {
+      whoosh(1.8, 300, 160, 1.6);
+      tone(2_600, { at: 0.5, seconds: 0.25, volume: 0.05 });
+    },
+    [PLACE_ACTION.bell]: () =>
+      [1_180, 2_470, 3_180].forEach((f, i) => tone(f, { seconds: 2.2 - i * 0.5, volume: 0.07 / (i + 1) })),
+    [PLACE_ACTION.schoolBell]: () => {
+      tone(784, { seconds: 0.9, volume: 0.1 });
+      tone(659, { at: 0.55, seconds: 1.2, volume: 0.1 });
+    },
+    [PLACE_ACTION.windChime]: () =>
+      [0, 0.12, 0.27, 0.36, 0.55].forEach((at) =>
+        tone(2_000 + Math.random() * 1_600, { at, seconds: 0.9, volume: 0.04 }),
+      ),
+  } satisfies Record<PlaceAction, () => void>;
+  const cue = (kind: PlaceAction) => {
+    if (context.state === 'running') CUES[kind]();
+  };
+
   return {
     step,
+    cue,
     setScene(region: Region, time: TimeOfDay) {
       mix = ambienceMix(region, time);
       const now = context.currentTime;

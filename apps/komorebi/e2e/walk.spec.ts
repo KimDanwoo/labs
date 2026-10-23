@@ -207,3 +207,21 @@ test('players from before the day pages keep every page they could read', async 
   await expect(memory).toContainText('노을이 논물 위에 길게 눕는다');
   await expect(memory).toContainText('여름의 조각 3 / 18');
 });
+
+test('once a page is kept, the place offers its little action instead', async ({ page }) => {
+  const errors: Error[] = [];
+  page.on('pageerror', (error) => errors.push(error));
+  await openWalk(page);
+  await page.getByRole('button', { name: '자연 소리 켜기' }).click();
+  await guideTo(page, '물소리 다리');
+  const prompt = page.locator('.interact');
+  await expect(prompt).toContainText('잠깐 머물러 보기', { timeout: 15_000 });
+  await prompt.click();
+  await page.getByRole('dialog', { name: '물소리 다리' }).getByRole('button', { name: '추억 닫기' }).click();
+  await expect(prompt).toContainText('물수제비 뜨기');
+  await prompt.click();
+  await expect(page.getByRole('status')).toContainText('돌이 세 번 튀었다');
+  await expect(page.getByRole('dialog', { name: '물소리 다리' })).toBeHidden();
+  await expect(page.locator('.journal-button b')).toHaveText('1 / 6');
+  expect(errors).toEqual([]);
+});
