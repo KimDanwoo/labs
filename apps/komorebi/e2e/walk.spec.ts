@@ -240,3 +240,10 @@ test('a shower can start and stop, with sound on, without errors', async ({ page
   await expect(page.locator('main.walk')).not.toHaveClass(/is-raining/);
   expect(errors).toEqual([]);
 });
+
+test('a cat or a dog strolls through now and then, but stays home in the rain', async ({ page }) => {
+  await openWalk(page);
+  await expect(landscape(page)).toHaveAttribute('data-visitor', /^(cat|dog)$/, { timeout: 30_000 });
+  await page.getByRole('button', { name: '소나기 내리게 하기' }).click();
+  await expect(landscape(page)).toHaveAttribute('data-visitor', '', { timeout: 5_000 });
+});

@@ -1,0 +1,12 @@
+Tool: Codex image generation (codexgen), 2026-10-23
+Runtime assets: public/art/cat-walk.webp, public/art/dog-walk.webp
+(4 frames each, cropped with one shared box so the ground line does not jump, 160px tall; sources came with alpha)
+
+Cat: A sprite sheet of exactly 4 frames arranged in one horizontal row, evenly spaced, each frame the same size: the
+same small calico cat (white with orange and black patches) walking to the RIGHT, strict side view, full body, a
+4-step walk cycle (contact, down, passing, up) with clearly different leg positions, tail raised. Same scale and same
+ground line in every frame, no overlap between frames. In the style of a lush hand-painted Japanese summer
+countryside anime background (soft cel shading, warm light, gentle dark outlines). Perfectly flat solid pure magenta
+(#FF00FF) background everywhere, no ground, no shadow, no text. Wide 4:1 image.
+
+Dog: same prompt with "the same small cream-and-tan shiba inu dog with a red collar ... curled tail".

@@ -31,6 +31,7 @@ import { createPortals } from './portals';
 import { createRain } from './rain';
 import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './regionPlates';
 import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
+import { createRoamers } from './roamers';
 import { createSceneLife } from './sceneLife';
 
 const CHILD_ATLAS_URL = '/art/child-motion-v2-ready.webp';
@@ -287,6 +288,7 @@ export async function createScene(
   const placeEffects = createPlaceEffects(scene);
   const nightLights = createNightLights(scene);
   const life = createSceneLife(scene, loader);
+  const roamers = createRoamers(scene, loader);
   const rain = createRain(scene);
   const targetMat = new THREE.SpriteMaterial({
     map: markerMap,
@@ -640,6 +642,15 @@ export async function createScene(
     background.uniforms.rain!.value = wetness;
     rain.update(paused ? 0 : dt, wetness, camera.position, reducedMotion);
     life.update({ region, dt: paused ? 0 : dt, elapsed, darkness, isStill: reducedMotion, isRaining: wetness > 0.5 });
+    roamers.update({
+      region,
+      dt: paused ? 0 : dt,
+      darkness,
+      isStill: reducedMotion,
+      isRaining: wetness > 0.5,
+      childZ: position.z,
+    });
+    container.dataset.visitor = roamers.visitor;
     character.setDarkness(darkness);
     transition = Math.min(1, transition + dt * 1.8);
     background.uniforms.time!.value = reducedMotion ? 0 : elapsed;
@@ -788,6 +799,7 @@ export async function createScene(
       placeEffects.dispose();
       nightLights.dispose();
       life.dispose();
+      roamers.dispose();
       rain.dispose();
       geo.dispose();
       dustGeo.dispose();
