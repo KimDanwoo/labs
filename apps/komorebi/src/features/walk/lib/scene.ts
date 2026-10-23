@@ -615,7 +615,7 @@ export async function createScene(
     wetness = settle(THREE.MathUtils.damp(wetness, targetWetness, 1.5, dt), targetWetness, WARMTH_EPSILON);
     background.uniforms.rain!.value = wetness;
     rain.update(paused ? 0 : dt, wetness, camera.position, reducedMotion);
-    life.update({ region, elapsed, darkness, isStill: reducedMotion, isRaining: wetness > 0.5 });
+    life.update({ region, dt: paused ? 0 : dt, elapsed, darkness, isStill: reducedMotion, isRaining: wetness > 0.5 });
     character.setDarkness(darkness);
     transition = Math.min(1, transition + dt * 1.8);
     background.uniforms.time!.value = reducedMotion ? 0 : elapsed;

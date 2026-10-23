@@ -1,113 +1,176 @@
 import type { Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
+import { FLIGHT, startFlight, stepButterfly, stepDragonfly, type Bounds, type Flight } from './flight';
 import { characterScale } from './perspective';
 
 const CAT_URL = '/art/cat-sleeping.webp';
 const FLYER_ORDER = 3.6;
 const CAT_ORDER = 2.5;
-
-const CREATURE = { butterfly: 'butterfly', dragonfly: 'dragonfly', gull: 'gull' } as const;
-type Creature = (typeof CREATURE)[keyof typeof CREATURE];
-
-/** Where each kind of small life wanders, in painting percent (x across, z down). */
-type Haunt = { kind: Creature; x: number; z: number; spreadX: number; spreadZ: number };
-const HAUNTS: Record<Region, Haunt[]> = {
-  village: [
-    { kind: CREATURE.butterfly, x: 18, z: 54, spreadX: 9, spreadZ: 6 },
-    { kind: CREATURE.butterfly, x: 26, z: 60, spreadX: 7, spreadZ: 5 },
-    { kind: CREATURE.dragonfly, x: 70, z: 36, spreadX: 9, spreadZ: 4 },
-  ],
-  river: [
-    { kind: CREATURE.dragonfly, x: 55, z: 66, spreadX: 8, spreadZ: 9 },
-    { kind: CREATURE.dragonfly, x: 62, z: 78, spreadX: 7, spreadZ: 6 },
-    { kind: CREATURE.butterfly, x: 15, z: 82, spreadX: 6, spreadZ: 5 },
-  ],
-  coast: [
-    { kind: CREATURE.gull, x: 72, z: 22, spreadX: 18, spreadZ: 4 },
-    { kind: CREATURE.gull, x: 58, z: 30, spreadX: 14, spreadZ: 3 },
-  ],
-  forest: [
-    { kind: CREATURE.butterfly, x: 31, z: 38, spreadX: 5, spreadZ: 4 },
-    { kind: CREATURE.butterfly, x: 79, z: 38, spreadX: 5, spreadZ: 4 },
-  ],
-  school: [
-    { kind: CREATURE.butterfly, x: 9, z: 34, spreadX: 6, spreadZ: 5 },
-    { kind: CREATURE.dragonfly, x: 40, z: 50, spreadX: 14, spreadZ: 8 },
-  ],
-  shops: [{ kind: CREATURE.butterfly, x: 33, z: 44, spreadX: 4, spreadZ: 3 }],
-};
 const CAT_SPOT = { region: 'village' as Region, x: 14.5, z: 35.5 };
 
-const BODY_SIZE = { butterfly: 3.4, dragonfly: 3.6, gull: 3.2 } satisfies Record<Creature, number>;
-const FLAP_RATE = { butterfly: 13, dragonfly: 40, gull: 2.2 } satisfies Record<Creature, number>;
-const DRIFT_RATE = { butterfly: 0.35, dragonfly: 0.22, gull: 0.08 } satisfies Record<Creature, number>;
+const INSECT = { butterfly: 'butterfly', dragonfly: 'dragonfly' } as const;
+type Insect = (typeof INSECT)[keyof typeof INSECT];
 
-function drawWings(kind: Creature, c: CanvasRenderingContext2D) {
-  if (kind === CREATURE.gull) {
-    c.lineCap = 'round';
-    for (const [style, width] of [
-      ['#55606a', 9],
-      ['#fbfcfa', 5],
-    ] as const) {
-      c.strokeStyle = style;
-      c.lineWidth = width;
-      c.beginPath();
-      c.moveTo(4, 30);
-      c.quadraticCurveTo(18, 12, 32, 28);
-      c.quadraticCurveTo(46, 12, 60, 30);
-      c.stroke();
-    }
-    return;
-  }
-  if (kind === CREATURE.dragonfly) {
-    c.fillStyle = '#eef9ffd0';
-    c.strokeStyle = '#6f97a3';
-    c.lineWidth = 1.5;
-    c.beginPath();
-    c.ellipse(18, 22, 14, 5, -0.2, 0, Math.PI * 2);
-    c.ellipse(46, 22, 14, 5, 0.2, 0, Math.PI * 2);
-    c.fill();
-    c.stroke();
-    c.fillStyle = '#c4542f';
-    c.fillRect(29, 12, 6, 42);
-    return;
-  }
-  c.fillStyle = '#ffd94a';
-  c.strokeStyle = '#a5681f';
+/** A patch of the painting an insect keeps to, with how many may live there. */
+type Patch = { kind: Insect; bounds: Bounds; count: [number, number] };
+const patch = (
+  kind: Insect,
+  minX: number,
+  maxX: number,
+  minZ: number,
+  maxZ: number,
+  count: [number, number],
+): Patch => ({
+  kind,
+  bounds: { minX, maxX, minZ, maxZ },
+  count,
+});
+const PATCHES: Record<Region, Patch[]> = {
+  village: [
+    patch(INSECT.butterfly, 4, 34, 44, 66, [2, 3]),
+    patch(INSECT.butterfly, 62, 90, 52, 70, [0, 1]),
+    patch(INSECT.dragonfly, 58, 84, 30, 42, [1, 2]),
+  ],
+  river: [patch(INSECT.dragonfly, 46, 70, 58, 88, [2, 3]), patch(INSECT.butterfly, 4, 26, 70, 92, [1, 2])],
+  coast: [],
+  forest: [patch(INSECT.butterfly, 24, 40, 32, 44, [1, 2]), patch(INSECT.butterfly, 72, 86, 32, 44, [1, 1])],
+  school: [patch(INSECT.butterfly, 2, 18, 26, 42, [1, 2]), patch(INSECT.dragonfly, 22, 78, 40, 70, [1, 2])],
+  shops: [patch(INSECT.butterfly, 26, 40, 40, 50, [1, 2])],
+};
+const GULL_PATHS: Partial<Record<Region, { x: number; z: number; spread: number }[]>> = {
+  coast: [
+    { x: 72, z: 22, spread: 18 },
+    { x: 58, z: 30, spread: 14 },
+    { x: 84, z: 18, spread: 10 },
+  ],
+};
+
+type Colours = { wing: string; edge: string };
+const BUTTERFLY_COLOURS: Colours[] = [
+  { wing: '#ffd94a', edge: '#a5681f' },
+  { wing: '#f8f6ee', edge: '#5f5a50' },
+  { wing: '#f29b4b', edge: '#5e3216' },
+  { wing: '#9cc3ea', edge: '#3f5f86' },
+];
+const DRAGONFLY_BODIES = ['#c4542f', '#3f6f9e', '#6f8f3a', '#b23a2a'];
+
+function drawButterfly({ wing, edge }: Colours, c: CanvasRenderingContext2D) {
+  c.fillStyle = wing;
+  c.strokeStyle = edge;
   c.lineWidth = 2.5;
   c.beginPath();
-  c.ellipse(20, 24, 13, 15, -0.4, 0, Math.PI * 2);
-  c.ellipse(44, 24, 13, 15, 0.4, 0, Math.PI * 2);
+  c.ellipse(21, 22, 12, 13, -0.45, 0, Math.PI * 2);
+  c.ellipse(43, 22, 12, 13, 0.45, 0, Math.PI * 2);
+  c.ellipse(24, 40, 8, 9, 0.5, 0, Math.PI * 2);
+  c.ellipse(40, 40, 8, 9, -0.5, 0, Math.PI * 2);
   c.fill();
   c.stroke();
-  c.fillStyle = '#5d5140';
-  c.fillRect(30, 14, 4, 24);
+  c.fillStyle = edge;
+  c.fillRect(30, 14, 4, 30);
 }
 
-type Scene = { region: Region; elapsed: number; darkness: number; isStill: boolean; isRaining: boolean };
+function drawDragonfly(body: string, c: CanvasRenderingContext2D) {
+  c.fillStyle = '#e6f4fb70';
+  c.strokeStyle = '#8fb0ba90';
+  c.lineWidth = 1;
+  c.beginPath();
+  c.ellipse(20, 19, 12, 3.6, -0.12, 0, Math.PI * 2);
+  c.ellipse(44, 19, 12, 3.6, 0.12, 0, Math.PI * 2);
+  c.ellipse(21, 26, 10.5, 3.2, 0.18, 0, Math.PI * 2);
+  c.ellipse(43, 26, 10.5, 3.2, -0.18, 0, Math.PI * 2);
+  c.fill();
+  c.stroke();
+  c.fillStyle = body;
+  c.beginPath();
+  c.ellipse(32, 12, 4.5, 4.5, 0, 0, Math.PI * 2);
+  c.ellipse(32, 22, 3.6, 6, 0, 0, Math.PI * 2);
+  c.fill();
+  c.fillRect(30, 26, 4, 34);
+  c.fillStyle = '#00000030';
+  for (let y = 32; y < 58; y += 6) c.fillRect(30, y, 4, 1.5);
+}
+
+function drawGull(c: CanvasRenderingContext2D) {
+  c.lineCap = 'round';
+  for (const [style, width] of [
+    ['#55606a', 9],
+    ['#fbfcfa', 5],
+  ] as const) {
+    c.strokeStyle = style;
+    c.lineWidth = width;
+    c.beginPath();
+    c.moveTo(4, 30);
+    c.quadraticCurveTo(18, 12, 32, 28);
+    c.quadraticCurveTo(46, 12, 60, 30);
+    c.stroke();
+  }
+}
+
+const SIZE = { butterfly: 3.2, dragonfly: 3.8, gull: 3.2 };
+/** Height above the painted ground, in scene units, while flying and while settled. */
+const ALTITUDE = { butterfly: [1.6, 0.5], dragonfly: [3.4, 1.2] } satisfies Record<Insect, [number, number]>;
+
+type Scene = { region: Region; dt: number; elapsed: number; darkness: number; isStill: boolean; isRaining: boolean };
+type Life = {
+  region: Region;
+  kind: Insect;
+  bounds: Bounds;
+  flight: Flight;
+  sprite: THREE.Sprite;
+  material: THREE.SpriteMaterial;
+  size: number;
+  bob: number;
+};
+
+const between = (min: number, max: number) => min + Math.random() * (max - min);
+const pick = <T>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)]!;
 
 /**
- * Small life in each painting: butterflies over gardens, dragonflies over water, gulls over the sea and a
- * sleeping cat. Flyers rest at night, in rain and with reduced motion; they never wake the 60 fps budget.
+ * Small life in each painting: butterflies that wander and settle, dragonflies that hover and dart, gulls over
+ * the sea and a sleeping cat. Colours, numbers and sizes vary per visit. Flyers rest at night, in rain and with
+ * reduced motion, and never wake the 60 fps budget.
  */
 export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader) {
-  const wings = (kind: Creature) => canvasTexture(64, 64, (c) => drawWings(kind, c));
-  const textures = {
-    butterfly: wings(CREATURE.butterfly),
-    dragonfly: wings(CREATURE.dragonfly),
-    gull: wings(CREATURE.gull),
-  } satisfies Record<Creature, THREE.Texture>;
-  const flyers = (Object.keys(HAUNTS) as Region[]).flatMap((region) =>
-    HAUNTS[region].map((haunt, i) => {
-      const material = new THREE.SpriteMaterial({ map: textures[haunt.kind], transparent: true, depthTest: false });
-      const sprite = new THREE.Sprite(material);
-      sprite.renderOrder = FLYER_ORDER;
-      sprite.visible = false;
-      scene.add(sprite);
-      return { region, haunt, sprite, material, phase: i * 1.7 + haunt.x };
-    }),
+  const butterflyTextures = BUTTERFLY_COLOURS.map((colours) => canvasTexture(64, 64, (c) => drawButterfly(colours, c)));
+  const dragonflyTextures = DRAGONFLY_BODIES.map((body) => canvasTexture(64, 64, (c) => drawDragonfly(body, c)));
+  const gullTexture = canvasTexture(64, 64, drawGull);
+  const sprite = (texture: THREE.Texture) => {
+    const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false });
+    const created = new THREE.Sprite(material);
+    created.renderOrder = FLYER_ORDER;
+    created.visible = false;
+    scene.add(created);
+    return { sprite: created, material };
+  };
+
+  const insects: Life[] = (Object.keys(PATCHES) as Region[]).flatMap((region) =>
+    PATCHES[region].flatMap(({ kind, bounds, count }) =>
+      Array.from({ length: Math.round(between(count[0], count[1])) }, () => {
+        const texture = kind === INSECT.butterfly ? pick(butterflyTextures) : pick(dragonflyTextures);
+        const mode = kind === INSECT.butterfly ? FLIGHT.flutter : FLIGHT.hover;
+        return {
+          region,
+          kind,
+          bounds,
+          flight: startFlight(bounds, Math.random, mode),
+          ...sprite(texture),
+          size: SIZE[kind] * between(0.8, 1.2),
+          bob: Math.random() * 10,
+        };
+      }),
+    ),
   );
+  const gulls = Object.entries(GULL_PATHS).flatMap(([region, paths]) =>
+    (paths ?? []).map((path) => ({
+      region,
+      path,
+      rate: between(0.05, 0.11),
+      phase: Math.random() * 10,
+      ...sprite(gullTexture),
+    })),
+  );
+
   const catMaterial = new THREE.SpriteMaterial({ transparent: true, depthTest: false });
   const cat = new THREE.Sprite(catMaterial);
   cat.renderOrder = CAT_ORDER;
@@ -136,24 +199,43 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
     })
     .catch(() => undefined);
 
+  function drawInsect(life: Life, elapsed: number) {
+    const { flight, kind, sprite: s, material, size } = life;
+    const isSettled = flight.mode === FLIGHT.rest;
+    const depth = characterScale(flight.z) * 2.4 * size;
+    const [flying, settled] = ALTITUDE[kind];
+    const bob = isSettled ? 0 : Math.sin(elapsed * 3.1 + life.bob) * 0.5 + Math.sin(elapsed * 7.3 + life.bob) * 0.2;
+    s.position.set(flight.x * 1.2 - 60, 40 - flight.z * 0.8 + (isSettled ? settled : flying + bob), 1);
+    if (kind === INSECT.butterfly) {
+      s.scale.set(depth * (0.2 + 0.8 * Math.abs(Math.cos(flight.wing))), depth, 1);
+      material.rotation = isSettled ? 0 : Math.sin(elapsed * 2 + life.bob) * 0.25;
+      return;
+    }
+    const screenAngle = Math.atan2(-Math.sin(flight.heading) * 0.8, Math.cos(flight.heading) * 1.2);
+    material.rotation = screenAngle - Math.PI / 2;
+    s.scale.set(depth * (0.88 + 0.12 * Math.abs(Math.sin(flight.wing))), depth, 1);
+  }
+
   return {
-    update({ region, elapsed, darkness, isStill, isRaining }: Scene) {
+    update({ region, dt, elapsed, darkness, isStill, isRaining }: Scene) {
       const isFlying = !isStill && !isRaining && darkness < 0.5;
-      for (const flyer of flyers) {
-        const { haunt, sprite, material, phase } = flyer;
-        sprite.visible = isFlying && flyer.region === region;
-        if (!sprite.visible) continue;
-        const t = elapsed * DRIFT_RATE[haunt.kind] + phase;
-        const x = haunt.x + Math.sin(t) * haunt.spreadX + Math.sin(t * 2.3) * haunt.spreadX * 0.25;
-        const z = haunt.z + Math.sin(t * 1.7 + 1) * haunt.spreadZ;
-        // Gulls fly far above the painted ground, so its depth scale would shrink them to specks.
-        const depthScale = haunt.kind === CREATURE.gull ? 1 : characterScale(z) * 2.4;
-        const size = BODY_SIZE[haunt.kind] * depthScale;
-        const flap = 0.35 + 0.65 * Math.abs(Math.sin(elapsed * FLAP_RATE[haunt.kind] + phase));
-        sprite.position.set(x * 1.2 - 60, 40 - z * 0.8 + (haunt.kind === CREATURE.gull ? 0 : 3), 1);
-        sprite.scale.set(size, size * (haunt.kind === CREATURE.gull ? flap : 1), 1);
-        if (haunt.kind === CREATURE.butterfly) sprite.scale.x = size * flap;
-        material.opacity = 1 - darkness;
+      for (const life of insects) {
+        life.sprite.visible = isFlying && life.region === region;
+        if (!life.sprite.visible) continue;
+        const step = life.kind === INSECT.butterfly ? stepButterfly : stepDragonfly;
+        life.flight = step(life.flight, dt, life.bounds, Math.random);
+        life.material.opacity = 1 - darkness;
+        drawInsect(life, elapsed);
+      }
+      for (const gull of gulls) {
+        gull.sprite.visible = isFlying && gull.region === region;
+        if (!gull.sprite.visible) continue;
+        const t = elapsed * gull.rate + gull.phase;
+        const x = gull.path.x + Math.sin(t) * gull.path.spread + Math.sin(t * 2.3) * gull.path.spread * 0.25;
+        const z = gull.path.z + Math.sin(t * 1.7 + 1) * 3;
+        const flap = 0.35 + 0.65 * Math.abs(Math.sin(elapsed * 2.2 + gull.phase));
+        gull.sprite.position.set(x * 1.2 - 60, 40 - z * 0.8, 1);
+        gull.sprite.scale.set(SIZE.gull, SIZE.gull * flap, 1);
       }
       cat.visible = catTexture !== null && region === CAT_SPOT.region;
       if (!cat.visible) return;
@@ -163,11 +245,11 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
     },
     dispose() {
       isDisposed = true;
-      for (const { sprite, material } of flyers) {
-        scene.remove(sprite);
+      for (const { sprite: s, material } of [...insects, ...gulls]) {
+        scene.remove(s);
         material.dispose();
       }
-      Object.values(textures).forEach((texture) => texture.dispose());
+      [...butterflyTextures, ...dragonflyTextures, gullTexture].forEach((texture) => texture.dispose());
       scene.remove(cat);
       catMaterial.dispose();
       catTexture?.dispose();
