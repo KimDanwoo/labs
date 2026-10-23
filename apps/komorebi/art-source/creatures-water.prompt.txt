@@ -13,3 +13,8 @@ sea-foam-raw.png → sea-foam.webp (512², 회색조, R=포말 밀도) — 프�
 Seamless tileable grayscale texture for a hand-painted coastal sea-foam shader. Pure black = no foam; ivory-to-white = foam density. Irregular broken lace, clustered bubbles, torn feathered edges, broad black gaps, mostly horizontal fragmented strokes. Gouache/watercolor animation background character. 20–30% coverage. Must tile on both edge pairs.
 
 water-ripples-raw.png — 첫 물결 시안(현재 미사용)
+
+wave-break-raw.png / wave-crest-raw.png / wave-lace-raw.png → wave-*.webp (각 4×3칸 12프레임, 프롬프트는 Codex 설계 review-_agn8n22, 원화 coast-harbour-road를 CODEXGEN_REF로 첨부)
+- break는 실제 투명 배경으로 나옴. crest·lace는 체크무늬를 '그려' 넣어서, 배경을 단색 마젠타(#FF00FF)로 다시 생성한 뒤 키잉:
+  알파 = (255 − ((R+B)/2 − G)) / 295 (마젠타 255, 청록·아이보리 물빛 ≈ −40), 색은 역합성, 남은 마젠타 번짐 제거.
+- lace는 칸 가장자리가 직선이라 칸마다 좌우·아래 가장자리를 부드럽게 흐림.
