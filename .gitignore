@@ -50,3 +50,5 @@ yarn-error.log*
 next-env.d.ts
 
 .omc
+# Claude–Codex 협업 기록
+.agent-collab/
