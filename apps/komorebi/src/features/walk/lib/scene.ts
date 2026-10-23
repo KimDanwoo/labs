@@ -33,6 +33,7 @@ import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './reg
 import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
 import { createRoamers } from './roamers';
 import { createSceneLife } from './sceneLife';
+import { SEA_ATMOSPHERE_GLSL } from './seaAtmosphere';
 import { createWaterMaps } from './water';
 import { createWaves } from './waves';
 
@@ -159,6 +160,7 @@ export async function createScene(
     fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float rain; uniform float fade;
       uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform sampler2D foam; uniform sampler2D glitter; uniform float isSea; 
       // Sun glitter on the sea (designed by Codex): painted glints, each fading in and out on its own beat.
+      ${SEA_ATMOSPHERE_GLSL}
       vec3 glitterHash(vec2 p) {
         vec3 h = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
         h += dot(h, h.yxz + 33.33);
@@ -313,6 +315,36 @@ export async function createScene(
           smoothstep(.70, .98, tex.b / max(tex.g, .001));
         float waterEffect = wet * waterColour;
         vec2 glitterPainting = vec2(vUv.x, nearWater);
+        // Keep low-frequency body motion separate from painted bright foam.
+        float seaBodyMask =
+          isSea *
+          smoothstep(.80, .995, water.r) *
+          (1. - river) *
+          mix(.65, 1., waterColour);
+
+        float seaSwellValue = 0.;
+        float seaCloudValue = 0.;
+        float seaBoatValue = 0.;
+
+        float seaBoatAA = max(
+          length(fwidth(glitterPainting) / vec2(.058, .011)) * 1.2,
+          .018
+        );
+
+        if (isSea > .5) {
+          seaSwellValue = seaSwell(glitterPainting, time);
+          seaCloudValue = seaCloud(glitterPainting, time);
+          seaBoatValue = seaBoatRipples(
+            glitterPainting, time, seaBoatAA
+          );
+        }
+
+        // Clouds lose their distinct shadows under overcast skies.
+        float seaCloudShade =
+          seaCloudValue *
+          (1. - night) *
+          (1. - rain) * (1. - rain) *
+          mix(1., .7, evening);
 
         // Exactly two additional texture samples.
         float glitterFine = glitterLayer(glitterPainting, 0.);
@@ -407,6 +439,23 @@ export async function createScene(
         float waterFoam = clamp(waterEffect * riverSpray * (1. + rain * .20), 0., .88);
 
         vec3 c = tex.rgb;
+
+        // 1. Broad changes in reflected light, before time-of-day grading.
+        // Preserve contrast in the foam already painted into the image.
+        float seaPaintHighlight = smoothstep(
+          .55, .92, max(tex.r, max(tex.g, tex.b))
+        );
+        float seaBodyGain =
+          seaBodyMask *
+          mix(1., .4, seaPaintHighlight) *
+          mix(1., .55, night) *
+          mix(1., .65, rain);
+
+        c *= 1. + seaSwellValue * seaBodyGain;
+
+        // 2. Soft cloud shadows: subtle cooling, no white overlay.
+        c *= vec3(1.) -
+          vec3(.13, .10, .055) * seaCloudShade * seaBodyMask;
         vec3 warm=c*vec3(1.09,.79,.67)+vec3(.025,.005,.018);
         c=mix(c,warm,evening*.65);
         // Linear light: these factors read about twice as bright once converted for the screen.
@@ -460,7 +509,23 @@ export async function createScene(
           vec3(1., .76, .44) * lampLight * .42;
         vec3 foamColour = mix(foamDay, foamNight, night);
         c = mix(c, foamColour, waterFoam);
-        c += glitterAmount * glitterLight * (vec3(1.) - clamp(c, 0., 1.));
+        // The same cloud field dims the sun glitter.
+        float seaSunVisibility =
+          1. - seaCloudShade * seaBodyMask * .78;
+
+        c += glitterAmount * glitterLight * seaSunVisibility *
+          (vec3(1.) - clamp(c, 0., 1.));
+
+        // 3. Short, broken ripples on the visible side of the hull.
+        // foamColour already follows evening, night and nearby lights.
+        float seaHullRippleAmount =
+          seaBoatValue *
+          seaBodyMask *
+          .085 *
+          mix(1., .55, rain) *
+          (1. - seaCloudShade * .45);
+
+        c = mix(c, foamColour, seaHullRippleAmount);
         float edge=1.-smoothstep(.3,.95,length((uv-vec2(.5,.45))*vec2(1.1,1.35)));
         c*=mix(1.,.55+.45*edge,night);
         vec3 overcast=mix(c,vec3(dot(c,vec3(.3,.59,.11))),.5)*vec3(.6,.66,.72);

@@ -1,3 +1,4 @@
+import { COAST_BOAT_OUTLINE } from '@shared/world/coastBoat';
 import { WATER } from '@shared/world/water';
 import type { Region } from '@shared/world/world';
 import * as THREE from 'three';
@@ -5,6 +6,7 @@ import { canvasTexture } from './art';
 
 const SIZE = { width: 384, height: 256 };
 const STILL = 'rgb(0, 128, 128)';
+const BOAT_REGION: Region = 'coast';
 const EDGE_BLUR = 'blur(2px)';
 const FOAM_URL = '/art/sea-foam.webp';
 const GLITTER_URL = '/art/sea-glitter.webp';
@@ -24,6 +26,13 @@ function paintWater(region: Region) {
       c.fillStyle = `rgb(255, ${channel(flow[0] * speed)}, ${channel(flow[1] * speed)})`;
       c.beginPath();
       outline.forEach(([x, z]) => c.lineTo((x / 100) * SIZE.width, (z / 100) * SIZE.height));
+      c.fill();
+    }
+    // The moored boat is painted on the water; keep the sea's motion off it.
+    if (region === BOAT_REGION) {
+      c.fillStyle = STILL;
+      c.beginPath();
+      COAST_BOAT_OUTLINE.forEach(([x, z]) => c.lineTo((x / 100) * SIZE.width, (z / 100) * SIZE.height));
       c.fill();
     }
   });
