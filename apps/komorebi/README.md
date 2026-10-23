@@ -66,7 +66,6 @@ node apps/komorebi/e2e/serve.mjs apps/komorebi/out 3011
 - `src/shared/world/surfaces.ts`: 그림 속 바닥 재질(흙·돌·나무·모래) 구역
 - `src/shared/world`: 그림 속 길에 맞춘 이동 영역, 지역 연결, 최단 경로
 - `public/art`: 내장 이미지 생성 도구로 새로 제작한 여섯 장의 배경화
-- `art-source`: 런타임에 쓰지 않는 생성 원본 그림(배포 제외 보관용)
 - `scripts/*.test.ts`: 이동 영역·경로·렌더 예산·저장 데이터·추억 문장 단위 테스트
 - `e2e/`: Playwright 브라우저 테스트(입력·일시정지·지역 로딩 대기/실패·노을 추억)
 
