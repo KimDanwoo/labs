@@ -1,30 +1,39 @@
-import { FIRST_DAY, wakeFromSleep, weatherAfterRest, weatherDelay } from '@features/walk/lib/dayCycle';
-import { WEATHER } from '@features/walk/model/constants';
-import { useEffect, useState } from 'react';
+import { wakeFromSleep, weatherAfterRest, weatherDelay } from '@features/walk/lib/dayCycle';
+import { WEATHER, type Weather } from '@features/walk/model/constants';
+import { villageDayStore } from '@features/walk/model/store';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 
 export function useVillageDay(isPaused: boolean) {
-  const [today, setToday] = useState(FIRST_DAY);
+  const today = useSyncExternalStore(villageDayStore.subscribe, villageDayStore.get, villageDayStore.getServer);
+  const countdown = useRef<{ weather: Weather; remaining: number } | null>(null);
   useEffect(() => {
     if (isPaused) return undefined;
     let timer: ReturnType<typeof setTimeout>;
-    let weather = today.weather;
+    let deadline = 0;
     const schedule = () => {
-      timer = setTimeout(
-        () => {
-          weather = weather === WEATHER.rain ? WEATHER.clear : weatherAfterRest(Math.random());
-          setToday((current) => ({ ...current, weather }));
-          schedule();
-        },
-        weatherDelay(weather, Math.random()),
-      );
+      const current = villageDayStore.get();
+      const pending = countdown.current;
+      const delay =
+        pending?.weather === current.weather ? pending.remaining : weatherDelay(current.weather, Math.random());
+      countdown.current = { weather: current.weather, remaining: delay };
+      deadline = Date.now() + delay;
+      timer = setTimeout(() => {
+        const latest = villageDayStore.get();
+        const weather = latest.weather === WEATHER.rain ? WEATHER.clear : weatherAfterRest(Math.random());
+        countdown.current = { weather, remaining: weatherDelay(weather, Math.random()) };
+        villageDayStore.set({ ...latest, weather });
+        schedule();
+      }, delay);
     };
     schedule();
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (countdown.current) countdown.current.remaining = Math.max(0, deadline - Date.now());
+    };
   }, [isPaused, today.weather]);
   function wakeUp() {
-    // Sample once per sleep, outside React's replayable state updater.
-    const random = Math.random();
-    setToday((current) => wakeFromSleep(current, random));
+    countdown.current = null;
+    villageDayStore.set(wakeFromSleep(villageDayStore.get(), Math.random()));
   }
   return { ...today, wakeUp };
 }

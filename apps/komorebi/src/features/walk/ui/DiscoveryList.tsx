@@ -4,6 +4,7 @@ import { LANDMARKS } from '@shared/world/world';
 type Props = {
   pages: Record<TimeOfDay, readonly string[]>;
   isReady: boolean;
+  isJournal?: boolean;
   onGuide: (id: string) => void;
   onRead: (id: string) => void;
 };
@@ -13,7 +14,7 @@ function keptLabel(times: TimeOfDay[]) {
   return `${times.map((time) => TIME_LABEL[time]).join(' · ')}의 추억`;
 }
 
-export function DiscoveryList({ pages, isReady, onGuide, onRead }: Props) {
+export function DiscoveryList({ pages, isReady, isJournal = false, onGuide, onRead }: Props) {
   return (
     <div className="discovery-list">
       {LANDMARKS.map((p) => {
@@ -22,7 +23,12 @@ export function DiscoveryList({ pages, isReady, onGuide, onRead }: Props) {
         const stampTimes = keptAt.map((time) => `kept-${time}`).join(' ');
         return (
           <div key={p.id} className="discovery-item">
-            <button className="discovery-guide" onClick={() => onGuide(p.id)} disabled={!isReady}>
+            <button
+              className="discovery-guide"
+              aria-label={isJournal && isCollected ? `${p.name} 추억 다시 읽기` : undefined}
+              onClick={() => (isJournal ? onRead(p.id) : onGuide(p.id))}
+              disabled={isJournal ? !isCollected : !isReady}
+            >
               <span className={`stamp ${isCollected ? 'collected' : ''} ${stampTimes}`}>{p.icon}</span>
               <div>
                 <strong>{p.name}</strong>
@@ -30,7 +36,7 @@ export function DiscoveryList({ pages, isReady, onGuide, onRead }: Props) {
               </div>
               <span className="discovery-check">{isCollected ? '✓' : '→'}</span>
             </button>
-            {isCollected && (
+            {isCollected && !isJournal && (
               <button className="discovery-read" aria-label={`${p.name} 추억 다시 읽기`} onClick={() => onRead(p.id)}>
                 읽기
               </button>

@@ -4,7 +4,8 @@ import { advanceMotion, createMotion, crossedFootfall } from './motion';
 import { lightSprite } from './nightLights';
 
 /** Authored 4-direction artwork with idle, six walk poses and an airborne pose. Identity never morphs when turning. */
-export function createChild(atlas: THREE.Texture) {
+export function createChild(initialAtlas: THREE.Texture) {
+  let atlas = initialAtlas;
   const group = new THREE.Group();
   atlas.repeat.set(1 / 8, 1 / 4);
   atlas.offset.set(0, 3 / 4);
@@ -19,6 +20,18 @@ export function createChild(atlas: THREE.Texture) {
   let frame = -1;
   return {
     group,
+    setAtlas(next: THREE.Texture) {
+      atlas = next;
+      atlas.repeat.set(1 / 8, 1 / 4);
+      atlas.offset.set(0, (3 - facing) / 4);
+      material.map = atlas;
+      material.needsUpdate = true;
+      frame = -1;
+    },
+    setOpacity(value: number) {
+      material.opacity = value;
+      sprite.visible = value > 0.001;
+    },
     update(
       dt: number,
       travel: number,

@@ -170,11 +170,26 @@ export function createCountryside(scene: THREE.Scene) {
     return { mesh, material, map };
   });
   const birdMaps = [sparrowTexture(0), sparrowTexture(1), sparrowTexture(-1)];
-  const birds = [
-    startSparrow({ x: 30.5, z: 47 }, { x: 22, z: 31 }, 0.2),
-    startSparrow({ x: 33, z: 47.7 }, { x: 24, z: 29 }, 1.3),
-    startSparrow({ x: 49.5, z: 60 }, { x: 40.7, z: 48 }, 2.8),
-  ].map((bird) => {
+  const leftBirdMaps = birdMaps.map((map) => {
+    const mirrored = map.clone();
+    mirrored.repeat.x = -1;
+    mirrored.offset.x = 1;
+    return mirrored;
+  });
+  const birdHomes: { region: Region; ground: Point; perch: Point }[] = [
+    { region: 'village', ground: { x: 30.5, z: 47 }, perch: { x: 22, z: 31 } },
+    { region: 'village', ground: { x: 33, z: 47.7 }, perch: { x: 24, z: 29 } },
+    { region: 'village', ground: { x: 49.5, z: 60 }, perch: { x: 40.7, z: 48 } },
+    { region: 'school', ground: { x: 37, z: 49 }, perch: { x: 25, z: 28 } },
+    { region: 'school', ground: { x: 40, z: 51 }, perch: { x: 28, z: 26 } },
+    { region: 'shops', ground: { x: 48, z: 59 }, perch: { x: 34, z: 42 } },
+    { region: 'shops', ground: { x: 51, z: 58 }, perch: { x: 64, z: 31 } },
+    { region: 'river', ground: { x: 21, z: 49 }, perch: { x: 31, z: 30 } },
+    { region: 'forest', ground: { x: 42, z: 70 }, perch: { x: 25, z: 50 } },
+    { region: 'forest', ground: { x: 46, z: 72 }, perch: { x: 76, z: 44 } },
+  ];
+  const birds = birdHomes.map(({ region, ground, perch }, i) => {
+    const bird = startSparrow(ground, perch, i * 1.3 + 0.2);
     const material = new THREE.SpriteMaterial({
       map: birdMaps[0],
       transparent: true,
@@ -185,7 +200,7 @@ export function createCountryside(scene: THREE.Scene) {
     sprite.center.set(0.5, 0.12);
     sprite.renderOrder = 3.6;
     scene.add(sprite);
-    return { bird, sprite, material };
+    return { region, bird, sprite, material, facingLeft: false, opacity: 0 };
   });
   return {
     update({
@@ -211,18 +226,28 @@ export function createCountryside(scene: THREE.Scene) {
         mesh.visible = visible;
         lightSprite(material.color, darkness, 0.08);
       }
-      for (const { bird, sprite, material } of birds) {
-        sprite.visible = visible && darkness < 0.65 && !isRaining;
+      for (const entry of birds) {
+        const { region: birdRegion, bird, sprite, material } = entry;
+        if (birdRegion !== region) {
+          sprite.visible = false;
+          entry.opacity = 0;
+          continue;
+        }
+        const targetOpacity = isRaining ? 0 : 1 - THREE.MathUtils.smoothstep(darkness, 0.3, 0.65);
+        entry.opacity = isStill ? targetOpacity : THREE.MathUtils.damp(entry.opacity, targetOpacity, 3, dt);
+        sprite.visible = entry.opacity > 0.005;
         if (!sprite.visible) continue;
+        const previousX = bird.at.x;
         if (!isStill && dt > 0) stepSparrow(bird, player, dt);
+        if (Math.abs(bird.at.x - previousX) > 0.0005) entry.facingLeft = bird.at.x < previousX;
         const flying = bird.state === BIRD_STATE.flying || bird.state === BIRD_STATE.returning;
-        material.map = birdMaps[flying ? 1 + (Math.floor(bird.age * 12) % 2) : 0]!;
+        material.map = (entry.facingLeft ? leftBirdMaps : birdMaps)[flying ? 1 + (Math.floor(bird.age * 12) % 2) : 0]!;
         const height = characterScale(bird.at.z) * 2.7;
         const peck = !flying && (bird.age + bird.seed) % 3.7 > 3.3;
-        material.rotation = peck ? -0.22 : 0;
+        material.rotation = Number(peck) * (entry.facingLeft ? 0.22 : -0.22);
         sprite.scale.set(height * 1.33, height, 1);
         sprite.position.set(bird.at.x * 1.2 - 60, 40 - bird.at.z * 0.8 + bird.lift, 0.7);
-        material.opacity = 1 - THREE.MathUtils.smoothstep(darkness, 0.3, 0.65);
+        material.opacity = entry.opacity;
         lightSprite(material.color, darkness, 0);
       }
     },
@@ -240,7 +265,7 @@ export function createCountryside(scene: THREE.Scene) {
         scene.remove(sprite);
         material.dispose();
       }
-      birdMaps.forEach((map) => map.dispose());
+      [...birdMaps, ...leftBirdMaps].forEach((map) => map.dispose());
     },
   };
 }

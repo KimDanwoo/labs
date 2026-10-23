@@ -2,9 +2,15 @@ import { LANDMARKS } from '@shared/world/world';
 import { ControlsHint } from './ControlsHint';
 import { Icon } from './Icon';
 
-type Props = { place: string; visited: readonly string[]; shouldShowHint: boolean; onOpenJournal: () => void };
+type Props = {
+  place: string;
+  visited: readonly string[];
+  shouldShowHint: boolean;
+  isPaused?: boolean;
+  onOpenJournal: () => void;
+};
 
-export function BottomBar({ place, visited, shouldShowHint, onOpenJournal }: Props) {
+export function BottomBar({ place, visited, shouldShowHint, isPaused = false, onOpenJournal }: Props) {
   return (
     <footer className="bottom-bar">
       <div className="location">
@@ -15,7 +21,7 @@ export function BottomBar({ place, visited, shouldShowHint, onOpenJournal }: Pro
         </div>
       </div>
       {shouldShowHint && <ControlsHint />}
-      <button className="journal-button" onClick={onOpenJournal}>
+      <button className="journal-button" disabled={isPaused} onClick={onOpenJournal}>
         <span className="journal-dots">
           {LANDMARKS.map((p) => (
             <span key={p.id} className={visited.includes(p.id) ? 'filled' : ''} />

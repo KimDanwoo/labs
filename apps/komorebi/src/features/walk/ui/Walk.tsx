@@ -1,7 +1,7 @@
 'use client';
 
 import { diaryMemory, liveMemory } from '@features/walk/lib/memory';
-import { DIALOG, TIME, TIME_ORDER, WEATHER, type Dialog, type TimeOfDay } from '@features/walk/model/constants';
+import { DIALOG, TIME_ORDER, WEATHER, type Dialog, type TimeOfDay } from '@features/walk/model/constants';
 import {
   useAmbience,
   useAmbienceScene,
@@ -12,10 +12,11 @@ import {
   useVillageDay,
   useWalkEngine,
 } from '@features/walk/model/hooks';
-import { pageStores } from '@features/walk/model/store';
+import { appearanceStore, pageStores } from '@features/walk/model/store';
 import type { Memory } from '@features/walk/model/types';
-import { HOME_BED, LANDMARKS, WORLDS, type Landmark } from '@shared/world/world';
-import { useRef, useState } from 'react';
+import type { Appearance } from '@shared/world/appearance';
+import { HOME_DESK, HOME_WARDROBE, LANDMARKS, WORLDS, type Landmark } from '@shared/world/world';
+import { useRef, useState, useSyncExternalStore } from 'react';
 import { flushSync } from 'react-dom';
 import { BottomBar } from './BottomBar';
 import { GameHeader } from './GameHeader';
@@ -26,6 +27,7 @@ import { MemoryDialog } from './MemoryDialog';
 import { MobileControls } from './MobileControls';
 import { SleepTransition } from './SleepTransition';
 import { ToolBar } from './ToolBar';
+import { WardrobeDialog } from './WardrobeDialog';
 
 const FIRST_LOOK = {
   day: '잠깐 머물러 보기',
@@ -40,6 +42,7 @@ export function Walk() {
   const [memory, setMemory] = useState<Memory | null>(null);
   const [hasGuided, setHasGuided] = useState(false);
   const [isSleeping, setIsSleeping] = useState(false);
+  const appearance = useSyncExternalStore(appearanceStore.subscribe, appearanceStore.get, appearanceStore.getServer);
   const isPaused = dialog !== DIALOG.none || isSleeping;
   const today = useVillageDay(isPaused);
   const timeOfDay = today.time;
@@ -50,20 +53,36 @@ export function Walk() {
   const isFirstVisit = useIsFirstVisit();
   const ambience = useAmbience(() => toast.notify('이 브라우저에서는 소리를 재생할 수 없어요.'));
   const { engine, isReady, error, status, hasWalked } = useWalkEngine(landscapeRef, {
+    appearance,
     timeOfDay,
     weather,
     isSprinting,
     isPaused,
     onNotice: toast.notify,
     onStep: ambience.step,
+    onSleep: () => setIsSleeping(true),
   });
   useAmbienceScene(ambience.setScene, { region: status.region, time: timeOfDay, weather });
   const hasStarted = hasWalked || hasGuided;
-  const isNearBed = status.region === 'home' && Math.hypot(status.x - HOME_BED.x, status.z - HOME_BED.z) < 4.5;
+
+  const isNearDesk = status.region === 'home' && Math.hypot(status.x - HOME_DESK.x, status.z - HOME_DESK.z) < 4.5;
+  const isNearWardrobe =
+    status.region === 'home' && Math.hypot(status.x - HOME_WARDROBE.x, status.z - HOME_WARDROBE.z) < 4.5;
+
+  async function changeAppearance(next: Appearance) {
+    if (!(await engine.current?.setAppearance(next))) return false;
+    appearanceStore.set(next);
+    return true;
+  }
 
   function interact() {
-    if (isNearBed) {
-      setIsSleeping(true);
+    if (isPaused) return;
+    if (isNearWardrobe) {
+      setDialog(DIALOG.wardrobe);
+      return;
+    }
+    if (isNearDesk) {
+      setDialog(DIALOG.journal);
       return;
     }
     const landmark = status.nearby;
@@ -99,12 +118,12 @@ export function Walk() {
   function guideTo(id: string) {
     engine.current?.travelTo(id);
     setHasGuided(true);
-    closeDialog(DIALOG.map);
+    closeDialog(dialog === DIALOG.journal ? DIALOG.journal : DIALOG.map);
     toast.notify('길을 따라 걸어갈게요. 방향키를 누르면 직접 움직일 수 있어요.');
   }
   function returnHome() {
     engine.current?.reset();
-    closeDialog(DIALOG.map);
+    closeDialog(dialog === DIALOG.journal ? DIALOG.journal : DIALOG.map);
     toast.notify('처음 출발했던 마을 입구로 돌아왔어요.');
   }
   async function takePhoto() {
@@ -132,28 +151,33 @@ export function Walk() {
         timeOfDay={timeOfDay}
         isRaining={isRaining}
         isSoundOn={ambience.isOn}
-        isReady={isReady}
+        isReady={isReady && !isSleeping}
         onToggleSound={ambience.toggle}
         onPhoto={takePhoto}
-        onOpenMap={() => setDialog(DIALOG.map)}
+        onOpenMap={() => {
+          if (!isSleeping) setDialog(DIALOG.map);
+        }}
+        onOpenWardrobe={() => {
+          if (!isSleeping) setDialog(DIALOG.wardrobe);
+        }}
       />
 
-      {isNearBed && !isPaused && (
-        <InteractPrompt
-          landmark={HOME_BED}
-          hint={timeOfDay === TIME.night ? '아침까지 푹 자기' : '잠깐 눈 붙이기'}
-          onInteract={interact}
-        />
+      {isNearDesk && !isPaused && <InteractPrompt landmark={HOME_DESK} hint="그림일기 펼치기" onInteract={interact} />}
+      {isNearWardrobe && !isPaused && (
+        <InteractPrompt landmark={HOME_WARDROBE} hint="옷 갈아입기" onInteract={interact} />
       )}
       {status.nearby && !isPaused && (
         <InteractPrompt landmark={status.nearby} hint={promptHint(status.nearby)} onInteract={interact} />
       )}
 
       <BottomBar
+        isPaused={isSleeping}
         place={status.nearby?.short ?? WORLDS[status.region].name}
         visited={collection.visited}
         shouldShowHint={isFirstVisit && isReady && !hasStarted}
-        onOpenJournal={() => setDialog(DIALOG.map)}
+        onOpenJournal={() => {
+          if (!isSleeping) setDialog(DIALOG.journal);
+        }}
       />
       <MobileControls
         isReady={isReady}
@@ -169,13 +193,14 @@ export function Walk() {
       {!isReady && <LoadingOverlay error={error} />}
 
       <MapDialog
-        isOpen={dialog === DIALOG.map}
+        isOpen={dialog === DIALOG.map || dialog === DIALOG.journal}
+        isJournal={dialog === DIALOG.journal}
         isReady={isReady}
         region={status.region}
         position={status}
         steps={status.steps}
         collection={collection}
-        onClose={() => closeDialog(DIALOG.map)}
+        onClose={() => closeDialog(dialog === DIALOG.journal ? DIALOG.journal : DIALOG.map)}
         onGuide={guideTo}
         onRead={readMemory}
         onReset={returnHome}
@@ -184,6 +209,7 @@ export function Walk() {
         <SleepTransition
           onWake={today.wakeUp}
           onDone={() => {
+            engine.current?.finishSleep();
             setIsSleeping(false);
             landscapeRef.current?.querySelector('canvas')?.focus({ preventScroll: true });
           }}
@@ -194,6 +220,12 @@ export function Walk() {
         memory={memory}
         pageCount={collection.pageCount}
         onClose={() => closeDialog(DIALOG.memory)}
+      />
+      <WardrobeDialog
+        isOpen={dialog === DIALOG.wardrobe}
+        appearance={appearance}
+        onChange={changeAppearance}
+        onClose={() => closeDialog(DIALOG.wardrobe)}
       />
     </main>
   );

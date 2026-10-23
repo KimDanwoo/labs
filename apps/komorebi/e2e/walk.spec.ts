@@ -60,6 +60,7 @@ async function guideTo(page: Page, landmark: string) {
 async function walkToBed(page: Page) {
   await guideTo(page, '파란 지붕 우리 집');
   await expect(landscape(page)).toHaveAttribute('data-region', 'home', { timeout: 25_000 });
+  await expect(page.locator('.village-map')).toHaveAttribute('aria-label', /현재 좌표 36, 70/, { timeout: 10_000 });
   await expect(landscape(page)).toHaveAttribute('data-motion', 'idle', { timeout: 10_000 });
   await page.locator('.landscape canvas').focus();
   const coordinate = async (axis: number) => {
@@ -67,19 +68,19 @@ async function walkToBed(page: Page) {
     return Number(label!.match(/현재 좌표 (\d+), (\d+)/)![axis]);
   };
   await page.keyboard.down('ArrowDown');
-  await expect.poll(() => coordinate(2), { intervals: [50] }).toBeGreaterThanOrEqual(78);
+  await expect.poll(() => coordinate(2), { intervals: [50] }).toBeGreaterThanOrEqual(73);
   await page.keyboard.up('ArrowDown');
   await page.keyboard.down('ArrowRight');
-  await expect.poll(() => coordinate(1), { intervals: [50], timeout: 10_000 }).toBeGreaterThanOrEqual(68);
+  // Keep walking until the quilt is actually reached; rounded map coordinates can stop short.
+  await expect(landscape(page)).toHaveAttribute('data-motion', 'sleeping', { timeout: 10_000 });
   await page.keyboard.up('ArrowRight');
-  await expect(landscape(page)).toHaveAttribute('data-motion', 'idle');
-  await expect(page.locator('.interact', { hasText: '포근한 잠자리' })).toBeVisible();
+  await expect(landscape(page)).toHaveAttribute('data-rest', 'tucked');
+  await expect(page.locator('.interact', { hasText: '포근한 잠자리' })).toHaveCount(0);
 }
 
 async function sleepAtHome(page: Page, count = 1) {
-  await walkToBed(page);
   for (let i = 0; i < count; i++) {
-    await page.locator('.interact', { hasText: '포근한 잠자리' }).click();
+    await walkToBed(page);
     await expect(page.locator('.sleep-transition')).toBeVisible();
     await expect(page.locator('.sleep-transition')).toHaveCount(0, { timeout: 5_000 });
   }
@@ -290,8 +291,21 @@ test('home is a walkable map with a bed and a doorway back to the village', asyn
   await expect(page.locator('.home-dialog')).toHaveCount(0);
   await expect(landscape(page)).toHaveAttribute('data-surface', 'wood');
   await page.screenshot({ path: '/tmp/komorebi-home-day.png' });
+  if (process.env.SHOT_DIR) {
+    for (let frame = 0; frame < 4; frame++) {
+      await page.waitForTimeout(140);
+      await page.screenshot({
+        path: `${process.env.SHOT_DIR}/fan-${frame}.png`,
+        clip: { x: 625, y: 340, width: 90, height: 120 },
+      });
+    }
+  }
+
   for (const phase of ['evening', 'night', 'day']) {
-    await page.locator('.interact', { hasText: '포근한 잠자리' }).click();
+    if (phase !== 'evening') await walkToBed(page);
+    await expect(landscape(page)).toHaveAttribute('data-rest', 'tucked');
+    await expect(page.getByRole('button', { name: '산책 지도 열기' })).toBeDisabled();
+    if (phase === 'evening') await page.screenshot({ path: '/tmp/komorebi-tucked.png' });
     await expect(page.locator('main.walk')).toHaveClass(new RegExp(`is-${phase}`));
     await expect(page.locator('.sleep-transition')).toHaveCount(0);
   }
@@ -310,12 +324,112 @@ test('home is a walkable map with a bed and a doorway back to the village', asyn
   await page.keyboard.up('ArrowUp');
   await expect(landscape(page)).toHaveAttribute('data-motion', 'idle');
   await page.screenshot({ path: '/tmp/komorebi-home-desk.png' });
+  await expect(page.locator('.interact')).toContainText('그림일기 펼치기');
+  await page.keyboard.press('KeyE');
+  const journal = page.getByRole('dialog', { name: '나의 여름 그림일기' });
+  await expect(journal).toBeVisible();
+  await expect(journal.locator('.village-map')).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(journal).toBeHidden();
+  await expect(landscape(page)).toHaveAttribute('data-region', 'home');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: '/tmp/komorebi-home-mobile.png' });
   await guideTo(page, '바람이 머무는 논');
   await expect(landscape(page)).toHaveAttribute('data-region', 'village', { timeout: 20_000 });
+  await page.reload();
+  await expect(page.locator('.loading')).toHaveCount(0, { timeout: 20_000 });
+  await expect(page.locator('.game-header')).toContainText('2일째');
+  await expect(page.locator('main.walk')).toHaveClass(/is-day/);
   expect(errors).toEqual([]);
+});
+
+test('tapping the painted quilt and desk walks to their usable side', async ({ page }) => {
+  await openWalk(page);
+  await guideTo(page, '파란 지붕 우리 집');
+  await expect(landscape(page)).toHaveAttribute('data-region', 'home', { timeout: 25_000 });
+  await expect(landscape(page)).toHaveAttribute('data-motion', 'idle', { timeout: 10_000 });
+  const canvas = page.locator('.landscape canvas');
+  await canvas.hover({ position: { x: 975, y: 580 } });
+  await expect(canvas).toHaveCSS('cursor', 'pointer');
+  await canvas.click({ position: { x: 975, y: 580 } });
+  await expect(landscape(page)).toHaveAttribute('data-rest', 'tucked', { timeout: 15_000 });
+  await expect(page.locator('.sleep-transition')).toHaveCount(0, { timeout: 6_000 });
+  await page.waitForTimeout(400);
+  await expect(landscape(page)).toHaveAttribute('data-rest', '');
+  await expect(landscape(page)).toHaveAttribute('data-motion', 'idle');
+  await canvas.click({ position: { x: 495, y: 395 } });
+  await expect(page.locator('.interact', { hasText: '그림일기 책상' })).toBeVisible({ timeout: 15_000 });
+  await page.keyboard.press('KeyE');
+  await expect(page.getByRole('dialog', { name: '나의 여름 그림일기' })).toBeVisible();
+});
+
+test('a rainy home stays sheltered and the mobile sleeper wakes with movement restored', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('komorebi-village-day-v1', JSON.stringify({ day: 3, time: 'day', weather: 'rain' }));
+  });
+  await openWalk(page);
+  await walkToBed(page);
+  await page.screenshot({ path: '/tmp/komorebi-home-rain.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(landscape(page)).toHaveAttribute('data-rest', 'tucked');
+  await page.screenshot({ path: '/tmp/komorebi-tucked-mobile.png' });
+  await expect(page.locator('.sleep-transition')).toHaveCount(0, { timeout: 6_000 });
+  await expect(page.locator('main.walk')).toHaveClass(/is-evening/);
+  await page.locator('.landscape canvas').focus();
+  await page.keyboard.down('ArrowLeft');
+  await expect(landscape(page)).toHaveAttribute('data-motion', 'running');
+  await page.keyboard.up('ArrowLeft');
+});
+
+test('the wardrobe changes both templates and outfits, keeps the choice after sleep and reload', async ({ page }) => {
+  test.setTimeout(90_000);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await openWalk(page);
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'boy-summer');
+  await page.getByRole('button', { name: '캐릭터와 옷 고르기' }).click();
+  const wardrobe = page.getByRole('dialog', { name: '나의 작은 옷장' });
+  await wardrobe.getByRole('button', { name: /여자/ }).click();
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'girl-summer');
+  await wardrobe.getByRole('button', { name: /풀잎 멜빵옷/ }).click();
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'girl-overalls');
+  await wardrobe.getByRole('button', { name: /남자/ }).click();
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'boy-overalls');
+  await wardrobe.getByRole('button', { name: /여자/ }).click();
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'girl-overalls');
+  await page.screenshot({ path: '/tmp/komorebi-wardrobe.png' });
+  await page.keyboard.press('Escape');
+  await expect(wardrobe).toBeHidden();
+  await expect(page.locator('.landscape canvas')).toBeFocused();
+  await page.keyboard.down('ArrowUp');
+  await expect(landscape(page)).toHaveAttribute('data-motion', 'running');
+  await page.keyboard.up('ArrowUp');
+  await page.keyboard.press('Space');
+  await expect(landscape(page)).toHaveAttribute('data-motion', 'jumping');
+  await sleepAtHome(page);
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'girl-overalls');
+  await page.reload();
+  await expect(page.locator('.loading')).toHaveCount(0, { timeout: 20_000 });
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'girl-overalls');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: '캐릭터와 옷 고르기' }).click();
+  await expect(wardrobe.getByRole('button', { name: /여자/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: '/tmp/komorebi-wardrobe-mobile.png' });
+  expect(errors).toEqual([]);
+});
+
+test('a failed outfit load preserves the current clothes and can be retried', async ({ page }) => {
+  await page.route('**/art/child-boy-overalls.webp', (route) => route.abort());
+  await openWalk(page);
+  await page.getByRole('button', { name: '캐릭터와 옷 고르기' }).click();
+  const wardrobe = page.getByRole('dialog', { name: '나의 작은 옷장' });
+  await wardrobe.getByRole('button', { name: /풀잎 멜빵옷/ }).click();
+  await expect(wardrobe.getByRole('status')).toContainText('다시 골라');
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'boy-summer');
+  await page.unroute('**/art/child-boy-overalls.webp');
+  await wardrobe.getByRole('button', { name: /풀잎 멜빵옷/ }).click();
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'boy-overalls');
 });
 
 test('footsteps play recorded takes for the ground underfoot, never the same take twice running', async ({ page }) => {
@@ -342,4 +456,29 @@ test('footsteps play recorded takes for the ground underfoot, never the same tak
   const played = await page.evaluate(() => (window as unknown as { played: string[] }).played);
   expect(played.length).toBeGreaterThanOrEqual(3);
   played.slice(1).forEach((take, i) => expect(take).not.toBe(played[i]));
+});
+
+test('saved evening and rain are restored on load', async ({ page }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem('komorebi-village-day-v1', JSON.stringify({ day: 8, time: 'evening', weather: 'rain' })),
+  );
+  await openWalk(page);
+  await expect(page.locator('.game-header')).toContainText('8일째');
+  await expect(page.locator('main.walk')).toHaveClass(/is-evening/);
+  await expect(page.locator('main.walk')).toHaveClass(/is-raining/);
+});
+
+test('opening the map pauses the shower countdown without restarting it', async ({ page }) => {
+  await page.addInitScript(() => {
+    Math.random = () => 0.1;
+  });
+  await page.clock.install();
+  await openWalk(page);
+  await page.clock.fastForward(60_000);
+  await page.getByRole('button', { name: '산책 지도 열기' }).click();
+  await page.clock.fastForward(60_000);
+  await expect(page.locator('main.walk')).not.toHaveClass(/is-raining/);
+  await page.keyboard.press('Escape');
+  await page.clock.fastForward(51_000);
+  await expect(page.locator('main.walk')).toHaveClass(/is-raining/);
 });

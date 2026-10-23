@@ -15,6 +15,8 @@ export const HOME = {
   z: 70,
 } as const;
 export const HOME_DOOR = { x: 15, z: 38 };
+export const HOME_DESK = { name: '작은 그림일기 책상', x: 40, z: 57 };
+export const HOME_WARDROBE = { name: '나무 옷장', x: 86, z: 62 };
 export const HOME_BED = { name: '포근한 잠자리', x: 70, z: 76 };
 /** A small thing to do at each place once its memory for this time of day is kept. */
 export const PLACE_ACTION = {
@@ -132,7 +134,7 @@ export const WORLDS: Record<
       { id: 'middle', x: 51, z: 77 },
       { id: 'bed', x: HOME_BED.x, z: HOME_BED.z },
       { id: 'window', x: 54, z: 59 },
-      { id: 'desk', x: 40, z: 57 },
+      { id: 'desk', x: HOME_DESK.x, z: HOME_DESK.z },
       { id: 'front', x: 53, z: 91 },
     ],
     routes: [

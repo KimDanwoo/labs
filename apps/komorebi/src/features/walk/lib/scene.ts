@@ -1,9 +1,12 @@
 import { TIME, WEATHER, type TimeOfDay, type Weather } from '@features/walk/model/constants';
+import { DEFAULT_APPEARANCE, characterAtlas, type Appearance } from '@shared/world/appearance';
 import { FOREGROUNDS, foregroundOrder } from '@shared/world/foreground';
+import { interactionDestination, isAtHomeBed, isNearHomeBed } from '@shared/world/interactions';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '@shared/world/portals';
 import { surfaceAt, type Surface } from '@shared/world/surfaces';
 import {
   DESTINATIONS,
+  HOME_BED,
   SPAWN,
   WORLDS,
   canWalk,
@@ -19,11 +22,16 @@ import {
 } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
+import { createBedRest } from './bedRest';
 import { createBoats } from './boats';
+import { BREEZE_GLSL, SCENERY_STYLE } from './breeze';
 import { constrainCameraAxis } from './cameraBounds';
 import { createChild } from './child';
 import { createCountryside } from './countryside';
+import { createDriftingLeaves } from './driftingLeaves';
+import { FAN_GLSL } from './fan';
 import { createFireflies } from './fireflies';
+import { HOME_WEATHER_GLSL } from './homeWeather';
 import { gameKey, isControlTarget } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
 import { MAX_LAMPS, createNightLights, lampGlowAt, lampUniforms } from './nightLights';
@@ -39,7 +47,6 @@ import { SEA_ATMOSPHERE_GLSL } from './seaAtmosphere';
 import { createWaterMaps } from './water';
 import { createWaves } from './waves';
 
-const CHILD_ATLAS_URL = '/art/child-motion-v2-ready.webp';
 const START_REGION: Region = 'village';
 const SEA_REGION: Region = 'coast';
 const CAMERA_EPSILON = 0.01;
@@ -73,12 +80,16 @@ export type SceneOptions = {
   onNotice: (message: string) => void;
   /** A foot touching the ground; loudness already accounts for distance and landings. */
   onStep: (surface: Surface, loudness: number) => void;
+  onSleep: () => void;
+  appearance?: Appearance;
   signal?: AbortSignal;
 };
 export type WalkEngine = {
   dispose: () => void;
   /** While paused (a dialog is open) the child stands still and new movement input is ignored. */
   setPaused: (value: boolean) => void;
+  finishSleep: () => void;
+  setAppearance: (appearance: Appearance) => Promise<boolean>;
   setTimeOfDay: (value: TimeOfDay) => void;
   setWeather: (value: Weather) => void;
   setInput: (key: string, pressed: boolean) => void;
@@ -93,7 +104,7 @@ export type WalkEngine = {
 /** Painted scenery on depth-separated Three.js planes, with a hand-inked directional child and a connected walkable lane graph. */
 export async function createScene(
   container: HTMLElement,
-  { onStatus, onNotice, onStep, signal }: SceneOptions,
+  { onStatus, onNotice, onStep, onSleep, appearance = DEFAULT_APPEARANCE, signal }: SceneOptions,
 ): Promise<WalkEngine> {
   const loader = new THREE.TextureLoader();
   const plates = createRegionPlates(loader, [START_REGION]);
@@ -105,7 +116,7 @@ export async function createScene(
   // Only the first view blocks the start; the other paintings follow in the background.
   const [startPlate, atlas] = await Promise.allSettled([
     plates.ensure(START_REGION),
-    loader.loadAsync(CHILD_ATLAS_URL),
+    loader.loadAsync(characterAtlas(appearance)),
   ]);
   if (atlas.status === 'fulfilled') loaded.push(preparePaintingTexture(atlas.value));
   if (startPlate.status === 'rejected' || atlas.status === 'rejected' || signal?.aborted) {
@@ -114,6 +125,9 @@ export async function createScene(
     throw failure?.reason ?? new DOMException('Scene cancelled', 'AbortError');
   }
   const childAtlas = atlas.value;
+  const appearances = new Map<string, THREE.Texture>([[characterAtlas(appearance), childAtlas]]);
+  let currentAppearance = appearance;
+  let appearanceRequest = 0;
   let character: ReturnType<typeof createChild>;
   try {
     character = createChild(childAtlas);
@@ -157,6 +171,9 @@ export async function createScene(
       isSea: { value: 0 },
       isVillage: { value: 1 },
       isHome: { value: 0 },
+      outdoorRain: { value: 0 },
+      sceneryStyle: { value: SCENERY_STYLE[START_REGION] },
+      sceneryTime: { value: 0 },
       renderDpr: { value: 1 },
       fade: { value: 1 },
     },
@@ -164,6 +181,9 @@ export async function createScene(
       'varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float rain; uniform float fade;
       uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform sampler2D foam; uniform sampler2D glitter; uniform float isSea; uniform float isVillage; uniform float isHome;
+      ${BREEZE_GLSL}
+      ${FAN_GLSL}
+      ${HOME_WEATHER_GLSL}
       // Sun glitter on the sea (designed by Codex): painted glints, each fading in and out on its own beat.
       ${SEA_ATMOSPHERE_GLSL}
       // The painted sea itself sways and rolls shoreward, and the moored boat bobs with it (designed by Codex).
@@ -384,10 +404,7 @@ export async function createScene(
           mix(.8, 1.4, rnd.y) * resolved;
       }
       void main(){
-        vec2 uv=vUv;
-        // Tiny local leaf motion, not a global distortion of architecture.
-        float canopy=smoothstep(.45,.82,uv.y)*(1.-smoothstep(.08,.34,uv.x));
-        uv.x+=sin(time*.6+uv.y*32.)*.00045*canopy*(1.-isHome);
+        vec2 uv=sceneryUv(vUv);
         // Rivers carry broken foam downstream and spray off the rocks (designed by Codex); the sea's waves are
         // painted sprites (see waves.ts).
         const float W_TAU = 6.28318530718;
@@ -680,7 +697,7 @@ export async function createScene(
 
         float waterFoam = clamp(waterEffect * riverSpray * (1. + rain * .20), 0., .88);
 
-        vec3 c = tex.rgb * (1. + riceBend * .045);
+        vec3 c = fanSurface(tex.rgb, vUv) * (1. + riceBend * .045) * sceneryLight(vUv);
         // The painted glints brighten and dim as the surface moves.
         if (isSea > .5) {
           float brightPaint = smoothstep(
@@ -799,6 +816,7 @@ export async function createScene(
         c*=mix(1.,.55+.45*edge,night);
         vec3 overcast=mix(c,vec3(dot(c,vec3(.3,.59,.11))),.5)*vec3(.6,.66,.72);
         c=mix(c,overcast,rain*.8);
+        c=homeWeather(c,vUv);
         gl_FragColor=vec4(c*fade,1.);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -818,6 +836,7 @@ export async function createScene(
   foregroundMaterial.transparent = true;
   foregroundMaterial.depthTest = false;
   foregroundMaterial.depthWrite = false;
+  const bedRest = createBedRest(scene, foregroundMaterial);
   const foregrounds = FOREGROUNDS.map((layer) => {
     const shape = new THREE.Shape(
       layer.outline.map(([x, y]) => new THREE.Vector2((x / 1536) * 120 - 60, 40 - (y / 1024) * 80)),
@@ -908,6 +927,8 @@ export async function createScene(
   const waves = createWaves(scene, loader);
   const boats = createBoats(scene);
   const countryside = createCountryside(scene);
+  const leaves = createDriftingLeaves(scene);
+  let sceneryTime = 0;
   const rain = createRain(scene);
   const targetMat = new THREE.SpriteMaterial({
     map: markerMap,
@@ -937,6 +958,9 @@ export async function createScene(
     weather: Weather = WEATHER.clear,
     wetness = 0,
     paused = false,
+    sleeping = false,
+    preparingSleep = false,
+    sleepBlocked = false,
     isSettling = true,
     warmth = 0,
     transition = 1;
@@ -1016,6 +1040,7 @@ export async function createScene(
     jump.velocity = 0;
     jump.landing = 0;
     region = next;
+    if (next === 'home') void bedRest.prepare(currentAppearance.character);
     slide.direction = null;
     slide.input = null;
     position = { ...spawn };
@@ -1027,6 +1052,7 @@ export async function createScene(
     background.uniforms.isSea!.value = next === SEA_REGION ? 1 : 0;
     background.uniforms.isVillage!.value = next === 'village' ? 1 : 0;
     background.uniforms.isHome!.value = next === 'home' ? 1 : 0;
+    background.uniforms.sceneryStyle!.value = SCENERY_STYLE[next];
     background.uniforms.lampCount!.value = lamps.count;
     // Home stays loaded for the reset button; everything beyond the next exits is freed.
     const nearby = [...new Set([START_REGION, ...nearbyRegions(next)])];
@@ -1041,6 +1067,7 @@ export async function createScene(
     container.dataset.region = next;
   };
   container.dataset.region = region;
+  container.dataset.appearance = `${currentAppearance.character}-${currentAppearance.outfit}`;
   const keyDown = (event: KeyboardEvent) => {
     if (paused || (event.target instanceof HTMLElement && isControlTarget(event.target))) return;
     const key = gameKey(event);
@@ -1064,29 +1091,51 @@ export async function createScene(
     cancelAnimationFrame(animation);
     if (!document.hidden && !disposed) animation = requestAnimationFrame(tick);
   };
-  const click = (event: PointerEvent) => {
-    if (paused) return;
-    renderer.domElement.focus({ preventScroll: true });
+  const ray = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  const groundPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+  const intersection = new THREE.Vector3();
+  const pick = (event: PointerEvent) => {
     const bounds = renderer.domElement.getBoundingClientRect();
-    const ray = new THREE.Raycaster();
     ray.setFromCamera(
-      new THREE.Vector2(
+      pointer.set(
         ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
         (-(event.clientY - bounds.top) / bounds.height) * 2 + 1,
       ),
       camera,
     );
     const portal = portalVisuals.pick(ray, region);
+    if (portal) return { point: portal.center, portal, interactive: true };
+    const marker = ray.intersectObjects(markers.filter((item) => item.visible))[0];
+    if (marker) {
+      const point = DESTINATIONS[markers.indexOf(marker.object as THREE.Sprite)];
+      if (point) return { point, portal: null, interactive: true };
+    }
+    if (!ray.ray.intersectPlane(groundPlane, intersection)) return null;
+    const hit = { x: (intersection.x + 60) / 1.2, z: (40 - intersection.y) / 0.8 };
+    const interactive = interactionDestination(hit, region);
+    const point = interactive ?? hit;
+    return canWalk(point.x, point.z, region) ? { point, portal: null, interactive: interactive !== null } : null;
+  };
+  const hover = (event: PointerEvent) => {
+    if (event.pointerType !== 'mouse' || paused) return;
+    const target = pick(event);
+    let cursor = 'default';
+    if (target) cursor = target.interactive ? 'pointer' : 'crosshair';
+    renderer.domElement.style.cursor = cursor;
+  };
+  const click = (event: PointerEvent) => {
+    if (paused || event.button !== 0) return;
+    renderer.domElement.focus({ preventScroll: true });
+    const target = pick(event);
+    if (!target) return;
+    const { point, portal } = target;
     if (portal) {
       destination = null;
       redirect(portal);
       route = findRoute(position, portal.center, region);
       return;
     }
-    const v = new THREE.Vector3();
-    if (!ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), v)) return;
-    const point = { x: (v.x + 60) / 1.2, z: (40 - v.y) / 0.8 };
-    if (!canWalk(point.x, point.z, region)) return;
     destination = null;
     redirect(null);
     route = findRoute(position, point, region);
@@ -1098,6 +1147,7 @@ export async function createScene(
   window.addEventListener('blur', clear);
   document.addEventListener('visibilitychange', visibility);
   renderer.domElement.addEventListener('pointerdown', click);
+  renderer.domElement.addEventListener('pointermove', hover);
   motionQuery.addEventListener('change', motionPreference);
   const enterPortal = (portal: WorldPortal) => {
     const plate = plates.get(portal.to);
@@ -1117,6 +1167,28 @@ export async function createScene(
       onNotice('풍경을 불러오지 못했어요. 길을 잠시 벗어났다가 다시 들어가 보세요.');
     });
   };
+  async function startSleep() {
+    const canSleep = () => !disposed && !paused && region === 'home' && !isAirborne(jump) && isAtHomeBed(position);
+    if (preparingSleep || sleepBlocked || !canSleep()) return;
+    preparingSleep = true;
+    const template = currentAppearance.character;
+    const ready = await bedRest.prepare(template);
+    preparingSleep = false;
+    if (!canSleep() || template !== currentAppearance.character) return;
+    sleepBlocked = true;
+    if (!ready) {
+      onNotice('잠자리를 준비하지 못했어요. 잠시 벗어났다가 다시 와 주세요.');
+      return;
+    }
+    sleeping = true;
+    paused = true;
+    keys.clear();
+    route = [];
+    destination = null;
+    bedRest.start(position);
+    onSleep();
+    wake();
+  }
   function tick(time: number) {
     if (disposed || document.hidden) return;
     const wasAirborne = isAirborne(jump);
@@ -1131,6 +1203,8 @@ export async function createScene(
     const dt = last ? Math.min((time - last) / 1000, 0.05) : 0;
     last = time;
     elapsed += dt;
+    if (!paused && !reducedMotion) sceneryTime += dt;
+    background.uniforms.sceneryTime!.value = reducedMotion ? 0 : sceneryTime;
     if (!paused) advanceJump(jump, dt);
     const hasLanded = !paused && wasAirborne && !isAirborne(jump);
     const regionBefore = region;
@@ -1180,6 +1254,8 @@ export async function createScene(
       }
     }
     if (!paused) {
+      if (region !== 'home' || !isNearHomeBed(position)) sleepBlocked = false;
+      if (region === 'home' && isAtHomeBed(position)) void startSleep();
       if (blockedPortal && !isInsidePortal(position, blockedPortal)) {
         blockedPortal = null;
         cancelledPortal = null;
@@ -1190,12 +1266,21 @@ export async function createScene(
     }
     const scale = characterScale(position.z);
     const size = scale * CHILD_SIZE;
+    const rest = sleeping ? bedRest.update(darkness, lampGlowAt(region, HOME_BED), reducedMotion) : null;
+    const visualPosition = rest?.point ?? position;
+    let characterDt = paused ? 0 : dt;
+    let characterTravel = jump.height > 0 ? frameTravel * 0.2 : frameTravel;
+    if (rest) {
+      characterDt = dt;
+      characterTravel = rest.walking ? dt * 6 : 0;
+    }
     child.scale.setScalar(size);
+    character.setOpacity(rest?.opacity ?? 1);
     const { hasStepped } = character.update(
-      paused ? 0 : dt,
-      jump.height > 0 ? frameTravel * 0.2 : frameTravel,
-      heading,
-      walking,
+      characterDt,
+      characterTravel,
+      rest?.heading ?? heading,
+      rest?.walking ?? walking,
       true,
       reducedMotion,
       jump.height,
@@ -1208,11 +1293,11 @@ export async function createScene(
       container.dataset.surface = surface;
       onStep(surface, ((hasLanded ? LANDING_LOUDNESS : 1) * scale) / NEAREST_SCALE);
     }
-    child.position.set(position.x * 1.2 - 60, 40 - position.z * 0.8 + jump.height * scale, 2);
-    shadow.position.set(child.position.x + scale * 0.3, 40 - position.z * 0.8 - 0.08, 1);
+    child.position.set(visualPosition.x * 1.2 - 60, 40 - visualPosition.z * 0.8 + jump.height * scale, 2);
+    shadow.position.set(child.position.x + scale * 0.3, 40 - visualPosition.z * 0.8 - 0.08, 1);
     const shadowSize = 1 - Math.min(jump.height * 0.12, 0.3);
     shadow.scale.set(3.8 * size * shadowSize, 1.1 * size * shadowSize, 1);
-    shadowMat.opacity = 1 - Math.min(jump.height * 0.22, 0.55);
+    shadowMat.opacity = (rest?.opacity ?? 1) * (1 - Math.min(jump.height * 0.22, 0.55));
     const maxX = Math.max(0, 60 - halfWidth),
       maxY = Math.max(0, 40 - halfHeight);
     const cameraX = THREE.MathUtils.clamp(child.position.x * (halfWidth < 35 ? 1 : 0), -maxX, maxX);
@@ -1241,8 +1326,8 @@ export async function createScene(
     );
     markers.forEach((marker, i) => {
       const point = DESTINATIONS[i]!;
-      marker.visible = point.region === region;
-      marker.position.y = 40 - point.z * 0.8 + 2 + (reducedMotion ? 0 : Math.sin(elapsed * 1.5 + i) * 0.17);
+      marker.visible = point.region === region && !sleeping;
+      marker.position.y = 40 - point.z * 0.8 + 2 + (reducedMotion ? 0 : Math.sin(sceneryTime * 1.5 + i) * 0.17);
     });
     portalVisuals.update(region);
     targetMarker.visible = route.length > 0;
@@ -1255,17 +1340,26 @@ export async function createScene(
     const targetDarkness = timeOfDay === TIME.night ? 1 : 0;
     darkness = settle(THREE.MathUtils.damp(darkness, targetDarkness, 2, dt), targetDarkness, WARMTH_EPSILON);
     background.uniforms.night!.value = darkness;
-    fireflies.update(elapsed, region === 'home' ? 0 : darkness, reducedMotion);
-    nightLights.update(region, darkness, elapsed, reducedMotion);
+    fireflies.update(sceneryTime, region === 'home' ? 0 : darkness, reducedMotion);
+    nightLights.update(region, darkness, sceneryTime, reducedMotion);
     background.uniforms.walker!.value.set((child.position.x + 60) / 120, (child.position.y + 40 + 1.8 * size) / 80);
     placeEffects.update(paused ? 0 : dt);
     const targetWetness = weather === WEATHER.rain ? 1 : 0;
     wetness = settle(THREE.MathUtils.damp(wetness, targetWetness, 1.5, dt), targetWetness, WARMTH_EPSILON);
     background.uniforms.rain!.value = region === 'home' ? 0 : wetness;
-    rain.update(paused ? 0 : dt, region === 'home' ? 0 : wetness, camera.position, reducedMotion);
-    life.update({ region, dt: paused ? 0 : dt, elapsed, darkness, isStill: reducedMotion, isRaining: wetness > 0.5 });
+    background.uniforms.outdoorRain!.value = wetness;
+    rain.update(paused ? 0 : dt, region === 'home' ? 0 : wetness, camera.position, reducedMotion, darkness);
+    life.update({
+      region,
+      dt: paused ? 0 : dt,
+      elapsed: sceneryTime,
+      darkness,
+      isStill: reducedMotion,
+      isRaining: wetness > 0.5,
+    });
     waves.update({ region, dt: paused ? 0 : dt, darkness, isStill: reducedMotion, rain: wetness });
     boats.update({ region, dt: paused ? 0 : dt, darkness, isStill: reducedMotion });
+    leaves.update(region, paused ? 0 : dt, darkness, wetness, reducedMotion);
     countryside.update({
       region,
       dt: paused ? 0 : dt,
@@ -1283,7 +1377,9 @@ export async function createScene(
       childZ: position.z,
     });
     container.dataset.visitor = roamers.visitor;
-    const walkers = [{ ...position, order: CHILD_ORDER }, roamers.standing].filter((walker) => walker !== null);
+    const walkers = [rest ? null : { ...position, order: CHILD_ORDER }, roamers.standing].filter(
+      (walker) => walker !== null,
+    );
     foregrounds.forEach((layer) => {
       const order = foregroundOrder(layer, walkers, region);
       layer.mesh.visible = order !== null;
@@ -1291,10 +1387,11 @@ export async function createScene(
     });
     character.setLight(darkness, lampGlowAt(region, position));
     transition = Math.min(1, transition + dt * 1.8);
-    background.uniforms.time!.value = reducedMotion ? 0 : elapsed;
+    background.uniforms.time!.value = reducedMotion ? 0 : sceneryTime;
     background.uniforms.evening!.value = warmth;
     background.uniforms.fade!.value = transition;
-    if (!reducedMotion) {
+    dustMat.opacity = (region === 'home' ? 0.28 : 0.45) * (1 - darkness * 0.85) * (1 - wetness * 0.8);
+    if (!reducedMotion && !paused) {
       for (let i = 0; i < 45; i++) {
         dust[i * 3] = dust[i * 3]! + dt * (0.15 + i * 0.002);
         dust[i * 3 + 1] = dust[i * 3 + 1]! + Math.sin(elapsed * 0.4 + i) * dt * 0.06;
@@ -1310,9 +1407,13 @@ export async function createScene(
       wetness !== targetWetness ||
       (!paused && placeEffects.isPlaying) ||
       transition < 1 ||
-      (!paused && jump.landing > 0.01);
+      (!paused && jump.landing > 0.01) ||
+      sleeping;
     if (elapsed - statusTime > 0.12) {
-      container.dataset.motion = motionLabel(jump.height > 0, walking, sprinting);
+      container.dataset.motion = sleeping ? 'sleeping' : motionLabel(jump.height > 0, walking, sprinting);
+      let restLabel = sleeping ? 'settling' : '';
+      if (rest && rest.tucked > 0.99) restLabel = 'tucked';
+      container.dataset.rest = restLabel;
       const nextStatus: SceneStatus = {
         ...position,
         region,
@@ -1340,6 +1441,37 @@ export async function createScene(
   animation = requestAnimationFrame(tick);
   plates.focus(nearbyRegions(START_REGION));
   return {
+    async setAppearance(next) {
+      const request = ++appearanceRequest;
+      const url = characterAtlas(next);
+      try {
+        let texture = appearances.get(url);
+        if (!texture) {
+          texture = preparePaintingTexture(await loader.loadAsync(url));
+          if (disposed) {
+            texture.dispose();
+            return false;
+          }
+          appearances.set(url, texture);
+          loaded.push(texture);
+        }
+        if (disposed || request !== appearanceRequest) return false;
+        currentAppearance = next;
+        character.setAtlas(texture);
+        container.dataset.appearance = `${next.character}-${next.outfit}`;
+        if (region === 'home') void bedRest.prepare(next.character);
+        wake();
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    finishSleep() {
+      sleeping = false;
+      bedRest.finish();
+      character.setOpacity(1);
+      wake();
+    },
     setWeather(value) {
       weather = value;
       wake();
@@ -1430,8 +1562,10 @@ export async function createScene(
       document.removeEventListener('visibilitychange', visibility);
       motionQuery.removeEventListener('change', motionPreference);
       renderer.domElement.removeEventListener('pointerdown', click);
+      renderer.domElement.removeEventListener('pointermove', hover);
       foregrounds.forEach(({ mesh }) => mesh.geometry.dispose());
       foregroundMaterial.dispose();
+      bedRest.dispose();
       portalVisuals.dispose();
       fireflies.dispose();
       placeEffects.dispose();
@@ -1441,6 +1575,7 @@ export async function createScene(
       waves.dispose();
       boats.dispose();
       countryside.dispose();
+      leaves.dispose();
       waterMaps.dispose();
       rain.dispose();
       geo.dispose();

@@ -2,13 +2,17 @@ import { execFileSync, spawn } from 'node:child_process';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import ts from 'typescript';
 
 // Requires Chrome (CHROME_BIN outside macOS) and cwebp. No server or GPU needed.
 const root = new URL('../', import.meta.url);
 const temporary = await mkdtemp(join(tmpdir(), 'komorebi-character-'));
-const source = await readFile(new URL('public/art/child-motion-v2-atlas.webp', root));
+const sourcePath = process.argv[2] ? resolve(process.argv[2]) : new URL('public/art/child-motion-v2-atlas.webp', root);
+const outputPath = process.argv[3]
+  ? resolve(process.argv[3])
+  : new URL('public/art/child-motion-v2-ready.webp', root).pathname;
+const source = await readFile(sourcePath);
 const modules = await Promise.all([
   readFile(new URL('src/features/walk/lib/atlas.ts', root), 'utf8'),
   readFile(new URL('scripts/prepareChildAtlas.ts', root), 'utf8'),
@@ -93,14 +97,8 @@ try {
   if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
   const png = join(temporary, 'prepared.png');
   await writeFile(png, Buffer.from(result.result.value, 'base64'));
-  execFileSync('cwebp', [
-    '-lossless',
-    '-quiet',
-    png,
-    '-o',
-    new URL('public/art/child-motion-v2-ready.webp', root).pathname,
-  ]);
-  console.log('Prepared 32 aligned poses in child-motion-v2-ready.webp (lossless).');
+  execFileSync('cwebp', ['-lossless', '-quiet', png, '-o', outputPath]);
+  console.log(`Prepared 32 aligned poses in ${outputPath} (lossless).`);
 } finally {
   ws?.close();
   chrome.kill();

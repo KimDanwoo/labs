@@ -1,5 +1,6 @@
 import { createScene, type SceneOptions, type SceneStatus, type WalkEngine } from '@features/walk/lib/scene';
 import type { TimeOfDay, Weather } from '@features/walk/model/constants';
+import type { Appearance } from '@shared/world/appearance';
 import { SPAWN } from '@shared/world/world';
 import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
 
@@ -10,6 +11,8 @@ type EngineSettings = {
   isPaused: boolean;
   onNotice: SceneOptions['onNotice'];
   onStep: SceneOptions['onStep'];
+  onSleep: SceneOptions['onSleep'];
+  appearance: Appearance;
 };
 
 const INITIAL_STATUS: SceneStatus = { ...SPAWN, region: 'village', walking: false, nearby: null, steps: 0 };
@@ -27,9 +30,12 @@ export function useWalkEngine(containerRef: RefObject<HTMLDivElement | null>, se
     instance.setWeather(settings.weather);
     instance.setInput('shift', settings.isSprinting);
     instance.setPaused(settings.isPaused);
+    void instance.setAppearance(settings.appearance);
   });
   const handleNotice = useEffectEvent<SceneOptions['onNotice']>((message) => settings.onNotice(message));
   const handleStep = useEffectEvent<SceneOptions['onStep']>((surface, loudness) => settings.onStep(surface, loudness));
+  const handleSleep = useEffectEvent(() => settings.onSleep());
+  const getAppearance = useEffectEvent(() => settings.appearance);
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return undefined;
@@ -43,6 +49,8 @@ export function useWalkEngine(containerRef: RefObject<HTMLDivElement | null>, se
       onStatus: handleStatus,
       onNotice: handleNotice,
       onStep: handleStep,
+      onSleep: handleSleep,
+      appearance: getAppearance(),
       signal: controller.signal,
     })
       .then((instance) => {

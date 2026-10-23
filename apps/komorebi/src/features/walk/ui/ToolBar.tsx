@@ -10,9 +10,19 @@ type Props = {
   onToggleSound: () => void;
   onPhoto: () => void;
   onOpenMap: () => void;
+  onOpenWardrobe: () => void;
 };
 
-export function ToolBar({ timeOfDay, isRaining, isSoundOn, isReady, onToggleSound, onPhoto, onOpenMap }: Props) {
+export function ToolBar({
+  timeOfDay,
+  isRaining,
+  isSoundOn,
+  isReady,
+  onToggleSound,
+  onPhoto,
+  onOpenMap,
+  onOpenWardrobe,
+}: Props) {
   const soundLabel = isSoundOn ? '자연 소리 끄기' : '자연 소리 켜기';
   return (
     <nav className="tools" aria-label="산책 설정">
@@ -35,10 +45,25 @@ export function ToolBar({ timeOfDay, isRaining, isSoundOn, isReady, onToggleSoun
         <Icon name={isSoundOn ? 'sound' : 'mute'} />
       </button>
       <span className="tool-divider" />
+      <button
+        className="tool"
+        title="캐릭터와 옷 고르기"
+        aria-label="캐릭터와 옷 고르기"
+        disabled={!isReady}
+        onClick={onOpenWardrobe}
+      >
+        <Icon name="shirt" />
+      </button>
       <button className="tool" title="풍경 사진 저장" aria-label="풍경 사진 저장" disabled={!isReady} onClick={onPhoto}>
         <Icon name="camera" />
       </button>
-      <button className="tool" title="산책 지도 (M)" aria-label="산책 지도 열기" onClick={onOpenMap}>
+      <button
+        className="tool"
+        title="산책 지도 (M)"
+        aria-label="산책 지도 열기"
+        disabled={!isReady}
+        onClick={onOpenMap}
+      >
         <Icon name="map" />
       </button>
     </nav>

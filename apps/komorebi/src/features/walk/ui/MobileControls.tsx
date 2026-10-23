@@ -13,10 +13,20 @@ export function MobileControls({ isReady, isPaused, isSprinting, onInput, onTogg
     <div className="mobile-controls" aria-label="터치 이동">
       <Joystick disabled={!isReady || isPaused} onInput={onInput} />
       <div className="action-buttons">
-        <button className="jump-button" aria-label="점프" disabled={!isReady} onClick={() => onInput(' ', true)}>
+        <button
+          className="jump-button"
+          aria-label="점프"
+          disabled={!isReady || isPaused}
+          onClick={() => onInput(' ', true)}
+        >
           점프 ↑
         </button>
-        <button className="run-button" aria-pressed={isSprinting} onClick={onToggleSprint}>
+        <button
+          className="run-button"
+          disabled={!isReady || isPaused}
+          aria-pressed={isSprinting}
+          onClick={onToggleSprint}
+        >
           {isSprinting ? '달리기로 전환' : '전력 질주'}
         </button>
       </div>

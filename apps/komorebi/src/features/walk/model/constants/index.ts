@@ -5,7 +5,7 @@ export const EVENING_DISCOVERY_STORAGE_KEY = 'komorebi-evening-discoveries-v1';
 export const NIGHT_PAGE_STORAGE_KEY = 'komorebi-night-pages-v1';
 export const CONTROLS_SEEN_STORAGE_KEY = 'komorebi-controls-seen-v1';
 
-export const DIALOG = { none: 'none', map: 'map', memory: 'memory' } as const;
+export const DIALOG = { none: 'none', map: 'map', journal: 'journal', memory: 'memory', wardrobe: 'wardrobe' } as const;
 export type Dialog = (typeof DIALOG)[keyof typeof DIALOG];
 
 export const TIME = { day: 'day', evening: 'evening', night: 'night' } as const;
