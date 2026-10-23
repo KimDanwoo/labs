@@ -1,4 +1,4 @@
-import { createScene, type SceneStatus, type WalkEngine } from '@features/walk/lib/scene';
+import { createScene, type SceneOptions, type SceneStatus, type WalkEngine } from '@features/walk/lib/scene';
 import { SPAWN } from '@shared/world/world';
 import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
 
@@ -6,7 +6,8 @@ type EngineSettings = {
   isEvening: boolean;
   isSprinting: boolean;
   isPaused: boolean;
-  onNotice: (message: string) => void;
+  onNotice: SceneOptions['onNotice'];
+  onStep: SceneOptions['onStep'];
 };
 
 const INITIAL_STATUS: SceneStatus = { ...SPAWN, region: 'village', walking: false, nearby: null, steps: 0 };
@@ -24,7 +25,8 @@ export function useWalkEngine(containerRef: RefObject<HTMLDivElement | null>, se
     instance.setInput('shift', settings.isSprinting);
     instance.setPaused(settings.isPaused);
   });
-  const handleNotice = useEffectEvent((message: string) => settings.onNotice(message));
+  const handleNotice = useEffectEvent<SceneOptions['onNotice']>((message) => settings.onNotice(message));
+  const handleStep = useEffectEvent<SceneOptions['onStep']>((surface, loudness) => settings.onStep(surface, loudness));
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return undefined;
@@ -34,7 +36,12 @@ export function useWalkEngine(containerRef: RefObject<HTMLDivElement | null>, se
       setStatus(next);
       if (next.walking) setHasWalked(true);
     };
-    createScene(container, { onStatus: handleStatus, onNotice: handleNotice, signal: controller.signal })
+    createScene(container, {
+      onStatus: handleStatus,
+      onNotice: handleNotice,
+      onStep: handleStep,
+      signal: controller.signal,
+    })
       .then((instance) => {
         if (isCancelled) {
           instance.dispose();

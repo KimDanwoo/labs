@@ -75,3 +75,15 @@ test('planted foot cancels forward travel and recovery clears the ground', async
     assert.ok(!recovery.planted && recovery.lift > 0.99);
   }
 });
+
+test('a footfall lands each time the gait passes half a cycle, never twice for one crossing', async () => {
+  const { crossedFootfall, isAirborne, startJump, createJump } = await import('../src/features/walk/lib/motion');
+  assert.equal(crossedFootfall(0.1, 0.2), false);
+  assert.equal(crossedFootfall(Math.PI - 0.01, Math.PI + 0.01), true);
+  assert.equal(crossedFootfall(Math.PI + 0.01, Math.PI + 0.02), false);
+  assert.equal(crossedFootfall(2 * Math.PI - 0.1, 2 * Math.PI + 0.1), true);
+  const jump = createJump();
+  assert.equal(isAirborne(jump), false);
+  startJump(jump);
+  assert.equal(isAirborne(jump), true, 'airborne from the take-off frame, before height rises');
+});

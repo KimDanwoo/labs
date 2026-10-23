@@ -3,12 +3,20 @@ import type { Region } from '@shared/world/world';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 
 type Ambience = ReturnType<typeof createAmbience>;
+type Scene = { region: Region; isEvening: boolean };
 
-type Options = { region: Region; isEvening: boolean; onUnavailable: () => void };
-
-export function useAmbience({ region, isEvening, onUnavailable }: Options) {
+/** The nature sound switch; scene and footsteps can be wired before the walk engine exists. */
+export function useAmbience(onUnavailable: () => void) {
   const audio = useRef<Ambience | null>(null);
+  const scene = useRef<Scene>({ region: 'village', isEvening: false });
   const [isOn, setIsOn] = useState(false);
+  const [sound] = useState(() => ({
+    step: (...args: Parameters<Ambience['step']>) => audio.current?.step(...args),
+    setScene(next: Scene) {
+      scene.current = next;
+      audio.current?.setScene(next.region, next.isEvening);
+    },
+  }));
   function stop() {
     audio.current?.dispose();
     audio.current = null;
@@ -24,9 +32,6 @@ export function useAmbience({ region, isEvening, onUnavailable }: Options) {
       audio.current?.dispose();
     };
   }, []);
-  useEffect(() => {
-    audio.current?.setScene(region, isEvening);
-  }, [region, isEvening]);
   function toggle() {
     if (audio.current) {
       stop();
@@ -34,11 +39,18 @@ export function useAmbience({ region, isEvening, onUnavailable }: Options) {
     }
     try {
       audio.current = createAmbience();
-      audio.current.setScene(region, isEvening);
+      audio.current.setScene(scene.current.region, scene.current.isEvening);
       setIsOn(true);
     } catch {
       onUnavailable();
     }
   }
-  return { isOn, toggle };
+  return { isOn, toggle, ...sound };
+}
+
+/** Keeps the soundscape on the painting and time of day in view. */
+export function useAmbienceScene(setScene: (scene: Scene) => void, region: Region, isEvening: boolean) {
+  useEffect(() => {
+    setScene({ region, isEvening });
+  }, [setScene, region, isEvening]);
 }

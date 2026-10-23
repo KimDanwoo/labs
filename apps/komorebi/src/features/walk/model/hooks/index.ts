@@ -1,4 +1,4 @@
-export { useAmbience } from './useAmbience';
+export { useAmbience, useAmbienceScene } from './useAmbience';
 export { useDiscoveries } from './useDiscoveries';
 export { useIsFirstVisit } from './useIsFirstVisit';
 export { useModal } from './useModal';

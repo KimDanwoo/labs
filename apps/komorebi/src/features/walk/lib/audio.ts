@@ -1,3 +1,4 @@
+import { SURFACE, type Surface } from '@shared/world/surfaces';
 import type { Region } from '@shared/world/world';
 import { ambienceMix, type AmbienceMix } from './ambienceMix';
 
@@ -5,6 +6,16 @@ const MASTER_VOLUME = 0.22;
 const LAYER_VOLUME = { water: 0.5, waves: 0.9, cicadas: 0.012 } as const;
 const FADE_SECONDS = 1.2;
 const CALL_INTERVAL_MS = 6_500;
+const STEP_VOLUME = 0.55;
+
+type StepSound = { filter: BiquadFilterType; frequency: number; q: number; seconds: number; knock?: number };
+/** Each ground answers a footfall differently: crunch, click, hollow knock or soft hiss. */
+const STEP_SOUNDS = {
+  [SURFACE.dirt]: { filter: 'lowpass', frequency: 900, q: 0.7, seconds: 0.09 },
+  [SURFACE.stone]: { filter: 'bandpass', frequency: 2_300, q: 1.4, seconds: 0.05 },
+  [SURFACE.wood]: { filter: 'bandpass', frequency: 420, q: 2.5, seconds: 0.11, knock: 170 },
+  [SURFACE.sand]: { filter: 'highpass', frequency: 2_800, q: 0.5, seconds: 0.12 },
+} satisfies Record<Surface, StepSound>;
 
 function brownNoise(context: AudioContext, seconds: number) {
   const buffer = context.createBuffer(1, context.sampleRate * seconds, context.sampleRate);
@@ -120,7 +131,45 @@ export function createAmbience() {
   }, CALL_INTERVAL_MS);
   void context.resume();
 
+  const whiteNoise = context.createBuffer(1, context.sampleRate * 0.2, context.sampleRate);
+  const whiteData = whiteNoise.getChannelData(0);
+  for (let i = 0; i < whiteData.length; i++) whiteData[i] = Math.random() * 2 - 1;
+
+  const step = (surface: Surface, loudness: number) => {
+    if (context.state !== 'running') return;
+    const sound: StepSound = STEP_SOUNDS[surface];
+    const now = context.currentTime;
+    const peak = STEP_VOLUME * Math.min(loudness, 2) * (0.8 + Math.random() * 0.4);
+    const source = context.createBufferSource();
+    source.buffer = whiteNoise;
+    source.playbackRate.value = 0.85 + Math.random() * 0.3;
+    const filter = context.createBiquadFilter();
+    filter.type = sound.filter;
+    filter.frequency.value = sound.frequency;
+    filter.Q.value = sound.q;
+    const gain = context.createGain();
+    gain.gain.setValueAtTime(peak, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + sound.seconds);
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(master);
+    source.start(now);
+    source.stop(now + sound.seconds);
+    const parts: AudioNode[] = [source, filter, gain];
+    if (sound.knock) {
+      const knock = context.createOscillator();
+      knock.frequency.setValueAtTime(sound.knock, now);
+      knock.frequency.exponentialRampToValueAtTime(sound.knock * 0.7, now + sound.seconds);
+      knock.connect(gain);
+      knock.start(now);
+      knock.stop(now + sound.seconds);
+      parts.push(knock);
+    }
+    source.onended = () => parts.forEach((part) => part.disconnect());
+  };
+
   return {
+    step,
     setScene(region: Region, isEvening: boolean) {
       mix = ambienceMix(region, isEvening);
       const now = context.currentTime;

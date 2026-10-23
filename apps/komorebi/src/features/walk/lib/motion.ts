@@ -43,6 +43,15 @@ export function solveLeg(forward: number, lift: number, hipHeight = 1.62) {
   return { hip, knee, ankle: -hip - knee };
 }
 
+/** A gait cycle plants two feet: one each time the phase passes a multiple of π. */
+export function crossedFootfall(previousPhase: number, nextPhase: number) {
+  return Math.floor(nextPhase / Math.PI) > Math.floor(previousPhase / Math.PI);
+}
+
+export function isAirborne(jump: JumpMotion) {
+  return jump.height > 0 || jump.velocity > 0;
+}
+
 export type JumpMotion = { height: number; velocity: number; landing: number };
 export function createJump(): JumpMotion {
   return { height: 0, velocity: 0, landing: 0 };

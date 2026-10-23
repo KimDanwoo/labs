@@ -4,6 +4,7 @@ import { diaryMemory, liveMemory } from '@features/walk/lib/memory';
 import { DIALOG, type Dialog } from '@features/walk/model/constants';
 import {
   useAmbience,
+  useAmbienceScene,
   useDiscoveries,
   useIsFirstVisit,
   useShortcuts,
@@ -36,17 +37,15 @@ export function Walk() {
   const visited = useDiscoveries(dayDiscoveries);
   const eveningVisited = useDiscoveries(eveningDiscoveries);
   const isFirstVisit = useIsFirstVisit();
+  const ambience = useAmbience(() => toast.notify('이 브라우저에서는 소리를 재생할 수 없어요.'));
   const { engine, isReady, error, status, hasWalked } = useWalkEngine(landscapeRef, {
     isEvening,
     isSprinting,
     isPaused,
     onNotice: toast.notify,
+    onStep: ambience.step,
   });
-  const ambience = useAmbience({
-    region: status.region,
-    isEvening,
-    onUnavailable: () => toast.notify('이 브라우저에서는 소리를 재생할 수 없어요.'),
-  });
+  useAmbienceScene(ambience.setScene, status.region, isEvening);
   const hasStarted = hasWalked || hasGuided;
 
   function openMemory() {

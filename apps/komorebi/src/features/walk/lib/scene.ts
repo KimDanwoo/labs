@@ -1,5 +1,6 @@
 import { FOREGROUNDS, isForegroundInFront } from '@shared/world/foreground';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '@shared/world/portals';
+import { surfaceAt, type Surface } from '@shared/world/surfaces';
 import {
   LANDMARKS,
   SPAWN,
@@ -19,7 +20,7 @@ import { canvasTexture } from './art';
 import { constrainCameraAxis } from './cameraBounds';
 import { createChild } from './child';
 import { gameKey, isControlTarget } from './input';
-import { advanceJump, createJump, startJump } from './motion';
+import { advanceJump, createJump, isAirborne, startJump } from './motion';
 import { characterScale } from './perspective';
 import { createPortals } from './portals';
 import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './regionPlates';
@@ -30,6 +31,8 @@ const START_REGION: Region = 'village';
 const CAMERA_EPSILON = 0.01;
 const WARMTH_EPSILON = 0.002;
 const MOVE_KEYS = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
+const LANDING_LOUDNESS = 1.6;
+const NEAREST_SCALE = characterScale(100);
 const RUN_SPEED = 24;
 const SPRINT_SPEED = 36;
 
@@ -49,6 +52,8 @@ export type SceneOptions = {
   onStatus: (status: SceneStatus) => void;
   /** Short messages for the player, such as a neighbouring painting still loading. */
   onNotice: (message: string) => void;
+  /** A foot touching the ground; loudness already accounts for distance and landings. */
+  onStep: (surface: Surface, loudness: number) => void;
   signal?: AbortSignal;
 };
 export type WalkEngine = {
@@ -66,7 +71,7 @@ export type WalkEngine = {
 /** Painted scenery on depth-separated Three.js planes, with a hand-inked directional child and a connected walkable lane graph. */
 export async function createScene(
   container: HTMLElement,
-  { onStatus, onNotice, signal }: SceneOptions,
+  { onStatus, onNotice, onStep, signal }: SceneOptions,
 ): Promise<WalkEngine> {
   const loader = new THREE.TextureLoader();
   const plates = createRegionPlates(loader, [START_REGION]);
@@ -435,9 +440,9 @@ export async function createScene(
   };
   function tick(time: number) {
     if (disposed || document.hidden) return;
-    const isAirborne = jump.height > 0 || jump.velocity > 0;
+    const wasAirborne = isAirborne(jump);
     const hasMoveKey = MOVE_KEYS.some((key) => keys.has(key));
-    const isMoving = !paused && (hasMoveKey || route.length > 0 || isAirborne || moveSpeed > 0.05);
+    const isMoving = !paused && (hasMoveKey || route.length > 0 || wasAirborne || moveSpeed > 0.05);
     const rate = isMoving || isSettling ? RENDER_RATE.active : RENDER_RATE.idle;
     if (!shouldRenderFrame(time, nextFrame, rate)) {
       animation = requestAnimationFrame(tick);
@@ -448,6 +453,8 @@ export async function createScene(
     last = time;
     elapsed += dt;
     if (!paused) advanceJump(jump, dt);
+    const hasLanded = !paused && wasAirborne && !isAirborne(jump);
+    const regionBefore = region;
     let dx = Number(keys.has('d') || keys.has('arrowright')) - Number(keys.has('a') || keys.has('arrowleft'));
     let dz = Number(keys.has('s') || keys.has('arrowdown')) - Number(keys.has('w') || keys.has('arrowup'));
     const keyboardWalking = Math.hypot(dx, dz) > 0;
@@ -504,7 +511,7 @@ export async function createScene(
     }
     const scale = characterScale(position.z);
     child.scale.setScalar(scale * 1.65);
-    character.update(
+    const { hasStepped } = character.update(
       paused ? 0 : dt,
       jump.height > 0 ? frameTravel * 0.2 : frameTravel,
       heading,
@@ -515,6 +522,12 @@ export async function createScene(
       jump.velocity,
       jump.landing,
     );
+    const isFootfall = !paused && region === regionBefore && (hasLanded || hasStepped);
+    if (isFootfall) {
+      const surface = surfaceAt(position, region);
+      container.dataset.surface = surface;
+      onStep(surface, ((hasLanded ? LANDING_LOUDNESS : 1) * scale) / NEAREST_SCALE);
+    }
     child.position.set(position.x * 1.2 - 60, 40 - position.z * 0.8 + jump.height * scale, 2);
     shadow.position.set(child.position.x + scale * 0.3, 40 - position.z * 0.8 - 0.08, 1);
     const shadowSize = 1 - Math.min(jump.height * 0.12, 0.3);

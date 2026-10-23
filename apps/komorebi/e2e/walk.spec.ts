@@ -148,3 +148,18 @@ test('choosing the cancelled exit again resumes the crossing once it loads', asy
   release();
   await expect(landscape(page)).toHaveAttribute('data-region', 'river', { timeout: 15_000 });
 });
+
+test('footfalls follow the ground: dirt in the village, wood on the river bridge', async ({ page }) => {
+  const errors: Error[] = [];
+  page.on('pageerror', (error) => errors.push(error));
+  await openWalk(page);
+  await page.getByRole('button', { name: '자연 소리 켜기' }).click();
+  await page.locator('.landscape canvas').focus();
+  await page.keyboard.down('ArrowUp');
+  await expect(landscape(page)).toHaveAttribute('data-surface', 'dirt');
+  await page.keyboard.up('ArrowUp');
+  await guideTo(page, '물소리 다리');
+  await expect(landscape(page)).toHaveAttribute('data-region', 'river', { timeout: 15_000 });
+  await expect(landscape(page)).toHaveAttribute('data-surface', 'wood', { timeout: 15_000 });
+  expect(errors).toEqual([]);
+});
