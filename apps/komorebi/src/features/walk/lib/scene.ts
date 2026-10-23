@@ -24,6 +24,7 @@ import { createChild } from './child';
 import { createFireflies } from './fireflies';
 import { gameKey, isControlTarget } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
+import { MAX_LAMPS, createNightLights, lampUniforms } from './nightLights';
 import { characterScale } from './perspective';
 import { createPlaceEffects } from './placeEffects';
 import { createPortals } from './portals';
@@ -138,11 +139,15 @@ export async function createScene(
       evening: { value: 0 },
       night: { value: 0 },
       rain: { value: 0 },
+      lamps: { value: lampUniforms(START_REGION).values },
+      lampCount: { value: lampUniforms(START_REGION).count },
+      walker: { value: new THREE.Vector2(0.5, 0.2) },
       fade: { value: 1 },
     },
     vertexShader:
       'varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float rain; uniform float fade; 
+    fragmentShader: `varying vec2 vUv; uniform sampler2D map; uniform float time; uniform float evening; uniform float night; uniform float rain; uniform float fade;
+      uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; 
       void main(){
         vec2 uv=vUv;
         // Tiny local leaf motion, not a global distortion of architecture.
@@ -158,9 +163,22 @@ export async function createScene(
         vec3 warm=c*vec3(1.09,.79,.67)+vec3(.025,.005,.018);
         c=mix(c,warm,evening*.65);
         // Linear light: these factors read about twice as bright once converted for the screen.
+        vec3 base=c;
         vec3 grey=vec3(dot(c,vec3(.3,.59,.11)));
         vec3 moonlit=mix(c,grey,.45)*vec3(.09,.12,.24)+vec3(.0,.003,.015);
         c=mix(c,moonlit,night*.9);
+        // After dark, windows, lanterns and the walker's glow give the painting back its colour in warm pools.
+        float pool=0.;
+        for(int i=0;i<${MAX_LAMPS};i++){
+          if(i>=lampCount) break;
+          vec2 d=(uv-lamps[i].xy)*vec2(1.5,1.);
+          pool+=smoothstep(lamps[i].z*2.2,0.,length(d));
+        }
+        float carry=smoothstep(.13,0.,length((uv-walker)*vec2(1.5,1.)));
+        vec3 lamplit=base*vec3(1.05,.84,.58);
+        c=mix(c,lamplit,clamp(pool*.85+carry*.35,0.,.9)*night);
+        float edge=smoothstep(.95,.3,length((uv-vec2(.5,.45))*vec2(1.1,1.35)));
+        c*=mix(1.,.55+.45*edge,night);
         vec3 overcast=mix(c,grey,.5)*vec3(.6,.66,.72);
         c=mix(c,overcast,rain*.8);
         gl_FragColor=vec4(c*fade,1.);
@@ -267,6 +285,7 @@ export async function createScene(
   const portalVisuals = createPortals(scene);
   const fireflies = createFireflies(scene);
   const placeEffects = createPlaceEffects(scene);
+  const nightLights = createNightLights(scene);
   const life = createSceneLife(scene, loader);
   const rain = createRain(scene);
   const targetMat = new THREE.SpriteMaterial({
@@ -380,6 +399,9 @@ export async function createScene(
     position = { ...spawn };
     route = [];
     background.uniforms.map!.value = plate;
+    const lamps = lampUniforms(next);
+    background.uniforms.lamps!.value = lamps.values;
+    background.uniforms.lampCount!.value = lamps.count;
     // Home stays loaded for the reset button; everything beyond the next exits is freed.
     const nearby = [...new Set([START_REGION, ...nearbyRegions(next)])];
     plates.focus(nearby);
@@ -610,6 +632,8 @@ export async function createScene(
     darkness = settle(THREE.MathUtils.damp(darkness, targetDarkness, 2, dt), targetDarkness, WARMTH_EPSILON);
     background.uniforms.night!.value = darkness;
     fireflies.update(elapsed, darkness, reducedMotion);
+    nightLights.update(region, darkness, elapsed, reducedMotion);
+    background.uniforms.walker!.value.set((child.position.x + 60) / 120, (child.position.y + 40 + 3 * scale) / 80);
     placeEffects.update(paused ? 0 : dt);
     const targetWetness = weather === WEATHER.rain ? 1 : 0;
     wetness = settle(THREE.MathUtils.damp(wetness, targetWetness, 1.5, dt), targetWetness, WARMTH_EPSILON);
@@ -762,6 +786,7 @@ export async function createScene(
       portalVisuals.dispose();
       fireflies.dispose();
       placeEffects.dispose();
+      nightLights.dispose();
       life.dispose();
       rain.dispose();
       geo.dispose();
