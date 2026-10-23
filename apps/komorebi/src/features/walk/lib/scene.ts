@@ -269,6 +269,8 @@ export async function createScene(
     transition = 1;
   let blockedPortal: WorldPortal | null = null;
   let waitingPortal: WorldPortal | null = null;
+  /** An exit the player turned away from while it loaded; choosing it again lifts the block (a failed load does not). */
+  let cancelledPortal: WorldPortal | null = null;
   let heading = 0,
     moveSpeed = 0,
     touchSprint = false;
@@ -323,8 +325,14 @@ export async function createScene(
   };
   /** A new heading elsewhere cancels the wait at a loading exit until the child steps out of it. */
   const redirect = (exit: WorldPortal | null) => {
+    if (exit && exit === cancelledPortal) {
+      blockedPortal = null;
+      cancelledPortal = null;
+      return;
+    }
     if (!waitingPortal || waitingPortal === exit) return;
     blockedPortal = waitingPortal;
+    cancelledPortal = waitingPortal;
     waitingPortal = null;
   };
   const switchRegion = (next: Region, spawn: Point, plate: THREE.Texture) => {
@@ -340,6 +348,7 @@ export async function createScene(
     transition = reducedMotion ? 1 : 0.25;
     blockedPortal = portalAt(position, region);
     waitingPortal = null;
+    cancelledPortal = null;
     plan();
     wake();
     container.dataset.region = next;
@@ -417,6 +426,7 @@ export async function createScene(
       if (disposed || waitingPortal !== portal) return;
       waitingPortal = null;
       blockedPortal = portal;
+      cancelledPortal = null;
       onNotice('풍경을 불러오지 못했어요. 길을 잠시 벗어났다가 다시 들어가 보세요.');
     });
   };
@@ -481,7 +491,10 @@ export async function createScene(
       }
     }
     if (!paused) {
-      if (blockedPortal && !isInsidePortal(position, blockedPortal)) blockedPortal = null;
+      if (blockedPortal && !isInsidePortal(position, blockedPortal)) {
+        blockedPortal = null;
+        cancelledPortal = null;
+      }
       const portal = portalAt(position, region);
       if (!portal) waitingPortal = null;
       else if (portal !== blockedPortal) enterPortal(portal);

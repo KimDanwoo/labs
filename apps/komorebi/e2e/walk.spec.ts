@@ -130,3 +130,21 @@ test('a place found at dusk keeps a dusk page that the diary can reread', async 
   await expect(memory).toContainText('노을이 논물 위에 길게 눕는다');
   await expect(page.locator('.journal-button b')).toHaveText('1 / 6');
 });
+
+test('choosing the cancelled exit again resumes the crossing once it loads', async ({ page }) => {
+  let release = () => {};
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route('**/art/river-game.webp', async (route) => {
+    await held;
+    await route.continue();
+  });
+  await openWalk(page);
+  await guideTo(page, '물소리 다리');
+  await expect(page.getByRole('status')).toContainText('풍경을 펼치고 있어요', { timeout: 15_000 });
+  await guideTo(page, '바람이 머무는 논');
+  await guideTo(page, '물소리 다리');
+  release();
+  await expect(landscape(page)).toHaveAttribute('data-region', 'river', { timeout: 15_000 });
+});
