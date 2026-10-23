@@ -22,7 +22,7 @@ import { gameKey, isControlTarget } from './input';
 import { advanceJump, createJump, startJump } from './motion';
 import { characterScale } from './perspective';
 import { createPortals } from './portals';
-import { createRegionPlates, preparePaintingTexture } from './regionPlates';
+import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './regionPlates';
 import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
 
 const CHILD_ATLAS_URL = '/art/child-motion-v2-ready.webp';
@@ -69,7 +69,7 @@ export async function createScene(
   { onStatus, onNotice, signal }: SceneOptions,
 ): Promise<WalkEngine> {
   const loader = new THREE.TextureLoader();
-  const plates = createRegionPlates(loader);
+  const plates = createRegionPlates(loader, [START_REGION]);
   const loaded: THREE.Texture[] = [];
   const releaseTextures = () => {
     plates.dispose();
@@ -345,6 +345,9 @@ export async function createScene(
     position = { ...spawn };
     route = [];
     background.uniforms.map!.value = plate;
+    // Home stays loaded for the reset button; everything beyond the next exits is freed.
+    const nearby = [...new Set([START_REGION, ...nearbyRegions(next)])];
+    plates.focus(nearby);
     transition = reducedMotion ? 1 : 0.25;
     blockedPortal = portalAt(position, region);
     waitingPortal = null;
@@ -604,7 +607,7 @@ export async function createScene(
     animation = requestAnimationFrame(tick);
   }
   animation = requestAnimationFrame(tick);
-  plates.preload((Object.keys(WORLDS) as Region[]).filter((other) => other !== START_REGION));
+  plates.focus(nearbyRegions(START_REGION));
   return {
     setEvening(value) {
       evening = value;

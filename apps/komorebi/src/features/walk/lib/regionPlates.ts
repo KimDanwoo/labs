@@ -1,14 +1,24 @@
 import { WORLDS, type Region } from '@shared/world/world';
 import * as THREE from 'three';
 
+type TextureSource = { loadAsync: (url: string) => Promise<THREE.Texture> };
+
 export type RegionPlates = {
   get: (region: Region) => THREE.Texture | undefined;
-  /** One shared request per region; a failed request is forgotten so a later visit can retry. */
+  /**
+   * One shared request per region. A failed request is forgotten so a later visit can retry; a painting that is
+   * no longer wanted when it arrives is disposed and the request rejects instead of returning a freed texture.
+   */
   ensure: (region: Region) => Promise<THREE.Texture>;
-  /** Loads the remaining regions one at a time so they do not compete with the first view. */
-  preload: (regions: Region[]) => void;
+  /** Keeps only `regions`: frees the rest and loads the missing ones one at a time, abandoning any older queue. */
+  focus: (regions: Region[]) => void;
   dispose: () => void;
 };
+
+/** The painting in view plus the ones its exits lead to — what a walker can reach next. */
+export function nearbyRegions(region: Region): Region[] {
+  return [region, ...new Set(WORLDS[region].portals.map((portal) => portal.to))];
+}
 
 export function preparePaintingTexture(texture: THREE.Texture) {
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -17,13 +27,17 @@ export function preparePaintingTexture(texture: THREE.Texture) {
   return texture;
 }
 
-export function createRegionPlates(loader: THREE.TextureLoader): RegionPlates {
+const abandoned = () => new DOMException('Painting no longer needed', 'AbortError');
+
+export function createRegionPlates(loader: TextureSource, initial: Region[]): RegionPlates {
   const textures = new Map<Region, THREE.Texture>();
   const requests = new Map<Region, Promise<THREE.Texture>>();
+  let wanted = new Set(initial);
+  let generation = 0;
   let isDisposed = false;
 
   function ensure(region: Region) {
-    if (isDisposed) return Promise.reject(new DOMException('Scene disposed', 'AbortError'));
+    if (isDisposed || !wanted.has(region)) return Promise.reject(abandoned());
     const ready = textures.get(region);
     if (ready) return Promise.resolve(ready);
     const pending = requests.get(region);
@@ -31,9 +45,9 @@ export function createRegionPlates(loader: THREE.TextureLoader): RegionPlates {
     const request = loader.loadAsync(WORLDS[region].image).then(
       (texture) => {
         requests.delete(region);
-        if (isDisposed) {
+        if (isDisposed || !wanted.has(region)) {
           texture.dispose();
-          throw new DOMException('Scene disposed', 'AbortError');
+          throw abandoned();
         }
         textures.set(region, preparePaintingTexture(texture));
         return texture;
@@ -47,17 +61,29 @@ export function createRegionPlates(loader: THREE.TextureLoader): RegionPlates {
     return request;
   }
 
+  async function loadInTurn(regions: Region[], queue: number) {
+    for (const region of regions) {
+      if (queue !== generation) return;
+      await ensure(region).catch(() => undefined);
+    }
+  }
+
   return {
     get: (region) => textures.get(region),
     ensure,
-    preload(regions) {
-      void regions.reduce<Promise<unknown>>(
-        (previous, region) => previous.then(() => ensure(region).catch(() => undefined)),
-        Promise.resolve(),
-      );
+    focus(regions) {
+      wanted = new Set(regions);
+      textures.forEach((texture, region) => {
+        if (wanted.has(region)) return;
+        texture.dispose();
+        textures.delete(region);
+      });
+      generation += 1;
+      void loadInTurn(regions, generation);
     },
     dispose() {
       isDisposed = true;
+      generation += 1;
       textures.forEach((texture) => texture.dispose());
       textures.clear();
     },
