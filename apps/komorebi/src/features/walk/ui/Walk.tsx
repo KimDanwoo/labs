@@ -28,13 +28,18 @@ export function Walk() {
   const [dialog, setDialog] = useState<Dialog>(DIALOG.none);
   const [memory, setMemory] = useState<Landmark | null>(null);
   const [hasGuided, setHasGuided] = useState(false);
+  const isPaused = dialog !== DIALOG.none;
   const toast = useToast();
   const visited = useDiscoveries();
   const isFirstVisit = useIsFirstVisit();
   const ambience = useAmbience(() => toast.notify('이 브라우저에서는 소리를 재생할 수 없어요.'));
-  const { engine, isReady, error, status, hasWalked } = useWalkEngine(landscapeRef, { isEvening, isSprinting });
+  const { engine, isReady, error, status, hasWalked } = useWalkEngine(landscapeRef, {
+    isEvening,
+    isSprinting,
+    isPaused,
+    onNotice: toast.notify,
+  });
   const hasStarted = hasWalked || hasGuided;
-  const isDialogOpen = dialog !== DIALOG.none;
 
   function openMemory() {
     if (!status.nearby) return;
@@ -63,7 +68,7 @@ export function Walk() {
       isSaved ? '오늘의 여름을 사진으로 간직했어요.' : '사진을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.',
     );
   }
-  useShortcuts({ isEnabled: !isDialogOpen, onDiscover: openMemory, onOpenMap: () => setDialog(DIALOG.map) });
+  useShortcuts({ isEnabled: !isPaused, onDiscover: openMemory, onOpenMap: () => setDialog(DIALOG.map) });
 
   return (
     <main className={`walk ${isEvening ? 'is-evening' : ''} ${hasStarted ? 'has-started' : ''}`}>
@@ -91,7 +96,7 @@ export function Walk() {
           <span className="hint-spark">✧</span>
         </div>
       )}
-      {status.nearby && !isDialogOpen && (
+      {status.nearby && !isPaused && (
         <InteractPrompt
           landmark={status.nearby}
           isCollected={visited.includes(status.nearby.id)}

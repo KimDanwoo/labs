@@ -22,8 +22,14 @@ import { gameKey, isControlTarget } from './input';
 import { advanceJump, createJump, startJump } from './motion';
 import { characterScale } from './perspective';
 import { createPortals } from './portals';
-import { nextRenderTime, renderPixelRatio, shouldRenderFrame } from './renderBudget';
+import { createRegionPlates, preparePaintingTexture } from './regionPlates';
+import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
 
+const CHILD_ATLAS_URL = '/art/child-motion-v2-ready.webp';
+const START_REGION: Region = 'village';
+const CAMERA_EPSILON = 0.01;
+const WARMTH_EPSILON = 0.002;
+const MOVE_KEYS = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
 const RUN_SPEED = 24;
 const SPRINT_SPEED = 36;
 
@@ -39,8 +45,16 @@ export type SceneStatus = Point & {
   nearby: Landmark | null;
   steps: number;
 };
+export type SceneOptions = {
+  onStatus: (status: SceneStatus) => void;
+  /** Short messages for the player, such as a neighbouring painting still loading. */
+  onNotice: (message: string) => void;
+  signal?: AbortSignal;
+};
 export type WalkEngine = {
   dispose: () => void;
+  /** While paused (a dialog is open) the child stands still and new movement input is ignored. */
+  setPaused: (value: boolean) => void;
   setEvening: (value: boolean) => void;
   setInput: (key: string, pressed: boolean) => void;
   reset: () => void;
@@ -52,40 +66,32 @@ export type WalkEngine = {
 /** Painted scenery on depth-separated Three.js planes, with a hand-inked directional child and a connected walkable lane graph. */
 export async function createScene(
   container: HTMLElement,
-  onStatus: (status: SceneStatus) => void,
-  signal?: AbortSignal,
+  { onStatus, onNotice, signal }: SceneOptions,
 ): Promise<WalkEngine> {
   const loader = new THREE.TextureLoader();
-  const plates = {} as Record<Region, THREE.Texture>;
+  const plates = createRegionPlates(loader);
   const loaded: THREE.Texture[] = [];
-  const regions = Object.keys(WORLDS) as Region[];
-  // Load concurrently, but settle every request before cleaning up a failed load.
-  const results = await Promise.allSettled(
-    [...regions.map((region) => WORLDS[region].image), '/art/child-motion-v2-ready.webp'].map((url) =>
-      loader.loadAsync(url),
-    ),
-  );
-  for (const result of results) {
-    if (result.status !== 'fulfilled') continue;
-    result.value.colorSpace = THREE.SRGBColorSpace;
-    result.value.generateMipmaps = false;
-    result.value.minFilter = THREE.LinearFilter;
-    loaded.push(result.value);
-  }
-  const failure = results.find((result) => result.status === 'rejected');
-  if (failure || signal?.aborted) {
+  const releaseTextures = () => {
+    plates.dispose();
     loaded.forEach((texture) => texture.dispose());
+  };
+  // Only the first view blocks the start; the other paintings follow in the background.
+  const [startPlate, atlas] = await Promise.allSettled([
+    plates.ensure(START_REGION),
+    loader.loadAsync(CHILD_ATLAS_URL),
+  ]);
+  if (atlas.status === 'fulfilled') loaded.push(preparePaintingTexture(atlas.value));
+  if (startPlate.status === 'rejected' || atlas.status === 'rejected' || signal?.aborted) {
+    releaseTextures();
+    const failure = [startPlate, atlas].find((result) => result.status === 'rejected');
     throw failure?.reason ?? new DOMException('Scene cancelled', 'AbortError');
   }
-  regions.forEach((region, index) => {
-    plates[region] = loaded[index]!;
-  });
-  const childAtlas = loaded[regions.length]!;
+  const childAtlas = atlas.value;
   let character: ReturnType<typeof createChild>;
   try {
     character = createChild(childAtlas);
   } catch (error) {
-    loaded.forEach((texture) => texture.dispose());
+    releaseTextures();
     throw error;
   }
   let renderer: THREE.WebGLRenderer;
@@ -93,7 +99,7 @@ export async function createScene(
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: false });
   } catch (error) {
     character.dispose();
-    loaded.forEach((t) => t.dispose());
+    releaseTextures();
     throw error;
   }
   // Cap fill rate on touch devices without changing the CSS viewport.
@@ -109,7 +115,7 @@ export async function createScene(
   const geo = new THREE.PlaneGeometry(120, 80, 1, 1);
   const background = new THREE.ShaderMaterial({
     uniforms: {
-      map: { value: plates.village },
+      map: { value: startPlate.value },
       time: { value: 0 },
       evening: { value: 0 },
       fade: { value: 1 },
@@ -245,7 +251,7 @@ export async function createScene(
   targetMarker.visible = false;
   scene.add(targetMarker);
 
-  let region: Region = 'village',
+  let region: Region = START_REGION,
     position = { ...SPAWN },
     route: Point[] = [],
     destination: string | null = null;
@@ -257,16 +263,29 @@ export async function createScene(
     animation = 0,
     disposed = false,
     evening = false,
+    paused = false,
+    isSettling = true,
     warmth = 0,
     transition = 1;
   let blockedPortal: WorldPortal | null = null;
+  let waitingPortal: WorldPortal | null = null;
   let heading = 0,
     moveSpeed = 0,
     touchSprint = false;
   const jump = createJump();
   const slide = createSlideMotion();
   const keys = new Set<string>();
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /** Render the next frame now and keep the full rate until camera, light and fades come to rest. */
+  const wake = () => {
+    isSettling = true;
+    nextFrame = 0;
+  };
+  const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let reducedMotion = motionQuery.matches;
+  const motionPreference = (event: MediaQueryListEvent) => {
+    reducedMotion = event.matches;
+    wake();
+  };
   let halfWidth = 60,
     halfHeight = 40;
   const resize = () => {
@@ -284,6 +303,7 @@ export async function createScene(
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(renderPixelRatio(w, h, window.devicePixelRatio, touchDevice));
     renderer.setSize(w, h);
+    wake();
   };
   const observer = new ResizeObserver(resize);
   observer.observe(container);
@@ -298,7 +318,7 @@ export async function createScene(
       route = findRoute(position, portal.center, region);
     }
   };
-  const switchRegion = (next: Region, spawn: Point) => {
+  const switchRegion = (next: Region, spawn: Point, plate: THREE.Texture) => {
     jump.height = 0;
     jump.velocity = 0;
     jump.landing = 0;
@@ -307,24 +327,22 @@ export async function createScene(
     slide.input = null;
     position = { ...spawn };
     route = [];
-    background.uniforms.map!.value = plates[region];
+    background.uniforms.map!.value = plate;
     transition = reducedMotion ? 1 : 0.25;
     blockedPortal = portalAt(position, region);
+    waitingPortal = null;
     plan();
+    wake();
     container.dataset.region = next;
   };
   container.dataset.region = region;
   const keyDown = (event: KeyboardEvent) => {
-    if (
-      (event.target instanceof HTMLElement && isControlTarget(event.target)) ||
-      document.querySelector('dialog[open]')
-    )
-      return;
+    if (paused || (event.target instanceof HTMLElement && isControlTarget(event.target))) return;
     const key = gameKey(event);
     if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) event.preventDefault();
     if (key === ' ' && !event.repeat) startJump(jump);
     keys.add(key);
-    if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+    if (MOVE_KEYS.includes(key)) {
       route = [];
       destination = null;
     }
@@ -342,7 +360,7 @@ export async function createScene(
     if (!document.hidden && !disposed) animation = requestAnimationFrame(tick);
   };
   const click = (event: PointerEvent) => {
-    if (document.querySelector('dialog[open]')) return;
+    if (paused) return;
     renderer.domElement.focus({ preventScroll: true });
     const bounds = renderer.domElement.getBoundingClientRect();
     const ray = new THREE.Raycaster();
@@ -373,20 +391,39 @@ export async function createScene(
   window.addEventListener('blur', clear);
   document.addEventListener('visibilitychange', visibility);
   renderer.domElement.addEventListener('pointerdown', click);
+  motionQuery.addEventListener('change', motionPreference);
+  const enterPortal = (portal: WorldPortal) => {
+    const plate = plates.get(portal.to);
+    if (plate) {
+      waitingPortal = null;
+      switchRegion(portal.to, portal.spawn, plate);
+      return;
+    }
+    if (waitingPortal === portal) return;
+    waitingPortal = portal;
+    onNotice(`${WORLDS[portal.to].name} 풍경을 펼치고 있어요…`);
+    plates.ensure(portal.to).catch(() => {
+      if (disposed || waitingPortal !== portal) return;
+      waitingPortal = null;
+      blockedPortal = portal;
+      onNotice('풍경을 불러오지 못했어요. 길을 잠시 벗어났다가 다시 들어가 보세요.');
+    });
+  };
   function tick(time: number) {
     if (disposed || document.hidden) return;
-    const active = keys.size > 0 || route.length > 0 || jump.height > 0 || moveSpeed > 0.05;
-    if (!shouldRenderFrame(time, nextFrame, active)) {
+    const isAirborne = jump.height > 0 || jump.velocity > 0;
+    const hasMoveKey = MOVE_KEYS.some((key) => keys.has(key));
+    const isMoving = !paused && (hasMoveKey || route.length > 0 || isAirborne || moveSpeed > 0.05);
+    const rate = isMoving || isSettling ? RENDER_RATE.active : RENDER_RATE.idle;
+    if (!shouldRenderFrame(time, nextFrame, rate)) {
       animation = requestAnimationFrame(tick);
       return;
     }
-    nextFrame = active ? time : nextRenderTime(Math.max(time, nextFrame), nextFrame);
+    nextFrame = nextRenderTime(time, nextFrame, rate);
     const dt = last ? Math.min((time - last) / 1000, 0.05) : 0;
     last = time;
     elapsed += dt;
-    const paused = !!document.querySelector('dialog[open]') || document.hidden;
-    if (paused) keys.clear();
-    else advanceJump(jump, dt);
+    if (!paused) advanceJump(jump, dt);
     let dx = Number(keys.has('d') || keys.has('arrowright')) - Number(keys.has('a') || keys.has('arrowleft'));
     let dz = Number(keys.has('s') || keys.has('arrowdown')) - Number(keys.has('w') || keys.has('arrowup'));
     const keyboardWalking = Math.hypot(dx, dz) > 0;
@@ -435,7 +472,8 @@ export async function createScene(
     if (!paused) {
       if (blockedPortal && !isInsidePortal(position, blockedPortal)) blockedPortal = null;
       const portal = portalAt(position, region);
-      if (portal && portal !== blockedPortal) switchRegion(portal.to, portal.spawn);
+      if (!portal) waitingPortal = null;
+      else if (portal !== blockedPortal) enterPortal(portal);
     }
     const scale = characterScale(position.z);
     child.scale.setScalar(scale * 1.65);
@@ -462,23 +500,27 @@ export async function createScene(
       maxY = Math.max(0, 40 - halfHeight);
     const cameraX = THREE.MathUtils.clamp(child.position.x * (halfWidth < 35 ? 1 : 0), -maxX, maxX);
     const cameraY = THREE.MathUtils.clamp(Math.min(0, child.position.y + halfHeight - 7), -maxY, maxY);
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, cameraX, reducedMotion ? 100 : 3, dt);
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, cameraY, reducedMotion ? 100 : 3, dt);
     const characterHeight = 10.4 * scale * 1.65;
     const characterHalfWidth = 3.9 * scale * 1.65;
-    camera.position.x = constrainCameraAxis(
-      camera.position.x,
-      halfWidth,
-      60,
-      child.position.x - characterHalfWidth,
-      child.position.x + characterHalfWidth,
+    const keepX = (x: number) =>
+      constrainCameraAxis(
+        x,
+        halfWidth,
+        60,
+        child.position.x - characterHalfWidth,
+        child.position.x + characterHalfWidth,
+      );
+    const keepY = (y: number) =>
+      constrainCameraAxis(y, halfHeight, 40, child.position.y - 1, child.position.y + characterHeight);
+    // Damp toward a target that already respects the painting edges, so the camera can actually arrive.
+    const targetX = keepX(cameraX);
+    const targetY = keepY(cameraY);
+    const cameraLag = reducedMotion ? 100 : 3;
+    camera.position.x = keepX(
+      settle(THREE.MathUtils.damp(camera.position.x, targetX, cameraLag, dt), targetX, CAMERA_EPSILON),
     );
-    camera.position.y = constrainCameraAxis(
-      camera.position.y,
-      halfHeight,
-      40,
-      child.position.y - 1,
-      child.position.y + characterHeight,
+    camera.position.y = keepY(
+      settle(THREE.MathUtils.damp(camera.position.y, targetY, cameraLag, dt), targetY, CAMERA_EPSILON),
     );
     markers.forEach((marker, i) => {
       const point = LANDMARKS[i]!;
@@ -491,7 +533,8 @@ export async function createScene(
       const target = route[route.length - 1]!;
       targetMarker.position.set(target.x * 1.2 - 60, 40 - target.z * 0.8 + 0.5, 1);
     }
-    warmth = THREE.MathUtils.damp(warmth, evening ? 1 : 0, 2, dt);
+    const targetWarmth = evening ? 1 : 0;
+    warmth = settle(THREE.MathUtils.damp(warmth, targetWarmth, 2, dt), targetWarmth, WARMTH_EPSILON);
     transition = Math.min(1, transition + dt * 1.8);
     background.uniforms.time!.value = reducedMotion ? 0 : elapsed;
     background.uniforms.evening!.value = warmth;
@@ -504,6 +547,12 @@ export async function createScene(
       }
       dustGeo.attributes.position!.needsUpdate = true;
     }
+    isSettling =
+      camera.position.x !== targetX ||
+      camera.position.y !== targetY ||
+      warmth !== targetWarmth ||
+      transition < 1 ||
+      jump.landing > 0.01;
     if (elapsed - statusTime > 0.12) {
       container.dataset.motion = motionLabel(jump.height > 0, walking, sprinting);
       const nextStatus: SceneStatus = {
@@ -531,9 +580,16 @@ export async function createScene(
     animation = requestAnimationFrame(tick);
   }
   animation = requestAnimationFrame(tick);
+  plates.preload((Object.keys(WORLDS) as Region[]).filter((other) => other !== START_REGION));
   return {
     setEvening(value) {
       evening = value;
+      wake();
+    },
+    setPaused(value) {
+      paused = value;
+      keys.clear();
+      wake();
     },
     setInput(key, pressed) {
       if (key === 'shift') {
@@ -541,9 +597,10 @@ export async function createScene(
         return;
       }
       if (key === ' ') {
-        if (pressed && !document.querySelector('dialog[open]')) startJump(jump);
+        if (pressed && !paused) startJump(jump);
         return;
       }
+      if (pressed && paused) return;
       if (pressed) {
         keys.add(key);
         if (key !== 'shift') {
@@ -558,7 +615,7 @@ export async function createScene(
     },
     reset() {
       destination = null;
-      switchRegion('village', SPAWN);
+      switchRegion(START_REGION, SPAWN, startPlate.value);
       keys.clear();
     },
     photo() {
@@ -599,6 +656,7 @@ export async function createScene(
       window.removeEventListener('keyup', keyUp);
       window.removeEventListener('blur', clear);
       document.removeEventListener('visibilitychange', visibility);
+      motionQuery.removeEventListener('change', motionPreference);
       renderer.domElement.removeEventListener('pointerdown', click);
       foregrounds.forEach(({ mesh }) => mesh.geometry.dispose());
       foregroundMaterial.dispose();
@@ -606,7 +664,7 @@ export async function createScene(
       geo.dispose();
       dustGeo.dispose();
       [background, shadowMat, dustMat, targetMat, ...markerMats].forEach((m) => m.dispose());
-      loaded.forEach((t) => t.dispose());
+      releaseTextures();
       character.dispose();
       renderer.dispose();
       renderer.domElement.remove();
