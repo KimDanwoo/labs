@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { FLIGHT, startFlight, stepButterfly, stepDragonfly, type Bounds } from '../src/features/walk/lib/flight';
+import {
+  FLIGHT,
+  flyFor,
+  startFlight,
+  stepButterfly,
+  stepDragonfly,
+  type Bounds,
+} from '../src/features/walk/lib/flight';
 
 const bounds: Bounds = { minX: 10, maxX: 30, minZ: 40, maxZ: 60 };
 function seeded(seed: number) {
@@ -51,4 +58,28 @@ test('two flyers from different seeds take different paths', () => {
     fb = stepButterfly(fb, 1 / 60, bounds, b);
   }
   assert.ok(Math.hypot(fa.x - fb.x, fa.z - fb.z) > 1);
+});
+
+test('an insect flies the same at 30 and 60 frames a second', () => {
+  const seeded = () => {
+    let seed = 11;
+    return () => {
+      seed = (seed * 1_664_525 + 1_013_904_223) >>> 0;
+      return seed / 4_294_967_296;
+    };
+  };
+  const fly = (fps: number) => {
+    const random = seeded();
+    let state = { flight: startFlight(bounds, random, FLIGHT.flutter), clock: 0 };
+    for (let frame = 0; frame < 60 * fps; frame++)
+      state = flyFor(state.flight, state.clock, 1 / fps, stepButterfly, bounds, random);
+    return state.flight;
+  };
+  const at30 = fly(30);
+  const at60 = fly(60);
+  assert.ok(
+    Math.abs(at30.x - at60.x) < 1e-6 && Math.abs(at30.z - at60.z) < 1e-6,
+    `${at30.x},${at30.z} vs ${at60.x},${at60.z}`,
+  );
+  assert.equal(at30.mode, at60.mode);
 });

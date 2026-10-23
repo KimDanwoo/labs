@@ -119,3 +119,21 @@ export function stepDragonfly(f: Flight, dt: number, bounds: Bounds, random: Ran
 function angleTowards(from: number, to: number) {
   return Math.atan2(Math.sin(to - from), Math.cos(to - from));
 }
+
+export const FLIGHT_STEP = 1 / 60;
+const MAX_STEPS = 4;
+type Step = (f: Flight, dt: number, bounds: Bounds, random: Random) => Flight;
+
+/**
+ * Advances a flight in fixed 1/60 s steps, whatever the frame rate, so an insect behaves the same whether the
+ * scene draws at 30 or 60 fps. `clock` carries the leftover time; a long stall is dropped rather than replayed.
+ */
+export function flyFor(f: Flight, clock: number, seconds: number, step: Step, bounds: Bounds, random: Random) {
+  let flight = f;
+  let left = Math.min(clock + seconds, FLIGHT_STEP * MAX_STEPS);
+  while (left >= FLIGHT_STEP - 1e-9) {
+    flight = step(flight, FLIGHT_STEP, bounds, random);
+    left -= FLIGHT_STEP;
+  }
+  return { flight, clock: Math.max(0, left) };
+}

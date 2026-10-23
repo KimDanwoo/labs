@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { FOREGROUNDS, foregroundOrder, isForegroundInFront } from '../src/shared/world/foreground';
-import type { Region } from '../src/shared/world/world';
+import { WORLDS, canWalk, type Region } from '../src/shared/world/world';
 
 function covered(region: Region, x: number, y: number, feetDepth: number) {
   return FOREGROUNDS.some((layer) => {
@@ -83,4 +83,37 @@ test('a foreground layer sits just above whoever is behind it and under whoever 
   const childBehind = foregroundOrder(bridgeRail, [child(onBridge), cat(onPathBelow, 4.2)], 'river');
   assert.ok(childBehind !== null && childBehind > 4 && childBehind < 4.2);
   assert.equal(foregroundOrder(bridgeRail, [child(onBridge)], 'village'), null);
+});
+
+test('no reachable pair of child and animal needs a foreground both above and below them', () => {
+  const STEP = 0.5;
+  for (const region of Object.keys(WORLDS) as Region[]) {
+    const { nodes, routes } = WORLDS[region];
+    const lanes = routes.flatMap(({ a, b }) => {
+      const from = nodes.find((node) => node.id === a)!;
+      const to = nodes.find((node) => node.id === b)!;
+      const count = Math.ceil(Math.hypot(to.x - from.x, to.z - from.z) / STEP);
+      return Array.from({ length: count + 1 }, (_, i) => ({
+        x: from.x + ((to.x - from.x) * i) / count,
+        z: from.z + ((to.z - from.z) * i) / count,
+      }));
+    });
+    const walkable = Array.from({ length: 201 * 201 }, (_, i) => ({
+      x: (i % 201) * STEP,
+      z: Math.floor(i / 201) * STEP,
+    })).filter(({ x, z }) => canWalk(x, z, region));
+    for (const layer of FOREGROUNDS.filter((candidate) => candidate.region === region)) {
+      const xs = layer.outline.map(([x]) => x / 15.36);
+      const isNear = ({ x }: { x: number }) => x >= Math.min(...xs) - 4 && x <= Math.max(...xs) + 4;
+      const isBehind = (point: { x: number; z: number }) => isForegroundInFront(layer, point, region);
+      const children = walkable.filter(isNear);
+      // Nearer walkers carry the higher render order, so whoever the layer hides must also be the farther one.
+      for (const animal of lanes.filter(isNear)) {
+        const clash = children.find(
+          (child) => isBehind(animal) !== isBehind(child) && isBehind(animal) === animal.z > child.z,
+        );
+        assert.equal(clash, undefined, `${region}: animal ${animal.x},${animal.z} vs child ${clash?.x},${clash?.z}`);
+      }
+    }
+  }
 });

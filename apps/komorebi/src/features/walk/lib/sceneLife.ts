@@ -1,7 +1,7 @@
 import type { Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
-import { FLIGHT, startFlight, stepButterfly, stepDragonfly, type Bounds, type Flight } from './flight';
+import { FLIGHT, flyFor, startFlight, stepButterfly, stepDragonfly, type Bounds, type Flight } from './flight';
 import { lampGlowAt, lightSprite } from './nightLights';
 import { characterScale } from './perspective';
 
@@ -130,6 +130,8 @@ type Life = {
   lift: number;
   /** 1 in the air, 0 on a perch, eased between so the hovering bob fades rather than snaps. */
   aloft: number;
+  /** Time not yet spent on a whole flight step. */
+  clock: number;
 };
 
 const between = (min: number, max: number) => min + Math.random() * (max - min);
@@ -168,6 +170,7 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
           bob: Math.random() * 10,
           lift: ALTITUDE[kind][0],
           aloft: 1,
+          clock: 0,
         };
       }),
     ),
@@ -237,7 +240,14 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
         life.sprite.visible = isFlying && life.region === region;
         if (!life.sprite.visible) continue;
         const step = life.kind === INSECT.butterfly ? stepButterfly : stepDragonfly;
-        life.flight = step(life.flight, dt, life.bounds, Math.random);
+        ({ flight: life.flight, clock: life.clock } = flyFor(
+          life.flight,
+          life.clock,
+          dt,
+          step,
+          life.bounds,
+          Math.random,
+        ));
         life.material.opacity = 1 - dusk;
         drawInsect(life, elapsed, dt);
       }
