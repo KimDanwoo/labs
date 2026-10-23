@@ -56,23 +56,24 @@ python3 -m http.server 3011 --directory apps/komorebi/out
 - `src/features/walk/lib/audio.ts`: Web Audio 바람과 새소리
 - `src/shared/world`: 그림 속 길에 맞춘 이동 영역, 지역 연결, 최단 경로
 - `public/art`: 내장 이미지 생성 도구로 새로 제작한 여섯 장의 배경화
+- `art-source`: 런타임에 쓰지 않는 원본 PNG·이전 시트·생성 프롬프트(배포 제외 보관용)
 - `scripts/world.test.ts`: 이동 가능 영역, 강 진입 차단, 모든 경로의 도달 가능성 검증
 
 배경은 자유 회전하는 완전한 3D 지형이 아니라 고정 시점의 배경화입니다. 아이는 원화 스프라이트 시트를 사용하는 2D 캐릭터이며 거리별 크기, 옆모습·뒷모습, 움직이는 그림자로 입체감을 표현합니다. 모바일에서는 좁은 화면 밖으로 아이가 나가지 않게 가로 카메라가 따라갑니다. 논길과 다리처럼 화면에 보이는 길로 이동 범위를 제한합니다.
 
 WebGL이 필요하며 기기 화면 배율을 최대 2로 제한합니다. 시스템의 동작 줄이기 설정을 지원합니다. 게임 이미지와 오디오는 외부 API 없이 로컬 자산과 합성으로 동작합니다. Google Fonts가 연결되지 않으면 시스템 글꼴을 사용합니다.
 
-배경 제작 도구와 프롬프트는 [GAME-ART-PROMPTS.txt](public/art/GAME-ART-PROMPTS.txt)에 기록했습니다. 참고 게임의 원본 이미지나 모델을 사용하지 않습니다.
+배경 제작 도구와 프롬프트는 [GAME-ART-PROMPTS.txt](art-source/GAME-ART-PROMPTS.txt)에 기록했습니다. 참고 게임의 원본 이미지나 모델을 사용하지 않습니다.
 
 캐릭터는 실제 이동 거리로 보행 위상을 계산합니다. 정지 자세와 방향별 보행 프레임을 분리하고, 후드 중심과 발 높이를 정렬해 프레임 전환의 떨림을 줄였습니다. 달리기는 재생 속도와 상체 기울기가 달라집니다. 점프는 중력과 착지 반동을 사용하고, 공중에서 다시 점프할 수 없습니다. 학교 운동장에서는 넓은 영역을 자유롭게 뛰어다닐 수 있습니다.
 
-학교·상점가 배경의 생성 프롬프트는 [EXTRA-ART-PROMPTS.txt](public/art/EXTRA-ART-PROMPTS.txt)에 있습니다.
+학교·상점가 배경의 생성 프롬프트는 [EXTRA-ART-PROMPTS.txt](art-source/EXTRA-ART-PROMPTS.txt)에 있습니다.
 
 캐릭터 동작 확인 영상: [걷기·달리기·점프](docs/character-motion.webm).
 
-캐릭터 원화: `public/art/child-atlas.png` (4방향 × 6프레임). 생성 도구와 프롬프트: [CHARACTER-PROMPT.txt](public/art/CHARACTER-PROMPT.txt).
+캐릭터 원화: `art-source/child-atlas.png` (4방향 × 6프레임). 생성 도구와 프롬프트: [CHARACTER-PROMPT.txt](art-source/CHARACTER-PROMPT.txt).
 
-보행 개선 시트: `public/art/child-walk-atlas.png` (4방향 × 8열: 정지 1 + 보행 6 + 공중 1). RGB 시트의 중성 체크 배경은 Three.js 렌더러에서 제거합니다. [보행 개선 프롬프트](public/art/CHARACTER-WALK-PROMPTS.txt).
+보행 개선 시트: `art-source/child-walk-atlas.png` (4방향 × 8열: 정지 1 + 보행 6 + 공중 1). RGB 시트의 중성 체크 배경은 Three.js 렌더러에서 제거합니다. [보행 개선 프롬프트](art-source/CHARACTER-WALK-PROMPTS.txt).
 
 ## 성능 관리
 
