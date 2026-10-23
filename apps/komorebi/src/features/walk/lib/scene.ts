@@ -1358,7 +1358,7 @@ export async function createScene(
       ctx.font = `${Math.max(20, canvas.width / 55)}px serif`;
       ctx.shadowColor = '#18372c';
       ctx.shadowBlur = 5;
-      ctx.fillText('木漏れ日  /  여름빛 산책', canvas.width * 0.04, canvas.height * 0.95);
+      ctx.fillText('여름빛 산책', canvas.width * 0.04, canvas.height * 0.95);
       return new Promise<boolean>((resolve) => {
         canvas.toBlob((blob) => {
           if (!blob) {
