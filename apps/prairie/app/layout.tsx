@@ -21,14 +21,14 @@ const sora = Sora({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://prairie.danwoo.dev'),
-  title: '유니콘 러시 · Unicorn Rush',
-  applicationName: 'Unicorn Rush',
+  title: '유니콘 러시',
+  applicationName: '유니콘 러시',
   twitter: { card: 'summary_large_image' },
-  description: '유니콘을 타고 초원과 하늘을 탐험하는 3D 비행 플레이그라운드. 공중 회전과 제로백 스킬을 즐겨보세요.',
+  description: '초원과 하늘을 자유롭게 달리는 게임',
   openGraph: {
-    title: '유니콘 러시 · Unicorn Rush',
-    siteName: 'Unicorn Rush',
-    description: '유니콘과 함께하는 3D 비행. 공중 회전, 별가루, 제로백 가속.',
+    title: '유니콘 러시',
+    siteName: '유니콘 러시',
+    description: '초원과 하늘을 자유롭게 달리는 게임',
     locale: 'ko_KR',
     type: 'website',
   },

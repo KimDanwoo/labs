@@ -59,8 +59,8 @@ const LANDING_LOUDNESS = 1.6;
 const NEAREST_SCALE = characterScale(100);
 /** One place action at a time, sound included; the longest cue (the shrine bell) rings about this long. */
 const ACTION_LOCK_MS = 2_200;
-const RUN_SPEED = 24;
-const SPRINT_SPEED = 36;
+const WALK_SPEED = 18;
+const SPRINT_SPEED = 30;
 
 function motionLabel(isAirborne: boolean, isMoving: boolean, isSprinting: boolean) {
   if (isAirborne) return 'jumping';
@@ -130,7 +130,7 @@ export async function createScene(
   let appearanceRequest = 0;
   let character: ReturnType<typeof createChild>;
   try {
-    character = createChild(childAtlas);
+    character = createChild(childAtlas, appearance);
   } catch (error) {
     releaseTextures();
     throw error;
@@ -1232,7 +1232,7 @@ export async function createScene(
     const magnitude = Math.hypot(dx, dz);
     let walking = magnitude > 0 && !paused;
     let frameTravel = 0;
-    const targetSpeed = sprinting ? SPRINT_SPEED : RUN_SPEED;
+    const targetSpeed = sprinting ? SPRINT_SPEED : WALK_SPEED;
     moveSpeed = THREE.MathUtils.damp(moveSpeed, walking ? targetSpeed : 0, 24, dt);
     if (walking) {
       dx /= magnitude;
@@ -1281,7 +1281,7 @@ export async function createScene(
       characterTravel,
       rest?.heading ?? heading,
       rest?.walking ?? walking,
-      true,
+      !rest && sprinting,
       reducedMotion,
       jump.height,
       jump.velocity,
@@ -1457,7 +1457,7 @@ export async function createScene(
         }
         if (disposed || request !== appearanceRequest) return false;
         currentAppearance = next;
-        character.setAtlas(texture);
+        character.setAtlas(texture, next);
         container.dataset.appearance = `${next.character}-${next.outfit}`;
         if (region === 'home') void bedRest.prepare(next.character);
         wake();

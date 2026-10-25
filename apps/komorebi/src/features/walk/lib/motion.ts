@@ -23,7 +23,7 @@ export function advanceMotion(
   const blend = 1 - Math.exp(-dt * 13);
   state.energy += ((moving ? 1 : 0) - state.energy) * blend;
   state.run += ((running && moving ? 1 : 0) - state.run) * (1 - Math.exp(-dt * 9));
-  state.phase += (travel * Math.PI * 2) / (8 + state.run * 3);
+  state.phase += (travel * Math.PI * 2) / (16 + state.run * 6);
   const delta = angleDelta(state.heading, heading);
   const turn = delta * (1 - Math.exp(-dt * 15));
   state.heading += turn;

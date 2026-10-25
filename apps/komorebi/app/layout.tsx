@@ -2,8 +2,18 @@ import '@app/globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '코모레비 — 여름빛 산책',
-  description: '논길을 지나 강과 바다로. 작은 꼬마와 함께 걷는 2.5D 여름 시골, Three.js 산책 프로젝트.',
+  metadataBase: new URL('https://komorebi.danwoo.dev'),
+  title: '코모레비',
+  applicationName: '코모레비',
+  twitter: { card: 'summary_large_image' },
+  openGraph: {
+    title: '코모레비',
+    siteName: '코모레비',
+    description: '여름 시골을 느긋하게 걷는 게임',
+    locale: 'ko_KR',
+    type: 'website',
+  },
+  description: '여름 시골을 느긋하게 걷는 게임',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

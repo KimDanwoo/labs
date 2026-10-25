@@ -27,7 +27,7 @@ export function MobileControls({ isReady, isPaused, isSprinting, onInput, onTogg
           aria-pressed={isSprinting}
           onClick={onToggleSprint}
         >
-          {isSprinting ? '달리기로 전환' : '전력 질주'}
+          {isSprinting ? '걷기로 전환' : '달리기'}
         </button>
       </div>
     </div>

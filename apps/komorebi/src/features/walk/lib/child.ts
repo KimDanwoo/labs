@@ -1,11 +1,14 @@
+import { characterDirectionScale, type Appearance } from '@shared/world/appearance';
 import * as THREE from 'three';
 import { childFacing } from './atlas';
+import { atlasColumn } from './childFrames';
 import { advanceMotion, createMotion, crossedFootfall } from './motion';
 import { lightSprite } from './nightLights';
 
-/** Authored 4-direction artwork with idle, six walk poses and an airborne pose. Identity never morphs when turning. */
-export function createChild(initialAtlas: THREE.Texture) {
+/** Four directions: idle, four walking poses, two running contacts and a jump. */
+export function createChild(initialAtlas: THREE.Texture, initialAppearance: Appearance) {
   let atlas = initialAtlas;
+  let appearance = initialAppearance;
   const group = new THREE.Group();
   atlas.repeat.set(1 / 8, 1 / 4);
   atlas.offset.set(0, 3 / 4);
@@ -20,8 +23,9 @@ export function createChild(initialAtlas: THREE.Texture) {
   let frame = -1;
   return {
     group,
-    setAtlas(next: THREE.Texture) {
+    setAtlas(next: THREE.Texture, nextAppearance: Appearance) {
       atlas = next;
+      appearance = nextAppearance;
       atlas.repeat.set(1 / 8, 1 / 4);
       atlas.offset.set(0, (3 - facing) / 4);
       material.map = atlas;
@@ -49,7 +53,7 @@ export function createChild(initialAtlas: THREE.Texture) {
       // Discrete artwork must follow the requested direction immediately. Smoothing
       // a 180-degree turn displays unrelated side frames while walking backwards.
       facing = childFacing(facing, heading);
-      const column = atlasColumn(jumpHeight > 0, walking && !reducedMotion, m.phase);
+      const column = atlasColumn(jumpHeight > 0 || jumpVelocity > 0, walking && !reducedMotion, m.phase, running);
       const nextFrame = facing * 8 + column;
       if (frame !== nextFrame) {
         atlas.offset.set(column / 8, (3 - facing) / 4);
@@ -58,9 +62,9 @@ export function createChild(initialAtlas: THREE.Texture) {
       // The drawings carry the gait. Only subtle whole-body secondary motion is added.
       material.rotation = reducedMotion ? 0 : -Math.sin((facing * Math.PI) / 2) * m.run * m.energy * 0.045;
       const squash = reducedMotion ? 0 : landing * 0.045;
-      sprite.scale.set(7.8 * (1 + squash * 0.4), 10.4 * (1 - squash), 1);
+      const directionScale = characterDirectionScale(appearance, facing);
+      sprite.scale.set(7.8 * directionScale * (1 + squash * 0.4), 10.4 * directionScale * (1 - squash), 1);
       sprite.position.y = reducedMotion ? 0 : Math.sin(time * 2.2) * 0.015 * (1 - m.energy);
-      void jumpVelocity;
       return { hasStepped: walking && jumpHeight <= 0 && crossedFootfall(previousPhase, m.phase) };
     },
     /** Moonlight on the sprite, so the child sits in the night painting rather than on top of it. */
@@ -72,14 +76,4 @@ export function createChild(initialAtlas: THREE.Texture) {
       material.dispose();
     },
   };
-}
-
-const AIR_COLUMN = 7;
-const STAND_COLUMN = 0;
-const WALK_FRAMES = 6;
-
-function atlasColumn(isAirborne: boolean, isStepping: boolean, phase: number) {
-  if (isAirborne) return AIR_COLUMN;
-  if (!isStepping) return STAND_COLUMN;
-  return 1 + (Math.floor((phase / (Math.PI * 2)) * WALK_FRAMES) % WALK_FRAMES);
 }
