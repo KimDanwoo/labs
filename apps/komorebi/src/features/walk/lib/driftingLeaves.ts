@@ -2,6 +2,7 @@ import type { Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { lightSprite } from './nightLights';
+import { sceneX, sceneY } from './perspective';
 
 // Sparse leaves start beside actual trees, rather than raining over the entire screen.
 const SOURCES: Record<Region, readonly [number, number][]> = {
@@ -82,7 +83,7 @@ export function createDriftingLeaves(scene: THREE.Scene) {
         const drift = progress * (7 + rain * 5) + Math.sin(progress * 9 + phase) * 1.3;
         const x = source[0] + drift;
         const z = source[1] + progress * 16;
-        sprite.position.set(x * 1.2 - 60, 40 - z * 0.8, 1);
+        sprite.position.set(sceneX(x), sceneY(z), 1);
         const size = 0.3 + z * 0.003;
         sprite.scale.set(size * (0.25 + 0.75 * Math.abs(Math.cos(clock * 2.4 + phase))), size * 0.65, 1);
         material.rotation = Math.sin(clock * 1.6 + phase) * 0.7 + progress * 2;

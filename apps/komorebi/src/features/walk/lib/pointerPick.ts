@@ -2,6 +2,7 @@ import { interactionDestination } from '@shared/world/interactions';
 import type { WorldPortal } from '@shared/world/portals';
 import { DESTINATIONS, canWalk, type Point, type Region } from '@shared/world/world';
 import * as THREE from 'three';
+import { worldFromScene } from './perspective';
 import type { createPortals } from './portals';
 
 export type PickTarget = { point: Point; portal: WorldPortal | null; interactive: boolean };
@@ -36,7 +37,7 @@ export function createPointerPick({ canvas, camera, portals, markers }: PointerP
       if (point) return { point, portal: null, interactive: true };
     }
     if (!ray.ray.intersectPlane(groundPlane, intersection)) return null;
-    const hit = { x: (intersection.x + 60) / 1.2, z: (40 - intersection.y) / 0.8 };
+    const hit = worldFromScene(intersection.x, intersection.y);
     const interactive = interactionDestination(hit, region);
     const point = interactive ?? hit;
     return canWalk(point.x, point.z, region) ? { point, portal: null, interactive: interactive !== null } : null;

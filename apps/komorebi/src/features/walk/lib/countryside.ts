@@ -2,7 +2,7 @@ import type { Point, Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { lightSprite } from './nightLights';
-import { characterScale } from './perspective';
+import { characterScale, sceneX, sceneY } from './perspective';
 import { BIRD_STATE, startSparrow, stepSparrow } from './sparrows';
 
 function sparrowTexture(wing: number) {
@@ -133,7 +133,7 @@ export function createCountryside(scene: THREE.Scene) {
     depthWrite: false,
   });
   const rope = new THREE.Sprite(ropeMaterial);
-  rope.position.set(42.5 * 1.2 - 60, 40 - 35.4 * 0.8, 0.5);
+  rope.position.set(sceneX(42.5), sceneY(35.4), 0.5);
   rope.scale.set(8.6, 4.3, 1);
   rope.renderOrder = 2;
   scene.add(rope);
@@ -246,7 +246,7 @@ export function createCountryside(scene: THREE.Scene) {
         const peck = !flying && (bird.age + bird.seed) % 3.7 > 3.3;
         material.rotation = Number(peck) * (entry.facingLeft ? 0.22 : -0.22);
         sprite.scale.set(height * 1.33, height, 1);
-        sprite.position.set(bird.at.x * 1.2 - 60, 40 - bird.at.z * 0.8 + bird.lift, 0.7);
+        sprite.position.set(sceneX(bird.at.x), sceneY(bird.at.z) + bird.lift, 0.7);
         material.opacity = entry.opacity;
         lightSprite(material.color, darkness, 0);
       }

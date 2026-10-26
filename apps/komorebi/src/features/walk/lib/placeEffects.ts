@@ -1,6 +1,7 @@
 import { PLACE_ACTION, type PlaceAction, type Point } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
+import { sceneX, sceneY } from './perspective';
 
 const RING_POOL = 6;
 const MOTE_POOL = 24;
@@ -18,7 +19,7 @@ type Mote = {
 type Ring = { delay: number; at: Point };
 type Burst = { motes: Mote[]; rings: Ring[] };
 
-const toScene = (point: Point) => new THREE.Vector2(point.x * 1.2 - 60, 40 - point.z * 0.8);
+const toScene = (point: Point) => new THREE.Vector2(sceneX(point.x), sceneY(point.z));
 
 let seed = 7;
 const random = () => {

@@ -2,7 +2,7 @@ import type { Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { FLIGHT, flyFor, startFlight, stepButterfly, stepDragonfly, type Bounds, type Flight } from './flight';
 import { lampGlowAt, lightSprite } from './nightLights';
-import { characterScale } from './perspective';
+import { characterScale, sceneX, sceneY } from './perspective';
 
 const CAT_URL = '/art/cat-sleeping.webp';
 const FLYER_ORDER = 3.6;
@@ -165,7 +165,7 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
   const cat = new THREE.Sprite(catMaterial);
   cat.renderOrder = CAT_ORDER;
   cat.visible = false;
-  cat.position.set(CAT_SPOT.x * 1.2 - 60, 40 - CAT_SPOT.z * 0.8, 1);
+  cat.position.set(sceneX(CAT_SPOT.x), sceneY(CAT_SPOT.z), 1);
   scene.add(cat);
   let catTexture: THREE.Texture | null = null;
   let catWidth = 0;
@@ -196,7 +196,7 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
     life.lift = THREE.MathUtils.damp(life.lift, isSettled ? settled : flying, LANDING_EASE, dt);
     life.aloft = THREE.MathUtils.damp(life.aloft, isSettled ? 0 : 1, LANDING_EASE, dt);
     const bob = life.aloft * (Math.sin(elapsed * 3.1 + life.bob) * 0.5 + Math.sin(elapsed * 7.3 + life.bob) * 0.2);
-    s.position.set(flight.x * 1.2 - 60, 40 - flight.z * 0.8 + life.lift + bob, 1);
+    s.position.set(sceneX(flight.x), sceneY(flight.z) + life.lift + bob, 1);
     if (kind === INSECT.butterfly) {
       s.scale.set(depth * ATLAS.butterfly.aspect * (0.2 + 0.8 * Math.abs(Math.cos(flight.wing))), depth, 1);
       material.rotation = isSettled ? 0 : Math.sin(elapsed * 2 + life.bob) * 0.25;
@@ -234,7 +234,7 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
         const z = gull.path.z + Math.sin(t * 1.7 + 1) * 3;
         const beat = WINGBEAT[Math.floor((elapsed * 3 + gull.phase) * WINGBEAT.length) % WINGBEAT.length]!;
         showCell(gull.material.map!, beat, ATLAS.gull.frames);
-        gull.sprite.position.set(x * 1.2 - 60, 40 - z * 0.8, 1);
+        gull.sprite.position.set(sceneX(x), sceneY(z), 1);
         gull.sprite.scale.set(SIZE.gull * ATLAS.gull.aspect, SIZE.gull, 1);
         gull.material.opacity = 1 - dusk;
       }

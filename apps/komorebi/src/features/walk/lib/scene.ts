@@ -33,7 +33,7 @@ import { createFireflies } from './fireflies';
 import { gameKey, isControlTarget, keyboardDirection } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
 import { createNightLights, lampGlowAt, lampUniforms } from './nightLights';
-import { CHILD_SIZE, characterScale } from './perspective';
+import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
 import { createPlaceEffects } from './placeEffects';
 import { createPointerPick } from './pointerPick';
 import { createPortals } from './portals';
@@ -278,7 +278,7 @@ export async function createScene(
   );
   const markers = DESTINATIONS.map((p, i) => {
     const s = new THREE.Sprite(markerMats[i]);
-    s.position.set(p.x * 1.2 - 60, 40 - p.z * 0.8 + 2, 1);
+    s.position.set(sceneX(p.x), sceneY(p.z) + 2, 1);
     s.scale.set(1.7, 1.7, 1);
     s.renderOrder = 2;
     scene.add(s);
@@ -619,8 +619,8 @@ export async function createScene(
   }
   function placeCharacter(scale: number, size: number, rest: BedRestFrame | null) {
     const visualPosition = rest?.point ?? position;
-    child.position.set(visualPosition.x * 1.2 - 60, 40 - visualPosition.z * 0.8 + jump.height * scale, 2);
-    shadow.position.set(child.position.x + scale * 0.3, 40 - visualPosition.z * 0.8 - 0.08, 1);
+    child.position.set(sceneX(visualPosition.x), sceneY(visualPosition.z) + jump.height * scale, 2);
+    shadow.position.set(child.position.x + scale * 0.3, sceneY(visualPosition.z) - 0.08, 1);
     const shadowSize = 1 - Math.min(jump.height * 0.12, 0.3);
     shadow.scale.set(3.8 * size * shadowSize, 1.1 * size * shadowSize, 1);
     shadowMat.opacity = (rest?.opacity ?? 1) * (1 - Math.min(jump.height * 0.22, 0.55));
@@ -664,13 +664,13 @@ export async function createScene(
     markers.forEach((marker, i) => {
       const point = DESTINATIONS[i]!;
       marker.visible = point.region === region && !sleeping;
-      marker.position.y = 40 - point.z * 0.8 + 2 + (reducedMotion ? 0 : Math.sin(sceneryTime * 1.5 + i) * 0.17);
+      marker.position.y = sceneY(point.z) + 2 + (reducedMotion ? 0 : Math.sin(sceneryTime * 1.5 + i) * 0.17);
     });
     portalVisuals.update(region);
     targetMarker.visible = route.length > 0;
     if (route.length) {
       const target = route[route.length - 1]!;
-      targetMarker.position.set(target.x * 1.2 - 60, 40 - target.z * 0.8 + 0.5, 1);
+      targetMarker.position.set(sceneX(target.x), sceneY(target.z) + 0.5, 1);
     }
   }
   /** Eases warmth, darkness and wetness toward the chosen time and weather; returns whether any is still changing. */
