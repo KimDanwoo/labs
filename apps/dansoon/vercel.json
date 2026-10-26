@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "**": false,
+      "main": true
+    }
+  },
   "framework": "astro",
   "buildCommand": "pnpm exec turbo run build --filter=dansoon",
   "outputDirectory": "dist",
