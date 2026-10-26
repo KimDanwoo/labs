@@ -66,6 +66,16 @@ function motionLabel(isAirborne: boolean, isMoving: boolean, isSprinting: boolea
   return isSprinting ? 'sprinting' : 'running';
 }
 
+const easeLight = (current: number, target: number, lambda: number, dt: number) =>
+  settle(THREE.MathUtils.damp(current, target, lambda, dt), target, WARMTH_EPSILON);
+
+const STATUS_KEYS = ['x', 'z', 'region', 'walking', 'nearby', 'steps'] as const satisfies (keyof SceneStatus)[];
+const hasStatusChanged = (previous: SceneStatus, next: SceneStatus) =>
+  STATUS_KEYS.some((key) => previous[key] !== next[key]);
+
+type Stride = { walking: boolean; sprinting: boolean; frameTravel: number };
+type BedRestFrame = NonNullable<ReturnType<ReturnType<typeof createBedRest>['update']>>;
+
 export type SceneStatus = Point & {
   region: Region;
   walking: boolean;
@@ -522,25 +532,8 @@ export async function createScene(
     onSleep();
     wake();
   }
-  function tick(time: number) {
-    if (disposed || document.hidden) return;
-    const wasAirborne = isAirborne(jump);
-    const hasMoveKey = MOVE_KEYS.some((key) => keys.has(key));
-    const isMoving = !paused && (hasMoveKey || route.length > 0 || wasAirborne || moveSpeed > 0.05);
-    const rate = isMoving || isSettling ? RENDER_RATE.active : RENDER_RATE.idle;
-    if (!shouldRenderFrame(time, nextFrame, rate)) {
-      animation = requestAnimationFrame(tick);
-      return;
-    }
-    nextFrame = nextRenderTime(time, nextFrame, rate);
-    const dt = last ? Math.min((time - last) / 1000, 0.05) : 0;
-    last = time;
-    elapsed += dt;
-    if (!paused && !reducedMotion) sceneryTime += dt;
-    background.uniforms.sceneryTime!.value = reducedMotion ? 0 : sceneryTime;
-    if (!paused) advanceJump(jump, dt);
-    const hasLanded = !paused && wasAirborne && !isAirborne(jump);
-    const regionBefore = region;
+  /** Moves the child along held keys or the planned route and reports how this frame's stride went. */
+  function walk(dt: number) {
     let { dx, dz } = keyboardDirection(keys);
     const keyboardWalking = Math.hypot(dx, dz) > 0;
     if (!keyboardWalking || paused) {
@@ -585,21 +578,24 @@ export async function createScene(
         destination = null;
       }
     }
-    if (!paused) {
-      if (region !== 'home' || !isNearHomeBed(position)) sleepBlocked = false;
-      if (region === 'home' && isAtHomeBed(position)) void startSleep();
-      if (blockedPortal && !isInsidePortal(position, blockedPortal)) {
-        blockedPortal = null;
-        cancelledPortal = null;
-      }
-      const portal = portalAt(position, region);
-      if (!portal) waitingPortal = null;
-      else if (portal !== blockedPortal) enterPortal(portal);
+    return { walking, sprinting, frameTravel };
+  }
+  /** Reacts to where the child now stands: the bed, a released exit, or a new exit to cross. */
+  function arriveAt() {
+    if (region !== 'home' || !isNearHomeBed(position)) sleepBlocked = false;
+    if (region === 'home' && isAtHomeBed(position)) void startSleep();
+    if (blockedPortal && !isInsidePortal(position, blockedPortal)) {
+      blockedPortal = null;
+      cancelledPortal = null;
     }
+    const portal = portalAt(position, region);
+    if (!portal) waitingPortal = null;
+    else if (portal !== blockedPortal) enterPortal(portal);
+  }
+  function animateCharacter(dt: number, { walking, frameTravel }: Stride) {
     const scale = characterScale(position.z);
     const size = scale * CHILD_SIZE;
     const rest = sleeping ? bedRest.update(darkness, lampGlowAt(region, HOME_BED), reducedMotion) : null;
-    const visualPosition = rest?.point ?? position;
     let characterDt = paused ? 0 : dt;
     let characterTravel = jump.height > 0 ? frameTravel * 0.2 : frameTravel;
     if (rest) {
@@ -619,17 +615,23 @@ export async function createScene(
       jump.velocity,
       jump.landing,
     );
-    const isFootfall = !paused && region === regionBefore && (hasLanded || hasStepped);
-    if (isFootfall) {
-      const surface = surfaceAt(position, region);
-      container.dataset.surface = surface;
-      onStep(surface, ((hasLanded ? LANDING_LOUDNESS : 1) * scale) / NEAREST_SCALE);
-    }
+    return { scale, size, rest, hasStepped };
+  }
+  function placeCharacter(scale: number, size: number, rest: BedRestFrame | null) {
+    const visualPosition = rest?.point ?? position;
     child.position.set(visualPosition.x * 1.2 - 60, 40 - visualPosition.z * 0.8 + jump.height * scale, 2);
     shadow.position.set(child.position.x + scale * 0.3, 40 - visualPosition.z * 0.8 - 0.08, 1);
     const shadowSize = 1 - Math.min(jump.height * 0.12, 0.3);
     shadow.scale.set(3.8 * size * shadowSize, 1.1 * size * shadowSize, 1);
     shadowMat.opacity = (rest?.opacity ?? 1) * (1 - Math.min(jump.height * 0.22, 0.55));
+  }
+  function playFootfall(hasLanded: boolean, scale: number) {
+    const surface = surfaceAt(position, region);
+    container.dataset.surface = surface;
+    onStep(surface, ((hasLanded ? LANDING_LOUDNESS : 1) * scale) / NEAREST_SCALE);
+  }
+  /** Eases the camera after the child and returns whether it is still on its way. */
+  function followCamera(dt: number, size: number) {
     const maxX = Math.max(0, 60 - halfWidth),
       maxY = Math.max(0, 40 - halfHeight);
     const cameraX = THREE.MathUtils.clamp(child.position.x * (halfWidth < 35 ? 1 : 0), -maxX, maxX);
@@ -656,6 +658,9 @@ export async function createScene(
     camera.position.y = keepY(
       settle(THREE.MathUtils.damp(camera.position.y, targetY, cameraLag, dt), targetY, CAMERA_EPSILON),
     );
+    return camera.position.x !== targetX || camera.position.y !== targetY;
+  }
+  function placeMarkers() {
     markers.forEach((marker, i) => {
       const point = DESTINATIONS[i]!;
       marker.visible = point.region === region && !sleeping;
@@ -667,49 +672,41 @@ export async function createScene(
       const target = route[route.length - 1]!;
       targetMarker.position.set(target.x * 1.2 - 60, 40 - target.z * 0.8 + 0.5, 1);
     }
+  }
+  /** Eases warmth, darkness and wetness toward the chosen time and weather; returns whether any is still changing. */
+  function easeAtmosphere(dt: number) {
     const targetWarmth = WARMTH_BY_TIME[timeOfDay];
-    warmth = settle(THREE.MathUtils.damp(warmth, targetWarmth, 2, dt), targetWarmth, WARMTH_EPSILON);
     const targetDarkness = timeOfDay === TIME.night ? 1 : 0;
-    darkness = settle(THREE.MathUtils.damp(darkness, targetDarkness, 2, dt), targetDarkness, WARMTH_EPSILON);
-    background.uniforms.night!.value = darkness;
-    fireflies.update(sceneryTime, region === 'home' ? 0 : darkness, reducedMotion);
-    nightLights.update(region, darkness, sceneryTime, reducedMotion);
-    background.uniforms.walker!.value.set((child.position.x + 60) / 120, (child.position.y + 40 + 1.8 * size) / 80);
-    placeEffects.update(paused ? 0 : dt);
     const targetWetness = weather === WEATHER.rain ? 1 : 0;
-    wetness = settle(THREE.MathUtils.damp(wetness, targetWetness, 1.5, dt), targetWetness, WARMTH_EPSILON);
+    warmth = easeLight(warmth, targetWarmth, 2, dt);
+    darkness = easeLight(darkness, targetDarkness, 2, dt);
+    wetness = easeLight(wetness, targetWetness, 1.5, dt);
+    return warmth !== targetWarmth || darkness !== targetDarkness || wetness !== targetWetness;
+  }
+  function paintBackground(dt: number, size: number) {
+    transition = Math.min(1, transition + dt * 1.8);
+    background.uniforms.night!.value = darkness;
+    background.uniforms.walker!.value.set((child.position.x + 60) / 120, (child.position.y + 40 + 1.8 * size) / 80);
     background.uniforms.rain!.value = region === 'home' ? 0 : wetness;
     background.uniforms.outdoorRain!.value = wetness;
-    rain.update(paused ? 0 : dt, region === 'home' ? 0 : wetness, camera.position, reducedMotion, darkness);
-    life.update({
-      region,
-      dt: paused ? 0 : dt,
-      elapsed: sceneryTime,
-      darkness,
-      isStill: reducedMotion,
-      isRaining: wetness > 0.5,
-    });
-    waves.update({ region, dt: paused ? 0 : dt, darkness, isStill: reducedMotion, rain: wetness });
-    boats.update({ region, dt: paused ? 0 : dt, darkness, isStill: reducedMotion });
-    leaves.update(region, paused ? 0 : dt, darkness, wetness, reducedMotion);
-    countryside.update({
-      region,
-      dt: paused ? 0 : dt,
-      darkness,
-      isStill: reducedMotion,
-      isRaining: wetness > 0.5,
-      player: position,
-    });
-    roamers.update({
-      region,
-      dt: paused ? 0 : dt,
-      darkness,
-      isStill: reducedMotion,
-      isRaining: wetness > 0.5,
-      childZ: position.z,
-    });
+    background.uniforms.time!.value = reducedMotion ? 0 : sceneryTime;
+    background.uniforms.evening!.value = warmth;
+    background.uniforms.fade!.value = transition;
+  }
+  function animateLife(worldDt: number, isResting: boolean) {
+    const isRaining = wetness > 0.5;
+    fireflies.update(sceneryTime, region === 'home' ? 0 : darkness, reducedMotion);
+    nightLights.update(region, darkness, sceneryTime, reducedMotion);
+    placeEffects.update(worldDt);
+    rain.update(worldDt, region === 'home' ? 0 : wetness, camera.position, reducedMotion, darkness);
+    life.update({ region, dt: worldDt, elapsed: sceneryTime, darkness, isStill: reducedMotion, isRaining });
+    waves.update({ region, dt: worldDt, darkness, isStill: reducedMotion, rain: wetness });
+    boats.update({ region, dt: worldDt, darkness, isStill: reducedMotion });
+    leaves.update(region, worldDt, darkness, wetness, reducedMotion);
+    countryside.update({ region, dt: worldDt, darkness, isStill: reducedMotion, isRaining, player: position });
+    roamers.update({ region, dt: worldDt, darkness, isStill: reducedMotion, isRaining, childZ: position.z });
     container.dataset.visitor = roamers.visitor;
-    const walkers = [rest ? null : { ...position, order: CHILD_ORDER }, roamers.standing].filter(
+    const walkers = [isResting ? null : { ...position, order: CHILD_ORDER }, roamers.standing].filter(
       (walker) => walker !== null,
     );
     foregrounds.forEach((layer) => {
@@ -718,53 +715,73 @@ export async function createScene(
       layer.mesh.renderOrder = order ?? 0;
     });
     character.setLight(darkness, lampGlowAt(region, position));
-    transition = Math.min(1, transition + dt * 1.8);
-    background.uniforms.time!.value = reducedMotion ? 0 : sceneryTime;
-    background.uniforms.evening!.value = warmth;
-    background.uniforms.fade!.value = transition;
+  }
+  function driftDust(dt: number) {
     dustMat.opacity = (region === 'home' ? 0.28 : 0.45) * (1 - darkness * 0.85) * (1 - wetness * 0.8);
-    if (!reducedMotion && !paused) {
-      for (let i = 0; i < 45; i++) {
-        dust[i * 3] = dust[i * 3]! + dt * (0.15 + i * 0.002);
-        dust[i * 3 + 1] = dust[i * 3 + 1]! + Math.sin(elapsed * 0.4 + i) * dt * 0.06;
-        if (dust[i * 3]! > 60) dust[i * 3] = -60;
-      }
-      dustGeo.attributes.position!.needsUpdate = true;
+    if (reducedMotion || paused) return;
+    for (let i = 0; i < 45; i++) {
+      dust[i * 3] = dust[i * 3]! + dt * (0.15 + i * 0.002);
+      dust[i * 3 + 1] = dust[i * 3 + 1]! + Math.sin(elapsed * 0.4 + i) * dt * 0.06;
+      if (dust[i * 3]! > 60) dust[i * 3] = -60;
     }
+    dustGeo.attributes.position!.needsUpdate = true;
+  }
+  function reportStatus({ walking, sprinting }: Stride, rest: BedRestFrame | null) {
+    container.dataset.motion = sleeping ? 'sleeping' : motionLabel(jump.height > 0, walking, sprinting);
+    let restLabel = sleeping ? 'settling' : '';
+    if (rest && rest.tucked > 0.99) restLabel = 'tucked';
+    container.dataset.rest = restLabel;
+    const nextStatus: SceneStatus = {
+      ...position,
+      region,
+      walking,
+      nearby: closestLandmark(position.x, position.z, region),
+      steps: Math.floor(distance * 5),
+    };
+    if (previousStatus && !hasStatusChanged(previousStatus, nextStatus)) return;
+    previousStatus = nextStatus;
+    onStatus(nextStatus);
+  }
+  function tick(time: number) {
+    if (disposed || document.hidden) return;
+    const wasAirborne = isAirborne(jump);
+    const hasMoveKey = MOVE_KEYS.some((key) => keys.has(key));
+    const isMoving = !paused && (hasMoveKey || route.length > 0 || wasAirborne || moveSpeed > 0.05);
+    const rate = isMoving || isSettling ? RENDER_RATE.active : RENDER_RATE.idle;
+    if (!shouldRenderFrame(time, nextFrame, rate)) {
+      animation = requestAnimationFrame(tick);
+      return;
+    }
+    nextFrame = nextRenderTime(time, nextFrame, rate);
+    const dt = last ? Math.min((time - last) / 1000, 0.05) : 0;
+    last = time;
+    elapsed += dt;
+    if (!paused && !reducedMotion) sceneryTime += dt;
+    background.uniforms.sceneryTime!.value = reducedMotion ? 0 : sceneryTime;
+    if (!paused) advanceJump(jump, dt);
+    const hasLanded = !paused && wasAirborne && !isAirborne(jump);
+    const regionBefore = region;
+    const stride = walk(dt);
+    if (!paused) arriveAt();
+    const { scale, size, rest, hasStepped } = animateCharacter(dt, stride);
+    const isFootfall = !paused && region === regionBefore && (hasLanded || hasStepped);
+    if (isFootfall) playFootfall(hasLanded, scale);
+    placeCharacter(scale, size, rest);
+    const isCameraMoving = followCamera(dt, size);
+    placeMarkers();
+    const isAtmosphereChanging = easeAtmosphere(dt);
+    paintBackground(dt, size);
+    animateLife(paused ? 0 : dt, rest !== null);
+    driftDust(dt);
     isSettling =
-      camera.position.x !== targetX ||
-      camera.position.y !== targetY ||
-      warmth !== targetWarmth ||
-      darkness !== targetDarkness ||
-      wetness !== targetWetness ||
+      isCameraMoving ||
+      isAtmosphereChanging ||
       (!paused && placeEffects.isPlaying) ||
       transition < 1 ||
       (!paused && jump.landing > 0.01) ||
       sleeping;
     if (elapsed - statusTime > 0.12) {
-      container.dataset.motion = sleeping ? 'sleeping' : motionLabel(jump.height > 0, walking, sprinting);
-      let restLabel = sleeping ? 'settling' : '';
-      if (rest && rest.tucked > 0.99) restLabel = 'tucked';
-      container.dataset.rest = restLabel;
-      const nextStatus: SceneStatus = {
-        ...position,
-        region,
-        walking,
-        nearby: closestLandmark(position.x, position.z, region),
-        steps: Math.floor(distance * 5),
-      };
-      if (
-        !previousStatus ||
-        nextStatus.x !== previousStatus.x ||
-        nextStatus.z !== previousStatus.z ||
-        nextStatus.region !== previousStatus.region ||
-        nextStatus.walking !== previousStatus.walking ||
-        nextStatus.nearby !== previousStatus.nearby ||
-        nextStatus.steps !== previousStatus.steps
-      ) {
-        previousStatus = nextStatus;
-        onStatus(nextStatus);
-      }
+      reportStatus(stride, rest);
       statusTime = elapsed;
     }
     renderer.render(scene, camera);
