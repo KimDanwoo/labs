@@ -1,7 +1,14 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { distanceToRiver, nearestRiverX, RIVER_TRENCH_HALF_WIDTH, terrainHeightAt } from '@shared/config';
+import {
+  coastDistanceAt,
+  distanceToRiver,
+  nearestRiverX,
+  RIVER_TRENCH_HALF_WIDTH,
+  riverWidthAt,
+  terrainHeightAt,
+} from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
 import { runnerState } from '@shared/r3f';
 import { createCreatureState, habitatSeed, updateCreature } from '@shared/wildlife/behavior';
@@ -26,6 +33,9 @@ export function WingedLife({ kind, anchor }: { kind: Kind; anchor?: readonly [nu
     if (!wings.current || !bodies.current) return;
     const t = clock.elapsedTime;
     const rider = runnerState.position;
+    const offshore = !anchor && kind === 'dragonfly' && coastDistanceAt(rider.x, rider.z) > 80;
+    wings.current.visible = bodies.current.visible = !offshore;
+    if (offshore) return;
     for (let i = 0; i < count; i++) {
       const home = homes.current[i]!;
       if (anchor) {
@@ -40,9 +50,12 @@ export function WingedLife({ kind, anchor }: { kind: Kind; anchor?: readonly [nu
         home.x = cx * 96 + (habitatSeed(cx, cz, i) - 0.5) * 180;
         home.z = cz * 96 + (habitatSeed(cx, cz, i + 32) - 0.5) * 180;
         if (kind === 'dragonfly')
-          home.x = nearestRiverX(rider.x) + (i % 2 ? 1 : -1) * (RIVER_TRENCH_HALF_WIDTH + 1 + (i % 4));
-        else if (distanceToRiver(home.x) < RIVER_TRENCH_HALF_WIDTH + 5)
-          home.x = nearestRiverX(home.x) - RIVER_TRENCH_HALF_WIDTH - 12;
+          home.x =
+            nearestRiverX(rider.x, home.z) +
+            (i % 2 ? 1 : -1) * (RIVER_TRENCH_HALF_WIDTH + 1 + (i % 4)) * riverWidthAt(home.z);
+        else if (distanceToRiver(home.x, home.z) < RIVER_TRENCH_HALF_WIDTH + 5)
+          home.x = nearestRiverX(home.x, home.z) - (RIVER_TRENCH_HALF_WIDTH + 12) * riverWidthAt(home.z);
+        home.z -= Math.max(0, coastDistanceAt(home.x, home.z) + 30);
         home.y = terrainHeightAt(home.x, home.z);
         states.current[i]!.alert = 0;
         states.current[i]!.rest = 0;

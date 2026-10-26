@@ -3,7 +3,7 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { RIVER_GLSL, SCENE_COLORS, TERRAIN_GLSL, WORLD } from '@shared/config';
 import { useRef } from 'react';
-import { Group, type WebGLProgramParametersWithUniforms } from 'three';
+import { Color, Group, type WebGLProgramParametersWithUniforms } from 'three';
 
 // 2D 값 노이즈(해시 + 부드러운 보간). 0..1.
 const GROUND_NOISE_GLSL = `
@@ -24,6 +24,8 @@ const GROUND_NOISE_GLSL = `
 // 지면은 unlit이라 색이 SCENE_COLORS.grass 그대로 → 잔디 blade가 멀어지며 정확히 이 색에 녹는다.
 // 그 위에 잔디 인상: 가늘고 긴 셀(멀리서 본 풀 다발) + 저주파 얼룩 + 미세 반점. 무늬는 안개 범위에 맞춰 멀어지면 흐려진다(에일리어싱 방지).
 function shadeGround(shader: WebGLProgramParametersWithUniforms): void {
+  shader.uniforms.uSandColor = { value: new Color('#c8b68f') };
+  shader.uniforms.uWetSandColor = { value: new Color('#8a947b') };
   // 지형 기복: 월드 XZ로 높이를 구해 평면 법선(로컬 +z = 월드 +y) 방향으로 올린다. fog 깊이는 변위 뒤 정점으로 계산된다.
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', `#include <common>\nvarying vec2 vGroundWorldXZ;\n${RIVER_GLSL}\n${TERRAIN_GLSL}`)
@@ -31,16 +33,16 @@ function shadeGround(shader: WebGLProgramParametersWithUniforms): void {
       '#include <begin_vertex>',
       `#include <begin_vertex>
       vGroundWorldXZ = (modelMatrix * vec4(transformed, 1.0)).xz;
-      transformed.z += terrainHeight(vGroundWorldXZ);`,
+      transformed.z += terrainHeight(vGroundWorldXZ) - waterBedDepth(vGroundWorldXZ);`,
     );
   shader.fragmentShader = shader.fragmentShader
     .replace(
       '#include <common>',
-      `#include <common>\nvarying vec2 vGroundWorldXZ;\n${RIVER_GLSL}\n${GROUND_NOISE_GLSL}`,
+      `#include <common>\nvarying vec2 vGroundWorldXZ;\nuniform vec3 uSandColor, uWetSandColor;\n${RIVER_GLSL}\n${GROUND_NOISE_GLSL}`,
     )
     .replace(
       '#include <clipping_planes_fragment>',
-      '#include <clipping_planes_fragment>\nif (riverDist(vGroundWorldXZ.x) < RIVER_TRENCH_HALF) discard;',
+      '#include <clipping_planes_fragment>\nif (coastDistance(vGroundWorldXZ) < 0.0 && riverDist(vGroundWorldXZ) < RIVER_TRENCH_HALF) discard;',
     )
     .replace(
       '#include <color_fragment>',
@@ -52,7 +54,12 @@ function shadeGround(shader: WebGLProgramParametersWithUniforms): void {
       float streak = groundNoise(vGroundWorldXZ * vec2(3.0, 0.9));
       float blotch = groundNoise(vGroundWorldXZ * 0.45 + 17.0);
       float detail = mix(0.86, 1.14, streak) * mix(0.94, 1.06, blotch);
-      diffuseColor.rgb *= mix(0.86, 1.0, meadow) * mix(detail, 1.0, blur);`,
+      diffuseColor.rgb *= mix(0.86, 1.0, meadow) * mix(detail, 1.0, blur);
+      float coast = coastDistance(vGroundWorldXZ);
+      float beach = smoothstep(-32.0, -18.0, coast + (blotch - 0.5) * 6.0);
+      vec3 sand = mix(uSandColor, uWetSandColor, smoothstep(-10.0, 4.0, coast));
+      sand *= 0.96 + 0.06 * blotch;
+      diffuseColor.rgb = mix(diffuseColor.rgb, sand, beach);`,
     );
 }
 

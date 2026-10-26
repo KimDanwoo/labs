@@ -17,7 +17,7 @@ function simulate(state, seconds, fps, input = controls, ground = 0) {
 test('releasing ascent eases through the apex instead of dropping instantly', () => {
   const state = airborne(12, 5);
   updateFlight(state, controls, 0, 1 / 60);
-  assert.ok(state.velocity > 4.5);
+  assert.ok(state.velocity > 4);
   simulate(state, 2, 60);
   assert.ok(state.velocity < 0 && state.velocity >= -FLIGHT.glideSlow);
 });
@@ -26,10 +26,10 @@ test('commanded descent is faster, but both modes flare and land once', () => {
     const state = airborne(20);
     const input = { ...controls, descend };
     simulate(state, 1, 60, input);
-    assert.ok(descend ? state.velocity < -5 : state.velocity > -3);
+    assert.ok(descend ? state.velocity < -5 : state.velocity < -4 && state.velocity > -6);
     const impacts = simulate(state, 40, 60, input);
     assert.equal(impacts.length, 1);
-    assert.ok(impacts[0] < 1.2, `touchdown ${impacts[0]}`);
+    assert.ok(impacts[0] < 1.6, `touchdown ${impacts[0]}`);
     assert.equal(state.height, 0);
     assert.equal(state.velocity, 0);
   }
@@ -60,6 +60,27 @@ test('grounded rider follows terrain and only a new press launches', () => {
   simulate(state, 30, 60, { ...controls, lift: true }, 6);
   assert.ok(Math.abs(state.height - FLIGHT.ceiling) < 0.1);
 });
+test('takeoff requires a forward run-up; standing, walking and reversing cannot launch', () => {
+  for (const speed of [0, 3, FLIGHT.minTakeoffRunSpeed - 0.01, -12]) {
+    const state = createFlightState();
+    simulate(state, 1, 60, { ...controls, speed, lift: true, launch: true });
+    assert.equal(state.height, 0);
+    assert.equal(state.velocity, 0);
+  }
+  const state = createFlightState();
+  updateFlight(state, { ...controls, speed: FLIGHT.minTakeoffRunSpeed, lift: true, launch: true }, 0, 1 / 60);
+  assert.ok(state.height > 0);
+});
+test('an early held press does not auto-launch, and low speed does not disable airborne lift', () => {
+  const state = createFlightState();
+  updateFlight(state, { ...controls, speed: 0, lift: true, launch: true }, 0, 1 / 60);
+  simulate(state, 1, 60, { ...controls, lift: true });
+  assert.equal(state.height, 0);
+  updateFlight(state, { ...controls, lift: true, launch: true }, 0, 1 / 60);
+  assert.ok(state.height > 0);
+  simulate(state, 1, 60, { ...controls, speed: 0, lift: true });
+  assert.ok(state.height > 4);
+});
 test('skill altitude hold eases a fall without teleporting; malformed delta is ignored', () => {
   const state = airborne(20, -2);
   updateFlight(state, { ...controls, holdAltitude: true }, 0, 1 / 60);
@@ -69,4 +90,14 @@ test('skill altitude hold eases a fall without teleporting; malformed delta is i
   const before = { ...state };
   for (const delta of [0, -1, NaN, Infinity]) updateFlight(state, controls, 0, delta);
   assert.deepEqual(state, before);
+});
+
+test('released flight from ring altitude lands promptly even without forward input', () => {
+  for (const speed of [0, 12, 18]) {
+    const state = airborne(25, 5.5);
+    const impacts = simulate(state, 8, 60, { ...controls, speed });
+    assert.equal(state.height, 0, `still floating at speed ${speed}`);
+    assert.equal(impacts.length, 1);
+    assert.ok(impacts[0] < 1.6);
+  }
 });

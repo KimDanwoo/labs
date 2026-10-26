@@ -78,3 +78,13 @@ pnpm dev        # 모든 앱 개발 서버 동시 실행
 pnpm --filter hub dev
 pnpm --filter prairie dev
 ```
+
+## 배포
+
+- 각 앱의 `vercel.json`은 `main` 브랜치만 자동 배포하도록 제한한다. 작업 브랜치와 PR에서는 GitHub CI만 실행한다.
+- Vercel 프로젝트의 Production Branch는 `main`, Root Directory는 해당 `apps/<앱>`으로 설정한다.
+- **Settings → Build and Deployment → Root Directory → Skip deployment**를 켠다. 해당 앱이나 의존하는 공유 패키지가 변경된 경우에만 배포한다. 워크스페이스 밖의 공통 파일 변경은 전체 앱에 영향을 줄 수 있다.
+- 기존 `ignoreCommand`는 빌드 단계의 보조 검사다. 이것만으로는 배포 횟수 한도를 절약할 수 없으므로 Vercel의 Skip deployment 설정이 필요하다.
+- `pnpm new-app`으로 생성한 앱도 `main` 제한을 상속한다. Vercel에 새 프로젝트를 연결할 때 위 프로젝트 설정을 함께 적용한다.
+
+참고: [Git 배포 브랜치 제한](https://vercel.com/docs/project-configuration/git-configuration), [변경 없는 앱 건너뛰기](https://vercel.com/docs/monorepos#skipping-unaffected-projects).

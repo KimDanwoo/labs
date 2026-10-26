@@ -18,12 +18,14 @@ import { getRunnerInput } from '@features/runner-control/model/store';
 import { useFrame, useThree } from '@react-three/fiber';
 import {
   CAMERA,
+  coastDistanceAt,
   distanceToRiver,
+  groundHeightAt,
   RIVER,
   riverBearing,
-  riverBedDepthAt,
-  riverWaterDepthAt,
+  riverWidthAt,
   terrainHeightAt,
+  waterDepthAt,
 } from '@shared/config';
 import { runnerState, setRideRiver } from '@shared/r3f';
 import { useRef } from 'react';
@@ -76,8 +78,7 @@ export function RunnerRig() {
     if (rollRef.current) rollRef.current.rotation.z = spinRef.current.angle;
 
     // 말은 하상 프로파일을 따라 골로 내려가고, 수심에 비례해 최고속도가 떨어진다. 공중에선 물이 발에 안 닿으니 감속 없음.
-    const riverDist = distanceToRiver(positionRef.current.x);
-    const waterDepth = riverWaterDepthAt(riverDist);
+    const waterDepth = waterDepthAt(positionRef.current.x, positionRef.current.z);
     const wade = isGrounded ? Math.min(waterDepth / RIVER.wadeDepthRef, 1) : 0;
     const maxSpeed = physics.maxSpeed * MathUtils.lerp(1, RIVER.wadeSpeedScale, wade);
 
@@ -94,7 +95,10 @@ export function RunnerRig() {
     let speed = speedRef.current;
     if (forward) speed += physics.accel * sprintAccel * delta;
     else if (backward) speed -= physics.brake * delta;
-    else speed -= MathUtils.clamp(speed, -physics.coastDecel * delta, physics.coastDecel * delta);
+    else {
+      const drag = physics.coastDecel * (isGrounded ? 1 : 0.22) * delta;
+      speed -= MathUtils.clamp(speed, -drag, drag);
+    }
     const normalMax = maxSpeed * sprintMax;
     const dashSpeed = MathUtils.lerp(normalMax, DASH_SKILL.speed, dashRef.current.strength);
     if (dashRef.current.active) speed = Math.max(speed, DASH_SKILL.speed * dashRef.current.strength);
@@ -117,8 +121,10 @@ export function RunnerRig() {
     if (air.height < FLORA.trunk.height && pushOutOfFlora(position) > 0) speedRef.current = speed * 0.5;
 
     // 이동과 충돌 보정 뒤의 위치에서 지면을 샘플링해 발이 언덕에 묻히지 않게 한다.
-    const currentRiverDist = distanceToRiver(position.x);
-    const groundY = terrainHeightAt(position.x, position.z) - riverBedDepthAt(currentRiverDist);
+    // Buoyancy keeps the horse above deep water instead of walking along the seabed.
+    const currentWaterDepth = waterDepthAt(position.x, position.z);
+    const bedY = groundHeightAt(position.x, position.z);
+    const groundY = currentWaterDepth > 0 ? Math.max(bedY, -RIVER.waterDrop - 0.65) : bedY;
     const impact = updateFlight(
       air,
       {
@@ -146,7 +152,7 @@ export function RunnerRig() {
     runnerState.position.copy(position).setY(visualY);
     runnerState.heading = heading;
     runnerState.speed = speedRef.current;
-    runnerState.waterDepth = riverWaterDepthAt(currentRiverDist);
+    runnerState.waterDepth = currentWaterDepth;
     runnerState.isSprinting = isSprinting;
     runnerState.airborneHeight = air.height;
     runnerState.verticalSpeed = air.velocity;
@@ -191,7 +197,11 @@ export function RunnerRig() {
     );
     camera.lookAt(smoothTarget);
 
-    setRideRiver(distanceToRiver(position.x), riverBearing(position.x, camYaw));
+    setRideRiver(
+      Math.max(0, distanceToRiver(position.x, position.z) - RIVER.halfWidth) * riverWidthAt(position.z),
+      riverBearing(position.x, camYaw, position.z),
+      coastDistanceAt(position.x, position.z),
+    );
   });
 
   return (

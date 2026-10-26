@@ -45,4 +45,4 @@ jobs:
         run: pnpm test
 
       # 빌드는 넣지 않는다. fe-deep 등이 빌드 시점에 Supabase를 조회해 시크릿 없이는 실패하고,
-      # 앱별 빌드는 Vercel이 vercel.json의 turbo-ignore로 이미 담당한다.
+      # 앱별 빌드는 main 반영 시 Vercel이 담당한다. 변경 없는 앱은 프로젝트의 Skip deployment로 제외한다.

@@ -34,7 +34,7 @@ export function SceneCanvas() {
     <Canvas
       className="cursor-grab"
       fallback={<SceneFailure />}
-      dpr={dpr}
+      dpr={Math.min(dpr, dprRange.max)}
       shadows={{ type: PCFShadowMap }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{
@@ -44,7 +44,12 @@ export function SceneCanvas() {
         position: [0, CAMERA.followHeight, -CAMERA.followDistance],
       }}
     >
-      <PerformanceMonitor onDecline={() => setDpr(dprRange.min)} onIncline={() => setDpr(dprRange.max)} />
+      <PerformanceMonitor
+        flipflops={3}
+        onDecline={() => setDpr(dprRange.min)}
+        onIncline={() => setDpr(dprRange.max)}
+        onFallback={() => setDpr(dprRange.min)}
+      />
       <fog attach="fog" args={[SCENE_COLORS.fog, fog.near, fog.far]} />
 
       <hemisphereLight color={SCENE_COLORS.ambient} groundColor={SCENE_COLORS.grass} intensity={SUN.ambientIntensity} />

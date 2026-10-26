@@ -12,10 +12,11 @@ export const SCENE_COLORS = {
   grassBase: '#304b36',
   grassTip: '#9eb96e',
   grassDry: '#d3be87',
-  waterDeep: '#72b4c7',
-  waterShallow: '#bde1e4',
-  pebbleDark: '#8a7f72',
-  pebbleLight: '#d9cdb9',
+  oceanHorizon: '#c5d4ce',
+  waterDeep: '#376d70',
+  waterShallow: '#8fae94',
+  pebbleDark: '#8b8873',
+  pebbleLight: '#b8ad91',
 } as const;
 
 export const WORLD = {
@@ -25,22 +26,29 @@ export const WORLD = {
   groundSegments: 100,
 } as const;
 
-// 강은 Z축으로 무한한 띠. X로 period마다 반복 → 좌우 어느 쪽으로 달려도 만난다(정면 +Z는 순수 초원).
-// 불변식 period/2 > FOG.far → 화면에 강이 둘 이상 들어오지 않는다(400 > 360) → 평면 한 장으로 충분.
+// 완만한 굽이와 폭 변화를 공유하는 강. 반복 간격은 굽이·강둑까지 안개 밖에서 전환되도록 확보한다.
 export const RIVER = {
   firstX: 110,
-  period: 800,
+  period: 1600,
+  bends: [
+    { amplitude: 20, frequency: 0.008 },
+    { amplitude: 8, frequency: 0.021 },
+  ],
+  widthWaves: [
+    { amplitude: 0.12, frequency: 0.013 },
+    { amplitude: 0.06, frequency: 0.031 },
+  ],
   // 수면 명목 반폭. HUD의 물속 판정·잔디 기준이며, 하상 프로파일이 이 지점에서 수면과 만나도록 아래 값을 맞춘다(테스트로 고정).
-  halfWidth: 16,
+  halfWidth: 36,
   // 수면 밖 강둑(자갈) 폭. 골 전체 반폭 = halfWidth + bankWidth.
-  bankWidth: 3.2,
-  // Z 길이는 안개 시야(FOG.far)를 앞뒤로 덮으면 된다(2×360 < 800).
+  bankWidth: 7,
+  // Z 길이는 안개 시야를 앞뒤로 덮는다. 모바일 메시는 River에서 더 짧게 만든다.
   length: 800,
-  // 하상 프로파일: 중앙은 지면 아래 depth까지 파이고, slopeStart부터 골 가장자리까지 완만하게 올라온다.
-  depth: 1.8,
-  slopeStart: 6.8,
+  // 명목 단면: 중앙은 depth만큼 파이고, slopeStart부터 강둑까지 완만하게 올라온다.
+  depth: 2.2,
+  slopeStart: 15.5,
   // 수면은 지면보다 이만큼 낮다 → 강둑이 수면 위로 드러난다.
-  waterDrop: 0.3,
+  waterDrop: 0.35,
   rippleHeight: 0.05,
   // 물속 최고속도 배율. 수심이 wadeDepthRef 이상이면 최대 감속.
   wadeSpeedScale: 0.5,
@@ -52,16 +60,38 @@ export const RIVER = {
   grassOverhang: 2.5,
 } as const;
 
+export const OCEAN = {
+  coastZ: 900,
+  beachWidth: 24,
+  shelfLength: 150,
+  depth: 6,
+  estuaryStart: 500,
+  estuaryEnd: 900,
+  estuaryExpansion: 2.2,
+} as const;
+
 export const RIVER_TRENCH_HALF_WIDTH = RIVER.halfWidth + RIVER.bankWidth;
 
-// firstX 격자에서 가장 가까운 강의 중심 X.
-export function nearestRiverX(x: number): number {
-  return RIVER.firstX + Math.round((x - RIVER.firstX) / RIVER.period) * RIVER.period;
+// CPU placement, collision and GPU river geometry share these wave parameters.
+export function riverOffsetAt(z: number): number {
+  return RIVER.bends.reduce((offset, wave) => offset + wave.amplitude * Math.sin(z * wave.frequency), 0);
 }
 
-// 강 중심선까지의 거리. halfWidth 미만이면 물속.
-export function distanceToRiver(x: number): number {
-  return Math.abs(x - nearestRiverX(x));
+export function riverWidthAt(z: number): number {
+  const variation =
+    1 + RIVER.widthWaves.reduce((width, wave) => width + wave.amplitude * Math.sin(z * wave.frequency), 0);
+  return variation * (1 + OCEAN.estuaryExpansion * smoothstep(OCEAN.estuaryStart, OCEAN.estuaryEnd, z));
+}
+
+export function nearestRiverX(x: number, z = 0): number {
+  const origin = RIVER.firstX + riverOffsetAt(z);
+  return origin + Math.round((x - origin) / RIVER.period) * RIVER.period;
+}
+
+// Distance in the nominal cross-section; dividing by width keeps water, banks,
+// vegetation and collision on the same profile as the channel widens/narrows.
+export function distanceToRiver(x: number, z = 0): number {
+  return Math.abs(x - nearestRiverX(x, z)) / riverWidthAt(z);
 }
 
 function smoothstep(edge0: number, edge1: number, x: number): number {
@@ -79,14 +109,38 @@ export function riverWaterDepthAt(dist: number): number {
   return Math.max(0, riverBedDepthAt(dist) - RIVER.waterDrop);
 }
 
+// Positive offshore, negative inland. A broad coast remains stable as the camera moves.
+export function coastDistanceAt(x: number, z: number): number {
+  return z - (OCEAN.coastZ + 18 * Math.sin(x * 0.004) + 9 * Math.sin(x * 0.011));
+}
+
+export function coastBedDepthAt(x: number, z: number): number {
+  const coast = coastDistanceAt(x, z);
+  return (
+    RIVER.waterDrop * smoothstep(-OCEAN.beachWidth, 0, coast) + OCEAN.depth * smoothstep(0, OCEAN.shelfLength, coast)
+  );
+}
+
+export function waterBedDepthAt(x: number, z: number): number {
+  return Math.max(riverBedDepthAt(distanceToRiver(x, z)), coastBedDepthAt(x, z));
+}
+
+export function groundHeightAt(x: number, z: number): number {
+  return terrainHeightAt(x, z) - waterBedDepthAt(x, z);
+}
+
+export function waterDepthAt(x: number, z: number): number {
+  return Math.max(0, waterBedDepthAt(x, z) - RIVER.waterDrop);
+}
+
 export const RIVER_BEARINGS = ['ahead', 'behind', 'left', 'right', 'crossing'] as const;
 export type RiverBearing = (typeof RIVER_BEARINGS)[number];
 
 // 화면 기준으로 강이 어느 쪽인지. 카메라가 말 뒤에서 +Z를 보는 배치라 화면 오른쪽 축은 world -X → -cos(yaw).
-// 강은 Z로 무한하니 최단 경로는 언제나 X축 횡단 한 방향뿐이다.
-export function riverBearing(x: number, camYaw: number): RiverBearing {
-  if (distanceToRiver(x) < RIVER.halfWidth) return 'crossing';
-  const toRiver = Math.sign(nearestRiverX(x) - x);
+// 현재 Z 단면의 물가 방향을 안내한다.
+export function riverBearing(x: number, camYaw: number, z = 0): RiverBearing {
+  if (distanceToRiver(x, z) < RIVER.halfWidth) return 'crossing';
+  const toRiver = Math.sign(nearestRiverX(x, z) - x);
   const ahead = toRiver * Math.sin(camYaw);
   const right = toRiver * -Math.cos(camYaw);
   if (Math.abs(ahead) > Math.abs(right)) return ahead > 0 ? 'ahead' : 'behind';
@@ -124,9 +178,9 @@ export const HAZE = {
 // 능선 겹. 먼 겹부터 그린다 — 멀수록 높고 하늘색에 가깝게 바래고(대기 원근), 가까울수록 낮고 짙다.
 // baseY/ampY는 월드 m(원통 반경 1000 기준). cells는 원통 한 바퀴의 노이즈 셀 수(정수 → 이음새 없음).
 export const RIDGES = [
-  { baseY: 30, ampY: 180, cells: 9, seed: 0.17, color: '#b6c8ce' },
-  { baseY: 18, ampY: 115, cells: 17, seed: 0.53, color: '#92ada8' },
-  { baseY: 10, ampY: 65, cells: 29, seed: 0.81, color: '#779586' },
+  { baseY: 30, ampY: 180, cells: 9, seed: 0.17, color: '#a6b5bf' },
+  { baseY: 18, ampY: 115, cells: 17, seed: 0.53, color: '#81989d' },
+  { baseY: 10, ampY: 65, cells: 29, seed: 0.81, color: '#607e79' },
 ] as const;
 
 export const CAMERA = {
@@ -160,10 +214,10 @@ export function terrainHeightAt(x: number, z: number): number {
   const mask = smoothstep(
     RIVER_TRENCH_HALF_WIDTH + TERRAIN.maskNear,
     RIVER_TRENCH_HALF_WIDTH + TERRAIN.maskFar,
-    distanceToRiver(x),
+    distanceToRiver(x, z),
   );
   if (mask === 0) return 0;
   let h = 0;
   for (const wave of TERRAIN.waves) h += wave.amp * Math.sin(x * wave.kx + z * wave.kz + wave.phase);
-  return mask * h;
+  return mask * h * (1 - smoothstep(-OCEAN.beachWidth - 70, -OCEAN.beachWidth, coastDistanceAt(x, z)));
 }

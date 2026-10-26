@@ -1,9 +1,9 @@
 'use client';
 
 import { useFrame, useThree } from '@react-three/fiber';
-import { HAZE, RIDGES, SCENE_COLORS } from '@shared/config';
+import { coastDistanceAt, HAZE, RIDGES, SCENE_COLORS } from '@shared/config';
 import { useRef } from 'react';
-import { BackSide, Color, Mesh, ShaderMaterial } from 'three';
+import { BackSide, Color, MathUtils, Mesh, ShaderMaterial } from 'three';
 
 const HEIGHT = HAZE.topY - HAZE.bottomY;
 const CENTER_Y = (HAZE.topY + HAZE.bottomY) / 2;
@@ -22,13 +22,13 @@ const RIDGE_GLSL = RIDGES.map(
     {
       float u = vUv.x + ${glslFloat(ridge.seed)};
       float h = ${glslFloat(ridge.baseY)} + ${glslFloat(ridge.ampY)} * ridgeNoise(u, ${glslFloat(ridge.cells)});
-      float cover = 1.0 - smoothstep(h - EDGE, h + EDGE, y);
+      float cover = (1.0 - smoothstep(h - EDGE, h + EDGE, y)) * mountainVisibility;
       // 해 쪽(+u) 사면은 밝게, 반대 사면은 어둡게 — 기울기 부호로 간단히.
       float slope = ridgeNoise(u + SLOPE_DU, ${glslFloat(ridge.cells)}) - ridgeNoise(u - SLOPE_DU, ${glslFloat(ridge.cells)});
       float lit = 1.0 + SLOPE_SHADE * clamp(slope * ${glslFloat(ridge.ampY)} / SLOPE_SCALE, -1.0, 1.0);
-      float folds = sin(u * 410.0 + y * 0.022 + periodicNoise(u, 32.0) * 8.0);
-      float detail = periodicNoise(u + y * 0.00012, 128.0);
-      vec3 tint = ${glslColor(ridge.color)} * (lit + folds * 0.045 + (detail - 0.5) * 0.08);
+      // Broad, quiet rock faces keep the silhouette readable without curtain-like bands.
+      float face = smoothstep(0.15, 0.95, y / max(h, 1.0));
+      vec3 tint = ${glslColor(ridge.color)} * (lit + face * 0.045);
       // 대기 원근: 밑동(능선 높이의 35%까지)은 안개가 절반쯤 덮는다. 겹 사이 거리감은 겹 색 자체가 낸다.
       vec3 ridgeColor = mix(tint, uFog, BASE_FOG * (1.0 - smoothstep(0.0, 0.35 * h, y)));
       color = mix(color, ridgeColor, cover);
@@ -40,17 +40,22 @@ const RIDGE_GLSL = RIDGES.map(
 const hazeMaterial = new ShaderMaterial({
   uniforms: {
     uFog: { value: new Color(SCENE_COLORS.fog) },
+    uCoastal: { value: 0 },
   },
   vertexShader: `
     varying vec2 vUv;
+    varying vec3 vHorizonRay;
     void main() {
       vUv = uv;
+      vHorizonRay = (modelMatrix * vec4(position, 1.0)).xyz - cameraPosition;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `,
   fragmentShader: `
     uniform vec3 uFog;
+    uniform float uCoastal;
     varying vec2 vUv;
+    varying vec3 vHorizonRay;
 
     const float BOTTOM_Y = ${glslFloat(HAZE.bottomY)};
     const float HEIGHT = ${glslFloat(HEIGHT)};
@@ -61,8 +66,8 @@ const hazeMaterial = new ShaderMaterial({
     // 사면 음영: 둘레 좌표 차분 폭과 음영 세기.
     const float SLOPE_DU = 0.004;
     const float SLOPE_SCALE = 12.0;
-    const float SLOPE_SHADE = 0.24;
-    const float BASE_FOG = 0.5;
+    const float SLOPE_SHADE = 0.08;
+    const float BASE_FOG = 0.3;
 
     float hash(float n) { return fract(sin(n * 127.1) * 43758.5453); }
 
@@ -85,7 +90,7 @@ const hazeMaterial = new ShaderMaterial({
         float n = 1.0 - abs(2.0 * periodicNoise(u, c) - 1.0);
         sum += n * amp;
         norm += amp;
-        amp *= 0.5;
+        amp *= 0.32;
         c *= 2.0;
       }
       float h = sum / norm;
@@ -95,6 +100,7 @@ const hazeMaterial = new ShaderMaterial({
     void main() {
       float y = BOTTOM_Y + vUv.y * HEIGHT;
       vec3 color = uFog;
+      float mountainVisibility = 1.0 - uCoastal * smoothstep(-0.3, 0.4, normalize(vHorizonRay).z);
       float alpha = 1.0 - smoothstep(FADE_START_Y, FADE_TOP_Y, y);
       ${RIDGE_GLSL}
       gl_FragColor = vec4(color, alpha);
@@ -108,6 +114,9 @@ const hazeMaterial = new ShaderMaterial({
 });
 
 // 지평선 헤이즈 + 먼 능선 원통. 카메라 XZ를 따라다녀 항상 시야 끝을 감싼다.
+const inlandFog = new Color(SCENE_COLORS.fog);
+const seaFog = new Color(SCENE_COLORS.oceanHorizon);
+
 export function Haze() {
   const meshRef = useRef<Mesh>(null);
   const camera = useThree((state) => state.camera);
@@ -115,6 +124,9 @@ export function Haze() {
   useFrame(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
+    const coastal = MathUtils.smoothstep(coastDistanceAt(camera.position.x, camera.position.z), -300, -20);
+    hazeMaterial.uniforms.uCoastal!.value = coastal;
+    hazeMaterial.uniforms.uFog!.value.copy(inlandFog).lerp(seaFog, coastal);
     mesh.position.x = camera.position.x;
     mesh.position.z = camera.position.z;
   });

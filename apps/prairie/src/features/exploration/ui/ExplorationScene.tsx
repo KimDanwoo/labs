@@ -21,6 +21,7 @@ const centers = GATES.map((gate) => ({ x: gate.x, y: terrainHeightAt(gate.x, gat
 export function ExplorationScene() {
   const progress = useExploration();
   const previous = useRef(new Vector3());
+  const bodyPosition = useRef(new Vector3());
   const initialized = useRef(false);
   const elapsed = useRef(0);
   const noticeUntil = useRef(0);
@@ -29,7 +30,8 @@ export function ExplorationScene() {
     loadExploration();
   }, []);
   useFrame((state, delta) => {
-    const position = runnerState.position;
+    const position = bodyPosition.current.copy(runnerState.position);
+    position.y += 1.3; // The visible torso, rather than the hoof/terrain origin.
     if (!initialized.current) {
       previous.current.copy(position);
       initialized.current = true;

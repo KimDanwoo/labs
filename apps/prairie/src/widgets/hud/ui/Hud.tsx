@@ -4,6 +4,7 @@ import { ExplorationHud } from '@features/exploration/ui';
 import { useState } from 'react';
 import { PrairieMark } from './PrairieMark';
 import { RideControls } from './RideControls';
+import { RiverGuide } from './RiverGuide';
 
 export function Hud() {
   const [isVisible, setIsVisible] = useState(true);
@@ -22,6 +23,7 @@ export function Hud() {
           >
             {isVisible ? '풍경만 보기 ↗' : '안내 보기 +'}
           </button>
+          {isVisible && <RiverGuide />}
         </div>
       </header>
 

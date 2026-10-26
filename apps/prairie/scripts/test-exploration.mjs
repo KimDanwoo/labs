@@ -8,13 +8,13 @@ import {
   parseProgress,
 } from '../src/shared/exploration/world.ts';
 
-test('gate crossing catches dash segments, requires forward crossing and aperture', () => {
+test('gate crossing catches dash segments, accepts both directions and requires aperture', () => {
   const center = { x: 0, y: 10, z: 20 };
   assert.equal(crossesGate({ x: 0, y: 10, z: 0 }, { x: 0, y: 10, z: 40 }, center), true);
-  assert.equal(crossesGate({ x: 0, y: 10, z: 40 }, { x: 0, y: 10, z: 0 }, center), false);
+  assert.equal(crossesGate({ x: 0, y: 10, z: 40 }, { x: 0, y: 10, z: 0 }, center), true);
   assert.equal(crossesGate({ x: 8, y: 10, z: 0 }, { x: 8, y: 10, z: 40 }, center), false);
   assert.equal(crossesGate({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 40 }, center), false);
-  assert.equal(crossesGate({ x: 0, y: 10, z: 20 }, { x: 0, y: 10, z: 20 }, center), false);
+  assert.equal(crossesGate({ x: 0, y: 10, z: 20 }, { x: 0, y: 10, z: 20 }, center), true);
 });
 test('saved progress tolerates corrupt and old data without trusting unknown IDs', () => {
   for (const raw of [null, 'broken', 'null', '[]'])
@@ -29,4 +29,12 @@ test('landmark and gate approach areas are clear of generated trees and rocks', 
   for (const point of [...LANDMARKS, ...GATES]) assert.equal(isExplorationClearing(point.x, point.z), true);
   assert.equal(isExplorationClearing(1000, 1000), false);
   for (let i = 1; i < GATES.length; i++) assert.ok(GATES[i].z > GATES[i - 1].z);
+});
+
+test('body contact collects near the rim and during sideways motion, but distant passes miss', () => {
+  const center = { x: 0, y: 10, z: 20 };
+  assert.equal(crossesGate({ x: 4.9, y: 10, z: 19 }, { x: 4.9, y: 10, z: 21 }, center), true);
+  assert.equal(crossesGate({ x: -8, y: 10, z: 20.3 }, { x: 8, y: 10, z: 20.3 }, center), true);
+  assert.equal(crossesGate({ x: -8, y: 10, z: 21 }, { x: 8, y: 10, z: 21 }, center), false);
+  assert.equal(crossesGate({ x: 5.3, y: 10, z: 0 }, { x: 5.3, y: 10, z: 40 }, center), false);
 });

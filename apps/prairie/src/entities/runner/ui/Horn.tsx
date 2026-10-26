@@ -30,6 +30,10 @@ export function Horn() {
           <torusGeometry args={[HORN.radius * 1.06, 0.013, 8, 32]} />
           <meshStandardMaterial color={HORN.color} roughness={0.25} metalness={0.65} />
         </mesh>
+        <mesh position={[0, 0.035, HORN.radius * 1.2]} scale={[0.075, 0.13, 0.045]}>
+          <octahedronGeometry args={[1, 0]} />
+          <meshPhysicalMaterial color="#81cde0" metalness={0.3} roughness={0.15} clearcoat={1} />
+        </mesh>
         <mesh geometry={geometry.body}>
           <meshStandardMaterial color={HORN.color} roughness={0.3} metalness={0.55} />
         </mesh>

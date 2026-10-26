@@ -1,5 +1,5 @@
 import { GRASS_FIELD } from '@entities/grass/model/constants';
-import { distanceToRiver, RIVER, RIVER_TRENCH_HALF_WIDTH, riverBedDepthAt, terrainHeightAt } from '@shared/config';
+import { coastDistanceAt, distanceToRiver, groundHeightAt, RIVER, RIVER_TRENCH_HALF_WIDTH } from '@shared/config';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import {
   type BufferGeometry,
@@ -68,11 +68,13 @@ export const GrassChunk = memo(function GrassChunk({
     const centerZ = cellZ * GRASS_FIELD.tile;
     const rng = makeRng(seed);
     const dummy = new Object3D();
+    let visible = 0;
+    const lodIndex = chunkGeometry.getAttribute('aLodIndex');
     for (let i = 0; i < bladesPerChunk; i += 1) {
       const x = centerX + (rng() - 0.5) * GRASS_FIELD.tile;
       const z = centerZ + (rng() - 0.5) * GRASS_FIELD.tile;
-      const riverDist = distanceToRiver(x);
-      dummy.position.set(x, terrainHeightAt(x, z) - riverBedDepthAt(riverDist), z);
+      const riverDist = distanceToRiver(x, z);
+      dummy.position.set(x, groundHeightAt(x, z), z);
       // 기울기(X) 뒤에 방향(Y) — 평면 blade가 수직이면 공중에서 내려다볼 때 모서리만 보여 사라진다. 기울여 위에서도 면이 보이게.
       const lean = GRASS_FIELD.minLean + rng() * (GRASS_FIELD.maxLean - GRASS_FIELD.minLean);
       dummy.rotation.set(lean, rng() * Math.PI * 2, 0, 'YXZ');
@@ -80,18 +82,21 @@ export const GrassChunk = memo(function GrassChunk({
       const clump = 0.75 + clumpAt(x, z) * 0.4;
       const jitter = 0.9 + rng() * 0.3;
       // 강둑 경사 윗부분(grassOverhang)까지 잔디가 넘어오고, 거기서 grassFade 폭에 걸쳐 성겨지며 키도 낮아진다.
-      // 골 안쪽은 비운다. 지우는 대신 크기 0(인스턴스 수 고정).
+      // 물과 모래사장은 제출할 인스턴스에서 빼되 원래 LOD 인덱스는 보존한다.
       const riverward = (riverDist - (RIVER_TRENCH_HALF_WIDTH - RIVER.grassOverhang)) / RIVER.grassFade;
-      const isBare = rng() > riverward;
+      const isBare = rng() > riverward || coastDistanceAt(x, z) > -28;
       const height = scale * clump * jitter * MathUtils.lerp(RIVER.grassMinHeight, 1, MathUtils.clamp(riverward, 0, 1));
-      if (isBare) dummy.scale.set(0, 0, 0);
-      else dummy.scale.set(scale * (0.7 + clump * 0.3), height, scale);
+      if (isBare) continue;
+      dummy.scale.set(scale * (0.7 + clump * 0.3), height, scale);
       dummy.updateMatrix();
-      mesh.setMatrixAt(i, dummy.matrix);
+      lodIndex.setX(visible, i / fullPool);
+      mesh.setMatrixAt(visible++, dummy.matrix);
     }
+    mesh.count = visible;
+    lodIndex.needsUpdate = true;
     mesh.instanceMatrix.needsUpdate = true;
     mesh.computeBoundingSphere();
-  }, [cellX, cellZ, seed, bladesPerChunk]);
+  }, [cellX, cellZ, seed, bladesPerChunk, chunkGeometry, fullPool]);
 
   return <instancedMesh ref={meshRef} args={[chunkGeometry, material, bladesPerChunk]} />;
 });
