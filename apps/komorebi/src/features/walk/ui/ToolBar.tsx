@@ -47,8 +47,8 @@ export function ToolBar({
       <span className="tool-divider" />
       <button
         className="tool"
-        title="캐릭터와 옷 고르기"
-        aria-label="캐릭터와 옷 고르기"
+        title="산책 옷 고르기"
+        aria-label="산책 옷 고르기"
         disabled={!isReady}
         onClick={onOpenWardrobe}
       >

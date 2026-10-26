@@ -1,14 +1,20 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { DEFAULT_APPEARANCE, characterAtlas, parseAppearance, sleepingPortrait } from '../src/shared/world/appearance';
+import {
+  CHARACTER,
+  DEFAULT_APPEARANCE,
+  characterAtlas,
+  parseAppearance,
+  sleepingPortrait,
+} from '../src/shared/world/appearance';
 
-test('appearance persistence accepts only shipped character and outfit combinations', () => {
-  for (const character of ['boy', 'girl'] as const)
+test('appearance persistence keeps outfits and migrates old characters to the straw-hat child', () => {
+  for (const character of [CHARACTER.child, 'boy', 'girl'])
     for (const outfit of ['summer', 'overalls'] as const) {
-      const appearance = { character, outfit };
-      assert.deepEqual(parseAppearance(JSON.stringify(appearance)), appearance);
-      assert.equal(characterAtlas(appearance), `/art/child-${character}-${outfit}.webp`);
-      assert.equal(sleepingPortrait(character), `/art/child-${character}-sleep.webp`);
+      const appearance = { character: CHARACTER.child, outfit };
+      assert.deepEqual(parseAppearance(JSON.stringify({ character, outfit })), appearance);
+      assert.equal(characterAtlas(appearance), `/art/child-straw-hat-${outfit}.webp`);
+      assert.equal(sleepingPortrait(appearance.character), '/art/child-boy-sleep.webp');
     }
   for (const value of [
     null,
