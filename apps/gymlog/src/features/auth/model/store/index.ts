@@ -1,1 +1,0 @@
-export { signInConsentOpenAtom } from './consent';

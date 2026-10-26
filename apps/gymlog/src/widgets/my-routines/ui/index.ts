@@ -1,1 +1,0 @@
-export { MyRoutineList } from './MyRoutineList';
