@@ -28,7 +28,6 @@
 | **dansoon**         | AI 기술 뉴스·베스트셀러 리포트 블로그                    | Astro                                | [log.danwoo.dev](https://log.danwoo.dev)         |
 | **prairie**         | 인터랙티브 3D 초원 달리기 씬                             | Next.js, React Three Fiber, three.js | [prairie.danwoo.dev](https://prairie.danwoo.dev) |
 
-`apps/plco`·`apps/gymlog`는 리포에 남아 있지만 완성도가 낮아 카탈로그·허브에서 노출하지 않는다. 고도화 후 재등록한다.
 
 ---
 
