@@ -2,6 +2,7 @@ import { getWorldPortals, type WorldPortal } from '@shared/world/portals';
 import { WORLDS, type Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
+import { sceneX, sceneY } from './perspective';
 
 /** Quiet direction signs; the road boundary, not the sign, triggers travel. */
 export function createPortals(scene: THREE.Scene) {
@@ -29,8 +30,8 @@ export function createPortals(scene: THREE.Scene) {
       });
       const label = new THREE.Sprite(material);
       label.position.set(
-        THREE.MathUtils.clamp(portal.center.x * 1.2 - 60 + (portal.edge === 'bottom' ? 9 : 0), -49, 49),
-        40 - portal.center.z * 0.8 + (portal.edge === 'bottom' ? 12 : 5),
+        THREE.MathUtils.clamp(sceneX(portal.center.x) + (portal.edge === 'bottom' ? 9 : 0), -49, 49),
+        sceneY(portal.center.z) + (portal.edge === 'bottom' ? 12 : 5),
         1,
       );
       label.scale.set(8, 1.9, 1);

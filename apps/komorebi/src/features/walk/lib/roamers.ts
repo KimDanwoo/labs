@@ -2,7 +2,7 @@ import type { Point, Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { lampGlowAt, lightSprite } from './nightLights';
-import { CHILD_SIZE, characterScale } from './perspective';
+import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
 import { passingRoute, presence, routeLength, startGait, walkOn, type Gait } from './roam';
 
 const FRAMES = 4;
@@ -130,7 +130,7 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     material.map!.offset.set((frame + (gait.isFacingLeft ? 1 : 0)) / FRAMES, 0);
     const height = spec.height * characterScale(gait.at.z) * CHILD_SIZE;
     sprite.scale.set(height * spec.aspect, height, 1);
-    sprite.position.set(gait.at.x * 1.2 - 60, 40 - gait.at.z * 0.8, 2);
+    sprite.position.set(sceneX(gait.at.x), sceneY(gait.at.z), 2);
     sprite.renderOrder = gait.at.z > childZ ? ORDER.front : ORDER.behind;
     standing = { ...gait.at, order: sprite.renderOrder };
     lightSprite(material.color, darkness, lampGlowAt(region, gait.at));

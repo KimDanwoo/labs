@@ -1,6 +1,7 @@
 import type { Point, Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
+import { sceneX, sceneY } from './perspective';
 
 /** A lit window, lantern or shop front, in painting percent; `reach` is the pool of light it throws (0–1 of width). */
 type Lamp = { x: number; z: number; reach: number; flicker?: boolean };
@@ -92,7 +93,7 @@ export function lightSprite(color: THREE.Color, darkness: number, glow: number) 
   color.lerp(DAYLIT, 1 - darkness);
 }
 
-const toScene = (x: number, z: number) => new THREE.Vector3(x * 1.2 - 60, 40 - z * 0.8, 1);
+const toScene = (x: number, z: number) => new THREE.Vector3(sceneX(x), sceneY(z), 1);
 
 /** Brightness over time: a lantern flame breathes gently, far-off lights twinkle, windows hold steady. */
 const FLICKER = {

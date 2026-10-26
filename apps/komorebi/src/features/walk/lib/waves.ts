@@ -1,7 +1,7 @@
 import type { Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { lampGlowAt, lightSprite } from './nightLights';
-import { characterScale } from './perspective';
+import { characterScale, sceneX, sceneY } from './perspective';
 
 /**
  * Painted wave animations, 12 cells each (4 × 3, row by row), all drawn by Codex:
@@ -212,8 +212,8 @@ export function createWaves(scene: THREE.Scene, loader: THREE.TextureLoader) {
           1,
         );
         sprite.position.set(
-          spec.x * 1.2 - 60 + Math.sin(material.rotation) * travel,
-          40 - spec.z * 0.8 - Math.cos(material.rotation) * travel,
+          sceneX(spec.x) + Math.sin(material.rotation) * travel,
+          sceneY(spec.z) - Math.cos(material.rotation) * travel,
           0.5,
         );
         material.opacity =

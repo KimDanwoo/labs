@@ -39,3 +39,12 @@ test('keys on focused controls are left to the control', async () => {
   assert.equal(isControlTarget({ tagName: 'CANVAS', isContentEditable: false }), false);
   assert.equal(isControlTarget({ tagName: 'BODY', isContentEditable: false }), false);
 });
+
+test('held keys give one step per axis, with WASD and arrows merged and opposites cancelling', async () => {
+  const { keyboardDirection } = await import('../src/features/walk/lib/input');
+  assert.deepEqual(keyboardDirection(new Set()), { dx: 0, dz: 0 });
+  assert.deepEqual(keyboardDirection(new Set(['d', 'arrowright'])), { dx: 1, dz: 0 });
+  assert.deepEqual(keyboardDirection(new Set(['a', 'arrowright'])), { dx: 0, dz: 0 });
+  assert.deepEqual(keyboardDirection(new Set(['arrowup', 'arrowleft'])), { dx: -1, dz: -1 });
+  assert.deepEqual(keyboardDirection(new Set(['s', 'shift'])), { dx: 0, dz: 1 });
+});

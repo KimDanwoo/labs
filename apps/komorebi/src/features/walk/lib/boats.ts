@@ -2,6 +2,7 @@ import type { Region } from '@shared/world/world';
 import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { lightSprite } from './nightLights';
+import { sceneX, sceneY } from './perspective';
 
 /** A small coastal fishing boat, painted at high resolution for a soft distant silhouette. */
 function boatTexture(isFerry: boolean) {
@@ -232,9 +233,9 @@ export function createBoats(scene: THREE.Scene) {
         entry.cabin.visible = boat.visible = wake.visible = reflection.visible = region === 'coast';
         if (!boat.visible) continue;
         const phase = (clock / route.duration + route.phase) % 1;
-        const x = THREE.MathUtils.lerp(route.from, route.to, phase) * 1.2 - 60;
+        const x = sceneX(THREE.MathUtils.lerp(route.from, route.to, phase));
         const bob = Math.sin(clock * 1.1 + route.phase * 12) * 0.1;
-        const y = 40 - route.z * 0.8 + bob;
+        const y = sceneY(route.z) + bob;
         const fade = THREE.MathUtils.smoothstep(phase, 0, 0.08) * (1 - THREE.MathUtils.smoothstep(phase, 0.9, 1));
         boat.position.set(x, y, 0.6);
         boat.scale.set(route.width, route.width * 0.5, 1);
