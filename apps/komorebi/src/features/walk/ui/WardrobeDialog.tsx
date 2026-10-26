@@ -1,5 +1,5 @@
 import { useModal } from '@features/walk/model/hooks';
-import { CHARACTER, OUTFIT, type Appearance } from '@shared/world/appearance';
+import { OUTFIT, type Appearance } from '@shared/world/appearance';
 import { useId, useState } from 'react';
 import { CharacterPreview } from './CharacterPreview';
 import { Icon } from './Icon';
@@ -10,10 +10,6 @@ type Props = {
   onChange: (next: Appearance) => Promise<boolean>;
   onClose: () => void;
 };
-const TEMPLATES = [
-  { id: CHARACTER.boy, name: '남자', detail: '짧은 바가지머리' },
-  { id: CHARACTER.girl, name: '여자', detail: '허리까지 긴 생머리' },
-];
 const OUTFITS = [
   { id: OUTFIT.summer, name: '레몬빛 여름옷', detail: '노란 티셔츠와 산호색 반바지' },
   { id: OUTFIT.overalls, name: '풀잎 멜빵옷', detail: '작은 꽃이 달린 초록 멜빵' },
@@ -56,29 +52,13 @@ export function WardrobeDialog({ isOpen, appearance, onChange, onClose }: Props)
           <Icon name="close" />
         </button>
       </div>
-      <p className="dialog-intro">마음에 드는 모습으로, 오늘도 한 걸음.</p>
+      <p className="dialog-intro">밀짚모자를 쓰고, 오늘도 한 걸음.</p>
       <div className="wardrobe-body" aria-busy={isChanging}>
         <div className="wardrobe-mirror">
           <CharacterPreview appearance={appearance} />
           <span>오늘의 나</span>
         </div>
         <div className="wardrobe-choices">
-          <fieldset disabled={isChanging}>
-            <legend>캐릭터</legend>
-            <div className="wardrobe-options">
-              {TEMPLATES.map((template) => (
-                <button
-                  key={template.id}
-                  aria-pressed={appearance.character === template.id}
-                  onClick={() => void choose({ ...appearance, character: template.id })}
-                >
-                  <CharacterPreview appearance={{ ...appearance, character: template.id }} />
-                  <strong>{template.name}</strong>
-                  <small>{template.detail}</small>
-                </button>
-              ))}
-            </div>
-          </fieldset>
           <fieldset disabled={isChanging}>
             <legend>오늘 입을 옷</legend>
             <div className="wardrobe-options">

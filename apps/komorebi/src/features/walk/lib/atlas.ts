@@ -10,10 +10,30 @@ export function extractChildFrames(data: Uint8ClampedArray, width: number, heigh
     const neutral = Math.max(r, g, b) - Math.min(r, g, b) < 18 && Math.max(r, g, b) > 110;
     foreground[i] = Number(!neutral && data[i * 4 + 3]! > 80);
   }
+  // Authored soles can extend below the nominal row boundary. Split in the
+  // empty gutter instead of cutting every row at exactly one quarter height.
+  const rowEdges = [0];
+  for (let row = 1; row < 4; row++) {
+    const expected = Math.round((row * height) / 4);
+    const radius = Math.max(1, Math.floor(height * 0.04));
+    let best = expected,
+      bestCost = Infinity;
+    for (let y = expected - radius; y <= expected + radius; y++) {
+      let occupied = 0;
+      for (let x = 0; x < width; x++) occupied += foreground[y * width + x]!;
+      const cost = occupied * 1000 + Math.abs(y - expected);
+      if (cost < bestCost) {
+        best = y;
+        bestCost = cost;
+      }
+    }
+    rowEdges.push(best);
+  }
+  rowEdges.push(height);
   const frames = [];
   for (let row = 0; row < 4; row++) {
-    const top = Math.round((row * height) / 4),
-      bottom = Math.round(((row + 1) * height) / 4);
+    const top = rowEdges[row]!,
+      bottom = rowEdges[row + 1]!;
     const h = bottom - top;
     // Minimum-cost seams bend around the outlines where neighbouring hoods touch.
     const seams: Int32Array[] = [new Int32Array(h)];
@@ -70,6 +90,14 @@ export function extractChildFrames(data: Uint8ClampedArray, width: number, heigh
         for (let x = leftSeam[y]!; x < rightSeam[y]!; x++) {
           if (!foreground[(top + y) * width + x]) continue;
           body[y * w + x - left] = 1;
+        }
+      // A neighbouring row's toe or hat can cross the authored cell boundary.
+      // Keep the connected character before measuring its bounds and anchor;
+      // otherwise a detached sliver survives and shifts the entire pose.
+      keepLargestComponent(body, w, h);
+      for (let y = 0; y < h; y++)
+        for (let x = leftSeam[y]!; x < rightSeam[y]!; x++) {
+          if (!body[y * w + x - left]) continue;
           minX = Math.min(minX, x - left);
           maxX = Math.max(maxX, x - left);
           minY = Math.min(minY, y);
@@ -123,6 +151,43 @@ export function extractChildFrames(data: Uint8ClampedArray, width: number, heigh
     }
   }
   return frames;
+}
+
+function keepLargestComponent(mask: Uint8Array, width: number, height: number) {
+  const labels = new Int32Array(mask.length);
+  const queue = new Int32Array(mask.length);
+  let label = 0,
+    largestLabel = 0,
+    largestSize = 0;
+  for (let start = 0; start < mask.length; start++) {
+    if (!mask[start] || labels[start]) continue;
+    label++;
+    let read = 0,
+      write = 1;
+    queue[0] = start;
+    labels[start] = label;
+    while (read < write) {
+      const index = queue[read++]!;
+      const x = index % width,
+        y = Math.floor(index / width);
+      // Diagonal ink strokes belong to the same outlined character.
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dx = -1; dx <= 1; dx++) {
+          const nx = x + dx,
+            ny = y + dy;
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+          const next = ny * width + nx;
+          if (!mask[next] || labels[next]) continue;
+          labels[next] = label;
+          queue[write++] = next;
+        }
+    }
+    if (write > largestSize) {
+      largestSize = write;
+      largestLabel = label;
+    }
+  }
+  for (let i = 0; i < mask.length; i++) mask[i] = Number(largestLabel > 0 && labels[i] === largestLabel);
 }
 
 /** Screen-down is front, screen-right is right, screen-up is back. */

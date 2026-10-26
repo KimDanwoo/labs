@@ -382,22 +382,17 @@ test('a rainy home stays sheltered and the mobile sleeper wakes with movement re
   await page.keyboard.up('ArrowLeft');
 });
 
-test('the wardrobe changes both templates and outfits, keeps the choice after sleep and reload', async ({ page }) => {
+test('the straw-hat child changes outfits and keeps the choice after sleep and reload', async ({ page }) => {
   test.setTimeout(90_000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await openWalk(page);
-  await expect(landscape(page)).toHaveAttribute('data-appearance', 'boy-summer');
-  await page.getByRole('button', { name: '캐릭터와 옷 고르기' }).click();
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'straw-hat-summer');
+  await page.getByRole('button', { name: '산책 옷 고르기' }).click();
   const wardrobe = page.getByRole('dialog', { name: '나의 작은 옷장' });
-  await wardrobe.getByRole('button', { name: /여자/ }).click();
-  await expect(landscape(page)).toHaveAttribute('data-appearance', 'girl-summer');
+  await expect(wardrobe.getByRole('group', { name: '머리 스타일' })).toHaveCount(0);
   await wardrobe.getByRole('button', { name: /풀잎 멜빵옷/ }).click();
-  await expect(landscape(page)).toHaveAttribute('data-appearance', 'girl-overalls');
-  await wardrobe.getByRole('button', { name: /남자/ }).click();
-  await expect(landscape(page)).toHaveAttribute('data-appearance', 'boy-overalls');
-  await wardrobe.getByRole('button', { name: /여자/ }).click();
-  await expect(landscape(page)).toHaveAttribute('data-appearance', 'girl-overalls');
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'straw-hat-overalls');
   await page.screenshot({ path: '/tmp/komorebi-wardrobe.png' });
   await page.keyboard.press('Escape');
   await expect(wardrobe).toBeHidden();
@@ -408,28 +403,28 @@ test('the wardrobe changes both templates and outfits, keeps the choice after sl
   await page.keyboard.press('Space');
   await expect(landscape(page)).toHaveAttribute('data-motion', 'jumping');
   await sleepAtHome(page);
-  await expect(landscape(page)).toHaveAttribute('data-appearance', 'girl-overalls');
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'straw-hat-overalls');
   await page.reload();
   await expect(page.locator('.loading')).toHaveCount(0, { timeout: 20_000 });
-  await expect(landscape(page)).toHaveAttribute('data-appearance', 'girl-overalls');
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'straw-hat-overalls');
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole('button', { name: '캐릭터와 옷 고르기' }).click();
-  await expect(wardrobe.getByRole('button', { name: /여자/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: '산책 옷 고르기' }).click();
+  await expect(wardrobe.getByRole('button', { name: /풀잎 멜빵옷/ })).toHaveAttribute('aria-pressed', 'true');
   await page.screenshot({ path: '/tmp/komorebi-wardrobe-mobile.png' });
   expect(errors).toEqual([]);
 });
 
 test('a failed outfit load preserves the current clothes and can be retried', async ({ page }) => {
-  await page.route('**/art/child-boy-overalls.webp', (route) => route.abort());
+  await page.route('**/art/child-straw-hat-overalls.webp', (route) => route.abort());
   await openWalk(page);
-  await page.getByRole('button', { name: '캐릭터와 옷 고르기' }).click();
+  await page.getByRole('button', { name: '산책 옷 고르기' }).click();
   const wardrobe = page.getByRole('dialog', { name: '나의 작은 옷장' });
   await wardrobe.getByRole('button', { name: /풀잎 멜빵옷/ }).click();
   await expect(wardrobe.getByRole('status')).toContainText('다시 골라');
-  await expect(landscape(page)).toHaveAttribute('data-appearance', 'boy-summer');
-  await page.unroute('**/art/child-boy-overalls.webp');
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'straw-hat-summer');
+  await page.unroute('**/art/child-straw-hat-overalls.webp');
   await wardrobe.getByRole('button', { name: /풀잎 멜빵옷/ }).click();
-  await expect(landscape(page)).toHaveAttribute('data-appearance', 'boy-overalls');
+  await expect(landscape(page)).toHaveAttribute('data-appearance', 'straw-hat-overalls');
 });
 
 test('footsteps play recorded takes for the ground underfoot, never the same take twice running', async ({ page }) => {
