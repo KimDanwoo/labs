@@ -14,7 +14,7 @@ import { useFrame } from '@react-three/fiber';
 import { FOG, SCENE_COLORS } from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
 import { runnerState } from '@shared/r3f';
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Color, DoubleSide, ShaderMaterial, Vector2, type BufferGeometry } from 'three';
 import { GrassChunk } from './GrassChunk';
 
@@ -69,6 +69,9 @@ export function GrassField() {
       }),
     [],
   );
+
+  useEffect(() => () => material.dispose(), [material]);
+  useEffect(() => () => geometries.forEach((g) => g.dispose()), [geometries]);
 
   const [center, setCenter] = useState<Cell>({ x: 0, z: 0 });
   const centerRef = useRef<Cell>({ x: 0, z: 0 });

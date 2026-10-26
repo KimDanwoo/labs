@@ -14,7 +14,7 @@ export function RideControls() {
           <KeyCap>Shift</KeyCap>질주
         </span>
         <span className="flex items-center gap-sm">
-          <KeyCap>Space</KeyCap>상승 · 놓으면 활공
+          <KeyCap>Space</KeyCap>달린 뒤 눌러 이륙 · 길게 상승 · 놓으면 활공
         </span>
         <span className="flex items-center gap-sm">
           <KeyCap>E</KeyCap>공중 회전
@@ -28,7 +28,7 @@ export function RideControls() {
         <span className="text-prairie-paper/65">드래그로 둘러보기</span>
       </div>
       <p className="hidden text-xs text-prairie-paper/80 pointer-coarse:block">
-        화면을 끌어 이동 · 비행을 놓으면 활공 · ↓ 하강
+        화면을 끌어 달린 뒤 ↑ 이륙 · 길게 상승 · 놓으면 활공 · ↓ 하강
       </p>
     </div>
   );

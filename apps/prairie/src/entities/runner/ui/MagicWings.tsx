@@ -25,14 +25,17 @@ export function MagicWings({ anchor }: MagicWingsProps) {
     anchor.getWorldPosition(point);
     root.parent?.worldToLocal(point);
     root.position.copy(point);
-    const target = MathUtils.smoothstep(runnerState.airborneHeight, 0.2, 1.2);
+    const falling = MathUtils.smoothstep(-runnerState.verticalSpeed, 0.5, 5);
+    const landingFlare = (1 - MathUtils.smoothstep(runnerState.airborneHeight, 0.6, 2.4)) * falling;
+    const target =
+      MathUtils.smoothstep(runnerState.airborneHeight, 0.15, 0.9) * (1 - falling * 0.65 + landingFlare * 0.55);
     openRef.current = MathUtils.damp(openRef.current, target, 6, delta);
     const open = openRef.current;
     root.visible = true;
     const rising = MathUtils.smoothstep(runnerState.verticalSpeed, -0.3, 2);
     const flare =
       (1 - MathUtils.smoothstep(runnerState.airborneHeight, 0.4, 3)) * (runnerState.verticalSpeed < 0 ? 1 : 0);
-    phaseRef.current += MathUtils.lerp(1.4, WINGS.flapSpeedRising, rising) * delta;
+    phaseRef.current += MathUtils.lerp(WINGS.flapSpeedAir, WINGS.flapSpeedRising, rising) * delta;
     const flap =
       MathUtils.lerp(0.16, WINGS.openAngleBase, rising) +
       Math.sin(phaseRef.current) * MathUtils.lerp(0.1, WINGS.flapAmplitude, rising) +

@@ -24,11 +24,27 @@ export const GATES = [
 export const GATE_RADIUS = 4.5;
 export type Point = { x: number; y: number; z: number };
 
-// Segment/plane intersection prevents a fast dash from skipping a gate between frames.
+// Sweep a small body volume through the aperture in either direction, including dashes.
 export function crossesGate(from: Point, to: Point, center: Point): boolean {
-  if (from.z >= center.z || to.z < center.z) return false;
-  const t = (center.z - from.z) / (to.z - from.z);
-  return Math.hypot(from.x + (to.x - from.x) * t - center.x, from.y + (to.y - from.y) * t - center.y) < GATE_RADIUS;
+  const depth = 0.65;
+  const dz = to.z - from.z;
+  let start = 0;
+  let end = 1;
+  if (Math.abs(dz) < 1e-8) {
+    if (Math.abs(from.z - center.z) > depth) return false;
+  } else {
+    const a = (center.z - depth - from.z) / dz;
+    const b = (center.z + depth - from.z) / dz;
+    start = Math.max(0, Math.min(a, b));
+    end = Math.min(1, Math.max(a, b));
+    if (start > end) return false;
+  }
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const lengthSq = dx * dx + dy * dy;
+  const closest = lengthSq > 0 ? ((center.x - from.x) * dx + (center.y - from.y) * dy) / lengthSq : start;
+  const t = Math.max(start, Math.min(end, closest));
+  return Math.hypot(from.x + dx * t - center.x, from.y + dy * t - center.y) <= GATE_RADIUS + depth;
 }
 
 export function isExplorationClearing(x: number, z: number): boolean {

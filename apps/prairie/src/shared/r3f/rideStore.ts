@@ -6,17 +6,27 @@ import { useSyncExternalStore } from 'react';
 type RideSnapshot = {
   riverDistance: number;
   riverBearing: RiverBearing;
+  seaDistance: number;
+  atSea: boolean;
 };
 
-const INITIAL_SNAPSHOT: RideSnapshot = { riverDistance: 0, riverBearing: 'ahead' };
+const INITIAL_SNAPSHOT: RideSnapshot = { riverDistance: 0, riverBearing: 'ahead', seaDistance: 900, atSea: false };
 
 let snapshot: RideSnapshot = INITIAL_SNAPSHOT;
 const listeners = new Set<() => void>();
 
-export function setRideRiver(distance: number, bearing: RiverBearing): void {
+export function setRideRiver(distance: number, bearing: RiverBearing, coastDistance: number): void {
   const rounded = Math.round(distance);
-  if (rounded === snapshot.riverDistance && bearing === snapshot.riverBearing) return;
-  snapshot = { riverDistance: rounded, riverBearing: bearing };
+  const seaDistance = Math.max(0, Math.round(-coastDistance / 10) * 10);
+  const atSea = coastDistance >= 0;
+  if (
+    rounded === snapshot.riverDistance &&
+    bearing === snapshot.riverBearing &&
+    seaDistance === snapshot.seaDistance &&
+    atSea === snapshot.atSea
+  )
+    return;
+  snapshot = { riverDistance: rounded, riverBearing: bearing, seaDistance, atSea };
   listeners.forEach((listen) => listen());
 }
 

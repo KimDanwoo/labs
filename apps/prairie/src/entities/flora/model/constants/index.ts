@@ -1,4 +1,4 @@
-import { distanceToRiver, RIVER_TRENCH_HALF_WIDTH } from '@shared/config';
+import { coastDistanceAt, distanceToRiver, RIVER_TRENCH_HALF_WIDTH } from '@shared/config';
 import { isExplorationClearing } from '@shared/exploration/world';
 
 // 나무·바위 배치. 셀 좌표 해시만으로 결정되므로 어디서 다시 와도 같은 자리에 같은 나무가 선다(저장 없음).
@@ -53,12 +53,21 @@ function hash2(cellX: number, cellZ: number, salt: number): number {
 
 function isBlocked(x: number, z: number): boolean {
   if (isExplorationClearing(x, z)) return true;
-  if (distanceToRiver(x) < RIVER_TRENCH_HALF_WIDTH + FLORA.riverMargin) return true;
+  if (coastDistanceAt(x, z) > -32) return true;
+  if (distanceToRiver(x, z) < RIVER_TRENCH_HALF_WIDTH + FLORA.riverMargin) return true;
   return Math.hypot(x, z) < FLORA.spawnClearRadius;
 }
 
+// Bounded cache serves both collision checks (every frame) and visible-cell rebuilds.
+// Entries are deterministic and callers only read them; roaming cannot grow memory forever.
+const cellCache = new Map<string, FloraPlacement[]>();
+const MAX_CACHED_CELLS = 2048;
+
 // 셀 하나의 배치. 나무는 군락(0~4그루), 바위는 0~2개. 각 항목은 셀 안에서 해시로 흩는다.
 export function floraInCell(cellX: number, cellZ: number): FloraPlacement[] {
+  const key = `${cellX}:${cellZ}`;
+  const cached = cellCache.get(key);
+  if (cached) return cached;
   const out: FloraPlacement[] = [];
   const origin = { x: cellX * FLORA.cell, z: cellZ * FLORA.cell };
   const grove = hash2(cellX, cellZ, 1);
@@ -80,6 +89,8 @@ export function floraInCell(cellX: number, cellZ: number): FloraPlacement[] {
     const r = hash2(cellX, cellZ, 42 + i * 3);
     out.push({ kind: 'rock', x, z, yaw: r * Math.PI * 2, scale: 0.5 + r * 1.2, variant: 0 });
   }
+  if (cellCache.size >= MAX_CACHED_CELLS) cellCache.delete(cellCache.keys().next().value!);
+  cellCache.set(key, out);
   return out;
 }
 

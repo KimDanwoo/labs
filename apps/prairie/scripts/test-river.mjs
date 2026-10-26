@@ -9,6 +9,13 @@ import {
 } from '../src/entities/grass/model/constants/index.ts';
 import {
   distanceToRiver,
+  coastDistanceAt,
+  groundHeightAt,
+  waterDepthAt,
+  waterBedDepthAt,
+  riverOffsetAt,
+  riverWidthAt,
+  OCEAN,
   FOG,
   HAZE,
   nearestRiverX,
@@ -48,8 +55,10 @@ test('강 사이 중간 지점에서 어느 강도 안개 시야 안에 들어�
 // 강 골과 그 주변 maskNear 폭은 평지여야 하상·수면·강둑 전제가 맞는다. 최대 경사는 말이 미끄러지지 않을 만큼 완만하게.
 test('지형 기복은 강 주변에서 0이고 경사가 완만하다', () => {
   for (const z of [0, 37, -120]) {
-    assert.equal(terrainHeightAt(RIVER.firstX, z), 0);
-    assert.equal(terrainHeightAt(RIVER.firstX + RIVER_TRENCH_HALF_WIDTH + TERRAIN.maskNear, z), 0);
+    const center = nearestRiverX(RIVER.firstX, z);
+    assert.equal(terrainHeightAt(center, z), 0);
+    const edge = center + (RIVER_TRENCH_HALF_WIDTH + TERRAIN.maskNear - 0.001) * riverWidthAt(z);
+    assert.equal(terrainHeightAt(edge, z), 0);
   }
   const maxSlope = TERRAIN.waves.reduce((sum, w) => sum + w.amp * Math.hypot(w.kx, w.kz), 0);
   assert.ok(maxSlope < 0.25, `최대 경사 ${maxSlope.toFixed(3)} < 0.25`);
@@ -121,4 +130,47 @@ test('LOD 링 풀이 경계 거리의 keep을 감당한다', () => {
       );
     }
   }
+});
+
+test('curved channel stays aligned with water depth, banks and terrain on both sides', () => {
+  for (let z = -1200; z < 900; z += 17) {
+    const center = nearestRiverX(110, z);
+    const width = riverWidthAt(z);
+    assert.ok(width > 0);
+    assert.ok(Math.abs(distanceToRiver(center, z)) < 1e-8);
+    for (const side of [-1, 1]) {
+      const shore = center + side * RIVER.halfWidth * width;
+      assert.ok(Math.abs(riverBedDepthAt(distanceToRiver(shore, z)) - RIVER.waterDrop) < 0.03);
+      const bank = center + side * RIVER_TRENCH_HALF_WIDTH * width;
+      assert.ok(riverBedDepthAt(distanceToRiver(bank, z)) < 1e-8);
+      assert.equal(terrainHeightAt(bank, z), 0);
+    }
+  }
+});
+
+test('the estuary opens into a continuous sea with a dry beach and a submerged shelf', () => {
+  assert.ok(RIVER.halfWidth * 2 >= 72);
+  assert.ok(riverWidthAt(880) > riverWidthAt(400) * 2);
+  for (const x of [-3000, -500, 0, 110, 700, 4000]) {
+    const shoreline = OCEAN.coastZ - coastDistanceAt(x, OCEAN.coastZ);
+    assert.ok(waterDepthAt(x, shoreline + OCEAN.shelfLength) >= OCEAN.depth - 1e-8);
+    assert.ok(groundHeightAt(x, shoreline + OCEAN.shelfLength) < -RIVER.waterDrop);
+    for (let z = shoreline - 50; z <= shoreline + 200; z += 0.5) {
+      assert.ok(Number.isFinite(groundHeightAt(x, z)));
+      assert.ok(Math.abs(groundHeightAt(x, z + 0.5) - groundHeightAt(x, z)) < 0.25);
+      assert.equal(waterDepthAt(x, z), Math.max(0, waterBedDepthAt(x, z) - RIVER.waterDrop));
+    }
+  }
+  const x = 600;
+  const shore = OCEAN.coastZ - coastDistanceAt(x, OCEAN.coastZ);
+  assert.equal(waterDepthAt(x, shore - OCEAN.beachWidth), 0);
+});
+
+test('river mesh switching remains outside visibility even at the widest estuary', () => {
+  const bend = RIVER.bends.reduce((n, w) => n + w.amplitude, 0);
+  const width = (1 + RIVER.widthWaves.reduce((n, w) => n + w.amplitude, 0)) * (1 + OCEAN.estuaryExpansion);
+  for (const fog of Object.values(FOG)) {
+    assert.ok(RIVER.period / 2 - 2 * bend - RIVER_TRENCH_HALF_WIDTH * width > fog.far);
+  }
+  assert.equal(riverOffsetAt(0), 0);
 });

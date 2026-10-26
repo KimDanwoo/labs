@@ -71,7 +71,7 @@ export function TouchActions() {
       </button>
       <button
         type="button"
-        aria-label="누르면 점프, 길게 눌러 비행"
+        aria-label="충분히 달린 뒤 눌러 이륙, 길게 눌러 상승"
         onPointerDown={(event) => handlePress(event, 'jump')}
         onPointerUp={() => setRunnerAction('jump', false)}
         onPointerCancel={() => setRunnerAction('jump', false)}

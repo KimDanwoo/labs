@@ -10,11 +10,15 @@ const BEARING = {
 } as const;
 
 export function RiverGuide() {
-  const { riverDistance, riverBearing } = useRideRiver();
+  const { riverDistance, riverBearing, seaDistance, atSea } = useRideRiver();
   const isCrossing = riverBearing === 'crossing';
+  let description = isCrossing ? '물결 사이를 지나는 중' : '가까운 강까지';
+  if (atSea) description = '강이 닿는 곳';
+  let destination = seaDistance < 400 ? '바다로 이어지는 하구' : '넓은 강을 지나는 중';
+  if (atSea) destination = '탁 트인 바다';
 
   return (
-    <div className="flex items-center gap-sm rounded-2xl border border-prairie-paper/20 bg-prairie-ink/35 px-md py-md backdrop-blur-md sm:gap-md sm:px-lg">
+    <div className="absolute right-4 top-24 flex max-w-[190px] items-center gap-sm rounded-2xl border border-prairie-paper/20 bg-prairie-ink/35 px-md py-md backdrop-blur-md sm:static sm:max-w-none sm:gap-md sm:px-lg">
       <svg
         aria-hidden
         viewBox="0 0 24 24"
@@ -26,10 +30,10 @@ export function RiverGuide() {
         <path d="M2 7c3-4 5 4 8 0s5 4 8 0 4 0 4 0M2 12c3-4 5 4 8 0s5 4 8 0 4 0 4 0M2 17c3-4 5 4 8 0s5 4 8 0 4 0 4 0" />
       </svg>
       <div>
-        <p className="text-xs text-prairie-paper/70">{isCrossing ? '물결 사이를 지나는 중' : '가까운 강까지'}</p>
+        <p className="text-xs text-prairie-paper/70">{description}</p>
         <p className="flex items-baseline gap-sm text-sm">
-          {isCrossing ? (
-            <span>강을 건너는 중</span>
+          {atSea || isCrossing ? (
+            <span>{destination}</span>
           ) : (
             <>
               <span className="font-mono text-lg tabular-nums">
@@ -42,6 +46,7 @@ export function RiverGuide() {
             </>
           )}
         </p>
+        {!atSea && <p className="mt-xs text-xs text-prairie-paper/60">강의 하류를 따라 · 바다까지 약 {seaDistance}m</p>}
       </div>
     </div>
   );

@@ -58,7 +58,16 @@ export function Runner({ speedRef }: RunnerProps) {
         copy.roughness = 0.56;
         if (copy.name === 'Hair') copy.roughness = 0.48;
         if (copy.name === 'Eye_Black') copy.roughness = 0.16;
-        copy.envMapIntensity = 0.35;
+        if (copy.name === 'Main' || copy.name === 'Main_Light') {
+          copy.sheen = 0.65;
+          copy.sheenColor.set('#c9ddff');
+          copy.roughness = 0.42;
+        }
+        if (copy.name === 'Hooves') {
+          copy.metalness = 0.65;
+          copy.roughness = 0.28;
+        }
+        copy.envMapIntensity = 0.5;
         copy.flatShading = false;
         if (copy.name === 'Hair') {
           copy.onBeforeCompile = (shader) => {

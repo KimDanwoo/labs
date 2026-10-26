@@ -1,13 +1,14 @@
 export const FLIGHT = {
   ceiling: 32,
+  minTakeoffRunSpeed: 7,
   takeoffSpeed: 5.6,
   climbSpeed: 5.5,
-  glideSlow: 2.6,
-  glideFast: 1.7,
-  descendSpeed: 7,
-  flareHeight: 3,
-  landingSpeed: 0.75,
-  flareDeceleration: 4,
+  glideSlow: 6.5,
+  glideFast: 4.5,
+  descendSpeed: 10,
+  flareHeight: 1.6,
+  landingSpeed: 1,
+  flareDeceleration: 12,
 } as const;
 
 export type FlightState = {
@@ -44,8 +45,11 @@ export function updateFlight(state: FlightState, input: FlightInput, groundY: nu
   }
   if (state.height <= 0) {
     state.height = 0;
-    state.velocity = input.launch ? FLIGHT.takeoffSpeed : 0;
-    if (!input.launch) return null;
+    // Takeoff needs a forward run-up and a fresh press; holding lift at rest
+    // must not trigger an automatic launch once the rider starts moving.
+    const canLaunch = input.launch && input.speed >= FLIGHT.minTakeoffRunSpeed;
+    state.velocity = canLaunch ? FLIGHT.takeoffSpeed : 0;
+    if (!canLaunch) return null;
   }
   // Small substeps keep apex/flare timing stable at 30, 60 and 120 fps.
   const duration = Math.min(delta, 0.1);
@@ -63,7 +67,7 @@ export function updateFlight(state: FlightState, input: FlightInput, groundY: nu
       const flare = smooth(state.height / FLIGHT.flareHeight);
       target = -FLIGHT.landingSpeed + (target + FLIGHT.landingSpeed) * flare;
     }
-    let response = 2.2;
+    let response = 3.2;
     if (input.lift) response = 3.5;
     if (input.descend) response = 4;
     state.velocity += (target - state.velocity) * (1 - Math.exp(-response * dt));

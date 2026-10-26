@@ -2,7 +2,7 @@
 
 import { makeFlowerGeometry } from '@entities/flora/model/services';
 import { useFrame } from '@react-three/fiber';
-import { distanceToRiver, RIVER_TRENCH_HALF_WIDTH, terrainHeightAt } from '@shared/config';
+import { coastDistanceAt, distanceToRiver, RIVER_TRENCH_HALF_WIDTH, terrainHeightAt } from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
 import { useMemo, useRef } from 'react';
 import { Color, InstancedMesh, Object3D } from 'three';
@@ -45,7 +45,8 @@ export function MeadowFlowers() {
           const spread = Math.sqrt(hash(seed + i * 4.1 + 9)) * 4.5;
           const x = patchX + Math.cos(angle) * spread,
             z = patchZ + Math.sin(angle) * spread;
-          if (distanceToRiver(x) < RIVER_TRENCH_HALF_WIDTH + 5) continue;
+          if (coastDistanceAt(x, z) > -32) continue;
+          if (distanceToRiver(x, z) < RIVER_TRENCH_HALF_WIDTH + 5) continue;
           const y = terrainHeightAt(x, z);
           const height = 0.22 + hash(seed + i * 1.1) * 0.34;
           dummy.position.set(x, y, z);

@@ -19,11 +19,11 @@ export const RUNNER_ANIM = {
 
 // 천마 룩: 모델 머티리얼 이름별 색 덮어쓰기(원본 glb는 그대로).
 export const UNICORN_TINT: Record<string, string> = {
-  Main: '#f0ebe2',
-  Main_Light: '#e8dfce',
-  Hair: '#d9dfdf',
-  Muzzle: '#aaa4a1',
-  Hooves: '#4c4841',
+  Main: '#f4f0e9',
+  Main_Light: '#c9d5df',
+  Hair: '#647b99',
+  Muzzle: '#7f899b',
+  Hooves: '#b99251',
   Eye_Black: '#211e1b',
   Eye_White: '#c9bfae',
 };
@@ -35,7 +35,7 @@ export const HORN = {
   position: [0, 0.18, 0.4] as [number, number, number],
   tiltForward: 0.18,
   radius: 0.085,
-  height: 0.86,
+  height: 1.08,
   bend: 0.07,
   color: '#e4c17f',
   ridgeColor: '#fff0c7',

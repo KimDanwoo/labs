@@ -8,7 +8,7 @@ import {
   makeTrunkGeometry,
 } from '@entities/flora/model/services';
 import { useFrame } from '@react-three/fiber';
-import { distanceToRiver, riverBedDepthAt, terrainHeightAt } from '@shared/config';
+import { FOG, groundHeightAt } from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { Color, InstancedMesh, Object3D, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
@@ -69,17 +69,20 @@ export function FloraField() {
   const viewRadius = coarse ? FLORA.viewRadius.mobile : FLORA.viewRadius.desktop;
   const geometry = useMemo(
     () => ({
-      canopy: makeCanopyGeometry(coarse ? 1 : FLORA.canopy.detail),
+      canopy: makeCanopyGeometry(coarse ? 1 : 2),
+      farCanopy: makeCanopyGeometry(1),
       conifer: makeConiferGeometry(),
       trunk: makeTrunkGeometry(),
     }),
     [coarse],
   );
+  useEffect(() => () => Object.values(geometry).forEach((g) => g.dispose()), [geometry]);
   const shadowTexture = useMemo(() => makeShadowTexture(), []);
   useEffect(() => () => shadowTexture.dispose(), [shadowTexture]);
   const shadowRef = useRef<InstancedMesh>(null);
   const trunkRef = useRef<InstancedMesh>(null);
   const canopyRef = useRef<InstancedMesh>(null);
+  const farCanopyRef = useRef<InstancedMesh>(null);
   const coneRef = useRef<InstancedMesh>(null);
   const rockRef = useRef<InstancedMesh>(null);
   const centerRef = useRef({ x: Number.NaN, z: Number.NaN });
@@ -87,10 +90,11 @@ export function FloraField() {
   const rebuild = (cx: number, cz: number) => {
     const trunk = trunkRef.current;
     const canopy = canopyRef.current;
+    const farCanopy = farCanopyRef.current;
     const cone = coneRef.current;
     const rock = rockRef.current;
     const shadow = shadowRef.current;
-    if (!trunk || !canopy || !cone || !rock || !shadow) return;
+    if (!trunk || !canopy || !farCanopy || !cone || !rock || !shadow) return;
 
     const items: FloraPlacement[] = [];
     for (let dx = -viewRadius; dx <= viewRadius; dx += 1) {
@@ -106,10 +110,14 @@ export function FloraField() {
     let trees = 0;
     let shadows = 0;
     let blobs = 0;
+    let farBlobs = 0;
     let cones = 0;
     let rocks = 0;
     for (const item of items) {
-      const groundY = terrainHeightAt(item.x, item.z) - riverBedDepthAt(distanceToRiver(item.x));
+      const distance = Math.hypot(item.x - centerX, item.z - centerZ);
+      if (distance > FOG[coarse ? 'mobile' : 'desktop'].far + FLORA.cell) continue;
+      const distant = distance > (coarse ? 48 : 96);
+      const groundY = groundHeightAt(item.x, item.z);
       if (shadows < FLORA.maxTrees + FLORA.maxRocks) {
         const shadeSize = item.scale * (item.kind === 'rock' ? 1.6 : 5.4);
         dummy.position.set(item.x, groundY + 0.025, item.z);
@@ -159,7 +167,7 @@ export function FloraField() {
       }
 
       const seed = item.x * 7.13 + item.z * 3.71;
-      for (let b = 0; b < FLORA.canopy.blobs; b += 1) {
+      for (let b = 0; b < (distant ? 6 : FLORA.canopy.blobs); b += 1) {
         const r1 = hash(seed + b * 1.37);
         const r2 = hash(seed + b * 2.91 + 5);
         const r3 = hash(seed + b * 4.07 + 9);
@@ -178,10 +186,11 @@ export function FloraField() {
         dummy.scale.set(s * (0.9 + r1 * 0.35), s * (0.65 + r3 * 0.3), s);
         dummy.updateMatrix();
         tint.copy(CANOPY_COLORS[(item.variant + b) % CANOPY_COLORS.length]!);
-        canopy.setMatrixAt(blobs, dummy.matrix);
-        canopy.setColorAt(blobs, tint);
-        blobs += 1;
-        if (b > 0 && b <= FLORA.branches) {
+        const foliage = distant ? farCanopy : canopy;
+        const slot = distant ? farBlobs++ : blobs++;
+        foliage.setMatrixAt(slot, dummy.matrix);
+        foliage.setColorAt(slot, tint);
+        if (!distant && b > 0 && b <= FLORA.branches) {
           const startY = groundY + trunkH * (0.5 + r3 * 0.2);
           const endY = groundY + trunkH + FLORA.canopy.radius * (0.3 + lift) * item.scale;
           branchDirection.set(Math.cos(angle) * spread, endY - startY, Math.sin(angle) * spread);
@@ -203,9 +212,10 @@ export function FloraField() {
     shadow.count = shadows;
     trunk.count = trunks;
     canopy.count = blobs;
+    farCanopy.count = farBlobs;
     cone.count = cones;
     rock.count = rocks;
-    for (const mesh of [trunk, canopy, cone, rock, shadow]) {
+    for (const mesh of [trunk, canopy, farCanopy, cone, rock, shadow]) {
       mesh.instanceMatrix.needsUpdate = true;
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
       mesh.computeBoundingSphere();
@@ -232,6 +242,9 @@ export function FloraField() {
         <meshLambertMaterial color={FLORA.colors.trunk} />
       </instancedMesh>
       <instancedMesh ref={canopyRef} args={[geometry.canopy, undefined, FLORA.maxTrees * FLORA.canopy.blobs]}>
+        <meshLambertMaterial onBeforeCompile={shadeCanopy} />
+      </instancedMesh>
+      <instancedMesh ref={farCanopyRef} args={[geometry.farCanopy, undefined, FLORA.maxTrees * 6]}>
         <meshLambertMaterial onBeforeCompile={shadeCanopy} />
       </instancedMesh>
       <instancedMesh ref={coneRef} args={[geometry.conifer, undefined, FLORA.maxTrees * FLORA.conifer.tiers]}>

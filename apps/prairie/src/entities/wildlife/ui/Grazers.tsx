@@ -1,7 +1,14 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { distanceToRiver, nearestRiverX, RIVER_TRENCH_HALF_WIDTH, terrainHeightAt } from '@shared/config';
+import {
+  coastDistanceAt,
+  distanceToRiver,
+  nearestRiverX,
+  RIVER_TRENCH_HALF_WIDTH,
+  riverWidthAt,
+  terrainHeightAt,
+} from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
 import { runnerState } from '@shared/r3f';
 import { createCreatureState, habitatSeed, updateCreature } from '@shared/wildlife/behavior';
@@ -27,6 +34,9 @@ export function Grazers() {
     const dt = Math.min(delta, 0.05),
       t = clock.elapsedTime,
       rider = runnerState.position;
+    const offshore = coastDistanceAt(rider.x, rider.z) > 120;
+    fur.current.visible = dark.current.visible = !offshore;
+    if (offshore) return;
     for (let i = 0; i < count; i++) {
       const animal = herd.current[i]!;
       if (Math.hypot(animal.x - rider.x, animal.z - rider.z) > 160) {
@@ -37,8 +47,9 @@ export function Grazers() {
         animal.alert = 0;
         animal.rest = 0;
       }
-      if (distanceToRiver(animal.x) < RIVER_TRENCH_HALF_WIDTH + 6)
-        animal.x = nearestRiverX(animal.x) - RIVER_TRENCH_HALF_WIDTH - 8;
+      if (distanceToRiver(animal.x, animal.z) < RIVER_TRENCH_HALF_WIDTH + 6)
+        animal.x = nearestRiverX(animal.x, animal.z) - (RIVER_TRENCH_HALF_WIDTH + 8) * riverWidthAt(animal.z);
+      animal.z -= Math.max(0, coastDistanceAt(animal.x, animal.z) + 40);
       const y = terrainHeightAt(animal.x, animal.z);
       const distance = Math.hypot(animal.x - rider.x, y - rider.y, animal.z - rider.z);
       updateCreature(animal, distance, 12, dt);

@@ -32,11 +32,11 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
       const offset = p.length / 3;
       for (let ring = 0; ring <= 12; ring += 1) {
         const t = ring / 12;
-        const radius = 0.032 * Math.pow(1 - t * 0.97, 0.8);
+        const radius = 0.043 * Math.pow(1 - t * 0.97, 0.8);
         for (let side = 0; side < 6; side += 1) {
           const angle = (side / 6) * Math.PI * 2;
           p.push(Math.cos(angle) * radius, t, Math.sin(angle) * radius);
-          const color = new Color('#8595ac').lerp(new Color('#eee5d5'), 0.3 + t * 0.5 + Math.sin(strand * 2.4) * 0.12);
+          const color = new Color('#425f88').lerp(new Color('#f5dfad'), 0.3 + t * 0.5 + Math.sin(strand * 2.4) * 0.12);
           colors.push(color.r, color.g, color.b);
           lengths.push(t);
           strands.push(strand);
@@ -81,7 +81,7 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
           center.y -= t * t * (0.12 + 0.16 * sin(phase));
         } else {
           center = mix(uTop, uBottom, rootT);
-          float length = 0.72 + sin(rootT * 3.14159) * 0.28;
+          float length = 0.92 + sin(rootT * 3.14159) * 0.36;
           center += vec3(0.32 + rootT * 0.18, -length, -0.14 - uFlow * 0.38) * t;
           center.x += sin(t * 3.14159) * 0.2;
           center.y += sin(phase) * 0.08 * t * t;
