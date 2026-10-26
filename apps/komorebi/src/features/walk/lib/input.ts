@@ -29,6 +29,15 @@ export function padDirection(x: number, y: number): string[] {
   return keys;
 }
 
+/** Unnormalised step from held keys: opposite keys cancel, WASD and arrows count as the same direction. */
+export function keyboardDirection(keys: ReadonlySet<string>) {
+  const held = (...names: string[]) => Number(names.some((name) => keys.has(name)));
+  return {
+    dx: held('d', 'arrowright') - held('a', 'arrowleft'),
+    dz: held('s', 'arrowdown') - held('w', 'arrowup'),
+  };
+}
+
 const CONTROL_TAGS = new Set(['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'A']);
 
 /** Keys pressed on a focused control (Space on a button, typing in a field) belong to that control, not the walk. */

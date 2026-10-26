@@ -1,7 +1,7 @@
 import { TIME, WEATHER, type TimeOfDay, type Weather } from '@features/walk/model/constants';
 import { DEFAULT_APPEARANCE, characterAtlas, type Appearance } from '@shared/world/appearance';
 import { FOREGROUNDS, foregroundOrder } from '@shared/world/foreground';
-import { interactionDestination, isAtHomeBed, isNearHomeBed } from '@shared/world/interactions';
+import { isAtHomeBed, isNearHomeBed } from '@shared/world/interactions';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '@shared/world/portals';
 import { surfaceAt, type Surface } from '@shared/world/surfaces';
 import {
@@ -9,7 +9,6 @@ import {
   HOME_BED,
   SPAWN,
   WORLDS,
-  canWalk,
   closestLandmark,
   createSlideMotion,
   findRoute,
@@ -31,11 +30,12 @@ import { createChild } from './child';
 import { createCountryside } from './countryside';
 import { createDriftingLeaves } from './driftingLeaves';
 import { createFireflies } from './fireflies';
-import { gameKey, isControlTarget } from './input';
+import { gameKey, isControlTarget, keyboardDirection } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
 import { createNightLights, lampGlowAt, lampUniforms } from './nightLights';
 import { CHILD_SIZE, characterScale } from './perspective';
 import { createPlaceEffects } from './placeEffects';
+import { createPointerPick } from './pointerPick';
 import { createPortals } from './portals';
 import { createRain } from './rain';
 import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './regionPlates';
@@ -447,35 +447,10 @@ export async function createScene(
     cancelAnimationFrame(animation);
     if (!document.hidden && !disposed) animation = requestAnimationFrame(tick);
   };
-  const ray = new THREE.Raycaster();
-  const pointer = new THREE.Vector2();
-  const groundPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-  const intersection = new THREE.Vector3();
-  const pick = (event: PointerEvent) => {
-    const bounds = renderer.domElement.getBoundingClientRect();
-    ray.setFromCamera(
-      pointer.set(
-        ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
-        (-(event.clientY - bounds.top) / bounds.height) * 2 + 1,
-      ),
-      camera,
-    );
-    const portal = portalVisuals.pick(ray, region);
-    if (portal) return { point: portal.center, portal, interactive: true };
-    const marker = ray.intersectObjects(markers.filter((item) => item.visible))[0];
-    if (marker) {
-      const point = DESTINATIONS[markers.indexOf(marker.object as THREE.Sprite)];
-      if (point) return { point, portal: null, interactive: true };
-    }
-    if (!ray.ray.intersectPlane(groundPlane, intersection)) return null;
-    const hit = { x: (intersection.x + 60) / 1.2, z: (40 - intersection.y) / 0.8 };
-    const interactive = interactionDestination(hit, region);
-    const point = interactive ?? hit;
-    return canWalk(point.x, point.z, region) ? { point, portal: null, interactive: interactive !== null } : null;
-  };
+  const pick = createPointerPick({ canvas: renderer.domElement, camera, portals: portalVisuals, markers });
   const hover = (event: PointerEvent) => {
     if (event.pointerType !== 'mouse' || paused) return;
-    const target = pick(event);
+    const target = pick(event, region);
     let cursor = 'default';
     if (target) cursor = target.interactive ? 'pointer' : 'crosshair';
     renderer.domElement.style.cursor = cursor;
@@ -483,7 +458,7 @@ export async function createScene(
   const click = (event: PointerEvent) => {
     if (paused || event.button !== 0) return;
     renderer.domElement.focus({ preventScroll: true });
-    const target = pick(event);
+    const target = pick(event, region);
     if (!target) return;
     const { point, portal } = target;
     if (portal) {
@@ -498,13 +473,15 @@ export async function createScene(
   };
   renderer.domElement.tabIndex = 0;
   renderer.domElement.setAttribute('aria-label', '산책 게임. 방향키 또는 WASD로 이동, Shift로 전력 질주, Space로 점프');
-  window.addEventListener('keydown', keyDown);
-  window.addEventListener('keyup', keyUp);
-  window.addEventListener('blur', clear);
-  document.addEventListener('visibilitychange', visibility);
-  renderer.domElement.addEventListener('pointerdown', click);
-  renderer.domElement.addEventListener('pointermove', hover);
-  motionQuery.addEventListener('change', motionPreference);
+  const listening = new AbortController();
+  const listen = { signal: listening.signal };
+  window.addEventListener('keydown', keyDown, listen);
+  window.addEventListener('keyup', keyUp, listen);
+  window.addEventListener('blur', clear, listen);
+  document.addEventListener('visibilitychange', visibility, listen);
+  renderer.domElement.addEventListener('pointerdown', click, listen);
+  renderer.domElement.addEventListener('pointermove', hover, listen);
+  motionQuery.addEventListener('change', motionPreference, listen);
   const enterPortal = (portal: WorldPortal) => {
     const plate = plates.get(portal.to);
     if (plate) {
@@ -564,8 +541,7 @@ export async function createScene(
     if (!paused) advanceJump(jump, dt);
     const hasLanded = !paused && wasAirborne && !isAirborne(jump);
     const regionBefore = region;
-    let dx = Number(keys.has('d') || keys.has('arrowright')) - Number(keys.has('a') || keys.has('arrowleft'));
-    let dz = Number(keys.has('s') || keys.has('arrowdown')) - Number(keys.has('w') || keys.has('arrowup'));
+    let { dx, dz } = keyboardDirection(keys);
     const keyboardWalking = Math.hypot(dx, dz) > 0;
     if (!keyboardWalking || paused) {
       slide.direction = null;
@@ -912,13 +888,7 @@ export async function createScene(
       disposed = true;
       cancelAnimationFrame(animation);
       observer.disconnect();
-      window.removeEventListener('keydown', keyDown);
-      window.removeEventListener('keyup', keyUp);
-      window.removeEventListener('blur', clear);
-      document.removeEventListener('visibilitychange', visibility);
-      motionQuery.removeEventListener('change', motionPreference);
-      renderer.domElement.removeEventListener('pointerdown', click);
-      renderer.domElement.removeEventListener('pointermove', hover);
+      listening.abort();
       foregrounds.forEach(({ mesh }) => mesh.geometry.dispose());
       foregroundMaterial.dispose();
       bedRest.dispose();
