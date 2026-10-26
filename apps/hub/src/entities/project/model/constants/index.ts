@@ -37,14 +37,14 @@ export const PROJECTS: Project[] = [
   },
   {
     title: 'Unicorn Rush',
-    description: '유니콘을 타고 떠나는 하늘 여행',
+    description: 'three.js를 활용한 유니콘 시뮬레이션',
     href: 'https://prairie.danwoo.dev/',
     image: '/projects/unicorn-rush-cover.webp',
     imagePosition: 'center',
   },
   {
     title: '코모레비',
-    description: '밀짚모자 쓰고 떠나는 여름 산책',
+    description: '이미지를 사용한 여름 시골 산책',
     href: 'https://komorebi.danwoo.dev/',
     image: '/projects/komorebi-cover.webp',
     imagePosition: 'center',
