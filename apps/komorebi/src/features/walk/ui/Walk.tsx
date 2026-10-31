@@ -19,6 +19,7 @@ import { HOME_DESK, HOME_WARDROBE, LANDMARKS, WORLDS, type Landmark } from '@sha
 import { useRef, useState, useSyncExternalStore } from 'react';
 import { flushSync } from 'react-dom';
 import { BottomBar } from './BottomBar';
+import { FishingDialog } from './FishingDialog';
 import { GameHeader } from './GameHeader';
 import { InteractPrompt } from './InteractPrompt';
 import { LoadingOverlay } from './LoadingOverlay';
@@ -43,7 +44,8 @@ export function Walk() {
   const [hasGuided, setHasGuided] = useState(false);
   const [isSleeping, setIsSleeping] = useState(false);
   const appearance = useSyncExternalStore(appearanceStore.subscribe, appearanceStore.get, appearanceStore.getServer);
-  const isPaused = dialog !== DIALOG.none || isSleeping;
+  const [isFishing, setIsFishing] = useState(false);
+  const isPaused = dialog !== DIALOG.none || isSleeping || isFishing;
   const today = useVillageDay(isPaused);
   const timeOfDay = today.time;
   const weather = today.weather;
@@ -168,6 +170,20 @@ export function Walk() {
       )}
       {status.nearby && !isPaused && (
         <InteractPrompt landmark={status.nearby} hint={promptHint(status.nearby)} onInteract={interact} />
+      )}
+
+      {status.nearby?.id === 'sea' && !isPaused && (
+        <button className="fishing-open" onClick={() => setIsFishing(true)}>
+          🎣 바다 낚시
+        </button>
+      )}
+      {isFishing && (
+        <FishingDialog
+          onClose={() => {
+            setIsFishing(false);
+            landscapeRef.current?.querySelector('canvas')?.focus({ preventScroll: true });
+          }}
+        />
       )}
 
       <BottomBar

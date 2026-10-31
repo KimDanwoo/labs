@@ -1779,3 +1779,94 @@ dialog::backdrop {
     animation-timing-function: steps(1, end);
   }
 }
+
+/* Fishing keeps the same paper-and-water palette as the walking HUD. */
+.fishing-open {
+  position: absolute;
+  z-index: 12;
+  right: 1rem;
+  top: 6rem;
+  border: 1px solid var(--line);
+  border-radius: 2rem;
+  padding: 0.8rem 1.1rem;
+  background: rgb(var(--paper) / 0.95);
+  box-shadow: 0 4px 20px rgb(var(--deep) / 0.12);
+}
+.fishing-dialog {
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+.fishing-dialog > small {
+  display: block;
+  margin-top: 0.7rem;
+  color: rgb(var(--moss));
+}
+.fishing-water {
+  position: relative;
+  overflow: hidden;
+  height: 9rem;
+  border-radius: 1rem;
+  margin-top: 1rem;
+  background: linear-gradient(rgb(var(--sky) / 0.55), rgb(var(--sky)), rgb(var(--moss) / 0.45));
+}
+.fishing-line {
+  position: absolute;
+  width: 1px;
+  height: 55%;
+  top: 0;
+  left: 50%;
+  background: rgb(var(--paper) / 0.8);
+}
+.fishing-float {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgb(var(--rust));
+  font-size: 1.5rem;
+}
+.is-waiting .fishing-float {
+  animation: fishing-bob 1.8s ease-in-out infinite;
+}
+.is-bite .fishing-float {
+  animation: fishing-bob 0.22s ease-in-out infinite;
+}
+.fishing-bite {
+  position: absolute;
+  top: 15%;
+  left: 58%;
+  font-size: 2rem;
+  color: rgb(var(--rust));
+}
+.fishing-message {
+  min-height: 3rem;
+}
+.fishing-collection {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+.fishing-collection h3 {
+  font: 700 1rem var(--serif);
+}
+.fishing-entry {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.85rem;
+}
+.fishing-entry small {
+  color: rgb(var(--moss));
+}
+@keyframes fishing-bob {
+  50% {
+    transform: translate(-50%, 0.5rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fishing-float {
+    animation: none !important;
+  }
+}
