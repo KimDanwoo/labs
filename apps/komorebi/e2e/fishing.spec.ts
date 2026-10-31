@@ -14,6 +14,15 @@ test('coastal fishing catches once, saves the journal and closes cleanly', async
   await page.clock.fastForward(6100);
   await expect(dialog.getByRole('button', { name: '챔질하기!' })).toBeVisible();
   await dialog.getByRole('button', { name: '챔질하기!' }).click();
+  await expect(dialog.getByRole('button', { name: '꾹 눌러 릴 감기' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('komorebi-fish-v1'))).toBeNull();
+  for (let i = 0; i < 350 && (await dialog.locator('meter').count()); i++) {
+    const tension = await dialog.locator('meter').evaluate((element: HTMLMeterElement) => element.value);
+    if (tension < 60) await page.keyboard.down('e');
+    else await page.keyboard.up('e');
+    await page.clock.runFor(100);
+  }
+  await page.keyboard.up('e');
   await expect(dialog.getByRole('status')).toContainText('처음 만난 물고기!');
   const saved = await page.evaluate(() => localStorage.getItem('komorebi-fish-v1'));
   expect(saved).toBeTruthy();

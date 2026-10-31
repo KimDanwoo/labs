@@ -1,5 +1,7 @@
 import {
   addCatch,
+  FIGHT_OUTCOME,
+  type Fight,
   BITE_WINDOW_MS,
   FISH,
   FISHING_PHASE,
@@ -11,6 +13,7 @@ import {
   type FishingPhase,
 } from '@features/walk/lib/fishing';
 import { useModal } from '@features/walk/model/hooks';
+import { FishingFight } from './FishingFight';
 import { useEffect, useId, useRef, useState } from 'react';
 
 export function FishingDialog({ onClose }: { onClose: () => void }) {
@@ -27,6 +30,8 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
   });
   const [isNew, setIsNew] = useState(false);
   const [hasSaveError, setHasSaveError] = useState(false);
+  const [isPerfect, setIsPerfect] = useState(false);
+  const [failure, setFailure] = useState('물고기가 달아났어요. 다시 해 볼까요?');
   const deadline = useRef(0);
   const hasReeled = useRef(false);
   useEffect(() => {
@@ -46,7 +51,27 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
     }
     return undefined;
   }, [phase]);
+  function finishFight(outcome: Fight['outcome']) {
+    if (outcome !== FIGHT_OUTCOME.landed || !caught) {
+      setFailure(
+        outcome === FIGHT_OUTCOME.snapped ? '팽! 너무 당겨 줄이 끊어졌어요.' : '줄이 느슨해져 물고기가 빠져나갔어요.',
+      );
+      setPhase(FISHING_PHASE.missed);
+      return;
+    }
+    const updated = addCatch(collection, caught);
+    setIsNew(!collection[caught.id]);
+    setCollection(updated);
+    try {
+      localStorage.setItem(FISHING_STORAGE_KEY, JSON.stringify(updated));
+      setHasSaveError(false);
+    } catch {
+      setHasSaveError(true);
+    }
+    setPhase(FISHING_PHASE.caught);
+  }
   function act() {
+    if (phase === FISHING_PHASE.fighting) return;
     if (phase === FISHING_PHASE.waiting || phase === FISHING_PHASE.bite) {
       if (hasReeled.current) return;
       hasReeled.current = true;
@@ -54,20 +79,13 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
         setPhase(FISHING_PHASE.missed);
         return;
       }
-      const next = rollCatch();
-      const updated = addCatch(collection, next);
-      setIsNew(!collection[next.id]);
-      setCaught(next);
-      setCollection(updated);
-      try {
-        localStorage.setItem(FISHING_STORAGE_KEY, JSON.stringify(updated));
-        setHasSaveError(false);
-      } catch {
-        setHasSaveError(true);
-      }
-      setPhase(FISHING_PHASE.caught);
+      setIsPerfect(Date.now() < deadline.current - BITE_WINDOW_MS + 450);
+      setCaught(rollCatch());
+      navigator.vibrate?.([25, 30, 60]);
+      setPhase(FISHING_PHASE.fighting);
       return;
     }
+    setFailure('물고기가 달아났어요. 다시 해 볼까요?');
     hasReeled.current = false;
     setCaught(null);
     setPhase(FISHING_PHASE.waiting);
@@ -77,7 +95,8 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
     [FISHING_PHASE.idle]: '바람을 느끼며 낚싯줄을 던져 보세요.',
     [FISHING_PHASE.waiting]: '찌가 잠길 때까지 잠깐 기다려요…',
     [FISHING_PHASE.bite]: '지금! 낚싯대를 올려요!',
-    [FISHING_PHASE.missed]: '물고기가 달아났어요. 다시 해 볼까요?',
+    [FISHING_PHASE.missed]: failure,
+    [FISHING_PHASE.fighting]: '쭉 당겨요! 물고기가 힘을 쓰면 잠깐 놓아 주세요.',
     [FISHING_PHASE.caught]:
       fish && caught ? `${isNew ? '처음 만난 물고기! ' : ''}${fish.name} · ${caught.size} cm` : '',
   };
@@ -85,6 +104,7 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
     [FISHING_PHASE.idle]: '낚싯줄 던지기',
     [FISHING_PHASE.waiting]: '낚싯줄 걷기',
     [FISHING_PHASE.bite]: '챔질하기!',
+    [FISHING_PHASE.fighting]: '릴 감기',
     [FISHING_PHASE.caught]: '낚싯줄 던지기',
     [FISHING_PHASE.missed]: '낚싯줄 던지기',
   }[phase];
@@ -98,6 +118,7 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
         if (!event.currentTarget.open) onClose();
       }}
       onKeyDown={(event) => {
+        if (phase === FISHING_PHASE.fighting) return;
         if (event.repeat) {
           if (event.key === ' ' || event.key === 'Enter' || event.key.toLowerCase() === 'e') event.preventDefault();
           return;
@@ -121,9 +142,13 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
       <p className="fishing-message" role="status">
         {messages[phase]}
       </p>
-      <button className="continue-button" onClick={act} autoFocus>
-        {actionLabel}
-      </button>
+      {phase === FISHING_PHASE.fighting && caught ? (
+        <FishingFight fish={caught} isPerfect={isPerfect} onFinish={finishFight} />
+      ) : (
+        <button className="continue-button" onClick={act} autoFocus>
+          {actionLabel}
+        </button>
+      )}
       <small>버튼 또는 E · 입질 뒤 1.8초 안에 챔질해요</small>
       <section className="fishing-collection" aria-label="물고기 도감">
         <h3>

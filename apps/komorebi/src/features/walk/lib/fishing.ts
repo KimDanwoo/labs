@@ -2,6 +2,7 @@ export const FISHING_PHASE = {
   idle: 'idle',
   waiting: 'waiting',
   bite: 'bite',
+  fighting: 'fighting',
   caught: 'caught',
   missed: 'missed',
 } as const;
@@ -59,4 +60,35 @@ export function parseCollection(raw: string | null): FishCollection {
 }
 export function isBiteOnTime(now: number, deadline: number) {
   return now < deadline;
+}
+
+export const FIGHT_OUTCOME = { active: 'active', landed: 'landed', snapped: 'snapped', escaped: 'escaped' } as const;
+export type Fight = {
+  tension: number;
+  progress: number;
+  elapsed: number;
+  outcome: (typeof FIGHT_OUTCOME)[keyof typeof FIGHT_OUTCOME];
+};
+export function startFight(isPerfect: boolean): Fight {
+  return { tension: 40, progress: isPerfect ? 20 : 10, elapsed: 0, outcome: FIGHT_OUTCOME.active };
+}
+export function stepFight(state: Fight, isReeling: boolean, seconds: number, size: number): Fight {
+  if (state.outcome !== FIGHT_OUTCOME.active) return state;
+  const dt = Math.max(0, Math.min(0.1, seconds));
+  const elapsed = state.elapsed + dt;
+  const strength = Math.min(1, size / 65);
+  const surge = Math.sin(elapsed * 2.4) > 0.45;
+  const tension = Math.max(
+    0,
+    Math.min(100, state.tension + (isReeling ? 23 + strength * 12 + (surge ? 20 : 0) : -30 + (surge ? 12 : 0)) * dt),
+  );
+  const progress = Math.max(
+    0,
+    Math.min(100, state.progress + (isReeling && tension >= 20 && tension <= 80 ? 28 - strength * 8 : -3) * dt),
+  );
+  let outcome: Fight['outcome'] = FIGHT_OUTCOME.active;
+  if (tension >= 100) outcome = FIGHT_OUTCOME.snapped;
+  else if (tension <= 0 || progress <= 0) outcome = FIGHT_OUTCOME.escaped;
+  else if (progress >= 100) outcome = FIGHT_OUTCOME.landed;
+  return { tension, progress, elapsed, outcome };
 }
