@@ -184,6 +184,7 @@ export function Walk() {
       )}
       {isFishing && (
         <FishingHud
+          onSound={ambience.fishingCue}
           onFrame={(frame) => engine.current?.setFishing(frame)}
           onClose={() => {
             engine.current?.setFishing(null);

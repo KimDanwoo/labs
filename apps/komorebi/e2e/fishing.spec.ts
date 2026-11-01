@@ -26,6 +26,9 @@ test('walk to the pier, fish in the world, save a catch and return to walking', 
   await page.keyboard.up('e');
   await expect(hud.getByRole('status')).toContainText('처음 만난 물고기!');
   await expect(page.locator('.landscape')).toHaveAttribute('data-fishing', 'caught');
+  await expect(hud.getByRole('button', { name: /잡았다!/ })).toBeDisabled();
+  await page.clock.runFor(2500);
+  await expect(hud.getByRole('button', { name: /다시 던지기/ })).toBeEnabled();
   const saved = await page.evaluate(() => localStorage.getItem('komorebi-fish-v1'));
   expect(saved).toBeTruthy();
   await page.keyboard.press('Escape');
@@ -37,7 +40,7 @@ test('walk to the pier, fish in the world, save a catch and return to walking', 
   await page.clock.runFor(850);
   const bounds = await hud.boundingBox();
   expect(bounds!.width).toBeLessThanOrEqual(390);
-  await expect(hud.getByText('바다 도감 · 1 / 4')).toBeVisible();
+  await expect(hud.getByText('바다 도감 · 1 / 16')).toBeVisible();
   await hud.getByRole('button', { name: /낚싯줄 걷기/ }).click();
   await expect(hud.getByRole('status')).toContainText('물고기가 달아났어요');
   expect(await page.evaluate(() => localStorage.getItem('komorebi-fish-v1'))).toBe(saved);

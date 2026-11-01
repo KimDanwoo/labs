@@ -27,11 +27,12 @@ import { createBedRest } from './bedRest';
 import { createBoats } from './boats';
 import { SCENERY_STYLE } from './breeze';
 import { constrainCameraAxis } from './cameraBounds';
+import { catchCelebration } from './catchCelebration';
 import { createChild } from './child';
 import { createCountryside } from './countryside';
 import { createDriftingLeaves } from './driftingLeaves';
 import { createFireflies } from './fireflies';
-import { type FishingFrame } from './fishing';
+import { FISHING_PHASE, type FishingFrame } from './fishing';
 import { gameKey, isControlTarget, keyboardDirection } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
 import { createNightLights, lampGlowAt, lampUniforms } from './nightLights';
@@ -197,6 +198,8 @@ export async function createScene(
   scene.add(child);
   const pierFishing = createPierFishing(scene);
   let fishingFrame: FishingFrame | null = null;
+  let fishingAge = 0;
+  let fishingLift = 0;
   // Group order sorts before mesh order: keep the group at the scene default
   // so the foreground can render after the character's individual sprites.
   child.children.forEach((part) => {
@@ -598,6 +601,10 @@ export async function createScene(
     if (!portal) waitingPortal = null;
     else if (portal !== blockedPortal) enterPortal(portal);
   }
+  function fishingHeading() {
+    if (fishingFrame?.phase === FISHING_PHASE.caught && fishingAge > 0.8) return 0;
+    return Math.PI / 2;
+  }
   function animateCharacter(dt: number, { walking, frameTravel }: Stride) {
     const scale = characterScale(position.z);
     const size = scale * CHILD_SIZE;
@@ -613,22 +620,26 @@ export async function createScene(
     const { hasStepped } = character.update(
       characterDt,
       characterTravel,
-      fishingFrame ? Math.PI / 2 : (rest?.heading ?? heading),
+      fishingFrame ? fishingHeading() : (rest?.heading ?? heading),
       rest?.walking ?? walking,
       true,
       reducedMotion,
-      jump.height,
+      jump.height + fishingLift,
       jump.velocity,
       jump.landing,
     );
-    character.setFishingPose(fishingFrame, elapsed, reducedMotion);
+    character.setFishingPose(fishingFrame, fishingAge, reducedMotion);
     return { scale, size, rest, hasStepped };
   }
   function placeCharacter(scale: number, size: number, rest: BedRestFrame | null) {
     const visualPosition = rest?.point ?? position;
-    child.position.set(sceneX(visualPosition.x), sceneY(visualPosition.z) + jump.height * scale, 2);
+    child.position.set(
+      sceneX(visualPosition.x),
+      sceneY(visualPosition.z) + jump.height * scale + fishingLift * size,
+      2,
+    );
     shadow.position.set(child.position.x + scale * 0.3, sceneY(visualPosition.z) - 0.08, 1);
-    const shadowSize = 1 - Math.min(jump.height * 0.12, 0.3);
+    const shadowSize = 1 - Math.min((jump.height + fishingLift) * 0.12, 0.3);
     shadow.scale.set(3.8 * size * shadowSize, 1.1 * size * shadowSize, 1);
     shadowMat.opacity = (rest?.opacity ?? 1) * (1 - Math.min(jump.height * 0.22, 0.55));
   }
@@ -763,6 +774,9 @@ export async function createScene(
     const dt = last ? Math.min((time - last) / 1000, 0.05) : 0;
     last = time;
     elapsed += dt;
+    if (fishingFrame) fishingAge += dt;
+    fishingLift =
+      fishingFrame?.phase === FISHING_PHASE.caught ? catchCelebration(fishingAge, reducedMotion).childLift : 0;
     if ((!paused || fishingFrame) && !reducedMotion) sceneryTime += dt;
     background.uniforms.sceneryTime!.value = reducedMotion ? 0 : sceneryTime;
     if (!paused) advanceJump(jump, dt);
@@ -774,7 +788,7 @@ export async function createScene(
     const isFootfall = !paused && region === regionBefore && (hasLanded || hasStepped);
     if (isFootfall) playFootfall(hasLanded, scale);
     placeCharacter(scale, size, rest);
-    pierFishing.update(dt, fishingFrame, child.position, size, reducedMotion);
+    pierFishing.update(fishingAge, fishingFrame, child.position, size, reducedMotion);
     const isCameraMoving = followCamera(dt, size);
     placeMarkers();
     const isAtmosphereChanging = easeAtmosphere(dt);
@@ -848,6 +862,7 @@ export async function createScene(
         jump.height = 0;
         jump.velocity = 0;
       }
+      if (frame?.phase !== fishingFrame?.phase) fishingAge = 0;
       fishingFrame = frame;
       container.dataset.fishing = frame?.phase ?? 'none';
       wake();

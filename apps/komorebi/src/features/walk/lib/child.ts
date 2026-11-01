@@ -71,6 +71,7 @@ export function createChild(initialAtlas: THREE.Texture) {
       let lean = 0.015;
       if (isCasting) lean = Math.sin(elapsed * 7) * 0.08;
       if (isFighting) lean = (frame.isReeling ? 0.1 : 0.025) * (0.5 + frame.tension / 100);
+      if (frame.phase === FISHING_PHASE.caught) lean = elapsed < 1.5 ? Math.sin(elapsed * 10) * 0.045 : 0;
       material.rotation = lean;
       sprite.scale.set(7.8, 10.4 * (1 - Math.abs(lean) * 0.2), 1);
       sprite.position.y = isFighting && frame.isReeling ? Math.sin(elapsed * 14) * 0.06 : 0;

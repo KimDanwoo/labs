@@ -1,6 +1,7 @@
 import {
   FIGHT_OUTCOME,
   FISHING_PHASE,
+  fishSurge,
   startFight,
   stepFight,
   type Catch,
@@ -22,7 +23,8 @@ export function FishingFight({
 }) {
   const [fight, setFight] = useState(() => startFight(isPerfect));
   const current = useRef(fight);
-  const isHolding = useRef(false);
+  const keys = useRef(new Set<string>());
+  const pointer = useRef<number | null>(null);
   const button = useRef<HTMLButtonElement>(null);
   const finish = useEffectEvent(onFinish);
   const publish = useEffectEvent(onFrame);
@@ -30,14 +32,16 @@ export function FishingFight({
     button.current?.focus();
     let previous = performance.now();
     const release = () => {
-      isHolding.current = false;
+      keys.current.clear();
+      pointer.current = null;
     };
     const timer = window.setInterval(() => {
       const now = performance.now();
       const dt = (now - previous) / 1000;
       previous = now;
       if (document.hidden) return;
-      const next = stepFight(current.current, isHolding.current, dt, fish.size);
+      const isHolding = keys.current.size > 0 || pointer.current !== null;
+      const next = stepFight(current.current, isHolding, dt, fish.size, fish.id);
       current.current = next;
       setFight(next);
       publish({
@@ -45,7 +49,8 @@ export function FishingFight({
         elapsed: next.elapsed,
         tension: next.tension,
         progress: next.progress,
-        isReeling: isHolding.current,
+        isReeling: isHolding,
+        isSurging: fishSurge(fish.id, next.elapsed),
       });
       if (next.outcome !== FIGHT_OUTCOME.active) {
         window.clearInterval(timer);
@@ -56,10 +61,10 @@ export function FishingFight({
     const keydown = (event: KeyboardEvent) => {
       if (event.code !== 'KeyE') return;
       event.preventDefault();
-      isHolding.current = true;
+      keys.current.add(event.code);
     };
     const keyup = (event: KeyboardEvent) => {
-      if (event.code === 'KeyE') release();
+      keys.current.delete(event.code);
     };
     window.addEventListener('keydown', keydown);
     window.addEventListener('keyup', keyup);
@@ -72,7 +77,10 @@ export function FishingFight({
       window.removeEventListener('blur', release);
       document.removeEventListener('visibilitychange', release);
     };
-  }, [fish.size]);
+  }, [fish.id, fish.size]);
+  let guidance = fishSurge(fish.id, fight.elapsed) ? '물고기가 힘을 쓰고 있어요!' : '힘이 풀렸어요 · 감을 기회!';
+  if (fight.tension > 75) guidance = '줄을 잠깐 풀어요!';
+  if (fight.tension < 25) guidance = '지금 감아 주세요!';
   const isDanger = fight.tension > 80 || fight.tension < 20;
   return (
     <section className={`fishing-fight ${isDanger ? 'is-danger' : ''}`} aria-label="물고기와 줄다리기">
@@ -80,7 +88,7 @@ export function FishingFight({
       <label>
         줄 장력 <meter min={0} max={100} low={20} high={80} optimum={50} value={fight.tension} />
         <span>
-          {Math.round(fight.tension)}% · {isDanger ? '위험! 줄을 조절해요' : '적당한 장력을 유지해요'}
+          {Math.round(fight.tension)}% · {guidance}
         </span>
       </label>
       <label>
@@ -91,34 +99,35 @@ export function FishingFight({
         ref={button}
         className="continue-button fishing-reel"
         onPointerDown={(event) => {
-          if (event.button !== 0) return;
+          if (event.button !== 0 || pointer.current !== null) return;
           event.currentTarget.setPointerCapture(event.pointerId);
-          isHolding.current = true;
+          pointer.current = event.pointerId;
         }}
-        onPointerUp={() => {
-          isHolding.current = false;
+        onPointerUp={(event) => {
+          if (pointer.current === event.pointerId) pointer.current = null;
         }}
-        onPointerCancel={() => {
-          isHolding.current = false;
+        onPointerCancel={(event) => {
+          if (pointer.current === event.pointerId) pointer.current = null;
         }}
-        onLostPointerCapture={() => {
-          isHolding.current = false;
+        onLostPointerCapture={(event) => {
+          if (pointer.current === event.pointerId) pointer.current = null;
         }}
         onBlur={() => {
-          isHolding.current = false;
+          keys.current.clear();
+          pointer.current = null;
         }}
         onKeyDown={(event) => {
-          if (event.key === ' ' || event.key === 'Enter' || event.code === 'KeyE') {
+          if (['Space', 'Enter', 'KeyE'].includes(event.code)) {
             event.preventDefault();
             event.stopPropagation();
-            isHolding.current = true;
+            keys.current.add(event.code);
           }
         }}
         onKeyUp={(event) => {
-          if (event.key === ' ' || event.key === 'Enter' || event.code === 'KeyE') {
+          if (['Space', 'Enter', 'KeyE'].includes(event.code)) {
             event.preventDefault();
             event.stopPropagation();
-            isHolding.current = false;
+            keys.current.delete(event.code);
           }
         }}
       >
