@@ -1,6 +1,6 @@
 import { TIME_ORDER } from '@features/walk/model/constants';
 import { useModal, type Collection } from '@features/walk/model/hooks';
-import { FISHING_PIER, HOME, LANDMARKS, type Point, type Region } from '@shared/world/world';
+import { FISHING_PIER, HOME, HOME_AQUARIUM, LANDMARKS, PIER_CAT, type Point, type Region } from '@shared/world/world';
 import { useId } from 'react';
 import { DiscoveryList } from './DiscoveryList';
 import { Icon } from './Icon';
@@ -71,6 +71,17 @@ export function MapDialog({
           ? '걸으며 모은 풍경들을 한 장씩 꺼내 보세요.'
           : '목적지를 누르면 길을 따라 걸어가요. 도착하면 E로 추억을 간직하세요.'}
       </p>
+      {!isJournal &&
+        [HOME_AQUARIUM, PIER_CAT].map((place) => (
+          <button key={place.id} className="home-guide" onClick={() => onGuide(place.id)} disabled={!isReady}>
+            <span aria-hidden="true">{place.icon}</span>
+            <span>
+              <strong>{place.name}</strong>
+              <small>{place.id === HOME_AQUARIUM.id ? '수조 물고기 만나러 가기' : '삼색이에게 인사하러 가기'}</small>
+            </span>
+            <Icon name="arrow" />
+          </button>
+        ))}
       {!isJournal && <WalkMap region={region} position={position} visited={collection.visited} />}
       {!isJournal && (
         <button className="home-guide" onClick={() => onGuide(HOME.id)} disabled={!isReady}>
