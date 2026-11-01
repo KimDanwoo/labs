@@ -1,5 +1,6 @@
 import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT, type Point, type Region } from '@shared/world/world';
 import * as THREE from 'three';
+import { AQUARIUM_ART, aquariumFishArt, aquariumPose } from './aquarium';
 import { catchCelebration } from './catchCelebration';
 import {
   COMPANION_REACTION,
@@ -9,7 +10,7 @@ import {
   type CompanionReaction,
   type Companions,
 } from './companions';
-import { FISH, FISHING_PHASE, FISH_SHAPE, type FishingFrame } from './fishing';
+import { FISHING_PHASE, type FishingFrame } from './fishing';
 import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
 
 /** Local, bounded movement keeps the companion on the pier, even when the child leaves. */
@@ -58,41 +59,47 @@ export function createCompanionScene(scene: THREE.Scene, loader?: THREE.TextureL
   tank.position.set(sceneX(HOME_AQUARIUM.x + 4), sceneY(HOME_AQUARIUM.z - 3), 2);
   tank.scale.setScalar(characterScale(HOME_AQUARIUM.z) * CHILD_SIZE);
   scene.add(tank);
-  part(tank, plane, 0x745b43, 0, 1, 10.5, 2);
-  part(tank, plane, 0x4a3426, -4, 0, 0.5, 2);
-  part(tank, plane, 0x4a3426, 4, 0, 0.5, 2);
-  part(tank, plane, 0x779f99, 0, 4.6, 10, 5.3);
-  part(tank, plane, 0xc5e5d9, 0, 4.8, 9.5, 4.8, 3.61, 0.55);
-  part(tank, plane, 0xd6c7a0, 0, 2.3, 9.5, 0.6, 3.62);
-  for (let i = 0; i < 6; i++) {
-    const plant = part(
-      tank,
-      circle,
-      i % 2 ? 0x729b72 : 0x4f806b,
-      -4 + (i % 3) * 0.45 + Math.floor(i / 3) * 7,
-      3,
-      0.2,
-      0.8 + (i % 3) * 0.3,
-      3.63,
-    );
-    plant.rotation.z = ((i % 3) - 1) * 0.25;
-  }
+  const tankTextures = new Map<string, THREE.Texture>();
+  let isTankDisposed = false;
+  const tankArt = part(tank, plane, 0xffffff, 0, 4.667, 14, 9.333);
+  tankArt.visible = false;
   const swimmers = Array.from({ length: TANK_CAPACITY }, (_, index) => {
     const group = new THREE.Group();
     group.name = `aquarium-fish-${index}`;
-    const body = part(group, circle, 0xffffff, 0, 0, 0.6, 0.3, 3.7);
-    const tail = part(group, triangle, 0xffffff, -0.65, 0, 0.35, 0.35, 3.7);
-    part(group, circle, 0x293b38, 0.3, 0.07, 0.06, 0.06, 3.71);
+    const geometry = new THREE.PlaneGeometry(1, 1, 16, 2);
+    geometries.push(geometry);
+    const body = part(group, geometry, 0xffffff, 0, 0, 1, 1, 3.7);
+    body.visible = false;
     tank.add(group);
-    return { group, body, tail };
+    return { group, body };
   });
-  part(tank, plane, 0xe8f5e8, -3.5, 5.1, 0.12, 3.8, 3.8, 0.6).rotation.z = -0.16;
-  part(tank, plane, 0xf2e5bc, 0, 7.25, 10.5, 0.3, 3.8);
-  const bubbles = Array.from({ length: 5 }, (_, i) =>
-    part(tank, circle, 0xf0fff5, 3.8, 3 + i * 0.7, 0.07, 0.07, 3.75, 0.65),
+  for (const src of [
+    AQUARIUM_ART,
+    ...new Set(['mackerel', 'bream', 'flounder', 'grouper'].map((name) => `/art/aquarium-${name}-v2.webp`)),
+  ]) {
+    if (!loader) continue;
+    void loader
+      .loadAsync(src)
+      .then((loaded) => {
+        if (isTankDisposed) {
+          loaded.dispose();
+          return;
+        }
+        loaded.colorSpace = THREE.SRGBColorSpace;
+        tankTextures.set(src, loaded);
+        if (src === AQUARIUM_ART) {
+          tankArt.material.map = loaded;
+          tankArt.material.needsUpdate = true;
+          tankArt.visible = true;
+        }
+      })
+      .catch(() => undefined);
+  }
+  const bubbles = Array.from({ length: 6 }, (_, i) =>
+    part(tank, circle, 0xf0fff5, -4.9 + i * 0.05, 5 + i * 0.3, 0.025, 0.04, 3.75, 0.4),
   );
   const pellets = Array.from({ length: 5 }, (_, i) =>
-    part(tank, circle, 0x966642, (i - 2) * 0.4, 6.6, 0.08, 0.08, 3.8),
+    part(tank, circle, 0x966642, (i - 2) * 0.25, 7, 0.035, 0.035, 3.8),
   );
   const cat = new THREE.Group();
   cat.name = 'pier-companion-cat';
@@ -159,28 +166,35 @@ export function createCompanionScene(scene: THREE.Scene, loader?: THREE.TextureL
       tank.visible = region === 'home';
       cat.visible = region === 'coast';
       const feed = reaction === COMPANION_REACTION.feed && reactionAge < 3;
-      const attraction = feed ? Math.max(0, Math.min(1, reactionAge / 0.6, (3 - reactionAge) / 0.6)) : 0;
       const kept = state.fish.filter((fish) => fish.home === FISH_HOME.tank);
-      swimmers.forEach(({ group, body, tail }, i) => {
+      swimmers.forEach(({ group, body }, i) => {
         const keptFish = kept[i];
         group.visible = Boolean(keptFish);
         if (!keptFish) return;
-        const species = FISH.find((item) => item.id === keptFish.id)!;
-        const time = reducedMotion ? i : elapsed * (0.5 + i * 0.035) + i * 1.7;
-        const x = Math.sin(time) * (3.3 - attraction * 1.7);
-        group.position.set(
-          x,
-          (4.4 + Math.cos(time * 0.8 + i) * 1.3) * (1 - attraction) + (5.6 + Math.sin(i) * 0.5) * attraction,
-          0,
-        );
-        const scale = 0.8 + (keptFish.size / species.max) * 0.4;
-        group.scale.set((Math.cos(time) >= 0 ? 1 : -1) * scale, scale, 1);
-        body.scale.y = species.shape === FISH_SHAPE.slender ? 0.25 : 0.42;
-        body.material.color.setHex(species.color);
-        tail.material.color.setHex(species.color);
+        const pose = aquariumPose(keptFish, elapsed, feed ? reactionAge : 10, reducedMotion);
+        const art = aquariumFishArt(keptFish.id);
+        const map = tankTextures.get(art.src);
+        if (map && body.material.map !== map) {
+          body.material.map = map;
+          body.material.needsUpdate = true;
+          body.visible = true;
+        }
+        group.position.set((pose.x - 0.5) * 14, (1 - pose.y) * 9.333, 0);
+        group.scale.set(pose.width * 14 * pose.facing, (pose.width * 14) / art.ratio, 1);
+        group.rotation.z = -pose.tilt;
+        const vertices = body.geometry.getAttribute('position');
+        for (let v = 0; v < vertices.count; v++) {
+          const x = vertices.getX(v);
+          const baseY = 0.5 - Math.floor(v / 17) / 2;
+          vertices.setY(
+            v,
+            baseY + (reducedMotion ? 0 : Math.sin(elapsed * 7 + x * 10 + pose.phase) * 0.045 * (0.5 - x) ** 2),
+          );
+        }
+        vertices.needsUpdate = true;
       });
       bubbles.forEach((bubble, i) => {
-        bubble.position.y = 2.8 + ((reducedMotion ? i * 0.7 : elapsed * 0.7 + i * 0.7) % 3.8);
+        bubble.position.y = 4.7 + ((reducedMotion ? i * 0.4 : elapsed * 0.4 + i * 0.4) % 2.3);
       });
       pellets.forEach((pellet, i) => {
         pellet.visible = feed;
@@ -215,6 +229,8 @@ export function createCompanionScene(scene: THREE.Scene, loader?: THREE.TextureL
     },
     dispose() {
       disposed = true;
+      isTankDisposed = true;
+      tankTextures.forEach((item) => item.dispose());
       scene.remove(cat, tank);
       texture?.dispose();
       spriteMaterial.dispose();

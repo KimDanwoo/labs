@@ -2251,3 +2251,101 @@ dialog::backdrop {
     width: 12.5rem;
   }
 }
+
+.aquarium-panel {
+  width: min(36rem, calc(100vw - 2rem));
+  background: linear-gradient(145deg, #faf4e5f5, #e9eeddf5);
+  border: 1px solid #b6c5ac;
+  box-shadow: 0 16px 60px #263d3650;
+}
+.aquarium-gallery {
+  margin: 0 -0.4rem 0.7rem;
+}
+.aquarium-art {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  background-size: contain;
+  background-repeat: no-repeat;
+  isolation: isolate;
+}
+.aquarium-swimmer {
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  width: 10%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  filter: drop-shadow(0 3px 3px #1f58532a);
+}
+.aquarium-swimmer img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.aquarium-swimmer:hover {
+  filter: drop-shadow(0 0 4px #fff4bb);
+}
+.aquarium-caption {
+  text-align: center;
+  min-height: 1.5em;
+  color: #45665b;
+  font-size: 0.8rem;
+}
+.aquarium-glimmer {
+  position: absolute;
+  pointer-events: none;
+  left: 12%;
+  top: 22%;
+  width: 74%;
+  height: 29%;
+  background: linear-gradient(
+    110deg,
+    transparent 20%,
+    #fffde512 24%,
+    transparent 28%,
+    transparent 65%,
+    #fffde51a 68%,
+    transparent 71%
+  );
+}
+.aquarium-feed {
+  position: absolute;
+  left: 42%;
+  top: 23%;
+  color: #92663b;
+  letter-spacing: 0.2rem;
+  animation: aquarium-feed-fall 3s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes aquarium-feed-fall {
+  from {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(35px);
+    opacity: 0;
+  }
+}
+.aquarium-panel .companion-fish-list {
+  max-height: 9rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid #b6c5ac70;
+}
+.aquarium-panel summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+@media (max-height: 650px) {
+  .aquarium-gallery {
+    max-width: 25rem;
+    margin-inline: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aquarium-feed {
+    animation: none;
+  }
+}
