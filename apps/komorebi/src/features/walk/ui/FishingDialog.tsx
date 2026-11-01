@@ -1,8 +1,7 @@
 import {
   addCatch,
-  FIGHT_OUTCOME,
-  type Fight,
   BITE_WINDOW_MS,
+  FIGHT_OUTCOME,
   FISH,
   FISHING_PHASE,
   FISHING_STORAGE_KEY,
@@ -10,11 +9,12 @@ import {
   parseCollection,
   rollCatch,
   type Catch,
+  type Fight,
   type FishingPhase,
 } from '@features/walk/lib/fishing';
 import { useModal } from '@features/walk/model/hooks';
-import { FishingFight } from './FishingFight';
 import { useEffect, useId, useRef, useState } from 'react';
+import { FishingFight } from './FishingFight';
 
 export function FishingDialog({ onClose }: { onClose: () => void }) {
   const ref = useModal(true);

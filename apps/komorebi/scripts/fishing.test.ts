@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  FIGHT_OUTCOME,
-  startFight,
-  stepFight,
   addCatch,
+  FIGHT_OUTCOME,
   isBiteOnTime,
   parseCollection,
   rollCatch,
+  startFight,
+  stepFight,
 } from '../src/features/walk/lib/fishing';
 
 test('fishing draws common and rare fish at the pool boundaries', () => {
