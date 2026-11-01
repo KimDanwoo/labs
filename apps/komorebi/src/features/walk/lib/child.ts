@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { childFacing } from './atlas';
+import { FISHING_PHASE, type FishingFrame } from './fishing';
 import { advanceMotion, createMotion, crossedFootfall } from './motion';
 import { lightSprite } from './nightLights';
 
@@ -62,6 +63,17 @@ export function createChild(initialAtlas: THREE.Texture) {
       sprite.position.y = reducedMotion ? 0 : Math.sin(time * 2.2) * 0.015 * (1 - m.energy);
       void jumpVelocity;
       return { hasStepped: walking && jumpHeight <= 0 && crossedFootfall(previousPhase, m.phase) };
+    },
+    setFishingPose(frame: FishingFrame | null, elapsed: number, reducedMotion: boolean) {
+      if (!frame || reducedMotion) return;
+      const isFighting = frame.phase === FISHING_PHASE.fighting;
+      const isCasting = frame.phase === FISHING_PHASE.casting;
+      let lean = 0.015;
+      if (isCasting) lean = Math.sin(elapsed * 7) * 0.08;
+      if (isFighting) lean = (frame.isReeling ? 0.1 : 0.025) * (0.5 + frame.tension / 100);
+      material.rotation = lean;
+      sprite.scale.set(7.8, 10.4 * (1 - Math.abs(lean) * 0.2), 1);
+      sprite.position.y = isFighting && frame.isReeling ? Math.sin(elapsed * 14) * 0.06 : 0;
     },
     /** Moonlight on the sprite, so the child sits in the night painting rather than on top of it. */
     /** Moonlit after dark, warmed by `glow` (0–0.9) where lamplight falls on the child. */

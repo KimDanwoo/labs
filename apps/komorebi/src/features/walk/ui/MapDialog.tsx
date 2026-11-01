@@ -1,6 +1,6 @@
 import { TIME_ORDER } from '@features/walk/model/constants';
 import { useModal, type Collection } from '@features/walk/model/hooks';
-import { HOME, LANDMARKS, type Point, type Region } from '@shared/world/world';
+import { FISHING_PIER, HOME, LANDMARKS, type Point, type Region } from '@shared/world/world';
 import { useId } from 'react';
 import { DiscoveryList } from './DiscoveryList';
 import { Icon } from './Icon';
@@ -78,6 +78,16 @@ export function MapDialog({
           <span>
             <strong>{HOME.name}</strong>
             <small>집에 돌아가 쉬어 가기</small>
+          </span>
+          <Icon name="arrow" />
+        </button>
+      )}
+      {!isJournal && (
+        <button className="home-guide pier-guide" onClick={() => onGuide(FISHING_PIER.id)} disabled={!isReady}>
+          <span aria-hidden="true">🎣</span>
+          <span>
+            <strong>바다 낚시 부두</strong>
+            <small>창고 옆 돌부두까지 걸어가기</small>
           </span>
           <Icon name="arrow" />
         </button>

@@ -1,5 +1,6 @@
 export const FISHING_PHASE = {
   idle: 'idle',
+  casting: 'casting',
   waiting: 'waiting',
   bite: 'bite',
   fighting: 'fighting',
@@ -92,3 +93,12 @@ export function stepFight(state: Fight, isReeling: boolean, seconds: number, siz
   else if (progress >= 100) outcome = FIGHT_OUTCOME.landed;
   return { tension, progress, elapsed, outcome };
 }
+
+export type FishingFrame = {
+  phase: FishingPhase;
+  elapsed: number;
+  tension: number;
+  progress: number;
+  isReeling: boolean;
+};
+export const CAST_SECONDS = 0.8;
