@@ -1,4 +1,4 @@
-import { DANWOO_PROFILE, MUSIC_STATUS, musicSource, musicTime, musicWidgetSrc } from '@features/music/lib/soundcloud';
+import { MUSIC_STATUS, musicTime, musicWidgetSrc } from '@features/music/lib/soundcloud';
 import { useMusicPlayer } from '@features/music/model/hooks';
 import { useRef, useState } from 'react';
 
@@ -6,21 +6,17 @@ export function MusicPlayer({
   source,
   initialVolume,
   onRetry,
-  onSource,
   onPowerOff,
   profile,
 }: {
   source: string;
   initialVolume: number;
   onRetry: () => void;
-  onSource: (source: string) => void;
   onPowerOff: () => void;
   profile: string;
 }) {
   const { iframe: iframeRef, ...player } = useMusicPlayer(source, initialVolume);
   const [isExpanded, setIsExpanded] = useState(true);
-  const [sourceInput, setSourceInput] = useState(source === DANWOO_PROFILE ? '' : source);
-  const [sourceError, setSourceError] = useState('');
   const expandButton = useRef<HTMLButtonElement>(null);
   const isReady = player.status === MUSIC_STATUS.ready;
   const currentPosition = Math.min(player.position, player.track?.duration ?? 0);
@@ -32,7 +28,7 @@ export function MusicPlayer({
   return (
     <section
       className={`music-player ${isExpanded ? 'is-expanded' : ''}`}
-      aria-label="DANWOO MP3 플레이어"
+      aria-label="주머니 속 MP3"
       onKeyDown={(event) => {
         event.stopPropagation();
         if (event.key === 'Escape') {
@@ -55,7 +51,7 @@ export function MusicPlayer({
             ♫
           </span>
           <span>
-            <small>DANWOO · 산책의 배경음악</small>
+            <small>MY MP3 · 산책할 때 듣는 노래</small>
             <strong>{player.track?.title ?? '주머니 속 작은 MP3'}</strong>
           </span>
         </button>
@@ -70,17 +66,17 @@ export function MusicPlayer({
       </div>
       <div id="music-controls" hidden={!isExpanded} className="music-controls">
         <p className="music-status" role="status">
-          {player.status === MUSIC_STATUS.loading ? '사운드클라우드에서 노래를 불러오는 중…' : ''}
+          {player.status === MUSIC_STATUS.loading ? 'MP3에 담아 둔 노래를 읽는 중…' : ''}
           {player.status === MUSIC_STATUS.error
-            ? '음악을 연결하지 못했어요. 다시 연결하거나 아래 사클 플레이어를 열어 주세요.'
+            ? '노래를 불러오지 못했어요. 다시 불러오거나 아래 원본 플레이어를 열어 주세요.'
             : ''}
           {isReady
-            ? `${player.tracks.length}곡 · ${player.isPlaying ? '음악과 함께 걷는 중' : '재생을 눌러 산책을 시작해요'}`
+            ? `담아 둔 ${player.tracks.length}곡 · ${player.isPlaying ? '음악과 함께 걷는 중' : '재생을 눌러 산책을 시작해요'}`
             : ''}
         </p>
         {player.status === MUSIC_STATUS.error && (
           <button className="music-text-button" onClick={onRetry}>
-            다시 연결
+            다시 불러오기
           </button>
         )}
         <div className="music-transport">
@@ -118,13 +114,14 @@ export function MusicPlayer({
             max={100}
             step={1}
             value={player.volume}
+            disabled={!isReady}
             onChange={(event) => player.changeVolume(Number(event.target.value))}
           />
           <span>{player.volume}%</span>
         </label>
         <p className="music-hint">접어도 음악은 계속돼요. 자연 소리는 위의 스피커 버튼으로 따로 조절해요.</p>
-        <details className="music-track-list">
-          <summary>플레이리스트 · {player.tracks.length}곡</summary>
+        <details className="music-track-list" open>
+          <summary>담아 둔 노래 · {player.tracks.length}곡</summary>
           <ol>
             {player.tracks.map((track) => (
               <li key={track.id}>
@@ -139,41 +136,8 @@ export function MusicPlayer({
             ))}
           </ol>
         </details>
-        <details className="music-source">
-          <summary>내 사클 플레이리스트 연결</summary>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              const next = musicSource(sourceInput);
-              if (!next) {
-                setSourceError('danwooking 계정의 공개 플레이리스트 주소를 넣어 주세요.');
-                return;
-              }
-              setSourceError('');
-              onSource(next);
-            }}
-          >
-            <label>
-              플레이리스트 주소
-              <input
-                type="url"
-                value={sourceInput}
-                onChange={(event) => setSourceInput(event.target.value)}
-                placeholder="https://soundcloud.com/danwooking/sets/…"
-                required
-              />
-            </label>
-            <button type="submit" className="music-text-button">
-              이 플레이리스트 듣기
-            </button>
-            <button type="button" className="music-text-button" onClick={() => onSource(DANWOO_PROFILE)}>
-              DANWOO 공개 곡으로 돌아가기
-            </button>
-            {sourceError && <p role="alert">{sourceError}</p>}
-          </form>
-        </details>
         <details className="music-native" open={player.status === MUSIC_STATUS.error}>
-          <summary>SoundCloud 플레이어 직접 열기</summary>
+          <summary>원본 플레이어 열기</summary>
           <iframe
             ref={iframeRef}
             title="DANWOO SoundCloud 플레이어"
@@ -185,7 +149,7 @@ export function MusicPlayer({
         </details>
         <div className="music-footer">
           <a href={player.track?.url ?? profile} target="_blank" rel="noreferrer">
-            DANWOO on SoundCloud ↗
+            음악 출처 · SoundCloud ↗
           </a>
           <button onClick={onPowerOff}>MP3 끄기</button>
         </div>

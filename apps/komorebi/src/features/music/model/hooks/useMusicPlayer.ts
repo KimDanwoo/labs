@@ -32,6 +32,9 @@ export function useMusicPlayer(source: string, initialVolume: number) {
     void loadMusicApi()
       .then((api) => {
         if (cancelled || !iframe.current) return;
+        const savedVolume = readMusicPreferences().volume;
+        volumeRef.current = savedVolume;
+        setVolume(savedVolume);
         const player = api.Widget(iframe.current);
         widget.current = player;
         cleanup = bindMusicWidget(
