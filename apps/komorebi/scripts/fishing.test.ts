@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  addCatch,
   FIGHT_OUTCOME,
+  FISH,
+  FISH_TOTAL_WEIGHT,
+  addCatch,
+  fishSurge,
   isBiteOnTime,
   parseCollection,
   rollCatch,
@@ -17,7 +20,7 @@ test('fishing draws common and rare fish at the pool boundaries', () => {
   );
   assert.deepEqual(
     rollCatch(() => 1),
-    { id: 'bream', size: 65 },
+    { id: 'grouper', size: 100 },
   );
 });
 test('collection adds catches without losing the largest size or other fish', () => {
@@ -52,12 +55,51 @@ test('holding too hard snaps the line and leaving it slack loses the fish', () =
 });
 test('alternating reel and release lands every fish size, and perfect hooks give a head start', () => {
   assert.ok(startFight(true).progress > startFight(false).progress);
-  for (const size of [8, 18, 38, 40, 65]) {
-    let state = startFight(false);
-    for (let i = 0; i < 1200 && state.outcome === FIGHT_OUTCOME.active; i++) {
-      state = stepFight(state, state.tension < 60, 0.05, size);
+  for (const fish of FISH)
+    for (const size of [fish.min, fish.max]) {
+      let state = startFight(false);
+      for (let i = 0; i < 1200 && state.outcome === FIGHT_OUTCOME.active; i++) {
+        state = stepFight(state, state.tension < 60, 0.05, size, fish.id);
+      }
+      assert.equal(state.outcome, FIGHT_OUTCOME.landed, `size ${size}`);
+      assert.equal(stepFight(state, true, 1, size), state);
     }
-    assert.equal(state.outcome, FIGHT_OUTCOME.landed, `size ${size}`);
-    assert.equal(stepFight(state, true, 1, size), state);
+});
+
+test('every species has a reachable weighted interval and valid size endpoints', () => {
+  assert.equal(new Set(FISH.map((fish) => fish.id)).size, 16);
+  assert.equal(FISH_TOTAL_WEIGHT, 100);
+  let cumulative = 0;
+  for (const fish of FISH) {
+    const ticket = (cumulative + fish.weight / 2) / FISH_TOTAL_WEIGHT;
+    for (const sizeRoll of [0, 1]) {
+      let calls = 0;
+      const caught = rollCatch(() => (calls++ === 0 ? ticket : sizeRoll));
+      assert.deepEqual(caught, { id: fish.id, size: sizeRoll ? fish.max : fish.min });
+      const saved = addCatch({}, caught);
+      assert.deepEqual(parseCollection(JSON.stringify(saved)), saved);
+    }
+    cumulative += fish.weight;
+  }
+});
+
+test('the expanded journal preserves all four original species and their records', () => {
+  const legacy = {
+    goby: { count: 3, best: 18 },
+    mackerel: { count: 2, best: 38 },
+    rockfish: { count: 1, best: 40 },
+    bream: { count: 1, best: 65 },
+  };
+  assert.deepEqual(parseCollection(JSON.stringify(legacy)), legacy);
+  const expanded = addCatch(legacy, { id: 'grouper', size: 100 });
+  for (const [id, entry] of Object.entries(legacy)) assert.deepEqual(expanded[id], entry);
+});
+
+test('species resistance differs and always includes recovery windows', () => {
+  const patterns = FISH.map((fish) => Array.from({ length: 200 }, (_, i) => fishSurge(fish.id, i * 0.1)));
+  assert.equal(new Set(patterns.map((pattern) => pattern.join())).size, FISH.length);
+  for (const pattern of patterns) {
+    assert.ok(pattern.includes(true));
+    assert.ok(pattern.includes(false));
   }
 });

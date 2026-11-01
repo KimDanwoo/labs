@@ -253,6 +253,18 @@ export function createAmbience() {
   return {
     step,
     cue,
+    fishingCue(kind: 'cast' | 'waiting' | 'bite' | 'hook' | 'success' | 'rare' | 'miss') {
+      if (context.state !== 'running') return;
+      if (kind === 'cast') whoosh(0.35, 400, 1400, 0.3);
+      else if (kind === 'waiting') tone(420, { seconds: 0.18, glideTo: 100 });
+      else if (kind === 'bite') [0, 0.14].forEach((at) => tone(880, { at, seconds: 0.15 }));
+      else if (kind === 'hook') tone(520, { seconds: 0.22, glideTo: 1040 });
+      else if (kind === 'miss') tone(330, { seconds: 0.3, glideTo: 160, volume: 0.06 });
+      else
+        (kind === 'rare' ? [523, 659, 784, 1047, 1319] : [523, 659, 784]).forEach((frequency, index) =>
+          tone(frequency, { at: index * 0.12, seconds: 0.55, volume: 0.09 }),
+        );
+    },
     setScene(region: Region, time: TimeOfDay, weather: Weather) {
       mix = ambienceMix(region, time, weather);
       const now = context.currentTime;
