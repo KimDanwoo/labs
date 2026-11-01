@@ -10,7 +10,7 @@ import {
   type MusicTrack,
   type MusicWidget,
 } from '@features/music/lib/soundcloud';
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 export function useMusicPlayer(source: string, initialVolume: number) {
   const iframe = useRef<HTMLIFrameElement>(null);
@@ -23,7 +23,7 @@ export function useMusicPlayer(source: string, initialVolume: number) {
   const [position, setPosition] = useState(0);
   const volumeRef = useRef(initialVolume);
   const previousSecond = useRef(-1);
-  useEffect(() => {
+  useLayoutEffect(() => {
     let cancelled = false;
     let cleanup: (() => void) | undefined;
     const timer = window.setTimeout(() => {

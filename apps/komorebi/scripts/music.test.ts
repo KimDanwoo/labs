@@ -157,3 +157,34 @@ test('widget waits for a gesture, follows native events, never double-skips and 
   assert.equal(pauses, 1);
   assert.equal(handlers.size, 0);
 });
+
+test('disposal remains safe when SoundCloud posts to an already detached iframe', () => {
+  const released: string[] = [];
+  const widget: MusicWidget = {
+    bind: () => {},
+    unbind: (event) => {
+      released.push(event);
+      if (event === 'READY') throw new Error('detached');
+    },
+    play: () => {},
+    pause: () => {
+      throw new Error('null postMessage');
+    },
+    prev: () => {},
+    next: () => {},
+    skip: () => {},
+    seekTo: () => {},
+    setVolume: () => {},
+    getSounds: () => {},
+    getCurrentSoundIndex: () => {},
+    isPaused: () => {},
+  };
+  const dispose = bindMusicWidget(
+    widget,
+    { READY: 'READY', PLAY: 'PLAY', PAUSE: 'PAUSE' },
+    { ready: () => {}, playing: () => {}, track: () => {}, progress: () => {}, error: () => {} },
+    35,
+  );
+  assert.doesNotThrow(dispose);
+  assert.deepEqual(released, ['READY', 'PLAY', 'PAUSE']);
+});
