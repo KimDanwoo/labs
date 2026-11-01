@@ -11,8 +11,8 @@ import {
   rollCatch,
   type Catch,
   type Fight,
-  type FishingPhase,
   type FishingFrame,
+  type FishingPhase,
 } from '@features/walk/lib/fishing';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { FishingFight } from './FishingFight';

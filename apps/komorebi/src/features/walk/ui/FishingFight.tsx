@@ -1,11 +1,11 @@
 import {
   FIGHT_OUTCOME,
+  FISHING_PHASE,
   startFight,
   stepFight,
   type Catch,
   type Fight,
   type FishingFrame,
-  FISHING_PHASE,
 } from '@features/walk/lib/fishing';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 
