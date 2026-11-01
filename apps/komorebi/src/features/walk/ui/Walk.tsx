@@ -1,5 +1,6 @@
 'use client';
 
+import { COMPANION_PANEL, type CompanionPanelKind } from '@features/walk/lib/companions';
 import { diaryMemory, liveMemory } from '@features/walk/lib/memory';
 import { DIALOG, TIME_ORDER, WEATHER, type Dialog, type TimeOfDay } from '@features/walk/model/constants';
 import {
@@ -15,10 +16,20 @@ import {
 import { appearanceStore, pageStores } from '@features/walk/model/store';
 import type { Memory } from '@features/walk/model/types';
 import type { Appearance } from '@shared/world/appearance';
-import { FISHING_PIER, HOME_DESK, HOME_WARDROBE, LANDMARKS, WORLDS, type Landmark } from '@shared/world/world';
+import {
+  FISHING_PIER,
+  HOME_AQUARIUM,
+  HOME_DESK,
+  HOME_WARDROBE,
+  LANDMARKS,
+  PIER_CAT,
+  WORLDS,
+  type Landmark,
+} from '@shared/world/world';
 import { useRef, useState, useSyncExternalStore } from 'react';
 import { flushSync } from 'react-dom';
 import { BottomBar } from './BottomBar';
+import { CompanionPanel } from './CompanionPanel';
 import { FishingHud } from './FishingHud';
 import { GameHeader } from './GameHeader';
 import { InteractPrompt } from './InteractPrompt';
@@ -44,8 +55,10 @@ export function Walk() {
   const [hasGuided, setHasGuided] = useState(false);
   const [isSleeping, setIsSleeping] = useState(false);
   const appearance = useSyncExternalStore(appearanceStore.subscribe, appearanceStore.get, appearanceStore.getServer);
+  const [companionPanel, setCompanionPanel] = useState<CompanionPanelKind>(COMPANION_PANEL.none);
+  const isWithCompanion = companionPanel !== COMPANION_PANEL.none;
   const [isFishing, setIsFishing] = useState(false);
-  const isPaused = dialog !== DIALOG.none || isSleeping || isFishing;
+  const isPaused = dialog !== DIALOG.none || isSleeping || isFishing || isWithCompanion;
   const today = useVillageDay(isPaused);
   const timeOfDay = today.time;
   const weather = today.weather;
@@ -67,6 +80,9 @@ export function Walk() {
   useAmbienceScene(ambience.setScene, { region: status.region, time: timeOfDay, weather });
   const hasStarted = hasWalked || hasGuided;
 
+  const isNearAquarium =
+    status.region === 'home' && Math.hypot(status.x - HOME_AQUARIUM.x, status.z - HOME_AQUARIUM.z) < 3;
+  const isNearCat = status.region === 'coast' && Math.hypot(status.x - PIER_CAT.x, status.z - PIER_CAT.z) < 3;
   const isAtPier = status.region === 'coast' && Math.hypot(status.x - FISHING_PIER.x, status.z - FISHING_PIER.z) < 1.6;
   const isNearDesk = status.region === 'home' && Math.hypot(status.x - HOME_DESK.x, status.z - HOME_DESK.z) < 4.5;
   const isNearWardrobe =
@@ -80,6 +96,10 @@ export function Walk() {
 
   function interact() {
     if (isPaused) return;
+    if (isNearAquarium || isNearCat) {
+      setCompanionPanel(isNearAquarium ? COMPANION_PANEL.aquarium : COMPANION_PANEL.cat);
+      return;
+    }
     if (isAtPier) {
       setIsFishing(true);
       return;
@@ -143,7 +163,7 @@ export function Walk() {
 
   return (
     <main
-      className={`walk ${isFishing ? 'is-fishing' : ''} is-${timeOfDay} ${isRaining ? 'is-raining' : ''} ${hasStarted ? 'has-started' : ''}`}
+      className={`walk ${isFishing || isWithCompanion ? 'is-fishing' : ''} is-${timeOfDay} ${isRaining ? 'is-raining' : ''} ${hasStarted ? 'has-started' : ''}`}
     >
       <div className="landscape" ref={landscapeRef} />
       <div className="paper-grain" aria-hidden="true" />
@@ -160,14 +180,14 @@ export function Walk() {
         timeOfDay={timeOfDay}
         isRaining={isRaining}
         isSoundOn={ambience.isOn}
-        isReady={isReady && !isSleeping && !isFishing}
+        isReady={isReady && !isSleeping && !isFishing && !isWithCompanion}
         onToggleSound={ambience.toggle}
         onPhoto={takePhoto}
         onOpenMap={() => {
-          if (!isSleeping && !isFishing) setDialog(DIALOG.map);
+          if (!isSleeping && !isFishing && !isWithCompanion) setDialog(DIALOG.map);
         }}
         onOpenWardrobe={() => {
-          if (!isSleeping && !isFishing) setDialog(DIALOG.wardrobe);
+          if (!isSleeping && !isFishing && !isWithCompanion) setDialog(DIALOG.wardrobe);
         }}
       />
 
@@ -175,16 +195,34 @@ export function Walk() {
       {isNearWardrobe && !isPaused && (
         <InteractPrompt landmark={HOME_WARDROBE} hint="옷 갈아입기" onInteract={interact} />
       )}
-      {status.nearby && !isPaused && !isAtPier && (
+      {status.nearby && !isPaused && !isAtPier && !isNearCat && !isNearAquarium && (
         <InteractPrompt landmark={status.nearby} hint={promptHint(status.nearby)} onInteract={interact} />
       )}
 
-      {isAtPier && !isPaused && (
+      {isNearAquarium && !isPaused && (
+        <InteractPrompt landmark={HOME_AQUARIUM} hint="물고기 만나기 · 먹이 주기" onInteract={interact} />
+      )}
+      {isNearCat && !isPaused && (
+        <InteractPrompt landmark={PIER_CAT} hint="인사하기 · 물고기 나눠 주기" onInteract={interact} />
+      )}
+      {isWithCompanion && (
+        <CompanionPanel
+          key={companionPanel}
+          kind={companionPanel}
+          onReact={(reaction) => engine.current?.reactToCompanion(reaction)}
+          onClose={() => {
+            setCompanionPanel(COMPANION_PANEL.none);
+            landscapeRef.current?.querySelector('canvas')?.focus({ preventScroll: true });
+          }}
+        />
+      )}
+      {isAtPier && !isPaused && !isNearCat && (
         <InteractPrompt landmark={FISHING_PIER} hint="부두 끝에서 낚싯줄 던지기" onInteract={interact} />
       )}
       {isFishing && (
         <FishingHud
           onSound={ambience.fishingCue}
+          onReact={(reaction) => engine.current?.reactToCompanion(reaction)}
           onFrame={(frame) => engine.current?.setFishing(frame)}
           onClose={() => {
             engine.current?.setFishing(null);
@@ -195,12 +233,12 @@ export function Walk() {
       )}
 
       <BottomBar
-        isPaused={isSleeping || isFishing}
+        isPaused={isSleeping || isFishing || isWithCompanion}
         place={status.nearby?.short ?? WORLDS[status.region].name}
         visited={collection.visited}
         shouldShowHint={isFirstVisit && isReady && !hasStarted}
         onOpenJournal={() => {
-          if (!isSleeping && !isFishing) setDialog(DIALOG.journal);
+          if (!isSleeping && !isFishing && !isWithCompanion) setDialog(DIALOG.journal);
         }}
       />
       <MobileControls

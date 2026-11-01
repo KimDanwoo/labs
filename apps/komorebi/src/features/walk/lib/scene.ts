@@ -1,4 +1,5 @@
 import { TIME, WEATHER, type TimeOfDay, type Weather } from '@features/walk/model/constants';
+import { companionStore } from '@features/walk/model/store';
 import { DEFAULT_APPEARANCE, characterAtlas, type Appearance } from '@shared/world/appearance';
 import { FOREGROUNDS, foregroundOrder } from '@shared/world/foreground';
 import { isAtHomeBed, isNearHomeBed } from '@shared/world/interactions';
@@ -29,6 +30,8 @@ import { SCENERY_STYLE } from './breeze';
 import { constrainCameraAxis } from './cameraBounds';
 import { catchCelebration } from './catchCelebration';
 import { createChild } from './child';
+import { createCompanionScene } from './companionScene';
+import type { CompanionReaction } from './companions';
 import { createCountryside } from './countryside';
 import { createDriftingLeaves } from './driftingLeaves';
 import { createFireflies } from './fireflies';
@@ -102,6 +105,7 @@ export type WalkEngine = {
   setPaused: (value: boolean) => void;
   finishSleep: () => void;
   setFishing: (frame: FishingFrame | null) => void;
+  reactToCompanion: (reaction: CompanionReaction) => void;
   setAppearance: (appearance: Appearance) => Promise<boolean>;
   setTimeOfDay: (value: TimeOfDay) => void;
   setWeather: (value: Weather) => void;
@@ -197,9 +201,11 @@ export async function createScene(
   const child = character.group;
   scene.add(child);
   const pierFishing = createPierFishing(scene);
+  const companions = createCompanionScene(scene, loader);
   let fishingFrame: FishingFrame | null = null;
   let fishingAge = 0;
   let fishingLift = 0;
+  let companionAge = 10;
   // Group order sorts before mesh order: keep the group at the scene default
   // so the foreground can render after the character's individual sprites.
   child.children.forEach((part) => {
@@ -355,6 +361,7 @@ export async function createScene(
     isSettling = true;
     nextFrame = 0;
   };
+  const unsubscribeCompanions = companionStore.subscribe(wake);
   const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   let reducedMotion = motionQuery.matches;
   const motionPreference = (event: MediaQueryListEvent) => {
@@ -629,6 +636,7 @@ export async function createScene(
       jump.landing,
     );
     character.setFishingPose(fishingFrame, fishingAge, reducedMotion);
+    if (!fishingFrame && paused) character.setCompanionPose(companionAge, reducedMotion);
     return { scale, size, rest, hasStepped };
   }
   function placeCharacter(scale: number, size: number, rest: BedRestFrame | null) {
@@ -774,6 +782,7 @@ export async function createScene(
     const dt = last ? Math.min((time - last) / 1000, 0.05) : 0;
     last = time;
     elapsed += dt;
+    companionAge += dt;
     if (fishingFrame) fishingAge += dt;
     fishingLift =
       fishingFrame?.phase === FISHING_PHASE.caught ? catchCelebration(fishingAge, reducedMotion).childLift : 0;
@@ -789,6 +798,7 @@ export async function createScene(
     if (isFootfall) playFootfall(hasLanded, scale);
     placeCharacter(scale, size, rest);
     pierFishing.update(fishingAge, fishingFrame, child.position, size, reducedMotion);
+    companions.update(dt, elapsed, region, companionStore.get(), fishingFrame, fishingAge, reducedMotion);
     const isCameraMoving = followCamera(dt, size);
     placeMarkers();
     const isAtmosphereChanging = easeAtmosphere(dt);
@@ -849,6 +859,11 @@ export async function createScene(
     },
     setTimeOfDay(value) {
       timeOfDay = value;
+      wake();
+    },
+    reactToCompanion(reaction) {
+      companionAge = 0;
+      companions.react(reaction);
       wake();
     },
     setFishing(frame) {
@@ -948,6 +963,8 @@ export async function createScene(
       foregroundMaterial.dispose();
       bedRest.dispose();
       pierFishing.dispose();
+      companions.dispose();
+      unsubscribeCompanions();
       portalVisuals.dispose();
       fireflies.dispose();
       placeEffects.dispose();

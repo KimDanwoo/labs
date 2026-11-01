@@ -64,6 +64,12 @@ export function createChild(initialAtlas: THREE.Texture) {
       void jumpVelocity;
       return { hasStepped: walking && jumpHeight <= 0 && crossedFootfall(previousPhase, m.phase) };
     },
+    setCompanionPose(age: number, reducedMotion: boolean) {
+      if (reducedMotion || age >= 2.4) return;
+      const lean = Math.sin(Math.min(1, age / 2.4) * Math.PI) * 0.09;
+      material.rotation = lean;
+      sprite.scale.set(7.8, 10.4 * (1 - lean * 0.5), 1);
+    },
     setFishingPose(frame: FishingFrame | null, elapsed: number, reducedMotion: boolean) {
       if (!frame || reducedMotion) return;
       const isFighting = frame.phase === FISHING_PHASE.fighting;

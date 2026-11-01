@@ -3,3 +3,5 @@ export { pageStores, parseDayPages, parseDiscoveries, type DiscoveryStore } from
 
 export { appearanceStore } from './appearance';
 export { villageDayStore } from './villageDay';
+
+export { companionStore } from './companions';

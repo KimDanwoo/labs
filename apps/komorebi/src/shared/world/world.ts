@@ -122,7 +122,25 @@ export const FISHING_PIER = {
   x: 56,
   z: 33,
 };
-export const DESTINATIONS = [...LANDMARKS, HOME, FISHING_PIER];
+export const HOME_AQUARIUM = {
+  id: 'home-aquarium',
+  region: 'home' as const,
+  name: '창가의 작은 수조',
+  short: '우리 집 수조',
+  icon: '🐠',
+  x: 46,
+  z: 64,
+};
+export const PIER_CAT = {
+  id: 'pier-cat',
+  region: 'coast' as const,
+  name: '부두의 삼색 고양이',
+  short: '부두 고양이',
+  icon: '🐈',
+  x: 50,
+  z: 34,
+};
+export const DESTINATIONS = [...LANDMARKS, HOME, FISHING_PIER, HOME_AQUARIUM, PIER_CAT];
 export const WORLDS: Record<
   Region,
   {

@@ -1,5 +1,6 @@
 import type { createAmbience } from '@features/walk/lib/audio';
 import { CATCH_CELEBRATION_SECONDS } from '@features/walk/lib/catchCelebration';
+import { COMPANION_ACTION, type CompanionReaction } from '@features/walk/lib/companions';
 import {
   BITE_WINDOW_MS,
   CAST_SECONDS,
@@ -18,18 +19,24 @@ import {
   type FishingFrame,
   type FishingPhase,
 } from '@features/walk/lib/fishing';
+import { companionStore } from '@features/walk/model/store';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { CatchChoices } from './CatchChoices';
 import { FishingFight } from './FishingFight';
 
 export function FishingHud({
   onClose,
   onFrame,
   onSound,
+  onReact,
 }: {
   onClose: () => void;
+  onReact: (reaction: CompanionReaction) => void;
   onSound: ReturnType<typeof createAmbience>['fishingCue'];
   onFrame: (frame: FishingFrame | null) => void;
 }) {
+  const [keptUid, setKeptUid] = useState<string | null>(null);
+  const hasFinished = useRef(false);
   const [phase, setPhase] = useState<FishingPhase>(FISHING_PHASE.casting);
   const [caught, setCaught] = useState<Catch | null>(null);
   const [collection, setCollection] = useState(() => {
@@ -92,6 +99,8 @@ export function FishingHud({
     return undefined;
   }, [phase]);
   function finishFight(outcome: Fight['outcome']) {
+    if (hasFinished.current) return;
+    hasFinished.current = true;
     if (outcome !== FIGHT_OUTCOME.landed || !caught) {
       setFailure(
         outcome === FIGHT_OUTCOME.snapped ? '팽! 너무 당겨 줄이 끊어졌어요.' : '줄이 느슨해져 물고기가 빠져나갔어요.',
@@ -99,6 +108,9 @@ export function FishingHud({
       setPhase(FISHING_PHASE.missed);
       return;
     }
+    const uid = crypto.randomUUID();
+    const kept = companionStore.act({ kind: COMPANION_ACTION.keep, fish: caught, uid });
+    setKeptUid(kept.changed ? uid : null);
     const updated = addCatch(collection, caught);
     setIsNew(!collection[caught.id]);
     setIsRecord(Boolean(collection[caught.id] && caught.size > collection[caught.id]!.best));
@@ -106,7 +118,7 @@ export function FishingHud({
     setCollection(updated);
     try {
       localStorage.setItem(FISHING_STORAGE_KEY, JSON.stringify(updated));
-      setHasSaveError(false);
+      setHasSaveError(!kept.saved);
     } catch {
       setHasSaveError(true);
     }
@@ -129,6 +141,7 @@ export function FishingHud({
     }
     setFailure('물고기가 달아났어요. 다시 해 볼까요?');
     hasReeled.current = false;
+    hasFinished.current = false;
     setCaught(null);
     setIsRecord(false);
     setPhase(FISHING_PHASE.casting);
@@ -203,6 +216,9 @@ export function FishingHud({
         <button className="continue-button" onClick={act} disabled={phase === FISHING_PHASE.casting || isCelebrating}>
           <kbd>E</kbd> {isCelebrating ? '잡았다! ♥' : actionLabel}
         </button>
+      )}
+      {phase === FISHING_PHASE.caught && !isCelebrating && (
+        <CatchChoices key={keptUid ?? 'overflow'} uid={keptUid} onReact={onReact} />
       )}
       <small>
         {phase === FISHING_PHASE.caught
