@@ -193,7 +193,18 @@ export function bindMusicWidget(
   return () => {
     active = false;
     revision++;
-    widget.pause();
-    bound.forEach((event) => widget.unbind(event));
+    // React may already have detached the iframe; the SDK then throws on postMessage.
+    try {
+      widget.pause();
+    } catch {
+      /* Detached frames have already stopped playback. */
+    }
+    bound.forEach((event) => {
+      try {
+        widget.unbind(event);
+      } catch {
+        /* Continue releasing the remaining subscriptions. */
+      }
+    });
   };
 }
