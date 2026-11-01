@@ -14,6 +14,8 @@ import { FISH } from '@features/walk/lib/fishing';
 import { companionStore } from '@features/walk/model/store';
 import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react';
 
+import { AquariumView } from './AquariumView';
+
 export function CompanionPanel({
   kind,
   onClose,
@@ -68,7 +70,10 @@ export function CompanionPanel({
     setMessage(isTank ? '톡톡, 먹이를 뿌리니 물고기들이 모여들어요.' : '가만히 손을 내미니 삼색이가 고개를 기울여요.');
   }
   return (
-    <section className="pier-fishing-hud companion-panel" aria-label={isTank ? '우리 집 수조' : '부두 고양이'}>
+    <section
+      className={`pier-fishing-hud companion-panel${isTank ? ' aquarium-panel' : ''}`}
+      aria-label={isTank ? '우리 집 수조' : '부두 고양이'}
+    >
       <div className="pier-fishing-heading">
         <strong>{isTank ? '🐠 창가의 작은 바다' : '🐈 삼색이와 잠깐'}</strong>
         <button ref={button} onClick={onClose}>
@@ -80,13 +85,15 @@ export function CompanionPanel({
           ? `함께 사는 물고기 ${tank.length}/${TANK_CAPACITY}`
           : `${bond.name} · ${'♥'.repeat(state.friendship)}${'♡'.repeat(5 - state.friendship)}`}
       </p>
+      {isTank && <AquariumView fish={tank} isFeeding={isReacting} />}
       {!isTank && <small>{bond.hint} 물고기 2마리면 친구, 5마리면 낚시 단짝이 돼요.</small>}
       <button className="continue-button" disabled={isReacting || (isTank && !tank.length)} onClick={react}>
         {isTank ? '먹이 톡톡 뿌리기' : '손 내밀어 인사하기'}
       </button>
       <p role="status">{message}</p>
       {isTank && (
-        <div className="companion-fish-list" aria-label="수조 물고기">
+        <details className="companion-fish-list">
+          <summary>함께 사는 물고기 · {tank.length}마리</summary>
           {!tank.length && <p>아직 조용한 수조예요. 부두에서 만난 물고기를 데려와 보세요.</p>}
           {tank.map((fish) => (
             <div className="fishing-entry" key={fish.uid}>
@@ -101,7 +108,7 @@ export function CompanionPanel({
               </button>
             </div>
           ))}
-        </div>
+        </details>
       )}
       <details className="pier-journal" open={!isTank || !tank.length}>
         <summary>
