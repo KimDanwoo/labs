@@ -1,6 +1,7 @@
 import {
   addCatch,
   BITE_WINDOW_MS,
+  CAST_SECONDS,
   FIGHT_OUTCOME,
   FISH,
   FISHING_PHASE,
@@ -11,15 +12,19 @@ import {
   type Catch,
   type Fight,
   type FishingPhase,
+  type FishingFrame,
 } from '@features/walk/lib/fishing';
-import { useModal } from '@features/walk/model/hooks';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { FishingFight } from './FishingFight';
 
-export function FishingDialog({ onClose }: { onClose: () => void }) {
-  const ref = useModal(true);
-  const titleId = useId();
-  const [phase, setPhase] = useState<FishingPhase>(FISHING_PHASE.idle);
+export function FishingHud({
+  onClose,
+  onFrame,
+}: {
+  onClose: () => void;
+  onFrame: (frame: FishingFrame | null) => void;
+}) {
+  const [phase, setPhase] = useState<FishingPhase>(FISHING_PHASE.casting);
   const [caught, setCaught] = useState<Catch | null>(null);
   const [collection, setCollection] = useState(() => {
     try {
@@ -34,7 +39,16 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
   const [failure, setFailure] = useState('물고기가 달아났어요. 다시 해 볼까요?');
   const deadline = useRef(0);
   const hasReeled = useRef(false);
+  const publish = useEffectEvent(onFrame);
   useEffect(() => {
+    if (phase !== FISHING_PHASE.fighting) publish({ phase, elapsed: 0, tension: 0, progress: 0, isReeling: false });
+  }, [phase]);
+  useEffect(() => () => publish(null), []);
+  useEffect(() => {
+    if (phase === FISHING_PHASE.casting) {
+      const timer = window.setTimeout(() => setPhase(FISHING_PHASE.waiting), CAST_SECONDS * 1000);
+      return () => window.clearTimeout(timer);
+    }
     if (phase === FISHING_PHASE.waiting) {
       const timer = window.setTimeout(
         () => {
@@ -71,7 +85,7 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
     setPhase(FISHING_PHASE.caught);
   }
   function act() {
-    if (phase === FISHING_PHASE.fighting) return;
+    if (phase === FISHING_PHASE.fighting || phase === FISHING_PHASE.casting) return;
     if (phase === FISHING_PHASE.waiting || phase === FISHING_PHASE.bite) {
       if (hasReeled.current) return;
       hasReeled.current = true;
@@ -88,10 +102,28 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
     setFailure('물고기가 달아났어요. 다시 해 볼까요?');
     hasReeled.current = false;
     setCaught(null);
-    setPhase(FISHING_PHASE.waiting);
+    setPhase(FISHING_PHASE.casting);
   }
+  const handleAct = useEffectEvent(act);
+  const handleClose = useEffectEvent(onClose);
+  useEffect(() => {
+    const key = (event: KeyboardEvent) => {
+      if (event.code === 'Escape') {
+        event.preventDefault();
+        handleClose();
+        return;
+      }
+      if (event.code === 'KeyE' && !event.repeat) {
+        event.preventDefault();
+        handleAct();
+      }
+    };
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  }, []);
   const fish = FISH.find((item) => item.id === caught?.id);
   const messages = {
+    [FISHING_PHASE.casting]: '낚싯대를 휘둘러 바다로 던져요…',
     [FISHING_PHASE.idle]: '바람을 느끼며 낚싯줄을 던져 보세요.',
     [FISHING_PHASE.waiting]: '찌가 잠길 때까지 잠깐 기다려요…',
     [FISHING_PHASE.bite]: '지금! 낚싯대를 올려요!',
@@ -100,63 +132,35 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
     [FISHING_PHASE.caught]:
       fish && caught ? `${isNew ? '처음 만난 물고기! ' : ''}${fish.name} · ${caught.size} cm` : '',
   };
-  const actionLabel = {
-    [FISHING_PHASE.idle]: '낚싯줄 던지기',
-    [FISHING_PHASE.waiting]: '낚싯줄 걷기',
-    [FISHING_PHASE.bite]: '챔질하기!',
-    [FISHING_PHASE.fighting]: '릴 감기',
-    [FISHING_PHASE.caught]: '낚싯줄 던지기',
-    [FISHING_PHASE.missed]: '낚싯줄 던지기',
-  }[phase];
+  let actionLabel = '다시 던지기';
+  if (phase === FISHING_PHASE.bite) actionLabel = '챔질하기!';
+  if (phase === FISHING_PHASE.waiting) actionLabel = '낚싯줄 걷기';
   return (
-    <dialog
-      ref={ref}
-      className="memory-dialog fishing-dialog"
-      aria-labelledby={titleId}
-      onCancel={onClose}
-      onClose={(event) => {
-        if (!event.currentTarget.open) onClose();
-      }}
-      onKeyDown={(event) => {
-        if (phase === FISHING_PHASE.fighting) return;
-        if (event.repeat) {
-          if (event.key === ' ' || event.key === 'Enter' || event.key.toLowerCase() === 'e') event.preventDefault();
-          return;
-        }
-        if (event.key.toLowerCase() === 'e' || (event.key === ' ' && !(event.target instanceof HTMLButtonElement))) {
-          event.preventDefault();
-          act();
-        }
-      }}
-    >
-      <button className="tool memory-close" aria-label="낚시 닫기" onClick={onClose}>
-        ×
-      </button>
-      <span className="eyebrow">A QUIET MOMENT BY THE SEA</span>
-      <h2 id={titleId}>바닷가 낚시</h2>
-      <div className={`fishing-water is-${phase}`} aria-hidden="true">
-        <span className="fishing-line" />
-        <span className="fishing-float">{phase === FISHING_PHASE.caught ? fish?.symbol : '●'}</span>
-        {phase === FISHING_PHASE.bite && <strong className="fishing-bite">!</strong>}
+    <section className="pier-fishing-hud" aria-label="부두 낚시" data-phase={phase}>
+      <div className="pier-fishing-heading">
+        <strong>🎣 부두에서 낚시 중</strong>
+        <button onClick={onClose} aria-label="낚시 그만하기">
+          그만하기 <kbd>Esc</kbd>
+        </button>
       </div>
-      <p className="fishing-message" role="status">
+      <p role="status" className={phase === FISHING_PHASE.bite ? 'pier-bite-message' : ''}>
         {messages[phase]}
       </p>
       {phase === FISHING_PHASE.fighting && caught ? (
-        <FishingFight fish={caught} isPerfect={isPerfect} onFinish={finishFight} />
+        <FishingFight fish={caught} isPerfect={isPerfect} onFinish={finishFight} onFrame={onFrame} />
       ) : (
-        <button className="continue-button" onClick={act} autoFocus>
-          {actionLabel}
+        <button className="continue-button" onClick={act} disabled={phase === FISHING_PHASE.casting}>
+          <kbd>E</kbd> {phase === FISHING_PHASE.casting ? '줄을 던지는 중' : actionLabel}
         </button>
       )}
-      <small>버튼 또는 E · 입질 뒤 1.8초 안에 챔질해요</small>
-      <section className="fishing-collection" aria-label="물고기 도감">
-        <h3>
+      <small>바다의 찌를 보세요 · 입질하면 E로 챔질</small>
+      <details className="pier-journal">
+        <summary>
           바다 도감 · {Object.keys(collection).length} / {FISH.length}
-        </h3>
+        </summary>
         {FISH.map((item) => (
-          <div key={item.id} className="fishing-entry">
-            <span>{collection[item.id] ? `${item.symbol} ${item.name}` : '？ 아직 만나지 못한 물고기'}</span>
+          <div className="fishing-entry" key={item.id}>
+            <span>{collection[item.id] ? item.name : '아직 만나지 못한 물고기'}</span>
             <small>
               {collection[item.id]
                 ? `${collection[item.id]!.count}마리 · 최대 ${collection[item.id]!.best} cm`
@@ -164,10 +168,8 @@ export function FishingDialog({ onClose }: { onClose: () => void }) {
             </small>
           </div>
         ))}
-      </section>
-      {hasSaveError && (
-        <p role="alert">이 브라우저에서는 도감을 저장하지 못했어요. 현재 화면에서는 기록을 볼 수 있어요.</p>
-      )}
-    </dialog>
+      </details>
+      {hasSaveError && <p role="alert">도감을 저장하지 못했어요. 현재 화면에서는 기록을 볼 수 있어요.</p>}
+    </section>
   );
 }

@@ -6,6 +6,7 @@ import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '@sh
 import { surfaceAt, type Surface } from '@shared/world/surfaces';
 import {
   DESTINATIONS,
+  FISHING_PIER,
   HOME_BED,
   SPAWN,
   WORLDS,
@@ -29,6 +30,8 @@ import { constrainCameraAxis } from './cameraBounds';
 import { createChild } from './child';
 import { createCountryside } from './countryside';
 import { createDriftingLeaves } from './driftingLeaves';
+import { type FishingFrame } from './fishing';
+import { createPierFishing } from './pierFishing';
 import { createFireflies } from './fireflies';
 import { gameKey, isControlTarget, keyboardDirection } from './input';
 import { advanceJump, createJump, isAirborne, startJump } from './motion';
@@ -97,6 +100,7 @@ export type WalkEngine = {
   /** While paused (a dialog is open) the child stands still and new movement input is ignored. */
   setPaused: (value: boolean) => void;
   finishSleep: () => void;
+  setFishing: (frame: FishingFrame | null) => void;
   setAppearance: (appearance: Appearance) => Promise<boolean>;
   setTimeOfDay: (value: TimeOfDay) => void;
   setWeather: (value: Weather) => void;
@@ -191,6 +195,8 @@ export async function createScene(
   scene.add(new THREE.Mesh(geo, background));
   const child = character.group;
   scene.add(child);
+  const pierFishing = createPierFishing(scene);
+  let fishingFrame: FishingFrame | null = null;
   // Group order sorts before mesh order: keep the group at the scene default
   // so the foreground can render after the character's individual sprites.
   child.children.forEach((part) => {
@@ -596,7 +602,7 @@ export async function createScene(
     const scale = characterScale(position.z);
     const size = scale * CHILD_SIZE;
     const rest = sleeping ? bedRest.update(darkness, lampGlowAt(region, HOME_BED), reducedMotion) : null;
-    let characterDt = paused ? 0 : dt;
+    let characterDt = paused && !fishingFrame ? 0 : dt;
     let characterTravel = jump.height > 0 ? frameTravel * 0.2 : frameTravel;
     if (rest) {
       characterDt = dt;
@@ -607,7 +613,7 @@ export async function createScene(
     const { hasStepped } = character.update(
       characterDt,
       characterTravel,
-      rest?.heading ?? heading,
+      fishingFrame ? Math.PI / 2 : (rest?.heading ?? heading),
       rest?.walking ?? walking,
       true,
       reducedMotion,
@@ -615,6 +621,7 @@ export async function createScene(
       jump.velocity,
       jump.landing,
     );
+    character.setFishingPose(fishingFrame, elapsed, reducedMotion);
     return { scale, size, rest, hasStepped };
   }
   function placeCharacter(scale: number, size: number, rest: BedRestFrame | null) {
@@ -747,7 +754,7 @@ export async function createScene(
     const wasAirborne = isAirborne(jump);
     const hasMoveKey = MOVE_KEYS.some((key) => keys.has(key));
     const isMoving = !paused && (hasMoveKey || route.length > 0 || wasAirborne || moveSpeed > 0.05);
-    const rate = isMoving || isSettling ? RENDER_RATE.active : RENDER_RATE.idle;
+    const rate = isMoving || isSettling || fishingFrame ? RENDER_RATE.active : RENDER_RATE.idle;
     if (!shouldRenderFrame(time, nextFrame, rate)) {
       animation = requestAnimationFrame(tick);
       return;
@@ -756,7 +763,7 @@ export async function createScene(
     const dt = last ? Math.min((time - last) / 1000, 0.05) : 0;
     last = time;
     elapsed += dt;
-    if (!paused && !reducedMotion) sceneryTime += dt;
+    if ((!paused || fishingFrame) && !reducedMotion) sceneryTime += dt;
     background.uniforms.sceneryTime!.value = reducedMotion ? 0 : sceneryTime;
     if (!paused) advanceJump(jump, dt);
     const hasLanded = !paused && wasAirborne && !isAirborne(jump);
@@ -767,11 +774,12 @@ export async function createScene(
     const isFootfall = !paused && region === regionBefore && (hasLanded || hasStepped);
     if (isFootfall) playFootfall(hasLanded, scale);
     placeCharacter(scale, size, rest);
+    pierFishing.update(dt, fishingFrame, child.position, size, reducedMotion);
     const isCameraMoving = followCamera(dt, size);
     placeMarkers();
     const isAtmosphereChanging = easeAtmosphere(dt);
     paintBackground(dt, size);
-    animateLife(paused ? 0 : dt, rest !== null);
+    animateLife(paused && !fishingFrame ? 0 : dt, rest !== null);
     driftDust(dt);
     isSettling =
       isCameraMoving ||
@@ -827,6 +835,21 @@ export async function createScene(
     },
     setTimeOfDay(value) {
       timeOfDay = value;
+      wake();
+    },
+    setFishing(frame) {
+      if (frame && !fishingFrame) {
+        if (region !== 'coast' || Math.hypot(position.x - FISHING_PIER.x, position.z - FISHING_PIER.z) >= 1.6) return;
+        route = [];
+        destination = null;
+        keys.clear();
+        heading = Math.PI / 2;
+        moveSpeed = 0;
+        jump.height = 0;
+        jump.velocity = 0;
+      }
+      fishingFrame = frame;
+      container.dataset.fishing = frame?.phase ?? 'none';
       wake();
     },
     setPaused(value) {
@@ -909,6 +932,7 @@ export async function createScene(
       foregrounds.forEach(({ mesh }) => mesh.geometry.dispose());
       foregroundMaterial.dispose();
       bedRest.dispose();
+      pierFishing.dispose();
       portalVisuals.dispose();
       fireflies.dispose();
       placeEffects.dispose();

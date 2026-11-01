@@ -1,20 +1,31 @@
-import { FIGHT_OUTCOME, startFight, stepFight, type Catch, type Fight } from '@features/walk/lib/fishing';
+import {
+  FIGHT_OUTCOME,
+  startFight,
+  stepFight,
+  type Catch,
+  type Fight,
+  type FishingFrame,
+  FISHING_PHASE,
+} from '@features/walk/lib/fishing';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 
 export function FishingFight({
   fish,
   isPerfect,
   onFinish,
+  onFrame,
 }: {
   fish: Catch;
   isPerfect: boolean;
   onFinish: (outcome: Fight['outcome']) => void;
+  onFrame: (frame: FishingFrame) => void;
 }) {
   const [fight, setFight] = useState(() => startFight(isPerfect));
   const current = useRef(fight);
   const isHolding = useRef(false);
   const button = useRef<HTMLButtonElement>(null);
   const finish = useEffectEvent(onFinish);
+  const publish = useEffectEvent(onFrame);
   useEffect(() => {
     button.current?.focus();
     let previous = performance.now();
@@ -29,16 +40,35 @@ export function FishingFight({
       const next = stepFight(current.current, isHolding.current, dt, fish.size);
       current.current = next;
       setFight(next);
+      publish({
+        phase: FISHING_PHASE.fighting,
+        elapsed: next.elapsed,
+        tension: next.tension,
+        progress: next.progress,
+        isReeling: isHolding.current,
+      });
       if (next.outcome !== FIGHT_OUTCOME.active) {
         window.clearInterval(timer);
         navigator.vibrate?.(next.outcome === FIGHT_OUTCOME.landed ? [40, 30, 80] : 90);
         finish(next.outcome);
       }
     }, 50);
+    const keydown = (event: KeyboardEvent) => {
+      if (event.code !== 'KeyE') return;
+      event.preventDefault();
+      isHolding.current = true;
+    };
+    const keyup = (event: KeyboardEvent) => {
+      if (event.code === 'KeyE') release();
+    };
+    window.addEventListener('keydown', keydown);
+    window.addEventListener('keyup', keyup);
     window.addEventListener('blur', release);
     document.addEventListener('visibilitychange', release);
     return () => {
       window.clearInterval(timer);
+      window.removeEventListener('keydown', keydown);
+      window.removeEventListener('keyup', keyup);
       window.removeEventListener('blur', release);
       document.removeEventListener('visibilitychange', release);
     };
@@ -78,14 +108,14 @@ export function FishingFight({
           isHolding.current = false;
         }}
         onKeyDown={(event) => {
-          if (event.key === ' ' || event.key === 'Enter' || event.key.toLowerCase() === 'e') {
+          if (event.key === ' ' || event.key === 'Enter' || event.code === 'KeyE') {
             event.preventDefault();
             event.stopPropagation();
             isHolding.current = true;
           }
         }}
         onKeyUp={(event) => {
-          if (event.key === ' ' || event.key === 'Enter' || event.key.toLowerCase() === 'e') {
+          if (event.key === ' ' || event.key === 'Enter' || event.code === 'KeyE') {
             event.preventDefault();
             event.stopPropagation();
             isHolding.current = false;

@@ -113,7 +113,16 @@ export const LANDMARKS = [
   },
 ] as const;
 export type Landmark = (typeof LANDMARKS)[number];
-export const DESTINATIONS = [...LANDMARKS, HOME];
+export const FISHING_PIER = {
+  id: 'fishing-pier',
+  region: 'coast' as const,
+  name: '바다 낚시 부두',
+  short: '낚시 부두',
+  icon: '🎣',
+  x: 56,
+  z: 33,
+};
+export const DESTINATIONS = [...LANDMARKS, HOME, FISHING_PIER];
 export const WORLDS: Record<
   Region,
   {
@@ -221,6 +230,11 @@ export const WORLDS: Record<
       { id: 'entry', x: 15, z: 64 },
       { id: 'middle', x: 40, z: 70 },
       { id: 'sea', x: 65, z: 73 },
+      { id: 'harbour', x: 37, z: 49 },
+      { id: 'pier-entry', x: 42, z: 40 },
+      { id: 'pier-bend', x: 46, z: 36 },
+      { id: 'pier-middle', x: 51, z: 34 },
+      { id: 'fishing-pier', x: 56, z: 33 },
       { id: 'end', x: 93, z: 77 },
     ],
     routes: [
@@ -228,6 +242,11 @@ export const WORLDS: Record<
       { a: 'entry', b: 'middle', width: 5 },
       { a: 'middle', b: 'sea', width: 5 },
       { a: 'sea', b: 'end', width: 4.5 },
+      { a: 'middle', b: 'harbour', width: 3 },
+      { a: 'harbour', b: 'pier-entry', width: 2 },
+      { a: 'pier-entry', b: 'pier-bend', width: 1.5 },
+      { a: 'pier-bend', b: 'pier-middle', width: 1.5 },
+      { a: 'pier-middle', b: 'fishing-pier', width: 1.5 },
     ],
     portals: [{ node: 'back', to: 'river', spawn: { x: 85, z: 47 }, label: '강가' }],
   },

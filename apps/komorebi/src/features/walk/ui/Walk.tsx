@@ -15,11 +15,11 @@ import {
 import { appearanceStore, pageStores } from '@features/walk/model/store';
 import type { Memory } from '@features/walk/model/types';
 import type { Appearance } from '@shared/world/appearance';
-import { HOME_DESK, HOME_WARDROBE, LANDMARKS, WORLDS, type Landmark } from '@shared/world/world';
+import { FISHING_PIER, HOME_DESK, HOME_WARDROBE, LANDMARKS, WORLDS, type Landmark } from '@shared/world/world';
 import { useRef, useState, useSyncExternalStore } from 'react';
 import { flushSync } from 'react-dom';
 import { BottomBar } from './BottomBar';
-import { FishingDialog } from './FishingDialog';
+import { FishingHud } from './FishingHud';
 import { GameHeader } from './GameHeader';
 import { InteractPrompt } from './InteractPrompt';
 import { LoadingOverlay } from './LoadingOverlay';
@@ -67,6 +67,7 @@ export function Walk() {
   useAmbienceScene(ambience.setScene, { region: status.region, time: timeOfDay, weather });
   const hasStarted = hasWalked || hasGuided;
 
+  const isAtPier = status.region === 'coast' && Math.hypot(status.x - FISHING_PIER.x, status.z - FISHING_PIER.z) < 1.6;
   const isNearDesk = status.region === 'home' && Math.hypot(status.x - HOME_DESK.x, status.z - HOME_DESK.z) < 4.5;
   const isNearWardrobe =
     status.region === 'home' && Math.hypot(status.x - HOME_WARDROBE.x, status.z - HOME_WARDROBE.z) < 4.5;
@@ -79,6 +80,10 @@ export function Walk() {
 
   function interact() {
     if (isPaused) return;
+    if (isAtPier) {
+      setIsFishing(true);
+      return;
+    }
     if (isNearWardrobe) {
       setDialog(DIALOG.wardrobe);
       return;
@@ -137,7 +142,9 @@ export function Walk() {
   useShortcuts({ isEnabled: !isPaused, onDiscover: interact, onOpenMap: () => setDialog(DIALOG.map) });
 
   return (
-    <main className={`walk is-${timeOfDay} ${isRaining ? 'is-raining' : ''} ${hasStarted ? 'has-started' : ''}`}>
+    <main
+      className={`walk ${isFishing ? 'is-fishing' : ''} is-${timeOfDay} ${isRaining ? 'is-raining' : ''} ${hasStarted ? 'has-started' : ''}`}
+    >
       <div className="landscape" ref={landscapeRef} />
       <div className="paper-grain" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
@@ -153,14 +160,14 @@ export function Walk() {
         timeOfDay={timeOfDay}
         isRaining={isRaining}
         isSoundOn={ambience.isOn}
-        isReady={isReady && !isSleeping}
+        isReady={isReady && !isSleeping && !isFishing}
         onToggleSound={ambience.toggle}
         onPhoto={takePhoto}
         onOpenMap={() => {
-          if (!isSleeping) setDialog(DIALOG.map);
+          if (!isSleeping && !isFishing) setDialog(DIALOG.map);
         }}
         onOpenWardrobe={() => {
-          if (!isSleeping) setDialog(DIALOG.wardrobe);
+          if (!isSleeping && !isFishing) setDialog(DIALOG.wardrobe);
         }}
       />
 
@@ -168,18 +175,18 @@ export function Walk() {
       {isNearWardrobe && !isPaused && (
         <InteractPrompt landmark={HOME_WARDROBE} hint="옷 갈아입기" onInteract={interact} />
       )}
-      {status.nearby && !isPaused && (
+      {status.nearby && !isPaused && !isAtPier && (
         <InteractPrompt landmark={status.nearby} hint={promptHint(status.nearby)} onInteract={interact} />
       )}
 
-      {status.nearby?.id === 'sea' && !isPaused && (
-        <button className="fishing-open" onClick={() => setIsFishing(true)}>
-          🎣 바다 낚시
-        </button>
+      {isAtPier && !isPaused && (
+        <InteractPrompt landmark={FISHING_PIER} hint="부두 끝에서 낚싯줄 던지기" onInteract={interact} />
       )}
       {isFishing && (
-        <FishingDialog
+        <FishingHud
+          onFrame={(frame) => engine.current?.setFishing(frame)}
           onClose={() => {
+            engine.current?.setFishing(null);
             setIsFishing(false);
             landscapeRef.current?.querySelector('canvas')?.focus({ preventScroll: true });
           }}
@@ -187,12 +194,12 @@ export function Walk() {
       )}
 
       <BottomBar
-        isPaused={isSleeping}
+        isPaused={isSleeping || isFishing}
         place={status.nearby?.short ?? WORLDS[status.region].name}
         visited={collection.visited}
         shouldShowHint={isFirstVisit && isReady && !hasStarted}
         onOpenJournal={() => {
-          if (!isSleeping) setDialog(DIALOG.journal);
+          if (!isSleeping && !isFishing) setDialog(DIALOG.journal);
         }}
       />
       <MobileControls
