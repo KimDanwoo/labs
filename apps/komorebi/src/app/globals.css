@@ -2349,3 +2349,14 @@ dialog::backdrop {
     animation: none;
   }
 }
+
+.aquarium-swimmer[aria-pressed='true'] {
+  filter: drop-shadow(0 0 4px #fff4bb);
+}
+@media (min-width: 900px) {
+  body:has(.companion-panel) .music-player,
+  body:has(.companion-panel) .music-launcher {
+    left: 1rem;
+    right: auto;
+  }
+}
