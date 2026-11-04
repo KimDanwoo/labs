@@ -1,10 +1,8 @@
-import { AuthProvider } from '@app/providers/AuthProvider';
-import { JotaiProvider } from '@app/providers/JotaiProvider';
-import { ThemeProvider } from '@app/providers/ThemeProvider';
+import '@app/globals.css';
+import { AppProviders } from '@app/providers';
 import type { Metadata, Viewport } from 'next';
 import { Rubik, Space_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
-import './globals.css';
 
 const rubik = Rubik({
   variable: '--font-rubik',
@@ -96,11 +94,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${rubik.variable} ${spaceMono.variable} antialiased`}>
-        <JotaiProvider>
-          <ThemeProvider>
-            <AuthProvider>{children}</AuthProvider>
-          </ThemeProvider>
-        </JotaiProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

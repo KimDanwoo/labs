@@ -1,7 +1,7 @@
 'use client';
 
-import type { User } from '@entities/auth/model/types';
-import type { GameStats } from '@features/game-stats/model/types';
+import type { GameStats } from '@entities/game/model/types';
+import type { User } from '@entities/session/model/types';
 import { cn } from '@shared/model/utils';
 import Image from 'next/image';
 import { memo } from 'react';

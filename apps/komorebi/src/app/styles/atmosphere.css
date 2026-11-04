@@ -1,0 +1,110 @@
+/* The illustrated scenery remains vivid; interface ink floats over its dark tree canopy. */
+.header,
+.title-block,
+.vertical-note {
+  color: rgb(var(--cream));
+  text-shadow: 0 2px 15px rgb(var(--night) / 0.63);
+}
+.header .brand-symbol {
+  border-color: rgb(var(--cream) / 0.53);
+}
+.header .season-dot {
+  background: rgb(var(--butter));
+}
+.header .edition {
+  border-color: rgb(var(--cream) / 0.33);
+}
+.title-block .eyebrow,
+.title-block p,
+.title-block .weather {
+  color: rgb(var(--cream));
+}
+.title-block .eyebrow > span {
+  background: rgb(var(--honey));
+}
+.title-block .title-dot {
+  color: rgb(var(--butter));
+}
+.weather-divider {
+  background: rgb(var(--cream) / 0.4);
+}
+.vignette {
+  background: linear-gradient(
+    180deg,
+    rgb(var(--night) / 0.17),
+    transparent 20%,
+    transparent 80%,
+    rgb(var(--deep) / 0.13)
+  );
+}
+.paper-grain {
+  opacity: 0.025;
+}
+.title-block {
+  top: 18%;
+  transition:
+    opacity 0.8s,
+    transform 0.8s;
+}
+.title-block h1 {
+  font-size: clamp(38px, 4.3vw, 66px);
+}
+.has-started .title-block {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.vertical-note {
+  color: rgb(var(--cream) / 0.66);
+}
+.discovery-guide {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  background: transparent;
+  padding: 5px 2px;
+  border-radius: 8px;
+}
+.discovery-guide:hover {
+  background: rgb(var(--mist));
+}
+.discovery-guide > div {
+  flex: 1;
+}
+.landscape {
+  touch-action: none;
+}
+.landscape canvas {
+  cursor: crosshair;
+}
+.tools {
+  background: rgb(var(--paper) / 0.72);
+}
+.interact {
+  bottom: 135px;
+}
+@media (max-width: 700px) {
+  .title-block {
+    top: 15%;
+    max-width: 70%;
+  }
+  .title-block h1 {
+    font-size: 38px;
+  }
+  .interact {
+    bottom: 220px;
+  }
+  .header-right {
+    display: none;
+  }
+  .title-block .eyebrow {
+    max-width: 210px;
+    font-size: 6px;
+  }
+  .title-block p {
+    font-size: 11px;
+  }
+  .weather {
+    margin-top: 12px;
+  }
+}

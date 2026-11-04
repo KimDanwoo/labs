@@ -1,17 +1,9 @@
 'use client';
 
 import { DifficultyBadge } from '@entities/question/ui';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  Badge,
-  Button,
-  Card,
-  MarkdownRenderer,
-} from '@shared/ui';
-import { useBookmarkedQuestions } from '@views/my-page/model';
+import { MarkdownRenderer } from '@shared/ui';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Button, Card } from '@ui/react';
+import { useBookmarkedQuestions } from '@views/my-page/model/hooks';
 import { Bookmark, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -64,11 +56,9 @@ export function BookmarksPage() {
                       북마크 삭제
                     </Button>
                     {category && (
-                      <Link href={`/reference/${category.slug}`}>
-                        <Button variant="ghost" size="sm">
-                          {category.title}에서 보기 →
-                        </Button>
-                      </Link>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/reference/${category.slug}`}>{category.title}에서 보기 →</Link>
+                      </Button>
                     )}
                   </div>
                 </AccordionContent>
@@ -82,11 +72,9 @@ export function BookmarksPage() {
             <Bookmark className="h-8 w-8 text-muted-foreground/50" />
           </div>
           <p className="text-muted-foreground">아직 북마크한 질문이 없습니다.</p>
-          <Link href="/reference">
-            <Button variant="link" className="mt-3">
-              레퍼런스에서 질문 북마크하기 →
-            </Button>
-          </Link>
+          <Button variant="link" className="mt-3" asChild>
+            <Link href="/reference">레퍼런스에서 질문 북마크하기 →</Link>
+          </Button>
         </Card>
       )}
     </div>

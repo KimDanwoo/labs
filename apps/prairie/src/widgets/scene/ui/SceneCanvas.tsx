@@ -15,7 +15,7 @@ import { Suspense, useState } from 'react';
 import { PCFShadowMap } from 'three';
 import { ReadySignal } from './ReadySignal';
 import { RideSun } from './RideSun';
-import { SceneFailure } from './SceneBoundary';
+import { SceneFailure } from './SceneFailure';
 
 const DPR = {
   desktop: { max: 1.5, min: 1 },

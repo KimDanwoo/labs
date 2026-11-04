@@ -2,6 +2,11 @@ import { expect, test, type Page } from '@playwright/test';
 
 const landscape = (page: Page) => page.locator('.landscape');
 
+test.beforeEach(async ({ page }) => {
+  // 산책 검증의 가상 시계를 외부 음악 플레이어의 타이머와 분리한다.
+  await page.route('https://w.soundcloud.com/**', (route) => route.abort());
+});
+
 async function openWalk(page: Page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('.loading')).toHaveCount(0, { timeout: 20_000 });
@@ -113,7 +118,9 @@ test('a slow neighbouring painting holds the child at the exit, then crosses', a
   });
   await openWalk(page);
   await guideTo(page, '물소리 다리');
-  await expect(page.getByRole('status')).toContainText('풍경을 펼치고 있어요', { timeout: 15_000 });
+  await expect(page.getByRole('status', { name: '산책 알림' })).toContainText('풍경을 펼치고 있어요', {
+    timeout: 15_000,
+  });
   await expect(landscape(page)).toHaveAttribute('data-region', 'village');
   release();
   await expect(landscape(page)).toHaveAttribute('data-region', 'river', { timeout: 15_000 });
@@ -123,7 +130,7 @@ test('a failed neighbouring painting keeps the child in the current region', asy
   await page.route('**/art/river-game.webp', (route) => route.abort());
   await openWalk(page);
   await guideTo(page, '물소리 다리');
-  await expect(page.getByRole('status')).toContainText('불러오지 못했어요', { timeout: 15_000 });
+  await expect(page.getByRole('status', { name: '산책 알림' })).toContainText('불러오지 못했어요', { timeout: 15_000 });
   await expect(landscape(page)).toHaveAttribute('data-region', 'village');
 });
 
@@ -138,7 +145,9 @@ test('choosing a new destination while an exit is loading cancels that crossing'
   });
   await openWalk(page);
   await guideTo(page, '물소리 다리');
-  await expect(page.getByRole('status')).toContainText('풍경을 펼치고 있어요', { timeout: 15_000 });
+  await expect(page.getByRole('status', { name: '산책 알림' })).toContainText('풍경을 펼치고 있어요', {
+    timeout: 15_000,
+  });
   await guideTo(page, '바람이 머무는 논');
   release();
   await expect(page.locator('.interact')).toContainText('바람이 머무는 논', { timeout: 15_000 });
@@ -180,7 +189,9 @@ test('choosing the cancelled exit again resumes the crossing once it loads', asy
   });
   await openWalk(page);
   await guideTo(page, '물소리 다리');
-  await expect(page.getByRole('status')).toContainText('풍경을 펼치고 있어요', { timeout: 15_000 });
+  await expect(page.getByRole('status', { name: '산책 알림' })).toContainText('풍경을 펼치고 있어요', {
+    timeout: 15_000,
+  });
   await guideTo(page, '바람이 머무는 논');
   await guideTo(page, '물소리 다리');
   release();
@@ -251,7 +262,7 @@ test('once a page is kept, the place offers its little action instead', async ({
   await page.getByRole('dialog', { name: '물소리 다리' }).getByRole('button', { name: '추억 닫기' }).click();
   await expect(prompt).toContainText('물수제비 뜨기');
   await prompt.click();
-  await expect(page.getByRole('status')).toContainText('돌이 세 번 튀었다');
+  await expect(page.getByRole('status', { name: '산책 알림' })).toContainText('돌이 세 번 튀었다');
   await expect(page.getByRole('dialog', { name: '물소리 다리' })).toBeHidden();
   await expect(page.locator('.journal-button b')).toHaveText('1 / 6');
   expect(errors).toEqual([]);
@@ -346,6 +357,7 @@ test('home is a walkable map with a bed and a doorway back to the village', asyn
 
 test('tapping the painted quilt and desk walks to their usable side', async ({ page }) => {
   await openWalk(page);
+  await page.getByRole('button', { name: 'MP3 접기 · 음악은 계속 재생' }).click();
   await guideTo(page, '파란 지붕 우리 집');
   await expect(landscape(page)).toHaveAttribute('data-region', 'home', { timeout: 25_000 });
   await expect(landscape(page)).toHaveAttribute('data-motion', 'idle', { timeout: 10_000 });

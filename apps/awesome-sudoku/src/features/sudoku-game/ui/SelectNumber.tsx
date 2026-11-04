@@ -1,16 +1,16 @@
 'use client';
-
-import { BOARD_SIZE, KEY_NUMBER } from '@entities/board/model/constants';
+import { BOARD_SIZE, KEY_NUMBER } from '@entities/game/model/constants';
 import {
   boardAtom,
   fillCellAtom,
   isNoteModeAtom,
   numberCountsAtom,
+  pushStateAtom,
   selectedCellAtom,
   timerActiveAtom,
   toggleNoteAtom,
-} from '@features/sudoku-game/model/atoms';
-import { pushStateAtom } from '@features/undo-redo/model/atoms';
+} from '@entities/game/model/store';
+import { cellAt } from '@shared/lib/gridAccess';
 import { cn } from '@shared/model/utils';
 import { NumberButton } from '@shared/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -26,13 +26,13 @@ export const SelectNumber: FC = () => {
   const toggleNote = useSetAtom(toggleNoteAtom);
   const pushState = useSetAtom(pushStateAtom);
 
-  const isNumberDisabled = useMemo(() => (value: number) => numberCounts[value] >= BOARD_SIZE, [numberCounts]);
+  const isNumberDisabled = useMemo(() => (value: number) => (numberCounts[value] ?? 0) >= BOARD_SIZE, [numberCounts]);
 
   const handleNoteToggle = useCallback(
     (value: number) => {
       if (!selectedCell) return;
 
-      const cell = board[selectedCell.row][selectedCell.col];
+      const cell = cellAt(board, selectedCell.row, selectedCell.col);
       if (cell.isInitial) return;
 
       pushState(board);

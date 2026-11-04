@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test scripts/test-*.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@supabase/ssr": "catalog:",
@@ -28,6 +30,7 @@
     "tailwind-merge": "catalog:"
   },
   "devDependencies": {
+    "@playwright/test": "catalog:",
     "@config/tsconfig": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
@@ -38,6 +41,7 @@
     "eslint": "catalog:",
     "shadcn": "catalog:",
     "tailwindcss": "catalog:",
+    "tsx": "catalog:",
     "tw-animate-css": "catalog:",
     "typescript": "catalog:"
   },

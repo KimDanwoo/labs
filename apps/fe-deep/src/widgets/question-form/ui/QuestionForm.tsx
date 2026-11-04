@@ -1,21 +1,20 @@
 'use client';
 
-import type { Category, Difficulty, Question, QuestionInput } from '@entities/question/model';
-import { createQuestion, updateQuestion } from '@entities/question/services';
+import { createQuestion, updateQuestion } from '@entities/question/model/actions';
+import type { Category, Difficulty, Question, QuestionInput } from '@entities/question/model/types';
+import { ConfirmDialog, MarkdownRenderer } from '@shared/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Badge,
   Button,
   Checkbox,
-  ConfirmDialog,
   Input,
-  MarkdownRenderer,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@shared/ui';
-import { useQueryClient } from '@tanstack/react-query';
+} from '@ui/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 

@@ -1,8 +1,6 @@
 {
   "extends": "@config/tsconfig/next.json",
   "compilerOptions": {
-    // 스도쿠 보드 인덱싱(board[r][c])이 424곳이라 한 번에 켤 수 없다. 별도 작업으로 제거할 것.
-    "noUncheckedIndexedAccess": false,
     "paths": {
       "@app/*": ["./src/app/*"],
       "@views/*": ["./src/views/*"],

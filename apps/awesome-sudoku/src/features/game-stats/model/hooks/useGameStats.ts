@@ -1,11 +1,7 @@
-import { LEADERBOARD_RECORD_LIMIT } from '@entities/game-record/model/constants';
-import type { GameRecord } from '@entities/game-record/model/types';
-import { getRecordPoint } from '@entities/game-record/model/utils';
-import { GAME_LEVEL } from '@entities/game/model/constants';
-import type { Difficulty } from '@entities/game/model/types';
-import { userAtom } from '@features/auth/model/atoms';
-import { getUserRecords } from '@features/game-record/model/services';
-import type { DifficultyStats, GameStats } from '@features/game-stats/model/types';
+import { GAME_LEVEL, LEADERBOARD_RECORD_LIMIT } from '@entities/game/model/constants';
+import { getRecordPoint, getUserRecords } from '@entities/game/model/services';
+import type { Difficulty, DifficultyStats, GameRecord, GameStats } from '@entities/game/model/types';
+import { userAtom } from '@entities/session/model/store';
 import { useAtomValue } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 

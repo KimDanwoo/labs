@@ -16,8 +16,8 @@ import {
   SheetTitle,
   SheetTrigger,
   ThemeToggle,
-} from '@shared/ui';
-import { useHeader } from '@widgets/layout/model';
+} from '@ui/react';
+import { useHeader } from '@widgets/layout/model/hooks';
 import {
   Bookmark,
   BookOpen,
@@ -66,12 +66,12 @@ export function Header() {
             const Icon = item.icon;
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
-              <Link key={item.href} href={item.href}>
-                <Button variant={isActive ? 'secondary' : 'ghost'} size="sm" className="gap-2">
+              <Button variant={isActive ? 'secondary' : 'ghost'} size="sm" className="gap-2" asChild key={item.href}>
+                <Link href={item.href}>
                   <Icon className="h-4 w-4" />
                   {item.label}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             );
           })}
         </nav>
@@ -129,12 +129,12 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link href="/auth/login" aria-label="로그인">
-              <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2" asChild>
+              <Link href="/auth/login" aria-label="로그인">
                 <LogIn className="h-4 w-4" aria-hidden="true" />
                 <span className="hidden sm:inline">로그인</span>
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           )}
 
           {/* Mobile menu */}
@@ -151,42 +151,47 @@ export function Header() {
                   const Icon = item.icon;
                   const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                   return (
-                    <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
-                      <Button variant={isActive ? 'secondary' : 'ghost'} className="w-full justify-start gap-3">
+                    <Button
+                      variant={isActive ? 'secondary' : 'ghost'}
+                      className="w-full justify-start gap-3"
+                      asChild
+                      key={item.href}
+                    >
+                      <Link href={item.href} onClick={() => setOpen(false)}>
                         <Icon className="h-4 w-4" />
                         {item.label}
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   );
                 })}
                 {user && (
                   <>
                     <div className="my-2 border-t" />
-                    <Link href="/mypage/progress" onClick={() => setOpen(false)}>
-                      <Button variant="ghost" className="w-full justify-start gap-3">
+                    <Button variant="ghost" className="w-full justify-start gap-3" asChild>
+                      <Link href="/mypage/progress" onClick={() => setOpen(false)}>
                         <User className="h-4 w-4" />
                         학습 현황
-                      </Button>
-                    </Link>
-                    <Link href="/mypage/bookmarks" onClick={() => setOpen(false)}>
-                      <Button variant="ghost" className="w-full justify-start gap-3">
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start gap-3" asChild>
+                      <Link href="/mypage/bookmarks" onClick={() => setOpen(false)}>
                         <Bookmark className="h-4 w-4" />
                         북마크
-                      </Button>
-                    </Link>
-                    <Link href="/mypage/account" onClick={() => setOpen(false)}>
-                      <Button variant="ghost" className="w-full justify-start gap-3">
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start gap-3" asChild>
+                      <Link href="/mypage/account" onClick={() => setOpen(false)}>
                         <Settings className="h-4 w-4" />
                         계정 설정
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                     {isAdminUser && (
-                      <Link href="/admin" onClick={() => setOpen(false)}>
-                        <Button variant="ghost" className="w-full justify-start gap-3">
+                      <Button variant="ghost" className="w-full justify-start gap-3" asChild>
+                        <Link href="/admin" onClick={() => setOpen(false)}>
                           <Shield className="h-4 w-4" />
                           관리자
-                        </Button>
-                      </Link>
+                        </Link>
+                      </Button>
                     )}
                     <div className="my-2 border-t" />
                     <Button

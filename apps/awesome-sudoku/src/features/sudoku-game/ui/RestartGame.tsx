@@ -1,4 +1,4 @@
-import { resetUserInputsAtom, timerActiveAtom } from '@features/sudoku-game/model/atoms';
+import { resetUserInputsAtom, timerActiveAtom } from '@entities/game/model/store';
 import { IconButton } from '@shared/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuRotateCcw } from 'react-icons/lu';

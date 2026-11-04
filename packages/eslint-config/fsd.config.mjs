@@ -1,5 +1,6 @@
 import typescriptParser from '@typescript-eslint/parser';
 import boundaries from 'eslint-plugin-boundaries';
+import architecture from './rules/architecture.mjs';
 
 const FSD_ELEMENTS = [
   { type: 'app', pattern: 'src/app/**' },
@@ -60,40 +61,7 @@ const SEGMENT_DEPTH_PATTERNS = [
 ];
 
 /**
- * 슬라이스 구조 강제.
- * - 슬라이스 루트 index.ts 금지: 통합 배럴이 없어야 세그먼트를 건너뛴 import가 컴파일 단계에서 막힌다.
- * - 슬라이스 루트 파일은 views의 메인 뷰(`*View.tsx`)만 허용하고 나머지는 ui/ · model/로 내린다.
- * app·shared는 슬라이스 구조가 아니라 대상이 아니다.
- */
-const SLICE_LAYERS = ['views', 'widgets', 'features', 'entities'];
-
-const sliceStructure = {
-  meta: { type: 'problem', schema: [] },
-  create(context) {
-    return {
-      Program(node) {
-        const parts = context.filename.split('/');
-        const layerIndex = parts.findIndex((part, i) => parts[i - 1] === 'src' && SLICE_LAYERS.includes(part));
-        if (layerIndex === -1) return;
-
-        const belowSlice = parts.slice(layerIndex + 2);
-        if (belowSlice.length !== 1) return;
-
-        const [name] = belowSlice;
-        if (name === 'index.ts') {
-          context.report({ node, message: '슬라이스 루트 통합 배럴은 만들지 않는다. ui/index.ts · model/<세그먼트>/index.ts로 나눌 것.' });
-          return;
-        }
-        if (parts[layerIndex] !== 'views' || !/View\.tsx$/.test(name)) {
-          context.report({ node, message: '슬라이스 루트에는 views의 메인 뷰(*View.tsx)만 둔다. 나머지는 ui/ 또는 model/로 옮길 것.' });
-        }
-      },
-    };
-  },
-};
-
-/**
- * FSD 레이어 경계 강제(eslint-plugin-boundaries v6).
+ * FSD 레이어 경계 강제(eslint-plugin-boundaries v7).
  * app → views → widgets → features → entities → shared (상위는 하위만 import 가능).
  * node_modules/워크스페이스 패키지(@ui/react 등)는 element가 아니므로 이 규칙의 대상이 아니다.
  */
@@ -104,7 +72,7 @@ const eslintConfig = [
       parser: typescriptParser,
       parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
     },
-    plugins: { boundaries, fsd: { rules: { 'slice-structure': sliceStructure } } },
+    plugins: { boundaries, fsd: architecture },
     settings: {
       'boundaries/elements': FSD_ELEMENTS,
       'boundaries/include': ['src/**/*.*'],
@@ -115,6 +83,11 @@ const eslintConfig = [
     rules: {
       'boundaries/dependencies': ['error', { default: 'disallow', policies: DEPENDENCY_POLICIES }],
       'fsd/slice-structure': 'error',
+      'fsd/independent-slices': 'error',
+      'fsd/component-file': 'error',
+      'fsd/routing-location': 'error',
+      'fsd/entity-state': 'error',
+      'fsd/interactive-composition': 'error',
       'no-restricted-imports': ['error', { patterns: SEGMENT_DEPTH_PATTERNS }],
     },
   },

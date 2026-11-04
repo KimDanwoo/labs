@@ -6,8 +6,14 @@ import { currentIndexAtom, frameState, isPlayingAtom, repeatModeAtom, shuffleAto
 import { useFrame } from '@shared/lib/frame';
 import { useAtom, useAtomValue } from 'jotai';
 import { useRef } from 'react';
-import { NextIcon, PauseIcon, PlayIcon, PrevIcon, RepeatIcon, RepeatOneIcon, ShuffleIcon } from './Icons';
+import { NextIcon } from './NextIcon';
+import { PauseIcon } from './PauseIcon';
+import { PlayIcon } from './PlayIcon';
+import { PrevIcon } from './PrevIcon';
+import { RepeatIcon } from './RepeatIcon';
+import { RepeatOneIcon } from './RepeatOneIcon';
 import { Scrubber } from './Scrubber';
+import { ShuffleIcon } from './ShuffleIcon';
 
 // 켜짐 표시를 hover/focus가 덮지 않게 변형을 겹쳐 특정도를 올린다.
 // (hover:text-paper 와 aria-[pressed=true]:text-brass 는 특정도가 같아 순서에 좌우된다 —

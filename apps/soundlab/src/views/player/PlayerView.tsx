@@ -1,14 +1,9 @@
 'use client';
 
+import { PlaybackProvider } from '@entities/track/ui';
+
 import { PLAYER_SCREEN, TRACKS, type PlayerScreen } from '@entities/track/model/constants';
-import {
-  PlaybackProvider,
-  useKeyboard,
-  useMediaSession,
-  usePlayback,
-  useTrackUrl,
-  useWaveform,
-} from '@entities/track/model/hooks';
+import { useKeyboard, useMediaSession, usePlayback, useTrackUrl, useWaveform } from '@entities/track/model/hooks';
 import { currentIndexAtom, engineModeAtom, isPlayingAtom, playerScreenAtom } from '@entities/track/model/store';
 import { Playlist, QueueToggle } from '@widgets/playlist/ui';
 import { Stage } from '@widgets/stage/ui';

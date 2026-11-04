@@ -9,6 +9,7 @@ export default defineConfig({
   timeout: 60_000,
   // Parallel WebGL pages starve each other in headless Chrome and never finish loading.
   workers: 1,
+  maxFailures: 1,
   use: { baseURL: `http://127.0.0.1:${PORT}`, channel: 'chrome', viewport: { width: 1280, height: 800 } },
   webServer: {
     command: `node e2e/serve.mjs out ${PORT}`,

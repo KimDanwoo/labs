@@ -1,17 +1,12 @@
 'use client';
 
-import { getCurrentStreak } from '@entities/progress/api';
-import { getAllCategories, getAllQuestions, getQuestionsByCategorySlug } from '@entities/question/api';
-import {
-  type Category,
-  type Difficulty,
-  DIFFICULTY_CONFIG,
-  DIFFICULTY_VALUES,
-  type Question,
-} from '@entities/question/model';
+import { getCurrentStreak } from '@entities/progress/model/services';
+import { DIFFICULTY_CONFIG, DIFFICULTY_VALUES } from '@entities/question/model/constants';
+import { getAllCategories, getAllQuestions, getQuestionsByCategorySlug } from '@entities/question/model/services';
+import type { Category, Difficulty, Question } from '@entities/question/model/types';
 import { shuffleArray } from '@shared/lib/shuffle';
-import { Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui';
-import { useCardStudySession } from '@views/learn/model';
+import { Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/react';
+import { useCardStudySession } from '@views/learn/model/hooks';
 import { ArrowDownAZ, Flame, Shuffle, Trophy, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
@@ -33,6 +28,7 @@ export function LearnPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [streak, setStreak] = useState(0);
   const [isEmpty, setIsEmpty] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const onComplete = useCallback(() => {
     setStreak(getCurrentStreak());
@@ -58,43 +54,57 @@ export function LearnPage() {
   } = useCardStudySession({ questions, phase, onComplete });
 
   useEffect(() => {
+    let cancelled = false;
     getAllCategories()
-      .then(setCategories)
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
+      .then((data) => {
+        if (!cancelled) setCategories(data);
+      })
+      .catch((cause: unknown) => {
+        if (!cancelled) setError(new Error('학습 카테고리를 불러오지 못했습니다.', { cause }));
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const startStudy = async () => {
     setPhase('loading');
     setIsEmpty(false);
 
-    let loaded =
-      selectedCategory === 'all' ? await getAllQuestions() : await getQuestionsByCategorySlug(selectedCategory);
+    try {
+      let loaded =
+        selectedCategory === 'all' ? await getAllQuestions() : await getQuestionsByCategorySlug(selectedCategory);
 
-    if (difficulties.length > 0) {
-      loaded = loaded.filter((q) => difficulties.includes(q.difficulty));
+      if (difficulties.length > 0) {
+        loaded = loaded.filter((q) => difficulties.includes(q.difficulty));
+      }
+
+      if (loaded.length === 0) {
+        setIsEmpty(true);
+        setPhase('setup');
+        return;
+      }
+
+      if (order === STUDY_ORDER.random) {
+        loaded = shuffleArray(loaded);
+      } else {
+        const categoryOrder = new Map(categories.map((cat) => [cat.id, cat.order_num]));
+        loaded = [...loaded].sort(
+          (a, b) =>
+            (categoryOrder.get(a.category_id) ?? 0) - (categoryOrder.get(b.category_id) ?? 0) ||
+            a.order_num - b.order_num,
+        );
+      }
+
+      setQuestions(loaded);
+      resetStudy();
+      setPhase('study');
+    } catch (cause) {
+      setError(new Error('학습 문제를 불러오지 못했습니다.', { cause }));
     }
-
-    if (loaded.length === 0) {
-      setIsEmpty(true);
-      setPhase('setup');
-      return;
-    }
-
-    if (order === STUDY_ORDER.random) {
-      loaded = shuffleArray(loaded);
-    } else {
-      const categoryOrder = new Map(categories.map((cat) => [cat.id, cat.order_num]));
-      loaded = [...loaded].sort(
-        (a, b) =>
-          (categoryOrder.get(a.category_id) ?? 0) - (categoryOrder.get(b.category_id) ?? 0) ||
-          a.order_num - b.order_num,
-      );
-    }
-
-    setQuestions(loaded);
-    resetStudy();
-    setPhase('study');
   };
 
   const toggleDifficulty = (value: Difficulty) => {
@@ -105,6 +115,8 @@ export function LearnPage() {
     setQuestions([]);
     setPhase('setup');
   };
+
+  if (error) throw error;
 
   // ==================== SETUP ====================
   if (phase === 'setup' || phase === 'loading') {
@@ -223,11 +235,9 @@ export function LearnPage() {
             <Button onClick={backToSetup} variant="outline" className="gap-2 shadow-sm">
               다시 학습하기
             </Button>
-            <Link href="/mypage/progress">
-              <Button variant="ghost" className="gap-2">
-                학습 현황 보기
-              </Button>
-            </Link>
+            <Button variant="ghost" className="gap-2" asChild>
+              <Link href="/mypage/progress">학습 현황 보기</Link>
+            </Button>
           </div>
         </div>
       </div>

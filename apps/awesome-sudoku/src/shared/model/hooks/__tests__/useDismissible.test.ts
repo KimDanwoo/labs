@@ -1,6 +1,6 @@
-import { useDismissible } from '@shared/model/hooks';
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { useDismissible } from '../useDismissible';
 
 describe('useDismissible', () => {
   it('조건이 참이면 열리고, 사용자가 닫으면 그 회차에는 다시 안 열린다', () => {

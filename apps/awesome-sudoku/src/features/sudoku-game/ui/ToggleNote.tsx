@@ -1,4 +1,4 @@
-import { isNoteModeAtom, timerActiveAtom, toggleNoteModeAtom } from '@features/sudoku-game/model/atoms';
+import { isNoteModeAtom, timerActiveAtom, toggleNoteModeAtom } from '@entities/game/model/store';
 import { IconButton } from '@shared/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuPencil } from 'react-icons/lu';

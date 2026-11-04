@@ -26,6 +26,7 @@ import type { Track } from '@entities/track/model/types';
 import { useFrame } from '@shared/lib/frame';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useRef } from 'react';
+import { useVolumeFade } from './useVolumeFade';
 
 /** 위젯 콜백은 undefined를 줄 수 있다. 비유한값이 frameState로 새면 시간 표시가 NaN이 된다. */
 const validDuration = (value: unknown, fallback: number) =>
@@ -46,11 +47,6 @@ const EVENTS = {
   buffer: 'loadProgress',
   error: 'error',
 } as const;
-
-/** 페이드 길이와 스텝. setVolume은 postMessage라 프레임마다 보내지 않는다. */
-const FADE_MS = 220;
-const FADE_STEP_MS = 20;
-const FULL_VOLUME = 100;
 
 /**
  * 위젯 위치 보고의 지터 흡수. 보고값을 그대로 좇으면 시계가 앞뒤로 잔튀고 비트 격자가 같이 튄다.
@@ -126,46 +122,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   // 준비 전에 사용자가 다른 곡을 누르면 그 곡이 이 값을 덮어쓴다 — 사용자의 선택이 이긴다.
   const queued = useRef<number | null>(PLAY_CURRENT);
   const flushQueued = useRef<() => void>(() => {});
-  // 위젯은 볼륨 램프를 안 해준다. 안 감싸면 재생이 툭 시작하고 정지가 툭 끊긴다.
-  const volume = useRef(FULL_VOLUME);
-  const fade = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  /** 현재 볼륨에서 target까지 민다. 진행 중인 페이드는 지금 값에서 이어받아 튀지 않는다. */
-  const rampTo = useCallback((instance: ScWidget, target: number, done?: () => void) => {
-    if (fade.current !== null) clearInterval(fade.current);
-    const from = volume.current;
-    if (from === target) {
-      done?.();
-      return;
-    }
-    const started = performance.now();
-    const handle = setInterval(() => {
-      const ratio = Math.min(1, (performance.now() - started) / FADE_MS);
-      volume.current = from + (target - from) * ratio;
-      instance.setVolume(volume.current);
-      if (ratio < 1) return;
-      clearInterval(handle);
-      if (fade.current === handle) fade.current = null;
-      done?.();
-    }, FADE_STEP_MS);
-    fade.current = handle;
-  }, []);
-
-  const playFaded = useCallback(
-    (instance: ScWidget) => {
-      instance.play();
-      rampTo(instance, FULL_VOLUME);
-    },
-    [rampTo],
-  );
-
-  const pauseFaded = useCallback(
-    (instance: ScWidget) => {
-      // 볼륨은 0으로 남긴다. 다음 재생은 play 이벤트가 다시 올려준다.
-      rampTo(instance, 0, () => instance.pause());
-    },
-    [rampTo],
-  );
+  const { playFaded, pauseFaded, restoreVolume, silence, stopFade } = useVolumeFade();
 
   useEffect(() => {
     playing.current = isPlaying;
@@ -212,9 +169,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     resume.current = point;
     frameState.durationMs = track.durationMs;
     reported.current = { ms: point.ms, at: performance.now(), live: false };
-    // 진입 시 한 번만. tracks·setIndex는 앱 수명 동안 안 바뀐다.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialTrackId, setIndex, tracks]);
 
   useEffect(() => {
     let disposed = false;
@@ -241,10 +196,12 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         widget.current = instance;
 
         instance.bind(EVENTS.ready, () => {
+          if (disposed) return;
           clearTimeout(readyTimer);
           setEngineError(null);
           // 세트 URL이 실제로 먹혔는지 런타임에 확인한다. 곡 수는 위젯이 정하므로 일치를 요구하지 않는다.
           instance.getSounds((sounds) => {
+            if (disposed) return;
             soundIds.current = readSoundIds(sounds);
             holdsSet.current = soundIds.current.length > 1;
             setEngineMode(holdsSet.current ? 'set' : 'single');
@@ -253,6 +210,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
             flushQueued.current();
           });
           instance.getDuration((ms) => {
+            if (disposed) return;
             frameState.durationMs = validDuration(ms, frameState.durationMs);
           });
           setIsReady(true);
@@ -277,7 +235,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
             anchor(at);
           }
           // 어느 경로로 시작했든(토글·곡 전환·위젯 자체 전환) 여기서 볼륨을 되올린다.
-          rampTo(instance, FULL_VOLUME);
+          restoreVolume(instance);
           setIsPlaying(true);
           // 소리가 났다 = 엔진은 살아 있다. 이전 곡의 에러 배너가 남지 않게 지운다.
           setEngineError(null);
@@ -292,6 +250,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
               setIndex(next);
             });
             instance.getDuration((ms) => {
+              if (disposed) return;
               frameState.durationMs = validDuration(ms, frameState.durationMs);
             });
           }
@@ -309,7 +268,12 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         };
         instance.bind(EVENTS.progress, (payload) => {
           readBuffered(payload.loadedProgress);
-          if (typeof payload.currentPosition !== 'number') return;
+          if (
+            typeof payload.currentPosition !== 'number' ||
+            !Number.isFinite(payload.currentPosition) ||
+            payload.currentPosition < 0
+          )
+            return;
           reported.current = { ms: payload.currentPosition, at: performance.now(), live: true };
           if (performance.now() - savedAt.current >= SAVE_INTERVAL_MS) remember(payload.currentPosition);
         });
@@ -323,96 +287,100 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         });
       })
       .catch((error: Error) => {
+        if (disposed) return;
         clearTimeout(readyTimer);
         setEngineError(error.message);
       });
 
     return () => {
       disposed = true;
+      const owned = widget.current;
       widget.current = null;
+      ready.current = false;
+      for (const event of Object.values(EVENTS)) owned?.unbind(event);
+      setIsReady(false);
+      setIsPlaying(false);
       clearTimeout(readyTimer);
-      if (fade.current !== null) clearInterval(fade.current);
+      stopFade();
       frame.remove();
     };
-    // 엔진은 한 번만 만든다. 곡 교체는 widget.load로 처리한다.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [remember, restoreVolume, setEngineError, setEngineMode, setIndex, setIsPlaying, setIsReady, stopFade, tracks]);
 
-  const goTo = useCallback((next: number, track: Track) => {
-    const instance = widget.current;
-    if (!instance || !ready.current) {
-      queued.current = next;
-      return;
-    }
-    const seq = ++goSeq.current;
-    const stale = () => goSeq.current !== seq;
-    reported.current = { ms: 0, at: performance.now(), live: false };
-    // 고른 곡은 처음부터다 — 이어 들을 자리가 그 곡의 것일 때만 남긴다.
-    shouldRewind.current = true;
-    if (resume.current?.index !== next) resume.current = null;
-    heldIndex.current = next;
-    frameState.position = 0;
-    frameState.buffered = 0;
-    frameState.durationMs = track.durationMs;
-    // 새 곡은 무음에서 올라온다. play 이벤트가 볼륨을 되올린다.
-    volume.current = 0;
-    instance.setVolume(0);
+  const goTo = useCallback(
+    (next: number, track: Track) => {
+      const instance = widget.current;
+      if (!instance || !ready.current) {
+        queued.current = next;
+        return;
+      }
+      const seq = ++goSeq.current;
+      const stale = () => goSeq.current !== seq || widget.current !== instance || !ready.current;
+      reported.current = { ms: 0, at: performance.now(), live: false };
+      // 고른 곡은 처음부터다 — 이어 들을 자리가 그 곡의 것일 때만 남긴다.
+      shouldRewind.current = true;
+      if (resume.current?.index !== next) resume.current = null;
+      heldIndex.current = next;
+      frameState.position = 0;
+      frameState.buffered = 0;
+      frameState.durationMs = track.durationMs;
+      // 새 곡은 무음에서 올라온다. play 이벤트가 볼륨을 되올린다.
+      silence(instance);
 
-    const readDuration = () =>
-      instance.getDuration((ms) => {
-        if (stale()) return;
-        frameState.durationMs = validDuration(ms, track.durationMs);
-      });
-
-    // 목록은 ready 시점의 것이 끝이 아니다 — 위젯이 프로필 곡을 나눠 싣는다(실측 20개 → 25개).
-    // 전환할 때마다 다시 읽어야 위치가 맞는다. 우리 목록에 없는 사운드(최근 업로드)가 섞여 있어도 마찬가지다.
-    instance.getSounds((sounds) => {
-      if (stale()) return;
-      soundIds.current = readSoundIds(sounds);
-      // 위젯 안의 위치로 변환한다. TRACKS 인덱스를 그대로 넘기면 다른 곡이 걸린다.
-      const soundIndex = soundIds.current.indexOf(track.id);
-
-      if (soundIndex >= 0 && holdsSet.current) {
-        // 이미 재생 중인 플레이어 안에서 옮겨간다 — 새 재생을 시작하지 않는 게 핵심이다.
-        // 단, 위젯이 이미 그 사운드를 들고 있으면 skip은 아무 일도 하지 않는다(멈춰 있으면 계속 멈춘 채다).
-        // 곡을 고른 건 듣겠다는 뜻이므로 그때는 play로 깨운다.
-        instance.getCurrentSoundIndex((current) => {
+      const readDuration = () =>
+        instance.getDuration((ms) => {
           if (stale()) return;
-          if (current === soundIndex) instance.play();
-          else instance.skip(soundIndex);
+          frameState.durationMs = validDuration(ms, track.durationMs);
         });
-        return;
-      }
 
-      // 세트 밖 곡을 틀면 위젯이 세트를 잃는다.
-      // 다시 세트 안 곡으로 돌아올 땐 세트를 복구해야 skip과 백그라운드 전환이 살아난다.
-      const target = soundIndex >= 0 ? setUrl(tracks) : null;
-      if (target) {
-        instance.load(target, {
-          auto_play: true,
-          callback: () => {
+      // 목록은 ready 시점의 것이 끝이 아니다 — 위젯이 프로필 곡을 나눠 싣는다(실측 20개 → 25개).
+      // 전환할 때마다 다시 읽어야 위치가 맞는다. 우리 목록에 없는 사운드(최근 업로드)가 섞여 있어도 마찬가지다.
+      instance.getSounds((sounds) => {
+        if (stale()) return;
+        soundIds.current = readSoundIds(sounds);
+        // 위젯 안의 위치로 변환한다. TRACKS 인덱스를 그대로 넘기면 다른 곡이 걸린다.
+        const soundIndex = soundIds.current.indexOf(track.id);
+
+        if (soundIndex >= 0 && holdsSet.current) {
+          // 이미 재생 중인 플레이어 안에서 옮겨간다 — 새 재생을 시작하지 않는 게 핵심이다.
+          // 단, 위젯이 이미 그 사운드를 들고 있으면 skip은 아무 일도 하지 않는다(멈춰 있으면 계속 멈춘 채다).
+          // 곡을 고른 건 듣겠다는 뜻이므로 그때는 play로 깨운다.
+          instance.getCurrentSoundIndex((current) => {
             if (stale()) return;
-            holdsSet.current = true;
-            setEngineMode('set');
-            instance.skip(soundIndex);
-            readDuration();
-          },
-        });
-        return;
-      }
+            if (current === soundIndex) instance.play();
+            else instance.skip(soundIndex);
+          });
+          return;
+        }
 
-      holdsSet.current = false;
-      setEngineMode('single');
-      instance.load(trackUrl(track), {
-        auto_play: true,
-        show_artwork: false,
-        show_comments: false,
-        callback: readDuration,
+        // 세트 밖 곡을 틀면 위젯이 세트를 잃는다.
+        // 다시 세트 안 곡으로 돌아올 땐 세트를 복구해야 skip과 백그라운드 전환이 살아난다.
+        const target = soundIndex >= 0 ? setUrl(tracks) : null;
+        if (target) {
+          instance.load(target, {
+            auto_play: true,
+            callback: () => {
+              if (stale()) return;
+              holdsSet.current = true;
+              setEngineMode('set');
+              instance.skip(soundIndex);
+              readDuration();
+            },
+          });
+          return;
+        }
+
+        holdsSet.current = false;
+        setEngineMode('single');
+        instance.load(trackUrl(track), {
+          auto_play: true,
+          show_artwork: false,
+          show_comments: false,
+          callback: readDuration,
+        });
       });
-    });
-    // tracks·setEngineMode는 앱 수명 동안 안 바뀐다. 엔진과 함께 한 번만 만든다.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    },
+    [setEngineMode, silence, tracks],
+  );
 
   /** 재개. 위젯이 지금 곡을 안 들고 있으면 그 곡을 걸고 처음부터 시작한다. */
   const start = useCallback(
@@ -514,6 +482,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   }, [index, repeatMode, shuffle, step, tracks]);
 
   const seek = useCallback((ratio: number) => {
+    if (!Number.isFinite(ratio)) return;
     const clamped = Math.min(1, Math.max(0, ratio));
     const ms = clamped * frameState.durationMs;
     // 스크럽은 즉시 반응해야 하므로 live로 둔다. 실제 위치와의 오차는 다음 보고가 잡는다.

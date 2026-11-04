@@ -1,16 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
-import { readFileSync } from 'fs';
+import { createSeedClient } from './lib/seedClient.mjs';
 
-// .env.local 로드
-const envContent = readFileSync('.env.local', 'utf-8');
-for (const line of envContent.split('\n')) {
-  const t = line.trim();
-  if (!t || t.startsWith('#')) continue;
-  const i = t.indexOf('=');
-  if (i > 0) process.env[t.slice(0, i)] = t.slice(i + 1);
-}
-
-const sbAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const sbAdmin = createSeedClient();
 
 // ============================================================
 // 1. 카테고리 생성 (유비쿼터스)

@@ -7,12 +7,12 @@ import {
   grassLodForRing,
   grassViewRadius,
   GUST,
-  makeBladeGeometry,
   type GrassQuality,
 } from '@entities/grass/model/constants';
 import { useFrame } from '@react-three/fiber';
 import { FOG, SCENE_COLORS } from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
+import { makeBladeGeometry } from '@shared/lib/makeBladeGeometry';
 import { runnerState } from '@shared/r3f';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Color, DoubleSide, ShaderMaterial, Vector2, type BufferGeometry } from 'three';

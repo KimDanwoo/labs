@@ -1,1 +1,1 @@
-export { makeCloudTexture } from './makeCloudTexture';
+export * from './makeCloudTexture';

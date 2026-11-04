@@ -10,25 +10,27 @@ export function useVillageDay(isPaused: boolean) {
     if (isPaused) return undefined;
     let timer: ReturnType<typeof setTimeout>;
     let deadline = 0;
+    let scheduled: { weather: Weather; remaining: number };
     const schedule = () => {
       const current = villageDayStore.get();
       const pending = countdown.current;
       const delay =
         pending?.weather === current.weather ? pending.remaining : weatherDelay(current.weather, Math.random());
-      countdown.current = { weather: current.weather, remaining: delay };
+      scheduled = { weather: current.weather, remaining: delay };
+      countdown.current = scheduled;
       deadline = Date.now() + delay;
       timer = setTimeout(() => {
         const latest = villageDayStore.get();
         const weather = latest.weather === WEATHER.rain ? WEATHER.clear : weatherAfterRest(Math.random());
         countdown.current = { weather, remaining: weatherDelay(weather, Math.random()) };
-        villageDayStore.set({ ...latest, weather });
-        schedule();
+        if (weather === latest.weather) schedule();
+        else villageDayStore.set({ ...latest, weather });
       }, delay);
     };
     schedule();
     return () => {
       clearTimeout(timer);
-      if (countdown.current) countdown.current.remaining = Math.max(0, deadline - Date.now());
+      if (countdown.current === scheduled) scheduled.remaining = Math.max(0, deadline - Date.now());
     };
   }, [isPaused, today.weather]);
   function wakeUp() {

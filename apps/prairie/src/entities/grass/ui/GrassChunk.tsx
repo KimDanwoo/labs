@@ -100,3 +100,5 @@ export const GrassChunk = memo(function GrassChunk({
 
   return <instancedMesh ref={meshRef} args={[chunkGeometry, material, bladesPerChunk]} />;
 });
+
+GrassChunk.displayName = 'GrassChunk';

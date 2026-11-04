@@ -1,6 +1,6 @@
 'use client';
 
-import { useAiFeedback } from '@views/study/model';
+import { useAiFeedback } from '@views/study/model/hooks';
 import { Loader2, Sparkles } from 'lucide-react';
 
 interface AiFeedbackProps {

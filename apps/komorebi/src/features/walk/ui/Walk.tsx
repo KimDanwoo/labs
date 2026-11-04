@@ -26,7 +26,7 @@ import {
   WORLDS,
   type Landmark,
 } from '@shared/world/world';
-import { useRef, useState, useSyncExternalStore } from 'react';
+import { useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { BottomBar } from './BottomBar';
 import { CompanionPanel } from './CompanionPanel';
@@ -47,7 +47,7 @@ const FIRST_LOOK = {
   night: '밤의 풍경 바라보기',
 } satisfies Record<TimeOfDay, string>;
 
-export function Walk() {
+export function Walk({ children }: { children?: ReactNode }) {
   const landscapeRef = useRef<HTMLDivElement>(null);
   const [isSprinting, setIsSprinting] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(DIALOG.none);
@@ -249,7 +249,7 @@ export function Walk() {
         onToggleSprint={() => setIsSprinting((value) => !value)}
       />
 
-      <div className={`toast ${toast.message ? 'visible' : ''}`} role="status">
+      <div className={`toast ${toast.message ? 'visible' : ''}`} role="status" aria-label="산책 알림">
         {toast.message}
       </div>
       {!isReady && <LoadingOverlay error={error} />}
@@ -289,6 +289,7 @@ export function Walk() {
         onChange={changeAppearance}
         onClose={() => closeDialog(DIALOG.wardrobe)}
       />
+      {children}
     </main>
   );
 }

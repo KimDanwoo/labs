@@ -1,5 +1,5 @@
-import type { CellProps } from '@entities/board/model/types';
-import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom } from '@features/sudoku-game/model/atoms';
+import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom } from '@entities/game/model/store';
+import type { CellProps } from '@entities/game/model/types';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { useCellAccessibility } from './useCellAccessibility';

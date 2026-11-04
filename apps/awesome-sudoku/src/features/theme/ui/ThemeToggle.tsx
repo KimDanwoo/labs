@@ -1,6 +1,6 @@
 'use client';
 
-import { resolvedThemeAtom, setThemeAtom } from '@features/theme/model/atoms';
+import { resolvedThemeAtom, setThemeAtom } from '@entities/theme/model/store';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback } from 'react';

@@ -1,17 +1,9 @@
 'use client';
 
 import { DifficultyBadge } from '@entities/question/ui';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  Badge,
-  Card,
-  Input,
-  MarkdownRenderer,
-} from '@shared/ui';
-import { useSearch } from '@views/search/model';
+import { MarkdownRenderer } from '@shared/ui';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card, Input } from '@ui/react';
+import { useSearch } from '@views/search/model/hooks';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 

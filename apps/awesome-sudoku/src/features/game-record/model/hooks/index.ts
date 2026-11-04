@@ -1,1 +1,1 @@
-export { useSaveGameRecord } from './useSaveGameRecord';
+export * from './useSaveGameRecord';

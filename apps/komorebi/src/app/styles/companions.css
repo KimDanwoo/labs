@@ -1,0 +1,62 @@
+.companion-choices {
+  margin-block: 0.6rem;
+  padding: 0.65rem;
+  border-radius: 0.7rem;
+  background: rgb(var(--lichen) / 0.45);
+}
+.companion-choices small {
+  display: block;
+  font-size: 0.72rem;
+}
+.companion-choices p:empty {
+  display: none;
+}
+.companion-choices p {
+  font-size: 0.8rem;
+}
+.companion-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.companion-buttons button,
+.companion-panel .fishing-entry button {
+  min-height: 2.5rem;
+  border: 1px solid rgb(var(--moss) / 0.25);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: rgb(var(--paper));
+  color: rgb(var(--ink));
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.companion-buttons button:disabled,
+.companion-panel button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.companion-fish-list {
+  max-height: 12rem;
+  overflow-y: auto;
+}
+.companion-panel .fishing-entry {
+  gap: 0.6rem;
+}
+.companion-panel .fishing-entry span {
+  font-size: 0.8rem;
+}
+.companion-panel .pier-journal {
+  max-height: 14rem;
+  overflow-y: auto;
+}
+.pier-fishing-hud {
+  max-height: calc(100dvh - 6rem);
+  overflow-y: auto;
+}
+.companion-buttons button:focus-visible,
+.companion-panel button:focus-visible {
+  outline: 2px solid rgb(var(--moss));
+  outline-offset: 3px;
+}

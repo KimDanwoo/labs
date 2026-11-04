@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Painterly summer palette as RGB channels: rgb(var(--name) / alpha). */
+  --cream: 255 249 227;
+  --paper: 250 247 233;
+  --mist: 232 236 217;
+  --lichen: 220 229 198;
+  --butter: 242 217 138;
+  --peach: 242 200 150;
+  --sky: 169 208 212;
+  --stone: 183 182 187;
+  --sage: 168 175 147;
+  --fern: 135 154 109;
+  --reed: 138 145 119;
+  --amber: 192 138 66;
+  --rust: 184 109 67;
+  --moss: 116 130 107;
+  --leaf: 109 135 90;
+  --forest: 85 107 78;
+  --pine: 63 86 52;
+  --ink: 52 74 59;
+  --deep: 28 58 50;
+  --sun: 233 155 78;
+  --twilight: 43 53 82;
+  --night: 14 47 58;
+  --ochre: 163 136 75;
+  --honey: 251 239 184;
+  --blush: 231 199 174;
+  --grass: 75 102 53;
+  --muted: rgb(var(--moss));
+  --line: rgb(var(--forest) / 0.18);
+  --serif: 'Gowun Batang', Georgia, serif;
+  --sans: 'Noto Sans KR', Arial, sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  font-family: var(--sans);
+  color: rgb(var(--ink));
+  background: rgb(var(--lichen));
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgb(var(--rust));
+  outline-offset: 5px;
+}
+button {
+  border: 0;
+}
+button svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button:hover {
+  filter: brightness(0.95);
+}

@@ -1,17 +1,8 @@
 'use client';
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  Button,
-  Card,
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  VoiceSetting,
-} from '@shared/ui';
-import { useAccount } from '@views/my-page/model';
+import { VoiceSetting } from '@shared/ui';
+import { Avatar, AvatarFallback, AvatarImage, Button, Card, Sheet, SheetContent, SheetTitle } from '@ui/react';
+import { useAccount } from '@views/my-page/model/hooks';
 import { Mail, User, Volume2 } from 'lucide-react';
 
 export function AccountPage() {

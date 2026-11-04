@@ -1,4 +1,4 @@
-import type { Difficulty } from '@entities/question/model';
+import type { Difficulty } from '@entities/question/model/types';
 import { CheckCircle } from 'lucide-react';
 import { DifficultyBadge } from './DifficultyBadge';
 

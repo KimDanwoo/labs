@@ -1,11 +1,11 @@
+import { formatTime } from '@entities/game/model/services';
 import {
   currentTimeAtom,
   incrementTimerAtom,
   isCompletedAtom,
   timerActiveAtom,
   toggleTimerAtom,
-} from '@features/sudoku-game/model/atoms';
-import { formatTime } from '@features/sudoku-game/model/utils';
+} from '@entities/game/model/store';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';

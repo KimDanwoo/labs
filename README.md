@@ -18,16 +18,16 @@
 
 ## 앱 카탈로그
 
-| 앱                  | 설명                                                     | 주요 스택                            | 라이브                                           |
-| ------------------- | -------------------------------------------------------- | ------------------------------------ | ------------------------------------------------ |
-| **hub**             | 프로젝트 갤러리 허브                                     | Next.js, Tailwind CSS                | [lab.danwoo.dev](https://lab.danwoo.dev)         |
-| **cheongyeon-saju** | 사주팔자 계산·해석                                       | Next.js                              | [saju.danwoo.dev](https://saju.danwoo.dev)       |
-| **soundlab**        | 내 노래를 듣는 플레이어 + WebGL 픽셀 파티클 비주얼라이저 | Next.js, WebGL, Jotai                | [sound.danwoo.dev](https://sound.danwoo.dev)     |
-| **fe-deep**         | 프론트엔드 학습 플랫폼                                   | Next.js, Supabase                    | [fe-deep.danwoo.dev](https://fe-deep.danwoo.dev) |
-| **awesome-sudoku**  | 온라인 스도쿠 게임                                       | Next.js, Firebase                    | [sudoku.danwoo.dev](https://sudoku.danwoo.dev)   |
-| **dansoon**         | AI 기술 뉴스·베스트셀러 리포트 블로그                    | Astro                                | [log.danwoo.dev](https://log.danwoo.dev)         |
-| **prairie**         | 인터랙티브 3D 초원 달리기 씬                             | Next.js, React Three Fiber, three.js | [prairie.danwoo.dev](https://prairie.danwoo.dev) |
-
+| 앱                 | 설명                                                     | 주요 스택                            | 라이브                                           |
+| ------------------ | -------------------------------------------------------- | ------------------------------------ | ------------------------------------------------ |
+| **hub**            | 프로젝트 갤러리 허브                                     | Next.js, Tailwind CSS                | [lab.danwoo.dev](https://lab.danwoo.dev)         |
+| **soundlab**       | 내 노래를 듣는 플레이어 + WebGL 픽셀 파티클 비주얼라이저 | Next.js, WebGL, Jotai                | [sound.danwoo.dev](https://sound.danwoo.dev)     |
+| **fe-deep**        | 프론트엔드 학습 플랫폼                                   | Next.js, Supabase                    | [fe-deep.danwoo.dev](https://fe-deep.danwoo.dev) |
+| **awesome-sudoku** | 온라인 스도쿠 게임                                       | Next.js, Firebase                    | [sudoku.danwoo.dev](https://sudoku.danwoo.dev)   |
+| **dansoon**        | AI 기술 뉴스·베스트셀러 리포트 블로그                    | Astro                                | [log.danwoo.dev](https://log.danwoo.dev)         |
+| **prairie**        | 인터랙티브 3D 초원 달리기 씬                             | Next.js, React Three Fiber, three.js | [prairie.danwoo.dev](https://prairie.danwoo.dev) |
+| **komorebi**       | 픽셀 아트 산책·낚시 게임                                 | Next.js, Canvas                      | —                                                |
+| **design**         | 공유 디자인 시스템 미리보기                              | Next.js, @ui/react                   | —                                                |
 
 ---
 
@@ -62,14 +62,19 @@ pnpm dev        # 모든 앱 개발 서버 동시 실행
 
 ## 스크립트
 
-| 명령                  | 동작                                                       |
-| --------------------- | ---------------------------------------------------------- |
-| `pnpm dev`            | 모든 앱 개발 서버 실행 (`turbo run dev`)                   |
-| `pnpm build`          | 전체 빌드                                                  |
-| `pnpm lint`           | 전체 lint                                                  |
-| `pnpm tokens`         | 디자인 토큰 → `packages/tokens/generated/theme.css` 재생성 |
-| `pnpm new-app <name>` | `templates/app`을 복제해 새 앱 스캐폴드 생성               |
-| `pnpm format`         | Prettier 전체 포맷                                         |
+| 명령                      | 동작                                                       |
+| ------------------------- | ---------------------------------------------------------- |
+| `pnpm dev`                | 모든 앱 개발 서버 실행 (`turbo run dev`)                   |
+| `pnpm build`              | 전체 빌드                                                  |
+| `pnpm lint`               | 구조 규칙 검사 + 전체 lint                                 |
+| `pnpm check:architecture` | 전체 워크스페이스·템플릿 구조 검사                         |
+| `pnpm typecheck`          | 전체 TypeScript 검사                                       |
+| `pnpm test`               | 구조 규칙·앱별 회귀 테스트                                 |
+| `pnpm tokens`             | 디자인 토큰 → `packages/tokens/generated/theme.css` 재생성 |
+| `pnpm new-app <name>`     | `templates/app`을 복제해 새 앱 스캐폴드 생성               |
+| `pnpm format`             | Prettier 전체 포맷                                         |
+
+AI 작업 규칙은 [AGENTS.md](AGENTS.md)를 따른다. 브라우저 회귀 검증은 `pnpm --filter fe-deep test:e2e`, `pnpm --filter komorebi test:e2e`로 실행한다. Komorebi는 먼저 `pnpm --filter komorebi build`가 필요하다.
 
 특정 앱만 실행하려면 `--filter`를 쓴다.
 
