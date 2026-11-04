@@ -1,0 +1,430 @@
+/* In-game HUD: just the walk's name and the hour, set lightly on the scene. */
+.tools,
+.bottom-bar,
+.interact {
+  z-index: 17;
+}
+
+.game-header {
+  position: absolute;
+  top: 30px;
+  left: 34px;
+  pointer-events: none;
+  color: rgb(var(--cream));
+  text-shadow:
+    0 0 2px rgb(var(--ink) / 0.5),
+    0 1px 12px rgb(var(--ink) / 0.6);
+}
+/* A soft shade in the corner keeps the words legible without boxing them in. */
+.game-header::before {
+  content: '';
+  position: absolute;
+  inset: -90px -140px -70px -120px;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgb(var(--ink) / 0.32), transparent);
+}
+.game-name {
+  margin: 0;
+  font: 600 17px var(--serif);
+  letter-spacing: 6px;
+}
+.game-time {
+  margin: 10px 0 0;
+  padding-top: 9px;
+  border-top: 1px solid rgb(var(--cream) / 0.6);
+  width: fit-content;
+  font: 12px var(--serif);
+  letter-spacing: 5px;
+}
+.scene-caption {
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font: 700 18px var(--serif);
+  color: rgb(var(--cream));
+  text-shadow: 0 2px 7px rgb(var(--deep));
+  letter-spacing: 2px;
+  pointer-events: none;
+  animation: caption-fade 7s ease forwards;
+  white-space: nowrap;
+}
+.scene-caption span {
+  opacity: 0.6;
+  margin: 0 8px;
+}
+.tools {
+  top: 27px;
+  right: 28px;
+  flex-direction: row;
+  border-radius: 30px;
+  padding: 5px 8px;
+  gap: 3px;
+  background: rgb(var(--cream) / 0.87);
+  border: 2px solid rgb(var(--cream));
+  box-shadow: 2px 3px 0 rgb(var(--pine) / 0.16);
+}
+.tool-divider {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+}
+.bottom-bar {
+  left: 25px;
+  right: 25px;
+  bottom: 23px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+  pointer-events: none;
+  align-items: flex-end;
+}
+.location {
+  padding: 10px 15px;
+  background: rgb(var(--cream) / 0.91);
+  border: 2px solid rgb(var(--cream));
+  border-radius: 4px 13px 5px 14px;
+  box-shadow: 2px 3px 0 rgb(var(--pine) / 0.16);
+  min-width: 0;
+}
+.location strong {
+  font: 700 13px var(--serif);
+}
+.location .small-label {
+  font-size: 8px;
+}
+.location-marker {
+  font-size: 25px;
+  color: rgb(var(--fern));
+}
+.keyboard-help {
+  color: rgb(var(--cream));
+  text-shadow: 0 1px 6px rgb(var(--deep));
+  padding: 7px 14px;
+  background: rgb(var(--ink) / 0.32);
+  border-radius: 9px;
+  backdrop-filter: blur(5px);
+}
+.keyboard-help kbd {
+  background: rgb(var(--paper) / 0.92);
+  color: rgb(var(--forest));
+  text-shadow: none;
+}
+.keyboard-help i {
+  background: rgb(var(--cream) / 0.4);
+}
+.journal-button {
+  pointer-events: auto;
+  background: rgb(var(--cream) / 0.93);
+  border: 2px solid rgb(var(--cream));
+  border-radius: 13px 4px 14px 5px;
+  box-shadow: 2px 3px 0 rgb(var(--pine) / 0.16);
+  padding: 14px 18px;
+  transform: rotate(1deg);
+  font-family: var(--serif);
+  font-size: 13px;
+}
+.journal-button b {
+  font-size: 12px;
+}
+.journal-dots {
+  display: flex;
+}
+.interact {
+  bottom: 108px;
+}
+.toast {
+  top: 110px;
+}
+.vignette {
+  background: linear-gradient(0deg, rgb(var(--deep) / 0.17), transparent 13%, transparent);
+}
+@keyframes caption-fade {
+  0% {
+    opacity: 0;
+    translate: 0 6px;
+  }
+  15%,
+  65% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (max-width: 1000px) {
+  .scene-caption {
+    font-size: 14px;
+    top: 95px;
+  }
+  .tools {
+    right: 22px;
+    top: 24px;
+  }
+  .game-header {
+    left: 22px;
+    top: 20px;
+  }
+  .keyboard-help {
+    font-size: 9px;
+    gap: 5px;
+  }
+  .journal-dots {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .game-header {
+    left: 16px;
+    top: 18px;
+  }
+  .tools {
+    right: 14px;
+    top: 20px;
+    padding: 5px 4px;
+    gap: 0;
+  }
+  .tools .tool {
+    height: 32px;
+    width: 32px;
+  }
+  .tools .tool-divider {
+    margin: 0 2px;
+    height: 17px;
+  }
+  .scene-caption {
+    top: 115px;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+  .bottom-bar {
+    left: 14px;
+    right: 14px;
+    bottom: 15px;
+    gap: 8px;
+  }
+  .location {
+    padding: 9px 10px;
+    gap: 6px;
+    max-width: 61%;
+  }
+  .location strong {
+    font-size: 11px;
+  }
+  .location-marker {
+    font-size: 21px;
+  }
+  .journal-button {
+    padding: 13px 10px;
+    font-size: 11px;
+    gap: 6px;
+  }
+  .journal-button b {
+    font-size: 10px;
+    margin-left: 4px;
+  }
+  .journal-button svg {
+    width: 13px;
+  }
+  .interact {
+    bottom: 205px;
+  }
+  .mobile-controls {
+    bottom: 90px;
+  }
+  .toast {
+    top: 110px;
+  }
+}
+@media (max-height: 550px) {
+  .game-header {
+    top: 12px;
+  }
+  .tools {
+    top: 15px;
+  }
+  .scene-caption {
+    top: 28px;
+    font-size: 13px;
+  }
+  .interact {
+    bottom: 85px;
+  }
+  .mobile-controls {
+    bottom: 78px;
+  }
+  .bottom-bar {
+    bottom: 10px;
+  }
+  .location {
+    padding: 6px 10px;
+  }
+  .journal-button {
+    padding: 10px 13px;
+  }
+}
+.action-buttons {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  pointer-events: auto;
+}
+.jump-button {
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgb(var(--cream));
+  border-radius: 50%;
+  background: rgb(var(--butter) / 0.92);
+  box-shadow: 0 3px 0 rgb(var(--ochre) / 0.4);
+  color: rgb(var(--forest));
+  font: 700 12px var(--sans);
+  touch-action: manipulation;
+}
+.jump-button:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* A captured thumbstick allows continuous turns without lifting the finger. */
+.joystick {
+  position: relative;
+  flex: 0 0 128px;
+  width: 128px;
+  height: 128px;
+  border: 2px solid rgb(var(--cream) / 0.8);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(var(--cream) / 0.33), rgb(var(--moss) / 0.31));
+  box-shadow:
+    inset 0 2px 12px rgb(var(--ink) / 0.15),
+    0 4px 20px rgb(var(--ink) / 0.13);
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.joystick-arrows {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 105px;
+  color: rgb(var(--paper) / 0.6);
+  line-height: 1;
+  pointer-events: none;
+}
+.joystick-thumb {
+  position: absolute;
+  left: 38px;
+  top: 38px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgb(var(--cream) / 0.93);
+  border: 2px solid rgb(var(--paper));
+  box-shadow: 0 3px 8px rgb(var(--ink) / 0.25);
+  pointer-events: none;
+}
+.joystick-label {
+  position: absolute;
+  bottom: -22px;
+  width: 100%;
+  text-align: center;
+  font: 700 11px var(--sans);
+  color: rgb(var(--paper));
+  text-shadow: 0 1px 3px rgb(var(--ink));
+  pointer-events: none;
+}
+@media (max-width: 700px), (any-pointer: coarse) {
+  .interact {
+    top: max(150px, calc(env(safe-area-inset-top) + 135px));
+    bottom: auto;
+  }
+  .mobile-controls {
+    display: flex;
+    position: fixed;
+    left: max(18px, env(safe-area-inset-left));
+    right: max(18px, env(safe-area-inset-right));
+    bottom: max(88px, calc(env(safe-area-inset-bottom) + 70px));
+    justify-content: space-between;
+    align-items: flex-end;
+    pointer-events: none;
+    z-index: 30;
+  }
+  .action-buttons {
+    gap: 10px;
+  }
+}
+@media (max-height: 550px) and (any-pointer: coarse) {
+  .interact {
+    top: max(76px, calc(env(safe-area-inset-top) + 60px));
+  }
+  .mobile-controls {
+    bottom: max(52px, calc(env(safe-area-inset-bottom) + 35px));
+  }
+  .joystick {
+    scale: 0.8;
+    transform-origin: bottom left;
+  }
+}
+
+/* The first-visit controls hint leaves on its own after a short look. */
+.keyboard-help {
+  animation: hint-leave 0.4s ease 8s forwards;
+}
+@keyframes hint-leave {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.discovery-guide {
+  flex: 1;
+  min-width: 0;
+}
+.discovery-read {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border: 1px solid rgb(var(--sage));
+  border-radius: 999px;
+  background: transparent;
+  font-size: 9px;
+  color: var(--muted);
+}
+.discovery-read:hover {
+  background: rgb(var(--mist));
+}
+/* One ring per time of day the page was kept: dusk inside, night outside. */
+.stamp.kept-evening {
+  box-shadow: 0 0 0 2px rgb(var(--peach));
+}
+.stamp.kept-night {
+  box-shadow: 0 0 0 4px rgb(var(--twilight) / 0.7);
+}
+.stamp.kept-evening.kept-night {
+  box-shadow:
+    0 0 0 2px rgb(var(--peach)),
+    0 0 0 4px rgb(var(--twilight) / 0.7);
+}
+.memory-time {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* Read by screen readers only: announces the region after each crossing. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

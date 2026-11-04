@@ -3,9 +3,8 @@ import { Walk } from '@features/walk/ui';
 
 export function WalkView() {
   return (
-    <>
-      {' '}
-      <Walk /> <MusicDock />{' '}
-    </>
+    <Walk>
+      <MusicDock />
+    </Walk>
   );
 }
