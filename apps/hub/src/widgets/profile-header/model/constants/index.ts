@@ -1,1 +1,1 @@
-export { PROFILE_PARAGRAPHS } from './profileContent';
+export * from './profileContent';
