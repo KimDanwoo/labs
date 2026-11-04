@@ -1,5 +1,7 @@
 'use client';
 
+import { runnerState, useLowDetail } from '@shared/r3f';
+
 import { useFrame } from '@react-three/fiber';
 import {
   coastDistanceAt,
@@ -9,8 +11,7 @@ import {
   riverWidthAt,
   terrainHeightAt,
 } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
-import { runnerState } from '@shared/r3f';
+
 import { createCreatureState, habitatSeed, updateCreature } from '@shared/wildlife/behavior';
 import { useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
@@ -21,7 +22,7 @@ const wingPositions = new Float32Array([0, 0, 0, 1, 0, -0.22, 0.65, 0, 0.36]);
 
 // Fixed instance budgets; open-world habitats recycle only beyond the near field.
 export function WingedLife({ kind, anchor }: { kind: Kind; anchor?: readonly [number, number, number] }) {
-  const mobile = useIsCoarsePointer();
+  const mobile = useLowDetail();
   const count = mobile ? 10 : 22;
   const wingCount = kind === 'bird' ? 2 : 4;
   const wings = useRef<InstancedMesh>(null);

@@ -1,5 +1,7 @@
 'use client';
 
+import { runnerState, useLowDetail } from '@shared/r3f';
+
 import { useFrame } from '@react-three/fiber';
 import {
   coastDistanceAt,
@@ -9,14 +11,13 @@ import {
   riverWidthAt,
   terrainHeightAt,
 } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
-import { runnerState } from '@shared/r3f';
+
 import { createCreatureState, habitatSeed, updateCreature } from '@shared/wildlife/behavior';
 import { useRef } from 'react';
 import { InstancedMesh, Object3D } from 'three';
 
 export function Grazers() {
-  const mobile = useIsCoarsePointer();
+  const mobile = useLowDetail();
   const count = mobile ? 4 : 8;
   const fur = useRef<InstancedMesh>(null);
   const dark = useRef<InstancedMesh>(null);

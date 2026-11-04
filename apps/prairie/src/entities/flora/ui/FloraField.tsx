@@ -1,5 +1,7 @@
 'use client';
 
+import { useLowDetail } from '@shared/r3f';
+
 import { FLORA, floraCellOf, floraInCell, type FloraPlacement } from '@entities/flora/model/constants';
 import {
   makeCanopyGeometry,
@@ -9,7 +11,7 @@ import {
 } from '@entities/flora/model/services';
 import { useFrame } from '@react-three/fiber';
 import { FOG, groundHeightAt } from '@shared/config';
-import { makeLeafCanopy, useIsCoarsePointer } from '@shared/lib';
+import { makeLeafCanopy } from '@shared/lib';
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
 
@@ -65,7 +67,7 @@ const shadeConifer = makeFoliageShader(FLORA.conifer.tierHeight / 2);
 // 줄기·가지, 잎 군집, 침엽수, 바위, 접지 음영을 다섯 InstancedMesh로 그린다.
 // 카메라 셀이 바뀔 때만 주변 셀의 배치를 다시 쓴다(수백 개 → 무시할 비용).
 export function FloraField() {
-  const coarse = useIsCoarsePointer();
+  const coarse = useLowDetail();
   const viewRadius = coarse ? FLORA.viewRadius.mobile : FLORA.viewRadius.desktop;
   const geometry = useMemo(
     () => ({

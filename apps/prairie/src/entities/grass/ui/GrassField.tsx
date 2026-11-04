@@ -11,9 +11,10 @@ import {
 } from '@entities/grass/model/constants';
 import { useFrame } from '@react-three/fiber';
 import { FOG, SCENE_COLORS } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
+import { runnerState, useLowDetail } from '@shared/r3f';
+
 import { makeBladeGeometry } from '@shared/lib/makeBladeGeometry';
-import { runnerState } from '@shared/r3f';
+
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Color, DoubleSide, ShaderMaterial, Vector2, type BufferGeometry } from 'three';
 import { GrassChunk } from './GrassChunk';
@@ -26,7 +27,7 @@ const gustOriginUniform = new Vector2();
 // ghibli-grass-v2(MIT, © Wilson Ko) 색/바람 셰이더 + 절차적 blade를 카메라 주변 청크로만 유지(chunk-follow).
 // 링은 blade 풀·분할 수만, 보이는 밀도·크기는 셰이더가 거리로 연속 계산(팝 없음). 마지막 링 너머는 Ground의 잔디 무늬가 인상을 이어간다.
 export function GrassField() {
-  const coarse = useIsCoarsePointer();
+  const coarse = useLowDetail();
   const quality: GrassQuality = coarse ? 'mobile' : 'desktop';
   const { fadeNear, fadeFar } = GRASS_QUALITY[quality];
   const viewRadius = grassViewRadius(quality);

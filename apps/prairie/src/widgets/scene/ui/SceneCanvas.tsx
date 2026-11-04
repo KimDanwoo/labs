@@ -11,7 +11,8 @@ import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { CAMERA, CINEMATIC, FOG, SCENE_COLORS, SUN, type FogQuality } from '@shared/config';
 import { RENDER_PIXELS, useIsCoarsePointer } from '@shared/lib';
-import { Suspense, useState } from 'react';
+import { SceneQualityContext } from '@shared/r3f';
+import { Suspense, useRef, useState } from 'react';
 import { PCFShadowMap } from 'three';
 import { ReadySignal } from './ReadySignal';
 import { RenderBudget } from './RenderBudget';
@@ -26,7 +27,10 @@ const DPR = {
 
 export function SceneCanvas() {
   const coarse = useIsCoarsePointer();
-  const quality: FogQuality = coarse ? 'mobile' : 'desktop';
+  const [degraded, setDegraded] = useState(false);
+  const software = useRef(false);
+  const lowDetail = coarse || degraded;
+  const quality: FogQuality = lowDetail ? 'mobile' : 'desktop';
   const fog = FOG[quality];
   const dprRange = DPR[quality];
   // 프레임이 떨어지면 해상도를 낮추고, 여유가 생기면 되돌린다(적응형 DPR).
@@ -46,38 +50,63 @@ export function SceneCanvas() {
         position: [0, CAMERA.followHeight, -CAMERA.followDistance],
       }}
       onCreated={({ gl }) => {
+        const context = gl.getContext();
+        const info = context.getExtension('WEBGL_debug_renderer_info');
+        const renderer: unknown = info ? context.getParameter(info.UNMASKED_RENDERER_WEBGL) : '';
+        if (typeof renderer === 'string' && /swiftshader|llvmpipe|software/i.test(renderer)) {
+          software.current = true;
+          setDegraded(true);
+          setDpr(DPR.mobile.min);
+        }
         gl.toneMappingExposure = CINEMATIC.exposure;
         gl.domElement.setAttribute('aria-label', '유니콘 Rush 3D 초원. WASD로 이동, Space로 비행, 드래그로 시점 회전');
         gl.domElement.tabIndex = 0;
       }}
     >
-      <RenderBudget desired={Math.min(dpr, dprRange.max)} pixels={RENDER_PIXELS[quality]} />
-      <PerformanceMonitor
-        flipflops={3}
-        onDecline={() => setDpr(dprRange.min)}
-        onIncline={() => setDpr(dprRange.max)}
-        onFallback={() => setDpr(dprRange.min)}
-      />
-      <fog attach="fog" args={[SCENE_COLORS.fog, fog.near, fog.far]} />
+      <SceneQualityContext value={lowDetail}>
+        <RenderBudget desired={Math.min(dpr, dprRange.max)} pixels={RENDER_PIXELS[quality]} />
+        <PerformanceMonitor
+          flipflops={3}
+          onDecline={() => {
+            setDpr(DPR.mobile.min);
+            setDegraded(true);
+          }}
+          onIncline={() => {
+            if (!software.current) {
+              setDpr(DPR.desktop.max);
+              setDegraded(false);
+            }
+          }}
+          onFallback={() => {
+            setDpr(DPR.mobile.min);
+            setDegraded(true);
+          }}
+        />
+        <fog attach="fog" args={[SCENE_COLORS.fog, fog.near, fog.far]} />
 
-      <hemisphereLight color={SCENE_COLORS.ambient} groundColor={SCENE_COLORS.grass} intensity={SUN.ambientIntensity} />
-      <RideSun mobile={coarse} />
-      <directionalLight color={SCENE_COLORS.fillLight} intensity={0.7} position={[40, 35, -60]} />
+        <hemisphereLight
+          color={SCENE_COLORS.ambient}
+          groundColor={SCENE_COLORS.grass}
+          intensity={SUN.ambientIntensity}
+        />
+        <RideSun mobile={lowDetail} />
+        <directionalLight color={SCENE_COLORS.fillLight} intensity={0.7} position={[40, 35, -60]} />
 
-      <Suspense fallback={null}>
-        <Scenery />
-        <Ground />
-        <River />
-        <GrassField />
-        <FloraField />
-        <RunnerRig />
-        <ExplorationScene />
-        <Grazers />
-        <WingedLife kind="bird" />
-        <WingedLife kind="dragonfly" />
-        <ReadySignal />
-      </Suspense>
-      <SceneEffects enabled={!coarse && dpr > dprRange.min} pixels={RENDER_PIXELS[quality]} />
+        <Suspense fallback={null}>
+          <Scenery />
+          <Ground />
+          <River />
+          <GrassField />
+          <FloraField />
+          <RunnerRig />
+          <ExplorationScene />
+          <Grazers />
+          <WingedLife kind="bird" />
+          <WingedLife kind="dragonfly" />
+          <ReadySignal />
+        </Suspense>
+        <SceneEffects enabled={!lowDetail && dpr > dprRange.min} pixels={RENDER_PIXELS[quality]} />
+      </SceneQualityContext>
     </Canvas>
   );
 }

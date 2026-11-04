@@ -46,13 +46,14 @@ async function verifyFrame(page: Page, info: TestInfo, name: string) {
 
 test('desktop: cinematic rendering survives camera changes, recentering and resizing', async ({ page }, info) => {
   const errors = await openRide(page);
+  if (process.env.CI) await expect(page.locator('canvas')).toHaveAttribute('data-render-mode', 'direct');
   await expect(page.getByRole('button', { name: '가까운 주행 시점' })).toHaveAttribute('aria-pressed', 'true');
   await verifyFrame(page, info, 'desktop-close');
   await page.getByRole('button', { name: '넓은 풍경 시점' }).click();
   await expect(page.getByRole('button', { name: '넓은 풍경 시점' })).toHaveAttribute('aria-pressed', 'true');
   await page.mouse.move(730, 450);
   await page.mouse.down();
-  await page.mouse.move(940, 520, { steps: 12 });
+  await page.mouse.move(940, 520, { steps: process.env.CI ? 2 : 12 });
   await page.mouse.up();
   await page.getByRole('button', { name: '시점 초기화' }).click();
   await page.setViewportSize({ width: 3840, height: 2160 });

@@ -1,9 +1,11 @@
 'use client';
 
+import { runnerState, useLowDetail } from '@shared/r3f';
+
 import { useFrame, useThree } from '@react-three/fiber';
 import { CINEMATIC, RIVER_GLSL, SCENE_COLORS, TERRAIN_GLSL } from '@shared/config';
-import { useIsCoarsePointer, useReducedMotion } from '@shared/lib';
-import { runnerState } from '@shared/r3f';
+import { useReducedMotion } from '@shared/lib';
+
 import { useEffect, useMemo, useRef } from 'react';
 import { AdditiveBlending, BufferGeometry, Color, Float32BufferAttribute, ShaderMaterial, Vector2 } from 'three';
 
@@ -40,7 +42,7 @@ const FRAGMENT = `
 
 export function MeadowMotes() {
   const materialRef = useRef<ShaderMaterial>(null);
-  const coarse = useIsCoarsePointer();
+  const coarse = useLowDetail();
   const reduced = useReducedMotion();
   const dpr = useThree((state) => state.viewport.dpr);
   const count = coarse ? CINEMATIC.dust.mobile : CINEMATIC.dust.desktop;
