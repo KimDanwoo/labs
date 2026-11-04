@@ -1,10 +1,8 @@
 import { colors } from '@tokens/css';
 import { SEMANTIC_ROLES } from '@views/showcase/model/constants';
+import type { ColorToken } from '@views/showcase/model/types';
 import { Section } from './Section';
-import { Swatch } from './Swatch';
-
-type ColorToken = keyof typeof colors;
-
+import { SwatchGrid } from './SwatchGrid';
 const TOKEN_NAMES = Object.keys(colors) as ColorToken[];
 
 const belongsToRole = (name: string, role: string) => name === role || name.startsWith(`${role}-`);
@@ -12,17 +10,6 @@ const belongsToRole = (name: string, role: string) => name === role || name.star
 const roleTokens = (role: string) => TOKEN_NAMES.filter((name) => belongsToRole(name, role));
 
 const surfaceTokens = TOKEN_NAMES.filter((name) => !SEMANTIC_ROLES.some((role) => belongsToRole(name, role)));
-
-function SwatchGrid({ names }: { names: ColorToken[] }) {
-  return (
-    <div className="grid grid-cols-2 gap-md sm:grid-cols-4">
-      {names.map((name) => (
-        <Swatch key={name} color={`var(--color-${name})`} label={name} sub={colors[name].light} />
-      ))}
-    </div>
-  );
-}
-
 export function ColorSemanticSection() {
   return (
     <Section
