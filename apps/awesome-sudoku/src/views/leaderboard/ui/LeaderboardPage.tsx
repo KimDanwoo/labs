@@ -1,6 +1,5 @@
 'use client';
-
-import { userAtom } from '@features/auth/model/atoms';
+import { userAtom } from '@entities/session/model/store';
 import { useCumulativeLeaderboard, useLeaderboard } from '@features/leaderboard/model/hooks';
 import { CumulativeLeaderboardTable, LeaderboardFilters, LeaderboardTable } from '@features/leaderboard/ui';
 import { ThemeToggle } from '@features/theme/ui';
@@ -9,15 +8,8 @@ import { SubpageHeader } from '@shared/ui';
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
 
+import { ErrorMessage } from './ErrorMessage';
 type LeaderboardTab = 'best' | 'cumulative';
-
-const ErrorMessage = ({ message }: { message: string }) => (
-  <div className={cn('text-center py-12', 'text-[rgb(var(--color-error))]')}>
-    <p>데이터를 불러오는데 실패했습니다.</p>
-    <p className="text-sm mt-1">{message}</p>
-  </div>
-);
-
 export const LeaderboardPage = () => {
   const [tab, setTab] = useState<LeaderboardTab>('best');
   const [difficulty, setDifficulty] = useState('');

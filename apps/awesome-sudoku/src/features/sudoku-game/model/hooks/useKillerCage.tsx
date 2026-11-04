@@ -1,6 +1,6 @@
-import type { CageInfo } from '@entities/board/model/types';
 import { GAME_MODE } from '@entities/game/model/constants';
-import { cagesAtom, gameModeAtom } from '@features/sudoku-game/model/atoms';
+import { cagesAtom, gameModeAtom } from '@entities/game/model/store';
+import type { CageInfo } from '@entities/game/model/types';
 import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useState } from 'react';
 import { useCagePathCalculator } from './useCagePathCalculator';
@@ -46,7 +46,7 @@ export const useKillerCage = () => {
 
       if (match && cageInfo.paths.length > 1) {
         const secondMatch = cageInfo.paths[1]?.path.match(/M([\d.]+),([\d.]+)/);
-        if (secondMatch) {
+        if (match[1] && secondMatch?.[1]) {
           const x1 = parseFloat(match[1]);
           const x2 = parseFloat(secondMatch[1]);
           return Math.max(Math.abs(x2 - x1), DEFAULT_CELL_SIZE);

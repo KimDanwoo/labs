@@ -1,0 +1,1 @@
+export { GameResultSheet } from './GameResultSheet';

@@ -1,21 +1,22 @@
-import type { Grid, SudokuBoard } from '@entities/board/model/types';
+import { cellAt } from '@shared/lib/gridAccess';
+import { createStore } from 'jotai';
+import { describe, expect, it } from 'vitest';
 import {
   CLASSIC_DIFFICULTY,
   GAME_LEVEL,
   GAME_MODE,
   HINTS_REMAINING,
   MAX_MISTAKES,
-} from '@entities/game/model/constants';
-import type { KillerCage } from '@entities/game/model/types';
+} from '../../../../entities/game/model/constants/game';
+import { fillCellAtom } from '../../../../entities/game/model/store/cellValueAtoms';
+import { initializeGameAtom } from '../../../../entities/game/model/store/gameLifecycleAtoms';
+import { getHintAtom } from '../../../../entities/game/model/store/hintAtoms';
 import {
   boardAtom,
   cagesAtom,
   difficultyAtom,
-  fillCellAtom,
   gameModeAtom,
-  getHintAtom,
   hintsRemainingAtom,
-  initializeGameAtom,
   isCompletedAtom,
   isGeneratingAtom,
   isSuccessAtom,
@@ -23,9 +24,9 @@ import {
   selectedCellAtom,
   solutionAtom,
   timerActiveAtom,
-} from '@features/sudoku-game/model/atoms';
-import { createStore } from 'jotai';
-import { describe, expect, it } from 'vitest';
+} from '../../../../entities/game/model/store/primitives';
+import type { Grid, SudokuBoard } from '../../../../entities/game/model/types/board';
+import type { KillerCage } from '../../../../entities/game/model/types/game';
 
 const SOLUTION: Grid = [
   [5, 3, 4, 6, 7, 8, 9, 1, 2],
@@ -76,10 +77,10 @@ describe('fillCellAtom — 실수 판정', () => {
       [8, 8],
     ]);
     store.set(selectedCellAtom, { row: 0, col: 0 });
-    store.set(fillCellAtom, SOLUTION[0][0]);
+    store.set(fillCellAtom, cellAt(SOLUTION, 0, 0));
 
     expect(store.get(mistakeCountAtom)).toBe(0);
-    expect(store.get(boardAtom)[0][0].isConflict).toBe(false);
+    expect(cellAt(store.get(boardAtom), 0, 0).isConflict).toBe(false);
   });
 
   it('행·열·블록 충돌이 없어도 정답과 다르면 실수이고 충돌로 표시된다', () => {
@@ -92,8 +93,8 @@ describe('fillCellAtom — 실수 판정', () => {
     store.set(fillCellAtom, 9);
 
     expect(store.get(mistakeCountAtom)).toBe(1);
-    expect(store.get(boardAtom)[0][0].value).toBe(9);
-    expect(store.get(boardAtom)[0][0].isConflict).toBe(true);
+    expect(cellAt(store.get(boardAtom), 0, 0).value).toBe(9);
+    expect(cellAt(store.get(boardAtom), 0, 0).isConflict).toBe(true);
     expect(store.get(isCompletedAtom)).toBe(false);
   });
 
@@ -104,7 +105,7 @@ describe('fillCellAtom — 실수 판정', () => {
     store.set(fillCellAtom, null);
 
     expect(store.get(mistakeCountAtom)).toBe(1);
-    expect(store.get(boardAtom)[0][0].value).toBeNull();
+    expect(cellAt(store.get(boardAtom), 0, 0).value).toBeNull();
   });
 
   it('초기 셀에는 입력이 무시된다', () => {
@@ -112,7 +113,7 @@ describe('fillCellAtom — 실수 판정', () => {
     store.set(selectedCellAtom, { row: 1, col: 1 });
     store.set(fillCellAtom, 1);
 
-    expect(store.get(boardAtom)[1][1].value).toBe(SOLUTION[1][1]);
+    expect(cellAt(store.get(boardAtom), 1, 1).value).toBe(cellAt(SOLUTION, 1, 1));
     expect(store.get(mistakeCountAtom)).toBe(0);
   });
 
@@ -136,13 +137,13 @@ describe('fillCellAtom — 실수 판정', () => {
     expect(store.get(isCompletedAtom)).toBe(true);
     expect(store.get(isSuccessAtom)).toBe(false);
     expect(store.get(timerActiveAtom)).toBe(false);
-    expect(store.get(boardAtom)[0][0].value).toBe(6);
+    expect(cellAt(store.get(boardAtom), 0, 0).value).toBe(6);
   });
 
   it('마지막 칸을 정답으로 채우면 완료·성공이고 타이머가 멈춘다', () => {
     const store = setupStore([[0, 0]]);
     store.set(selectedCellAtom, { row: 0, col: 0 });
-    store.set(fillCellAtom, SOLUTION[0][0]);
+    store.set(fillCellAtom, cellAt(SOLUTION, 0, 0));
 
     expect(store.get(isCompletedAtom)).toBe(true);
     expect(store.get(isSuccessAtom)).toBe(true);
@@ -158,7 +159,7 @@ describe('fillCellAtom — 실수 판정', () => {
           [0, 0],
           [0, 1],
         ],
-        sum: SOLUTION[0][0] + SOLUTION[0][1],
+        sum: cellAt(SOLUTION, 0, 0) + cellAt(SOLUTION, 0, 1),
       },
     ];
     const store = setupStore(
@@ -172,8 +173,8 @@ describe('fillCellAtom — 실수 판정', () => {
     store.set(fillCellAtom, 9); // 9 + 3 = 12 > 8
 
     expect(store.get(mistakeCountAtom)).toBe(1);
-    expect(store.get(boardAtom)[0][0].isConflict).toBe(true);
-    expect(store.get(boardAtom)[0][1].isConflict).toBe(true);
+    expect(cellAt(store.get(boardAtom), 0, 0).isConflict).toBe(true);
+    expect(cellAt(store.get(boardAtom), 0, 1).isConflict).toBe(true);
   });
 });
 
@@ -186,10 +187,10 @@ describe('getHintAtom — 대상 칸 선택', () => {
     store.set(selectedCellAtom, { row: 8, col: 8 });
     store.set(getHintAtom);
 
-    const cell = store.get(boardAtom)[8][8];
-    expect(cell.value).toBe(SOLUTION[8][8]);
+    const cell = cellAt(store.get(boardAtom), 8, 8);
+    expect(cell.value).toBe(cellAt(SOLUTION, 8, 8));
     expect(cell.isHint).toBe(true);
-    expect(store.get(boardAtom)[0][0].value).toBeNull();
+    expect(cellAt(store.get(boardAtom), 0, 0).value).toBeNull();
     expect(store.get(hintsRemainingAtom)).toBe(HINTS_REMAINING - 1);
   });
 
@@ -202,8 +203,8 @@ describe('getHintAtom — 대상 칸 선택', () => {
     store.set(fillCellAtom, 9);
     store.set(getHintAtom);
 
-    const cell = store.get(boardAtom)[0][0];
-    expect(cell.value).toBe(SOLUTION[0][0]);
+    const cell = cellAt(store.get(boardAtom), 0, 0);
+    expect(cell.value).toBe(cellAt(SOLUTION, 0, 0));
     expect(cell.isConflict).toBe(false);
   });
 
@@ -213,10 +214,10 @@ describe('getHintAtom — 대상 칸 선택', () => {
       [8, 8],
     ]);
     store.set(selectedCellAtom, { row: 0, col: 0 });
-    store.set(fillCellAtom, SOLUTION[0][0]);
+    store.set(fillCellAtom, cellAt(SOLUTION, 0, 0));
     store.set(getHintAtom);
 
-    expect(store.get(boardAtom)[8][8].value).toBe(SOLUTION[8][8]);
+    expect(cellAt(store.get(boardAtom), 8, 8).value).toBe(cellAt(SOLUTION, 8, 8));
     expect(store.get(selectedCellAtom)).toEqual({ row: 8, col: 8 });
   });
 
@@ -225,7 +226,7 @@ describe('getHintAtom — 대상 칸 선택', () => {
     store.set(selectedCellAtom, null);
     store.set(getHintAtom);
 
-    expect(store.get(boardAtom)[0][0].value).toBe(SOLUTION[0][0]);
+    expect(cellAt(store.get(boardAtom), 0, 0).value).toBe(cellAt(SOLUTION, 0, 0));
     expect(store.get(isCompletedAtom)).toBe(true);
     expect(store.get(isSuccessAtom)).toBe(true);
   });

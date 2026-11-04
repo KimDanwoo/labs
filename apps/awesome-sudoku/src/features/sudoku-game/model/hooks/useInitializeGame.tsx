@@ -1,5 +1,5 @@
 import { GAME_LEVEL } from '@entities/game/model/constants';
-import { boardAtom, initializeGameAtom } from '@features/sudoku-game/model/atoms';
+import { boardAtom, initializeGameAtom } from '@entities/game/model/store';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 

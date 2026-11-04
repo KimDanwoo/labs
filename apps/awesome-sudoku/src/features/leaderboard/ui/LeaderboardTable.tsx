@@ -1,9 +1,8 @@
 'use client';
 
-import type { GameRecord } from '@entities/game-record/model/types';
-import { getRecordPoint } from '@entities/game-record/model/utils';
 import { GAME_LEVEL_LABELS, GAME_MODE } from '@entities/game/model/constants';
-import { formatTime } from '@features/sudoku-game/model/utils';
+import { formatTime, getRecordPoint } from '@entities/game/model/services';
+import type { GameRecord } from '@entities/game/model/types';
 import { cn } from '@shared/model/utils';
 import Image from 'next/image';
 import { memo } from 'react';

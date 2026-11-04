@@ -1,6 +1,6 @@
 'use client';
 
-import { isAuthenticatedAtom, userAtom } from '@features/auth/model/atoms';
+import { isAuthenticatedAtom, userAtom } from '@entities/session/model/store';
 import { useGameStats } from '@features/game-stats/model/hooks';
 import { StatsByDifficulty, StatsOverview } from '@features/game-stats/ui';
 import { useProfile } from '@features/profile/model/hooks';

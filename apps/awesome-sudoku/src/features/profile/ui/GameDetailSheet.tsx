@@ -1,26 +1,17 @@
 'use client';
-
-import type { GameRecord } from '@entities/game-record/model/types';
-import { getRecordPoint } from '@entities/game-record/model/utils';
 import { GAME_LEVEL_LABELS, GAME_MODE } from '@entities/game/model/constants';
-import { formatTime } from '@features/sudoku-game/model/utils';
+import { formatTime, getRecordPoint } from '@entities/game/model/services';
+import type { GameRecord } from '@entities/game/model/types';
 import { cn } from '@shared/model/utils';
 import { BottomSheet } from '@shared/ui';
 import { memo } from 'react';
 
+import { DetailRow } from './DetailRow';
 interface GameDetailSheetProps {
   game: GameRecord | null;
   isOpen: boolean;
   onClose: () => void;
 }
-
-const DetailRow = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex justify-between">
-    <span className="text-[rgb(var(--color-text-secondary))]">{label}</span>
-    <span className={cn('font-medium', 'text-[rgb(var(--color-text-primary))]')}>{value}</span>
-  </div>
-);
-
 export const GameDetailSheet = memo<GameDetailSheetProps>(({ game, isOpen, onClose }) => {
   if (!game) return null;
 

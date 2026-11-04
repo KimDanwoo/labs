@@ -1,4 +1,4 @@
-import { handleKeyInputAtom } from '@features/sudoku-game/model/atoms';
+import { handleKeyInputAtom } from '@entities/game/model/store';
 import { gameStore } from '@shared/model/store';
 import { type KeyboardEvent, useCallback } from 'react';
 

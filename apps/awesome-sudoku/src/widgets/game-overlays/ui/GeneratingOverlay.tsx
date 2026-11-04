@@ -1,4 +1,4 @@
-import { isGeneratingAtom } from '@features/sudoku-game/model/atoms';
+import { isGeneratingAtom } from '@entities/game/model/store';
 import { cn } from '@shared/model/utils';
 import { SudokuLoader } from '@shared/ui';
 import { useAtomValue } from 'jotai';

@@ -1,8 +1,5 @@
-import type { GameRecord, PointResult } from '@entities/game-record/model/types';
 import { HINTS_REMAINING } from '@entities/game/model/constants';
-import { userAtom } from '@features/auth/model/atoms';
-import { saveGameRecord } from '@features/game-record/model/services';
-import { calculatePoint } from '@features/game-record/model/utils';
+import { calculatePoint, saveGameRecord } from '@entities/game/model/services';
 import {
   currentTimeAtom,
   difficultyAtom,
@@ -11,7 +8,9 @@ import {
   isRecordSavedAtom,
   isSuccessAtom,
   mistakeCountAtom,
-} from '@features/sudoku-game/model/atoms';
+} from '@entities/game/model/store';
+import type { GameRecord, PointResult } from '@entities/game/model/types';
+import { userAtom } from '@entities/session/model/store';
 import { gameStore } from '@shared/model/store';
 import { useAtomValue } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';

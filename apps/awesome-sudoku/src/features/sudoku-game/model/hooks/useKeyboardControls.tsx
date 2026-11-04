@@ -1,4 +1,4 @@
-import { handleKeyInputAtom, selectedCellAtom } from '@features/sudoku-game/model/atoms';
+import { handleKeyInputAtom, selectedCellAtom } from '@entities/game/model/store';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 

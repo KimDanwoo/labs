@@ -1,1 +1,2 @@
-export * from './GameHeader';
+export { GameStatus } from './GameStatus';
+export { MistakeCounter } from './MistakeCounter';

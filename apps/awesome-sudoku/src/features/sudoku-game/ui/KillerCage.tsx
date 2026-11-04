@@ -1,30 +1,8 @@
-import { KillerCageLine } from '@entities/board/ui';
+import { KillerCageLine } from '@entities/game/ui';
 import { useKillerCage } from '@features/sudoku-game/model/hooks';
 import { memo, useMemo } from 'react';
 
-interface CageSumLabelProps {
-  sum: number;
-  x: number;
-  y: number;
-  fontSize: string;
-}
-
-const CageSumLabel = memo<CageSumLabelProps>(({ sum, x, y, fontSize }) => (
-  <div
-    className="absolute font-medium text-[rgb(var(--color-accent))] z-20"
-    style={{
-      top: `${y}px`,
-      left: `${x}px`,
-      fontSize,
-      lineHeight: '1',
-      backgroundColor: 'rgb(var(--color-surface-primary))',
-    }}
-  >
-    {sum}
-  </div>
-));
-
-CageSumLabel.displayName = 'CageSumLabel';
+import { CageSumLabel } from './CageSumLabel';
 
 export const KillerCage = memo(() => {
   const { overlayRef, cageInfo, cellSize } = useKillerCage();

@@ -1,5 +1,5 @@
-import type { GameRecord } from '@entities/game-record/model/types';
-import { getLeaderboard, type LeaderboardQuery } from '@features/game-record/model/services';
+import { getLeaderboard, type LeaderboardQuery } from '@entities/game/model/services';
+import type { GameRecord } from '@entities/game/model/types';
 import { useCallback, useEffect, useState } from 'react';
 
 interface UseLeaderboardResult {

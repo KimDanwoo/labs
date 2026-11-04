@@ -1,45 +1,19 @@
 'use client';
-
-import type { GameRecord } from '@entities/game-record/model/types';
-import { getRecordPoint } from '@entities/game-record/model/utils';
 import { GAME_LEVEL_LABELS, GAME_MODE } from '@entities/game/model/constants';
-import { formatTime } from '@features/sudoku-game/model/utils';
+import { formatTime, getRecordPoint } from '@entities/game/model/services';
+import type { GameRecord } from '@entities/game/model/types';
 import { cn } from '@shared/model/utils';
 import { memo, useState } from 'react';
 import { GameDetailSheet } from './GameDetailSheet';
 
+import { EmptyState } from './EmptyState';
+import { ErrorState } from './ErrorState';
+import { LoadingState } from './LoadingState';
 interface RecentGamesProps {
   games: GameRecord[];
   isLoading: boolean;
   error?: Error | null;
 }
-
-const LoadingState = () => (
-  <div className="flex items-center justify-center py-12">
-    <div
-      className={cn(
-        'animate-spin w-6 h-6 border-2',
-        'border-[rgb(var(--color-accent))]',
-        'border-t-transparent rounded-full',
-      )}
-    />
-  </div>
-);
-
-const EmptyState = () => (
-  <div className={cn('text-center py-12', 'text-[rgb(var(--color-text-secondary))]')}>
-    <p>아직 완료한 게임이 없습니다.</p>
-    <p className="text-sm mt-1">게임을 완료하면 여기에 표시됩니다.</p>
-  </div>
-);
-
-const ErrorState = ({ message }: { message: string }) => (
-  <div className={cn('text-center py-12', 'text-[rgb(var(--color-error-text))]')}>
-    <p>데이터를 불러오지 못했습니다.</p>
-    <p className="text-sm mt-1">{message}</p>
-  </div>
-);
-
 export const RecentGames = memo<RecentGamesProps>(({ games, isLoading, error }) => {
   const [selectedGame, setSelectedGame] = useState<GameRecord | null>(null);
 

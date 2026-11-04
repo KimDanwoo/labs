@@ -5,7 +5,7 @@ import {
   isGeneratingAtom,
   timerActiveAtom,
   toggleTimerAtom,
-} from '@features/sudoku-game/model/atoms';
+} from '@entities/game/model/store';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { FC } from 'react';
