@@ -1,2 +1,2 @@
-export { usePointerLook } from './usePointerLook';
-export { useRunnerControls } from './useRunnerControls';
+export * from './usePointerLook';
+export * from './useRunnerControls';

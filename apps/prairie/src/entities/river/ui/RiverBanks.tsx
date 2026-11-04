@@ -1,6 +1,7 @@
 'use client';
 
-import { makeBladeGeometry } from '@entities/grass/model/constants';
+import { makeBladeGeometry } from '@shared/lib/makeBladeGeometry';
+
 import { useFrame } from '@react-three/fiber';
 import { coastDistanceAt, groundHeightAt, nearestRiverX, RIVER, riverWidthAt } from '@shared/config';
 import { useIsCoarsePointer } from '@shared/lib';
