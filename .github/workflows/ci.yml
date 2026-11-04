@@ -50,5 +50,11 @@ jobs:
       - name: Verify data error and retry flows
         run: pnpm --filter fe-deep test:e2e
 
-      # 빌드는 넣지 않는다. fe-deep 등이 빌드 시점에 Supabase를 조회해 시크릿 없이는 실패하고,
-      # 앱별 빌드는 main 반영 시 Vercel이 담당한다. 변경 없는 앱은 프로젝트의 Skip deployment로 제외한다.
+      - name: Build Unicorn Rush
+        run: pnpm --filter prairie build
+
+      - name: Verify Unicorn Rush rendering and controls
+        run: pnpm --filter prairie test:e2e
+
+      # 전체 빌드는 하지 않는다. fe-deep 등은 빌드 시점에 DB 시크릿이 필요하다.
+      # Unicorn Rush는 외부 API 없이 빌드해 실제 WebGL·키보드·터치 흐름을 검증한다.
