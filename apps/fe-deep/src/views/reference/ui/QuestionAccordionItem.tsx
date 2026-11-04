@@ -1,9 +1,9 @@
 'use client';
 
-import type { Question } from '@entities/question/model';
+import type { Question } from '@entities/question/model/types';
 import { QuestionAnswer, QuestionMeta } from '@entities/question/ui';
-import { AccordionContent, AccordionItem, AccordionTrigger } from '@shared/ui';
-import { useQuestionActions } from '@views/reference/model';
+import { AccordionContent, AccordionItem, AccordionTrigger } from '@ui/react';
+import { useQuestionActions } from '@views/reference/model/hooks';
 import { QuestionActions } from './QuestionActions';
 
 interface QuestionAccordionItemProps {

@@ -2,33 +2,14 @@
   "extends": "@config/tsconfig/next.json",
   "compilerOptions": {
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@shared/*": [
-        "./src/shared/*"
-      ],
-      "@entities/*": [
-        "./src/entities/*"
-      ],
-      "@features/*": [
-        "./src/features/*"
-      ],
-      "@widgets/*": [
-        "./src/widgets/*"
-      ],
-      "@views/*": [
-        "./src/views/*"
-      ]
+      "@app/*": ["./src/app/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@entities/*": ["./src/entities/*"],
+      "@features/*": ["./src/features/*"],
+      "@widgets/*": ["./src/widgets/*"],
+      "@views/*": ["./src/views/*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

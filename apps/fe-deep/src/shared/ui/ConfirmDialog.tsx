@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@shared/ui';
+import { Button } from '@ui/react';
 import { useEffect, useRef } from 'react';
 
 interface ConfirmDialogProps {

@@ -1,9 +1,9 @@
 'use client';
 
 import { cn } from '@shared/lib/utils';
-import { Badge, Card, KeywordCheck, MarkdownRenderer, SpeakButton } from '@shared/ui';
-import type { BadgeVariant } from '@ui/react';
-import { STEP_KIND, type StudyStep } from '@views/study/model';
+import { KeywordCheck, MarkdownRenderer, SpeakButton } from '@shared/ui';
+import { Badge, Card, type BadgeVariant } from '@ui/react';
+import { STEP_KIND, type StudyStep } from '@views/study/model/services';
 import { Lightbulb } from 'lucide-react';
 import { AiFeedback } from './AiFeedback';
 

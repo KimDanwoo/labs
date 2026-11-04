@@ -1,4 +1,4 @@
-import { STUDY_SORT, STUDY_SORT_LABELS, type StudySort } from '@views/study/model/studySort';
+import { STUDY_SORT, STUDY_SORT_LABELS, type StudySort } from '@views/study/model/services';
 import Link from 'next/link';
 
 type StudySortTabsProps = {

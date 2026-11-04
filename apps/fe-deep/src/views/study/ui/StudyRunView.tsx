@@ -1,5 +1,6 @@
 'use client';
 
+import { useReviewTopics, useUnderstoodTopics } from '@views/study/model/hooks';
 import {
   STUDY_FILTER,
   countByTier,
@@ -8,13 +9,11 @@ import {
   parseStudyFilter,
   parseStudyTiers,
   serializeStudyTiers,
-  useReviewTopics,
-  useUnderstoodTopics,
   type StudyDoc,
   type StudyFilter,
   type StudyTier,
   type TopicMarks,
-} from '@views/study/model';
+} from '@views/study/model/services';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { StudyFilterBar } from './StudyFilterBar';

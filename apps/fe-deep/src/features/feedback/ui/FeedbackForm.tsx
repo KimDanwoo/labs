@@ -1,6 +1,8 @@
 'use client';
 
-/* eslint-disable no-restricted-imports -- 이 슬라이스는 types/constants/actions가 세그먼트 폴더가 아니라 루트 파일이라 alias로 가리킬 수 없다. 구조 정리 후 제거할 것. */
+import { FEEDBACK_TYPE_LABELS } from '@features/feedback/model/constants';
+import { useFeedbackForm } from '@features/feedback/model/hooks';
+import type { FeedbackType } from '@features/feedback/model/types';
 import {
   Button,
   Select,
@@ -11,11 +13,8 @@ import {
   Sheet,
   SheetContent,
   SheetTitle,
-} from '@shared/ui';
+} from '@ui/react';
 import { MessageSquarePlus, Send } from 'lucide-react';
-import { FEEDBACK_TYPE_LABELS } from '../constants';
-import { useFeedbackForm } from '../model';
-import type { FeedbackType } from '../types';
 
 interface FeedbackFormProps {
   questionId?: string;
