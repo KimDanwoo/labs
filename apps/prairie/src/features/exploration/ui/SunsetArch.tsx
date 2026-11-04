@@ -2,12 +2,19 @@
 import { useFrame } from '@react-three/fiber';
 import { terrainHeightAt } from '@shared/config';
 import { LANDMARKS } from '@shared/exploration/world';
-import { runnerState } from '@shared/r3f';
+import { makeSurfaceBump, SURFACE_KIND } from '@shared/lib';
+import { runnerState, useLowDetail } from '@shared/r3f';
 import { crossedArch } from '@shared/wildlife/behavior';
-import { useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { AdditiveBlending, Group, InstancedMesh, MeshBasicMaterial, Object3D, Vector3 } from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 export function SunsetArch() {
+  const low = useLowDetail();
+  const stone = useMemo(() => new RoundedBoxGeometry(1, 1, 1, low ? 1 : 2, 0.08), [low]);
+  const surface = useMemo(() => makeSurfaceBump(SURFACE_KIND.stone), []);
+  useEffect(() => () => stone.dispose(), [stone]);
+  useEffect(() => () => surface.dispose(), [surface]);
   const floating = useRef<Group>(null),
     glyph = useRef<MeshBasicMaterial>(null),
     particles = useRef<InstancedMesh>(null);
@@ -54,10 +61,16 @@ export function SunsetArch() {
               key={i}
               position={[side * (7 + (i % 2) * 0.12), 1.1 + i * 2.2, 0]}
               rotation={[0.025 * i, side * 0.06, side * 0.025]}
+              geometry={stone}
+              scale={[3.1 - i * 0.12, 2.1, 3.4]}
               castShadow
             >
-              <boxGeometry args={[3.1 - i * 0.12, 2.1, 3.4]} />
-              <meshStandardMaterial color={i % 2 ? '#aaa18b' : '#bcb29b'} roughness={1} />
+              <meshStandardMaterial
+                color={i % 2 ? '#aaa18b' : '#bcb29b'}
+                roughness={0.9}
+                bumpMap={surface}
+                bumpScale={0.1}
+              />
             </mesh>
           ))}
         </group>
@@ -69,10 +82,16 @@ export function SunsetArch() {
             key={i}
             position={[Math.cos(a) * 7, 9 + Math.sin(a) * 7, ((i % 3) - 1) * 0.2]}
             rotation={[0, 0, a - Math.PI / 2 + (i % 2) * 0.035]}
+            geometry={stone}
+            scale={[2.1, 2.8, 3.2]}
             castShadow
           >
-            <boxGeometry args={[2.1, 2.8, 3.2]} />
-            <meshStandardMaterial color={i % 2 ? '#c4b79e' : '#a99d88'} roughness={1} />
+            <meshStandardMaterial
+              color={i % 2 ? '#c4b79e' : '#a99d88'}
+              roughness={0.9}
+              bumpMap={surface}
+              bumpScale={0.1}
+            />
           </mesh>
         );
       })}
@@ -85,7 +104,7 @@ export function SunsetArch() {
             castShadow
           >
             <dodecahedronGeometry args={[0.35 + (i % 3) * 0.2, 0]} />
-            <meshStandardMaterial color="#b7b29b" roughness={1} />
+            <meshStandardMaterial color="#b7b29b" roughness={0.9} bumpMap={surface} bumpScale={0.08} />
           </mesh>
         ))}
       </group>

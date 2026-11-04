@@ -1,10 +1,12 @@
 'use client';
 
+import { useLowDetail } from '@shared/r3f';
+
 import { makeBladeGeometry } from '@shared/lib/makeBladeGeometry';
 
 import { useFrame } from '@react-three/fiber';
 import { coastDistanceAt, groundHeightAt, nearestRiverX, RIVER, riverWidthAt } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
+
 import { useEffect, useMemo, useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
 
@@ -17,7 +19,7 @@ const hash = (n: number) => {
 
 // A small, deterministic pool adds irregular shoreline landmarks without a mesh per stone/stem.
 export function RiverBanks() {
-  const coarse = useIsCoarsePointer();
+  const coarse = useLowDetail();
   const rocks = useRef<InstancedMesh>(null);
   const reeds = useRef<InstancedMesh>(null);
   const cell = useRef('');

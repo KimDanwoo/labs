@@ -1,9 +1,15 @@
-import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three';
+import { BufferGeometry, Color, Float32BufferAttribute, Vector3 } from 'three';
 
 // 바깥 비행깃·안쪽 비행깃·덮깃을 겹친다. 모든 깃털을 같은 점에 모으면 밑동이 겹쳐 깜빡인다.
 export function makeWingGeometry(span: number, feathers: number): BufferGeometry {
   const positions: number[] = [];
   const indices: number[] = [];
+  const uvs: number[] = [];
+  const colors: number[] = [];
+  const pearl = new Color('#f1eadc');
+  const shadow = new Color('#9eafc4');
+  const gold = new Color('#d8bd82');
+  const tint = new Color();
   const rings = 8;
   const sides = 6;
   const count = Math.ceil(feathers * 0.6);
@@ -34,6 +40,10 @@ export function makeWingGeometry(span: number, feathers: number): BufferGeometry
             center.y + Math.sin(angle) * width * 0.18,
             center.z + across.z * Math.cos(angle) * width,
           );
+          uvs.push((Math.cos(angle) + 1) * 0.5, t);
+          tint.copy(shadow).lerp(pearl, 0.35 + layer * 0.13 + t * 0.3);
+          tint.lerp(gold, Math.max(0, (t - 0.88) / 0.12) * (layer === 0 ? 0.3 : 0.12));
+          colors.push(tint.r, tint.g, tint.b);
         }
       }
       for (let ring = 0; ring < rings; ring += 1) {
@@ -47,6 +57,8 @@ export function makeWingGeometry(span: number, feathers: number): BufferGeometry
   }
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+  geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();

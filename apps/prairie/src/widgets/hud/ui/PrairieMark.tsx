@@ -1,10 +1,10 @@
 export function PrairieMark() {
   return (
-    <div className="flex items-center gap-sm sm:gap-md">
+    <div className="flex items-center gap-sm rounded-full border border-prairie-paper/20 bg-prairie-ink/60 px-md py-xs backdrop-blur-md sm:gap-md">
       <svg
         aria-hidden
         viewBox="0 0 40 40"
-        className="size-8 shrink-0 sm:size-10"
+        className="size-6 shrink-0 sm:size-8"
         fill="none"
         stroke="currentColor"
         strokeWidth="1.2"
@@ -14,7 +14,7 @@ export function PrairieMark() {
         <circle cx="33" cy="7" r="2" fill="currentColor" stroke="none" />
       </svg>
       <div>
-        <p className="font-display text-xl font-medium tracking-tight sm:text-3xl">
+        <p className="font-display text-xl font-medium tracking-tight sm:text-2xl">
           unicorn rush<span className="text-prairie-accent">.</span>
         </p>
       </div>

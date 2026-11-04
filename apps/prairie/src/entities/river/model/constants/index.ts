@@ -68,7 +68,7 @@ export const RIVER_FRAGMENT_SHADER = `
     col = mix(col, sky, fresnel);
     alpha = mix(alpha, 1.0, fresnel);
     float glint = pow(max(dot(refl, uSunDir), 0.0), 90.0);
-    col += vec3(1.0, 0.94, 0.77) * glint * 0.35;
+    col += vec3(1.0, 0.86, 0.6) * glint * 1.8;
 
     // Broken foam follows shallow shore contours; no uniform white outline.
     float shore = (1.0 - smoothstep(0.03, mix(0.16, 0.32, sea), depth));

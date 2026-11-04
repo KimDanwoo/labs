@@ -1,17 +1,20 @@
 // WebGL 머티리얼 색은 토큰으로 표현 불가 → 파스텔 톤 팔레트를 여기 한곳에 모은다.
 export const SCENE_COLORS = {
-  skyTop: '#74abc6',
-  skyBottom: '#f5dfbb',
+  skyTop: '#6d9fae',
+  skyBottom: '#f3dab0',
   // 먼 들판이 대기에 희미해진 색. 잔디 페이드·물·자갈의 원경색이 전부 이 값을 쓴다.
   // 하늘과의 이음은 Haze가 맡으므로 큐브맵 지평선색에 맞출 필요가 없다 — 하늘색이면 잔디 너머가 '하늘 띠'로 읽힌다.
-  fog: '#c9d2b7',
-  sunLight: '#ffe3b0',
-  ambient: '#afcddd',
+  fog: '#cbd0b9',
+  sunLight: '#ffdda3',
+  ambient: '#bbd4df',
   // unlit 지면색 = 잔디 blade가 멀어지며 녹아드는 색. 하상 강둑 블렌드도 이 값.
-  grass: '#607c49',
-  grassBase: '#304b36',
-  grassTip: '#9eb96e',
-  grassDry: '#d3be87',
+  grass: '#536d43',
+  grassBase: '#263f32',
+  grassTip: '#9ab777',
+  grassDry: '#dfc78e',
+  path: '#a59a71',
+  dust: '#ffe3ab',
+  fillLight: '#c3dcf5',
   oceanHorizon: '#c5d4ce',
   waterDeep: '#376d70',
   waterShallow: '#8fae94',
@@ -148,10 +151,28 @@ export function riverBearing(x: number, camYaw: number, z = 0): RiverBearing {
 }
 
 export const SUN = {
-  position: [-65, 65, -35] as [number, number, number],
-  intensity: 2.6,
-  ambientIntensity: 0.65,
+  position: [-80, 26, 110] as [number, number, number],
+  intensity: 2.8,
+  ambientIntensity: 0.8,
 };
+
+export const CINEMATIC = {
+  exposure: 0.98,
+  bloom: { strength: 0.18, radius: 0.45, threshold: 2.8 },
+  dust: { desktop: 150, mobile: 55, radius: 40, height: 9 },
+  camera: { restingYaw: -0.72, response: 1.8 },
+} as const;
+
+export const MEADOW_PATH = { length: 360, drift: 58, halfWidth: 1.6, edge: 1.4 } as const;
+
+export function meadowPathX(z: number): number {
+  return -MEADOW_PATH.drift * Math.sin((Math.max(0, z) / MEADOW_PATH.length) * Math.PI) ** 2;
+}
+
+export function meadowPathDistanceAt(x: number, z: number): number {
+  if (z < -25 || z > MEADOW_PATH.length + 25) return Infinity;
+  return Math.abs(x - meadowPathX(z));
+}
 
 // 기기별 안개. 잔디 blade는 fadeFar에서 지면색에 완전히 녹으므로(데스크톱 66 < 청크 끝 72) 안개가 청크 끝을 가릴 필요는 없다 —
 // 안개는 그 너머 평지를 능선 밑동에 닿기 전에 닫는 역할. 강 불변식: RIVER.period/2 > far, RIVER.length > 2×far.
@@ -178,22 +199,22 @@ export const HAZE = {
 // 능선 겹. 먼 겹부터 그린다 — 멀수록 높고 하늘색에 가깝게 바래고(대기 원근), 가까울수록 낮고 짙다.
 // baseY/ampY는 월드 m(원통 반경 1000 기준). cells는 원통 한 바퀴의 노이즈 셀 수(정수 → 이음새 없음).
 export const RIDGES = [
-  { baseY: 30, ampY: 180, cells: 9, seed: 0.17, color: '#a6b5bf' },
-  { baseY: 18, ampY: 115, cells: 17, seed: 0.53, color: '#81989d' },
-  { baseY: 10, ampY: 65, cells: 29, seed: 0.81, color: '#607e79' },
+  { baseY: 30, ampY: 235, cells: 9, seed: 0.17, color: '#a6b5bf' },
+  { baseY: 18, ampY: 155, cells: 17, seed: 0.53, color: '#81989d' },
+  { baseY: 10, ampY: 85, cells: 29, seed: 0.81, color: '#607e79' },
 ] as const;
 
 export const CAMERA = {
-  fov: 55,
+  fov: 50,
   near: 0.1,
   far: 1200,
   // 말 뒤를 낮게 따라가는 고정 추적 카메라.
-  followDistance: 9.5,
-  followHeight: 3.6,
+  followDistance: 8.7,
+  followHeight: 2.8,
   // 카메라 자리의 지형 위로 최소 이만큼 띄운다(언덕 뒤에서 땅에 묻히지 않게).
-  groundClearance: 2.4,
+  groundClearance: 1.8,
   // 카메라가 바라보는 지점의 높이(말 몸통) → 말이 화면 중앙에 온다.
-  targetHeight: 1.35,
+  targetHeight: 1.5,
   positionLerp: 0.1,
   targetLerp: 0.14,
 } as const;

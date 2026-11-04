@@ -3,6 +3,7 @@ import { terrainHeightAt } from '@shared/config';
 import { LANDMARKS } from '@shared/exploration/world';
 
 import { Branch } from './Branch';
+import { GardenColumn } from './GardenColumn';
 import { GardenPlanting } from './GardenPlanting';
 
 export function FlowerGarden() {
@@ -23,14 +24,7 @@ export function FlowerGarden() {
             ]}
             rotation={[0, a, i % 2 ? 0.08 : -0.04]}
           >
-            <mesh position={[0, height / 2, 0]} castShadow>
-              <cylinderGeometry args={[0.75, 1, height, 7]} />
-              <meshStandardMaterial color="#aaa993" roughness={1} />
-            </mesh>
-            <mesh position={[0.15, height, 0]} rotation={[0.08, 0.2, 0.1]} castShadow>
-              <boxGeometry args={[1.9, 0.4, 1.8]} />
-              <meshStandardMaterial color="#c2bba4" roughness={1} />
-            </mesh>
+            <GardenColumn height={height} />
             <Branch
               radius={0.055}
               color="#577250"

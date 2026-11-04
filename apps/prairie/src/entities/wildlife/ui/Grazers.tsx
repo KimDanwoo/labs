@@ -1,5 +1,7 @@
 'use client';
 
+import { runnerState, useLowDetail } from '@shared/r3f';
+
 import { useFrame } from '@react-three/fiber';
 import {
   coastDistanceAt,
@@ -9,17 +11,20 @@ import {
   riverWidthAt,
   terrainHeightAt,
 } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
-import { runnerState } from '@shared/r3f';
+
+import { makeSurfaceBump, SURFACE_KIND } from '@shared/lib';
 import { createCreatureState, habitatSeed, updateCreature } from '@shared/wildlife/behavior';
-import { useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { InstancedMesh, Object3D } from 'three';
 
 export function Grazers() {
-  const mobile = useIsCoarsePointer();
+  const mobile = useLowDetail();
   const count = mobile ? 4 : 8;
   const fur = useRef<InstancedMesh>(null);
   const dark = useRef<InstancedMesh>(null);
+  const eyes = useRef<InstancedMesh>(null);
+  const wool = useMemo(() => makeSurfaceBump(SURFACE_KIND.wool), []);
+  useEffect(() => () => wool.dispose(), [wool]);
   const dummy = useRef(new Object3D());
   const herd = useRef(
     Array.from({ length: 8 }, (_, i) => ({
@@ -30,12 +35,12 @@ export function Grazers() {
     })),
   );
   useFrame(({ clock }, delta) => {
-    if (!fur.current || !dark.current) return;
+    if (!fur.current || !dark.current || !eyes.current) return;
     const dt = Math.min(delta, 0.05),
       t = clock.elapsedTime,
       rider = runnerState.position;
     const offshore = coastDistanceAt(rider.x, rider.z) > 120;
-    fur.current.visible = dark.current.visible = !offshore;
+    fur.current.visible = dark.current.visible = eyes.current.visible = !offshore;
     if (offshore) return;
     for (let i = 0; i < count; i++) {
       const animal = herd.current[i]!;
@@ -98,15 +103,22 @@ export function Grazers() {
       part(dark.current, i * 7 + 4, 0, 1.25 - grazing * 0.75, 1.02, 0.22, 0.18, 0.22);
       for (let ear = 0; ear < 2; ear++)
         part(dark.current, i * 7 + 5 + ear, ear ? 0.3 : -0.3, 1.45 - grazing * 0.65, 0.8, 0.19, 0.08, 0.12);
+      for (let side = 0; side < 2; side++)
+        part(eyes.current, i * 2 + side, side ? 0.2 : -0.2, 1.4 - grazing * 0.65, 0.98, 0.045, 0.045, 0.035);
     }
     fur.current.instanceMatrix.needsUpdate = true;
     dark.current.instanceMatrix.needsUpdate = true;
+    eyes.current.instanceMatrix.needsUpdate = true;
   });
   return (
     <group>
       <instancedMesh ref={fur} args={[undefined, undefined, count * 2]} frustumCulled={false} castShadow>
         <icosahedronGeometry args={[1, 2]} />
-        <meshStandardMaterial color="#d6cbb1" roughness={1} />
+        <meshStandardMaterial color="#ded6c2" roughness={1} bumpMap={wool} bumpScale={0.12} />
+      </instancedMesh>
+      <instancedMesh ref={eyes} args={[undefined, undefined, count * 2]} frustumCulled={false}>
+        <sphereGeometry args={[1, 8, 6]} />
+        <meshPhysicalMaterial color="#161e24" roughness={0.12} clearcoat={1} />
       </instancedMesh>
       <instancedMesh ref={dark} args={[undefined, undefined, count * 7]} frustumCulled={false} castShadow>
         <icosahedronGeometry args={[1, 1]} />

@@ -53,6 +53,23 @@ h2 {
   right: max(var(--spacing-md), env(safe-area-inset-right));
 }
 
+.ride-camera-option[aria-pressed='true'] {
+  background: var(--color-prairie-paper);
+  color: var(--color-prairie-ink);
+}
+
+.ride-camera-option[aria-pressed='false']:hover {
+  background: color-mix(in srgb, var(--color-prairie-paper) 12%, transparent);
+}
+
+.ride-help-panel {
+  width: min(var(--container-md), calc(100vw - var(--spacing-2xl) * 2));
+}
+
+canvas:focus-visible {
+  @apply outline-2 -outline-offset-2 outline-prairie-accent;
+}
+
 @media (max-width: 640px) {
   .prairie-hud {
     padding-inline: max(var(--spacing-md), env(safe-area-inset-left)) max(var(--spacing-md), env(safe-area-inset-right));

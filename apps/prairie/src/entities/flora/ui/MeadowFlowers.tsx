@@ -1,9 +1,18 @@
 'use client';
 
+import { useLowDetail } from '@shared/r3f';
+
 import { makeFlowerGeometry } from '@entities/flora/model/services';
 import { useFrame } from '@react-three/fiber';
-import { coastDistanceAt, distanceToRiver, RIVER_TRENCH_HALF_WIDTH, terrainHeightAt } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
+import {
+  coastDistanceAt,
+  distanceToRiver,
+  MEADOW_PATH,
+  meadowPathDistanceAt,
+  RIVER_TRENCH_HALF_WIDTH,
+  terrainHeightAt,
+} from '@shared/config';
+
 import { useMemo, useRef } from 'react';
 import { Color, InstancedMesh, Object3D } from 'three';
 
@@ -16,7 +25,7 @@ const TILE = 16;
 
 // 셀마다 작은 야생화 군락. 두 번의 draw call로 그리고 강 골에는 심지 않는다.
 export function MeadowFlowers() {
-  const coarse = useIsCoarsePointer();
+  const coarse = useLowDetail();
   const radius = coarse ? 2 : 3;
   const perCell = coarse ? 18 : 36;
   const capacity = (radius * 2 + 1) ** 2 * perCell;
@@ -46,6 +55,7 @@ export function MeadowFlowers() {
           const x = patchX + Math.cos(angle) * spread,
             z = patchZ + Math.sin(angle) * spread;
           if (coastDistanceAt(x, z) > -32) continue;
+          if (meadowPathDistanceAt(x, z) < MEADOW_PATH.halfWidth + 0.6) continue;
           if (distanceToRiver(x, z) < RIVER_TRENCH_HALF_WIDTH + 5) continue;
           const y = terrainHeightAt(x, z);
           const height = 0.22 + hash(seed + i * 1.1) * 0.34;

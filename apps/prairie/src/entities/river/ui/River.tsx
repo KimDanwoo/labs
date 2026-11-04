@@ -1,5 +1,7 @@
 'use client';
 
+import { runnerState, useLowDetail } from '@shared/r3f';
+
 import {
   RIVER_BED_FRAGMENT_SHADER,
   RIVER_BED_VERTEX_SHADER,
@@ -17,8 +19,7 @@ import {
   SCENE_COLORS,
   SUN,
 } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
-import { runnerState } from '@shared/r3f';
+
 import { useLayoutEffect, useRef } from 'react';
 import { Color, Group, ShaderMaterial, Vector2, Vector3 } from 'three';
 import { RiverBanks } from './RiverBanks';
@@ -91,7 +92,7 @@ export function River() {
   const groupRef = useRef<Group>(null);
   const oceanRef = useRef<Group>(null);
   const camera = useThree((state) => state.camera);
-  const coarse = useIsCoarsePointer();
+  const coarse = useLowDetail();
 
   // 안개 범위는 기기별(SceneCanvas의 scene fog와 동일 값).
   useLayoutEffect(() => {

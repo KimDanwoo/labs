@@ -1,5 +1,14 @@
 import { FLORA } from '@entities/flora/model/constants';
-import { ConeGeometry, CylinderGeometry, DataTexture, IcosahedronGeometry, RGBAFormat } from 'three';
+import {
+  Color,
+  ConeGeometry,
+  CylinderGeometry,
+  DataTexture,
+  Float32BufferAttribute,
+  IcosahedronGeometry,
+  MathUtils,
+  RGBAFormat,
+} from 'three';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 export function makeCanopyGeometry(detail: number) {
@@ -44,6 +53,29 @@ export function makeTrunkGeometry() {
     position.setZ(i, position.getZ(i) + Math.sin(y * Math.PI * 1.3) * 0.035);
   }
   geometry.computeVertexNormals();
+  return geometry;
+}
+
+export function makeRockGeometry(detail: number) {
+  const base = new IcosahedronGeometry(FLORA.rock.radius, detail);
+  const geometry = mergeVertices(base);
+  base.dispose();
+  const points = geometry.getAttribute('position');
+  const colors: number[] = [];
+  const moss = new Color('#8a9a78');
+  const tint = new Color();
+  for (let i = 0; i < points.count; i++) {
+    const x = points.getX(i),
+      y = points.getY(i),
+      z = points.getZ(i);
+    const noise = Math.sin(x * 4 + z * 3) * Math.cos(y * 5 - z * 2);
+    points.setXYZ(i, x * (1 + noise * 0.14), y * (1 + noise * 0.18), z * (1 + noise * 0.1));
+    tint.setRGB(1, 1, 1).lerp(moss, MathUtils.smoothstep(y / FLORA.rock.radius, 0.05, 0.8) * 0.7);
+    colors.push(tint.r, tint.g, tint.b);
+  }
+  geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
   return geometry;
 }
 

@@ -9,12 +9,15 @@ import { ExplorationScene } from '@features/exploration/ui';
 import { RunnerRig } from '@features/runner-control/ui';
 import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { CAMERA, FOG, SCENE_COLORS, SUN, type FogQuality } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
+import { CAMERA, CINEMATIC, FOG, SCENE_COLORS, SUN, type FogQuality } from '@shared/config';
+import { RENDER_PIXELS, useIsCoarsePointer } from '@shared/lib';
+import { SceneQualityContext } from '@shared/r3f';
 import { Suspense, useState } from 'react';
 import { PCFShadowMap } from 'three';
 import { ReadySignal } from './ReadySignal';
+import { RenderBudget } from './RenderBudget';
 import { RideSun } from './RideSun';
+import { SceneEffects } from './SceneEffects';
 import { SceneFailure } from './SceneFailure';
 
 const DPR = {
@@ -24,17 +27,22 @@ const DPR = {
 
 export function SceneCanvas() {
   const coarse = useIsCoarsePointer();
-  const quality: FogQuality = coarse ? 'mobile' : 'desktop';
+  const [degraded, setDegraded] = useState(false);
+  const [isSoftware, setIsSoftware] = useState(false);
+  const lowDetail = coarse || degraded;
+  const quality: FogQuality = lowDetail ? 'mobile' : 'desktop';
   const fog = FOG[quality];
   const dprRange = DPR[quality];
   // 프레임이 떨어지면 해상도를 낮추고, 여유가 생기면 되돌린다(적응형 DPR).
   const [dpr, setDpr] = useState<number>(dprRange.max);
+  const desiredDpr = Math.min(dpr, isSoftware ? 0.6 : dprRange.max);
+  const pixelBudget = isSoftware ? RENDER_PIXELS.software : RENDER_PIXELS[quality];
 
   return (
     <Canvas
       className="cursor-grab"
       fallback={<SceneFailure />}
-      dpr={Math.min(dpr, dprRange.max)}
+      dpr={desiredDpr}
       shadows={{ type: PCFShadowMap }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{
@@ -43,31 +51,64 @@ export function SceneCanvas() {
         far: CAMERA.far,
         position: [0, CAMERA.followHeight, -CAMERA.followDistance],
       }}
+      onCreated={({ gl }) => {
+        const context = gl.getContext();
+        const info = context.getExtension('WEBGL_debug_renderer_info');
+        const renderer: unknown = info ? context.getParameter(info.UNMASKED_RENDERER_WEBGL) : '';
+        if (typeof renderer === 'string' && /swiftshader|llvmpipe|software/i.test(renderer)) {
+          setIsSoftware(true);
+          setDegraded(true);
+          setDpr(DPR.mobile.min);
+        }
+        gl.toneMappingExposure = CINEMATIC.exposure;
+        gl.domElement.setAttribute('aria-label', '유니콘 Rush 3D 초원. WASD로 이동, Space로 비행, 드래그로 시점 회전');
+        gl.domElement.tabIndex = 0;
+      }}
     >
-      <PerformanceMonitor
-        flipflops={3}
-        onDecline={() => setDpr(dprRange.min)}
-        onIncline={() => setDpr(dprRange.max)}
-        onFallback={() => setDpr(dprRange.min)}
-      />
-      <fog attach="fog" args={[SCENE_COLORS.fog, fog.near, fog.far]} />
+      <SceneQualityContext value={lowDetail}>
+        <RenderBudget desired={desiredDpr} pixels={pixelBudget} />
+        <PerformanceMonitor
+          flipflops={3}
+          onDecline={() => {
+            setDpr(DPR.mobile.min);
+            setDegraded(true);
+          }}
+          onIncline={() => {
+            if (!isSoftware) {
+              setDpr(DPR.desktop.max);
+              setDegraded(false);
+            }
+          }}
+          onFallback={() => {
+            setDpr(DPR.mobile.min);
+            setDegraded(true);
+          }}
+        />
+        <fog attach="fog" args={[SCENE_COLORS.fog, fog.near, fog.far]} />
 
-      <hemisphereLight color={SCENE_COLORS.ambient} groundColor={SCENE_COLORS.grass} intensity={SUN.ambientIntensity} />
-      <RideSun mobile={coarse} />
+        <hemisphereLight
+          color={SCENE_COLORS.ambient}
+          groundColor={SCENE_COLORS.grass}
+          intensity={SUN.ambientIntensity}
+        />
+        <RideSun mobile={lowDetail} />
+        <directionalLight color={SCENE_COLORS.fillLight} intensity={0.7} position={[40, 35, -60]} />
 
-      <Suspense fallback={null}>
-        <Scenery />
-        <Ground />
-        <River />
-        <GrassField />
-        <FloraField />
-        <RunnerRig />
-        <ExplorationScene />
-        <Grazers />
-        <WingedLife kind="bird" />
-        <WingedLife kind="dragonfly" />
-        <ReadySignal />
-      </Suspense>
+        <Suspense fallback={null}>
+          <Scenery />
+          <Ground />
+          <River />
+          <GrassField />
+          <FloraField />
+          <RunnerRig />
+          <ExplorationScene />
+          <Grazers />
+          <WingedLife kind="bird" />
+          <WingedLife kind="dragonfly" />
+          <ReadySignal />
+        </Suspense>
+        <SceneEffects enabled={!lowDetail && dpr > dprRange.min} pixels={pixelBudget} />
+      </SceneQualityContext>
     </Canvas>
   );
 }

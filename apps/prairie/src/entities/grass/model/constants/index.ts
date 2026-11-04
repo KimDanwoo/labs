@@ -1,8 +1,13 @@
+import { MEADOW_LIGHT_GLSL, SUN } from '@shared/config';
+
+const SUN_LENGTH = Math.hypot(...SUN.position);
+const SUN_DIRECTION_GLSL = `vec3(${SUN.position.map((component) => (component / SUN_LENGTH).toFixed(5)).join(',')})`;
+
 // 카메라 주변 청크만 유지(chunk-follow). 멀어진 청크는 언마운트 → 메모리·초기화 절약.
 export const GRASS_FIELD = {
   tile: 16,
-  minScale: 0.65,
-  maxScale: 1.25,
+  minScale: 0.45,
+  maxScale: 1.05,
   // blade 기울기(rad). 위에서 내려다볼 때도 면이 보이도록 수직에서 살짝 눕힌다.
   minLean: 0.08,
   maxLean: 0.38,
@@ -99,6 +104,7 @@ export const GRASS_VERTEX_SHADER = `
   varying float vDist;
   varying float vTint;
   varying vec2 vWorldXZ;
+  varying float vBacklight;
   void main() {
     // 연속 LOD: blade 밑동의 카메라 XZ 거리로 살릴지·얼마나 키울지 정한다. 인덱스 비율(aLodIndex)이 keep 아래면 보이고,
     // 임계 근처는 크기를 줄여 다가갈수록 자라난다. 죽은 blade는 크기 0.
@@ -110,6 +116,7 @@ export const GRASS_VERTEX_SHADER = `
     float detailScale = 1.0 - aDetail * smoothstep(24.0, 36.0, camDist);
     vec4 world = instanceMatrix * vec4(position * lodScale * alive * detailScale, 1.0);
     vWorldXZ = world.xz;
+    vBacklight = pow(max(dot(normalize(world.xyz - cameraPosition), ${SUN_DIRECTION_GLSL}), 0.0), 4.0);
     float hash = fract(sin(dot(floor(world.xz), vec2(12.9898, 78.233))) * 43758.5453);
     vTint = 0.88 + hash * 0.24;
 
@@ -146,6 +153,7 @@ export const GRASS_VERTEX_SHADER = `
 // blade가 끝나는 곳이 보이지 않는다 — 안개색으로 직접 페이드하면 아직 안개가 덜 낀 지면과 어긋나 띠가 생긴다.
 // 색은 선형 공간에서 섞고 마지막에 내장 머티리얼과 같은 tonemapping/colorspace include를 탄다 → Ground 평면과 정확히 같은 색에 녹는다.
 export const GRASS_FRAGMENT_SHADER = `
+  uniform float uTime;
   uniform float uBrightness;
   uniform vec3 uHorizonColor;
   uniform vec3 uGroundColor;
@@ -160,6 +168,8 @@ export const GRASS_FRAGMENT_SHADER = `
   varying float vDist;
   varying float vTint;
   varying vec2 vWorldXZ;
+  varying float vBacklight;
+  ${MEADOW_LIGHT_GLSL}
   void main() {
     // SCENE_COLORS의 밑동·끝 색을 Three Color가 선형 공간으로 변환해 전달한다.
     float dry = smoothstep(0.7, 0.95, sin(vWorldXZ.x * 0.11 + vWorldXZ.y * 0.07) * 0.5 + 0.5);
@@ -169,6 +179,8 @@ export const GRASS_FRAGMENT_SHADER = `
     // 광역 색 얼룩(초원의 옅고 진한 패치)
     float meadow = sin(vWorldXZ.x * 0.045) * sin(vWorldXZ.y * 0.045) * 0.5 + 0.5;
     col *= mix(0.9, 1.08, meadow);
+    col *= meadowLight(vWorldXZ, uTime);
+    col *= mix(vec3(1.0), vec3(1.35, 1.18, 0.82), vBacklight * pow(vFrc, 1.5) * 0.7);
 
     vec3 groundHere = mix(uGroundColor, uHorizonColor, smoothstep(uFogNear, uFogFar, vDist));
     float fade = smoothstep(uFadeNear, uFadeFar, vDist);

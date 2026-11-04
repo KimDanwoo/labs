@@ -1,14 +1,15 @@
 'use client';
+
 import { useFrame } from '@react-three/fiber';
 import { LANDMARKS } from '@shared/exploration/world';
-import { useIsCoarsePointer } from '@shared/lib';
-import { runnerState } from '@shared/r3f';
+import { runnerState, useLowDetail } from '@shared/r3f';
+
 import { useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
 
 const silver = new Color('#dbe2c1');
 export function SilverLeaves() {
-  const mobile = useIsCoarsePointer();
+  const mobile = useLowDetail();
   const count = mobile ? 28 : 64;
   const leaves = useRef<InstancedMesh>(null);
   const driftTime = useRef(0);

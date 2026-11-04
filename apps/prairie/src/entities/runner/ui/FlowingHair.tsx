@@ -1,7 +1,8 @@
 'use client';
 
+import { RUNNER_FINISH } from '@entities/runner/model/constants';
 import { useFrame } from '@react-three/fiber';
-import { runnerState } from '@shared/r3f';
+import { runnerState, useLowDetail } from '@shared/r3f';
 import { useEffect, useMemo, useRef } from 'react';
 import {
   BufferGeometry,
@@ -16,6 +17,7 @@ import {
 type FlowingHairProps = { head: Object3D; neck: Object3D; speedRef: { current: number }; isTail?: boolean };
 
 export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHairProps) {
+  const strandCount = useLowDetail() ? 28 : RUNNER_FINISH.strands;
   const mesh = useRef<Mesh>(null);
   const active = useRef<ReturnType<typeof makeUniforms> | null>(null);
   const uniforms = useMemo(() => makeUniforms(), []);
@@ -28,15 +30,18 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
       lengths: number[] = [],
       strands: number[] = [],
       indices: number[] = [];
-    for (let strand = 0; strand < 28; strand += 1) {
+    for (let strand = 0; strand < strandCount; strand += 1) {
       const offset = p.length / 3;
       for (let ring = 0; ring <= 12; ring += 1) {
         const t = ring / 12;
-        const radius = 0.043 * Math.pow(1 - t * 0.97, 0.8);
+        const radius = 0.035 * Math.pow(1 - t * 0.97, 0.8);
         for (let side = 0; side < 6; side += 1) {
           const angle = (side / 6) * Math.PI * 2;
           p.push(Math.cos(angle) * radius, t, Math.sin(angle) * radius);
-          const color = new Color('#425f88').lerp(new Color('#f5dfad'), 0.3 + t * 0.5 + Math.sin(strand * 2.4) * 0.12);
+          const color = new Color(RUNNER_FINISH.maneRoot).lerp(
+            new Color(RUNNER_FINISH.maneTip),
+            0.18 + t * 0.65 + Math.sin(strand * 2.4) * 0.12,
+          );
           colors.push(color.r, color.g, color.b);
           lengths.push(t);
           strands.push(strand);
@@ -58,7 +63,8 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
     g.setIndex(indices);
     g.computeVertexNormals();
     return g;
-  }, []);
+  }, [strandCount]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
   const shade = (shader: WebGLProgramParametersWithUniforms) => {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = shader.vertexShader
@@ -67,16 +73,16 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
         `#include <common>
       attribute float aLength, aStrand;
       uniform vec3 uTop, uBottom;
-      uniform float uTime, uFlow, uTail;
+      uniform float uTime, uFlow, uTail, uStrandCount;
       vec3 hairCenter(float t, float strand) {
-        float rootT = strand / 27.0;
+        float rootT = strand / (uStrandCount - 1.0);
         float phase = strand * 2.39996;
         vec3 center;
         if (uTail > 0.5) {
-          float spread = sqrt((strand + 0.5) / 28.0);
+          float spread = sqrt((strand + 0.5) / uStrandCount);
           center = mix(uTop, uBottom, t);
-          center.x += cos(phase) * spread * (0.08 + sin(t * 2.4) * 0.22);
-          center.z += sin(phase) * spread * 0.1;
+          center.x += cos(phase) * spread * (0.1 + sin(t * 2.4) * 0.3);
+          center.z += sin(phase) * spread * 0.16;
           center.z -= t * t * (0.35 + uFlow * 0.5);
           center.y -= t * t * (0.12 + 0.16 * sin(phase));
         } else {
@@ -116,6 +122,7 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
     object.parent.worldToLocal(u.uTop.value);
     object.parent.worldToLocal(u.uBottom.value);
     u.uTail.value = isTail ? 1 : 0;
+    u.uStrandCount.value = strandCount;
     u.uTop.value.y += isTail ? 0 : 0.35;
     u.uTop.value.z -= isTail ? 0 : 0.22;
     u.uBottom.value.y += isTail ? -0.25 : 0.3;
@@ -127,11 +134,11 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
     <mesh ref={mesh} geometry={geometry} frustumCulled={false}>
       <meshPhysicalMaterial
         vertexColors
-        roughness={0.48}
+        roughness={0.34}
         metalness={0.04}
-        sheen={0.65}
+        sheen={0.85}
         sheenColor="#f7eee1"
-        sheenRoughness={0.5}
+        sheenRoughness={0.35}
         onBeforeCompile={shade}
       />
     </mesh>
@@ -145,5 +152,6 @@ function makeUniforms() {
     uTime: { value: 0 },
     uFlow: { value: 0 },
     uTail: { value: 0 },
+    uStrandCount: { value: RUNNER_FINISH.strands as number },
   };
 }

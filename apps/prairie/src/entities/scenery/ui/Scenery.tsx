@@ -1,12 +1,14 @@
 import { Haze } from './Haze';
+import { MeadowMotes } from './MeadowMotes';
 import { Sky } from './Sky';
 
-// 배경 = 큐브맵 스카이박스(하늘+구름) + 지평선 헤이즈. 저폴리 산/구름 플레인은 제거해 순수 들판 느낌.
+// 로컬 HDR 하늘과 미리 구운 능선, 가까운 빛 입자로 대기 원근을 만든다.
 export function Scenery() {
   return (
     <>
       <Sky />
       <Haze />
+      <MeadowMotes />
     </>
   );
 }

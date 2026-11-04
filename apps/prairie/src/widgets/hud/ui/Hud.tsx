@@ -3,7 +3,9 @@
 import { ExplorationHud } from '@features/exploration/ui';
 import { useState } from 'react';
 import { PrairieMark } from './PrairieMark';
+import { RideCameraControls } from './RideCameraControls';
 import { RideControls } from './RideControls';
+import { RideTelemetry } from './RideTelemetry';
 import { RiverGuide } from './RiverGuide';
 
 export function Hud() {
@@ -30,7 +32,11 @@ export function Hud() {
       {isVisible && <ExplorationHud />}
 
       {isVisible && (
-        <footer className="border-t border-prairie-paper/25 pt-md">
+        <footer className="flex items-end justify-between gap-sm">
+          <div className="flex flex-col gap-md">
+            <RideTelemetry />
+            <RideCameraControls />
+          </div>
           <RideControls />
         </footer>
       )}
