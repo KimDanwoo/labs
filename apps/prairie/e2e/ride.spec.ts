@@ -62,6 +62,10 @@ test('desktop: cinematic rendering survives camera changes, recentering and resi
     .toBeLessThanOrEqual(3_205_000);
   await page.setViewportSize({ width: 1120, height: 760 });
   await verifyFrame(page, info, 'desktop-wide-resized');
+  await page.getByRole('button', { name: '유니콘 자세히 보기' }).click();
+  await expect(page.getByRole('button', { name: '유니콘 자세히 보기' })).toHaveAttribute('aria-pressed', 'true');
+  await verifyFrame(page, info, 'unicorn-detail');
+  await page.getByRole('button', { name: '넓은 풍경 시점' }).click();
   await page.getByText('조작법', { exact: false }).click();
   await expect(page.getByText('바람을 따라, 자유롭게.')).toBeVisible();
   await page.getByText('조작법', { exact: false }).click();
@@ -74,8 +78,10 @@ test('desktop: cinematic rendering survives camera changes, recentering and resi
 
 test('desktop: running, sprinting, takeoff and descent remain usable', async ({ page }, info) => {
   const errors = await openRide(page);
+  await page.getByRole('button', { name: '유니콘 자세히 보기' }).click();
   await page.locator('canvas').focus();
   await page.keyboard.down('KeyW');
+  await expect(page.getByRole('button', { name: '가까운 주행 시점' })).toHaveAttribute('aria-pressed', 'true');
   await expect.poll(async () => Number(await page.getByLabel('현재 속도').textContent())).toBeGreaterThan(20);
   await page.keyboard.down('Shift');
   await expect.poll(async () => Number(await page.getByLabel('현재 속도').textContent())).toBeGreaterThan(48);
@@ -105,6 +111,8 @@ test.describe('phone', () => {
     await expect(page.locator('canvas')).toHaveAttribute('data-render-mode', 'direct');
     await page.getByRole('button', { name: '넓은 풍경 시점' }).tap();
     await expect(page.getByRole('button', { name: '넓은 풍경 시점' })).toHaveAttribute('aria-pressed', 'true');
+    await page.getByRole('button', { name: '유니콘 자세히 보기' }).tap();
+    await expect(page.getByRole('button', { name: '유니콘 자세히 보기' })).toHaveAttribute('aria-pressed', 'true');
     await page.getByRole('button', { name: '가까운 주행 시점' }).tap();
     await page.getByText('조작법', { exact: false }).tap();
     await expect(page.getByText('화면을 끌어 달린 뒤', { exact: false })).toBeVisible();

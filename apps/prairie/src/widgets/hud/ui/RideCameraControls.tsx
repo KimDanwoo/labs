@@ -10,7 +10,7 @@ export function RideCameraControls() {
     <div className="pointer-events-auto flex items-center gap-sm">
       <div
         role="group"
-        aria-label="카메라 거리"
+        aria-label="카메라 시점"
         className="flex rounded-full border border-prairie-paper/25 bg-prairie-ink/60 p-xs backdrop-blur-md"
       >
         <button
@@ -29,7 +29,17 @@ export function RideCameraControls() {
           onClick={() => cameraSettings.setMode(CAMERA_MODE.wide)}
           className="ride-camera-option rounded-full px-md py-sm text-xs transition-colors focus-visible:outline-2 focus-visible:outline-prairie-accent"
         >
-          넓게 보기
+          넓게
+        </button>
+        <button
+          type="button"
+          aria-label="유니콘 자세히 보기"
+          aria-pressed={mode === CAMERA_MODE.hero}
+          title="유니콘을 가까이 보기 · 이동하면 주행 시점으로 돌아옵니다"
+          onClick={() => cameraSettings.setMode(CAMERA_MODE.hero)}
+          className="ride-camera-option rounded-full px-md py-sm text-xs transition-colors focus-visible:outline-2 focus-visible:outline-prairie-accent"
+        >
+          유니콘
         </button>
       </div>
       <button

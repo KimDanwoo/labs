@@ -19,14 +19,25 @@ export const RUNNER_ANIM = {
 
 // 천마 룩: 모델 머티리얼 이름별 색 덮어쓰기(원본 glb는 그대로).
 export const UNICORN_TINT: Record<string, string> = {
-  Main: '#f4f0e9',
-  Main_Light: '#c9d5df',
+  Main: '#e2e2de',
+  Main_Light: '#b7c6d2',
   Hair: '#647b99',
-  Muzzle: '#7f899b',
-  Hooves: '#b99251',
-  Eye_Black: '#211e1b',
-  Eye_White: '#c9bfae',
+  Muzzle: '#8a9299',
+  Hooves: '#aa8446',
+  Eye_Black: '#152e36',
+  Eye_White: '#eee9df',
 };
+
+export const RUNNER_FINISH = {
+  gold: '#cda967',
+  paleGold: '#f4ddb0',
+  opal: '#72b8c5',
+  iris: '#1c5b65',
+  pupil: '#101b2b',
+  maneRoot: '#293e62',
+  maneTip: '#c3dce4',
+  strands: 48,
+} as const;
 
 // 뿔: Head 뼈에 붙인다. 뼈에 스케일 100이 들어 있어 자식은 boneScaleFix로 보정.
 // 위치·회전은 Head 로컬(+Z = 위·앞, +Y = 코 방향) 기준 모델 단위. 실측: 뼈 원점(0,4.18,2.53) → 이마 위(0,4.6,2.9).
@@ -35,8 +46,8 @@ export const HORN = {
   position: [0, 0.18, 0.4] as [number, number, number],
   tiltForward: 0.18,
   radius: 0.085,
-  height: 1.08,
-  bend: 0.07,
+  height: 1.2,
+  bend: 0.12,
   color: '#e4c17f',
   ridgeColor: '#fff0c7',
 } as const;

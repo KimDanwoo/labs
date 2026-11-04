@@ -152,13 +152,13 @@ export function riverBearing(x: number, camYaw: number, z = 0): RiverBearing {
 
 export const SUN = {
   position: [-80, 26, 110] as [number, number, number],
-  intensity: 3.4,
-  ambientIntensity: 0.9,
+  intensity: 2.8,
+  ambientIntensity: 0.8,
 };
 
 export const CINEMATIC = {
-  exposure: 1.05,
-  bloom: { strength: 0.3, radius: 0.55, threshold: 1.15 },
+  exposure: 0.98,
+  bloom: { strength: 0.18, radius: 0.45, threshold: 2.8 },
   dust: { desktop: 150, mobile: 55, radius: 40, height: 9 },
   camera: { restingYaw: -0.72, response: 1.8 },
 } as const;

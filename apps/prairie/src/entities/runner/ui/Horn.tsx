@@ -1,5 +1,5 @@
 import { HORN } from '@entities/runner/model/constants';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { CatmullRomCurve3, LatheGeometry, TubeGeometry, Vector2, Vector3 } from 'three';
 
 export function Horn() {
@@ -21,8 +21,9 @@ export function Horn() {
       const angle = t * Math.PI * 2 * 4;
       return new Vector3(Math.cos(angle) * r, t * HORN.height, Math.sin(angle) * r - HORN.bend * t * t);
     });
-    return { body, ridge: new TubeGeometry(new CatmullRomCurve3(spiral), 100, 0.003, 4, false) };
+    return { body, ridge: new TubeGeometry(new CatmullRomCurve3(spiral), 100, 0.005, 6, false) };
   }, []);
+  useEffect(() => () => Object.values(geometry).forEach((part) => part.dispose()), [geometry]);
   return (
     <group scale={HORN.boneScaleFix}>
       <group position={HORN.position} rotation={[Math.PI / 2 - HORN.tiltForward, 0, 0]}>

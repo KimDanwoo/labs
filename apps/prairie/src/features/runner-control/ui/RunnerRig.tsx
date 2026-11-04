@@ -1,7 +1,7 @@
 'use client';
 
 import { FLORA, pushOutOfFlora } from '@entities/flora/model/constants';
-import { CAMERA_PRESETS } from '@entities/ride-settings/model/constants';
+import { CAMERA_MODE, CAMERA_PRESETS } from '@entities/ride-settings/model/constants';
 import { cameraSettings } from '@entities/ride-settings/model/store';
 import { GroundShadow, Runner, SpinStardust, SprintTrail, WadeSplash } from '@entities/runner/ui';
 import { RUNNER_PHYSICS } from '@features/runner-control/model/constants';
@@ -74,7 +74,11 @@ export function RunnerRig() {
     const { forward, backward, left, right, sprint, jump, spin, dash, descend } = getRunnerInput();
     const physics = RUNNER_PHYSICS;
     const now = state.clock.elapsedTime;
-    const cameraSetting = cameraSettings.get();
+    let cameraSetting = cameraSettings.get();
+    if (cameraSetting.mode === CAMERA_MODE.hero && (forward || backward || left || right || jump || dash)) {
+      cameraSettings.setMode(CAMERA_MODE.close);
+      cameraSetting = cameraSettings.get();
+    }
     if (cameraRevisionRef.current !== cameraSetting.revision) {
       viewYawRef.current = 0;
       viewPitchRef.current = 0;
@@ -189,7 +193,7 @@ export function RunnerRig() {
     // 카메라 방향 = 말의 heading + 마우스 드래그 yaw 오프셋(말은 heading 그대로, 카메라만 좌우로 돈다).
     restingYawRef.current = MathUtils.damp(
       restingYawRef.current,
-      CINEMATIC.camera.restingYaw * (1 - MathUtils.smoothstep(Math.abs(speed), 0.5, 5)),
+      cameraPreset.yaw * (1 - MathUtils.smoothstep(Math.abs(speed), 0.5, 5)),
       CINEMATIC.camera.response,
       delta,
     );
@@ -205,7 +209,7 @@ export function RunnerRig() {
     desiredTarget
       .copy(position)
       .addScaledVector(forwardVec, speedFraming * 2)
-      .setY(CAMERA.targetHeight + visualY);
+      .setY(cameraPreset.targetHeight + visualY);
 
     if (!initializedRef.current) {
       camera.position.copy(desiredCam);

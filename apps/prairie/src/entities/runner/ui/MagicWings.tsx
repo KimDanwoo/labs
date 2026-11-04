@@ -4,8 +4,9 @@ import { WINGS } from '@entities/runner/model/constants';
 import { makeWingGeometry } from '@entities/runner/model/services';
 import { useFrame } from '@react-three/fiber';
 import { runnerState } from '@shared/r3f';
-import { useMemo, useRef } from 'react';
-import { DoubleSide, Group, MathUtils, Vector3, type Object3D } from 'three';
+import { useEffect, useMemo, useRef } from 'react';
+import { Group, MathUtils, Vector3, type Object3D } from 'three';
+import { FeatherWing } from './FeatherWing';
 
 type MagicWingsProps = { anchor: Object3D };
 
@@ -17,6 +18,7 @@ export function MagicWings({ anchor }: MagicWingsProps) {
   const phaseRef = useRef(0);
   const point = useMemo(() => new Vector3(), []);
   const geometry = useMemo(() => makeWingGeometry(WINGS.span, WINGS.feathers), []);
+  useEffect(() => () => geometry.dispose(), [geometry]);
 
   useFrame((_, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05);
@@ -60,26 +62,10 @@ export function MagicWings({ anchor }: MagicWingsProps) {
   return (
     <group ref={rootRef} visible={false}>
       <group ref={leftRef} position={[-rootX, rootY, rootZ]} rotation={[0, 0, 0, 'YXZ']}>
-        <mesh castShadow receiveShadow geometry={geometry} scale={[-1, 1, 1]}>
-          <meshPhysicalMaterial
-            color={WINGS.color}
-            side={DoubleSide}
-            roughness={0.65}
-            sheen={0.35}
-            sheenColor="#fff0d6"
-          />
-        </mesh>
+        <FeatherWing geometry={geometry} mirror />
       </group>
       <group ref={rightRef} position={[rootX, rootY, rootZ]} rotation={[0, 0, 0, 'YXZ']}>
-        <mesh castShadow receiveShadow geometry={geometry}>
-          <meshPhysicalMaterial
-            color={WINGS.color}
-            side={DoubleSide}
-            roughness={0.65}
-            sheen={0.35}
-            sheenColor="#fff0d6"
-          />
-        </mesh>
+        <FeatherWing geometry={geometry} />
       </group>
     </group>
   );

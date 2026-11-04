@@ -1,5 +1,6 @@
 'use client';
 
+import { RUNNER_FINISH } from '@entities/runner/model/constants';
 import { useFrame } from '@react-three/fiber';
 import { runnerState } from '@shared/r3f';
 import { useEffect, useMemo, useRef } from 'react';
@@ -28,15 +29,18 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
       lengths: number[] = [],
       strands: number[] = [],
       indices: number[] = [];
-    for (let strand = 0; strand < 28; strand += 1) {
+    for (let strand = 0; strand < RUNNER_FINISH.strands; strand += 1) {
       const offset = p.length / 3;
       for (let ring = 0; ring <= 12; ring += 1) {
         const t = ring / 12;
-        const radius = 0.043 * Math.pow(1 - t * 0.97, 0.8);
+        const radius = 0.035 * Math.pow(1 - t * 0.97, 0.8);
         for (let side = 0; side < 6; side += 1) {
           const angle = (side / 6) * Math.PI * 2;
           p.push(Math.cos(angle) * radius, t, Math.sin(angle) * radius);
-          const color = new Color('#425f88').lerp(new Color('#f5dfad'), 0.3 + t * 0.5 + Math.sin(strand * 2.4) * 0.12);
+          const color = new Color(RUNNER_FINISH.maneRoot).lerp(
+            new Color(RUNNER_FINISH.maneTip),
+            0.18 + t * 0.65 + Math.sin(strand * 2.4) * 0.12,
+          );
           colors.push(color.r, color.g, color.b);
           lengths.push(t);
           strands.push(strand);
@@ -59,6 +63,7 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
     g.computeVertexNormals();
     return g;
   }, []);
+  useEffect(() => () => geometry.dispose(), [geometry]);
   const shade = (shader: WebGLProgramParametersWithUniforms) => {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = shader.vertexShader
@@ -69,14 +74,14 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
       uniform vec3 uTop, uBottom;
       uniform float uTime, uFlow, uTail;
       vec3 hairCenter(float t, float strand) {
-        float rootT = strand / 27.0;
+        float rootT = strand / ${(RUNNER_FINISH.strands - 1).toFixed(1)};
         float phase = strand * 2.39996;
         vec3 center;
         if (uTail > 0.5) {
-          float spread = sqrt((strand + 0.5) / 28.0);
+          float spread = sqrt((strand + 0.5) / ${RUNNER_FINISH.strands.toFixed(1)});
           center = mix(uTop, uBottom, t);
-          center.x += cos(phase) * spread * (0.08 + sin(t * 2.4) * 0.22);
-          center.z += sin(phase) * spread * 0.1;
+          center.x += cos(phase) * spread * (0.1 + sin(t * 2.4) * 0.3);
+          center.z += sin(phase) * spread * 0.16;
           center.z -= t * t * (0.35 + uFlow * 0.5);
           center.y -= t * t * (0.12 + 0.16 * sin(phase));
         } else {
@@ -127,11 +132,11 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
     <mesh ref={mesh} geometry={geometry} frustumCulled={false}>
       <meshPhysicalMaterial
         vertexColors
-        roughness={0.48}
+        roughness={0.34}
         metalness={0.04}
-        sheen={0.65}
+        sheen={0.85}
         sheenColor="#f7eee1"
-        sheenRoughness={0.5}
+        sheenRoughness={0.35}
         onBeforeCompile={shade}
       />
     </mesh>

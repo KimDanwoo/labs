@@ -6,12 +6,13 @@ import { FLORA, floraCellOf, floraInCell, type FloraPlacement } from '@entities/
 import {
   makeCanopyGeometry,
   makeConiferGeometry,
+  makeRockGeometry,
   makeShadowTexture,
   makeTrunkGeometry,
 } from '@entities/flora/model/services';
 import { useFrame } from '@react-three/fiber';
 import { FOG, groundHeightAt } from '@shared/config';
-import { makeLeafCanopy } from '@shared/lib';
+import { makeLeafCanopy, makeSurfaceBump, SURFACE_KIND } from '@shared/lib';
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
 
@@ -75,10 +76,16 @@ export function FloraField() {
       farCanopy: makeCanopyGeometry(1),
       conifer: makeConiferGeometry(),
       trunk: makeTrunkGeometry(),
+      rock: makeRockGeometry(coarse ? 1 : 2),
     }),
     [coarse],
   );
   useEffect(() => () => Object.values(geometry).forEach((g) => g.dispose()), [geometry]);
+  const surface = useMemo(
+    () => ({ bark: makeSurfaceBump(SURFACE_KIND.bark), stone: makeSurfaceBump(SURFACE_KIND.stone) }),
+    [],
+  );
+  useEffect(() => () => Object.values(surface).forEach((texture) => texture.dispose()), [surface]);
   const shadowTexture = useMemo(() => makeShadowTexture(), []);
   useEffect(() => () => shadowTexture.dispose(), [shadowTexture]);
   const shadowRef = useRef<InstancedMesh>(null);
@@ -241,10 +248,16 @@ export function FloraField() {
     <group>
       <MeadowFlowers />
       <instancedMesh ref={trunkRef} args={[geometry.trunk, undefined, FLORA.maxTrees * (FLORA.branches + 1)]}>
-        <meshLambertMaterial color={FLORA.colors.trunk} />
+        <meshStandardMaterial color={FLORA.colors.trunk} roughness={0.95} bumpMap={surface.bark} bumpScale={0.16} />
       </instancedMesh>
       <instancedMesh ref={canopyRef} args={[geometry.canopy, undefined, FLORA.maxTrees * FLORA.canopy.blobs]}>
-        <meshLambertMaterial vertexColors side={DoubleSide} onBeforeCompile={shadeCanopy} />
+        <meshStandardMaterial
+          vertexColors
+          side={DoubleSide}
+          roughness={0.82}
+          envMapIntensity={0.25}
+          onBeforeCompile={shadeCanopy}
+        />
       </instancedMesh>
       <instancedMesh ref={farCanopyRef} args={[geometry.farCanopy, undefined, FLORA.maxTrees * 6]}>
         <meshLambertMaterial onBeforeCompile={shadeCanopy} />
@@ -256,9 +269,14 @@ export function FloraField() {
         <planeGeometry args={[1, 1]} />
         <meshBasicMaterial map={shadowTexture} color="#293221" transparent opacity={0.3} depthWrite={false} />
       </instancedMesh>
-      <instancedMesh ref={rockRef} args={[undefined, undefined, FLORA.maxRocks]}>
-        <icosahedronGeometry args={[FLORA.rock.radius, FLORA.rock.detail]} />
-        <meshLambertMaterial color={FLORA.colors.rock} flatShading />
+      <instancedMesh ref={rockRef} args={[geometry.rock, undefined, FLORA.maxRocks]}>
+        <meshStandardMaterial
+          color={FLORA.colors.rock}
+          vertexColors
+          roughness={0.95}
+          bumpMap={surface.stone}
+          bumpScale={0.12}
+        />
       </instancedMesh>
     </group>
   );

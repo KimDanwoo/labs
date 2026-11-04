@@ -16,6 +16,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type AnimationAction } from 'three';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { FlowingHair } from './FlowingHair';
+import { HeadCrown } from './HeadCrown';
 import { Horn } from './Horn';
 import { MagicWings } from './MagicWings';
 
@@ -34,17 +35,19 @@ export function Runner({ speedRef }: RunnerProps) {
   const headingRef = useRef(0);
   const previousSpeedRef = useRef(0);
   const accelerationRef = useRef(0);
-  const timeRef = useRef<{ value: number } | null>(null);
   const { scene, animations } = useGLTF(RUNNER_MODEL_URL);
   const prepared = useMemo(() => {
     const model = clone(scene);
-    const time = { value: 0 };
     const materials: MeshStandardMaterial[] = [];
     model.traverse((object) => {
       if (!(object instanceof Mesh)) return;
       object.castShadow = true;
       object.receiveShadow = true;
       const source = Array.isArray(object.material) ? object.material : [object.material];
+      if (source.length === 1 && source[0]?.name === 'Hair') {
+        object.visible = false;
+        return;
+      }
       const copies = source.map((material) => {
         if (!(material instanceof MeshStandardMaterial)) return material;
         const copy = new MeshPhysicalMaterial();
@@ -56,16 +59,20 @@ export function Runner({ speedRef }: RunnerProps) {
         if (tint) copy.color.set(tint);
         copy.metalness = 0;
         copy.roughness = 0.56;
-        if (copy.name === 'Hair') copy.roughness = 0.48;
         if (copy.name === 'Eye_Black') copy.roughness = 0.16;
         if (copy.name === 'Main' || copy.name === 'Main_Light') {
           copy.sheen = 0.65;
           copy.sheenColor.set('#c9ddff');
-          copy.roughness = 0.42;
+          copy.roughness = 0.52;
         }
         if (copy.name === 'Hooves') {
-          copy.metalness = 0.65;
-          copy.roughness = 0.28;
+          copy.metalness = 0.8;
+          copy.roughness = 0.22;
+        }
+        if (copy.name === 'Eye_Black' || copy.name === 'Eye_White') {
+          copy.roughness = 0.12;
+          copy.clearcoat = 1;
+          copy.clearcoatRoughness = 0.08;
         }
         copy.envMapIntensity = 0.85;
         if (copy.name === 'Main' || copy.name === 'Main_Light') {
@@ -76,32 +83,14 @@ export function Runner({ speedRef }: RunnerProps) {
           copy.iridescenceThicknessRange = [160, 320];
         }
         copy.flatShading = false;
-        if (copy.name === 'Hair') {
-          copy.onBeforeCompile = (shader) => {
-            shader.uniforms.uManeTime = time;
-            shader.vertexShader = shader.vertexShader
-              .replace('#include <common>', '#include <common>\nuniform float uManeTime;')
-              .replace(
-                '#include <begin_vertex>',
-                `#include <begin_vertex>
-                float tail = smoothstep(0.012, 0.022, position.y);
-                float tip = 1.0 - smoothstep(0.014, 0.033, position.z);
-                transformed.x += sin(uManeTime * 2.8 + position.y * 180.0) * 0.0012 * tail * tip;`,
-              );
-          };
-        }
         materials.push(copy);
         return copy;
       });
       object.material = Array.isArray(object.material) ? copies : copies[0]!;
     });
-    return { model, materials, time };
+    return { model, materials };
   }, [scene]);
   const { actions } = useAnimations(animations, root);
-
-  useEffect(() => {
-    timeRef.current = prepared.time;
-  }, [prepared]);
 
   useEffect(() => () => prepared.materials.forEach((material) => material.dispose()), [prepared]);
   useEffect(() => {
@@ -142,7 +131,6 @@ export function Runner({ speedRef }: RunnerProps) {
       airborne > 0.5 ? 0.8 : tune.minRunScale,
       tune.maxRunScale,
     );
-    if (timeRef.current) timeRef.current.value = state.clock.elapsedTime;
     const acceleration = (speedRef.current - previousSpeedRef.current) / Math.max(delta, 0.001);
     accelerationRef.current = MathUtils.damp(accelerationRef.current, MathUtils.clamp(acceleration, -14, 14), 5, delta);
     previousSpeedRef.current = speedRef.current;
@@ -187,7 +175,14 @@ export function Runner({ speedRef }: RunnerProps) {
       {shoulder && <MagicWings anchor={shoulder} />}
       {tailRoot && tailTip && <FlowingHair head={tailRoot} neck={tailTip} speedRef={speedRef} isTail />}
       {head && neck && <FlowingHair head={head} neck={neck} speedRef={speedRef} />}
-      {head && createPortal(<Horn />, head)}
+      {head &&
+        createPortal(
+          <>
+            <Horn />
+            <HeadCrown />
+          </>,
+          head,
+        )}
     </group>
   );
 }
