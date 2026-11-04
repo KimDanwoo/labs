@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test scripts/test-*.mjs",
     "sync-tracks": "node scripts/sync-tracks.mjs",
     "analyze-audio": "node scripts/analyze-audio.mjs",
     "og": "node scripts/shoot-og.mjs"
@@ -30,7 +31,9 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "eslint": "catalog:",
+    "jsdom": "catalog:",
     "tailwindcss": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:"
   }
 }

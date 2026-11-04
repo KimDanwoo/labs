@@ -2,7 +2,7 @@ import { TRACKS } from '@entities/track/model/constants';
 import { artworkUrl } from '@entities/track/model/services';
 import { currentIndexAtom, frameState } from '@entities/track/model/store';
 import { useFrame } from '@shared/lib/frame';
-import { createRenderer, RIPPLE_SLOTS, type Renderer } from '@widgets/stage/lib';
+import { createRenderer, RIPPLE_SLOTS, type Renderer } from '@widgets/stage/lib/renderer';
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 

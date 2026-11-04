@@ -7,8 +7,6 @@ const OUTLINE = {
   strokeLinejoin: 'round',
   'aria-hidden': true,
 } as const;
-
-/** 목록(줄) + 재생 삼각형 — 재생목록 화면으로 가는 버튼. */
 export function QueueIcon() {
   return (
     <svg {...OUTLINE} className="size-[20px]">

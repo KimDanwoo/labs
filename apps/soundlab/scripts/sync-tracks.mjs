@@ -30,8 +30,12 @@ const FONT_OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', '
 const warn = (message) => console.warn(`[sync-tracks] ${message}`);
 
 // 생성물이 Prettier(singleQuote)와 어긋나면 커밋마다 포맷 diff가 난다
-const q = (value) =>
-  `'${String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n')}'`;
+const q = (value) => {
+  const text = String(value);
+  const quote = text.split("'").length > text.split('"').length ? '"' : "'";
+  const escaped = JSON.stringify(text).slice(1, -1);
+  return quote === '"' ? `"${escaped}"` : `'${escaped.replace(/\\"/g, '"').replace(/'/g, "\\'")}'`;
+};
 
 async function get(url, userAgent = UA) {
   const res = await fetch(url, { headers: { 'user-agent': userAgent }, signal: AbortSignal.timeout(TIMEOUT_MS) });
@@ -120,7 +124,9 @@ async function writeOgFont(tracks) {
   const font = Buffer.from(await (await get(found[1])).arrayBuffer());
   mkdirSync(dirname(FONT_OUT), { recursive: true });
   writeFileSync(FONT_OUT, font);
-  console.log(`[sync-tracks] OG 폰트 서브셋 ${(font.length / 1024).toFixed(1)}KB (${chars.length}자) → ${FONT_OUT.replace(process.cwd(), '.')}`);
+  console.log(
+    `[sync-tracks] OG 폰트 서브셋 ${(font.length / 1024).toFixed(1)}KB (${chars.length}자) → ${FONT_OUT.replace(process.cwd(), '.')}`,
+  );
 }
 
 try {

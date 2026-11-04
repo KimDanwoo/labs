@@ -6,7 +6,8 @@ import { currentIndexAtom, frameState } from '@entities/track/model/store';
 import { FLOATING_BUTTON } from '@shared/lib/floatingButton';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
-import { CheckIcon, LinkIcon } from './Icons';
+import { CheckIcon } from './CheckIcon';
+import { LinkIcon } from './LinkIcon';
 
 const COPIED_MS = 1600;
 

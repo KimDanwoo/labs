@@ -335,7 +335,7 @@ export const TRACKS: readonly Track[] = [
   },
   {
     id: 2401267203,
-    title: '춤을 추어요 (Let\'s Dance)',
+    title: "춤을 추어요 (Let's Dance)",
     permalinkUrl: 'https://soundcloud.com/danwooking/jzcjqtgrdfr8',
     artworkBase: 'https://i1.sndcdn.com/artworks-y9IhyVOTNLy5rKMt-tzgyYw',
     artworkExt: '.jpg',
@@ -355,7 +355,7 @@ export const TRACKS: readonly Track[] = [
   },
   {
     id: 2400823827,
-    title: '데리러 갈게 (I\'ll Come Get You)',
+    title: "데리러 갈게 (I'll Come Get You)",
     permalinkUrl: 'https://soundcloud.com/danwooking/zwioribkedsm',
     artworkBase: 'https://i1.sndcdn.com/artworks-99zKL3Y5oy76XwWu-i9PyjQ',
     artworkExt: '.jpg',
