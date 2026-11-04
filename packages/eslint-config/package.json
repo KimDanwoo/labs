@@ -2,11 +2,15 @@
   "name": "@repo/eslint-config",
   "version": "0.0.0",
   "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
   "files": [
     "next.eslint.config.mjs",
     "fsd.config.mjs",
     "naming.config.mjs",
-    "library.eslint.config.mjs"
+    "library.eslint.config.mjs",
+    "rules/"
   ],
   "devDependencies": {
     "@typescript-eslint/parser": "catalog:",
