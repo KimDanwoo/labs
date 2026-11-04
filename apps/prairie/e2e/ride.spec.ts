@@ -44,7 +44,7 @@ async function verifyFrame(page: Page, info: TestInfo, name: string) {
   expect(colors.range, `${name} must contain lit surfaces and shadows`).toBeGreaterThan(40);
 }
 
-test('desktop: cinematic rendering survives camera changes, recentering and resizing', async ({ page }, info) => {
+test('desktop: cinematic rendering survives camera changes and recentering', async ({ page }, info) => {
   const errors = await openRide(page);
   if (process.env.CI) await expect(page.locator('canvas')).toHaveAttribute('data-render-mode', 'direct');
   await expect(page.getByRole('button', { name: '가까운 주행 시점' })).toHaveAttribute('aria-pressed', 'true');
@@ -56,15 +56,26 @@ test('desktop: cinematic rendering survives camera changes, recentering and resi
   await page.mouse.move(940, 520, { steps: process.env.CI ? 2 : 12 });
   await page.mouse.up();
   await page.getByRole('button', { name: '시점 초기화' }).click();
+  await page.getByRole('button', { name: '유니콘 자세히 보기' }).click();
+  await expect(page.getByRole('button', { name: '유니콘 자세히 보기' })).toHaveAttribute('aria-pressed', 'true');
+  await verifyFrame(page, info, 'unicorn-detail');
+  expect(errors).toEqual([]);
+});
+
+test('desktop: rendering stays within budget through 4K resizing', async ({ page }, info) => {
+  const errors = await openRide(page);
+  await page.getByRole('button', { name: '넓은 풍경 시점' }).click();
   await page.setViewportSize({ width: 3840, height: 2160 });
   await expect
     .poll(() => page.locator('canvas').evaluate((canvas: HTMLCanvasElement) => canvas.width * canvas.height))
     .toBeLessThanOrEqual(process.env.CI ? 325_000 : 3_205_000);
   await page.setViewportSize({ width: 1120, height: 760 });
   await verifyFrame(page, info, 'desktop-wide-resized');
-  await page.getByRole('button', { name: '유니콘 자세히 보기' }).click();
-  await expect(page.getByRole('button', { name: '유니콘 자세히 보기' })).toHaveAttribute('aria-pressed', 'true');
-  await verifyFrame(page, info, 'unicorn-detail');
+  expect(errors).toEqual([]);
+});
+
+test('desktop: help and scenery mode preserve the selected camera', async ({ page }) => {
+  const errors = await openRide(page);
   await page.getByRole('button', { name: '넓은 풍경 시점' }).click();
   await page.getByText('조작법', { exact: false }).click();
   await expect(page.getByText('바람을 따라, 자유롭게.')).toBeVisible();
