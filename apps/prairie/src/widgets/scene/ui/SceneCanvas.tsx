@@ -12,7 +12,7 @@ import { Canvas } from '@react-three/fiber';
 import { CAMERA, CINEMATIC, FOG, SCENE_COLORS, SUN, type FogQuality } from '@shared/config';
 import { RENDER_PIXELS, useIsCoarsePointer } from '@shared/lib';
 import { SceneQualityContext } from '@shared/r3f';
-import { Suspense, useRef, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { PCFShadowMap } from 'three';
 import { ReadySignal } from './ReadySignal';
 import { RenderBudget } from './RenderBudget';
@@ -28,19 +28,21 @@ const DPR = {
 export function SceneCanvas() {
   const coarse = useIsCoarsePointer();
   const [degraded, setDegraded] = useState(false);
-  const software = useRef(false);
+  const [isSoftware, setIsSoftware] = useState(false);
   const lowDetail = coarse || degraded;
   const quality: FogQuality = lowDetail ? 'mobile' : 'desktop';
   const fog = FOG[quality];
   const dprRange = DPR[quality];
   // 프레임이 떨어지면 해상도를 낮추고, 여유가 생기면 되돌린다(적응형 DPR).
   const [dpr, setDpr] = useState<number>(dprRange.max);
+  const desiredDpr = Math.min(dpr, isSoftware ? 0.6 : dprRange.max);
+  const pixelBudget = isSoftware ? RENDER_PIXELS.software : RENDER_PIXELS[quality];
 
   return (
     <Canvas
       className="cursor-grab"
       fallback={<SceneFailure />}
-      dpr={Math.min(dpr, dprRange.max)}
+      dpr={desiredDpr}
       shadows={{ type: PCFShadowMap }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{
@@ -54,7 +56,7 @@ export function SceneCanvas() {
         const info = context.getExtension('WEBGL_debug_renderer_info');
         const renderer: unknown = info ? context.getParameter(info.UNMASKED_RENDERER_WEBGL) : '';
         if (typeof renderer === 'string' && /swiftshader|llvmpipe|software/i.test(renderer)) {
-          software.current = true;
+          setIsSoftware(true);
           setDegraded(true);
           setDpr(DPR.mobile.min);
         }
@@ -64,7 +66,7 @@ export function SceneCanvas() {
       }}
     >
       <SceneQualityContext value={lowDetail}>
-        <RenderBudget desired={Math.min(dpr, dprRange.max)} pixels={RENDER_PIXELS[quality]} />
+        <RenderBudget desired={desiredDpr} pixels={pixelBudget} />
         <PerformanceMonitor
           flipflops={3}
           onDecline={() => {
@@ -72,7 +74,7 @@ export function SceneCanvas() {
             setDegraded(true);
           }}
           onIncline={() => {
-            if (!software.current) {
+            if (!isSoftware) {
               setDpr(DPR.desktop.max);
               setDegraded(false);
             }
@@ -105,7 +107,7 @@ export function SceneCanvas() {
           <WingedLife kind="dragonfly" />
           <ReadySignal />
         </Suspense>
-        <SceneEffects enabled={!lowDetail && dpr > dprRange.min} pixels={RENDER_PIXELS[quality]} />
+        <SceneEffects enabled={!lowDetail && dpr > dprRange.min} pixels={pixelBudget} />
       </SceneQualityContext>
     </Canvas>
   );

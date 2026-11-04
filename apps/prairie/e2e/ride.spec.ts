@@ -59,7 +59,7 @@ test('desktop: cinematic rendering survives camera changes, recentering and resi
   await page.setViewportSize({ width: 3840, height: 2160 });
   await expect
     .poll(() => page.locator('canvas').evaluate((canvas: HTMLCanvasElement) => canvas.width * canvas.height))
-    .toBeLessThanOrEqual(3_205_000);
+    .toBeLessThanOrEqual(process.env.CI ? 325_000 : 3_205_000);
   await page.setViewportSize({ width: 1120, height: 760 });
   await verifyFrame(page, info, 'desktop-wide-resized');
   await page.getByRole('button', { name: '유니콘 자세히 보기' }).click();

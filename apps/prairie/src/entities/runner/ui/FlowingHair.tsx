@@ -2,7 +2,7 @@
 
 import { RUNNER_FINISH } from '@entities/runner/model/constants';
 import { useFrame } from '@react-three/fiber';
-import { runnerState } from '@shared/r3f';
+import { runnerState, useLowDetail } from '@shared/r3f';
 import { useEffect, useMemo, useRef } from 'react';
 import {
   BufferGeometry,
@@ -17,6 +17,7 @@ import {
 type FlowingHairProps = { head: Object3D; neck: Object3D; speedRef: { current: number }; isTail?: boolean };
 
 export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHairProps) {
+  const strandCount = useLowDetail() ? 28 : RUNNER_FINISH.strands;
   const mesh = useRef<Mesh>(null);
   const active = useRef<ReturnType<typeof makeUniforms> | null>(null);
   const uniforms = useMemo(() => makeUniforms(), []);
@@ -29,7 +30,7 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
       lengths: number[] = [],
       strands: number[] = [],
       indices: number[] = [];
-    for (let strand = 0; strand < RUNNER_FINISH.strands; strand += 1) {
+    for (let strand = 0; strand < strandCount; strand += 1) {
       const offset = p.length / 3;
       for (let ring = 0; ring <= 12; ring += 1) {
         const t = ring / 12;
@@ -62,7 +63,7 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
     g.setIndex(indices);
     g.computeVertexNormals();
     return g;
-  }, []);
+  }, [strandCount]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   const shade = (shader: WebGLProgramParametersWithUniforms) => {
     Object.assign(shader.uniforms, uniforms);
@@ -72,13 +73,13 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
         `#include <common>
       attribute float aLength, aStrand;
       uniform vec3 uTop, uBottom;
-      uniform float uTime, uFlow, uTail;
+      uniform float uTime, uFlow, uTail, uStrandCount;
       vec3 hairCenter(float t, float strand) {
-        float rootT = strand / ${(RUNNER_FINISH.strands - 1).toFixed(1)};
+        float rootT = strand / (uStrandCount - 1.0);
         float phase = strand * 2.39996;
         vec3 center;
         if (uTail > 0.5) {
-          float spread = sqrt((strand + 0.5) / ${RUNNER_FINISH.strands.toFixed(1)});
+          float spread = sqrt((strand + 0.5) / uStrandCount);
           center = mix(uTop, uBottom, t);
           center.x += cos(phase) * spread * (0.1 + sin(t * 2.4) * 0.3);
           center.z += sin(phase) * spread * 0.16;
@@ -121,6 +122,7 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
     object.parent.worldToLocal(u.uTop.value);
     object.parent.worldToLocal(u.uBottom.value);
     u.uTail.value = isTail ? 1 : 0;
+    u.uStrandCount.value = strandCount;
     u.uTop.value.y += isTail ? 0 : 0.35;
     u.uTop.value.z -= isTail ? 0 : 0.22;
     u.uBottom.value.y += isTail ? -0.25 : 0.3;
@@ -150,5 +152,6 @@ function makeUniforms() {
     uTime: { value: 0 },
     uFlow: { value: 0 },
     uTail: { value: 0 },
+    uStrandCount: { value: RUNNER_FINISH.strands as number },
   };
 }
