@@ -9,9 +9,9 @@ import {
 } from '@entities/flora/model/services';
 import { useFrame } from '@react-three/fiber';
 import { FOG, groundHeightAt } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
+import { makeLeafCanopy, useIsCoarsePointer } from '@shared/lib';
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
-import { Color, InstancedMesh, Object3D, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
+import { Color, DoubleSide, InstancedMesh, Object3D, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
 
 import { MeadowFlowers } from './MeadowFlowers';
 
@@ -69,7 +69,7 @@ export function FloraField() {
   const viewRadius = coarse ? FLORA.viewRadius.mobile : FLORA.viewRadius.desktop;
   const geometry = useMemo(
     () => ({
-      canopy: makeCanopyGeometry(coarse ? 1 : 2),
+      canopy: makeLeafCanopy(FLORA.canopy.radius, coarse ? 100 : 180),
       farCanopy: makeCanopyGeometry(1),
       conifer: makeConiferGeometry(),
       trunk: makeTrunkGeometry(),
@@ -242,7 +242,7 @@ export function FloraField() {
         <meshLambertMaterial color={FLORA.colors.trunk} />
       </instancedMesh>
       <instancedMesh ref={canopyRef} args={[geometry.canopy, undefined, FLORA.maxTrees * FLORA.canopy.blobs]}>
-        <meshLambertMaterial onBeforeCompile={shadeCanopy} />
+        <meshLambertMaterial vertexColors side={DoubleSide} onBeforeCompile={shadeCanopy} />
       </instancedMesh>
       <instancedMesh ref={farCanopyRef} args={[geometry.farCanopy, undefined, FLORA.maxTrees * 6]}>
         <meshLambertMaterial onBeforeCompile={shadeCanopy} />

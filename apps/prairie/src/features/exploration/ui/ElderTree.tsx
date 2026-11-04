@@ -1,12 +1,15 @@
 'use client';
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
-import { Group } from 'three';
+import { makeLeafCanopy } from '@shared/lib';
+import { useEffect, useMemo, useRef } from 'react';
+import { DoubleSide, Group } from 'three';
 
 import { Branch } from './Branch';
 import { SilverLeaves } from './SilverLeaves';
 
 export function ElderTree() {
+  const leaves = useMemo(() => ({ crown: makeLeafCanopy(3.6, 240), tips: makeLeafCanopy(2.6, 140) }), []);
+  useEffect(() => () => Object.values(leaves).forEach((geometry) => geometry.dispose()), [leaves]);
   const crown = useRef<Group>(null);
   useFrame(({ clock }) => {
     if (crown.current) crown.current.rotation.z = Math.sin(clock.elapsedTime * 0.45) * 0.012;
@@ -52,13 +55,16 @@ export function ElderTree() {
                 ]}
                 radius={0.35 + (i % 2) * 0.15}
               />
-              <mesh position={[x, y, z]} scale={[1.6, 0.65, 1.1]} castShadow>
-                <icosahedronGeometry args={[3.6, 2]} />
-                <meshStandardMaterial color={i % 2 ? '#9dac88' : '#748c6a'} roughness={1} />
+              <mesh geometry={leaves.crown} position={[x, y, z]} scale={[1.6, 0.65, 1.1]} castShadow>
+                <meshStandardMaterial
+                  vertexColors
+                  side={DoubleSide}
+                  color={i % 2 ? '#9dac88' : '#748c6a'}
+                  roughness={0.85}
+                />
               </mesh>
-              <mesh position={[x + 1, y + 0.9, z - 0.7]} scale={[1.5, 0.4, 1]}>
-                <icosahedronGeometry args={[2.6, 1]} />
-                <meshStandardMaterial color="#bcc6a3" roughness={1} />
+              <mesh geometry={leaves.tips} position={[x + 1, y + 0.9, z - 0.7]} scale={[1.5, 0.4, 1]}>
+                <meshStandardMaterial vertexColors side={DoubleSide} color="#bcc6a3" roughness={0.85} />
               </mesh>
             </group>
           );

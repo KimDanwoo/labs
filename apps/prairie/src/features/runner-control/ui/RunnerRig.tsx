@@ -1,6 +1,8 @@
 'use client';
 
 import { FLORA, pushOutOfFlora } from '@entities/flora/model/constants';
+import { CAMERA_PRESETS } from '@entities/ride-settings/model/constants';
+import { cameraSettings } from '@entities/ride-settings/model/store';
 import { GroundShadow, Runner, SpinStardust, SprintTrail, WadeSplash } from '@entities/runner/ui';
 import { RUNNER_PHYSICS } from '@features/runner-control/model/constants';
 import { usePointerLook, useRunnerControls } from '@features/runner-control/model/hooks';
@@ -18,6 +20,7 @@ import { getRunnerInput } from '@features/runner-control/model/store';
 import { useFrame, useThree } from '@react-three/fiber';
 import {
   CAMERA,
+  CINEMATIC,
   coastDistanceAt,
   distanceToRiver,
   groundHeightAt,
@@ -27,7 +30,7 @@ import {
   terrainHeightAt,
   waterDepthAt,
 } from '@shared/config';
-import { runnerState, setRideRiver } from '@shared/r3f';
+import { runnerState, setRideRiver, setRideTelemetry } from '@shared/r3f';
 import { useRef } from 'react';
 import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three';
 
@@ -54,19 +57,30 @@ export function RunnerRig() {
   const rollRef = useRef<Group>(null);
   const headingRef = useRef(0);
   const viewYawRef = useRef(0);
+  const viewPitchRef = useRef(0);
+  const cameraRevisionRef = useRef(cameraSettings.get().revision);
   const positionRef = useRef(new Vector3(0, 0, 0));
   const airborneRef = useRef(createFlightState());
   const wasSprintingRef = useRef(false);
   const wasJumpPressedRef = useRef(false);
   const initializedRef = useRef(false);
+  const restingYawRef = useRef(CINEMATIC.camera.restingYaw as number);
+  const telemetryAtRef = useRef(-1);
 
-  usePointerLook(viewYawRef);
+  usePointerLook(viewYawRef, viewPitchRef);
 
   useFrame((state, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05);
     const { forward, backward, left, right, sprint, jump, spin, dash, descend } = getRunnerInput();
     const physics = RUNNER_PHYSICS;
     const now = state.clock.elapsedTime;
+    const cameraSetting = cameraSettings.get();
+    if (cameraRevisionRef.current !== cameraSetting.revision) {
+      viewYawRef.current = 0;
+      viewPitchRef.current = 0;
+      cameraRevisionRef.current = cameraSetting.revision;
+    }
+    const cameraPreset = CAMERA_PRESETS[cameraSetting.mode];
 
     const air = airborneRef.current;
     const isGrounded = air.height <= 0;
@@ -156,6 +170,10 @@ export function RunnerRig() {
     runnerState.isSprinting = isSprinting;
     runnerState.airborneHeight = air.height;
     runnerState.verticalSpeed = air.velocity;
+    if (now - telemetryAtRef.current > 0.15) {
+      setRideTelemetry(speedRef.current, air.height);
+      telemetryAtRef.current = now;
+    }
 
     const frameCamera = state.camera;
     if (frameCamera instanceof PerspectiveCamera) {
@@ -169,13 +187,19 @@ export function RunnerRig() {
     }
 
     // 카메라 방향 = 말의 heading + 마우스 드래그 yaw 오프셋(말은 heading 그대로, 카메라만 좌우로 돈다).
-    const camYaw = heading + viewYawRef.current;
+    restingYawRef.current = MathUtils.damp(
+      restingYawRef.current,
+      CINEMATIC.camera.restingYaw * (1 - MathUtils.smoothstep(Math.abs(speed), 0.5, 5)),
+      CINEMATIC.camera.response,
+      delta,
+    );
+    const camYaw = heading + viewYawRef.current + restingYawRef.current;
     camDirVec.set(Math.sin(camYaw), 0, Math.cos(camYaw));
     const speedFraming = MathUtils.clamp(Math.abs(speed) / 24, 0, 1);
     desiredCam
       .copy(position)
-      .addScaledVector(camDirVec, -(CAMERA.followDistance + speedFraming * 2))
-      .setY(visualY + CAMERA.followHeight + speedFraming * 0.7);
+      .addScaledVector(camDirVec, -(cameraPreset.distance + speedFraming * 2))
+      .setY(visualY + cameraPreset.height + viewPitchRef.current * cameraPreset.distance + speedFraming * 0.7);
     // 말 뒤 언덕이 솟아 있으면 카메라가 지면 아래로 묻힌다 → 그 자리 지형 위 최소 높이를 보장.
     desiredCam.y = Math.max(desiredCam.y, terrainHeightAt(desiredCam.x, desiredCam.z) + CAMERA.groundClearance);
     desiredTarget

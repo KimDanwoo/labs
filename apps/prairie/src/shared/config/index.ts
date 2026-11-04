@@ -1,8 +1,11 @@
+export { MEADOW_LIGHT_GLSL } from './meadowGlsl';
 export { RIVER_GLSL, TERRAIN_GLSL } from './riverGlsl';
 export {
   CAMERA,
+  CINEMATIC,
   FOG,
   HAZE,
+  MEADOW_PATH,
   OCEAN,
   RIDGES,
   RIVER,
@@ -15,6 +18,8 @@ export {
   coastDistanceAt,
   distanceToRiver,
   groundHeightAt,
+  meadowPathDistanceAt,
+  meadowPathX,
   nearestRiverX,
   riverBearing,
   riverBedDepthAt,

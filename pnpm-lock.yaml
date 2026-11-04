@@ -610,6 +610,9 @@ importers:
       '@config/tsconfig':
         specifier: workspace:*
         version: link:../../packages/config
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.64.0
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -637,6 +640,9 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.0
+      tsx:
+        specifier: 'catalog:'
+        version: 4.22.4
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

@@ -35,6 +35,9 @@ export const RUNNER_PHYSICS = {
 // PC: 캔버스를 마우스로 끌어 카메라를 좌우로 회전(yaw). px 이동량 × 감도(rad).
 export const VIEW_LOOK = {
   sensitivity: 0.005,
+  pitchSensitivity: 0.003,
+  minPitch: -0.25,
+  maxPitch: 0.65,
 } as const;
 
 // 모바일: 손 댄 자리에 생기는 플로팅 조이스틱. 단위는 px(화면 좌표 기준).

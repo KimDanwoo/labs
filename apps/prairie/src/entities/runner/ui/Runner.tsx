@@ -67,7 +67,14 @@ export function Runner({ speedRef }: RunnerProps) {
           copy.metalness = 0.65;
           copy.roughness = 0.28;
         }
-        copy.envMapIntensity = 0.5;
+        copy.envMapIntensity = 0.85;
+        if (copy.name === 'Main' || copy.name === 'Main_Light') {
+          copy.clearcoat = 0.2;
+          copy.clearcoatRoughness = 0.5;
+          copy.iridescence = 0.18;
+          copy.iridescenceIOR = 1.25;
+          copy.iridescenceThicknessRange = [160, 320];
+        }
         copy.flatShading = false;
         if (copy.name === 'Hair') {
           copy.onBeforeCompile = (shader) => {

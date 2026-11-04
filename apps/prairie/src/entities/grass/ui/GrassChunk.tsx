@@ -1,5 +1,13 @@
 import { GRASS_FIELD } from '@entities/grass/model/constants';
-import { coastDistanceAt, distanceToRiver, groundHeightAt, RIVER, RIVER_TRENCH_HALF_WIDTH } from '@shared/config';
+import {
+  coastDistanceAt,
+  distanceToRiver,
+  groundHeightAt,
+  MEADOW_PATH,
+  meadowPathDistanceAt,
+  RIVER,
+  RIVER_TRENCH_HALF_WIDTH,
+} from '@shared/config';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import {
   type BufferGeometry,
@@ -84,8 +92,18 @@ export const GrassChunk = memo(function GrassChunk({
       // 강둑 경사 윗부분(grassOverhang)까지 잔디가 넘어오고, 거기서 grassFade 폭에 걸쳐 성겨지며 키도 낮아진다.
       // 물과 모래사장은 제출할 인스턴스에서 빼되 원래 LOD 인덱스는 보존한다.
       const riverward = (riverDist - (RIVER_TRENCH_HALF_WIDTH - RIVER.grassOverhang)) / RIVER.grassFade;
-      const isBare = rng() > riverward || coastDistanceAt(x, z) > -28;
-      const height = scale * clump * jitter * MathUtils.lerp(RIVER.grassMinHeight, 1, MathUtils.clamp(riverward, 0, 1));
+      const path = MathUtils.smoothstep(
+        meadowPathDistanceAt(x, z),
+        MEADOW_PATH.halfWidth,
+        MEADOW_PATH.halfWidth + MEADOW_PATH.edge,
+      );
+      const isBare = rng() > riverward || coastDistanceAt(x, z) > -28 || rng() > 0.1 + path * 0.9;
+      const height =
+        scale *
+        clump *
+        jitter *
+        MathUtils.lerp(0.2, 1, path) *
+        MathUtils.lerp(RIVER.grassMinHeight, 1, MathUtils.clamp(riverward, 0, 1));
       if (isBare) continue;
       dummy.scale.set(scale * (0.7 + clump * 0.3), height, scale);
       dummy.updateMatrix();

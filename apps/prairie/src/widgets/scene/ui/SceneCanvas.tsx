@@ -9,12 +9,14 @@ import { ExplorationScene } from '@features/exploration/ui';
 import { RunnerRig } from '@features/runner-control/ui';
 import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { CAMERA, FOG, SCENE_COLORS, SUN, type FogQuality } from '@shared/config';
-import { useIsCoarsePointer } from '@shared/lib';
+import { CAMERA, CINEMATIC, FOG, SCENE_COLORS, SUN, type FogQuality } from '@shared/config';
+import { RENDER_PIXELS, useIsCoarsePointer } from '@shared/lib';
 import { Suspense, useState } from 'react';
 import { PCFShadowMap } from 'three';
 import { ReadySignal } from './ReadySignal';
+import { RenderBudget } from './RenderBudget';
 import { RideSun } from './RideSun';
+import { SceneEffects } from './SceneEffects';
 import { SceneFailure } from './SceneFailure';
 
 const DPR = {
@@ -43,7 +45,13 @@ export function SceneCanvas() {
         far: CAMERA.far,
         position: [0, CAMERA.followHeight, -CAMERA.followDistance],
       }}
+      onCreated={({ gl }) => {
+        gl.toneMappingExposure = CINEMATIC.exposure;
+        gl.domElement.setAttribute('aria-label', '유니콘 Rush 3D 초원. WASD로 이동, Space로 비행, 드래그로 시점 회전');
+        gl.domElement.tabIndex = 0;
+      }}
     >
+      <RenderBudget desired={Math.min(dpr, dprRange.max)} pixels={RENDER_PIXELS[quality]} />
       <PerformanceMonitor
         flipflops={3}
         onDecline={() => setDpr(dprRange.min)}
@@ -54,6 +62,7 @@ export function SceneCanvas() {
 
       <hemisphereLight color={SCENE_COLORS.ambient} groundColor={SCENE_COLORS.grass} intensity={SUN.ambientIntensity} />
       <RideSun mobile={coarse} />
+      <directionalLight color={SCENE_COLORS.fillLight} intensity={0.7} position={[40, 35, -60]} />
 
       <Suspense fallback={null}>
         <Scenery />
@@ -68,6 +77,7 @@ export function SceneCanvas() {
         <WingedLife kind="dragonfly" />
         <ReadySignal />
       </Suspense>
+      <SceneEffects enabled={!coarse && dpr > dprRange.min} pixels={RENDER_PIXELS[quality]} />
     </Canvas>
   );
 }

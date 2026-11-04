@@ -18,7 +18,7 @@ export function RiverGuide() {
   if (atSea) destination = '탁 트인 바다';
 
   return (
-    <div className="absolute right-4 top-24 flex max-w-[190px] items-center gap-sm rounded-2xl border border-prairie-paper/20 bg-prairie-ink/35 px-md py-md backdrop-blur-md sm:static sm:max-w-none sm:gap-md sm:px-lg">
+    <div className="absolute right-lg top-24 flex max-w-48 items-center gap-sm rounded-2xl border border-prairie-paper/20 bg-prairie-ink/60 px-md py-md backdrop-blur-md sm:static sm:max-w-none sm:gap-md sm:px-lg">
       <svg
         aria-hidden
         viewBox="0 0 24 24"
@@ -46,7 +46,11 @@ export function RiverGuide() {
             </>
           )}
         </p>
-        {!atSea && <p className="mt-xs text-xs text-prairie-paper/60">강의 하류를 따라 · 바다까지 약 {seaDistance}m</p>}
+        {!atSea && (
+          <p className="mt-xs break-keep text-pretty text-xs text-prairie-paper/60">
+            강의 하류를 따라 · 바다까지 약 {seaDistance}m
+          </p>
+        )}
       </div>
     </div>
   );
