@@ -17,7 +17,7 @@ const { tags, counts } = Astro.props;
         <li>
           <a
             href={tagPath(tag)}
-            class="inline-flex items-center gap-xs rounded-md bg-muted px-sm py-xs text-sm text-muted-foreground transition-colors hover:text-foreground"
+            class="inline-flex items-center gap-xs rounded-md bg-muted px-sm py-xs text-sm text-muted-foreground transition-colors hover:bg-primary-subtle hover:text-primary"
           >
             #{TAG_LABEL[tag]}
             {counts && <span class="text-xs opacity-70">{counts.get(tag)}</span>}

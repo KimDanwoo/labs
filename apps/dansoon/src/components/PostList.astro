@@ -1,8 +1,8 @@
 ---
 import { Image } from 'astro:assets';
+import CategoryBadge from '~/components/CategoryBadge.astro';
 import { formatShortDate, readingMinutes } from '~/lib/format';
 import { postPath, type Post } from '~/lib/posts';
-import { CATEGORY_LABEL } from '~/lib/taxonomy';
 
 type Props = {
   posts: Post[];
@@ -24,15 +24,14 @@ const { posts } = Astro.props;
           <a href={postPath(post)} class="group flex items-start gap-lg py-lg">
             <div class="min-w-0 flex-1">
               <p class="flex items-center gap-sm text-sm text-muted-foreground">
+                <CategoryBadge category={post.data.category} />
                 <time datetime={post.data.publishedAt.toISOString()} class="tabular-nums">
                   {formatShortDate(post.data.publishedAt)}
                 </time>
                 <span aria-hidden="true">·</span>
-                <span>{CATEGORY_LABEL[post.data.category]}</span>
-                <span aria-hidden="true">·</span>
                 <span>{readingMinutes(post.body)}분</span>
               </p>
-              <h2 class="mt-sm text-xl leading-snug font-bold tracking-tight group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+              <h2 class="mt-sm text-xl leading-snug font-bold tracking-tight transition-colors group-hover:text-primary">
                 {post.data.title}
               </h2>
               <p class="mt-sm line-clamp-2 leading-relaxed text-muted-foreground">{post.data.description}</p>

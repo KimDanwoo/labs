@@ -22,7 +22,7 @@ const weeks = groupByWeek(await getBookReports());
             {reports.map((report) => (
               <a
                 href={bookReportPath(report)}
-                class="inline-flex h-9 items-center gap-xs rounded-full px-md text-sm text-muted-foreground ring-1 ring-border transition-colors hover:bg-muted hover:text-foreground"
+                class="inline-flex h-9 items-center gap-xs rounded-full px-md text-sm text-muted-foreground ring-1 ring-border transition-colors hover:bg-primary-subtle hover:text-primary hover:ring-primary/30"
               >
                 {REPORT_KIND_LABEL[report.data.category]}
                 <Icon name="arrow-right" class="size-3.5" />

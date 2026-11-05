@@ -23,8 +23,9 @@ const tabs = [
           <a
             href={tab.href}
             aria-current={tab.id === active ? 'page' : undefined}
-            class="inline-flex h-9 items-center gap-xs rounded-full px-md text-sm whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted hover:text-foreground aria-[current=page]:bg-foreground aria-[current=page]:text-background"
+            class="inline-flex h-9 items-center gap-xs rounded-full px-md text-sm whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted hover:text-foreground aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground"
           >
+            {tab.id !== 'all' && <span data-category={tab.id} class="category-dot" aria-hidden="true" />}
             {tab.label}
             <span class="text-xs tabular-nums opacity-60">{tab.count}</span>
           </a>

@@ -166,9 +166,43 @@
   }
 
   .toc-link[aria-current='true'] {
-    color: var(--color-foreground);
-    border-color: var(--color-foreground);
-    font-weight: 600;
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  /* 카테고리 색: 공용 토큰의 상태 색을 빌려 쓴다(다크모드도 토큰이 바꿔 준다) */
+  [data-category='dev'] {
+    --category: var(--color-info);
+  }
+
+  [data-category='retro'] {
+    --category: var(--color-warning);
+  }
+
+  [data-category='reading'] {
+    --category: var(--color-success);
+  }
+
+  .category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125em 0.5em;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    background-color: color-mix(in oklch, var(--category) 14%, transparent);
+    /* 옅은 바탕 위 작은 글씨도 읽히도록 본문 색 쪽으로 당긴다 */
+    color: color-mix(in oklch, var(--category) 70%, var(--color-foreground));
+  }
+
+  .category-dot {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--radius-full);
+    background-color: var(--category);
   }
 }
 

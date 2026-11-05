@@ -55,7 +55,7 @@ const groups = CATEGORY_IDS.map((category) => ({
               data-nav-link
               data-active-prefixes={item.activePrefixes.join(' ')}
               aria-current={isShortcutActive(item) ? 'page' : undefined}
-              class="block rounded-md px-sm py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:font-bold aria-[current=page]:text-foreground"
+              class="block rounded-md px-sm py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-primary-subtle aria-[current=page]:font-bold aria-[current=page]:text-primary"
             >
               {item.label}
             </a>
@@ -74,6 +74,7 @@ const groups = CATEGORY_IDS.map((category) => ({
               name="chevron-right"
               class="size-3.5 shrink-0 text-muted-foreground transition-transform group-open:rotate-90"
             />
+            <span data-category={group.category} class="category-dot" aria-hidden="true" />
             {group.label}
             <span class="ml-auto text-xs font-normal text-muted-foreground tabular-nums">{group.posts.length}</span>
           </summary>
@@ -84,7 +85,7 @@ const groups = CATEGORY_IDS.map((category) => ({
                   href={postPath(post)}
                   data-nav-link
                   aria-current={post.id === currentPost?.id ? 'page' : undefined}
-                  class="-ml-px block border-l-2 border-transparent py-1.5 pr-sm pl-md text-sm leading-snug text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:border-foreground aria-[current=page]:font-bold aria-[current=page]:text-foreground"
+                  class="-ml-px block border-l-2 border-transparent py-1.5 pr-sm pl-md text-sm leading-snug text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:border-primary aria-[current=page]:font-bold aria-[current=page]:text-primary"
                 >
                   <span class="line-clamp-2">{post.data.title}</span>
                 </a>
