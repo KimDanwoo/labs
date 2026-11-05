@@ -1,0 +1,45 @@
+---
+import Icon from '~/components/Icon.astro';
+---
+
+<dialog
+  id="image-lightbox"
+  aria-label="이미지 크게 보기"
+  class="m-auto max-h-none max-w-none bg-transparent p-0 backdrop:bg-transparent"
+>
+  <button
+    type="button"
+    data-lightbox-close
+    class="fixed top-md right-md inline-flex size-10 items-center justify-center rounded-full bg-background/80 text-foreground"
+    aria-label="닫기"
+  >
+    <Icon name="x" />
+  </button>
+  <img data-lightbox-image alt="" class="max-h-[90dvh] max-w-[94vw] rounded-md object-contain" />
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#image-lightbox');
+  const preview = dialog?.querySelector<HTMLImageElement>('[data-lightbox-image]');
+
+  document.querySelectorAll<HTMLImageElement>('.article img').forEach((image) => {
+    image.tabIndex = 0;
+    image.setAttribute('role', 'button');
+    image.setAttribute('aria-label', `${image.alt || '이미지'} 크게 보기`);
+    const open = () => {
+      if (!dialog || !preview) return;
+      preview.src = image.currentSrc || image.src;
+      preview.alt = image.alt;
+      dialog.showModal();
+    };
+    image.addEventListener('click', open);
+    image.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        open();
+      }
+    });
+  });
+
+  dialog?.addEventListener('click', () => dialog.close());
+</script>

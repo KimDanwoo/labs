@@ -1,0 +1,15 @@
+---
+import Icon from '~/components/Icon.astro';
+---
+
+<footer class="border-t border-border">
+  <div
+    class="mx-auto flex max-w-(--container-3xl) items-center justify-between gap-md px-md py-lg text-xs text-muted-foreground sm:px-xl"
+  >
+    <p>© {new Date().getFullYear()} 김단우</p>
+    <a href="/rss.xml" class="inline-flex items-center gap-xs hover:text-foreground">
+      <Icon name="rss" class="size-3.5" />
+      RSS
+    </a>
+  </div>
+</footer>

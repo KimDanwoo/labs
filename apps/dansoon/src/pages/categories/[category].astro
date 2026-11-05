@@ -1,0 +1,22 @@
+---
+import type { GetStaticPaths } from 'astro';
+import CategoryTabs from '~/components/CategoryTabs.astro';
+import ListPage from '~/components/ListPage.astro';
+import PostList from '~/components/PostList.astro';
+import { filterByCategory, getPublishedPosts } from '~/lib/posts';
+import { CATEGORY_IDS, CATEGORY_LABEL, type CategoryId } from '~/lib/taxonomy';
+
+export const getStaticPaths = (() =>
+  CATEGORY_IDS.map((category) => ({ params: { category } }))) satisfies GetStaticPaths;
+
+const category = Astro.params.category as CategoryId;
+const posts = await getPublishedPosts();
+const label = CATEGORY_LABEL[category];
+---
+
+<ListPage heading={label} icon="folder" lead={`${label} 카테고리의 글`}>
+  <div slot="header" class="mt-lg">
+    <CategoryTabs posts={posts} active={category} />
+  </div>
+  <PostList posts={filterByCategory(posts, category)} />
+</ListPage>

@@ -1,0 +1,56 @@
+---
+/**
+ * giscus 댓글(GitHub Discussions). 저장소에서 Discussions를 켜고 giscus 앱을 설치한 뒤
+ * https://giscus.app 에서 받은 categoryId를 채워야 표시된다.
+ */
+const GISCUS = {
+  repo: 'KimDanwoo/labs',
+  repoId: 'R_kgDOStrREg',
+  category: 'Comments',
+  categoryId: '',
+} as const;
+
+const isConfigured = GISCUS.categoryId !== '';
+---
+
+{
+  isConfigured && (
+    <section aria-label="댓글">
+      <div class="giscus" data-giscus-config={JSON.stringify(GISCUS)} />
+    </section>
+  )
+}
+
+<script>
+  const GISCUS_ORIGIN = 'https://giscus.app';
+  const themeName = () => (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+
+  const container = document.querySelector<HTMLElement>('.giscus[data-giscus-config]');
+  if (container) {
+    const config = JSON.parse(container.dataset.giscusConfig ?? '{}') as Record<string, string>;
+    const script = document.createElement('script');
+    script.src = `${GISCUS_ORIGIN}/client.js`;
+    script.async = true;
+    script.crossOrigin = 'anonymous';
+    Object.entries({
+      'data-repo': config.repo,
+      'data-repo-id': config.repoId,
+      'data-category': config.category,
+      'data-category-id': config.categoryId,
+      'data-mapping': 'pathname',
+      'data-strict': '1',
+      'data-reactions-enabled': '1',
+      'data-input-position': 'top',
+      'data-lang': 'ko',
+      'data-loading': 'lazy',
+      'data-theme': themeName(),
+    }).forEach(([key, value]) => value && script.setAttribute(key, value));
+    container.after(script);
+
+    // 사이트 테마를 바꾸면 댓글 iframe에도 알린다
+    document.addEventListener('themechange', () => {
+      const frame = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+      frame?.contentWindow?.postMessage({ giscus: { setConfig: { theme: themeName() } } }, GISCUS_ORIGIN);
+    });
+  }
+</script>

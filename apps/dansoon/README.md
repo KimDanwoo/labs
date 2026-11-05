@@ -1,52 +1,65 @@
 # dansoon
 
-AI 기술 뉴스 큐레이션과 주간 베스트셀러 리포트를 제공하는 개인 블로그. Astro 기반 정적 사이트.
+프론트엔드 엔지니어 김단우의 개발 노트·회고·독서 기록 블로그. Astro 정적 사이트.
 
 **라이브:** [log.danwoo.dev](https://log.danwoo.dev)
 
-## 개요
-
-두 개의 콘텐츠 섹션으로 구성된다.
-
-- **Tech** — 주간 AI·개발 기술 뉴스 요약 (Python 스크립트로 자동 수집·생성)
-- **Book** — 교보문고·YES24 주간 베스트셀러 및 웹소설 순위 리포트 (Python + Gemini API로 자동 파싱)
-
 ## 기술 스택
 
-| 영역          | 선택                                       |
-| ------------- | ------------------------------------------ |
-| 프레임워크    | Astro 5                                    |
-| UI            | React 19 (인터랙티브 컴포넌트만)           |
-| 스타일        | Tailwind CSS 4 + Typography 플러그인       |
-| 콘텐츠        | Astro Content Collections (Markdown)       |
-| 배포          | Vercel                                     |
+| 영역       | 선택                                                            |
+| ---------- | --------------------------------------------------------------- |
+| 프레임워크 | Astro 7 (Sätteri 마크다운 처리기)                               |
+| 스타일     | Tailwind CSS 4 + Typography 플러그인 + 공용 토큰(`@tokens/css`) |
+| 서체       | 마루부리(`@tokens/css/fonts.css`)                               |
+| 코드 블록  | astro-expressive-code (복사·줄 강조·라이트/다크)                |
+| 콘텐츠     | Astro Content Collections (`contents/posts/<slug>/index.md`)    |
+| 배포       | Vercel                                                          |
+
+클라이언트 프레임워크(React 등)는 쓰지 않는다. 검색·목차·테마·이미지 확대는 Astro `<script>`로 처리한다.
 
 ## 구조
 
 ```
+contents/posts/<slug>/index.md   # 글 1편 = 폴더 1개(이미지는 같은 폴더). 폴더 이름이 곧 URL slug
 src/
+  content.config.ts              # posts 스키마(카테고리·태그·연재·draft 검증)
+  lib/
+    taxonomy.ts                  # 카테고리·태그·연재 ID와 화면 이름
+    posts.ts                     # 공개 글 조회·정렬·연재·이전/다음·관련 글
+    format.ts                    # 날짜(Asia/Seoul)·읽는 시간
+    articleHastPlugin.mjs        # 본문 후처리: 제목 앵커, 표 가로 스크롤
+  layouts/BaseLayout.astro       # 메타·테마 초기화·사이드바 틀
+  components/                    # AppSidebar, PostList, Toc, SearchDialog, Giscus 등
   pages/
-    index.astro            # Tech 목록 메인
-    tech/[...slug].astro   # Tech 포스트 상세
-    book/index.astro       # Book 목록
-    book/[slug].astro      # Book 리포트 상세
-    rss.xml.ts             # RSS 피드
-  layouts/BaseLayout.astro
-  components/
-    Main/PostList/         # 포스트 목록
-    Category/              # 카테고리 필터
-    Search/                # 클라이언트 사이드 검색
-    Common/Utterances/     # 댓글 (utterances)
-  hooks/useFilter.ts
-  content.config.ts        # tech, book 컬렉션 스키마 정의
-contents/
-  tech/                    # 날짜별 Tech 뉴스 Markdown
-  book/                    # 날짜별 Book 리포트 Markdown
+    index.astro                  # 전체 글
+    posts/[slug].astro           # 글 상세
+    categories/ tags/ series/    # 목록
+    rss.xml.ts search.json.ts    # RSS, 검색 인덱스
+scripts/import-tistory.mjs       # 티스토리 글 이전(재실행 가능)
 ```
 
-## 콘텐츠 자동화 (중단)
+## 글 쓰기
 
-Tech 뉴스·베스트셀러·웹소설 자동 수집은 중단했다. 기존 글은 티스토리 글 이전과 함께 정리한다.
+`contents/posts/<영문-slug>/index.md`를 만들고 frontmatter를 채운다. 스키마는 `src/content.config.ts`가 검증한다.
+
+```yaml
+---
+title: '제목'
+description: '목록·검색·SNS 미리보기 요약(200자 이내)'
+publishedAt: '2026-11-05T10:00:00+09:00'
+category: 'dev' # dev | retro | reading
+tags: ['react'] # src/lib/taxonomy.ts의 TAG_IDS
+# series: 'hanghae-plus'
+# seriesOrder: 10
+# draft: true          # true면 목록·상세·RSS·검색 어디에도 나오지 않는다
+---
+```
+
+새 태그·카테고리·연재는 `src/lib/taxonomy.ts`에 ID와 이름을 먼저 추가한다. slug(폴더 이름)는 URL이므로 바꾸지 않는다.
+
+## 댓글
+
+giscus(GitHub Discussions). `KimDanwoo/labs` 저장소에서 Discussions를 켜고 giscus 앱을 설치한 뒤, `src/components/Giscus.astro`의 `categoryId`를 채우면 표시된다.
 
 ## 시작하기
 

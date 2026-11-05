@@ -100,9 +100,12 @@ catalog:
   '@astrojs/react': ^6.0.4
   '@astrojs/rss': ^4.0.10
   '@astrojs/sitemap': ^3.2.1
+  '@astrojs/markdown-satteri': 0.3.8
   '@tailwindcss/typography': ^0.5.15
   '@tailwindcss/vite': ^4.1.0
   prettier-plugin-astro: ^0.14.1
+  # 코드 블록(복사·파일명·줄 강조). Astro 7 지원(peer ^7.0.0) 확인.
+  astro-expressive-code: 0.44.3
   # 티스토리 글 이전 스크립트. 7.2.5는 배포 직후라 검증된 7.2.4로 고정한다.
   turndown: 7.2.4
 

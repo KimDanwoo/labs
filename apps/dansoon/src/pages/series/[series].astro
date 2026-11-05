@@ -1,0 +1,40 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Icon from '~/components/Icon.astro';
+import ListPage from '~/components/ListPage.astro';
+import { formatShortDate } from '~/lib/format';
+import { getPublishedPosts, getSeriesPosts, postPath } from '~/lib/posts';
+import { SERIES_IDS, SERIES_INFO, type SeriesId } from '~/lib/taxonomy';
+
+export const getStaticPaths = (() => SERIES_IDS.map((series) => ({ params: { series } }))) satisfies GetStaticPaths;
+
+const series = Astro.params.series as SeriesId;
+const { label, description } = SERIES_INFO[series];
+const posts = getSeriesPosts(await getPublishedPosts(), series);
+---
+
+<ListPage heading={label} icon="layers" lead={description}>
+  <ol class="divide-y divide-border rounded-lg border border-border">
+    {
+      posts.map((post, index) => (
+        <li>
+          <a href={postPath(post)} class="group flex items-center gap-md px-md py-sm transition-colors hover:bg-muted">
+            <span class="grid size-7 shrink-0 place-items-center rounded-md bg-muted text-xs font-semibold tabular-nums">
+              {index + 1}
+            </span>
+            <span class="min-w-0 flex-1 font-medium group-hover:underline group-hover:underline-offset-4">
+              {post.data.title}
+            </span>
+            <time
+              datetime={post.data.publishedAt.toISOString()}
+              class="hidden shrink-0 text-sm text-muted-foreground tabular-nums sm:block"
+            >
+              {formatShortDate(post.data.publishedAt)}
+            </time>
+            <Icon name="chevron-right" class="size-4 shrink-0 text-muted-foreground" />
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</ListPage>

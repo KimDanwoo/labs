@@ -1,0 +1,56 @@
+<div class="adfit-slot" aria-hidden="true"></div>
+
+<script>
+  // 자리 폭에 맞는 단위 하나만 삽입한다 — 둘 다 넣고 CSS로 숨기면 노출 집계가 왜곡돼 제재 사유가 된다
+  const UNITS = {
+    pc: { unit: 'DAN-8vKsCr57ivUR97pn', width: 728, height: 90 },
+    mobile: { unit: 'DAN-QHiQQni8uspeE4y8', width: 320, height: 100 },
+  } as const;
+
+  document.querySelectorAll<HTMLElement>('.adfit-slot').forEach((slot) => {
+    // 창 폭이 아니라 실제 자리 폭으로 고른다 — 본문 칼럼(672px)에는 728 배너가 들어가지 않는다
+    const { unit, width, height } = slot.clientWidth >= UNITS.pc.width ? UNITS.pc : UNITS.mobile;
+    const ins = document.createElement('ins');
+    ins.className = 'kakao_ad_area';
+    ins.style.display = 'none';
+    ins.dataset.adUnit = unit;
+    ins.dataset.adWidth = String(width);
+    ins.dataset.adHeight = String(height);
+    const loader = document.createElement('script');
+    loader.async = true;
+    loader.src = 'https://t1.kakaocdn.net/kas/static/ba.min.js';
+    slot.replaceChildren(ins, loader);
+  });
+</script>
+
+<style>
+  /* 광고 로드 전 공간을 예약해 본문이 밀리는 것(CLS)을 막는다 */
+  .adfit-slot {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-muted);
+  }
+
+  .adfit-slot::before {
+    content: 'AD';
+    position: absolute;
+    font-size: var(--text-xs);
+    letter-spacing: 0.15em;
+    color: var(--color-muted-foreground);
+  }
+
+  /* 광고가 실제로 렌더링되면(iframe 삽입) 플레이스홀더를 걷어낸다 */
+  .adfit-slot:has(iframe) {
+    border: none;
+    background: none;
+  }
+
+  .adfit-slot:has(iframe)::before {
+    display: none;
+  }
+</style>

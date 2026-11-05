@@ -1,0 +1,30 @@
+---
+import Icon from '~/components/Icon.astro';
+---
+
+<button
+  type="button"
+  data-copy-link
+  class="inline-flex h-9 items-center gap-sm rounded-md border border-border px-md text-sm text-muted-foreground transition-colors hover:text-foreground"
+>
+  <Icon name="link" class="size-4" />
+  <span data-copy-label>링크 복사</span>
+</button>
+
+<script>
+  const RESET_DELAY_MS = 2_000;
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy-link]')) {
+    const label = button.querySelector('[data-copy-label]');
+    button.addEventListener('click', async () => {
+      if (!label) return;
+      try {
+        await navigator.clipboard.writeText(window.location.href.split('#')[0] ?? window.location.href);
+        label.textContent = '복사했어요';
+      } catch {
+        label.textContent = '복사하지 못했어요';
+      }
+      setTimeout(() => (label.textContent = '링크 복사'), RESET_DELAY_MS);
+    });
+  }
+</script>

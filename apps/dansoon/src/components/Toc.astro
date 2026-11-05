@@ -1,0 +1,86 @@
+---
+import type { MarkdownHeading } from 'astro';
+import Icon from '~/components/Icon.astro';
+
+const TOC_DEPTHS = [2, 3];
+
+type Props = {
+  headings: MarkdownHeading[];
+  variant: 'sidebar' | 'inline';
+};
+
+const { headings, variant } = Astro.props;
+const items = headings.filter((heading) => TOC_DEPTHS.includes(heading.depth));
+const linkClass =
+  'toc-link block border-l-2 border-transparent py-xs pr-sm leading-snug transition-colors hover:text-foreground';
+const indentOf = (depth: number) => (depth === 2 ? 'pl-md' : 'pl-xl');
+---
+
+{
+  items.length > 0 &&
+    (variant === 'sidebar' ? (
+      <nav aria-label="목차" data-toc class="text-sm text-muted-foreground">
+        <p class="mb-sm text-xs font-semibold text-muted-foreground">이 글의 목차</p>
+        <ul class="border-l border-border">
+          {items.map((heading) => (
+            <li>
+              <a href={`#${heading.slug}`} class:list={[linkClass, indentOf(heading.depth), '-ml-px']}>
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    ) : (
+      <details class="group rounded-lg border border-border text-sm">
+        <summary class="flex cursor-pointer list-none items-center justify-between px-md py-sm font-semibold">
+          <span class="flex items-center gap-sm">
+            <Icon name="list" class="size-3.5" />
+            목차
+          </span>
+          <Icon name="chevron-down" class="size-4 text-muted-foreground transition-transform group-open:rotate-180" />
+        </summary>
+        <ul class="border-t border-border px-sm py-sm text-muted-foreground">
+          {items.map((heading) => (
+            <li>
+              <a
+                href={`#${heading.slug}`}
+                class:list={['block rounded-md py-xs hover:text-foreground', indentOf(heading.depth)]}
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </details>
+    ))
+}
+
+<script>
+  /** 화면 위쪽에 걸린 마지막 제목을 현재 위치로 표시한다. */
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc] a')];
+  const headings = links
+    .map((link) => document.getElementById(decodeURIComponent(link.hash.slice(1))))
+    .filter((heading): heading is HTMLElement => heading !== null);
+
+  function markCurrent() {
+    const threshold = window.innerHeight * 0.25;
+    const passed = headings.filter((heading) => heading.getBoundingClientRect().top <= threshold);
+    const current = passed.at(-1) ?? headings[0];
+    for (const link of links) {
+      link.setAttribute('aria-current', String(link.hash.slice(1) === encodeURIComponent(current?.id ?? '')));
+    }
+  }
+
+  if (headings.length > 0) {
+    // 스크롤·리사이즈마다 한 프레임에 한 번만 다시 계산한다
+    let frame = 0;
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(markCurrent);
+    };
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    markCurrent();
+  }
+</script>

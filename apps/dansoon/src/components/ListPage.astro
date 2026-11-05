@@ -1,0 +1,31 @@
+---
+import Icon, { type IconName } from '~/components/Icon.astro';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+
+type Props = {
+  /** 페이지 제목(<h1>) */
+  heading: string;
+  icon: IconName;
+  lead?: string;
+  /** <title>·메타 설명. 생략하면 heading·lead를 쓴다 */
+  title?: string;
+  description?: string;
+};
+
+/** 목록형 페이지(홈·카테고리·태그·연재)의 노션식 페이지 머리: 아이콘 + 제목 + 설명 */
+const { heading, icon, lead, title, description } = Astro.props;
+---
+
+<BaseLayout title={title ?? heading} description={description ?? lead}>
+  <div class="mx-auto max-w-(--container-3xl) px-md py-xl sm:px-xl sm:py-2xl">
+    <header class="mb-xl">
+      <span class="grid size-12 place-items-center rounded-lg bg-muted text-muted-foreground">
+        <Icon name={icon} class="size-6" />
+      </span>
+      <h1 class="mt-md text-3xl font-bold tracking-tight sm:text-4xl">{heading}</h1>
+      {lead && <p class="mt-sm text-muted-foreground">{lead}</p>}
+      <slot name="header" />
+    </header>
+    <slot />
+  </div>
+</BaseLayout>

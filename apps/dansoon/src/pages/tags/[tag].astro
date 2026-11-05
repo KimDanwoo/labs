@@ -1,0 +1,21 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ListPage from '~/components/ListPage.astro';
+import PostList from '~/components/PostList.astro';
+import { countBy, filterByTag, getPublishedPosts } from '~/lib/posts';
+import { TAG_LABEL, type TagId } from '~/lib/taxonomy';
+
+/** 글이 하나도 없는 태그는 빈 페이지가 되므로 만들지 않는다. */
+export const getStaticPaths = (async () => {
+  const counts = countBy(await getPublishedPosts(), (post) => post.data.tags);
+  return [...counts.keys()].map((tag) => ({ params: { tag } }));
+}) satisfies GetStaticPaths;
+
+const tag = Astro.params.tag as TagId;
+const posts = filterByTag(await getPublishedPosts(), tag);
+const label = TAG_LABEL[tag];
+---
+
+<ListPage heading={label} icon="hash" lead={`${posts.length}개의 글`} description={`${label} 태그가 달린 글 모음`}>
+  <PostList posts={posts} />
+</ListPage>

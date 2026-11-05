@@ -1,0 +1,35 @@
+---
+import { categoryPath, countBy, type Post } from '~/lib/posts';
+import { CATEGORY_IDS, CATEGORY_LABEL, type CategoryId } from '~/lib/taxonomy';
+
+type Props = {
+  posts: Post[];
+  active: CategoryId | 'all';
+};
+
+const { posts, active } = Astro.props;
+const counts = countBy(posts, (post) => [post.data.category]);
+const tabs = [
+  { id: 'all', label: '전체', href: '/', count: posts.length },
+  ...CATEGORY_IDS.map((id) => ({ id, label: CATEGORY_LABEL[id], href: categoryPath(id), count: counts.get(id) ?? 0 })),
+];
+---
+
+<nav aria-label="카테고리" class="overflow-x-auto">
+  <ul class="inline-flex gap-px rounded-lg bg-muted p-0.5 text-sm">
+    {
+      tabs.map((tab) => (
+        <li>
+          <a
+            href={tab.href}
+            aria-current={tab.id === active ? 'page' : undefined}
+            class="inline-flex h-8 items-center gap-xs rounded-md px-md whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-background aria-[current=page]:font-medium aria-[current=page]:text-foreground aria-[current=page]:shadow-sm"
+          >
+            {tab.label}
+            <span class="text-xs tabular-nums opacity-60">{tab.count}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

@@ -1,0 +1,145 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import AdFit from '~/components/AdFit.astro';
+import CopyLinkButton from '~/components/CopyLinkButton.astro';
+import Giscus from '~/components/Giscus.astro';
+import Icon from '~/components/Icon.astro';
+import ImageLightbox from '~/components/ImageLightbox.astro';
+import PostNav from '~/components/PostNav.astro';
+import RelatedPosts from '~/components/RelatedPosts.astro';
+import SeriesBox from '~/components/SeriesBox.astro';
+import TagChips from '~/components/TagChips.astro';
+import Toc from '~/components/Toc.astro';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { formatLongDate, readingMinutes } from '~/lib/format';
+import {
+  categoryPath,
+  getAdjacentPosts,
+  getPublishedPosts,
+  getRelatedPosts,
+  getSeriesPosts,
+  postPath,
+  type Post,
+} from '~/lib/posts';
+import { CATEGORY_LABEL } from '~/lib/taxonomy';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }));
+}) satisfies GetStaticPaths;
+
+type Props = {
+  post: Post;
+  posts: Post[];
+};
+
+const { post, posts } = Astro.props;
+const { title, description, publishedAt, updatedAt, category, tags, series } = post.data;
+const { Content, headings } = await render(post);
+const { older, newer } = getAdjacentPosts(posts, post);
+const seriesPosts = series ? getSeriesPosts(posts, series) : [];
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: publishedAt.toISOString(),
+  dateModified: (updatedAt ?? publishedAt).toISOString(),
+  author: { '@type': 'Person', name: '김단우', url: 'https://lab.danwoo.dev' },
+  mainEntityOfPage: new URL(postPath(post), Astro.site).href,
+  inLanguage: 'ko',
+};
+// 제목 등에 '</script>'가 들어가도 태그를 빠져나가지 못하게 '<'를 이스케이프한다
+const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c');
+const propertyLabelClass = 'flex items-center gap-sm text-muted-foreground';
+---
+
+<BaseLayout title={title} description={description} article={{ publishedAt, updatedAt }}>
+  <script is:inline slot="head" type="application/ld+json" set:html={structuredDataJson} />
+
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <div class="mx-auto max-w-6xl px-md sm:px-xl xl:grid xl:grid-cols-[minmax(0,1fr)_var(--container-3xs)] xl:gap-2xl">
+    <article class="mx-auto w-full max-w-(--container-2xl) min-w-0 py-xl sm:py-2xl">
+      <nav aria-label="현재 위치" class="flex items-center gap-xs text-sm text-muted-foreground">
+        <a href="/" class="rounded-sm px-xs hover:bg-muted hover:text-foreground">전체 글</a>
+        <Icon name="chevron-right" class="size-3.5" />
+        <a href={categoryPath(category)} class="rounded-sm px-xs hover:bg-muted hover:text-foreground">
+          {CATEGORY_LABEL[category]}
+        </a>
+      </nav>
+
+      <h1 class="mt-lg text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl">{title}</h1>
+
+      <dl class="mt-lg grid grid-cols-[7rem_minmax(0,1fr)] gap-x-md gap-y-sm text-sm">
+        <dt class={propertyLabelClass}><Icon name="calendar" class="size-4" /> 작성일</dt>
+        <dd><time datetime={publishedAt.toISOString()}>{formatLongDate(publishedAt)}</time></dd>
+        {
+          updatedAt && (
+            <>
+              <dt class={propertyLabelClass}>
+                <Icon name="pencil" class="size-4" /> 수정일
+              </dt>
+              <dd>
+                <time datetime={updatedAt.toISOString()}>{formatLongDate(updatedAt)}</time>
+              </dd>
+            </>
+          )
+        }
+        <dt class={propertyLabelClass}><Icon name="folder" class="size-4" /> 카테고리</dt>
+        <dd>
+          <a href={categoryPath(category)} class="rounded-sm bg-muted px-xs py-0.5 text-xs hover:text-primary">
+            {CATEGORY_LABEL[category]}
+          </a>
+        </dd>
+        {
+          tags.length > 0 && (
+            <>
+              <dt class={propertyLabelClass}>
+                <Icon name="tag" class="size-4" /> 태그
+              </dt>
+              <dd>
+                <TagChips tags={tags} />
+              </dd>
+            </>
+          )
+        }
+        <dt class={propertyLabelClass}><Icon name="clock" class="size-4" /> 분량</dt>
+        <dd>약 {readingMinutes(post.body)}분</dd>
+      </dl>
+
+      <hr class="my-lg border-border" />
+
+      <div class="space-y-md">
+        {series && <SeriesBox series={series} posts={seriesPosts} current={post} />}
+        <div class="xl:hidden">
+          <Toc headings={headings} variant="inline" />
+        </div>
+      </div>
+
+      <div class="article prose mt-lg max-w-none">
+        <Content />
+      </div>
+
+      <footer class="mt-2xl space-y-xl">
+        <div class="flex justify-end border-b border-border pb-md">
+          <CopyLinkButton />
+        </div>
+        <PostNav older={older} newer={newer} />
+        <RelatedPosts posts={getRelatedPosts(posts, post)} />
+        <AdFit />
+        <Giscus />
+      </footer>
+    </article>
+
+    <aside class="hidden xl:block" aria-label="글 목차">
+      <div class="sticky top-0 max-h-dvh overflow-y-auto py-2xl">
+        <Toc headings={headings} variant="sidebar" />
+      </div>
+    </aside>
+  </div>
+
+  <ImageLightbox />
+</BaseLayout>

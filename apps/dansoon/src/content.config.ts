@@ -1,24 +1,35 @@
 import { glob } from 'astro/loaders';
-import { defineCollection, z, type SchemaContext } from 'astro:content';
+import { z } from 'astro/zod';
+import { defineCollection } from 'astro:content';
+import { CATEGORY_IDS, SERIES_IDS, TAG_IDS } from '~/lib/taxonomy';
 
-const schema = ({ image }: SchemaContext) =>
-  z.object({
-    title: z.string(),
-    date: z.coerce.date().optional().default(new Date('2023-01-01')),
-    description: z.string(),
-    category: z.string().optional().default(''),
-    isHidden: z.boolean().optional().default(false),
-    thumbnail: image().optional(),
-  });
+const DESCRIPTION_MAX_LENGTH = 200;
 
-const tech = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './contents/tech' }),
-  schema,
+const posts = defineCollection({
+  // contents/posts/<slug>/index.md — 폴더 이름이 곧 URL slug다
+  loader: glob({
+    pattern: '*/index.md',
+    base: './contents/posts',
+    generateId: ({ entry }) => entry.split('/')[0] ?? entry,
+  }),
+  schema: ({ image }) =>
+    z
+      .object({
+        title: z.string().min(1),
+        description: z.string().min(1).max(DESCRIPTION_MAX_LENGTH),
+        publishedAt: z.coerce.date(),
+        updatedAt: z.coerce.date().optional(),
+        category: z.enum(CATEGORY_IDS),
+        tags: z.array(z.enum(TAG_IDS)).default([]),
+        series: z.enum(SERIES_IDS).optional(),
+        seriesOrder: z.number().int().positive().optional(),
+        thumbnail: image().optional(),
+        legacyUrl: z.url().optional(),
+        draft: z.boolean().default(false),
+      })
+      .refine((data) => (data.series === undefined) === (data.seriesOrder === undefined), {
+        message: 'series와 seriesOrder는 함께 지정해야 한다',
+      }),
 });
 
-const book = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './contents/book' }),
-  schema,
-});
-
-export const collections = { tech, book };
+export const collections = { posts };

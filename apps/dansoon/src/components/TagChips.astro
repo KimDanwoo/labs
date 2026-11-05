@@ -1,0 +1,29 @@
+---
+import { tagPath } from '~/lib/posts';
+import { TAG_LABEL, type TagId } from '~/lib/taxonomy';
+
+type Props = {
+  tags: readonly TagId[];
+  counts?: Map<TagId, number>;
+};
+
+const { tags, counts } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <ul class="flex flex-wrap gap-sm" aria-label="태그">
+      {tags.map((tag) => (
+        <li>
+          <a
+            href={tagPath(tag)}
+            class="inline-flex items-center gap-xs rounded-md bg-muted px-sm py-xs text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            #{TAG_LABEL[tag]}
+            {counts && <span class="text-xs opacity-70">{counts.get(tag)}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

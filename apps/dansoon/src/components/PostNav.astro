@@ -1,0 +1,40 @@
+---
+import Icon from '~/components/Icon.astro';
+import { postPath, type Post } from '~/lib/posts';
+
+type Props = {
+  older?: Post;
+  newer?: Post;
+};
+
+const { older, newer } = Astro.props;
+const cardClass =
+  'group flex flex-col gap-xs rounded-lg border border-border px-md py-sm transition-colors hover:bg-muted';
+---
+
+{
+  (older || newer) && (
+    <nav aria-label="이전 글과 다음 글" class="grid gap-sm sm:grid-cols-2">
+      {older ? (
+        <a href={postPath(older)} class={cardClass} rel="prev">
+          <span class="flex items-center gap-xs text-xs text-muted-foreground">
+            <Icon name="arrow-left" class="size-3.5" />
+            이전 글
+          </span>
+          <span class="line-clamp-2 text-sm font-medium">{older.data.title}</span>
+        </a>
+      ) : (
+        <span class="hidden sm:block" />
+      )}
+      {newer && (
+        <a href={postPath(newer)} class:list={[cardClass, 'sm:items-end sm:text-right']} rel="next">
+          <span class="flex items-center gap-xs text-xs text-muted-foreground">
+            다음 글
+            <Icon name="arrow-right" class="size-3.5" />
+          </span>
+          <span class="line-clamp-2 text-sm font-medium">{newer.data.title}</span>
+        </a>
+      )}
+    </nav>
+  )
+}
