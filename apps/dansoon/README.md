@@ -20,7 +20,6 @@ AI 기술 뉴스 큐레이션과 주간 베스트셀러 리포트를 제공하�
 | 스타일        | Tailwind CSS 4 + Typography 플러그인       |
 | 콘텐츠        | Astro Content Collections (Markdown)       |
 | 배포          | Vercel                                     |
-| 콘텐츠 자동화 | Python + `google-genai` (Gemini 2.5 Flash) |
 
 ## 구조
 
@@ -43,21 +42,11 @@ src/
 contents/
   tech/                    # 날짜별 Tech 뉴스 Markdown
   book/                    # 날짜별 Book 리포트 Markdown
-scripts/                   # 콘텐츠 자동 수집 Python 스크립트
-  fetch_tech_news.py       # HackerNews 수집 + Gemini 요약
-  fetch_bestseller.py      # 교보/YES24 크롤링 + Gemini 파싱
-  fetch_webnovel.py        # 웹소설 순위 크롤링 + Gemini 파싱
 ```
 
-## 콘텐츠 자동화
+## 콘텐츠 자동화 (중단)
 
-`scripts/` 는 Node.js가 아닌 Python 환경에서 실행된다. Gemini API 키와 `google-genai` pip 패키지가 필요하다.
-
-```bash
-pip install google-genai playwright
-python scripts/fetch_tech_news.py
-python scripts/fetch_bestseller.py
-```
+Tech 뉴스·베스트셀러·웹소설 자동 수집은 중단했다. 기존 글은 티스토리 글 이전과 함께 정리한다.
 
 ## 시작하기
 
