@@ -54,3 +54,7 @@ next-env.d.ts
 .omc
 # Claude–Codex 협업 기록
 .agent-collab/
+
+# Python 바이트코드
+__pycache__/
+*.pyc
