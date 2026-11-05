@@ -30,7 +30,7 @@ export const PROJECTS: Project[] = [
   },
   {
     title: 'Dansoon',
-    description: 'AI로 기술·베스트셀러·웹소설을 자동화한 리포트 블로그',
+    description: '프론트엔드 개발 기록과 주간 책 순위를 담은 블로그',
     href: 'https://log.danwoo.dev/',
     image: '/projects/dansoon.webp',
     imagePosition: 'center',

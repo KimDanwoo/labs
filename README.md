@@ -24,7 +24,7 @@
 | **soundlab**       | 내 노래를 듣는 플레이어 + WebGL 픽셀 파티클 비주얼라이저 | Next.js, WebGL, Jotai                | [sound.danwoo.dev](https://sound.danwoo.dev)     |
 | **fe-deep**        | 프론트엔드 학습 플랫폼                                   | Next.js, Supabase                    | [fe-deep.danwoo.dev](https://fe-deep.danwoo.dev) |
 | **awesome-sudoku** | 온라인 스도쿠 게임                                       | Next.js, Firebase                    | [sudoku.danwoo.dev](https://sudoku.danwoo.dev)   |
-| **dansoon**        | AI 기술 뉴스·베스트셀러 리포트 블로그                    | Astro                                | [log.danwoo.dev](https://log.danwoo.dev)         |
+| **dansoon**        | 프론트엔드 개발 기록·주간 책 순위 블로그                 | Astro                                | [log.danwoo.dev](https://log.danwoo.dev)         |
 | **prairie**        | 인터랙티브 3D 초원 달리기 씬                             | Next.js, React Three Fiber, three.js | [prairie.danwoo.dev](https://prairie.danwoo.dev) |
 | **komorebi**       | 픽셀 아트 산책·낚시 게임                                 | Next.js, Canvas                      | —                                                |
 | **design**         | 공유 디자인 시스템 미리보기                              | Next.js, @ui/react                   | —                                                |

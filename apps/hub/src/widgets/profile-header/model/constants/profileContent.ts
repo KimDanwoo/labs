@@ -2,7 +2,7 @@ import type { ProfileParagraph } from '@widgets/profile-header/model/types';
 
 const RESUME_URL = 'https://docs.google.com/document/d/1_oia6H3WisAHsGNJWZAYqru9pHUXovRNAaRJcZn5UBU/edit';
 const SOUNDCLOUD_URL = 'https://soundcloud.com/danwooking';
-const BLOG_URL = 'https://dansoon-dev.tistory.com/category';
+const BLOG_URL = 'https://log.danwoo.dev/';
 const GITHUB_URL = 'https://github.com/KimDanwoo';
 
 export const PROFILE_PARAGRAPHS: readonly ProfileParagraph[] = [
