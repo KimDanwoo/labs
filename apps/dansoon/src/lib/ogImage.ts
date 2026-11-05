@@ -12,7 +12,7 @@ export type OgCard = {
 const WIDTH = 1200;
 const HEIGHT = 630;
 const PADDING_X = 80;
-// satori는 woff2와 oklch를 읽지 못해 woff 서체와 토큰을 hex로 옮긴 값을 쓴다
+// satori는 woff2를 읽지 못해 woff로 변환한 서체를 쓰고, 스타일시트의 CSS 변수를 볼 수 없어 토큰 값을 hex로 옮겨 둔다
 const FONT_PATH = 'src/assets/fonts/MaruBuri-Bold.woff';
 const COLOR = {
   background: '#ffffff',
