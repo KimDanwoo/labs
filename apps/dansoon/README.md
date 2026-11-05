@@ -64,7 +64,7 @@ GitHub Actions가 매주 월요일 리포트를 만들어 `contents/book/`에 �
 
 ## 댓글
 
-giscus(GitHub Discussions). `KimDanwoo/labs` 저장소에서 Discussions를 켜고 giscus 앱을 설치한 뒤, `src/components/Giscus.astro`의 `categoryId`를 채우면 표시된다.
+giscus(GitHub Discussions). 댓글은 공개 저장소 `KimDanwoo/dansoon-comments`의 Announcements 카테고리에 쌓인다. 저장소에 giscus 앱이 설치돼 있어야 한다. 설정은 `src/components/Giscus.astro`.
 
 ## 시작하기
 
