@@ -103,6 +103,8 @@ catalog:
   '@tailwindcss/typography': ^0.5.15
   '@tailwindcss/vite': ^4.1.0
   prettier-plugin-astro: ^0.14.1
+  # 티스토리 글 이전 스크립트. 7.2.5는 배포 직후라 검증된 7.2.4로 고정한다.
+  turndown: 7.2.4
 
   # ui (fe-deep)
   shadcn: ^4.19.0
