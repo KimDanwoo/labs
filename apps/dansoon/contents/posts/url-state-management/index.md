@@ -5,6 +5,7 @@ publishedAt: "2026-07-29T16:09:06+09:00"
 updatedAt: "2026-08-02T18:20:32+09:00"
 category: "dev"
 tags: ["state-management"]
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/28"
 ---
 
@@ -61,7 +62,7 @@ type ReservationState = {
 
 각 화면에서는 필요한 상태를 읽고, 정해진 액션을 통해 값을 변경하면 된다.
 
-```text
+```ts
 updateReservationConditions(nextConditions);
 clearSelectedOption();
 ```
@@ -103,7 +104,7 @@ URL을 읽으면 어떤 조건으로 데이터를 조회해야 하는지 알 수
 
 상태관리 라이브러리를 사용한다면 객체를 그대로 저장할 수 있다.
 
-```text
+```ts
 setSelectedOption(option);
 ```
 
@@ -123,7 +124,7 @@ Router State를 사용해 다음 화면으로 전달하는 것도 가능하다.
 
 대신 옵션 객체 전체를 저장하지는 않았다.
 
-```text
+```ts
 {
   id: 120,
   title: '예약 옵션 A',
@@ -160,7 +161,7 @@ URL은 선택을 복원하고, 서버는 사실을 확인한다.
 
 로컬 상태나 전역 상태는 대부분 애플리케이션 코드가 변경한다.
 
-```text
+```ts
 setParticipants(2);
 ```
 
@@ -177,7 +178,7 @@ TypeScript에서 타입을 선언하더라도 URL에서 읽은 값은 문자열�
 
 숫자로 변환할 수 있다는 것과 도메인에서 사용할 수 있는 값이라는 것도 다르다.
 
-```text
+```ts
 Number('hello'); // NaN
 Number('-10');   // 숫자지만 유효한 인원은 아님
 ```
@@ -365,7 +366,7 @@ URL 상태관리는 값 몇 개를 주소에 저장하는 방식이 아니었다
 
 그래서 파싱과 직렬화, 경로 생성을 하나의 경계에 모았다.
 
-```text
+```ts
 parseReservationParams();
 toReservationParams();
 toOptionsPath();

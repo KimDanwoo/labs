@@ -4,6 +4,7 @@ description: "Feature-Sliced Design(FSD)은 기능 단위로 코드를 나누는
 publishedAt: "2025-11-30T14:49:57+09:00"
 category: "dev"
 tags: ["fsd"]
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/23"
 ---
 

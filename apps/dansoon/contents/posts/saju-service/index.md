@@ -4,6 +4,7 @@ description: "청연사주는 생년월일시를 입력하면 사주와 운세�
 publishedAt: "2026-11-04T14:18:26+09:00"
 category: "dev"
 tags: ["ai","side-project"]
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/31"
 ---
 

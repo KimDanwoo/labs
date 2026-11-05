@@ -4,6 +4,7 @@ description: "올해 나는 새로운 프로젝트에 참여했다. 처음부터
 publishedAt: "2025-12-31T16:25:04+09:00"
 category: "retro"
 tags: []
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/26"
 ---
 

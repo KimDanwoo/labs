@@ -4,6 +4,7 @@ description: "\"기본형은 ref, 객체는 reactive로 써야 합니다.\" Vue 
 publishedAt: "2025-10-18T14:31:44+09:00"
 category: "dev"
 tags: ["vue","react"]
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/22"
 ---
 

@@ -1,5 +1,4 @@
 ---
-import Icon from '~/components/Icon.astro';
 import { formatShortDate } from '~/lib/format';
 import { postPath, type Post } from '~/lib/posts';
 
@@ -13,18 +12,19 @@ const { posts } = Astro.props;
 {
   posts.length > 0 && (
     <section aria-labelledby="related-posts">
-      <h2 id="related-posts" class="px-sm text-xs font-semibold text-muted-foreground">
+      <h2 id="related-posts" class="text-sm font-bold text-muted-foreground">
         함께 읽으면 좋은 글
       </h2>
-      <ul class="mt-xs">
+      <ul class="mt-sm divide-y divide-border">
         {posts.map((post) => (
           <li>
-            <a href={postPath(post)} class="group flex items-center gap-sm rounded-md px-sm py-sm hover:bg-muted">
-              <Icon name="file-text" class="size-4 shrink-0 text-muted-foreground" />
-              <span class="min-w-0 flex-1 truncate text-sm font-medium">{post.data.title}</span>
+            <a href={postPath(post)} class="group flex items-baseline justify-between gap-md py-sm">
+              <span class="leading-snug font-medium group-hover:underline group-hover:underline-offset-4">
+                {post.data.title}
+              </span>
               <time
                 datetime={post.data.publishedAt.toISOString()}
-                class="shrink-0 text-xs text-muted-foreground tabular-nums"
+                class="shrink-0 text-sm text-muted-foreground tabular-nums"
               >
                 {formatShortDate(post.data.publishedAt)}
               </time>

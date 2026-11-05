@@ -27,13 +27,18 @@ import Icon from '~/components/Icon.astro';
     }
   }
 
-  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
-    syncLabel(button, document.documentElement.classList.contains('dark'));
-    button.addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark');
-      saveTheme(isDark);
-      syncLabel(button, isDark);
-      document.dispatchEvent(new CustomEvent('themechange', { detail: { isDark } }));
-    });
-  }
+  const syncAllLabels = (isDark: boolean) =>
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => syncLabel(button, isDark));
+
+  document.addEventListener('astro:page-load', () =>
+    syncAllLabels(document.documentElement.classList.contains('dark')),
+  );
+  // 복제된 사이드바(모바일 서랍) 안의 버튼도 동작하도록 클릭은 문서에서 받는다
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element && event.target.closest('[data-theme-toggle]'))) return;
+    const isDark = document.documentElement.classList.toggle('dark');
+    saveTheme(isDark);
+    syncAllLabels(isDark);
+    document.dispatchEvent(new CustomEvent('themechange', { detail: { isDark } }));
+  });
 </script>

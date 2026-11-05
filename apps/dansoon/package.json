@@ -19,6 +19,7 @@
     "@tokens/css": "workspace:*",
     "astro": "catalog:",
     "astro-expressive-code": "catalog:",
+    "overlayscrollbars": "catalog:",
     "sharp": "catalog:",
     "tailwindcss": "catalog:"
   },

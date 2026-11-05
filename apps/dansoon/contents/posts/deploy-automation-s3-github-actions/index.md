@@ -5,8 +5,6 @@ publishedAt: "2024-12-11T13:27:04+09:00"
 updatedAt: "2025-08-04T13:36:07+09:00"
 category: "dev"
 tags: ["ci-cd"]
-series: "hanghae-plus"
-seriesOrder: 8
 legacyUrl: "https://dansoon-dev.tistory.com/10"
 ---
 
@@ -28,7 +26,7 @@ IAM을 통해 최소 권한 원칙에 따른 보안 설정을 적용하고, GitH
 
 GitHub Actions의 경우, 간단한 예제부터 시작해서 점진적으로 기능을 추가하는 방식으로 접근했다. 처음에는 단순히 S3에 배포하는 것부터 시작해서, 점차 **CloudFront 캐시 무효화**, **슬랙 알림** 등의 기능을 추가했다. 이 과정에서 YAML 문법과 GitHub Actions의 다양한 기능들을 자연스럽게 익힐 수 있었다.
 
-```text
+```yaml
 name: 배포 워크플로우
 on:
   push:

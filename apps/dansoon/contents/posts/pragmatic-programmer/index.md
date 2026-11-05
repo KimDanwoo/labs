@@ -4,6 +4,7 @@ description: "『실용주의 프로그래머』를 읽으며 얻은 통찰을 �
 publishedAt: "2025-08-21T13:51:57+09:00"
 category: "reading"
 tags: []
+thumbnail: "./thumbnail.jpg"
 legacyUrl: "https://dansoon-dev.tistory.com/19"
 ---
 

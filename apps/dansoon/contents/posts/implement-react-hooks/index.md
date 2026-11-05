@@ -4,8 +4,7 @@ description: "3주차에는 리액트 컴포넌트를 최적화하는 방법에 
 publishedAt: "2024-12-11T13:23:34+09:00"
 category: "dev"
 tags: ["react"]
-series: "hanghae-plus"
-seriesOrder: 3
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/5"
 ---
 

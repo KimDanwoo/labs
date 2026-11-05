@@ -4,6 +4,7 @@ description: "나는 코드 작성보다 코드를 읽는 일에 훨씬 더 많�
 publishedAt: "2025-12-31T16:22:06+09:00"
 category: "reading"
 tags: []
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/25"
 ---
 

@@ -128,6 +128,15 @@
     min-width: 100%;
   }
 
+  /* 표 안에서는 단어 중간을 끊지 않는다(본문의 overflow-wrap:anywhere 해제). 넓으면 가로로 스크롤된다 */
+  .table-scroll :where(th, td) {
+    overflow-wrap: normal;
+  }
+
+  .table-scroll :where(th) {
+    white-space: nowrap;
+  }
+
   /* 읽기 진행바: 스크롤 연동 애니메이션을 지원하는 브라우저에서만 보인다 */
   .reading-progress {
     position: fixed;
@@ -142,7 +151,11 @@
   @supports (animation-timeline: scroll()) {
     .reading-progress {
       animation: reading-progress linear both;
-      animation-timeline: scroll(root);
+    }
+
+    /* 압축기가 animation 단축 속성에 합치면 타임라인이 사라진다(단축 속성은 타임라인을 받지 않는다) — 규칙을 나눈다 */
+    .reading-progress.reading-progress {
+      animation-timeline: --content;
     }
   }
 
@@ -178,5 +191,221 @@
   --tw-prose-td-borders: var(--color-border);
 
   font-size: var(--text-base);
-  line-height: 1.8;
+  line-height: 1.9;
+  letter-spacing: -0.003em;
+}
+
+/* 마루부리는 획이 가늘어 작은 크기에서 흐려 보인다 — 넓은 화면에서는 한 단계 키운다 */
+@media (width >= 40rem) {
+  .prose.article {
+    font-size: 1.0625rem;
+  }
+}
+
+.prose.article :where(p) {
+  margin-block: 1.35em;
+}
+
+.prose.article :where(h2) {
+  margin-top: 2.6em;
+  margin-bottom: 0.9em;
+  font-size: 1.5em;
+  font-weight: 700;
+}
+
+.prose.article :where(h3) {
+  margin-top: 2.1em;
+  margin-bottom: 0.7em;
+  font-size: 1.22em;
+  font-weight: 700;
+}
+
+.prose.article :where(h4) {
+  margin-top: 1.8em;
+  font-size: 1.05em;
+  font-weight: 700;
+}
+
+.prose.article :where(strong) {
+  font-weight: 700;
+}
+
+.prose.article :where(a) {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.prose.article :where(li) {
+  margin-block: 0.45em;
+}
+
+.prose.article :where(hr) {
+  margin-block: 3em;
+}
+
+/* ── 움직임 ─────────────────────────────────────────────────────
+   모두 CSS로만 처리한다. 지원하지 않는 브라우저에서는 즉시 열리고 닫히며, '동작 줄이기' 설정이면 끈다. */
+:root {
+  /* details 높이를 auto까지 부드럽게 늘리기 위해 필요하다 */
+  interpolate-size: allow-keywords;
+  --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-out: 90ms;
+  --motion-base: 260ms;
+}
+
+/* 페이지 이동: 사이드바·상단바는 그대로 두고, 본문은 이전 화면이 먼저 빠진 뒤 새 화면이 올라온다(겹쳐 보이지 않게) */
+::view-transition-old(sidebar),
+::view-transition-new(sidebar),
+::view-transition-old(topbar),
+::view-transition-new(topbar) {
+  animation: none;
+}
+
+::view-transition-old(page) {
+  animation: var(--motion-out) ease-in both motion-fade-out;
+}
+
+::view-transition-new(page) {
+  animation: var(--motion-base) var(--motion-ease) var(--motion-out) both motion-rise-in;
+}
+
+@keyframes motion-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes motion-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+/* 모달(검색·이미지·모바일 서랍): 열고 닫을 때 모두 움직인다(@starting-style + allow-discrete) */
+.motion-dialog {
+  opacity: 0;
+  transition-property: opacity, transform, overlay, display;
+  transition-duration: var(--motion-base);
+  transition-timing-function: var(--motion-ease);
+  transition-behavior: allow-discrete;
+}
+
+.motion-dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+
+.motion-dialog::backdrop {
+  background-color: oklch(0 0 0 / 0);
+  backdrop-filter: blur(0);
+  transition-property: background-color, backdrop-filter, overlay, display;
+  transition-duration: var(--motion-base);
+  transition-behavior: allow-discrete;
+}
+
+.motion-dialog[open]::backdrop {
+  background-color: oklch(0 0 0 / 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.motion-pop {
+  transform: translateY(-0.5rem) scale(0.98);
+}
+
+.motion-drawer {
+  opacity: 1;
+  transform: translateX(-100%);
+}
+
+@starting-style {
+  .motion-dialog[open] {
+    opacity: 0;
+  }
+
+  .motion-pop[open] {
+    transform: translateY(-0.5rem) scale(0.98);
+  }
+
+  .motion-drawer[open] {
+    opacity: 1;
+    transform: translateX(-100%);
+  }
+
+  .motion-dialog[open]::backdrop {
+    background-color: oklch(0 0 0 / 0);
+    backdrop-filter: blur(0);
+  }
+}
+
+/* 접이식(사이드바 카테고리·목차): 높이가 부드럽게 늘고 준다 */
+.motion-details::details-content {
+  block-size: 0;
+  overflow-y: clip;
+  transition:
+    block-size var(--motion-base) var(--motion-ease),
+    content-visibility var(--motion-base) allow-discrete;
+}
+
+.motion-details[open]::details-content {
+  block-size: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-dialog,
+  .motion-dialog::backdrop,
+  .motion-details::details-content {
+    transition: none;
+  }
+}
+
+/* 페이지 스크롤바: 얇게, 스크롤하는 동안만 보인다(.is-scrolling은 BaseLayout 스크립트가 붙인다) */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+html.is-scrolling {
+  scrollbar-color: color-mix(in oklch, var(--color-foreground) 30%, transparent) transparent;
+}
+
+/* 사이드바·목차의 떠 있는 스크롤바(OverlayScrollbars) — 스크롤할 때만 나타나는 얇은 막대 */
+.os-theme-dansoon {
+  --os-size: 10px;
+  --os-padding-perpendicular: 2px;
+  --os-padding-axis: 2px;
+  --os-track-border-radius: var(--radius-full);
+  --os-handle-border-radius: var(--radius-full);
+  --os-handle-bg: color-mix(in oklch, var(--color-foreground) 25%, transparent);
+  --os-handle-bg-hover: color-mix(in oklch, var(--color-foreground) 45%, transparent);
+  --os-handle-bg-active: color-mix(in oklch, var(--color-foreground) 60%, transparent);
+  --os-handle-perpendicular-size: 60%;
+  --os-handle-perpendicular-size-hover: 100%;
+  --os-handle-perpendicular-size-active: 100%;
+  --os-handle-interactive-area-offset: 4px;
+}
+
+/* ── 스크롤 영역 ─────────────────────────────────────────────
+   모바일은 문서가, 데스크톱은 본문 영역([data-content-scroll])이 스크롤된다. 읽기 진행바는 --content 타임라인을 따른다.
+   스크롤바 라이브러리가 붙으면 실제 스크롤 요소는 안쪽 viewport다. */
+html {
+  scroll-timeline: --content block;
+}
+
+[data-overlayscrollbars-viewport] {
+  /* 끝까지 스크롤해도 바깥 영역으로 스크롤이 넘어가지 않는다 */
+  overscroll-behavior: contain;
+}
+
+@media (width >= 64rem) {
+  html {
+    scroll-timeline: none;
+  }
+
+  [data-content-scroll]:not([data-overlayscrollbars]),
+  [data-content-scroll] > [data-overlayscrollbars-viewport] {
+    scroll-timeline: --content block;
+    scroll-padding-top: var(--spacing-lg);
+    overscroll-behavior: contain;
+  }
 }

@@ -11,50 +11,42 @@ const CONTENT_DIR = new URL('../contents/posts/', import.meta.url);
 const USER_AGENT = 'Mozilla/5.0 (dansoon tistory importer)';
 const BODY_START = '<div class="tt_article_useless_p_margin contents_style">';
 const BODY_END = '<!-- System - START -->';
+// 대표 이미지를 따로 지정하지 않은 글은 og:image가 티스토리 기본 이미지(tistory_admin)를 가리킨다
+const DEFAULT_THUMBNAIL_MARKER = 'tistory_admin';
 const DESCRIPTION_MAX_LENGTH = 140;
 const MS_PER_DAY = 86_400_000;
 
 /** 티스토리 글 번호 → 새 글 메타. slug는 한 번 정하면 바꾸지 않는다(URL). */
 const POSTS = {
-  3: { slug: 'vanilla-js-spa', category: 'dev', tags: ['javascript', 'spa'], series: 'hanghae-plus', seriesOrder: 1 },
+  3: { slug: 'vanilla-js-spa', category: 'dev', tags: ['javascript', 'spa'] },
   4: {
     slug: 'build-my-own-react',
     category: 'dev',
     tags: ['react', 'javascript'],
-    series: 'hanghae-plus',
-    seriesOrder: 2,
   },
-  5: { slug: 'implement-react-hooks', category: 'dev', tags: ['react'], series: 'hanghae-plus', seriesOrder: 3 },
+  5: { slug: 'implement-react-hooks', category: 'dev', tags: ['react'] },
   6: {
     slug: 'react-context-hook-refactoring',
     category: 'dev',
     tags: ['react', 'state-management'],
-    series: 'hanghae-plus',
-    seriesOrder: 4,
   },
   7: {
     slug: 'fsd-state-management-refactoring',
     category: 'dev',
     tags: ['fsd', 'state-management'],
-    series: 'hanghae-plus',
-    seriesOrder: 5,
   },
   8: {
     slug: 'test-code-fsd-refactoring',
     category: 'dev',
     tags: ['testing', 'fsd'],
-    series: 'hanghae-plus',
-    seriesOrder: 6,
   },
-  9: { slug: 'test-scenario-e2e', category: 'dev', tags: ['testing'], series: 'hanghae-plus', seriesOrder: 7 },
+  9: { slug: 'test-scenario-e2e', category: 'dev', tags: ['testing'] },
   10: {
     slug: 'deploy-automation-s3-github-actions',
     category: 'dev',
     tags: ['ci-cd'],
-    series: 'hanghae-plus',
-    seriesOrder: 8,
   },
-  11: { slug: 'hanghae-plus-retrospective', category: 'retro', tags: [], series: 'hanghae-plus', seriesOrder: 9 },
+  11: { slug: 'hanghae-plus-retrospective', category: 'retro', tags: [] },
   12: { slug: 'import-path-alias-barrel-fsd', category: 'dev', tags: ['fsd', 'architecture'] },
   13: { slug: 'fsd-guide', category: 'dev', tags: ['fsd', 'architecture'] },
   14: { slug: 'retrospective-2024', category: 'retro', tags: [] },
@@ -106,12 +98,20 @@ const NAMED_ENTITIES = {
   rdquo: '”',
 };
 
+/** 언어 표시가 없는 코드 블록의 언어를 내용으로 추정한다. 위에서부터 먼저 맞는 것을 쓴다. */
 const LANGUAGE_HINTS = [
   ['text', /[├└│]──/],
+  ['html', /^\s*(<!DOCTYPE|<html|<head|<body|<script|<!--|<div|<meta)/i],
+  // 블록이 YAML 키로 시작하고 코드 기호(';', '//' 주석 줄)가 없을 때만 — TS 객체의 'type:' 같은 줄과 구분한다
+  ['yaml', (code) => /^\s*(name|on|jobs):\s/.test(code) && !/;|^\s*\/\//m.test(code)],
   ['bash', /^\s*(\$ |pnpm |npm |npx |yarn |git |cd |mkdir |brew |curl )/m],
   ['json', /^\s*[{[]\s*"[^"]+"\s*:/],
   ['tsx', /<[A-Z][\w.]*[\s/>]|return \(\s*</],
-  ['ts', /\b(const|let|function|import|export|interface|type|class|async|await)\b|=>/],
+  // 키워드·화살표 함수, 주석, 'fn(...);' 형태의 호출, 'key: value' 객체 줄
+  [
+    'ts',
+    /\b(const|let|function|import|export|interface|type|class|async|await|module\.exports)\b|=>|^\s*\/\/|^\s*[\w.]+\(.*\);?\s*(\/\/.*)?$|^\s*\w+\s*:\s*[\w'"[{]/m,
+  ],
 ];
 
 const UNSAFE_MARKDOWN = /<(script|iframe|style|object|embed)\b|\son\w+\s*=|javascript:/i;
@@ -146,6 +146,13 @@ function readMeta(html, property) {
   return match ? decodeEntities(match[1]) : null;
 }
 
+/** og:image는 티스토리 리사이즈 프록시 주소다 — fname 파라미터에 원본 주소가 들어 있다. */
+function thumbnailUrlOf(ogImage) {
+  if (!ogImage) return null;
+  const original = new URL(ogImage).searchParams.get('fname');
+  return original && !original.includes(DEFAULT_THUMBNAIL_MARKER) ? original : null;
+}
+
 async function fetchArticle(id) {
   const response = await fetch(`${BLOG_ORIGIN}/${id}`, { headers: { 'User-Agent': USER_AGENT } });
   if (!response.ok) throw new Error(`${id}: HTTP ${response.status}`);
@@ -154,6 +161,7 @@ async function fetchArticle(id) {
   if (!afterStart) throw new Error(`${id}: 본문 시작 표시를 찾지 못함`);
   return {
     title: readMeta(html, 'og:title'),
+    thumbnailUrl: thumbnailUrlOf(readMeta(html, 'og:image')),
     publishedAt: readMeta(html, 'article:published_time'),
     modifiedAt: readMeta(html, 'article:modified_time'),
     bodyHtml: afterStart.split(BODY_END)[0].replace(/<\/div>\s*$/, ''),
@@ -161,7 +169,8 @@ async function fetchArticle(id) {
 }
 
 function guessLanguage(code) {
-  return LANGUAGE_HINTS.find(([, pattern]) => pattern.test(code))?.[0] ?? 'text';
+  const matches = (hint) => (typeof hint === 'function' ? hint(code) : hint.test(code));
+  return LANGUAGE_HINTS.find(([, hint]) => matches(hint))?.[0] ?? 'text';
 }
 
 function fence(code, language) {
@@ -312,7 +321,10 @@ async function importPost(id, meta) {
   const directory = new URL(`${meta.slug}/`, CONTENT_DIR);
   await rm(directory, { recursive: true, force: true });
   await mkdir(directory, { recursive: true });
-  await Promise.all(images.map((image) => downloadImage(image, directory)));
+  const thumbnail = article.thumbnailUrl
+    ? { url: article.thumbnailUrl, file: `thumbnail${imageExtension('', article.thumbnailUrl)}` }
+    : null;
+  await Promise.all([...images, ...(thumbnail ? [thumbnail] : [])].map((image) => downloadImage(image, directory)));
 
   const frontmatter = toFrontmatter({
     title: article.title,
@@ -321,12 +333,11 @@ async function importPost(id, meta) {
     updatedAt: isMeaningfullyUpdated(article.publishedAt, article.modifiedAt) ? article.modifiedAt : undefined,
     category: meta.category,
     tags: meta.tags,
-    series: meta.series,
-    seriesOrder: meta.seriesOrder,
+    thumbnail: thumbnail ? `./${thumbnail.file}` : undefined,
     legacyUrl: `${BLOG_ORIGIN}/${id}`,
   });
   await writeFile(new URL('index.md', directory), `${frontmatter}\n${markdown}\n`);
-  console.log(`✓ ${id} → ${meta.slug} (이미지 ${images.length})`);
+  console.log(`✓ ${id} → ${meta.slug} (이미지 ${images.length}${thumbnail ? ', 썸네일' : ''})`);
 }
 
 for (const [id, meta] of Object.entries(POSTS)) {

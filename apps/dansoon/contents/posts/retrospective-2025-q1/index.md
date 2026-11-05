@@ -5,6 +5,7 @@ publishedAt: "2025-03-14T16:30:47+09:00"
 updatedAt: "2025-11-17T13:09:00+09:00"
 category: "retro"
 tags: []
+thumbnail: "./thumbnail.jpg"
 legacyUrl: "https://dansoon-dev.tistory.com/15"
 ---
 

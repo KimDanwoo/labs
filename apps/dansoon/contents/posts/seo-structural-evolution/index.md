@@ -5,6 +5,7 @@ publishedAt: "2025-09-17T10:49:05+09:00"
 updatedAt: "2025-10-27T17:23:04+09:00"
 category: "dev"
 tags: ["seo"]
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/20"
 ---
 
@@ -20,7 +21,7 @@ Next.js는 분명히 SEO에 유리한 환경을 제공하지만, 검색엔진 �
 
 초기 웹에서 SEO는 단순했습니다. 정적 HTML 문서에 적절한 메타 태그와 제목, 그리고 의미있는 마크업만 있으면 되었습니다.
 
-```text
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -63,7 +64,7 @@ function App() {
 
 이때 크롤러가 보는 것은
 
-```text
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -80,7 +81,7 @@ function App() {
 
 ### 웹 크롤러는 어떻게 사이트를 읽을까?
 
-```text
+```ts
 // 크롤러의 동작 과정 (단순화)
 1. HTTP 요청 → 서버에서 HTML 응답받음
 2. HTML 파싱 → DOM 구조 파악
@@ -111,7 +112,7 @@ function App() {
 
 **CSR = 펜과 종이** 크롤러가 서버에 요청하면 빈 종이(빈 HTML)와 펜(JavaScript)을 받습니다. 글을 써서 완성하려면 시간이 걸리고, 크롤러는 보통 기다리지 않습니다.
 
-```text
+```html
 <!-- 크롤러가 받는 CSR 응답 -->
 <!DOCTYPE html>
 <html>
@@ -127,7 +128,7 @@ function App() {
 
 **SSR = 완성된 책** 크롤러가 서버에 요청하면 이미 완성된 책(완성된 HTML)을 받습니다. 책을 펴자마자 모든 내용을 읽을 수 있습니다.
 
-```text
+```html
 <!-- 크롤러가 받는 SSR 응답 -->
 <!DOCTYPE html>
 <html>

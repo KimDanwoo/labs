@@ -1,0 +1,33 @@
+---
+import Icon from '~/components/Icon.astro';
+import ListPage from '~/components/ListPage.astro';
+import { bookReportPath, getBookReports, groupByWeek, REPORT_KIND_LABEL } from '~/lib/books';
+import { formatShortDate } from '~/lib/format';
+
+const weeks = groupByWeek(await getBookReports());
+---
+
+<ListPage heading="주간 책 순위" lead="매주 월요일, 서점 베스트셀러와 웹소설 순위를 한 페이지로 모아 정리합니다.">
+  <ul class="divide-y divide-border border-t border-border">
+    {
+      weeks.map(({ date, reports }) => (
+        <li class="flex flex-wrap items-center justify-between gap-md py-md">
+          <time datetime={date.toISOString()} class="font-bold tabular-nums">
+            {formatShortDate(date)} 주
+          </time>
+          <div class="flex gap-xs">
+            {reports.map((report) => (
+              <a
+                href={bookReportPath(report)}
+                class="inline-flex h-9 items-center gap-xs rounded-full px-md text-sm text-muted-foreground ring-1 ring-border transition-colors hover:bg-muted hover:text-foreground"
+              >
+                {REPORT_KIND_LABEL[report.data.category]}
+                <Icon name="arrow-right" class="size-3.5" />
+              </a>
+            ))}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</ListPage>

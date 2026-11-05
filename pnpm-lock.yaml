@@ -117,6 +117,9 @@ catalogs:
     next-themes:
       specifier: ^0.4.6
       version: 0.4.6
+    overlayscrollbars:
+      specifier: 2.17.0
+      version: 2.17.0
     prettier:
       specifier: ^3.4.2
       version: 3.8.3
@@ -322,6 +325,9 @@ importers:
       astro-expressive-code:
         specifier: 'catalog:'
         version: 0.44.3(astro@7.2.9(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.4.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
+      overlayscrollbars:
+        specifier: 'catalog:'
+        version: 2.17.0
       sharp:
         specifier: 'catalog:'
         version: 0.35.5(@types/node@26.4.0)
@@ -5988,6 +5994,9 @@ packages:
 
   outvariant@1.4.3:
     resolution: {integrity: sha512-+Sl2UErvtsoajRDKCE5/dBz4DIvHXQQnAxtQTF04OJxY0+DyZXSo5P5Bb7XYWOh81syohlYL24hbDwxedPUJCA==}
+
+  overlayscrollbars@2.17.0:
+    resolution: {integrity: sha512-tyFSxFVJ2FcTTiEkwMthAb+Ogs8vgpW31Sy5z2TL1Q6Kw7579zrcd4xDm38lmdD934LjiTHyrzR90KMDrbCXoA==}
 
   own-keys@1.0.2:
     resolution: {integrity: sha512-19YVAg7T+WTrxggPukVq7DjTv6+PJ867TmhCvBsYwmbFCsZd344rq2Ld1p0wo8f8Qrrhgp82c6FJRqdXWtSEhg==}
@@ -13300,6 +13309,8 @@ snapshots:
 
   outvariant@1.4.3:
     optional: true
+
+  overlayscrollbars@2.17.0: {}
 
   own-keys@1.0.2:
     dependencies:

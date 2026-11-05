@@ -4,6 +4,7 @@ description: "“개발자는 코드만 잘 짜면 된다”는 말, 이제는 �
 publishedAt: "2025-09-29T09:33:03+09:00"
 category: "reading"
 tags: ["writing"]
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/21"
 ---
 

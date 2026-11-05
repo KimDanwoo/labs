@@ -1,6 +1,7 @@
 ---
 import '@tokens/css/fonts.css';
 import '~/styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import AppSidebar from '~/components/AppSidebar.astro';
 import Icon from '~/components/Icon.astro';
 import MobileTopBar from '~/components/MobileTopBar.astro';
@@ -50,48 +51,64 @@ const imageUrl = new URL(image, Astro.site).href;
     {article?.updatedAt && <meta property="article:modified_time" content={article.updatedAt.toISOString()} />}
     <meta name="twitter:card" content="summary_large_image" />
     <slot name="head" />
+    <ClientRouter />
 
-    <!-- 첫 페인트 전에 테마를 정해 깜빡임을 막는다. 저장값이 없으면 OS 설정을 따른다. -->
+    <!-- 첫 페인트 전에 테마를 정해 깜빡임을 막는다. 저장값이 없으면 OS 설정을 따른다.
+         페이지를 옮기면 ClientRouter가 <html> 속성을 새 문서 것으로 바꾸므로, 바꾼 직후에도 다시 적용한다. -->
     <script is:inline>
       (() => {
-        let saved = null;
-        try {
-          saved = localStorage.getItem('theme');
-        } catch {}
-        const isDark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.classList.toggle('dark', isDark);
+        const applyTheme = (root) => {
+          let saved = null;
+          try {
+            saved = localStorage.getItem('theme');
+          } catch {}
+          const isDark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+          root.classList.toggle('dark', isDark);
+        };
+        applyTheme(document.documentElement);
+        if (window.__dansoonThemeSync) return;
+        window.__dansoonThemeSync = true;
+        document.addEventListener('astro:before-swap', (event) => applyTheme(event.newDocument.documentElement));
       })();
     </script>
   </head>
 
-  <body class="min-h-dvh">
+  <body class="min-h-dvh lg:h-dvh lg:overflow-hidden">
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:fixed focus:top-sm focus:left-sm focus:z-50 focus:rounded-md focus:bg-primary focus:px-md focus:py-sm focus:text-primary-foreground"
     >
       본문으로 건너뛰기
     </a>
-    <div class="lg:grid lg:grid-cols-[var(--container-3xs)_minmax(0,1fr)]">
+    <div class="lg:grid lg:h-dvh lg:grid-cols-[var(--container-3xs)_minmax(0,1fr)]">
       <aside
-        data-sidebar
+        transition:persist="sidebar"
         aria-label="사이트 탐색"
-        class="sticky top-0 hidden h-dvh overflow-y-auto border-r border-border bg-secondary-subtle lg:block"
+        class="hidden h-dvh border-r border-border bg-secondary-subtle lg:block"
+        style="view-transition-name: sidebar"
       >
-        <AppSidebar posts={posts} />
+        <!-- 사이드바는 자기 영역만 스크롤한다. 스크롤바 라이브러리는 안쪽 요소에 붙인다 -->
+        <div data-sidebar class="h-full overflow-y-auto">
+          <AppSidebar posts={posts} />
+        </div>
       </aside>
-      <div class="flex min-h-dvh min-w-0 flex-col">
-        <MobileTopBar />
-        <main id="main" class="flex-1">
-          <slot />
-        </main>
-        <SiteFooter />
+      <!-- 데스크톱에서는 본문 영역이 스크롤 주체다(사이드바와 스크롤이 섞이지 않는다) -->
+      <div data-content-scroll class="min-w-0 lg:h-dvh lg:overflow-y-auto">
+        <div class="flex min-h-dvh flex-col">
+          <MobileTopBar />
+          <main id="main" class="flex-1" style="view-transition-name: page">
+            <slot />
+          </main>
+          <SiteFooter />
+        </div>
       </div>
     </div>
 
     <dialog
       id="mobile-nav"
+      transition:persist
       aria-label="사이트 탐색"
-      class="fixed inset-y-0 left-0 m-0 h-dvh max-h-none w-72 max-w-[85vw] bg-secondary-subtle p-0 text-foreground"
+      class="motion-dialog motion-drawer fixed inset-y-0 left-0 m-0 h-dvh max-h-none w-72 max-w-[85vw] bg-secondary-subtle p-0 text-foreground"
     >
       <button
         type="button"
@@ -102,26 +119,13 @@ const imageUrl = new URL(image, Astro.site).href;
       >
         <Icon name="x" />
       </button>
-      <AppSidebar posts={posts} />
+      <!-- 처음 열 때 데스크톱 사이드바를 복제해 채운다(같은 목록을 두 번 그리지 않는다) -->
+      <div data-mobile-nav-body></div>
     </dialog>
     <SearchDialog />
 
     <script>
-      const mobileNav = document.querySelector<HTMLDialogElement>('#mobile-nav');
-      document.querySelector('[data-nav-open]')?.addEventListener('click', () => mobileNav?.showModal());
-      mobileNav?.querySelector('[data-nav-close]')?.addEventListener('click', () => mobileNav.close());
-      mobileNav?.addEventListener('click', (event) => {
-        if (event.target === mobileNav) mobileNav.close();
-      });
-      // 검색을 열면 서랍은 닫는다(모달 두 개가 겹치지 않게)
-      mobileNav
-        ?.querySelectorAll('[data-search-open]')
-        .forEach((button) => button.addEventListener('click', () => mobileNav.close()));
-
-      // 사이드바에서 지금 글이 보이도록 사이드바 안에서만 스크롤한다(페이지 스크롤은 건드리지 않는다)
-      const sidebar = document.querySelector<HTMLElement>('[data-sidebar]');
-      const current = sidebar?.querySelector<HTMLElement>('details [aria-current="page"]');
-      if (sidebar && current) sidebar.scrollTop = current.offsetTop - sidebar.clientHeight / 3;
+      import '~/scripts/layout';
     </script>
   </body>
 </html>

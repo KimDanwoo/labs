@@ -4,6 +4,7 @@ description: "최근 Thoughtworks의 「Should we still design code for humans?�
 publishedAt: "2026-08-07T15:59:14+09:00"
 category: "dev"
 tags: ["ai"]
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/30"
 ---
 

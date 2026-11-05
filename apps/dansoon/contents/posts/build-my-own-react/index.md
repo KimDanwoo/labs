@@ -5,8 +5,6 @@ publishedAt: "2024-12-11T13:21:01+09:00"
 updatedAt: "2025-08-03T09:34:54+09:00"
 category: "dev"
 tags: ["react","javascript"]
-series: "hanghae-plus"
-seriesOrder: 2
 legacyUrl: "https://dansoon-dev.tistory.com/4"
 ---
 

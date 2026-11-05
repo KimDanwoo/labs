@@ -4,6 +4,7 @@ description: "Next.js App Router를 사용하다 보면, 폴더 구조나 컴포
 publishedAt: "2025-11-30T15:45:55+09:00"
 category: "dev"
 tags: ["nextjs","seo"]
+thumbnail: "./thumbnail.jpg"
 legacyUrl: "https://dansoon-dev.tistory.com/24"
 ---
 

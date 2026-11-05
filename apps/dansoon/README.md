@@ -1,6 +1,6 @@
 # dansoon
 
-프론트엔드 엔지니어 김단우의 개발 노트·회고·독서 기록 블로그. Astro 정적 사이트.
+프론트엔드 엔지니어 김단우의 개발 노트·회고·독서 기록과 주간 책 순위 리포트. Astro 정적 사이트.
 
 **라이브:** [log.danwoo.dev](https://log.danwoo.dev)
 
@@ -21,11 +21,12 @@
 
 ```
 contents/posts/<slug>/index.md   # 글 1편 = 폴더 1개(이미지는 같은 폴더). 폴더 이름이 곧 URL slug
+contents/book/<날짜>-<종류>/      # 주간 책 순위 리포트(자동 생성, /book/<폴더 이름>/)
 src/
-  content.config.ts              # posts 스키마(카테고리·태그·연재·draft 검증)
+  content.config.ts              # posts 스키마(카테고리·태그·draft 검증)
   lib/
     taxonomy.ts                  # 카테고리·태그·연재 ID와 화면 이름
-    posts.ts                     # 공개 글 조회·정렬·연재·이전/다음·관련 글
+    posts.ts                     # 공개 글 조회·정렬·이전/다음·관련 글
     format.ts                    # 날짜(Asia/Seoul)·읽는 시간
     articleHastPlugin.mjs        # 본문 후처리: 제목 앵커, 표 가로 스크롤
   layouts/BaseLayout.astro       # 메타·테마 초기화·사이드바 틀
@@ -33,9 +34,11 @@ src/
   pages/
     index.astro                  # 전체 글
     posts/[slug].astro           # 글 상세
-    categories/ tags/ series/    # 목록
+    categories/ tags/            # 목록
     rss.xml.ts search.json.ts    # RSS, 검색 인덱스
 scripts/import-tistory.mjs       # 티스토리 글 이전(재실행 가능)
+scripts/fetch_bestseller.py      # 주간 베스트셀러 리포트 생성
+scripts/fetch_webnovel.py        # 주간 웹소설 순위 리포트 생성
 ```
 
 ## 글 쓰기
@@ -49,13 +52,15 @@ description: '목록·검색·SNS 미리보기 요약(200자 이내)'
 publishedAt: '2026-11-05T10:00:00+09:00'
 category: 'dev' # dev | retro | reading
 tags: ['react'] # src/lib/taxonomy.ts의 TAG_IDS
-# series: 'hanghae-plus'
-# seriesOrder: 10
 # draft: true          # true면 목록·상세·RSS·검색 어디에도 나오지 않는다
 ---
 ```
 
-새 태그·카테고리·연재는 `src/lib/taxonomy.ts`에 ID와 이름을 먼저 추가한다. slug(폴더 이름)는 URL이므로 바꾸지 않는다.
+새 태그·카테고리는 `src/lib/taxonomy.ts`에 ID와 이름을 먼저 추가한다. slug(폴더 이름)는 URL이므로 바꾸지 않는다.
+
+## 주간 책 순위(자동)
+
+GitHub Actions가 매주 월요일 리포트를 만들어 `contents/book/`에 커밋한다(`dansoon-weekly-bestseller`, `dansoon-weekly-webnovel`). 블로그는 `/book/`에서 주별로 모아 보여준다. 수집 스크립트는 Python이며 Gemini API 키와 `google-genai`가 필요하다. 테크 뉴스 자동 수집은 중단했다.
 
 ## 댓글
 

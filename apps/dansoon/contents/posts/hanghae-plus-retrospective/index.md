@@ -5,8 +5,7 @@ publishedAt: "2024-12-11T13:29:58+09:00"
 updatedAt: "2025-08-04T13:35:22+09:00"
 category: "retro"
 tags: []
-series: "hanghae-plus"
-seriesOrder: 9
+thumbnail: "./thumbnail.jpg"
 legacyUrl: "https://dansoon-dev.tistory.com/11"
 ---
 

@@ -4,8 +4,9 @@ import Icon from '~/components/Icon.astro';
 
 <dialog
   id="search-dialog"
+  transition:persist
   aria-label="글 검색"
-  class="m-0 mx-auto mt-0 w-full max-w-none bg-transparent p-0 text-foreground backdrop:bg-transparent sm:mt-[12vh] sm:max-w-(--container-2xl) sm:px-md"
+  class="motion-dialog motion-pop m-0 mx-auto mt-0 w-full max-w-none bg-transparent p-0 text-foreground sm:mt-[12vh] sm:max-w-(--container-2xl) sm:px-md"
 >
   <div
     class="flex max-h-[80dvh] flex-col overflow-hidden border-b border-border bg-popover shadow-lg sm:rounded-xl sm:border"
@@ -119,7 +120,7 @@ import Icon from '~/components/Icon.astro';
     meta.className = 'text-xs text-muted-foreground';
     meta.textContent = [document_.category, document_.date].join(' · ');
     const title = document.createElement('p');
-    title.className = 'font-semibold';
+    title.className = 'font-bold';
     appendHighlighted(title, document_.title, terms);
     const snippet = document.createElement('p');
     snippet.className = 'mt-xs line-clamp-2 text-sm text-muted-foreground';
@@ -176,7 +177,9 @@ import Icon from '~/components/Icon.astro';
   const isTyping = (target: EventTarget | null) =>
     target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
 
-  document.querySelectorAll('[data-search-open]').forEach((button) => button.addEventListener('click', open));
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('[data-search-open]')) open();
+  });
   dialog?.querySelector('[data-search-close]')?.addEventListener('click', () => dialog.close());
   dialog?.addEventListener('click', (event) => {
     if (event.target === dialog) dialog.close();
@@ -194,6 +197,8 @@ import Icon from '~/components/Icon.astro';
       if (first) window.location.href = first.href;
     }
   });
+  // 검색 결과를 눌러 이동하면 열려 있던 모달을 닫는다(모달은 페이지를 옮겨도 남아 있다)
+  document.addEventListener('astro:after-swap', () => dialog?.close());
   document.addEventListener('keydown', (event) => {
     const isShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k';
     const isSlash = event.key === '/' && !isTyping(event.target);

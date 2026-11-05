@@ -1,5 +1,5 @@
 /**
- * 카테고리·태그·연재의 ID와 화면 이름. ID는 URL과 frontmatter에 쓰이므로 바꾸지 않는다.
+ * 카테고리·태그의 ID와 화면 이름. ID는 URL과 frontmatter에 쓰이므로 바꾸지 않는다.
  * 이름만 바꿀 때는 *_LABEL만 고친다.
  */
 export const CATEGORY_IDS = ['dev', 'retro', 'reading'] as const;
@@ -49,13 +49,3 @@ export const TAG_LABEL = {
   vue: 'Vue',
   writing: '글쓰기',
 } satisfies Record<TagId, string>;
-
-export const SERIES_IDS = ['hanghae-plus'] as const;
-export type SeriesId = (typeof SERIES_IDS)[number];
-
-export const SERIES_INFO = {
-  'hanghae-plus': {
-    label: '항해 플러스',
-    description: '10주 동안 바닐라 JS SPA부터 React 구현, FSD 리팩토링, 테스트, 배포 자동화까지 다룬 과정의 기록',
-  },
-} satisfies Record<SeriesId, { label: string; description: string }>;

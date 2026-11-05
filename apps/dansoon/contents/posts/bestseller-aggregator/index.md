@@ -4,6 +4,7 @@ description: "아내의 한마디에서 시작해 매주 자동으로 생성되�
 publishedAt: "2026-08-02T18:20:10+09:00"
 category: "dev"
 tags: ["side-project"]
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/29"
 ---
 

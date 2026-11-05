@@ -7,20 +7,25 @@
     mobile: { unit: 'DAN-QHiQQni8uspeE4y8', width: 320, height: 100 },
   } as const;
 
-  document.querySelectorAll<HTMLElement>('.adfit-slot').forEach((slot) => {
-    // 창 폭이 아니라 실제 자리 폭으로 고른다 — 본문 칼럼(672px)에는 728 배너가 들어가지 않는다
-    const { unit, width, height } = slot.clientWidth >= UNITS.pc.width ? UNITS.pc : UNITS.mobile;
-    const ins = document.createElement('ins');
-    ins.className = 'kakao_ad_area';
-    ins.style.display = 'none';
-    ins.dataset.adUnit = unit;
-    ins.dataset.adWidth = String(width);
-    ins.dataset.adHeight = String(height);
-    const loader = document.createElement('script');
-    loader.async = true;
-    loader.src = 'https://t1.kakaocdn.net/kas/static/ba.min.js';
-    slot.replaceChildren(ins, loader);
-  });
+  // ba.min.js는 로드 시점의 .kakao_ad_area만 처리하므로, 페이지를 옮길 때마다 광고 자리와 로더를 새로 넣는다
+  function renderAds() {
+    document.querySelectorAll<HTMLElement>('.adfit-slot').forEach((slot) => {
+      // 창 폭이 아니라 실제 자리 폭으로 고른다 — 본문 칼럼(672px)에는 728 배너가 들어가지 않는다
+      const { unit, width, height } = slot.clientWidth >= UNITS.pc.width ? UNITS.pc : UNITS.mobile;
+      const ins = document.createElement('ins');
+      ins.className = 'kakao_ad_area';
+      ins.style.display = 'none';
+      ins.dataset.adUnit = unit;
+      ins.dataset.adWidth = String(width);
+      ins.dataset.adHeight = String(height);
+      const loader = document.createElement('script');
+      loader.async = true;
+      loader.src = 'https://t1.kakaocdn.net/kas/static/ba.min.js';
+      slot.replaceChildren(ins, loader);
+    });
+  }
+
+  document.addEventListener('astro:page-load', renderAds);
 </script>
 
 <style>

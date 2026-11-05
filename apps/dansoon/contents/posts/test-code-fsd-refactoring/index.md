@@ -5,8 +5,6 @@ publishedAt: "2024-12-11T13:25:56+09:00"
 updatedAt: "2025-08-03T09:36:21+09:00"
 category: "dev"
 tags: ["testing","fsd"]
-series: "hanghae-plus"
-seriesOrder: 6
 legacyUrl: "https://dansoon-dev.tistory.com/8"
 ---
 

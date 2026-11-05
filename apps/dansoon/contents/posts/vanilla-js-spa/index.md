@@ -5,8 +5,6 @@ publishedAt: "2024-12-11T13:20:03+09:00"
 updatedAt: "2025-08-03T09:34:32+09:00"
 category: "dev"
 tags: ["javascript","spa"]
-series: "hanghae-plus"
-seriesOrder: 1
 legacyUrl: "https://dansoon-dev.tistory.com/3"
 ---
 

@@ -5,6 +5,7 @@ publishedAt: "2024-12-17T16:56:31+09:00"
 updatedAt: "2025-07-29T15:33:28+09:00"
 category: "dev"
 tags: ["fsd","architecture"]
+thumbnail: "./thumbnail.jpg"
 legacyUrl: "https://dansoon-dev.tistory.com/13"
 ---
 

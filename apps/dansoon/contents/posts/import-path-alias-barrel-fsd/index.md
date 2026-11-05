@@ -5,6 +5,7 @@ publishedAt: "2024-12-15T14:47:25+09:00"
 updatedAt: "2025-08-03T09:37:41+09:00"
 category: "dev"
 tags: ["fsd","architecture"]
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/12"
 ---
 
@@ -145,7 +146,7 @@ module.exports = {
 
 FSD 아키텍처는 모듈 별칭과 완벽하게 시너지를 발휘하며, 이를 최대한 활용한 구성은 다음과 같다:
 
-```text
+```ts
 // tsconfig.json
 {
   "compilerOptions": {
@@ -312,14 +313,14 @@ export { default as LargeComponent } from './LargeComponent';
 3.  **IDE 통합 최적화**
     -   VSCode에서의 자동 완성 및 네비게이션 지원을 위한 설정:
 
-        ```text
+        ```ts
         // .vscode/settings.json{  "typescript.preferences.importModuleSpecifier": "non-relative"}
         ```
 
 4.  **지속적 통합 파이프라인 구성**
     -   import 경로 일관성 검사를 위한 ESLint 규칙 적용:
 
-        ```text
+        ```ts
         // .eslintrc.jsmodule.exports = {  // ...  rules: {    'no-restricted-imports': [      'error',      {        patterns: [          {            group: ['../*'],            message: 'Use aliases instead of relative imports'          }        ]      }    ]  }};
         ```
 

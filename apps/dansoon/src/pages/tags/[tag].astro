@@ -16,6 +16,6 @@ const posts = filterByTag(await getPublishedPosts(), tag);
 const label = TAG_LABEL[tag];
 ---
 
-<ListPage heading={label} icon="hash" lead={`${posts.length}개의 글`} description={`${label} 태그가 달린 글 모음`}>
+<ListPage heading={label} lead={`${posts.length}개의 글`} description={`${label} 태그가 달린 글 모음`}>
   <PostList posts={posts} />
 </ListPage>

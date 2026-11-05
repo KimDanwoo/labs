@@ -4,6 +4,7 @@ description: "최근 하나의 프로젝트가 100개가 넘는 도메인에서 
 publishedAt: "2026-07-02T14:18:10+09:00"
 category: "dev"
 tags: ["architecture"]
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/27"
 ---
 

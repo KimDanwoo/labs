@@ -15,15 +15,15 @@ const tabs = [
 ];
 ---
 
-<nav aria-label="카테고리" class="overflow-x-auto">
-  <ul class="inline-flex gap-px rounded-lg bg-muted p-0.5 text-sm">
+<nav aria-label="카테고리" class="-mx-md overflow-x-auto px-md sm:mx-0 sm:px-0">
+  <ul class="flex gap-xs">
     {
       tabs.map((tab) => (
         <li>
           <a
             href={tab.href}
             aria-current={tab.id === active ? 'page' : undefined}
-            class="inline-flex h-8 items-center gap-xs rounded-md px-md whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-background aria-[current=page]:font-medium aria-[current=page]:text-foreground aria-[current=page]:shadow-sm"
+            class="inline-flex h-9 items-center gap-xs rounded-full px-md text-sm whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted hover:text-foreground aria-[current=page]:bg-foreground aria-[current=page]:text-background"
           >
             {tab.label}
             <span class="text-xs tabular-nums opacity-60">{tab.count}</span>
