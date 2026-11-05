@@ -22,7 +22,7 @@ import {
   type Region,
 } from '@shared/world/world';
 import * as THREE from 'three';
-import { canvasTexture } from './art';
+import { CANVAS_FONT_FAMILY, canvasTexture } from './art';
 import { BACKGROUND_FRAGMENT, BACKGROUND_VERTEX } from './backgroundShader';
 import { createBedRest } from './bedRest';
 import { createBoats } from './boats';
@@ -933,7 +933,7 @@ export async function createScene(
       if (!ctx) return Promise.resolve(false);
       ctx.drawImage(renderer.domElement, 0, 0);
       ctx.fillStyle = '#fff9e8';
-      ctx.font = `${Math.max(20, canvas.width / 55)}px serif`;
+      ctx.font = `${Math.max(20, canvas.width / 55)}px ${CANVAS_FONT_FAMILY}`;
       ctx.shadowColor = '#18372c';
       ctx.shadowBlur = 5;
       ctx.fillText('여름빛 산책', canvas.width * 0.04, canvas.height * 0.95);

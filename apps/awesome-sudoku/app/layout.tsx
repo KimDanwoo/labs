@@ -1,22 +1,8 @@
 import '@app/globals.css';
 import { AppProviders } from '@app/providers';
+import '@tokens/css/fonts.css';
 import type { Metadata, Viewport } from 'next';
-import { Rubik, Space_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
-
-const rubik = Rubik({
-  variable: '--font-rubik',
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-});
-
-const spaceMono = Space_Mono({
-  variable: '--font-space-mono',
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  display: 'swap',
-});
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -93,7 +79,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${rubik.variable} ${spaceMono.variable} antialiased`}>
+      <body className="antialiased">
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

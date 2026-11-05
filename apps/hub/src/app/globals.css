@@ -8,7 +8,7 @@
 
 /* ─── Hub 전용 CSS 커스텀 프로퍼티 ───────────────────────────── */
 :root {
-  --font-display: var(--font-display, var(--font-sans));
+  --font-display: var(--font-sans);
 }
 
 /* ─── Body / Background ──────────────────────────────────────── */

@@ -4,6 +4,7 @@
 
 @theme {
   --breakpoint-xs: 395px;
+  --font-sans: var(--font-maruburi);
 }
 
 :root {

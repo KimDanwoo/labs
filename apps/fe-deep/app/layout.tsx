@@ -1,13 +1,9 @@
 import '@app/globals.css';
 import { AppProviders } from '@app/providers';
 import { SITE_URL } from '@shared/config/site';
+import '@tokens/css/fonts.css';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
+import { Geist_Mono } from 'next/font/google';
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -48,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistMono.variable} antialiased`}>
         <AppProviders>{children}</AppProviders>
         <script
           type="application/ld+json"
