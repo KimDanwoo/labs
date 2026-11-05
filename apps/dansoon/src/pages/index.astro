@@ -7,7 +7,7 @@ import { getPublishedPosts } from '~/lib/posts';
 const posts = await getPublishedPosts();
 ---
 
-<ListPage heading="개발하며 배운 것들" lead="프론트엔드 엔지니어 김단우가 만들고 부딪히며 배운 것을 기록합니다.">
+<ListPage heading="전체 글" lead="개발하면서 배운 것과 회고, 읽은 책 이야기를 적어요.">
   <div slot="header" class="mt-lg">
     <CategoryTabs posts={posts} active="all" />
   </div>

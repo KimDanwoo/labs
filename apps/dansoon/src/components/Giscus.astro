@@ -10,17 +10,11 @@ const GISCUS = {
   category: 'Announcements',
   categoryId: 'DIC_kwDOVjp52c4DKbbw',
 } as const;
-
-const isConfigured = GISCUS.categoryId !== '';
 ---
 
-{
-  isConfigured && (
-    <section aria-label="댓글">
-      <div class="giscus" data-giscus-config={JSON.stringify(GISCUS)} />
-    </section>
-  )
-}
+<section aria-label="댓글">
+  <div class="giscus" data-giscus-config={JSON.stringify(GISCUS)}></div>
+</section>
 
 <script>
   const GISCUS_ORIGIN = 'https://giscus.app';
