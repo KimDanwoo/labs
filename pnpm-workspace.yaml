@@ -109,6 +109,8 @@ catalog:
   astro-expressive-code: 0.44.3
   # 티스토리 글 이전 스크립트. 7.2.5는 배포 직후라 검증된 7.2.4로 고정한다.
   turndown: 7.2.4
+  # 빌드 때 OG 이미지(글·책 리포트 카드)를 그린다. Vercel 유지 관리.
+  satori: 0.63.2
 
   # ui (fe-deep)
   shadcn: ^4.19.0
