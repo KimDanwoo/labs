@@ -31,6 +31,13 @@ function weekOf(report: BookReport): Week | null {
 /** 11월 2주차 */
 export const formatWeek = ({ month, week }: Week) => `${month}월 ${week}주차`;
 
+/** '일반 도서 베스트셀러 (2026년 11월 2째주)' → 제목 '일반 도서 베스트셀러', 주차 '2026년 11월 2주차' */
+export function splitReportTitle(report: BookReport): { heading: string; week?: string } {
+  const week = weekOf(report);
+  if (!week) return { heading: report.data.title };
+  return { heading: report.data.title.replace(WEEK_IN_TITLE, '').trim(), week: `${week.year}년 ${formatWeek(week)}` };
+}
+
 /**
  * 같은 주차의 리포트를 한 줄로 묶는다(최신 주가 먼저). 초기 리포트는 종류별 발행일이 하루씩 어긋나므로
  * 날짜가 아니라 제목의 주차로 묶고, 주차가 없으면 발행일로 묶는다.

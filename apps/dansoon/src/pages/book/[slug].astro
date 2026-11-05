@@ -33,7 +33,7 @@ const structuredData = {
 const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c');
 ---
 
-<BaseLayout title={title} description={description} article={{ publishedAt: date }}>
+<BaseLayout title={title} description={description} image={`/og/book/${report.id}.png`} article={{ publishedAt: date }}>
   <script is:inline slot="head" type="application/ld+json" set:html={structuredDataJson} />
   <div class="mx-auto max-w-6xl px-md sm:px-xl xl:grid xl:grid-cols-[minmax(0,1fr)_var(--container-3xs)] xl:gap-3xl">
     <!-- 순위 표가 넓어 글보다 넓은 칼럼을 쓴다 -->

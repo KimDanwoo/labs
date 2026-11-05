@@ -31,7 +31,10 @@ const { Content, headings } = await render(post);
 const { older, newer } = getAdjacentPosts(posts, post);
 // SNS 미리보기는 jpg/png 1200px가 가장 무난하다
 const OG_IMAGE_WIDTH = 1200;
-const ogImage = thumbnail ? (await getImage({ src: thumbnail, width: OG_IMAGE_WIDTH, format: 'jpg' })).src : undefined;
+// 썸네일이 없으면 빌드 때 만든 제목 카드(/og/posts/<id>.png)를 쓴다
+const ogImage = thumbnail
+  ? (await getImage({ src: thumbnail, width: OG_IMAGE_WIDTH, format: 'jpg' })).src
+  : `/og/posts/${post.id}.png`;
 
 const structuredData = {
   '@context': 'https://schema.org',
