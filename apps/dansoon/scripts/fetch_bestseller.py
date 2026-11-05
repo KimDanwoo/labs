@@ -14,6 +14,8 @@ from google import genai
 from google.genai import types as genai_types
 from datetime import datetime
 
+from bestseller_trends import annotate_trends, change_label, load_previous_rankings, summary_markdown
+
 DATE = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y-%m-%d")
 
 ALADIN_TTB_KEY = os.environ.get("ALADIN_TTB_KEY")
@@ -896,7 +898,7 @@ def build_markdown(
     )
 
     rows = [
-        f"| **{b['rank']}** | {_title_cell(b)} | {_md_cell(b['author'])} "
+        f"| **{b['rank']}** | {change_label(b.get('change'))} | {_title_cell(b)} | {_md_cell(b['author'])} "
         f"| {_publisher_cell(b)} "
         f"| {next((g['name'] for g in GENRES if g['key'] == b['genre_key']), '')} "
         f"| {_source_cells(b['sources'])} |"
@@ -904,8 +906,8 @@ def build_markdown(
     ]
 
     overall_table = "\n".join([
-        "| 순위 | 책 | 저자 | 출판사 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |",
-        "|:----:|-----|------|--------|------|:------:|:-------:|:-----:|:----:|",
+        "| 순위 | 변동 | 책 | 저자 | 출판사 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |",
+        "|:----:|:----:|-----|------|--------|------|:------:|:-------:|:-----:|:----:|",
         *rows,
     ])
 
@@ -942,7 +944,9 @@ isHidden: true
 집계에 쓰인 {source_count}개 서점에서 모두 1위면 만점이고, 순위에 없는 서점은 0점입니다.
 서점마다 확인 가능한 순위 깊이가 달라(알라딘·교보문고·YES24 20위, 리디 {RIDI_OVERALL_MAX}위)
 순위를 그대로 더하지 않습니다. **출판사**는 알라딘 정보 기준이며, 알라딘에 없는 책은 `-`입니다.
+**변동**은 지난주 종합 순위와 비교한 값입니다(NEW: 새로 들어온 책).
 
+{summary_markdown(charted)}
 {overall_table}
 
 ---
@@ -1093,6 +1097,8 @@ def main():
             print(f"     {book['title'][:30]} → {searched[key] or '미확보'}")
         book["publisher"] = searched[key]
 
+    # 지난 주들의 덤프와 비교해 변동·연속 순위권을 붙인다(첫 주처럼 기록이 없으면 '-')
+    annotate_trends(charted, load_previous_rankings(DEBUG_DUMP_DIR, DATE, _title_key), _title_key)
     md = build_markdown(charted, genre_data, DATE, collected_sources)
     slug = f"{DATE}-bestseller"
     out_dir = pathlib.Path("contents/book") / slug

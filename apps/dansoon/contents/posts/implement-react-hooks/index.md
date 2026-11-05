@@ -1,6 +1,6 @@
 ---
 title: "React Hook을 직접 구현해보자"
-description: "3주차에는 리액트 컴포넌트를 최적화하는 방법에 집중했다. 특히 메모이제이션과 렌더링 최적화를 통해 성능을 개선하는 것이 목표였다. 주요 문제는 크게 세 가지로 나뉘었다: 이번 주에는 컴포넌트 최적화를 위해 몇 가지 중요한 방법들을 시도해 보았다."
+description: "shallowEquals·deepEquals, useMemo, useCallback, memo를 직접 구현해 불필요한 렌더링을 줄이고 렌더링 시간을 6ms에서 2ms로 낮춘 과정이에요."
 publishedAt: "2024-12-11T13:23:34+09:00"
 category: "dev"
 tags: ["react"]

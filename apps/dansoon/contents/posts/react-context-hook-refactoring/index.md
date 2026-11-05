@@ -1,6 +1,6 @@
 ---
 title: "리액트 리팩토링: Context와 Hook을 활용한 상태 관리 개선"
-description: "이번 주에는 기존 리액트 코드의 상태 관리 방식을 Context와 Custom Hook을 활용해 리팩토링하는 과제가 있었다. 컴포넌트마다 각기 다른 상태와 로직을 관리하고 있었기 때문에 코드가 복잡해지고, 유지보수가 어려워지는 문제가 있었다."
+description: "컴포넌트마다 흩어진 상태와 중복 로직을 Context와 Custom Hook으로 분리한 리팩토링 과정과 그 뒤에 남은 배움을 정리했어요."
 publishedAt: "2024-12-11T13:25:06+09:00"
 updatedAt: "2025-08-03T09:35:29+09:00"
 category: "dev"

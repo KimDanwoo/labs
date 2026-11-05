@@ -1,6 +1,6 @@
 ---
 title: "import 경로 관리 알아보기 (alias와 barrel 패턴, FSD)"
-description: "최근 같이 교류하던 분들과 친한 개발자 분이 이렇게 물어봤다. \"이 @components 같은 거 왜 쓰는 거예요? 어떤 이유가 있죠?\" 솔직히 처음에는 그냥 \"깔끔해 보여서\" 쓰기 시작했다."
+description: "상대경로 import의 문제를 alias로 풀고 barrel 패턴으로 모듈을 캡슐화하는 방법을 정리해요. FSD 적용 사례와 주의점도 담았어요."
 publishedAt: "2024-12-15T14:47:25+09:00"
 updatedAt: "2025-08-03T09:37:41+09:00"
 category: "dev"

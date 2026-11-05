@@ -2,12 +2,16 @@
  * 티스토리(dansoon-dev.tistory.com) 글을 contents/posts/<slug>/index.md로 옮긴다.
  * 재실행하면 같은 입력에서 같은 결과를 덮어쓴다. 실행: pnpm --filter dansoon import:tistory
  */
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import sharp from 'sharp';
 import TurndownService from 'turndown';
 
 const BLOG_ORIGIN = 'https://dansoon-dev.tistory.com';
 const CONTENT_DIR = new URL('../contents/posts/', import.meta.url);
+// 사람이 다듬은 목록용 요약(slug → 요약). 없으면 본문 앞부분에서 만든다
+const CURATED_DESCRIPTIONS = JSON.parse(
+  await readFile(new URL('./tistory-descriptions.json', import.meta.url), 'utf8'),
+);
 const USER_AGENT = 'Mozilla/5.0 (dansoon tistory importer)';
 const BODY_START = '<div class="tt_article_useless_p_margin contents_style">';
 const BODY_END = '<!-- System - START -->';
@@ -328,7 +332,7 @@ async function importPost(id, meta) {
 
   const frontmatter = toFrontmatter({
     title: article.title,
-    description: describe(article.bodyHtml),
+    description: CURATED_DESCRIPTIONS[meta.slug] ?? describe(article.bodyHtml),
     publishedAt: article.publishedAt,
     updatedAt: isMeaningfullyUpdated(article.publishedAt, article.modifiedAt) ? article.modifiedAt : undefined,
     category: meta.category,

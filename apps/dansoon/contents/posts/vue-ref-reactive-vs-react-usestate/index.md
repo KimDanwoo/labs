@@ -1,6 +1,6 @@
 ---
 title: "Vue 3의 ref와 reactive, 그리고 React useState 톺아보기"
-description: "\"기본형은 ref, 객체는 reactive로 써야 합니다.\" Vue 3을 쓰다 보면 이런 말을 자주 듣습니다. 하지만 실무에서 보면 꼭 그렇지 않습니다. 대부분의 코드베이스에서는 ref만 쓰는 경우가 훨씬 많습니다."
+description: "Vue 3의 Proxy 반응성 안에서 ref와 reactive가 어떻게 다른지 파헤치고, React useState와의 차이, 데이터 형태에 따른 선택 기준을 정리해요."
 publishedAt: "2025-10-18T14:31:44+09:00"
 category: "dev"
 tags: ["vue","react"]

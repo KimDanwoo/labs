@@ -1,6 +1,6 @@
 ---
 title: "JavaScript의 흐름과 구조를 바라보며"
-description: "자바스크립트는 오랜 시간 동안 ‘기능적인 언어’로 오해받아 왔습니다. 필요하면 쓰고, 문제 생기면 회피하는 도구처럼 사용했습니다."
+description: "jQuery, ES6, 비동기, 프레임워크, TypeScript까지 JavaScript가 구조와 패턴을 문법으로 받아들이며 진화해 온 흐름을 살펴봐요."
 publishedAt: "2025-08-01T10:00:52+09:00"
 updatedAt: "2025-08-03T09:32:19+09:00"
 category: "dev"

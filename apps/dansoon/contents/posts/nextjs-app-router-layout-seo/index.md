@@ -1,6 +1,6 @@
 ---
 title: "Next.js App Router 레이아웃·라우팅과 SEO"
-description: "Next.js App Router를 사용하다 보면, 폴더 구조나 컴포넌트 분리보다 먼저 고민하게 되는 부분이 있습니다. 바로 레이아웃 설계와 라우팅 방식이 실제 서비스 운영에 어떤 영향을 주는지에 대한 문제입니다."
+description: "App Router의 레이아웃 트리와 라우팅이 SSR, 캐시, SEO를 좌우하는 이유를 운영 경험으로 정리하고, URL·메타데이터 설계 기준을 제안해요."
 publishedAt: "2025-11-30T15:45:55+09:00"
 category: "dev"
 tags: ["nextjs","seo"]

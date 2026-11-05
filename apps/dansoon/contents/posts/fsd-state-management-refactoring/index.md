@@ -1,6 +1,6 @@
 ---
 title: "FSD 패턴과 상태 관리 리팩토링"
-description: "이번 주 과제는 기존의 상태 관리와 컴포넌트 구조를 FSD(Folder Structure Design) 패턴으로 리팩토링하고, react-query와 zustand를 활용해 상태 관리 방식을 개선하는 것이었다."
+description: "상태와 API, UI가 얽힌 코드를 FSD 구조로 나누고 react-query와 zustand로 상태 관리를 개선한 리팩토링 과정을 돌아봐요."
 publishedAt: "2024-12-11T13:25:30+09:00"
 updatedAt: "2025-08-03T09:35:55+09:00"
 category: "dev"

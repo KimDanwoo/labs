@@ -1,6 +1,6 @@
 ---
 title: "클라우드 기반 배포 자동화 여정: AWS S3부터 GitHub Actions까지"
-description: "AWS를 활용한 CI/CD 파이프라인 구축 프로젝트를 진행했다. 다양한 클라우드 서비스 중에서 AWS를 선택한 이유는 실제 업무 환경에서 가장 널리 사용되고 있으며, S3와 CloudFront의 조합이 비용 효율적이면서도 확장성이 뛰어나기 때문이다."
+description: "S3와 CloudFront, IAM, GitHub Actions로 빌드·배포 자동화를 구축한 과정과 캐시 무효화, 슬랙 알림까지 넓혀간 경험을 정리했어요."
 publishedAt: "2024-12-11T13:27:04+09:00"
 updatedAt: "2025-08-04T13:36:07+09:00"
 category: "dev"

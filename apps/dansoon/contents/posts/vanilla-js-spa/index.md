@@ -1,6 +1,6 @@
 ---
 title: "Vanilla JavaScript로 SPA 만들기"
-description: "이번 과제에서는 Vanilla JavaScript로 SPA(Single Page Application)를 구현했다. 주요 요구사항은 History API로 라우터를 구현하는 것, LocalStorage를 사용한 사용자 관리 기능, 컴포넌트 기반 구조…"
+description: "History API 라우터, 경로 보호, 싱글톤 스토어를 Vanilla JavaScript로 직접 구현하며 프레임워크가 대신하는 일을 체감한 과정이에요."
 publishedAt: "2024-12-11T13:20:03+09:00"
 updatedAt: "2025-08-03T09:34:32+09:00"
 category: "dev"

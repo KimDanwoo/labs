@@ -1,6 +1,6 @@
 ---
 title: "AI에게 코드를 맡기기 위한 위임의 조건"
-description: "최근 Thoughtworks의 「Should we still design code for humans?」 라는 글을 읽었다. AI가 코드를 작성하고, 다시 AI가 그 코드를 읽고 수정하는 일이 자연스러워진 지금, 여전히 사람이 읽기 좋은 코드를 만드는…"
+description: "AI가 만든 코드가 각각은 맞는데 전체가 틀어지는 문제를 겪고, 규칙과 검증, 피드백 루프로 판단을 위임하는 조건을 정리했어요."
 publishedAt: "2026-08-07T15:59:14+09:00"
 category: "dev"
 tags: ["ai"]
