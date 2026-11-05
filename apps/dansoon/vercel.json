@@ -10,6 +10,7 @@
   "buildCommand": "pnpm exec turbo run build --filter=dansoon",
   "outputDirectory": "dist",
   "ignoreCommand": "npx turbo-ignore dansoon",
+  "redirects": [{ "source": "/tech/:path*", "destination": "/", "permanent": true }],
   "headers": [
     {
       "source": "/(.*)",
