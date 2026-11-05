@@ -443,3 +443,31 @@ html {
     overscroll-behavior: contain;
   }
 }
+
+/* 주간 리포트 생성기(scripts/fetch_*.py)가 본문에 넣는 탭·표는 예전 블로그의 변수 이름을 쓴다 — 새 토큰에 연결한다 */
+.prose.article {
+  --green: var(--color-primary);
+  --border: var(--color-border);
+  --bg-subtle: var(--color-muted);
+  --text-secondary: var(--color-muted-foreground);
+  --text-muted: var(--color-muted-foreground);
+}
+
+/* 코드 블록 오른쪽 위에 언어를 표시한다(파일 이름 프레임이 없는 블록만). text는 표시하지 않는다 */
+.article .expressive-code .frame:not(.has-title) pre[data-language]:not([data-language='text']) {
+  position: relative;
+}
+
+.article .expressive-code .frame:not(.has-title) pre[data-language]:not([data-language='text'])::before {
+  content: attr(data-language);
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  pointer-events: none;
+}

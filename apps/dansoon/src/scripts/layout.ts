@@ -60,17 +60,35 @@ function syncSidebarCurrent() {
 }
 
 // ── 본문 영역 ────────────────────────────────────────────────
-// 데스크톱에서는 본문 영역이 스크롤 주체라 브라우저가 뒤로가기 위치를 기억해 주지 않는다 — 경로별로 직접 기억한다
+// 데스크톱에서는 본문 영역이 스크롤 주체라 브라우저가 뒤로가기 위치를 기억해 주지 않는다.
+// 같은 글을 여러 번 방문해도 섞이지 않도록 방문 기록 항목(ClientRouter가 붙이는 history.state.index)별로 기억한다.
 const contentScrollTops = new Map<string, number>();
 let contentScroller: HTMLElement | null = null;
 let lastNavigationType: TransitionBeforePreparationEvent['navigationType'] | undefined;
-// 뒤로가기(popstate)는 이벤트 시점에 이미 주소가 바뀌어 있으므로, 지금 보고 있는 경로를 따로 들고 있는다
-let currentPath = window.location.pathname;
 
-function attachContentScroller() {
+const historyEntryKey = () => {
+  const index: unknown = window.history.state?.index;
+  return typeof index === 'number' ? `entry:${index}` : `path:${window.location.pathname}`;
+};
+// 뒤로가기(popstate)는 이벤트 시점에 이미 기록이 바뀌어 있으므로, 지금 보고 있는 항목을 따로 들고 있는다
+let currentEntryKey = historyEntryKey();
+
+/** 데스크톱이면 본문 영역에 떠 있는 스크롤바를 붙이고, 모바일이면 떼어 문서 스크롤로 돌려놓는다. */
+function syncContentScroller() {
   const host = document.querySelector<HTMLElement>('[data-content-scroll]');
-  contentScroller = host && desktop.matches ? attachScrollbar(host) : null;
+  if (!host) {
+    contentScroller = null;
+    return;
+  }
+  if (desktop.matches) {
+    contentScroller = attachScrollbar(host);
+    return;
+  }
+  OverlayScrollbars(host)?.destroy();
+  contentScroller = null;
 }
+
+desktop.addEventListener('change', syncContentScroller);
 
 // ── 모바일 서랍 ──────────────────────────────────────────────
 const mobileNav = () => document.querySelector<HTMLDialogElement>('#mobile-nav');
@@ -112,7 +130,7 @@ window.addEventListener(
 // ── 페이지 이동 ──────────────────────────────────────────────
 document.addEventListener('astro:before-preparation', (event) => {
   lastNavigationType = event.navigationType;
-  if (contentScroller) contentScrollTops.set(currentPath, contentScroller.scrollTop);
+  if (contentScroller) contentScrollTops.set(currentEntryKey, contentScroller.scrollTop);
 });
 document.addEventListener('astro:before-swap', () => {
   sidebarScrollTop = sidebarScroller?.scrollTop ?? 0;
@@ -123,10 +141,10 @@ document.addEventListener('astro:page-load', () => {
   // 스크롤바 라이브러리가 크기를 다시 잴 때 위치가 흔들릴 수 있어 한 번 더 맞춘다
   restoreSidebarScroll();
   syncSidebarCurrent();
-  currentPath = window.location.pathname;
-  attachContentScroller();
+  currentEntryKey = historyEntryKey();
+  syncContentScroller();
   if (contentScroller && lastNavigationType === 'traverse') {
-    contentScroller.scrollTop = contentScrollTops.get(window.location.pathname) ?? 0;
+    contentScroller.scrollTop = contentScrollTops.get(currentEntryKey) ?? 0;
   }
   // 서랍 복제본은 지금 위치 표시가 낡으므로 다음에 열 때 새로 만든다
   const nav = mobileNav();

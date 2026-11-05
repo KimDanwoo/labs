@@ -57,17 +57,27 @@ import Icon from '~/components/Icon.astro';
   const list = document.querySelector<HTMLUListElement>('#search-results');
   const status = document.querySelector<HTMLParagraphElement>('#search-status');
 
-  let documents: SearchDocument[] | null = null;
+  let documents: Promise<SearchDocument[]> | null = null;
   let latestQuery = '';
 
   const normalize = (text: string) => text.normalize('NFC').toLowerCase();
   const termsOf = (query: string) => normalize(query).split(/\s+/).filter(Boolean);
 
-  /** 빌드 때 같은 사이트가 만든 인덱스(/search.json)를 처음 검색할 때 한 번만 받는다. */
-  async function loadDocuments(): Promise<SearchDocument[]> {
-    const loaded = documents ?? ((await fetch('/search.json').then((response) => response.json())) as SearchDocument[]);
-    documents = loaded;
-    return loaded;
+  /**
+   * 빌드 때 같은 사이트가 만든 인덱스(/search.json)를 받는다. 진행 중인 요청은 함께 쓰고,
+   * 실패하면 다음 검색에서 다시 시도하도록 캐시를 비운다.
+   */
+  function loadDocuments(): Promise<SearchDocument[]> {
+    documents ??= fetch('/search.json')
+      .then((response) => {
+        if (!response.ok) throw new Error(`검색 인덱스 응답 ${response.status}`);
+        return response.json() as Promise<SearchDocument[]>;
+      })
+      .catch((error: unknown) => {
+        documents = null;
+        throw error;
+      });
+    return documents;
   }
 
   function score(document: SearchDocument, terms: string[]) {
@@ -154,7 +164,15 @@ import Icon from '~/components/Icon.astro';
       status.textContent = '';
       return;
     }
-    const loaded = await loadDocuments();
+    let loaded: SearchDocument[];
+    try {
+      loaded = await loadDocuments();
+    } catch {
+      if (query !== latestQuery) return;
+      list.replaceChildren();
+      status.textContent = '검색 목록을 불러오지 못했어요. 잠시 후 다시 입력해 주세요.';
+      return;
+    }
     // 첫 검색은 인덱스를 받는 동안 기다리므로, 그사이 입력이 바뀌었으면 이 결과는 버린다
     if (query !== latestQuery) return;
     list.replaceChildren();
@@ -171,7 +189,8 @@ import Icon from '~/components/Icon.astro';
     if (!dialog || dialog.open) return;
     dialog.showModal();
     input?.select();
-    void loadDocuments();
+    // 미리 받아 두기만 한다 — 실패는 실제 검색할 때 안내한다
+    loadDocuments().catch(() => {});
   }
 
   const isTyping = (target: EventTarget | null) =>

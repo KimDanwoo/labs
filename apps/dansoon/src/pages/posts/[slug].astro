@@ -43,6 +43,7 @@ const structuredData = {
   author: { '@type': 'Person', name: '김단우', url: 'https://lab.danwoo.dev' },
   mainEntityOfPage: new URL(postPath(post), Astro.site).href,
   inLanguage: 'ko',
+  ...(ogImage ? { image: new URL(ogImage, Astro.site).href } : {}),
 };
 // 제목 등에 '</script>'가 들어가도 태그를 빠져나가지 못하게 '<'를 이스케이프한다
 const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c');

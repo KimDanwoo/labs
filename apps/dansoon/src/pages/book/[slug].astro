@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import Toc from '~/components/Toc.astro';
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import { getBookReports, REPORT_KIND_LABEL, type BookReport } from '~/lib/books';
+import { bookReportPath, getBookReports, REPORT_KIND_LABEL, type BookReport } from '~/lib/books';
 import { formatLongDate } from '~/lib/format';
 
 export const getStaticPaths = (async () => {
@@ -18,9 +18,23 @@ type Props = {
 const { report } = Astro.props;
 const { title, description, date, category } = report.data;
 const { Content, headings } = await render(report);
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: date.toISOString(),
+  author: { '@type': 'Person', name: '김단우', url: 'https://lab.danwoo.dev' },
+  mainEntityOfPage: new URL(bookReportPath(report), Astro.site).href,
+  inLanguage: 'ko',
+};
+// 제목 등에 '</script>'가 들어가도 태그를 빠져나가지 못하게 '<'를 이스케이프한다
+const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c');
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} article={{ publishedAt: date }}>
+  <script is:inline slot="head" type="application/ld+json" set:html={structuredDataJson} />
   <div class="mx-auto max-w-6xl px-md sm:px-xl xl:grid xl:grid-cols-[minmax(0,1fr)_var(--container-3xs)] xl:gap-3xl">
     <!-- 순위 표가 넓어 글보다 넓은 칼럼을 쓴다 -->
     <article class="mx-auto w-full max-w-(--container-4xl) min-w-0 pt-2xl pb-xl sm:pt-3xl">

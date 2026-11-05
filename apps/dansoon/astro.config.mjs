@@ -13,7 +13,8 @@ export default defineConfig({
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   integrations: [
     expressiveCode({
-      themes: ['github-light', 'github-dark'],
+      // 라이트는 깔끔한 GitHub, 다크는 대비가 뚜렷한 One Dark Pro
+      themes: ['github-light', 'one-dark-pro'],
       // 사이트 테마는 <html class="dark"> 하나로 결정한다(OS 설정은 첫 방문 기본값으로만 쓴다)
       themeCssSelector: (theme) => (theme.type === 'dark' ? '.dark' : ':root:not(.dark)'),
       useDarkModeMediaQuery: false,
