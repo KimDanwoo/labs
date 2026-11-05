@@ -14,6 +14,8 @@ export function MagicWings({ anchor }: MagicWingsProps) {
   const rootRef = useRef<Group>(null);
   const leftRef = useRef<Group>(null);
   const rightRef = useRef<Group>(null);
+  const leftTrimRef = useRef<Group>(null);
+  const rightTrimRef = useRef<Group>(null);
   const openRef = useRef(0);
   const phaseRef = useRef(0);
   const point = useMemo(() => new Vector3(), []);
@@ -44,6 +46,9 @@ export function MagicWings({ anchor }: MagicWingsProps) {
       flare * 0.22;
     const angle = MathUtils.lerp(WINGS.foldedAngle, flap, open);
     const size = MathUtils.lerp(WINGS.foldedScale, 1, open);
+    const isTrimVisible = open > WINGS.trimVisibleOpen;
+    if (leftTrimRef.current) leftTrimRef.current.visible = isTrimVisible;
+    if (rightTrimRef.current) rightTrimRef.current.visible = isTrimVisible;
     if (leftRef.current) {
       leftRef.current.rotation.z = -angle;
       leftRef.current.rotation.x = (-Math.PI / 2) * (1 - open);
@@ -62,10 +67,10 @@ export function MagicWings({ anchor }: MagicWingsProps) {
   return (
     <group ref={rootRef} visible={false}>
       <group ref={leftRef} position={[-rootX, rootY, rootZ]} rotation={[0, 0, 0, 'YXZ']}>
-        <FeatherWing geometry={geometry} mirror />
+        <FeatherWing geometry={geometry} trimRef={leftTrimRef} mirror />
       </group>
       <group ref={rightRef} position={[rootX, rootY, rootZ]} rotation={[0, 0, 0, 'YXZ']}>
-        <FeatherWing geometry={geometry} />
+        <FeatherWing geometry={geometry} trimRef={rightTrimRef} />
       </group>
     </group>
   );
