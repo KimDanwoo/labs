@@ -40,13 +40,17 @@ src/
   hooks/useFilter.ts
   content.config.ts        # tech, book 컬렉션 스키마 정의
 contents/
-  tech/                    # 날짜별 Tech 뉴스 Markdown
   book/                    # 날짜별 Book 리포트 Markdown
 ```
 
-## 콘텐츠 자동화 (중단)
+## 콘텐츠 자동화
 
-Tech 뉴스·베스트셀러·웹소설 자동 수집은 중단했다. 기존 글은 티스토리 글 이전과 함께 정리한다.
+Tech 뉴스 자동 수집은 중단했다. 주간 도서 리포트는 계속 돌린다.
+
+- `scripts/fetch_bestseller.py` — 매주 월요일 교보·YES24·알라딘·리디 베스트셀러 종합 리포트 (`dansoon-weekly-bestseller`)
+- `scripts/fetch_webnovel.py` — 매주 웹소설 순위 리포트 (`dansoon-weekly-webnovel`)
+
+Python 환경에서 실행되며 Gemini API 키와 `google-genai` 패키지가 필요하다.
 
 ## 시작하기
 
