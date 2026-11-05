@@ -12,6 +12,26 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 
+// HDR 버퍼의 NaN·Inf 픽셀 하나를 bloom 블러가 넓게 번지게 해 화면이 검게 깜빡인다
+const FINITE_COLOR_SHADER = {
+  name: 'FiniteColorShader',
+  uniforms: { tDiffuse: { value: null } },
+  vertexShader: /* glsl */ `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }`,
+  fragmentShader: /* glsl */ `
+    uniform sampler2D tDiffuse;
+    varying vec2 vUv;
+    void main() {
+      vec4 color = texture2D(tDiffuse, vUv);
+      bool isBroken = any(isnan(color)) || any(isinf(color));
+      gl_FragColor = isBroken ? vec4(0.0, 0.0, 0.0, 1.0) : color;
+    }`,
+};
+
 export function SceneEffects({ enabled, pixels }: { enabled: boolean; pixels: number }) {
   const { gl, scene, camera, size, viewport } = useThree();
   const composer = useRef<EffectComposer | null>(null);
@@ -29,10 +49,13 @@ export function SceneEffects({ enabled, pixels }: { enabled: boolean; pixels: nu
     );
     const output = new OutputPass();
     const smooth = new ShaderPass(FXAAShader);
+    const finite = new ShaderPass(FINITE_COLOR_SHADER);
     pipeline.addPass(render);
+    pipeline.addPass(finite);
     pipeline.addPass(bloom);
-    pipeline.addPass(smooth);
+    // FXAA는 톤 매핑·sRGB 변환을 마친 최종 색에서 경계를 찾아야 한다
     pipeline.addPass(output);
+    pipeline.addPass(smooth);
     const canvasSize = gl.getSize(new Vector2());
     const dpr = boundedDpr(canvasSize.x, canvasSize.y, gl.getPixelRatio(), pixels);
     pipeline.setPixelRatio(dpr);
@@ -47,6 +70,7 @@ export function SceneEffects({ enabled, pixels }: { enabled: boolean; pixels: nu
       bloom.dispose();
       output.dispose();
       smooth.dispose();
+      finite.dispose();
       pipeline.dispose();
     };
   }, [gl, scene, camera, enabled, pixels]);

@@ -90,6 +90,54 @@ for (const face of faces)
   });
 vertices = used;
 
+// 판 꼬리를 떼어낸 자리에 열린 경계 고리가 남아 엉덩이가 뚫려 보인다. 중심점 부채꼴로 막는다.
+function openBoundaryLoops() {
+  const halfEdges = new Set();
+  for (const { ids: [a, b, c] } of faces) for (const [u, v] of [[a, b], [b, c], [c, a]]) halfEdges.add(`${u}:${v}`);
+  const previous = new Map();
+  for (const key of halfEdges) {
+    const [u, v] = key.split(':').map(Number);
+    if (!halfEdges.has(`${v}:${u}`)) previous.set(v, u);
+  }
+  const visited = new Set();
+  const loops = [];
+  for (const start of previous.keys()) {
+    const loop = [];
+    for (let at = start; at !== undefined && !visited.has(at); at = previous.get(at)) {
+      visited.add(at);
+      loop.push(at);
+    }
+    if (loop.length > 2) loops.push(loop);
+  }
+  return loops;
+}
+
+// 런타임은 Hair 재질 메시를 통째로 숨긴다(Runner.tsx). 구멍 둘레에 남은 Hair 면은 몸통으로 돌려야 보인다.
+const BODY_MATERIAL = 0;
+const HAIR_MATERIAL = 1;
+
+function reclaimHairAround(loop) {
+  const pending = new Set(loop);
+  const reached = new Set();
+  while (pending.size) {
+    const [vertex] = pending;
+    pending.delete(vertex);
+    reached.add(vertex);
+    for (const face of faces) {
+      if (face.material !== HAIR_MATERIAL || !face.ids.includes(vertex)) continue;
+      face.material = BODY_MATERIAL;
+      face.ids.filter((id) => !reached.has(id)).forEach((id) => pending.add(id));
+    }
+  }
+}
+
+for (const loop of openBoundaryLoops()) {
+  reclaimHairAround(loop);
+  const center = vertices.length;
+  vertices.push(interpolate(vertices, loop.map((i) => [i, 1 / loop.length])));
+  loop.forEach((at, k) => faces.push({ ids: [center, at, loop[(k + 1) % loop.length]], material: BODY_MATERIAL }));
+}
+
 for (let iteration = 0; iteration < 2; iteration += 1) {
   const edges = new Map();
   const neighbors = vertices.map(() => new Set());
