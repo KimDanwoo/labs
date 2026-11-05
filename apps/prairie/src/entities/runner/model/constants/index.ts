@@ -63,6 +63,20 @@ export const WINGS = {
   flapSpeedAir: 3.2,
   flapSpeedRising: 5.5,
   color: '#eee9df',
+  // 접히는 중에는 어깨 장식이 깃털과 함께 등 뒤로 밀려 몸통 밖에 떠 보인다
+  trimVisibleOpen: 0.2,
+} as const;
+
+// 깃털 표면 bump. 주기/픽셀이 페이드 구간을 넘으면 결을 지워 모아레를 막는다.
+export const FEATHER_SURFACE = {
+  shaftSharpness: 35,
+  shaftHeight: 0.003,
+  barbAlong: 280,
+  barbAcross: 100,
+  barbHeight: 0.00035,
+  barbFadeCycles: [0.2, 0.45],
+  shaftFadeWidth: [0.5, 1.5],
+  distanceFade: [8, 24],
 } as const;
 
 // 달리기 모션 튜닝값.
