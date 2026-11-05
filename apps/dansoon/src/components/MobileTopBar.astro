@@ -1,0 +1,21 @@
+---
+import Icon from '~/components/Icon.astro';
+import ThemeToggle from '~/components/ThemeToggle.astro';
+
+const iconButtonClass =
+  'inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground';
+---
+
+<header
+  style="view-transition-name: topbar"
+  class="sticky top-0 z-30 flex h-12 items-center gap-xs border-b border-border bg-background/90 px-sm backdrop-blur-md lg:hidden"
+>
+  <button type="button" data-nav-open class={iconButtonClass} aria-label="메뉴 열기" aria-controls="mobile-nav">
+    <Icon name="menu" />
+  </button>
+  <a href="/" class="mr-auto font-bold">Dansoon</a>
+  <button type="button" data-search-open class={iconButtonClass} aria-label="글 검색">
+    <Icon name="search" />
+  </button>
+  <ThemeToggle />
+</header>

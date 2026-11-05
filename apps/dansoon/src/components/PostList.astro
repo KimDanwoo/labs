@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import CategoryBadge from '~/components/CategoryBadge.astro';
+import { formatShortDate, readingMinutes } from '~/lib/format';
+import { postPath, type Post } from '~/lib/posts';
+
+type Props = {
+  posts: Post[];
+};
+
+// 2배 해상도 화면을 고려해 표시 크기(최대 7rem)의 두 배로 만든다
+const THUMBNAIL_SIZE = 224;
+
+const { posts } = Astro.props;
+---
+
+{
+  posts.length === 0 ? (
+    <p class="py-2xl text-center text-muted-foreground">아직 글이 없어요.</p>
+  ) : (
+    <ul class="divide-y divide-border border-t border-border">
+      {posts.map((post) => (
+        <li>
+          <a href={postPath(post)} class="group flex items-start gap-lg py-lg">
+            <div class="min-w-0 flex-1">
+              <p class="flex items-center gap-sm text-sm text-muted-foreground">
+                <CategoryBadge category={post.data.category} />
+                <time datetime={post.data.publishedAt.toISOString()} class="tabular-nums">
+                  {formatShortDate(post.data.publishedAt)}
+                </time>
+                <span aria-hidden="true">·</span>
+                <span>{readingMinutes(post.body)}분</span>
+              </p>
+              <h2 class="mt-sm text-xl leading-snug font-bold tracking-tight transition-colors group-hover:text-primary">
+                {post.data.title}
+              </h2>
+              <p class="mt-sm line-clamp-2 leading-relaxed text-muted-foreground">{post.data.description}</p>
+            </div>
+            {post.data.thumbnail && (
+              <div class="mt-xs size-20 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border sm:size-28">
+                <Image
+                  src={post.data.thumbnail}
+                  alt=""
+                  width={THUMBNAIL_SIZE}
+                  height={THUMBNAIL_SIZE}
+                  class="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                />
+              </div>
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

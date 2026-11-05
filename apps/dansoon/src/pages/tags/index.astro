@@ -1,0 +1,16 @@
+---
+import ListPage from '~/components/ListPage.astro';
+import TagChips from '~/components/TagChips.astro';
+import { countBy, getPublishedPosts } from '~/lib/posts';
+import { TAG_LABEL } from '~/lib/taxonomy';
+
+const posts = await getPublishedPosts();
+const counts = countBy(posts, (post) => post.data.tags);
+const tags = [...counts.keys()].sort(
+  (a, b) => (counts.get(b) ?? 0) - (counts.get(a) ?? 0) || TAG_LABEL[a].localeCompare(TAG_LABEL[b], 'ko'),
+);
+---
+
+<ListPage heading="태그" lead="주제별로 글을 모아 볼 수 있어요.">
+  <TagChips tags={tags} counts={counts} />
+</ListPage>

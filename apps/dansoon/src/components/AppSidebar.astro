@@ -1,0 +1,120 @@
+---
+import Icon from '~/components/Icon.astro';
+import ThemeToggle from '~/components/ThemeToggle.astro';
+import { filterByCategory, postPath, type Post } from '~/lib/posts';
+import { CATEGORY_IDS, CATEGORY_LABEL } from '~/lib/taxonomy';
+
+type Props = {
+  posts: Post[];
+};
+
+/** 사이드바: 바로가기 + 카테고리별 전체 글. 지금 글이 든 카테고리만 펼쳐 둔다. */
+const { posts } = Astro.props;
+const { pathname } = Astro.url;
+const currentPost = posts.find((post) => postPath(post) === pathname);
+
+/** activePrefixes: 이 경로로 시작해도 현재 위치로 본다. 클라이언트 갱신(BaseLayout)도 같은 규칙을 쓴다. */
+const SHORTCUTS = [
+  { href: '/', label: '전체 글', activePrefixes: ['/categories'] },
+  { href: '/tags/', label: '태그', activePrefixes: ['/tags'] },
+  { href: '/book/', label: '주간 책 순위', activePrefixes: ['/book'] },
+];
+const isShortcutActive = ({ href, activePrefixes }: (typeof SHORTCUTS)[number]) =>
+  pathname === href || activePrefixes.some((prefix) => pathname.startsWith(prefix));
+const groups = CATEGORY_IDS.map((category) => ({
+  category,
+  label: CATEGORY_LABEL[category],
+  posts: filterByCategory(posts, category),
+}));
+---
+
+<div data-sidebar-content class="flex min-h-full flex-col px-md pt-lg pb-md">
+  <a href="/" class="block px-sm">
+    <span class="block text-lg font-bold tracking-tight">Dansoon</span>
+  </a>
+
+  <button
+    type="button"
+    data-search-open
+    class="mt-lg flex h-9 items-center gap-sm rounded-md bg-background px-sm text-sm text-muted-foreground ring-1 ring-border transition-colors hover:text-foreground"
+    aria-label="글 검색"
+    aria-keyshortcuts="Meta+K Control+K"
+  >
+    <Icon name="search" class="size-3.5" />
+    <span>검색</span>
+    <kbd class="ml-auto text-xs opacity-70">⌘K</kbd>
+  </button>
+
+  <nav aria-label="바로가기" class="mt-lg">
+    <ul class="space-y-0.5">
+      {
+        SHORTCUTS.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              data-nav-link
+              data-active-prefixes={item.activePrefixes.join(' ')}
+              aria-current={isShortcutActive(item) ? 'page' : undefined}
+              class="block rounded-md px-sm py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-primary-subtle aria-[current=page]:font-bold aria-[current=page]:text-primary"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <nav aria-label="카테고리별 글" class="mt-xl">
+    {
+      groups.map((group) => (
+        <details open={group.category === currentPost?.data.category} class="motion-details group mb-sm">
+          <summary class="flex cursor-pointer list-none items-center gap-xs rounded-md px-sm py-1.5 text-sm font-bold transition-colors hover:bg-muted [&::-webkit-details-marker]:hidden">
+            <Icon
+              name="chevron-right"
+              class="size-3.5 shrink-0 text-muted-foreground transition-transform group-open:rotate-90"
+            />
+            <span data-category={group.category} class="category-dot" aria-hidden="true" />
+            {group.label}
+            <span class="ml-auto text-xs font-normal text-muted-foreground tabular-nums">{group.posts.length}</span>
+          </summary>
+          <ul class="mt-xs mb-md ml-sm border-l border-border">
+            {group.posts.map((post) => (
+              <li>
+                <a
+                  href={postPath(post)}
+                  data-nav-link
+                  aria-current={post.id === currentPost?.id ? 'page' : undefined}
+                  class="-ml-px block border-l-2 border-transparent py-1.5 pr-sm pl-md text-sm leading-snug text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:border-primary aria-[current=page]:font-bold aria-[current=page]:text-primary"
+                >
+                  <span class="line-clamp-2">{post.data.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ))
+    }
+  </nav>
+
+  <div class="mt-auto flex items-center gap-xs pt-lg text-sm text-muted-foreground">
+    <a
+      href="https://github.com/KimDanwoo"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex size-9 items-center justify-center rounded-md hover:bg-muted hover:text-foreground"
+      aria-label="GitHub"
+    >
+      <Icon name="github" />
+    </a>
+    <a
+      href="https://lab.danwoo.dev"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex h-9 items-center gap-xs rounded-md px-sm hover:bg-muted hover:text-foreground"
+    >
+      Labs <Icon name="arrow-up-right" class="size-3" />
+    </a>
+    <span class="ml-auto"><ThemeToggle /></span>
+  </div>
+</div>

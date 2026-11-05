@@ -1,36 +1,36 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseLayout from '~/layouts/BaseLayout.astro';
-import PostList from '~/components/Main/PostList';
+import Icon from '~/components/Icon.astro';
+import ListPage from '~/components/ListPage.astro';
+import { bookReportPath, formatWeek, getBookReports, groupByWeek, REPORT_KIND_LABEL } from '~/lib/books';
+import { formatShortDate } from '~/lib/format';
 
-const allPosts = await getCollection('book');
-const bookPosts = allPosts
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .map((post) => {
-    const slug = post.id.replace(/\/index\.md$/, '').replace(/\.md$/, '');
-    return {
-      title: post.data.title,
-      description: post.data.description,
-      category: post.data.category ?? '',
-      isHidden: false,
-      thumbnail: post.data.thumbnail ? { src: post.data.thumbnail.src } : null,
-      url: `/book/${slug}/`,
-      publishedAt: post.data.date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
-    };
-  });
+const weeks = groupByWeek(await getBookReports());
 ---
 
-<BaseLayout title="베스트셀러 | blog.danwoo" description="알라딘, 리디 베스트셀러 주간 리포트" contentWidth="narrow">
-  <div class="page-hero animate-fade-in-up">
-    <p class="page-hero-tag">Weekly Report</p>
-    <h1 class="page-hero-title">베스트셀러</h1>
-    <p class="page-hero-subtitle">알라딘·리디 주간 베스트셀러를 한눈에 — 지금 읽어야 할 책.</p>
-    <div class="page-hero-divider"></div>
-  </div>
-
-  <PostList posts={bookPosts} />
-</BaseLayout>
+<ListPage heading="주간 책 순위" lead="매주 월요일, 서점 베스트셀러와 웹소설 순위를 한눈에 볼 수 있어요.">
+  <ul class="divide-y divide-border border-t border-border">
+    {
+      weeks.map(({ week, date, reports }) => (
+        <li class="flex flex-wrap items-center justify-between gap-md py-md">
+          <div>
+            <p class="font-bold">{week ? `${week.year}년 ${formatWeek(week)}` : formatShortDate(date)}</p>
+            <time datetime={date.toISOString()} class="text-sm text-muted-foreground tabular-nums">
+              {formatShortDate(date)} 발행
+            </time>
+          </div>
+          <div class="flex gap-xs">
+            {reports.map((report) => (
+              <a
+                href={bookReportPath(report)}
+                class="inline-flex h-9 items-center gap-xs rounded-full px-md text-sm text-muted-foreground ring-1 ring-border transition-colors hover:bg-primary-subtle hover:text-primary hover:ring-primary/30"
+              >
+                {REPORT_KIND_LABEL[report.data.category]}
+                <Icon name="arrow-right" class="size-3.5" />
+              </a>
+            ))}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</ListPage>

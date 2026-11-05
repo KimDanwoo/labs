@@ -1,0 +1,228 @@
+---
+import Icon from '~/components/Icon.astro';
+---
+
+<dialog
+  id="search-dialog"
+  transition:persist
+  aria-label="글 검색"
+  class="motion-dialog motion-pop m-0 mx-auto mt-0 w-full max-w-none bg-transparent p-0 text-foreground sm:mt-[12vh] sm:max-w-(--container-2xl) sm:px-md"
+>
+  <div
+    class="flex max-h-[80dvh] flex-col overflow-hidden border-b border-border bg-popover shadow-lg sm:rounded-xl sm:border"
+  >
+    <div class="flex items-center gap-sm border-b border-border px-md">
+      <Icon name="search" class="size-4 shrink-0 text-muted-foreground" />
+      <input
+        id="search-input"
+        type="search"
+        placeholder="제목, 태그, 본문으로 검색"
+        autocomplete="off"
+        spellcheck="false"
+        class="h-14 w-full bg-transparent text-base outline-none placeholder:text-muted-foreground focus-visible:outline-none"
+        aria-describedby="search-status search-hint"
+      />
+      <button
+        type="button"
+        data-search-close
+        class="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
+        aria-label="검색 닫기"
+      >
+        <Icon name="x" />
+      </button>
+    </div>
+    <p id="search-status" class="px-md pt-sm text-xs text-muted-foreground" aria-live="polite"></p>
+    <p id="search-hint" class="sr-only">아래 화살표로 결과로 이동하고, Enter로 첫 결과를 엽니다.</p>
+    <ul id="search-results" class="overflow-y-auto p-sm" aria-label="검색 결과"></ul>
+  </div>
+</dialog>
+
+<script>
+  type SearchDocument = {
+    url: string;
+    title: string;
+    description: string;
+    category: string;
+    tags: string[];
+    date: string;
+    text: string;
+  };
+
+  const RESULT_LIMIT = 20;
+  const SNIPPET_RADIUS = 48;
+  const SCORE = { title: 6, tag: 4, description: 2, text: 1 } as const;
+
+  const dialog = document.querySelector<HTMLDialogElement>('#search-dialog');
+  const input = document.querySelector<HTMLInputElement>('#search-input');
+  const list = document.querySelector<HTMLUListElement>('#search-results');
+  const status = document.querySelector<HTMLParagraphElement>('#search-status');
+
+  let documents: Promise<SearchDocument[]> | null = null;
+  let latestQuery = '';
+
+  const normalize = (text: string) => text.normalize('NFC').toLowerCase();
+  const termsOf = (query: string) => normalize(query).split(/\s+/).filter(Boolean);
+
+  /**
+   * 빌드 때 같은 사이트가 만든 인덱스(/search.json)를 받는다. 진행 중인 요청은 함께 쓰고,
+   * 실패하면 다음 검색에서 다시 시도하도록 캐시를 비운다.
+   */
+  function loadDocuments(): Promise<SearchDocument[]> {
+    documents ??= fetch('/search.json')
+      .then((response) => {
+        if (!response.ok) throw new Error(`검색 인덱스 응답 ${response.status}`);
+        return response.json() as Promise<SearchDocument[]>;
+      })
+      .catch((error: unknown) => {
+        documents = null;
+        throw error;
+      });
+    return documents;
+  }
+
+  function score(document: SearchDocument, terms: string[]) {
+    const fields = {
+      title: normalize(document.title),
+      tag: normalize(document.tags.join(' ')),
+      description: normalize(document.description),
+      text: normalize(document.text),
+    };
+    let total = 0;
+    for (const term of terms) {
+      const hits = (Object.keys(fields) as (keyof typeof fields)[]).filter((field) => fields[field].includes(term));
+      if (hits.length === 0) return 0;
+      total += hits.reduce((sum, field) => sum + SCORE[field], 0);
+    }
+    return total;
+  }
+
+  function snippetOf(document: SearchDocument, terms: string[]) {
+    const text = document.text;
+    const index = Math.min(...terms.map((term) => normalize(text).indexOf(term)).filter((at) => at >= 0));
+    if (!Number.isFinite(index)) return document.description;
+    const start = Math.max(0, index - SNIPPET_RADIUS);
+    const prefix = start > 0 ? '…' : '';
+    return prefix + text.slice(start, index + SNIPPET_RADIUS * 2);
+  }
+
+  /** 사용자 입력이 섞인 문자열이므로 innerHTML 없이 텍스트 노드와 <mark>로만 그린다. */
+  function appendHighlighted(target: HTMLElement, text: string, terms: string[]) {
+    const pattern = new RegExp(`(${terms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi');
+    for (const part of text.split(pattern)) {
+      if (!part) continue;
+      if (terms.includes(normalize(part))) {
+        const mark = document.createElement('mark');
+        mark.className = 'rounded-sm bg-primary-subtle text-primary';
+        mark.textContent = part;
+        target.append(mark);
+      } else {
+        target.append(part);
+      }
+    }
+  }
+
+  function renderResult(document_: SearchDocument, terms: string[]) {
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = document_.url;
+    link.className = 'block rounded-lg px-md py-sm outline-none hover:bg-muted focus-visible:bg-muted';
+    const meta = document.createElement('p');
+    meta.className = 'text-xs text-muted-foreground';
+    meta.textContent = [document_.category, document_.date].join(' · ');
+    const title = document.createElement('p');
+    title.className = 'font-bold';
+    appendHighlighted(title, document_.title, terms);
+    const snippet = document.createElement('p');
+    snippet.className = 'mt-xs line-clamp-2 text-sm text-muted-foreground';
+    appendHighlighted(snippet, snippetOf(document_, terms), terms);
+    link.append(meta, title, snippet);
+    item.append(link);
+    return item;
+  }
+
+  const resultLinks = () => [...(list?.querySelectorAll<HTMLAnchorElement>('a') ?? [])];
+
+  /** 결과는 일반 링크 목록이다. 방향키는 실제 포커스를 옮기고, 맨 위에서 위로 가면 입력창으로 돌아간다. */
+  function moveFocus(step: 1 | -1) {
+    const links = resultLinks();
+    if (links.length === 0) return;
+    const current = links.indexOf(document.activeElement as HTMLAnchorElement);
+    const next = current + step;
+    if (next < 0) {
+      input?.focus();
+      return;
+    }
+    links[Math.min(next, links.length - 1)]?.focus();
+  }
+
+  async function search(query: string) {
+    if (!list || !status) return;
+    latestQuery = query;
+    const terms = termsOf(query);
+    if (terms.length === 0) {
+      list.replaceChildren();
+      status.textContent = '';
+      return;
+    }
+    let loaded: SearchDocument[];
+    try {
+      loaded = await loadDocuments();
+    } catch {
+      if (query !== latestQuery) return;
+      list.replaceChildren();
+      status.textContent = '검색 목록을 불러오지 못했어요. 잠시 후 다시 입력해 주세요.';
+      return;
+    }
+    // 첫 검색은 인덱스를 받는 동안 기다리므로, 그사이 입력이 바뀌었으면 이 결과는 버린다
+    if (query !== latestQuery) return;
+    list.replaceChildren();
+    const ranked = loaded
+      .map((document_) => ({ document_, score: score(document_, terms) }))
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, RESULT_LIMIT);
+    status.textContent = ranked.length > 0 ? `${ranked.length}개의 글` : '검색 결과가 없어요';
+    list.append(...ranked.map(({ document_ }) => renderResult(document_, terms)));
+  }
+
+  function open() {
+    if (!dialog || dialog.open) return;
+    dialog.showModal();
+    input?.select();
+    // 미리 받아 두기만 한다 — 실패는 실제 검색할 때 안내한다
+    loadDocuments().catch(() => {});
+  }
+
+  const isTyping = (target: EventTarget | null) =>
+    target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('[data-search-open]')) open();
+  });
+  dialog?.querySelector('[data-search-close]')?.addEventListener('click', () => dialog.close());
+  dialog?.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  input?.addEventListener('input', () => void search(input.value));
+  dialog?.addEventListener('keydown', (event) => {
+    // 한글 조합 중 Enter·방향키는 IME가 쓰므로 가로채지 않는다
+    if (event.isComposing) return;
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveFocus(event.key === 'ArrowDown' ? 1 : -1);
+    }
+    if (event.key === 'Enter' && event.target === input) {
+      const [first] = resultLinks();
+      if (first) window.location.href = first.href;
+    }
+  });
+  // 검색 결과를 눌러 이동하면 열려 있던 모달을 닫는다(모달은 페이지를 옮겨도 남아 있다)
+  document.addEventListener('astro:after-swap', () => dialog?.close());
+  document.addEventListener('keydown', (event) => {
+    const isShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k';
+    const isSlash = event.key === '/' && !isTyping(event.target);
+    if (!isShortcut && !isSlash) return;
+    event.preventDefault();
+    open();
+  });
+</script>

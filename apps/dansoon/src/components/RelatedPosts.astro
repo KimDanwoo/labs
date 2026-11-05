@@ -1,0 +1,35 @@
+---
+import { formatShortDate } from '~/lib/format';
+import { postPath, type Post } from '~/lib/posts';
+
+type Props = {
+  posts: Post[];
+};
+
+const { posts } = Astro.props;
+---
+
+{
+  posts.length > 0 && (
+    <section aria-labelledby="related-posts">
+      <h2 id="related-posts" class="text-sm font-bold text-muted-foreground">
+        함께 읽으면 좋은 글
+      </h2>
+      <ul class="mt-sm divide-y divide-border">
+        {posts.map((post) => (
+          <li>
+            <a href={postPath(post)} class="group flex items-baseline justify-between gap-md py-sm">
+              <span class="leading-snug font-medium transition-colors group-hover:text-primary">{post.data.title}</span>
+              <time
+                datetime={post.data.publishedAt.toISOString()}
+                class="shrink-0 text-sm text-muted-foreground tabular-nums"
+              >
+                {formatShortDate(post.data.publishedAt)}
+              </time>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

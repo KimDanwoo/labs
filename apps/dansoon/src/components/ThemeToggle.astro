@@ -1,0 +1,44 @@
+---
+import Icon from '~/components/Icon.astro';
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  class="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+  aria-label="다크 모드 켜기"
+>
+  <Icon name="moon" class="size-4 dark:hidden" />
+  <Icon name="sun" class="hidden size-4 dark:block" />
+</button>
+
+<script>
+  const THEME_STORAGE_KEY = 'theme';
+
+  function syncLabel(button: HTMLButtonElement, isDark: boolean) {
+    button.setAttribute('aria-label', isDark ? '라이트 모드 켜기' : '다크 모드 켜기');
+  }
+
+  function saveTheme(isDark: boolean) {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, isDark ? 'dark' : 'light');
+    } catch {
+      // 저장소가 막힌 환경(사생활 보호 모드 등)에서는 이번 방문에만 적용된다
+    }
+  }
+
+  const syncAllLabels = (isDark: boolean) =>
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => syncLabel(button, isDark));
+
+  document.addEventListener('astro:page-load', () =>
+    syncAllLabels(document.documentElement.classList.contains('dark')),
+  );
+  // 복제된 사이드바(모바일 서랍) 안의 버튼도 동작하도록 클릭은 문서에서 받는다
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element && event.target.closest('[data-theme-toggle]'))) return;
+    const isDark = document.documentElement.classList.toggle('dark');
+    saveTheme(isDark);
+    syncAllLabels(isDark);
+    document.dispatchEvent(new CustomEvent('themechange', { detail: { isDark } }));
+  });
+</script>

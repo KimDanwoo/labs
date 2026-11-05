@@ -7,29 +7,30 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "typecheck": "astro check && tsc --noEmit"
+    "typecheck": "astro check && tsc --noEmit",
+    "import:tistory": "node scripts/import-tistory.mjs"
   },
   "dependencies": {
-    "@astrojs/react": "catalog:",
+    "@astrojs/markdown-satteri": "catalog:",
     "@astrojs/rss": "catalog:",
     "@astrojs/sitemap": "catalog:",
     "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tokens/css": "workspace:*",
     "astro": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
+    "astro-expressive-code": "catalog:",
+    "overlayscrollbars": "catalog:",
+    "sharp": "catalog:",
     "tailwindcss": "catalog:"
   },
   "devDependencies": {
     "@astrojs/check": "catalog:",
     "@repo/prettier-config": "workspace:*",
     "@types/node": "catalog:",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-astro": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
+    "turndown": "catalog:",
     "typescript": "catalog:"
   },
   "engines": {

@@ -2,201 +2,130 @@
 import '@tokens/css/fonts.css';
 import '~/styles/global.css';
 import { ClientRouter } from 'astro:transitions';
+import AppSidebar from '~/components/AppSidebar.astro';
+import Icon from '~/components/Icon.astro';
+import MobileTopBar from '~/components/MobileTopBar.astro';
+import SearchDialog from '~/components/SearchDialog.astro';
+import SiteFooter from '~/components/SiteFooter.astro';
+import { getPublishedPosts } from '~/lib/posts';
 
-// 목록은 모바일 폭의 한 줄 흐름으로 읽히게, 상세는 넓은 표를 담을 수 있게 나눈다.
-const CONTENT_WIDTH = {
-  wide: '1120px',
-  narrow: '640px',
-} as const;
-type ContentWidth = keyof typeof CONTENT_WIDTH;
+const SITE_TITLE = 'Dansoon';
+const SITE_DESCRIPTION = '프론트엔드 개발을 하며 배운 것과 회고, 읽은 책을 기록해요.';
+// og.png를 바꾸면 v를 올려야 SNS 캐시가 갱신된다
+const DEFAULT_OG_IMAGE = '/og.png?v=2';
 
-interface Props {
+type Props = {
   title?: string;
   description?: string;
-  thumbnail?: string;
-  contentWidth?: ContentWidth;
-}
+  image?: string;
+  article?: { publishedAt: Date; updatedAt?: Date };
+};
 
-const { title = 'blog.danwoo', description = '기록하고 공유합니다', thumbnail, contentWidth = 'wide' } = Astro.props;
-
-const siteTitle = 'blog.danwoo';
-// 배포 도메인은 astro.config의 site 하나로 관리한다 — origin이라 뒤에 슬래시가 붙지 않는다
-const siteUrl = Astro.site!.origin;
-const metaUrl = new URL(Astro.url.pathname, Astro.site!).href;
-// og.png 교체 시 v를 올려야 SNS 캐시가 갱신된다
-const defaultThumbnail = `${siteUrl}/og.png?v=2`;
-// og:image는 절대 URL이어야 한다 — 포스트 썸네일은 /_astro/... 상대경로로 들어온다
-const metaThumbnail = thumbnail ? new URL(thumbnail, siteUrl).href : defaultThumbnail;
-const isDefaultThumbnail = metaThumbnail === defaultThumbnail;
-const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
-const isBookPage = Astro.url.pathname.startsWith('/book');
+const { title, description = SITE_DESCRIPTION, image = DEFAULT_OG_IMAGE, article } = Astro.props;
+const posts = await getPublishedPosts();
+const fullTitle = title ? `${title} | ${SITE_TITLE}` : SITE_TITLE;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
+const imageUrl = new URL(image, Astro.site).href;
 ---
 
 <!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={metaUrl} />
+    <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="icon" href="/favicon.png" type="image/png" />
-    <meta property="og:locale" content="ko_KR" />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={siteTitle} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={metaThumbnail} />
-    <meta property="og:image:alt" content={title} />
-    {
-      isDefaultThumbnail && (
-        <>
-          <meta property="og:image:width" content="1200" />
-          <meta property="og:image:height" content="630" />
-        </>
-      )
-    }
-    <meta property="og:url" content={metaUrl} />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={metaThumbnail} />
+    <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
     <meta name="google-site-verification" content="-kohA7qdl_10fMUGOMlZ7EArpE6vOn0DHONUwImizX8" />
+
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:site_name" content={SITE_TITLE} />
+    <meta property="og:type" content={article ? 'article' : 'website'} />
+    <meta property="og:title" content={title ?? SITE_TITLE} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={imageUrl} />
+    {article && <meta property="article:published_time" content={article.publishedAt.toISOString()} />}
+    {article?.updatedAt && <meta property="article:modified_time" content={article.updatedAt.toISOString()} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <slot name="head" />
     <ClientRouter />
 
-    <!-- Anti-flash: apply theme before first paint -->
+    <!-- 첫 페인트 전에 테마를 정해 깜빡임을 막는다. 저장값이 없으면 OS 설정을 따른다.
+         페이지를 옮기면 ClientRouter가 <html> 속성을 새 문서 것으로 바꾸므로, 바꾼 직후에도 다시 적용한다. -->
     <script is:inline>
-      (function () {
-        const saved = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = saved ?? (prefersDark ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', theme);
+      (() => {
+        const applyTheme = (root) => {
+          let saved = null;
+          try {
+            saved = localStorage.getItem('theme');
+          } catch {}
+          const isDark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+          root.classList.toggle('dark', isDark);
+        };
+        applyTheme(document.documentElement);
+        if (window.__dansoonThemeSync) return;
+        window.__dansoonThemeSync = true;
+        document.addEventListener('astro:before-swap', (event) => applyTheme(event.newDocument.documentElement));
       })();
     </script>
   </head>
 
-  <body class="min-h-screen flex flex-col" style={`--content-width: ${CONTENT_WIDTH[contentWidth]}`}>
-    <div id="scroll-sentinel" class="absolute top-0 h-0 w-full pointer-events-none"></div>
-
-    <header id="main-header" class="site-header sticky top-0 z-[9999] w-full">
-      <div class="max-w-(--shell-width) mx-auto flex items-center px-5 h-14 sm:h-16 gap-5">
-        <a class="header-logo mr-auto" href={isBookPage ? '/book' : '/'}> Dansoon </a>
-        <nav class="flex items-center gap-5">
-          {
-            isBookPage ? (
-              <a class="nav-link" href="/">
-                TECH
-              </a>
-            ) : (
-              <a class="nav-link" href="/book">
-                BOOK
-              </a>
-            )
-          }
-          <a class="nav-link" href="https://lab.danwoo.dev" target="_blank" rel="noopener noreferrer">LABS</a>
-          <a class="nav-link" href="https://github.com/KimDanwoo" target="_blank" rel="noopener noreferrer">GITHUB</a>
-        </nav>
-        <button id="theme-toggle" class="theme-toggle" aria-label="테마 변경" type="button">
-          <!-- Sun icon (dark mode → switch to light) -->
-          <svg
-            class="icon-sun"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-          <!-- Moon icon (light mode → switch to dark) -->
-          <svg
-            class="icon-moon"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-        </button>
-      </div>
-    </header>
-
-    <main
-      class="flex-1 max-w-(--content-width) w-full mx-auto px-5 py-8 sm:py-12"
-      style="view-transition-name: main-content"
+  <body class="min-h-dvh lg:h-dvh lg:overflow-hidden">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-sm focus:left-sm focus:z-50 focus:rounded-md focus:bg-primary focus:px-md focus:py-sm focus:text-primary-foreground"
     >
-      <slot />
-    </main>
-
-    <footer class="site-footer">
-      <div
-        class="max-w-(--shell-width) mx-auto px-5 py-8 flex items-center justify-between text-sm"
-        style="color: var(--text-muted)"
+      본문으로 건너뛰기
+    </a>
+    <div class="lg:grid lg:h-dvh lg:grid-cols-[var(--container-3xs)_minmax(0,1fr)]">
+      <aside
+        transition:persist="sidebar"
+        aria-label="사이트 탐색"
+        class="hidden h-dvh border-r border-border bg-secondary-subtle lg:block"
+        style="view-transition-name: sidebar"
       >
-        <span>© {new Date().getFullYear()} <a class="footer-link" href="https://github.com/KimDanwoo">Danwoo</a></span>
-        <span>Built with <a class="footer-link" href="https://astro.build">Astro</a></span>
+        <!-- 사이드바는 자기 영역만 스크롤한다. 스크롤바 라이브러리는 안쪽 요소에 붙인다 -->
+        <div data-sidebar class="h-full overflow-y-auto">
+          <AppSidebar posts={posts} />
+        </div>
+      </aside>
+      <!-- 데스크톱에서는 본문 영역이 스크롤 주체다(사이드바와 스크롤이 섞이지 않는다) -->
+      <div data-content-scroll class="min-w-0 lg:h-dvh lg:overflow-y-auto">
+        <div class="flex min-h-dvh flex-col">
+          <MobileTopBar />
+          <main id="main" class="flex-1" style="view-transition-name: page">
+            <slot />
+          </main>
+          <SiteFooter />
+        </div>
       </div>
-    </footer>
+    </div>
+
+    <dialog
+      id="mobile-nav"
+      transition:persist
+      aria-label="사이트 탐색"
+      class="motion-dialog motion-drawer fixed inset-y-0 left-0 m-0 h-dvh max-h-none w-72 max-w-[85vw] bg-secondary-subtle p-0 text-foreground"
+    >
+      <button
+        type="button"
+        data-nav-close
+        autofocus
+        class="absolute top-sm right-sm z-10 inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
+        aria-label="메뉴 닫기"
+      >
+        <Icon name="x" />
+      </button>
+      <!-- 처음 열 때 데스크톱 사이드바를 복제해 채운다(같은 목록을 두 번 그리지 않는다) -->
+      <div data-mobile-nav-body></div>
+    </dialog>
+    <SearchDialog />
 
     <script>
-      function applyTheme() {
-        const saved = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = saved ?? (prefersDark ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', theme);
-      }
-
-      function init() {
-        // ViewTransitions 이후 <html> 속성이 교체되므로 테마 재적용
-        applyTheme();
-
-        // Scroll shadow
-        const sentinel = document.getElementById('scroll-sentinel');
-        const header = document.getElementById('main-header');
-        if (sentinel && header) {
-          new IntersectionObserver(([e]) => header.classList.toggle('scrolled', !e.isIntersecting), {
-            threshold: 1.0,
-          }).observe(sentinel);
-        }
-
-        // Theme toggle
-        const btn = document.getElementById('theme-toggle');
-        btn?.addEventListener('click', () => {
-          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-          const next = isDark ? 'light' : 'dark';
-          document.documentElement.setAttribute('data-theme', next);
-          localStorage.setItem('theme', next);
-        });
-      }
-
-      // 첫 로드
-      init();
-      // 전환 직전 새 문서에도 테마를 미리 적용해 깜빡임 방지
-      document.addEventListener('astro:before-swap', (e) => {
-        const saved = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = saved ?? (prefersDark ? 'dark' : 'light');
-        e.newDocument.documentElement.setAttribute('data-theme', theme);
-      });
-      // ViewTransitions 이후 페이지마다 재실행
-      document.addEventListener('astro:after-swap', init);
+      import '~/scripts/layout';
     </script>
   </body>
 </html>

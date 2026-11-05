@@ -1,0 +1,21 @@
+---
+import { categoryPath } from '~/lib/posts';
+import { CATEGORY_LABEL, type CategoryId } from '~/lib/taxonomy';
+
+type Props = {
+  category: CategoryId;
+  /** 카테고리 페이지로 이동하는 링크로 그린다 */
+  asLink?: boolean;
+};
+
+const { category, asLink = false } = Astro.props;
+const Tag = asLink ? 'a' : 'span';
+---
+
+<Tag
+  href={asLink ? categoryPath(category) : undefined}
+  data-category={category}
+  class:list={['category-badge', asLink && 'transition-opacity hover:opacity-80']}
+>
+  {CATEGORY_LABEL[category]}
+</Tag>

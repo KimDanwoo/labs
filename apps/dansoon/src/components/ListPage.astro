@@ -1,0 +1,26 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+
+type Props = {
+  /** 페이지 제목(<h1>) */
+  heading: string;
+  lead?: string;
+  /** <title>·메타 설명. 생략하면 heading·lead를 쓴다 */
+  title?: string;
+  description?: string;
+};
+
+/** 목록형 페이지(홈·카테고리·태그)의 공통 틀: 제목 + 설명 + 본문 칼럼 */
+const { heading, lead, title, description } = Astro.props;
+---
+
+<BaseLayout title={title ?? heading} description={description ?? lead}>
+  <div class="mx-auto max-w-(--container-2xl) px-md pt-2xl pb-xl sm:px-xl sm:pt-3xl">
+    <header class="mb-xl">
+      <h1 class="text-3xl font-bold tracking-tight">{heading}</h1>
+      {lead && <p class="mt-sm leading-relaxed text-muted-foreground">{lead}</p>}
+      <slot name="header" />
+    </header>
+    <slot />
+  </div>
+</BaseLayout>
