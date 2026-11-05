@@ -1,21 +1,11 @@
 import '@app/globals.css';
 import { AppProviders } from '@app/providers/AppProviders';
+import '@tokens/css/fonts.css';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Sora } from 'next/font/google';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
+import { Geist_Mono } from 'next/font/google';
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
-
-// Unicorn Rush 디스플레이 폰트.
-const sora = Sora({
-  variable: '--font-display',
   subsets: ['latin'],
 });
 
@@ -43,11 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} ${sora.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
+    <html lang="ko" className={`${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

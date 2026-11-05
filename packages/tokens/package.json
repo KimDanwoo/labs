@@ -7,13 +7,15 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./theme.css": "./generated/theme.css"
+    "./theme.css": "./generated/theme.css",
+    "./fonts.css": "./fonts/maruburi.css"
   },
   "scripts": {
     "tokens": "node --import tsx scripts/buildTokens.ts",
     "build": "node --import tsx scripts/buildTokens.ts",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "fonts": "python3 scripts/subsetFonts.py"
   },
   "devDependencies": {
     "@config/tsconfig": "workspace:*",

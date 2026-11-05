@@ -204,6 +204,9 @@ importers:
 
   apps/awesome-sudoku:
     dependencies:
+      '@tokens/css':
+        specifier: workspace:*
+        version: link:../../packages/tokens
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -301,6 +304,9 @@ importers:
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.3.2(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@tokens/css':
+        specifier: workspace:*
+        version: link:../../packages/tokens
       astro:
         specifier: 'catalog:'
         version: 7.2.9(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.4.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)
@@ -536,6 +542,9 @@ importers:
 
   apps/komorebi:
     dependencies:
+      '@tokens/css':
+        specifier: workspace:*
+        version: link:../../packages/tokens
       next:
         specifier: 16.3.8
         version: 16.3.8(@babel/core@7.29.7)(@playwright/test@1.64.0)(@types/node@26.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)

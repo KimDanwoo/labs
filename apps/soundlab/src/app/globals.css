@@ -19,7 +19,7 @@
   --color-hairline-soft: #f2f3f512;
   --color-brass: #c8a97e;
 
-  --font-display: var(--font-gothic-a1), 'Apple SD Gothic Neo', system-ui, sans-serif;
+  --font-display: var(--font-sans);
   --font-label: var(--font-plex-mono), ui-monospace, monospace;
 
   --spacing-2xs: 2px;

@@ -15,6 +15,7 @@
     "@astrojs/sitemap": "catalog:",
     "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "catalog:",
+    "@tokens/css": "workspace:*",
     "astro": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

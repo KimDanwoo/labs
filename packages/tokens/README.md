@@ -39,4 +39,6 @@ Semantic 토큰은 atomic 스텝을 참조하므로 **palette.ts만 수정**하�
 ## 주의
 
 - `generated/theme.css`는 자동 생성 파일 — **직접 수정 금지**.
+- 랩스 공통 서체는 **마루부리**다. 앱 루트에서 `import '@tokens/css/fonts.css'`를 반드시 함께 불러온다(`--font-sans`가 참조하는 `--font-maruburi`와 `@font-face`가 여기 있다). 고정폭 서체는 앱이 정한다.
+- `fonts/`의 조각 파일과 `maruburi.css`는 `pnpm --filter @tokens/css fonts`(`scripts/subsetFonts.py`, fonttools·brotli 필요)로 생성한다 — **직접 수정 금지**. 원본은 `fonts/source/`, 라이선스는 `fonts/LICENSE.md`.
 - 색은 반드시 Tailwind 시맨틱 유틸로만 사용하고, 임의 hex 값을 인라인으로 쓰지 않는다.

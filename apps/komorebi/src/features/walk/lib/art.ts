@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 
+/** Canvas는 CSS 변수를 못 읽으므로 랩스 공통 서체(@tokens/css/fonts.css)를 이름으로 지정한다. */
+export const CANVAS_FONT_FAMILY = "'MaruBuri', serif";
+
 export function canvasTexture(width: number, height: number, paint: (ctx: CanvasRenderingContext2D) => void) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
