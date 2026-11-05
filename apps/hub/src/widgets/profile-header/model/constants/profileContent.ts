@@ -3,6 +3,7 @@ import type { ProfileParagraph } from '@widgets/profile-header/model/types';
 const RESUME_URL = 'https://docs.google.com/document/d/1_oia6H3WisAHsGNJWZAYqru9pHUXovRNAaRJcZn5UBU/edit';
 const SOUNDCLOUD_URL = 'https://soundcloud.com/danwooking';
 const BLOG_URL = 'https://dansoon-dev.tistory.com/category';
+const GITHUB_URL = 'https://github.com/KimDanwoo';
 
 export const PROFILE_PARAGRAPHS: readonly ProfileParagraph[] = [
   [
@@ -13,7 +14,9 @@ export const PROFILE_PARAGRAPHS: readonly ProfileParagraph[] = [
   [
     '하루를 마치면 그날 만들고 싶은 게 하나씩 떠올라요. 분야는 가리지 않고, 꽂히면 주말을 넘기지 않고 배포까지 끝내는 편이에요. 요즘은 AI와 함께 작업하면서 머릿속 아이디어를 훨씬 빠르게 현실로 옮기고 있어요. 그 과정에서 배운 건 가끔 ',
     { label: '블로그', href: BLOG_URL },
-    '에 적어 둬요.',
+    '에 적어 두고, 코드는 ',
+    { label: 'GitHub', href: GITHUB_URL },
+    '에 올려 둬요.',
   ],
   [
     '취미는 운동이랑 음악이에요. 운동은 머리 비우기에 좋아서 오래 하고 있고, 음악은 요즘 AI로 작곡한 곡을 ',
