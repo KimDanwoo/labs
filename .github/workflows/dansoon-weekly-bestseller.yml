@@ -1,0 +1,72 @@
+name: Dansoon Weekly Bestseller
+
+on:
+  schedule:
+    - cron: '0 1 * * 1' # 매주 월요일 오전 10시 KST (UTC 01:00)
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(TZ=Asia/Seoul date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Git
+        run: |
+          git config --global user.name 'KimDanwoo'
+          git config --global user.email '84695769+KimDanwoo@users.noreply.github.com'
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install requests curl_cffi google-genai playwright
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('**/dansoon-weekly-bestseller.yml') }}
+
+      - name: Install Playwright browsers
+        run: playwright install chromium --with-deps
+
+      - name: Fetch bestseller data
+        working-directory: apps/dansoon
+        run: python scripts/fetch_bestseller.py ${{ steps.date.outputs.date }}
+        env:
+          ALADIN_TTB_KEY: ${{ secrets.ALADIN_TTB_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: Commit, open PR, and merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="feature/${{ steps.date.outputs.date }}-bestseller"
+          TITLE='✨ feat(${{ steps.date.outputs.date }}): 주간 베스트셀러 추가'
+          # data/는 덤프가 생성되지 않으면 존재하지 않는다. 없는 경로를 넘기면
+          # git add가 실패해 리포트 발행까지 함께 막히므로 있는 경로만 넘긴다.
+          git add apps/dansoon/contents/
+          if [ -d apps/dansoon/data ]; then git add apps/dansoon/data/; fi
+          if git diff --cached --quiet; then
+            echo "생성된 변경이 없어 종료합니다."
+            exit 0
+          fi
+          git switch -c "$BRANCH"
+          git commit -m "$TITLE"
+          git push -f origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" --title "$TITLE" --body '자동 생성된 주간 베스트셀러입니다.'
+          gh pr merge "$BRANCH" --squash --delete-branch
