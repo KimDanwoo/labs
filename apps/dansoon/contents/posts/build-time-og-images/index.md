@@ -4,7 +4,7 @@ description: "썸네일 없는 글과 책 리포트의 링크 미리보기(OG) �
 publishedAt: "2026-11-05T21:30:00+09:00"
 category: "dev"
 tags: ["side-project", "seo"]
-draft: true
+draft: false
 ---
 
 블로그 글 링크를 메신저나 SNS에 붙이면 제목 옆에 이미지가 함께 뜬다. 페이지의 `og:image` 메타 태그가 가리키는 이미지다.
