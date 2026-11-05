@@ -4,6 +4,7 @@ description: "썸네일 없는 글과 책 리포트의 링크 미리보기(OG) �
 publishedAt: "2026-11-05T21:30:00+09:00"
 category: "dev"
 tags: ["side-project", "seo"]
+thumbnail: "./thumbnail.png"
 draft: false
 ---
 
