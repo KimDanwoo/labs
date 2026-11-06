@@ -107,7 +107,6 @@ const imageUrl = new URL(image, Astro.site).href;
         transition:persist="sidebar"
         aria-label="사이트 탐색"
         class="hidden h-dvh flex-col border-r border-border bg-secondary-subtle lg:flex"
-        style="view-transition-name: sidebar"
       >
         <!-- 목록만 스크롤하고 푸터는 바닥에 고정한다. 스크롤바 라이브러리는 안쪽 요소에 붙인다 -->
         <div data-sidebar class="min-h-0 flex-1 overflow-y-auto">
@@ -119,7 +118,7 @@ const imageUrl = new URL(image, Astro.site).href;
       <div data-content-scroll class="min-w-0 lg:h-dvh lg:overflow-y-auto">
         <div class="flex min-h-dvh flex-col">
           <MobileTopBar />
-          <main id="main" class="flex-1" style="view-transition-name: page">
+          <main id="main" class="flex-1">
             <slot />
           </main>
           <SiteFooter />
