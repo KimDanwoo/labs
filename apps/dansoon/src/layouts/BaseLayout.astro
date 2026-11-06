@@ -13,6 +13,7 @@ const SITE_TITLE = 'Dansoon';
 const SITE_DESCRIPTION = '프론트엔드 개발을 하며 배운 것과 회고, 읽은 책을 기록해요.';
 // og.png를 바꾸면 v를 올려야 SNS 캐시가 갱신된다
 const DEFAULT_OG_IMAGE = '/og.png?v=2';
+const GTM_ID = 'GTM-WHZHDZFH';
 
 type Props = {
   title?: string;
@@ -53,6 +54,19 @@ const imageUrl = new URL(image, Astro.site).href;
     <meta name="twitter:card" content="summary_large_image" />
     <slot name="head" />
     <ClientRouter />
+
+    <!-- 개발 서버 방문이 통계에 섞이지 않게 배포 빌드에만 넣는다 -->
+    {
+      import.meta.env.PROD && (
+        <>
+          <script is:inline>
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+          </script>
+          <script is:inline async src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`} />
+        </>
+      )
+    }
 
     <!-- 첫 페인트 전에 테마를 정해 깜빡임을 막는다. 저장값이 없으면 OS 설정을 따른다.
          페이지를 옮기면 ClientRouter가 <html> 속성을 새 문서 것으로 바꾸므로, 바꾼 직후에도 다시 적용한다. -->
