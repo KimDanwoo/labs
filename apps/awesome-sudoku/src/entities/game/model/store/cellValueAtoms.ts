@@ -10,6 +10,7 @@ import {
 } from '@entities/game/model/services';
 import { cellAt } from '@shared/lib/gridAccess';
 import { atom } from 'jotai';
+import { clearHistoryAtom, pushStateAtom } from './historyAtoms';
 import {
   boardAtom,
   cagesAtom,
@@ -32,6 +33,7 @@ import { toggleTimerAtom } from './timerAtoms';
 
 /** 선택된 셀에 값 입력 */
 export const fillCellAtom = atom(null, (get, set, value: number | null) => {
+  if (get(isCompletedAtom)) return;
   const board = get(boardAtom);
   const selectedCell = get(selectedCellAtom);
 
@@ -64,6 +66,7 @@ export const fillCellAtom = atom(null, (get, set, value: number | null) => {
   const { result } = resolveBoardState(updatedBoard, solution, gameMode, cages);
   const state = buildGameResultState(result);
 
+  set(pushStateAtom, board);
   set(boardAtom, state.board);
   set(isCompletedAtom, state.isCompleted);
   set(isSuccessAtom, state.isSuccess);
@@ -80,6 +83,7 @@ export const fillCellAtom = atom(null, (get, set, value: number | null) => {
 
 /** 노트 토글 */
 export const toggleNoteAtom = atom(null, (get, set, value: number) => {
+  if (get(isCompletedAtom)) return;
   const board = get(boardAtom);
   const selectedCell = get(selectedCellAtom);
 
@@ -97,6 +101,7 @@ export const toggleNoteAtom = atom(null, (get, set, value: number) => {
     noteIndex === -1 ? [...currentNotes, value].sort((a, b) => a - b) : currentNotes.filter((note) => note !== value);
 
   const newBoard = updateCellNotes(board, row, col, newNotes);
+  set(pushStateAtom, board);
   set(boardAtom, newBoard);
 });
 
@@ -113,6 +118,7 @@ export const resetUserInputsAtom = atom(null, (get, set) => {
   const emptyHighlights = clearHighlights(highlightedCells);
 
   set(boardAtom, newBoard);
+  set(clearHistoryAtom);
   set(highlightedCellsAtom, emptyHighlights);
   set(hintsRemainingAtom, HINTS_REMAINING);
   set(mistakeCountAtom, 0);

@@ -2,6 +2,7 @@ import { GAME_LEVEL, HINTS_REMAINING } from '@entities/game/model/constants';
 import { createEmptyHighlights, requestPuzzle } from '@entities/game/model/services';
 import type { Difficulty, GameMode } from '@entities/game/model/types';
 import { atom } from 'jotai';
+import { clearHistoryAtom } from './historyAtoms';
 import {
   boardAtom,
   cagesAtom,
@@ -35,6 +36,7 @@ export const initializeGameAtom = atom(null, async (get, set, difficulty: Diffic
   if (requestId !== latestRequest) return;
 
   set(boardAtom, board);
+  set(clearHistoryAtom);
   set(solutionAtom, solution);
   set(cagesAtom, cages);
   set(selectedCellAtom, null);

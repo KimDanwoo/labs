@@ -5,7 +5,6 @@ import {
   fillCellAtom,
   isNoteModeAtom,
   numberCountsAtom,
-  pushStateAtom,
   selectedCellAtom,
   timerActiveAtom,
   toggleNoteAtom,
@@ -24,7 +23,6 @@ export const SelectNumber: FC = () => {
   const selectedCell = useAtomValue(selectedCellAtom);
   const fillCell = useSetAtom(fillCellAtom);
   const toggleNote = useSetAtom(toggleNoteAtom);
-  const pushState = useSetAtom(pushStateAtom);
 
   const isNumberDisabled = useMemo(() => (value: number) => (numberCounts[value] ?? 0) >= BOARD_SIZE, [numberCounts]);
 
@@ -35,15 +33,13 @@ export const SelectNumber: FC = () => {
       const cell = cellAt(board, selectedCell.row, selectedCell.col);
       if (cell.isInitial) return;
 
-      pushState(board);
-
       if (isNoteMode) {
         toggleNote(value);
         return;
       }
       fillCell(value);
     },
-    [isNoteMode, fillCell, toggleNote, board, selectedCell, pushState],
+    [isNoteMode, fillCell, toggleNote, board, selectedCell],
   );
 
   return (
