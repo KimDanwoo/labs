@@ -35,6 +35,15 @@ const sidebarHost = document.querySelector<HTMLElement>('[data-sidebar]');
 const sidebarScroller = sidebarHost ? attachScrollbar(sidebarHost) : null;
 // 유지되는 요소라도 새 문서로 옮겨 붙일 때 브라우저가 스크롤을 0으로 되돌린다 — 옮기기 전 값을 들고 있다가 되돌린다
 let sidebarScrollTop = 0;
+// 사용자가 굴린 위치를 바로 기억한다 — 이동 중(page-load 전)에 굴린 휠을 되돌리기가 옛 위치로 덮어쓰지 않게.
+// 옮겨 붙일 때 0으로 돌아가는 건 after-swap에서 같은 작업 안에 되돌리므로, 이 이벤트가 읽는 값은 이미 복원된 위치다
+sidebarScroller?.addEventListener(
+  'scroll',
+  () => {
+    sidebarScrollTop = sidebarScroller.scrollTop;
+  },
+  { passive: true },
+);
 
 function restoreSidebarScroll() {
   if (sidebarScroller) sidebarScroller.scrollTop = sidebarScrollTop;
@@ -182,7 +191,13 @@ document.addEventListener('astro:before-preparation', (event) => {
   lastNavigationType = event.navigationType;
   if (contentScroller) contentScrollTops.set(currentEntryKey, contentScroller.scrollTop);
 });
-document.addEventListener('astro:before-swap', () => {
+document.addEventListener('astro:before-swap', (event) => {
+  // View Transition 애니메이션이 도는 동안(약 0.35초) 브라우저가 휠 입력을 받지 않아 사이드바 스크롤이 씹혔다.
+  // 화면 전환은 건너뛰고, 새 본문이 올라오는 움직임은 CSS(html[data-navigated] #main)로 대신한다
+  // 건너뛰면 ready가 거절된다 — 의도한 동작이라 받아 두지 않으면 매 이동마다 콘솔에 에러가 남는다
+  event.viewTransition.ready.catch(() => undefined);
+  event.viewTransition.skipTransition();
+  event.newDocument.documentElement.dataset.navigated = '';
   sidebarScrollTop = sidebarScroller?.scrollTop ?? 0;
   // <body>가 통째로 바뀌므로 문서 스크롤바는 새 <body>에 다시 붙인다(page-load)
   OverlayScrollbars(document.body)?.destroy();
