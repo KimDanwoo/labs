@@ -7,8 +7,8 @@ type Props = {
   newer?: Post;
 };
 
-// 2배 해상도 화면을 고려해 표시 크기(4rem)의 두 배로 만든다
-const THUMBNAIL_SIZE = 128;
+// 2배 해상도 화면을 고려해 표시 너비(6rem)의 두 배로 만든다. 높이는 썸네일 비율(1200×630)대로 정해진다
+const THUMBNAIL_WIDTH = 192;
 
 const { older, newer } = Astro.props;
 const entries = [
@@ -31,12 +31,11 @@ const entries = [
             ]}
           >
             {post.data.thumbnail && (
-              <span class="size-16 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border">
+              <span class="aspect-40/21 w-24 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border">
                 <Image
                   src={post.data.thumbnail}
                   alt=""
-                  width={THUMBNAIL_SIZE}
-                  height={THUMBNAIL_SIZE}
+                  width={THUMBNAIL_WIDTH}
                   class="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
                 />
               </span>

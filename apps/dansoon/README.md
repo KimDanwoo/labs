@@ -58,6 +58,8 @@ tags: ['react'] # src/lib/taxonomy.ts의 TAG_IDS
 
 새 태그·카테고리는 `src/lib/taxonomy.ts`에 ID와 이름을 먼저 추가한다. slug(폴더 이름)는 URL이므로 바꾸지 않는다.
 
+이미지: 글 폴더에 제목 없는 배경 `cover.jpg`(3:2, 모티프는 오른쪽, 왼쪽은 비움)를 두고 `node scripts/make-thumbnails.ts <slug>`로 제목을 얹은 `thumbnail.jpg`(1200×630)를 만든다. frontmatter에 `thumbnail: './thumbnail.jpg'`, `cover: './cover.jpg'`를 적는다. 커버는 글 상단, 썸네일은 목록·링크 미리보기에 쓰인다. 제목을 바꾸면 스크립트를 다시 돌린다.
+
 ## 주간 책 순위(자동)
 
 GitHub Actions가 매주 월요일 리포트를 만들어 `contents/book/`에 커밋한다(`dansoon-weekly-bestseller`, `dansoon-weekly-webnovel`). 블로그는 `/book/`에서 주별로 모아 보여준다. 수집 스크립트는 Python이며 Gemini API 키와 `google-genai`가 필요하다. 테크 뉴스 자동 수집은 중단했다.

@@ -26,11 +26,9 @@ type Props = {
 };
 
 const { post, posts } = Astro.props;
-const { title, description, publishedAt, updatedAt, category, tags, thumbnail } = post.data;
+const { title, description, publishedAt, updatedAt, category, tags, thumbnail, cover } = post.data;
 const { Content, headings } = await render(post);
 const { older, newer } = getAdjacentPosts(posts, post);
-// 가로 썸네일만 제목 위 커버로 쓴다 — 예전 글의 정사각 제목 카드는 목록에만 둔다
-const cover = thumbnail && thumbnail.width > thumbnail.height ? thumbnail : undefined;
 const COVER_WIDTH = 1344;
 // SNS 미리보기는 jpg/png 1200px가 가장 무난하다
 const OG_IMAGE_WIDTH = 1200;
