@@ -6,7 +6,7 @@ category: "bestseller"
 isHidden: true
 ---
 
-## 🏅 일반 도서 베스트셀러 TOP 15
+## 일반 도서 베스트셀러 TOP 15
 
 각 서점의 **전체 베스트셀러 순위**입니다. 리디는 제공 범위상 11위까지만 집계됩니다.
 
@@ -15,32 +15,40 @@ isHidden: true
 서점마다 확인 가능한 순위 깊이가 달라(알라딘·교보문고·YES24 20위, 리디 11위)
 순위를 그대로 더하지 않습니다. **출판사**는 알라딘 정보 기준이며, 알라딘에 없는 책은 `-`입니다.
 
-| 순위 | 책 | 저자 | 출판사 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |
-|:----:|-----|------|--------|------|:------:|:-------:|:-----:|:----:|
-| **1** | [세네카, 오늘을 빼앗기고 있는 당신에게](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396404956&amp;partner=openAPI&amp;start=api) | 루키우스 안나이우스 세네카 | 논픽션 | 인문사회 | 1위 | 1위 | 1위 | - |
-| **2** | [한국사 이상현상 연구원](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400909759&amp;partner=openAPI&amp;start=api) | 최인서 | 다이브 | 소설 | 4위 | 5위 | 14위 | 4위 |
-| **3** | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api) | 헤르만 헤세 | 민음사 | 소설 | 3위 | 4위 | 4위 | - |
-| **4** | [그랬다고 적었다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400193697&amp;partner=openAPI&amp;start=api) | 김애란 | 문학동네 | 에세이 | 9위 | 13위 | 9위 | 8위 |
-| **5** | [마음의 어휘력](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400143853&amp;partner=openAPI&amp;start=api) | 조아란 | 페이지2(page2) | 에세이 | 14위 | 10위 | 7위 | - |
-| **6** | [니체의 초월자](https://product.kyobobook.co.kr/detail/S000218278239) | 프리드리히 니체 | 히읏 | 인문사회 | - | 8위 | 5위 | - |
-| **7** | [모순](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&amp;partner=openAPI&amp;start=api) | 양귀자 | 쓰다 | 소설 | 8위 | 16위 | 11위 | - |
-| **8** | [빵충 사육 준수 사항](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398726639&amp;partner=openAPI&amp;start=api) | 김혜영 | 안전가옥 | 소설 | 16위 | - | - | 1위 |
-| **9** | [수족관](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330811810&amp;partner=openAPI&amp;start=api) | 유래혁 | 포스터샵 | 소설 | 12위 | 11위 | 18위 | - |
-| **10** | [서리꽃 세트](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400649153&amp;partner=openAPI&amp;start=api) | 조정래 | 해냄 | 소설 | 10위 | - | 13위 | - |
-| **11** | [리더는 언제 차이를 만들어내는가](https://ridibooks.com/books/1546001529) | 재레드 다이아몬드 | 김영사 | 인문사회 | - | - | - | 2위 |
-| **12** | [머니 트렌드 2027](https://product.kyobobook.co.kr/detail/S000221075112) | 정태익 외 | 북모먼트 | 경제경영 | - | 3위 | - | - |
-| **13** | [헝거 게임: 50번째 추첨의 날](https://ridibooks.com/books/593001169) | 수잔 콜린스 | 북폴리오 | 소설 | - | - | - | 3위 |
-| **14** | [박완서의 낱말들](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=401813692&amp;partner=openAPI&amp;start=api) | 박완서 | 웅진지식하우스 | 인문사회 | 6위 | - | - | - |
-| **15** | [테오](https://product.kyobobook.co.kr/detail/S000220307771) | 앨런 레비 | 오팬하우스 | 소설 | - | 6위 | - | - |
+**변동**은 지난주 종합 순위와 비교한 값입니다(NEW: 새로 들어온 책).
+
+### 이번 주 한눈에
+
+- 새로 들어온 책 4권: **니체의 초월자**, **머니 트렌드 2027**, **박완서의 낱말들** 외 1권
+- 가장 많이 오른 책: **마음의 어휘력** (5위, ▲6)
+- 가장 오래 순위권: **싯다르타** (13주 연속)
+
+| 순위 | 변동 | 책 | 저자 | 출판사 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |
+|:----:|:----:|-----|------|--------|------|:------:|:-------:|:-----:|:----:|
+| **1** | ▲1 | [세네카, 오늘을 빼앗기고 있는 당신에게](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396404956&amp;partner=openAPI&amp;start=api) | 루키우스 안나이우스 세네카 | 논픽션 | 인문사회 | 1위 | 1위 | 1위 | - |
+| **2** | ▼1 | [한국사 이상현상 연구원](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400909759&amp;partner=openAPI&amp;start=api) | 최인서 | 다이브 | 소설 | 4위 | 5위 | 14위 | 4위 |
+| **3** | - | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api) | 헤르만 헤세 | 민음사 | 소설 | 3위 | 4위 | 4위 | - |
+| **4** | - | [그랬다고 적었다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400193697&amp;partner=openAPI&amp;start=api) | 김애란 | 문학동네 | 에세이 | 9위 | 13위 | 9위 | 8위 |
+| **5** | ▲6 | [마음의 어휘력](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400143853&amp;partner=openAPI&amp;start=api) | 조아란 | 페이지2(page2) | 에세이 | 14위 | 10위 | 7위 | - |
+| **6** | NEW | [니체의 초월자](https://product.kyobobook.co.kr/detail/S000218278239) | 프리드리히 니체 | 히읏 | 인문사회 | - | 8위 | 5위 | - |
+| **7** | ▲3 | [모순](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&amp;partner=openAPI&amp;start=api) | 양귀자 | 쓰다 | 소설 | 8위 | 16위 | 11위 | - |
+| **8** | - | [빵충 사육 준수 사항](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398726639&amp;partner=openAPI&amp;start=api) | 김혜영 | 안전가옥 | 소설 | 16위 | - | - | 1위 |
+| **9** | ▼4 | [수족관](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330811810&amp;partner=openAPI&amp;start=api) | 유래혁 | 포스터샵 | 소설 | 12위 | 11위 | 18위 | - |
+| **10** | ▼1 | [서리꽃 세트](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400649153&amp;partner=openAPI&amp;start=api) | 조정래 | 해냄 | 소설 | 10위 | - | 13위 | - |
+| **11** | ▲3 | [리더는 언제 차이를 만들어내는가](https://ridibooks.com/books/1546001529) | 재레드 다이아몬드 | 김영사 | 인문사회 | - | - | - | 2위 |
+| **12** | NEW | [머니 트렌드 2027](https://product.kyobobook.co.kr/detail/S000221075112) | 정태익 외 | 북모먼트 | 경제경영 | - | 3위 | - | - |
+| **13** | ▲2 | [헝거 게임: 50번째 추첨의 날](https://ridibooks.com/books/593001169) | 수잔 콜린스 | 북폴리오 | 소설 | - | - | - | 3위 |
+| **14** | NEW | [박완서의 낱말들](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=401813692&amp;partner=openAPI&amp;start=api) | 박완서 | 웅진지식하우스 | 인문사회 | 6위 | - | - | - |
+| **15** | NEW | [테오](https://product.kyobobook.co.kr/detail/S000220307771) | 앨런 레비 | 오팬하우스 | 소설 | - | 6위 | - | - |
 
 ---
 
-## 📚 장르별 베스트셀러
+## 장르별 베스트셀러
 
 알라딘·리디는 **해당 장르 베스트셀러 순위**, 교보문고·YES24는 장르별 목록을 제공하지 않아
 **전체 순위**를 그대로 씁니다(그래서 두 서점은 상위 20위에 든 책만 표시됩니다).
 
-### 📖 소설
+### 소설
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
@@ -50,7 +58,7 @@ isHidden: true
 | **4** | [수족관](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330811810&amp;partner=openAPI&amp;start=api) | 유래혁 | 포스터샵 | 5위 | 11위 | 18위 | - |
 | **5** | [서리꽃 세트](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400649153&amp;partner=openAPI&amp;start=api) | 조정래 | 해냄 | 4위 | - | 13위 | - |
 
-### 💼 경제경영
+### 경제경영
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
@@ -60,7 +68,7 @@ isHidden: true
 | **4** | [돈의 심리학](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=383315006&amp;partner=openAPI&amp;start=api) | 모건 하우절 | 인플루엔셜(주) | 6위 | - | - | 2위 |
 | **5** | [독하게 돈 공부](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397270202&amp;partner=openAPI&amp;start=api) | 박소연 | 메이븐 | 7위 | - | - | 3위 |
 
-### 🚀 자기계발
+### 자기계발
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
@@ -70,7 +78,7 @@ isHidden: true
 | **4** | [신경 끄기의 기술 (한교동 에디션)](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400979302&amp;partner=openAPI&amp;start=api) | 마크 맨슨 | 갤리온 | 1위 | - | - | - |
 | **5** | [더 시스템](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330399601&amp;partner=openAPI&amp;start=api) | 스콧 애덤스 | 베리북 | 8위 | - | - | 5위 |
 
-### 🌍 인문사회
+### 인문사회
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
@@ -80,7 +88,7 @@ isHidden: true
 | **4** | [칵테일을 마시는 철학자들](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=399460405&amp;partner=openAPI&amp;start=api) | 세라 베이크웰 | 다산초당 | 3위 | - | - | 5위 |
 | **5** | [옥스브리지의 철학 수업](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400561491&amp;partner=openAPI&amp;start=api) | 고요엘 | 상상스퀘어 | 6위 | - | - | 3위 |
 
-### 🔬 과학기술
+### 과학기술
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
@@ -90,7 +98,7 @@ isHidden: true
 | **4** | [원소 원정대](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=393526281&amp;partner=openAPI&amp;start=api) | 아게도리도리 | 윌북주니어 | 3위 | - | - | - |
 | **5** | [물고기는 존재하지 않는다](https://ridibooks.com/books/852001243) | 룰루 밀러 | 곰출판 | - | - | - | 3위 |
 
-### ✍️ 에세이
+### 에세이
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
