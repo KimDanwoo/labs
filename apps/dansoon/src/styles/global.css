@@ -85,11 +85,6 @@
     font-weight: 400;
   }
 
-  .article :where(:not(pre) > code)::before,
-  .article :where(:not(pre) > code)::after {
-    content: none;
-  }
-
   .article :where(img) {
     border-radius: var(--radius-md);
     cursor: zoom-in;
@@ -227,6 +222,18 @@
   font-size: var(--text-base);
   line-height: 1.9;
   letter-spacing: -0.003em;
+}
+
+/* 아래 둘도 .prose(utilities 레이어)를 이겨야 해서 레이어 밖에 둔다 */
+/* 인라인 코드 앞뒤의 백틱 장식을 지운다(바탕색은 components의 .article 규칙) */
+.prose.article :where(:not(pre) > code)::before,
+.prose.article :where(:not(pre) > code)::after {
+  content: none;
+}
+
+/* typography 기본값(600)이면 표 머리글 하나 때문에 SemiBold 서체(한글 세트만 132KB)를 더 받는다 — 이미 받는 Bold로 맞춘다 */
+.prose.article :where(th) {
+  font-weight: 700;
 }
 
 /* 마루부리는 획이 가늘어 작은 크기에서 흐려 보인다 — 넓은 화면에서는 한 단계 키운다 */

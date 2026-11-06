@@ -41,7 +41,7 @@ const groups = CATEGORY_IDS.map((category) => ({
   >
     <Icon name="search" class="size-3.5" />
     <span>검색</span>
-    <kbd class="ml-auto text-xs opacity-70">⌘K</kbd>
+    <kbd class="ml-auto text-xs text-muted-foreground">⌘K</kbd>
   </button>
 
   <nav aria-label="바로가기" class="mt-lg">
@@ -54,7 +54,7 @@ const groups = CATEGORY_IDS.map((category) => ({
               data-nav-link
               data-active-prefixes={item.activePrefixes.join(' ')}
               aria-current={isShortcutActive(item) ? 'page' : undefined}
-              class="block rounded-md px-sm py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-primary-subtle aria-[current=page]:font-bold aria-[current=page]:text-primary"
+              class="block rounded-md px-sm py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-primary-subtle aria-[current=page]:font-bold aria-[current=page]:text-primary dark:aria-[current=page]:text-primary-accent"
             >
               {item.label}
             </a>
