@@ -24,10 +24,28 @@ const DRAWER_CATEGORY_GROUP = 'drawer-category';
 
 const desktop = window.matchMedia(DESKTOP_QUERY);
 
+const remeasuredHosts = new WeakSet<HTMLElement>();
+
+/**
+ * 라이브러리는 DOM이 바뀐 순간에만 넘침을 잰다. 접이식(details)은 `open`이 바뀐 뒤 높이 애니메이션으로 커지는데
+ * 이 애니메이션은 전환 이벤트도 보내지 않아, 처음에 넘침이 없던 사이드바(홈: 카테고리가 모두 접힘)는 펼친 뒤에도
+ * overflow: hidden으로 남아 휠이 먹지 않았다 — 내용 크기가 바뀔 때마다 다시 재게 한다.
+ * 스크롤 영역 자체는 화면 높이로 고정이라, 실제로 커지는 안쪽 자식들을 지켜본다.
+ */
+function remeasureOnContentResize(host: HTMLElement, content: HTMLElement) {
+  if (remeasuredHosts.has(host)) return;
+  remeasuredHosts.add(host);
+  const observer = new ResizeObserver(() => OverlayScrollbars(host)?.update(true));
+  [...content.children].forEach((child) => observer.observe(child));
+}
+
 /** 떠 있는 스크롤바를 붙이고, 실제로 스크롤되는 요소를 돌려준다(라이브러리가 취소되면 대상 자신). */
 function attachScrollbar(host: HTMLElement) {
   const instance = OverlayScrollbars(host, SCROLLBAR_OPTIONS);
-  return instance.state().destroyed ? host : instance.elements().viewport;
+  if (instance.state().destroyed) return host;
+  const { viewport, content } = instance.elements();
+  remeasureOnContentResize(host, content);
+  return viewport;
 }
 
 // ── 사이드바 ─────────────────────────────────────────────────
