@@ -295,6 +295,11 @@
   animation: none;
 }
 
+/* 본문은 스크롤한 만큼 이전·새 위치가 벌어진다(수천 px) — 위치를 옮기는 기본 애니메이션을 끄지 않으면 화면 전체가 미끄러진다 */
+::view-transition-group(page) {
+  animation: none;
+}
+
 ::view-transition-old(page) {
   animation: var(--motion-out) ease-in both motion-fade-out;
 }
