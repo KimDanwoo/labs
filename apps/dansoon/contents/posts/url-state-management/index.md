@@ -5,8 +5,9 @@ publishedAt: "2026-07-29T16:09:06+09:00"
 updatedAt: "2026-08-02T18:20:32+09:00"
 category: "dev"
 tags: ["state-management"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/28"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 예약 플로우의 상태를 URL에 두고 구현했다. URL은 내가 중요하게 본 문제를 해결했지만 그 과정에서 외부 입력 검증과 History 정책, 확정 시점의 구분이라는 문제도 함께 다뤄야 했다.

@@ -5,8 +5,9 @@ publishedAt: "2025-08-01T10:00:52+09:00"
 updatedAt: "2025-08-03T09:32:19+09:00"
 category: "dev"
 tags: ["javascript"]
-thumbnail: "./thumbnail.jpg"
 legacyUrl: "https://dansoon-dev.tistory.com/18"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 자바스크립트는 어떻게 구조를 갖춰 왔을까

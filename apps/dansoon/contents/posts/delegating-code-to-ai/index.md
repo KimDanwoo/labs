@@ -4,8 +4,9 @@ description: "AI가 만든 코드가 각각은 맞는데 전체가 틀어지는 
 publishedAt: "2026-08-07T15:59:14+09:00"
 category: "dev"
 tags: ["ai"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/30"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 코드는 맡겨도, 판단까지 맡길 수는 없었다

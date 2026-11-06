@@ -4,8 +4,9 @@ description: "불확실한 신규 프로젝트 합류부터 팀 문화, 결혼 �
 publishedAt: "2025-12-31T16:25:04+09:00"
 category: "retro"
 tags: []
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/26"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 1. 새로운 프로젝트에 합류

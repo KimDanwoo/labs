@@ -4,8 +4,9 @@ description: "App Router의 레이아웃 트리와 라우팅이 SSR, 캐시, SEO
 publishedAt: "2025-11-30T15:45:55+09:00"
 category: "dev"
 tags: ["nextjs","seo"]
-thumbnail: "./thumbnail.jpg"
 legacyUrl: "https://dansoon-dev.tistory.com/24"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 레이아웃과 라우팅 설계가 운영에 미치는 영향

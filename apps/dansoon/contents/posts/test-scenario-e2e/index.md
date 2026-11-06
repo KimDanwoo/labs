@@ -5,8 +5,9 @@ publishedAt: "2024-12-11T13:26:30+09:00"
 updatedAt: "2025-08-03T09:36:48+09:00"
 category: "dev"
 tags: ["testing"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/9"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 프로젝트 개요: 테스트 시나리오를 직접 작성하다

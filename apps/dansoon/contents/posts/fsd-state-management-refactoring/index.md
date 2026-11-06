@@ -5,8 +5,9 @@ publishedAt: "2024-12-11T13:25:30+09:00"
 updatedAt: "2025-08-03T09:35:55+09:00"
 category: "dev"
 tags: ["fsd","state-management"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/7"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 기존 코드의 문제: 상태·API·UI가 한 파일에 얽힘

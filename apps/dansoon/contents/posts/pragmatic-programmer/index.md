@@ -4,8 +4,9 @@ description: "『실용주의 프로그래머』의 ETC, DRY, 직교성 같은 �
 publishedAt: "2025-08-21T13:51:57+09:00"
 category: "reading"
 tags: []
-thumbnail: "./thumbnail.jpg"
 legacyUrl: "https://dansoon-dev.tistory.com/19"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ### AI가 코드를 짜는 시대에 개발자가 하는 일

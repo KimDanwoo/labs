@@ -4,8 +4,9 @@ description: "shallowEquals·deepEquals, useMemo, useCallback, memo를 직접 �
 publishedAt: "2024-12-11T13:23:34+09:00"
 category: "dev"
 tags: ["react"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/5"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 1\. 문제: 불필요한 재렌더링과 메모이제이션

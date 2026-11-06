@@ -5,8 +5,9 @@ publishedAt: "2025-07-02T10:29:12+09:00"
 updatedAt: "2025-07-29T15:23:10+09:00"
 category: "reading"
 tags: ["functional-programming"]
-thumbnail: "./thumbnail.jpg"
 legacyUrl: "https://dansoon-dev.tistory.com/17"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ### 10주 동안 함수형 코딩을 읽으며 든 생각

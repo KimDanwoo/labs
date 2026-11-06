@@ -4,8 +4,9 @@ description: "Vue 3의 Proxy 반응성 안에서 ref와 reactive가 어떻게 �
 publishedAt: "2025-10-18T14:31:44+09:00"
 category: "dev"
 tags: ["vue","react"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/22"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 들어가며: 기본형은 ref, 객체는 reactive라는 말

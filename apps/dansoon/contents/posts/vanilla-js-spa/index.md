@@ -5,8 +5,9 @@ publishedAt: "2024-12-11T13:20:03+09:00"
 updatedAt: "2025-08-03T09:34:32+09:00"
 category: "dev"
 tags: ["javascript","spa"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/3"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 과제 개요: 프레임워크 없이 SPA 구현하기

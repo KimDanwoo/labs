@@ -5,8 +5,9 @@ publishedAt: "2024-12-11T13:21:01+09:00"
 updatedAt: "2025-08-03T09:34:54+09:00"
 category: "dev"
 tags: ["react","javascript"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/4"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 1\. 문제: 가상 DOM을 직접 구현해야 했다

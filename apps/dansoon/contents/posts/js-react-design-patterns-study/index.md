@@ -5,8 +5,9 @@ publishedAt: "2025-04-01T12:50:36+09:00"
 updatedAt: "2025-07-29T15:23:55+09:00"
 category: "reading"
 tags: ["react","design-pattern"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/16"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 코드 구조화 문제를 풀려고 읽은 책

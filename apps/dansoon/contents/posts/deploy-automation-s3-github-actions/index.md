@@ -5,8 +5,9 @@ publishedAt: "2024-12-11T13:27:04+09:00"
 updatedAt: "2025-08-04T13:36:07+09:00"
 category: "dev"
 tags: ["ci-cd"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/10"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 1\. 문제: AWS로 CI/CD 파이프라인 구축하기

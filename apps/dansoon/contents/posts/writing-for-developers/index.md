@@ -4,8 +4,9 @@ description: "『개발자의 글쓰기』를 바탕으로 문장 구조, 띄어
 publishedAt: "2025-09-29T09:33:03+09:00"
 category: "reading"
 tags: ["writing"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/21"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 개발자에게 글쓰기가 중요한 이유

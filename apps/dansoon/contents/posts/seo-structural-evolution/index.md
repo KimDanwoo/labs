@@ -5,8 +5,9 @@ publishedAt: "2025-09-17T10:49:05+09:00"
 updatedAt: "2025-10-27T17:23:04+09:00"
 category: "dev"
 tags: ["seo"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/20"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## Next.js만 쓰면 SEO가 해결될까

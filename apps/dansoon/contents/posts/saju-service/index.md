@@ -4,8 +4,9 @@ description: "AI에 구현을 맡기고 다른 AI로 교차 검토하며 사주 
 publishedAt: "2026-11-04T14:18:26+09:00"
 category: "dev"
 tags: ["ai","side-project"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/31"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ![사주 서비스 제작기 표지 일러스트](./image-1.png)

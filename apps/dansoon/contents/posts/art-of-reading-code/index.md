@@ -4,8 +4,9 @@ description: "『프로그램을 읽는 기술』에서 배운 목적 중심·�
 publishedAt: "2025-12-31T16:22:06+09:00"
 category: "reading"
 tags: []
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/25"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ### 코드 읽기에 시간을 쓰는 개발자의 고민

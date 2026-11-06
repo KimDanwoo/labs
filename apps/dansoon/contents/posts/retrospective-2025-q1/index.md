@@ -5,8 +5,9 @@ publishedAt: "2025-03-14T16:30:47+09:00"
 updatedAt: "2025-11-17T13:09:00+09:00"
 category: "retro"
 tags: []
-thumbnail: "./thumbnail.jpg"
 legacyUrl: "https://dansoon-dev.tistory.com/15"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 회사에서 1분기부터 시작된 '방구하기 프로젝트'가 드디어 첫 번째 마일스톤을 완료했다. 이 프로젝트를 진행하면서 경험한 기술적인 도전과 배움을 정리한다. 레거시 환경을 새 프레임워크로 옮기려던 고민은 [24년 회고](/posts/retrospective-2024/)에 적었다.

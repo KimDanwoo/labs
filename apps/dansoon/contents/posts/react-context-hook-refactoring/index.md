@@ -5,8 +5,9 @@ publishedAt: "2024-12-11T13:25:06+09:00"
 updatedAt: "2025-08-03T09:35:29+09:00"
 category: "dev"
 tags: ["react","state-management"]
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/6"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 ## 1\. 문제: 흩어진 상태와 중복된 코드

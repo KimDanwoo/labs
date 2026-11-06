@@ -5,8 +5,9 @@ publishedAt: "2024-12-11T13:29:58+09:00"
 updatedAt: "2026-11-06T12:00:00+09:00"
 category: "retro"
 tags: []
-thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/11"
+thumbnail: "./thumbnail.jpg"
+cover: "./cover.jpg"
 ---
 
 "더 깊이 알고 싶다", "이게 최선일까?", "정말 이게 맞는 걸까?"
