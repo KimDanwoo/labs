@@ -6,30 +6,38 @@ category: 'bestseller'
 isHidden: true
 ---
 
-## 🏅 일반 도서 베스트셀러 TOP 15
+## 일반 도서 베스트셀러 TOP 15
 
-|  순위  | 책                                                                                                                                                                        | 저자                | 장르     | 알라딘 | 교보문고 | YES24 | 리디 |
-| :----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | -------- | :----: | :------: | :---: | :--: |
-| **1**  | [프로젝트 헤일메리](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=270454373&partner=openAPI&start=api)                                                               | 앤디 위어           | 소설     |  1위   |   2위    |  1위  |  -   |
-| **2**  | [안녕이라 그랬어](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=365665217&partner=openAPI&start=api)                                                                 | 김애란              | 소설     |  6위   |   4위    |  3위  |  -   |
-| **3**  | [품격 있는 대화를 위한 지식 브리핑](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=392447560&partner=openAPI&start=api)                                               | 김진                | 소설     |  5위   |   1위    |  8위  |  -   |
-| **4**  | [2026 큰별쌤 최태성의 별★별한국사 기출 500제 한국사능력검정시험 심화 (1, 2, 3급)](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=379922349&partner=openAPI&start=api) | 최태성              | 인문사회 |  15위  |   6위    |  6위  |  -   |
-| **5**  | [인생을 위한 최소한의 생각](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=385481121&partner=openAPI&start=api)                                                       | 신영준              | 소설     |  16위  |   9위    |  9위  |  -   |
-| **6**  | [바다에서 온 소년](https://store.kyobobook.co.kr/bestseller/online)                                                                                                       | 개럿 카             | 소설     |   -    |   5위    |  7위  |  -   |
-| **7**  | [니체의 초월자](https://store.kyobobook.co.kr/bestseller/online)                                                                                                          | 프리드리히 니체     | 인문사회 |   -    |   8위    | 10위  |  -   |
-| **8**  | [모순](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&partner=openAPI&start=api)                                                                             | 양귀자              | 소설     |  12위  |    -     | 12위  |  -   |
-| **9**  | [페르세폴리스](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=193382764&partner=openAPI&start=api)                                                                    | 마르얀 사트라피     | 소설     |  11위  |    -     | 16위  |  -   |
-| **10** | [우리가 사랑한 책](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391174039&partner=openAPI&start=api)                                                                | 김혜리              | 소설     |  7위   |    -     |   -   |  -   |
-| **11** | [체호프 단편선](https://store.kyobobook.co.kr/bestseller/online)                                                                                                          | 안톤 체호프         | 소설     |   -    |   7위    |   -   |  -   |
-| **12** | [백지 앞에서](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391370049&partner=openAPI&start=api)                                                                     | 최은영              | 에세이   |  8위   |    -     |   -   |  -   |
-| **13** | [젊은 베르테르의 슬픔 (먼슬리 클래식)](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=392517373&partner=openAPI&start=api)                                            | 요한 볼프강 폰 괴테 | 소설     |  10위  |    -     |   -   |  -   |
-| **14** | [나의 완벽한 장례식](https://store.kyobobook.co.kr/bestseller/online)                                                                                                     | 조현선              | 소설     |   -    |   10위   |   -   |  -   |
+**변동**은 지난주 종합 순위와 비교한 값입니다(NEW: 새로 들어온 책).
+
+### 이번 주 한눈에
+
+- 새로 들어온 책 8권: **품격 있는 대화를 위한 지식 브리핑**, **2026 큰별쌤 최태성의 별★별한국사 기출 500제 한국사능력검정시험 심화 (1, 2, 3급)**, **니체의 초월자** 외 5권
+- 가장 많이 오른 책: **바다에서 온 소년** (6위, ▲6)
+- 가장 오래 순위권: **프로젝트 헤일메리** (3주 연속)
+
+|  순위  | 변동 | 책                                                                                                                                                                        | 저자                | 장르     | 알라딘 | 교보문고 | YES24 | 리디 |
+| :----: |:----:| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | -------- | :----: | :------: | :---: | :--: |
+| **1**  | - | [프로젝트 헤일메리](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=270454373&partner=openAPI&start=api)                                                               | 앤디 위어           | 소설     |  1위   |   2위    |  1위  |  -   |
+| **2**  | - | [안녕이라 그랬어](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=365665217&partner=openAPI&start=api)                                                                 | 김애란              | 소설     |  6위   |   4위    |  3위  |  -   |
+| **3**  | NEW | [품격 있는 대화를 위한 지식 브리핑](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=392447560&partner=openAPI&start=api)                                               | 김진                | 소설     |  5위   |   1위    |  8위  |  -   |
+| **4**  | NEW | [2026 큰별쌤 최태성의 별★별한국사 기출 500제 한국사능력검정시험 심화 (1, 2, 3급)](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=379922349&partner=openAPI&start=api) | 최태성              | 인문사회 |  15위  |   6위    |  6위  |  -   |
+| **5**  | - | [인생을 위한 최소한의 생각](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=385481121&partner=openAPI&start=api)                                                       | 신영준              | 소설     |  16위  |   9위    |  9위  |  -   |
+| **6**  | ▲6 | [바다에서 온 소년](https://store.kyobobook.co.kr/bestseller/online)                                                                                                       | 개럿 카             | 소설     |   -    |   5위    |  7위  |  -   |
+| **7**  | NEW | [니체의 초월자](https://store.kyobobook.co.kr/bestseller/online)                                                                                                          | 프리드리히 니체     | 인문사회 |   -    |   8위    | 10위  |  -   |
+| **8**  | - | [모순](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&partner=openAPI&start=api)                                                                             | 양귀자              | 소설     |  12위  |    -     | 12위  |  -   |
+| **9**  | NEW | [페르세폴리스](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=193382764&partner=openAPI&start=api)                                                                    | 마르얀 사트라피     | 소설     |  11위  |    -     | 16위  |  -   |
+| **10** | NEW | [우리가 사랑한 책](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391174039&partner=openAPI&start=api)                                                                | 김혜리              | 소설     |  7위   |    -     |   -   |  -   |
+| **11** | NEW | [체호프 단편선](https://store.kyobobook.co.kr/bestseller/online)                                                                                                          | 안톤 체호프         | 소설     |   -    |   7위    |   -   |  -   |
+| **12** | NEW | [백지 앞에서](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391370049&partner=openAPI&start=api)                                                                     | 최은영              | 에세이   |  8위   |    -     |   -   |  -   |
+| **13** | NEW | [젊은 베르테르의 슬픔 (먼슬리 클래식)](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=392517373&partner=openAPI&start=api)                                            | 요한 볼프강 폰 괴테 | 소설     |  10위  |    -     |   -   |  -   |
+| **14** | ▼7 | [나의 완벽한 장례식](https://store.kyobobook.co.kr/bestseller/online)                                                                                                     | 조현선              | 소설     |   -    |   10위   |   -   |  -   |
 
 ---
 
-## 📚 장르별 베스트셀러
+## 장르별 베스트셀러
 
-### 📖 소설
+### 소설
 
 | 순위  | 책                                                                                                                             | 저자                | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | ------------------------------------------------------------------------------------------------------------------------------ | ------------------- | :----: | :------: | :---: | :--: |
@@ -39,7 +47,7 @@ isHidden: true
 | **4** | [모순](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&partner=openAPI&start=api)                                  | 양귀자              |  4위   |    -     | 12위  |  -   |
 | **5** | [젊은 베르테르의 슬픔 (먼슬리 클래식)](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=392517373&partner=openAPI&start=api) | 요한 볼프강 폰 괴테 |  3위   |    -     |   -   |  -   |
 
-### 💼 경제경영
+### 경제경영
 
 | 순위  | 책                                                                                                                            | 저자                | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | ----------------------------------------------------------------------------------------------------------------------------- | ------------------- | :----: | :------: | :---: | :--: |
@@ -49,7 +57,7 @@ isHidden: true
 | **4** | [AI, 신의 탄생 인간의 종말](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389318783&partner=openAPI&start=api)           | 엘리에저 유드코스키 |  4위   |    -     |   -   |  -   |
 | **5** | [한 권의 재테크 수업](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=390782898&partner=openAPI&start=api)                 | 수미숨(상의민)      |  5위   |    -     |   -   |  -   |
 
-### 🚀 자기계발
+### 자기계발
 
 | 순위  | 책                                                                                                                       | 저자              | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | ------------------------------------------------------------------------------------------------------------------------ | ----------------- | :----: | :------: | :---: | :--: |
@@ -59,7 +67,7 @@ isHidden: true
 | **4** | [완벽한 원시인](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=386947012&partner=openAPI&start=api)                  | 자청              |  2위   |    -     |   -   |  -   |
 | **5** | [무례한 세상에서 나를 지키는 법](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388169547&partner=openAPI&start=api) | 발타사르 그라시안 |  3위   |    -     |   -   |  -   |
 
-### 🌍 인문사회
+### 인문사회
 
 | 순위  | 책                                                                                                                          | 저자            | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | --------------------------------------------------------------------------------------------------------------------------- | --------------- | :----: | :------: | :---: | :--: |
@@ -69,7 +77,7 @@ isHidden: true
 | **4** | [인생을 위한 최소한의 생각](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=385481121&partner=openAPI&start=api)         | 신영준          |  3위   |    -     |   -   |  -   |
 | **5** | [완벽한 원시인](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=386947012&partner=openAPI&start=api)                     | 자청            |  4위   |    -     |   -   |  -   |
 
-### 🔬 과학기술
+### 과학기술
 
 | 순위  | 책                                                                                                                                         | 저자                | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------- | :----: | :------: | :---: | :--: |
@@ -79,7 +87,7 @@ isHidden: true
 | **4** | [기계가 언어를 사용한다는 것에 대한 인문학적 사유](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391649125&partner=openAPI&start=api) | 마크 코켈버그       |  4위   |    -     |   -   |  -   |
 | **5** | [착한 염증 나쁜 염증](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=391373242&partner=openAPI&start=api)                              | 이승훈              |  5위   |    -     |   -   |  -   |
 
-### ✍️ 에세이
+### 에세이
 
 | 순위  | 책                                                                                                             | 저자   | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | -------------------------------------------------------------------------------------------------------------- | ------ | :----: | :------: | :---: | :--: |

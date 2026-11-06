@@ -6,7 +6,7 @@ category: "bestseller"
 isHidden: true
 ---
 
-## 🏅 일반 도서 베스트셀러 TOP 15
+## 일반 도서 베스트셀러 TOP 15
 
 각 서점의 **전체 베스트셀러 순위**입니다. 리디는 제공 범위상 11위까지만 집계됩니다.
 
@@ -15,32 +15,40 @@ isHidden: true
 계산합니다. 서점마다 확인 가능한 순위 깊이가 달라(알라딘·교보문고·YES24 20위,
 리디 11위) 순위를 그대로 더하지 않습니다.
 
-| 순위 | 책 | 저자 | 장르 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |
-|:----:|-----|------|------|:----:|:------:|:-------:|:-----:|:----:|
-| **1** | [오디세이아](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=362390080&amp;partner=openAPI&amp;start=api) | 호메로스 | 인문사회 | 88 | 5위 | 2위 | 2위 | 3위 |
-| **2** | [세네카, 오늘을 빼앗기고 있는 당신에게](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396404956&amp;partner=openAPI&amp;start=api) | 루키우스 안나이우스 세네카 | 인문사회 | 75 | 1위 | 1위 | 1위 | - |
-| **3** | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api) | 헤르만 헤세 | 소설 | 62 | 3위 | 5위 | 5위 | - |
-| **4** | [오뒷세이아](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=686827&amp;partner=openAPI&amp;start=api) | 호메로스 | 소설 | 59 | 4위 | 12위 | 9위 | 7위 |
-| **5** | [그랬다고 적었다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400193697&amp;partner=openAPI&amp;start=api) | 김애란 | 에세이 | 42 | 2위 | - | 6위 | - |
-| **6** | [안녕, 피터팬](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396458047&amp;partner=openAPI&amp;start=api) | 전경철 | 에세이 | 41 | 19위 | 3위 | 8위 | - |
-| **7** | [투명한 나선](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398021172&amp;partner=openAPI&amp;start=api) | 히가시노 게이고 | 소설 | 35 | 8위 | 17위 | 10위 | - |
-| **8** | [수족관](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330811810&amp;partner=openAPI&amp;start=api) | 유래혁 | 소설 | 35 | 12위 | 6위 | 17위 | - |
-| **9** | [니체의 초월자](https://product.kyobobook.co.kr/detail/S000218278239) | 프리드리히 니체 | 인문사회 | 31 | - | 13위 | 4위 | - |
-| **10** | [프로젝트 헤일메리](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396798366&amp;partner=openAPI&amp;start=api) | 앤디 위어 | 소설 | 30 | 10위 | - | - | 5위 |
-| **11** | [테오](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396397936&amp;partner=openAPI&amp;start=api) | 앨런 레비 | 소설 | 25 | 18위 | 10위 | 15위 | - |
-| **12** | [원소 원정대](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=393526281&amp;partner=openAPI&amp;start=api) | 아게도리도리 | 과학기술 | 25 | 7위 | 15위 | - | - |
-| **13** | [십이국기 시리즈 세트 (전 14권)](https://ridibooks.com/books/111143856) | 오노 후유미 | 소설 | 25 | - | - | - | 1위 |
-| **14** | [경의원](https://ridibooks.com/books/4999000617) | 이도현 | 소설 | 23 | - | - | - | 2위 |
-| **15** | [기억의 무늬](https://product.kyobobook.co.kr/detail/S000220637951) | 백희성 | 에세이 | 21 | - | 4위 | - | - |
+**변동**은 지난주 종합 순위와 비교한 값입니다(NEW: 새로 들어온 책).
+
+### 이번 주 한눈에
+
+- 새로 들어온 책 4권: **그랬다고 적었다**, **안녕, 피터팬**, **경의원** 외 1권
+- 가장 많이 오른 책: **싯다르타** (3위, ▲2)
+- 가장 오래 순위권: **싯다르타** (10주 연속)
+
+| 순위 | 변동 | 책 | 저자 | 장르 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |
+|:----:|:----:|-----|------|------|:----:|:------:|:-------:|:-----:|:----:|
+| **1** | - | [오디세이아](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=362390080&amp;partner=openAPI&amp;start=api) | 호메로스 | 인문사회 | 88 | 5위 | 2위 | 2위 | 3위 |
+| **2** | - | [세네카, 오늘을 빼앗기고 있는 당신에게](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396404956&amp;partner=openAPI&amp;start=api) | 루키우스 안나이우스 세네카 | 인문사회 | 75 | 1위 | 1위 | 1위 | - |
+| **3** | ▲2 | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api) | 헤르만 헤세 | 소설 | 62 | 3위 | 5위 | 5위 | - |
+| **4** | - | [오뒷세이아](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=686827&amp;partner=openAPI&amp;start=api) | 호메로스 | 소설 | 59 | 4위 | 12위 | 9위 | 7위 |
+| **5** | NEW | [그랬다고 적었다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400193697&amp;partner=openAPI&amp;start=api) | 김애란 | 에세이 | 42 | 2위 | - | 6위 | - |
+| **6** | NEW | [안녕, 피터팬](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396458047&amp;partner=openAPI&amp;start=api) | 전경철 | 에세이 | 41 | 19위 | 3위 | 8위 | - |
+| **7** | ▼4 | [투명한 나선](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398021172&amp;partner=openAPI&amp;start=api) | 히가시노 게이고 | 소설 | 35 | 8위 | 17위 | 10위 | - |
+| **8** | ▼2 | [수족관](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330811810&amp;partner=openAPI&amp;start=api) | 유래혁 | 소설 | 35 | 12위 | 6위 | 17위 | - |
+| **9** | - | [니체의 초월자](https://product.kyobobook.co.kr/detail/S000218278239) | 프리드리히 니체 | 인문사회 | 31 | - | 13위 | 4위 | - |
+| **10** | ▼2 | [프로젝트 헤일메리](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396798366&amp;partner=openAPI&amp;start=api) | 앤디 위어 | 소설 | 30 | 10위 | - | - | 5위 |
+| **11** | ▼4 | [테오](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396397936&amp;partner=openAPI&amp;start=api) | 앨런 레비 | 소설 | 25 | 18위 | 10위 | 15위 | - |
+| **12** | ▲1 | [원소 원정대](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=393526281&amp;partner=openAPI&amp;start=api) | 아게도리도리 | 과학기술 | 25 | 7위 | 15위 | - | - |
+| **13** | ▼1 | [십이국기 시리즈 세트 (전 14권)](https://ridibooks.com/books/111143856) | 오노 후유미 | 소설 | 25 | - | - | - | 1위 |
+| **14** | NEW | [경의원](https://ridibooks.com/books/4999000617) | 이도현 | 소설 | 23 | - | - | - | 2위 |
+| **15** | NEW | [기억의 무늬](https://product.kyobobook.co.kr/detail/S000220637951) | 백희성 | 에세이 | 21 | - | 4위 | - | - |
 
 ---
 
-## 📚 장르별 베스트셀러
+## 장르별 베스트셀러
 
 알라딘·리디는 **해당 장르 베스트셀러 순위**, 교보문고·YES24는 장르별 목록을 제공하지 않아
 **전체 순위**를 그대로 씁니다(그래서 두 서점은 상위 20위에 든 책만 표시됩니다).
 
-### 📖 소설
+### 소설
 
 | 순위 | 책 | 저자 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:----:|:------:|:-------:|:-----:|:----:|
@@ -50,7 +58,7 @@ isHidden: true
 | **4** | [프로젝트 헤일메리](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396798366&amp;partner=openAPI&amp;start=api) | 앤디 위어 | 32 | 4위 | - | - | 5위 |
 | **5** | [오뒷세이아](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=686827&amp;partner=openAPI&amp;start=api) | 호메로스 | 31 | 9위 | 12위 | 9위 | - |
 
-### 💼 경제경영
+### 경제경영
 
 | 순위 | 책 | 저자 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:----:|:------:|:-------:|:-----:|:----:|
@@ -60,7 +68,7 @@ isHidden: true
 | **4** | [나의 첫 번째 부동산 교과서](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=394433203&amp;partner=openAPI&amp;start=api) | 송희구 | 32 | 3위 | 11위 | - | - |
 | **5** | [투자는 심리게임이다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=327823128&amp;partner=openAPI&amp;start=api) | 앙드레 코스톨라니 | 28 | 6위 | - | - | 5위 |
 
-### 🚀 자기계발
+### 자기계발
 
 | 순위 | 책 | 저자 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:----:|:------:|:-------:|:-----:|:----:|
@@ -70,7 +78,7 @@ isHidden: true
 | **4** | [데일 카네기의 인간관계 수업](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398956621&amp;partner=openAPI&amp;start=api) | 데일 카네기 | 22 | 2위 | - | - | - |
 | **5** | [나는 왜 네 말이 힘들까](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398727715&amp;partner=openAPI&amp;start=api) | 박재연 | 20 | 3위 | - | - | - |
 
-### 🌍 인문사회
+### 인문사회
 
 | 순위 | 책 | 저자 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:----:|:------:|:-------:|:-----:|:----:|
@@ -80,7 +88,7 @@ isHidden: true
 | **4** | [오뒷세이아](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=324441050&amp;partner=openAPI&amp;start=api) | 호메로스 | 45 | 2위 | - | - | 2위 |
 | **5** | [일리아스](https://www.yes24.com/product/goods/193352062) | 호메로스 원 | 26 | - | - | 14위 | 4위 |
 
-### 🔬 과학기술
+### 과학기술
 
 | 순위 | 책 | 저자 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:----:|:------:|:-------:|:-----:|:----:|
@@ -90,7 +98,7 @@ isHidden: true
 | **4** | [한국전문소생술](https://ridibooks.com/books/2218000077) | 대한심폐소생협회 | 22 | - | - | - | 2위 |
 | **5** | [숲처럼 생각하기](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398420471&amp;partner=openAPI&amp;start=api) | 벤 롤런스 | 18 | 4위 | - | - | - |
 
-### ✍️ 에세이
+### 에세이
 
 | 순위 | 책 | 저자 | 지수 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:----:|:------:|:-------:|:-----:|:----:|

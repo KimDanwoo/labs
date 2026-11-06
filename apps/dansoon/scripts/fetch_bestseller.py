@@ -27,27 +27,27 @@ if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY 환경변수가 필요합니다.")
 
 GENRES = [
-    {"key": "novel",   "name": "소설",     "emoji": "📖", "aladin_id": 1,     "keywords": [
+    {"key": "novel",   "name": "소설",     "aladin_id": 1,     "keywords": [
         "소설", "fiction", "novel", "sf", "판타지", "로맨스", "추리", "공포", "미스터리",
         "스릴러", "시집", "희곡", "단편", "장편", "문학", "이야기", "동화", "동시"
     ]},
-    {"key": "economy", "name": "경제경영", "emoji": "💼", "aladin_id": 170,   "keywords": [
+    {"key": "economy", "name": "경제경영", "aladin_id": 170,   "keywords": [
         "경제", "경영", "비즈니스", "투자", "재테크", "마케팅", "금융", "주식", "부동산",
         "창업", "스타트업", "회계", "세금", "절세", "부의", "돈의", "돈을", "자산", "펀드"
     ]},
-    {"key": "selfdev", "name": "자기계발", "emoji": "🚀", "aladin_id": 336,   "keywords": [
+    {"key": "selfdev", "name": "자기계발", "aladin_id": 336,   "keywords": [
         "자기계발", "성공", "습관", "리더십", "동기", "긍정", "루틴", "목표", "의지",
         "잠재력", "변화", "성장", "생산성", "집중력", "시간관리", "마인드", "행복"
     ]},
-    {"key": "humanit", "name": "인문사회", "emoji": "🌍", "aladin_id": 656,   "keywords": [
+    {"key": "humanit", "name": "인문사회", "aladin_id": 656,   "keywords": [
         "인문", "사회", "철학", "역사", "정치", "교육", "심리", "문화", "종교", "예술",
         "언어", "윤리", "사상", "고전", "지식", "교양", "미학", "법학", "인간"
     ]},
-    {"key": "science", "name": "과학기술", "emoji": "🔬", "aladin_id": 987,   "keywords": [
+    {"key": "science", "name": "과학기술", "aladin_id": 987,   "keywords": [
         "과학", "기술", "it", "수학", "물리", "생물", "화학", "의학", "ai", "인공지능",
         "뇌", "우주", "자연", "환경", "생태", "진화", "건강", "의료", "코딩", "개발"
     ]},
-    {"key": "essay",   "name": "에세이",   "emoji": "✍️", "aladin_id": 55889, "keywords": [
+    {"key": "essay",   "name": "에세이",   "aladin_id": 55889, "keywords": [
         "에세이", "산문", "여행", "일상", "기행", "감성", "힐링", "치유", "사색", "독립",
         "청춘", "위로", "기억", "이별", "사랑이야기", "수필"
     ]},
@@ -890,7 +890,7 @@ def build_markdown(
     missing = [name for name in SOURCE_NAMES if name not in collected_sources]
     # 서점이 빠진 주는 순위가 그만큼 부분적이다. 숨기지 않고 표에 명시한다.
     missing_note = (
-        f"\n> ⚠️ 이번 주는 **{'·'.join(missing)}** 수집에 실패해 "
+        f"\n> 이번 주는 **{'·'.join(missing)}** 수집에 실패해 "
         f"{'·'.join(collected_sources)} {source_count}개 서점만으로 집계했습니다. "
         "해당 서점에만 오르는 책은 순위에 반영되지 않습니다.\n"
         if missing
@@ -926,7 +926,7 @@ def build_markdown(
             "|:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|",
             *genre_rows,
         ])
-        genre_sections += f"\n### {genre['emoji']} {genre['name']}\n\n{genre_table}\n"
+        genre_sections += f"\n### {genre['name']}\n\n{genre_table}\n"
 
     return f"""---
 title: "일반 도서 베스트셀러 ({date_kr})"
@@ -936,7 +936,7 @@ category: "bestseller"
 isHidden: true
 ---
 
-## 🏅 일반 도서 베스트셀러 TOP {len(charted)}
+## 일반 도서 베스트셀러 TOP {len(charted)}
 
 각 서점의 **전체 베스트셀러 순위**입니다. 리디는 제공 범위상 {RIDI_OVERALL_MAX}위까지만 집계됩니다.
 {missing_note}
@@ -951,7 +951,7 @@ isHidden: true
 
 ---
 
-## 📚 장르별 베스트셀러
+## 장르별 베스트셀러
 
 알라딘·리디는 **해당 장르 베스트셀러 순위**, 교보문고·YES24는 장르별 목록을 제공하지 않아
 **전체 순위**를 그대로 씁니다(그래서 두 서점은 상위 20위에 든 책만 표시됩니다).
@@ -983,6 +983,15 @@ def write_debug_dump(raw_sources: dict, merged: list[dict]) -> pathlib.Path:
     }
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     return path
+
+
+def preserved_note(out_path: pathlib.Path) -> str:
+    """같은 날짜로 다시 만들 때 frontmatter에 직접 써 둔 메모(note)를 지우지 않는다."""
+    if not out_path.exists():
+        return ""
+    front = out_path.read_text(encoding="utf-8").split("\n---\n", 1)[0]
+    match = re.search(r"^note: .*$", front, re.M)
+    return match.group(0) + "\n" if match else ""
 
 
 # ── main ─────────────────────────────────────────────────────
@@ -1104,7 +1113,7 @@ def main():
     out_dir = pathlib.Path("contents/book") / slug
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "index.md"
-    out_path.write_text(md, encoding="utf-8")
+    out_path.write_text(md.replace("\n---\n", f"\n{preserved_note(out_path)}---\n", 1), encoding="utf-8")
     print(f"\n✅ 완료: {out_path}")
 
     # 덤프는 사후 추적용 부가 산출물이다. 여기서 예외가 나면 스크립트가 비정상 종료해

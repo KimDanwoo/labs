@@ -8,8 +8,10 @@ type Props = {
   posts: Post[];
 };
 
-// 2배 해상도 화면을 고려해 표시 크기(최대 7rem)의 두 배로 만든다
-const THUMBNAIL_SIZE = 224;
+// 2배 해상도 화면을 고려해 표시 너비(최대 11rem)의 두 배로 만든다. 썸네일은 1200×630이라 높이는 비율대로 정해진다
+const THUMBNAIL_WIDTH = 352;
+// 모바일 정사각 칸(5rem)의 두 배 높이가 나오도록 3:2 커버의 너비를 정한다
+const MOBILE_COVER_WIDTH = 240;
 
 const { posts } = Astro.props;
 ---
@@ -37,13 +39,24 @@ const { posts } = Astro.props;
               <p class="mt-sm line-clamp-2 leading-relaxed text-muted-foreground">{post.data.description}</p>
             </div>
             {post.data.thumbnail && (
-              <div class="mt-xs size-20 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border sm:size-28">
+              <div class="mt-xs size-20 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border sm:aspect-40/21 sm:h-auto sm:w-44">
+                {/* 모바일 정사각 칸은 제목이 잘리지 않게 제목 없는 커버를 모티프가 있는 오른쪽 기준으로 보여 준다 */}
+                {post.data.cover && (
+                  <Image
+                    src={post.data.cover}
+                    alt=""
+                    width={MOBILE_COVER_WIDTH}
+                    class="size-full object-cover object-right sm:hidden"
+                  />
+                )}
                 <Image
                   src={post.data.thumbnail}
                   alt=""
-                  width={THUMBNAIL_SIZE}
-                  height={THUMBNAIL_SIZE}
-                  class="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                  width={THUMBNAIL_WIDTH}
+                  class:list={[
+                    'size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105',
+                    post.data.cover && 'max-sm:hidden',
+                  ]}
                 />
               </div>
             )}

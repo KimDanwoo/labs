@@ -6,7 +6,7 @@ category: "bestseller"
 isHidden: true
 ---
 
-## 🏅 일반 도서 베스트셀러 TOP 15
+## 일반 도서 베스트셀러 TOP 15
 
 각 서점의 **전체 베스트셀러 순위**입니다. 리디는 제공 범위상 11위까지만 집계됩니다.
 
@@ -15,32 +15,40 @@ isHidden: true
 서점마다 확인 가능한 순위 깊이가 달라(알라딘·교보문고·YES24 20위, 리디 11위)
 순위를 그대로 더하지 않습니다. **출판사**는 알라딘 정보 기준이며, 알라딘에 없는 책은 `-`입니다.
 
-| 순위 | 책 | 저자 | 출판사 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |
-|:----:|-----|------|--------|------|:------:|:-------:|:-----:|:----:|
-| **1** | [빨강의 자서전](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=353110834&amp;partner=openAPI&amp;start=api) | 앤 카슨 | 한겨레출판 | 소설 | 1위 | - | 1위 | 3위 |
-| **2** | [트렌드 코리아 2027](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=401344136&amp;partner=openAPI&amp;start=api) | 김난도 | 미래의창 | 경제경영 | 5위 | 10위 | 3위 | - |
-| **3** | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api) | 헤르만 헤세 | 민음사 | 소설 | 4위 | 13위 | 6위 | 10위 |
-| **4** | [세네카, 오늘을 빼앗기고 있는 당신에게](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=404259167&amp;partner=openAPI&amp;start=api) | 루키우스 안나이우스 세네카 | 논픽션 | 인문사회 | 8위 | 5위 | 8위 | - |
-| **5** | [한국사 이상현상 연구원](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400909759&amp;partner=openAPI&amp;start=api) | 최인서 | 다이브 | 소설 | 9위 | 17위 | 14위 | 2위 |
-| **6** | [가호](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=403216369&amp;partner=openAPI&amp;start=api) | 무라카미 하루키 | 문학동네 | 소설 | 2위 | - | 2위 | - |
-| **7** | [모순](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&amp;partner=openAPI&amp;start=api) | 양귀자 | 쓰다 | 소설 | 14위 | 11위 | 7위 | - |
-| **8** | [돈, 뜨겁게 사랑하고 차갑게 다루어라](https://product.kyobobook.co.kr/detail/S000209182287) | 앙드레 코스톨라니 | 미래의창 | 경제경영 | - | 3위 | 17위 | 8위 |
-| **9** | [가짜 돈 진짜 부](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=403845775&amp;partner=openAPI&amp;start=api) | 박종훈 | 글로퍼스 | 경제경영 | 15위 | 9위 | 10위 | - |
-| **10** | [퍼플필](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=404475638&amp;partner=openAPI&amp;start=api) | 진쏠미 | 클랩북스 | 자기계발 | 7위 | - | 9위 | - |
-| **11** | [빵충 사육 준수 사항](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398726639&amp;partner=openAPI&amp;start=api) | 김혜영 | 안전가옥 | 소설 | 16위 | - | - | 1위 |
-| **12** | [머니 트렌드 2027](https://product.kyobobook.co.kr/detail/S000221075112) | 정태익 외 | 북모먼트 | 경제경영 | - | 8위 | 12위 | - |
-| **13** | [품격 있는 대화를 위한 지식 브리핑(10만 부 기념 특별 한정판)](https://product.kyobobook.co.kr/detail/S000219732915) | 김진 | 북플레저 | 인문사회 | - | 2위 | - | - |
-| **14** | [자연의 것들은 그저 자란다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=403156082&amp;partner=openAPI&amp;start=api) | 이윤 리 | 다산책방 | 에세이 | 6위 | - | - | - |
-| **15** | [예약판매투자에 대한 생각](https://product.kyobobook.co.kr/detail/S000000970535) | 하워드 막스 | - | 경제경영 | - | 6위 | - | - |
+**변동**은 지난주 종합 순위와 비교한 값입니다(NEW: 새로 들어온 책).
+
+### 이번 주 한눈에
+
+- 새로 들어온 책 5권: **돈, 뜨겁게 사랑하고 차갑게 다루어라**, **퍼플필**, **품격 있는 대화를 위한 지식 브리핑(10만 부 기념 특별 한정판)** 외 2권
+- 가장 많이 오른 책: **세네카, 오늘을 빼앗기고 있는 당신에게** (4위, ▲1)
+- 가장 오래 순위권: **싯다르타** (13주 연속)
+
+| 순위 | 변동 | 책 | 저자 | 출판사 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |
+|:----:|:----:|-----|------|--------|------|:------:|:-------:|:-----:|:----:|
+| **1** | - | [빨강의 자서전](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=353110834&amp;partner=openAPI&amp;start=api) | 앤 카슨 | 한겨레출판 | 소설 | 1위 | - | 1위 | 3위 |
+| **2** | - | [트렌드 코리아 2027](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=401344136&amp;partner=openAPI&amp;start=api) | 김난도 | 미래의창 | 경제경영 | 5위 | 10위 | 3위 | - |
+| **3** | - | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api) | 헤르만 헤세 | 민음사 | 소설 | 4위 | 13위 | 6위 | 10위 |
+| **4** | ▲1 | [세네카, 오늘을 빼앗기고 있는 당신에게](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=404259167&amp;partner=openAPI&amp;start=api) | 루키우스 안나이우스 세네카 | 논픽션 | 인문사회 | 8위 | 5위 | 8위 | - |
+| **5** | ▼1 | [한국사 이상현상 연구원](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=400909759&amp;partner=openAPI&amp;start=api) | 최인서 | 다이브 | 소설 | 9위 | 17위 | 14위 | 2위 |
+| **6** | - | [가호](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=403216369&amp;partner=openAPI&amp;start=api) | 무라카미 하루키 | 문학동네 | 소설 | 2위 | - | 2위 | - |
+| **7** | ▲1 | [모순](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&amp;partner=openAPI&amp;start=api) | 양귀자 | 쓰다 | 소설 | 14위 | 11위 | 7위 | - |
+| **8** | NEW | [돈, 뜨겁게 사랑하고 차갑게 다루어라](https://product.kyobobook.co.kr/detail/S000209182287) | 앙드레 코스톨라니 | 미래의창 | 경제경영 | - | 3위 | 17위 | 8위 |
+| **9** | ▲1 | [가짜 돈 진짜 부](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=403845775&amp;partner=openAPI&amp;start=api) | 박종훈 | 글로퍼스 | 경제경영 | 15위 | 9위 | 10위 | - |
+| **10** | NEW | [퍼플필](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=404475638&amp;partner=openAPI&amp;start=api) | 진쏠미 | 클랩북스 | 자기계발 | 7위 | - | 9위 | - |
+| **11** | ▼4 | [빵충 사육 준수 사항](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398726639&amp;partner=openAPI&amp;start=api) | 김혜영 | 안전가옥 | 소설 | 16위 | - | - | 1위 |
+| **12** | ▼1 | [머니 트렌드 2027](https://product.kyobobook.co.kr/detail/S000221075112) | 정태익 외 | 북모먼트 | 경제경영 | - | 8위 | 12위 | - |
+| **13** | NEW | [품격 있는 대화를 위한 지식 브리핑(10만 부 기념 특별 한정판)](https://product.kyobobook.co.kr/detail/S000219732915) | 김진 | 북플레저 | 인문사회 | - | 2위 | - | - |
+| **14** | NEW | [자연의 것들은 그저 자란다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=403156082&amp;partner=openAPI&amp;start=api) | 이윤 리 | 다산책방 | 에세이 | 6위 | - | - | - |
+| **15** | NEW | [예약판매투자에 대한 생각](https://product.kyobobook.co.kr/detail/S000000970535) | 하워드 막스 | - | 경제경영 | - | 6위 | - | - |
 
 ---
 
-## 📚 장르별 베스트셀러
+## 장르별 베스트셀러
 
 알라딘·리디는 **해당 장르 베스트셀러 순위**, 교보문고·YES24는 장르별 목록을 제공하지 않아
 **전체 순위**를 그대로 씁니다(그래서 두 서점은 상위 20위에 든 책만 표시됩니다).
 
-### 📖 소설
+### 소설
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
@@ -50,7 +58,7 @@ isHidden: true
 | **4** | [가호](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=403216369&amp;partner=openAPI&amp;start=api) | 무라카미 하루키 | 문학동네 | 2위 | - | 2위 | - |
 | **5** | [모순](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&amp;partner=openAPI&amp;start=api) | 양귀자 | 쓰다 | 6위 | 11위 | 7위 | - |
 
-### 💼 경제경영
+### 경제경영
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
@@ -60,7 +68,7 @@ isHidden: true
 | **4** | [머니 트렌드 2027](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=401122536&amp;partner=openAPI&amp;start=api) | 정태익 | 북모먼트 | 6위 | 8위 | 12위 | - |
 | **5** | [트렌드 코리아 2027 : 2027 대한민국 소비트렌드 전망](https://ridibooks.com/books/754051942) | 김난도 | - | - | - | - | 1위 |
 
-### 🚀 자기계발
+### 자기계발
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
@@ -70,7 +78,7 @@ isHidden: true
 | **4** | [어떻게 살아낼 것인가](https://ridibooks.com/books/3435000125) | 짐 콜린스 | 필름(Feelm) | - | - | - | 1위 |
 | **5** | [주의를 기울이는 법](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=402344037&amp;partner=openAPI&amp;start=api) | 롭 워커 | 마주 | 2위 | - | - | - |
 
-### 🌍 인문사회
+### 인문사회
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
@@ -80,7 +88,7 @@ isHidden: true
 | **4** | [서늘한 대화](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=403713715&amp;partner=openAPI&amp;start=api) | 정재승 | 어크로스 | 2위 | - | - | - |
 | **5** | [지능의 기원 : 우리의 뇌 그리고 AI를 만든 다섯 번의 혁신](https://ridibooks.com/books/754044013) | 맥스 베넷 | - | - | - | - | 2위 |
 
-### 🔬 과학기술
+### 과학기술
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|
@@ -90,7 +98,7 @@ isHidden: true
 | **4** | [서늘한 대화](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=403713715&amp;partner=openAPI&amp;start=api) | 정재승 | 어크로스 | 1위 | - | - | - |
 | **5** | [지능의 기원](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=355714458&amp;partner=openAPI&amp;start=api) | 맥스 베넷 | 더퀘스트 | 2위 | - | - | - |
 
-### ✍️ 에세이
+### 에세이
 
 | 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|

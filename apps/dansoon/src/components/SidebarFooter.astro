@@ -1,0 +1,27 @@
+---
+import Icon from '~/components/Icon.astro';
+import ThemeToggle from '~/components/ThemeToggle.astro';
+---
+
+<div data-sidebar-footer class="border-t border-border px-md py-sm">
+  <div class="flex items-center gap-xs text-sm text-muted-foreground">
+    <a
+      href="https://github.com/KimDanwoo"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex size-9 items-center justify-center rounded-md hover:bg-muted hover:text-foreground"
+      aria-label="GitHub"
+    >
+      <Icon name="github" />
+    </a>
+    <a
+      href="https://lab.danwoo.dev"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex h-9 items-center gap-xs rounded-md px-sm hover:bg-muted hover:text-foreground"
+    >
+      Labs <Icon name="arrow-up-right" class="size-3" />
+    </a>
+    <span class="ml-auto"><ThemeToggle /></span>
+  </div>
+</div>

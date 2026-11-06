@@ -33,7 +33,9 @@ import Icon from '~/components/Icon.astro';
     </div>
     <p id="search-status" class="px-md pt-sm text-xs text-muted-foreground" aria-live="polite"></p>
     <p id="search-hint" class="sr-only">아래 화살표로 결과로 이동하고, Enter로 첫 결과를 엽니다.</p>
-    <ul id="search-results" class="overflow-y-auto p-sm" aria-label="검색 결과"></ul>
+    <div data-overlay-scroll class="min-h-0 overflow-y-auto">
+      <ul id="search-results" class="p-sm" aria-label="검색 결과"></ul>
+    </div>
   </div>
 </dialog>
 
@@ -49,6 +51,10 @@ import Icon from '~/components/Icon.astro';
   };
 
   const RESULT_LIMIT = 20;
+  // 검색어가 없을 때 보여 줄 최근 글 수. 인덱스는 최신 글 순서로 만들어진다
+  const RECENT_LIMIT = 5;
+  // 타이핑이 멈춘 뒤에만 검색한다(한 글자마다 전체 본문을 훑지 않도록)
+  const SEARCH_DEBOUNCE_MS = 150;
   const SNIPPET_RADIUS = 48;
   const SCORE = { title: 6, tag: 4, description: 2, text: 1 } as const;
 
@@ -59,6 +65,7 @@ import Icon from '~/components/Icon.astro';
 
   let documents: Promise<SearchDocument[]> | null = null;
   let latestQuery = '';
+  let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
   const normalize = (text: string) => text.normalize('NFC').toLowerCase();
   const termsOf = (query: string) => normalize(query).split(/\s+/).filter(Boolean);
@@ -107,6 +114,10 @@ import Icon from '~/components/Icon.astro';
 
   /** 사용자 입력이 섞인 문자열이므로 innerHTML 없이 텍스트 노드와 <mark>로만 그린다. */
   function appendHighlighted(target: HTMLElement, text: string, terms: string[]) {
+    if (terms.length === 0) {
+      target.append(text);
+      return;
+    }
     const pattern = new RegExp(`(${terms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi');
     for (const part of text.split(pattern)) {
       if (!part) continue;
@@ -155,13 +166,27 @@ import Icon from '~/components/Icon.astro';
     links[Math.min(next, links.length - 1)]?.focus();
   }
 
+  /** 검색어가 없으면 무엇을 찾을 수 있는지 알려 주고, 바로 고를 수 있게 최근 글을 보여 준다. */
+  async function showEmptyState() {
+    if (!list || !status) return;
+    list.replaceChildren();
+    status.textContent = '최근에 쓴 글이에요. 찾는 내용이 있으면 위에 입력해 주세요.';
+    let loaded: SearchDocument[];
+    try {
+      loaded = await loadDocuments();
+    } catch {
+      return;
+    }
+    if (latestQuery.trim() !== '') return;
+    list.append(...loaded.slice(0, RECENT_LIMIT).map((document_) => renderResult(document_, [])));
+  }
+
   async function search(query: string) {
     if (!list || !status) return;
     latestQuery = query;
     const terms = termsOf(query);
     if (terms.length === 0) {
-      list.replaceChildren();
-      status.textContent = '';
+      await showEmptyState();
       return;
     }
     let loaded: SearchDocument[];
@@ -185,10 +210,22 @@ import Icon from '~/components/Icon.astro';
     list.append(...ranked.map(({ document_ }) => renderResult(document_, terms)));
   }
 
+  function scheduleSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => void search(input?.value ?? ''), SEARCH_DEBOUNCE_MS);
+  }
+
+  /** Enter는 기다리지 않는다 — 예약된 검색을 바로 실행해 지금 입력에 맞는 첫 결과로 이동한다. */
+  async function searchNow() {
+    clearTimeout(searchTimer);
+    await search(input?.value ?? '');
+  }
+
   function open() {
     if (!dialog || dialog.open) return;
     dialog.showModal();
     input?.select();
+    if (!input?.value.trim()) void showEmptyState();
     // 미리 받아 두기만 한다 — 실패는 실제 검색할 때 안내한다
     loadDocuments().catch(() => {});
   }
@@ -203,7 +240,7 @@ import Icon from '~/components/Icon.astro';
   dialog?.addEventListener('click', (event) => {
     if (event.target === dialog) dialog.close();
   });
-  input?.addEventListener('input', () => void search(input.value));
+  input?.addEventListener('input', scheduleSearch);
   dialog?.addEventListener('keydown', (event) => {
     // 한글 조합 중 Enter·방향키는 IME가 쓰므로 가로채지 않는다
     if (event.isComposing) return;
@@ -211,9 +248,11 @@ import Icon from '~/components/Icon.astro';
       event.preventDefault();
       moveFocus(event.key === 'ArrowDown' ? 1 : -1);
     }
-    if (event.key === 'Enter' && event.target === input) {
-      const [first] = resultLinks();
-      if (first) window.location.href = first.href;
+    if (event.key === 'Enter' && event.target === input && input?.value.trim()) {
+      void searchNow().then(() => {
+        const [first] = resultLinks();
+        if (first) window.location.href = first.href;
+      });
     }
   });
   // 검색 결과를 눌러 이동하면 열려 있던 모달을 닫는다(모달은 페이지를 옮겨도 남아 있다)

@@ -1,0 +1,907 @@
+{
+  "date": "2026-05-11",
+  "platforms": {
+    "카카오페이지": {
+      "fantasy": [
+        {
+          "title": "내가 키운 EX급 캐릭터로 탑을 씹어먹음",
+          "author": "은비니",
+          "rank": 1
+        },
+        {
+          "title": "F급 수의사가 S급 마수를 물리치료함",
+          "author": "이햄찌",
+          "rank": 2
+        },
+        {
+          "title": "내가 키운 검들이 너무 강함",
+          "author": "불곰주먹",
+          "rank": 3
+        },
+        {
+          "title": "최약체 테이머가 SSS급 드래곤을 길들이는 법",
+          "author": "Dagzo",
+          "rank": 4
+        },
+        {
+          "title": "재해를 먹는 마법사",
+          "author": "마지막검사",
+          "rank": 5
+        },
+        {
+          "title": "마법학교 마법사로 살아가는 법",
+          "author": "글쓰는기계",
+          "rank": 6
+        },
+        {
+          "title": "미궁탐험 101",
+          "author": "김두릅",
+          "rank": 7
+        },
+        {
+          "title": "불탄 사막의 모래술사",
+          "author": "우각",
+          "rank": 8
+        },
+        {
+          "title": "천재 대장장이의 게임",
+          "author": "박민규",
+          "rank": 9
+        },
+        {
+          "title": "일격필살의 소드마스터",
+          "author": "단비령",
+          "rank": 10
+        }
+      ],
+      "romfantasy": [
+        {
+          "title": "복수의 여왕",
+          "author": "달슬",
+          "rank": 1
+        },
+        {
+          "title": "잊혀진 들판",
+          "author": "김수지",
+          "rank": 2
+        },
+        {
+          "title": "멍문세가를 호령하는 아기 고양이입니다",
+          "author": "아울킴",
+          "rank": 3
+        },
+        {
+          "title": "육아물 악녀가 인성을 안 숨김",
+          "author": "샤무아",
+          "rank": 4
+        },
+        {
+          "title": "이번 생은 가주가 되겠습니다",
+          "author": "김로아",
+          "rank": 5
+        },
+        {
+          "title": "성녀님이 거짓말을 너무 잘함!",
+          "author": "무소",
+          "rank": 6
+        },
+        {
+          "title": "아빠가 무인도에서 돌아왔다",
+          "author": "yed",
+          "rank": 7
+        },
+        {
+          "title": "누군가 내 몸에 빙의했다",
+          "author": "신솔라",
+          "rank": 8
+        },
+        {
+          "title": "막내가 뭔갈 많이 숨김",
+          "author": "유유니",
+          "rank": 9
+        },
+        {
+          "title": "악당 아기님이 예언을 함",
+          "author": "자은향",
+          "rank": 10
+        }
+      ],
+      "romance": [
+        {
+          "title": "매화궁 공주님",
+          "author": "김나든",
+          "rank": 1
+        },
+        {
+          "title": "나만 바라보는 예쁜 인형이 되어 주길",
+          "author": "제이이슬",
+          "rank": 2
+        },
+        {
+          "title": "차인 밤, 오빠 친구와",
+          "author": "윤단짠",
+          "rank": 3
+        },
+        {
+          "title": "백호 가문의 아기 솜뭉치",
+          "author": "꿀끼",
+          "rank": 4
+        },
+        {
+          "title": "이번 생엔 남편 말고 오스카상이요",
+          "author": "이그나르",
+          "rank": 5
+        },
+        {
+          "title": "첫사랑의 아이를 임신할 것 [19세 완전판]",
+          "author": "쁠라",
+          "rank": 6
+        },
+        {
+          "title": "윗집 오빠의 야밤 연락",
+          "author": "아유이",
+          "rank": 7
+        },
+        {
+          "title": "첫사랑의 아이를 임신할 것",
+          "author": "쁠라",
+          "rank": 8
+        },
+        {
+          "title": "궁극의 오빠",
+          "author": "재인",
+          "rank": 9
+        },
+        {
+          "title": "무명 여배우인데 모두 날 알아",
+          "author": "크트밀",
+          "rank": 10
+        }
+      ],
+      "modern": [
+        {
+          "title": "데뷔 못 하면 죽는 병 걸림",
+          "author": "백덕수",
+          "rank": 1
+        },
+        {
+          "title": "회사원이 퇴마를 잘함",
+          "author": "호안",
+          "rank": 2
+        },
+        {
+          "title": "미국 씹어먹는 천재 타자",
+          "author": "글생글사",
+          "rank": 3
+        },
+        {
+          "title": "다시 한번 아역부터 슈퍼스타",
+          "author": "재화룡",
+          "rank": 4
+        },
+        {
+          "title": "괴담에 떨어져도 출근을 해야 하는구나",
+          "author": "백덕수",
+          "rank": 5
+        },
+        {
+          "title": "국정원 요원 천재배우로 환생",
+          "author": "류연우",
+          "rank": 6
+        },
+        {
+          "title": "망나니 PD 아이돌로 살아남기",
+          "author": "문찐",
+          "rank": 7
+        },
+        {
+          "title": "초심 잃은 아이돌을 위한 회귀 백서",
+          "author": "리벨",
+          "rank": 8
+        },
+        {
+          "title": "우리 호텔 정상 영업합니다",
+          "author": "취미글주의",
+          "rank": 9
+        },
+        {
+          "title": "1년차 만렙 매니저",
+          "author": "현신",
+          "rank": 10
+        }
+      ],
+      "martial": [
+        {
+          "title": "제암진천경",
+          "author": "유과",
+          "rank": 1
+        },
+        {
+          "title": "쾌검무적",
+          "author": "교암",
+          "rank": 2
+        },
+        {
+          "title": "의원, 다시 살다",
+          "author": "태선",
+          "rank": 3
+        },
+        {
+          "title": "천하제일 무공교관",
+          "author": "신가",
+          "rank": 4
+        },
+        {
+          "title": "진주언가 망나니",
+          "author": "테이글세터",
+          "rank": 5
+        },
+        {
+          "title": "십전무황",
+          "author": "무가람",
+          "rank": 6
+        },
+        {
+          "title": "은해상단 막내아들",
+          "author": "향란",
+          "rank": 7
+        },
+        {
+          "title": "천마등선",
+          "author": "은열",
+          "rank": 8
+        },
+        {
+          "title": "광마전기",
+          "author": "현임",
+          "rank": 9
+        },
+        {
+          "title": "화산천마",
+          "author": "사야객",
+          "rank": 10
+        }
+      ],
+      "bl": [
+        {
+          "title": "담비꺼야",
+          "author": "에뷔시",
+          "rank": 1
+        },
+        {
+          "title": "탁월한 거짓말",
+          "author": "송캐",
+          "rank": 2
+        },
+        {
+          "title": "불완전 개화",
+          "author": "김견맥",
+          "rank": 3
+        },
+        {
+          "title": "계승자들",
+          "author": "리다조",
+          "rank": 4
+        },
+        {
+          "title": "탁월한 거짓말 [19세 완전판]",
+          "author": "송캐",
+          "rank": 5
+        },
+        {
+          "title": "리와인드 릴레이션십 [19세 완전판]",
+          "author": "피아A",
+          "rank": 6
+        },
+        {
+          "title": "정지우, 전국 서열 2위에 빙의하다 [19세 완전판]",
+          "author": "불송",
+          "rank": 7
+        },
+        {
+          "title": "힐러인데 엉덩이가 바쁨",
+          "author": "이동막걸리",
+          "rank": 8
+        },
+        {
+          "title": "대체 남자는 어떻게 꼬시는 거야?",
+          "author": "웹소설BL",
+          "rank": 9
+        }
+      ]
+    },
+    "네이버 시리즈": {
+      "fantasy": [
+        {
+          "title": "아포칼립스에서 마도구를 주웠다",
+          "author": "김일꾼",
+          "rank": 1
+        },
+        {
+          "title": "게임 속 바바리안으로 살아남기",
+          "author": "정윤강",
+          "rank": 2
+        },
+        {
+          "title": "오늘만 사는 기사",
+          "author": "소울풍",
+          "rank": 3
+        },
+        {
+          "title": "하남자의 탑 공략법",
+          "author": "꾸찌꾸찌",
+          "rank": 4
+        },
+        {
+          "title": "몰락민족의 천재 기사",
+          "author": "수박복숭아",
+          "rank": 5
+        },
+        {
+          "title": "검술명가의 네크로맨서",
+          "author": "감튀이이이",
+          "rank": 6
+        },
+        {
+          "title": "판타지에서 나 혼자 선협식 수련",
+          "author": "불로수선전",
+          "rank": 7
+        },
+        {
+          "title": "야생에서 갤러리를 얻었다",
+          "author": "두부두부",
+          "rank": 8
+        },
+        {
+          "title": "악당들의 후원자가 되었다",
+          "author": "봄한방울",
+          "rank": 9
+        },
+        {
+          "title": "이세계서 유부남된 썰",
+          "author": "베르헤라",
+          "rank": 10
+        }
+      ],
+      "romfantasy": [
+        {
+          "title": "무기의 여왕",
+          "author": "바가지",
+          "rank": 1
+        },
+        {
+          "title": "공작님의 아이만 필요합니다",
+          "author": "백단",
+          "rank": 2
+        },
+        {
+          "title": "바람 끝에 남은 이름",
+          "author": "작심이",
+          "rank": 3
+        },
+        {
+          "title": "스캔들 메이커가 돌아왔다",
+          "author": "레몬개구리",
+          "rank": 4
+        },
+        {
+          "title": "대공비가 체질입니다",
+          "author": "레치모나",
+          "rank": 5
+        },
+        {
+          "title": "마론 후작",
+          "author": "자야",
+          "rank": 6
+        },
+        {
+          "title": "언니, 이번 생엔 내가 왕비야",
+          "author": "레팔진프미완",
+          "rank": 7
+        },
+        {
+          "title": "죽음은 잠 못 이루고",
+          "author": "인식론",
+          "rank": 8
+        },
+        {
+          "title": "우리의 모든 거짓말",
+          "author": "시야",
+          "rank": 9
+        },
+        {
+          "title": "드미트리 대공의 노예 신부",
+          "author": "offnun",
+          "rank": 10
+        }
+      ],
+      "romance": [
+        {
+          "title": "더 트레이스",
+          "author": "윤재인",
+          "rank": 1
+        },
+        {
+          "title": "버릴 남편",
+          "author": "꽃우물",
+          "rank": 2
+        },
+        {
+          "title": "미친 상사를 낚았다 [삽화본]",
+          "author": "골드드럼",
+          "rank": 3
+        },
+        {
+          "title": "신비로운 연애",
+          "author": "아슈크림",
+          "rank": 4
+        },
+        {
+          "title": "몰래 내 아이를 낳은 널",
+          "author": "최송지",
+          "rank": 5
+        },
+        {
+          "title": "매리지 레슨",
+          "author": "오대리",
+          "rank": 6
+        },
+        {
+          "title": "또 해요, 교수님",
+          "author": "초연희",
+          "rank": 7
+        },
+        {
+          "title": "응급 연애",
+          "author": "박하",
+          "rank": 8
+        },
+        {
+          "title": "극단적 연애사",
+          "author": "유다른",
+          "rank": 9
+        },
+        {
+          "title": "어린 아내와 나쁜 짓",
+          "author": "이리와",
+          "rank": 10
+        }
+      ],
+      "modern": [
+        {
+          "title": "전능의 노가다꾼이 되었다",
+          "author": "퀀퀀",
+          "rank": 1
+        },
+        {
+          "title": "퇴사 후 아포칼립스로 출근합니다",
+          "author": "포더엠",
+          "rank": 2
+        },
+        {
+          "title": "회사에서 건물주인 걸 안 숨김",
+          "author": "골마지",
+          "rank": 3
+        },
+        {
+          "title": "천재 사학도가 국보급 유물을 잘 찾음",
+          "author": "필빛",
+          "rank": 4
+        },
+        {
+          "title": "미국 트럭커가 골동품으로 대박남",
+          "author": "지나83",
+          "rank": 5
+        },
+        {
+          "title": "전능의 뇌를 얻었다",
+          "author": "몽쉐르",
+          "rank": 6
+        },
+        {
+          "title": "서울에서 주술사로 살아남기",
+          "author": "아우송",
+          "rank": 7
+        },
+        {
+          "title": "천재 투수인데 벤클을 더 잘함",
+          "author": "희도",
+          "rank": 8
+        },
+        {
+          "title": "이혼하고 비트코인 천 개를 찾았다",
+          "author": "예성",
+          "rank": 9
+        },
+        {
+          "title": "사짜 무당이 죽을 날을 알려줌",
+          "author": "와쿤",
+          "rank": 10
+        }
+      ],
+      "martial": [
+        {
+          "title": "화산귀환",
+          "author": "비가",
+          "rank": 1
+        },
+        {
+          "title": "절대회귀",
+          "author": "장영훈",
+          "rank": 2
+        },
+        {
+          "title": "전생검귀",
+          "author": "김이제",
+          "rank": 3
+        },
+        {
+          "title": "멸천수라",
+          "author": "체엔",
+          "rank": 4
+        },
+        {
+          "title": "즉사기 들고 무림에 떨어지다",
+          "author": "오늘도요",
+          "rank": 5
+        },
+        {
+          "title": "모든걸 기억하는 천재무사",
+          "author": "적설목",
+          "rank": 6
+        },
+        {
+          "title": "무신급 점소이가 되었다",
+          "author": "소판양",
+          "rank": 7
+        },
+        {
+          "title": "무협에서 작가로 살아남는 법",
+          "author": "검은먹",
+          "rank": 8
+        },
+        {
+          "title": "시한부 천재가 살아남는 법",
+          "author": "청시소",
+          "rank": 9
+        },
+        {
+          "title": "사천당가의 폭군은 무신이 되었다",
+          "author": "극지여우",
+          "rank": 10
+        }
+      ],
+      "bl": [
+        {
+          "title": "너에게서 벗어나고 싶어 [BL]",
+          "author": "꽃님냥이",
+          "rank": 1
+        },
+        {
+          "title": "구원 말고 구혼 [BL]",
+          "author": "아르곤18",
+          "rank": 2
+        },
+        {
+          "title": "서털구털 [BL]",
+          "author": "밤밤맨",
+          "rank": 3
+        }
+      ]
+    },
+    "리디": {
+      "fantasy": [
+        {
+          "title": "명문고 EX급 조연의 리플레이",
+          "author": "기월월",
+          "rank": 1
+        },
+        {
+          "title": "백작가의 망나니가 되었다",
+          "author": "유려한",
+          "rank": 2
+        },
+        {
+          "title": "내 눈에만 범인이 보임",
+          "author": "스플렌더",
+          "rank": 3
+        },
+        {
+          "title": "주인공이 컨셉충이면 곤란한가요",
+          "author": "해인설",
+          "rank": 4
+        },
+        {
+          "title": "이 소설은 내 소설이 아니다",
+          "author": "별볆볆별명",
+          "rank": 5
+        }
+      ],
+      "romfantasy": [
+        {
+          "title": "약탈자들",
+          "author": "밤오렌지페퍼민트",
+          "rank": 1
+        },
+        {
+          "title": "백조 무덤",
+          "author": "켄디앤씨북스",
+          "rank": 2
+        },
+        {
+          "title": "속죄, 그 잔혹함에 대하여",
+          "author": "한보연",
+          "rank": 3
+        },
+        {
+          "title": "겨울성에 봄비 일면",
+          "author": "박오롯",
+          "rank": 4
+        },
+        {
+          "title": "페레니케",
+          "author": "김차차",
+          "rank": 5
+        },
+        {
+          "title": "안개를 삼킨 나비",
+          "author": "박오롯",
+          "rank": 6
+        },
+        {
+          "title": "상수리나무 아래",
+          "author": "김수지",
+          "rank": 7
+        },
+        {
+          "title": "주제를 아는 결혼",
+          "author": "죄송한취향",
+          "rank": 8
+        },
+        {
+          "title": "살롱 드로리안",
+          "author": "만다라",
+          "rank": 9
+        },
+        {
+          "title": "디어 마이 매드 허니(Dear My Mad Honey)",
+          "author": "글뽑는자판기",
+          "rank": 10
+        },
+        {
+          "title": "초록 풋보리 추신을 엮어",
+          "author": "디키탈리스",
+          "rank": 11
+        }
+      ],
+      "romance": [
+        {
+          "title": "숫것",
+          "author": "가김블랙엔",
+          "rank": 1
+        },
+        {
+          "title": "인투 더 섀도우(Into the shadow)",
+          "author": "이분홍블랙엔",
+          "rank": 2
+        },
+        {
+          "title": "졸업은 해야지",
+          "author": "씨씨블랙엔",
+          "rank": 3
+        },
+        {
+          "title": "가시 돋친 순애",
+          "author": "감언이설래이니북스",
+          "rank": 4
+        },
+        {
+          "title": "크레이지 페어",
+          "author": "블랙라엘몽블랑",
+          "rank": 5
+        },
+        {
+          "title": "음란한 좋은 선배",
+          "author": "양과람블랙엔",
+          "rank": 6
+        },
+        {
+          "title": "순정과 과보호의 역학관계",
+          "author": "임은성DIELNUE 디엘뉴",
+          "rank": 7
+        },
+        {
+          "title": "산삼보다 더 귀한 신랑을 캤습니다",
+          "author": "예하본이지콘텐츠",
+          "rank": 8
+        },
+        {
+          "title": "룰 브레이커(Rule Breaker)",
+          "author": "베지터블나인",
+          "rank": 9
+        },
+        {
+          "title": "류안",
+          "author": "김지소나인",
+          "rank": 10
+        },
+        {
+          "title": "꽃은 미끼야",
+          "author": "건어물녀에이블",
+          "rank": 11
+        }
+      ],
+      "modern": [
+        {
+          "title": "은행원도 용꿈을 꾸나요",
+          "author": "연산호",
+          "rank": 1
+        },
+        {
+          "title": "답은 정해졌고 넌 데뷔만 해",
+          "author": "스레트",
+          "rank": 2
+        },
+        {
+          "title": "반월당의 기묘한 이야기",
+          "author": "정연",
+          "rank": 3
+        },
+        {
+          "title": "미궁이 된 회사에서 죽어 나가는 법",
+          "author": "긴급사퇴",
+          "rank": 4
+        },
+        {
+          "title": "성스러운 아이돌",
+          "author": "신화진",
+          "rank": 5
+        },
+        {
+          "title": "금손 아빠가 되었다",
+          "author": "레몬탕",
+          "rank": 6
+        },
+        {
+          "title": "어느 날, 탑이 무너지기 시작했다",
+          "author": "서이서",
+          "rank": 7
+        },
+        {
+          "title": "이세계 착각 헌터",
+          "author": "대대원",
+          "rank": 8
+        },
+        {
+          "title": "악역 소장은 육아 중!",
+          "author": "고마",
+          "rank": 9
+        },
+        {
+          "title": "어두운 바다의 등불이 되어",
+          "author": "연산호",
+          "rank": 10
+        },
+        {
+          "title": "신성한 S급 길드장님",
+          "author": "김도설",
+          "rank": 11
+        }
+      ],
+      "martial": [
+        {
+          "title": "내 무협 주인공이 나를 싫어한다",
+          "author": "커피신",
+          "rank": 1
+        },
+        {
+          "title": "폐급 무공도 신공으로 만드는 회귀자",
+          "author": "철자웅",
+          "rank": 2
+        },
+        {
+          "title": "전생검신",
+          "author": "구로수번",
+          "rank": 3
+        },
+        {
+          "title": "신객",
+          "author": "나한",
+          "rank": 4
+        },
+        {
+          "title": "무한전생-당가는 못말려",
+          "author": "광악",
+          "rank": 5
+        },
+        {
+          "title": "석가장 망나니 이공자",
+          "author": "주비",
+          "rank": 6
+        },
+        {
+          "title": "백룡선생",
+          "author": "",
+          "rank": 7
+        },
+        {
+          "title": "창룡군림",
+          "author": "북미혼",
+          "rank": 8
+        },
+        {
+          "title": "환생마신전",
+          "author": "사도연",
+          "rank": 9
+        },
+        {
+          "title": "금선비록",
+          "author": "권신",
+          "rank": 10
+        },
+        {
+          "title": "무당기협",
+          "author": "은열",
+          "rank": 11
+        }
+      ],
+      "bl": [
+        {
+          "title": "총총",
+          "author": "톨쥬",
+          "rank": 1
+        },
+        {
+          "title": "천운",
+          "author": "채팔이",
+          "rank": 2
+        },
+        {
+          "title": "절친X교환",
+          "author": "치율",
+          "rank": 3
+        },
+        {
+          "title": "터닝(Turning)",
+          "author": "쿠유",
+          "rank": 4
+        },
+        {
+          "title": "어쩌다 메리지",
+          "author": "클레어",
+          "rank": 5
+        },
+        {
+          "title": "웬 댓 데이 컴즈",
+          "author": "빈트",
+          "rank": 6
+        },
+        {
+          "title": "공의 형이 된다는 건",
+          "author": "8각시계",
+          "rank": 7
+        },
+        {
+          "title": "디플라워 미 이프 유 캔(Deflower Me If You Can)",
+          "author": "ZIG",
+          "rank": 8
+        },
+        {
+          "title": "착각으로 구원하라",
+          "author": "samk",
+          "rank": 9
+        },
+        {
+          "title": "애시드",
+          "author": "제노리노",
+          "rank": 10
+        },
+        {
+          "title": "풀칠 ; 내 가이드 입에 풀칠하기",
+          "author": "원샷",
+          "rank": 11
+        }
+      ]
+    }
+  }
+}

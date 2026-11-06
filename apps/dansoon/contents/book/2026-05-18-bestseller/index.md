@@ -6,31 +6,39 @@ category: 'bestseller'
 isHidden: true
 ---
 
-## 🏅 일반 도서 베스트셀러 TOP 15
+## 일반 도서 베스트셀러 TOP 15
 
-|  순위  | 책                                                                                                                          | 저자            | 장르     | 알라딘 | 교보문고 | YES24 | 리디 |
-| :----: | --------------------------------------------------------------------------------------------------------------------------- | --------------- | -------- | :----: | :------: | :---: | :--: |
-| **1**  | [프로젝트 헤일메리](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=270454373&partner=openAPI&start=api)                 | 앤디 위어       | 소설     |  3위   |   1위    |  1위  |  -   |
-| **2**  | [내면 근력](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388955379&partner=openAPI&start=api)                         | 짐 머피         | 자기계발 |  6위   |   6위    |  2위  |  -   |
-| **3**  | [안녕이라 그랬어](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=365665217&partner=openAPI&start=api)                   | 김애란          | 소설     |  5위   |   7위    |  3위  |  -   |
-| **4**  | [품격 있는 대화를 위한 지식 브리핑](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=392447560&partner=openAPI&start=api) | 김진            | 소설     |  7위   |   3위    |  5위  |  -   |
-| **5**  | [모순](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&partner=openAPI&start=api)                               | 양귀자          | 소설     |  13위  |    -     | 12위  |  -   |
-| **6**  | [이더리움 없는 미래는 없다](https://store.kyobobook.co.kr/bestseller/online)                                                | 오태민 외       | 경제경영 |   -    |   8위    | 18위  |  -   |
-| **7**  | [괴테는 모든 것을 말했다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=376765918&partner=openAPI&start=api)           | 스즈키 유이     | 소설     |  15위  |    -     | 14위  |  -   |
-| **8**  | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&partner=openAPI&start=api)                             | 헤르만 헤세     | 소설     |  16위  |    -     | 13위  |  -   |
-| **9**  | [영화에 관하여](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=390399925&partner=openAPI&start=api)                     | 수전 손택       | 소설     |  2위   |    -     |   -   |  -   |
-| **10** | [번뇌를 종료합니다](https://store.kyobobook.co.kr/bestseller/online)                                                        | 필로소피랩      | 자기계발 |   -    |   2위    |   -   |  -   |
-| **11** | [일리아스 좋아하세요?](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=390942945&partner=openAPI&start=api)              | 하길(석민주)    | 소설     |  4위   |    -     |   -   |  -   |
-| **12** | [웨딩 피플](https://store.kyobobook.co.kr/bestseller/online)                                                                | 앨리슨 에스파흐 | 소설     |   -    |   4위    |   -   |  -   |
-| **13** | [니체의 초월자](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001)                                       | 프리드리히 니체 | 인문사회 |   -    |    -     |  4위  |  -   |
-| **14** | [바다에서 온 소년](https://store.kyobobook.co.kr/bestseller/online)                                                         | 개럿 카         | 소설     |   -    |   5위    |   -   |  -   |
-| **15** | [인생을 위한 최소한의 생각](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001)                           | 신영준, 고영성  | 인문사회 |   -    |    -     |  7위  |  -   |
+**변동**은 지난주 종합 순위와 비교한 값입니다(NEW: 새로 들어온 책).
+
+### 이번 주 한눈에
+
+- 새로 들어온 책 8권: **내면 근력**, **이더리움 없는 미래는 없다**, **괴테는 모든 것을 말했다** 외 5권
+- 가장 많이 오른 책: **모순** (5위, ▲3)
+- 가장 오래 순위권: **프로젝트 헤일메리** (4주 연속)
+
+|  순위  | 변동 | 책                                                                                                                          | 저자            | 장르     | 알라딘 | 교보문고 | YES24 | 리디 |
+| :----: |:----:| --------------------------------------------------------------------------------------------------------------------------- | --------------- | -------- | :----: | :------: | :---: | :--: |
+| **1**  | - | [프로젝트 헤일메리](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=270454373&partner=openAPI&start=api)                 | 앤디 위어       | 소설     |  3위   |   1위    |  1위  |  -   |
+| **2**  | NEW | [내면 근력](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=388955379&partner=openAPI&start=api)                         | 짐 머피         | 자기계발 |  6위   |   6위    |  2위  |  -   |
+| **3**  | ▼1 | [안녕이라 그랬어](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=365665217&partner=openAPI&start=api)                   | 김애란          | 소설     |  5위   |   7위    |  3위  |  -   |
+| **4**  | ▼1 | [품격 있는 대화를 위한 지식 브리핑](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=392447560&partner=openAPI&start=api) | 김진            | 소설     |  7위   |   3위    |  5위  |  -   |
+| **5**  | ▲3 | [모순](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=25843736&partner=openAPI&start=api)                               | 양귀자          | 소설     |  13위  |    -     | 12위  |  -   |
+| **6**  | NEW | [이더리움 없는 미래는 없다](https://store.kyobobook.co.kr/bestseller/online)                                                | 오태민 외       | 경제경영 |   -    |   8위    | 18위  |  -   |
+| **7**  | NEW | [괴테는 모든 것을 말했다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=376765918&partner=openAPI&start=api)           | 스즈키 유이     | 소설     |  15위  |    -     | 14위  |  -   |
+| **8**  | NEW | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&partner=openAPI&start=api)                             | 헤르만 헤세     | 소설     |  16위  |    -     | 13위  |  -   |
+| **9**  | NEW | [영화에 관하여](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=390399925&partner=openAPI&start=api)                     | 수전 손택       | 소설     |  2위   |    -     |   -   |  -   |
+| **10** | NEW | [번뇌를 종료합니다](https://store.kyobobook.co.kr/bestseller/online)                                                        | 필로소피랩      | 자기계발 |   -    |   2위    |   -   |  -   |
+| **11** | NEW | [일리아스 좋아하세요?](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=390942945&partner=openAPI&start=api)              | 하길(석민주)    | 소설     |  4위   |    -     |   -   |  -   |
+| **12** | NEW | [웨딩 피플](https://store.kyobobook.co.kr/bestseller/online)                                                                | 앨리슨 에스파흐 | 소설     |   -    |   4위    |   -   |  -   |
+| **13** | ▼6 | [니체의 초월자](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001)                                       | 프리드리히 니체 | 인문사회 |   -    |    -     |  4위  |  -   |
+| **14** | ▼8 | [바다에서 온 소년](https://store.kyobobook.co.kr/bestseller/online)                                                         | 개럿 카         | 소설     |   -    |   5위    |   -   |  -   |
+| **15** | ▼10 | [인생을 위한 최소한의 생각](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001)                           | 신영준, 고영성  | 인문사회 |   -    |    -     |  7위  |  -   |
 
 ---
 
-## 📚 장르별 베스트셀러
+## 장르별 베스트셀러
 
-### 📖 소설
+### 소설
 
 | 순위  | 책                                                                                                                | 저자        | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | ----------------------------------------------------------------------------------------------------------------- | ----------- | :----: | :------: | :---: | :--: |
@@ -40,7 +48,7 @@ isHidden: true
 | **4** | [괴테는 모든 것을 말했다](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=376765918&partner=openAPI&start=api) | 스즈키 유이 |  4위   |    -     | 14위  |  -   |
 | **5** | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&partner=openAPI&start=api)                   | 헤르만 헤세 |  5위   |    -     | 13위  |  -   |
 
-### 💼 경제경영
+### 경제경영
 
 | 순위  | 책                                                                                                                            | 저자           | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | ----------------------------------------------------------------------------------------------------------------------------- | -------------- | :----: | :------: | :---: | :--: |
@@ -50,7 +58,7 @@ isHidden: true
 | **4** | [박곰희 연금 부자 수업](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=366615290&partner=openAPI&start=api)               | 박곰희         |  2위   |    -     |   -   |  -   |
 | **5** | [부의 사다리에 올라타라](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389340198&partner=openAPI&start=api)              | 닉 매기울리    |  3위   |    -     |   -   |  -   |
 
-### 🚀 자기계발
+### 자기계발
 
 | 순위  | 책                                                                                                                 | 저자          | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | ------------------------------------------------------------------------------------------------------------------ | ------------- | :----: | :------: | :---: | :--: |
@@ -60,7 +68,7 @@ isHidden: true
 | **4** | [부처님 말씀대로 살아보니](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=385370551&partner=openAPI&start=api) | 토니 페르난도 |  3위   |    -     |   -   |  -   |
 | **5** | [부의 사다리에 올라타라](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=389340198&partner=openAPI&start=api)   | 닉 매기울리   |  4위   |    -     |   -   |  -   |
 
-### 🌍 인문사회
+### 인문사회
 
 | 순위  | 책                                                                                                                          | 저자            | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | --------------------------------------------------------------------------------------------------------------------------- | --------------- | :----: | :------: | :---: | :--: |
@@ -70,7 +78,7 @@ isHidden: true
 | **4** | [영화에 관하여](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=390399925&partner=openAPI&start=api)                     | 수전 손택       |  1위   |    -     |   -   |  -   |
 | **5** | [일리아스 좋아하세요?](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=390942945&partner=openAPI&start=api)              | 하길(석민주)    |  2위   |    -     |   -   |  -   |
 
-### 🔬 과학기술
+### 과학기술
 
 | 순위  | 책                                                                                                                  | 저자                | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | ------------------------------------------------------------------------------------------------------------------- | ------------------- | :----: | :------: | :---: | :--: |
@@ -80,7 +88,7 @@ isHidden: true
 | **4** | [이기적 유전자](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=170482558&partner=openAPI&start=api)             | 리처드 도킨스       |  4위   |    -     |   -   |  -   |
 | **5** | [스페이스X 일론 머스크](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=390694024&partner=openAPI&start=api)     | 에릭 버거           |  5위   |    -     |   -   |  -   |
 
-### ✍️ 에세이
+### 에세이
 
 | 순위  | 책                                                                                                                     | 저자             | 알라딘 | 교보문고 | YES24 | 리디 |
 | :---: | ---------------------------------------------------------------------------------------------------------------------- | ---------------- | :----: | :------: | :---: | :--: |

@@ -6,31 +6,39 @@ category: "bestseller"
 isHidden: true
 ---
 
-## 🏅 일반 도서 베스트셀러 TOP 15
+## 일반 도서 베스트셀러 TOP 15
 
-| 순위 | 책 | 저자 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |
-|:----:|-----|------|------|:------:|:-------:|:-----:|:----:|
-| **1** | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api) | 헤르만 헤세 | 소설 | 3위 | 3위 | 9위 | 9위 |
-| **2** | [수족관](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330811810&amp;partner=openAPI&amp;start=api) | 유래혁 | 소설 | 4위 | 4위 | 6위 | - |
-| **3** | [니체의 초월자](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=375395519&amp;partner=openAPI&amp;start=api) | 프리드리히 니체 | 소설 | 13위 | 9위 | 5위 | - |
-| **4** | [1020 극우가 온다](https://store.kyobobook.co.kr/bestseller/online) | 정민철 | 인문사회 | - | 1위 | - | 1위 |
-| **5** | [유럽 도시 기행 3](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397155927&amp;partner=openAPI&amp;start=api) | 유시민 | 소설 | 1위 | 2위 | - | - |
-| **6** | [나의 첫 번째 부동산 교과서](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=394433203&amp;partner=openAPI&amp;start=api) | 송희구 | 경제경영 | 16위 | 5위 | 13위 | - |
-| **7** | [오늘 단 2시간만](https://ridibooks.com/books/3414000104) | 이마이 다카시 | 자기계발 | - | - | - | 2위 |
-| **8** | [말하지 않고 말하기](https://ridibooks.com/books/222003881) | 김정운 | 자기계발 | - | - | - | 6위 |
-| **9** | [개정판 \| 빅터 프랭클의 죽음의 수용소에서](https://ridibooks.com/books/969000280) | 빅터 프랭클 | 인문사회 | - | - | - | 1위 |
-| **10** | [내면 근력](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001) | 짐 머피 | 자기계발 | - | - | 12위 | 2위 |
-| **11** | [프로젝트 헤일메리](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001) | 앤디 위어 | 소설 | - | - | 16위 | 7위 |
-| **12** | [혼자 남아도 외로워하지 말 것](https://ridibooks.com/books/5322000003) | 경민선 | 소설 | - | - | - | 1위 |
-| **13** | [돈의 심리학](https://ridibooks.com/books/1691000246) | 모건 하우절 | 경제경영 | - | - | - | 1위 |
-| **14** | [코스모스](https://ridibooks.com/books/786000077) | 칼 세이건 | 과학기술 | - | - | - | 1위 |
-| **15** | [투명한 나선](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398021172&amp;partner=openAPI&amp;start=api) | 히가시노 게이고 | 소설 | 2위 | - | - | - |
+**변동**은 지난주 종합 순위와 비교한 값입니다(NEW: 새로 들어온 책).
+
+### 이번 주 한눈에
+
+- 새로 들어온 책 8권: **니체의 초월자**, **1020 극우가 온다**, **유럽 도시 기행 3** 외 5권
+- 가장 많이 오른 책: **프로젝트 헤일메리** (11위, ▲5)
+- 가장 오래 순위권: **프로젝트 헤일메리** (9주 연속)
+
+| 순위 | 변동 | 책 | 저자 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |
+|:----:|:----:|-----|------|------|:------:|:-------:|:-----:|:----:|
+| **1** | - | [싯다르타](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=329596&amp;partner=openAPI&amp;start=api) | 헤르만 헤세 | 소설 | 3위 | 3위 | 9위 | 9위 |
+| **2** | - | [수족관](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=330811810&amp;partner=openAPI&amp;start=api) | 유래혁 | 소설 | 4위 | 4위 | 6위 | - |
+| **3** | NEW | [니체의 초월자](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=375395519&amp;partner=openAPI&amp;start=api) | 프리드리히 니체 | 소설 | 13위 | 9위 | 5위 | - |
+| **4** | NEW | [1020 극우가 온다](https://store.kyobobook.co.kr/bestseller/online) | 정민철 | 인문사회 | - | 1위 | - | 1위 |
+| **5** | NEW | [유럽 도시 기행 3](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=397155927&amp;partner=openAPI&amp;start=api) | 유시민 | 소설 | 1위 | 2위 | - | - |
+| **6** | NEW | [나의 첫 번째 부동산 교과서](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=394433203&amp;partner=openAPI&amp;start=api) | 송희구 | 경제경영 | 16위 | 5위 | 13위 | - |
+| **7** | ▼3 | [오늘 단 2시간만](https://ridibooks.com/books/3414000104) | 이마이 다카시 | 자기계발 | - | - | - | 2위 |
+| **8** | ▼5 | [말하지 않고 말하기](https://ridibooks.com/books/222003881) | 김정운 | 자기계발 | - | - | - | 6위 |
+| **9** | NEW | [개정판 \| 빅터 프랭클의 죽음의 수용소에서](https://ridibooks.com/books/969000280) | 빅터 프랭클 | 인문사회 | - | - | - | 1위 |
+| **10** | ▼5 | [내면 근력](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001) | 짐 머피 | 자기계발 | - | - | 12위 | 2위 |
+| **11** | ▲5 | [프로젝트 헤일메리](https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001) | 앤디 위어 | 소설 | - | - | 16위 | 7위 |
+| **12** | NEW | [혼자 남아도 외로워하지 말 것](https://ridibooks.com/books/5322000003) | 경민선 | 소설 | - | - | - | 1위 |
+| **13** | NEW | [돈의 심리학](https://ridibooks.com/books/1691000246) | 모건 하우절 | 경제경영 | - | - | - | 1위 |
+| **14** | - | [코스모스](https://ridibooks.com/books/786000077) | 칼 세이건 | 과학기술 | - | - | - | 1위 |
+| **15** | NEW | [투명한 나선](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398021172&amp;partner=openAPI&amp;start=api) | 히가시노 게이고 | 소설 | 2위 | - | - | - |
 
 ---
 
-## 📚 장르별 베스트셀러
+## 장르별 베스트셀러
 
-### 📖 소설
+### 소설
 
 | 순위 | 책 | 저자 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:------:|:-------:|:-----:|:----:|
@@ -40,7 +48,7 @@ isHidden: true
 | **4** | [투명한 나선](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=398021172&amp;partner=openAPI&amp;start=api) | 히가시노 게이고 | 1위 | - | - | - |
 | **5** | [혼자 남아도 외로워하지 말 것](https://ridibooks.com/books/5322000003) | 경민선 | - | - | - | 1위 |
 
-### 💼 경제경영
+### 경제경영
 
 | 순위 | 책 | 저자 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:------:|:-------:|:-----:|:----:|
@@ -50,7 +58,7 @@ isHidden: true
 | **4** | [부의 갈림길](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=394438909&amp;partner=openAPI&amp;start=api) | 오건영 | 4위 | - | - | 3위 |
 | **5** | [생각에 관한 생각](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=140135544&amp;partner=openAPI&amp;start=api) | 대니얼 카너먼 | 7위 | - | - | 2위 |
 
-### 🚀 자기계발
+### 자기계발
 
 | 순위 | 책 | 저자 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:------:|:-------:|:-----:|:----:|
@@ -60,7 +68,7 @@ isHidden: true
 | **4** | [독서의 기술](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396563552&amp;partner=openAPI&amp;start=api) | 고명환 | 1위 | - | - | - |
 | **5** | [말하지 않고 말하기](https://ridibooks.com/books/222003881) | 김정운 | - | - | - | 1위 |
 
-### 🌍 인문사회
+### 인문사회
 
 | 순위 | 책 | 저자 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:------:|:-------:|:-----:|:----:|
@@ -70,7 +78,7 @@ isHidden: true
 | **4** | [사고외주](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396089663&amp;partner=openAPI&amp;start=api) | 홍진기 | 6위 | - | - | 2위 |
 | **5** | [품격 있는 대화를 위한 지식 브리핑](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=392447560&amp;partner=openAPI&amp;start=api) | 김진 | 10위 | 8위 | - | - |
 
-### 🔬 과학기술
+### 과학기술
 
 | 순위 | 책 | 저자 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:------:|:-------:|:-----:|:----:|
@@ -80,7 +88,7 @@ isHidden: true
 | **4** | [코스모스 (100만 부 기념판)](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=396765073&amp;partner=openAPI&amp;start=api) | 칼 세이건 | 1위 | - | - | - |
 | **5** | [완벽한 원시인](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=386947012&amp;partner=openAPI&amp;start=api) | 자청 | 3위 | - | - | - |
 
-### ✍️ 에세이
+### 에세이
 
 | 순위 | 책 | 저자 | 알라딘 | 교보문고 | YES24 | 리디 |
 |:----:|-----|------|:------:|:-------:|:-----:|:----:|

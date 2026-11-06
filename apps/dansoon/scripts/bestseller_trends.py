@@ -7,8 +7,10 @@
 
 from __future__ import annotations
 
+import html
 import json
 import pathlib
+import re
 from collections.abc import Callable
 
 # 연속 순위권 주 수를 셀 때 거슬러 올라가는 최대 주 수
@@ -57,6 +59,12 @@ def change_label(change: int | str | None) -> str:
     return f"▲{change}" if change > 0 else f"▼{-change}"
 
 
+def md_text(text: str) -> str:
+    """외부에서 수집한 제목을 마크다운에 넣을 수 있게 HTML·마크다운 특수문자와 줄바꿈을 무력화한다."""
+    escaped = html.escape(" ".join(text.split()), quote=False)
+    return re.sub(r"([\\`*_\[\]|])", r"\\\1", escaped)
+
+
 def summary_markdown(books: list[dict]) -> str:
     """'이번 주 한눈에' 요약. 비교할 지난주 기록이 없으면 빈 문자열."""
     if not books or all(book.get("change") is None for book in books):
@@ -64,16 +72,16 @@ def summary_markdown(books: list[dict]) -> str:
     lines: list[str] = []
     new_entries = [book for book in books if book.get("change") == "new"]
     if new_entries:
-        titles = ", ".join(f"**{book['title']}**" for book in new_entries[:3])
+        titles = ", ".join(f"**{md_text(book['title'])}**" for book in new_entries[:3])
         more = f" 외 {len(new_entries) - 3}권" if len(new_entries) > 3 else ""
-        lines.append(f"- 🆕 새로 들어온 책 {len(new_entries)}권: {titles}{more}")
+        lines.append(f"- 새로 들어온 책 {len(new_entries)}권: {titles}{more}")
     risers = [book for book in books if isinstance(book.get("change"), int) and book["change"] > 0]
     if risers:
         top = max(risers, key=lambda book: book["change"])
-        lines.append(f"- 📈 가장 많이 오른 책: **{top['title']}** ({top['rank']}위, {change_label(top['change'])})")
+        lines.append(f"- 가장 많이 오른 책: **{md_text(top['title'])}** ({top['rank']}위, {change_label(top['change'])})")
     longest = max(books, key=lambda book: book.get("streak", 1))
     if longest.get("streak", 1) > 1:
-        lines.append(f"- 🏆 가장 오래 순위권: **{longest['title']}** ({longest['streak']}주 연속)")
+        lines.append(f"- 가장 오래 순위권: **{md_text(longest['title'])}** ({longest['streak']}주 연속)")
     return "### 이번 주 한눈에\n\n" + "\n".join(lines) + "\n" if lines else ""
 
 
@@ -100,6 +108,8 @@ if __name__ == "__main__":
         assert [change_label(book["change"]) for book in books] == ["▲1", "▲1", "NEW"]
         assert "새로 들어온 책 1권" in summary_markdown(books)
         assert "3주 연속" in summary_markdown(books)
+
+        assert md_text("<b>*x*</b>") == "&lt;b&gt;\\*x\\*&lt;/b&gt;"
 
         first_week = [{"title": "A", "rank": 1}]
         annotate_trends(first_week, [], key)

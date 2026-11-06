@@ -1,11 +1,14 @@
 ---
 import '@tokens/css/fonts.css';
+// 스크롤바 라이브러리 CSS는 페이지 CSS로 넣는다 — 스크립트에서 import하면 개발 서버에서 페이지를 옮길 때 <head>에서 빠진다
+import 'overlayscrollbars/overlayscrollbars.css';
 import '~/styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import AppSidebar from '~/components/AppSidebar.astro';
 import Icon from '~/components/Icon.astro';
 import MobileTopBar from '~/components/MobileTopBar.astro';
 import SearchDialog from '~/components/SearchDialog.astro';
+import SidebarFooter from '~/components/SidebarFooter.astro';
 import SiteFooter from '~/components/SiteFooter.astro';
 import { getPublishedPosts } from '~/lib/posts';
 
@@ -20,9 +23,10 @@ type Props = {
   description?: string;
   image?: string;
   article?: { publishedAt: Date; updatedAt?: Date };
+  noindex?: boolean;
 };
 
-const { title, description = SITE_DESCRIPTION, image = DEFAULT_OG_IMAGE, article } = Astro.props;
+const { title, description = SITE_DESCRIPTION, image = DEFAULT_OG_IMAGE, article, noindex = false } = Astro.props;
 const posts = await getPublishedPosts();
 const fullTitle = title ? `${title} | ${SITE_TITLE}` : SITE_TITLE;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
@@ -30,14 +34,17 @@ const imageUrl = new URL(image, Astro.site).href;
 ---
 
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-overlayscrollbars-initialize>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/icon-512.png" type="image/png" sizes="512x512" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
     <meta name="google-site-verification" content="-kohA7qdl_10fMUGOMlZ7EArpE6vOn0DHONUwImizX8" />
     <meta name="google-adsense-account" content="ca-pub-4063325112682329" />
@@ -88,7 +95,7 @@ const imageUrl = new URL(image, Astro.site).href;
     </script>
   </head>
 
-  <body class="min-h-dvh lg:h-dvh lg:overflow-hidden">
+  <body data-overlayscrollbars-initialize class="min-h-dvh lg:h-dvh lg:overflow-hidden">
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:fixed focus:top-sm focus:left-sm focus:z-50 focus:rounded-md focus:bg-primary focus:px-md focus:py-sm focus:text-primary-foreground"
@@ -99,13 +106,14 @@ const imageUrl = new URL(image, Astro.site).href;
       <aside
         transition:persist="sidebar"
         aria-label="사이트 탐색"
-        class="hidden h-dvh border-r border-border bg-secondary-subtle lg:block"
+        class="hidden h-dvh flex-col border-r border-border bg-secondary-subtle lg:flex"
         style="view-transition-name: sidebar"
       >
-        <!-- 사이드바는 자기 영역만 스크롤한다. 스크롤바 라이브러리는 안쪽 요소에 붙인다 -->
-        <div data-sidebar class="h-full overflow-y-auto">
+        <!-- 목록만 스크롤하고 푸터는 바닥에 고정한다. 스크롤바 라이브러리는 안쪽 요소에 붙인다 -->
+        <div data-sidebar class="min-h-0 flex-1 overflow-y-auto">
           <AppSidebar posts={posts} />
         </div>
+        <SidebarFooter />
       </aside>
       <!-- 데스크톱에서는 본문 영역이 스크롤 주체다(사이드바와 스크롤이 섞이지 않는다) -->
       <div data-content-scroll class="min-w-0 lg:h-dvh lg:overflow-y-auto">
@@ -134,8 +142,13 @@ const imageUrl = new URL(image, Astro.site).href;
       >
         <Icon name="x" />
       </button>
-      <!-- 처음 열 때 데스크톱 사이드바를 복제해 채운다(같은 목록을 두 번 그리지 않는다) -->
-      <div data-mobile-nav-body></div>
+      <!-- 처음 열 때 데스크톱 사이드바(목록·푸터)를 복제해 채운다(같은 목록을 두 번 그리지 않는다) -->
+      <div class="flex h-full flex-col">
+        <div data-mobile-nav-body class="min-h-0 flex-1 overflow-y-auto">
+          <div data-mobile-nav-content></div>
+        </div>
+        <div data-mobile-nav-footer></div>
+      </div>
     </dialog>
     <SearchDialog />
 

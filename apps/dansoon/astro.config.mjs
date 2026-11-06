@@ -28,7 +28,8 @@ export default defineConfig({
         frames: { frameBoxShadowCssValue: 'none' },
       },
     }),
-    sitemap(),
+    // 자동 생성 리포트(/book/<날짜>-<종류>/)는 애드센스 심사 동안 색인하지 않는다. book/[slug].astro의 noindex와 함께 걷어 낸다
+    sitemap({ filter: (page) => !/\/book\/[^/]+\/$/.test(new URL(page).pathname) }),
   ],
   markdown: {
     processor: satteri({

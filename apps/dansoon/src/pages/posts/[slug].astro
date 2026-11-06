@@ -1,6 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { getImage } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
 import { render } from 'astro:content';
 import AdFit from '~/components/AdFit.astro';
 import CategoryBadge from '~/components/CategoryBadge.astro';
@@ -26,9 +26,10 @@ type Props = {
 };
 
 const { post, posts } = Astro.props;
-const { title, description, publishedAt, updatedAt, category, tags, thumbnail } = post.data;
+const { title, description, publishedAt, updatedAt, category, tags, thumbnail, cover } = post.data;
 const { Content, headings } = await render(post);
 const { older, newer } = getAdjacentPosts(posts, post);
+const COVER_WIDTH = 1344;
 // SNS 미리보기는 jpg/png 1200px가 가장 무난하다
 const OG_IMAGE_WIDTH = 1200;
 // 썸네일이 없으면 빌드 때 만든 제목 카드(/og/posts/<id>.png)를 쓴다
@@ -60,6 +61,18 @@ const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c
   <div class="mx-auto max-w-6xl px-md sm:px-xl xl:grid xl:grid-cols-[minmax(0,1fr)_var(--container-3xs)] xl:gap-3xl">
     <article class="mx-auto w-full max-w-(--container-2xl) min-w-0 pt-2xl pb-xl sm:pt-3xl">
       <header>
+        {
+          cover && (
+            <Image
+              src={cover}
+              alt=""
+              width={COVER_WIDTH}
+              loading="eager"
+              fetchpriority="high"
+              class="mb-xl aspect-video w-full rounded-xl object-cover ring-1 ring-border"
+            />
+          )
+        }
         <CategoryBadge category={category} asLink />
         <h1 class="mt-md text-3xl leading-[1.3] font-bold tracking-tight text-balance sm:text-4xl">
           {title}

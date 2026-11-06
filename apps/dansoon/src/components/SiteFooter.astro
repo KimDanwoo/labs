@@ -7,8 +7,10 @@ import Icon from '~/components/Icon.astro';
     class="mx-auto flex max-w-(--container-3xl) items-center justify-between gap-md px-md py-lg text-xs text-muted-foreground sm:px-xl"
   >
     <p>© {new Date().getFullYear()} Dansoon</p>
-    <nav aria-label="사이트 정보" class="flex items-center gap-md">
+    <nav aria-label="사이트 정보" class="flex flex-wrap items-center justify-end gap-x-md gap-y-xs">
       <a href="/about/" class="hover:text-foreground">소개</a>
+      <a href="/contact/" class="hover:text-foreground">문의</a>
+      <a href="/terms/" class="hover:text-foreground">이용약관</a>
       <a href="/privacy/" class="hover:text-foreground">개인정보처리방침</a>
       <a href="/rss.xml" class="inline-flex items-center gap-xs hover:text-foreground">
         <Icon name="rss" class="size-3.5" />
