@@ -1,11 +1,11 @@
 ---
 title: "[회고] 10주간의 항해를 마치며"
-description: "일과 병행한 항해 플러스 10주를 마치며, 동료와 코드 리뷰, 코치 피드백으로 얻은 '함께하는 성장'의 의미를 돌아봐요."
+description: "회사 일과 병행한 항해 플러스 프론트엔드 3기 10주를 돌아봐요. 바닐라 SPA부터 가상 DOM, 테스트, FSD, 배포 자동화까지 매주 풀어 본 과제와 동료·코드 리뷰로 얻은 '함께하는 성장'을 정리했어요."
 publishedAt: "2024-12-11T13:29:58+09:00"
-updatedAt: "2025-08-04T13:35:22+09:00"
+updatedAt: "2026-11-06T12:00:00+09:00"
 category: "retro"
 tags: []
-thumbnail: "./thumbnail.jpg"
+thumbnail: "./thumbnail.png"
 legacyUrl: "https://dansoon-dev.tistory.com/11"
 ---
 
@@ -17,6 +17,27 @@ legacyUrl: "https://dansoon-dev.tistory.com/11"
 
 그렇게 시작한 10주간의 여정이 마무리되었다.
 
+## 항해 플러스 프론트엔드 3기
+
+항해 플러스 프론트엔드 3기는 2024년 9월 21일부터 11월 30일까지 10주 동안 진행됐다. 매주 새로운 과제가 나오고, 팀원끼리 코드를 리뷰하고, 코치에게 피드백을 받는 흐름이 10주 내내 반복됐다. 이 기수를 함께 수료한 동기는 74명이었다.
+
+## 10주 동안 풀어 본 과제
+
+과제마다 배운 것은 따로 글로 남겼다. 이 블로그에 정리한 과제를 순서대로 모으면 이렇다.
+
+- **[Vanilla JavaScript로 SPA 만들기](/posts/vanilla-js-spa/)** — 프레임워크 없이 History API로 라우터를 만들고, LocalStorage로 사용자 관리를 구현했다. SPA 라우팅이 어떻게 동작하는지 직접 구현하며 이해했다.
+- **[내가 리액트를 직접 만들어봤다?](/posts/build-my-own-react/)** — 리액트를 직접 구현하는 과제로, 가상 DOM과 diff 알고리즘을 만들었다.
+- **[React Hook을 직접 구현해보자](/posts/implement-react-hooks/)** — 3주차 과제로, 메모이제이션과 렌더링 최적화로 컴포넌트 성능을 개선했다.
+- **[리액트 리팩토링: Context와 Hook을 활용한 상태 관리 개선](/posts/react-context-hook-refactoring/)** — 컴포넌트마다 흩어져 있던 상태와 로직을 Context와 Custom Hook으로 정리했다.
+- **[FSD 패턴과 상태 관리 리팩토링](/posts/fsd-state-management-refactoring/)** — 프로젝트 구조를 FSD로 나누고, react-query와 zustand로 상태 관리 방식을 바꿨다.
+- **[테스트 코드 작성과 FSD 패턴 리팩토링](/posts/test-code-fsd-refactoring/)** — 6주차에 도입한 FSD 구조에 테스트를 붙이면서 드러난 구조의 빈틈을 다시 고쳤다.
+- **[테스트 시나리오 작성과 E2E테스트](/posts/test-scenario-e2e/)** — 사용자 관점의 테스트 시나리오를 쓰고 E2E 테스트로 검증했다.
+- **[클라우드 기반 배포 자동화 여정: AWS S3부터 GitHub Actions까지](/posts/deploy-automation-s3-github-actions/)** — S3 정적 호스팅에 GitHub Actions를 연결해 배포를 자동화했다.
+
+돌아보면 바닐라 자바스크립트에서 출발해 리액트의 내부 동작, 상태 관리, 구조 설계, 테스트, 배포까지 프론트엔드 개발의 흐름을 한 바퀴 돈 셈이다. 구조 설계는 과정이 끝난 뒤에도 더 파고들어 [쉽게 정리한 Feature-Sliced Design(FSD) 가이드](/posts/fsd-guide/)로 따로 정리했다.
+
+## 동료와 코치에게 배운 것
+
 다양한 경력을 가진 팀원들과 함께하며 새로운 시각을 발견했다.
 
 밤늦게까지 이어진 과제와 코드 리뷰 시간은 단순한 기술 공유를 넘어 서로의 관점을 이해하는 소중한 시간이었다.
@@ -24,6 +45,8 @@ legacyUrl: "https://dansoon-dev.tistory.com/11"
 '이런 식으로도 생각할 수 있구나!' 하는 깨달음의 순간들이 쌓여갔고,
 
 열정 넘치는 코치님들의 멘토링은 기술 외적인 부분에서도 값진 배움을 선물해주었다.
+
+## 회사 일과 병행하기
 
 처음엔 모든 과제를 완벽하게 해내겠다는 욕심을 부렸지만,
 
@@ -34,6 +57,10 @@ legacyUrl: "https://dansoon-dev.tistory.com/11"
 주말은 과제에 집중하고, 평일에는 운동 후 자기 전까지 시간을 투자하는 나만의 리듬을 찾아갔다.
 
 덕분에 모든 과제를 무사히 통과할 수 있었고, 코치님들의 꼼꼼한 피드백으로 한걸음씩 성장할 수 있었다.
+
+수료 카드에는 학습 시간 505시간이 찍혔다. 결과로 블랙 배지(실력 상위 1%)를 받았고, 카드에 적힌 습득 스킬은 JavaScript, TypeScript, React, 클린 코드, 디자인 패턴, CI/CD, Git 버전 관리 전략, 테스트 코드, TDD, 성능 최적화였다.
+
+## 함께하는 성장
 
 이번 항해99를 통해 '함께하는 성장'이 얼마나 값진 것인지 깊이 깨달았다.
 
