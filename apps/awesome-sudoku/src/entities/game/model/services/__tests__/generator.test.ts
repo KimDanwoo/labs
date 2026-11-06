@@ -3,8 +3,14 @@ import { describe, expect, it } from 'vitest';
 import { SUDOKU_CELL_COUNT } from '../../constants/board';
 import { CLASSIC_DIFFICULTY, GAME_LEVEL, KILLER_DIFFICULTY, TECHNIQUE } from '../../constants/game';
 import type { Grid, GridPosition, SudokuBoard } from '../../types/board';
-import type { Difficulty, KillerCage } from '../../types/game';
-import { generateBoard, generateKillerBoard, generateKillerCages, generateSolution } from '../generator';
+import type { Difficulty, KillerCage, Technique } from '../../types/game';
+import {
+  generateBoard,
+  generateKillerBoard,
+  generateKillerCages,
+  generateSolution,
+  retryUntilGraded,
+} from '../generator';
 import { countSolutions, gradePuzzle } from '../solver';
 import { isValidSolution } from '../validator';
 
@@ -135,5 +141,28 @@ describe('generateKillerBoard', () => {
     const ladder = [GAME_LEVEL.EASY, GAME_LEVEL.MEDIUM, GAME_LEVEL.HARD];
     const clues = ladder.map((d) => countClues(generateKillerBoard(solution, d).board));
     for (let i = 1; i < clues.length; i++) expect(clues[i]).toBeLessThanOrEqual(atIndex(clues, i - 1));
+  });
+});
+
+describe('retryUntilGraded — 폴백', () => {
+  const EXPERT_RANGE = { clues: 0, minTechnique: TECHNIQUE.ADVANCED, maxTechnique: TECHNIQUE.ADVANCED };
+  const fromSequence = (grades: Technique[]) => {
+    let index = 0;
+    return () => atIndex(grades, Math.min(index++, grades.length - 1));
+  };
+
+  it('범위 밖이어도 추측(GUESS) 판보다 풀리는 판을 고른다', () => {
+    const produce = fromSequence([TECHNIQUE.GUESS, TECHNIQUE.LOCKED, TECHNIQUE.GUESS]);
+    expect(retryUntilGraded(3, EXPERT_RANGE, produce, (grade) => grade)).toBe(TECHNIQUE.LOCKED);
+  });
+
+  it('시도 횟수 안에 GUESS만 나오면 풀리는 판이 나올 때까지 더 뽑는다', () => {
+    const produce = fromSequence([TECHNIQUE.GUESS, TECHNIQUE.GUESS, TECHNIQUE.SUBSET]);
+    expect(retryUntilGraded(2, EXPERT_RANGE, produce, (grade) => grade)).toBe(TECHNIQUE.SUBSET);
+  });
+
+  it('상한까지 GUESS만 나오면 GUESS 판이라도 반환한다(멈추지 않는다)', () => {
+    const produce = fromSequence([TECHNIQUE.GUESS]);
+    expect(retryUntilGraded(2, EXPERT_RANGE, produce, (grade) => grade)).toBe(TECHNIQUE.GUESS);
   });
 });

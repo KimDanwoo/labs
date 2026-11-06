@@ -1,4 +1,10 @@
-import { BOARD_SIZE, CLASSIC_DIFFICULTY, KILLER_DIFFICULTY, SUDOKU_CELL_COUNT } from '@entities/game/model/constants';
+import {
+  BOARD_SIZE,
+  CLASSIC_DIFFICULTY,
+  KILLER_DIFFICULTY,
+  SUDOKU_CELL_COUNT,
+  TECHNIQUE,
+} from '@entities/game/model/constants';
 import type {
   Difficulty,
   GradedDifficultySpec,
@@ -81,10 +87,17 @@ const CLASSIC_GRADE_ATTEMPTS = 60;
 const KILLER_GRADE_ATTEMPTS = 10;
 
 /**
- * @description 후보를 만들어 채점하고, 기법 범위에 들면 바로 반환한다. 끝까지 못 들면 가장 가까운 후보를 쓴다.
- * 같은 거리면 추측이 필요한(범위 위) 쪽보다 풀 수 있는(범위 아래) 쪽을 택한다.
+ * 추측이 필요한 판만 계속 나올 때의 상한. 실측(시도 300회)에서 GUESS는 시도당 최대 ~25%라 사실상 닿지 않는다.
+ * ponytail: 상한에 닿으면 GUESS 판이라도 반환한다 — 판을 못 주는 것보다 낫다.
  */
-function retryUntilGraded<T>(
+const GUESS_FREE_ATTEMPT_CAP_FACTOR = 4;
+
+/**
+ * @description 후보를 만들어 채점하고, 기법 범위에 들면 바로 반환한다. 끝까지 못 들면 가장 가까운 후보를 쓴다.
+ * 추측이 필요한(GUESS) 판은 폴백으로도 쓰지 않고, 추측 없이 풀리는 후보가 나올 때까지 더 뽑는다.
+ * 같은 거리면 범위 위쪽보다 풀기 쉬운(범위 아래) 쪽을 택한다.
+ */
+export function retryUntilGraded<T>(
   attempts: number,
   { minTechnique, maxTechnique }: GradedDifficultySpec,
   produce: () => T,
@@ -98,10 +111,17 @@ function retryUntilGraded<T>(
 
   let best: T | null = null;
   let bestDistance = Number.POSITIVE_INFINITY;
+  let lastGuess: T | null = null;
+  const attemptCap = attempts * GUESS_FREE_ATTEMPT_CAP_FACTOR;
 
-  for (let attempt = 0; attempt < attempts; attempt++) {
+  for (let attempt = 0; attempt < attempts || (best === null && attempt < attemptCap); attempt++) {
     const candidate = produce();
-    const distance = distanceToRange(gradeOf(candidate));
+    const grade = gradeOf(candidate);
+    if (grade === TECHNIQUE.GUESS) {
+      lastGuess = candidate;
+      continue;
+    }
+    const distance = distanceToRange(grade);
     if (distance === 0) return candidate;
     if (distance < bestDistance) {
       bestDistance = distance;
@@ -109,7 +129,7 @@ function retryUntilGraded<T>(
     }
   }
 
-  return best!;
+  return (best ?? lastGuess)!;
 }
 
 /**
