@@ -31,6 +31,8 @@ function createUniqueIds() {
 /** 문서마다 새로 만들어 slug 중복 카운트가 글 사이에 섞이지 않게 한다. */
 export function articleHastPlugin() {
   const uniqueId = createUniqueIds();
+  // 표 영역마다 이름이 같으면 스크린 리더가 영역을 구분하지 못한다(axe landmark-unique) — 번호로 나눈다
+  let tableCount = 0;
   return {
     name: 'dansoon-article',
     element: {
@@ -47,7 +49,7 @@ export function articleHastPlugin() {
           ctx.wrapNode(node, {
             type: 'element',
             tagName: 'div',
-            properties: { className: ['table-scroll'], tabIndex: 0, role: 'region', ariaLabel: '표 (가로 스크롤)' },
+            properties: { className: ['table-scroll'], tabIndex: 0, role: 'region', ariaLabel: `표 ${(tableCount += 1)} (가로 스크롤)` },
             children: [],
           });
           return;
