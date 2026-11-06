@@ -16,8 +16,11 @@ type Props = {
 };
 
 const { report } = Astro.props;
-const { title, description, date, category } = report.data;
+const { title, description, date, category, note } = report.data;
 const { Content, headings } = await render(report);
+// 애드센스 심사 동안 자동 생성 리포트는 검색 색인에서 뺀다(BaseLayout의 noindex).
+// 승인 후 이 값과 astro.config.mjs의 sitemap filter를 함께 걷어 낸다.
+const IS_EXCLUDED_FROM_SEARCH = true;
 
 const structuredData = {
   '@context': 'https://schema.org',
@@ -33,7 +36,13 @@ const structuredData = {
 const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c');
 ---
 
-<BaseLayout title={title} description={description} image={`/og/book/${report.id}.png`} article={{ publishedAt: date }}>
+<BaseLayout
+  title={title}
+  description={description}
+  image={`/og/book/${report.id}.png`}
+  article={{ publishedAt: date }}
+  noindex={IS_EXCLUDED_FROM_SEARCH}
+>
   <script is:inline slot="head" type="application/ld+json" set:html={structuredDataJson} />
   <div class="mx-auto max-w-6xl px-md sm:px-xl xl:grid xl:grid-cols-[minmax(0,1fr)_var(--container-3xs)] xl:gap-3xl">
     <!-- 순위 표가 넓어 글보다 넓은 칼럼을 쓴다 -->
@@ -46,6 +55,14 @@ const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c
         <p class="mt-md text-sm text-muted-foreground">
           <time datetime={date.toISOString()}>{formatLongDate(date)}</time> 기준
         </p>
+        {
+          note && (
+            <aside class="mt-lg rounded-lg border border-border px-lg py-md" aria-label="이번 주 메모">
+              <p class="text-sm font-bold">이번 주 메모</p>
+              <p class="mt-xs text-sm leading-relaxed text-muted-foreground">{note}</p>
+            </aside>
+          )
+        }
       </header>
 
       <div class="mt-xl xl:hidden">

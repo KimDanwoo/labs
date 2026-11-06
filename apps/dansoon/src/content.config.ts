@@ -42,6 +42,8 @@ const books = defineCollection({
     category: z.enum(REPORT_KINDS),
     // 예전 블로그 목록에서 숨기던 표시. 지금은 쓰지 않지만 생성기가 계속 쓰므로 받아 둔다
     isHidden: z.boolean().optional(),
+    // 직접 쓰는 한 줄 메모. 생성기는 비워 두고, 쓰고 싶은 주에만 frontmatter에 적는다
+    note: z.string().min(1).optional(),
   }),
 });
 
