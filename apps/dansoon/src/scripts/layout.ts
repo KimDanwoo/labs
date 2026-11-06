@@ -51,6 +51,12 @@ function attachScrollbar(host: HTMLElement) {
 // ── 사이드바 ─────────────────────────────────────────────────
 const sidebarHost = document.querySelector<HTMLElement>('[data-sidebar]');
 const sidebarScroller = sidebarHost ? attachScrollbar(sidebarHost) : null;
+const sidebarHeader = document.querySelector<HTMLElement>('aside [data-sidebar-header]');
+
+/** 목록이 고정된 머리(브랜드·검색) 밑으로 스크롤되면 경계선을 보인다(SidebarHeader의 data-scrolled) */
+function syncHeaderEdge(header: Element | null | undefined, scroller: HTMLElement) {
+  header?.toggleAttribute('data-scrolled', scroller.scrollTop > 0);
+}
 // 유지되는 요소라도 새 문서로 옮겨 붙일 때 브라우저가 스크롤을 0으로 되돌린다 — 옮기기 전 값을 들고 있다가 되돌린다
 let sidebarScrollTop = 0;
 // 사용자가 굴린 위치를 바로 기억한다 — 이동 중(page-load 전)에 굴린 휠을 되돌리기가 옛 위치로 덮어쓰지 않게.
@@ -59,6 +65,7 @@ sidebarScroller?.addEventListener(
   'scroll',
   () => {
     sidebarScrollTop = sidebarScroller.scrollTop;
+    syncHeaderEdge(sidebarHeader, sidebarScroller);
   },
   { passive: true },
 );
@@ -170,9 +177,11 @@ mobileNavScroller?.addEventListener(
   'scroll',
   () => {
     if (mobileNav()?.open) mobileNavScrollTop = mobileNavScroller.scrollTop;
+    syncHeaderEdge(mobileNavHeader?.firstElementChild, mobileNavScroller);
   },
   { passive: true },
 );
+const mobileNavHeader = document.querySelector<HTMLElement>('[data-mobile-nav-header]');
 const mobileNavContent = document.querySelector<HTMLElement>('[data-mobile-nav-content]');
 const mobileNavFooter = document.querySelector<HTMLElement>('[data-mobile-nav-footer]');
 
@@ -187,11 +196,14 @@ function openMobileNav() {
   const nav = mobileNav();
   const content = sidebarHost?.querySelector('[data-sidebar-content]');
   const footer = document.querySelector('aside [data-sidebar-footer]');
-  if (!nav || !mobileNavContent || !mobileNavFooter || !content || !footer) return;
+  if (!nav || !mobileNavHeader || !mobileNavContent || !mobileNavFooter || !sidebarHeader || !content || !footer) return;
+  if (mobileNavHeader.childElementCount === 0) mobileNavHeader.append(sidebarHeader.cloneNode(true));
   if (mobileNavContent.childElementCount === 0) mobileNavContent.append(cloneSidebarForDrawer(content));
   if (mobileNavFooter.childElementCount === 0) mobileNavFooter.append(footer.cloneNode(true));
   nav.showModal();
-  if (mobileNavScroller) mobileNavScroller.scrollTop = mobileNavScrollTop;
+  if (!mobileNavScroller) return;
+  mobileNavScroller.scrollTop = mobileNavScrollTop;
+  syncHeaderEdge(mobileNavHeader.firstElementChild, mobileNavScroller);
 }
 
 // 버튼이 복제된 사이드바 안에도 있으므로 클릭은 문서에서 한 번에 받는다

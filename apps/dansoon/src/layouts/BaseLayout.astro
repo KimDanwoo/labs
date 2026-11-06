@@ -9,6 +9,7 @@ import Icon from '~/components/Icon.astro';
 import MobileTopBar from '~/components/MobileTopBar.astro';
 import SearchDialog from '~/components/SearchDialog.astro';
 import SidebarFooter from '~/components/SidebarFooter.astro';
+import SidebarHeader from '~/components/SidebarHeader.astro';
 import SiteFooter from '~/components/SiteFooter.astro';
 import { getPublishedPosts } from '~/lib/posts';
 
@@ -108,7 +109,8 @@ const imageUrl = new URL(image, Astro.site).href;
         aria-label="사이트 탐색"
         class="hidden h-dvh flex-col border-r border-border bg-secondary-subtle lg:flex"
       >
-        <!-- 목록만 스크롤하고 푸터는 바닥에 고정한다. 스크롤바 라이브러리는 안쪽 요소에 붙인다 -->
+        <!-- 브랜드·검색과 푸터는 고정하고 목록만 스크롤한다. 스크롤바 라이브러리는 안쪽 요소에 붙인다 -->
+        <SidebarHeader />
         <div data-sidebar class="min-h-0 flex-1 overflow-y-auto">
           <AppSidebar posts={posts} />
         </div>
@@ -141,8 +143,9 @@ const imageUrl = new URL(image, Astro.site).href;
       >
         <Icon name="x" />
       </button>
-      <!-- 처음 열 때 데스크톱 사이드바(목록·푸터)를 복제해 채운다(같은 목록을 두 번 그리지 않는다) -->
+      <!-- 처음 열 때 데스크톱 사이드바(머리·목록·푸터)를 복제해 채운다(같은 목록을 두 번 그리지 않는다) -->
       <div class="flex h-full flex-col">
+        <div data-mobile-nav-header></div>
         <div data-mobile-nav-body class="min-h-0 flex-1 overflow-y-auto">
           <div data-mobile-nav-content></div>
         </div>
