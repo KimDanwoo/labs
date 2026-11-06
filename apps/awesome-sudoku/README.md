@@ -19,12 +19,12 @@ TypeScript + Next.js로 만들었고, 알고리즘부터 UI까지 직접 구현�
 - 클래식 모드 & 킬러 모드 (케이지 합산 규칙)
 - 메모 모드, 힌트 시스템, 충돌 감지
 - Undo / Redo
-- 실수 5회 초과 시 게임 오버
+- 실수 5회 시 게임 오버
 - 게임 결과 바텀시트 (성공/실패 분기)
 
 **Record & Stats**
 
-- 난이도 기반 포인트 시스템 (4~10점)
+- 난이도·시간 기반 포인트 시스템 (쉬움 1~3, 중간 3~6, 어려움 6~9, 전문가 9~12점 · 킬러 모드 1점 감점)
 - 게임별 기록 저장 (시간, 힌트, 실수, 포인트)
 - 난이도별 통계, 완료율, 최고 포인트
 
@@ -39,13 +39,13 @@ TypeScript + Next.js로 만들었고, 알고리즘부터 UI까지 직접 구현�
 
 - 다크 / 라이트 테마
 - 반응형 레이아웃 (모바일 395px ~ 데스크탑)
-- 드래그로 닫는 바텀시트, 토스트 알림
+- 드래그로 닫는 바텀시트
 - Jonathan Ive 인스파이어드 미니멀 디자인
 
 ## Tech Stack
 
 ```
-Next.js 15 (App Router + Turbopack)
+Next.js 16 (App Router + Turbopack)
 React 19 · TypeScript · Tailwind CSS v4
 Jotai v2 (state management)
 Firebase Auth + Firestore

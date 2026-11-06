@@ -12,6 +12,14 @@ import { fillCellAtom } from '../../../../entities/game/model/store/cellValueAto
 import { initializeGameAtom } from '../../../../entities/game/model/store/gameLifecycleAtoms';
 import { getHintAtom } from '../../../../entities/game/model/store/hintAtoms';
 import {
+  canRedoAtom,
+  canUndoAtom,
+  futureAtom,
+  redoAtom,
+  undoAtom,
+} from '../../../../entities/game/model/store/historyAtoms';
+import { handleKeyInputAtom } from '../../../../entities/game/model/store/keyboardAtoms';
+import {
   boardAtom,
   cagesAtom,
   difficultyAtom,
@@ -19,6 +27,7 @@ import {
   hintsRemainingAtom,
   isCompletedAtom,
   isGeneratingAtom,
+  isNoteModeAtom,
   isSuccessAtom,
   mistakeCountAtom,
   selectedCellAtom,
@@ -260,5 +269,119 @@ describe('initializeGameAtom — 비동기 생성', () => {
 
     expect(store.get(cagesAtom).length).toBeGreaterThan(0);
     expect(store.get(cagesAtom).flatMap((cage) => cage.cells).length).toBe(81);
+  });
+});
+
+describe('undoAtom / redoAtom — 히스토리', () => {
+  const valueAt = (store: ReturnType<typeof setupStore>): number | null => cellAt(store.get(boardAtom), 0, 0).value;
+
+  it('입력 → undo → redo 하면 입력 전 보드와 입력 후 값으로 오간다', () => {
+    const store = setupStore([
+      [0, 0],
+      [8, 8],
+    ]);
+    store.set(selectedCellAtom, { row: 0, col: 0 });
+    store.set(fillCellAtom, 5);
+
+    store.set(undoAtom);
+    expect(valueAt(store)).toBeNull();
+    expect(store.get(canRedoAtom)).toBe(true);
+
+    store.set(redoAtom);
+    expect(valueAt(store)).toBe(5);
+    expect(store.get(canRedoAtom)).toBe(false);
+    expect(store.get(canUndoAtom)).toBe(true);
+  });
+
+  it('undo 뒤에 새로 입력하면 redo 기록이 비워진다', () => {
+    const store = setupStore([
+      [0, 0],
+      [8, 8],
+    ]);
+    store.set(selectedCellAtom, { row: 0, col: 0 });
+    store.set(fillCellAtom, 5);
+    store.set(undoAtom);
+    expect(store.get(futureAtom)).toHaveLength(1);
+
+    store.set(fillCellAtom, 5);
+    expect(store.get(futureAtom)).toHaveLength(0);
+  });
+
+  it('키보드 입력·지우기·메모도 기록된다', () => {
+    const store = setupStore([
+      [0, 0],
+      [8, 8],
+    ]);
+    store.set(selectedCellAtom, { row: 0, col: 0 });
+    store.set(handleKeyInputAtom, '5');
+    store.set(handleKeyInputAtom, 'Backspace');
+    store.set(isNoteModeAtom, true);
+    store.set(handleKeyInputAtom, '3');
+
+    store.set(undoAtom);
+    expect(cellAt(store.get(boardAtom), 0, 0).notes).toEqual([]);
+    store.set(undoAtom);
+    expect(valueAt(store)).toBe(5);
+    store.set(undoAtom);
+    expect(valueAt(store)).toBeNull();
+    expect(store.get(canUndoAtom)).toBe(false);
+  });
+
+  it('끝난 판에서는 입력·undo가 무시된다 — 힌트로 완료한 뒤 Backspace → undo로 판이 다시 열리지 않는다', () => {
+    const store = setupStore([[0, 0]]);
+    store.set(selectedCellAtom, { row: 0, col: 0 });
+    store.set(getHintAtom);
+    expect(store.get(isCompletedAtom)).toBe(true);
+
+    store.set(handleKeyInputAtom, 'Backspace');
+    store.set(undoAtom);
+    expect(valueAt(store)).toBe(cellAt(SOLUTION, 0, 0));
+    expect(store.get(isCompletedAtom)).toBe(true);
+    expect(store.get(timerActiveAtom)).toBe(false);
+  });
+
+  it('무시되는 입력(같은 값 재입력)은 기록하지 않는다', () => {
+    const store = setupStore([
+      [0, 0],
+      [8, 8],
+    ]);
+    store.set(selectedCellAtom, { row: 0, col: 0 });
+    store.set(fillCellAtom, 5);
+    store.set(fillCellAtom, 5);
+
+    store.set(undoAtom);
+    expect(store.get(canUndoAtom)).toBe(false);
+  });
+
+  it('undo는 실수 횟수와 힌트를 되돌리지 않는다', () => {
+    const store = setupStore([
+      [0, 0],
+      [8, 8],
+    ]);
+    store.set(selectedCellAtom, { row: 0, col: 0 });
+    store.set(fillCellAtom, 9);
+    store.set(getHintAtom);
+
+    store.set(undoAtom);
+    store.set(undoAtom);
+    expect(valueAt(store)).toBeNull();
+    expect(store.get(mistakeCountAtom)).toBe(1);
+    expect(store.get(hintsRemainingAtom)).toBe(HINTS_REMAINING - 1);
+  });
+
+  it('되돌린 보드의 선택 표시는 지금 선택한 칸을 따른다', () => {
+    const store = setupStore([
+      [0, 0],
+      [8, 8],
+    ]);
+    store.set(selectedCellAtom, { row: 0, col: 0 });
+    store.set(fillCellAtom, 5);
+    store.set(selectedCellAtom, { row: 8, col: 8 });
+
+    store.set(undoAtom);
+    const selectedCells = store
+      .get(boardAtom)
+      .flatMap((row, r) => row.flatMap((cell, c) => (cell.isSelected ? [[r, c]] : [])));
+    expect(selectedCells).toEqual([[8, 8]]);
   });
 });
