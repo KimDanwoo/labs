@@ -20,6 +20,8 @@ body {
   word-break: keep-all;
   /* 끊을 수 없는 긴 토큰(URL 등)은 넘치지 않게 줄바꿈 허용. */
   overflow-wrap: anywhere;
+  /* 히어로 글로우가 떠다니며 좁은 화면에서 가로 스크롤을 만들지 않게 뷰포트에서만 자른다. */
+  overflow-x: clip;
 }
 
 /* ─── 디스플레이 타이포그래피 ─────────────────────────────────── */
@@ -33,40 +35,236 @@ body {
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    translate: 0 10px;
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    translate: 0 0;
   }
 }
 
-/* 히어로 타이틀 — 조금 더 긴 이동거리 */
-@keyframes hero-enter {
+/* 히어로 뒤 글로우 — 왼쪽 아래로만 떠다닌다(오른쪽으로 가면 좁은 화면에서 가로 넘침) */
+@keyframes glow-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-20%, 20%) scale(1.15);
+  }
+}
+
+.hero-glow {
+  animation: glow-drift 14s ease-in-out infinite;
+}
+
+/* 헤드라인 단어별 등장 — 흐릿하게 떠올라 선명해진다 */
+@keyframes word-in {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    translate: 0 0.35em;
+    filter: blur(12px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    translate: 0 0;
+    filter: blur(0);
   }
+}
+
+.word-reveal {
+  display: inline-block;
+  animation: word-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 강조 단어 — 그라데이션이 천천히 흐른다 */
+@keyframes text-flow {
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+.text-flow {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-primary-accent),
+    var(--color-info),
+    var(--color-primary)
+  );
+  background-size: 300% 100%;
+  background-position: 0% 50%;
+  background-clip: text;
+  color: transparent;
+  animation: text-flow 6s ease-in-out infinite alternate;
+}
+
+/* ─── 프로젝트 카드: 커서 스포트라이트 · 3D 틸트 · 회전 테두리 ─── */
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes border-spin {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+.spotlight-host {
+  --mx: 50%;
+  --my: 50%;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  --shift-x: 0px;
+  --shift-y: 0px;
+  --spotlight-radius: 22rem;
+}
+
+/* 측정용 링크(host)는 그대로 두고 안쪽 레이어만 기울여 좌표 계산이 흔들리지 않게 한다 */
+.spotlight-card {
+  position: relative;
+  isolation: isolate;
+  transform: perspective(60rem) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spotlight-host:hover .spotlight-card {
+  transition-duration: 0.15s;
+}
+
+.spotlight-card::before,
+.spotlight-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+/* 커서를 따라다니는 표면 조명 */
+.spotlight-card::before {
+  background: radial-gradient(
+    var(--spotlight-radius) circle at var(--mx) var(--my),
+    color-mix(in oklab, var(--color-primary) 28%, transparent),
+    transparent 60%
+  );
+}
+
+/* 테두리만 남기도록 마스크한 회전 conic 그라데이션 */
+.spotlight-card::after {
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0deg,
+    var(--color-primary) 70deg,
+    var(--color-primary-accent) 130deg,
+    transparent 200deg
+  );
+  mask:
+    linear-gradient(black 0 0) content-box,
+    linear-gradient(black 0 0);
+  mask-composite: exclude;
+}
+
+.spotlight-host:hover .spotlight-card::before,
+.spotlight-host:hover .spotlight-card::after,
+.spotlight-host:focus-visible .spotlight-card::before,
+.spotlight-host:focus-visible .spotlight-card::after {
+  opacity: 1;
+}
+
+.spotlight-host:hover .spotlight-card::after {
+  animation: border-spin 3s linear infinite;
+}
+
+/* 커버는 기울기 반대로 움직여 깊이감을 만든다 */
+.spotlight-cover {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spotlight-host:hover .spotlight-cover {
+  transform: translate(var(--shift-x), var(--shift-y)) scale(1.08);
 }
 
 .fade-up {
   animation: fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.hero-enter {
-  animation: hero-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+/* ─── 스크롤 연동 (지원 브라우저만, 미지원은 로드 시 fade-up 유지) ─── */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 var(--spacing-2xl);
+    scale: 0.94;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@keyframes hero-recede {
+  to {
+    opacity: 0.25;
+    translate: 0 var(--spacing-2xl);
+    scale: 0.96;
+  }
+}
+
+@keyframes header-condense {
+  to {
+    padding-block: var(--spacing-sm);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .scroll-reveal {
+    animation: reveal-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 30%;
+    /* 로드용 스태거 지연(인라인)은 스크롤 타임라인에선 의미가 없어 무력화한다 */
+    animation-delay: 0s !important;
+  }
+
+  .hero-recede {
+    animation: hero-recede linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 70vh;
+  }
+
+  .header-condense {
+    animation: header-condense linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 var(--spacing-3xl);
+  }
 }
 
 /* ─── 접근성 ─────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .fade-up,
-  .hero-enter {
-    animation: none;
+  .hero-glow,
+  .word-reveal,
+  .text-flow,
+  .scroll-reveal,
+  .hero-recede,
+  .header-condense {
+    animation: none !important;
     opacity: 1;
+  }
+
+  .spotlight-card,
+  .spotlight-host:hover .spotlight-cover {
+    transform: none;
+  }
+
+  .spotlight-host:hover .spotlight-card::after {
+    animation: none;
   }
 
   *,

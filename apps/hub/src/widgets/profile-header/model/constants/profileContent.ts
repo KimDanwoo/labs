@@ -5,9 +5,18 @@ const SOUNDCLOUD_URL = 'https://soundcloud.com/danwooking';
 const BLOG_URL = 'https://log.danwoo.dev/';
 const GITHUB_URL = 'https://github.com/KimDanwoo';
 
+/** 헤드라인 첫 줄에서 돌아가며 바뀌는 키워드. 첫 항목이 기본 문장(낭독기·동작 줄이기)으로 쓰인다. */
+export const HEADLINE_KEYWORDS: readonly string[] = [
+  '제품을 키우는',
+  'AI와 함께 만드는',
+  '데이터로 판단하는',
+  '구조부터 다듬는',
+  '아이디어를 배포하는',
+];
+
 export const PROFILE_PARAGRAPHS: readonly ProfileParagraph[] = [
   [
-    '제품을 키우는 데 관심이 많은 프론트엔드 엔지니어예요. 화면을 다듬는 일도 좋아하지만, 더 끌리는 건 그 뒤에 있는 구조와 데이터, 그리고 일하는 방식을 조금씩 더 낫게 바꾸는 쪽이에요. 지금까지 해온 일은 ',
+    '화면을 다듬는 일도 좋아하지만, 더 끌리는 건 그 뒤에 있는 구조와 데이터, 그리고 일하는 방식을 조금씩 더 낫게 바꾸는 쪽이에요. 지금까지 해온 일은 ',
     { label: '이력서', href: RESUME_URL },
     '에 정리해 뒀어요.',
   ],
