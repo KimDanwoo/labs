@@ -3,7 +3,21 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig } from 'astro/config';
+import { readdirSync, readFileSync } from 'node:fs';
 import { articleHastPlugin } from './src/lib/articleHastPlugin.mjs';
+
+// 설정 파일에서는 content collection을 쓸 수 없어 frontmatter의 날짜만 직접 읽는다(updatedAt이 있으면 그 값)
+const POSTS_DIR = new URL('./contents/posts/', import.meta.url);
+const readFrontmatterDate = (source, key) => source.match(new RegExp(`^${key}:\\s*["']?([^"'\\n]+)`, 'm'))?.[1]?.trim();
+const POST_LASTMOD = new Map(
+  readdirSync(POSTS_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .flatMap((entry) => {
+      const source = readFileSync(new URL(`${entry.name}/index.md`, POSTS_DIR), 'utf8');
+      const date = readFrontmatterDate(source, 'updatedAt') ?? readFrontmatterDate(source, 'publishedAt');
+      return date ? [[entry.name, new Date(date).toISOString()]] : [];
+    }),
+);
 
 const CODE_FONT_FAMILY = "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace";
 
@@ -29,7 +43,14 @@ export default defineConfig({
       },
     }),
     // 자동 생성 리포트(/book/<날짜>-<종류>/)는 애드센스 심사 동안 색인하지 않는다. book/[slug].astro의 noindex와 함께 걷어 낸다
-    sitemap({ filter: (page) => !/\/book\/[^/]+\/$/.test(new URL(page).pathname) }),
+    sitemap({
+      filter: (page) => !/\/book\/[^/]+\/$/.test(new URL(page).pathname),
+      serialize: (item) => {
+        const slug = new URL(item.url).pathname.match(/^\/posts\/([^/]+)\/$/)?.[1];
+        const lastmod = slug && POST_LASTMOD.get(slug);
+        return lastmod ? { ...item, lastmod } : item;
+      },
+    }),
   ],
   markdown: {
     processor: satteri({
