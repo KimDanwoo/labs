@@ -4,7 +4,7 @@ import Link from 'next/link';
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-glass-border bg-glass backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-lg py-md">
+      <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-lg py-md header-condense">
         <Link
           href="/"
           aria-label="Danwoo Lab 홈"
