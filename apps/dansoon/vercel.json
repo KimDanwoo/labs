@@ -9,6 +9,7 @@
   "framework": "astro",
   "buildCommand": "pnpm exec turbo run build --filter=dansoon",
   "outputDirectory": "dist",
+  "trailingSlash": true,
   "ignoreCommand": "npx turbo-ignore dansoon",
   "redirects": [
     { "source": "/tech", "destination": "/", "permanent": true },
