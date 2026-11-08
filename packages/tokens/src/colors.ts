@@ -29,8 +29,9 @@ export const colors = {
   'secondary-foreground': { light: t.gray[700], dark: t.gray[200] },
   'secondary-subtle': { light: t.gray[50], dark: t.gray[900] },
 
+  // 상태색(success·warning·info·error)의 라이트 값은 각자의 subtle 배경 위 글자 대비가 4.5:1(WCAG AA) 이상이다.
   // Success — green
-  success: { light: t.green[600], dark: t.green[400] },
+  success: { light: t.green[700], dark: t.green[400] },
   'success-foreground': { light: c.white, dark: t.green[900] },
   'success-subtle': { light: t.green[50], dark: 'oklch(0.30 0.05 152)' },
 
@@ -40,12 +41,12 @@ export const colors = {
   'error-subtle': { light: t.red[50], dark: 'oklch(0.30 0.05 27)' },
 
   // Warning — amber
-  warning: { light: t.amber[700], dark: t.amber[400] },
+  warning: { light: t.amber[800], dark: t.amber[400] },
   'warning-foreground': { light: c.white, dark: 'oklch(0.25 0.03 55)' },
   'warning-subtle': { light: t.amber[100], dark: 'oklch(0.32 0.05 60)' },
 
   // Info — sky
-  info: { light: t.sky[600], dark: t.sky[400] },
+  info: { light: t.sky[700], dark: t.sky[400] },
   'info-foreground': { light: c.white, dark: 'oklch(0.25 0.04 228)' },
   'info-subtle': { light: t.sky[100], dark: 'oklch(0.30 0.05 228)' },
 
