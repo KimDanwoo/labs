@@ -14,7 +14,7 @@ export const colors = {
   'prairie-ink': { light: t.green[900], dark: t.green[900] },
   'prairie-accent': { light: t.amber[200], dark: t.amber[200] },
 
-  // Primary — brand 램프(기본 코발트, hue 회전으로 리스킨)
+  // Primary — brand 램프(기본 sky 블루 240, hue 회전으로 리스킨)
   primary: { light: t.brand[600], dark: t.brand[400] },
   'primary-foreground': { light: c.white, dark: t.gray[900] },
   'primary-accent': { light: t.brand[500], dark: t.brand[300] },
