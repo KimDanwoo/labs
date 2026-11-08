@@ -16,7 +16,6 @@ export const spacing = {
 } as const;
 
 export const radius = {
-  none: '0px',
   sm: '4px',
   md: '8px',
   lg: '12px',
@@ -46,7 +45,6 @@ export const container = {
   '5xl': '64rem',
   '6xl': '72rem',
   '7xl': '80rem',
-  mobile: '28rem', // 폰 앱(gymlog 등) 콘텐츠 폭 — spacing과 안 겹쳐 max-w-mobile로 안전.
   content: '42rem', // 읽기 앱(fe-deep·hub) 본문 폭.
 } as const;
 

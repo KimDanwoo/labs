@@ -5,7 +5,7 @@ import { commonColors as c, themeColors as t } from './palette';
  * 이 맵이 codegen 입력이며 light/dark 두 값을 갖는다.
  *
  * 역할: primary / secondary / success / error / warning / info + 표면·폼·이펙트.
- * primary·accent·ring·glow 는 brand 램프를 참조 → `--brand-hue` 회전에 함께 반응(스킨).
+ * primary·accent·ring 은 brand 램프를 참조 → `--brand-hue` 회전에 함께 반응(스킨).
  * 다크는 밝은 스텝을 base로 올리고 foreground를 어둡게 뒤집어 대비를 확보한다.
  */
 export const colors = {
@@ -67,17 +67,9 @@ export const colors = {
   input: { light: t.gray[200], dark: t.gray[700] },
   ring: { light: t.brand[600], dark: t.brand[400] },
 
-  // 이펙트 (brand hue 인식)
+  // 이펙트 — 반투명 유리 표면
   glass: { light: 'oklch(1 0 0 / 0.72)', dark: 'oklch(0.20 0.018 264 / 0.6)' },
   'glass-border': { light: 'oklch(0.145 0.018 264 / 0.08)', dark: 'oklch(1 0 0 / 0.08)' },
-  glow: {
-    light: 'oklch(0.48 0.20 var(--brand-hue) / 0.16)',
-    dark: 'oklch(0.66 0.16 var(--brand-hue) / 0.18)',
-  },
-  'glow-strong': {
-    light: 'oklch(0.48 0.20 var(--brand-hue) / 0.3)',
-    dark: 'oklch(0.66 0.16 var(--brand-hue) / 0.32)',
-  },
 
   // 테마 토글 장식색 — 스위치의 낮/밤 상태에 고정(앱 테마와 무관 → light=dark 동일값).
   // 값은 Tailwind 팔레트 oklch(sky/amber/indigo). 여기 한 곳만 바꾸면 전 앱 토글이 함께 바뀐다.
