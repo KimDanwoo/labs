@@ -112,10 +112,12 @@ function generate() {
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  color-scheme: light;
 ${indent([...scalarLines, '', ...rootLines, '', ...staticLines])}
 }
 
 .dark {
+  color-scheme: dark;
 ${indent(darkLines)}
 }
 
