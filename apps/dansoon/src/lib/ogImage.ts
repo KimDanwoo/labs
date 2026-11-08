@@ -21,7 +21,7 @@ const COLOR = {
   border: '#e2e5e9',
 } as const;
 
-/** 카테고리 색(--color-info/warning/success)과 블루 포인트(--color-primary)의 라이트 테마 값 */
+/** 카테고리 색(global.css의 --category-*)과 블루 포인트(--color-primary)의 라이트 테마 값 */
 export const OG_ACCENT = {
   dev: '#007ead',
   retro: '#b3621e',

@@ -5,6 +5,16 @@
 :root {
   /* 공용 토큰의 고정폭 서체는 Geist Mono 변수를 가리키는데, 이 앱은 그 폰트를 불러오지 않는다 */
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --category-dev: oklch(0.55 0.13 228);
+  --category-retro: oklch(0.58 0.13 55);
+  --category-reading: oklch(0.56 0.15 152);
+}
+
+.dark {
+  --category-dev: oklch(0.72 0.13 230);
+  --category-retro: oklch(0.82 0.16 78);
+  --category-reading: oklch(0.72 0.16 152);
 }
 
 /* 레이어 안에 둬야 Tailwind 유틸리티(outline-none 등)가 덮어쓸 수 있다 */
@@ -166,17 +176,17 @@
     font-weight: 700;
   }
 
-  /* 카테고리 색: 공용 토큰의 상태 색을 빌려 쓴다(다크모드도 토큰이 바꿔 준다) */
+  /* 카테고리는 상태가 아니라 분류라서 색을 앱이 정한다(라이트 값은 ogImage.ts의 OG_ACCENT와 같다) */
   [data-category='dev'] {
-    --category: var(--color-info);
+    --category: var(--category-dev);
   }
 
   [data-category='retro'] {
-    --category: var(--color-warning);
+    --category: var(--category-retro);
   }
 
   [data-category='reading'] {
-    --category: var(--color-success);
+    --category: var(--category-reading);
   }
 
   .category-badge {
