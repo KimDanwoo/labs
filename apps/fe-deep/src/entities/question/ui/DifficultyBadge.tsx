@@ -8,9 +8,5 @@ interface DifficultyBadgeProps {
 
 export function DifficultyBadge({ difficulty }: DifficultyBadgeProps) {
   const config = DIFFICULTY_CONFIG[difficulty];
-  return (
-    <Badge variant="outline" className={config.className}>
-      {config.label}
-    </Badge>
-  );
+  return <Badge variant={config.variant}>{config.label}</Badge>;
 }

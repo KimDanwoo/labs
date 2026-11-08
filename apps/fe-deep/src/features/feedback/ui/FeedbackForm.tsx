@@ -78,7 +78,7 @@ export function FeedbackForm({ questionId, questionText, fixedType, label, class
               autoFocus
             />
 
-            {status === 'success' && <p className="text-sm text-green-600">피드백이 제출되었습니다. 감사합니다!</p>}
+            {status === 'success' && <p className="text-sm text-success">피드백이 제출되었습니다. 감사합니다!</p>}
             {status === 'error' && <p className="text-sm text-error">{errorMsg}</p>}
 
             <div className="flex justify-end gap-2">

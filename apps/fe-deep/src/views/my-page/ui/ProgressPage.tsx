@@ -47,8 +47,8 @@ export function ProgressPage() {
         </Card>
         <Card className="shadow-sm">
           <Card.Content className="p-5 text-center">
-            <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-green-500/10">
-              <CheckCircle className="h-5 w-5 text-green-500" />
+            <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-success-subtle">
+              <CheckCircle className="h-5 w-5 text-success" />
             </div>
             <div className="text-2xl font-bold tabular-nums">{stats.mastered}</div>
             <div className="text-xs text-muted-foreground mt-0.5">마스터</div>
@@ -56,8 +56,8 @@ export function ProgressPage() {
         </Card>
         <Card className="shadow-sm">
           <Card.Content className="p-5 text-center">
-            <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500/10">
-              <Brain className="h-5 w-5 text-yellow-500" />
+            <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-warning-subtle">
+              <Brain className="h-5 w-5 text-warning" />
             </div>
             <div className="text-2xl font-bold tabular-nums">{stats.learning}</div>
             <div className="text-xs text-muted-foreground mt-0.5">학습 중</div>
@@ -102,10 +102,10 @@ export function ProgressPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium truncate">{cat.title}</span>
                       <div className="flex items-center gap-2 ml-2 shrink-0">
-                        <Badge variant="outline" className="text-xs text-green-500 tabular-nums">
+                        <Badge variant="success" className="tabular-nums">
                           {cs.mastered}
                         </Badge>
-                        <Badge variant="outline" className="text-xs text-yellow-500 tabular-nums">
+                        <Badge variant="warning" className="tabular-nums">
                           {cs.learning}
                         </Badge>
                         <span className="text-xs text-muted-foreground tabular-nums">{percent}%</span>
