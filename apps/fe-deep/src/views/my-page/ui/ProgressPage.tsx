@@ -29,7 +29,7 @@ export function ProgressPage() {
       {/* Study Heatmap */}
       <Card className="mb-8 shadow-sm">
         <Card.Content className="p-6">
-          <h2 className="text-sm font-medium mb-4">학습 기록</h2>
+          <h2 className="text-sm font-normal mb-4">학습 기록</h2>
           <StudyHeatmap heatmap={heatmap} />
         </Card.Content>
       </Card>
@@ -78,8 +78,8 @@ export function ProgressPage() {
       <Card className="mb-8 shadow-sm">
         <Card.Content className="p-6">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium">전체 진도</span>
-            <span className="text-sm font-medium tabular-nums text-primary">{overallPercent}%</span>
+            <span className="text-sm font-normal">전체 진도</span>
+            <span className="text-sm font-normal tabular-nums text-primary">{overallPercent}%</span>
           </div>
           <Progress value={overallPercent} className="h-2" />
         </Card.Content>
@@ -100,7 +100,7 @@ export function ProgressPage() {
                   <span className="text-xl">{cat.icon}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium truncate">{cat.title}</span>
+                      <span className="text-sm font-normal truncate">{cat.title}</span>
                       <div className="flex items-center gap-2 ml-2 shrink-0">
                         <Badge variant="success" className="tabular-nums">
                           {cs.mastered}

@@ -67,13 +67,13 @@ export function QuestionTable({
               <th className="p-3 w-10">
                 <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="전체 선택" />
               </th>
-              <th className="text-left p-3 font-medium">카테고리</th>
-              <th className="text-left p-3 font-medium">질문</th>
-              <th className="text-left p-3 font-medium">소분류</th>
-              <th className="text-left p-3 font-medium">난이도</th>
-              <th className="text-left p-3 font-medium">노출</th>
-              <th className="text-left p-3 font-medium">태그</th>
-              <th className="text-right p-3 font-medium">액션</th>
+              <th className="text-left p-3 font-normal">카테고리</th>
+              <th className="text-left p-3 font-normal">질문</th>
+              <th className="text-left p-3 font-normal">소분류</th>
+              <th className="text-left p-3 font-normal">난이도</th>
+              <th className="text-left p-3 font-normal">노출</th>
+              <th className="text-left p-3 font-normal">태그</th>
+              <th className="text-right p-3 font-normal">액션</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -158,7 +158,7 @@ export function QuestionTable({
                   aria-label={`${q.question} 선택`}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium leading-snug line-clamp-2">{q.question}</p>
+                  <p className="text-sm font-normal leading-snug line-clamp-2">{q.question}</p>
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     {cat && (
                       <span className="text-xs text-muted-foreground">

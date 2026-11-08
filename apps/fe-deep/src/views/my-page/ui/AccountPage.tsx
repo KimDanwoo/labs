@@ -25,7 +25,7 @@ export function AccountPage() {
             <div className="space-y-1 min-w-0">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">{displayName}</span>
+                <span className="font-normal">{displayName}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
@@ -41,7 +41,7 @@ export function AccountPage() {
         <Card.Content className="p-6">
           <div className="mb-1 flex items-center gap-2">
             <Volume2 className="h-4 w-4 text-muted-foreground" />
-            <h2 className="font-medium">답변 읽어주기 음성</h2>
+            <h2 className="font-normal">답변 읽어주기 음성</h2>
           </div>
           <p className="mb-4 text-sm text-muted-foreground">
             학습·레퍼런스 화면에서 답변을 읽어줄 목소리입니다. 이 브라우저에만 저장됩니다.

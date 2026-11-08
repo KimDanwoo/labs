@@ -68,7 +68,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center gap-0.5 px-3 py-1.5 text-xs transition-colors',
-                  isActive ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground',
+                  isActive ? 'text-primary font-normal' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 <Icon className="size-5" />
@@ -88,7 +88,7 @@ function NavLink({ href, active, children }: { href: string; active?: boolean; c
       href={href}
       className={cn(
         'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors',
-        active ? 'text-foreground bg-muted font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+        active ? 'text-foreground bg-muted font-normal' : 'text-muted-foreground hover:text-foreground hover:bg-muted',
       )}
     >
       {children}

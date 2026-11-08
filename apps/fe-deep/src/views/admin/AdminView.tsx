@@ -15,7 +15,7 @@ export async function AdminView() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <Card.Header className="pb-2">
-            <Card.Title className="text-sm font-medium text-muted-foreground">전체 질문 수</Card.Title>
+            <Card.Title className="text-sm font-normal text-muted-foreground">전체 질문 수</Card.Title>
           </Card.Header>
           <Card.Content>
             <p className="text-3xl font-bold">{totalQuestions}</p>
@@ -23,7 +23,7 @@ export async function AdminView() {
         </Card>
         <Card>
           <Card.Header className="pb-2">
-            <Card.Title className="text-sm font-medium text-muted-foreground">카테고리 수</Card.Title>
+            <Card.Title className="text-sm font-normal text-muted-foreground">카테고리 수</Card.Title>
           </Card.Header>
           <Card.Content>
             <p className="text-3xl font-bold">{categories.length}</p>

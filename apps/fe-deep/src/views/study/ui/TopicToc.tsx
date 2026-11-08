@@ -31,7 +31,7 @@ export function TopicToc({ topics, activeIndex, understood, review, onSelect }: 
               className={cn(
                 'flex w-full items-start gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
                 index === activeIndex
-                  ? 'bg-muted font-medium text-foreground'
+                  ? 'bg-muted font-normal text-foreground'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >

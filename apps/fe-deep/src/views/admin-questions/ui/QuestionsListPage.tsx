@@ -226,14 +226,14 @@ export function QuestionsListPage() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           {totalCount}개 질문 (페이지 {page}/{totalPages})
-          {hasSelection && <span className="ml-2 font-medium text-foreground">· {selectedIds.size}개 선택됨</span>}
+          {hasSelection && <span className="ml-2 font-normal text-foreground">· {selectedIds.size}개 선택됨</span>}
         </p>
       </div>
 
       {categoryFilter !== 'all' && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/20 p-3">
           <FolderSync className="size-4 text-muted-foreground" />
-          <span className="text-sm font-medium mr-1">카테고리 전체:</span>
+          <span className="text-sm font-normal mr-1">카테고리 전체:</span>
           <Button
             variant="outline"
             size="sm"
@@ -276,7 +276,7 @@ export function QuestionsListPage() {
 
       {hasSelection && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-3">
-          <span className="text-sm font-medium mr-2">일괄 작업:</span>
+          <span className="text-sm font-normal mr-2">일괄 작업:</span>
           <Button variant="destructive" size="sm" onClick={handleBulkDelete} className="gap-1">
             <Trash2 className="size-3.5" />
             삭제 ({selectedIds.size})

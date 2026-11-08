@@ -75,7 +75,7 @@ export function YearHeatmap({ year, heatmap, maxCount, today }: YearHeatmapProps
 
   return (
     <div className="mb-6">
-      <p className="text-sm font-medium text-muted-foreground mb-2">{year}년</p>
+      <p className="text-sm font-normal text-muted-foreground mb-2">{year}년</p>
       <div className="flex gap-1 min-w-max">
         {/* 요일 레이블 */}
         <div className="flex flex-col gap-1 mr-1">

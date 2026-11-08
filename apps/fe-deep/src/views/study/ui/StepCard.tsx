@@ -76,7 +76,7 @@ export function StepCard({ step, stepIndex, stepCount, isRevealed, recall, onRec
         <div className="mt-6 space-y-5 border-t border-border/50 pt-5">
           {recall.trim() && (
             <div className="rounded-lg bg-muted/40 p-4">
-              <p className="mb-2 text-xs font-medium text-muted-foreground">내가 말한 것</p>
+              <p className="mb-2 text-xs font-normal text-muted-foreground">내가 말한 것</p>
               <p className="whitespace-pre-wrap text-sm leading-relaxed">{recall}</p>
             </div>
           )}
@@ -96,7 +96,7 @@ export function StepCard({ step, stepIndex, stepCount, isRevealed, recall, onRec
               <Lightbulb className="mt-0.5 size-4 shrink-0" />
               <p className="leading-relaxed">
                 이 질문엔 정해진 답이 없습니다. 아래 순서로 직접 정리해보세요.
-                <span className="mt-2 block font-medium text-foreground">{ANSWER_FRAME.join(' → ')}</span>
+                <span className="mt-2 block font-normal text-foreground">{ANSWER_FRAME.join(' → ')}</span>
               </p>
             </div>
           )}

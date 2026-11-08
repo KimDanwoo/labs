@@ -127,7 +127,7 @@ export function LearnPage() {
 
         <Card className="p-6 space-y-6">
           <div>
-            <label className="text-sm font-medium mb-3 block">카테고리</label>
+            <label className="text-sm font-normal mb-3 block">카테고리</label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isLoading}>
               <SelectTrigger>
                 <SelectValue placeholder={isLoading ? '카테고리 불러오는 중...' : '카테고리 선택'} />
@@ -145,7 +145,7 @@ export function LearnPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-3 block">순서</label>
+            <label className="text-sm font-normal mb-3 block">순서</label>
             <div className="grid grid-cols-2 gap-1.5">
               <Button
                 variant={order === STUDY_ORDER.sequential ? 'default' : 'outline'}
@@ -169,7 +169,7 @@ export function LearnPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-3 block">난이도</label>
+            <label className="text-sm font-normal mb-3 block">난이도</label>
             <div className="grid grid-cols-4 gap-1.5">
               <Button
                 variant={difficulties.length === 0 ? 'default' : 'outline'}
