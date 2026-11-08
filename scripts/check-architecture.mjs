@@ -10,6 +10,7 @@ const PALETTE_CLASS =
   /\b(?:bg|text|border(?:-[trblxyse])?|ring(?:-offset)?|fill|stroke|from|via|to|outline|divide|shadow|decoration|accent|caret|placeholder)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b/g;
 const ARBITRARY_COLOR = /\b[a-z-]+-\[(?:#[0-9a-fA-F]{3,8}|(?:rgba?|hsla?|oklch|oklab|color-mix)\()/g;
 const TOKEN_EXCEPTION = /token-exception:\s*\S/;
+const UNSUPPORTED_WEIGHT = /\bfont-(?:thin|extralight|light|medium|extrabold|black)\b/;
 
 export function validateManifest(manifest, workspaceNames, catalogNames) {
   const problems = [];
@@ -56,8 +57,9 @@ export function validateDesignTokens(text) {
       problems.push(`${at}: 기본 팔레트 ${match} 대신 시맨틱 색 토큰을 쓴다.`);
     for (const [match] of line.matchAll(ARBITRARY_COLOR))
       problems.push(`${at}: 임의 색 값 ${match}… 대신 색 토큰을 쓴다.`);
-    if (/\bfont-medium\b/.test(line) && !/\bfont-mono\b/.test(line))
-      problems.push(`${at}: 마루부리에 없는 font-medium 대신 font-normal·font-semibold를 쓴다.`);
+    const weight = line.match(UNSUPPORTED_WEIGHT)?.[0];
+    if (weight && !/\bfont-mono\b/.test(line))
+      problems.push(`${at}: 마루부리에 없는 굵기 ${weight} 대신 font-normal·font-semibold·font-bold를 쓴다.`);
   });
   return problems;
 }
