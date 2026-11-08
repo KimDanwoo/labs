@@ -16,7 +16,7 @@ export const UserProfileMenu = memo(() => {
         onClick={signInWithGoogle}
         className={cn(
           'flex items-center gap-1.5 px-3 py-1.5 rounded-xl',
-          'text-sm font-medium',
+          'text-sm font-normal',
           'text-[rgb(var(--color-accent))]',
           'transition-all duration-150 ease-out',
           'hover:bg-[rgb(var(--color-hover))]',
@@ -49,7 +49,7 @@ export const UserProfileMenu = memo(() => {
               className={cn(
                 'w-full h-full flex items-center justify-center',
                 'bg-[rgb(var(--color-bg-tertiary))]',
-                'text-sm font-medium',
+                'text-sm font-normal',
                 'text-[rgb(var(--color-text-secondary))]',
               )}
             >
@@ -57,7 +57,7 @@ export const UserProfileMenu = memo(() => {
             </div>
           )}
         </div>
-        <span className="text-sm font-medium text-[rgb(var(--color-text-primary))] hidden sm:inline">
+        <span className="text-sm font-normal text-[rgb(var(--color-text-primary))] hidden sm:inline">
           {user.displayName}
         </span>
       </button>
@@ -76,7 +76,7 @@ export const UserProfileMenu = memo(() => {
         >
           {/* User Info */}
           <div className="px-3 py-2 border-b border-[rgb(var(--color-border-light))]">
-            <p className="text-sm font-medium text-[rgb(var(--color-text-primary))]">{user.displayName}</p>
+            <p className="text-sm font-normal text-[rgb(var(--color-text-primary))]">{user.displayName}</p>
             <p className="text-xs text-[rgb(var(--color-text-tertiary))] truncate">{user.email}</p>
           </div>
 

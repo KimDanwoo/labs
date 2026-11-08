@@ -27,7 +27,7 @@ export const RankBadge = memo<{ rank: number }>(({ rank }) => {
     <div
       className={cn(
         'w-7 h-7 flex items-center justify-center',
-        'text-sm font-medium',
+        'text-sm font-normal',
         'text-[rgb(var(--color-text-secondary))]',
       )}
     >

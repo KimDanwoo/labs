@@ -23,7 +23,7 @@ export const SelectSelector = () => {
         'px-3 py-1.5 pr-8',
         'bg-[rgb(var(--color-bg-tertiary))]/80 backdrop-blur-sm',
         'border-none rounded-lg',
-        'text-sm font-medium text-[rgb(var(--color-text-primary))]',
+        'text-sm font-normal text-[rgb(var(--color-text-primary))]',
         'cursor-pointer',
         'transition-all duration-200 ease-out',
         'hover:bg-[rgb(var(--color-bg-tertiary))]',

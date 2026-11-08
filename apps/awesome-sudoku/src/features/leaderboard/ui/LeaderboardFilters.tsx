@@ -30,7 +30,7 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
     <div className="flex flex-wrap gap-4 mb-6">
       {/* Difficulty Filter */}
       <fieldset className="flex-1 min-w-[140px]">
-        <legend className="block text-xs font-medium text-[rgb(var(--color-text-secondary))] mb-1.5">난이도</legend>
+        <legend className="block text-xs font-normal text-[rgb(var(--color-text-secondary))] mb-1.5">난이도</legend>
         <div className="flex flex-wrap gap-2" role="group" aria-label="난이도 필터">
           {difficulties.map((d) => (
             <button
@@ -54,7 +54,7 @@ export const LeaderboardFilters = memo<LeaderboardFiltersProps>(
 
       {/* Game Mode Filter */}
       <fieldset className="flex-1 min-w-[140px]">
-        <legend className="block text-xs font-medium text-[rgb(var(--color-text-secondary))] mb-1.5">모드</legend>
+        <legend className="block text-xs font-normal text-[rgb(var(--color-text-secondary))] mb-1.5">모드</legend>
         <div className="flex flex-wrap gap-2" role="group" aria-label="게임 모드 필터">
           {gameModes.map((m) => (
             <button

@@ -22,7 +22,7 @@ export const GeneratingOverlay: FC = () => {
       )}
     >
       <SudokuLoader size="lg" />
-      <span className="text-sm font-medium text-[rgb(var(--color-text-secondary))]">새 퍼즐을 만드는 중…</span>
+      <span className="text-sm font-normal text-[rgb(var(--color-text-secondary))]">새 퍼즐을 만드는 중…</span>
     </div>
   );
 };

@@ -50,14 +50,14 @@ export const PauseGameOverlay: FC = () => {
         >
           <VscPlay className="text-white text-3xl ml-1" />
         </div>
-        <span className="text-sm font-medium text-[rgb(var(--color-text-secondary))]">탭하여 계속하기</span>
+        <span className="text-sm font-normal text-[rgb(var(--color-text-secondary))]">탭하여 계속하기</span>
       </button>
 
       <button
         onClick={() => initializeGame(difficulty)}
         className={cn(
           'px-6 py-2.5 rounded-xl',
-          'text-sm font-medium',
+          'text-sm font-normal',
           'text-[rgb(var(--color-text-secondary))]',
           'bg-[rgb(var(--color-surface-primary))]/60',
           'border border-[rgb(var(--color-border-light))]/50',

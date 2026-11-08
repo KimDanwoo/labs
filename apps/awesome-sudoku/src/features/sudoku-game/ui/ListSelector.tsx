@@ -22,7 +22,7 @@ export const ListSelector = () => {
               onClick={() => initializeGame(option.value as Difficulty)}
               className={cn(
                 'px-4 py-2 rounded-xl',
-                'text-sm font-medium',
+                'text-sm font-normal',
                 'transition-all duration-200 ease-out',
                 'active:scale-95',
                 isActive
