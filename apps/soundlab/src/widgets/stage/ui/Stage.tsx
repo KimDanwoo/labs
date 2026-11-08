@@ -35,7 +35,7 @@ export function Stage() {
       </div>
       {/* 제목이 먼저, 장르가 아래 — 순번(01/25)은 목록 화면의 각 행이 이미 들고 있어 여기선 뺀다. */}
       <div className="flex max-w-[34ch] flex-col items-center gap-xs text-center">
-        <h2 className="text-[clamp(22px,2.7vw,38px)] leading-tight font-extrabold tracking-tight break-keep text-balance">
+        <h2 className="text-[clamp(22px,2.7vw,38px)] leading-tight font-bold tracking-tight break-keep text-balance">
           {track?.title ?? ''}
         </h2>
         <span className="font-label text-mute text-[10px] tracking-wide-label uppercase">{track?.genre ?? ''}</span>
