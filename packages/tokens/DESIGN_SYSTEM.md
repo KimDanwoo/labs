@@ -1,126 +1,108 @@
 # Danwoo 디자인 시스템 — 통합 스펙
 
-> **상태**: P1·P2·P3 완료. P1=토큰 OKLCH 재작성 + `--brand-hue`/`--brand-chroma` seam. P2=앱별 스킨 — hub(코발트+Plus Jakarta Sans)·gymlog(코발트+Space Grotesk)·prairie(코발트+Sora). P3=**이름 규칙을 shadcn 표준으로 통일**(`muted`/`secondary`=표면 + `-foreground`=텍스트, `popover` 추가) 후 fe-deep를 공유 베이스로 이관(코발트 hue·채도 0.6·차트/사이드바/읽기 opt-in 유지). **cheongyeon-saju는 우주 다크·보라·serif 정체성을 살려 이관 대상에서 제외(테마 one-off)**. **색은 코발트 단일, 정체성은 디스플레이 폰트로** 원칙 확정.
-> **한 줄**: 프딥 수준의 **OKLCH 단일 베이스**를 만들고, 앱은 **아주 얇은 스킨(브랜드 hue+채도 + 디스플레이 폰트)**만 덧입혀 정체성을 유지한다.
+> **한 줄**: OKLCH **단일 베이스**(`@tokens/css`)를 모든 앱이 공유하고, 앱은 브랜드 hue·채도 정도만 덮어쓴다. 서체는 마루부리 하나로 통일한다.
 
 ## 1. 목표 & 원칙
 
-- **하나의 잘 만든 시스템을 돌려쓴다.** 소스 오브 트루스는 `packages/tokens`(→ `@tokens/css`).
-- **"베이스 + 스킨"으로 클론화 방지.** 과거 실패("앱이 다 hub 같고 AI스럽다")를 구조로 차단한다.
-  - **베이스(공유)**: 구조·중립 스케일·상태색·시맨틱 토큰 _이름 계약_·`@ui/react` 컴포넌트. 기본 브랜드 = 코발트.
-  - **스킨(앱별, 최소)**: ① 브랜드 **hue 1개** ② **디스플레이 폰트** ③ (선택) 밀도. 이 이상은 오버라이드하지 않는다.
+- **하나의 시스템을 돌려쓴다.** 소스 오브 트루스는 `packages/tokens`(→ `@tokens/css`).
+- **베이스(공유)**: 중립 스케일·상태색·시맨틱 토큰 _이름 계약_·서체·간격·반경·그림자·`@ui/react` 컴포넌트.
+- **스킨(앱별, 최소)**: `--brand-hue`·`--brand-chroma`. 그 밖의 오버라이드는 7절 예외만 허용한다.
 - **절제된 모던 유지**: 그라데이션·큰 글로우·grain·shimmer 지양. 강조는 단색 브랜드 1곳.
 
 ## 2. 색공간 — OKLCH
 
-- 프딥이 이미 채택. hex 대비 **지각적 균일성**이 높아 스케일이 매끈하고 대비 계산이 안정적.
-- **핵심 이점**: L(밝기)·C(채도) 고정 + **hue만 회전**하면 앱별 브랜드색이 같은 시스템에서 자동으로 조화롭게 나온다. → 스킨이 사실상 `--brand-hue` 하나로 끝난다(hex로는 불가능).
+- hex 대비 **지각적 균일성**이 높아 스케일이 매끈하고 대비 계산이 안정적.
+- L(밝기)·C(채도)를 고정하고 **hue만 회전**하면 같은 시스템 안에서 앱별 브랜드색이 나온다.
 
-## 3. 아키텍처 (3-tier)
+## 3. 아키텍처 (2-tier + 스킨)
 
+```text
+palette(원자)          →  semantic(역할 alias)    →  skin(앱 오버라이드)
+oklch(L C H) 스케일        --color-primary 등           --brand-hue / --brand-chroma
 ```
-primitives(원자)      →  semantic(역할 alias)   →  skin(앱 오버라이드)
-oklch(L C H) 스케일       --color-primary 등          --brand-hue / --font-display
+
+- **palette**(`palette.ts`): gray(쿨톤 hue 264 고정)·brand(hue/채도 변수)·green·red·amber·sky, 스텝 50–900 + white/black.
+- **semantic**(`colors.ts`): palette 스텝을 역할로 alias(light/dark 2값). codegen 입력.
+- **skin**: 앱 전역 CSS가 `@tokens/css/theme.css`를 import한 뒤 `:root`에서 스킨 변수만 덮어씀.
+
+## 4. 브랜드 hue 회전 seam
+
+브랜드 램프는 L만 고정하고 hue·채도를 변수로 둔다:
+
+```text
+/* palette.ts 의 brand-600 = primary(light) */
+oklch(0.48 calc(0.20 * var(--brand-chroma)) var(--brand-hue))
 ```
-
-- **primitives**: 브랜드 램프 + 중립(gray) + 상태(green/red/amber/…) + (opt-in) 차트 hue.
-- **semantic**: primitives를 역할로 alias(light/dark 2값). codegen 입력.
-- **skin**: 앱 `globals.css`가 `@tokens/css/theme.css`를 import한 뒤 `:root`에서 소수 변수만 덮어씀.
-
-## 4. 브랜드 hue 회전 seam (스킨의 심장)
-
-브랜드 램프를 **hue를 변수로** 정의한다:
 
 ```css
-/* theme.css (생성물) — 개념 예시 */
-:root {
-  --brand-hue: 265; /* 코발트 기본값 */
-  --brand-600: oklch(0.47 0.22 var(--brand-hue)); /* primary(light) 앵커 */
-  --brand-400: oklch(0.66 0.18 var(--brand-hue)); /* primary(dark) */
-  /* …50–900 램프 전부 hue만 변수 참조 */
-}
+/* 생성물 :root 기본값 */
+--brand-hue: 240;
+--brand-chroma: 0.8;
 ```
 
-앱은 이렇게만 리스킨한다:
-
-```css
-/* apps/<app>/src/app/globals.css */
-@import '@tokens/css/theme.css';
-:root {
-  --brand-hue: 150; /* 예: 이 앱은 그린 계열 */
-  --font-display: var(--font-space-grotesk);
-}
-```
-
-- L·C는 베이스가 잡으므로 어떤 hue를 넣어도 **대비·톤이 붕괴하지 않는다**.
-- 중립(gray)은 기본적으로 **고정 쿨톤**(안정성 우선). 원하면 `--brand-hue`를 살짝 섞는 옵션을 둘 수 있으나 기본 off.
+- primary·accent·ring·glow·shadow-glow가 brand를 참조하므로 hue 회전에 함께 반응한다.
+- 중립(gray)은 고정 쿨톤이며 brand hue를 섞지 않는다.
 
 ## 5. 시맨틱 토큰 계약 (통일 이름)
 
-현재 공유 토큰 + 프딥 계약을 병합한 **상위집합**. 이름은 고정, 값은 primitives 참조.
-
-### Core (모든 앱 필수)
+이름은 고정, 값은 palette 참조. 이름은 널리 쓰이는 역할 기반 규칙(`primary`·`muted-foreground` 등)을 따른다 — 사람도 AI도 이름만 보고 쓰임새를 짐작할 수 있게.
 
 | 그룹        | 토큰                                                                                                                       |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Surface     | `background` `foreground` `card` `card-foreground` `card-border` `popover` `popover-foreground` `muted` `muted-foreground` |
 | Brand       | `primary` `primary-foreground` `primary-subtle` `primary-accent`                                                           |
-| Accent 표면 | `accent` `accent-foreground` (= 브랜드 연한 틴트 표면; 프딥 호환)                                                          |
+| Accent 표면 | `accent` `accent-foreground` (= 브랜드 연한 틴트 표면)                                                                     |
 | Secondary   | `secondary` `secondary-foreground` `secondary-subtle`                                                                      |
 | Form/Line   | `border` `input` `ring`                                                                                                    |
 | Status      | `success` `error`(=destructive) `warning` `info` + 각 `-foreground` `-subtle`                                              |
-| Effect      | `glass` `glass-border` `glow` `glow-strong`                                                                                |
+| Effect      | `glass` `glass-border` `glow`                                                                                              |
+| Toggle      | `toggle-*` (테마 토글 장식색, light=dark 동일값)                                                                           |
 
-> **이름 규칙 = shadcn 표준.** `muted`·`secondary`는 **연한 표면**, 그 위 텍스트는 `-foreground`. (`text-muted`처럼 muted를 텍스트로 쓰던 앱은 `text-muted-foreground`로 이관 완료.) 프딥의 `destructive`는 CSS에서 `error`로 매핑(variant API 이름 `destructive`는 관례상 유지), `accent`는 브랜드 subtle 표면으로 정렬.
+- `muted`·`secondary`는 **연한 표면**, 그 위 텍스트는 `-foreground`(`text-muted-foreground`).
+- `destructive`는 CSS에서 `error`로 매핑한다(variant API 이름 `destructive`는 유지).
+- **상태색 대비**: 라이트의 `success`·`warning`·`info`·`error`는 각자의 `-subtle` 배경 위 글자 대비 4.5:1 이상이다(success green700, warning amber800, info sky700, error red600).
+- 공유 토큰은 상태·역할 색만 담는다. 차트·사이드바·읽기 타이포 같은 opt-in은 필요한 앱(fe-deep)이 자기 CSS에 둔다.
 
-### Opt-in (성격 맞는 앱만)
+## 6. 다크 모드 & 생성물
 
-| 그룹    | 토큰                            | 대상                        |
-| ------- | ------------------------------- | --------------------------- |
-| Charts  | `chart-1`…`chart-5` (고유 hue)  | 데이터 시각화(프딥)         |
-| Sidebar | `sidebar-*`                     | 관리자/대시보드(프딥 admin) |
-| Reading | 본문 17px·프로즈 measure 스케일 | 장문 콘텐츠(프딥)           |
+- `@custom-variant dark (&:where(.dark, .dark *))`.
+- `:root`는 `color-scheme: light` + 라이트 색, `.dark`는 `color-scheme: dark` + 다크 색으로 semantic만 재매핑한다(브랜드는 밝은 스텝으로 올리고 foreground 반전). palette는 공유.
+- `@theme inline`이 자기참조 맵(`--color-x: var(--color-x)`)이라 유틸이 런타임 변수를 가리킨다 → 앱의 `:root`/`.dark` 오버라이드가 유틸에 그대로 반영된다.
+- **max-w 가드**: Tailwind는 `max-w-*`를 `--max-width` → `--spacing` → `--container` 순으로 찾는다. spacing과 이름이 겹치는 키(xs~3xl)는 `--max-width-*: var(--container-*)`를 생성해 막는다 → `max-w-md` = 28rem. `w-*`·`min-w-*`는 spacing 값 그대로(`w-md` = 16px).
+- **보더 기본색**: `@layer base { * { border-color: var(--color-border) } }` — 색을 안 준 `border`가 currentColor 대신 border 토큰을 쓴다.
 
-- 게임·3D 앱(plco·prairie)은 opt-in 미사용. 베이스는 이들에게 짐이 되지 않는다.
+## 7. 스킨 계약 & 예외
 
-## 6. 다크 모드
+| 변수             | 의미                                        | 기본값 |
+| ---------------- | ------------------------------------------- | ------ |
+| `--brand-hue`    | 브랜드 램프 hue 회전                        | `240`  |
+| `--brand-chroma` | 브랜드 램프 채도 배율(낮추면 톤이 가라앉음) | `0.8`  |
 
-- 프딥 방식 유지: `.dark`에서 semantic 재매핑(브랜드는 밝은 스텝 up, foreground 반전). primitives는 공유.
-- `@custom-variant dark (&:where(.dark, .dark *))` 현행 유지.
+- 그 외 공유 토큰 오버라이드는 하지 않는다. 새 시맨틱 색이 필요하면 베이스에 추가한다.
+- **앱 전용 색은 그 앱 전역 CSS에**: 상태·역할이 아닌 색(장식색·카테고리색 등)은 공유 토큰에 넣지 않는다. 상태색을 다른 의미로 빌려 쓰지 않는다. 예) soundlab 팔레트(`void`·`paper`·`brass` 등), fe-deep `streak`·`highlight`·`study`·`heat-1..4`, prairie `prairie-*`, dansoon `--category-*`.
 
-## 7. 스킨 계약 (앱이 오버라이드하는 것 — 이게 전부)
+### 예외
 
-| 변수              | 의미                                        | 기본값             |
-| ----------------- | ------------------------------------------- | ------------------ |
-| `--brand-hue`     | 브랜드 램프 hue 회전                        | `265`(코발트)      |
-| `--brand-chroma`  | 브랜드 램프 채도 배율(낮추면 톤이 가라앉음) | `1`                |
-| `--font-display`  | 제목용 디스플레이 폰트                      | `var(--font-sans)` |
-| `--density`(선택) | 여백 배율                                   | `1`                |
+| 대상           | 내용                                                                                                 |
+| -------------- | ---------------------------------------------------------------------------------------------------- |
+| fe-deep        | `--brand-chroma: 0.6`, 표면색(`background`·`card`·`popover`) 오버라이드, `--radius` 기반 반경 스케일 |
+| soundlab       | 단일 다크 테마. 화면 색은 앱 전용 팔레트(`@theme`)로 표현                                            |
+| komorebi       | 독립 디자인 프로젝트(아트 주도). `theme.css` 미사용, `fonts.css`만 사용                              |
+| prairie        | 독립 디자인 프로젝트(아트 주도). `theme.css`를 import하되 색은 자체 `@theme` 팔레트                  |
+| awesome-sudoku | 자체 팔레트. `theme.css`를 import하지 않는다(공유 색 토큰 미적용)                                    |
 
-- 예) fe-deep(읽기 앱)은 `--brand-chroma: 0.6`으로 코발트를 차분하게. hue는 공유값 유지 = 색 통일.
+## 8. 서체 · 간격
 
-- 앱별 정체성은 **폰트로** 주로 준다(취향과 일치): 예) gymlog=Space Grotesk, hub=Plus Jakarta Sans.
-- 그 외 토큰 오버라이드는 **금지**(클론화·불일치 방지). 새 색이 필요하면 베이스에 추가.
+- **서체**: `font-sans` = `var(--font-maruburi)`(마루부리), `font-mono` = Geist Mono. `--font-maruburi`·`@font-face`는 `@tokens/css/fonts.css`가 정의하므로 앱은 함께 import한다.
+- **굵기**: `font-normal`(400)·`font-semibold`(600)·`font-bold`(700)만 토큰으로 둔다(마루부리가 400·600·700만 제공). `font-medium` 등은 `font-mono`와 함께일 때만 쓴다.
+- **간격은 두 스케일**: 앱 레이아웃은 이름 토큰(`xs` 4px ~ `3xl` 64px, `px-lg`·`gap-3xl`), `packages/ui`(shadcn 계열)와 fe-deep 내부는 Tailwind 숫자 스케일(`p-4` = 1rem). 임의 px 매직값은 쓰지 않는다.
 
-## 8. 파이프라인 규칙 (현행 유지)
+## 9. 파이프라인 & 검사
 
-- `packages/tokens/src/*.ts`가 유일 소스. 수정 후 `pnpm tokens`로 `generated/theme.css` 재생성.
-- **`generated/theme.css`는 AUTO-GENERATED — 직접 수정 금지.**
-- 앱은 토큰 유틸만 사용(임의 hex/px 금지). 카탈로그(`apps/design`)처럼 토큰 값 자체를 보여주는 경우에만 inline 예외.
-
-## 9. 마이그레이션 단계
-
-| 단계   | 내용                                                                                                                                                      | 리스크                         |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| **P0** | 이 스펙 확정                                                                                                                                              | —                              |
-| **P1** | `packages/tokens` OKLCH 재작성 + hue seam. **시맨틱 이름 하위호환 유지**(hub/gymlog/prairie 안 깨지게). `apps/design` 카탈로그로 검증                     | 중 — 값 변화, 이름 유지로 완화 |
-| **P2** | hub/gymlog/prairie에 스킨(hue+디스플레이 폰트) 부여                                                                                                       | 저                             |
-| **P3** | ✅ 이름 규칙 shadcn 통일 + fe-deep 이관(charts/sidebar/reading opt-in 유지, 코발트 hue·채도 0.6). cheongyeon-saju는 테마 one-off로 제외. 전 앱 build 통과 | 중 — 시각 QA 권장              |
-
-- 각 단계 후 `pnpm --filter <app> build`로 검증. 실제 적용은 사용자 확인 후 진행.
-
-## 10. 열린 결정 (P1 착수 전 확정)
-
-1. **중립 hue**: 완전 고정 vs `--brand-hue` 살짝 반영(기본 off 제안).
-2. **코발트 OKLCH 최종값**: 4절 램프는 목표치. L/C 미세조정은 P1에서 카탈로그 보며 확정.
-3. **`accent` 의미**: 프딥의 "브랜드 연한 표면"으로 통일(= 기존 `primary-subtle`과 관계 정리).
+- `packages/tokens/src/{palette,colors,typography,spacing,shadow}.ts`가 유일 소스 → `scripts/buildTokens.ts` → `generated/theme.css`. 로컬은 `pnpm tokens`, 빌드는 turbo가 생성한다.
+- **`generated/theme.css`는 AUTO-GENERATED — 직접 수정 금지**(gitignore 대상).
+- **`pnpm lint`가 강제한다**(`scripts/check-architecture.mjs`의 `validateDesignTokens`): CSS에서 `@tokens/css/theme.css`를 import하는 워크스페이스와 `packages/ui`의 `.ts`·`.tsx`·`.astro`에서
+  - Tailwind 기본 팔레트 색 클래스
+  - 임의 색 값(`bg-[#...]`, `[rgb(...)]`, `[oklch(...)]` 등)
+  - 마루부리에 없는 굵기(`thin`·`extralight`·`light`·`medium`·`extrabold`·`black`, `font-mono`와 같은 줄이면 허용)
+- 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
