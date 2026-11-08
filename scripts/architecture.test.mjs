@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   findImportCycles,
   findServerLeaks,
+  validateDesignTokens,
   validateManifest,
   validateSourceTypes,
   validateTypeScript,
@@ -70,4 +71,14 @@ test('client imports through a barrel cannot expose server IO; explicit Server A
 test('unsafe any is rejected in libraries too, while strings and comments remain valid', () => {
   assert.equal(validateSourceTypes('export const value: any = 1;', 'library.ts').length, 1);
   assert.deepEqual(validateSourceTypes("export const label = 'any'; // any is just text", 'library.ts'), []);
+});
+
+test('styles use design tokens: default palette, arbitrary colors and font-medium are rejected with explicit exceptions', () => {
+  assert.deepEqual(validateDesignTokens('<p className="bg-primary text-muted-foreground font-semibold px-lg" />'), []);
+  assert.equal(validateDesignTokens('<p className="text-green-500 hover:bg-red-500/10" />').length, 2);
+  assert.equal(validateDesignTokens('<p className="bg-[#f7f8fc] text-[oklch(0.5_0.1_240)]" />').length, 2);
+  assert.equal(validateDesignTokens('<p className="font-medium" />').length, 1);
+  assert.deepEqual(validateDesignTokens('<code className="font-mono font-medium" />'), []);
+  assert.deepEqual(validateDesignTokens('<p className="text-[13px] max-w-[20rem]" />'), []);
+  assert.deepEqual(validateDesignTokens('{/* token-exception: 고정폭 서체 */}\n<p className="font-medium" />'), []);
 });
