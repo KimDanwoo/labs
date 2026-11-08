@@ -41,7 +41,7 @@ export function SceneLoader() {
         </svg>
       </div>
       <div className="text-center">
-        <p className="font-display text-4xl font-medium tracking-tight sm:text-6xl">unicorn rush.</p>
+        <p className="font-display text-4xl font-normal tracking-tight sm:text-6xl">unicorn rush.</p>
       </div>
       <div className="w-56">
         <div

@@ -14,7 +14,7 @@ export function PrairieMark() {
         <circle cx="33" cy="7" r="2" fill="currentColor" stroke="none" />
       </svg>
       <div>
-        <p className="font-display text-xl font-medium tracking-tight sm:text-2xl">
+        <p className="font-display text-xl font-normal tracking-tight sm:text-2xl">
           unicorn rush<span className="text-prairie-accent">.</span>
         </p>
       </div>
