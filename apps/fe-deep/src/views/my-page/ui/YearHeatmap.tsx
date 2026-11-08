@@ -17,10 +17,10 @@ const DAY_LABELS = ['일', '', '화', '', '목', '', '토'];
 
 function getHeatmapColor(intensity: number): string {
   if (intensity <= 0) return 'bg-muted';
-  if (intensity === 1) return 'bg-green-200 dark:bg-green-900';
-  if (intensity === 2) return 'bg-green-300 dark:bg-green-700';
-  if (intensity === 3) return 'bg-green-500 dark:bg-green-500';
-  return 'bg-green-600 dark:bg-green-400';
+  if (intensity === 1) return 'bg-heat-1';
+  if (intensity === 2) return 'bg-heat-2';
+  if (intensity === 3) return 'bg-heat-3';
+  return 'bg-heat-4';
 }
 
 type Cell = { date: string; count: number };
