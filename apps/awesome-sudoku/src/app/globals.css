@@ -35,12 +35,6 @@
   --color-border-medium: 199, 199, 204;
   --color-border-strong: 58, 58, 60;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
-
   /* Status Colors */
   --color-error: 255, 59, 48;
   --color-success: 52, 199, 89;
@@ -106,12 +100,6 @@
   --color-border-light: 48, 48, 52;
   --color-border-medium: 62, 62, 66;
   --color-border-strong: 174, 174, 178;
-
-  /* Shadows - deeper in dark mode */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
 
   /* Status */
   --color-error: 255, 69, 58;
