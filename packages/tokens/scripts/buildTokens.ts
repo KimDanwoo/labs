@@ -122,6 +122,13 @@ ${indent(darkLines)}
 @theme inline {
 ${indent(themeLines)}
 }
+
+/* 색을 지정하지 않은 \`border\`가 글자색(currentColor) 대신 border 토큰을 쓰게 한다. */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+}
 `;
 
   mkdirSync(dirname(OUT_FILE), { recursive: true });
