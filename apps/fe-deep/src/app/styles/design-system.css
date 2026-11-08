@@ -3,7 +3,7 @@
 
    코어 토큰(primitives·brand·status·surface 계약)은 @tokens/css 가 제공한다.
    이 파일은 그 위에 프딥 전용만 덧입힌다:
-     · 스킨      : --brand-hue(코발트) + --brand-chroma(차분한 톤) + radius 밀도
+     · 스킨      : --brand-hue(240, 공유 기본과 동일) + --brand-chroma(차분한 톤) + radius 밀도
      · 표면 미세 : 배경/카드를 살짝 가라앉힌 gray 표면으로 (읽기 편의)
      · opt-in    : chart / sidebar / 확장 gray 스텝 / 읽기 타이포 / 이펙트 / 애니메이션
    ══════════════════════════════════════════════════════════ */
