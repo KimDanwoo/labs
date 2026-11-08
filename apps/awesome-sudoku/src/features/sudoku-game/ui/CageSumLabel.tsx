@@ -8,7 +8,7 @@ interface CageSumLabelProps {
 }
 export const CageSumLabel = memo<CageSumLabelProps>(({ sum, x, y, fontSize }) => (
   <div
-    className="absolute font-medium text-[rgb(var(--color-accent))] z-20"
+    className="absolute font-normal text-[rgb(var(--color-accent))] z-20"
     style={{
       top: `${y}px`,
       left: `${x}px`,

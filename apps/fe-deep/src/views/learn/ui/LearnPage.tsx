@@ -127,7 +127,7 @@ export function LearnPage() {
 
         <Card className="p-6 space-y-6">
           <div>
-            <label className="text-sm font-medium mb-3 block">카테고리</label>
+            <label className="text-sm font-normal mb-3 block">카테고리</label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isLoading}>
               <SelectTrigger>
                 <SelectValue placeholder={isLoading ? '카테고리 불러오는 중...' : '카테고리 선택'} />
@@ -145,7 +145,7 @@ export function LearnPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-3 block">순서</label>
+            <label className="text-sm font-normal mb-3 block">순서</label>
             <div className="grid grid-cols-2 gap-1.5">
               <Button
                 variant={order === STUDY_ORDER.sequential ? 'default' : 'outline'}
@@ -169,7 +169,7 @@ export function LearnPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-3 block">난이도</label>
+            <label className="text-sm font-normal mb-3 block">난이도</label>
             <div className="grid grid-cols-4 gap-1.5">
               <Button
                 variant={difficulties.length === 0 ? 'default' : 'outline'}
@@ -220,13 +220,13 @@ export function LearnPage() {
     return (
       <div className="container mx-auto max-w-168 px-4 py-8 sm:py-12 animate-fade-in-up">
         <div className="text-center py-16">
-          <Trophy className="h-16 w-16 text-yellow-500 mx-auto mb-5" />
+          <Trophy className="h-16 w-16 text-highlight mx-auto mb-5" />
           <h1 className="text-3xl font-bold tracking-tight mb-3">학습 완료!</h1>
           <p className="text-muted-foreground mb-6">{questions.length}문제를 모두 학습했습니다.</p>
 
           {streak > 0 && (
-            <div className="inline-flex items-center gap-2 rounded-full bg-orange-500/10 border border-orange-500/20 px-4 py-2 mb-8">
-              <Flame className="h-5 w-5 text-orange-500" />
+            <div className="inline-flex items-center gap-2 rounded-full bg-streak/10 border border-streak/20 px-4 py-2 mb-8">
+              <Flame className="h-5 w-5 text-streak" />
               <span className="text-lg font-bold">{streak}일 연속 학습 중!</span>
             </div>
           )}

@@ -49,7 +49,7 @@ export const LeaderboardPage = () => {
               type="button"
               onClick={() => setTab(t.key)}
               className={cn(
-                'flex-1 py-2 text-sm font-medium',
+                'flex-1 py-2 text-sm font-normal',
                 'rounded-lg transition-all',
                 tab === t.key
                   ? cn('bg-[rgb(var(--color-surface-primary))]', 'text-[rgb(var(--color-text-primary))]', 'shadow-sm')

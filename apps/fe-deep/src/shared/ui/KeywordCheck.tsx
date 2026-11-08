@@ -16,7 +16,7 @@ export function KeywordCheck({ keywords, recall }: KeywordCheckProps) {
 
   return (
     <div className="rounded-lg border border-border/60 p-4">
-      <p className="mb-2 text-xs font-medium text-muted-foreground">
+      <p className="mb-2 text-xs font-normal text-muted-foreground">
         키워드 {matchedCount}/{matches.length} 언급
       </p>
       <ul className="flex flex-wrap gap-1.5">

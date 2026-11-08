@@ -6,6 +6,11 @@ import ts from 'typescript';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROTECTED_OPTIONS = ['strict', 'noUncheckedIndexedAccess', 'verbatimModuleSyntax'];
 const LAYERS = ['app', 'views', 'widgets', 'features', 'entities', 'shared'];
+const PALETTE_CLASS =
+  /\b(?:bg|text|border(?:-[trblxyse])?|ring(?:-offset)?|fill|stroke|from|via|to|outline|divide|shadow|decoration|accent|caret|placeholder)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b/g;
+const ARBITRARY_COLOR = /\b[a-z-]+-\[(?:#[0-9a-fA-F]{3,8}|(?:rgba?|hsla?|oklch|oklab|color-mix)\()/g;
+const TOKEN_EXCEPTION = /token-exception:\s*\S/;
+const UNSUPPORTED_WEIGHT = /\bfont-(?:thin|extralight|light|medium|extrabold|black)\b/;
 
 export function validateManifest(manifest, workspaceNames, catalogNames) {
   const problems = [];
@@ -39,6 +44,23 @@ export function validateSourceTypes(text, filename) {
     ts.forEachChild(node, visit);
   }
   visit(ast);
+  return problems;
+}
+
+export function validateDesignTokens(text) {
+  const problems = [];
+  const lines = text.split('\n');
+  lines.forEach((line, index) => {
+    if (TOKEN_EXCEPTION.test(line) || TOKEN_EXCEPTION.test(lines[index - 1] ?? '')) return;
+    const at = `${index + 1}행`;
+    for (const [match] of line.matchAll(PALETTE_CLASS))
+      problems.push(`${at}: 기본 팔레트 ${match} 대신 시맨틱 색 토큰을 쓴다.`);
+    for (const [match] of line.matchAll(ARBITRARY_COLOR))
+      problems.push(`${at}: 임의 색 값 ${match}… 대신 색 토큰을 쓴다.`);
+    const weight = line.match(UNSUPPORTED_WEIGHT)?.[0];
+    if (weight && !/\bfont-mono\b/.test(line))
+      problems.push(`${at}: 마루부리에 없는 굵기 ${weight} 대신 font-normal·font-semibold·font-bold를 쓴다.`);
+  });
   return problems;
 }
 
@@ -144,9 +166,17 @@ export function checkRepository(root = ROOT) {
           problems.push(`${relative}: 공유 ${preset}을 사용해야 한다.`);
       }
     }
-    for (const file of [...walk(path.join(dir, 'src')), ...walk(path.join(dir, 'app'))].filter((f) =>
-      /\.(ts|tsx)$/.test(f),
-    )) {
+    const sources = [...walk(path.join(dir, 'src')), ...walk(path.join(dir, 'app'))];
+    const usesTokens =
+      manifest.name === '@ui/react' ||
+      walk(dir).some((f) => f.endsWith('.css') && readFileSync(f, 'utf8').includes('@tokens/css/theme.css'));
+    if (usesTokens) {
+      for (const file of sources.filter((f) => /\.(ts|tsx|astro)$/.test(f))) {
+        for (const problem of validateDesignTokens(readFileSync(file, 'utf8')))
+          problems.push(`${path.relative(root, file)}:${problem}`);
+      }
+    }
+    for (const file of sources.filter((f) => /\.(ts|tsx)$/.test(f))) {
       const text = readFileSync(file, 'utf8');
       for (const problem of validateSourceTypes(text, file)) problems.push(`${path.relative(root, file)}: ${problem}`);
       if (/eslint-disable[^\n]*(?:fsd\/|no-restricted-imports)/.test(text))

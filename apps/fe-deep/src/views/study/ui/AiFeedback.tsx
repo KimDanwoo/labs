@@ -29,7 +29,7 @@ export function AiFeedback({ question, modelAnswer, recall }: AiFeedbackProps) {
 
   return (
     <div className="rounded-lg border border-border/60 p-4">
-      <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+      <p className="mb-2 flex items-center gap-1.5 text-xs font-normal text-muted-foreground">
         <Sparkles className="size-3.5" />
         AI 피드백
       </p>
@@ -46,7 +46,7 @@ export function AiFeedback({ question, modelAnswer, recall }: AiFeedbackProps) {
             const { label, body } = splitFeedbackLine(line);
             return (
               <li key={line} className="text-sm leading-relaxed">
-                {label && <span className="mr-1.5 font-medium">{label}</span>}
+                {label && <span className="mr-1.5 font-normal">{label}</span>}
                 {body}
               </li>
             );

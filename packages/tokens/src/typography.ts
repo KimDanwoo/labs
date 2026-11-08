@@ -20,9 +20,10 @@ export const fontSize = {
   '4xl': '2.25rem',
 } as const;
 
+// 마루부리는 400·600·700만 제공한다. 500(medium)은 400과 똑같이 그려지므로 토큰에 두지 않는다.
+// font-medium은 500을 가진 고정폭 서체(font-mono 등)에만 쓴다.
 export const fontWeight = {
   normal: '400',
-  medium: '500',
   semibold: '600',
   bold: '700',
 } as const;

@@ -12,7 +12,7 @@ export const MistakeCounter: FC = () => {
     <div
       className={cn(
         'flex items-center gap-1 text-sm',
-        'font-medium font-tabular',
+        'font-normal font-tabular',
         mistakeCount >= MAX_MISTAKES - 1
           ? 'text-[rgb(var(--color-error-text))]'
           : 'text-[rgb(var(--color-text-secondary))]',

@@ -51,12 +51,12 @@ export const LeaderboardTable = memo<LeaderboardTableProps>(({ records, isLoadin
               'border-[rgb(var(--color-border-light))]',
             )}
           >
-            <th className="pb-3 pl-3 font-medium">순위</th>
-            <th className="pb-3 font-medium">플레이어</th>
-            <th className="pb-3 font-medium">포인트</th>
-            <th className="pb-3 font-medium hidden sm:table-cell">시간</th>
-            <th className="pb-3 font-medium hidden md:table-cell">난이도</th>
-            <th className="pb-3 font-medium hidden md:table-cell">모드</th>
+            <th className="pb-3 pl-3 font-normal">순위</th>
+            <th className="pb-3 font-normal">플레이어</th>
+            <th className="pb-3 font-normal">포인트</th>
+            <th className="pb-3 font-normal hidden sm:table-cell">시간</th>
+            <th className="pb-3 font-normal hidden md:table-cell">난이도</th>
+            <th className="pb-3 font-normal hidden md:table-cell">모드</th>
           </tr>
         </thead>
         <tbody>
@@ -98,7 +98,7 @@ export const LeaderboardTable = memo<LeaderboardTableProps>(({ records, isLoadin
                           'bg-[rgb(var(--color-bg-tertiary))]',
                           'flex items-center justify-center',
                           'text-[rgb(var(--color-text-secondary))]',
-                          'text-sm font-medium',
+                          'text-sm font-normal',
                         )}
                       >
                         {record.userDisplayName?.charAt(0) || '?'}
@@ -106,7 +106,7 @@ export const LeaderboardTable = memo<LeaderboardTableProps>(({ records, isLoadin
                     )}
                     <span
                       className={cn(
-                        'font-medium truncate',
+                        'font-normal truncate',
                         'max-w-[120px]',
                         isMe ? 'text-[rgb(var(--color-accent))]' : 'text-[rgb(var(--color-text-primary))]',
                       )}

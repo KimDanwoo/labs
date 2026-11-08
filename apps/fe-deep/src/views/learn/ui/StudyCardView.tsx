@@ -67,7 +67,7 @@ export function StudyCardView({
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium tabular-nums text-muted-foreground">
+            <span className="text-sm font-normal tabular-nums text-muted-foreground">
               {currentIndex + 1} / {totalCount}
             </span>
             {isNewCard && (
@@ -127,7 +127,7 @@ export function StudyCardView({
 
             {/* Question */}
             <div className="flex flex-col items-center justify-center min-h-[120px] mb-6">
-              <p className="text-lg font-medium text-center leading-relaxed whitespace-pre-line">{prompt}</p>
+              <p className="text-lg font-normal text-center leading-relaxed whitespace-pre-line">{prompt}</p>
             </div>
 
             {/* Keyword hint — 답 확인 + 인출 입력이 있으면 언급 체크로 대체된다 */}
@@ -171,7 +171,7 @@ export function StudyCardView({
                 <div className="border-t border-border/50 pt-5 space-y-5">
                   {recallInput.trim() && (
                     <div className="rounded-lg bg-muted/40 p-4">
-                      <p className="text-xs font-medium text-muted-foreground mb-2">내 답변</p>
+                      <p className="text-xs font-normal text-muted-foreground mb-2">내 답변</p>
                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{recallInput}</p>
                     </div>
                   )}
@@ -179,7 +179,7 @@ export function StudyCardView({
                     <KeywordCheck keywords={keywords} recall={recallInput} />
                   )}
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-2">모범 답변</p>
+                    <p className="text-xs font-normal text-muted-foreground mb-2">모범 답변</p>
                     <MarkdownRenderer content={answer} />
                   </div>
                 </div>

@@ -31,12 +31,12 @@ export const StatsByDifficulty = memo<StatsByDifficultyProps>(({ stats }) => (
               'border-b border-[rgb(var(--color-border-light))]',
             )}
           >
-            <th className="px-4 py-3 font-medium">난이도</th>
-            <th className="px-4 py-3 font-medium">플레이</th>
-            <th className="px-4 py-3 font-medium">완료</th>
-            <th className="px-4 py-3 font-medium hidden sm:table-cell">평균 시간</th>
-            <th className="px-4 py-3 font-medium hidden sm:table-cell">최고 시간</th>
-            <th className="px-4 py-3 font-medium">최고 포인트</th>
+            <th className="px-4 py-3 font-normal">난이도</th>
+            <th className="px-4 py-3 font-normal">플레이</th>
+            <th className="px-4 py-3 font-normal">완료</th>
+            <th className="px-4 py-3 font-normal hidden sm:table-cell">평균 시간</th>
+            <th className="px-4 py-3 font-normal hidden sm:table-cell">최고 시간</th>
+            <th className="px-4 py-3 font-normal">최고 포인트</th>
           </tr>
         </thead>
         <tbody>

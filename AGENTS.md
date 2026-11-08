@@ -38,8 +38,13 @@ scripts/new-app.mjs   # 새 앱 생성기
 
 2. **디자인 토큰 워크플로**: `packages/tokens/src/*.ts`(palette / colors / typography / spacing / shadow)가 **source of truth**. 수정 후 `pnpm tokens`로 `packages/tokens/generated/theme.css`를 생성한다.
    - **`generated/theme.css`는 AUTO-GENERATED — 직접 수정 금지.**
-   - **색은 2-tier**: atomic 팔레트(`palette.ts`의 `themeColors`/`commonColors`, 스케일 50–900) → semantic alias(`colors.ts`, primary/secondary/success/error/warning/info × base·foreground·subtle, light/dark). semantic은 atomic 스텝을 참조한다.
-   - 스타일은 토큰 기반 Tailwind 유틸로만: 색 `bg-primary`/`text-muted`, 간격 `px-lg`/`gap-3xl`, 반경 `rounded-md`, 그림자 `shadow-md`/`shadow-glow` 등. **임의 hex/px 매직값 금지.**
+   - **색은 2-tier**: atomic 팔레트(`palette.ts`의 `themeColors`/`commonColors`, 스케일 50–900) → semantic alias(`colors.ts`, primary/secondary/muted/accent/card + success/error/warning/info × base·foreground·subtle, light/dark). semantic은 atomic 스텝을 참조한다. `muted`는 표면색이고 흐린 글자는 `muted-foreground`다.
+   - 스타일은 토큰 기반 Tailwind 유틸로만: 색 `bg-primary`/`text-muted-foreground`, 간격 `px-lg`/`gap-3xl`, 반경 `rounded-md`, 그림자 `shadow-md`/`shadow-glow` 등. **임의 hex/px 매직값 금지.**
+   - **간격은 두 스케일**: 앱 레이아웃은 이름 토큰(`xs` 4px ~ `3xl` 64px, `px-lg`), 공유 UI(`packages/ui`)와 fe-deep 내부는 Tailwind 숫자 스케일(`p-4` = 1rem)을 쓴다. `max-w-md` 같은 폭 유틸은 컨테이너 값(28rem)으로 생성된다.
+   - **굵기는 `font-normal`·`font-semibold`·`font-bold`만**: 공통 서체 마루부리가 400·600·700만 제공한다. `font-medium` 등은 500을 가진 고정폭 서체(`font-mono`)에만 쓴다.
+   - **앱 전용 색은 그 앱의 `@theme`에**: 상태·역할이 아닌 색(장식색, 카테고리색 등)은 공유 토큰에 넣지 않고 앱 전역 CSS에 토큰으로 정의해 쓴다. 상태색을 다른 의미로 빌려 쓰지 않는다.
+   - **예외 앱**: komorebi·prairie는 독립 디자인 프로젝트, awesome-sudoku는 자체 팔레트다(공유 색 토큰 미적용).
+   - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateDesignTokens`): 공유 토큰을 쓰는 앱과 `packages/ui`에서 기본 팔레트 색 클래스, 임의 색 값(`bg-[#...]`), 서체에 없는 굵기를 막는다. 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
 
 3. **새 앱은 스캐폴드로**: 손으로 만들지 말고 `pnpm new-app <name>`(소문자/숫자/하이픈). `templates/app`을 복제하고 `<name>`으로 채운다.
 

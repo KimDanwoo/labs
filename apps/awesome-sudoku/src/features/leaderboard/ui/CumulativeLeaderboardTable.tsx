@@ -50,10 +50,10 @@ export const CumulativeLeaderboardTable = memo<CumulativeLeaderboardTableProps>(
                 'border-[rgb(var(--color-border-light))]',
               )}
             >
-              <th className="pb-3 pl-3 font-medium">순위</th>
-              <th className="pb-3 font-medium">플레이어</th>
-              <th className="pb-3 font-medium">누적 포인트</th>
-              <th className="pb-3 font-medium hidden sm:table-cell">게임 수</th>
+              <th className="pb-3 pl-3 font-normal">순위</th>
+              <th className="pb-3 font-normal">플레이어</th>
+              <th className="pb-3 font-normal">누적 포인트</th>
+              <th className="pb-3 font-normal hidden sm:table-cell">게임 수</th>
             </tr>
           </thead>
           <tbody>
@@ -92,7 +92,7 @@ export const CumulativeLeaderboardTable = memo<CumulativeLeaderboardTableProps>(
                             'bg-[rgb(var(--color-bg-tertiary))]',
                             'flex items-center justify-center',
                             'text-[rgb(var(--color-text-secondary))]',
-                            'text-sm font-medium',
+                            'text-sm font-normal',
                           )}
                         >
                           {entry.userDisplayName?.charAt(0) || '?'}
@@ -100,7 +100,7 @@ export const CumulativeLeaderboardTable = memo<CumulativeLeaderboardTableProps>(
                       )}
                       <span
                         className={cn(
-                          'font-medium truncate',
+                          'font-normal truncate',
                           'max-w-[120px]',
                           isMe ? 'text-[rgb(var(--color-accent))]' : 'text-[rgb(var(--color-text-primary))]',
                         )}

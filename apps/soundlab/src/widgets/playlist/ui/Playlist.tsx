@@ -40,6 +40,7 @@ export function Playlist() {
       className={`border-t-hairline-soft min-[820px]:border-r-hairline-soft order-2 flex min-h-0 flex-col backdrop-blur-md min-[820px]:order-1 min-[820px]:border-r ${QUEUE_SCREEN}`}
     >
       <div className="border-b-hairline-soft flex min-w-0 flex-col gap-xs border-b p-md">
+        {/* token-exception: font-label(IBM Plex Mono)은 500 굵기를 제공한다 */}
         <h1 className="font-label text-[11px] font-medium tracking-mark uppercase">soundlab</h1>
         <p className="font-label text-mute text-[10px] tracking-label break-keep tabular-nums uppercase">
           Danwoo · {TRACKS.length} tracks · {totalLabel}

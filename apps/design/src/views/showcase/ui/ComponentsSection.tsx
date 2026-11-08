@@ -15,9 +15,7 @@ export function ComponentsSection() {
               {variant}
             </Button>
           ))}
-          <Button disabled className="opacity-40">
-            disabled
-          </Button>
+          <Button disabled>disabled</Button>
         </div>
       </div>
 

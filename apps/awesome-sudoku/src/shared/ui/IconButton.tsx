@@ -32,7 +32,7 @@ export const IconButton = ({
       // Shape - softer rounded
       'rounded-2xl',
       // Typography
-      'text-xs font-medium tracking-wide',
+      'text-xs font-normal tracking-wide',
       // Transitions
       'transition-all duration-200 ease-out',
       // Disabled state

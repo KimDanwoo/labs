@@ -14,10 +14,10 @@ export function StudyDocTable({ docs }: StudyDocTableProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b text-xs text-muted-foreground">
-            <th className="px-5 py-3 text-left font-medium">문서</th>
-            <th className="hidden w-20 px-3 py-3 text-right font-medium sm:table-cell">주제</th>
-            <th className="hidden w-20 px-3 py-3 text-right font-medium sm:table-cell">카드</th>
-            <th className="w-28 px-3 py-3 text-right font-medium">날짜</th>
+            <th className="px-5 py-3 text-left font-normal">문서</th>
+            <th className="hidden w-20 px-3 py-3 text-right font-normal sm:table-cell">주제</th>
+            <th className="hidden w-20 px-3 py-3 text-right font-normal sm:table-cell">카드</th>
+            <th className="w-28 px-3 py-3 text-right font-normal">날짜</th>
             <th className="w-10" aria-hidden />
           </tr>
         </thead>
@@ -32,7 +32,7 @@ export function StudyDocTable({ docs }: StudyDocTableProps) {
                   <div className="min-w-0">
                     <Link
                       href={`/study/${doc.slug}`}
-                      className="break-keep font-medium after:absolute after:inset-0 focus-visible:outline-none group-focus-within:underline"
+                      className="break-keep font-normal after:absolute after:inset-0 focus-visible:outline-none group-focus-within:underline"
                     >
                       {doc.title}
                     </Link>

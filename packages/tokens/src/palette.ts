@@ -3,7 +3,7 @@
  *
  * 색공간은 OKLCH — 지각적 균일성이 높아 스케일이 매끈하고 대비가 안정적이다.
  * **브랜드 램프(brand)는 hue를 `var(--brand-hue)`로 둬서, 앱이 hue 하나만 회전하면
- * 같은 L·C로 자기 브랜드색을 얻는다(스킨).** 기본 hue는 코발트(rootScalars.brand-hue).
+ * 같은 L·C로 자기 브랜드색을 얻는다(스킨).** 기본 hue는 sky 블루 240(rootScalars.brand-hue).
  * 중립(gray)·상태(green/red/amber/sky)는 hue 고정.
  */
 export const themeColors = {
@@ -20,7 +20,7 @@ export const themeColors = {
     800: 'oklch(0.20 0.018 264)',
     900: 'oklch(0.145 0.018 264)',
   },
-  // 브랜드 — hue는 var로 회전(기본 코발트), 채도는 var 배율로 조절(기본 1).
+  // 브랜드 — hue는 var로 회전(기본 240), 채도는 var 배율로 조절(기본 0.8).
   // L은 고정, C는 `--brand-chroma`를 곱해 앱이 톤을 가라앉힐 수 있다(예: 읽기 앱).
   brand: {
     50: 'oklch(0.97 calc(0.02 * var(--brand-chroma)) var(--brand-hue))',
@@ -73,7 +73,7 @@ export const themeColors = {
     800: 'oklch(0.48 0.10 50)',
     900: 'oklch(0.40 0.08 48)',
   },
-  // 정보 — sky(hue 228–235). 브랜드(코발트)와 충돌 없게 별도 블루.
+  // 정보 — sky(hue 228–235). 기본 브랜드(hue 240)와 hue가 가깝다(약 12°). 바꿀지는 따로 정한다.
   sky: {
     50: 'oklch(0.97 0.02 235)',
     100: 'oklch(0.93 0.04 235)',

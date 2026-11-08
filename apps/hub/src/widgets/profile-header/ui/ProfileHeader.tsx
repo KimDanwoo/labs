@@ -7,7 +7,7 @@ import { RevealWord } from './RevealWord';
 import { ScrambleKeyword } from './ScrambleKeyword';
 
 const LINK_CLASS =
-  'font-medium text-primary underline-offset-4 hover:underline transition-colors duration-150 hover:text-primary-accent';
+  'font-normal text-primary underline-offset-4 hover:underline transition-colors duration-150 hover:text-primary-accent';
 
 export function ProfileHeader() {
   return (

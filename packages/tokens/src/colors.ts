@@ -9,12 +9,7 @@ import { commonColors as c, themeColors as t } from './palette';
  * 다크는 밝은 스텝을 base로 올리고 foreground를 어둡게 뒤집어 대비를 확보한다.
  */
 export const colors = {
-  // Prairie 씬 오버레이는 OS 테마와 무관하게 같은 대비를 유지한다.
-  'prairie-paper': { light: t.amber[50], dark: t.amber[50] },
-  'prairie-ink': { light: t.green[900], dark: t.green[900] },
-  'prairie-accent': { light: t.amber[200], dark: t.amber[200] },
-
-  // Primary — brand 램프(기본 코발트, hue 회전으로 리스킨)
+  // Primary — brand 램프(기본 sky 블루 240, hue 회전으로 리스킨)
   primary: { light: t.brand[600], dark: t.brand[400] },
   'primary-foreground': { light: c.white, dark: t.gray[900] },
   'primary-accent': { light: t.brand[500], dark: t.brand[300] },
@@ -29,8 +24,9 @@ export const colors = {
   'secondary-foreground': { light: t.gray[700], dark: t.gray[200] },
   'secondary-subtle': { light: t.gray[50], dark: t.gray[900] },
 
+  // 상태색(success·warning·info·error)의 라이트 값은 각자의 subtle 배경 위 글자 대비가 4.5:1(WCAG AA) 이상이다.
   // Success — green
-  success: { light: t.green[600], dark: t.green[400] },
+  success: { light: t.green[700], dark: t.green[400] },
   'success-foreground': { light: c.white, dark: t.green[900] },
   'success-subtle': { light: t.green[50], dark: 'oklch(0.30 0.05 152)' },
 
@@ -40,12 +36,12 @@ export const colors = {
   'error-subtle': { light: t.red[50], dark: 'oklch(0.30 0.05 27)' },
 
   // Warning — amber
-  warning: { light: t.amber[700], dark: t.amber[400] },
+  warning: { light: t.amber[800], dark: t.amber[400] },
   'warning-foreground': { light: c.white, dark: 'oklch(0.25 0.03 55)' },
   'warning-subtle': { light: t.amber[100], dark: 'oklch(0.32 0.05 60)' },
 
   // Info — sky
-  info: { light: t.sky[600], dark: t.sky[400] },
+  info: { light: t.sky[700], dark: t.sky[400] },
   'info-foreground': { light: c.white, dark: 'oklch(0.25 0.04 228)' },
   'info-subtle': { light: t.sky[100], dark: 'oklch(0.30 0.05 228)' },
 
@@ -66,16 +62,12 @@ export const colors = {
   input: { light: t.gray[200], dark: t.gray[700] },
   ring: { light: t.brand[600], dark: t.brand[400] },
 
-  // 이펙트 (brand hue 인식)
+  // 이펙트 — 반투명 유리 표면과 brand glow(hue 인식)
   glass: { light: 'oklch(1 0 0 / 0.72)', dark: 'oklch(0.20 0.018 264 / 0.6)' },
   'glass-border': { light: 'oklch(0.145 0.018 264 / 0.08)', dark: 'oklch(1 0 0 / 0.08)' },
   glow: {
     light: 'oklch(0.48 0.20 var(--brand-hue) / 0.16)',
     dark: 'oklch(0.66 0.16 var(--brand-hue) / 0.18)',
-  },
-  'glow-strong': {
-    light: 'oklch(0.48 0.20 var(--brand-hue) / 0.3)',
-    dark: 'oklch(0.66 0.16 var(--brand-hue) / 0.32)',
   },
 
   // 테마 토글 장식색 — 스위치의 낮/밤 상태에 고정(앱 테마와 무관 → light=dark 동일값).

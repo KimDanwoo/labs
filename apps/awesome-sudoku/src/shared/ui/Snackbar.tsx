@@ -52,7 +52,7 @@ export const Snackbar = memo<SnackbarProps>(({ message, isVisible, onClose, vari
       <div
         className={cn(
           'px-4 py-3 rounded-2xl shadow-lg',
-          'text-sm font-medium',
+          'text-sm font-normal',
           'min-w-[200px] max-w-[90vw] text-center',
           variantStyles[variant],
         )}

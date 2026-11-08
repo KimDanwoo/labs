@@ -83,7 +83,19 @@ function buildThemeMap() {
   for (const name of Object.keys(container)) {
     lines.push(`--container-${name}: var(--container-${name});`);
   }
+  lines.push(...buildMaxWidthGuard());
   return lines;
+}
+
+/**
+ * Tailwind v4는 max-w-*를 --max-width → --spacing → --container 순서로 찾는다.
+ * spacing과 이름이 겹치는 키(xs~3xl)는 max-w-md가 --spacing-md(16px)로 풀려 폭이 무너지므로,
+ * 겹치는 키만 --max-width-*를 container 값으로 먼저 잡아 둔다.
+ */
+function buildMaxWidthGuard() {
+  return Object.keys(container)
+    .filter((name) => name in spacing)
+    .map((name) => `--max-width-${name}: var(--container-${name});`);
 }
 
 function generate() {
@@ -100,15 +112,24 @@ function generate() {
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  color-scheme: light;
 ${indent([...scalarLines, '', ...rootLines, '', ...staticLines])}
 }
 
 .dark {
+  color-scheme: dark;
 ${indent(darkLines)}
 }
 
 @theme inline {
 ${indent(themeLines)}
+}
+
+/* 색을 지정하지 않은 \`border\`가 글자색(currentColor) 대신 border 토큰을 쓰게 한다. */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
 }
 `;
 

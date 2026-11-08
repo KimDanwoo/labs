@@ -32,7 +32,7 @@ export function BookmarksPage() {
               >
                 <AccordionTrigger className="hover:no-underline py-4">
                   <div className="flex flex-col gap-1.5 text-left flex-1 mr-4">
-                    <span className="font-medium text-sm leading-relaxed">{question.question}</span>
+                    <span className="font-normal text-sm leading-relaxed">{question.question}</span>
                     <div className="flex items-center gap-2 flex-wrap">
                       {category && (
                         <Badge variant="outline" className="text-xs">

@@ -98,7 +98,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium">카테고리</label>
+          <label className="text-sm font-normal">카테고리</label>
           <Select value={form.category_id} onValueChange={(v) => setField('category_id', v)}>
             <SelectTrigger className="w-full">
               <SelectValue />
@@ -113,7 +113,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
           </Select>
         </div>
         <div className="space-y-1.5">
-          <label className="text-sm font-medium">난이도</label>
+          <label className="text-sm font-normal">난이도</label>
           <Select value={form.difficulty} onValueChange={(v) => setField('difficulty', v as Difficulty)}>
             <SelectTrigger className="w-full">
               <SelectValue />
@@ -128,7 +128,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-sm font-medium">소분류 (sub_category)</label>
+        <label className="text-sm font-normal">소분류 (sub_category)</label>
         <Input
           value={form.sub_category}
           onChange={(e) => setField('sub_category', e.target.value)}
@@ -137,7 +137,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-sm font-medium">질문</label>
+        <label className="text-sm font-normal">질문</label>
         <textarea
           value={form.question}
           onChange={(e) => setField('question', e.target.value)}
@@ -149,7 +149,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
 
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">답변 (Markdown)</label>
+          <label className="text-sm font-normal">답변 (Markdown)</label>
           <Button type="button" variant="ghost" size="sm" onClick={() => setShowPreview((p) => !p)}>
             {showPreview ? '편집' : '미리보기'}
           </Button>
@@ -170,7 +170,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-sm font-medium">태그</label>
+        <label className="text-sm font-normal">태그</label>
         <div className="flex gap-2">
           <Input
             value={tagInput}
@@ -200,7 +200,7 @@ export function QuestionForm({ categories, question }: QuestionFormProps) {
       </div>
 
       <div className="space-y-3">
-        <label className="text-sm font-medium">학습 노출 설정</label>
+        <label className="text-sm font-normal">학습 노출 설정</label>
         <div className="flex items-center gap-6">
           <label className="flex items-center gap-2 text-sm">
             <Checkbox

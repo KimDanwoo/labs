@@ -75,7 +75,7 @@ export function StudyRunner({
           <Link href="/study" className="text-xs text-muted-foreground hover:text-foreground">
             {docTitle}
           </Link>
-          <p className="truncate text-sm font-medium">
+          <p className="truncate text-sm font-normal">
             <span className="tabular-nums text-muted-foreground">
               {run.topicIndex + 1}/{topics.length}
             </span>{' '}
@@ -141,7 +141,7 @@ export function StudyRunner({
 
       {run.topic.notes && (
         <details className="mt-6 rounded-xl border border-border/60">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-normal text-muted-foreground hover:text-foreground">
             참고 자료 — {run.topic.title}
           </summary>
           <div className="border-t border-border/60 px-4 py-4">

@@ -23,7 +23,7 @@ export function QuestionAccordionItem({ question, number }: QuestionAccordionIte
             {String(number).padStart(2, '0')}
           </span>
           <div className="flex flex-col gap-1.5 min-w-0">
-            <span className="font-medium text-sm leading-relaxed">{question.question}</span>
+            <span className="font-normal text-sm leading-relaxed">{question.question}</span>
             <QuestionMeta
               difficulty={question.difficulty}
               subCategory={question.sub_category}

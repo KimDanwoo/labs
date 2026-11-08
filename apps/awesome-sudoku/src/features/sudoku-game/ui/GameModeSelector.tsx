@@ -12,7 +12,7 @@ const gameModes = [
 
 const tabClass = (isActive: boolean) =>
   cn(
-    'px-4 py-1.5 rounded-lg text-sm font-medium',
+    'px-4 py-1.5 rounded-lg text-sm font-normal',
     'transition-all duration-200 ease-out',
     isActive
       ? 'bg-[rgb(var(--color-surface-primary))] text-[rgb(var(--color-text-primary))] shadow-sm'

@@ -59,7 +59,7 @@ export const RecentGames = memo<RecentGamesProps>(({ games, isLoading, error }) 
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className={cn('font-medium', 'text-[rgb(var(--color-text-primary))]')}>{diffLabel}</span>
+                  <span className={cn('font-normal', 'text-[rgb(var(--color-text-primary))]')}>{diffLabel}</span>
                   {isKiller && (
                     <span
                       className={cn(

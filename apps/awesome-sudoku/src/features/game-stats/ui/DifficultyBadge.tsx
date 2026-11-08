@@ -12,7 +12,7 @@ const difficultyColors: Record<Difficulty, string> = {
 export const DifficultyBadge = memo<{ difficulty: Difficulty; label: string }>(({ difficulty, label }) => (
   <span
     className={cn(
-      'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium',
+      'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-normal',
       difficultyColors[difficulty],
     )}
   >
