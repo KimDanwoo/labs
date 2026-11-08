@@ -58,7 +58,7 @@ export function ProjectCard({ project, index, staggerBaseMs }: ProjectCardProps)
               />
             ) : (
               <div className={`absolute inset-0 flex items-center justify-center ${fallbackBg}`}>
-                <span className={`font-display text-5xl font-extrabold tracking-tight select-none ${fallbackFg}`}>
+                <span className={`font-display text-5xl font-bold tracking-tight select-none ${fallbackFg}`}>
                   {project.title.charAt(0)}
                 </span>
               </div>
