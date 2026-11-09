@@ -1,5 +1,5 @@
 'use client';
-import type { Difficulty } from '@entities/game/model/types';
+import type { Difficulty } from '@entities/game';
 import { cn } from '@shared/model/utils';
 import { memo } from 'react';
 

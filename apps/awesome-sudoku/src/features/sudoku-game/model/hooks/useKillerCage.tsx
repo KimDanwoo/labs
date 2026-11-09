@@ -1,6 +1,4 @@
-import { GAME_MODE } from '@entities/game/model/constants';
-import { cagesAtom, gameModeAtom } from '@entities/game/model/store';
-import type { CageInfo } from '@entities/game/model/types';
+import { type CageInfo, cagesAtom, GAME_MODE, gameModeAtom } from '@entities/game';
 import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useState } from 'react';
 import { useCagePathCalculator } from './useCagePathCalculator';

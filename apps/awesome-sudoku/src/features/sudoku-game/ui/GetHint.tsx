@@ -1,4 +1,4 @@
-import { getHintAtom, hintsRemainingAtom, timerActiveAtom } from '@entities/game/model/store';
+import { getHintAtom, hintsRemainingAtom, timerActiveAtom } from '@entities/game';
 import { IconButton } from '@shared/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuLightbulb } from 'react-icons/lu';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@entities/session/model/hooks';
+import { useAuth } from '@entities/session';
 import { cn } from '@shared/model/utils';
 import { FcGoogle } from 'react-icons/fc';
 

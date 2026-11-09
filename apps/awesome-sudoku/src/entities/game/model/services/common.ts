@@ -1,7 +1,7 @@
-import { BOARD_SIZE } from '@entities/game/model/constants';
-import type { CellHighlight, Grid, SudokuBoard } from '@entities/game/model/types';
 import { atIndex } from '@shared/lib/gridAccess';
 import { MINUTE } from '@shared/model/constants';
+import { BOARD_SIZE } from '../constants/board';
+import type { CellHighlight, Grid, SudokuBoard } from '../types/board';
 
 export function createEmptyGrid(): Grid {
   return Array(BOARD_SIZE)

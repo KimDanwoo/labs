@@ -1,8 +1,6 @@
 'use client';
-import { GAME_MODE } from '@entities/game/model/constants';
-import { boardAtom, gameModeAtom, selectCellAtom } from '@entities/game/model/store';
-import { useInitializeGame, useKeyboardControls } from '@features/sudoku-game/model/hooks';
-import { KillerCage } from '@features/sudoku-game/ui';
+import { boardAtom, GAME_MODE, gameModeAtom, selectCellAtom } from '@entities/game';
+import { KillerCage, useInitializeGame, useKeyboardControls } from '@features/sudoku-game';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';

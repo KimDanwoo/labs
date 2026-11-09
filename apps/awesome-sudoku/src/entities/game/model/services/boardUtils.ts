@@ -1,4 +1,4 @@
-import type { Grid } from '@entities/game/model/types';
+import type { Grid } from '../types/board';
 
 /**
  * 그리드를 깊은 복사하여 반환

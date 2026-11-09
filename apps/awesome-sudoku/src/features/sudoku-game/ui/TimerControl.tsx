@@ -1,11 +1,11 @@
-import { formatTime } from '@entities/game/model/services';
 import {
   currentTimeAtom,
+  formatTime,
   incrementTimerAtom,
   isCompletedAtom,
   timerActiveAtom,
   toggleTimerAtom,
-} from '@entities/game/model/store';
+} from '@entities/game';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';

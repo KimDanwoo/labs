@@ -1,17 +1,21 @@
 'use client';
 
-import { UserProfileMenu } from '@features/auth/ui';
-import { GameModeSelector, SelectNumber } from '@features/sudoku-game/ui';
-import { ThemeToggle } from '@features/theme/ui';
+import { UserProfileMenu } from '@features/auth';
+import { GameModeSelector, SelectNumber } from '@features/sudoku-game';
+import { ThemeToggle } from '@features/theme';
 import { cn } from '@shared/model/utils';
-import { SudokuBoard } from '@widgets/game-board/ui';
-import { Controls } from '@widgets/game-controls/ui';
-import { GameStatus } from '@widgets/game-header/ui';
+import { SudokuBoard } from '@widgets/game-board';
+import { Controls } from '@widgets/game-controls';
+import { GameStatus } from '@widgets/game-header';
 import dynamic from 'next/dynamic';
 
-const PauseGameOverlay = dynamic(() => import('../../../widgets/game-overlays/ui/PauseGameOverlay'), { ssr: false });
-const GeneratingOverlay = dynamic(() => import('../../../widgets/game-overlays/ui/GeneratingOverlay'), { ssr: false });
-const GameResultSheet = dynamic(() => import('@widgets/game-result/ui').then((m) => m.GameResultSheet), { ssr: false });
+const PauseGameOverlay = dynamic(() => import('@widgets/game-overlays').then((m) => m.PauseGameOverlay), {
+  ssr: false,
+});
+const GeneratingOverlay = dynamic(() => import('@widgets/game-overlays').then((m) => m.GeneratingOverlay), {
+  ssr: false,
+});
+const GameResultSheet = dynamic(() => import('@widgets/game-result').then((m) => m.GameResultSheet), { ssr: false });
 
 export const HomePage = () => (
   <main

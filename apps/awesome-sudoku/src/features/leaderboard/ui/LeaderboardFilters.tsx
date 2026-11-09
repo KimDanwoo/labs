@@ -1,6 +1,6 @@
 'use client';
 
-import { GAME_LEVEL, GAME_LEVEL_LABELS, GAME_MODE } from '@entities/game/model/constants';
+import { GAME_LEVEL, GAME_LEVEL_LABELS, GAME_MODE } from '@entities/game';
 import { cn } from '@shared/model/utils';
 import { memo } from 'react';
 

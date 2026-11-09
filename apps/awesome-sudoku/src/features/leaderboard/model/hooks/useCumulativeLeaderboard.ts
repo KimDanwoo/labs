@@ -1,4 +1,4 @@
-import { type CumulativePointsEntry, getCumulativeLeaderboard } from '@entities/game/model/services';
+import { type CumulativePointsEntry, getCumulativeLeaderboard } from '@entities/game';
 import { useCallback, useEffect, useState } from 'react';
 
 interface UseCumulativeLeaderboardResult {

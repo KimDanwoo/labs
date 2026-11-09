@@ -1,18 +1,18 @@
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
-import { describe, expect, it } from 'vitest';
-import { SUDOKU_CELL_COUNT } from '../../constants/board';
-import { CLASSIC_DIFFICULTY, GAME_LEVEL, KILLER_DIFFICULTY, TECHNIQUE } from '../../constants/game';
-import type { Grid, GridPosition, SudokuBoard } from '../../types/board';
-import type { Difficulty, KillerCage, Technique } from '../../types/game';
+import { SUDOKU_CELL_COUNT } from '@entities/game/model/constants/board';
+import { CLASSIC_DIFFICULTY, GAME_LEVEL, KILLER_DIFFICULTY, TECHNIQUE } from '@entities/game/model/constants/game';
 import {
   generateBoard,
   generateKillerBoard,
   generateKillerCages,
   generateSolution,
   retryUntilGraded,
-} from '../generator';
-import { countSolutions, gradePuzzle } from '../solver';
-import { isValidSolution } from '../validator';
+} from '@entities/game/model/services/generator';
+import { countSolutions, gradePuzzle } from '@entities/game/model/services/solver';
+import { isValidSolution } from '@entities/game/model/services/validator';
+import type { Grid, GridPosition, SudokuBoard } from '@entities/game/model/types/board';
+import type { Difficulty, KillerCage, Technique } from '@entities/game/model/types/game';
+import { atIndex, cellAt } from '@shared/lib/gridAccess';
+import { describe, expect, it } from 'vitest';
 
 const DIFFICULTIES = Object.values(GAME_LEVEL) as Difficulty[];
 

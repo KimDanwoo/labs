@@ -1,4 +1,4 @@
-import { isGeneratingAtom } from '@entities/game/model/store';
+import { isGeneratingAtom } from '@entities/game';
 import { cn } from '@shared/model/utils';
 import { SudokuLoader } from '@shared/ui';
 import { useAtomValue } from 'jotai';
@@ -26,5 +26,3 @@ export const GeneratingOverlay: FC = () => {
     </div>
   );
 };
-
-export default GeneratingOverlay;

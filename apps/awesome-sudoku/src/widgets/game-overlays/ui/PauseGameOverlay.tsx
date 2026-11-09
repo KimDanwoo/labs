@@ -5,7 +5,7 @@ import {
   isGeneratingAtom,
   timerActiveAtom,
   toggleTimerAtom,
-} from '@entities/game/model/store';
+} from '@entities/game';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { FC } from 'react';
@@ -72,5 +72,3 @@ export const PauseGameOverlay: FC = () => {
     </div>
   );
 };
-
-export default PauseGameOverlay;

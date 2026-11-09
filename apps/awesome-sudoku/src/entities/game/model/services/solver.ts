@@ -1,6 +1,8 @@
-import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT, TECHNIQUE } from '@entities/game/model/constants';
-import type { Grid, KillerCage, Technique } from '@entities/game/model/types';
 import { atIndex } from '@shared/lib/gridAccess';
+import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from '../constants/board';
+import { TECHNIQUE } from '../constants/game';
+import type { Grid } from '../types/board';
+import type { KillerCage, Technique } from '../types/game';
 import { createEmptyGrid, shuffleArray } from './common';
 
 /** 후보는 비트마스크로 다룬다: 숫자 d ↔ 비트 (1 << d). 0번 비트는 쓰지 않는다. */

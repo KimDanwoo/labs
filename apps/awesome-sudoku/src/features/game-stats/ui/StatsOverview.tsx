@@ -1,6 +1,5 @@
 'use client';
-import { formatScore, formatTime } from '@entities/game/model/services';
-import type { GameStats } from '@entities/game/model/types';
+import { type GameStats, formatScore, formatTime } from '@entities/game';
 import { memo } from 'react';
 
 import { CheckIcon } from './CheckIcon';

@@ -1,6 +1,6 @@
-import { BLOCK_SIZE, BOARD_SIZE, KEY_NUMBER } from '@entities/game/model/constants';
-import type { Grid } from '@entities/game/model/types';
 import { atIndex, cellAt } from '@shared/lib/gridAccess';
+import { BLOCK_SIZE, BOARD_SIZE, KEY_NUMBER } from '../constants/board';
+import type { Grid } from '../types/board';
 
 /**
  * 숫자 세트가 유효한지 확인

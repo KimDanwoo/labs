@@ -1,4 +1,4 @@
-import { canRedoAtom, redoAtom, timerActiveAtom } from '@entities/game/model/store';
+import { canRedoAtom, redoAtom, timerActiveAtom } from '@entities/game';
 import { IconButton } from '@shared/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuRedo2 } from 'react-icons/lu';

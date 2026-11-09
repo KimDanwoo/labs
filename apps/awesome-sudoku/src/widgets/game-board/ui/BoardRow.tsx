@@ -1,6 +1,6 @@
 'use client';
-import type { SudokuCell as SudokuCellType } from '@entities/game/model/types';
-import { Cell as SudokuCell } from '@features/sudoku-game/ui';
+import type { SudokuCell as SudokuCellType } from '@entities/game';
+import { SudokuCell } from '@features/sudoku-game';
 import { memo } from 'react';
 
 interface BoardRowProps {

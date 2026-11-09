@@ -1,11 +1,17 @@
+import { TECHNIQUE } from '@entities/game/model/constants/game';
+import { generateKillerCages } from '@entities/game/model/services/generator';
+import {
+  countSolutions,
+  generateRandomSolution,
+  gradePuzzle,
+  hasUniqueSolution,
+  solveLogically,
+} from '@entities/game/model/services/solver';
+import { isValidSolution } from '@entities/game/model/services/validator';
+import type { Grid, GridPosition } from '@entities/game/model/types/board';
+import type { KillerCage } from '@entities/game/model/types/game';
 import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, it } from 'vitest';
-import { TECHNIQUE } from '../../constants/game';
-import type { Grid, GridPosition } from '../../types/board';
-import type { KillerCage } from '../../types/game';
-import { generateKillerCages } from '../generator';
-import { countSolutions, generateRandomSolution, gradePuzzle, hasUniqueSolution, solveLogically } from '../solver';
-import { isValidSolution } from '../validator';
 
 const parse = (rows: string[]): Grid => rows.map((row) => [...row].map((ch) => (ch === '.' ? 0 : Number(ch))));
 

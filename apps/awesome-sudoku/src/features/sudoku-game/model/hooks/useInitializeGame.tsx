@@ -1,5 +1,4 @@
-import { GAME_LEVEL } from '@entities/game/model/constants';
-import { boardAtom, initializeGameAtom } from '@entities/game/model/store';
+import { boardAtom, GAME_LEVEL, initializeGameAtom } from '@entities/game';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 

@@ -1,7 +1,5 @@
 'use client';
-import { GAME_LEVEL_LABELS, GAME_MODE } from '@entities/game/model/constants';
-import { formatTime, getRecordPoint } from '@entities/game/model/services';
-import type { GameRecord } from '@entities/game/model/types';
+import { type GameRecord, formatTime, GAME_LEVEL_LABELS, GAME_MODE, getRecordPoint } from '@entities/game';
 import { cn } from '@shared/model/utils';
 import { BottomSheet } from '@shared/ui';
 import { memo } from 'react';

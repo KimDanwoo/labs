@@ -1,8 +1,13 @@
 'use client';
-import { userAtom } from '@entities/session/model/store';
-import { useCumulativeLeaderboard, useLeaderboard } from '@features/leaderboard/model/hooks';
-import { CumulativeLeaderboardTable, LeaderboardFilters, LeaderboardTable } from '@features/leaderboard/ui';
-import { ThemeToggle } from '@features/theme/ui';
+import { userAtom } from '@entities/session';
+import {
+  CumulativeLeaderboardTable,
+  LeaderboardFilters,
+  LeaderboardTable,
+  useCumulativeLeaderboard,
+  useLeaderboard,
+} from '@features/leaderboard';
+import { ThemeToggle } from '@features/theme';
 import { cn } from '@shared/model/utils';
 import { SubpageHeader } from '@shared/ui';
 import { useAtomValue } from 'jotai';

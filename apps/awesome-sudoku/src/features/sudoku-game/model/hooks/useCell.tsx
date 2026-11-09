@@ -1,5 +1,4 @@
-import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom } from '@entities/game/model/store';
-import type { CellProps } from '@entities/game/model/types';
+import { type CellProps, gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom } from '@entities/game';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { useCellAccessibility } from './useCellAccessibility';

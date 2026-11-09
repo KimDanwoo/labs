@@ -1,11 +1,9 @@
 'use client';
 
-import { isAuthenticatedAtom, userAtom } from '@entities/session/model/store';
-import { useGameStats } from '@features/game-stats/model/hooks';
-import { StatsByDifficulty, StatsOverview } from '@features/game-stats/ui';
-import { useProfile } from '@features/profile/model/hooks';
-import { ProfileCard, RecentGames } from '@features/profile/ui';
-import { ThemeToggle } from '@features/theme/ui';
+import { isAuthenticatedAtom, userAtom } from '@entities/session';
+import { StatsByDifficulty, StatsOverview, useGameStats } from '@features/game-stats';
+import { ProfileCard, RecentGames, useProfile } from '@features/profile';
+import { ThemeToggle } from '@features/theme';
 import { SubpageHeader } from '@shared/ui';
 import { useAtomValue } from 'jotai';
 import { useRouter } from 'next/navigation';

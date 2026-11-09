@@ -1,6 +1,6 @@
 'use client';
 
-import type { CumulativePointsEntry } from '@entities/game/model/services';
+import type { CumulativePointsEntry } from '@entities/game';
 import { cn } from '@shared/model/utils';
 import Image from 'next/image';
 import { memo } from 'react';

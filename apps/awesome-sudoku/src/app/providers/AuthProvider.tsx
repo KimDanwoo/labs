@@ -1,7 +1,6 @@
 'use client';
 
-import { subscribeToAuthChanges } from '@entities/session/model/services';
-import { setLoadingAtom, setUserAtom } from '@entities/session/model/store';
+import { setLoadingAtom, setUserAtom, subscribeToAuthChanges } from '@entities/session';
 import { useSetAtom } from 'jotai';
 import { type ReactNode, useEffect } from 'react';
 

@@ -1,7 +1,14 @@
-import { GAME_LEVEL, LEADERBOARD_RECORD_LIMIT } from '@entities/game/model/constants';
-import { getRecordPoint, getUserRecords } from '@entities/game/model/services';
-import type { Difficulty, DifficultyStats, GameRecord, GameStats } from '@entities/game/model/types';
-import { userAtom } from '@entities/session/model/store';
+import {
+  type Difficulty,
+  type DifficultyStats,
+  type GameRecord,
+  type GameStats,
+  GAME_LEVEL,
+  getRecordPoint,
+  getUserRecords,
+  LEADERBOARD_RECORD_LIMIT,
+} from '@entities/game';
+import { userAtom } from '@entities/session';
 import { useAtomValue } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 

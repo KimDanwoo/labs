@@ -1,4 +1,4 @@
-import type { GameMode, SudokuCell } from '@entities/game/model/types';
+import type { GameMode, SudokuCell } from '@entities/game';
 import { useMemo } from 'react';
 
 interface UseCellAccessibilityProps {

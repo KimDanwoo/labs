@@ -1,7 +1,5 @@
 'use client';
-import { GAME_LEVEL_LABELS } from '@entities/game/model/constants';
-import { formatScore, formatTime } from '@entities/game/model/services';
-import type { DifficultyStats } from '@entities/game/model/types';
+import { type DifficultyStats, formatScore, formatTime, GAME_LEVEL_LABELS } from '@entities/game';
 import { cn } from '@shared/model/utils';
 import { memo } from 'react';
 

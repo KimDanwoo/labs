@@ -1,8 +1,7 @@
-import { difficultyAtom, initializeGameAtom } from '@entities/game/model/store';
-import type { Difficulty } from '@entities/game/model/types';
-import { options } from '@features/sudoku-game/model/constants';
+import { type Difficulty, difficultyAtom, initializeGameAtom } from '@entities/game';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
+import { options } from '../model/constants/gameDifficultySelector';
 
 const chevronSvg =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' " +

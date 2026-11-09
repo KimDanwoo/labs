@@ -1,6 +1,5 @@
 'use client';
-import { MAX_MISTAKES } from '@entities/game/model/constants';
-import { mistakeCountAtom } from '@entities/game/model/store';
+import { MAX_MISTAKES, mistakeCountAtom } from '@entities/game';
 import { cn } from '@shared/model/utils';
 import { useAtomValue } from 'jotai';
 import type { FC } from 'react';

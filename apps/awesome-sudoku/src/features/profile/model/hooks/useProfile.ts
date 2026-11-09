@@ -1,6 +1,5 @@
-import { getUserRecords } from '@entities/game/model/services';
-import type { GameRecord } from '@entities/game/model/types';
-import { userAtom } from '@entities/session/model/store';
+import { type GameRecord, getUserRecords } from '@entities/game';
+import { userAtom } from '@entities/session';
 import { useAtomValue } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 

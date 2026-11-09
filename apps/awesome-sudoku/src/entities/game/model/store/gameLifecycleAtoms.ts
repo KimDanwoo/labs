@@ -1,7 +1,8 @@
-import { GAME_LEVEL, HINTS_REMAINING } from '@entities/game/model/constants';
-import { createEmptyHighlights, requestPuzzle } from '@entities/game/model/services';
-import type { Difficulty, GameMode } from '@entities/game/model/types';
 import { atom } from 'jotai';
+import { GAME_LEVEL, HINTS_REMAINING } from '../constants/game';
+import { createEmptyHighlights } from '../services/common';
+import { requestPuzzle } from '../services/puzzleService';
+import type { Difficulty, GameMode } from '../types/game';
 import { clearHistoryAtom } from './historyAtoms';
 import {
   boardAtom,

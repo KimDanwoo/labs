@@ -1,5 +1,5 @@
 'use client';
-import { GetHint, RedoMove, RemoveNumber, RestartGame, ToggleNote, UndoMove } from '@features/sudoku-game/ui';
+import { GetHint, RedoMove, RemoveNumber, RestartGame, ToggleNote, UndoMove } from '@features/sudoku-game';
 import React from 'react';
 
 export const Controls: React.FC = () => (

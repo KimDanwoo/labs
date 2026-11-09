@@ -1,4 +1,5 @@
-import type { GameCompletionResult, GameMode, KillerCage, SudokuBoard } from '@entities/game/model/types';
+import type { SudokuBoard } from '../types/board';
+import type { GameCompletionResult, GameMode, KillerCage } from '../types/game';
 import { checkGameCompletion, validateBoard } from './update';
 
 export const buildGameResultState = (result: GameCompletionResult) => ({

@@ -1,4 +1,4 @@
-import { canUndoAtom, timerActiveAtom, undoAtom } from '@entities/game/model/store';
+import { canUndoAtom, timerActiveAtom, undoAtom } from '@entities/game';
 import { IconButton } from '@shared/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuUndo2 } from 'react-icons/lu';

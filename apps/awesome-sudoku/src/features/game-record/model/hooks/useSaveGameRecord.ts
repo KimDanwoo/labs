@@ -1,16 +1,18 @@
-import { HINTS_REMAINING } from '@entities/game/model/constants';
-import { calculatePoint, saveGameRecord } from '@entities/game/model/services';
 import {
+  type GameRecord,
+  type PointResult,
+  calculatePoint,
   currentTimeAtom,
   difficultyAtom,
   gameModeAtom,
+  HINTS_REMAINING,
   hintsRemainingAtom,
   isRecordSavedAtom,
   isSuccessAtom,
   mistakeCountAtom,
-} from '@entities/game/model/store';
-import type { GameRecord, PointResult } from '@entities/game/model/types';
-import { userAtom } from '@entities/session/model/store';
+  saveGameRecord,
+} from '@entities/game';
+import { userAtom } from '@entities/session';
 import { gameStore } from '@shared/model/store';
 import { useAtomValue } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';

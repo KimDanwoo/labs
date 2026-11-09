@@ -1,4 +1,4 @@
-import { useAuth } from '@entities/session/model/hooks';
+import { useAuth } from '@entities/session';
 import { useClickOutside } from '@shared/model/hooks';
 import { cn } from '@shared/model/utils';
 import Image from 'next/image';

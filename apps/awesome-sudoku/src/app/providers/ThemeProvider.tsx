@@ -1,7 +1,6 @@
 'use client';
 
-import { useThemeSync } from '@entities/theme/model/hooks';
-import { initThemeAtom } from '@entities/theme/model/store';
+import { initThemeAtom, useThemeSync } from '@entities/theme';
 import { useSetAtom } from 'jotai';
 import { type ReactNode, useEffect } from 'react';
 

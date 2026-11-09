@@ -1,6 +1,4 @@
-import { GAME_MODE } from '@entities/game/model/constants';
-import { gameModeAtom, switchGameModeAtom } from '@entities/game/model/store';
-import type { GameMode } from '@entities/game/model/types';
+import { type GameMode, GAME_MODE, gameModeAtom, switchGameModeAtom } from '@entities/game';
 import { cn } from '@shared/model/utils';
 import { useAtomValue, useSetAtom } from 'jotai';
 import React, { memo, useCallback } from 'react';

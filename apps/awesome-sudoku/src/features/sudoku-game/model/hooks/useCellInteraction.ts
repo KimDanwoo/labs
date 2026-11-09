@@ -1,4 +1,4 @@
-import { handleKeyInputAtom } from '@entities/game/model/store';
+import { handleKeyInputAtom } from '@entities/game';
 import { gameStore } from '@shared/model/store';
 import { type KeyboardEvent, useCallback } from 'react';
 

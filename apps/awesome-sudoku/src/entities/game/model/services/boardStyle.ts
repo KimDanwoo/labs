@@ -1,5 +1,5 @@
-import type { CellHighlight } from '@entities/game/model/types';
 import { cn } from '@shared/model/utils';
+import type { CellHighlight } from '../types/board';
 
 /**
  * 셀 테두리 스타일을 반환

@@ -1,4 +1,4 @@
-import { ProfilePage } from '@views/profile/ui';
+import { ProfilePage } from '@views/profile';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {

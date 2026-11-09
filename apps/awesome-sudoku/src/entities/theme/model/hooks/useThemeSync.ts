@@ -1,8 +1,8 @@
 'use client';
 
-import { setThemeAtom, themeAtom } from '@entities/theme/model/store';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
+import { setThemeAtom, themeAtom } from '../store/themeAtoms';
 
 export function useThemeSync() {
   const theme = useAtomValue(themeAtom);

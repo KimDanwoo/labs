@@ -1,5 +1,5 @@
 'use client';
-import { GameDifficultySelector, TimerControl } from '@features/sudoku-game/ui';
+import { GameDifficultySelector, TimerControl } from '@features/sudoku-game';
 import type { FC } from 'react';
 
 import { MistakeCounter } from './MistakeCounter';

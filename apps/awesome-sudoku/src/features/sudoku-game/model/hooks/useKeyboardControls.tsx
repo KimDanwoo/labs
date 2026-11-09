@@ -1,4 +1,4 @@
-import { handleKeyInputAtom, selectedCellAtom } from '@entities/game/model/store';
+import { handleKeyInputAtom, selectedCellAtom } from '@entities/game';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 

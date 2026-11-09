@@ -1,4 +1,4 @@
-import { fillCellAtom, timerActiveAtom } from '@entities/game/model/store';
+import { fillCellAtom, timerActiveAtom } from '@entities/game';
 import { IconButton } from '@shared/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuEraser } from 'react-icons/lu';

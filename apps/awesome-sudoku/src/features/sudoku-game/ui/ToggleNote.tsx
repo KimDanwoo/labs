@@ -1,4 +1,4 @@
-import { isNoteModeAtom, timerActiveAtom, toggleNoteModeAtom } from '@entities/game/model/store';
+import { isNoteModeAtom, timerActiveAtom, toggleNoteModeAtom } from '@entities/game';
 import { IconButton } from '@shared/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuPencil } from 'react-icons/lu';

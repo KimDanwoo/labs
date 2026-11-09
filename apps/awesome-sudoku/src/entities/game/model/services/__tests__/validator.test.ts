@@ -1,8 +1,4 @@
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BOARD_SIZE } from '../../constants/board';
-import type { Grid, GridPosition, SudokuBoard, SudokuCell } from '../../types/board';
-import type { KillerCage } from '../../types/game';
+import { BOARD_SIZE } from '@entities/game/model/constants/board';
 import {
   checkConflicts,
   isBoardComplete,
@@ -10,7 +6,11 @@ import {
   isValidSolution,
   markWrongValues,
   validateKillerCages,
-} from '../validator';
+} from '@entities/game/model/services/validator';
+import type { Grid, GridPosition, SudokuBoard, SudokuCell } from '@entities/game/model/types/board';
+import type { KillerCage } from '@entities/game/model/types/game';
+import { atIndex, cellAt } from '@shared/lib/gridAccess';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('validator.ts 테스트', () => {
   // 헬퍼 함수들

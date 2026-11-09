@@ -1,5 +1,4 @@
-import { BOARD_SIZE } from '@entities/game/model/constants';
-import type { CageInfo, KillerCage } from '@entities/game/model/types';
+import { type CageInfo, type KillerCage, BOARD_SIZE } from '@entities/game';
 import { useMemo } from 'react';
 import type { CellPosition } from './useTableDimensions';
 

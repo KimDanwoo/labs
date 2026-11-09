@@ -1,10 +1,5 @@
-import {
-  calculateHighlights,
-  clearHighlights,
-  updateCellSelection,
-  updateSingleCell,
-} from '@entities/game/model/services';
 import { atom } from 'jotai';
+import { calculateHighlights, clearHighlights, updateCellSelection, updateSingleCell } from '../services/update';
 import { boardAtom, highlightedCellsAtom, selectedCellAtom } from './primitives';
 
 /** 하이라이트 업데이트 */

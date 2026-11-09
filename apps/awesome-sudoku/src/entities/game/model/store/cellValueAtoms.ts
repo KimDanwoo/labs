@@ -1,15 +1,14 @@
-import { HINTS_REMAINING, MAX_MISTAKES } from '@entities/game/model/constants';
+import { cellAt } from '@shared/lib/gridAccess';
+import { atom } from 'jotai';
+import { HINTS_REMAINING, MAX_MISTAKES } from '../constants/game';
+import { buildGameResultState, resolveBoardState } from '../services/gameResult';
 import {
-  buildGameResultState,
   canFillCell,
   clearHighlights,
   resetUserInputs as resetUserInputsOptimized,
-  resolveBoardState,
   updateCellNotes,
   updateCellValue,
-} from '@entities/game/model/services';
-import { cellAt } from '@shared/lib/gridAccess';
-import { atom } from 'jotai';
+} from '../services/update';
 import { clearHistoryAtom, pushStateAtom } from './historyAtoms';
 import {
   boardAtom,

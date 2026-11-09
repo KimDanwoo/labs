@@ -1,7 +1,7 @@
+import { deepCopyGrid } from '@entities/game/model/services/boardUtils';
+import type { Grid } from '@entities/game/model/types/board';
 import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, it } from 'vitest';
-import type { Grid } from '../../types/board';
-import { deepCopyGrid } from '../boardUtils';
 
 describe('스도쿠 유틸리티 함수 테스트', () => {
   const sampleGrid: Grid = [

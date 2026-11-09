@@ -1,11 +1,16 @@
 'use client';
-import { MAX_MISTAKES } from '@entities/game/model/constants';
-import { formatTime } from '@entities/game/model/services';
-import { currentTimeAtom, isCompletedAtom, isSuccessAtom, mistakeCountAtom } from '@entities/game/model/store';
-import { userAtom } from '@entities/session/model/store';
-import { GoogleSignInButton } from '@features/auth/ui';
-import { useSaveGameRecord } from '@features/game-record/model/hooks';
-import { FailureIcon, GameDifficultySelector, SuccessIcon } from '@features/sudoku-game/ui';
+import {
+  currentTimeAtom,
+  formatTime,
+  isCompletedAtom,
+  isSuccessAtom,
+  MAX_MISTAKES,
+  mistakeCountAtom,
+} from '@entities/game';
+import { userAtom } from '@entities/session';
+import { GoogleSignInButton } from '@features/auth';
+import { useSaveGameRecord } from '@features/game-record';
+import { FailureIcon, GameDifficultySelector, SuccessIcon } from '@features/sudoku-game';
 import { useDismissible, useSnackbar } from '@shared/model/hooks';
 import { cn } from '@shared/model/utils';
 import { BottomSheet, Snackbar } from '@shared/ui';

@@ -1,14 +1,15 @@
 'use client';
-import { BOARD_SIZE, KEY_NUMBER } from '@entities/game/model/constants';
 import {
+  BOARD_SIZE,
   boardAtom,
   fillCellAtom,
   isNoteModeAtom,
+  KEY_NUMBER,
   numberCountsAtom,
   selectedCellAtom,
   timerActiveAtom,
   toggleNoteAtom,
-} from '@entities/game/model/store';
+} from '@entities/game';
 import { cellAt } from '@shared/lib/gridAccess';
 import { cn } from '@shared/model/utils';
 import { NumberButton } from '@shared/ui';

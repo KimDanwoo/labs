@@ -1,7 +1,7 @@
-import { signInWithGoogle, signOut } from '@entities/session/model/services';
-import { isAuthenticatedAtom, isLoadingAtom, logoutAtom, userAtom } from '@entities/session/model/store';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
+import { signInWithGoogle, signOut } from '../services/authService';
+import { isAuthenticatedAtom, isLoadingAtom, logoutAtom, userAtom } from '../store/authAtoms';
 
 export function useAuth() {
   const user = useAtomValue(userAtom);

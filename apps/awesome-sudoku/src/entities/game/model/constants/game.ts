@@ -1,4 +1,4 @@
-import type { ClassicDifficultySpec, Difficulty, KillerDifficultySpec } from '@entities/game/model/types';
+import type { ClassicDifficultySpec, Difficulty, KillerDifficultySpec } from '../types/game';
 
 export const HINTS_REMAINING = 3;
 

@@ -1,20 +1,8 @@
-import {
-  BOARD_SIZE,
-  CLASSIC_DIFFICULTY,
-  KILLER_DIFFICULTY,
-  SUDOKU_CELL_COUNT,
-  TECHNIQUE,
-} from '@entities/game/model/constants';
-import type {
-  Difficulty,
-  GradedDifficultySpec,
-  Grid,
-  GridPosition,
-  KillerCage,
-  SudokuBoard,
-  Technique,
-} from '@entities/game/model/types';
 import { atIndex, cellAt } from '@shared/lib/gridAccess';
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../constants/board';
+import { CLASSIC_DIFFICULTY, KILLER_DIFFICULTY, TECHNIQUE } from '../constants/game';
+import type { Grid, GridPosition, SudokuBoard } from '../types/board';
+import type { Difficulty, GradedDifficultySpec, KillerCage, Technique } from '../types/game';
 import { deepCopyGrid } from './boardUtils';
 import { shuffleArray } from './common';
 import { generateRandomSolution, gradePuzzle, staysUniqueWithout } from './solver';
