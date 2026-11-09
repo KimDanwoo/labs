@@ -1,4 +1,4 @@
-import { OUTLINE } from '@widgets/transport/model/constants';
+import { OUTLINE } from '../model/constants/icons';
 
 export function CheckIcon() {
   return (

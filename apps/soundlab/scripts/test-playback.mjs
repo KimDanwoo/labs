@@ -5,7 +5,7 @@ import test from 'node:test';
 import { act, createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { usePlayback } from '../src/entities/track/model/hooks/usePlayback.ts';
-import { currentIndexAtom, frameState } from '../src/entities/track/model/store/index.ts';
+import { currentIndexAtom, frameState } from '../src/entities/track/model/store/playback.ts';
 
 // TS 훅과 동일한 Jotai 엔트리를 사용한다. ESM/CJS 각각의 Provider 컨텍스트를 섞지 않는다.
 const { Provider, createStore } = createRequire(import.meta.url)('jotai');

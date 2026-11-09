@@ -1,9 +1,6 @@
 'use client';
 
-import { TRACKS } from '@entities/track/model/constants';
-import { usePlaybackControls } from '@entities/track/model/hooks';
-import { currentIndexAtom } from '@entities/track/model/store';
-import { TrackRow } from '@entities/track/ui';
+import { currentIndexAtom, TrackRow, TRACKS, usePlaybackControls } from '@entities/track';
 import { ScrollArea } from '@ui/react';
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef } from 'react';

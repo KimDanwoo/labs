@@ -1,8 +1,6 @@
 'use client';
 
-import { PLAYER_SCREEN, TRACKS } from '@entities/track/model/constants';
-import { playerPath } from '@entities/track/model/services';
-import { currentIndexAtom, playerScreenAtom } from '@entities/track/model/store';
+import { currentIndexAtom, PLAYER_SCREEN, playerPath, playerScreenAtom, TRACKS } from '@entities/track';
 import { FLOATING_BUTTON } from '@shared/lib/floatingButton';
 import { useAtom, useAtomValue } from 'jotai';
 import { QueueIcon } from './QueueIcon';

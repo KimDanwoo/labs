@@ -1,10 +1,10 @@
 'use client';
 
-import { fetchBands, fetchWaveform } from '@entities/track/model/services';
-import { frameState } from '@entities/track/model/store';
-import type { Track } from '@entities/track/model/types';
 import { useFrame } from '@shared/lib/frame';
 import { useEffect, useRef } from 'react';
+import { fetchBands, fetchWaveform } from '../services/widget';
+import { frameState } from '../store/playback';
+import type { Track } from '../types/track';
 
 /**
  * PRD §6 "음악 악센트 — 신호 설계".

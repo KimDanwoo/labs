@@ -1,8 +1,6 @@
 'use client';
 
-import { TRACKS } from '@entities/track/model/constants';
-import { artworkUrl } from '@entities/track/model/services';
-import { currentIndexAtom, engineErrorAtom } from '@entities/track/model/store';
+import { artworkUrl, currentIndexAtom, engineErrorAtom, TRACKS } from '@entities/track';
 import { useAtomValue } from 'jotai';
 import { useCallback, useRef, useState } from 'react';
 import { ParticleCanvas } from './ParticleCanvas';

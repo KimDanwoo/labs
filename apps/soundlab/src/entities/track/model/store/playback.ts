@@ -1,5 +1,6 @@
-import { PLAYER_SCREEN, REPEAT_MODE, type PlayerScreen, type RepeatMode } from '@entities/track/model/constants';
-import { atom } from 'jotai';
+import { atom } from 'jotai/vanilla';
+import { type PlayerScreen, PLAYER_SCREEN } from '../constants/playerScreen';
+import { type RepeatMode, REPEAT_MODE } from '../constants/repeatMode';
 
 export const currentIndexAtom = atom(0);
 export const isPlayingAtom = atom(false);
@@ -51,5 +52,3 @@ export const frameState = {
   buffered: 0,
   durationMs: 0,
 };
-
-export { PlaybackContext } from './playbackContext';

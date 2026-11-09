@@ -1,4 +1,4 @@
-import { SOLID } from '@widgets/transport/model/constants';
+import { SOLID } from '../model/constants/icons';
 
 export function PauseIcon() {
   return (

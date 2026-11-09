@@ -1,13 +1,23 @@
 'use client';
 
-import { PlaybackProvider } from '@entities/track/ui';
-
-import { PLAYER_SCREEN, TRACKS, type PlayerScreen } from '@entities/track/model/constants';
-import { useKeyboard, useMediaSession, usePlayback, useTrackUrl, useWaveform } from '@entities/track/model/hooks';
-import { currentIndexAtom, engineModeAtom, isPlayingAtom, playerScreenAtom } from '@entities/track/model/store';
-import { Playlist, QueueToggle } from '@widgets/playlist/ui';
-import { Stage } from '@widgets/stage/ui';
-import { ShareButton, Transport } from '@widgets/transport/ui';
+import {
+  currentIndexAtom,
+  engineModeAtom,
+  isPlayingAtom,
+  PlaybackProvider,
+  PLAYER_SCREEN,
+  playerScreenAtom,
+  TRACKS,
+  useKeyboard,
+  useMediaSession,
+  usePlayback,
+  useTrackUrl,
+  useWaveform,
+  type PlayerScreen,
+} from '@entities/track';
+import { Playlist, QueueToggle } from '@widgets/playlist';
+import { Stage } from '@widgets/stage';
+import { ShareButton, Transport } from '@widgets/transport';
 import { useAtomValue } from 'jotai';
 
 type PlayerViewProps = {

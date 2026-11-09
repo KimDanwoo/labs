@@ -1,5 +1,5 @@
-import { TRACKS } from '@entities/track/model/constants';
-import { PlayerView } from '@views/player/PlayerView';
+import { TRACKS } from '@entities/track';
+import { PlayerView } from '@views/player';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 

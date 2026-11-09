@@ -1,4 +1,4 @@
-import { OUTLINE, REPEAT_LOOP } from '@widgets/transport/model/constants';
+import { OUTLINE, REPEAT_LOOP } from '../model/constants/icons';
 
 export function RepeatOneIcon() {
   return (

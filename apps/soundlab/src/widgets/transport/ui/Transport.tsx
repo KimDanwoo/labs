@@ -1,8 +1,17 @@
 'use client';
 
-import { REPEAT_LABEL, REPEAT_MODE, TRACKS, nextRepeatMode } from '@entities/track/model/constants';
-import { usePlaybackControls } from '@entities/track/model/hooks';
-import { currentIndexAtom, frameState, isPlayingAtom, repeatModeAtom, shuffleAtom } from '@entities/track/model/store';
+import {
+  REPEAT_LABEL,
+  REPEAT_MODE,
+  TRACKS,
+  currentIndexAtom,
+  frameState,
+  isPlayingAtom,
+  nextRepeatMode,
+  repeatModeAtom,
+  shuffleAtom,
+  usePlaybackControls,
+} from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
 import { useAtom, useAtomValue } from 'jotai';
 import { useRef } from 'react';
