@@ -1,5 +1,5 @@
 import { Badge, Button, Card, Checkbox, Input, ThemeToggle } from '@ui/react';
-import { BADGE_VARIANTS, BUTTON_VARIANTS } from '@views/showcase/model/constants';
+import { BADGE_VARIANTS, BUTTON_VARIANTS } from '../model/constants/catalog';
 import { Section } from './Section';
 
 const GROUP_LABEL = 'text-xs font-semibold uppercase tracking-widest text-muted-foreground';
