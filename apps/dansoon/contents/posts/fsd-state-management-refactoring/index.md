@@ -1,5 +1,5 @@
 ---
-title: "FSD 패턴과 상태 관리 리팩토링"
+title: "FSD 패턴으로 상태 관리 리팩토링하기: react-query와 zustand"
 description: "상태와 API, UI가 얽힌 코드를 FSD 구조로 나누고 react-query와 zustand로 상태 관리를 개선한 리팩토링 과정을 돌아봐요."
 publishedAt: "2024-12-11T13:25:30+09:00"
 updatedAt: "2025-08-03T09:35:55+09:00"
@@ -159,3 +159,5 @@ export const usePostStore = create<PostState>((set) => ({
 ---
 
 이번 리팩토링 과제를 통해 코드의 모듈화와 상태 관리의 중요성을 다시 깨달았다. 앞으로 더 복잡한 프로젝트에서도 이 경험을 바탕으로 유지보수성과 확장성을 높일 수 있는 구조를 설계할 수 있다는 자신감을 얻었다.
+
+이 구조에 테스트를 붙이며 보완한 과정은 [MSW로 테스트 코드를 작성하며 FSD 구조 보완하기](/posts/test-code-fsd-refactoring/)에 이어서 정리했다.

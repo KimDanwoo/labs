@@ -1,5 +1,5 @@
 ---
-title: "테스트 시나리오 작성과 E2E테스트"
+title: "테스트 시나리오 작성과 E2E 테스트: MSW와 Playwright"
 description: "Integration 테스트 중심에 E2E를 보완하는 전략으로 MSW와 Playwright 테스트를 구현하며 겪은 환경 격리·시간 테스트 문제를 정리해요."
 publishedAt: "2024-12-11T13:26:30+09:00"
 updatedAt: "2025-08-03T09:36:48+09:00"

@@ -334,3 +334,5 @@ export { default as LargeComponent } from './LargeComponent';
 프로젝트 초기 단계에서 이러한 패턴을 도입하는 데 드는 약간의 설정 비용은 장기적인 개발 생산성 향상과 기술 부채 감소로 충분히 보상받을 수 있다.
 
 새로운 프로젝트를 시작할 때마다 이러한 패턴을 기본 설정으로 도입한다면, 보다 견고하고 유지보수가 용이한 코드베이스를 구축할 수 있을 것이다.
+
+배럴로만 import하는 규칙을 lint로 강제하는 방법은 [FSD 규칙을 문서 대신 ESLint로 강제하기](/posts/fsd-eslint-boundaries/)에 정리했다.
