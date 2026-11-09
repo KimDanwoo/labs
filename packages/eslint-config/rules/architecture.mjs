@@ -1,7 +1,9 @@
 import path from 'node:path';
 
-const LAYERS = ['app', 'views', 'widgets', 'features', 'entities', 'shared'];
-const SLICED_LAYERS = new Set(['views', 'widgets', 'features', 'entities']);
+const LAYERS = ['app', 'pages', 'widgets', 'features', 'entities', 'shared'];
+const SLICED_LAYERS = new Set(['pages', 'widgets', 'features', 'entities']);
+// Next.js의 app·pages 폴더와 겹치지 않게 두 레이어 폴더에만 _를 붙인다(공식 Next.js 가이드).
+const layerDir = (layer) => (layer === 'app' || layer === 'pages' ? `_${layer}` : layer);
 const MODEL_SEGMENTS = new Set(['hooks', 'types', 'constants', 'store', 'services', 'server', 'actions', '__tests__']);
 const SLICE_SEGMENTS = ['ui', 'model', 'lib', 'api', 'config'];
 const PUBLIC_ENTRY = /^index(?:\.server)?(?:\.tsx?)?$/;
@@ -10,15 +12,19 @@ const ROUTE_FILE =
   /^(page|layout|route|error|loading|not-found|global-error|template|default|sitemap|robots|manifest)$/;
 
 function location(filename) {
-  const match = filename.replaceAll('\\', '/').match(/^(.*)\/src\/(app|views|widgets|features|entities|shared)\/(.*)$/);
-  return match ? { root: match[1], layer: match[2], rest: match[3], slice: match[3].split('/')[0] } : null;
+  const match = filename
+    .replaceAll('\\', '/')
+    .match(/^(.*)\/src\/(_app|_pages|widgets|features|entities|shared)\/(.*)$/);
+  return match
+    ? { root: match[1], layer: match[2].replace(/^_/, ''), rest: match[3], slice: match[3].split('/')[0] }
+    : null;
 }
 
 function moduleLocation(filename, source, appRoot = location(filename)?.root) {
   if (!appRoot) return null;
   if (source.startsWith('.')) return location(path.posix.resolve(path.posix.dirname(filename), source));
-  if (/^@(app|views|widgets|features|entities|shared)\//.test(source))
-    return location(path.posix.normalize(`${appRoot}/src/${source.slice(1)}`));
+  const alias = source.match(/^@(app|pages|widgets|features|entities|shared)\/(.*)$/);
+  if (alias) return location(path.posix.normalize(`${appRoot}/src/${layerDir(alias[1])}/${alias[2]}`));
   return null;
 }
 
@@ -175,7 +181,7 @@ const routingLocation = {
         if (own?.layer === 'app' && ROUTE_FILE.test(path.basename(context.filename).split('.')[0])) {
           context.report({
             node,
-            message: 'Next 라우팅 파일은 앱 루트 app/에 둔다. src/app/은 전역 설정과 providers만 담당한다.',
+            message: 'Next 라우팅 파일은 앱 루트 app/에 둔다. src/_app/은 전역 설정과 providers만 담당한다.',
           });
         }
       },

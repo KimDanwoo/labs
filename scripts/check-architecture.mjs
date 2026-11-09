@@ -5,7 +5,8 @@ import ts from 'typescript';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROTECTED_OPTIONS = ['strict', 'noUncheckedIndexedAccess', 'verbatimModuleSyntax'];
-const LAYERS = ['app', 'views', 'widgets', 'features', 'entities', 'shared'];
+const LAYERS = ['app', 'pages', 'widgets', 'features', 'entities', 'shared'];
+const layerDir = (layer) => (layer === 'app' || layer === 'pages' ? `_${layer}` : layer);
 const PALETTE_CLASS =
   /\b(?:bg|text|border(?:-[trblxyse])?|ring(?:-offset)?|fill|stroke|from|via|to|outline|divide|shadow|decoration|accent|caret|placeholder)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b/g;
 const ARBITRARY_COLOR = /\b[a-z-]+-\[(?:#[0-9a-fA-F]{3,8}|(?:rgba?|hsla?|oklch|oklab|color-mix)\()/g;
@@ -150,9 +151,12 @@ export function checkRepository(root = ROOT) {
             problems.push(`${relative}/tsconfig.json: 공유 Next 설정을 확장해야 한다.`);
           for (const layer of LAYERS) {
             if (
-              JSON.stringify(config.compilerOptions?.paths?.[`@${layer}/*`]) !== JSON.stringify([`./src/${layer}/*`])
+              JSON.stringify(config.compilerOptions?.paths?.[`@${layer}/*`]) !==
+              JSON.stringify([`./src/${layerDir(layer)}/*`])
             ) {
-              problems.push(`${relative}/tsconfig.json: @${layer}/* 별칭은 ./src/${layer}/*를 가리켜야 한다.`);
+              problems.push(
+                `${relative}/tsconfig.json: @${layer}/* 별칭은 ./src/${layerDir(layer)}/*를 가리켜야 한다.`,
+              );
             }
           }
         }

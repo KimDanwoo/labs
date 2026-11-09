@@ -56,16 +56,16 @@ scripts/new-app.mjs   # 새 앱 생성기
 
 **Next 라우팅과 FSD `app` 레이어는 분리한다 (합치기 금지).**
 
-- **`apps/<app>/app/`** (= `src/` **밖**): Next 라우팅 진입점. `layout.tsx`/`page.tsx`/`route.ts` + 파일 기반 메타데이터(`icon.*`/`opengraph-image.*` 등)만 둔다. **얇게** — 화면은 `views`, 전역 setup은 `src/app`에 위임한다.
-- **`apps/<app>/src/app/`** (= FSD `app` 레이어, **라우팅 아님**): `providers/`(전역 프로바이더 합성 루트), `globals.css`(전역 스타일) 등 앱 전역 setup. 라우팅 파일(page/layout)을 여기에 두지 않는다.
-- 루트 `app/layout.tsx`는 전역 스타일·프로바이더를 `@app`에서 가져온다: `import '@app/globals.css'` + `import { AppProviders } from '@app/providers'`. Next가 라우팅 위치를 강제해도 `src/app`을 라우팅으로 쓰지 않는다.
+- **`apps/<app>/app/`** (= `src/` **밖**): Next 라우팅 진입점. `layout.tsx`/`page.tsx`/`route.ts` + 파일 기반 메타데이터(`icon.*`/`opengraph-image.*` 등)만 둔다. **얇게** — 화면은 `_pages`, 전역 setup은 `src/_app`에 위임한다.
+- **`apps/<app>/src/_app/`** (= FSD `app` 레이어, **라우팅 아님**): `providers/`(전역 프로바이더 합성 루트), `globals.css`(전역 스타일) 등 앱 전역 setup. 라우팅 파일(page/layout)을 여기에 두지 않는다.
+- 루트 `app/layout.tsx`는 전역 스타일·프로바이더를 `@app`에서 가져온다: `import '@app/globals.css'` + `import { AppProviders } from '@app/providers'`. Next가 라우팅 위치를 강제해도 `src/_app`을 라우팅으로 쓰지 않는다.
 
-**레이어 의존성** (단방향, `@repo/eslint-config`의 `fsd.config.mjs` → `eslint-plugin-boundaries`로 **lint 강제**): `app → views → widgets → features → entities → shared`
+**레이어 의존성** (단방향, `@repo/eslint-config`의 `fsd.config.mjs` → `eslint-plugin-boundaries`로 **lint 강제**): `app → pages → widgets → features → entities → shared`
 
 - 하위 레이어는 상위를 import 불가. cross-import 금지. `packages/ui`·`@tokens/css`는 모든 레이어에서 사용 가능.
 - 위반 시 `pnpm lint`가 에러로 막는다. 구조 규칙을 `eslint-disable`로 우회하지 않는다. 같은 슬라이스 내부 참조는 허용하고, 같은 레이어의 다른 슬라이스 참조는 금지한다.
 
-**경로 별칭** (앱 `tsconfig.json`의 `paths`): `@app/` `@views/` `@widgets/` `@features/` `@entities/` `@shared/` → `./src/<layer>/`. `@app/`은 **FSD app 레이어(`src/app/`)**를 가리킨다 — 루트 라우팅 `app/`은 Next 진입점이라 별칭이 없다.
+**경로 별칭** (앱 `tsconfig.json`의 `paths`): `@app/` `@pages/` `@widgets/` `@features/` `@entities/` `@shared/` → `./src/<layer>/`(`@app`·`@pages`만 `./src/_app`·`./src/_pages`). `@app/`은 **FSD app 레이어(`src/_app/`)**를 가리킨다 — 루트 라우팅 `app/`은 Next 진입점이라 별칭이 없다.
 
 **순수 계산·그래픽 코드**: `lib/`는 알고리즘·그래픽 구현을 둔다. React 컴포넌트·훅·전역 atom 정의를 lib에 숨기지 않는다.
 
@@ -77,8 +77,8 @@ scripts/new-app.mjs   # 새 앱 생성기
 apps/<app>/
   app/                       # Next 라우팅 진입점(src 밖): layout/page/route + 메타데이터 파일. 얇게.
   src/
-    app/                     # FSD app 레이어(라우팅 아님): providers/, globals.css 등 전역 setup
-    views/home/
+    _app/                    # FSD app 레이어(라우팅 아님): providers/, globals.css 등 전역 setup
+    _pages/home/
       index.ts               # 공개 API: 밖에서 쓰는 것만 명시적으로 재수출
       ui/HomeView.tsx        # 메인 뷰: 위젯 합성
     widgets/project-grid/    # 위젯: 화면 블록(index.ts + ui/)
@@ -93,7 +93,7 @@ apps/<app>/
 
 **공개 API 규칙** (`fsd.config.mjs`의 `fsd/public-api`로 **lint 강제**, 루트 `app/`의 라우팅 파일도 대상): 공식 FSD의 Public API 방식을 따른다.
 
-- 슬라이스 **밖**에서는 공개 API만 import한다: `from '@entities/project'`, 서버 전용은 `from '@views/study/index.server'`. 내부 파일(`@entities/project/ui/...`)을 직접 가져오지 않는다.
+- 슬라이스 **밖**에서는 공개 API만 import한다: `from '@entities/project'`, 서버 전용은 `from '@pages/study/index.server'`. 내부 파일(`@entities/project/ui/...`)을 직접 가져오지 않는다.
 - 슬라이스 **안**에서는 구현 파일을 상대경로로 가져온다(`../model/types/project`). 자기 슬라이스의 공개 API를 import하지 않는다(순환 참조 방지).
 - `index.ts`는 밖에서 실제로 쓰는 것만 명시적으로 재수출한다. `export *` 금지, 타입은 `export type { ... }`.
 - 세그먼트 안에는 `index.ts`(배럴)를 두지 않는다. `shared`는 슬라이스가 없으므로 기존 세그먼트 배럴을 유지한다.

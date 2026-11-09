@@ -54,8 +54,8 @@ test('a public API re-exports names explicitly', () => {
 });
 
 test('Next route files outside src also use public APIs; tests may reach internals', () => {
-  assert.equal(check('public-api', "import { HomeView } from '@views/home';", 'app/page.tsx').length, 0);
-  assert.equal(check('public-api', "import { HomeView } from '@views/home/ui/HomeView';", 'app/page.tsx').length, 1);
+  assert.equal(check('public-api', "import { HomeView } from '@pages/home';", 'app/page.tsx').length, 0);
+  assert.equal(check('public-api', "import { HomeView } from '@pages/home/ui/HomeView';", 'app/page.tsx').length, 1);
   assert.equal(
     check(
       'public-api',
@@ -81,7 +81,7 @@ test('slice roots hold only the public API; model files live inside an explicit 
   assert.equal(check('slice-structure', 'export {};', 'src/features/first/index.ts').length, 0);
   assert.equal(check('slice-structure', 'export {};', 'src/features/first/index.server.ts').length, 0);
   assert.equal(check('slice-structure', 'export const value = 1;', 'src/features/first/api/request.ts').length, 0);
-  assert.equal(check('slice-structure', 'export {};', 'src/views/home/HomeView.tsx').length, 1);
+  assert.equal(check('slice-structure', 'export {};', 'src/_pages/home/HomeView.tsx').length, 1);
   assert.equal(check('slice-structure', 'export {};', 'src/features/first/ui/index.ts').length, 1);
   assert.equal(check('slice-structure', 'export const value = 1;', 'src/features/first/model/types.ts').length, 1);
   assert.equal(
@@ -106,9 +106,9 @@ test('components require a matching file and cannot hide in a hook', () => {
 });
 
 test('Next routes cannot be placed in the FSD app layer', () => {
-  assert.equal(check('routing-location', 'export default function Page() {}', 'src/app/page.tsx').length, 1);
+  assert.equal(check('routing-location', 'export default function Page() {}', 'src/_app/page.tsx').length, 1);
   assert.equal(
-    check('routing-location', 'export function AppProviders() {}', 'src/app/providers/AppProviders.tsx').length,
+    check('routing-location', 'export function AppProviders() {}', 'src/_app/providers/AppProviders.tsx').length,
     0,
   );
 });

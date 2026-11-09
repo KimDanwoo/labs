@@ -3,8 +3,8 @@ import boundaries from 'eslint-plugin-boundaries';
 import architecture from './rules/architecture.mjs';
 
 const FSD_ELEMENTS = [
-  { type: 'app', pattern: 'src/app/**' },
-  { type: 'views', pattern: 'src/views/**' },
+  { type: 'app', pattern: 'src/_app/**' },
+  { type: 'pages', pattern: 'src/_pages/**' },
   { type: 'widgets', pattern: 'src/widgets/**' },
   { type: 'features', pattern: 'src/features/**' },
   { type: 'entities', pattern: 'src/entities/**' },
@@ -16,10 +16,10 @@ const FSD_ELEMENTS = [
 const DEPENDENCY_POLICIES = [
   {
     from: { element: { type: 'app' } },
-    allow: { to: { element: { types: { anyOf: ['app', 'views', 'widgets', 'features', 'entities', 'shared'] } } } },
+    allow: { to: { element: { types: { anyOf: ['app', 'pages', 'widgets', 'features', 'entities', 'shared'] } } } },
   },
   {
-    from: { element: { type: 'views' } },
+    from: { element: { type: 'pages' } },
     allow: { to: { element: { types: { anyOf: ['widgets', 'features', 'entities', 'shared'] } } } },
   },
   {
@@ -33,7 +33,7 @@ const DEPENDENCY_POLICIES = [
 
 /**
  * FSD 레이어 경계 강제(eslint-plugin-boundaries v7).
- * app → views → widgets → features → entities → shared (상위는 하위만 import 가능).
+ * app → pages → widgets → features → entities → shared (상위는 하위만 import 가능).
  * node_modules/워크스페이스 패키지(@ui/react 등)는 element가 아니므로 이 규칙의 대상이 아니다.
  */
 const LANGUAGE_OPTIONS = {
