@@ -1,5 +1,5 @@
 import { PLAYER_SCREEN, TRACKS } from '@entities/track';
-import { PlayerView } from '@views/player';
+import { PlayerView } from '@pages/player';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 

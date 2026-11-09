@@ -25,7 +25,7 @@ export const TRACKS: readonly Track[] = [
   },
   {
     id: 2428337913,
-    title: '마르기 전에 (Before It Dries)',
+    title: '마르기 전에',
     permalinkUrl: 'https://soundcloud.com/danwooking/jeir0j4t0cry',
     artworkBase: 'https://i1.sndcdn.com/artworks-lMik2oVkXP9O7UYV-KrScAw',
     artworkExt: '.jpg',
@@ -35,7 +35,7 @@ export const TRACKS: readonly Track[] = [
   },
   {
     id: 2428333635,
-    title: '눈 (Snow)',
+    title: '눈',
     permalinkUrl: 'https://soundcloud.com/danwooking/ivlkxnay5veh',
     artworkBase: 'https://i1.sndcdn.com/artworks-G7yJPs1qgvcPkSJA-QMACEg',
     artworkExt: '.jpg',
