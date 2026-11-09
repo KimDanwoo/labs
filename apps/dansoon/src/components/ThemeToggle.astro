@@ -27,18 +27,82 @@ import Icon from '~/components/Icon.astro';
     }
   }
 
+  const IRIS_DURATION_MS = 600;
+  const IRIS_EASING = 'cubic-bezier(0.65, 0, 0.35, 1)';
+  // global.css가 이 클래스가 붙은 동안만 페이지 이동용 전환 애니메이션을 끄고 원형 전환을 쓴다
+  const THEME_TRANSITION_CLASS = 'theme-transition';
+  // 다크로 갈 때는 이전(밝은) 화면을 위에 올려 버튼으로 빨려 들어가게 한다(global.css)
+  const COLLAPSE_CLASS = 'theme-transition-collapse';
+
+  type Point = { x: number; y: number };
+  type IrisDirection = 'collapse' | 'expand';
+
+  /** 다크: 밝은 화면이 버튼으로 모여 꺼진다. 라이트: 밝은 화면이 버튼에서 퍼져 켜진다 */
+  const IRIS_BY_DIRECTION = {
+    collapse: { pseudoElement: '::view-transition-old(root)', isShrinking: true },
+    expand: { pseudoElement: '::view-transition-new(root)', isShrinking: false },
+  } satisfies Record<IrisDirection, { pseudoElement: string; isShrinking: boolean }>;
+
   const syncAllLabels = (isDark: boolean) =>
     document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => syncLabel(button, isDark));
+
+  function applyTheme() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    saveTheme(isDark);
+    syncAllLabels(isDark);
+    document.dispatchEvent(new CustomEvent('themechange', { detail: { isDark } }));
+  }
+
+  const centerOf = (element: Element): Point => {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  };
+
+  const farthestCornerDistance = ({ x, y }: Point) =>
+    Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+
+  const circleAt = (radius: number, { x, y }: Point) => `circle(${radius}px at ${x}px ${y}px)`;
+
+  const canAnimateThemeChange = () =>
+    'startViewTransition' in document && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function animateIris(direction: IrisDirection, origin: Point): Animation {
+    const { pseudoElement, isShrinking } = IRIS_BY_DIRECTION[direction];
+    const open = circleAt(farthestCornerDistance(origin), origin);
+    const closed = circleAt(0, origin);
+    return document.documentElement.animate(
+      { clipPath: isShrinking ? [open, closed] : [closed, open] },
+      { duration: IRIS_DURATION_MS, easing: IRIS_EASING, fill: 'forwards', pseudoElement },
+    );
+  }
+
+  function changeTheme(trigger: Element) {
+    if (!canAnimateThemeChange()) {
+      applyTheme();
+      return;
+    }
+
+    const root = document.documentElement;
+    const direction: IrisDirection = root.classList.contains('dark') ? 'expand' : 'collapse';
+    const transitionClasses =
+      direction === 'collapse' ? [THEME_TRANSITION_CLASS, COLLAPSE_CLASS] : [THEME_TRANSITION_CLASS];
+    root.classList.add(...transitionClasses);
+    const transition = document.startViewTransition(applyTheme);
+    // 페이지 이동 전환과 겹쳐 건너뛰면 ready가 거절된다 — 테마는 이미 바뀌었으므로 애니메이션만 생략한다
+    const iris = transition.ready.then(() => animateIris(direction, centerOf(trigger))).catch(() => undefined);
+    // fill: forwards 애니메이션을 남겨 두면 다음 전환의 같은 의사 요소에 다시 걸려 화면이 비므로 끝나면 지운다
+    transition.finished.finally(async () => {
+      root.classList.remove(...transitionClasses);
+      (await iris)?.cancel();
+    });
+  }
 
   document.addEventListener('astro:page-load', () =>
     syncAllLabels(document.documentElement.classList.contains('dark')),
   );
   // 복제된 사이드바(모바일 서랍) 안의 버튼도 동작하도록 클릭은 문서에서 받는다
   document.addEventListener('click', (event) => {
-    if (!(event.target instanceof Element && event.target.closest('[data-theme-toggle]'))) return;
-    const isDark = document.documentElement.classList.toggle('dark');
-    saveTheme(isDark);
-    syncAllLabels(isDark);
-    document.dispatchEvent(new CustomEvent('themechange', { detail: { isDark } }));
+    const trigger = event.target instanceof Element ? event.target.closest('[data-theme-toggle]') : null;
+    if (trigger) changeTheme(trigger);
   });
 </script>

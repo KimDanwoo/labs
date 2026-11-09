@@ -44,17 +44,8 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Install browser
-        run: pnpm --filter fe-deep exec playwright install --with-deps chromium
-
-      - name: Verify data error and retry flows
-        run: pnpm --filter fe-deep test:e2e
-
       - name: Build Unicorn Rush
         run: pnpm --filter prairie build
 
-      - name: Verify Unicorn Rush rendering and controls
-        run: pnpm --filter prairie test:e2e
-
       # 전체 빌드는 하지 않는다. fe-deep 등은 빌드 시점에 DB 시크릿이 필요하다.
-      # Unicorn Rush는 외부 API 없이 빌드해 실제 WebGL·키보드·터치 흐름을 검증한다.
+      # e2e는 push 전 로컬 훅(.githooks/pre-push)이 바뀐 앱만 돌린다. Unicorn Rush는 GPU 없는 러너에서 실제 화면을 검증하지 못한다.
