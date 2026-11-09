@@ -19,9 +19,16 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      # PR은 바뀐 패키지와 그 패키지를 쓰는 앱만, main push는 전체를 검증한다.
+      # 구조 검사(check:architecture, scripts/*.test.mjs)는 저장소 전체 규칙이라 항상 돈다.
+      AFFECTED: ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+      TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # --affected가 PR base 커밋과 비교한다
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -35,17 +42,15 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      # pnpm run 뒤 인자는 스크립트 끝(turbo run)에 붙는다. pnpm test는 내장 명령이라 인자를 넘기지 않는다.
       - name: Lint
-        run: pnpm lint
+        run: pnpm run lint $AFFECTED
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: pnpm run typecheck $AFFECTED
 
       - name: Test
-        run: pnpm test
+        run: pnpm run test $AFFECTED
 
-      - name: Build Unicorn Rush
-        run: pnpm --filter prairie build
-
-      # 전체 빌드는 하지 않는다. fe-deep 등은 빌드 시점에 DB 시크릿이 필요하다.
-      # e2e는 push 전 로컬 훅(.githooks/pre-push)이 바뀐 앱만 돌린다. Unicorn Rush는 GPU 없는 러너에서 실제 화면을 검증하지 못한다.
+      # 빌드는 하지 않는다. fe-deep 등은 빌드 시점에 DB 시크릿이 필요하고, 배포 빌드는 Vercel이 맡는다.
+      # e2e와 prairie 빌드는 push 전 로컬 훅(.githooks/pre-push)이 바뀐 앱만 돌린다.
