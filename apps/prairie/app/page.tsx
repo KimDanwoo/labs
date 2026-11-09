@@ -1,4 +1,4 @@
-import { RideView } from '@views/ride';
+import { RideView } from '@pages/ride';
 
 export default function Home() {
   return <RideView />;
