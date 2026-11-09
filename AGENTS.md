@@ -67,7 +67,11 @@ scripts/new-app.mjs   # 새 앱 생성기
 
 **경로 별칭** (앱 `tsconfig.json`의 `paths`): `@app/` `@pages/` `@widgets/` `@features/` `@entities/` `@shared/` → `./src/<layer>/`(`@app`·`@pages`만 `./src/_app`·`./src/_pages`). `@app/`은 **FSD app 레이어(`src/_app/`)**를 가리킨다 — 루트 라우팅 `app/`은 Next 진입점이라 별칭이 없다.
 
-**순수 계산·그래픽 코드**: `lib/`는 알고리즘·그래픽 구현을 둔다. React 컴포넌트·훅·전역 atom 정의를 lib에 숨기지 않는다.
+**세그먼트 판단 기준**(공식 세그먼트 정의): 코드가 **무엇을 위한 것인지**로 나눈다.
+- `api/`: 서버·외부 서비스 통신(Supabase·Firebase·외부 SDK 요청, 그 요청을 감싼 React Query 옵션).
+- `lib/`: 알고리즘·그래픽 구현(퍼즐 생성·풀이, 지오메트리, 파서 등). React 컴포넌트·훅·전역 atom 정의를 lib에 숨기지 않는다.
+- `ui/`: 컴포넌트와 표시용 계산(스타일 클래스 계산 등).
+- `model/`: 도메인 규칙·상태 전이·타입·상수·저장소(localStorage 포함). 실행 위치(서버/클라이언트)만으로 `api`가 되지 않는다.
 
 **서버 경계**: 파일시스템·서버 전용 데이터 로딩은 `model/server/`, Server Action은 `model/actions/`에 둔다. 서버 전용 모듈은 슬라이스의 `index.server.ts`로만 공개하고 `index.ts`에서 재수출하지 않는다. 클라이언트가 호출하는 Server Action(`'use server'`)은 `index.ts`로 공개해도 된다.
 
