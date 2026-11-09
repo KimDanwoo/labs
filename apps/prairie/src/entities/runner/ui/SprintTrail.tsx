@@ -1,10 +1,10 @@
 'use client';
 
-import { SPRINT_TRAIL } from '@entities/runner/model/constants';
 import { useFrame } from '@react-three/fiber';
 import { runnerState } from '@shared/r3f';
 import { useMemo, useRef } from 'react';
 import { AdditiveBlending, InstancedMesh, Object3D } from 'three';
+import { SPRINT_TRAIL } from '../model/constants/runner';
 
 const { maxMotes } = SPRINT_TRAIL;
 const dummy = new Object3D();

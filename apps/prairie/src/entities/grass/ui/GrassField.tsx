@@ -1,3 +1,6 @@
+import { useFrame } from '@react-three/fiber';
+import { FOG, SCENE_COLORS } from '@shared/config';
+import { runnerState, useLowDetail } from '@shared/r3f';
 import {
   chunkSeed,
   GRASS_FIELD,
@@ -8,10 +11,7 @@ import {
   grassViewRadius,
   GUST,
   type GrassQuality,
-} from '@entities/grass/model/constants';
-import { useFrame } from '@react-three/fiber';
-import { FOG, SCENE_COLORS } from '@shared/config';
-import { runnerState, useLowDetail } from '@shared/r3f';
+} from '../model/constants/grass';
 
 import { makeBladeGeometry } from '@shared/lib/makeBladeGeometry';
 

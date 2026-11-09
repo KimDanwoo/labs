@@ -1,12 +1,12 @@
 'use client';
 
-import { FloraField } from '@entities/flora/ui';
-import { GrassField } from '@entities/grass/ui';
-import { River } from '@entities/river/ui';
-import { Ground, Scenery } from '@entities/scenery/ui';
-import { Grazers, WingedLife } from '@entities/wildlife/ui';
-import { ExplorationScene } from '@features/exploration/ui';
-import { RunnerRig } from '@features/runner-control/ui';
+import { FloraField } from '@entities/flora';
+import { GrassField } from '@entities/grass';
+import { River } from '@entities/river';
+import { Ground, Scenery } from '@entities/scenery';
+import { Grazers, WingedLife } from '@entities/wildlife';
+import { ExplorationScene } from '@features/exploration';
+import { RunnerRig } from '@features/runner-control';
 import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { CAMERA, CINEMATIC, FOG, SCENE_COLORS, SUN, type FogQuality } from '@shared/config';

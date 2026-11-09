@@ -1,11 +1,11 @@
 'use client';
 
-import { GROUND_SHADOW } from '@entities/runner/model/constants';
 import { useFrame } from '@react-three/fiber';
 import { terrainHeightAt } from '@shared/config';
 import { runnerState } from '@shared/r3f';
 import { useRef } from 'react';
 import { Matrix4, Mesh, ShaderMaterial, Vector3 } from 'three';
+import { GROUND_SHADOW } from '../model/constants/runner';
 
 const SLOPE_SAMPLE = 0.5;
 const normal = new Vector3();

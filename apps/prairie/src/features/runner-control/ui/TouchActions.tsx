@@ -1,8 +1,8 @@
 'use client';
 
-import type { RunnerAction } from '@features/runner-control/model/constants';
-import { setRunnerAction } from '@features/runner-control/model/store';
 import type { PointerEvent } from 'react';
+import type { RunnerAction } from '../model/constants/controls';
+import { setRunnerAction } from '../model/store/runnerInput';
 
 function handlePress(event: PointerEvent<HTMLButtonElement>, action: RunnerAction) {
   event.preventDefault();

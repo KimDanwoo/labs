@@ -1,4 +1,4 @@
-import { CAMERA_MODE, type CameraMode } from '@entities/ride-settings/model/constants';
+import { type CameraMode, CAMERA_MODE } from '../constants/camera';
 
 const INITIAL = { mode: CAMERA_MODE.close as CameraMode, revision: 0 };
 let snapshot = INITIAL;

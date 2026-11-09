@@ -1,6 +1,6 @@
-import { HORN } from '@entities/runner/model/constants';
 import { useEffect, useMemo } from 'react';
 import { CatmullRomCurve3, LatheGeometry, TubeGeometry, Vector2, Vector3 } from 'three';
+import { HORN } from '../model/constants/runner';
 
 export function Horn() {
   const geometry = useMemo(() => {

@@ -1,6 +1,6 @@
-import { TouchControls } from '@features/runner-control/ui';
-import { Hud } from '@widgets/hud/ui';
-import { SceneBoundary, SceneCanvas, SceneLoader } from '@widgets/scene/ui';
+import { TouchControls } from '@features/runner-control';
+import { Hud } from '@widgets/hud';
+import { SceneBoundary, SceneCanvas, SceneLoader } from '@widgets/scene';
 
 export function RideView() {
   return (

@@ -1,4 +1,3 @@
-import { GRASS_FIELD } from '@entities/grass/model/constants';
 import {
   coastDistanceAt,
   distanceToRiver,
@@ -17,6 +16,7 @@ import {
   Object3D,
   type ShaderMaterial,
 } from 'three';
+import { GRASS_FIELD } from '../model/constants/grass';
 
 type GrassChunkProps = {
   cellX: number;

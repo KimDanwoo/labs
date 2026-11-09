@@ -2,19 +2,19 @@
 
 import { useLowDetail } from '@shared/r3f';
 
-import { FLORA, floraCellOf, floraInCell, type FloraPlacement } from '@entities/flora/model/constants';
+import { useFrame } from '@react-three/fiber';
+import { FOG, groundHeightAt } from '@shared/config';
+import { makeLeafCanopy, makeSurfaceBump, SURFACE_KIND } from '@shared/lib';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { Color, DoubleSide, InstancedMesh, Object3D, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
+import { FLORA, floraCellOf, floraInCell, type FloraPlacement } from '../model/constants/flora';
 import {
   makeCanopyGeometry,
   makeConiferGeometry,
   makeRockGeometry,
   makeShadowTexture,
   makeTrunkGeometry,
-} from '@entities/flora/model/services';
-import { useFrame } from '@react-three/fiber';
-import { FOG, groundHeightAt } from '@shared/config';
-import { makeLeafCanopy, makeSurfaceBump, SURFACE_KIND } from '@shared/lib';
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
-import { Color, DoubleSide, InstancedMesh, Object3D, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
+} from '../model/services/makeFloraGeometry';
 
 import { MeadowFlowers } from './MeadowFlowers';
 

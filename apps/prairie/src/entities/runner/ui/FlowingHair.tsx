@@ -1,6 +1,5 @@
 'use client';
 
-import { RUNNER_FINISH } from '@entities/runner/model/constants';
 import { useFrame } from '@react-three/fiber';
 import { runnerState, useLowDetail } from '@shared/r3f';
 import { useEffect, useMemo, useRef } from 'react';
@@ -13,6 +12,7 @@ import {
   type Object3D,
   type WebGLProgramParametersWithUniforms,
 } from 'three';
+import { RUNNER_FINISH } from '../model/constants/runner';
 
 type FlowingHairProps = { head: Object3D; neck: Object3D; speedRef: { current: number }; isTail?: boolean };
 

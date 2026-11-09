@@ -1,1 +1,0 @@
-export { cameraSettings } from './cameraSettings';

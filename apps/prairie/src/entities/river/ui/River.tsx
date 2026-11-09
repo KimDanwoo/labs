@@ -2,12 +2,6 @@
 
 import { runnerState, useLowDetail } from '@shared/r3f';
 
-import {
-  RIVER_BED_FRAGMENT_SHADER,
-  RIVER_BED_VERTEX_SHADER,
-  RIVER_FRAGMENT_SHADER,
-  RIVER_VERTEX_SHADER,
-} from '@entities/river/model/constants';
 import { useFrame, useThree } from '@react-three/fiber';
 import {
   coastDistanceAt,
@@ -19,6 +13,12 @@ import {
   SCENE_COLORS,
   SUN,
 } from '@shared/config';
+import {
+  RIVER_BED_FRAGMENT_SHADER,
+  RIVER_BED_VERTEX_SHADER,
+  RIVER_FRAGMENT_SHADER,
+  RIVER_VERTEX_SHADER,
+} from '../model/constants/shaders';
 
 import { useLayoutEffect, useRef } from 'react';
 import { Color, Group, ShaderMaterial, Vector2, Vector3 } from 'three';

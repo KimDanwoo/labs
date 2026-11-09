@@ -1,5 +1,5 @@
 'use client';
-import { WingedLife } from '@entities/wildlife/ui';
+import { WingedLife } from '@entities/wildlife';
 import { terrainHeightAt } from '@shared/config';
 import { LANDMARKS } from '@shared/exploration/world';
 import { memo } from 'react';

@@ -1,6 +1,6 @@
-import { RUNNER_FINISH } from '@entities/runner/model/constants';
 import { useEffect, useMemo } from 'react';
 import { CatmullRomCurve3, TubeGeometry, Vector3 } from 'three';
+import { RUNNER_FINISH } from '../model/constants/runner';
 
 export function HeadCrown() {
   const pieces = useMemo(() => {

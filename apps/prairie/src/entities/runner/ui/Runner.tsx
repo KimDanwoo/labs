@@ -1,13 +1,5 @@
 'use client';
 
-import {
-  RUNNER_ANIM,
-  RUNNER_ANIM_TUNING,
-  RUNNER_MODEL_TRANSFORM,
-  RUNNER_MODEL_URL,
-  UNICORN_TINT,
-} from '@entities/runner/model/constants';
-import { gaitWeights } from '@entities/runner/model/services';
 import { useAnimations, useGLTF } from '@react-three/drei';
 import { createPortal, useFrame } from '@react-three/fiber';
 import { terrainHeightAt } from '@shared/config';
@@ -15,6 +7,14 @@ import { runnerState } from '@shared/r3f';
 import { useEffect, useMemo, useRef } from 'react';
 import { Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type AnimationAction } from 'three';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import {
+  RUNNER_ANIM,
+  RUNNER_ANIM_TUNING,
+  RUNNER_MODEL_TRANSFORM,
+  RUNNER_MODEL_URL,
+  UNICORN_TINT,
+} from '../model/constants/runner';
+import { gaitWeights } from '../model/services/gaitWeights';
 import { FlowingHair } from './FlowingHair';
 import { HeadCrown } from './HeadCrown';
 import { Horn } from './Horn';

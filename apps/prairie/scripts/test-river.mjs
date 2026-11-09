@@ -6,7 +6,7 @@ import {
   GRASS_QUALITY,
   grassKeepAt,
   grassViewRadius,
-} from '../src/entities/grass/model/constants/index.ts';
+} from '../src/entities/grass/model/constants/grass.ts';
 import {
   distanceToRiver,
   coastDistanceAt,

@@ -1,7 +1,7 @@
-import { RUNNER_FINISH, WINGS } from '@entities/runner/model/constants';
-import { shadeFeathers } from '@entities/runner/model/services';
 import type { Ref } from 'react';
 import { DoubleSide, type BufferGeometry, type Group } from 'three';
+import { RUNNER_FINISH, WINGS } from '../model/constants/runner';
+import { shadeFeathers } from '../model/services/featherSurface';
 
 type FeatherWingProps = { geometry: BufferGeometry; trimRef: Ref<Group>; mirror?: boolean };
 

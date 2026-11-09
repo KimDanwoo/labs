@@ -1,6 +1,6 @@
 'use client';
 
-import { ExplorationHud } from '@features/exploration/ui';
+import { ExplorationHud } from '@features/exploration';
 import { useState } from 'react';
 import { PrairieMark } from './PrairieMark';
 import { RideCameraControls } from './RideCameraControls';

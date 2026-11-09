@@ -1,8 +1,8 @@
 'use client';
 
-import { JOYSTICK } from '@features/runner-control/model/constants';
-import { setRunnerAction } from '@features/runner-control/model/store';
 import { type PointerEvent, useRef, useState } from 'react';
+import { JOYSTICK } from '../model/constants/controls';
+import { setRunnerAction } from '../model/store/runnerInput';
 import { TouchActions } from './TouchActions';
 
 type Vec = { x: number; y: number };

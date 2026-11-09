@@ -1,11 +1,11 @@
 'use client';
 
-import { WADE_SPLASH } from '@entities/runner/model/constants';
 import { useFrame } from '@react-three/fiber';
 import { RIVER } from '@shared/config';
 import { runnerState } from '@shared/r3f';
 import { useMemo, useRef } from 'react';
 import { InstancedMesh, Mesh, MeshBasicMaterial, Object3D, Vector3 } from 'three';
+import { WADE_SPLASH } from '../model/constants/runner';
 
 const WATER_Y = -RIVER.waterDrop;
 const RING_Y = WATER_Y + 0.06;

@@ -2,7 +2,6 @@
 
 import { useLowDetail } from '@shared/r3f';
 
-import { makeFlowerGeometry } from '@entities/flora/model/services';
 import { useFrame } from '@react-three/fiber';
 import {
   coastDistanceAt,
@@ -12,6 +11,7 @@ import {
   RIVER_TRENCH_HALF_WIDTH,
   terrainHeightAt,
 } from '@shared/config';
+import { makeFlowerGeometry } from '../model/services/makeFlowerGeometry';
 
 import { useMemo, useRef } from 'react';
 import { Color, InstancedMesh, Object3D } from 'three';

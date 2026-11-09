@@ -1,22 +1,8 @@
 'use client';
 
-import { FLORA, pushOutOfFlora } from '@entities/flora/model/constants';
-import { CAMERA_MODE, CAMERA_PRESETS } from '@entities/ride-settings/model/constants';
-import { cameraSettings } from '@entities/ride-settings/model/store';
-import { GroundShadow, Runner, SpinStardust, SprintTrail, WadeSplash } from '@entities/runner/ui';
-import { RUNNER_PHYSICS } from '@features/runner-control/model/constants';
-import { usePointerLook, useRunnerControls } from '@features/runner-control/model/hooks';
-import {
-  createDashState,
-  createFlightState,
-  createSpinState,
-  DASH_SKILL,
-  SPIN_SKILL,
-  updateDash,
-  updateFlight,
-  updateSpin,
-} from '@features/runner-control/model/services';
-import { getRunnerInput } from '@features/runner-control/model/store';
+import { FLORA, pushOutOfFlora } from '@entities/flora';
+import { CAMERA_MODE, CAMERA_PRESETS, cameraSettings } from '@entities/ride-settings';
+import { GroundShadow, Runner, SpinStardust, SprintTrail, WadeSplash } from '@entities/runner';
 import { useFrame, useThree } from '@react-three/fiber';
 import {
   CAMERA,
@@ -33,6 +19,13 @@ import {
 import { runnerState, setRideRiver, setRideTelemetry } from '@shared/r3f';
 import { useRef } from 'react';
 import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three';
+import { RUNNER_PHYSICS } from '../model/constants/controls';
+import { usePointerLook } from '../model/hooks/usePointerLook';
+import { useRunnerControls } from '../model/hooks/useRunnerControls';
+import { createDashState, DASH_SKILL, updateDash } from '../model/services/dashSkill';
+import { createFlightState, updateFlight } from '../model/services/flightDynamics';
+import { createSpinState, SPIN_SKILL, updateSpin } from '../model/services/spinSkill';
+import { getRunnerInput } from '../model/store/runnerInput';
 
 const forwardVec = new Vector3();
 const camDirVec = new Vector3();
