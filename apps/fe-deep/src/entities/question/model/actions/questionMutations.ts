@@ -1,9 +1,9 @@
 'use server';
 
-import type { Question, QuestionInput } from '@entities/question/model/types';
 import { createAdminSupabaseClient } from '@shared/config/supabase/admin';
 import { requireAdmin } from '@shared/lib/requireAdmin';
 import { randomUUID } from 'crypto';
+import type { Question, QuestionInput } from '../types/types';
 
 export async function createQuestion(data: QuestionInput): Promise<Question> {
   await requireAdmin();

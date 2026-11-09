@@ -1,5 +1,5 @@
-import type { Difficulty } from '@entities/question/model/types';
 import { queryOptions } from '@tanstack/react-query';
+import type { Difficulty } from '../types/types';
 import {
   getAllCategories,
   getAllQuestions,

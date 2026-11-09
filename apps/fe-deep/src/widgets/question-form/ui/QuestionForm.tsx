@@ -1,7 +1,13 @@
 'use client';
 
-import { createQuestion, updateQuestion } from '@entities/question/model/actions';
-import type { Category, Difficulty, Question, QuestionInput } from '@entities/question/model/types';
+import {
+  type Category,
+  type Difficulty,
+  type Question,
+  type QuestionInput,
+  createQuestion,
+  updateQuestion,
+} from '@entities/question';
 import { ConfirmDialog, MarkdownRenderer } from '@shared/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import {

@@ -17,7 +17,6 @@ import {
   SheetTrigger,
   ThemeToggle,
 } from '@ui/react';
-import { useHeader } from '@widgets/layout/model/hooks';
 import {
   Bookmark,
   BookOpen,
@@ -33,6 +32,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useHeader } from '../model/hooks/useHeader';
 
 const navItems = [
   { href: '/reference', label: '레퍼런스', icon: BookOpen },

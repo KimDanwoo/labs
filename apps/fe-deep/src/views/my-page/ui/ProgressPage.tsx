@@ -1,8 +1,8 @@
 'use client';
 
 import { Badge, Card, Progress } from '@ui/react';
-import { useProgressStats } from '@views/my-page/model/hooks';
 import { BookOpen, Brain, CheckCircle, Flame, Target } from 'lucide-react';
+import { useProgressStats } from '../model/hooks/useProgressStats';
 import { StudyHeatmap } from './StudyHeatmap';
 
 export function ProgressPage() {

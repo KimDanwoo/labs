@@ -1,6 +1,6 @@
-import { countSteps, type StudyDoc } from '@views/study/model/services';
 import { ChevronRight, FileText } from 'lucide-react';
 import Link from 'next/link';
+import { type StudyDoc, countSteps } from '../model/services/parseHandbook';
 
 type StudyDocTableProps = {
   docs: StudyDoc[];

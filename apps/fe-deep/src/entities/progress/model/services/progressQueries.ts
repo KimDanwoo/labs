@@ -1,13 +1,8 @@
 'use client';
 
 import { queryOptions } from '@tanstack/react-query';
-import {
-  getCurrentStreak,
-  getLocalProgress,
-  getProgressByCategory,
-  getProgressForQuestion,
-  getStudyHeatmap,
-} from './progressApi';
+import { getCurrentStreak, getProgressByCategory, getProgressForQuestion, getStudyHeatmap } from './progressApi';
+import { getLocalProgress } from './progressStorage';
 
 /** Progress 도메인 조회 쿼리 (TanStack Query queryOptions) */
 export const progressQueries = {

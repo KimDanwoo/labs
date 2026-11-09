@@ -1,7 +1,7 @@
 'use client';
-import { SM2_CONSTANTS } from '@entities/progress/model/constants';
-import type { UserProgress } from '@entities/progress/model/types';
 import { STORAGE_KEYS } from '@shared/constants';
+import { SM2_CONSTANTS } from '../constants/constants';
+import type { UserProgress } from '../types/types';
 import { todayString } from './progressDates';
 
 export function getLocalProgress(): Record<string, UserProgress> {

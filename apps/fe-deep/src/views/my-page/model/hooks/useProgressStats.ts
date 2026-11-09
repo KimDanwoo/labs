@@ -1,13 +1,7 @@
 'use client';
 
-import {
-  getCurrentStreak,
-  getLocalProgress,
-  getProgressByCategory,
-  getStudyHeatmap,
-} from '@entities/progress/model/services';
-import { getAllCategories, getAllQuestions } from '@entities/question/model/services';
-import { type Category } from '@entities/question/model/types';
+import { getCurrentStreak, getLocalProgress, getProgressByCategory, getStudyHeatmap } from '@entities/progress';
+import { type Category, getAllCategories, getAllQuestions } from '@entities/question';
 import { useEffect, useState } from 'react';
 
 interface OverallStats {

@@ -1,11 +1,11 @@
 'use client';
 
-import { DifficultyBadge } from '@entities/question/ui';
+import { DifficultyBadge } from '@entities/question';
 import { MarkdownRenderer } from '@shared/ui';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Button, Card } from '@ui/react';
-import { useBookmarkedQuestions } from '@views/my-page/model/hooks';
 import { Bookmark, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { useBookmarkedQuestions } from '../model/hooks/useBookmarkedQuestions';
 
 export function BookmarksPage() {
   const { bookmarkedQuestions, handleRemoveBookmark, getCategoryForQuestion } = useBookmarkedQuestions();

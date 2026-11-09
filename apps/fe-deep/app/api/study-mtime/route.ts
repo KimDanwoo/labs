@@ -1,4 +1,4 @@
-import { getStudyContentStamp } from '@views/study/model/server';
+import { getStudyContentStamp } from '@views/study/index.server';
 import { NextResponse } from 'next/server';
 
 /** dev 전용 — 학습 md의 최신 수정 시각. 클라이언트가 폴링해서 저장 즉시 화면을 갱신한다. */

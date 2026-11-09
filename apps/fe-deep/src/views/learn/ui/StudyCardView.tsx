@@ -1,7 +1,6 @@
 'use client';
 
-import type { FollowUp, Question } from '@entities/question/model/types';
-import { DifficultyBadge } from '@entities/question/ui';
+import { type FollowUp, type Question, DifficultyBadge } from '@entities/question';
 import { cn } from '@shared/lib/utils';
 import { KeywordCheck, MarkdownRenderer } from '@shared/ui';
 import { Badge, Button, Card, Progress } from '@ui/react';

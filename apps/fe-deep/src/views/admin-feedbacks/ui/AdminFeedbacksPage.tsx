@@ -1,5 +1,5 @@
 'use client';
-import { getFeedbacks, updateFeedbackStatus } from '@features/feedback/model/actions';
+import { getFeedbacks, updateFeedbackStatus } from '@features/feedback';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Badge, Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/react';
 import { CheckCircle, Clock, Eye, MessageSquare, Trash2 } from 'lucide-react';

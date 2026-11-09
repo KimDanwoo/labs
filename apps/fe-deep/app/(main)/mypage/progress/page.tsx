@@ -1,3 +1,3 @@
-import { ProgressPage } from '@views/my-page/ui';
+import { ProgressPage } from '@views/my-page';
 
 export default ProgressPage;

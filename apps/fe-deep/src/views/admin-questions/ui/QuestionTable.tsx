@@ -1,7 +1,6 @@
 'use client';
 
-import type { Category, Question } from '@entities/question/model/types';
-import { DifficultyBadge } from '@entities/question/ui';
+import { type Category, type Question, DifficultyBadge } from '@entities/question';
 import { Badge, Button, Checkbox } from '@ui/react';
 import { BookOpen, Layers, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';

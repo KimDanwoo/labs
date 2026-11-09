@@ -1,7 +1,6 @@
 'use client';
 
-import { searchQuestions } from '@entities/question/model/services';
-import { type SearchResult } from '@entities/question/model/types';
+import { type SearchResult, searchQuestions } from '@entities/question';
 import { useDebounce } from '@shared/lib/hooks';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';

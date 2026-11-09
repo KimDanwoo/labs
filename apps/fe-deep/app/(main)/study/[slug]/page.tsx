@@ -1,2 +1,2 @@
-export { StudyDetailView as default, generateMetadata, generateStaticParams } from '@views/study/StudyDetailView';
+export { StudyDetailView as default, generateMetadata, generateStaticParams } from '@views/study';
 export const dynamicParams = false;

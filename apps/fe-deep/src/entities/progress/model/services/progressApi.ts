@@ -1,7 +1,7 @@
 'use client';
 
-import { SM2_CONSTANTS } from '@entities/progress/model/constants';
-import type { UserProgress } from '@entities/progress/model/types';
+import { SM2_CONSTANTS } from '../constants/constants';
+import type { UserProgress } from '../types/types';
 import { addDays, todayString } from './progressDates';
 import { getLocalProgress, saveLocalProgress } from './progressStorage';
 export { getLocalProgress, saveLocalProgress } from './progressStorage';

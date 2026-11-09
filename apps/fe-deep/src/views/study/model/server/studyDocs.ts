@@ -1,6 +1,6 @@
-import { parseStudyDoc, type StudyDoc } from '@views/study/model/services';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
+import { type StudyDoc, parseStudyDoc } from '../services/parseHandbook';
 
 /** 학습 문서 원본. 여기에 .md 파일을 넣으면 학습 화면이 자동으로 생긴다. */
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'study');

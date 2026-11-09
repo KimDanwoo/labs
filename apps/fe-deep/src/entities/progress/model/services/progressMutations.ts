@@ -1,7 +1,8 @@
 'use client';
 
-import type { UserProgress } from '@entities/progress/model/types';
-import { saveLocalProgress, updateQuestionProgress } from './progressApi';
+import type { UserProgress } from '../types/types';
+import { updateQuestionProgress } from './progressApi';
+import { saveLocalProgress } from './progressStorage';
 
 /** Progress 도메인 뮤테이션 옵션 (useMutation에 스프레드하여 사용) */
 export const progressMutations = {

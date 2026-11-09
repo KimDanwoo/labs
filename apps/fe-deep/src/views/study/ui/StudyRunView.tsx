@@ -1,7 +1,14 @@
 'use client';
 
-import { useReviewTopics, useUnderstoodTopics } from '@views/study/model/hooks';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { useReviewTopics } from '../model/hooks/useReviewTopics';
+import { useUnderstoodTopics } from '../model/hooks/useUnderstoodTopics';
+import type { StudyDoc } from '../model/services/parseHandbook';
 import {
+  type StudyFilter,
+  type StudyTier,
+  type TopicMarks,
   STUDY_FILTER,
   countByTier,
   filterTopics,
@@ -9,13 +16,7 @@ import {
   parseStudyFilter,
   parseStudyTiers,
   serializeStudyTiers,
-  type StudyDoc,
-  type StudyFilter,
-  type StudyTier,
-  type TopicMarks,
-} from '@views/study/model/services';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+} from '../model/services/studyFilter';
 import { StudyFilterBar } from './StudyFilterBar';
 import { StudyRunner } from './StudyRunner';
 

@@ -1,6 +1,6 @@
-import { getAllCategories, getQuestionById } from '@entities/question/model/services';
+import { getAllCategories, getQuestionById } from '@entities/question';
 import { createServerSupabaseClient } from '@shared/config/supabase/server';
-import { QuestionForm } from '@widgets/question-form/ui';
+import { QuestionForm } from '@widgets/question-form';
 import { notFound } from 'next/navigation';
 
 interface Props {

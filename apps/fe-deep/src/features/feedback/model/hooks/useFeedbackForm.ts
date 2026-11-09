@@ -1,9 +1,9 @@
 'use client';
 
-import { createFeedback } from '@features/feedback/model/actions';
-import type { FeedbackType, SubmitStatus } from '@features/feedback/model/types';
 import { createClient } from '@shared/config/supabase/client';
 import { useEffect, useState } from 'react';
+import { createFeedback } from '../actions/feedbackActions';
+import type { FeedbackType, SubmitStatus } from '../types/types';
 
 interface UseFeedbackFormOptions {
   questionId?: string;

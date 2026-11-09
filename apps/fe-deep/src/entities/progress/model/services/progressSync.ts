@@ -1,7 +1,7 @@
 'use client';
 
-import type { UserProgress } from '@entities/progress/model/types';
 import { createClient } from '@shared/config/supabase/client';
+import type { UserProgress } from '../types/types';
 import { getLocalProgress, saveLocalProgress } from './progressStorage';
 
 // ============================================================

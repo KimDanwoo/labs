@@ -1,6 +1,6 @@
 'use client';
 
-import type { Category } from '@entities/question/model/types';
+import type { Category } from '@entities/question';
 import { cn } from '@shared/lib/utils';
 import { ScrollArea } from '@ui/react';
 import Link from 'next/link';

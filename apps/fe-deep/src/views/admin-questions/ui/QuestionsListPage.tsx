@@ -1,11 +1,13 @@
 'use client';
 import {
+  type Category,
+  type Question,
+  type QuestionVisibilityField,
   deleteQuestion,
   deleteQuestions,
   updateCategoryVisibility,
   updateQuestionsVisibility,
-} from '@entities/question/model/actions';
-import type { Category, Question, QuestionVisibilityField } from '@entities/question/model/types';
+} from '@entities/question';
 import { createClient } from '@shared/config/supabase/client';
 import { useDebounce } from '@shared/lib/hooks';
 import { useQuery } from '@tanstack/react-query';
