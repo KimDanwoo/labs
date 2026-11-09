@@ -22,6 +22,13 @@ function moduleLocation(filename, source, appRoot = location(filename)?.root) {
   return null;
 }
 
+// 문자열이나 보간 없는 템플릿 리터럴만 정적으로 판정할 수 있다.
+function staticSource(node) {
+  if (node?.type === 'Literal' && typeof node.value === 'string') return node.value;
+  if (node?.type === 'TemplateLiteral' && node.expressions.length === 0) return node.quasis[0].value.cooked;
+  return null;
+}
+
 function onModuleSources(check) {
   return {
     ImportDeclaration: (node) => check(node.source, node.source.value),
@@ -29,7 +36,8 @@ function onModuleSources(check) {
       if (node.source) check(node.source, node.source.value);
     },
     ExportAllDeclaration: (node) => check(node.source, node.source.value),
-    ImportExpression: (node) => check(node.source, node.source.value),
+    ImportExpression: (node) => check(node.source, staticSource(node.source)),
+    TSImportType: (node) => check(node, staticSource(node.argument?.literal ?? node.argument)),
   };
 }
 
@@ -42,7 +50,12 @@ const structure = {
         if (!own || !SLICED_LAYERS.has(own.layer)) return;
         const parts = own.rest.split('/').slice(1);
         if (parts.length === 1 && PUBLIC_ENTRY.test(parts[0])) return;
-        if (!SLICE_SEGMENTS.includes(parts[0])) {
+        if (/^index\.tsx?$/.test(parts.at(-1))) {
+          context.report({
+            node,
+            message: '세그먼트 안에는 index.ts(배럴)를 두지 않는다. 공개 API는 슬라이스 루트 index.ts다.',
+          });
+        } else if (!SLICE_SEGMENTS.includes(parts[0])) {
           context.report({
             node,
             message:
@@ -87,6 +100,8 @@ const publicApi = {
     if (TEST_FILE.test(filename)) return {};
     const from = location(filename);
     const appRoot = from?.root ?? context.cwd.replaceAll('\\', '/');
+    const isEntryFile =
+      from && SLICED_LAYERS.has(from.layer) && PUBLIC_ENTRY.test(from.rest.split('/').slice(1).join('/'));
     function check(node, source) {
       if (typeof source !== 'string') return;
       const to = moduleLocation(filename, source, appRoot);
@@ -99,6 +114,8 @@ const publicApi = {
           node,
           message: '자기 슬라이스의 공개 API를 import하지 않는다. 구현 파일을 상대경로로 가져온다.',
         });
+      } else if (sameSlice && source.startsWith('@')) {
+        context.report({ node, message: '슬라이스 안에서는 alias 대신 상대경로로 구현 파일을 가져온다.' });
       } else if (!sameSlice && !isEntry) {
         context.report({
           node,
@@ -106,7 +123,15 @@ const publicApi = {
         });
       }
     }
-    return onModuleSources(check);
+    const visitors = onModuleSources(check);
+    if (!isEntryFile) return visitors;
+    return {
+      ...visitors,
+      ExportAllDeclaration(node) {
+        context.report({ node, message: '공개 API는 export * 대신 밖에서 쓰는 이름만 명시적으로 재수출한다.' });
+        visitors.ExportAllDeclaration(node);
+      },
+    };
   },
 };
 

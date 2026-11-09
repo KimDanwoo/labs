@@ -35,6 +35,8 @@ test('other slices are reached only through their public API', () => {
     "import { Game } from '../../../entities/game/ui/Game';",
     "export { Game } from '@entities/game/ui/Game';",
     "const game = import('@entities/game/ui/Game');",
+    'const game = import(`@entities/game/ui/Game`);',
+    "type Game = import('@entities/game/model/types/game').Game;",
   ])
     assert.equal(check('public-api', code).length, 1, code);
 });
@@ -43,6 +45,12 @@ test('a slice does not import its own public API', () => {
   assert.equal(check('public-api', "import { state } from '../model/store/first';").length, 0);
   assert.equal(check('public-api', "import { First } from '@features/first';").length, 1);
   assert.equal(check('public-api', "import { First } from '../index';").length, 1);
+  assert.equal(check('public-api', "import { state } from '@features/first/model/store/first';").length, 1);
+});
+
+test('a public API re-exports names explicitly', () => {
+  assert.equal(check('public-api', "export { First } from './ui/First';", 'src/features/first/index.ts').length, 0);
+  assert.equal(check('public-api', "export * from './ui/First';", 'src/features/first/index.ts').length, 1);
 });
 
 test('Next route files outside src also use public APIs; tests may reach internals', () => {
@@ -74,9 +82,10 @@ test('slice roots hold only the public API; model files live inside an explicit 
   assert.equal(check('slice-structure', 'export {};', 'src/features/first/index.server.ts').length, 0);
   assert.equal(check('slice-structure', 'export const value = 1;', 'src/features/first/api/request.ts').length, 0);
   assert.equal(check('slice-structure', 'export {};', 'src/views/home/HomeView.tsx').length, 1);
+  assert.equal(check('slice-structure', 'export {};', 'src/features/first/ui/index.ts').length, 1);
   assert.equal(check('slice-structure', 'export const value = 1;', 'src/features/first/model/types.ts').length, 1);
   assert.equal(
-    check('slice-structure', 'export const value = 1;', 'src/features/first/model/types/index.ts').length,
+    check('slice-structure', 'export const value = 1;', 'src/features/first/model/types/first.ts').length,
     0,
   );
   assert.equal(check('slice-structure', 'export const value = 1;', 'src/features/first/actions.ts').length, 1);

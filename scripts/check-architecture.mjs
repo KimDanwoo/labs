@@ -238,7 +238,7 @@ export function checkRepository(root = ROOT) {
         ts.isCallExpression(node) &&
         node.expression.kind === ts.SyntaxKind.ImportKeyword &&
         node.arguments[0] &&
-        ts.isStringLiteral(node.arguments[0])
+        (ts.isStringLiteral(node.arguments[0]) || ts.isNoSubstitutionTemplateLiteral(node.arguments[0]))
       ) {
         const name = node.arguments[0].text;
         if (/^(?:node:)?(?:fs|child_process|net|tls)(?:\/|$)|^next\/headers$|^server-only$/.test(name))
