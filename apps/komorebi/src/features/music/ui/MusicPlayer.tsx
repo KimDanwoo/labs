@@ -1,6 +1,6 @@
-import { MUSIC_STATUS, musicTime, musicWidgetSrc } from '@features/music/lib/soundcloud';
-import { useMusicPlayer } from '@features/music/model/hooks';
 import { useRef, useState } from 'react';
+import { MUSIC_STATUS, musicTime, musicWidgetSrc } from '../lib/soundcloud';
+import { useMusicPlayer } from '../model/hooks/useMusicPlayer';
 
 export function MusicPlayer({
   source,

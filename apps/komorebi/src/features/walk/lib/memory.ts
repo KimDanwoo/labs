@@ -1,6 +1,6 @@
-import { TIME, TIME_LABEL, TIME_ORDER, type TimeOfDay } from '@features/walk/model/constants';
-import type { Memory } from '@features/walk/model/types';
 import type { Landmark } from '@shared/world/world';
+import { type TimeOfDay, TIME, TIME_LABEL, TIME_ORDER } from '../model/constants/walk';
+import type { Memory } from '../model/types/memory';
 
 const TEXT_BY_TIME = {
   [TIME.day]: (landmark: Landmark) => landmark.text,

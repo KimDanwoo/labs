@@ -1,16 +1,16 @@
-import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT, type Point, type Region } from '@shared/world/world';
+import { type Point, type Region, FISHING_PIER, HOME_AQUARIUM, PIER_CAT } from '@shared/world/world';
 import * as THREE from 'three';
 import { AQUARIUM_ART, aquariumFishArt, aquariumPose } from './aquarium';
 import { catchCelebration } from './catchCelebration';
 import {
+  type CompanionReaction,
+  type Companions,
   COMPANION_REACTION,
   FISH_HOME,
   TANK_CAPACITY,
   catBond,
-  type CompanionReaction,
-  type Companions,
 } from './companions';
-import { FISHING_PHASE, type FishingFrame } from './fishing';
+import { type FishingFrame, FISHING_PHASE } from './fishing';
 import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
 
 /** Local, bounded movement keeps the companion on the pier, even when the child leaves. */

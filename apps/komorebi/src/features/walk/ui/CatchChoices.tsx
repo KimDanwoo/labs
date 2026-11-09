@@ -1,13 +1,13 @@
+import { useState, useSyncExternalStore } from 'react';
 import {
+  type CompanionReaction,
   COMPANION_ACTION,
   COMPANION_REACTION,
   FISH_HOME,
   TANK_CAPACITY,
   catBond,
-  type CompanionReaction,
-} from '@features/walk/lib/companions';
-import { companionStore } from '@features/walk/model/store';
-import { useState, useSyncExternalStore } from 'react';
+} from '../lib/companions';
+import { companionStore } from '../model/store/companions';
 
 export function CatchChoices({ uid, onReact }: { uid: string | null; onReact: (reaction: CompanionReaction) => void }) {
   const state = useSyncExternalStore(companionStore.subscribe, companionStore.get, companionStore.getServer);

@@ -1,13 +1,6 @@
+import { type Bounds, FLIGHT, flyFor, startFlight, stepButterfly, stepDragonfly } from '@features/walk/lib/flight';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  FLIGHT,
-  flyFor,
-  startFlight,
-  stepButterfly,
-  stepDragonfly,
-  type Bounds,
-} from '../src/features/walk/lib/flight';
 
 const bounds: Bounds = { minX: 10, maxX: 30, minZ: 40, maxZ: 60 };
 function seeded(seed: number) {

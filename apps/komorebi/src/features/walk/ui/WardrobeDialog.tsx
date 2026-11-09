@@ -1,6 +1,6 @@
-import { useModal } from '@features/walk/model/hooks';
 import { OUTFIT, type Appearance } from '@shared/world/appearance';
 import { useId, useState } from 'react';
+import { useModal } from '../model/hooks/useModal';
 import { CharacterPreview } from './CharacterPreview';
 import { Icon } from './Icon';
 

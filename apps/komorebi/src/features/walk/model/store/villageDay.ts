@@ -1,5 +1,5 @@
-import { FIRST_DAY, type VillageDay } from '@features/walk/lib/dayCycle';
-import { TIME_ORDER, WEATHER } from '@features/walk/model/constants';
+import { type VillageDay, FIRST_DAY } from '../../lib/dayCycle';
+import { TIME_ORDER, WEATHER } from '../constants/walk';
 
 export const VILLAGE_DAY_KEY = 'komorebi-village-day-v1';
 

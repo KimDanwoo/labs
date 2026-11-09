@@ -1,12 +1,12 @@
+import { LANDMARKS } from '@shared/world/world';
 import {
+  type TimeOfDay,
   DAY_PAGE_STORAGE_KEY,
   EVENING_DISCOVERY_STORAGE_KEY,
   LEGACY_DISCOVERY_STORAGE_KEY,
   NIGHT_PAGE_STORAGE_KEY,
   TIME,
-  type TimeOfDay,
-} from '@features/walk/model/constants';
-import { LANDMARKS } from '@shared/world/world';
+} from '../constants/walk';
 
 const NO_PAGES: readonly string[] = [];
 

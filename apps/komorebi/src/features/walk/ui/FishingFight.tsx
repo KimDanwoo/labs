@@ -1,14 +1,14 @@
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import {
+  type Catch,
+  type Fight,
+  type FishingFrame,
   FIGHT_OUTCOME,
   FISHING_PHASE,
   fishSurge,
   startFight,
   stepFight,
-  type Catch,
-  type Fight,
-  type FishingFrame,
-} from '@features/walk/lib/fishing';
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
+} from '../lib/fishing';
 
 export function FishingFight({
   fish,

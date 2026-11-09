@@ -1,6 +1,6 @@
+import { ambienceMix } from '@features/walk/lib/ambienceMix';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { ambienceMix } from '../src/features/walk/lib/ambienceMix';
 
 test('each place has its own sound and dusk swaps birds for crickets', () => {
   assert.equal(ambienceMix('river', 'day').water, 1);

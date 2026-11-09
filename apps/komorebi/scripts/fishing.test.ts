@@ -1,5 +1,3 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
 import {
   FIGHT_OUTCOME,
   FISH,
@@ -11,7 +9,9 @@ import {
   rollCatch,
   startFight,
   stepFight,
-} from '../src/features/walk/lib/fishing';
+} from '@features/walk/lib/fishing';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 test('fishing draws common and rare fish at the pool boundaries', () => {
   assert.deepEqual(

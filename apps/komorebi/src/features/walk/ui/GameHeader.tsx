@@ -1,4 +1,4 @@
-import { TIME_LABEL, type TimeOfDay } from '@features/walk/model/constants';
+import { type TimeOfDay, TIME_LABEL } from '../model/constants/walk';
 
 type Props = { timeOfDay: TimeOfDay; day: number };
 

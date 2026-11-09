@@ -1,4 +1,8 @@
+import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react';
 import {
+  type CompanionAction,
+  type CompanionPanelKind,
+  type CompanionReaction,
   BAG_CAPACITY,
   COMPANION_ACTION,
   COMPANION_PANEL,
@@ -6,13 +10,9 @@ import {
   FISH_HOME,
   TANK_CAPACITY,
   catBond,
-  type CompanionAction,
-  type CompanionPanelKind,
-  type CompanionReaction,
-} from '@features/walk/lib/companions';
-import { FISH } from '@features/walk/lib/fishing';
-import { companionStore } from '@features/walk/model/store';
-import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react';
+} from '../lib/companions';
+import { FISH } from '../lib/fishing';
+import { companionStore } from '../model/store/companions';
 
 import { AquariumView } from './AquariumView';
 

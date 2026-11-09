@@ -1,7 +1,7 @@
 'use client';
 
-import { DANWOO_PROFILE, DEFAULT_MUSIC } from '@features/music/lib/soundcloud';
 import { useState } from 'react';
+import { DANWOO_PROFILE, DEFAULT_MUSIC } from '../lib/soundcloud';
 import { MusicPlayer } from './MusicPlayer';
 
 export function MusicDock() {

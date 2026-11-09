@@ -1,7 +1,7 @@
-import { TIME_ORDER, type TimeOfDay } from '@features/walk/model/constants';
-import { pageStores, type DiscoveryStore } from '@features/walk/model/store';
 import { LANDMARKS } from '@shared/world/world';
 import { useSyncExternalStore } from 'react';
+import { type TimeOfDay, TIME_ORDER } from '../constants/walk';
+import { type DiscoveryStore, pageStores } from '../store/discoveries';
 
 function usePages(store: DiscoveryStore): readonly string[] {
   return useSyncExternalStore(store.subscribe, store.get, store.getServer);

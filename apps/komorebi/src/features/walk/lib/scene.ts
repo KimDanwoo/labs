@@ -1,5 +1,3 @@
-import { TIME, WEATHER, type TimeOfDay, type Weather } from '@features/walk/model/constants';
-import { companionStore } from '@features/walk/model/store';
 import { DEFAULT_APPEARANCE, characterAtlas, type Appearance } from '@shared/world/appearance';
 import { FOREGROUNDS, foregroundOrder } from '@shared/world/foreground';
 import { isAtHomeBed, isNearHomeBed } from '@shared/world/interactions';
@@ -22,6 +20,8 @@ import {
   type Region,
 } from '@shared/world/world';
 import * as THREE from 'three';
+import { TIME, WEATHER, type TimeOfDay, type Weather } from '../model/constants/walk';
+import { companionStore } from '../model/store/companions';
 import { CANVAS_FONT_FAMILY, canvasTexture } from './art';
 import { BACKGROUND_FRAGMENT, BACKGROUND_VERTEX } from './backgroundShader';
 import { createBedRest } from './bedRest';

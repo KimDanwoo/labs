@@ -1,7 +1,7 @@
+import { FIRST_DAY } from '@features/walk/lib/dayCycle';
+import { parseVillageDay } from '@features/walk/model/store/villageDay';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { FIRST_DAY } from '../src/features/walk/lib/dayCycle';
-import { parseVillageDay } from '../src/features/walk/model/store/villageDay';
 
 test('saved days preserve the date, light and weather without trusting malformed storage', () => {
   assert.deepEqual(parseVillageDay('{"day":8,"time":"night","weather":"rain"}'), {

@@ -1,7 +1,7 @@
+import { createRoamers } from '@features/walk/lib/roamers';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { createRoamers } from '../src/features/walk/lib/roamers';
 
 // Sprites paint their shadow on a canvas when created; a stand-in is enough here.
 const paint = { createRadialGradient: () => ({ addColorStop() {} }), fillRect() {} };

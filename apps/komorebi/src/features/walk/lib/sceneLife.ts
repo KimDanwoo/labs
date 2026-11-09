@@ -1,6 +1,6 @@
 import type { Region } from '@shared/world/world';
 import * as THREE from 'three';
-import { FLIGHT, flyFor, startFlight, stepButterfly, stepDragonfly, type Bounds, type Flight } from './flight';
+import { type Bounds, type Flight, FLIGHT, flyFor, startFlight, stepButterfly, stepDragonfly } from './flight';
 import { lampGlowAt, lightSprite } from './nightLights';
 import { characterScale, sceneX, sceneY } from './perspective';
 

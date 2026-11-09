@@ -1,16 +1,16 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import {
+  type MusicPreferences,
+  type MusicStatus,
+  type MusicTrack,
+  type MusicWidget,
   DEFAULT_MUSIC,
   MUSIC_STATUS,
   MUSIC_STORAGE_KEY,
   bindMusicWidget,
   loadMusicApi,
   parseMusicPreferences,
-  type MusicPreferences,
-  type MusicStatus,
-  type MusicTrack,
-  type MusicWidget,
-} from '@features/music/lib/soundcloud';
-import { useLayoutEffect, useRef, useState } from 'react';
+} from '../../lib/soundcloud';
 
 export function useMusicPlayer(source: string, initialVolume: number) {
   const iframe = useRef<HTMLIFrameElement>(null);

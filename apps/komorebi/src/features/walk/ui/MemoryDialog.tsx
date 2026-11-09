@@ -1,8 +1,8 @@
-import { TIME_ORDER } from '@features/walk/model/constants';
-import { useModal } from '@features/walk/model/hooks';
-import type { Memory } from '@features/walk/model/types';
 import { LANDMARKS } from '@shared/world/world';
 import { useId } from 'react';
+import { TIME_ORDER } from '../model/constants/walk';
+import { useModal } from '../model/hooks/useModal';
+import type { Memory } from '../model/types/memory';
 import { Icon } from './Icon';
 
 type Props = { isOpen: boolean; memory: Memory | null; pageCount: number; onClose: () => void };

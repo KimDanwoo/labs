@@ -1,7 +1,8 @@
-import { TIME_ORDER } from '@features/walk/model/constants';
-import { useModal, type Collection } from '@features/walk/model/hooks';
 import { FISHING_PIER, HOME, HOME_AQUARIUM, LANDMARKS, PIER_CAT, type Point, type Region } from '@shared/world/world';
 import { useId } from 'react';
+import { TIME_ORDER } from '../model/constants/walk';
+import type { Collection } from '../model/hooks/useCollection';
+import { useModal } from '../model/hooks/useModal';
 import { DiscoveryList } from './DiscoveryList';
 import { Icon } from './Icon';
 import { WalkMap } from './WalkMap';

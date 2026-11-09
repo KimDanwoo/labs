@@ -1,5 +1,5 @@
-import { TIME_LABEL, TIME_ORDER, type TimeOfDay } from '@features/walk/model/constants';
 import { LANDMARKS } from '@shared/world/world';
+import { type TimeOfDay, TIME_LABEL, TIME_ORDER } from '../model/constants/walk';
 
 type Props = {
   pages: Record<TimeOfDay, readonly string[]>;

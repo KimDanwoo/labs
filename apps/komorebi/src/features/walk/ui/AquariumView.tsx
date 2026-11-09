@@ -1,7 +1,7 @@
-import { AQUARIUM_ART, aquariumFishArt, aquariumPose } from '@features/walk/lib/aquarium';
-import type { KeptFish } from '@features/walk/lib/companions';
-import { FISH } from '@features/walk/lib/fishing';
 import { useEffect, useRef, useState } from 'react';
+import { AQUARIUM_ART, aquariumFishArt, aquariumPose } from '../lib/aquarium';
+import type { KeptFish } from '../lib/companions';
+import { FISH } from '../lib/fishing';
 
 export function AquariumView({ fish, isFeeding }: { fish: KeptFish[]; isFeeding: boolean }) {
   const root = useRef<HTMLDivElement>(null);

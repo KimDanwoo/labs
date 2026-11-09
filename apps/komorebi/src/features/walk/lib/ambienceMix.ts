@@ -1,5 +1,5 @@
-import { TIME, WEATHER, type TimeOfDay, type Weather } from '@features/walk/model/constants';
 import type { Region } from '@shared/world/world';
+import { type TimeOfDay, type Weather, TIME, WEATHER } from '../model/constants/walk';
 
 export type AmbienceMix = {
   water: number;

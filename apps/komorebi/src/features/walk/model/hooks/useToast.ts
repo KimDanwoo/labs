@@ -1,5 +1,5 @@
-import { TOAST_DURATION_MS } from '@features/walk/model/constants';
 import { useEffect, useRef, useState } from 'react';
+import { TOAST_DURATION_MS } from '../constants/walk';
 
 export function useToast() {
   const [message, setMessage] = useState('');

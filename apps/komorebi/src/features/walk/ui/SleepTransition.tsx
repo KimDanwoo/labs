@@ -1,5 +1,5 @@
-import { SLEEP_TIMING } from '@features/walk/lib/bedRest';
 import { useEffect, useEffectEvent } from 'react';
+import { SLEEP_TIMING } from '../lib/bedRest';
 
 type Props = { onWake: () => void; onDone: () => void };
 

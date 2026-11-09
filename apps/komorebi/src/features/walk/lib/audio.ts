@@ -1,7 +1,7 @@
-import { TIME, type TimeOfDay, type Weather } from '@features/walk/model/constants';
 import { SURFACE, type Surface } from '@shared/world/surfaces';
 import { PLACE_ACTION, type PlaceAction, type Region } from '@shared/world/world';
-import { ambienceMix, type AmbienceMix } from './ambienceMix';
+import { TIME, type TimeOfDay, type Weather } from '../model/constants/walk';
+import { type AmbienceMix, ambienceMix } from './ambienceMix';
 
 const MASTER_VOLUME = 0.22;
 const LAYER_VOLUME = { water: 0.5, waves: 0.65, cicadas: 0.012, rain: 0.7 } as const;

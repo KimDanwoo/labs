@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { childFacing } from './atlas';
-import { FISHING_PHASE, type FishingFrame } from './fishing';
+import { type FishingFrame, FISHING_PHASE } from './fishing';
 import { advanceMotion, createMotion, crossedFootfall } from './motion';
 import { lightSprite } from './nightLights';
 

@@ -1,7 +1,7 @@
+import { LAMPS, lampGlowAt, lightSprite } from '@features/walk/lib/nightLights';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { LAMPS, lampGlowAt, lightSprite } from '../src/features/walk/lib/nightLights';
 
 test('lamplight is brightest at a lamp, fades with distance and never reaches across the painting', () => {
   const lantern = LAMPS.forest[0]!;

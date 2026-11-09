@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { canvasTexture } from './art';
 import { lampGlowAt, lightSprite } from './nightLights';
 import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
-import { passingRoute, presence, routeLength, startGait, walkOn, type Gait } from './roam';
+import { type Gait, passingRoute, presence, routeLength, startGait, walkOn } from './roam';
 
 const FRAMES = 4;
 const ANIMAL = {

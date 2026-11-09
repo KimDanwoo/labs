@@ -1,20 +1,5 @@
 'use client';
 
-import { COMPANION_PANEL, type CompanionPanelKind } from '@features/walk/lib/companions';
-import { diaryMemory, liveMemory } from '@features/walk/lib/memory';
-import { DIALOG, TIME_ORDER, WEATHER, type Dialog, type TimeOfDay } from '@features/walk/model/constants';
-import {
-  useAmbience,
-  useAmbienceScene,
-  useCollection,
-  useIsFirstVisit,
-  useShortcuts,
-  useToast,
-  useVillageDay,
-  useWalkEngine,
-} from '@features/walk/model/hooks';
-import { appearanceStore, pageStores } from '@features/walk/model/store';
-import type { Memory } from '@features/walk/model/types';
 import type { Appearance } from '@shared/world/appearance';
 import {
   FISHING_PIER,
@@ -28,6 +13,19 @@ import {
 } from '@shared/world/world';
 import { useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
+import { COMPANION_PANEL, type CompanionPanelKind } from '../lib/companions';
+import { diaryMemory, liveMemory } from '../lib/memory';
+import { DIALOG, TIME_ORDER, WEATHER, type Dialog, type TimeOfDay } from '../model/constants/walk';
+import { useAmbience, useAmbienceScene } from '../model/hooks/useAmbience';
+import { useCollection } from '../model/hooks/useCollection';
+import { useIsFirstVisit } from '../model/hooks/useIsFirstVisit';
+import { useShortcuts } from '../model/hooks/useShortcuts';
+import { useToast } from '../model/hooks/useToast';
+import { useVillageDay } from '../model/hooks/useVillageDay';
+import { useWalkEngine } from '../model/hooks/useWalkEngine';
+import { appearanceStore } from '../model/store/appearance';
+import { pageStores } from '../model/store/discoveries';
+import type { Memory } from '../model/types/memory';
 import { BottomBar } from './BottomBar';
 import { CompanionPanel } from './CompanionPanel';
 import { FishingHud } from './FishingHud';

@@ -1,8 +1,6 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
-import * as THREE from 'three';
-import { catPosition, createCompanionScene } from '../src/features/walk/lib/companionScene';
+import { catPosition, createCompanionScene } from '@features/walk/lib/companionScene';
 import {
+  type Companions,
   BAG_CAPACITY,
   COMPANION_ACTION,
   COMPANION_REACTION,
@@ -12,9 +10,11 @@ import {
   catBond,
   changeCompanions,
   parseCompanions,
-  type Companions,
-} from '../src/features/walk/lib/companions';
-import { FISHING_PHASE, type FishingFrame } from '../src/features/walk/lib/fishing';
+} from '@features/walk/lib/companions';
+import { type FishingFrame, FISHING_PHASE } from '@features/walk/lib/fishing';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import * as THREE from 'three';
 import { FISHING_PIER, HOME, HOME_AQUARIUM, PIER_CAT, canWalk, findRoute } from '../src/shared/world/world';
 
 const caught = { id: 'goby', size: 15 };

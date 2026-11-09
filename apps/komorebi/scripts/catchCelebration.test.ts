@@ -1,9 +1,9 @@
+import { catchCelebration, catchHeart } from '@features/walk/lib/catchCelebration';
+import { type FishingFrame, FISHING_PHASE } from '@features/walk/lib/fishing';
+import { createPierFishing } from '@features/walk/lib/pierFishing';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as THREE from 'three';
-import { catchCelebration, catchHeart } from '../src/features/walk/lib/catchCelebration';
-import { FISHING_PHASE, type FishingFrame } from '../src/features/walk/lib/fishing';
-import { createPierFishing } from '../src/features/walk/lib/pierFishing';
 
 test('a catch rises from the final reel position, hops twice and settles without looping', () => {
   const start = catchCelebration(0);

@@ -1,8 +1,8 @@
-import { createScene, type SceneOptions, type SceneStatus, type WalkEngine } from '@features/walk/lib/scene';
-import type { TimeOfDay, Weather } from '@features/walk/model/constants';
 import type { Appearance } from '@shared/world/appearance';
 import { SPAWN } from '@shared/world/world';
 import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
+import { createScene, type SceneOptions, type SceneStatus, type WalkEngine } from '../../lib/scene';
+import type { TimeOfDay, Weather } from '../constants/walk';
 
 type EngineSettings = {
   timeOfDay: TimeOfDay;

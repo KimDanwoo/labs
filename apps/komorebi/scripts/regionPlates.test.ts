@@ -1,7 +1,7 @@
+import { createRegionPlates, nearbyRegions } from '@features/walk/lib/regionPlates';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { createRegionPlates, nearbyRegions } from '../src/features/walk/lib/regionPlates';
 import { WORLDS, type Region } from '../src/shared/world/world';
 
 test('nearby regions are the current painting and the ones its exits lead to', () => {

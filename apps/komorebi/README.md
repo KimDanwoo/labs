@@ -84,7 +84,7 @@ node apps/komorebi/e2e/serve.mjs apps/komorebi/out 3011
 
 ## 구조와 표현 방식
 
-- `app/`: Next 라우팅 진입점(layout·page·icon). 화면은 `src/views/walk/WalkView`에 위임
+- `app/`: Next 라우팅 진입점(layout·page·icon). 화면은 `src/views/walk`(공개 API `@views/walk`)에 위임
 - `src/app/globals.css`: 게임 HUD 스타일
 - `src/features/walk/ui`: HUD·지도·그림일기·추억·터치 조작 컴포넌트(`Walk`가 합성)
 - `src/features/walk/model`: 엔진 수명주기·발견 기록·소리·단축키 훅, localStorage 저장소, 상수·타입

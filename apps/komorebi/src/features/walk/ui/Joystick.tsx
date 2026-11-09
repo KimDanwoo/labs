@@ -1,7 +1,7 @@
 'use client';
 
-import { padDirection } from '@features/walk/lib/input';
 import { useEffect, useEffectEvent, useRef, type PointerEvent } from 'react';
+import { padDirection } from '../lib/input';
 
 const directions = ['w', 'a', 's', 'd'] as const;
 type Props = { onInput: (key: string, pressed: boolean) => void; disabled: boolean };

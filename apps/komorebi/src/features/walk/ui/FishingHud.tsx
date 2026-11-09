@@ -1,7 +1,12 @@
-import type { createAmbience } from '@features/walk/lib/audio';
-import { CATCH_CELEBRATION_SECONDS } from '@features/walk/lib/catchCelebration';
-import { COMPANION_ACTION, type CompanionReaction } from '@features/walk/lib/companions';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import type { createAmbience } from '../lib/audio';
+import { CATCH_CELEBRATION_SECONDS } from '../lib/catchCelebration';
+import { type CompanionReaction, COMPANION_ACTION } from '../lib/companions';
 import {
+  type Catch,
+  type Fight,
+  type FishingFrame,
+  type FishingPhase,
   BITE_WINDOW_MS,
   CAST_SECONDS,
   FIGHT_OUTCOME,
@@ -14,13 +19,8 @@ import {
   isRareFish,
   parseCollection,
   rollCatch,
-  type Catch,
-  type Fight,
-  type FishingFrame,
-  type FishingPhase,
-} from '@features/walk/lib/fishing';
-import { companionStore } from '@features/walk/model/store';
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
+} from '../lib/fishing';
+import { companionStore } from '../model/store/companions';
 import { CatchChoices } from './CatchChoices';
 import { FishingFight } from './FishingFight';
 

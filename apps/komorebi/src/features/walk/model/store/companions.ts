@@ -1,11 +1,11 @@
 import {
+  type CompanionAction,
+  type Companions,
   COMPANION_KEY,
   EMPTY_COMPANIONS,
   changeCompanions,
   parseCompanions,
-  type CompanionAction,
-  type Companions,
-} from '@features/walk/lib/companions';
+} from '../../lib/companions';
 
 let current: Companions | undefined;
 const listeners = new Set<() => void>();

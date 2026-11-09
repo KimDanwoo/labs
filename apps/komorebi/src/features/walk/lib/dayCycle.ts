@@ -1,4 +1,4 @@
-import { TIME, TIME_ORDER, WEATHER, type TimeOfDay, type Weather } from '@features/walk/model/constants';
+import { type TimeOfDay, type Weather, TIME, TIME_ORDER, WEATHER } from '../model/constants/walk';
 
 export type VillageDay = { day: number; time: TimeOfDay; weather: Weather };
 export const FIRST_DAY: VillageDay = { day: 1, time: TIME.day, weather: WEATHER.clear };

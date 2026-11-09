@@ -1,6 +1,6 @@
+import { advanceMotion, angleDelta, createMotion, solveLeg } from '@features/walk/lib/motion';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { advanceMotion, angleDelta, createMotion, solveLeg } from '../src/features/walk/lib/motion';
 
 test('turning across the angle seam takes the short route', () => {
   const m = createMotion();

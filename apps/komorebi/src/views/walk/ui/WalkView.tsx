@@ -1,5 +1,5 @@
-import { MusicDock } from '@features/music/ui';
-import { Walk } from '@features/walk/ui';
+import { MusicDock } from '@features/music';
+import { Walk } from '@features/walk';
 
 export function WalkView() {
   return (

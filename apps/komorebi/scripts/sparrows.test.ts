@@ -1,6 +1,6 @@
+import { BIRD_STATE, startSparrow, stepSparrow } from '@features/walk/lib/sparrows';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { BIRD_STATE, startSparrow, stepSparrow } from '../src/features/walk/lib/sparrows';
 import { canWalk, findRoute, HOME, HOME_DOOR, SPAWN } from '../src/shared/world/world';
 
 test('sparrows flee approaching feet, wait on their branch, then return once the lane is clear', () => {

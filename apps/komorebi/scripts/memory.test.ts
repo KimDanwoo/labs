@@ -1,6 +1,6 @@
+import { diaryMemory, liveMemory } from '@features/walk/lib/memory';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { diaryMemory, liveMemory } from '../src/features/walk/lib/memory';
 import { LANDMARKS } from '../src/shared/world/world';
 
 const landmark = LANDMARKS[0]!;
