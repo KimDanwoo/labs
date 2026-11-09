@@ -3,8 +3,8 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import { useEffect } from 'react';
+import { playerPath, screenFromPath } from '../../api/widget';
 import { type PlayerScreen, PLAYER_SCREEN } from '../constants/playerScreen';
-import { playerPath, screenFromPath } from '../services/widget';
 import { currentIndexAtom, playerScreenAtom } from '../store/playback';
 import type { Track } from '../types/track';
 

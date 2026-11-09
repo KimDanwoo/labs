@@ -2,7 +2,7 @@
 
 import { useFrame } from '@shared/lib/frame';
 import { useEffect, useRef } from 'react';
-import { fetchBands, fetchWaveform } from '../services/widget';
+import { fetchBands, fetchWaveform } from '../../api/widget';
 import { frameState } from '../store/playback';
 import type { Track } from '../types/track';
 

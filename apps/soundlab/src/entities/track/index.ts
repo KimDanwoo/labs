@@ -1,3 +1,4 @@
+export { artworkUrl, playerPath, shareUrl } from './api/widget';
 export { PLAYER_SCREEN } from './model/constants/playerScreen';
 export type { PlayerScreen } from './model/constants/playerScreen';
 export { REPEAT_LABEL, REPEAT_MODE, nextRepeatMode } from './model/constants/repeatMode';
@@ -8,7 +9,6 @@ export { usePlayback } from './model/hooks/usePlayback';
 export { usePlaybackControls } from './model/hooks/usePlaybackControls';
 export { useTrackUrl } from './model/hooks/useTrackUrl';
 export { useWaveform } from './model/hooks/useWaveform';
-export { artworkUrl, playerPath, shareUrl } from './model/services/widget';
 export {
   currentIndexAtom,
   engineErrorAtom,

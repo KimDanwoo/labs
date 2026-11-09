@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import type { ScWidget } from '../services/widget';
+import type { ScWidget } from '../../api/widget';
 
 const FULL_VOLUME = 100;
 const FADE_MS = 220;

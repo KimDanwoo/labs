@@ -3,7 +3,6 @@
 import { useFrame } from '@shared/lib/frame';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useRef } from 'react';
-import { REPEAT_MODE } from '../constants/repeatMode';
 import {
   type ScWidget,
   loadWidgetApi,
@@ -14,7 +13,8 @@ import {
   trackUrl,
   widgetSrc,
   writeLastPlayed,
-} from '../services/widget';
+} from '../../api/widget';
+import { REPEAT_MODE } from '../constants/repeatMode';
 import {
   currentIndexAtom,
   engineErrorAtom,

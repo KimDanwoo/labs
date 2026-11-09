@@ -1,5 +1,5 @@
-import { type PlayerScreen, PLAYER_SCREEN } from '../constants/playerScreen';
-import type { ArtworkSize, Track } from '../types/track';
+import { type PlayerScreen, PLAYER_SCREEN } from '../model/constants/playerScreen';
+import type { ArtworkSize, Track } from '../model/types/track';
 
 const WIDGET_API_SRC = 'https://w.soundcloud.com/player/api.js';
 
