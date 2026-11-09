@@ -148,7 +148,8 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 | `pnpm format`             | Prettier 전체 포맷               |
 
 - 특정 앱만: `pnpm --filter hub dev`.
-- e2e는 CI에서 돌리지 않는다. `pnpm install`이 설치하는 pre-push 훅(`.githooks/pre-push`)이 push하는 커밋에서 바뀐 앱(prairie·fe-deep)의 e2e만 로컬에서 돌린다. 건너뛰기: `git push --no-verify`.
+- 앱 전용 검증은 앱별 워크플로가 그 앱(또는 `packages/`)이 바뀐 PR에서만 돌린다: prairie 빌드(`prairie.yml`), fe-deep e2e(`fe-deep.yml`). prairie e2e는 GPU 없는 러너에서 실제 화면을 검증하지 못해 자동화하지 않는다(로컬 GPU에서 `pnpm --filter prairie test:e2e`로 수동 실행).
+- main은 GitHub ruleset으로 PR로만 반영한다. 로컬 git 훅은 쓰지 않는다.
 
 ## 응답 스타일 (사용자 선호)
 
