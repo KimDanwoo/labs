@@ -59,7 +59,7 @@ jobs:
         run: pnpm test
 
       - name: Install browser
-        if: steps.changes.outputs.fedeep || steps.changes.outputs.prairie
+        if: steps.changes.outputs.fedeep
         run: pnpm --filter fe-deep exec playwright install --with-deps chromium
 
       - name: Verify data error and retry flows
@@ -70,9 +70,5 @@ jobs:
         if: steps.changes.outputs.prairie
         run: pnpm --filter prairie build
 
-      - name: Verify Unicorn Rush rendering and controls
-        if: steps.changes.outputs.prairie
-        run: pnpm --filter prairie test:e2e
-
       # 전체 빌드는 하지 않는다. fe-deep 등은 빌드 시점에 DB 시크릿이 필요하다.
-      # Unicorn Rush는 외부 API 없이 빌드해 실제 WebGL·키보드·터치 흐름을 검증한다.
+      # Unicorn Rush e2e는 GPU가 있는 로컬에서 돌린다. CI(SwiftShader)는 저화질 경로만 그려 실제 화면을 검증하지 못하고 6분 넘게 걸린다.
