@@ -98,7 +98,7 @@ export function SceneCanvas() {
           <Scenery />
           <Ground />
           <River />
-          <GrassField />
+          <GrassField isSoftware={isSoftware} />
           <FloraField />
           <RunnerRig />
           <ExplorationScene />

@@ -57,6 +57,16 @@ export const GRASS_QUALITY = {
     fadeNear: 20,
     fadeFar: 66,
   },
+  // SwiftShader·llvmpipe는 정점을 CPU로 처리해 모바일 단계(약 7만 blade)에서도 프레임당 0.5초가 걸린다.
+  // 가까운 두 링만 1분할로 남기고(약 1만 blade) 나머지는 Ground 잔디 무늬와 안개에 맡긴다(40 > 38).
+  software: {
+    rings: [
+      { maxRing: 1, blades: 500, segments: 1 },
+      { maxRing: 2, blades: 400, segments: 1 },
+    ] as GrassLodRing[],
+    fadeNear: 16,
+    fadeFar: 38,
+  },
 } as const;
 
 export type GrassQuality = keyof typeof GRASS_QUALITY;

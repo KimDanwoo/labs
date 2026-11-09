@@ -176,9 +176,13 @@ export function meadowPathDistanceAt(x: number, z: number): number {
 
 // 기기별 안개. 잔디 blade는 fadeFar에서 지면색에 완전히 녹으므로(데스크톱 66 < 청크 끝 72) 안개가 청크 끝을 가릴 필요는 없다 —
 // 안개는 그 너머 평지를 능선 밑동에 닿기 전에 닫는 역할. 강 불변식: RIVER.period/2 > far, RIVER.length > 2×far.
+const MOBILE_FOG = { near: 36, far: 140 } as const;
+
+// software(GPU 없는 렌더러)는 모바일 안개를 그대로 쓴다. 잔디 단계(GRASS_QUALITY)와 키를 맞춘다.
 export const FOG = {
   desktop: { near: 85, far: 360 },
-  mobile: { near: 36, far: 140 },
+  mobile: MOBILE_FOG,
+  software: MOBILE_FOG,
 } as const;
 
 export type FogQuality = keyof typeof FOG;
