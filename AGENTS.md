@@ -148,6 +148,7 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 | `pnpm format`             | Prettier 전체 포맷               |
 
 - 특정 앱만: `pnpm --filter hub dev`.
+- e2e는 CI에서 돌리지 않는다. `pnpm install`이 설치하는 pre-push 훅(`.githooks/pre-push`)이 push하는 커밋에서 바뀐 앱(prairie·fe-deep)의 e2e만 로컬에서 돌린다. 건너뛰기: `git push --no-verify`.
 
 ## 응답 스타일 (사용자 선호)
 

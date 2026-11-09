@@ -22,20 +22,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      # e2e는 해당 앱이나 공유 설정이 바뀔 때만 돌린다. diff를 못 구하면(강제 푸시 등) 전부 돌린다.
-      - name: Detect changed apps
-        id: changes
-        env:
-          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: |
-          shared='^(packages/|pnpm-lock\.yaml$|package\.json$|\.nvmrc$|\.github/workflows/ci\.yml$)'
-          files=$(git diff --name-only "$BASE" HEAD) || files=$'apps/prairie/\napps/fe-deep/'
-          grep -qE "^apps/prairie/|$shared" <<<"$files" && echo "prairie=true" >> "$GITHUB_OUTPUT"
-          grep -qE "^apps/fe-deep/|$shared" <<<"$files" && echo "fedeep=true" >> "$GITHUB_OUTPUT"
-          true
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -58,17 +44,8 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Install browser
-        if: steps.changes.outputs.fedeep
-        run: pnpm --filter fe-deep exec playwright install --with-deps chromium
-
-      - name: Verify data error and retry flows
-        if: steps.changes.outputs.fedeep
-        run: pnpm --filter fe-deep test:e2e
-
       - name: Build Unicorn Rush
-        if: steps.changes.outputs.prairie
         run: pnpm --filter prairie build
 
       # 전체 빌드는 하지 않는다. fe-deep 등은 빌드 시점에 DB 시크릿이 필요하다.
-      # Unicorn Rush e2e는 GPU가 있는 로컬에서 돌린다. CI(SwiftShader)는 저화질 경로만 그려 실제 화면을 검증하지 못하고 6분 넘게 걸린다.
+      # e2e는 push 전 로컬 훅(.githooks/pre-push)이 바뀐 앱만 돌린다. Unicorn Rush는 GPU 없는 러너에서 실제 화면을 검증하지 못한다.
