@@ -374,6 +374,18 @@
   }
 }
 
+/* 테마 전환(ThemeToggle): 원형 애니메이션은 스크립트가 건다. 페이지 이동용 기본 교차 페이드는 끈다 */
+html.theme-transition::view-transition-old(root),
+html.theme-transition::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* 다크로 갈 때: 이전(밝은) 화면을 위로 올려, 버튼으로 모여 사라지며 아래의 새 화면이 드러나게 한다 */
+html.theme-transition-collapse::view-transition-old(root) {
+  z-index: 1;
+}
+
 /* 접이식(사이드바 카테고리·목차): 높이가 부드럽게 늘고 준다 */
 .motion-details::details-content {
   block-size: 0;
