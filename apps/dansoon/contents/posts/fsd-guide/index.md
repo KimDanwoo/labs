@@ -300,3 +300,5 @@ src/
     │           └── assets/  # 기능별 리소스
     └── package.json
 ```
+
+2026년 공식 문서에서 바뀐 내용은 [FSD는 왜 Widgets 레이어를 권하지 않게 됐을까](/posts/fsd-2026-widgets/)에, 이 규칙을 ESLint로 강제하는 방법은 [FSD 규칙을 문서 대신 ESLint로 강제하기](/posts/fsd-eslint-boundaries/)에 정리했다.

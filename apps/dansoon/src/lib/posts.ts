@@ -7,10 +7,10 @@ const RELATED_POSTS_LIMIT = 3;
 const SAME_CATEGORY_SCORE = 1;
 const SHARED_TAG_SCORE = 2;
 
-const isPublished = (post: Post) => !post.data.draft;
+const isPublished = (post: Post) => import.meta.env.DEV || !post.data.draft;
 const byNewest = (a: Post, b: Post) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf();
 
-/** 상세·목록·RSS·검색·태그가 모두 이 집합만 쓴다 — draft는 어디에도 노출되지 않는다. */
+/** 상세·목록·RSS·검색·태그가 모두 이 집합만 쓴다 — draft는 dev 서버에서만 보인다(미리보기용). */
 export async function getPublishedPosts(): Promise<Post[]> {
   const posts = await getCollection('posts', isPublished);
   return posts.sort(byNewest);

@@ -157,3 +157,5 @@ FSD 규칙을 검사하는 도구는 이것 말고도 있다. FSD 공식 린터�
 - 파일 하나로 판단할 수 없는 규칙은 `check:architecture`가 검사하고 `pnpm lint`와 CI가 둘 다 실행한다.
 
 FSD 레이어 구성은 [쉽게 정리한 FSD 가이드](/posts/fsd-guide/)에, import 경로와 배럴 패턴은 [import 경로 관리 알아보기](/posts/import-path-alias-barrel-fsd/)에 정리돼 있다.
+
+같은 방식으로 디자인 토큰 규칙을 도구에 맡긴 과정은 [디자인 토큰 규칙을 문서 대신 도구가 지키게 만들기](/posts/design-token-conventions/)에 있다.
