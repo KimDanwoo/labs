@@ -1,6 +1,6 @@
 import { ChevronRight, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { type StudyDoc, countSteps } from '../model/services/parseHandbook';
+import { type StudyDoc, countSteps } from '../lib/parseHandbook';
 
 type StudyDocTableProps = {
   docs: StudyDoc[];

@@ -2,9 +2,9 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import type { StudyDoc } from '../lib/parseHandbook';
 import { useReviewTopics } from '../model/hooks/useReviewTopics';
 import { useUnderstoodTopics } from '../model/hooks/useUnderstoodTopics';
-import type { StudyDoc } from '../model/services/parseHandbook';
 import {
   type StudyFilter,
   type StudyTier,

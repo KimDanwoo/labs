@@ -1,7 +1,14 @@
 import { createClient } from '@shared/config/supabase/client';
 import { shuffleArray } from '@shared/lib/shuffle';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Category, Difficulty, PaginatedResult, Question, SearchResult, VisibilityFilter } from '../types/types';
+import type {
+  Category,
+  Difficulty,
+  PaginatedResult,
+  Question,
+  SearchResult,
+  VisibilityFilter,
+} from '../model/types/types';
 
 // 조회 실패는 호출자에게 전달한다. 정상적인 결과 없음만 빈 배열 또는 undefined로 반환한다.
 

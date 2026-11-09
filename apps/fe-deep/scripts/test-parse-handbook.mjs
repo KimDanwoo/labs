@@ -1,7 +1,7 @@
 // 학습 문서 파서 회귀 체크: node scripts/test-parse-handbook.mjs
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { STEP_KIND, parseStudyDoc } from '../src/_pages/study/model/services/parseHandbook.ts';
+import { STEP_KIND, parseStudyDoc } from '../src/_pages/study/lib/parseHandbook.ts';
 
 const SAMPLE = `# 핸드북
 

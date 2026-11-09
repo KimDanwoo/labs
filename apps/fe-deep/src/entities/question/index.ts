@@ -1,13 +1,4 @@
 export {
-  createQuestion,
-  deleteQuestion,
-  deleteQuestions,
-  updateCategoryVisibility,
-  updateQuestion,
-  updateQuestionsVisibility,
-} from './model/actions/questionMutations';
-export { DIFFICULTY_CONFIG, DIFFICULTY_VALUES } from './model/constants/constants';
-export {
   getAllCategories,
   getAllQuestions,
   getCategoryBySlug,
@@ -16,7 +7,16 @@ export {
   getQuestionsByCategorySlugPaginated,
   getQuestionsByIds,
   searchQuestions,
-} from './model/services/questionApi';
+} from './api/questionApi';
+export {
+  createQuestion,
+  deleteQuestion,
+  deleteQuestions,
+  updateCategoryVisibility,
+  updateQuestion,
+  updateQuestionsVisibility,
+} from './model/actions/questionMutations';
+export { DIFFICULTY_CONFIG, DIFFICULTY_VALUES } from './model/constants/constants';
 export type {
   Category,
   Difficulty,

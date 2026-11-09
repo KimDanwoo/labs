@@ -13,7 +13,7 @@ import {
   getQuestionsByIds,
   getRandomQuestions,
   searchQuestions,
-} from '../src/entities/question/model/services/questionApi.ts';
+} from '../src/entities/question/api/questionApi.ts';
 
 const DATABASE_ERROR = { code: '08006', message: 'Database unavailable', details: '', hint: '' };
 const FAILURE_RESPONSE = { status: 503, headers: { 'Retry-After': '0' } };

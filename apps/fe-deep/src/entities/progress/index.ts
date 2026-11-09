@@ -1,3 +1,4 @@
+export { clearUserIdCache, getCurrentUserId, syncProgress } from './api/progressSync';
 export {
   getCurrentStreak,
   getProgressByCategory,
@@ -6,5 +7,4 @@ export {
   updateQuestionProgress,
 } from './model/services/progressApi';
 export { getLocalProgress } from './model/services/progressStorage';
-export { clearUserIdCache, getCurrentUserId, syncProgress } from './model/services/progressSync';
 export type { ProgressStatus } from './model/types/types';

@@ -1,8 +1,8 @@
 'use client';
 import { STORAGE_KEYS } from '@shared/constants';
+import { todayString } from '../../lib/progressDates';
 import { SM2_CONSTANTS } from '../constants/constants';
 import type { UserProgress } from '../types/types';
-import { todayString } from './progressDates';
 
 export function getLocalProgress(): Record<string, UserProgress> {
   if (typeof window === 'undefined') return {};

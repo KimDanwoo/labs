@@ -1,8 +1,8 @@
 'use client';
 
 import { createClient } from '@shared/config/supabase/client';
-import type { UserProgress } from '../types/types';
-import { getLocalProgress, saveLocalProgress } from './progressStorage';
+import { getLocalProgress, saveLocalProgress } from '../model/services/progressStorage';
+import type { UserProgress } from '../model/types/types';
 
 // ============================================================
 // Supabase 동기화

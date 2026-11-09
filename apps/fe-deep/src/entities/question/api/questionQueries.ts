@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { Difficulty } from '../types/types';
+import type { Difficulty } from '../model/types/types';
 import {
   getAllCategories,
   getAllQuestions,

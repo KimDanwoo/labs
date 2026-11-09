@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import type { StudyTopic } from '../services/parseHandbook';
+import type { StudyTopic } from '../../lib/parseHandbook';
 
 /** 입력 중이거나 버튼에 포커스가 있을 땐 단축키를 가로채지 않는다. */
 const SKIP_SHORTCUT_TAGS = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT'];

@@ -2,7 +2,7 @@
 
 import { cn } from '@shared/lib/utils';
 import { BookmarkPlus, Check } from 'lucide-react';
-import type { StudyTopic } from '../model/services/parseHandbook';
+import type { StudyTopic } from '../lib/parseHandbook';
 
 /** 문서 제목에 이미 번호가 있으면(`1. 자기소개`) 목차에서 번호를 중복 표기하지 않는다. */
 const LEADING_NUMBER_PATTERN = /^\d/;
