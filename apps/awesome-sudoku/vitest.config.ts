@@ -11,8 +11,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@app': resolve(__dirname, './src/app'),
-      '@views': resolve(__dirname, './src/views'),
+      '@app': resolve(__dirname, './src/_app'),
+      '@pages': resolve(__dirname, './src/_pages'),
       '@entities': resolve(__dirname, './src/entities'),
       '@features': resolve(__dirname, './src/features'),
       '@widgets': resolve(__dirname, './src/widgets'),

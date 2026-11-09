@@ -57,12 +57,12 @@ Firebase Auth + Firestore
 
 ```
 src/
-├── views/        # 페이지 (Home, Profile, Leaderboard)
+├── _pages/       # 페이지 (Home, Profile, Leaderboard)
 ├── widgets/      # 조합 UI (GameBoard, GameHeader, Overlays)
 ├── features/     # 기능 단위 (sudoku-game, auth, leaderboard...)
 ├── entities/     # 도메인 모델 (board, game, game-record)
 ├── shared/       # 공통 유틸 & UI (cn, BottomSheet, Snackbar...)
-└── apps/         # 외부 서비스 초기화 (Firebase)
+└── _app/         # 앱 전역 설정 (프로바이더, 전역 스타일)
 ```
 
 ## License

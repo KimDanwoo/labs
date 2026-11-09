@@ -2,8 +2,8 @@
   "extends": "@config/tsconfig/next.json",
   "compilerOptions": {
     "paths": {
-      "@app/*": ["./src/app/*"],
-      "@views/*": ["./src/views/*"],
+      "@app/*": ["./src/_app/*"],
+      "@pages/*": ["./src/_pages/*"],
       "@widgets/*": ["./src/widgets/*"],
       "@features/*": ["./src/features/*"],
       "@entities/*": ["./src/entities/*"],
