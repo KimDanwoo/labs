@@ -24,7 +24,7 @@
 app/                  # Next.js App Router (라우팅만, 얇게 유지)
 src/
   entities/project/   # Project 타입 + PROJECTS 상수 (프로젝트 목록 단일 진실 공급원)
-  views/home/         # HomeView — 페이지 조합
+  _pages/home/        # HomeView — 페이지 조합
   widgets/
     profile-header/   # 프로필 소개 + 외부 링크
     project-grid/     # 프로젝트 카드 그리드
