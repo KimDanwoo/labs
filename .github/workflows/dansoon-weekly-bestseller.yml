@@ -48,7 +48,6 @@ jobs:
         working-directory: apps/dansoon
         run: python scripts/fetch_bestseller.py ${{ steps.date.outputs.date }}
         env:
-          ALADIN_TTB_KEY: ${{ secrets.ALADIN_TTB_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Commit, open PR, and merge
