@@ -1,0 +1,1845 @@
+{
+  "date": "2026-11-09",
+  "sources": {
+    "kyobo": [
+      {
+        "rank": 1,
+        "title": "가짜 돈 진짜 부",
+        "author": "박종훈",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221580226",
+        "publisher": "글로퍼스",
+        "genre_key": "economy",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 2,
+        "title": "가호",
+        "author": "무라카미 하루키",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221505184",
+        "publisher": "문학동네",
+        "genre_key": "novel",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 3,
+        "title": "세네카, 오늘을 빼앗기고 있는 당신에게(20만 부 기념 리커버 한정판 에디션)",
+        "author": "세네카",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220308313",
+        "publisher": "논픽션",
+        "genre_key": "humanit",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 4,
+        "title": "물각유주",
+        "author": "공백",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221811215",
+        "publisher": "북로망스",
+        "genre_key": "etc",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 5,
+        "title": "한국사 이상현상 연구원(일반판)",
+        "author": "최인서",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220693844",
+        "publisher": "다이브",
+        "genre_key": "novel",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 6,
+        "title": "싯다르타",
+        "author": "헤르만 헤세",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000000620195",
+        "publisher": "민음사",
+        "genre_key": "novel",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 7,
+        "title": "옥스브리지의 철학 수업",
+        "author": "고요엘",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220923864",
+        "publisher": "상상스퀘어",
+        "genre_key": "humanit",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 8,
+        "title": "사람을 고치려 들지 마라",
+        "author": "아르투어 쇼펜하우어",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221662855",
+        "publisher": "어센딩",
+        "genre_key": "etc",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 9,
+        "title": "머니 트렌드 2027",
+        "author": "정태익 외",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221075112",
+        "publisher": "북모먼트",
+        "genre_key": "economy",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 10,
+        "title": "타카하시 명언 일력 365",
+        "author": "타카하시서점",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221599395",
+        "publisher": "포레스트북스",
+        "genre_key": "etc",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 11,
+        "title": "독재자(들)",
+        "author": "황현필",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221583260",
+        "publisher": "역바연",
+        "genre_key": "humanit",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 12,
+        "title": "트렌드 코리아 2027",
+        "author": "김난도 외",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221151022",
+        "publisher": "미래의창",
+        "genre_key": "economy",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 13,
+        "title": "서늘한 대화",
+        "author": "정재승",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221565159",
+        "publisher": "어크로스",
+        "genre_key": "humanit",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 14,
+        "title": "사이언스 2027",
+        "author": "National Geographic Kids",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221414513",
+        "publisher": "비룡소",
+        "genre_key": "etc",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 15,
+        "title": "마키아벨리",
+        "author": "니콜로 마키아벨리",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000221773301",
+        "publisher": "어센딩",
+        "genre_key": "etc",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 16,
+        "title": "돈, 뜨겁게 사랑하고 차갑게 다루어라",
+        "author": "앙드레 코스톨라니",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000209182287",
+        "publisher": "미래의창",
+        "genre_key": "economy",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 17,
+        "title": "모순",
+        "author": "양귀자",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000001632467",
+        "publisher": "쓰다",
+        "genre_key": "novel",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 18,
+        "title": "쇼펜하우어 인생수업(30만 부 기념 개정증보판)",
+        "author": "쇼펜하우어",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000212414274",
+        "publisher": "하이스트",
+        "genre_key": "humanit",
+        "source": "교보문고",
+        "depth": 19
+      },
+      {
+        "rank": 19,
+        "title": "마음의 어휘력",
+        "author": "조아란 외",
+        "cover": "",
+        "link": "https://product.kyobobook.co.kr/detail/S000220636999",
+        "publisher": "페이지2북스",
+        "genre_key": "essay",
+        "source": "교보문고",
+        "depth": 19
+      }
+    ],
+    "yes24": [
+      {
+        "rank": 1,
+        "title": "가호",
+        "author": "무라카미 하루키",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/197068949",
+        "publisher": "문학동네",
+        "genre_key": "novel",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 2,
+        "title": "세네카, 오늘을 빼앗기고 있는 당신에게",
+        "author": "루키우스 안나이우스 세네카",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/192474512",
+        "publisher": "논픽션",
+        "genre_key": "humanit",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 3,
+        "title": "옥스브리지의 철학 수업",
+        "author": "고요엘",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/195225852",
+        "publisher": "상상스퀘어",
+        "genre_key": "humanit",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 4,
+        "title": "싯다르타",
+        "author": "헤르만 헤세",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/257435",
+        "publisher": "민음사",
+        "genre_key": "novel",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 5,
+        "title": "트렌드 코리아 2027",
+        "author": "김난도, 전미영, 최지혜, 권정윤, 한다혜 저 외 8명 정보 더 보기",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/195842609",
+        "publisher": "미래의창",
+        "genre_key": "economy",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 6,
+        "title": "독재자(들)",
+        "author": "황현필",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/197808669",
+        "publisher": "역바연",
+        "genre_key": "humanit",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 7,
+        "title": "마음의 어휘력",
+        "author": "조아란, 권희, 이정윤",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/195028168",
+        "publisher": "페이지2북스",
+        "genre_key": "essay",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 8,
+        "title": "가짜 돈 진짜 부",
+        "author": "박종훈",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/197772287",
+        "publisher": "글로퍼스",
+        "genre_key": "economy",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 9,
+        "title": "모순",
+        "author": "양귀자",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/8759796",
+        "publisher": "쓰다",
+        "genre_key": "novel",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 10,
+        "title": "서늘한 대화",
+        "author": "정재승",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/197648352",
+        "publisher": "어크로스",
+        "genre_key": "humanit",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 11,
+        "title": "2026 큰별쌤 최태성의 별별한국사 한국사능력검정시험 심화(1,2,3급) 상",
+        "author": "최태성",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/167466420",
+        "publisher": "이투스북",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 12,
+        "title": "쇼펜하우어 인생수업 (30만 부 기념 개정증보판)",
+        "author": "아르투어 쇼펜하우어",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/125085536",
+        "publisher": "하이스트",
+        "genre_key": "humanit",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 13,
+        "title": "2026 큰별쌤 최태성의 별별한국사 한국사능력검정시험 심화(1,2,3급) 하",
+        "author": "최태성",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/167466432",
+        "publisher": "이투스북",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 14,
+        "title": "빨강의 자서전",
+        "author": "앤 카슨",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/139807878",
+        "publisher": "한겨레출판",
+        "genre_key": "novel",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 15,
+        "title": "퍼플필",
+        "author": "진쏠미",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/198328008",
+        "publisher": "클랩북스",
+        "genre_key": "selfdev",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 16,
+        "title": "한국사 이상현상 연구원",
+        "author": "최인서",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/195265894",
+        "publisher": "다이브",
+        "genre_key": "novel",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 17,
+        "title": "루이&후이 보물 같은 나날들",
+        "author": "이화",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/199743902",
+        "publisher": "한스미디어",
+        "genre_key": "essay",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 18,
+        "title": "2026 큰별쌤 최태성의 별별한국사 기출 500제 한국사능력검정시험 심화(1,2,3급)",
+        "author": "최태성",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/168393009",
+        "publisher": "이투스북",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 19,
+        "title": "니체의 초월자",
+        "author": "프리드리히 니체",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/161401496",
+        "publisher": "히읏",
+        "genre_key": "humanit",
+        "source": "YES24",
+        "depth": 20
+      },
+      {
+        "rank": 20,
+        "title": "2027 공단기 이유진 국어 백일기도 모의고사 (시즌1 스탠다드)",
+        "author": "이유진",
+        "cover": "",
+        "link": "https://www.yes24.com/product/goods/199205811",
+        "publisher": "고시동네",
+        "genre_key": "etc",
+        "source": "YES24",
+        "depth": 20
+      }
+    ],
+    "ridi_overall": [
+      {
+        "rank": 1,
+        "title": "가호",
+        "author": "무라카미 하루키",
+        "cover": "",
+        "link": "https://ridibooks.com/books/371004039",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 2,
+        "title": "한국사 이상현상 연구원",
+        "author": "최인서",
+        "cover": "",
+        "link": "https://ridibooks.com/books/4667000136",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 3,
+        "title": "옥스브리지의 철학 수업",
+        "author": "고요엘",
+        "cover": "",
+        "link": "https://ridibooks.com/books/4698000131",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 4,
+        "title": "아메리칸 학원 1",
+        "author": "이민진",
+        "cover": "",
+        "link": "https://ridibooks.com/books/593001174",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 5,
+        "title": "빵충 사육 준수 사항",
+        "author": "김혜영",
+        "cover": "",
+        "link": "https://ridibooks.com/books/3620000126",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 6,
+        "title": "가짜돈 진짜부",
+        "author": "박종훈",
+        "cover": "",
+        "link": "https://ridibooks.com/books/5708000003",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 7,
+        "title": "눈물을 마시는 새 세트 (전 4권)",
+        "author": "이영도",
+        "cover": "",
+        "link": "https://ridibooks.com/books/111010208",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 8,
+        "title": "항밈학과 같은 건 없습니다",
+        "author": "QNTM(샘 휴즈)",
+        "cover": "",
+        "link": "https://ridibooks.com/books/682001829",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 9,
+        "title": "자연의 것들은 그저 자란다",
+        "author": "이윤 리",
+        "cover": "",
+        "link": "https://ridibooks.com/books/4803002877",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 10,
+        "title": "프로젝트 헤일메리",
+        "author": "앤디 위어",
+        "cover": "",
+        "link": "https://ridibooks.com/books/510001099",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      },
+      {
+        "rank": 11,
+        "title": "싯다르타",
+        "author": "헤르만 헤세",
+        "cover": "",
+        "link": "https://ridibooks.com/books/509000551",
+        "publisher": "",
+        "genre_key": "etc",
+        "source": "리디",
+        "depth": 11
+      }
+    ],
+    "ridi_by_genre": {
+      "novel": [
+        {
+          "rank": 1,
+          "title": "가호",
+          "author": "무라카미 하루키",
+          "cover": "",
+          "link": "https://ridibooks.com/books/371004039",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "한국사 이상현상 연구원",
+          "author": "최인서",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4667000136",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "아메리칸 학원 1",
+          "author": "이민진",
+          "cover": "",
+          "link": "https://ridibooks.com/books/593001174",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "빵충 사육 준수 사항",
+          "author": "김혜영",
+          "cover": "",
+          "link": "https://ridibooks.com/books/3620000126",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "눈물을 마시는 새 세트 (전 4권)",
+          "author": "이영도",
+          "cover": "",
+          "link": "https://ridibooks.com/books/111010208",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "항밈학과 같은 건 없습니다",
+          "author": "QNTM(샘 휴즈)",
+          "cover": "",
+          "link": "https://ridibooks.com/books/682001829",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "프로젝트 헤일메리",
+          "author": "앤디 위어",
+          "cover": "",
+          "link": "https://ridibooks.com/books/510001099",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "싯다르타",
+          "author": "헤르만 헤세",
+          "cover": "",
+          "link": "https://ridibooks.com/books/509000551",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "눈물을 마시는 새",
+          "author": "이영도",
+          "cover": "",
+          "link": "https://ridibooks.com/books/682000457",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "괴담 소설이라는 이름의 소설 괴담",
+          "author": "사와무라 이치",
+          "cover": "",
+          "link": "https://ridibooks.com/books/777192899",
+          "publisher": "",
+          "genre_key": "novel",
+          "source": "리디",
+          "depth": 10
+        }
+      ],
+      "economy": [
+        {
+          "rank": 1,
+          "title": "가짜돈 진짜부",
+          "author": "박종훈",
+          "cover": "",
+          "link": "https://ridibooks.com/books/5708000003",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "돈, 뜨겁게 사랑하고 차갑게 다루어라",
+          "author": "앙드레 코스톨라니",
+          "cover": "",
+          "link": "https://ridibooks.com/books/754044361",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "트렌드 코리아 2027 : 2027 대한민국 소비트렌드 전망",
+          "author": "김난도",
+          "cover": "",
+          "link": "https://ridibooks.com/books/754051942",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "시대예보: 수고인류의 시간",
+          "author": "송길영",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4759002623",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "생각에 관한 생각",
+          "author": "대니얼 카너먼",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1546001153",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "투자 말고 트레이딩",
+          "author": "오션 드라이브",
+          "cover": "",
+          "link": "https://ridibooks.com/books/152000129",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "경제학자는 결코 손해 보지 않는다",
+          "author": "한순구",
+          "cover": "",
+          "link": "https://ridibooks.com/books/776000623",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "찰리 멍거 바이블 완결판",
+          "author": "김재현",
+          "cover": "",
+          "link": "https://ridibooks.com/books/852003484",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "돈의 심리학",
+          "author": "모건 하우절",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1691000246",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "작은 회사를 위한 일의 구조",
+          "author": "공여사들",
+          "cover": "",
+          "link": "https://ridibooks.com/books/734003156",
+          "publisher": "",
+          "genre_key": "economy",
+          "source": "리디",
+          "depth": 10
+        }
+      ],
+      "selfdev": [
+        {
+          "rank": 1,
+          "title": "부자의 5가지 철학",
+          "author": "사힐 블룸",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4698000138",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "나는 코드를 모르는 AI 팀장입니다",
+          "author": "정수진",
+          "cover": "",
+          "link": "https://ridibooks.com/books/606002721",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "운이 좋은 사람은 이렇게 합니다",
+          "author": "박성준",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4139000134",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "어떻게 살아낼 것인가",
+          "author": "짐 콜린스",
+          "cover": "",
+          "link": "https://ridibooks.com/books/3435000125",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "아주 작은 습관의 힘(50만 부 기념 스페셜 에디션)",
+          "author": "제임스 클리어",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1780000157",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "독서의 기술",
+          "author": "고명환",
+          "cover": "",
+          "link": "https://ridibooks.com/books/3444000093",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "데일 카네기 인간관계론 (50만부 돌파 초판 무삭제 완역본)",
+          "author": "데일 카네기",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1883000099",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "데일 카네기 인간관계론",
+          "author": "데일 카네기",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4010000008",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "유혹의 기술",
+          "author": "로버트 그린",
+          "cover": "",
+          "link": "https://ridibooks.com/books/606001215",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "지금 이 순간을 살아라",
+          "author": "에크하르트 톨레",
+          "cover": "",
+          "link": "https://ridibooks.com/books/966000028",
+          "publisher": "",
+          "genre_key": "selfdev",
+          "source": "리디",
+          "depth": 10
+        }
+      ],
+      "humanit": [
+        {
+          "rank": 1,
+          "title": "옥스브리지의 철학 수업",
+          "author": "고요엘",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4698000131",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "서늘한 대화",
+          "author": "정재승",
+          "cover": "",
+          "link": "https://ridibooks.com/books/280000295",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "정의란 무엇인가",
+          "author": "마이클 샌델",
+          "cover": "",
+          "link": "https://ridibooks.com/books/593000535",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "문해내공",
+          "author": "신종호",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4698000129",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "총, 균, 쇠",
+          "author": "재레드 다이아몬드",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1546001070",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "사피엔스",
+          "author": "유발 하라리",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1546001038",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "지능의 기원 : 우리의 뇌 그리고 AI를 만든 다섯 번의 혁신",
+          "author": "맥스 베넷",
+          "cover": "",
+          "link": "https://ridibooks.com/books/754044013",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "개정판 | 미움받을 용기 (200만 부 기념 스페셜 에디션)",
+          "author": "기시미 이치로",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1691000128",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "유혹하는 글쓰기",
+          "author": "스티븐 킹",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1546001462",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "읽는 인간",
+          "author": "오에 겐자부로",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4698000135",
+          "publisher": "",
+          "genre_key": "humanit",
+          "source": "리디",
+          "depth": 10
+        }
+      ],
+      "science": [
+        {
+          "rank": 1,
+          "title": "서늘한 대화",
+          "author": "정재승",
+          "cover": "",
+          "link": "https://ridibooks.com/books/280000295",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "코스모스",
+          "author": "칼 세이건",
+          "cover": "",
+          "link": "https://ridibooks.com/books/786000077",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "모든 하루는 뇌에서 시작된다",
+          "author": "벤트 프라이발트",
+          "cover": "",
+          "link": "https://ridibooks.com/books/510001688",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "제중맥학",
+          "author": "조현모",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4608000014",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "이기적 유전자 (50주년 기념판)",
+          "author": "리처드 도킨스",
+          "cover": "",
+          "link": "https://ridibooks.com/books/950000499",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "인체 수리 매뉴얼",
+          "author": "메리 로치",
+          "cover": "",
+          "link": "https://ridibooks.com/books/280000296",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "세상이 그대를 속일지라도",
+          "author": "김상욱",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4097000359",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "물고기는 존재하지 않는다",
+          "author": "룰루 밀러",
+          "cover": "",
+          "link": "https://ridibooks.com/books/852001243",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "악령이 출몰하는 세상",
+          "author": "칼 세이건",
+          "cover": "",
+          "link": "https://ridibooks.com/books/786000272",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "개정판｜미적분의 쓸모",
+          "author": "한화택",
+          "cover": "",
+          "link": "https://ridibooks.com/books/754034784",
+          "publisher": "",
+          "genre_key": "science",
+          "source": "리디",
+          "depth": 10
+        }
+      ],
+      "essay": [
+        {
+          "rank": 1,
+          "title": "자연의 것들은 그저 자란다",
+          "author": "이윤 리",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4803002877",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 2,
+          "title": "직업으로서의 소설가",
+          "author": "무라카미 하루키",
+          "cover": "",
+          "link": "https://ridibooks.com/books/593000857",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 3,
+          "title": "마음의 어휘력",
+          "author": "조아란",
+          "cover": "",
+          "link": "https://ridibooks.com/books/4139000133",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 4,
+          "title": "숨결이 바람 될 때",
+          "author": "폴 칼라니티",
+          "cover": "",
+          "link": "https://ridibooks.com/books/745000075",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 5,
+          "title": "입 속의 검은 잎",
+          "author": "기형도",
+          "cover": "",
+          "link": "https://ridibooks.com/books/754047977",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 6,
+          "title": "개정판 | 빅터 프랭클의 죽음의 수용소에서",
+          "author": "빅터 프랭클",
+          "cover": "",
+          "link": "https://ridibooks.com/books/969000280",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 7,
+          "title": "그랬다고 적었다",
+          "author": "김애란",
+          "cover": "",
+          "link": "https://ridibooks.com/books/371003979",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 8,
+          "title": "가족관계 특이사항 있음",
+          "author": "마민지",
+          "cover": "",
+          "link": "https://ridibooks.com/books/1068000178",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 9,
+          "title": "이 지랄맞음이 쌓여 축제가 되겠지",
+          "author": "조승리",
+          "cover": "",
+          "link": "https://ridibooks.com/books/2019000091",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        },
+        {
+          "rank": 10,
+          "title": "한 말씀만 하소서 [개정판]",
+          "author": "박완서",
+          "cover": "",
+          "link": "https://ridibooks.com/books/754048764",
+          "publisher": "",
+          "genre_key": "essay",
+          "source": "리디",
+          "depth": 10
+        }
+      ]
+    }
+  },
+  "merged": [
+    {
+      "title": "가호",
+      "author": "무라카미 하루키",
+      "link": "https://product.kyobobook.co.kr/detail/S000221505184",
+      "publisher": "문학동네",
+      "sources": {
+        "교보문고": {
+          "rank": 2,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 1,
+          "depth": 20
+        },
+        "리디": {
+          "rank": 1,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 2.9473684210526314,
+      "rank": 1,
+      "change": 0,
+      "streak": 6,
+      "index": 98
+    },
+    {
+      "title": "옥스브리지의 철학 수업",
+      "author": "고요엘",
+      "link": "https://product.kyobobook.co.kr/detail/S000220923864",
+      "publisher": "상상스퀘어",
+      "sources": {
+        "교보문고": {
+          "rank": 7,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 3,
+          "depth": 20
+        },
+        "리디": {
+          "rank": 3,
+          "depth": 11
+        }
+      },
+      "genre_key": "humanit",
+      "score": 2.4023923444976076,
+      "rank": 2,
+      "change": 10,
+      "streak": 2,
+      "index": 80
+    },
+    {
+      "title": "가짜돈 진짜부",
+      "author": "박종훈",
+      "link": "https://product.kyobobook.co.kr/detail/S000221580226",
+      "publisher": "글로퍼스",
+      "sources": {
+        "교보문고": {
+          "rank": 1,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 8,
+          "depth": 20
+        },
+        "리디": {
+          "rank": 6,
+          "depth": 11
+        }
+      },
+      "genre_key": "economy",
+      "score": 2.1954545454545453,
+      "rank": 3,
+      "change": "new",
+      "streak": 1,
+      "index": 73
+    },
+    {
+      "title": "한국사 이상현상 연구원",
+      "author": "최인서",
+      "link": "https://product.kyobobook.co.kr/detail/S000220693844",
+      "publisher": "다이브",
+      "sources": {
+        "교보문고": {
+          "rank": 5,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 16,
+          "depth": 20
+        },
+        "리디": {
+          "rank": 2,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 1.9485645933014353,
+      "rank": 4,
+      "change": -1,
+      "streak": 11,
+      "index": 65
+    },
+    {
+      "title": "세네카, 오늘을 빼앗기고 있는 당신에게",
+      "author": "세네카",
+      "link": "https://product.kyobobook.co.kr/detail/S000220308313",
+      "publisher": "논픽션",
+      "sources": {
+        "교보문고": {
+          "rank": 3,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 2,
+          "depth": 20
+        }
+      },
+      "genre_key": "humanit",
+      "score": 1.844736842105263,
+      "rank": 5,
+      "change": "new",
+      "streak": 1,
+      "index": 61
+    },
+    {
+      "title": "싯다르타",
+      "author": "헤르만 헤세",
+      "link": "https://product.kyobobook.co.kr/detail/S000000620195",
+      "publisher": "민음사",
+      "sources": {
+        "교보문고": {
+          "rank": 6,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 4,
+          "depth": 20
+        },
+        "리디": {
+          "rank": 11,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 1.6777511961722487,
+      "rank": 6,
+      "change": -4,
+      "streak": 13,
+      "index": 56
+    },
+    {
+      "title": "독재자(들)",
+      "author": "황현필",
+      "link": "https://product.kyobobook.co.kr/detail/S000221583260",
+      "publisher": "역바연",
+      "sources": {
+        "교보문고": {
+          "rank": 11,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 6,
+          "depth": 20
+        }
+      },
+      "genre_key": "humanit",
+      "score": 1.2236842105263157,
+      "rank": 7,
+      "change": "new",
+      "streak": 1,
+      "index": 41
+    },
+    {
+      "title": "트렌드 코리아 2027",
+      "author": "김난도 외",
+      "link": "https://product.kyobobook.co.kr/detail/S000221151022",
+      "publisher": "미래의창",
+      "sources": {
+        "교보문고": {
+          "rank": 12,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 5,
+          "depth": 20
+        }
+      },
+      "genre_key": "economy",
+      "score": 1.2210526315789474,
+      "rank": 8,
+      "change": "new",
+      "streak": 1,
+      "index": 41
+    },
+    {
+      "title": "서늘한 대화",
+      "author": "정재승",
+      "link": "https://product.kyobobook.co.kr/detail/S000221565159",
+      "publisher": "어크로스",
+      "sources": {
+        "교보문고": {
+          "rank": 13,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 10,
+          "depth": 20
+        }
+      },
+      "genre_key": "humanit",
+      "score": 0.918421052631579,
+      "rank": 9,
+      "change": 1,
+      "streak": 3,
+      "index": 31
+    },
+    {
+      "title": "물각유주",
+      "author": "공백",
+      "link": "https://product.kyobobook.co.kr/detail/S000221811215",
+      "publisher": "북로망스",
+      "sources": {
+        "교보문고": {
+          "rank": 4,
+          "depth": 19
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.8421052631578947,
+      "index": 28
+    },
+    {
+      "title": "모순",
+      "author": "양귀자",
+      "link": "https://product.kyobobook.co.kr/detail/S000001632467",
+      "publisher": "쓰다",
+      "sources": {
+        "교보문고": {
+          "rank": 17,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 9,
+          "depth": 20
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.7578947368421052,
+      "rank": 10,
+      "change": "new",
+      "streak": 1,
+      "index": 25
+    },
+    {
+      "title": "마음의 어휘력",
+      "author": "조아란 외",
+      "link": "https://product.kyobobook.co.kr/detail/S000220636999",
+      "publisher": "페이지2북스",
+      "sources": {
+        "교보문고": {
+          "rank": 19,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 7,
+          "depth": 20
+        }
+      },
+      "genre_key": "essay",
+      "score": 0.7526315789473683,
+      "rank": 11,
+      "change": -4,
+      "streak": 2,
+      "index": 25
+    },
+    {
+      "title": "아메리칸 학원 1",
+      "author": "이민진",
+      "link": "https://ridibooks.com/books/593001174",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 4,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.7272727272727273,
+      "rank": 12,
+      "change": "new",
+      "streak": 1,
+      "index": 24
+    },
+    {
+      "title": "빵충 사육 준수 사항",
+      "author": "김혜영",
+      "link": "https://ridibooks.com/books/3620000126",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 5,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.6363636363636364,
+      "rank": 13,
+      "change": -7,
+      "streak": 10,
+      "index": 21
+    },
+    {
+      "title": "사람을 고치려 들지 마라",
+      "author": "아르투어 쇼펜하우어",
+      "link": "https://product.kyobobook.co.kr/detail/S000221662855",
+      "publisher": "어센딩",
+      "sources": {
+        "교보문고": {
+          "rank": 8,
+          "depth": 19
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.631578947368421,
+      "index": 21
+    },
+    {
+      "title": "머니 트렌드 2027",
+      "author": "정태익 외",
+      "link": "https://product.kyobobook.co.kr/detail/S000221075112",
+      "publisher": "북모먼트",
+      "sources": {
+        "교보문고": {
+          "rank": 9,
+          "depth": 19
+        }
+      },
+      "genre_key": "economy",
+      "score": 0.5789473684210527,
+      "rank": 14,
+      "change": "new",
+      "streak": 1,
+      "index": 19
+    },
+    {
+      "title": "쇼펜하우어 인생수업(30만 부 기념 개정증보판)",
+      "author": "쇼펜하우어",
+      "link": "https://product.kyobobook.co.kr/detail/S000212414274",
+      "publisher": "하이스트",
+      "sources": {
+        "교보문고": {
+          "rank": 18,
+          "depth": 19
+        },
+        "YES24": {
+          "rank": 12,
+          "depth": 20
+        }
+      },
+      "genre_key": "humanit",
+      "score": 0.5552631578947369,
+      "rank": 15,
+      "change": "new",
+      "streak": 1,
+      "index": 19
+    },
+    {
+      "title": "타카하시 명언 일력 365",
+      "author": "타카하시서점",
+      "link": "https://product.kyobobook.co.kr/detail/S000221599395",
+      "publisher": "포레스트북스",
+      "sources": {
+        "교보문고": {
+          "rank": 10,
+          "depth": 19
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.5263157894736842,
+      "index": 18
+    },
+    {
+      "title": "2026 큰별쌤 최태성의 별별한국사 한국사능력검정시험 심화(1,2,3급) 상",
+      "author": "최태성",
+      "link": "https://www.yes24.com/product/goods/167466420",
+      "publisher": "이투스북",
+      "sources": {
+        "YES24": {
+          "rank": 11,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.5,
+      "index": 17
+    },
+    {
+      "title": "눈물을 마시는 새 세트 (전 4권)",
+      "author": "이영도",
+      "link": "https://ridibooks.com/books/111010208",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 7,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.45454545454545453,
+      "index": 15
+    },
+    {
+      "title": "2026 큰별쌤 최태성의 별별한국사 한국사능력검정시험 심화(1,2,3급) 하",
+      "author": "최태성",
+      "link": "https://www.yes24.com/product/goods/167466432",
+      "publisher": "이투스북",
+      "sources": {
+        "YES24": {
+          "rank": 13,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.4,
+      "index": 13
+    },
+    {
+      "title": "항밈학과 같은 건 없습니다",
+      "author": "QNTM(샘 휴즈)",
+      "link": "https://ridibooks.com/books/682001829",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 8,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.36363636363636365,
+      "index": 12
+    },
+    {
+      "title": "빨강의 자서전",
+      "author": "앤 카슨",
+      "link": "https://www.yes24.com/product/goods/139807878",
+      "publisher": "한겨레출판",
+      "sources": {
+        "YES24": {
+          "rank": 14,
+          "depth": 20
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.35,
+      "index": 12
+    },
+    {
+      "title": "사이언스 2027",
+      "author": "National Geographic Kids",
+      "link": "https://product.kyobobook.co.kr/detail/S000221414513",
+      "publisher": "비룡소",
+      "sources": {
+        "교보문고": {
+          "rank": 14,
+          "depth": 19
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.3157894736842105,
+      "index": 11
+    },
+    {
+      "title": "퍼플필",
+      "author": "진쏠미",
+      "link": "https://www.yes24.com/product/goods/198328008",
+      "publisher": "클랩북스",
+      "sources": {
+        "YES24": {
+          "rank": 15,
+          "depth": 20
+        }
+      },
+      "genre_key": "selfdev",
+      "score": 0.3,
+      "index": 10
+    },
+    {
+      "title": "자연의 것들은 그저 자란다",
+      "author": "이윤 리",
+      "link": "https://ridibooks.com/books/4803002877",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 9,
+          "depth": 11
+        }
+      },
+      "genre_key": "essay",
+      "score": 0.2727272727272727,
+      "index": 9
+    },
+    {
+      "title": "마키아벨리",
+      "author": "니콜로 마키아벨리",
+      "link": "https://product.kyobobook.co.kr/detail/S000221773301",
+      "publisher": "어센딩",
+      "sources": {
+        "교보문고": {
+          "rank": 15,
+          "depth": 19
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.2631578947368421,
+      "index": 9
+    },
+    {
+      "title": "돈, 뜨겁게 사랑하고 차갑게 다루어라",
+      "author": "앙드레 코스톨라니",
+      "link": "https://product.kyobobook.co.kr/detail/S000209182287",
+      "publisher": "미래의창",
+      "sources": {
+        "교보문고": {
+          "rank": 16,
+          "depth": 19
+        }
+      },
+      "genre_key": "economy",
+      "score": 0.21052631578947367,
+      "index": 7
+    },
+    {
+      "title": "루이&후이 보물 같은 나날들",
+      "author": "이화",
+      "link": "https://www.yes24.com/product/goods/199743902",
+      "publisher": "한스미디어",
+      "sources": {
+        "YES24": {
+          "rank": 17,
+          "depth": 20
+        }
+      },
+      "genre_key": "essay",
+      "score": 0.2,
+      "index": 7
+    },
+    {
+      "title": "프로젝트 헤일메리",
+      "author": "앤디 위어",
+      "link": "https://ridibooks.com/books/510001099",
+      "publisher": "",
+      "sources": {
+        "리디": {
+          "rank": 10,
+          "depth": 11
+        }
+      },
+      "genre_key": "novel",
+      "score": 0.18181818181818182,
+      "index": 6
+    },
+    {
+      "title": "2026 큰별쌤 최태성의 별별한국사 기출 500제 한국사능력검정시험 심화(1,2,3급)",
+      "author": "최태성",
+      "link": "https://www.yes24.com/product/goods/168393009",
+      "publisher": "이투스북",
+      "sources": {
+        "YES24": {
+          "rank": 18,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.15,
+      "index": 5
+    },
+    {
+      "title": "니체의 초월자",
+      "author": "프리드리히 니체",
+      "link": "https://www.yes24.com/product/goods/161401496",
+      "publisher": "히읏",
+      "sources": {
+        "YES24": {
+          "rank": 19,
+          "depth": 20
+        }
+      },
+      "genre_key": "humanit",
+      "score": 0.1,
+      "index": 3
+    },
+    {
+      "title": "2027 공단기 이유진 국어 백일기도 모의고사 (시즌1 스탠다드)",
+      "author": "이유진",
+      "link": "https://www.yes24.com/product/goods/199205811",
+      "publisher": "고시동네",
+      "sources": {
+        "YES24": {
+          "rank": 20,
+          "depth": 20
+        }
+      },
+      "genre_key": "etc",
+      "score": 0.05,
+      "index": 2
+    }
+  ]
+}
