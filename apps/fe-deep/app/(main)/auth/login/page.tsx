@@ -1,1 +1,1 @@
-export { AuthLoginView as default } from '@views/auth-login';
+export { AuthLoginView as default } from '@pages/auth-login';

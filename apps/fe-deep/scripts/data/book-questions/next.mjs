@@ -136,7 +136,7 @@ export default async function Page() {
 - **신규 프로젝트 → App Router.** Next.js의 모든 신규 기능이 여기에 들어갑니다
 - **기존 Pages Router 대규모 앱** → 급하게 옮길 필요는 없습니다. Pages Router는 계속 지원되며, 라우트 단위로 점진 이전이 가능합니다
 
-> 이 저장소의 앱들은 App Router를 쓰되 **Next 라우팅용 \`app/\`과 FSD의 \`src/app\` 레이어를 분리**합니다. \`app/\`은 진입점만 얇게 두고 화면은 \`views\`, 전역 setup은 \`src/app\`이 담당합니다.`,
+> 이 저장소의 앱들은 App Router를 쓰되 **Next 라우팅용 \`app/\`과 FSD의 \`src/_app\` 레이어를 분리**합니다. \`app/\`은 진입점만 얇게 두고 화면은 \`_pages\`, 전역 setup은 \`src/_app\`이 담당합니다.`,
     sub_category: 'App Router',
     difficulty: 'medium',
     tags: ['App Router', 'Pages Router', 'RSC', 'layout', '마이그레이션'],

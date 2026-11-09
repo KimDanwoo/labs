@@ -1,1 +1,1 @@
-export { AdminFeedbacksView as default } from '@views/admin-feedbacks';
+export { AdminFeedbacksView as default } from '@pages/admin-feedbacks';

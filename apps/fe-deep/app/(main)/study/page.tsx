@@ -1,1 +1,1 @@
-export { StudyView as default, metadata } from '@views/study';
+export { StudyView as default, metadata } from '@pages/study';

@@ -1,4 +1,4 @@
-import { SearchContent } from '@views/search';
+import { SearchContent } from '@pages/search';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 

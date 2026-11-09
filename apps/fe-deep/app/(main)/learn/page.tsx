@@ -1,3 +1,3 @@
-import { LearnPage } from '@views/learn';
+import { LearnPage } from '@pages/learn';
 
 export default LearnPage;

@@ -1,1 +1,1 @@
-export { AdminQuestionsView as default } from '@views/admin-questions';
+export { AdminQuestionsView as default } from '@pages/admin-questions';
