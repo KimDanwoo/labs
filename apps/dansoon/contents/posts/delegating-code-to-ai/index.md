@@ -640,7 +640,7 @@ AI에게 더 많은 코드를 맡기기 위해 만든 도구지만
 
 AI에게 구현을 맡긴 실제 프로젝트 사례는 [사주 서비스 제작기](/posts/saju-service/)에 담았다.
 
-규칙을 실제로 lint에 옮긴 예는 [FSD 규칙을 문서 대신 ESLint로 강제하기](/posts/fsd-eslint-boundaries/)와 [디자인 토큰 규칙을 문서 대신 도구가 지키게 만들기](/posts/design-token-conventions/)에, AI로 빨리 만들 수 있게 된 뒤의 고민은 [AI 바이브 코딩으로 빨리 만들 수 있게 되자](/posts/too-easy-to-build/)에 있다.
+규칙을 실제로 lint에 옮긴 예는 [FSD 규칙을 문서 대신 ESLint로 강제하기](/posts/fsd-eslint-boundaries/)와 [디자인 토큰 규칙을 문서 대신 도구가 지키게 만들기](/posts/design-token-conventions/)에, AI로 빨리 만들 수 있게 된 뒤의 고민은 [AI 바이브 코딩으로 빨리 만들 수 있게 되자](/posts/too-easy-to-build/)에 있다. 에이전트를 집 맥북에서 계속 돌려 두고 밖에서 휴대폰으로 쓰는 구성은 [밖에서 휴대폰으로 집 맥북의 Claude Code 쓰기](/posts/orca-home-macbook-tailscale/)에 정리했다.
 
 ## 참고자료
 
