@@ -29,7 +29,8 @@ import Icon from '~/components/Icon.astro';
       image.setAttribute('role', 'button');
       image.setAttribute('aria-label', `${image.alt || '이미지'} 크게 보기`);
       const open = () => {
-        preview.src = image.currentSrc || image.src;
+        // 본문은 화면 폭에 맞는 작은 이미지를 받으므로, 크게 보기는 원본 해상도(src)로 연다
+        preview.src = image.src;
         preview.alt = image.alt;
         dialog.showModal();
       };
