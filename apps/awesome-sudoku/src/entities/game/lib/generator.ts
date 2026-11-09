@@ -1,10 +1,10 @@
 import { atIndex, cellAt } from '@shared/lib/gridAccess';
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../constants/board';
-import { CLASSIC_DIFFICULTY, KILLER_DIFFICULTY, TECHNIQUE } from '../constants/game';
-import type { Grid, GridPosition, SudokuBoard } from '../types/board';
-import type { Difficulty, GradedDifficultySpec, KillerCage, Technique } from '../types/game';
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../model/constants/board';
+import { CLASSIC_DIFFICULTY, KILLER_DIFFICULTY, TECHNIQUE } from '../model/constants/game';
+import { shuffleArray } from '../model/services/common';
+import type { Grid, GridPosition, SudokuBoard } from '../model/types/board';
+import type { Difficulty, GradedDifficultySpec, KillerCage, Technique } from '../model/types/game';
 import { deepCopyGrid } from './boardUtils';
-import { shuffleArray } from './common';
 import { generateRandomSolution, gradePuzzle, staysUniqueWithout } from './solver';
 
 const EMPTY = 0;

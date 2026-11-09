@@ -1,4 +1,4 @@
-import type { Difficulty, GameMode } from '../types/game';
+import type { Difficulty, GameMode } from '../model/types/game';
 import type { PuzzleRequest, PuzzleResponse } from './puzzle.worker';
 import { type GeneratedPuzzle, generatePuzzle } from './puzzleGenerator';
 

@@ -1,4 +1,4 @@
-import type { Difficulty, GameMode } from '../types/game';
+import type { Difficulty, GameMode } from '../model/types/game';
 import { type GeneratedPuzzle, generatePuzzle } from './puzzleGenerator';
 
 export type PuzzleRequest = { id: number; gameMode: GameMode; difficulty: Difficulty };

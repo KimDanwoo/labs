@@ -1,10 +1,5 @@
+import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from '@entities/game/lib/gameUtils';
 import { BLOCK_SIZE, BOARD_SIZE } from '@entities/game/model/constants/board';
-import {
-  getBlockNumbers,
-  getColumnNumbers,
-  getRowNumbers,
-  isValidNumberSet,
-} from '@entities/game/model/services/gameUtils';
 import type { Grid } from '@entities/game/model/types/board';
 import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, test } from 'vitest';

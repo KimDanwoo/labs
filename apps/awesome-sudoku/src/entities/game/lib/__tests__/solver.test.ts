@@ -1,13 +1,13 @@
-import { TECHNIQUE } from '@entities/game/model/constants/game';
-import { generateKillerCages } from '@entities/game/model/services/generator';
+import { generateKillerCages } from '@entities/game/lib/generator';
 import {
   countSolutions,
   generateRandomSolution,
   gradePuzzle,
   hasUniqueSolution,
   solveLogically,
-} from '@entities/game/model/services/solver';
-import { isValidSolution } from '@entities/game/model/services/validator';
+} from '@entities/game/lib/solver';
+import { isValidSolution } from '@entities/game/lib/validator';
+import { TECHNIQUE } from '@entities/game/model/constants/game';
 import type { Grid, GridPosition } from '@entities/game/model/types/board';
 import type { KillerCage } from '@entities/game/model/types/game';
 import { atIndex, cellAt } from '@shared/lib/gridAccess';

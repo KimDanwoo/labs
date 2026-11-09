@@ -1,4 +1,4 @@
-import { deepCopyGrid } from '@entities/game/model/services/boardUtils';
+import { deepCopyGrid } from '@entities/game/lib/boardUtils';
 import type { Grid } from '@entities/game/model/types/board';
 import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, it } from 'vitest';

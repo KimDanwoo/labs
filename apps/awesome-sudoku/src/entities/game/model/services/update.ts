@@ -1,15 +1,15 @@
 import { cellAt } from '@shared/lib/gridAccess';
-import { BLOCK_SIZE, BOARD_SIZE } from '../constants/board';
-import { GAME_MODE } from '../constants/game';
-import type { CellHighlight, Grid, SudokuBoard, SudokuCell } from '../types/board';
-import type { GameCompletionResult, GameMode, KillerCage } from '../types/game';
 import {
   checkConflicts,
   isBoardComplete,
   isKillerBoardComplete,
   markWrongValues,
   validateKillerCages,
-} from './validator';
+} from '../../lib/validator';
+import { BLOCK_SIZE, BOARD_SIZE } from '../constants/board';
+import { GAME_MODE } from '../constants/game';
+import type { CellHighlight, Grid, SudokuBoard, SudokuCell } from '../types/board';
+import type { GameCompletionResult, GameMode, KillerCage } from '../types/game';
 
 /**
  * @description 단일 셀만 업데이트

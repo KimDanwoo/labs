@@ -1,4 +1,3 @@
-import { BOARD_SIZE } from '@entities/game/model/constants/board';
 import {
   checkConflicts,
   isBoardComplete,
@@ -6,7 +5,8 @@ import {
   isValidSolution,
   markWrongValues,
   validateKillerCages,
-} from '@entities/game/model/services/validator';
+} from '@entities/game/lib/validator';
+import { BOARD_SIZE } from '@entities/game/model/constants/board';
 import type { Grid, GridPosition, SudokuBoard, SudokuCell } from '@entities/game/model/types/board';
 import type { KillerCage } from '@entities/game/model/types/game';
 import { atIndex, cellAt } from '@shared/lib/gridAccess';

@@ -1,6 +1,6 @@
 import { getAuthInstance } from '@shared/lib/firebase/config';
 import type { User as FirebaseUser } from 'firebase/auth';
-import type { User } from '../types/user';
+import type { User } from '../model/types/user';
 
 /**
  * @description Firebase User를 앱의 User 타입으로 변환

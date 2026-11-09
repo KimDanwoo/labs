@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
+import { requestPuzzle } from '../../lib/puzzleService';
 import { GAME_LEVEL, HINTS_REMAINING } from '../constants/game';
 import { createEmptyHighlights } from '../services/common';
-import { requestPuzzle } from '../services/puzzleService';
 import type { Difficulty, GameMode } from '../types/game';
 import { clearHistoryAtom } from './historyAtoms';
 import {

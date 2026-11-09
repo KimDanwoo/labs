@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
-import { signInWithGoogle, signOut } from '../services/authService';
+import { signInWithGoogle, signOut } from '../../api/authService';
 import { isAuthenticatedAtom, isLoadingAtom, logoutAtom, userAtom } from '../store/authAtoms';
 
 export function useAuth() {

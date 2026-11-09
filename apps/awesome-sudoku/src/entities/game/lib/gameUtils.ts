@@ -1,6 +1,6 @@
 import { atIndex, cellAt } from '@shared/lib/gridAccess';
-import { BLOCK_SIZE, BOARD_SIZE, KEY_NUMBER } from '../constants/board';
-import type { Grid } from '../types/board';
+import { BLOCK_SIZE, BOARD_SIZE, KEY_NUMBER } from '../model/constants/board';
+import type { Grid } from '../model/types/board';
 
 /**
  * 숫자 세트가 유효한지 확인

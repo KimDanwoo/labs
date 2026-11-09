@@ -1,7 +1,7 @@
 import { cellAt } from '@shared/lib/gridAccess';
-import { BLOCKS_PER_ROW, BLOCK_SIZE, BOARD_SIZE } from '../constants/board';
-import type { Grid, SudokuBoard } from '../types/board';
-import type { KillerCage } from '../types/game';
+import { BLOCKS_PER_ROW, BLOCK_SIZE, BOARD_SIZE } from '../model/constants/board';
+import type { Grid, SudokuBoard } from '../model/types/board';
+import type { KillerCage } from '../model/types/game';
 import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from './gameUtils';
 
 /**

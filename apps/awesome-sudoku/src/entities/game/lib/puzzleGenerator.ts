@@ -1,6 +1,6 @@
-import { GAME_MODE } from '../constants/game';
-import type { Grid, SudokuBoard } from '../types/board';
-import type { Difficulty, GameMode, KillerCage } from '../types/game';
+import { GAME_MODE } from '../model/constants/game';
+import type { Grid, SudokuBoard } from '../model/types/board';
+import type { Difficulty, GameMode, KillerCage } from '../model/types/game';
 import { generateBoard, generateKillerBoard, generateSolution } from './generator';
 
 export type GeneratedPuzzle = {

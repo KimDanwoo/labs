@@ -1,8 +1,12 @@
 import { getDb } from '@shared/lib/firebase/config';
 import type { Firestore } from 'firebase/firestore';
-import { CUMULATIVE_RECORD_LIMIT, DEFAULT_USER_RECORD_LIMIT, LEADERBOARD_RECORD_LIMIT } from '../constants/record';
-import type { GameRecord } from '../types/record';
-import { getRecordPoint } from './recordUtils';
+import {
+  CUMULATIVE_RECORD_LIMIT,
+  DEFAULT_USER_RECORD_LIMIT,
+  LEADERBOARD_RECORD_LIMIT,
+} from '../model/constants/record';
+import { getRecordPoint } from '../model/services/recordUtils';
+import type { GameRecord } from '../model/types/record';
 
 const COLLECTION_NAME = 'gameRecords';
 
