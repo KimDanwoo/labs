@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { gaitWeights } from '../src/entities/runner/model/services/gaitWeights.ts';
+import { gaitWeights } from '../src/entities/runner/lib/gaitWeights.ts';
 
 const weights = (speed, height) => gaitWeights(speed, height, 4, 7);
 

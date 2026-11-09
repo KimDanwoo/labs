@@ -7,6 +7,7 @@ import { runnerState } from '@shared/r3f';
 import { useEffect, useMemo, useRef } from 'react';
 import { Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type AnimationAction } from 'three';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { gaitWeights } from '../lib/gaitWeights';
 import {
   RUNNER_ANIM,
   RUNNER_ANIM_TUNING,
@@ -14,7 +15,6 @@ import {
   RUNNER_MODEL_URL,
   UNICORN_TINT,
 } from '../model/constants/runner';
-import { gaitWeights } from '../model/services/gaitWeights';
 import { FlowingHair } from './FlowingHair';
 import { HeadCrown } from './HeadCrown';
 import { Horn } from './Horn';

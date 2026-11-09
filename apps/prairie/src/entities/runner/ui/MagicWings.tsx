@@ -4,8 +4,8 @@ import { useFrame } from '@react-three/fiber';
 import { runnerState } from '@shared/r3f';
 import { useEffect, useMemo, useRef } from 'react';
 import { Group, MathUtils, Vector3, type Object3D } from 'three';
+import { makeWingGeometry } from '../lib/makeWingGeometry';
 import { WINGS } from '../model/constants/runner';
-import { makeWingGeometry } from '../model/services/makeWingGeometry';
 import { FeatherWing } from './FeatherWing';
 
 type MagicWingsProps = { anchor: Object3D };

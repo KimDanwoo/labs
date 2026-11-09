@@ -9,7 +9,7 @@ import {
   RGBAFormat,
 } from 'three';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { FLORA } from '../constants/flora';
+import { FLORA } from '../model/constants/flora';
 
 export function makeCanopyGeometry(detail: number) {
   const base = new IcosahedronGeometry(FLORA.canopy.radius, detail);

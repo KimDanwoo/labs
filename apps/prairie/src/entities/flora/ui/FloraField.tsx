@@ -7,14 +7,14 @@ import { FOG, groundHeightAt } from '@shared/config';
 import { makeLeafCanopy, makeSurfaceBump, SURFACE_KIND } from '@shared/lib';
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
-import { FLORA, floraCellOf, floraInCell, type FloraPlacement } from '../model/constants/flora';
 import {
   makeCanopyGeometry,
   makeConiferGeometry,
   makeRockGeometry,
   makeShadowTexture,
   makeTrunkGeometry,
-} from '../model/services/makeFloraGeometry';
+} from '../lib/makeFloraGeometry';
+import { FLORA, floraCellOf, floraInCell, type FloraPlacement } from '../model/constants/flora';
 
 import { MeadowFlowers } from './MeadowFlowers';
 

@@ -1,5 +1,5 @@
 import type { WebGLProgramParametersWithUniforms } from 'three';
-import { FEATHER_SURFACE as F } from '../constants/runner';
+import { FEATHER_SURFACE as F } from '../model/constants/runner';
 
 // 깃가지 결이 픽셀보다 촘촘해지면 모아레가 생겨 날개가 망사처럼 비쳐 보인다.
 // 화면 미분으로 픽셀당 주기를 재서, 표현할 수 없는 주파수는 bump에서 빼낸다.

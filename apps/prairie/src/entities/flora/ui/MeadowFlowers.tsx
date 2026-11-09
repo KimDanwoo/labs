@@ -11,7 +11,7 @@ import {
   RIVER_TRENCH_HALF_WIDTH,
   terrainHeightAt,
 } from '@shared/config';
-import { makeFlowerGeometry } from '../model/services/makeFlowerGeometry';
+import { makeFlowerGeometry } from '../lib/makeFlowerGeometry';
 
 import { useMemo, useRef } from 'react';
 import { Color, InstancedMesh, Object3D } from 'three';
