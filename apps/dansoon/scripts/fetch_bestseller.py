@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""도서 주간 베스트셀러 수집 — 알라딘(API) · 교보문고 · YES24 · 리디"""
+"""도서 주간 베스트셀러 수집 — 교보문고 · YES24 · 리디"""
 
 import os
 import sys
@@ -7,7 +7,6 @@ import json
 import re
 import html as htmllib
 import pathlib
-import requests
 from curl_cffi import requests as cffi_requests
 from playwright.sync_api import sync_playwright, Page
 from google import genai
@@ -18,43 +17,40 @@ from bestseller_trends import annotate_trends, change_label, load_previous_ranki
 
 DATE = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y-%m-%d")
 
-ALADIN_TTB_KEY = os.environ.get("ALADIN_TTB_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-if not ALADIN_TTB_KEY:
-    raise ValueError("ALADIN_TTB_KEY 환경변수가 필요합니다.")
 if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY 환경변수가 필요합니다.")
 
 GENRES = [
-    {"key": "novel",   "name": "소설",     "aladin_id": 1,     "keywords": [
+    {"key": "novel",   "name": "소설", "keywords": [
         "소설", "fiction", "novel", "sf", "판타지", "로맨스", "추리", "공포", "미스터리",
         "스릴러", "시집", "희곡", "단편", "장편", "문학", "이야기", "동화", "동시"
     ]},
-    {"key": "economy", "name": "경제경영", "aladin_id": 170,   "keywords": [
+    {"key": "economy", "name": "경제경영", "keywords": [
         "경제", "경영", "비즈니스", "투자", "재테크", "마케팅", "금융", "주식", "부동산",
         "창업", "스타트업", "회계", "세금", "절세", "부의", "돈의", "돈을", "자산", "펀드"
     ]},
-    {"key": "selfdev", "name": "자기계발", "aladin_id": 336,   "keywords": [
+    {"key": "selfdev", "name": "자기계발", "keywords": [
         "자기계발", "성공", "습관", "리더십", "동기", "긍정", "루틴", "목표", "의지",
         "잠재력", "변화", "성장", "생산성", "집중력", "시간관리", "마인드", "행복"
     ]},
-    {"key": "humanit", "name": "인문사회", "aladin_id": 656,   "keywords": [
+    {"key": "humanit", "name": "인문사회", "keywords": [
         "인문", "사회", "철학", "역사", "정치", "교육", "심리", "문화", "종교", "예술",
         "언어", "윤리", "사상", "고전", "지식", "교양", "미학", "법학", "인간"
     ]},
-    {"key": "science", "name": "과학기술", "aladin_id": 987,   "keywords": [
+    {"key": "science", "name": "과학기술", "keywords": [
         "과학", "기술", "it", "수학", "물리", "생물", "화학", "의학", "ai", "인공지능",
         "뇌", "우주", "자연", "환경", "생태", "진화", "건강", "의료", "코딩", "개발"
     ]},
-    {"key": "essay",   "name": "에세이",   "aladin_id": 55889, "keywords": [
+    {"key": "essay",   "name": "에세이", "keywords": [
         "에세이", "산문", "여행", "일상", "기행", "감성", "힐링", "치유", "사색", "독립",
         "청춘", "위로", "기억", "이별", "사랑이야기", "수필"
     ]},
 ]
 
 _GENRE_KR_TO_KEY = {g["name"]: g["key"] for g in GENRES}
-# 알라딘 categoryName 경로 세그먼트("국내도서>소설/시/희곡>한국소설") 및 Gemini 응답 매핑.
+# 카테고리 경로 세그먼트("국내도서>소설/시/희곡>한국소설") 및 Gemini 응답 매핑.
 # 여기에 없는 대분류(만화/라이트노벨·수험서·유아 등)는 etc로 남아 종합표에서 제외된다.
 _GENRE_KR_TO_KEY.update({
     "소설/시/희곡": "novel", "장르소설": "novel", "문학": "novel", "한국소설": "novel",
@@ -145,9 +141,10 @@ def _matches_any(key: str, reference_keys: set[str]) -> bool:
     return any(_is_same_work(ref, key) or _is_same_work(key, ref) for ref in reference_keys)
 
 
-# 서로 다른 서점의 베스트셀러 상위 20위는 상당 부분 겹친다(2026-07-27 수집 기준
-# 알라딘∩교보 6권, 알라딘∩YES24 5권). 겹침이 이 수준에도 못 미치면 순위 목록이
-# 아니라 추천 캐러셀·기획전 배열을 잡은 것으로 보고 폐기한다.
+# 서로 다른 서점의 베스트셀러는 상당 부분 겹친다(2026-08~11 덤프 기준 교보 20위 중
+# 리디 전체·장르별 목록과 3~7권, YES24 20위 중 교보와 8~13권). 겹침이 이 수준에도 못
+# 미치면 순위 목록이 아니라 추천 캐러셀·기획전 배열을 잡은 것으로 보고 폐기한다.
+# ponytail: 교보∩리디 최저치가 기준선과 같은 3권이다. 오탐 폐기가 생기면 기준을 2로 낮춘다.
 _SANITY_MIN_OVERLAP = 3
 
 
@@ -157,14 +154,14 @@ def _is_plausible_list(items: list[dict], reference_keys: set[str], source_name:
     hits = sum(1 for b in items if _matches_any(_title_key(b["title"]), reference_keys))
     if hits >= _SANITY_MIN_OVERLAP:
         return True
-    print(f"  ⚠️  {source_name} 목록이 알라딘 베스트셀러와 {hits}권만 겹칩니다 — 베스트셀러 목록이 아닌 것으로 보고 폐기")
+    print(f"  ⚠️  {source_name} 목록이 다른 서점 베스트셀러와 {hits}권만 겹칩니다 — 베스트셀러 목록이 아닌 것으로 보고 폐기")
     return False
 
 
 def _stamp_depth(items: list[dict]) -> list[dict]:
     """정규화 점수의 기준이 될 목록 깊이를 각 항목에 새긴다.
 
-    서점마다 확인 가능한 순위 범위가 달라(알라딘·교보·YES24 20위, 리디 전체 11위,
+    서점마다 확인 가능한 순위 범위가 달라(교보·YES24 20위, 리디 전체 11위,
     장르별 10위) 순위를 그대로 더하면 얕게 수집되는 서점이 과대평가된다.
     """
     depth = len(items)
@@ -195,103 +192,6 @@ def _find_book_items(obj, depth=0) -> list:
             if found:
                 return found
     return []
-
-
-# ── 알라딘 API ──────────────────────────────────────────────
-def fetch_aladin_overall(limit: int = 20) -> list[dict]:
-    url = "https://www.aladin.co.kr/ttb/api/ItemList.aspx"
-    params = {
-        "ttbkey": ALADIN_TTB_KEY, "QueryType": "Bestseller",
-        "MaxResults": limit, "start": 1, "SearchTarget": "Book",
-        "output": "js", "Version": "20131101", "CategoryId": 0,
-    }
-    try:
-        data = requests.get(url, params=params, timeout=10).json()
-        _EXCLUDE_CAT = ("이벤트", "선물", "기획전", "특별")
-        results = []
-        rank = 0
-        for item in data.get("item", []):
-            cat_name = item.get("categoryName", "")
-            if any(kw in cat_name for kw in _EXCLUDE_CAT):
-                continue
-            rank += 1
-            if rank > limit:
-                break
-            results.append({
-                "rank": rank,
-                "title": item["title"].split(" - ")[0].strip(),
-                "author": item["author"].split("(지은이)")[0].strip().split(",")[0].strip(),
-                "cover": item.get("cover", ""),
-                "link": item["link"],
-                "publisher": item.get("publisher", ""),
-                "genre_key": classify_genre(cat_name),
-                "source": "알라딘",
-            })
-        return _stamp_depth(results)
-    except Exception as e:
-        print(f"  ⚠️  알라딘 전체 실패: {e}")
-        return []
-
-
-def fetch_aladin_publisher(title: str, author: str) -> str:
-    """알라딘 검색으로 출판사만 보강.
-
-    출판사는 알라딘 API에서만 온다(교보·YES24는 DOM 파싱, 리디는 SSR HTML 파싱이라 없다).
-    타 서점 단독 진입 도서는 베스트셀러 목록 어디에도 없어 제목 검색으로 따로 찾는다.
-    """
-    url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx"
-    params = {
-        "ttbkey": ALADIN_TTB_KEY, "Query": title, "QueryType": "Title",
-        "MaxResults": 5, "start": 1, "SearchTarget": "Book",
-        "output": "js", "Version": "20131101",
-    }
-    try:
-        items = requests.get(url, params=params, timeout=10).json().get("item", [])
-    except Exception as e:
-        print(f"  ⚠️  알라딘 출판사 검색 실패({title}): {e}")
-        return ""
-
-    target_key = _title_key(title)
-    target_author = _normalize(author)
-    fallback = ""
-    for item in items:
-        publisher = str(item.get("publisher", "")).strip()
-        if not publisher:
-            continue
-        found_key = _title_key(str(item.get("title", "")).split(" - ")[0])
-        if not (found_key == target_key or _is_same_work(target_key, found_key)):
-            continue
-        if target_author and target_author in _normalize(str(item.get("author", ""))):
-            return publisher
-        fallback = fallback or publisher
-    return fallback
-
-
-def fetch_aladin_genre(genre: dict, limit: int = 10) -> list[dict]:
-    url = "https://www.aladin.co.kr/ttb/api/ItemList.aspx"
-    params = {
-        "ttbkey": ALADIN_TTB_KEY, "QueryType": "Bestseller",
-        "MaxResults": limit, "start": 1, "SearchTarget": "Book",
-        "output": "js", "Version": "20131101", "CategoryId": genre["aladin_id"],
-    }
-    try:
-        data = requests.get(url, params=params, timeout=10).json()
-        results = []
-        for i, item in enumerate(data.get("item", []), start=1):
-            results.append({
-                "rank": i,
-                "title": item["title"].split(" - ")[0].strip(),
-                "author": item["author"].split("(지은이)")[0].strip().split(",")[0].strip(),
-                "cover": item.get("cover", ""),
-                "link": item["link"],
-                "publisher": item.get("publisher", ""),
-                "genre_key": genre["key"],
-                "source": "알라딘",
-            })
-        return _stamp_depth(results)
-    except Exception as e:
-        print(f"  ⚠️  알라딘 {genre['name']} 실패: {e}")
-        return []
 
 
 # ── Gemini 헬퍼 ─────────────────────────────────────────────
@@ -370,16 +270,12 @@ _KYOBO_DOM_JS = """
       const href = a.getAttribute('href') || '';
       const lines = li.innerText.split('\\n').map((s) => s.trim()).filter(Boolean);
       const ti = lines.indexOf(title);
-      let author = '';
-      if (ti >= 0) {
-        for (let i = ti + 1; i < lines.length; i++) {
-          const l = lines[i];
-          if (l && l !== '·' && !/^[\\d,]/.test(l)) { author = l; break; }
-        }
-      }
+      // 제목 다음 줄들이 "저자 · 출판사 · 출간일" 순서다.
+      const meta = ti >= 0 ? lines.slice(ti + 1).filter((l) => l !== '·' && !/^[\\d,]/.test(l)) : [];
       out.push({
         title,
-        author,
+        author: meta[0] || '',
+        publisher: meta[1] || '',
         link: href.startsWith('http') ? href : 'https://product.kyobobook.co.kr' + href,
       });
     }
@@ -404,12 +300,16 @@ _YES24_DOM_JS = """
     return {
       title: a.textContent.trim(),
       author,
+      publisher: (li.querySelector('.info_pub') || {}).innerText || '',
       link: href.startsWith('http') ? href : 'https://www.yes24.com' + href,
       rankText: (li.querySelector('.saleNum') || {}).textContent || '',
     };
   });
 }
 """
+
+
+_KYOBO_BADGE_RE = re.compile(r"^\s*예약판매\s*")
 
 
 def _rows_from_dom(pw_page: Page, script: str, source_name: str, limit: int) -> list[dict]:
@@ -421,7 +321,8 @@ def _rows_from_dom(pw_page: Page, script: str, source_name: str, limit: int) -> 
     results: list[dict] = []
     seen: set[str] = set()
     for entry in raw:
-        title = str(entry.get("title", "")).strip()
+        # 교보는 제목 링크 안에 배지 텍스트가 붙어 온다("예약판매옥스브리지의 철학 수업").
+        title = _KYOBO_BADGE_RE.sub("", str(entry.get("title", ""))).strip()
         key = _title_key(title)
         if not title or not key or key in seen:
             continue
@@ -432,7 +333,7 @@ def _rows_from_dom(pw_page: Page, script: str, source_name: str, limit: int) -> 
             "author": str(entry.get("author", "")).strip(),
             "cover": "",
             "link": str(entry.get("link", "")).strip(),
-            "publisher": "",
+            "publisher": str(entry.get("publisher", "")).strip(),
             "genre_key": classify_genre(title),
             "source": source_name,
         })
@@ -706,6 +607,34 @@ def fetch_ridi_by_genre(limit: int = 10) -> dict[str, list[dict]]:
     return result
 
 
+# YES24 분야별 베스트셀러(분야당 24위, SSR). 교보·YES24 전체 순위에는 분류가 없어
+# 장르 판정 기준으로만 쓰고 순위 집계에는 넣지 않는다.
+YES24_GENRE_CAT: dict[str, tuple[str, ...]] = {
+    "novel":   ("001001046",),                          # 소설/시/희곡
+    "economy": ("001001025",),                          # 경제 경영
+    "selfdev": ("001001026",),                          # 자기계발
+    "humanit": ("001001019", "001001022", "001001010"), # 인문 · 사회 정치 · 역사
+    "science": ("001001002", "001001003"),              # 자연과학 · IT 모바일
+    "essay":   ("001001047",),                          # 에세이
+}
+_YES24_TITLE_RE = re.compile(r'class="gd_name"[^>]*>([^<]*)')
+
+
+def fetch_yes24_genre_lookup() -> dict[str, str]:
+    lookup: dict[str, str] = {}
+    for genre_key, cat_ids in YES24_GENRE_CAT.items():
+        for cat_id in cat_ids:
+            url = f"https://www.yes24.com/Product/Category/BestSeller?categoryNumber={cat_id}&pageSize=24"
+            try:
+                html = cffi_requests.get(url, impersonate="chrome", timeout=20).text
+            except Exception as e:
+                print(f"  ⚠️  YES24 분야 {cat_id} 실패: {e}")
+                continue
+            for title in _YES24_TITLE_RE.findall(html):
+                lookup.setdefault(_title_key(htmllib.unescape(title)), genre_key)
+    return lookup
+
+
 # 교보/YES24는 Gemini 폴백 시 개별 책 링크를 못 얻어 목록 URL이 들어온다.
 _LIST_URL_MARKERS = ("/bestseller", "bestseller?", "BestSeller", "/category/")
 
@@ -754,7 +683,6 @@ def _source_score(rank: int, depth: int) -> float:
 def merge_rankings(
     all_items: list[dict],
     genre_lookup: dict[str, str] | None = None,
-    publisher_lookup: dict[str, str] | None = None,
 ) -> list[dict]:
     """서점별 목록을 한 권 단위로 합치고 정규화 점수로 정렬한다(자르기는 호출자 몫)."""
     canonical = _canonical_keys(all_items)
@@ -770,7 +698,6 @@ def merge_rankings(
             book = books[key] = {
                 "title": item["title"],
                 "author": item.get("author", ""),
-                "cover": "",
                 "link": "",
                 "publisher": item.get("publisher", ""),
                 "raw_keys": set(),
@@ -787,18 +714,12 @@ def merge_rankings(
         # 에디션·부제가 붙은 표기보다 짧은 표기를 대표 제목으로 쓴다
         if len(item["title"]) < len(book["title"]):
             book["title"] = item["title"]
-        # 저자는 알라딘 표기를 우선(리디는 미등록 작가 시 비어 온다)
-        if item.get("author") and (not book["author"] or item["source"] == "알라딘"):
+        # 리디는 미등록 작가 시 저자가, 출판사는 교보·YES24만 채워 준다. 비어 있으면 뒤늦게라도 채운다.
+        if item.get("author") and not book["author"]:
             book["author"] = item["author"]
-        # 출판사는 알라딘만 채워 준다. 첫 항목이 교보·리디면 비어 있으므로 뒤늦게라도 채운다.
         if item.get("publisher") and not book["publisher"]:
             book["publisher"] = item["publisher"]
-        # 알라딘 커버/링크 우선, 그다음 아무 상세 링크
-        if item["source"] == "알라딘" and item.get("cover"):
-            book["cover"] = item["cover"]
-            if _is_detail_link(item.get("link", "")):
-                book["link"] = item["link"]
-        elif not book["link"] and _is_detail_link(item.get("link", "")):
+        if not book["link"] and _is_detail_link(item.get("link", "")):
             book["link"] = item["link"]
         if book["genre_key"] == "etc":
             book["genre_key"] = item.get("genre_key", "etc")
@@ -811,13 +732,6 @@ def merge_rankings(
             for raw_key in sorted(book["raw_keys"]):
                 if raw_key in genre_lookup:
                     book["genre_key"] = genre_lookup[raw_key]
-                    break
-        # 종합 순위에는 알라딘 전체 목록만 넣으므로(장르별을 섞으면 점수가 왜곡된다)
-        # 장르별 수집에서 확인된 출판사는 여기서 따로 채운다.
-        if publisher_lookup and not book["publisher"]:
-            for raw_key in sorted(book["raw_keys"]):
-                if raw_key in publisher_lookup:
-                    book["publisher"] = publisher_lookup[raw_key]
                     break
 
     return sorted(
@@ -846,7 +760,7 @@ def take_charted(books: list[dict], top_n: int) -> tuple[list[dict], list[dict]]
 # ── MD 생성 ──────────────────────────────────────────────────
 TOP_N_OVERALL = 15
 TOP_N_GENRE = 5
-SOURCE_NAMES = ("알라딘", "교보문고", "YES24", "리디")
+SOURCE_NAMES = ("교보문고", "YES24", "리디")
 
 
 def _md_cell(text: str) -> str:
@@ -866,7 +780,7 @@ def _source_cells(sources: dict[str, dict]) -> str:
 def _index_cell(book: dict, source_count: int = len(SOURCE_NAMES)) -> str:
     """정규화 점수를 0~100 지수로 환산. 수집에 성공한 서점 모두 1위면 100.
 
-    항상 4로 나누면 서점 하나가 실패한 주에 지수 상한이 75로 묶여, 설명과 어긋나고
+    항상 서점 수 전체로 나누면 서점 하나가 실패한 주에 지수 상한이 낮게 묶여, 설명과 어긋나고
     주 간 비교도 깨진다. 실제로 수집된 서점 수로 나눠 기준을 맞춘다.
     """
     return str(round(book["score"] / max(1, source_count) * 100))
@@ -906,8 +820,8 @@ def build_markdown(
     ]
 
     overall_table = "\n".join([
-        "| 순위 | 변동 | 책 | 저자 | 출판사 | 장르 | 알라딘 | 교보문고 | YES24 | 리디 |",
-        "|:----:|:----:|-----|------|--------|------|:------:|:-------:|:-----:|:----:|",
+        "| 순위 | 변동 | 책 | 저자 | 출판사 | 장르 | 교보문고 | YES24 | 리디 |",
+        "|:----:|:----:|-----|------|--------|------|:-------:|:-----:|:----:|",
         *rows,
     ])
 
@@ -922,8 +836,8 @@ def build_markdown(
             for b in books
         ]
         genre_table = "\n".join([
-            "| 순위 | 책 | 저자 | 출판사 | 알라딘 | 교보문고 | YES24 | 리디 |",
-            "|:----:|-----|------|--------|:------:|:-------:|:-----:|:----:|",
+            "| 순위 | 책 | 저자 | 출판사 | 교보문고 | YES24 | 리디 |",
+            "|:----:|-----|------|--------|:-------:|:-----:|:----:|",
             *genre_rows,
         ])
         genre_sections += f"\n### {genre['name']}\n\n{genre_table}\n"
@@ -931,7 +845,7 @@ def build_markdown(
     return f"""---
 title: "일반 도서 베스트셀러 ({date_kr})"
 date: {date_str}
-description: "알라딘·교보문고·YES24·리디 베스트셀러를 종합한 TOP {len(charted)}와 장르별 베스트셀러입니다."
+description: "교보문고·YES24·리디 베스트셀러를 종합한 TOP {len(charted)}와 장르별 베스트셀러입니다."
 category: "bestseller"
 isHidden: true
 ---
@@ -942,8 +856,8 @@ isHidden: true
 {missing_note}
 **순위**는 서점별 순위를 그 서점의 수집 범위 기준으로 0~100 환산해 합산한 점수로 정합니다.
 집계에 쓰인 {source_count}개 서점에서 모두 1위면 만점이고, 순위에 없는 서점은 0점입니다.
-서점마다 확인 가능한 순위 깊이가 달라(알라딘·교보문고·YES24 20위, 리디 {RIDI_OVERALL_MAX}위)
-순위를 그대로 더하지 않습니다. **출판사**는 알라딘 정보 기준이며, 알라딘에 없는 책은 `-`입니다.
+서점마다 확인 가능한 순위 깊이가 달라(교보문고·YES24 20위, 리디 {RIDI_OVERALL_MAX}위)
+순위를 그대로 더하지 않습니다. **출판사**는 교보문고·YES24 정보 기준이며, 두 곳에 없는 책은 `-`입니다.
 **변동**은 지난주 종합 순위와 비교한 값입니다(NEW: 새로 들어온 책).
 
 {summary_markdown(charted)}
@@ -953,13 +867,13 @@ isHidden: true
 
 ## 장르별 베스트셀러
 
-알라딘·리디는 **해당 장르 베스트셀러 순위**, 교보문고·YES24는 장르별 목록을 제공하지 않아
+리디는 **해당 장르 베스트셀러 순위**, 교보문고·YES24는 장르별 목록을 제공하지 않아
 **전체 순위**를 그대로 씁니다(그래서 두 서점은 상위 20위에 든 책만 표시됩니다).
 {genre_sections}
 
 ---
 
-*데이터 출처: [알라딘](https://www.aladin.co.kr) · [교보문고](https://store.kyobobook.co.kr) · [YES24](https://www.yes24.com) · [리디](https://ridibooks.com)*
+*데이터 출처: [교보문고](https://store.kyobobook.co.kr) · [YES24](https://www.yes24.com) · [리디](https://ridibooks.com)*
 *매주 자동으로 수집되는 베스트셀러 리포트입니다.*
 """
 
@@ -976,7 +890,7 @@ def write_debug_dump(raw_sources: dict, merged: list[dict]) -> pathlib.Path:
         "date": DATE,
         "sources": raw_sources,
         "merged": [
-            {k: v for k, v in book.items() if k not in ("raw_keys", "cover")}
+            {k: v for k, v in book.items() if k != "raw_keys"}
             | {"index": round(book["score"] / len(SOURCE_NAMES) * 100)}
             for book in merged
         ],
@@ -1000,74 +914,60 @@ def main():
 
     client = genai.Client(api_key=GEMINI_API_KEY)
 
-    # 알라딘 — API (requests)
-    print("  📚 알라딘 전체 베스트셀러 수집...")
-    aladin_overall = fetch_aladin_overall(20)
-    print(f"     → {len(aladin_overall)}개")
+    # 리디 — curl_cffi. 교보·YES24 목록 검증 기준으로 쓰므로 먼저 받는다.
+    print("  📱 리디 전체 수집...")
+    ridi_overall = fetch_ridi_overall()
 
-    aladin_by_genre: dict[str, list[dict]] = {}
-    for genre in GENRES:
-        print(f"  📚 알라딘 [{genre['name']}] 수집...")
-        aladin_by_genre[genre["key"]] = fetch_aladin_genre(genre, limit=10)
+    print("  📱 리디 장르별 수집...")
+    ridi_by_genre = fetch_ridi_by_genre(limit=10)
+    print(f"     → 장르별 {sum(len(v) for v in ridi_by_genre.values())}개 ({len(ridi_by_genre)}장르)")
 
-    # 교보문고 · YES24 · 리디 — Playwright (브라우저 1개 공유)
+    # 교보문고 · YES24 — Playwright (브라우저 1개 공유)
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         ctx = browser.new_context(locale="ko-KR")
         pw_page = ctx.new_page()
 
-        # 알라딘은 공식 API라 가장 믿을 만하다. 스크레이핑 결과가 이것과 전혀
-        # 겹치지 않으면 순위 목록이 아닌 배열을 잡은 것으로 보고 버린다.
-        reference_keys = {_title_key(b["title"]) for b in aladin_overall}
+        # 스크레이핑 결과가 다른 서점 목록과 거의 겹치지 않으면 순위 목록이 아닌 배열을 잡은 것으로 보고 버린다.
+        reference_keys = {_title_key(b["title"]) for items in [ridi_overall, *ridi_by_genre.values()] for b in items}
 
         print("  🏪 교보문고 수집...")
         kyobo_items = fetch_kyobo(pw_page, client, reference_keys, 20)
         print(f"     → {len(kyobo_items)}개")
 
         print("  🛒 YES24 수집...")
+        reference_keys |= {_title_key(b["title"]) for b in kyobo_items}
         yes24_items = fetch_yes24(pw_page, client, reference_keys, 20)
         print(f"     → {len(yes24_items)}개")
 
-        print("  📱 리디 전체 수집...")
-        ridi_overall = fetch_ridi_overall()
-
-        print("  📱 리디 장르별 수집...")
-        ridi_by_genre = fetch_ridi_by_genre(limit=10)
-        print(f"     → 장르별 {sum(len(v) for v in ridi_by_genre.values())}개 ({len(ridi_by_genre)}장르)")
-
         browser.close()
 
-    # 장르별 수집에서 확인된 장르(알라딘 CID·리디 카테고리 기준)를 장르 판정의 기준으로 삼는다.
-    # 교보·YES24는 카테고리 문자열 키워드 추측이라 여기서 확인되면 덮어쓴다.
+    # 분야별 목록에서 확인된 장르(리디 카테고리 → YES24 분야 순)를 장르 판정의 기준으로 삼는다.
+    # 교보·YES24 전체 순위는 제목 키워드 추측이라 여기서 확인되면 덮어쓴다.
+    print("  📂 YES24 분야별 목록 수집(장르 판정용)...")
     genre_lookup: dict[str, str] = {}
-    for items in list(aladin_by_genre.values()) + list(ridi_by_genre.values()):
+    for items in ridi_by_genre.values():
         for b in items:
             genre_lookup.setdefault(_title_key(b["title"]), b["genre_key"])
+    for key, genre_key in fetch_yes24_genre_lookup().items():
+        genre_lookup.setdefault(key, genre_key)
+    print(f"     → 장르 확인 {len(genre_lookup)}권")
     for b in kyobo_items + yes24_items:
         resolved = genre_lookup.get(_title_key(b["title"]))
         if resolved:
             b["genre_key"] = resolved
 
-    # 출판사는 알라딘 항목에만 있다. 종합 순위 병합에는 알라딘 전체 목록만 들어가므로
-    # 장르별에서만 확인된 출판사를 잃지 않도록 별도 조회표로 넘긴다.
-    publisher_lookup: dict[str, str] = {}
-    for items in [aladin_overall] + list(aladin_by_genre.values()):
-        for b in items:
-            if b.get("publisher"):
-                publisher_lookup.setdefault(_title_key(b["title"]), b["publisher"])
-
     # 종합 순위 — 리디는 전체 순위만 넣는다.
     # 장르별 순위(장르마다 1위 존재)를 섞으면 만점이 중복 발생해 종합 순위가 왜곡된다.
     print("\n  🔢 종합 순위 계산...")
-    all_items = aladin_overall + kyobo_items + yes24_items + ridi_overall
-    overall = merge_rankings(all_items, genre_lookup=genre_lookup, publisher_lookup=publisher_lookup)
+    all_items = kyobo_items + yes24_items + ridi_overall
+    overall = merge_rankings(all_items, genre_lookup=genre_lookup)
     charted, dropped = take_charted(overall, TOP_N_OVERALL)
     # 지수 기준을 실제 수집된 서점 수에 맞춘다. 실패한 서점을 분모에 넣으면
     # 지수 상한이 100에 못 미쳐 설명과 어긋나고 주 간 비교도 깨진다.
     collected_sources = tuple(
         name for name, items in (
-            ("알라딘", aladin_overall), ("교보문고", kyobo_items),
-            ("YES24", yes24_items), ("리디", ridi_overall),
+            ("교보문고", kyobo_items), ("YES24", yes24_items), ("리디", ridi_overall),
         ) if items
     )
     print(f"     → 병합 {len(overall)}권 중 상위 {len(charted)}권 게시")
@@ -1082,29 +982,15 @@ def main():
     for genre in GENRES:
         key = genre["key"]
         combined = (
-            aladin_by_genre.get(key, []) +
             [b for b in kyobo_items if b["genre_key"] == key] +
             [b for b in yes24_items if b["genre_key"] == key] +
             ridi_by_genre.get(key, [])
         )
         if combined:
             genre_data[key], _ = take_charted(
-                merge_rankings(combined, publisher_lookup=publisher_lookup), TOP_N_GENRE
+                merge_rankings(combined), TOP_N_GENRE
             )
             print(f"     [{genre['name']}] {len(genre_data[key])}개")
-
-    # 타 서점 단독 진입 도서는 알라딘 목록에 없어 출판사가 비어 있다. 책에서 출판사는
-    # 저자만큼 중요한 정보라 게시되는 책에 한해 제목 검색으로 채운다(주당 수 건).
-    print("\n  🏷  출판사 미확보 도서 보강...")
-    searched: dict[str, str] = {}
-    for book in charted + [b for books in genre_data.values() for b in books]:
-        if book["publisher"]:
-            continue
-        key = _title_key(book["title"])
-        if key not in searched:
-            searched[key] = fetch_aladin_publisher(book["title"], book["author"])
-            print(f"     {book['title'][:30]} → {searched[key] or '미확보'}")
-        book["publisher"] = searched[key]
 
     # 지난 주들의 덤프와 비교해 변동·연속 순위권을 붙인다(첫 주처럼 기록이 없으면 '-')
     annotate_trends(charted, load_previous_rankings(DEBUG_DUMP_DIR, DATE, _title_key), _title_key)
@@ -1121,8 +1007,6 @@ def main():
     try:
         dump_path = write_debug_dump(
             {
-                "aladin_overall": aladin_overall,
-                "aladin_by_genre": aladin_by_genre,
                 "kyobo": kyobo_items,
                 "yes24": yes24_items,
                 "ridi_overall": ridi_overall,
