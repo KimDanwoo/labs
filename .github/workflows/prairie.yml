@@ -1,0 +1,37 @@
+name: Prairie
+
+# prairie(Unicorn Rush)나 그것이 쓰는 공유 패키지가 바뀐 PR에서만 배포 빌드를 확인한다.
+# e2e는 GPU 없는 러너가 실제 WebGL 화면을 그리지 못해 돌리지 않는다.
+on:
+  pull_request:
+    paths:
+      - 'apps/prairie/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/prairie.yml'
+
+concurrency:
+  group: prairie-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm turbo run build --filter=prairie # 의존 패키지(토큰)까지 빌드한다

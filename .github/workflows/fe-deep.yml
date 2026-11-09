@@ -1,0 +1,44 @@
+name: FE Deep
+
+# fe-deep이나 그것이 쓰는 공유 패키지가 바뀐 PR에서만 데이터 오류·재시도 흐름 e2e를 돌린다.
+# 빌드는 하지 않는다(빌드 시점에 DB 시크릿이 필요하다). e2e는 자체 dev 서버로 돈다.
+on:
+  pull_request:
+    paths:
+      - 'apps/fe-deep/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/fe-deep.yml'
+
+concurrency:
+  group: fe-deep-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # 앱이 쓰는 theme.css는 커밋하지 않는 생성 파일이라 먼저 만든다.
+      - name: Build design tokens
+        run: pnpm turbo run build --filter=@tokens/css
+
+      - name: Install browser
+        run: pnpm --filter fe-deep exec playwright install --with-deps chromium
+
+      - name: Verify data error and retry flows
+        run: pnpm --filter fe-deep test:e2e
