@@ -3,8 +3,12 @@
  * - 제목(h2~h4)에 id와 앵커 링크를 단다. 앵커 글자는 CSS로 그려 목차 텍스트에 섞이지 않게 한다.
  * - 표를 키보드로도 가로 스크롤할 수 있는 영역으로 감싼다.
  * - 외부 링크는 새 탭으로 연다(블로그 안 링크는 같은 탭에서 페이지 전환으로 이동한다).
+ * - 본문 이미지에 반응형 크기를 단다. Astro 이미지 마커보다 먼저 돌아서 이 속성이 getImage()로 넘어간다.
  * Astro의 heading-ids 플러그인은 이미 있는 id를 그대로 쓰므로 목차와 앵커가 같은 id를 공유한다.
  */
+// 본문 폭(42rem)의 1x·1.5x·2x — 모바일이 1536px 원본을 받지 않게 한다. 원본보다 큰 폭은 Astro가 건너뛴다
+const ARTICLE_IMAGE_WIDTHS = [640, 960, 1344];
+const ARTICLE_IMAGE_SIZES = '(min-width: 42rem) 42rem, 100vw';
 const HEADINGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 const ANCHOR_HEADINGS = new Set(['h2', 'h3', 'h4']);
 const FALLBACK_SLUG = 'section';
@@ -36,8 +40,13 @@ export function articleHastPlugin() {
   return {
     name: 'dansoon-article',
     element: {
-      filter: [...HEADINGS, 'table', 'a'],
+      filter: [...HEADINGS, 'table', 'a', 'img'],
       visit(node, ctx) {
+        if (node.tagName === 'img') {
+          ctx.setProperty(node, 'widths', ARTICLE_IMAGE_WIDTHS);
+          ctx.setProperty(node, 'sizes', ARTICLE_IMAGE_SIZES);
+          return;
+        }
         if (node.tagName === 'a') {
           if (!EXTERNAL_LINK.test(String(node.properties?.href ?? ''))) return;
           ctx.setProperty(node, 'target', '_blank');
