@@ -37,7 +37,7 @@ public/projects/      # 프로젝트 카드 커버 이미지
 
 ## 프로젝트 목록 추가
 
-`src/entities/project/model/constants/index.ts` 의 `PROJECTS` 배열에 항목을 추가한다.
+`src/entities/project/model/constants/projects.ts` 의 `PROJECTS` 배열에 항목을 추가한다.
 
 ```ts
 {

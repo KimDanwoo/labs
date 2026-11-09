@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import {
-  glyphsAt,
-  planDuration,
-  planScramble,
-  toGlyphs,
-  type ScrambleGlyph,
-} from '@widgets/profile-header/lib/scramble';
+import { type ScrambleGlyph, glyphsAt, planDuration, planScramble, toGlyphs } from '../lib/scramble';
 
 /** 헤드라인 단어 등장이 끝난 뒤 첫 전환을 시작한다. */
 const FIRST_HOLD_MS = 1900;

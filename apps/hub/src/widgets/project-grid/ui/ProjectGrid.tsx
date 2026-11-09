@@ -1,5 +1,4 @@
-import { PROJECTS } from '@entities/project/model/constants';
-import { ProjectCard } from '@entities/project/ui';
+import { ProjectCard, PROJECTS } from '@entities/project';
 
 import { SpotlightGrid } from './SpotlightGrid';
 

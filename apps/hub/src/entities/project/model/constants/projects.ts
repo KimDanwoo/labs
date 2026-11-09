@@ -1,4 +1,4 @@
-import type { Project } from '@entities/project/model/types';
+import type { Project } from '../types/project';
 
 /** 소개할 내 프로젝트(Labs) 목록. 새 프로젝트는 여기에 추가한다. */
 export const PROJECTS: Project[] = [

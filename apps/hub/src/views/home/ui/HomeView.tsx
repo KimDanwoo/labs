@@ -1,7 +1,7 @@
-import { LabFooter } from '@widgets/lab-footer/ui';
-import { ProfileHeader } from '@widgets/profile-header/ui';
-import { ProjectGrid } from '@widgets/project-grid/ui';
-import { SiteHeader } from '@widgets/site-header/ui';
+import { LabFooter } from '@widgets/lab-footer';
+import { ProfileHeader } from '@widgets/profile-header';
+import { ProjectGrid } from '@widgets/project-grid';
+import { SiteHeader } from '@widgets/site-header';
 
 export function HomeView() {
   return (

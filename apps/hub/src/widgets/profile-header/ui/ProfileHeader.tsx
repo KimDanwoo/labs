@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 
-import { HEADLINE_KEYWORDS, PROFILE_PARAGRAPHS } from '@widgets/profile-header/model/constants';
-import { isProfileLink } from '@widgets/profile-header/model/types';
+import { HEADLINE_KEYWORDS, PROFILE_PARAGRAPHS } from '../model/constants/profileContent';
+import { isProfileLink } from '../model/types/profile';
 
 import { RevealWord } from './RevealWord';
 import { ScrambleKeyword } from './ScrambleKeyword';
