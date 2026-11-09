@@ -72,7 +72,7 @@ pnpm --filter komorebi build
 pnpm --filter komorebi test:e2e   # 브라우저 테스트 — build 후, 설치된 Chrome 사용
 ```
 
-스타일 변경 전후 화면 비교: `SHOT_DIR=<폴더> pnpm --filter komorebi test:e2e e2e/visual.spec.ts`로 동작 줄이기 상태의 고정 화면 6장을 저장해 비교합니다. 색은 `src/app/globals.css`의 `:root` 팔레트(RGB 채널)를 `rgb(var(--이름) / 알파)`로만 씁니다.
+스타일 변경 전후 화면 비교: `SHOT_DIR=<폴더> pnpm --filter komorebi test:e2e e2e/visual.spec.ts`로 동작 줄이기 상태의 고정 화면 6장을 저장해 비교합니다. 색은 `src/_app/globals.css`의 `:root` 팔레트(RGB 채널)를 `rgb(var(--이름) / 알파)`로만 씁니다.
 
 `output: 'export'`를 사용하므로 빌드 결과인 `apps/komorebi/out/`을 정적 호스팅에 올릴 수 있습니다.
 
@@ -84,8 +84,8 @@ node apps/komorebi/e2e/serve.mjs apps/komorebi/out 3011
 
 ## 구조와 표현 방식
 
-- `app/`: Next 라우팅 진입점(layout·page·icon). 화면은 `src/views/walk`(공개 API `@views/walk`)에 위임
-- `src/app/globals.css`: 게임 HUD 스타일
+- `app/`: Next 라우팅 진입점(layout·page·icon). 화면은 `src/_pages/walk`(공개 API `@pages/walk`)에 위임
+- `src/_app/globals.css`: 게임 HUD 스타일
 - `src/features/walk/ui`: HUD·지도·그림일기·추억·터치 조작 컴포넌트(`Walk`가 합성)
 - `src/features/walk/model`: 엔진 수명주기·발견 기록·소리·단축키 훅, localStorage 저장소, 상수·타입
 - `src/features/walk/lib/scene.ts`: 배경화 평면과 방향별 캐릭터 합성, 카메라, 이동, 지역 전환, 일시정지·렌더 예산
