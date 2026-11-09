@@ -3,6 +3,9 @@ import path from 'node:path';
 const LAYERS = ['app', 'views', 'widgets', 'features', 'entities', 'shared'];
 const SLICED_LAYERS = new Set(['views', 'widgets', 'features', 'entities']);
 const MODEL_SEGMENTS = new Set(['hooks', 'types', 'constants', 'store', 'services', 'server', 'actions', '__tests__']);
+const SLICE_SEGMENTS = ['ui', 'model', 'lib', 'api', 'config'];
+const PUBLIC_ENTRY = /^index(?:\.server)?(?:\.tsx?)?$/;
+const TEST_FILE = /__tests__|\.(?:test|spec)\.[cm]?[jt]sx?$/;
 const ROUTE_FILE =
   /^(page|layout|route|error|loading|not-found|global-error|template|default|sitemap|robots|manifest)$/;
 
@@ -11,13 +14,23 @@ function location(filename) {
   return match ? { root: match[1], layer: match[2], rest: match[3], slice: match[3].split('/')[0] } : null;
 }
 
-function moduleLocation(filename, source) {
-  const own = location(filename);
-  if (!own) return null;
+function moduleLocation(filename, source, appRoot = location(filename)?.root) {
+  if (!appRoot) return null;
   if (source.startsWith('.')) return location(path.posix.resolve(path.posix.dirname(filename), source));
   if (/^@(app|views|widgets|features|entities|shared)\//.test(source))
-    return location(path.posix.normalize(`${own.root}/src/${source.slice(1)}`));
+    return location(path.posix.normalize(`${appRoot}/src/${source.slice(1)}`));
   return null;
+}
+
+function onModuleSources(check) {
+  return {
+    ImportDeclaration: (node) => check(node.source, node.source.value),
+    ExportNamedDeclaration: (node) => {
+      if (node.source) check(node.source, node.source.value);
+    },
+    ExportAllDeclaration: (node) => check(node.source, node.source.value),
+    ImportExpression: (node) => check(node.source, node.source.value),
+  };
 }
 
 const structure = {
@@ -28,11 +41,12 @@ const structure = {
         const own = location(context.filename);
         if (!own || !SLICED_LAYERS.has(own.layer)) return;
         const parts = own.rest.split('/').slice(1);
-        if (parts.length === 1 && own.layer === 'views' && /^[A-Z]\w*View\.tsx$/.test(parts[0])) return;
-        if (!['ui', 'model', 'lib'].includes(parts[0])) {
+        if (parts.length === 1 && PUBLIC_ENTRY.test(parts[0])) return;
+        if (!SLICE_SEGMENTS.includes(parts[0])) {
           context.report({
             node,
-            message: '슬라이스는 ui/, model/, lib/로 나눈다. 메인 *View.tsx만 views 슬라이스 루트에 둔다.',
+            message:
+              '슬라이스 루트에는 공개 API(index.ts, index.server.ts)만 두고, 코드는 ui/, model/, lib/, api/, config/에 둔다.',
           });
         } else if (parts[0] === 'model' && (parts.length < 3 || !MODEL_SEGMENTS.has(parts[1]))) {
           context.report({
@@ -62,14 +76,37 @@ const dependencies = {
         });
       }
     }
-    return {
-      ImportDeclaration: (node) => check(node.source, node.source.value),
-      ExportNamedDeclaration: (node) => {
-        if (node.source) check(node.source, node.source.value);
-      },
-      ExportAllDeclaration: (node) => check(node.source, node.source.value),
-      ImportExpression: (node) => check(node.source, node.source.value),
-    };
+    return onModuleSources(check);
+  },
+};
+
+const publicApi = {
+  meta: { type: 'problem', schema: [] },
+  create(context) {
+    const filename = context.filename.replaceAll('\\', '/');
+    if (TEST_FILE.test(filename)) return {};
+    const from = location(filename);
+    const appRoot = from?.root ?? context.cwd.replaceAll('\\', '/');
+    function check(node, source) {
+      if (typeof source !== 'string') return;
+      const to = moduleLocation(filename, source, appRoot);
+      if (!to || !SLICED_LAYERS.has(to.layer)) return;
+      const inner = to.rest.split('/').slice(1);
+      const isEntry = inner.length === 0 || (inner.length === 1 && PUBLIC_ENTRY.test(inner[0]));
+      const sameSlice = from?.layer === to.layer && from.slice === to.slice;
+      if (sameSlice && isEntry) {
+        context.report({
+          node,
+          message: '자기 슬라이스의 공개 API를 import하지 않는다. 구현 파일을 상대경로로 가져온다.',
+        });
+      } else if (!sameSlice && !isEntry) {
+        context.report({
+          node,
+          message: `${to.layer}/${to.slice}의 내부 파일 대신 공개 API(@${to.layer}/${to.slice})를 import한다.`,
+        });
+      }
+    }
+    return onModuleSources(check);
   },
 };
 
@@ -82,10 +119,10 @@ const componentFile = {
     const basename = path.basename(context.filename, '.tsx');
     function check(node, name) {
       if (!name || !/^[A-Z]/.test(name)) return;
-      if (!own.rest.includes('/ui/') && !(own.layer === 'views' && basename.endsWith('View'))) {
+      if (!own.rest.includes('/ui/')) {
         context.report({
           node,
-          message: '컴포넌트는 ui/ 또는 메인 *View.tsx에 둔다. 훅 파일에 Provider를 함께 선언하지 않는다.',
+          message: '컴포넌트는 ui/에 둔다. 훅 파일에 Provider를 함께 선언하지 않는다.',
         });
       } else if (name !== basename) {
         context.report({ node, message: `컴포넌트 ${name}은 ${name}.tsx로 분리한다.` });
@@ -150,9 +187,12 @@ const entityState = {
           own &&
           node.callee.type === 'Identifier' &&
           /^atom(?:With\w+|Family)?$/.test(node.callee.name) &&
-          (own.layer !== 'entities' || !own.rest.includes('/model/store/'))
+          (!SLICED_LAYERS.has(own.layer) || !own.rest.includes('/model/store/'))
         ) {
-          context.report({ node, message: '전역 atom은 entities/<domain>/model/store/에서 정의한다.' });
+          context.report({
+            node,
+            message: '전역 atom은 쓰는 슬라이스의 model/store/에서 정의한다. 여러 슬라이스가 쓰면 entities로 내린다.',
+          });
         }
       },
     };
@@ -163,6 +203,7 @@ export default {
   rules: {
     'slice-structure': structure,
     'independent-slices': dependencies,
+    'public-api': publicApi,
     'component-file': componentFile,
     'routing-location': routingLocation,
     'entity-state': entityState,

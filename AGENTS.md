@@ -69,31 +69,35 @@ scripts/new-app.mjs   # 새 앱 생성기
 
 **순수 계산·그래픽 코드**: `lib/`는 알고리즘·그래픽 구현을 둔다. React 컴포넌트·훅·전역 atom 정의를 lib에 숨기지 않는다.
 
-**서버 경계**: 파일시스템·서버 전용 데이터 로딩은 `model/server/`, Server Action은 `model/actions/`에 둔다. 클라이언트가 쓰는 `model/services/`·`ui/` barrel에서 서버 전용 모듈을 재수출하지 않는다.
+**서버 경계**: 파일시스템·서버 전용 데이터 로딩은 `model/server/`, Server Action은 `model/actions/`에 둔다. 서버 전용 모듈은 슬라이스의 `index.server.ts`로만 공개하고 `index.ts`에서 재수출하지 않는다. 클라이언트가 호출하는 Server Action(`'use server'`)은 `index.ts`로 공개해도 된다.
 
-**slice 구조**: 메인 뷰 파일은 slice 루트에, 나머지는 `ui/` / `model/{hooks,types,constants,store,services,server,actions}`로 분리.
+**slice 구조**: 슬라이스 루트에는 공개 API(`index.ts`, 필요하면 `index.server.ts`)만 둔다. 코드는 `ui/` / `model/{hooks,types,constants,store,services,server,actions}` / `lib/`에 둔다(공식 세그먼트 `api/`·`config/`도 허용). 메인 뷰도 `ui/`에 둔다.
 
 ```
 apps/<app>/
   app/                       # Next 라우팅 진입점(src 밖): layout/page/route + 메타데이터 파일. 얇게.
   src/
     app/                     # FSD app 레이어(라우팅 아님): providers/, globals.css 등 전역 setup
-    views/home/HomeView.tsx  # 메인 뷰: 위젯 합성
-    widgets/project-grid/ui/ # 위젯: 화면 블록
+    views/home/
+      index.ts               # 공개 API: 밖에서 쓰는 것만 명시적으로 재수출
+      ui/HomeView.tsx        # 메인 뷰: 위젯 합성
+    widgets/project-grid/    # 위젯: 화면 블록(index.ts + ui/)
     entities/project/
-      model/types/           # 도메인 타입
-      model/constants/       # 도메인 데이터/상수
-      ui/                    # 도메인 표시 컴포넌트(ProjectCard)
+      index.ts
+      model/types/project.ts       # 도메인 타입
+      model/constants/projects.ts  # 도메인 데이터/상수
+      ui/ProjectCard.tsx           # 도메인 표시 컴포넌트
 ```
 
-**컴포넌트 인라인 선언 금지**: 모든 앱의 뷰·위젯·기능·엔티티 파일은 컴포넌트당 파일 하나를 사용한다. 컴포넌트 이름과 파일명을 일치시킨다. 모든 컴포넌트는 해당 slice의 `ui/` 하위 파일로 분리 후 `ui/index.ts`에서 export.
+**컴포넌트 인라인 선언 금지**: 모든 앱의 뷰·위젯·기능·엔티티 파일은 컴포넌트당 파일 하나를 사용한다. 컴포넌트 이름과 파일명을 일치시킨다. 모든 컴포넌트는 해당 slice의 `ui/` 하위 파일로 분리한다. 슬라이스 밖에서 쓰는 컴포넌트만 슬라이스 루트 `index.ts`에서 재수출한다.
 
-**Import 세그먼트 규칙** (`fsd.config.mjs`의 `no-restricted-imports`로 **lint 강제**): import 경로에 `ui`인지 `model`인지가 항상 드러나야 한다. 세그먼트보다 깊이 파고들지 않는다 — `ui`는 `ui`까지, `model` 하위는 `model/<세그먼트>`까지. **slice 루트(`@widgets/x`, `@entities/x`) 직접 import 금지.** (`@shared/**`와 테스트 파일은 대상 아님)
+**공개 API 규칙** (`fsd.config.mjs`의 `fsd/public-api`로 **lint 강제**, 루트 `app/`의 라우팅 파일도 대상): 공식 FSD의 Public API 방식을 따른다.
 
-- ui 컴포넌트: `from '@widgets/project-grid/ui'`, `from '@entities/project/ui'`, `from '@ui/react'`
-- 메인 뷰(폴더 루트 파일): 파일명까지 — `from '@views/home/HomeView'`
-- model 하위: `model/types`, `model/constants`, `model/store`, `model/hooks`까지 명시
-- slice 루트 통합 `index.ts`는 만들지 않는다(통합 barrel이 없어야 슬라이스 루트 import가 컴파일 에러로 막힌다).
+- 슬라이스 **밖**에서는 공개 API만 import한다: `from '@entities/project'`, 서버 전용은 `from '@views/study/index.server'`. 내부 파일(`@entities/project/ui/...`)을 직접 가져오지 않는다.
+- 슬라이스 **안**에서는 구현 파일을 상대경로로 가져온다(`../model/types/project`). 자기 슬라이스의 공개 API를 import하지 않는다(순환 참조 방지).
+- `index.ts`는 밖에서 실제로 쓰는 것만 명시적으로 재수출한다. `export *` 금지, 타입은 `export type { ... }`.
+- 세그먼트 안에는 `index.ts`(배럴)를 두지 않는다. `shared`는 슬라이스가 없으므로 기존 세그먼트 배럴을 유지한다.
+- 테스트(`__tests__`, `*.test.*`, `*.spec.*`)는 대상 내부 파일을 직접 import할 수 있다.
 
 **Import 순서**: `prettier-plugin-organize-imports`가 저장/포맷 시 자동 정렬한다(수동 정렬 불필요, alphabetical). 큰 흐름은 내장 모듈 → 외부 패키지 → 절대경로(`@ui`/`@tokens`/`@app`…`@shared`) → 상대경로 → type import.
 
@@ -105,7 +109,7 @@ apps/<app>/
 
 ## 상태 관리 (도입 시)
 
-**상태가 필요해지면**: 비동기=React Query · 로컬=useState/useReducer · 전역=꼭 필요할 때만 Jotai. 전역 atom은 `entities/<domain>/model/store/`에 두고 컴포넌트가 직접 구독한다. dispatch/setState 콜백을 prop으로 내려보내지 않는다(prop drilling 금지).
+**상태가 필요해지면**: 비동기=React Query · 로컬=useState/useReducer · 전역=꼭 필요할 때만 Jotai. 전역 atom은 쓰는 슬라이스의 `model/store/`에 두고, 여러 슬라이스가 쓰게 되면 `entities/<domain>/model/store/`로 내린다. 컴포넌트가 직접 구독한다. dispatch/setState 콜백을 prop으로 내려보내지 않는다(prop drilling 금지).
 
 ## 코드 컨벤션
 
@@ -160,7 +164,7 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 
 - 이 파일이 Codex·Claude 등 모든 코딩 에이전트의 공통 규칙이다. 도구별 문서에 다른 아키텍처를 중복 정의하지 않는다.
 - `pnpm check:architecture`는 전체 워크스페이스와 새 앱 템플릿의 catalog·경로 별칭·공유 설정·TypeScript 엄격 옵션·`any`·구조 규칙 우회·동적 import를 포함한 순환 참조·서버/클라이언트 경계를 검사한다. `pnpm lint`에서 자동 실행된다.
-- 공유 ESLint는 레이어 역참조, 슬라이스 교차 참조, model 세그먼트, 컴포넌트 파일, 라우팅 위치, 전역 atom 위치를 검사한다. 공유 규칙 자체에도 회귀 테스트가 있다.
+- 공유 ESLint는 레이어 역참조, 슬라이스 교차 참조, 공개 API 경유, 슬라이스 구조, 컴포넌트 파일, 라우팅 위치, 전역 atom 위치를 검사한다. 공유 규칙 자체에도 회귀 테스트가 있다.
 - Server Action의 권한 검사는 화면·미들웨어와 독립적으로 수행한다. 관리자 DB 클라이언트 생성 전에 인증과 관리자 권한을 확인한다.
 - `'use client'`·`'use server'`는 모듈 맨 앞의 지시문이어야 한다. import를 그 앞에 추가하지 않는다.
 - 파일 이동 후 상대 경로·공개 export·Web Worker URL·라우트 타입·테스트 경로를 함께 확인한다.

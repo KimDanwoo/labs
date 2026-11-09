@@ -20,10 +20,42 @@ function check(rule, code, filename = 'src/features/first/ui/First.tsx') {
 }
 
 test('same-slice imports work; sibling slices and upward dependencies fail', () => {
-  assert.equal(check('independent-slices', "import { state } from '@features/first/model/store';").length, 0);
-  assert.equal(check('independent-slices', "import { state } from '@entities/game/model/store';").length, 0);
-  assert.equal(check('independent-slices', "import { state } from '@features/second/model/store';").length, 1);
-  assert.equal(check('independent-slices', "import { state } from '@widgets/game/ui';").length, 1);
+  assert.equal(check('independent-slices', "import { state } from '../model/store/first';").length, 0);
+  assert.equal(check('independent-slices', "import { state } from '@entities/game';").length, 0);
+  assert.equal(check('independent-slices', "import { state } from '@features/second';").length, 1);
+  assert.equal(check('independent-slices', "import { state } from '@widgets/game';").length, 1);
+});
+
+test('other slices are reached only through their public API', () => {
+  assert.equal(check('public-api', "import { Game } from '@entities/game';").length, 0);
+  assert.equal(check('public-api', "import { loadGame } from '@entities/game/index.server';").length, 0);
+  for (const code of [
+    "import { Game } from '@entities/game/ui';",
+    "import { state } from '@entities/game/model/store/game';",
+    "import { Game } from '../../../entities/game/ui/Game';",
+    "export { Game } from '@entities/game/ui/Game';",
+    "const game = import('@entities/game/ui/Game');",
+  ])
+    assert.equal(check('public-api', code).length, 1, code);
+});
+
+test('a slice does not import its own public API', () => {
+  assert.equal(check('public-api', "import { state } from '../model/store/first';").length, 0);
+  assert.equal(check('public-api', "import { First } from '@features/first';").length, 1);
+  assert.equal(check('public-api', "import { First } from '../index';").length, 1);
+});
+
+test('Next route files outside src also use public APIs; tests may reach internals', () => {
+  assert.equal(check('public-api', "import { HomeView } from '@views/home';", 'app/page.tsx').length, 0);
+  assert.equal(check('public-api', "import { HomeView } from '@views/home/ui/HomeView';", 'app/page.tsx').length, 1);
+  assert.equal(
+    check(
+      'public-api',
+      "import { state } from '@entities/game/model/store/game';",
+      'src/features/first/model/__tests__/x.test.ts',
+    ).length,
+    0,
+  );
 });
 
 test('relative, re-exported and dynamic imports cannot bypass layer boundaries', () => {
@@ -37,7 +69,11 @@ test('relative, re-exported and dynamic imports cannot bypass layer boundaries',
     assert.equal(check('independent-slices', code).length, 1, code);
 });
 
-test('model files must live inside an explicit segment', () => {
+test('slice roots hold only the public API; model files live inside an explicit segment', () => {
+  assert.equal(check('slice-structure', 'export {};', 'src/features/first/index.ts').length, 0);
+  assert.equal(check('slice-structure', 'export {};', 'src/features/first/index.server.ts').length, 0);
+  assert.equal(check('slice-structure', 'export const value = 1;', 'src/features/first/api/request.ts').length, 0);
+  assert.equal(check('slice-structure', 'export {};', 'src/views/home/HomeView.tsx').length, 1);
   assert.equal(check('slice-structure', 'export const value = 1;', 'src/features/first/model/types.ts').length, 1);
   assert.equal(
     check('slice-structure', 'export const value = 1;', 'src/features/first/model/types/index.ts').length,
@@ -68,7 +104,8 @@ test('Next routes cannot be placed in the FSD app layer', () => {
   );
 });
 
-test('global atoms belong to entity stores', () => {
+test('global atoms belong to a slice store', () => {
+  assert.equal(check('entity-state', 'const value = atom(0);', 'src/features/first/model/store/first.ts').length, 0);
   assert.equal(check('entity-state', 'const value = atom(0);').length, 1);
   assert.equal(
     check('entity-state', 'const value = atomWithStorage("key", 0);', 'src/entities/game/model/hooks/useGame.ts')

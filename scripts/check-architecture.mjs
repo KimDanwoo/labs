@@ -208,7 +208,7 @@ export function checkRepository(root = ROOT) {
       if (directive.expression.text === 'use client') clients.add(file);
       if (directive.expression.text === 'use server') actions.add(file);
     }
-    if (file.includes('/model/server/')) serverModules.add(file);
+    if (file.includes('/model/server/') || /\/index\.server\.tsx?$/.test(file)) serverModules.add(file);
     for (const node of ast.statements) {
       if (
         !(ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) ||
