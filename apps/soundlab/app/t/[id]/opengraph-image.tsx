@@ -1,5 +1,4 @@
-import { TRACKS } from '@entities/track/model/constants';
-import { artworkUrl } from '@entities/track/model/services';
+import { artworkUrl, TRACKS } from '@entities/track';
 import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';

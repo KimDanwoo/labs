@@ -1,4 +1,4 @@
-import { TRACKS } from '@entities/track/model/constants';
+import { TRACKS } from '@entities/track';
 import type { MetadataRoute } from 'next';
 
 const BASE_URL = 'https://sound.danwoo.dev';

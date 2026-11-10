@@ -1,7 +1,7 @@
 'use client';
 
-import { PlaybackContext } from '@entities/track/model/store';
 import { useContext } from 'react';
+import { PlaybackContext } from '../store/playbackContext';
 import type { Playback } from './usePlayback';
 
 export function usePlaybackControls(): Playback {
