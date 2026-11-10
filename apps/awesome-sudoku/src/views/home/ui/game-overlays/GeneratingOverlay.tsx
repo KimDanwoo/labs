@@ -1,8 +1,8 @@
 import { isGeneratingAtom } from '@entities/game';
 import { cn } from '@shared/lib/cn';
-import { SudokuLoader } from '@shared/ui/SudokuLoader';
 import { useAtomValue } from 'jotai';
 import type { FC } from 'react';
+import { SudokuLoader } from './SudokuLoader';
 
 /** 워커가 새 판을 만드는 동안 보드를 덮는다 — 이전 판을 건드리지 못하게 포인터도 막는다 */
 export const GeneratingOverlay: FC = () => {

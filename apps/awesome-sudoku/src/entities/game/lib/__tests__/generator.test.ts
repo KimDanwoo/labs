@@ -5,13 +5,13 @@ import {
   generateSolution,
   retryUntilGraded,
 } from '@entities/game/lib/generator';
+import { atIndex, cellAt } from '@entities/game/lib/gridAccess';
 import { countSolutions, gradePuzzle } from '@entities/game/lib/solver';
 import { isValidSolution } from '@entities/game/lib/validator';
 import { SUDOKU_CELL_COUNT } from '@entities/game/model/constants/board';
 import { CLASSIC_DIFFICULTY, GAME_LEVEL, KILLER_DIFFICULTY, TECHNIQUE } from '@entities/game/model/constants/game';
 import type { Grid, GridPosition, SudokuBoard } from '@entities/game/model/types/board';
 import type { Difficulty, KillerCage, Technique } from '@entities/game/model/types/game';
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, it } from 'vitest';
 
 const DIFFICULTIES = Object.values(GAME_LEVEL) as Difficulty[];

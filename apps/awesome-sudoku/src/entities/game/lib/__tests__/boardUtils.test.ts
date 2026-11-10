@@ -1,6 +1,6 @@
 import { deepCopyGrid } from '@entities/game/lib/boardUtils';
+import { atIndex, cellAt } from '@entities/game/lib/gridAccess';
 import type { Grid } from '@entities/game/model/types/board';
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, it } from 'vitest';
 
 describe('스도쿠 유틸리티 함수 테스트', () => {

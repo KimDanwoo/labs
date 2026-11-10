@@ -1,3 +1,4 @@
+import { atIndex, cellAt } from '@entities/game/lib/gridAccess';
 import { BOARD_SIZE } from '@entities/game/model/constants/board';
 import { GAME_MODE } from '@entities/game/model/constants/game';
 import {
@@ -14,7 +15,6 @@ import {
 } from '@entities/game/model/services/update';
 import type { SudokuBoard, SudokuCell } from '@entities/game/model/types/board';
 import type { KillerCage } from '@entities/game/model/types/game';
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, it } from 'vitest';
 
 describe('update.ts 유틸리티 함수 테스트', () => {

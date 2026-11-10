@@ -1,8 +1,8 @@
-import { cellAt } from '@shared/lib/gridAccess';
 import { BLOCKS_PER_ROW, BLOCK_SIZE, BOARD_SIZE } from '../model/constants/board';
 import type { Grid, SudokuBoard } from '../model/types/board';
 import type { KillerCage } from '../model/types/game';
 import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from './gameUtils';
+import { cellAt } from './gridAccess';
 
 /**
  * @description 완성 그리드가 스도쿠 규칙(행·열·블록에 1~9가 한 번씩)을 만족하는지 검사

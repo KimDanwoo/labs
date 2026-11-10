@@ -1,4 +1,4 @@
-import { cellAt } from '@shared/lib/gridAccess';
+import { cellAt } from '../../lib/gridAccess';
 import {
   checkConflicts,
   isBoardComplete,

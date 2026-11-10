@@ -1,3 +1,4 @@
+import { atIndex, cellAt } from '@entities/game/lib/gridAccess';
 import {
   checkConflicts,
   isBoardComplete,
@@ -9,7 +10,6 @@ import {
 import { BOARD_SIZE } from '@entities/game/model/constants/board';
 import type { Grid, GridPosition, SudokuBoard, SudokuCell } from '@entities/game/model/types/board';
 import type { KillerCage } from '@entities/game/model/types/game';
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('validator.ts 테스트', () => {

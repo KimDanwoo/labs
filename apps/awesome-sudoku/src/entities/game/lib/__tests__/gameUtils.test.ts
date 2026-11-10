@@ -1,7 +1,7 @@
 import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from '@entities/game/lib/gameUtils';
+import { atIndex, cellAt } from '@entities/game/lib/gridAccess';
 import { BLOCK_SIZE, BOARD_SIZE } from '@entities/game/model/constants/board';
 import type { Grid } from '@entities/game/model/types/board';
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, test } from 'vitest';
 
 // 테스트용 완전한 스도쿠 그리드 (해결된 상태) - 함수로 만들어 매번 새로운 인스턴스 생성

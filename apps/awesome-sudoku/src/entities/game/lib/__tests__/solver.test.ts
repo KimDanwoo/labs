@@ -1,4 +1,5 @@
 import { generateKillerCages } from '@entities/game/lib/generator';
+import { atIndex, cellAt } from '@entities/game/lib/gridAccess';
 import {
   countSolutions,
   generateRandomSolution,
@@ -10,7 +11,6 @@ import { isValidSolution } from '@entities/game/lib/validator';
 import { TECHNIQUE } from '@entities/game/model/constants/game';
 import type { Grid, GridPosition } from '@entities/game/model/types/board';
 import type { KillerCage } from '@entities/game/model/types/game';
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, it } from 'vitest';
 
 const parse = (rows: string[]): Grid => rows.map((row) => [...row].map((ch) => (ch === '.' ? 0 : Number(ch))));

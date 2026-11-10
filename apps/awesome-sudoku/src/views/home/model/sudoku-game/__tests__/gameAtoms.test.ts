@@ -1,3 +1,4 @@
+import { cellAt } from '@entities/game/lib/gridAccess';
 import {
   CLASSIC_DIFFICULTY,
   GAME_LEVEL,
@@ -27,7 +28,6 @@ import {
 } from '@entities/game/model/store/primitives';
 import type { Grid, SudokuBoard } from '@entities/game/model/types/board';
 import type { KillerCage } from '@entities/game/model/types/game';
-import { cellAt } from '@shared/lib/gridAccess';
 import { createStore } from 'jotai';
 import { describe, expect, it } from 'vitest';
 

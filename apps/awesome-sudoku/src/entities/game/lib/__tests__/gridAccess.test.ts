@@ -1,4 +1,4 @@
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
+import { atIndex, cellAt } from '@entities/game/lib/gridAccess';
 import { describe, expect, it } from 'vitest';
 
 describe('checked board access', () => {

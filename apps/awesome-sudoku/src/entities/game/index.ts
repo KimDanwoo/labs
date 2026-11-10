@@ -6,6 +6,7 @@ export {
   type CumulativePointsEntry,
   type LeaderboardQuery,
 } from './api/gameRecordService';
+export { atIndex, cellAt } from './lib/gridAccess';
 export { BOARD_SIZE, KEY_NUMBER, SUDOKU_CELL_COUNT } from './model/constants/board';
 export { GAME_LEVEL, GAME_LEVEL_LABELS, GAME_MODE, HINTS_REMAINING, MAX_MISTAKES } from './model/constants/game';
 export { LEADERBOARD_RECORD_LIMIT } from './model/constants/record';

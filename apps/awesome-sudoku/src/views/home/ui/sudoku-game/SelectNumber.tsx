@@ -3,6 +3,7 @@ import {
   BOARD_SIZE,
   KEY_NUMBER,
   boardAtom,
+  cellAt,
   fillCellAtom,
   isNoteModeAtom,
   numberCountsAtom,
@@ -11,10 +12,9 @@ import {
   toggleNoteAtom,
 } from '@entities/game';
 import { cn } from '@shared/lib/cn';
-import { cellAt } from '@shared/lib/gridAccess';
-import { NumberButton } from '@shared/ui/NumberButton';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { type FC, useCallback, useMemo } from 'react';
+import { NumberButton } from './NumberButton';
 
 export const SelectNumber: FC = () => {
   const isNoteMode = useAtomValue(isNoteModeAtom);

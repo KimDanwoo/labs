@@ -1,5 +1,5 @@
-import { cellAt } from '@shared/lib/gridAccess';
 import { atom } from 'jotai';
+import { cellAt } from '../../lib/gridAccess';
 import { HINTS_REMAINING, MAX_MISTAKES } from '../constants/game';
 import { buildGameResultState, resolveBoardState } from '../services/gameResult';
 import {

@@ -1,3 +1,4 @@
+import { atIndex, cellAt } from '@entities/game/lib/gridAccess';
 import { BOARD_SIZE } from '@entities/game/model/constants/board';
 import {
   createEmptyBoard,
@@ -5,7 +6,6 @@ import {
   formatTime,
   shuffleArray,
 } from '@entities/game/model/services/common';
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, test } from 'vitest';
 
 describe('스도쿠 유틸리티 함수 테스트', () => {

@@ -1,5 +1,5 @@
 import { MINUTE } from '@shared/config/time';
-import { atIndex } from '@shared/lib/gridAccess';
+import { atIndex } from '../../lib/gridAccess';
 import { BOARD_SIZE } from '../constants/board';
 import type { CellHighlight, Grid, SudokuBoard } from '../types/board';
 

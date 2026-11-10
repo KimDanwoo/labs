@@ -1,5 +1,5 @@
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { atom } from 'jotai';
+import { atIndex, cellAt } from '../../lib/gridAccess';
 import { buildGameResultState, resolveBoardState } from '../services/gameResult';
 import { updateCellValue, updateSingleCell } from '../services/update';
 import { pushStateAtom } from './historyAtoms';
