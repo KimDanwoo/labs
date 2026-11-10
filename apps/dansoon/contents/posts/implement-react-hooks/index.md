@@ -89,8 +89,8 @@ useMemo는 ref에 이전 deps와 계산 값을 저장해 두고, deps가 달라�
 ```ts
 export function memo(Component, equals = shallowEquals) {
   return (newProps) => {
-    const previousPropsRef = useRef(null);
-    const elementRef = useRef(null);
+    const previousPropsRef = useRef<object | null>(null);
+    const elementRef = useRef<ReactElement | null>(null);
     if (elementRef.current === null || !equals(previousPropsRef.current, newProps)) {
       previousPropsRef.current = newProps;
       elementRef.current = createElement(Component, newProps);

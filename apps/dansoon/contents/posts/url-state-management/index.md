@@ -191,11 +191,17 @@ URL을 상태의 원본으로 선택한 순간, 동시에 URL을 외부 입력�
 그래서 애플리케이션으로 들어오는 경계에서 값을 파싱하고 검증했다.
 
 ```ts
+// 2026-02-30처럼 형식만 맞고 달력에 없는 날짜를 거른다
+const isRealDate = (value: string) => {
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value);
+};
+
 const reservationParamsSchema = z.object({
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .refine((value) => !Number.isNaN(Date.parse(value)))
+    .refine(isRealDate)
     .nullable()
     .catch(null),
 

@@ -328,9 +328,12 @@ async function proxy(request: NextRequest, context: Context) {
   const { path } = await context.params;
 
   // new URL(path, base)는 path가 절대 주소면 base를 무시한다.
-  // 세그먼트를 인코딩해 base 뒤에 이어 붙여서 백엔드 주소를 벗어나지 못하게 한다.
-  const targetPath = path.map(encodeURIComponent).join('/');
-  const targetUrl = new URL(`${API_BASE_URL}/${targetPath}`);
+  // 세그먼트를 인코딩해 이어 붙이고, 만든 주소가 백엔드 주소 아래를 벗어나면 거절한다.
+  const baseUrl = `${API_BASE_URL}`.replace(/\/*$/, '/');
+  const targetUrl = new URL(path.map(encodeURIComponent).join('/'), baseUrl);
+  if (!targetUrl.href.startsWith(baseUrl)) {
+    return new Response(null, { status: 400 });
+  }
   targetUrl.search = request.nextUrl.search;
 
   const headers = new Headers();
