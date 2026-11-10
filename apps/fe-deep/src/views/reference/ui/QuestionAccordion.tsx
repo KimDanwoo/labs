@@ -1,6 +1,6 @@
 'use client';
 
-import type { Question } from '@entities/question/model/types';
+import type { Question } from '@entities/question';
 import { Accordion } from '@ui/react';
 import { QuestionAccordionItem } from './QuestionAccordionItem';
 

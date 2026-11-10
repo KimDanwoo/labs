@@ -1,5 +1,5 @@
-import { createServerSupabaseClient } from '@shared/config/supabase/server';
-import { assertAdminUser } from './adminAuthorization';
+import { createServerSupabaseClient } from '@shared/api/supabaseServer';
+import { assertAdminUser } from '@shared/lib/adminAuthorization';
 
 export async function requireAdmin() {
   const supabase = await createServerSupabaseClient();

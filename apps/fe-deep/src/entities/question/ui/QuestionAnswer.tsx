@@ -1,4 +1,5 @@
-import { MarkdownRenderer, SpeakButton } from '@shared/ui';
+import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
+import { SpeakButton } from '@shared/ui/SpeakButton';
 
 interface QuestionAnswerProps {
   answer: string;

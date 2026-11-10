@@ -1,6 +1,8 @@
 'use client';
 
-import { getPreferredVoiceName, getSynth, pickKoreanVoice, toSpeechChunks } from '@shared/lib';
+import { pickKoreanVoice } from '@shared/lib/koreanVoice';
+import { getPreferredVoiceName, getSynth } from '@shared/lib/speechVoice';
+import { toSpeechChunks } from '@shared/lib/toSpeechChunks';
 import { Button } from '@ui/react';
 import { Square, Volume2 } from 'lucide-react';
 import { useEffect, useState, useSyncExternalStore } from 'react';

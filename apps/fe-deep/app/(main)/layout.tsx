@@ -1,4 +1,4 @@
-import { Footer, Header, ScrollToTop } from '@widgets/layout/ui';
+import { Footer, Header, ScrollToTop } from '@app/layout';
 import { Suspense } from 'react';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {

@@ -1,3 +1,3 @@
-import { AccountPage } from '@views/my-page/ui';
+import { AccountPage } from '@views/my-page';
 
 export default AccountPage;

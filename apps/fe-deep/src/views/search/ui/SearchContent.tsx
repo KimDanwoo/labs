@@ -1,11 +1,11 @@
 'use client';
 
-import { DifficultyBadge } from '@entities/question/ui';
-import { MarkdownRenderer } from '@shared/ui';
+import { DifficultyBadge } from '@entities/question';
+import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card, Input } from '@ui/react';
-import { useSearch } from '@views/search/model/hooks';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
+import { useSearch } from '../model/hooks/useSearch';
 
 const MATCH_TYPE_LABEL: Record<string, string> = {
   question: '질문 일치',

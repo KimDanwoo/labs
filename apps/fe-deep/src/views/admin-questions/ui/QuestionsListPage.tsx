@@ -4,10 +4,12 @@ import {
   deleteQuestions,
   updateCategoryVisibility,
   updateQuestionsVisibility,
-} from '@entities/question/model/actions';
-import type { Category, Question, QuestionVisibilityField } from '@entities/question/model/types';
-import { createClient } from '@shared/config/supabase/client';
-import { useDebounce } from '@shared/lib/hooks';
+  type Category,
+  type Question,
+  type QuestionVisibilityField,
+} from '@entities/question';
+import { createClient } from '@shared/api/supabaseClient';
+import { useDebounce } from '@shared/lib/useDebounce';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@ui/react';
 import { BookOpenCheck, Eye, EyeOff, FolderSync, Plus, Trash2 } from 'lucide-react';

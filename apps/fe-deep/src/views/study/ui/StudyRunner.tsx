@@ -1,11 +1,11 @@
 'use client';
 
-import { MarkdownRenderer } from '@shared/ui';
+import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
 import { Button, Progress, Sheet, SheetContent, SheetTitle, SheetTrigger } from '@ui/react';
-import { useStudyRun } from '@views/study/model/hooks';
-import { type StudyTopic } from '@views/study/model/services';
 import { BookmarkPlus, CheckCircle2, ChevronLeft, ChevronRight, List, RotateCcw, SkipForward } from 'lucide-react';
 import Link from 'next/link';
+import type { StudyTopic } from '../lib/parseHandbook';
+import { useStudyRun } from '../model/hooks/useStudyRun';
 import { StepCard } from './StepCard';
 import { TopicToc } from './TopicToc';
 

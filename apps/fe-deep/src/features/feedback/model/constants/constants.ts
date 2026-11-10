@@ -1,4 +1,4 @@
-import type { FeedbackType } from '@features/feedback/model/types';
+import type { FeedbackType } from '../types/types';
 
 export const FEEDBACK_TYPE_LABELS: Record<FeedbackType, string> = {
   add_question: '질문 추가 요청',

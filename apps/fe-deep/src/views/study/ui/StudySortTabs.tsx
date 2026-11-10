@@ -1,5 +1,5 @@
-import { STUDY_SORT, STUDY_SORT_LABELS, type StudySort } from '@views/study/model/services';
 import Link from 'next/link';
+import { STUDY_SORT, STUDY_SORT_LABELS, type StudySort } from '../model/services/studySort';
 
 type StudySortTabsProps = {
   current: StudySort;

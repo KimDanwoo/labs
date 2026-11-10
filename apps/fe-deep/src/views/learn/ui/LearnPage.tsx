@@ -1,15 +1,22 @@
 'use client';
 
-import { getCurrentStreak } from '@entities/progress/model/services';
-import { DIFFICULTY_CONFIG, DIFFICULTY_VALUES } from '@entities/question/model/constants';
-import { getAllCategories, getAllQuestions, getQuestionsByCategorySlug } from '@entities/question/model/services';
-import type { Category, Difficulty, Question } from '@entities/question/model/types';
+import { getCurrentStreak } from '@entities/progress';
+import {
+  DIFFICULTY_CONFIG,
+  DIFFICULTY_VALUES,
+  getAllCategories,
+  getAllQuestions,
+  getQuestionsByCategorySlug,
+  type Category,
+  type Difficulty,
+  type Question,
+} from '@entities/question';
 import { shuffleArray } from '@shared/lib/shuffle';
 import { Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/react';
-import { useCardStudySession } from '@views/learn/model/hooks';
 import { ArrowDownAZ, Flame, Shuffle, Trophy, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useCardStudySession } from '../model/hooks/useCardStudySession';
 import { StudyCardView } from './StudyCardView';
 
 const STUDY_ORDER = { sequential: 'sequential', random: 'random' } as const;
