@@ -1,1 +1,0 @@
-export { LabFooter } from './LabFooter';

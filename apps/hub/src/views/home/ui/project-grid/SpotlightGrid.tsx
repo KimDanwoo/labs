@@ -2,7 +2,7 @@
 
 import { useRef, type PointerEvent, type ReactNode } from 'react';
 
-import { applySpotlight, resetSpotlight } from '@widgets/project-grid/lib/spotlight';
+import { applySpotlight, resetSpotlight } from '../../lib/spotlight';
 
 const SPOTLIGHT_SELECTOR = '[data-spotlight]';
 

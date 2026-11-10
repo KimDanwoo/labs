@@ -1,5 +1,5 @@
-import type { Project } from '@entities/project/model/types';
 import { Card } from '@ui/react';
+import type { Project } from '../../model/types/project';
 
 import { ArrowUpRightIcon } from './ArrowUpRightIcon';
 
