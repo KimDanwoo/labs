@@ -34,6 +34,7 @@ import { createCompanionScene } from './companionScene';
 import type { CompanionReaction } from './companions';
 import { createCountryside } from './countryside';
 import { createDriftingLeaves } from './driftingLeaves';
+import { createDust } from './dust';
 import { createFireflies } from './fireflies';
 import { FISHING_PHASE, type FishingFrame } from './fishing';
 import { gameKey, isControlTarget, keyboardDirection } from './input';
@@ -248,30 +249,7 @@ export async function createScene(
   const shadow = new THREE.Sprite(shadowMat);
   shadow.renderOrder = 3;
   scene.add(shadow);
-  // Screen-space flecks float at several actual Z depths, providing gentle parallax.
-  const dustGeo = new THREE.BufferGeometry();
-  const dust = new Float32Array(45 * 3);
-  let seed = 52;
-  const random = () => {
-    seed = (seed * 1664525 + 1013904223) >>> 0;
-    return seed / 4294967296;
-  };
-  for (let i = 0; i < 45; i++) {
-    dust[i * 3] = random() * 120 - 60;
-    dust[i * 3 + 1] = random() * 70 - 35;
-    dust[i * 3 + 2] = 4 + random() * 20;
-  }
-  dustGeo.setAttribute('position', new THREE.BufferAttribute(dust, 3));
-  const dustMat = new THREE.PointsMaterial({
-    color: '#fff6c5',
-    size: 0.15,
-    transparent: true,
-    opacity: 0.6,
-    depthTest: false,
-  });
-  const dustCloud = new THREE.Points(dustGeo, dustMat);
-  dustCloud.renderOrder = 5;
-  scene.add(dustCloud);
+  const dust = createDust(scene);
   const markerMap = canvasTexture(64, 64, (c) => {
     c.strokeStyle = '#fff8ca';
     c.lineWidth = 3;
@@ -742,16 +720,6 @@ export async function createScene(
     });
     character.setLight(darkness, lampGlowAt(region, position));
   }
-  function driftDust(dt: number) {
-    dustMat.opacity = (region === 'home' ? 0.28 : 0.45) * (1 - darkness * 0.85) * (1 - wetness * 0.8);
-    if (reducedMotion || paused) return;
-    for (let i = 0; i < 45; i++) {
-      dust[i * 3] = dust[i * 3]! + dt * (0.15 + i * 0.002);
-      dust[i * 3 + 1] = dust[i * 3 + 1]! + Math.sin(elapsed * 0.4 + i) * dt * 0.06;
-      if (dust[i * 3]! > 60) dust[i * 3] = -60;
-    }
-    dustGeo.attributes.position!.needsUpdate = true;
-  }
   function reportStatus({ walking, sprinting }: Stride, rest: BedRestFrame | null) {
     container.dataset.motion = sleeping ? 'sleeping' : motionLabel(jump.height > 0, walking, sprinting);
     let restLabel = sleeping ? 'settling' : '';
@@ -804,7 +772,14 @@ export async function createScene(
     const isAtmosphereChanging = easeAtmosphere(dt);
     paintBackground(dt, size);
     animateLife(paused && !fishingFrame ? 0 : dt, rest !== null);
-    driftDust(dt);
+    dust.update({
+      dt,
+      elapsed,
+      isIndoors: region === 'home',
+      darkness,
+      wetness,
+      isStill: reducedMotion || paused,
+    });
     isSettling =
       isCameraMoving ||
       isAtmosphereChanging ||
@@ -978,8 +953,8 @@ export async function createScene(
       waterMaps.dispose();
       rain.dispose();
       geo.dispose();
-      dustGeo.dispose();
-      [background, shadowMat, dustMat, targetMat, ...markerMats].forEach((m) => m.dispose());
+      dust.dispose();
+      [background, shadowMat, targetMat, ...markerMats].forEach((m) => m.dispose());
       releaseTextures();
       character.dispose();
       renderer.dispose();
