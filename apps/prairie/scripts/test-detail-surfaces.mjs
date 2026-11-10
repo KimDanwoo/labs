@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { makeRockGeometry } from '../src/entities/flora/model/services/makeFloraGeometry.ts';
-import { makeWingGeometry } from '../src/entities/runner/model/services/makeWingGeometry.ts';
-import { makeSurfaceBump, SURFACE_KIND } from '../src/shared/lib/makeSurfaceBump.ts';
+import { makeRockGeometry } from '../src/views/ride/lib/flora/makeFloraGeometry.ts';
+import { makeWingGeometry } from '../src/views/ride/lib/runner/makeWingGeometry.ts';
+import { makeSurfaceBump, SURFACE_KIND } from '../src/views/ride/lib/makeSurfaceBump.ts';
 
 test('layered feathers have valid UVs, normals and colors within the existing geometry budget', () => {
   const wing = makeWingGeometry(4.4, 26);

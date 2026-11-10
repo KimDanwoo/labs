@@ -6,7 +6,7 @@ import {
   GRASS_QUALITY,
   grassKeepAt,
   grassViewRadius,
-} from '../src/entities/grass/model/constants/index.ts';
+} from '../src/views/ride/model/grass/constants.ts';
 import {
   distanceToRiver,
   coastDistanceAt,
@@ -27,7 +27,7 @@ import {
   riverWaterDepthAt,
   TERRAIN,
   terrainHeightAt,
-} from '../src/shared/config/scene.ts';
+} from '../src/views/ride/config/scene.ts';
 
 test('스폰 지점에서 첫 강까지 firstX만큼 떨어져 있다', () => {
   assert.equal(nearestRiverX(0), RIVER.firstX);

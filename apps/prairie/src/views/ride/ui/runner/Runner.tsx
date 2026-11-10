@@ -1,0 +1,190 @@
+'use client';
+
+import { useAnimations, useGLTF } from '@react-three/drei';
+import { createPortal, useFrame } from '@react-three/fiber';
+import { useEffect, useMemo, useRef } from 'react';
+import { Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type AnimationAction } from 'three';
+import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { terrainHeightAt } from '../../config/scene';
+import { gaitWeights } from '../../lib/runner/gaitWeights';
+import { runnerState } from '../../model/ride-state/runnerState';
+import {
+  RUNNER_ANIM,
+  RUNNER_ANIM_TUNING,
+  RUNNER_MODEL_TRANSFORM,
+  RUNNER_MODEL_URL,
+  UNICORN_TINT,
+} from '../../model/runner/constants';
+import { FlowingHair } from './FlowingHair';
+import { HeadCrown } from './HeadCrown';
+import { Horn } from './Horn';
+import { MagicWings } from './MagicWings';
+
+type RunnerProps = { speedRef: { current: number } };
+type Gaits = {
+  idle: AnimationAction | null;
+  walk: AnimationAction | null;
+  run: AnimationAction | null;
+  flight: AnimationAction | null;
+};
+const { scale, rotationY, position } = RUNNER_MODEL_TRANSFORM;
+
+export function Runner({ speedRef }: RunnerProps) {
+  const root = useRef<Group>(null);
+  const gaitRef = useRef<Gaits>({ idle: null, walk: null, run: null, flight: null });
+  const headingRef = useRef(0);
+  const previousSpeedRef = useRef(0);
+  const accelerationRef = useRef(0);
+  const { scene, animations } = useGLTF(RUNNER_MODEL_URL);
+  const prepared = useMemo(() => {
+    const model = clone(scene);
+    const materials: MeshStandardMaterial[] = [];
+    model.traverse((object) => {
+      if (!(object instanceof Mesh)) return;
+      object.castShadow = true;
+      object.receiveShadow = true;
+      const source = Array.isArray(object.material) ? object.material : [object.material];
+      if (source.length === 1 && source[0]?.name === 'Hair') {
+        object.visible = false;
+        return;
+      }
+      const copies = source.map((material) => {
+        if (!(material instanceof MeshStandardMaterial)) return material;
+        const copy = new MeshPhysicalMaterial();
+        MeshStandardMaterial.prototype.copy.call(copy, material);
+        copy.sheen = copy.name === 'Main' || copy.name === 'Main_Light' ? 0.3 : 0;
+        copy.sheenColor.set('#fff1db');
+        copy.sheenRoughness = 0.75;
+        const tint = UNICORN_TINT[copy.name];
+        if (tint) copy.color.set(tint);
+        copy.metalness = 0;
+        copy.roughness = 0.56;
+        if (copy.name === 'Eye_Black') copy.roughness = 0.16;
+        if (copy.name === 'Main' || copy.name === 'Main_Light') {
+          copy.sheen = 0.65;
+          copy.sheenColor.set('#c9ddff');
+          copy.roughness = 0.52;
+        }
+        if (copy.name === 'Hooves') {
+          copy.metalness = 0.8;
+          copy.roughness = 0.22;
+        }
+        if (copy.name === 'Eye_Black' || copy.name === 'Eye_White') {
+          copy.roughness = 0.12;
+          copy.clearcoat = 1;
+          copy.clearcoatRoughness = 0.08;
+        }
+        copy.envMapIntensity = 0.85;
+        if (copy.name === 'Main' || copy.name === 'Main_Light') {
+          copy.clearcoat = 0.2;
+          copy.clearcoatRoughness = 0.5;
+          copy.iridescence = 0.18;
+          copy.iridescenceIOR = 1.25;
+          copy.iridescenceThicknessRange = [160, 320];
+        }
+        copy.flatShading = false;
+        materials.push(copy);
+        return copy;
+      });
+      object.material = Array.isArray(object.material) ? copies : copies[0]!;
+    });
+    return { model, materials };
+  }, [scene]);
+  const { actions } = useAnimations(animations, root);
+
+  useEffect(() => () => prepared.materials.forEach((material) => material.dispose()), [prepared]);
+  useEffect(() => {
+    const gaits = {
+      idle: actions[RUNNER_ANIM.idle] ?? null,
+      walk: actions[RUNNER_ANIM.walk] ?? null,
+      run: actions[RUNNER_ANIM.run] ?? null,
+      flight: actions[RUNNER_ANIM.flight] ?? null,
+    };
+    gaitRef.current = gaits;
+    Object.values(gaits).forEach((action) => {
+      action?.reset().play();
+      if (action) action.weight = 0;
+    });
+    if (gaits.idle) gaits.idle.weight = 1;
+    if (gaits.flight) {
+      gaits.flight.time = gaits.flight.getClip().duration * 0.52;
+      gaits.flight.paused = true;
+    }
+    return () => Object.values(gaits).forEach((action) => action?.stop());
+  }, [actions]);
+
+  useFrame((state, rawDelta) => {
+    const delta = Math.min(rawDelta, 0.05);
+    const { idle, walk, run, flight } = gaitRef.current;
+    if (!idle || !walk || !run || !flight) return;
+    const speed = Math.abs(speedRef.current);
+    const tune = RUNNER_ANIM_TUNING;
+    const weights = gaitWeights(speed, runnerState.airborneHeight, tune.gallopBlendStart, tune.gallopBlendEnd);
+    const { airborne } = weights;
+    for (const name of ['idle', 'walk', 'run', 'flight'] as const) {
+      const action = gaitRef.current[name];
+      if (action) action.weight = MathUtils.damp(action.weight, weights[name], tune.blendRate, delta);
+    }
+    walk.timeScale = (speedRef.current < 0 ? -1 : 1) * MathUtils.clamp(speed / tune.walkRefSpeed, 0.45, 1.7);
+    run.timeScale = MathUtils.clamp(
+      speed / tune.runRefSpeed,
+      airborne > 0.5 ? 0.8 : tune.minRunScale,
+      tune.maxRunScale,
+    );
+    const acceleration = (speedRef.current - previousSpeedRef.current) / Math.max(delta, 0.001);
+    accelerationRef.current = MathUtils.damp(accelerationRef.current, MathUtils.clamp(acceleration, -14, 14), 5, delta);
+    previousSpeedRef.current = speedRef.current;
+    if (root.current) {
+      const turn = MathUtils.euclideanModulo(runnerState.heading - headingRef.current + Math.PI, Math.PI * 2) - Math.PI;
+      const lean = MathUtils.clamp((turn / Math.max(delta, 0.001)) * speed * 0.009, -0.24, 0.24);
+      root.current.rotation.z = MathUtils.damp(root.current.rotation.z, lean, 6, delta);
+      // 클립의 발걸음 위상에 맞춘 작은 탄력. 공중에서는 지상 반동을 지운다.
+      const phase = (run.time / run.getClip().duration) * Math.PI * 2;
+      const gallop = run.weight * (1 - airborne);
+      const landingAge = state.clock.elapsedTime - runnerState.landedAt;
+      const landing =
+        runnerState.landedAt >= 0 && landingAge >= 0 && landingAge < 0.5
+          ? Math.sin((landingAge / 0.5) * Math.PI) *
+            Math.exp(-landingAge * 5) *
+            MathUtils.clamp(runnerState.landingImpact / 3, 0.3, 1)
+          : 0;
+      root.current.position.y = position[1] + (1 - Math.cos(phase * 2)) * 0.035 * gallop - landing * 0.12;
+      const { x, z } = runnerState.position;
+      const dx = Math.sin(runnerState.heading) * 1.2;
+      const dz = Math.cos(runnerState.heading) * 1.2;
+      const slope = Math.atan2(terrainHeightAt(x + dx, z + dz) - terrainHeightAt(x - dx, z - dz), 2.4);
+      const pitch =
+        -slope * (1 - airborne) +
+        accelerationRef.current * 0.003 * (1 - airborne) +
+        Math.sin(phase) * 0.025 * gallop -
+        runnerState.verticalSpeed * 0.018 * airborne +
+        landing * 0.06;
+      root.current.rotation.x = MathUtils.damp(root.current.rotation.x, pitch, 5, delta);
+    }
+    headingRef.current = runnerState.heading;
+  });
+
+  const head = prepared.model.getObjectByName('Head');
+  const tailRoot = prepared.model.getObjectByName('Tail1');
+  const tailTip = prepared.model.getObjectByName('Tail7_end');
+  const neck = prepared.model.getObjectByName('Neck1');
+  const shoulder = prepared.model.getObjectByName('Torso3');
+  return (
+    <group ref={root} scale={scale} rotation={[0, rotationY, 0]} position={position}>
+      <primitive object={prepared.model} />
+      {shoulder && <MagicWings anchor={shoulder} />}
+      {tailRoot && tailTip && <FlowingHair head={tailRoot} neck={tailTip} speedRef={speedRef} isTail />}
+      {head && neck && <FlowingHair head={head} neck={neck} speedRef={speedRef} />}
+      {head &&
+        createPortal(
+          <>
+            <Horn />
+            <HeadCrown />
+          </>,
+          head,
+        )}
+    </group>
+  );
+}
+
+useGLTF.preload(RUNNER_MODEL_URL);
