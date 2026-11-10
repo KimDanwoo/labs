@@ -2,7 +2,7 @@ import parser from '@typescript-eslint/parser';
 import { Linter } from 'eslint';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import architecture from '../rules/architecture.mjs';
+import architecture from '../architecture.mjs';
 
 function check(rule, code, filename = 'src/features/first/ui/First.tsx') {
   return new Linter().verify(

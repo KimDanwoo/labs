@@ -7,7 +7,7 @@ import {
   validateManifest,
   validateSourceTypes,
   validateTypeScript,
-} from './check-architecture.mjs';
+} from '../check-architecture.mjs';
 
 test('dependency rules reject raw versions, missing catalog entries and incompatible workspace references', () => {
   const workspaces = new Set(['@ui/react']);

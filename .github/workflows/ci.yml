@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # PR은 바뀐 패키지와 그 패키지를 쓰는 앱만, main push는 전체를 검증한다.
-      # 구조 검사(check:architecture, scripts/*.test.mjs)는 저장소 전체 규칙이라 항상 돈다.
+      # 구조 검사(check:architecture, scripts/__tests__/*.test.mjs)는 저장소 전체 규칙이라 항상 돈다.
       AFFECTED: ${{ github.event_name == 'pull_request' && '--affected' || '' }}
       TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
 

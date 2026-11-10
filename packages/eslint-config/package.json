@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test \"rules/__tests__/*.test.mjs\""
   },
   "files": [
     "next.eslint.config.mjs",

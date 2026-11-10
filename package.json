@@ -10,7 +10,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "pnpm check:architecture && turbo run lint",
-    "test": "node --test scripts/*.test.mjs && turbo run test",
+    "test": "node --test \"scripts/__tests__/*.test.mjs\" && turbo run test",
     "check:architecture": "node scripts/check-architecture.mjs",
     "tokens": "turbo run tokens",
     "new-app": "node scripts/new-app.mjs",
