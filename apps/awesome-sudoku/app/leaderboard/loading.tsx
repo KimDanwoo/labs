@@ -1,4 +1,4 @@
-import { cn } from '@shared/model/utils';
+import { cn } from '@shared/lib/cn';
 
 export default function LeaderboardLoading() {
   return (

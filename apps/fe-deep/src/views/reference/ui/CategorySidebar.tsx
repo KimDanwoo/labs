@@ -1,7 +1,7 @@
 'use client';
 
-import type { Category } from '@entities/question/model/types';
-import { cn } from '@shared/lib/utils';
+import type { Category } from '@entities/question';
+import { cn } from '@shared/lib/cn';
 import { ScrollArea } from '@ui/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';

@@ -1,1 +1,1 @@
-export { TermsView as default, metadata } from '@views/terms/TermsView';
+export { TermsView as default, metadata } from '@views/terms';

@@ -1,3 +1,3 @@
-import { BookmarksPage } from '@views/my-page/ui';
+import { BookmarksPage } from '@views/my-page';
 
 export default BookmarksPage;

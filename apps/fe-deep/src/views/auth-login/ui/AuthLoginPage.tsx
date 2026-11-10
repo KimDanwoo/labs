@@ -1,6 +1,6 @@
 'use client';
 
-import { createClient } from '@shared/config/supabase/client';
+import { createClient } from '@shared/api/supabaseClient';
 import { Button, Card } from '@ui/react';
 import { useState } from 'react';
 

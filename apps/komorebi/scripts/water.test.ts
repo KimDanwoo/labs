@@ -1,7 +1,7 @@
+import { WATER } from '@views/walk/model/world/water';
+import { WORLDS, type Region } from '@views/walk/model/world/world';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { WATER } from '../src/shared/world/water';
-import { WORLDS, type Region } from '../src/shared/world/world';
 
 const inside = (outline: [number, number][], x: number, z: number) => {
   let isInside = false;

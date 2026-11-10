@@ -1,4 +1,4 @@
-import type { StudyTopic } from './parseHandbook';
+import type { StudyTopic } from '../../lib/parseHandbook';
 
 /** 진행 상태 필터 — 단일 선택 */
 export const STUDY_FILTER = {

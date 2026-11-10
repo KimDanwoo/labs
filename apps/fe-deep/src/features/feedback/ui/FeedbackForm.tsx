@@ -1,8 +1,5 @@
 'use client';
 
-import { FEEDBACK_TYPE_LABELS } from '@features/feedback/model/constants';
-import { useFeedbackForm } from '@features/feedback/model/hooks';
-import type { FeedbackType } from '@features/feedback/model/types';
 import {
   Button,
   Select,
@@ -15,6 +12,9 @@ import {
   SheetTitle,
 } from '@ui/react';
 import { MessageSquarePlus, Send } from 'lucide-react';
+import { FEEDBACK_TYPE_LABELS } from '../model/constants/constants';
+import { useFeedbackForm } from '../model/hooks/useFeedbackForm';
+import type { FeedbackType } from '../model/types/types';
 
 interface FeedbackFormProps {
   questionId?: string;

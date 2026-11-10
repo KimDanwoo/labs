@@ -1,12 +1,15 @@
 'use client';
-import { userAtom } from '@entities/session/model/store';
-import { useCumulativeLeaderboard, useLeaderboard } from '@features/leaderboard/model/hooks';
-import { CumulativeLeaderboardTable, LeaderboardFilters, LeaderboardTable } from '@features/leaderboard/ui';
-import { ThemeToggle } from '@features/theme/ui';
-import { cn } from '@shared/model/utils';
-import { SubpageHeader } from '@shared/ui';
+import { userAtom } from '@entities/session';
+import { ThemeToggle } from '@features/theme';
+import { cn } from '@shared/lib/cn';
+import { SubpageHeader } from '@shared/ui/SubpageHeader';
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
+import { useCumulativeLeaderboard } from '../model/hooks/useCumulativeLeaderboard';
+import { useLeaderboard } from '../model/hooks/useLeaderboard';
+import { CumulativeLeaderboardTable } from './CumulativeLeaderboardTable';
+import { LeaderboardFilters } from './LeaderboardFilters';
+import { LeaderboardTable } from './LeaderboardTable';
 
 import { ErrorMessage } from './ErrorMessage';
 type LeaderboardTab = 'best' | 'cumulative';

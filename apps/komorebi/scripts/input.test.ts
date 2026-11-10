@@ -1,6 +1,6 @@
+import { gameKey } from '@views/walk/lib/input';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { gameKey } from '../src/features/walk/lib/input';
 
 test('movement and shortcuts work with Korean IME and match keyup after language switching', () => {
   for (const [code, key, expected] of [
@@ -19,7 +19,7 @@ test('movement and shortcuts work with Korean IME and match keyup after language
 });
 
 test('thumbstick supports all directions, a dead zone and a neutral release', async () => {
-  const { padDirection } = await import('../src/features/walk/lib/input');
+  const { padDirection } = await import('../src/views/walk/lib/input');
   assert.deepEqual(padDirection(0, 0), []);
   assert.deepEqual(padDirection(0.1, 0.1), []);
   assert.deepEqual(padDirection(1, 0), ['d']);
@@ -31,7 +31,7 @@ test('thumbstick supports all directions, a dead zone and a neutral release', as
 });
 
 test('keys on focused controls are left to the control', async () => {
-  const { isControlTarget } = await import('../src/features/walk/lib/input');
+  const { isControlTarget } = await import('../src/views/walk/lib/input');
   for (const tagName of ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'A']) {
     assert.equal(isControlTarget({ tagName, isContentEditable: false }), true);
   }
@@ -41,7 +41,7 @@ test('keys on focused controls are left to the control', async () => {
 });
 
 test('held keys give one step per axis, with WASD and arrows merged and opposites cancelling', async () => {
-  const { keyboardDirection } = await import('../src/features/walk/lib/input');
+  const { keyboardDirection } = await import('../src/views/walk/lib/input');
   assert.deepEqual(keyboardDirection(new Set()), { dx: 0, dz: 0 });
   assert.deepEqual(keyboardDirection(new Set(['d', 'arrowright'])), { dx: 1, dz: 0 });
   assert.deepEqual(keyboardDirection(new Set(['a', 'arrowright'])), { dx: 0, dz: 0 });

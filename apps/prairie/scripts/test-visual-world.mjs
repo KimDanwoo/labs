@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { MEADOW_PATH, meadowPathDistanceAt, meadowPathX, RIDGES, waterDepthAt } from '../src/shared/config/scene.ts';
-import { LANDMARKS } from '../src/shared/exploration/world.ts';
-import { makeLeafCanopy } from '../src/shared/lib/makeLeafCanopy.ts';
-import { makeRidgeTexture } from '../src/shared/lib/makeRidgeTexture.ts';
+import { MEADOW_PATH, meadowPathDistanceAt, meadowPathX, RIDGES, waterDepthAt } from '../src/views/ride/config/scene.ts';
+import { LANDMARKS } from '../src/views/ride/model/exploration/world.ts';
+import { makeLeafCanopy } from '../src/views/ride/lib/makeLeafCanopy.ts';
+import { makeRidgeTexture } from '../src/views/ride/lib/makeRidgeTexture.ts';
 import { boundedDpr, RENDER_PIXELS } from '../src/shared/lib/renderBudget.ts';
 
 test('leaf canopy has finite normals and a bounded geometry budget at both detail levels', () => {

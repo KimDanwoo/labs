@@ -1,8 +1,8 @@
 'use client';
 
-import { SM2_CONSTANTS } from '@entities/progress/model/constants';
-import type { UserProgress } from '@entities/progress/model/types';
-import { addDays, todayString } from './progressDates';
+import { addDays, todayString } from '../../lib/progressDates';
+import { SM2_CONSTANTS } from '../constants/constants';
+import type { UserProgress } from '../types/types';
 import { getLocalProgress, saveLocalProgress } from './progressStorage';
 export { getLocalProgress, saveLocalProgress } from './progressStorage';
 
@@ -92,7 +92,7 @@ export function updateQuestionProgress(questionId: string, knew: boolean): UserP
   saveLocalProgress(allProgress);
 
   // Supabase write-through (lazy import로 순환 의존성 방지)
-  import('./progressSync')
+  import('../../api/progressSync')
     .then(({ syncSingleCard }) => {
       syncSingleCard(updated).catch(() => {});
     })

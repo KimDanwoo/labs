@@ -1,5 +1,5 @@
-import type { Difficulty } from '@entities/question/model/types';
 import type { BadgeVariant } from '@ui/react';
+import type { Difficulty } from '../types/types';
 
 export const DIFFICULTY_VALUES = ['easy', 'medium', 'hard'] as const;
 

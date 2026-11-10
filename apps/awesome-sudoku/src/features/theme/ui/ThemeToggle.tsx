@@ -1,7 +1,7 @@
 'use client';
 
-import { resolvedThemeAtom, setThemeAtom } from '@entities/theme/model/store';
-import { cn } from '@shared/model/utils';
+import { resolvedThemeAtom, setThemeAtom } from '@entities/theme';
+import { cn } from '@shared/lib/cn';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback } from 'react';
 import { LuMoon, LuSun } from 'react-icons/lu';

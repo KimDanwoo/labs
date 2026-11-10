@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createDashState, DASH_SKILL, updateDash } from '../src/features/runner-control/model/services/dashSkill.ts';
+import { createDashState, DASH_SKILL, updateDash } from '../src/views/ride/model/runner-control/services/dashSkill.ts';
 
 test('제로백은 공중 새 입력에서만 발동하고 0.18초에 최대 출력에 도달한다', () => {
   const state = createDashState();

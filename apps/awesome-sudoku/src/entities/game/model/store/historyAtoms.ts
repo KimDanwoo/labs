@@ -1,6 +1,6 @@
-import { updateCellSelection } from '@entities/game/model/services';
-import type { SudokuBoard } from '@entities/game/model/types';
 import { atom } from 'jotai';
+import { updateCellSelection } from '../services/update';
+import type { SudokuBoard } from '../types/board';
 import { boardAtom, isCompletedAtom, selectedCellAtom } from './primitives';
 import { updateHighlightsAtom } from './selectionAtoms';
 import { countBoardNumbersAtom } from './statusAtoms';

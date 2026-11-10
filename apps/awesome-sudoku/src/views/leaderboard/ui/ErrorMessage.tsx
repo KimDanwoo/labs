@@ -1,5 +1,5 @@
 'use client';
-import { cn } from '@shared/model/utils';
+import { cn } from '@shared/lib/cn';
 
 export const ErrorMessage = ({ message }: { message: string }) => (
   <div className={cn('text-center py-12', 'text-[rgb(var(--color-error))]')}>

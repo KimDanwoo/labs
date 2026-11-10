@@ -1,5 +1,5 @@
-import { BOARD_MAX_INDEX } from '@entities/game/model/constants';
 import { atom } from 'jotai';
+import { BOARD_MAX_INDEX } from '../constants/board';
 import { fillCellAtom, toggleNoteAtom } from './cellValueAtoms';
 import { isNoteModeAtom, selectedCellAtom } from './primitives';
 import { selectCellAtom } from './selectionAtoms';

@@ -1,1 +1,0 @@
-export { AdminFeedbacksPage } from './AdminFeedbacksPage';

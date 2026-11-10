@@ -1,22 +1,63 @@
 import path from 'node:path';
 
-const LAYERS = ['app', 'views', 'widgets', 'features', 'entities', 'shared'];
-const SLICED_LAYERS = new Set(['views', 'widgets', 'features', 'entities']);
-const MODEL_SEGMENTS = new Set(['hooks', 'types', 'constants', 'store', 'services', 'server', 'actions', '__tests__']);
+const LAYERS = ['app', 'views', 'features', 'entities', 'shared'];
+const SLICED_LAYERS = new Set(['views', 'features', 'entities']);
+const SLICE_SEGMENTS = new Set(['ui', 'model', 'api', 'lib', 'config']);
+const SHARED_SEGMENTS = new Set(['ui', 'lib', 'api', 'config']);
+const ITEM_ENTRY_SEGMENTS = new Set(['ui', 'lib']);
+const LAYER_PATH = /^(.*)\/src\/(app|views|features|entities|shared)\/(.*)$/;
+const LAYER_ALIAS = /^@(app|views|features|entities|shared)\//;
+const PUBLIC_ENTRY = /^index(?:\.server)?(?:\.tsx?)?$/;
+const INDEX_FILE = /^index(?:\.server)?\.tsx?$/;
+const TEST_FILE = /\/__tests__\/|\.(?:test|spec)\.[cm]?[jt]sx?$/;
 const ROUTE_FILE =
   /^(page|layout|route|error|loading|not-found|global-error|template|default|sitemap|robots|manifest)$/;
 
 function location(filename) {
-  const match = filename.replaceAll('\\', '/').match(/^(.*)\/src\/(app|views|widgets|features|entities|shared)\/(.*)$/);
+  const match = filename.replaceAll('\\', '/').match(LAYER_PATH);
   return match ? { root: match[1], layer: match[2], rest: match[3], slice: match[3].split('/')[0] } : null;
 }
 
-function moduleLocation(filename, source) {
-  const own = location(filename);
-  if (!own) return null;
+function moduleLocation(filename, source, cwd) {
   if (source.startsWith('.')) return location(path.posix.resolve(path.posix.dirname(filename), source));
-  if (/^@(app|views|widgets|features|entities|shared)\//.test(source))
-    return location(path.posix.normalize(`${own.root}/src/${source.slice(1)}`));
+  if (!LAYER_ALIAS.test(source)) return null;
+  const root = location(filename)?.root ?? cwd;
+  return location(path.posix.normalize(`${root}/src/${source.slice(1)}`));
+}
+
+function staticSource(node) {
+  if (node?.type === 'Literal') return node.value;
+  if (node?.type === 'TemplateLiteral' && node.expressions.length === 0) return node.quasis[0].value.cooked;
+  return null;
+}
+
+function importVisitors(check) {
+  return {
+    ImportDeclaration: (node) => check(node.source, node.source.value),
+    ExportNamedDeclaration: (node) => {
+      if (node.source) check(node.source, node.source.value);
+    },
+    ExportAllDeclaration: (node) => check(node.source, node.source.value),
+    ImportExpression: (node) => check(node.source, staticSource(node.source)),
+    TSImportType: (node) => check(node, staticSource(node.source ?? node.argument?.literal ?? node.argument)),
+  };
+}
+
+function structureProblem(own) {
+  const parts = own.rest.split('/');
+  const basename = parts.at(-1);
+  if (own.layer === 'shared') {
+    if (!SHARED_SEGMENTS.has(parts[0]))
+      return 'shared 바로 아래는 ui/, lib/, api/, config/ 세그먼트만 둔다. 도메인 코드는 쓰는 슬라이스로 옮긴다.';
+    if (parts.length === 2 && ITEM_ENTRY_SEGMENTS.has(parts[0]) && INDEX_FILE.test(basename))
+      return `shared/${parts[0]} 전체를 묶는 index.ts를 두지 않는다. 항목마다 진입점을 둔다.`;
+    return null;
+  }
+  const inner = parts.slice(1);
+  if (inner.length === 1)
+    return INDEX_FILE.test(basename) ? null : '슬라이스 루트에는 공개 API(index.ts, index.server.ts)만 둔다.';
+  if (!SLICE_SEGMENTS.has(inner[0])) return '슬라이스는 ui/, model/, api/, lib/, config/ 세그먼트로 나눈다.';
+  if (INDEX_FILE.test(basename)) return '세그먼트 안에 index.ts를 두지 않는다. 공개 API는 슬라이스 루트 하나다.';
   return null;
 }
 
@@ -26,20 +67,60 @@ const structure = {
     return {
       Program(node) {
         const own = location(context.filename);
-        if (!own || !SLICED_LAYERS.has(own.layer)) return;
-        const parts = own.rest.split('/').slice(1);
-        if (parts.length === 1 && own.layer === 'views' && /^[A-Z]\w*View\.tsx$/.test(parts[0])) return;
-        if (!['ui', 'model', 'lib'].includes(parts[0])) {
-          context.report({
-            node,
-            message: '슬라이스는 ui/, model/, lib/로 나눈다. 메인 *View.tsx만 views 슬라이스 루트에 둔다.',
-          });
-        } else if (parts[0] === 'model' && (parts.length < 3 || !MODEL_SEGMENTS.has(parts[1]))) {
-          context.report({
-            node,
-            message: 'model은 hooks/, types/, constants/, store/, services/, server/, actions/ 세그먼트로 나눈다.',
-          });
-        }
+        if (!own || (!SLICED_LAYERS.has(own.layer) && own.layer !== 'shared')) return;
+        const message = structureProblem(own);
+        if (message) context.report({ node, message });
+      },
+    };
+  },
+};
+
+function sharedItem(rest) {
+  const [segment, item = ''] = rest.split('/');
+  return `${segment}/${item.replace(/\.[cm]?[jt]sx?$/, '')}`;
+}
+
+function segmentOf(own) {
+  return own.rest.split('/')[1];
+}
+
+function publicApiProblem(from, to, source) {
+  const inner = to.rest.split('/').slice(1);
+  if (to.layer === 'shared') {
+    const parts = to.rest.split('/').filter((part) => !PUBLIC_ENTRY.test(part));
+    if (from?.layer === 'shared' && sharedItem(from.rest) === sharedItem(to.rest)) return null;
+    if (parts.length > 2) return 'shared는 세그먼트 또는 항목 진입점까지만 import한다(@shared/lib/<항목>).';
+    if (parts.length === 1 && ITEM_ENTRY_SEGMENTS.has(parts[0]))
+      return `@shared/${parts[0]}/<항목>처럼 항목 진입점으로 import한다.`;
+    return null;
+  }
+  if (!SLICED_LAYERS.has(to.layer)) return null;
+  const isEntry = inner.length === 0 || (inner.length === 1 && PUBLIC_ENTRY.test(inner[0]));
+  const isOwnSlice = from?.layer === to.layer && from.slice === to.slice;
+  if (!isOwnSlice) return isEntry ? null : `${to.layer}/${to.slice}는 공개 API(index.ts)로만 import한다.`;
+  if (isEntry) return '슬라이스 안에서 자기 공개 API를 import하지 않는다(순환 참조).';
+  if (!source.startsWith('.')) return '슬라이스 안에서는 상대경로로 import한다.';
+  return null;
+}
+
+const publicApi = {
+  meta: { type: 'problem', schema: [] },
+  create(context) {
+    const filename = context.filename.replaceAll('\\', '/');
+    const from = location(filename);
+    const isEntryFile = from && INDEX_FILE.test(path.posix.basename(filename));
+    function check(node, source) {
+      if (typeof source !== 'string' || TEST_FILE.test(filename)) return;
+      const to = moduleLocation(filename, source, context.cwd.replaceAll('\\', '/'));
+      if (!to) return;
+      const message = publicApiProblem(from, to, source);
+      if (message) context.report({ node, message });
+    }
+    return {
+      ...importVisitors(check),
+      ExportAllDeclaration(node) {
+        if (isEntryFile) context.report({ node, message: '공개 API에서 export *를 쓰지 않는다. 이름을 명시한다.' });
+        else check(node.source, node.source.value);
       },
     };
   },
@@ -51,7 +132,7 @@ const dependencies = {
     function check(node, source) {
       if (typeof source !== 'string') return;
       const from = location(context.filename);
-      const to = moduleLocation(context.filename, source);
+      const to = moduleLocation(context.filename, source, context.cwd);
       if (!from || !to) return;
       if (LAYERS.indexOf(to.layer) < LAYERS.indexOf(from.layer)) {
         context.report({ node, message: `${from.layer}에서 상위 레이어 ${to.layer}를 참조할 수 없다.` });
@@ -62,14 +143,7 @@ const dependencies = {
         });
       }
     }
-    return {
-      ImportDeclaration: (node) => check(node.source, node.source.value),
-      ExportNamedDeclaration: (node) => {
-        if (node.source) check(node.source, node.source.value);
-      },
-      ExportAllDeclaration: (node) => check(node.source, node.source.value),
-      ImportExpression: (node) => check(node.source, node.source.value),
-    };
+    return importVisitors(check);
   },
 };
 
@@ -82,11 +156,8 @@ const componentFile = {
     const basename = path.basename(context.filename, '.tsx');
     function check(node, name) {
       if (!name || !/^[A-Z]/.test(name)) return;
-      if (!own.rest.includes('/ui/') && !(own.layer === 'views' && basename.endsWith('View'))) {
-        context.report({
-          node,
-          message: '컴포넌트는 ui/ 또는 메인 *View.tsx에 둔다. 훅 파일에 Provider를 함께 선언하지 않는다.',
-        });
+      if (segmentOf(own) !== 'ui') {
+        context.report({ node, message: '컴포넌트는 ui/에 둔다. 훅 파일에 Provider를 함께 선언하지 않는다.' });
       } else if (name !== basename) {
         context.report({ node, message: `컴포넌트 ${name}은 ${name}.tsx로 분리한다.` });
       }
@@ -140,20 +211,39 @@ const interactiveComposition = {
   },
 };
 
+const JOTAI_MODULE = /^jotai(?:\/|$)|^jotai-family$/;
+const ATOM_FACTORY = /^atom(?:With\w+|Family)?$/;
+
 const entityState = {
   meta: { type: 'problem', schema: [] },
   create(context) {
+    const own = location(context.filename);
+    const isAllowed = own && SLICED_LAYERS.has(own.layer) && segmentOf(own) === 'model';
+    if (!own || isAllowed) return {};
+    const factories = new Set();
+    const namespaces = new Set();
+    function isAtomFactory(callee) {
+      if (callee.type === 'Identifier') return factories.has(callee.name);
+      return (
+        callee.type === 'MemberExpression' &&
+        callee.object.type === 'Identifier' &&
+        namespaces.has(callee.object.name) &&
+        callee.property.type === 'Identifier' &&
+        ATOM_FACTORY.test(callee.property.name)
+      );
+    }
     return {
-      CallExpression(node) {
-        const own = location(context.filename);
-        if (
-          own &&
-          node.callee.type === 'Identifier' &&
-          /^atom(?:With\w+|Family)?$/.test(node.callee.name) &&
-          (own.layer !== 'entities' || !own.rest.includes('/model/store/'))
-        ) {
-          context.report({ node, message: '전역 atom은 entities/<domain>/model/store/에서 정의한다.' });
+      ImportDeclaration(node) {
+        if (!JOTAI_MODULE.test(node.source.value)) return;
+        for (const specifier of node.specifiers) {
+          if (specifier.type === 'ImportNamespaceSpecifier') namespaces.add(specifier.local.name);
+          else if (specifier.type === 'ImportSpecifier' && ATOM_FACTORY.test(specifier.imported.name))
+            factories.add(specifier.local.name);
         }
+      },
+      CallExpression(node) {
+        if (isAtomFactory(node.callee))
+          context.report({ node, message: '전역 atom은 쓰는 슬라이스의 model/에서 정의한다.' });
       },
     };
   },
@@ -162,6 +252,7 @@ const entityState = {
 export default {
   rules: {
     'slice-structure': structure,
+    'public-api': publicApi,
     'independent-slices': dependencies,
     'component-file': componentFile,
     'routing-location': routingLocation,

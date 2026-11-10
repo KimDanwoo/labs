@@ -1,9 +1,9 @@
 'use client';
 
-import type { FollowUp, Question } from '@entities/question/model/types';
-import { DifficultyBadge } from '@entities/question/ui';
-import { cn } from '@shared/lib/utils';
-import { KeywordCheck, MarkdownRenderer } from '@shared/ui';
+import { type FollowUp, type Question, DifficultyBadge } from '@entities/question';
+import { cn } from '@shared/lib/cn';
+import { KeywordCheck } from '@shared/ui/KeywordCheck';
+import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
 import { Badge, Button, Card, Progress } from '@ui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Eye, RotateCcw, SkipForward } from 'lucide-react';

@@ -1,6 +1,6 @@
 'use client';
 
-import { STORAGE_KEYS } from '@shared/constants';
+import { STORAGE_KEYS } from '@shared/config/storageKeys';
 import { useTopicMarks } from './useTopicMarks';
 
 const REVIEW_STORE = { table: 'study_review', storageKey: STORAGE_KEYS.STUDY_REVIEW };

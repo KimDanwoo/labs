@@ -1,7 +1,7 @@
 'use client';
 
-import { getCurrentUserId } from '@entities/progress/model/services';
-import { createClient } from '@shared/config/supabase/client';
+import { getCurrentUserId } from '@entities/progress';
+import { createClient } from '@shared/api/supabaseClient';
 import { useCallback, useEffect, useState } from 'react';
 
 // ============================================================

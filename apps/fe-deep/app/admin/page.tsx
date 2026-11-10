@@ -1,1 +1,1 @@
-export { AdminView as default } from '@views/admin/AdminView';
+export { AdminView as default } from '@views/admin/index.server';

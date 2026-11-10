@@ -1,7 +1,7 @@
+import { BIRD_STATE, startSparrow, stepSparrow } from '@views/walk/lib/sparrows';
+import { canWalk, findRoute, HOME, HOME_DOOR, SPAWN } from '@views/walk/model/world/world';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { BIRD_STATE, startSparrow, stepSparrow } from '../src/features/walk/lib/sparrows';
-import { canWalk, findRoute, HOME, HOME_DOOR, SPAWN } from '../src/shared/world/world';
 
 test('sparrows flee approaching feet, wait on their branch, then return once the lane is clear', () => {
   const bird = startSparrow({ x: 30, z: 47 }, { x: 22, z: 31 }, 1);

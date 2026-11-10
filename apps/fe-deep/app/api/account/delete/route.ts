@@ -1,5 +1,5 @@
-import { createAdminSupabaseClient } from '@shared/config/supabase/admin';
-import { createServerSupabaseClient } from '@shared/config/supabase/server';
+import { createAdminSupabaseClient } from '@shared/api/supabaseAdmin';
+import { createServerSupabaseClient } from '@shared/api/supabaseServer';
 import { NextResponse } from 'next/server';
 
 export async function DELETE() {

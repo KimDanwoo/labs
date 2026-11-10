@@ -33,13 +33,13 @@ function actions(file, overrides = {}) {
         throw new Error('관리자 권한이 필요합니다.');
       },
     },
-    '@shared/config/supabase/admin': {
+    '@shared/api/supabaseAdmin': {
       createAdminSupabaseClient: () => {
         privilegedClients++;
         assert.fail('권한 검사 전에 관리자 DB에 접근했습니다.');
       },
     },
-    '@shared/config/supabase/server': {
+    '@shared/api/supabaseServer': {
       createServerSupabaseClient: async () => ({
         auth: { getUser: async () => ({ data: { user: { id: 'ordinary-user' } } }) },
       }),
@@ -87,7 +87,7 @@ test('question ordering failures cannot report a successful mutation', async () 
   };
   const { exported } = actions('../src/entities/question/model/actions/questionMutations.ts', {
     '@shared/lib/requireAdmin': { requireAdmin: async () => ({ id: 'admin' }) },
-    '@shared/config/supabase/admin': { createAdminSupabaseClient: () => ({ from: () => query }) },
+    '@shared/api/supabaseAdmin': { createAdminSupabaseClient: () => ({ from: () => query }) },
   });
   await assert.rejects(exported.createQuestion({ category_id: 'cat-1' }), /질문 순서 조회 실패/);
   assert.equal(insertions, 0);

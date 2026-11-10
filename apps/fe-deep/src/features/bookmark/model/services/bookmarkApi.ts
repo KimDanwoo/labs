@@ -1,6 +1,6 @@
 'use client';
 
-import { STORAGE_KEYS } from '@shared/constants';
+import { STORAGE_KEYS } from '@shared/config/storageKeys';
 
 // ============================================================
 // Bookmarks (localStorage)

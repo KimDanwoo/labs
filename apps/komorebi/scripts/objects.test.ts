@@ -1,9 +1,9 @@
+import { FOREGROUNDS, isForegroundInFront } from '@views/walk/model/world/foreground';
+import { hasGroundBetween } from '@views/walk/model/world/ground';
+import { WORLD_OBJECTS } from '@views/walk/model/world/objects';
+import { canWalk, createSlideMotion, findRoute, movePlayer } from '@views/walk/model/world/world';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { FOREGROUNDS, isForegroundInFront } from '../src/shared/world/foreground';
-import { hasGroundBetween } from '../src/shared/world/ground';
-import { WORLD_OBJECTS } from '../src/shared/world/objects';
-import { canWalk, createSlideMotion, findRoute, movePlayer } from '../src/shared/world/world';
 
 const point = (x: number, y: number) => ({ x: x / 15.36, z: y / 10.24 });
 

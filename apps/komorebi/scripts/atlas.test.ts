@@ -1,6 +1,6 @@
+import { childFacing, extractChildFrames } from '@views/walk/lib/atlas';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { childFacing, extractChildFrames } from '../src/features/walk/lib/atlas';
 
 test('front/back reversals select the destination artwork without an intermediate side pose', () => {
   assert.equal(childFacing(0, Math.PI), 2);

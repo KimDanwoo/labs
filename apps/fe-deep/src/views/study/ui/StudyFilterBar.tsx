@@ -7,7 +7,7 @@ import {
   STUDY_TIER_ORDER,
   type StudyFilter,
   type StudyTier,
-} from '@views/study/model/services';
+} from '../model/services/studyFilter';
 
 const FILTER_LABELS: Record<StudyFilter, string> = {
   [STUDY_FILTER.all]: '전체',

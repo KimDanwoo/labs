@@ -1,15 +1,15 @@
 'use client';
 
+import { listKoreanVoices } from '@shared/lib/koreanVoice';
 import {
   getPreferredVoiceName,
   getSynth,
-  listKoreanVoices,
   setPreferredVoiceName,
   subscribePreferredVoice,
-} from '@shared/lib';
+} from '@shared/lib/speechVoice';
+import { SpeakButton } from '@shared/ui/SpeakButton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/react';
 import { useSyncExternalStore } from 'react';
-import { SpeakButton } from './SpeakButton';
 
 /** Radix Select는 빈 문자열 value를 허용하지 않아 자동 선택에 별도 값을 쓴다. */
 const AUTO_VALUE = 'auto';

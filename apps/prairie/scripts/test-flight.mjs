@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createFlightState, updateFlight, FLIGHT } from '../src/features/runner-control/model/services/flightDynamics.ts';
+import { createFlightState, updateFlight, FLIGHT } from '../src/views/ride/model/runner-control/services/flightDynamics.ts';
 const controls = { lift: false, launch: false, descend: false, holdAltitude: false, speed: 12 };
 const airborne = (height = 12, velocity = 0) => ({ height, velocity, groundY: 0 });
 function simulate(state, seconds, fps, input = controls, ground = 0) {

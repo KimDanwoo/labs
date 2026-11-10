@@ -15,7 +15,6 @@ export default defineConfig({
       '@views': resolve(__dirname, './src/views'),
       '@entities': resolve(__dirname, './src/entities'),
       '@features': resolve(__dirname, './src/features'),
-      '@widgets': resolve(__dirname, './src/widgets'),
       '@shared': resolve(__dirname, './src/shared'),
       '@test': resolve(__dirname, './src/test'),
     },

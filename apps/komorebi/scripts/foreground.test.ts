@@ -1,7 +1,7 @@
+import { FOREGROUNDS, foregroundOrder, isForegroundInFront } from '@views/walk/model/world/foreground';
+import { WORLDS, canWalk, type Region } from '@views/walk/model/world/world';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { FOREGROUNDS, foregroundOrder, isForegroundInFront } from '../src/shared/world/foreground';
-import { WORLDS, canWalk, type Region } from '../src/shared/world/world';
 
 function covered(region: Region, x: number, y: number, feetDepth: number) {
   return FOREGROUNDS.some((layer) => {

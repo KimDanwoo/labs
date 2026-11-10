@@ -1,4 +1,4 @@
-import { isAdmin } from './isAdmin';
+import { isAdmin } from '@shared/lib/isAdmin';
 
 type AuthenticatedUser = { email?: string | null };
 

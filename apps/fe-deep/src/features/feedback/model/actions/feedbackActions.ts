@@ -1,9 +1,9 @@
 'use server';
 
-import type { CreateFeedbackInput } from '@features/feedback/model/types';
-import { createAdminSupabaseClient } from '@shared/config/supabase/admin';
-import { createServerSupabaseClient } from '@shared/config/supabase/server';
+import { createAdminSupabaseClient } from '@shared/api/supabaseAdmin';
+import { createServerSupabaseClient } from '@shared/api/supabaseServer';
 import { requireAdmin } from '@shared/lib/requireAdmin';
+import type { CreateFeedbackInput } from '../types/types';
 
 /** 로그인 사용자의 피드백을 생성한다. */
 export async function createFeedback(input: CreateFeedbackInput) {

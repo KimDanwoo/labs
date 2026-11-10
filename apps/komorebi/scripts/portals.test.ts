@@ -1,7 +1,7 @@
+import { getWorldPortals, isInsidePortal, portalAt } from '@views/walk/model/world/portals';
+import { WORLDS, canWalk, findRoute, movePlayer, type Region } from '@views/walk/model/world/world';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { getWorldPortals, isInsidePortal, portalAt } from '../src/shared/world/portals';
-import { WORLDS, canWalk, findRoute, movePlayer, type Region } from '../src/shared/world/world';
 
 const regions = Object.keys(WORLDS) as Region[];
 

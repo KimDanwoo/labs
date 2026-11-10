@@ -1,4 +1,4 @@
-import { getAllCategories } from '@entities/question/model/services';
+import { getAllCategories } from '@entities/question';
 import { SITE_URL } from '@shared/config/site';
 import { createClient } from '@supabase/supabase-js';
 import type { MetadataRoute } from 'next';

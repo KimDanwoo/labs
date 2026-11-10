@@ -1,5 +1,6 @@
-import { GAME_MODE, KILLER_MODE_DEDUCTION, POINT_RANGES, TIME_THRESHOLDS } from '@entities/game/model/constants';
-import type { PointInput, PointResult } from '@entities/game/model/types';
+import { GAME_MODE } from '../constants/game';
+import { KILLER_MODE_DEDUCTION, POINT_RANGES, TIME_THRESHOLDS } from '../constants/record';
+import type { PointInput, PointResult } from '../types/record';
 
 /**
  * 시간 기반 포인트 계산.

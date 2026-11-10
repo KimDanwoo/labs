@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useSyncExternalStore } from 'react';
 import {
   SERVER_SNAPSHOT,
   getSnapshot,
@@ -7,8 +8,7 @@ import {
   markQuestionLearned,
   subscribe,
   toggleQuestionBookmark,
-} from '@views/reference/model/store';
-import { useCallback, useSyncExternalStore } from 'react';
+} from '../store/questionActionsStore';
 
 /**
  * 질문 1개의 북마크·학습완료 상태를 직접 구독하고 실행한다.

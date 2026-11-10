@@ -1,7 +1,4 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
-import * as THREE from 'three';
-import { catPosition, createCompanionScene } from '../src/features/walk/lib/companionScene';
+import { catPosition, createCompanionScene } from '@views/walk/lib/companionScene';
 import {
   BAG_CAPACITY,
   COMPANION_ACTION,
@@ -13,9 +10,12 @@ import {
   changeCompanions,
   parseCompanions,
   type Companions,
-} from '../src/features/walk/lib/companions';
-import { FISHING_PHASE, type FishingFrame } from '../src/features/walk/lib/fishing';
-import { FISHING_PIER, HOME, HOME_AQUARIUM, PIER_CAT, canWalk, findRoute } from '../src/shared/world/world';
+} from '@views/walk/lib/companions';
+import { FISHING_PHASE, type FishingFrame } from '@views/walk/lib/fishing';
+import { FISHING_PIER, HOME, HOME_AQUARIUM, PIER_CAT, canWalk, findRoute } from '@views/walk/model/world/world';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import * as THREE from 'three';
 
 const caught = { id: 'goby', size: 15 };
 const keep = (state: Companions, uid: string) =>

@@ -1,7 +1,7 @@
 'use client';
 
-import { matchKeywords } from '@shared/lib';
-import { cn } from '@shared/lib/utils';
+import { cn } from '@shared/lib/cn';
+import { matchKeywords } from '@shared/lib/matchKeywords';
 import { Check, X } from 'lucide-react';
 
 interface KeywordCheckProps {

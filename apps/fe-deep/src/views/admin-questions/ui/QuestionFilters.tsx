@@ -1,6 +1,6 @@
 'use client';
 
-import type { Category } from '@entities/question/model/types';
+import type { Category } from '@entities/question';
 import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/react';
 
 interface QuestionFiltersProps {

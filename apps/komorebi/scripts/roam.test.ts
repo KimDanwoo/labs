@@ -1,15 +1,7 @@
+import { depthPace, laneEnds, passingRoute, presence, startGait, strollOn, walkOn } from '@views/walk/lib/roam';
+import { canWalk, type Region } from '@views/walk/model/world/world';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  depthPace,
-  laneEnds,
-  passingRoute,
-  presence,
-  startGait,
-  strollOn,
-  walkOn,
-} from '../src/features/walk/lib/roam';
-import { canWalk, type Region } from '../src/shared/world/world';
 
 const REGIONS: Region[] = ['village', 'river', 'coast', 'forest', 'school', 'shops'];
 

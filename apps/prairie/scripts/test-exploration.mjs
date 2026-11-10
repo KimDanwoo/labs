@@ -6,7 +6,7 @@ import {
   isExplorationClearing,
   LANDMARKS,
   parseProgress,
-} from '../src/shared/exploration/world.ts';
+} from '../src/views/ride/model/exploration/world.ts';
 
 test('gate crossing catches dash segments, accepts both directions and requires aperture', () => {
   const center = { x: 0, y: 10, z: 20 };

@@ -1,6 +1,6 @@
-import { NUMBER_COUNTS } from '@entities/game/model/constants';
-import { buildGameResultState, resolveBoardState } from '@entities/game/model/services';
 import { atom } from 'jotai';
+import { NUMBER_COUNTS } from '../constants/board';
+import { buildGameResultState, resolveBoardState } from '../services/gameResult';
 import {
   boardAtom,
   cagesAtom,

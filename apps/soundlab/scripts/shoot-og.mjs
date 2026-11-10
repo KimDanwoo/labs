@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { TRACKS } from '../src/entities/track/model/constants/tracks.ts';
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
-const RENDERER = join(HERE, '../src/widgets/stage/lib/renderer.ts');
+const RENDERER = join(HERE, '../src/views/player/lib/stage/renderer.ts');
 const DEFAULT_OUT = join(HERE, '../app/opengraph-image.png');
 
 const WIDTH = 1200;

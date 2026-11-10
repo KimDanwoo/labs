@@ -41,23 +41,23 @@ src/
 │   │   └── auth/             # 인증
 │   └── admin/            # 어드민 (질문 CRUD, AI 생성)
 │
-├── widgets/              # 조합된 UI 블록
-│   └── layout/               # 헤더, 푸터
-│
-├── features/             # 사용자 행동 단위
-│   └── bookmark/             # 북마크 기능
+├── features/             # 여러 화면에서 쓰는 사용자 행동
+│   ├── bookmark/             # 북마크
+│   ├── feedback/             # 피드백
+│   └── question-form/        # 질문 작성·수정 폼
 │
 ├── entities/             # 도메인 모델
 │   ├── question/             # 질문/카테고리 도메인
 │   └── progress/             # 학습 진도 도메인
 │
 └── shared/               # 공통 인프라
-    ├── config/supabase/      # Supabase 클라이언트
+    ├── api/                  # Supabase 클라이언트(브라우저·서버·관리자·미들웨어)
+    ├── config/               # 사이트 설정, 저장소 키
     ├── ui/                   # shadcn/ui 컴포넌트
     └── lib/                  # 유틸리티
 ```
 
-**의존성 방향**: `app → widgets → features → entities → shared`
+**의존성 방향**: `app → views → features → entities → shared`
 
 <br>
 

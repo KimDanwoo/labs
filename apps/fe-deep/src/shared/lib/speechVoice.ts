@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from '@shared/constants';
+import { STORAGE_KEYS } from '@shared/config/storageKeys';
 
 export const getSynth = () => (typeof window === 'undefined' ? undefined : window.speechSynthesis);
 

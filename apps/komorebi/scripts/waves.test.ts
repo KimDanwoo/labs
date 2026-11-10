@@ -1,6 +1,6 @@
+import { waveFrame } from '@views/walk/lib/waves';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { waveFrame } from '../src/features/walk/lib/waves';
 
 test('a breaker plays its frames once, then the sea waits for the next wave', () => {
   const breaker = { kind: 'break', period: 6 } as const;

@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@shared/lib/utils';
+import { cn } from '@shared/lib/cn';
 import { ThemeToggle } from '@ui/react';
 import { ExternalLink, FileText, LayoutDashboard, MessageSquare, Plus } from 'lucide-react';
 import Link from 'next/link';
