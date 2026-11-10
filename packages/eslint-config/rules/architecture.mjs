@@ -75,11 +75,20 @@ const structure = {
   },
 };
 
+function sharedItem(rest) {
+  const [segment, item = ''] = rest.split('/');
+  return `${segment}/${item.replace(/\.[cm]?[jt]sx?$/, '')}`;
+}
+
+function segmentOf(own) {
+  return own.rest.split('/')[1];
+}
+
 function publicApiProblem(from, to, source) {
   const inner = to.rest.split('/').slice(1);
   if (to.layer === 'shared') {
-    if (from?.layer === 'shared') return null;
     const parts = to.rest.split('/').filter((part) => !PUBLIC_ENTRY.test(part));
+    if (from?.layer === 'shared' && sharedItem(from.rest) === sharedItem(to.rest)) return null;
     if (parts.length > 2) return 'shared는 세그먼트 또는 항목 진입점까지만 import한다(@shared/lib/<항목>).';
     if (parts.length === 1 && ITEM_ENTRY_SEGMENTS.has(parts[0]))
       return `@shared/${parts[0]}/<항목>처럼 항목 진입점으로 import한다.`;
@@ -147,7 +156,7 @@ const componentFile = {
     const basename = path.basename(context.filename, '.tsx');
     function check(node, name) {
       if (!name || !/^[A-Z]/.test(name)) return;
-      if (!own.rest.includes('/ui/')) {
+      if (segmentOf(own) !== 'ui') {
         context.report({ node, message: '컴포넌트는 ui/에 둔다. 훅 파일에 Provider를 함께 선언하지 않는다.' });
       } else if (name !== basename) {
         context.report({ node, message: `컴포넌트 ${name}은 ${name}.tsx로 분리한다.` });
@@ -202,20 +211,39 @@ const interactiveComposition = {
   },
 };
 
+const JOTAI_MODULE = /^jotai(?:\/|$)|^jotai-family$/;
+const ATOM_FACTORY = /^atom(?:With\w+|Family)?$/;
+
 const entityState = {
   meta: { type: 'problem', schema: [] },
   create(context) {
+    const own = location(context.filename);
+    const isAllowed = own && SLICED_LAYERS.has(own.layer) && segmentOf(own) === 'model';
+    if (!own || isAllowed) return {};
+    const factories = new Set();
+    const namespaces = new Set();
+    function isAtomFactory(callee) {
+      if (callee.type === 'Identifier') return factories.has(callee.name);
+      return (
+        callee.type === 'MemberExpression' &&
+        callee.object.type === 'Identifier' &&
+        namespaces.has(callee.object.name) &&
+        callee.property.type === 'Identifier' &&
+        ATOM_FACTORY.test(callee.property.name)
+      );
+    }
     return {
-      CallExpression(node) {
-        const own = location(context.filename);
-        if (
-          own &&
-          node.callee.type === 'Identifier' &&
-          /^atom(?:With\w+|Family)?$/.test(node.callee.name) &&
-          (!SLICED_LAYERS.has(own.layer) || !own.rest.includes('/model/'))
-        ) {
-          context.report({ node, message: '전역 atom은 쓰는 슬라이스의 model/에서 정의한다.' });
+      ImportDeclaration(node) {
+        if (!JOTAI_MODULE.test(node.source.value)) return;
+        for (const specifier of node.specifiers) {
+          if (specifier.type === 'ImportNamespaceSpecifier') namespaces.add(specifier.local.name);
+          else if (specifier.type === 'ImportSpecifier' && ATOM_FACTORY.test(specifier.imported.name))
+            factories.add(specifier.local.name);
         }
+      },
+      CallExpression(node) {
+        if (isAtomFactory(node.callee))
+          context.report({ node, message: '전역 atom은 쓰는 슬라이스의 model/에서 정의한다.' });
       },
     };
   },

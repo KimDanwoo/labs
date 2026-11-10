@@ -87,7 +87,10 @@ test('slices are imported through their public API only', () => {
   ])
     assert.equal(api(code), 1, code);
   assert.equal(api("import { Home } from '@views/home/ui/Home';", 'app/page.tsx'), 1);
-  assert.equal(api("import { cn } from './cn/cn';", 'src/shared/ui/button/Button.tsx'), 0);
+  assert.equal(api("import { variants } from './variants';", 'src/shared/ui/button/Button.tsx'), 0);
+  assert.equal(api("import { cn } from '@shared/lib/cn';", 'src/shared/ui/button/Button.tsx'), 0);
+  assert.equal(api("import { app } from '@shared/lib/firebase/config';", 'src/shared/ui/button/Button.tsx'), 1);
+  assert.equal(api("import { app } from '../../lib/firebase/config';", 'src/shared/ui/button/Button.tsx'), 1);
   assert.equal(api("import { Game } from '@entities/game/model/types';", 'src/features/first/model/first.test.ts'), 0);
 });
 
@@ -112,6 +115,10 @@ test('components require a matching file and cannot hide in a hook', () => {
       .length,
     1,
   );
+  assert.equal(
+    check('component-file', 'function Other() { return <div />; }', 'src/entities/game/config/ui/Other.tsx').length,
+    1,
+  );
 });
 
 test('Next routes cannot be placed in the FSD app layer', () => {
@@ -123,13 +130,22 @@ test('Next routes cannot be placed in the FSD app layer', () => {
 });
 
 test('global atoms belong to a slice model', () => {
-  assert.equal(check('entity-state', 'const value = atom(0);').length, 1);
-  assert.equal(check('entity-state', 'const value = atom(0);', 'src/shared/lib/store.ts').length, 1);
-  assert.equal(check('entity-state', 'const value = atom(0);', 'src/entities/game/model/store/game.ts').length, 0);
+  const state = (code, filename) => check('entity-state', code, filename).length;
+  const atom = "import { atom } from 'jotai';\nconst value = atom(0);";
+  assert.equal(state(atom), 1);
+  assert.equal(state(atom, 'src/shared/lib/store.ts'), 1);
+  assert.equal(state(atom, 'src/views/home/ui/model/state.ts'), 1);
+  assert.equal(state(atom, 'src/entities/game/model/store/game.ts'), 0);
   assert.equal(
-    check('entity-state', 'const value = atomWithStorage("key", 0);', 'src/views/home/model/store.ts').length,
+    state(
+      "import { atomWithStorage } from 'jotai/utils';\nconst value = atomWithStorage('key', 0);",
+      'src/views/home/model/store.ts',
+    ),
     0,
   );
+  assert.equal(state("import { atom as makeAtom } from 'jotai/vanilla';\nconst value = makeAtom(0);"), 1);
+  assert.equal(state("import * as jotai from 'jotai';\nconst value = jotai.atom(0);"), 1);
+  assert.equal(state("import { atom } from './chemistry';\nconst value = atom(0);"), 0);
 });
 
 test('a navigation button has only one interactive element', () => {
