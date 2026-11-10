@@ -1,12 +1,12 @@
-import assert from 'node:assert/strict';
-import test from 'node:test';
 import {
   CHARACTER,
   DEFAULT_APPEARANCE,
   characterAtlas,
   parseAppearance,
   sleepingPortrait,
-} from '../src/shared/world/appearance';
+} from '@views/walk/model/world/appearance';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 
 test('appearance persistence keeps outfits and migrates old characters to the straw-hat child', () => {
   for (const character of [CHARACTER.child, 'boy', 'girl'])

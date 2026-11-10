@@ -14,7 +14,7 @@ const outputPath = process.argv[3]
   : new URL('public/art/child-motion-v2-ready.webp', root).pathname;
 const source = await readFile(sourcePath);
 const modules = await Promise.all([
-  readFile(new URL('src/features/walk/lib/atlas.ts', root), 'utf8'),
+  readFile(new URL('src/views/walk/lib/atlas.ts', root), 'utf8'),
   readFile(new URL('scripts/prepareChildAtlas.ts', root), 'utf8'),
 ]);
 const javascript = modules

@@ -1,8 +1,8 @@
+import { createRegionPlates, nearbyRegions } from '@views/walk/lib/regionPlates';
+import { WORLDS, type Region } from '@views/walk/model/world/world';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { createRegionPlates, nearbyRegions } from '../src/features/walk/lib/regionPlates';
-import { WORLDS, type Region } from '../src/shared/world/world';
 
 test('nearby regions are the current painting and the ones its exits lead to', () => {
   assert.deepEqual(nearbyRegions('village').sort(), ['forest', 'home', 'river', 'shops', 'village']);

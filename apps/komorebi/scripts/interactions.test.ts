@@ -1,7 +1,7 @@
+import { interactionDestination, isNearHomeBed } from '@views/walk/model/world/interactions';
+import { HOME_BED, HOME_DESK, LANDMARKS, canWalk, findRoute } from '@views/walk/model/world/world';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { interactionDestination, isNearHomeBed } from '../src/shared/world/interactions';
-import { HOME_BED, HOME_DESK, LANDMARKS, canWalk, findRoute } from '../src/shared/world/world';
 
 test('solid home furniture routes to usable floor instead of sending the child into it', () => {
   assert.equal(interactionDestination({ x: 1160 / 15.36, z: 720 / 10.24 }, 'home'), HOME_BED);

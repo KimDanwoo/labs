@@ -1,6 +1,4 @@
-import assert from 'node:assert/strict';
-import test from 'node:test';
-import { hasGroundBetween, isOnGround } from '../src/shared/world/ground';
+import { hasGroundBetween, isOnGround } from '@views/walk/model/world/ground';
 import {
   LANDMARKS,
   SPAWN,
@@ -12,7 +10,9 @@ import {
   movePlayer,
   nextRegionStep,
   type Region,
-} from '../src/shared/world/world';
+} from '@views/walk/model/world/world';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 
 test('spawn, every landmark and every portal arrival are on walkable lanes', () => {
   assert.ok(canWalk(SPAWN.x, SPAWN.z));

@@ -1,6 +1,6 @@
+import { advanceMotion, angleDelta, createMotion, solveLeg } from '@views/walk/lib/motion';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { advanceMotion, angleDelta, createMotion, solveLeg } from '../src/features/walk/lib/motion';
 
 test('turning across the angle seam takes the short route', () => {
   const m = createMotion();
@@ -41,7 +41,7 @@ test('leg joints put a reachable planted foot on the ground with a level sole', 
 });
 
 test('jump has a consistent apex, cannot double-jump, and lands back at ground height', async () => {
-  const { createJump, startJump, advanceJump } = await import('../src/features/walk/lib/motion');
+  const { createJump, startJump, advanceJump } = await import('../src/views/walk/lib/motion');
   for (const fps of [30, 60, 120]) {
     const jump = createJump();
     assert.ok(startJump(jump));
@@ -62,7 +62,7 @@ test('jump has a consistent apex, cannot double-jump, and lands back at ground h
 });
 
 test('planted foot cancels forward travel and recovery clears the ground', async () => {
-  const { footCycle } = await import('../src/features/walk/lib/motion');
+  const { footCycle } = await import('../src/views/walk/lib/motion');
   for (const run of [0, 0.5, 1]) {
     const stance = 0.6 - run * 0.22;
     const cycle = 3.8 + run * 1.3;
@@ -77,7 +77,7 @@ test('planted foot cancels forward travel and recovery clears the ground', async
 });
 
 test('a footfall lands each time the gait passes half a cycle, never twice for one crossing', async () => {
-  const { crossedFootfall, isAirborne, startJump, createJump } = await import('../src/features/walk/lib/motion');
+  const { crossedFootfall, isAirborne, startJump, createJump } = await import('../src/views/walk/lib/motion');
   assert.equal(crossedFootfall(0.1, 0.2), false);
   assert.equal(crossedFootfall(Math.PI - 0.01, Math.PI + 0.01), true);
   assert.equal(crossedFootfall(Math.PI + 0.01, Math.PI + 0.02), false);

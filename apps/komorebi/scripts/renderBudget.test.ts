@@ -1,12 +1,6 @@
+import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from '@views/walk/lib/renderBudget';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  RENDER_RATE,
-  nextRenderTime,
-  renderPixelRatio,
-  settle,
-  shouldRenderFrame,
-} from '../src/features/walk/lib/renderBudget';
 
 test('large Retina displays stay within the pixel budget without changing layout', () => {
   for (const [width, height, density] of [

@@ -1,6 +1,6 @@
+import { constrainCameraAxis } from '@views/walk/lib/cameraBounds';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { constrainCameraAxis } from '../src/features/walk/lib/cameraBounds';
 
 test('camera stays inside the painting at every edge across desktop and mobile viewports', () => {
   for (const aspect of [390 / 844, 844 / 390, 1, 1.44, 16 / 9, 3]) {
