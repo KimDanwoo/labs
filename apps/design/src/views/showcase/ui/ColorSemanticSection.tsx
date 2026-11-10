@@ -1,6 +1,6 @@
 import { colors } from '@tokens/css';
-import { SEMANTIC_ROLES } from '@views/showcase/model/constants';
-import type { ColorToken } from '@views/showcase/model/types';
+import { SEMANTIC_ROLES } from '../model/constants/showcase';
+import type { ColorToken } from '../model/types/colorSemanticSection';
 import { Section } from './Section';
 import { SwatchGrid } from './SwatchGrid';
 const TOKEN_NAMES = Object.keys(colors) as ColorToken[];

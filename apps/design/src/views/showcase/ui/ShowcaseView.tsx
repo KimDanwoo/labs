@@ -1,13 +1,11 @@
 import { ThemeToggle } from '@ui/react';
-import {
-  ColorSemanticSection,
-  ComponentsSection,
-  PaletteSection,
-  RadiusSection,
-  ShadowSection,
-  SpacingSection,
-  TypographySection,
-} from '@views/showcase/ui';
+import { ColorSemanticSection } from './ColorSemanticSection';
+import { ComponentsSection } from './ComponentsSection';
+import { PaletteSection } from './PaletteSection';
+import { RadiusSection } from './RadiusSection';
+import { ShadowSection } from './ShadowSection';
+import { SpacingSection } from './SpacingSection';
+import { TypographySection } from './TypographySection';
 
 export function ShowcaseView() {
   return (

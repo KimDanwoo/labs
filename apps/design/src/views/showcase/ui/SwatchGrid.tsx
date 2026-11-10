@@ -1,5 +1,5 @@
 import { colors } from '@tokens/css';
-import type { ColorToken } from '@views/showcase/model/types';
+import type { ColorToken } from '../model/types/colorSemanticSection';
 import { Swatch } from './Swatch';
 
 export function SwatchGrid({ names }: { names: ColorToken[] }) {
