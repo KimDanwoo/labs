@@ -11,7 +11,7 @@ import { userAtom } from '@entities/session';
 import { cn } from '@shared/lib/cn';
 import { useDismissible } from '@shared/lib/useDismissible';
 import { useSnackbar } from '@shared/lib/useSnackbar';
-import { BottomSheet } from '@shared/ui/BottomSheet';
+import { BottomSheet } from '@shared/ui/bottom-sheet';
 import { Snackbar } from '@shared/ui/Snackbar';
 import { useAtomValue } from 'jotai';
 import { memo, useEffect, useRef } from 'react';
