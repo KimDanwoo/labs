@@ -1,28 +1,43 @@
-import { createClient } from '@supabase/supabase-js';
-import { readFileSync } from 'fs';
+/**
+ * 카테고리별 질문 덤프.
+ *   node scripts/dump-questions.mjs                        # 질문 목록(한 줄 요약)
+ *   node scripts/dump-questions.mjs --full                 # 답변·태그까지
+ *   node scripts/dump-questions.mjs --full react css       # 지정한 카테고리 slug만
+ */
+import { createReadClient } from './lib/seedClient.mjs';
 
-// Load .env.local
-const envContent = readFileSync('.env.local', 'utf-8');
-for (const line of envContent.split('\n')) {
-  const t = line.trim();
-  if (!t || t.startsWith('#')) continue;
-  const i = t.indexOf('=');
-  if (i > 0) process.env[t.slice(0, i)] = t.slice(i + 1);
-}
+const FULL_FLAG = '--full';
+const RULE = '='.repeat(60);
 
-const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const args = process.argv.slice(2);
+const isFull = args.includes(FULL_FLAG);
+const slugs = args.filter((arg) => arg !== FULL_FLAG);
 
-const { data: cats } = await sb.from('categories').select('id, slug, title, order_num').order('order_num');
-console.log('=== CATEGORIES ===');
-cats.forEach((c) => console.log(`${c.id} | ${c.slug} | ${c.title}`));
+const sb = createReadClient();
 
-console.log('\n=== QUESTIONS BY CATEGORY ===');
-for (const c of cats) {
-  const { data: qs } = await sb
+const summaryLine = (q) => `  ${q.id} | ${q.difficulty} | ${q.sub_category || '-'} | ${q.question}`;
+
+const fullBlock = (q) =>
+  [
+    `\n--- ${q.id} | ${q.difficulty} | ${q.sub_category} ---`,
+    `Q: ${q.question}`,
+    `A:\n${q.answer}`,
+    `tags: ${q.tags?.join(', ') || 'none'}`,
+  ].join('\n');
+
+let categoryQuery = sb.from('categories').select('id, slug, title').order('order_num');
+if (slugs.length > 0) categoryQuery = categoryQuery.in('slug', slugs);
+const { data: categories, error: categoryError } = await categoryQuery;
+if (categoryError) throw categoryError;
+
+for (const category of categories) {
+  const { data: questions, error } = await sb
     .from('questions')
-    .select('id, question, difficulty, sub_category, order_num')
-    .eq('category_id', c.id)
+    .select('id, question, answer, difficulty, sub_category, order_num, tags')
+    .eq('category_id', category.id)
     .order('order_num');
-  console.log(`\n--- ${c.title} (${c.slug}) : ${qs.length}개 ---`);
-  qs.forEach((q) => console.log(`  ${q.id} | ${q.difficulty} | ${q.sub_category || '-'} | ${q.question}`));
+  if (error) throw error;
+
+  console.log(`\n${RULE}\n${category.title} (${category.slug}) : ${questions.length}개\n${RULE}`);
+  console.log(questions.map(isFull ? fullBlock : summaryLine).join('\n'));
 }
