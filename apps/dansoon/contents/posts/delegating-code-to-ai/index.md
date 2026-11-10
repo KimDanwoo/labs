@@ -2,6 +2,7 @@
 title: "AI에게 코드를 맡기기 위한 위임의 조건"
 description: "AI가 만든 코드가 각각은 맞는데 전체가 틀어지는 문제를 겪고, 규칙과 검증, 피드백 루프로 판단을 위임하는 조건을 정리했어요."
 publishedAt: "2026-08-07T15:59:14+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["ai"]
 legacyUrl: "https://dansoon-dev.tistory.com/30"
@@ -56,6 +57,8 @@ Agent는 현재 코드베이스를 읽고 기존 패턴을 찾고 요구사항�
 세 번째에서는 기존 모델이 애매해서 상태를 하나 더 만든다.
 
 네 번째에서는 기존 abstraction으로는 표현하기 어려워 별도의 경로를 만든다.
+
+다섯 번째에서는 기존 구조에 예외 처리를 넣는다.
 
 ```text
 Feature A → 조건 하나 추가
@@ -219,7 +222,7 @@ Agent에게 "우리는 이런 구조를 쓴다"고 알려줬다고 해서 3개�
 
 그래서 최근에는 하네스에 세 번째 축을 넣었다.
 
-되읽기(Read-back) 다.
+되읽기(Read-back)다.
 
 현재 check는 실제 src 코드를 다시 훑으면서 설치된 구조 팩의 의존 방향이 아직 지켜지고 있는지를 검사한다.
 
@@ -596,19 +599,15 @@ Human
 
 적어도 지금은 그렇다.
 
+---
+
 ## my-fe-harness로 위임의 조건을 옮겨보기
 
 이 생각을 실제 개발 환경에도 조금씩 옮겨보고 있다.
 
 최근 만든 [my-fe-harness](https://github.com/KimDanwoo/my-fe-harness)도 그 과정에서 시작했다.
 
-Agent에게 매번
-
-“이 프로젝트에서는 이렇게 작성해줘.”, “이 구조는 지켜줘.”
-
-“이건 하지 마.”
-
-라고 다시 설명하는 대신,
+Agent에게 매번 “이 프로젝트에서는 이렇게 작성해줘.”, “이 구조는 지켜줘.”, “이건 하지 마.”라고 다시 설명하는 대신,
 
 내가 중요하다고 판단한 기준을 규칙으로 만들고  
 필요한 순간에 컨텍스트로 주입하고  
@@ -629,10 +628,7 @@ Agent에게 매번
 
 그리고 다음에는 무엇을 자동화할 것인가.
 
-AI에게 더 많은 코드를 맡기기 위해 만든 도구지만
-
-역설적으로 만들면서 가장 많이 고민한 것은  
-무엇까지 맡길 것인가였다.
+AI에게 더 많은 코드를 맡기기 위해 만든 도구지만 역설적으로 만들면서 가장 많이 고민한 것은 무엇까지 맡길 것인가였다.
 
 아마 앞으로도 내가 공부하고 싶은 건 그 경계일 것 같다.
 
@@ -653,9 +649,9 @@ AI에게 구현을 맡긴 실제 프로젝트 사례는 [사주 서비스 제작
 -   **GitHub — 코드를 만드는 비용과 소유하는 비용은 다르다**  
     AI로 코드 생성 비용은 낮아졌지만, 이해·검증·유지보수 비용까지 사라진 것은 아니라는 이야기.  
     [The cost of saying yes has changed](https://github.blog/engineering/the-cost-of-saying-yes-has-changed/)
--   **Martin Fowler — Agentic Programming**  
+-   **Martin Fowler — Agentic Engineering**  
     AI에게 구현을 맡기는 것과 코드에 대한 책임까지 내려놓는 것은 다르다는 관점.  
-    [Agentic Programming](https://martinfowler.com/bliki/AgenticProgramming.html)
+    [Agentic Engineering](https://martinfowler.com/bliki/AgenticProgramming.html)
 -   **More Code, Less Reuse — AI 생성 코드 품질 연구**  
     AI가 만든 PR에서 코드 재사용과 중복 측면의 특성을 분석한 연구.  
     [논문 보기](https://arxiv.org/abs/2601.21276)

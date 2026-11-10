@@ -2,7 +2,7 @@
 title: "MSW로 테스트 코드를 작성하며 FSD 구조 보완하기"
 description: "MSW 핸들러로 테스트 독립성을 확보하고 CRUD·필터 테스트를 작성하며 FSD 구조를 보완한 과정과 배운 점을 돌아봐요."
 publishedAt: "2024-12-11T13:25:56+09:00"
-updatedAt: "2025-08-03T09:36:21+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["testing","fsd"]
 legacyUrl: "https://dansoon-dev.tistory.com/8"
@@ -12,7 +12,7 @@ cover: "./cover.jpg"
 
 ## 테스트 코드를 작성하며 겪은 문제
 
-이번 주 과제는 지난주에 [FSD 패턴과 상태 관리 리팩토링](/posts/fsd-state-management-refactoring/)한 프로젝트 구조를 바탕으로 테스트 코드를 작성하고, FSD 패턴과 상태 관리에서 미숙했던 부분을 개선하는 것이었다. 이 과정에서 몇 가지 문제와 고민이 생겼다.
+이번 주 과제는 지난주에 [FSD 패턴으로 상태 관리 리팩토링하기](/posts/fsd-state-management-refactoring/)한 프로젝트 구조를 바탕으로 테스트 코드를 작성하고, FSD 패턴과 상태 관리에서 미숙했던 부분을 개선하는 것이었다. 이 과정에서 몇 가지 문제와 고민이 생겼다.
 
 1.  테스트 범위 결정의 어려움
     -   주요 기능을 모두 테스트하려다 보니 테스트 범위를 어디까지 설정해야 할지 고민이 많았다. 특히 유틸리티 함수와 커스텀 훅의 테스트부터 시작해, 전체 흐름을 확인하는 통합 테스트까지 커버하려고 하니 테스트 케이스 관리와 코드 작성이 생각보다 오래 걸렸다.
@@ -93,13 +93,13 @@ describe('일정 CRUD 및 뷰 모드 기능', () => {
     setupMockHandlers();
     renderApp();
 
-    const newEvent = { 
-	    title: '프론트엔드 리뷰', 
-	    date: '2024-11-04', 
-	    startTime: '09:00', 
-	    endTime: '10:00' 
-	  };
-	  
+    const newEvent = {
+      title: '프론트엔드 리뷰',
+      date: '2024-11-04',
+      startTime: '09:00',
+      endTime: '10:00',
+    };
+
     await fillEventForm(user, newEvent); // 헬퍼 함수
     await user.click(screen.getByRole('button', { name: /일정 추가/ }));
 
