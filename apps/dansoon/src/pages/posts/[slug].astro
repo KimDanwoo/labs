@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { getImage, Image } from 'astro:assets';
 import { render } from 'astro:content';
+import AdFit from '~/components/AdFit.astro';
 import CategoryBadge from '~/components/CategoryBadge.astro';
 import CopyLinkButton from '~/components/CopyLinkButton.astro';
 import Giscus from '~/components/Giscus.astro';
@@ -105,6 +106,7 @@ const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c
         </div>
         <PostNav older={older} newer={newer} />
         <RelatedPosts posts={getRelatedPosts(posts, post)} />
+        <AdFit />
         <Giscus />
       </footer>
     </article>
