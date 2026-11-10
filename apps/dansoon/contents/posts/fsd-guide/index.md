@@ -2,7 +2,7 @@
 title: "Feature-Sliced Design(FSD) 가이드: Next.js 앱 일곱 개에 적용하며 정한 기준"
 description: "FSD의 레이어·슬라이스·세그먼트와 import 규칙을 공식 문서 기준으로 정리하고, Next.js 앱 일곱 개에 적용하며 정한 기준과 부딪힌 문제를 담았어요. 2026년 바뀐 Next.js 가이드도 반영했어요."
 publishedAt: "2024-12-17T16:56:31+09:00"
-updatedAt: "2026-11-09T18:00:00+09:00"
+updatedAt: "2026-11-10T18:00:00+09:00"
 category: "dev"
 tags: ["fsd","architecture"]
 legacyUrl: "https://dansoon-dev.tistory.com/13"
@@ -59,21 +59,24 @@ FSD에서 가장 중요한 규칙은 하나다.
 
 **pages 레이어는 `views`라고 부른다.** Next.js는 App Router를 써도 `src/pages` 폴더가 있으면 Pages Router로 읽으려 한다. 그래서 FSD pages 레이어의 이름을 처음부터 `views`로 바꿨다.
 
-**필요한 레이어만 만든다.** 레이어 여섯 개를 다 만들어 두지 않는다. 지금 앱 일곱 개의 `src/` 아래를 보면 이렇다.
+**widgets 레이어는 쓰지 않는다.** 한 화면에서만 쓰는 블록은 그 화면(views) 안에 두고, 여러 화면에서 쓰는 동작은 features로, 앱 전체 레이아웃은 `src/app`으로 보낸다.
+
+**쓰는 화면이 하나뿐이면 그 화면 안에 둔다.** features와 entities는 지금 실제로 여러 화면에서 쓰는 코드만 남긴다. 화면이 하나뿐인 앱은 `views` 슬라이스 하나에 거의 모든 코드가 들어간다. 지금 앱 일곱 개의 `src/` 아래를 보면 이렇다.
 
 | 앱 | 있는 레이어 |
 |---|---|
-| design | app, views |
-| komorebi | app, views, features, shared |
-| hub | app, views, widgets, entities |
-| soundlab | app, views, widgets, entities, shared |
-| awesome-sudoku, fe-deep, prairie | app, views, widgets, features, entities, shared |
+| design, hub, komorebi | app, views |
+| prairie | app, views, shared |
+| soundlab | app, views, entities, shared |
+| awesome-sudoku, fe-deep | app, views, features, entities, shared |
 
-**공유 디자인 시스템이 shared UI를 맡는다.** 버튼 같은 표시용 기본 요소는 모노레포의 UI 패키지에서 가져오고, 앱의 `src/shared`에는 그 앱에서만 쓰는 공용 코드만 둔다.
+**공유 디자인 시스템이 shared UI를 맡는다.** 버튼 같은 표시용 기본 요소는 모노레포의 UI 패키지에서 가져오고, 앱의 `src/shared`에는 그 앱에서만 쓰는 공용 코드만 둔다. shared 바로 아래에는 `ui`·`lib`·`api`·`config` 세그먼트만 두고, 도메인 이름이 붙은 폴더는 쓰는 슬라이스로 옮긴다.
 
-**import는 세그먼트까지만 한다.** `@widgets/project-grid/ui`처럼 경로에 `ui`인지 `model`인지가 항상 보이게 하고, 그보다 깊은 파일을 직접 가져오지 않는다. 슬라이스 전체를 한 번에 내보내는 통합 `index.ts`는 일부러 만들지 않는다. 없어야 슬라이스 루트에서 import하는 코드가 컴파일 에러로 바로 막힌다. alias와 barrel 패턴 자체는 [import 경로 관리 알아보기](/posts/import-path-alias-barrel-fsd/)에 정리했다.
+**슬라이스는 루트 `index.ts`로만 내보낸다.** 밖에서는 `@entities/game`처럼 슬라이스 이름까지만 적는다. 슬라이스 안에서는 `../model/types/game`처럼 상대경로로 파일을 직접 가져오고, 자기 `index.ts`는 거치지 않는다. `index.ts`에는 밖에서 실제로 쓰는 것만 이름을 하나씩 적는다. shared는 슬라이스가 없으니 `@shared/lib/cn`, `@shared/ui/BottomSheet`처럼 항목 단위로 가져온다.
 
-**전역 상태는 entities에 둔다.** 전역 상태가 꼭 필요하면 `entities/<도메인>/model/store/`에 두고, 쓰는 컴포넌트가 직접 구독한다.
+**전역 상태는 쓰는 슬라이스의 `model`에 둔다.** 여러 화면에서 쓰게 되면 그때 entities로 내린다.
+
+이 가운데 import 기준은 2026년 11월에 바꾼 것이다. 그전에는 반대였다. `@widgets/project-grid/ui`처럼 세그먼트마다 `index.ts`를 두고 경로에 `ui`인지 `model`인지가 보이게 했고, 슬라이스 루트의 `index.ts`는 일부러 만들지 않았다. 공식 문서는 정확히 그 반대를 권한다. 슬라이스가 있는 레이어에서는 세그먼트 안에 `index.ts`를 두지 말고 루트 하나만 두라고 하고, `shared/ui`와 `shared/lib`는 하나로 묶지 말고 항목마다 따로 두라고 한다([Public API](https://fsd.how/docs/reference/public-api/)). 그래서 앱 일곱 개를 한꺼번에 공식 방식으로 옮겼다. 같은 때에 widgets 레이어를 없애고, 쓰는 화면이 하나뿐인 슬라이스를 화면 안으로 합쳤다. alias와 barrel 패턴 자체는 [import 경로 관리 알아보기](/posts/import-path-alias-barrel-fsd/)에 정리했다.
 
 이 규칙들은 처음에 문서로만 적어 뒀는데, 새 코드를 쓸 때마다 어긋났다. 지금은 공유 ESLint 설정으로 막는다. 그 과정은 [FSD 규칙을 문서 대신 ESLint로 강제하기](/posts/fsd-eslint-boundaries/)에 있다.
 
@@ -117,7 +120,7 @@ Next.js는 요청을 가로채는 파일을 정해진 위치에서만 찾는다.
 
 슬라이스마다 `index.ts`로 공개할 것만 내보내면, 클라이언트 컴포넌트가 그 `index.ts`를 import할 때 같은 파일에서 내보낸 서버 전용 코드까지 함께 읽힌다. 서버 전용 모듈을 클라이언트에서 쓴다는 에러가 여기서 났다.
 
-2024년에는 shared 안에 `server-utils/`와 `utils/`를 따로 두는 식으로 피했다. 지금 공식 가이드는 슬라이스에 `index.server.ts`를 하나 더 두라고 한다. 서버 컴포넌트나 `server-only`로 표시한 데이터 접근 함수는 거기서만 내보내는 방식이다. 서버 코드를 shared로 따로 빼지 않고 슬라이스 안에 그대로 둘 수 있다는 점이 다르다.
+2024년에는 shared 안에 `server-utils/`와 `utils/`를 따로 두는 식으로 피했다. 지금 공식 가이드는 슬라이스에 `index.server.ts`를 하나 더 두라고 한다. 서버 컴포넌트나 `server-only`로 표시한 데이터 접근 함수는 거기서만 내보내는 방식이다. 서버 코드를 shared로 따로 빼지 않고 슬라이스 안에 그대로 둘 수 있다는 점이 다르다. 지금은 나도 이 방식을 쓴다. 서버에서 데이터를 읽어 오는 화면은 `index.server.ts`로 내보내고, 라우팅 파일이 `@views/study/index.server`처럼 가져간다.
 
 ### 정적 리소스
 
