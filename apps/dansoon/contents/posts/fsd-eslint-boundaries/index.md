@@ -1,11 +1,12 @@
 ---
-title: "FSD 규칙을 문서 대신 ESLint로 강제하기: boundaries와 직접 만든 규칙 6개"
-description: "문서로만 정해 둔 FSD 규칙은 새 코드마다 어긋났어요. Next.js 앱 일곱 개가 쓰는 공유 ESLint 설정에 eslint-plugin-boundaries와 직접 만든 규칙 6개를 넣어 레이어 방향, 세그먼트 깊이, 슬라이스 구조를 lint로 막은 과정을 실제 에러 출력과 함께 정리해요."
+title: "FSD 규칙을 문서 대신 ESLint로 강제하기: boundaries와 직접 만든 규칙"
+description: "문서로만 정해 둔 FSD 규칙은 새 코드마다 어긋났어요. Next.js 앱 일곱 개가 쓰는 공유 ESLint 설정에 eslint-plugin-boundaries와 직접 만든 규칙을 넣어 레이어 방향, 공개 API, 슬라이스 구조를 lint로 막은 과정을 실제 에러 출력과 함께 정리해요."
 publishedAt: "2026-11-06T16:50:00+09:00"
 category: "dev"
 tags: ["fsd", "architecture"]
 thumbnail: "./thumbnail.jpg"
 cover: "./cover.jpg"
+updatedAt: "2026-11-10T18:00:00+09:00"
 draft: false
 ---
 
@@ -19,6 +20,8 @@ chore(eslint-config): import 세그먼트 깊이를 lint로 강제한다 — 문
 
 그 뒤로 문서에만 있던 규칙을 하나씩 lint로 옮겼다. 지금은 규칙을 어기면 `pnpm lint`가 실패하고 CI도 같은 명령으로 막는다.
 
+> 2026년 11월 10일에 덧붙인다. 이 글을 올리고 나흘 뒤에 import 규칙을 FSD 공식 문서의 공개 API 방식으로 바꿨다. 1~7장은 그전까지의 기록이라 그대로 두고, 바뀐 규칙은 8장에 정리했다.
+
 ## 1. 문서에서 lint로 옮겨 온 순서
 
 규칙은 한 번에 옮기지 않았다. 커밋 기록을 날짜순으로 정리하면 이렇다.
@@ -29,6 +32,7 @@ chore(eslint-config): import 세그먼트 깊이를 lint로 강제한다 — 문
 | 2026-08-24 | import 세그먼트 깊이 제한 |
 | 2026-08-30 | 식별자·파일·디렉토리 네이밍 규약, 세그먼트를 넘는 상대경로 금지 |
 | 2026-11-04 | 직접 만든 FSD 규칙 6개, 저장소 전체 구조 검사 |
+| 2026-11-10 | 공식 공개 API 기준으로 import 규칙 교체, widgets 레이어 제거(8장) |
 
 모든 앱은 같은 설정을 쓴다. 공유 패키지 `@repo/eslint-config`의 `fsd.config.mjs`를 각 앱의 `eslint.config.mjs`가 펼쳐 쓰는 구조라, 규칙을 한 곳에서 고치면 일곱 개 앱에 함께 적용된다.
 
@@ -144,9 +148,46 @@ ESLint는 파일 단위로 코드를 본다. 패키지 설정이나 여러 파�
 
 ## 7. 남은 것
 
-이 규칙 체계는 아직 widgets 레이어를 전제로 한다. 레이어 정책에 `views → widgets → features` 방향이 그대로 들어 있다. FSD 공식 문서는 2026년 7월부터 widgets 레이어를 권장하지 않는데, 그 내용은 [FSD는 왜 Widgets 레이어를 권하지 않게 됐을까](/posts/fsd-2026-widgets/)에 정리했다. 위젯을 페이지 슬라이스로 옮긴다면 정책 한 줄과 직접 만든 규칙의 레이어 목록을 함께 고쳐야 한다.
+이 글을 처음 올릴 때 규칙 체계는 widgets 레이어를 전제로 했다. 레이어 정책에 `views → widgets → features` 방향이 그대로 들어 있었다. FSD 공식 문서는 2026년 7월부터 widgets 레이어를 권장하지 않는데, 그 내용은 [FSD는 왜 Widgets 레이어를 권하지 않게 됐을까](/posts/fsd-2026-widgets/)에 정리했다. 위젯을 페이지 슬라이스로 옮기려면 정책 한 줄과 직접 만든 규칙의 레이어 목록을 함께 고쳐야 했고, 이 일은 11월 10일에 했다(8장).
 
 FSD 규칙을 검사하는 도구는 이것 말고도 있다. FSD 공식 린터인 [steiger](https://github.com/feature-sliced/steiger)는 FSD 구조 규칙이 미리 들어 있는 별도 CLI다. eslint-plugin-boundaries는 규칙을 직접 적어야 하는 대신 ESLint 규칙이라서 다른 lint 에러와 함께 편집기와 `pnpm lint`에서 바로 보인다. 이 저장소는 후자에 직접 만든 규칙과 구조 검사 스크립트를 더한 형태다.
+
+## 8. 2026년 11월: 공식 공개 API로 규칙을 바꿨다
+
+3장의 규칙은 내가 정한 것이었다. 세그먼트마다 `index.ts`를 두고 `@entities/game/model/types`처럼 세그먼트까지 적어서 가져오게 했다. FSD 공식 문서는 반대를 권한다. 슬라이스 루트에 `index.ts` 하나만 두고, 슬라이스가 있는 레이어에서는 세그먼트 안에 `index.ts`를 두지 말라고 한다([Public API](https://fsd.how/docs/reference/public-api/)). 11월 10일에 앱 일곱 개와 lint 규칙을 공식 방식으로 옮겼다.
+
+| 항목 | 이전 | 지금 |
+| --- | --- | --- |
+| 슬라이스 밖에서 import | 세그먼트 배럴까지(`@entities/game/model/types`) | 슬라이스 루트만(`@entities/game`) |
+| 슬라이스 안에서 import | 세그먼트를 넘으면 alias | 상대경로로 파일을 직접 |
+| 세그먼트 안 `index.ts` | 필수 | 금지 |
+| shared | `@shared/ui` 배럴 | 항목 단위(`@shared/ui/BottomSheet`) |
+| 레이어 | 6개 | 5개(widgets 제거) |
+| 전역 atom 위치 | `entities/<도메인>/model/store/` | 쓰는 슬라이스의 `model/` |
+
+상대경로 규칙은 정반대가 됐다. 8월 30일에는 세그먼트를 넘는 상대경로 200건을 alias로 바꿨는데, 이번에는 슬라이스 안의 alias를 모두 상대경로로 되돌렸다. 공식 문서가 같은 슬라이스 안에서는 상대경로를, 다른 슬라이스는 alias를 쓰라고 하기 때문이다. 슬라이스 안에서 자기 `index.ts`를 거쳐 가져오면 순환 참조가 생긴다.
+
+lint 설정에서는 `no-restricted-imports` 패턴 두 개를 지우고 직접 만든 규칙 `fsd/public-api`를 더했다. 직접 만든 규칙은 7개가 됐고 파일은 262줄이다. `fsd/slice-structure`는 세그먼트 이름을 `ui`·`model`·`api`·`lib`·`config`로 제한하고, 세그먼트 안의 `index.ts`와 shared 바로 아래의 도메인 폴더를 막는다. 테스트는 10개 시나리오로 늘었다.
+
+5장과 같은 방식으로 스도쿠 앱의 `entities/game` 안에서 규칙을 어긴 코드를 넣어 봤다.
+
+```ts
+// src/entities/game/model/hooks/sample.ts
+import { sessionAtom } from '@entities/session/model/store/sessionAtoms';
+import { cellAt } from '@entities/game';
+import { validate } from '@entities/game/lib/validator';
+import { cn } from '@shared/lib';
+```
+
+```text
+1:29  error  entities/session는 공개 API(index.ts)로만 import한다                        fsd/public-api
+1:29  error  같은 레이어의 game → session 교차 참조를 금지한다. 도메인을 합치거나 공통 책임을 하위 레이어로 옮긴다  fsd/independent-slices
+2:24  error  슬라이스 안에서 자기 공개 API를 import하지 않는다(순환 참조)                          fsd/public-api
+3:26  error  슬라이스 안에서는 상대경로로 import한다                                         fsd/public-api
+4:20  error  @shared/lib/<항목>처럼 항목 진입점으로 import한다                              fsd/public-api
+```
+
+공식 린터 steiger도 이때 다시 검토했다. steiger는 `views`라는 이름을 pages 레이어로 인식하지 못해서, 이 저장소에서는 화면 레이어가 검사에서 빠졌다. 그래서 steiger는 들이지 않고 ESLint 규칙을 고쳐 쓰는 쪽을 택했다. 바뀐 기준 전체는 [FSD 가이드](/posts/fsd-guide/)의 4장에 있다.
 
 ## 정리
 
@@ -155,6 +196,7 @@ FSD 규칙을 검사하는 도구는 이것 말고도 있다. FSD 공식 린터�
 - 세그먼트 깊이와 상대경로는 `no-restricted-imports` 패턴으로 막았다. 상대경로 200건을 alias로 바꾸고 순환을 만드는 같은 폴더 참조 688건은 남겼다.
 - 플러그인으로 표현하기 어려운 규칙 6개는 직접 만들었다. import 문자열을 경로로 풀어 판단하므로 파일로 해석되지 않는 import도 잡는다.
 - 파일 하나로 판단할 수 없는 규칙은 `check:architecture`가 검사하고 `pnpm lint`와 CI가 둘 다 실행한다.
+- 11월 10일에 import 규칙을 공식 공개 API 방식으로 바꿨다. 세그먼트 깊이 규칙은 `fsd/public-api`로 대체했고, 슬라이스 안은 다시 상대경로를 쓴다.
 
 FSD 레이어 구성은 [쉽게 정리한 FSD 가이드](/posts/fsd-guide/)에, import 경로와 배럴 패턴은 [import 경로 관리 알아보기](/posts/import-path-alias-barrel-fsd/)에 정리돼 있다.
 

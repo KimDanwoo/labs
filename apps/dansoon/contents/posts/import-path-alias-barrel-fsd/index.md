@@ -2,13 +2,15 @@
 title: "import 경로 관리 알아보기 (alias와 barrel 패턴, FSD)"
 description: "상대경로 import의 문제를 alias로 풀고 barrel 패턴으로 모듈을 캡슐화하는 방법을 정리해요. FSD 적용 사례와 주의점도 담았어요."
 publishedAt: "2024-12-15T14:47:25+09:00"
-updatedAt: "2025-08-03T09:37:41+09:00"
+updatedAt: "2026-11-10T18:00:00+09:00"
 category: "dev"
 tags: ["fsd","architecture"]
 legacyUrl: "https://dansoon-dev.tistory.com/12"
 thumbnail: "./thumbnail.jpg"
 cover: "./cover.jpg"
 ---
+
+> 2024년 12월에 쓴 글이다. 2026년 11월에 FSD 공식 문서 기준으로 barrel을 쓰는 방식을 바꿨다. 달라진 내용은 글 끝의 '2026년 11월에 바꾼 것'에 덧붙였다.
 
 ## 들어가며
 
@@ -155,7 +157,6 @@ Feature-Sliced Design(FSD) 아키텍처는 모듈 별칭과 시너지가 크며,
     "paths": {
       "@/*": ["src/*"],
       "@app/*": ["src/app/*"],
-      "@processes/*": ["src/processes/*"],
       "@pages/*": ["src/pages/*"],
       "@widgets/*": ["src/widgets/*"],
       "@features/*": ["src/features/*"],
@@ -171,13 +172,14 @@ Feature-Sliced Design(FSD) 아키텍처는 모듈 별칭과 시너지가 크며,
 ```ts
 // 계층 간 의존성 방향을 명시적으로 보여주는 import 구조
 import { AppProvider } from '@app/providers';
-import { PaymentProcess } from '@processes/payment';
 import { ProfilePage } from '@pages/profile';
 import { Header, Footer } from '@widgets/layout';
 import { LoginForm } from '@features/auth';
 import { User, Product } from '@entities/models';
 import { Button, Input, formatCurrency } from '@shared/ui';
 ```
+
+processes 레이어는 지금 폐지돼서 예시에서 뺐다. Next.js에서는 `pages` 폴더 이름이 라우터와 겹치므로 이름을 바꿔야 한다. 그 내용은 FSD 가이드에 있다.
 
 ## barrel 패턴으로 모듈 캡슐화하기
 
@@ -201,7 +203,6 @@ export type { ButtonProps, InputProps, SelectProps } from './types';
 
 1.  모듈 경계 명확화: 공개 API와 내부 구현을 명확히 구분
 2.  버전 간 호환성 유지: 내부 구현 변경 시에도 공개 API 안정성 확보
-3.  컴파일 시간 최적화: IDE와 TypeScript 컴파일러의 타입 추론 성능 향상
 
 ### 계층적 barrel 패턴
 
@@ -264,6 +265,8 @@ import { TextInput, PrimaryButton, Card } from '@components/common';
 import { TextInput, PrimaryButton, SpecializedTable } from '@components';
 ```
 
+지금은 이 계층적 barrel을 쓰지 않는다. `index.ts`가 층마다 쌓이면 같은 것을 가져오는 경로가 여러 개가 되고, `export *`로 무엇이 공개되는지도 흐려진다. 이유는 글 끝에 적었다.
+
 ### barrel 패턴과 트리쉐이킹
 
 barrel 패턴을 쓸 때 트리쉐이킹 최적화를 위한 모범 사례는 다음과 같다.
@@ -299,7 +302,8 @@ export { default as LargeComponent } from './LargeComponent';
 2.  리팩토링 효율성: 구조 변경 시 import 경로 수정 작업 감소
 3.  코드 가독성: PR 리뷰 시 의존성 파악이 용이해져 리뷰 효율성 향상
 4.  온보딩 시간 단축: 신규 개발자가 프로젝트 구조를 이해하는 시간 감소
-5.  빌드 최적화: 적절한 barrel 패턴 적용으로 번들 크기 감소
+
+barrel이 번들 크기나 빌드 속도를 줄여 주지는 않는다. 오히려 `index.ts`가 많아지면 개발 서버가 느려질 수 있고, 관련 없는 것을 한 파일로 묶으면 안 쓰는 코드가 함께 딸려 올 수 있다. 얻는 것은 경계와 가독성이다.
 
 ## 별칭과 barrel 패턴을 쓸 때 주의할 점
 
@@ -325,6 +329,36 @@ export { default as LargeComponent } from './LargeComponent';
         // .eslintrc.jsmodule.exports = {  // ...  rules: {    'no-restricted-imports': [      'error',      {        patterns: [          {            group: ['../*'],            message: 'Use aliases instead of relative imports'          }        ]      }    ]  }};
         ```
 
+## 2026년 11월에 바꾼 것
+
+이 글을 쓴 뒤로 barrel을 쓰는 기준이 달라졌다. FSD 공식 문서의 [Public API](https://fsd.how/docs/reference/public-api/)를 기준으로 삼았다.
+
+**barrel은 슬라이스 루트에 하나만 둔다.** 공식 문서는 슬라이스가 있는 레이어에서 세그먼트 안에 `index.ts`를 두지 말라고 한다. 루트 `index.ts` 하나면 충분하고, `index.ts`가 많으면 개발 서버가 느려진다는 이유다. 앞에서 본 계층적 barrel과는 반대 방향이다.
+
+```ts
+// entities/game/index.ts — 슬라이스의 유일한 출입구
+export { GameBoard } from './ui/GameBoard';
+export { useGame } from './model/hooks/useGame';
+export type { Game } from './model/types/game';
+```
+
+**`export *`는 쓰지 않는다.** 밖에서 실제로 쓰는 것만 이름을 하나씩 적는다. 공식 문서는 `export *`가 무엇이 공개되는지 찾기 어렵게 만들고, 내부 구현까지 실수로 내보내게 한다고 설명한다.
+
+**슬라이스 안에서는 상대경로를 쓴다.** 앞에서는 `../*`를 ESLint로 막는 설정을 권했는데, 지금은 그렇게 하지 않는다. 공식 문서는 같은 슬라이스 안이면 상대경로를, 다른 슬라이스면 alias를 쓰라고 한다. 슬라이스 안에서 자기 `index.ts`를 거쳐 가져오면 순환 참조가 생기기 때문이다. alias는 슬라이스 밖으로 나갈 때만 쓴다.
+
+**shared의 `ui`와 `lib`는 하나로 묶지 않는다.** 서로 관련 없는 것들의 모음이라, `index.ts` 하나로 묶으면 번들러에 따라 하나만 가져와도 나머지가 함께 딸려 올 수 있다. 공식 문서는 항목마다 진입점을 따로 두라고 한다.
+
+```ts
+// 이전
+import { Button, Input } from '@shared/ui';
+
+// 지금
+import { Button } from '@shared/ui/button';
+import { Input } from '@shared/ui/input';
+```
+
+정리하면 barrel은 "모듈의 출입구"로만 쓰고, 편하게 가져오려고 층층이 쌓지 않는다.
+
 ## 결론
 
 모듈 별칭과 barrel 패턴은 코드 스타일 선호가 아니라 확장 가능하고 유지보수하기 쉬운 코드베이스를 구축하기 위한 견고한 아키텍처 패턴이다.
@@ -335,4 +369,4 @@ export { default as LargeComponent } from './LargeComponent';
 
 새로운 프로젝트를 시작할 때마다 이러한 패턴을 기본 설정으로 도입한다면, 보다 견고하고 유지보수가 용이한 코드베이스를 구축할 수 있을 것이다.
 
-배럴로만 import하는 규칙을 lint로 강제하는 방법은 [FSD 규칙을 문서 대신 ESLint로 강제하기](/posts/fsd-eslint-boundaries/)에 정리했다.
+공개 API로만 import하는 규칙을 lint로 강제하는 방법은 [FSD 규칙을 문서 대신 ESLint로 강제하기](/posts/fsd-eslint-boundaries/)에 정리했다.
