@@ -1,45 +1,31 @@
 'use client';
 
 import { getCurrentStreak } from '@entities/progress';
-import {
-  DIFFICULTY_CONFIG,
-  DIFFICULTY_VALUES,
-  getAllCategories,
-  getAllQuestions,
-  getQuestionsByCategorySlug,
-  type Category,
-  type Difficulty,
-  type Question,
-} from '@entities/question';
-import { shuffleArray } from '@shared/lib/shuffle';
-import { Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/react';
-import { ArrowDownAZ, Flame, Shuffle, Trophy, X } from 'lucide-react';
-import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { getAllCategories, type Question } from '@entities/question';
+import { useQuery } from '@tanstack/react-query';
+import { Button } from '@ui/react';
+import { X } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { loadStudyQuestions } from '../api/loadStudyQuestions';
+import { DEFAULT_SETTINGS, PHASE, type StudyPhase, type StudySettings } from '../model/constants/study';
 import { useCardStudySession } from '../model/hooks/useCardStudySession';
+import { LearnDone } from './LearnDone';
+import { LearnSetup } from './LearnSetup';
 import { StudyCardView } from './StudyCardView';
 
-const STUDY_ORDER = { sequential: 'sequential', random: 'random' } as const;
-type StudyOrder = keyof typeof STUDY_ORDER;
-
-type Phase = 'setup' | 'loading' | 'study' | 'done';
-
 export function LearnPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [phase, setPhase] = useState<Phase>('setup');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [order, setOrder] = useState<StudyOrder>(STUDY_ORDER.sequential);
-  /** 포함할 난이도. 빈 배열 = 전체. */
-  const [difficulties, setDifficulties] = useState<Difficulty[]>([]);
+  const [phase, setPhase] = useState<StudyPhase>(PHASE.setup);
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [streak, setStreak] = useState(0);
   const [isEmpty, setIsEmpty] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [loadError, setLoadError] = useState<Error | null>(null);
+
+  const categories = useQuery({ queryKey: ['categories'], queryFn: () => getAllCategories() });
 
   const onComplete = useCallback(() => {
     setStreak(getCurrentStreak());
-    setPhase('done');
+    setPhase(PHASE.done);
   }, []);
 
   const {
@@ -60,198 +46,51 @@ export function LearnPage() {
     resetStudy,
   } = useCardStudySession({ questions, phase, onComplete });
 
-  useEffect(() => {
-    let cancelled = false;
-    getAllCategories()
-      .then((data) => {
-        if (!cancelled) setCategories(data);
-      })
-      .catch((cause: unknown) => {
-        if (!cancelled) setError(new Error('학습 카테고리를 불러오지 못했습니다.', { cause }));
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const startStudy = async () => {
-    setPhase('loading');
+  const startStudy = async (nextSettings: StudySettings) => {
+    setSettings(nextSettings);
+    setPhase(PHASE.loading);
     setIsEmpty(false);
 
     try {
-      let loaded =
-        selectedCategory === 'all' ? await getAllQuestions() : await getQuestionsByCategorySlug(selectedCategory);
-
-      if (difficulties.length > 0) {
-        loaded = loaded.filter((q) => difficulties.includes(q.difficulty));
-      }
-
+      const loaded = await loadStudyQuestions(nextSettings, categories.data ?? []);
       if (loaded.length === 0) {
         setIsEmpty(true);
-        setPhase('setup');
+        setPhase(PHASE.setup);
         return;
       }
-
-      if (order === STUDY_ORDER.random) {
-        loaded = shuffleArray(loaded);
-      } else {
-        const categoryOrder = new Map(categories.map((cat) => [cat.id, cat.order_num]));
-        loaded = [...loaded].sort(
-          (a, b) =>
-            (categoryOrder.get(a.category_id) ?? 0) - (categoryOrder.get(b.category_id) ?? 0) ||
-            a.order_num - b.order_num,
-        );
-      }
-
       setQuestions(loaded);
       resetStudy();
-      setPhase('study');
+      setPhase(PHASE.study);
     } catch (cause) {
-      setError(new Error('학습 문제를 불러오지 못했습니다.', { cause }));
+      setLoadError(new Error('학습 문제를 불러오지 못했습니다.', { cause }));
     }
-  };
-
-  const toggleDifficulty = (value: Difficulty) => {
-    setDifficulties((prev) => (prev.includes(value) ? prev.filter((d) => d !== value) : [...prev, value]));
   };
 
   const backToSetup = () => {
     setQuestions([]);
-    setPhase('setup');
+    setPhase(PHASE.setup);
   };
 
-  if (error) throw error;
+  if (categories.error) throw new Error('학습 카테고리를 불러오지 못했습니다.', { cause: categories.error });
+  if (loadError) throw loadError;
 
-  // ==================== SETUP ====================
-  if (phase === 'setup' || phase === 'loading') {
+  if (phase === PHASE.setup || phase === PHASE.loading) {
     return (
-      <div className="container mx-auto max-w-168 px-4 py-8 sm:py-12 animate-fade-in">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">학습</h1>
-        <p className="text-muted-foreground mb-8">질문을 보고 답을 먼저 적어본 뒤, 모범 답변과 비교하세요.</p>
-
-        <Card className="p-6 space-y-6">
-          <div>
-            <label className="text-sm font-normal mb-3 block">카테고리</label>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isLoading}>
-              <SelectTrigger>
-                <SelectValue placeholder={isLoading ? '카테고리 불러오는 중...' : '카테고리 선택'} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">전체 카테고리</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.slug}>
-                    {cat.icon} {cat.title}
-                    {cat.question_count !== undefined && cat.question_count !== null && ` (${cat.question_count})`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-sm font-normal mb-3 block">순서</label>
-            <div className="grid grid-cols-2 gap-1.5">
-              <Button
-                variant={order === STUDY_ORDER.sequential ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setOrder(STUDY_ORDER.sequential)}
-                className="gap-1.5 transition-all duration-200"
-              >
-                <ArrowDownAZ className="h-3.5 w-3.5" />
-                순서대로
-              </Button>
-              <Button
-                variant={order === STUDY_ORDER.random ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setOrder(STUDY_ORDER.random)}
-                className="gap-1.5 transition-all duration-200"
-              >
-                <Shuffle className="h-3.5 w-3.5" />
-                무작위
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <label className="text-sm font-normal mb-3 block">난이도</label>
-            <div className="grid grid-cols-4 gap-1.5">
-              <Button
-                variant={difficulties.length === 0 ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setDifficulties([])}
-                className="transition-all duration-200"
-              >
-                전체
-              </Button>
-              {DIFFICULTY_VALUES.map((value) => (
-                <Button
-                  key={value}
-                  variant={difficulties.includes(value) ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => toggleDifficulty(value)}
-                  className="transition-all duration-200"
-                >
-                  {DIFFICULTY_CONFIG[value].label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <Button
-            onClick={startStudy}
-            size="lg"
-            className="w-full gap-2 h-12 shadow-md hover:shadow-lg transition-all duration-300"
-            disabled={isLoading || phase === 'loading'}
-          >
-            {phase === 'loading' ? '문제 불러오는 중...' : '학습 시작'}
-          </Button>
-
-          {isEmpty && <p className="text-sm text-muted-foreground text-center">조건에 맞는 문제가 없습니다.</p>}
-        </Card>
-
-        <div className="mt-6 p-4 rounded-xl bg-muted/40 border border-border/50">
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            <strong className="text-foreground/70">학습 방법:</strong> 답을 보기 전에 떠오르는 내용을 먼저 적어보세요.
-            읽기만 하는 것보다 직접 인출해보는 쪽이 기억에 훨씬 오래 남습니다.
-          </p>
-        </div>
-      </div>
+      <LearnSetup
+        categories={categories.data ?? []}
+        isLoadingCategories={categories.isPending}
+        initialSettings={settings}
+        isStarting={phase === PHASE.loading}
+        isEmpty={isEmpty}
+        onStart={startStudy}
+      />
     );
   }
 
-  // ==================== DONE ====================
-  if (phase === 'done') {
-    return (
-      <div className="container mx-auto max-w-168 px-4 py-8 sm:py-12 animate-fade-in-up">
-        <div className="text-center py-16">
-          <Trophy className="h-16 w-16 text-highlight mx-auto mb-5" />
-          <h1 className="text-3xl font-bold tracking-tight mb-3">학습 완료!</h1>
-          <p className="text-muted-foreground mb-6">{questions.length}문제를 모두 학습했습니다.</p>
-
-          {streak > 0 && (
-            <div className="inline-flex items-center gap-2 rounded-full bg-streak/10 border border-streak/20 px-4 py-2 mb-8">
-              <Flame className="h-5 w-5 text-streak" />
-              <span className="text-lg font-bold">{streak}일 연속 학습 중!</span>
-            </div>
-          )}
-
-          <div className="flex gap-3 justify-center">
-            <Button onClick={backToSetup} variant="outline" className="gap-2 shadow-sm">
-              다시 학습하기
-            </Button>
-            <Button variant="ghost" className="gap-2" asChild>
-              <Link href="/mypage/progress">학습 현황 보기</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+  if (phase === PHASE.done) {
+    return <LearnDone questionCount={questions.length} streak={streak} onRestart={backToSetup} />;
   }
 
-  // ==================== STUDY ====================
   return (
     <StudyCardView
       currentIndex={currentIndex}
