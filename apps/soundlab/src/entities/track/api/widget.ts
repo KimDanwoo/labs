@@ -82,6 +82,20 @@ export function soundId(sound: unknown): number | null {
   return typeof sound.id === 'number' ? sound.id : null;
 }
 
+const ENGINE_FRAME_STYLE = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
+
+/** 소리만 내는 숨은 위젯 iframe을 문서에 붙인다. display:none은 일부 엔진에서 미디어 재생을 막아 1×1 투명으로 둔다. */
+export function mountEngineFrame(src: string): HTMLIFrameElement {
+  const frame = document.createElement('iframe');
+  frame.style.cssText = ENGINE_FRAME_STYLE;
+  frame.allow = 'autoplay';
+  frame.setAttribute('aria-hidden', 'true');
+  frame.title = 'SoundCloud 재생 엔진';
+  frame.src = src;
+  document.body.append(frame);
+  return frame;
+}
+
 export function widgetSrc(url: string): string {
   const params = new URLSearchParams({
     url,
@@ -231,4 +245,11 @@ export function writeLastPlayed(last: LastPlayed): void {
   } catch {
     return;
   }
+}
+
+/** 어디서부터 들을 것인가. 주소가 곡을 지목했으면(공유 링크) 그 링크의 ?t가, 아니면 지난 방문 기록이 정한다. */
+export function readStartTarget(sharedTrackId: number | undefined): LastPlayed | null {
+  if (sharedTrackId === undefined) return readLastPlayed();
+  const ms = readSharedStartMs(window.location.search);
+  return ms === null ? null : { id: sharedTrackId, ms };
 }

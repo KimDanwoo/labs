@@ -6,14 +6,15 @@ import { useCallback, useEffect, useRef } from 'react';
 import {
   type ScWidget,
   loadWidgetApi,
-  readLastPlayed,
-  readSharedStartMs,
+  mountEngineFrame,
+  readStartTarget,
   setUrl,
   soundId,
   trackUrl,
   widgetSrc,
   writeLastPlayed,
 } from '../../api/widget';
+import { type PositionReport, advanceClock, estimatePosition } from '../../lib/playbackClock';
 import { REPEAT_MODE } from '../constants/repeatMode';
 import {
   currentIndexAtom,
@@ -48,17 +49,28 @@ const EVENTS = {
   error: 'error',
 } as const;
 
-/**
- * 위젯 위치 보고의 지터 흡수. 보고값을 그대로 좇으면 시계가 앞뒤로 잔튀고 비트 격자가 같이 튄다.
- * 프레임당 보정을 경과시간의 이 비율로 묶어 단조로 흘리고, 문턱을 넘는 차이는 시킹으로 보고 점프한다.
- */
-const DRIFT_CORRECT_RATIO = 0.3;
-const DRIFT_SNAP_MS = 250;
-
 /** ready가 이 안에 안 오면 엔진이 막힌 것으로 본다 — w.soundcloud.com은 광고 차단기가 흔히 막는다. */
 const READY_TIMEOUT_MS = 10_000;
-/** 재생 중 위치 보고가 이보다 오래 끊기면 시계 전진을 세운다 — 소리는 멈췄는데 진행바만 달리지 않게. */
-const STALL_MS = 3000;
+const ENGINE_BLOCKED_MESSAGE =
+  '재생 엔진이 응답하지 않습니다. 광고 차단기가 soundcloud.com을 막고 있는지 확인해 주세요.';
+const TRACK_FAILED_MESSAGE = '곡을 재생할 수 없습니다. 잠시 후 다시 시도해 주세요.';
+
+const MS_PER_SECOND = 1000;
+
+const isValidPosition = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value) && value >= 0;
+
+/** 위젯이 알려준 버퍼 비율을 0~1로 묶어 남긴다. 값이 없거나 깨졌으면 직전 값을 지킨다. */
+const writeBuffered = (loaded: number | undefined) => {
+  if (typeof loaded === 'number' && Number.isFinite(loaded)) frameState.buffered = Math.min(1, Math.max(0, loaded));
+};
+
+/** 지금 곡이 아닌 곡을 무작위로 고른다. 곡이 둘 이상일 때만 부른다. */
+const randomOtherIndex = (current: number, count: number): number => {
+  let next = current;
+  while (next === current) next = Math.floor(Math.random() * count);
+  return next;
+};
 
 /** 이어 듣기 기록. 자주 쓰면 낭비, 드물게 쓰면 마지막 몇 초를 잃는다. */
 const SAVE_INTERVAL_MS = 5000;
@@ -89,7 +101,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   // PLAY_PROGRESS는 수백 ms 간격이라 60fps에 부족하다. 마지막 보고값과 시각을 남겨 rAF에서 보간한다.
   // live = 그 보고가 "지금 흐르는 소리"의 것인가. play 이벤트는 버퍼링 전에 오므로
   // 첫 보고를 받기 전까지 보간을 세워둔다 — 안 세우면 소리 없이 시간이 흐르다 0으로 되돌아간다.
-  const reported = useRef({ ms: 0, at: 0, live: false });
+  const reported = useRef<PositionReport>({ ms: 0, at: 0, live: false });
   // 화면에 실제로 내보낸 시계. 보고값과의 차이를 조금씩만 좁혀 비트 격자가 튀지 않게 한다.
   const smoothMs = useRef(0);
   const playing = useRef(false);
@@ -146,48 +158,26 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     return () => window.removeEventListener('pagehide', onHide);
   }, [remember]);
 
-  // 어디서부터 들을 것인가. 주소가 곡을 지목했으면(공유 링크) 그 링크의 ?t가, 아니면 지난 방문 기록이 정한다.
   // 소리를 자동으로 내지는 않는다 — 브라우저가 제스처 없는 재생을 막는다. 첫 재생 조작에서 이어진다.
   useEffect(() => {
-    const shared = () => {
-      const ms = readSharedStartMs(window.location.search);
-      const at = tracks.findIndex((track) => track.id === initialTrackId);
-      return ms === null || at < 0 ? null : { index: at, ms };
-    };
-    const remembered = () => {
-      const last = readLastPlayed();
-      if (!last) return null;
-      const at = tracks.findIndex((track) => track.id === last.id);
-      return at < 0 ? null : { index: at, ms: last.ms };
-    };
-
-    const point = initialTrackId !== undefined ? shared() : remembered();
-    const track = point && tracks[point.index];
-    if (!point || !track) return;
-    setIndex(point.index);
-    if (track.durationMs - point.ms < RESUME_TAIL_MS) return;
-    resume.current = point;
+    const target = readStartTarget(initialTrackId);
+    const at = target ? tracks.findIndex((track) => track.id === target.id) : -1;
+    const track = tracks[at];
+    if (!target || !track) return;
+    setIndex(at);
+    if (track.durationMs - target.ms < RESUME_TAIL_MS) return;
+    resume.current = { index: at, ms: target.ms };
     frameState.durationMs = track.durationMs;
-    reported.current = { ms: point.ms, at: performance.now(), live: false };
+    reported.current = { ms: target.ms, at: performance.now(), live: false };
   }, [initialTrackId, setIndex, tracks]);
 
   useEffect(() => {
     let disposed = false;
-    const frame = document.createElement('iframe');
-    // display:none은 일부 엔진에서 미디어 재생을 막는다. 1×1 투명으로 둔다.
-    frame.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
-    frame.allow = 'autoplay';
-    frame.setAttribute('aria-hidden', 'true');
-    frame.title = 'SoundCloud 재생 엔진';
     // 곡 전체를 한 번에 올려본다. 받아들여지면 전환이 skip으로 끝난다.
     const first = tracks[0];
-    frame.src = widgetSrc(setUrl(tracks) ?? (first ? trackUrl(first) : ''));
-    document.body.append(frame);
+    const frame = mountEngineFrame(widgetSrc(setUrl(tracks) ?? (first ? trackUrl(first) : '')));
 
-    const readyTimer = setTimeout(
-      () => setEngineError('재생 엔진이 응답하지 않습니다. 광고 차단기가 soundcloud.com을 막고 있는지 확인해 주세요.'),
-      READY_TIMEOUT_MS,
-    );
+    const readyTimer = setTimeout(() => setEngineError(ENGINE_BLOCKED_MESSAGE), READY_TIMEOUT_MS);
 
     loadWidgetApi()
       .then((sc) => {
@@ -219,10 +209,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         const anchor = (ms: number) => {
           reported.current = { ms, at: performance.now(), live: false };
         };
-        const interpolated = () => {
-          const { ms, at, live } = reported.current;
-          return live && playing.current ? ms + Math.min(STALL_MS, performance.now() - at) : ms;
-        };
+        const interpolated = () => estimatePosition(reported.current, playing.current, performance.now());
 
         instance.bind(EVENTS.play, () => {
           anchor(interpolated());
@@ -261,25 +248,15 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
           remember(reported.current.ms);
           setIsPlaying(false);
         });
-        const readBuffered = (loaded: number | undefined) => {
-          if (typeof loaded === 'number' && Number.isFinite(loaded)) {
-            frameState.buffered = Math.min(1, Math.max(0, loaded));
-          }
-        };
         instance.bind(EVENTS.progress, (payload) => {
-          readBuffered(payload.loadedProgress);
-          if (
-            typeof payload.currentPosition !== 'number' ||
-            !Number.isFinite(payload.currentPosition) ||
-            payload.currentPosition < 0
-          )
-            return;
+          writeBuffered(payload.loadedProgress);
+          if (!isValidPosition(payload.currentPosition)) return;
           reported.current = { ms: payload.currentPosition, at: performance.now(), live: true };
           if (performance.now() - savedAt.current >= SAVE_INTERVAL_MS) remember(payload.currentPosition);
         });
         // 재생을 눌러도 소리가 나기 전 구간이 있다. 그동안 진행바 뒤에 버퍼가 차는 걸 보여준다.
-        instance.bind(EVENTS.buffer, (payload) => readBuffered(payload.loadedProgress));
-        instance.bind(EVENTS.error, () => setEngineError('곡을 재생할 수 없습니다. 잠시 후 다시 시도해 주세요.'));
+        instance.bind(EVENTS.buffer, (payload) => writeBuffered(payload.loadedProgress));
+        instance.bind(EVENTS.error, () => setEngineError(TRACK_FAILED_MESSAGE));
         instance.bind(EVENTS.finish, () => {
           // 다음 곡(또는 반복)은 0부터다. 끝난 위치를 물고 있으면 그 곡의 첫 순간이 끝 시간으로 보인다.
           anchor(0);
@@ -430,13 +407,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     (direction: 1 | -1) => {
       const count = tracks.length;
       if (count === 0) return;
-      if (shuffle && direction === 1 && count > 1) {
-        let next = index;
-        while (next === index) next = Math.floor(Math.random() * count);
-        select(next);
-        return;
-      }
-      select((index + direction + count) % count);
+      const isShuffling = shuffle && direction === 1 && count > 1;
+      select(isShuffling ? randomOtherIndex(index, count) : (index + direction + count) % count);
     },
     [index, select, shuffle, tracks.length],
   );
@@ -495,7 +467,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   const seekBy = useCallback(
     (seconds: number) => {
       if (frameState.durationMs === 0) return;
-      seek(frameState.position + (seconds * 1000) / frameState.durationMs);
+      seek(frameState.position + (seconds * MS_PER_SECOND) / frameState.durationMs);
     },
     [seek],
   );
@@ -510,18 +482,13 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   useFrame((delta) => {
     const { durationMs } = frameState;
     if (!Number.isFinite(durationMs) || durationMs <= 0) return;
-    const { ms, at, live } = reported.current;
-    if (!(playing.current && live)) {
-      smoothMs.current = ms;
-      frameState.position = Math.min(1, ms / durationMs);
-      return;
-    }
-    // 보고가 끊긴 지 오래면 전진을 멈춘다. 다음 보고가 오면 DRIFT_SNAP이 실제 위치로 데려간다.
-    const target = ms + Math.min(STALL_MS, performance.now() - at);
-    const drift = target - (smoothMs.current + delta);
-    const bound = delta * DRIFT_CORRECT_RATIO;
-    smoothMs.current =
-      Math.abs(drift) > DRIFT_SNAP_MS ? target : smoothMs.current + delta + Math.min(bound, Math.max(-bound, drift));
+    smoothMs.current = advanceClock({
+      smoothMs: smoothMs.current,
+      delta,
+      report: reported.current,
+      isPlaying: playing.current,
+      now: performance.now(),
+    });
     frameState.position = Math.min(1, smoothMs.current / durationMs);
   });
 
