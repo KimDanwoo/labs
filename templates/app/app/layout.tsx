@@ -1,5 +1,5 @@
 import '@app/globals.css';
-import { AppProviders } from '@app/providers';
+import { AppProviders } from '@app/providers/AppProviders';
 import '@tokens/css/fonts.css';
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
