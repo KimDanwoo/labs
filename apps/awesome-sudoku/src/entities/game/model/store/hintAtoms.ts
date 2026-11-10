@@ -1,11 +1,7 @@
-import {
-  buildGameResultState,
-  resolveBoardState,
-  updateCellValue,
-  updateSingleCell,
-} from '@entities/game/model/services';
 import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { atom } from 'jotai';
+import { buildGameResultState, resolveBoardState } from '../services/gameResult';
+import { updateCellValue, updateSingleCell } from '../services/update';
 import { pushStateAtom } from './historyAtoms';
 import {
   boardAtom,

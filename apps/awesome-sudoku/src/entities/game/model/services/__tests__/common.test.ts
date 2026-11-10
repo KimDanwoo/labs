@@ -1,7 +1,12 @@
+import { BOARD_SIZE } from '@entities/game/model/constants/board';
+import {
+  createEmptyBoard,
+  createEmptyHighlights,
+  formatTime,
+  shuffleArray,
+} from '@entities/game/model/services/common';
 import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, test } from 'vitest';
-import { BOARD_SIZE } from '../../constants/board';
-import { createEmptyBoard, createEmptyHighlights, formatTime, shuffleArray } from '../common';
 
 describe('스도쿠 유틸리티 함수 테스트', () => {
   describe('shuffleArray', () => {

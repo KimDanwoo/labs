@@ -1,5 +1,5 @@
+import { atIndex, cellAt } from '@shared/lib/gridAccess';
 import { describe, expect, it } from 'vitest';
-import { atIndex, cellAt } from '../gridAccess';
 
 describe('checked board access', () => {
   it('preserves zero, false and null values', () => {

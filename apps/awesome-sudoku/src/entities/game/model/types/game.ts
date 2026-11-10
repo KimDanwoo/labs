@@ -1,4 +1,4 @@
-import { GAME_LEVEL, GAME_MODE, TECHNIQUE } from '@entities/game/model/constants';
+import { GAME_LEVEL, GAME_MODE, TECHNIQUE } from '../constants/game';
 import type { GridPosition, SudokuBoard } from './board';
 
 export type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE];

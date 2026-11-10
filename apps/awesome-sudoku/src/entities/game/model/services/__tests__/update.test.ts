@@ -1,9 +1,5 @@
-import { atIndex, cellAt } from '@shared/lib/gridAccess';
-import { describe, expect, it } from 'vitest';
-import { BOARD_SIZE } from '../../constants/board';
-import { GAME_MODE } from '../../constants/game';
-import type { SudokuBoard, SudokuCell } from '../../types/board';
-import type { KillerCage } from '../../types/game';
+import { BOARD_SIZE } from '@entities/game/model/constants/board';
+import { GAME_MODE } from '@entities/game/model/constants/game';
 import {
   calculateHighlights,
   canFillCell,
@@ -15,7 +11,11 @@ import {
   updateCellValue,
   updateSingleCell,
   validateBoard,
-} from '../update';
+} from '@entities/game/model/services/update';
+import type { SudokuBoard, SudokuCell } from '@entities/game/model/types/board';
+import type { KillerCage } from '@entities/game/model/types/game';
+import { atIndex, cellAt } from '@shared/lib/gridAccess';
+import { describe, expect, it } from 'vitest';
 
 describe('update.ts 유틸리티 함수 테스트', () => {
   // 테스트용 보드 생성 헬퍼 함수

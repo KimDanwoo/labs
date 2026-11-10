@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@shared/model/utils';
+import { cn } from '@shared/lib/cn';
 import { memo, useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 

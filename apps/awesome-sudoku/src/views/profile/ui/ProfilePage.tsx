@@ -1,15 +1,17 @@
 'use client';
 
-import { isAuthenticatedAtom, userAtom } from '@entities/session/model/store';
-import { useGameStats } from '@features/game-stats/model/hooks';
-import { StatsByDifficulty, StatsOverview } from '@features/game-stats/ui';
-import { useProfile } from '@features/profile/model/hooks';
-import { ProfileCard, RecentGames } from '@features/profile/ui';
-import { ThemeToggle } from '@features/theme/ui';
-import { SubpageHeader } from '@shared/ui';
+import { isAuthenticatedAtom, userAtom } from '@entities/session';
+import { ThemeToggle } from '@features/theme';
+import { SubpageHeader } from '@shared/ui/SubpageHeader';
 import { useAtomValue } from 'jotai';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useGameStats } from '../model/game-stats/hooks/useGameStats';
+import { useProfile } from '../model/hooks/useProfile';
+import { StatsByDifficulty } from './game-stats/StatsByDifficulty';
+import { StatsOverview } from './game-stats/StatsOverview';
+import { ProfileCard } from './ProfileCard';
+import { RecentGames } from './RecentGames';
 
 export const ProfilePage = () => {
   const router = useRouter();

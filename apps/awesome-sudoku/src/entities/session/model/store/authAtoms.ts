@@ -1,6 +1,6 @@
-import type { User } from '@entities/session/model/types';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
+import type { User } from '../types/user';
 
 /** 로그인 사용자 (localStorage 영속) */
 export const userAtom = atomWithStorage<User | null>('sudoku-user', null);

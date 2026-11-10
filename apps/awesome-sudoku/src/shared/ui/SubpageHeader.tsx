@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@shared/model/utils';
+import { cn } from '@shared/lib/cn';
 import Link from 'next/link';
 import { memo, type ReactNode } from 'react';
 

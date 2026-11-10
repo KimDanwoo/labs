@@ -1,8 +1,10 @@
-import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING, NUMBER_COUNTS } from '@entities/game/model/constants';
-import { createEmptyBoard, createEmptyGrid, createEmptyHighlights } from '@entities/game/model/services';
-import type { CellHighlight, Difficulty, GameMode, KillerCage, Position, SudokuCell } from '@entities/game/model/types';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
+import { NUMBER_COUNTS } from '../constants/board';
+import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING } from '../constants/game';
+import { createEmptyBoard, createEmptyGrid, createEmptyHighlights } from '../services/common';
+import type { CellHighlight, Position, SudokuCell } from '../types/board';
+import type { Difficulty, GameMode, KillerCage } from '../types/game';
 
 // ── 영속 atoms (localStorage) ──────────────────────────────
 

@@ -1,13 +1,3 @@
-import { BLOCK_SIZE, BOARD_SIZE, GAME_MODE } from '@entities/game/model/constants';
-import type {
-  CellHighlight,
-  GameCompletionResult,
-  GameMode,
-  Grid,
-  KillerCage,
-  SudokuBoard,
-  SudokuCell,
-} from '@entities/game/model/types';
 import { cellAt } from '@shared/lib/gridAccess';
 import {
   checkConflicts,
@@ -15,7 +5,11 @@ import {
   isKillerBoardComplete,
   markWrongValues,
   validateKillerCages,
-} from './validator';
+} from '../../lib/validator';
+import { BLOCK_SIZE, BOARD_SIZE } from '../constants/board';
+import { GAME_MODE } from '../constants/game';
+import type { CellHighlight, Grid, SudokuBoard, SudokuCell } from '../types/board';
+import type { GameCompletionResult, GameMode, KillerCage } from '../types/game';
 
 /**
  * @description 단일 셀만 업데이트

@@ -1,6 +1,6 @@
 'use client';
 
-import { gameStore } from '@shared/model/store';
+import { gameStore } from '@entities/game';
 import { Provider } from 'jotai';
 import type { ReactNode } from 'react';
 
