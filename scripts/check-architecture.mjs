@@ -5,7 +5,9 @@ import ts from 'typescript';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROTECTED_OPTIONS = ['strict', 'noUncheckedIndexedAccess', 'verbatimModuleSyntax'];
-const LAYERS = ['app', 'views', 'widgets', 'features', 'entities', 'shared'];
+const LAYERS = ['app', 'views', 'features', 'entities', 'shared'];
+const SERVER_MODULE = /\/model\/server\/|\/index\.server\.tsx?$/;
+const SERVER_PACKAGE = /^(?:node:)?(?:fs|child_process|net|tls)(?:\/|$)|^next\/headers$|^server-only$/;
 const PALETTE_CLASS =
   /\b(?:bg|text|border(?:-[trblxyse])?|ring(?:-offset)?|fill|stroke|from|via|to|outline|divide|shadow|decoration|accent|caret|placeholder)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b/g;
 const ARBITRARY_COLOR = /\b[a-z-]+-\[(?:#[0-9a-fA-F]{3,8}|(?:rgba?|hsla?|oklch|oklab|color-mix)\()/g;
@@ -155,6 +157,8 @@ export function checkRepository(root = ROOT) {
               problems.push(`${relative}/tsconfig.json: @${layer}/* 별칭은 ./src/${layer}/*를 가리켜야 한다.`);
             }
           }
+          if (config.compilerOptions?.paths?.['@widgets/*'] || existsSync(path.join(dir, 'src/widgets')))
+            problems.push(`${relative}: widgets 레이어는 쓰지 않는다. 화면 전용 블록은 views, 공용 동작은 features로 옮긴다.`);
         }
       }
     }
@@ -208,7 +212,7 @@ export function checkRepository(root = ROOT) {
       if (directive.expression.text === 'use client') clients.add(file);
       if (directive.expression.text === 'use server') actions.add(file);
     }
-    if (file.includes('/model/server/')) serverModules.add(file);
+    if (SERVER_MODULE.test(file)) serverModules.add(file);
     for (const node of ast.statements) {
       if (
         !(ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) ||
@@ -225,10 +229,7 @@ export function checkRepository(root = ROOT) {
         bindings.elements.every((element) => element.isTypeOnly)
       )
         continue;
-      if (
-        /^(?:node:)?(?:fs|child_process|net|tls)(?:\/|$)|^next\/headers$|^server-only$/.test(node.moduleSpecifier.text)
-      )
-        serverModules.add(file);
+      if (SERVER_PACKAGE.test(node.moduleSpecifier.text)) serverModules.add(file);
       const target = ts.resolveModuleName(node.moduleSpecifier.text, file, compilerOptions, ts.sys).resolvedModule
         ?.resolvedFileName;
       if (target && modules.has(target)) targets.push(target);
@@ -238,11 +239,10 @@ export function checkRepository(root = ROOT) {
         ts.isCallExpression(node) &&
         node.expression.kind === ts.SyntaxKind.ImportKeyword &&
         node.arguments[0] &&
-        ts.isStringLiteral(node.arguments[0])
+        ts.isStringLiteralLike(node.arguments[0])
       ) {
         const name = node.arguments[0].text;
-        if (/^(?:node:)?(?:fs|child_process|net|tls)(?:\/|$)|^next\/headers$|^server-only$/.test(name))
-          serverModules.add(file);
+        if (SERVER_PACKAGE.test(name)) serverModules.add(file);
         const target = ts.resolveModuleName(name, file, compilerOptions, ts.sys).resolvedModule?.resolvedFileName;
         if (target && modules.has(target)) targets.push(target);
       }
