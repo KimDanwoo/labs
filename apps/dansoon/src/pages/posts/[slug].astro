@@ -2,7 +2,6 @@
 import type { GetStaticPaths } from 'astro';
 import { getImage, Image } from 'astro:assets';
 import { render } from 'astro:content';
-import AdFit from '~/components/AdFit.astro';
 import CategoryBadge from '~/components/CategoryBadge.astro';
 import CopyLinkButton from '~/components/CopyLinkButton.astro';
 import Giscus from '~/components/Giscus.astro';
@@ -84,16 +83,6 @@ const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c
         </h1>
         <p class="mt-lg flex flex-wrap items-center gap-x-sm gap-y-xs text-sm text-muted-foreground">
           <time datetime={publishedAt.toISOString()}>{formatLongDate(publishedAt)}</time>
-          {
-            updatedAt && (
-              <>
-                <span aria-hidden="true">·</span>
-                <span>
-                  <time datetime={updatedAt.toISOString()}>{formatLongDate(updatedAt)}</time> 수정
-                </span>
-              </>
-            )
-          }
           <span aria-hidden="true">·</span>
           <span>{readingMinutes(post.body)}분 분량</span>
         </p>
@@ -116,7 +105,6 @@ const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c
         </div>
         <PostNav older={older} newer={newer} />
         <RelatedPosts posts={getRelatedPosts(posts, post)} />
-        <AdFit />
         <Giscus />
       </footer>
     </article>
