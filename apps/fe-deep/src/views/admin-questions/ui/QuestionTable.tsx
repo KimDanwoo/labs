@@ -1,16 +1,17 @@
 'use client';
 
-import { type Category, type Question, DifficultyBadge } from '@entities/question';
+import { type Category, DifficultyBadge } from '@entities/question';
 import { Badge, Button, Checkbox } from '@ui/react';
 import { BookOpen, Layers, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import type { QuestionListItem } from '../api/questionList';
 
 interface QuestionTableProps {
-  questions: Question[];
+  questions: QuestionListItem[];
   categoryMap: Map<string, Category>;
   loading: boolean;
-  selectedIds: Set<string>;
-  onSelectionChange: (ids: Set<string>) => void;
+  selectedIds: ReadonlySet<string>;
+  onSelectionChange: (ids: ReadonlySet<string>) => void;
   onDelete: (id: string) => void;
 }
 
