@@ -1,7 +1,8 @@
 'use client';
 
-import type { Category } from '@entities/question';
+import { DIFFICULTY_VALUES, type Category } from '@entities/question';
 import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/react';
+import { DIFFICULTY_FILTER_LABEL, FILTER_ALL } from '../config/questionList';
 
 interface QuestionFiltersProps {
   search: string;
@@ -35,7 +36,7 @@ export function QuestionFilters({
           <SelectValue placeholder="카테고리" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">전체 카테고리</SelectItem>
+          <SelectItem value={FILTER_ALL}>전체 카테고리</SelectItem>
           {categories.map((c) => (
             <SelectItem key={c.id} value={c.id}>
               {c.icon} {c.title}
@@ -48,10 +49,12 @@ export function QuestionFilters({
           <SelectValue placeholder="난이도" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">전체</SelectItem>
-          <SelectItem value="easy">Easy</SelectItem>
-          <SelectItem value="medium">Medium</SelectItem>
-          <SelectItem value="hard">Hard</SelectItem>
+          <SelectItem value={FILTER_ALL}>전체</SelectItem>
+          {DIFFICULTY_VALUES.map((value) => (
+            <SelectItem key={value} value={value}>
+              {DIFFICULTY_FILTER_LABEL[value]}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

@@ -1,5 +1,10 @@
-import { AdminQuestionsPage } from './AdminQuestionsPage';
+import { Suspense } from 'react';
+import { QuestionsListPage } from './QuestionsListPage';
 
 export function AdminQuestionsView() {
-  return <AdminQuestionsPage />;
+  return (
+    <Suspense fallback={null}>
+      <QuestionsListPage />
+    </Suspense>
+  );
 }

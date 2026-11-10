@@ -95,7 +95,7 @@ apps/<app>/
 - `index.ts`는 **밖에서 실제로 쓰는 것만**, 이름을 하나씩 적어 내보낸다. `export *` 금지. 타입은 `export type` 또는 `type` 한정자.
 - **세그먼트 안에 `index.ts`(배럴)를 두지 않는다.** 출입구는 슬라이스 루트 하나다.
 - `shared`는 `@shared/<세그먼트>/<항목>`으로 import한다(`@shared/lib/cn`, `@shared/ui/BottomSheet`). `shared/ui`·`shared/lib` 전체를 묶는 `index.ts`는 만들지 않는다(공식 권장 — 하나만 써도 전부 딸려 온다). `shared/api`·`shared/config`는 세그먼트 `index.ts` 하나로 묶어도 된다. shared 안에서도 다른 항목은 진입점으로만 가져온다.
-- 테스트는 대상 파일을 직접 import해도 된다.
+- **테스트는 대상 코드 옆 `__tests__/<대상>.test.ts`(컴포넌트는 `.test.tsx`)에 둔다**(`.mjs` 스크립트·설정 패키지의 테스트는 `.test.mjs`). `scripts/`에 모으지 않는다. 테스트는 대상 파일을 직접 import해도 되고, 같은 슬라이스 안은 상대경로로 가져온다. 여러 테스트가 함께 쓰는 테스트 전용 헬퍼도 `__tests__/` 안에 `.test.` 없는 이름으로 둔다. 브라우저 테스트는 앱 루트 `e2e/*.spec.ts`다.
 
 **서버 경계**: 서버 전용 코드(파일시스템, `next/headers`, `server-only`)와 그것을 쓰는 서버 컴포넌트는 `index.server.ts`로만 내보낸다. 클라이언트가 쓰는 `index.ts`에 섞지 않는다. Server Action은 `'use server'` 모듈(`model/actions/`)에 두고 `index.ts`에서 내보내도 된다. 서버 전용 데이터 로딩은 `model/server/` 또는 `api/`에 둔다.
 

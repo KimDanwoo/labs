@@ -3,12 +3,13 @@
 import { getLocalProgress, updateQuestionProgress } from '@entities/progress';
 import type { FollowUp, Question } from '@entities/question';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { PHASE, type StudyPhase } from '../constants/study';
 
 interface UseCardStudySessionOptions {
   /** 학습할 질문 배열 */
   questions: Question[];
-  /** 현재 Phase. 'study'일 때만 키보드 단축키와 progressSnapshot이 활성화된다. */
-  phase: string;
+  /** 현재 Phase. 학습 중일 때만 키보드 단축키와 progressSnapshot이 활성화된다. */
+  phase: StudyPhase;
   /** 마지막 카드를 넘긴 뒤 호출되는 콜백 */
   onComplete: () => void;
 }
@@ -109,7 +110,7 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
 
   // 키보드 단축키: Space/Enter로 뒤집기 → 다음
   useEffect(() => {
-    if (phase !== 'study') return undefined;
+    if (phase !== PHASE.study) return undefined;
 
     function handleKeyDown(e: KeyboardEvent) {
       if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
@@ -126,7 +127,7 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
 
   // 학습 시작 시점의 progress 스냅샷. 카드마다 getLocalProgress()를 재호출하지 않는다.
   const progressSnapshot = useMemo(() => {
-    if (phase !== 'study') return {};
+    if (phase !== PHASE.study) return {};
     return getLocalProgress();
   }, [phase]);
 

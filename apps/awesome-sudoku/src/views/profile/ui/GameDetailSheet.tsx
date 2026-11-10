@@ -1,7 +1,7 @@
 'use client';
 import { GAME_LEVEL_LABELS, GAME_MODE, formatTime, getRecordPoint, type GameRecord } from '@entities/game';
 import { cn } from '@shared/lib/cn';
-import { BottomSheet } from '@shared/ui/BottomSheet';
+import { BottomSheet } from '@shared/ui/bottom-sheet';
 import { memo } from 'react';
 
 import { DetailRow } from './DetailRow';

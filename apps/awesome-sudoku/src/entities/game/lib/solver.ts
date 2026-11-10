@@ -298,6 +298,18 @@ const UNIT_SUM = 45;
 
 type LogicCage = { cells: number[]; sum: number; combos: number[] };
 
+/** 피시의 기준 줄 하나: 그 줄과, 줄 안에서 숫자가 올 수 있는 칸들. */
+type FishLine = { line: number[]; spots: number[] };
+
+/** 피시를 찾는 두 방향: [기준 줄, 교차 줄]. */
+const FISH_ORIENTATIONS = [
+  [ROW_UNITS, COL_UNITS],
+  [COL_UNITS, ROW_UNITS],
+] as const;
+
+const LINE_UNITS = [...ROW_UNITS, ...COL_UNITS];
+const CELL_INDEXES = Array.from({ length: SUDOKU_CELL_COUNT }, (_, i) => i);
+
 /** 45 규칙을 적용할 영역: 유닛 27개 + 인접한 두 줄 + 밴드/스택(세 줄) */
 const REGIONS: number[][] = (() => {
   const pairs = (lines: number[][]): number[][] => lines.slice(0, -1).map((line, k) => [...line, ...lines[k + 1]!]);
@@ -334,6 +346,9 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
 
   const isSolved = (): boolean => cells.every((v) => v !== EMPTY);
 
+  const hasCandidate = (i: number, d: number): boolean => cells[i] === EMPTY && (cands[i]! & bit(d)) !== 0;
+  const openSpots = (unit: number[], d: number): number[] => unit.filter((i) => hasCandidate(i, d));
+
   const nakedSingles = (): boolean => {
     let progressed = false;
     for (let i = 0; i < SUDOKU_CELL_COUNT; i++) {
@@ -348,7 +363,7 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     let progressed = false;
     for (const unit of UNITS) {
       for (let d = 1; d <= BOARD_SIZE; d++) {
-        const spots = unit.filter((i) => cells[i] === EMPTY && cands[i]! & bit(d));
+        const spots = openSpots(unit, d);
         if (spots.length !== 1) continue;
         place(spots[0]!, d);
         progressed = true;
@@ -367,36 +382,26 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
+  /** container 안에서 d가 한 crossing에 갇혀 있으면, 그 crossing의 container 밖 칸에서 d를 지운다. */
+  const eliminateConfined = (containers: number[][], crossings: number[][], d: number): boolean => {
+    let progressed = false;
+    for (const container of containers) {
+      const spots = openSpots(container, d);
+      if (spots.length < 2) continue;
+      for (const crossing of crossings.filter((unit) => spots.every((i) => unit.includes(i)))) {
+        const outside = crossing.filter((i) => !container.includes(i));
+        progressed = eliminate(outside, bit(d)) || progressed;
+      }
+    }
+    return progressed;
+  };
+
   /** 박스 안에서 한 줄에 갇힌 숫자는 그 줄의 다른 박스에서 지우고(pointing), 줄 안에서 한 박스에 갇힌 숫자는 그 박스의 다른 줄에서 지운다(claiming). */
   const lockedCandidates = (): boolean => {
     let progressed = false;
-    const lines = [...ROW_UNITS, ...COL_UNITS];
-
     for (let d = 1; d <= BOARD_SIZE; d++) {
-      for (const box of BOX_UNITS) {
-        const spots = box.filter((i) => cells[i] === EMPTY && cands[i]! & bit(d));
-        if (spots.length < 2) continue;
-        for (const line of lines) {
-          if (!spots.every((i) => line.includes(i))) continue;
-          progressed =
-            eliminate(
-              line.filter((i) => !box.includes(i)),
-              bit(d),
-            ) || progressed;
-        }
-      }
-      for (const line of lines) {
-        const spots = line.filter((i) => cells[i] === EMPTY && cands[i]! & bit(d));
-        if (spots.length < 2) continue;
-        for (const box of BOX_UNITS) {
-          if (!spots.every((i) => box.includes(i))) continue;
-          progressed =
-            eliminate(
-              box.filter((i) => !line.includes(i)),
-              bit(d),
-            ) || progressed;
-        }
-      }
+      progressed = eliminateConfined(BOX_UNITS, LINE_UNITS, d) || progressed;
+      progressed = eliminateConfined(LINE_UNITS, BOX_UNITS, d) || progressed;
     }
     return progressed;
   };
@@ -436,27 +441,36 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
+  /** 고른 기준 줄들의 후보가 같은 수의 교차 줄에만 놓였으면, 그 교차 줄의 나머지 칸에서 d를 지운다. */
+  const eliminateFish = (chosen: FishLine[], covers: readonly number[][], d: number): boolean => {
+    const coverIndexes = new Set(chosen.flatMap(({ line, spots }) => spots.map((i) => line.indexOf(i))));
+    if (coverIndexes.size !== chosen.length) return false;
+    const baseCells = new Set(chosen.flatMap(({ line }) => line));
+    const targets = [...coverIndexes].flatMap((k) => covers[k]!.filter((i) => !baseCells.has(i)));
+    return eliminate(targets, bit(d));
+  };
+
+  /** 한 방향·한 숫자의 피시. 기준 줄 후보는 제거를 시작하기 전에 한 번만 고른다. */
+  const fishForDigit = (bases: readonly number[][], covers: readonly number[][], d: number): boolean => {
+    const candidateLines: FishLine[] = bases
+      .map((line) => ({ line, spots: openSpots(line, d) }))
+      .filter(({ spots }) => spots.length >= 2 && spots.length <= MAX_FISH_SIZE);
+
+    let progressed = false;
+    for (let size = 2; size <= MAX_FISH_SIZE; size++) {
+      for (const chosen of combinations(candidateLines, size)) {
+        progressed = eliminateFish(chosen, covers, d) || progressed;
+      }
+    }
+    return progressed;
+  };
+
   /** X-Wing(2)·Swordfish(3): 숫자 d가 k개 줄에서 합쳐 k개 칸(교차 줄)에만 오면 그 교차 줄의 다른 칸에서 d를 지운다. */
   const fish = (): boolean => {
     let progressed = false;
-    const lineIndex = (unit: number[], i: number): number => unit.indexOf(i);
-    for (const [bases, covers] of [
-      [ROW_UNITS, COL_UNITS],
-      [COL_UNITS, ROW_UNITS],
-    ] as const) {
+    for (const [bases, covers] of FISH_ORIENTATIONS) {
       for (let d = 1; d <= BOARD_SIZE; d++) {
-        const candidateLines = bases
-          .map((line) => ({ line, spots: line.filter((i) => cells[i] === EMPTY && cands[i]! & bit(d)) }))
-          .filter(({ spots }) => spots.length >= 2 && spots.length <= MAX_FISH_SIZE);
-        for (let size = 2; size <= MAX_FISH_SIZE; size++) {
-          for (const chosen of combinations(candidateLines, size)) {
-            const coverIndexes = new Set(chosen.flatMap(({ line, spots }) => spots.map((i) => lineIndex(line, i))));
-            if (coverIndexes.size !== size) continue;
-            const baseCells = new Set(chosen.flatMap(({ line }) => line));
-            const targets = [...coverIndexes].flatMap((k) => covers[k]!.filter((i) => !baseCells.has(i)));
-            progressed = eliminate(targets, bit(d)) || progressed;
-          }
-        }
+        progressed = fishForDigit(bases, covers, d) || progressed;
       }
     }
     return progressed;
@@ -504,6 +518,50 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
+  /** 숫자 d가 정확히 두 칸에만 오는 유닛마다 그 두 칸을 잇는다(강한 연결). */
+  const strongLinks = (d: number): Map<number, number[]> => {
+    const links = new Map<number, number[]>();
+    for (const unit of UNITS) {
+      const spots = openSpots(unit, d);
+      if (spots.length !== 2) continue;
+      const [a, b] = spots as [number, number];
+      links.set(a, [...(links.get(a) ?? []), b]);
+      links.set(b, [...(links.get(b) ?? []), a]);
+    }
+    return links;
+  };
+
+  /** start에서 이어진 칸들을 두 색으로 번갈아 칠하고, 칠한 칸들을 돌려준다. */
+  const paintCluster = (start: number, links: Map<number, number[]>, color: Map<number, number>): number[] => {
+    const cluster: number[] = [];
+    const stack = [start];
+    color.set(start, 0);
+    while (stack.length > 0) {
+      const i = stack.pop()!;
+      cluster.push(i);
+      for (const j of links.get(i)!) {
+        if (color.has(j)) continue;
+        color.set(j, 1 - color.get(i)!);
+        stack.push(j);
+      }
+    }
+    return cluster;
+  };
+
+  const seesAny = (i: number, group: number[]): boolean => group.some((j) => PEERS[i]!.includes(j));
+
+  /** 같은 색끼리 서로 보이면 그 색은 거짓이라 통째로 지우고, 아니면 두 색을 모두 보는 바깥 칸에서 지운다. */
+  const eliminateByColors = (cluster: number[], color: Map<number, number>, d: number): boolean => {
+    const byColor = [cluster.filter((i) => color.get(i) === 0), cluster.filter((i) => color.get(i) === 1)];
+    const falseColor = byColor.findIndex((group) => group.some((i, k) => seesAny(i, group.slice(k + 1))));
+    if (falseColor !== -1) return eliminate(byColor[falseColor]!, bit(d));
+
+    const targets = CELL_INDEXES.filter(
+      (i) => hasCandidate(i, d) && !color.has(i) && seesAny(i, byColor[0]!) && seesAny(i, byColor[1]!),
+    );
+    return eliminate(targets, bit(d));
+  };
+
   /**
    * 단일 숫자 컬러링: 어떤 숫자가 정확히 두 칸에만 오는 유닛들을 강한 연결로 이어 두 색으로 칠한다.
    * 같은 색 두 칸이 한 유닛에 있으면 그 색은 거짓, 두 색을 모두 보는 칸에서는 그 숫자를 지운다.
@@ -512,50 +570,13 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
   const simpleColoring = (): boolean => {
     let progressed = false;
     for (let d = 1; d <= BOARD_SIZE; d++) {
-      const has = (i: number): boolean => cells[i] === EMPTY && (cands[i]! & bit(d)) !== 0;
-      const links = new Map<number, number[]>();
-      for (const unit of UNITS) {
-        const spots = unit.filter(has);
-        if (spots.length !== 2) continue;
-        const [a, b] = spots as [number, number];
-        links.set(a, [...(links.get(a) ?? []), b]);
-        links.set(b, [...(links.get(b) ?? []), a]);
-      }
-
+      const links = strongLinks(d);
       const color = new Map<number, number>();
       for (const start of links.keys()) {
         if (color.has(start)) continue;
-        const cluster: number[] = [];
-        const stack = [start];
-        color.set(start, 0);
-        while (stack.length > 0) {
-          const i = stack.pop()!;
-          cluster.push(i);
-          for (const j of links.get(i)!) {
-            if (color.has(j)) continue;
-            color.set(j, 1 - color.get(i)!);
-            stack.push(j);
-          }
-        }
+        const cluster = paintCluster(start, links, color);
         if (cluster.length < 3) continue;
-
-        const byColor = [cluster.filter((i) => color.get(i) === 0), cluster.filter((i) => color.get(i) === 1)];
-        // 같은 색끼리 서로 보이면 그 색은 거짓
-        const falseColor = byColor.findIndex((group) =>
-          group.some((i, k) => group.slice(k + 1).some((j) => PEERS[i]!.includes(j))),
-        );
-        if (falseColor !== -1) {
-          progressed = eliminate(byColor[falseColor]!, bit(d)) || progressed;
-          continue;
-        }
-        // 두 색을 모두 보는 바깥 칸에서 지운다
-        const seesColor = (i: number, group: number[]): boolean => group.some((j) => PEERS[i]!.includes(j));
-        const targets: number[] = [];
-        for (let i = 0; i < SUDOKU_CELL_COUNT; i++) {
-          if (!has(i) || color.has(i)) continue;
-          if (seesColor(i, byColor[0]!) && seesColor(i, byColor[1]!)) targets.push(i);
-        }
-        progressed = eliminate(targets, bit(d)) || progressed;
+        progressed = eliminateByColors(cluster, color, d) || progressed;
       }
     }
     return progressed;
@@ -618,12 +639,14 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
   /** 두 칸의 합이 S로 정해졌을 때 짝이 없는 후보를 지운다 */
   const restrictPairSum = ([a, b]: number[], sum: number): boolean => {
     const seeEachOther = PEERS[a!]!.includes(b!);
-    const fits = (i: number, j: number, d: number): boolean => {
+    const fits = (partner: number, d: number): boolean => {
       const other = sum - d;
-      return other >= 1 && other <= BOARD_SIZE && (cands[j]! & bit(other)) !== 0 && !(seeEachOther && other === d);
+      return (
+        other >= 1 && other <= BOARD_SIZE && (cands[partner]! & bit(other)) !== 0 && !(seeEachOther && other === d)
+      );
     };
-    const maskA = digitsOf(cands[a!]!).reduce((m, d) => (fits(a!, b!, d) ? m | bit(d) : m), 0);
-    const maskB = digitsOf(cands[b!]!).reduce((m, d) => (fits(b!, a!, d) ? m | bit(d) : m), 0);
+    const maskA = digitsOf(cands[a!]!).reduce((m, d) => (fits(b!, d) ? m | bit(d) : m), 0);
+    const maskB = digitsOf(cands[b!]!).reduce((m, d) => (fits(a!, d) ? m | bit(d) : m), 0);
     return eliminate([a!], ALL_DIGITS & ~maskA) || eliminate([b!], ALL_DIGITS & ~maskB);
   };
 

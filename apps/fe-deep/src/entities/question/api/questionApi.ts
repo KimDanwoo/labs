@@ -1,9 +1,11 @@
 import { createClient } from '@shared/api/supabaseClient';
+import { toContainsPattern } from '@shared/lib/postgrestFilter';
 import { shuffleArray } from '@shared/lib/shuffle';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type {
   Category,
   Difficulty,
+  FollowUp,
   PaginatedResult,
   Question,
   SearchResult,
@@ -15,6 +17,15 @@ import type {
 /** questions 조회 시 공통으로 가져오는 컬럼. 컬럼이 늘면 여기만 고친다. */
 const QUESTION_COLUMNS =
   'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard, follow_ups';
+
+const CATEGORY_COLUMNS = 'id, slug, title, order_num, icon, description';
+
+type CategoryWithCountRow = Omit<Category, 'question_count'> & { questions: { count: number }[] | null };
+
+type QuestionWithCategoryRow = Omit<Question, 'follow_ups'> & {
+  follow_ups: FollowUp[] | null;
+  categories: Category | null;
+};
 
 /**
  * Supabase 클라이언트를 반환한다.
@@ -30,30 +41,22 @@ export async function getAllCategories(supabase?: SupabaseClient): Promise<Categ
   const client = getClient(supabase);
   const { data, error } = await client
     .from('categories')
-    .select('id, slug, title, order_num, icon, description, questions(count)')
-    .order('order_num');
+    .select(`${CATEGORY_COLUMNS}, questions(count)`)
+    .order('order_num')
+    .overrideTypes<CategoryWithCountRow[], { merge: false }>();
 
   if (error) throw error;
 
-  return (data ?? []).map((c: Record<string, unknown>) => ({
-    id: c.id as string,
-    slug: c.slug as string,
-    title: c.title as string,
-    order_num: c.order_num as number,
-    icon: c.icon as string,
-    description: c.description as string,
-    question_count: (c.questions as { count: number }[])?.[0]?.count ?? 0,
+  return (data ?? []).map(({ questions, ...category }) => ({
+    ...category,
+    question_count: questions?.[0]?.count ?? 0,
   }));
 }
 
 /** slug로 카테고리를 찾는다. 없으면 undefined를 반환한다. */
 export async function getCategoryBySlug(slug: string, supabase?: SupabaseClient): Promise<Category | undefined> {
   const client = getClient(supabase);
-  const { data, error } = await client
-    .from('categories')
-    .select('id, slug, title, order_num, icon, description')
-    .eq('slug', slug)
-    .maybeSingle();
+  const { data, error } = await client.from('categories').select(CATEGORY_COLUMNS).eq('slug', slug).maybeSingle();
 
   if (error) throw error;
   if (!data) return undefined;
@@ -147,55 +150,37 @@ export async function getAllQuestions(supabase?: SupabaseClient): Promise<Questi
   return (data ?? []) as Question[];
 }
 
+/** 질문·답변·태그 순으로 검색어가 처음 걸리는 곳을 찾는다. */
+function findMatchType(question: Question, lowerQuery: string): SearchResult['matchType'] | undefined {
+  if (question.question.toLowerCase().includes(lowerQuery)) return 'question';
+  if (question.answer.toLowerCase().includes(lowerQuery)) return 'answer';
+  if (question.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))) return 'tag';
+  return undefined;
+}
+
 /** 키워드로 질문, 답변을 검색한다. 대소문자를 구분하지 않는다. */
 export async function searchQuestions(query: string, supabase?: SupabaseClient): Promise<SearchResult[]> {
   if (!query.trim()) return [];
 
   const client = getClient(supabase);
-  // ILIKE 특수문자(%_\)를 이스케이프하여 리터럴 검색이 되도록 한다.
-  const escaped = query.replace(/[%_\\]/g, '\\$&');
-  const pattern = `%${escaped}%`;
+  const pattern = toContainsPattern(query);
 
   const { data, error } = await client
     .from('questions')
-    .select(`${QUESTION_COLUMNS}, categories(id, slug, title, order_num, icon, description)`)
-    .or(`question.ilike.${pattern},answer.ilike.${pattern}`);
+    .select(`${QUESTION_COLUMNS}, categories(${CATEGORY_COLUMNS})`)
+    .or(`question.ilike.${pattern},answer.ilike.${pattern}`)
+    .overrideTypes<QuestionWithCategoryRow[], { merge: false }>();
 
   if (error) throw error;
 
-  if (!data || data.length === 0) return [];
-
   const lowerQuery = query.toLowerCase();
-  const results: SearchResult[] = [];
 
-  for (const row of data) {
-    const category = row.categories as unknown as Category;
-    if (!category) continue;
-
-    const q: Question = {
-      id: row.id as string,
-      category_id: row.category_id as string,
-      question: row.question as string,
-      answer: row.answer as string,
-      sub_category: row.sub_category as string,
-      difficulty: row.difficulty as Question['difficulty'],
-      order_num: row.order_num as number,
-      tags: row.tags as string[],
-      show_in_daily: row.show_in_daily as boolean,
-      show_in_flashcard: row.show_in_flashcard as boolean,
-      follow_ups: (row.follow_ups ?? []) as Question['follow_ups'],
-    };
-
-    if (q.question.toLowerCase().includes(lowerQuery)) {
-      results.push({ question: q, category, matchType: 'question' });
-    } else if (q.answer.toLowerCase().includes(lowerQuery)) {
-      results.push({ question: q, category, matchType: 'answer' });
-    } else if (q.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))) {
-      results.push({ question: q, category, matchType: 'tag' });
-    }
-  }
-
-  return results;
+  return (data ?? []).flatMap(({ categories: category, follow_ups: followUps, ...row }) => {
+    if (!category) return [];
+    const question: Question = { ...row, follow_ups: followUps ?? [] };
+    const matchType = findMatchType(question, lowerQuery);
+    return matchType ? [{ question, category, matchType }] : [];
+  });
 }
 
 /** 난이도별 질문 목록을 반환한다. */
