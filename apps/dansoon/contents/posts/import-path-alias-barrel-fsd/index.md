@@ -203,7 +203,6 @@ export type { ButtonProps, InputProps, SelectProps } from './types';
 
 1.  모듈 경계 명확화: 공개 API와 내부 구현을 명확히 구분
 2.  버전 간 호환성 유지: 내부 구현 변경 시에도 공개 API 안정성 확보
-3.  컴파일 시간 최적화: IDE와 TypeScript 컴파일러의 타입 추론 성능 향상
 
 ### 계층적 barrel 패턴
 
@@ -303,7 +302,8 @@ export { default as LargeComponent } from './LargeComponent';
 2.  리팩토링 효율성: 구조 변경 시 import 경로 수정 작업 감소
 3.  코드 가독성: PR 리뷰 시 의존성 파악이 용이해져 리뷰 효율성 향상
 4.  온보딩 시간 단축: 신규 개발자가 프로젝트 구조를 이해하는 시간 감소
-5.  빌드 최적화: 적절한 barrel 패턴 적용으로 번들 크기 감소
+
+barrel이 번들 크기나 빌드 속도를 줄여 주지는 않는다. 오히려 `index.ts`가 많아지면 개발 서버가 느려질 수 있고, 관련 없는 것을 한 파일로 묶으면 안 쓰는 코드가 함께 딸려 올 수 있다. 얻는 것은 경계와 가독성이다.
 
 ## 별칭과 barrel 패턴을 쓸 때 주의할 점
 

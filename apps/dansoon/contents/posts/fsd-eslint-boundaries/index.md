@@ -1,6 +1,6 @@
 ---
-title: "FSD 규칙을 문서 대신 ESLint로 강제하기: boundaries와 직접 만든 규칙 6개"
-description: "문서로만 정해 둔 FSD 규칙은 새 코드마다 어긋났어요. Next.js 앱 일곱 개가 쓰는 공유 ESLint 설정에 eslint-plugin-boundaries와 직접 만든 규칙 6개를 넣어 레이어 방향, 세그먼트 깊이, 슬라이스 구조를 lint로 막은 과정을 실제 에러 출력과 함께 정리해요."
+title: "FSD 규칙을 문서 대신 ESLint로 강제하기: boundaries와 직접 만든 규칙"
+description: "문서로만 정해 둔 FSD 규칙은 새 코드마다 어긋났어요. Next.js 앱 일곱 개가 쓰는 공유 ESLint 설정에 eslint-plugin-boundaries와 직접 만든 규칙을 넣어 레이어 방향, 공개 API, 슬라이스 구조를 lint로 막은 과정을 실제 에러 출력과 함께 정리해요."
 publishedAt: "2026-11-06T16:50:00+09:00"
 category: "dev"
 tags: ["fsd", "architecture"]
