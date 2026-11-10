@@ -52,60 +52,66 @@ scripts/new-app.mjs   # 새 앱 생성기
 
 ## FSD 아키텍처 (앱 내부)
 
-각 앱은 `apps/<app>/src/` 아래에 FSD로 구성한다. **공유 디자인 시스템(`packages/ui`·`packages/tokens`)이 FSD의 `shared` UI 레이어 역할**을 하므로, 앱의 표시 프리미티브는 `@ui/react`에서 가져오고 앱 `src/shared`에는 그 앱 전용 공용 코드만 둔다.
+각 앱은 `apps/<app>/src/` 아래에 FSD로 구성한다. 기준은 공식 FSD 2.1이다. **공유 디자인 시스템(`packages/ui`·`packages/tokens`)이 FSD의 `shared` UI 레이어 역할**을 하므로, 앱의 표시 프리미티브는 `@ui/react`에서 가져오고 앱 `src/shared`에는 그 앱 전용 공용 코드만 둔다.
 
 **Next 라우팅과 FSD `app` 레이어는 분리한다 (합치기 금지).**
 
 - **`apps/<app>/app/`** (= `src/` **밖**): Next 라우팅 진입점. `layout.tsx`/`page.tsx`/`route.ts` + 파일 기반 메타데이터(`icon.*`/`opengraph-image.*` 등)만 둔다. **얇게** — 화면은 `views`, 전역 setup은 `src/app`에 위임한다.
-- **`apps/<app>/src/app/`** (= FSD `app` 레이어, **라우팅 아님**): `providers/`(전역 프로바이더 합성 루트), `globals.css`(전역 스타일) 등 앱 전역 setup. 라우팅 파일(page/layout)을 여기에 두지 않는다.
-- 루트 `app/layout.tsx`는 전역 스타일·프로바이더를 `@app`에서 가져온다: `import '@app/globals.css'` + `import { AppProviders } from '@app/providers'`. Next가 라우팅 위치를 강제해도 `src/app`을 라우팅으로 쓰지 않는다.
+- **`apps/<app>/src/app/`** (= FSD `app` 레이어, **라우팅 아님**): `providers/`(전역 프로바이더 합성 루트), `globals.css`(전역 스타일), 앱 전체 레이아웃 등 앱 전역 setup. 라우팅 파일(page/layout)을 여기에 두지 않는다.
+- FSD `pages` 레이어는 Next와 이름이 겹쳐 `views`로 부른다(공식 권장 `_pages`·`_app` 대신 이 저장소는 `views`·`src/app`으로 통일).
 
-**레이어 의존성** (단방향, `@repo/eslint-config`의 `fsd.config.mjs` → `eslint-plugin-boundaries`로 **lint 강제**): `app → views → widgets → features → entities → shared`
+**레이어 의존성** (단방향, `@repo/eslint-config`의 `fsd.config.mjs`로 **lint 강제**): `app → views → features → entities → shared`
 
-- 하위 레이어는 상위를 import 불가. cross-import 금지. `packages/ui`·`@tokens/css`는 모든 레이어에서 사용 가능.
-- 위반 시 `pnpm lint`가 에러로 막는다. 구조 규칙을 `eslint-disable`로 우회하지 않는다. 같은 슬라이스 내부 참조는 허용하고, 같은 레이어의 다른 슬라이스 참조는 금지한다.
+- 하위 레이어는 상위를 import 불가. 같은 레이어의 다른 슬라이스 참조 금지. `packages/ui`·`@tokens/css`는 모든 레이어에서 사용 가능.
+- **`widgets` 레이어는 쓰지 않는다.** 한 화면 전용 블록은 그 view에, 여러 화면에서 쓰는 동작은 `features`에, 앱 전체 레이아웃은 `src/app`에 둔다.
+- 위반 시 `pnpm lint`가 에러로 막는다. 구조 규칙을 `eslint-disable`로 우회하지 않는다.
 
-**경로 별칭** (앱 `tsconfig.json`의 `paths`): `@app/` `@views/` `@widgets/` `@features/` `@entities/` `@shared/` → `./src/<layer>/`. `@app/`은 **FSD app 레이어(`src/app/`)**를 가리킨다 — 루트 라우팅 `app/`은 Next 진입점이라 별칭이 없다.
+**어디에 둘지 (pages-first)**: 먼저 쓰는 화면의 `views/<화면>`에 둔다. `features`·`entities`로 내리는 건 **지금 실제로 여러 화면에서 쓸 때만** 한다. 쓰는 곳이 하나뿐인 feature·entity는 그 view로 되돌린다. 화면이 하나뿐인 앱은 `src/app` + `views/<화면>` + (필요하면) `shared`만 가진다.
 
-**순수 계산·그래픽 코드**: `lib/`는 알고리즘·그래픽 구현을 둔다. React 컴포넌트·훅·전역 atom 정의를 lib에 숨기지 않는다.
+**경로 별칭** (앱 `tsconfig.json`의 `paths`): `@app/` `@views/` `@features/` `@entities/` `@shared/` → `./src/<layer>/`. `@app/`은 **FSD app 레이어(`src/app/`)**를 가리킨다 — 루트 라우팅 `app/`은 Next 진입점이라 별칭이 없다.
 
-**서버 경계**: 파일시스템·서버 전용 데이터 로딩은 `model/server/`, Server Action은 `model/actions/`에 둔다. 클라이언트가 쓰는 `model/services/`·`ui/` barrel에서 서버 전용 모듈을 재수출하지 않는다.
-
-**slice 구조**: 메인 뷰 파일은 slice 루트에, 나머지는 `ui/` / `model/{hooks,types,constants,store,services,server,actions}`로 분리.
+**슬라이스 구조와 공개 API**
 
 ```
 apps/<app>/
-  app/                       # Next 라우팅 진입점(src 밖): layout/page/route + 메타데이터 파일. 얇게.
+  app/                         # Next 라우팅 진입점(src 밖). 얇게.
   src/
-    app/                     # FSD app 레이어(라우팅 아님): providers/, globals.css 등 전역 setup
-    views/home/HomeView.tsx  # 메인 뷰: 위젯 합성
-    widgets/project-grid/ui/ # 위젯: 화면 블록
-    entities/project/
-      model/types/           # 도메인 타입
-      model/constants/       # 도메인 데이터/상수
-      ui/                    # 도메인 표시 컴포넌트(ProjectCard)
+    app/                       # FSD app 레이어: providers/, globals.css, 앱 레이아웃
+    views/home/
+      index.ts                 # 공개 API — 슬라이스의 유일한 출입구
+      index.server.ts          # 서버 전용 코드가 있을 때만
+      ui/                      # 컴포넌트 (HomeView.tsx 포함)
+      model/                   # 상태·비즈니스 로직·타입 (model/hooks, model/store, model/types …)
+      api/                     # 백엔드 통신
+      lib/                     # 슬라이스 내부 보조 코드(알고리즘·그래픽)
+      config/                  # 설정·상수
+    shared/
+      ui/ lib/ api/ config/    # 세그먼트만. 도메인 폴더 금지
 ```
 
-**컴포넌트 인라인 선언 금지**: 모든 앱의 뷰·위젯·기능·엔티티 파일은 컴포넌트당 파일 하나를 사용한다. 컴포넌트 이름과 파일명을 일치시킨다. 모든 컴포넌트는 해당 slice의 `ui/` 하위 파일로 분리 후 `ui/index.ts`에서 export.
+- 세그먼트 이름은 `ui`·`model`·`api`·`lib`·`config`만 쓴다(목적 기준). 필요한 것만 만든다. `hooks`·`types`·`constants`·`services` 같은 종류 기준 이름은 세그먼트 **안**의 하위 폴더로만 쓴다. 슬라이스가 커지면 세그먼트 아래에 도메인 하위 폴더를 둔다(`ui/scene/`, `model/runner/`).
+- **밖에서는 슬라이스 루트로만 import한다**: `from '@entities/game'`, 서버 전용은 `from '@views/study/index.server'`. `@entities/game/model/types`처럼 안쪽 경로로 가져오지 않는다.
+- **슬라이스 안에서는 상대경로**로 파일을 직접 import한다(`./Card`, `../model/types/game`). 자기 `index.ts`를 거치지 않는다(순환 참조).
+- `index.ts`는 **밖에서 실제로 쓰는 것만**, 이름을 하나씩 적어 내보낸다. `export *` 금지. 타입은 `export type` 또는 `type` 한정자.
+- **세그먼트 안에 `index.ts`(배럴)를 두지 않는다.** 출입구는 슬라이스 루트 하나다.
+- `shared`는 `@shared/<세그먼트>/<항목>`으로 import한다(`@shared/lib/cn`, `@shared/ui/BottomSheet`). `shared/ui`·`shared/lib` 전체를 묶는 `index.ts`는 만들지 않는다.
+- 테스트는 대상 파일을 직접 import해도 된다.
 
-**Import 세그먼트 규칙** (`fsd.config.mjs`의 `no-restricted-imports`로 **lint 강제**): import 경로에 `ui`인지 `model`인지가 항상 드러나야 한다. 세그먼트보다 깊이 파고들지 않는다 — `ui`는 `ui`까지, `model` 하위는 `model/<세그먼트>`까지. **slice 루트(`@widgets/x`, `@entities/x`) 직접 import 금지.** (`@shared/**`와 테스트 파일은 대상 아님)
+**서버 경계**: 서버 전용 코드(파일시스템, `next/headers`, `server-only`)와 그것을 쓰는 서버 컴포넌트는 `index.server.ts`로만 내보낸다. 클라이언트가 쓰는 `index.ts`에 섞지 않는다. Server Action은 `'use server'` 모듈(`model/actions/`)에 두고 `index.ts`에서 내보내도 된다. 서버 전용 데이터 로딩은 `model/server/` 또는 `api/`에 둔다.
 
-- ui 컴포넌트: `from '@widgets/project-grid/ui'`, `from '@entities/project/ui'`, `from '@ui/react'`
-- 메인 뷰(폴더 루트 파일): 파일명까지 — `from '@views/home/HomeView'`
-- model 하위: `model/types`, `model/constants`, `model/store`, `model/hooks`까지 명시
-- slice 루트 통합 `index.ts`는 만들지 않는다(통합 barrel이 없어야 슬라이스 루트 import가 컴파일 에러로 막힌다).
+**컴포넌트 인라인 선언 금지**: 컴포넌트당 파일 하나, 컴포넌트 이름과 파일명 일치. 모든 컴포넌트는 슬라이스의 `ui/` 아래에 둔다.
 
 **Import 순서**: `prettier-plugin-organize-imports`가 저장/포맷 시 자동 정렬한다(수동 정렬 불필요, alphabetical). 큰 흐름은 내장 모듈 → 외부 패키지 → 절대경로(`@ui`/`@tokens`/`@app`…`@shared`) → 상대경로 → type import.
 
 ## 컴포넌트 분리 원칙
 
-- **부모는 분기·합성, 자식은 구독·실행**: 뷰는 위젯 조합만, 위젯/엔티티 컴포넌트가 필요한 데이터를 직접 가져온다.
+- **부모는 분기·합성, 자식은 구독·실행**: 메인 뷰는 블록 조합만, 각 블록 컴포넌트가 필요한 데이터를 직접 가져온다.
 - **표시-only 컴포넌트는 표시용 데이터만 props로** 받는다(도메인 상태를 알지 않는다). 예: `Card`/`Button`(`@ui/react`), `ProjectCard`(`project`만 받음).
 - **재사용 판단으로 위치 결정**: 여러 앱 공용 → `packages/ui`, 특정 앱 전용 → 그 앱의 적절한 FSD 레이어. 무리한 추상화는 피한다.
 
 ## 상태 관리 (도입 시)
 
-**상태가 필요해지면**: 비동기=React Query · 로컬=useState/useReducer · 전역=꼭 필요할 때만 Jotai. 전역 atom은 `entities/<domain>/model/store/`에 두고 컴포넌트가 직접 구독한다. dispatch/setState 콜백을 prop으로 내려보내지 않는다(prop drilling 금지).
+**상태가 필요해지면**: 비동기=React Query · 로컬=useState/useReducer · 전역=꼭 필요할 때만 Jotai. 전역 atom은 **쓰는 슬라이스의 `model/`**에 두고(여러 화면이 쓰게 되면 `entities`로 내린다) 컴포넌트가 직접 구독한다. dispatch/setState 콜백을 prop으로 내려보내지 않는다(prop drilling 금지).
 
 ## 코드 컨벤션
 
@@ -160,7 +166,7 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 
 - 이 파일이 Codex·Claude 등 모든 코딩 에이전트의 공통 규칙이다. 도구별 문서에 다른 아키텍처를 중복 정의하지 않는다.
 - `pnpm check:architecture`는 전체 워크스페이스와 새 앱 템플릿의 catalog·경로 별칭·공유 설정·TypeScript 엄격 옵션·`any`·구조 규칙 우회·동적 import를 포함한 순환 참조·서버/클라이언트 경계를 검사한다. `pnpm lint`에서 자동 실행된다.
-- 공유 ESLint는 레이어 역참조, 슬라이스 교차 참조, model 세그먼트, 컴포넌트 파일, 라우팅 위치, 전역 atom 위치를 검사한다. 공유 규칙 자체에도 회귀 테스트가 있다.
+- 공유 ESLint는 레이어 역참조, 슬라이스 교차 참조, 공개 API 우회, 세그먼트 구조, 컴포넌트 파일, 라우팅 위치, 전역 atom 위치를 검사한다. 공유 규칙 자체에도 회귀 테스트가 있다.
 - Server Action의 권한 검사는 화면·미들웨어와 독립적으로 수행한다. 관리자 DB 클라이언트 생성 전에 인증과 관리자 권한을 확인한다.
 - `'use client'`·`'use server'`는 모듈 맨 앞의 지시문이어야 한다. import를 그 앞에 추가하지 않는다.
 - 파일 이동 후 상대 경로·공개 export·Web Worker URL·라우트 타입·테스트 경로를 함께 확인한다.

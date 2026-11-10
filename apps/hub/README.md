@@ -23,13 +23,10 @@
 ```
 app/                  # Next.js App Router (라우팅만, 얇게 유지)
 src/
-  entities/project/   # Project 타입 + PROJECTS 상수 (프로젝트 목록 단일 진실 공급원)
-  views/home/         # HomeView — 페이지 조합
-  widgets/
-    profile-header/   # 프로필 소개 + 외부 링크
-    project-grid/     # 프로젝트 카드 그리드
-    site-header/      # 상단 헤더
-    lab-footer/       # 하단 푸터
+  views/home/         # 홈 화면 한 슬라이스 (공개 API: index.ts)
+    ui/               # HomeView, SiteHeader, LabFooter, profile-header/, project-grid/
+    model/            # constants/(프로필 문구, 프로젝트 목록), types/
+    lib/              # 글자 스크램블, 스포트라이트 효과
 public/projects/      # 프로젝트 카드 커버 이미지
 ```
 
@@ -37,7 +34,7 @@ public/projects/      # 프로젝트 카드 커버 이미지
 
 ## 프로젝트 목록 추가
 
-`src/entities/project/model/constants/index.ts` 의 `PROJECTS` 배열에 항목을 추가한다.
+`src/views/home/model/constants/projects.ts` 의 `PROJECTS` 배열에 항목을 추가한다.
 
 ```ts
 {
