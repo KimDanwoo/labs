@@ -2,7 +2,7 @@
 title: "클라우드 기반 배포 자동화 여정: AWS S3부터 GitHub Actions까지"
 description: "S3와 CloudFront, IAM, GitHub Actions로 빌드·배포 자동화를 구축한 과정과 캐시 무효화, 슬랙 알림까지 넓혀간 경험을 정리했어요."
 publishedAt: "2024-12-11T13:27:04+09:00"
-updatedAt: "2025-08-04T13:36:07+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["ci-cd"]
 legacyUrl: "https://dansoon-dev.tistory.com/10"
@@ -14,15 +14,13 @@ cover: "./cover.jpg"
 
 AWS를 활용한 CI/CD 파이프라인 구축 프로젝트를 진행했다.
 
-다양한 클라우드 서비스 중에서 AWS를 선택한 이유는 실제 업무 환경에서 가장 널리 사용되고 있으며,
+다양한 클라우드 서비스 중에서 AWS를 선택한 이유는 실제 업무 환경에서 가장 널리 사용되고 있으며, S3와 CloudFront의 조합이 비용 효율적이면서도 확장성이 뛰어나기 때문이다. CloudFront는 AWS의 CDN(콘텐츠 전송 네트워크)으로, 전 세계 엣지 서버에 파일을 캐시해 사용자와 가까운 곳에서 내려준다.
 
-S3와 CloudFront의 조합이 비용 효율적이면서도 확장성이 뛰어나기 때문이다. CloudFront는 AWS의 CDN(콘텐츠 전송 네트워크)으로, 전 세계 엣지 서버에 파일을 캐시해 사용자와 가까운 곳에서 내려준다.
-
-AWS 아키텍처는 S3 버킷을 기반으로 정적 웹사이트 호스팅 설정을 구성하고 CloudFront를 통한 글로벌 CDN 배포망을 구축했다.
+AWS 아키텍처는 정적 파일을 담는 S3 버킷을 만들고 CloudFront를 통한 글로벌 CDN 배포망을 구축했다.
 
 IAM(AWS의 권한 관리 서비스)을 통해 최소 권한 원칙에 따른 보안 설정을 적용하고 GitHub Actions를 활용하여 완전 자동화된 배포 파이프라인을 구현했다.
 
-GitHub Actions 워크플로우를 통해 코드 변경 시 자동으로 빌드, 테스트, 배포가 이루어지는 시스템을 구축했으며 시크릿 키와 환경 변수의 안전한 관리 체계를 마련했다.
+GitHub Actions 워크플로우를 통해 코드 변경 시 자동으로 빌드와 배포가 이루어지는 시스템을 구축했으며 시크릿 키와 환경 변수의 안전한 관리 체계를 마련했다.
 
 ## 2\. 시도: GitHub Actions로 S3 배포와 CloudFront 캐시 무효화 자동화
 

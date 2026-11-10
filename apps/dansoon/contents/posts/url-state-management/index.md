@@ -2,7 +2,7 @@
 title: "URL 상태관리는 문제를 해결했다: 예약 플로우에서 쿼리스트링에 상태를 둔 경험"
 description: "예약 플로우의 상태를 URL에 두며 마주친 검증, History, 확정 시점 문제를 돌아보고, 익숙한 상태관리와 비교한 선택 기준을 정리해요."
 publishedAt: "2026-07-29T16:09:06+09:00"
-updatedAt: "2026-08-02T18:20:32+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["state-management"]
 legacyUrl: "https://dansoon-dev.tistory.com/28"
@@ -195,7 +195,9 @@ const reservationParamsSchema = z.object({
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .nullable(),
+    .refine((value) => !Number.isNaN(Date.parse(value)))
+    .nullable()
+    .catch(null),
 
   participants: z.coerce
     .number()
@@ -212,7 +214,8 @@ const reservationParamsSchema = z.object({
     .number()
     .int()
     .positive()
-    .optional(),
+    .optional()
+    .catch(undefined),
 });
 ```
 
@@ -414,7 +417,7 @@ URL을 기준으로 예약 흐름을 구성하는 방식은 의도대로 동작�
 
 다만 익숙한 상태관리 방식을 사용했다면 이 조건을 모두 만족시키지 않더라도 예약의 핵심 흐름은 더 단순하게 표현할 수 있었다.
 
-이미 알고 있는 방식으로 상태 변경을 구성하고, URL의 파싱과 직렬화, History 정책을 별도로 설계하지 않아도 됐을 것이다. Context와 Hook으로 상태를 관리한 과정은 [리액트 리팩토링: Context와 Hook을 활용한 상태 관리 개선](/posts/react-context-hook-refactoring/)에, react-query와 zustand로 상태 관리를 바꾼 과정은 [FSD 패턴과 상태 관리 리팩토링](/posts/fsd-state-management-refactoring/)에 정리했다.
+이미 알고 있는 방식으로 상태 변경을 구성하고, URL의 파싱과 직렬화, History 정책을 별도로 설계하지 않아도 됐을 것이다. Context와 Hook으로 상태를 관리한 과정은 [리액트 리팩토링: Context와 Hook을 활용한 상태 관리 개선](/posts/react-context-hook-refactoring/)에, react-query와 zustand로 상태 관리를 바꾼 과정은 [FSD 패턴으로 상태 관리 리팩토링하기](/posts/fsd-state-management-refactoring/)에 정리했다.
 
 URL이 문제를 잘 해결하지 못한 것은 아니었다.
 
@@ -430,7 +433,7 @@ URL이 문제를 잘 해결하지 못한 것은 아니었다.
 
 직접 사용해보니 더 큰 비용은 따로 있었다.
 
-익숙한 도구에서는 이미 지나간 판단을 다시 해야 했다.
+익숙한 도구였다면 이미 끝나 있었을 판단을 처음부터 다시 해야 했다.
 
 어디까지 URL에 둘 것인지, 기본값을 주소에 남길 것인지, 어떤 변경을 History에 기록할 것인지, 잘못된 파라미터를 복구할 것인지 거부할 것인지 하나씩 정해야 했다.
 

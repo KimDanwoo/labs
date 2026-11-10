@@ -2,7 +2,7 @@
 title: "SEO의 구조적 진화: SPA·SSR, 구글·네이버 크롤러와 Next.js의 한계"
 description: "HTML부터 SPA, SSR까지 SEO의 변천과 구글·네이버 크롤러 차이를 짚고, Next.js만으로 해결되지 않는 부분과 실무 설계를 정리해요."
 publishedAt: "2025-09-17T10:49:05+09:00"
-updatedAt: "2025-10-27T17:23:04+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["seo"]
 legacyUrl: "https://dansoon-dev.tistory.com/20"
@@ -76,7 +76,7 @@ function App() {
 </html>
 ```
 
-콘텐츠가 JavaScript 실행 후에야 나타나는 구조가 되면서 검색엔진은 빈 페이지만 보게 되었습니다.
+콘텐츠가 JavaScript 실행 후에야 나타나는 구조가 되면서, JavaScript를 실행하지 않는 크롤러는 빈 페이지만 보게 되었습니다.
 
 ### 웹 크롤러는 어떻게 사이트를 읽을까?
 
@@ -89,7 +89,7 @@ function App() {
 5. JavaScript 실행 (일부 크롤러만, 제한적)
 ```
 
-크롤러는 최초 HTTP 응답에서 받은 HTML을 기준으로 판단합니다.
+크롤러는 먼저 최초 HTTP 응답에서 받은 HTML을 읽습니다. JavaScript를 실행하는 크롤러도 렌더링은 그 뒤에 별도 단계로 처리합니다.
 
 ### 크롤러의 한계
 
@@ -109,7 +109,7 @@ function App() {
 
 ### CSR vs SSR, 비유로 이해하기
 
-CSR은 펜과 종이에 비유할 수 있습니다. 크롤러가 서버에 요청하면 빈 종이(빈 HTML)와 펜(JavaScript)을 받습니다. 글을 써서 완성하려면 시간이 걸리고, 크롤러는 보통 기다리지 않습니다.
+CSR은 펜과 종이에 비유할 수 있습니다. 크롤러가 서버에 요청하면 빈 종이(빈 HTML)와 펜(JavaScript)을 받습니다. 글을 써서 완성하려면 시간이 걸리고, 그 내용이 색인에 반영되는 것도 그만큼 늦어집니다.
 
 ```html
 <!-- 크롤러가 받는 CSR 응답 -->
@@ -179,7 +179,7 @@ const googlebotCharacteristics = {
   javascript: {
     support: '높음',
     execution: 'Chromium 기반, 최신 ES6+ 지원',
-    waitTime: '5초 내외 (제한적)',
+    waitTime: '렌더링 대기열을 거침 (지연될 수 있음)',
     rendering: 'SPA도 어느정도 인덱싱 가능'
   },
   crawling: {
@@ -207,9 +207,9 @@ const googlebotCharacteristics = {
 ```ts
 const naverYetiCharacteristics = {
   javascript: {
-    support: '제한적',
-    execution: '기본적인 수준만',
-    waitTime: '매우 짧음',
+    support: '지원 (재방문 때 렌더링)',
+    execution: '스크립트를 따로 수집한 뒤 렌더링',
+    waitTime: '정적 HTML을 먼저 색인',
     rendering: 'SSR 강력 권장'
   },
   crawling: {
@@ -227,8 +227,8 @@ const naverYetiCharacteristics = {
 
 네이버 크롤러의 특징
 
--   JavaScript 실행 능력이 매우 제한적
--   정적 HTML 구조를 더 중시
+-   JavaScript를 렌더링하지만, 스크립트를 따로 수집해 둔 뒤 다시 방문할 때 처리함([네이버 웹마스터 가이드](https://searchadvisor.naver.com/guide/seo-advanced-javascript))
+-   그래서 정적 HTML의 내용이 먼저 색인됨
 -   한국어 콘텐츠와 문화적 맥락에 대한 이해도가 높음
 -   네이버 자체 서비스(블로그, 카페 등)와의 연동성을 중시
 
@@ -238,8 +238,10 @@ const naverYetiCharacteristics = {
 
 ```tsx
 // Next.js App Router의 현대적 접근
+// Next.js 15부터 params는 Promise라서 await로 꺼낸다
 export async function generateMetadata({ params }) {
-  const data = await fetchData(params.id);
+  const { id } = await params;
+  const data = await fetchData(id);
   return {
     title: data.title,
     description: data.description
@@ -247,7 +249,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function Page({ params }) {
-  const data = await fetchData(params.id);
+  const { id } = await params;
+  const data = await fetchData(id);
   
   return (
     <div>
@@ -270,17 +273,18 @@ export default async function Page({ params }) {
 ```ts
 // 실제 실무에서 필요한 복잡한 메타데이터 로직
 export async function generateMetadata({ params }) {
-  const product = await getProduct(params.id);
+  const { id } = await params;
+  const product = await getProduct(id);
 
-  // 제목 길이 최적화 (구글: 60자, 네이버: 50자)
+  // 제목이 길면 검색 결과에서 잘리므로 적당한 길이로 줄임
   const title = product.name.length > 60
     ? `${product.name.slice(0, 57)}...`
     : product.name;
 
-  // 설명 최적화 (구글: 160자, 네이버: 120자)
+  // 설명도 검색 결과에서 잘리는 길이를 고려해 줄임
   const description = optimizeDescription(product.description);
   
-  // 키워드 추출 및 최적화
+  // 키워드 메타 태그 (구글은 순위에 쓰지 않음)
   const keywords = extractSEOKeywords(product);
 
   return {
@@ -342,30 +346,24 @@ export function createMetadata({
   title,
   description,
   path = '',
-  image = siteConfig.defaultImage,
-  targetCrawler = 'both' // 'google', 'naver', 'both'
+  image = siteConfig.defaultImage
 }: MetadataProps) {
   const url = `${siteConfig.url}${path}`;
-  
-  const baseMetadata = {
-    title: title ? `${title} | ${siteConfig.name}` : siteConfig.name,
-    description: description || siteConfig.description,
-    alternates: { canonical: url }
+  const pageTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name;
+  const pageDescription = description || siteConfig.description;
+
+  return {
+    title: pageTitle,
+    description: pageDescription,
+    alternates: { canonical: url },
+    // 링크 미리보기(Open Graph)는 검색엔진과 상관없이 항상 넣는다
+    openGraph: {
+      title: pageTitle,
+      description: pageDescription,
+      url,
+      images: [{ url: image, width: 1200, height: 630 }]
+    }
   };
-
-  // 크롤러별 최적화
-  if (targetCrawler === 'google' || targetCrawler === 'both') {
-    Object.assign(baseMetadata, {
-      openGraph: {
-        title,
-        description,
-        url,
-        images: [{ url: image, width: 1200, height: 630 }]
-      }
-    });
-  }
-
-  return baseMetadata;
 }
 ```
 
@@ -429,8 +427,8 @@ export function mergeMeta(pageMeta) {
     description: pageMeta.description ?? defaultMeta.description,
     og: { image: pageMeta.og?.image ?? defaultMeta.og.image },
     robots: {
-      index: pageMeta.robots?.index ?? defaultMeta.robots.index,
-      follow: pageMeta.robots?.follow ?? defaultMeta.robots.follow,
+      index: (pageMeta.robots?.index ?? true) && defaultMeta.robots.index,
+      follow: (pageMeta.robots?.follow ?? true) && defaultMeta.robots.follow,
     },
   };
 }

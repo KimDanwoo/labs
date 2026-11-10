@@ -2,7 +2,7 @@
 title: "리액트 리팩토링: Context와 Hook을 활용한 상태 관리 개선"
 description: "컴포넌트마다 흩어진 상태와 중복 로직을 Context와 Custom Hook으로 분리한 리팩토링 과정과 그 뒤에 남은 배움을 정리했어요."
 publishedAt: "2024-12-11T13:25:06+09:00"
-updatedAt: "2025-08-03T09:35:29+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["react","state-management"]
 legacyUrl: "https://dansoon-dev.tistory.com/6"
@@ -75,9 +75,9 @@ addProduct와 updateProduct는 `setProducts`에 함수형 업데이트를 넘겨
 import { createContext, ReactNode } from 'react';
 import { useProduct, useProductEditor, useNewProduct, useDiscount } from '@/hooks';
 
-const ProductContext = createContext(null);
+export const ProductContext = createContext(null);
 
-export const ProductProvider = ({ children }) => {
+export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const product = useProduct([]);
   const productEditor = useProductEditor(product.updateProduct);
   const newProduct = useNewProduct(product.addProduct);
@@ -89,7 +89,11 @@ export const ProductProvider = ({ children }) => {
 };
 ```
 
-ProductProvider는 네 훅이 반환한 값을 펼쳐 하나의 contextValue로 합친 뒤 Provider의 value로 내려준다. 메모이제이션 훅을 직접 구현한 과정은 [React Hook을 직접 구현해보자](/posts/implement-react-hooks/)에서, FSD 구조와 함께 상태 관리를 리팩토링한 과정은 [FSD 패턴과 상태 관리 리팩토링](/posts/fsd-state-management-refactoring/)에서 다뤘다.
+ProductProvider는 네 훅이 반환한 값을 펼쳐 하나의 contextValue로 합친 뒤 Provider의 value로 내려준다. 컴포넌트는 `useContext(ProductContext)`로 이 값을 꺼내 쓴다.
+
+다만 contextValue는 렌더링할 때마다 새 객체로 만들어진다. 그래서 Provider가 다시 렌더링되면 이 Context를 읽는 컴포넌트도 함께 다시 렌더링된다. 값이 자주 바뀐다면 useMemo로 감싸거나 Context를 더 잘게 나누는 편이 낫다.
+
+메모이제이션 훅을 직접 구현한 과정은 [React Hook을 직접 구현해보자](/posts/implement-react-hooks/)에서, FSD 구조와 함께 상태 관리를 리팩토링한 과정은 [FSD 패턴으로 상태 관리 리팩토링하기](/posts/fsd-state-management-refactoring/)에서 다뤘다.
 
 ---
 

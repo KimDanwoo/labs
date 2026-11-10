@@ -2,6 +2,7 @@
 title: "도메인 100개 넘는 서비스의 CORS·인증 문제와 Next.js 프록시"
 description: "도메인이 100개를 넘는 서비스에서 CORS와 쿠키 문제를 Next.js 프록시 계층으로 푸는 접근을 비교하고, 감수할 비용까지 정리해요."
 publishedAt: "2026-07-02T14:18:10+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["architecture"]
 legacyUrl: "https://dansoon-dev.tistory.com/27"
@@ -326,7 +327,10 @@ type Context = {
 async function proxy(request: NextRequest, context: Context) {
   const { path } = await context.params;
 
-  const targetUrl = new URL(path.join('/'), API_BASE_URL);
+  // new URL(path, base)는 path가 절대 주소면 base를 무시한다.
+  // 세그먼트를 인코딩해 base 뒤에 이어 붙여서 백엔드 주소를 벗어나지 못하게 한다.
+  const targetPath = path.map(encodeURIComponent).join('/');
+  const targetUrl = new URL(`${API_BASE_URL}/${targetPath}`);
   targetUrl.search = request.nextUrl.search;
 
   const headers = new Headers();
@@ -348,9 +352,14 @@ async function proxy(request: NextRequest, context: Context) {
     cache: 'no-store',
   });
 
+  // fetch가 이미 압축을 풀어 준 본문이라 원본의 압축·길이 헤더는 넘기지 않는다
+  const responseHeaders = new Headers(response.headers);
+  responseHeaders.delete('content-encoding');
+  responseHeaders.delete('content-length');
+
   return new Response(response.body, {
     status: response.status,
-    headers: response.headers,
+    headers: responseHeaders,
   });
 }
 
@@ -364,6 +373,8 @@ export const DELETE = proxy;
 물론 실제 서비스에서는 이보다 더 많은 처리가 필요하다.
 
 메서드별 처리, 쿼리스트링 전달, 요청 바디 전달, 에러 처리, 인증 실패 처리, 응답 헤더 제어 등을 함께 고려해야 한다.
+
+특히 받은 경로로 요청 주소를 만들 때는 그 주소가 백엔드를 벗어나지 않는지 확인해야 한다. 확인 없이 합치면 경로 자리에 다른 사이트 주소가 들어왔을 때 쿠키를 실은 요청이 그쪽으로 나간다.
 
 그래서 이 코드는 정답이 아니다.
 

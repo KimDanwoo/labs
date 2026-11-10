@@ -2,7 +2,7 @@
 title: "Feature-Sliced Design(FSD) 가이드: Next.js 앱 일곱 개에 적용하며 정한 기준"
 description: "FSD의 레이어·슬라이스·세그먼트와 import 규칙을 공식 문서 기준으로 정리하고, Next.js 앱 일곱 개에 적용하며 정한 기준과 부딪힌 문제를 담았어요. 2026년 바뀐 Next.js 가이드도 반영했어요."
 publishedAt: "2024-12-17T16:56:31+09:00"
-updatedAt: "2026-11-10T18:00:00+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["fsd","architecture"]
 legacyUrl: "https://dansoon-dev.tistory.com/13"
@@ -10,7 +10,7 @@ thumbnail: "./thumbnail.jpg"
 cover: "./cover.jpg"
 ---
 
-> 2024년 12월에 쓴 글을 2026년 11월에 다시 썼다. 그사이 FSD는 2.1이 됐고, 공식 Next.js 가이드와 Next.js의 파일 규칙도 바뀌었다. 지금 쓰는 기준과 바뀐 내용을 반영했다.
+> 2024년 12월에 처음 쓴 글을 지금 쓰는 기준에 맞춰 다시 썼다. 그사이 공식 Next.js 가이드와 Next.js의 파일 규칙이 바뀌었다.
 
 ## 1. 왜 FSD였나
 
@@ -93,7 +93,6 @@ Next.js는 `app` 폴더를 App Router로, `pages` 폴더를 Pages Router로 쓴�
 ├── src/
 │   ├── app/      # FSD app 레이어
 │   ├── views/    # FSD pages 레이어(이름 변경)
-│   ├── widgets/
 │   ├── features/
 │   ├── entities/
 │   └── shared/
@@ -107,7 +106,7 @@ Next.js는 `app` 폴더를 App Router로, `pages` 폴더를 Pages Router로 쓴�
 | 방법 | 구조 | 특징 |
 |---|---|---|
 | 빈 `pages/` 폴더 | 루트에 `app/`과 빈 `pages/`, FSD는 `src/`에 표준 이름 그대로 | 2026년 6월 이전 공식 권장. 용도를 모르는 빈 폴더가 남는다 |
-| `views`로 이름 변경 | 루트 `app/`, FSD pages 레이어만 `src/views/` | 내가 쓰는 방법. 커뮤니티에서 많이 쓰지만 공식 이름은 아니다 |
+| `views`로 이름 변경 | 루트 `app/`, FSD pages 레이어만 `src/views/` | 내가 쓰는 방법. 공식 이름은 아니다 |
 | `_app`·`_pages` 접두사 | FSD `app`·`pages` 레이어 둘 다 이름 앞에 `_` | 2026년 6월 이후 공식 권장 |
 
 ### middleware 위치
@@ -139,4 +138,4 @@ Next.js는 요청을 가로채는 파일을 정해진 위치에서만 찾는다.
 3. [FSD는 왜 Widgets 레이어를 권하지 않게 됐을까](/posts/fsd-2026-widgets/): 2026년 공식 문서의 변화
 4. [FSD 규칙을 문서 대신 ESLint로 강제하기](/posts/fsd-eslint-boundaries/): 규칙을 lint로 막기
 5. [import 경로 관리 알아보기](/posts/import-path-alias-barrel-fsd/): alias와 barrel 패턴
-6. 처음 적용했을 때의 기록: [FSD 패턴으로 상태 관리 리팩토링하기](/posts/fsd-state-management-refactoring/), [MSW로 테스트 코드를 작성하며 FSD 구조 보완하기](/posts/test-code-fsd-refactoring/)
+6. 처음 적용했을 때의 기록(세그먼트마다 `index.ts`를 두고 widgets를 쓰던 때의 구조다): [FSD 패턴으로 상태 관리 리팩토링하기](/posts/fsd-state-management-refactoring/), [MSW로 테스트 코드를 작성하며 FSD 구조 보완하기](/posts/test-code-fsd-refactoring/)

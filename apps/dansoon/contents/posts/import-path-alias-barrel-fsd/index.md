@@ -2,7 +2,7 @@
 title: "import 경로 관리 알아보기 (alias와 barrel 패턴, FSD)"
 description: "상대경로 import의 문제를 alias로 풀고 barrel 패턴으로 모듈을 캡슐화하는 방법을 정리해요. FSD 적용 사례와 주의점도 담았어요."
 publishedAt: "2024-12-15T14:47:25+09:00"
-updatedAt: "2026-11-10T18:00:00+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["fsd","architecture"]
 legacyUrl: "https://dansoon-dev.tistory.com/12"
@@ -82,7 +82,7 @@ TypeScript에서는 tsconfig.json을 통해 경로 별칭을 설정할 수 있�
       "@hooks/*": ["src/hooks/*"],
       "@services/*": ["src/services/*"],
       "@utils/*": ["src/utils/*"],
-      "@types/*": ["src/types/*"],
+      "@models/*": ["src/types/*"],
       "@assets/*": ["src/assets/*"],
       "@contexts/*": ["src/contexts/*"],
       "@constants/*": ["src/constants/*"]
@@ -99,7 +99,11 @@ TypeScript에서는 tsconfig.json을 통해 경로 별칭을 설정할 수 있�
 
 이 구성은 경로 매핑만이 아니라 TypeScript의 모듈 해석 알고리즘과 통합되어 타입 검사와 코드 네비게이션을 최적화한다.
 
+타입 폴더의 별칭을 `@types/*`로 짓지는 않는다. `@types/`는 타입 선언 패키지가 쓰는 이름이라 이 이름으로 import하면 TypeScript가 `Cannot import type declaration files` 오류(TS6137)를 낸다.
+
 ### Next.js의 Webpack 설정
+
+> Next.js는 `tsconfig.json`의 `paths`와 `baseUrl`을 기본으로 지원한다. 별칭만 필요하다면 아래 webpack 설정은 없어도 된다.
 
 Next.js에서는 Webpack 구성을 확장하여 모듈 별칭을 설정하는데, 성능 최적화까지 고려한 구성은 다음과 같다.
 
@@ -147,7 +151,7 @@ module.exports = {
 
 ### FSD 아키텍처와 별칭 함께 쓰기
 
-Feature-Sliced Design(FSD) 아키텍처는 모듈 별칭과 시너지가 크며, 이를 최대한 활용한 구성은 다음과 같다. FSD 자체는 [쉽게 정리한 FSD 가이드](/posts/fsd-guide/)에 정리해 두었다.
+Feature-Sliced Design(FSD) 아키텍처는 모듈 별칭과 시너지가 크며, 이를 최대한 활용한 구성은 다음과 같다. FSD 자체는 [FSD 가이드](/posts/fsd-guide/)에 정리해 두었다.
 
 ```ts
 // tsconfig.json
@@ -167,7 +171,7 @@ Feature-Sliced Design(FSD) 아키텍처는 모듈 별칭과 시너지가 크며,
 }
 ```
 
-이 구성은 FSD의 계층 구조를 명확히 반영하며, 각 슬라이스 간의 의존성 방향성을 경로 체계로 강제한다:
+이 구성은 FSD의 계층 구조를 경로 이름에 그대로 드러낸다. alias는 어느 레이어에서 가져오는지 보이게 할 뿐이고 의존 방향을 지키게 하는 일은 lint가 맡는다.
 
 ```ts
 // 계층 간 의존성 방향을 명시적으로 보여주는 import 구조
@@ -179,7 +183,7 @@ import { User, Product } from '@entities/models';
 import { Button, Input, formatCurrency } from '@shared/ui';
 ```
 
-processes 레이어는 지금 폐지돼서 예시에서 뺐다. Next.js에서는 `pages` 폴더 이름이 라우터와 겹치므로 이름을 바꿔야 한다. 그 내용은 FSD 가이드에 있다.
+processes 레이어는 지금 폐지돼서 예시에서 뺐다. Next.js에서는 `pages` 폴더 이름이 라우터와 겹치므로 이름을 바꿔야 한다. 그 내용은 FSD 가이드에 있다. widgets 레이어도 지금은 쓰지 않는다. 이유는 [FSD는 왜 Widgets 레이어를 권하지 않게 됐을까](/posts/fsd-2026-widgets/)에 적었다.
 
 ## barrel 패턴으로 모듈 캡슐화하기
 
@@ -280,20 +284,6 @@ const { Button } = Components;
 import { Button } from '@components';
 ```
 
-대규모 모듈은 named export 대신 default export를 고려할 수 있다.
-
-```ts
-// LargeComponent.tsx
-const LargeComponent = () => {
-  // 복잡한 구현...
-};
-
-export default LargeComponent;
-
-// index.ts
-export { default as LargeComponent } from './LargeComponent';
-```
-
 ## 실제 프로젝트 적용 사례
 
 실제 엔터프라이즈급 프로젝트에서 이러한 패턴을 적용한 결과는 다음과 같다.
@@ -318,15 +308,34 @@ barrel이 번들 크기나 빌드 속도를 줄여 주지는 않는다. 오히�
 3.  IDE 통합 최적화
     -   VSCode에서의 자동 완성 및 네비게이션 지원을 위한 설정:
 
-        ```ts
-        // .vscode/settings.json{  "typescript.preferences.importModuleSpecifier": "non-relative"}
+        ```json
+        // .vscode/settings.json
+        {
+          "typescript.preferences.importModuleSpecifier": "non-relative"
+        }
         ```
 
 4.  지속적 통합 파이프라인 구성
     -   import 경로 일관성 검사를 위한 ESLint 규칙 적용:
 
-        ```ts
-        // .eslintrc.jsmodule.exports = {  // ...  rules: {    'no-restricted-imports': [      'error',      {        patterns: [          {            group: ['../*'],            message: 'Use aliases instead of relative imports'          }        ]      }    ]  }};
+        ```js
+        // .eslintrc.js
+        module.exports = {
+          // ...
+          rules: {
+            'no-restricted-imports': [
+              'error',
+              {
+                patterns: [
+                  {
+                    group: ['../*'],
+                    message: 'Use aliases instead of relative imports',
+                  },
+                ],
+              },
+            ],
+          },
+        };
         ```
 
 ## 2026년 11월에 바꾼 것
