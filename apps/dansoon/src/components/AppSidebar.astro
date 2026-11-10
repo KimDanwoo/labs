@@ -16,7 +16,6 @@ const currentPost = posts.find((post) => postPath(post) === pathname);
 const SHORTCUTS = [
   { href: '/', label: '전체 글', activePrefixes: ['/categories'] },
   { href: '/tags/', label: '태그', activePrefixes: ['/tags'] },
-  { href: '/book/', label: '주간 책 순위', activePrefixes: ['/book'] },
 ];
 const isShortcutActive = ({ href, activePrefixes }: (typeof SHORTCUTS)[number]) =>
   pathname === href || activePrefixes.some((prefix) => pathname.startsWith(prefix));
