@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
@@ -13,49 +13,12 @@ import {
   getQuestionsByIds,
   getRandomQuestions,
   searchQuestions,
-} from '../src/entities/question/api/questionApi.ts';
+} from '../questionApi';
+import { CATEGORY, DATABASE_ERROR, FAILURE_RESPONSE, QUESTION, database } from './fakeDatabase';
 
-const DATABASE_ERROR = { code: '08006', message: 'Database unavailable', details: '', hint: '' };
-const FAILURE_RESPONSE = { status: 503, headers: { 'Retry-After': '0' } };
-const CATEGORY = {
-  id: 'cat-1',
-  slug: 'javascript',
-  title: 'JavaScript',
-  order_num: 1,
-  icon: 'JS',
-  description: '',
-};
-const QUESTION = {
-  id: 'q-1',
-  category_id: CATEGORY.id,
-  question: 'What is JavaScript?',
-  answer: 'A programming language.',
-  sub_category: 'basics',
-  difficulty: 'easy',
-  order_num: 1,
-  tags: ['javascript'],
-  show_in_daily: true,
-  show_in_flashcard: true,
-  follow_ups: [],
-};
+type Query<Result> = (client: SupabaseClient) => Promise<Result>;
 
-/** 실제 Supabase 쿼리·응답 처리를 사용하고 HTTP 전송만 대체한다. */
-function database(respond) {
-  const requests = [];
-  const client = createClient('https://database.example', 'test-anon-key', {
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    global: {
-      fetch: async (input) => {
-        const url = new URL(input);
-        requests.push(url);
-        return respond(url);
-      },
-    },
-  });
-  return { client, requests };
-}
-
-const listQueries = [
+const listQueries: [name: string, query: Query<unknown[]>][] = [
   ['categories', (client) => getAllCategories(client)],
   ['all questions', (client) => getAllQuestions(client)],
   ['questions by category', (client) => getQuestionsByCategory(CATEGORY.id, client)],
@@ -77,10 +40,12 @@ for (const [name, query] of listQueries) {
   });
 }
 
-for (const [name, query, row] of [
+const singleQueries: [name: string, query: Query<unknown>, row: unknown][] = [
   ['category', (client) => getCategoryBySlug(CATEGORY.slug, client), CATEGORY],
   ['question', (client) => getQuestionById(QUESTION.id, client), QUESTION],
-]) {
+];
+
+for (const [name, query, row] of singleQueries) {
   test(`${name}: no match returns undefined`, async () => {
     const { client } = database(() => Response.json([]));
     assert.equal(await query(client), undefined);
@@ -102,7 +67,7 @@ for (const [name, query, row] of [
   });
 }
 
-const categoryQueries = [
+const categoryQueries: [name: string, query: Query<unknown>, empty: unknown][] = [
   ['category questions', (client) => getQuestionsByCategorySlug(CATEGORY.slug, client), []],
   [
     'paginated questions',
@@ -150,7 +115,7 @@ test('pagination preserves records, counts and filters on success', async () => 
     pageSize: 10,
     totalPages: 2,
   });
-  const params = requests[1].searchParams;
+  const params = requests[1]!.searchParams;
   assert.equal(params.get('category_id'), `eq.${CATEGORY.id}`);
   assert.equal(params.get('difficulty'), 'eq.easy');
   assert.equal(params.get('offset'), '10');
@@ -172,8 +137,8 @@ test('random questions preserve category and visibility filters', async () => {
     return Response.json(url.searchParams.get('select') === 'id' ? [{ id: QUESTION.id }] : [QUESTION]);
   });
   assert.deepEqual(await getRandomQuestions(1, CATEGORY.slug, client, { visibilityFilter: 'daily' }), [QUESTION]);
-  assert.equal(requests[1].searchParams.get('category_id'), `eq.${CATEGORY.id}`);
-  assert.equal(requests[1].searchParams.get('show_in_daily'), 'eq.true');
+  assert.equal(requests[1]!.searchParams.get('category_id'), `eq.${CATEGORY.id}`);
+  assert.equal(requests[1]!.searchParams.get('show_in_daily'), 'eq.true');
 });
 
 test('empty ID lists and blank searches do not access the database', async () => {
@@ -181,4 +146,28 @@ test('empty ID lists and blank searches do not access the database', async () =>
   assert.deepEqual(await getQuestionsByIds([], client), []);
   assert.deepEqual(await searchQuestions('   ', client), []);
   assert.equal(requests.length, 0);
+});
+
+test('categories carry their question count', async () => {
+  const { client } = database(() => Response.json([{ ...CATEGORY, questions: [{ count: 3 }] }]));
+  assert.deepEqual(await getAllCategories(client), [{ ...CATEGORY, question_count: 3 }]);
+});
+
+test('search returns each match with its category and where it matched', async () => {
+  const { client } = database(() =>
+    Response.json([
+      { ...QUESTION, follow_ups: null, categories: CATEGORY },
+      { ...QUESTION, id: 'q-without-category', categories: null },
+    ]),
+  );
+  assert.deepEqual(await searchQuestions('PROGRAMMING', client), [
+    { question: QUESTION, category: CATEGORY, matchType: 'answer' },
+  ]);
+});
+
+test('search keeps filter syntax characters in the keyword literal', async () => {
+  const { client, requests } = database(() => Response.json([]));
+  await searchQuestions(String.raw`var, let (100%_a"b\c)`, client);
+  const pattern = String.raw`"%var, let (100\\%\\_a\"b\\\\c)%"`;
+  assert.equal(requests[0]!.searchParams.get('or'), `(question.ilike.${pattern},answer.ilike.${pattern})`);
 });

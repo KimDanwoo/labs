@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { GROUPS, NEW_CATEGORIES, buildBookQuestionRows } from './lib/bookQuestions.mjs';
+import { GROUPS, NEW_CATEGORIES, buildBookQuestionRows } from '../bookQuestions.mjs';
 
 test('all book questions have unique IDs, complete content and preserved group ordering', () => {
   const rows = buildBookQuestionRows();
