@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createFlightState, updateFlight, FLIGHT } from '../src/views/ride/model/runner-control/services/flightDynamics.ts';
-const controls = { lift: false, launch: false, descend: false, holdAltitude: false, speed: 12 };
-const airborne = (height = 12, velocity = 0) => ({ height, velocity, groundY: 0 });
-function simulate(state, seconds, fps, input = controls, ground = 0) {
-  const impacts = [];
+import { createFlightState, FLIGHT, updateFlight, type FlightInput, type FlightState } from '../flightDynamics';
+const controls: FlightInput = { lift: false, launch: false, descend: false, holdAltitude: false, speed: 12 };
+const airborne = (height = 12, velocity = 0): FlightState => ({ height, velocity, groundY: 0 });
+function simulate(state: FlightState, seconds: number, fps: number, input = controls, ground = 0) {
+  const impacts: number[] = [];
   for (let i = 0; i < seconds * fps; i++) {
     const impact = updateFlight(state, input, ground, 1 / fps);
     if (impact !== null) impacts.push(impact);
@@ -29,7 +29,7 @@ test('commanded descent is faster, but both modes flare and land once', () => {
     assert.ok(descend ? state.velocity < -5 : state.velocity < -4 && state.velocity > -6);
     const impacts = simulate(state, 40, 60, input);
     assert.equal(impacts.length, 1);
-    assert.ok(impacts[0] < 1.6, `touchdown ${impacts[0]}`);
+    assert.ok(impacts[0]! < 1.6, `touchdown ${impacts[0]}`);
     assert.equal(state.height, 0);
     assert.equal(state.velocity, 0);
   }
@@ -40,7 +40,7 @@ test('30/60/120 fps produce the same flight trajectory', () => {
     simulate(state, 4, fps);
     return state;
   });
-  assert.ok(Math.max(...states.map(s => s.height)) - Math.min(...states.map(s => s.height)) < 0.01);
+  assert.ok(Math.max(...states.map((s) => s.height)) - Math.min(...states.map((s) => s.height)) < 0.01);
 });
 test('terrain changes preserve airborne world altitude and rising terrain lands safely', () => {
   const state = airborne(12);
@@ -98,6 +98,6 @@ test('released flight from ring altitude lands promptly even without forward inp
     const impacts = simulate(state, 8, 60, { ...controls, speed });
     assert.equal(state.height, 0, `still floating at speed ${speed}`);
     assert.equal(impacts.length, 1);
-    assert.ok(impacts[0] < 1.6);
+    assert.ok(impacts[0]! < 1.6);
   }
 });

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createSpinState, SPIN_SKILL, updateSpin } from '../src/views/ride/model/runner-control/services/spinSkill.ts';
+import { createSpinState, SPIN_SKILL, updateSpin } from '../spinSkill';
 
 test('회전은 충분한 비행 고도에서 새 입력으로만 시작한다', () => {
   const state = createSpinState();

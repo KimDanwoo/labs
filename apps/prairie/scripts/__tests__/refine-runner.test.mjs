@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 function load(name) {
-  const bytes = readFileSync(new URL(`../public/models/${name}.glb`, import.meta.url));
+  const bytes = readFileSync(new URL(`../../public/models/${name}.glb`, import.meta.url));
   const jsonLength = bytes.readUInt32LE(12);
   const gltf = JSON.parse(bytes.subarray(20, 20 + jsonLength).toString());
   return { gltf, bin: bytes.subarray(jsonLength + 28) };

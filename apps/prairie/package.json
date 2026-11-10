@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test scripts/test-*.mjs",
+    "test": "node --import tsx --test \"src/**/__tests__/*.test.ts\" \"scripts/**/__tests__/*.test.mjs\"",
     "test:e2e": "playwright test"
   },
   "dependencies": {

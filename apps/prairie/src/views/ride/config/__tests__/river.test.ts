@@ -1,4 +1,4 @@
-// 강 배치 불변식 체크: node scripts/test-river.mjs
+// 강 배치 불변식 체크
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
@@ -6,28 +6,31 @@ import {
   GRASS_QUALITY,
   grassKeepAt,
   grassViewRadius,
-} from '../src/views/ride/model/grass/constants.ts';
+  type GrassQuality,
+} from '../../model/grass/constants';
 import {
-  distanceToRiver,
   coastDistanceAt,
-  groundHeightAt,
-  waterDepthAt,
-  waterBedDepthAt,
-  riverOffsetAt,
-  riverWidthAt,
-  OCEAN,
+  distanceToRiver,
   FOG,
+  groundHeightAt,
   HAZE,
   nearestRiverX,
+  OCEAN,
   RIDGES,
   RIVER,
   RIVER_TRENCH_HALF_WIDTH,
   riverBearing,
   riverBedDepthAt,
+  riverOffsetAt,
   riverWaterDepthAt,
+  riverWidthAt,
   TERRAIN,
   terrainHeightAt,
-} from '../src/views/ride/config/scene.ts';
+  waterBedDepthAt,
+  waterDepthAt,
+} from '../scene';
+
+const QUALITIES = Object.keys(GRASS_QUALITY) as GrassQuality[];
 
 test('스폰 지점에서 첫 강까지 firstX만큼 떨어져 있다', () => {
   assert.equal(nearestRiverX(0), RIVER.firstX);
@@ -79,7 +82,8 @@ test('능선 최고 높이가 헤이즈 원통 안에 든다', () => {
 
 // blade는 청크 커버 끝보다 먼저 지면색에 완전히 녹아야 청크 경계가 안 보인다. 안개는 그 뒤에 닫힌다.
 test('잔디 blade가 청크 끝보다 먼저 지면에 녹는다', () => {
-  for (const [quality, grass] of Object.entries(GRASS_QUALITY)) {
+  for (const quality of QUALITIES) {
+    const grass = GRASS_QUALITY[quality];
     const coverage = (grassViewRadius(quality) + 0.5) * GRASS_FIELD.tile;
     assert.ok(grass.fadeFar < coverage, `${quality}: fadeFar ${grass.fadeFar} < coverage ${coverage}`);
     assert.ok(grass.fadeFar <= FOG[quality].far, `${quality}: 잔디가 안개보다 먼저 닫힌다`);
@@ -119,14 +123,16 @@ test('물속에서는 방위 대신 crossing', () => {
 
 // 링 안쪽 경계에서 보여야 하는 blade 수(첫 링 풀 × keep)가 그 링의 풀보다 크면 경계에서 잔디가 튄다.
 test('LOD 링 풀이 경계 거리의 keep을 감당한다', () => {
-  for (const [quality, grass] of Object.entries(GRASS_QUALITY)) {
-    const fullPool = grass.rings[0].blades;
+  for (const quality of QUALITIES) {
+    const grass = GRASS_QUALITY[quality];
+    const fullPool = grass.rings[0]!.blades;
     for (let i = 1; i < grass.rings.length; i += 1) {
-      const innerEdge = (grass.rings[i - 1].maxRing + 0.5) * GRASS_FIELD.tile;
+      const ring = grass.rings[i]!;
+      const innerEdge = (grass.rings[i - 1]!.maxRing + 0.5) * GRASS_FIELD.tile;
       const needed = fullPool * grassKeepAt(innerEdge);
       assert.ok(
-        grass.rings[i].blades >= needed,
-        `${quality} ring ${i}: pool ${grass.rings[i].blades} < needed ${needed.toFixed(0)} at ${innerEdge}m`,
+        ring.blades >= needed,
+        `${quality} ring ${i}: pool ${ring.blades} < needed ${needed.toFixed(0)} at ${innerEdge}m`,
       );
     }
   }

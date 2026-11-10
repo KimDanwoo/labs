@@ -1,12 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  crossesGate,
-  GATES,
-  isExplorationClearing,
-  LANDMARKS,
-  parseProgress,
-} from '../src/views/ride/model/exploration/world.ts';
+import { crossesGate, GATES, isExplorationClearing, LANDMARKS, parseProgress } from '../world';
 
 test('gate crossing catches dash segments, accepts both directions and requires aperture', () => {
   const center = { x: 0, y: 10, z: 20 };
@@ -28,7 +22,7 @@ test('saved progress tolerates corrupt and old data without trusting unknown IDs
 test('landmark and gate approach areas are clear of generated trees and rocks', () => {
   for (const point of [...LANDMARKS, ...GATES]) assert.equal(isExplorationClearing(point.x, point.z), true);
   assert.equal(isExplorationClearing(1000, 1000), false);
-  for (let i = 1; i < GATES.length; i++) assert.ok(GATES[i].z > GATES[i - 1].z);
+  for (let i = 1; i < GATES.length; i++) assert.ok(GATES[i]!.z > GATES[i - 1]!.z);
 });
 
 test('body contact collects near the rim and during sideways motion, but distant passes miss', () => {

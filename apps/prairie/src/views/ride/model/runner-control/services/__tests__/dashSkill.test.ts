@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createDashState, DASH_SKILL, updateDash } from '../src/views/ride/model/runner-control/services/dashSkill.ts';
+import { createDashState, DASH_SKILL, updateDash } from '../dashSkill';
 
 test('제로백은 공중 새 입력에서만 발동하고 0.18초에 최대 출력에 도달한다', () => {
   const state = createDashState();
@@ -39,7 +39,7 @@ test('착지하면 가속 효과를 종료한다', () => {
 });
 
 test('프레임 간격이 달라도 같은 시간의 출력은 같다', () => {
-  const sample = (frames) => {
+  const sample = (frames: number) => {
     const state = createDashState();
     updateDash(state, true, 5, 0);
     for (let i = 0; i < frames; i++) updateDash(state, false, 5, 1 / frames);

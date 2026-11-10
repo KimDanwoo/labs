@@ -1,8 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { gaitWeights } from '../src/views/ride/lib/runner/gaitWeights.ts';
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { gaitWeights } from '../gaitWeights';
 
-const weights = (speed, height) => gaitWeights(speed, height, 4, 7);
+const weights = (speed: number, height: number) => gaitWeights(speed, height, 4, 7);
+
+type Gait = keyof ReturnType<typeof gaitWeights>;
+const GAIT_CLIPS: [speed: number, clipName: string, gait: Gait][] = [
+  [2, 'Walk', 'walk'],
+  [8, 'Gallop', 'run'],
+];
 
 test('공중 이동 중에는 정지 포즈 대신 갤럽 클립을 재생한다', () => {
   assert.equal(weights(8, 5).run, 1);
@@ -34,8 +41,8 @@ test('실제 GLB를 공중 이동 가중치로 재생하면 네 다리의 포즈
   const { readFileSync } = await import('node:fs');
   const { AnimationMixer, PropertyBinding } = await import('three');
   const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
-  const bytes = readFileSync(new URL('../public/models/unicorn.glb', import.meta.url));
-  const gltf = await new Promise((resolve, reject) =>
+  const bytes = readFileSync(new URL('../../../../../../public/models/unicorn.glb', import.meta.url));
+  const gltf = await new Promise<GLTF>((resolve, reject) =>
     new GLTFLoader().parse(
       bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
       '',
@@ -44,25 +51,25 @@ test('실제 GLB를 공중 이동 가중치로 재생하면 네 다리의 포즈
     ),
   );
   const names = ['FrontUpperLeg.L', 'FrontUpperLeg.R', 'BackUpperLeg.L', 'BackUpperLeg.R'];
-  const legs = names.map((name) => gltf.scene.getObjectByName(PropertyBinding.sanitizeNodeName(name)));
-  assert.ok(legs.every(Boolean));
-  for (const [speed, clipName, gait] of [
-    [2, 'Walk', 'walk'],
-    [8, 'Gallop', 'run'],
-  ]) {
+  const legs = names.map((name) => {
+    const leg = gltf.scene.getObjectByName(PropertyBinding.sanitizeNodeName(name));
+    assert.ok(leg, name);
+    return leg;
+  });
+  for (const [speed, clipName, gait] of GAIT_CLIPS) {
     const mixer = new AnimationMixer(gltf.scene);
     const clip = gltf.animations.find((animation) => animation.name === `AnimalArmature|${clipName}`);
     assert.ok(clip);
     const action = mixer.clipAction(clip).play();
     action.weight = weights(speed, 5)[gait];
-    const poses = names.map(() => []);
+    const poses: number[][][] = names.map(() => []);
     for (let frame = 0; frame < 8; frame += 1) {
       mixer.update(0.09);
-      legs.forEach((bone, index) => poses[index].push(bone.quaternion.toArray()));
+      legs.forEach((bone, index) => poses[index]!.push(bone.quaternion.toArray()));
     }
     poses.forEach((samples, index) => {
       assert.ok(
-        samples.slice(1).some((pose) => pose.some((value, axis) => Math.abs(value - samples[0][axis]) > 0.01)),
+        samples.slice(1).some((pose) => pose.some((value, axis) => Math.abs(value - samples[0]![axis]!) > 0.01)),
         `${clipName}: ${names[index]}`,
       );
     });
