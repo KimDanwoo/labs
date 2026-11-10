@@ -94,7 +94,10 @@ test('slices are imported through their public API only', () => {
 test('public entries name their exports', () => {
   assert.equal(check('public-api', "export * from './ui/First';", 'src/features/first/index.ts').length, 1);
   assert.equal(check('public-api', "export { First } from './ui/First';", 'src/features/first/index.ts').length, 0);
-  assert.equal(check('public-api', "export type { First } from './model/types';", 'src/features/first/index.ts').length, 0);
+  assert.equal(
+    check('public-api', "export type { First } from './model/types';", 'src/features/first/index.ts').length,
+    0,
+  );
 });
 
 test('components require a matching file and cannot hide in a hook', () => {

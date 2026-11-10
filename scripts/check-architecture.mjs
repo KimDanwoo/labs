@@ -158,7 +158,9 @@ export function checkRepository(root = ROOT) {
             }
           }
           if (config.compilerOptions?.paths?.['@widgets/*'] || existsSync(path.join(dir, 'src/widgets')))
-            problems.push(`${relative}: widgets 레이어는 쓰지 않는다. 화면 전용 블록은 views, 공용 동작은 features로 옮긴다.`);
+            problems.push(
+              `${relative}: widgets 레이어는 쓰지 않는다. 화면 전용 블록은 views, 공용 동작은 features로 옮긴다.`,
+            );
         }
       }
     }
