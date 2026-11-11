@@ -1,0 +1,54 @@
+---
+import Icon from '~/components/Icon.astro';
+import { postPath, seriesPath, type Post } from '~/lib/posts';
+import { SERIES_INFO, type SeriesId } from '~/lib/taxonomy';
+
+type Props = {
+  seriesId: SeriesId;
+  /** 연재 글 전체(읽는 순서대로) */
+  posts: Post[];
+  currentId: string;
+};
+
+const { seriesId, posts, currentId } = Astro.props;
+const { label } = SERIES_INFO[seriesId];
+const position = posts.findIndex((post) => post.id === currentId) + 1;
+---
+
+<details class="motion-details group rounded-lg border border-border text-sm">
+  <summary class="flex cursor-pointer list-none items-center justify-between gap-md px-md py-sm">
+    <span class="flex min-w-0 items-center gap-sm">
+      <Icon name="layers" class="size-3.5 shrink-0 text-muted-foreground" />
+      <span class="truncate"><span class="text-muted-foreground">연재</span> <b>{label}</b></span>
+    </span>
+    <span class="flex shrink-0 items-center gap-sm text-muted-foreground tabular-nums">
+      {position} / {posts.length}
+      <Icon name="chevron-down" class="size-4 transition-transform group-open:rotate-180" />
+    </span>
+  </summary>
+  <ol class="border-t border-border px-md py-sm">
+    {
+      posts.map((post, index) => (
+        <li class="flex gap-sm py-xs">
+          <span class="w-5 shrink-0 text-right text-muted-foreground tabular-nums">{index + 1}</span>
+          {post.id === currentId ? (
+            <span aria-current="page" class="leading-snug font-bold">
+              {post.data.title}
+            </span>
+          ) : (
+            <a href={postPath(post)} class="leading-snug text-muted-foreground transition-colors hover:text-foreground">
+              {post.data.title}
+            </a>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+  <a
+    href={seriesPath(seriesId)}
+    class="flex items-center justify-end gap-xs border-t border-border px-md py-sm text-muted-foreground transition-colors hover:text-foreground"
+  >
+    연재 전체 보기
+    <Icon name="chevron-right" class="size-3.5" />
+  </a>
+</details>

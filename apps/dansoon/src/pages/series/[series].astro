@@ -1,0 +1,28 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ListPage from '~/components/ListPage.astro';
+import PostList from '~/components/PostList.astro';
+import { filterBySeries, getPublishedPosts } from '~/lib/posts';
+import { SERIES_IDS, SERIES_INFO, type SeriesId } from '~/lib/taxonomy';
+
+/** 공개된 글이 없는 연재는 빈 페이지가 되므로 만들지 않는다. */
+export const getStaticPaths = (async () => {
+  const posts = await getPublishedPosts();
+  return SERIES_IDS.filter((series) => filterBySeries(posts, series).length > 0).map((series) => ({
+    params: { series },
+  }));
+}) satisfies GetStaticPaths;
+
+const series = Astro.params.series as SeriesId;
+const posts = filterBySeries(await getPublishedPosts(), series);
+const { label, description } = SERIES_INFO[series];
+---
+
+<ListPage
+  heading={label}
+  lead={`${description} 모두 ${posts.length}편이에요.`}
+  title={`${label} 연재`}
+  description={description}
+>
+  <PostList posts={posts} />
+</ListPage>

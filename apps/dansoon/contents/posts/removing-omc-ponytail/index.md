@@ -7,6 +7,7 @@ tags: ['ai', 'side-project']
 draft: false
 thumbnail: './thumbnail.jpg'
 cover: './cover.webp'
+series: { id: 'ai-dev', order: 5 }
 ---
 
 ## 1. 설치할 때의 이유가 계속 유효한지 궁금해졌다

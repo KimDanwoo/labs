@@ -9,11 +9,12 @@ import Giscus from '~/components/Giscus.astro';
 import ImageLightbox from '~/components/ImageLightbox.astro';
 import PostNav from '~/components/PostNav.astro';
 import RelatedPosts from '~/components/RelatedPosts.astro';
+import SeriesBox from '~/components/SeriesBox.astro';
 import TagChips from '~/components/TagChips.astro';
 import Toc from '~/components/Toc.astro';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import { formatLongDate, readingMinutes } from '~/lib/format';
-import { getAdjacentPosts, getPublishedPosts, getRelatedPosts, postPath, type Post } from '~/lib/posts';
+import { filterBySeries, getAdjacentPosts, getPublishedPosts, getRelatedPosts, postPath, type Post } from '~/lib/posts';
 
 export const getStaticPaths = (async () => {
   const posts = await getPublishedPosts();
@@ -26,7 +27,7 @@ type Props = {
 };
 
 const { post, posts } = Astro.props;
-const { title, description, publishedAt, updatedAt, category, tags, thumbnail, cover } = post.data;
+const { title, description, publishedAt, updatedAt, category, tags, thumbnail, cover, series } = post.data;
 const { Content, headings } = await render(post);
 const { older, newer } = getAdjacentPosts(posts, post);
 const COVER_WIDTH = 1344;
@@ -90,6 +91,13 @@ const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c
         <div class="mt-md">
           <TagChips tags={tags} />
         </div>
+        {
+          series && (
+            <div class="mt-xl">
+              <SeriesBox seriesId={series.id} posts={filterBySeries(posts, series.id)} currentId={post.id} />
+            </div>
+          )
+        }
       </header>
 
       <div class="mt-xl xl:hidden">

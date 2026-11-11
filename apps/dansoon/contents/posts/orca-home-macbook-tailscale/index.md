@@ -8,6 +8,7 @@ tags: ["ai", "side-project"]
 draft: false
 thumbnail: "./thumbnail.jpg"
 cover: "./cover.webp"
+series: { id: 'ai-dev', order: 4 }
 ---
 
 Claude Code나 Codex 같은 CLI 에이전트는 띄워 둔 컴퓨터에서만 돈다. 노트북 뚜껑을 닫으면 에이전트도 멈추고 밖에서 진행 상황을 보려면 그 노트북을 다시 열어야 한다.
