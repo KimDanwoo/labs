@@ -50,7 +50,7 @@ test('corrupt or duplicated saved discoveries are cleaned on load', async ({ pag
     localStorage.setItem('komorebi-discoveries-v1', JSON.stringify(['fields', 'fields', 'nowhere', 7]));
   });
   await openWalk(page);
-  await expect(page.locator('.journal-button b')).toHaveText('1 / 6');
+  await expect(page.locator('.journal-button b')).toHaveText('1 / 7');
 });
 
 async function guideTo(page: Page, landmark: string) {
@@ -174,8 +174,8 @@ test('a place found at dusk keeps a dusk page that the diary can reread', async 
   await page.getByRole('button', { name: '바람이 머무는 논 추억 다시 읽기' }).click();
   await expect(memory).toContainText('초록빛 파도가 발끝까지 밀려온다');
   await expect(memory).toContainText('노을이 논물 위에 길게 눕는다');
-  await expect(memory).toContainText('여름의 조각 2 / 18');
-  await expect(page.locator('.journal-button b')).toHaveText('1 / 6');
+  await expect(memory).toContainText('여름의 조각 2 / 21');
+  await expect(page.locator('.journal-button b')).toHaveText('1 / 7');
 });
 
 test('choosing the cancelled exit again resumes the crossing once it loads', async ({ page }) => {
@@ -223,7 +223,7 @@ test('sleeping at home advances the day and a night visit keeps a night page', a
   await page.locator('.interact').click();
   const memory = page.getByRole('dialog', { name: '바람이 머무는 논' });
   await expect(memory).toContainText('논물에 별이 하나씩 내려앉는다');
-  await expect(memory).toContainText('여름의 조각 1 / 18');
+  await expect(memory).toContainText('여름의 조각 1 / 21');
   await memory.getByRole('button', { name: '추억 닫기' }).click();
   await page.getByRole('button', { name: '산책 지도 열기' }).click();
   await page.getByRole('button', { name: '바람이 머무는 논 추억 다시 읽기' }).click();
@@ -240,13 +240,13 @@ test('players from before the day pages keep every page they could read', async 
     localStorage.setItem('komorebi-evening-discoveries-v1', JSON.stringify(['fields']));
   });
   await openWalk(page);
-  await expect(page.locator('.journal-button b')).toHaveText('2 / 6');
+  await expect(page.locator('.journal-button b')).toHaveText('2 / 7');
   await page.getByRole('button', { name: '산책 지도 열기' }).click();
   await page.getByRole('button', { name: '바람이 머무는 논 추억 다시 읽기' }).click();
   const memory = page.getByRole('dialog', { name: '바람이 머무는 논' });
   await expect(memory).toContainText('초록빛 파도가 발끝까지 밀려온다');
   await expect(memory).toContainText('노을이 논물 위에 길게 눕는다');
-  await expect(memory).toContainText('여름의 조각 3 / 18');
+  await expect(memory).toContainText('여름의 조각 3 / 21');
 });
 
 test('once a page is kept, the place offers its little action instead', async ({ page }) => {
@@ -264,7 +264,7 @@ test('once a page is kept, the place offers its little action instead', async ({
   await prompt.click();
   await expect(page.getByRole('status', { name: '산책 알림' })).toContainText('돌이 세 번 튀었다');
   await expect(page.getByRole('dialog', { name: '물소리 다리' })).toBeHidden();
-  await expect(page.locator('.journal-button b')).toHaveText('1 / 6');
+  await expect(page.locator('.journal-button b')).toHaveText('1 / 7');
   expect(errors).toEqual([]);
 });
 
@@ -357,7 +357,6 @@ test('home is a walkable map with a bed and a doorway back to the village', asyn
 
 test('tapping the painted quilt and desk walks to their usable side', async ({ page }) => {
   await openWalk(page);
-  await page.getByRole('button', { name: 'MP3 접기 · 음악은 계속 재생' }).click();
   await guideTo(page, '파란 지붕 우리 집');
   await expect(landscape(page)).toHaveAttribute('data-region', 'home', { timeout: 25_000 });
   await expect(landscape(page)).toHaveAttribute('data-motion', 'idle', { timeout: 10_000 });

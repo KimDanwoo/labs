@@ -1,6 +1,9 @@
 import { hasGroundBetween, isOnGround } from './ground';
 
-export type Region = 'village' | 'river' | 'coast' | 'forest' | 'school' | 'shops' | 'home';
+export type Region = 'village' | 'river' | 'coast' | 'forest' | 'school' | 'shops' | 'home' | 'hallway' | 'classroom';
+/** Rooms under a roof: no rain, fireflies or visiting animals, and a hushed outdoor soundscape. */
+const INDOOR_REGIONS: readonly Region[] = ['home', 'hallway', 'classroom'];
+export const isIndoors = (region: Region) => INDOOR_REGIONS.includes(region);
 export type Point = { x: number; z: number };
 export type RouteNode = Point & { id: string };
 export type Route = { a: string; b: string; width: number };
@@ -18,6 +21,7 @@ export const HOME_DOOR = { x: 15, z: 38 };
 export const HOME_DESK = { name: '작은 그림일기 책상', x: 40, z: 57 };
 export const HOME_WARDROBE = { name: '나무 옷장', x: 86, z: 62 };
 export const HOME_BED = { name: '포근한 잠자리', x: 70, z: 76 };
+export const CLASSROOM_BOARD = { name: '초록 칠판', x: 50, z: 62 };
 /** A small thing to do at each place once its memory for this time of day is kept. */
 export const PLACE_ACTION = {
   gust: 'gust',
@@ -26,6 +30,7 @@ export const PLACE_ACTION = {
   bell: 'bell',
   schoolBell: 'schoolBell',
   windChime: 'windChime',
+  book: 'book',
 } as const;
 export type PlaceAction = (typeof PLACE_ACTION)[keyof typeof PLACE_ACTION];
 export const LANDMARKS = [
@@ -96,6 +101,23 @@ export const LANDMARKS = [
       kind: PLACE_ACTION.schoolBell,
       label: '학교 종 치기',
       caption: '딩동댕 — 아무도 없는 운동장에 종이 울린다.',
+    },
+  },
+  {
+    id: 'classroom',
+    region: 'classroom',
+    name: '여름방학의 빈 교실',
+    short: '교실',
+    x: 79,
+    z: 60,
+    icon: '室',
+    text: '아무도 없는 교실에 매미 소리만 가득하다. 내 책상 서랍에는 1학기에 두고 간 지우개가 그대로 있다.',
+    eveningText: '창으로 들어온 노을이 책상 줄을 따라 길게 눕는다. 의자 그림자들이 꼭 수업을 듣는 친구들 같다.',
+    nightText: '불 꺼진 교실에 달빛이 칠판을 하얗게 비춘다. 낮에 그려 둔 낙서가 어둠 속에서 나를 보고 웃는다.',
+    action: {
+      kind: PLACE_ACTION.book,
+      label: '학급문고 펼쳐 보기',
+      caption: '책장 사이에서 누군가 끼워 둔 네잎클로버가 나왔다.',
     },
   },
   {
@@ -298,6 +320,7 @@ export const WORLDS: Record<
       { id: 'entry', x: 50, z: 86 },
       { id: 'center', x: 50, z: 70 },
       { id: 'school', x: 50, z: 39 },
+      { id: 'door', x: 52, z: 35 },
       { id: 'left', x: 18, z: 72 },
       { id: 'right', x: 83, z: 72 },
     ],
@@ -305,10 +328,61 @@ export const WORLDS: Record<
       { a: 'gate', b: 'entry', width: 6 },
       { a: 'entry', b: 'center', width: 9 },
       { a: 'center', b: 'school', width: 5 },
+      { a: 'school', b: 'door', width: 3 },
       { a: 'center', b: 'left', width: 9 },
       { a: 'center', b: 'right', width: 9 },
     ],
-    portals: [{ node: 'gate', to: 'shops', spawn: { x: 14, z: 60 }, label: '상점가' }],
+    portals: [
+      { node: 'gate', to: 'shops', spawn: { x: 14, z: 60 }, label: '상점가' },
+      { node: 'door', to: 'hallway', spawn: { x: 18, z: 70 }, label: '현관' },
+    ],
+  },
+  classroom: {
+    image: '/art/classroom-game.webp',
+    name: '방학 중인 우리 교실',
+    nodes: [
+      { id: 'door', x: 95, z: 62.5 },
+      { id: 'aisle', x: 80, z: 61 },
+      { id: 'classroom', x: 79, z: 60 },
+      { id: 'board', x: CLASSROOM_BOARD.x, z: CLASSROOM_BOARD.z },
+      { id: 'lectern', x: 39, z: 61 },
+      { id: 'center', x: 50, z: 78 },
+      { id: 'front', x: 50, z: 94 },
+    ],
+    routes: [
+      { a: 'door', b: 'aisle', width: 2.5 },
+      { a: 'aisle', b: 'classroom', width: 2.5 },
+      { a: 'aisle', b: 'board', width: 2.5 },
+      { a: 'board', b: 'lectern', width: 2.5 },
+      { a: 'board', b: 'center', width: 6 },
+      { a: 'center', b: 'front', width: 8 },
+    ],
+    portals: [{ node: 'door', to: 'hallway', spawn: { x: 68.5, z: 70 }, label: '복도' }],
+  },
+  hallway: {
+    image: '/art/hallway-game.webp',
+    name: '조용한 학교 복도',
+    nodes: [
+      { id: 'entrance', x: 16, z: 60 },
+      { id: 'lobby', x: 18, z: 70 },
+      { id: 'middle', x: 45, z: 74 },
+      { id: 'corridor', x: 68.5, z: 70 },
+      { id: 'classdoor', x: 68.5, z: 62 },
+      { id: 'stairs', x: 90, z: 72 },
+      { id: 'front', x: 50, z: 92 },
+    ],
+    routes: [
+      { a: 'entrance', b: 'lobby', width: 3 },
+      { a: 'lobby', b: 'middle', width: 6 },
+      { a: 'middle', b: 'corridor', width: 6 },
+      { a: 'corridor', b: 'classdoor', width: 3 },
+      { a: 'corridor', b: 'stairs', width: 6 },
+      { a: 'middle', b: 'front', width: 8 },
+    ],
+    portals: [
+      { node: 'entrance', to: 'school', spawn: { x: 52, z: 40.5 }, label: '운동장' },
+      { node: 'classdoor', to: 'classroom', spawn: { x: 88, z: 62 }, label: '교실' },
+    ],
   },
   shops: {
     image: '/art/shops-school-road.webp',

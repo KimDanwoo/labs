@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Point, Region } from '../model/world/world';
+import { isIndoors, type Point, type Region } from '../model/world/world';
 import { canvasTexture } from './art';
 import { lampGlowAt, lightSprite } from './nightLights';
 import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
@@ -150,7 +150,7 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     },
     update(now: Scene) {
       const { region, dt, darkness, isStill, isRaining } = now;
-      if (region === 'home') {
+      if (isIndoors(region)) {
         hide();
         return;
       }

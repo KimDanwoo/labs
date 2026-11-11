@@ -20,6 +20,59 @@ const GROUND: Record<Region, readonly PixelPoint[][]> = {
       [300, 690],
     ],
   ],
+  hallway: [
+    // The corridor floor, the tiled entrance between the glass doors and the classroom doorway.
+    [
+      [0, 1024],
+      [0, 700],
+      [105, 692],
+      [105, 640],
+      [180, 640],
+      [185, 590],
+      [330, 590],
+      [335, 640],
+      [390, 645],
+      [395, 665],
+      [820, 658],
+      [1000, 656],
+      [1002, 615],
+      [1106, 615],
+      [1110, 656],
+      [1200, 660],
+      [1210, 670],
+      [1400, 670],
+      [1405, 660],
+      [1536, 660],
+      [1536, 1024],
+    ],
+  ],
+  classroom: [
+    // Floor between the two desk groups, the strip before the board and the back aisle to the door.
+    [
+      [565, 598],
+      [1085, 596],
+      [1330, 606],
+      [1440, 612],
+      [1482, 618],
+      [1484, 662],
+      [1440, 664],
+      [1320, 660],
+      [1095, 662],
+      [1090, 725],
+      [1150, 800],
+      [1232, 905],
+      [1536, 918],
+      [1536, 1024],
+      [0, 1024],
+      [0, 918],
+      [275, 915],
+      [305, 862],
+      [385, 800],
+      [448, 725],
+      [452, 640],
+      [560, 636],
+    ],
+  ],
   shops: [
     // Cleared school approach: continuous pavement across the whole left branch.
     [
@@ -590,6 +643,8 @@ const GROUND_GEOMETRY = {
   forest: prepareGeometry(GROUND.forest),
   school: prepareGeometry(GROUND.school),
   shops: prepareGeometry(GROUND.shops),
+  hallway: prepareGeometry(GROUND.hallway),
+  classroom: prepareGeometry(GROUND.classroom),
 };
 const OBJECT_GEOMETRY = WORLD_OBJECTS.map((object) => ({
   region: object.region,

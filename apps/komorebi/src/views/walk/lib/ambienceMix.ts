@@ -1,5 +1,5 @@
 import { TIME, WEATHER, type TimeOfDay, type Weather } from '../model/constants/walk';
-import type { Region } from '../model/world/world';
+import { isIndoors, type Region } from '../model/world/world';
 
 export type AmbienceMix = {
   water: number;
@@ -19,6 +19,8 @@ const REGION_LAYERS = {
   forest: { water: 0, waves: 0, cicadas: 1 },
   school: { water: 0, waves: 0, cicadas: 0.45 },
   shops: { water: 0, waves: 0, cicadas: 0.2 },
+  hallway: { water: 0, waves: 0, cicadas: 0.2 },
+  classroom: { water: 0, waves: 0, cicadas: 0.12 },
 } satisfies Record<Region, Layers>;
 
 const EVENING_CICADA_SHARE = 0.3;
@@ -27,7 +29,7 @@ const RAIN_INSECT_SHARE = 0.3;
 /** Each place keeps its own sound; at dusk birds give way to crickets, and at night the cicadas fall silent. */
 export function ambienceMix(region: Region, time: TimeOfDay, weather: Weather = WEATHER.clear): AmbienceMix {
   const clear = timeMix(region, time);
-  if (region === 'home')
+  if (isIndoors(region))
     return {
       ...clear,
       birds: clear.birds * 0.12,

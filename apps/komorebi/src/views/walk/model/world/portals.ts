@@ -14,13 +14,37 @@ export type WorldPortal = {
 
 // Exit spans follow the painted connecting road, not every path touching that screen edge.
 const EXIT_SPANS: Record<Region, Record<string, readonly [number, number]>> = {
-  home: { door: [61, 70] },
-  village: { home: [13.5, 16.5], bottom: [33, 65], forestgate: [32, 39], rivergate: [37, 42] },
+  home: {},
+  hallway: {},
+  classroom: {},
+  village: { bottom: [33, 65], forestgate: [32, 39], rivergate: [37, 42] },
   river: { back: [45, 52], coastgate: [43, 54] },
   coast: { back: [52, 62] },
   forest: { back: [40, 61] },
   school: { gate: [45, 61] },
   shops: { schoolgate: [50, 66], villagegate: [49, 59] },
+};
+
+type Doorway = Pick<WorldPortal, 'edge' | 'boundary' | 'center' | 'lateralRange'> & { extent: number };
+
+// Doorways are small thresholds inside a painting, unlike the road exits at its edges.
+const DOORWAYS: Partial<Record<Region, Partial<Record<Region, Doorway>>>> = {
+  village: {
+    home: { edge: 'top', boundary: 38.5, center: { x: 15, z: 38 }, lateralRange: [13.5, 16.5], extent: 2 },
+  },
+  home: {
+    village: { edge: 'left', boundary: 24, center: { x: 23.5, z: 65 }, lateralRange: [61, 70], extent: 3 },
+  },
+  school: {
+    hallway: { edge: 'top', boundary: 35.5, center: { x: 52, z: 35 }, lateralRange: [49.5, 54.5], extent: 1.5 },
+  },
+  hallway: {
+    school: { edge: 'top', boundary: 61, center: { x: 16, z: 60 }, lateralRange: [12.5, 21], extent: 2 },
+    classroom: { edge: 'top', boundary: 62.5, center: { x: 68.5, z: 62 }, lateralRange: [66, 71], extent: 2 },
+  },
+  classroom: {
+    hallway: { edge: 'right', boundary: 94, center: { x: 95, z: 62.5 }, lateralRange: [59, 66], extent: 3 },
+  },
 };
 
 type Edge = WorldPortal['edge'];
@@ -43,20 +67,8 @@ const portals = Object.fromEntries(
     region,
     WORLDS[region].portals.map((portal): WorldPortal => {
       const end = WORLDS[region].nodes.find((node) => node.id === portal.node)!;
-      // Doorways are small thresholds inside a painting, unlike the road exits at its edges.
-      if (region === 'village' && portal.to === 'home') {
-        return {
-          ...portal,
-          edge: 'top',
-          boundary: 38.5,
-          center: { x: 15, z: 38 },
-          lateralRange: [13.5, 16.5],
-          extent: 2,
-        };
-      }
-      if (region === 'home') {
-        return { ...portal, edge: 'left', boundary: 24, center: { x: 23.5, z: 65 }, lateralRange: [61, 70], extent: 3 };
-      }
+      const doorway = DOORWAYS[region]?.[portal.to];
+      if (doorway) return { ...portal, ...doorway };
       const edge = portalEdge(end);
       const { boundary, center } = EDGE_GEOMETRY[edge](end);
       return { ...portal, edge, boundary, center, lateralRange: EXIT_SPANS[region][portal.node]! };

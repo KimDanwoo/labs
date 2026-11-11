@@ -15,6 +15,7 @@ import {
   closestLandmark,
   createSlideMotion,
   findRoute,
+  isIndoors,
   movePlayer,
   nextRegionStep,
   type Landmark,
@@ -29,6 +30,7 @@ import { createBoats } from './boats';
 import { SCENERY_STYLE } from './breeze';
 import { constrainCameraAxis } from './cameraBounds';
 import { catchCelebration } from './catchCelebration';
+import { createChalkLayer } from './chalkLayer';
 import { createChild } from './child';
 import { createCompanionScene } from './companionScene';
 import type { CompanionReaction } from './companions';
@@ -55,6 +57,7 @@ import { createWaves } from './waves';
 
 const START_REGION: Region = 'village';
 const SEA_REGION: Region = 'coast';
+const CHALK_REGION: Region = 'classroom';
 const CAMERA_EPSILON = 0.01;
 const WARMTH_EPSILON = 0.002;
 const CHILD_ORDER = 4;
@@ -189,6 +192,8 @@ export async function createScene(
       isSea: { value: 0 },
       isVillage: { value: 1 },
       isHome: { value: 0 },
+      chalk: { value: null },
+      hasChalk: { value: 0 },
       outdoorRain: { value: 0 },
       sceneryStyle: { value: SCENERY_STYLE[START_REGION] },
       sceneryTime: { value: 0 },
@@ -340,6 +345,8 @@ export async function createScene(
     nextFrame = 0;
   };
   const unsubscribeCompanions = companionStore.subscribe(wake);
+  const chalkLayer = createChalkLayer(wake);
+  background.uniforms.chalk!.value = chalkLayer.texture;
   const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   let reducedMotion = motionQuery.matches;
   const motionPreference = (event: MediaQueryListEvent) => {
@@ -412,6 +419,7 @@ export async function createScene(
     background.uniforms.isSea!.value = next === SEA_REGION ? 1 : 0;
     background.uniforms.isVillage!.value = next === 'village' ? 1 : 0;
     background.uniforms.isHome!.value = next === 'home' ? 1 : 0;
+    background.uniforms.hasChalk!.value = next === CHALK_REGION ? 1 : 0;
     background.uniforms.sceneryStyle!.value = SCENERY_STYLE[next];
     background.uniforms.lampCount!.value = lamps.count;
     // Home stays loaded for the reset button; everything beyond the next exits is freed.
@@ -691,7 +699,7 @@ export async function createScene(
     transition = Math.min(1, transition + dt * 1.8);
     background.uniforms.night!.value = darkness;
     background.uniforms.walker!.value.set((child.position.x + 60) / 120, (child.position.y + 40 + 1.8 * size) / 80);
-    background.uniforms.rain!.value = region === 'home' ? 0 : wetness;
+    background.uniforms.rain!.value = isIndoors(region) ? 0 : wetness;
     background.uniforms.outdoorRain!.value = wetness;
     background.uniforms.time!.value = reducedMotion ? 0 : sceneryTime;
     background.uniforms.evening!.value = warmth;
@@ -699,10 +707,10 @@ export async function createScene(
   }
   function animateLife(worldDt: number, isResting: boolean) {
     const isRaining = wetness > 0.5;
-    fireflies.update(sceneryTime, region === 'home' ? 0 : darkness, reducedMotion);
+    fireflies.update(sceneryTime, isIndoors(region) ? 0 : darkness, reducedMotion);
     nightLights.update(region, darkness, sceneryTime, reducedMotion);
     placeEffects.update(worldDt);
-    rain.update(worldDt, region === 'home' ? 0 : wetness, camera.position, reducedMotion, darkness);
+    rain.update(worldDt, isIndoors(region) ? 0 : wetness, camera.position, reducedMotion, darkness);
     life.update({ region, dt: worldDt, elapsed: sceneryTime, darkness, isStill: reducedMotion, isRaining });
     waves.update({ region, dt: worldDt, darkness, isStill: reducedMotion, rain: wetness });
     boats.update({ region, dt: worldDt, darkness, isStill: reducedMotion });
@@ -775,7 +783,7 @@ export async function createScene(
     dust.update({
       dt,
       elapsed,
-      isIndoors: region === 'home',
+      isIndoors: isIndoors(region),
       darkness,
       wetness,
       isStill: reducedMotion || paused,
@@ -943,6 +951,7 @@ export async function createScene(
       portalVisuals.dispose();
       fireflies.dispose();
       placeEffects.dispose();
+      chalkLayer.dispose();
       nightLights.dispose();
       life.dispose();
       roamers.dispose();

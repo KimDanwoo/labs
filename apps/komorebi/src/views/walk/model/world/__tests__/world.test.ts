@@ -9,6 +9,7 @@ import {
   closestLandmark,
   createSlideMotion,
   findRoute,
+  isIndoors,
   movePlayer,
   nextRegionStep,
   type Region,
@@ -347,4 +348,16 @@ test('steady input stays straight on open ground and slides without alternating 
   assert.equal(slide.direction, null);
   const reversed = movePlayer(position, -0.2, 0, 'river', slide);
   assert.ok(reversed.x < position.x, 'changing direction must release the old slide');
+});
+
+test('the classroom is reached through the school entrance and its corridor, never straight from the playground', () => {
+  assert.equal(nextRegionStep('school', 'classroom'), 'hallway');
+  assert.equal(nextRegionStep('hallway', 'classroom'), 'classroom');
+  assert.equal(nextRegionStep('classroom', 'school'), 'hallway');
+  assert.ok(!WORLDS.school.portals.some((portal) => portal.to === 'classroom'));
+});
+
+test('rooms under a roof are indoors and everywhere else is outdoors', () => {
+  const indoors = (Object.keys(WORLDS) as Region[]).filter(isIndoors);
+  assert.deepEqual(indoors.sort(), ['classroom', 'hallway', 'home']);
 });

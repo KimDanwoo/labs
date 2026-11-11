@@ -1,4 +1,5 @@
 import { BREEZE_GLSL } from './breeze';
+import { CHALK_GLSL } from './chalkboard';
 import { FAN_GLSL } from './fan';
 import { HOME_WEATHER_GLSL } from './homeWeather';
 import { MAX_LAMPS } from './nightLights';
@@ -11,6 +12,7 @@ export const BACKGROUND_FRAGMENT = `varying vec2 vUv; uniform sampler2D map; uni
   uniform vec3 lamps[${MAX_LAMPS}]; uniform int lampCount; uniform vec2 walker; uniform sampler2D waterMap; uniform sampler2D foam; uniform sampler2D glitter; uniform float isSea; uniform float isVillage; uniform float isHome;
   ${BREEZE_GLSL}
   ${FAN_GLSL}
+  ${CHALK_GLSL}
   ${HOME_WEATHER_GLSL}
   // Sun glitter on the sea (designed by Codex): painted glints, each fading in and out on its own beat.
   ${SEA_ATMOSPHERE_GLSL}
@@ -372,6 +374,7 @@ export const BACKGROUND_FRAGMENT = `varying vec2 vUv; uniform sampler2D map; uni
     }
 
     vec4 tex = texture2D(map, uv);
+    tex.rgb = chalkSurface(tex.rgb, vUv);
 
     float waterColour =
       smoothstep(.008, .080, max(tex.g, tex.b) - tex.r) *

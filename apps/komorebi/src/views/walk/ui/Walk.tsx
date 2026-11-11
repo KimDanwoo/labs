@@ -17,6 +17,7 @@ import { pageStores } from '../model/store/discoveries';
 import type { Memory } from '../model/types/memory';
 import type { Appearance } from '../model/world/appearance';
 import {
+  CLASSROOM_BOARD,
   FISHING_PIER,
   HOME_AQUARIUM,
   HOME_DESK,
@@ -27,6 +28,7 @@ import {
   type Landmark,
 } from '../model/world/world';
 import { BottomBar } from './BottomBar';
+import { ChalkboardDialog } from './ChalkboardDialog';
 import { CompanionPanel } from './CompanionPanel';
 import { FishingHud } from './FishingHud';
 import { GameHeader } from './GameHeader';
@@ -85,6 +87,8 @@ export function Walk({ children }: { children?: ReactNode }) {
   const isNearDesk = status.region === 'home' && Math.hypot(status.x - HOME_DESK.x, status.z - HOME_DESK.z) < 4.5;
   const isNearWardrobe =
     status.region === 'home' && Math.hypot(status.x - HOME_WARDROBE.x, status.z - HOME_WARDROBE.z) < 4.5;
+  const isNearBoard =
+    status.region === 'classroom' && Math.hypot(status.x - CLASSROOM_BOARD.x, status.z - CLASSROOM_BOARD.z) < 4.5;
 
   async function changeAppearance(next: Appearance) {
     if (!(await engine.current?.setAppearance(next))) return false;
@@ -108,6 +112,10 @@ export function Walk({ children }: { children?: ReactNode }) {
     }
     if (isNearDesk) {
       setDialog(DIALOG.journal);
+      return;
+    }
+    if (isNearBoard) {
+      setDialog(DIALOG.chalkboard);
       return;
     }
     const landmark = status.nearby;
@@ -193,7 +201,10 @@ export function Walk({ children }: { children?: ReactNode }) {
       {isNearWardrobe && !isPaused && (
         <InteractPrompt landmark={HOME_WARDROBE} hint="옷 갈아입기" onInteract={interact} />
       )}
-      {status.nearby && !isPaused && !isAtPier && !isNearCat && !isNearAquarium && (
+      {isNearBoard && !isPaused && (
+        <InteractPrompt landmark={CLASSROOM_BOARD} hint="칠판에 낙서하기" onInteract={interact} />
+      )}
+      {status.nearby && !isPaused && !isAtPier && !isNearCat && !isNearAquarium && !isNearBoard && (
         <InteractPrompt landmark={status.nearby} hint={promptHint(status.nearby)} onInteract={interact} />
       )}
 
@@ -281,6 +292,7 @@ export function Walk({ children }: { children?: ReactNode }) {
         pageCount={collection.pageCount}
         onClose={() => closeDialog(DIALOG.memory)}
       />
+      <ChalkboardDialog isOpen={dialog === DIALOG.chalkboard} onClose={() => closeDialog(DIALOG.chalkboard)} />
       <WardrobeDialog
         isOpen={dialog === DIALOG.wardrobe}
         appearance={appearance}
