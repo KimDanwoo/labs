@@ -7,7 +7,7 @@ category: "dev"
 tags: ["side-project"]
 legacyUrl: "https://dansoon-dev.tistory.com/29"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 > 아내의 한마디에서 시작해 매주 자동으로 생성되는 베스트셀러 리포트를 만든 과정

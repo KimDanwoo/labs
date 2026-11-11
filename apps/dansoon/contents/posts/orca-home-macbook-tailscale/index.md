@@ -7,7 +7,7 @@ category: "dev"
 tags: ["ai", "side-project"]
 draft: false
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 Claude Code나 Codex 같은 CLI 에이전트는 띄워 둔 컴퓨터에서만 돈다. 노트북 뚜껑을 닫으면 에이전트도 멈추고 밖에서 진행 상황을 보려면 그 노트북을 다시 열어야 한다.
@@ -33,7 +33,7 @@ Orca에는 **Remote Orca Servers** 기능이 있다. 한 컴퓨터가 서버가 
 | 집 맥북 | 서버. 저장소, CLI 에이전트, 인증 정보가 여기 있다 | Orca, Tailscale, Claude Code·Codex |
 | 휴대폰 | 클라이언트. 화면만 띄운다 | Orca Mobile, Tailscale |
 
-![집 맥북에서 에이전트가 일하고, 닫힌 통로로 연결된 휴대폰에는 같은 화면이 뜬다](./structure.jpg)
+![집 맥북에서 에이전트가 일하고, 닫힌 통로로 연결된 휴대폰에는 같은 화면이 뜬다](./structure.webp)
 
 ### 다른 방법과 비교
 

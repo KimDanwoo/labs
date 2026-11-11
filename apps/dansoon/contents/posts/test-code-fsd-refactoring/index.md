@@ -7,7 +7,7 @@ category: "dev"
 tags: ["testing","fsd"]
 legacyUrl: "https://dansoon-dev.tistory.com/8"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 테스트 코드를 작성하며 겪은 문제

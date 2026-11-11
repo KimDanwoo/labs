@@ -7,7 +7,7 @@ category: "dev"
 tags: ["side-project", "seo"]
 draft: false
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 블로그 글 링크를 메신저나 SNS에 붙이면 제목 옆에 이미지가 함께 뜬다. 페이지의 `og:image` 메타 태그가 가리키는 이미지다.
@@ -60,7 +60,7 @@ el({ display: 'flex', flexDirection: 'column', padding: '72px 80px 64px' }, [
 
 디자인은 블로그 화면과 맞췄다. 위쪽에 카테고리 색 점과 카테고리 이름을 두고 제목은 크게, 맨 아래에는 블로그 이름과 주소를 넣었다.
 
-![빌드할 때 만든 미리보기 이미지 예시](./image-1.png)
+![빌드할 때 만든 미리보기 이미지 예시](./image-1.webp)
 
 ### 이미지를 만드는 함수 하나
 

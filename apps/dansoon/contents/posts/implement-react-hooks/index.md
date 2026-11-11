@@ -7,7 +7,7 @@ category: "dev"
 tags: ["react"]
 legacyUrl: "https://dansoon-dev.tistory.com/5"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 1\. 문제: 불필요한 재렌더링과 메모이제이션
@@ -118,13 +118,13 @@ memo는 equals 함수(기본값 shallowEquals)로 이전 props와 새 props를 �
 
 ### 최적화 전
 
-![React DevTools Profiler 플레임 그래프 — ThemeProvider 업데이트, 렌더링 6ms](./image-2.png)
+![React DevTools Profiler 플레임 그래프 — ThemeProvider 업데이트, 렌더링 6ms](./image-2.webp)
 
 최적화 전에는 ThemeProvider에서 업데이트가 발생할 때, ItemList, ThemeLayout 같은 하위 컴포넌트들이 불필요하게 다시 렌더링되는 문제가 있었다. 전체 렌더링 시간이 6ms였고, 그중 ItemList가 1.5ms를 차지했다. ThemeProvider와 Context.Provider도 각각 0.5ms, 0.3ms로 적지 않은 렌더링 시간이 걸렸다.
 
 ### 최적화 후
 
-![React DevTools Profiler 플레임 그래프 — ThemeProvider 업데이트, 렌더링 2ms](./image-1.png)
+![React DevTools Profiler 플레임 그래프 — ThemeProvider 업데이트, 렌더링 2ms](./image-1.webp)
 
 최적화 후에는 useCallback과 useMemo를 적극적으로 활용해 렌더링 시간을 크게 줄일 수 있었다. 최적화 후 전체 렌더링 시간은 2ms로, 약 3배 가까이 개선되었다. ItemList의 렌더링 시간은 1.5ms에서 0.5ms로, ThemeProvider의 렌더링 시간은 0.5ms에서 0.2ms로 줄었다.
 

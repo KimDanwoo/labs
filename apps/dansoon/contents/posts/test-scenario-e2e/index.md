@@ -7,7 +7,7 @@ category: "dev"
 tags: ["testing"]
 legacyUrl: "https://dansoon-dev.tistory.com/9"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 프로젝트 개요: 테스트 시나리오를 직접 작성하다

@@ -1,5 +1,5 @@
 /**
- * 글 폴더의 cover.jpg(제목 없는 배경)에 제목을 얹어 thumbnail.jpg(목록·링크 미리보기용)를 만든다.
+ * 글 폴더의 cover.webp(제목 없는 배경)에 제목을 얹어 thumbnail.jpg(목록·링크 미리보기용)를 만든다.
  * 제목이나 카테고리를 바꾸면 다시 실행한다(앱 폴더에서): node scripts/make-thumbnails.ts [slug...]
  */
 import { readdir, readFile, writeFile } from 'node:fs/promises';
@@ -16,7 +16,7 @@ const isCategory = (value: string | undefined): value is CategoryId =>
 
 async function makeThumbnail(slug: string) {
   const dir = `${POSTS_DIR}/${slug}`;
-  const cover = await readFile(`${dir}/cover.jpg`).catch(() => undefined);
+  const cover = await readFile(`${dir}/cover.webp`).catch(() => undefined);
   if (!cover) return false;
 
   const markdown = await readFile(`${dir}/index.md`, 'utf8');

@@ -7,7 +7,7 @@ category: "dev"
 tags: ["architecture"]
 legacyUrl: "https://dansoon-dev.tistory.com/27"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 최근 하나의 프로젝트가 100개가 넘는 도메인에서 동작하는 구조를 마주했다.

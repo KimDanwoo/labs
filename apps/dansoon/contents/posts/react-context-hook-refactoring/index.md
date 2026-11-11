@@ -7,7 +7,7 @@ category: "dev"
 tags: ["react","state-management"]
 legacyUrl: "https://dansoon-dev.tistory.com/6"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 1\. 문제: 흩어진 상태와 중복된 코드

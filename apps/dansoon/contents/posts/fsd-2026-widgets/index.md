@@ -7,7 +7,7 @@ category: "dev"
 tags: ["fsd", "architecture"]
 draft: false
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 1년 전 [FSD 2.1은 무엇이 달라졌을까?](/posts/fsd-2-1/)에서 Widget을 이렇게 설명했다.
@@ -44,7 +44,7 @@ Widgets는 원래 여러 entity와 feature를 조합한 독립적인 UI 블록�
 
 PR #933은 권장을 거둔 이유를 이렇게 설명한다. 실제 프론트엔드 코드에서 UI 블록은 화면만 그리지 않는다. 데이터를 가져오고, 상태를 관리하고, 이벤트를 처리한다. 그러면 사용자 흐름을 맡는 Features와 UI 블록을 맡는 Widgets의 책임이 겹친다. 어떤 코드를 features에 둘지 widgets에 둘지 정하기 어려워지고, 프로젝트가 커질수록 그 경계는 더 흐려진다.
 
-![FSD 공식 한국어 문서 레이어 레퍼런스의 Widget 항목. "이 가이드에서는 Widgets Layer의 사용을 권장하지 않습니다"라는 주의 상자가 있다](./docs-widgets.png)
+![FSD 공식 한국어 문서 레이어 레퍼런스의 Widget 항목. "이 가이드에서는 Widgets Layer의 사용을 권장하지 않습니다"라는 주의 상자가 있다](./docs-widgets.webp)
 
 여기서 오해하기 쉬운 부분이 있다. **권장하지 않는다는 것이지 없앴다는 것이 아니다.** PR은 Widgets를 제거하거나 금지하는 것이 아니라고 분명히 적었다. 이미 Widgets를 문제없이 쓰고 있는 프로젝트는 구조를 바꿀 필요가 없고, 프로젝트에 맞으면 계속 써도 된다. 레이어 목록에서 흐리게 표시되는 Processes는 2023년 v2.0 때부터 deprecated였던 레이어라서 이번 변화와는 결이 다르다.
 
@@ -115,7 +115,7 @@ export { ExamplePage as default, metadata } from '@/_pages/example';
 
 새 기준으로 다시 분류하면 이렇게 된다.
 
-![위젯 16개 분류 도식. 쓰는 페이지 슬라이스 안으로 14개, app 레이어로 1개(layout), 한 페이지로 묶기 1개(question-form)이고, 훅을 쓰는 위젯은 11개다](./widgets-16.png)
+![위젯 16개 분류 도식. 쓰는 페이지 슬라이스 안으로 14개, app 레이어로 1개(layout), 한 페이지로 묶기 1개(question-form)이고, 훅을 쓰는 위젯은 11개다](./widgets-16.webp)
 
 - **쓰는 페이지가 하나인 14개**는 그 페이지 슬라이스 안으로 들어간다. 위젯 이름은 page 슬라이스 안의 `ui` 컴포넌트 이름으로 남는다.
 - **면접 준비 앱의 레이아웃 위젯**(`layout`)은 사용자 화면 전체에 헤더와 푸터를 씌우는 레이아웃이므로 `app` 레이어로 간다.

@@ -7,7 +7,7 @@ category: "dev"
 tags: ["fsd"]
 legacyUrl: "https://dansoon-dev.tistory.com/23"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 Feature-Sliced Design(FSD)은 기능 단위로 코드를 나누는 구조적 설계 방식입니다. 2.1 버전에서 가장 크게 달라진 점은 화면을 분해하는 기준이 ‘Feature 중심’에서 ‘Page 우선(Page-first)’으로 바뀌었다는 점입니다.

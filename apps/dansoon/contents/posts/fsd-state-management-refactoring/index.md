@@ -7,7 +7,7 @@ category: "dev"
 tags: ["fsd","state-management"]
 legacyUrl: "https://dansoon-dev.tistory.com/7"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 기존 코드의 문제: 상태·API·UI가 한 파일에 얽힘

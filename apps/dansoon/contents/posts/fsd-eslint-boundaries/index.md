@@ -5,7 +5,7 @@ publishedAt: "2026-11-06T16:50:00+09:00"
 category: "dev"
 tags: ["fsd", "architecture"]
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 updatedAt: "2026-11-10T18:24:00+09:00"
 draft: false
 ---
@@ -65,7 +65,7 @@ rules: {
 }
 ```
 
-![FSD 레이어 여섯 개의 허용 의존 방향 도식. 위 레이어는 아래 레이어만 import할 수 있고 같은 레이어의 다른 슬라이스끼리와 아래에서 위로 가는 import는 막힌다](./layer-policy.png)
+![FSD 레이어 여섯 개의 허용 의존 방향 도식. 위 레이어는 아래 레이어만 import할 수 있고 같은 레이어의 다른 슬라이스끼리와 아래에서 위로 가는 import는 막힌다](./layer-policy.webp)
 
 `packages/ui` 같은 워크스페이스 패키지와 `node_modules`는 요소로 등록하지 않았으므로 이 규칙의 대상이 아니다. 디자인 시스템 컴포넌트는 어느 레이어에서든 가져다 쓸 수 있다.
 
@@ -121,7 +121,7 @@ import { cn } from '../../../../shared/lib';
 
 네 줄에서 에러 6개가 나왔다.
 
-![ESLint 실행 결과 화면. 같은 레이어 교차 참조, 상위 레이어 참조, 세그먼트 깊이 초과, 세그먼트를 넘는 상대경로로 에러 6개가 나온다](./lint-output.png)
+![ESLint 실행 결과 화면. 같은 레이어 교차 참조, 상위 레이어 참조, 세그먼트 깊이 초과, 세그먼트를 넘는 상대경로로 에러 6개가 나온다](./lint-output.webp)
 
 - 1번 줄은 같은 레이어(`entities`)의 다른 슬라이스 `session`을 가져와서 막혔다.
 - 2번 줄은 아래 레이어에서 위 레이어 `features`를 가져와서 막혔다. 직접 만든 규칙만 잡은 줄이다.

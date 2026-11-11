@@ -7,7 +7,7 @@ category: "reading"
 tags: ["functional-programming"]
 legacyUrl: "https://dansoon-dev.tistory.com/17"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 10주 동안 함수형 코딩을 읽으며 든 생각
