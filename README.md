@@ -83,6 +83,24 @@ pnpm --filter hub dev
 pnpm --filter prairie dev
 ```
 
+## AI 하네스
+
+`my-fe-harness`의 코어·React·FSD 규칙을 이 저장소에 설치했다. 원본은 `.claude/rules/`에 있고, 설치 매니페스트로 갱신과 수정 여부를 추적한다.
+
+- Codex는 `AGENTS.md`의 하네스 블록과 프로젝트 규칙을 읽는다. `.codex/config.toml`은 지침 상한을 64KiB로 설정한다.
+- Claude는 `CLAUDE.md`의 `@AGENTS.md` import로 같은 문서를 읽는다. 안전장치를 제외한 일반 팩과 충돌하면 문서 뒤쪽의 프로젝트 규칙을 우선한다.
+- 블로그 스킬은 `.claude/skills/dansoon-post`를 원본으로 두고, Codex의 `.agents/skills/dansoon-post`에서 심볼릭 링크로 공유한다.
+- 안전 훅은 현재 전역 설치를 사용한다. 이 저장소에는 기존 패키지 매니저 검사 훅만 등록하며, `AGENTS.md`를 읽는 것 자체가 훅을 실행하지는 않는다.
+
+하네스 CLI로 설치 상태와 업데이트를 관리한다.
+
+```bash
+npx github:KimDanwoo/my-fe-harness status
+npx github:KimDanwoo/my-fe-harness update
+```
+
+규칙을 바꾸려면 `.claude/rules/`를 수정한 뒤 `update`로 `AGENTS.md`에 반영한다. 자동 생성 블록은 직접 편집하지 않는다. 변경한 규칙 파일은 업데이트에서 보존된다.
+
 ## 배포
 
 - 각 앱의 `vercel.json`은 `main` 브랜치만 자동 배포하도록 제한한다. 작업 브랜치와 PR에서는 GitHub CI만 실행한다.

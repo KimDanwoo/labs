@@ -1,3 +1,387 @@
+<!-- prettier-ignore-start -->
+
+<!-- my-fe-harness:start -->
+<!-- 자동 생성 영역(my-fe-harness). 규칙은 .claude/rules/ 원본을 고친 뒤 `my-fe-harness update`로 반영한다. 이 블록을 직접 고치면 update·uninstall이 보존한다. -->
+
+# 프론트엔드 규칙 (my-fe-harness)
+
+'적용 대상'이 표시된 규칙은 그 파일을 만들거나 고칠 때 따른다. 표시가 없는 규칙은 항상 적용한다. 규칙끼리 충돌하면 안전장치가 우선한다.
+
+# 안전장치 (최우선 · 항상 적용)
+
+> 다른 규칙과 충돌하면 이 규칙이 이긴다. 위배되는 코드는 **작성·수정 전에 경고**한다.
+
+- **비밀**: API 키·토큰·자격증명을 코드/번들/로그에 넣지 않는다(서버 전용, `.env`, 미커밋). `NEXT_PUBLIC_`/`VITE_`는 브라우저 공개 — 비밀에 금지.
+- **외부 입력**: 폼·URL·쿼리스트링·API 응답은 신뢰하지 않고 검증(zod 등). URL/리다이렉트는 오픈 리다이렉트·`javascript:` 인젝션 검사.
+- **XSS**: `dangerouslySetInnerHTML`·`v-html`·`innerHTML` 금지(불가피하면 DOMPurify). 사용자 콘텐츠를 `eval`/`new Function`으로 실행 금지. `target="_blank"` 링크엔 `rel="noopener noreferrer"`(역탐색 탈취 방지).
+- **인증·통신**: 토큰은 가능하면 HttpOnly 쿠키(localStorage는 XSS 취약). HTTPS, 민감 데이터를 URL에 싣지 않는다.
+- **CSP**: 가능하면 Content-Security-Policy로 인라인 스크립트·외부 출처를 제한한다. 인라인 `on*` 핸들러·`style` 주입을 CSP가 막는 방향으로 코드를 맞춘다.
+- **환경변수 검증**: `process.env`/`import.meta.env`를 직접 흩뿌리지 말고 부팅 시 스키마(zod 등)로 한 번 검증·파싱해 타입 확정. 누락·오타를 런타임 초반에 실패시킨다.
+- **의존성**: 없는 패키지·API·옵션을 지어내지 않는다(불확실하면 "모름"+문서 확인). 새 의존성은 실재·유지보수 확인(타이포스쿼팅 주의).
+- **옵저버빌리티**: 에러·핵심 이벤트는 관측 도구로 보고하되(특정 벤더 강제 안 함), 페이로드에 비밀·PII를 싣지 않는다. `console.log`를 프로덕션 로깅 수단으로 남기지 않는다.
+
+---
+
+# TypeScript — 핵심
+
+> 적용 대상: `**/*.{ts,tsx,mts,cts}`
+
+## any 대신 unknown으로 받고 좁힌다
+
+```ts
+// ❌ any — 이 지점부터 타입 검사가 통째로 꺼진다
+function parseItems(raw: any) {
+  return raw.data.items
+}
+
+// ✅ unknown으로 받고 런타임 스키마로 좁힌다 — 여기서부터 타입이 보장된다
+function parseItems(raw: unknown) {
+  return responseSchema.parse(raw).data.items
+}
+```
+
+외부 입력(API 응답·폼·URL·`localStorage`)은 **전부** 경계에서 검증한다. 타입 선언은 런타임 보장이 아니다.
+
+## as 단언은 최후 수단
+
+```ts
+// ❌ as — 컴파일러만 속인다. 실제 응답이 다르면 런타임에 터진다
+const user = JSON.parse(text) as User
+
+// ✅ 검증으로 타입을 "얻는다"
+const user = userSchema.parse(JSON.parse(text))
+```
+
+```ts
+// ❌ as — 값이 타입에 맞는지 검사되지 않고, 리터럴 타입도 잃는다
+const ROUTES = { home: '/', post: '/post/:id' } as Record<RouteKey, string>
+
+// ✅ satisfies — 검사는 받되 각 값의 리터럴 타입은 좁게 유지된다
+const ROUTES = { home: '/', post: '/post/:id' } satisfies Record<RouteKey, string>
+```
+
+좁혀야 할 땐 단언 말고 **타입 가드**(`in`·`typeof`·`is` 술어).
+
+## 불법 상태를 타입으로 차단한다 — 판별 유니온
+
+```ts
+// ❌ 옵셔널 나열 — "로딩 중인데 data가 있는" 불가능한 조합이 타입상 허용된다
+type Result = { isLoading: boolean; data?: User; error?: string }
+
+// ✅ 판별 유니온 — 불가능한 조합이 애초에 표현되지 않는다
+type Result =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | { status: 'success'; data: User }
+
+function label(result: Result): string {
+  switch (result.status) {
+    case 'loading': return '불러오는 중'
+    case 'error': return result.message
+    case 'success': return result.data.name
+    // 케이스를 빠뜨리면 여기서 컴파일 에러 — 유니온이 늘어날 때 자동으로 잡힌다
+    default: { const exhaustive: never = result; return exhaustive }
+  }
+}
+```
+
+## enum 대신 union 리터럴
+
+```ts
+// ❌ enum — 런타임 객체가 생기고 구조적 타이핑과 어긋난다
+enum Status { Idle, Loading }
+
+// ✅ as const + 인덱스 접근 — 값 목록과 타입이 한 곳에서 나온다
+const STATUSES = ['idle', 'loading', 'done'] as const
+type Status = (typeof STATUSES)[number]
+```
+
+## 배럴 · import
+
+```ts
+// ❌ 내부 구현에 직접 접근 (deep import)
+import { formatPrice } from '@/features/cart/lib/format/price'
+
+// ✅ 공개 API(배럴)로만
+import { formatPrice } from '@/features/cart'
+```
+
+- 공개 경계마다 `index.ts`, 외부는 배럴로만. `export *`·기계적 배럴 금지.
+- import 순서: 외부 → 절대경로 → 상대경로. **순환 의존 금지.**
+
+## 네이밍 · 시그니처
+
+- 변수/함수 camelCase · 타입 PascalCase · 상수 SCREAMING_SNAKE_CASE.
+- boolean은 `is/has/should`, 핸들러는 `handleXxx`/`onXxx`. 매직넘버는 상수로.
+- `type` 우선(선언 병합·확장이 필요할 때만 `interface`). 공개(export) 함수는 반환 타입 명시.
+- 파라미터 3개 초과면 옵션 객체. boolean 플래그 파라미터 금지. 미사용 코드·조급한 추상화 금지(YAGNI).
+
+---
+
+# React — 핵심
+
+> 적용 대상: `**/*.{tsx,jsx}`
+
+> 적용 조건: **React 프로젝트에만.** Vue/기타 스택이면 이 규칙을 무시한다.
+
+함수 컴포넌트만, `React.FC` 지양. props 타입은 파일 안에서 `type Props`. 한 파일 = 한 공개 컴포넌트.
+
+## 서버 상태를 이펙트로 가져오지 않는다
+
+```tsx
+// ❌ useEffect 패칭 + 파생 값을 상태로 복사 — 경쟁 상태·중복 요청·동기화 버그
+const [items, setItems] = useState([])
+const [total, setTotal] = useState(0)
+useEffect(() => { fetchItems().then(setItems) }, [])
+useEffect(() => { setTotal(items.reduce((s, i) => s + i.price, 0)) }, [items])
+
+// ✅ React Query + 렌더 중 계산
+const { data: items = [] } = useQuery({ queryKey: ['items'], queryFn: fetchItems })
+const total = items.reduce((sum, item) => sum + item.price, 0)
+```
+
+**렌더 중 계산할 수 있으면 상태로 두지 않는다.** `useMemo`는 그다음 문제다.
+
+## 이벤트로 벌어진 일은 이벤트 핸들러에서
+
+```tsx
+// ❌ 사용자 행동을 상태로 옮긴 뒤 이펙트로 처리 — 왜 실행됐는지 추적이 안 된다
+const [submitted, setSubmitted] = useState(false)
+useEffect(() => {
+  if (submitted) postOrder(cart)
+}, [submitted, cart])
+
+// ✅ 이벤트에서 일어난 일은 이벤트에서 끝낸다
+const handleSubmit = () => postOrder(cart)
+```
+
+`useEffect`는 **외부 시스템 동기화**(구독·타이머·DOM 측정)에만. 그 외에는 대부분 이펙트가 답이 아니다.
+
+## Hooks는 항상 최상위에서
+
+```tsx
+// ❌ early return 뒤의 훅 — 렌더마다 훅 개수가 달라져 터진다
+function Profile({ userId }: Props) {
+  if (!userId) return null
+  const { data } = useQuery({ queryKey: ['user', userId], queryFn: fetchUser })
+}
+
+// ✅ 훅을 먼저, 분기는 그 뒤. 실행 여부는 훅의 옵션으로 제어
+function Profile({ userId }: Props) {
+  const { data } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: fetchUser,
+    enabled: Boolean(userId),
+  })
+  if (!userId) return null
+}
+```
+
+조건·루프·콜백 안에서 훅 호출 금지. 의존성 배열은 정직하게(린트 무시 주석으로 덮지 않는다).
+
+## 상태 초기화는 이펙트가 아니라 key
+
+```tsx
+// ❌ props가 바뀔 때마다 이펙트로 상태를 되돌린다
+useEffect(() => { setDraft('') }, [postId])
+
+// ✅ key가 바뀌면 React가 새로 마운트한다 — 초기화 코드 자체가 사라진다
+<Editor key={postId} postId={postId} />
+```
+
+## 상태 전략
+
+- **비동기·서버**: React Query. **로컬**: `useState`/`useReducer`(관련 상태가 3개 넘게 얽히면 reducer).
+- **전역**: 꼭 필요할 때만 Jotai/Zustand. props 두 단계 내려가는 걸 피하려고 전역으로 올리지 않는다.
+- 여러 `useState`가 항상 같이 바뀌면 하나의 객체이거나 reducer다.
+
+## 성능
+
+- `memo`/`useMemo`/`useCallback`은 **측정된 병목에만**. 기본값은 안 쓰는 것.
+- 리스트 `key`는 안정된 식별자 — 배열 index는 순서가 바뀌는 리스트에서 상태를 뒤섞는다.
+
+## React 19+ (설치된 버전이 19 미만이면 이 절 무시)
+
+- 폼·변이는 **Actions**: `<form action={fn}>` + `useActionState`로 대기·에러·결과를 일원화. 수동 `isSubmitting` 금지. 진행 상태는 `useFormStatus`(폼의 **자식**에서만 읽힌다).
+- 낙관적 UI는 `useOptimistic`. `use()`는 다른 훅과 달리 **조건·루프 안에서도 호출 가능**.
+- `ref`는 일반 prop — 새 컴포넌트에 `forwardRef` 불필요. `<Context.Provider>` 대신 `<Context>` 직접 사용.
+- `<title>`/`<meta>`/`<link>`는 컴포넌트에서 렌더하면 `<head>`로 호이스팅 — 별도 헬퍼 불필요.
+
+---
+
+# 좋은 패턴 — 선언형·가독성
+
+> 적용 대상: `**/*.{ts,tsx,js,jsx,mts,cts,mjs,cjs,vue,svelte,astro}`
+
+코드는 "한눈에 읽히게". 아래 패턴을 기본값으로 삼는다.
+
+## Early return — 중첩 대신 조기 탈출
+
+```ts
+// ❌ 중첩 3단계
+function getDiscount(user: User | null): number {
+  if (user) {
+    if (user.isMember) {
+      if (user.years > 5) return 0.2
+      return 0.1
+    }
+  }
+  return 0
+}
+
+// ✅ 조기 탈출 + 상수화
+function getDiscount(user: User | null): number {
+  if (!user?.isMember) return 0
+  return user.years > LOYAL_YEARS ? LOYAL_DISCOUNT : MEMBER_DISCOUNT
+}
+```
+
+## 선언형 — 어떻게(how)가 아니라 무엇(what)
+
+```ts
+// ❌ 임시 변수 + push 루프
+const result = []
+for (let i = 0; i < users.length; i++) {
+  if (users[i].active && users[i].paid) result.push(users[i].name)
+}
+
+// ✅ 이름 있는 조건 + 체인
+const activePaidNames = users.filter(isActive).filter(isPaid).map((user) => user.name)
+```
+
+## 조건에 이름 붙이기
+
+```ts
+// ❌ 읽는 사람이 해석해야 하는 조건
+if (user.age >= 19 && user.country === 'KR' && !user.banned) { ... }
+
+// ✅ 의도가 이름에 드러난다
+const canPurchase = isAdult(user) && isKorean(user) && !user.banned
+if (canPurchase) { ... }
+```
+
+## 분기보다 매핑 — 컴포지션
+
+```tsx
+// ❌ 늘어나는 if/switch
+if (status === 'pending') return <PendingBadge />
+if (status === 'done') return <DoneBadge />
+
+// ✅ 매핑 객체 — 케이스 추가가 한 줄, 누락은 타입이 잡는다
+const BADGE_BY_STATUS = {
+  pending: PendingBadge,
+  done: DoneBadge,
+  failed: FailedBadge,
+} satisfies Record<Status, ComponentType>
+
+const Badge = BADGE_BY_STATUS[status]
+return <Badge />
+```
+
+## 함수 · 추상화
+
+- 주석을 달고 싶어지면 함수로 추출해 **이름으로 설명**한다. 함수 1개 = 책임 1개 = 추상화 수준 1개.
+- 매직넘버는 상수로(`RETRY_DELAY_MS = 3_000`). 조급한 추상화 금지 — 세 번째 사용처에서 추출.
+
+## 금지
+
+- 흐름 설명 주석(주석은 "왜"에만) · boolean 플래그 파라미터(`render(true)`) · 미사용 코드(YAGNI) · 남은 `console.log`·주석 처리된 코드.
+
+---
+
+# FSD (Feature-Sliced Design) 규칙
+
+> 적용 대상: `src/**/*`
+
+## 레이어 — 위에서 아래로만 import 가능
+
+```
+app → pages → features → entities → shared
+```
+
+- **app**: 진입점 — 프로바이더, 라우팅 설정, 전역 스타일, 앱 전체 레이아웃
+- **pages**: 라우트 단위 조립 — 그 화면에서만 쓰는 블록도 여기 (Next.js와 폴더명 충돌 시 `views`로 개명)
+- **features**: 사용자 행동·흐름 단위 (검색, 좋아요, 로그인) — 여러 페이지에서 쓰는 동작
+- **entities**: 도메인 모델 (user, product) — ui·model·api
+- **shared**: 프레임워크·비즈니스 맥락 무관 공용 코드 (ui-kit, lib, api client, config)
+
+> **widgets는 공식 비권장**(FSD 문서, 2026-07). 데이터 로딩·상태·이벤트를 품으면 features와 경계가 겹친다.
+> 신규 프로젝트에선 만들지 않는다. 이미 잘 쓰고 있는 프로젝트는 유지해도 된다 — 위치는 pages와 features 사이.
+> `processes`는 계속 deprecated.
+
+## 배치 결정 규칙 — "이 코드 어디에 두지?"
+
+**pages-first — 먼저 쓰는 곳(그 화면의 pages 슬라이스)에 둔다.** 화면 전용 폼·상태·API·비즈니스 로직도 pages에 둬도 된다.
+프로바이더·라우팅·전역 스타일·앱 레이아웃은 **app**. 아래 레이어로 내리는 건 **세 조건이 모두** 맞을 때만:
+
+1. 지금 실제로 여러 곳에서 쓴다 (예정·가정 말고).
+2. 특정 소비자 하나와 무관한 독립된 변경 이유가 있다.
+3. 경계의 책임이 하나로 응집된다.
+
+내릴 곳은 성격으로 정한다:
+
+- 비즈니스 규칙이 **없는** 인프라 (UI kit, 유틸, API 클라이언트) → **shared**.
+- 여러 소비자가 쓰는 완결된 사용자 **동작** (로그인한다, 좋아요한다) → **features**.
+- 여러 소비자가 쓰는 도메인 **모델** (user, product, order) → **entities**.
+
+**두 곳에서 쓴다는 이유만으로 레이어·슬라이스를 만들지 않는다** — 관리 가능한 중복은 각 페이지에 둬도 된다.
+확신이 없으면 pages에 둔다. 내리는 건 쉽고, 성급히 내린 걸 도로 올리는 건 어렵다.
+
+## import 방향 위반 — 가장 흔한 세 가지
+
+```ts
+// ❌ 아래 레이어가 위를 import — 의존 방향 역전, 구조가 무너지는 첫 신호
+// entities/user/ui/UserCard.tsx
+import { LoginForm } from '@/features/auth'
+
+// ❌ 같은 레이어의 옆 슬라이스를 직접 import (pages끼리도 마찬가지)
+// features/cart/model/store.ts
+import { toggleLike } from '@/features/like'
+
+// ❌ 슬라이스 내부로 deep import — 공개 API를 우회한다
+import { userStore } from '@/entities/user/model/store'
+
+// ✅ 공개 API로만 접근하고, 조합은 상위 레이어에서 한다
+// pages/product/ui/ProductSection.tsx
+import { UserCard } from '@/entities/user'
+import { AddToCartButton } from '@/features/cart'
+```
+
+- 슬라이스는 공개 API(`index.ts`)로만 노출. 슬라이스 내부에서 자기 배럴을 경유해 참조하지 않는다 — 순환 의존이 된다.
+- 슬라이스 내부 세그먼트는 `ui` / `model` / `api` / `lib` 중 **필요한 것만** 만든다.
+- 같은 레이어 슬라이스 간 참조가 불가피하면(주로 entities 간) **cross-import 공개 API `@x`**로만:
+  `entities/A/@x/B.ts`로 B에게만 노출한다. 일반 `index.ts` deep import로 옆 슬라이스를 끌어오지 않는다.
+- features끼리 조합해야 하면 옆 feature를 import하지 말고 **상위(pages)에서 조합**하거나, 조합 지점을
+  props·slot으로 열어 바깥에서 끼우게 한다.
+
+## 안티패턴
+
+- ❌ `shared/lib/formatOrderStatus.ts` — 도메인 지식이 shared에 샜다. 한 화면용이면 그 page에, 추출 조건을 채우면 `entities/order/lib`로.
+- ❌ `entities/user/ui/LoginButton.tsx` — entity에 사용자 행동이 들어갔다. 한 화면용이면 그 page에, 공용이면 `features/auth`로.
+- ❌ 소비자가 하나뿐인 feature·entity — 그 소비자(page) 안으로 되돌린다.
+- ❌ 신규 프로젝트에 `widgets/` 생성 — 화면 전용 조합은 pages, 공용 동작은 features, 맥락 없는 UI는 shared로.
+- ❌ 처음부터 모든 레이어 스캐폴드 — app·pages·shared부터. 빈 레이어는 만들지 않는다(YAGNI).
+
+---
+
+# 감지된 스택·컨벤션 — my-fe-harness 기록
+
+- 프레임워크: 감지 안 됨 (모노레포)
+- 설치된 규칙 팩: safety, typescript, patterns, react, fsd
+
+my-fe-harness가 `package.json`·`tsconfig`·소스 디렉토리를 감지해 자동 생성한 스탬프다(수동 편집 대상 아님).
+이 스택과 맞지 않는 규칙(예: 다른 프레임워크 전용 규칙)은 적용하지 말 것.
+
+<!-- my-fe-harness:end -->
+
+<!-- prettier-ignore-end -->
+
+---
+
+# 프로젝트 규칙 우선순위
+
+아래 Danwoo Lab 규칙은 이 저장소의 구체적인 기준이다. 안전장치를 제외한 일반 규칙과 충돌하면 아래 프로젝트 규칙을 우선한다.
+
 # Danwoo Lab
 
 > 내가 만든 프로젝트들을 모아 소개하는 포트폴리오 허브 + 작은 실험 앱들을 담는 **모노레포**.

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "installedBy": "0.2.0",
+  "rules": {
+    "safety.md": "db7494c2124f8632a4bec8f2d3608ab6cdbfda49dcbd8571fb651d30f07a09a1",
+    "typescript.md": "5cc4878b0f6339da8c1f430c3f5456fd9fd588027f42d70f5a6404308fdecd24",
+    "patterns.md": "f9fdc2bec8ab72abea79fdde350733c51b378e77a7f40b98f13285b4b0a362fb",
+    "react.md": "34332813359a8c19cb2fb68a70cc7da81fb8e99ae39d226ecba994a36df641a7",
+    "fsd.md": "cf978079d7cfa56f9c050522ff54b5b801ce299bb17690461d5fe5b9ee7a319a"
+  },
+  "files": {
+    "rules/_stack.md": "0e2ede6883aa7fda87ba6dd5d143fa82aba62c597d2ae71d1a1402e80b538282"
+  },
+  "hook": null,
+  "agents": {
+    "file": "/Users/duse/Dev/danwoo/labs/AGENTS.md",
+    "sha": "b28460f2499dd71510a1e41185c7d4a3cd74b3c224f05e684bcf858e452b3339",
+    "created": false
+  }
+}
