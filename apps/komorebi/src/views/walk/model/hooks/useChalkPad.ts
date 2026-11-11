@@ -31,17 +31,21 @@ const startStroke = (brush: ChalkBrush, x: number, y: number): ChalkStroke =>
     ? { tool: CHALK_TOOL.eraser, points: [x, y] }
     : { tool: CHALK_TOOL.chalk, color: brush, points: [x, y] };
 
+/** Measured inside the canvas border, where the slate is actually drawn. */
 function boardPoint(event: PointerEvent<HTMLCanvasElement>) {
-  const rect = event.currentTarget.getBoundingClientRect();
+  const canvas = event.currentTarget;
+  const rect = canvas.getBoundingClientRect();
   return {
-    x: roundCoordinate((event.clientX - rect.left) / rect.width),
-    y: roundCoordinate((event.clientY - rect.top) / rect.height),
+    x: roundCoordinate((event.clientX - rect.left - canvas.clientLeft) / canvas.clientWidth),
+    y: roundCoordinate((event.clientY - rect.top - canvas.clientTop) / canvas.clientHeight),
   };
 }
 
 /** Pointer drawing on the slate: the stroke is drawn live and saved once, when the pointer lifts. */
 export function useChalkPad(canvasRef: RefObject<HTMLCanvasElement | null>, { strokes, brush, onNotice }: Options) {
   const draft = useRef<ChalkStroke | null>(null);
+  // Only the pointer that started the stroke may extend or end it; a second finger is ignored.
+  const activePointer = useRef<number | null>(null);
   const committed = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -65,12 +69,19 @@ export function useChalkPad(canvasRef: RefObject<HTMLCanvasElement | null>, { st
     return copy;
   }
 
+  const isActive = (event: PointerEvent<HTMLCanvasElement>) => event.pointerId === activePointer.current;
+
   function finish() {
     const stroke = draft.current;
     draft.current = null;
+    activePointer.current = null;
     committed.current = null;
     if (!stroke) return;
     if (!chalkboardStore.set([...strokes, stroke])) onNotice(CHALK_NOTICE.unsaved);
+  }
+
+  function finishIfActive(event: PointerEvent<HTMLCanvasElement>) {
+    if (isActive(event)) finish();
   }
 
   return {
@@ -81,6 +92,7 @@ export function useChalkPad(canvasRef: RefObject<HTMLCanvasElement | null>, { st
         return;
       }
       event.currentTarget.setPointerCapture(event.pointerId);
+      activePointer.current = event.pointerId;
       const { x, y } = boardPoint(event);
       committed.current = snapshot(event.currentTarget);
       draft.current = startStroke(brush, x, y);
@@ -88,7 +100,7 @@ export function useChalkPad(canvasRef: RefObject<HTMLCanvasElement | null>, { st
     },
     onPointerMove(event: PointerEvent<HTMLCanvasElement>) {
       const stroke = draft.current;
-      if (!stroke) return;
+      if (!stroke || !isActive(event)) return;
       const { x, y } = boardPoint(event);
       if (!isFarEnough(stroke.points, x, y)) return;
       if (!canAddPoint(strokes, stroke.points)) {
@@ -99,8 +111,8 @@ export function useChalkPad(canvasRef: RefObject<HTMLCanvasElement | null>, { st
       stroke.points.push(x, y);
       redrawDraft(event.currentTarget, stroke);
     },
-    onPointerUp: finish,
-    onPointerCancel: finish,
-    onLostPointerCapture: finish,
+    onPointerUp: finishIfActive,
+    onPointerCancel: finishIfActive,
+    onLostPointerCapture: finishIfActive,
   };
 }

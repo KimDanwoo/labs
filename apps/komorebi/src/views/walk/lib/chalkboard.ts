@@ -128,6 +128,9 @@ export const CHALK_GLSL = `
     // Only the dark green slate takes chalk; the vase and hydrangeas in front keep their paint.
     float slate = smoothstep(.015,.05,painting.g-max(painting.r,painting.b)) * (1.-smoothstep(.38,.45,painting.g));
     vec4 mark = texture2D(chalk, vec2(board.x, 1.-board.y));
-    return painting*(1.-mark.a*slate) + mark.rgb*slate;
+    if (mark.a < .004) return painting;
+    // Premultiplied filtering keeps line edges from fading through black; the painting is sampled linear.
+    vec3 colour = pow(mark.rgb / mark.a, vec3(2.2));
+    return mix(painting, colour, mark.a*slate);
   }
 `;
