@@ -52,7 +52,7 @@ description: '목록·검색·SNS 미리보기 요약(200자 이내)'
 publishedAt: '2026-11-05T10:00:00+09:00'
 category: 'dev' # dev | retro | reading
 tags: ['react'] # src/lib/taxonomy.ts의 TAG_IDS
-# draft: true          # true면 목록·상세·RSS·검색 어디에도 나오지 않는다
+# draft: true          # 로컬 dev에서는 보이고, 프로덕션의 목록·상세·RSS·검색에서 제외한다
 ---
 ```
 

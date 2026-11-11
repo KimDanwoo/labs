@@ -638,6 +638,8 @@ AI에게 구현을 맡긴 실제 프로젝트 사례는 [사주 서비스 제작
 
 규칙을 실제로 lint에 옮긴 예는 [FSD 규칙을 문서 대신 ESLint로 강제하기](/posts/fsd-eslint-boundaries/)와 [디자인 토큰 규칙을 문서 대신 도구가 지키게 만들기](/posts/design-token-conventions/)에, AI로 빨리 만들 수 있게 된 뒤의 고민은 [AI 바이브 코딩으로 빨리 만들 수 있게 되자](/posts/too-easy-to-build/)에 있다. 에이전트를 집 맥북에서 계속 돌려 두고 밖에서 휴대폰으로 쓰는 구성은 [밖에서 휴대폰으로 집 맥북의 Claude Code 쓰기](/posts/orca-home-macbook-tailscale/)에 정리했다.
 
+하네스 자체의 규칙과 모델 설정을 다시 살펴본 과정은 [Claude Code는 바뀌는데, 내 하네스는 그대로였다](/posts/removing-omc-ponytail/)에 정리했다.
+
 ## 참고자료
 
 -   **Thoughtworks — 사람이 읽기 좋은 코드는 여전히 필요할까?**  
