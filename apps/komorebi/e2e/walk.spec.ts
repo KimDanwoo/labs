@@ -357,7 +357,6 @@ test('home is a walkable map with a bed and a doorway back to the village', asyn
 
 test('tapping the painted quilt and desk walks to their usable side', async ({ page }) => {
   await openWalk(page);
-  await page.getByRole('button', { name: 'MP3 접기 · 음악은 계속 재생' }).click();
   await guideTo(page, '파란 지붕 우리 집');
   await expect(landscape(page)).toHaveAttribute('data-region', 'home', { timeout: 25_000 });
   await expect(landscape(page)).toHaveAttribute('data-motion', 'idle', { timeout: 10_000 });
