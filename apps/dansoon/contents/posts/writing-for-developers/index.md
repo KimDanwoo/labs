@@ -6,7 +6,7 @@ category: "reading"
 tags: ["writing"]
 legacyUrl: "https://dansoon-dev.tistory.com/21"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 개발자에게 글쓰기가 중요한 이유

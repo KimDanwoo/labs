@@ -7,7 +7,7 @@ category: "dev"
 tags: ["javascript","spa"]
 legacyUrl: "https://dansoon-dev.tistory.com/3"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 과제 개요: 프레임워크 없이 SPA 구현하기

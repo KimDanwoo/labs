@@ -7,7 +7,7 @@ category: "dev"
 tags: ["seo"]
 legacyUrl: "https://dansoon-dev.tistory.com/20"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## Next.js만 쓰면 SEO가 해결될까

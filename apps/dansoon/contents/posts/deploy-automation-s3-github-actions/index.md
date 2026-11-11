@@ -7,7 +7,7 @@ category: "dev"
 tags: ["ci-cd"]
 legacyUrl: "https://dansoon-dev.tistory.com/10"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 1\. 문제: AWS로 CI/CD 파이프라인 구축하기

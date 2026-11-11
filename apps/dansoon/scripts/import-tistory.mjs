@@ -5,6 +5,7 @@
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import sharp from 'sharp';
 import TurndownService from 'turndown';
+import { encodePostImage } from './lib/postImage.mjs';
 
 const BLOG_ORIGIN = 'https://dansoon-dev.tistory.com';
 const CONTENT_DIR = new URL('../contents/posts/', import.meta.url);
@@ -186,7 +187,8 @@ function fence(code, language) {
 function imageExtension(fileName, url) {
   const source = fileName || new URL(url).pathname;
   const match = source.match(/\.(png|jpe?g|gif|webp|svg)$/i);
-  return match ? match[0].toLowerCase() : '.png';
+  const extension = match?.[0].toLowerCase();
+  return extension === '.svg' || extension === '.gif' ? extension : '.webp';
 }
 
 function createConverter(images, alts = []) {
@@ -311,7 +313,11 @@ async function downloadImage({ url, file }, directory) {
   const original = Buffer.from(await response.arrayBuffer());
   if (/\.(svg|gif)$/.test(file)) return writeFile(target, original);
   // 사진 EXIF에 촬영 위치(GPS)·기기 정보가 남아 있을 수 있어, 방향만 적용하고 메타데이터 없이 다시 저장한다
-  await sharp(original).rotate().toFile(target.pathname);
+  const output =
+    file === 'thumbnail.jpg'
+      ? await sharp(original).rotate().jpeg({ quality: 86, mozjpeg: true }).toBuffer()
+      : await encodePostImage(original);
+  await writeFile(target, output);
 }
 
 async function importPost(id, meta) {
@@ -325,9 +331,7 @@ async function importPost(id, meta) {
   const directory = new URL(`${meta.slug}/`, CONTENT_DIR);
   await rm(directory, { recursive: true, force: true });
   await mkdir(directory, { recursive: true });
-  const thumbnail = article.thumbnailUrl
-    ? { url: article.thumbnailUrl, file: `thumbnail${imageExtension('', article.thumbnailUrl)}` }
-    : null;
+  const thumbnail = article.thumbnailUrl ? { url: article.thumbnailUrl, file: 'thumbnail.jpg' } : null;
   await Promise.all([...images, ...(thumbnail ? [thumbnail] : [])].map((image) => downloadImage(image, directory)));
 
   const frontmatter = toFrontmatter({

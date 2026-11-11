@@ -7,7 +7,7 @@ category: "dev"
 tags: ["react","javascript"]
 legacyUrl: "https://dansoon-dev.tistory.com/4"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 1\. 문제: 가상 DOM을 직접 구현해야 했다

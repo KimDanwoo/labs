@@ -7,7 +7,7 @@ category: "dev"
 tags: ["fsd","architecture"]
 legacyUrl: "https://dansoon-dev.tistory.com/12"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 > 2024년 12월에 쓴 글이다. 2026년 11월에 FSD 공식 문서 기준으로 barrel을 쓰는 방식을 바꿨다. 달라진 내용은 글 끝의 '2026년 11월에 바꾼 것'에 덧붙였다.

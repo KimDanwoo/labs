@@ -7,7 +7,7 @@ category: "dev"
 tags: ["javascript"]
 legacyUrl: "https://dansoon-dev.tistory.com/18"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 자바스크립트는 어떻게 구조를 갖춰 왔을까

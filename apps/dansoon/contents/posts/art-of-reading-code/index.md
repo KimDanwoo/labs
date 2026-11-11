@@ -6,7 +6,7 @@ category: "reading"
 tags: []
 legacyUrl: "https://dansoon-dev.tistory.com/25"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ### 코드 읽기에 시간을 쓰는 개발자의 고민

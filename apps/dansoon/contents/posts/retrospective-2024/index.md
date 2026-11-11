@@ -7,7 +7,7 @@ category: "retro"
 tags: []
 legacyUrl: "https://dansoon-dev.tistory.com/14"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 24년, 첫 이직과 서비스 기여의 한 해

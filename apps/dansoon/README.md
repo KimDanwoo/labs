@@ -58,7 +58,18 @@ tags: ['react'] # src/lib/taxonomy.ts의 TAG_IDS
 
 새 태그·카테고리는 `src/lib/taxonomy.ts`에 ID와 이름을 먼저 추가한다. slug(폴더 이름)는 URL이므로 바꾸지 않는다.
 
-이미지: 글 폴더에 제목 없는 배경 `cover.jpg`(3:2, 모티프는 오른쪽, 왼쪽은 비움)를 두고 `node scripts/make-thumbnails.ts <slug>`로 제목을 얹은 `thumbnail.jpg`(1200×630)를 만든다. frontmatter에 `thumbnail: './thumbnail.jpg'`, `cover: './cover.jpg'`를 적는다. 커버는 글 상단, 썸네일은 목록·링크 미리보기에 쓰인다. 제목을 바꾸면 스크립트를 다시 돌린다.
+본문 이미지와 커버는 **WebP만 저장**한다. JPG는 품질 85로, PNG는 글자·도표를 보존하도록 무손실로 변환하며 이미지 크기는 유지한다. 기존 WebP·SVG·GIF와 공유용 `thumbnail.jpg`는 건드리지 않는다. 변환 전 JPG·PNG를 함께 보관할 필요는 없다.
+
+새 JPG·PNG를 글 폴더에 넣은 뒤 모노레포 루트에서 실행한다.
+
+```bash
+pnpm --filter dansoon images:optimize <slug>
+# slug를 생략하면 모든 글 폴더를 처리한다.
+```
+
+변환기는 `index.md`의 상대 이미지 경로(frontmatter 포함)를 WebP로 바꾸고, 변환한 JPG·PNG를 삭제한다. 같은 이름의 WebP가 이미 있으면 덮어쓰지 않고 중단한다. 기존 WebP는 다시 압축하지 않으므로 재실행해도 화질이 떨어지지 않는다. 무손실 변환은 이미지에 따라 용량이 커질 수도 있다. 티스토리 가져오기도 본문 이미지는 같은 규칙으로 저장한다(SVG·GIF 제외).
+
+커버: 글 폴더에 제목 없는 배경 `cover.webp`(3:2, 모티프는 오른쪽, 왼쪽은 비움)를 두고 **앱 폴더에서** `node scripts/make-thumbnails.ts <slug>`로 제목을 얹은 `thumbnail.jpg`(1200×630)를 만든다. frontmatter에 `thumbnail: './thumbnail.jpg'`, `cover: './cover.webp'`를 적는다. 커버는 글 상단, 썸네일은 목록·SNS 링크 미리보기에 쓰인다. 제목을 바꾸면 썸네일 생성기를 다시 돌린다.
 
 ## 주간 책 순위(자동)
 

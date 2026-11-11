@@ -7,7 +7,7 @@ category: "dev"
 tags: ["fsd","architecture"]
 legacyUrl: "https://dansoon-dev.tistory.com/13"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 > 2024년 12월에 쓴 글을 2026년 11월에 다시 썼다. 그사이 FSD는 2.1이 됐고, 공식 Next.js 가이드와 Next.js의 파일 규칙도 바뀌었다. 지금 쓰는 기준과 바뀐 내용을 반영했다.

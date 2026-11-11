@@ -7,7 +7,7 @@ category: "retro"
 tags: []
 legacyUrl: "https://dansoon-dev.tistory.com/11"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 "더 깊이 알고 싶다", "이게 최선일까?", "정말 이게 맞는 걸까?"
@@ -81,6 +81,6 @@ cover: "./cover.jpg"
 
 함께해준 314팀, 코치님들, 매니저님들께 진심으로 감사드립니다!
 
-![항해 플러스 수료 단체 사진이 담긴 즉석 사진](./image-1.jpg)
+![항해 플러스 수료 단체 사진이 담긴 즉석 사진](./image-1.webp)
 
-![항해 플러스 블랙 배지 수료 카드 — 학습 505시간, 실력 상위 1%](./image-2.png)
+![항해 플러스 블랙 배지 수료 카드 — 학습 505시간, 실력 상위 1%](./image-2.webp)

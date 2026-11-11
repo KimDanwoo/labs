@@ -6,7 +6,7 @@ category: "dev"
 tags: ["nextjs","seo"]
 legacyUrl: "https://dansoon-dev.tistory.com/24"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 레이아웃과 라우팅 설계가 운영에 미치는 영향

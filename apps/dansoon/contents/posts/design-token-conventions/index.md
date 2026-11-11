@@ -5,7 +5,7 @@ publishedAt: "2026-11-08T15:30:00+09:00"
 category: "dev"
 tags: ["css", "architecture"]
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 draft: false
 ---
 
@@ -70,7 +70,7 @@ Tailwind v4는 `max-w-md`의 `md`를 테마 변수 세 곳에서 순서대로 �
 - 계정 설정의 음성 선택 상자가 `max-w-xs` = 4px이 되어 빈 박스가 됐다.
 - 새 앱을 만드는 스캐폴드 템플릿의 첫 화면이 `max-w-3xl` = 64px이었다. 새 앱마다 깨진 화면으로 시작한 셈이다.
 
-![접힌 나무 자 옆에서 놋쇠 집게 사이에 좁은 종이 띠가 끼어 있고, 그 옆에 넓은 종이가 비어 있다](./ruler.jpg)
+![접힌 나무 자 옆에서 놋쇠 집게 사이에 좁은 종이 띠가 끼어 있고, 그 옆에 넓은 종이가 비어 있다](./ruler.webp)
 
 ### 서체에 없는 굵기
 
@@ -157,7 +157,7 @@ export function validateDesignTokens(text) {
 
 예외가 필요하면 그 줄이나 바로 윗줄에 `token-exception: 이유` 주석을 남긴다. 고정폭 서체만은 스크립트 안에 규칙으로 들어 있어서, 같은 줄에 `font-mono`가 있으면 굵기 검사를 건너뛴다. 그 밖의 예외는 지금 한 줄뿐이다. `font-mono` 클래스를 쓰지 않는 IBM Plex Mono 위의 `font-medium`이다.
 
-![놋쇠 체에 튀는 빨강·파랑 칩 두 개만 걸려 있고, 차분한 톤의 칩들은 쟁반 위에 한 줄로 놓여 있다](./sieve.jpg)
+![놋쇠 체에 튀는 빨강·파랑 칩 두 개만 걸려 있고, 차분한 톤의 칩들은 쟁반 위에 한 줄로 놓여 있다](./sieve.webp)
 
 ## 4. 다 맞추면 깨지는 것
 

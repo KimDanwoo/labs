@@ -6,7 +6,7 @@ category: "retro"
 tags: []
 legacyUrl: "https://dansoon-dev.tistory.com/26"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 1. 새로운 프로젝트에 합류

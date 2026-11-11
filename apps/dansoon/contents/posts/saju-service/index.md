@@ -6,7 +6,7 @@ category: "dev"
 tags: ["ai","side-project"]
 legacyUrl: "https://dansoon-dev.tistory.com/31"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 청연사주는 생년월일시를 입력하면 사주와 운세를 볼 수 있는 개인 프로젝트다. 현재 사주 조회 경로는 계산 결과에 맞는 해석과 문장을 구성하는 규칙 기반 구조다.

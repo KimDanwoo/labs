@@ -7,7 +7,7 @@ category: "reading"
 tags: ["react","design-pattern"]
 legacyUrl: "https://dansoon-dev.tistory.com/16"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 코드 구조화 문제를 풀려고 읽은 책

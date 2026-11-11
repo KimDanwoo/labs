@@ -6,7 +6,7 @@ category: "reading"
 tags: []
 legacyUrl: "https://dansoon-dev.tistory.com/19"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ### AI가 코드를 짜는 시대에 개발자가 하는 일

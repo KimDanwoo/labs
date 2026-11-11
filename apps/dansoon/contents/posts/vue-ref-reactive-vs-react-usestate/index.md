@@ -6,7 +6,7 @@ category: "dev"
 tags: ["vue","react"]
 legacyUrl: "https://dansoon-dev.tistory.com/22"
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 
 ## 들어가며: 기본형은 ref, 객체는 reactive라는 말
