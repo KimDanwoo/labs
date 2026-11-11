@@ -8,6 +8,8 @@ export const SCENERY_STYLE = {
   forest: 4,
   school: 5,
   shops: 6,
+  classroom: 7,
+  hallway: 8,
 } satisfies Record<Region, number>;
 
 /** Local, feathered movement in painting coordinates; walls, paths and furniture stay rigid. */
@@ -39,13 +41,21 @@ export const BREEZE_GLSL = `
                            clothPatch(p,vec4(.603,.320,.626,.438)));
       p.x += curtains * sin(sceneryTime*1.4+p.y*24.) * gust * .0023;
       p.y += curtains * sin(sceneryTime*1.7+p.x*20.) * .0005;
-    } else if (sceneryStyle > 5.5) {
+    } else if (abs(sceneryStyle - 6.) < .5) {
       float awnings = max(clothPatch(p,vec4(.091,.341,.328,.379)),
         max(clothPatch(p,vec4(.805,.378,.942,.420)),
             clothPatch(p,vec4(.382,.270,.456,.295))));
       p.y += awnings * sin(sceneryTime*1.8+p.x*25.)*gust*.0018;
       // The green grocer's sign is painted green but isn't a leaf.
       plants *= 1.-softPatch(p,vec2(.405,.233),vec2(.07,.04));
+    } else if (abs(sceneryStyle - 7.) < .5) {
+      // Only the trees beyond the windows and the hanging ivy move; the green chalkboard must stay still.
+      plants *= max(softPatch(p,vec2(.11,.30),vec2(.12,.2)), softPatch(p,vec2(.83,.22),vec2(.035,.1)));
+      float curtains = max(clothPatch(p,vec4(.0,.075,.033,.545)), clothPatch(p,vec4(.212,.22,.236,.485)));
+      p.x += curtains * sin(sceneryTime*1.2+p.y*18.) * gust * .0018;
+    } else if (abs(sceneryStyle - 8.) < .5) {
+      // The chalkboard glimpsed through the classroom door is green but not a leaf.
+      plants *= 1.-softPatch(p,vec2(.684,.41),vec2(.045,.06));
     }
     p.x += plants*sway*.00135*depth;
     p.y += plants*sin(sceneryTime*1.1+p.x*28.)*gust*.00045*depth;

@@ -7,6 +7,8 @@ import { sceneX, sceneY } from './perspective';
 // Sparse leaves start beside actual trees, rather than raining over the entire screen.
 const SOURCES: Record<Region, readonly [number, number][]> = {
   home: [],
+  hallway: [],
+  classroom: [],
   village: [
     [9, 25],
     [76, 53],

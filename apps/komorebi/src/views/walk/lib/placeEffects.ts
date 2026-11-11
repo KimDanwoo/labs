@@ -69,6 +69,18 @@ const BURSTS = {
   }),
   [PLACE_ACTION.schoolBell]: (at: Point) => sparkle(at, '#fff0a8'),
   [PLACE_ACTION.windChime]: (at: Point) => sparkle(at, '#dff3f5'),
+  [PLACE_ACTION.book]: (at: Point) => ({
+    rings: [],
+    motes: spray({ x: at.x, z: at.z - 8 }, 6, (i, origin) => ({
+      delay: i * 0.12,
+      life: 1.8,
+      from: new THREE.Vector2(origin.x + random() * 4 - 2, origin.y + random() * 2),
+      velocity: new THREE.Vector2(random() * 1.4 - 0.7, -2 - random()),
+      wobble: 1.2,
+      size: 1.4,
+      color: '#a8d98a',
+    })),
+  }),
 } satisfies Record<PlaceAction, (at: Point) => Burst>;
 
 function sparkle(at: Point, color: string): Burst {

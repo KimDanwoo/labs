@@ -245,6 +245,10 @@ export function createAmbience() {
       [0, 0.12, 0.27, 0.36, 0.55].forEach((at) =>
         tone(2_000 + Math.random() * 1_600, { at, seconds: 0.9, volume: 0.04 }),
       ),
+    [PLACE_ACTION.book]: () => {
+      whoosh(0.35, 2_400, 900, 0.5);
+      tone(1_480, { at: 0.45, seconds: 0.5, volume: 0.035 });
+    },
   } satisfies Record<PlaceAction, () => void>;
   const cue = (kind: PlaceAction) => {
     if (context.state === 'running') CUES[kind]();
