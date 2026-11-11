@@ -1,5 +1,5 @@
 /**
- * 카테고리·태그의 ID와 화면 이름. ID는 URL과 frontmatter에 쓰이므로 바꾸지 않는다.
+ * 카테고리·태그·연재의 ID와 화면 이름. ID는 URL과 frontmatter에 쓰이므로 바꾸지 않는다.
  * 이름만 바꿀 때는 *_LABEL만 고친다.
  */
 export const CATEGORY_IDS = ['dev', 'retro', 'reading'] as const;
@@ -51,3 +51,14 @@ export const TAG_LABEL = {
   vue: 'Vue',
   writing: '글쓰기',
 } satisfies Record<TagId, string>;
+
+/** 순서대로 읽는 글 묶음. 글 frontmatter의 `series: { id, order }`로 소속과 순서를 정한다. */
+export const SERIES_IDS = ['ai-dev'] as const;
+export type SeriesId = (typeof SERIES_IDS)[number];
+
+export const SERIES_INFO = {
+  'ai-dev': {
+    label: 'AI 개발기',
+    description: 'AI에게 구현을 맡기면서 규칙·도구·작업 환경을 어떻게 바꿔 왔는지 순서대로 모았어요.',
+  },
+} satisfies Record<SeriesId, { label: string; description: string }>;

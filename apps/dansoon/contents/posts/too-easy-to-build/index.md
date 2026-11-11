@@ -8,6 +8,7 @@ tags: ["ai", "side-project"]
 draft: false
 thumbnail: "./thumbnail.jpg"
 cover: "./cover.webp"
+series: { id: 'ai-dev', order: 3 }
 ---
 
 무언가를 만들다 보면 막히는 지점은 늘 있었다. 처음 써 보는 라이브러리 설정, 원인을 알 수 없는 에러, 배포 환경에서만 생기는 문제 같은 것들이다. 그래도 결국에는 다 풀었다. 문서를 뒤지고 이슈를 찾아 읽고 이것저것 바꿔 보면서. 다만 그 시간이 길었다.

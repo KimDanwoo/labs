@@ -8,6 +8,7 @@ tags: ["css", "architecture"]
 thumbnail: "./thumbnail.jpg"
 cover: "./cover.webp"
 draft: false
+series: { id: 'ai-dev', order: 2 }
 ---
 
 `max-w-sm`을 준 안내문이 폭 8px로 줄어들어 글자가 한 줄에 한두 자씩 세로로 쌓여 있었다. 원인은 Tailwind의 이름 충돌이었고, 이 함정은 토큰 파일 주석에 "이 이름을 `max-w`에 쓰지 말라"고 이미 경고해 둔 것이었다. 주석은 아무것도 막지 못했다.

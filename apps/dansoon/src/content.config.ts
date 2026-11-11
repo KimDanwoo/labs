@@ -1,7 +1,7 @@
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { defineCollection } from 'astro:content';
-import { CATEGORY_IDS, TAG_IDS } from '~/lib/taxonomy';
+import { CATEGORY_IDS, SERIES_IDS, TAG_IDS } from '~/lib/taxonomy';
 
 const DESCRIPTION_MAX_LENGTH = 200;
 
@@ -20,6 +20,8 @@ const posts = defineCollection({
       updatedAt: z.coerce.date().optional(),
       category: z.enum(CATEGORY_IDS),
       tags: z.array(z.enum(TAG_IDS)).default([]),
+      // 날짜가 같은 글도 있어 연재 안 순서는 order로 따로 정한다
+      series: z.object({ id: z.enum(SERIES_IDS), order: z.number().int().positive() }).optional(),
       // 제목을 얹은 썸네일(목록·링크 미리보기)과 제목 없는 배경(글 상단 커버). 썸네일은 scripts/make-thumbnails.ts가 커버로 만든다
       thumbnail: image().optional(),
       cover: image().optional(),

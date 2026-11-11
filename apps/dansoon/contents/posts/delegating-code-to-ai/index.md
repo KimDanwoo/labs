@@ -8,6 +8,7 @@ tags: ["ai"]
 legacyUrl: "https://dansoon-dev.tistory.com/30"
 thumbnail: "./thumbnail.jpg"
 cover: "./cover.webp"
+series: { id: 'ai-dev', order: 1 }
 ---
 
 ## 코드는 맡겨도, 판단까지 맡길 수는 없었다
