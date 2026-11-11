@@ -1,10 +1,10 @@
 ---
 title: 'Claude Code는 바뀌는데, 내 하네스는 그대로였다'
 description: 'OMC·포니테일을 정리하며 Claude Code 하네스의 규칙과 모델 설정을 다시 봤어요. Superpowers·ECC 등의 업데이트 사례, Claude·Codex 공통 지침 구성과 실제 작업으로 검증할 기준을 정리해요.'
-publishedAt: '2026-11-11T13:06:37+09:00'
+publishedAt: '2026-11-11T14:23:43+09:00'
 category: 'dev'
 tags: ['ai', 'side-project']
-draft: true
+draft: false
 thumbnail: './thumbnail.jpg'
 cover: './cover.webp'
 ---
