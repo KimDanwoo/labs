@@ -11,10 +11,6 @@
   "outputDirectory": "dist",
   "trailingSlash": true,
   "ignoreCommand": "npx turbo-ignore dansoon",
-  "redirects": [
-    { "source": "/tech", "destination": "/", "permanent": true },
-    { "source": "/tech/(.*)", "destination": "/", "permanent": true }
-  ],
   "headers": [
     {
       "source": "/(.*)",

@@ -84,16 +84,6 @@ const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c
         </h1>
         <p class="mt-lg flex flex-wrap items-center gap-x-sm gap-y-xs text-sm text-muted-foreground">
           <time datetime={publishedAt.toISOString()}>{formatLongDate(publishedAt)}</time>
-          {
-            updatedAt && (
-              <>
-                <span aria-hidden="true">·</span>
-                <span>
-                  <time datetime={updatedAt.toISOString()}>{formatLongDate(updatedAt)}</time> 수정
-                </span>
-              </>
-            )
-          }
           <span aria-hidden="true">·</span>
           <span>{readingMinutes(post.body)}분 분량</span>
         </p>

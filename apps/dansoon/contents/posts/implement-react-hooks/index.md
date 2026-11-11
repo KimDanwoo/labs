@@ -2,6 +2,7 @@
 title: "React Hook을 직접 구현해보자: useMemo·useCallback·memo 렌더링 최적화"
 description: "shallowEquals·deepEquals, useMemo, useCallback, memo를 직접 구현해 불필요한 렌더링을 줄이고 렌더링 시간을 6ms에서 2ms로 낮춘 과정이에요."
 publishedAt: "2024-12-11T13:23:34+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["react"]
 legacyUrl: "https://dansoon-dev.tistory.com/5"
@@ -61,9 +62,9 @@ deepEquals는 shallowEquals의 비교 함수 자리에 자기 자신을 넘겨, 
 
 ```tsx
 // useMemo
-function useMemo<T>(factory: () => T, deps: DependencyList) {
+function useMemo<T>(factory: () => T, deps: DependencyList, equals = shallowEquals) {
   const ref = useRef({ deps: undefined, value: undefined });
-  if (!shallowEquals(ref.current.deps, deps)) {
+  if (!equals(ref.current.deps, deps)) {
     ref.current.value = factory();
     ref.current.deps = deps;
   }
@@ -81,18 +82,20 @@ function useDeepMemo<T>(factory: () => T, deps: DependencyList): T {
 }
 ```
 
-useMemo는 ref에 이전 deps와 계산 값을 저장해 두고, deps가 shallowEquals로 달라졌을 때만 factory를 다시 실행한다. useCallback은 함수 자체를 메모하는 useMemo다. useDeepMemo는 세 번째 인자로 deepEquals를 넘겨 깊은 비교를 쓰려는 변형인데, 위 useMemo는 비교 함수를 받지 않고 shallowEquals를 고정으로 쓰므로 실제로 깊은 비교를 하려면 useMemo가 비교 함수를 인자로 받도록 바꿔야 한다. 덕분에 불필요한 재렌더링을 막고, 복잡한 연산이 필요한 컴포넌트에서도 이점을 얻을 수 있었다.
+useMemo는 ref에 이전 deps와 계산 값을 저장해 두고, deps가 달라졌을 때만 factory를 다시 실행한다. 비교 함수는 세 번째 인자로 받고 기본값은 shallowEquals다. useCallback은 함수 자체를 메모하는 useMemo다. useDeepMemo는 세 번째 인자로 deepEquals를 넘겨 깊은 비교를 쓰는 변형이다. 덕분에 불필요한 재계산을 줄이고 memo와 함께 쓰면 하위 컴포넌트의 재렌더링도 줄일 수 있었다.
 
 ### 3\. memo와 deepMemo
 
 ```ts
 export function memo(Component, equals = shallowEquals) {
   return (newProps) => {
-    const previousPropsRef = useRef(null);
-    if (!equals(previousPropsRef.current, newProps)) {
+    const previousPropsRef = useRef<object | null>(null);
+    const elementRef = useRef<ReactElement | null>(null);
+    if (elementRef.current === null || !equals(previousPropsRef.current, newProps)) {
       previousPropsRef.current = newProps;
+      elementRef.current = createElement(Component, newProps);
     }
-    return createElement(Component, newProps);
+    return elementRef.current;
   };
 }
 
@@ -101,7 +104,7 @@ export function deepMemo(Component) {
 }
 ```
 
-memo는 equals 함수(기본값 shallowEquals)로 이전 props와 새 props를 비교하고 deepMemo는 그 자리에 deepEquals를 쓴다. 복잡한 데이터 구조를 다루는 컴포넌트에 deepMemo를 적용해 성능과 정확도 모두를 만족시킬 수 있었다.
+memo는 equals 함수(기본값 shallowEquals)로 이전 props와 새 props를 비교해, 같으면 이전에 만든 요소를 그대로 돌려준다. 같은 요소를 받은 리액트는 그 컴포넌트를 다시 렌더링하지 않는다. deepMemo는 비교 함수 자리에 deepEquals를 쓴다. 복잡한 데이터 구조를 다루는 컴포넌트에 deepMemo를 적용해 성능과 정확도 모두를 만족시킬 수 있었다.
 
 ## 4\. 알게 된 것: 메모이제이션과 비교 방식의 균형
 
@@ -109,19 +112,19 @@ memo는 equals 함수(기본값 shallowEquals)로 이전 props와 새 props를 �
 
 -   **메모이제이션**: useMemo와 useCallback을 적재적소에 사용해 불필요한 연산을 피하고 좀 더 효율적으로 동작하도록 만들 수 있었다. 특히 복잡한 로직이 포함된 컴포넌트에서는 성능 차이가 확연했다.
 -   **깊은 비교와 얕은 비교의 균형**: 상황에 따라 shallowEquals와 deepEquals를 적절히 선택하는 것이 중요하다는 점을 알게 되었다. 리액트도 이런 비교 방식으로 성능을 최적화한다는 것을 알 수 있었다. 모든 곳에 깊은 비교를 쓸 필요는 없지만, 필요한 곳에는 확실히 적용해야 한다는 것도 깨달았다.
--   **컴포넌트의 불필요한 재렌더링 방지**: memo와 deepMemo를 통해 props가 변하지 않는 컴포넌트가 다시 렌더링되지 않도록 최적화할 수 있었다. 성능을 크게 개선할 수 있었고 특히 대규모 데이터를 다룰 때 효과가 두드러졌다. 다만 꼭 필요한 상태가 아니라면 사용하지 않는 것이 좋다는 것도 알게 되었다.
+-   **컴포넌트의 불필요한 재렌더링 방지**: memo와 deepMemo를 통해 props가 변하지 않는 컴포넌트가 다시 렌더링되지 않도록 최적화할 수 있었다. 성능을 크게 개선할 수 있었고 특히 대규모 데이터를 다룰 때 효과가 두드러졌다. 다만 꼭 필요한 곳이 아니라면 memo를 쓰지 않는 것이 좋다는 것도 알게 되었다.
 
 이번 주에는 컴포넌트 성능을 최적화하면서 렌더링 성능을 개선했다. 개선 결과는 React DevTools Profiler로 확인했다.
 
 ### 최적화 전
 
-![React DevTools Profiler 플레임 그래프 — ThemeProvider 업데이트, 렌더링 2ms](./image-1.webp)
+![React DevTools Profiler 플레임 그래프 — ThemeProvider 업데이트, 렌더링 6ms](./image-2.webp)
 
 최적화 전에는 ThemeProvider에서 업데이트가 발생할 때, ItemList, ThemeLayout 같은 하위 컴포넌트들이 불필요하게 다시 렌더링되는 문제가 있었다. 전체 렌더링 시간이 6ms였고, 그중 ItemList가 1.5ms를 차지했다. ThemeProvider와 Context.Provider도 각각 0.5ms, 0.3ms로 적지 않은 렌더링 시간이 걸렸다.
 
 ### 최적화 후
 
-![React DevTools Profiler 플레임 그래프 — ThemeProvider 업데이트, 렌더링 6ms](./image-2.webp)
+![React DevTools Profiler 플레임 그래프 — ThemeProvider 업데이트, 렌더링 2ms](./image-1.webp)
 
 최적화 후에는 useCallback과 useMemo를 적극적으로 활용해 렌더링 시간을 크게 줄일 수 있었다. 최적화 후 전체 렌더링 시간은 2ms로, 약 3배 가까이 개선되었다. ItemList의 렌더링 시간은 1.5ms에서 0.5ms로, ThemeProvider의 렌더링 시간은 0.5ms에서 0.2ms로 줄었다.
 

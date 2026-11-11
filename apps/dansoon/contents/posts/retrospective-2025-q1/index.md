@@ -2,7 +2,7 @@
 title: "25년 1분기 회고: 마이크로 프론트엔드, 모노레포, 디자인 시스템"
 description: "방구하기 프로젝트에서 마이크로 프론트엔드 통합, OTAT 인증, 모노레포, 디자인 시스템을 다룬 1분기의 기술 과제와 성과를 돌아봐요."
 publishedAt: "2025-03-14T16:30:47+09:00"
-updatedAt: "2025-11-17T13:09:00+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "retro"
 tags: []
 legacyUrl: "https://dansoon-dev.tistory.com/15"
@@ -40,7 +40,7 @@ OTAT 처리의 핵심은 Next.js 미들웨어에서 이루어졌다.
 
 페이지 컴포넌트가 아닌 애플리케이션 레벨에서 토큰을 처리함으로써 인증 로직을 중앙화하고 일관성을 유지할 수 있었다.
 
-```bash
+```ts
 // middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { handleOtat } from './otatHandler';
@@ -64,7 +64,7 @@ export const authMiddleware = async (request: NextRequest): Promise<NextResponse
 
 // 인증이 필요한 경로인지 확인
 const shouldCheckAuth = (pathname: string): boolean => {
-  const publicPaths = ['/building', '/map', '/amount' ... ];
+  const publicPaths = ['/building', '/map', '/amount' /* ... */];
   const staticResourcePattern = /\.(ico|png|jpg|jpeg|gif|svg|css|js)$/;
   
   return !(
@@ -84,7 +84,7 @@ export { AuthErrorType } from './errorHandler';
 
 OTAT를 검증하고 세션을 만드는 핸들러는 다음과 같이 구현했다.
 
-```bash
+```ts
 import { NextRequest, NextResponse } from 'next/server';
 import { OtatVerificationResult } from './types';
 import { logger } from '../common/logger';
@@ -158,7 +158,7 @@ const redirectToLogin = (request: NextRequest): NextResponse => {
 
 미들웨어를 통한 인증 처리는 보안 측면에서도 이점이 있었다.
 
-토큰이 클라이언트 코드에 노출되지 않고 서버 사이드에서 처리되므로 토큰 탈취 위험이 감소했다. 세션 토큰은 HTTP Only 쿠키에 저장해 XSS 공격에 대한 방어 수준을 높였다.
+일회용 토큰은 미들웨어가 서버에서 검증해 곧바로 세션으로 바꾸므로 클라이언트 코드가 토큰을 다루지 않는다. 다만 토큰이 주소에 실려 오기 때문에 한 번만 쓸 수 있고 유효 시간이 짧아야 한다. 세션 토큰은 HTTP Only 쿠키에 저장해 XSS 공격에 대한 방어 수준을 높였다.
 
 앞으로는 더 복잡한 시나리오와 보안 요구사항을 충족시키기 위해 인증 시스템을 지속적으로 개선해 나갈 계획이다.
 
@@ -172,7 +172,7 @@ const redirectToLogin = (request: NextRequest): NextResponse => {
 
 이를 위해 새롭게 개발하는 Next.js 애플리케이션에 Turborepo를 기반으로 구성한 모노레포 아키텍처를 도입했다.
 
-```bash
+```text
 방구하기/
 ├── apps/
 │   ├── ceo/       # 관리자 페이지

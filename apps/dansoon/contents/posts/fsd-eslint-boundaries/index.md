@@ -6,7 +6,7 @@ category: "dev"
 tags: ["fsd", "architecture"]
 thumbnail: "./thumbnail.jpg"
 cover: "./cover.webp"
-updatedAt: "2026-11-10T18:00:00+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 draft: false
 ---
 
@@ -146,7 +146,7 @@ ESLint는 파일 단위로 코드를 본다. 패키지 설정이나 여러 파�
 
 작업 규칙 문서도 같은 날 정리했다. Codex와 Claude가 함께 읽는 AGENTS.md 한 곳에 규칙을 두고 도구별 문서에는 같은 내용을 다시 적지 않는다. 문서에는 무엇을 왜 지키는지 적고 지켜졌는지는 lint와 구조 검사가 확인한다. 코드를 AI에게 맡기는 조건은 [AI에게 코드를 맡기기 위한 위임의 조건](/posts/delegating-code-to-ai/)에 따로 정리했다.
 
-## 7. 남은 것
+## 7. 한계와 다른 도구
 
 이 글을 처음 올릴 때 규칙 체계는 widgets 레이어를 전제로 했다. 레이어 정책에 `views → widgets → features` 방향이 그대로 들어 있었다. FSD 공식 문서는 2026년 7월부터 widgets 레이어를 권장하지 않는데, 그 내용은 [FSD는 왜 Widgets 레이어를 권하지 않게 됐을까](/posts/fsd-2026-widgets/)에 정리했다. 위젯을 페이지 슬라이스로 옮기려면 정책 한 줄과 직접 만든 규칙의 레이어 목록을 함께 고쳐야 했고, 이 일은 11월 10일에 했다(8장).
 
@@ -193,11 +193,11 @@ import { cn } from '@shared/lib';
 
 - 문서로만 정한 규칙은 새 코드마다 어긋났다. 규칙은 lint로 옮겨야 지켜졌다.
 - 레이어 방향은 eslint-plugin-boundaries로 막았다. 기본값을 `disallow`로 두고 허용할 방향만 적었다.
-- 세그먼트 깊이와 상대경로는 `no-restricted-imports` 패턴으로 막았다. 상대경로 200건을 alias로 바꾸고 순환을 만드는 같은 폴더 참조 688건은 남겼다.
-- 플러그인으로 표현하기 어려운 규칙 6개는 직접 만들었다. import 문자열을 경로로 풀어 판단하므로 파일로 해석되지 않는 import도 잡는다.
+- 세그먼트 깊이와 상대경로는 처음에 `no-restricted-imports` 패턴으로 막았다. 상대경로 200건을 alias로 바꾸고 순환을 만드는 같은 폴더 참조 688건은 남겼다.
+- 플러그인으로 표현하기 어려운 규칙은 직접 만들었다. 처음에는 6개였고 지금은 7개다. import 문자열을 경로로 풀어 판단하므로 파일로 해석되지 않는 import도 잡는다.
 - 파일 하나로 판단할 수 없는 규칙은 `check:architecture`가 검사하고 `pnpm lint`와 CI가 둘 다 실행한다.
 - 11월 10일에 import 규칙을 공식 공개 API 방식으로 바꿨다. 세그먼트 깊이 규칙은 `fsd/public-api`로 대체했고, 슬라이스 안은 다시 상대경로를 쓴다.
 
-FSD 레이어 구성은 [쉽게 정리한 FSD 가이드](/posts/fsd-guide/)에, import 경로와 배럴 패턴은 [import 경로 관리 알아보기](/posts/import-path-alias-barrel-fsd/)에 정리돼 있다.
+FSD 레이어 구성은 [FSD 가이드](/posts/fsd-guide/)에, import 경로와 배럴 패턴은 [import 경로 관리 알아보기](/posts/import-path-alias-barrel-fsd/)에 정리돼 있다.
 
 같은 방식으로 디자인 토큰 규칙을 도구에 맡긴 과정은 [디자인 토큰 규칙을 문서 대신 도구가 지키게 만들기](/posts/design-token-conventions/)에 있다.

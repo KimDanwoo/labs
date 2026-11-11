@@ -2,7 +2,7 @@
 title: "FSD 패턴으로 상태 관리 리팩토링하기: react-query와 zustand"
 description: "상태와 API, UI가 얽힌 코드를 FSD 구조로 나누고 react-query와 zustand로 상태 관리를 개선한 리팩토링 과정을 돌아봐요."
 publishedAt: "2024-12-11T13:25:30+09:00"
-updatedAt: "2025-08-03T09:35:55+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["fsd","state-management"]
 legacyUrl: "https://dansoon-dev.tistory.com/7"
@@ -12,7 +12,7 @@ cover: "./cover.webp"
 
 ## 기존 코드의 문제: 상태·API·UI가 한 파일에 얽힘
 
-이번 주 과제는 기존의 상태 관리와 컴포넌트 구조를 FSD(Feature-Sliced Design) 패턴으로 리팩토링하고, react-query와 zustand를 활용해 상태 관리 방식을 개선하는 것이었다. FSD 자체는 [쉽게 정리한 FSD 가이드](/posts/fsd-guide/)에 정리해 두었다. 이를 진행하면서 겪은 문제는 다음과 같다.
+이번 주 과제는 기존의 상태 관리와 컴포넌트 구조를 FSD(Feature-Sliced Design) 패턴으로 리팩토링하고, react-query와 zustand를 활용해 상태 관리 방식을 개선하는 것이었다. FSD 자체는 [FSD 가이드](/posts/fsd-guide/)에 정리해 두었다. 이를 진행하면서 겪은 문제는 다음과 같다.
 
 1.  코드 구조의 복잡성
     -   상태 관리와 API 호출, UI 로직이 한 파일에 얽혀 있어 코드가 길어지고, 컴포넌트별로 코드를 이해하기 어려운 점이 많았다.
@@ -71,7 +71,7 @@ src/
 
 ```ts
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { fetchPosts, addPost, updatePost, deletePost } from '@/entities/post/api/postApi';
+import { fetchPosts, addPost } from '@/entities/post/api/postApi';
 
 // 게시물 목록 가져오기
 export const usePosts = (params) => {
@@ -132,8 +132,8 @@ export const usePostStore = create<PostState>((set) => ({
 2.  재사용성과 확장성 확보
     -   커스텀 훅과 공통 컴포넌트를 활용한 덕분에 동일한 기능을 여러 컴포넌트에서 재사용할 수 있었다.
     -   상태 관리 로직이 모듈화되면서 기능 확장이나 변경이 필요할 때 관련 파일만 수정하면 되어 확장성이 높아졌다.
-3.  클린 아키텍처 구현
-    -   FSD 패턴과 상태 관리 개선을 통해 각 기능이 독립적이고 의존성이 최소화된 클린 아키텍처를 구현할 수 있었다.
+3.  의존 관계 정리
+    -   FSD 패턴과 상태 관리 개선을 통해 각 기능이 독립적이고 의존 관계가 단순한 구조를 만들 수 있었다.
     -   덕분에 코드 변경 시 발생할 수 있는 부수 효과가 줄어들었고, 코드의 안정성도 높아졌다.
 
 ---
@@ -152,7 +152,7 @@ export const usePostStore = create<PostState>((set) => ({
 
 ## 앞으로도 유지할 부분
 
--   FSD 패턴과 상태 관리 구조: 기능이 복잡하고 관리할 상태가 많을 경우, FSD 패턴과 상태 관리 분리 방식에 대한 이해도를 좀 더 높여서 컨벤션을 작성할 때 어떻게 분리할지를 명확하게 구분하도록 좀 더 학습이 필요할 것 같다.
+-   FSD 패턴과 상태 관리 구조: 기능이 복잡하고 관리할 상태가 많을 때 어떻게 분리할지 컨벤션으로 명확히 정하려면 FSD 패턴과 상태 관리 분리 방식을 더 학습해야 할 것 같다.
 -   모듈화된 상태와 로직 분리: 각 기능에 맞는 상태와 로직을 모듈화하고, 컴포넌트는 UI만 담당하는 구조를 유지하면서 코드를 더욱 깔끔하게 관리할 것이다.
 -   커스텀 훅과 공통 컴포넌트 사용: 재사용할 수 있는 로직은 커스텀 훅으로, 공통 UI 요소는 공통 컴포넌트로 만들어 프로젝트 전체의 유지보수성을 높이고자 한다.
 

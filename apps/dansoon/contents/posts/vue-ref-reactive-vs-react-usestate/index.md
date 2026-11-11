@@ -2,6 +2,7 @@
 title: "Vue 3 ref와 reactive 차이, 그리고 React useState 톺아보기"
 description: "Vue 3의 Proxy 반응성 안에서 ref와 reactive가 어떻게 다른지 파헤치고, React useState와의 차이, 데이터 형태에 따른 선택 기준을 정리해요."
 publishedAt: "2025-10-18T14:31:44+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["vue","react"]
 legacyUrl: "https://dansoon-dev.tistory.com/22"
@@ -19,7 +20,7 @@ Vue 3을 쓰다 보면 이런 말을 자주 듣습니다. 하지만 실무에서
 
 이게 단순히 팀 컨벤션 때문일까요? 저는 이 부분이 항상 명확히 와닿지 않았습니다.
 
-그래서 이번 글에서는 ref와 reactive가 어떻게 다르게 작동하는지, 그리고 React의 useState와는 어떤 구조적 차이가 있는지를 직접 파헤쳐 보려 합니다.
+그래서 ref와 reactive가 어떻게 다르게 작동하는지, React의 useState와는 구조가 어떻게 다른지 직접 파헤쳐 봤습니다.
 
 ## 1\. Vue의 반응성, Proxy로 시작하다
 
@@ -47,7 +48,7 @@ targetMap (WeakMap)
 
 effect는 반응형 데이터를 읽는 함수입니다. 컴포넌트의 렌더 함수도 effect로 동작합니다.
 
-이게 Vue의 근본이에요.
+이게 Vue의 근본입니다.
 
 “누가 무엇을 읽었는지 기억하고, 그 데이터가 바뀌면 그 사람만 깨운다.”
 
@@ -58,11 +59,11 @@ Proxy는 객체만 감쌀 수 있습니다.
 그래서 다음 코드는 작동하지 않거나, 원하는 반응성을 얻지 못합니다.
 
 ```javascript
-const count = reactive(0) // ❌ 작동 안 함
-count++ // 반응성 없음
+let count = reactive(0) // ❌ 원시값은 Proxy로 감싸지 못해 0이 그대로 돌아옴
+count++ // 숫자만 바뀔 뿐 반응성 없음
 ```
 
-Proxy는 객체의 프로퍼티 접근(get, set)을 가로채는 기능이기 때문에 숫자나 문자열처럼 프로퍼티가 없는 값에는 적용할 수 없죠.
+Proxy는 객체의 프로퍼티 접근(get, set)을 가로채는 기능이기 때문에 숫자나 문자열처럼 프로퍼티가 없는 값에는 적용할 수 없습니다.
 
 그래서 Vue는 별도의 래퍼를 만들었습니다 — ref().
 
@@ -71,16 +72,16 @@ const count = ref(0)
 count.value++ // 내부적으로 track(), trigger() 실행
 ```
 
-ref는 단일 값을 { value } 형태의 객체로 감싸 마치 Proxy처럼 동작하게 만든 의도적인 가짜 객체예요.
+ref는 단일 값을 { value } 형태의 객체로 감싸고, value를 읽고 쓸 때 track과 trigger를 호출하게 만든 래퍼입니다.
 
 ## 3\. ref와 reactive의 진짜 차이
 
 | 항목 | ref | reactive |
 | --- | --- | --- |
-| **대상** | 기본형 값 (number, string 등) | 객체, 배열, Map, Set |
+| **대상** | 모든 값 (기본형, 객체 모두) | 객체, 배열, Map, Set |
 | **구현 방식** | { value } 형태로 감싸고 get/set 재정의 | Proxy로 전체 객체 감시 |
 | **접근 방식** | .value 필요 | 바로 점 표기법 사용 가능 |
-| **반응성 범위** | 단일 값 추적 | 속성 단위 추적 (Deep Reactivity) |
+| **반응성 범위** | .value 추적 (객체를 넣으면 내부는 reactive로 깊게 추적) | 속성 단위 추적 (Deep Reactivity) |
 | **주요 목적** | 단일 상태 관리 | 구조적 데이터 관리 |
 
 ## 4\. React의 useState는 완전히 다른 접근을 한다
@@ -129,13 +130,13 @@ React가 diff로 변경분만 DOM에 반영하는 원리는 [내가 리액트를
 | **성능 최적화 포인트** | fine-grained reactivity | diff reconciliation |
 | **개발자 관점** | "데이터가 바뀌면 그 데이터만 반응" | "상태가 바뀌면 컴포넌트 전체가 반응" |
 
-Vue는 “데이터 중심”, React는 “렌더링 중심”이에요.
+Vue는 “데이터 중심”, React는 “렌더링 중심”입니다.
 
 그래서 Vue는 reactive 시스템의 정밀도를, React는 렌더링 파이프라인의 단순성을 택했습니다.
 
 ## 5\. 실무에서 reactive보다 ref가 더 자주 쓰이는 이유
 
-1.  **타입 안정성**: reactive는 Proxy로 감싸기 때문에 TypeScript 타입 추론이 흔들릴 때가 있습니다. 반면 ref는 Ref\<T> 타입으로 명확하게 추론됩니다.
+1.  **타입 지정**: reactive는 반환 타입이 넘긴 타입과 달라질 수 있어, 공식 문서가 제네릭 인자를 쓰지 말라고 안내합니다. ref는 ref\<number>(0)처럼 제네릭으로 타입을 바로 지정할 수 있습니다.
 2.  **구조분해 안정성**: reactive 객체를 구조분해하면 반응성이 깨집니다. const { count } = state에서 count가 원시값이면 값만 복사되어 이후 변경이 반영되지 않습니다(중첩 객체를 꺼내면 그 객체 자체의 반응성은 남습니다). 반면 ref는 값 자체가 독립적으로 추적됩니다.
 3.  **코드 일관성**: Composition API 안에서 .value 접근을 명시적으로 하므로 “이건 반응형 데이터구나”라는 인식이 명확합니다.
 4.  **성능 제어 용이성**: 기본 ref도 객체를 넣으면 내부를 깊게 반응형으로 만들지만, 깊은 감시가 필요 없는 큰 값은 shallowRef로 바꿔 최상위 값만 추적하게 할 수 있습니다.
@@ -147,11 +148,11 @@ Vue는 “데이터 중심”, React는 “렌더링 중심”이에요.
 | **Primitive 감싸기 불가** | Proxy는 객체만 감쌀 수 있어 기본형에서는 동작하지 않음 |
 | **구조분해 시 반응성 손실** | Proxy 참조가 끊기면 반응성도 끊김 |
 | **Deep Proxy 비용** | 모든 하위 객체를 Proxy로 감싸는 오버헤드 |
-| **타입 추론 불안정** | TypeScript에서 Proxy 구조를 완벽히 추론하지 못함 |
+| **타입이 달라질 수 있음** | 중첩된 ref를 풀어 주는 과정에서 반환 타입이 넘긴 타입과 달라짐 |
 
 ```javascript
-const state = reactive({ user: { name: 'Danwoo' } })
-const { user } = state // ❌ 반응성 깨짐
+const state = reactive({ count: 0 })
+const { count } = state // ❌ 값만 복사되어 반응성이 끊김
 ```
 
 ## 7\. ref만 사용했을 때의 문제점
@@ -160,7 +161,6 @@ const { user } = state // ❌ 반응성 깨짐
 | --- | --- |
 | **.value 중첩** | 객체 상태에서 .value 접근이 반복되어 가독성 저하 |
 | **깊은 반응성 비용** | 객체를 넣으면 내부를 reactive로 감싸 깊게 추적함(최상위만 추적하려면 shallowRef) |
-| **불필요한 re-render** | value 전체가 추적 단위라 일부 변경에도 전체 effect 실행 |
 | **Composition 코드 일관성 저하** | .value 남발로 코드 통일성 저하 |
 
 ```javascript

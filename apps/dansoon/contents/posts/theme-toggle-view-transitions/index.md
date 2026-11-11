@@ -2,6 +2,7 @@
 title: "다크모드 전환을 원형 애니메이션으로: View Transitions API와 Astro"
 description: "블로그 다크모드 토글에 View Transitions API로 원형 전환 애니메이션을 넣었어요. 처음 만든 두 단계 애니메이션이 어색했던 이유, fill: forwards가 남긴 버그, Astro 페이지 전환과 겹치지 않게 한 방법, 애니메이션을 느리게 재생해 확인한 과정을 정리해요."
 publishedAt: "2026-11-09T23:00:00+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["css", "javascript"]
 draft: false
@@ -59,7 +60,7 @@ MDN 기준으로 `startViewTransition()`은 2025년 10월부터 주요 브라우
 | --- | --- |
 | ![밝은 화면이 왼쪽 아래 토글 버튼으로 모이며 바깥부터 어두운 화면이 드러난다](./to-dark.webp) | ![밝은 화면이 왼쪽 아래 토글 버튼에서 원형으로 퍼지며 어두운 화면을 덮는다](./to-light.webp) |
 
-방향을 바꾸는 데 필요한 건 어느 의사 요소에 애니메이션을 거느냐뿐이다.
+방향에 따라 달라지는 건 어느 의사 요소에 애니메이션을 거느냐와 쌓임 순서다.
 
 ```ts
 const IRIS_BY_DIRECTION = {
@@ -114,7 +115,7 @@ html.theme-transition::view-transition-new(root) {
 
 ## 5. 지원하지 않거나 움직임을 줄인 환경
 
-두 경우에는 애니메이션 없이 바로 바꾼다.
+다음 경우에는 애니메이션 없이 바로 바꾼다.
 
 ```ts
 const canAnimateThemeChange = () =>

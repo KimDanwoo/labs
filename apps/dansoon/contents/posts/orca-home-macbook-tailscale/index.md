@@ -2,6 +2,7 @@
 title: "밖에서 휴대폰으로 집 맥북의 Claude Code 쓰기: Orca와 Tailscale"
 description: "집 맥북에 Orca를 서버로 띄우고 Tailscale로 연결해 밖에서도 휴대폰으로 Claude Code·Codex 세션에 접속하도록 설정했어요. 접속 링크 만들기, 맥북 잠자기 막기, 재부팅 대비, 그리고 이슈 처리·사이트 점검·정보 수집·의존성 업데이트 자동화까지 정리해요."
 publishedAt: "2026-11-09T21:00:00+09:00"
+updatedAt: "2026-11-10T18:24:00+09:00"
 category: "dev"
 tags: ["ai", "side-project"]
 draft: false
@@ -50,7 +51,7 @@ SSH와 tmux 조합은 따로 앱이 필요 없고 자료도 가장 많다. 다�
 
 집 맥북과 휴대폰에 Tailscale을 깔고 **같은 계정으로 로그인**했다. 두 기기가 같은 tailnet에 들어가는 게 전부다.
 
-로그인하고 나면 Tailscale 메뉴나 관리 콘솔에서 집 맥북의 주소를 확인할 수 있다. `100.x.y.z` 꼴이다. 이 주소는 다음 단계에서 Orca가 알아서 찾아 준다.
+로그인하고 나면 Tailscale 메뉴나 관리 콘솔에서 집 맥북의 주소를 확인할 수 있다. `100.x.y.z` 꼴이다. 이 주소는 다음 단계에서 Orca의 주소 목록에 나타난다.
 
 ## 3. 집 맥북에서 접속 링크 만들기
 
@@ -84,8 +85,10 @@ Orca 문서의 전제 조건 중 하나가 **서버 컴퓨터가 깨어 있고, 
 설정이 먹었는지는 터미널에서 확인한다.
 
 ```bash
-pmset -g
+pmset -g | grep -w sleep
 ```
+
+`sleep` 값이 0이면 자동으로 잠들지 않는 상태다.
 
 ## 6. 재부팅 뒤에도 다시 서버가 되도록
 
@@ -151,8 +154,12 @@ Orca는 에이전트마다 worktree를 따로 잡아 준다. 그래서 같은 �
 </plist>
 ```
 
+스크립트에는 실행 권한을 주고 설정을 등록한다. 등록됐는지는 목록에서 확인한다.
+
 ```bash
-launchctl load ~/Library/LaunchAgents/dev.danwoo.site-check.plist
+chmod +x ~/automation/site-check.sh
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.danwoo.site-check.plist
+launchctl list | grep site-check
 ```
 
 자동화에는 원칙을 하나 정했다. **에이전트는 PR까지만 올리고 머지는 내가 한다.** 사람 없이 도는 에이전트에게 머지 권한을 주지 않고 토큰 권한도 해당 저장소로 좁혔다.
@@ -173,7 +180,7 @@ launchctl load ~/Library/LaunchAgents/dev.danwoo.site-check.plist
 
 ### 의존성 업데이트와 마이그레이션
 
-매주 `pnpm outdated`로 메이저 업데이트를 확인한다. 올릴 게 있으면 worktree에서 올려 보고 깨지는 코드는 에이전트가 고친다. 테스트까지 통과한 것만 PR로 올라온다. 버전만 올려 주는 업데이트 봇과 달리 깨진 코드를 고치는 데까지 간다.
+매주 `pnpm outdated`로 오래된 의존성을 확인한다. 올릴 게 있으면 worktree에서 올려 보고 깨지는 코드는 에이전트가 고친다. 테스트까지 통과한 것만 PR로 올라온다. 버전만 올려 주는 업데이트 봇과 달리 깨진 코드를 고치는 데까지 간다.
 
 자동화도 Claude 구독 한도를 같이 쓴다. 밤새 많이 돌리면 다음 날 쓸 몫이 줄어서 작업마다 도는 횟수와 시각을 나눠 두었다.
 
