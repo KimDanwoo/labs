@@ -20,7 +20,7 @@ export function useTrackUrl(tracks: readonly Track[], initialTrackId?: number, i
   // 첫 렌더에서 원자를 채워야 0번 곡·현재 재생 화면을 먼저 보여줬다가 덮어쓰는 깜빡임이 없다.
   useHydrateAtoms([
     [currentIndexAtom, found > 0 ? found : 0],
-    [playerScreenAtom, initialScreen ?? PLAYER_SCREEN.nowPlaying],
+    [playerScreenAtom, initialScreen ?? (initialTrackId ? PLAYER_SCREEN.nowPlaying : PLAYER_SCREEN.archive)],
   ]);
 
   const index = useAtomValue(currentIndexAtom);
@@ -31,6 +31,7 @@ export function useTrackUrl(tracks: readonly Track[], initialTrackId?: number, i
   useEffect(() => {
     const track = tracks[index];
     if (!track) return;
+    document.title = screen === PLAYER_SCREEN.archive ? 'DANWOO — Sound archive' : `${track.title} — DANWOO`;
     const next = playerPath(track, screen);
     if (window.location.pathname === next) return;
     // state를 null로 덮으면 Next가 그 히스토리 항목을 복원할 근거를 잃는다. 있는 그대로 물려준다.

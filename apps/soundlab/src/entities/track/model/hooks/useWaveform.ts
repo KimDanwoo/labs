@@ -127,7 +127,7 @@ const inFlight = new Map<number, Promise<void>>();
 
 /** 원곡 분석 신호를 먼저 찾고, 없으면 사클 파형으로 떨어진다. */
 async function load(track: Track): Promise<Signals> {
-  const bands = await fetchBands(track.id).catch(() => null);
+  const bands = await fetchBands(track.id, track.durationMs).catch(() => null);
   if (bands) {
     return withDerived(bands.mid, bands.fps, { bass: bands.low, air: bands.high, beats: bands.beats });
   }

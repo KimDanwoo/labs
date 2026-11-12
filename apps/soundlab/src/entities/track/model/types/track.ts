@@ -9,6 +9,10 @@ export type Track = {
   waveformUrl: string;
   durationMs: number;
   genre: string;
+  /** SoundCloud에 작성된 곡 설명. */
+  description?: string;
+  /** 목록에서 사라진 곡도 URL을 보존한다. 과거 생성물은 공개 곡으로 취급한다. */
+  isAvailable?: boolean;
 };
 
 export type ArtworkSize = 't200x200' | 't300x300' | 't500x500';
