@@ -1,10 +1,10 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type JSX } from 'react';
 import { MUSIC_STATUS, musicTime, musicWidgetSrc } from '../../lib/music/soundcloud';
 import { useMusicPlayer } from '../../model/hooks/music/useMusicPlayer';
 
-type Props = { source: string; initialVolume: number; onRetry: () => void; profile: string };
+type Props = { source: string; initialVolume: number; profile: string };
 
-export function MusicPlayer({ source, initialVolume, onRetry, profile }: Props) {
+export function MusicPlayer({ source, initialVolume, profile }: Props): JSX.Element {
   const { iframe: iframeRef, ...player } = useMusicPlayer(source, initialVolume);
   const [isExpanded, setIsExpanded] = useState(false);
   const toggleButton = useRef<HTMLButtonElement>(null);
@@ -68,7 +68,7 @@ export function MusicPlayer({ source, initialVolume, onRetry, profile }: Props) 
         />
         {player.status === MUSIC_STATUS.error && (
           <p className="music-error" role="status">
-            노래를 불러오지 못했어요. <button onClick={onRetry}>다시 불러오기</button>
+            노래를 불러오지 못했어요. <button onClick={player.retry}>다시 불러오기</button>
           </p>
         )}
         <ol className="music-list">
@@ -90,6 +90,7 @@ export function MusicPlayer({ source, initialVolume, onRetry, profile }: Props) 
       </div>
       {/* The SoundCloud widget is the playback engine; it stays mounted but out of sight. */}
       <iframe
+        key={player.attempt}
         ref={iframeRef}
         className="music-engine"
         title="DANWOO SoundCloud 플레이어"
