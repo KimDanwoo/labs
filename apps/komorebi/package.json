@@ -8,9 +8,11 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test \"src/**/__tests__/*.test.ts\"",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:together": "NEXT_PUBLIC_REALTIME_URL=ws://127.0.0.1:8787 next build && playwright test --config playwright.together.config.ts"
   },
   "dependencies": {
+    "@komorebi/realtime": "workspace:*",
     "@tokens/css": "workspace:*",
     "next": "catalog:",
     "react": "catalog:",

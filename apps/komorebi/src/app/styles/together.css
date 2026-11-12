@@ -1,0 +1,68 @@
+.together-dialog {
+  width: min(29rem, calc(100% - 2rem));
+  margin: auto;
+}
+.together-dialog p {
+  line-height: 1.8;
+}
+.together-form {
+  display: grid;
+  gap: 0.75rem;
+}
+.together-dialog input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  font: inherit;
+  color: rgb(var(--ink));
+  background: rgb(var(--cream));
+}
+.together-peers {
+  list-style: none;
+  padding: 0;
+  margin-block: 1rem;
+}
+.together-peers li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.5rem;
+}
+.together-peers span,
+.together-note,
+.invitation-label {
+  font-size: 0.8rem;
+}
+.invitation-label {
+  display: block;
+  margin-top: 1rem;
+}
+.invitation-label input {
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
+}
+.together-leave {
+  background: transparent;
+  text-decoration: underline;
+  padding: 0.5rem;
+}
+.together-tool {
+  position: relative;
+}
+.party-count {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: rgb(var(--forest));
+  color: rgb(var(--cream));
+  border-radius: 1rem;
+  min-width: 1rem;
+  font-size: 0.65rem;
+}
+@media (max-width: 560px) {
+  .together-dialog {
+    padding: 1rem;
+  }
+}

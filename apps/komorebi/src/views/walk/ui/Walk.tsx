@@ -4,12 +4,15 @@ import { useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { COMPANION_PANEL, type CompanionPanelKind } from '../lib/companions';
 import { diaryMemory, liveMemory } from '../lib/memory';
+import type { WalkEngine } from '../lib/scene';
 import { DIALOG, TIME_ORDER, WEATHER, type Dialog, type TimeOfDay } from '../model/constants/walk';
 import { useAmbience, useAmbienceScene } from '../model/hooks/useAmbience';
 import { useCollection } from '../model/hooks/useCollection';
+import { useInvitation } from '../model/hooks/useInvitation';
 import { useIsFirstVisit } from '../model/hooks/useIsFirstVisit';
 import { useShortcuts } from '../model/hooks/useShortcuts';
 import { useToast } from '../model/hooks/useToast';
+import { useTogether } from '../model/hooks/useTogether';
 import { useVillageDay } from '../model/hooks/useVillageDay';
 import { useWalkEngine } from '../model/hooks/useWalkEngine';
 import { SCHOOL_REGION, SCHOOLMATES, schoolRegion, type SchoolmateId } from '../model/schoolmates';
@@ -41,6 +44,7 @@ import { MemoryDialog } from './MemoryDialog';
 import { MobileControls } from './MobileControls';
 import { SchoolmateDialog } from './SchoolmateDialog';
 import { SleepTransition } from './SleepTransition';
+import { TogetherDialog } from './TogetherDialog';
 import { ToolBar } from './ToolBar';
 import { WardrobeDialog } from './WardrobeDialog';
 
@@ -56,8 +60,12 @@ type FriendActivity =
 
 export function Walk({ children }: { children?: ReactNode }) {
   const landscapeRef = useRef<HTMLDivElement>(null);
+  const engine = useRef<WalkEngine | null>(null);
   const [isSprinting, setIsSprinting] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(DIALOG.none);
+  const invitedRoom = useInvitation();
+  const [dismissedInvitation, setDismissedInvitation] = useState<string | null>(null);
+  const isTogetherOpen = dialog === DIALOG.together || (invitedRoom !== null && dismissedInvitation !== invitedRoom);
   const [memory, setMemory] = useState<Memory | null>(null);
   const [hasGuided, setHasGuided] = useState(false);
   const [isSleeping, setIsSleeping] = useState(false);
@@ -67,25 +75,31 @@ export function Walk({ children }: { children?: ReactNode }) {
   const [isFishing, setIsFishing] = useState(false);
   const [friendActivity, setFriendActivity] = useState<FriendActivity>({ kind: FRIEND_ACTIVITY.none });
   const isWithFriend = friendActivity.kind !== FRIEND_ACTIVITY.none;
-  const isPaused = dialog !== DIALOG.none || isSleeping || isFishing || isWithCompanion || isWithFriend;
+  const isPaused =
+    dialog !== DIALOG.none || isTogetherOpen || isSleeping || isFishing || isWithCompanion || isWithFriend;
   const today = useVillageDay(isPaused);
-  const timeOfDay = today.time;
-  const weather = today.weather;
+  const together = useTogether({ engine, invitedRoom, climate: { time: today.time, weather: today.weather } });
+  const timeOfDay = together.climate?.time ?? today.time;
+  const weather = together.climate?.weather ?? today.weather;
   const isRaining = weather === WEATHER.rain;
   const toast = useToast();
   const collection = useCollection();
   const isFirstVisit = useIsFirstVisit();
   const ambience = useAmbience(() => toast.notify('이 브라우저에서는 소리를 재생할 수 없어요.'));
-  const { engine, isReady, error, status, hasWalked } = useWalkEngine(landscapeRef, {
-    appearance,
-    timeOfDay,
-    weather,
-    isSprinting,
-    isPaused,
-    onNotice: toast.notify,
-    onStep: ambience.step,
-    onSleep: () => setIsSleeping(true),
-  });
+  const { isReady, error, status, hasWalked } = useWalkEngine(
+    landscapeRef,
+    {
+      appearance,
+      timeOfDay,
+      weather,
+      isSprinting,
+      isPaused,
+      onNotice: toast.notify,
+      onStep: ambience.step,
+      onSleep: () => setIsSleeping(true),
+    },
+    engine,
+  );
   useAmbienceScene(ambience.setScene, { region: status.region, time: timeOfDay, weather });
   const hasStarted = hasWalked || hasGuided;
   const nearbyFriend = SCHOOLMATES.find((friend) => friend.id === status.schoolmateId);
@@ -167,6 +181,7 @@ export function Walk({ children }: { children?: ReactNode }) {
     return collection.pages[timeOfDay].includes(landmark.id) ? landmark.action.label : FIRST_LOOK[timeOfDay];
   }
   function closeDialog(which: Dialog) {
+    if (which === DIALOG.together) setDismissedInvitation(invitedRoom);
     // Commit now: window-level shortcuts read this state and must not see a dialog the browser already closed.
     flushSync(() => setDialog((current) => (current === which ? DIALOG.none : current)));
     landscapeRef.current?.querySelector('canvas')?.focus({ preventScroll: true });
@@ -206,6 +221,8 @@ export function Walk({ children }: { children?: ReactNode }) {
         <span>—</span> {WORLDS[status.region].name} <span>—</span>
       </div>
       <ToolBar
+        partySize={together.peers.length}
+        onOpenTogether={() => setDialog(DIALOG.together)}
         timeOfDay={timeOfDay}
         isRaining={isRaining}
         isSoundOn={ambience.isOn}
@@ -337,6 +354,12 @@ export function Walk({ children }: { children?: ReactNode }) {
         onClose={() => closeDialog(DIALOG.memory)}
       />
       <ChalkboardDialog isOpen={dialog === DIALOG.chalkboard} onClose={() => closeDialog(DIALOG.chalkboard)} />
+      <TogetherDialog
+        isOpen={isTogetherOpen}
+        isReady={isReady}
+        together={together}
+        onClose={() => closeDialog(DIALOG.together)}
+      />
       <WardrobeDialog
         isOpen={dialog === DIALOG.wardrobe}
         appearance={appearance}

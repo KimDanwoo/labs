@@ -5,6 +5,7 @@ const PORT = 3111;
 /** Runs against the static export; build first with `pnpm build`. */
 export default defineConfig({
   testDir: 'e2e',
+  testIgnore: 'together.spec.ts',
   // Several tests walk the child across a whole painting before they assert anything.
   timeout: 60_000,
   // Parallel WebGL pages starve each other in headless Chrome and never finish loading.

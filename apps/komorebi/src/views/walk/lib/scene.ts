@@ -1,3 +1,4 @@
+import type { Peer, Walker } from '@komorebi/realtime';
 import * as THREE from 'three';
 import { BALL_PHASE, BALL_ROLE, BALL_TIMING, type BallGame } from '../model/ballGame';
 import { TIME, WEATHER, type TimeOfDay, type Weather } from '../model/constants/walk';
@@ -19,6 +20,7 @@ import {
   HOME_BED,
   SPAWN,
   WORLDS,
+  canWalk,
   closestLandmark,
   createSlideMotion,
   findRoute,
@@ -62,6 +64,7 @@ import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFram
 import { createRoamers } from './roamers';
 import { createSceneLife } from './sceneLife';
 import { createSchoolmates } from './schoolmatesScene';
+import { createTogetherScene } from './togetherScene';
 import { createWaterMaps } from './water';
 import { createWaves } from './waves';
 
@@ -123,6 +126,9 @@ export type SceneOptions = {
   signal?: AbortSignal;
 };
 export type WalkEngine = {
+  getWalker: () => Walker;
+  setPeers: (peers: readonly Peer[]) => void;
+  arriveTogether: (peers: readonly Peer[]) => Promise<void>;
   dispose: () => void;
   /** While paused (a dialog is open) the child stands still and new movement input is ignored. */
   setPaused: (value: boolean) => void;
@@ -324,6 +330,8 @@ export async function createScene(
   const life = createSceneLife(scene, loader);
   const roamers = createRoamers(scene, loader);
   const schoolmates = createSchoolmates(scene, loader, onNotice);
+  const together = createTogetherScene({ scene, loader, onNotice });
+  let arrivalRequest = 0;
   const ball = createBallScene(scene);
   let greetingId: SchoolmateId | null = null;
   let ballFrame: BallGame | null = null;
@@ -790,6 +798,7 @@ export async function createScene(
       isResting ? null : { ...position, order: CHILD_ORDER },
       roamers.standing,
       ...schoolmates.standing,
+      ...together.standing,
     ].filter((walker) => walker !== null);
     foregrounds.forEach((layer) => {
       const order = foregroundOrder(layer, walkers, region);
@@ -866,6 +875,8 @@ export async function createScene(
     placeMarkers();
     const isAtmosphereChanging = easeAtmosphere(dt);
     paintBackground(dt, size);
+    together.update({ region, dt, darkness, isStill: reducedMotion, player: position });
+    container.dataset.remoteActors = String(together.standing.length);
     animateLife(paused && !fishingFrame ? 0 : dt, rest !== null);
     ball.update({
       game: ballFrame,
@@ -898,6 +909,56 @@ export async function createScene(
   animation = requestAnimationFrame(tick);
   plates.focus(nearbyRegions(START_REGION));
   return {
+    getWalker() {
+      return {
+        region,
+        x: position.x,
+        z: position.z,
+        heading,
+        isWalking: !paused && moveSpeed > 0.05,
+        isRunning: !paused && keys.has('shift'),
+        jumpHeight: jump.height,
+        outfit: currentAppearance.outfit,
+      };
+    },
+    setPeers(peers) {
+      if (peers.length === 0) arrivalRequest += 1;
+      together.setPeers(peers);
+      container.dataset.peers = JSON.stringify(peers);
+      wake();
+    },
+    async arriveTogether(peers) {
+      const host = peers[0]?.walker;
+      if (!host || !canWalk(host.x, host.z, host.region)) return;
+      const request = ++arrivalRequest;
+      const offsets = [7, -7, 14, -14];
+      const candidates = offsets.flatMap((offset) => [
+        { x: host.x + offset, z: host.z },
+        { x: host.x, z: host.z + offset },
+      ]);
+      const spawn =
+        candidates.find(
+          (point) =>
+            canWalk(point.x, point.z, host.region) &&
+            peers.every(
+              (peer) =>
+                peer.walker.region !== host.region || Math.hypot(peer.walker.x - point.x, peer.walker.z - point.z) >= 6,
+            ),
+        ) ?? host;
+      plates.focus([...new Set([region, ...nearbyRegions(host.region)])]);
+      try {
+        const plate = await plates.ensure(host.region);
+        if (disposed || request !== arrivalRequest) return;
+        destination = null;
+        keys.clear();
+        moveSpeed = 0;
+        switchRegion(host.region, spawn, plate);
+        plates.focus(nearbyRegions(host.region));
+        wake();
+      } catch {
+        if (!disposed) onNotice('친구가 있는 풍경을 불러오지 못했어요. 지도로 찾아가 주세요.');
+      }
+    },
     async setAppearance(next) {
       const request = ++appearanceRequest;
       const url = characterLayers(next).outfit;
@@ -1100,6 +1161,7 @@ export async function createScene(
       life.dispose();
       roamers.dispose();
       schoolmates.dispose();
+      together.dispose();
       ball.dispose();
       waves.dispose();
       boats.dispose();

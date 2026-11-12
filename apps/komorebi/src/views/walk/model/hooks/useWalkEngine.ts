@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
+import { useEffect, useEffectEvent, useState, type RefObject } from 'react';
 import { createScene, type SceneOptions, type SceneStatus, type WalkEngine } from '../../lib/scene';
 import type { TimeOfDay, Weather } from '../constants/walk';
 import type { Appearance } from '../world/appearance';
@@ -26,8 +26,11 @@ const INITIAL_STATUS: SceneStatus = {
 const LOAD_ERROR = '풍경을 불러오지 못했어요. 페이지를 새로고침하거나 브라우저의 하드웨어 가속 설정을 확인해 주세요.';
 
 /** Owns the Three.js engine lifecycle and keeps it in step with the HUD settings. */
-export function useWalkEngine(containerRef: RefObject<HTMLDivElement | null>, settings: EngineSettings) {
-  const engine = useRef<WalkEngine | null>(null);
+export function useWalkEngine(
+  containerRef: RefObject<HTMLDivElement | null>,
+  settings: EngineSettings,
+  engine: RefObject<WalkEngine | null>,
+) {
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState('');
   const [status, setStatus] = useState<SceneStatus>(INITIAL_STATUS);
@@ -78,18 +81,18 @@ export function useWalkEngine(containerRef: RefObject<HTMLDivElement | null>, se
       engine.current?.dispose();
       engine.current = null;
     };
-  }, [containerRef]);
+  }, [containerRef, engine]);
   useEffect(() => {
     engine.current?.setTimeOfDay(settings.timeOfDay);
-  }, [settings.timeOfDay]);
+  }, [settings.timeOfDay, engine]);
   useEffect(() => {
     engine.current?.setWeather(settings.weather);
-  }, [settings.weather]);
+  }, [settings.weather, engine]);
   useEffect(() => {
     engine.current?.setInput('shift', settings.isSprinting);
-  }, [settings.isSprinting]);
+  }, [settings.isSprinting, engine]);
   useEffect(() => {
     engine.current?.setPaused(settings.isPaused);
-  }, [settings.isPaused]);
+  }, [settings.isPaused, engine]);
   return { engine, isReady, error, status, hasWalked };
 }
