@@ -1,0 +1,176 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "rig": {
+    "width": 1536,
+    "height": 1024,
+    "columns": 8,
+    "rows": 4,
+    "frameWidth": 192,
+    "frameHeight": 256,
+    "footAnchor": {
+      "x": 96,
+      "y": 250
+    },
+    "directions": ["front", "right", "back", "left"],
+    "poses": ["idle", "walk-1", "walk-2", "walk-3", "walk-4", "walk-5", "walk-6", "jump"],
+    "bodyPoseOffsets": {
+      "straw-hat": {
+        "0": 3,
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 3,
+        "5": 3,
+        "6": 4,
+        "7": 3,
+        "8": 4,
+        "9": 4,
+        "10": 4,
+        "11": 5,
+        "12": 4,
+        "13": 3,
+        "14": 5,
+        "15": 8,
+        "16": 4,
+        "17": 3,
+        "18": 3,
+        "19": 3,
+        "20": 4,
+        "21": 4,
+        "22": 4,
+        "23": 4,
+        "24": 4,
+        "25": 6,
+        "26": 4,
+        "27": 6,
+        "28": 5,
+        "29": 6,
+        "30": 6,
+        "31": 7
+      },
+      "boy": {
+        "0": 2,
+        "1": 1,
+        "2": 2,
+        "3": 1,
+        "4": 2,
+        "5": 2,
+        "6": 2,
+        "7": 2,
+        "8": 3,
+        "9": 3,
+        "10": 3,
+        "11": 3,
+        "12": 2,
+        "13": 3,
+        "14": 3,
+        "15": 13,
+        "16": 28,
+        "17": 28,
+        "18": 28,
+        "19": 25,
+        "20": 28,
+        "21": 28,
+        "22": 25,
+        "23": 38,
+        "24": 6,
+        "25": 7,
+        "26": 6,
+        "27": 6,
+        "28": 6,
+        "29": 6,
+        "30": 6,
+        "31": 11
+      },
+      "girl": {
+        "0": 3,
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 4,
+        "9": 4,
+        "10": 4,
+        "11": 4,
+        "12": 4,
+        "13": 4,
+        "14": 4,
+        "15": 7,
+        "16": 3,
+        "17": 3,
+        "18": 3,
+        "19": 3,
+        "20": 3,
+        "21": 3,
+        "22": 4,
+        "23": 4,
+        "24": 6,
+        "25": 5,
+        "26": 6,
+        "27": 5,
+        "28": 6,
+        "29": 6,
+        "30": 5,
+        "31": 5
+      }
+    }
+  },
+  "encoding": "Lossless WebP converted with cwebp; source references remain unchanged.",
+  "assets": [
+    {
+      "file": "public/art/child-base-straw-hat.webp",
+      "reference": "public/art/child-straw-hat-summer.webp",
+      "preparation": "Replace the original T-shirt and shorts with an ivory undershirt and ivory shorts without moving any pose.",
+      "finalPrompt": "Asset edit: produce a 2D game paper-doll BODY PARTS foreground atlas. From this exact 1536x1024 8x4 atlas, make ONLY the ivory undershirts and ivory shorts transparent. Leave disconnected head/hat/hair/neck, exposed arms/hands, exposed lower legs/socks/yellow shoes, and backpack exactly in their original pixels. The torso and hip garment regions must become empty alpha holes for a separate costume layer behind them. DO NOT reveal or draw any underlying torso, chest, underwear, hips or anatomy: completely transparent holes only, like game animation cutout pieces. Preserve exact existing pixel positions, cell spacing, silhouette of all retained parts, pose and identities. Do not move, reshape or recenter any fragment. No clothing fabric remains, no shaded background, no nude anatomy, no checkerboard, text, shadow or labels. Real alpha transparency."
+    },
+    {
+      "file": "public/art/child-base-boy.webp",
+      "reference": "public/art/child-boy-summer.webp",
+      "preparation": "Replace the original T-shirt and shorts with an ivory undershirt and ivory shorts without moving any pose.",
+      "finalPrompt": "Asset edit: produce a 2D game paper-doll BODY PARTS foreground atlas. From this exact 1536x1024 8x4 atlas, make ONLY the ivory undershirts and ivory shorts transparent. Leave disconnected boy head/hair/neck, exposed arms/hands, exposed lower legs/socks/yellow shoes, and backpack exactly in their original pixels. The torso and hip garment regions must become empty alpha holes for a separate costume layer behind them. DO NOT reveal or draw any underlying torso, chest, underwear, hips or anatomy: completely transparent holes only, like game animation cutout pieces. Preserve exact existing pixel positions, cell spacing, silhouette of all retained parts, pose and identity. Do not move, reshape or recenter any fragment. No clothing fabric remains, no shaded background, no nude anatomy, no checkerboard, text, shadow or labels. Real alpha transparency."
+    },
+    {
+      "file": "public/art/child-base-girl.webp",
+      "reference": "public/art/child-girl-summer.webp",
+      "preparation": "Extract directly from the original colored reference to remove semitransparent fabric and skin accidentally retained in the costume area.",
+      "finalPrompt": "Use case: background-extraction. Produce a clean transparent 2D paper-doll BODY PARTS atlas from this exact original game sprite sheet, canvas1536x1024, 8columns x4rows, cells192x256. REMOVE EVERY PIXEL of the yellow T-shirts and coral-red shorts, including fabric outlines, seams, sleeve cloth and semitransparent fabric traces. The garment regions become completely empty alpha holes for independent clothing behind the parts. Keep ONLY the original head/face/neck, original long hair exactly where it already existed, backpack/straps, exposed forearms/hands, exposed lower legs, white socks and yellow shoes. Do NOT extend skin upward into the shorts region, do NOT retain red/ivory shorts as thigh skin, and do NOT fill garment holes with brown hair or shading. Preserve retained fragments at their exact original coordinates, scale and poses, so overlays match 32 poses. Do not expose or draw any torso, chest, hips, underwear or anatomy in garment holes: empty transparency only. Do not recenter, add padding, resize, alter face/hair/body-part shapes or make new poses. No background gradient, no checkerboard, text, labels or shadow. Fully opaque retained parts and fully transparent empty space; no semitransparent old clothing remnants."
+    },
+    {
+      "file": "public/art/outfit-summer.webp",
+      "reference": "public/art/child-straw-hat-summer.webp",
+      "finalPrompt": "Use case: background-extraction. Extract ONLY the costume garment pixels from the supplied 1536x1024 game sprite atlas: yellow leaf-pattern short-sleeved T-shirts and coral shorts in all 32 poses. The output is a TRANSPARENT CLOTHING-ONLY OVERLAY atlas, same exact 1536x1024 dimensions, 8 columns and 4 rows. Retain all clothing at its exact original pixel coordinates, same silhouette, outlines, folds, colors, scaling and spacing. Remove the entire head, hair, straw hat, face, neck skin, hands, arms outside sleeves, legs, socks, yellow shoes and backpack to real alpha transparency. At places where a hand/arm/backpack/hair obscures the shirt, preserve the original cutout by keeping those areas transparent; do not fill behind them. No body, no skin, no mannequin, no character, no hat, no backpack, no shoes, no text or labels, no checkerboard, no shadows. Do not shift or recenter the garment cutouts. This must overlay the exact original unchanged poses without alignment drift. Row order front,right,back,left; columns idle,6 walk,jump."
+    },
+    {
+      "file": "public/art/outfit-overalls.webp",
+      "reference": "public/art/child-straw-hat-overalls.webp",
+      "preparation": "Extract the white undershirt and green overalls in the original grid, then remove residual hands and backpacks.",
+      "finalPrompt": "Asset edit: clothing-only atlas cleanup, exact 1536x1024 8x4 grid. Keep all white shirt sleeves and green short overalls with their little daisy and gold clasps EXACTLY unchanged, at identical pixel coordinates and size. Remove ALL backpacks, backpack straps, hands, gloves, forearms, skin and any shoes to true alpha transparency. In back-facing row 3 where backpacks are currently drawn, replace that backpack shape with the green overalls back panel (do not add a backpack). No heads, hair, bodies, hands, gloves, skin or backpacks may remain anywhere. Garments only; empty transparency everywhere else. Do not change any pose, cell layout, position, size, outlined art style or sleeve cloth. No checkerboard, text, labels or scenery. This is a reusable outfit that goes behind separate body/hair/hand/backpack foreground fragments."
+    },
+    {
+      "file": "public/art/outfit-pe.webp",
+      "reference": "public/art/outfit-summer.webp",
+      "finalPrompt": "Use case: precise-object-edit. Recolor the existing clothing-only 1536x1024 8x4 costume atlas into a school PE uniform: ivory white short-sleeved shirt, navy collar and sleeve cuffs, navy shorts with two ivory side stripes. Preserve all 32 poses, pixel coordinates, silhouettes, cutout holes, outlines and shading. Remove leaf emblem. No heads, skin, hair, shoes, backpacks, text, shadows or background. Real alpha transparency.",
+      "alphaCleanupPrompt": "Use case: background-extraction. Preserve all 32 exact clothing silhouettes and coordinates. Remove grey gradient haze and scattered pixels outside garment outlines to full alpha transparency. Garment fabric and outlines opaque. No new parts or changes to colors, poses, scale or grid."
+    },
+    {
+      "file": "public/art/child-base-boy-v2.webp",
+      "reference": "public/art/child-base-boy.webp",
+      "finalPrompt": "Use case: precise-object-edit. Correct only exposed lower legs, white socks and yellow shoes in ROW 2 (right-facing) and ROW 4 (left-facing) of this exact transparent 1536x1024, 8 columns x4 rows game body-parts atlas. Cells are 192x256. Keep every head, face, hair, hat if any, backpack and arm exactly at the original pixel positions and dimensions. Keep rows 1 and 3 entirely unchanged. The empty shirt/shorts cutouts must remain fully transparent: no torso, anatomy, underwear or clothing added. Crucial correction: a SIDE VIEW must have PROFILE legs and PROFILE yellow shoes pointing in the same direction as the face, with the far leg partly occluded. Never draw two front-facing parallel legs or two front-facing shoes under a side-facing head. In each side-facing row: column0 is relaxed idle with the far foot mostly hidden behind the near foot; columns1..6 form ONE correctly ordered seamless WALK cycle: near-foot forward contact, near-foot planted/far-foot passing, near-foot trailing/far-foot forward contact, far-foot planted/near-foot passing, opposite contact, return passing. Both soles must NOT be airborne together while walking. Maintain short child proportions; attach the lower-leg fragments at the original garment-hem locations around local y214 and keep the planted sole at local y250 in every side-view cell. Column7 keeps the original jump but corrects shoe profile direction. Do not move, enlarge, recenter or warp any whole character or change the exact grid. Fully opaque retained parts, fully transparent empty space; no haze, shadows, background, labels, extra parts, clothes or text."
+    },
+    {
+      "file": "public/art/child-base-girl-v2.webp",
+      "reference": "public/art/child-base-girl.webp",
+      "finalPrompt": "Use case: precise-object-edit. Correct only exposed lower legs, white socks and yellow shoes in ROW 2 (right-facing) and ROW 4 (left-facing) of this exact transparent 1536x1024, 8 columns x4 rows game body-parts atlas. Cells are 192x256. Keep every head, face, hair, hat if any, backpack and arm exactly at the original pixel positions and dimensions. Keep rows 1 and 3 entirely unchanged. The empty shirt/shorts cutouts must remain fully transparent: no torso, anatomy, underwear or clothing added. Crucial correction: a SIDE VIEW must have PROFILE legs and PROFILE yellow shoes pointing in the same direction as the face, with the far leg partly occluded. Never draw two front-facing parallel legs or two front-facing shoes under a side-facing head. In each side-facing row: column0 is relaxed idle with the far foot mostly hidden behind the near foot; columns1..6 form ONE correctly ordered seamless WALK cycle: near-foot forward contact, near-foot planted/far-foot passing, near-foot trailing/far-foot forward contact, far-foot planted/near-foot passing, opposite contact, return passing. Both soles must NOT be airborne together while walking. Maintain short child proportions; attach the lower-leg fragments at the original garment-hem locations around local y214 and keep the planted sole at local y250 in every side-view cell. Column7 keeps the original jump but corrects shoe profile direction. Do not move, enlarge, recenter or warp any whole character or change the exact grid. Fully opaque retained parts, fully transparent empty space; no haze, shadows, background, labels, extra parts, clothes or text."
+    },
+    {
+      "file": "public/art/child-base-straw-hat-v2.webp",
+      "reference": "public/art/child-base-straw-hat.webp",
+      "finalPrompt": "Use case: precise-object-edit. Correct only exposed lower legs, white socks and yellow shoes in ROW 2 (right-facing) and ROW 4 (left-facing) of this exact transparent 1536x1024, 8 columns x4 rows game body-parts atlas. Cells are 192x256. Keep every head, face, hair, hat if any, backpack and arm exactly at the original pixel positions and dimensions. Keep rows 1 and 3 entirely unchanged. The empty shirt/shorts cutouts must remain fully transparent: no torso, anatomy, underwear or clothing added. Crucial correction: a SIDE VIEW must have PROFILE legs and PROFILE yellow shoes pointing in the same direction as the face, with the far leg partly occluded. Never draw two front-facing parallel legs or two front-facing shoes under a side-facing head. In each side-facing row: column0 is relaxed idle with the far foot mostly hidden behind the near foot; columns1..6 form ONE correctly ordered seamless WALK cycle: near-foot forward contact, near-foot planted/far-foot passing, near-foot trailing/far-foot forward contact, far-foot planted/near-foot passing, opposite contact, return passing. Both soles must NOT be airborne together while walking. Maintain short child proportions; attach the lower-leg fragments at the original garment-hem locations around local y214 and keep the planted sole at local y250 in every side-view cell. Column7 keeps the original jump but corrects shoe profile direction. Do not move, enlarge, recenter or warp any whole character or change the exact grid. Fully opaque retained parts, fully transparent empty space; no haze, shadows, background, labels, extra parts, clothes or text.",
+      "followupPrompt": "Use case: precise-object-edit. Fix ONLY the idle lower legs and yellow shoes in TWO cells of this exact 1536x1024 transparent body-parts atlas: row2 column0 (local rectangle x60..135,y214..252 within its 192x256 cell), and row4 column0 (same local rectangle). These are SIDE PROFILES, right and left respectively. Replace the two front-facing parallel shin-and-shoe shapes with a true side silhouette: near shin in front of far shin, far shin almost entirely occluded; one long profile shoe points toward the face (right in row2, left in row4) and only a small heel/sliver of the far shoe is visible. Right shoe toe protrudes at least 8px farther RIGHT than its ankle; left shoe toe protrudes at least 8px farther LEFT. Shoe pair width under 44px, not two round front shoes side by side. Plant the sole at local y250. All other 30 cells and every head, arm, hair, hat and backpack must remain exactly unchanged. Maintain transparent shirt/shorts holes and all empty background as alpha0. Do not add fabric, torso, anatomy, labels, shadows, haze or background. Fully opaque retained parts, transparent background. Exact 8x4 grid and cell alignment, no whole-image re-render or recentering."
+    }
+  ]
+}

@@ -102,7 +102,7 @@ test('an open dialog pauses a guided walk, which resumes when it closes', async 
 });
 
 test('the first view does not wait for the other paintings', async ({ page }) => {
-  await page.route(/\/art\/(?!village|child)/, () => {});
+  await page.route(/\/art\/(?!village|child|outfit)/, () => {});
   await openWalk(page);
   await expect(landscape(page)).toHaveAttribute('data-region', 'village');
 });
@@ -396,14 +396,24 @@ test('a rainy home stays sheltered and the mobile sleeper wakes with movement re
 test('the straw-hat child changes outfits and keeps the choice after sleep and reload', async ({ page }) => {
   test.setTimeout(90_000);
   const errors: string[] = [];
+  const bodyRequests: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  page.on('request', (request) => {
+    if (request.url().includes('/art/child-base-')) bodyRequests.push(request.url());
+  });
   await openWalk(page);
   await expect(landscape(page)).toHaveAttribute('data-appearance', 'straw-hat-summer');
   await page.getByRole('button', { name: '산책 옷 고르기' }).click();
   const wardrobe = page.getByRole('dialog', { name: '나의 작은 옷장' });
+  const bodiesBeforeChanging = bodyRequests.length;
   await expect(wardrobe.getByRole('group', { name: '머리 스타일' })).toHaveCount(0);
   await wardrobe.getByRole('button', { name: /풀잎 멜빵옷/ }).click();
   await expect(landscape(page)).toHaveAttribute('data-appearance', 'straw-hat-overalls');
+  expect(bodyRequests.length).toBe(bodiesBeforeChanging);
+  await expect(wardrobe.locator('.wardrobe-mirror .character-preview')).toHaveCSS(
+    'background-image',
+    /child-base-straw-hat-v2\.webp.*outfit-overalls\.webp/,
+  );
   await page.screenshot({ path: '/tmp/komorebi-wardrobe.png' });
   await page.keyboard.press('Escape');
   await expect(wardrobe).toBeHidden();
@@ -426,14 +436,14 @@ test('the straw-hat child changes outfits and keeps the choice after sleep and r
 });
 
 test('a failed outfit load preserves the current clothes and can be retried', async ({ page }) => {
-  await page.route('**/art/child-straw-hat-overalls.webp', (route) => route.abort());
+  await page.route('**/art/outfit-overalls.webp', (route) => route.abort());
   await openWalk(page);
   await page.getByRole('button', { name: '산책 옷 고르기' }).click();
   const wardrobe = page.getByRole('dialog', { name: '나의 작은 옷장' });
   await wardrobe.getByRole('button', { name: /풀잎 멜빵옷/ }).click();
   await expect(wardrobe.getByRole('status')).toContainText('다시 골라');
   await expect(landscape(page)).toHaveAttribute('data-appearance', 'straw-hat-summer');
-  await page.unroute('**/art/child-straw-hat-overalls.webp');
+  await page.unroute('**/art/outfit-overalls.webp');
   await wardrobe.getByRole('button', { name: /풀잎 멜빵옷/ }).click();
   await expect(landscape(page)).toHaveAttribute('data-appearance', 'straw-hat-overalls');
 });

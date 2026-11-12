@@ -12,6 +12,7 @@ import { useShortcuts } from '../model/hooks/useShortcuts';
 import { useToast } from '../model/hooks/useToast';
 import { useVillageDay } from '../model/hooks/useVillageDay';
 import { useWalkEngine } from '../model/hooks/useWalkEngine';
+import { SCHOOL_REGION, SCHOOLMATES, schoolRegion, type SchoolmateId } from '../model/schoolmates';
 import { appearanceStore } from '../model/store/appearance';
 import { pageStores } from '../model/store/discoveries';
 import type { Memory } from '../model/types/memory';
@@ -27,6 +28,7 @@ import {
   WORLDS,
   type Landmark,
 } from '../model/world/world';
+import { BallGameHud } from './BallGameHud';
 import { BottomBar } from './BottomBar';
 import { ChalkboardDialog } from './ChalkboardDialog';
 import { CompanionPanel } from './CompanionPanel';
@@ -37,6 +39,7 @@ import { LoadingOverlay } from './LoadingOverlay';
 import { MapDialog } from './MapDialog';
 import { MemoryDialog } from './MemoryDialog';
 import { MobileControls } from './MobileControls';
+import { SchoolmateDialog } from './SchoolmateDialog';
 import { SleepTransition } from './SleepTransition';
 import { ToolBar } from './ToolBar';
 import { WardrobeDialog } from './WardrobeDialog';
@@ -46,6 +49,10 @@ const FIRST_LOOK = {
   evening: '노을빛으로 머물러 보기',
   night: '밤의 풍경 바라보기',
 } satisfies Record<TimeOfDay, string>;
+const FRIEND_ACTIVITY = { none: 'none', greeting: 'greeting', ball: 'ball' } as const;
+type FriendActivity =
+  | { kind: typeof FRIEND_ACTIVITY.none }
+  | { kind: typeof FRIEND_ACTIVITY.greeting | typeof FRIEND_ACTIVITY.ball; id: SchoolmateId };
 
 export function Walk({ children }: { children?: ReactNode }) {
   const landscapeRef = useRef<HTMLDivElement>(null);
@@ -58,7 +65,9 @@ export function Walk({ children }: { children?: ReactNode }) {
   const [companionPanel, setCompanionPanel] = useState<CompanionPanelKind>(COMPANION_PANEL.none);
   const isWithCompanion = companionPanel !== COMPANION_PANEL.none;
   const [isFishing, setIsFishing] = useState(false);
-  const isPaused = dialog !== DIALOG.none || isSleeping || isFishing || isWithCompanion;
+  const [friendActivity, setFriendActivity] = useState<FriendActivity>({ kind: FRIEND_ACTIVITY.none });
+  const isWithFriend = friendActivity.kind !== FRIEND_ACTIVITY.none;
+  const isPaused = dialog !== DIALOG.none || isSleeping || isFishing || isWithCompanion || isWithFriend;
   const today = useVillageDay(isPaused);
   const timeOfDay = today.time;
   const weather = today.weather;
@@ -79,6 +88,16 @@ export function Walk({ children }: { children?: ReactNode }) {
   });
   useAmbienceScene(ambience.setScene, { region: status.region, time: timeOfDay, weather });
   const hasStarted = hasWalked || hasGuided;
+  const nearbyFriend = SCHOOLMATES.find((friend) => friend.id === status.schoolmateId);
+  const activeFriend =
+    friendActivity.kind === FRIEND_ACTIVITY.none ? null : SCHOOLMATES.find((friend) => friend.id === friendActivity.id);
+  const friendRegion = schoolRegion(status.region);
+
+  function closeFriend() {
+    engine.current?.endSchoolmateGreeting();
+    flushSync(() => setFriendActivity({ kind: FRIEND_ACTIVITY.none }));
+    landscapeRef.current?.querySelector('canvas')?.focus({ preventScroll: true });
+  }
 
   const isNearAquarium =
     status.region === 'home' && Math.hypot(status.x - HOME_AQUARIUM.x, status.z - HOME_AQUARIUM.z) < 3;
@@ -116,6 +135,10 @@ export function Walk({ children }: { children?: ReactNode }) {
     }
     if (isNearBoard) {
       setDialog(DIALOG.chalkboard);
+      return;
+    }
+    if (nearbyFriend && engine.current?.greetSchoolmate(nearbyFriend.id)) {
+      setFriendActivity({ kind: FRIEND_ACTIVITY.greeting, id: nearbyFriend.id });
       return;
     }
     const landmark = status.nearby;
@@ -169,7 +192,7 @@ export function Walk({ children }: { children?: ReactNode }) {
 
   return (
     <main
-      className={`walk ${isFishing || isWithCompanion ? 'is-fishing' : ''} is-${timeOfDay} ${isRaining ? 'is-raining' : ''} ${hasStarted ? 'has-started' : ''}`}
+      className={`walk ${isFishing || isWithCompanion || isWithFriend ? 'is-fishing' : ''} is-${timeOfDay} ${isRaining ? 'is-raining' : ''} ${hasStarted ? 'has-started' : ''}`}
     >
       <div className="landscape" ref={landscapeRef} />
       <div className="paper-grain" aria-hidden="true" />
@@ -186,14 +209,14 @@ export function Walk({ children }: { children?: ReactNode }) {
         timeOfDay={timeOfDay}
         isRaining={isRaining}
         isSoundOn={ambience.isOn}
-        isReady={isReady && !isSleeping && !isFishing && !isWithCompanion}
+        isReady={isReady && !isSleeping && !isFishing && !isWithCompanion && !isWithFriend}
         onToggleSound={ambience.toggle}
         onPhoto={takePhoto}
         onOpenMap={() => {
-          if (!isSleeping && !isFishing && !isWithCompanion) setDialog(DIALOG.map);
+          if (!isSleeping && !isFishing && !isWithCompanion && !isWithFriend) setDialog(DIALOG.map);
         }}
         onOpenWardrobe={() => {
-          if (!isSleeping && !isFishing && !isWithCompanion) setDialog(DIALOG.wardrobe);
+          if (!isSleeping && !isFishing && !isWithCompanion && !isWithFriend) setDialog(DIALOG.wardrobe);
         }}
       />
 
@@ -204,7 +227,10 @@ export function Walk({ children }: { children?: ReactNode }) {
       {isNearBoard && !isPaused && (
         <InteractPrompt landmark={CLASSROOM_BOARD} hint="칠판에 낙서하기" onInteract={interact} />
       )}
-      {status.nearby && !isPaused && !isAtPier && !isNearCat && !isNearAquarium && !isNearBoard && (
+      {nearbyFriend && !isNearBoard && !isPaused && (
+        <InteractPrompt landmark={{ name: nearbyFriend.name }} hint="친구에게 인사하기" onInteract={interact} />
+      )}
+      {status.nearby && !nearbyFriend && !isPaused && !isAtPier && !isNearCat && !isNearAquarium && !isNearBoard && (
         <InteractPrompt landmark={status.nearby} hint={promptHint(status.nearby)} onInteract={interact} />
       )}
 
@@ -241,13 +267,31 @@ export function Walk({ children }: { children?: ReactNode }) {
         />
       )}
 
+      {activeFriend && friendRegion && friendActivity.kind === FRIEND_ACTIVITY.greeting && (
+        <SchoolmateDialog
+          name={activeFriend.name}
+          region={friendRegion}
+          time={timeOfDay}
+          canPlay={status.region === SCHOOL_REGION.yard && !isRaining}
+          onPlay={() => setFriendActivity({ kind: FRIEND_ACTIVITY.ball, id: activeFriend.id })}
+          onClose={closeFriend}
+        />
+      )}
+      {activeFriend && friendActivity.kind === FRIEND_ACTIVITY.ball && (
+        <BallGameHud
+          name={activeFriend.name}
+          onFrame={(frame) => engine.current?.setBallGame(frame) ?? false}
+          onClose={closeFriend}
+        />
+      )}
+
       <BottomBar
-        isPaused={isSleeping || isFishing || isWithCompanion}
+        isPaused={isSleeping || isFishing || isWithCompanion || isWithFriend}
         place={status.nearby?.short ?? WORLDS[status.region].name}
         visited={collection.visited}
         shouldShowHint={isFirstVisit && isReady && !hasStarted}
         onOpenJournal={() => {
-          if (!isSleeping && !isFishing && !isWithCompanion) setDialog(DIALOG.journal);
+          if (!isSleeping && !isFishing && !isWithCompanion && !isWithFriend) setDialog(DIALOG.journal);
         }}
       />
       <MobileControls
