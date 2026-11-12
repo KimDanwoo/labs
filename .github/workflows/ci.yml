@@ -8,6 +8,7 @@ on:
       - 'apps/dansoon/contents/**'
       - 'apps/dansoon/data/**'
       - 'apps/soundlab/src/entities/track/model/constants/tracks.ts'
+      - 'apps/soundlab/src/entities/track/model/constants/highlights.ts'
       - 'apps/soundlab/assets/og-title.ttf'
   push:
     branches: [main]

@@ -9,7 +9,13 @@ const SEEK_SEC = 10;
 export function useKeyboard({ toggle, step, seek, seekBy }: Playback) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.metaKey || event.ctrlKey || event.altKey || event.isComposing) return;
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable || target.closest('input, textarea, select, [role=slider], [role=menu]'))
+      )
+        return;
       // 버튼에 포커스가 있으면 Space는 브라우저가 클릭으로 처리한다. 이중 발동을 막는다.
       const onButton = event.target instanceof HTMLButtonElement;
       const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
