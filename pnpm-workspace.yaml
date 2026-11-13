@@ -21,10 +21,21 @@ catalog:
   firebase: ^12.15.0
 
   # 3d (life-simulation 앱)
-  three: 0.185.1
+  three: 0.187.0
   '@react-three/fiber': 9.7.0
   '@react-three/drei': 10.7.8
-  '@types/three': 0.185.4
+  '@types/three': 0.187.0
+
+  # danwoo-island 월드 엔진 — folio-2025 lockfile과 같은 버전으로 고정
+  '@dimforge/rapier3d-compat': 0.19.3
+  gsap: 3.15.1
+  howler: 2.2.4
+  seedrandom: 3.0.5
+  camera-controls: 3.1.2
+  normalize-wheel: 1.0.1
+  tweakpane: 4.0.5
+  '@tweakpane/plugin-essentials': 0.2.1
+  '@tweakpane/plugin-camerakit': 0.3.0
 
   # tooling
   # TS 7은 코드상 통과하지만 typescript-eslint가 아직 미지원이라 보류(2026-08-30 확인).

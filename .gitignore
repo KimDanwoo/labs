@@ -23,6 +23,11 @@ out/
 build
 dist
 
+# Danwoo Island 월드 에셋·허브 콘텐츠 (world:sync로 재생성)
+apps/danwoo-island/public/world/
+apps/danwoo-island/public/.world-*/
+apps/danwoo-island/src/views/drive/lib/engine/data/danwoo.js
+
 # turbo
 .turbo
 
