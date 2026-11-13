@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { rebuildVillageProps } from '../islandVillage.js'
 import { rebuildBowlingSign, rebuildRadioCabinet } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
@@ -12,6 +13,7 @@ export class BowlingArea extends Area
 {
     setObjects()
     {
+        rebuildVillageProps(this.model, this.game.materials)
         rebuildBowlingSign(this.model, this.game.materials, this.game.resources.bowlingNeonTexture)
         rebuildRadioCabinet(this.model, this.game.materials)
         super.setObjects()

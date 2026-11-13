@@ -1,4 +1,5 @@
 import { replaceLandingName } from './landingName.js'
+import { rebuildVillageProps } from '../islandVillage.js'
 import { rebuildKiosk } from '../islandStructures.js'
 import * as THREE from 'three/webgpu'
 import { color, float, Fn, instancedArray, mix, normalWorld, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
@@ -24,6 +25,7 @@ export class LandingArea extends Area
 
     setObjects()
     {
+        rebuildVillageProps(this.model, this.game.materials)
         replaceLandingName(this.model)
         rebuildKiosk(this.model, this.game.materials)
         super.setObjects()

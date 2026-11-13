@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { rebuildVillageProps } from '../islandVillage.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import { Area } from './Area.js'
 import { Fn, texture, uv, vec2, vec3, vec4 } from 'three/tsl'
@@ -7,6 +8,12 @@ import content from '../../../data/danwoo.js'
 
 export class TimeMachineArea extends Area
 {
+    setObjects()
+    {
+        rebuildVillageProps(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     constructor(model)
     {
         super(model)

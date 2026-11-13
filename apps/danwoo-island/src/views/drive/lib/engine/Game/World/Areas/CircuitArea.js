@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { rebuildCircuitObjects } from '../islandVillage.js'
 import { Game } from '../../Game.js'
 import { lerp, segmentCircleIntersection } from '../../utilities/maths.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
@@ -12,6 +13,12 @@ import { timeToRaceString } from '../../utilities/time.js'
 
 export class CircuitArea extends Area
 {
+    setObjects()
+    {
+        rebuildCircuitObjects(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     static STATE_PENDING = 1
     static STATE_STARTING = 2
     static STATE_RUNNING = 3
