@@ -186,7 +186,7 @@ export class CareerArea extends Area
         position.y = 1
         this.interactivePoint = this.game.interactivePoints.create(
             position,
-            'View Resume',
+            '이력서 보기',
             InteractivePoints.ALIGN_RIGHT,
             InteractivePoints.STATE_CONCEALED,
             () => window.open(content.resumeUrl, '_blank', 'noopener,noreferrer'),

@@ -48,17 +48,17 @@ export class Map
     {
         this.locations = {}
         this.locations.items = [
-            { name: 'Altar', respawnName: 'altar', offset: { x: 0, y: -0.05 } },
-            { name: 'Behind\nthe scene', respawnName: 'behindTheScene', offset: { x: 0.01, y: 0 } },
-            { name: 'Bowling', respawnName: 'bowling', offset: { x: -0.08, y: 0.03 } },
-            { name: 'Profile / Resume', respawnName: 'career', offset: { x: 0, y: -0.06 } },
-            { name: 'Circuit', respawnName: 'circuit', offset: { x: -0.08, y: -0.05 } },
-            { name: 'Cookie', respawnName: 'cookie', offset: { x: -0.02, y: -0.01 } },
+            { name: '서낭당', respawnName: 'altar', offset: { x: 0, y: -0.05 } },
+            { name: '크레딧', respawnName: 'behindTheScene', offset: { x: 0.01, y: 0 } },
+            { name: '볼링장', respawnName: 'bowling', offset: { x: -0.08, y: 0.03 } },
+            { name: '소개·이력서', respawnName: 'career', offset: { x: 0, y: -0.06 } },
+            { name: '서킷', respawnName: 'circuit', offset: { x: -0.08, y: -0.05 } },
+            { name: '포장마차', respawnName: 'cookie', offset: { x: -0.02, y: -0.01 } },
             { name: 'Danwoo Lab', respawnName: 'lab', offset: { x: -0.03, y: 0 } },
-            { name: 'Landing', respawnName: 'landing', offset: { x: 0.02, y: 0 } },
-            { name: 'Projects', respawnName: 'projects', offset: { x: 0, y: -0.02 } },
-            { name: 'Social', respawnName: 'social', offset: { x: -0.01, y: -0.04 } },
-            { name: 'Lab Portal', respawnName: 'timeMachine', offset: { x: 0, y: 0 } },
+            { name: '출발점', respawnName: 'landing', offset: { x: 0.02, y: 0 } },
+            { name: '프로젝트', respawnName: 'projects', offset: { x: 0, y: -0.02 } },
+            { name: '소셜', respawnName: 'social', offset: { x: -0.01, y: -0.04 } },
+            { name: 'Lab 포털', respawnName: 'timeMachine', offset: { x: 0, y: 0 } },
         ]
 
         for(const item of this.locations.items)
