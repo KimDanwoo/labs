@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import { cn } from './lib/cn';
 
-/** 공용 텍스트 입력. 토큰 기반(border-input/ring/error) — 앱 스킨에 자동 반응. */
 function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   return (
     <input

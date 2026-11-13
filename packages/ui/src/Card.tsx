@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import { cn } from './lib/cn';
 
-/** 카드 루트. 색·보더·그림자 전부 토큰. */
 function CardRoot({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -55,10 +54,6 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
   return <div data-slot="card-footer" className={cn('flex items-center [.border-t]:pt-6', className)} {...props} />;
 }
 
-/**
- * 공용 카드 — 컴파운드 API. `import { Card }` 하나로 `<Card>` 루트와
- * `<Card.Header/Title/Description/Content/Footer/Action>` 슬롯을 dot-access로 쓴다.
- */
 export const Card = Object.assign(CardRoot, {
   Header: CardHeader,
   Title: CardTitle,
