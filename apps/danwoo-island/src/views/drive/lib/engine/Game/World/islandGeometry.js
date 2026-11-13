@@ -35,6 +35,13 @@ export const SHADES = {
     earth: '#b9956b',
     ink: '#2b2420',
     jangseungWood: '#c4895a',
+    basalt: '#625b58',
+    basaltDark: '#423d3c',
+    neonBoard: '#2a2230',
+    metalDark: '#3a3a40',
+    cabinetWood: '#8a4f2c',
+    grille: '#c9b48a',
+    timber: '#bb8650',
     obangBlue: '#2f5fb3',
     obangRed: '#c9372c',
     obangYellow: '#e8b830',
@@ -119,7 +126,7 @@ export function createParts()
         const flat = geometry.index ? geometry.toNonIndexed() : geometry
         if(flat !== geometry)
             geometry.dispose()
-        if(flat.hasAttribute('uv'))
+        if(!GLOW[name] && flat.hasAttribute('uv'))
             flat.deleteAttribute('uv')
         flat.computeVertexNormals()
         if(!batches.has(name))
