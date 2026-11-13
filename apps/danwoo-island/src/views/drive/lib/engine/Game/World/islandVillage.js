@@ -707,7 +707,8 @@ const CIRCUIT_DECORATION = {
     tires: [box3([-27.45, -1.05, -3.25], [-23.98, 0.5, 0.1]), box3([-2.35, -1.05, 10.9], [0.85, 0.5, 14.55])],
     clock: box3([-17.8, -1.05, 4.68], [-16.6, 0.6, 6.2]),
     gantry: box3([-14.6, -1.1, -18.3], [-0.1, 4, -14.6]),
-    startLights: box3([-11.6, 2.3, -16.9], [-7.8, 3.5, -15.4]),
+    startLights: box3([-11.6, 2.2, -16.9], [-7.8, 3.6, -15.4]),
+    tents: box3([-29, -1.1, -27], [-15, 2, -2]),
     groundPaintTop: -0.9,
     legMaxWidth: 0.25,
     legMinHeight: 1.5,
@@ -758,13 +759,13 @@ function classifyDecoration(component)
     const center = box.getCenter(new THREE.Vector3())
     const size = box.getSize(new THREE.Vector3())
     const {
-        resetLetters, tires, clock, gantry, startLights, groundPaintTop, legMaxWidth, legMinHeight,
+        resetLetters, tires, clock, gantry, startLights, tents, groundPaintTop, legMaxWidth, legMinHeight,
     } = CIRCUIT_DECORATION
     const isErased = [resetLetters, clock, ...tires].some((region) => region.containsPoint(center))
         || (gantry.containsPoint(center) && !startLights.containsBox(box) && box.max.y > groundPaintTop)
     if(isErased)
         return 'erase'
-    if(size.x < legMaxWidth && size.z < legMaxWidth && size.y > legMinHeight)
+    if(tents.containsPoint(center) && size.x < legMaxWidth && size.z < legMaxWidth && size.y > legMinHeight)
         return 'tentLeg'
     return 'keep'
 }
@@ -795,7 +796,7 @@ function angbuilgu(parts)
     parts.rod('iron', 0.02, [center.x - 0.42, bottom + 1.2, center.z], [center.x, bottom + 0.9, center.z])
 }
 
-const HONGSALMUN = { postX: [-14.2, -0.5], z: -16.32, bottom: -1, lowerBeam: 3.55, upperBeam: 4.2, slatTop: 4.95, slatGap: 0.55 }
+const HONGSALMUN = { postX: [-14.2, -0.5], z: -16.32, bottom: -1, lowerBeam: 3.72, upperBeam: 4.2, slatTop: 4.95, slatGap: 0.55 }
 
 function hongsalmun(parts)
 {
