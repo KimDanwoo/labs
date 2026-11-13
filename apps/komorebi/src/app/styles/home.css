@@ -1,4 +1,3 @@
-/* Painted map overlay inside the walk map dialog. */
 .map-route {
   stroke: rgb(var(--honey));
   stroke-width: 2;
@@ -34,7 +33,6 @@
   stroke-width: 2;
 }
 
-/* Home belongs to the same painted world; controls sit beside the things they act on. */
 .weather-indicator {
   display: grid;
   place-items: center;

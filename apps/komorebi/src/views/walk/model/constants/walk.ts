@@ -18,7 +18,6 @@ export type Dialog = (typeof DIALOG)[keyof typeof DIALOG];
 
 export const TIME = { day: 'day', evening: 'evening', night: 'night' } as const;
 export type TimeOfDay = (typeof TIME)[keyof typeof TIME];
-/** The sun button walks through the day in this order and wraps around. */
 export const TIME_ORDER: readonly TimeOfDay[] = [TIME.day, TIME.evening, TIME.night];
 export const TIME_LABEL = { day: '한낮', evening: '해 질 녘', night: '밤' } satisfies Record<TimeOfDay, string>;
 

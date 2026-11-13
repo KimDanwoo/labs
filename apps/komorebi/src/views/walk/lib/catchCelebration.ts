@@ -6,7 +6,6 @@ function hop(age: number, start: number, duration: number, height: number) {
   return Math.sin(t * Math.PI) * height;
 }
 
-/** One finite celebration per catch; frame-rate independent and safe to interrupt. */
 export function catchCelebration(age: number, reducedMotion = false) {
   const time = Math.max(0, age);
   if (reducedMotion) return { childLift: 0, fishX: 3.4, fishY: 12.5, fishTurn: 0, splash: 0 };

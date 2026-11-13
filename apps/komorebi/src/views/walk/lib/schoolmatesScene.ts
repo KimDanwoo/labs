@@ -42,7 +42,6 @@ const DEPTH_ORDER_SCALE = 0.01;
 const NIGHT_THRESHOLD = 0.5;
 const NPC_STRIDE_DISTANCE = 2.5;
 
-/** School artwork loads on the first visit, independently of the player's initial scene. */
 export function createSchoolmates(
   scene: THREE.Scene,
   loader: THREE.TextureLoader,

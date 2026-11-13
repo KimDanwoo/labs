@@ -10,7 +10,6 @@ export function aquariumFishArt(id: string) {
   if (fish.shape === FISH_SHAPE.round) return { src: '/art/aquarium-bream-v2.webp', ratio: 320 / 188 };
   return { src: '/art/aquarium-mackerel-v2.webp', ratio: 320 / 122 };
 }
-/** Coordinates are fractions of the painted cabinet, shared by world and close-up. */
 export function aquariumPose(fish: KeptFish, elapsed: number, feedAge: number, reducedMotion: boolean) {
   let hash = 0;
   for (const char of fish.uid) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;

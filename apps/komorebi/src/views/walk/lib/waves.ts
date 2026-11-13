@@ -3,13 +3,6 @@ import type { Region } from '../model/world/world';
 import { lampGlowAt, lightSprite } from './nightLights';
 import { characterScale, sceneX, sceneY } from './perspective';
 
-/**
- * Painted wave animations, 12 cells each (4 × 3, row by row), all drawn by Codex:
- * - break: a wave rolls in, breaks against rock or wall, spreads into foam and fades;
- * - crest: an offshore swell rises, catches a little white and settles;
- * - lace: a thin wash runs up a sheltered shore and drains back, looping.
- * `contact` is where the wave meets its shore, from the bottom of its cell, so rotation pivots there.
- */
 const SHEETS = {
   break: {
     url: '/art/wave-break.webp',
@@ -42,18 +35,14 @@ const SHEETS = {
     isLoop: true,
   },
 } as const;
-/** How far a swell rolls toward the shore over one showing, as a share of its width. */
 const CREST_TRAVEL = 0.2;
 type Kind = keyof typeof SHEETS;
 const COLUMNS = 4;
 const ROWS = 3;
-/** Wave widths are given, in scene units, for where the child stands at depth 40; nearer ones are larger. */
 const REFERENCE_DEPTH = 40;
-/** With reduced motion each wave holds one gentle frame, faintly. */
 const STILL_FRAME = 6;
 const STILL_FADE = 0.4;
 const RAIN_HURRY = 0.25;
-/** Foam only catches moonlight after dark, so it fades back rather than glowing white. */
 const NIGHT_DIM = 0.6;
 const WAVE_ORDER = 1;
 const SEA: Region = 'coast';
@@ -77,7 +66,6 @@ const wave = (
   [phase, period]: [number, number],
 ): Wave => ({ kind, x, z, scale, isFlipped, degrees, phase, period });
 
-/** Keep painted foam at the near shoreline; offshore water is animated by the surface shader. */
 const WAVES: Wave[] = [
   wave('lace', [69.0, 52.8], 0.8, false, 178, [0.15, 6.4]),
   wave('lace', [80.0, 53.2], 0.75, true, 178, [0.65, 7.0]),
@@ -94,7 +82,6 @@ function showFrame(map: THREE.Texture, frame: number, isFlipped: boolean) {
   map.offset.set((column + (isFlipped ? 1 : 0)) / COLUMNS, (ROWS - 1 - row) / ROWS);
 }
 
-/** Which frame a wave shows `clock` seconds into its cycle, or null while it waits between waves. */
 export function waveFrame({ kind, period }: Pick<Wave, 'kind' | 'period'>, clock: number) {
   const { frames, fps, isLoop } = SHEETS[kind];
   if (isLoop) return Math.floor((clock / period) * frames) % frames;
@@ -102,20 +89,17 @@ export function waveFrame({ kind, period }: Pick<Wave, 'kind' | 'period'>, clock
   return frame < frames ? frame : null;
 }
 
-/** How far through one showing a wave is (0–1): its whole period for a loop, its frames otherwise. */
 function progressOf({ kind, period }: Pick<Wave, 'kind' | 'period'>, clock: number) {
   const { frames, fps, isLoop } = SHEETS[kind];
   if (isLoop) return clock / period;
   return THREE.MathUtils.clamp(clock / (frames / fps), 0, 1);
 }
 
-/** Fades a breaker or swell in and out over its showing; a looping wash only breathes. */
 function envelopeOf(kind: Kind, progress: number) {
   if (SHEETS[kind].isLoop) return 0.65 + 0.35 * Math.sin(Math.PI * progress) ** 2;
   return THREE.MathUtils.smoothstep(progress, 0, 0.2) * (1 - THREE.MathUtils.smoothstep(progress, 0.6, 1));
 }
 
-/** The sea's waves: swells offshore, breakers on the rocks and the breakwater, a wash along the near shore. */
 export function createWaves(scene: THREE.Scene, loader: THREE.TextureLoader) {
   const waves = WAVES.map((spec) => {
     const sheet = SHEETS[spec.kind];
@@ -154,7 +138,6 @@ export function createWaves(scene: THREE.Scene, loader: THREE.TextureLoader) {
   });
   const sheets: THREE.Texture[] = [];
   let isDisposed = false;
-  // Waves are a nicety: if a sheet fails to load the sea simply stays as painted there.
   [...new Set(WAVES.map(({ kind }) => kind))].forEach((kind) => {
     loader
       .loadAsync(SHEETS[kind].url)
@@ -201,7 +184,6 @@ export function createWaves(scene: THREE.Scene, loader: THREE.TextureLoader) {
           (Math.floor(frame / COLUMNS) - Math.floor(nextFrame / COLUMNS)) / ROWS,
         );
         const progress = isStill ? STILL_FRAME / (SHEETS[spec.kind].frames - 1) : progressOf(spec, entry.clock);
-        // Swells roll shoreward, square to their own crest line.
         const wash = Math.sin(Math.PI * progress) ** 2;
         let travel = 0;
         if (spec.kind === 'crest') travel = entry.width * CREST_TRAVEL * progress;

@@ -1,7 +1,6 @@
 import { hasGroundBetween, isOnGround } from './ground';
 
 export type Region = 'village' | 'river' | 'coast' | 'forest' | 'school' | 'shops' | 'home' | 'hallway' | 'classroom';
-/** Rooms under a roof: no rain, fireflies or visiting animals, and a hushed outdoor soundscape. */
 const INDOOR_REGIONS: readonly Region[] = ['home', 'hallway', 'classroom'];
 export const isIndoors = (region: Region) => INDOOR_REGIONS.includes(region);
 export type Point = { x: number; z: number };
@@ -22,7 +21,6 @@ export const HOME_DESK = { name: '작은 그림일기 책상', x: 40, z: 57 };
 export const HOME_WARDROBE = { name: '나무 옷장', x: 86, z: 62 };
 export const HOME_BED = { name: '포근한 잠자리', x: 70, z: 76 };
 export const CLASSROOM_BOARD = { name: '초록 칠판', x: 50, z: 62 };
-/** A small thing to do at each place once its memory for this time of day is kept. */
 export const PLACE_ACTION = {
   gust: 'gust',
   skip: 'skip',
@@ -223,7 +221,6 @@ export const WORLDS: Record<
       { a: 'house', b: HOME.id, width: 1.2 },
       { a: 'fork', b: 'fields', width: 3 },
       { a: 'fields', b: 'bridge', width: 1.2 },
-      // Narrow diagonal deck, measured between the painted railings.
       { a: 'bridge', b: 'rivergate', width: 0.65 },
     ],
     portals: [
@@ -410,7 +407,6 @@ export const WORLDS: Record<
     ],
   },
 };
-/** Find the next neighboring scene along a connected region route. */
 export function nextRegionStep(from: Region, to: Region): Region | null {
   if (from === to) return null;
   const queue: Region[][] = [[from]],
@@ -438,7 +434,6 @@ export function createSlideMotion(): SlideMotion {
   return { direction: null, input: null };
 }
 
-/** Follow a nearby free direction when the requested step meets a road edge. */
 function slideStep(position: Point, dx: number, dz: number, region: Region, slide?: SlideMotion): Point {
   const length = Math.hypot(dx, dz);
   if (length < 1e-9) return position;
@@ -451,7 +446,6 @@ function slideStep(position: Point, dx: number, dz: number, region: Region, slid
       const sz = dx * Math.sin(angle) + dz * Math.cos(angle);
       const candidate = { x: position.x + sx, z: position.z + sz };
       if (!clearSegment(position, candidate, region)) continue;
-      // Prefer a direction with room ahead, so small edge irregularities do not trap the feet.
       const ahead = { x: position.x + sx / length, z: position.z + sz / length };
       const continuity = slide?.direction ? (sx * slide.direction.x + sz * slide.direction.z) / length : 0;
       if (slide?.direction && continuity < -0.05) continue;
@@ -517,7 +511,6 @@ function groundConnections(region: Region) {
   navigationEdges.set(region, edges);
   return edges;
 }
-/** Route across the full painted ground, using only unobstructed connections. */
 export function findRoute(start: Point, target: Point, region: Region): Point[] {
   const world = WORLDS[region];
   if (!canWalk(start.x, start.z, region) || !canWalk(target.x, target.z, region)) return [];

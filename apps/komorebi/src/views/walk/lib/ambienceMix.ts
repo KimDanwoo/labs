@@ -26,7 +26,6 @@ const REGION_LAYERS = {
 const EVENING_CICADA_SHARE = 0.3;
 const RAIN_INSECT_SHARE = 0.3;
 
-/** Each place keeps its own sound; at dusk birds give way to crickets, and at night the cicadas fall silent. */
 export function ambienceMix(region: Region, time: TimeOfDay, weather: Weather = WEATHER.clear): AmbienceMix {
   const clear = timeMix(region, time);
   if (isIndoors(region))
@@ -37,7 +36,6 @@ export function ambienceMix(region: Region, time: TimeOfDay, weather: Weather = 
       rain: weather === WEATHER.rain ? 0.18 : 0,
     };
   if (weather === WEATHER.clear) return clear;
-  // A shower hushes the birds and insects under the patter.
   return {
     ...clear,
     birds: 0,

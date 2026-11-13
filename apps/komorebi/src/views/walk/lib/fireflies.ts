@@ -3,10 +3,6 @@ import * as THREE from 'three';
 const COUNT = 36;
 const SIZE = 16;
 
-/**
- * Night-only glow points drifting over the painting. Positions and blinking live in the shader, so the CPU only
- * advances one clock; with reduced motion the clock stops and the lights hold still.
- */
 export function createFireflies(scene: THREE.Scene) {
   let seed = 1_297;
   const random = () => {

@@ -6,7 +6,6 @@ import type { Region } from '../world/world';
 type Ambience = ReturnType<typeof createAmbience>;
 type Scene = { region: Region; time: TimeOfDay; weather: Weather };
 
-/** The nature sound switch; scene and footsteps can be wired before the walk engine exists. */
 export function useAmbience(onUnavailable: () => void) {
   const audio = useRef<Ambience | null>(null);
   const scene = useRef<Scene>({ region: 'village', time: TIME.day, weather: WEATHER.clear });
@@ -51,7 +50,6 @@ export function useAmbience(onUnavailable: () => void) {
   return { isOn, toggle, ...sound };
 }
 
-/** Keeps the soundscape on the painting and time of day in view. */
 export function useAmbienceScene(setScene: (scene: Scene) => void, { region, time, weather }: Scene) {
   useEffect(() => {
     setScene({ region, time, weather });

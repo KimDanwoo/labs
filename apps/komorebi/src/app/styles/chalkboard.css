@@ -7,7 +7,6 @@
   aspect-ratio: 655 / 207;
   border: 10px solid rgb(var(--amber));
   border-radius: 6px;
-  /* The slate is cut straight from the classroom painting (BOARD_RECT in lib/chalkboard.ts). */
   background: url('/art/classroom-game.webp') 50.17% 31.21% / 234.5% auto no-repeat;
   box-shadow: inset 0 0 24px rgb(var(--deep) / 0.45);
   cursor: crosshair;

@@ -1,8 +1,6 @@
 const MAX_RENDER_PIXELS = 2_400_000;
-/** Frames per second while something moves, and for the gently animated scenery at rest. */
 export const RENDER_RATE = { active: 60, idle: 30 } as const;
 
-/** Bound GPU work independently of CSS size and display density. */
 export function renderPixelRatio(width: number, height: number, deviceRatio: number, touch: boolean) {
   return Math.min(deviceRatio, touch ? 1.5 : 2, Math.sqrt(MAX_RENDER_PIXELS / Math.max(1, width * height)));
 }

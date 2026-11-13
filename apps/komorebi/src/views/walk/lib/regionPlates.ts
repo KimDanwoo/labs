@@ -10,12 +10,10 @@ export type RegionPlates = {
    * no longer wanted when it arrives is disposed and the request rejects instead of returning a freed texture.
    */
   ensure: (region: Region) => Promise<THREE.Texture>;
-  /** Keeps only `regions`: frees the rest and loads the missing ones one at a time, abandoning any older queue. */
   focus: (regions: Region[]) => void;
   dispose: () => void;
 };
 
-/** The painting in view plus the ones its exits lead to — what a walker can reach next. */
 export function nearbyRegions(region: Region): Region[] {
   return [region, ...new Set(WORLDS[region].portals.map((portal) => portal.to))];
 }

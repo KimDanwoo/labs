@@ -74,12 +74,10 @@ const CHALK_REGION: Region = 'classroom';
 const CAMERA_EPSILON = 0.01;
 const WARMTH_EPSILON = 0.002;
 const CHILD_ORDER = 4;
-/** How much dusk colour each time of day keeps; night adds its own blue on top. */
 const WARMTH_BY_TIME = { day: 0, evening: 1, night: 0.35 } satisfies Record<TimeOfDay, number>;
 const MOVE_KEYS = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
 const LANDING_LOUDNESS = 1.6;
 const NEAREST_SCALE = characterScale(100);
-/** One place action at a time, sound included; the longest cue (the shrine bell) rings about this long. */
 const ACTION_LOCK_MS = 2_200;
 const RUN_SPEED = 24;
 const SPRINT_SPEED = 36;
@@ -117,9 +115,7 @@ export type SceneStatus = Point & {
 };
 export type SceneOptions = {
   onStatus: (status: SceneStatus) => void;
-  /** Short messages for the player, such as a neighbouring painting still loading. */
   onNotice: (message: string) => void;
-  /** A foot touching the ground; loudness already accounts for distance and landings. */
   onStep: (surface: Surface, loudness: number) => void;
   onSleep: () => void;
   appearance?: Appearance;
@@ -130,7 +126,6 @@ export type WalkEngine = {
   setPeers: (peers: readonly Peer[]) => void;
   arriveTogether: (peers: readonly Peer[]) => Promise<void>;
   dispose: () => void;
-  /** While paused (a dialog is open) the child stands still and new movement input is ignored. */
   setPaused: (value: boolean) => void;
   finishSleep: () => void;
   setFishing: (frame: FishingFrame | null) => void;
@@ -143,14 +138,11 @@ export type WalkEngine = {
   setWeather: (value: Weather) => void;
   setInput: (key: string, pressed: boolean) => void;
   reset: () => void;
-  /** Resolves false when the browser could not encode the picture. */
   photo: () => Promise<boolean>;
   travelTo: (id: string) => void;
-  /** Plays a place's little action; false while an earlier one is still playing. */
   playAction: (kind: PlaceAction, at: Point) => boolean;
 };
 
-/** Painted scenery on depth-separated Three.js planes, with a hand-inked directional child and a connected walkable lane graph. */
 export async function createScene(
   container: HTMLElement,
   { onStatus, onNotice, onStep, onSleep, appearance = DEFAULT_APPEARANCE, signal }: SceneOptions,
@@ -162,7 +154,6 @@ export async function createScene(
     plates.dispose();
     loaded.forEach((texture) => texture.dispose());
   };
-  // Only the first view blocks the start; the other paintings follow in the background.
   const layerUrls = characterLayers(appearance);
   const [startPlate, bodyAtlas, outfitAtlas] = await Promise.allSettled([
     plates.ensure(START_REGION),
@@ -204,7 +195,6 @@ export async function createScene(
     releaseTextures();
     throw error;
   }
-  // Cap fill rate on touch devices without changing the CSS viewport.
   const touchDevice = window.matchMedia('(pointer: coarse)').matches;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor('#1b352b');
@@ -257,7 +247,6 @@ export async function createScene(
   child.children.forEach((part) => {
     part.renderOrder = CHILD_ORDER;
   });
-  // Reuse the painting shader and its live uniforms so lighting and transitions match.
   const foregroundMaterial = background.clone();
   foregroundMaterial.uniforms = background.uniforms;
   foregroundMaterial.transparent = true;
@@ -387,7 +376,6 @@ export async function createScene(
   const slide = createSlideMotion();
   const keys = new Set<string>();
   const portalInput = createPortalInput();
-  /** Render the next frame now and keep the full rate until camera, light and fades come to rest. */
   const wake = () => {
     isSettling = true;
     nextFrame = 0;
@@ -409,7 +397,6 @@ export async function createScene(
       h = Math.max(container.clientHeight, 1),
       aspect = w / h;
     const fullHeight = Math.min(80, 120 / aspect);
-    // A modest crop allows the illustration to drift with the walker.
     halfHeight = fullHeight * 0.47;
     halfWidth = halfHeight * aspect;
     camera.left = -halfWidth;
@@ -425,7 +412,6 @@ export async function createScene(
   const observer = new ResizeObserver(resize);
   observer.observe(container);
   resize();
-  /** Routes toward the destination and returns the exit it heads for, if it leaves this region. */
   const plan = (): WorldPortal | null => {
     if (!destination) return null;
     const point = DESTINATIONS.find((p) => p.id === destination);
@@ -438,7 +424,6 @@ export async function createScene(
     route = findRoute(position, portal.center, region);
     return portal;
   };
-  /** A new heading elsewhere cancels the wait at a loading exit until the child steps out of it. */
   const redirect = (exit: WorldPortal | null) => {
     if (exit && exit === cancelledPortal) {
       blockedPortal = null;
@@ -475,7 +460,6 @@ export async function createScene(
     background.uniforms.hasChalk!.value = next === CHALK_REGION ? 1 : 0;
     background.uniforms.sceneryStyle!.value = SCENERY_STYLE[next];
     background.uniforms.lampCount!.value = lamps.count;
-    // Home stays loaded for the reset button; everything beyond the next exits is freed.
     const nearby = [...new Set([START_REGION, ...nearbyRegions(next)])];
     plates.focus(nearby);
     transition = reducedMotion ? 1 : 0.25;
@@ -593,7 +577,6 @@ export async function createScene(
     onSleep();
     wake();
   }
-  /** Moves the child along held keys or the planned route and reports how this frame's stride went. */
   function walk(dt: number) {
     const canMove = !paused || (ballFrame?.phase === BALL_PHASE.ready && route.length > 0);
     let { dx, dz } = keyboardDirection(keys);
@@ -604,7 +587,6 @@ export async function createScene(
     }
     let routeDistance = Infinity;
     if (canMove && !keyboardWalking) {
-      // Reach bends before turning, and consume reached waypoints without pausing a frame.
       while (route.length && Math.hypot(route[0]!.x - position.x, route[0]!.z - position.z) < 0.02) route.shift();
       if (route.length) {
         const next = route[0]!;
@@ -624,7 +606,6 @@ export async function createScene(
     if (walking) {
       dx /= magnitude;
       dz /= magnitude;
-      // Keep distant paths responsive while retaining perspective in the gait.
       const perspective = THREE.MathUtils.clamp((position.z - 15) / 70, 0.45, 1);
       const speed = moveSpeed * Math.max(perspective, 0.75);
       const step = Math.min(speed * dt, routeDistance);
@@ -642,7 +623,6 @@ export async function createScene(
     }
     return { walking, sprinting, frameTravel };
   }
-  /** Reacts to where the child now stands: the bed, a released exit, or a new exit to cross. */
   function arriveAt() {
     if (region !== 'home' || !isNearHomeBed(position)) sleepBlocked = false;
     if (region === 'home' && isAtHomeBed(position)) void startSleep();
@@ -707,7 +687,6 @@ export async function createScene(
     container.dataset.surface = surface;
     onStep(surface, ((hasLanded ? LANDING_LOUDNESS : 1) * scale) / NEAREST_SCALE);
   }
-  /** Eases the camera after the child and returns whether it is still on its way. */
   function followCamera(dt: number, size: number) {
     const maxX = Math.max(0, 60 - halfWidth),
       maxY = Math.max(0, 40 - halfHeight);
@@ -752,7 +731,6 @@ export async function createScene(
       targetMarker.position.set(sceneX(target.x), sceneY(target.z) + 0.5, 1);
     }
   }
-  /** Eases warmth, darkness and wetness toward the chosen time and weather; returns whether any is still changing. */
   function easeAtmosphere(dt: number) {
     const targetWarmth = WARMTH_BY_TIME[timeOfDay];
     const targetDarkness = timeOfDay === TIME.night ? 1 : 0;

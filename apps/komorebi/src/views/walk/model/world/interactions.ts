@@ -2,7 +2,6 @@ import { WORLD_OBJECTS } from './objects';
 import { CLASSROOM_BOARD, HOME_BED, HOME_DESK, HOME_WARDROBE, LANDMARKS, type Point, type Region } from './world';
 
 const futon = WORLD_OBJECTS.find((object) => object.id === 'home-futon')!;
-/** Reach the quilt from any side, rather than only one invisible spot beside its foot. */
 export function isNearHomeBed(point: Point, reach = 3.5) {
   if (Math.hypot(point.x - HOME_BED.x, point.z - HOME_BED.z) < reach + 1) return true;
   return futon.footprint.some(([x, y], i) => {
@@ -19,7 +18,6 @@ export const isAtHomeBed = (point: Point) => isNearHomeBed(point, 1.2);
 
 type PaintedTarget = { left: number; top: number; right: number; bottom: number; destination: Point };
 const classroomShelf = LANDMARKS.find((place) => place.id === 'classroom')!;
-/** Painted furniture, in painting pixels, and the floor spot to walk to when it is tapped. */
 const PAINTED_TARGETS: Partial<Record<Region, PaintedTarget[]>> = {
   home: [
     { left: 1075, top: 650, right: 1260, bottom: 780, destination: HOME_BED },
@@ -32,7 +30,6 @@ const PAINTED_TARGETS: Partial<Record<Region, PaintedTarget[]>> = {
   ],
 };
 
-/** Painted objects can be tapped even when their solid silhouette isn't walkable. */
 export function interactionDestination(point: Point, region: Region): Point | null {
   const x = point.x * 15.36;
   const y = point.z * 10.24;

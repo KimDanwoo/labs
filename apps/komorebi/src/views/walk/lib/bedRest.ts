@@ -7,7 +7,6 @@ import { preparePaintingTexture } from './regionPlates';
 export const SLEEP_TIMING = { wake: 2800, finish: 4500 } as const;
 const smooth = (value: number) => THREE.MathUtils.smoothstep(value, 0, 1);
 
-/** The pillow keeps the sleeping head behind the original painted quilt, in the same scene and lighting. */
 export function createBedRest(scene: THREE.Scene, painting: THREE.ShaderMaterial) {
   const material = new THREE.SpriteMaterial({ transparent: true, depthTest: false, depthWrite: false });
   const head = new THREE.Sprite(material);

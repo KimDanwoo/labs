@@ -28,7 +28,6 @@ export function startSparrow(home: Point, perch: Point, seed: number): Sparrow {
   };
 }
 
-/** Near feet send a bird up to its branch. It returns only after the path is quiet. */
 export function stepSparrow(bird: Sparrow, player: Point, dt: number) {
   bird.age += dt;
   bird.clock += dt;

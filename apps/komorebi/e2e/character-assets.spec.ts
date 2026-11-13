@@ -42,7 +42,6 @@ test('body atlases keep every pose on the shared foot anchor and leave the costu
           }
         }
         let costumeAlpha = 0;
-        // The idle front pose's shorts panel must be empty, clear of hair, hands and exposed legs.
         for (let y = 198; y < 206; y++) {
           for (let x = 72; x < 121; x++) {
             costumeAlpha = Math.max(costumeAlpha, data[(y * image.width + x) * 4 + 3] ?? 0);

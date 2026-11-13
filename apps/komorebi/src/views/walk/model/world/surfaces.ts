@@ -5,7 +5,6 @@ export type Surface = (typeof SURFACE)[keyof typeof SURFACE];
 
 type Zone = { surface: Surface; minX: number; maxX: number; minZ: number; maxZ: number };
 
-/** What the painted ground underfoot is made of: a default per painting, with zones for bridges and paths. */
 const SURFACES: Record<Region, { base: Surface; zones: Zone[] }> = {
   home: { base: SURFACE.wood, zones: [] },
   hallway: { base: SURFACE.wood, zones: [] },

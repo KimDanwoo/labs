@@ -4,7 +4,6 @@ const DROPS = 320;
 const FALL_SPEED = 70;
 const DRIFT = 0.18;
 
-/** A shower of short slanted streaks that wraps around the camera view; one draw call for every drop. */
 export function createRain(scene: THREE.Scene) {
   let seed = 31;
   const random = () => {

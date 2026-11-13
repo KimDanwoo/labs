@@ -3,14 +3,12 @@ import test from 'node:test';
 import * as THREE from 'three';
 import { createRoamers } from '../roamers';
 
-// Sprites paint their shadow on a canvas when created; a stand-in is enough here.
 const paint = { createRadialGradient: () => ({ addColorStop() {} }), fillRect() {} };
 Object.assign(globalThis, { document: { createElement: () => ({ getContext: () => paint }) } });
 
 const STEP = 1 / 60;
 const VILLAGE = { region: 'village', darkness: 0, isRaining: false, isStill: false, childZ: 0 } as const;
 
-/** A visitor that always pauses partway, from a fixed choice of animal and lane. */
 async function visitor() {
   const random = Math.random;
   Math.random = () => 0.1;

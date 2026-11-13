@@ -1,5 +1,3 @@
-/** Insect flight in painting percent (x across, z down). Pure state machines so the rules can be tested. */
-
 export type Bounds = { minX: number; maxX: number; minZ: number; maxZ: number };
 type Random = () => number;
 
@@ -15,7 +13,6 @@ export type Flight = {
   timer: number;
   targetX: number;
   targetZ: number;
-  /** Wing phase in radians; its rate depends on what the insect is doing. */
   wing: number;
 };
 
@@ -40,7 +37,6 @@ export function startFlight(bounds: Bounds, random: Random, mode: Mode): Flight 
 
 const BUTTERFLY = { minSpeed: 2.5, maxSpeed: 5.5, turn: 5, flap: 14, restFlap: 2.2, restChance: 0.3 };
 
-/** Wanders with jittery turns, drifts back when it strays, and now and then settles to open and close its wings. */
 export function stepButterfly(f: Flight, dt: number, bounds: Bounds, random: Random): Flight {
   if (f.mode === FLIGHT.rest) {
     const timer = f.timer - dt;
@@ -71,7 +67,6 @@ export function stepButterfly(f: Flight, dt: number, bounds: Bounds, random: Ran
 
 const DRAGONFLY = { dartSpeed: 22, flap: 45, perchChance: 0.15 };
 
-/** Hovers in place with small jitters, then darts straight to a new spot; sometimes perches for a while. */
 export function stepDragonfly(f: Flight, dt: number, bounds: Bounds, random: Random): Flight {
   if (f.mode === FLIGHT.dart) {
     const dx = f.targetX - f.x;
@@ -115,7 +110,6 @@ export function stepDragonfly(f: Flight, dt: number, bounds: Bounds, random: Ran
   return { ...f, mode: FLIGHT.dart, targetX, targetZ, heading: Math.atan2(targetZ - f.z, targetX - f.x) };
 }
 
-/** Signed smallest turn from one heading to another. */
 function angleTowards(from: number, to: number) {
   return Math.atan2(Math.sin(to - from), Math.cos(to - from));
 }

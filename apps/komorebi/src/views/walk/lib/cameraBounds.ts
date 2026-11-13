@@ -1,4 +1,3 @@
-/** Keep the subject visible where possible, but never expose space outside the painting. */
 export function constrainCameraAxis(
   center: number,
   halfView: number,

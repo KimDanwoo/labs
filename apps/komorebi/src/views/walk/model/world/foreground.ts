@@ -4,7 +4,6 @@ import type { Point, Region } from './world';
 type PixelPoint = readonly [number, number];
 type Baseline = readonly [PixelPoint, PixelPoint];
 
-/** Match occlusion to the object's ground contact, including sloping fences. */
 export type Foreground = {
   region: Region;
   baseline: Baseline;
@@ -42,14 +41,9 @@ export function isForegroundInFront(layer: Foreground, position: Point, region: 
   return position.z * 10.24 < groundY;
 }
 
-/** Something standing in the painting, with the render order its sprite draws at. */
 export type Walker = Point & { order: number };
 const LIFT = 0.05;
 
-/**
- * Render order for a foreground layer: just above everyone standing behind it, so it still draws under anyone in
- * front (nearer walkers always carry a higher order). Null when it hides nobody and need not draw at all.
- */
 export function foregroundOrder(layer: Foreground, walkers: Walker[], region: Region): number | null {
   const hidden = walkers.filter((walker) => isForegroundInFront(layer, walker, region));
   if (hidden.length === 0) return null;
@@ -62,7 +56,6 @@ export function foregroundOrder(layer: Foreground, walkers: Walker[], region: Re
 
 for (const object of WORLD_OBJECTS) polygon(object.region, object.groundY, object.outline);
 
-// River bridge: front handrail, lower beam, and individual posts.
 rail(
   'river',
   [
@@ -137,7 +130,6 @@ polygon('river', 542, [
   [382, 542],
 ]);
 
-// Village bridge slopes away from the camera.
 rail(
   'village',
   [
@@ -173,7 +165,6 @@ for (const [x, y, bottom] of [
     [x! + 9, bottom!],
     [x!, bottom! + 2],
   ]);
-// Foreground garden fence along the left fork.
 rail(
   'village',
   [
@@ -199,7 +190,6 @@ for (const [x, y, bottom] of [
     [x!, bottom!],
   ]);
 
-// Stone lanterns beside the shrine approach.
 for (const x of [490, 993])
   polygon('forest', 603, [
     [x, 603],
@@ -229,7 +219,6 @@ for (const x of [490, 993])
     [x + 8, 577],
   ]);
 
-// Only the seafront stretch remains; the harbour junction is completely open.
 rail(
   'coast',
   [
@@ -277,7 +266,6 @@ function classroomFurniture(groundY: number, pieces: [number, number][][]): void
   });
 }
 
-// Each desk has its own ground contact. Empty floor between legs stays transparent.
 classroomFurniture(715, [
   [
     [220, 579],

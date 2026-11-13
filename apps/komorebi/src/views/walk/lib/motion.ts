@@ -31,7 +31,6 @@ export function advanceMotion(
   state.turn += (Math.max(-1, Math.min(1, delta)) - state.turn) * blend;
   return state;
 }
-/** Two-segment leg solver, keeping the sole level during the planted part of a step. */
 export function solveLeg(forward: number, lift: number, hipHeight = 1.62) {
   const upper = 0.72,
     lower = 0.73;
@@ -44,7 +43,6 @@ export function solveLeg(forward: number, lift: number, hipHeight = 1.62) {
   return { hip, knee, ankle: -hip - knee };
 }
 
-/** A gait cycle plants two feet: one each time the phase passes a multiple of π. */
 export function crossedFootfall(previousPhase: number, nextPhase: number) {
   return Math.floor(nextPhase / Math.PI) > Math.floor(previousPhase / Math.PI);
 }
@@ -77,7 +75,6 @@ export function advanceJump(jump: JumpMotion, dt: number) {
   return jump;
 }
 
-/** Linear stance cancels world travel; eased recovery lifts the toe off the ground. */
 export function footCycle(phase: number, run: number) {
   const t = (((phase / (Math.PI * 2)) % 1) + 1) % 1;
   const stance = 0.6 - run * 0.22;

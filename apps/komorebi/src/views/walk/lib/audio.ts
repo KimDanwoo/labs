@@ -18,7 +18,6 @@ const STEP_GAIN = { [SURFACE.dirt]: 2, [SURFACE.stone]: 1, [SURFACE.wood]: 1, [S
   Surface,
   number
 >;
-/** Each step plays a touch faster or slower, as real strides do. */
 const STEP_PITCH_SPREAD = 0.16;
 
 function brownNoise(context: AudioContext, seconds: number) {
@@ -32,7 +31,6 @@ function brownNoise(context: AudioContext, seconds: number) {
   return buffer;
 }
 
-/** Short pitched calls: a falling bird phrase by day, a high cricket trill at dusk. */
 function call(
   context: AudioContext,
   output: AudioNode,
@@ -60,7 +58,6 @@ function call(
   }
 }
 
-/** Wind with place-specific water, waves and insects, synthesized locally; no remote audio assets. */
 export function createAmbience() {
   const context = new AudioContext();
   const master = context.createGain();
@@ -157,7 +154,6 @@ export function createAmbience() {
   }, CALL_INTERVAL_MS);
   void context.resume();
 
-  // Footsteps stay silent until their recordings have loaded; a failed one just leaves that ground quiet.
   const steps = new Map<Surface, AudioBuffer[]>();
   STEP_SURFACES.forEach((surface) => {
     const takes = Array.from({ length: STEP_TAKES }, (_, take) =>
@@ -190,7 +186,6 @@ export function createAmbience() {
     source.start();
   };
 
-  /** A single decaying sine, the building block of plops, bells and chimes. */
   const tone = (frequency: number, { at = 0, seconds = 0.6, volume = 0.12, glideTo = frequency } = {}) => {
     const start = context.currentTime + at;
     const oscillator = context.createOscillator();

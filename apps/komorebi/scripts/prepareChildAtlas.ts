@@ -1,6 +1,5 @@
 import { extractChildFrames } from '@views/walk/lib/atlas';
 
-/** Bake the original extraction and alignment once, instead of on every visit. */
 export function prepareChildAtlas(source: HTMLImageElement) {
   const canvas = document.createElement('canvas');
   canvas.width = source.width;

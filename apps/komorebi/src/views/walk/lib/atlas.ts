@@ -35,7 +35,6 @@ export function extractChildFrames(data: Uint8ClampedArray, width: number, heigh
     const top = rowEdges[row]!,
       bottom = rowEdges[row + 1]!;
     const h = bottom - top;
-    // Minimum-cost seams bend around the outlines where neighbouring hoods touch.
     const seams: Int32Array[] = [new Int32Array(h)];
     for (let column = 1; column < 8; column++) {
       const expected = width * (0.0718 + (column - 0.5) * 0.1235);
@@ -91,7 +90,6 @@ export function extractChildFrames(data: Uint8ClampedArray, width: number, heigh
           if (!foreground[(top + y) * width + x]) continue;
           body[y * w + x - left] = 1;
         }
-      // A neighbouring row's toe or hat can cross the authored cell boundary.
       // Keep the connected character before measuring its bounds and anchor;
       // otherwise a detached sliver survives and shifts the entire pose.
       keepLargestComponent(body, w, h);
@@ -170,7 +168,6 @@ function keepLargestComponent(mask: Uint8Array, width: number, height: number) {
       const index = queue[read++]!;
       const x = index % width,
         y = Math.floor(index / width);
-      // Diagonal ink strokes belong to the same outlined character.
       for (let dy = -1; dy <= 1; dy++)
         for (let dx = -1; dx <= 1; dx++) {
           const nx = x + dx,
