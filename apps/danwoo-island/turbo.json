@@ -1,0 +1,22 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/apps/hub/src/views/home/model/constants/projects.ts",
+        "$TURBO_ROOT$/apps/hub/src/views/home/model/constants/profileContent.ts",
+        "$TURBO_ROOT$/apps/hub/public/projects/**",
+        "$TURBO_ROOT$/apps/hub/app/opengraph-image.png",
+        "$TURBO_ROOT$/packages/tokens/fonts/**"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**",
+        "public/world/**",
+        "src/views/drive/lib/engine/data/danwoo.js"
+      ]
+    }
+  }
+}
