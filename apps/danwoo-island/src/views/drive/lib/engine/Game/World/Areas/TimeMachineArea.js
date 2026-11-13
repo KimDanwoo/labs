@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { rebuildVillageProps } from '../islandVillage.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import { Area } from './Area.js'
 import { Fn, texture, uv, vec2, vec3, vec4 } from 'three/tsl'
@@ -7,6 +8,12 @@ import content from '../../../data/danwoo.js'
 
 export class TimeMachineArea extends Area
 {
+    setObjects()
+    {
+        rebuildVillageProps(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     constructor(model)
     {
         super(model)
@@ -48,6 +55,7 @@ export class TimeMachineArea extends Area
 
         const hubTexture = new THREE.TextureLoader().load('danwoo/hub.png')
         hubTexture.colorSpace = THREE.SRGBColorSpace
+        hubTexture.flipY = false
         const screenTextures = [hubTexture]
 
         const alertSound = this.game.audio.register({

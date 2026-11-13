@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { makeBungeoppang, rebuildVillageProps } from '../islandVillage.js'
 import { rebuildCookieCart } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { color, float, Fn, instancedArray, mix, normalWorld, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
@@ -13,6 +14,8 @@ export class CookieArea extends Area
 {
     setObjects()
     {
+        rebuildVillageProps(this.model, this.game.materials)
+        makeBungeoppang(this.model.children.find((child) => child.name === 'refCookie'))
         rebuildCookieCart(this.model, this.game.materials)
         super.setObjects()
     }

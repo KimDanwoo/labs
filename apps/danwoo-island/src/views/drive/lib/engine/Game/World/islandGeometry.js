@@ -42,11 +42,15 @@ export const SHADES = {
     cabinetWood: '#8a4f2c',
     grille: '#c9b48a',
     timber: '#bb8650',
+    slate: '#2f3a33',
+    bungeoppang: '#c98a3d',
     obangBlue: '#2f5fb3',
     obangRed: '#c9372c',
     obangYellow: '#e8b830',
     obangWhite: '#f2eee4',
     obangBlack: '#2a2a2e',
+    jindo: '#e6d3ad',
+    bronze: '#b0803a',
 }
 
 const GLOW = {

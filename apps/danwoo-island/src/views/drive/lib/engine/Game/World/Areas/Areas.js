@@ -13,6 +13,7 @@ import { BehindTheSceneArea } from './BehindTheSceneArea.js'
 import { AchievementsArea } from './AchievementsArea.js'
 import { TimeMachineArea } from './TimeMachineArea.js'
 import { EasterArea } from './EasterArea.js'
+import { applyIslandTextures } from '../islandTextures.js'
 
 export class Areas
 {
@@ -36,6 +37,7 @@ export class Areas
             [ 'timeMachine', TimeMachineArea ],
         ]
 
+        applyIslandTextures(this.game.resources.areasModel.scene, this.game.resources)
         const model = [...this.game.resources.areasModel.scene.children]
         
         for(const child of model)
