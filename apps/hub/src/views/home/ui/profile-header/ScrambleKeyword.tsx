@@ -4,15 +4,12 @@ import { useEffect, useState } from 'react';
 
 import { glyphsAt, planDuration, planScramble, toGlyphs, type ScrambleGlyph } from '../../lib/scramble';
 
-/** 헤드라인 단어 등장이 끝난 뒤 첫 전환을 시작한다. */
 const FIRST_HOLD_MS = 1900;
 const HOLD_MS = 1700;
-/** 흐트러진 글자가 너무 빨리 깜빡이지 않게 화면 갱신 간격을 둔다. */
 const GLYPH_FRAME_MS = 35;
 
 type ScrambleKeywordProps = { keywords: readonly string[] };
 
-/** 키워드가 기호·자모로 흐트러졌다가 다음 키워드로 풀리며 계속 바뀐다. 낭독기에는 첫 키워드만 읽힌다. */
 export function ScrambleKeyword({ keywords }: ScrambleKeywordProps) {
   const firstKeyword = keywords[0] ?? '';
   const [glyphs, setGlyphs] = useState<ScrambleGlyph[]>(() => toGlyphs(firstKeyword));

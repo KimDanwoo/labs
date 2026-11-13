@@ -8,7 +8,6 @@ const SPOTLIGHT_SELECTOR = '[data-spotlight]';
 
 type SpotlightGridProps = { className: string; children: ReactNode };
 
-/** 카드마다 리스너를 달지 않고 그리드 하나에서 포인터를 받아 현재 카드에만 효과를 준다. */
 export function SpotlightGrid({ className, children }: SpotlightGridProps) {
   const activeCardRef = useRef<HTMLElement | null>(null);
 

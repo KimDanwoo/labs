@@ -1,7 +1,6 @@
 const MAX_TILT_DEG = 6;
 const MAX_COVER_SHIFT_PX = 10;
 
-/** 카드 안 포인터 위치(0~1)로 스포트라이트 좌표·기울기·커버 패럴랙스 CSS 변수를 갱신한다. */
 export function applySpotlight(card: HTMLElement, clientX: number, clientY: number): void {
   const rect = card.getBoundingClientRect();
   const ratioX = (clientX - rect.left) / rect.width;

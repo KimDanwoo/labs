@@ -3,7 +3,6 @@ import { ProjectCard } from './ProjectCard';
 
 import { SpotlightGrid } from './SpotlightGrid';
 
-/** 카드 등장 스태거 기준(ms). 섹션 헤더 등장 후 시작한다. */
 const GRID_STAGGER_BASE_MS = 80;
 
 export function ProjectGrid() {

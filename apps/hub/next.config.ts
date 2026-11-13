@@ -1,6 +1,5 @@
 import type { NextConfig } from 'next';
 
-// 모든 앱 공통 보안 헤더.
 const SECURITY_HEADERS = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
