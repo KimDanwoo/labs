@@ -1,8 +1,8 @@
 ---
 title: "JavaScript의 진화: jQuery에서 ES2025까지 구조와 흐름 살펴보기"
-description: "jQuery, ES6, async/await, 프레임워크, TypeScript, ES2025 신기능까지 JavaScript가 구조와 패턴을 문법으로 받아들이며 진화해 온 흐름을 살펴봐요."
+description: "jQuery, ES6, async/await, 프레임워크, TypeScript, ES2025까지 JavaScript가 구조를 문법으로 받아들여 온 흐름을 살펴보고, jQuery를 순수 JS로 바꿀 때 확인할 fetch·위임 이벤트 동작 차이를 정리해요."
 publishedAt: "2025-08-01T10:00:52+09:00"
-updatedAt: "2026-11-10T18:24:00+09:00"
+updatedAt: "2026-11-13T13:30:00+09:00"
 category: "dev"
 tags: ["javascript"]
 legacyUrl: "https://dansoon-dev.tistory.com/18"
@@ -55,11 +55,64 @@ $('#btn').on('click', () => {
 
 이벤트 처리, DOM 조작, Ajax 호출 모두가 `$` 하나의 인터페이스로 통일되었습니다. 브라우저에 따라 다른 방식으로 처리해도 개발자는 그 내부를 몰라도 되었습니다.
 
-저는 실무에서 jQuery를 직접 사용한 경험은 없지만 레거시 프로젝트에서 이를 순수 JavaScript로 치환하는 리팩터링 작업을 수행한 적이 있습니다.
+jQuery로 새 기능을 개발해 본 적은 없습니다. 다만 레거시 프로젝트에서 jQuery를 걷어내고 순수 JavaScript로 바꾸는 리팩터링을 한 적이 있습니다.
 
 당시 .on() → addEventListener(), $.ajax() → fetch(), .addClass() → classList.add() 등으로 변환하면서 문법 차이뿐 아니라 코드 구조 자체가 더 명확하고 예측 가능해졌다는 것을 체감했습니다.
 
 이 과정에서 jQuery는 “그 시대에는 필요했던 합리적인 추상화”였지만, 이제 JS가 그 기능을 품음으로써 언어 자체가 구조적으로 성장해왔음을 실감할 수 있었습니다.
+
+### jQuery를 걷어낼 때 확인해야 하는 동작 차이
+
+메서드 이름만 일대일로 바꾸면 같은 코드처럼 보여도 동작이 달라지는 곳이 있습니다. 공식 문서([MDN](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch), [jQuery API](https://api.jquery.com/))에서 확인한 차이를 아래 표에 모았습니다.
+
+![만능칼 하나에 모여 있던 도구가 각각의 도구로 나뉘어 놓인 모습](./jquery-to-vanilla.webp)
+
+| jQuery | 순수 JavaScript | 달라지는 점 |
+| --- | --- | --- |
+| `$.ajax()` | `fetch()` | `$.ajax`는 요청이 실패하면 `error` 콜백을 부르고, 404 같은 에러 응답도 그쪽으로 처리합니다. `fetch()`는 404·504 응답에서 reject하지 않으므로 `response.ok`를 직접 확인해야 합니다. |
+| `dataType` 생략 | `response.json()` | `$.ajax`는 `dataType`을 생략하면 응답 형식을 추측(Intelligent Guess)해 파싱합니다. `fetch()`는 본문을 `json()`이나 `text()`로 직접 읽어야 합니다. |
+| `.on('click', '.item', fn)` | `addEventListener` + `closest()` | 위임 이벤트는 나중에 추가된 자식 요소의 이벤트도 처리합니다. 순수 JavaScript에서는 부모에 리스너를 걸고 `event.target.closest('.item')`으로 대상을 찾아야 합니다. |
+| 핸들러에서 `return false` | `preventDefault()`·`stopPropagation()` | jQuery는 `return false`를 두 메서드 호출로 처리합니다. `addEventListener` 콜백의 반환값은 쓰이지 않으므로 두 메서드를 직접 불러야 합니다. |
+| `$('.item').addClass('on')` | `querySelectorAll` + `forEach` | `addClass`는 선택된 모든 요소에 적용됩니다. `classList.add`는 요소 하나에만 적용되므로 `querySelectorAll`이 돌려준 NodeList를 순회해야 합니다. |
+
+첫 번째 차이를 가장 놓치기 쉽습니다. `success`·`error` 콜백을 그대로 `then`·`catch`로 옮기면 404 응답이 성공 경로로 들어갑니다.
+
+```ts
+// jQuery
+$.ajax({
+  url: '/data',
+  success: (res) => render(res),
+  error: () => showError(),
+});
+
+// 순수 JavaScript
+try {
+  const response = await fetch('/data');
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  render(await response.json());
+} catch {
+  showError();
+}
+```
+
+위임 이벤트도 같은 방식으로 옮깁니다. 목록에 나중에 추가되는 항목까지 처리하려면 리스너를 목록에 걸고 클릭된 요소에서 대상을 찾아 올라갑니다.
+
+```ts
+// jQuery
+$('#list').on('click', '.item', function () {
+  select(this);
+});
+
+// 순수 JavaScript
+const list = document.querySelector('#list');
+list?.addEventListener('click', (event) => {
+  const item = (event.target as Element).closest('.item');
+  if (!item || !list.contains(item)) return;
+  select(item);
+});
+```
+
+메서드를 바꾸는 작업이지만 이런 차이를 놓치면 에러 처리나 이벤트 동작이 조용히 달라집니다. 바꾼 뒤에는 실패 응답과 동적으로 추가된 요소처럼 jQuery가 대신 처리해 주던 경우를 따로 확인해야 합니다.
 
 ## ES5에서 ES6로의 진화는 ‘언어적 반성’의 결과였다
 
@@ -130,8 +183,6 @@ render(posts);
 -   RegExp.escape(): 사용자 입력을 안전하게 정규식에 삽입할 수 있도록 도와주는 정규식 이스케이프 API가 추가되었습니다.
 
 실제로 저는 Array.prototype.at() 메서드가 도입되기 전까지는 arr\[arr.length - 1\] 같은 표현을 습관처럼 사용했지만, 그 의미가 명확하지 않아 가독성이 떨어진다는 피드백을 받은 경험이 있습니다. 이후 Stage 4 기능들을 꾸준히 체크하며 코드의 의도를 더 분명히 전달하는 습관이 생겼습니다.
-
-또한 최근 프로젝트에서는 Promise.try()를 사용해 예외 흐름을 보다 일관되게 유지할 수 있는 것도 코드 품질을 높이는 데 도움이 되었습니다.
 
 신기능의 도입은 문법의 추가에 그치지 않고 팀 전체의 코드 퀄리티와 생산성을 한 단계 끌어올리는 계기라고 생각합니다.
 

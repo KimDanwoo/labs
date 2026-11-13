@@ -296,9 +296,15 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   const link = (vertexSource: string, fragmentSource: string, names: readonly string[]): Program => {
     const program = gl.createProgram();
     if (!program) throw new Error('프로그램을 만들 수 없습니다');
-    gl.attachShader(program, compile(gl.VERTEX_SHADER, vertexSource));
-    gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragmentSource));
+    const vertex = compile(gl.VERTEX_SHADER, vertexSource);
+    const fragment = compile(gl.FRAGMENT_SHADER, fragmentSource);
+    gl.attachShader(program, vertex);
+    gl.attachShader(program, fragment);
     gl.linkProgram(program);
+    gl.detachShader(program, vertex);
+    gl.detachShader(program, fragment);
+    gl.deleteShader(vertex);
+    gl.deleteShader(fragment);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       throw new Error(gl.getProgramInfoLog(program) ?? '프로그램 링크 실패');
     }
@@ -388,6 +394,15 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   let hadRipple = false;
   let hadAccent = false;
 
+  function releaseTargets() {
+    for (const target of [...(accum ?? []), ...(bloom ?? [])]) {
+      gl.deleteTexture(target.texture);
+      gl.deleteFramebuffer(target.framebuffer);
+    }
+    accum = null;
+    bloom = null;
+  }
+
   function ensureGrid() {
     // 격자는 실제 표시 크기에 맞춘다 — 좁은 화면에서 8만 개를 그리지 않는다.
     const next = Math.max(GRID_MIN, Math.min(GRID_MAX, Math.round((side * dpr) / 1.9)));
@@ -418,6 +433,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
 
     if (canvas.width !== pixelWidth || canvas.height !== pixelHeight || !accum) {
+      releaseTargets();
       canvas.width = pixelWidth;
       canvas.height = pixelHeight;
       accum = [makeTarget(pixelWidth, pixelHeight), makeTarget(pixelWidth, pixelHeight)];
@@ -568,7 +584,14 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   }
 
   function dispose() {
-    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    // Strict Mode는 같은 canvas로 다시 setup한다. 컨텍스트는 유지하고 소유 자원만 해제한다.
+    releaseTargets();
+    gl.deleteTexture(artwork);
+    gl.deleteBuffer(quadBuffer);
+    gl.deleteBuffer(uvBuffer);
+    gl.deleteVertexArray(quadVao);
+    gl.deleteVertexArray(pointsVao);
+    for (const prepared of [points, fade, bright, blur, composite]) gl.deleteProgram(prepared.program);
   }
 
   return { layout, setArtwork, render, dispose };

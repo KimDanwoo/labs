@@ -1,60 +1,89 @@
 'use client';
 
-import { currentIndexAtom, TrackRow, TRACKS, usePlaybackControls } from '@entities/track';
-import { ScrollArea } from '@ui/react';
-import { useAtomValue } from 'jotai';
-import { useEffect, useRef } from 'react';
+import { currentIndexAtom, playbackQueueAtom, TRACKS, usePlaybackControls } from '@entities/track';
+import { Button, ScrollArea } from '@ui/react';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useEffect, useRef, type JSX } from 'react';
+import { COLLECTIONS } from '../../config/collections';
+import {
+  collectionFilterAtom,
+  FILTER_LABELS,
+  libraryFilterAtom,
+  searchAtom,
+  visibleTracksAtom,
+} from '../../model/browse';
+import { BrowseControls } from '../library/BrowseControls';
+import { CollectionCard } from '../library/CollectionCard';
+import { LibraryTrack } from '../library/LibraryTrack';
+import { ListeningHistory } from '../library/ListeningHistory';
 
-const totalLabel = (() => {
-  const seconds = TRACKS.reduce((sum, track) => sum + track.durationMs, 0) / 1000;
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.round((seconds % 3600) / 60);
-  return hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
-})();
-
-/**
- * 모바일에선 무대를 덮는 한 화면이고(재생바는 남는다 — 목록에서도 조작할 수 있어야 한다),
- * 데스크톱에선 왼쪽 열이다. 그리드 1행을 컨테이닝 블록으로 쓰려면 row-start/end를 양끝 다 줘야 한다.
- */
-const QUEUE_SCREEN = [
-  'absolute inset-x-0 top-0 bottom-0 row-start-1 row-end-2 bg-void',
-  'min-[820px]:static min-[820px]:row-auto min-[820px]:bg-void/95',
-].join(' ');
-
-export function Playlist() {
+export function Playlist(): JSX.Element {
   const index = useAtomValue(currentIndexAtom);
-  const { select } = usePlaybackControls();
+  const tracks = useAtomValue(visibleTracksAtom);
+  const filter = useAtomValue(libraryFilterAtom);
+  const selectedCollection = useAtomValue(collectionFilterAtom);
+  const queue = useAtomValue(playbackQueueAtom);
+  const setSearch = useSetAtom(searchAtom);
+  const { startQueue } = usePlaybackControls();
   const list = useRef<HTMLDivElement | null>(null);
-
-  // 곡이 바뀌면 그 행이 보이게 한다.
+  const collection = COLLECTIONS.find((item) => item.id === selectedCollection);
+  const label = collection?.title ?? FILTER_LABELS[filter];
+  const availableCount = TRACKS.filter((track) => track.isAvailable !== false).length;
   useEffect(() => {
     list.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' });
   }, [index]);
-
   return (
     <aside
       id="playlist"
-      className={`border-t-hairline-soft min-[820px]:border-r-hairline-soft order-2 flex min-h-0 flex-col backdrop-blur-md min-[820px]:order-1 min-[820px]:border-r ${QUEUE_SCREEN}`}
+      aria-label="음악 라이브러리"
+      className="absolute inset-x-0 top-0 bottom-0 z-20 order-2 row-start-2 row-end-3 flex min-h-0 flex-col border-hairline bg-void player:static player:order-1 player:row-auto player:border-r"
     >
-      <div className="border-b-hairline-soft flex min-w-0 flex-col gap-xs border-b p-md">
-        {/* token-exception: font-label(IBM Plex Mono)은 500 굵기를 제공한다 */}
-        <h1 className="font-label text-[11px] font-medium tracking-mark uppercase">soundlab</h1>
-        <p className="font-label text-mute text-[10px] tracking-label break-keep tabular-nums uppercase">
-          Danwoo · {TRACKS.length} tracks · {totalLabel}
-        </p>
+      <div className="border-b border-hairline p-md pr-3xl">
+        <h1 className="font-label text-sm tracking-mark text-paper">SOUNDLAB</h1>
+        <p className="mt-xs text-xs text-dim">{availableCount}곡</p>
       </div>
-      {/* 오버레이 스크롤 — 레이아웃을 밀지 않고 호버할 때만 보인다 */}
-      <ScrollArea
-        ref={list}
-        type="hover"
-        scrollHideDelay={400}
-        className="min-h-0 flex-1 **:data-[slot=scroll-area-scrollbar]:w-1.5 **:data-[slot=scroll-area-scrollbar]:border-l-0 **:data-[slot=scroll-area-thumb]:bg-hairline"
-      >
-        <div className="py-xs">
-          {TRACKS.map((track, position) => (
-            <TrackRow key={track.id} track={track} index={position} isCurrent={position === index} onSelect={select} />
-          ))}
+      <ScrollArea ref={list} className="min-h-0 flex-1">
+        <div className="space-y-md p-md">
+          <details>
+            <summary className="cursor-pointer text-xs text-dim">플레이리스트</summary>
+            <div className="mt-md flex flex-col">
+              {COLLECTIONS.map((item) => (
+                <CollectionCard key={item.id} collection={item} />
+              ))}
+            </div>
+          </details>
+          <BrowseControls />
+          {queue ? (
+            <p className="text-xs text-brass" role="status">
+              재생 중인 순서 · {queue.label} · {queue.ids.length}곡
+            </p>
+          ) : null}
+          <div className="flex items-center justify-between gap-sm">
+            <p className="text-sm" aria-live="polite">
+              {label} · {tracks.length}곡
+            </p>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={!tracks.length}
+              onClick={() => startQueue({ ids: tracks.map((track) => track.id), label })}
+            >
+              이 목록 재생
+            </Button>
+          </div>
         </div>
+        {tracks.length ? (
+          tracks.map((track, position) => <LibraryTrack key={track.id} track={track} position={position} />)
+        ) : (
+          <div className="p-lg text-center text-sm leading-relaxed text-dim">
+            <p>표시할 곡이 없습니다.</p>
+            <Button type="button" variant="ghost" className="mt-sm" onClick={() => setSearch('')}>
+              검색어 지우기
+            </Button>
+          </div>
+        )}
+        <ListeningHistory />
       </ScrollArea>
     </aside>
   );

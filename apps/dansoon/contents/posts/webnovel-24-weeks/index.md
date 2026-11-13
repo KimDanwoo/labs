@@ -2,7 +2,7 @@
 title: "웹소설 플랫폼 세 곳의 장르별 순위 24주를 모아 비교해 보니"
 description: "카카오페이지·네이버 시리즈·리디의 웹소설 장르별 순위 24주치를 모아 정리해요. 세 플랫폼의 순위는 거의 겹치지 않았고, 1위가 기록할 때마다 바뀌는 곳과 수집 기간 내내 그대로인 곳이 갈렸어요."
 publishedAt: "2026-11-06T23:00:00+09:00"
-updatedAt: "2026-11-10T18:24:00+09:00"
+updatedAt: "2026-11-13T14:00:00+09:00"
 category: "reading"
 tags: ["side-project"]
 draft: false
@@ -24,6 +24,8 @@ cover: "./cover.webp"
 - 리포트는 대부분 1주 간격이지만 5월 1일과 4일은 3일 간격이고 6월 1일과 7월 6일 사이는 4주가 비어 있다. 아래에서 "24회"는 수집된 24번을 뜻하고, 공백 기간에도 순위에 있었는지는 알 수 없다.
 - 네이버 시리즈는 일간 순위를 가져온다. 카카오페이지와 리디는 각 플랫폼의 장르별 화면에 보이는 순위를 그대로 가져오는데 그 화면의 집계 기간이 일간인지 주간인지는 따로 확인하지 못했다. 순위가 얼마나 자주 바뀌는지는 이 집계 기간의 영향을 받는다.
 - 리디는 한 작품이 여러 장르 목록에 함께 오르기도 한다. 24편 동안 두 장르 이상의 TOP 10에 오른 작품이 리디에서만 26개였다.
+
+리포트 원문은 공개 저장소의 [`apps/dansoon/contents/book`](https://github.com/KimDanwoo/labs/tree/main/apps/dansoon/contents/book)에, 플랫폼별 수집 원본은 [`apps/dansoon/data/webnovel`](https://github.com/KimDanwoo/labs/tree/main/apps/dansoon/data/webnovel)에 남아 있다. 아래 숫자는 이 리포트들의 장르별 순위표에서 TOP 10까지만 직접 셌다.
 
 ## 2. 세 플랫폼의 순위는 거의 겹치지 않았다
 

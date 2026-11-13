@@ -1,3 +1,4 @@
+import { parseBandSignals, parseWaveform } from '../lib/signals';
 import { type PlayerScreen, PLAYER_SCREEN } from '../model/constants/playerScreen';
 import type { ArtworkSize, Track } from '../model/types/track';
 
@@ -42,11 +43,20 @@ export function loadWidgetApi(): Promise<ScGlobal> {
       const script = document.createElement('script');
       script.src = WIDGET_API_SRC;
       script.async = true;
+      const timer = setTimeout(() => {
+        script.remove();
+        reject(new Error('재생 API 연결 시간 초과'));
+      }, 10_000);
       script.onload = () => {
+        clearTimeout(timer);
         if (globalThis.SC) resolve(globalThis.SC);
         else reject(new Error('api.js를 불러왔지만 SC 전역이 없습니다'));
       };
-      script.onerror = () => reject(new Error('SoundCloud Widget API 로드 실패'));
+      script.onerror = () => {
+        clearTimeout(timer);
+        script.remove();
+        reject(new Error('SoundCloud Widget API 로드 실패'));
+      };
       document.head.append(script);
     });
     // 실패까지 캐시하면 새로고침 전엔 재시도가 불가능하다. 다음 호출이 다시 시도하게 비운다.
@@ -79,7 +89,7 @@ export function setUrl(tracks: readonly Track[]): string | null {
 /** 위젯이 준 sound 객체에서 트랙 id를 꺼낸다. 형식이 다르면 매핑에서 제외한다. */
 export function soundId(sound: unknown): number | null {
   if (typeof sound !== 'object' || sound === null || !('id' in sound)) return null;
-  return typeof sound.id === 'number' ? sound.id : null;
+  return typeof sound.id === 'number' && Number.isSafeInteger(sound.id) && sound.id > 0 ? sound.id : null;
 }
 
 const ENGINE_FRAME_STYLE = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
@@ -123,15 +133,9 @@ export function artworkUrl(track: Track, size: ArtworkSize): string {
  * 0–1로 정규화해 Float32Array로 캐시한다.
  */
 export async function fetchWaveform(url: string): Promise<Float32Array> {
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
   if (!response.ok) throw new Error(`파형 요청 실패: ${response.status}`);
-  const { samples, height } = (await response.json()) as { samples: number[]; height: number };
-  if (!Array.isArray(samples) || samples.length === 0) throw new Error('파형 샘플이 비어 있습니다');
-
-  const peak = height || Math.max(...samples) || 1;
-  const normalized = new Float32Array(samples.length);
-  for (let i = 0; i < samples.length; i++) normalized[i] = Math.min(1, (samples[i] ?? 0) / peak);
-  return normalized;
+  return parseWaveform(await response.json());
 }
 
 /**
@@ -139,17 +143,6 @@ export async function fetchWaveform(url: string): Promise<Float32Array> {
  * 없으면 앱은 사클 파형 폴백으로 돈다(신호가 있는 곡만 확장 시각).
  * 대역은 Uint8을 base64로 담는다(43Hz × 3채널을 평문 배열로 두면 3배가 된다).
  */
-type BandSignals = {
-  fps: number;
-  audioMs: number;
-  low: string;
-  mid: string;
-  high: string;
-  bpm: number | null;
-  /** [시각ms, 세기 0–255] — 실제 타격이 있는 격자선만 담긴다. */
-  beats: [number, number][];
-};
-
 const decodeBand = (base64: string) => {
   const binary = atob(base64);
   const out = new Float32Array(binary.length);
@@ -161,25 +154,32 @@ let manifest: Promise<Set<number>> | null = null;
 
 /** 신호가 있는 곡 목록. 곡마다 404를 두드리지 않으려고 한 번만 받는다. */
 function fetchSignalManifest(): Promise<Set<number>> {
-  manifest ??= fetch('/signals/index.json')
-    .then((response) => (response.ok ? (response.json() as Promise<number[]>) : []))
-    .then((ids) => new Set(ids))
+  manifest ??= fetch('/signals/index.json', { signal: AbortSignal.timeout(10_000) })
+    .then(async (response): Promise<unknown> => (response.ok ? response.json() : []))
+    .then(
+      (ids) =>
+        new Set<number>(
+          Array.isArray(ids)
+            ? ids.filter((id): id is number => typeof id === 'number' && Number.isSafeInteger(id) && id > 0)
+            : [],
+        ),
+    )
     .catch(() => new Set<number>());
   return manifest;
 }
 
-export async function fetchBands(trackId: number) {
+export async function fetchBands(trackId: number, durationMs: number) {
   if (!(await fetchSignalManifest()).has(trackId)) return null;
-  const response = await fetch(`/signals/${trackId}.json`);
+  const response = await fetch(`/signals/${trackId}.json`, { signal: AbortSignal.timeout(10_000) });
   if (!response.ok) return null;
-  const raw = (await response.json()) as BandSignals;
-  if (!Number.isFinite(raw.fps) || raw.fps <= 0) return null;
+  const raw = parseBandSignals(await response.json());
+  if (!raw || Math.abs(raw.audioMs - durationMs) > 250) return null;
   return {
     fps: raw.fps,
     low: decodeBand(raw.low),
     mid: decodeBand(raw.mid),
     high: decodeBand(raw.high),
-    beats: Array.isArray(raw.beats) ? raw.beats : [],
+    beats: raw.beats,
   };
 }
 
@@ -211,10 +211,12 @@ export function readSharedStartMs(search: string): number | null {
 
 /** 주소는 "무슨 곡 + 어떤 화면"을 담는다. 새로고침·공유로 그 화면에 그대로 들어올 수 있다. */
 export function playerPath(track: Track, screen: PlayerScreen): string {
+  if (screen === PLAYER_SCREEN.archive) return '/';
   return screen === PLAYER_SCREEN.queue ? `${trackPath(track)}${QUEUE_SEGMENT}` : trackPath(track);
 }
 
 export function screenFromPath(pathname: string): PlayerScreen {
+  if (pathname === '/') return PLAYER_SCREEN.archive;
   return pathname.endsWith(QUEUE_SEGMENT) ? PLAYER_SCREEN.queue : PLAYER_SCREEN.nowPlaying;
 }
 
@@ -230,7 +232,8 @@ export function readLastPlayed(): LastPlayed | null {
     if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== 'object' || parsed === null) return null;
-    const { id, ms } = parsed as Record<string, unknown>;
+    if (!('id' in parsed) || !('ms' in parsed)) return null;
+    const { id, ms } = parsed;
     if (typeof id !== 'number' || !Number.isInteger(id)) return null;
     if (typeof ms !== 'number' || !Number.isFinite(ms) || ms < 0) return null;
     return { id, ms };

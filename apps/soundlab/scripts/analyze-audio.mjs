@@ -11,7 +11,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TRACKS_FILE = join(HERE, '..', 'src', 'entities', 'track', 'model', 'constants', 'tracks.ts');
@@ -112,19 +112,6 @@ function probeDurationMs(file) {
   return Number.isFinite(seconds) ? seconds * 1000 : Number.NaN;
 }
 
-function parseTracks() {
-  const src = readFileSync(TRACKS_FILE, 'utf8');
-  return src
-    .split(/\n {2}\{/)
-    .slice(1)
-    .map((block) => ({
-      id: Number(block.match(/id: (\d+)/)?.[1]),
-      title: block.match(/title: '((?:[^'\\]|\\.)*)'/)?.[1]?.replace(/\\'/g, "'"),
-      durationMs: Number(block.match(/durationMs: (\d+)/)?.[1]),
-    }))
-    .filter((track) => track.id && track.title);
-}
-
 function decodeMono(file) {
   mkdirSync(dirname(TMP), { recursive: true });
   execFileSync(
@@ -149,7 +136,10 @@ for (let i = 0; i < FFT_SIZE / 2; i++) {
   twiddleCos[i] = Math.cos((-2 * Math.PI * i) / FFT_SIZE);
   twiddleSin[i] = Math.sin((-2 * Math.PI * i) / FFT_SIZE);
 }
-const window = Float64Array.from({ length: FFT_SIZE }, (_, i) => 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (FFT_SIZE - 1)));
+const window = Float64Array.from(
+  { length: FFT_SIZE },
+  (_, i) => 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (FFT_SIZE - 1)),
+);
 
 function fft(re, im) {
   for (let i = 0; i < FFT_SIZE; i++) {
@@ -240,8 +230,7 @@ function detectOnsets(flux) {
     let variance = 0;
     for (let i = from; i < to; i++) variance += (flux[i] - mean) ** 2;
     const sd = Math.sqrt(variance / (to - from));
-    const isPeak =
-      flux[f] >= flux[f - 1] && flux[f] >= flux[f + 1] && flux[f] >= flux[f - 2] && flux[f] >= flux[f + 2];
+    const isPeak = flux[f] >= flux[f - 1] && flux[f] >= flux[f + 1] && flux[f] >= flux[f - 2] && flux[f] >= flux[f + 2];
     if (isPeak && flux[f] > mean + 1.3 * sd) {
       const ms = (f / FPS) * 1000;
       if (!found.length || ms - found.at(-1).ms > 90) found.push({ ms, strength: flux[f] });
@@ -360,7 +349,7 @@ function selftest() {
 
   // 2) 무작위 온셋은 격자가 아니다 — 신뢰도가 문턱 아래여야 비트를 안 내보낸다.
   let seed = 1;
-  const random = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+  const random = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
   const noise = [];
   for (let ms = 0; ms < 30_000; ms += 90 + random() * 400) noise.push({ ms, strength: 1 });
   const noisy = findGrid(noise, 30_000);
@@ -391,7 +380,8 @@ if (!folder || !existsSync(folder)) {
   process.exit(1);
 }
 
-const tracks = parseTracks();
+const { TRACKS } = await import(pathToFileURL(TRACKS_FILE).href);
+const tracks = TRACKS.filter((track) => track.isAvailable !== false);
 const byTitle = new Map(tracks.map((track) => [track.title, track]));
 /** 곡별 하위 폴더로 정리된 경우가 많다. 아래까지 훑는다(파일명만 매칭에 쓰므로 깊이는 상관없다). */
 function collectAudio(root, depth = 0) {
@@ -516,7 +506,9 @@ if (skipped.length) console.log(`제목이 목록과 안 맞아 건너뜀: ${ski
 if (mismatched.length) {
   console.log('\n⚠ 사클에 올라간 마스터와 길이가 맞는 파일이 없어 건너뜀 (그 곡은 사클 파형 폴백으로 돕니다):');
   for (const { title, drift, tried } of mismatched) {
-    const how = Number.isFinite(drift) ? `가장 가까운 것도 ${(drift / 1000).toFixed(1)}초 ${drift > 0 ? '길다' : '짧다'}` : '길이를 읽지 못했다';
+    const how = Number.isFinite(drift)
+      ? `가장 가까운 것도 ${(drift / 1000).toFixed(1)}초 ${drift > 0 ? '길다' : '짧다'}`
+      : '길이를 읽지 못했다';
     console.log(`   ${title}: ${how}  [${tried.join(', ')}]`);
   }
 }

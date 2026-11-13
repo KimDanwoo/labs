@@ -33,10 +33,12 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      # 익명 client_id 경로가 깨지면 스크립트가 경고만 남기고 0으로 끝난다.
-      # 그 경우 tracks.ts가 그대로라 아래 diff 검사에서 조용히 종료된다.
+      # 예약 갱신 실패는 워크플로 실패로 드러내고, 기존 아카이브는 보존한다.
       - name: Sync tracks
-        run: node apps/soundlab/scripts/sync-tracks.mjs
+        run: node apps/soundlab/scripts/sync-tracks.mjs --strict
+
+      - name: Validate signal coverage and refresh listening moments
+        run: node apps/soundlab/scripts/check-signals.mjs --write
 
       - name: Commit, open PR, and merge
         env:
@@ -45,7 +47,7 @@ jobs:
           BRANCH="feature/${{ steps.date.outputs.date }}-soundlab-tracks"
           TITLE='chore(soundlab): 곡 목록 동기화 (${{ steps.date.outputs.date }})'
           # OG 카드용 폰트 서브셋은 제목에 쓰인 글자만 담으므로 곡 목록과 함께 바뀐다.
-          git add apps/soundlab/src/entities/track/model/constants/tracks.ts apps/soundlab/assets/og-title.ttf
+          git add apps/soundlab/src/entities/track/model/constants/tracks.ts apps/soundlab/src/entities/track/model/constants/highlights.ts apps/soundlab/assets/og-title.ttf
           if git diff --cached --quiet; then
             echo "곡 목록에 변경이 없어 종료합니다."
             exit 0

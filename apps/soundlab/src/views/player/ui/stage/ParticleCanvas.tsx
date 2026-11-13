@@ -3,6 +3,7 @@ import { useFrame } from '@shared/lib/frame';
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { createRenderer, RIPPLE_SLOTS, type Renderer } from '../../lib/stage/renderer';
+import { VISUAL_MODE, visualModeAtom } from '../../model/visual';
 
 /**
  * 아트워크는 다른 오리진이므로 crossOrigin 없이는 텍스처 업로드가 보안 오류로 막힌다.
@@ -118,6 +119,12 @@ type ParticleCanvasProps = {
 
 export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
   const index = useAtomValue(currentIndexAtom);
+  const visualMode = useAtomValue(visualModeAtom);
+  const isCalm = visualMode === VISUAL_MODE.calm;
+  const calmModeRef = useRef(isCalm);
+  useEffect(() => {
+    calmModeRef.current = isCalm;
+  }, [isCalm]);
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const renderer = useRef<Renderer | null>(null);
   // 렌더러가 안 서면 캔버스를 화면에서 뺀다. alpha:false로 만든 컨텍스트라 한 번도 안 그린 캔버스가
@@ -149,6 +156,7 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
       return undefined;
     }
     renderer.current = instance;
+    setIsDead(false);
 
     const relayout = () => {
       const rect = slotRef.current?.getBoundingClientRect();
@@ -178,7 +186,7 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
     };
     calm.addEventListener('change', readCalm);
     const handlePointerDown = (event: PointerEvent) => {
-      if (calm.matches) return;
+      if (calm.matches || calmModeRef.current) return;
       claim(event.clientX - node.clientWidth / 2, node.clientHeight / 2 - event.clientY, 1, RIPPLE_MS, true);
     };
     slot.addEventListener('pointerdown', handlePointerDown);
@@ -208,10 +216,12 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
 
   useFrame((delta) => {
     const instance = renderer.current;
-    if (!instance) return;
+    if (!instance || document.hidden) return;
     const step = Math.min(3, delta / 16.7);
+    const shouldReduceMotion = calmRef.current || isCalm;
 
     const target = want.current;
+    if (shouldReduceMotion) morph.current = target;
     morph.current += (target - morph.current) * (target > morph.current ? 0.038 : 0.075) * step;
 
     if (target === 0 && morph.current < 0.02 && pending.current !== null && ready.current) {
@@ -229,7 +239,7 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
     // 비트가 왔으면 액자 안 무작위 자리에서 파동을 쏜다. 세기에 비례한 진폭이라 약한 박은 약하게 퍼진다.
     if (frameState.beatId !== seenBeat.current) {
       seenBeat.current = frameState.beatId;
-      if (!calmRef.current) {
+      if (!shouldReduceMotion) {
         const { x, y, half } = frame.current;
         const reach = half * BEAT_RIPPLE_SPREAD;
         claim(
@@ -260,11 +270,11 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
 
     instance.render({
       morph: morph.current,
-      level: frameState.level,
-      swell: frameState.swell,
-      pre: frameState.pre,
-      hit: frameState.hit,
-      air: frameState.air,
+      level: shouldReduceMotion ? 0 : frameState.level,
+      swell: shouldReduceMotion ? 0 : frameState.swell,
+      pre: shouldReduceMotion ? 0 : frameState.pre,
+      hit: shouldReduceMotion ? 0 : frameState.hit,
+      air: shouldReduceMotion ? 0 : frameState.air,
       // 파동이 살아 있는 동안만 트레일을 얹어 물결이 빛 자국을 남기게 한다. 상한은 무한 번짐 방지.
       decay: Math.min(0.88, trail.current * 0.86 + energy * 0.24),
       ripples: rippleBuffer,

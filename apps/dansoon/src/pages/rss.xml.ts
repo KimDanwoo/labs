@@ -8,7 +8,7 @@ export async function GET({ site }: APIContext) {
   return rss({
     title: 'Dansoon',
     description: '프론트엔드 개발을 하며 배운 것과 회고, 읽은 책을 기록해요.',
-    site: site ?? 'https://log.danwoo.dev',
+    site: site ?? 'https://danwoo.dev',
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,

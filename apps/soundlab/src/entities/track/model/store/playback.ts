@@ -1,6 +1,11 @@
 import { atom } from 'jotai/vanilla';
 import { type PlayerScreen, PLAYER_SCREEN } from '../constants/playerScreen';
 import { type RepeatMode, REPEAT_MODE } from '../constants/repeatMode';
+import type { PlaybackQueue } from '../queue';
+
+export const playbackQueueAtom = atom<PlaybackQueue | null>(null);
+export const recoveryNoticeAtom = atom(false);
+export const resumeNoticeAtom = atom<number | null>(null);
 
 export const currentIndexAtom = atom(0);
 export const isPlayingAtom = atom(false);

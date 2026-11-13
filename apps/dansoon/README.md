@@ -2,7 +2,7 @@
 
 프론트엔드 엔지니어 김단우의 개발 노트·회고·독서 기록과 주간 책 순위 리포트. Astro 정적 사이트.
 
-**라이브:** [log.danwoo.dev](https://log.danwoo.dev)
+**라이브:** [danwoo.dev](https://danwoo.dev) (`log.danwoo.dev`·`www.danwoo.dev`는 Vercel 도메인 설정에서 308 영구 이동)
 
 ## 기술 스택
 
@@ -78,7 +78,7 @@ GitHub Actions가 매주 월요일 리포트를 만들어 `contents/book/`에 �
 **애드센스 심사 동안 리포트 페이지는 내려 둔다.** Google 게시자 정책이 수동 검토 없는 자동 생성 콘텐츠에 광고를 허용하지 않기 때문이다. 라우트 폴더를 `src/pages/_book`, `src/pages/og/_book`으로 바꿔 Astro 라우팅에서 뺐고(밑줄 폴더는 페이지가 되지 않는다), 사이드바 메뉴와 글의 `/book/` 링크도 뺐다. 수집은 계속된다. 승인 후 되돌릴 때:
 
 1. 두 폴더 이름을 `book`으로 되돌리고, `AppSidebar.astro`의 바로가기와 `about.md`의 항목, 글 3편(`bestseller-24-weeks`, `webnovel-24-weeks`, `bestseller-aggregator`)의 링크를 복구한다.
-2. 리포트 페이지에는 Google 광고를 붙이지 않는다. `google-adsense-account` 메타 태그를 리포트 페이지에서 빼고, 애드센스 "페이지 제외"에 `danwoo.dev/book`과 `log.danwoo.dev/book`을 등록한다.
+2. 리포트 페이지에는 Google 광고를 붙이지 않는다. `google-adsense-account` 메타 태그를 리포트 페이지에서 빼고, 애드센스 "페이지 제외"에 `danwoo.dev/book`을 등록한다.
 3. `_book/[slug].astro`의 `IS_EXCLUDED_FROM_SEARCH`와 `astro.config.mjs`의 sitemap filter를 유지할지 정한다.
 
 ## 댓글

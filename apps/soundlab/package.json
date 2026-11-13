@@ -5,14 +5,16 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "node scripts/sync-tracks.mjs",
+    "prebuild": "node scripts/sync-tracks.mjs && node scripts/check-signals.mjs --write",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test \"src/**/__tests__/*.test.ts\"",
+    "test": "node --import tsx --test \"src/**/__tests__/*.test.ts\" \"scripts/__tests__/*.test.mjs\" && node scripts/check-signals.mjs",
     "sync-tracks": "node scripts/sync-tracks.mjs",
     "analyze-audio": "node scripts/analyze-audio.mjs",
-    "og": "node scripts/shoot-og.mjs"
+    "og": "node scripts/shoot-og.mjs",
+    "check:signals": "node scripts/check-signals.mjs",
+    "build:highlights": "node scripts/check-signals.mjs --write"
   },
   "dependencies": {
     "@tokens/css": "workspace:*",

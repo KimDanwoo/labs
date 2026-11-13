@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import type { ScWidget } from '../../../api/widget';
 import { currentIndexAtom, frameState } from '../../store/playback';
 import type { Track } from '../../types/track';
+import { useKeyboard } from '../useKeyboard';
 import { usePlayback, type Playback } from '../usePlayback';
 
 // TS 훅과 동일한 Jotai 엔트리를 사용한다. ESM/CJS 각각의 Provider 컨텍스트를 섞지 않는다.
@@ -29,12 +30,15 @@ const TRACKS: Track[] = [1, 2, 3].map((id) => ({
 }));
 
 async function player(t: TestContext) {
-  const dom = new JSDOM('<div id="root"></div>', { url: 'http://localhost/' });
+  const dom = new JSDOM('<input id="search" /><div id="root"></div>', { url: 'http://localhost/' });
   const previous = new Map<string, PropertyDescriptor | undefined>();
   const frames = new Map<number, FrameRequestCallback>();
   let nextFrame = 0;
   const events = new Map<string, WidgetListener>();
   const skips: number[] = [];
+  const loads: string[] = [];
+  const seeks: number[] = [];
+  let pauses = 0;
   const pending: SoundsCallback[] = [];
   let deferred = false;
   let current = 0;
@@ -55,15 +59,23 @@ async function player(t: TestContext) {
       current = index;
       skips.push(index);
     },
-    load: () => {},
+    load: (url) => {
+      loads.push(url);
+    },
     play: () => {},
-    pause: () => {},
-    seekTo: () => {},
+    pause: () => {
+      pauses++;
+    },
+    seekTo: (ms) => {
+      seeks.push(ms);
+    },
     setVolume: () => {},
   };
   const values = {
     window: dom.window,
     document: dom.window.document,
+    HTMLElement: dom.window.HTMLElement,
+    HTMLButtonElement: dom.window.HTMLButtonElement,
     localStorage: dom.window.localStorage,
     SC: { Widget: () => widget },
     IS_REACT_ACT_ENVIRONMENT: true,
@@ -85,6 +97,7 @@ async function player(t: TestContext) {
   let controls: Playback | undefined;
   function Harness() {
     controls = usePlayback(TRACKS);
+    useKeyboard(controls);
     return null;
   }
   const container = dom.window.document.getElementById('root');
@@ -111,6 +124,32 @@ async function player(t: TestContext) {
   return {
     store,
     skips,
+    loads,
+    seeks,
+    pauseCount: () => pauses,
+    startQueue: (ids: readonly number[]) =>
+      act(() => {
+        assert.ok(controls);
+        controls.startQueue({ ids, label: 'test' });
+      }),
+    retry: () =>
+      act(() => {
+        assert.ok(controls);
+        controls.retry();
+      }),
+    playFrom: (ms: number) =>
+      act(() => {
+        assert.ok(controls);
+        controls.playFrom(ms);
+      }),
+    inputKey: (key: string) =>
+      act(() => {
+        dom.window.document
+          .getElementById('search')
+          ?.dispatchEvent(
+            new dom.window.KeyboardEvent('keydown', { key, code: key === ' ' ? 'Space' : key, bubbles: true }),
+          );
+      }),
     pending,
     events,
     unmount,
@@ -181,4 +220,55 @@ test('malformed widget progress cannot corrupt the playback clock', async (t) =>
   await app.emit('playProgress', { currentPosition: -100 });
   await app.frame();
   assert.ok(frameState.position >= 0);
+});
+
+test('custom queue follows its order and stops after its final track', async (t) => {
+  const app = await player(t);
+  await app.emit('ready');
+  await app.startQueue([3, 1]);
+  assert.equal(app.store.get(currentIndexAtom), 2);
+  assert.equal(app.loads.at(-1), 'https://api.soundcloud.com/tracks/3');
+  await app.emit('finish');
+  assert.equal(app.store.get(currentIndexAtom), 0);
+  assert.equal(app.loads.at(-1), 'https://api.soundcloud.com/tracks/1');
+  const before = app.loads.length;
+  await app.emit('finish');
+  assert.equal(app.loads.length, before);
+  assert.ok(app.pauseCount() > 0);
+});
+
+test('retry rebuilds the engine and preserves the requested track', async (t) => {
+  const app = await player(t);
+  await app.emit('ready');
+  await app.select(2);
+  await app.retry();
+  assert.equal(document.querySelectorAll('iframe').length, 1);
+  await app.emit('ready');
+  assert.equal(app.store.get(currentIndexAtom), 2);
+});
+
+test('highlight seeking works while the current track is already playing', async (t) => {
+  const app = await player(t);
+  await app.emit('ready');
+  await app.select(0);
+  await app.emit('play');
+  await app.playFrom(42_000);
+  assert.equal(app.seeks.at(-1), 42_000);
+  assert.equal(frameState.position, 0.35);
+});
+
+test('typing playback shortcuts into search does not seek or change tracks', async (t) => {
+  const app = await player(t);
+  await app.emit('ready');
+  const seeks = app.seeks.length;
+  for (const key of ['k', ' ', 'l', 'j', '9', 'Home', 'ArrowLeft']) await app.inputKey(key);
+  assert.equal(app.seeks.length, seeks);
+  assert.equal(app.store.get(currentIndexAtom), 0);
+});
+
+test('engine readiness alone never starts a song', async (t) => {
+  const app = await player(t);
+  await app.emit('ready');
+  assert.deepEqual(app.skips, []);
+  assert.deepEqual(app.loads, []);
 });

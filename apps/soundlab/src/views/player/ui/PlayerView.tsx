@@ -16,10 +16,10 @@ import {
   type PlayerScreen,
 } from '@entities/track';
 import { useAtomValue } from 'jotai';
+import { Archive } from './archive/Archive';
+import { PlayerHeader } from './PlayerHeader';
 import { Playlist } from './playlist/Playlist';
-import { QueueToggle } from './playlist/QueueToggle';
 import { Stage } from './stage/Stage';
-import { ShareButton } from './transport/ShareButton';
 import { Transport } from './transport/Transport';
 
 type PlayerViewProps = {
@@ -46,24 +46,24 @@ export function PlayerView({ initialTrackId, initialScreen }: PlayerViewProps) {
 
   return (
     <PlaybackProvider value={playback}>
-      {/* 화면은 무대와 재생목록 둘이고, 재생바는 둘 다에 남는다 — 목록에서도 조작할 수 있어야 한다.
-          모바일은 목록이 무대를 덮고, 데스크톱은 왼쪽 열로 붙는다(그래서 열 구성만 달라진다).
-          order는 셋 다 명시한다 — 빠뜨리면 기본값 0이 되어 자동 배치에서 맨 위로 올라간다. */}
       <div
         data-engine-mode={engineMode}
-        className={`relative z-10 grid h-full grid-cols-1 grid-rows-[minmax(0,1fr)_auto] ${
-          isQueue
-            ? 'min-[820px]:grid-cols-[clamp(258px,25vw,372px)_minmax(0,1fr)]'
-            : 'min-[820px]:grid-cols-[minmax(0,1fr)]'
+        className={`relative z-10 grid h-full grid-cols-1 grid-rows-[auto_minmax(0,1fr)_auto] ${
+          isQueue ? 'player:grid-cols-[var(--spacing-library)_minmax(0,1fr)]' : 'player:grid-cols-[minmax(0,1fr)]'
         }`}
       >
-        {isQueue ? <Playlist /> : null}
-        <Stage />
-        <Transport />
-        <div className="absolute top-md right-md z-20 flex items-center gap-xs">
-          <ShareButton />
-          <QueueToggle />
+        <div className="col-span-full">
+          <PlayerHeader />
         </div>
+        {screen === PLAYER_SCREEN.archive ? (
+          <Archive />
+        ) : (
+          <>
+            {isQueue ? <Playlist /> : null}
+            <Stage />
+          </>
+        )}
+        <Transport />
       </div>
     </PlaybackProvider>
   );

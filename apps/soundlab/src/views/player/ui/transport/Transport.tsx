@@ -74,7 +74,10 @@ export function Transport() {
       {/* 좁은 화면에선 시간 / 컨트롤 / 링크를 3행으로 접는다 — 한 줄에 넣으면 44px 터치 타깃
           5개를 min-content로도 못 담아 그리드가 넘치고 오른쪽이 잘린다. */}
       <div className="font-label text-mute grid grid-cols-[1fr_auto] items-center gap-sm text-[10px] tracking-label tabular-nums uppercase min-[820px]:grid-cols-[1fr_auto_1fr]">
-        <span className="col-start-1 row-start-1">
+        <span className="col-start-1 row-start-1 flex min-w-0 items-center gap-md">
+          <span className="max-w-40 truncate text-xs tracking-normal normal-case text-dim" title={track?.title}>
+            {track?.title}
+          </span>
           <b ref={elapsed} className="text-paper font-normal">
             0:00
           </b>
@@ -101,6 +104,7 @@ export function Transport() {
           </button>
           <button
             type="button"
+            disabled={track?.isAvailable === false}
             aria-label={isPlaying ? '일시정지' : '재생'}
             title={`${isPlaying ? '일시정지' : '재생'} · Space / K`}
             className={PLAY_BUTTON}
@@ -139,7 +143,7 @@ export function Transport() {
               <a
                 href={track.permalinkUrl}
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
                 // py-sm: 링크 하나만 남은 행이라 최소 터치 타깃(24px)을 패딩으로 확보한다.
                 className="decoration-hairline hover:text-paper focus-visible:text-paper py-sm underline underline-offset-[3px] min-[820px]:py-0"
               >
