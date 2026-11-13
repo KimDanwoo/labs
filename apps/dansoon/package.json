@@ -19,6 +19,7 @@
     "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tokens/css": "workspace:*",
+    "@vercel/analytics": "catalog:",
     "astro": "catalog:",
     "astro-expressive-code": "catalog:",
     "overlayscrollbars": "catalog:",
