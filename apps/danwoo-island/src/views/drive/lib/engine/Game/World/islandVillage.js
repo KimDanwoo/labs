@@ -372,7 +372,7 @@ function bigDok(parts, frame)
     parts.prism('onggiLid', radius * 0.6, radius * 0.74, height * 0.1, { position: [0, bottom + height * 0.96, 0], matrix }, 12)
 }
 
-const TV_BODY = { halfWidth: 0.97, bottom: -1.15, top: 0.84, back: -0.5, front: 0.4 }
+const TV_BODY = { halfWidth: 0.97, bottom: -1.15, top: 0.84, back: -0.5, front: 0.33 }
 const TV_SCREEN = { halfWidth: 0.71, bottom: -0.68, top: 0.55 }
 
 function tvCabinet(parts, container)
@@ -429,9 +429,9 @@ function watermelonTray(parts, frame)
     const radius = Math.min(size.z * 0.42, size.y * 1.6)
     for(const [x, turn] of [[-size.x * 0.22, 0.2], [size.x * 0.2, -0.15]])
     {
-        const rind = new THREE.CylinderGeometry(radius, radius, 0.12, 10, 1, false, 0, Math.PI)
+        const rind = new THREE.CylinderGeometry(radius, radius, 0.12, 10, 1, false, Math.PI, Math.PI)
         parts.add('dancheongGreen', rind, { position: [x, bottom + 0.05, 0], rotation: [Math.PI / 2, 0, turn], matrix })
-        const flesh = new THREE.CylinderGeometry(radius * 0.86, radius * 0.86, 0.125, 10, 1, false, 0, Math.PI)
+        const flesh = new THREE.CylinderGeometry(radius * 0.86, radius * 0.86, 0.125, 10, 1, false, Math.PI, Math.PI)
         parts.add('obangRed', flesh, { position: [x, bottom + 0.06, 0], rotation: [Math.PI / 2, 0, turn], matrix })
     }
 }

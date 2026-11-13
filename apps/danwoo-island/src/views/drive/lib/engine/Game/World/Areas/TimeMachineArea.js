@@ -55,6 +55,7 @@ export class TimeMachineArea extends Area
 
         const hubTexture = new THREE.TextureLoader().load('danwoo/hub.png')
         hubTexture.colorSpace = THREE.SRGBColorSpace
+        hubTexture.flipY = false
         const screenTextures = [hubTexture]
 
         const alertSound = this.game.audio.register({
