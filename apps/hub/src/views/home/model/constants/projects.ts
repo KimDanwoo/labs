@@ -48,4 +48,11 @@ export const PROJECTS: Project[] = [
     image: '/projects/komorebi-cover.webp',
     imagePosition: 'center',
   },
+  {
+    title: 'Danwoo Island',
+    description: '한국 섬마을을 검정 SUV로 달리며 프로젝트를 둘러봐요',
+    href: 'https://world.danwoo.dev/',
+    image: '/projects/danwoo-island-cover.webp',
+    imagePosition: 'center',
+  },
 ];
