@@ -282,14 +282,19 @@ function jangseung(parts, { size, matrix })
     const radius = Math.min(size.x, size.z) * 0.32
     const bottom = -size.y / 2
     const bodyHeight = size.y * 0.82
-    parts.prism('wood', radius, radius * 1.1, bodyHeight, { position: [0, bottom + bodyHeight / 2, 0], matrix }, 8)
+    parts.prism('jangseungWood', radius, radius * 1.1, bodyHeight, { position: [0, bottom + bodyHeight / 2, 0], matrix }, 8)
     const face = bottom + bodyHeight * 0.78
-    for(const side of [-1, 1])
+    for(const facing of [1, -1])
     {
-        parts.box('ink', [radius * 0.45, radius * 0.18, 0.06], { position: [side * radius * 0.4, face, radius * 0.98], matrix })
-        parts.box('ink', [radius * 0.55, radius * 0.08, 0.06], { position: [side * radius * 0.4, face + radius * 0.3, radius * 0.96], matrix })
+        const depth = facing * radius * 0.98
+        for(const side of [-1, 1])
+        {
+            parts.box('ink', [radius * 0.45, radius * 0.18, 0.08], { position: [side * radius * 0.4, face, depth], matrix })
+            parts.box('ink', [radius * 0.55, radius * 0.08, 0.08], { position: [side * radius * 0.4, face + radius * 0.3, depth], matrix })
+        }
+        parts.box('obangRed', [radius * 0.9, radius * 0.16, 0.08], { position: [0, face - radius * 0.65, depth], matrix })
+        parts.box('ink', [radius * 0.14, radius * 0.4, 0.1], { position: [0, face - radius * 0.25, depth * 1.04], matrix })
     }
-    parts.box('obangRed', [radius * 0.9, radius * 0.16, 0.06], { position: [0, face - radius * 0.65, radius * 0.97], matrix })
     parts.prism('obangBlack', radius * 1.9, radius * 1.9, 0.08, { position: [0, bottom + bodyHeight + 0.04, 0], matrix }, 12)
     parts.prism('obangBlack', radius * 0.75, radius * 0.85, size.y * 0.14, { position: [0, bottom + bodyHeight + size.y * 0.07, 0], matrix }, 10)
 }

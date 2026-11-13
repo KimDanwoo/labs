@@ -34,6 +34,7 @@ export const SHADES = {
     glass: '#bfe3ea',
     earth: '#b9956b',
     ink: '#2b2420',
+    jangseungWood: '#c4895a',
     obangBlue: '#2f5fb3',
     obangRed: '#c9372c',
     obangYellow: '#e8b830',
@@ -46,13 +47,15 @@ const GLOW = {
     cheongsachorong: { name: 'emissiveCheongsachorongGradient', inner: '#ffd58a', outer: '#ff3b2f', intensity: 1.8 },
 }
 
+const SIGNAGE_FACES = new Set(['hanji', 'mapGreen', 'mapBlue', 'glass'])
+
 const shadedMaterials = new Map()
 
 function shadedMaterial(name)
 {
     if(!shadedMaterials.has(name))
     {
-        const material = new MeshDefaultMaterial({ colorNode: color(SHADES[name]), hasCoreShadows: true, hasDropShadows: true })
+        const material = new MeshDefaultMaterial({ colorNode: color(SHADES[name]), hasCoreShadows: !SIGNAGE_FACES.has(name), hasDropShadows: !SIGNAGE_FACES.has(name) })
         material.userData.prevent = true
         shadedMaterials.set(name, material)
     }
