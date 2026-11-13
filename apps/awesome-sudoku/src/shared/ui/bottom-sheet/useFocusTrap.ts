@@ -10,7 +10,6 @@ type UseFocusTrapOptions = {
   onEscape: () => void;
 };
 
-/** Tab 포커스를 컨테이너 안에서 순환시키고, Escape를 알린다. */
 export function useFocusTrap({ containerRef, isActive, onEscape }: UseFocusTrapOptions): void {
   useEffect(() => {
     if (!isActive) return undefined;

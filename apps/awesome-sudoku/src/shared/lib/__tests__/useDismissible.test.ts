@@ -16,8 +16,8 @@ describe('useDismissible', () => {
     act(() => result.current.dismiss());
     expect(result.current.isOpen).toBe(false);
 
-    rerender({ open: false }); // 새 판 시작
-    rerender({ open: true }); // 다음 회차 종료
+    rerender({ open: false });
+    rerender({ open: true });
 
     expect(result.current.isOpen).toBe(true);
   });

@@ -4,7 +4,6 @@ import { BLOCK_SIZE, BOARD_SIZE } from '@entities/game/model/constants/board';
 import type { Grid } from '@entities/game/model/types/board';
 import { describe, expect, test } from 'vitest';
 
-// 테스트용 완전한 스도쿠 그리드 (해결된 상태) - 함수로 만들어 매번 새로운 인스턴스 생성
 function createValidSudokuGrid(): Grid {
   return [
     [5, 3, 4, 6, 7, 8, 9, 1, 2],
@@ -19,7 +18,6 @@ function createValidSudokuGrid(): Grid {
   ];
 }
 
-// 테스트용 부분적으로 채워진 그리드 - 함수로 만들어 매번 새로운 인스턴스 생성
 function createIncompleteSudokuGrid(): Grid {
   return [
     [5, 3, 0, 0, 7, 0, 0, 0, 0],
@@ -115,15 +113,12 @@ describe('getRowNumbers', () => {
     const grid = createValidSudokuGrid();
     const result = getRowNumbers(grid, 0);
 
-    // getRowNumbers는 grid[row]를 직접 반환하므로 참조가 같아야 함
     expect(result).toBe(grid[0]);
 
-    // 반환된 배열 수정이 원본에 반영되는지 확인
     const originalValue = atIndex(result, 0);
     result[0] = 999;
     expect(cellAt(grid, 0, 0)).toBe(999);
 
-    // 원상 복구
     result[0] = originalValue;
   });
 });
@@ -205,7 +200,6 @@ describe('getBlockNumbers', () => {
 
   test('블록 좌표가 올바르게 매핑된다', () => {
     const grid = createValidSudokuGrid();
-    // 블록(1,1)은 실제 그리드의 (3,3)부터 (5,5)까지
     const result = getBlockNumbers(grid, 1, 1);
     const expected = [
       cellAt(grid, 3, 3),
@@ -222,7 +216,6 @@ describe('getBlockNumbers', () => {
   });
 });
 
-// 통합 테스트
 describe('그리드 유틸리티 통합 테스트', () => {
   test('완성된 스도쿠 그리드의 모든 행이 유효하다', () => {
     const grid = createValidSudokuGrid();
@@ -252,15 +245,12 @@ describe('그리드 유틸리티 통합 테스트', () => {
 
   test('불완전한 스도쿠 그리드는 유효하지 않다', () => {
     const grid = createIncompleteSudokuGrid();
-    // 첫 번째 행이 불완전함
     const rowNumbers = getRowNumbers(grid, 0);
     expect(isValidNumberSet(rowNumbers)).toBe(false);
 
-    // 첫 번째 열이 불완전함
     const colNumbers = getColumnNumbers(grid, 0);
     expect(isValidNumberSet(colNumbers)).toBe(false);
 
-    // 첫 번째 블록이 불완전함
     const blockNumbers = getBlockNumbers(grid, 0, 0);
     expect(isValidNumberSet(blockNumbers)).toBe(false);
   });
@@ -268,13 +258,12 @@ describe('그리드 유틸리티 통합 테스트', () => {
   test('특정 셀이 포함된 행, 열, 블록을 모두 가져올 수 있다', () => {
     const grid = createValidSudokuGrid();
     const row = 4,
-      col = 4; // 중앙 셀
+      col = 4;
 
     const rowNumbers = getRowNumbers(grid, row);
     const colNumbers = getColumnNumbers(grid, col);
     const blockNumbers = getBlockNumbers(grid, Math.floor(row / BLOCK_SIZE), Math.floor(col / BLOCK_SIZE));
 
-    // 해당 셀의 값이 각각에 포함되어 있는지 확인
     const cellValue = cellAt(grid, row, col);
     expect(rowNumbers).toContain(cellValue);
     expect(colNumbers).toContain(cellValue);
@@ -282,7 +271,6 @@ describe('그리드 유틸리티 통합 테스트', () => {
   });
 });
 
-// 에러 케이스 테스트
 describe('에러 케이스 테스트', () => {
   test('빈 그리드에서도 함수들이 정상 동작한다', () => {
     const emptyGrid: Grid = Array(9)
@@ -295,13 +283,11 @@ describe('에러 케이스 테스트', () => {
   });
 });
 
-// 성능 테스트
 describe('성능 테스트', () => {
   test('대용량 연산에서도 합리적인 시간 내에 완료된다', () => {
     const grid = createValidSudokuGrid();
     const startTime = Date.now();
 
-    // 모든 행, 열, 블록을 여러 번 검사
     for (let i = 0; i < 100; i++) {
       for (let j = 0; j < BOARD_SIZE; j++) {
         getRowNumbers(grid, j);
@@ -318,7 +304,6 @@ describe('성능 테스트', () => {
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    // 1초 이내에 완료되어야 함
     expect(duration).toBeLessThan(1000);
   });
 });

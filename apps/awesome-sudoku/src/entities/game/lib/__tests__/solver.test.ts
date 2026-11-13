@@ -15,7 +15,6 @@ import { describe, expect, it } from 'vitest';
 
 const parse = (rows: string[]): Grid => rows.map((row) => [...row].map((ch) => (ch === '.' ? 0 : Number(ch))));
 
-/** 싱글만으로 풀리는 고전 예제 (Project Euler #96 1번) */
 const EASY_PUZZLE = parse([
   '..3.2.6..',
   '9..3.5..1',

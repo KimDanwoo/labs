@@ -20,10 +20,8 @@ describe('스도쿠 유틸리티 함수 테스트', () => {
     it('그리드를 깊은 복사해야 함', () => {
       const copied = deepCopyGrid(sampleGrid);
 
-      // 복사된 그리드가 원본과 같은 값을 가져야 함
       expect(copied).toEqual(sampleGrid);
 
-      // 하지만 다른 참조를 가져야 함
       expect(copied).not.toBe(sampleGrid);
       expect(copied[0]).not.toBe(sampleGrid[0]);
     });
@@ -32,13 +30,10 @@ describe('스도쿠 유틸리티 함수 테스트', () => {
       const copied = deepCopyGrid(sampleGrid);
       const originalValue = cellAt(sampleGrid, 0, 0);
 
-      // 원본 수정
       atIndex(sampleGrid, 0)[0] = 999;
 
-      // 복사본은 변경되지 않아야 함
       expect(cellAt(copied, 0, 0)).toBe(originalValue);
 
-      // 원본 복원
       atIndex(sampleGrid, 0)[0] = originalValue;
     });
 

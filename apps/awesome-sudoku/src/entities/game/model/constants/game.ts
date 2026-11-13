@@ -21,17 +21,11 @@ export const GAME_MODE = {
   KILLER: 'killer',
 } as const;
 
-/** 퍼즐을 푸는 데 필요한 사람 기법 단계. 숫자가 클수록 어렵다. */
 export const TECHNIQUE = {
-  /** 네이키드·히든 싱글만으로 풀림 */
   SINGLE: 1,
-  /** 락드 캔디데이트(pointing/claiming) 필요 */
   LOCKED: 2,
-  /** 서브셋(네이키드·히든 페어/트리플) 필요 */
   SUBSET: 3,
-  /** 피시(X-Wing·Swordfish)·XY-Wing 필요 */
   ADVANCED: 4,
-  /** 위 기법으로 안 풀림 — 추측(시행착오) 필요 */
   GUESS: 5,
 } as const;
 
@@ -59,5 +53,4 @@ export const KILLER_DIFFICULTY: Record<Difficulty, KillerDifficultySpec> = {
   [GAME_LEVEL.EXPERT]: { clues: 0, maxCageSize: 5, minTechnique: TECHNIQUE.LOCKED, maxTechnique: TECHNIQUE.ADVANCED },
 };
 
-/** 최대 실수 허용 횟수 (초과 시 게임 오버) */
 export const MAX_MISTAKES = 5;

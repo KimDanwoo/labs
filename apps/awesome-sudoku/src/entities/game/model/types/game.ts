@@ -6,9 +6,7 @@ export type Difficulty = (typeof GAME_LEVEL)[keyof typeof GAME_LEVEL];
 export type Technique = (typeof TECHNIQUE)[keyof typeof TECHNIQUE];
 
 export type GradedDifficultySpec = {
-  /** 남기는 힌트(주어진 숫자) 수 */
   clues: number;
-  /** 사람 기법 채점이 이 범위에 들어야 한다 */
   minTechnique: Technique;
   maxTechnique: Technique;
 };

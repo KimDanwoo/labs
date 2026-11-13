@@ -22,7 +22,6 @@ type SheetMotion = {
   hidden: { transform: string; opacity?: string };
 };
 
-/** 데스크톱: 화면 가운데에서 살짝 커지며 나타나는 모달. */
 const DESKTOP_MOTION: SheetMotion = {
   transition: transitionOf('transform', 'opacity'),
   willChange: 'transform, opacity',
@@ -30,7 +29,6 @@ const DESKTOP_MOTION: SheetMotion = {
   hidden: { transform: 'translate(-50%, -50%) scale(0.95)', opacity: '0' },
 };
 
-/** 모바일: 아래에서 올라오는 시트. */
 export const MOBILE_MOTION: SheetMotion = {
   transition: transitionOf('transform'),
   willChange: 'transform',

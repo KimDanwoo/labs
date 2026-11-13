@@ -3,13 +3,11 @@ import { cn } from '@shared/lib/cn';
 export default function ProfileLoading() {
   return (
     <main className="min-h-svh bg-[rgb(var(--color-surface-secondary))]">
-      {/* Header skeleton */}
       <div className={cn('glass-header', 'px-4 py-4')}>
         <div className="h-6 w-16 rounded-md bg-[rgb(var(--color-bg-tertiary))] animate-pulse" />
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* Profile card skeleton */}
         <div
           className={cn(
             'bg-[rgb(var(--color-surface-primary))]',
@@ -34,7 +32,6 @@ export default function ProfileLoading() {
           </div>
         </div>
 
-        {/* Stats skeleton */}
         <div
           className={cn(
             'bg-[rgb(var(--color-surface-primary))]',

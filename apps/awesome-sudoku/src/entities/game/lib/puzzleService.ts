@@ -58,7 +58,6 @@ const generate = (gameMode: GameMode, difficulty: Difficulty): Promise<Generated
 
 const keyOf = (gameMode: GameMode, difficulty: Difficulty): string => `${gameMode}:${difficulty}`;
 
-/** 모드·난이도별로 다음 판 한 장을 미리 뽑아 둔다 — 같은 설정으로 "새 게임"을 누르면 대기 시간이 0이다 */
 const prefetched = new Map<string, Promise<GeneratedPuzzle>>();
 
 export const prefetchPuzzle = (gameMode: GameMode, difficulty: Difficulty): void => {

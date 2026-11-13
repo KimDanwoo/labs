@@ -3,7 +3,6 @@
 import { useRef, type PointerEvent, type RefObject } from 'react';
 import { MOBILE_MOTION } from './sheetMotion';
 
-/** 시트 높이의 이 비율보다 많이 끌어내리면 닫는다. */
 const DISMISS_HEIGHT_RATIO = 0.35;
 /** 이보다 빠르게(px/초) 튕기면 거리가 짧아도 닫는다. */
 const DISMISS_VELOCITY = 500;

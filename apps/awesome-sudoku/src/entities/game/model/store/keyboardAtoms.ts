@@ -4,7 +4,6 @@ import { fillCellAtom, toggleNoteAtom } from './cellValueAtoms';
 import { isNoteModeAtom, selectedCellAtom } from './primitives';
 import { selectCellAtom } from './selectionAtoms';
 
-/** 키보드 입력 처리 */
 export const handleKeyInputAtom = atom(null, (get, set, key: string) => {
   const isNoteMode = get(isNoteModeAtom);
 

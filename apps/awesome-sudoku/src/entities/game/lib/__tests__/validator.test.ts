@@ -13,7 +13,6 @@ import type { KillerCage } from '@entities/game/model/types/game';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('validator.ts 테스트', () => {
-  // 헬퍼 함수들
   const createMockSudokuCell = (value: number | null = null, isInitial = false, isConflict = false): SudokuCell => ({
     value,
     isInitial,
@@ -70,7 +69,7 @@ describe('validator.ts 테스트', () => {
       it('행 충돌을 감지하고 표시해야 한다', () => {
         const board = createEmptyBoard();
         atIndex(board, 0)[0] = createMockSudokuCell(5, true);
-        atIndex(board, 0)[5] = createMockSudokuCell(5, true); // 같은 행에 중복
+        atIndex(board, 0)[5] = createMockSudokuCell(5, true);
 
         const result = checkConflicts(board);
 
@@ -82,7 +81,7 @@ describe('validator.ts 테스트', () => {
       it('열 충돌을 감지하고 표시해야 한다', () => {
         const board = createEmptyBoard();
         atIndex(board, 0)[1] = createMockSudokuCell(3, true);
-        atIndex(board, 5)[1] = createMockSudokuCell(3, true); // 같은 열에 중복
+        atIndex(board, 5)[1] = createMockSudokuCell(3, true);
 
         const result = checkConflicts(board);
 
@@ -94,7 +93,7 @@ describe('validator.ts 테스트', () => {
       it('블록 충돌을 감지하고 표시해야 한다', () => {
         const board = createEmptyBoard();
         atIndex(board, 0)[0] = createMockSudokuCell(8, true);
-        atIndex(board, 2)[2] = createMockSudokuCell(8, true); // 같은 블록에 중복
+        atIndex(board, 2)[2] = createMockSudokuCell(8, true);
 
         const result = checkConflicts(board);
 
@@ -106,8 +105,8 @@ describe('validator.ts 테스트', () => {
       it('여러 종류의 충돌을 동시에 감지해야 한다', () => {
         const board = createEmptyBoard();
         atIndex(board, 0)[0] = createMockSudokuCell(1, true);
-        atIndex(board, 0)[1] = createMockSudokuCell(1, true); // 행 충돌
-        atIndex(board, 1)[0] = createMockSudokuCell(1, true); // 열 및 블록 충돌
+        atIndex(board, 0)[1] = createMockSudokuCell(1, true);
+        atIndex(board, 1)[0] = createMockSudokuCell(1, true);
 
         const result = checkConflicts(board);
 
@@ -148,7 +147,7 @@ describe('validator.ts 테스트', () => {
 
       it('충돌이 있으면 미완성으로 판단해야 한다', () => {
         const board = createValidSudokuBoard();
-        atIndex(board, 0)[0] = createMockSudokuCell(5, true, true); // 충돌 있음
+        atIndex(board, 0)[0] = createMockSudokuCell(5, true, true);
 
         const isComplete = isBoardComplete(board);
         expect(isComplete).toBe(false);
@@ -210,7 +209,7 @@ describe('validator.ts 테스트', () => {
               [0, 1],
             ],
             8,
-          ), // 5 + 3 = 8
+          ),
           createMockKillerCage(
             2,
             [
@@ -218,12 +217,11 @@ describe('validator.ts 테스트', () => {
               [1, 1],
             ],
             13,
-          ), // 6 + 7 = 13
+          ),
         ];
 
         const result = validateKillerCages(board, cages);
 
-        // 기본 충돌 검사도 수행되어야 함
         expect(cellAt(result, 0, 0).isConflict).toBe(false);
         expect(cellAt(result, 0, 1).isConflict).toBe(false);
       });
@@ -238,7 +236,7 @@ describe('validator.ts 테스트', () => {
               [0, 1],
             ],
             10,
-          ), // 실제는 8이지만 10으로 설정
+          ),
         ];
 
         const result = validateKillerCages(board, cages);
@@ -259,7 +257,7 @@ describe('validator.ts 테스트', () => {
               [0, 1],
             ],
             8,
-          ), // 5 + 3 = 8
+          ),
           createMockKillerCage(
             2,
             [
@@ -267,10 +265,9 @@ describe('validator.ts 테스트', () => {
               [1, 1],
             ],
             13,
-          ), // 6 + 7 = 13
+          ),
         ];
 
-        // 나머지 모든 셀을 개별 케이지로 만들기
         let cageId = 3;
         for (let row = 0; row < 9; row++) {
           for (let col = 0; col < 9; col++) {
@@ -287,7 +284,7 @@ describe('validator.ts 테스트', () => {
 
       it('빈 셀이 있는 킬러 보드를 미완성으로 판단해야 한다', () => {
         const board = createValidSudokuBoard();
-        atIndex(board, 0)[0] = createMockSudokuCell(null); // 빈 셀 생성
+        atIndex(board, 0)[0] = createMockSudokuCell(null);
 
         const cages: KillerCage[] = [createMockKillerCage(1, [[0, 0]], 5)];
 
@@ -302,20 +299,16 @@ describe('validator.ts 테스트', () => {
       const solution = createValidSudokuGrid();
       const board = createValidSudokuBoard();
 
-      // 1. 기본 그리드 검증
       expect(isValidSolution(solution)).toBe(true);
 
-      // 2. 보드 완성도 검사
       expect(isBoardComplete(board)).toBe(true);
 
-      // 3. 정답 대조 — 틀린 값이 없어야 한다
       expect(
         markWrongValues(board, solution)
           .flat()
           .some((cell) => cell.isConflict),
       ).toBe(false);
 
-      // 4. 충돌 검사
       const checkedBoard = checkConflicts(board);
       const hasAnyConflict = checkedBoard.some((row) => row.some((cell) => cell.isConflict));
       expect(hasAnyConflict).toBe(false);
@@ -324,15 +317,12 @@ describe('validator.ts 테스트', () => {
     it('잘못된 보드는 모든 검증 단계에서 감지되어야 한다', () => {
       const board = createValidSudokuBoard();
 
-      // 의도적으로 오류 생성
-      atIndex(board, 0)[0] = createMockSudokuCell(cellAt(board, 0, 1).value); // 중복 생성
+      atIndex(board, 0)[0] = createMockSudokuCell(cellAt(board, 0, 1).value);
 
-      // 충돌 검사에서 감지되어야 함
       const checkedBoard = checkConflicts(board);
       expect(cellAt(checkedBoard, 0, 0).isConflict).toBe(true);
       expect(cellAt(checkedBoard, 0, 1).isConflict).toBe(true);
 
-      // 보드 완성도 검사에서 실패해야 함
       expect(isBoardComplete(checkedBoard)).toBe(false);
     });
   });

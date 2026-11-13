@@ -1,9 +1,7 @@
 import { useCallback, useState } from 'react';
 
 interface Dismissible {
-  /** 시트에 그대로 넘길 열림 여부 — 사용자가 닫았으면 false */
   isOpen: boolean;
-  /** 시트의 onClose에 연결 */
   dismiss: () => void;
 }
 

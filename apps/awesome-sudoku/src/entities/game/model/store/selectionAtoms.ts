@@ -2,7 +2,6 @@ import { atom } from 'jotai';
 import { calculateHighlights, clearHighlights, updateCellSelection, updateSingleCell } from '../services/update';
 import { boardAtom, highlightedCellsAtom, selectedCellAtom } from './primitives';
 
-/** 하이라이트 업데이트 */
 export const updateHighlightsAtom = atom(null, (get, set, pos: { row: number; col: number }) => {
   const board = get(boardAtom);
   const highlightedCells = get(highlightedCellsAtom);
@@ -10,7 +9,6 @@ export const updateHighlightsAtom = atom(null, (get, set, pos: { row: number; co
   set(highlightedCellsAtom, newHighlights);
 });
 
-/** 셀 선택 */
 export const selectCellAtom = atom(null, (get, set, pos: { row: number; col: number }) => {
   const { row, col } = pos;
   const board = get(boardAtom);
@@ -23,7 +21,6 @@ export const selectCellAtom = atom(null, (get, set, pos: { row: number; col: num
   set(updateHighlightsAtom, { row, col });
 });
 
-/** 셀 선택 해제 */
 export const deselectCellAtom = atom(null, (get, set) => {
   const board = get(boardAtom);
   const selectedCell = get(selectedCellAtom);

@@ -32,7 +32,6 @@ export const ThemeToggle = memo(() => {
         'focus-visible:ring-[rgb(var(--color-accent))]/40',
       )}
     >
-      {/* Light track background */}
       <div
         className={cn(
           'absolute inset-0 rounded-full',
@@ -42,7 +41,6 @@ export const ThemeToggle = memo(() => {
         )}
       />
 
-      {/* Dark track background */}
       <div
         className={cn(
           'absolute inset-0 rounded-full',
@@ -52,7 +50,6 @@ export const ThemeToggle = memo(() => {
         )}
       />
 
-      {/* Stars overlay (dark mode only) */}
       <div
         className={cn(
           'absolute inset-0 rounded-full overflow-hidden',
@@ -65,7 +62,6 @@ export const ThemeToggle = memo(() => {
         <span className="absolute rounded-full bg-white/50" style={{ width: 2, height: 2, top: 7, left: 24 }} />
       </div>
 
-      {/* Sliding thumb */}
       <div
         className={cn(
           'relative z-10 flex items-center justify-center',
@@ -75,7 +71,6 @@ export const ThemeToggle = memo(() => {
           isDark ? 'translate-x-[24px] bg-indigo-100' : 'translate-x-0 bg-white',
         )}
       >
-        {/* Sun icon */}
         <LuSun
           size={13}
           className={cn(
@@ -84,7 +79,6 @@ export const ThemeToggle = memo(() => {
             isDark ? 'opacity-0 -rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100',
           )}
         />
-        {/* Moon icon */}
         <LuMoon
           size={13}
           className={cn(

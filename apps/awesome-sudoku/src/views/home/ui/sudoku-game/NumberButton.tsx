@@ -10,19 +10,13 @@ interface NumberButtonProps {
 export const NumberButton: React.FC<NumberButtonProps> = memo(({ value, onClick, isDisabled }) => (
   <button
     className={cn(
-      // Size - constrained on desktop to fit panel
       'w-full aspect-square',
       'max-w-8 xs:max-w-10 lg:max-w-[72px] xl:max-w-[88px]',
-      // Shape
       'rounded-xl md:rounded-2xl',
-      // Typography
       'text-lg xs:text-xl md:text-3xl lg:text-4xl font-semibold',
       'font-tabular',
-      // Layout
       'flex items-center justify-center',
-      // Transitions
       'transition-all duration-200 ease-out',
-      // States
       isDisabled
         ? [
             'text-[rgb(var(--color-text-tertiary))] cursor-not-allowed',
@@ -44,7 +38,6 @@ export const NumberButton: React.FC<NumberButtonProps> = memo(({ value, onClick,
             'hover:-translate-y-0.5',
             'active:translate-y-0 active:shadow-sm',
           ],
-      // Focus
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40',
     )}
     aria-label={`숫자 ${value}`}

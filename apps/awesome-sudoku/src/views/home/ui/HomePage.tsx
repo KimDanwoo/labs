@@ -20,7 +20,6 @@ export const HomePage = () => (
   <main
     className={cn('min-h-svh min-w-[360px]', 'bg-[rgb(var(--color-surface-secondary))]', 'relative overflow-x-hidden')}
   >
-    {/* Ambient background */}
     <div className="fixed inset-0 pointer-events-none">
       <div
         className={cn(
@@ -45,7 +44,6 @@ export const HomePage = () => (
       />
     </div>
 
-    {/* Header */}
     <header className={cn('glass-header')}>
       <div
         className={cn(
@@ -63,7 +61,6 @@ export const HomePage = () => (
       </div>
     </header>
 
-    {/* Main content */}
     <div className="relative mx-auto px-4 sm:px-6 py-6 md:py-10">
       <div
         className={cn(
@@ -72,7 +69,6 @@ export const HomePage = () => (
           'lg:justify-center lg:items-start lg:gap-12',
         )}
       >
-        {/* Left: Header + Board */}
         <div className="flex flex-col items-center">
           <div className="w-full mb-4">
             <GameStatus />
@@ -84,7 +80,6 @@ export const HomePage = () => (
           </div>
         </div>
 
-        {/* Right: Control Panel (Desktop only) */}
         <div className="hidden lg:flex flex-col pt-[52px]">
           <div
             className={cn(
@@ -109,7 +104,6 @@ export const HomePage = () => (
           </div>
         </div>
 
-        {/* Mobile/Tablet controls */}
         <div className="lg:hidden w-full mt-6 space-y-3 max-w-[360px]">
           <Controls />
           <SelectNumber />
@@ -117,7 +111,6 @@ export const HomePage = () => (
       </div>
     </div>
 
-    {/* Game Result Bottom Sheet */}
     <GameResultSheet />
   </main>
 );

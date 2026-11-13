@@ -10,7 +10,6 @@ type UseSheetPhaseOptions = {
   isDesktop: boolean;
 };
 
-/** 시트의 여닫힘 단계를 진행한다: idle → mounted → opening → open → closing → idle. */
 export function useSheetPhase({ isOpen, onClose, sheetRef, isDesktop }: UseSheetPhaseOptions) {
   const [phase, setPhase] = useState<Phase>(PHASE.idle);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -19,7 +18,6 @@ export function useSheetPhase({ isOpen, onClose, sheetRef, isDesktop }: UseSheet
     onCloseRef.current = onClose;
   }, [onClose]);
 
-  // isOpen 전이 — 렌더 중 상태 보정으로 mount/close 트리거
   const [prevOpen, setPrevOpen] = useState(false);
   if (prevOpen !== isOpen) {
     setPrevOpen(isOpen);
@@ -35,7 +33,6 @@ export function useSheetPhase({ isOpen, onClose, sheetRef, isDesktop }: UseSheet
     setPhase((current) => (current === PHASE.idle || current === PHASE.closing ? current : PHASE.closing));
   }, []);
 
-  // mounted: 이전 포커스 기억 + 강제 reflow 후 다음 프레임에 opening
   useLayoutEffect(() => {
     if (phase !== PHASE.mounted) return undefined;
     const focused = document.activeElement;

@@ -11,14 +11,6 @@ import { GAME_MODE } from '../constants/game';
 import type { CellHighlight, Grid, SudokuBoard, SudokuCell } from '../types/board';
 import type { GameCompletionResult, GameMode, KillerCage } from '../types/game';
 
-/**
- * @description 단일 셀만 업데이트
- * @param {SudokuBoard} board - 업데이트할 보드
- * @param {number} row - 업데이트할 행
- * @param {number} col - 업데이트할 열
- * @param {Partial<SudokuCell>} updates - 업데이트할 셀 정보
- * @returns
- */
 export function updateSingleCell(
   board: SudokuBoard,
   row: number,
@@ -30,13 +22,6 @@ export function updateSingleCell(
   );
 }
 
-/**
- * @description 셀 선택 상태 업데이트 (자주 사용되는 패턴)
- * @param {SudokuBoard} board - 업데이트할 보드
- * @param {number} selectedRow - 선택된 행
- * @param {number} selectedCol - 선택된 열
- * @returns
- */
 export function updateCellSelection(board: SudokuBoard, selectedRow: number, selectedCol: number): SudokuBoard {
   let hasChanges = false;
 
@@ -65,31 +50,16 @@ export function updateCellSelection(board: SudokuBoard, selectedRow: number, sel
   return hasChanges ? nextBoard : board;
 }
 
-/**
- * @description 노트만 업데이트
- * @param {SudokuBoard} board - 업데이트할 보드
- * @param {number} row - 업데이트할 행
- * @param {number} col - 업데이트할 열
- * @param {number[]} notes - 업데이트할 노트
- * @returns
- */
 export function updateCellNotes(board: SudokuBoard, row: number, col: number, notes: number[]): SudokuBoard {
   return updateSingleCell(board, row, col, { notes: [...notes] });
 }
 
-/**
- * @description 사용자 입력 초기화 (초기 셀은 유지)
- * @param {SudokuBoard} board - 업데이트할 보드
- * @returns
- */
 export function resetUserInputs(board: SudokuBoard): SudokuBoard {
   return board.map((row) =>
     row.map((cell) => {
       if (cell.isInitial) {
-        // 초기 셀은 선택/충돌 상태만 리셋
         return { ...cell, isSelected: false, isConflict: false };
       }
-      // 사용자 입력 셀은 값과 노트 제거
       return {
         ...cell,
         value: null,
@@ -102,21 +72,6 @@ export function resetUserInputs(board: SudokuBoard): SudokuBoard {
   );
 }
 
-/**
- * @description 같은 행, 열, 블록의 셀들을 related로 마킹
- * @param {Record<string, CellHighlight>} highlights - 하이라이트 객체
- * @param {number} row - 행
- * @param {number} col - 열
- * @param {string} selectedKey - 선택된 셀 키
- */
-/**
- * @description 선택된 셀 기준으로 하이라이트 상태를 계산합니다
- * @param {SudokuBoard} board - 현재 스도쿠 보드
- * @param {number} row - 선택된 행
- * @param {number} col - 선택된 열
- * @param {Record<string, CellHighlight>} previousHighlights - 이전 하이라이트 맵
- * @returns {Record<string, CellHighlight>} 계산된 하이라이트 객체
- */
 export function calculateHighlights(
   board: SudokuBoard,
   row: number,
@@ -186,12 +141,6 @@ export function clearHighlights(previousHighlights?: Record<string, CellHighligh
   return nextHighlights;
 }
 
-/**
- * @description 셀에 값을 입력할 수 있는지 검증
- * @param {Position} selectedCell - 선택된 셀
- * @param {SudokuBoard} board - 보드
- * @returns {boolean} 셀에 값을 입력할 수 있는지 여부
- */
 export function canFillCell(selectedCell: { row: number; col: number } | null, board: SudokuBoard): boolean {
   if (!selectedCell) return false;
 
@@ -199,14 +148,6 @@ export function canFillCell(selectedCell: { row: number; col: number } | null, b
   return !cellAt(board, row, col).isInitial;
 }
 
-/**
- * @description 보드에 값을 입력하고 새로운 보드 반환
- * @param {SudokuBoard} board - 보드
- * @param {number} row - 행
- * @param {number} col - 열
- * @param {number | null} value - 입력할 값
- * @returns {SudokuBoard} 업데이트된 보드
- */
 export function updateCellValue(board: SudokuBoard, row: number, col: number, value: number | null): SudokuBoard {
   return updateSingleCell(board, row, col, {
     value,
@@ -214,14 +155,6 @@ export function updateCellValue(board: SudokuBoard, row: number, col: number, va
   });
 }
 
-/**
- * @description 규칙 충돌(행·열·블록, 킬러면 케이지까지) + 정답과 다른 값을 충돌로 표시
- * @param {SudokuBoard} board - 보드
- * @param {Grid} solution - 정답
- * @param {GameMode} gameMode - 게임 모드
- * @param {KillerCage[]} cages - 케이지 배열
- * @returns {SudokuBoard} 충돌 검사된 보드
- */
 export function validateBoard(
   board: SudokuBoard,
   solution: Grid,
