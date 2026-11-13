@@ -16,7 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { preparePortfolioContent } from './portfolioContent.mjs';
 
-const SYNC_FORMAT_VERSION = '5';
+const SYNC_FORMAT_VERSION = '4';
 const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WORLD_COMMIT = '70764a94756cc4de564e493c8ba46c4b5fe03ed1';
 const WORLD_REPOSITORY = 'https://github.com/brunosimon/folio-2025.git';
@@ -43,7 +43,6 @@ const REQUIRED_STATIC_FILES = [
 ];
 
 const UNUSED_STATIC_DIRECTORIES = ['projects', 'lab'];
-const REPLACED_STATIC_FILES = new Set(['sounds/musics/Sudo.mp3', 'sounds/musics/Boy.mp3', 'sounds/musics/Baguira.mp3']);
 const UNCOMPRESSED_FILES_IN_USE = new Set(['vehicle/default.glb', 'vehicle/oldSchool.glb']);
 const COMPRESSED_COUNTERPART = [
   [/\.glb$/, '-compressed.glb'],
@@ -52,7 +51,7 @@ const COMPRESSED_COUNTERPART = [
 
 function isUnusedStatic(source, staticDirectory) {
   const relative = path.relative(staticDirectory, source).split(path.sep).join('/');
-  if (UNUSED_STATIC_DIRECTORIES.includes(relative) || REPLACED_STATIC_FILES.has(relative)) return true;
+  if (UNUSED_STATIC_DIRECTORIES.includes(relative)) return true;
   if (relative.endsWith('.wav')) return true;
   if (relative.endsWith('-compressed.glb') || UNCOMPRESSED_FILES_IN_USE.has(relative)) return false;
   return COMPRESSED_COUNTERPART.some(

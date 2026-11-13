@@ -40,11 +40,15 @@ export function BehindTheSceneContent() {
       </ul>
       <h2 className="title">음악</h2>
       <p className="text">
-        배경 음악 &lsquo;녹아&rsquo;와 &lsquo;장마&rsquo;는 직접 만든 곡이에요.{' '}
-        <a href="https://sound.danwoo.dev/" target="_blank" rel="noopener noreferrer">
-          soundlab
+        배경 음악은 Kounine(
+        <a href="https://linktr.ee/Kounine" target="_blank" rel="noopener noreferrer">
+          Linktree
         </a>
-        에서 다른 곡도 들을 수 있어요.
+        )이 원본 월드를 위해 만들었고,{' '}
+        <a href="https://choosealicense.com/licenses/cc0-1.0/" target="_blank" rel="noopener noreferrer">
+          CC0 라이선스
+        </a>
+        로 공개했어요.
       </p>
       <h2 className="title">글꼴</h2>
       <p className="text">메뉴와 안내 글꼴은 네이버 마루부리예요.</p>
