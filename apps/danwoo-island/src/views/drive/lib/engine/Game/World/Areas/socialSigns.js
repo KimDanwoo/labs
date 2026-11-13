@@ -11,7 +11,7 @@ const LABELS = {
 
 export function personalizeSocialSigns(area)
 {
-    const bodyMaterial = new MeshDefaultMaterial({ colorNode: color('#c6b8a3'), hasWater: false })
+    const bodyMaterial = new MeshDefaultMaterial({ colorNode: color('#6b4327'), hasWater: false })
     for(const object of area.objects.items)
     {
         const mesh = object.visual?.object3D
@@ -30,7 +30,7 @@ export function personalizeSocialSigns(area)
         canvas.width = 512
         canvas.height = 256
         const context = canvas.getContext('2d')
-        context.fillStyle = '#ede7d6'
+        context.fillStyle = '#f0cf73'
         context.font = '700 96px MaruBuri'
         context.textAlign = 'center'
         context.textBaseline = 'middle'

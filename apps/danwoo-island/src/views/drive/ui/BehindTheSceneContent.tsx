@@ -24,8 +24,8 @@ export function BehindTheSceneContent() {
       </p>
       <h2 className="title">바꾼 것</h2>
       <p className="text">
-        석등·청사초롱·평상·옹기 같은 소품과 누각·초가 공방·서낭당 같은 건물을 한국 섬마을 모습으로 새로 만들었어요.
-        나뭇잎은 벚꽃잎 모양이에요.
+        석등·청사초롱·평상·옹기 같은 소품과 누각·초가 공방·서낭당·돌하르방·석탑 같은 건물을 한국 섬마을 모습으로 새로
+        만들었어요. 나뭇잎은 벚꽃잎 모양이에요.
       </p>
       <h2 className="title">사용한 도구</h2>
       <ul className="text">

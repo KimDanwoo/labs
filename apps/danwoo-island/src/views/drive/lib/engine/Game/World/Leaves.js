@@ -39,14 +39,15 @@ export class Leaves
 
     setGeometry()
     {
-        this.geometry = new THREE.PlaneGeometry(1, 1)
-
-        const positionsArray = this.geometry.attributes.position.array
-
-        positionsArray[0] += 0.15
-        positionsArray[3] += 0.15
-        positionsArray[6] -= 0.15
-        positionsArray[9] -= 0.15
+        const petal = new THREE.Shape()
+        petal.moveTo(0, - 0.5)
+        petal.quadraticCurveTo(0.5, - 0.2, 0.32, 0.4)
+        petal.lineTo(0.1, 0.5)
+        petal.lineTo(0, 0.36)
+        petal.lineTo(- 0.1, 0.5)
+        petal.lineTo(- 0.32, 0.4)
+        petal.quadraticCurveTo(- 0.5, - 0.2, 0, - 0.5)
+        this.geometry = new THREE.ShapeGeometry(petal, 3)
 
         this.geometry.rotateX(- Math.PI * 0.5)
     }
@@ -94,8 +95,8 @@ export class Leaves
         const weightBuffer = instancedArray(weightArray, 'float')
 
         // Color buffer
-        const colorA = uniform(color(0x95513a))// 0x999257
-        const colorB = uniform(color(0xf56a3a))// 0xcc8214
+        const colorA = uniform(color(0xe17f9c))
+        const colorB = uniform(color(0xffd3de))
         const colorNode = Fn(() =>
         {
             const mixStrength = hash(instanceIndex.add(99))
