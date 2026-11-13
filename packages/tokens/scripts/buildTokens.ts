@@ -13,7 +13,6 @@ const OUT_FILE = resolve(__dirname, '../generated/theme.css');
 
 const indent = (lines: string[]) => lines.map((l) => `  ${l}`).join('\n');
 
-/** light 값으로 :root, dark 값으로 .dark 블록을 만든다. */
 function buildColorVars() {
   const rootLines: string[] = [];
   const darkLines: string[] = [];
@@ -24,12 +23,10 @@ function buildColorVars() {
   return { rootLines, darkLines };
 }
 
-/** 색이 아닌 :root 스칼라(brand-hue 등). 앱 스킨이 오버라이드하는 지점. */
 function buildRootScalars() {
   return Object.entries(rootScalars).map(([name, value]) => `--${name}: ${value};`);
 }
 
-/** 테마 무관 토큰(폰트/크기/굵기/여백/반경)을 :root 변수로 만든다. */
 function buildStaticVars() {
   const lines: string[] = [];
   for (const [name, value] of Object.entries(fontFamily)) {
@@ -56,7 +53,6 @@ function buildStaticVars() {
   return lines;
 }
 
-/** Tailwind가 유틸리티를 생성하도록 토큰 이름을 @theme inline에 매핑한다. */
 function buildThemeMap() {
   const lines: string[] = [];
   for (const name of Object.keys(colors)) {

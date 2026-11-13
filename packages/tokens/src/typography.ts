@@ -1,9 +1,4 @@
-/**
- * 타이포그래피 토큰 — 폰트 패밀리 / 크기 / 굵기 맵.
- * 테마와 무관하므로 단일 값으로 정의한다.
- */
 export const fontFamily = {
-  // 랩스 공통 본문·제목 서체는 마루부리(세리프)다. 키는 Tailwind 기본 유틸(font-sans)과 맞추려 sans를 유지한다.
   // --font-maruburi와 @font-face는 '@tokens/css/fonts.css'가 정의한다 — 앱은 반드시 함께 import한다.
   sans: 'var(--font-maruburi)',
   mono: 'var(--font-geist-mono), ui-monospace, monospace',

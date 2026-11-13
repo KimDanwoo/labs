@@ -19,7 +19,6 @@ import { shadow } from './shadow';
 import { container, radius, spacing } from './spacing';
 import { fontFamily, fontSize, fontWeight } from './typography';
 
-/** 모든 토큰을 한 번에 참조할 때 쓰는 통합 객체. */
 export const tokens = {
   themeColors,
   commonColors,
