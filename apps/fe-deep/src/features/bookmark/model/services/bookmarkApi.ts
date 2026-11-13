@@ -2,11 +2,6 @@
 
 import { STORAGE_KEYS } from '@shared/config/storageKeys';
 
-// ============================================================
-// Bookmarks (localStorage)
-// ============================================================
-
-/** localStorage에서 북마크된 질문 ID 목록을 반환한다. */
 export function getBookmarks(): string[] {
   if (typeof window === 'undefined') return [];
   try {
@@ -17,7 +12,6 @@ export function getBookmarks(): string[] {
   }
 }
 
-/** 질문의 북마크 상태를 토글한다. 토글 후의 상태(true=추가됨, false=제거됨)를 반환한다. */
 export function toggleBookmark(questionId: string): boolean {
   const bookmarks = getBookmarks();
   const index = bookmarks.indexOf(questionId);
@@ -33,7 +27,6 @@ export function toggleBookmark(questionId: string): boolean {
   }
 }
 
-/** 질문이 북마크되어 있는지 확인한다. */
 export function isBookmarked(questionId: string): boolean {
   return getBookmarks().includes(questionId);
 }

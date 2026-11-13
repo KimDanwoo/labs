@@ -116,17 +116,14 @@ export async function ReferenceDetailView({ params, searchParams }: CategoryPage
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
       <div className="flex gap-8">
-        {/* Desktop sidebar */}
         <aside className="hidden lg:block w-64 shrink-0">
           <div className="sticky top-20 border border-border/60 rounded-xl shadow-sm">
             <CategorySidebar categories={categories} />
           </div>
         </aside>
 
-        {/* Main content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-3 mb-8">
-            {/* Mobile sidebar trigger */}
             <Sheet>
               <SheetTrigger asChild className="lg:hidden">
                 <Button

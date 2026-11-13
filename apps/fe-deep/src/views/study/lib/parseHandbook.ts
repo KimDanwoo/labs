@@ -22,11 +22,8 @@ export type StepKind = (typeof STEP_KIND)[keyof typeof STEP_KIND];
 export type StudyStep = {
   id: string;
   kind: StepKind;
-  /** 카드 상단에 크게 보여줄 질문 또는 지시문 */
   prompt: string;
-  /** 키워드 카드에서 곧바로 노출할 키워드들 */
   keywords: string[];
-  /** 답 확인 시 펼칠 마크다운 */
   reveal: string;
 };
 
@@ -34,14 +31,12 @@ export type StudyTopic = {
   id: string;
   title: string;
   steps: StudyStep[];
-  /** 배경 설명 — 카드 하단에서 필요할 때만 펼친다. */
   notes: string;
 };
 
 export type StudyDoc = {
   slug: string;
   title: string;
-  /** frontmatter `date: YYYY-MM-DD`. 목록 정렬 기준이며 없으면 null. */
   date: string | null;
   intro: string;
   topics: StudyTopic[];
@@ -84,7 +79,6 @@ const FOLLOW_UP_NOTE_PATTERN = /^(주의|위험|경고|금지|참고|중요)/;
 /** 꼬리질문 답변 첫 줄의 `키워드: a, b, c`는 본문이 아니라 그 질문의 키워드 목록이다. */
 const KEYWORD_LINE_PATTERN = /^키워드\s*[:：]\s*(.+)$/;
 
-/** 답변 첫 비어있지 않은 줄이 키워드 줄이면 분리해서 반환한다. */
 function extractKeywordLine(answer: string): { keywords: string[]; body: string } {
   const lines = answer.split('\n');
   const firstIndex = lines.findIndex((line) => line.trim());
@@ -115,7 +109,6 @@ function matchHeading(line: string): Pick<Block, 'level' | 'heading'> | null {
   return { level: hashes.length, heading };
 }
 
-/** 처음으로 번호가 붙은 제목의 레벨이 주제 레벨이다. 번호 제목이 없으면 문서 첫 제목의 레벨을 따른다. */
 function findTopicLevel(markdown: string): number {
   let isInFence = false;
   let firstHeadingLevel: number | null = null;
@@ -140,7 +133,6 @@ const ANSWER_HEADINGS = ['설명', '개념', '첫문장'];
 
 function classifySection(heading: string): SectionRole {
   const text = heading.replace(/\s+/g, '');
-  // `Why 1 — 왜 리팩터링이 아니었나요?`처럼 제목이 곧 질문이면 본문이 그 답이다.
   if (QUESTION_HEADING_PATTERN.test(heading)) return 'question';
   if (text.includes('오답')) return 'mistake';
   if (text.includes('보완')) return 'improve';
@@ -187,7 +179,6 @@ function extractItems(body: string): string[] {
   return items.filter(Boolean);
 }
 
-/** 꼬꼬무 섹션: 질문 제목이 있으면 답까지, 불릿 목록이면 질문만 뽑는다. */
 function splitFollowUps(body: string, questionLevel: number): FollowUp[] {
   const questionPattern = new RegExp(`^#{${Math.min(questionLevel, MAX_HEADING_LEVEL)}}\\s+(.+?)\\s*#*\\s*$`);
   const items: FollowUp[] = [];
@@ -221,7 +212,6 @@ function splitFollowUps(body: string, questionLevel: number): FollowUp[] {
   return extractListItems(body).map((question) => ({ question, answer: '' }));
 }
 
-/** 역할 섹션보다 깊은 제목은 그 섹션의 본문으로 남긴다. */
 function splitBlocks(markdown: string, maxLevel: number): { intro: string; blocks: Block[] } {
   const blocks: Block[] = [];
   const introLines: string[] = [];
@@ -296,7 +286,6 @@ function buildTopic(draft: TopicDraft, index: number): StudyTopic {
   const notes = noteParts.join('\n\n');
 
   // 답변 섹션이 여러 개여도 카드는 하나다 — 질문 형태가 아닌 제목이 카드로 노출되지 않게
-  // 전부 첫 카드의 공개 내용으로 합친다.
   const answerBody =
     draft.answers.length > 1
       ? draft.answers.map((answer) => `**${answer.heading}**\n\n${answer.body}`).join('\n\n')
@@ -331,7 +320,6 @@ function buildTopic(draft: TopicDraft, index: number): StudyTopic {
   return { id: `topic-${index}`, title: draft.title, steps, notes: isNotesConsumed ? '' : notes };
 }
 
-/** 문서 맨 앞의 frontmatter를 떼어내고 date 필드만 읽는다. */
 function splitFrontmatter(raw: string): { date: string | null; markdown: string } {
   const matched = FRONTMATTER_PATTERN.exec(raw);
   if (!matched) return { date: null, markdown: raw };
@@ -354,7 +342,6 @@ export function parseStudyDoc(slug: string, raw: string): StudyDoc {
   let current: TopicDraft | null = null;
 
   for (const block of blocks) {
-    // 주제 레벨의 제목은 전부 주제다. 번호는 주제 레벨을 찾을 때만 쓴다.
     const isTopic = Boolean(title) && block.level <= topicLevel;
 
     if (isTopic) {

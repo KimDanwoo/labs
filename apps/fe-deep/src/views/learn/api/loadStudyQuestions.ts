@@ -2,7 +2,6 @@ import { getAllQuestions, getQuestionsByCategorySlug, type Category, type Questi
 import { shuffleArray } from '@shared/lib/shuffle';
 import { ALL_CATEGORIES, STUDY_ORDER, type StudySettings } from '../model/constants/study';
 
-/** 설정에 맞는 질문을 학습할 순서대로 돌려준다. 순서대로 = 카테고리 순서 → 카테고리 안 순서. */
 export async function loadStudyQuestions(
   { categorySlug, order, difficulties }: StudySettings,
   categories: Category[],

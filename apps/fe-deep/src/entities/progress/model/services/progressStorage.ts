@@ -11,7 +11,6 @@ export function getLocalProgress(): Record<string, UserProgress> {
     if (!data) return {};
     const parsed = JSON.parse(data) as Record<string, UserProgress>;
 
-    // 기존 데이터에 SM-2 필드가 없으면 마이그레이션 후 저장
     let needsSave = false;
     for (const [key, entry] of Object.entries(parsed)) {
       if (entry.easiness_factor === undefined) {
@@ -47,6 +46,6 @@ function migrateProgress(old: Partial<UserProgress> & { question_id: string }): 
     interval:
       old.status === 'mastered' ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION,
     repetition: old.status === 'mastered' ? 2 : 0,
-    next_review: today, // 마이그레이션 시 오늘 복습 대상으로
+    next_review: today,
   };
 }

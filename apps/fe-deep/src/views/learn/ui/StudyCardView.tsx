@@ -12,7 +12,6 @@ interface StudyCardViewProps {
   currentIndex: number;
   totalCount: number;
   currentQuestion: Question | undefined;
-  /** 현재 단계의 꼬리질문. 없으면 원 질문 단계다. */
   currentFollowUp: FollowUp | undefined;
   stepIndex: number;
   stepCount: number;
@@ -21,13 +20,10 @@ interface StudyCardViewProps {
   progressPercent: number;
   isNewCard: boolean;
   onNext: () => void;
-  /** 답을 확인하지 않고 다음 질문으로 건너뛴다. */
   onSkip: () => void;
   onRetry: () => void;
-  /** 답을 보기 전에 스스로 적어보는 인출 입력 */
   recallInput: string;
   onRecallChange: (v: string) => void;
-  /** 우측 상단에 렌더링할 액션 (종료 버튼 등) */
   headerAction?: React.ReactNode;
 }
 
@@ -63,7 +59,6 @@ export function StudyCardView({
 
   return (
     <div className="container mx-auto max-w-168 px-4 py-8 sm:py-12">
-      {/* Progress bar */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -85,7 +80,6 @@ export function StudyCardView({
         <Progress value={progressPercent} className="h-1.5" />
       </div>
 
-      {/* Card */}
       <AnimatePresence mode="wait">
         <motion.div
           key={`${currentIndex}-${stepIndex}`}
@@ -95,7 +89,6 @@ export function StudyCardView({
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
         >
           <Card className="min-h-[300px] p-6 relative shadow-sm">
-            {/* Meta */}
             <div className="flex items-center gap-2 mb-5">
               {currentFollowUp ? (
                 <Badge className="text-xs">꼬꼬무</Badge>
@@ -125,12 +118,10 @@ export function StudyCardView({
               )}
             </div>
 
-            {/* Question */}
             <div className="flex flex-col items-center justify-center min-h-[120px] mb-6">
               <p className="text-lg font-normal text-center leading-relaxed whitespace-pre-line">{prompt}</p>
             </div>
 
-            {/* Keyword hint — 답 확인 + 인출 입력이 있으면 언급 체크로 대체된다 */}
             {keywords.length > 0 && !(isFlipped && recallInput.trim()) && (
               <details className="mb-5">
                 <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
@@ -146,7 +137,6 @@ export function StudyCardView({
               </details>
             )}
 
-            {/* Answer or prompt */}
             {!isFlipped ? (
               <div>
                 <label htmlFor="recall-input" className="block text-sm text-muted-foreground mb-2">
@@ -189,7 +179,6 @@ export function StudyCardView({
         </motion.div>
       </AnimatePresence>
 
-      {/* Actions — 버튼은 항상 같은 자리, 상태는 라벨·disabled로만 바뀐다 */}
       <div className="mt-5 flex flex-wrap items-center gap-2.5">
         <Button variant="outline" size="lg" onClick={onRetry} disabled={!isFlipped} className="gap-2 shadow-sm">
           <RotateCcw className="h-4 w-4" />

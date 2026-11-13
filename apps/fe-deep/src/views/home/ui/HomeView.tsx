@@ -10,7 +10,6 @@ export async function HomeView() {
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border/50">
         <div className="hero-gradient absolute inset-0" />
         <div className="noise-overlay absolute inset-0" />
@@ -57,7 +56,6 @@ export async function HomeView() {
         </div>
       </section>
 
-      {/* Categories */}
       <section className="container mx-auto max-w-4xl px-4 py-8 sm:py-12">
         <div className="text-center mb-8 animate-fade-in">
           <h2 className="text-xl font-semibold mb-2">학습 카테고리</h2>

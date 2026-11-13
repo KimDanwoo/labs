@@ -25,13 +25,11 @@ export function createSeedClient() {
   return createCliClient('SUPABASE_SERVICE_ROLE_KEY', '시드 실행');
 }
 
-/** 정리 스크립트용 쓰기(service_role) 클라이언트. 항상 .env.local의 DB에 쓴다. */
 export function createLocalAdminClient() {
   preferLocalEnv();
   return createCliClient('SUPABASE_SERVICE_ROLE_KEY', '정리 실행');
 }
 
-/** 덤프용 읽기(anon) 클라이언트. 항상 .env.local의 DB를 읽는다. */
 export function createReadClient() {
   preferLocalEnv();
   return createCliClient('NEXT_PUBLIC_SUPABASE_ANON_KEY', '조회');

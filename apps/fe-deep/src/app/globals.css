@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-/* 공유 디자인 토큰(코어 primitives·brand·status·surface 계약). 프딥 스킨은 다음 줄에서 덮어씀. */
 @import '@tokens/css/theme.css';
 @import './styles/design-system.css';
 @import './styles/reset.css';

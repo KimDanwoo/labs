@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { StudyTopic } from '../../lib/parseHandbook';
 
-/** 입력 중이거나 버튼에 포커스가 있을 땐 단축키를 가로채지 않는다. */
 const SKIP_SHORTCUT_TAGS = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT'];
 
 export function useStudyRun(topics: StudyTopic[]) {
@@ -68,10 +67,8 @@ export function useStudyRun(topics: StudyTopic[]) {
     [resetStep],
   );
 
-  /** 현재 단계를 답 가리고 처음부터 다시 푼다. */
   const retryStep = useCallback(() => resetStep(), [resetStep]);
 
-  /** 남은 단계를 건너뛰고 다음 주제의 첫 단계로 간다. */
   const goNextTopic = useCallback(() => {
     if (isLastTopic) return;
     jumpToTopic(topicIndex + 1);

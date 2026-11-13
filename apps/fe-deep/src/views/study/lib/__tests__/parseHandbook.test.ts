@@ -1,4 +1,3 @@
-// 학습 문서 파서 회귀 체크
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { STEP_KIND, parseStudyDoc } from '../parseHandbook';
@@ -56,7 +55,6 @@ test('H1은 주제, H2는 역할별 섹션으로 갈린다', () => {
     [STEP_KIND.keywords, STEP_KIND.followUp, STEP_KIND.followUp],
   );
   assert.deepEqual(topic.steps[0]!.keywords, ['프론트엔드', '0→1']);
-  // 답변 섹션이 여러 개면 별도 카드 없이 첫 카드 공개 내용에 합친다
   assert.match(topic.steps[0]!.reveal, /\*\*30초 답변\*\*/);
   assert.match(topic.steps[0]!.reveal, /안녕하세요\./);
   assert.match(topic.steps[0]!.reveal, /길게 말하기\./);
@@ -265,7 +263,6 @@ test('오답·보완할 점은 정답 뒤·꼬꼬무 앞뒤로 각각 카드가 
   assert.equal(topic.steps[1]!.reveal, '같은 말을 네 번 했다.');
   assert.equal(topic.steps[3]!.prompt, '보완할 점 — 다음엔 이렇게');
   assert.equal(topic.steps[3]!.reveal, '두 번째 되물음에서 멈춘다.');
-  // 오답·보완은 카드로 올라갔으니 참고 자료에 중복되지 않는다
   assert.doesNotMatch(topic.notes, /같은 말을 네 번 했다/);
 });
 

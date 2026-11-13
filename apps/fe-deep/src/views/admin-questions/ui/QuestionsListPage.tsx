@@ -50,7 +50,6 @@ export function QuestionsListPage() {
     selectedQuestions.filter((question) => question[field]).length;
   const hasSelection = selectedIds.size > 0;
 
-  /** 변경을 실행하고 목록을 다시 불러온다. 실패는 서버가 준 사유를 그대로 알린다. */
   async function mutate(run: () => Promise<unknown>, failureMessage: string, onSuccess = clearSelection) {
     try {
       await run();

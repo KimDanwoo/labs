@@ -13,7 +13,6 @@ async function fetchStamp(): Promise<number> {
   return body.stamp;
 }
 
-/** dev 전용 — 학습 md 저장을 감지해 화면을 자동 갱신한다. 프로덕션에선 아무것도 하지 않는다. */
 export function StudyDevReload() {
   const router = useRouter();
   const lastStampRef = useRef<number | null>(null);

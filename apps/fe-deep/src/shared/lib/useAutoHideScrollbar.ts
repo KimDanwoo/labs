@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 
 const HIDE_DELAY_MS = 700;
 
-/** 스크롤 중에만 `<html>`에 `data-scrolling`을 붙인다. 실제 표시는 globals.css의 scrollbar-color가 담당. */
 export function useAutoHideScrollbar() {
   useEffect(() => {
     const root = document.documentElement;

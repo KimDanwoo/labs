@@ -12,7 +12,6 @@ const FIRST_PAGE = 1;
 const isDefault = (key: string, value: string | null): value is null | '' =>
   value === null || value === '' || value === FILTER_ALL || (key === PARAM.page && value === String(FIRST_PAGE));
 
-/** 목록의 검색어·필터·페이지를 URL에 둔다 — 편집 화면에서 돌아와도 보던 목록이 복원된다. */
 export function useQuestionListParams() {
   const router = useRouter();
   const pathname = usePathname();

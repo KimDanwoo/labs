@@ -11,7 +11,6 @@ const FIELDS = Object.values(VISIBILITY_FIELD);
 
 type BulkActionBarProps = {
   selectedCount: number;
-  /** 선택한 질문 중 해당 노출이 켜진 개수. */
   visibleCounts: Record<QuestionVisibilityField, number>;
   onDelete: () => void;
   onVisibilityChange: (field: QuestionVisibilityField, isVisible: boolean) => void;

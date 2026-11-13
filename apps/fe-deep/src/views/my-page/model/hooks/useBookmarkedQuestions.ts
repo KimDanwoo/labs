@@ -4,10 +4,6 @@ import { getAllCategories, getQuestionsByIds, type Category, type Question } fro
 import { getBookmarks, toggleBookmark } from '@features/bookmark';
 import { useEffect, useState } from 'react';
 
-/**
- * localStorage의 북마크 ID를 기반으로 질문과 카테고리를 fetch하고,
- * 북마크 삭제 핸들러를 제공한다.
- */
 export function useBookmarkedQuestions() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[]>([]);

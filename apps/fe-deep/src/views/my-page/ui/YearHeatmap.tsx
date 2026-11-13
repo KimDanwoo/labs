@@ -31,7 +31,6 @@ function buildYearGrid(year: number, heatmap: Record<string, number>, today: Dat
   const jan1 = new Date(year, 0, 1);
   const end = new Date(year, 11, 31);
 
-  // Jan 1이 속한 주의 일요일부터 시작
   const cursor = new Date(jan1);
   cursor.setDate(jan1.getDate() - jan1.getDay());
 
@@ -77,7 +76,6 @@ export function YearHeatmap({ year, heatmap, maxCount, today }: YearHeatmapProps
     <div className="mb-6">
       <p className="text-sm font-normal text-muted-foreground mb-2">{year}년</p>
       <div className="flex gap-1 min-w-max">
-        {/* 요일 레이블 */}
         <div className="flex flex-col gap-1 mr-1">
           <div className="h-4" />
           {DAY_LABELS.map((label, i) => (
@@ -87,7 +85,6 @@ export function YearHeatmap({ year, heatmap, maxCount, today }: YearHeatmapProps
           ))}
         </div>
 
-        {/* 주 열 */}
         {weeks.map((week, wi) => {
           const monthLabel = monthStartCols.find((m) => m.col === wi)?.label ?? '';
           return (

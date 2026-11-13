@@ -9,7 +9,6 @@ export async function createQuestion(data: QuestionInput): Promise<Question> {
   await requireAdmin();
   const admin = createAdminSupabaseClient();
 
-  // order_num이 없으면 해당 카테고리 내 마지막 + 1
   let orderNum = data.order_num;
   if (orderNum === null || orderNum === undefined) {
     const { data: last, error } = await admin
@@ -51,7 +50,6 @@ export async function deleteQuestion(id: string): Promise<void> {
   if (error) throw new Error(`질문 삭제 실패: ${error.message}`);
 }
 
-/** 여러 질문을 일괄 삭제한다. */
 export async function deleteQuestions(ids: string[]): Promise<void> {
   if (ids.length === 0) return;
   await requireAdmin();
@@ -61,7 +59,6 @@ export async function deleteQuestions(ids: string[]): Promise<void> {
   if (error) throw new Error(`일괄 삭제 실패: ${error.message}`);
 }
 
-/** 여러 질문의 노출 설정을 일괄 변경한다. */
 export async function updateQuestionsVisibility(
   ids: string[],
   fields: { show_in_daily?: boolean; show_in_flashcard?: boolean },
@@ -74,7 +71,6 @@ export async function updateQuestionsVisibility(
   if (error) throw new Error(`노출 설정 변경 실패: ${error.message}`);
 }
 
-/** 카테고리 전체 질문의 노출 설정을 일괄 변경한다. */
 export async function updateCategoryVisibility(
   categoryId: string,
   fields: { show_in_daily?: boolean; show_in_flashcard?: boolean },

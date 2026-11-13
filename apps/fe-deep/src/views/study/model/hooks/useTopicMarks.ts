@@ -4,17 +4,11 @@ import { getCurrentUserId } from '@entities/progress';
 import { createClient } from '@shared/api/supabaseClient';
 import { useCallback, useEffect, useState } from 'react';
 
-// ============================================================
-// 주제 단위 표시(이해됨 · 오답노트) 공용 훅
-// 비로그인: localStorage만 사용
 // 로그인: 서버 테이블이 진실 — 로드 시 로컬 전용 항목을 서버로 올리고 합집합 사용
-// ============================================================
 
-/** 문서 slug → 표시된 주제 제목 목록 */
 type MarkMap = Record<string, string[]>;
 
 interface TopicMarkStore {
-  /** 서버 테이블 이름. 스키마는 (user_id, doc_slug, topic_key)로 동일하다. */
   table: string;
   storageKey: string;
 }

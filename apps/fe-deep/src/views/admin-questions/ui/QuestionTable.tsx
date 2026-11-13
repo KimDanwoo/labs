@@ -53,13 +53,11 @@ export function QuestionTable({
 
   return (
     <>
-      {/* Select all */}
       <div className="flex items-center gap-2 px-1 mb-2">
         <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="전체 선택" />
         <span className="text-sm text-muted-foreground">전체 선택</span>
       </div>
 
-      {/* Desktop table */}
       <div className="hidden md:block overflow-x-auto border rounded-lg">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
@@ -141,7 +139,6 @@ export function QuestionTable({
         </table>
       </div>
 
-      {/* Mobile card list */}
       <div className="md:hidden space-y-2">
         {questions.map((q) => {
           const cat = categoryMap.get(q.category_id);

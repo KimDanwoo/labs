@@ -12,14 +12,12 @@ const SPEECH_RATE = 1;
 
 const subscribeNever = () => () => {};
 
-/** 마크다운 답변을 브라우저 내장 TTS로 읽어준다. 지원하지 않는 브라우저에선 렌더하지 않는다. */
 export function SpeakButton({ text, className }: { text: string; className?: string }) {
   const isSupported = useSyncExternalStore(
     subscribeNever,
     () => Boolean(getSynth()),
     () => false,
   );
-  /** 재생 중인 답변 본문. text가 바뀌면 자동으로 정지 상태가 된다. */
   const [speakingText, setSpeakingText] = useState<string | null>(null);
   const isSpeaking = speakingText === text;
 

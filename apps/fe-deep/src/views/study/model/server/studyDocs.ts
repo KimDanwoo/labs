@@ -2,7 +2,6 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { parseStudyDoc, type StudyDoc } from '../../lib/parseHandbook';
 
-/** 학습 문서 원본. 여기에 .md 파일을 넣으면 학습 화면이 자동으로 생긴다. */
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'study');
 const MD_EXTENSION = '.md';
 const SLUG_PATTERN = /^[a-z0-9][a-z0-9-_]*$/i;
@@ -31,7 +30,6 @@ export async function getStudyDoc(slug: string): Promise<StudyDoc | null> {
   }
 }
 
-/** 학습 문서들의 최신 수정 시각. dev에서 md 저장을 감지해 화면을 갱신하는 데 쓴다. */
 export async function getStudyContentStamp(): Promise<number> {
   try {
     const files = await readdir(CONTENT_DIR);

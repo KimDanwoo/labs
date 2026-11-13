@@ -1,7 +1,6 @@
 /** 브라우저 TTS가 한 번에 안정적으로 읽는 길이. 크롬은 긴 발화를 도중에 끊는다. */
 const CHUNK_LIMIT = 180;
 
-/** 마크다운 → 낭독용 평문. 코드블록·이미지·링크 URL 등 소리로 들으면 소음인 것을 걷어낸다. */
 function toSpeechText(markdown: string): string {
   return markdown
     .replace(/```[\s\S]*?```/g, '')

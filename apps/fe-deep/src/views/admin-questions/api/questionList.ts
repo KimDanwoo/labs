@@ -21,7 +21,6 @@ export type QuestionListPage = {
   totalCount: number;
 };
 
-/** 관리자 목록 한 페이지. 검색어는 질문 본문의 부분 일치 또는 태그의 완전 일치로 찾는다. */
 export async function fetchQuestionList(
   { page, categoryId, difficulty, search }: QuestionListQuery,
   signal: AbortSignal,

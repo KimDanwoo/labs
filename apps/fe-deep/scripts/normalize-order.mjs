@@ -4,13 +4,11 @@ const sbAdmin = createLocalAdminClient();
 
 const isDryRun = process.argv.includes('--dry-run');
 
-// q-77 → 77. 숫자가 아닌 id(UUID)는 뒤로 밀되 id 문자열 순으로 안정 정렬한다.
 function idRank(id) {
   const n = Number(id.replace(/^q-/, ''));
   return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
 }
 
-// 현재 화면 순서(order_num → id)를 그대로 유지한 채 1..N으로 다시 매긴다.
 function compare(a, b) {
   if (a.order_num !== b.order_num) return a.order_num - b.order_num;
   const ra = idRank(a.id);

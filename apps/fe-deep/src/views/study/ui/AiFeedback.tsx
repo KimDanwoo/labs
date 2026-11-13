@@ -9,14 +9,12 @@ interface AiFeedbackProps {
   recall: string;
 }
 
-/** "잘 짚은 것: …" 형태의 줄을 라벨과 본문으로 나눈다. 형식이 다르면 통째로 본문 처리. */
 function splitFeedbackLine(line: string): { label: string; body: string } {
   const colonIndex = line.indexOf(':');
   if (colonIndex < 1 || colonIndex > 20) return { label: '', body: line };
   return { label: line.slice(0, colonIndex).trim(), body: line.slice(colonIndex + 1).trim() };
 }
 
-/** 답 확인 시 자동으로 피드백을 요청해 보여준다. dev 전용 — 프로덕션 번들에선 렌더되지 않는다. */
 export function AiFeedback({ question, modelAnswer, recall }: AiFeedbackProps) {
   const { data, error, isPending } = useAiFeedback({ question, modelAnswer, recall });
 

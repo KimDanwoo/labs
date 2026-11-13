@@ -51,7 +51,6 @@ export function StudyRunView({ doc }: StudyRunViewProps) {
     marksRef.current = { understood, review };
   }, [understood, review]);
 
-  // 이해됨과 오답노트는 동시에 켜지지 않는다 — 한쪽을 켜면 반대쪽을 끈다.
   const handleToggleUnderstood = (topicTitle: string) => {
     if (!understood.has(topicTitle) && review.has(topicTitle)) toggleReview(topicTitle);
     toggleUnderstood(topicTitle);
