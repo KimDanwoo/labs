@@ -11,6 +11,8 @@ type Props = {
   onPhoto: () => void;
   onOpenMap: () => void;
   onOpenWardrobe: () => void;
+  onOpenTogether: () => void;
+  partySize: number;
 };
 
 export function ToolBar({
@@ -22,6 +24,8 @@ export function ToolBar({
   onPhoto,
   onOpenMap,
   onOpenWardrobe,
+  onOpenTogether,
+  partySize,
 }: Props) {
   const soundLabel = isSoundOn ? '자연 소리 끄기' : '자연 소리 켜기';
   return (
@@ -45,6 +49,16 @@ export function ToolBar({
         <Icon name={isSoundOn ? 'sound' : 'mute'} />
       </button>
       <span className="tool-divider" />
+      <button
+        className="tool together-tool"
+        title="친구와 같이 걷기"
+        aria-label="친구와 같이 걷기"
+        disabled={!isReady}
+        onClick={onOpenTogether}
+      >
+        <Icon name="people" />
+        {partySize > 0 && <span className="party-count">{partySize}</span>}
+      </button>
       <button
         className="tool"
         title="산책 옷 고르기"

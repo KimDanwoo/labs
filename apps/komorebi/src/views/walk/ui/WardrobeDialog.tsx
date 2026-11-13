@@ -1,6 +1,6 @@
-import { useId, useState } from 'react';
+import { useId, useState, type JSX } from 'react';
 import { useModal } from '../model/hooks/useModal';
-import { OUTFIT, type Appearance } from '../model/world/appearance';
+import { OUTFIT_DEFINITIONS, type Appearance } from '../model/world/appearance';
 import { CharacterPreview } from './CharacterPreview';
 import { Icon } from './Icon';
 
@@ -10,12 +10,8 @@ type Props = {
   onChange: (next: Appearance) => Promise<boolean>;
   onClose: () => void;
 };
-const OUTFITS = [
-  { id: OUTFIT.summer, name: '레몬빛 여름옷', detail: '노란 티셔츠와 산호색 반바지' },
-  { id: OUTFIT.overalls, name: '풀잎 멜빵옷', detail: '작은 꽃이 달린 초록 멜빵' },
-];
 
-export function WardrobeDialog({ isOpen, appearance, onChange, onClose }: Props) {
+export function WardrobeDialog({ isOpen, appearance, onChange, onClose }: Props): JSX.Element {
   const ref = useModal(isOpen);
   const titleId = useId();
   const [isChanging, setIsChanging] = useState(false);
@@ -62,7 +58,7 @@ export function WardrobeDialog({ isOpen, appearance, onChange, onClose }: Props)
           <fieldset disabled={isChanging}>
             <legend>오늘 입을 옷</legend>
             <div className="wardrobe-options">
-              {OUTFITS.map((outfit) => (
+              {Object.values(OUTFIT_DEFINITIONS).map((outfit) => (
                 <button
                   key={outfit.id}
                   aria-pressed={appearance.outfit === outfit.id}

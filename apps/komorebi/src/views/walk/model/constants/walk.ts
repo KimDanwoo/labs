@@ -12,6 +12,7 @@ export const DIALOG = {
   memory: 'memory',
   wardrobe: 'wardrobe',
   chalkboard: 'chalkboard',
+  together: 'together',
 } as const;
 export type Dialog = (typeof DIALOG)[keyof typeof DIALOG];
 

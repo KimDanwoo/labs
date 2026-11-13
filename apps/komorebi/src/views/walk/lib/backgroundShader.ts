@@ -1,7 +1,7 @@
 import { BREEZE_GLSL } from './breeze';
 import { CHALK_GLSL } from './chalkboard';
 import { FAN_GLSL } from './fan';
-import { HOME_WEATHER_GLSL } from './homeWeather';
+import { INDOOR_WEATHER_GLSL } from './indoorWeather';
 import { MAX_LAMPS } from './nightLights';
 import { SEA_ATMOSPHERE_GLSL } from './seaAtmosphere';
 
@@ -13,7 +13,7 @@ export const BACKGROUND_FRAGMENT = `varying vec2 vUv; uniform sampler2D map; uni
   ${BREEZE_GLSL}
   ${FAN_GLSL}
   ${CHALK_GLSL}
-  ${HOME_WEATHER_GLSL}
+  ${INDOOR_WEATHER_GLSL}
   // Sun glitter on the sea (designed by Codex): painted glints, each fading in and out on its own beat.
   ${SEA_ATMOSPHERE_GLSL}
   // The painted sea itself sways and rolls shoreward, and the moored boat bobs with it (designed by Codex).
@@ -647,7 +647,7 @@ export const BACKGROUND_FRAGMENT = `varying vec2 vUv; uniform sampler2D map; uni
     c*=mix(1.,.55+.45*edge,night);
     vec3 overcast=mix(c,vec3(dot(c,vec3(.3,.59,.11))),.5)*vec3(.6,.66,.72);
     c=mix(c,overcast,rain*.8);
-    c=homeWeather(c,vUv);
+    c=indoorWeather(c,vUv);
     gl_FragColor=vec4(c*fade,1.);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>

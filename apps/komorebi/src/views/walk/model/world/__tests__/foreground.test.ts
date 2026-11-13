@@ -6,13 +6,15 @@ import { WORLDS, canWalk, type Region } from '../world';
 function covered(region: Region, x: number, y: number, feetDepth: number) {
   return FOREGROUNDS.some((layer) => {
     if (!isForegroundInFront(layer, { x: x / 15.36, z: feetDepth }, region)) return false;
-    let inside = false;
-    for (let i = 0, j = layer.outline.length - 1; i < layer.outline.length; j = i++) {
-      const [ax, ay] = layer.outline[i]!;
-      const [bx, by] = layer.outline[j]!;
-      if (ay > y !== by > y && x < ((bx - ax) * (y - ay)) / (by - ay) + ax) inside = !inside;
-    }
-    return inside;
+    return (layer.pieces ?? [layer.outline]).some((outline) => {
+      let inside = false;
+      for (let i = 0, j = outline.length - 1; i < outline.length; j = i++) {
+        const [ax, ay] = outline[i]!;
+        const [bx, by] = outline[j]!;
+        if (ay > y !== by > y && x < ((bx - ax) * (y - ay)) / (by - ay) + ax) inside = !inside;
+      }
+      return inside;
+    });
   });
 }
 
@@ -83,6 +85,31 @@ test('a foreground layer sits just above whoever is behind it and under whoever 
   const childBehind = foregroundOrder(bridgeRail, [child(onBridge), cat(onPathBelow, 4.2)], 'river');
   assert.ok(childBehind !== null && childBehind > 4 && childBehind < 4.2);
   assert.equal(foregroundOrder(bridgeRail, [child(onBridge)], 'village'), null);
+});
+
+test('a nearby friend behind a desk cannot lift the desk over the player standing just in front', () => {
+  const desk = FOREGROUNDS.find((layer) => layer.region === 'classroom' && layer.baseline[0][1] === 918);
+  assert.ok(desk);
+  const player = { x: 18, z: 919 / 10.24, order: 4 };
+  const friend = { x: 18, z: 917 / 10.24, order: 3.998 };
+  const order = foregroundOrder(desk, [player, friend], 'classroom');
+  assert.ok(order !== null && order > friend.order && order < player.order);
+});
+
+test('desk and chair masks retain the visible gaps underneath and never cover the floor in front', () => {
+  assert.equal(covered('classroom', 140, 835, 88), false, 'empty space between the nearest chair legs');
+  assert.equal(covered('classroom', 1420, 850, 88), false, 'empty space between the nearest right chair legs');
+  assert.ok(covered('classroom', 180, 692, 87), 'the actual tabletop still covers a character behind it');
+  for (let x = 0; x <= 1536; x += 32) {
+    assert.equal(covered('classroom', x, 800, 94), false, `front aisle at ${x}`);
+  }
+});
+
+test('standing between a desk foot and its nearer chair does not let the chair lift the desk over the child', () => {
+  assert.ok(canWalk(300 / 15.36, 910 / 10.24, 'classroom'));
+  assert.equal(covered('classroom', 257, 830, 910 / 10.24), false);
+  assert.ok(canWalk(1220 / 15.36, 911 / 10.24, 'classroom'));
+  assert.equal(covered('classroom', 1273, 850, 911 / 10.24), false);
 });
 
 test('no reachable pair of child and animal needs a foreground both above and below them', () => {

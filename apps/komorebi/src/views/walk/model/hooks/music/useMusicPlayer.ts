@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import {
   DEFAULT_MUSIC,
   MUSIC_STATUS,
@@ -12,7 +12,27 @@ import {
   type MusicWidget,
 } from '../../../lib/music/soundcloud';
 
-export function useMusicPlayer(source: string, initialVolume: number) {
+type MusicPlayerModel = {
+  attempt: number;
+  iframe: RefObject<HTMLIFrameElement | null>;
+  status: MusicStatus;
+  tracks: MusicTrack[];
+  track: MusicTrack | undefined;
+  isPlaying: boolean;
+  position: number;
+  volume: number;
+  retry: () => void;
+  toggle: () => void;
+  pause: () => void;
+  next: () => void;
+  prev: () => void;
+  choose: (index: number) => void;
+  changeVolume: (value: number) => void;
+  seek: (position: number) => void;
+};
+
+export function useMusicPlayer(source: string, initialVolume: number): MusicPlayerModel {
+  const [attempt, setAttempt] = useState(0);
   const iframe = useRef<HTMLIFrameElement>(null);
   const widget = useRef<MusicWidget | null>(null);
   const [status, setStatus] = useState<MusicStatus>(MUSIC_STATUS.loading);
@@ -78,7 +98,7 @@ export function useMusicPlayer(source: string, initialVolume: number) {
       cleanup?.();
       widget.current = null;
     };
-  }, [source]);
+  }, [source, attempt]);
   const track = tracks.find((track) => track.index === index) ?? tracks[0];
   const choose = (next: number) => {
     if (status === MUSIC_STATUS.ready) widget.current?.skip(next);
@@ -91,6 +111,7 @@ export function useMusicPlayer(source: string, initialVolume: number) {
     saveMusicPreferences({ volume: bounded, source });
   };
   return {
+    attempt,
     iframe,
     status,
     tracks,
@@ -98,6 +119,15 @@ export function useMusicPlayer(source: string, initialVolume: number) {
     isPlaying,
     position,
     volume,
+    retry: () => {
+      setStatus(MUSIC_STATUS.loading);
+      setTracks([]);
+      setIndex(0);
+      setIsPlaying(false);
+      setPosition(0);
+      previousSecond.current = -1;
+      setAttempt((value) => value + 1);
+    },
     toggle: () => {
       if (isPlaying) widget.current?.pause();
       else widget.current?.play();

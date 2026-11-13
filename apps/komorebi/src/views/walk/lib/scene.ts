@@ -1,7 +1,15 @@
+import type { Peer, Walker } from '@komorebi/realtime';
 import * as THREE from 'three';
+import { BALL_PHASE, BALL_ROLE, BALL_TIMING, type BallGame } from '../model/ballGame';
 import { TIME, WEATHER, type TimeOfDay, type Weather } from '../model/constants/walk';
+import {
+  nearestSchoolmate,
+  schoolmateGreetingPosition,
+  schoolmatePlayPosition,
+  type SchoolmateId,
+} from '../model/schoolmates';
 import { companionStore } from '../model/store/companions';
-import { DEFAULT_APPEARANCE, characterAtlas, type Appearance } from '../model/world/appearance';
+import { DEFAULT_APPEARANCE, characterLayers, type Appearance } from '../model/world/appearance';
 import { FOREGROUNDS, foregroundOrder } from '../model/world/foreground';
 import { isAtHomeBed, isNearHomeBed } from '../model/world/interactions';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '../model/world/portals';
@@ -12,6 +20,7 @@ import {
   HOME_BED,
   SPAWN,
   WORLDS,
+  canWalk,
   closestLandmark,
   createSlideMotion,
   findRoute,
@@ -25,6 +34,7 @@ import {
 } from '../model/world/world';
 import { CANVAS_FONT_FAMILY, canvasTexture } from './art';
 import { BACKGROUND_FRAGMENT, BACKGROUND_VERTEX } from './backgroundShader';
+import { createBallScene } from './ballScene';
 import { createBedRest } from './bedRest';
 import { createBoats } from './boats';
 import { SCENERY_STYLE } from './breeze';
@@ -46,12 +56,15 @@ import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
 import { createPierFishing } from './pierFishing';
 import { createPlaceEffects } from './placeEffects';
 import { createPointerPick } from './pointerPick';
+import { createPortalInput } from './portalInput';
 import { createPortals } from './portals';
 import { createRain } from './rain';
 import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './regionPlates';
 import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
 import { createRoamers } from './roamers';
 import { createSceneLife } from './sceneLife';
+import { createSchoolmates } from './schoolmatesScene';
+import { createTogetherScene } from './togetherScene';
 import { createWaterMaps } from './water';
 import { createWaves } from './waves';
 
@@ -80,7 +93,15 @@ function motionLabel(isAirborne: boolean, isMoving: boolean, isSprinting: boolea
 const easeLight = (current: number, target: number, lambda: number, dt: number) =>
   settle(THREE.MathUtils.damp(current, target, lambda, dt), target, WARMTH_EPSILON);
 
-const STATUS_KEYS = ['x', 'z', 'region', 'walking', 'nearby', 'steps'] as const satisfies (keyof SceneStatus)[];
+const STATUS_KEYS = [
+  'x',
+  'z',
+  'region',
+  'walking',
+  'nearby',
+  'steps',
+  'schoolmateId',
+] as const satisfies (keyof SceneStatus)[];
 const hasStatusChanged = (previous: SceneStatus, next: SceneStatus) =>
   STATUS_KEYS.some((key) => previous[key] !== next[key]);
 
@@ -92,6 +113,7 @@ export type SceneStatus = Point & {
   walking: boolean;
   nearby: Landmark | null;
   steps: number;
+  schoolmateId: SchoolmateId | null;
 };
 export type SceneOptions = {
   onStatus: (status: SceneStatus) => void;
@@ -104,11 +126,17 @@ export type SceneOptions = {
   signal?: AbortSignal;
 };
 export type WalkEngine = {
+  getWalker: () => Walker;
+  setPeers: (peers: readonly Peer[]) => void;
+  arriveTogether: (peers: readonly Peer[]) => Promise<void>;
   dispose: () => void;
   /** While paused (a dialog is open) the child stands still and new movement input is ignored. */
   setPaused: (value: boolean) => void;
   finishSleep: () => void;
   setFishing: (frame: FishingFrame | null) => void;
+  greetSchoolmate: (id: SchoolmateId) => boolean;
+  endSchoolmateGreeting: () => void;
+  setBallGame: (frame: BallGame | null) => boolean;
   reactToCompanion: (reaction: CompanionReaction) => void;
   setAppearance: (appearance: Appearance) => Promise<boolean>;
   setTimeOfDay: (value: TimeOfDay) => void;
@@ -135,23 +163,35 @@ export async function createScene(
     loaded.forEach((texture) => texture.dispose());
   };
   // Only the first view blocks the start; the other paintings follow in the background.
-  const [startPlate, atlas] = await Promise.allSettled([
+  const layerUrls = characterLayers(appearance);
+  const [startPlate, bodyAtlas, outfitAtlas] = await Promise.allSettled([
     plates.ensure(START_REGION),
-    loader.loadAsync(characterAtlas(appearance)),
+    loader.loadAsync(layerUrls.body),
+    loader.loadAsync(layerUrls.outfit),
   ]);
-  if (atlas.status === 'fulfilled') loaded.push(preparePaintingTexture(atlas.value));
-  if (startPlate.status === 'rejected' || atlas.status === 'rejected' || signal?.aborted) {
+  for (const atlas of [bodyAtlas, outfitAtlas]) {
+    if (atlas.status === 'fulfilled') loaded.push(preparePaintingTexture(atlas.value));
+  }
+  if (
+    startPlate.status === 'rejected' ||
+    bodyAtlas.status === 'rejected' ||
+    outfitAtlas.status === 'rejected' ||
+    signal?.aborted
+  ) {
     releaseTextures();
-    const failure = [startPlate, atlas].find((result) => result.status === 'rejected');
+    const failure = [startPlate, bodyAtlas, outfitAtlas].find((result) => result.status === 'rejected');
     throw failure?.reason ?? new DOMException('Scene cancelled', 'AbortError');
   }
-  const childAtlas = atlas.value;
-  const appearances = new Map<string, THREE.Texture>([[characterAtlas(appearance), childAtlas]]);
+  const outfits = new Map<string, THREE.Texture>([[layerUrls.outfit, outfitAtlas.value]]);
   let currentAppearance = appearance;
   let appearanceRequest = 0;
   let character: ReturnType<typeof createChild>;
   try {
-    character = createChild(childAtlas);
+    character = createChild({
+      body: bodyAtlas.value,
+      outfit: outfitAtlas.value,
+      bodyPoseOffsets: layerUrls.bodyPoseOffsets,
+    });
   } catch (error) {
     releaseTextures();
     throw error;
@@ -225,10 +265,11 @@ export async function createScene(
   foregroundMaterial.depthWrite = false;
   const bedRest = createBedRest(scene, foregroundMaterial);
   const foregrounds = FOREGROUNDS.map((layer) => {
-    const shape = new THREE.Shape(
-      layer.outline.map(([x, y]) => new THREE.Vector2((x / 1536) * 120 - 60, 40 - (y / 1024) * 80)),
+    const shapes = (layer.pieces ?? [layer.outline]).map(
+      (outline) =>
+        new THREE.Shape(outline.map(([x, y]) => new THREE.Vector2((x / 1536) * 120 - 60, 40 - (y / 1024) * 80))),
     );
-    const geometry = new THREE.ShapeGeometry(shape);
+    const geometry = new THREE.ShapeGeometry(shapes);
     const vertices = geometry.getAttribute('position');
     const uv = geometry.getAttribute('uv');
     for (let i = 0; i < vertices.count; i++) uv.setXY(i, (vertices.getX(i) + 60) / 120, (vertices.getY(i) + 40) / 80);
@@ -288,6 +329,12 @@ export async function createScene(
   const nightLights = createNightLights(scene);
   const life = createSceneLife(scene, loader);
   const roamers = createRoamers(scene, loader);
+  const schoolmates = createSchoolmates(scene, loader, onNotice);
+  const together = createTogetherScene({ scene, loader, onNotice });
+  let arrivalRequest = 0;
+  const ball = createBallScene(scene);
+  let greetingId: SchoolmateId | null = null;
+  let ballFrame: BallGame | null = null;
   const waves = createWaves(scene, loader);
   const boats = createBoats(scene);
   const countryside = createCountryside(scene);
@@ -339,6 +386,7 @@ export async function createScene(
   const jump = createJump();
   const slide = createSlideMotion();
   const keys = new Set<string>();
+  const portalInput = createPortalInput();
   /** Render the next frame now and keep the full rate until camera, light and fades come to rest. */
   const wake = () => {
     isSettling = true;
@@ -403,6 +451,11 @@ export async function createScene(
     waitingPortal = null;
   };
   const switchRegion = (next: Region, spawn: Point, plate: THREE.Texture) => {
+    if (isIndoors(region) || isIndoors(next)) {
+      portalInput.arrive(keys);
+      keys.clear();
+      moveSpeed = 0;
+    }
     jump.height = 0;
     jump.velocity = 0;
     jump.landing = 0;
@@ -440,6 +493,7 @@ export async function createScene(
     if (paused || (event.target instanceof HTMLElement && isControlTarget(event.target))) return;
     const key = gameKey(event);
     if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) event.preventDefault();
+    if (portalInput.isBlocked(key)) return;
     if (key === ' ' && !event.repeat) startJump(jump);
     keys.add(key);
     if (MOVE_KEYS.includes(key)) {
@@ -448,9 +502,14 @@ export async function createScene(
     }
   };
   let previousStatus: SceneStatus | undefined;
-  const keyUp = (event: KeyboardEvent) => keys.delete(gameKey(event));
+  const keyUp = (event: KeyboardEvent) => {
+    const key = gameKey(event);
+    keys.delete(key);
+    portalInput.release(key);
+  };
   const clear = () => {
     keys.clear();
+    portalInput.clear();
     last = 0;
     nextFrame = 0;
   };
@@ -536,14 +595,15 @@ export async function createScene(
   }
   /** Moves the child along held keys or the planned route and reports how this frame's stride went. */
   function walk(dt: number) {
+    const canMove = !paused || (ballFrame?.phase === BALL_PHASE.ready && route.length > 0);
     let { dx, dz } = keyboardDirection(keys);
     const keyboardWalking = Math.hypot(dx, dz) > 0;
-    if (!keyboardWalking || paused) {
+    if (!keyboardWalking || !canMove) {
       slide.direction = null;
       slide.input = null;
     }
     let routeDistance = Infinity;
-    if (!paused && !keyboardWalking) {
+    if (canMove && !keyboardWalking) {
       // Reach bends before turning, and consume reached waypoints without pausing a frame.
       while (route.length && Math.hypot(route[0]!.x - position.x, route[0]!.z - position.z) < 0.02) route.shift();
       if (route.length) {
@@ -555,9 +615,9 @@ export async function createScene(
         destination = null;
       }
     }
-    const sprinting = keys.has('shift') || touchSprint;
+    const sprinting = !paused && (keys.has('shift') || touchSprint);
     const magnitude = Math.hypot(dx, dz);
-    let walking = magnitude > 0 && !paused;
+    let walking = magnitude > 0 && canMove;
     let frameTravel = 0;
     const targetSpeed = sprinting ? SPRINT_SPEED : RUN_SPEED;
     moveSpeed = THREE.MathUtils.damp(moveSpeed, walking ? targetSpeed : 0, 24, dt);
@@ -602,7 +662,7 @@ export async function createScene(
     const scale = characterScale(position.z);
     const size = scale * CHILD_SIZE;
     const rest = sleeping ? bedRest.update(darkness, lampGlowAt(region, HOME_BED), reducedMotion) : null;
-    let characterDt = paused && !fishingFrame ? 0 : dt;
+    let characterDt = paused && !fishingFrame && !walking ? 0 : dt;
     let characterTravel = jump.height > 0 ? frameTravel * 0.2 : frameTravel;
     if (rest) {
       characterDt = dt;
@@ -610,19 +670,24 @@ export async function createScene(
     }
     child.scale.setScalar(size);
     character.setOpacity(rest?.opacity ?? 1);
-    const { hasStepped } = character.update(
-      characterDt,
-      characterTravel,
-      fishingFrame ? fishingHeading() : (rest?.heading ?? heading),
-      rest?.walking ?? walking,
-      true,
-      reducedMotion,
-      jump.height + fishingLift,
-      jump.velocity,
-      jump.landing,
-    );
-    character.setFishingPose(fishingFrame, fishingAge, reducedMotion);
-    if (!fishingFrame && paused) character.setCompanionPose(companionAge, reducedMotion);
+    const { hasStepped } = character.update({
+      dt: characterDt,
+      travel: characterTravel,
+      heading: fishingFrame ? fishingHeading() : (rest?.heading ?? heading),
+      isWalking: rest?.walking ?? walking,
+      isRunning: true,
+      isStill: reducedMotion,
+      jumpHeight: jump.height + fishingLift,
+      landing: jump.landing,
+    });
+    character.setFishingPose({ frame: fishingFrame, elapsed: fishingAge, isStill: reducedMotion });
+    if (!fishingFrame && paused && !walking) character.setCompanionPose({ age: companionAge, isStill: reducedMotion });
+    character.setBallPose({
+      game: walking ? null : ballFrame,
+      role: BALL_ROLE.player,
+      heading,
+      isStill: reducedMotion,
+    });
     return { scale, size, rest, hasStepped };
   }
   function placeCharacter(scale: number, size: number, rest: BedRestFrame | null) {
@@ -646,8 +711,10 @@ export async function createScene(
   function followCamera(dt: number, size: number) {
     const maxX = Math.max(0, 60 - halfWidth),
       maxY = Math.max(0, 40 - halfHeight);
-    const cameraX = THREE.MathUtils.clamp(child.position.x * (halfWidth < 35 ? 1 : 0), -maxX, maxX);
-    const cameraY = THREE.MathUtils.clamp(Math.min(0, child.position.y + halfHeight - 7), -maxY, maxY);
+    const friend = ballFrame ? schoolmates.standing.find((friend) => friend.id === greetingId) : null;
+    const focusX = friend ? (child.position.x + sceneX(friend.x)) / 2 : child.position.x;
+    const cameraX = THREE.MathUtils.clamp(focusX * (halfWidth < 35 ? 1 : 0), -maxX, maxX);
+    const cameraY = friend ? -maxY : THREE.MathUtils.clamp(Math.min(0, child.position.y + halfHeight - 7), -maxY, maxY);
     const characterHeight = 10.4 * size;
     const characterHalfWidth = 3.9 * size;
     const keepX = (x: number) =>
@@ -718,17 +785,40 @@ export async function createScene(
     countryside.update({ region, dt: worldDt, darkness, isStill: reducedMotion, isRaining, player: position });
     roamers.update({ region, dt: worldDt, darkness, isStill: reducedMotion, isRaining, childZ: position.z });
     container.dataset.visitor = roamers.visitor;
-    const walkers = [isResting ? null : { ...position, order: CHILD_ORDER }, roamers.standing].filter(
-      (walker) => walker !== null,
-    );
+    schoolmates.update({
+      region,
+      dt: paused ? 0 : worldDt,
+      darkness,
+      isStill: reducedMotion,
+      isRaining,
+      player: position,
+    });
+    container.dataset.schoolmates = String(schoolmates.standing.length);
+    const walkers = [
+      isResting ? null : { ...position, order: CHILD_ORDER },
+      roamers.standing,
+      ...schoolmates.standing,
+      ...together.standing,
+    ].filter((walker) => walker !== null);
     foregrounds.forEach((layer) => {
       const order = foregroundOrder(layer, walkers, region);
       layer.mesh.visible = order !== null;
       layer.mesh.renderOrder = order ?? 0;
     });
+    container.dataset.playerOccluders = String(
+      foregrounds.filter((layer) => layer.mesh.visible && layer.mesh.renderOrder > CHILD_ORDER).length,
+    );
     character.setLight(darkness, lampGlowAt(region, position));
   }
   function reportStatus({ walking, sprinting }: Stride, rest: BedRestFrame | null) {
+    container.dataset.position = `${position.x.toFixed(2)},${position.z.toFixed(2)}`;
+    const ballFriend = ballFrame ? schoolmates.standing.find((friend) => friend.id === greetingId) : null;
+    container.dataset.ballDistance = ballFriend
+      ? Math.hypot(ballFriend.x - position.x, ballFriend.z - position.z).toFixed(2)
+      : '';
+    container.dataset.schoolmatePositions = schoolmates.standing
+      .map(({ x, z }) => `${x.toFixed(2)},${z.toFixed(2)}`)
+      .join(' ');
     container.dataset.motion = sleeping ? 'sleeping' : motionLabel(jump.height > 0, walking, sprinting);
     let restLabel = sleeping ? 'settling' : '';
     if (rest && rest.tucked > 0.99) restLabel = 'tucked';
@@ -739,6 +829,7 @@ export async function createScene(
       walking,
       nearby: closestLandmark(position.x, position.z, region),
       steps: Math.floor(distance * 5),
+      schoolmateId: nearestSchoolmate(schoolmates.standing, position),
     };
     if (previousStatus && !hasStatusChanged(previousStatus, nextStatus)) return;
     previousStatus = nextStatus;
@@ -749,7 +840,11 @@ export async function createScene(
     const wasAirborne = isAirborne(jump);
     const hasMoveKey = MOVE_KEYS.some((key) => keys.has(key));
     const isMoving = !paused && (hasMoveKey || route.length > 0 || wasAirborne || moveSpeed > 0.05);
-    const rate = isMoving || isSettling || fishingFrame ? RENDER_RATE.active : RENDER_RATE.idle;
+    const isBallMoving =
+      ballFrame !== null &&
+      ballFrame.phase !== BALL_PHASE.complete &&
+      !(ballFrame.phase === BALL_PHASE.missed && ballFrame.elapsed >= BALL_TIMING.miss);
+    const rate = isMoving || isSettling || fishingFrame || isBallMoving ? RENDER_RATE.active : RENDER_RATE.idle;
     if (!shouldRenderFrame(time, nextFrame, rate)) {
       animation = requestAnimationFrame(tick);
       return;
@@ -770,7 +865,8 @@ export async function createScene(
     const stride = walk(dt);
     if (!paused) arriveAt();
     const { scale, size, rest, hasStepped } = animateCharacter(dt, stride);
-    const isFootfall = !paused && region === regionBefore && (hasLanded || hasStepped);
+    const isFootfall =
+      (!paused || ballFrame?.phase === BALL_PHASE.ready) && region === regionBefore && (hasLanded || hasStepped);
     if (isFootfall) playFootfall(hasLanded, scale);
     placeCharacter(scale, size, rest);
     pierFishing.update(fishingAge, fishingFrame, child.position, size, reducedMotion);
@@ -779,7 +875,15 @@ export async function createScene(
     placeMarkers();
     const isAtmosphereChanging = easeAtmosphere(dt);
     paintBackground(dt, size);
+    together.update({ region, dt, darkness, isStill: reducedMotion, player: position });
+    container.dataset.remoteActors = String(together.standing.length);
     animateLife(paused && !fishingFrame ? 0 : dt, rest !== null);
+    ball.update({
+      game: ballFrame,
+      player: position,
+      friend: schoolmates.standing.find((friend) => friend.id === greetingId) ?? null,
+      isStill: reducedMotion,
+    });
     dust.update({
       dt,
       elapsed,
@@ -805,23 +909,73 @@ export async function createScene(
   animation = requestAnimationFrame(tick);
   plates.focus(nearbyRegions(START_REGION));
   return {
+    getWalker() {
+      return {
+        region,
+        x: position.x,
+        z: position.z,
+        heading,
+        isWalking: !paused && moveSpeed > 0.05,
+        isRunning: !paused && keys.has('shift'),
+        jumpHeight: jump.height,
+        outfit: currentAppearance.outfit,
+      };
+    },
+    setPeers(peers) {
+      if (peers.length === 0) arrivalRequest += 1;
+      together.setPeers(peers);
+      container.dataset.peers = JSON.stringify(peers);
+      wake();
+    },
+    async arriveTogether(peers) {
+      const host = peers[0]?.walker;
+      if (!host || !canWalk(host.x, host.z, host.region)) return;
+      const request = ++arrivalRequest;
+      const offsets = [7, -7, 14, -14];
+      const candidates = offsets.flatMap((offset) => [
+        { x: host.x + offset, z: host.z },
+        { x: host.x, z: host.z + offset },
+      ]);
+      const spawn =
+        candidates.find(
+          (point) =>
+            canWalk(point.x, point.z, host.region) &&
+            peers.every(
+              (peer) =>
+                peer.walker.region !== host.region || Math.hypot(peer.walker.x - point.x, peer.walker.z - point.z) >= 6,
+            ),
+        ) ?? host;
+      plates.focus([...new Set([region, ...nearbyRegions(host.region)])]);
+      try {
+        const plate = await plates.ensure(host.region);
+        if (disposed || request !== arrivalRequest) return;
+        destination = null;
+        keys.clear();
+        moveSpeed = 0;
+        switchRegion(host.region, spawn, plate);
+        plates.focus(nearbyRegions(host.region));
+        wake();
+      } catch {
+        if (!disposed) onNotice('친구가 있는 풍경을 불러오지 못했어요. 지도로 찾아가 주세요.');
+      }
+    },
     async setAppearance(next) {
       const request = ++appearanceRequest;
-      const url = characterAtlas(next);
+      const url = characterLayers(next).outfit;
       try {
-        let texture = appearances.get(url);
+        let texture = outfits.get(url);
         if (!texture) {
           texture = preparePaintingTexture(await loader.loadAsync(url));
           if (disposed) {
             texture.dispose();
             return false;
           }
-          appearances.set(url, texture);
+          outfits.set(url, texture);
           loaded.push(texture);
         }
         if (disposed || request !== appearanceRequest) return false;
         currentAppearance = next;
-        character.setAtlas(texture);
+        character.setOutfit(texture);
         container.dataset.appearance = `${next.character}-${next.outfit}`;
         if (region === 'home') void bedRest.prepare(next.character);
         wake();
@@ -849,6 +1003,55 @@ export async function createScene(
       companions.react(reaction);
       wake();
     },
+    greetSchoolmate(id) {
+      const friend = schoolmates.greet(id, position);
+      if (!friend) return false;
+      const standing = schoolmateGreetingPosition({ player: position, friend, region });
+      if (!standing) {
+        schoolmates.endGreeting();
+        return false;
+      }
+      position = standing;
+      greetingId = id;
+      route = [];
+      destination = null;
+      keys.clear();
+      moveSpeed = 0;
+      heading = Math.atan2(friend.x - position.x, friend.z - position.z);
+      wake();
+      return true;
+    },
+    endSchoolmateGreeting() {
+      schoolmates.endGreeting();
+      greetingId = null;
+      ballFrame = null;
+      route = [];
+      moveSpeed = 0;
+      wake();
+    },
+    setBallGame(frame) {
+      if (frame && (!greetingId || region !== 'school' || weather === WEATHER.rain)) return false;
+      if (frame && !ballFrame) {
+        const friend = schoolmates.standing.find((friend) => friend.id === greetingId);
+        const spot = friend ? schoolmatePlayPosition({ player: position, friend }) : null;
+        if (!spot) return false;
+        route = findRoute(position, spot, region);
+        destination = null;
+        jump.height = 0;
+        jump.velocity = 0;
+      }
+      if (frame === ballFrame) return route.length === 0;
+      const hasPhaseChanged = frame?.phase !== ballFrame?.phase;
+      if (frame?.phase === BALL_PHASE.returning && ballFrame?.phase !== BALL_PHASE.returning) companionAge = 0;
+      ballFrame = frame;
+      schoolmates.setBallGame(frame);
+      if (hasPhaseChanged) wake();
+      if (route.length === 0 && greetingId) {
+        const friend = schoolmates.standing.find((friend) => friend.id === greetingId);
+        if (friend) heading = Math.atan2(friend.x - position.x, friend.z - position.z);
+      }
+      return route.length === 0;
+    },
     setFishing(frame) {
       if (frame && !fishingFrame) {
         if (region !== 'coast' || Math.hypot(position.x - FISHING_PIER.x, position.z - FISHING_PIER.z) >= 1.6) return;
@@ -873,6 +1076,8 @@ export async function createScene(
       wake();
     },
     setInput(key, pressed) {
+      if (!pressed) portalInput.release(key);
+      if (pressed && portalInput.isBlocked(key)) return;
       if (key === 'shift') {
         touchSprint = pressed;
         return;
@@ -955,6 +1160,9 @@ export async function createScene(
       nightLights.dispose();
       life.dispose();
       roamers.dispose();
+      schoolmates.dispose();
+      together.dispose();
+      ball.dispose();
       waves.dispose();
       boats.dispose();
       countryside.dispose();
