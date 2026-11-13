@@ -2098,24 +2098,6 @@ html.is-mode-touch .map .location .name {
 .island-dot {
   color: var(--island-accent);
 }
-.island-credit {
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  left: calc(var(--island-edge) + env(safe-area-inset-left));
-  z-index: 2;
-  color: var(--island-ink);
-  opacity: 0.75;
-  margin: 0;
-  font:
-    11px/1.5 Nunito,
-    system-ui,
-    sans-serif;
-  position: fixed;
-}
-.island-credit a {
-  color: inherit;
-  text-underline-offset: 3px;
-  text-decoration: underline;
-}
 @media (width<=600px) {
   .island-identity {
     gap: 8px;
@@ -2123,10 +2105,6 @@ html.is-mode-touch .map .location .name {
   }
   .island-symbol {
     font-size: 34px;
-  }
-  .island-credit {
-    bottom: calc(8px + env(safe-area-inset-bottom));
-    font-size: 9px;
   }
 }
 @font-face {
@@ -2151,8 +2129,7 @@ body,
 .text,
 .name,
 .island-startup,
-.island-identity,
-.island-credit {
+.island-identity {
   font-family: MaruBuri, serif;
 }
 .title {
@@ -2198,11 +2175,6 @@ body,
 }
 body:has(.menu.is-displayed) .island-identity {
   visibility: hidden;
-}
-@media (width<=600px), (height<=500px) {
-  body:has(.menu.is-displayed) .island-credit {
-    visibility: hidden;
-  }
 }
 .island-startup {
   bottom: calc(48px + env(safe-area-inset-bottom));
