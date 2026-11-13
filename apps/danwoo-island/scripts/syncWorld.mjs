@@ -1,12 +1,22 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { preparePortfolioContent } from './portfolioContent.mjs';
 
-const SYNC_FORMAT_VERSION = '2';
+const SYNC_FORMAT_VERSION = '3';
 const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WORLD_COMMIT = '70764a94756cc4de564e493c8ba46c4b5fe03ed1';
 const WORLD_REPOSITORY = 'https://github.com/brunosimon/folio-2025.git';
@@ -17,6 +27,7 @@ const WORLD_DIRECTORY = path.join(PUBLIC_DIRECTORY, 'world');
 const STAGING_DIRECTORY = path.join(PUBLIC_DIRECTORY, '.world-staging');
 const PREVIOUS_DIRECTORY = path.join(PUBLIC_DIRECTORY, '.world-previous');
 const STAMP_FILE = '.stamp';
+const OVERRIDES_DIRECTORY = path.join(APP_ROOT, 'world-overrides');
 const CONTENT_MODULE = path.join(APP_ROOT, 'src/views/drive/lib/engine/data/danwoo.js');
 const LOCK_DIRECTORY = path.join(tmpdir(), 'danwoo-island-world.lock');
 const LOCK_OWNER_FILE = path.join(LOCK_DIRECTORY, 'pid');
@@ -120,6 +131,21 @@ function readText(file) {
   return existsSync(file) ? readFileSync(file, 'utf8') : null;
 }
 
+function collectOverrides() {
+  return readdirSync(OVERRIDES_DIRECTORY, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => {
+      const source = path.join(entry.parentPath, entry.name);
+      return { source, destination: path.relative(OVERRIDES_DIRECTORY, source) };
+    });
+}
+
+function hashAssets(assets) {
+  const hash = createHash('sha256');
+  for (const asset of assets) hash.update(asset.destination).update(readFileSync(asset.source));
+  return hash.digest('hex');
+}
+
 function isUpToDate(stamp, content) {
   return (
     readText(path.join(WORLD_DIRECTORY, STAMP_FILE)) === stamp &&
@@ -163,8 +189,15 @@ function writeContentModule(source) {
   renameSync(temporary, CONTENT_MODULE);
 }
 
-const content = preparePortfolioContent();
-const stamp = createHash('sha256').update(SYNC_FORMAT_VERSION).update(WORLD_COMMIT).update(content.hash).digest('hex');
+const portfolio = preparePortfolioContent();
+const overrides = collectOverrides();
+const content = { source: portfolio.source, assets: [...portfolio.assets, ...overrides] };
+const stamp = createHash('sha256')
+  .update(SYNC_FORMAT_VERSION)
+  .update(WORLD_COMMIT)
+  .update(portfolio.hash)
+  .update(hashAssets(overrides))
+  .digest('hex');
 
 const EXIT_CODE_BY_SIGNAL = { SIGINT: 130, SIGTERM: 143 };
 for (const [signal, exitCode] of Object.entries(EXIT_CODE_BY_SIGNAL))

@@ -24,6 +24,8 @@ src/views/drive/
   lib/bootWorld.ts           엔진 동적 import·중복 부팅 방지·분리된 DOM이면 새로고침
   lib/engine/                포크한 원본 엔진(JS, ESLint 제외). world.js가 진입점
   lib/engine/data/danwoo.js  허브 projects·profile에서 생성(커밋하지 않음)
+  lib/engine/Game/World/islandProps.js  한국 섬마을 소품(석등·청사초롱·평상·싸리 울타리·옹기·돌담 돌) 형상
+world-overrides/            world:sync가 public/world 위에 덮어쓰는 자체 에셋(벚꽃잎 잎 SDF 등)
 ```
 
 - 엔진은 문서 수명과 같다. 정리(dispose) 경로가 없으므로 엔진 코드를 고친 뒤에는 브라우저를 새로고침한다.
