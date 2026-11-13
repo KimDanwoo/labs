@@ -88,7 +88,7 @@ function card({ label, color, title, subtitle }: OgCard): Node {
         },
         [
           el({ display: 'flex', fontSize: 34, color: COLOR.foreground }, 'Dansoon'),
-          el({ display: 'flex', fontSize: 28, color: COLOR.muted }, 'log.danwoo.dev'),
+          el({ display: 'flex', fontSize: 28, color: COLOR.muted }, 'danwoo.dev'),
         ],
       ),
     ],

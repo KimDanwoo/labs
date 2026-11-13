@@ -2,7 +2,7 @@ import type { ProfileParagraph } from '../types/profile';
 
 const RESUME_URL = 'https://docs.google.com/document/d/1_oia6H3WisAHsGNJWZAYqru9pHUXovRNAaRJcZn5UBU/edit';
 const SOUNDCLOUD_URL = 'https://soundcloud.com/danwooking';
-const BLOG_URL = 'https://log.danwoo.dev/';
+const BLOG_URL = 'https://danwoo.dev/';
 const GITHUB_URL = 'https://github.com/KimDanwoo';
 
 /** 헤드라인 첫 줄에서 돌아가며 바뀌는 키워드. 첫 항목이 기본 문장(낭독기·동작 줄이기)으로 쓰인다. */

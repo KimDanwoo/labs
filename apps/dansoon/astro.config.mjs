@@ -22,7 +22,7 @@ const POST_LASTMOD = new Map(
 const CODE_FONT_FAMILY = "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace";
 
 export default defineConfig({
-  site: 'https://log.danwoo.dev',
+  site: 'https://danwoo.dev',
   trailingSlash: 'always',
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   integrations: [
