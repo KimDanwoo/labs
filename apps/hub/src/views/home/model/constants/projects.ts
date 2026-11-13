@@ -11,7 +11,7 @@ export const PROJECTS: Project[] = [
   {
     title: 'Dansoon',
     description: '프론트엔드 개발 기록과 매주 바뀌는 책 순위를 모아요',
-    href: 'https://log.danwoo.dev/',
+    href: 'https://danwoo.dev/',
     image: '/projects/dansoon.webp',
     imagePosition: 'center',
   },
