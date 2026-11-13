@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-// templates/app 을 복제해 apps/<name> 새 앱을 만든다.
-// 사용법: pnpm new-app <name>
 import { cpSync, existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
