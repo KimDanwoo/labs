@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { rebuildLabGate } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import gsap from 'gsap'
@@ -13,6 +14,12 @@ import { Area } from './Area.js'
 
 export class LabArea extends Area
 {
+    setObjects()
+    {
+        rebuildLabGate(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     static DIRECTION_PREVIOUS = 1
     static DIRECTION_NEXT = 2
     static STATE_OPEN = 3

@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { rebuildSeonangdang } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { attribute, clamp, color, float, Fn, instancedArray, instanceIndex, luminance, max, min, mix, smoothstep, step, texture, uniform, uv, varying, vec2, vec3, vec4 } from 'three/tsl'
 import gsap from 'gsap'
@@ -7,6 +8,12 @@ import { Area } from './Area.js'
 
 export class AltarArea extends Area
 {
+    setObjects()
+    {
+        rebuildSeonangdang(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     constructor(model)
     {
         super(model)
@@ -22,7 +29,7 @@ export class AltarArea extends Area
         this.value = 0
         this.position = this.references.items.get('altar')[0].position.clone()
 
-        this.color = uniform(color('#ff544d'))
+        this.color = uniform(color('#ffb347'))
         this.emissive = uniform(8)
         this.progressUniform = uniform(0)
 

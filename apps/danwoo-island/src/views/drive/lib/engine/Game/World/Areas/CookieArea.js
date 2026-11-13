@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { rebuildCookieCart } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { color, float, Fn, instancedArray, mix, normalWorld, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import { InstancedGroup } from '../../InstancedGroup.js'
@@ -10,6 +11,12 @@ import { Area } from './Area.js'
 
 export class CookieArea extends Area
 {
+    setObjects()
+    {
+        rebuildCookieCart(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     constructor(model)
     {
         super(model)

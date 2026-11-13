@@ -1,9 +1,16 @@
 import * as THREE from 'three/webgpu'
+import { rebuildOuthouse } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { Area } from './Area.js'
 
 export class ToiletArea extends Area
 {
+    setObjects()
+    {
+        rebuildOuthouse(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     constructor(model)
     {
         super(model)

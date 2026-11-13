@@ -1,4 +1,5 @@
 import { color, float, Fn, max, PI, positionWorld, texture, uniform, uv, vec3 } from 'three/tsl'
+import { rebuildBridge } from './islandStructures.js'
 import { Game } from '../Game.js'
 import { References } from '../References.js'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
@@ -11,7 +12,10 @@ export class Scenery
 
         this.references = new References()
         const model = [...this.game.resources.sceneryModel.scene.children]
-        for(const child of model)
+        for(const bridge of model.filter((child) => /^bridgePhysicalFixed/.test(child.name)))
+            rebuildBridge(bridge, this.game.materials)
+
+        for(const child of [...this.game.resources.sceneryModel.scene.children])
         {
             // Add
             if(typeof child.userData.prevent === 'undefined' || child.userData.prevent === false)
