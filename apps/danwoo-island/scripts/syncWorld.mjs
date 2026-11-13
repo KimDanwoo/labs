@@ -16,7 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { preparePortfolioContent } from './portfolioContent.mjs';
 
-const SYNC_FORMAT_VERSION = '3';
+const SYNC_FORMAT_VERSION = '4';
 const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WORLD_COMMIT = '70764a94756cc4de564e493c8ba46c4b5fe03ed1';
 const WORLD_REPOSITORY = 'https://github.com/brunosimon/folio-2025.git';
@@ -41,6 +41,23 @@ const REQUIRED_STATIC_FILES = [
   'draco/draco_decoder.js',
   'favicons/favicon.svg',
 ];
+
+const UNUSED_STATIC_DIRECTORIES = ['projects', 'lab'];
+const UNCOMPRESSED_FILES_IN_USE = new Set(['vehicle/default.glb', 'vehicle/oldSchool.glb']);
+const COMPRESSED_COUNTERPART = [
+  [/\.glb$/, '-compressed.glb'],
+  [/\.png$/, '.ktx'],
+];
+
+function isUnusedStatic(source, staticDirectory) {
+  const relative = path.relative(staticDirectory, source).split(path.sep).join('/');
+  if (UNUSED_STATIC_DIRECTORIES.includes(relative)) return true;
+  if (relative.endsWith('.wav')) return true;
+  if (relative.endsWith('-compressed.glb') || UNCOMPRESSED_FILES_IN_USE.has(relative)) return false;
+  return COMPRESSED_COUNTERPART.some(
+    ([extension, counterpart]) => extension.test(relative) && existsSync(source.replace(extension, counterpart)),
+  );
+}
 
 function sleep(milliseconds) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
@@ -160,7 +177,10 @@ function buildStaging(content, stamp) {
   const missing = findMissingFiles(staticDirectory);
   if (missing.length) throw new Error(`받은 월드 에셋에 필수 파일이 없어요:\n${missing.join('\n')}`);
   rmSync(STAGING_DIRECTORY, { recursive: true, force: true });
-  cpSync(staticDirectory, STAGING_DIRECTORY, { recursive: true });
+  cpSync(staticDirectory, STAGING_DIRECTORY, {
+    recursive: true,
+    filter: (source) => !isUnusedStatic(source, staticDirectory),
+  });
   cpSync(path.join(CHECKOUT_DIRECTORY, 'license.md'), path.join(STAGING_DIRECTORY, 'LICENSE.txt'));
   for (const asset of content.assets) {
     const destination = path.join(STAGING_DIRECTORY, asset.destination);
