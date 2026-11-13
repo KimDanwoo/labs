@@ -1,5 +1,6 @@
 import { Game } from '../Game.js'
 import { InstancedGroup } from '../InstancedGroup.js'
+import { createBrushwoodFence } from './islandProps.js'
 
 export class Fences
 {
@@ -52,7 +53,7 @@ export class Fences
         }
 
         // Instanced group
-        this.instancedGroup = new InstancedGroup(references, base)
+        this.instancedGroup = new InstancedGroup(references, createBrushwoodFence(this.game.materials, base))
 
         // Tick update
         this.game.ticker.events.on('tick', () =>

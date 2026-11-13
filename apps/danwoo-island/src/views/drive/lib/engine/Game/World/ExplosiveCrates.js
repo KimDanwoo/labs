@@ -2,6 +2,7 @@ import * as THREE from 'three/webgpu'
 import gsap from 'gsap'
 import { Game } from '../Game.js'
 import { InstancedGroup } from '../InstancedGroup.js'
+import { createOnggi } from './islandProps.js'
 
 export class ExplosiveCrates
 {
@@ -21,7 +22,7 @@ export class ExplosiveCrates
         this.game.materials.updateObject(base)
 
         // Create instanced group
-        this.instancedGroup = new InstancedGroup(this.references, base)
+        this.instancedGroup = new InstancedGroup(this.references, createOnggi(this.game.materials, base))
 
         this.items = []
 

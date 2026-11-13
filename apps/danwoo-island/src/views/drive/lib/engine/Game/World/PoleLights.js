@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
 import { InstancedGroup } from '../InstancedGroup.js'
+import { createLanternPole } from './islandProps.js'
 import { hash, instancedArray, instanceIndex, sin, uniform, vec3 } from 'three/tsl'
 import gsap from 'gsap'
 
@@ -35,7 +36,7 @@ export class PoleLights
         this.game.materials.updateObject(base)
 
         // Create instanced group
-        this.instancedGroup = new InstancedGroup(this.references, base, false)
+        this.instancedGroup = new InstancedGroup(this.references, createLanternPole(this.game.materials, base), false)
 
         this.glass = this.instancedGroup.meshes.find(mesh => mesh.instance.name === 'glass').instance
         

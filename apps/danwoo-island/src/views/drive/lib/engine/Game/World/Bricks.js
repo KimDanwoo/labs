@@ -1,5 +1,6 @@
 import { Game } from '../Game.js'
 import { InstancedGroup } from '../InstancedGroup.js'
+import { createFieldstone } from './islandProps.js'
 
 export class Bricks
 {
@@ -50,7 +51,7 @@ export class Bricks
         }
 
         // Instanced group
-        this.instancedGroup = new InstancedGroup(references, base)
+        this.instancedGroup = new InstancedGroup(references, createFieldstone(this.game.materials, base))
 
         // Tick update
         this.game.ticker.events.on('tick', () =>

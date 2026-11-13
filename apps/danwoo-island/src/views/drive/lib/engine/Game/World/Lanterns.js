@@ -1,5 +1,6 @@
 import { Game } from '../Game.js'
 import { InstancedGroup } from '../InstancedGroup.js'
+import { createStoneLantern } from './islandProps.js'
 
 export class Lanterns
 {
@@ -47,7 +48,7 @@ export class Lanterns
                         contactThreshold: 10,
                         onCollision: (force, position) =>
                         {
-                            this.game.audio.groups.get('hitMetal').playRandomNext(force, position)
+                            this.game.audio.groups.get('hitBrick').playRandomNext(force, position)
                         }
                     },
                 )
@@ -55,7 +56,7 @@ export class Lanterns
         }
 
         // Instanced group
-        this.instancedGroup = new InstancedGroup(references, base)
+        this.instancedGroup = new InstancedGroup(references, createStoneLantern(this.game.materials, base))
 
         // Tick update
         this.game.ticker.events.on('tick', () =>
