@@ -1,8 +1,8 @@
 ---
 title: "Next.js App Router 레이아웃·라우팅과 SEO"
-description: "App Router의 레이아웃 트리와 라우팅이 SSR, 캐시, SEO를 좌우하는 이유를 운영 경험으로 정리하고, URL·메타데이터 설계 기준을 제안해요."
+description: "App Router의 레이아웃 트리와 라우팅이 SSR, 캐시, SEO를 좌우하는 이유를 운영 경험으로 정리하고, URL·메타데이터 설계 기준과 공개 저장소의 generateMetadata 적용 예시를 함께 보여줘요."
 publishedAt: "2025-11-30T15:45:55+09:00"
-updatedAt: "2026-11-10T18:24:00+09:00"
+updatedAt: "2026-11-13T14:30:00+09:00"
 category: "dev"
 tags: ["nextjs","seo"]
 legacyUrl: "https://dansoon-dev.tistory.com/24"
@@ -153,6 +153,41 @@ Dynamic route에서 generateMetadata()를 사용할 때 가장 중요했던 점�
 이 세 가지가 맞지 않으면 검색 엔진은 페이지 의미를 정확히 해석하지 못합니다.
 
 실제 운영 서비스에서 이를 일관되게 맞춰두니 검색 안정성이 확실히 좋아졌습니다. 크롤러가 HTML을 읽는 방식과 SSR이 SEO에 주는 영향은 [SEO의 구조적 진화](/posts/seo-structural-evolution/)에서 정리했습니다.
+
+### 공개 저장소의 예: 학습 문서 페이지
+
+같은 기준을 개인 프로젝트에도 적용했습니다. 프론트엔드 학습 앱 fe-deep의 학습 문서 페이지(`/study/[slug]`)는 라우트 파일이 화면 쪽 코드를 다시 내보내기만 합니다([소스](https://github.com/KimDanwoo/labs/tree/main/apps/fe-deep/src/views/study)).
+
+```tsx
+// app/(main)/study/[slug]/page.tsx
+export { StudyDetailView as default, generateMetadata, generateStaticParams } from '@views/study/index.server';
+export const dynamicParams = false;
+```
+
+```tsx
+// src/views/study/ui/StudyDetailView.tsx 일부
+export async function generateStaticParams() {
+  const slugs = await getStudyDocSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: StudyDocPageProps) {
+  const { slug } = await params;
+  const doc = await getStudyDoc(slug);
+  return { title: doc?.title ?? '면접 학습' };
+}
+
+export async function StudyDetailView({ params }: StudyDocPageProps) {
+  const { slug } = await params;
+  const doc = await getStudyDoc(slug);
+  if (!doc) notFound();
+  // ...
+}
+```
+
+URL의 `slug`, 페이지 본문, 메타데이터의 제목이 모두 같은 `getStudyDoc(slug)`에서 나옵니다. 만들 수 있는 주소 목록도 같은 문서 폴더에서 `getStudyDocSlugs()`로 뽑습니다. `dynamicParams = false`를 두었기 때문에 [공식 문서](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config/dynamicParams) 설명대로 목록에 없는 주소는 404를 돌려줍니다. 문서가 없는 주소가 빈 페이지로 색인될 일이 없습니다.
+
+다만 이 페이지는 위 기준의 절반만 지킵니다. 제목은 문서에서 만들지만 description과 OG는 루트 레이아웃에 적은 사이트 공통 문구를 그대로 씁니다. 문서마다 도입 문단(`intro`)이 있으니 description과 OG도 같은 `doc`에서 만들어야 검색 결과와 링크 미리보기가 페이지 내용과 맞게 됩니다.
 
 ## 새 페이지를 만들 때 먼저 정리하는 네 가지
 
