@@ -18,7 +18,6 @@ import type { KillerCage } from '@entities/game/model/types/game';
 import { describe, expect, it } from 'vitest';
 
 describe('update.ts 유틸리티 함수 테스트', () => {
-  // 테스트용 보드 생성 헬퍼 함수
   const createTestBoard = (): SudokuBoard =>
     Array(BOARD_SIZE)
       .fill(null)
@@ -62,7 +61,6 @@ describe('update.ts 유틸리티 함수 테스트', () => {
         ...cellAt(board, 0, 0),
         ...updates,
       });
-      // 다른 셀들은 변경되지 않아야 함
       expect(cellAt(updatedBoard, 0, 1)).toEqual(cellAt(board, 0, 1));
       expect(cellAt(updatedBoard, 1, 0)).toEqual(cellAt(board, 1, 0));
     });
@@ -73,10 +71,8 @@ describe('update.ts 유틸리티 함수 테스트', () => {
       const board = createTestBoard();
       const updatedBoard = updateCellSelection(board, 2, 3);
 
-      // 선택된 셀 확인
       expect(cellAt(updatedBoard, 2, 3).isSelected).toBe(true);
 
-      // 다른 모든 셀은 false여야 함
       for (let row = 0; row < BOARD_SIZE; row++) {
         for (let col = 0; col < BOARD_SIZE; col++) {
           if (row !== 2 || col !== 3) {
@@ -94,7 +90,6 @@ describe('update.ts 유틸리티 함수 테스트', () => {
       const updatedBoard = updateCellNotes(board, 1, 1, notes);
 
       expect(cellAt(updatedBoard, 1, 1).notes).toEqual(notes);
-      // 다른 셀들은 변경되지 않아야 함
       expect(cellAt(updatedBoard, 1, 1).value).toBeNull();
       expect(cellAt(updatedBoard, 0, 0).notes).toEqual([]);
     });
@@ -103,20 +98,16 @@ describe('update.ts 유틸리티 함수 테스트', () => {
   describe('resetUserInputs', () => {
     it('초기 셀은 유지하면서 사용자 입력을 초기화해야 합니다', () => {
       const board = createTestBoard();
-      // 초기 셀 설정
       atIndex(board, 0)[0] = { ...cellAt(board, 0, 0), isInitial: true, value: 5 };
-      // 사용자 입력 설정
       atIndex(board, 1)[1] = { ...cellAt(board, 1, 1), value: 3, notes: [1, 2], isSelected: true, isConflict: true };
 
       const resetBoard = resetUserInputs(board);
 
-      // 초기 셀은 값이 유지되어야 함
       expect(cellAt(resetBoard, 0, 0).value).toBe(5);
       expect(cellAt(resetBoard, 0, 0).isInitial).toBe(true);
       expect(cellAt(resetBoard, 0, 0).isSelected).toBe(false);
       expect(cellAt(resetBoard, 0, 0).isConflict).toBe(false);
 
-      // 사용자 입력 셀은 초기화되어야 함
       expect(cellAt(resetBoard, 1, 1).value).toBeNull();
       expect(cellAt(resetBoard, 1, 1).notes).toEqual([]);
       expect(cellAt(resetBoard, 1, 1).isSelected).toBe(false);
@@ -127,23 +118,19 @@ describe('update.ts 유틸리티 함수 테스트', () => {
   describe('calculateHighlights', () => {
     it('선택된 셀과 관련된 셀들을 올바르게 하이라이트해야 합니다', () => {
       const board = createTestBoard();
-      // 테스트를 위해 일부 셀에 값 설정
       cellAt(board, 0, 0).value = 5;
-      cellAt(board, 1, 1).value = 5; // 같은 값
-      cellAt(board, 0, 1).value = 3; // 같은 행
-      cellAt(board, 1, 0).value = 4; // 같은 열
+      cellAt(board, 1, 1).value = 5;
+      cellAt(board, 0, 1).value = 3;
+      cellAt(board, 1, 0).value = 4;
 
       const highlights = calculateHighlights(board, 0, 0);
 
-      // 선택된 셀 확인
       expect(highlights['0-0']?.selected).toBe(true);
 
-      // 같은 행, 열, 블록의 셀들이 related로 마킹되어야 함
-      expect(highlights['0-1']?.related).toBe(true); // 같은 행
-      expect(highlights['1-0']?.related).toBe(true); // 같은 열
-      expect(highlights['1-1']?.related).toBe(true); // 같은 블록
+      expect(highlights['0-1']?.related).toBe(true);
+      expect(highlights['1-0']?.related).toBe(true);
+      expect(highlights['1-1']?.related).toBe(true);
 
-      // 같은 값을 가진 셀이 sameValue로 마킹되어야 함
       expect(highlights['1-1']?.sameValue).toBe(true);
     });
 
@@ -177,7 +164,6 @@ describe('update.ts 유틸리티 함수 테스트', () => {
   describe('canFillCell', () => {
     it('초기 셀이 아닌 경우에만 true를 반환해야 합니다', () => {
       const board = createTestBoard();
-      // 초기 셀 설정
       cellAt(board, 0, 0).isInitial = true;
 
       expect(canFillCell({ row: 0, col: 0 }, board)).toBe(false);
@@ -201,9 +187,8 @@ describe('update.ts 유틸리티 함수 테스트', () => {
   describe('validateBoard', () => {
     it('일반 모드에서는 행·열·블록 충돌을 검사해야 합니다', () => {
       const board = createTestBoard();
-      // 충돌이 있는 보드 설정
       cellAt(board, 0, 0).value = 1;
-      cellAt(board, 0, 1).value = 1; // 같은 행에 중복
+      cellAt(board, 0, 1).value = 1;
 
       const validatedBoard = validateBoard(board, createTestSolution(), GAME_MODE.CLASSIC, []);
 
@@ -234,9 +219,8 @@ describe('update.ts 유틸리티 함수 테스트', () => {
         },
       ];
 
-      // 케이지 규칙을 위반하는 값 설정
       cellAt(board, 0, 0).value = 1;
-      cellAt(board, 0, 1).value = 3; // 합이 4가 되어 규칙 위반
+      cellAt(board, 0, 1).value = 3;
 
       const validatedBoard = validateBoard(board, createTestSolution(), GAME_MODE.KILLER, cages);
 
@@ -250,7 +234,6 @@ describe('update.ts 유틸리티 함수 테스트', () => {
       const board = createTestBoard();
       const solution = createTestSolution();
 
-      // 보드를 완성된 상태로 설정
       for (let row = 0; row < BOARD_SIZE; row++) {
         for (let col = 0; col < BOARD_SIZE; col++) {
           cellAt(board, row, col).value = cellAt(solution, row, col);
@@ -266,7 +249,6 @@ describe('update.ts 유틸리티 함수 테스트', () => {
     it('충돌이 있는 보드는 completed와 success가 false여야 합니다', () => {
       const board = createTestBoard();
 
-      // 보드를 모두 같은 값으로 채우기 (충돌 발생)
       for (let row = 0; row < BOARD_SIZE; row++) {
         for (let col = 0; col < BOARD_SIZE; col++) {
           cellAt(board, row, col).value = 2;

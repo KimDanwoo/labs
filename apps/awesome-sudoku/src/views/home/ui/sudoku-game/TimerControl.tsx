@@ -61,7 +61,6 @@ export const TimerControl = memo(() => {
 
   return (
     <div className="flex items-center gap-2.5">
-      {/* Timer Display */}
       <div
         className={cn(
           'px-3 py-1.5 rounded-lg',
@@ -74,7 +73,6 @@ export const TimerControl = memo(() => {
         {formattedTime}
       </div>
 
-      {/* Play/Pause Button */}
       <button
         className={cn(
           'w-8 h-8 rounded-full',

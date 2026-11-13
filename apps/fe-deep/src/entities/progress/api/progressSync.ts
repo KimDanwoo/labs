@@ -4,25 +4,15 @@ import { createClient } from '@shared/api/supabaseClient';
 import { getLocalProgress, saveLocalProgress } from '../model/services/progressStorage';
 import type { UserProgress } from '../model/types/types';
 
-// ============================================================
-// Supabase 동기화
-// 로그인 시 localStorage ↔ Supabase 양방향 머지
-// 학습 시 write-through (localStorage + Supabase)
-// ============================================================
-
-/** 캐시된 userId. 동일 세션 내 반복 API 호출을 방지한다. */
 let cachedUserId: string | null | undefined = undefined;
 
-/** 모듈 내부에서 공유하는 단일 Supabase 클라이언트 */
 let sharedClient: ReturnType<typeof createClient> | null = null;
 
-/** 모듈 내부용 Supabase 클라이언트를 반환한다. */
 function getClient() {
   if (!sharedClient) sharedClient = createClient();
   return sharedClient;
 }
 
-/** 현재 로그인된 사용자 ID를 반환한다. 비로그인 시 null. 결과를 캐시한다. */
 export async function getCurrentUserId(): Promise<string | null> {
   if (cachedUserId !== undefined) return cachedUserId;
   const {
@@ -32,7 +22,6 @@ export async function getCurrentUserId(): Promise<string | null> {
   return cachedUserId;
 }
 
-/** auth 상태 변경 시 캐시를 초기화한다. */
 export function clearUserIdCache() {
   cachedUserId = undefined;
 }
@@ -48,7 +37,6 @@ export async function syncProgress(): Promise<void> {
   const supabase = getClient();
   const localData = getLocalProgress();
 
-  // Supabase에서 전체 진도 가져오기
   const { data: remoteRows, error } = await supabase.from('user_progress').select('*').eq('user_id', userId);
 
   if (error) {
@@ -73,7 +61,6 @@ export async function syncProgress(): Promise<void> {
     });
   }
 
-  // 머지: 모든 question_id를 모아서 최신 데이터 채택
   const allQuestionIds = new Set([...Object.keys(localData), ...remoteMap.keys()]);
 
   // 삭제된 질문의 로컬 진도가 섞이면 FK 위반으로 upsert 배치 전체가 실패하므로,
@@ -99,30 +86,24 @@ export async function syncProgress(): Promise<void> {
     const remote = remoteMap.get(qId);
 
     if (local && remote) {
-      // 둘 다 있으면 last_reviewed가 최신인 쪽 채택
       const localTime = new Date(local.last_reviewed).getTime();
       const remoteTime = new Date(remote.last_reviewed).getTime();
       const winner = localTime >= remoteTime ? { ...local, user_id: userId } : remote;
       merged[qId] = winner;
-      // local이 더 최신이면 Supabase 업데이트 필요
       if (localTime > remoteTime) {
         toUpsert.push(winner);
       }
     } else if (local) {
-      // local에만 있으면 Supabase에 추가
       const entry = { ...local, user_id: userId };
       merged[qId] = entry;
       toUpsert.push(entry);
     } else if (remote) {
-      // remote에만 있으면 local에 추가
       merged[qId] = remote;
     }
   }
 
-  // localStorage 업데이트
   saveLocalProgress(merged);
 
-  // Supabase에 upsert (local이 더 최신인 항목들)
   if (toUpsert.length > 0) {
     const rows = toUpsert.map((p) => ({
       user_id: userId,

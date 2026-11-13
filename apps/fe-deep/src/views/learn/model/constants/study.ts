@@ -12,7 +12,6 @@ export const ALL_CATEGORIES = 'all';
 export type StudySettings = {
   categorySlug: string;
   order: StudyOrder;
-  /** 포함할 난이도. 빈 배열 = 전체. */
   difficulties: Difficulty[];
 };
 

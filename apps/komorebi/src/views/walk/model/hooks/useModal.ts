@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-/** Mirrors a declarative `isOpen` onto a native modal dialog. */
 export function useModal(isOpen: boolean) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {

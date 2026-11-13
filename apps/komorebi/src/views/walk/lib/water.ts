@@ -13,10 +13,6 @@ const GLITTER_URL = '/art/sea-glitter.webp';
 
 const channel = (value: number) => Math.round(128 + 127 * value);
 
-/**
- * A small map of where each painting's water lies for the shader: red marks water, green and blue carry the
- * on-painting flow (scaled by its speed) around a neutral 128, so still water reads as no flow.
- */
 function paintWater(region: Region) {
   const texture = canvasTexture(SIZE.width, SIZE.height, (c) => {
     c.fillStyle = STILL;
@@ -28,7 +24,6 @@ function paintWater(region: Region) {
       outline.forEach(([x, z]) => c.lineTo((x / 100) * SIZE.width, (z / 100) * SIZE.height));
       c.fill();
     }
-    // The moored boat is painted on the water; keep the sea's motion off it.
     if (region === BOAT_REGION) {
       c.fillStyle = STILL;
       c.beginPath();
@@ -41,10 +36,6 @@ function paintWater(region: Region) {
   return texture;
 }
 
-/**
- * Water maps per region, painted the first time each painting is shown, and the tiling foam the shader carries
- * along them (blank until loaded, so water simply shows no foam until then).
- */
 export function createWaterMaps(loader: THREE.TextureLoader) {
   const maps = new Map<Region, THREE.Texture>();
   const blank = new THREE.DataTexture(new Uint8Array(4), 1, 1);
@@ -85,7 +76,6 @@ export function createWaterMaps(loader: THREE.TextureLoader) {
       maps.set(region, map);
       return map;
     },
-    /** Shared uniforms for the foam and sun-glitter textures, swapped in once they have loaded. */
     foam,
     glitter,
     dispose() {

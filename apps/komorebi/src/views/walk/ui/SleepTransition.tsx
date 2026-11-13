@@ -3,7 +3,6 @@ import { SLEEP_TIMING } from '../lib/bedRest';
 
 type Props = { onWake: () => void; onDone: () => void };
 
-/** A short fade over the game canvas; sleeping never creates a second movement surface. */
 export function SleepTransition({ onWake, onDone }: Props) {
   const wake = useEffectEvent(onWake);
   const done = useEffectEvent(onDone);

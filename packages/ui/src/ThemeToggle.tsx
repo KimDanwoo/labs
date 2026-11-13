@@ -48,7 +48,6 @@ export function ThemeToggle() {
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
       )}
     >
-      {/* 라이트 트랙 */}
       <span
         suppressHydrationWarning
         className={cn(
@@ -56,7 +55,6 @@ export function ThemeToggle() {
           isDark ? 'opacity-0' : 'opacity-100',
         )}
       />
-      {/* 다크 트랙 */}
       <span
         suppressHydrationWarning
         className={cn(
@@ -64,7 +62,6 @@ export function ThemeToggle() {
           isDark ? 'shadow-toggle-night/50 opacity-100 shadow-inner' : 'opacity-0',
         )}
       />
-      {/* 별 오버레이 (다크) */}
       <span
         suppressHydrationWarning
         className={cn(
@@ -76,7 +73,6 @@ export function ThemeToggle() {
         <span className="absolute rounded-full bg-white/40" style={{ width: 2, height: 2, top: 17, left: 17 }} />
         <span className="absolute rounded-full bg-white/50" style={{ width: 2, height: 2, top: 7, left: 24 }} />
       </span>
-      {/* 슬라이딩 썸 */}
       <span
         suppressHydrationWarning
         className={cn(

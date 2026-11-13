@@ -8,132 +8,103 @@
 }
 
 :root {
-  /* Jonathan Ive Design System */
-
-  /* Primary Palette - Warm, sophisticated grays */
   --color-bg-primary: 250, 250, 252;
   --color-bg-secondary: 255, 255, 255;
   --color-bg-tertiary: 245, 245, 247;
 
-  /* Text Colors */
   --color-text-primary: 28, 28, 30;
   --color-text-secondary: 99, 99, 102;
   --color-text-tertiary: 142, 142, 147;
 
-  /* Accent Colors - Refined blue */
   --color-accent: 0, 122, 255;
   --color-accent-light: 230, 242, 255;
   --color-accent-soft: 245, 249, 255;
 
-  /* Cell Highlights */
   --color-cell-selected: 220, 235, 255;
   --color-cell-related: 245, 248, 255;
   --color-cell-same-value: 200, 225, 255;
 
-  /* Borders */
   --color-border-light: 229, 229, 234;
   --color-border-medium: 199, 199, 204;
   --color-border-strong: 58, 58, 60;
 
-  /* Status Colors */
   --color-error: 255, 59, 48;
   --color-success: 52, 199, 89;
 
-  /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Surface Colors */
   --color-surface-primary: 255, 255, 255;
   --color-surface-secondary: 248, 250, 252;
   --color-surface-tertiary: 241, 245, 249;
   --color-surface-elevated: 255, 255, 255;
 
-  /* Glass / Overlay */
   --color-glass: 255, 255, 255;
   --glass-opacity: 0.7;
   --overlay-opacity: 0.9;
 
-  /* Interactive States */
   --color-hover: 248, 250, 252;
   --color-active: 241, 245, 249;
 
-  /* Gradient Endpoints */
   --color-gradient-from: 59, 130, 246;
   --color-gradient-to: 99, 102, 241;
 
-  /* Status Backgrounds */
   --color-error-bg: 254, 226, 226;
   --color-error-text: 225, 29, 72;
   --color-success-bg: 209, 250, 229;
   --color-success-text: 5, 150, 105;
 
-  /* Hint */
   --color-hint-text: 16, 185, 129;
 
-  /* Dividers */
   --color-divider: 241, 245, 249;
 }
 
 .dark {
-  /* Primary Palette - Apple dark mode */
   --color-bg-primary: 22, 22, 24;
   --color-bg-secondary: 28, 28, 30;
   --color-bg-tertiary: 36, 36, 38;
 
-  /* Text */
   --color-text-primary: 242, 242, 247;
   --color-text-secondary: 174, 174, 178;
   --color-text-tertiary: 124, 124, 128;
 
-  /* Accent - slightly brighter for dark readability */
   --color-accent: 10, 132, 255;
   --color-accent-light: 20, 40, 70;
   --color-accent-soft: 15, 25, 50;
 
-  /* Cell Highlights - improved contrast */
   --color-cell-selected: 30, 60, 110;
   --color-cell-related: 38, 40, 58;
   --color-cell-same-value: 28, 55, 100;
 
-  /* Borders */
   --color-border-light: 48, 48, 52;
   --color-border-medium: 62, 62, 66;
   --color-border-strong: 174, 174, 178;
 
-  /* Status */
   --color-error: 255, 69, 58;
   --color-success: 48, 209, 88;
 
-  /* Surfaces */
   --color-surface-primary: 28, 28, 30;
   --color-surface-secondary: 22, 22, 24;
   --color-surface-tertiary: 36, 36, 38;
   --color-surface-elevated: 44, 44, 46;
 
-  /* Glass */
   --color-glass: 28, 28, 30;
   --glass-opacity: 0.8;
   --overlay-opacity: 0.95;
 
-  /* Interactive */
   --color-hover: 44, 44, 46;
   --color-active: 54, 54, 58;
 
-  /* Gradients */
   --color-gradient-from: 10, 132, 255;
   --color-gradient-to: 94, 92, 230;
 
-  /* Status Backgrounds */
   --color-error-bg: 50, 20, 20;
   --color-error-text: 255, 69, 58;
   --color-success-bg: 15, 45, 25;
   --color-success-text: 48, 209, 88;
 
-  /* Hint */
   --color-hint-text: 52, 211, 153;
 
-  /* Dividers */
   --color-divider: 44, 44, 46;
 }
 
@@ -146,22 +117,18 @@ body {
   color: rgb(var(--color-text-primary));
 }
 
-/* Smooth scrolling — only on html, respect user preference */
 html {
   scroll-behavior: smooth;
 }
 
-/* Premium selection */
 ::selection {
   background: rgba(var(--color-accent), 0.2);
 }
 
-/* Number font optimization */
 .font-tabular {
   font-variant-numeric: tabular-nums;
 }
 
-/* Subtle pulse for conflicts */
 @keyframes subtle-pulse {
   0%,
   100% {
@@ -176,7 +143,6 @@ html {
   animation: subtle-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* 상단 고정 반투명 헤더. 화면마다 복붙되던 sticky + glass 배경 + 하단 보더 조합을 한곳에 둔다. */
 @utility glass-header {
   position: sticky;
   top: 0;
@@ -187,18 +153,15 @@ html {
   border-bottom-color: rgba(var(--color-border-light), 0.5);
 }
 
-/* Pressed state */
 .press-effect:active {
   transform: scale(0.97);
 }
 
-/* Focus ring */
 .focus-ring:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.3);
 }
 
-/* Bottom Sheet slide-up animation */
 @keyframes slide-up {
   from {
     transform: translateY(100%);
@@ -212,7 +175,6 @@ html {
   animation: slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-/* Snackbar fade-in animation */
 @keyframes snackbar-in {
   from {
     transform: translateY(16px);
@@ -243,7 +205,6 @@ html {
   animation: snackbar-out 0.2s ease-in forwards;
 }
 
-/* Theme transition animation */
 html.theme-transition,
 html.theme-transition *,
 html.theme-transition *::before,
@@ -256,7 +217,6 @@ html.theme-transition *::after {
   transition-delay: 0s !important;
 }
 
-/* Preserve toggle's own transitions during theme switch */
 html.theme-transition [data-theme-toggle],
 html.theme-transition [data-theme-toggle] * {
   transition-property: all !important;
@@ -264,7 +224,6 @@ html.theme-transition [data-theme-toggle] * {
   transition-timing-function: cubic-bezier(0.68, -0.15, 0.27, 1.15) !important;
 }
 
-/* Auth floating numbers */
 @keyframes float {
   0%,
   100% {
@@ -275,7 +234,6 @@ html.theme-transition [data-theme-toggle] * {
   }
 }
 
-/* Sudoku loader cell pulse */
 @keyframes sudokuPulse {
   0%,
   100% {
@@ -288,7 +246,6 @@ html.theme-transition [data-theme-toggle] * {
   }
 }
 
-/* Reduced motion — disable non-essential animations */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -255,7 +255,6 @@ test('once a page is kept, the place offers its little action instead', async ({
   await openWalk(page);
   await page.getByRole('button', { name: '자연 소리 켜기' }).click();
   await guideTo(page, '물소리 다리');
-  // The guided route passes the rice field first, so wait for the bridge's own prompt.
   const prompt = page.locator('.interact', { hasText: '물소리 다리' });
   await expect(prompt).toContainText('잠깐 머물러 보기', { timeout: 30_000 });
   await prompt.click();
@@ -321,7 +320,6 @@ test('home is a walkable map with a bed and a doorway back to the village', asyn
     await expect(page.locator('.sleep-transition')).toHaveCount(0);
   }
   await expect(page.locator('.game-header')).toContainText('2일째');
-  // The same small character can walk right up to the resized desk and chair.
   const coordinate = async (axis: number) => {
     const label = await page.locator('.village-map').getAttribute('aria-label');
     return Number(label!.match(/현재 좌표 (\d+), (\d+)/)![axis]);

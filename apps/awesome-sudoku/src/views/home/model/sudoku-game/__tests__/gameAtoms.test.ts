@@ -43,7 +43,6 @@ const SOLUTION: Grid = [
   [3, 4, 5, 2, 8, 6, 1, 7, 9],
 ];
 
-/** 정답에서 blanks 칸만 비운 보드 */
 const boardWithBlanks = (blanks: [number, number][]): SudokuBoard =>
   SOLUTION.map((row, r) =>
     row.map((value, c) => {
@@ -132,7 +131,7 @@ describe('fillCellAtom — 실수 판정', () => {
   it('실수 한도에 닿으면 게임 오버(완료·실패)이고 마지막 값은 놓이지 않는다', () => {
     const store = setupStore([[0, 0]]);
     store.set(selectedCellAtom, { row: 0, col: 0 });
-    const wrongValues = [9, 8, 7, 6, 1]; // (0,0) 정답은 5
+    const wrongValues = [9, 8, 7, 6, 1];
     expect(wrongValues.length).toBe(MAX_MISTAKES);
     wrongValues.forEach((v) => store.set(fillCellAtom, v));
 
@@ -173,7 +172,7 @@ describe('fillCellAtom — 실수 판정', () => {
       cages,
     );
     store.set(selectedCellAtom, { row: 0, col: 0 });
-    store.set(fillCellAtom, 9); // 9 + 3 = 12 > 8
+    store.set(fillCellAtom, 9);
 
     expect(store.get(mistakeCountAtom)).toBe(1);
     expect(cellAt(store.get(boardAtom), 0, 0).isConflict).toBe(true);

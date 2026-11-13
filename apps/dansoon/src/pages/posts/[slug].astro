@@ -31,12 +31,9 @@ const { title, description, publishedAt, updatedAt, category, tags, thumbnail, c
 const { Content, headings } = await render(post);
 const { older, newer } = getAdjacentPosts(posts, post);
 const COVER_WIDTH = 1344;
-// 커버는 본문 폭(42rem)까지만 커진다 — 모바일이 1344px 원본을 받지 않게 작은 크기도 만든다
 const COVER_WIDTHS = [640, 960, COVER_WIDTH];
 const COVER_SIZES = '(min-width: 42rem) 42rem, 100vw';
-// SNS 미리보기는 jpg/png 1200px가 가장 무난하다
 const OG_IMAGE_WIDTH = 1200;
-// 썸네일이 없으면 빌드 때 만든 제목 카드(/og/posts/<id>.png)를 쓴다
 const ogImage = thumbnail
   ? (await getImage({ src: thumbnail, width: OG_IMAGE_WIDTH, format: 'jpg' })).src
   : `/og/posts/${post.id}.png`;

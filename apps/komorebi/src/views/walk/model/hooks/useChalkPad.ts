@@ -31,7 +31,6 @@ const startStroke = (brush: ChalkBrush, x: number, y: number): ChalkStroke =>
     ? { tool: CHALK_TOOL.eraser, points: [x, y] }
     : { tool: CHALK_TOOL.chalk, color: brush, points: [x, y] };
 
-/** Measured inside the canvas border, where the slate is actually drawn. */
 function boardPoint(event: PointerEvent<HTMLCanvasElement>) {
   const canvas = event.currentTarget;
   const rect = canvas.getBoundingClientRect();
@@ -41,7 +40,6 @@ function boardPoint(event: PointerEvent<HTMLCanvasElement>) {
   };
 }
 
-/** Pointer drawing on the slate: the stroke is drawn live and saved once, when the pointer lifts. */
 export function useChalkPad(canvasRef: RefObject<HTMLCanvasElement | null>, { strokes, brush, onNotice }: Options) {
   const draft = useRef<ChalkStroke | null>(null);
   // Only the pointer that started the stroke may extend or end it; a second finger is ignored.

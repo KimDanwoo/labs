@@ -10,7 +10,6 @@ export function parseStudySort(value: string | undefined): StudySort {
   return value === STUDY_SORT.oldest ? STUDY_SORT.oldest : STUDY_SORT.latest;
 }
 
-/** 날짜 없는 문서는 정렬 방향과 무관하게 맨 뒤에 둔다. */
 export function sortStudyDocs(docs: StudyDoc[], sort: StudySort): StudyDoc[] {
   const direction = sort === STUDY_SORT.latest ? -1 : 1;
   return [...docs].sort((a, b) => {

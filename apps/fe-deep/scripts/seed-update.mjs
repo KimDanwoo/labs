@@ -2,11 +2,9 @@ import { createSeedClient } from './lib/seedClient.mjs';
 
 const sbAdmin = createSeedClient();
 
-// === Part 1: 기존 질문 수정 ===
 let count = 0;
 
 try {
-  // 1. q-4: Cookie expires date fix (2025 → 2027)
   {
     const { data, error } = await sbAdmin.from('questions').select('answer').eq('id', 'q-4').single();
     if (error) throw error;
@@ -17,7 +15,6 @@ try {
     count++;
   }
 
-  // 2. q-42: sub_category fix (저장소 → 렌더링)
   {
     const { error } = await sbAdmin.from('questions').update({ sub_category: '렌더링' }).eq('id', 'q-42');
     if (error) throw error;
@@ -25,7 +22,6 @@ try {
     count++;
   }
 
-  // 3. q-51: Core Web Vitals - FID → INP 교체
   {
     const { data, error } = await sbAdmin.from('questions').select('answer').eq('id', 'q-51').single();
     if (error) throw error;
@@ -59,7 +55,6 @@ try {
     count++;
   }
 
-  // 4. q-36: Next.js fetch caching - Next.js 15 기본값 변경 반영
   {
     const { data, error } = await sbAdmin.from('questions').select('answer').eq('id', 'q-36').single();
     if (error) throw error;
@@ -74,7 +69,6 @@ try {
     count++;
   }
 
-  // 5. q-66: Observer pattern classification fix (구조 패턴 → 행위 패턴)
   {
     const { error } = await sbAdmin.from('questions').update({ sub_category: '행위 패턴' }).eq('id', 'q-66');
     if (error) throw error;
@@ -82,7 +76,6 @@ try {
     count++;
   }
 
-  // 6. q-3: HTML inline elements - img 대체 인라인 요소 설명 추가
   {
     const { data, error } = await sbAdmin.from('questions').select('answer').eq('id', 'q-3').single();
     if (error) throw error;
@@ -103,14 +96,11 @@ try {
   process.exit(1);
 }
 
-// === Part 2: 새 질문 추가 ===
 try {
-  // 카테고리 ID 매핑
   const { data: cats, error: catErr } = await sbAdmin.from('categories').select('id, slug').order('order_num');
   if (catErr) throw catErr;
   const catMap = Object.fromEntries(cats.map((c) => [c.slug, c.id]));
 
-  // 각 카테고리의 현재 최대 order_num 조회
   const orderMap = {};
   for (const c of cats) {
     const { data } = await sbAdmin
@@ -127,7 +117,6 @@ try {
   }
 
   const newQuestions = [
-    // === HTML (q-77 ~ q-79) ===
     {
       id: 'q-77',
       category_id: catMap['html'],
@@ -237,7 +226,6 @@ dialog::backdrop {
 - 접근성(ARIA role=dialog) 내장
 - 별도 라이브러리 없이 모달 패턴 구현 가능`,
     },
-    // === CSS (q-80 ~ q-82) ===
     {
       id: 'q-80',
       category_id: catMap['css'],
@@ -365,7 +353,6 @@ document.documentElement.style.setProperty('--primary-color', '#ef4444');
 
 **성능 팁:** \`transform\`과 \`opacity\`만 애니메이션하면 GPU 가속으로 60fps 유지 가능합니다.`,
     },
-    // === JavaScript (q-83 ~ q-85) ===
     {
       id: 'q-83',
       category_id: catMap['javascript'],
@@ -486,7 +473,6 @@ function track(node) {
 - 객체별 캐시 (메모리 누수 방지)
 - 순환 참조 탐지 (방문한 객체 추적)`,
     },
-    // === TypeScript (q-86 ~ q-87) ===
     {
       id: 'q-86',
       category_id: catMap['typescript'],
@@ -571,7 +557,6 @@ type Result = ExtractParam<'/:id'>; // 'id'
 - 유니온 타입 조합 시 경우의 수가 급격히 증가할 수 있어 컴파일 성능에 주의합니다.
 - 너무 복잡한 템플릿 리터럴 타입은 가독성을 해칠 수 있으므로 적절한 수준에서 사용합니다.`,
     },
-    // === React (q-88 ~ q-90) ===
     {
       id: 'q-88',
       category_id: catMap['react'],
@@ -719,7 +704,6 @@ const LazyPage = React.lazy(() => import('./HeavyPage'));
 
 **주의:** Error Boundary는 이벤트 핸들러, 비동기 코드(setTimeout 등)의 에러는 잡지 못합니다.`,
     },
-    // === Next.js (q-91 ~ q-92) ===
     {
       id: 'q-91',
       category_id: catMap['nextjs'],
@@ -814,7 +798,6 @@ export default function Page() {
 - 느린 API 하나가 전체 페이지를 블록하지 않음
 - Next.js App Router에서는 \`loading.tsx\`가 자동으로 Suspense 경계 생성`,
     },
-    // === 브라우저 (q-93 ~ q-94) ===
     {
       id: 'q-93',
       category_id: catMap['browser'],
@@ -906,7 +889,6 @@ self.addEventListener('fetch', (e) => {
 - HTTPS 필수 (localhost 제외)
 - iOS Safari에서 일부 기능 제한`,
     },
-    // === 네트워크 (q-95 ~ q-96) ===
     {
       id: 'q-95',
       category_id: catMap['network'],
@@ -977,7 +959,6 @@ query {
 **GraphQL의 장점:** 복잡한 관계형 데이터, 다양한 클라이언트(웹/모바일)가 같은 API 사용 시
 **REST의 장점:** 단순 CRUD, HTTP 캐싱 활용, 파일 업로드, 팀 러닝 커브 고려 시`,
     },
-    // === 성능 최적화 (q-97 ~ q-99) ===
     {
       id: 'q-97',
       category_id: catMap['performance'],
@@ -1094,7 +1075,6 @@ used();
 | prefetch | 미래 | 낮음 | 다음 내비게이션 준비 |
 | preconnect | 현재 | 중간 | 외부 도메인 연결 준비 |`,
     },
-    // === 보안 (q-100 ~ q-101) ===
     {
       id: 'q-100',
       category_id: catMap['security'],
@@ -1185,7 +1165,6 @@ shasum -b -a 384 lib.js | awk '{print $1}' | xxd -r -p | base64
 - CDN 리소스 업데이트 시 해시도 함께 갱신해야 합니다.
 - \`crossorigin="anonymous"\` 속성이 필요합니다.`,
     },
-    // === 자료구조 (q-102 ~ q-103) ===
     {
       id: 'q-102',
       category_id: catMap['data-structure'],
@@ -1301,7 +1280,6 @@ class LinkedList {
 | 중간 삽입 | O(n) | O(1) (노드 알 때) |
 | 메모리 | 연속 | 비연속 (포인터 추가) |`,
     },
-    // === 알고리즘 (q-104 ~ q-105) ===
     {
       id: 'q-104',
       category_id: catMap['algorithm'],
@@ -1405,7 +1383,6 @@ function hasCycle(head) {
 
 **핵심:** 브루트포스 O(n²)를 O(n)으로 줄이는 것이 목표입니다.`,
     },
-    // === 디자인패턴 (q-106 ~ q-107) ===
     {
       id: 'q-106',
       category_id: catMap['design-pattern'],
@@ -1521,7 +1498,6 @@ function calcPrice(price: number, type: keyof typeof discountStrategies) {
 
 **장점:** if-else/switch 분기 제거, 전략 추가가 기존 코드 변경 없이 가능 (개방-폐쇄 원칙)`,
     },
-    // === Git (q-108 ~ q-109) ===
     {
       id: 'q-108',
       category_id: catMap['git'],
@@ -1623,7 +1599,6 @@ npx --no -- commitlint --edit $1
 
 이 조합으로 커밋 시점에 자동으로 코드 품질과 커밋 규칙을 강제할 수 있습니다.`,
     },
-    // === 테스트 (q-110 ~ q-111) ===
     {
       id: 'q-110',
       category_id: catMap['testing'],
@@ -1728,7 +1703,6 @@ export const worker = setupWorker(...handlers);
 - 요청/응답 형태가 실제 API와 동일하여 신뢰도 높음
 - 네트워크 수준 모킹으로 구현 세부사항에 의존하지 않음`,
     },
-    // === CS 기초 (q-112 ~ q-113) ===
     {
       id: 'q-112',
       category_id: catMap['cs-fundamentals'],

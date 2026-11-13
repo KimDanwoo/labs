@@ -9,7 +9,6 @@ import { encodePostImage } from './lib/postImage.mjs';
 
 const BLOG_ORIGIN = 'https://dansoon-dev.tistory.com';
 const CONTENT_DIR = new URL('../contents/posts/', import.meta.url);
-// 사람이 다듬은 목록용 요약(slug → 요약). 없으면 본문 앞부분에서 만든다
 const CURATED_DESCRIPTIONS = JSON.parse(
   await readFile(new URL('./tistory-descriptions.json', import.meta.url), 'utf8'),
 );
@@ -74,7 +73,6 @@ const POSTS = {
   31: { slug: 'saju-service', category: 'dev', tags: ['ai', 'side-project'] },
 };
 
-/** 원문에 캡션이 없는 이미지의 대체 텍스트(글 번호 → 이미지 순서대로) */
 const IMAGE_ALTS = {
   5: [
     'React DevTools Profiler 플레임 그래프 — ThemeProvider 업데이트, 렌더링 2ms',
@@ -103,7 +101,6 @@ const NAMED_ENTITIES = {
   rdquo: '”',
 };
 
-/** 언어 표시가 없는 코드 블록의 언어를 내용으로 추정한다. 위에서부터 먼저 맞는 것을 쓴다. */
 const LANGUAGE_HINTS = [
   ['text', /[├└│]──/],
   ['html', /^\s*(<!DOCTYPE|<html|<head|<body|<script|<!--|<div|<meta)/i],
@@ -112,7 +109,6 @@ const LANGUAGE_HINTS = [
   ['bash', /^\s*(\$ |pnpm |npm |npx |yarn |git |cd |mkdir |brew |curl )/m],
   ['json', /^\s*[{[]\s*"[^"]+"\s*:/],
   ['tsx', /<[A-Z][\w.]*[\s/>]|return \(\s*</],
-  // 키워드·화살표 함수, 주석, 'fn(...);' 형태의 호출, 'key: value' 객체 줄
   [
     'ts',
     /\b(const|let|function|import|export|interface|type|class|async|await|module\.exports)\b|=>|^\s*\/\/|^\s*[\w.]+\(.*\);?\s*(\/\/.*)?$|^\s*\w+\s*:\s*[\w'"[{]/m,
@@ -120,10 +116,8 @@ const LANGUAGE_HINTS = [
 ];
 
 const UNSAFE_MARKDOWN = /<(script|iframe|style|object|embed)\b|\son\w+\s*=|javascript:/i;
-/** 펜스 코드 블록(목록 안 들여쓰기 포함)과 인라인 코드 */
 const CODE_PATTERN = /^( *)(`{3,})[^\n]*\n[\s\S]*?\n\1\2[ \t]*$|`[^`\n]*`/gm;
 
-/** 코드는 원문 그대로 두고 나머지 본문에만 변환을 적용한다. */
 function mapProse(markdown, transform) {
   let result = '';
   let cursor = 0;
@@ -134,7 +128,6 @@ function mapProse(markdown, transform) {
   return result + transform(markdown.slice(cursor));
 }
 
-/** 코드는 텍스트로만 렌더링되므로, 코드 밖에 남은 HTML만 검사한다. */
 function hasUnsafeHtml(markdown) {
   return UNSAFE_MARKDOWN.test(markdown.replace(CODE_PATTERN, ''));
 }
@@ -201,11 +194,9 @@ function createConverter(images, alts = []) {
   });
   service.remove(['script', 'style', 'iframe', 'button', 'noscript']);
 
-  // 본문의 '<T>' 같은 글자가 HTML 태그로 해석되지 않게 막는다
   const escapeMarkdown = service.escape.bind(service);
   service.escape = (text) => escapeMarkdown(text).replace(/</g, '\\<');
 
-  // 티스토리가 간격용으로 넣은 빈 문단·빈 제목(&nbsp;)은 버린다
   service.addRule('blankBlock', {
     filter: (node) =>
       /^(P|H[1-6])$/.test(node.nodeName) &&

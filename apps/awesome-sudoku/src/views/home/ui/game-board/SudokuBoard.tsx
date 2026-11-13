@@ -21,7 +21,6 @@ export const SudokuBoard: React.FC = () => {
 
   return (
     <div className="relative group flex-shrink-0">
-      {/* Outer glow */}
       <div
         className={cn(
           'absolute -inset-3 opacity-60 blur-2xl transition-opacity duration-500',
@@ -31,7 +30,6 @@ export const SudokuBoard: React.FC = () => {
         )}
       />
 
-      {/* Board container */}
       <div
         className={cn(
           'relative bg-[rgb(var(--color-surface-primary))] overflow-hidden',

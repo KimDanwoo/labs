@@ -1,9 +1,3 @@
-/**
- * 네이밍 규약 강제(flat).
- * 식별자는 @typescript-eslint/naming-convention이, 파일·디렉토리명은 자체 룰이 본다.
- * `@typescript-eslint` 플러그인은 eslint-config-next/typescript가 이미 등록하므로 여기선 룰만 참조한다.
- */
-
 const PASCAL_CASE = /^[A-Z][a-zA-Z0-9]*$/;
 const CAMEL_CASE = /^[a-z][a-zA-Z0-9]*$/;
 const KEBAB_CASE = /^[a-z0-9]+(-[a-z0-9]+)*$/;

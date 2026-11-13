@@ -7,7 +7,6 @@
  * 중립(gray)·상태(green/red/amber/sky)는 hue 고정.
  */
 export const themeColors = {
-  // 중립 — 쿨톤 고정(hue 264). 표면·텍스트·보더의 기반.
   gray: {
     50: 'oklch(0.985 0.002 264)',
     100: 'oklch(0.96 0.004 264)',
@@ -20,8 +19,6 @@ export const themeColors = {
     800: 'oklch(0.20 0.018 264)',
     900: 'oklch(0.145 0.018 264)',
   },
-  // 브랜드 — hue는 var로 회전(기본 240), 채도는 var 배율로 조절(기본 0.8).
-  // L은 고정, C는 `--brand-chroma`를 곱해 앱이 톤을 가라앉힐 수 있다(예: 읽기 앱).
   brand: {
     50: 'oklch(0.97 calc(0.02 * var(--brand-chroma)) var(--brand-hue))',
     100: 'oklch(0.93 calc(0.045 * var(--brand-chroma)) var(--brand-hue))',
@@ -34,7 +31,6 @@ export const themeColors = {
     800: 'oklch(0.34 calc(0.15 * var(--brand-chroma)) var(--brand-hue))',
     900: 'oklch(0.27 calc(0.11 * var(--brand-chroma)) var(--brand-hue))',
   },
-  // 성공 — green(hue 152)
   green: {
     50: 'oklch(0.96 0.03 152)',
     100: 'oklch(0.93 0.06 152)',
@@ -47,7 +43,6 @@ export const themeColors = {
     800: 'oklch(0.40 0.10 152)',
     900: 'oklch(0.32 0.07 152)',
   },
-  // 에러 — red(hue 27)
   red: {
     50: 'oklch(0.96 0.02 25)',
     100: 'oklch(0.93 0.04 25)',
@@ -60,7 +55,6 @@ export const themeColors = {
     800: 'oklch(0.41 0.16 27)',
     900: 'oklch(0.35 0.12 27)',
   },
-  // 경고 — amber(hue 62–85, 밝은 쪽이 더 노랑)
   amber: {
     50: 'oklch(0.97 0.03 85)',
     100: 'oklch(0.94 0.06 85)',
@@ -73,7 +67,6 @@ export const themeColors = {
     800: 'oklch(0.48 0.10 50)',
     900: 'oklch(0.40 0.08 48)',
   },
-  // 정보 — sky(hue 228–235). 기본 브랜드(hue 240)와 hue가 가깝다(약 12°). 바꿀지는 따로 정한다.
   sky: {
     50: 'oklch(0.97 0.02 235)',
     100: 'oklch(0.93 0.04 235)',
@@ -88,17 +81,11 @@ export const themeColors = {
   },
 } as const;
 
-/** 범용 색상 (white / black). */
 export const commonColors = {
   black: 'oklch(0 0 0)',
   white: 'oklch(1 0 0)',
 } as const;
 
-/**
- * :root 스칼라 — 색이 아닌 루트 변수. 앱 스킨이 오버라이드하는 지점.
- * brand-hue: 브랜드 램프 hue(기본 sky 블루 240). 앱 globals.css에서 이 값만 바꾸면 리스킨된다.
- * brand-chroma: 브랜드 램프 채도 배율(기본 0.8, 절제된 톤). 더 낮추면 톤이 더 가라앉는다(읽기 앱 등).
- */
 export const rootScalars = {
   'brand-hue': '240',
   'brand-chroma': '0.8',

@@ -5,7 +5,6 @@
  * GA4 향상된 측정의 "브라우저 방문 기록 이벤트 기반 페이지 변경"은 꺼 둬야 이중 집계되지 않는다.
  */
 const MEASUREMENT_ID = 'G-EHWN21GFLV';
-// 로컬 dev·preview 방문이 통계에 섞이지 않게 실제 도메인에서만 보낸다
 const TRACKED_HOSTNAME = 'danwoo.dev';
 
 const dataLayer: unknown[] = [];

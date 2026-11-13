@@ -28,10 +28,8 @@ function weekOf(report: BookReport): Week | null {
   return year && month && week ? { year, month, week } : null;
 }
 
-/** 11월 2주차 */
 export const formatWeek = ({ month, week }: Week) => `${month}월 ${week}주차`;
 
-/** '일반 도서 베스트셀러 (2026년 11월 2째주)' → 제목 '일반 도서 베스트셀러', 주차 '2026년 11월 2주차' */
 export function splitReportTitle(report: BookReport): { heading: string; week?: string } {
   const week = weekOf(report);
   if (!week) return { heading: report.data.title };

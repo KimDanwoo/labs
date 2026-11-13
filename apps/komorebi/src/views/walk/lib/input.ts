@@ -18,7 +18,6 @@ export function gameKey(event: { code: string; key: string }) {
   return physical[event.code] ?? event.key.toLowerCase();
 }
 
-/** Eight-way pad with a quiet centre; diagonal input has the same world speed. */
 export function padDirection(x: number, y: number): string[] {
   if (Math.hypot(x, y) < 0.2) return [];
   const keys = [];
@@ -29,7 +28,6 @@ export function padDirection(x: number, y: number): string[] {
   return keys;
 }
 
-/** Unnormalised step from held keys: opposite keys cancel, WASD and arrows count as the same direction. */
 export function keyboardDirection(keys: ReadonlySet<string>) {
   const held = (...names: string[]) => Number(names.some((name) => keys.has(name)));
   return {

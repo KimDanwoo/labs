@@ -14,7 +14,6 @@ import type {
 
 // 조회 실패는 호출자에게 전달한다. 정상적인 결과 없음만 빈 배열 또는 undefined로 반환한다.
 
-/** questions 조회 시 공통으로 가져오는 컬럼. 컬럼이 늘면 여기만 고친다. */
 const QUESTION_COLUMNS =
   'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard, follow_ups';
 
@@ -36,7 +35,6 @@ function getClient(supabase?: SupabaseClient) {
   return supabase ?? createClient();
 }
 
-/** 전체 카테고리 목록을 order_num 순서로 반환한다. 각 카테고리에 question_count를 포함한다. */
 export async function getAllCategories(supabase?: SupabaseClient): Promise<Category[]> {
   const client = getClient(supabase);
   const { data, error } = await client
@@ -53,7 +51,6 @@ export async function getAllCategories(supabase?: SupabaseClient): Promise<Categ
   }));
 }
 
-/** slug로 카테고리를 찾는다. 없으면 undefined를 반환한다. */
 export async function getCategoryBySlug(slug: string, supabase?: SupabaseClient): Promise<Category | undefined> {
   const client = getClient(supabase);
   const { data, error } = await client.from('categories').select(CATEGORY_COLUMNS).eq('slug', slug).maybeSingle();
@@ -64,7 +61,6 @@ export async function getCategoryBySlug(slug: string, supabase?: SupabaseClient)
   return data as Category;
 }
 
-/** 카테고리 ID에 속하는 질문들을 order_num 순서로 반환한다. */
 export async function getQuestionsByCategory(categoryId: string, supabase?: SupabaseClient): Promise<Question[]> {
   const client = getClient(supabase);
   const { data, error } = await client
@@ -78,7 +74,6 @@ export async function getQuestionsByCategory(categoryId: string, supabase?: Supa
   return (data ?? []) as Question[];
 }
 
-/** 카테고리 slug로 해당 카테고리의 질문들을 반환한다. 카테고리가 없으면 빈 배열. */
 export async function getQuestionsByCategorySlug(slug: string, supabase?: SupabaseClient): Promise<Question[]> {
   const client = getClient(supabase);
   const category = await getCategoryBySlug(slug, client);
@@ -86,7 +81,6 @@ export async function getQuestionsByCategorySlug(slug: string, supabase?: Supaba
   return getQuestionsByCategory(category.id, client);
 }
 
-/** 카테고리 slug로 해당 카테고리의 질문들을 페이지네이션하여 반환한다. */
 export async function getQuestionsByCategorySlugPaginated(
   slug: string,
   page: number = 1,
@@ -118,7 +112,6 @@ export async function getQuestionsByCategorySlugPaginated(
   };
 }
 
-/** 질문 ID로 단일 질문을 찾는다. */
 export async function getQuestionById(id: string, supabase?: SupabaseClient): Promise<Question | undefined> {
   const client = getClient(supabase);
   const { data, error } = await client.from('questions').select(QUESTION_COLUMNS).eq('id', id).maybeSingle();
@@ -129,7 +122,6 @@ export async function getQuestionById(id: string, supabase?: SupabaseClient): Pr
   return data as Question;
 }
 
-/** 여러 질문 ID로 벌크 조회한다. */
 export async function getQuestionsByIds(ids: string[], supabase?: SupabaseClient): Promise<Question[]> {
   if (ids.length === 0) return [];
   const client = getClient(supabase);
@@ -140,7 +132,6 @@ export async function getQuestionsByIds(ids: string[], supabase?: SupabaseClient
   return (data ?? []) as Question[];
 }
 
-/** 전체 질문 목록을 반환한다. */
 export async function getAllQuestions(supabase?: SupabaseClient): Promise<Question[]> {
   const client = getClient(supabase);
   const { data, error } = await client.from('questions').select(QUESTION_COLUMNS);
@@ -150,7 +141,6 @@ export async function getAllQuestions(supabase?: SupabaseClient): Promise<Questi
   return (data ?? []) as Question[];
 }
 
-/** 질문·답변·태그 순으로 검색어가 처음 걸리는 곳을 찾는다. */
 function findMatchType(question: Question, lowerQuery: string): SearchResult['matchType'] | undefined {
   if (question.question.toLowerCase().includes(lowerQuery)) return 'question';
   if (question.answer.toLowerCase().includes(lowerQuery)) return 'answer';
@@ -158,7 +148,6 @@ function findMatchType(question: Question, lowerQuery: string): SearchResult['ma
   return undefined;
 }
 
-/** 키워드로 질문, 답변을 검색한다. 대소문자를 구분하지 않는다. */
 export async function searchQuestions(query: string, supabase?: SupabaseClient): Promise<SearchResult[]> {
   if (!query.trim()) return [];
 
@@ -183,7 +172,6 @@ export async function searchQuestions(query: string, supabase?: SupabaseClient):
   });
 }
 
-/** 난이도별 질문 목록을 반환한다. */
 export async function getQuestionsByDifficulty(difficulty: Difficulty, supabase?: SupabaseClient): Promise<Question[]> {
   const client = getClient(supabase);
   const { data, error } = await client.from('questions').select(QUESTION_COLUMNS).eq('difficulty', difficulty);
@@ -193,7 +181,6 @@ export async function getQuestionsByDifficulty(difficulty: Difficulty, supabase?
   return (data ?? []) as Question[];
 }
 
-/** 랜덤으로 질문을 뽑는다. categorySlug가 주어지면 해당 카테고리에서만 뽑는다. */
 export async function getRandomQuestions(
   count: number,
   categorySlug?: string,
@@ -202,7 +189,6 @@ export async function getRandomQuestions(
 ): Promise<Question[]> {
   const client = getClient(supabase);
 
-  // 1) ID 목록만 가져온다
   let query = client.from('questions').select('id');
   if (categorySlug) {
     const category = await getCategoryBySlug(categorySlug, client);
@@ -219,11 +205,9 @@ export async function getRandomQuestions(
   if (idError) throw idError;
   if (!idRows || idRows.length === 0) return [];
 
-  // 2) Fisher-Yates shuffle → pick (균등 분포 보장)
   const pickedIds = shuffleArray(idRows)
     .slice(0, count)
     .map((r) => r.id as string);
 
-  // 3) 벌크 조회
   return getQuestionsByIds(pickedIds, client);
 }

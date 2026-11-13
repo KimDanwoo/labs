@@ -5,7 +5,6 @@ const SOUNDCLOUD_URL = 'https://soundcloud.com/danwooking';
 const BLOG_URL = 'https://danwoo.dev/';
 const GITHUB_URL = 'https://github.com/KimDanwoo';
 
-/** 헤드라인 첫 줄에서 돌아가며 바뀌는 키워드. 첫 항목이 기본 문장(낭독기·동작 줄이기)으로 쓰인다. */
 export const HEADLINE_KEYWORDS: readonly string[] = [
   '제품을 키우는',
   'AI와 함께 만드는',

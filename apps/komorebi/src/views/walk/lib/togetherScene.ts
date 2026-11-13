@@ -145,7 +145,6 @@ export function createTogetherScene(options: {
           continue;
         }
         const hasChangedOutfit = actor.peer.walker.outfit !== current.walker.outfit;
-        // Keep the old outfit until its replacement has loaded.
         if (hasChangedOutfit) ensure(current);
         else actor.peer = current;
       }

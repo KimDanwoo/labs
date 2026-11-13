@@ -10,10 +10,6 @@ import {
   toggleQuestionBookmark,
 } from '../store/questionActionsStore';
 
-/**
- * 질문 1개의 북마크·학습완료 상태를 직접 구독하고 실행한다.
- * 같은 id를 구독하는 컴포넌트끼리 공유 스토어로 자동 동기화된다.
- */
 export function useQuestionActions(questionId: string) {
   const state = useSyncExternalStore(
     useCallback((listener) => subscribe(questionId, listener), [questionId]),

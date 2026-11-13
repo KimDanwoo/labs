@@ -13,10 +13,6 @@ interface OverallStats {
 
 type CategoryStats = Record<string, { mastered: number; learning: number; unseen: number }>;
 
-/**
- * 전체 학습 현황(통계, 카테고리별 진도, 히트맵, 스트릭)을 로드한다.
- * localStorage는 한 번만 파싱하여 각 파생 값에 공유한다.
- */
 export function useProgressStats() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [stats, setStats] = useState<OverallStats>({ total: 0, mastered: 0, learning: 0, unseen: 0 });

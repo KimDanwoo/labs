@@ -3,18 +3,14 @@ import type { Point, Region } from '../model/world/world';
 import { canvasTexture } from './art';
 import { sceneX, sceneY } from './perspective';
 
-/** A lit window, lantern or shop front, in painting percent; `reach` is the pool of light it throws (0–1 of width). */
 type Lamp = { x: number; z: number; reach: number; flicker?: boolean };
-/** Far-off lights that only twinkle, such as the town across the bay. */
 type Twinkle = { x: number; z: number };
 
 export const MAX_LAMPS = 8;
 
 export const LAMPS: Record<Region, Lamp[]> = {
   home: [{ x: 54, z: 42, reach: 0.3 }],
-  // The classroom lights are off for the holidays; only the corridor lamp beyond the door is lit.
   classroom: [{ x: 97, z: 38, reach: 0.035 }],
-  // A lamp over the entrance doors, outside.
   hallway: [{ x: 15, z: 30, reach: 0.08 }],
   village: [
     { x: 31, z: 30, reach: 0.07 },
@@ -73,7 +69,6 @@ const smoothstep = (edge0: number, edge1: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-/** How much lamplight falls at a point (0–0.9), with the same falloff the painting shader uses for its pools. */
 export function lampGlowAt(region: Region, point: Point) {
   const pool = LAMPS[region]
     .slice(0, MAX_LAMPS)
@@ -91,7 +86,6 @@ const MOONLIT = new THREE.Color(0.5, 0.58, 0.8);
 const LAMPLIT = new THREE.Color(1, 0.86, 0.64);
 const DAYLIT = new THREE.Color(1, 1, 1);
 
-/** Tints a sprite standing in the painting: moonlit blue after dark, warmed back where lamplight falls on it. */
 export function lightSprite(color: THREE.Color, darkness: number, glow: number) {
   color.copy(MOONLIT).lerp(LAMPLIT, glow);
   color.lerp(DAYLIT, 1 - darkness);
@@ -99,7 +93,6 @@ export function lightSprite(color: THREE.Color, darkness: number, glow: number) 
 
 const toScene = (x: number, z: number) => new THREE.Vector3(sceneX(x), sceneY(z), 1);
 
-/** Brightness over time: a lantern flame breathes gently, far-off lights twinkle, windows hold steady. */
 const FLICKER = {
   steady: () => 1,
   flame: (t: number) => 0.97 + 0.03 * Math.sin(t * 2.6) * Math.sin(t * 1.1),
@@ -107,7 +100,6 @@ const FLICKER = {
 } satisfies Record<string, (t: number) => number>;
 type Flicker = (typeof FLICKER)[keyof typeof FLICKER];
 
-/** Warm halos over each lamp and tiny far-off twinkles, added on top of the painting only after dark. */
 export function createNightLights(scene: THREE.Scene) {
   const glow = canvasTexture(64, 64, (c) => {
     const g = c.createRadialGradient(32, 32, 0, 32, 32, 32);

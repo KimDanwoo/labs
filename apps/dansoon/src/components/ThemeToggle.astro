@@ -31,13 +31,11 @@ import Icon from '~/components/Icon.astro';
   const IRIS_EASING = 'cubic-bezier(0.65, 0, 0.35, 1)';
   // global.css가 이 클래스가 붙은 동안만 페이지 이동용 전환 애니메이션을 끄고 원형 전환을 쓴다
   const THEME_TRANSITION_CLASS = 'theme-transition';
-  // 다크로 갈 때는 이전(밝은) 화면을 위에 올려 버튼으로 빨려 들어가게 한다(global.css)
   const COLLAPSE_CLASS = 'theme-transition-collapse';
 
   type Point = { x: number; y: number };
   type IrisDirection = 'collapse' | 'expand';
 
-  /** 다크: 밝은 화면이 버튼으로 모여 꺼진다. 라이트: 밝은 화면이 버튼에서 퍼져 켜진다 */
   const IRIS_BY_DIRECTION = {
     collapse: { pseudoElement: '::view-transition-old(root)', isShrinking: true },
     expand: { pseudoElement: '::view-transition-new(root)', isShrinking: false },

@@ -6,7 +6,6 @@ import * as React from 'react';
 
 import { cn } from './lib/cn';
 
-/** 공용 체크박스 — radix 기반(a11y·키보드). 토큰 기반 색상. */
 function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
   return (
     <CheckboxPrimitive.Root

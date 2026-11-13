@@ -5,10 +5,6 @@ import { useDebounce } from '@shared/lib/useDebounce';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-/**
- * 검색 쿼리 상태, 디바운스, 결과 fetch, 로딩 파생 상태를 관리한다.
- * lastSearchedQuery로 isSearching을 파생하여 별도 loading 상태를 제거한다.
- */
 export function useSearch() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') ?? '');

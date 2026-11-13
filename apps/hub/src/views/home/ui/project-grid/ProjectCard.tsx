@@ -18,10 +18,8 @@ const IMAGE_POSITION = {
   center: 'object-center',
 } as const;
 
-/** 히어로·섹션 헤더가 먼저 보인 뒤 카드가 이어서 등장하도록 미루는 시간(ms). */
 const CARD_ENTER_DELAY_MS = 420;
 
-/** 데스크톱 첫 줄(3열)까지는 바로 보이므로 즉시 불러온다. */
 const EAGER_IMAGE_COUNT = 3;
 
 type ProjectCardProps = {

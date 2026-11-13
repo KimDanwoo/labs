@@ -42,7 +42,6 @@ const PLAY_BUTTON = [
   'hover:bg-white focus-visible:bg-white',
 ].join(' ');
 
-// 위젯이 길이를 알려주기 전이나 콜백이 undefined를 줬을 때 NaN:NaN이 뜨지 않게 한다.
 const clock = (seconds: number) => {
   const safe = Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
   return `${Math.floor(safe / 60)}:${String(Math.floor(safe % 60)).padStart(2, '0')}`;
@@ -144,7 +143,6 @@ export function Transport() {
                 href={track.permalinkUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                // py-sm: 링크 하나만 남은 행이라 최소 터치 타깃(24px)을 패딩으로 확보한다.
                 className="decoration-hairline hover:text-paper focus-visible:text-paper py-sm underline underline-offset-[3px] min-[820px]:py-0"
               >
                 SoundCloud

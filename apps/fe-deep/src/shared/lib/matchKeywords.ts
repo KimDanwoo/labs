@@ -2,7 +2,6 @@ export type KeywordMatch = { keyword: string; isMatched: boolean };
 
 /** 토큰 끝의 한 글자 조사는 떼고 비교한다 — "구조와"가 "구조를"과도 맞게. */
 const TRAILING_PARTICLE_PATTERN = /[와과을를이가은는의에로도]$/;
-/** 구문형 키워드를 의미 단위로 쪼개는 구분자. */
 const TOKEN_SEPARATOR_PATTERN = /[\s/·,()]+/;
 
 /**

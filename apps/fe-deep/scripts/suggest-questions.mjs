@@ -17,8 +17,6 @@ import { dirname, resolve } from 'path';
 import { createInterface } from 'readline';
 import { fileURLToPath } from 'url';
 
-// ── .env.local 자동 로드 ────────────────────────────────────────
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 try {
   const envPath = resolve(__dirname, '..', '.env.local');
@@ -35,8 +33,6 @@ try {
 } catch {
   // .env.local 없으면 기존 환경 변수 사용
 }
-
-// ── 환경 변수 확인 ──────────────────────────────────────────────
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -55,16 +51,12 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
 
-// ── readline 유틸 ───────────────────────────────────────────────
-
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 
 /** @param {string} q */
 function ask(q) {
   return new Promise((resolve) => rl.question(q, resolve));
 }
-
-// ── Supabase 쿼리 ──────────────────────────────────────────────
 
 async function fetchCategories() {
   const { data, error } = await supabase
@@ -104,8 +96,6 @@ async function insertQuestion(q) {
   return data.id;
 }
 
-// ── Gemini API ─────────────────────────────────────────────────
-
 async function callGemini(prompt) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
 
@@ -129,8 +119,6 @@ async function callGemini(prompt) {
   const json = await res.json();
   return json.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
 }
-
-// ── 프롬프트 생성 ──────────────────────────────────────────────
 
 function buildPrompt(category, existingQuestions, topic) {
   const existingList = existingQuestions.map((q) => `- ${q.question}`).join('\n');
@@ -168,8 +156,6 @@ JSON 배열로만 출력하세요. 다른 텍스트는 포함하지 마세요.
 `.trim();
 }
 
-// ── 메인 플로우 ────────────────────────────────────────────────
-
 async function main() {
   console.log('\n📚 질문 후보 생성 CLI (Gemini)\n');
 
@@ -184,7 +170,6 @@ async function main() {
     topic = await ask('주제/키워드 입력: ');
   }
 
-  // 카테고리 선택
   console.log('\n📂 카테고리 목록:');
   const sorted = [...categories].sort((a, b) => a.question_count - b.question_count);
   sorted.forEach((c, i) => {
@@ -208,7 +193,6 @@ async function main() {
   let candidates;
   try {
     const raw = await callGemini(prompt);
-    // JSON 블록 추출
     const jsonMatch = raw.match(/\[[\s\S]*\]/);
     if (!jsonMatch) throw new Error('JSON 파싱 실패');
     candidates = JSON.parse(jsonMatch[0]);

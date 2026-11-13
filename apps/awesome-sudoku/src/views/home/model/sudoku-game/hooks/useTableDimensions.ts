@@ -13,7 +13,7 @@ interface TableDimensions {
   cellPositions: Record<string, CellPosition>;
 }
 
-const DEBOUNCE_DELAY = 16; // ~1 frame at 60fps for smooth resize
+const DEBOUNCE_DELAY = 16;
 
 export const useTableDimensions = (onDimensionsChange: (dimensions: TableDimensions) => void, deps: unknown[]) => {
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -99,7 +99,6 @@ export const useTableDimensions = (onDimensionsChange: (dimensions: TableDimensi
       const table = document.querySelector('table.border-collapse');
       if (!table) return;
 
-      // ResizeObserver for responsive resize
       if (!resizeObserverRef.current) {
         resizeObserverRef.current = new ResizeObserver(() => {
           scheduleCalculation();
@@ -107,7 +106,6 @@ export const useTableDimensions = (onDimensionsChange: (dimensions: TableDimensi
         resizeObserverRef.current.observe(table);
       }
 
-      // MutationObserver for DOM changes
       if (!mutationObserverRef.current) {
         mutationObserverRef.current = new MutationObserver((mutations) => {
           const hasRelevantChanges = mutations.some(

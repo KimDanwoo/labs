@@ -12,7 +12,6 @@ export type WorldPortal = {
   lateralRange: readonly [number, number];
 };
 
-// Exit spans follow the painted connecting road, not every path touching that screen edge.
 const EXIT_SPANS: Record<Region, Record<string, readonly [number, number]>> = {
   home: {},
   hallway: {},
@@ -27,7 +26,6 @@ const EXIT_SPANS: Record<Region, Record<string, readonly [number, number]>> = {
 
 type Doorway = Pick<WorldPortal, 'edge' | 'boundary' | 'center' | 'lateralRange'> & { extent: number };
 
-// Doorways are small thresholds inside a painting, unlike the road exits at its edges.
 const DOORWAYS: Partial<Record<Region, Partial<Record<Region, Doorway>>>> = {
   village: {
     home: { edge: 'top', boundary: 38.5, center: { x: 15, z: 38 }, lateralRange: [13.5, 16.5], extent: 2 },
@@ -87,7 +85,6 @@ const BEYOND_BOUNDARY = {
   bottom: (position, boundary) => position.z >= boundary,
 } satisfies Record<Edge, (position: Point, boundary: number) => boolean>;
 
-/** The whole road beyond the exit boundary transfers, regardless of lateral position. */
 export function isInsidePortal(position: Point, portal: WorldPortal) {
   const lateral = portal.edge === 'left' || portal.edge === 'right' ? position.z : position.x;
   if (lateral < portal.lateralRange[0] || lateral > portal.lateralRange[1]) return false;

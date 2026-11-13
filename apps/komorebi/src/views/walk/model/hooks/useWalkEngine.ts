@@ -25,7 +25,6 @@ const INITIAL_STATUS: SceneStatus = {
 };
 const LOAD_ERROR = '풍경을 불러오지 못했어요. 페이지를 새로고침하거나 브라우저의 하드웨어 가속 설정을 확인해 주세요.';
 
-/** Owns the Three.js engine lifecycle and keeps it in step with the HUD settings. */
 export function useWalkEngine(
   containerRef: RefObject<HTMLDivElement | null>,
   settings: EngineSettings,

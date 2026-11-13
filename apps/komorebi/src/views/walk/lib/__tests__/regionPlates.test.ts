@@ -10,7 +10,6 @@ test('nearby regions are the current painting and the ones its exits lead to', (
   assert.ok(!nearbyRegions('forest').includes('coast'));
 });
 
-/** A loader whose requests finish only when the test says so, in any order. */
 function deferredLoader() {
   const pending = new Map<string, { resolve: (t: THREE.Texture) => void; reject: (e: Error) => void }>();
   const disposed: string[] = [];

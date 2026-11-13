@@ -2,11 +2,6 @@ import { GAME_MODE } from '../constants/game';
 import { KILLER_MODE_DEDUCTION, POINT_RANGES, TIME_THRESHOLDS } from '../constants/record';
 import type { PointInput, PointResult } from '../types/record';
 
-/**
- * 시간 기반 포인트 계산.
- * 난이도별 범위(min~max) 안에서 완료 시간에 따라 선형 보간.
- * 빠를수록 높은 점수, 킬러 모드는 -1 감점.
- */
 export function calculatePoint(input: PointInput): PointResult {
   const { difficulty, gameMode, completionTime } = input;
 

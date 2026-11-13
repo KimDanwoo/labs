@@ -2,7 +2,6 @@ import * as THREE from 'three';
 
 const COUNT = 45;
 const AXES = 3;
-/** Flecks drift right across the painting and re-enter from the left edge. */
 const EDGE_X = 60;
 const HALF_HEIGHT = 35;
 const NEAREST_DEPTH = 4;
@@ -12,7 +11,6 @@ const SEED = 52;
 const INDOOR_OPACITY = 0.28;
 const OUTDOOR_OPACITY = 0.45;
 
-/** The same flecks every visit, spread over the painting at several depths. */
 export function createDustPositions(): Float32Array {
   let seed = SEED;
   const random = () => {
@@ -28,7 +26,6 @@ export function createDustPositions(): Float32Array {
   return positions;
 }
 
-/** Each fleck drifts right at its own pace while bobbing; one that leaves the right edge re-enters on the left. */
 export function driftDustPositions(positions: Float32Array, dt: number, elapsed: number): void {
   for (let i = 0; i < COUNT; i++) {
     positions[i * AXES] = positions[i * AXES]! + dt * (0.15 + i * 0.002);
@@ -46,7 +43,6 @@ type DustFrame = {
   isStill: boolean;
 };
 
-/** Screen-space flecks float at several actual Z depths, providing gentle parallax. They fade at night and in rain. */
 export function createDust(scene: THREE.Scene) {
   const positions = createDustPositions();
   const geometry = new THREE.BufferGeometry();

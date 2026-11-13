@@ -58,7 +58,6 @@ export function AquariumView({ fish, isFeeding }: { fish: KeptFish[]; isFeeding:
             aria-label={`${FISH.find((entry) => entry.id === item.id)?.name}, ${item.size} cm 자세히 보기`}
             onClick={() => setSelected(item.uid)}
           >
-            {/* Local painted sprites preserve their transparent silhouette. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={aquariumFishArt(item.id).src} alt="" draggable={false} />
           </button>

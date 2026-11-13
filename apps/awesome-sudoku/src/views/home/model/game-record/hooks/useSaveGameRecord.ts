@@ -24,11 +24,6 @@ interface SaveGameRecordResult {
   pointResult: PointResult | null;
 }
 
-/**
- * 게임 기록 저장 훅.
- * 비로그인 상태에서도 pointResult를 계산해 UI에 보여주고,
- * 로그인 완료 시 자동으로 Firestore에 저장한다.
- */
 export function useSaveGameRecord(): SaveGameRecordResult {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -44,7 +39,6 @@ export function useSaveGameRecord(): SaveGameRecordResult {
   const isSuccess = useAtomValue(isSuccessAtom);
   const isRecordSaved = useAtomValue(isRecordSavedAtom);
 
-  // 게임 성공 시 pointResult를 미리 계산 (비로그인도) — 렌더 중 상태 보정
   if (isSuccess && !pointResult) {
     setPointResult(
       calculatePoint({
@@ -100,7 +94,6 @@ export function useSaveGameRecord(): SaveGameRecordResult {
     }
   }, [user, isSuccess, isRecordSaved, difficulty, gameMode, currentTime, hintsRemaining, mistakeCount, pointResult]);
 
-  // 로그인 후 자동 저장: user가 null→유저로 바뀌었을 때
   const saveRef = useRef(save);
   useEffect(() => {
     saveRef.current = save;

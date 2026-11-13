@@ -2,10 +2,6 @@ import { createSeedClient } from './lib/seedClient.mjs';
 
 const sbAdmin = createSeedClient();
 
-// ============================================================
-// 1. 카테고리 생성 (유비쿼터스)
-// ============================================================
-
 const CATEGORY_ID = 'cat-ubiquitous';
 const CATEGORY = {
   id: CATEGORY_ID,
@@ -16,12 +12,7 @@ const CATEGORY = {
   description: '유비쿼터스 컴퓨팅',
 };
 
-// ============================================================
-// 2. 질문 데이터 (show_in_daily: false, show_in_flashcard: false)
-// ============================================================
-
 const questions = [
-  // === 1강: 유비쿼터스 환경 ===
   {
     id: 'ubq-01',
     question: '유비쿼터스(Ubiquitous)의 어원과 최초 제안자는?',
@@ -59,7 +50,6 @@ const questions = [
     tags: ['유비쿼터스', '구현방식', '사물인식', '내장형네트워크'],
   },
 
-  // === 2강: 유비쿼터스 컴퓨팅 ===
   {
     id: 'ubq-05',
     question: '유비쿼터스 컴퓨팅의 정의와 3대 필수 조건은?',
@@ -88,7 +78,6 @@ const questions = [
     tags: ['유비쿼터스컴퓨팅', '기술이슈', '가시성', '비가시성'],
   },
 
-  // === 3강: VR/AR/MR/메타버스 ===
   {
     id: 'ubq-08',
     question: '가상성의 연속성(Virtuality Continuum) 개념과 VR/AR/MR의 관계를 설명하시오.',
@@ -117,7 +106,6 @@ const questions = [
     tags: ['메타버스', '유형', '정의'],
   },
 
-  // === 4강: SoC와 MEMS ===
   {
     id: 'ubq-11',
     question: 'SoC(System on Chip)의 정의와 장점을 서술하시오.',
@@ -146,7 +134,6 @@ const questions = [
     tags: ['SoC', 'MEMS', '나노', '비교'],
   },
 
-  // === 5강: 나노·전지 ===
   {
     id: 'ubq-14',
     question: '나노 기술의 정의, 특징, 6대 활용 분야를 설명하시오.',
@@ -166,7 +153,6 @@ const questions = [
     tags: ['전지', '커패시터', '연료전지', '비교'],
   },
 
-  // === 6강: 네트워크·IoT ===
   {
     id: 'ubq-16',
     question: '유비쿼터스 네트워킹 구조 모델의 4계층을 설명하시오.',
@@ -195,7 +181,6 @@ const questions = [
     tags: ['BcN', '광대역통합망', '유무선융합'],
   },
 
-  // === 7강: 블록체인 ===
   {
     id: 'ubq-19',
     question: '블록체인의 정의, 동작 흐름, 4대 특징을 서술하시오.',
@@ -224,7 +209,6 @@ const questions = [
     tags: ['블록체인', '분류', '합의알고리즘', 'PoW', 'PoS', 'PBFT'],
   },
 
-  // === 8강: 클라우드 컴퓨팅 ===
   {
     id: 'ubq-22',
     question: '클라우드 컴퓨팅의 정의와 5대 핵심 특징을 설명하시오.',
@@ -253,7 +237,6 @@ const questions = [
     tags: ['클라우드', 'IaaS', 'PaaS', 'SaaS', '배포모델'],
   },
 
-  // === 9강: USN ===
   {
     id: 'ubq-25',
     question: 'USN(유비쿼터스 센서 네트워크)의 데이터 흐름과 구성요소를 설명하시오.',
@@ -282,7 +265,6 @@ const questions = [
     tags: ['IoT', 'USN', '비교'],
   },
 
-  // === 10강: 상황인식 컴퓨팅 ===
   {
     id: 'ubq-28',
     question: '상황인식 컴퓨팅의 정의와 상황(Context)의 3가지 분류를 설명하시오.',
@@ -312,14 +294,9 @@ const questions = [
   },
 ];
 
-// ============================================================
-// 3. 실행
-// ============================================================
-
 async function main() {
   console.log('🚀 유비쿼터스 학습 데이터 시드 시작...\n');
 
-  // 카테고리 upsert
   const { error: catErr } = await sbAdmin.from('categories').upsert(CATEGORY, { onConflict: 'id' });
   if (catErr) {
     console.error('❌ 카테고리 생성 실패:', catErr.message);
@@ -327,7 +304,6 @@ async function main() {
   }
   console.log(`✅ 카테고리 생성/업데이트: ${CATEGORY.icon} ${CATEGORY.title}`);
 
-  // 질문 일괄 삽입
   const rows = questions.map((q, i) => ({
     ...q,
     category_id: CATEGORY_ID,

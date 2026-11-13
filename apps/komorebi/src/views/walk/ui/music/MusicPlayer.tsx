@@ -88,7 +88,6 @@ export function MusicPlayer({ source, initialVolume, profile }: Props): JSX.Elem
           SoundCloud ↗
         </a>
       </div>
-      {/* The SoundCloud widget is the playback engine; it stays mounted but out of sight. */}
       <iframe
         key={player.attempt}
         ref={iframeRef}

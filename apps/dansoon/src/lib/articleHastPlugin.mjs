@@ -1,11 +1,3 @@
-/**
- * 글 본문 HTML 후처리(Sätteri hast 플러그인).
- * - 제목(h2~h4)에 id와 앵커 링크를 단다. 앵커 글자는 CSS로 그려 목차 텍스트에 섞이지 않게 한다.
- * - 표를 키보드로도 가로 스크롤할 수 있는 영역으로 감싼다.
- * - 외부 링크는 새 탭으로 연다(블로그 안 링크는 같은 탭에서 페이지 전환으로 이동한다).
- * - 본문 이미지에 반응형 크기를 단다. Astro 이미지 마커보다 먼저 돌아서 이 속성이 getImage()로 넘어간다.
- * Astro의 heading-ids 플러그인은 이미 있는 id를 그대로 쓰므로 목차와 앵커가 같은 id를 공유한다.
- */
 // 본문 폭(42rem)의 1x·1.5x·2x — 모바일이 1536px 원본을 받지 않게 한다. 원본보다 큰 폭은 Astro가 건너뛴다
 const ARTICLE_IMAGE_WIDTHS = [640, 960, 1344];
 const ARTICLE_IMAGE_SIZES = '(min-width: 42rem) 42rem, 100vw';
@@ -21,7 +13,6 @@ const slugify = (text) =>
     .replace(/[^\p{L}\p{M}\p{N}\p{Pc}\s-]/gu, '')
     .replace(/\s+/g, '-') || FALLBACK_SLUG;
 
-/** 이미 쓴 최종 id를 모두 기억해 'x, x, x-1' 같은 제목에서도 id가 겹치지 않게 한다. */
 function createUniqueIds() {
   const used = new Set();
   return (preferred) => {
@@ -50,7 +41,6 @@ export function articleHastPlugin() {
         if (node.tagName === 'a') {
           if (!EXTERNAL_LINK.test(String(node.properties?.href ?? ''))) return;
           ctx.setProperty(node, 'target', '_blank');
-          // 새 탭이 window.opener로 이 페이지를 조작하지 못하게 한다
           ctx.setProperty(node, 'rel', ['noopener', 'noreferrer']);
           return;
         }

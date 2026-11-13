@@ -21,7 +21,6 @@ const GROUND: Record<Region, readonly PixelPoint[][]> = {
     ],
   ],
   hallway: [
-    // The corridor floor, the tiled entrance between the glass doors and the classroom doorway.
     [
       [0, 1024],
       [0, 700],
@@ -47,7 +46,6 @@ const GROUND: Record<Region, readonly PixelPoint[][]> = {
     ],
   ],
   classroom: [
-    // Floor between the two desk groups, the strip before the board and the back aisle to the door.
     [
       [565, 598],
       [1085, 596],
@@ -74,7 +72,6 @@ const GROUND: Record<Region, readonly PixelPoint[][]> = {
     ],
   ],
   shops: [
-    // Cleared school approach: continuous pavement across the whole left branch.
     [
       [0, 518],
       [130, 540],
@@ -322,7 +319,6 @@ const GROUND: Record<Region, readonly PixelPoint[][]> = {
     ],
   ],
   coast: [
-    // Open harbour junction replaces the old guardrail and shrub bottleneck.
     [
       [240, 599],
       [280, 552],
@@ -614,7 +610,6 @@ const GROUND: Record<Region, readonly PixelPoint[][]> = {
   ],
 };
 
-// Reject distant polygons and edges before doing exact footprint intersections.
 function prepareGeometry(polygons: readonly PixelPoint[][]) {
   return polygons.map((outline) => ({
     outline,
@@ -679,7 +674,6 @@ const FOOT_SAMPLES: readonly PixelPoint[] = [
   [13, 4],
 ];
 
-/** Check the whole footprint, including the middle of concave corners and seams. */
 export function isOnGround(x: number, z: number, region: Region) {
   const scale = Math.max(0.45, Math.min(1, (z - 15) / 70));
   return FOOT_SAMPLES.every(([dx, dy]) => {
@@ -704,7 +698,6 @@ export function isOnGround(x: number, z: number, region: Region) {
   });
 }
 
-/** Check every boundary crossing, including slivers a fixed sampling interval can skip. */
 export function hasGroundBetween(from: Point, to: Point, region: Region): boolean {
   const cuts = [0, 1];
   if (to.z !== from.z)

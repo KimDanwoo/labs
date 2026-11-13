@@ -35,18 +35,13 @@ export const ProfilePage = () => {
     <main className="min-h-svh bg-[rgb(var(--color-surface-secondary))]">
       <SubpageHeader title="프로필" rightAction={<ThemeToggle />} />
 
-      {/* Content */}
       <div className="max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* Profile Card */}
         <ProfileCard user={user} stats={stats} />
 
-        {/* Stats Overview */}
         {stats && !statsLoading && <StatsOverview stats={stats} />}
 
-        {/* Stats by Difficulty */}
         {statsByDifficulty.length > 0 && !statsLoading && <StatsByDifficulty stats={statsByDifficulty} />}
 
-        {/* Recent Games */}
         <RecentGames games={recentGames} isLoading={gamesLoading} error={gamesError} />
       </div>
     </main>

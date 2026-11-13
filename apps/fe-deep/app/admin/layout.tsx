@@ -18,7 +18,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex min-h-screen min-w-[340px] flex-col md:flex-row">
-      {/* Desktop sidebar */}
       <aside className="hidden md:flex w-56 shrink-0 flex-col border-r bg-muted/30 p-4 gap-1 sticky top-0 h-screen overflow-y-auto">
         <div className="flex items-center justify-between mb-3 px-2">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Admin</p>
@@ -42,7 +41,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Mobile header */}
       <header className="md:hidden sticky top-0 z-40 flex items-center justify-between border-b bg-background/95 backdrop-blur px-4 h-12">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Admin</p>
         <div className="flex items-center gap-2">
@@ -53,10 +51,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </header>
 
-      {/* Content */}
       <div className="flex-1 p-4 md:p-6 pb-20 md:pb-6">{children}</div>
 
-      {/* Mobile bottom nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur safe-area-bottom">
         <div className="flex items-center justify-around h-14 min-w-[340px]">
           {navItems.map((item) => {

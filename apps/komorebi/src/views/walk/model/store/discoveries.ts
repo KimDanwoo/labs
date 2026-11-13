@@ -70,7 +70,6 @@ function createDiscoveryStore(storageKey: string, read: () => string[]): Discove
   };
 }
 
-/** One page per place and time of day: the same field reads differently at noon, at dusk and at night. */
 export const pageStores = {
   [TIME.day]: createDiscoveryStore(DAY_PAGE_STORAGE_KEY, () =>
     parseDayPages(localStorage.getItem(DAY_PAGE_STORAGE_KEY), localStorage.getItem(LEGACY_DISCOVERY_STORAGE_KEY)),

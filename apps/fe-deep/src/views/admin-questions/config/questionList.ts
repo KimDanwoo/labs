@@ -3,7 +3,6 @@ import type { Difficulty, QuestionVisibilityField } from '@entities/question';
 export const PAGE_SIZE = 10;
 export const SEARCH_DEBOUNCE_MS = 300;
 
-/** 필터를 걸지 않은 상태. URL에는 싣지 않는다. */
 export const FILTER_ALL = 'all';
 
 export const VISIBILITY_FIELD = {

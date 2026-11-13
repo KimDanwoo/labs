@@ -6,9 +6,6 @@ import { isAdmin } from '@shared/lib/isAdmin';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { useEffect, useMemo, useState } from 'react';
 
-/**
- * Header의 인증 상태와 모바일 메뉴 오픈 상태를 관리한다.
- */
 export function useHeader() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [open, setOpen] = useState(false);

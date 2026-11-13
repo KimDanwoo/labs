@@ -13,7 +13,6 @@ export function ProgressPage() {
       <h1 className="text-3xl font-bold tracking-tight mb-2">학습 현황</h1>
       <p className="text-muted-foreground mb-8">전체 학습 진도를 확인하세요.</p>
 
-      {/* Streak */}
       <Card className="shadow-sm mb-6">
         <Card.Content className="p-5 flex items-center gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-streak/10">
@@ -26,7 +25,6 @@ export function ProgressPage() {
         </Card.Content>
       </Card>
 
-      {/* Study Heatmap */}
       <Card className="mb-8 shadow-sm">
         <Card.Content className="p-6">
           <h2 className="text-sm font-normal mb-4">학습 기록</h2>
@@ -34,7 +32,6 @@ export function ProgressPage() {
         </Card.Content>
       </Card>
 
-      {/* Overview Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 stagger-children">
         <Card className="shadow-sm">
           <Card.Content className="p-5 text-center">
@@ -74,7 +71,6 @@ export function ProgressPage() {
         </Card>
       </div>
 
-      {/* Overall Progress */}
       <Card className="mb-8 shadow-sm">
         <Card.Content className="p-6">
           <div className="flex items-center justify-between mb-3">
@@ -85,7 +81,6 @@ export function ProgressPage() {
         </Card.Content>
       </Card>
 
-      {/* Category Progress */}
       <h2 className="text-xl font-bold tracking-tight mb-4">카테고리별 진도</h2>
       <div className="space-y-3">
         {categories.map((cat) => {

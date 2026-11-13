@@ -78,7 +78,6 @@ export function Scrubber() {
       }}
     >
       <span aria-hidden className="bg-hairline absolute inset-x-0 h-[2px]" />
-      {/* 버퍼된 구간. 다 차면 스스로 사라진다 — 정보가 없는 동안 화면에 선을 하나 더 남기지 않는다. */}
       <span
         aria-hidden
         className="bg-mute absolute inset-x-0 h-[2px] origin-left"

@@ -41,7 +41,6 @@ declare global {
   var aiFeedbackStandby: ClaudeProcess | undefined;
 }
 
-/** 대기 중인 프로세스를 꺼내고, 다음 요청을 위해 새 프로세스를 바로 예열한다. */
 function takeClaude(): ClaudeProcess {
   const standby = globalThis.aiFeedbackStandby;
   globalThis.aiFeedbackStandby = spawnClaude();
@@ -51,7 +50,6 @@ function takeClaude(): ClaudeProcess {
   return spawnClaude();
 }
 
-/** stream-json 한 줄이 최종 결과 이벤트면 그 본문을, 아니면 null을 돌려준다. */
 function readResult(line: string): string | null {
   let event: unknown;
   try {
@@ -104,7 +102,6 @@ function readText(body: object, field: FeedbackField): string | null {
   return typeof value === 'string' && value.length <= MAX_INPUT_LENGTH[field] ? value : null;
 }
 
-/** 요청 본문을 검증한다. 형식·길이가 맞지 않거나 질문·답변이 비어 있으면 null. */
 export function parseFeedbackInput(body: unknown): FeedbackInput | null {
   if (typeof body !== 'object' || body === null) return null;
 
@@ -134,7 +131,6 @@ function buildPrompt({ question, modelAnswer, recall }: FeedbackInput): string {
   ].join('\n');
 }
 
-/** 답변 피드백 3줄을 생성한다. 응답이 비었거나 시간 안에 오지 않으면 거부한다. */
 export async function generateAiFeedback(input: FeedbackInput): Promise<string> {
   const feedback = await runClaude(buildPrompt(input));
   if (!feedback) throw new Error('empty response');

@@ -1,6 +1,5 @@
 import type { StudyTopic } from '../../lib/parseHandbook';
 
-/** 진행 상태 필터 — 단일 선택 */
 export const STUDY_FILTER = {
   all: 'all',
   todo: 'todo',
@@ -10,7 +9,6 @@ export const STUDY_FILTER = {
 
 export type StudyFilter = (typeof STUDY_FILTER)[keyof typeof STUDY_FILTER];
 
-/** 우선순위 티어 — 다중 선택 */
 export const STUDY_TIER = {
   a: 'a',
   b: 'b',
@@ -69,7 +67,6 @@ function isStudyTier(value: string): value is StudyTier {
   return STUDY_TIER_ORDER.some((tier) => tier === value);
 }
 
-/** 빈 값이면 빈 Set — 티어로 좁히지 않는다는 뜻이다. */
 export function parseStudyTiers(raw: string | null): Set<StudyTier> {
   if (!raw) return new Set();
   return new Set(raw.split(TIER_SEPARATOR).filter(isStudyTier));
@@ -91,7 +88,6 @@ export function countByTier(topics: StudyTopic[]): Record<StudyTier, number> {
   return counts;
 }
 
-/** 핸드북 제목이 바뀌어 목록에서 조용히 빠지는 것을 개발 중에 잡는다. */
 function warnMissingTierTitles(topics: StudyTopic[]): void {
   if (process.env.NODE_ENV === 'production') return;
   const titles = new Set(topics.map((topic) => topic.title));

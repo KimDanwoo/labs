@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 
 const IS_DEV = process.env.NODE_ENV === 'development';
 
-/** 로컬 Claude Code로 답변 피드백을 생성하는 dev 전용 API. */
 export async function POST(request: Request) {
   if (!IS_DEV) {
     return NextResponse.json({ error: '로컬 개발 환경에서만 사용할 수 있습니다.' }, { status: 404 });

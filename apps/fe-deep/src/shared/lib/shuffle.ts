@@ -1,4 +1,3 @@
-/** Fisher-Yates 셔플. 원본 배열을 변경하지 않는다. */
 export function shuffleArray<T>(arr: T[]): T[] {
   const result = [...arr];
   for (let i = result.length - 1; i > 0; i--) {

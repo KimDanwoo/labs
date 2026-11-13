@@ -12,7 +12,6 @@ import {
   timerActiveAtom,
 } from './primitives';
 
-/** 보드 숫자 카운트 */
 export const countBoardNumbersAtom = atom(null, (get, set) => {
   const board = get(boardAtom);
   const counts = structuredClone(NUMBER_COUNTS);
@@ -28,7 +27,6 @@ export const countBoardNumbersAtom = atom(null, (get, set) => {
   set(numberCountsAtom, counts);
 });
 
-/** 솔루션 확인 */
 export const checkSolutionAtom = atom(null, (get, set) => {
   const board = get(boardAtom);
   const solution = get(solutionAtom);

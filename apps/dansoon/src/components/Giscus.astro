@@ -1,9 +1,4 @@
 ---
-/**
- * giscus 댓글(GitHub Discussions). 댓글 전용 공개 저장소 KimDanwoo/dansoon-comments에 쌓인다.
- * Announcements 카테고리는 관리자와 giscus만 토론을 만들 수 있어 스팸 글을 막는다.
- * 저장소에 giscus 앱(https://github.com/apps/giscus)이 설치돼 있어야 댓글을 쓸 수 있다.
- */
 const GISCUS = {
   repo: 'KimDanwoo/dansoon-comments',
   repoId: 'R_kgDOVjp52Q',
@@ -45,7 +40,6 @@ const GISCUS = {
   }
 
   document.addEventListener('astro:page-load', mountGiscus);
-  // 사이트 테마를 바꾸면 지금 페이지의 댓글 iframe에도 알린다(한 번만 등록)
   document.addEventListener('themechange', () => {
     const frame = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
     frame?.contentWindow?.postMessage({ giscus: { setConfig: { theme: themeName() } } }, GISCUS_ORIGIN);

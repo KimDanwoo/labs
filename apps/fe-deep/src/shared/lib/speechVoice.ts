@@ -11,7 +11,6 @@ export function subscribePreferredVoice(onChange: () => void): () => void {
   };
 }
 
-/** 빈 문자열이면 자동 선택. */
 export function getPreferredVoiceName(): string {
   try {
     return localStorage.getItem(STORAGE_KEYS.SPEECH_VOICE) ?? '';

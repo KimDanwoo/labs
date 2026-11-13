@@ -11,10 +11,8 @@ const shortDate = new Intl.DateTimeFormat('ko-KR', {
 });
 const yearOnly = new Intl.DateTimeFormat('en-US', { timeZone: TIME_ZONE, year: 'numeric' });
 
-/** 2026년 7월 29일 */
 export const formatLongDate = (date: Date) => longDate.format(date);
 
-/** 2026. 07. 29. → 2026.07.29 */
 export const formatShortDate = (date: Date) => shortDate.format(date).replace(/\.\s?/g, '.').replace(/\.$/, '');
 
 export const yearOf = (date: Date) => Number(yearOnly.format(date));

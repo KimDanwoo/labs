@@ -13,7 +13,6 @@ import {
 import { FISHING_PHASE, type FishingFrame } from './fishing';
 import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
 
-/** Local, bounded movement keeps the companion on the pier, even when the child leaves. */
 export function catPosition(friendship: number, isFishing: boolean): Point {
   if (!isFishing) return { x: PIER_CAT.x - 2, z: PIER_CAT.z };
   const distance = [4, 2.5, 1.5][catBond(friendship).level]!;
@@ -55,7 +54,6 @@ export function createCompanionScene(scene: THREE.Scene, loader?: THREE.TextureL
   }
   const tank = new THREE.Group();
   tank.name = 'home-aquarium';
-  // Stand beside the aquarium rather than covering it with the child sprite.
   tank.position.set(sceneX(HOME_AQUARIUM.x + 4), sceneY(HOME_AQUARIUM.z - 3), 2);
   tank.scale.setScalar(characterScale(HOME_AQUARIUM.z) * CHILD_SIZE);
   scene.add(tank);

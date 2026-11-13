@@ -45,7 +45,7 @@ export const container = {
   '5xl': '64rem',
   '6xl': '72rem',
   '7xl': '80rem',
-  content: '42rem', // 읽기 앱(fe-deep·hub) 본문 폭.
+  content: '42rem',
 } as const;
 
 export type SpacingToken = keyof typeof spacing;

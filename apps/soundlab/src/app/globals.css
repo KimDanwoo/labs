@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 
-/* @tokens/css 가 생성한 디자인 토큰 */
 @import '@tokens/css/theme.css';
 
 @source '../../../../packages/ui/src/**/*.{ts,tsx}';

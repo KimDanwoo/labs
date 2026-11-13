@@ -30,7 +30,6 @@ function loadArtwork(index: number): Promise<HTMLImageElement> {
   return loading;
 }
 
-/** 다음·이전 곡을 미리 받아둔다. 전환 순간 파티클이 흩어진 채 네트워크를 기다리지 않게. */
 function warmNeighbors(index: number) {
   for (const offset of [1, -1]) {
     loadArtwork((index + offset + TRACKS.length) % TRACKS.length).catch(() => undefined);
@@ -55,7 +54,6 @@ function createRendererOrFallback(canvas: HTMLCanvasElement): Renderer | null {
   }
 }
 
-/** 파동 수명. 짧으면 튕기고, 길면 그림이 계속 일렁여 아트워크가 안 읽힌다. */
 const RIPPLE_MS = 900;
 /**
  * 비트 파동은 클릭보다 짧고 약하다. 킥 간격이 실측 평균 538ms인데 클릭 수명(900ms)을 그대로 주면
@@ -65,12 +63,6 @@ const RIPPLE_MS = 900;
  */
 const BEAT_RIPPLE_MS = 480;
 const BEAT_RIPPLE_AMP = 0.7;
-/**
- * 비트 파동이 태어나는 자리 — 액자 안 무작위. 액자 반폭에 이 비율을 곱한 범위에서 고른다.
- * 한 자리에서만 나면 같은 그림이 반복되고, 원점이 매번 다르면 파면이 겹칠 일도 줄어
- * 좌표 접힘 여유가 늘어난다(측정: 클릭+비트 4발 동시에도 도함수 -0.64, 한계 -1).
- * 1에 가까울수록 테두리에서 태어나 반쪽 링이 되니 안쪽으로 물린다.
- */
 const BEAT_RIPPLE_SPREAD = 0.62;
 
 /**
@@ -108,7 +100,6 @@ function claim(x: number, y: number, amp: number, life: number, fromClick: boole
   slot.age = 0;
   slot.amp = amp;
   slot.life = life;
-  // 파동마다 다른 시드 — 셰이더가 전파 속도와 파면 폭을 여기서 흔든다.
   slot.seed = Math.random();
 }
 
@@ -131,14 +122,12 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
   // 투명이 아니라 불투명으로 합성되는데, 이 캔버스는 뷰포트 전체를 덮으므로 body 배경이 통째로 가려진다.
   const [isDead, setIsDead] = useState(false);
 
-  // 전환 상태 기계. 완전히 흩어진 뒤 텍스처를 갈고 다시 모은다.
   const morph = useRef(0.001);
   const want = useRef(0);
   const pending = useRef<number | null>(null);
   const ready = useRef<HTMLImageElement | null>(null);
   const prevMorph = useRef(0);
   const trail = useRef(0);
-  // 비트 파동이 태어날 액자 영역. 셰이더 좌표(캔버스 중심 기준·y 위쪽)로 미리 변환해 둔다.
   const frame = useRef({ x: 0, y: 0, half: 0 });
   const seenBeat = useRef(0);
   const calmRef = useRef(false);
@@ -150,7 +139,6 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
 
     const instance = createRendererOrFallback(node);
     if (!instance) {
-      // WebGL2를 못 쓰거나 셰이더가 안 서면 Stage의 img 폴백이 그대로 남는다.
       setIsDead(true);
       onReady(false);
       return undefined;
@@ -177,8 +165,6 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
     if (slot.parentElement) observer.observe(slot.parentElement);
     window.addEventListener('resize', relayout);
 
-    // 캔버스는 pointer-events-none이라 클릭은 슬롯(아트워크 영역)이 받는다.
-    // 셰이더 좌표계는 캔버스 중심 기준·y 위쪽이므로 그에 맞춰 변환한다.
     const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
     calmRef.current = calm.matches;
     const readCalm = () => {
@@ -201,7 +187,6 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
     };
   }, [onReady, slotRef]);
 
-  // 곡이 바뀌면 흩어짐부터 시작한다.
   useEffect(() => {
     pending.current = index;
     want.current = 0;
@@ -231,12 +216,10 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
       want.current = 1;
     }
 
-    // 트레일은 움직일 때만 남긴다. 집결이 끝나면 감쇠를 0으로 보내 선명해진다.
     const speed = Math.abs(morph.current - prevMorph.current) / Math.max(0.2, step);
     prevMorph.current = morph.current;
     trail.current += (Math.min(1, speed * 140) - trail.current) * 0.14 * step;
 
-    // 비트가 왔으면 액자 안 무작위 자리에서 파동을 쏜다. 세기에 비례한 진폭이라 약한 박은 약하게 퍼진다.
     if (frameState.beatId !== seenBeat.current) {
       seenBeat.current = frameState.beatId;
       if (!shouldReduceMotion) {
@@ -275,7 +258,6 @@ export function ParticleCanvas({ slotRef, onReady }: ParticleCanvasProps) {
       pre: shouldReduceMotion ? 0 : frameState.pre,
       hit: shouldReduceMotion ? 0 : frameState.hit,
       air: shouldReduceMotion ? 0 : frameState.air,
-      // 파동이 살아 있는 동안만 트레일을 얹어 물결이 빛 자국을 남기게 한다. 상한은 무한 번짐 방지.
       decay: Math.min(0.88, trail.current * 0.86 + energy * 0.24),
       ripples: rippleBuffer,
       rippleSeeds: seedBuffer,

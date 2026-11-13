@@ -9,7 +9,6 @@ function usePages(store: DiscoveryStore): readonly string[] {
 
 export type Collection = {
   pages: Record<TimeOfDay, readonly string[]>;
-  /** Places seen at any time of day, in landmark order. */
   visited: string[];
   pageCount: number;
 };

@@ -24,20 +24,13 @@ export const IconButton = ({
   <button
     aria-label={ariaLabel ?? label}
     className={cn(
-      // Layout
       'flex flex-col items-center justify-center gap-1.5',
-      // Sizing - constrained on desktop to fit panel
       'w-full aspect-square',
       'lg:max-w-[72px] xl:max-w-[88px]',
-      // Shape - softer rounded
       'rounded-2xl',
-      // Typography
       'text-xs font-normal tracking-wide',
-      // Transitions
       'transition-all duration-200 ease-out',
-      // Disabled state
       disabled && 'opacity-40 cursor-not-allowed',
-      // Variants
       variant === 'default' && [
         'bg-gradient-to-b from-[rgb(var(--color-bg-tertiary))] to-[rgb(var(--color-surface-tertiary))]',
         'text-[rgb(var(--color-text-secondary))]',
@@ -66,9 +59,7 @@ export const IconButton = ({
         !disabled && 'hover:bg-[rgb(var(--color-hover))] hover:text-[rgb(var(--color-text-primary))]',
         !disabled && 'active:scale-95',
       ],
-      // Focus
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40',
-      // Relative for badge
       'relative',
       className,
     )}

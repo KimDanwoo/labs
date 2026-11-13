@@ -7,7 +7,6 @@ export { Checkbox } from './Checkbox';
 export { Input } from './Input';
 export { ThemeToggle } from './ThemeToggle';
 
-// radix 기반 프리미티브 (fe-deep에서 승격). 서브컴포넌트가 많아 전량 re-export.
 export * from './Accordion';
 export * from './Avatar';
 export * from './DropdownMenu';

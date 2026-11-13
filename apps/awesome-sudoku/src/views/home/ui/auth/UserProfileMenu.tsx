@@ -30,7 +30,6 @@ export const UserProfileMenu = memo(() => {
 
   return (
     <div ref={menuRef} className="relative">
-      {/* Profile Button */}
       <button
         aria-label="프로필 메뉴"
         onClick={() => setIsOpen(!isOpen)}
@@ -62,7 +61,6 @@ export const UserProfileMenu = memo(() => {
         </span>
       </button>
 
-      {/* Dropdown Menu */}
       {isOpen && (
         <div
           className={cn(
@@ -74,13 +72,11 @@ export const UserProfileMenu = memo(() => {
             'z-50',
           )}
         >
-          {/* User Info */}
           <div className="px-3 py-2 border-b border-[rgb(var(--color-border-light))]">
             <p className="text-sm font-normal text-[rgb(var(--color-text-primary))]">{user.displayName}</p>
             <p className="text-xs text-[rgb(var(--color-text-tertiary))] truncate">{user.email}</p>
           </div>
 
-          {/* Menu Items */}
           <div className="py-1">
             <Link
               href="/leaderboard"

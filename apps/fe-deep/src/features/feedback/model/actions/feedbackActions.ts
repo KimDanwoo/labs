@@ -5,7 +5,6 @@ import { createServerSupabaseClient } from '@shared/api/supabaseServer';
 import { requireAdmin } from '@shared/lib/requireAdmin';
 import type { CreateFeedbackInput } from '../types/types';
 
-/** 로그인 사용자의 피드백을 생성한다. */
 export async function createFeedback(input: CreateFeedbackInput) {
   const supabase = await createServerSupabaseClient();
   const {
@@ -27,7 +26,6 @@ export async function createFeedback(input: CreateFeedbackInput) {
   if (error) throw new Error(`피드백 제출 실패: ${error.message}`);
 }
 
-/** 관리자: 모든 피드백을 조회한다. */
 export async function getFeedbacks(status?: string) {
   await requireAdmin();
 
@@ -43,7 +41,6 @@ export async function getFeedbacks(status?: string) {
   return data;
 }
 
-/** 관리자: 피드백 상태를 변경한다. */
 export async function updateFeedbackStatus(id: string, status: string) {
   await requireAdmin();
 

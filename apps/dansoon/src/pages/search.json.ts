@@ -2,7 +2,6 @@ import { formatShortDate } from '~/lib/format';
 import { getPublishedPosts, postPath } from '~/lib/posts';
 import { CATEGORY_LABEL, TAG_LABEL } from '~/lib/taxonomy';
 
-/** 마크다운 기호를 걷어낸 본문. 코드 내용은 검색되도록 남긴다(예: useEffect). */
 function toPlainText(markdown: string) {
   return markdown
     .replace(/^`{3,}.*$/gm, '')

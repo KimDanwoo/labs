@@ -16,14 +16,10 @@ describe('스도쿠 유틸리티 함수 테스트', () => {
 
       shuffleArray(arrayToShuffle);
 
-      // 길이는 동일해야 함
       expect(arrayToShuffle).toHaveLength(originalArray.length);
 
-      // 모든 원소가 보존되어야 함
       expect(arrayToShuffle.sort()).toEqual(originalArray);
 
-      // 원본 배열과 다르게 섞였을 가능성이 높음 (완전히 같을 수도 있지만 매우 낮은 확률)
-      // 여러 번 테스트해서 최소 한 번은 달라야 함
       let isDifferent = false;
       for (let i = 0; i < 10; i++) {
         const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -76,7 +72,7 @@ describe('스도쿠 유틸리티 함수 테스트', () => {
     test('1분 이상을 올바르게 포맷팅해야 한다', () => {
       expect(formatTime(65)).toBe('01:05');
       expect(formatTime(125)).toBe('02:05');
-      expect(formatTime(3661)).toBe('61:01'); // 61분 1초
+      expect(formatTime(3661)).toBe('61:01');
     });
 
     test('긴 시간을 올바르게 포맷팅해야 한다', () => {
@@ -115,7 +111,6 @@ describe('스도쿠 유틸리티 함수 테스트', () => {
     test('각 행과 열이 독립적인 배열이어야 한다', () => {
       const board = createEmptyBoard();
 
-      // 한 셀을 수정해도 다른 셀에 영향을 주지 않아야 함
       cellAt(board, 0, 0).value = 5;
       expect(cellAt(board, 0, 1).value).toBeNull();
       expect(cellAt(board, 1, 0).value).toBeNull();
@@ -167,21 +162,17 @@ describe('스도쿠 유틸리티 함수 테스트', () => {
     test('경계값 위치의 하이라이트를 올바르게 생성해야 한다', () => {
       const highlights = createEmptyHighlights();
 
-      // 첫 번째 셀
       expect(highlights['0-0']).toBeDefined();
 
-      // 마지막 셀
       const lastIndex = BOARD_SIZE - 1;
       expect(highlights[`${lastIndex}-${lastIndex}`]).toBeDefined();
 
-      // 모서리 셀들
       expect(highlights[`0-${lastIndex}`]).toBeDefined();
       expect(highlights[`${lastIndex}-0`]).toBeDefined();
     });
   });
 });
 
-// 통합 테스트
 describe('유틸리티 함수 통합 테스트', () => {
   test('빈 보드와 빈 하이라이트의 크기가 일치해야 한다', () => {
     const board = createEmptyBoard();

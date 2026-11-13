@@ -39,7 +39,6 @@ export const GameResultSheet = memo(() => {
   const snackbar = useSnackbar();
   const { show: showSnackbar } = snackbar;
 
-  // 로그인 상태에서 게임 완료 시 자동 저장
   useEffect(() => {
     if (isCompleted && isSuccess && user) {
       saveRef.current().then((id) => {
@@ -89,7 +88,6 @@ export const GameResultSheet = memo(() => {
               <p className={cn('text-xs animate-pulse', 'text-[rgb(var(--color-text-tertiary))]')}>기록 저장 중...</p>
             )}
 
-            {/* 비로그인 상태: 로그인 유도 */}
             {!user && !isSaving && (
               <div className="space-y-3 pt-2">
                 <p className={cn('text-sm', 'text-[rgb(var(--color-text-secondary))]')}>

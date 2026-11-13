@@ -4,7 +4,6 @@ import { canvasTexture } from './art';
 import { lightSprite } from './nightLights';
 import { sceneX, sceneY } from './perspective';
 
-/** A small coastal fishing boat, painted at high resolution for a soft distant silhouette. */
 function boatTexture(isFerry: boolean) {
   return canvasTexture(512, 256, (c) => {
     const shape = (fill: string, points: number[][]) => {
@@ -22,7 +21,6 @@ function boatTexture(isFerry: boolean) {
       c.stroke();
     };
     c.lineJoin = 'round';
-    // Hull faces and a darker waterline give the boat volume at a small screen size.
     shape('#294d58', [
       [62, 191],
       [444, 179],

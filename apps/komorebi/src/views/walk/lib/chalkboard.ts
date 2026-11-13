@@ -31,7 +31,6 @@ export const roundCoordinate = (value: number) => Math.round(Math.min(1, Math.ma
 export const countPoints = (strokes: readonly ChalkStroke[]) =>
   strokes.reduce((sum, stroke) => sum + stroke.points.length / 2, 0);
 
-/** Whether the pointer has moved far enough from the stroke's last point to keep a new one. */
 export function isFarEnough(points: readonly number[], x: number, y: number) {
   if (points.length < 2) return true;
   return Math.hypot(x - points[points.length - 2]!, (y - points[points.length - 1]!) / ASPECT) >= MIN_POINT_DISTANCE;
@@ -80,13 +79,11 @@ export const canAddPoint = (strokes: readonly ChalkStroke[], draft: readonly num
 function trace(ctx: CanvasRenderingContext2D, points: readonly number[], width: number, height: number, shift = 0) {
   ctx.beginPath();
   ctx.moveTo(points[0]! * width + shift, points[1]! * height - shift);
-  // A single tap still leaves a dot.
   if (points.length === 2) ctx.lineTo(points[0]! * width + shift + 0.01, points[1]! * height - shift);
   for (let i = 2; i < points.length; i += 2) ctx.lineTo(points[i]! * width + shift, points[i + 1]! * height - shift);
   ctx.stroke();
 }
 
-/** Replays strokes in order on a transparent layer, so the eraser reveals the painted slate underneath. */
 export function paintChalk(ctx: CanvasRenderingContext2D, strokes: readonly ChalkStroke[]) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   for (const stroke of strokes) paintStroke(ctx, stroke);
@@ -109,7 +106,6 @@ export function paintStroke(ctx: CanvasRenderingContext2D, stroke: ChalkStroke) 
   ctx.globalAlpha = CHALK_ALPHA;
   ctx.lineWidth = lineWidth;
   trace(ctx, stroke.points, width, height);
-  // A thinner, fainter offset pass gives the dry, uneven edge of real chalk.
   ctx.globalAlpha = GRAIN_ALPHA;
   ctx.lineWidth = lineWidth * 0.55;
   trace(ctx, stroke.points, width, height, lineWidth * 0.3);

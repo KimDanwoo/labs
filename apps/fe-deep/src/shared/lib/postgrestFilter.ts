@@ -10,5 +10,4 @@ const quote = (value: string): string => `"${value.replace(QUOTE_BREAKERS, '\\$&
  */
 export const toContainsPattern = (text: string): string => quote(`%${text.replace(LIKE_WILDCARDS, '\\$&')}%`);
 
-/** `.or()`에 넣는 원소 하나짜리 배열(`tags.cs.${toSingleItemArray(tag)}`). 원소와 배열을 각각 인용한다. */
 export const toSingleItemArray = (item: string): string => quote(`{${quote(item)}}`);

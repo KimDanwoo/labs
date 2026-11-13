@@ -9,7 +9,6 @@ export function StudyHeatmap({ heatmap }: { heatmap: Record<string, number> }) {
     if (v > maxCount) maxCount = v;
   }
 
-  // 데이터가 존재하는 가장 오래된 연도 파악
   const years = Object.keys(heatmap).map((d) => Number(d.slice(0, 4)));
   const minYear = years.length > 0 ? Math.min(...years) : currentYear;
 

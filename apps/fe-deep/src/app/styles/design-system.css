@@ -1,18 +1,4 @@
-/* ══════════════════════════════════════════════════════════
-   Design System — 프딥 (공유 베이스 스킨 + opt-in 확장)
-
-   코어 토큰(primitives·brand·status·surface 계약)은 @tokens/css 가 제공한다.
-   이 파일은 그 위에 프딥 전용만 덧입힌다:
-     · 스킨      : --brand-hue(240, 공유 기본과 동일) + --brand-chroma(차분한 톤) + radius 밀도
-     · 표면 미세 : 배경/카드를 살짝 가라앉힌 gray 표면으로 (읽기 편의)
-     · opt-in    : chart / sidebar / 확장 gray 스텝 / 읽기 타이포 / 이펙트 / 애니메이션
-   ══════════════════════════════════════════════════════════ */
-
-/* ── 1. 스킨 + opt-in primitives ────────────────────────── */
-
 :root {
-  /* 스킨: 공유 브랜드 램프를 프딥 톤으로. hue는 sky 블루(공유 기본과 동일 = 색 통일),
-     채도는 공유 기본(0.8)보다 더 낮춰 장문 읽기에 편한 차분한 파랑으로. */
   --brand-hue: 240;
   --brand-chroma: 0.6;
 
@@ -34,7 +20,6 @@
   --gray-900: oklch(0.12 0.015 264);
   --gray-950: oklch(0.115 0.015 264);
 
-  /* 차트 전용 hue (opt-in). chart-1 은 브랜드를 재사용한다. */
   --teal-500: oklch(0.6 0.118 185);
   --teal-400: oklch(0.696 0.17 162);
   --blue-600: oklch(0.398 0.07 227);
@@ -43,25 +28,20 @@
   --purple-500: oklch(0.627 0.265 304);
   --orange-500: oklch(0.645 0.246 16);
 
-  /* 다크 sidebar 경계용 알파 화이트 */
   --white-10: oklch(1 0.008 264 / 10%);
 
-  /* radius 밀도 (프딥 정체성) */
   --radius: 0.625rem;
 
-  /* 표면 미세조정 — 공유는 순백 배경이지만 프딥은 은은한 gray 배경 + 밝은 카드 */
   --color-background: var(--gray-50);
   --color-card: var(--gray-25);
   --color-popover: var(--gray-25);
 
-  /* Charts (opt-in) */
   --chart-1: var(--color-primary);
   --chart-2: var(--teal-500);
   --chart-3: var(--blue-600);
   --chart-4: var(--yellow-400);
   --chart-5: var(--yellow-500);
 
-  /* Sidebar (opt-in) */
   --sidebar: var(--gray-75);
   --sidebar-foreground: var(--color-foreground);
   --sidebar-primary: var(--color-primary);
@@ -71,12 +51,10 @@
   --sidebar-border: var(--color-border);
   --sidebar-ring: var(--color-ring);
 
-  /* 학습 장식색 — 시맨틱 역할이 아닌 프딥 전용 색. 값은 Tailwind 기본 팔레트와 같다. */
-  --streak: oklch(70.5% 0.213 47.604); /* orange-500 · 연속 학습 불꽃 */
-  --highlight: oklch(79.5% 0.184 86.047); /* yellow-500 · 완료 트로피·북마크 */
-  --study: oklch(62.3% 0.214 259.815); /* blue-500 · 학습한 문제 수 */
+  --streak: oklch(70.5% 0.213 47.604);
+  --highlight: oklch(79.5% 0.184 86.047);
+  --study: oklch(62.3% 0.214 259.815);
 
-  /* 학습 활동 히트맵 단계(1~4) */
   --heat-1: oklch(92.5% 0.084 155.995);
   --heat-2: oklch(87.1% 0.15 154.449);
   --heat-3: oklch(72.3% 0.219 149.579);
@@ -101,8 +79,6 @@
   --heat-3: oklch(72.3% 0.219 149.579);
   --heat-4: oklch(79.2% 0.209 151.711);
 }
-
-/* ── 2. Theme (opt-in 토큰만 Tailwind 유틸로 등록) ──────── */
 
 @theme inline {
   --color-chart-1: var(--chart-1);
@@ -158,9 +134,6 @@
     transform: translateY(0);
   }
 }
-
-/* ── 3. Typography (읽기 타이포 — opt-in) ───────────────── */
-/* tbd = bold (700), tmd = medium (500), trg = regular (400) */
 
 @utility tbd-40 {
   font-size: 40px;
@@ -302,8 +275,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-/* ── 4. Utilities (이펙트 — opt-in) ─────────────────────── */
 
 @utility card-hover {
   border-color: var(--color-border);

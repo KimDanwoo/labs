@@ -33,7 +33,6 @@ type ChildCharacter = {
   dispose: () => void;
 };
 
-/** Body and costume share a pose grid; changing clothes never replaces the character or resets their gait. */
 export function createChild(initialLayers: ChildLayers): ChildCharacter {
   const layers = { body: initialLayers.body, outfit: initialLayers.outfit };
   const bodyPoseOffsets = initialLayers.bodyPoseOffsets ?? {};
@@ -102,7 +101,6 @@ export function createChild(initialLayers: ChildLayers): ChildCharacter {
         });
         frame = nextFrame;
       }
-      // The drawings carry the gait. Only subtle whole-body secondary motion is added.
       materials.forEach((material) => {
         material.rotation = reducedMotion ? 0 : -Math.sin((facing * Math.PI) / 2) * m.run * m.energy * 0.045;
       });
@@ -146,8 +144,6 @@ export function createChild(initialLayers: ChildLayers): ChildCharacter {
         sprite.scale.y *= compression;
       });
     },
-    /** Moonlight on the sprite, so the child sits in the night painting rather than on top of it. */
-    /** Moonlit after dark, warmed by `glow` (0–0.9) where lamplight falls on the child. */
     setLight(darkness: number, glow: number) {
       materials.forEach((material) => lightSprite(material.color, darkness, glow));
     },

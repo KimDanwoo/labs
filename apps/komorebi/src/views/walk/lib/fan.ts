@@ -1,7 +1,3 @@
-/**
- * Each room keeps its painted fan turning. At home a blurred rotor sits behind a stationary guard; the classroom fan
- * stands against a bright window, so its own painted blades are swept around the hub into a translucent disc.
- */
 export const FAN_GLSL = `
   float fanRotor(vec2 q, float phase) {
     float radius = length(q);

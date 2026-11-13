@@ -17,7 +17,6 @@ import {
 import { updateHighlightsAtom } from './selectionAtoms';
 import { countBoardNumbersAtom } from './statusAtoms';
 
-/** 힌트 제공 — 선택한 칸이 비었거나 틀렸으면 그 칸을, 아니면 아직 못 맞힌 칸 중 하나를 채운다 */
 export const getHintAtom = atom(null, (get, set) => {
   if (get(isCompletedAtom)) return;
   const board = get(boardAtom);

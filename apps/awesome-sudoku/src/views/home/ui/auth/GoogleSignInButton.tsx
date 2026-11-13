@@ -22,7 +22,6 @@ export function GoogleSignInButton() {
         'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-[rgb(var(--color-border-light))]',
       )}
     >
-      {/* Hover gradient overlay */}
       <div
         className={cn(
           'absolute inset-0 rounded-2xl bg-gradient-to-r',

@@ -21,7 +21,6 @@ export const GameDetailSheet = memo<GameDetailSheetProps>(({ game, isOpen, onClo
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} title="게임 결과">
       <div className="space-y-4">
-        {/* Point display */}
         <div className="text-center py-4">
           <p className={cn('text-sm', 'text-[rgb(var(--color-text-secondary))]')}>획득 포인트</p>
           <p
@@ -36,7 +35,6 @@ export const GameDetailSheet = memo<GameDetailSheetProps>(({ game, isOpen, onClo
           </p>
         </div>
 
-        {/* Detail rows */}
         <div className={cn('rounded-2xl p-4 space-y-3', 'bg-[rgb(var(--color-bg-tertiary))]')}>
           <DetailRow label="난이도" value={diffLabel} />
           <DetailRow label="모드" value={isKiller ? '킬러' : '클래식'} />

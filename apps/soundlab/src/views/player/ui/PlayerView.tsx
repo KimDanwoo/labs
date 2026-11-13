@@ -23,9 +23,7 @@ import { Stage } from './stage/Stage';
 import { Transport } from './transport/Transport';
 
 type PlayerViewProps = {
-  /** 공유 링크(/t/[id])로 들어왔을 때 시작할 곡. 없으면 첫 곡. */
   initialTrackId?: number;
-  /** 진입 화면. /t/[id]/queue로 들어오면 재생목록부터 보여준다. */
   initialScreen?: PlayerScreen;
 };
 

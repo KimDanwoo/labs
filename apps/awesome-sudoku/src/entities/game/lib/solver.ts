@@ -28,7 +28,6 @@ const colOf = (index: number): number => index % BOARD_SIZE;
 const boxOf = (index: number): number =>
   Math.floor(rowOf(index) / BLOCK_SIZE) * BLOCK_SIZE + Math.floor(colOf(index) / BLOCK_SIZE);
 
-/** 27개 유닛(행 9 · 열 9 · 박스 9)의 셀 인덱스 */
 const UNITS: number[][] = (() => {
   const rows = Array.from({ length: BOARD_SIZE }, (_, r) =>
     Array.from({ length: BOARD_SIZE }, (_, c) => r * BOARD_SIZE + c),
@@ -51,7 +50,6 @@ const ROW_UNITS = UNITS.slice(0, BOARD_SIZE);
 const COL_UNITS = UNITS.slice(BOARD_SIZE, BOARD_SIZE * 2);
 const BOX_UNITS = UNITS.slice(BOARD_SIZE * 2);
 
-/** 셀별 피어(같은 행·열·박스의 나머지 20칸) */
 const PEERS: number[][] = Array.from({ length: SUDOKU_CELL_COUNT }, (_, i) => {
   const peers = new Set<number>();
   for (const unit of [ROW_UNITS[rowOf(i)]!, COL_UNITS[colOf(i)]!, BOX_UNITS[boxOf(i)]!])
@@ -70,9 +68,6 @@ const unflatten = (cells: number[]): Grid => {
   return grid;
 };
 
-// ── 킬러 케이지 제약 ──────────────────────────────────────────
-
-/** (크기, 합)별로 가능한 숫자 조합(비트마스크) 목록. 케이지 하나가 가질 수 있는 숫자 집합은 이 중 하나다. */
 const cageCombosCache = new Map<string, number[]>();
 
 const cageCombos = (size: number, sum: number): number[] => {
@@ -96,7 +91,6 @@ const cageCombos = (size: number, sum: number): number[] => {
 type CageState = {
   combos: number[];
   usedMask: number;
-  /** usedMask → 아직 놓을 수 있는 숫자 마스크 (조합 중 usedMask를 포함하는 것들의 합집합에서 usedMask를 뺀 것) */
   allowedCache: Map<number, number>;
 };
 
@@ -111,15 +105,12 @@ const cageAllowedMask = (cage: CageState): number => {
   return allowed;
 };
 
-// ── 백트래킹 탐색 ─────────────────────────────────────────────
-
 type SearchOptions = {
   limit: number;
   randomize: boolean;
   cages?: KillerCage[];
   /** 방문 노드 상한. 넘기면 exhausted=true로 중단한다 — 힌트가 거의 없는 킬러 판에서 탐색이 폭발하는 것을 막는다. */
   nodeBudget?: number;
-  /** 이 칸에는 이 숫자를 놓지 않는다 — "원래 값이 아닌 다른 해"가 있는지 찾을 때 쓴다 */
   exclude?: { index: number; digit: number };
 };
 
@@ -270,16 +261,11 @@ export function staysUniqueWithout(
   return !exhausted && count === 0;
 }
 
-/**
- * @description 무작위 완성 그리드 생성 — 빈 판을 후보 순서를 섞어 채운다.
- */
 export function generateRandomSolution(): Grid {
   const { solution } = search(flatten(createEmptyGrid()), { limit: 1, randomize: true });
   if (!solution) throw new Error('빈 스도쿠 판을 채우지 못했습니다');
   return unflatten(solution);
 }
-
-// ── 사람 기법 기반 채점 ───────────────────────────────────────
 
 function* combinations<T>(items: T[], size: number, start = 0, acc: T[] = []): Generator<T[]> {
   if (acc.length === size) {
@@ -298,10 +284,8 @@ const UNIT_SUM = 45;
 
 type LogicCage = { cells: number[]; sum: number; combos: number[] };
 
-/** 피시의 기준 줄 하나: 그 줄과, 줄 안에서 숫자가 올 수 있는 칸들. */
 type FishLine = { line: number[]; spots: number[] };
 
-/** 피시를 찾는 두 방향: [기준 줄, 교차 줄]. */
 const FISH_ORIENTATIONS = [
   [ROW_UNITS, COL_UNITS],
   [COL_UNITS, ROW_UNITS],
@@ -310,7 +294,6 @@ const FISH_ORIENTATIONS = [
 const LINE_UNITS = [...ROW_UNITS, ...COL_UNITS];
 const CELL_INDEXES = Array.from({ length: SUDOKU_CELL_COUNT }, (_, i) => i);
 
-/** 45 규칙을 적용할 영역: 유닛 27개 + 인접한 두 줄 + 밴드/스택(세 줄) */
 const REGIONS: number[][] = (() => {
   const pairs = (lines: number[][]): number[][] => lines.slice(0, -1).map((line, k) => [...line, ...lines[k + 1]!]);
   const triples = (lines: number[][]): number[][] =>
@@ -318,10 +301,6 @@ const REGIONS: number[][] = (() => {
   return [...UNITS, ...pairs(ROW_UNITS), ...pairs(COL_UNITS), ...triples(ROW_UNITS), ...triples(COL_UNITS)];
 })();
 
-/**
- * @description 퍼즐을 사람 기법으로 푼다. 싱글(네이키드·히든) → 락드 캔디데이트 → 네이키드 서브셋(2~4) 순으로 시도하고,
- * 어느 것도 진전이 없으면 GUESS(추측 필요)로 멈춘다. grid는 그 시점까지 놓인 값(0은 빈 칸).
- */
 export function solveLogically(grid: Grid, cages: KillerCage[] = []): { technique: Technique; grid: Grid } {
   const cells = flatten(grid);
   const cands = new Array<number>(SUDOKU_CELL_COUNT).fill(ALL_DIGITS);
@@ -382,7 +361,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** container 안에서 d가 한 crossing에 갇혀 있으면, 그 crossing의 container 밖 칸에서 d를 지운다. */
   const eliminateConfined = (containers: number[][], crossings: number[][], d: number): boolean => {
     let progressed = false;
     for (const container of containers) {
@@ -396,7 +374,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** 박스 안에서 한 줄에 갇힌 숫자는 그 줄의 다른 박스에서 지우고(pointing), 줄 안에서 한 박스에 갇힌 숫자는 그 박스의 다른 줄에서 지운다(claiming). */
   const lockedCandidates = (): boolean => {
     let progressed = false;
     for (let d = 1; d <= BOARD_SIZE; d++) {
@@ -406,7 +383,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** 유닛 안의 k칸이 정확히 k개 후보만 공유하면 나머지 칸에서 그 후보를 지운다. */
   const nakedSubsets = (): boolean => {
     let progressed = false;
     for (const unit of UNITS) {
@@ -423,7 +399,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** 유닛 안에서 k개 숫자가 정확히 k칸에만 올 수 있으면 그 칸들의 다른 후보를 지운다. */
   const hiddenSubsets = (): boolean => {
     let progressed = false;
     for (const unit of UNITS) {
@@ -441,7 +416,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** 고른 기준 줄들의 후보가 같은 수의 교차 줄에만 놓였으면, 그 교차 줄의 나머지 칸에서 d를 지운다. */
   const eliminateFish = (chosen: FishLine[], covers: readonly number[][], d: number): boolean => {
     const coverIndexes = new Set(chosen.flatMap(({ line, spots }) => spots.map((i) => line.indexOf(i))));
     if (coverIndexes.size !== chosen.length) return false;
@@ -450,7 +424,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return eliminate(targets, bit(d));
   };
 
-  /** 한 방향·한 숫자의 피시. 기준 줄 후보는 제거를 시작하기 전에 한 번만 고른다. */
   const fishForDigit = (bases: readonly number[][], covers: readonly number[][], d: number): boolean => {
     const candidateLines: FishLine[] = bases
       .map((line) => ({ line, spots: openSpots(line, d) }))
@@ -465,7 +438,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** X-Wing(2)·Swordfish(3): 숫자 d가 k개 줄에서 합쳐 k개 칸(교차 줄)에만 오면 그 교차 줄의 다른 칸에서 d를 지운다. */
   const fish = (): boolean => {
     let progressed = false;
     for (const [bases, covers] of FISH_ORIENTATIONS) {
@@ -476,7 +448,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** XY-Wing: 후보 {x,y} 피벗과 그것을 보는 {x,z}·{y,z} 두 날개가 있으면, 두 날개를 모두 보는 칸에서 z를 지운다. */
   const xyWing = (): boolean => {
     let progressed = false;
     const bivalue = (i: number): boolean => cells[i] === EMPTY && popcount(cands[i]!) === 2;
@@ -496,7 +467,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** XYZ-Wing: 후보 {x,y,z} 피벗과 그것을 보는 {x,z}·{y,z} 두 날개가 있으면, 셋을 모두 보는 칸에서 z를 지운다. */
   const xyzWing = (): boolean => {
     let progressed = false;
     for (let pivot = 0; pivot < SUDOKU_CELL_COUNT; pivot++) {
@@ -518,7 +488,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** 숫자 d가 정확히 두 칸에만 오는 유닛마다 그 두 칸을 잇는다(강한 연결). */
   const strongLinks = (d: number): Map<number, number[]> => {
     const links = new Map<number, number[]>();
     for (const unit of UNITS) {
@@ -531,7 +500,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return links;
   };
 
-  /** start에서 이어진 칸들을 두 색으로 번갈아 칠하고, 칠한 칸들을 돌려준다. */
   const paintCluster = (start: number, links: Map<number, number[]>, color: Map<number, number>): number[] => {
     const cluster: number[] = [];
     const stack = [start];
@@ -550,7 +518,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
 
   const seesAny = (i: number, group: number[]): boolean => group.some((j) => PEERS[i]!.includes(j));
 
-  /** 같은 색끼리 서로 보이면 그 색은 거짓이라 통째로 지우고, 아니면 두 색을 모두 보는 바깥 칸에서 지운다. */
   const eliminateByColors = (cluster: number[], color: Map<number, number>, d: number): boolean => {
     const byColor = [cluster.filter((i) => color.get(i) === 0), cluster.filter((i) => color.get(i) === 1)];
     const falseColor = byColor.findIndex((group) => group.some((i, k) => seesAny(i, group.slice(k + 1))));
@@ -562,11 +529,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return eliminate(targets, bit(d));
   };
 
-  /**
-   * 단일 숫자 컬러링: 어떤 숫자가 정확히 두 칸에만 오는 유닛들을 강한 연결로 이어 두 색으로 칠한다.
-   * 같은 색 두 칸이 한 유닛에 있으면 그 색은 거짓, 두 색을 모두 보는 칸에서는 그 숫자를 지운다.
-   * (Skyscraper · 2-String Kite · Turbot Fish를 포괄한다)
-   */
   const simpleColoring = (): boolean => {
     let progressed = false;
     for (let d = 1; d <= BOARD_SIZE; d++) {
@@ -582,9 +544,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  // ── 킬러 기법 ──
-
-  /** 케이지의 남은 칸에 실제로 놓을 수 있는 조합들(놓인 숫자를 포함하고, 남은 숫자마다 갈 칸이 있는 것) */
   const feasibleCombos = (cage: LogicCage): { placed: number; remaining: number[]; empty: number[] } => {
     const empty = cage.cells.filter((i) => cells[i] === EMPTY);
     const placed = cage.cells.reduce((m, i) => (cells[i] === EMPTY ? m : m | bit(cells[i]!)), 0);
@@ -596,7 +555,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return { placed, remaining, empty };
   };
 
-  /** 케이지 조합: 어느 조합에도 없는 숫자를 지우고, 모든 조합에 있는 숫자가 한 칸에만 올 수 있으면 놓는다. */
   const cageCombinations = (): boolean => {
     let progressed = false;
     for (const cage of cageInfos) {
@@ -616,7 +574,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** 케이지 잠금: 케이지의 남은 칸이 한 유닛 안에 있으면, 반드시 들어가는 숫자를 그 유닛의 다른 칸에서 지운다. */
   const cageLocked = (): boolean => {
     let progressed = false;
     for (const cage of cageInfos) {
@@ -636,7 +593,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return progressed;
   };
 
-  /** 두 칸의 합이 S로 정해졌을 때 짝이 없는 후보를 지운다 */
   const restrictPairSum = ([a, b]: number[], sum: number): boolean => {
     const seeEachOther = PEERS[a!]!.includes(b!);
     const fits = (partner: number, d: number): boolean => {
@@ -650,7 +606,6 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
     return eliminate([a!], ALL_DIGITS & ~maskA) || eliminate([b!], ALL_DIGITS & ~maskB);
   };
 
-  /** 정해진 합 S를 미지의 칸들이 채워야 할 때: 1칸이면 놓고, 2칸이면 짝을 제한한다 */
   const applyKnownSum = (unknown: number[], sum: number): boolean => {
     if (unknown.length === 1) {
       const i = unknown[0]!;
@@ -710,7 +665,4 @@ export function solveLogically(grid: Grid, cages: KillerCage[] = []): { techniqu
   return { technique: hardest, grid: unflatten(cells) };
 }
 
-/**
- * @description 퍼즐을 푸는 데 필요한 최고 기법
- */
 export const gradePuzzle = (grid: Grid, cages: KillerCage[] = []): Technique => solveLogically(grid, cages).technique;

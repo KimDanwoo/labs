@@ -1,4 +1,3 @@
-// Cell types (merged from entities/cell)
 export interface SudokuCell {
   value: number | null;
   isInitial: boolean;
@@ -21,7 +20,6 @@ export interface CellHighlight {
   sameValue: boolean;
 }
 
-// Board types
 export type Grid = number[][];
 export type GridPosition = [row: number, col: number];
 export type SudokuBoard = SudokuCell[][];

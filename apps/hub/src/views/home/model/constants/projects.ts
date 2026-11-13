@@ -1,6 +1,5 @@
 import type { Project } from '../types/project';
 
-/** 소개할 내 프로젝트(Labs) 목록. 새 프로젝트는 여기에 추가한다. */
 export const PROJECTS: Project[] = [
   {
     title: '청연사주',

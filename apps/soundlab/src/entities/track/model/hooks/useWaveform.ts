@@ -18,10 +18,8 @@ import type { Track } from '../types/track';
  * 실측: `새벽`의 파티클 확대 폭이 0.29%p(반경 1.3px)였다. 그래서 곡별 백분위로 다시 편다.
  */
 
-/** 재매핑 기준. p10 아래는 0, p95 위는 1로 눕힌다. */
 const FLOOR_PERCENTILE = 0.1;
 const CEIL_PERCENTILE = 0.95;
-/** swell 창 길이. 프레이즈 하나가 들어가는 크기. */
 const SWELL_WINDOW_MS = 4000;
 /**
  * 악센트로 삼을 피크 수와 최소 간격(곡 길이 비율). 간격이 없으면 한 절정에서 세 번 터진다.
@@ -30,10 +28,8 @@ const SWELL_WINDOW_MS = 4000;
  */
 const PEAK_COUNT = 3;
 const PEAK_GAP_RATIO = 1 / 5;
-/** 피크 앞의 들이쉼과 뒤의 릴리스. */
 const PRE_MS = 300;
 const HIT_MS = 900;
-/** 프레임 스무딩. level·bass·air는 따라붙고 swell은 느리게 흐른다. */
 const LEVEL_SMOOTHING = 0.12;
 const SWELL_SMOOTHING = 0.04;
 /**
@@ -47,23 +43,18 @@ const BEAT_RELEASE_MS = 220;
 const BEAT_STALE_MS = 150;
 
 type Signals = {
-  /** 초당 샘플 수. 두 출처의 해상도가 달라 인덱싱은 절대 시각으로 한다. */
   fps: number;
-  /** 0–1. 원곡 분석이면 중역, 폴백이면 재매핑된 진폭. */
   level: Float32Array;
   swell: Float32Array;
-  /** 원곡 분석에서만 채워진다. */
   bass: Float32Array | null;
   air: Float32Array | null;
   peakMs: number[];
-  /** [시각ms, 세기 0–255]. 격자를 못 찾은 곡은 빈 배열. */
   beats: readonly (readonly [number, number])[];
 };
 
 const percentile = (sorted: Float32Array, ratio: number) =>
   sorted[Math.min(sorted.length - 1, Math.floor(ratio * sorted.length))] ?? 0;
 
-/** 창 안의 평균을 누적합으로 한 번에 낸다 — 곡마다 수천 샘플이라 O(n)이면 체감이 없다. */
 function movingAverage(values: Float32Array, window: number) {
   const out = new Float32Array(values.length);
   const sums = new Float64Array(values.length + 1);
@@ -91,7 +82,6 @@ function pickPeaks(swell: Float32Array, msPerSample: number) {
   return picked.sort((a, b) => a - b).map((index) => index * msPerSample);
 }
 
-/** 포화된 진폭을 곡별 백분위로 다시 편다. */
 function remap(raw: Float32Array) {
   const sorted = Float32Array.from(raw).sort();
   const floor = percentile(sorted, FLOOR_PERCENTILE);
@@ -110,7 +100,6 @@ function deriveSignals(raw: Float32Array, durationMs: number): Signals {
   return withDerived(remap(raw), fps, { bass: null, air: null, beats: [] });
 }
 
-/** 피크 앞에서 차오르고(pre) 피크를 지나며 풀린다(hit). 릴리스는 제곱으로 떨어져 꼬리가 남는다. */
 function accentAt(peakMs: readonly number[], nowMs: number) {
   let pre = 0;
   let hit = 0;
@@ -125,7 +114,6 @@ function accentAt(peakMs: readonly number[], nowMs: number) {
 const cache = new Map<number, Signals>();
 const inFlight = new Map<number, Promise<void>>();
 
-/** 원곡 분석 신호를 먼저 찾고, 없으면 사클 파형으로 떨어진다. */
 async function load(track: Track): Promise<Signals> {
   const bands = await fetchBands(track.id, track.durationMs).catch(() => null);
   if (bands) {
@@ -143,7 +131,6 @@ function warm(track: Track | undefined): Promise<void> {
     .then((signals) => {
       cache.set(track.id, signals);
     })
-    // 신호가 없으면 전부 0으로 남아 정적 렌더로 degrade한다. 화면이 멈추지는 않는다.
     .catch(() => undefined)
     .finally(() => inFlight.delete(track.id));
 
@@ -158,7 +145,6 @@ function warm(track: Track | undefined): Promise<void> {
 export function useWaveform(track: Track | undefined, next: Track | undefined, isPlaying: boolean) {
   const signals = useRef<Signals | null>(null);
   const playing = useRef(isPlaying);
-  // 비트 임펄스의 잔향과, 다음에 넘을 격자선 위치. 되감으면 다시 찾는다.
   const beat = useRef({ value: 0, cursor: 0, atMs: 0 });
 
   useEffect(() => {
@@ -198,13 +184,11 @@ export function useWaveform(track: Track | undefined, next: Track | undefined, i
     }
 
     const index = Math.min(data.level.length - 1, Math.max(0, Math.floor((nowMs / 1000) * data.fps)));
-    // 진폭을 그대로 쓰면 반짝임이 노이즈로 읽힌다. 완만하게 따라가게 한다.
     frameState.level += ((data.level[index] ?? 0) - frameState.level) * LEVEL_SMOOTHING * step;
     frameState.swell += ((data.swell[index] ?? 0) - frameState.swell) * SWELL_SMOOTHING * step;
     frameState.bass += ((data.bass?.[index] ?? 0) - frameState.bass) * LEVEL_SMOOTHING * step;
     frameState.air += ((data.air?.[index] ?? 0) - frameState.air) * LEVEL_SMOOTHING * step;
 
-    // 되감거나 곡을 옮겼으면 격자 커서를 다시 잡는다.
     if (nowMs < beat.current.atMs) {
       beat.current.cursor = data.beats.findIndex(([ms]) => ms >= nowMs);
       if (beat.current.cursor < 0) beat.current.cursor = data.beats.length;
@@ -223,7 +207,6 @@ export function useWaveform(track: Track | undefined, next: Track | undefined, i
       }
       beat.current.cursor++;
     }
-    // 사건을 카운터로 알린다 — 무대가 이걸 보고 파동을 쏜다.
     if (struck > 0) {
       frameState.beatStrength = struck;
       frameState.beatId++;

@@ -22,7 +22,6 @@ function paintSign(c: CanvasRenderingContext2D, text: string) {
   c.fillText(text, 160, 38);
 }
 
-/** Quiet direction signs; the road boundary, not the sign, triggers travel. */
 export function createPortals(scene: THREE.Scene) {
   const entries = (Object.keys(WORLDS) as Region[]).flatMap((region) =>
     getWorldPortals(region).map((portal) => {

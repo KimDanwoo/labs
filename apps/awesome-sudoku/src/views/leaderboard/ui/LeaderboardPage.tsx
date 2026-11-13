@@ -42,9 +42,7 @@ export const LeaderboardPage = () => {
     <main className={cn('min-h-svh', 'bg-[rgb(var(--color-surface-secondary))]')}>
       <SubpageHeader title="랭킹" rightAction={<ThemeToggle />} />
 
-      {/* Content */}
       <div className={cn('max-w-5xl xl:max-w-6xl mx-auto', 'px-4 sm:px-6 py-6')}>
-        {/* Tab Switcher */}
         <div className={cn('flex gap-1 mb-6 p-1 rounded-xl', 'bg-[rgb(var(--color-bg-tertiary))]')}>
           {tabs.map((t) => (
             <button
@@ -64,7 +62,6 @@ export const LeaderboardPage = () => {
           ))}
         </div>
 
-        {/* Filters (best tab only) */}
         {tab === 'best' && (
           <LeaderboardFilters
             difficulty={difficulty}
@@ -74,7 +71,6 @@ export const LeaderboardPage = () => {
           />
         )}
 
-        {/* Leaderboard Card */}
         <div
           className={cn(
             'bg-[rgb(var(--color-surface-primary))]',

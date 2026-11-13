@@ -12,7 +12,6 @@ export const SCENERY_STYLE = {
   hallway: 8,
 } satisfies Record<Region, number>;
 
-/** Local, feathered movement in painting coordinates; walls, paths and furniture stay rigid. */
 export const BREEZE_GLSL = `
   uniform float sceneryStyle;
   uniform float sceneryTime;

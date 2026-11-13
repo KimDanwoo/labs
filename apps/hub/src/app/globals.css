@@ -1,37 +1,27 @@
 @import 'tailwindcss';
 
-/* @tokens/css 가 생성한 디자인 토큰 (색상/폰트/여백 + 다크모드 변수) */
 @import '@tokens/css/theme.css';
 
-/* 모노레포 공통 UI 패키지의 클래스도 스캔 대상에 포함 */
 @source '../../../../packages/ui/src/**/*.{ts,tsx}';
 
-/* ─── Hub 전용 CSS 커스텀 프로퍼티 ───────────────────────────── */
 :root {
   --font-display: var(--font-sans);
 }
 
-/* ─── Body / Background ──────────────────────────────────────── */
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
-  /* 한글이 글자 단위로 끊기지 않고 단어(어절) 단위로 줄바꿈되게 한다. */
   word-break: keep-all;
-  /* 끊을 수 없는 긴 토큰(URL 등)은 넘치지 않게 줄바꿈 허용. */
   overflow-wrap: anywhere;
   /* 히어로 글로우가 떠다니며 좁은 화면에서 가로 스크롤을 만들지 않게 뷰포트에서만 자른다. */
   overflow-x: clip;
 }
 
-/* ─── 디스플레이 타이포그래피 ─────────────────────────────────── */
 .font-display {
   font-family: var(--font-display);
 }
 
-/* ─── 애니메이션 ─────────────────────────────────────────────── */
-
-/* 기본 페이드업 */
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -58,7 +48,6 @@ body {
   animation: glow-drift 14s ease-in-out infinite;
 }
 
-/* 헤드라인 단어별 등장 — 흐릿하게 떠올라 선명해진다 */
 @keyframes word-in {
   from {
     opacity: 0;
@@ -77,7 +66,6 @@ body {
   animation: word-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* 강조 단어 — 그라데이션이 천천히 흐른다 */
 @keyframes text-flow {
   to {
     background-position: 100% 50%;
@@ -99,7 +87,6 @@ body {
   animation: text-flow 6s ease-in-out infinite alternate;
 }
 
-/* ─── 프로젝트 카드: 커서 스포트라이트 · 3D 틸트 · 회전 테두리 ─── */
 @property --border-angle {
   syntax: '<angle>';
   inherits: false;
@@ -146,7 +133,6 @@ body {
   transition: opacity 0.3s ease-out;
 }
 
-/* 커서를 따라다니는 표면 조명 */
 .spotlight-card::before {
   background: radial-gradient(
     var(--spotlight-radius) circle at var(--mx) var(--my),
@@ -155,7 +141,6 @@ body {
   );
 }
 
-/* 테두리만 남기도록 마스크한 회전 conic 그라데이션 */
 .spotlight-card::after {
   padding: 1px;
   background: conic-gradient(
@@ -182,7 +167,6 @@ body {
   animation: border-spin 3s linear infinite;
 }
 
-/* 커버는 기울기 반대로 움직여 깊이감을 만든다 */
 .spotlight-cover {
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -195,7 +179,6 @@ body {
   animation: fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* ─── 스크롤 연동 (지원 브라우저만, 미지원은 로드 시 fade-up 유지) ─── */
 @keyframes reveal-up {
   from {
     opacity: 0;
@@ -228,7 +211,6 @@ body {
     animation: reveal-up linear both;
     animation-timeline: view();
     animation-range: entry 0% cover 30%;
-    /* 로드용 스태거 지연(인라인)은 스크롤 타임라인에선 의미가 없어 무력화한다 */
     animation-delay: 0s !important;
   }
 
@@ -245,7 +227,6 @@ body {
   }
 }
 
-/* ─── 접근성 ─────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .fade-up,
   .hero-glow,

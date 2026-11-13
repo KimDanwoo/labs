@@ -12,7 +12,6 @@ export function wakeFromSleep(current: VillageDay, random: number): VillageDay {
   return { day: current.day + (current.time === TIME.night ? 1 : 0), time, weather: weatherAfterRest(random) };
 }
 
-/** Showers pass through on their own; clear stretches are longer than rainy ones. */
 export function weatherDelay(weather: Weather, random: number) {
   return weather === WEATHER.rain ? 45_000 + random * 45_000 : 100_000 + random * 100_000;
 }

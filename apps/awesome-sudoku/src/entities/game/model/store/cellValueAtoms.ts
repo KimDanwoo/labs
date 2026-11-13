@@ -30,7 +30,6 @@ import { deselectCellAtom, updateHighlightsAtom } from './selectionAtoms';
 import { countBoardNumbersAtom } from './statusAtoms';
 import { toggleTimerAtom } from './timerAtoms';
 
-/** 선택된 셀에 값 입력 */
 export const fillCellAtom = atom(null, (get, set, value: number | null) => {
   if (get(isCompletedAtom)) return;
   const board = get(boardAtom);
@@ -80,7 +79,6 @@ export const fillCellAtom = atom(null, (get, set, value: number | null) => {
   set(updateHighlightsAtom, { row, col });
 });
 
-/** 노트 토글 */
 export const toggleNoteAtom = atom(null, (get, set, value: number) => {
   if (get(isCompletedAtom)) return;
   const board = get(boardAtom);
@@ -104,12 +102,10 @@ export const toggleNoteAtom = atom(null, (get, set, value: number) => {
   set(boardAtom, newBoard);
 });
 
-/** 노트 모드 토글 */
 export const toggleNoteModeAtom = atom(null, (get, set) => {
   set(isNoteModeAtom, !get(isNoteModeAtom));
 });
 
-/** 사용자 입력 초기화 (초기 셀 유지) */
 export const resetUserInputsAtom = atom(null, (get, set) => {
   const board = get(boardAtom);
   const highlightedCells = get(highlightedCellsAtom);

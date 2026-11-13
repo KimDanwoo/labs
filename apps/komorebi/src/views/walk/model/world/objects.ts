@@ -8,7 +8,6 @@ type WorldObject = {
   outline: [number, number][];
 };
 
-/** Separate the solid base from the visible silhouette of each painted object. */
 export const WORLD_OBJECTS: WorldObject[] = [
   {
     id: 'home-futon',

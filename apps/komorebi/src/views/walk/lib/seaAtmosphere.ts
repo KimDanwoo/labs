@@ -1,4 +1,3 @@
-/** Slow life across the whole sea, designed by Codex: a low swell of light, drifting cloud shadows and rings off the moored boat. */
 export const SEA_ATMOSPHERE_GLSL = /* glsl */ `
   float seaHash(vec2 p) {
     vec3 q = fract(vec3(p.xyx) * .1031);

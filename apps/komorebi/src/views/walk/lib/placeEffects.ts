@@ -32,7 +32,6 @@ function spray(at: Point, count: number, mote: (i: number, origin: THREE.Vector2
   return Array.from({ length: count }, (_, i) => mote(i, origin));
 }
 
-/** What each place does when its little action plays: stone rings on water, drifting leaves, rising sparkles. */
 const BURSTS = {
   [PLACE_ACTION.skip]: () => ({
     motes: [],
@@ -100,7 +99,6 @@ function sparkle(at: Point, color: string): Burst {
 
 const RING_LIFE = 0.9;
 
-/** Short-lived scenery reactions in pooled sprites; only one action plays at a time. */
 export function createPlaceEffects(scene: THREE.Scene) {
   const ringTexture = canvasTexture(64, 64, (c) => {
     c.strokeStyle = '#f4ffff';
@@ -139,7 +137,6 @@ export function createPlaceEffects(scene: THREE.Scene) {
     Math.max(0, ...b.rings.map((ring) => ring.delay + RING_LIFE), ...b.motes.map((mote) => mote.delay + mote.life));
 
   return {
-    /** Returns false while an earlier action is still playing. */
     play(kind: PlaceAction, at: Point) {
       if (burst) return false;
       burst = BURSTS[kind](at);
@@ -184,7 +181,6 @@ export function createPlaceEffects(scene: THREE.Scene) {
         hideAll();
       }
     },
-    /** Region changes and resets drop whatever was playing. */
     clear() {
       burst = null;
       hideAll();

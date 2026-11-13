@@ -4,7 +4,6 @@ import { canvasTexture } from './art';
 import { lightSprite } from './nightLights';
 import { sceneX, sceneY } from './perspective';
 
-// Sparse leaves start beside actual trees, rather than raining over the entire screen.
 const SOURCES: Record<Region, readonly [number, number][]> = {
   home: [],
   hallway: [],
@@ -78,7 +77,6 @@ export function createDriftingLeaves(scene: THREE.Scene) {
         if (!sprite.visible) return;
         const source = sources[Math.floor(i / 2)]!;
         const cycle = (clock / period + phase) % 1;
-        // A long quiet interval separates each fall, and the endpoints fade away.
         const progress = cycle / 0.68;
         sprite.visible = progress < 1;
         if (!sprite.visible) return;

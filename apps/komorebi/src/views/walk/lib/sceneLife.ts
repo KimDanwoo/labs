@@ -12,7 +12,6 @@ const CAT_SPOT = { region: 'village' as Region, x: 14.5, z: 35.5 };
 const INSECT = { butterfly: 'butterfly', dragonfly: 'dragonfly' } as const;
 type Insect = (typeof INSECT)[keyof typeof INSECT];
 
-/** A patch of the painting an insect keeps to, with how many may live there. */
 type Patch = { kind: Insect; bounds: Bounds; count: [number, number] };
 const patch = (
   kind: Insect,
@@ -49,21 +48,16 @@ const GULL_PATHS: Partial<Record<Region, { x: number; z: number; spread: number 
   ],
 };
 
-/** Painted sprite sheets, one creature or flap pose per equal cell; `aspect` is a cell's width over its height. */
 const ATLAS = {
   butterfly: { url: '/art/butterflies.webp', frames: 4, aspect: 160 / 128 },
   dragonfly: { url: '/art/dragonflies.webp', frames: 4, aspect: 160 / 128 },
   gull: { url: '/art/gull.webp', frames: 3, aspect: 256 / 128 },
 } as const;
 type Flyer = keyof typeof ATLAS;
-/** Gull wing poses in order through one wingbeat: up, level, down, level. */
 const WINGBEAT = [0, 1, 2, 1];
 
 const SIZE = { butterfly: 2.9, dragonfly: 3.4, gull: 2.6 };
-/** Height above the painted ground, in scene units, while flying and while settled. */
-/** Darkness over which flyers fade out and head home, rather than vanishing all at once. */
 const DUSK = [0.25, 0.55] as const;
-/** How quickly an insect drops to its perch or rises off it (higher is quicker). */
 const LANDING_EASE = 8;
 const ALTITUDE = { butterfly: [1.6, 0.5], dragonfly: [3.4, 1.2] } satisfies Record<Insect, [number, number]>;
 
@@ -77,27 +71,18 @@ type Life = {
   material: THREE.SpriteMaterial;
   size: number;
   bob: number;
-  /** Height above the ground right now, eased toward the flying or settled height. */
   lift: number;
-  /** 1 in the air, 0 on a perch, eased between so the hovering bob fades rather than snaps. */
   aloft: number;
-  /** Time not yet spent on a whole flight step. */
   clock: number;
 };
 
 const between = (min: number, max: number) => min + Math.random() * (max - min);
 
-/**
- * Small life in each painting: butterflies that wander and settle, dragonflies that hover and dart, gulls over
- * the sea and a sleeping cat. Colours, numbers and sizes vary per visit. Flyers rest at night, in rain and with
- * reduced motion, and never wake the 60 fps budget.
- */
 export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader) {
   const sheets: THREE.Texture[] = [];
   const cells: THREE.Texture[] = [];
   const waiting: { kind: Flyer; frame: number; material: THREE.SpriteMaterial }[] = [];
   let isDisposed = false;
-  /** A sprite showing one cell of its sheet; it stays hidden until the sheet has loaded. */
   const sprite = (kind: Flyer, frame: number) => {
     const material = new THREE.SpriteMaterial({ transparent: true, depthTest: false });
     const created = new THREE.Sprite(material);
@@ -141,7 +126,6 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
     })),
   );
 
-  // Creatures are a nicety: if a sheet fails to load the walk simply goes on without them.
   (Object.keys(ATLAS) as Flyer[]).forEach((kind) => {
     loader
       .loadAsync(ATLAS[kind].url)
@@ -172,7 +156,6 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
   let catTexture: THREE.Texture | null = null;
   let catWidth = 0;
   let catAspect = 1;
-  // The cat is a nicety: if its picture fails to load the walk simply goes on without it.
   loader
     .loadAsync(CAT_URL)
     .then((texture) => {

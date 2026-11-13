@@ -61,7 +61,6 @@ export const SudokuLoader = memo<SudokuLoaderProps>(({ size = 'md', className })
           </div>
         ))}
 
-        {/* Grid lines overlay */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{

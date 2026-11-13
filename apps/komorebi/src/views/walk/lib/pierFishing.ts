@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { catchCelebration, catchHeart } from './catchCelebration';
 import { CAST_SECONDS, FISH, FISHING_PHASE, FISH_RARITY, FISH_SHAPE, isRareFish, type FishingFrame } from './fishing';
 
-/** Fishing tackle lives in the same scene and perspective as the child's hands. */
 export function createPierFishing(scene: THREE.Scene) {
   const group = new THREE.Group();
   group.name = 'pier-fishing';

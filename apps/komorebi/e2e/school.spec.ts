@@ -116,7 +116,6 @@ for (const screen of [
     const bounds = await canvas.boundingBox();
     expect(bounds).not.toBeNull();
     if (!bounds) return;
-    // The reduced-motion camera is settled at the school entrance; Haru stands on the left of the painting.
     await canvas.click({ position: { x: bounds.width * 0.16, y: bounds.height * 0.75 } });
     await expect(page.locator('.interact')).toContainText('친구에게 인사하기', { timeout: 15_000 });
     await page.keyboard.press('KeyE');

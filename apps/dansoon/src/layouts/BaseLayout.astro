@@ -96,14 +96,12 @@ const imageUrl = new URL(image, Astro.site).href;
         aria-label="사이트 탐색"
         class="hidden h-dvh flex-col border-r border-border bg-secondary-subtle lg:flex"
       >
-        <!-- 브랜드·검색과 푸터는 고정하고 목록만 스크롤한다. 스크롤바 라이브러리는 안쪽 요소에 붙인다 -->
         <SidebarHeader />
         <div data-sidebar class="min-h-0 flex-1 overflow-y-auto">
           <AppSidebar posts={posts} />
         </div>
         <SidebarFooter />
       </aside>
-      <!-- 데스크톱에서는 본문 영역이 스크롤 주체다(사이드바와 스크롤이 섞이지 않는다) -->
       <div data-content-scroll class="min-w-0 lg:h-dvh lg:overflow-y-auto">
         <div class="flex min-h-dvh flex-col">
           <MobileTopBar />
@@ -130,7 +128,6 @@ const imageUrl = new URL(image, Astro.site).href;
       >
         <Icon name="x" />
       </button>
-      <!-- 처음 열 때 데스크톱 사이드바(머리·목록·푸터)를 복제해 채운다(같은 목록을 두 번 그리지 않는다) -->
       <div class="flex h-full flex-col">
         <div data-mobile-nav-header></div>
         <div data-mobile-nav-body class="min-h-0 flex-1 overflow-y-auto">

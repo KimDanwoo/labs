@@ -1,5 +1,4 @@
 type SwatchProps = {
-  /** 실제 적용할 색 문자열(시맨틱은 `var(--color-*)`, atomic은 hex). */
   color: string;
   label: string;
   sub?: string;

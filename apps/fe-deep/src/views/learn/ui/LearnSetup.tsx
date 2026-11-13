@@ -16,7 +16,6 @@ const selectedVariant = (isSelected: boolean) => (isSelected ? 'default' : 'outl
 type LearnSetupProps = {
   categories: Category[];
   isLoadingCategories: boolean;
-  /** 직전 학습의 설정. 학습을 마치고 돌아왔을 때 고른 값이 그대로 남는다. */
   initialSettings: StudySettings;
   isStarting: boolean;
   isEmpty: boolean;

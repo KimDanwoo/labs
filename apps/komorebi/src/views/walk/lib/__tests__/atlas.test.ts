@@ -51,7 +51,6 @@ test('neighbouring row fragments cannot survive extraction or move the character
     for (let column = 0; column < 8; column++) {
       const center = Math.round(width * (0.0718 + column * 0.1235));
       for (let y = 20; y < 90; y++) for (let x = center - 30; x <= center + 30; x++) paint(x, row * 100 + y);
-      // A detached shoe from the row above, offset to bias the old head anchor.
       for (let y = 0; y < 3; y++) for (let x = center + 34; x <= center + 40; x++) paint(x, row * 100 + y);
     }
   const frames = extractChildFrames(pixels, width, height);

@@ -20,7 +20,6 @@
 /* 레이어 안에 둬야 Tailwind 유틸리티(outline-none 등)가 덮어쓸 수 있다 */
 @layer base {
   html {
-    /* 모바일 상단 바(h-12)에 앵커 대상 제목이 가리지 않게 한다 */
     scroll-padding-top: calc(var(--spacing) * 12 + var(--spacing-lg));
     color-scheme: light;
   }
@@ -33,7 +32,6 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    /* 한글은 어절 단위로 줄바꿈하고, 끊을 곳 없는 긴 토큰(URL 등)만 강제로 끊는다 */
     word-break: keep-all;
     overflow-wrap: anywhere;
     -webkit-font-smoothing: antialiased;
@@ -51,7 +49,6 @@
     }
   }
 
-  /* 검색 입력의 브라우저 기본 지우기 버튼 — 닫기 버튼과 겹친다 */
   input[type='search']::-webkit-search-cancel-button {
     appearance: none;
   }
@@ -85,7 +82,6 @@
     content: none;
   }
 
-  /* 인라인 코드: 백틱 장식 대신 은은한 바탕(노션식) */
   .article :where(:not(pre) > code) {
     padding: 0.15em 0.4em;
     border-radius: var(--radius-sm);
@@ -104,7 +100,6 @@
     margin-block: 1.5em;
   }
 
-  /* 제목 앵커: 글자는 CSS로만 그려 목차 텍스트에 섞이지 않게 한다 */
   .heading-anchor {
     margin-left: var(--spacing-sm);
     color: var(--color-muted-foreground);
@@ -122,7 +117,6 @@
     opacity: 1;
   }
 
-  /* 표: 좁은 화면에서는 가로 스크롤(키보드 포커스로도 스크롤 가능) */
   .table-scroll {
     overflow-x: auto;
     margin-block: 1.5em;
@@ -133,7 +127,6 @@
     min-width: 100%;
   }
 
-  /* 표 안에서는 단어 중간을 끊지 않는다(본문의 overflow-wrap:anywhere 해제). 넓으면 가로로 스크롤된다 */
   .table-scroll :where(th, td) {
     overflow-wrap: normal;
   }
@@ -142,7 +135,6 @@
     white-space: nowrap;
   }
 
-  /* 읽기 진행바: 스크롤 연동 애니메이션을 지원하는 브라우저에서만 보인다 */
   .reading-progress {
     position: fixed;
     inset: 0 0 auto;
@@ -197,7 +189,6 @@
     font-size: var(--text-xs);
     font-weight: 700;
     background-color: color-mix(in oklch, var(--category) 14%, transparent);
-    /* 옅은 바탕 위 작은 글씨도 읽히도록 본문 색 쪽으로 당긴다 */
     color: color-mix(in oklch, var(--category) 70%, var(--color-foreground));
   }
 
@@ -235,7 +226,6 @@
 }
 
 /* 아래 둘도 .prose(utilities 레이어)를 이겨야 해서 레이어 밖에 둔다 */
-/* 인라인 코드 앞뒤의 백틱 장식을 지운다(바탕색은 components의 .article 규칙) */
 .prose.article :where(:not(pre) > code)::before,
 .prose.article :where(:not(pre) > code)::after {
   content: none;
@@ -294,8 +284,6 @@
   margin-block: 3em;
 }
 
-/* ── 움직임 ─────────────────────────────────────────────────────
-   모두 CSS로만 처리한다. 지원하지 않는 브라우저에서는 즉시 열리고 닫히며, '동작 줄이기' 설정이면 끈다. */
 :root {
   /* details 높이를 auto까지 부드럽게 늘리기 위해 필요하다 */
   interpolate-size: allow-keywords;
@@ -318,7 +306,6 @@
   }
 }
 
-/* 모달(검색·이미지·모바일 서랍): 열고 닫을 때 모두 움직인다(@starting-style + allow-discrete) */
 .motion-dialog {
   opacity: 0;
   transition-property: opacity, transform, overlay, display;
@@ -374,19 +361,16 @@
   }
 }
 
-/* 테마 전환(ThemeToggle): 원형 애니메이션은 스크립트가 건다. 페이지 이동용 기본 교차 페이드는 끈다 */
 html.theme-transition::view-transition-old(root),
 html.theme-transition::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-/* 다크로 갈 때: 이전(밝은) 화면을 위로 올려, 버튼으로 모여 사라지며 아래의 새 화면이 드러나게 한다 */
 html.theme-transition-collapse::view-transition-old(root) {
   z-index: 1;
 }
 
-/* 접이식(사이드바 카테고리·목차): 높이가 부드럽게 늘고 준다 */
 .motion-details::details-content {
   block-size: 0;
   overflow-y: clip;
@@ -431,15 +415,11 @@ html.theme-transition-collapse::view-transition-old(root) {
   --os-handle-interactive-area-offset: 4px;
 }
 
-/* ── 스크롤 영역 ─────────────────────────────────────────────
-   모바일은 문서가, 데스크톱은 본문 영역([data-content-scroll])이 스크롤된다. 읽기 진행바는 --content 타임라인을 따른다.
-   스크롤바 라이브러리가 붙으면 실제 스크롤 요소는 안쪽 viewport다. */
 html {
   scroll-timeline: --content block;
 }
 
 [data-overlayscrollbars-viewport] {
-  /* 끝까지 스크롤해도 바깥 영역으로 스크롤이 넘어가지 않는다 */
   overscroll-behavior: contain;
 }
 
@@ -465,7 +445,6 @@ html {
   --text-muted: var(--color-muted-foreground);
 }
 
-/* 코드 블록 오른쪽 위에 언어를 표시한다(파일 이름 프레임이 없는 블록만). text는 표시하지 않는다 */
 .article .expressive-code .frame:not(.has-title) pre[data-language]:not([data-language='text']) {
   position: relative;
 }

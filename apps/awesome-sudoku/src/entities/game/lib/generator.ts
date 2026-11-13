@@ -9,7 +9,6 @@ import { generateRandomSolution, gradePuzzle, staysUniqueWithout } from './solve
 
 const EMPTY = 0;
 const MIN_CAGE_SIZE = 2;
-/** 1칸 케이지(값이 그대로 드러남)가 없는 레이아웃을 찾기 위한 시도 수 */
 const CAGE_LAYOUT_ATTEMPTS = 20;
 /**
  * 킬러 유일해 검사 1회당 탐색 노드 상한. 예산 안에 유일함을 증명 못 한 칸은 힌트로 남긴다(안전한 쪽).
@@ -33,15 +32,8 @@ const shuffledPositions = (): GridPosition[] => {
 
 const randomInt = (maxExclusive: number): number => Math.floor(Math.random() * maxExclusive);
 
-/**
- * @description 완성된 솔루션 그리드 생성
- */
 export const generateSolution = (): Grid => generateRandomSolution();
 
-/**
- * @description 솔루션에서 칸을 하나씩 파내되 유일해가 깨지면 되돌린다. targetClues에 닿으면 멈추고,
- * 그 전에 더 파낼 칸이 없으면(최소 퍼즐) 그대로 반환한다.
- */
 function digCells(solution: Grid, targetClues: number, cages?: KillerCage[], nodeBudget?: number): Grid {
   const puzzle = deepCopyGrid(solution);
   let clues = SUDOKU_CELL_COUNT;
@@ -71,7 +63,6 @@ function toBoard(puzzle: Grid): SudokuBoard {
 
 /** expert(ADVANCED 전용)는 무작위 최소 퍼즐의 ~10%만 해당해 60회면 99.8% 적중한다 */
 const CLASSIC_GRADE_ATTEMPTS = 60;
-/** 킬러는 케이지 조합·45규칙으로 대부분 범위에 들어 적게 시도해도 된다 */
 const KILLER_GRADE_ATTEMPTS = 10;
 
 /**
@@ -80,11 +71,6 @@ const KILLER_GRADE_ATTEMPTS = 10;
  */
 const GUESS_FREE_ATTEMPT_CAP_FACTOR = 4;
 
-/**
- * @description 후보를 만들어 채점하고, 기법 범위에 들면 바로 반환한다. 끝까지 못 들면 가장 가까운 후보를 쓴다.
- * 추측이 필요한(GUESS) 판은 폴백으로도 쓰지 않고, 추측 없이 풀리는 후보가 나올 때까지 더 뽑는다.
- * 같은 거리면 범위 위쪽보다 풀기 쉬운(범위 아래) 쪽을 택한다.
- */
 export function retryUntilGraded<T>(
   attempts: number,
   { minTechnique, maxTechnique }: GradedDifficultySpec,
@@ -131,8 +117,6 @@ export function generateBoard(solution: Grid, difficulty: Difficulty): SudokuBoa
   return toBoard(puzzle);
 }
 
-// ── 킬러 케이지 ────────────────────────────────────────────────
-
 const key = (r: number, c: number): number => r * BOARD_SIZE + c;
 
 const neighborsOf = ([r, c]: GridPosition): GridPosition[] =>
@@ -140,10 +124,6 @@ const neighborsOf = ([r, c]: GridPosition): GridPosition[] =>
     ([nr, nc]) => nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE,
   );
 
-/**
- * @description 무작위 시작점에서 인접 칸으로 케이지를 키운다. 같은 값은 한 케이지에 넣지 않는다(킬러 규칙).
- * 키우다 막혀 1칸으로 남은 케이지는 값이 겹치지 않는 인접 케이지에 붙여 본다.
- */
 function layoutCages(solution: Grid, maxCageSize: number): GridPosition[][] {
   const cageOf = new Array<number>(SUDOKU_CELL_COUNT).fill(-1);
   const cages: GridPosition[][] = [];
@@ -187,9 +167,6 @@ function layoutCages(solution: Grid, maxCageSize: number): GridPosition[][] {
   return cages.filter((cage) => cage.length > 0);
 }
 
-/**
- * @description 케이지 레이아웃 생성 — 몇 번 뽑아 1칸 케이지(값이 그대로 드러나는 케이지)가 가장 적은 것을 고른다.
- */
 export function generateKillerCages(solution: Grid, maxCageSize: number): KillerCage[] {
   let best: GridPosition[][] | null = null;
   let bestSingles = Number.POSITIVE_INFINITY;
@@ -210,10 +187,6 @@ export function generateKillerCages(solution: Grid, maxCageSize: number): Killer
   }));
 }
 
-/**
- * @description 킬러 보드 생성 — 케이지를 깔고 케이지 제약 포함 유일해를 유지하며 힌트를 목표 수까지 파낸 뒤,
- * 킬러 기법(케이지 조합·45규칙)까지 포함한 채점이 범위에 들 때까지 케이지부터 다시 뽑는다.
- */
 export function generateKillerBoard(
   solution: Grid,
   difficulty: Difficulty,

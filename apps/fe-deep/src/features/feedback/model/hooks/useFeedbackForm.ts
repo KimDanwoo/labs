@@ -10,10 +10,6 @@ interface UseFeedbackFormOptions {
   fixedType?: FeedbackType;
 }
 
-/**
- * 피드백 폼의 로그인 확인, 입력 상태, 제출 로직을 관리한다.
- * 로그인하지 않은 경우 isLoggedIn이 false로 반환된다.
- */
 export function useFeedbackForm({ questionId, fixedType }: UseFeedbackFormOptions) {
   const defaultType: FeedbackType = fixedType ?? (questionId ? 'edit_question' : 'add_question');
 

@@ -12,17 +12,14 @@ const ANIMAL = {
 } as const;
 type Animal = keyof typeof ANIMAL;
 
-/** Seconds between visitors; the first one shows up sooner. */
 const FIRST_VISIT = [3, 8] as const;
 const NEXT_VISIT = [10, 25] as const;
 const NIGHT_CAT_SHARE = 0.8;
 const DAY_CAT_SHARE = 0.5;
 const PAUSE_CHANCE = 0.35;
 const PAUSE_SECONDS = 1.6;
-/** Lane distance over which an animal steps out of a lane end or melts into the far one. */
 const FADE_IN = 3;
 const FADE_OUT = 4;
-/** Seconds an animal takes to slip away once rain starts. */
 const LEAVE_SECONDS = 0.8;
 /** Render order around the child's sprites (4): drawn over them when nearer the viewer, under them otherwise. */
 const ORDER = { front: 4.2, behind: 3.8 } as const;
@@ -33,13 +30,11 @@ type Scene = {
   darkness: number;
   isStill: boolean;
   isRaining: boolean;
-  /** Depth of the child, so an animal in front of them draws over them and one behind draws under. */
   childZ: number;
 };
 
 const between = ([min, max]: readonly [number, number]) => min + Math.random() * (max - min);
 
-/** Now and then a cat or a dog strolls through the painting along its lanes, pausing once to look around. */
 export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
   const textures: Partial<Record<Animal, THREE.Texture>> = {};
   let isDisposed = false;
@@ -84,7 +79,6 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     pauseAt: number;
     frame: number;
     opacity: number;
-    /** Once rain starts: how visible it was then and how many seconds it has spent slipping away since. */
     leaving: { from: number; seconds: number } | null;
   } | null = null;
   let standing: (Point & { order: number }) | null = null;
@@ -110,7 +104,6 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     };
   }
 
-  /** Fades in and out at the lane ends; once leaving, only ever fades further from where it was. */
   function fadeFor({ length, leaving }: NonNullable<typeof visitor>, gait: Gait) {
     const along = presence(gait.walked, length, FADE_IN, FADE_OUT);
     if (!leaving) return along;
@@ -144,7 +137,6 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     get visitor() {
       return visitor?.animal ?? '';
     },
-    /** Where the visiting animal's feet are, so foreground objects can hide it like they hide the child. */
     get standing() {
       return standing;
     },
@@ -165,7 +157,6 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
       if (isRaining) visitor.leaving ??= { from: visitor.opacity, seconds: 0 };
       if (visitor.leaving) visitor.leaving.seconds += dt;
       const spec = ANIMAL[visitor.animal];
-      // With reduced motion the animal holds its pose where it stands, and nobody new comes along.
       const isPausing = !isStill && visitor.gait.walked >= visitor.pauseAt && visitor.pause < PAUSE_SECONDS;
       if (isPausing) visitor.pause += dt;
       const strolled = isPausing || isStill ? visitor.gait : walkOn(visitor.gait, spec, dt);

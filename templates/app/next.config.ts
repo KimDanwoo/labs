@@ -1,6 +1,5 @@
 import type { NextConfig } from 'next';
 
-// 모든 앱 공통 보안 헤더. 앱별로 완화가 필요하면 그 앱에서만 덮어쓴다.
 const SECURITY_HEADERS = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },

@@ -17,7 +17,6 @@ import type { Playback } from './usePlayback';
 
 /** 잠금화면 진행바 갱신 주기. OS가 playbackRate로 사이를 메우므로 매 프레임 보낼 이유가 없다. */
 const POSITION_INTERVAL_MS = 1000;
-/** 액션에 오프셋이 안 실려 오면 쓰는 기본값. 키보드 J/L과 같게 맞춘다. */
 const SEEK_SEC = 10;
 
 const ARTWORK_SIZES: readonly ArtworkSize[] = ['t200x200', 't300x300', 't500x500'];
@@ -45,7 +44,6 @@ export function useMediaSession(track: Track | undefined, isPlaying: boolean, pl
       album: 'soundlab',
       artwork: ARTWORK_SIZES.map((size) => ({
         src: artworkUrl(track, size),
-        // t500x500 → 500x500
         sizes: size.slice(1),
         type: track.artworkExt === '.png' ? 'image/png' : 'image/jpeg',
       })),

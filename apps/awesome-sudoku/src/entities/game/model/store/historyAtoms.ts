@@ -12,14 +12,12 @@ const NO_CELL = -1;
 /** undo 스택 — 바뀌기 전 보드. 보드는 불변이라 참조를 그대로 쌓는다 */
 export const pastAtom = atom<SudokuBoard[]>([]);
 
-/** redo 스택 — undo로 물린 보드 */
 export const futureAtom = atom<SudokuBoard[]>([]);
 
 export const canUndoAtom = atom((get) => get(pastAtom).length > 0);
 
 export const canRedoAtom = atom((get) => get(futureAtom).length > 0);
 
-/** 보드를 바꾸기 직전에 호출한다. 새 입력이 생기면 redo 갈래는 버린다 */
 export const pushStateAtom = atom(null, (get, set, board: SudokuBoard) => {
   set(pastAtom, [...get(pastAtom), board].slice(-MAX_HISTORY_SIZE));
   set(futureAtom, []);
@@ -36,7 +34,6 @@ const restoreBoardAtom = atom(null, (get, set, board: SudokuBoard) => {
   if (selected) set(updateHighlightsAtom, selected);
 });
 
-/** 끝난 판(완료·실수 한도)은 되돌려 다시 열지 않는다 */
 export const undoAtom = atom(null, (get, set) => {
   if (get(isCompletedAtom)) return;
   const past = get(pastAtom);

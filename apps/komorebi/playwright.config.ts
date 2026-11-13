@@ -2,7 +2,6 @@ import { defineConfig } from '@playwright/test';
 
 const PORT = 3111;
 
-/** Runs against the static export; build first with `pnpm build`. */
 export default defineConfig({
   testDir: 'e2e',
   testIgnore: 'together.spec.ts',

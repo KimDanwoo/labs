@@ -40,7 +40,6 @@ const navItems = [
   { href: '/search', label: '검색', icon: Search },
 ];
 
-/** 관리자만 접근 가능한 경로(미들웨어에서 강제). 링크도 관리자에게만 보인다. */
 const adminNavItems = [{ href: '/study', label: '면접 학습', icon: NotebookPen }];
 
 export function Header() {
@@ -137,7 +136,6 @@ export function Header() {
             </Button>
           )}
 
-          {/* Mobile menu */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" size="icon" aria-label="메뉴 열기">

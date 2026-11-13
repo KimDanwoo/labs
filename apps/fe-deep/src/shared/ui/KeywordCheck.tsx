@@ -9,7 +9,6 @@ interface KeywordCheckProps {
   recall: string;
 }
 
-/** 답 확인 후, 내가 말한 것에 키워드가 언급됐는지 맞춤/놓침으로 보여준다. */
 export function KeywordCheck({ keywords, recall }: KeywordCheckProps) {
   const matches = matchKeywords(keywords, recall);
   const matchedCount = matches.filter((match) => match.isMatched).length;

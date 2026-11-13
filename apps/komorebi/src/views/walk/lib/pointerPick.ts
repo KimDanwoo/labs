@@ -14,7 +14,6 @@ type PointerPickOptions = {
   markers: THREE.Sprite[];
 };
 
-/** Resolves a pointer to what it lands on: an exit, a landmark marker, or walkable ground. */
 export function createPointerPick({ canvas, camera, portals, markers }: PointerPickOptions) {
   const ray = new THREE.Raycaster();
   const pointer = new THREE.Vector2();

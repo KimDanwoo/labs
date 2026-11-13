@@ -6,7 +6,6 @@ export type Appearance = { character: typeof CHARACTER.child; outfit: Outfit };
 export const DEFAULT_APPEARANCE: Appearance = { character: CHARACTER.child, outfit: OUTFIT.summer };
 export const CHARACTER_RIG = { width: 1536, height: 1024, columns: 8, rows: 4, footInset: 6 } as const;
 export type BodyPoseOffsets = Readonly<Partial<Record<number, number>>>;
-// Per-pose sole offsets keep the authored fragments on the common outfit rig.
 const BODY_POSE_OFFSETS: Record<CharacterTemplate, BodyPoseOffsets> = {
   [CHARACTER.child]: Object.fromEntries(
     [3, 3, 3, 3, 3, 3, 4, 3, 4, 4, 4, 5, 4, 3, 5, 8, 4, 3, 3, 3, 4, 4, 4, 4, 4, 6, 4, 6, 5, 6, 6, 7].map(
@@ -61,7 +60,6 @@ export function characterLayers({ character, outfit }: { character: CharacterTem
     bodyPoseOffsets: BODY_POSE_OFFSETS[character],
   };
 }
-// The same child takes their hat off to sleep.
 export const sleepingPortrait = (character: CharacterTemplate) =>
   ({
     [CHARACTER.child]: '/art/child-boy-sleep.webp',
