@@ -1,11 +1,3 @@
-/**
- * 레이아웃 동작(한 번만 실행된다). 사이드바·모바일 서랍·검색은 페이지를 옮겨도 남아 있고(transition:persist),
- * 본문 영역은 페이지마다 새로 그려진다.
- *
- * 데스크톱(64rem 이상)은 사이드바와 본문이 각자 자기 영역만 스크롤한다(문서 전체는 스크롤하지 않는다).
- * 모바일은 사이드바가 서랍이므로 문서 전체가 스크롤된다.
- * 어느 쪽이든 스크롤바는 떠 있어서 자리를 차지하지 않는다(페이지 길이에 따라 본문이 좌우로 밀리지 않는다).
- */
 import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars';
 
@@ -14,10 +6,8 @@ const SCROLLBAR_OPTIONS: PartialOptions = {
 };
 const DESKTOP_QUERY = '(width >= 64rem)';
 const SIDEBAR_FOCUS_RATIO = 1 / 3;
-// 뒤로가기 위치가 늦게 커지는 내용(댓글·광고 iframe) 때문에 아직 없을 때, 내용이 자라길 기다리는 최대 시간
 const RESTORE_WAIT_MS = 3_000;
 const USER_SCROLL_EVENTS = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const;
-// <html>·<body>에 붙여 두면 라이브러리가 붙기 전에도 기본 스크롤바가 숨는다(BaseLayout)
 const SCROLLBAR_INITIALIZE_ATTR = 'data-overlayscrollbars-initialize';
 // details name 그룹은 문서 전체에 걸린다. 서랍 복제본을 따로 묶지 않으면 끼워 넣는 순간 열린 카테고리가 닫힌다
 const DRAWER_CATEGORY_GROUP = 'drawer-category';
@@ -39,7 +29,6 @@ function remeasureOnContentResize(host: HTMLElement, content: HTMLElement) {
   [...content.children].forEach((child) => observer.observe(child));
 }
 
-/** 떠 있는 스크롤바를 붙이고, 실제로 스크롤되는 요소를 돌려준다(라이브러리가 취소되면 대상 자신). */
 function attachScrollbar(host: HTMLElement) {
   const instance = OverlayScrollbars(host, SCROLLBAR_OPTIONS);
   if (instance.state().destroyed) return host;
@@ -48,12 +37,10 @@ function attachScrollbar(host: HTMLElement) {
   return viewport;
 }
 
-// ── 사이드바 ─────────────────────────────────────────────────
 const sidebarHost = document.querySelector<HTMLElement>('[data-sidebar]');
 const sidebarScroller = sidebarHost ? attachScrollbar(sidebarHost) : null;
 const sidebarHeader = document.querySelector<HTMLElement>('aside [data-sidebar-header]');
 
-/** 목록이 고정된 머리(브랜드·검색) 밑으로 스크롤되면 경계선을 보인다(SidebarHeader의 data-scrolled) */
 function syncHeaderEdge(header: Element | null | undefined, scroller: HTMLElement) {
   header?.toggleAttribute('data-scrolled', scroller.scrollTop > 0);
 }
@@ -98,7 +85,6 @@ function syncSidebarCurrent(root: ParentNode | null) {
   });
 }
 
-// ── 본문 영역 ────────────────────────────────────────────────
 // 데스크톱에서는 본문 영역이 스크롤 주체라 브라우저가 뒤로가기 위치를 기억해 주지 않는다.
 // 같은 글을 여러 번 방문해도 섞이지 않도록 방문 기록 항목(ClientRouter가 붙이는 history.state.index)별로 기억한다.
 const contentScrollTops = new Map<string, number>();
@@ -120,7 +106,6 @@ function attachDocumentScrollbar() {
   document.body.removeAttribute(SCROLLBAR_INITIALIZE_ATTR);
 }
 
-/** 스크롤 주체에 떠 있는 스크롤바를 붙인다: 데스크톱은 본문 영역, 모바일은 문서. */
 function syncPageScroller() {
   const host = document.querySelector<HTMLElement>('[data-content-scroll]');
   if (desktop.matches) {
@@ -135,10 +120,6 @@ function syncPageScroller() {
 
 desktop.addEventListener('change', syncPageScroller);
 
-/**
- * 저장해 둔 위치로 바로 되돌린다. 그 위치가 아직 없으면(댓글·광고가 덜 커서 페이지가 짧으면) 내용이 자랄 때마다 다시 맞추고,
- * 닿거나 사용자가 먼저 움직이거나 시간이 다 되면 멈춘다.
- */
 function restoreScrollTop(scroller: Element, top: number) {
   const hasReached = () => {
     scroller.scrollTo({ top, behavior: 'instant' });
@@ -149,7 +130,9 @@ function restoreScrollTop(scroller: Element, top: number) {
   const stop = new AbortController();
   const observer = new ResizeObserver(() => hasReached() && stop.abort());
   [...scroller.children].forEach((child) => observer.observe(child));
-  USER_SCROLL_EVENTS.forEach((type) => window.addEventListener(type, () => stop.abort(), { signal: stop.signal, passive: true }));
+  USER_SCROLL_EVENTS.forEach((type) =>
+    window.addEventListener(type, () => stop.abort(), { signal: stop.signal, passive: true }),
+  );
   const timer = window.setTimeout(() => stop.abort(), RESTORE_WAIT_MS);
   stop.signal.addEventListener('abort', () => {
     observer.disconnect();
@@ -167,7 +150,6 @@ function restoreTraversedScroll() {
   if (typeof savedY === 'number' && document.scrollingElement) restoreScrollTop(document.scrollingElement, savedY);
 }
 
-// ── 모바일 서랍 ──────────────────────────────────────────────
 const mobileNav = () => document.querySelector<HTMLDialogElement>('#mobile-nav');
 const mobileNavHost = document.querySelector<HTMLElement>('[data-mobile-nav-body]');
 const mobileNavScroller = mobileNavHost ? attachScrollbar(mobileNavHost) : null;
@@ -196,7 +178,8 @@ function openMobileNav() {
   const nav = mobileNav();
   const content = sidebarHost?.querySelector('[data-sidebar-content]');
   const footer = document.querySelector('aside [data-sidebar-footer]');
-  if (!nav || !mobileNavHeader || !mobileNavContent || !mobileNavFooter || !sidebarHeader || !content || !footer) return;
+  if (!nav || !mobileNavHeader || !mobileNavContent || !mobileNavFooter || !sidebarHeader || !content || !footer)
+    return;
   if (mobileNavHeader.childElementCount === 0) mobileNavHeader.append(sidebarHeader.cloneNode(true));
   if (mobileNavContent.childElementCount === 0) mobileNavContent.append(cloneSidebarForDrawer(content));
   if (mobileNavFooter.childElementCount === 0) mobileNavFooter.append(footer.cloneNode(true));
@@ -212,24 +195,20 @@ document.addEventListener('click', (event) => {
   const nav = mobileNav();
   if (target?.closest('[data-nav-open]')) openMobileNav();
   if (target?.closest('[data-nav-close]') || (nav && event.target === nav)) nav?.close();
-  // 검색을 열면 서랍은 닫는다(모달 두 개가 겹치지 않게)
   if (target?.closest('[data-search-open]') && nav?.open) nav.close();
 });
 
-// ── 페이지 이동 ──────────────────────────────────────────────
 document.addEventListener('astro:before-preparation', (event) => {
   lastNavigationType = event.navigationType;
   if (contentScroller) contentScrollTops.set(currentEntryKey, contentScroller.scrollTop);
 });
 document.addEventListener('astro:before-swap', (event) => {
   // View Transition 애니메이션이 도는 동안(약 0.35초) 브라우저가 휠 입력을 받지 않아 사이드바 스크롤이 씹혔다.
-  // 화면 전환은 건너뛰고, 새 본문이 올라오는 움직임은 CSS(html[data-navigated] #main)로 대신한다
   // 건너뛰면 ready가 거절된다 — 의도한 동작이라 받아 두지 않으면 매 이동마다 콘솔에 에러가 남는다
   event.viewTransition.ready.catch(() => undefined);
   event.viewTransition.skipTransition();
   event.newDocument.documentElement.dataset.navigated = '';
   sidebarScrollTop = sidebarScroller?.scrollTop ?? 0;
-  // <body>가 통째로 바뀌므로 문서 스크롤바는 새 <body>에 다시 붙인다(page-load)
   OverlayScrollbars(document.body)?.destroy();
 });
 document.addEventListener('astro:after-swap', restoreSidebarScroll);
@@ -246,6 +225,5 @@ document.addEventListener('astro:page-load', () => {
   document.querySelectorAll<HTMLElement>('[data-overlay-scroll]').forEach(attachScrollbar);
 });
 
-// 처음 들어왔을 때만 지금 글 위치로 사이드바를 맞춘다. 이후 이동에서는 사용자가 둔 스크롤을 그대로 둔다.
 scrollSidebarToCurrent();
 sidebarScrollTop = sidebarScroller?.scrollTop ?? 0;

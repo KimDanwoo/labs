@@ -52,7 +52,6 @@ export const TAG_LABEL = {
   writing: '글쓰기',
 } satisfies Record<TagId, string>;
 
-/** 순서대로 읽는 글 묶음. 글 frontmatter의 `series: { id, order }`로 소속과 순서를 정한다. */
 export const SERIES_IDS = ['ai-dev'] as const;
 export type SeriesId = (typeof SERIES_IDS)[number];
 

@@ -21,7 +21,6 @@ const COLOR = {
   border: '#e2e5e9',
 } as const;
 
-/** 카테고리 색(global.css의 --category-*)과 블루 포인트(--color-primary)의 라이트 테마 값 */
 export const OG_ACCENT = {
   dev: '#007ead',
   retro: '#b3621e',
@@ -29,7 +28,6 @@ export const OG_ACCENT = {
   book: '#0064ad',
 } as const;
 
-// 빌드는 앱 폴더에서 돌므로 앱 기준 상대 경로로 읽는다. 여러 이미지가 한 번 읽은 서체를 같이 쓴다
 let font: Promise<Buffer> | undefined;
 const loadFont = () => (font ??= readFile(FONT_PATH));
 
@@ -96,7 +94,6 @@ function card({ label, color, title, subtitle }: OgCard): Node {
 }
 
 const COVER_TITLE_WIDTH = 720;
-// 제목이 길수록 글자를 줄여 잘리지 않고 끝까지 보이게 한다(가장 긴 제목도 세 줄 안팎)
 const coverTitleSize = (title: string) => (title.length <= 28 ? 60 : title.length <= 40 ? 54 : 48);
 
 /**
@@ -121,11 +118,9 @@ function coverTitle(title: string): Node {
   );
 }
 
-/** 배경 위 왼쪽에 제목을 얹는다. 배경은 오른쪽에 모티프를 두고 왼쪽을 비워 두도록 만든다(scripts/make-thumbnails.ts). */
 function coverCard({ label, color, title }: OgCard, backgroundUri: string): Node {
   return el({ ...fill, display: 'flex', fontFamily: 'MaruBuri' }, [
     { type: 'img', props: { src: backgroundUri, style: { ...fill, objectFit: 'cover' } } },
-    // 배경 밝기가 글마다 달라도 제목이 읽히도록 왼쪽부터 옅게 덮는다
     el({ ...fill, backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.72) 50%, rgba(255,255,255,0) 78%)' }),
     el(
       {
@@ -157,14 +152,12 @@ const renderSvg = async (node: Node) =>
     }),
   );
 
-/** 공유 미리보기용 1200×630 PNG를 만든다. */
 export async function renderOgImage(input: OgCard): Promise<Buffer> {
   return sharp(await renderSvg(card(input))).png().toBuffer();
 }
 
 const THUMBNAIL_QUALITY = 86;
 
-/** 배경 이미지에 제목을 얹은 1200×630 JPG 썸네일(목록·링크 미리보기용)을 만든다. */
 export async function renderThumbnail(input: OgCard, background: Buffer): Promise<Buffer> {
   const resized = await sharp(background).resize(WIDTH, HEIGHT, { fit: 'cover' }).jpeg().toBuffer();
   const svg = await renderSvg(coverCard(input, `data:image/jpeg;base64,${resized.toString('base64')}`));

@@ -10,7 +10,6 @@ type Props = {
 
 // 2배 해상도 화면을 고려해 표시 너비(최대 11rem)의 두 배로 만든다. 썸네일은 1200×630이라 높이는 비율대로 정해진다
 const THUMBNAIL_WIDTH = 352;
-// 모바일 정사각 칸(5rem)의 두 배 높이가 나오도록 3:2 커버의 너비를 정한다
 const MOBILE_COVER_WIDTH = 240;
 
 const { posts } = Astro.props;
@@ -40,7 +39,6 @@ const { posts } = Astro.props;
             </div>
             {post.data.thumbnail && (
               <div class="mt-xs size-20 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border sm:aspect-40/21 sm:h-auto sm:w-44">
-                {/* 모바일 정사각 칸은 제목이 잘리지 않게 제목 없는 커버를 모티프가 있는 오른쪽 기준으로 보여 준다 */}
                 {post.data.cover && (
                   <Image
                     src={post.data.cover}

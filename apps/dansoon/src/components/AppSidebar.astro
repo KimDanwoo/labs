@@ -7,7 +7,6 @@ type Props = {
   posts: Post[];
 };
 
-/** 사이드바 목록(스크롤 영역): 바로가기 + 카테고리별 전체 글. 브랜드·검색은 SidebarHeader에 고정한다. 카테고리는 한 번에 하나만 펼친다(처음엔 지금 글이 든 카테고리). */
 const { posts } = Astro.props;
 const { pathname } = Astro.url;
 const currentPost = posts.find((post) => postPath(post) === pathname);

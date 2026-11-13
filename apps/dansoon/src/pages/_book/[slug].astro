@@ -45,7 +45,6 @@ const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c
 >
   <script is:inline slot="head" type="application/ld+json" set:html={structuredDataJson} />
   <div class="mx-auto max-w-6xl px-md sm:px-xl xl:grid xl:grid-cols-[minmax(0,1fr)_var(--container-3xs)] xl:gap-3xl">
-    <!-- 순위 표가 넓어 글보다 넓은 칼럼을 쓴다 -->
     <article class="mx-auto w-full max-w-(--container-4xl) min-w-0 pt-2xl pb-xl sm:pt-3xl">
       <header>
         <a href="/book/" class="text-sm font-bold text-primary hover:underline">

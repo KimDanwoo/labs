@@ -5,7 +5,6 @@ import PostList from '~/components/PostList.astro';
 import { countBy, filterByTag, getPublishedPosts } from '~/lib/posts';
 import { TAG_LABEL, type TagId } from '~/lib/taxonomy';
 
-/** 글이 하나도 없는 태그는 빈 페이지가 되므로 만들지 않는다. */
 export const getStaticPaths = (async () => {
   const counts = countBy(await getPublishedPosts(), (post) => post.data.tags);
   return [...counts.keys()].map((tag) => ({ params: { tag } }));

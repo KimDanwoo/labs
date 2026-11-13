@@ -39,14 +39,12 @@ function assertUniqueSeriesOrder(series: SeriesId, posts: Post[]): void {
   throw new Error(`연재 '${series}'에 order가 겹치는 글이 있습니다: ${posts.map((post) => post.id).join(', ')}`);
 }
 
-/** 연재 글을 읽는 순서(order)대로 돌려준다. */
 export function filterBySeries(posts: Post[], series: SeriesId): Post[] {
   const seriesPosts = posts.filter((post) => post.data.series?.id === series);
   assertUniqueSeriesOrder(series, seriesPosts);
   return seriesPosts.sort(bySeriesOrder);
 }
 
-/** posts는 최신순이다 — 앞이 더 새 글이다. */
 export function getAdjacentPosts(posts: Post[], current: Post) {
   const index = posts.findIndex((post) => post.id === current.id);
   return { newer: posts[index - 1], older: posts[index + 1] };
@@ -58,7 +56,6 @@ function relatedScore(base: Post, candidate: Post) {
   return sharedTags * SHARED_TAG_SCORE + sameCategory;
 }
 
-/** 태그가 하나 이상 겹치는 글만 고른다. 점수가 같으면 최신 글이 앞선다(posts가 최신순). */
 export function getRelatedPosts(posts: Post[], current: Post) {
   return posts
     .filter((post) => post.id !== current.id)

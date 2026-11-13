@@ -51,9 +51,7 @@ import Icon from '~/components/Icon.astro';
   };
 
   const RESULT_LIMIT = 20;
-  // 검색어가 없을 때 보여 줄 최근 글 수. 인덱스는 최신 글 순서로 만들어진다
   const RECENT_LIMIT = 5;
-  // 타이핑이 멈춘 뒤에만 검색한다(한 글자마다 전체 본문을 훑지 않도록)
   const SEARCH_DEBOUNCE_MS = 150;
   const SNIPPET_RADIUS = 48;
   const SCORE = { title: 6, tag: 4, description: 2, text: 1 } as const;
@@ -153,7 +151,6 @@ import Icon from '~/components/Icon.astro';
 
   const resultLinks = () => [...(list?.querySelectorAll<HTMLAnchorElement>('a') ?? [])];
 
-  /** 결과는 일반 링크 목록이다. 방향키는 실제 포커스를 옮기고, 맨 위에서 위로 가면 입력창으로 돌아간다. */
   function moveFocus(step: 1 | -1) {
     const links = resultLinks();
     if (links.length === 0) return;
@@ -166,7 +163,6 @@ import Icon from '~/components/Icon.astro';
     links[Math.min(next, links.length - 1)]?.focus();
   }
 
-  /** 검색어가 없으면 무엇을 찾을 수 있는지 알려 주고, 바로 고를 수 있게 최근 글을 보여 준다. */
   async function showEmptyState() {
     if (!list || !status) return;
     list.replaceChildren();
@@ -215,7 +211,6 @@ import Icon from '~/components/Icon.astro';
     searchTimer = setTimeout(() => void search(input?.value ?? ''), SEARCH_DEBOUNCE_MS);
   }
 
-  /** Enter는 기다리지 않는다 — 예약된 검색을 바로 실행해 지금 입력에 맞는 첫 결과로 이동한다. */
   async function searchNow() {
     clearTimeout(searchTimer);
     await search(input?.value ?? '');
@@ -226,7 +221,6 @@ import Icon from '~/components/Icon.astro';
     dialog.showModal();
     input?.select();
     if (!input?.value.trim()) void showEmptyState();
-    // 미리 받아 두기만 한다 — 실패는 실제 검색할 때 안내한다
     loadDocuments().catch(() => {});
   }
 

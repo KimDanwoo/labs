@@ -29,7 +29,6 @@
 </script>
 
 <style>
-  /* 광고 로드 전 공간을 예약해 본문이 밀리는 것(CLS)을 막는다 */
   .adfit-slot {
     position: relative;
     display: flex;
@@ -49,7 +48,6 @@
     color: var(--color-muted-foreground);
   }
 
-  /* 광고가 실제로 렌더링되면(iframe 삽입) 플레이스홀더를 걷어낸다 */
   .adfit-slot:has(iframe) {
     border: none;
     background: none;

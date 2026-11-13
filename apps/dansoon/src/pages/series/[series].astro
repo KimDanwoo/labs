@@ -5,7 +5,6 @@ import PostList from '~/components/PostList.astro';
 import { filterBySeries, getPublishedPosts } from '~/lib/posts';
 import { SERIES_IDS, SERIES_INFO, type SeriesId } from '~/lib/taxonomy';
 
-/** 공개된 글이 없는 연재는 빈 페이지가 되므로 만들지 않는다. */
 export const getStaticPaths = (async () => {
   const posts = await getPublishedPosts();
   return SERIES_IDS.filter((series) => filterBySeries(posts, series).length > 0).map((series) => ({
