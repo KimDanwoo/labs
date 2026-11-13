@@ -6,7 +6,7 @@
  */
 const MEASUREMENT_ID = 'G-EHWN21GFLV';
 // 로컬 dev·preview 방문이 통계에 섞이지 않게 실제 도메인에서만 보낸다
-const TRACKED_HOSTNAMES = new Set(['log.danwoo.dev', 'danwoo.dev']);
+const TRACKED_HOSTNAME = 'danwoo.dev';
 
 const dataLayer: unknown[] = [];
 
@@ -36,7 +36,7 @@ function sendPageViewOnNavigation(): void {
   previousUrl = location.href;
 }
 
-if (TRACKED_HOSTNAMES.has(location.hostname)) {
+if (location.hostname === TRACKED_HOSTNAME) {
   Object.assign(window, { dataLayer });
   gtag('js', new Date());
   gtag('config', MEASUREMENT_ID);
