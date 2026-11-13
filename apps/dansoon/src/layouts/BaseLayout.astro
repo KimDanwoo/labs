@@ -3,6 +3,7 @@ import '@tokens/css/fonts.css';
 // 스크롤바 라이브러리 CSS는 페이지 CSS로 넣는다 — 스크립트에서 import하면 개발 서버에서 페이지를 옮길 때 <head>에서 빠진다
 import 'overlayscrollbars/overlayscrollbars.css';
 import '~/styles/global.css';
+import Analytics from '@vercel/analytics/astro';
 import { ClientRouter } from 'astro:transitions';
 import AppSidebar from '~/components/AppSidebar.astro';
 import Icon from '~/components/Icon.astro';
@@ -62,6 +63,7 @@ const imageUrl = new URL(image, Astro.site).href;
     <meta name="twitter:card" content="summary_large_image" />
     <slot name="head" />
     <ClientRouter />
+    <Analytics />
 
     <!-- 첫 페인트 전에 테마를 정해 깜빡임을 막는다. 저장값이 없으면 OS 설정을 따른다.
          페이지를 옮기면 ClientRouter가 <html> 속성을 새 문서 것으로 바꾸므로, 바꾼 직후에도 다시 적용한다. -->
