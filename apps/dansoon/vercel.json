@@ -11,14 +11,6 @@
   "outputDirectory": "dist",
   "trailingSlash": true,
   "ignoreCommand": "npx turbo-ignore dansoon",
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "log.danwoo.dev" }],
-      "destination": "https://danwoo.dev/:path*",
-      "permanent": true
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",

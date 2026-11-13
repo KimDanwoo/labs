@@ -2,7 +2,7 @@
 
 프론트엔드 엔지니어 김단우의 개발 노트·회고·독서 기록과 주간 책 순위 리포트. Astro 정적 사이트.
 
-**라이브:** [danwoo.dev](https://danwoo.dev) (`log.danwoo.dev`는 `vercel.json`에서 308 영구 이동)
+**라이브:** [danwoo.dev](https://danwoo.dev) (`log.danwoo.dev`·`www.danwoo.dev`는 Vercel 도메인 설정에서 308 영구 이동)
 
 ## 기술 스택
 
