@@ -1,125 +1,57 @@
+const ORIGINAL_WORLD_URL = 'https://github.com/brunosimon/folio-2025';
+
+const TOOLS = [
+  { role: '3D 렌더링', name: 'Three.js', url: 'https://threejs.org' },
+  { role: '물리', name: 'Rapier', url: 'https://rapier.rs' },
+  { role: '오디오', name: 'Howler.js', url: 'https://howlerjs.com' },
+  { role: '애니메이션', name: 'GSAP', url: 'https://gsap.com' },
+] as const;
+
 export function BehindTheSceneContent() {
   return (
     <div className="content-inner">
-      <div className="title">Behind the scene</div>
+      <div className="title">크레딧</div>
       <p className="text">
-        Thank you for visiting my portfolio! <br />
-        If you are curious about the stack and how I built this project, here’s everything you need to know.
-      </p>
-      <h2 className="title">Three.js</h2>
-      <p className="text">
-        <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">
-          Three.js
-        </a>{' '}
-        is the library I’m using to render this 3D world. <br />
-        It was created by <strong>mr.doob</strong> (
-        <a href="https://x.com/mrdoob" target="_blank" rel="noopener noreferrer">
-          X
+        이 섬은 Bruno Simon이 공개한 포트폴리오 월드{' '}
+        <a href={ORIGINAL_WORLD_URL} target="_blank" rel="noopener noreferrer">
+          folio-2025
         </a>
-        ,{' '}
-        <a href="https://github.com/mrdoob" target="_blank" rel="noopener noreferrer">
-          GitHub
-        </a>
-        ), followed by hundreds of awesome developers, one of which being Sunag (
-        <a href="https://x.com/sea3dformat" target="_blank" rel="noopener noreferrer">
-          X
-        </a>
-        ,{' '}
-        <a href="https://github.com/sunag" target="_blank" rel="noopener noreferrer">
-          GitHub
-        </a>
-        ) who added{' '}
-        <a
-          href="https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          TSL
-        </a>
-        , enabling the use of both WebGL and WebGPU, making this portfolio possible.
-      </p>
-      <h2 className="title">Three.js Journey</h2>
-      <p className="text">
-        If you want to learn Three.js, I got you covered with this{' '}
-        <a href="https://threejs-journey.com" target="_blank" rel="noopener noreferrer">
-          huge course
-        </a>
-        . <br />
-        It contains everything you need to start building awesome stuff with Three.js (and much more).
-      </p>
-      <h2 className="title">Devlogs</h2>
-      <p className="text">
-        I’ve been making devlogs since the very start of this portfolio and you can find them all on my{' '}
-        <a
-          href="https://www.youtube.com/playlist?list=PL5nApUt6Z8sTZxEsEMd8x89OCKCAAfNL0"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Youtube channel
-        </a>
-        .
-      </p>
-      <h2 className="title">Source code</h2>
-      <p className="text">
-        The code is available on{' '}
-        <a href="https://github.com/brunosimon/folio-2025" target="_blank" rel="noopener noreferrer">
-          GitHub
-        </a>{' '}
-        under{' '}
+        를 바탕으로 만들었어요. 원본은{' '}
         <a href="https://choosealicense.com/licenses/mit/" target="_blank" rel="noopener noreferrer">
-          MIT license
+          MIT 라이선스
         </a>
-        . Even the Blender files are there, so have fun! <br />
-        For security reasons, I’m not sharing the server code, but the portfolio works without it.
+        로 공개돼 있어요.
       </p>
-      <h2 className="title">Musics</h2>
+      <h2 className="title">바꾼 것</h2>
       <p className="text">
-        The music you hear was made especially for this portfolio by the awesome Kounine (
+        석등·청사초롱·평상·옹기 같은 소품과 누각·초가 공방·서낭당 같은 건물을 한국 섬마을 모습으로 새로 만들었어요.
+        나뭇잎은 벚꽃잎 모양이에요.
+      </p>
+      <h2 className="title">사용한 도구</h2>
+      <ul className="text">
+        {TOOLS.map(({ role, name, url }) => (
+          <li key={name}>
+            {role} ⇒{' '}
+            <a href={url} target="_blank" rel="noopener noreferrer">
+              {name}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <h2 className="title">음악</h2>
+      <p className="text">
+        배경 음악은 Kounine(
         <a href="https://linktr.ee/Kounine" target="_blank" rel="noopener noreferrer">
           Linktree
         </a>
-        ). <br />
-        They are now under{' '}
+        )이 원본 월드를 위해 만들었고,{' '}
         <a href="https://choosealicense.com/licenses/cc0-1.0/" target="_blank" rel="noopener noreferrer">
-          CC0 license
+          CC0 라이선스
         </a>
-        , meaning you can do whatever you want with them! <br />
-        Download them{' '}
-        <a
-          href="https://github.com/brunosimon/folio-2025/tree/main/static/sounds/musics"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          here
-        </a>
-        .
+        로 공개했어요.
       </p>
-      <h2 className="title">Some more links</h2>
-      <ul className="text">
-        <li>
-          Physics library ⇒{' '}
-          <a href="https://rapier.rs" target="_blank" rel="noopener noreferrer">
-            Rapier
-          </a>
-        </li>
-        <li>
-          Audio library ⇒{' '}
-          <a href="https://howlerjs.com" target="_blank" rel="noopener noreferrer">
-            Howler.js
-          </a>
-        </li>
-        <li>
-          Fonts ⇒{' '}
-          <a href="https://fonts.google.com/specimen/Amatic+SC" target="_blank" rel="noopener noreferrer">
-            Amatic SC
-          </a>{' '}
-          &{' '}
-          <a href="https://fonts.google.com/specimen/Nunito?query=Nunito" target="_blank" rel="noopener noreferrer">
-            Nunito
-          </a>
-        </li>
-      </ul>
-      <p className="text text-faded text-align-right">— Bruno</p>
+      <h2 className="title">글꼴</h2>
+      <p className="text">메뉴와 안내 글꼴은 네이버 마루부리예요.</p>
     </div>
   );
 }
