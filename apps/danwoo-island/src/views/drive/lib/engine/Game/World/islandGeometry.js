@@ -49,6 +49,7 @@ export const SHADES = {
     obangYellow: '#e8b830',
     obangWhite: '#f2eee4',
     obangBlack: '#2a2a2e',
+    jindo: '#e6d3ad',
 }
 
 const GLOW = {

@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
-import { createParts, FULL_TURN, SHADES } from './islandGeometry.js'
+import { createParts, FULL_TURN, SHADES, seededRandom } from './islandGeometry.js'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { color } from 'three/tsl'
 
@@ -372,7 +372,186 @@ function bigDok(parts, frame)
     parts.prism('onggiLid', radius * 0.6, radius * 0.74, height * 0.1, { position: [0, bottom + height * 0.96, 0], matrix }, 12)
 }
 
+const TV_BODY = { halfWidth: 0.97, bottom: -1.15, top: 0.84, back: -0.5, front: 0.4 }
+const TV_SCREEN = { halfWidth: 0.71, bottom: -0.68, top: 0.55 }
+
+function tvCabinet(parts, container)
+{
+    const { halfWidth, bottom, top, back, front } = TV_BODY
+    const depth = front - back
+    parts.box('cabinetWood', [halfWidth * 2, top - bottom, depth], { position: [0, (top + bottom) / 2, (front + back) / 2] })
+    const rear = collidersOf(container).find((frame) => frame.size.y < 1.5)
+    if(rear)
+        parts.box('woodDark', [rear.size.x * 0.8, rear.size.y * 0.9, rear.size.z * 0.95], { matrix: rear.matrix })
+    const frameZ = front + 0.04
+    const bar = 0.1
+    parts.box('woodDark', [TV_SCREEN.halfWidth * 2 + bar * 2, bar, 0.08], { position: [0, TV_SCREEN.top + bar / 2, frameZ] })
+    parts.box('woodDark', [TV_SCREEN.halfWidth * 2 + bar * 2, bar, 0.08], { position: [0, TV_SCREEN.bottom - bar / 2, frameZ] })
+    for(const side of [-1, 1])
+        parts.box('woodDark', [bar, TV_SCREEN.top - TV_SCREEN.bottom, 0.08], { position: [side * (TV_SCREEN.halfWidth + bar / 2), (TV_SCREEN.top + TV_SCREEN.bottom) / 2, frameZ] })
+    parts.box('grille', [1.2, 0.24, 0.03], { position: [-0.12, -0.93, front + 0.015] })
+    for(const y of [-0.85, -0.93, -1.01])
+        parts.box('woodDark', [1.16, 0.025, 0.035], { position: [-0.12, y, front + 0.02] })
+    parts.prism('iron', 0.06, 0.06, 0.06, { position: [0.79, -0.8, front + 0.03], rotation: [Math.PI / 2, 0, 0] }, 8)
+    parts.box('giwa', [halfWidth * 2 + 0.12, 0.08, depth + 0.12], { position: [0, top + 0.04, (front + back) / 2] })
+}
+
+function badukBoard(parts, frame)
+{
+    const { size, matrix } = frame
+    const legHeight = size.y * 0.4
+    const slabHeight = size.y - legHeight
+    const bottom = -size.y / 2
+    const top = bottom + size.y
+    parts.box('timber', [size.x * 0.96, slabHeight, size.z * 0.96], { position: [0, top - slabHeight / 2, 0], matrix })
+    for(const x of [-1, 1])
+        for(const z of [-1, 1])
+            parts.box('woodDark', [0.14, legHeight, 0.14], { position: [x * size.x * 0.36, bottom + legHeight / 2, z * size.z * 0.36], matrix })
+    const half = Math.min(size.x, size.z) * 0.42
+    const lines = 7
+    for(let index = 0; index < lines; index++)
+    {
+        const t = -half + (index * 2 * half) / (lines - 1)
+        parts.box('ink', [half * 2, 0.012, 0.012], { position: [0, top + 0.006, t], matrix })
+        parts.box('ink', [0.012, 0.012, half * 2], { position: [t, top + 0.006, 0], matrix })
+    }
+    const stones = [[-1, -1, 'obangBlack'], [0, 1, 'obangWhite'], [1, -2, 'obangBlack'], [2, 0, 'obangWhite'], [-2, 2, 'obangBlack']]
+    const step = (2 * half) / (lines - 1)
+    for(const [x, z, name] of stones)
+        parts.prism(name, 0.06, 0.07, 0.035, { position: [x * step, top + 0.02, z * step], matrix }, 8)
+}
+
+function watermelonTray(parts, frame)
+{
+    const { size, matrix } = frame
+    const bottom = -size.y / 2
+    parts.box('timber', [size.x * 0.95, 0.05, size.z * 0.9], { position: [0, bottom + 0.025, 0], matrix })
+    const radius = Math.min(size.z * 0.42, size.y * 1.6)
+    for(const [x, turn] of [[-size.x * 0.22, 0.2], [size.x * 0.2, -0.15]])
+    {
+        const rind = new THREE.CylinderGeometry(radius, radius, 0.12, 10, 1, false, 0, Math.PI)
+        parts.add('dancheongGreen', rind, { position: [x, bottom + 0.05, 0], rotation: [Math.PI / 2, 0, turn], matrix })
+        const flesh = new THREE.CylinderGeometry(radius * 0.86, radius * 0.86, 0.125, 10, 1, false, 0, Math.PI)
+        parts.add('obangRed', flesh, { position: [x, bottom + 0.06, 0], rotation: [Math.PI / 2, 0, turn], matrix })
+    }
+}
+
+function dotjari(parts, frame)
+{
+    const { size, matrix } = frame
+    const bottom = -size.y / 2
+    parts.box('thatch', [size.x * 0.96, 0.04, size.z * 0.96], { position: [0, bottom + 0.02, 0], matrix })
+    for(let index = 1; index < 6; index++)
+        parts.box('thatchRope', [size.x * 0.96, 0.045, 0.03], { position: [0, bottom + 0.02, -size.z * 0.48 + (index * size.z * 0.96) / 6], matrix })
+    parts.box('obangRed', [0.55, 0.12, 0.55], { position: [size.x * 0.25, bottom + 0.1, -size.z * 0.2], rotation: [0, 0.3, 0], matrix })
+    parts.box('obangBlue', [0.55, 0.12, 0.55], { position: [-size.x * 0.22, bottom + 0.1, size.z * 0.18], rotation: [0, -0.2, 0], matrix })
+}
+
+function bellowsBase(parts, frame)
+{
+    const { size, matrix } = frame
+    const bottom = -size.y / 2
+    parts.box('woodDark', [size.x * 0.92, 0.2, size.z * 0.92], { position: [0, bottom + 0.15, 0], matrix })
+    for(const x of [-1, 1])
+        parts.box('timber', [0.14, 0.08, size.z * 0.96], { position: [x * size.x * 0.36, bottom + 0.04, 0], matrix })
+}
+
+const PIN_PROFILE = [[0, 0.02], [0.3, 0.02], [0.46, 0.55], [0.48, 0.85], [0.36, 1.45], [0.22, 1.85], [0.24, 2.2], [0.3, 2.5], [0.24, 2.8], [0, 2.92]]
+
+function bowlingPin(parts)
+{
+    lathe(parts, 'obangWhite', PIN_PROFILE, {}, 10)
+    parts.prism('obangRed', 0.235, 0.24, 0.12, { position: [0, 1.95, 0] }, 10)
+    parts.prism('obangBlue', 0.23, 0.235, 0.08, { position: [0, 2.08, 0] }, 10)
+}
+
+function taegeukBall(parts, frame)
+{
+    const radius = frame.size.x / 2
+    parts.add('obangRed', new THREE.SphereGeometry(radius, 12, 4, 0, FULL_TURN, 0, Math.PI / 2))
+    parts.add('obangBlue', new THREE.SphereGeometry(radius, 12, 4, 0, FULL_TURN, Math.PI / 2, Math.PI / 2))
+    parts.add('obangYellow', new THREE.TorusGeometry(radius * 1.005, radius * 0.06, 4, 16), { rotation: [Math.PI / 2, 0, 0] })
+}
+
+function stonePillar(parts, frame)
+{
+    const { size, matrix } = frame
+    const bottom = -size.y / 2
+    const radius = Math.min(size.x, size.z) / 2
+    parts.prism('stoneDark', radius, radius, 0.28, { position: [0, bottom + 0.14, 0], matrix })
+    parts.prism('stone', radius * 0.78, radius * 0.82, size.y - 0.7, { position: [0, bottom + 0.28 + (size.y - 0.7) / 2, 0], matrix })
+    parts.prism('stoneDark', radius * 0.98, radius * 0.8, 0.24, { position: [0, size.y / 2 - 0.3, 0], matrix })
+    parts.prism('stone', radius * 0.3, radius * 0.62, 0.18, { position: [0, size.y / 2 - 0.09, 0], matrix })
+}
+
+function taegeukFan(parts)
+{
+    const radius = 0.5
+    const centerY = 0.2
+    parts.add('obangRed', new THREE.CylinderGeometry(radius, radius, 0.05, 12, 1, false, 0, Math.PI), { position: [0, centerY, 0], rotation: [Math.PI / 2, 0, 0] })
+    parts.add('obangBlue', new THREE.CylinderGeometry(radius, radius, 0.05, 12, 1, false, Math.PI, Math.PI), { position: [0, centerY, 0], rotation: [Math.PI / 2, 0, 0] })
+    parts.add('obangYellow', new THREE.TorusGeometry(radius, 0.035, 4, 16), { position: [0, centerY, 0] })
+    parts.rod('woodDark', 0.04, [0, -0.65, 0], [0, centerY - radius + 0.05, 0])
+}
+
+function sortedColliders(container)
+{
+    return collidersOf(container).sort((a, b) => b.size.x * b.size.y * b.size.z - a.size.x * a.size.y * a.size.z)
+}
+
+function haetae(parts, container)
+{
+    const [body, head] = sortedColliders(container)
+    const { size, matrix } = body
+    parts.box('stoneDark', [size.x, size.y * 0.18, size.z * 1.1], { position: [0, -size.y * 0.41, 0], matrix })
+    parts.box('stone', [size.x * 0.8, size.y * 0.6, size.z * 0.9], { position: [0, -size.y * 0.02, 0], matrix })
+    parts.box('stone', [size.x * 0.4, size.y * 0.42, size.z], { position: [size.x * 0.3, size.y * 0.25, 0], matrix })
+    if(!head)
+        return
+    parts.box('stone', [head.size.x * 0.8, head.size.y, head.size.z], { matrix: head.matrix })
+    parts.box('stoneDark', [head.size.x * 0.3, head.size.y * 1.15, head.size.z * 1.1], { position: [-head.size.x * 0.35, 0, 0], matrix: head.matrix })
+    for(const z of [-1, 1])
+        parts.box('ink', [0.04, 0.08, 0.08], { position: [head.size.x * 0.4, head.size.y * 0.18, z * head.size.z * 0.25], matrix: head.matrix })
+}
+
+function dongjaseok(parts, container)
+{
+    const [{ size, matrix }] = sortedColliders(container)
+    const bottom = -size.y / 2
+    const radius = Math.min(size.x, size.z) / 2
+    parts.prism('stoneDark', radius * 1.1, radius * 1.15, 0.16, { position: [0, bottom + 0.08, 0], matrix })
+    parts.prism('stone', radius * 0.7, radius * 0.95, size.y * 0.55, { position: [0, bottom + 0.16 + size.y * 0.275, 0], matrix })
+    parts.box('stone', [radius * 0.9, 0.16, radius * 0.5], { position: [0, bottom + size.y * 0.55, radius * 0.6], matrix })
+    parts.add('stone', new THREE.IcosahedronGeometry(radius * 0.72, 0), { position: [0, bottom + size.y * 0.82, 0], matrix })
+    for(const x of [-1, 1])
+        parts.add('stoneDark', new THREE.IcosahedronGeometry(radius * 0.22, 0), { position: [x * radius * 0.45, bottom + size.y * 0.97, 0], matrix })
+}
+
+function jindoDog(parts, container)
+{
+    const [body, pack] = sortedColliders(container)
+    const { size, matrix } = body
+    const bottom = -size.y / 2
+    parts.box('jindo', [size.x * 0.75, size.y * 0.45, size.z * 0.8], { position: [0, bottom + size.y * 0.3, -size.z * 0.05], rotation: [-0.35, 0, 0], matrix })
+    for(const x of [-1, 1])
+        parts.box('jindo', [0.14, size.y * 0.3, 0.14], { position: [x * size.x * 0.2, bottom + size.y * 0.15, size.z * 0.32], matrix })
+    parts.box('jindo', [size.x * 0.55, size.y * 0.24, size.z * 0.5], { position: [0, bottom + size.y * 0.66, size.z * 0.18], matrix })
+    parts.box('earth', [size.x * 0.25, size.y * 0.1, size.z * 0.22], { position: [0, bottom + size.y * 0.62, size.z * 0.48], matrix })
+    for(const x of [-1, 1])
+        parts.prism('jindo', 0, 0.09, 0.2, { position: [x * size.x * 0.17, bottom + size.y * 0.86, size.z * 0.15], matrix }, 4)
+    parts.prism('jindo', 0.04, 0.09, size.y * 0.35, { position: [0, bottom + size.y * 0.45, -size.z * 0.45], rotation: [-0.9, 0, 0], matrix }, 5)
+    if(pack)
+        parts.box('obangBlue', [pack.size.x * 0.4, pack.size.y * 0.6, Math.max(pack.size.z, 0.3)], { matrix: pack.matrix })
+}
+
+const SOCIAL_OBJECTS = [
+    { pattern: /^baguiraPhysicalDynamic/, build: haetae },
+    { pattern: /^boyPhysicalDynamic/, build: dongjaseok },
+    { pattern: /^sudoPhysicalDynamic/, build: jindoDog },
+]
+
 const BUILDERS = [
+    ...SOCIAL_OBJECTS,
     { pattern: /^gamepadPhysicalDynamic/, keepEmissive: false, build: (parts, container) => yutBoard(parts, collidersOf(container)[0]) },
     { pattern: /^phonePhysicalDynamic/, keepEmissive: false, build: paengi },
     { pattern: /^gizmoPhysicalDynamic$/, build: (parts, container) => janggu(parts, collidersOf(container)[0]) },
@@ -390,11 +569,20 @@ const BUILDERS = [
     { pattern: /^sauceMustardPhysicalDynamic/, build: (parts, container) => oilBottle(parts, collidersOf(container)[0]) },
     { pattern: /^barPhysicalDynamic/, build: barCounter },
     { pattern: /^cupPhysicalDynamic/, build: (parts, container) => makgeolliBowl(parts, collidersOf(container)[0]) },
+    { pattern: /^refTvPhysicalDynamic$/, build: tvCabinet },
+    { pattern: /^blowerPhysicalDynamic/, build: (parts, container) => bellowsBase(parts, collidersOf(container)[0]) },
+    { pattern: /^refPinPhysicalDynamic$/, build: (parts) => bowlingPin(parts) },
+    { pattern: /^refBallPhysicalDynamic$/, build: (parts, container) => taegeukBall(parts, collidersOf(container)[0]) },
 ]
 
 const UNCOLLIDED_BUILDERS = [
     { pattern: /^sword$/, build: obangFlag },
     { pattern: /^table002$/, build: (parts, frame) => workTable(parts, frame) },
+    { pattern: /^Cube006$/, build: badukBoard },
+    { pattern: /^Cylinder$/, build: watermelonTray },
+    { pattern: /^Plane005$/, build: dotjari },
+    { pattern: /^refPillar$/, build: stonePillar },
+    { pattern: /^refFan$/, build: (parts) => taegeukFan(parts) },
 ]
 
 const CIRCUIT_OBJECT = /^refObjectsPhysicalDynamic/
@@ -427,19 +615,111 @@ export function rebuildVillageProps(model, materials)
     }
 }
 
+const CIRCUIT_OBSTACLE = /^refObstaclesPhysicalKinematicPositionBased/
+const BATDAM = { rows: 3, stoneLength: 0.62, seed: 17 }
+
+function batdam(parts, container)
+{
+    const random = seededRandom(BATDAM.seed)
+    for(const { size, matrix } of collidersOf(container))
+    {
+        const rowHeight = size.y / BATDAM.rows
+        const count = Math.max(2, Math.round(size.z / BATDAM.stoneLength))
+        const length = size.z / count
+        for(let row = 0; row < BATDAM.rows; row++)
+        {
+            const y = -size.y / 2 + rowHeight * (row + 0.5)
+            for(let index = 0; index < count; index++)
+            {
+                const z = -size.z / 2 + length * (index + 0.5) + (row % 2) * length * 0.25
+                const name = random() > 0.5 ? 'basalt' : 'basaltDark'
+                parts.box(name, [size.x * (0.8 + random() * 0.2), rowHeight * (0.85 + random() * 0.2), length * 0.92], { position: [0, y, Math.min(z, size.z / 2 - length * 0.45)], rotation: [random() * 0.2 - 0.1, random() * 0.3 - 0.15, random() * 0.2 - 0.1], matrix })
+            }
+        }
+    }
+}
+
+function circuitFiller(parts, container)
+{
+    const [frame] = collidersOf(container)
+    if(frame.isTube && frame.radius > 0.5)
+        bigDok(parts, frame)
+    else
+        strawBale(parts, frame)
+}
+
 export function rebuildCircuitObjects(model, materials)
 {
-    for(const child of [...model.children].filter((item) => CIRCUIT_OBJECT.test(item.name)))
-        rebuildChild(child, materials, {
-            build: (parts, container) =>
-            {
-                const [frame] = collidersOf(container)
-                if(frame.isTube && frame.radius > 0.5)
-                    bigDok(parts, frame)
-                else
-                    strawBale(parts, frame)
-            },
-        })
+    for(const child of [...model.children])
+    {
+        if(CIRCUIT_OBJECT.test(child.name))
+            rebuildChild(child, materials, { build: circuitFiller })
+        else if(CIRCUIT_OBSTACLE.test(child.name))
+            rebuildChild(child, materials, { build: batdam })
+    }
+}
+
+const PODIUM_BACKDROP = { front: -1.53, back: -1.58, bottom: -1.0, top: 3.53, halfDepth: 3.87, frame: 0.12 }
+const PODIUM_RANK_MARK = { width: 0.5, height: 0.08, gap: 0.16 }
+
+function podiumStep(parts, frame, rank)
+{
+    const { size, matrix } = frame
+    const top = size.y / 2
+    parts.box('stone', [size.x, size.y, size.z], { matrix })
+    parts.box('stoneDark', [size.x + 0.06, 0.1, size.z + 0.06], { position: [0, top - 0.05, 0], matrix })
+    const front = size.x / 2 + 0.01
+    for(let index = 0; index < rank; index++)
+    {
+        const y = top - 0.3 - index * PODIUM_RANK_MARK.gap
+        parts.box('obangYellow', [0.02, PODIUM_RANK_MARK.height, PODIUM_RANK_MARK.width], { position: [front, y, 0], matrix })
+    }
+}
+
+function podiumBackdrop(parts)
+{
+    const { front, back, bottom, top, halfDepth, frame } = PODIUM_BACKDROP
+    const thickness = front - back
+    parts.box('woodDark', [thickness, top - bottom, halfDepth * 2], { position: [(front + back) / 2, (top + bottom) / 2, 0] })
+    for(const side of [-1, 1])
+        parts.box('pillarRed', [0.24, top - bottom + 0.2, frame * 2], { position: [front - 0.08, (top + bottom) / 2 + 0.1, side * (halfDepth - frame)] })
+    parts.box('giwa', [0.9, 0.14, halfDepth * 2 + 0.6], { position: [front - 0.1, top + 0.27, 0] })
+    parts.box('giwaRidge', [0.24, 0.14, halfDepth * 2 + 0.7], { position: [front - 0.1, top + 0.4, 0] })
+}
+
+export function rebuildPodium(model, materials)
+{
+    const podium = model.children.find((child) => /^refPodiumPhysicalFixed/.test(child.name))
+    if(!podium)
+        return
+    podium.children.filter((child) => child.isMesh && child.material?.name === 'palette').forEach((child) => child.removeFromParent())
+    const steps = collidersOf(podium).filter((frame) => frame.size.x > 1).sort((a, b) => b.size.y - a.size.y)
+    const parts = createParts()
+    steps.forEach((frame, index) => podiumStep(parts, frame, index + 1))
+    podiumBackdrop(parts)
+    podium.add(parts.build(materials))
+}
+
+const CIRCUIT_RESET_LETTERS = new THREE.Box3(new THREE.Vector3(-17.33, -0.03, 2.38), new THREE.Vector3(-17.15, 0.47, 4.47))
+
+export function eraseCircuitResetLetters(model)
+{
+    const decoration = model.getObjectByName('Cube088')
+    if(!decoration?.isMesh)
+        return
+    const geometry = decoration.geometry
+    const position = geometry.attributes.position
+    const index = geometry.index ? Array.from(geometry.index.array) : Array.from({ length: position.count }, (_, vertex) => vertex)
+    const point = new THREE.Vector3()
+    const isLetter = (vertex) => CIRCUIT_RESET_LETTERS.containsPoint(point.fromBufferAttribute(position, vertex))
+    const kept = []
+    for(let offset = 0; offset < index.length; offset += 3)
+    {
+        const triangle = index.slice(offset, offset + 3)
+        if(!triangle.every(isLetter))
+            kept.push(...triangle)
+    }
+    geometry.setIndex(kept)
 }
 
 export function makeBungeoppang(cookie)

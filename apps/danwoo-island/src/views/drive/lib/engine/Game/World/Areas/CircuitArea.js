@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { rebuildCircuitObjects } from '../islandVillage.js'
+import { eraseCircuitResetLetters, rebuildCircuitObjects, rebuildPodium } from '../islandVillage.js'
 import { Game } from '../../Game.js'
 import { lerp, segmentCircleIntersection } from '../../utilities/maths.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
@@ -16,6 +16,8 @@ export class CircuitArea extends Area
     setObjects()
     {
         rebuildCircuitObjects(this.model, this.game.materials)
+        rebuildPodium(this.model, this.game.materials)
+        eraseCircuitResetLetters(this.model)
         super.setObjects()
     }
 

@@ -1,5 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { rebuildHareubang } from '../islandStructures.js'
+import { rebuildVillageProps } from '../islandVillage.js'
 import { Game } from '../../Game.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import socialData from '../../../data/social.js'
@@ -12,6 +13,7 @@ export class SocialArea extends Area
     setObjects()
     {
         rebuildHareubang(this.model, this.game.materials)
+        rebuildVillageProps(this.model, this.game.materials)
         super.setObjects()
     }
 
