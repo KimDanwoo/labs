@@ -24,8 +24,8 @@ export function BehindTheSceneContent() {
       </p>
       <h2 className="title">바꾼 것</h2>
       <p className="text">
-        석등·청사초롱·평상·옹기 같은 소품과 누각·초가 공방·서낭당 같은 건물을 한국 섬마을 모습으로 새로 만들었어요.
-        나뭇잎은 벚꽃잎 모양이에요.
+        석등·청사초롱·평상·옹기 같은 소품과 누각·초가 공방·서낭당·돌하르방·석탑 같은 건물을 한국 섬마을 모습으로 새로
+        만들었어요. 나뭇잎은 벚꽃잎 모양이에요.
       </p>
       <h2 className="title">사용한 도구</h2>
       <ul className="text">
@@ -40,15 +40,11 @@ export function BehindTheSceneContent() {
       </ul>
       <h2 className="title">음악</h2>
       <p className="text">
-        배경 음악은 Kounine(
-        <a href="https://linktr.ee/Kounine" target="_blank" rel="noopener noreferrer">
-          Linktree
+        배경 음악 &lsquo;녹아&rsquo;와 &lsquo;장마&rsquo;는 직접 만든 곡이에요.{' '}
+        <a href="https://sound.danwoo.dev/" target="_blank" rel="noopener noreferrer">
+          soundlab
         </a>
-        )이 원본 월드를 위해 만들었고,{' '}
-        <a href="https://choosealicense.com/licenses/cc0-1.0/" target="_blank" rel="noopener noreferrer">
-          CC0 라이선스
-        </a>
-        로 공개했어요.
+        에서 다른 곡도 들을 수 있어요.
       </p>
       <h2 className="title">글꼴</h2>
       <p className="text">메뉴와 안내 글꼴은 네이버 마루부리예요.</p>
