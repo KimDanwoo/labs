@@ -709,6 +709,9 @@ const CIRCUIT_DECORATION = {
     gantry: box3([-14.6, -1.1, -18.3], [-0.1, 4, -14.6]),
     startLights: box3([-11.6, 2.2, -16.9], [-7.8, 3.6, -15.4]),
     tents: box3([-29, -1.1, -27], [-15, 2, -2]),
+    dancerBases: [[-26.08, -16.23], [0, 0]],
+    bannerStands: [[-17.62, -15.69], [-17.48, -4.1]],
+    propReach: 0.8,
     groundPaintTop: -0.9,
     legMaxWidth: 0.25,
     legMinHeight: 1.5,
@@ -759,9 +762,10 @@ function classifyDecoration(component)
     const center = box.getCenter(new THREE.Vector3())
     const size = box.getSize(new THREE.Vector3())
     const {
-        resetLetters, tires, clock, gantry, startLights, tents, groundPaintTop, legMaxWidth, legMinHeight,
+        resetLetters, tires, clock, gantry, startLights, tents, dancerBases, bannerStands, propReach, groundPaintTop, legMaxWidth, legMinHeight,
     } = CIRCUIT_DECORATION
-    const isErased = [resetLetters, clock, ...tires].some((region) => region.containsPoint(center))
+    const isProp = [...dancerBases, ...bannerStands].some(([x, z]) => Math.hypot(center.x - x, center.z - z) < propReach)
+    const isErased = isProp || [resetLetters, clock, ...tires].some((region) => region.containsPoint(center))
         || (gantry.containsPoint(center) && !startLights.containsBox(box) && box.max.y > groundPaintTop)
     if(isErased)
         return 'erase'
@@ -820,6 +824,27 @@ function hongsalmun(parts)
     parts.add('obangBlue', new THREE.CylinderGeometry(0.42, 0.42, 0.08, 14, 1, false, 0, Math.PI), { position: [centerX, (lowerBeam + upperBeam) / 2 + 0.1, z + 0.12], rotation: [Math.PI / 2, 0, 0] })
 }
 
+function dancerChest(parts)
+{
+    for(const [x, z] of CIRCUIT_DECORATION.dancerBases)
+    {
+        parts.box('cabinetWood', [1.1, 0.9, 1.1], { position: [x, -0.5, z] })
+        parts.box('woodDark', [1.16, 0.1, 1.16], { position: [x, -0.02, z] })
+        for(const [cx, cz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]])
+            parts.box('obangYellow', [0.14, 0.92, 0.14], { position: [x + cx * 0.5, -0.5, z + cz * 0.5] })
+    }
+}
+
+function bannerStand(parts)
+{
+    for(const [x, z] of CIRCUIT_DECORATION.bannerStands)
+    {
+        parts.box('stoneDark', [1.2, 0.2, 1.2], { position: [x, -0.9, z] })
+        parts.box('stone', [0.5, 0.16, 0.5], { position: [x, -0.72, z] })
+        parts.prism('wood', 0.07, 0.08, 1.35, { position: [x, -0.14, z] }, 6)
+    }
+}
+
 function tentPole(parts, box)
 {
     const center = box.getCenter(new THREE.Vector3())
@@ -846,6 +871,8 @@ export function reshapeCircuitDecoration(model, materials)
     }
     byeotgari(parts)
     angbuilgu(parts)
+    dancerChest(parts)
+    bannerStand(parts)
     hongsalmun(parts)
     const kept = []
     for(let offset = 0; offset < index.length; offset += 3)
