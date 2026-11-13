@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { rebuildHareubang } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import socialData from '../../../data/social.js'
@@ -8,6 +9,12 @@ import { personalizeSocialSigns } from './socialSigns.js'
 
 export class SocialArea extends Area
 {
+    setObjects()
+    {
+        rebuildHareubang(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     constructor(model)
     {
         super(model)

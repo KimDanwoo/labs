@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { rebuildWaterfallPagoda } from '../islandStructures.js'
 import { add, color, cos, float, Fn, instancedArray, instancedBufferAttribute, instanceIndex, max, min, mix, PI2, positionGeometry, positionWorld, sin, texture, uniform, uv, varying, vec2, vec3, vec4 } from 'three/tsl'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
@@ -9,6 +10,12 @@ const rng = new alea('achievements')
 
 export class AchievementsArea extends Area
 {
+    setObjects()
+    {
+        rebuildWaterfallPagoda(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     constructor(model)
     {
         super(model)

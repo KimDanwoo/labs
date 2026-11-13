@@ -1,4 +1,6 @@
 import * as THREE from 'three/webgpu'
+import { Fn, max, texture, uv, vec4 } from 'three/tsl'
+import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { createParts, FULL_TURN, seededRandom } from './islandGeometry.js'
 
 const OBANG = ['obangBlue', 'obangRed', 'obangYellow', 'obangWhite', 'obangBlack']
@@ -347,4 +349,210 @@ export function rebuildSeonangdang(model, materials)
     ropePoints.sort((a, b) => Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x))
     geumjul(parts, random, ropePoints)
     container.add(parts.build(materials))
+}
+
+function removeVisualMeshes(container)
+{
+    for(const child of container.children.filter((item) => item.isMesh && !/^(cuboid|hull|trimesh|tube|ball)/i.test(item.name)))
+        child.removeFromParent()
+}
+
+function boulderStack(parts, random, { size, matrix }, shades = ['fieldstone', 'stoneDark'])
+{
+    const layers = Math.max(1, Math.round(size.y / 1.3))
+    const layerHeight = size.y / layers
+    for(let index = 0; index < layers; index++)
+        parts.add(shades[index % shades.length], new THREE.IcosahedronGeometry(1, 0), {
+            position: [(random() - 0.5) * 0.15, -size.y / 2 + layerHeight * (index + 0.5), (random() - 0.5) * 0.15],
+            rotation: [0, random() * FULL_TURN, 0],
+            scale: [(size.x / 2) * 1.12, (layerHeight / 2) * 1.2, (size.z / 2) * 1.12],
+            matrix,
+        })
+}
+
+function stonePagoda(parts, { x, y, z })
+{
+    parts.box('stone', [2.0, 0.32, 2.0], { position: [x, y + 0.16, z] })
+    parts.box('stone', [1.6, 0.28, 1.6], { position: [x, y + 0.46, z] })
+    let level = y + 0.6
+    for(const [width, height] of [[0.95, 0.62], [0.75, 0.36], [0.62, 0.32]])
+    {
+        parts.box('stone', [width, height, width], { position: [x, level + height / 2, z] })
+        level += height
+        parts.box('stoneDark', [width + 0.75, 0.12, width + 0.75], { position: [x, level + 0.06, z] })
+        for(const sideX of [-1, 1])
+            for(const sideZ of [-1, 1])
+                parts.box('stoneDark', [0.2, 0.08, 0.2], { position: [x + sideX * (width + 0.68) / 2, level + 0.13, z + sideZ * (width + 0.68) / 2] })
+        level += 0.12
+    }
+    parts.prism('stoneDark', 0.1, 0.16, 0.25, { position: [x, level + 0.12, z] })
+    parts.add('stone', new THREE.IcosahedronGeometry(0.1, 0), { position: [x, level + 0.32, z] })
+}
+
+export function rebuildHareubang(model, materials)
+{
+    replaceVisual(model, 'refStatuePhysicalDynamic', () =>
+    {
+        const parts = createParts()
+        const random = seededRandom(41)
+        const front = 0.1
+        parts.prism('stone', 0.72, 0.78, 0.26, { position: [0, -2.37, front] })
+        parts.prism('basalt', 0.5, 0.6, 2.5, { position: [0, -1.0, front] }, 10)
+        parts.add('basalt', new THREE.IcosahedronGeometry(1, 1), { position: [0, 0.75, front], scale: [0.5, 0.62, 0.48] })
+        parts.prism('basalt', 0.62, 0.62, 0.1, { position: [0, 1.3, front] }, 12)
+        parts.add('basalt', new THREE.SphereGeometry(1, 10, 5, 0, FULL_TURN, 0, Math.PI / 2), { position: [0, 1.34, front], scale: [0.46, 0.55, 0.46] })
+        for(const side of [-1, 1])
+        {
+            parts.add('basalt', new THREE.IcosahedronGeometry(0.13, 1), { position: [side * 0.2, 0.86, front + 0.42] })
+            parts.box('basaltDark', [0.24, 0.05, 0.08], { position: [side * 0.2, 1.02, front + 0.44], rotation: [0, 0, side * -0.15] })
+        }
+        parts.add('basalt', new THREE.IcosahedronGeometry(1, 0), { position: [0, 0.64, front + 0.47], scale: [0.12, 0.2, 0.12] })
+        parts.box('basaltDark', [0.28, 0.04, 0.05], { position: [0, 0.42, front + 0.46] })
+        parts.box('basalt', [0.55, 0.14, 0.18], { position: [0.1, -0.25, front + 0.55], rotation: [0, 0, 0.08] })
+        parts.box('basalt', [0.55, 0.14, 0.18], { position: [-0.08, -0.52, front + 0.57], rotation: [0, 0, -0.06] })
+        for(let index = 0; index < 14; index++)
+        {
+            const angle = (random() - 0.5) * 2.2
+            const height = -2.0 + random() * 1.9
+            parts.add('basaltDark', new THREE.IcosahedronGeometry(0.045, 0), { position: [Math.sin(angle) * 0.56, height, front + Math.cos(angle) * 0.56] })
+        }
+        return parts.build(materials)
+    })
+}
+
+export function rebuildWaterfallPagoda(model, materials)
+{
+    findChild(model, 'Cube089').removeFromParent()
+    const container = findChild(model, 'physicalFixed008')
+    const random = seededRandom(31)
+    const parts = createParts()
+    for(const cuboid of container.children.filter((child) => /^cuboid/.test(child.name)))
+    {
+        const frame = cuboidFrame(cuboid)
+        const isPillarColumn = Math.hypot(cuboid.position.x, cuboid.position.z) < 0.1 && frame.size.y > 3
+        if(isPillarColumn)
+            continue
+        if(frame.size.y > 3)
+            boulderStack(parts, random, frame)
+        else if(frame.size.y <= 0.2)
+            parts.box('stone', [frame.size.x, 0.2, frame.size.z], { matrix: frame.matrix })
+        else
+            parts.box(frame.size.x < 0.5 ? 'stoneDark' : 'stone', [frame.size.x, frame.size.y, frame.size.z], { matrix: frame.matrix })
+    }
+    const hull = container.children.find((child) => /^hull/.test(child.name))
+    hull.updateMatrix()
+    parts.add('fieldstone', hull.geometry.clone(), { matrix: hull.matrix })
+    hull.geometry.computeBoundingBox()
+    const top = hull.geometry.boundingBox.clone().applyMatrix4(hull.matrix)
+    stonePagoda(parts, { x: (top.min.x + top.max.x) / 2, y: top.max.y - 0.1, z: (top.min.z + top.max.z) / 2 })
+    container.add(parts.build(materials))
+}
+
+function neonMaterial(game, neonTexture)
+{
+    neonTexture.colorSpace = THREE.SRGBColorSpace
+    const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false })
+    material.outputNode = Fn(() =>
+    {
+        const sample = texture(neonTexture, uv())
+        const glow = vec4(sample.rgb.mul(2.2), max(sample.r, max(sample.g, sample.b)))
+        return MeshDefaultMaterial.revealDiscardNodeBuilder(game, glow)
+    })()
+    material.fog = false
+    material.userData.prevent = true
+    return material
+}
+
+export function rebuildBowlingSign(model, materials, neonTexture)
+{
+    findChild(model, 'sign001').removeFromParent()
+    const sign = swapForGroup(findChild(model, 'sign002'))
+    const parts = createParts()
+    parts.box('neonBoard', [4.0, 2.05, 0.12], { position: [0.05, -0.04, -0.08] })
+    for(const side of [-1, 1])
+        parts.box('metalDark', [0.14, 4.4, 0.14], { position: [side * 1.6, -3.1, -0.12] })
+    const group = parts.build(materials)
+    const neon = new THREE.Mesh(new THREE.PlaneGeometry(3.86, 1.9), neonMaterial(materials.game, neonTexture))
+    neon.name = 'neon'
+    neon.position.set(0.05, -0.04, 0.0)
+    group.add(neon)
+    sign.add(group)
+}
+
+export function rebuildRadioCabinet(model, materials)
+{
+    const container = findChild(model, 'refJukeboxPhysicalDynamic')
+    removeVisualMeshes(container)
+    const collider = cuboidFrame(container.children.find((child) => /^cuboid/.test(child.name)))
+    const { x: width, y: height, z: depth } = collider.size
+    const frame = { matrix: collider.matrix }
+    const parts = createParts()
+    parts.box('cabinetWood', [width - 0.1, height - 0.36, depth - 0.1], { position: [0, -0.06, 0], ...frame })
+    parts.box('woodDark', [width, 0.12, depth], { position: [0, height / 2 - 0.18, 0], ...frame })
+    for(const x of [-1, 1])
+        for(const z of [-1, 1])
+            parts.box('woodDark', [0.16, 0.24, 0.16], { position: [x * (width / 2 - 0.2), -height / 2 + 0.12, z * (depth / 2 - 0.2)], ...frame })
+    parts.box('grille', [width - 0.6, height * 0.4, 0.04], { position: [0, -height * 0.18, depth / 2 - 0.03], ...frame })
+    for(let index = 0; index < 5; index++)
+        parts.box('cabinetWood', [width - 0.6, 0.03, 0.05], { position: [0, -height * 0.36 + index * (height * 0.09), depth / 2 - 0.01], ...frame })
+    parts.box('lantern', [width - 1.0, 0.36, 0.04], { position: [0, height * 0.18, depth / 2 - 0.03], ...frame })
+    for(const x of [-0.75, 0.75])
+        parts.prism('woodDark', 0.13, 0.13, 0.08, { position: [x, height * 0.02, depth / 2], rotation: [Math.PI / 2, 0, 0], ...frame }, 10)
+    container.add(parts.build(materials))
+}
+
+function timberPile(parts, { size, matrix })
+{
+    const layers = 4
+    const beam = size.y / layers
+    for(let layer = 0; layer < layers; layer++)
+        for(const offset of [-1, 0, 1])
+            parts.box('timber', [size.x, beam * 0.9, size.z / 3.3], {
+                position: [0, -size.y / 2 + beam * (layer + 0.5), offset * (size.z / 3.1) + (layer % 2) * 0.04],
+                matrix,
+            })
+    for(const x of [-size.x * 0.3, size.x * 0.3])
+        parts.box('thatchRope', [0.06, size.y + 0.02, size.z + 0.04], { position: [x, 0, 0], matrix })
+}
+
+function hangingLantern(parts, { matrix, z, y })
+{
+    parts.box('woodDark', [0.02, 0.1, 0.02], { position: [0, y + 0.17, z], matrix })
+    for(const [shade, offsetY, height] of [['silkRed', 0.0, 0.24], ['silkBlue', -0.2, 0.16]])
+        parts.box(shade, [0.26, height, 0.26], { position: [0, y + offsetY, z], matrix })
+    parts.box('cheongsachorong', [0.28, 0.25, 0.28], { position: [0, y, z], matrix })
+}
+
+export function rebuildBuildingSite(model, materials)
+{
+    for(const generator of model.children.filter((child) => /^lightGeneratorPhysicalDynamic/.test(child.name)))
+    {
+        removeVisualMeshes(generator)
+        const cuboids = generator.children.filter((child) => /^cuboid/.test(child.name)).map(cuboidFrame).sort((a, b) => b.size.y - a.size.y)
+        const pole = cuboids[0]
+        const pile = cuboids.find((frame) => frame !== pole && frame.size.x > 1)
+        const crossbar = cuboids.find((frame) => frame !== pole && frame !== pile)
+        const parts = createParts()
+        timberPile(parts, pile)
+        parts.box('woodDark', [pole.size.x * 0.9, pole.size.y, pole.size.z * 0.9], { matrix: pole.matrix })
+        parts.box('wood', [crossbar.size.x * 0.9, crossbar.size.y * 0.8, crossbar.size.z], { matrix: crossbar.matrix })
+        for(const z of [-crossbar.size.z * 0.42, crossbar.size.z * 0.42])
+            hangingLantern(parts, { matrix: crossbar.matrix, z, y: -0.45 })
+        generator.add(parts.build(materials))
+    }
+    for(const cone of model.children.filter((child) => /^refObjectsPhysicalDynamic/.test(child.name)))
+    {
+        replaceVisual(model, cone.name, () =>
+        {
+            const parts = createParts()
+            parts.box('stoneDark', [0.85, 0.1, 0.85], { position: [0, -0.46, 0] })
+            for(let index = 0; index < 6; index++)
+                parts.add('giwa', new THREE.CylinderGeometry(0.3, 0.3, 0.62, 8, 1, false, 0, Math.PI), {
+                    position: [0, -0.38 + index * 0.15, 0],
+                    rotation: [0, index % 2 === 0 ? 0 : Math.PI / 2, Math.PI / 2],
+                    scale: [1, 1, 0.55],
+                })
+            return parts.build(materials)
+        })
+    }
 }

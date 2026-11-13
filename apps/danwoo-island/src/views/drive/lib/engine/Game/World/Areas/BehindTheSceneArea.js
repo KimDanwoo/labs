@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { rebuildBuildingSite } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { PortalSlabsGeometry } from '../../Geometries/PortalSlabsGeometry.js'
 import { attribute, color, float, Fn, mix, PI, PI2, positionGeometry, screenCoordinate, sin, texture, uniform, varying, vec2, vec3, vec4, viewportCoordinate } from 'three/tsl'
@@ -7,6 +8,12 @@ import { Area } from './Area.js'
 
 export class BehindTheSceneArea extends Area
 {
+    setObjects()
+    {
+        rebuildBuildingSite(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     constructor(model)
     {
         super(model)
