@@ -3,9 +3,9 @@ import { GamepadControlRow } from './GamepadControlRow';
 import { KeyControlRow } from './KeyControlRow';
 
 const CONTROL_TABS = [
-  { name: 'mouse-keyboard', label: 'Mouse Keyboard' },
-  { name: 'touch', label: 'Mobile Tablet' },
-  { name: 'gamepad', label: 'Gamepad' },
+  { name: 'mouse-keyboard', label: '키보드·마우스' },
+  { name: 'touch', label: '모바일·태블릿' },
+  { name: 'gamepad', label: '게임패드' },
 ] as const;
 
 export function ControlsContent() {

@@ -20,8 +20,8 @@ export const PAINT_OPTIONS = [
 ] as const;
 
 export const TOUCH_BUTTONS = [
-  { name: 'interact', label: 'Interact' },
-  { name: 'unstuck', label: 'Unstuck' },
+  { name: 'interact', label: '확인' },
+  { name: 'unstuck', label: '빼내기' },
   { name: 'previous', label: '' },
   { name: 'next', label: '' },
   { name: 'open', label: '' },

@@ -11,7 +11,7 @@ export function CircuitContent() {
               fill="#ffffff"
             />
           </svg>{' '}
-          Restart
+          다시 시작
         </button>{' '}
         <button className="js-button-end button">
           <svg className="icon icon-flag" width="23" height="20" viewBox="0 0 23 20" fill="none">
@@ -20,7 +20,7 @@ export function CircuitContent() {
               fill="#ffffff"
             />
           </svg>{' '}
-          End
+          그만하기
         </button>{' '}
         <button className="js-button-controls button">
           <svg className="icon icon-controller" width="34" height="22" viewBox="0 0 34 22" fill="none">
@@ -29,7 +29,7 @@ export function CircuitContent() {
               fill="#ffffff"
             />
           </svg>{' '}
-          Controls
+          조작법
         </button>
       </div>
     </div>
