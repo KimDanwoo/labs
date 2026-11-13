@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-// SoundCloud 프로필의 곡 목록을 tracks.ts로 생성한다.
-//
 // 전체 페이지를 성공적으로 읽은 경우에만 아카이브를 갱신한다.
 import { existsSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -52,7 +50,6 @@ async function findClientId() {
  * 제목이 바뀌면 필요한 글자도 바뀌므로 곡 목록과 같은 시점에 다시 만든다.
  */
 async function writeOgFont(tracks) {
-  // 카드에 실제로 그리는 문자만 모은다 — 제목·장르 + 고정 문구·숫자.
   const used = tracks.map((t) => `${t.title}${t.genre}`).join('');
   const chars = [...new Set(`${used}SOUNDLABDANWOO 0123456789:·`.split(''))].sort().join('');
   const api = `https://fonts.googleapis.com/css2?family=Gothic+A1:wght@700&text=${encodeURIComponent(chars)}`;

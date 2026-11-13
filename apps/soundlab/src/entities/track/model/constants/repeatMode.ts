@@ -1,4 +1,3 @@
-/** 버튼을 누를 때마다 off → all → one → off 로 순환한다. */
 export const REPEAT_MODE = {
   off: 'off',
   all: 'all',

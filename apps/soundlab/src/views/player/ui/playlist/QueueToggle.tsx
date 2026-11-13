@@ -11,7 +11,6 @@ import { QueueIcon } from './QueueIcon';
  * Link/router가 아니라 pushState다 — 라우터로 이동하면 트리가 리마운트되고 재생 엔진 iframe이 사라진다.
  * 주소는 진짜 라우트(/t/<id>/queue)라서 새로고침·공유·뒤로가기가 그대로 동작한다.
  */
-// 주 내비게이션이라 공유 버튼보다 밝게, 링을 둘러 배경에서 떼어낸다(아트워크 위에서도 눈에 걸리게).
 const QUEUE_BUTTON = [
   FLOATING_BUTTON,
   'ring-hairline bg-void/80 text-paper ring-1 hover:bg-void hover:text-white focus-visible:bg-void',

@@ -17,17 +17,12 @@ const BACKGROUND: readonly [number, number, number] = [5 / 255, 6 / 255, 7 / 255
  * 앞 파동이 아직 살아 있어 슬롯이 모자란다 — 클릭이 밀려 죽지 않게 늘렸다.
  */
 export const RIPPLE_SLOTS = 5;
-/** 꺼진 슬롯(z >= 1)로 채운 기본값. ripples를 안 넘기는 호출자를 위해 쓴다. */
 const IDLE_RIPPLES = new Float32Array(Array.from({ length: RIPPLE_SLOTS }, () => [0, 0, 1, 0]).flat());
 const IDLE_SEEDS = new Float32Array(RIPPLE_SLOTS);
 
 const GRID_MIN = 120;
 const GRID_MAX = 288;
 
-/**
- * 음악 악센트(PRD §6). 상수였던 블룸·깊이를 신호가 밀어올린다.
- * swell은 프레이즈 규모로 느리게, hit은 피크 직후에 짧게 터진다.
- */
 const BLOOM_THRESHOLD = 0.7;
 const BLOOM_BASE = 0.5;
 const BLOOM_PER_SWELL = 0.35;
@@ -70,7 +65,6 @@ const RIPPLE_WIDTH = '(0.085 + (speed - 0.68) * 0.19)';
 const LUM_LOD = '2.0';
 /** 블룸 타깃 축소 배율(비트 시프트). 블룸은 저주파라 1/4 해상도로도 눈에 안 띄고 필레이트가 4배 싸다. */
 const BLOOM_SHIFT = 2;
-/** 블러 한 탭의 이동거리(풀해상도 px). 블룸 타깃 크기와 무관하게 화면상 반경을 고정한다. */
 const BLUR_PX = 2.8;
 /**
  * 렌더 픽셀 상한. 4K·5K에서 dpr 2를 그대로 쓰면 필레이트만으로 프레임 예산을 넘긴다.
@@ -254,22 +248,15 @@ type RenderInput = {
    * 필수로 두면 타입 검사가 닿지 않는 호출자(scripts/shoot-og.mjs가 문자열로 만드는 페이지)에서
    * undefined가 uniform에 들어가 NaN이 되고 파티클이 전부 사라진다.
    */
-  /** 프레이즈 에너지(0–1). 블룸량과 휘도 깊이를 느리게 밀어올린다. */
   swell?: number;
-  /** 피크 직전 들이쉼(0–1). 파티클이 수축한다. */
   pre?: number;
-  /** 피크 직후 릴리스(0–1). 블룸 문턱이 낮아지고 점이 커진다. */
   hit?: number;
-  /** 고역 = 하이햇·공기감(0–1). 블룸으로 번진다. 원곡 분석 신호가 없으면 0. */
   air?: number;
-  /** RIPPLE_SLOTS × (x, y, 진행도, 진폭). 생략하면 파동 없음. */
   ripples?: Float32Array;
-  /** RIPPLE_SLOTS × 시드. 파동마다 속도·폭을 달리해 같은 파동이 반복되지 않게 한다. */
   rippleSeeds?: Float32Array;
 };
 
 export type Renderer = {
-  /** 캔버스 크기와 .slot 위치를 다시 읽는다. */
   layout: (slot: DOMRect) => void;
   setArtwork: (image: TexImageSource) => void;
   render: (input: RenderInput) => void;
@@ -387,7 +374,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   let side = 300;
   let centerX = 0;
   let centerY = 0;
-  // 마지막으로 실제로 그린 입력. 다음 입력과의 차이가 서브픽셀이면 그 프레임은 건너뛴다.
   let dirty = true;
   let drawnMorph = 0;
   let drawnLevel = 0;
@@ -404,7 +390,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   }
 
   function ensureGrid() {
-    // 격자는 실제 표시 크기에 맞춘다 — 좁은 화면에서 8만 개를 그리지 않는다.
     const next = Math.max(GRID_MIN, Math.min(GRID_MAX, Math.round((side * dpr) / 1.9)));
     if (next === grid) return;
     grid = next;
@@ -449,7 +434,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
-    // 파티클이 모일 자리를 예약 칸에서 그대로 읽는다. 눈대중 오프셋을 두지 않는다.
     side = slot.width;
     centerX = slot.left + slot.width / 2 - cssWidth / 2;
     centerY = cssHeight / 2 - (slot.top + slot.height / 2);
@@ -505,7 +489,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     // 악센트가 살아 있으면 매 프레임 그린다 — 들이쉼·릴리스는 짧아서 건너뛰면 툭툭 끊긴다.
     // 끝난 직후 한 프레임도 그려야 수축·블룸이 화면에서 지워진다(hadRipple과 같은 이유).
     const accented = pre > 0 || hit > 0;
-    // 연속 채널은 한 스칼라로 합쳐 문턱을 잡는다 — 어느 하나가 움직이면 그 프레임을 그린다.
     const continuous = level + swell + air;
     if (!accented && !hadAccent && isRedundant(morph, continuous, decay, rippleAlive)) return;
     dirty = false;
@@ -519,7 +502,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     if (!source || !destination) return;
     const [bloomA, bloomB] = bloom;
 
-    // 1) 이전 프레임을 감쇠시켜 옮긴다. 정지 상태면 그냥 지운다(선명하게 남는다).
     gl.disable(gl.BLEND);
     if (decay > STATIC_DECAY) {
       quadPass(destination, fade, () => {
@@ -533,7 +515,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
       gl.clear(gl.COLOR_BUFFER_BIT);
     }
 
-    // 2) 파티클
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.useProgram(points.program);
@@ -553,10 +534,8 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     gl.drawArrays(gl.POINTS, 0, count);
     gl.disable(gl.BLEND);
 
-    // 3) 블룸 — 브라이트패스 후 가로·세로 블러
     quadPass(bloomA, bright, () => {
       bindTexture(0, destination.texture, bright.uniforms.uSrc ?? null);
-      // 피크 직후엔 문턱을 낮춰 평소 안 새던 밝기까지 빛으로 끌어올린다.
       gl.uniform1f(bright.uniforms.uThreshold ?? null, BLOOM_THRESHOLD - hit * THRESHOLD_PER_HIT);
     });
     // uDir은 uv 단위다. 블룸 타깃 크기가 아니라 캔버스로 나눠 화면상 반경을 축소배율과 무관하게 고정한다.
@@ -569,7 +548,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
       gl.uniform2f(blur.uniforms.uDir ?? null, 0, BLUR_PX / canvas.height);
     });
 
-    // 4) 합성 — 누적 버퍼는 빛만 담으므로 배경색을 여기서 더한다.
     quadPass(null, composite, () => {
       bindTexture(0, destination.texture, composite.uniforms.uScene ?? null);
       bindTexture(1, bloomA.texture, composite.uniforms.uBloom ?? null);

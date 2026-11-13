@@ -39,9 +39,7 @@ const MORPH = 0.97;
  * (630 - SLOT) / 2 가 그보다 커야 아래위가 잘리지 않는다.
  */
 const SLOT = 410;
-/** 아트 중심 x. 왼쪽을 워드마크에 내주는 2단 구성. */
 const SLOT_CENTER_X = 796;
-/** 20 Gothic Gravity — 밝은 코어가 썸네일에서도 초점을 만들고 반짝이는 질감이 파티클과 겹친다. */
 const DEFAULT_TRACK = 20;
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -126,7 +124,6 @@ try {
 </html>`;
 }
 
-/** CDP는 요청마다 id를 붙여 응답을 맞춰야 한다. 얇은 래퍼로 감춘다. */
 function connect(url) {
   const socket = new WebSocket(url);
   const pending = new Map();

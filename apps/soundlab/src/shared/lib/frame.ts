@@ -21,7 +21,6 @@ function tick(now: number) {
   handle = requestAnimationFrame(tick);
 }
 
-/** 위젯마다 rAF 루프를 만들지 않는다. 앱 전체가 한 루프를 공유한다. */
 function subscribeFrame(callback: FrameCallback) {
   callbacks.add(callback);
   if (!handle) {

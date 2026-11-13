@@ -29,7 +29,6 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   if (!track) return new ImageResponse(<div style={{ background: VOID, width: '100%', height: '100%' }} />, size);
 
   // Satori는 시스템 폰트를 쓰지 않는다. 한글을 그리려면 바이너리를 직접 넘겨야 한다.
-  // 이 서브셋은 sync-tracks.mjs가 곡 제목에 쓰인 글자만 담아 만든다(20KB대).
   const font = await readFile(join(process.cwd(), 'assets', 'og-title.ttf'));
 
   // <img src="https://…">를 그대로 두면 Satori가 uncached fetch를 돌려 이 라우트가 통째로

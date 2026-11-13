@@ -17,7 +17,6 @@ export type ScWidget = {
   /** 0–100. 페이드에 쓴다 — 위젯 오디오는 cross-origin이라 이게 유일한 음량 손잡이다. */
   setVolume(volume: number): void;
   getDuration(callback: (milliseconds: number) => void): void;
-  /** 여러 곡이 실린 경우에만 의미가 있다. iframe 재탐색 없이 즉시 전환된다. */
   skip(soundIndex: number): void;
   getSounds(callback: (sounds: unknown[]) => void): void;
   getCurrentSoundIndex(callback: (index: number) => void): void;
@@ -35,7 +34,6 @@ declare global {
 
 let pending: Promise<ScGlobal> | null = null;
 
-/** api.js를 한 번만 로드한다. 이미 있으면 즉시 반환. */
 export function loadWidgetApi(): Promise<ScGlobal> {
   if (globalThis.SC) return Promise.resolve(globalThis.SC);
   if (!pending) {
@@ -86,7 +84,6 @@ export function setUrl(tracks: readonly Track[]): string | null {
   return `${scheme}//${host}/${user}`;
 }
 
-/** 위젯이 준 sound 객체에서 트랙 id를 꺼낸다. 형식이 다르면 매핑에서 제외한다. */
 export function soundId(sound: unknown): number | null {
   if (typeof sound !== 'object' || sound === null || !('id' in sound)) return null;
   return typeof sound.id === 'number' && Number.isSafeInteger(sound.id) && sound.id > 0 ? sound.id : null;
@@ -128,10 +125,6 @@ export function artworkUrl(track: Track, size: ArtworkSize): string {
   return `${track.artworkBase}-${size}${track.artworkExt}`;
 }
 
-/**
- * wave.sndcdn.com은 0–140 정수 1800개를 준다(`ACAO: *`).
- * 0–1로 정규화해 Float32Array로 캐시한다.
- */
 export async function fetchWaveform(url: string): Promise<Float32Array> {
   const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
   if (!response.ok) throw new Error(`파형 요청 실패: ${response.status}`);
@@ -152,7 +145,6 @@ const decodeBand = (base64: string) => {
 
 let manifest: Promise<Set<number>> | null = null;
 
-/** 신호가 있는 곡 목록. 곡마다 404를 두드리지 않으려고 한 번만 받는다. */
 function fetchSignalManifest(): Promise<Set<number>> {
   manifest ??= fetch('/signals/index.json', { signal: AbortSignal.timeout(10_000) })
     .then(async (response): Promise<unknown> => (response.ok ? response.json() : []))
@@ -193,7 +185,6 @@ const QUEUE_SEGMENT = '/queue';
 /** 공유 링크가 시작 지점을 싣는 이름. 유튜브와 같게 둔다 — 손으로 고쳐 쓸 수 있어야 한다. */
 const TIME_PARAM = 't';
 
-/** 지금 듣는 자리까지 담은 공유 링크. 맨 앞이면 초를 붙이지 않는다 — 곡 링크가 더 깔끔하다. */
 export function shareUrl(track: Track, ms: number, origin: string): string {
   const url = new URL(trackPath(track), origin);
   const seconds = Math.floor(ms / 1000);
@@ -201,7 +192,6 @@ export function shareUrl(track: Track, ms: number, origin: string): string {
   return url.toString();
 }
 
-/** 공유 링크가 지목한 시작 지점(ms). 없거나 해석이 안 되면 null. */
 export function readSharedStartMs(search: string): number | null {
   const raw = new URLSearchParams(search).get(TIME_PARAM);
   if (raw === null) return null;
@@ -209,7 +199,6 @@ export function readSharedStartMs(search: string): number | null {
   return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : null;
 }
 
-/** 주소는 "무슨 곡 + 어떤 화면"을 담는다. 새로고침·공유로 그 화면에 그대로 들어올 수 있다. */
 export function playerPath(track: Track, screen: PlayerScreen): string {
   if (screen === PLAYER_SCREEN.archive) return '/';
   return screen === PLAYER_SCREEN.queue ? `${trackPath(track)}${QUEUE_SEGMENT}` : trackPath(track);
@@ -222,10 +211,8 @@ export function screenFromPath(pathname: string): PlayerScreen {
 
 const LAST_PLAYED_KEY = 'soundlab:last-played';
 
-/** 나갔다 들어왔을 때 이어 들을 자리. 곡 하나만 기억한다. */
 type LastPlayed = { id: number; ms: number };
 
-/** 저장을 막는 환경(시크릿·저장 거부)이나 낡은 형식이면 이어 듣기만 포기한다. */
 export function readLastPlayed(): LastPlayed | null {
   try {
     const raw = localStorage.getItem(LAST_PLAYED_KEY);
@@ -250,7 +237,6 @@ export function writeLastPlayed(last: LastPlayed): void {
   }
 }
 
-/** 어디서부터 들을 것인가. 주소가 곡을 지목했으면(공유 링크) 그 링크의 ?t가, 아니면 지난 방문 기록이 정한다. */
 export function readStartTarget(sharedTrackId: number | undefined): LastPlayed | null {
   if (sharedTrackId === undefined) return readLastPlayed();
   const ms = readSharedStartMs(window.location.search);

@@ -20,17 +20,15 @@ const TMP = join(HERE, '..', 'node_modules', '.cache', 'soundlab-pcm.raw');
 
 const SAMPLE_RATE = 22050;
 const FFT_SIZE = 1024;
-const HOP = 512; // 43.07Hz — 킥을 23ms 안에 집을 수 있고, 사클 파형의 5배다
+const HOP = 512;
 const FPS = SAMPLE_RATE / HOP;
 
-/** 대역 경계(Hz). 저역=킥·베이스, 중역=보컬·스네어·기타, 고역=하이햇·공기감. */
 const BAND_EDGES = [
   [20, 200],
   [200, 4000],
   [4000, SAMPLE_RATE / 2],
 ];
 
-/** 비트 격자 탐색 범위와 허용 오차. 격자에 붙은 온셋 비율이 신뢰도가 된다. */
 const BPM_MIN = 60;
 const BPM_MAX = 180;
 const BPM_STEP = 0.25;
@@ -61,7 +59,6 @@ const GRID_MIN_CONFIDENCE = 0.75;
  */
 const MASTER_DRIFT_MS = 250;
 
-/** 제목이 다른 경우의 수동 대응표. 사클 제목 ← 파일명(확장자 제외). */
 const TITLE_ALIAS = { 네온사인: 'Neon Sign', '네가 만든 Scene': 'Scene' };
 
 const AUDIO_EXT = new Set(['.mp3', '.wav', '.m4a', '.flac', '.aiff', '.aif', '.ogg']);
@@ -76,7 +73,6 @@ const VERSION_TAG =
 const normalizeStem = (stem) => {
   let out = stem.trim();
   let previous;
-  // 표기가 겹쳐 붙은 경우(`곡 remaster v2`)도 벗긴다.
   do {
     previous = out;
     out = out.replace(VERSION_TAG, '').trim();
@@ -98,7 +94,6 @@ const titleKey = (value) =>
 
 /** 같은 곡의 파일이 여럿이고 길이도 같을 때의 우선순위. 리마스터를 올렸다는 게 사용자의 규칙이다. */
 const versionRank = (stem) => (/remaster|리마스터/i.test(stem) ? 2 : /v\d|verson|version|\d$/i.test(stem) ? 1 : 0);
-/** 이 차이 안이면 길이로는 못 가른다고 보고 위 우선순위로 넘긴다. */
 const DRIFT_TIE_MS = 150;
 
 /** 디코드는 곡당 1초쯤 걸린다. 후보를 고를 때는 길이만 빠르게 묻는다. */
@@ -123,7 +118,6 @@ function decodeMono(file) {
   return new Float32Array(buffer.buffer, buffer.byteOffset, buffer.length / 4);
 }
 
-// --- 반복형 radix-2 FFT. 프레임마다 도니 테이블은 한 번만 만든다.
 const reverse = new Uint32Array(FFT_SIZE);
 for (let i = 0, bits = Math.log2(FFT_SIZE); i < FFT_SIZE; i++) {
   let r = 0;
@@ -171,7 +165,6 @@ function fft(re, im) {
 
 const binOf = (hz) => Math.max(1, Math.round((hz / (SAMPLE_RATE / 2)) * (FFT_SIZE / 2)));
 
-/** 대역별 에너지 엔벨로프와 저역 스펙트럼 플럭스(=킥 후보)를 한 번의 STFT로 뽑는다. */
 function spectra(pcm) {
   const frames = Math.max(0, Math.floor((pcm.length - FFT_SIZE) / HOP));
   const bands = BAND_EDGES.map(() => new Float32Array(frames));
@@ -256,7 +249,6 @@ function findGrid(onsets, durationMs) {
       // 기대치를 빼고 남는 만큼만 점수로 센다 — 세분이 달라도 값이 비교 가능해진다.
       const chance = Math.min(0.95, (2 * tolerance) / period);
 
-      // 위상은 첫 온셋들을 후보로 삼는다 — 격자는 어딘가의 실제 타격에서 시작한다.
       for (const anchor of onsets.slice(0, 24)) {
         let matched = 0;
         for (const onset of onsets) {
@@ -274,7 +266,6 @@ function findGrid(onsets, durationMs) {
 
   // 신뢰도도 우연 보정된 점수를 쓴다 — 원시 일치율은 잘게 쪼갤수록 부풀려진다.
   const confidence = Math.max(0, best.score);
-  // 격자선마다 근처 온셋의 세기를 붙인다. 온셋이 없는 격자선은 0 — 쉬는 박은 조용해야 한다.
   const tolerance = Math.min(GRID_TOLERANCE_MS, Math.max(GRID_TOLERANCE_MIN_MS, best.period * GRID_TOLERANCE_RATIO));
   const peak = Math.max(...onsets.map((onset) => onset.strength)) || 1;
   // 세기 0인 격자선은 내보내지 않는다 — 펄스를 안 만들면서 파일만 키운다(실측: 격자선의 66~82%).
@@ -339,7 +330,6 @@ function selftest() {
     if (!ok) process.exitCode = 1;
   };
 
-  // 1) 120BPM 16분음표(125ms) + 지터. 주기를 2% 안에서 복원해야 한다.
   const jitter = (seed) => ((Math.sin(seed * 12.9898) * 43758.5453) % 1) * 16 - 8;
   const grid = Array.from({ length: 240 }, (_, i) => ({ ms: i * 125 + jitter(i), strength: 1 }));
   const found = findGrid(grid, 30_000);
@@ -347,7 +337,6 @@ function selftest() {
   check('등간격 격자 복원', !!found && Math.abs(period - 125) / 125 < 0.02, `주기 ${period.toFixed(1)}ms (기대 125ms)`);
   check('신뢰도 높음', !!found && found.confidence > 0.9, `${((found?.confidence ?? 0) * 100).toFixed(0)}%`);
 
-  // 2) 무작위 온셋은 격자가 아니다 — 신뢰도가 문턱 아래여야 비트를 안 내보낸다.
   let seed = 1;
   const random = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
   const noise = [];
@@ -359,13 +348,11 @@ function selftest() {
     `신뢰도 ${((noisy?.confidence ?? 0) * 100).toFixed(0)}% < ${GRID_MIN_CONFIDENCE * 100}%`,
   );
 
-  // 3) 중간이 비어도(쉬는 구간) 격자는 유지되고, 빈 격자선은 내보내지 않는다.
   const gapped = grid.filter((onset) => onset.ms < 10_000 || onset.ms > 20_000);
   const withGap = findGrid(gapped, 30_000);
   const inGap = withGap?.beats.filter(([ms]) => ms > 11_000 && ms < 19_000).length ?? -1;
   check('쉬는 구간에는 비트를 안 만든다', inGap === 0, `구간 내 ${inGap}개`);
 
-  // 4) 온셋이 너무 적으면 판단하지 않는다.
   check('증거 부족이면 null', findGrid(grid.slice(0, 8), 30_000) === null);
 }
 
@@ -383,7 +370,6 @@ if (!folder || !existsSync(folder)) {
 const { TRACKS } = await import(pathToFileURL(TRACKS_FILE).href);
 const tracks = TRACKS.filter((track) => track.isAvailable !== false);
 const byTitle = new Map(tracks.map((track) => [track.title, track]));
-/** 곡별 하위 폴더로 정리된 경우가 많다. 아래까지 훑는다(파일명만 매칭에 쓰므로 깊이는 상관없다). */
 function collectAudio(root, depth = 0) {
   if (depth > 4) return [];
   const out = [];
@@ -401,7 +387,6 @@ mkdirSync(OUT_DIR, { recursive: true });
 const skipped = [];
 const mismatched = [];
 
-// 열쇠 하나에 곡이 여럿일 수 있어 배열로 담는다.
 const byKey = new Map();
 for (const track of tracks) {
   const key = titleKey(track.title);
@@ -414,7 +399,6 @@ const resolve = (stem, file) => {
   if (direct) return direct;
   const found = byKey.get(titleKey(TITLE_ALIAS[stem] ?? stem)) ?? [];
   if (found.length <= 1) return found[0];
-  // 열쇠가 겹치면 길이가 가장 가까운 곡으로 붙인다.
   let ms = Number.NaN;
   try {
     ms = probeDurationMs(file);
@@ -424,7 +408,6 @@ const resolve = (stem, file) => {
   return found.reduce((a, b) => (Math.abs(b.durationMs - ms) < Math.abs(a.durationMs - ms) ? b : a));
 };
 
-// 곡 하나에 파일이 여러 개일 수 있다(원본 + 리마스터). 곡별로 묶는다.
 const candidates = new Map();
 for (const full of files) {
   const name = basename(full);
@@ -454,7 +437,6 @@ function pickMaster(entry) {
   });
   const usable = measured.filter((m) => Number.isFinite(m.drift));
   if (usable.length === 0) return { measured };
-  // 길이로 먼저 고르고, 길이가 같으면(원본과 리마스터가 같은 길이인 경우가 흔하다) 리마스터를 집는다.
   usable.sort((a, b) => {
     const gap = Math.abs(a.drift) - Math.abs(b.drift);
     if (Math.abs(gap) > DRIFT_TIE_MS) return gap;

@@ -27,7 +27,6 @@ export function useTrackUrl(tracks: readonly Track[], initialTrackId?: number, i
   const screen = useAtomValue(playerScreenAtom);
   const setScreen = useSetAtom(playerScreenAtom);
 
-  // 상태 → 주소
   useEffect(() => {
     const track = tracks[index];
     if (!track) return;
@@ -38,7 +37,6 @@ export function useTrackUrl(tracks: readonly Track[], initialTrackId?: number, i
     window.history.replaceState(window.history.state, '', next);
   }, [index, screen, tracks]);
 
-  // 주소 → 상태. 뒤로/앞으로가 화면 전환을 되돌린다.
   // 곡은 되돌리지 않는다 — 엔진에 load/skip을 걸지 않고 인덱스만 바꾸면 목록 하이라이트가 실제 소리와 어긋난다.
   useEffect(() => {
     const sync = () => setScreen(screenFromPath(window.location.pathname));
