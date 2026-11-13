@@ -1,124 +1,10 @@
 import * as THREE from 'three/webgpu'
-import { color } from 'three/tsl'
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
-import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
+import { createParts, FULL_TURN, OCTAGON, seededRandom } from './islandGeometry.js'
 
-const OCTAGON = 8
-const FULL_TURN = Math.PI * 2
-
-const SHADES = {
-    stone: '#a39a90',
-    stoneDark: '#857c74',
-    wood: '#9a5b34',
-    woodDark: '#6b3d24',
-    twig: '#b07a45',
-    silkRed: '#d6453a',
-    silkBlue: '#3a56b5',
-    onggi: '#5b2f1f',
-    onggiLid: '#7c4127',
-    fieldstone: '#9a948b',
-}
-
-const GLOW = {
-    lantern: { name: 'emissiveSeokdeungGradient', inner: '#fff1b8', outer: '#ffad3d', intensity: 1.6 },
-    cheongsachorong: { name: 'emissiveCheongsachorongGradient', inner: '#ffd58a', outer: '#ff3b2f', intensity: 1.8 },
-}
-
-function shadedMaterial(shade)
-{
-    const material = new MeshDefaultMaterial({ colorNode: color(shade), hasCoreShadows: true, hasDropShadows: true })
-    material.userData.prevent = true
-    return material
-}
-
-function seededRandom(seed)
-{
-    let state = seed
-    return () =>
-    {
-        state = (state * 1664525 + 1013904223) % 4294967296
-        return state / 4294967296
-    }
-}
-
-function createParts()
-{
-    const batches = new Map()
-
-    const add = (name, geometry, { position = [0, 0, 0], rotation = [0, 0, 0], scale = [1, 1, 1] } = {}) =>
-    {
-        geometry.scale(...scale)
-        geometry.rotateX(rotation[0])
-        geometry.rotateY(rotation[1])
-        geometry.rotateZ(rotation[2])
-        geometry.translate(...position)
-        const flat = geometry.index ? geometry.toNonIndexed() : geometry
-        if(flat !== geometry)
-            geometry.dispose()
-        flat.deleteAttribute('uv')
-        flat.computeVertexNormals()
-        if(!batches.has(name))
-            batches.set(name, [])
-        batches.get(name).push(flat)
-    }
-
-    const box = (name, size, transform) => add(name, new THREE.BoxGeometry(...size), transform)
-    const prism = (name, radiusTop, radiusBottom, height, transform, sides = OCTAGON) =>
-        add(name, new THREE.CylinderGeometry(radiusTop, radiusBottom, height, sides), transform)
-    const rod = (name, radius, from, to) =>
-    {
-        const start = new THREE.Vector3(...from)
-        const end = new THREE.Vector3(...to)
-        const length = start.distanceTo(end)
-        const geometry = new THREE.CylinderGeometry(radius, radius, length, 5)
-        geometry.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), end.clone().sub(start).normalize()))
-        geometry.translate(...start.add(end).multiplyScalar(0.5).toArray())
-        add(name, geometry)
-    }
-
-    const build = (materialFor, template) =>
-    {
-        const group = new THREE.Group()
-        for(const [name, geometries] of batches)
-        {
-            const mesh = new THREE.Mesh(mergeGeometries(geometries), materialFor(name))
-            for(const geometry of geometries)
-                geometry.dispose()
-            mesh.name = name
-            mesh.castShadow = true
-            mesh.receiveShadow = true
-            mesh.matrixAutoUpdate = false
-            mesh.matrix.copy(template.matrix)
-            group.add(mesh)
-        }
-        return group
-    }
-
-    return { add, box, prism, rod, build }
-}
-
-function materialResolver(materials, shadeByPart)
-{
-    const cache = new Map()
-    return (name) =>
-    {
-        const glow = GLOW[name]
-        if(glow)
-        {
-            if(!materials.list.has(glow.name))
-                materials.createEmissiveGradient(glow.name, glow.inner, glow.outer, glow.intensity, true)
-            return materials.list.get(glow.name)
-        }
-        if(!cache.has(name))
-            cache.set(name, shadedMaterial(shadeByPart[name]))
-        return cache.get(name)
-    }
-}
-
-function prepareTemplate(template)
+function templateMatrix(template)
 {
     template.updateMatrix()
-    return template
+    return template.matrix
 }
 
 export function createStoneLantern(materials, template)
@@ -147,7 +33,7 @@ export function createStoneLantern(materials, template)
     parts.prism('stone', 0.1, 0.36, 0.13, { position: [0, 0.55, 0] })
     parts.prism('stone', 0.05, 0.07, 0.05, { position: [0, 0.63, 0] })
     parts.add('stone', new THREE.IcosahedronGeometry(0.065, 0), { position: [0, 0.69, 0] })
-    return parts.build(materialResolver(materials, SHADES), prepareTemplate(template))
+    return parts.build(materials, templateMatrix(template))
 }
 
 export function createLanternPole(materials, template)
@@ -166,7 +52,7 @@ export function createLanternPole(materials, template)
     parts.box('woodDark', [0.38, 0.05, 0.38], { position: [lanternX, 0.74, 0] })
     parts.rod('silkRed', 0.02, [lanternX, 0.72, 0], [lanternX, 0.56, 0])
     parts.box('cheongsachorong', [0.34, 0.31, 0.34], { position: [lanternX, 1.11, 0] })
-    const group = parts.build(materialResolver(materials, SHADES), prepareTemplate(template))
+    const group = parts.build(materials, templateMatrix(template))
     group.getObjectByName('cheongsachorong').name = 'glass'
     return group
 }
@@ -192,7 +78,7 @@ export function createPyeongsang(materials, template)
         parts.box('woodDark', [0.1, 0.62, 0.1], { position: [-1.2, 0.17, z] })
     parts.box('wood', [0.1, 0.08, 1.9], { position: [-1.2, railY + 0.18, -0.05] })
     parts.box('wood', [0.08, 0.06, 1.9], { position: [-1.2, railY - 0.08, -0.05] })
-    return parts.build(materialResolver(materials, SHADES), prepareTemplate(template))
+    return parts.build(materials, templateMatrix(template))
 }
 
 export function createBrushwoodFence(materials, template)
@@ -212,7 +98,7 @@ export function createBrushwoodFence(materials, template)
         const z = index % 2 === 0 ? 0.02 : -0.03
         parts.rod('twig', 0.02, [x, -0.98, z], [x + lean, top, z])
     }
-    return parts.build(materialResolver(materials, SHADES), prepareTemplate(template))
+    return parts.build(materials, templateMatrix(template))
 }
 
 export function createOnggi(materials, template)
@@ -232,7 +118,7 @@ export function createOnggi(materials, template)
     parts.add('onggi', new THREE.LatheGeometry(profile, 10))
     parts.prism('onggiLid', 0.26, 0.33, 0.07, { position: [0, 0.5, 0] }, 10)
     parts.prism('onggiLid', 0.06, 0.08, 0.06, { position: [0, 0.56, 0] }, 6)
-    return parts.build(materialResolver(materials, SHADES), prepareTemplate(template))
+    return parts.build(materials, templateMatrix(template))
 }
 
 export function createFieldstone(materials, template)
@@ -251,6 +137,6 @@ export function createFieldstone(materials, template)
     }
     const parts = createParts()
     parts.add('fieldstone', geometry, { scale: [0.68, 0.37, 0.82] })
-    return parts.build(materialResolver(materials, SHADES), prepareTemplate(template))
+    return parts.build(materials, templateMatrix(template))
 }
 
