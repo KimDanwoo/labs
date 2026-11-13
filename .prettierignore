@@ -2,6 +2,10 @@
 # Prettier가 강조 기호·목록 들여쓰기를 바꾸면 원문 대조와 재실행 결과가 어긋난다.
 apps/dansoon/contents/
 
+# 하네스 설치본 — 포맷 변경이 설치 매니페스트의 해시를 깨지 않게 보존한다.
+.claude/rules/
+.claude/.my-fe-harness-manifest.json
+
 # 빌드 산출물
 **/.next/
 **/dist/
