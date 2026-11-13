@@ -700,26 +700,158 @@ export function rebuildPodium(model, materials)
     podium.add(parts.build(materials))
 }
 
-const CIRCUIT_RESET_LETTERS = new THREE.Box3(new THREE.Vector3(-17.33, -0.03, 2.38), new THREE.Vector3(-17.15, 0.47, 4.47))
+const box3 = (min, max) => new THREE.Box3(new THREE.Vector3(...min), new THREE.Vector3(...max))
 
-export function eraseCircuitResetLetters(model)
+const CIRCUIT_DECORATION = {
+    resetLetters: box3([-17.33, -0.03, 2.38], [-17.15, 0.47, 4.47]),
+    tires: [box3([-27.45, -1.05, -3.25], [-23.98, 0.5, 0.1]), box3([-2.35, -1.05, 10.9], [0.85, 0.5, 14.55])],
+    clock: box3([-17.8, -1.05, 4.68], [-16.6, 0.6, 6.2]),
+    gantry: box3([-14.6, -1.1, -18.3], [-0.1, 4, -14.6]),
+    startLights: box3([-11.6, 2.3, -16.9], [-7.8, 3.5, -15.4]),
+    groundPaintTop: -0.9,
+    legMaxWidth: 0.25,
+    legMinHeight: 1.5,
+}
+
+function meshComponents(geometry)
+{
+    const position = geometry.attributes.position
+    const index = geometry.index ? Array.from(geometry.index.array) : Array.from({ length: position.count }, (_, vertex) => vertex)
+    const canonical = new Map()
+    const parent = Array.from({ length: position.count }, (_, vertex) => vertex)
+    const find = (vertex) =>
+    {
+        while(parent[vertex] !== vertex)
+            vertex = parent[vertex] = parent[parent[vertex]]
+        return vertex
+    }
+    const representative = (vertex) =>
+    {
+        const key = [position.getX(vertex), position.getY(vertex), position.getZ(vertex)].map((value) => value.toFixed(3)).join()
+        if(!canonical.has(key))
+            canonical.set(key, vertex)
+        return canonical.get(key)
+    }
+    const roots = index.map(representative)
+    for(let offset = 0; offset < roots.length; offset += 3)
+        for(const other of [roots[offset + 1], roots[offset + 2]])
+            parent[find(other)] = find(roots[offset])
+
+    const components = new Map()
+    const point = new THREE.Vector3()
+    for(let offset = 0; offset < index.length; offset += 3)
+    {
+        const root = find(roots[offset])
+        if(!components.has(root))
+            components.set(root, { offsets: [], box: new THREE.Box3() })
+        const component = components.get(root)
+        component.offsets.push(offset)
+        for(const vertex of index.slice(offset, offset + 3))
+            component.box.expandByPoint(point.fromBufferAttribute(position, vertex))
+    }
+    return { index, components: [...components.values()] }
+}
+
+function classifyDecoration(component)
+{
+    const { box } = component
+    const center = box.getCenter(new THREE.Vector3())
+    const size = box.getSize(new THREE.Vector3())
+    const {
+        resetLetters, tires, clock, gantry, startLights, groundPaintTop, legMaxWidth, legMinHeight,
+    } = CIRCUIT_DECORATION
+    const isErased = [resetLetters, clock, ...tires].some((region) => region.containsPoint(center))
+        || (gantry.containsPoint(center) && !startLights.containsBox(box) && box.max.y > groundPaintTop)
+    if(isErased)
+        return 'erase'
+    if(size.x < legMaxWidth && size.z < legMaxWidth && size.y > legMinHeight)
+        return 'tentLeg'
+    return 'keep'
+}
+
+const BYEOTGARI = { radius: 0.68, bottom: -1.01, height: 1.46, columns: [[-24.75, -0.65], [-26.68, -2.5], [-25.57, -1.66], [0.1, 13.81], [-1.57, 11.63], [-0.72, 12.81]] }
+
+function byeotgari(parts)
+{
+    const { radius, bottom, height, columns } = BYEOTGARI
+    for(const [x, z] of columns)
+    {
+        parts.prism('thatch', radius * 0.92, radius, height, { position: [x, bottom + height / 2, z] }, 10)
+        for(const t of [0.3, 0.7])
+            parts.prism('thatchRope', radius * 1.01, radius * 1.01, 0.08, { position: [x, bottom + height * t, z] }, 10)
+        parts.prism('thatch', 0, radius * 0.95, 0.45, { position: [x, bottom + height + 0.22, z] }, 10)
+    }
+}
+
+function angbuilgu(parts)
+{
+    const center = CIRCUIT_DECORATION.clock.getCenter(new THREE.Vector3())
+    const bottom = CIRCUIT_DECORATION.clock.min.y
+    parts.box('stone', [0.9, 0.55, 0.9], { position: [center.x, bottom + 0.275, center.z] })
+    parts.box('stoneDark', [1.0, 0.08, 1.0], { position: [center.x, bottom + 0.59, center.z] })
+    for(const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]])
+        parts.box('bronze', [0.08, 0.3, 0.08], { position: [center.x + x * 0.28, bottom + 0.78, center.z + z * 0.28] })
+    lathe(parts, 'bronze', [[0, bottom + 0.75], [0.36, bottom + 0.82], [0.52, bottom + 1.05], [0.56, bottom + 1.22], [0.5, bottom + 1.22], [0.46, bottom + 1.08], [0.3, bottom + 0.9], [0, bottom + 0.86]], { position: [center.x, 0, center.z] }, 12)
+    parts.rod('iron', 0.02, [center.x - 0.42, bottom + 1.2, center.z], [center.x, bottom + 0.9, center.z])
+}
+
+const HONGSALMUN = { postX: [-14.2, -0.5], z: -16.32, bottom: -1, lowerBeam: 3.55, upperBeam: 4.2, slatTop: 4.95, slatGap: 0.55 }
+
+function hongsalmun(parts)
+{
+    const { postX, z, bottom, lowerBeam, upperBeam, slatTop, slatGap } = HONGSALMUN
+    const [left, right] = postX
+    const width = right - left
+    for(const x of postX)
+    {
+        parts.prism('stoneDark', 0.32, 0.36, 0.3, { position: [x, bottom + 0.15, z] }, 8)
+        parts.prism('pillarRed', 0.18, 0.2, slatTop - bottom, { position: [x, (slatTop + bottom) / 2, z] }, 8)
+    }
+    for(const y of [lowerBeam, upperBeam])
+        parts.box('pillarRed', [width + 0.5, 0.18, 0.18], { position: [(left + right) / 2, y, z] })
+    for(let x = left + slatGap; x < right - slatGap / 2; x += slatGap)
+    {
+        parts.box('pillarRed', [0.06, slatTop - lowerBeam, 0.06], { position: [x, (slatTop + lowerBeam) / 2, z] })
+        parts.prism('pillarRed', 0, 0.06, 0.18, { position: [x, slatTop + 0.09, z] }, 4)
+    }
+    const centerX = (left + right) / 2
+    parts.add('obangRed', new THREE.CylinderGeometry(0.42, 0.42, 0.08, 14, 1, false, Math.PI, Math.PI), { position: [centerX, (lowerBeam + upperBeam) / 2 + 0.1, z + 0.12], rotation: [Math.PI / 2, 0, 0] })
+    parts.add('obangBlue', new THREE.CylinderGeometry(0.42, 0.42, 0.08, 14, 1, false, 0, Math.PI), { position: [centerX, (lowerBeam + upperBeam) / 2 + 0.1, z + 0.12], rotation: [Math.PI / 2, 0, 0] })
+}
+
+function tentPole(parts, box)
+{
+    const center = box.getCenter(new THREE.Vector3())
+    const height = box.max.y - box.min.y
+    parts.prism('wood', 0.07, 0.09, height, { position: center.toArray() }, 6)
+}
+
+export function reshapeCircuitDecoration(model, materials)
 {
     const decoration = model.getObjectByName('Cube088')
     if(!decoration?.isMesh)
         return
-    const geometry = decoration.geometry
-    const position = geometry.attributes.position
-    const index = geometry.index ? Array.from(geometry.index.array) : Array.from({ length: position.count }, (_, vertex) => vertex)
-    const point = new THREE.Vector3()
-    const isLetter = (vertex) => CIRCUIT_RESET_LETTERS.containsPoint(point.fromBufferAttribute(position, vertex))
+    const { index, components } = meshComponents(decoration.geometry)
+    const parts = createParts()
+    const removed = new Set()
+    for(const component of components)
+    {
+        const kind = classifyDecoration(component)
+        if(kind === 'keep')
+            continue
+        component.offsets.forEach((offset) => removed.add(offset))
+        if(kind === 'tentLeg')
+            tentPole(parts, component.box)
+    }
+    byeotgari(parts)
+    angbuilgu(parts)
+    hongsalmun(parts)
     const kept = []
     for(let offset = 0; offset < index.length; offset += 3)
-    {
-        const triangle = index.slice(offset, offset + 3)
-        if(!triangle.every(isLetter))
-            kept.push(...triangle)
-    }
-    geometry.setIndex(kept)
+        if(!removed.has(offset))
+            kept.push(index[offset], index[offset + 1], index[offset + 2])
+    decoration.geometry.setIndex(kept)
+    decoration.add(parts.build(materials))
 }
 
 export function makeBungeoppang(cookie)
