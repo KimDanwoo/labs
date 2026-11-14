@@ -104,18 +104,6 @@ export class Scenery
         // this.road.body.setEnabled(false)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.game.debug.panel.addFolder({
-                title: '🛣️ Road',
-                expanded: false
-            })
-            this.game.debug.addThreeColorBinding(debugPanel, this.road.color.value, 'color')
-            debugPanel.addBinding(this.road.glitterScarcity, 'value', { label: 'glitterScarcity', min: 100, max: 10000, step: 1 })
-            debugPanel.addBinding(this.road.glitterIntensity, 'value', { label: 'glitterIntensity', min: 0, max: 10, step: 0.01 })
-            debugPanel.addBinding(this.road.glitterPerlinFrequency, 'value', { label: 'glitterPerlinFrequency', min: 0, max: 0.1, step: 0.0001 })
-            debugPanel.addBinding(this.road.glitterHashFrequency, 'value', { label: 'glitterHashFrequency', min: 0, max: 1, step: 0.0001 })
-        }
     }
 
     update()

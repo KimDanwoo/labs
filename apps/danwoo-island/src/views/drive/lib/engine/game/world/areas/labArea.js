@@ -37,13 +37,6 @@ export class LabArea extends Area
         super(model)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🧪 Lab',
-                expanded: false,
-            })
-        }
 
         this.state = LabArea.STATE_CLOSED
 
@@ -71,11 +64,6 @@ export class LabArea extends Area
         this.scroller.animate()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addButton({ title: 'open', label: 'open' }).on('click', () => { this.open() })
-            this.debugPanel.addButton({ title: 'close', label: 'close' }).on('click', () => { this.close() })
-        }
     }
 
     setSounds()
@@ -207,19 +195,6 @@ export class LabArea extends Area
         applyPositionAndTarget()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({
-                title: 'cinematic',
-                expanded: false,
-            })
-            debugPanel.addBinding(this.cinematic.positionOffset, 'x', { label: 'positionX', min: - 10, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-            debugPanel.addBinding(this.cinematic.positionOffset, 'y', { label: 'positionY', min: 0, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-            debugPanel.addBinding(this.cinematic.positionOffset, 'z', { label: 'positionZ', min: - 10, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-            debugPanel.addBinding(this.cinematic.targetOffset, 'x', { label: 'targetX', min: - 10, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-            debugPanel.addBinding(this.cinematic.targetOffset, 'y', { label: 'targetY', min: 0, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-            debugPanel.addBinding(this.cinematic.targetOffset, 'z', { label: 'targetZ', min: - 10, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-        }
     }
 
     setShadeMix()
@@ -237,32 +212,6 @@ export class LabArea extends Area
         this.shadeMix.texts.mixUniform = uniform(this.shadeMix.texts.min)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({
-                title: 'Shader mix',
-                expanded: true,
-            })
-
-            const debugUpdate = () =>
-            {
-                if(this.state === LabArea.STATE_OPEN || this.state === LabArea.STATE_OPENING)
-                {
-                    this.shadeMix.images.mixUniform.value = this.shadeMix.images.max
-                    this.shadeMix.texts.mixUniform.value = this.shadeMix.texts.max
-                }
-                else
-                {
-                    this.shadeMix.images.mixUniform.value = this.shadeMix.images.min
-                    this.shadeMix.texts.mixUniform.value = this.shadeMix.texts.min
-                }
-            }
-
-            debugPanel.addBinding(this.shadeMix.images, 'min', { label: 'imagesMin', min: 0, max: 1, step: 0.001 }).on('change', debugUpdate)
-            debugPanel.addBinding(this.shadeMix.images, 'max', { label: 'imagesMax', min: 0, max: 1, step: 0.001 }).on('change', debugUpdate)
-            debugPanel.addBinding(this.shadeMix.texts, 'min', { label: 'textsMin', min: 0, max: 1, step: 0.001 }).on('change', debugUpdate)
-            debugPanel.addBinding(this.shadeMix.texts, 'max', { label: 'textsMax', min: 0, max: 1, step: 0.001 }).on('change', debugUpdate)
-        }
     }
 
     setTexts()
@@ -1238,15 +1187,6 @@ export class LabArea extends Area
             this.cauldron.wood = this.references.items.get('wood')[0]
             this.cauldron.wood.material = material
 
-            if(this.game.debug.active)
-            {
-                const debugPanel = this.debugPanel.addFolder({
-                    title: 'burning wood',
-                    expanded: false,
-                })
-                this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'colorA')
-                this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
-            }
         }
 
         // Liquid
@@ -1265,15 +1205,6 @@ export class LabArea extends Area
             this.cauldron.liquid.surface = this.references.items.get('liquid')[0]
             this.cauldron.liquid.surface.material = material
 
-            if(this.game.debug.active)
-            {
-                const debugPanel = this.debugPanel.addFolder({
-                    title: 'cauldron',
-                    expanded: false,
-                })
-                this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'colorA')
-                this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
-            }
         }
     }
 

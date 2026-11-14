@@ -22,15 +22,6 @@ export class Time
         }, 0)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '⏱️ Time',
-                expanded: false,
-            })
-            this.debugPanel.addBinding(this, 'defaultScale', { min: 0, max: 5, step: 0.01 })
-            this.debugPanel.addButton({ title: 'bullet time' }).on('click', () => { this.bulletTime.activate() })
-        }
     }
 
     setBulletTime()

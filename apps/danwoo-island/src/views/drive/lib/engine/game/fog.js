@@ -28,14 +28,6 @@ export class Fog
         }, 10)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.game.debug.panel.addFolder({
-                title: '☁️ Fog',
-                expanded: false,
-            })
-            debugPanel.addBinding(this.radialCenter, 'value', { value: 'offset', min: 0, max: 1 })
-        }
     }
 
     update()

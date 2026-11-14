@@ -1,3 +1,4 @@
+import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
 import { Game } from '../game'
 import { lerp, remap, smoothstep } from '../utilities/maths'
@@ -10,13 +11,6 @@ export class Cycles
     {
         this.game = Game.getInstance()
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: name,
-                expanded: false,
-            })
-        }
 
         this.name = name
         this.duration = duration
@@ -31,26 +25,10 @@ export class Cycles
         this.events = new Events()
 
         // Debug
-        this.newAbsoluteProgressBinding = this.game.debug.addManualBinding(
-            this.debugPanel,
-            this,
-            'newAbsoluteProgress',
-            {
-                view: 'cameraring',
-                series: 0,
-                unit: {
-                    pixels: 100,
-                    ticks: 4,
-                    value: 1,
-                    step: 0.001
-                },
-            },
-            () =>
+        this.newAbsoluteProgressBinding = autoBinding(this, 'newAbsoluteProgress', () =>
             {
                 return forcedProgress !== null ? forcedProgress : ((new Date()).getTime() / 1000 / this.duration)
-            },
-            manual
-        )
+            })
 
         this.setKeyframes()
         this.setOverride()

@@ -62,14 +62,6 @@ export class Physics
             this.update()
         }, 3)
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '⬇️ Physics',
-                expanded: false,
-            })
-            this.debugPanel.addBinding(this.world.gravity, 'y', { min: - 20, max: 20, step: 0.01 })
-        }
     }
 
     getBinaryGroups(groupNames)

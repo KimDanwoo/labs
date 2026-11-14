@@ -20,13 +20,6 @@ export class CareerArea extends Area
         super(references)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '💼 Career',
-                expanded: false,
-            })
-        }
 
         this.setSounds()
         this.setLines()
@@ -147,13 +140,6 @@ export class CareerArea extends Area
         }
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.game.debug.addThreeColorBinding(this.debugPanel, colors.blue.value, 'blue')
-            this.game.debug.addThreeColorBinding(this.debugPanel, colors.orange.value, 'orange')
-            this.game.debug.addThreeColorBinding(this.debugPanel, colors.purple.value, 'purple')
-            this.game.debug.addThreeColorBinding(this.debugPanel, colors.green.value, 'green')
-        }
     }
 
     createProfileTexture(name)

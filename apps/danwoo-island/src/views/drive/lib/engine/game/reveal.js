@@ -27,18 +27,6 @@ export class Reveal
             preload: true
         })
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '📜 Reveal',
-                expanded: false,
-            })
-
-            this.debugPanel.addBinding(this.distance, 'value', { label: 'distance', min: 0, max: 20, step: 0.01 })
-            this.debugPanel.addBinding(this.thickness, 'value', { label: 'thickness', min: 0, max: 1, step: 0.001 })
-            // this.game.debug.addThreeColorBinding(this.debugPanel, this.color.value, 'color')
-            this.debugPanel.addBinding(this.intensity, 'value', { label: 'intensity', min: 1, max: 20, step: 0.001 })
-        }
 
         this.update = this.update.bind(this)
         this.game.ticker.events.on('tick', this.update, 10)

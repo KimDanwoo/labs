@@ -19,13 +19,6 @@ export class Leaves
         // this.count = Math.pow(2, 12)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🍃 Leaves',
-                expanded: false,
-            })
-        }
 
         this.setGeometry()
         this.setMaterial()
@@ -255,23 +248,6 @@ export class Leaves
         this.updateCompute = update.compute(this.count)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.game.debug.addThreeColorBinding(this.debugPanel, colorA.value, 'colorA')
-            this.game.debug.addThreeColorBinding(this.debugPanel, colorB.value, 'colorB')
-            this.debugPanel.addBinding(this.scale, 'value', { label: 'scale', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(this.scale, 'value', { label: 'scale', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(this.rotationFrequency, 'value', { label: 'rotationFrequency', min: 0, max: 20, step: 0.001 })
-            this.debugPanel.addBinding(this.rotationElevationMultiplier, 'value', { label: 'rotationElevationMultiplier', min: 0, max: 2, step: 0.001 })
-            this.debugPanel.addBinding(this.pushSidewaysMultiplier, 'value', { label: 'pushSidewaysMultiplier', min: 0, max: 300, step: 1 })
-            this.debugPanel.addBinding(this.pushMultiplier, 'value', { label: 'pushMultiplier', min: 0, max: 300, step: 1 })
-            this.debugPanel.addBinding(this.windFrequency, 'value', { label: 'windFrequency', min: 0, max: 0.02, step: 0.00001 })
-            this.debugPanel.addBinding(this.windMultiplier, 'value', { label: 'windMultiplier', min: 0, max: 10, step: 0.0001 })
-            this.debugPanel.addBinding(this.upwardMultiplier, 'value', { label: 'upwardMultiplier', min: 0, max: 10, step: 0.01 })
-            this.debugPanel.addBinding(this.defaultDamping, 'value', { label: 'defaultDamping', min: 0, max: 10, step: 0.01 })
-            this.debugPanel.addBinding(this.waterDamping, 'value', { label: 'waterDamping', min: 0, max: 10, step: 0.01 })
-            this.debugPanel.addBinding(this.gravity, 'value', { label: 'gravity', min: 0, max: 20, step: 0.01 })
-        }
     }
 
     setMesh()

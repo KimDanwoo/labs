@@ -33,13 +33,6 @@ export class CircuitArea extends Area
         super(model)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🛞 Circuit',
-                expanded: false,
-            })
-        }
 
         this.state = CircuitArea.STATE_PENDING
 
@@ -504,14 +497,6 @@ export class CircuitArea extends Area
         }
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({ title: 'checkpoints' })
-            this.game.debug.addThreeColorBinding(debugPanel, this.checkpoints.doorTarget.color.value, 'targetColor')
-            this.game.debug.addThreeColorBinding(debugPanel, this.checkpoints.doorReached.color.value, 'reachedColor')
-
-            debugPanel.addBinding(doorIntensity, 'value', { label: 'intensity', min: 0, max: 5, step: 0.01 })
-        }
     }
 
     setResetObjects()

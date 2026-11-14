@@ -1,3 +1,4 @@
+import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
 import { Game } from '../game'
 import { attribute, cameraPosition, cameraProjectionMatrix, cameraViewMatrix, color, cross, float, floor, Fn, instancedArray, luminance, min, mix, modelWorldMatrix, mul, positionGeometry, positionWorld, remapClamp, step, uniform, varying, vec3, vec4, vertexIndex } from 'three/tsl'
@@ -15,13 +16,6 @@ export class Lightnings
         this.game = Game.getInstance()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '⚡️ Lightnings',
-                expanded: false,
-            })
-        }
 
         this.frequency = 2
         this.hitChances = 0
@@ -33,24 +27,11 @@ export class Lightnings
         this.game.scene.add(this.group)
 
         // Debug
-        this.hitChancesBinding = this.game.debug.addManualBinding(
-            this.debugPanel,
-            this,
-            'hitChances',
-            { label: 'hitChances', min: 0, max: 1, step: 0.001 },
-            () =>
+        this.hitChancesBinding = autoBinding(this, 'hitChances', () =>
             {
                 return Math.max(0, this.game.weather.clouds.value) * Math.max(0, this.game.weather.electricField.value) * this.game.weather.humidity.value
-            }
-        )
+            })
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(this, 'frequency', { min: 0.1, max: 10, step: 0.1 })
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.colorA.value, 'colorA')
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.colorB.value, 'colorB')
-            this.debugPanel.addBinding(this.intensity, 'value', { label: 'intensity', min: 0, max: 10, step: 0.01 })
-        }
 
         this.setSounds()
         this.setAnticipationParticles()
@@ -211,15 +192,6 @@ export class Lightnings
             return mesh
         }
 
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({ title: 'Anticipation' })
-            debugPanel
-                .addBinding(this.anticipationParticles, 'duration', { min: 0, max: 10, step: 0.01 })
-                .on('change', () => { durationUniform.value = this.anticipationParticles.duration })
-            debugPanel.addBinding(scaleUniform, 'value', { label: 'scale', min: 0, max: 1, step: 0.001 })
-            debugPanel.addBinding(elevationUniform, 'value', { label: 'elevation', min: 0, max: 5, step: 0.01 })
-        }
     }
 
     setArc()
@@ -307,14 +279,6 @@ export class Lightnings
             return mesh
         }
 
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({ title: 'Arc' })
-            debugPanel.addBinding(this.arc, 'duration', { min: 0, max: 10, step: 0.01 })
-            debugPanel.addBinding(easeOutUniform, 'value', { label: 'easeOut', min: 1, max: 10, step: 1 })
-            debugPanel.addBinding(driftAmplitudeUniform, 'value', { label: 'driftAmplitude', min: 0, max: 3, step: 0.001 })
-            debugPanel.addBinding(thicknessUniform, 'value', { label: 'thickness', min: 0, max: 1, step: 0.001 })
-        }
     }
 
     setExplosionParticles()
@@ -402,15 +366,6 @@ export class Lightnings
             return mesh
         }
 
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({ title: 'Explosion' })
-            debugPanel.addBinding(this.explosionParticles, 'duration', { min: 0, max: 10, step: 0.01 })
-            debugPanel.addBinding(easeOutUniform, 'value', { label: 'easeOut', min: 1, max: 10, step: 1 })
-            debugPanel.addBinding(scaleUniform, 'value', { label: 'scale', min: 0, max: 1, step: 0.001 })
-            debugPanel.addBinding(radiusUniform, 'value', { label: 'radius', min: 0, max: 10, step: 0.001 })
-            debugPanel.addBinding(this.explosionParticles, 'fallAmplitude', { min: 0, max: 2, step: 0.001 })
-        }
     }
 
     createRandom(rng)

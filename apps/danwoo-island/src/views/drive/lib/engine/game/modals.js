@@ -190,8 +190,6 @@ export class Modals
 
     preopen()
     {
-        if(this.game.debug.active)
-            return
 
         this.items.forEach((item) => 
         {

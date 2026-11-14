@@ -12,13 +12,6 @@ export class PoleLights
         this.game = Game.getInstance()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🏮 Pole lights',
-                expanded: false,
-            })
-        }
 
         // Base and references
         const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.poleLightsModel.scene.children)

@@ -1,3 +1,4 @@
+import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
 import { Game } from '../game'
 import { attribute, clamp, color, float, Fn, fract, hash, instancedArray, instanceIndex, max, mod, normalWorld, positionGeometry, rotateUV, sin, smoothstep, step, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
@@ -30,34 +31,14 @@ export class RainLines
         }, 2)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🌧️ Rain',
-                expanded: false,
-            })
-            this.debugPanel.addBinding(this.elevation, 'value', { label: 'elevation', min: 0, max: 50, step: 0.1 })
-            this.debugPanel.addBinding(this.thickness, 'value', { label: 'thickness', min: 0, max: 0.1, step: 0.001 })
-        }
 
         // Binding
-        this.visibleRatioBinding = this.game.debug.addManualBinding(
-            this.debugPanel,
-            this.visibleRatio,
-            'value',
-            { label: 'visibleRatio', min: 0, max: 1, step: 0.001 },
-            () =>
+        this.visibleRatioBinding = autoBinding(this.visibleRatio, 'value', () =>
             {
                 return Math.pow(this.game.weather.rain.value, 2)
-            }
-        )
+            })
 
-        this.lengthRatioBinding = this.game.debug.addManualBinding(
-            this.debugPanel,
-            this.length,
-            'value',
-            { label: 'length', min: 0, max: 10, step: 0.001 },
-            () =>
+        this.lengthRatioBinding = autoBinding(this.length, 'value', () =>
             {
                 const baseLength = remapClamp(this.game.weather.rain.value, 0, 1, 1, 3)
 
@@ -65,15 +46,9 @@ export class RainLines
                 const snowLength = 0.03
 
                 return lerp(baseLength, snowLength, snowRatio)
-            }
-        )
+            })
 
-        this.speedRatioBinding = this.game.debug.addManualBinding(
-            this.debugPanel,
-            this,
-            'speed',
-            { label: 'speed', min: 0, max: 1, step: 0.001 },
-            () =>
+        this.speedRatioBinding = autoBinding(this, 'speed', () =>
             {
                 const baseSpeed = remapClamp(this.game.weather.rain.value, 0, 1, 0.2, 0.4)
 
@@ -81,19 +56,12 @@ export class RainLines
                 const snowSpeed = 0.05
 
                 return lerp(baseSpeed, snowSpeed, snowRatio)
-            }
-        )
+            })
 
-        this.inclineRatioBinding = this.game.debug.addManualBinding(
-            this.debugPanel,
-            this.incline,
-            'value',
-            { label: 'incline', min: 0, max: 1, step: 0.001 },
-            () =>
+        this.inclineRatioBinding = autoBinding(this.incline, 'value', () =>
             {
                 return remapClamp(this.game.weather.wind.value, 0, 1, 0.1, 0.4)
-            }
-        )
+            })
     }
 
     setGeometry()

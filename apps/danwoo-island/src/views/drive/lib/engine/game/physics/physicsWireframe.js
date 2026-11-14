@@ -24,21 +24,6 @@ export class PhysicsWireframe
             this.update()
         }, 4)
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.physics.debugPanel.addFolder({
-                title: 'Wireframe',
-                expanded: true,
-            })
-            
-            this.debugPanel.addBinding(this, 'active', { label: 'debug' }).on('change', () =>
-            {
-                if(this.active)
-                    this.game.scene.add(this.lineSegments)
-                else
-                    this.game.scene.remove(this.lineSegments)
-            })
-        }
     }
     
     update()

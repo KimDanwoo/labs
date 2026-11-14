@@ -80,12 +80,11 @@ export class Intro
         this.circle.hide = (callback = null) =>
         {
             const dummy = { scale: 1 }
-            const speedMultiplier = this.game.debug.active ? 4 : 1
             gsap.to(
                 dummy,
                 {
                     scale: 0,
-                    duration: 1.5 / speedMultiplier,
+                    duration: 1.5,
                     // ease: 'back.in(1.7)',
                     ease: 'power4.in',
                     overwrite: true,
@@ -232,13 +231,12 @@ export class Intro
     {
         setStartupStage(STARTUP.ready)
         const dummy = { scale: 0 }
-        const speedMultiplier = this.game.debug.active ? 4 : 1
         gsap.to(
             dummy,
             {
                 scale: 1,
-                duration: 2 / speedMultiplier,
-                delay: 1 / speedMultiplier,
+                duration: 2,
+                delay: 1,
                 ease: 'elastic.out(0.5)',
                 overwrite: true,
                 onUpdate: () =>
@@ -251,13 +249,12 @@ export class Intro
 
     hideLabel()
     {
-        const speedMultiplier = this.game.debug.active ? 4 : 1
         const dummy = { scale: 1 }
         gsap.to(
             dummy,
             {
                 scale: 0,
-                duration: 0.3 / speedMultiplier,
+                duration: 0.3,
                 ease: 'power2.in',
                 overwrite: true,
                 onUpdate: () =>

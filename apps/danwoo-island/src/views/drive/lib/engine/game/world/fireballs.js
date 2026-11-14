@@ -16,17 +16,6 @@ export class Fireballs
         this.emissiveStrength = uniform(8)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🔥 Fireballs',
-                expanded: false,
-            })
-
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.emissiveColorA.value, 'emissiveColorA')
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.emissiveColorB.value, 'emissiveColorB')
-            this.debugPanel.addBinding(this.emissiveStrength, 'value', { label: 'emissiveStrength', min: 0, max: 20, step: 0.1 })
-        }
 
     }
 

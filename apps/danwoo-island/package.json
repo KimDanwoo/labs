@@ -13,8 +13,6 @@
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "catalog:",
-    "@tweakpane/plugin-camerakit": "catalog:",
-    "@tweakpane/plugin-essentials": "catalog:",
     "camera-controls": "catalog:",
     "gsap": "catalog:",
     "howler": "catalog:",
@@ -23,8 +21,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "seedrandom": "catalog:",
-    "three": "catalog:",
-    "tweakpane": "catalog:"
+    "three": "catalog:"
   },
   "devDependencies": {
     "@config/tsconfig": "workspace:*",

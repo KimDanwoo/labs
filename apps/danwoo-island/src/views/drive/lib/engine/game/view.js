@@ -29,28 +29,6 @@ export class View
         this.idealRatio = idealRatio
         this.ratioOverflow = Math.max(1, this.idealRatio / this.game.viewport.ratio) - 1
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🎥 View',
-                expanded: false,
-            })
-
-            this.debugPanel.addBinding(
-                this,
-                'mode',
-                {
-                    options:
-                    {
-                        default: View.MODE_DEFAULT,
-                        free: View.MODE_FREE,
-                    }
-                }
-            ).on('change', () => 
-            {
-                this.setMode(this.mode)
-            })
-        }
 
         this.setFocusPoint()
         this.setZoom()
@@ -81,20 +59,6 @@ export class View
         }, 1)
 
         // Toggle
-        if(this.game.debug.active)
-        {
-            this.game.inputs.addActions([
-                { name: 'viewToggle', categories: [], keys: [ 'Keyboard.KeyV' ] }
-            ])
-
-            this.game.inputs.events.on('viewToggle', (action) =>
-            {
-                if(action.active)
-                {
-                    this.toggleMode()
-                }
-            })
-        }
     }
 
     toggleMode()
@@ -159,14 +123,6 @@ export class View
         this.focusPoint.helper.userData.preventPreRender = true
         this.game.scene.add(this.focusPoint.helper)
 
-        if(this.game.debug.active)
-        {
-            const zoomDebugPanel = this.debugPanel.addFolder({
-                title: 'Magnet',
-                expanded: true,
-            })
-            zoomDebugPanel.addBinding(this.focusPoint.magnet, 'multiplier', { min: 0, max: 1, step: 0.0001 })
-        }
     }
 
     setOptimalArea()
@@ -317,16 +273,6 @@ export class View
             }
         })
 
-        if(this.game.debug.active)
-        {
-            const zoomDebugPanel = this.debugPanel.addFolder({
-                title: 'Zoom',
-                expanded: false,
-            })
-            zoomDebugPanel.addBinding(this.zoom, 'speedAmplitude', { min: 0, max: 1, step: 0.001 })
-            zoomDebugPanel.addBinding(this.zoom, 'speedEdge', { min: 0, max: 100, step: 0.001 })
-            zoomDebugPanel.addBinding(this.zoom, 'sensitivity', { min: 0, max: 0.5, step: 0.0001 })
-        }
     }
 
     setSpherical()
@@ -343,16 +289,6 @@ export class View
         this.spherical.offset = new THREE.Vector3()
         this.spherical.offset.setFromSphericalCoords(this.spherical.radius.current, this.spherical.phi, this.spherical.theta)
 
-        if(this.game.debug.active)
-        {
-            const sphericalDebugPanel = this.debugPanel.addFolder({
-                title: 'Spherical',
-                expanded: false,
-            })
-            sphericalDebugPanel.addBinding(this.spherical, 'phi', { min: 0, max: Math.PI * 0.5, step: 0.001 })
-            sphericalDebugPanel.addBinding(this.spherical, 'theta', { min: - Math.PI, max: Math.PI, step: 0.001 })
-            sphericalDebugPanel.addBinding(this.spherical.radius, 'edges', { min: 0, max: 100, step: 0.001 })
-        }
     }
 
     setRoll()
@@ -370,23 +306,6 @@ export class View
             this.roll.speed = strength * this.roll.kickStrength * (Math.random() < 0.5 ? - 1 : 1)
         }
 
-        if(this.game.debug.active)
-        {
-            const rollDebugPanel = this.debugPanel.addFolder({
-                title: 'Roll',
-                expanded: false,
-            })
-            rollDebugPanel
-                .addButton({ title: 'kick' })
-                .on('click', () =>
-                {
-                    this.roll.kick()
-                })
-
-            rollDebugPanel.addBinding(this.roll, 'damping', { min: 0, max: 20, step: 0.1 })
-            rollDebugPanel.addBinding(this.roll, 'pullStrength', { min: 0, max: 400, step: 0.1 })
-            rollDebugPanel.addBinding(this.roll, 'kickStrength', { min: 0, max: 10, step: 0.1 })
-        }
     }
 
     setCameras()
@@ -404,10 +323,6 @@ export class View
         this.cameraHelper.userData.preventPreRender = true
         this.game.scene.add(this.cameraHelper)
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(this.cameraHelper, 'visible', { label: 'cameraHelper' })
-        }
     }
 
     setFree()
@@ -551,15 +466,6 @@ export class View
         this.game.scene.add(this.speedLines.mesh)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const folder = this.debugPanel.addFolder({
-                title: 'Speed lines',
-                expanded: false,
-            })
-            folder.addBinding(this.speedLines, 'strength', { label: 'strength', min: 0, max: 1, step: 0.001 })
-            folder.addBinding(this.speedLines.speed, 'value', { label: 'speed', min: 0, max: 100, step: 0.001 })
-        }
     }
 
     resize()

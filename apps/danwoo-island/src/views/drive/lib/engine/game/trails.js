@@ -27,13 +27,6 @@ export class Trails
     {
         this.game = Game.getInstance()
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🌈 Trails',
-                expanded: false,
-            })
-        }
         
         this.subdivisions = 32
         this.texel = 1 / this.subdivisions
@@ -50,12 +43,6 @@ export class Trails
             this.update()
         }, 10)
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(this.emissiveMultiplier, 'value', { label: 'emissiveMultiplier', min: 0, max: 10, step: 0.01 })
-            this.debugPanel.addBinding(this.fresnelOffset, 'value', { label: 'fresnelOffset', min: 0, max: 1, step: 0.01 })
-            this.debugPanel.addBinding(this, 'decay', { min: 0, max: 1, step: 0.001 })
-        }
     }
 
     setGeometry()

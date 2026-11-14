@@ -26,13 +26,6 @@ export class BowlingArea extends Area
         super(model)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🎳 Bowling',
-                expanded: false,
-            })
-        }
         this.won = false
         this.wonTime = 0
 
@@ -345,17 +338,6 @@ export class BowlingArea extends Area
         }
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({
-                title: 'Screen',
-                expanded: false,
-            })
-            this.game.debug.addThreeColorBinding(debugPanel, discsColor.value, 'discsColor')
-            debugPanel.addBinding(discsStrength, 'value', { label: 'discsStrength', min: 0, max: 10, step: 0.001 })
-            this.game.debug.addThreeColorBinding(debugPanel, crossesColor.value, 'crossesColor')
-            debugPanel.addBinding(crossesStrength, 'value', { label: 'crossesStrength', min: 0, max: 10, step: 0.001 })
-        }
     }
 
     setBumpers()
@@ -494,15 +476,6 @@ export class BowlingArea extends Area
         this.references.items.get('jukebox')[0].add(points)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({
-                title: 'Jukebox',
-                expanded: false,
-            })
-            this.game.debug.addThreeColorBinding(debugPanel, notesColor.value, 'notesColor')
-            debugPanel.addBinding(notesStrength, 'value', { label: 'notesStrength', min: 0, max: 10, step: 0.001 })
-        }
     }
 
     update()

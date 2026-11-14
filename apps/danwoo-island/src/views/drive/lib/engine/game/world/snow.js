@@ -1,3 +1,4 @@
+import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
 import { Game } from '../game'
 import { attribute, cameraNormalMatrix, color, cross, dot, float, Fn, hash, If, materialNormal, min, mix, modelNormalMatrix, modelViewMatrix, normalWorld, PI, PI2, positionGeometry, positionLocal, positionWorld, rotateUV, step, texture, time, uniform, uv, uvec4, varying, vec2, vec3, vec4, viewportSize } from 'three/tsl'
@@ -19,13 +20,6 @@ export class Snow
         this.subdivisionSize = this.size / this.subdivisions
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '⛇ Snow',
-                expanded: false,
-            })
-        }
 
         this.setNodes()
         this.setSnowElevation()
@@ -91,12 +85,7 @@ export class Snow
             return elevation
         })
 
-        this.elevationBinding = this.game.debug.addManualBinding(
-            this.debugPanel,
-            this.elevation,
-            'value',
-            { label: 'elevation', min: -1, max: 1, step: 0.001 },
-            () =>
+        this.elevationBinding = autoBinding(this.elevation, 'value', () =>
             {
                 const elevationStrength = this.game.weather.snow.value * Math.max(this.game.dayCycles.progressDelta, 0) * 10
 
@@ -104,8 +93,7 @@ export class Snow
                 newElevation = clamp(newElevation, -1, 0.5)
 
                 return newElevation
-            }
-        )
+            })
     }
 
     setSnowElevation()
@@ -377,35 +365,6 @@ export class Snow
         })()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(this.material, 'wireframe')
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.color.value, 'color')
-            this.debugPanel.addBlade({ view: 'separator' })
-            this.debugPanel.addBinding(this.fadeEdgeHigh, 'value', { label: 'fadeEdgeHigh', min: - 2, max: 2, step: 0.001 })
-            this.debugPanel.addBinding(this.fadeEdgeLow, 'value', { label: 'fadeEdgeLow', min: - 2, max: 2, step: 0.001 })
-            this.debugPanel.addBlade({ view: 'separator' })
-            this.debugPanel.addBinding(this.normalNeighbourShift, 'value', { label: 'normalNeighbourShift', min: 0, max: 2, step: 0.001 })
-            this.debugPanel.addBlade({ view: 'separator' })
-            this.debugPanel.addBinding(this.noiseMultiplier, 'value', { label: 'noiseMultiplier', min: 0, max: 2, step: 0.001 })
-            this.debugPanel.addBinding(this.noise1Frequency, 'value', { label: 'noise1Frequency', min: 0, max: 0.4, step: 0.001 })
-            this.debugPanel.addBinding(this.noise2Frequency, 'value', { label: 'noise2Frequency', min: 0, max: 0.4, step: 0.001 })
-            this.debugPanel.addBinding(this.waterDropEdgeLow, 'value', { label: 'waterDropEdgeLow', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(this.waterDropEdgeHigh, 'value', { label: 'waterDropEdgeHigh', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(this.waterDropAmplitude, 'value', { label: 'waterDropAmplitude', min: 0, max: 5, step: 0.001 })
-            this.debugPanel.addBlade({ view: 'separator' })
-            // this.debugPanel.addBinding(this.glittersPositionFrequency, 'value', { label: 'glittersPositionFrequency', min: 1, max: 100, step: 1 })
-            // this.debugPanel.addBinding(this.glittersVariationFrequency, 'value', { label: 'glittersVariationFrequency', min: 0, max: 0.001, step: 0.000001 })
-            // this.debugPanel.addBinding(this.glittersScarcity, 'value', { label: 'glittersScarcity', min: 0, max: 0.01, step: 0.000001 })
-            // this.debugPanel.addBinding(this.glittersStrength, 'value', { label: 'glittersStrength', min: 0, max: 10, step: 0.001 })
-
-            this.debugPanel.addBinding(this, 'glitterViewMultiplier', { min: 0, max: 0.001, step: 0.000001 })
-            this.debugPanel.addBinding(this, 'glitterTimeMultiplier', { min: 0, max: 0.001, step: 0.000001 })
-            this.debugPanel.addBinding(this.glitterScarcity, 'value', { label: 'glitterScarcity', min: 100, max: 10000, step: 1 })
-            this.debugPanel.addBinding(this.glitterIntensity, 'value', { label: 'glitterIntensity', min: 0, max: 10, step: 0.01 })
-            this.debugPanel.addBinding(this.glitterPerlinFrequency, 'value', { label: 'glitterPerlinFrequency', min: 0, max: 0.1, step: 0.0001 })
-            this.debugPanel.addBinding(this.glitterHashFrequency, 'value', { label: 'glitterHashFrequency', min: 0, max: 1, step: 0.0001 })
-        }
     }
 
     setMesh()

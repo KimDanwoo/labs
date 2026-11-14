@@ -24,13 +24,6 @@ export class CookieArea extends Area
     {
         super(model)
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🍪 Cookie Stand',
-                expanded: false,
-            })
-        }
 
         this.setSound()
         this.setBlower()

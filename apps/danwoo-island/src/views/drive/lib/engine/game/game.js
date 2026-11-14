@@ -2,7 +2,6 @@ import { STARTUP, setStartupStage } from '../islandStartup'
 import { WORLD_CONFIG } from '../worldConfig'
 import * as THREE from 'three/webgpu'
 
-import { Debug } from './debug'
 import { Inputs } from './inputs/inputs'
 import { Physics } from './physics/physics'
 import { Rendering } from './rendering'
@@ -77,7 +76,6 @@ export class Game
 
         // First batch for intro
         this.scene = new THREE.Scene()
-        this.debug = new Debug()
         this.resourcesLoader = new ResourcesLoader()
         this.quality = new Quality()
         this.ticker = new Ticker()

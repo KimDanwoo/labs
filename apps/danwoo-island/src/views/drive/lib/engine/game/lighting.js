@@ -27,13 +27,6 @@ export class Lighting
         this.shadowNormalBias = 0.1
         this.shadowRadius = this.game.quality.level === 0 ? 3 : 2
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '💡 Lighting',
-                expanded: false,
-            })
-        }
 
         this.setNodes()
         this.setLight()
@@ -53,29 +46,6 @@ export class Lighting
         }, 3)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(this, 'useDayCycles')
-            this.debugPanel.addBinding(this, 'phi', { min: 0, max: Math.PI * 0.5 }).on('change', () => this.updateCoordinates())
-            this.debugPanel.addBinding(this, 'theta', { min: - Math.PI, max: Math.PI }).on('change', () => this.updateCoordinates())
-            this.debugPanel.addBinding(this, 'phiAmplitude', { min: 0, max: Math.PI}).on('change', () => this.updateCoordinates())
-            this.debugPanel.addBinding(this, 'thetaAmplitude', { min: - Math.PI, max: Math.PI }).on('change', () => this.updateCoordinates())
-            this.debugPanel.addBinding(this.spherical, 'radius', { min: 0, max: 100 }).on('change', () => this.updateCoordinates())
-            this.debugPanel.addBlade({ view: 'separator' })
-            this.debugPanel.addBinding(this, 'near', { min: 0.1, max: 50, step: 0.1 }).on('change', () => this.updateShadow())
-            this.debugPanel.addBinding(this, 'depth', { min: 0.1, max: 100, step: 0.1 }).on('change', () => this.updateShadow())
-            this.debugPanel.addBinding(this, 'shadowAmplitude', { min: 1, max: 50 }).on('change', () => this.updateShadow())
-            this.debugPanel.addBinding(this, 'shadowBias', { min: -0.02, max: 0.02 }).on('change', () => this.updateShadow())
-            this.debugPanel.addBinding(this, 'shadowNormalBias', { min: -0.3, max: 0.3 }).on('change', () => this.updateShadow())
-            this.debugPanel.addBinding(this, 'shadowRadius', { min: 0, max: 10 }).on('change', () => this.updateShadow())
-
-            const mapSizes = {}
-            for(let i = 0; i < 12; i++)
-            {
-                const size = Math.pow(2, i + 1)
-                mapSizes[size] = size
-            }
-        }
     }
 
     setNodes()
@@ -91,18 +61,6 @@ export class Lighting
         this.coreShadowEdgeHigh = uniform(float(1))
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.bounceColor.value, 'bounceColor')
-            this.debugPanel.addBinding(this.lightBounceEdgeLow, 'value', { label: 'lightBounceEdgeLow', min: - 1, max: 1, step: 0.01 })
-            this.debugPanel.addBinding(this.lightBounceEdgeHigh, 'value', { label: 'lightBounceEdgeHigh', min: - 1, max: 1, step: 0.01 })
-            this.debugPanel.addBinding(this.lightBounceDistance, 'value', { label: 'lightBounceDistance', min: 0, max: 5, step: 0.01 })
-            this.debugPanel.addBinding(this.lightBounceMultiplier, 'value', { label: 'lightBounceMultiplier', min: 0, max: 1, step: 0.01 })
-
-            this.debugPanel.addBlade({ view: 'separator' })
-            this.debugPanel.addBinding(this.coreShadowEdgeLow, 'value', { label: 'coreShadowEdgeLow', min: - 1, max: 1, step: 0.01 })
-            this.debugPanel.addBinding(this.coreShadowEdgeHigh, 'value', { label: 'coreShadowEdgeHigh', min: - 1, max: 1, step: 0.01 })
-        }
     }
 
     setLight()
@@ -143,11 +101,6 @@ export class Lighting
         this.shadowHelper.userData.preventPreRender = true
         this.game.scene.add(this.shadowHelper)
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(this.directionHelper, 'visible', { label: 'directionHelper' })
-            this.debugPanel.addBinding(this.shadowHelper, 'visible', { label: 'shadowHelper' })
-        }
     }
 
     updateShadow()

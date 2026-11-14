@@ -10,13 +10,6 @@ export class Trees
         this.game = Game.getInstance()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: `🌳 ${name}`,
-                expanded: false,
-            })
-        }
 
         this.visual = visual
         this.references = references
@@ -86,15 +79,6 @@ export class Trees
         this.leaves = new Foliage(references, leavesColorANode, leavesColorBNode, true)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.game.debug.addThreeColorBinding(this.debugPanel, leavesColorANode.value, 'leavesColorA')
-            this.game.debug.addThreeColorBinding(this.debugPanel, leavesColorBNode.value, 'leavesColorB')
-            this.debugPanel.addBinding(this.leaves.material.shadowOffset, 'value', { label: 'shadowOffset', min: 0, max: 2, step: 0.001 })
-            this.debugPanel.addBinding(this.leaves.material.threshold, 'value', { label: 'threshold', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(this.leaves.material.seeThroughEdgeMin, 'value', { label: 'seeThroughEdgeMin', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(this.leaves.material.seeThroughEdgeMax, 'value', { label: 'seeThroughEdgeMax', min: 0, max: 1, step: 0.001 })
-        }
     }
 
     setPhysical()
