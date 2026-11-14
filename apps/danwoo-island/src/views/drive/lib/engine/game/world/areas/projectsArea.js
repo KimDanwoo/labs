@@ -6,7 +6,7 @@ import { removeAwardsTable } from '../islandReskins'
 import { getGame } from '../../gameContext'
 import { InteractivePoints } from '../../interactivePoints'
 import gsap from 'gsap'
-import projectsData from '../../../data/projects'
+import content from '../../../data/danwoo'
 import { TextCanvas } from '../../textCanvas'
 import { add, color, float, Fn, If, luminance, mix, mul, normalWorld, positionGeometry, sin, step, texture, uniform, uv, vec3, vec4 } from 'three/tsl'
 import { Inputs } from '../../inputs/inputs'
@@ -377,21 +377,21 @@ export class ProjectsArea extends Area
                 projectIndex -= 1
 
                 if(projectIndex < 0)
-                    projectIndex = projectsData.length - 1
+                    projectIndex = content.projects.length - 1
 
-                imageIndex = projectsData[projectIndex].images.length - 1
+                imageIndex = content.projects[projectIndex].images.length - 1
             }
             else if(imageIndex > this.navigation.current.images.length - 1)
             {
                 projectIndex += 1
 
-                if(projectIndex > projectsData.length - 1)
+                if(projectIndex > content.projects.length - 1)
                     projectIndex = 0
 
                 imageIndex = 0
             }
 
-            const key = projectsData[projectIndex].images[imageIndex]
+            const key = content.projects[projectIndex].images[imageIndex]
             const resource = this.images.getResourceAndLoad(key)
         }
 
@@ -1259,15 +1259,15 @@ export class ProjectsArea extends Area
     {
         let loopIndex = index
 
-        if(loopIndex > projectsData.length - 1)
+        if(loopIndex > content.projects.length - 1)
             loopIndex = 0
         else if(loopIndex < 0)
-            loopIndex = projectsData.length - 1
+            loopIndex = content.projects.length - 1
 
         this.navigation.index = loopIndex
-        this.navigation.current = projectsData[this.navigation.index]
-        this.navigation.previous = projectsData[(this.navigation.index - 1) < 0 ? projectsData.length - 1 : this.navigation.index - 1]
-        this.navigation.next = projectsData[(this.navigation.index + 1) % projectsData.length]
+        this.navigation.current = content.projects[this.navigation.index]
+        this.navigation.previous = content.projects[(this.navigation.index - 1) < 0 ? content.projects.length - 1 : this.navigation.index - 1]
+        this.navigation.next = content.projects[(this.navigation.index + 1) % content.projects.length]
 
         this.attributes.update()
         this.adjacents.update()

@@ -1,4 +1,4 @@
-import './threejs-override';
+import './objectCopyOverride';
 
 import { DefaultLoadingManager } from 'three/webgpu';
 

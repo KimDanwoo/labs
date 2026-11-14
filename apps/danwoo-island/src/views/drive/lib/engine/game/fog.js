@@ -30,9 +30,9 @@ export class Fog
     update()
     {
         const amplitude = this.game.view.optimalArea.farDistance - this.game.view.optimalArea.nearDistance
-        this.colorA.value.copy(this.game.dayCycles.properties.fogColorA.value)
-        this.colorB.value.copy(this.game.dayCycles.properties.fogColorB.value)
-        this.near.value = this.game.view.optimalArea.nearDistance + this.game.dayCycles.properties.fogNearRatio.value * amplitude
-        this.far.value = this.game.view.optimalArea.nearDistance + this.game.dayCycles.properties.fogFarRatio.value * amplitude
+        this.colorA.value.copy(this.game.dayCycles.colorOf('fogColorA'))
+        this.colorB.value.copy(this.game.dayCycles.colorOf('fogColorB'))
+        this.near.value = this.game.view.optimalArea.nearDistance + this.game.dayCycles.numberOf('fogNearRatio') * amplitude
+        this.far.value = this.game.view.optimalArea.nearDistance + this.game.dayCycles.numberOf('fogFarRatio') * amplitude
     }
 }

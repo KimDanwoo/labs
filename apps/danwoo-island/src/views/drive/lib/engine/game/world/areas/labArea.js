@@ -4,7 +4,6 @@ import { rebuildLabGate } from '../islandStructures'
 import { getGame } from '../../gameContext'
 import { InteractivePoints } from '../../interactivePoints'
 import gsap from 'gsap'
-import labData from '../../../data/lab'
 import content from '../../../data/danwoo'
 import { TextCanvas } from '../../textCanvas'
 import { add, color, float, Fn, If, luminance, mix, mul, normalWorld, positionGeometry, positionWorld, sin, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
@@ -373,12 +372,12 @@ export class LabArea extends Area
                 projectIndex += 1
 
             if(projectIndex < 0)
-                projectIndex = labData.length - 1
+                projectIndex = content.lab.length - 1
 
-            if(projectIndex > labData.length - 1)
+            if(projectIndex > content.lab.length - 1)
                 projectIndex = 0
 
-            const key = labData[projectIndex].image
+            const key = content.lab[projectIndex].image
             const resource = this.images.getResourceAndLoad(key)
         }
 
@@ -692,13 +691,13 @@ export class LabArea extends Area
             this.scroller.minis = {}
             this.scroller.minis.inter = 0.9
             this.scroller.minis.items = []
-            this.scroller.minis.total = labData.length * this.scroller.minis.inter
+            this.scroller.minis.total = content.lab.length * this.scroller.minis.inter
             this.scroller.minis.current = null
             this.scroller.minis.width = 1920 / 8
             this.scroller.minis.height = 1080 / 8
 
             let i = 0
-            for(const project of labData)
+            for(const project of content.lab)
             {
                 const mini = {}
                 mini.index = i
@@ -895,8 +894,8 @@ export class LabArea extends Area
 
         this.scroller.update = () =>
         {
-            const centeringOffset = labData.length - 3.25
-            const closestProgress = Math.round((this.scroller.progress + this.navigation.index - centeringOffset) / labData.length) * labData.length - this.navigation.index + centeringOffset
+            const centeringOffset = content.lab.length - 3.25
+            const closestProgress = Math.round((this.scroller.progress + this.navigation.index - centeringOffset) / content.lab.length) * content.lab.length - this.navigation.index + centeringOffset
             this.scroller.targetProgress = closestProgress
 
             if(this.scroller.minis.current)
@@ -1242,21 +1241,21 @@ export class LabArea extends Area
     {
         let loopIndex = index
 
-        if(loopIndex > labData.length - 1)
+        if(loopIndex > content.lab.length - 1)
             loopIndex = 0
         else if(loopIndex < 0)
-            loopIndex = labData.length - 1
+            loopIndex = content.lab.length - 1
 
         if(this.navigation.index === loopIndex)
             return
 
         if(direction === null)
-            direction = signedModDelta(loopIndex, this.navigation.index, labData.length) > 0 ? LabArea.DIRECTION_PREVIOUS : LabArea.DIRECTION_NEXT
+            direction = signedModDelta(loopIndex, this.navigation.index, content.lab.length) > 0 ? LabArea.DIRECTION_PREVIOUS : LabArea.DIRECTION_NEXT
 
         this.navigation.index = loopIndex
-        this.navigation.current = labData[this.navigation.index]
-        this.navigation.previous = labData[(this.navigation.index - 1) < 0 ? labData.length - 1 : this.navigation.index - 1]
-        this.navigation.next = labData[(this.navigation.index + 1) % labData.length]
+        this.navigation.current = content.lab[this.navigation.index]
+        this.navigation.previous = content.lab[(this.navigation.index - 1) < 0 ? content.lab.length - 1 : this.navigation.index - 1]
+        this.navigation.next = content.lab[(this.navigation.index + 1) % content.lab.length]
         this.navigation.direction = direction
 
         this.title.update(direction)

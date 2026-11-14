@@ -116,6 +116,6 @@ export class PoleLights
         }
 
         this.game.dayCycles.events.on('night', intervalChange)
-        intervalChange(this.game.dayCycles.intervalEvents.get('night').inInterval)
+        intervalChange(this.game.dayCycles.isInInterval('night'))
     }
 }

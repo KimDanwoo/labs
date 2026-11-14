@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu'
 import { rebuildVillageProps } from '../islandVillage'
 import { getGame } from '../../gameContext'
 import { InteractivePoints } from '../../interactivePoints'
-import socialData from '../../../data/social'
+import content from '../../../data/danwoo'
 import { InstancedGroup } from '../../instancedGroup'
 import { Area } from './area'
 import { personalizeSocialSigns, recordSteleFrames, reshapeSocialPlaza } from './socialSigns'
@@ -32,7 +32,7 @@ export class SocialArea extends Area
     setLinks()
     {
         const models = { GitHub: 'gitHub', '블로그': 'twitch', SoundCloud: 'youtube', '이력서': 'mail', 'Danwoo Lab': 'x' }
-        for(const link of socialData)
+        for(const link of content.social)
         {
             const object = this.objects.items.find(item => item.visual?.object3D.name === models[link.name])
             if(!object) continue
