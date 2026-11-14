@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu'
 import { rebuildBuildingSite } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { PortalSlabsGeometry } from '../../Geometries/PortalSlabsGeometry.js'
-import { attribute, color, float, Fn, mix, PI, PI2, positionGeometry, screenCoordinate, sin, texture, uniform, varying, vec2, vec3, vec4, viewportCoordinate } from 'three/tsl'
+import { attribute, color, float, Fn, PI2, positionGeometry, sin, uniform, varying, vec2, vec4 } from 'three/tsl'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import { Area } from './Area.js'
 
@@ -57,9 +57,8 @@ export class BehindTheSceneArea extends Area
         const material = new THREE.MeshBasicMaterial({ wireframe: false })
         const effectVarying = varying(float())
         this.vehicleRelativePosition = uniform(vec2())
-        this.bloomColor = uniform(color('#6053ff'))
-        this.bloomIntensity = uniform(14)
-        this.starsOffset = uniform(vec2(0))
+        this.chalkColor = uniform(color('#f3ead7'))
+        this.chalkIntensity = uniform(1)
 
         material.positionNode = Fn(() =>
         {
@@ -95,13 +94,9 @@ export class BehindTheSceneArea extends Area
             const edgeOffset = effectVarying.remapClamp(0.1, 1, 0.5, 0)
             const edgeTreshold = edge.remapClamp(0, 1, 0.98, 1)
             const strength = edge.toVar().sub(0.5).abs().mul(2).add(edgeOffset).step(edgeTreshold)
+            strength.lessThan(0.5).discard()
 
-            const starsUv = screenCoordinate.div(256).fract().add(this.starsOffset)
-            const starsColor = texture(this.game.resources.behindTheSceneStarsTexture, starsUv).rgb.pow(2).mul(5)
-
-            const bloomColor = this.bloomColor.mul(this.bloomIntensity)
-            const finalColor = mix(starsColor, bloomColor, strength)
-            return vec4(finalColor, 1)
+            return vec4(this.chalkColor.mul(this.chalkIntensity), 1)
         })()
 
         // Mesh
@@ -114,8 +109,8 @@ export class BehindTheSceneArea extends Area
         // Debug
         if(this.game.debug.active)
         {
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.bloomColor.value, 'bloomColor')
-            this.debugPanel.addBinding(this.bloomIntensity, 'value', { label: 'bloomIntensity', min: 0, max: 20, step: 0.001 })
+            this.game.debug.addThreeColorBinding(this.debugPanel, this.chalkColor.value, 'chalkColor')
+            this.debugPanel.addBinding(this.chalkIntensity, 'value', { label: 'chalkIntensity', min: 0, max: 2, step: 0.001 })
         }
     }
 
@@ -156,10 +151,5 @@ export class BehindTheSceneArea extends Area
     {
         this.vehicleRelativePosition.value.x = this.game.physicalVehicle.position.x - this.slabs.position.x
         this.vehicleRelativePosition.value.y = this.game.physicalVehicle.position.z - this.slabs.position.z
-
-        const viewOffset = new THREE.Vector2(this.game.view.focusPoint.smoothedPosition.x, this.game.view.focusPoint.smoothedPosition.z)
-        viewOffset.rotateAround(new THREE.Vector2(), Math.PI * 0.25)
-        this.starsOffset.value.x = viewOffset.x * 0.1
-        this.starsOffset.value.y = viewOffset.y * 0.1
     }
 }

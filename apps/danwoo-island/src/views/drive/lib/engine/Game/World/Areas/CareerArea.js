@@ -3,11 +3,18 @@ import { color, Fn, luminance, max, mix, step, texture, uniform, uv, vec4 } from
 import gsap from 'gsap'
 import { clamp } from 'three/src/math/MathUtils.js'
 import { Area } from './Area.js'
+import { paintCareerLines } from '../islandReskins.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import content from '../../../data/danwoo.js'
 
 export class CareerArea extends Area
 {
+    setObjects()
+    {
+        paintCareerLines(this.model, this.game.materials)
+        super.setObjects()
+    }
+
     constructor(references)
     {
         super(references)

@@ -101,23 +101,29 @@ export function createBrushwoodFence(materials, template)
     return parts.build(materials, templateMatrix(template))
 }
 
+const ONGGI_PROFILE = [
+    [0.0, -0.5],
+    [0.3, -0.5],
+    [0.38, -0.38],
+    [0.47, -0.12],
+    [0.49, 0.06],
+    [0.44, 0.22],
+    [0.34, 0.33],
+    [0.25, 0.39],
+    [0.25, 0.43],
+    [0.3, 0.46],
+    [0.3, 0.49],
+    [0.0, 0.47],
+]
+const ONGGI_SIDES = 16
+
 export function createOnggi(materials, template)
 {
-    const profile = [
-        [0.0, -0.55],
-        [0.34, -0.55],
-        [0.46, -0.4],
-        [0.55, -0.12],
-        [0.54, 0.12],
-        [0.44, 0.32],
-        [0.3, 0.42],
-        [0.28, 0.46],
-        [0.0, 0.46],
-    ].map(([x, y]) => new THREE.Vector2(x, y))
     const parts = createParts()
-    parts.add('onggi', new THREE.LatheGeometry(profile, 10))
-    parts.prism('onggiLid', 0.26, 0.33, 0.07, { position: [0, 0.5, 0] }, 10)
-    parts.prism('onggiLid', 0.06, 0.08, 0.06, { position: [0, 0.56, 0] }, 6)
+    parts.add('onggi', new THREE.LatheGeometry(ONGGI_PROFILE.map(([x, y]) => new THREE.Vector2(x, y)), ONGGI_SIDES))
+    parts.add('twig', new THREE.TorusGeometry(0.47, 0.025, 4, ONGGI_SIDES), { position: [0, 0.14, 0], rotation: [Math.PI / 2, 0, 0] })
+    parts.prism('onggiLid', 0.12, 0.33, 0.09, { position: [0, 0.54, 0] }, ONGGI_SIDES)
+    parts.prism('onggiLid', 0.05, 0.07, 0.06, { position: [0, 0.61, 0] }, 6)
     return parts.build(materials, templateMatrix(template))
 }
 

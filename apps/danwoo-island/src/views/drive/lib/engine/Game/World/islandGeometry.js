@@ -26,7 +26,6 @@ export const SHADES = {
     thatch: '#d6a548',
     thatchRope: '#a3772c',
     hanji: '#efe2c4',
-    mapGreen: '#7fb069',
     mapBlue: '#69a7c9',
     tarpOrange: '#e8742f',
     tarpLight: '#f3a35a',
@@ -58,7 +57,7 @@ const GLOW = {
     cheongsachorong: { name: 'emissiveCheongsachorongGradient', inner: '#ffd58a', outer: '#ff3b2f', intensity: 1.8 },
 }
 
-const SIGNAGE_FACES = new Set(['hanji', 'mapGreen', 'mapBlue', 'glass'])
+const SIGNAGE_FACES = new Set(['hanji', 'mapBlue', 'glass'])
 
 const shadedMaterials = new Map()
 
@@ -73,7 +72,7 @@ function shadedMaterial(name)
     return shadedMaterials.get(name)
 }
 
-function resolveMaterial(materials, name)
+export function islandMaterial(materials, name)
 {
     const glow = GLOW[name]
     if(!glow)
@@ -158,7 +157,7 @@ export function createParts()
         const group = new THREE.Group()
         for(const [name, geometries] of batches)
         {
-            const mesh = new THREE.Mesh(mergeGeometries(geometries), resolveMaterial(materials, name))
+            const mesh = new THREE.Mesh(mergeGeometries(geometries), islandMaterial(materials, name))
             for(const geometry of geometries)
                 geometry.dispose()
             mesh.name = name
@@ -172,4 +171,56 @@ export function createParts()
     }
 
     return { add, box, prism, rod, hipRoof, build }
+}
+
+export function meshComponents(geometry)
+{
+    const position = geometry.attributes.position
+    const index = geometry.index ? Array.from(geometry.index.array) : Array.from({ length: position.count }, (_, vertex) => vertex)
+    const canonical = new Map()
+    const parent = Array.from({ length: position.count }, (_, vertex) => vertex)
+    const find = (vertex) =>
+    {
+        while(parent[vertex] !== vertex)
+            vertex = parent[vertex] = parent[parent[vertex]]
+        return vertex
+    }
+    const representative = (vertex) =>
+    {
+        const key = [position.getX(vertex), position.getY(vertex), position.getZ(vertex)].map((value) => value.toFixed(3)).join()
+        if(!canonical.has(key))
+            canonical.set(key, vertex)
+        return canonical.get(key)
+    }
+    const roots = index.map(representative)
+    for(let offset = 0; offset < roots.length; offset += 3)
+        for(const other of [roots[offset + 1], roots[offset + 2]])
+            parent[find(other)] = find(roots[offset])
+
+    const components = new Map()
+    const point = new THREE.Vector3()
+    for(let offset = 0; offset < index.length; offset += 3)
+    {
+        const root = find(roots[offset])
+        if(!components.has(root))
+            components.set(root, { offsets: [], box: new THREE.Box3() })
+        const component = components.get(root)
+        component.offsets.push(offset)
+        for(const vertex of index.slice(offset, offset + 3))
+            component.box.expandByPoint(point.fromBufferAttribute(position, vertex))
+    }
+    return { index, components: [...components.values()] }
+}
+
+export function removeComponents(mesh, shouldRemove)
+{
+    const { index, components } = meshComponents(mesh.geometry)
+    const removed = components.filter(shouldRemove)
+    const offsets = new Set(removed.flatMap((component) => component.offsets))
+    const kept = []
+    for(let offset = 0; offset < index.length; offset += 3)
+        if(!offsets.has(offset))
+            kept.push(index[offset], index[offset + 1], index[offset + 2])
+    mesh.geometry.setIndex(kept)
+    return removed
 }

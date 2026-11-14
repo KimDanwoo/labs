@@ -136,7 +136,24 @@ export function rebuildLabGate(model, materials)
     })
 }
 
-export function rebuildKiosk(model, materials)
+const MAP_ASPECT = 1.5
+const MAP_MARGIN = 0.6
+
+function guideMap(board, mapTexture, { width, height, centerY, z })
+{
+    const fitWidth = Math.min(width - MAP_MARGIN, (height - MAP_MARGIN) * MAP_ASPECT)
+    const geometry = new THREE.PlaneGeometry(fitWidth, fitWidth / MAP_ASPECT)
+    geometry.translate(0, centerY, z)
+    geometry.applyMatrix4(board.matrix)
+    const material = new MeshDefaultMaterial({ colorNode: texture(mapTexture).rgb, hasCoreShadows: false, hasDropShadows: false })
+    material.userData.prevent = true
+    const mesh = new THREE.Mesh(geometry, material)
+    mesh.name = 'guideMap'
+    mesh.receiveShadow = true
+    return mesh
+}
+
+export function rebuildKiosk(model, materials, mapTexture)
 {
     replaceVisual(model, 'physicalFixed009', (container) =>
     {
@@ -152,15 +169,12 @@ export function rebuildKiosk(model, materials)
         }
         parts.box('wood', [width, half * 1.25, 0.22], { position: [0, 0.35, 0], ...frame })
         parts.box('hanji', [width - 0.35, half * 1.25 - 0.35, 0.05], { position: [0, 0.35, 0.13], ...frame })
-        for(const [x, y, w, h] of [[-0.3, 0.4, 1.3, 0.9], [0.62, 0.15, 0.6, 0.5]])
-            parts.box('mapGreen', [w, h, 0.02], { position: [x, y, 0.17], ...frame })
-        for(const [x, y, w, h] of [[0.2, 0.62, 0.9, 0.08], [-0.1, -0.12, 1.6, 0.08]])
-            parts.box('mapBlue', [w, h, 0.02], { position: [x, y, 0.19], ...frame })
         const roof = createParts()
         giwaRoof(roof, { center: [0, half + 0.3, 0], width: width + 0.6, depth: 1.1, height: 0.6 })
         const group = parts.build(materials)
         for(const mesh of roof.build(materials, board.matrix).children)
             group.add(mesh)
+        group.add(guideMap(board, mapTexture, { width, height: half * 1.25, centerY: 0.35, z: 0.17 }))
         return group
     })
 }

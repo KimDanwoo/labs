@@ -27,7 +27,7 @@ export class LandingArea extends Area
     {
         rebuildVillageProps(this.model, this.game.materials)
         replaceLandingName(this.model)
-        rebuildKiosk(this.model, this.game.materials)
+        rebuildKiosk(this.model, this.game.materials, this.game.resources.islandMapTexture)
         super.setObjects()
     }
 
