@@ -1,6 +1,6 @@
 import { Game } from '../Game.js'
 import { InstancedGroup } from '../InstancedGroup.js'
-import { createPyeongsang } from './islandProps.js'
+import { createBeachBench } from './islandProps.js'
 
 export class Benches
 {
@@ -50,7 +50,7 @@ export class Benches
 
 
         // Instanced group
-        this.instancedGroup = new InstancedGroup(references, createPyeongsang(this.game.materials))
+        this.instancedGroup = new InstancedGroup(references, createBeachBench(this.game.materials))
 
         // Tick update
         this.game.ticker.events.on('tick', () =>

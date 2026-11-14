@@ -4,7 +4,7 @@ import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { bungeoppangGeometry, createParts, FULL_TURN, seededRandom } from './islandGeometry.js'
 import { islandModelMesh } from './islandModels.js'
 
-const OBANG = ['obangBlue', 'obangRed', 'obangYellow', 'obangWhite', 'obangBlack']
+const BUNTING = ['bunting1', 'bunting2', 'bunting3', 'bunting4', 'bunting5']
 
 function cuboidFrame(cuboid)
 {
@@ -138,8 +138,7 @@ export function rebuildLabGate(model, materials)
 }
 
 const MAP_ASPECT = 1.5
-const KIOSK_ROOF_GROOVES = 6
-const MAP_BACKING_DEPTH = 0.01
+const GUIDE_BOARD = { mapWidth: 0.68, mapHeight: 0.43, mapY: -0.01, mapFront: 0.11 }
 
 function guideMap(board, mapTexture, { width, height, y, z })
 {
@@ -159,35 +158,10 @@ export function rebuildKiosk(model, materials, mapTexture)
     replaceVisual(model, 'physicalFixed009', (container) =>
     {
         const board = cuboidFrame(container.children.find((child) => child.name === 'cuboid018'))
-        const { x: W, y: H, z: D } = board.size
-        const at = (t) => (t - 0.5) * H
-        const frame = { matrix: board.matrix }
-        const parts = createParts()
-        for(const side of [-1, 1])
-        {
-            parts.add('stoneDark', new THREE.CylinderGeometry(0.5, 0.5, 1, 8), { scale: [0.16 * W, 0.07 * H, 0.9 * D], position: [side * 0.4 * W, at(0.045), 0], ...frame })
-            parts.box('woodDark', [0.075 * W, 0.84 * H, 0.36 * D], { position: [side * 0.4 * W, at(0.49), 0], ...frame })
-        }
-        parts.box('wood', [0.75 * W, 0.51 * H, 0.23 * D], { position: [0, at(0.49), 0.04 * D], ...frame })
-        parts.box('hanji', [0.7 * W, 0.46 * H, MAP_BACKING_DEPTH], { position: [0, at(0.49), 0.16 * D], ...frame })
-        parts.box('woodDark', [0.98 * W, 0.012 * H, 0.96 * D], { position: [0, at(0.91), 0], ...frame })
-        const roofHeight = Math.min(0.06 * H, 0.28 * D)
-        const roofBase = at(0.916)
-        parts.hipRoof('giwa', { width: 0.98 * W, depth: 0.96 * D, height: roofHeight, ridgeRatio: 0.6, position: [0, roofBase, 0], ...frame })
-        parts.box('giwaRidge', [0.62 * W, 0.018 * H, 0.15 * D], { position: [0, roofBase + roofHeight, 0], ...frame })
-        for(let index = 0; index < KIOSK_ROOF_GROOVES; index++)
-        {
-            const x = -0.4 * W + (index * 0.8 * W) / (KIOSK_ROOF_GROOVES - 1)
-            for(const side of [-1, 1])
-            {
-                const eave = new THREE.Vector3(x, roofBase + 0.01, side * 0.46 * D).applyMatrix4(board.matrix)
-                const ridge = new THREE.Vector3(x * 0.62, roofBase + roofHeight, side * 0.04 * D).applyMatrix4(board.matrix)
-                parts.rod('giwaRidge', 0.012 * D, eave.toArray(), ridge.toArray(), 4)
-            }
-        }
-        const group = parts.build(materials)
-        const mapWidth = Math.min(0.68 * W, 0.43 * H * MAP_ASPECT)
-        group.add(guideMap(board, mapTexture, { width: mapWidth, height: mapWidth / MAP_ASPECT, y: at(0.49), z: 0.16 * D + MAP_BACKING_DEPTH }))
+        const { x: W, y: H } = board.size
+        const group = new THREE.Group().add(islandModelMesh(materials, 'guideBoard', board.matrix, board.size))
+        const mapWidth = Math.min(GUIDE_BOARD.mapWidth * W, GUIDE_BOARD.mapHeight * H * MAP_ASPECT)
+        group.add(guideMap(board, mapTexture, { width: mapWidth, height: mapWidth / MAP_ASPECT, y: GUIDE_BOARD.mapY * H, z: GUIDE_BOARD.mapFront }))
         return group
     })
 }
@@ -342,13 +316,20 @@ function geumjul(parts, random, points)
             for(let strip = 1; strip < strips; strip++)
             {
                 const anchor = from.clone().lerp(to, strip / strips)
-                parts.box(OBANG[Math.floor(random() * OBANG.length)], [0.16, 0.55, 0.03], {
+                parts.box(BUNTING[Math.floor(random() * BUNTING.length)], [0.16, 0.55, 0.03], {
                     position: [anchor.x, anchor.y - 0.3, anchor.z],
                     rotation: [0, random() * FULL_TURN, 0],
                 })
             }
         }
     }
+}
+
+const SURFBOARD_PROPORTION = { width: 0.27, depth: 0.15 }
+
+function surfboardSize(height)
+{
+    return new THREE.Vector3(height * SURFBOARD_PROPORTION.width, height, height * SURFBOARD_PROPORTION.depth)
 }
 
 export function rebuildSeonangdang(model, materials)
@@ -369,8 +350,7 @@ export function rebuildSeonangdang(model, materials)
     const tall = pillars.slice(0, 3)
     for(const frame of tall)
         cairn(parts, random, frame)
-    const generals = ['jangseungHeaven', 'jangseungEarth']
-    const figures = pillars.slice(3).map(({ size, matrix }, index) => islandModelMesh(materials, generals[index % generals.length], matrix, size))
+    const figures = pillars.slice(3).map(({ size, matrix }) => islandModelMesh(materials, 'surfboardStand', matrix, surfboardSize(size.y)))
     const ropePoints = tall.map((frame) => new THREE.Vector3().setFromMatrixPosition(frame.matrix).add(new THREE.Vector3(0, frame.size.y * 0.32, 0)))
     ropePoints.sort((a, b) => Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x))
     geumjul(parts, random, ropePoints)

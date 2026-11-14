@@ -29,7 +29,7 @@ export const LIGHTHOUSE = {
 
 const LANDMARKS = [
     { pattern: /^refStatuePhysicalDynamic$/, ...SHELL_FOUNTAIN },
-    { pattern: /^gamepadPhysicalDynamic/, ...PALM_HAMMOCK },
+    { pattern: /^gamepadPhysicalDynamic/, ...PALM_HAMMOCK, offset: new THREE.Vector3(1, 0, 0) },
 ]
 
 const BEACH_SPOTS = [{ pattern: /^gamepadPhysicalDynamic/, ...SURF_CORNER, position: new THREE.Vector3(56, 0, 37.6) }]
@@ -77,7 +77,7 @@ export function placeLandmarks(model, materials)
     {
         const landmark = LANDMARKS.find(({ pattern }) => pattern.test(child.name))
         if(landmark)
-            model.add(fixedLandmark(materials, landmark, footprintOf(model, child), child.quaternion))
+            model.add(fixedLandmark(materials, landmark, footprintOf(model, child).add(landmark.offset ?? new THREE.Vector3()), child.quaternion))
         for(const spot of BEACH_SPOTS.filter(({ pattern }) => pattern.test(child.name)))
             model.add(fixedLandmark(materials, spot, model.worldToLocal(spot.position.clone()), new THREE.Quaternion()))
         if(landmark || REMOVED.test(child.name))

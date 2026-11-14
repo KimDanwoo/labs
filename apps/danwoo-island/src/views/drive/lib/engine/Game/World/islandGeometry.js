@@ -47,6 +47,11 @@ export const SHADES = {
     obangYellow: '#e8b830',
     obangWhite: '#f2eee4',
     obangBlack: '#2a2a2e',
+    bunting1: '#36AFC0',
+    bunting2: '#F47F75',
+    bunting3: '#F6CF68',
+    bunting4: '#FFF1D6',
+    bunting5: '#AA91CC',
     bronze: '#b0803a',
 }
 
