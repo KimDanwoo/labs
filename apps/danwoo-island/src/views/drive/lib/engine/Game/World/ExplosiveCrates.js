@@ -22,7 +22,7 @@ export class ExplosiveCrates
         this.game.materials.updateObject(base)
 
         // Create instanced group
-        this.instancedGroup = new InstancedGroup(this.references, createOnggi(this.game.materials, base))
+        this.instancedGroup = new InstancedGroup(this.references, createOnggi(this.game.materials))
 
         this.items = []
 

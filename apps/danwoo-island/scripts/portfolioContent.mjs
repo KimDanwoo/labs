@@ -8,7 +8,6 @@ import { PROJECTS } from '../../hub/src/views/home/model/constants/projects.ts';
 
 const HUB_ROOT = fileURLToPath(new URL('../../hub/', import.meta.url));
 const FONT_ROOT = fileURLToPath(new URL('../../../packages/tokens/fonts/', import.meta.url));
-const LANDING_PREVIEW = fileURLToPath(new URL('../upstream/assets/landing-preview.webp', import.meta.url));
 const LAB_URL = 'https://lab.danwoo.dev/';
 const PROJECT_IMAGE_PATH = /^\/projects\/[a-z0-9-]+\.webp$/;
 
@@ -33,7 +32,6 @@ function collectAssets() {
   return [
     ...projectImages,
     { source: path.join(HUB_ROOT, 'app/opengraph-image.png'), destination: 'danwoo/hub.png' },
-    { source: LANDING_PREVIEW, destination: 'danwoo/landing-preview.webp' },
     ...fonts,
     { source: path.join(FONT_ROOT, 'LICENSE.md'), destination: 'danwoo/fonts/LICENSE.md' },
   ];

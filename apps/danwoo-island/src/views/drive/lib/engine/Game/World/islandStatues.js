@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { createParts } from './islandGeometry.js'
 import { projectFrontUV, propMaterial, texturedMesh } from './islandTextured.js'
 
@@ -13,7 +14,7 @@ const HAREUBANG = {
     body: [[0, 0.03], [0.76, 0.03], [0.88, 0.08], [0.9, 0.32], [0.87, 0.48], [0.8, 0.6], [0.65, 0.65], [0, 0.65]],
     head: [[0, 0.6], [0.65, 0.6], [0.91, 0.65], [0.97, 0.75], [0.88, 0.84], [0.65, 0.87], [0, 0.87]],
     hat: [[0, 0.84], [1, 0.84], [1, 0.875], [0.79, 0.885], [0.76, 0.94], [0.5, 0.985], [0, 0.99]],
-    envelope: [[0.76, 0.03], [0.88, 0.08], [0.9, 0.32], [0.87, 0.48], [0.8, 0.6], [0.91, 0.65], [0.97, 0.75], [0.94, 0.835], [1, 0.84], [1, 0.875], [0.79, 0.885], [0.76, 0.94], [0.5, 0.985], [0.05, 0.99]],
+    envelope: [[0.87, 0.47], [0.87, 0.48], [0.8, 0.6], [0.91, 0.65], [0.97, 0.75], [0.94, 0.835], [1, 0.84], [1, 0.875], [0.79, 0.885], [0.76, 0.94], [0.5, 0.985], [0.05, 0.99]],
 }
 
 function latheGeometry(profile, radius, height, { phiStart = 0, phiLength = Math.PI * 2, lift = 1 } = {})
@@ -34,8 +35,8 @@ export function hareubangFigure(materials, { size, matrix })
     const depthScale = (HAREUBANG.depthRatio * size.z) / radius
     const group = new THREE.Group()
     const basalt = propMaterial(materials, 'basalt', { repeat: HAREUBANG.basaltRepeat })
-    for(const [name, profile] of [['hareubangBody', HAREUBANG.body], ['hareubangHead', HAREUBANG.head], ['hareubangHat', HAREUBANG.hat]])
-        group.add(texturedMesh(squashDepth(latheGeometry(profile, radius, size.y), depthScale), basalt, { name, matrix }))
+    const stone = mergeGeometries([HAREUBANG.body, HAREUBANG.head, HAREUBANG.hat].map((profile) => squashDepth(latheGeometry(profile, radius, size.y), depthScale)))
+    group.add(texturedMesh(stone, basalt, { name: 'hareubangStone', matrix }))
 
     const { bottom, top, widthRatio } = HAREUBANG.decal
     const shell = squashDepth(latheGeometry(HAREUBANG.envelope, radius, size.y, { phiStart: -HAREUBANG.frontArc, phiLength: HAREUBANG.frontArc * 2, lift: HAREUBANG.shellLift }), depthScale)

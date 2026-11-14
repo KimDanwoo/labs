@@ -3,6 +3,8 @@ import { Game } from '../Game.js'
 import { mul, max, step, output, color, sin, smoothstep, mix, matcapUV, float, mod, texture, transformNormalToView, uniformArray, varying, vertexIndex, rotateUV, cameraPosition, vec4, atan, vec3, vec2, modelWorldMatrix, Fn, attribute, uniform, normalWorld } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 
+const GRASS_CLEARINGS = [{ x: 57.4, z: 32.4, radius: 2.4 }]
+
 export class Grass
 {
     constructor()
@@ -122,7 +124,8 @@ export class Grass
         const hiddenThreshold = 0.1
         // const terrainUv = this.game.terrain.worldPositionToUvNode(bladePosition)
         const terrainData = this.game.terrain.terrainNode(bladePosition)
-        const terrainDataGrass = terrainData.g
+        const clearing = GRASS_CLEARINGS.reduce((amount, { x, z, radius }) => amount.mul(bladePosition.sub(vec2(x, z)).length().smoothstep(radius * 0.8, radius)), float(1))
+        const terrainDataGrass = terrainData.g.mul(clearing)
         const hidden = step(terrainData.g.sub(0.4), hiddenThreshold)
 
         // Instance

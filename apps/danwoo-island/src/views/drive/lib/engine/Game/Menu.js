@@ -92,12 +92,10 @@ export class Menu
     setItems()
     {
         const navigationElement = this.element.querySelector('.js-navigation')
-        const previewElement = this.element.querySelector('.js-previews')
         const contentElement = this.element.querySelector('.js-contents')
         this.items = new Map()
 
         const navigationElements = navigationElement.querySelectorAll('.js-navigation-item')
-        const previewElements = [...previewElement.querySelectorAll('.js-preview')]
         const contentElements = [...contentElement.querySelectorAll('.js-content')]
 
         for(const navigationElement of navigationElements)
@@ -105,7 +103,6 @@ export class Menu
             const item = {}
             item.navigationElement = navigationElement
             item.name = item.navigationElement.dataset.name
-            item.previewElement = previewElements.find(element => element.classList.contains(`${item.name}-preview`))
             item.contentElement = contentElements.find(element => element.classList.contains(`${item.name}-content`))
             item.mainFocus = item.contentElement.querySelector('.js-main-focus')
             item.isOpen = false
@@ -202,7 +199,6 @@ export class Menu
         if(this.current)
         {
             this.current.navigationElement.classList.remove('is-active')
-            this.current.previewElement.classList.remove('is-visible')
             this.current.contentElement.classList.remove('is-visible')
             
             this.current.isOpen = false
@@ -210,7 +206,6 @@ export class Menu
 
         // Entering item
         item.navigationElement.classList.add('is-active')
-        item.previewElement.classList.add('is-visible')
         item.contentElement.classList.add('is-visible')
         
         item.isOpen = true

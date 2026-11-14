@@ -8,7 +8,9 @@ export const GENERALS = {
 
 const LOG_PROFILE = [[0, 0], [0.88, 0], [0.96, 0.03], [0.91, 0.27], [0.86, 0.6], [0.94, 0.65], [1, 0.72], [0.98, 0.86], [0.9, 0.92], [0.8, 0.95], [0, 0.95]]
 const EARTH_CROWN = [[0.9, 0.94], [0.78, 0.98], [0, 0.995]]
-const LOG_SIDES = 10
+const LOG_SIDES = 24
+const LOG_TOP = 0.94
+const NOSE = { width: 0.15, height: 0.055, depth: 0.12, t: 0.78, margin: 0.005 }
 const FACE = { t: 0.79, halfAngle: (50 * Math.PI) / 180, lift: 0.004 }
 const INSCRIPTION = { t: 0.35, widthRatio: 0.61, heightRatio: 0.4, lift: 0.004, canvas: [128, 640] }
 
@@ -41,12 +43,14 @@ function lathe(profile, radius, height)
     return new THREE.LatheGeometry(profile.map(([r, t]) => new THREE.Vector2(r * radius, t * height)), LOG_SIDES)
 }
 
-export function jangseungFigure(parts, materials, { height, radius, bottom = 0, matrix = new THREE.Matrix4(), general = GENERALS.heaven })
+export function jangseungFigure(parts, materials, { height, radius, halfDepth = radius / 0.92, bottom = 0, matrix = new THREE.Matrix4(), general = GENERALS.heaven })
 {
     const local = new THREE.Matrix4().makeTranslation(0, bottom, 0).premultiply(matrix)
     parts.add('jangseungWood', lathe(LOG_PROFILE, radius, height), { matrix: local })
-    const width = (2 * radius) / 0.92
-    parts.box('woodDark', [0.15 * width, 0.055 * height, 0.12 * width], { position: [0, 0.78 * height, radius * 1.02], matrix: local })
+    const width = 2 * halfDepth
+    const noseDepth = NOSE.depth * width
+    const noseZ = Math.min(radius * 1.02, halfDepth - noseDepth / 2 - NOSE.margin)
+    parts.box('woodDark', [NOSE.width * width, NOSE.height * height, noseDepth], { position: [0, NOSE.t * height, noseZ], matrix: local })
     if(general.isMale)
         parts.prism('woodDark', 0.9 * radius, 0.9 * radius, 0.04 * height, { position: [0, 0.96 * height, 0], matrix: local }, LOG_SIDES)
     else
@@ -54,8 +58,9 @@ export function jangseungFigure(parts, materials, { height, radius, bottom = 0, 
 
     const radiusAt = profileRadius(LOG_PROFILE.map(([r, t]) => [r * radius, t * height]))
     const faceY = FACE.t * height
-    const faceSize = 2 * FACE.halfAngle * radiusAt(faceY)
-    const face = curvedPatchGeometry({ radiusAt, thetaHalf: FACE.halfAngle, bottom: faceY - faceSize / 2, top: faceY + faceSize / 2, lift: FACE.lift })
+    const faceTop = Math.min(faceY + FACE.halfAngle * radiusAt(faceY), LOG_TOP * height)
+    const faceSize = 2 * (faceTop - faceY)
+    const face = curvedPatchGeometry({ radiusAt, thetaHalf: FACE.halfAngle, bottom: faceY - faceSize / 2, top: faceTop, lift: FACE.lift, columns: 12 })
     const inscriptionWidth = INSCRIPTION.widthRatio * radius
     const inscriptionY = INSCRIPTION.t * height
     const inscriptionHalf = INSCRIPTION.heightRatio * height / 2

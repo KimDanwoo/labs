@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { texture, uv } from 'three/tsl'
+import { texture, uv, vec2 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 
 const PROP_TEXTURES = {
@@ -9,6 +9,9 @@ const PROP_TEXTURES = {
     hareubangFront: { path: 'areas/island/props/hareubangFront.webp' },
     basalt: { path: 'areas/island/props/basaltTile.webp', isRepeating: true },
     steleFace: { path: 'areas/island/props/steleFace.webp' },
+    haetaeFront: { path: 'areas/island/props/haetaeFront.webp' },
+    dongjaseokFront: { path: 'areas/island/props/dongjaseokFront.webp' },
+    jindoFront: { path: 'areas/island/props/jindoFront.webp' },
 }
 
 const resourceName = (key) => `prop${key[0].toUpperCase()}${key.slice(1)}Texture`
@@ -39,7 +42,7 @@ export function propMaterial(materials, key, { repeat = [1, 1], hasAlpha = false
     if(materialCache.has(cacheKey))
         return materialCache.get(cacheKey)
     const map = materials.game.resources[resourceName(key)]
-    const sample = texture(map, uv().mul(...repeat))
+    const sample = texture(map, uv().mul(vec2(...repeat)))
     const material = new MeshDefaultMaterial({ colorNode: sample.rgb, ...(hasAlpha ? { alphaNode: sample.a } : {}) })
     material.userData.prevent = true
     materialCache.set(cacheKey, material)

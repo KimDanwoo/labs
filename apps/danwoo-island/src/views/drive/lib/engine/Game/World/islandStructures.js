@@ -140,6 +140,7 @@ export function rebuildLabGate(model, materials)
 
 const MAP_ASPECT = 1.5
 const KIOSK_ROOF_GROOVES = 6
+const MAP_BACKING_DEPTH = 0.01
 
 function guideMap(board, mapTexture, { width, height, y, z })
 {
@@ -169,7 +170,7 @@ export function rebuildKiosk(model, materials, mapTexture)
             parts.box('woodDark', [0.075 * W, 0.84 * H, 0.36 * D], { position: [side * 0.4 * W, at(0.49), 0], ...frame })
         }
         parts.box('wood', [0.75 * W, 0.51 * H, 0.23 * D], { position: [0, at(0.49), 0.04 * D], ...frame })
-        parts.box('hanji', [0.7 * W, 0.46 * H, 0.01], { position: [0, at(0.49), 0.16 * D], ...frame })
+        parts.box('hanji', [0.7 * W, 0.46 * H, MAP_BACKING_DEPTH], { position: [0, at(0.49), 0.16 * D], ...frame })
         parts.box('woodDark', [0.98 * W, 0.012 * H, 0.96 * D], { position: [0, at(0.91), 0], ...frame })
         const roofHeight = Math.min(0.06 * H, 0.28 * D)
         const roofBase = at(0.916)
@@ -187,7 +188,7 @@ export function rebuildKiosk(model, materials, mapTexture)
         }
         const group = parts.build(materials)
         const mapWidth = Math.min(0.68 * W, 0.43 * H * MAP_ASPECT)
-        group.add(guideMap(board, mapTexture, { width: mapWidth, height: mapWidth / MAP_ASPECT, y: at(0.49), z: 0.165 * D }))
+        group.add(guideMap(board, mapTexture, { width: mapWidth, height: mapWidth / MAP_ASPECT, y: at(0.49), z: 0.16 * D + MAP_BACKING_DEPTH }))
         return group
     })
 }
@@ -371,7 +372,7 @@ export function rebuildSeonangdang(model, materials)
         cairn(parts, random, frame)
     const generals = [GENERALS.heaven, GENERALS.earth]
     const decals = pillars.slice(3).flatMap(({ size, matrix }, index) =>
-        jangseungFigure(parts, materials, { height: size.y, radius: Math.min(size.x, size.z) * 0.46, bottom: -size.y / 2, matrix, general: generals[index % generals.length] }))
+        jangseungFigure(parts, materials, { height: size.y, radius: Math.min(size.x, size.z) * 0.46, halfDepth: Math.min(size.x, size.z) / 2, bottom: -size.y / 2, matrix, general: generals[index % generals.length] }))
     const ropePoints = tall.map((frame) => new THREE.Vector3().setFromMatrixPosition(frame.matrix).add(new THREE.Vector3(0, frame.size.y * 0.32, 0)))
     ropePoints.sort((a, b) => Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x))
     geumjul(parts, random, ropePoints)

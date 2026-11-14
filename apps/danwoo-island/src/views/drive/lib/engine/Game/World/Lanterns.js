@@ -56,7 +56,7 @@ export class Lanterns
         }
 
         // Instanced group
-        this.instancedGroup = new InstancedGroup(references, createStoneLantern(this.game.materials, base))
+        this.instancedGroup = new InstancedGroup(references, createStoneLantern(this.game.materials))
 
         // Tick update
         this.game.ticker.events.on('tick', () =>

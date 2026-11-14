@@ -6,7 +6,7 @@ import { InteractivePoints } from '../../InteractivePoints.js'
 import socialData from '../../../data/social.js'
 import { InstancedGroup } from '../../InstancedGroup.js'
 import { Area } from './Area.js'
-import { personalizeSocialSigns, reshapeSocialPlaza } from './socialSigns.js'
+import { personalizeSocialSigns, recordSteleFrames, reshapeSocialPlaza } from './socialSigns.js'
 
 export class SocialArea extends Area
 {
@@ -15,6 +15,7 @@ export class SocialArea extends Area
         rebuildHareubang(this.model, this.game.materials)
         rebuildVillageProps(this.model, this.game.materials)
         reshapeSocialPlaza(this.model, this.game.materials)
+        recordSteleFrames(this.model)
         super.setObjects()
     }
 

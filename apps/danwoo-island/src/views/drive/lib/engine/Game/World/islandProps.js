@@ -1,13 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { createParts, FULL_TURN, OCTAGON, seededRandom } from './islandGeometry.js'
 
-function templateMatrix(template)
-{
-    template.updateMatrix()
-    return template.matrix
-}
-
-export function createStoneLantern(materials, template)
+export function createStoneLantern(materials)
 {
     const parts = createParts()
     parts.prism('stone', 0.44, 0.46, 0.1, { position: [0, -0.46, 0] })
@@ -33,10 +27,10 @@ export function createStoneLantern(materials, template)
     parts.prism('stone', 0.1, 0.36, 0.13, { position: [0, 0.55, 0] })
     parts.prism('stone', 0.05, 0.07, 0.05, { position: [0, 0.63, 0] })
     parts.add('stone', new THREE.IcosahedronGeometry(0.065, 0), { position: [0, 0.69, 0] })
-    return parts.build(materials, templateMatrix(template))
+    return parts.build(materials)
 }
 
-export function createLanternPole(materials, template)
+export function createLanternPole(materials)
 {
     const lanternX = 0.62
     const parts = createParts()
@@ -52,12 +46,12 @@ export function createLanternPole(materials, template)
     parts.box('woodDark', [0.38, 0.05, 0.38], { position: [lanternX, 0.74, 0] })
     parts.rod('silkRed', 0.02, [lanternX, 0.72, 0], [lanternX, 0.56, 0])
     parts.box('cheongsachorong', [0.34, 0.31, 0.34], { position: [lanternX, 1.11, 0] })
-    const group = parts.build(materials, templateMatrix(template))
+    const group = parts.build(materials)
     group.getObjectByName('cheongsachorong').name = 'glass'
     return group
 }
 
-export function createPyeongsang(materials, template)
+export function createPyeongsang(materials)
 {
     const parts = createParts()
     const legX = 1.12
@@ -78,10 +72,10 @@ export function createPyeongsang(materials, template)
         parts.box('woodDark', [0.1, 0.62, 0.1], { position: [-1.2, 0.17, z] })
     parts.box('wood', [0.1, 0.08, 1.9], { position: [-1.2, railY + 0.18, -0.05] })
     parts.box('wood', [0.08, 0.06, 1.9], { position: [-1.2, railY - 0.08, -0.05] })
-    return parts.build(materials, templateMatrix(template))
+    return parts.build(materials)
 }
 
-export function createBrushwoodFence(materials, template)
+export function createBrushwoodFence(materials)
 {
     const random = seededRandom(7)
     const parts = createParts()
@@ -98,7 +92,7 @@ export function createBrushwoodFence(materials, template)
         const z = index % 2 === 0 ? 0.02 : -0.03
         parts.rod('twig', 0.02, [x, -0.98, z], [x + lean, top, z])
     }
-    return parts.build(materials, templateMatrix(template))
+    return parts.build(materials)
 }
 
 const ONGGI = {
@@ -114,20 +108,20 @@ function onggiLathe(profile)
     return new THREE.LatheGeometry(profile.map(([r, t]) => new THREE.Vector2(r * ONGGI.radius, t - 0.5)), ONGGI.sides)
 }
 
-export function createOnggi(materials, template)
+export function createOnggi(materials)
 {
     const parts = createParts()
     parts.add('onggi', onggiLathe(ONGGI.body))
     parts.add('onggiLid', onggiLathe(ONGGI.lid))
     const { top, bottom, height, t } = ONGGI.knob
     parts.prism('onggiLid', top, bottom, height, { position: [0, t - 0.5, 0] }, 8)
-    const group = parts.build(materials, templateMatrix(template))
+    const group = parts.build(materials)
     const placementUp = new THREE.Matrix4().makeRotationX(-Math.PI / 2)
     group.traverse((child) => child.isMesh && child.geometry.applyMatrix4(placementUp))
     return group
 }
 
-export function createFieldstone(materials, template)
+export function createFieldstone(materials)
 {
     const random = seededRandom(11)
     const geometry = new THREE.IcosahedronGeometry(1, 1)
@@ -143,6 +137,6 @@ export function createFieldstone(materials, template)
     }
     const parts = createParts()
     parts.add('fieldstone', geometry, { scale: [0.68, 0.37, 0.82] })
-    return parts.build(materials, templateMatrix(template))
+    return parts.build(materials)
 }
 

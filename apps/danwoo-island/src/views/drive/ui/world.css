@@ -2208,87 +2208,226 @@ body:has(.menu.is-displayed) .island-identity {
   outline: 2px solid #ffb27e;
 }
 :root {
-  --hanji: #efe2c4;
-  --hanji-deep: #e3d0a8;
-  --ink: #2b2420;
-  --seal: #c8372d;
+  --glass: rgb(15 18 24 / 72%);
+  --glass-raised: rgb(255 255 255 / 8%);
+  --glass-border: rgb(255 255 255 / 12%);
+  --glass-text: #f5f3f0;
+  --glass-muted: rgb(245 243 240 / 70%);
+  --accent: #e5533d;
+  --ui-font: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+}
+.menu,
+.island-identity {
+  font-family: var(--ui-font);
 }
 .menu {
-  color: var(--ink);
+  color: var(--glass-text);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 .menu ::selection {
-  color: var(--hanji);
-  background-color: var(--ink);
+  color: #fff;
+  background-color: var(--accent);
+}
+.menu .container {
+  gap: 20px;
+  padding: 20px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: 0 30px 80px rgb(0 0 0 / 45%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+  box-sizing: border-box;
+}
+.menu .previews {
+  background: transparent;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.menu .previews:after {
+  display: none;
 }
 .menu .contents,
-.menu .contents .content,
-.menu .previews {
-  background: var(--hanji);
+.menu .contents .content {
+  background: transparent;
 }
-.menu .previews:after,
-.menu .navigation .item .button-inner:after,
-.menu .close .button-inner:after {
-  border-color: var(--ink);
+.menu .contents .content-inner {
+  padding-top: 64px;
 }
-.menu .navigation .item .button-inner {
-  background: var(--hanji-deep);
+.menu .contents .title {
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+.menu .contents .text {
+  color: var(--glass-muted);
+  line-height: 1.65;
+}
+.menu .navigation {
+  gap: 2px;
+  padding: 4px;
+  top: 40px;
+  bottom: auto;
+  left: calc(50% + 30px);
+  z-index: 2;
+  background: var(--glass-raised);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+}
+.menu .navigation .item {
+  width: 52px;
+  height: 36px;
+}
+.menu .navigation .item .button-inner,
+.menu .navigation .item.is-active .button-inner {
+  height: 100%;
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.2s;
 }
 .menu .navigation .item.is-active .button-inner {
-  background: var(--hanji);
+  background: var(--accent);
+}
+html:not(.is-mode-touch) .menu .navigation .item:hover .button-inner {
+  transform: none;
+  background: var(--glass-raised);
+}
+html:not(.is-mode-touch) .menu .navigation .item.is-active:hover .button-inner {
+  background: var(--accent);
+}
+.menu .navigation .item .button-inner:after,
+.menu .close .button-inner:after,
+.menu-trigger .button-inner:after,
+.map-trigger .button-inner:after {
+  display: none;
 }
 .menu .navigation .item .button-inner .icon-container {
-  color: var(--ink);
+  inset: 0;
+  color: var(--glass-text);
 }
-.menu .navigation .item .button-inner .icon-container img,
+.menu .navigation .item .button-inner .icon-container img {
+  width: 20px;
+  height: 20px;
+}
+.menu .close {
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  z-index: 3;
+}
+.menu .close .button-inner {
+  height: 100%;
+  background: var(--glass-raised);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+html:not(.is-mode-touch) .menu .close:hover .button-inner {
+  transform: none;
+  background: rgb(255 255 255 / 16%);
+}
+.menu .close .button-inner .icon-container {
+  inset: 0;
+}
 .menu .close .button-inner .icon-container .icon.is-default {
-  width: 26px;
-  height: 26px;
+  width: 18px;
+  height: 18px;
 }
-.menu .close .button-inner,
+.menu-trigger,
+.map-trigger {
+  width: 44px;
+  height: 44px;
+  right: 16px;
+}
 .menu-trigger .button-inner,
 .map-trigger .button-inner {
-  background: var(--seal);
+  width: 100%;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  box-sizing: border-box;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
 }
-.menu .close .button-inner .icon-container .icon.is-default,
+html:not(.is-mode-touch) .menu-trigger:hover .button-inner,
+html:not(.is-mode-touch) .map-trigger:hover .button-inner {
+  transform: none;
+  background: rgb(15 18 24 / 85%);
+}
+.menu-trigger .button-inner .icon-container,
+.map-trigger .button-inner .icon-container {
+  inset: 0;
+}
 .menu-trigger .menu-icon,
 .map-trigger .map-icon {
-  filter: invert(93%) sepia(14%) saturate(437%) hue-rotate(338deg);
-}
-.menu-trigger .menu-icon,
-.map-trigger .map-icon {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 .menu .button {
-  color: var(--ink);
-  border-color: color-mix(in srgb, var(--ink) 55%, transparent);
+  color: var(--glass-text);
+  background: var(--glass-raised);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
 }
 html:not(.is-mode-touch) .menu .button:not(.is-disabled):hover {
-  color: var(--seal);
-  border-color: var(--seal);
-}
-.menu .button .icon,
-.menu .tabs .tabs-navigation .tab .icon-gamepad,
-.menu .tabs .tabs-navigation .tab .icon-mouse-keyboard,
-.menu .tabs .tabs-navigation .tab .icon-touch {
-  filter: invert(1) brightness(0.3);
+  color: #fff;
+  border-color: var(--accent);
 }
 .menu .tabs .tabs-navigation .tab .active-background {
-  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  background: var(--glass-raised);
+  border-radius: 10px;
 }
 .menu .contents .controls-content .list .key {
-  border-color: color-mix(in srgb, var(--ink) 30%, transparent);
+  border-color: var(--glass-border);
+  background: var(--glass-raised);
+  border-radius: 6px;
 }
 .menu .paint-options select,
 .menu .paint-options option {
-  color: var(--ink);
-  background: var(--hanji);
-  border-color: color-mix(in srgb, var(--ink) 45%, transparent);
+  color: var(--glass-text);
+  background: #1a1d24;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
 }
-.menu .contents .controls-content .list .is-gamepad-button.is-icon {
-  filter: invert(1) brightness(0.3);
+.menu .inner {
+  width: min(480px, 100% - 32px);
+  height: min(560px, 100% - 64px);
+  transform: translateY(14px) scale(0.97);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.menu .close .button-inner .icon-container .icon.is-xbox {
-  color: var(--hanji);
-  border-color: var(--hanji);
+.menu.is-visible .inner {
+  transform: none;
+}
+.menu .previews {
+  display: none;
+}
+.menu .contents {
+  width: 100%;
+  height: 100%;
+}
+.menu .contents .content-inner {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 72px 24px 24px;
+}
+.menu .navigation {
+  top: 38px;
+  left: 38px;
+}
+@media only screen and (orientation: portrait) {
+  .menu .inner {
+    width: min(480px, 100% - 24px);
+    height: min(620px, 100% - 48px);
+  }
+  .menu .contents {
+    height: 100%;
+  }
+}
+.menu *,
+.island-identity * {
+  font-family: var(--ui-font);
+}
+.menu .contents .title {
+  font-size: 1.6rem;
 }

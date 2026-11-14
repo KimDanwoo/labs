@@ -54,17 +54,46 @@ function labelTexture(label)
     return map
 }
 
+const COLLIDER = /^(cuboid|tube)/i
+const TUBE_INNER = { width: 0.9, depth: 0.4 }
+
+function colliderFrame(collider)
+{
+    const matrix = new THREE.Matrix4().compose(collider.position, collider.quaternion, new THREE.Vector3(1, 1, 1))
+    if(/^tube/i.test(collider.name))
+    {
+        const diameter = collider.scale.x
+        return { size: new THREE.Vector3(diameter * TUBE_INNER.width, collider.scale.y, diameter * TUBE_INNER.depth), matrix }
+    }
+    return { size: collider.scale.clone(), matrix }
+}
+
+function signName(name)
+{
+    return name.replace(/PhysicalDynamic.*$/, '')
+}
+
+export function recordSteleFrames(model)
+{
+    for(const child of model.children.filter((item) => LABELS[signName(item.name)]))
+    {
+        const frames = child.children.filter((item) => COLLIDER.test(item.name)).map(colliderFrame)
+        frames.sort((a, b) => b.size.x * b.size.y * b.size.z - a.size.x * a.size.y * a.size.z)
+        if(frames[0])
+            child.userData.steleFrame = frames[0]
+    }
+}
+
 function steleFrame(mesh)
 {
-    mesh.geometry.computeBoundingBox()
-    const bounds = mesh.geometry.boundingBox
-    const size = bounds.getSize(new THREE.Vector3())
-    const center = bounds.getCenter(new THREE.Vector3())
+    const { size, matrix } = mesh.userData.steleFrame
     const isThinX = size.x < size.z
-    const width = isThinX ? size.z : size.x
-    const thickness = Math.min(isThinX ? size.x : size.z, STELE.maxThickness)
-    const matrix = new THREE.Matrix4().makeTranslation(center.x, center.y, center.z).multiply(new THREE.Matrix4().makeRotationY(isThinX ? Math.PI / 2 : 0))
-    return { width, height: size.y, thickness, matrix }
+    return {
+        width: isThinX ? size.z : size.x,
+        height: size.y,
+        thickness: Math.min(isThinX ? size.x : size.z, STELE.maxThickness),
+        matrix: matrix.clone().multiply(new THREE.Matrix4().makeRotationY(isThinX ? Math.PI / 2 : 0)),
+    }
 }
 
 function faceCard(width, height, z, isBack)
@@ -111,7 +140,7 @@ export function personalizeSocialSigns(area)
     {
         const mesh = object.visual?.object3D
         const label = LABELS[mesh?.name]
-        if(label && mesh.isMesh)
+        if(label && mesh.isMesh && mesh.userData.steleFrame)
             buildStele(mesh, label, area.game.materials)
     }
 }

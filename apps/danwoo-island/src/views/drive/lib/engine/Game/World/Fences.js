@@ -53,7 +53,7 @@ export class Fences
         }
 
         // Instanced group
-        this.instancedGroup = new InstancedGroup(references, createBrushwoodFence(this.game.materials, base))
+        this.instancedGroup = new InstancedGroup(references, createBrushwoodFence(this.game.materials))
 
         // Tick update
         this.game.ticker.events.on('tick', () =>

@@ -32,7 +32,7 @@ export const SHADES = {
     glass: '#bfe3ea',
     earth: '#b9956b',
     ink: '#2b2420',
-    jangseungWood: '#c4895a',
+    jangseungWood: '#cf7e33',
     basalt: '#625b58',
     basaltDark: '#423d3c',
     neonBoard: '#2a2230',
@@ -47,7 +47,10 @@ export const SHADES = {
     obangYellow: '#e8b830',
     obangWhite: '#f2eee4',
     obangBlack: '#2a2a2e',
-    jindo: '#e6d3ad',
+    granite: '#aba9a9',
+    graniteDark: '#8f8c88',
+    jindoPaint: '#f2dcc0',
+    jindoPaintDark: '#d4bd9c',
     bronze: '#b0803a',
 }
 

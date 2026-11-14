@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { bungeoppangGeometry, createParts, FULL_TURN, meshComponents, SHADES, seededRandom } from './islandGeometry.js'
 import { propMaterial, texturedMesh } from './islandTextured.js'
+import { dongjaseokFigure, haetaeFigure, jindoFigure } from './islandCompanions.js'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { color } from 'three/tsl'
 
@@ -101,15 +102,29 @@ const YUT_TABLE = {
     boardX: 0.23,
 }
 
+function yutStickGeometry(radius, length)
+{
+    const shape = new THREE.Shape()
+    shape.moveTo(-radius, 0)
+    shape.absarc(0, 0, radius, Math.PI, 0, true)
+    shape.lineTo(-radius, 0)
+    const geometry = new THREE.ExtrudeGeometry(shape, { depth: length, bevelEnabled: false, curveSegments: 6 })
+    geometry.translate(0, 0, -length / 2)
+    return geometry
+}
+
 function yutStick(parts, { x, y, z, turn, isFlatUp, length, radius, matrix })
 {
-    const rotation = [0, (turn * Math.PI) / 180, isFlatUp ? -Math.PI / 2 : Math.PI / 2]
-    const lift = isFlatUp ? radius : 0
-    parts.add('timber', new THREE.CylinderGeometry(radius, radius, length, 7, 1, false, 0, Math.PI), { position: [x, y + lift, z], rotation, matrix })
+    const heading = Math.PI / 2 + (turn * Math.PI) / 180
+    const place = new THREE.Matrix4().makeTranslation(x, y + (isFlatUp ? radius : 0), z)
+        .multiply(new THREE.Matrix4().makeRotationY(heading))
+        .multiply(new THREE.Matrix4().makeRotationZ(isFlatUp ? Math.PI : 0))
+    const transform = matrix.clone().multiply(place)
+    parts.add('timber', yutStickGeometry(radius, length), { matrix: transform })
     if(!isFlatUp)
         return
     for(const offset of [-0.15, 0.15])
-        parts.box('ink', [length * 0.035, 0.006, radius * 1.6], { position: [x + Math.cos(rotation[1]) * offset * length, y + lift + 0.004, z - Math.sin(rotation[1]) * offset * length], rotation: [0, rotation[1], 0], matrix })
+        parts.box('ink', [radius * 1.6, 0.006, length * 0.035], { position: [0, -0.004, offset * length], matrix: transform })
 }
 
 function yutTable(parts, container, materials)
@@ -181,14 +196,14 @@ function janggu(parts, frame)
         parts.box('woodDark', [0.1 * W, 0.06 * H, 0.44 * D], { position: [side * 0.25 * W, (0.08 - 0.5) * H, 0], matrix })
     }
     const ring = (x, angle) => new THREE.Vector3(x, centerY + Math.cos(angle) * R * 0.98, Math.sin(angle) * R * 0.98).applyMatrix4(matrix)
-    const cord = 0.004 * Math.min(H, D)
+    const cord = 0.008 * Math.min(H, D)
     for(let index = 0; index < JANGGU.cords; index++)
     {
         const angle = (index / JANGGU.cords) * FULL_TURN
         const across = angle + Math.PI / JANGGU.cords
         const next = angle + FULL_TURN / JANGGU.cords
-        parts.rod('hanji', cord, ring(-headX, angle).toArray(), ring(headX, across).toArray(), 4)
-        parts.rod('hanji', cord, ring(headX, across).toArray(), ring(-headX, next).toArray(), 4)
+        parts.rod('earth', cord, ring(-headX, angle).toArray(), ring(headX, across).toArray(), 4)
+        parts.rod('earth', cord, ring(headX, across).toArray(), ring(-headX, next).toArray(), 4)
         const tightener = ring(-headX, angle).lerp(ring(headX, across), 0.5 + JANGGU.tightenerX)
         parts.box('woodDark', [0.035 * W, 0.025 * H, 0.025 * D], { position: tightener.toArray() })
     }
@@ -540,55 +555,10 @@ function sortedColliders(container)
     return collidersOf(container).sort((a, b) => b.size.x * b.size.y * b.size.z - a.size.x * a.size.y * a.size.z)
 }
 
-function haetae(parts, container)
-{
-    const [body, head] = sortedColliders(container)
-    const { size, matrix } = body
-    parts.box('stoneDark', [size.x, size.y * 0.18, size.z * 1.1], { position: [0, -size.y * 0.41, 0], matrix })
-    parts.box('stone', [size.x * 0.8, size.y * 0.6, size.z * 0.9], { position: [0, -size.y * 0.02, 0], matrix })
-    parts.box('stone', [size.x * 0.4, size.y * 0.42, size.z], { position: [size.x * 0.3, size.y * 0.25, 0], matrix })
-    if(!head)
-        return
-    parts.box('stone', [head.size.x * 0.8, head.size.y, head.size.z], { matrix: head.matrix })
-    parts.box('stoneDark', [head.size.x * 0.3, head.size.y * 1.15, head.size.z * 1.1], { position: [-head.size.x * 0.35, 0, 0], matrix: head.matrix })
-    for(const z of [-1, 1])
-        parts.box('ink', [0.04, 0.08, 0.08], { position: [head.size.x * 0.4, head.size.y * 0.18, z * head.size.z * 0.25], matrix: head.matrix })
-}
-
-function dongjaseok(parts, container)
-{
-    const [{ size, matrix }] = sortedColliders(container)
-    const bottom = -size.y / 2
-    const radius = Math.min(size.x, size.z) / 2
-    parts.prism('stoneDark', radius * 1.1, radius * 1.15, 0.16, { position: [0, bottom + 0.08, 0], matrix })
-    parts.prism('stone', radius * 0.7, radius * 0.95, size.y * 0.55, { position: [0, bottom + 0.16 + size.y * 0.275, 0], matrix })
-    parts.box('stone', [radius * 0.9, 0.16, radius * 0.5], { position: [0, bottom + size.y * 0.55, radius * 0.6], matrix })
-    parts.add('stone', new THREE.IcosahedronGeometry(radius * 0.72, 0), { position: [0, bottom + size.y * 0.82, 0], matrix })
-    for(const x of [-1, 1])
-        parts.add('stoneDark', new THREE.IcosahedronGeometry(radius * 0.22, 0), { position: [x * radius * 0.45, bottom + size.y * 0.97, 0], matrix })
-}
-
-function jindoDog(parts, container)
-{
-    const [body, pack] = sortedColliders(container)
-    const { size, matrix } = body
-    const bottom = -size.y / 2
-    parts.box('jindo', [size.x * 0.75, size.y * 0.45, size.z * 0.8], { position: [0, bottom + size.y * 0.3, -size.z * 0.05], rotation: [-0.35, 0, 0], matrix })
-    for(const x of [-1, 1])
-        parts.box('jindo', [0.14, size.y * 0.3, 0.14], { position: [x * size.x * 0.2, bottom + size.y * 0.15, size.z * 0.32], matrix })
-    parts.box('jindo', [size.x * 0.55, size.y * 0.24, size.z * 0.5], { position: [0, bottom + size.y * 0.66, size.z * 0.18], matrix })
-    parts.box('earth', [size.x * 0.25, size.y * 0.1, size.z * 0.22], { position: [0, bottom + size.y * 0.62, size.z * 0.48], matrix })
-    for(const x of [-1, 1])
-        parts.prism('jindo', 0, 0.09, 0.2, { position: [x * size.x * 0.17, bottom + size.y * 0.86, size.z * 0.15], matrix }, 4)
-    parts.prism('jindo', 0.04, 0.09, size.y * 0.35, { position: [0, bottom + size.y * 0.45, -size.z * 0.45], rotation: [-0.9, 0, 0], matrix }, 5)
-    if(pack)
-        parts.box('obangBlue', [pack.size.x * 0.4, pack.size.y * 0.6, Math.max(pack.size.z, 0.3)], { matrix: pack.matrix })
-}
-
 const SOCIAL_OBJECTS = [
-    { pattern: /^baguiraPhysicalDynamic/, build: haetae },
-    { pattern: /^boyPhysicalDynamic/, build: dongjaseok },
-    { pattern: /^sudoPhysicalDynamic/, build: jindoDog },
+    { pattern: /^baguiraPhysicalDynamic/, build: (parts, container, materials) => haetaeFigure(parts, sortedColliders(container), materials, container) },
+    { pattern: /^boyPhysicalDynamic/, build: (parts, container, materials) => dongjaseokFigure(parts, sortedColliders(container), materials, container) },
+    { pattern: /^sudoPhysicalDynamic/, build: (parts, container, materials) => jindoFigure(parts, sortedColliders(container), materials, container) },
 ]
 
 const BUILDERS = [
