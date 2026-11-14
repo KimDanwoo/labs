@@ -7,6 +7,8 @@ const CAREER_PAINT = {
     emissiveBlueRadialGradient: 'obangBlue',
 }
 
+const AWARDS_TABLE = ['table002', 'cube024', 'refel003', 'medal', 'refDistinctions']
+
 const STEPPING_STONES = ['slabes', 'Cube001', 'Cube002']
 
 const SCREEN_STAND = {
@@ -73,4 +75,10 @@ export function rebuildBowlingScreenStand(model, materials)
     SCREEN_STAND.legX.forEach((x) => trestle(parts, x, ground))
     parts.rod('woodDark', 0.05, [left, 0.95, SCREEN_STAND.z], [right, 0.95, SCREEN_STAND.z])
     body.add(parts.build(materials))
+}
+
+export function removeAwardsTable(model)
+{
+    for(const name of AWARDS_TABLE)
+        model.getObjectByName(name)?.removeFromParent()
 }

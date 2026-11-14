@@ -577,7 +577,6 @@ const BUILDERS = [
 
 const UNCOLLIDED_BUILDERS = [
     { pattern: /^sword$/, build: obangFlag },
-    { pattern: /^table002$/, build: (parts, frame) => workTable(parts, frame) },
     { pattern: /^Cube006$/, build: badukBoard },
     { pattern: /^Cylinder$/, build: watermelonTray },
     { pattern: /^Plane005$/, build: dotjari },

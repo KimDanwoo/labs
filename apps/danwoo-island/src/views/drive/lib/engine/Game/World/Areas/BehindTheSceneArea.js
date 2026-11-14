@@ -3,7 +3,6 @@ import { rebuildBuildingSite } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { PortalSlabsGeometry } from '../../Geometries/PortalSlabsGeometry.js'
 import { attribute, color, float, Fn, PI2, positionGeometry, sin, uniform, varying, vec2, vec4 } from 'three/tsl'
-import { InteractivePoints } from '../../InteractivePoints.js'
 import { Area } from './Area.js'
 
 export class BehindTheSceneArea extends Area
@@ -31,7 +30,6 @@ export class BehindTheSceneArea extends Area
 
         this.setSounds()
         this.setSlabs()
-        this.setInteractivePoint()
     }
 
     setSounds()
@@ -112,39 +110,6 @@ export class BehindTheSceneArea extends Area
             this.game.debug.addThreeColorBinding(this.debugPanel, this.chalkColor.value, 'chalkColor')
             this.debugPanel.addBinding(this.chalkIntensity, 'value', { label: 'chalkIntensity', min: 0, max: 2, step: 0.001 })
         }
-    }
-
-    setInteractivePoint()
-    {
-        this.interactivePoint = this.game.interactivePoints.create(
-            this.references.items.get('interactivePoint')[0].position,
-            '크레딧',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
-            {
-                this.game.inputs.interactiveButtons.clearItems()
-                this.game.menu.open('behindTheScene')
-                this.interactivePoint.hide()
-            },
-            () =>
-            {
-                this.game.inputs.interactiveButtons.addItems(['interact'])
-            },
-            () =>
-            {
-                this.game.inputs.interactiveButtons.removeItems(['interact'])
-            },
-            () =>
-            {
-                this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
-
-        this.game.menu.items.get('behindTheScene').events.on('close', () =>
-        {
-            this.interactivePoint.show()
-        })
     }
 
     update()

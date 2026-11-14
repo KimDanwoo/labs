@@ -5,7 +5,6 @@ export const MENU_SECTIONS = [
   { name: 'options', icon: 'ui/gear.svg', preview: LANDING_PREVIEW },
   { name: 'controls', icon: 'ui/controls/gamepad.svg', preview: LANDING_PREVIEW },
   { name: 'circuit', icon: 'ui/wheel.svg', preview: 'ui/previews/circuit.webp' },
-  { name: 'behindTheScene', icon: 'ui/question.svg', preview: 'ui/previews/behindTheScene.webp' },
 ] as const;
 
 export type MenuSectionName = (typeof MENU_SECTIONS)[number]['name'];

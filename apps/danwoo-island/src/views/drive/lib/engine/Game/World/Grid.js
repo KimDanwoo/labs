@@ -4,6 +4,7 @@ import MeshGridMaterial, { MeshGridMaterialLine } from '../Materials/MeshGridMat
 import { float, normalWorld, positionWorld, vec3, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { Fn } from 'three/tsl'
+import { inkSeaMaterial, isInkLoading } from './inkLoading.js'
 
 export class Grid
 {
@@ -24,6 +25,12 @@ export class Grid
 
     setVisual()
     {
+        if(isInkLoading)
+        {
+            this.addPlane(inkSeaMaterial(this.game))
+            return
+        }
+
         const lines = [
             // new MeshGridMaterialLine(0x705df2, 1, 0.03, 0.2),
             // new MeshGridMaterialLine(0xffffff, 10, 0.003, 1),
@@ -55,18 +62,7 @@ export class Grid
             return defaultMaterial.outputNode
         })()
 
-        this.mesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(100, 100),
-            uvGridMaterial
-        )
-        this.mesh.position.y = 0
-        this.mesh.rotation.x = - Math.PI * 0.5
-
-        const defaultRespawn = this.game.respawns.getDefault()
-        this.mesh.position.x = defaultRespawn.position.x
-        this.mesh.position.z = defaultRespawn.position.z
-        
-        this.game.scene.add(this.mesh)
+        this.addPlane(uvGridMaterial)
 
         // Debug
         if(this.game.debug.active)
@@ -86,6 +82,17 @@ export class Grid
                 lineDebugPanel.addBinding({ color: '#' + line.color.value.getHexString(THREE.SRGBColorSpace) }, 'color').on('change', tweak => line.color.value.set(tweak.value))
             }
         }
+    }
+
+    addPlane(material)
+    {
+        this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), material)
+        this.mesh.rotation.x = - Math.PI * 0.5
+
+        const defaultRespawn = this.game.respawns.getDefault()
+        this.mesh.position.set(defaultRespawn.position.x, 0, defaultRespawn.position.z)
+
+        this.game.scene.add(this.mesh)
     }
 
     show()

@@ -1,9 +1,12 @@
 import { STARTUP, setStartupStage } from '../../islandStartup.js'
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { atan, float, Fn, PI, PI2, positionGeometry, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
+import { atan, color, float, Fn, PI, PI2, positionGeometry, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import gsap from 'gsap'
 import { Inputs } from '../Inputs/Inputs.js'
+import { INK_LABEL, inkBrushMaterial, inkRingGeometry, isInkLoading } from './inkLoading.js'
+
+const LABEL_TINT = isInkLoading ? INK_LABEL : '#ffffff'
 
 export class Intro
 {
@@ -58,20 +61,8 @@ export class Intro
         this.circle.progress = 0
         this.circle.smoothedProgress = uniform(0)
 
-        // Geometry
-        const geometry = new THREE.RingGeometry(radius - thickness, radius, 128, 1)
-
-        // Material
-        const material = new THREE.MeshBasicNodeMaterial()
-        material.outputNode = Fn(() =>
-        {
-            const angle = atan(positionGeometry.y, positionGeometry.x)
-            const angleProgress = angle.div(PI2).add(0.5).oneMinus()
-
-            this.circle.smoothedProgress.lessThan(angleProgress).discard()
-
-            return vec4(this.game.reveal.color.mul(this.game.reveal.intensity), 1)
-        })()
+        const geometry = isInkLoading ? inkRingGeometry(radius) : new THREE.RingGeometry(radius - thickness, radius, 128, 1)
+        const material = isInkLoading ? inkBrushMaterial(this.circle.smoothedProgress, this.game.resources.inkBrushTexture, radius) : this.glowRingMaterial()
 
         // Mesh
         const mesh = new THREE.Mesh(geometry, material)
@@ -114,6 +105,21 @@ export class Intro
         }
     }
 
+    glowRingMaterial()
+    {
+        const material = new THREE.MeshBasicNodeMaterial()
+        material.outputNode = Fn(() =>
+        {
+            const angle = atan(positionGeometry.y, positionGeometry.x)
+            const angleProgress = angle.div(PI2).add(0.5).oneMinus()
+
+            this.circle.smoothedProgress.lessThan(angleProgress).discard()
+
+            return vec4(this.game.reveal.color.mul(this.game.reveal.intensity), 1)
+        })()
+        return material
+    }
+
     setText()
     {
         this.text = { textures: new Map() }
@@ -153,7 +159,7 @@ export class Intro
             }
             material.outputNode = Fn(() =>
             {
-                return vec4(vec3(1), texture(labelTexture, uv()).r)
+                return vec4(color(LABEL_TINT), texture(labelTexture, uv()).r)
             })()
             material.needsUpdate = true
         }

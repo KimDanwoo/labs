@@ -1730,15 +1730,6 @@ html:not(.is-mode-touch) .discord .content .item .button-container .button:hover
   left: calc(50% - 8px);
   transform: rotate(45deg);
 }
-.behindTheScene-content p.text {
-  margin-bottom: 1em;
-}
-.behindTheScene-content p.text a {
-  font-weight: 700;
-}
-.behindTheScene-content h2 {
-  font-size: 2rem;
-}
 .map-trigger {
   z-index: 9;
   -webkit-user-select: none;
@@ -2092,9 +2083,9 @@ html.is-mode-touch .map .location .name {
   position: fixed;
 }
 .island-symbol {
-  font-size: 46px;
-  font-weight: 400;
-  line-height: 1;
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(0 1px 6px #130c1e38);
 }
 .island-dot {
   color: var(--island-accent);
@@ -2105,7 +2096,8 @@ html.is-mode-touch .map .location .name {
     font-size: 17px;
   }
   .island-symbol {
-    font-size: 34px;
+    width: 34px;
+    height: 34px;
   }
 }
 @font-face {

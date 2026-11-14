@@ -2,6 +2,7 @@ import * as THREE from 'three/webgpu'
 import { color, uniform, vec2 } from 'three/tsl'
 import { Game } from './Game.js'
 import gsap from 'gsap'
+import { INK_REVEAL, isInkLoading } from './World/inkLoading.js'
 
 export class Reveal
 {
@@ -229,6 +230,12 @@ export class Reveal
 
     update()
     {
+        if(isInkLoading)
+        {
+            this.color.value.set(INK_REVEAL.color)
+            this.intensity.value = INK_REVEAL.intensity * this.intensityMultiplier
+            return
+        }
         this.color.value.copy(this.game.dayCycles.properties.revealColor.value)
         this.intensity.value = this.game.dayCycles.properties.revealIntensity.value * this.intensityMultiplier
     }
