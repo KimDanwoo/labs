@@ -1,5 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { bungeoppangGeometry, createParts, FULL_TURN, meshComponents, SHADES, seededRandom } from './islandGeometry.js'
+import { propMaterial, texturedMesh } from './islandTextured.js'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { color } from 'three/tsl'
 
@@ -93,35 +94,45 @@ function lathe(parts, name, profile, transform, segments = 10)
     parts.add(name, new THREE.LatheGeometry(profile.map(([x, y]) => new THREE.Vector2(x, y)), segments), transform)
 }
 
-function yutBoard(parts, frame)
+const YUT_TABLE = {
+    sticks: [{ z: -0.3, turn: -12, isFlatUp: false }, { z: -0.1, turn: 5, isFlatUp: true }, { z: 0.1, turn: -6, isFlatUp: false }, { z: 0.3, turn: 10, isFlatUp: true }],
+    stickX: -0.27,
+    stickLength: 0.34,
+    boardX: 0.23,
+}
+
+function yutStick(parts, { x, y, z, turn, isFlatUp, length, radius, matrix })
 {
-    const { size, matrix } = frame
-    const bottom = -size.y / 2
-    parts.box('woodDark', [size.x, size.y * 0.45, size.z], { position: [0, bottom + size.y * 0.225, 0], matrix })
-    const top = bottom + size.y * 0.45
-    const boardSize = Math.min(size.z * 0.92, size.x * 0.5)
-    const boardX = size.x / 2 - boardSize / 2 - 0.08
-    parts.box('hanji', [boardSize, 0.04, boardSize], { position: [boardX, top + 0.02, 0], matrix })
-    const half = boardSize / 2 - 0.12
-    const spots = []
-    for(let index = 0; index <= 5; index++)
-    {
-        const t = -half + (index * 2 * half) / 5
-        spots.push([t, -half], [t, half], [-half, t], [half, t])
-    }
-    for(let index = 1; index < 6; index++)
-    {
-        const t = -half + (index * 2 * half) / 6
-        spots.push([t, t], [t, -t])
-    }
-    for(const [x, z] of spots)
-        parts.prism(Math.abs(x) === half && Math.abs(z) === half ? 'obangRed' : 'ink', 0.05, 0.05, 0.02, { position: [boardX + x, top + 0.05, z], matrix }, 8)
-    for(let index = 0; index < 4; index++)
-    {
-        const z = -size.z * 0.3 + index * size.z * 0.2
-        parts.box('timber', [size.x * 0.32, 0.08, 0.13], { position: [-size.x * 0.22, top + 0.05, z], rotation: [0, (index - 1.5) * 0.18, 0], matrix })
-        parts.box('ink', [0.06, 0.09, 0.14], { position: [-size.x * 0.22, top + 0.051, z], rotation: [0, (index - 1.5) * 0.18, 0], matrix })
-    }
+    const rotation = [0, (turn * Math.PI) / 180, isFlatUp ? -Math.PI / 2 : Math.PI / 2]
+    const lift = isFlatUp ? radius : 0
+    parts.add('timber', new THREE.CylinderGeometry(radius, radius, length, 7, 1, false, 0, Math.PI), { position: [x, y + lift, z], rotation, matrix })
+    if(!isFlatUp)
+        return
+    for(const offset of [-0.15, 0.15])
+        parts.box('ink', [length * 0.035, 0.006, radius * 1.6], { position: [x + Math.cos(rotation[1]) * offset * length, y + lift + 0.004, z - Math.sin(rotation[1]) * offset * length], rotation: [0, rotation[1], 0], matrix })
+}
+
+function yutTable(parts, container, materials)
+{
+    const { size, matrix } = collidersOf(container)[0]
+    const { x: W, y: H, z: D } = size
+    const at = (t) => (t - 0.5) * H
+    for(const sx of [-1, 1])
+        for(const sz of [-1, 1])
+            parts.box('woodDark', [0.08 * W, 0.3 * H, 0.12 * D], { position: [sx * 0.37 * W, at(0.15), sz * 0.34 * D], matrix })
+    for(const sz of [-1, 1])
+        parts.box('woodDark', [0.86 * W, 0.1 * H, 0.07 * D], { position: [0, at(0.32), sz * 0.36 * D], matrix })
+    parts.box('wood', [0.94 * W, 0.1 * H, 0.9 * D], { position: [0, at(0.39), 0], matrix })
+    const boardSize = Math.min(0.85 * D, 0.45 * W)
+    const boardX = YUT_TABLE.boardX * W
+    parts.box('thatch', [boardSize, 0.025 * H, boardSize], { position: [boardX, at(0.455), 0], matrix })
+    const board = new THREE.PlaneGeometry(boardSize, boardSize)
+    board.rotateX(-Math.PI / 2)
+    board.translate(boardX, at(0.469), 0)
+    container.add(texturedMesh(board, propMaterial(materials, 'yutBoard'), { name: 'yutBoard', matrix, castShadow: false }))
+    const radius = Math.min(0.045 * D, 0.1 * H)
+    for(const stick of YUT_TABLE.sticks)
+        yutStick(parts, { ...stick, x: YUT_TABLE.stickX * W, y: at(0.44), z: stick.z * D, length: YUT_TABLE.stickLength * W, radius, matrix })
 }
 
 const PAENGI_PROFILE = [[0, -0.5], [0.08, -0.42], [0.55, 0.05], [0.95, 0.32], [1, 0.38], [0.9, 0.42], [0.3, 0.46], [0, 0.47]]
@@ -146,34 +157,41 @@ function paengi(parts, container)
     parts.prism('woodDark', radius * 0.12, radius * 0.16, height * 0.12, { position: [0, height * 0.52, 0], matrix }, 8)
 }
 
-const JANGGU = { lacing: 10, cord: 0.014, waist: 0.2 }
-const JANGGU_PROFILE = [[0, -0.9], [0.92, -0.9], [0.98, -0.84], [0.86, -0.58], [0.5, -0.3], [JANGGU.waist, -0.08], [JANGGU.waist, 0.08], [0.5, 0.3], [0.86, 0.58], [0.98, 0.84], [0.92, 0.9], [0, 0.9]]
+const JANGGU = {
+    body: [[0, -0.42], [0.96, -0.42], [1, -0.36], [0.85, -0.25], [0.46, -0.1], [0.34, -0.035], [0.34, 0.035], [0.46, 0.1], [0.85, 0.25], [1, 0.36], [0.96, 0.42], [0, 0.42]],
+    headX: 0.425,
+    centerT: 0.48,
+    cords: 8,
+    tightenerX: 0.16,
+}
 
 function janggu(parts, frame)
 {
     const { size, matrix } = frame
-    const half = size.x / 2
-    const radius = size.y * 0.42
-    const alongX = { rotation: [0, 0, Math.PI / 2], matrix }
-    lathe(parts, 'pillarRed', JANGGU_PROFILE.map(([r, y]) => [r * radius, y * half * 0.86]), alongX, 16)
-    const rimX = half * 0.9
+    const { x: W, y: H, z: D } = size
+    const R = 0.39 * Math.min(H, D)
+    const centerY = (JANGGU.centerT - 0.5) * H
+    const alongX = { rotation: [0, 0, -Math.PI / 2], position: [0, centerY, 0], matrix }
+    lathe(parts, 'pillarRed', JANGGU.body.map(([q, a]) => [q * R, a * W]), alongX, 12)
+    const headX = JANGGU.headX * W
     for(const side of [-1, 1])
     {
-        parts.prism('hanji', size.y * 0.5, size.y * 0.5, 0.05, { position: [side * rimX, 0, 0], ...alongX }, 16)
-        parts.add('iron', new THREE.TorusGeometry(size.y * 0.5, 0.025, 4, 18), { position: [side * rimX, 0, 0], rotation: [0, Math.PI / 2, 0], matrix })
-        parts.add('obangYellow', new THREE.TorusGeometry(radius * 0.9, 0.018, 4, 16), { position: [side * half * 0.62, 0, 0], rotation: [0, Math.PI / 2, 0], matrix })
+        parts.prism('hanji', R, R, 0.018 * W, { position: [side * headX, centerY, 0], rotation: [0, 0, -Math.PI / 2], matrix }, 12)
+        parts.add('woodDark', new THREE.TorusGeometry(R * 0.995, R * 0.04, 4, 14), { position: [side * headX, centerY, 0], rotation: [0, Math.PI / 2, 0], matrix })
+        parts.box('woodDark', [0.1 * W, 0.06 * H, 0.44 * D], { position: [side * 0.25 * W, (0.08 - 0.5) * H, 0], matrix })
     }
-    const ring = (x, angle) => new THREE.Vector3(x, Math.cos(angle) * size.y * 0.47, Math.sin(angle) * size.y * 0.47).applyMatrix4(matrix).toArray()
-    for(let index = 0; index < JANGGU.lacing; index++)
+    const ring = (x, angle) => new THREE.Vector3(x, centerY + Math.cos(angle) * R * 0.98, Math.sin(angle) * R * 0.98).applyMatrix4(matrix)
+    const cord = 0.004 * Math.min(H, D)
+    for(let index = 0; index < JANGGU.cords; index++)
     {
-        const angle = (index / JANGGU.lacing) * FULL_TURN
-        const next = ((index + 0.5) / JANGGU.lacing) * FULL_TURN
-        parts.rod('obangWhite', JANGGU.cord, ring(-rimX, angle), ring(rimX, next))
-        parts.rod('obangWhite', JANGGU.cord, ring(rimX, next), ring(-rimX, angle + FULL_TURN / JANGGU.lacing))
-        const tab = new THREE.Vector3(rimX * 0.55, Math.cos(next) * size.y * 0.46, Math.sin(next) * size.y * 0.46).applyMatrix4(matrix)
-        parts.box('woodDark', [0.08, 0.05, 0.05], { position: tab.toArray() })
+        const angle = (index / JANGGU.cords) * FULL_TURN
+        const across = angle + Math.PI / JANGGU.cords
+        const next = angle + FULL_TURN / JANGGU.cords
+        parts.rod('hanji', cord, ring(-headX, angle).toArray(), ring(headX, across).toArray(), 4)
+        parts.rod('hanji', cord, ring(headX, across).toArray(), ring(-headX, next).toArray(), 4)
+        const tightener = ring(-headX, angle).lerp(ring(headX, across), 0.5 + JANGGU.tightenerX)
+        parts.box('woodDark', [0.035 * W, 0.025 * H, 0.025 * D], { position: tightener.toArray() })
     }
-    parts.rod('timber', 0.018, ring(-half * 0.2, -0.2), new THREE.Vector3(half * 0.5, size.y * 0.75, size.y * 0.1).applyMatrix4(matrix).toArray())
 }
 
 function obangFlag(parts, frame)
@@ -575,7 +593,7 @@ const SOCIAL_OBJECTS = [
 
 const BUILDERS = [
     ...SOCIAL_OBJECTS,
-    { pattern: /^gamepadPhysicalDynamic/, keepEmissive: false, build: (parts, container) => yutBoard(parts, collidersOf(container)[0]) },
+    { pattern: /^gamepadPhysicalDynamic/, keepEmissive: false, build: yutTable },
     { pattern: /^phonePhysicalDynamic/, keepEmissive: false, build: paengi },
     { pattern: /^gizmoPhysicalDynamic$/, build: (parts, container) => janggu(parts, collidersOf(container)[0]) },
     { pattern: /^blackBoardPhysicalDynamic/, build: slateBoards },
@@ -613,7 +631,7 @@ function rebuildChild(child, materials, { build, keepEmissive = true })
 {
     const container = prepare(child, { keepEmissive })
     const parts = createParts()
-    build(parts, container)
+    build(parts, container, materials)
     container.add(parts.build(materials))
 }
 

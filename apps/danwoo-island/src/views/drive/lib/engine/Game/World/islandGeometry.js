@@ -158,8 +158,8 @@ export function createParts()
         geometry.translate(...start.add(end).multiplyScalar(0.5).toArray())
         add(name, geometry)
     }
-    const hipRoof = (name, { width, depth, height, ridgeRatio = 0.55, position }) =>
-        add(name, hipRoofGeometry(width, depth, height, ridgeRatio), { position })
+    const hipRoof = (name, { width, depth, height, ridgeRatio = 0.55, position, matrix = null }) =>
+        add(name, hipRoofGeometry(width, depth, height, ridgeRatio), { position, matrix })
 
     const build = (materials, matrix = new THREE.Matrix4()) =>
     {

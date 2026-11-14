@@ -101,30 +101,30 @@ export function createBrushwoodFence(materials, template)
     return parts.build(materials, templateMatrix(template))
 }
 
-const ONGGI_PROFILE = [
-    [0.0, -0.5],
-    [0.3, -0.5],
-    [0.38, -0.38],
-    [0.47, -0.12],
-    [0.49, 0.06],
-    [0.44, 0.22],
-    [0.34, 0.33],
-    [0.25, 0.39],
-    [0.25, 0.43],
-    [0.3, 0.46],
-    [0.3, 0.49],
-    [0.0, 0.47],
-]
-const ONGGI_SIDES = 16
+const ONGGI = {
+    radius: 0.46,
+    sides: 12,
+    body: [[0, 0.02], [0.62, 0.02], [0.72, 0.1], [0.94, 0.29], [1, 0.48], [0.96, 0.64], [0.82, 0.77], [0.6, 0.84], [0.6, 0.88], [0.7, 0.89], [0.7, 0.91], [0, 0.91]],
+    lid: [[0, 0.895], [0.8, 0.895], [0.82, 0.92], [0.68, 0.955], [0.22, 0.97], [0, 0.97]],
+    knob: { top: 0.055, bottom: 0.07, height: 0.025, t: 0.974 },
+}
+
+function onggiLathe(profile)
+{
+    return new THREE.LatheGeometry(profile.map(([r, t]) => new THREE.Vector2(r * ONGGI.radius, t - 0.5)), ONGGI.sides)
+}
 
 export function createOnggi(materials, template)
 {
     const parts = createParts()
-    parts.add('onggi', new THREE.LatheGeometry(ONGGI_PROFILE.map(([x, y]) => new THREE.Vector2(x, y)), ONGGI_SIDES))
-    parts.add('twig', new THREE.TorusGeometry(0.47, 0.025, 4, ONGGI_SIDES), { position: [0, 0.14, 0], rotation: [Math.PI / 2, 0, 0] })
-    parts.prism('onggiLid', 0.12, 0.33, 0.09, { position: [0, 0.54, 0] }, ONGGI_SIDES)
-    parts.prism('onggiLid', 0.05, 0.07, 0.06, { position: [0, 0.61, 0] }, 6)
-    return parts.build(materials, templateMatrix(template))
+    parts.add('onggi', onggiLathe(ONGGI.body))
+    parts.add('onggiLid', onggiLathe(ONGGI.lid))
+    const { top, bottom, height, t } = ONGGI.knob
+    parts.prism('onggiLid', top, bottom, height, { position: [0, t - 0.5, 0] }, 8)
+    const group = parts.build(materials, templateMatrix(template))
+    const placementUp = new THREE.Matrix4().makeRotationX(-Math.PI / 2)
+    group.traverse((child) => child.isMesh && child.geometry.applyMatrix4(placementUp))
+    return group
 }
 
 export function createFieldstone(materials, template)

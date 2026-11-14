@@ -10,7 +10,7 @@ const CAREER_PAINT = {
 
 const AWARDS_TABLE = ['table002', 'cube024', 'refel003', 'medal', 'refDistinctions']
 
-const CIRCUIT_JANGSEUNG = { height: 4.3, radius: 0.42, generals: [GENERALS.heaven, GENERALS.earth] }
+const CIRCUIT_JANGSEUNG = { height: 4.3, radius: 0.4, generals: [GENERALS.heaven, GENERALS.earth] }
 
 const STEPPING_STONES = ['slabes', 'Cube001', 'Cube002']
 
@@ -93,10 +93,10 @@ export function replaceAirDancers(model, materials)
     {
         dancer.updateMatrix()
         const parts = createParts()
-        const plate = jangseungFigure(parts, { height: CIRCUIT_JANGSEUNG.height, radius: CIRCUIT_JANGSEUNG.radius, matrix: dancer.matrix, general: CIRCUIT_JANGSEUNG.generals[index % CIRCUIT_JANGSEUNG.generals.length] })
+        const decals = jangseungFigure(parts, materials, { height: CIRCUIT_JANGSEUNG.height, radius: CIRCUIT_JANGSEUNG.radius, matrix: dancer.matrix, general: CIRCUIT_JANGSEUNG.generals[index % CIRCUIT_JANGSEUNG.generals.length] })
         const figure = parts.build(materials)
         figure.name = 'jangseung'
-        model.add(figure, plate)
+        model.add(figure, ...decals)
         dancer.removeFromParent()
     })
 }

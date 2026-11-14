@@ -3,6 +3,7 @@ import { Fn, max, texture, uv, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { bungeoppangGeometry, createParts, FULL_TURN, seededRandom } from './islandGeometry.js'
 import { GENERALS, jangseungFigure } from './islandJangseung.js'
+import { hareubangFigure } from './islandStatues.js'
 
 const OBANG = ['obangBlue', 'obangRed', 'obangYellow', 'obangWhite', 'obangBlack']
 
@@ -138,13 +139,12 @@ export function rebuildLabGate(model, materials)
 }
 
 const MAP_ASPECT = 1.5
-const MAP_MARGIN = 0.6
+const KIOSK_ROOF_GROOVES = 6
 
-function guideMap(board, mapTexture, { width, height, centerY, z })
+function guideMap(board, mapTexture, { width, height, y, z })
 {
-    const fitWidth = Math.min(width - MAP_MARGIN, (height - MAP_MARGIN) * MAP_ASPECT)
-    const geometry = new THREE.PlaneGeometry(fitWidth, fitWidth / MAP_ASPECT)
-    geometry.translate(0, centerY, z)
+    const geometry = new THREE.PlaneGeometry(width, height)
+    geometry.translate(0, y, z)
     geometry.applyMatrix4(board.matrix)
     const material = new MeshDefaultMaterial({ colorNode: texture(mapTexture).rgb, hasCoreShadows: false, hasDropShadows: false })
     material.userData.prevent = true
@@ -159,23 +159,35 @@ export function rebuildKiosk(model, materials, mapTexture)
     replaceVisual(model, 'physicalFixed009', (container) =>
     {
         const board = cuboidFrame(container.children.find((child) => child.name === 'cuboid018'))
-        const parts = createParts()
-        const width = board.size.x
-        const half = board.size.y / 2
+        const { x: W, y: H, z: D } = board.size
+        const at = (t) => (t - 0.5) * H
         const frame = { matrix: board.matrix }
+        const parts = createParts()
         for(const side of [-1, 1])
         {
-            parts.box('stone', [0.6, 0.3, 0.7], { position: [side * (width / 2 + 0.05), -half + 0.15, 0], ...frame })
-            parts.box('woodDark', [0.24, half * 2 + 0.5, 0.26], { position: [side * (width / 2 + 0.05), 0.25, 0], ...frame })
+            parts.add('stoneDark', new THREE.CylinderGeometry(0.5, 0.5, 1, 8), { scale: [0.16 * W, 0.07 * H, 0.9 * D], position: [side * 0.4 * W, at(0.045), 0], ...frame })
+            parts.box('woodDark', [0.075 * W, 0.84 * H, 0.36 * D], { position: [side * 0.4 * W, at(0.49), 0], ...frame })
         }
-        parts.box('wood', [width, half * 1.25, 0.22], { position: [0, 0.35, 0], ...frame })
-        parts.box('hanji', [width - 0.35, half * 1.25 - 0.35, 0.05], { position: [0, 0.35, 0.13], ...frame })
-        const roof = createParts()
-        giwaRoof(roof, { center: [0, half + 0.3, 0], width: width + 0.6, depth: 1.1, height: 0.6 })
+        parts.box('wood', [0.75 * W, 0.51 * H, 0.23 * D], { position: [0, at(0.49), 0.04 * D], ...frame })
+        parts.box('hanji', [0.7 * W, 0.46 * H, 0.01], { position: [0, at(0.49), 0.16 * D], ...frame })
+        parts.box('woodDark', [0.98 * W, 0.012 * H, 0.96 * D], { position: [0, at(0.91), 0], ...frame })
+        const roofHeight = Math.min(0.06 * H, 0.28 * D)
+        const roofBase = at(0.916)
+        parts.hipRoof('giwa', { width: 0.98 * W, depth: 0.96 * D, height: roofHeight, ridgeRatio: 0.6, position: [0, roofBase, 0], ...frame })
+        parts.box('giwaRidge', [0.62 * W, 0.018 * H, 0.15 * D], { position: [0, roofBase + roofHeight, 0], ...frame })
+        for(let index = 0; index < KIOSK_ROOF_GROOVES; index++)
+        {
+            const x = -0.4 * W + (index * 0.8 * W) / (KIOSK_ROOF_GROOVES - 1)
+            for(const side of [-1, 1])
+            {
+                const eave = new THREE.Vector3(x, roofBase + 0.01, side * 0.46 * D).applyMatrix4(board.matrix)
+                const ridge = new THREE.Vector3(x * 0.62, roofBase + roofHeight, side * 0.04 * D).applyMatrix4(board.matrix)
+                parts.rod('giwaRidge', 0.012 * D, eave.toArray(), ridge.toArray(), 4)
+            }
+        }
         const group = parts.build(materials)
-        for(const mesh of roof.build(materials, board.matrix).children)
-            group.add(mesh)
-        group.add(guideMap(board, mapTexture, { width, height: half * 1.25, centerY: 0.35, z: 0.17 }))
+        const mapWidth = Math.min(0.68 * W, 0.43 * H * MAP_ASPECT)
+        group.add(guideMap(board, mapTexture, { width: mapWidth, height: mapWidth / MAP_ASPECT, y: at(0.49), z: 0.165 * D }))
         return group
     })
 }
@@ -358,12 +370,12 @@ export function rebuildSeonangdang(model, materials)
     for(const frame of tall)
         cairn(parts, random, frame)
     const generals = [GENERALS.heaven, GENERALS.earth]
-    const plates = pillars.slice(3).map(({ size, matrix }, index) =>
-        jangseungFigure(parts, { height: size.y, radius: Math.min(size.x, size.z) * 0.32, bottom: -size.y / 2, matrix, general: generals[index % generals.length] }))
+    const decals = pillars.slice(3).flatMap(({ size, matrix }, index) =>
+        jangseungFigure(parts, materials, { height: size.y, radius: Math.min(size.x, size.z) * 0.46, bottom: -size.y / 2, matrix, general: generals[index % generals.length] }))
     const ropePoints = tall.map((frame) => new THREE.Vector3().setFromMatrixPosition(frame.matrix).add(new THREE.Vector3(0, frame.size.y * 0.32, 0)))
     ropePoints.sort((a, b) => Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x))
     geumjul(parts, random, ropePoints)
-    container.add(parts.build(materials), ...plates)
+    container.add(parts.build(materials), ...decals)
 }
 
 function removeVisualMeshes(container)
@@ -404,35 +416,17 @@ function stonePagoda(parts, { x, y, z })
     parts.add('stone', new THREE.IcosahedronGeometry(0.1, 0), { position: [x, level + 0.32, z] })
 }
 
+function largestCuboid(container)
+{
+    return container.children
+        .filter((child) => /^cuboid/.test(child.name))
+        .map(cuboidFrame)
+        .sort((a, b) => b.size.x * b.size.y * b.size.z - a.size.x * a.size.y * a.size.z)[0]
+}
+
 export function rebuildHareubang(model, materials)
 {
-    replaceVisual(model, 'refStatuePhysicalDynamic', () =>
-    {
-        const parts = createParts()
-        const random = seededRandom(41)
-        const front = 0.1
-        parts.prism('stone', 0.72, 0.78, 0.26, { position: [0, -2.37, front] })
-        parts.prism('basalt', 0.5, 0.6, 2.5, { position: [0, -1.0, front] }, 10)
-        parts.add('basalt', new THREE.IcosahedronGeometry(1, 1), { position: [0, 0.75, front], scale: [0.5, 0.62, 0.48] })
-        parts.prism('basalt', 0.62, 0.62, 0.1, { position: [0, 1.3, front] }, 12)
-        parts.add('basalt', new THREE.SphereGeometry(1, 10, 5, 0, FULL_TURN, 0, Math.PI / 2), { position: [0, 1.34, front], scale: [0.46, 0.55, 0.46] })
-        for(const side of [-1, 1])
-        {
-            parts.add('basalt', new THREE.IcosahedronGeometry(0.13, 1), { position: [side * 0.2, 0.86, front + 0.42] })
-            parts.box('basaltDark', [0.24, 0.05, 0.08], { position: [side * 0.2, 1.02, front + 0.44], rotation: [0, 0, side * -0.15] })
-        }
-        parts.add('basalt', new THREE.IcosahedronGeometry(1, 0), { position: [0, 0.64, front + 0.47], scale: [0.12, 0.2, 0.12] })
-        parts.box('basaltDark', [0.28, 0.04, 0.05], { position: [0, 0.42, front + 0.46] })
-        parts.box('basalt', [0.55, 0.14, 0.18], { position: [0.1, -0.25, front + 0.55], rotation: [0, 0, 0.08] })
-        parts.box('basalt', [0.55, 0.14, 0.18], { position: [-0.08, -0.52, front + 0.57], rotation: [0, 0, -0.06] })
-        for(let index = 0; index < 14; index++)
-        {
-            const angle = (random() - 0.5) * 2.2
-            const height = -2.0 + random() * 1.9
-            parts.add('basaltDark', new THREE.IcosahedronGeometry(0.045, 0), { position: [Math.sin(angle) * 0.56, height, front + Math.cos(angle) * 0.56] })
-        }
-        return parts.build(materials)
-    })
+    replaceVisual(model, 'refStatuePhysicalDynamic', (container) => hareubangFigure(materials, largestCuboid(container)))
 }
 
 export function rebuildWaterfallPagoda(model, materials)
