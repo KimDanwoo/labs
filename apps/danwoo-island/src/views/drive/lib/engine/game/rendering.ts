@@ -64,10 +64,10 @@ export class Rendering {
     bloomPass.threshold.value = BLOOM.threshold;
     bloomPass.strength.value = BLOOM.strength;
     bloomPass.smoothWidth.value = BLOOM.smoothWidth;
+    Reflect.set(bloomPass, BLOOM_MIPS_FIELD, BLOOM.mipsByQuality[this.game.quality.level]);
     const dofPass = cheapDOF(renderOutput(scenePass));
 
     const applyQuality = (level: QualityLevel): void => {
-      Reflect.set(bloomPass, BLOOM_MIPS_FIELD, BLOOM.mipsByQuality[level]);
       pipeline.outputNode = add(level === QUALITY.high ? dofPass : sceneColor, bloomPass);
       pipeline.needsUpdate = true;
     };
