@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { rebuildVillageProps } from '../islandVillage.js'
 import { rebuildBowlingSign, rebuildRadioCabinet } from '../islandStructures.js'
+import { rebuildBowlingScreenStand } from '../islandReskins.js'
 import { Game } from '../../Game.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import { clamp, lerp, remapClamp } from '../../utilities/maths.js'
@@ -16,6 +17,7 @@ export class BowlingArea extends Area
         rebuildVillageProps(this.model, this.game.materials)
         rebuildBowlingSign(this.model, this.game.materials, this.game.resources.bowlingNeonTexture)
         rebuildRadioCabinet(this.model, this.game.materials)
+        rebuildBowlingScreenStand(this.model, this.game.materials)
         super.setObjects()
     }
 
@@ -538,10 +540,9 @@ export class BowlingArea extends Area
         const targetX = clamp(this.game.player.position.x, this.screen.min, this.screen.max)
         this.screen.x += (targetX - this.screen.x) * this.game.ticker.deltaScaled * 2
 
-        const floatY = Math.sin(this.game.ticker.elapsedScaled * 0.3) * 0.5
         this.screen.object.physical.body.setNextKinematicTranslation({
             x: this.screen.x,
-            y: 0.5 + floatY,
+            y: this.screen.group.position.y,
             z: this.screen.group.position.z
         })
         this.screen.object.needsUpdate = true

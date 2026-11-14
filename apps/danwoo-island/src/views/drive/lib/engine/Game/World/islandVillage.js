@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
-import { createParts, FULL_TURN, SHADES, seededRandom } from './islandGeometry.js'
+import { createParts, FULL_TURN, meshComponents, SHADES, seededRandom } from './islandGeometry.js'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { color } from 'three/tsl'
 
@@ -715,45 +715,6 @@ const CIRCUIT_DECORATION = {
     groundPaintTop: -0.9,
     legMaxWidth: 0.25,
     legMinHeight: 1.5,
-}
-
-function meshComponents(geometry)
-{
-    const position = geometry.attributes.position
-    const index = geometry.index ? Array.from(geometry.index.array) : Array.from({ length: position.count }, (_, vertex) => vertex)
-    const canonical = new Map()
-    const parent = Array.from({ length: position.count }, (_, vertex) => vertex)
-    const find = (vertex) =>
-    {
-        while(parent[vertex] !== vertex)
-            vertex = parent[vertex] = parent[parent[vertex]]
-        return vertex
-    }
-    const representative = (vertex) =>
-    {
-        const key = [position.getX(vertex), position.getY(vertex), position.getZ(vertex)].map((value) => value.toFixed(3)).join()
-        if(!canonical.has(key))
-            canonical.set(key, vertex)
-        return canonical.get(key)
-    }
-    const roots = index.map(representative)
-    for(let offset = 0; offset < roots.length; offset += 3)
-        for(const other of [roots[offset + 1], roots[offset + 2]])
-            parent[find(other)] = find(roots[offset])
-
-    const components = new Map()
-    const point = new THREE.Vector3()
-    for(let offset = 0; offset < index.length; offset += 3)
-    {
-        const root = find(roots[offset])
-        if(!components.has(root))
-            components.set(root, { offsets: [], box: new THREE.Box3() })
-        const component = components.get(root)
-        component.offsets.push(offset)
-        for(const vertex of index.slice(offset, offset + 3))
-            component.box.expandByPoint(point.fromBufferAttribute(position, vertex))
-    }
-    return { index, components: [...components.values()] }
 }
 
 function classifyDecoration(component)

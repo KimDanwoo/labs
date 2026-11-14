@@ -13,6 +13,9 @@ import { Inputs } from '../../Inputs/Inputs.js'
 import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
 import { Area } from './Area.js'
 
+const ROPE_COLOR = '#a8814a'
+const HERBAL_BREW = { center: '#ffb347', rim: '#c2410c', intensity: 1.2 }
+
 export class LabArea extends Area
 {
     setObjects()
@@ -768,7 +771,7 @@ export class LabArea extends Area
         // Vertical chain material
         {
             const material = new MeshDefaultMaterial({
-                colorNode: color('#6f6a87'),
+                colorNode: color(ROPE_COLOR),
                 alphaNode: positionWorld.y.step(4).oneMinus(),
                 hasWater: false,
                 hasLightBounce: false
@@ -781,7 +784,7 @@ export class LabArea extends Area
         // Pulley chain material
         {
             const material = new MeshDefaultMaterial({
-                colorNode: color('#6f6a87'),
+                colorNode: color(ROPE_COLOR),
                 alphaNode: positionWorld.y.step(4),
                 hasWater: false,
                 hasLightBounce: false
@@ -1250,9 +1253,9 @@ export class LabArea extends Area
         {
             this.cauldron.liquid = {}
 
-            const colorA = uniform(color('#ff0083'))
-            const colorB = uniform(color('#3018eb'))
-            const intensity = uniform(1.7)
+            const colorA = uniform(color(HERBAL_BREW.center))
+            const colorB = uniform(color(HERBAL_BREW.rim))
+            const intensity = uniform(HERBAL_BREW.intensity)
 
             const material = new THREE.MeshBasicNodeMaterial({ transparent: true })
             const mixedColor = mix(colorA, colorB, uv().sub(0.5).length().mul(2))
