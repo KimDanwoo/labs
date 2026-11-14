@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { createParts, FULL_TURN, meshComponents, seededRandom } from './islandGeometry.js'
 import { placeLandmarks } from './islandLandmarks.js'
-import { islandModelGeometry, islandModelMesh, islandPaletteMaterial } from './islandModels.js'
+import { islandModelMesh } from './islandModels.js'
 
 const COLLIDER = /^(cuboid|hull|trimesh|tube|ball)/i
 const REFERENCE = /^ref/i
@@ -731,10 +731,11 @@ export function reshapeCircuitDecoration(model, materials)
     decoration.add(parts.build(materials))
 }
 
-const COCONUT_SIZE = new THREE.Vector3(0.55, 0.48, 0.5)
+export const COCONUT_SIZE = new THREE.Vector3(0.55, 0.48, 0.5)
 
 export function makeCoconut(cookie, materials)
 {
-    cookie.geometry = islandModelGeometry(materials, 'coconut', { size: COCONUT_SIZE })
-    cookie.material = islandPaletteMaterial(materials, 'coconut')
+    const coconut = islandModelMesh(materials, 'coconut', new THREE.Matrix4(), COCONUT_SIZE)
+    cookie.geometry = coconut.geometry
+    cookie.material = coconut.material
 }
