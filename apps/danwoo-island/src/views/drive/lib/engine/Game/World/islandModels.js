@@ -15,6 +15,9 @@ const ISLAND_MODELS = {
     linkSign: 'areas/island/models/linkSign.glb',
     rockBase: 'areas/island/models/rockBase.glb',
     guideBoard: 'areas/island/models/guideBoard.glb',
+    snackShack: 'areas/island/models/snackShack.glb',
+    coconut: 'areas/island/models/coconut.glb',
+    surfFlag: 'areas/island/models/surfFlag.glb',
 }
 
 const resourceName = (key) => `islandModel${key[0].toUpperCase()}${key.slice(1)}`

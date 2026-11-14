@@ -1,13 +1,10 @@
 import * as THREE from 'three/webgpu'
-import { bungeoppangGeometry, createParts, FULL_TURN, meshComponents, SHADES, seededRandom } from './islandGeometry.js'
+import { createParts, FULL_TURN, meshComponents, seededRandom } from './islandGeometry.js'
 import { placeLandmarks } from './islandLandmarks.js'
-import { islandModelMesh } from './islandModels.js'
-import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
-import { color } from 'three/tsl'
+import { islandModelGeometry, islandModelMesh, islandPaletteMaterial } from './islandModels.js'
 
 const COLLIDER = /^(cuboid|hull|trimesh|tube|ball)/i
 const REFERENCE = /^ref/i
-const OBANG = ['obangBlue', 'obangRed', 'obangYellow', 'obangWhite', 'obangBlack']
 
 function hasReference(object)
 {
@@ -104,16 +101,14 @@ function placeGamepad(container, materials)
     container.add(islandModelMesh(materials, 'gamepad', resting, GAMEPAD_SIZE))
 }
 
-function obangFlag(parts, frame)
+const SURF_FLAG = { width: 1.2, height: 3.2, depth: 0.4, poleX: -0.5 }
+
+function surfFlag(parts, { size, matrix }, { container, materials })
 {
-    const { size, matrix } = frame
-    const bottom = -size.y / 2
-    parts.add('stone', new THREE.IcosahedronGeometry(1, 0), { position: [0, bottom + 0.1, 0], scale: [0.55, 0.3, 0.45], matrix })
-    parts.prism('woodDark', 0.05, 0.06, size.y, { matrix }, 8)
-    parts.add('obangYellow', new THREE.IcosahedronGeometry(0.09, 0), { position: [0, size.y / 2 + 0.05, 0], matrix })
-    const stripeHeight = 0.22
-    OBANG.forEach((shade, index) =>
-        parts.box(shade, [1.1 - index * 0.14, stripeHeight, 0.03], { position: [0.6 - index * 0.07, size.y / 2 - 0.25 - index * stripeHeight, 0], matrix }))
+    const scale = size.y / SURF_FLAG.height
+    const anchored = matrix.clone().multiply(new THREE.Matrix4().makeTranslation(-SURF_FLAG.poleX * scale, 0, 0))
+    const flagSize = new THREE.Vector3(SURF_FLAG.width * scale, size.y, SURF_FLAG.depth * scale)
+    container.add(islandModelMesh(materials, 'surfFlag', anchored, flagSize))
 }
 
 function slateBoards(parts, container)
@@ -406,12 +401,14 @@ function bowlingPin(parts)
     parts.prism('obangBlue', 0.23, 0.235, 0.08, { position: [0, 2.08, 0] }, 10)
 }
 
-function taegeukBall(parts, frame)
+const BEACH_BALL_PANELS = ['bunting2', 'bunting4', 'bunting1', 'bunting4', 'bunting3', 'bunting4']
+
+function beachBall(parts, frame)
 {
     const radius = frame.size.x / 2
-    parts.add('obangRed', new THREE.SphereGeometry(radius, 12, 4, 0, FULL_TURN, 0, Math.PI / 2))
-    parts.add('obangBlue', new THREE.SphereGeometry(radius, 12, 4, 0, FULL_TURN, Math.PI / 2, Math.PI / 2))
-    parts.add('obangYellow', new THREE.TorusGeometry(radius * 1.005, radius * 0.06, 4, 16), { rotation: [Math.PI / 2, 0, 0] })
+    const panel = FULL_TURN / BEACH_BALL_PANELS.length
+    BEACH_BALL_PANELS.forEach((shade, index) =>
+        parts.add(shade, new THREE.SphereGeometry(radius, 3, 8, index * panel, panel)))
 }
 
 function stonePillar(parts, frame)
@@ -464,11 +461,11 @@ const BUILDERS = [
     { pattern: /^refTvPhysicalDynamic$/, build: tvCabinet },
     { pattern: /^blowerPhysicalDynamic/, build: (parts, container) => bellowsBase(parts, collidersOf(container)[0]) },
     { pattern: /^refPinPhysicalDynamic$/, build: (parts) => bowlingPin(parts) },
-    { pattern: /^refBallPhysicalDynamic$/, build: (parts, container) => taegeukBall(parts, collidersOf(container)[0]) },
+    { pattern: /^refBallPhysicalDynamic$/, build: (parts, container) => beachBall(parts, collidersOf(container)[0]) },
 ]
 
 const UNCOLLIDED_BUILDERS = [
-    { pattern: /^sword$/, build: obangFlag },
+    { pattern: /^sword$/, build: surfFlag },
     { pattern: /^Cube006$/, build: badukBoard },
     { pattern: /^Cylinder$/, build: watermelonTray },
     { pattern: /^Plane005$/, build: dotjari },
@@ -497,7 +494,7 @@ export function rebuildVillageProps(model, materials)
             const frame = boundsFrame(child)
             const container = prepare(child)
             const parts = createParts()
-            uncollided.build(parts, frame)
+            uncollided.build(parts, frame, { container, materials })
             container.add(parts.build(materials))
             continue
         }
@@ -734,10 +731,10 @@ export function reshapeCircuitDecoration(model, materials)
     decoration.add(parts.build(materials))
 }
 
-export function makeBungeoppang(cookie)
+const COCONUT_SIZE = new THREE.Vector3(0.55, 0.48, 0.5)
+
+export function makeCoconut(cookie, materials)
 {
-    cookie.geometry = bungeoppangGeometry()
-    const material = new MeshDefaultMaterial({ colorNode: color(SHADES.bungeoppang), hasCoreShadows: true, hasDropShadows: true })
-    material.userData.prevent = true
-    cookie.material = material
+    cookie.geometry = islandModelGeometry(materials, 'coconut', { size: COCONUT_SIZE })
+    cookie.material = islandPaletteMaterial(materials, 'coconut')
 }

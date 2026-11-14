@@ -4,7 +4,7 @@ import MeshGridMaterial, { MeshGridMaterialLine } from '../Materials/MeshGridMat
 import { float, normalWorld, positionWorld, vec3, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { Fn } from 'three/tsl'
-import { inkSeaMaterial, isInkLoading } from './inkLoading.js'
+import { isTideLoading, tideSeaMaterial } from './tideLoading.js'
 
 export class Grid
 {
@@ -25,9 +25,9 @@ export class Grid
 
     setVisual()
     {
-        if(isInkLoading)
+        if(isTideLoading)
         {
-            this.addPlane(inkSeaMaterial(this.game))
+            this.addPlane(tideSeaMaterial(this.game))
             return
         }
 

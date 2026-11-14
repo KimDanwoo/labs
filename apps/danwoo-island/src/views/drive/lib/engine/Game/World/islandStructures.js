@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { Fn, max, texture, uv, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
-import { bungeoppangGeometry, createParts, FULL_TURN, seededRandom } from './islandGeometry.js'
+import { createParts, FULL_TURN, seededRandom } from './islandGeometry.js'
 import { islandModelMesh } from './islandModels.js'
 
 const BUNTING = ['bunting1', 'bunting2', 'bunting3', 'bunting4', 'bunting5']
@@ -45,31 +45,6 @@ function replaceVisual(parent, name, build)
     return container
 }
 
-function giwaRoof(parts, { center, width, depth, height })
-{
-    const [x, y, z] = center
-    parts.box('woodDark', [width + 0.2, 0.14, depth + 0.2], { position: [x, y, z] })
-    parts.hipRoof('giwa', { width: width + 0.4, depth: depth + 0.4, height, position: [x, y + 0.07, z] })
-    const ridgeHalf = ((width + 0.4) * 0.55) / 2
-    parts.box('giwaRidge', [ridgeHalf * 2 + 0.3, 0.16, 0.22], { position: [x, y + 0.07 + height, z] })
-    for(const side of [-1, 1])
-        parts.box('giwaRidge', [0.22, 0.34, 0.22], { position: [x + side * (ridgeHalf + 0.15), y + 0.2 + height, z] })
-    const courses = Math.max(4, Math.round(width / 0.45))
-    for(let index = 1; index < courses; index++)
-    {
-        const eaveX = x - (width + 0.4) / 2 + ((width + 0.4) * index) / courses
-        const ridgeX = x + (eaveX - x) * 0.55
-        for(const side of [-1, 1])
-            parts.rod('giwaRidge', 0.035, [eaveX, y + 0.1, z + side * ((depth + 0.4) / 2)], [ridgeX, y + 0.07 + height, z])
-    }
-    for(const sideX of [-1, 1])
-        for(const sideZ of [-1, 1])
-            parts.box('giwaRidge', [0.5, 0.12, 0.2], {
-                position: [x + sideX * ((width + 0.4) / 2), y + 0.14, z + sideZ * ((depth + 0.4) / 2)],
-                rotation: [0, sideX * sideZ * 0.8, sideX * 0.35],
-            })
-}
-
 function thatchRoof(parts, { center, width, depth, height })
 {
     const [x, y, z] = center
@@ -83,18 +58,6 @@ function thatchRoof(parts, { center, width, depth, height })
         scale: [(width / 2) * 0.94, (depth / 2) * 0.94, 1],
     })
     parts.add('thatch', new THREE.SphereGeometry(1, 8, 4), { position: [x, y + height * 0.98, z], scale: [width * 0.12, height * 0.16, depth * 0.12] })
-}
-
-function dancheongBeam(parts, { from, to, y, z, depth = 0.42 })
-{
-    const length = to - from
-    const center = (from + to) / 2
-    parts.box('dancheongGreen', [length, 0.32, depth], { position: [center, y, z] })
-    for(const end of [from + 0.35, to - 0.35])
-    {
-        parts.box('dancheongRed', [0.18, 0.34, depth + 0.02], { position: [end, y, z] })
-        parts.box('dancheongBlue', [0.1, 0.34, depth + 0.02], { position: [end + (end < center ? 0.2 : -0.2), y, z] })
-    }
 }
 
 function pillar(parts, material, { x, z, bottom, top, radius = 0.2 })
@@ -111,11 +74,11 @@ export function rebuildProjectsGate(model, materials)
         const ground = -0.13
         const top = 3.75
         for(const [x, z] of [[-2.25, 0], [2.25, 0], [4.6, 1.5]])
-            pillar(parts, 'pillarRed', { x, z, bottom: ground, top })
-        dancheongBeam(parts, { from: -2.6, to: 2.6, y: top - 0.1, z: 0 })
-        parts.box('pillarRed', [2.4, 0.22, 0.3], { position: [3.45, top - 0.6, 0.75], rotation: [0, -0.57, 0] })
-        giwaRoof(parts, { center: [0, top + 0.1, 0], width: 5.6, depth: 1.8, height: 0.9 })
-        giwaRoof(parts, { center: [4.6, top - 0.35, 1.5], width: 1.1, depth: 1.1, height: 0.55 })
+            pillar(parts, 'wood', { x, z, bottom: ground, top, radius: 0.22 })
+        parts.box('woodDark', [5.6, 0.3, 0.4], { position: [0, top - 0.1, 0] })
+        parts.box('woodDark', [2.4, 0.22, 0.3], { position: [3.45, top - 0.6, 0.75], rotation: [0, -0.57, 0] })
+        thatchRoof(parts, { center: [0, top + 0.1, 0], width: 6.4, depth: 2.4, height: 1.05 })
+        thatchRoof(parts, { center: [4.6, top - 0.35, 1.5], width: 1.5, depth: 1.5, height: 0.6 })
         return parts.build(materials)
     })
 }
@@ -166,63 +129,16 @@ export function rebuildKiosk(model, materials, mapTexture)
     })
 }
 
-const POJANGMACHA = {
-    molds: [[-1.45, -0.55], [-0.8, -0.55], [-0.15, -0.55], [-1.45, -0.05], [-0.8, -0.05], [-0.15, -0.05]],
-    roof: { center: [-0.8, 2.55, -0.45], width: 3.8, depth: 3.0, height: 0.75 },
-    flapTop: 2.5,
-    bulbs: 5,
-}
-
-function pojangmachaTent(parts)
-{
-    const { roof, flapTop, bulbs } = POJANGMACHA
-    const [centerX, , centerZ] = roof.center
-    parts.hipRoof('tarpOrange', { ...roof, ridgeRatio: 0.7, position: roof.center })
-    const front = centerZ + roof.depth / 2 - 0.12
-    parts.box('tarpOrange', [roof.width, 0.35, 0.03], { position: [centerX, flapTop - 0.1, front + 0.1] })
-    for(let index = 0; index < bulbs; index++)
-    {
-        const x = centerX - roof.width * 0.4 + (index * roof.width * 0.8) / (bulbs - 1)
-        parts.rod('ink', 0.008, [x, flapTop + 0.02, front], [x, flapTop - 0.25, front])
-        parts.add('lantern', new THREE.SphereGeometry(0.09, 8, 6), { position: [x, flapTop - 0.32, front] })
-    }
-    parts.rod('ink', 0.01, [centerX - roof.width * 0.42, flapTop + 0.02, front], [centerX + roof.width * 0.42, flapTop + 0.02, front])
-}
+const SNACK_SHACK = { size: new THREE.Vector3(3.4, 5.1, 3.1), center: [-0.8, 0.75, -0.45], pole: { x: 4.71, z: 0.22, bottom: -1.8, top: 2.5 } }
 
 export function rebuildCookieCart(model, materials)
 {
     const container = findChild(model, 'cookiePhysicalFixed')
     findChild(container, 'Cube135').removeFromParent()
+    const { size, center, pole } = SNACK_SHACK
     const parts = createParts()
-    const bottom = -1.8
-    const counterTop = -0.8
-    parts.box('wood', [3.15, counterTop - bottom - 0.2, 2.2], { position: [-0.8, (bottom + counterTop) / 2 + 0.1, -0.46] })
-    parts.box('woodDark', [3.3, 0.1, 2.34], { position: [-0.8, counterTop - 0.05, -0.46] })
-    for(const z of [-1.62, 0.7])
-    {
-        parts.prism('woodDark', 0.48, 0.48, 0.12, { position: [-0.8, bottom + 0.48, z], rotation: [Math.PI / 2, 0, 0] }, 10)
-        parts.prism('wood', 0.12, 0.12, 0.16, { position: [-0.8, bottom + 0.48, z], rotation: [Math.PI / 2, 0, 0] }, 6)
-    }
-    parts.box('iron', [1.8, 0.2, 1.1], { position: [-0.8, counterTop + 0.1, -0.3] })
-    for(const [x, z] of POJANGMACHA.molds)
-    {
-        parts.box('metalDark', [0.5, 0.05, 0.3], { position: [x, counterTop + 0.22, z] })
-        parts.add('bungeoppang', bungeoppangGeometry(), { position: [x, counterTop + 0.27, z], scale: [0.62, 0.62, 0.62] })
-    }
-    parts.box('woodDark', [2.02, 0.12, 2.1], { position: [-0.8, -0.03, -0.91] })
-    parts.box('woodDark', [2.02, 0.12, 2.1], { position: [-0.8, 1.64, -0.91] })
-    for(const x of [-1.75, 0.15])
-        for(const z of [-1.9, 0.08])
-            parts.box('woodDark', [0.1, 1.7, 0.1], { position: [x, 0.81, z] })
-    parts.box('wood', [1.86, 1.46, 1.86], { position: [-0.8, 0.81, -0.91] })
-    for(const z of [-1.86, 0.04])
-        parts.box('glass', [1.6, 1.1, 0.04], { position: [-0.8, 0.86, z] })
-    for(const x of [-2.35, 0.75])
-        for(const z of [-1.55, 0.65])
-            parts.rod('woodDark', 0.05, [x, counterTop, z], [x, 2.55, z])
-    pojangmachaTent(parts)
-    parts.rod('woodDark', 0.11, [4.71, bottom, 0.22], [4.71, 2.5, 0.22], 6)
-    container.add(parts.build(materials))
+    parts.rod('woodDark', 0.11, [pole.x, pole.bottom, pole.z], [pole.x, pole.top, pole.z], 6)
+    container.add(parts.build(materials), islandModelMesh(materials, 'snackShack', new THREE.Matrix4().makeTranslation(...center), size))
 }
 
 export function rebuildOuthouse(model, materials)
@@ -493,9 +409,9 @@ function timberPile(parts, { size, matrix })
 function hangingLantern(parts, { matrix, z, y })
 {
     parts.box('woodDark', [0.02, 0.1, 0.02], { position: [0, y + 0.17, z], matrix })
-    for(const [shade, offsetY, height] of [['silkRed', 0.0, 0.24], ['silkBlue', -0.2, 0.16]])
-        parts.box(shade, [0.26, height, 0.26], { position: [0, y + offsetY, z], matrix })
-    parts.box('cheongsachorong', [0.28, 0.25, 0.28], { position: [0, y, z], matrix })
+    for(const offsetY of [0.13, -0.13])
+        parts.box('woodDark', [0.3, 0.04, 0.3], { position: [0, y + offsetY, z], matrix })
+    parts.box('lantern', [0.24, 0.22, 0.24], { position: [0, y, z], matrix })
 }
 
 export function rebuildBuildingSite(model, materials)

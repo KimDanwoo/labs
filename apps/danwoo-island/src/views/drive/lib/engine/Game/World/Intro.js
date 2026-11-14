@@ -4,9 +4,9 @@ import { Game } from '../Game.js'
 import { atan, color, float, Fn, PI, PI2, positionGeometry, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import gsap from 'gsap'
 import { Inputs } from '../Inputs/Inputs.js'
-import { INK_LABEL, inkBrushMaterial, inkRingGeometry, isInkLoading } from './inkLoading.js'
+import { isTideLoading, TIDE_LABEL, tideRingGeometry, tideRingMaterial } from './tideLoading.js'
 
-const LABEL_TINT = isInkLoading ? INK_LABEL : '#ffffff'
+const LABEL_TINT = isTideLoading ? TIDE_LABEL : '#ffffff'
 
 export class Intro
 {
@@ -61,8 +61,8 @@ export class Intro
         this.circle.progress = 0
         this.circle.smoothedProgress = uniform(0)
 
-        const geometry = isInkLoading ? inkRingGeometry(radius) : new THREE.RingGeometry(radius - thickness, radius, 128, 1)
-        const material = isInkLoading ? inkBrushMaterial(this.circle.smoothedProgress, this.game.resources.inkBrushTexture, radius) : this.glowRingMaterial()
+        const geometry = isTideLoading ? tideRingGeometry(radius) : new THREE.RingGeometry(radius - thickness, radius, 128, 1)
+        const material = isTideLoading ? tideRingMaterial(this.circle.smoothedProgress, radius, this.game) : this.glowRingMaterial()
 
         // Mesh
         const mesh = new THREE.Mesh(geometry, material)
