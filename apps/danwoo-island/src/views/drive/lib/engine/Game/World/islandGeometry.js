@@ -32,7 +32,7 @@ export const SHADES = {
     glass: '#bfe3ea',
     earth: '#b9956b',
     ink: '#2b2420',
-    jangseungWood: '#c4895a',
+    jangseungWood: '#cf7e33',
     basalt: '#625b58',
     basaltDark: '#423d3c',
     neonBoard: '#2a2230',
@@ -47,7 +47,6 @@ export const SHADES = {
     obangYellow: '#e8b830',
     obangWhite: '#f2eee4',
     obangBlack: '#2a2a2e',
-    jindo: '#e6d3ad',
     bronze: '#b0803a',
 }
 
@@ -158,8 +157,8 @@ export function createParts()
         geometry.translate(...start.add(end).multiplyScalar(0.5).toArray())
         add(name, geometry)
     }
-    const hipRoof = (name, { width, depth, height, ridgeRatio = 0.55, position }) =>
-        add(name, hipRoofGeometry(width, depth, height, ridgeRatio), { position })
+    const hipRoof = (name, { width, depth, height, ridgeRatio = 0.55, position, matrix = null }) =>
+        add(name, hipRoofGeometry(width, depth, height, ridgeRatio), { position, matrix })
 
     const build = (materials, matrix = new THREE.Matrix4()) =>
     {

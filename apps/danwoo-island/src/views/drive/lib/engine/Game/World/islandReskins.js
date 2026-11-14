@@ -1,5 +1,6 @@
+import * as THREE from 'three/webgpu'
 import { createParts, islandMaterial, removeComponents } from './islandGeometry.js'
-import { GENERALS, jangseungFigure } from './islandJangseung.js'
+import { islandModelMesh } from './islandModels.js'
 
 const CAREER_PAINT = {
     emissiveWhiteRadialGradient: 'hanji',
@@ -10,7 +11,8 @@ const CAREER_PAINT = {
 
 const AWARDS_TABLE = ['table002', 'cube024', 'refel003', 'medal', 'refDistinctions']
 
-const CIRCUIT_JANGSEUNG = { height: 4.3, radius: 0.42, generals: [GENERALS.heaven, GENERALS.earth] }
+const JANGSEUNG_PAIR = ['jangseungHeaven', 'jangseungEarth']
+const CIRCUIT_JANGSEUNG_SIZE = new THREE.Vector3(0.86, 4.3, 0.86)
 
 const STEPPING_STONES = ['slabes', 'Cube001', 'Cube002']
 
@@ -92,11 +94,8 @@ export function replaceAirDancers(model, materials)
     dancers.forEach((dancer, index) =>
     {
         dancer.updateMatrix()
-        const parts = createParts()
-        const plate = jangseungFigure(parts, { height: CIRCUIT_JANGSEUNG.height, radius: CIRCUIT_JANGSEUNG.radius, matrix: dancer.matrix, general: CIRCUIT_JANGSEUNG.generals[index % CIRCUIT_JANGSEUNG.generals.length] })
-        const figure = parts.build(materials)
-        figure.name = 'jangseung'
-        model.add(figure, plate)
+        const standing = dancer.matrix.clone().multiply(new THREE.Matrix4().makeTranslation(0, CIRCUIT_JANGSEUNG_SIZE.y / 2, 0))
+        model.add(islandModelMesh(materials, JANGSEUNG_PAIR[index % JANGSEUNG_PAIR.length], standing, CIRCUIT_JANGSEUNG_SIZE))
         dancer.removeFromParent()
     })
 }

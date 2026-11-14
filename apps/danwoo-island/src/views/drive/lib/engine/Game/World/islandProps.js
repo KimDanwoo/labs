@@ -1,13 +1,8 @@
 import * as THREE from 'three/webgpu'
 import { createParts, FULL_TURN, OCTAGON, seededRandom } from './islandGeometry.js'
+import { islandModelGeometry, islandPaletteMaterial } from './islandModels.js'
 
-function templateMatrix(template)
-{
-    template.updateMatrix()
-    return template.matrix
-}
-
-export function createStoneLantern(materials, template)
+export function createStoneLantern(materials)
 {
     const parts = createParts()
     parts.prism('stone', 0.44, 0.46, 0.1, { position: [0, -0.46, 0] })
@@ -33,10 +28,10 @@ export function createStoneLantern(materials, template)
     parts.prism('stone', 0.1, 0.36, 0.13, { position: [0, 0.55, 0] })
     parts.prism('stone', 0.05, 0.07, 0.05, { position: [0, 0.63, 0] })
     parts.add('stone', new THREE.IcosahedronGeometry(0.065, 0), { position: [0, 0.69, 0] })
-    return parts.build(materials, templateMatrix(template))
+    return parts.build(materials)
 }
 
-export function createLanternPole(materials, template)
+export function createLanternPole(materials)
 {
     const lanternX = 0.62
     const parts = createParts()
@@ -52,12 +47,12 @@ export function createLanternPole(materials, template)
     parts.box('woodDark', [0.38, 0.05, 0.38], { position: [lanternX, 0.74, 0] })
     parts.rod('silkRed', 0.02, [lanternX, 0.72, 0], [lanternX, 0.56, 0])
     parts.box('cheongsachorong', [0.34, 0.31, 0.34], { position: [lanternX, 1.11, 0] })
-    const group = parts.build(materials, templateMatrix(template))
+    const group = parts.build(materials)
     group.getObjectByName('cheongsachorong').name = 'glass'
     return group
 }
 
-export function createPyeongsang(materials, template)
+export function createPyeongsang(materials)
 {
     const parts = createParts()
     const legX = 1.12
@@ -78,10 +73,10 @@ export function createPyeongsang(materials, template)
         parts.box('woodDark', [0.1, 0.62, 0.1], { position: [-1.2, 0.17, z] })
     parts.box('wood', [0.1, 0.08, 1.9], { position: [-1.2, railY + 0.18, -0.05] })
     parts.box('wood', [0.08, 0.06, 1.9], { position: [-1.2, railY - 0.08, -0.05] })
-    return parts.build(materials, templateMatrix(template))
+    return parts.build(materials)
 }
 
-export function createBrushwoodFence(materials, template)
+export function createBrushwoodFence(materials)
 {
     const random = seededRandom(7)
     const parts = createParts()
@@ -98,36 +93,19 @@ export function createBrushwoodFence(materials, template)
         const z = index % 2 === 0 ? 0.02 : -0.03
         parts.rod('twig', 0.02, [x, -0.98, z], [x + lean, top, z])
     }
-    return parts.build(materials, templateMatrix(template))
+    return parts.build(materials)
 }
 
-const ONGGI_PROFILE = [
-    [0.0, -0.5],
-    [0.3, -0.5],
-    [0.38, -0.38],
-    [0.47, -0.12],
-    [0.49, 0.06],
-    [0.44, 0.22],
-    [0.34, 0.33],
-    [0.25, 0.39],
-    [0.25, 0.43],
-    [0.3, 0.46],
-    [0.3, 0.49],
-    [0.0, 0.47],
-]
-const ONGGI_SIDES = 16
-
-export function createOnggi(materials, template)
+export function createOnggi(materials)
 {
-    const parts = createParts()
-    parts.add('onggi', new THREE.LatheGeometry(ONGGI_PROFILE.map(([x, y]) => new THREE.Vector2(x, y)), ONGGI_SIDES))
-    parts.add('twig', new THREE.TorusGeometry(0.47, 0.025, 4, ONGGI_SIDES), { position: [0, 0.14, 0], rotation: [Math.PI / 2, 0, 0] })
-    parts.prism('onggiLid', 0.12, 0.33, 0.09, { position: [0, 0.54, 0] }, ONGGI_SIDES)
-    parts.prism('onggiLid', 0.05, 0.07, 0.06, { position: [0, 0.61, 0] }, 6)
-    return parts.build(materials, templateMatrix(template))
+    const upright = new THREE.Matrix4().makeRotationX(-Math.PI / 2)
+    const mesh = new THREE.Mesh(islandModelGeometry(materials, 'onggi', { matrix: upright }), islandPaletteMaterial(materials, 'onggi'))
+    mesh.castShadow = true
+    mesh.receiveShadow = true
+    return new THREE.Group().add(mesh)
 }
 
-export function createFieldstone(materials, template)
+export function createFieldstone(materials)
 {
     const random = seededRandom(11)
     const geometry = new THREE.IcosahedronGeometry(1, 1)
@@ -143,6 +121,6 @@ export function createFieldstone(materials, template)
     }
     const parts = createParts()
     parts.add('fieldstone', geometry, { scale: [0.68, 0.37, 0.82] })
-    return parts.build(materials, templateMatrix(template))
+    return parts.build(materials)
 }
 

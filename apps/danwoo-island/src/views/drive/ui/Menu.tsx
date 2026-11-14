@@ -32,13 +32,6 @@ export function Menu() {
           ))}
         </div>
         <div className="container">
-          <div className="previews js-previews">
-            {MENU_SECTIONS.map(({ name, preview }) => (
-              <div key={name} className={`js-preview preview ${name}-preview`}>
-                <img className="background" src={worldAsset(preview)} alt="" loading="lazy" draggable={false} />
-              </div>
-            ))}
-          </div>
           <div className="contents js-contents">
             {MENU_SECTIONS.map(({ name }) => {
               const Content = CONTENT_BY_SECTION[name];

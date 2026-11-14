@@ -51,7 +51,7 @@ export class Bricks
         }
 
         // Instanced group
-        this.instancedGroup = new InstancedGroup(references, createFieldstone(this.game.materials, base))
+        this.instancedGroup = new InstancedGroup(references, createFieldstone(this.game.materials))
 
         // Tick update
         this.game.ticker.events.on('tick', () =>
