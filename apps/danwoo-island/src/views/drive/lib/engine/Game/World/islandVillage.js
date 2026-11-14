@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { bungeoppangGeometry, createParts, FULL_TURN, meshComponents, SHADES, seededRandom } from './islandGeometry.js'
 import { propMaterial, texturedMesh } from './islandTextured.js'
-import { dongjaseokFigure, haetaeFigure, jindoFigure } from './islandCompanions.js'
+import { islandModelMesh } from './islandModels.js'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { color } from 'three/tsl'
 
@@ -172,57 +172,13 @@ function paengi(parts, container)
     parts.prism('woodDark', radius * 0.12, radius * 0.16, height * 0.12, { position: [0, height * 0.52, 0], matrix }, 8)
 }
 
-const GAMEPAD = {
-    outline: [
-        [-0.28, -0.3], [-0.12, -0.31], [0.12, -0.31], [0.28, -0.3], [0.39, -0.24], [0.45, -0.12], [0.46, 0.08], [0.43, 0.29],
-        [0.36, 0.4], [0.26, 0.41], [0.19, 0.36], [0.14, 0.22], [0.1, 0.13], [0.04, 0.1], [-0.04, 0.1], [-0.1, 0.13],
-        [-0.14, 0.22], [-0.19, 0.36], [-0.26, 0.41], [-0.36, 0.4], [-0.43, 0.29], [-0.46, 0.08], [-0.45, -0.12], [-0.39, -0.24],
-    ],
-    cross: [[-0.031, -0.095], [0.031, -0.095], [0.031, -0.031], [0.095, -0.031], [0.095, 0.031], [0.031, 0.031], [0.031, 0.095], [-0.031, 0.095], [-0.031, 0.031], [-0.095, 0.031], [-0.095, -0.031], [-0.031, -0.031]],
-    buttons: [
-        { shade: 'obangYellow', x: 0.27, z: -0.193 },
-        { shade: 'obangRed', x: 0.348, z: -0.115 },
-        { shade: 'dancheongGreen', x: 0.27, z: -0.037 },
-        { shade: 'obangBlue', x: 0.192, z: -0.115 },
-    ],
-}
+const GAMEPAD_SIZE = new THREE.Vector3(1.62, 0.54, 1.28)
 
-function flatShape(points, scaleX, scaleZ)
+function placeGamepad(container, materials)
 {
-    const shape = new THREE.Shape()
-    points.forEach(([x, z], index) => (index === 0 ? shape.moveTo(x * scaleX, -z * scaleZ) : shape.lineTo(x * scaleX, -z * scaleZ)))
-    shape.closePath()
-    return shape
-}
-
-function slab(shape, depth, bevel)
-{
-    const geometry = new THREE.ExtrudeGeometry(shape, { depth, steps: 1, curveSegments: 1, ...bevel })
-    geometry.translate(0, 0, -depth / 2)
-    geometry.rotateX(-Math.PI / 2)
-    return geometry
-}
-
-function gamepad(parts, frame)
-{
-    const { size, matrix } = frame
-    const { x: W, y: H, z: D } = size
-    const S = Math.min(W, D)
-    const at = (t) => (t - 0.5) * H
-    parts.add('woodDark', slab(flatShape(GAMEPAD.outline, W, D), 0.18 * H, { bevelEnabled: true, bevelThickness: 0.02 * H, bevelSize: 0.012 * S, bevelSegments: 1 }), { position: [0, at(0.13), 0], matrix })
-    parts.add('pillarRed', slab(flatShape(GAMEPAD.outline, W * 0.94, D * 0.94), 0.012 * H, { bevelEnabled: false }), { position: [0, at(0.246), 0], matrix })
-    parts.add('ink', slab(flatShape(GAMEPAD.cross, S, S), 0.034 * H, { bevelEnabled: false }), { position: [-0.27 * W, at(0.269), -0.115 * D], matrix })
-    for(const { shade, x, z } of GAMEPAD.buttons)
-        parts.prism(shade, 0.043 * S, 0.043 * S, 0.04 * H, { position: [x * W, at(0.272), z * D], matrix }, 8)
-    for(const side of [-1, 1])
-    {
-        const x = side * 0.145 * W
-        parts.prism('ink', 0.065 * S, 0.065 * S, 0.018 * H, { position: [x, at(0.26), 0.07 * D], matrix }, 10)
-        parts.prism('woodDark', 0.025 * S, 0.025 * S, 0.045 * H, { position: [x, at(0.286), 0.07 * D], matrix }, 8)
-        parts.prism('ink', 0.052 * S, 0.058 * S, 0.028 * H, { position: [x, at(0.318), 0.07 * D], matrix }, 10)
-        parts.box('woodDark', [0.18 * W, 0.065 * H, 0.075 * D], { position: [side * 0.25 * W, at(0.254), -0.285 * D], matrix })
-        parts.box('woodDark', [0.045 * W, 0.02 * H, 0.025 * D], { position: [side * 0.05 * W, at(0.262), -0.165 * D], matrix })
-    }
+    const { size, matrix } = collidersOf(container)[0]
+    const resting = matrix.clone().multiply(new THREE.Matrix4().makeTranslation(0, (GAMEPAD_SIZE.y - size.y) / 2, 0))
+    container.add(islandModelMesh(materials, 'gamepad', resting, GAMEPAD_SIZE))
 }
 
 function obangFlag(parts, frame)
@@ -571,17 +527,23 @@ function sortedColliders(container)
     return collidersOf(container).sort((a, b) => b.size.x * b.size.y * b.size.z - a.size.x * a.size.y * a.size.z)
 }
 
+function placeModel(container, materials, key)
+{
+    const [frame] = sortedColliders(container)
+    container.add(islandModelMesh(materials, key, frame.matrix, frame.size))
+}
+
 const SOCIAL_OBJECTS = [
-    { pattern: /^baguiraPhysicalDynamic/, build: (parts, container, materials) => haetaeFigure(parts, sortedColliders(container), materials, container) },
-    { pattern: /^boyPhysicalDynamic/, build: (parts, container, materials) => dongjaseokFigure(parts, sortedColliders(container), materials, container) },
-    { pattern: /^sudoPhysicalDynamic/, build: (parts, container, materials) => jindoFigure(parts, sortedColliders(container), materials, container) },
+    { pattern: /^baguiraPhysicalDynamic/, build: (parts, container, materials) => placeModel(container, materials, 'haetae') },
+    { pattern: /^boyPhysicalDynamic/, build: (parts, container, materials) => placeModel(container, materials, 'dongjaseok') },
+    { pattern: /^sudoPhysicalDynamic/, build: (parts, container, materials) => placeModel(container, materials, 'jindo') },
 ]
 
 const BUILDERS = [
     ...SOCIAL_OBJECTS,
     { pattern: /^gamepadPhysicalDynamic/, keepEmissive: false, build: yutTable },
     { pattern: /^phonePhysicalDynamic/, keepEmissive: false, build: paengi },
-    { pattern: /^gizmoPhysicalDynamic$/, build: (parts, container) => gamepad(parts, collidersOf(container)[0]) },
+    { pattern: /^gizmoPhysicalDynamic$/, build: (parts, container, materials) => placeGamepad(container, materials) },
     { pattern: /^blackBoardPhysicalDynamic/, build: slateBoards },
     { pattern: /^grinderPhysicalDynamic$/, build: grinderStand },
     { pattern: /^(main|side)TablePhysicalDynamic/, build: (parts, container) => candleSticks(parts, container, workTable(parts, collidersOf(container)[0])) },

@@ -1,5 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { createParts, FULL_TURN, OCTAGON, seededRandom } from './islandGeometry.js'
+import { islandModelGeometry, islandPaletteMaterial } from './islandModels.js'
 
 export function createStoneLantern(materials)
 {
@@ -95,30 +96,13 @@ export function createBrushwoodFence(materials)
     return parts.build(materials)
 }
 
-const ONGGI = {
-    radius: 0.46,
-    sides: 12,
-    body: [[0, 0.02], [0.62, 0.02], [0.72, 0.1], [0.94, 0.29], [1, 0.48], [0.96, 0.64], [0.82, 0.77], [0.6, 0.84], [0.6, 0.88], [0.7, 0.89], [0.7, 0.91], [0, 0.91]],
-    lid: [[0, 0.895], [0.8, 0.895], [0.82, 0.92], [0.68, 0.955], [0.22, 0.97], [0, 0.97]],
-    knob: { top: 0.055, bottom: 0.07, height: 0.025, t: 0.974 },
-}
-
-function onggiLathe(profile)
-{
-    return new THREE.LatheGeometry(profile.map(([r, t]) => new THREE.Vector2(r * ONGGI.radius, t - 0.5)), ONGGI.sides)
-}
-
 export function createOnggi(materials)
 {
-    const parts = createParts()
-    parts.add('onggi', onggiLathe(ONGGI.body))
-    parts.add('onggiLid', onggiLathe(ONGGI.lid))
-    const { top, bottom, height, t } = ONGGI.knob
-    parts.prism('onggiLid', top, bottom, height, { position: [0, t - 0.5, 0] }, 8)
-    const group = parts.build(materials)
-    const placementUp = new THREE.Matrix4().makeRotationX(-Math.PI / 2)
-    group.traverse((child) => child.isMesh && child.geometry.applyMatrix4(placementUp))
-    return group
+    const upright = new THREE.Matrix4().makeRotationX(-Math.PI / 2)
+    const mesh = new THREE.Mesh(islandModelGeometry(materials, 'onggi', { matrix: upright }), islandPaletteMaterial(materials, 'onggi'))
+    mesh.castShadow = true
+    mesh.receiveShadow = true
+    return new THREE.Group().add(mesh)
 }
 
 export function createFieldstone(materials)

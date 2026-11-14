@@ -47,10 +47,6 @@ export const SHADES = {
     obangYellow: '#e8b830',
     obangWhite: '#f2eee4',
     obangBlack: '#2a2a2e',
-    granite: '#aba9a9',
-    graniteDark: '#8f8c88',
-    jindoPaint: '#f2dcc0',
-    jindoPaintDark: '#d4bd9c',
     bronze: '#b0803a',
 }
 

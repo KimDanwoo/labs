@@ -2,8 +2,7 @@ import * as THREE from 'three/webgpu'
 import { Fn, max, texture, uv, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { bungeoppangGeometry, createParts, FULL_TURN, seededRandom } from './islandGeometry.js'
-import { GENERALS, jangseungFigure } from './islandJangseung.js'
-import { hareubangFigure } from './islandStatues.js'
+import { islandModelMesh } from './islandModels.js'
 
 const OBANG = ['obangBlue', 'obangRed', 'obangYellow', 'obangWhite', 'obangBlack']
 
@@ -370,13 +369,12 @@ export function rebuildSeonangdang(model, materials)
     const tall = pillars.slice(0, 3)
     for(const frame of tall)
         cairn(parts, random, frame)
-    const generals = [GENERALS.heaven, GENERALS.earth]
-    const decals = pillars.slice(3).flatMap(({ size, matrix }, index) =>
-        jangseungFigure(parts, materials, { height: size.y, radius: Math.min(size.x, size.z) * 0.46, halfDepth: Math.min(size.x, size.z) / 2, bottom: -size.y / 2, matrix, general: generals[index % generals.length] }))
+    const generals = ['jangseungHeaven', 'jangseungEarth']
+    const figures = pillars.slice(3).map(({ size, matrix }, index) => islandModelMesh(materials, generals[index % generals.length], matrix, size))
     const ropePoints = tall.map((frame) => new THREE.Vector3().setFromMatrixPosition(frame.matrix).add(new THREE.Vector3(0, frame.size.y * 0.32, 0)))
     ropePoints.sort((a, b) => Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x))
     geumjul(parts, random, ropePoints)
-    container.add(parts.build(materials), ...decals)
+    container.add(parts.build(materials), ...figures)
 }
 
 function removeVisualMeshes(container)
@@ -427,7 +425,7 @@ function largestCuboid(container)
 
 export function rebuildHareubang(model, materials)
 {
-    replaceVisual(model, 'refStatuePhysicalDynamic', (container) => hareubangFigure(materials, largestCuboid(container)))
+    replaceVisual(model, 'refStatuePhysicalDynamic', (container) => islandModelMesh(materials, 'hareubang', largestCuboid(container).matrix))
 }
 
 export function rebuildWaterfallPagoda(model, materials)
