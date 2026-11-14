@@ -6,7 +6,6 @@ const PROP_TEXTURES = {
     yutBoard: { path: 'areas/island/props/yutBoard.webp' },
     jangseungHeaven: { path: 'areas/island/props/jangseungHeaven.webp' },
     jangseungEarth: { path: 'areas/island/props/jangseungEarth.webp' },
-    hareubangFront: { path: 'areas/island/props/hareubangFront.webp' },
     basalt: { path: 'areas/island/props/basaltTile.webp', isRepeating: true },
     steleFace: { path: 'areas/island/props/steleFace.webp' },
     haetaeFront: { path: 'areas/island/props/haetaeFront.webp' },
