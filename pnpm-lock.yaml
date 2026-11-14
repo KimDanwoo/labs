@@ -69,15 +69,24 @@ catalogs:
     '@tweakpane/plugin-essentials':
       specifier: 0.2.1
       version: 0.2.1
+    '@types/howler':
+      specifier: 2.2.13
+      version: 2.2.13
     '@types/node':
       specifier: ^26.0.0
       version: 26.4.0
+    '@types/normalize-wheel':
+      specifier: 1.0.4
+      version: 1.0.4
     '@types/react':
       specifier: ^19
       version: 19.2.15
     '@types/react-dom':
       specifier: ^19
       version: 19.2.3
+    '@types/seedrandom':
+      specifier: 3.0.8
+      version: 3.0.8
     '@types/three':
       specifier: 0.187.0
       version: 0.187.0
@@ -456,15 +465,24 @@ importers:
       '@repo/prettier-config':
         specifier: workspace:*
         version: link:../../packages/prettier-config
+      '@types/howler':
+        specifier: 'catalog:'
+        version: 2.2.13
       '@types/node':
         specifier: 'catalog:'
         version: 26.4.0
+      '@types/normalize-wheel':
+        specifier: 'catalog:'
+        version: 1.0.4
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.15
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.15)
+      '@types/seedrandom':
+        specifier: 'catalog:'
+        version: 3.0.8
       '@types/three':
         specifier: 'catalog:'
         version: 0.187.0
@@ -3513,6 +3531,9 @@ packages:
   '@types/hast@3.0.5':
     resolution: {integrity: sha512-rp/ezSWaD1m44dPKICGhiskI13nVr7qTloFwDa/IYkhhf5nzwP+zIQcIJh3WIFSBOy/H1PzB40jPjMDksN4F+g==}
 
+  '@types/howler@2.2.13':
+    resolution: {integrity: sha512-40+EBjqIHHrC4VShlz/7i0lBUsE3QkgzZinQQji74Hd8sBkJZUBaT7LWFLK6rcabsDOOQpoMbEJvtaFQwxOu/g==}
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -3537,6 +3558,9 @@ packages:
   '@types/node@26.6.5':
     resolution: {integrity: sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg==}
 
+  '@types/normalize-wheel@1.0.4':
+    resolution: {integrity: sha512-iclKEmOclXH2LGVkMkdal0+ffJphB3kbazakec96z1hW/CfJYmsZNFYLAmkpzePxKoKewXp2HSlsN6G4SG0b0g==}
+
   '@types/offscreencanvas@2019.7.3':
     resolution: {integrity: sha512-ieXiYmgSRXUDeOntE1InxjWyvEelZGP63M+cGuquuRLuIKKT1osnkXjxev9B7d1nXSug5vpunx+gNlbVxMlC9A==}
 
@@ -3555,6 +3579,9 @@ packages:
 
   '@types/sax@1.2.7':
     resolution: {integrity: sha512-rO73L89PJxeYM3s3pPPjiPgVVcymqU490g0YO5n5By0k2Erzj6tay/4lr1CHAAU4JyOWd1rpQ8bCf6cZfHU96A==}
+
+  '@types/seedrandom@3.0.8':
+    resolution: {integrity: sha512-TY1eezMU2zH2ozQoAFAQFOPpvP15g+ZgSfTZt31AUUH/Rxtnz3H+A/Sv1Snw2/amp//omibc+AEkTaA8KUeOLQ==}
 
   '@types/set-cookie-parser@2.4.10':
     resolution: {integrity: sha512-GGmQVGpQWUe5qglJozEjZV/5dyxbOOZ0LHe/lqyWssB88Y4svNfst0uqBVscdDeIKl5Jy5+aPSvy7mI9tYRguw==}
@@ -10566,6 +10593,8 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
+  '@types/howler@2.2.13': {}
+
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
@@ -10592,6 +10621,8 @@ snapshots:
     dependencies:
       undici-types: 8.9.0
 
+  '@types/normalize-wheel@1.0.4': {}
+
   '@types/offscreencanvas@2019.7.3': {}
 
   '@types/react-dom@19.2.3(@types/react@19.2.15)':
@@ -10609,6 +10640,8 @@ snapshots:
   '@types/sax@1.2.7':
     dependencies:
       '@types/node': 26.6.5
+
+  '@types/seedrandom@3.0.8': {}
 
   '@types/set-cookie-parser@2.4.10':
     dependencies:
