@@ -23,8 +23,6 @@ export class SocialArea extends Area
 
         this.center = this.references.items.get('center')[0].position
 
-        // Debug
-
         personalizeSocialSigns(this)
         this.setLinks()
         this.setFans()
@@ -63,7 +61,6 @@ export class SocialArea extends Area
                     this.game.inputs.interactiveButtons.removeItems(['interact'])
                 }
             )
-
         }
     }
 
@@ -75,7 +72,6 @@ export class SocialArea extends Area
 
         baseFan.position.set(0, 0, 0)
 
-        // Update materials
         this.game.materials.updateObject(baseFan)
 
         baseFan.removeFromParent()
@@ -92,7 +88,6 @@ export class SocialArea extends Area
 
         for(let i = 0; i < this.fans.count; i++)
         {
-            // Reference
             const reference = new THREE.Object3D()
 
             reference.position.copy(this.fans.spawnerPosition)
@@ -100,7 +95,6 @@ export class SocialArea extends Area
             reference.needsUpdate = true
             references.push(reference)
 
-            // Object
             const object = this.game.objects.add(
                 {
                     model: reference,
@@ -140,25 +134,12 @@ export class SocialArea extends Area
             object.physical.body.setLinvel({ x: 0, y: 0, z: 0 })
             object.physical.body.setAngvel({ x: 0, y: 0, z: 0 })
             object.physical.body.wakeUp()
-            // this.game.ticker.wait(1, () =>
-            // {
-            //     object.physical.body.applyImpulse({
-            //         x: (Math.random() - 0.5) * this.fans.mass * 2,
-            //         y: Math.random() * this.fans.mass * 3,
-            //         z: this.fans.mass * 7
-            //     }, true)
-            //     object.physical.body.applyTorqueImpulse({ x: 0, y: 0, z: 0 }, true)
-            // })
 
             this.fans.currentIndex = (this.fans.currentIndex + 1) % this.fans.count
 
             this.fans.visibleCount = Math.min(this.fans.visibleCount + 1, this.fans.count)
 
-            // Sound
             this.game.audio.groups.get('click').play(true)
-
-            // Achievement
-
         }
     }
 

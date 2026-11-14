@@ -7,7 +7,7 @@ export class Viewport
         this.domElement = domElement
 
         this.events = new Events()
-        
+
         this.measure()
         this.setResize()
     }

@@ -24,7 +24,6 @@ export class CookieArea extends Area
     {
         super(model)
 
-
         this.setSound()
         this.setBlower()
         this.setBanner()
@@ -63,13 +62,11 @@ export class CookieArea extends Area
 
         const mesh = this.references.items.get('banner')[0]
 
-        // Position
         mesh.material.positionNode = Fn(() =>
         {
             const baseUv = uv()
             const newPosition = positionGeometry.toVar()
 
-            // Wind
             const windUv = baseUv
                 .mul(vec2(0.35, 0.175))
                 .sub(vec2(0.1, 0.05).mul(this.game.ticker.elapsedScaledUniform))
@@ -189,7 +186,6 @@ export class CookieArea extends Area
         baseCookie.frustumCulled = true
         baseCookie.position.set(0, 0, 0)
 
-        // Update materials
         this.game.materials.updateObject(baseCookie)
 
         this.cookies = {}
@@ -207,7 +203,6 @@ export class CookieArea extends Area
         {
             const onTable = i >= this.cookies.count
 
-            // Reference
             const reference = new THREE.Object3D()
 
             if(onTable)
@@ -223,7 +218,6 @@ export class CookieArea extends Area
             reference.needsUpdate = true
             references.push(reference)
 
-            // Object
             const object = this.game.objects.add(
                 {
                     model: reference,
@@ -279,7 +273,6 @@ export class CookieArea extends Area
 
     accept()
     {
-        // Cookies
         const object = this.cookies.objects[this.cookies.currentIndex]
 
         const spawnPosition = this.cookies.spawnerPosition.clone()
@@ -301,31 +294,19 @@ export class CookieArea extends Area
 
         this.cookies.visibleCount = Math.min(this.cookies.visibleCount + 1, this.cookies.count)
 
-        // Oven heat
         this.ovenHeat.scale.z = 2
         gsap.to(this.ovenHeat.scale, { z: 1, overwrite: true, duration: 2, delay: 0.2, ease: 'power1.inOut' })
 
-        // Counter
-
-        // Sound
         this.sounds.ding.play()
-
-        // Actual cookie
-
-        // Achievement
-
     }
 
     update()
     {
-        // Time
         const timeScale = (Math.sin(this.game.ticker.elapsedScaled) * 0.3 + 0.5) * 0.3
         this.localTime.value += this.game.ticker.deltaScaled * timeScale
 
-        // Blower
         this.blower.scale.y = Math.sin(this.game.ticker.elapsedScaled + Math.PI) * 0.25 + 0.75
 
-        // Cookies
         if(this.cookies.visibleCount)
         {
             let allCookiesSleeping = true

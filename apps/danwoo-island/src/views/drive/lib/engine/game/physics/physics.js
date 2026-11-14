@@ -9,19 +9,7 @@ export class Physics
 
         this.world = new this.game.RAPIER.World(
             { x: 0.0, y: -9.81, z: 0.0 },
-            
-            // {
-            //     contact_erp: 0.2,
-            //     dt: 1.0 / 60.0,
-            //     lengthUnit: 1,
-            //     maxCcdSubsteps: 1,
-            //     minIslandSize: 128,
-            //     normalizedAllowedLinearError: 0.001,
-            //     normalizedPredictionDistance: 0.002,
-            //     numAdditionalFrictionIterations: 1,
-            //     numInternalPgsIterations: 1,
-            //     numSolverIterations: 2
-            // }
+
         )
         this.eventQueue = new this.game.RAPIER.EventQueue(true)
 
@@ -45,29 +33,16 @@ export class Physics
             multiply: this.game.RAPIER.CoefficientCombineRule.Multiply,
         }
 
-        // this.world.integrationParameters.numSolverIterations = 4 // 4
-        // this.world.numAdditionalFrictionIterations = 0 // 0
-        // this.world.integrationParameters.numAdditionalFrictionIterations = 0 // 0
-        // this.world.numInternalPgsIterations = 1 // 1
-        // this.world.integrationParameters.numInternalPgsIterations = 1 // 1
-        // this.world.integrationParameters.normalizedAllowedLinearError = 0.001 // 0.001
-        // this.world.integrationParameters.minIslandSize = 128 // 128
-        // this.world.integrationParameters.maxCcdSubsteps = 1 // 1
-        // this.world.integrationParameters.normalizedPredictionDistance = 0.002 // 0.002
-        // this.world.lengthUnit = 1 // 1
-        // this.world.integrationParameters.lengthUnit = 1 // 1
-        
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
         }, 3)
-
     }
 
     getBinaryGroups(groupNames)
     {
         let binary = 0b0000000000000000
-        
+
         for(const groupName of groupNames)
             binary |= this.groups[groupName]
 
@@ -78,14 +53,12 @@ export class Physics
     {
         const physical = {}
 
-        // Attributes
         physical.waterGravityMultiplier = typeof _physicalDescription.waterGravityMultiplier !== 'undefined' ? _physicalDescription.waterGravityMultiplier : - 1.5
         physical.linearDamping = typeof _physicalDescription.linearDamping !== 'undefined' ? _physicalDescription.linearDamping : 0.1
         physical.angularDamping = typeof _physicalDescription.angularDamping !== 'undefined' ? _physicalDescription.angularDamping : 0.1
 
-        // Body
         let rigidBodyDesc = this.game.RAPIER.RigidBodyDesc
-        
+
         if(_physicalDescription.type === 'dynamic' || typeof _physicalDescription.type === 'undefined')
         {
             physical.type = 'dynamic'
@@ -125,10 +98,9 @@ export class Physics
 
         if(typeof _physicalDescription.enabled !== 'undefined')
             rigidBodyDesc.setEnabled(_physicalDescription.enabled)
-        
+
         physical.body = this.world.createRigidBody(rigidBodyDesc)
 
-        // Colliders
         let collidersOverwrite = {}
         if(typeof _physicalDescription.collidersOverwrite !== 'undefined')
             collidersOverwrite = _physicalDescription.collidersOverwrite
@@ -161,18 +133,18 @@ export class Physics
 
             if(_colliderDescription.quaternion)
                 colliderDescription = colliderDescription.setRotation(_colliderDescription.quaternion)
-                
+
             colliderDescription = colliderDescription.setDensity(0.1)
-                
-            if(typeof _colliderDescription.mass !== 'undefined') // From collider description
+
+            if(typeof _colliderDescription.mass !== 'undefined')
             {
                 if(typeof _colliderDescription.centerOfMass !== 'undefined')
                     colliderDescription = colliderDescription.setMassProperties(_colliderDescription.mass, _colliderDescription.centerOfMass, { x: 1, y: 1, z: 1 }, new THREE.Quaternion().setFromAxisAngle(new THREE.Euler(0, 1, 0), - Math.PI * 0))
                 else
                     colliderDescription = colliderDescription.setMass(_colliderDescription.mass)
             }
-                
-            if(typeof _physicalDescription.mass !== 'undefined') // From body description
+
+            if(typeof _physicalDescription.mass !== 'undefined')
             {
                 colliderDescription = colliderDescription.setMass(_physicalDescription.mass / _physicalDescription.colliders.length)
             }
@@ -188,14 +160,14 @@ export class Physics
             {
                 colliderDescription = colliderDescription.setFrictionCombineRule(this.frictionRules[_physicalDescription.frictionRule])
             }
-                
+
             if(typeof _physicalDescription.restitution !== 'undefined')
                 colliderDescription = colliderDescription.setRestitution(_physicalDescription.restitution)
             else if(typeof _colliderDescription.restitution !== 'undefined')
                 colliderDescription = colliderDescription.setRestitution(_colliderDescription.restitution)
             else
                 colliderDescription = colliderDescription.setRestitution(0.15)
-                
+
             let category = 'object'
             if(typeof _physicalDescription.category !== 'undefined')
                 category = _physicalDescription.category
@@ -203,11 +175,11 @@ export class Physics
                 category = _colliderDescription.category
 
             colliderDescription = colliderDescription.setCollisionGroups(this.categories[category])
-            
+
             if(typeof _physicalDescription.onCollision === 'function' || typeof _physicalDescription.contactThreshold !== 'undefined')
             {
                 colliderDescription = colliderDescription.setActiveEvents(this.game.RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS)
-                
+
                 colliderDescription = colliderDescription.setContactForceEventThreshold(typeof _physicalDescription.contactThreshold !== 'undefined' ? _physicalDescription.contactThreshold : 15)
 
                 if(typeof _physicalDescription.onCollision === 'function')
@@ -218,11 +190,10 @@ export class Physics
             physical.colliders.push(collider)
         }
 
-        // Original transform
         physical.initialState = {
             position: physical.body.translation(),
             rotation: physical.body.rotation(),
-            sleeping: physical.body.isSleeping() 
+            sleeping: physical.body.isSleeping()
         }
 
         this.physicals.push(physical)
@@ -233,11 +204,10 @@ export class Physics
     update()
     {
         this.world.timestep = this.game.ticker.deltaScaled
-    
+
         for(const physical of this.physicals)
         {
             const waterDepth = Math.max(- physical.body.translation(this.tempPosition).y, this.game.water.surfaceElevation)
-            // physical.body.setGravityScale(1 + waterDepth * physical.waterGravityMultiplier)
 
             if(waterDepth > 0)
             {
@@ -250,51 +220,29 @@ export class Physics
                 physical.body.setAngularDamping(physical.angularDamping)
             }
         }
-        
-        // this.world.step()
+
         this.world.step(this.eventQueue)
 
-        // // Works but not handy
-        // this.eventQueue.drainCollisionEvents((handle1, handle2, started) =>
-        // {
-        //     if(started)
-        //     {
-        //         const collider1 = this.world.getCollider(handle1)
-        //         const collider2 = this.world.getCollider(handle2)
-
-        //         console.log('---')
-        //         console.log(handle1)
-        //         console.log(handle2)
-        //         console.log(collider1)
-        //         console.log(collider2)
-        //     }
-        // })
-
-        // Doesn't work
         this.eventQueue.drainContactForceEvents(event =>
         {
-            // Retrieve colliders
             const collider1 = this.world.getCollider(event.collider1())
             const collider2 = this.world.getCollider(event.collider2())
 
-            // Retrieve bodies
             const body1 = collider1.parent()
             const body2 = collider2.parent()
 
-            // Retrieve callbacks
             const callback1 = body1.userData?.object?.physical?.onCollision
             const callback2 = body2.userData?.object?.physical?.onCollision
 
-            // Trigger callbacks with force
             if(typeof callback1 === 'function' || typeof callback2 === 'function')
             {
                 const mass1 = body1.mass()
                 const mass2 = body2.mass()
                 const force = event.maxForceMagnitude() / (mass1 + mass2)
-                
+
                 const position1 = body1.translation()
                 const position2 = body2.translation()
-                
+
                 const bodyPosition = (position1.x === 0 && position1.y === 0 && position1.z === 0) ? position2 : position1
 
                 if(typeof callback1 === 'function')

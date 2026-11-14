@@ -25,7 +25,6 @@ export class BowlingArea extends Area
     {
         super(model)
 
-        // Debug
         this.won = false
         this.wonTime = 0
 
@@ -88,20 +87,17 @@ export class BowlingArea extends Area
         this.pins.allSleeping = true
         this.pins.boundingUpdateTime = 0
 
-        // References
         const references = InstancedGroup.getReferencesFromChildren(this.references.items.get('pinPositions')[0].children)
 
-        // Instances
         const basePin = this.references.items.get('pinPhysicalDynamic')[0]
         basePin.castShadow = true
         basePin.receiveShadow = true
         basePin.position.set(0, 0, 0)
         basePin.rotation.set(0, 0, 0)
 
-        // Update materials
         this.game.materials.updateObject(basePin)
 
-        const descriptions = this.game.objects.getFromModel(basePin, {}, {}) // To extract colliders
+        const descriptions = this.game.objects.getFromModel(basePin, {}, {})
 
         let i = 0
         for(const reference of references)
@@ -112,7 +108,6 @@ export class BowlingArea extends Area
             pin.isSleeping = true
             pin.group = reference
 
-            // Object with physics linked to reference
             pin.object = this.game.objects.add(
                 {
                     model: reference,
@@ -143,26 +138,13 @@ export class BowlingArea extends Area
             pin.basePosition = pin.group.position.clone()
             pin.baseRotation = pin.group.quaternion.clone()
 
-            // pin.body.setLinearDamping(0.2)
-            // pin.body.setAngularDamping(0.2)
-
             this.pins.items.push(pin)
 
             i++
         }
 
-        // this.game.objects.add(
-        //     {
-        //         model: basePin,
-        //         parent: null
-        //     },
-        //     null
-        // )
-        // basePin.removeFromParent()
-
         this.pins.instancedGroup = new InstancedGroup(references, basePin)
 
-        // Reset
         this.pins.reset = () =>
         {
             for(const pin of this.pins.items)
@@ -175,7 +157,6 @@ export class BowlingArea extends Area
                 pin.body.resetTorques()
                 pin.body.setLinvel({ x: 0, y: 0, z: 0 })
                 pin.body.setAngvel({ x: 0, y: 0, z: 0 })
-                // pin.body.setEnabled(true)
                 this.game.ticker.wait(2, () =>
                 {
                     pin.body.sleep()
@@ -194,7 +175,6 @@ export class BowlingArea extends Area
         this.ball.basePosition = baseBall.position.clone()
         this.ball.position = new THREE.Vector3().copy(this.ball.body.translation())
         this.ball.speed = 0
-        // this.ball.basePosition.y += 1
 
         this.ball.reset = () =>
         {
@@ -203,7 +183,6 @@ export class BowlingArea extends Area
             this.ball.body.resetTorques()
             this.ball.body.setLinvel({ x: 0, y: 0, z: 0 })
             this.ball.body.setAngvel({ x: 0, y: 0, z: 0 })
-            // this.ball.body.setEnabled(true)
             this.game.ticker.wait(2, () =>
             {
                 this.ball.body.sleep()
@@ -226,7 +205,6 @@ export class BowlingArea extends Area
             this.restartInteractivePoint.hide()
         })
 
-        // Sound
         const sound = this.game.audio.groups.get('click')
         if(sound)
             sound.play(true)
@@ -284,7 +262,6 @@ export class BowlingArea extends Area
         )
         this.dataTexture.needsUpdate = true
 
-        // Offset position according to data texture
         const offsetPosition = Fn(([threshold]) =>
         {
             const active = step(texture(this.dataTexture, uv()).r.sub(threshold).abs(), 0.1)
@@ -294,25 +271,21 @@ export class BowlingArea extends Area
             return newPosition
         })
 
-        // Discs material
         const discsColor = uniform(color('#ffffff'))
         const discsStrength = uniform(2)
         const discsMaterial = new THREE.MeshBasicNodeMaterial()
         discsMaterial.outputNode = vec4(discsColor.mul(discsStrength), 1)
         discsMaterial.positionNode = offsetPosition(float(0))
 
-        // Crosses material
-        const crossesColor = uniform(color('#ff2b11')) // #b6ff11
+        const crossesColor = uniform(color('#ff2b11'))
         const crossesStrength = uniform(6)
         const crossesMaterial = new THREE.MeshBasicNodeMaterial()
         crossesMaterial.outputNode = vec4(crossesColor.mul(crossesStrength), 1)
         crossesMaterial.positionNode = offsetPosition(0.5)
 
-        // Update materials
         this.screen.discsMesh.material = discsMaterial
         this.screen.crossesMesh.material = crossesMaterial
 
-        // Strike label
         this.screen.labelStrike = this.references.items.get('labelStrike')[0]
 
         {
@@ -327,7 +300,6 @@ export class BowlingArea extends Area
             this.screen.labelStrike.visible = false
         }
 
-        // Reset
         this.screen.reset = () =>
         {
             for(const pin of this.pins.items)
@@ -336,8 +308,6 @@ export class BowlingArea extends Area
                 this.dataTexture.needsUpdate = true
             }
         }
-
-        // Debug
     }
 
     setBumpers()
@@ -349,13 +319,11 @@ export class BowlingArea extends Area
         this.bumpers.active = false
         this.bumpers.height = Math.abs(this.bumpers.mesh.position.y)
 
-        // Body
         this.bumpers.object.physical.body.collider(0).setRestitution(1)
         this.bumpers.object.physical.body.collider(0).setFriction(0)
         this.bumpers.object.physical.body.collider(1).setRestitution(1)
         this.bumpers.object.physical.body.collider(1).setFriction(0)
 
-        // Toggle
         this.bumpers.toggle = () =>
         {
             this.bumpers.active = !this.bumpers.active
@@ -382,7 +350,6 @@ export class BowlingArea extends Area
             this.game.player.sounds.suspensions.play()
         }
 
-        // Interactive point
         this.game.interactivePoints.create(
             this.references.items.get('bumpersInteractivePoint')[0].position,
             '범퍼',
@@ -411,7 +378,6 @@ export class BowlingArea extends Area
     {
         const count = 8
 
-        // Notes > Base position
         const positionsArray = new Float32Array(count * 3)
         for(let i = 0; i < count; i++)
         {
@@ -423,7 +389,6 @@ export class BowlingArea extends Area
 
         const positionAttribute = new THREE.InstancedBufferAttribute(positionsArray, 3)
 
-        // Notes > Material
         const progress = this.game.ticker.elapsedScaledUniform.mul(0.2).add(instanceIndex.toFloat().div(count)).fract().toVarying()
         const notesColor = uniform(color('#ff994d'))
         const notesStrength = uniform(3.5)
@@ -456,33 +421,25 @@ export class BowlingArea extends Area
 
         const material = new THREE.PointsNodeMaterial({
             outputNode: outputNode,
-            // outputNode: vec4(vec3(2), 1),
-            // opacityNode: float(0.2),
             positionNode: positionNode,
             rotationNode: rotationNode,
             scaleNode: scaleNode,
-            // sizeNode: float(0.5),
-            size: 1.5, // in pixels units
-            // vertexColors: true,
+            size: 1.5,
             sizeAttenuation: true,
             alphaToCoverage: true,
         })
 
-        // Notes > Mesh
         const points = new THREE.Sprite(material)
         points.count = count
         points.position.y = 1
         points.position.z = 0.5
         this.references.items.get('jukebox')[0].add(points)
-
-        // Debug
     }
 
     update()
     {
         let showRestartInteractivePoint = false
 
-        // Screen position
         const targetX = clamp(this.game.player.position.x, this.screen.min, this.screen.max)
         this.screen.x += (targetX - this.screen.x) * this.game.ticker.deltaScaled * 2
 
@@ -493,13 +450,11 @@ export class BowlingArea extends Area
         })
         this.screen.object.needsUpdate = true
 
-        // Screen strike label
         if(this.won)
             this.screen.labelStrike.visible = (this.game.ticker.elapsedScaled - this.wonTime) % 3 < 1.5
         else
             this.screen.labelStrike.visible = false
 
-        // Pins > Update
         this.pins.allSleeping = true
         let pinStateChanged = false
         for(const pin of this.pins.items)
@@ -508,7 +463,6 @@ export class BowlingArea extends Area
             pinUp.applyQuaternion(pin.group.quaternion)
             const isDown = pinUp.y < 0.5
 
-            // Wasn't down but is now down
             if(isDown && pin.isDown === false)
             {
                 pin.isDown = isDown
@@ -532,12 +486,10 @@ export class BowlingArea extends Area
                 pin.object.visual.object3D.needsUpdate = true
         }
 
-        // Pins > Texture update if needed and won event
         if(pinStateChanged)
         {
             this.dataTexture.needsUpdate = true
 
-            // Haven't won since reset
             if(!this.won)
             {
                 const allDown = this.pins.items.reduce((accumulator, pin) => accumulator && pin.isDown, true)
@@ -553,12 +505,10 @@ export class BowlingArea extends Area
                         this.game.world.confetti.pop(this.screen.group.position.clone().add(new THREE.Vector3(- 1, - 1, 0)))
                         this.game.world.confetti.pop(this.screen.group.position.clone().add(new THREE.Vector3(- 3.4, - 1, 0)))
                     }
-
                 }
             }
         }
 
-        // Pins > Update bounding at a fixed rate
         if(this.game.ticker.elapsed > this.pins.boundingUpdateTime + 0.2)
         {
             this.pins.boundingUpdateTime = this.game.ticker.elapsed
@@ -567,7 +517,6 @@ export class BowlingArea extends Area
                 this.pins.instancedGroup.updateBoundings()
         }
 
-        // Ball
         const ballIsSleeping = this.ball.body.isSleeping()
         if(ballIsSleeping !== this.ball.isSleeping)
         {
@@ -589,9 +538,7 @@ export class BowlingArea extends Area
             this.ball.speed = 0
         }
 
-        // Restart interactive point
         if(showRestartInteractivePoint && this.restartInteractivePoint.state === InteractivePoints.STATE_HIDDEN)
             this.restartInteractivePoint.show()
-
     }
 }

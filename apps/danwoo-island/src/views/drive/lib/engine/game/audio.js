@@ -36,7 +36,6 @@ export class Audio
         this.setAmbiants()
         this.setOneOffs()
 
-        // Play all autoplays that didn't start because not initated
         this.groups.forEach((group, name) =>
         {
             for(const item of group.items)
@@ -49,7 +48,6 @@ export class Audio
 
     register(options = {})
     {
-        // Group
         const groupName = options.group ?? 'all'
         let group = this.groups.get(groupName)
 
@@ -115,32 +113,26 @@ export class Audio
                 return
             }
 
-            // Load
             if(!item.loaded)
             {
                 item.loaded = true
                 item.howl.load()
             }
 
-            // Anti spam
             if(item.antiSpam)
             {
                 if(this.game.ticker.elapsed - item.lastPlay < item.antiSpam)
                     return
             }
 
-            // Play binding
             if(typeof item.onPlay === 'function')
                 item.onPlay(item, ...parameters)
-                
-            // Play
+
             item.howl.play()
 
-            // Save last play for anti spam
             item.lastPlay = this.game.ticker.elapsed
             item.playing = true
 
-            // Save for group
             group.lastPlayedId = item.id
         }
 
@@ -158,8 +150,7 @@ export class Audio
                 name: '바람 · danwoo0'
             },
         ]
-        this.playlist.index = (Math.floor(Date.now() / 1000 / 60 / 3) % this.playlist.songs.length) // Different music every X minutes
-        // this.playlist.index = -1 // Different music every X minutes
+        this.playlist.index = (Math.floor(Date.now() / 1000 / 60 / 3) % this.playlist.songs.length)
         this.playlist.current = null
         this.playlist.switching = false
 
@@ -188,15 +179,13 @@ export class Audio
 
             this.playlist.switching = true
 
-            // Disc change sound
             this.game.audio.groups.get('discChange').play()
 
-            // Old one
             if(this.playlist.current)
             {
                 this.playlist.current.sound.stop()
             }
-            
+
             gsap.delayedCall(3, () =>
             {
                 this.playlist.index++
@@ -204,7 +193,6 @@ export class Audio
                 if(this.playlist.index >= this.playlist.songs.length)
                     this.playlist.index = 0
 
-                // New one
                 this.playlist.current = this.playlist.songs[this.playlist.index]
 
                 if(!this.playlist.current.loaded)
@@ -214,7 +202,6 @@ export class Audio
 
                 this.playlist.current.sound.play()
 
-                // Notification
                 const content = createElement('div', 'top', [
                     createElement('div', 'title', [
                         '지금 흐르는 곡',
@@ -228,10 +215,8 @@ export class Audio
                     content,
                     'song',
                     5,
-                    // () => {
-                    // }
                 )
-                
+
                 this.playlist.switching = false
             })
         }
@@ -264,8 +249,7 @@ export class Audio
                 this.game.view.focusPoint.position.z + ((Math.random() < 0.5) ? distance : - distance)
             )
         }
-        
-        // Birds tweets
+
         {
             const tweetsPaths = [
                 'sounds/birdTweets/24074 small bird tweet calling-full-1.mp3',
@@ -295,23 +279,19 @@ export class Audio
                     })
                 )
 
-
             const tryPlay = () =>
             {
-                // Chance to trigger
                 if(!this.game.dayCycles.intervalEvents.get('night').inInterval && Math.random() < 0.5)
                 {
                     const sound = tweets[Math.floor(Math.random() * tweets.length)]
                     sound.play()
                 }
 
-                // Wait before trying again
                 gsap.delayedCall(0.5 + Math.random() * 5, tryPlay)
             }
             tryPlay()
         }
-        
-        // Owl
+
         {
             const sound = this.register({
                 group: 'owl',
@@ -330,19 +310,16 @@ export class Audio
 
             const tryPlay = () =>
             {
-                // Chance to trigger
                 if(this.game.dayCycles.intervalEvents.get('night').inInterval && Math.random() < 0.5)
                 {
                     sound.play()
                 }
 
-                // Wait before trying again
                 gsap.delayedCall(30 + Math.random() * 60, tryPlay)
             }
             gsap.delayedCall(30 + Math.random() * 60, tryPlay)
         }
 
-        // Rooster
         {
             const sound = this.register({
                 group: 'rooster',
@@ -352,7 +329,7 @@ export class Audio
                 volume: 0.1,
                 positions: new THREE.Vector3(),
                 onPlay: (item) =>
-                {   
+                {
                     item.volume = 0.1 + Math.random() * 0.2
                     item.positions[0].copy(getRandomDirection())
                 }
@@ -365,7 +342,6 @@ export class Audio
             })
         }
 
-        // Wolf
         {
             const sound = this.register({
                 group: 'wolf',
@@ -375,7 +351,7 @@ export class Audio
                 volume: 0.1,
                 positions: new THREE.Vector3(),
                 onPlay: (item) =>
-                {   
+                {
                     item.volume = 0.1 + Math.random() * 0.2
                     item.positions[0].copy(getRandomDirection())
                 }
@@ -388,7 +364,6 @@ export class Audio
             })
         }
 
-        // Crickets
         {
             const sound = this.register({
                 group: 'crickets',
@@ -404,7 +379,6 @@ export class Audio
             })
         }
 
-        // Jingle bells
         this.register({
             group: 'jingleBells',
             path: 'sounds/jingleBells/Mountain Audio - Christmas Bells.mp3',
@@ -421,7 +395,6 @@ export class Audio
             }
         })
 
-        // Rain
         this.register({
             group: 'rain',
             path: 'sounds/rain/soundjay_rain-on-leaves_main-01.mp3',
@@ -436,7 +409,6 @@ export class Audio
             }
         })
 
-        // Wind
         this.register({
             group: 'wind',
             path: 'sounds/wind/13582-wind-in-forest-loop.mp3',
@@ -449,7 +421,6 @@ export class Audio
             }
         })
 
-        // Waves
         this.register({
             group: 'waves',
             path: 'sounds/waves/lake-waves.mp3',
@@ -466,7 +437,6 @@ export class Audio
             }
         })
 
-        // Oven fire (Project Area + Cookie Area)
         {
             const positions = []
             if(this.game.world.areas?.cookie)
@@ -488,7 +458,6 @@ export class Audio
             }
         }
 
-        // Campfire (Lab Area + Bonfire Area)
         {
             const positions = []
             if(this.game.world.areas?.lab)
@@ -518,7 +487,7 @@ export class Audio
             loop: false,
             volume: 0.3,
         })
-        
+
         this.register({
             group: 'slide',
             path: 'sounds/mecanism/slide.mp3',
@@ -544,7 +513,6 @@ export class Audio
             volume: 0.3
         })
 
-        // Hits default
         {
             const paths = [
                 [ 'sounds/hits/defaults/Stone_Hit_Crash_106-2.mp3', 0.35 ],
@@ -577,7 +545,6 @@ export class Audio
             }
         }
 
-        // Hits bricks
         {
             const paths = [
                 [ 'sounds/hits/bricks/24445 brick light hitting-full-2.mp3', 0.6 ],
@@ -606,7 +573,6 @@ export class Audio
             }
         }
 
-        // Hits metal
         {
             const paths = [
                 [ 'sounds/hits/metal/EQUIPTact_Fire Gear_SDFIRE0411.mp3', 0.6 ],
@@ -653,7 +619,7 @@ export class Audio
         {
             if(this.mute.active)
                 return
-            
+
             Howler.mute(true)
             this.mute.active = true
             localStorage.setItem('soundToggle', '1')
@@ -665,7 +631,7 @@ export class Audio
         {
             if(!this.mute.active)
                 return
-            
+
             Howler.mute(false)
             this.mute.active = false
             localStorage.setItem('soundToggle', '0')
@@ -673,12 +639,10 @@ export class Audio
             this.events.trigger('muteChange', [ false ])
         }
 
-        // From local storage
         const soundToggleLocal = localStorage.getItem('soundToggle')
         if(soundToggleLocal !== null && soundToggleLocal === '1')
             this.mute.activate()
 
-        // Inputs keyboard
         this.game.inputs.addActions([
             { name: 'mute', categories: [ 'intro', 'modal', 'menu', 'racing', 'cinematic', 'wandering' ], keys: [ 'Keyboard.l' ] },
         ])
@@ -688,7 +652,6 @@ export class Audio
                 this.mute.toggle()
         })
 
-        // Tab focus / blur
         window.addEventListener('blur', () =>
         {
             Howler.mute(true)
@@ -707,7 +670,6 @@ export class Audio
                     this.playlist.current.sound.play()
             }
         })
-
     }
 
     update()
@@ -717,13 +679,11 @@ export class Audio
         {
             for(const item of group.items)
             {
-                // Apply tick binding
                 if(typeof item.onPlaying === 'function')
                 {
                     item.onPlaying(item)
                 }
 
-                // Positional and distance fade
                 let distanceFadeMultiplier = 1
                 if(item.positions && item.howl.playing())
                 {
@@ -755,10 +715,8 @@ export class Audio
                         item.howl.pos(cameraRelativePosition.x, cameraRelativePosition.y, cameraRelativePosition.z)
                 }
 
-                // Rate (apply global too)
                 item.howl.rate(clamp(item.rate * this.globalRate, 0.5, 4))
 
-                // Volume
                 const volume = item.volume * distanceFadeMultiplier
                 item.howl.volume(item.volume * distanceFadeMultiplier)
 

@@ -66,7 +66,6 @@ export class Map
             const respawn = this.game.respawns.getByName(item.respawnName)
             const mapPosition = this.worldToMap(respawn.position)
 
-            // HTML
             const element = createElement('div', 'location', [
                 createElement('div', 'pin'),
                 createElement('div', 'name-container', [ createElement('div', 'name', toLines(item.name)) ]),
@@ -135,7 +134,6 @@ export class Map
 
     setInputs()
     {
-        // Inputs keyboard
         this.game.inputs.addActions([
             { name: 'map', categories: [ 'modal', 'menu', 'wandering' ], keys: [ 'Keyboard.m', 'Keyboard.KeyM' ] },
         ])

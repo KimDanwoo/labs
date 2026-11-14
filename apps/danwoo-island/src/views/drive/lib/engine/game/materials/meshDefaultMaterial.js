@@ -12,12 +12,11 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
             distanceToCenter.greaterThan(game.reveal.distance).discard()
 
             const revealMix = distanceToCenter.step(game.reveal.distance.sub(game.reveal.thickness))
-            // const revealMix = game.reveal.distance.sub(distanceToCenter).oneMinus().max(0).pow(4)
             const revealColor = game.reveal.color.mul(game.reveal.intensity)
             return mix(outputColor.rgb, revealColor, revealMix)
         })(outputColor)
     }
-    
+
     constructor(parameters = {})
     {
         super()
@@ -44,41 +43,30 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
         this._shadowNode = parameters.shadowNode ?? float(0)
         this.alphaTest = parameters.alphaTest ?? 0.1
 
-        this.normalNode = this._normalNode // Get rid of warning
-        
-        /**
-         * Shadow catcher
-         * Catch shadow as a float and remove it from initial pipeline
-         */
+        this.normalNode = this._normalNode
+
         const catchedShadow = float(1).toVar()
 
         if(this.hasDropShadows)
         {
-            this.receivedShadowNode = Fn(([ shadow ]) => 
+            this.receivedShadowNode = Fn(([ shadow ]) =>
             {
                 catchedShadow.mulAssign(shadow.r)
                 return float(1)
             })
         }
 
-        /**
-         * Output node
-         */
         this.outputNode = Fn(() =>
         {
             const baseColor = this._colorNode.toVar()
             const outputColor = this._colorNode.toVar()
-            // outputColor.assign(vec3(0))
-            // outputColor.assign(vec3(0.8))
 
-            // Normal orientation
             const reorientedNormal = this._normalNode.toVar()
             if(this.side === THREE.DoubleSide || this.side === THREE.BackSide)
             {
                 If(frontFacing.not(), () => { reorientedNormal.mulAssign(-1) })
             }
 
-            // Light bounce
             if(this.hasLightBounce)
             {
                 const bounceOrientation = reorientedNormal.dot(vec3(0, - 1, 0)).smoothstep(this.game.lighting.lightBounceEdgeLow, this.game.lighting.lightBounceEdgeHigh)
@@ -88,7 +76,6 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
                 outputColor.assign(mix(outputColor, bounceColor, bounceOrientation.mul(bounceDistance).mul(this.game.lighting.lightBounceMultiplier)))
             }
 
-            // Water
             if(this.hasWater)
             {
                 const nearWaterSurface = positionWorld.y.sub(this.game.water.surfaceElevationUniform).abs().greaterThan(this.game.water.surfaceThicknessUniform)
@@ -96,40 +83,32 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
                 baseColor.assign(nearWaterSurface.select(baseColor, color('#ffffff')))
             }
 
-            // Light
             outputColor.mulAssign(this.game.lighting.colorUniform.mul(this.game.lighting.intensityUniform))
 
-            // Core shadow
             let coreShadowMix = float(0)
             if(this.hasCoreShadows)
                 coreShadowMix = reorientedNormal.dot(this.game.lighting.directionUniform).smoothstep(this.game.lighting.coreShadowEdgeHigh, this.game.lighting.coreShadowEdgeLow)
-            
-            // Cast shadow
+
             let dropShadowMix = float(0)
             if(this.hasDropShadows)
                 dropShadowMix = catchedShadow.oneMinus()
 
-            // Combined shadows
             if(this.hasCoreShadows || this.hasDropShadows)
             {
                 const combinedShadowMix = max(coreShadowMix, dropShadowMix, this._shadowNode).clamp(0, 1)
-                
+
                 const shadowColor = baseColor.rgb.mul(this.game.lighting.shadowColor).rgb
                 outputColor.assign(mix(outputColor, shadowColor, combinedShadowMix))
             }
-            
-            // Fog
+
             if(this.hasFog)
                 outputColor.assign(this.game.fog.strength.mix(outputColor, this.game.fog.color))
 
-            // Alpha test discard
             this._alphaNode.lessThan(this.alphaTest).discard()
 
-            // Reveal
             if(this.hasReveal)
                 outputColor.assign(MeshDefaultMaterial.revealDiscardNodeBuilder(this.game, outputColor))
 
-            // Output
             return vec4(outputColor, this._alphaNode)
         })()
     }

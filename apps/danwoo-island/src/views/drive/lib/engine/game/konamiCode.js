@@ -71,8 +71,5 @@ export class KonamiCode
         }
 
         this.activationCount++
-
-        // Achievement
-
     }
 }

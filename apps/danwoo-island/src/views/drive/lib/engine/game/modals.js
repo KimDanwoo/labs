@@ -8,7 +8,7 @@ export class Modals
     static OPENING = 2
     static CLOSED = 3
     static CLOSING = 4
-    
+
     constructor()
     {
         this.game = Game.getInstance()
@@ -22,7 +22,7 @@ export class Modals
         this.setClose()
         this.setItems()
         this.preopen()
-        
+
         this.element.addEventListener('transitionend', () =>
         {
             this.onTransitionEnded()
@@ -44,15 +44,13 @@ export class Modals
             this.current.events.trigger('closed')
             this.current.element.classList.remove('is-displayed')
             this.current = null
-            
-            // Pending => Open pending
+
             if(this.pending)
             {
                 this.open(this.pending)
                 this.pending = null
             }
 
-            // No pending => Fully hide
             else
             {
                 this.element.classList.remove('is-displayed')
@@ -63,9 +61,9 @@ export class Modals
     setItems()
     {
         const elements = this.element.querySelectorAll('.js-modal')
-        
+
         this.items = new Map()
-        
+
         for(const element of elements)
         {
             const name = element.dataset.name
@@ -118,7 +116,6 @@ export class Modals
         if(!item)
             return
 
-        // Already visible => Set pending
         if(this.state === Modals.OPEN || this.state === Modals.OPENING)
         {
             if(item === this.current)
@@ -127,15 +124,12 @@ export class Modals
             this.pending = name
             this.close()
         }
-        // Already closing => Set (or change) pending
         else if(this.state === Modals.CLOSING)
         {
             this.pending = name
         }
-        // Currently closed => Open immediately
         else if(this.state === Modals.CLOSED)
         {
-            // Sound
             const sound = this.game.audio.groups.get('click')
             if(sound)
                 sound.play(true)
@@ -149,11 +143,9 @@ export class Modals
                 {
                     this.element.classList.add('is-visible')
 
-                    // Tabs resize
                     if(item.tabs)
                         item.tabs.resize()
 
-                    // Focus
                     if(item.mainFocus)
                         item.mainFocus.focus()
                 })
@@ -175,7 +167,6 @@ export class Modals
         if(this.state === Modals.CLOSING || this.state === Modals.CLOSED)
             return
 
-        // Sound
         const sound = this.game.audio.groups.get('click')
         if(sound)
             sound.play(false)
@@ -190,13 +181,11 @@ export class Modals
 
     preopen()
     {
-
-        this.items.forEach((item) => 
+        this.items.forEach((item) =>
         {
-            // Is preopened
             if(typeof item.element.dataset.preopen !== 'undefined')
             {
-                this.open(item.name)               
+                this.open(item.name)
             }
         })
     }

@@ -48,7 +48,6 @@ export class ToiletArea extends Area
             if(cabinUp.y < 0.4)
             {
                 this.cabin.down = true
-
             }
         }
     }

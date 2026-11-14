@@ -113,5 +113,4 @@ export class TimeMachineArea extends Area
 
         screenMesh.material = material
     }
-
 }

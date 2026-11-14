@@ -30,14 +30,13 @@ export class Grass
             this.update()
         }, 10)
 
-        // Resize
         this.game.viewport.events.on('throttleChange', () =>
         {
             const halfExtent = this.game.view.optimalArea.radius
             this.size = halfExtent * 2
             this.surface = this.size * this.size
             this.surfaceOverflow = Math.max(0, this.surface - this.surfaceIdeal) / this.surfaceIdeal
-            
+
             this.sizeUniform.value = this.size
             this.bladeWidth.value = 0.1 * (1 + this.surfaceOverflow * 0.4)
             this.bladeHeight.value = 0.6 * (1 + this.surfaceOverflow * 0.4)
@@ -56,7 +55,7 @@ export class Grass
         for(let iX = 0; iX < this.subdivisions; iX++)
         {
             const fragmentX = (iX / this.subdivisions - 0.5) * this.size + this.fragmentSize * 0.5
-            
+
             for(let iZ = 0; iZ < this.subdivisions; iZ++)
             {
                 const fragmentZ = (iZ / this.subdivisions - 0.5) * this.size + this.fragmentSize * 0.5
@@ -65,7 +64,6 @@ export class Grass
                 const i3 = i * 3
                 const i6 = i * 6
 
-                // Center of the blade
                 const positionX = fragmentX + (Math.random() - 0.5) * this.fragmentSize
                 const positionZ = fragmentZ + (Math.random() - 0.5) * this.fragmentSize
 
@@ -78,13 +76,12 @@ export class Grass
                 position[i6 + 4] = positionX
                 position[i6 + 5] = positionZ
 
-                // Randomness
                 heightRandomness[i3    ] = Math.random()
                 heightRandomness[i3 + 1] = Math.random()
                 heightRandomness[i3 + 2] = Math.random()
             }
         }
-        
+
         this.geometry = new THREE.BufferGeometry()
         this.geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1)
         this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(position, 2))
@@ -94,7 +91,6 @@ export class Grass
     setMaterial()
     {
         this.center = uniform(new THREE.Vector2())
-        // this.tracksDelta = uniform(new THREE.Vector2())
 
         const vertexLoopIndex = varying(vertexIndex.toFloat().mod(3))
         const tipness = varying(step(vertexLoopIndex, 0.5))
@@ -108,27 +104,22 @@ export class Grass
 
         const bladeShape = uniformArray([
 
-                // Tip
                 0,
                 1,
 
-                // Left side
                 1,
                 0,
 
-                // Right side
                 - 1,
                 0,
         ])
 
         const hiddenThreshold = 0.1
-        // const terrainUv = this.game.terrain.worldPositionToUvNode(bladePosition)
         const terrainData = this.game.terrain.terrainNode(bladePosition)
         const clearing = GRASS_CLEARINGS.reduce((amount, { x, z, radius }) => amount.mul(bladePosition.sub(vec2(x, z)).length().smoothstep(radius * 0.8, radius)), float(1))
         const terrainDataGrass = terrainData.g.mul(clearing)
         const hidden = step(terrainData.g.sub(0.4), hiddenThreshold)
 
-        // Instance
         const tipnessShadowMix = tipness.oneMinus().mul(terrainDataGrass)
 
         this.material = new MeshDefaultMaterial({
@@ -141,7 +132,6 @@ export class Grass
 
         this.material.positionNode = Fn(() =>
         {
-            // Blade position
             const position = attribute('position')
 
             const loopPosition = position.sub(this.center)
@@ -153,38 +143,30 @@ export class Grass
             const worldPosition = modelWorldMatrix.mul(position3)
             bladePosition.assign(worldPosition.xz)
 
-            // Height
             const heightVariation = texture(this.game.noises.perlin, bladePosition.mul(0.0321)).r.add(0.5)
             const height = this.bladeHeight
                 .mul(this.bladeHeightRandomness.mul(attribute('heightRandomness')).add(this.bladeHeightRandomness.oneMinus()))
                 .mul(heightVariation)
                 .mul(terrainDataGrass)
 
-            // Shape
             const shape = vec3(
                 bladeShape.element(vertexLoopIndex.mod(3).mul(2)).mul(this.bladeWidth).mul(terrainDataGrass),
                 bladeShape.element(vertexLoopIndex.mod(3).mul(2).add(1)).mul(height),
                 0
             )
 
-            // Vertex positioning
             const vertexPosition = position3.add(shape)
 
-            // Vertex rotation
             const angleToCamera = atan(worldPosition.z.sub(cameraPosition.z), worldPosition.x.sub(cameraPosition.x)).add(- Math.PI * 0.5)
             vertexPosition.xz.assign(rotateUV(vertexPosition.xz, angleToCamera, worldPosition.xz))
 
-            // Wind
             wind.assign(this.game.wind.offsetNode(worldPosition.xz).mul(tipness).mul(height).mul(2))
             vertexPosition.addAssign(vec3(wind.x, 0, wind.y))
 
-            // Hide (far above)
             vertexPosition.y.addAssign(hidden.mul(100))
 
             return vertexPosition
         })()
-
-        // Debug
     }
 
     setMesh()
@@ -192,7 +174,6 @@ export class Grass
         this.mesh = new THREE.Mesh(this.geometry, this.material)
         this.mesh.frustumCulled = false
         this.mesh.receiveShadow = true
-        // this.mesh.visible = false
         this.game.scene.add(this.mesh)
     }
 

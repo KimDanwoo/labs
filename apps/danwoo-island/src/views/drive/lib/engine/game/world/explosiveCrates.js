@@ -10,18 +10,14 @@ export class ExplosiveCrates
     {
         this.game = Game.getInstance()
 
-        // Base and references
         const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.explosiveCratesModel.scene.children)
         this.references = references
 
-        // Setup base
         base.castShadow = true
         base.receiveShadow = true
 
-        // Update materials
         this.game.materials.updateObject(base)
 
-        // Create instanced group
         this.instancedGroup = new InstancedGroup(this.references, createCoconutCrate(this.game.materials))
 
         this.items = []
@@ -61,7 +57,6 @@ export class ExplosiveCrates
 
         this.setSounds()
 
-        // Tick update
         this.game.ticker.events.on('tick', () =>
         {
             for(const crate of this.items)
@@ -76,7 +71,6 @@ export class ExplosiveCrates
     {
         this.sounds = {}
 
-        // Click sound
         this.sounds.triggerClick = this.game.audio.register({
             path: 'sounds/clicks/Source Metal Clicks Delicate Light Sharp Clip Mid 07.mp3',
             autoplay: false,
@@ -132,19 +126,13 @@ export class ExplosiveCrates
 
         gsap.delayedCall(0.4, () =>
         {
-            // Sound
             this.sounds.explosions[Math.floor(Math.random() * this.sounds.explosions.length)].play(crate.reference.position)
 
-            // Explode
             this.game.world.fireballs.create(crate.object.physical.body.translation())
 
-            // Disable
             this.game.objects.disable(crate.object)
-            crate.object.visual.object3D.position.y += 100 // Hide the instance reference
+            crate.object.visual.object3D.position.y += 100
             crate.object.visual.object3D.needsUpdate = true
-
-            // Achievements
-
         })
     }
 
@@ -163,10 +151,8 @@ export class ExplosiveCrates
 
         this.instancedGroup.needsUpdate = true
 
-        // Disable every other object to prevent explosion trigger
         this.game.objects.list.forEach((object) =>
         {
-            // console.log(this.game.objects)
             if(
                 object.physical &&
                 (object.physical.type === 'dynamic' || object.physical.type === 'kinematicPositionBased') &&
@@ -175,15 +161,12 @@ export class ExplosiveCrates
             {
                 object.physical.body.setEnabled(false)
 
-                // Wait a second and reactivate
                 this.game.ticker.wait(1, () =>
                 {
                     object.physical.body.setEnabled(true)
 
-                    // Sleep
                     if(object.physical.initialState.sleeping)
                         object.physical.body.sleep()
-
                 })
             }
         })

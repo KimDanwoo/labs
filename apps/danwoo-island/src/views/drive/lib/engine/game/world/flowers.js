@@ -14,16 +14,12 @@ export class Flowers
     {
         this.game = Game.getInstance()
 
-        // Debug
-
-        // this.setOne()
         this.setClusters()
-        
+
         this.setGeometry()
         this.setMaterial()
         this.setInstancedMesh()
     }
-
 
     setOne()
     {
@@ -31,7 +27,7 @@ export class Flowers
         const object = new THREE.Object3D()
         object.position.set(0, 0.4, 4)
         object.scale.set(1, 1, 1)
-        
+
         object.updateMatrix()
 
         this.transformMatrices.push(object.matrix)
@@ -47,12 +43,10 @@ export class Flowers
             const clusterPosition = reference.position
 
             const clusterCount = 3 + Math.floor(rng() * 8)
-            // const clusterCount = 1
             for(let j = 0; j < clusterCount; j++)
             {
-                // Transform matrix
                 const object = new THREE.Object3D()
-                
+
                 object.rotation.y = Math.PI * 2 * rng()
 
                 object.position.set(
@@ -63,7 +57,7 @@ export class Flowers
 
                 const scale = 0.6 + rng() * 0.4
                 object.scale.setScalar(scale)
-                
+
                 object.updateMatrix()
 
                 this.transformMatrices.push(object.matrix)
@@ -81,7 +75,6 @@ export class Flowers
         {
             const plane = new THREE.PlaneGeometry(0.08, 0.08)
 
-            // Position
             const spherical = new THREE.Spherical(
                 1,
                 Math.PI * 0.2 * rng(),
@@ -90,24 +83,20 @@ export class Flowers
             const direction = new THREE.Vector3().setFromSpherical(spherical)
             const position = direction.clone().setLength(1 + (rng() - 0.5) * 0.5)
             position.y -= 0.75
-            
+
             const matrix = new THREE.Matrix4()
             matrix.lookAt(direction, new THREE.Vector3(), new THREE.Vector3(0, 1, 0))
             matrix.setPosition(position)
             matrix.scale(new THREE.Vector3(1, 1, 1).setScalar(1 + (Math.random() - 0.5)))
-            
+
             plane.applyMatrix4(matrix)
 
-            // Save
             planes.push(plane)
         }
 
-        // Merge all planes
         this.geometry = mergeGeometries(planes)
 
-        // Remove unsused attributes
         this.geometry.deleteAttribute('uv')
-    
     }
 
     setMaterial()
@@ -119,12 +108,10 @@ export class Flowers
             colorNode: baseColor,
             hasWater: false
         })
-    
-        // Received shadow position
+
         const shadowOffset = uniform(0.25)
         this.material.receivedShadowPositionNode = positionLocal.add(this.game.lighting.directionUniform.mul(shadowOffset))
 
-        // Position
         const wind = this.game.wind.offsetNode(positionLocal.xz)
         const multiplier = positionLocal.y.clamp(0, 1).mul(1)
 
@@ -134,14 +121,11 @@ export class Flowers
 
             return positionLocal.add(vec3(wind.x, 0, wind.y).mul(multiplier))
         })()
-
-        // Debug
     }
 
     setInstancedMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
-        // this.mesh.position.y = - 0.5
         this.mesh.castShadow = true
         this.mesh.receiveShadow = true
         this.mesh.count = this.transformMatrices.length
@@ -151,12 +135,9 @@ export class Flowers
         this.instanceMatrix = new THREE.InstancedBufferAttribute(new Float32Array(this.mesh.count * 16), 16)
         this.instanceMatrix.setUsage(THREE.StaticDrawUsage)
 
-        // this.instanceMatrix = new THREE.InstancedBufferAttribute(new Float32Array(this.mesh.count * 3), 16)
-        // this.instanceMatrix.setUsage(THREE.StaticDrawUsage)
-
         this.instanceColorIndex = new THREE.InstancedBufferAttribute(new Float32Array(this.colorIndices), 1)
         this.instanceColorIndex.setUsage(THREE.StaticDrawUsage)
-        
+
         let i = 0
         for(const _transformMatrix of this.transformMatrices)
         {

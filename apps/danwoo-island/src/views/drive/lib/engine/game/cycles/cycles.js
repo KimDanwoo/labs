@@ -11,7 +11,6 @@ export class Cycles
     {
         this.game = Game.getInstance()
 
-
         this.name = name
         this.duration = duration
         this.absoluteProgress = forcedProgress !== null ? forcedProgress : (Date.now() / 1000 / this.duration)
@@ -24,7 +23,6 @@ export class Cycles
         this.intervalEvents = new Map()
         this.events = new Events()
 
-        // Debug
         this.newAbsoluteProgressBinding = autoBinding(this, 'newAbsoluteProgress', () =>
             {
                 return forcedProgress !== null ? forcedProgress : ((new Date()).getTime() / 1000 / this.duration)
@@ -95,7 +93,6 @@ export class Cycles
             }
         }
 
-        // Add fake steps to fix non 0-1 stops
         const firstStep = steps[0]
         const lastStep = steps[steps.length - 1]
 
@@ -120,15 +117,12 @@ export class Cycles
 
     update(firstFrame = false)
     {
-        // New absolute progress
         this.newAbsoluteProgressBinding.update()
-        this.progressDelta = this.newAbsoluteProgress - this.absoluteProgress // Delta
+        this.progressDelta = this.newAbsoluteProgress - this.absoluteProgress
         this.absoluteProgress = this.newAbsoluteProgress
 
-        // New progress
         const newProgress = this.absoluteProgress % 1
 
-        // Test punctual events
         this.punctualEvents.forEach((punctualEvent) =>
         {
             if(newProgress >= punctualEvent.progress && this.progress < punctualEvent.progress)
@@ -143,7 +137,6 @@ export class Cycles
             }
         })
 
-        // Test interval events
         this.intervalEvents.forEach((intervalEvent) =>
         {
             const inInterval = newProgress > intervalEvent.startProgress && newProgress < intervalEvent.endProgress
@@ -172,17 +165,13 @@ export class Cycles
             }
         })
 
-        // Progress
         this.progress = newProgress % 1
 
-        // Progress override
         if(this.override.strength > 0 && this.override.progress !== null)
             this.progress = lerp(this.progress, this.override.progress, this.override.strength)
 
-        // Properties
         for(const keyframe of this.keyframesList)
         {
-            // Indices
             let indexPrev = -1
             let index = 0
 
@@ -196,18 +185,12 @@ export class Cycles
 
             const indexNext = (indexPrev + 1) % keyframe.steps.length
 
-            // Steps
             const stepPrevious = keyframe.steps[indexPrev]
             const stepNext = keyframe.steps[indexNext]
 
-            // Mix ratio
             let mixRatio = 0
-            // if(keyframe.interpolation === 'linear')
-            //     mixRatio = remap(this.progress, stepPrevious.stop, stepNext.stop, 0, 1)
-            // else if(keyframe.interpolation === 'smoothstep')
                 mixRatio = smoothstep(this.progress, stepPrevious.stop, stepNext.stop)
 
-            // Interpolate properties
             for(const key in this.properties)
             {
                 const property = this.properties[key]
@@ -233,10 +216,9 @@ export class Cycles
         this.override = {}
         this.override.strength = 0
         this.override.progress = null
-        
+
         this.override.start = (values = {}, duration = 5) =>
         {
-            // Properties
             for(const propertyKey in this.properties)
             {
                 const property = this.properties[propertyKey]
@@ -247,11 +229,9 @@ export class Cycles
                     property.overrideValue = null
             }
 
-            // Progress
             if(typeof values.progress !== 'undefined')
                 this.override.progress = values.progress
 
-            // Transition
             if(duration === 0)
                 this.override.strength = 1
             else
@@ -260,7 +240,6 @@ export class Cycles
 
         this.override.end = (duration = 5) =>
         {
-            // Transition
             if(duration === 0)
                 this.override.strength = 0
             else

@@ -27,7 +27,6 @@ export class Trails
     {
         this.game = Game.getInstance()
 
-        
         this.subdivisions = 32
         this.texel = 1 / this.subdivisions
         this.distanceThrottle = 0.4
@@ -37,12 +36,11 @@ export class Trails
         this.items = []
 
         this.setGeometry()
-        
+
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
         }, 10)
-
     }
 
     setGeometry()
@@ -51,7 +49,7 @@ export class Trails
         this.geometry.rotateY(Math.PI * 0.25)
         this.geometry.rotateX(- Math.PI * 0.5)
         this.geometry.translate(0, 0, 0.5)
-        
+
         this.geometry.deleteAttribute('uv')
     }
 
@@ -77,30 +75,23 @@ export class Trails
 
         material.positionNode = Fn(() =>
         {
-            // Ratio
             ratio.assign(positionGeometry.z.oneMinus())
 
-            // Trail data
             const trailData = texture(item.dataTexture, vec2(ratio, 0.5))
             const trailPosition = trailData.xyz
 
-            // Direction
             const nextPosition = texture(item.dataTexture, vec2(ratio.add(this.texel), 0.5)).xyz
             const direction = nextPosition.sub(trailPosition).normalize()
 
-            // Rotation matrix
             const rotationMatrix = getRotationMatrix(direction, vec3(0, 0, -1))
 
-            // Rotated position
             const basePosition = vec3(positionGeometry.x, positionGeometry.y, 0)
             const rotatedPoint = rotationMatrix.mul(basePosition)
 
-            // Normal
             customNormal.assign(modelViewMatrix.mul(vec4(rotationMatrix.mul(attribute('normal')), 0)))
 
-            // Alpha
             alpha.assign(trailData.w)
-            
+
             return trailPosition.add(rotatedPoint)
         })()
 
@@ -113,7 +104,7 @@ export class Trails
                 ratio.oneMinus().sub(fresnel.oneMinus().mul(this.fresnelOffset))
             )
             const baseColor = texture(this.game.materials.gradientTexture, gradientUv).rgb.mul(this.emissiveMultiplier)
-            
+
             return vec4(vec3(baseColor), ratio.oneMinus().mul(alpha))
         })()
         item.mesh = new THREE.Mesh(this.geometry, material)
@@ -122,7 +113,7 @@ export class Trails
         this.game.scene.add(item.mesh)
 
         this.items.push(item)
-        
+
         return item
     }
 
@@ -132,13 +123,11 @@ export class Trails
         {
             const data = item.dataTexture.source.data.data
 
-            // Throttle by distance
             const positionDelta = item.lastPosition.clone().sub(item.position)
             const distance = positionDelta.length()
-            
+
             if(distance > this.distanceThrottle)
             {
-                // Move data one "pixel"
                 for(let i = this.subdivisions - 1; i >= 0; i--)
                 {
                     const i4 = i * 4
@@ -148,18 +137,15 @@ export class Trails
                     data[i4 + 3] = data[i4 - 1]
                 }
 
-                // Save time and position
                 item.lastPosition.copy(item.position)
             }
 
-            // Fade out
             for(let i = this.subdivisions - 1; i >= 0; i--)
             {
                 const i4 = i * 4
                 data[i4 + 3] = Math.max(data[i4 + 3] - this.game.ticker.deltaScaled * this.decay, 0)
             }
 
-            // Draw new position
             data[0] = item.position.x
             data[1] = item.position.y
             data[2] = item.position.z

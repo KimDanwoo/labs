@@ -23,7 +23,7 @@ export class Area
         {
             if(this.frustum)
                 this.frustum.test()
-                
+
             if(typeof this.update === 'function' && (!this.frustum || this.frustum.isIn))
                 this.update()
         }, 10)
@@ -42,7 +42,6 @@ export class Area
                 const object = this.game.objects.addFromModel(
                     child,
                     {
-
                     },
                     {
                         position: child.position.add(this.model.position),
@@ -55,14 +54,13 @@ export class Area
                 this.objects.items.push(object)
 
                 if(
-                    object.visual && // Has visual
-                    (!object.physical || object.physical?.type === 'fixed') && // Doesn't have physical or is fixed
+                    object.visual &&
+                    (!object.physical || object.physical?.type === 'fixed') &&
                     typeof child.userData.preventFrustum === 'undefined' || child.userData.preventFrustum === false
                 )
                 {
                     this.objects.hideable.push(object.visual.object3D)
                 }
-
             }
 
             this.references.parse(child)
@@ -77,7 +75,7 @@ export class Area
             return
 
         zoneReference = zoneReference[0]
-        
+
         const position = zoneReference.position.clone()
         const radius = zoneReference.scale.x
         const zone = this.game.zones.create('cylinder', position, radius)
@@ -117,21 +115,6 @@ export class Area
         this.frustum.isIn = null
         this.frustum.alwaysVisible = false
 
-        // // Helper
-        // const helperColor = new THREE.Color('orange').multiplyScalar(4)
-        // const helper = new THREE.Mesh(
-        //     new THREE.TorusGeometry(zoneReference[0].scale.x, 0.1, 16, 64),
-        //     new THREE.MeshBasicNodeMaterial({ color: helperColor })
-        // )
-        // helper.rotation.x = Math.PI * 0.5
-        // helper.position.set(
-        //     zoneReference[0].position.x,
-        //     0.5,
-        //     zoneReference[0].position.z
-        // )
-        // this.game.scene.add(helper)
-
-        
         this.frustum.test = () =>
         {
             const isVisible = this.frustum.alwaysVisible || circleIntersectsPolygon(

@@ -10,7 +10,6 @@ const CAREER_PAINT = {
 
 const AWARDS_TABLE = ['table002', 'cube024', 'refel003', 'medal', 'refDistinctions']
 
-
 const STEPPING_STONES = ['slabes', 'Cube001', 'Cube002']
 
 const SCREEN_STAND = {

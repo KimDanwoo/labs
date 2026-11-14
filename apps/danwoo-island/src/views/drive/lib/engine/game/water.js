@@ -12,7 +12,5 @@ export class Water
 
         this.surfaceElevationUniform = uniform(this.surfaceElevation)
         this.surfaceThicknessUniform = uniform(0.013)
-
-        // Debug
     }
 }

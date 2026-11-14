@@ -30,19 +30,12 @@ THREE.Object3D.prototype.copy = function( source, recursive = true )
 
     this.animations = source.animations.slice();
 
-    // this.userData = JSON.parse( JSON.stringify( source.userData ) );
-
     if ( recursive === true ) {
-
         for ( let i = 0; i < source.children.length; i ++ ) {
-
             const child = source.children[ i ];
             this.add( child.clone() );
-
         }
-
     }
 
     return this;
-
 }

@@ -8,13 +8,11 @@ export class PreRenderer
     {
         const game = Game.getInstance()
 
-        // Setup
         const renderTarget = new CubeRenderTarget(32)
-        
+
         const cubeCamera = new THREE.CubeCamera(1, 100000, renderTarget)
         game.scene.add(cubeCamera)
 
-        // Make all visible
         const invisibles = []
         game.scene.traverse((child) =>
         {
@@ -25,10 +23,8 @@ export class PreRenderer
             }
         })
 
-        // Force render
         cubeCamera.update(game.rendering.renderer, game.scene)
 
-        // The warm-up camera and target are temporary; retain no GPU allocation after use.
         for(const child of invisibles)
             child.visible = false
         cubeCamera.removeFromParent()

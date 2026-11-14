@@ -48,14 +48,12 @@ export class AchievementsArea extends Area
         const waterColorA = uniform(color(this.game.terrain.colors[1].value))
         const waterColorB = uniform(color(this.game.terrain.colors[2].value))
 
-        // Still color and foam
         {
             const colorNode = Fn(() =>
             {
                 const baseUv = uv().toVar()
                 const baseColor = color()
 
-                // Water color
                 {
                     const xMix = baseUv.x.sub(0.5).mul(2).abs().pow3().max(0)
 
@@ -63,7 +61,6 @@ export class AchievementsArea extends Area
                     baseColor.assign(waterColor)
                 }
 
-                // Foam
                 {
                     const newUv = baseUv.toVar()
                     newUv.x.assign(newUv.x.sub(0.5).abs().mul(2))
@@ -89,17 +86,14 @@ export class AchievementsArea extends Area
                 hasReveal: false
             })
             const mesh = this.references.items.get('waterfallStill')[0]
-            // mesh.visible = false
             mesh.material = material
         }
 
-        // Drop foam
         {
             const colorNode = Fn(() =>
             {
                 const baseUv = uv().toVar()
 
-                // Foam
                 {
                     const uv3 = baseUv.sub(vec2(0, this.game.ticker.elapsedScaledUniform.mul(0.11))).mul(vec2(0.7, 0.6))
                     const noise3 = texture(this.game.noises.voronoi, uv3).r
@@ -121,11 +115,9 @@ export class AchievementsArea extends Area
                 hasReveal: false
             })
             const mesh = this.references.items.get('waterfallDrop')[0]
-            // mesh.visible = false
             mesh.material = material
         }
 
-        // Particles
         {
             const reference = this.references.items.get('waterfallParticles')[0]
             reference.removeFromParent()
@@ -167,7 +159,6 @@ export class AchievementsArea extends Area
                 hasWater: false,
                 hasReveal: false,
                 alphaTest: 0.1,
-
             })
 
             material.positionNode = Fn(() =>

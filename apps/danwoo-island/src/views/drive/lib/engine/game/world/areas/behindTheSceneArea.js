@@ -17,8 +17,6 @@ export class BehindTheSceneArea extends Area
     {
         super(model)
 
-        // Debug
-
         this.center = this.references.items.get('center')[0].position
 
         this.setSounds()
@@ -41,10 +39,8 @@ export class BehindTheSceneArea extends Area
 
     setSlabs()
     {
-        // Geometry
         const geometry = new PortalSlabsGeometry(1.5, 6)
 
-        // Material
         const material = new THREE.MeshBasicMaterial({ wireframe: false })
         const effectVarying = varying(float())
         this.vehicleRelativePosition = uniform(vec2())
@@ -64,18 +60,17 @@ export class BehindTheSceneArea extends Area
 
             const distanceToVehicle = center.sub(this.vehicleRelativePosition).length()
 
-            const effect = distanceToCenter.remap(0, 3.5, 3, 0).toVar()// Slab distance to center
-            effect.addAssign(osciliation) // Permanent osciliation
-            effect.assign(effect.clamp(0, 1)) // Clamp
-            effect.addAssign(distanceToVehicle.remapClamp(2, 4, -1, 0)) // Vehicle distance
-            effectVarying.assign(effect) // Assign to varying BEFORE applying edge
-            effect.mulAssign(edge) // Only on edges
+            const effect = distanceToCenter.remap(0, 3.5, 3, 0).toVar()
+            effect.addAssign(osciliation)
+            effect.assign(effect.clamp(0, 1))
+            effect.addAssign(distanceToVehicle.remapClamp(2, 4, -1, 0))
+            effectVarying.assign(effect)
+            effect.mulAssign(edge)
 
             const toCenter = newPosition.xz.sub(center)
             toCenter.mulAssign(effect)
             newPosition.xz.subAssign(toCenter)
 
-            // return positionGeometry
             return newPosition
         })()
 
@@ -90,14 +85,11 @@ export class BehindTheSceneArea extends Area
             return vec4(this.chalkColor.mul(this.chalkIntensity), 1)
         })()
 
-        // Mesh
         this.slabs = new THREE.Mesh(geometry, material)
         this.slabs.position.copy(this.center)
         this.slabs.position.y += 0.01
         this.game.scene.add(this.slabs)
         this.objects.hideable.push(this.slabs)
-
-        // Debug
     }
 
     update()

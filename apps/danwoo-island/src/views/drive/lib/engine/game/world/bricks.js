@@ -8,17 +8,14 @@ export class Bricks
     {
         this.game = Game.getInstance()
 
-        // Base and references
         const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.bricksModel.scene.children)
 
         base.castShadow = true
         base.receiveShadow = true
         base.frustumCulled = false
 
-        // Update materials 
         this.game.materials.updateObject(base)
-        
-        // Objects
+
         this.objects = []
         for(const reference of references)
         {
@@ -50,10 +47,8 @@ export class Bricks
             )
         }
 
-        // Instanced group
         this.instancedGroup = new InstancedGroup(references, createFieldstone(this.game.materials))
 
-        // Tick update
         this.game.ticker.events.on('tick', () =>
         {
             for(const object of this.objects)

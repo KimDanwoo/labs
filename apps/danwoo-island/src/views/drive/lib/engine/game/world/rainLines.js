@@ -18,21 +18,16 @@ export class RainLines
         this.setMaterial()
         this.setMesh()
 
-        // Tick
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
         }, 10)
 
-        // Resize
         this.game.viewport.events.on('throttleChange', () =>
         {
             this.size.value = this.game.view.optimalArea.radius * 2
         }, 2)
 
-        // Debug
-
-        // Binding
         this.visibleRatioBinding = autoBinding(this.visibleRatio, 'value', () =>
             {
                 return Math.pow(this.game.weather.rain.value, 2)
@@ -80,14 +75,12 @@ export class RainLines
 
             for(let vertexIndex = 0; vertexIndex < 4; vertexIndex++)
             {
-                // Position
                 const positionIndex = (lineIndex * 4 + vertexIndex) * 3
 
                 positionArray[positionIndex + 0] = x
                 positionArray[positionIndex + 1] = y
                 positionArray[positionIndex + 2] = z
 
-                // Offset
                 const offsetIndex = (lineIndex * 4 + vertexIndex) * 2
                 offsetArray[offsetIndex + 0] = 0
                 offsetArray[offsetIndex + 1] = 0
@@ -98,11 +91,9 @@ export class RainLines
                 if(vertexIndex === 0 || vertexIndex === 3)
                     offsetArray[offsetIndex + 1] = 1
 
-                // Random
                 randomArray[lineIndex * 4 + vertexIndex] = random
             }
 
-            // Index
             indexArray[lineIndex * 6 + 0] = lineIndex * 4 + 0
             indexArray[lineIndex * 6 + 1] = lineIndex * 4 + 3
             indexArray[lineIndex * 6 + 2] = lineIndex * 4 + 2
@@ -117,13 +108,11 @@ export class RainLines
         this.geometry.setAttribute('offset', new THREE.Float32BufferAttribute(offsetArray, 2))
         this.geometry.setAttribute('random', new THREE.Float32BufferAttribute(randomArray, 1))
         this.geometry.index = new THREE.Uint16BufferAttribute(indexArray, 1)
-
     }
 
     setMaterial()
     {
         this.material = new MeshDefaultMaterial({
-            // side: THREE.BackSide,
             normalNode: vec3(0, 1, 0),
             transparent: true,
             wireframe: false,
@@ -151,7 +140,6 @@ export class RainLines
             const random = attribute('random')
             const tangent = vec2(0.707, -0.707)
 
-            // Loop
             newPosition.xz.mulAssign(this.size)
             newPosition.xz.subAssign(this.center)
             const halfSize = this.size.mul(0.5)
@@ -159,21 +147,17 @@ export class RainLines
             newPosition.z.assign(mod(newPosition.z.add(halfSize), this.size).sub(halfSize))
             newPosition.xz.addAssign(this.center)
 
-            // Thickness
             newPosition.xz.addAssign(tangent.mul(offset.x.mul(this.thickness)))
 
-            // Elevation
             const progress = this.localTime.add(random).mod(1)
-            newPosition.y.assign(this.elevation.add(this.length)) // Move to the top + length
-            newPosition.y.subAssign(this.length.mul(offset.y.oneMinus())) // Offset the bottom part
-            newPosition.y.subAssign(progress.mul(this.elevation.add(this.length))) // Move down with progress
-            newPosition.y.assign(newPosition.y.clamp(0, this.elevation)) // Clamp between top and bottom
+            newPosition.y.assign(this.elevation.add(this.length))
+            newPosition.y.subAssign(this.length.mul(offset.y.oneMinus()))
+            newPosition.y.subAssign(progress.mul(this.elevation.add(this.length)))
+            newPosition.y.assign(newPosition.y.clamp(0, this.elevation))
 
-            // Visible ratio
             const visible = step(this.visibleRatio, fract(random.mul(99)))
             newPosition.y.addAssign(visible.mul(99))
 
-            // Incline
             newPosition.xz.addAssign(tangent.mul(newPosition.y.mul(this.incline).mul(-1)))
 
             return newPosition
@@ -191,7 +175,6 @@ export class RainLines
 
     update()
     {
-        // Apply weather
         this.visibleRatioBinding.update()
         this.lengthRatioBinding.update()
         this.speedRatioBinding.update()
@@ -203,17 +186,6 @@ export class RainLines
         {
             this.center.value.set(this.game.view.optimalArea.position.x, this.game.view.optimalArea.position.z)
             this.localTime.value += this.game.ticker.deltaScaled * this.speed
-
         }
-
-        // if(!this.mesh.visible)
-        //     return
-
-        // const optimalAreaPosition = this.game.view.optimalArea.position
-        // const cameraPosition = this.game.view.defaultCamera.position
-        // const focusPoint = optimalAreaPosition.clone().lerp(cameraPosition, 0.5)
-        // this.focusPoint.value.set(focusPoint.x, focusPoint.z)
-
-        // this.game.rendering.renderer.computeAsync(this.updateCompute)
     }
 }

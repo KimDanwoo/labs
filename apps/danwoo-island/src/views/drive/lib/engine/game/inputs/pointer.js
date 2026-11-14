@@ -33,7 +33,7 @@ export class Pointer
             _event.preventDefault()
 
             this.mode = Pointer.MODE_MOUSE
-            
+
             this.upcoming.x = _event.clientX
             this.upcoming.y = _event.clientY
         })
@@ -61,12 +61,9 @@ export class Pointer
 
         this.element.addEventListener('touchmove', (_event) =>
         {
-            // _event.preventDefault()
-
             this.mode = Pointer.MODE_TOUCH
             this.upcomingTouches = [ ..._event.touches ]
-            
-            // Calculate average
+
             let x = 0
             let y = 0
 
@@ -84,13 +81,10 @@ export class Pointer
 
         this.element.addEventListener('touchstart', (_event) =>
         {
-            // _event.preventDefault()
-
             this.mode = Pointer.MODE_TOUCH
             this.upcomingDown = true
             this.upcomingTouches = [ ..._event.touches ]
 
-            // Calculate average
             let x = 0
             let y = 0
 
@@ -126,14 +120,12 @@ export class Pointer
 
     update()
     {
-        // Update from upcoming
         this.delta.x = this.upcoming.x - this.current.x
         this.delta.y = this.upcoming.y - this.current.y
 
         this.current.x = this.upcoming.x
         this.current.y = this.upcoming.y
 
-        // Pinch from upcoming touches
         if(this.upcomingTouches.length >= 2)
         {
             let maxDistance = 0
@@ -158,7 +150,7 @@ export class Pointer
                 this.pinch.distanceDelta = 0
                 this.pinch.baseDistance = this.pinch.distance
             }
-        
+
             const pinchRatio = this.pinch.distance / this.pinch.baseDistance
 
             if(pinchRatio !== this.pinch.ratio)
@@ -177,9 +169,8 @@ export class Pointer
 
         this.touches = [ ...this.upcomingTouches ]
 
-        // Define what has changed and trigger events
         this.hasMoved = this.delta.x !== 0 || this.delta.y !== 0
-        
+
         if(this.upcomingDown !== this.isDown)
         {
             this.isDown = this.upcomingDown

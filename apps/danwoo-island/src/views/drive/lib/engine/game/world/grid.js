@@ -12,7 +12,6 @@ export class Grid
     {
         this.game = Game.getInstance()
 
-
         this.setVisual()
     }
 
@@ -25,8 +24,6 @@ export class Grid
         }
 
         const lines = [
-            // new MeshGridMaterialLine(0x705df2, 1, 0.03, 0.2),
-            // new MeshGridMaterialLine(0xffffff, 10, 0.003, 1),
             new MeshGridMaterialLine('#8d55ff', 10, 0.02, 0.2),
             new MeshGridMaterialLine('#675369', 100, 0.002, 1),
         ]
@@ -35,7 +32,7 @@ export class Grid
             color: 0x1b191f,
             scale: 0.001,
             antialiased: true,
-            reference: 'uv', // uv | world
+            reference: 'uv',
             side: THREE.DoubleSide,
             lines
         })
@@ -46,7 +43,7 @@ export class Grid
             hasReveal: false,
             hasLightBounce: false
         })
-        
+
         uvGridMaterial.outputNode = Fn(() =>
         {
             const distanceToCenter = positionWorld.xz.sub(this.game.reveal.position2Uniform).length()
@@ -56,8 +53,6 @@ export class Grid
         })()
 
         this.addPlane(uvGridMaterial)
-
-        // Debug
     }
 
     addPlane(material)

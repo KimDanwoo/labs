@@ -6,24 +6,17 @@ export class Gamepad
     constructor()
     {
         this.events = new Events()
-        
+
         this.setMappings()
         this.setType()
         this.setButtons()
         this.setJoysticks()
     }
 
-    /**
-     * Actions:
-     * - buttonRaw: Take the value directly from the buttons at specified index
-     * - axesToCircle: Convert two axes at specified indexes to circle coordinates
-     * - axisToArrow: Convert axes at specified index according to specified angles
-     * - axisToTrigger: Convert axis at specified index to button with value from 0 to 1
-     */
     setMappings()
     {
         this.mappings = {}
-        
+
         this.mappings.list = {}
         this.mappings.list.standard = [
             { name: 'cross',    type: 'button', action: 'buttonRaw', index: 0 },
@@ -107,18 +100,15 @@ export class Gamepad
 
         this.mappings.parseGamepad = (gamepad) =>
         {
-            // Find mapping
             const mappingName = this.mappings.getNameForGamepad(gamepad)
             const mapping = this.mappings.list[mappingName]
 
-            // Data
             const data = {}
             data.buttons = {}
             data.joysticks = {}
 
             for(const map of mapping)
             {
-                // Buttons
                 if(map.type === 'button')
                 {
                     const button = { name: map.name, value: 0 }
@@ -154,7 +144,7 @@ export class Gamepad
                                 if(Math.abs(angle - arrowAngle) < 0.1)
                                     isInAngles = true
                             }
-                            
+
                             if(isInAngles)
                                 button.value = 1
                         }
@@ -163,7 +153,6 @@ export class Gamepad
                     button.pressed = button.value > buttonPressedZone
                 }
 
-                // Joysticks
                 if(map.type === 'joystick')
                 {
                     const joystick = {
@@ -240,7 +229,6 @@ export class Gamepad
 
     update()
     {
-        // Get the last non-null gamepad from navigator.getGamepads
         let gamepad = null
         for(const _gamepad of navigator.getGamepads())
         {
@@ -248,16 +236,11 @@ export class Gamepad
                 gamepad = _gamepad
         }
 
-        // Didn't find gamepad
         if(gamepad === null)
             return
 
-        // Parse gamepad data
         const gamepadData = this.mappings.parseGamepad(gamepad)
 
-        /**
-         * Buttons
-         */
         for(const buttonName in this.buttons)
         {
             const savedButton = this.buttons[ buttonName ]
@@ -283,9 +266,6 @@ export class Gamepad
                 this.events.trigger('change', [ savedButton ])
         }
 
-        /**
-         * Joysticks
-         */
         for(const joystickName in this.joysticks)
         {
             const savedJoystick = this.joysticks[ joystickName ]
@@ -294,11 +274,8 @@ export class Gamepad
             Object.assign(savedJoystick, newJoystick)
         }
 
-        /**
-         * Type
-         */
         let type = 'default'
-        
+
         if(/xbox/i.test(gamepad.id))
             type = 'xbox'
         else if(/playstation|dualshock|dualsense|ps\d/i.test(gamepad.id))
@@ -315,123 +292,3 @@ export class Gamepad
     }
 }
 
-/*
-    https://w3c.github.io/gamepad/#remapping
-    PS5
-        Firefox on Windows
-            Mapping
-                ""
-            Axes
-                0: Left joystick H [-1, +1]
-                1: Left joystick V [-1, +1]
-                2: Right joystick H [-1, +1]
-                3: L2 [-1, +1]
-                4: L2 [-1, +1]
-                5: Right joystick V [-1, +1]
-                6: ???
-                7: ???
-                8: ???
-                9: Arrows (-1, 1.2857, -0.4286, 0.7142, 0.1429)
-            Buttons
-                0: square
-                1: cross
-                2: circle
-                3: triangle
-                4: l1
-                5: r1
-                6: l2
-                7: r2
-                8: select
-                9: start
-                10: l3
-                11: r3
-                12: home
-                13: pad
-                14: microphone
-                15: ???
-
-        Firefox on MacOS
-            Mapping
-                ""
-            Axes
-                0: Left joystick H [-1, +1]
-                1: Left joystick V [-1, +1]
-                2: Right joystick H [-1, +1]
-                3: Right joystick V [-1, +1]
-                4: L2 [-1, +1]
-                5: R2 [-1, +1]
-                6: Arrows (-1, 1.2857, -0.4286, 0.7142, 0.1429)
-            Buttons
-                0: square
-                1: cross
-                2: circle
-                3: triangle
-                4: l1
-                5: r1
-                6: l2
-                7: r2
-                8: select
-                9: start
-                10: l3
-                11: r3
-                12: home
-                13: pad
-                14: microphone
-
-        Chrome & Safari on MacOS & Windows
-            Mapping
-                "standard"
-            Axes
-                0: Left joystick H [-1, +1]
-                1: Left joystick V [-1, +1]
-                2: Right joystick H [-1, +1]
-                3: Right joystick V [-1, +1]
-            Buttons
-                0: cross
-                1: circle
-                2: square
-                3: triangle
-                4: l1
-                5: r1
-                6: l2
-                7: r2
-                8: select
-                9: start
-                10: l3
-                11: r3
-                12: up
-                13: down
-                14: left
-                15: right
-                16: home
-                17: pad
-
-    Xbox
-        *
-            Mapping
-                "standard"
-            Axes
-                0: Left joystick H [-1, +1]
-                1: Left joystick V [-1, +1]
-                2: Right joystick H [-1, +1]
-                3: Right joystick V [-1, +1]
-            Buttons
-                0: cross
-                1: circle
-                2: square
-                3: triangle
-                4: l1
-                5: r1
-                6: l2
-                7: r2
-                8: select
-                9: start
-                10: l3
-                11: r3
-                12: up
-                13: down
-                14: left
-                15: right
-                16: home
-
-*/

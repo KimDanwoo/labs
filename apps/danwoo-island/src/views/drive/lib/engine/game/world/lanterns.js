@@ -8,22 +8,18 @@ export class Lanterns
     {
         this.game = Game.getInstance()
 
-        // Base and references
         const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.lanternsModel.scene.children)
 
-        // Setup base
         for(const child of base.children)
         {
-            child.name = child.name.replace(/[0-9]+$/i, '') // Set clear name to retrieve it later as instances
+            child.name = child.name.replace(/[0-9]+$/i, '')
             child.castShadow = true
             child.receiveShadow = true
             child.frustumCulled = false
         }
 
-        // Update materials 
         this.game.materials.updateObject(base)
-        
-        // Objects
+
         this.objects = []
         for(const reference of references)
         {
@@ -55,10 +51,8 @@ export class Lanterns
             )
         }
 
-        // Instanced group
         this.instancedGroup = new InstancedGroup(references, createGardenLamp(this.game.materials))
 
-        // Tick update
         this.game.ticker.events.on('tick', () =>
         {
             for(const object of this.objects)

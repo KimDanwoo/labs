@@ -56,7 +56,6 @@ export class RayCursor
 
     testIntersects(actionTrigger)
     {
-        // Start
         if(actionTrigger === 'start' || actionTrigger === 'change')
         {
             if(actionTrigger === 'start')
@@ -72,11 +71,9 @@ export class RayCursor
 
             const intersects = this.intersects.filter((intersect) =>
             {
-                // Test active
                 if(!intersect.active)
                     return false
 
-                // Test too far
                 const distance = Math.hypot(
                     this.game.view.focusPoint.position.x - intersect.position.x,
                     this.game.view.focusPoint.position.z - intersect.position.z
@@ -97,7 +94,6 @@ export class RayCursor
                 )
                 this.raycaster.setFromCamera(ndcPointer, this.game.view.camera)
 
-                // Each intersect
                 for(const intersect of intersects)
                 {
                     let isIntersecting = false
@@ -111,7 +107,6 @@ export class RayCursor
                     if(intersect.shape instanceof THREE.Mesh)
                         isIntersecting = this.raycaster.intersectObject(intersect.shape).length
 
-                    // Intersect status changed
                     if(isIntersecting !== intersect.isIntersecting)
                     {
                         intersect.isIntersecting = isIntersecting
@@ -131,18 +126,16 @@ export class RayCursor
                         }
                     }
 
-                    // Save global intersect status
                     if(isIntersecting)
                     {
                         isAnyIntersecting = true
                     }
                 }
 
-                // Global intersect status changed
                 if(isAnyIntersecting !== this.isAnyIntersecting)
                 {
                     this.isAnyIntersecting = isAnyIntersecting
-                    
+
                     if(this.isAnyIntersecting)
                         this.game.canvasElement.style.cursor = 'pointer'
                     else
@@ -165,14 +158,12 @@ export class RayCursor
             }
         }
 
-        // End
         else if(actionTrigger === 'end')
         {
             const intersects = this.intersects.filter(intersect => intersect.active)
 
             const distance = Math.hypot(this.deltaCursor.x, this.deltaCursor.y)
-            
-            // Each intersect
+
             for(const intersect of intersects)
             {
                 if(intersect.isIntersecting)
@@ -181,7 +172,7 @@ export class RayCursor
                     {
                         intersect.onUp()
                     }
-                    
+
                     if(intersect.isDown)
                     {
                         intersect.isDown = false

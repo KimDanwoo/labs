@@ -48,7 +48,7 @@ export class Inputs
         this.setNipple()
 
         this.addActions(actions)
-        
+
         for(const filter of filters)
             this.filters.add(filter)
 
@@ -56,7 +56,7 @@ export class Inputs
         {
             this.update()
         }, 0)
-        
+
         document.documentElement.classList.add(`is-mode-mouse-keyboard`)
     }
 
@@ -161,7 +161,7 @@ export class Inputs
         {
             if(this.mode !== Inputs.MODE_TOUCH)
                 return
-                
+
             this.nipple.updateFromPointer(this.pointer, action)
         })
     }
@@ -182,29 +182,25 @@ export class Inputs
 
     checkCategory(action)
     {
-        // No filter => Allow all
         if(this.filters.size === 0)
             return true
 
-        // Has filter but no category on action => Forbid
         if(action.categories.length === 0)
             return true
 
-        // Has matching category and filter => All
         for(const category of action.categories)
         {
             if(this.filters.has(category))
                 return true
         }
 
-        // Otherwise => Forbid
         return false
     }
 
     start(key, value = 1, isToggle = true)
     {
         const filteredActions = [...this.actions.values()].filter((_action) => _action.keys.indexOf(key) !== - 1 )
-            
+
         for(const action of filteredActions)
         {
             if(action && this.checkCategory(action))
@@ -213,19 +209,17 @@ export class Inputs
                 action.activeKeys.add(key)
                 action.trigger = 'start'
 
-                // Can be active or inactive => trigger event only on change
                 if(isToggle)
                 {
                     if(!action.active)
                     {
                         action.active = true
-                        
+
                         this.events.trigger('actionStart', [ action ])
                         this.events.trigger(action.name, [ action ])
                     }
                 }
 
-                // Trigger event whenever action starts (no "end")
                 else
                 {
                     this.events.trigger('actionStart', [ action ])
@@ -238,7 +232,7 @@ export class Inputs
     end(key, value = 0)
     {
         const filteredActions = [...this.actions.values()].filter((_action) => _action.keys.indexOf(key) !== - 1 )
-            
+
         for(const action of filteredActions)
         {
             if(action && action.active)
@@ -261,14 +255,11 @@ export class Inputs
     change(key, value = 1)
     {
         const filteredActions = [...this.actions.values()].filter((_action) => _action.keys.indexOf(key) !== - 1 )
-            
+
         for(const action of filteredActions)
         {
             if(action && this.checkCategory(action))
             {
-                // Test if value has changed
-                // - number => Direct comparaison
-                // - object => Every property comparaison
                 let hasChanged = false
 
                 if(typeof value === 'number')
@@ -306,7 +297,7 @@ export class Inputs
 
         const oldMode = this.mode
         this.mode = mode
-        
+
         if(this.mode === Inputs.MODE_TOUCH)
             this.interactiveButtons.activate()
         else

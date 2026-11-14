@@ -49,7 +49,6 @@ export class LandingArea extends Area
 
     setKiosk()
     {
-        // Interactive point
         const interactivePoint = this.game.interactivePoints.create(
             this.references.items.get('kioskInteractivePoint')[0].position,
             '지도',
@@ -59,7 +58,6 @@ export class LandingArea extends Area
             {
                 this.game.inputs.interactiveButtons.clearItems()
                 this.game.modals.open('map')
-                // interactivePoint.hide()
             },
             () =>
             {
@@ -74,16 +72,10 @@ export class LandingArea extends Area
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             }
         )
-
-        // this.game.map.items.get('map').events.on('close', () =>
-        // {
-        //     interactivePoint.show()
-        // })
     }
 
     setControls()
     {
-        // Interactive point
         const interactivePoint = this.game.interactivePoints.create(
             this.references.items.get('controlsInteractivePoint')[0].position,
             '조작법',
@@ -109,7 +101,6 @@ export class LandingArea extends Area
             }
         )
 
-        // Menu instance
         const menuInstance = this.game.menu.items.get('controls')
 
         menuInstance.events.on('close', () =>
@@ -132,7 +123,6 @@ export class LandingArea extends Area
     {
         const position = this.references.items.get('bonfireHashes')[0].position
 
-        // Particles
         let particles = null
         {
             const emissiveMaterial = this.game.materials.getFromName('emissiveOrangeRadialGradient')
@@ -191,7 +181,6 @@ export class LandingArea extends Area
             this.game.scene.add(particles)
         }
 
-        // Hashes
         {
             const alphaNode = Fn(() =>
             {
@@ -219,11 +208,9 @@ export class LandingArea extends Area
             mesh.material = material
         }
 
-        // Burn
         const burn = this.references.items.get('bonfireBurn')[0]
         burn.visible = false
 
-        // Interactive point
         this.game.interactivePoints.create(
             this.references.items.get('bonfireInteractivePoint')[0].position,
             '초기화',
@@ -235,7 +222,6 @@ export class LandingArea extends Area
 
                 gsap.delayedCall(2, () =>
                 {
-                    // Bonfire
                     particles.visible = true
                     burn.visible = true
                     this.game.ticker.wait(2, () =>
@@ -244,7 +230,6 @@ export class LandingArea extends Area
                         particles.geometry.boundingSphere.radius = 2
                     })
 
-                    // Sound
                     this.game.audio.groups.get('campfire').items[0].positions.push(position)
                 })
             },

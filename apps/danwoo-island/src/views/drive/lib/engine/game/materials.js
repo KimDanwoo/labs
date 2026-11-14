@@ -10,10 +10,8 @@ export class Materials
         this.game = Game.getInstance()
         this.list = new Map()
 
-
         this.setGradient()
         this.setLuminance()
-        // this.setPreviews()
 
         this.createPalette()
 
@@ -22,7 +20,7 @@ export class Materials
         this.createEmissiveGradient('emissiveBlueRadialGradient', '#91f0ff', '#128fff', 1.7, true)
         this.createEmissiveGradient('emissiveGreenRadialGradient', '#f8ffa6', '#74ff00', 1.5, true)
         this.createEmissiveGradient('emissiveWhiteRadialGradient', '#ffffff', '#666666', 2.7, false)
-        
+
         this.createGradient('redGradient', '#ff3a3a', '#721551')
     }
 
@@ -31,9 +29,8 @@ export class Materials
         const material = new MeshDefaultMaterial({
             colorNode: texture(this.game.resources.paletteTexture).rgb
         })
-        
-        this.save('palette', material)
 
+        this.save('palette', material)
     }
 
     setGradient()
@@ -67,18 +64,7 @@ export class Materials
         }
 
         update()
-
-        // // Debug
-        // canvas.style.position = 'fixed'
-        // canvas.style.zIndex = 999
-        // canvas.style.top = 0
-        // canvas.style.left = 0
-        // canvas.style.width = '128px'
-        // canvas.style.height = `256px`
-        // document.body.append(canvas)
-        
     }
-
 
     setLuminance()
     {
@@ -92,7 +78,6 @@ export class Materials
         }
     }
 
-    // Create materials functions
     createEmissive(_name = 'material', _color = '#ffffff', _intensity = 3)
     {
         const baseColor = uniform(color(_color))
@@ -102,7 +87,6 @@ export class Materials
         material.colorNode = baseColor.div(luminance(baseColor)).mul(intensity)
         material.fog = false
         this.save(_name, material)
-  
 
         return material
     }
@@ -131,21 +115,6 @@ export class Materials
         material.fog = false
         this.save(_name, material)
 
-        
-        // const update = () =>
-        // {
-        //     material.color.set(dummy.color)
-        //     material.color.multiplyScalar(dummy.intensity / this.luminance.get(material.color))
-        // }
-
-        // update()
-
-        // if(this.game.debug.active && debugPanel)
-        // {
-        //     debugPanel.addBinding(dummy, 'intensity', { min: 0, max: 10, step: 0.01 }).on('change', update)
-        //     debugPanel.addBinding(dummy, 'color', { view: 'color' }).on('change', update)
-        // }
-
         return material
     }
 
@@ -158,10 +127,8 @@ export class Materials
         const material = new MeshDefaultMaterial({
             colorNode: baseColor
         })
-        // material.shadowSide = THREE.BackSide
-        
-        this.save(_name, material)
 
+        this.save(_name, material)
 
         return material
     }
@@ -176,7 +143,7 @@ export class Materials
         this.previews.group.visible = false
         this.previews.group.userData.preventPreRender = true
         this.game.scene.add(this.previews.group)
-        
+
         this.previews.update = () =>
         {
             this.list.forEach((material, name) =>
@@ -185,12 +152,11 @@ export class Materials
                 {
                     const test = {}
 
-                    // Pure
                     const pureColor = material.color.clone()
                     const maxLength = Math.max(pureColor.r, Math.max(pureColor.g, pureColor.b))
                     if(maxLength > 1)
                         pureColor.set(pureColor.r / maxLength, pureColor.g / maxLength, pureColor.b / maxLength)
-                    
+
                     const boxPure = new THREE.Mesh(this.previews.boxGeometry, new THREE.MeshBasicMaterial({ color: pureColor }))
                     boxPure.position.y = 0.75
                     boxPure.position.x = this.list.size * 3
@@ -198,8 +164,7 @@ export class Materials
                     boxPure.castShadow = true
                     boxPure.receiveShadow = true
                     this.previews.group.add(boxPure)
-                
-                    // Box
+
                     const box = new THREE.Mesh(this.previews.boxGeometry, material)
                     box.position.y = 0.75
                     box.position.x = this.list.size * 3
@@ -208,7 +173,6 @@ export class Materials
                     box.receiveShadow = true
                     this.previews.group.add(box)
 
-                    // Sphere
                     const sphere = new THREE.Mesh(this.previews.sphereGeometry, material)
                     sphere.position.z = 6
                     sphere.position.y = 0.75
@@ -221,8 +185,6 @@ export class Materials
                 }
             })
         }
-        
-        // Debug
     }
 
     save(name, material)
@@ -235,14 +197,11 @@ export class Materials
 
     getFromName(name, baseMaterial)
     {
-        // Return existing material
         if(this.list.has(name))
             return this.list.get(name)
 
-        // Create new
         const material = this.createFromMaterial(baseMaterial)
 
-        // Save
         this.save(name, material)
         return material
     }
@@ -251,32 +210,24 @@ export class Materials
     {
         if(baseMaterial.isMeshLambertNodeMaterial || baseMaterial.isMeshStandardMaterial)
         {
-            // Shadow
-            // material.shadowSide = THREE.BackSide
-
-            // Color
             let baseColor = null
-            
+
             if(baseMaterial.map)
                 baseColor = texture(baseMaterial.map).rgb
             else
                 baseColor = color(baseMaterial.color)
-            
-            // Alpha
+
             let alphaNode = null
-            
+
             if(baseMaterial.alphaMap)
                 alphaNode = texture(baseMaterial.alphaMap)
             else
                 alphaNode = float(baseMaterial.opacity)
 
-            // Transparent
             let transparent = baseMaterial.transparent
 
-            // Premultiplied alpha
             let premultipliedAlpha = false
 
-            // Exceptions
             if(
                 baseMaterial.name === 'projectsLabels' ||
                 baseMaterial.name === 'blackboardLabels'
@@ -287,7 +238,6 @@ export class Materials
                 alphaNode = texture(baseMaterial.map).r
             }
 
-            // Material
             const material = new MeshDefaultMaterial({
                 colorNode: baseColor,
                 alphaNode: alphaNode,
@@ -297,12 +247,11 @@ export class Materials
             })
             material.premultipliedAlpha = premultipliedAlpha
             material.map = baseMaterial.map
-            
+
             return material
         }
 
         return baseMaterial
-
     }
 
     copy(baseMaterial, targetMaterial)

@@ -10,14 +10,13 @@ export class Menu
     static OPENING = 2
     static CLOSED = 3
     static CLOSING = 4
-    
+
     constructor()
     {
         this.game = Game.getInstance()
         this.state = Menu.CLOSED
         this.element = document.querySelector('.js-menu')
         this.current = null
-        // this.pending = null
         this.default = null
         this.events = new Events()
 
@@ -25,7 +24,7 @@ export class Menu
         this.setClose()
         this.setItems()
         this.setGamepad()
-        
+
         this.element.addEventListener('transitionend', () =>
         {
             this.onTransitionEnded()
@@ -45,7 +44,7 @@ export class Menu
             this.state = Menu.CLOSED
             this.events.trigger('closed')
             this.current.events.trigger('closed')
-            
+
             this.element.classList.remove('is-displayed')
         }
     }
@@ -108,7 +107,6 @@ export class Menu
             item.isOpen = false
             item.events = new Events()
 
-            // Tabs
             const tabsElement = item.contentElement.querySelector('.js-tabs')
 
             if(tabsElement)
@@ -147,7 +145,6 @@ export class Menu
             { name: 'prev', categories: [ 'menu' ], keys: [ 'Gamepad.l1' ] }
         ])
 
-        // Respawn
         this.game.inputs.events.on('next', (action) =>
         {
             if(action.active)
@@ -162,7 +159,6 @@ export class Menu
                 this.open(this.current.prevName)
             }
         })
-
     }
 
     open(name = null)
@@ -179,42 +175,33 @@ export class Menu
 
         const item = this.items.get(_name)
 
-        // Not found
         if(!item)
             return
 
-        // Same
         if(
             (this.state === Menu.OPEN || this.state === Menu.OPENING) &&
             item === this.current
         )
             return
-        
-        // Sound
+
         const sound = this.game.audio.groups.get('click')
         if(sound)
             sound.play(true)
 
-        // Leaving item
         if(this.current)
         {
             this.current.navigationElement.classList.remove('is-active')
             this.current.contentElement.classList.remove('is-visible')
-            
+
             this.current.isOpen = false
         }
 
-        // Entering item
         item.navigationElement.classList.add('is-active')
         item.contentElement.classList.add('is-visible')
-        
+
         item.isOpen = true
-        
+
         this.current = item
-        
-        // // Tabs resize
-        // if(item.tabs)
-        //     item.tabs.resize()
 
         if(item.mainFocus && this.game.inputs.mode !== Inputs.MODE_TOUCH)
         {
@@ -224,15 +211,12 @@ export class Menu
             })
         }
 
-        // Input filters
         this.game.inputs.filters.clear()
         this.game.inputs.filters.add('menu')
 
-        // Events
         this.events.trigger('open')
         this.current.events.trigger('open')
-        
-        // Need open
+
         if(this.state === Menu.CLOSED || this.state === Menu.CLOSING)
         {
             this.state = Menu.OPENING
@@ -253,7 +237,6 @@ export class Menu
         if(this.state === Menu.CLOSING || this.state === Menu.CLOSED)
             return
 
-        // Sound
         const sound = this.game.audio.groups.get('click')
         if(sound)
             sound.play(false)
@@ -268,9 +251,8 @@ export class Menu
 
     preopen()
     {
-        this.items.forEach((item) => 
+        this.items.forEach((item) =>
         {
-            // Is preopened
             if(typeof item.navigationElement.dataset.preopen !== 'undefined')
             {
                 this.open(item.name)

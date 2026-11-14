@@ -12,7 +12,5 @@ export class Bushes
         this.colorANode = uniform(color('#438a50'))
         this.colorBNode = uniform(color('#91c85c'))
         this.foliage = new Foliage(this.game.resources.bushesReferences.scene.children, this.colorANode, this.colorBNode)
-
-        // Debug
     }
 }

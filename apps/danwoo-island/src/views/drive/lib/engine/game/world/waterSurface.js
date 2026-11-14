@@ -17,8 +17,6 @@ export class WaterSurface
         this.hasIce = false
         this.hasSplashes = false
 
-        // Debug
-
         this.setGeometry()
         this.setNodes()
         this.setMaterial()
@@ -39,9 +37,6 @@ export class WaterSurface
 
     setNodes()
     {
-        /**
-         * Ripples
-         */
         this.ripplesRatio = uniform(1)
         const ripplesSlopeFrequency = uniform(10)
         const ripplesNoiseFrequency = uniform(0.1)
@@ -53,7 +48,7 @@ export class WaterSurface
             })
 
         const ripplesNode = Fn(([terrainData]) =>
-        {           
+        {
             const baseRipple = terrainData.b.add(this.game.wind.localTime.mul(0.5)).mul(ripplesSlopeFrequency)
             const rippleIndex = baseRipple.floor()
 
@@ -61,7 +56,7 @@ export class WaterSurface
                 this.game.noises.perlin,
                 positionWorld.xz.add(rippleIndex.div(ripplesNoiseOffset)).mul(ripplesNoiseFrequency)
             ).r
-            
+
             const ripples = terrainData.b
                 .add(this.game.wind.localTime.mul(0.5))
                 .mul(ripplesSlopeFrequency)
@@ -74,11 +69,6 @@ export class WaterSurface
             return ripples
         })
 
-        // Debug
-
-        /**
-         * Ice
-         */
         this.iceRatio = uniform(0)
         const iceNoiseFrequency = uniform(0.3)
 
@@ -100,11 +90,6 @@ export class WaterSurface
             return ice
         })
 
-        // Debug
-
-        /**
-         * Splashes
-         */
         this.splashesRatio = uniform(0)
         const splashesNoiseFrequency = uniform(0.33)
         const splashesTimeFrequency = uniform(6)
@@ -119,7 +104,6 @@ export class WaterSurface
 
         const splashesNode = Fn(() =>
         {
-            // Noises
             const splashesVoronoi = texture(
                 this.game.noises.voronoi,
                 positionWorld.xz.mul(splashesNoiseFrequency)
@@ -129,86 +113,57 @@ export class WaterSurface
                 positionWorld.xz.mul(splashesNoiseFrequency.mul(0.25))
             ).r
 
-            // Base
             const splash = splashesVoronoi.r
 
-            // Time
             const splashTimeRandom = hash(splashesVoronoi.b.mul(123456)).add(splashPerlin)
             const splashTime = this.game.wind.localTime.mul(splashesTimeFrequency).add(splashTimeRandom)
             splash.assign(splash.sub(splashTime).mod(1))
-            
-            // Thickness
+
             const edgeMutliplier = splashesVoronoi.g.remapClamp(splashesEdgeAttenuationLow, splashesEdgeAttenuationHigh, 0, 1)
             const thickness = splashesThickness.mul(edgeMutliplier)
             splash.assign(splash.step(thickness).oneMinus())
-            
-            // Visibility
+
             const splashVisibilityRandom = hash(splashesVoronoi.b.mul(654321))
             const visible = splashVisibilityRandom.add(splashPerlin).mod(1)
             visible.assign(this.splashesRatio.step(visible))
             splash.assign(splash.mul(visible))
-            
+
             return splash
         })
 
-        // Debug
-
-        /**
-         * Shore
-         */
         const shoreEdge = uniform(0.17)
-        
+
         const shoreNode = Fn(([terrainData]) =>
         {
             return shoreEdge.step(terrainData.b)
         })
 
-        // Debug
-
-        /**
-         * Details mask
-         */
         this.detailsMask = () =>
         {
             return Fn(() =>
             {
-                // Terrain data
-                // const terrainUv = this.game.terrain.worldPositionToUvNode(positionWorld.xz)
                 const terrainData = this.game.terrain.terrainNode(positionWorld.xz)
                 const value = float(0)
 
-                // Ripples
                 if(this.hasRipples)
                     value.assign(max(value, ripplesNode(terrainData)))
 
-                // Ice
                 if(this.hasIce)
                     value.assign(max(value, iceNode(terrainData)))
-            
-                // Splashes
+
                 if(this.hasSplashes)
                     value.assign(max(value, splashesNode()))
 
-                // Shore
                 value.assign(max(value, shoreNode(terrainData)))
 
                 return value
             })()
         }
 
-        /**
-         * Blur Output
-         */
          const blurStrength = uniform(0.01)
 
          this.blurOutputNode = Fn(() =>
          {
-            // const blurOutput = boxBlur(viewportSharedTexture(screenUV), {
-			// 	size: 1.5,
-			// 	separation: 3
-			// }).rgb
-
-            // Hash blur
             const blurOutput = hashBlur(viewportSharedTexture(screenUV), 0.01, {
                 repeats: 25,
                 premultipliedAlpha: true
@@ -216,8 +171,6 @@ export class WaterSurface
 
             return vec3(blurOutput)
          })
-
-        // Debug
     }
 
     setMaterial()
@@ -251,7 +204,6 @@ export class WaterSurface
             return finalOuput
         })()
 
-        // Quality
         const qualityChange = (level) =>
         {
             if(level === 0)
@@ -262,32 +214,14 @@ export class WaterSurface
             {
                 material.outputNode = baseOutput
             }
-            
+
             material.needsUpdate = true
         }
         qualityChange(this.game.quality.level)
         this.game.quality.events.on('change', qualityChange)
 
-
-        // const baseOutput = material.outputNode
-        // material.outputNode = Fn(() =>
-        // {
-        //     const blurOutput = this.blurOutputNode()
-        //     const surfaceAlpha = baseOutput.a
-        //     const surfaceOutput = vec4(baseOutput.rgb, 1)
-
-        //     const finalOuput = select(
-        //         surfaceAlpha.lessThan(0.5),
-        //         blurOutput,
-        //         surfaceOutput
-        //     )
-
-        //     return finalOuput
-        // })()
-        
         material.maskShadowNode = this.detailsMask().greaterThan(0.5)
 
-        // Already exist
         if(this.material)
         {
             this.material.dispose()
@@ -295,7 +229,6 @@ export class WaterSurface
             this.mesh.material = this.material
         }
 
-        // Don't exist yet
         else
         {
             this.material = material
@@ -305,14 +238,13 @@ export class WaterSurface
     setMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
-        
+
         const halfExtent = this.game.view.optimalArea.radius
         this.mesh.scale.setScalar(halfExtent * 2)
 
         this.mesh.position.y = this.game.water.surfaceElevation
         this.mesh.castShadow = true
         this.mesh.receiveShadow = true
-        // this.mesh.renderOrder = -1
         this.game.scene.children.unshift(this.mesh)
 
         this.game.viewport.events.on('throttleChange', () =>
@@ -342,17 +274,14 @@ export class WaterSurface
 
     update()
     {
-        // Apply weather
         this.ripplesRatioBinding.update()
         this.iceRatioBinding.update()
         this.splashesRatioBinding.update()
 
-        // Mesh
         this.mesh.position.x = this.game.view.optimalArea.position.x
         this.mesh.position.z = this.game.view.optimalArea.position.z
         this.mesh.renderOrder = 1
 
-        // Material
         const hasRipples = this.ripplesRatio.value > 0.0001
         const hasIce = this.iceRatio.value > 0.0001
         const hasSplashes = this.splashesRatio.value > 0.0001
@@ -366,11 +295,10 @@ export class WaterSurface
             this.hasRipples = hasRipples
             this.hasIce = hasIce
             this.hasSplashes = hasSplashes
-            
+
             this.setMaterial()
         }
 
-        // Ice
         const friction = lerp(0.5, 0.02, this.iceRatio.value)
         this.ice.physical.body.collider(0).setFriction(friction)
         this.ice.physical.body.setNextKinematicTranslation({ x: 0, y: lerp(- 1.5 - this.ice.halfThickness, this.game.water.surfaceElevation - this.ice.halfThickness, this.iceRatio.value), z: 0})

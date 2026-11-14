@@ -17,7 +17,6 @@ export class InteractivePoints
     {
         this.game = Game.getInstance()
 
-
         this.items = []
         this.activeItem = null
         this.revealed = false
@@ -57,13 +56,10 @@ export class InteractivePoints
 
     setGeometries()
     {
-        // const size = 2.25
         this.geometries = {}
 
-        // Bottom
         this.geometries.plane = new THREE.PlaneGeometry(2, 2)
 
-        // Label
         this.geometries.label = new THREE.PlaneGeometry(1, 1, 1, 1)
         this.geometries.label.translate(0.5, 0, 0)
     }
@@ -72,22 +68,17 @@ export class InteractivePoints
     {
         this.materials = {}
 
-        // Uniforms
         this.playerPosition = uniform(vec2())
         this.backColor = uniform(color('#251f2b'))
         this.frontColor = uniform(color('#ffffff'))
-
-        // Debug
     }
 
     setKeyIcon()
     {
-        // Material
         const material = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: false })
 
         const iconOutput = Fn(([iconAlpha]) =>
         {
-            // Discard
             iconAlpha.lessThan(0.5).discard()
 
             return vec4(vec3(this.frontColor), 1)
@@ -95,7 +86,6 @@ export class InteractivePoints
 
         material.outputNode = iconOutput(texture(this.game.resources.interactivePointsKeyIconEnterTexture, vec2(uv().x, uv().y.oneMinus())).r)
 
-        // Mesh
         const mesh = new THREE.Mesh(
             this.geometries.plane,
             material
@@ -142,7 +132,6 @@ export class InteractivePoints
             }
         })
 
-        // Save
         this.keyIcon = mesh
     }
 
@@ -177,11 +166,7 @@ export class InteractivePoints
     )
     {
         const newPosition = position.clone()
-        // newPosition.y = 2.25
 
-        /**
-         * Group
-         */
         const group = new THREE.Group()
         group.rotation.reorder('YXZ')
         group.rotation.x = - Math.PI * 0.15
@@ -190,13 +175,8 @@ export class InteractivePoints
         group.scale.setScalar(0.85)
         this.game.scene.add(group)
 
-        // Materials
         const materials = []
 
-        /**
-         * Label
-         */
-        // Canvas
         const height = 64
         const textPaddingLeft = align === InteractivePoints.ALIGN_LEFT ? 60 : 12
         const textPaddingRight = align === InteractivePoints.ALIGN_LEFT ? 12 : 60
@@ -208,7 +188,6 @@ export class InteractivePoints
         canvas.style.zIndex = 999
         canvas.style.top = 0
         canvas.style.left = 0
-        // document.body.append(canvas)
 
         const context = canvas.getContext('2d')
         context.font = font
@@ -234,14 +213,12 @@ export class InteractivePoints
 
         labelTexture.needsUpdate = true
 
-        // Material
         const labelMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: true })
         materials.push(labelMaterial)
 
         const labelOffset = uniform(1)
         labelMaterial.outputNode = Fn(() =>
         {
-            // const _uv = uv().add(vec2(labelOffset, 0))
             const _uv = vec2(
                 uv().x.sub(labelOffset),
                 uv().y
@@ -249,19 +226,15 @@ export class InteractivePoints
 
             const text = texture(labelTexture, _uv).r
 
-            // Discard
             _uv.x.greaterThan(1).discard()
             _uv.x.lessThan(0).discard()
 
-            // Fogged back color
             const foggedBackColor = this.game.fog.strength.mix(this.backColor, this.game.fog.color)
 
-            // Final color
             const finalColor = mix(foggedBackColor, this.frontColor, text)
             return vec4(vec3(finalColor), 1)
         })()
 
-        // Mesh
         const label = new THREE.Mesh(
             this.geometries.label,
             labelMaterial
@@ -275,10 +248,6 @@ export class InteractivePoints
         label.visible = false
         group.add(label)
 
-        /**
-         * Diamond
-         */
-        // Material
         const diamondMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: true })
         materials.push(diamondMaterial)
 
@@ -291,22 +260,17 @@ export class InteractivePoints
             const _uv = uv()
             const distance = max(_uv.x.sub(0.5).abs(), _uv.y.sub(0.5).abs()).mul(2)
 
-            // Line
             const lineDistance = threshold.sub(distance).sub(lineOffset).abs()
             const line = step(lineDistance, lineThickness.mul(0.5))
 
-            // Discard
             distance.greaterThan(threshold).discard()
 
-            // Fogged back color
             const foggedBackColor = this.game.fog.strength.mix(this.backColor, this.game.fog.color)
 
-            // Final color
             const finalColor = mix(foggedBackColor, this.frontColor, line)
             return vec4(vec3(finalColor), 1)
         })()
 
-        // Mesh
         const diamond = new THREE.Mesh(
             this.geometries.plane,
             diamondMaterial
@@ -316,9 +280,6 @@ export class InteractivePoints
         diamond.visible = false
         group.add(diamond)
 
-        /**
-         * Item
-         */
         const item = {}
         item.position = new THREE.Vector2(position.x, position.z)
         item.interactCallback = interactCallback
@@ -331,9 +292,6 @@ export class InteractivePoints
         item.materials = materials
         this.items.push(item)
 
-        /**
-         * Cursor
-         */
         item.intersect = this.game.rayCursor.addIntersect({
             active: false,
             shape: new THREE.Sphere(newPosition, 0.75),
@@ -356,7 +314,6 @@ export class InteractivePoints
                     this.activeItem = item
                     item.reveal()
                 }
-
             },
             onLeave: () =>
             {
@@ -371,10 +328,6 @@ export class InteractivePoints
             }
         })
 
-        /**
-         * Methods
-         */
-        // Hide
         item.hide = () =>
         {
             if(item.state === InteractivePoints.STATE_HIDDEN)
@@ -389,7 +342,6 @@ export class InteractivePoints
             gsap.to(lineOffset, { value: 0.175, ease: 'back.in(4.5)', duration: 0.6, overwrite: true, onComplete: () =>
             {
                 diamond.visible = false
-                // key.visible = false
                 label.visible = false
             } })
 
@@ -400,16 +352,13 @@ export class InteractivePoints
 
             gsap.to(labelOffset, { value: 1, ease: 'power2.in', duration: 0.6, overwrite: true })
 
-            // Active item
             if(this.activeItem && this.activeItem === item)
                 this.activeItem = null
 
-            // Callback
             if(typeof item.hideCallback === 'function')
                 item.hideCallback()
         }
 
-        // Open
         item.reveal = () =>
         {
             if(item.state === InteractivePoints.STATE_OPEN)
@@ -437,22 +386,18 @@ export class InteractivePoints
 
             gsap.to(labelOffset, { value: 0, ease: 'power2.out', duration: 0.6, delay: 0.2, overwrite: true })
 
-            // Materials
             for(const material of item.materials)
             {
                 material.depthTest = false
                 material.needsUpdate = true
             }
 
-            // Reveal
             this.sounds.reveal.play()
 
-            // Callback
             if(typeof item.revealCallback === 'function')
                 item.revealCallback()
         }
 
-        // Close
         item.conceal = () =>
         {
             if(item.state === InteractivePoints.STATE_CONCEALED)
@@ -473,7 +418,6 @@ export class InteractivePoints
             {
                 label.visible = false
 
-                // Materials
                 for(const material of item.materials)
                 {
                     material.depthTest = true
@@ -491,15 +435,12 @@ export class InteractivePoints
 
             gsap.to(labelOffset, { value: align === InteractivePoints.ALIGN_LEFT ? - 1 : 1, ease: 'power2.in', duration: 0.6, overwrite: true })
 
-            // Reveal
             this.sounds.conceal.play()
 
-            // Callback
             if(typeof item.concealCallback === 'function')
                 item.concealCallback()
         }
 
-        // Interact
         item.interact = () =>
         {
             gsap.to(threshold, { value: 0.6, ease: 'power2.out', duration: 0.1, overwrite: true, onComplete: () =>
@@ -507,12 +448,10 @@ export class InteractivePoints
                 gsap.to(threshold, { value: 0.5, ease: 'elastic.out(1.3,0.6)', duration: 1.5, overwrite: true })
             } })
 
-            // Callback
             if(typeof item.interactCallback === 'function')
                 item.interactCallback()
         }
 
-        // Show
         item.show = () =>
         {
             if(item.isIn)
@@ -523,45 +462,33 @@ export class InteractivePoints
             this.needsTest = true
         }
 
-        /**
-         * Default state
-         */
         if(state === InteractivePoints.STATE_CONCEALED)
         {
-            // Points not revealed yet => Force hidden and wait
             if(!this.revealed)
             {
                 item.state = InteractivePoints.STATE_HIDDEN
                 item.showAfterReveal = true
             }
 
-            // Points already revealed => Activate
             else
             {
                 item.state = state
                 item.intersect.active = false
                 diamond.visible = true
-                // key.visible = true
                 threshold.value = 0.25
             }
         }
-
-        /**
-         * Debug
-         */
 
         return item
     }
 
     update()
     {
-        // Player testing (not cursor intersect)
         const distanceTraveled = Math.hypot(
             this.playerPosition.value.x - this.game.player.position2.x,
             this.playerPosition.value.y - this.game.player.position2.y
         )
 
-        // Only update is moved enough
         if(distanceTraveled > 0.2 || this.needsTest)
         {
             this.needsTest = false
@@ -597,14 +524,12 @@ export class InteractivePoints
 
             if(activeItem)
             {
-                // Activate item change => Deactivate old
                 if(activeItem !== this.activeItem && this.activeItem !== null)
                 {
                     this.activeItem.isIn = false
                     this.activeItem.conceal()
                 }
 
-                // Activate new active item
                 if(!activeItem.isIn || this.activeItem === null)
                 {
                     this.activeItem = activeItem

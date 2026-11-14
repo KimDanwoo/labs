@@ -104,28 +104,22 @@ export class VisualVehicle
             }
         })
 
-        // Chassis
         this.parts.chassis.rotation.reorder('YXZ')
         this.game.materials.updateObject(this.parts.chassis)
         this.game.scene.add(this.parts.chassis)
 
-        // Blinker left
         if(this.parts.blinkerLeft)
             this.parts.blinkerLeft.visible = false
 
-        // Blinker right
         if(this.parts.blinkerRight)
             this.parts.blinkerRight.visible = false
 
-        // Stop lights
         if(this.parts.stopLights)
             this.parts.stopLights.visible = false
 
-        // Back lights
         if(this.parts.backLights)
             this.parts.backLights.visible = false
 
-        // Wheel
         this.game.materials.updateObject(this.parts.wheelContainer)
     }
 
@@ -141,7 +135,6 @@ export class VisualVehicle
         if(this.model.name === 'islandBoxySUV')
             this.paints.choices.black = this.game.materials.createGradient('islandGraphite', '#434b53', '#171c23')
 
-        // Flames
         {
             const material = this.paints.choices.red.clone()
             const baseOutput = material.outputNode
@@ -151,7 +144,6 @@ export class VisualVehicle
 
             material.outputNode = Fn(() =>
             {
-                // Flames
                 {
                     const newUv = uv(1).toVar()
                     const uv3 = newUv.sub(vec2(0, this.game.ticker.elapsedScaledUniform.mul(-0.075))).mul(vec2(0.96 * 1.3, 0.35 * 1.3))
@@ -173,11 +165,8 @@ export class VisualVehicle
             })()
 
             this.paints.choices.flames = material
-
-            // Debug
         }
 
-        // Abyssal
         {
             const material = new THREE.MeshBasicMaterial({ wireframe: false })
             const fresnelColor = uniform(color('#6053ff'))
@@ -201,8 +190,6 @@ export class VisualVehicle
             })()
 
             this.paints.choices.abyssal = material
-
-            // Debug
         }
 
         this.paints.changeTo = (name = 'red') =>
@@ -222,7 +209,6 @@ export class VisualVehicle
         }
 
         this.paints.changeTo(this.game.options.paintName)
-
     }
 
     setMainGroundTrack()
@@ -232,17 +218,14 @@ export class VisualVehicle
 
     setWheels()
     {
-        // Setup
         this.wheels = {}
         this.wheels.items = []
         this.wheels.steering = 0
 
-        // Create wheels
         for(let i = 0; i < 4; i++)
         {
             const wheel = {}
 
-            // Clone group
             wheel.container = this.parts.wheelContainer.clone(true)
             this.parts.chassis.add(wheel.container)
 
@@ -256,13 +239,11 @@ export class VisualVehicle
                     wheel.painted = child
             })
 
-            // Cylinder (actual wheel)
             wheel.cylinder.position.set(0, 0, 0)
 
             if(i === 0 || i === 2)
                 wheel.container.rotation.y = Math.PI
 
-            // Add new track
             wheel.groundTrack = this.game.tracks.add(new Track(0.5, 'r'))
 
             this.wheels.items.push(wheel)
@@ -376,7 +357,6 @@ export class VisualVehicle
         this.boostAnimation.speed = 1.2
         this.boostAnimation.mixUniform = uniform(0)
 
-        // Energy
         if(this.parts.energy)
         {
             const emissiveOuput = this.game.materials.getFromName('emissivePurpleRadialGradient').outputNode
@@ -398,11 +378,9 @@ export class VisualVehicle
     {
         const physicalVehicle = this.game.physicalVehicle
 
-        // Chassis
         this.parts.chassis.position.copy(physicalVehicle.position)
         this.parts.chassis.quaternion.copy(physicalVehicle.quaternion)
 
-        // Wheels
         this.wheels.steering += ((this.game.player.steering * physicalVehicle.steeringAmplitude) - this.wheels.steering) * this.game.ticker.deltaScaled * 16
 
         const wheelsRotation = (physicalVehicle.forwardSpeed) / physicalVehicle.wheels.settings.radius * 0.006
@@ -411,8 +389,6 @@ export class VisualVehicle
         {
             const visualWheel = this.wheels.items[i]
             const physicalWheel = physicalVehicle.wheels.items[i]
-
-            // visualWheel.container.position.copy(physicalWheel.basePosition)
 
             if(!this.game.inputs.actions.get('brake').active || this.game.inputs.actions.get('forward').active || this.game.inputs.actions.get('backward').active)
             {
@@ -442,14 +418,11 @@ export class VisualVehicle
                 visualWheel.suspension.scale.y = suspensionScale
             }
 
-            // Ground tracks
             visualWheel.groundTrack.update(physicalWheel.contactPoint, physicalWheel.inContact)
         }
 
-        // Main ground track
         this.mainGroundTrack.update(physicalVehicle.position, physicalVehicle.position.y < 1.5)
 
-        // Antenna
         if(this.antenna)
         {
             const angle = Math.atan2(this.antenna.target.x - physicalVehicle.position.x, this.antenna.target.z - physicalVehicle.position.z)
@@ -463,7 +436,6 @@ export class VisualVehicle
             this.antenna.headAxle.rotation.z += this.game.ticker.deltaScaled * antennaRotationSpeed
         }
 
-        // Stop/back lights
         if(this.game.player.braking)
         {
             if(this.parts.stopLights)
@@ -482,13 +454,11 @@ export class VisualVehicle
 
             if(this.parts.backLights)
             {
-                // Backward
                 if(this.game.player.accelerating < 0)
                 {
                     this.parts.backLights.visible = true
                     this.parts.backLights.material = this.backLights.material
                 }
-                // Backward
                 else
                 {
                     this.parts.backLights.visible = false
@@ -496,17 +466,14 @@ export class VisualVehicle
             }
         }
 
-        // Boost trails
         const trailAlpha = physicalVehicle.goingForward && this.game.player.boosting && this.game.player.accelerating > 0 ? 1 : 0
         this.boostTrails.leftReference.getWorldPosition(this.boostTrails.left.position)
         this.boostTrails.left.alpha = trailAlpha
         this.boostTrails.rightReference.getWorldPosition(this.boostTrails.right.position)
         this.boostTrails.right.alpha = trailAlpha
 
-        // Boost animation
         this.boostAnimation.mix += (this.game.player.boosting ? 1 : - 1) * this.game.ticker.deltaScaled * this.boostAnimation.speed
         this.boostAnimation.mix = clamp(this.boostAnimation.mix, 0, 1)
-        // this.boostAnimation.mixUniform.value = remapClamp(this.boostAnimation.mix, 0, 0.2, 0, 1)
         this.boostAnimation.mixUniform.value = 1 - Math.pow(1 - this.boostAnimation.mix, 7)
         if(this.parts.energy)
         {
@@ -515,7 +482,6 @@ export class VisualVehicle
             this.parts.cell2.position.y = remapClamp(this.boostAnimation.mix, 0.4, 1, 0.2, 0)
         }
 
-        // Screen position
         const vector = new THREE.Vector3()
         vector.setFromMatrixPosition(this.parts.chassis.matrixWorld)
         vector.project(this.game.view.camera)

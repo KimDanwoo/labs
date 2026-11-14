@@ -32,10 +32,9 @@ export class Title
         {
             this.lastTime = this.game.ticker.elapsed
             this.offsetRounded = offsetRounded
-            
+
             const line = []
-            
-            // Create base line (with potential overlapping)
+
             for(let i = 0; i < this.length; i++)
             {
                 if(i === this.carPosition)
@@ -49,7 +48,6 @@ export class Title
                 }
             }
 
-            // Move items away from each other
             for(let i = 0; i < line.length - 1; i++)
             {
                 const leftItem = line[i]
@@ -70,7 +68,6 @@ export class Title
                 }
             }
 
-            // Formated final title
             let title = Array(this.length).fill(' ')
             for(let i = 0; i < line.length; i++)
             {
@@ -84,22 +81,8 @@ export class Title
                 }
             }
 
-            
             document.title = 'Danwoo Island ' + title.join('')
         }
     }
 }
 
-// 🌳 = 11
-// . = 40
-// ⚬ = ?
-// ● = ?
-// • = ?
-// ˚ = ?
-// ◦ = ?
-// ° = ?
-// ○ = ?
-// º = ?
-// o = ?
-// ∘ = ?
-//  ۪ = ?

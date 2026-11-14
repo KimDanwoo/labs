@@ -10,8 +10,6 @@ export class Confetti
     {
         this.game = Game.getInstance()
 
-        // Debug
-
         this.pool = []
         this.poolSize = 4
         this.count = 500
@@ -24,8 +22,6 @@ export class Confetti
         ])
 
         this.createPool()
-
-        // Debug
     }
 
     createPool()
@@ -49,7 +45,7 @@ export class Confetti
             {
                 return this.colorsUniform.element(instanceIndex.mod(3))
             })()
-            
+
             const material = new MeshDefaultMaterial({
                 colorNode: colorNode,
                 hasCoreShadows: true,
@@ -67,22 +63,18 @@ export class Confetti
 
             material.positionNode = Fn(() =>
             {
-                // Realize nodes so that the shadow updates too
                 instance(instanceMatrix).toStack()
 
                 const basePosition = positionLocal
 
-                // Progress
                 const progressStart = rest.mul(randomProgressBuffer)
                 const progressEnd = progressStart.add(confetti.amplitudeUniform)
                 const progress = remapClamp(confetti.progressUniform, progressStart, progressEnd, 0, 1).toVar()
                 progress.assign(progress.oneMinus().pow(3).oneMinus())
 
-                // Scale
                 const scale = progress.sub(0.5).mul(2).abs().oneMinus().mul(20).min(1)
                 basePosition.mulAssign(scale)
 
-                // Position
                 const baseX = sin(angleBuffer)
                 const baseZ = cos(angleBuffer)
 
@@ -93,7 +85,6 @@ export class Confetti
 
                 const finalPosition = vec3(basePosition.x.add(x), basePosition.y.add(y), basePosition.z.add(z))
 
-                // Projection
                 return finalPosition
             })()
 
@@ -103,14 +94,14 @@ export class Confetti
 
             const instanceMatrix = new THREE.InstancedBufferAttribute(new Float32Array(this.count * 16), 16)
             instanceMatrix.setUsage(THREE.StaticDrawUsage)
-    
+
             for(let i = 0; i < this.count; i++)
             {
                 const matrix = new THREE.Matrix4()
 
                 const position = new THREE.Vector3(0, 0, 0)
                 const quaternion = new THREE.Quaternion().random()
-                const scale = new THREE.Vector3(1, 1, 1)//.setScalar(0.5 + Math.random() * 0.5)
+                const scale = new THREE.Vector3(1, 1, 1)
 
                 matrix.compose(position, quaternion, scale)
 
@@ -121,14 +112,13 @@ export class Confetti
 
             this.game.scene.add(confetti.mesh)
 
-
             confetti.pop = (position, radius, elevation) =>
             {
                 confetti.available = false
 
                 confetti.mesh.visible = true
                 confetti.mesh.position.copy(position)
-                
+
                 confetti.radiusUniform.value = radius
                 confetti.elevationUniform.value = elevation
 

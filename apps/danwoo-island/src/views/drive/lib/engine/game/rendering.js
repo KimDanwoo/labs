@@ -10,7 +10,6 @@ export class Rendering
     constructor()
     {
         this.game = Game.getInstance()
-
     }
 
     start()
@@ -42,7 +41,6 @@ export class Rendering
 
         this.renderer.domElement.classList.add('experience')
         this.renderer.shadowMap.enabled = true
-        // this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
         this.renderer.setOpaqueSort((a, b) =>
         {
             return a.renderOrder - b.renderOrder
@@ -57,7 +55,6 @@ export class Rendering
             this.renderer.inspector = new Inspector()
         }
 
-        // Make the renderer control the ticker
         this.renderer.setAnimationLoop((elapsedTime) => { this.game.ticker.update(elapsedTime) })
 
         return this.renderer
@@ -79,7 +76,6 @@ export class Rendering
 
         this.cheapDOFPass = cheapDOF(renderOutput(scenePass))
 
-        // Quality
         const qualityChange = (level) =>
         {
             if(level === 0)
@@ -95,15 +91,13 @@ export class Rendering
         }
         qualityChange(this.game.quality.level)
         this.game.quality.events.on('change', qualityChange)
-
-        // Debug
     }
 
     setStats()
     {
         if(!location.hash.match(/stats/i))
             return
-            
+
         this.stats = {}
         this.stats.feed = {}
         this.stats.update = () =>
@@ -115,8 +109,6 @@ export class Rendering
         }
 
         this.stats.update()
-
-        // Debug
     }
 
     resize()
@@ -127,7 +119,6 @@ export class Rendering
 
     async render()
     {
-        // this.renderer.render(this.game.scene, this.game.view.camera)
         this.postProcessing.render()
 
         if(this.stats)

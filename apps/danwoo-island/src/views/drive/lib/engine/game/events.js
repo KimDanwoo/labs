@@ -7,15 +7,12 @@ export class Events
 
     on(_name, _callback, _order = 1)
     {
-        // Create callbacks array if needed
         if(!(this.callbacks[_name] instanceof Array))
             this.callbacks[_name] = []
 
-        // Create order array if needed
         if(!(this.callbacks[_name][_order] instanceof Array))
             this.callbacks[_name][_order] = []
 
-        // Save callback
         this.callbacks[_name][_order].push(_callback)
 
         return this
@@ -23,12 +20,10 @@ export class Events
 
     off(_name, _callback = null)
     {
-        // Remove specific
         if(typeof _callback === 'function')
         {
             for(const order in this.callbacks[_name])
             {
-                // Find
                 const callbacks = this.callbacks[_name][order]
                 const index = callbacks.indexOf(_callback)
 
@@ -37,7 +32,6 @@ export class Events
             }
         }
 
-        // Remove all
         else
         {
             if(this.callbacks[_name] instanceof Array)
@@ -59,7 +53,7 @@ export class Events
                 }
             }
         }
-        
+
         return this
     }
 }

@@ -3,13 +3,11 @@ import { vec2, Fn, texture, uniform } from 'three/tsl'
 import { Game } from './game'
 import { remapClamp } from './utilities/maths'
 
-
 export class Wind
 {
     constructor()
     {
         this.game = Game.getInstance()
-
 
         this.angle = Math.PI * 0.6
         this.direction = uniform(vec2(
@@ -20,7 +18,7 @@ export class Wind
         this.strength = uniform(0.5)
         this.localTime = uniform(0)
         this.timeFrequency = 0.1
-        
+
         this.offsetNode = Fn(([position]) =>
         {
             const remapedPosition = position.mul(this.positionFrequency)
@@ -32,7 +30,7 @@ export class Wind
             const noise2 = texture(this.game.noises.perlin, noiseUv2).r.sub(0.5)
 
             const intensity = noise2.add(noise1)
-            
+
             return vec2(this.direction.mul(intensity).mul(this.strength))
         })
 
@@ -41,17 +39,14 @@ export class Wind
             this.update()
         }, 9)
 
-        // Debug
         this.strengthBinding = autoBinding(this.strength, 'value', () =>
             {
                 return remapClamp(this.game.weather.wind.value, 0, 1, 0.1, 1)
             })
-
     }
 
     update()
     {
-        // Apply weather
         this.strengthBinding.update()
         this.localTime.value += this.game.ticker.deltaScaled * this.timeFrequency * this.strength.value
     }

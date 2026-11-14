@@ -39,15 +39,12 @@ export class PhysicsVehicle
             high: 40
         }
 
-        // Debug
-
         this.setChassis()
         this.controller = this.game.physics.world.createVehicleController(this.chassis.physical.body)
         this.setWheels()
         this.setStop()
         this.setUpsideDown()
         this.setStuck()
-        // this.setBackWheel()
         this.setFlip()
 
         this.game.ticker.events.on('tick', () =>
@@ -69,9 +66,9 @@ export class PhysicsVehicle
             friction: 0.4,
             rotation: new THREE.Quaternion().setFromAxisAngle(new THREE.Euler(0, 1, 0), Math.PI * 0),
             colliders: [
-                { shape: 'cuboid', mass: 2.5, parameters: [ 1.3, 0.4, 0.85 ], position: { x: 0, y: -0.1, z: 0 }, centerOfMass: { x: 0, y: -0.5, z: 0 } }, // Main
-                { shape: 'cuboid', mass: 0, parameters: [ 0.5, 0.15, 0.65 ], position: { x: 0, y: 0.4, z: 0 } }, // Top
-                { shape: 'cuboid', mass: 0, parameters: [ 1.5, 0.5, 0.9 ], position: { x: 0.1, y: -0.2, z: 0 }, category: 'bumper' }, // Bumper
+                { shape: 'cuboid', mass: 2.5, parameters: [ 1.3, 0.4, 0.85 ], position: { x: 0, y: -0.1, z: 0 }, centerOfMass: { x: 0, y: -0.5, z: 0 } },
+                { shape: 'cuboid', mass: 0, parameters: [ 0.5, 0.15, 0.65 ], position: { x: 0, y: 0.4, z: 0 } },
+                { shape: 'cuboid', mass: 0, parameters: [ 1.5, 0.5, 0.9 ], position: { x: 0.1, y: -0.2, z: 0 }, category: 'bumper' },
             ],
             canSleep: false,
             waterGravityMultiplier: 0,
@@ -86,13 +83,11 @@ export class PhysicsVehicle
 
     setWheels()
     {
-        // Setup
         this.wheels = {}
         this.wheels.inContactCount = 0
         this.wheels.justTouchedCount = 0
         this.wheels.items = []
 
-        // Create wheels
         for(let i = 0; i < 4; i++)
         {
             const wheel = {}
@@ -103,16 +98,13 @@ export class PhysicsVehicle
             wheel.suspensionState = 'low'
             wheel.lastTouchTime = this.game.ticker.elapsed
 
-            // Default wheel with random parameters
             this.controller.addWheel(new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), 1, 1)
 
-            // Base position
             wheel.basePosition = new THREE.Vector3()
 
             this.wheels.items.push(wheel)
         }
 
-        // Settings
         this.wheels.settings = {
             offset: { x: 0.90, y: 0, z: 0.75 },
             radius: 0.4,
@@ -137,12 +129,12 @@ export class PhysicsVehicle
                 new THREE.Vector3(- this.wheels.settings.offset.x, this.wheels.settings.offset.y,   this.wheels.settings.offset.z),
                 new THREE.Vector3(- this.wheels.settings.offset.x, this.wheels.settings.offset.y, - this.wheels.settings.offset.z),
             ]
-            
+
             let i = 0
             for(const wheel of this.wheels.items)
             {
                 wheel.basePosition.copy(wheelsPositions[i])
-                
+
                 this.controller.setWheelDirectionCs(i, this.wheels.settings.directionCs)
                 this.controller.setWheelAxleCs(i, this.wheels.settings.axleCs)
                 this.controller.setWheelRadius(i, this.wheels.settings.radius)
@@ -159,8 +151,6 @@ export class PhysicsVehicle
         }
 
         this.wheels.updateSettings()
-
-        // Debug
     }
 
     setStop()
@@ -172,7 +162,6 @@ export class PhysicsVehicle
 
         this.stop.test = () =>
         {
-
             if(this.speed < this.stop.lowThreshold)
             {
                 if(!this.stop.active)
@@ -276,40 +265,12 @@ export class PhysicsVehicle
         }
     }
 
-    // setBackWheel()
-    // {
-    //     this.backWheel = {}
-    //     this.backWheel.active = false
-    //     this.backWheel.test = () =>
-    //     {
-    //         if(
-    //             this.zRotation > 1 && this.zRotation < 1.7 &&
-    //             this.wheels.items[2].inContact && this.wheels.items[3].inContact
-    //         )
-    //         {
-    //             if(!this.backWheel.active)
-    //             {
-    //                 this.backWheel.active = true
-    //                 this.events.trigger('backWheel', [ this.backWheel.active ])
-    //             }
-    //         }
-    //         else
-    //         {
-    //             if(this.backWheel.active)
-    //             {
-    //                 this.backWheel.active = false
-    //                 this.events.trigger('backWheel', [ this.backWheel.active ])
-    //             }
-    //         }
-    //     }
-    // }
-
     setFlip()
     {
         this.flip = {}
         this.flip.force = 5
         let inAir = false
-        
+
         let previousXAngle = 0
         let accumulatedXAngle = 0
 
@@ -318,26 +279,22 @@ export class PhysicsVehicle
 
         this.flip.test = () =>
         {
-            // Every wheel stop touching
             if(this.wheels.inContactCount === 0)
             {
-                // Wasn't in the air => Start
                 if(!inAir)
                 {
                     inAir = true
-                    
+
                     previousXAngle = this.xRotation
                     accumulatedXAngle = 0
-                    
+
                     previousZAngle = this.zRotation
                     accumulatedZAngle = 0
                 }
             }
 
-            // 4 wheels are touching
             if(this.wheels.inContactCount >= 4)
             {
-                // Was in the air => stop
                 if(inAir)
                 {
                     inAir = false
@@ -373,7 +330,7 @@ export class PhysicsVehicle
             const sidewardDot = up.dot(this.sideward)
             const forwardDot = up.dot(this.forward)
             const upwarddDot = up.dot(this.upward)
-            
+
             const sidewardAbsolute = Math.abs(sidewardDot)
             const forwardAbsolute = Math.abs(forwardDot)
             const upwarddAbsolute = Math.abs(upwarddDot)
@@ -381,7 +338,6 @@ export class PhysicsVehicle
             const impulse = new THREE.Vector3(0, 1, 0).multiplyScalar(this.flip.force * this.chassis.mass)
             this.chassis.physical.body.applyImpulse(impulse)
 
-            // Upside down
             if(upwarddAbsolute > sidewardAbsolute && upwarddAbsolute > forwardAbsolute)
             {
                 const torqueX = 0.8 * this.chassis.mass
@@ -389,7 +345,6 @@ export class PhysicsVehicle
                 torque.applyQuaternion(this.chassis.physical.body.rotation())
                 this.chassis.physical.body.applyTorqueImpulse(torque)
             }
-            // On the side
             else
             {
                 const torqueX = sidewardDot * 0.4 * this.chassis.mass
@@ -399,7 +354,6 @@ export class PhysicsVehicle
                 this.chassis.physical.body.applyTorqueImpulse(torque)
             }
         }
-
     }
 
     moveTo(position, rotation = 0)
@@ -415,17 +369,15 @@ export class PhysicsVehicle
 
     updatePrePhysics()
     {
-        // Engine force
         const topSpeed = lerp(this.topSpeed, this.topSpeedBoost, this.game.player.boosting)
         const overflowSpeed = Math.max(0, this.speed - topSpeed)
         let engineForce = (this.game.player.accelerating * (1 + this.game.player.boosting * this.boostMultiplier)) * this.engineForceAmplitude / (1 + overflowSpeed) * this.game.ticker.deltaScaled
 
-        // Brake
         let brake = this.game.player.braking
 
         if(!this.game.player.braking && Math.abs(this.game.player.accelerating) < 0.1)
             brake = this.idleBrake
-    
+
         if(
             this.speed > 0.5 &&
             (
@@ -440,10 +392,8 @@ export class PhysicsVehicle
 
         brake *= this.brakeAmplitude * this.game.ticker.deltaScaled
 
-        // Steer
         const steer = this.game.player.steering * this.steeringAmplitude
 
-        // Update wheels
         this.controller.setWheelSteering(0, steer)
         this.controller.setWheelSteering(1, steer)
 
@@ -454,7 +404,6 @@ export class PhysicsVehicle
             this.controller.setWheelSuspensionRestLength(i, this.suspensionsHeights[this.game.player.suspensions[i]])
             this.controller.setWheelSuspensionStiffness(i, this.suspensionsStiffness[this.game.player.suspensions[i]])
 
-            // Ice slip
             const groundObject = this.controller.wheelGroundObject(i)
 
             if(groundObject && this.game.world.waterSurface)
@@ -466,14 +415,12 @@ export class PhysicsVehicle
             }
         }
 
-        // Update controller
         const delta = this.game.quality.level === 1 ? 1/60 : Math.min(1/60, this.game.ticker.deltaAverage)
         this.controller.updateVehicle(delta)
     }
 
     updatePostPhysics()
     {
-        // Various measures
         const newPosition = new THREE.Vector3().copy(this.chassis.physical.body.translation())
         this.velocity = newPosition.clone().sub(this.position)
         this.direction = this.velocity.clone().normalize()
@@ -482,7 +429,6 @@ export class PhysicsVehicle
         this.sideward.set(0, 0, 1).applyQuaternion(this.quaternion)
         this.upward.set(0, 1, 0).applyQuaternion(this.quaternion)
         this.forward.set(1, 0, 0).applyQuaternion(this.quaternion)
-        // this.speed = this.controller.currentVehicleSpeed()
         this.speed = this.velocity.length() / this.game.ticker.deltaScaled
         this.xzSpeed = Math.hypot(this.velocity.x, this.velocity.z) / this.game.ticker.deltaScaled
         this.forwardRatio = this.direction.dot(this.forward)
@@ -532,7 +478,6 @@ export class PhysicsVehicle
         this.stop.test()
         this.upsideDown.test()
         this.stuck.test()
-        // this.backWheel.test()
         this.flip.test()
     }
 
