@@ -19,7 +19,6 @@ export class Zones
         this.previewGroup.visible = false
         this.previewGroup.userData.preventPreRender = true
         this.game.scene.add(this.previewGroup)
-
     }
 
     create(type = 'sphere', position, radius)
@@ -28,7 +27,6 @@ export class Zones
         zone.events = new Events()
         this.items.push(zone)
 
-        // Preview
         zone.preview = new THREE.Mesh(
             new THREE.SphereGeometry(radius, 16, 16),
             new THREE.MeshBasicNodeMaterial({ color: '#ffffff', wireframe: true })

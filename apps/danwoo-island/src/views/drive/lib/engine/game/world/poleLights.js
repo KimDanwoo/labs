@@ -11,30 +11,23 @@ export class PoleLights
     {
         this.game = Game.getInstance()
 
-        // Debug
-
-        // Base and references
         const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.poleLightsModel.scene.children)
         this.references = references
-        
-        // Setup base
+
         for(const child of base.children)
         {
-            child.name = child.name.replace(/[0-9]+$/i, '') // Set clear name to retrieve it later as instances
+            child.name = child.name.replace(/[0-9]+$/i, '')
             child.castShadow = true
             child.receiveShadow = true
         }
 
-        // Update materials 
         this.game.materials.updateObject(base)
 
-        // Create instanced group
         this.instancedGroup = new InstancedGroup(this.references, createLampPost(this.game.materials), false)
 
         this.glass = this.instancedGroup.meshes.find(mesh => mesh.instance.name === 'glass').instance
-        
+
         this.setPhysics()
-        // this.setEmissives()
         this.setFireflies()
         this.setSwitchInterval()
     }
@@ -59,13 +52,6 @@ export class PoleLights
         }
     }
 
-    // setEmissives()
-    // {
-    //     this.emissive = {}
-    //     this.emissive.offMaterial = this.game.materials.getFromName('palette')
-    //     this.emissive.onMaterial = this.game.materials.getFromName('emissiveOrangeRadialGradient')
-    // }
-
     setFireflies()
     {
         this.firefliesScale = uniform(0)
@@ -88,7 +74,7 @@ export class PoleLights
                 i++
             }
         }
-        
+
         const positionAttribute = instancedArray(positions, 'vec3').toAttribute()
 
         const material = new THREE.SpriteNodeMaterial()
@@ -113,7 +99,6 @@ export class PoleLights
 
     setSwitchInterval()
     {
-
         const intervalChange = (inInterval) =>
         {
             if(inInterval)

@@ -52,7 +52,7 @@ function segmentCircleIntersection(x1, y1, x2, y2, cx, cy, r)
     const discriminant = b * b - 4 * a * c
     if (discriminant < 0)
     {
-        return [] // No intersection
+        return []
     }
 
     const intersections = []
@@ -63,17 +63,17 @@ function segmentCircleIntersection(x1, y1, x2, y2, cx, cy, r)
 
     if(t1 >= 0 && t1 <= 1)
     {
-        intersections.push({ 
-            x: x1 + t1 * dx, 
-            y: y1 + t1 * dy 
+        intersections.push({
+            x: x1 + t1 * dx,
+            y: y1 + t1 * dy
         })
     }
 
     if(t2 >= 0 && t2 <= 1 && discriminant !== 0)
     {
-        intersections.push({ 
-            x: x1 + t2 * dx, 
-            y: y1 + t2 * dy 
+        intersections.push({
+            x: x1 + t2 * dx,
+            y: y1 + t2 * dy
         })
     }
 
@@ -81,9 +81,9 @@ function segmentCircleIntersection(x1, y1, x2, y2, cx, cy, r)
 }
 
 const TAU = 2 * Math.PI
-var mod = function (a, n) { return ( a % n + n ) % n } // modulo
+var mod = function (a, n) { return ( a % n + n ) % n }
 
-var equivalent = function (a) { return mod(a + Math.PI, TAU) - Math.PI } // [-π, +π]
+var equivalent = function (a) { return mod(a + Math.PI, TAU) - Math.PI }
 
 function smallestAngle(current, target)
 {
@@ -99,25 +99,22 @@ function dist(a, b)
 
 function lineIntersectsCircle(p1, p2, center, radius)
 {
-    // Vector from p1 to p2
     const dx = p2.x - p1.x
     const dy = p2.y - p1.y
 
-    // Vector from p1 to circle center
     const fx = center.x - p1.x
     const fy = center.y - p1.y
 
-    // Project fx,fy onto dx,dy — normalized t position
     const t = (fx * dx + fy * dy) / (dx * dx + dy * dy)
 
     let closest = null
 
     if(t < 0)
-        closest = p1 // closest at segment start
+        closest = p1
     else if(t > 1)
-        closest = p2 // closest at segment end
+        closest = p2
     else
-        closest = { x: p1.x + t * dx, y: p1.y + t * dy } // projection point
+        closest = { x: p1.x + t * dx, y: p1.y + t * dy }
 
     return dist(closest, center) <= radius
 }
@@ -144,14 +141,12 @@ function pointInPolygon(point, poly)
 
 function circleIntersectsPolygon(center, radius, poly)
 {
-    // Check if any vertex of polygon is inside circle
     for (const p of poly)
     {
         if(dist(p, center) <= radius)
             return true
     }
 
-    // Check if any edge intersects circle
     for(let i = 0; i < poly.length; i++)
     {
         const p1 = poly[i]
@@ -160,7 +155,6 @@ function circleIntersectsPolygon(center, radius, poly)
             return true
     }
 
-    // Check if circle center is inside polygon
     if(pointInPolygon(center, poly))
         return true
 

@@ -6,7 +6,7 @@ export class Fog
     constructor()
     {
         this.game = Game.getInstance()
-        
+
         this.colorA = uniform(color('#ff0000'))
         this.colorB = uniform(color('#0000ff'))
         this.radialCenter = uniform(vec2(0, 0))
@@ -20,19 +20,15 @@ export class Fog
         this.near = uniform(this.game.view.optimalArea.nearDistance)
         this.far = uniform(this.game.view.optimalArea.farDistance)
         this.strength = rangeFogFactor(this.near, this.far)
-        // this.strength = float(1)
 
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
         }, 10)
-
-        // Debug
     }
 
     update()
     {
-        // Apply day cycles values
         const amplitude = this.game.view.optimalArea.farDistance - this.game.view.optimalArea.nearDistance
         this.colorA.value.copy(this.game.dayCycles.properties.fogColorA.value)
         this.colorB.value.copy(this.game.dayCycles.properties.fogColorB.value)

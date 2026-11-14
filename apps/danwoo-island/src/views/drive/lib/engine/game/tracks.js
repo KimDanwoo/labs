@@ -14,11 +14,11 @@ export class Tracks
         this.tracks = []
 
         this.focusPoint = new THREE.Vector2()
-        
+
         this.camera = new THREE.OrthographicCamera(- this.halfSize,  this.halfSize,  this.halfSize, - this.halfSize, 0.1, 10)
         this.camera.position.y = 5
         this.camera.rotation.x = - Math.PI * 0.5
-        
+
         this.scene = new THREE.Scene()
         this.scene.add(this.camera)
 
@@ -33,14 +33,11 @@ export class Tracks
             }
         )
 
-        // this.setDebugPlane()
-
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
         }, 9)
     }
-
 
     add(track)
     {
@@ -59,7 +56,6 @@ export class Tracks
         this.camera.position.x = this.focusPoint.x
         this.camera.position.z = this.focusPoint.y
 
-        // Render
         const rendererState = THREE.RendererUtils.resetRendererState(this.game.rendering.renderer)
 
         this.game.rendering.renderer.setPixelRatio(1)
@@ -70,7 +66,6 @@ export class Tracks
         THREE.RendererUtils.restoreRendererState(this.game.rendering.renderer, rendererState)
     }
 }
-
 
 export class Track
 {
@@ -93,10 +88,9 @@ export class Track
 
         this.distanceThrottle = 0.2
         this.lastPosition = new THREE.Vector3(Infinity, Infinity, Infinity)
-        
+
         this.setDataTexture()
         this.setTrail()
-        // this.setDebugPlane()
     }
 
     setDataTexture()
@@ -115,7 +109,7 @@ export class Track
         this.trail = {}
         this.trail.geometry = new THREE.PlaneGeometry(1, 1, this.subdivisions, 1)
         this.trail.geometry.translate(0.5, 0, 0)
-        
+
         this.trail.material = new THREE.MeshBasicNodeMaterial({ wireframe: false, depthTest: false, transparent: true, blending: THREE.AdditiveBlending })
 
         const trackData = varying(vec4())
@@ -147,7 +141,7 @@ export class Track
                 cos(angle.add(sideSign.mul(Math.PI * 0.5))),
                 sin(angle.add(sideSign.mul(Math.PI * 0.5)))
             ).mul(this.thickness)
-            
+
             const newPosition = vec3(
                 trackData.x.add(trailPosition.x),
                 trackData.y,
@@ -156,7 +150,7 @@ export class Track
 
             return newPosition
         })()
-        
+
         this.trail.material.outputNode = Fn(() =>
         {
             const endAlpha = uv().x.smoothstep(0.5, 1).oneMinus()
@@ -174,28 +168,24 @@ export class Track
             const alpha = endAlpha.mul(startAlpha).mul(contactAlpha).mul(trackEdgeAlpha).mul(renderEdgeAlpha)
             return vec4(this.channelVec3, alpha)
         })()
-        
+
         this.trail.mesh = new THREE.Mesh(this.trail.geometry, this.trail.material)
         this.trail.mesh.frustumCulled = false
         this.game.scene.add(this.trail.mesh)
     }
 
-
     update(_position, _touching)
     {
         const data = this.dataTexture.source.data.data
 
-        // Throttle by time
         const lastTimeDelta = this.game.ticker.elapsed - this.lastTime
         if(lastTimeDelta > this.timeThrottle)
         {
-            // Throttle by distance
             const positionDelta = this.lastPosition.clone().sub(_position)
             const distance = positionDelta.length()
-            
+
             if(distance > this.distanceThrottle)
             {
-                // Move data one "pixel"
                 for(let i = this.subdivisions - 1; i >= 0; i--)
                 {
                     const i4 = i * 4
@@ -205,13 +195,11 @@ export class Track
                     data[i4 + 3] = data[i4 - 1]
                 }
 
-                // Save time and position
                 this.lastTime = this.game.ticker.elapsed
                 this.lastPosition.copy(_position)
             }
         }
 
-        // Draw new position
         data[0] = _position.x
         data[1] = _position.y
         data[2] = _position.z

@@ -5,7 +5,6 @@ export class WindLineGeometry extends LineGeometry
 {
     constructor(length = 10, handlesCount = 4, amplitude = 1, divisions = 30)
     {
-        // Handles
         const halfExtent = length / 2
         const handleSpan = length / (handlesCount - 1)
         const handles = []
@@ -19,10 +18,9 @@ export class WindLineGeometry extends LineGeometry
             ))
         }
 
-        // Curve
         const curve = new THREE.CatmullRomCurve3(handles)
         const points = curve.getPoints(divisions)
-        
+
         super(points)
 
         this.type = 'WindLineGeometry'

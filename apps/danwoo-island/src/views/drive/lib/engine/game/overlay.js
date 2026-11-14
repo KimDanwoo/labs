@@ -11,7 +11,6 @@ export class Overlay
 
         this.setSounds()
 
-        // Uniforms
         const colorA = uniform(color('#251f2b'))
         const colorB = uniform(color('#1d1721'))
         this.progress = uniform(0)
@@ -21,17 +20,13 @@ export class Overlay
         const diagonalAmplitude = 0.5
         const diagonalInvertMultipilier = 1 + diagonalAmplitude * 2
 
-        // Geometry
         const geometry = new THREE.PlaneGeometry(2, 2)
 
-        // Material
         const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false })
         material.outputNode = Fn(() =>
         {
-            // Stroke
             const strokeMask = viewportCoordinate.x.add(viewportCoordinate.y).div(this.strokeSize).mod(1).sub(0.5).mul(2).abs()
 
-            // Pattern
             const patternUv = viewportCoordinate.div(this.patternSize).mod(1)
             const patternMask = texture(this.game.resources.overlayPatternTexture, patternUv).a.remap(0, 0.68, 0, 1).toVar()
 
@@ -40,21 +35,17 @@ export class Overlay
                 patternMask.assign(patternMask.oneMinus())
             })
 
-            // Final
             const mask = patternMask.add(strokeMask.mul(0.2)).mul(1 / (1 + 0.2))
 
-            // Diagonal
-            const diagonalRatio = screenUV.length().div(1.414).toVar() // Hypot 1, 1
+            const diagonalRatio = screenUV.length().div(1.414).toVar()
             If(this.inverted.greaterThan(0.5), () =>
             {
                 diagonalRatio.assign(diagonalRatio.oneMinus())
             })
             const diagonalProgress = this.progress.sub(diagonalRatio.mul(diagonalAmplitude)).mul(diagonalInvertMultipilier)
 
-            // Discard
             diagonalProgress.lessThan(mask).discard()
 
-            // Gradient
             const colorHash = texture(this.game.noises.hash, viewportCoordinate.div(this.game.noises.resolution)).r.sub(0.5).mul(0.2)
             const colorMix = screenUV.length().add(colorHash)
             const finalColor = mix(colorA, colorB, colorMix)
@@ -63,14 +54,12 @@ export class Overlay
         })()
         material.vertexNode = vec4(positionGeometry.x, positionGeometry.y, 0, 1)
 
-        // Mesh
         this.mesh = new THREE.Mesh(geometry, material)
         this.mesh.frustumCulled = false
         this.mesh.renderOrder = 99
         this.mesh.visible = true
         this.game.scene.add(this.mesh)
 
-        // Debug
         this.game.viewport.events.on('change', () =>
         {
             this.patternSize.value = 200 * this.game.viewport.pixelRatio

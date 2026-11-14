@@ -12,8 +12,7 @@ export function timeToReadableString(time, withHours = true, widthMinutes = true
     const hours = Math.floor(time / 3600)
     const minutes = Math.floor((time % 3600) / 60)
     const seconds = Math.floor((time % 60))
-    // const milliseconds = (time * 1000) % 1000
-    
+
     const parts = []
 
     if(hours > 0 && withHours)

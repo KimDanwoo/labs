@@ -14,12 +14,8 @@ export class Snow
         this.size = this.game.view.optimalArea.radius * 2
         this.halfSize = this.size * 0.5
         this.subdivisions = 256
-        // this.size = 10
-        // this.subdivisions = 3
 
         this.subdivisionSize = this.size / this.subdivisions
-
-        // Debug
 
         this.setNodes()
         this.setSnowElevation()
@@ -45,7 +41,6 @@ export class Snow
         this.waterDropEdgeHigh = uniform(0.235)
         this.waterDropAmplitude = uniform(1)
 
-        // Base elevation
         const rainRatio = remapClamp(this.game.weather.rain.value, 0.05, 0.3, 0, 1) * remapClamp(this.game.weather.temperature.value, 0, -5, 0, 1)
         const meltRatio = remapClamp(this.game.weather.temperature.value, 0, 10, 0, -1)
 
@@ -55,11 +50,8 @@ export class Snow
         {
             const elevation = this.elevation.toVar()
 
-            // Terrain
-            // const terrainUv = this.game.terrain.worldPositionToUvNode(position.xy)
             const terrainData = this.game.terrain.terrainNode(position.xy)
 
-            // Noise
             const noiseUv1 = position.mul(this.noise1Frequency).xy
             const noise1 = texture(this.game.noises.perlin, noiseUv1).r
 
@@ -68,7 +60,6 @@ export class Snow
 
             elevation.addAssign(noise1.mul(noise2).smoothstep(0, 1).mul(this.noiseMultiplier))
 
-            // Wheel tracks
             const groundDataColor = texture(
                 this.game.tracks.renderTarget.texture,
                 position.xy.sub(- this.game.tracks.halfSize).sub(this.roundedPosition).add(this.tracksDelta).div(this.game.tracks.size)
@@ -79,7 +70,6 @@ export class Snow
             const tracksHeight = min(wheelsTracksHeight, chassisTracksHeight)
             elevation.mulAssign(tracksHeight)
 
-            // Water elevation
             elevation.addAssign(terrainData.b.remap(0, 1, 0, -2))
 
             return elevation
@@ -126,25 +116,7 @@ export class Snow
         )
         this.snowElevation.texture = this.snowElevation.renderTarget.texture
 
-        // Quad mesh
         this.snowElevation.quadMesh = new THREE.QuadMesh(material)
-
-        // // Debug
-        // const debugMaterial = new THREE.MeshBasicNodeMaterial({ map: this.snowElevation.renderTarget.texture, transparent: true, depthTest: false, depthWrite: false })
-        // debugMaterial.vertexNode = Fn(() =>
-        // {
-        //     const ratio = viewportSize.x.div(viewportSize.y)
-        //     const position = attribute('position').mul(vec3(1, ratio, 0)).mul(0.5).sub(vec3(0.75, 0.5, 0))
-        //     return vec4(position, 1)
-        // })()
-
-        // const debugMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), debugMaterial)
-
-        // debugMesh.position.y = 5
-        // debugMesh.position.x = - 3
-        // debugMesh.frustumCulled = false
-        // debugMesh.renderOrder = 1
-        // this.game.scene.add(debugMesh)
     }
 
     setGeometry()
@@ -154,7 +126,6 @@ export class Snow
 
         const halfSubdivisionSize = this.subdivisionSize * 0.5
         const quad = [
-            // Triangle 1
             halfSubdivisionSize,
             - halfSubdivisionSize,
 
@@ -164,7 +135,6 @@ export class Snow
             - halfSubdivisionSize,
             halfSubdivisionSize,
 
-            // Triangle 2
             - halfSubdivisionSize,
             halfSubdivisionSize,
 
@@ -206,7 +176,6 @@ export class Snow
                 positionArray[iPosition + 16] = 0
                 positionArray[iPosition + 17] = pivotZ + quad[11]
 
-                // pivotArray
                 pivotArray[iPivot + 0] = pivotX
                 pivotArray[iPivot + 1] = pivotZ
                 pivotArray[iPivot + 2] = pivotX
@@ -242,7 +211,6 @@ export class Snow
         const computeNormal = varying(vec3())
 
         const pivot = attribute('pivot')
-        // const debugColor = varying(color('red'))
 
         const flipRotation = Math.PI * 0.5
 
@@ -265,12 +233,10 @@ export class Snow
 
         this.material.positionNode = Fn(() =>
         {
-            // Offset position
             const newPosition = positionGeometry.toVar()
             newPosition.x.addAssign(this.roundedPosition.x)
             newPosition.z.addAssign(this.roundedPosition.y)
 
-            // Rotate quad
             const pivotCenter = vec3(pivot.x, 0, pivot.y)
             pivotCenter.x.addAssign(this.roundedPosition.x)
             pivotCenter.z.addAssign(this.roundedPosition.y)
@@ -292,13 +258,11 @@ export class Snow
             const rotation = float(0)
             If(acDelta.lessThan(bdDelta), () =>
             {
-                // debugColor.assign(color('cyan'))
                 rotation.assign(flipRotation)
             })
 
             newPosition.xz.assign(rotateUV(newPosition.xz, rotation, pivotCenter.xz))
 
-            // Position / Normal
             const positionA = newPosition
             const positionB = positionA.add(vec3(this.normalNeighbourShift, 0, 0))
             const positionC = positionA.add(vec3(0, 0, this.normalNeighbourShift.negate()))
@@ -307,23 +271,17 @@ export class Snow
             positionB.y.assign(elevationFromTexture(positionB.xz))
             positionC.y.assign(elevationFromTexture(positionC.xz))
 
-            // Terrain data
-            // const terrainUv = this.game.terrain.worldPositionToUvNode(positionA.xz)
             const terrainData = this.game.terrain.terrainNode(positionA.xz)
             const terrainColor = this.game.terrain.colorNode(terrainData)
 
-            // Normal
             const newNormal = cross(positionA.sub(positionB), positionA.sub(positionC)).normalize()
             computeNormal.assign(modelViewMatrix.mul(vec4(newNormal, 0)))
 
-            // Push down further more in water (after calculating normal)
             const waterDrop = terrainData.b.remapClamp(this.waterDropEdgeLow, this.waterDropEdgeHigh, 0, this.waterDropAmplitude.negate())
             positionA.y.addAssign(waterDrop)
 
-            // Delta to floor
             deltaY.assign(positionA.y.sub(terrainData.b.mul(-2)))
 
-            // World UV
             worldUv.assign(positionA.xz)
 
             return positionA
@@ -343,28 +301,21 @@ export class Snow
         {
             const glitter = float(0)
 
-            // Hash
             const hashUv = positionWorld.xz.mul(this.glitterHashFrequency)
             const hash = texture(this.game.noises.hash, hashUv).r.mul(2).add(this.glitterVariation).mod(2).sub(1).abs()
             glitter.addAssign(hash)
 
-            // Perlin
             const perlinUv = positionWorld.xz.mul(this.glitterPerlinFrequency)
             const perlin = texture(this.game.noises.perlin, perlinUv).r
             const glitterPerlin = perlin.remapClamp(0, 0.5, 0, 1)
             glitter.mulAssign(glitterPerlin)
 
-            // Scarcity
             glitter.assign(glitter.pow(this.glitterScarcity))
 
-            // Intensity
             glitter.mulAssign(this.glitterIntensity)
 
-            // Output
             return vec4(baseOutput.rgb.add(glitter), baseOutput.a)
         })()
-
-        // Debug
     }
 
     setMesh()
@@ -383,32 +334,18 @@ export class Snow
 
         if(this.elevation.value > -0.9)
         {
-            // Apply weather
             this.mesh.visible = true
 
-            // Glitter
-            // this.glitterPositionDelta.value = 1 + (this.game.view.camera.position.x + this.game.view.camera.position.z) * this.glitterViewMultiplier + this.game.ticker.elapsedScaled * 0.4
-            // this.glitterPositionDelta.value = 123.456 + (this.game.view.camera.position.x + this.game.view.camera.position.z) * this.glitterViewMultiplier
-
-            // this.glitterViewMultiplier = 0.001
-            // this.glitterTimeMultiplier = 0.001
             this.glitterVariation.value += this.game.ticker.deltaScaled * this.glitterTimeMultiplier + this.game.view.delta.length() * this.glitterViewMultiplier
 
-            // Rounded position
             this.roundedPosition.value.x = Math.round(this.game.view.optimalArea.position.x / this.subdivisionSize) * this.subdivisionSize
             this.roundedPosition.value.y = Math.round(this.game.view.optimalArea.position.z / this.subdivisionSize) * this.subdivisionSize
 
-            // Tracks delta
             this.tracksDelta.value.set(
                 this.roundedPosition.value.x - this.game.tracks.focusPoint.x,
                 this.roundedPosition.value.y - this.game.tracks.focusPoint.y
             )
 
-            // this.game.rendering.renderer.setRenderTarget(this.snowElevation.renderTarget)
-            // this.snowElevation.quadMesh.render(this.game.rendering.renderer)
-            // this.game.rendering.renderer.setRenderTarget(null)
-
-            // Render
             const rendererState = THREE.RendererUtils.resetRendererState(this.game.rendering.renderer)
 
             this.game.rendering.renderer.setPixelRatio(1)

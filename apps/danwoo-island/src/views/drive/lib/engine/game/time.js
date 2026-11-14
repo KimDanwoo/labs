@@ -20,8 +20,6 @@ export class Time
         {
             this.update()
         }, 0)
-
-        // Debug
     }
 
     setBulletTime()
@@ -44,7 +42,7 @@ export class Time
             {
                 this.bulletTime.endTime = Date.now() + duration * 1000
             }
-            
+
             this.bulletTime.active = true
         }
     }
@@ -59,7 +57,6 @@ export class Time
         this.bulletTime.progress = clamp(this.bulletTime.progress, 0, 1)
 
         this.scale = remap(this.bulletTime.progress, 0, 1, this.defaultScale, this.bulletTime.scale)
-        // console.log(this.bulletTime.progress)
     }
 
     set scale(value)

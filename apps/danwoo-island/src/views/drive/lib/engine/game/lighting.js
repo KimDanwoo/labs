@@ -27,7 +27,6 @@ export class Lighting
         this.shadowNormalBias = 0.1
         this.shadowRadius = this.game.quality.level === 0 ? 3 : 2
 
-
         this.setNodes()
         this.setLight()
         this.updateShadow()
@@ -44,8 +43,6 @@ export class Lighting
             this.shadowAmplitude = this.game.view.optimalArea.radius
             this.updateShadow()
         }, 3)
-
-        // Debug
     }
 
     setNodes()
@@ -59,8 +56,6 @@ export class Lighting
         this.bounceColor = uniform(color('#82487f'))
         this.coreShadowEdgeLow = uniform(float(-0.25))
         this.coreShadowEdgeHigh = uniform(float(1))
-
-        // Debug
     }
 
     setLight()
@@ -75,7 +70,6 @@ export class Lighting
 
     setHelpers()
     {
-        // Direction helper
         this.directionHelper = new THREE.Mesh(
             new THREE.IcosahedronGeometry(0.25, 1),
             new THREE.MeshBasicNodeMaterial({ wireframe: true })
@@ -95,12 +89,10 @@ export class Lighting
 
         this.game.scene.add(this.directionHelper)
 
-        // Shadow helper
         this.shadowHelper = new THREE.CameraHelper(this.light.shadow.camera)
         this.shadowHelper.visible = false
         this.shadowHelper.userData.preventPreRender = true
         this.game.scene.add(this.shadowHelper)
-
     }
 
     updateShadow()
@@ -132,7 +124,6 @@ export class Lighting
 
     update()
     {
-        // Spherical coordinates
         if(this.useDayCycles)
         {
             const progressOffset = 9/16
@@ -145,23 +136,16 @@ export class Lighting
             this.spherical.phi = this.phi
         }
 
-        // Direction (for shaders)
         this.direction.setFromSpherical(this.spherical).normalize()
-        
-        // Actual lights transform
+
         const optimalRoundedPosition = this.game.view.optimalArea.position.clone()
-        // optimalRoundedPosition.x = Math.round(optimalRoundedPosition.x)
-        // optimalRoundedPosition.y = Math.round(optimalRoundedPosition.y)
-        // optimalRoundedPosition.z = Math.round(optimalRoundedPosition.z)
-        
+
         this.light.position.setFromSpherical(this.spherical).add(optimalRoundedPosition)
         this.light.target.position.copy(optimalRoundedPosition)
 
-        // Helper
         this.directionHelper.position.copy(this.direction).multiplyScalar(5).add(this.game.view.focusPoint.position)
         this.directionHelper.lookAt(this.game.view.focusPoint.position)
 
-        // Apply day cycles values
         this.colorUniform.value.copy(this.game.dayCycles.properties.lightColor.value)
         this.intensityUniform.value = this.game.dayCycles.properties.lightIntensity.value
     }

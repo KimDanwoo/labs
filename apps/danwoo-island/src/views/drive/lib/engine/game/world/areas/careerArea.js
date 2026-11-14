@@ -19,8 +19,6 @@ export class CareerArea extends Area
     {
         super(references)
 
-        // Debug
-
         this.setSounds()
         this.setLines()
         this.references.items.get('year')[0].removeFromParent()
@@ -56,7 +54,6 @@ export class CareerArea extends Area
             onPlay: (item, line) =>
             {
                 item.positions[0].copy(line.origin)
-                // item.rate = 0.9 + Math.random() * 0.2
             }
         })
     }
@@ -122,7 +119,6 @@ export class CareerArea extends Area
                     return vec4(finalColor, alpha)
                 })()
 
-                // Mesh
                 line.textMesh.castShadow = false
                 line.textMesh.receiveShadow = false
                 line.textMesh.material = material
@@ -138,8 +134,6 @@ export class CareerArea extends Area
         {
             line.index = i++
         }
-
-        // Debug
     }
 
     createProfileTexture(name)
@@ -191,12 +185,10 @@ export class CareerArea extends Area
 
     update()
     {
-        // Lines
         for(const line of this.lines.items)
         {
             const delta = line.origin.z - this.game.player.position.z
 
-            // Is in
             if(delta > - this.lines.padding && delta < line.size + this.lines.padding * 2)
             {
                 if(!line.isIn)
@@ -206,7 +198,6 @@ export class CareerArea extends Area
                 }
             }
 
-            // Is out
             else
             {
                 if(line.isIn)
@@ -216,7 +207,6 @@ export class CareerArea extends Area
                 }
             }
 
-            // Elevation
             if(line.isIn)
             {
                 if(!line.isUp)
@@ -257,7 +247,6 @@ export class CareerArea extends Area
             line.elevationTarget = line.isUp ? this.lines.activeElevation : 0
             line.stone.position.y += (line.elevationTarget - line.stone.position.y) * this.game.ticker.deltaScaled * 3
 
-            // Position
             if(line.isIn)
             {
                 if(line.stone.position.y > 1)
@@ -265,16 +254,13 @@ export class CareerArea extends Area
             }
             else
             {
-                // End
                 if(delta > line.size)
                     line.offsetTarget = - line.size
-                // Start
                 else
                     line.offsetTarget = 0
             }
 
             line.stone.position.z += (line.offsetTarget - line.stone.position.z) * this.game.ticker.deltaScaled * 10
         }
-
     }
 }

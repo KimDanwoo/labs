@@ -24,17 +24,15 @@ export class DayCycles extends Cycles
 
     getKeyframesDescriptions()
     {
-        // Debug
-
         return [
             [
-                { properties: presets.day, stop: 0.0 }, // day
-                { properties: presets.day, stop: 0.15 }, // day
-                { properties: presets.dusk, stop: 0.25 }, // Dusk
-                { properties: presets.night, stop: 0.35 }, // Night
-                { properties: presets.night, stop: 0.6 }, // Night
-                { properties: presets.dawn, stop: 0.8 }, // Dawn
-                { properties: presets.day, stop: 0.9 }, // day
+                { properties: presets.day, stop: 0.0 },
+                { properties: presets.day, stop: 0.15 },
+                { properties: presets.dusk, stop: 0.25 },
+                { properties: presets.night, stop: 0.35 },
+                { properties: presets.night, stop: 0.6 },
+                { properties: presets.dawn, stop: 0.8 },
+                { properties: presets.day, stop: 0.9 },
             ]
         ]
     }

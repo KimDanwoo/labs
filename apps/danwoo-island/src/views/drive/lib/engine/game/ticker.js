@@ -43,7 +43,6 @@ export class Ticker
         }
         this.deltaAverage = this.lastDeltas.reduce((total, value) => total + value) / arrayLength
 
-
         this.elapsedUniform.value = this.elapsed
         this.deltaUniform.value = this.delta
         this.elapsedScaledUniform.value = this.elapsedScaled
@@ -61,7 +60,7 @@ export class Ticker
                 i--
             }
         }
-        
+
         this.events.trigger('tick')
     }
 

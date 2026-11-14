@@ -51,7 +51,7 @@ export class Nipple
         this.uniforms.progressStartAngle = uniform(0)
         this.uniforms.progressEndAngle = uniform(0)
         this.uniforms.colorMultiplier = uniform(1)
-        
+
         const material = new THREE.MeshBasicNodeMaterial({ transparent: true, wireframe: false, depthWrite: false })
 
         material.outputNode = Fn(() =>
@@ -59,16 +59,14 @@ export class Nipple
             const radialCoord = vec2(positionGeometry.xz)
             const radialAngle = atan(radialCoord.y, radialCoord.x)
 
-            // Angle
             const directionAngleSDF = abs(radialAngle).sub(this.forwardAmplitude * 0.5).toVar()
-            
+
             If(this.uniforms.forward.lessThan(0.5), () =>
             {
                 directionAngleSDF.assign(directionAngleSDF.negate())
             })
             const directionAngle = step(directionAngleSDF, 0)
 
-            // Edges
             const innerEdgeSDF = abs(radialCoord.length().sub(this.progressRadiusLow)).toVar()
             const outerEdgeSDF = abs(radialCoord.length().sub(this.progressRadiusHigh)).toVar()
 
@@ -81,8 +79,7 @@ export class Nipple
             const edgesFill = max(innerEdgeFill, outerEdgeFill)
             const edgesOutline = max(innerEdgeOutline, outerEdgeOutline)
 
-            // Progress
-            const progressSDF = radialCoord.length().sub(this.progressRadiusLow).sub(this.uniforms.progress.mul(this.progressRadiusHigh - this.progressRadiusLow - this.outlineThickness / 2)).toVar() // Distance between edges minus outlines
+            const progressSDF = radialCoord.length().sub(this.progressRadiusLow).sub(this.uniforms.progress.mul(this.progressRadiusHigh - this.progressRadiusLow - this.outlineThickness / 2)).toVar()
 
             const progressLowSDF = radialCoord.length().sub(this.progressRadiusLow + this.outlineThickness / 2).negate()
             progressSDF.assign(max(progressSDF, progressLowSDF))
@@ -98,19 +95,16 @@ export class Nipple
 
             const progressOutline = step(progressSDF, this.outlineThickness / 4).mul(directionAngle)
 
-            // Final fill and outline
             const outline = max(edgesOutline, progressOutline)
             const fill = max(edgesFill, progressFill).toVar()
 
-            // Discard
             outline.lessThan(0.00001).discard()
 
-            // Alpha
             const alpha = outline.mul(0.35).add(fill.mul(0.75))
 
             return vec4(vec3(fill).mul(this.uniforms.colorMultiplier), alpha)
         })()
-        
+
         this.mesh = new THREE.Mesh(geometry, material)
 
         this.group.add(this.mesh)
@@ -129,14 +123,12 @@ export class Nipple
 
     updateFromPointer(pointer, action)
     {
-        // Start
         if(action.trigger === 'start')
         {
             if(pointer.touches.length == 1)
                 this.active = true
         }
 
-        // End
         else if(action.trigger === 'end')
         {
             this.active = false
@@ -147,15 +139,12 @@ export class Nipple
             this.inRadiusLow = false
         }
 
-        // Change
         if(action.trigger === 'start' || action.trigger === 'change')
         {
             if(this.active)
             {
-                // One finger => Handle it
                 if(pointer.touches.length == 1)
                 {
-                    // Intersect
                     const ndcPointer = new THREE.Vector2(
                         (pointer.current.x / this.game.viewport.width) * 2 - 1,
                         - ((pointer.current.y / this.game.viewport.height) * 2 - 1),
@@ -166,17 +155,13 @@ export class Nipple
                     const intersect = new THREE.Vector3()
                     this.raycaster.ray.intersectPlane(plane, intersect)
 
-                    // Distance
                     const distance = this.position.distanceTo(intersect)
 
-                    // Target angle
                     this.targetAngle = Math.atan2(intersect.z - this.position.z, intersect.x - this.position.x)
 
-                    // Progress
                     this.progress = clamp((distance - this.progressRadiusLow) / (this.progressRadiusHigh - this.progressRadiusLow), 0, 1)
                     this.uniforms.progress.value = this.progress
 
-                    // Tap
                     if(action.trigger === 'start')
                     {
                         if(this.progress === 0)
@@ -188,7 +173,6 @@ export class Nipple
                             this.inRadiusLow = false
                     }
                 }
-                // More than one finger => End
                 else
                 {
                     this.active = false
@@ -200,7 +184,7 @@ export class Nipple
     jump()
     {
         this.animated = true
-        
+
         gsap.to(
             this.mesh.position,
             {
@@ -232,15 +216,13 @@ export class Nipple
     {
         if(this.active || this.animated)
         {
-            // Smallest angle and forward
             this.smallestAngle = smallestAngle(this.angle, this.targetAngle)
             let smallestAngleAbs = Math.abs(this.smallestAngle)
 
             this.forward = smallestAngleAbs < this.forwardAmplitude / 2
-                
+
             this.uniforms.forward.value = this.forward ? 1 : 0
 
-            // Recalculate, but backward
             if(!this.forward)
                 this.smallestAngle = smallestAngle(this.angle + Math.PI, this.targetAngle)
 
@@ -263,16 +245,13 @@ export class Nipple
                 }
             }
 
-            // Color multiplier
             this.uniforms.colorMultiplier.value = this.progress === 1 ? 1.5 : 1
 
-            // Group visiblity
             this.group.visible = true
         }
 
         else
         {
-            // Hide
             this.group.visible = false
         }
     }

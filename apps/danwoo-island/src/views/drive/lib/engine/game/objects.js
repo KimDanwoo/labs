@@ -27,12 +27,8 @@ export class Objects
             reseting: false
         }
 
-        /**
-         * Visual
-         */
         if(_visualDescription && _visualDescription.model)
         {
-            // Default parameters
             const visualDescription = {
                 updateMaterials: true,
                 castShadow: true,
@@ -40,17 +36,14 @@ export class Objects
                 parent: this.game.scene,
                 ..._visualDescription
             }
-            
-            // Visual
+
             const visual = {}
             visual.object3D = _visualDescription.model
             visual.parent = visualDescription.parent
 
-            // Update materials
             if(visualDescription.updateMaterials)
                 this.game.materials.updateObject(visualDescription.model)
 
-            // Update shadows
             if(visualDescription.castShadow || visualDescription.receiveShadow)
             {
                 visualDescription.model.traverse(_child =>
@@ -66,25 +59,17 @@ export class Objects
                 })
             }
 
-            // Add to scene
             if(visualDescription.parent !== null)
                 visualDescription.parent.add(visual.object3D)
 
-            // Save
             object.visual = visual
         }
 
-        /**
-         * Physical
-         */
         if(_physicalDescription)
         {
             object.physical = this.game.physics.getPhysical(_physicalDescription)
         }
 
-        /**
-         * Save physical in visual and vis versa
-         */
         if(object.physical)
         {
             object.physical.body.userData = { object: object }
@@ -94,13 +79,9 @@ export class Objects
             object.visual.object3D.userData.object = object
         }
 
-        /**
-         * Save
-         */
         this.key++
         this.list.set(this.key, object)
 
-        // If sleeping, not enabled or fixed apply transform directly
         if(object.visual && object.physical)
         {
             if(_physicalDescription.sleeping || !_physicalDescription.enabled || object.physical.type === 'fixed')
@@ -116,7 +97,7 @@ export class Objects
     getFromModel(_model, _visualDescription = {}, _physicalDescription = {})
     {
         let name = _model.name
-        
+
         const physical = !!name.match(/physical/i)
         const cleanUpRegexp = /physical|fixed|dynamic|kinematicPositionBased/gi
 
@@ -124,7 +105,6 @@ export class Objects
 
         if(physical)
         {
-            // Define type
             if(typeof _physicalDescription.type === 'undefined')
             {
                 _physicalDescription.type = 'fixed'
@@ -135,30 +115,17 @@ export class Objects
                     _physicalDescription.type = 'kinematicPositionBased'
             }
 
-            // Restitution
             if(typeof _model.userData.restitution !== 'undefined')
                 _physicalDescription.restitution = _model.userData.restitution
 
-            // Friction
             if(typeof _model.userData.friction !== 'undefined')
                 _physicalDescription.friction = _model.userData.friction
 
-            // Category
             if(typeof _model.userData.category !== 'undefined')
                 _physicalDescription.category = _model.userData.category
 
-            // // Collision (removed, too expensive)
-            // if(_physicalDescription.type === 'dynamic')
-            // {
-            //     _physicalDescription.onCollision = (force, position) =>
-            //     {
-            //         this.game.audio.groups.get('hitDefault').playRandomNext(force, position)
-            //     }
-            // }
-
             _model.name = name.replaceAll(cleanUpRegexp, '')
 
-            // Colliders
             const children = [..._model.children]
             for(const _child of children)
             {
@@ -201,19 +168,15 @@ export class Objects
                 if(typeof _child.userData.category !== 'undefined')
                     collider.category = _child.userData.category
 
-                // Collider found
                 if(collider.shape)
                 {
-                    // Save
                     colliders.push(collider)
 
-                    // Remove
                     _child.removeFromParent()
                 }
             }
         }
-        
-        // Add
+
         return [
             { ..._visualDescription, model: _model },
             physical ? { ..._physicalDescription, colliders: colliders } : null
@@ -222,7 +185,6 @@ export class Objects
 
     addFromModel(_model, _visualDescription = {}, _physicalDescription = {})
     {
-        // Add
         return this.add(...this.getFromModel(_model, _visualDescription, _physicalDescription))
     }
 
@@ -246,12 +208,10 @@ export class Objects
         object.physical.body.resetForces()
         object.physical.body.resetTorques()
 
-        // Wait a second and reactivate
         this.game.ticker.wait(1, () =>
         {
             object.physical.body.setEnabled(isEnabled)
 
-            // Sleep
             if(object.physical.initialState.sleeping)
                 object.physical.body.sleep()
 
@@ -261,7 +221,7 @@ export class Objects
                 object.needsUpdate = true
             })
         })
-        
+
         if(object.visual)
         {
             if(object.visual.parent && object.visual.parent !== object.visual.object3D.parent)
@@ -321,7 +281,6 @@ export class Objects
         {
             const position = _object.physical ? _object.physical.body.translation(this.tempPosition) : null
 
-            // Apply physical to visual
             if(
                 _object.visual &&
                 _object.physical &&
@@ -339,20 +298,17 @@ export class Objects
                 _object.visual.object3D.quaternion.copy(_object.physical.body.rotation(this.tempRotation))
             }
 
-
             if(_object.physical)
             {
-                // Felt in the floor => reset
                 if(position.y < this.game.water.depthElevation)
                 {
                     this.resetObject(_object)
                 }
 
-                // Far from view => Reset
                 if(objectsNeedDistanceTest)
                 {
                     const distanceToView = Math.hypot(this.roundedViewPosition.x - position.x, this.roundedViewPosition.z - position.z)
-                
+
                     if(_object.physical.body.isEnabled() && !_object.physical.body.isSleeping() && distanceToView > this.game.view.optimalArea.radius)
                     {
                         _object.physical.body.sleep()

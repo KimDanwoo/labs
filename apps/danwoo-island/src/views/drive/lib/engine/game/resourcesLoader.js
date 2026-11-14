@@ -19,7 +19,7 @@ export class ResourcesLoader
             return this.loaders.get(_type)
 
         let loader = null
-        
+
         if(_type === 'texture')
         {
             loader = new THREE.TextureLoader()
@@ -41,7 +41,7 @@ export class ResourcesLoader
             const dracoLoader = this.getLoader('draco')
 
             const ktx2Loader = this.getLoader('textureKtx')
-            
+
             loader = new GLTFLoader()
             loader.setDRACOLoader(dracoLoader)
             loader.setKTX2Loader(ktx2Loader)
@@ -59,52 +59,42 @@ export class ResourcesLoader
             let toLoad = _files.length
             const loadedResources = {}
 
-            // Progress
             const progress = () =>
             {
                 toLoad--
 
                 if(typeof _progressCallback === 'function')
                     _progressCallback(toLoad, _files.length)
-                
+
                 if(toLoad === 0)
                     resolve(loadedResources)
             }
 
-            // Save
             const save = (_file, _resource) =>
             {
-                // Apply modifier
                 if(typeof _file[3] !== 'undefined')
                     _file[3](_resource)
-                    
-                // Save in resources object
+
                 loadedResources[_file[0]] = _resource
 
-                // Save in cache
                 this.cache.set(_file[1], _resource)
             }
 
-            // Error
             const error = (_file) =>
             {
                 console.log(`Resources > Couldn't load file ${_file[1]}`)
                 reject(_file[1])
             }
 
-            // Each file
             for(const _file of _files)
             {
-                // In cache
                 if(this.cache.has(_file[1]))
                 {
-                    // Save cached file directly in resources object
                     loadedResources[_file[0]] = this.cache.get(_file[1])
 
                     progress()
                 }
 
-                // Not in cache
                 else
                 {
                     const loader = this.getLoader(_file[2])

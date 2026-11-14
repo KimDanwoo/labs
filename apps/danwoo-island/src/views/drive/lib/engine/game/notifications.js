@@ -23,49 +23,16 @@ export class Notifications
         {
             this.update()
         }, 14)
-
-        // // Fake notifications
-        // for(let i = 0; i < 10; i++)
-        // {
-        //     // Notification
-        //     const html = /* html */`
-        //         <div class="top">
-        //             <div class="title">Some title</div>
-        //             <div class="progress">
-        //                 <div class="check-icon"></div>
-        //                 <span class="check"></span>
-        //                 <span class="current">1</span> / <span>2</span>
-        //             </div>
-        //         </div>
-        //         <div class="bottom">
-        //             <div class="description">Lorem ipsum dolor, sit amet consectetur adi</div>
-        //             <div class="open-icon"></div>
-        //         </div>
-        //     `
-
-        //     this.show(
-        //         html,
-        //         'test',
-        //         4,
-        //         () => {
-        //             this.game.inputs.interactiveButtons.clearItems()
-        //             this.game.menu.open('achievements')
-        //         },
-        //         'test1'
-        //     )
-        // }
     }
 
     show(content, type = '', duration = 3, clickCallback = null, id = null)
     {
-        // Pending
         if(this.current)
         {
-            // Test if last has same ID to avoid spam
             if(id !== null && this.pendings.length)
             {
                 const withSameId = this.pendings.find(([a, b, c, d, lastId]) => lastId === id)
-                
+
                 if(withSameId || id === this.current.id)
                 {
                     return false
@@ -86,7 +53,7 @@ export class Notifications
 
         if(type)
             item.element.classList.add(`is-${type}`)
-            
+
         item.element.append(content)
 
         item.timeBar = document.createElement('div')
@@ -100,7 +67,7 @@ export class Notifications
                 this.items.removeChild(item.element)
                 this.current = null
                 this.state = Notifications.STATE_HIDDEN
-                
+
                 if(this.pendings.length)
                 {
                     const pending = this.pendings.shift()
@@ -156,7 +123,6 @@ export class Notifications
         this.state = Notifications.STATE_HIDING
 
         this.current.element.classList.add('is-leaving')
-
     }
 
     update()

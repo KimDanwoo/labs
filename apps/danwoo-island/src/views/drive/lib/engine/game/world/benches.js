@@ -8,19 +8,15 @@ export class Benches
     {
         this.game = Game.getInstance()
 
-        // Base and references
         const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.benchesModel.scene.children)
         base.castShadow = true
         base.receiveShadow = true
         base.frustumCulled = true
 
-        // Descriptions > To extract colliders
         const descriptions = this.game.objects.getFromModel(base, {}, {})
-        
-        // Update materials 
+
         this.game.materials.updateObject(base)
 
-        // Objects
         this.objects = []
         for(const reference of references)
         {
@@ -42,17 +38,13 @@ export class Benches
                     contactThreshold: 10,
                     onCollision: (force, position) =>
                     {
-                        // this.game.audio.groups.get('hitMetal').playRandomNext(force, position)
                     }
                 },
             ))
         }
 
-
-        // Instanced group
         this.instancedGroup = new InstancedGroup(references, createBeachBench(this.game.materials))
 
-        // Tick update
         this.game.ticker.events.on('tick', () =>
         {
             for(const object of this.objects)

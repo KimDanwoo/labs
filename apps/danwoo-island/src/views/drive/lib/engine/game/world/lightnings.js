@@ -15,8 +15,6 @@ export class Lightnings
     {
         this.game = Game.getInstance()
 
-        // Debug
-
         this.frequency = 2
         this.hitChances = 0
         this.currentSecond = Math.floor(Date.now() / 1000)
@@ -26,12 +24,10 @@ export class Lightnings
         this.group = new THREE.Group()
         this.game.scene.add(this.group)
 
-        // Debug
         this.hitChancesBinding = autoBinding(this, 'hitChances', () =>
             {
                 return Math.max(0, this.game.weather.clouds.value) * Math.max(0, this.game.weather.electricField.value) * this.game.weather.humidity.value
             })
-
 
         this.setSounds()
         this.setAnticipationParticles()
@@ -48,7 +44,6 @@ export class Lightnings
     {
         this.sounds = {}
 
-        // Near
         {
             const paths = [
                 'sounds/thunder/near/THUNDER_GEN-HDF-23300.mp3',
@@ -73,9 +68,6 @@ export class Lightnings
                             const distance = Math.hypot(coordinates.x - this.game.player.position2.x, coordinates.z - this.game.player.position2.y)
                             item.positions[0].copy(coordinates)
 
-                            // const distanceVolumeEffect = Math.pow(mathRemapClamp(distance, 0, 20, 1, 0), 2)
-                            // item.volume = 0.1 + Math.random() * 0.1 + distanceVolumeEffect * 0.6
-
                             const distanceRateEffect = mathRemapClamp(distance, 0, 20, 0, - 0.3)
                             item.rate = 1.3 + Math.random() * 0.1 + distanceRateEffect
                         }
@@ -84,7 +76,6 @@ export class Lightnings
             }
         }
 
-        // Distant
         {
             const paths = [
                 'sounds/thunder/distant/Thunder32GentleCr SIG014001.mp3',
@@ -119,12 +110,10 @@ export class Lightnings
         this.anticipationParticles.count = 32
         this.anticipationParticles.duration = 5
 
-        // Uniforms
         const durationUniform = uniform(this.anticipationParticles.duration)
         const scaleUniform = uniform(0.07)
         const elevationUniform = uniform(1.5)
 
-        // Buffers
         const positionArray = new Float32Array(this.anticipationParticles.count * 3)
         const scaleArray = new Float32Array(this.anticipationParticles.count)
 
@@ -147,7 +136,6 @@ export class Lightnings
 
         const finalPosition = varying(vec3())
 
-        // Position node
         this.anticipationParticles.positionNode = Fn(([_startTime]) =>
         {
             const localTime = this.game.ticker.elapsedScaledUniform.sub(_startTime)
@@ -159,7 +147,6 @@ export class Lightnings
             return finalPosition
         })
 
-        // Scale node
         this.anticipationParticles.scaleNode = Fn(([_startTime]) =>
         {
             const localTime = this.game.ticker.elapsedScaledUniform.sub(_startTime)
@@ -170,13 +157,10 @@ export class Lightnings
             return finalScale
         })
 
-        // Create
         this.anticipationParticles.create = (coordinates, rng) =>
         {
-            // Uniforms
             const startTime = uniform(this.game.ticker.elapsedScaled)
 
-            // Material
             const material = new THREE.SpriteNodeMaterial({ transparent: true })
             material.colorNode = this.colorB.div(luminance(this.colorB)).mul(this.intensity)
             material.positionNode = this.anticipationParticles.positionNode(startTime)
@@ -191,7 +175,6 @@ export class Lightnings
 
             return mesh
         }
-
     }
 
     setArc()
@@ -199,7 +182,6 @@ export class Lightnings
         this.arc = {}
         this.arc.duration = 3
 
-        // Geometry
         const points = []
         const pointsCount = 15
         const height = 15
@@ -217,12 +199,10 @@ export class Lightnings
 
         this.arc.geometry = new LineGeometry(points)
 
-        // Uniforms
         const thicknessUniform = uniform(0.1)
         const easeOutUniform = uniform(5)
         const driftAmplitudeUniform = uniform(1)
 
-        // Vertex Node
         this.arc.vertexNode = Fn(([_startTime]) =>
         {
             const ratio = attribute('ratio')
@@ -254,13 +234,10 @@ export class Lightnings
             return cameraProjectionMatrix.mul(viewPosition)
         })
 
-        // Create
         this.arc.create = (coordinates, rng) =>
         {
-            // Uniforms
             const startTime = uniform(this.game.ticker.elapsedScaled)
 
-            // Material
             const material = new THREE.MeshBasicNodeMaterial({ transparent: true })
 
             const mixStrength = positionWorld.sub(vec3(coordinates.x, coordinates.y, coordinates.z)).length().div(8).min(1)
@@ -278,7 +255,6 @@ export class Lightnings
 
             return mesh
         }
-
     }
 
     setExplosionParticles()
@@ -288,7 +264,6 @@ export class Lightnings
         this.explosionParticles.duration = 4
         this.explosionParticles.fallAmplitude = 1
 
-        // Buffers
         const positionArray = new Float32Array(this.explosionParticles.count * 3)
         const scaleArray = new Float32Array(this.explosionParticles.count)
 
@@ -311,15 +286,12 @@ export class Lightnings
         this.explosionParticles.positionAttribute = instancedArray(positionArray, 'vec3').toAttribute()
         this.explosionParticles.scaleAttribute = instancedArray(scaleArray, 'float').toAttribute()
 
-        // Geometry
         this.explosionParticles.geometry = new THREE.PlaneGeometry()
 
-        // Uniforms
         const scaleUniform = uniform(0.1)
         const radiusUniform = uniform(3)
         const easeOutUniform = uniform(8)
 
-        // Position node
         this.explosionParticles.positionNode = Fn(([_startTime]) =>
         {
             const localTime = this.game.ticker.elapsedScaledUniform.sub(_startTime)
@@ -331,7 +303,6 @@ export class Lightnings
             return newPosition
         })
 
-        // Scale node
         this.explosionParticles.scaleNode = Fn(([_startTime]) =>
         {
             const localTime = this.game.ticker.elapsedScaledUniform.sub(_startTime)
@@ -340,7 +311,6 @@ export class Lightnings
             return finalScale
         })
 
-        // Create
         this.explosionParticles.create = (coordinates, rng) =>
         {
             const startTime = uniform(this.game.ticker.elapsedScaled)
@@ -365,7 +335,6 @@ export class Lightnings
 
             return mesh
         }
-
     }
 
     createRandom(rng)
@@ -385,24 +354,18 @@ export class Lightnings
     {
         const disposables = []
 
-        // Anticipation
         disposables.push(this.anticipationParticles.create(coordinates, rng))
 
         gsap.delayedCall(this.anticipationParticles.duration, () =>
         {
-            // Sound
             this.sounds.near[Math.floor(Math.random() * this.sounds.near.length)].play(coordinates)
 
-            // Game explosion
             const vehicleHit = this.game.explosions.explode(coordinates, 7, 4, true)
 
-            // Arc
             disposables.push(this.arc.create(coordinates, rng))
 
-            // Explosion particles
             disposables.push(this.explosionParticles.create(coordinates, rng))
 
-            // Wait and destroy
             const duration = Math.max(this.arc.duration, this.explosionParticles.duration)
             gsap.delayedCall(duration, () =>
             {
@@ -427,11 +390,9 @@ export class Lightnings
 
             const rng = alea(this.currentSecond)
 
-            // Normal lightning
             if(rng() < this.hitChances)
                 this.createRandom(rng)
 
-            // Distant thunder
             else
             {
                 const rng = alea(this.currentSecond + 999)

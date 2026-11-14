@@ -12,7 +12,6 @@ export class Terrain
         this.subdivision = 128
         this.size = 192
 
-
         this.setGradient()
         this.setNodes()
 
@@ -53,16 +52,6 @@ export class Terrain
         }
 
         update()
-
-        // // Debug
-        // canvas.style.position = 'fixed'
-        // canvas.style.zIndex = 999
-        // canvas.style.top = 0
-        // canvas.style.left = 0
-        // canvas.style.width = '128px'
-        // canvas.style.height = `256px`
-        // document.body.append(canvas)
-        
     }
 
     setNodes()
@@ -80,7 +69,6 @@ export class Terrain
             const textureUv = worldPositionToUvNode(position)
             const data = texture(this.game.resources.terrainTexture, textureUv)
 
-            // Wheel tracks
             const groundDataColor = texture(
                 this.game.tracks.renderTarget.texture,
                 position.sub(- this.game.tracks.halfSize).sub(this.tracksDelta).div(this.game.tracks.size)
@@ -89,23 +77,19 @@ export class Terrain
 
             return data
         })
-        
+
         this.colorNode = Fn(([terrainData]) =>
         {
-            // Dirt and water
             const baseColor = texture(this.gradientTexture, vec2(0, terrainData.b.oneMinus()))
 
-            // Grass
             baseColor.assign(mix(baseColor, this.grassColorUniform, terrainData.g))
 
             return baseColor.rgb
         })
-
     }
-    
+
     update()
     {
-        // Tracks delta
         this.tracksDelta.value.set(
             this.game.tracks.focusPoint.x,
             this.game.tracks.focusPoint.y

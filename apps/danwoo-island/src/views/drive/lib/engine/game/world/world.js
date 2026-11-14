@@ -34,12 +34,6 @@ export class World
         this.game = Game.getInstance()
 
         this.step(0)
-
-        // this.setAxesHelper()
-        // this.setCollisionGroupsTest()
-        // this.setNormalTest()
-        // this.setTestMesh()
-        // this.setTestShadow()
     }
 
     step(step)
@@ -110,30 +104,16 @@ export class World
 
     setTestShadow()
     {
-        // Geometry
         const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5)
 
-        // Material
         const material = new THREE.MeshLambertNodeMaterial()
         material.castShadowNode = vec4(0, 0, 0, 1)
 
-        // Mesh
         const mesh = new THREE.Mesh(geometry, material)
         mesh.position.y = 2
         mesh.receiveShadow = true
         mesh.castShadow = true
         this.game.scene.add(mesh)
-
-        // // Receiver
-        // const receiver = new THREE.Mesh(
-        //     new THREE.PlaneGeometry(3, 3),
-        //     new THREE.MeshLambertNodeMaterial()
-        // )
-        // receiver.rotation.x = - Math.PI * 0.5
-        // receiver.position.y = 1
-        // receiver.receiveShadow = true
-        // receiver.castShadow = true
-        // this.game.scene.add(receiver)
     }
 
     setTestMesh()
@@ -143,35 +123,9 @@ export class World
             new THREE.SphereGeometry(1, 32, 32),
             new THREE.MeshBasicMaterial()
         )
-        // console.log(testMesh.material.outputNode = vec4(1, 0, 0, 1))
-        // testMesh.material.outputNode = Fn(() =>
-        // {
-        //     return vec4(1, 0, 0, 1)
-        // })()
-        // setTimeout(() =>
-        // {
 
-        //     testMesh.material.outputNode = Fn(() =>
-        //     {
-        //         return vec4(1, 1, 0, 1)
-        //     })()
-        //     testMesh.material.needsUpdate = true
-        // }, 2000)
-        // testMesh.receiveShadow = true
         testMesh.position.z = 3
         this.game.scene.add(testMesh)
-
-        // const testMesh2 = new THREE.Mesh(
-        //     new THREE.SphereGeometry(1, 32, 32),
-        //     new MeshDefaultMaterial({
-        //         colorNode: color(0xffffff),
-        //         hasCoreShadows: true,
-        //         hasDropShadows: true,
-        //     })
-        // )
-        // testMesh2.receiveShadow = true
-        // testMesh2.position.x = 3
-        // this.game.scene.add(testMesh2)
     }
 
     setAxesHelper()
@@ -183,16 +137,6 @@ export class World
 
     setCollisionGroupsTest()
     {
-        // // Left (object)
-        // this.game.objects.add(
-        //     {
-        //         type: 'dynamic',
-        //         position: { x: 4, y: 2, z: 0.1 },
-        //         colliders: [ { shape: 'cuboid', parameters: [ 0.5, 0.5, 0.5 ], category: 'object' } ]
-        //     }
-        // )
-
-        // Right (terrain)
         this.game.objects.add(
             null,
             {
@@ -201,37 +145,5 @@ export class World
                 colliders: [ { shape: 'cuboid', parameters: [ 0.5, 0.5, 0.5 ], category: 'floor' } ]
             }
         )
-
-        // // Top (bumper)
-        // this.game.objects.add(
-        //     {
-        //         type: 'dynamic',
-        //         position: { x: 4, y: 4, z: -0.5 },
-        //         colliders: [ { shape: 'cuboid', parameters: [ 0.5, 0.5, 0.5 ], category: 'bumper' } ]
-        //     }
-        // )
     }
-
-    // setNormalTest()
-    // {
-    //     const geometry = new THREE.IcosahedronGeometry(1, 2)
-
-    //     const material = new THREE.MeshLambertNodeMaterial()
-
-    //     material.normalNode = normalView
-    //     // const newNormal =
-    //     // material.normalNode = vec3(0, 1, 0)
-
-    //     // material.positionNode = Fn(() =>
-    //     // {
-    //     //     // materialNormal.assign(vec3(0, 1, 0))
-    //     //     return positionGeometry
-    //     // })()
-    //     material.outputNode = vec4(transformedNormalWorld, 1)
-
-    //     const mesh = new THREE.Mesh(geometry, material)
-    //     mesh.position.y = 2
-
-    //     this.game.scene.add(mesh)
-    // }
 }

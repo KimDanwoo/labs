@@ -64,7 +64,6 @@ export class Intro
         const geometry = isTideLoading ? tideRingGeometry(radius) : new THREE.RingGeometry(radius - thickness, radius, 128, 1)
         const material = isTideLoading ? tideRingMaterial(this.circle.smoothedProgress, radius, this.game) : this.glowRingMaterial()
 
-        // Mesh
         const mesh = new THREE.Mesh(geometry, material)
 
         mesh.position.copy(this.center)
@@ -76,7 +75,6 @@ export class Intro
 
         this.circle.mesh = mesh
 
-        // Hide
         this.circle.hide = (callback = null) =>
         {
             const dummy = { scale: 1 }
@@ -85,7 +83,6 @@ export class Intro
                 {
                     scale: 0,
                     duration: 1.5,
-                    // ease: 'back.in(1.7)',
                     ease: 'power4.in',
                     overwrite: true,
                     onUpdate: () =>
@@ -172,17 +169,14 @@ export class Intro
     {
         this.soundButton = {}
 
-        // Texture
         const texture = this.game.resources.soundTexture
 
         if(this.game.audio.mute.active)
             texture.offset.x = 0.5
 
-        // Geometry
         const scale = 0.5
         const geometry = new THREE.PlaneGeometry(50 / 38 * scale, 1 * scale)
 
-        // Material
         const intensity = uniform(1)
         const material = new THREE.MeshBasicNodeMaterial({
             alphaTest: 0.5,
@@ -191,13 +185,11 @@ export class Intro
             outputNode: vec4(vec3(1).mul(intensity), 1)
         })
 
-        // Mesh
         const mesh = new THREE.Mesh(geometry, material)
         mesh.position.x = 0.38
         mesh.position.y = - 1
         this.label.add(mesh)
 
-        // Intersect
         const position = this.label.position.clone()
         position.x += 0.38
         position.y += - 1
@@ -285,17 +277,14 @@ export class Intro
     {
         this.label.removeFromParent()
 
-        // Geometries
         this.circle.mesh.geometry.dispose()
         this.soundButton.mesh.geometry.dispose()
         this.text.mesh.geometry.dispose()
 
-        // Materials
         this.circle.mesh.material.dispose()
         this.soundButton.mesh.material.dispose()
         this.text.mesh.material.dispose()
 
-        // Textures
         this.game.resources.soundTexture.dispose()
 
         this.text.textures.forEach((value, key) =>
@@ -303,7 +292,6 @@ export class Intro
             value.dispose()
         })
 
-        // Events
         this.game.ticker.events.off('tick', this.update)
         this.game.inputs.gamepad.events.off('typeChange', this.text.updateTexture)
         this.game.inputs.events.off('modeChange', this.text.updateTexture)

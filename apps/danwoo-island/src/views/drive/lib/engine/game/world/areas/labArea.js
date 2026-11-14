@@ -36,8 +36,6 @@ export class LabArea extends Area
     {
         super(model)
 
-        // Debug
-
         this.state = LabArea.STATE_CLOSED
 
         this.setSounds()
@@ -62,8 +60,6 @@ export class LabArea extends Area
         this.scroller.progress = this.scroller.targetProgress
 
         this.scroller.animate()
-
-        // Debug
     }
 
     setSounds()
@@ -83,7 +79,6 @@ export class LabArea extends Area
                 item.rate = remapClamp(absoluteSpeed, 0, 6, 0.95, 1.05)
             }
         })
-
     }
 
     setInteractivePoint()
@@ -95,7 +90,6 @@ export class LabArea extends Area
             InteractivePoints.STATE_CONCEALED,
             () =>
             {
-
                 window.open(content.labUrl, '_blank', 'noopener,noreferrer')
             },
             () =>
@@ -115,11 +109,6 @@ export class LabArea extends Area
 
     setInputs()
     {
-        // this.game.inputs.events.on('backward', () =>
-        // {
-        //     this.close()
-        // })
-
         this.game.inputs.events.on('left', (action) =>
         {
             if(action.active)
@@ -193,8 +182,6 @@ export class LabArea extends Area
             this.cinematic.target.copy(flatPosition).add(this.cinematic.targetOffset)
         }
         applyPositionAndTarget()
-
-        // Debug
     }
 
     setShadeMix()
@@ -210,8 +197,6 @@ export class LabArea extends Area
         this.shadeMix.texts.min = 0.1
         this.shadeMix.texts.max = 0.3
         this.shadeMix.texts.mixUniform = uniform(this.shadeMix.texts.min)
-
-        // Debug
     }
 
     setTexts()
@@ -246,7 +231,6 @@ export class LabArea extends Area
                 )
             })()
 
-            // Mesh
             mesh.castShadow = false
             mesh.receiveShadow = false
             mesh.material = material
@@ -258,7 +242,6 @@ export class LabArea extends Area
         this.hover = {}
         this.hover.baseColor = color('#ffffff')
 
-        // Default
         this.hover.inactiveMaterial = new MeshDefaultMaterial({
             colorNode: this.hover.baseColor,
             hasWater: false
@@ -278,7 +261,6 @@ export class LabArea extends Area
             )
         })()
 
-        // Active
         this.hover.activeMaterial = new THREE.MeshBasicNodeMaterial({ transparent: true })
         this.hover.activeMaterial.outputNode = vec4(this.hover.baseColor.mul(1.5), float(1))
     }
@@ -304,13 +286,11 @@ export class LabArea extends Area
         this.images.animationProgress = uniform(0)
         this.images.animationDirection = uniform(0)
 
-        // Mesh
         this.images.mesh = this.references.items.get('images')[0]
         this.images.mesh.receiveShadow = true
         this.images.mesh.castShadow = false
-        this.images.mesh.visible = false // Wait for first load to display
+        this.images.mesh.visible = false
 
-        // Finishing initiating and use first image as default resource
         this.images.init = (key) =>
         {
             this.images.initiated = true
@@ -321,24 +301,19 @@ export class LabArea extends Area
             this.images.textureOld = resource.texture.clone()
             this.images.textureNew = resource.texture.clone()
 
-            // Color node
             const colorNode = Fn(() =>
             {
                 const uvOld = uv().toVar()
                 const uvNew = uv().toVar()
 
-                // Parallax (add an offset according to progress)
                 uvNew.x.addAssign(this.images.animationProgress.oneMinus().mul(-0.25).mul(this.images.animationDirection))
                 uvOld.x.addAssign(this.images.animationProgress.mul(0.25).mul(this.images.animationDirection))
 
-                // Textures
                 const textureOldColor = texture(this.images.textureOld, uvOld).rgb
                 const textureNewColor = texture(this.images.textureNew, uvNew).rgb
 
-                // Load mix
                 textureNewColor.assign(mix(color('#333333'), textureNewColor, this.images.loadProgress))
 
-                // Reveal
                 const reveal = uv().x.toVar()
                 If(this.images.animationDirection.greaterThan(0), () =>
                 {
@@ -348,10 +323,8 @@ export class LabArea extends Area
 
                 const textureColor = mix(textureNewColor, textureOldColor, threshold)
                 return textureColor
-
             })()
 
-            // Material
             this.images.material = new MeshDefaultMaterial({
                 colorNode: colorNode,
                 hasWater: false
@@ -374,14 +347,11 @@ export class LabArea extends Area
             this.images.mesh.material = this.images.material
         }
 
-        // Load ended
         this.images.loadEnded = (key) =>
         {
-            // If first image => init
             if(!this.images.initiated)
                 this.images.init(key)
 
-            // Current image => Reveal
             if(this.navigation.current.image === key)
             {
                 const resource = this.images.getResourceAndLoad(key)
@@ -393,7 +363,6 @@ export class LabArea extends Area
             }
         }
 
-        // Load sibling
         this.images.loadSibling = () =>
         {
             let projectIndex = this.navigation.index
@@ -413,15 +382,12 @@ export class LabArea extends Area
             const resource = this.images.getResourceAndLoad(key)
         }
 
-        // Get resource and load
         this.images.getResourceAndLoad = (key) =>
         {
             const path = `danwoo/${key}`
 
-            // Try to retrieve resource
             let resource = this.images.resources.get(key)
 
-            // Resource not found => Create
             if(!resource)
             {
                 resource = {}
@@ -446,17 +412,14 @@ export class LabArea extends Area
                     }
                 )
 
-                // Save
                 this.images.resources.set(key, resource)
             }
 
             return resource
         }
 
-        // Update
         this.images.update = () =>
         {
-            // Get resource
             const key = this.navigation.current.image
             const resource = this.images.getResourceAndLoad(key)
 
@@ -470,7 +433,6 @@ export class LabArea extends Area
                 this.images.loadProgress.value = 0
             }
 
-            // Update textures
             if(this.images.initiated)
             {
                 this.images.textureOld.copy(this.images.textureNew)
@@ -483,7 +445,6 @@ export class LabArea extends Area
                 }
             }
 
-            // Animate right away
             gsap.fromTo(this.images.animationProgress, { value: 0 }, { value: 1, duration: 1, ease: 'power2.inOut', overwrite: true })
             this.images.animationDirection.value = this.navigation.direction === LabArea.DIRECTION_NEXT ? 1 : -1
         }
@@ -493,14 +454,9 @@ export class LabArea extends Area
     {
         this.adjacents = {}
 
-        /**
-         * Previous
-         */
-        // Arrow
         const arrowPrevious = this.references.items.get('arrowPrevious')[0]
         arrowPrevious.material = this.hover.inactiveMaterial
 
-        // Intersect
         const intersectPrevious = this.references.items.get('intersectPrevious')[0]
         const intersectPreviousPosition = new THREE.Vector3()
         intersectPrevious.getWorldPosition(intersectPreviousPosition)
@@ -522,14 +478,9 @@ export class LabArea extends Area
             }
         })
 
-        /**
-         * Next
-         */
-        // Arrow
         const arrowNext = this.references.items.get('arrowNext')[0]
         arrowNext.material = this.hover.inactiveMaterial
 
-        // Intersect
         const intersectNext = this.references.items.get('intersectNext')[0]
 
         const intersectNextPosition = new THREE.Vector3()
@@ -599,7 +550,6 @@ export class LabArea extends Area
         this.url.group = this.references.items.get('url')[0]
         this.url.inner = this.url.group.children[0]
 
-        // Text
         this.url.textMesh = this.url.inner.children.find(_child => _child.name.startsWith('text'))
         this.url.panel = this.url.inner.children.find(_child => _child.name.startsWith('panel'))
         this.url.textCanvas = new TextCanvas(
@@ -613,7 +563,6 @@ export class LabArea extends Area
         )
         this.url.mixStrength = uniform(0)
 
-        // Material
         const material = new MeshDefaultMaterial({
             colorNode: this.texts.baseColor,
             hasWater: false,
@@ -639,12 +588,10 @@ export class LabArea extends Area
             )
         })()
 
-        // Mesh
         this.url.textMesh.castShadow = false
         this.url.textMesh.receiveShadow = false
         this.url.textMesh.material = material
 
-        // Intersect
         const intersect = this.references.items.get('intersectUrl')[0]
         intersect.visible = false
 
@@ -665,7 +612,6 @@ export class LabArea extends Area
             }
         })
 
-        // Update
         this.url.update = (direction) =>
         {
             if(this.url.status === 'hiding')
@@ -686,11 +632,9 @@ export class LabArea extends Area
 
                 const ratio = this.url.textCanvas.getMeasure().width / this.texts.density
                 this.url.panel.scale.x = ratio + 0.2
-
             } })
         }
 
-        // Open
         this.url.open = () =>
         {
             if(this.navigation.current.url)
@@ -717,7 +661,6 @@ export class LabArea extends Area
         this.scroller.easing = 3
         this.scroller.speed = 0
 
-        // Vertical chain material
         {
             const material = new MeshDefaultMaterial({
                 colorNode: color(ROPE_COLOR),
@@ -730,7 +673,6 @@ export class LabArea extends Area
             this.scroller.chainRight.material = material
         }
 
-        // Pulley chain material
         {
             const material = new MeshDefaultMaterial({
                 colorNode: color(ROPE_COLOR),
@@ -742,7 +684,6 @@ export class LabArea extends Area
             this.scroller.chainPulley.material = material
         }
 
-        // Minis
         {
             const groupTemplate = this.references.items.get('mini')[0]
             const parent = groupTemplate.parent
@@ -764,13 +705,11 @@ export class LabArea extends Area
                 mini.y = - i * this.scroller.minis.inter
                 this.scroller.minis.items.push(mini)
 
-                // Group
                 mini.group = groupTemplate.clone(true)
                 mini.group.position.y = mini.y
                 mini.group.visible = true
                 parent.add(mini.group)
 
-                // Elements
                 let imageMesh = null
                 let textMesh = null
                 let panelMesh = null
@@ -788,11 +727,9 @@ export class LabArea extends Area
                         intersectMesh = child
                 }
 
-                // Image
                 {
                     imageMesh.visible = false
 
-                    // Load
                     mini.startedLoading = false
                     mini.startLoading = () =>
                     {
@@ -845,7 +782,6 @@ export class LabArea extends Area
                     }
                 }
 
-                // Text
                 {
                     mini.textMixStrength = uniform(0)
 
@@ -864,7 +800,6 @@ export class LabArea extends Area
                     const ratio = textCanvas.getMeasure().width / this.texts.density
                     panelMesh.scale.x = ratio + 0.2
 
-                    // Material
                     const material = new MeshDefaultMaterial({
                         colorNode: this.texts.baseColor,
                         hasWater: false,
@@ -891,13 +826,11 @@ export class LabArea extends Area
                         )
                     })()
 
-                    // Mesh
                     textMesh.castShadow = false
                     textMesh.receiveShadow = false
                     textMesh.material = material
                 }
 
-                // Intersect
                 intersectMesh.visible = false
                 mini.intersect = this.game.rayCursor.addIntersect({
                     active: false,
@@ -962,12 +895,10 @@ export class LabArea extends Area
 
         this.scroller.update = () =>
         {
-            // Scroll
             const centeringOffset = labData.length - 3.25
             const closestProgress = Math.round((this.scroller.progress + this.navigation.index - centeringOffset) / labData.length) * labData.length - this.navigation.index + centeringOffset
             this.scroller.targetProgress = closestProgress
 
-            // Active text
             if(this.scroller.minis.current)
                 this.scroller.minis.current.textMixStrength.value = 0
 
@@ -976,7 +907,6 @@ export class LabArea extends Area
             this.scroller.minis.current = mini
         }
 
-        // Inputs
         this.game.inputs.addActions([
             { name: 'labScroll', categories: [ 'cinematic' ], keys: [ 'Wheel.roll' ] }
         ])
@@ -1004,7 +934,6 @@ export class LabArea extends Area
         this.blackBoard.group = this.references.items.get('blackBoard')[0]
         this.blackBoard.parent = this.blackBoard.group.parent
 
-        // Jump timeline
         this.blackBoard.timeline = gsap.timeline({
             repeat: -1,
             repeatDelay: 5,
@@ -1025,7 +954,6 @@ export class LabArea extends Area
         this.blackBoard.timeline.to(this.blackBoard.group.rotation, { x: -0.1, duration: 0.3 }, 0.75 + 2)
         this.blackBoard.timeline.to(this.blackBoard.group.rotation, { x: 0, duration: 0.3 }, 1.05 + 2)
 
-        // Labels
         this.blackBoard.labelsGamepadPlaystation = this.references.items.get('blackboardLabelsGamepadPlaystation')[0]
         this.blackBoard.labelsGamepadXbox = this.references.items.get('blackboardLabelsGamepadXbox')[0]
         this.blackBoard.labelsMouseKeyboard = this.references.items.get('blackboardLabelsMouseKeyboard')[0]
@@ -1137,7 +1065,6 @@ export class LabArea extends Area
     {
         this.cauldron = {}
 
-        // Heat
         {
             const material = new THREE.MeshBasicNodeMaterial({ side: THREE.DoubleSide, transparent: true, depthTest: true, depthWrite: false })
 
@@ -1160,7 +1087,6 @@ export class LabArea extends Area
             this.cauldron.heat.castShadow = false
         }
 
-        // Burning wood
         {
             const baseMaterial = this.game.materials.getFromName('palette')
             const material = baseMaterial.clone()
@@ -1180,16 +1106,13 @@ export class LabArea extends Area
                 const mixStrength = baseUv.sub(0.5).length().mul(2).pow2()
                 const output = mix(baseOutput.rgb, emissiveOutput, mixStrength)
 
-                // return vec4(vec3(mixStrength), 1)
                 return vec4(output.rgb, 1)
             })()
 
             this.cauldron.wood = this.references.items.get('wood')[0]
             this.cauldron.wood.material = material
-
         }
 
-        // Liquid
         {
             this.cauldron.liquid = {}
 
@@ -1204,7 +1127,6 @@ export class LabArea extends Area
 
             this.cauldron.liquid.surface = this.references.items.get('liquid')[0]
             this.cauldron.liquid.surface.material = material
-
         }
     }
 
@@ -1213,7 +1135,6 @@ export class LabArea extends Area
         if(this.state === LabArea.STATE_OPEN || this.state === LabArea.STATE_OPENING)
             return
 
-        // State
         this.state = LabArea.STATE_OPENING
 
         if(this.stateTransition)
@@ -1225,46 +1146,34 @@ export class LabArea extends Area
             this.stateTransition = null
         })
 
-        // Inputs filters
         this.game.inputs.filters.delete('wandering')
         this.game.inputs.filters.add('cinematic')
 
-        // View cinematic
         this.game.view.cinematic.start(this.cinematic.position, this.cinematic.target)
 
-        // Interactive point
         this.game.interactivePoints.temporaryHide()
 
-        // Shade mix
         gsap.to(this.shadeMix.images.mixUniform, { value: this.shadeMix.images.max, duration: 2, ease: 'power2.inOut', overwrite: true })
         gsap.to(this.shadeMix.texts.mixUniform, { value: this.shadeMix.texts.max, duration: 2, ease: 'power2.inOut', overwrite: true })
 
-        // Board
         if(this.blackBoard.active)
         {
             this.blackBoard.timeline.repeat(-1)
             this.blackBoard.timeline.resume()
         }
 
-        // Cursor
         this.adjacents.nextIntersect.active = true
         this.adjacents.previousIntersect.active = true
         this.url.intersect.active = true
 
-        // Deactivate physical vehicle
         this.game.physicalVehicle.deactivate()
 
-        // Buttons
         this.game.inputs.interactiveButtons.clearItems()
         this.game.inputs.interactiveButtons.addItems(['previous', 'next', 'open', 'close'])
 
-        // Sound
         const sound = this.game.audio.groups.get('click')
         if(sound)
             sound.play(true)
-
-        // Achievement
-
     }
 
     close()
@@ -1272,7 +1181,6 @@ export class LabArea extends Area
         if(this.state === LabArea.STATE_CLOSED || this.state === LabArea.STATE_CLOSING)
             return
 
-        // State
         this.state = LabArea.STATE_CLOSING
 
         if(this.stateTransition)
@@ -1284,35 +1192,27 @@ export class LabArea extends Area
             this.stateTransition = null
         })
 
-        // Input filters
         this.game.inputs.filters.delete('cinematic')
         this.game.inputs.filters.add('wandering')
 
-        // View cinematic
         this.game.view.cinematic.end()
 
-        // Shade mix
         gsap.to(this.shadeMix.images.mixUniform, { value: this.shadeMix.images.min, duration: 1.5, ease: 'power2.inOut', overwrite: true })
         gsap.to(this.shadeMix.texts.mixUniform, { value: this.shadeMix.texts.min, duration: 1.5, ease: 'power2.inOut', overwrite: true })
 
-        // Interactive point
         gsap.delayedCall(1, () =>
         {
             this.game.interactivePoints.recover()
         })
 
-        // Cursor
         this.adjacents.nextIntersect.active = false
         this.adjacents.previousIntersect.active = false
         this.url.intersect.active = false
 
-        // Activate physical vehicle
         this.game.physicalVehicle.activate()
 
-        // Buttons
         this.game.inputs.interactiveButtons.clearItems()
 
-        // Sound
         const sound = this.game.audio.groups.get('click')
         if(sound)
             sound.play(false)
@@ -1340,7 +1240,6 @@ export class LabArea extends Area
 
     changeProject(index = 0, direction = null, silent = false)
     {
-        // Loop index
         let loopIndex = index
 
         if(loopIndex > labData.length - 1)
@@ -1348,30 +1247,24 @@ export class LabArea extends Area
         else if(loopIndex < 0)
             loopIndex = labData.length - 1
 
-        // Already active
         if(this.navigation.index === loopIndex)
             return
 
-        // Direction
         if(direction === null)
             direction = signedModDelta(loopIndex, this.navigation.index, labData.length) > 0 ? LabArea.DIRECTION_PREVIOUS : LabArea.DIRECTION_NEXT
 
-        // Save
         this.navigation.index = loopIndex
         this.navigation.current = labData[this.navigation.index]
         this.navigation.previous = labData[(this.navigation.index - 1) < 0 ? labData.length - 1 : this.navigation.index - 1]
         this.navigation.next = labData[(this.navigation.index + 1) % labData.length]
         this.navigation.direction = direction
 
-        // Update components
         this.title.update(direction)
         this.url.update(direction)
         this.images.update()
 
-        // Scroller
         this.scroller.update(this.navigation.index)
 
-        // Sounds
         if(!silent)
         {
             this.game.audio.groups.get('click').play()

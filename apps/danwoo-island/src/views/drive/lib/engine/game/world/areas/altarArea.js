@@ -18,7 +18,6 @@ export class AltarArea extends Area
     {
         super(model)
 
-
         this.value = 0
         this.position = this.references.items.get('altar')[0].position.clone()
 
@@ -31,8 +30,6 @@ export class AltarArea extends Area
         this.setBeamParticles()
         this.setGlyphs()
         this.setDeathZone()
-
-        // Debug
     }
 
     setSounds()
@@ -68,7 +65,6 @@ export class AltarArea extends Area
         this.height = 6
         this.beamAttenuation = uniform(2)
 
-        // Cylinder
         const cylinderGeometry = new THREE.CylinderGeometry(radius, radius, this.height, 32, 1, true)
         cylinderGeometry.translate(0, this.height * 0.5, 0)
 
@@ -78,23 +74,17 @@ export class AltarArea extends Area
         {
             const baseUv = uv()
 
-            // Noise
             const noiseUv = vec2(baseUv.x.mul(6).add(baseUv.y.mul(-2)), baseUv.y.mul(1).sub(this.game.ticker.elapsedScaledUniform.mul(0.2)))
             const noise = texture(this.game.noises.perlin, noiseUv).r
             noise.addAssign(baseUv.y.mul(this.beamAttenuation.add(1)))
 
-            // Emissive
             const emissiveColor = this.color.mul(this.emissive)
 
-            // Goo
-            const gooColor = this.game.fog.strength.mix(vec3(0), this.game.fog.color) // Fog
+            const gooColor = this.game.fog.strength.mix(vec3(0), this.game.fog.color)
 
-            // Mix
-            // const gooMask = step(noise, 0.95)
             const gooMask = step(0.65, noise)
             const finalColor = mix(emissiveColor, gooColor, gooMask)
 
-            // Discard
             noise.greaterThan(1).discard()
 
             return vec4(finalColor, 1)
@@ -105,7 +95,6 @@ export class AltarArea extends Area
         this.game.scene.add(cylinder)
         this.objects.hideable.push(cylinder)
 
-        // Bottom
         const bottomGeometry = new THREE.PlaneGeometry(radius * 2, radius * 2, 1, 1)
 
         const satanStarTexture = this.game.resources.satanStarTexture
@@ -120,7 +109,7 @@ export class AltarArea extends Area
             newUv.y.assign(newUv.y.oneMinus())
             const satanStar = texture(satanStarTexture, newUv).r
 
-            const gooColor = this.game.fog.strength.mix(vec3(0), this.game.fog.color) // Fog
+            const gooColor = this.game.fog.strength.mix(vec3(0), this.game.fog.color)
 
             const emissiveColor = this.color.mul(this.emissive)
 
@@ -154,10 +143,8 @@ export class AltarArea extends Area
     {
         const count = 150
 
-        // Uniforms
         const progress = uniform(0)
 
-        // Attributes
         const positionArray = new Float32Array(count * 3)
         const scaleArray = new Float32Array(count)
         const randomArray = new Float32Array(count)
@@ -183,16 +170,14 @@ export class AltarArea extends Area
         const scale = instancedArray(scaleArray, 'float').toAttribute()
         const random = instancedArray(randomArray, 'float').toAttribute()
 
-        // Material
         const particlesMaterial = new THREE.SpriteNodeMaterial()
         particlesMaterial.outputNode = Fn(() =>
         {
             const distanceToCenter = uv().sub(0.5).length()
-            const gooColor = this.game.fog.strength.mix(vec3(0), this.game.fog.color) // Fog
+            const gooColor = this.game.fog.strength.mix(vec3(0), this.game.fog.color)
             const emissiveColor = this.color.mul(this.emissive)
             const finalColor = mix(gooColor, emissiveColor, step(distanceToCenter, 0.35))
 
-            // Discard
             distanceToCenter.greaterThan(0.5).discard()
 
             return vec4(finalColor, 1)
@@ -212,10 +197,8 @@ export class AltarArea extends Area
             return finalScale
         })()
 
-        // Geometry
         const particlesGeometry = new THREE.PlaneGeometry(0.2, 0.2)
 
-        // Mesh
         const particles = new THREE.Mesh(particlesGeometry, particlesMaterial)
         particles.count = count
         particles.position.copy(this.position)
@@ -283,14 +266,12 @@ export class AltarArea extends Area
 
         material.outputNode = Fn(() =>
         {
-            // Glyph
             const glyphUv = uv().toVar()
             glyphUv.x.addAssign(instanceIndex)
             glyphUv.x.divAssign(32)
             const glyph = texture(this.game.resources.achievementsGlyphsTexture, glyphUv).r
             glyph.lessThan(0.5).discard()
 
-            // Emissive
             const emissiveOutput = mix(
                 emissiveBMaterial.outputNode,
                 emissiveAMaterial.outputNode,
@@ -344,9 +325,7 @@ export class AltarArea extends Area
                 {
                     this.sounds.deathBell1.play()
                 })
-
             }
         )
     }
-
 }

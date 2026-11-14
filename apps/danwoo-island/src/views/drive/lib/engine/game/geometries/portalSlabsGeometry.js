@@ -1,6 +1,5 @@
 import * as THREE from 'three/webgpu'
 
-
 export class PortalSlabGeometry extends THREE.BufferGeometry
 {
     constructor(size = 1)
@@ -13,7 +12,6 @@ export class PortalSlabGeometry extends THREE.BufferGeometry
             size
         }
 
-        // Positions
         const positions = new Float32Array(8 * 3)
 
         positions[0] = -size
@@ -48,7 +46,6 @@ export class PortalSlabGeometry extends THREE.BufferGeometry
         positions[22] = 0
         positions[23] = size
 
-        // Edges
         const edges = new Float32Array(8)
 
         edges[0] = 0
@@ -60,7 +57,6 @@ export class PortalSlabGeometry extends THREE.BufferGeometry
         edges[6] = 0
         edges[7] = 1
 
-        // Indices
         const indices = new Uint16Array(6 * 4)
 
         indices[0] = 0
@@ -113,7 +109,6 @@ export class PortalSlabsGeometry extends THREE.BufferGeometry
             columnsCount
         }
 
-        // Instantiate one unique slab as a reference
         const slabGeometry = new PortalSlabGeometry()
 
         const verticesCount = slabGeometry.attributes.position.count
@@ -123,9 +118,8 @@ export class PortalSlabsGeometry extends THREE.BufferGeometry
         const slabEdges = slabGeometry.attributes.edge.array
         const slabIndices = slabGeometry.index.array
 
-        // Grid of slabs
         const slabsCount = columnsCount * columnsCount
-        
+
         const positions = new Float32Array(verticesCount * slabsCount * 3)
         const centers = new Float32Array(verticesCount * slabsCount * 2)
         const edges = new Float32Array(verticesCount * slabsCount)

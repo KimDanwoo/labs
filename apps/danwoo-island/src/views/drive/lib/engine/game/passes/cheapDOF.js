@@ -27,23 +27,12 @@ class CheapDOFNode extends Node
 	{
 		const outputNode = Fn( () =>
 		{
-			// Strength
 			const strength = uv().y.sub(0.5).abs().smoothstep(this.start, this.end)
-			// return vec4(vec3(strength), 1)
 
-			// Hash blur
 			const blurOutput = hashBlur(this.textureNode, strength.mul(this.amount), {
 				repeats: this.repeats,
 				premultipliedAlpha: true
 			})
-
-			// // Box blur
-			// const blurOutput = boxBlur(this.textureNode, {
-			// 	size: this.size,
-			// 	separation: this.separation
-			// })
-
-			// return blurOutput
 
 			return mix(this.textureNode, blurOutput, strength)
 		} )()

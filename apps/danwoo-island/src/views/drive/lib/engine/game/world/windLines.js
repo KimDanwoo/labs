@@ -35,7 +35,7 @@ class WindLine
         {
             const worldPosition = modelWorldMatrix.mul(vec4(positionGeometry, 1))
             const tangent = _tangent.normalize()
-            
+
             const ratio = attribute('ratio')
             const baseThickness = ratio.sub(0.5).abs().mul(2).oneMinus().smoothstep(0, 1)
             const remapedProgress = this.progress.mul(3).sub(1)
@@ -44,7 +44,7 @@ class WindLine
 
             const sideStep = floor(vertexIndex.toFloat().mul(3).sub(2).div(3).mod(2)).sub(0.5)
             const sideOffset = tangent.mul(sideStep.mul(finalThickness))
-            
+
             worldPosition.addAssign(vec4(sideOffset, 0))
 
             const viewPosition = cameraViewMatrix.mul(worldPosition)
@@ -64,7 +64,6 @@ export class WindLines
     {
         this.game = Game.getInstance()
 
-        
         this.intervalRange = { min: 300, max: 2000 }
         this.duration = 4
         this.translation = 1
@@ -87,12 +86,10 @@ export class WindLines
             }, this.intervalRange.min + Math.random() * (this.intervalRange.max - this.intervalRange.min))
         }
 
-        // Debug
         this.durationBinding = autoBinding(this, 'duration', () =>
             {
                 return remapClamp(this.game.weather.wind.value, 0, 1, 8, 2)
             })
-
 
         displayInterval()
     }
@@ -104,14 +101,11 @@ export class WindLines
         if(!windLine)
             return
 
-        // Apply weather
         this.durationBinding.update()
 
-        // Setup
         windLine.mesh.visible = true
         windLine.available = false
 
-        // Position and rotation
         const angle = this.game.wind.angle
 
         windLine.mesh.position.x = this.game.view.focusPoint.position.x + (Math.random() - 0.5) * this.game.view.optimalArea.radius
@@ -119,7 +113,6 @@ export class WindLines
 
         windLine.mesh.rotation.y = angle
 
-        // Animate position
         gsap.to(
             windLine.mesh.position,
             {
@@ -129,7 +122,6 @@ export class WindLines
             }
         )
 
-        // Animate progress
         gsap.fromTo(
             windLine.progress,
             {
@@ -145,6 +137,5 @@ export class WindLines
                 }
             }
         )
-        
     }
 }

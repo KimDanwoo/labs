@@ -9,8 +9,6 @@ export class Trees
     {
         this.game = Game.getInstance()
 
-        // Debug
-
         this.visual = visual
         this.references = references
         this.colorA = colorA
@@ -27,7 +25,7 @@ export class Trees
         this.modelParts = {}
         this.modelParts.leaves = []
         this.modelParts.body = null
-        
+
         this.visual.traverse((_child) =>
         {
             if(_child.isMesh)
@@ -47,7 +45,7 @@ export class Trees
         this.bodies.instanceMatrix.setUsage(THREE.StaticDrawUsage)
         this.bodies.castShadow = true
         this.bodies.receiveShadow = true
-        
+
         let i = 0
         for(const treeReference of this.references)
         {
@@ -61,7 +59,7 @@ export class Trees
     setLeaves()
     {
         const references = []
-        
+
         for(const treeReference of this.references)
         {
             for(const leaves of this.modelParts.leaves)
@@ -77,8 +75,6 @@ export class Trees
         const leavesColorANode = uniform(color(this.colorA))
         const leavesColorBNode = uniform(color(this.colorB))
         this.leaves = new Foliage(references, leavesColorANode, leavesColorBNode, true)
-
-        // Debug
     }
 
     setPhysical()

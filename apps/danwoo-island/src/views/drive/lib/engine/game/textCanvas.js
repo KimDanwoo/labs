@@ -35,7 +35,6 @@ export class TextCanvas
         this.canvas.style.top = `${top}px`
         this.canvas.style.left = 0
         top += this.height + 10
-        // document.body.append(this.canvas)
 
         this.context = this.canvas.getContext('2d')
         this.context.font = this.font
@@ -81,7 +80,6 @@ export class TextCanvas
 
     draw()
     {
-        // Clear
         this.context.fillStyle = '#000000'
         this.context.fillRect(0, 0, this.width, this.height)
 
@@ -92,7 +90,6 @@ export class TextCanvas
         let i = 0
         for(const line of this.lines)
         {
-            // const y = this.height / (this.lines.length + 1) * (i + 1)
             const y = this.height / 2 + (i - (this.lines.length - 1) / 2) * this.lineHeight
 
             let x = null

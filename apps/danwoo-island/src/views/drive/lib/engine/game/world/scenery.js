@@ -19,14 +19,11 @@ export class Scenery
 
         for(const child of [...this.game.resources.sceneryModel.scene.children])
         {
-            // Add
             if(typeof child.userData.prevent === 'undefined' || child.userData.prevent === false)
             {
-                // Objects
                 this.game.objects.addFromModel(
                     child,
                     {
-
                     },
                     {
                         position: child.position,
@@ -47,14 +44,13 @@ export class Scenery
             this.update()
         })
     }
-    
+
     setRoad()
     {
         this.road = {}
 
-        // Mesh and material
         const mesh = this.references.items.get('road')[0]
-        
+
         this.road.color = uniform(color('#384246'))
         this.road.glitterVariation = uniform(0)
         this.road.glitterScarcity = uniform(100)
@@ -66,25 +62,21 @@ export class Scenery
         {
             const glitter = float(0)
 
-            // Hash
             const hashUv = positionWorld.xz.mul(this.road.glitterHashFrequency)
             const hash = texture(this.game.noises.hash, hashUv).r.mul(2).add(this.road.glitterVariation).mod(2).sub(1).abs()
             glitter.addAssign(hash)
 
-            // Scarcity
             glitter.assign(glitter.pow(this.road.glitterScarcity))
 
-            // Intensity
             glitter.mulAssign(this.road.glitterIntensity)
-            
+
             const perlinUv = positionWorld.xz.mul(this.road.glitterPerlinFrequency)
             const perlin = texture(this.game.noises.perlin, perlinUv).r
             glitter.mulAssign(perlin)
 
             const middle = uv().y.mul(PI).sin()
             glitter.mulAssign(middle)
-            
-            // Output
+
             const baseColor = this.road.color.toVar()
             baseColor.addAssign(glitter)
 
@@ -98,12 +90,6 @@ export class Scenery
             hasWater: false,
         })
         mesh.material = material
-
-        // // Physics
-        // this.road.body = mesh.userData.object.physical.body
-        // this.road.body.setEnabled(false)
-
-        // Debug
     }
 
     update()

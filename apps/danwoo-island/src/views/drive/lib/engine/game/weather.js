@@ -9,12 +9,9 @@ export class Weather
     {
         this.game = Game.getInstance()
 
-        // Debug
-
         this.properties = []
         this.setOverride()
 
-        // Temperature
         this.addProperty(
             'temperature',
             -15,
@@ -32,7 +29,6 @@ export class Weather
             }
         )
 
-        // Humidity
         this.addProperty(
             'humidity',
             0,
@@ -49,7 +45,6 @@ export class Weather
             }
         )
 
-        // Electric field
         this.addProperty(
             'electricField',
             -1,
@@ -57,7 +52,7 @@ export class Weather
             () =>
             {
                 const dayValue = this.game.dayCycles.properties.electricField.value
-                
+
                 const frequency = 0.53
                 const amplitude = 1
                 const variation = this.noise(this.game.dayCycles.absoluteProgress * frequency) * amplitude
@@ -66,7 +61,6 @@ export class Weather
             }
         )
 
-        // Clouds
         this.addProperty(
             'clouds',
             -1,
@@ -80,7 +74,6 @@ export class Weather
             }
         )
 
-        // Wind
         this.addProperty(
             'wind',
             0,
@@ -93,7 +86,6 @@ export class Weather
             }
         )
 
-        // Rain
         this.addProperty(
             'rain',
             0,
@@ -104,7 +96,6 @@ export class Weather
             }
         )
 
-        // Snow
         this.addProperty(
             'snow',
             -1,
@@ -118,7 +109,7 @@ export class Weather
                 return rainRatio * freezeRatio + meltRatio
             }
         )
-        
+
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
@@ -140,24 +131,17 @@ export class Weather
         property.value = get()
         property.overrideValue = null
 
-        // Debug
         property.binding = autoBinding(property, 'value', () =>
             {
                 let value = get()
-                
+
                 if(this.override.strength > 0 && property.overrideValue !== null)
                 {
                     value = lerp(value, property.overrideValue, this.override.strength)
-
-                    // if(name === 'humidity')
-                    // {
-                    //     console.log(value)
-                    // }
                 }
-                
+
                 return value
             })
-
 
         this[name] = property
         this.properties.push(property)
@@ -167,7 +151,7 @@ export class Weather
     {
         this.override = {}
         this.override.strength = 0
-        
+
         this.override.start = (values = {}, duration = 5) =>
         {
             for(const property of this.properties)

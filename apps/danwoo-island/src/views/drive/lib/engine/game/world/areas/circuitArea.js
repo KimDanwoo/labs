@@ -32,8 +32,6 @@ export class CircuitArea extends Area
     {
         super(model)
 
-        // Debug
-
         this.state = CircuitArea.STATE_PENDING
 
         this.setSounds()
@@ -126,10 +124,6 @@ export class CircuitArea extends Area
         this.startingLights.greenMaterial = this.game.materials.getFromName('emissiveGreenRadialGradient')
         this.startingLights.baseZ = this.startingLights.mesh.position.z
 
-        // this.startingLights.mesh.visible = true
-        // this.startingLights.mesh.position.z = this.startingLights.baseZ + 0.03
-        // this.startingLights.mesh.material = this.startingLights.greenMaterial
-
         this.startingLights.reset = () =>
         {
             this.startingLights.mesh.visible = false
@@ -150,14 +144,12 @@ export class CircuitArea extends Area
         this.timer.group.visible = false
         this.timer.defaultPosition = this.timer.group.position.clone()
 
-        // Digits
         {
             this.timer.digits = {}
             this.timer.digits.ratio = 6
             this.timer.digits.height = 32
             this.timer.digits.width = 32 * 6
 
-            // Canvas
             const font = `700 ${this.timer.digits.height}px "MaruBuri"`
 
             const canvas = document.createElement('canvas')
@@ -165,7 +157,6 @@ export class CircuitArea extends Area
             canvas.style.zIndex = 999
             canvas.style.top = 0
             canvas.style.left = 0
-            // document.body.append(canvas)
 
             const context = canvas.getContext('2d')
             context.font = font
@@ -183,7 +174,6 @@ export class CircuitArea extends Area
             context.fillText('00:00:000', this.timer.digits.width * 0.5, this.timer.digits.height * 0.5)
             this.timer.digits.context = context
 
-            // Texture
             const texture = new THREE.Texture(canvas)
             texture.minFilter = THREE.LinearFilter
             texture.magFilter = THREE.LinearFilter
@@ -191,7 +181,6 @@ export class CircuitArea extends Area
 
             this.timer.digits.texture = texture
 
-            // Digits
             const geometry = new THREE.PlaneGeometry(this.timer.digits.ratio, 1)
             const material = new THREE.MeshBasicNodeMaterial({
                 alphaMap: this.timer.digits.texture,
@@ -202,7 +191,6 @@ export class CircuitArea extends Area
             this.timer.group.add(mesh)
         }
 
-        // Write
         this.timer.write = (text) =>
         {
             this.timer.digits.context.fillStyle = '#000000'
@@ -214,7 +202,6 @@ export class CircuitArea extends Area
             this.timer.digits.texture.needsUpdate = true
         }
 
-        // Show
         this.timer.show = () =>
         {
             this.timer.visible = true
@@ -228,7 +215,6 @@ export class CircuitArea extends Area
             this.timer.group.visible = true
         }
 
-        // Hide
         this.timer.hide = () =>
         {
             const value = { scale: 1 }
@@ -243,17 +229,12 @@ export class CircuitArea extends Area
                     {
                         this.timer.group.scale.setScalar(value.scale)
                     },
-                    // onComplete: () =>
-                    // {
-                    //     this.timer.group.visible = false
-                    // }
                 }
             )
 
             this.timer.visible = false
         }
 
-        // Start
         this.timer.start = () =>
         {
             this.timer.running = true
@@ -261,7 +242,6 @@ export class CircuitArea extends Area
             this.timer.startTime = this.game.ticker.elapsed
         }
 
-        // End
         this.timer.end = () =>
         {
             this.timer.running = false
@@ -270,14 +250,11 @@ export class CircuitArea extends Area
             const formatedTime = timeToRaceString(this.timer.elapsedTime)
             this.timer.write(formatedTime)
 
-            // End modal
             this.endModal.timeElement.textContent = formatedTime
         }
 
-        // Update
         this.timer.update = () =>
         {
-            // Group > Follow car
             const target = new THREE.Vector3()
 
             if(this.state === CircuitArea.STATE_PENDING)
@@ -294,9 +271,7 @@ export class CircuitArea extends Area
             }
 
             this.timer.group.position.lerp(target, this.game.ticker.deltaScaled * 5)
-            // this.timer.group.position.z = this.game.player.position2.y
 
-            // Digits
             if(this.timer.running)
             {
                 this.timer.elapsedTime = this.game.ticker.elapsed - this.timer.startTime
@@ -316,7 +291,6 @@ export class CircuitArea extends Area
         this.checkpoints.reachedCount = 0
         this.checkpoints.timings = []
 
-        // Create checkpoints
         const baseCheckpoints = this.references.items.get('checkpoints').sort((a, b) => a.name.localeCompare(b.name))
 
         let i = 0
@@ -332,7 +306,6 @@ export class CircuitArea extends Area
             checkpoint.rotation = baseCheckpoint.rotation.y
             checkpoint.scale = baseCheckpoint.scale.x * 0.5
 
-            // Respawn position
             checkpoint.respawnPosition = baseCheckpoint.position.clone()
             const direction = new THREE.Vector2(3, 0)
             direction.rotateAround(new THREE.Vector2(), checkpoint.rotation)
@@ -340,39 +313,18 @@ export class CircuitArea extends Area
             checkpoint.respawnPosition.y = 4
             checkpoint.respawnPosition.z += direction.x
 
-            // Center
             checkpoint.center = new THREE.Vector2(checkpoint.position.x, checkpoint.position.z)
 
-            // Segment
             checkpoint.a = new THREE.Vector2(checkpoint.position.x - checkpoint.scale, checkpoint.position.z)
             checkpoint.b = new THREE.Vector2(checkpoint.position.x + checkpoint.scale, baseCheckpoint.position.z)
 
             checkpoint.a.rotateAround(checkpoint.center, - checkpoint.rotation)
             checkpoint.b.rotateAround(checkpoint.center, - checkpoint.rotation)
 
-            // // Helpers
-            // const helperA = new THREE.Mesh(
-            //     new THREE.CylinderGeometry(0.1, 0.1, 2, 8, 1),
-            //     new THREE.MeshBasicNodeMaterial({ color: 'yellow', wireframe: true })
-            // )
-            // helperA.position.x = checkpoint.a.x
-            // helperA.position.z = checkpoint.a.y
-            // this.game.scene.add(helperA)
-
-            // const helperB = new THREE.Mesh(
-            //     new THREE.CylinderGeometry(0.1, 0.1, 2, 8, 1),
-            //     new THREE.MeshBasicNodeMaterial({ color: 'yellow', wireframe: true })
-            // )
-            // helperB.position.x = checkpoint.b.x
-            // helperB.position.z = checkpoint.b.y
-            // this.game.scene.add(helperB)
-
-            // Set target
             checkpoint.setTarget = () =>
             {
                 this.checkpoints.target = checkpoint
 
-                // Mesh
                 this.checkpoints.doorTarget.scaleUniform.value = checkpoint.scale
                 this.checkpoints.doorTarget.mesh.visible = true
                 this.checkpoints.doorTarget.mesh.position.copy(checkpoint.position)
@@ -380,63 +332,51 @@ export class CircuitArea extends Area
                 this.checkpoints.doorTarget.mesh.scale.x = checkpoint.scale
             }
 
-            // Reach
             checkpoint.reach = () =>
             {
-                // Not target
                 if(checkpoint !== this.checkpoints.target)
                     return
 
-                // Confetti
                 if(this.game.world.confetti)
                 {
                     this.game.world.confetti.pop(new THREE.Vector3(checkpoint.a.x, 0, checkpoint.a.y))
                     this.game.world.confetti.pop(new THREE.Vector3(checkpoint.b.x, 0, checkpoint.b.y))
                 }
 
-                // Mesh
                 this.checkpoints.doorReached.scaleUniform.value = checkpoint.scale
                 this.checkpoints.doorReached.mesh.visible = true
                 this.checkpoints.doorReached.mesh.position.copy(checkpoint.position)
                 this.checkpoints.doorReached.mesh.rotation.y = checkpoint.rotation
                 this.checkpoints.doorReached.mesh.scale.x = checkpoint.scale
 
-                // Update reach count and last
                 this.checkpoints.last = checkpoint
                 this.checkpoints.reachedCount++
 
-                // Sound
                 this.sounds.checkpoint.play(this.checkpoints.reachedCount)
 
-                // Timings
                 this.checkpoints.timings.push(Math.round(this.timer.elapsedTime * 1000))
 
-                // Final checkpoint (start line)
                 if(this.checkpoints.reachedCount === this.checkpoints.count + 2)
                 {
                     this.finish()
                 }
 
-                // Next checkpoint
                 else
                 {
                     const newTarget = this.checkpoints.items[this.checkpoints.reachedCount % (this.checkpoints.count + 1)]
                     newTarget.setTarget()
                 }
 
-                // No more target
                 this.checkpoints.target
             }
 
             this.checkpoints.count = this.checkpoints.items.length
 
-            // Save
             this.checkpoints.items.push(checkpoint)
 
             i++
         }
 
-        // Checkpoint doors
         const doorIntensity = uniform(2)
         const doorOutputColor = Fn(([doorColor, doorScale]) =>
         {
@@ -495,8 +435,6 @@ export class CircuitArea extends Area
 
             this.checkpoints.doorReached.mesh = mesh
         }
-
-        // Debug
     }
 
     setResetObjects()
@@ -508,7 +446,6 @@ export class CircuitArea extends Area
 
         for(const baseObject of baseObjects)
         {
-
             this.resetObjects.items.push(baseObject.userData.object)
         }
 
@@ -578,7 +515,6 @@ export class CircuitArea extends Area
             InteractivePoints.STATE_CONCEALED,
             () =>
             {
-                // Sound
                 const sound = this.game.audio.groups.get('click')
                 if(sound)
                     sound.play(true)
@@ -649,7 +585,6 @@ export class CircuitArea extends Area
             { name: 'circuitRestart', categories: [ 'racing' ], keys: [ 'Keyboard.KeyR', 'Gamepad.select' ] },
         ])
 
-        // Reset
         this.game.inputs.events.on('circuitRestart', (action) =>
         {
             if(action.active)
@@ -662,10 +597,8 @@ export class CircuitArea extends Area
         if(this.state !== CircuitArea.STATE_RUNNING)
             return
 
-        // Player > Lock
         this.game.player.state = Player.STATE_LOCKED
 
-        // Respawn position and rotation
         const position = new THREE.Vector3()
         let rotation = 0
 
@@ -682,13 +615,11 @@ export class CircuitArea extends Area
 
         this.game.overlay.show(() =>
         {
-            // Player > Unlock
             gsap.delayedCall(2, () =>
             {
                 this.game.player.state = Player.STATE_DEFAULT
             })
 
-            // Update physical vehicle
             this.game.physicalVehicle.moveTo(
                 position,
                 rotation
@@ -742,20 +673,16 @@ export class CircuitArea extends Area
 
         this.podium.show = () =>
         {
-            // Object
             this.game.objects.enable(this.podium.object)
 
-            // View
             this.game.view.focusPoint.isTracking = false
             this.game.view.focusPoint.position.copy(this.podium.viewFocusPosition)
 
-            // Confetti
             this.podium.popConfetti()
         }
 
         this.podium.hide = () =>
         {
-            // Object
             this.game.objects.disable(this.podium.object)
         }
 
@@ -849,51 +776,37 @@ export class CircuitArea extends Area
         if(this.state === CircuitArea.STATE_STARTING)
             return
 
-        // Area frustum
         this.frustum.alwaysVisible = true
 
-        // Timer
         this.timer.end()
 
-        // State
         this.state = CircuitArea.STATE_STARTING
 
-        // Interactive point
         this.interactivePoint.hide()
 
-        // Player > Lock
         this.game.player.state = Player.STATE_LOCKED
 
-        // Inputs filters
         this.game.inputs.filters.clear()
         this.game.inputs.filters.add('racing')
 
-        // Starting timeline
         this.startAnimation.timeline.pause()
 
-        // Overlay > Show
         this.game.overlay.show(() =>
         {
-            // Menu buttons
             this.menu.racingButtons.classList.add('is-active')
 
-            // Update physical vehicle
             this.game.physicalVehicle.moveTo(
                 this.startPosition.position,
                 this.startPosition.rotation
             )
 
-            // Deactivate terrain physics
             if(this.game.world.floor)
                 this.game.world.floor.physical.body.setEnabled(false)
 
-            // Activate road physics (better collision)
             this.roadBody.setEnabled(true)
 
-            // Starting lights
             this.startingLights.reset()
 
-            // Checkpoints
             this.checkpoints.doorReached.mesh.visible = false
             this.checkpoints.doorTarget.mesh.visible = false
 
@@ -904,13 +817,10 @@ export class CircuitArea extends Area
 
             this.checkpoints.timings = []
 
-            // Objects
             this.resetObjects.reset()
 
-            // Crates (all crates in the world?)
             this.game.world.explosiveCrates.reset()
 
-            // Weather
             this.game.weather.override.start(
                 {
                     humidity: 0,
@@ -921,7 +831,6 @@ export class CircuitArea extends Area
                 0
             )
 
-            // Day cycles
             this.game.dayCycles.override.start(
                 {
                     progress: 0.85,
@@ -931,53 +840,40 @@ export class CircuitArea extends Area
                 0
             )
 
-            // Timer
             this.timer.show()
 
-            // Rails
             this.rails.activate()
 
-            // Podium => Hide
             this.podium.hide()
 
-            // Overlay > Hide
             this.game.overlay.hide(() =>
             {
-                // State
                 this.state = CircuitArea.STATE_RUNNING
 
-                // Start animation
                 this.startAnimation.start(() =>
                 {
-                    // Player > Unlock
                     this.game.player.state = Player.STATE_DEFAULT
 
                     this.timer.start()
                 })
-
             })
         })
     }
 
     finish(forced = false)
     {
-        // Not running
         if(this.state !== CircuitArea.STATE_RUNNING)
             return
 
-        // State
         this.state = CircuitArea.STATE_ENDING
 
-        // Timer
         this.timer.end()
         if(forced)
             this.timer.hide()
 
-        // Checkpoints
         this.checkpoints.target = null
         this.checkpoints.doorTarget.mesh.visible = false
 
-        // Sound
         if(!forced)
         {
             this.sounds.finish.play()
@@ -985,59 +881,42 @@ export class CircuitArea extends Area
 
         gsap.delayedCall(forced ? 1 : 4, () =>
         {
-            // Overlay > Show
             this.game.overlay.show(() =>
             {
-                // State
                 this.state = CircuitArea.STATE_PENDING
 
-                // Area frustum
                 this.frustum.alwaysVisible = false
 
-                // Menu buttons
                 this.menu.racingButtons.classList.remove('is-active')
 
-                // Interactive point
                 this.interactivePoint.show()
 
-                // Inputs filters
                 this.game.inputs.filters.clear()
                 this.game.inputs.filters.add('wandering')
 
-                // Update physical vehicle
                 const respawn = this.game.respawns.getByName('circuit')
                 this.game.physicalVehicle.moveTo(respawn.position, respawn.rotation)
 
-                // Activate terrain physics
                 if(this.game.world.floor)
                     this.game.world.floor.physical.body.setEnabled(true)
 
-                // Deactivate road physics
                 this.roadBody.setEnabled(false)
 
-                // Weather and day cycles
                 this.game.weather.override.end(0)
                 this.game.dayCycles.override.end(0)
 
-                // Checkpoints
                 this.checkpoints.doorReached.mesh.visible = false
                 this.checkpoints.doorTarget.mesh.visible = false
 
-                // Starting lights
                 this.startingLights.reset()
 
-                // Rails
                 this.rails.deactivate()
 
-                // Crates (all crates in the world?)
                 this.game.world.explosiveCrates.reset()
 
-                // Podium => Show
                 if(!forced)
                     this.podium.show()
 
-
-                // Sound
                 if(!forced)
                 {
                     gsap.delayedCall(2, () =>
@@ -1049,10 +928,8 @@ export class CircuitArea extends Area
                 if(!forced)
                     gsap.delayedCall(1, () => this.game.modals.open('circuit-end'))
 
-                // Overlay > Hide
                 this.game.overlay.hide(() =>
                 {
-                    // State
                     this.state = CircuitArea.STATE_PENDING
                 })
             })
@@ -1063,7 +940,6 @@ export class CircuitArea extends Area
     {
         if(this.state === CircuitArea.STATE_RUNNING)
         {
-            // Checkpoints
             for(const checkpoint of this.checkpoints.items)
             {
                 const intersections = segmentCircleIntersection(
@@ -1080,7 +956,6 @@ export class CircuitArea extends Area
                     checkpoint.reach()
             }
 
-            // Obstacles
             for(const obstacle of this.obstacles.items)
             {
                 const newPosition = obstacle.basePosition.clone()
@@ -1091,7 +966,6 @@ export class CircuitArea extends Area
                 obstacle.object.needsUpdate = true
             }
 
-            // If out of bounds
             if(this.game.player.position.y < this.bounds.threshold)
             {
                 if(!this.bounds.isOut)
@@ -1106,7 +980,6 @@ export class CircuitArea extends Area
             }
         }
 
-        // Banners
         let i = 0
         for(const banner of this.banners)
         {
@@ -1117,7 +990,6 @@ export class CircuitArea extends Area
             i++
         }
 
-        // Timer
         this.timer.update()
     }
 }

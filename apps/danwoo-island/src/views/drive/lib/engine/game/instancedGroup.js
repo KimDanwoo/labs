@@ -21,7 +21,7 @@ export class InstancedGroup
                 this.update()
             }, 13)
         }
-        
+
         this.update()
     }
 
@@ -38,8 +38,7 @@ export class InstancedGroup
                 _child.updateMatrix()
                 _child.updateWorldMatrix()
                 mesh.localMatrix = _child.matrix
-                // mesh.localMatrix = _child.matrixWorld
-                
+
                 mesh.instance = new THREE.InstancedMesh(_child.geometry, _child.material, this.count)
                 mesh.instance.name = _child.name
                 mesh.instance.castShadow = _child.castShadow
@@ -55,7 +54,7 @@ export class InstancedGroup
     static getReferencesFromChildren(children)
     {
         const references = []
-        
+
         for(const child of children)
         {
             const reference = new THREE.Object3D()
@@ -65,21 +64,19 @@ export class InstancedGroup
             reference.needsUpdate = true
             references.push(reference)
         }
-        
+
         return references
     }
 
     static getBaseAndReferencesFromInstances(instances)
     {
-        // Base
         const base = instances[0].clone()
 
         base.position.set(0, 0, 0)
         base.rotation.set(0, 0, 0)
 
-        // References
         const references = InstancedGroup.getReferencesFromChildren(instances)
-        
+
         return [ base, references ]
     }
 

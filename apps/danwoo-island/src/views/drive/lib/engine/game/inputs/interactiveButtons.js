@@ -25,7 +25,7 @@ export class InteractiveButtons
                 visible: false,
                 element: button
             }
-            
+
             this.items.set(item.name, item)
 
             item.element.addEventListener('click', () =>
@@ -46,7 +46,7 @@ export class InteractiveButtons
             {
                 if(!item.visible)
                 {
-                    item.visible = true 
+                    item.visible = true
                     item.element.classList.add('is-visible')
                 }
 
@@ -56,7 +56,7 @@ export class InteractiveButtons
             {
                 if(item.visible)
                 {
-                    item.visible = false 
+                    item.visible = false
                     item.element.classList.remove('is-visible')
                 }
             }

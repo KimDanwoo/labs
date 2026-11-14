@@ -23,9 +23,8 @@ export class PhysicsWireframe
         {
             this.update()
         }, 4)
-
     }
-    
+
     update()
     {
         if(!this.active)

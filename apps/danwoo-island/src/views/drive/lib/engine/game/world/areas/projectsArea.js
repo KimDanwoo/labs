@@ -34,8 +34,6 @@ export class ProjectsArea extends Area
     {
         super(model)
 
-        // Debug
-
         this.state = ProjectsArea.STATE_CLOSED
 
         this.setSounds()
@@ -58,8 +56,6 @@ export class ProjectsArea extends Area
         this.setAnvil()
 
         this.changeProject(0, ProjectsArea.DIRECTION_NEXT, false, true)
-
-        // Debug
     }
 
     setSounds()
@@ -109,11 +105,6 @@ export class ProjectsArea extends Area
 
     setInputs()
     {
-        // this.game.inputs.events.on('backward', () =>
-        // {
-        //     this.close()
-        // })
-
         this.game.inputs.events.on('left', (action) =>
         {
             if(action.active)
@@ -189,8 +180,6 @@ export class ProjectsArea extends Area
             this.cinematic.target.copy(flatPosition).add(this.cinematic.targetOffset)
         }
         applyPositionAndTarget()
-
-        // Debug
     }
 
     setShadeMix()
@@ -206,8 +195,6 @@ export class ProjectsArea extends Area
         this.shadeMix.texts.min = 0.1
         this.shadeMix.texts.max = 0.3
         this.shadeMix.texts.mixUniform = uniform(this.shadeMix.texts.min)
-
-        // Debug
     }
 
     setTexts()
@@ -242,7 +229,6 @@ export class ProjectsArea extends Area
                 )
             })()
 
-            // Mesh
             mesh.castShadow = false
             mesh.receiveShadow = false
             mesh.material = material
@@ -254,7 +240,6 @@ export class ProjectsArea extends Area
         this.hover = {}
         this.hover.baseColor = color('#ffffff')
 
-        // Default
         this.hover.inactiveMaterial = new MeshDefaultMaterial({
             colorNode: this.hover.baseColor,
             hasWater: false
@@ -274,7 +259,6 @@ export class ProjectsArea extends Area
             )
         })()
 
-        // Active
         this.hover.activeMaterial = new THREE.MeshBasicNodeMaterial({ transparent: true })
         this.hover.activeMaterial.outputNode = vec4(this.hover.baseColor.mul(1.5), float(1))
     }
@@ -301,13 +285,11 @@ export class ProjectsArea extends Area
         this.images.animationProgress = uniform(0)
         this.images.animationDirection = uniform(0)
 
-        // Mesh
         this.images.mesh = this.references.items.get('images')[0]
         this.images.mesh.receiveShadow = true
         this.images.mesh.castShadow = false
-        this.images.mesh.visible = false // Wait for first load to display
+        this.images.mesh.visible = false
 
-        // Finishing initiating and use first image as default resource
         this.images.init = (key) =>
         {
             this.images.initiated = true
@@ -318,24 +300,19 @@ export class ProjectsArea extends Area
             this.images.textureOld = resource.texture.clone()
             this.images.textureNew = resource.texture.clone()
 
-            // Color node
             const colorNode = Fn(() =>
             {
                 const uvOld = uv().toVar()
                 const uvNew = uv().toVar()
 
-                // Parallax (add an offset according to progress)
                 uvNew.x.addAssign(this.images.animationProgress.oneMinus().mul(-0.25).mul(this.images.animationDirection))
                 uvOld.x.addAssign(this.images.animationProgress.mul(0.25).mul(this.images.animationDirection))
 
-                // Textures
                 const textureOldColor = texture(this.images.textureOld, uvOld).rgb
                 const textureNewColor = texture(this.images.textureNew, uvNew).rgb
 
-                // Load mix
                 textureNewColor.assign(mix(color('#333333'), textureNewColor, this.images.loadProgress))
 
-                // Reveal
                 const reveal = uv().x.toVar()
                 If(this.images.animationDirection.greaterThan(0), () =>
                 {
@@ -345,10 +322,8 @@ export class ProjectsArea extends Area
 
                 const textureColor = mix(textureNewColor, textureOldColor, threshold)
                 return textureColor
-
             })()
 
-            // Material
             this.images.material = new MeshDefaultMaterial({
                 colorNode: colorNode,
                 hasWater: false
@@ -371,14 +346,11 @@ export class ProjectsArea extends Area
             this.images.mesh.material = this.images.material
         }
 
-        // Load ended
         this.images.loadEnded = (key) =>
         {
-            // If first image => init
             if(!this.images.initiated)
                 this.images.init(key)
 
-            // Current image => Reveal
             if(this.navigation.current.images[this.images.index] === key)
             {
                 const resource = this.images.getResourceAndLoad(key)
@@ -390,7 +362,6 @@ export class ProjectsArea extends Area
             }
         }
 
-        // Load sibling
         this.images.loadSibling = () =>
         {
             let projectIndex = this.navigation.index
@@ -424,15 +395,12 @@ export class ProjectsArea extends Area
             const resource = this.images.getResourceAndLoad(key)
         }
 
-        // Get resource and load
         this.images.getResourceAndLoad = (key) =>
         {
             const path = `danwoo/${key}`
 
-            // Try to retrieve resource
             let resource = this.images.resources.get(key)
 
-            // Resource not found => Create
             if(!resource)
             {
                 resource = {}
@@ -457,19 +425,16 @@ export class ProjectsArea extends Area
                     }
                 )
 
-                // Save
                 this.images.resources.set(key, resource)
             }
 
             return resource
         }
 
-        // Update
         this.images.update = (direction) =>
         {
             this.images.direction = direction
 
-            // Get resource
             const key = this.navigation.current.images[this.images.index]
             const resource = this.images.getResourceAndLoad(key)
 
@@ -483,7 +448,6 @@ export class ProjectsArea extends Area
                 this.images.loadProgress.value = 0
             }
 
-            // Update textures
             if(this.images.initiated)
             {
                 this.images.textureOld.copy(this.images.textureNew)
@@ -496,7 +460,6 @@ export class ProjectsArea extends Area
                 }
             }
 
-            // Animate right away
             gsap.fromTo(this.images.animationProgress, { value: 0 }, { value: 1, duration: 1, ease: 'power2.inOut', overwrite: true })
             this.images.animationDirection.value = direction === ProjectsArea.DIRECTION_NEXT ? 1 : -1
         }
@@ -509,7 +472,6 @@ export class ProjectsArea extends Area
         this.pagination.group = this.references.items.get('pagination')[0].children[0]
         this.pagination.items = []
 
-        // List
         let i = 0
         const intersectPagination = this.references.items.get('intersectPagination')
 
@@ -522,13 +484,11 @@ export class ProjectsArea extends Area
                 item.index = i
                 item.visible = false
 
-                // Mesh
                 item.mesh = child
                 item.mesh.position.x = this.pagination.inter * i
                 item.mesh.visible = false
                 item.mesh.material = this.hover.inactiveMaterial
 
-                // Intersect
                 item.intersectReference = intersectPagination[i]
 
                 item.intersect = this.game.rayCursor.addIntersect({
@@ -555,7 +515,6 @@ export class ProjectsArea extends Area
             }
         }
 
-        // Adjacents
         const intersectPrevious = this.references.items.get('intersectPreviousImage')[0]
         const intersectPreviousPosition = new THREE.Vector3()
         intersectPrevious.getWorldPosition(intersectPreviousPosition)
@@ -601,7 +560,6 @@ export class ProjectsArea extends Area
             }
         })
 
-        // Update
         this.pagination.update = () =>
         {
             let i = 0
@@ -657,7 +615,6 @@ export class ProjectsArea extends Area
         for(const child of this.attributes.group.children)
         {
             const item = {}
-            // item.textCanvas = this.texts[child.name]
             item.group = child
             item.visible = false
             item.group.visible = false
@@ -726,14 +683,10 @@ export class ProjectsArea extends Area
         this.adjacents = {}
         this.adjacents.status = 'hidden'
 
-        /**
-         * Previous
-         */
         this.adjacents.previous = {}
         this.adjacents.previous.group = this.references.items.get('previous')[0]
         this.adjacents.previous.inner = this.adjacents.previous.group.children[0]
 
-        // Text
         this.adjacents.previous.textMesh = this.adjacents.previous.inner.children.find(_child => _child.name.startsWith('text'))
         this.adjacents.previous.textCanvas = new TextCanvas(
             this.texts.fontFamily,
@@ -747,11 +700,9 @@ export class ProjectsArea extends Area
         )
         this.texts.createMaterialOnMesh(this.adjacents.previous.textMesh, this.adjacents.previous.textCanvas.texture)
 
-        // Arrow
         const arrowPrevious = this.references.items.get('arrowPreviousProject')[0]
         arrowPrevious.material = this.hover.inactiveMaterial
 
-        // Intersect
         const intersectPrevious = this.references.items.get('intersectPreviousProject')[0]
         const intersectPreviousPosition = new THREE.Vector3()
         intersectPrevious.getWorldPosition(intersectPreviousPosition)
@@ -773,14 +724,10 @@ export class ProjectsArea extends Area
             }
         })
 
-        /**
-         * Next
-         */
         this.adjacents.next = {}
         this.adjacents.next.group = this.references.items.get('next')[0]
         this.adjacents.next.inner = this.adjacents.next.group.children[0]
 
-        // Text
         this.adjacents.next.textMesh = this.adjacents.next.inner.children.find(_child => _child.name.startsWith('text'))
         this.adjacents.next.textCanvas = new TextCanvas(
             this.texts.fontFamily,
@@ -794,11 +741,9 @@ export class ProjectsArea extends Area
         )
         this.texts.createMaterialOnMesh(this.adjacents.next.textMesh, this.adjacents.next.textCanvas.texture)
 
-        // Arrow
         const arrowNext = this.references.items.get('arrowNextProject')[0]
         arrowNext.material = this.hover.inactiveMaterial
 
-        // Intersect
         const intersectNext = this.references.items.get('intersectNextProject')[0]
 
         const intersectNextPosition = new THREE.Vector3()
@@ -821,9 +766,6 @@ export class ProjectsArea extends Area
             }
         })
 
-        /**
-         * Update
-         */
         this.adjacents.update = () =>
         {
             if(this.adjacents.status === 'hiding')
@@ -893,7 +835,6 @@ export class ProjectsArea extends Area
         this.url.group = this.references.items.get('url')[0]
         this.url.inner = this.url.group.children[0]
 
-        // Text
         this.url.textMesh = this.url.inner.children.find(_child => _child.name.startsWith('text'))
         this.url.panel = this.url.inner.children.find(_child => _child.name.startsWith('panel'))
         this.url.textCanvas = new TextCanvas(
@@ -907,7 +848,6 @@ export class ProjectsArea extends Area
         )
         this.url.mixStrength = uniform(0)
 
-        // Material
         const material = new MeshDefaultMaterial({
             colorNode: this.texts.baseColor,
             hasWater: false,
@@ -933,12 +873,10 @@ export class ProjectsArea extends Area
             )
         })()
 
-        // Mesh
         this.url.textMesh.castShadow = false
         this.url.textMesh.receiveShadow = false
         this.url.textMesh.material = material
 
-        // Intersect
         const intersect = this.references.items.get('intersectUrl')[0]
         intersect.visible = false
 
@@ -959,7 +897,6 @@ export class ProjectsArea extends Area
             }
         })
 
-        // Update
         this.url.update = (direction) =>
         {
             if(this.url.status === 'hiding')
@@ -980,11 +917,9 @@ export class ProjectsArea extends Area
 
                 const ratio = this.url.textCanvas.getMeasure().width / this.texts.density
                 this.url.panel.scale.x = ratio + 0.2
-
             } })
         }
 
-        // Open
         this.url.open = () =>
         {
             if(this.navigation.current.url)
@@ -1011,7 +946,6 @@ export class ProjectsArea extends Area
         this.blackBoard.group = this.references.items.get('blackBoard')[0]
         this.blackBoard.parent = this.blackBoard.group.parent
 
-        // Jump timeline
         this.blackBoard.timeline = gsap.timeline({
             repeat: -1,
             repeatDelay: 5,
@@ -1032,7 +966,6 @@ export class ProjectsArea extends Area
         this.blackBoard.timeline.to(this.blackBoard.group.rotation, { x: -0.1, duration: 0.3 }, 0.75 + 2)
         this.blackBoard.timeline.to(this.blackBoard.group.rotation, { x: 0, duration: 0.3 }, 1.05 + 2)
 
-        // Labels
         this.blackBoard.labelsGamepadPlaystation = this.references.items.get('blackboardLabelsGamepadPlaystation')[0]
         this.blackBoard.labelsGamepadXbox = this.references.items.get('blackboardLabelsGamepadXbox')[0]
         this.blackBoard.labelsMouseKeyboard = this.references.items.get('blackboardLabelsMouseKeyboard')[0]
@@ -1095,10 +1028,8 @@ export class ProjectsArea extends Area
     {
         this.oven = {}
 
-        // Blower
         this.oven.blower = this.references.items.get('blower')[0]
 
-        // Charcoal
         this.oven.charcoal = this.references.items.get('charcoal')[0]
 
         this.oven.threshold = uniform(0.2)
@@ -1126,7 +1057,6 @@ export class ProjectsArea extends Area
 
         this.oven.charcoal.material = material
 
-        // Debug
         this.oven.thresholdBinding = autoBinding(this.oven.threshold, 'value', () => - Math.sin(this.game.ticker.elapsedScaled - 0.5) * 0.1 + 0.25)
     }
 
@@ -1141,11 +1071,9 @@ export class ProjectsArea extends Area
         this.anvil.frequency = 1
         this.anvil.loopTime = 0
 
-        // Hammer
         this.anvil.hammer = this.references.items.get('hammer')[0]
         this.anvil.hammer.rotation.reorder('ZXY')
 
-        // Blade
         this.anvil.blade = this.references.items.get('blade')[0]
 
         const material = new MeshDefaultMaterial({
@@ -1178,7 +1106,6 @@ export class ProjectsArea extends Area
         if(this.state === ProjectsArea.STATE_OPEN || this.state === ProjectsArea.STATE_OPENING)
             return
 
-        // State
         this.state = ProjectsArea.STATE_OPENING
 
         if(this.stateTransition)
@@ -1190,28 +1117,22 @@ export class ProjectsArea extends Area
             this.stateTransition = null
         })
 
-        // Inputs filters
         this.game.inputs.filters.delete('wandering')
         this.game.inputs.filters.add('cinematic')
 
-        // View cinematic
         this.game.view.cinematic.start(this.cinematic.position, this.cinematic.target)
 
-        // Interactive point
         this.game.interactivePoints.temporaryHide()
 
-        // Shade mix
         gsap.to(this.shadeMix.images.mixUniform, { value: this.shadeMix.images.max, duration: 2, ease: 'power2.inOut', overwrite: true })
         gsap.to(this.shadeMix.texts.mixUniform, { value: this.shadeMix.texts.max, duration: 2, ease: 'power2.inOut', overwrite: true })
 
-        // Board
         if(this.blackBoard.active)
         {
             this.blackBoard.timeline.repeat(-1)
             this.blackBoard.timeline.resume()
         }
 
-        // Cursor
         for(const item of this.pagination.items)
             item.intersect.active = item.visible
 
@@ -1221,20 +1142,14 @@ export class ProjectsArea extends Area
         this.pagination.nextIntersect.active = true
         this.url.intersect.active = true
 
-        // Deactivate physical vehicle
         this.game.physicalVehicle.deactivate()
 
-        // Buttons
         this.game.inputs.interactiveButtons.clearItems()
         this.game.inputs.interactiveButtons.addItems(['previous', 'next', 'open', 'close'])
 
-        // Sound
         const sound = this.game.audio.groups.get('click')
         if(sound)
             sound.play(true)
-
-        // Achievements
-
     }
 
     close()
@@ -1242,7 +1157,6 @@ export class ProjectsArea extends Area
         if(this.state === ProjectsArea.STATE_CLOSED || this.state === ProjectsArea.STATE_CLOSING)
             return
 
-        // State
         this.state = ProjectsArea.STATE_CLOSING
 
         if(this.stateTransition)
@@ -1254,24 +1168,19 @@ export class ProjectsArea extends Area
             this.stateTransition = null
         })
 
-        // Input filters
         this.game.inputs.filters.delete('cinematic')
         this.game.inputs.filters.add('wandering')
 
-        // View cinematic
         this.game.view.cinematic.end()
 
-        // Shade mix
         gsap.to(this.shadeMix.images.mixUniform, { value: this.shadeMix.images.min, duration: 1.5, ease: 'power2.inOut', overwrite: true })
         gsap.to(this.shadeMix.texts.mixUniform, { value: this.shadeMix.texts.min, duration: 1.5, ease: 'power2.inOut', overwrite: true })
 
-        // Interactive point
         gsap.delayedCall(1, () =>
         {
             this.game.interactivePoints.recover()
         })
 
-        // Cursor
         for(const item of this.pagination.items)
             item.intersect.active = false
 
@@ -1281,13 +1190,10 @@ export class ProjectsArea extends Area
         this.pagination.nextIntersect.active = false
         this.url.intersect.active = false
 
-        // Activate physical vehicle
         this.game.physicalVehicle.activate()
 
-        // Buttons
         this.game.inputs.interactiveButtons.clearItems([])
 
-        // Sound
         const sound = this.game.audio.groups.get('click')
         if(sound)
             sound.play(false)
@@ -1351,7 +1257,6 @@ export class ProjectsArea extends Area
 
     changeProject(index = 0, direction = ProjectsArea.DIRECTION_NEXT, firstImage = false, silent = false)
     {
-        // Loop index
         let loopIndex = index
 
         if(loopIndex > projectsData.length - 1)
@@ -1359,26 +1264,22 @@ export class ProjectsArea extends Area
         else if(loopIndex < 0)
             loopIndex = projectsData.length - 1
 
-        // Save
         this.navigation.index = loopIndex
         this.navigation.current = projectsData[this.navigation.index]
         this.navigation.previous = projectsData[(this.navigation.index - 1) < 0 ? projectsData.length - 1 : this.navigation.index - 1]
         this.navigation.next = projectsData[(this.navigation.index + 1) % projectsData.length]
 
-        // Update components
         this.attributes.update()
         this.adjacents.update()
         this.title.update(direction)
         this.url.update(direction)
 
-        // Change image
         let imageIndex = null
         if(firstImage)
             imageIndex = 0
         else
             imageIndex = direction === ProjectsArea.DIRECTION_NEXT ? 0 : this.navigation.current.images.length - 1
 
-        // Sound
         if(!silent)
         {
             this.game.audio.groups.get('click').play()
@@ -1395,11 +1296,9 @@ export class ProjectsArea extends Area
 
         this.images.index = imageIndex
 
-        // Update components
         this.images.update(direction)
         this.pagination.update()
 
-        // Sounds
         if(!silent)
         {
             this.game.audio.groups.get('click').play()
@@ -1409,18 +1308,14 @@ export class ProjectsArea extends Area
 
     update()
     {
-        // Oven
         this.oven.blower.scale.y = (Math.sin(this.game.ticker.elapsedScaled) * 0.2 + 0.8)
         this.oven.thresholdBinding.update()
 
-        // Grinder
         this.grinder.rotation.z = - this.game.ticker.elapsedScaled * 0.75
 
-        // Anvil
         const time = this.game.ticker.elapsedScaled * this.anvil.frequency + Math.PI * 0.25
         this.anvil.hammer.rotation.x = Math.pow(1 - Math.abs(Math.sin(time)), 5) - 1
 
-        // Anvil sound
         const loopTime = ((time) / Math.PI) % 1
         if(loopTime < this.anvil.loopTime)
             this.sounds.anvil.play()

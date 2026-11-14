@@ -14,14 +14,11 @@ export class References
         {
             const name = _child.name
 
-            // Anything starting with "reference"
             const matches = name.match(/^ref(?:erence)?([^0-9]+)([0-9]+)?$/)
             if(matches)
             {
-                // Extract name without "reference" and without number at the end
                 const referenceName = matches[1].charAt(0).toLowerCase() + matches[1].slice(1)
-                
-                // Create / save in array
+
                 if(!this.items.has(referenceName))
                     this.items.set(referenceName, [_child])
                 else
@@ -38,7 +35,6 @@ export class References
         {
             if(name.startsWith(searched))
             {
-                // Strip name from searched value
                 let stripName = name.replace(new RegExp(`^${searched}(.+)$`), '$1')
                 stripName = stripName.charAt(0).toLowerCase() + stripName.slice(1)
 

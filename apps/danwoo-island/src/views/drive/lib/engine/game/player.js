@@ -31,7 +31,6 @@ export class Player
         this.setSounds()
         this.setInputs()
         this.setUnstuck()
-        // this.setBackWheel()
 
         this.game.physicalVehicle.chassis.physical.initialState.position.x = respawn.position.x
         this.game.physicalVehicle.chassis.physical.initialState.position.y = respawn.position.y
@@ -101,9 +100,7 @@ export class Player
             }
         })
 
-        // Wheels on floor
         {
-            // Default pebbles
             this.game.audio.register({
                 group: 'wheelsOnFloor',
                 path: 'sounds/vehicle/floor/wheels-on-pebbles-road.mp3',
@@ -119,7 +116,6 @@ export class Player
                 }
             })
 
-            // Brake pebbles
             this.game.audio.register({
                 group: 'wheelsOnFloor',
                 path: 'sounds/vehicle/floor/Source Stone Loop Small Rubbing Pebbles On Concrete 02.mp3',
@@ -146,9 +142,7 @@ export class Player
             })
         }
 
-        // Engine and speed
         {
-            // Engine
             this.game.audio.register({
                 path: 'sounds/vehicle/engine/muscle car engine loop idle.mp3',
                 autoplay: true,
@@ -169,7 +163,6 @@ export class Player
                 }
             })
 
-            // Spin and wind
             this.game.audio.register({
                 path: 'sounds/vehicle/spin/41051 Glass stone turning loop 09-full.mp3',
                 autoplay: true,
@@ -190,7 +183,6 @@ export class Player
             })
         }
 
-        // Boost
         this.game.audio.register({
             path: 'sounds/vehicle/energy/Energy_-_force_field_8_loop.mp3',
             autoplay: true,
@@ -235,7 +227,6 @@ export class Player
             { name: 'honk',                  categories: [ 'wandering', 'racing', 'cinematic' ], keys: [ 'Keyboard.KeyH', 'Gamepad.l3' ] },
         ])
 
-        // Respawn
         this.game.inputs.events.on('respawn', (action) =>
         {
             if(this.state !== Player.STATE_DEFAULT)
@@ -247,27 +238,25 @@ export class Player
             }
         })
 
-        // Honk
         this.game.inputs.events.on('honk', (action) =>
         {
             if(action.active)
                 this.honk()
         })
 
-        // Suspensions
         const suspensionsUpdate = () =>
         {
             if(this.state !== Player.STATE_DEFAULT)
                 return
 
             const activeSuspensions = [
-                this.game.inputs.actions.get('suspensions').active || this.game.inputs.actions.get('suspensionsFront').active || this.game.inputs.actions.get('suspensionsRight').active || this.game.inputs.actions.get('suspensionsFrontRight').active, // front right
-                this.game.inputs.actions.get('suspensions').active || this.game.inputs.actions.get('suspensionsFront').active || this.game.inputs.actions.get('suspensionsLeft').active || this.game.inputs.actions.get('suspensionsFrontLeft').active, // front left
-                this.game.inputs.actions.get('suspensions').active || this.game.inputs.actions.get('suspensionsBack').active || this.game.inputs.actions.get('suspensionsRight').active || this.game.inputs.actions.get('suspensionsBackRight').active, // back right
-                this.game.inputs.actions.get('suspensions').active || this.game.inputs.actions.get('suspensionsBack').active || this.game.inputs.actions.get('suspensionsLeft').active || this.game.inputs.actions.get('suspensionsBackLeft').active, // back left
+                this.game.inputs.actions.get('suspensions').active || this.game.inputs.actions.get('suspensionsFront').active || this.game.inputs.actions.get('suspensionsRight').active || this.game.inputs.actions.get('suspensionsFrontRight').active,
+                this.game.inputs.actions.get('suspensions').active || this.game.inputs.actions.get('suspensionsFront').active || this.game.inputs.actions.get('suspensionsLeft').active || this.game.inputs.actions.get('suspensionsFrontLeft').active,
+                this.game.inputs.actions.get('suspensions').active || this.game.inputs.actions.get('suspensionsBack').active || this.game.inputs.actions.get('suspensionsRight').active || this.game.inputs.actions.get('suspensionsBackRight').active,
+                this.game.inputs.actions.get('suspensions').active || this.game.inputs.actions.get('suspensionsBack').active || this.game.inputs.actions.get('suspensionsLeft').active || this.game.inputs.actions.get('suspensionsBackLeft').active,
             ]
 
-            const activeState = this.game.inputs.actions.get('suspensions').active ? 'high' : 'mid' // high = jump, mid = lowride
+            const activeState = this.game.inputs.actions.get('suspensions').active ? 'high' : 'mid'
 
             for(let i = 0; i < 4; i++)
                 this.suspensions[i] = activeSuspensions[i] ? activeState : 'low'
@@ -276,10 +265,8 @@ export class Player
 
             if(activeCount)
             {
-                // Sound
                 this.sounds.suspensions.play(activeCount)
             }
-
         }
 
         this.game.inputs.events.on('suspensions', suspensionsUpdate)
@@ -298,7 +285,6 @@ export class Player
                 this.game.inputs.nipple.jump()
         })
 
-        // Nipple tap jump
         let nippleJumpTimeout = null
         this.game.inputs.nipple.events.on('tap', () =>
         {
@@ -326,7 +312,6 @@ export class Player
 
         this.game.physicalVehicle.events.on('rightSideUp', () =>
         {
-            // Reset delay
             if(this.unstuck.delay)
                 this.unstuck.delay.kill()
         })
@@ -340,15 +325,12 @@ export class Player
                 if(this.state !== Player.STATE_DEFAULT)
                     return
 
-                // Still upside down => Flip back
                 if(this.game.physicalVehicle.upsideDown.active)
                 {
                     this.game.physicalVehicle.flip.jump()
 
-                    // Sound
                     this.sounds.suspensions.play(4)
 
-                    // Again in case it didn't work
                     waitAndTest()
                 }
             })
@@ -356,11 +338,9 @@ export class Player
 
         this.game.physicalVehicle.events.on('upsideDown', (ratio) =>
         {
-            // Reset delay
             if(this.unstuck.delay)
                 this.unstuck.delay.kill()
 
-            // Wait a moment
             waitAndTest()
         })
 
@@ -381,38 +361,6 @@ export class Player
         })
     }
 
-    // setBackWheel()
-    // {
-    //     let delay = null
-    //     let startTime = null
-
-    //     this.game.physicalVehicle.events.on('backWheel', (_active) =>
-    //     {
-    //         if(_active)
-    //         {
-    //             startTime = this.game.ticker.elapsed
-
-    //             if(delay)
-    //             {
-    //                 delay.kill()
-    //                 delay = null
-    //             }
-    //         }
-    //         else
-    //         {
-    //             delay = gsap.delayedCall(0.1, () =>
-    //             {
-    //                 delay = null
-
-    //                 const duration = this.game.ticker.elapsed - startTime
-
-    //                 if(duration > 5)
-    //                     this.game.achievements.setProgress('backWheel', 1)
-    //             })
-    //         }
-    //     })
-    // }
-
     respawn(respawnName = null, callback = null)
     {
         this.game.overlay.show(() =>
@@ -420,10 +368,8 @@ export class Player
             if(typeof callback === 'function')
                 callback()
 
-            // Find respawn
             let respawn = respawnName ? this.game.respawns.getByName(respawnName) : this.game.respawns.getClosest(this.position)
 
-            // Update physical vehicle
             this.game.physicalVehicle.moveTo(
                 respawn.position,
                 respawn.rotation
@@ -449,7 +395,6 @@ export class Player
 
     honk()
     {
-        // Suspensions
         const randomWheelIndex = Math.floor(Math.random() * 4)
         const previousState = this.suspensions[randomWheelIndex]
         this.suspensions[ randomWheelIndex ] = 'mid'
@@ -473,51 +418,33 @@ export class Player
         if(this.state !== Player.STATE_DEFAULT)
             return
 
-        /**
-         * Accelerating
-         */
         if(this.game.inputs.actions.get('forward').active)
             this.accelerating += this.game.inputs.actions.get('forward').value
 
         if(this.game.inputs.actions.get('backward').active)
             this.accelerating -= this.game.inputs.actions.get('backward').value
 
-        /**
-         * Boosting
-         */
         if(this.game.inputs.actions.get('boost').active)
             this.boosting = 1
 
-        /**
-         * Braking
-         */
         if(this.game.inputs.actions.get('brake').active)
         {
             this.accelerating = 0
             this.braking = 1
         }
 
-        /**
-         * Steering
-         */
-        // Left / right actions
         if(this.game.inputs.actions.get('right').active)
             this.steering -= 1
         if(this.game.inputs.actions.get('left').active)
             this.steering += 1
 
-        // Gamepad joystick
         if(this.steering === 0 && this.game.inputs.gamepad.joysticks.left.active)
             this.steering = - this.game.inputs.gamepad.joysticks.left.safeX
 
-        /**
-         * Nipple
-         */
         if(this.game.inputs.nipple.active && this.game.inputs.nipple.progress > 0)
         {
             if(!this.game.view.focusPoint.isTracking)
             {
-                // Wait a few frames in case it a multi-touch
                 this.game.ticker.wait(5, () =>
                 {
                     if(this.game.inputs.nipple.active)
@@ -525,7 +452,6 @@ export class Player
                 })
             }
             this.accelerating = Math.pow(this.game.inputs.nipple.progress, 3)
-            // this.boosting = this.game.inputs.nipple.progress > 0.999
 
             const angleDeltaAbs = Math.abs(this.game.inputs.nipple.smallestAngle)
             const angleDeltaAbsNormalized = angleDeltaAbs / ((Math.PI * 2 - this.game.inputs.nipple.forwardAmplitude) / 2)
@@ -544,14 +470,11 @@ export class Player
 
     updatePostPhysics()
     {
-        // Position
         this.position.copy(this.game.physicalVehicle.position)
         this.position2 = new THREE.Vector2(this.position.x, this.position.z)
 
-        // View > Focus point
         this.game.view.focusPoint.trackedPosition.copy(this.position)
 
-        // View > Speed lines
         if(this.boosting && this.accelerating && this.game.physicalVehicle.speed > 15)
             this.game.view.speedLines.strength = 1
         else
@@ -559,19 +482,15 @@ export class Player
 
         this.game.view.speedLines.worldTarget.copy(this.position)
 
-        // Tracks > Focus point
         this.game.tracks.focusPoint.set(this.position.x, this.position.z)
 
-        // Inputs touch joystick
         this.rotationY = Math.atan2(this.game.physicalVehicle.forward.z, this.game.physicalVehicle.forward.x)
         this.game.inputs.nipple.setCoordinates(this.position.x, this.position.y, this.position.z, this.rotationY)
 
-        // Sound
         if(this.game.physicalVehicle.wheels.justTouchedCount > 1)
         {
             this.sounds.spring1.play(this.game.physicalVehicle.wheels.justTouchedCount)
             this.sounds.spring2.play(this.game.physicalVehicle.wheels.justTouchedCount)
         }
-
     }
 }

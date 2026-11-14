@@ -13,7 +13,6 @@ import { View } from './view'
 import { Viewport } from './viewport'
 import { World } from './world/world'
 import { Tracks } from './tracks'
-// import { Monitoring } from './Monitoring.js'
 import { Lighting } from './lighting'
 import { Materials } from './materials'
 import { Objects } from './objects'
@@ -58,7 +57,6 @@ export class Game
 
     constructor()
     {
-        // Singleton
         if(Game.instance)
             return Game.instance
 
@@ -69,12 +67,10 @@ export class Game
 
     async init()
     {
-        // Setup
         this.domElement = document.querySelector('.game')
         this.canvasElement = this.domElement.querySelector('.js-canvas')
         document.documentElement.classList.add('is-started')
 
-        // First batch for intro
         this.scene = new THREE.Scene()
         this.resourcesLoader = new ResourcesLoader()
         this.quality = new Quality()
@@ -123,11 +119,9 @@ export class Game
         this.explosions = new Explosions()
         this.world = new World()
 
-        // Load and init RAPIER
         const fontsPromise = Promise.all([document.fonts.load('400 24px MaruBuri'), document.fonts.load('700 24px MaruBuri')])
         const rapierPromise = import('@dimforge/rapier3d-compat').then(async (RAPIER) => { await RAPIER.init(); return RAPIER })
 
-        // Load rest of resources
         const resourcesPromise = this.resourcesLoader.load(
             [
                 [ 'foliageTexture',                        `foliage/cherryPetalSDF.png${cb}`,                                                   'texture', (resource) => { resource.minFilter = THREE.NearestFilter; resource.magFilter = THREE.NearestFilter; resource.generateMipmaps = false; } ],
@@ -195,11 +189,9 @@ export class Game
         this.konamiCode = new KonamiCode()
         this.map = new Map()
         this.title = new Title()
-        // this.monitoring = new Monitoring()
         this.world.step(1)
         this.overlay = new Overlay()
 
-        // Pre-render if quality high
         if(this.quality.level === 0 && this.rendering.renderer.backend.isWebGPUBackend)
             PreRenderer.render()
 
@@ -211,55 +203,42 @@ export class Game
 
     reset()
     {
-        // Interactive buttons
         this.inputs.interactiveButtons.clearItems()
 
-        // Player respawn
         this.player.respawn(null, () =>
         {
-            // Objects reset
             this.objects.resetAll()
 
-            // Explosive crates
             if(this.world.explosiveCrates)
                 this.world.explosiveCrates.reset()
 
-            // Bowling
             if(this.world.areas.bowling)
                 this.world.areas.bowling.restart()
 
-            // Cookie
             if(this.world.areas.cookie)
                 this.world.areas.cookie.cookies.instancedGroup.needsUpdate = true
 
-            // Toilet
             if(this.world.areas.toilet)
                 this.world.areas.toilet.cabin.down = false
 
-            // Social
             if(this.world.areas.social)
             {
                 this.world.areas.social.fans.instancedGroup.needsUpdate = true
             }
 
-            // Benches
             if(this.world.benches)
                 this.world.benches.instancedGroup.needsUpdate = true
 
-            // Fences
             if(this.world.fences)
                 this.world.fences.instancedGroup.needsUpdate = true
 
-            // Bricks
             if(this.world.bricks)
                 this.world.bricks.instancedGroup.needsUpdate = true
 
-            // Lanterns
             if(this.world.lanterns)
                 this.world.lanterns.instancedGroup.needsUpdate = true
             gsap.delayedCall(2, () =>
             {
-
             })
         })
     }

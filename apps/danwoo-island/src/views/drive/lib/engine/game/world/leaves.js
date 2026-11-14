@@ -11,14 +11,8 @@ export class Leaves
     {
         this.game = Game.getInstance()
 
-        // if(this.game.yearCycles.properties.leaves.value < 0.25)
-        //     return
-
         const power = Math.round(remap((this.game.yearCycles.properties.leaves.value), 0.25, 1, 7, 11))
         this.count = Math.pow(2, power)
-        // this.count = Math.pow(2, 12)
-
-        // Debug
 
         this.setGeometry()
         this.setMaterial()
@@ -47,7 +41,6 @@ export class Leaves
 
     setMaterial()
     {
-        // Uniforms
         this.focusPoint = uniform(vec2())
         this.vehicleVelocity = uniform(vec3())
         this.vehiclePosition = uniform(vec3())
@@ -65,29 +58,24 @@ export class Leaves
         this.explosion = uniform(vec4(0))
         this.tornado = uniform(vec4(0))
 
-        // Buffers
         this.positionBuffer = instancedArray(this.count, 'vec3')
         this.velocityBuffer = instancedArray(this.count, 'vec3')
 
-        // Base rotation buffer
         const baseRotationArray = new Float32Array(this.count)
         for(let i = 0; i < this.count; i++)
             baseRotationArray[i] = Math.random() * Math.PI * 2
         const baseRotationBuffer = instancedArray(baseRotationArray, 'float').toAttribute()
-        
-        // Scale
+
         const scaleArray = new Float32Array(this.count)
         for(let i = 0; i < this.count; i++)
             scaleArray[i] = Math.random() * 0.5 + 0.5
         const scaleBuffer = instancedArray(scaleArray, 'float').toAttribute()
-        
-        // Weight
+
         const weightArray = new Float32Array(this.count)
         for(let i = 0; i < this.count; i++)
             weightArray[i] = Math.random() * 0.1 + 0.1
         const weightBuffer = instancedArray(weightArray, 'float')
 
-        // Color buffer
         const colorA = uniform(color(0xe17f9c))
         const colorB = uniform(color(0xffd3de))
         const colorNode = Fn(() =>
@@ -96,7 +84,6 @@ export class Leaves
             return vec3(mix(colorA, colorB, mixStrength))
         })()
 
-        // Normal buffer
         const normalArray = new Float32Array(this.count * 3)
         for(let i = 0; i < this.count; i++)
         {
@@ -115,19 +102,16 @@ export class Leaves
             transparent: true
         })
 
-        // Position
         this.material.positionNode = Fn(() =>
         {
-            // Normal
             materialNormal.assign(modelViewMatrix.mul(vec4(normalBuffer, 0)))
 
-            // Position
             const leavePosition = this.positionBuffer.toAttribute()
 
             const newPosition = positionGeometry.mul(scaleBuffer).mul(this.scale)
 
             const rotationMultiplier = max(leavePosition.y.mul(this.rotationElevationMultiplier), 0)
-            
+
             const rotationZ = sin(leavePosition.x.mul(this.rotationFrequency)).mul(rotationMultiplier)
             const rotationX = sin(leavePosition.z.mul(this.rotationFrequency)).mul(rotationMultiplier)
             const rotationY = baseRotationBuffer
@@ -141,12 +125,10 @@ export class Leaves
 
         this.size = float(this.game.view.optimalArea.radius * 2)
 
-        // Init
         const init = Fn(() =>
         {
-            // Position
             const position = this.positionBuffer.element(instanceIndex)
-            
+
             position.assign(vec3(
                 hash(instanceIndex).sub(0.5).mul(this.size),
                 0,
@@ -161,18 +143,14 @@ export class Leaves
 
         this.game.rendering.renderer.computeAsync(initCompute)
 
-        // Update
         const update = Fn(() =>
         {
             const position = this.positionBuffer.element(instanceIndex)
             const velocity = this.velocityBuffer.element(instanceIndex)
             const weight = weightBuffer.element(instanceIndex)
 
-            // Terrain
-            // const terrainUv = this.game.terrain.worldPositionToUvNode(position.xz)
             const terrainData = this.game.terrain.terrainNode(position.xz)
-            
-            // Push from vehicle
+
             const vehicleDelta = position.sub(this.vehiclePosition)
 
             const pushSideways = vec3(vehicleDelta.x, 0, vehicleDelta.z).normalize().mul(this.pushSidewaysMultiplier)
@@ -182,11 +160,10 @@ export class Leaves
             const distanceToVehicle = vehicleDelta.length()
             const vehicleMultiplier = distanceToVehicle.remapClamp(0.5, 2, 1, 0)
             const speedMultiplier = this.vehicleVelocity.length()
-            const vehiclePush = pushVelocity.add(pushSideways).mul(speedMultiplier).mul(vehicleMultiplier)//.mul(inverseWeight)
+            const vehiclePush = pushVelocity.add(pushSideways).mul(speedMultiplier).mul(vehicleMultiplier)
 
             velocity.addAssign(vehiclePush)
 
-            // Wind
             const noiseUv = position.xz.mul(this.windFrequency).add(this.game.wind.direction.mul(this.game.wind.localTime)).xy
             const noise = texture(this.game.noises.perlin, noiseUv).r
 
@@ -194,60 +171,34 @@ export class Leaves
             velocity.x.addAssign(this.game.wind.direction.x.mul(windStrength))
             velocity.z.addAssign(this.game.wind.direction.y.mul(windStrength))
 
-            // Explosion
             const explosionDelta = position.xz.sub(this.explosion.xy)
             const distanceToExplosion = explosionDelta.length()
             const explosionMultiplier = distanceToExplosion.remapClamp(this.explosion.z.mul(0.5), this.explosion.z.mul(1), 0.2, 0)
             const explosionDirection = vec2(explosionDelta.x, explosionDelta.y)
             const explosionPush = explosionDirection.mul(explosionMultiplier).mul(this.explosion.a)
-            
+
             velocity.addAssign(vec3(explosionPush.x, 0, explosionPush.y))
 
-            // //Tornado
-            // const toTornado = this.tornado.sub(position)
-            // const tornadoDistance = toTornado.length()
-            // const strength = remapClamp(tornadoDistance, 20, 2, 0, 1)
-            // const sideAngleStrength = remapClamp(tornadoDistance, 8, 2, 0, Math.PI * 0.25)
-
-            // const force = toTornado.clone().normalize()
-
-            // const sideAngleStrength = remapClamp(tornadoDistance, 8, 2, 0, Math.PI * 0.25)
-            // force.applyAxisAngle(new THREE.Vector3(0, 1, 0), -sideAngleStrength)
-
-            // const flyForce = remapClamp(tornadoDistance, 8, 2, 0, 1)
-            // force.y = flyForce * 2
-
-            // force.setLength(strength * this.game.ticker.deltaScaled * this.game.tornado.strength * 30)
-            // this.chassis.physical.body.applyImpulse(force)
-
-            // Upward fly
             const upwardDim = position.y.remapClamp(0, 6, 1, 0)
             velocity.y = velocity.xz.length().min(2).mul(this.upwardMultiplier).mul(upwardDim)
 
-            // Damping
-            const groundDamping = terrainData.b.remapClamp(0.4, 0, this.waterDamping, this.defaultDamping) // Low on water
-            const inTheAirDamping = step(0.05, position.y).mul(this.defaultDamping) // High in the air
+            const groundDamping = terrainData.b.remapClamp(0.4, 0, this.waterDamping, this.defaultDamping)
+            const inTheAirDamping = step(0.05, position.y).mul(this.defaultDamping)
             const damping = max(groundDamping, inTheAirDamping).mul(this.game.ticker.deltaScaledUniform)
             velocity.mulAssign(float(1).sub(damping))
 
-            // Gravity
             velocity.y = velocity.y.sub(this.gravity.mul(weight))
 
-            // Apply velocity
             position.addAssign(velocity.mul(this.game.ticker.deltaScaledUniform))
 
-            // Clamp to floor / water
             const floorY = terrainData.b.remapClamp(0.02, 0.13, 0, this.game.water.surfaceElevationUniform).add(0.02)
             position.y.assign(max(position.y, floorY))
 
-            // Loop
             const halfSize = this.size.mul(0.5)
             position.x.assign(mod(position.x.add(halfSize).sub(this.focusPoint.x), this.size).sub(halfSize).add(this.focusPoint.x))
             position.z.assign(mod(position.z.add(halfSize).sub(this.focusPoint.y), this.size).sub(halfSize).add(this.focusPoint.y))
         })()
         this.updateCompute = update.compute(this.count)
-
-        // Debug
     }
 
     setMesh()
@@ -263,10 +214,10 @@ export class Leaves
 
     explode(coordinates, radius)
     {
-        this.explosion.value.x = coordinates.x // X
-        this.explosion.value.y = coordinates.z // Z
-        this.explosion.value.z = radius // Radius
-        this.explosion.value.w = 20 // Strength
+        this.explosion.value.x = coordinates.x
+        this.explosion.value.y = coordinates.z
+        this.explosion.value.z = radius
+        this.explosion.value.w = 20
     }
 
     update()
@@ -277,7 +228,6 @@ export class Leaves
         this.vehiclePosition.value.copy(this.game.physicalVehicle.position)
         this.game.rendering.renderer.computeAsync(this.updateCompute)
 
-        this.explosion.value.w = 0 // Reset potential explosion
-
+        this.explosion.value.w = 0
     }
 }

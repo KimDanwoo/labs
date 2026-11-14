@@ -18,7 +18,7 @@ export class YearCycles extends Cycles
             summer: { leaves: 0.25, temperature: 25, humidity: 0.5, clouds: 0.3,  wind: 0.1 },
             fall:   { leaves: 1, temperature: 15, humidity: 0.65, clouds: 0.65, wind: 0.25 },
         }
-        
+
         return [
             [
                 { properties: presets.winter, stop: 0 + 0.125 },
