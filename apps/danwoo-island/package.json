@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "catalog:",
-    "camera-controls": "catalog:",
     "gsap": "catalog:",
     "howler": "catalog:",
     "next": "catalog:",

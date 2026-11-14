@@ -31,7 +31,6 @@ catalog:
   gsap: 3.15.1
   howler: 2.2.4
   seedrandom: 3.0.5
-  camera-controls: 3.1.2
   normalize-wheel: 1.0.1
   '@types/howler': 2.2.13
   '@types/seedrandom': 3.0.8
