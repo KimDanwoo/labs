@@ -281,7 +281,7 @@ export class Audio
 
             const tryPlay = () =>
             {
-                if(!this.game.dayCycles.intervalEvents.get('night').inInterval && Math.random() < 0.5)
+                if(!this.game.dayCycles.isInInterval('night') && Math.random() < 0.5)
                 {
                     const sound = tweets[Math.floor(Math.random() * tweets.length)]
                     sound.play()
@@ -310,7 +310,7 @@ export class Audio
 
             const tryPlay = () =>
             {
-                if(this.game.dayCycles.intervalEvents.get('night').inInterval && Math.random() < 0.5)
+                if(this.game.dayCycles.isInInterval('night') && Math.random() < 0.5)
                 {
                     sound.play()
                 }
@@ -370,7 +370,7 @@ export class Audio
                     path: 'sounds/crickets/Crickets.mp3',
                 autoplay: true,
                 loop: true,
-                volume: this.game.dayCycles.intervalEvents.get('night').inInterval ? 0.65 : 0
+                volume: this.game.dayCycles.isInInterval('night') ? 0.65 : 0
             })
 
             this.game.dayCycles.events.on('night', (inInterval) =>

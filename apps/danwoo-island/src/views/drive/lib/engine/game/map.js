@@ -107,7 +107,7 @@ export class Map
 
         this.texture.update = () =>
         {
-            const url = this.game.dayCycles.intervalEvents.get('night').inInterval ? 'ui/map/map-night.webp' : 'ui/map/map-day.webp'
+            const url = this.game.dayCycles.isInInterval('night') ? 'ui/map/map-night.webp' : 'ui/map/map-day.webp'
 
             if(url !== this.texture.previousUrl)
             {
