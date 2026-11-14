@@ -15,7 +15,7 @@ export class Explosions
     explode(coordinates, radius = 7, strength = 4, vehicleOnly = false, bulletTimeStrengthThreshold = 3)
     {
         const distance = this.game.view.focusPoint.position.distanceTo(coordinates)
-        const rollKickStrength = remapClamp(distance, 2, 15, 1, 0)
+        const rollKickStrength = remapClamp(distance, [2, 15], [1, 0])
         this.game.view.roll.kick(rollKickStrength)
 
         this.game.world.leaves?.explode(coordinates, radius)
@@ -28,7 +28,7 @@ export class Explosions
             direction.y = 0
             const distance = Math.hypot(direction.x, direction.z)
 
-            const fadedStrength = remapClamp(distance, 1, radius, 1, 0)
+            const fadedStrength = remapClamp(distance, [1, radius], [1, 0])
             const impulse = direction.clone().setLength(0.5)
             impulse.y = 1
             impulse.normalize()

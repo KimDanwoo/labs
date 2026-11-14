@@ -942,15 +942,7 @@ export class CircuitArea extends Area
         {
             for(const checkpoint of this.checkpoints.items)
             {
-                const intersections = segmentCircleIntersection(
-                    checkpoint.a.x,
-                    checkpoint.a.y,
-                    checkpoint.b.x,
-                    checkpoint.b.y,
-                    this.game.player.position2.x,
-                    this.game.player.position2.y,
-                    this.checkpoints.checkRadius
-                )
+                const intersections = segmentCircleIntersection(checkpoint.a, checkpoint.b, { center: this.game.player.position2, radius: this.checkpoints.checkRadius })
 
                 if(intersections.length)
                     checkpoint.reach()

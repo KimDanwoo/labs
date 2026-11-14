@@ -197,7 +197,7 @@ export class PhysicsVehicle
                 if(!this.upsideDown.active)
                 {
                     this.upsideDown.active = true
-                    this.events.trigger('upsideDown', [ this.upsideDown.ratio ])
+                    this.events.trigger('upsideDown', this.upsideDown.ratio)
                 }
             }
             else
@@ -304,7 +304,7 @@ export class PhysicsVehicle
                         Math.abs(accumulatedZAngle) > 5
                     )
                     {
-                        this.events.trigger('flip', [ Math.sign(accumulatedZAngle) ])
+                        this.events.trigger('flip', Math.sign(accumulatedZAngle))
                     }
                 }
             }

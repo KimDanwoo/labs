@@ -92,7 +92,7 @@ export class Weather
             1,
             () =>
             {
-                return remapClamp(this.humidity.value, 0.65, 1, 0, 1) * remapClamp(this.clouds.value, 0, 1, 0, 1)
+                return remapClamp(this.humidity.value, [0.65, 1], [0, 1]) * remapClamp(this.clouds.value, [0, 1], [0, 1])
             }
         )
 
@@ -102,9 +102,9 @@ export class Weather
             1,
             () =>
             {
-                const rainRatio = remapClamp(this.rain.value, 0.05, 0.3, 0, 1)
-                const freezeRatio = remapClamp(this.temperature.value, 0, -5, 0, 1)
-                const meltRatio = remapClamp(this.temperature.value, 0, 10, 0, -1)
+                const rainRatio = remapClamp(this.rain.value, [0.05, 0.3], [0, 1])
+                const freezeRatio = remapClamp(this.temperature.value, [0, -5], [0, 1])
+                const meltRatio = remapClamp(this.temperature.value, [0, 10], [0, -1])
 
                 return rainRatio * freezeRatio + meltRatio
             }

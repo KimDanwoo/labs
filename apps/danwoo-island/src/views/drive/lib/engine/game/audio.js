@@ -403,8 +403,8 @@ export class Audio
             volume: 0,
             onPlaying: (item) =>
             {
-                const snowAttenuation = remapClamp(this.game.weather.snow.value, 0, 0.6, 1, 0)
-                const rainVolume = remapClamp(this.game.weather.rain.value, 0.1, 0.6, 0, 1)
+                const snowAttenuation = remapClamp(this.game.weather.snow.value, [0, 0.6], [1, 0])
+                const rainVolume = remapClamp(this.game.weather.rain.value, [0.1, 0.6], [0, 1])
                 item.volume = rainVolume * snowAttenuation
             }
         })
@@ -417,7 +417,7 @@ export class Audio
             volume: 0,
             onPlaying: (item) =>
             {
-                item.volume = Math.pow(remapClamp(this.game.weather.wind.value, 0.3, 1, 0, 1), 3) * 0.7
+                item.volume = Math.pow(remapClamp(this.game.weather.wind.value, [0.3, 1], [0, 1]), 3) * 0.7
             }
         })
 
@@ -433,7 +433,7 @@ export class Audio
                     this.game.terrain.size / 2 - Math.abs(this.game.player.position.x),
                     this.game.terrain.size / 2 - Math.abs(this.game.player.position.z)
                 )
-                item.volume = Math.pow(remapClamp(distanceToSide, 0, 40, 1, 0.1), 2) * 0.7
+                item.volume = Math.pow(remapClamp(distanceToSide, [0, 40], [1, 0.1]), 2) * 0.7
             }
         })
 
@@ -537,7 +537,7 @@ export class Audio
                     onPlay: (item, force, position) =>
                     {
                         item.positions[0].copy(position)
-                        const forceVolume = remapClamp(force, 0, 200, 0, 1)
+                        const forceVolume = remapClamp(force, [0, 200], [0, 1])
                         item.volume = baseVolume * forceVolume
                         item.rate = 0.9 + Math.random() * 0.2
                     }
@@ -566,7 +566,7 @@ export class Audio
                     onPlay: (item, force, position) =>
                     {
                         item.positions[0].copy(position)
-                        item.volume = baseVolume * Math.pow(remapClamp(force, 5, 20, 0, 1), 2)
+                        item.volume = baseVolume * Math.pow(remapClamp(force, [5, 20], [0, 1]), 2)
                         item.rate = 0.9 + Math.random() * 0.2
                     }
                 })
@@ -593,7 +593,7 @@ export class Audio
                     onPlay: (item, force, position) =>
                     {
                         item.positions[0].copy(position)
-                        item.volume = baseVolume * Math.pow(remapClamp(force, 5, 20, 0, 1), 2)
+                        item.volume = baseVolume * Math.pow(remapClamp(force, [5, 20], [0, 1]), 2)
                         item.rate = 0.9 + Math.random() * 0.2
                     }
                 })
@@ -624,7 +624,7 @@ export class Audio
             this.mute.active = true
             localStorage.setItem('soundToggle', '1')
             document.documentElement.classList.add('is-audio-muted')
-            this.events.trigger('muteChange', [ true ])
+            this.events.trigger('muteChange', true)
         }
 
         this.mute.deactivate = () =>
@@ -636,7 +636,7 @@ export class Audio
             this.mute.active = false
             localStorage.setItem('soundToggle', '0')
             document.documentElement.classList.remove('is-audio-muted')
-            this.events.trigger('muteChange', [ false ])
+            this.events.trigger('muteChange', false)
         }
 
         const soundToggleLocal = localStorage.getItem('soundToggle')
@@ -708,7 +708,7 @@ export class Audio
 
                     if(item.distanceFade)
                     {
-                        distanceFadeMultiplier = remapClamp(closestDistance, 0, item.distanceFade, 1, 0)
+                        distanceFadeMultiplier = remapClamp(closestDistance, [0, item.distanceFade], [1, 0])
                     }
 
                     if(distanceFadeMultiplier > 0)

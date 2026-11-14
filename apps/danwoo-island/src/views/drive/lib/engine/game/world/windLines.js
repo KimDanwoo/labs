@@ -88,7 +88,7 @@ export class WindLines
 
         this.durationBinding = autoBinding(this, 'duration', () =>
             {
-                return remapClamp(this.game.weather.wind.value, 0, 1, 8, 2)
+                return remapClamp(this.game.weather.wind.value, [0, 1], [8, 2])
             })
 
         displayInterval()

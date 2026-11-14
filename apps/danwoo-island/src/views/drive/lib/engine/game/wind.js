@@ -41,7 +41,7 @@ export class Wind
 
         this.strengthBinding = autoBinding(this.strength, 'value', () =>
             {
-                return remapClamp(this.game.weather.wind.value, 0, 1, 0.1, 1)
+                return remapClamp(this.game.weather.wind.value, [0, 1], [0.1, 1])
             })
     }
 

@@ -432,7 +432,7 @@ export class VisualVehicle
 
             const antennaTargetDistance = this.antenna.target.distanceTo(physicalVehicle.position)
 
-            const antennaRotationSpeed = remapClamp(antennaTargetDistance, 50, 5, 1, 10)
+            const antennaRotationSpeed = remapClamp(antennaTargetDistance, [50, 5], [1, 10])
             this.antenna.headAxle.rotation.z += this.game.ticker.deltaScaled * antennaRotationSpeed
         }
 
@@ -477,9 +477,9 @@ export class VisualVehicle
         this.boostAnimation.mixUniform.value = 1 - Math.pow(1 - this.boostAnimation.mix, 7)
         if(this.parts.energy)
         {
-            this.parts.cell1.position.y = remapClamp(this.boostAnimation.mix, 0, 0.6, 0.2, 0)
-            this.parts.cell3.position.y = remapClamp(this.boostAnimation.mix, 0.2, 0.8, 0.2, 0)
-            this.parts.cell2.position.y = remapClamp(this.boostAnimation.mix, 0.4, 1, 0.2, 0)
+            this.parts.cell1.position.y = remapClamp(this.boostAnimation.mix, [0, 0.6], [0.2, 0])
+            this.parts.cell3.position.y = remapClamp(this.boostAnimation.mix, [0.2, 0.8], [0.2, 0])
+            this.parts.cell2.position.y = remapClamp(this.boostAnimation.mix, [0.4, 1], [0.2, 0])
         }
 
         const vector = new THREE.Vector3()

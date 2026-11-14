@@ -171,15 +171,15 @@ export class Gamepad
                     if(map.action === 'axesToCircle')
                     {
                         joystick.x = gamepad.axes[map.indexes[0]]
-                        joystick.safeX = remapClamp(Math.abs(joystick.x), joystickDeadZone, 1, 0, 1) * Math.sign(joystick.x)
+                        joystick.safeX = remapClamp(Math.abs(joystick.x), [joystickDeadZone, 1], [0, 1]) * Math.sign(joystick.x)
 
                         joystick.y = gamepad.axes[map.indexes[1]]
-                        joystick.safeY = remapClamp(Math.abs(joystick.y), joystickDeadZone, 1, 0, 1) * Math.sign(joystick.y)
+                        joystick.safeY = remapClamp(Math.abs(joystick.y), [joystickDeadZone, 1], [0, 1]) * Math.sign(joystick.y)
 
                         joystick.angle = Math.atan2(joystick.y, joystick.x)
                         joystick.radius = Math.hypot(joystick.y, joystick.x)
 
-                        joystick.safeRadius = remapClamp(joystick.radius, joystickDeadZone, 1, 0, 1)
+                        joystick.safeRadius = remapClamp(joystick.radius, [joystickDeadZone, 1], [0, 1])
 
                         joystick.active = joystick.radius > joystickDeadZone
                     }
@@ -254,16 +254,16 @@ export class Gamepad
             if(newButton.pressed)
             {
                 if(!oldPressed)
-                    this.events.trigger('down', [ savedButton ])
+                    this.events.trigger('down', savedButton)
             }
             else
             {
                 if(oldPressed)
-                    this.events.trigger('up', [ savedButton ])
+                    this.events.trigger('up', savedButton)
             }
 
             if(newButton.value !== oldValue)
-                this.events.trigger('change', [ savedButton ])
+                this.events.trigger('change', savedButton)
         }
 
         for(const joystickName in this.joysticks)
@@ -287,7 +287,7 @@ export class Gamepad
             this.type = type
             document.documentElement.classList.remove(`is-gamepad-${oldType}`)
             document.documentElement.classList.add(`is-gamepad-${this.type}`)
-            this.events.trigger('typeChange', [ this.type ])
+            this.events.trigger('typeChange', this.type)
         }
     }
 }

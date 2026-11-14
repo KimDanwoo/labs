@@ -41,10 +41,10 @@ export class Snow
         this.waterDropEdgeHigh = uniform(0.235)
         this.waterDropAmplitude = uniform(1)
 
-        const rainRatio = remapClamp(this.game.weather.rain.value, 0.05, 0.3, 0, 1) * remapClamp(this.game.weather.temperature.value, 0, -5, 0, 1)
-        const meltRatio = remapClamp(this.game.weather.temperature.value, 0, 10, 0, -1)
+        const rainRatio = remapClamp(this.game.weather.rain.value, [0.05, 0.3], [0, 1]) * remapClamp(this.game.weather.temperature.value, [0, -5], [0, 1])
+        const meltRatio = remapClamp(this.game.weather.temperature.value, [0, 10], [0, -1])
 
-        this.elevation.value = remapClamp(rainRatio + meltRatio, -1, 1, -1, 0.5)
+        this.elevation.value = remapClamp(rainRatio + meltRatio, [-1, 1], [-1, 0.5])
 
         this.elevationNode = Fn(([position]) =>
         {

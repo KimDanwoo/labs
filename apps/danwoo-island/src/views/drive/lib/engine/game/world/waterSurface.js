@@ -44,7 +44,7 @@ export class WaterSurface
 
         this.ripplesRatioBinding = autoBinding(this.ripplesRatio, 'value', () =>
             {
-                return remapClamp(this.game.weather.temperature.value, 0, -3, 1, 0)
+                return remapClamp(this.game.weather.temperature.value, [0, -3], [1, 0])
             })
 
         const ripplesNode = Fn(([terrainData]) =>
@@ -74,7 +74,7 @@ export class WaterSurface
 
         this.iceRatioBinding = autoBinding(this.iceRatio, 'value', () =>
             {
-                return remapClamp(this.game.weather.temperature.value, 0, -5, 0, 1)
+                return remapClamp(this.game.weather.temperature.value, [0, -5], [0, 1])
             })
 
         const iceNode = Fn(([terrainData]) =>
