@@ -56,7 +56,7 @@ export class Zones
                 if(!zone.isIn)
                 {
                     zone.isIn = true
-                    zone.events.trigger('enter', [ zone ])
+                    zone.events.trigger('enter', zone)
                 }
             }
             else
@@ -64,7 +64,7 @@ export class Zones
                 if(zone.isIn)
                 {
                     zone.isIn = false
-                    zone.events.trigger('leave', [ zone ])
+                    zone.events.trigger('leave', zone)
                 }
             }
         }

@@ -147,10 +147,10 @@ export class Cycles
                 if(firstFrame)
                     this.game.ticker.wait(1, () =>
                     {
-                        this.events.trigger(intervalEvent.name, [ intervalEvent.inInterval ])
+                        this.events.trigger(intervalEvent.name, intervalEvent.inInterval)
                     })
                 else
-                    this.events.trigger(intervalEvent.name, [ intervalEvent.inInterval ])
+                    this.events.trigger(intervalEvent.name, intervalEvent.inInterval)
             }
             if(!inInterval && intervalEvent.inInterval)
             {
@@ -158,10 +158,10 @@ export class Cycles
                 if(firstFrame)
                     this.game.ticker.wait(1, () =>
                     {
-                        this.events.trigger(intervalEvent.name, [ intervalEvent.inInterval ])
+                        this.events.trigger(intervalEvent.name, intervalEvent.inInterval)
                     })
                 else
-                    this.events.trigger(intervalEvent.name, [ intervalEvent.inInterval ])
+                    this.events.trigger(intervalEvent.name, intervalEvent.inInterval)
             }
         })
 

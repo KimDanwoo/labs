@@ -68,7 +68,7 @@ export class Lightnings
                             const distance = Math.hypot(coordinates.x - this.game.player.position2.x, coordinates.z - this.game.player.position2.y)
                             item.positions[0].copy(coordinates)
 
-                            const distanceRateEffect = mathRemapClamp(distance, 0, 20, 0, - 0.3)
+                            const distanceRateEffect = mathRemapClamp(distance, [0, 20], [0, - 0.3])
                             item.rate = 1.3 + Math.random() * 0.1 + distanceRateEffect
                         }
                     })

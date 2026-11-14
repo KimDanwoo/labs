@@ -19,6 +19,6 @@ export class Quality
             return
 
         this.level = level
-        this.events.trigger('change', [ this.level ])
+        this.events.trigger('change', this.level)
     }
 }

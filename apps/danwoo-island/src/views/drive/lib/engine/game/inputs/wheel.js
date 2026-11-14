@@ -11,7 +11,7 @@ export class Wheel
         {
             const normalized = normalizeWheel(_event)
 
-            this.events.trigger('roll', [ _event.shiftKey ? normalized.spinX : normalized.spinY ])
+            this.events.trigger('roll', _event.shiftKey ? normalized.spinX : normalized.spinY)
         }, { passive: true })
     }
 }

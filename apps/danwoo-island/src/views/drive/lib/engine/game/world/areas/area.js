@@ -118,8 +118,7 @@ export class Area
         this.frustum.test = () =>
         {
             const isVisible = this.frustum.alwaysVisible || circleIntersectsPolygon(
-                this.frustum.position,
-                this.frustum.radius,
+                { center: this.frustum.position, radius: this.frustum.radius },
                 [
                     this.game.view.optimalArea.quad2[0].offseted,
                     this.game.view.optimalArea.quad2[1].offseted,

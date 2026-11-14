@@ -11,7 +11,7 @@ export default class Keyboard
         window.addEventListener('blur', () =>
         {
             for(const key of this.pressed)
-                this.events.trigger('up', [ key ])
+                this.events.trigger('up', key)
 
             this.pressed = []
         })
@@ -22,7 +22,7 @@ export default class Keyboard
                 return
 
             this.pressed.push(_event.code, _event.key)
-            this.events.trigger('down', [ _event.code, _event.key ])
+            this.events.trigger('down', _event.code, _event.key)
         })
 
         addEventListener('keyup', (_event) =>
@@ -37,7 +37,7 @@ export default class Keyboard
             if(indexKey !== -1)
                 this.pressed.splice(indexKey, 1)
 
-            this.events.trigger('up', [ _event.code, _event.key ])
+            this.events.trigger('up', _event.code, _event.key)
         })
     }
 }

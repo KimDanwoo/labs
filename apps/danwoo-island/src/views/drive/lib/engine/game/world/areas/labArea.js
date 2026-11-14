@@ -75,8 +75,8 @@ export class LabArea extends Area
             onPlaying: (item) =>
             {
                 const absoluteSpeed = Math.abs(this.scroller.speed)
-                item.volume = remapClamp(absoluteSpeed, 0, 6, 0, 0.5)
-                item.rate = remapClamp(absoluteSpeed, 0, 6, 0.95, 1.05)
+                item.volume = remapClamp(absoluteSpeed, [0, 6], [0, 0.5])
+                item.rate = remapClamp(absoluteSpeed, [0, 6], [0.95, 1.05])
             }
         })
     }
@@ -880,7 +880,7 @@ export class LabArea extends Area
             {
                 mini.group.position.y = safeMod(mini.y - this.scroller.offset, this.scroller.minis.total) - 1
 
-                const scale = remapClamp(mini.group.position.y, 3.3, 3.9, 1, 0)
+                const scale = remapClamp(mini.group.position.y, [3.3, 3.9], [1, 0])
                 mini.group.scale.y = scale
 
                 mini.group.visible = scale > 0

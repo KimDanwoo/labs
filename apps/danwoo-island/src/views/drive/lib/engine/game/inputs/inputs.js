@@ -6,7 +6,7 @@ import Keyboard from './keyboard'
 import { InteractiveButtons } from './interactiveButtons'
 import { Wheel } from './wheel'
 import { Nipple } from './nipple'
-import ObservableSet from '../utilities/observableSet'
+import { ObservableSet } from '../utilities/observableSet'
 
 export class Inputs
 {
@@ -215,15 +215,15 @@ export class Inputs
                     {
                         action.active = true
 
-                        this.events.trigger('actionStart', [ action ])
-                        this.events.trigger(action.name, [ action ])
+                        this.events.trigger('actionStart', action)
+                        this.events.trigger(action.name, action)
                     }
                 }
 
                 else
                 {
-                    this.events.trigger('actionStart', [ action ])
-                    this.events.trigger(action.name, [ action ])
+                    this.events.trigger('actionStart', action)
+                    this.events.trigger(action.name, action)
                 }
             }
         }
@@ -245,8 +245,8 @@ export class Inputs
                     action.value = value
                     action.trigger = 'end'
 
-                    this.events.trigger('actionEnd', [ action ])
-                    this.events.trigger(action.name, [ action ])
+                    this.events.trigger('actionEnd', action)
+                    this.events.trigger(action.name, action)
                 }
             }
         }
@@ -283,8 +283,8 @@ export class Inputs
                     action.value = value
                     action.trigger = 'change'
 
-                    this.events.trigger('actionChange', [ action ])
-                    this.events.trigger(action.name, [ action ])
+                    this.events.trigger('actionChange', action)
+                    this.events.trigger(action.name, action)
                 }
             }
         }
@@ -313,7 +313,7 @@ export class Inputs
         document.documentElement.classList.remove(`is-mode-${modeClasses[oldMode]}`)
         document.documentElement.classList.add(`is-mode-${modeClasses[this.mode]}`)
 
-        this.events.trigger('modeChange', [this.mode])
+        this.events.trigger('modeChange', this.mode)
     }
 
     update()

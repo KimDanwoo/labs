@@ -56,7 +56,7 @@ export class Time
         this.bulletTime.progress += (this.bulletTime.active ? 1 : - 1) * this.game.ticker.delta * speed
         this.bulletTime.progress = clamp(this.bulletTime.progress, 0, 1)
 
-        this.scale = remap(this.bulletTime.progress, 0, 1, this.defaultScale, this.bulletTime.scale)
+        this.scale = remap(this.bulletTime.progress, [0, 1], [this.defaultScale, this.bulletTime.scale])
     }
 
     set scale(value)

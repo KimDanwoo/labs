@@ -30,7 +30,7 @@ export class InteractiveButtons
 
             item.element.addEventListener('click', () =>
             {
-                this.events.trigger('click', [ item.name ])
+                this.events.trigger('click', item.name)
                 this.events.trigger(item.name)
             })
         }

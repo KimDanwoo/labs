@@ -11,7 +11,7 @@ export class Leaves
     {
         this.game = Game.getInstance()
 
-        const power = Math.round(remap((this.game.yearCycles.properties.leaves.value), 0.25, 1, 7, 11))
+        const power = Math.round(remap((this.game.yearCycles.properties.leaves.value), [0.25, 1], [7, 11]))
         this.count = Math.pow(2, power)
 
         this.setGeometry()

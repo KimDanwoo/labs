@@ -499,7 +499,7 @@ export class View
             this.focusPoint.position.z += magnetStrength * magnetDelta.z * this.game.ticker.delta
         }
 
-        const easing = remap(this.focusPoint.easing, 0, 1, 1, this.game.ticker.delta * 10)
+        const easing = remap(this.focusPoint.easing, [0, 1], [1, this.game.ticker.delta * 10])
 
         const newSmoothFocusPoint = this.focusPoint.smoothedPosition.clone().lerp(this.focusPoint.position, easing)
 

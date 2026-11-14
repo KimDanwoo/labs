@@ -110,7 +110,7 @@ export class Player
                 onPlaying: (item) =>
                 {
                     const defaultElevation = 1.08
-                    const inAirEffect = remapClamp(Math.abs(this.game.physicalVehicle.position.y - defaultElevation), 0, 2, 1, 0)
+                    const inAirEffect = remapClamp(Math.abs(this.game.physicalVehicle.position.y - defaultElevation), [0, 2], [1, 0])
                     const speedEffect = Math.min(1, this.game.physicalVehicle.xzSpeed * 0.1)
                     item.volume = inAirEffect * speedEffect * 0.25
                 }
@@ -158,7 +158,7 @@ export class Player
 
                     item.volume += delta * this.game.ticker.deltaScaled * easing
 
-                    const rate = remapClamp(accelerating * boosting, 0, 1, 0.6, 1.1)
+                    const rate = remapClamp(accelerating * boosting, [0, 1], [0.6, 1.1])
                     item.rate += (rate - item.rate) * this.game.ticker.deltaScaled * 5
                 }
             })
@@ -177,7 +177,7 @@ export class Player
 
                     item.volume += delta * this.game.ticker.deltaScaled * easing
 
-                    const rate = remapClamp(speedEffect, 0, 1, 1, 2)
+                    const rate = remapClamp(speedEffect, [0, 1], [1, 2])
                     item.rate += (rate - item.rate) * this.game.ticker.deltaScaled * 5
                 }
             })

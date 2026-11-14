@@ -35,7 +35,7 @@ export class RainLines
 
         this.lengthRatioBinding = autoBinding(this.length, 'value', () =>
             {
-                const baseLength = remapClamp(this.game.weather.rain.value, 0, 1, 1, 3)
+                const baseLength = remapClamp(this.game.weather.rain.value, [0, 1], [1, 3])
 
                 const snowRatio = 1 - Math.pow(1 - Math.max(this.game.weather.snow.value, 0), 4)
                 const snowLength = 0.03
@@ -45,7 +45,7 @@ export class RainLines
 
         this.speedRatioBinding = autoBinding(this, 'speed', () =>
             {
-                const baseSpeed = remapClamp(this.game.weather.rain.value, 0, 1, 0.2, 0.4)
+                const baseSpeed = remapClamp(this.game.weather.rain.value, [0, 1], [0.2, 0.4])
 
                 const snowRatio = 1 - Math.pow(1 - Math.max(this.game.weather.snow.value, 0), 4)
                 const snowSpeed = 0.05
@@ -55,7 +55,7 @@ export class RainLines
 
         this.inclineRatioBinding = autoBinding(this.incline, 'value', () =>
             {
-                return remapClamp(this.game.weather.wind.value, 0, 1, 0.1, 0.4)
+                return remapClamp(this.game.weather.wind.value, [0, 1], [0.1, 0.4])
             })
     }
 

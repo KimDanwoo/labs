@@ -58,7 +58,7 @@ export class BowlingArea extends Area
             onPlay: (item, force, position) =>
             {
                 item.positions[0].copy(position)
-                const forceRemaped = remapClamp(force, 3, 10, 0, 1)
+                const forceRemaped = remapClamp(force, [3, 10], [0, 1])
                 item.volume = forceRemaped * 0.5
                 item.rate = 1.2 - forceRemaped * 0.2
             }
@@ -75,7 +75,7 @@ export class BowlingArea extends Area
             onPlaying: (item) =>
             {
                 item.positions[0].copy(this.ball.position)
-                item.volume = remapClamp(this.ball.speed, 0, 5, 0, 0.6)
+                item.volume = remapClamp(this.ball.speed, [0, 5], [0, 0.6])
             }
         })
     }
