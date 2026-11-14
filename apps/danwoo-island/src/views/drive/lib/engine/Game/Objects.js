@@ -57,7 +57,7 @@ export class Objects
                 {
                     if(_child.isMesh)
                     {
-                        if(visualDescription.castShadow)
+                        if(visualDescription.castShadow && !_child.userData.preventShadow)
                             _child.castShadow = true
 
                         if(visualDescription.receiveShadow)

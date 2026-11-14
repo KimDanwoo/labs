@@ -21,7 +21,7 @@ export function setStartupStage(next)
     performance.mark(`danwoo-island:${next}`)
     const messages = {
         [STARTUP.assets]: '풍경을 불러오고 있어요',
-        [STARTUP.graphics]: '화면과 움직임을 준비하고 있어요',
+        [STARTUP.graphics]: '섬을 준비하고 있어요',
         [STARTUP.ready]: '',
         [STARTUP.error]: '준비를 마치지 못했어요',
     }

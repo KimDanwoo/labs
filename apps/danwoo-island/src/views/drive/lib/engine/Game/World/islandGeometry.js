@@ -28,7 +28,6 @@ export const SHADES = {
     hanji: '#efe2c4',
     mapBlue: '#69a7c9',
     tarpOrange: '#e8742f',
-    tarpLight: '#f3a35a',
     iron: '#3b3a3f',
     glass: '#bfe3ea',
     earth: '#b9956b',
@@ -113,6 +112,15 @@ function hipRoofGeometry(width, depth, height, ridgeRatio)
     return geometry
 }
 
+const SHADOW_MIN_RADIUS = 0.3
+const SHADOWLESS_SUFFIX = ':shadowless'
+
+function castsShadow(geometry)
+{
+    geometry.computeBoundingSphere()
+    return geometry.boundingSphere.radius >= SHADOW_MIN_RADIUS
+}
+
 export function createParts()
 {
     const batches = new Map()
@@ -132,9 +140,10 @@ export function createParts()
         if(!GLOW[name] && flat.hasAttribute('uv'))
             flat.deleteAttribute('uv')
         flat.computeVertexNormals()
-        if(!batches.has(name))
-            batches.set(name, [])
-        batches.get(name).push(flat)
+        const key = `${name}${castsShadow(flat) ? '' : SHADOWLESS_SUFFIX}`
+        if(!batches.has(key))
+            batches.set(key, [])
+        batches.get(key).push(flat)
     }
 
     const box = (name, size, transform) => add(name, new THREE.BoxGeometry(...size), transform)
@@ -155,13 +164,16 @@ export function createParts()
     const build = (materials, matrix = new THREE.Matrix4()) =>
     {
         const group = new THREE.Group()
-        for(const [name, geometries] of batches)
+        for(const [key, geometries] of batches)
         {
+            const isShadowless = key.endsWith(SHADOWLESS_SUFFIX)
+            const name = isShadowless ? key.slice(0, -SHADOWLESS_SUFFIX.length) : key
             const mesh = new THREE.Mesh(mergeGeometries(geometries), islandMaterial(materials, name))
             for(const geometry of geometries)
                 geometry.dispose()
             mesh.name = name
-            mesh.castShadow = true
+            mesh.castShadow = !isShadowless
+            mesh.userData.preventShadow = isShadowless
             mesh.receiveShadow = true
             mesh.matrixAutoUpdate = false
             mesh.matrix.copy(matrix)
@@ -223,4 +235,25 @@ export function removeComponents(mesh, shouldRemove)
             kept.push(index[offset], index[offset + 1], index[offset + 2])
     mesh.geometry.setIndex(kept)
     return removed
+}
+
+export function bungeoppangGeometry()
+{
+    const body = new THREE.SphereGeometry(1, 10, 6)
+    body.scale(0.5, 0.16, 0.3)
+    const tail = new THREE.ConeGeometry(0.22, 0.32, 3)
+    tail.rotateZ(Math.PI / 2)
+    tail.scale(1, 0.55, 1.3)
+    tail.translate(0.58, 0, 0)
+    const fin = new THREE.ConeGeometry(0.1, 0.18, 3)
+    fin.translate(0, 0.16, 0)
+    const pieces = [body, tail, fin].map((geometry) =>
+    {
+        const flat = geometry.index ? geometry.toNonIndexed() : geometry
+        if(flat.hasAttribute('uv'))
+            flat.deleteAttribute('uv')
+        flat.computeVertexNormals()
+        return flat
+    })
+    return mergeGeometries(pieces)
 }

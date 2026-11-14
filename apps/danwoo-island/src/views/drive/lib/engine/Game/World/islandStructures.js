@@ -1,7 +1,8 @@
 import * as THREE from 'three/webgpu'
 import { Fn, max, texture, uv, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
-import { createParts, FULL_TURN, seededRandom } from './islandGeometry.js'
+import { bungeoppangGeometry, createParts, FULL_TURN, seededRandom } from './islandGeometry.js'
+import { GENERALS, jangseungFigure } from './islandJangseung.js'
 
 const OBANG = ['obangBlue', 'obangRed', 'obangYellow', 'obangWhite', 'obangBlack']
 
@@ -179,6 +180,29 @@ export function rebuildKiosk(model, materials, mapTexture)
     })
 }
 
+const POJANGMACHA = {
+    molds: [[-1.45, -0.55], [-0.8, -0.55], [-0.15, -0.55], [-1.45, -0.05], [-0.8, -0.05], [-0.15, -0.05]],
+    roof: { center: [-0.8, 2.55, -0.45], width: 3.8, depth: 3.0, height: 0.75 },
+    flapTop: 2.5,
+    bulbs: 5,
+}
+
+function pojangmachaTent(parts)
+{
+    const { roof, flapTop, bulbs } = POJANGMACHA
+    const [centerX, , centerZ] = roof.center
+    parts.hipRoof('tarpOrange', { ...roof, ridgeRatio: 0.7, position: roof.center })
+    const front = centerZ + roof.depth / 2 - 0.12
+    parts.box('tarpOrange', [roof.width, 0.35, 0.03], { position: [centerX, flapTop - 0.1, front + 0.1] })
+    for(let index = 0; index < bulbs; index++)
+    {
+        const x = centerX - roof.width * 0.4 + (index * roof.width * 0.8) / (bulbs - 1)
+        parts.rod('ink', 0.008, [x, flapTop + 0.02, front], [x, flapTop - 0.25, front])
+        parts.add('lantern', new THREE.SphereGeometry(0.09, 8, 6), { position: [x, flapTop - 0.32, front] })
+    }
+    parts.rod('ink', 0.01, [centerX - roof.width * 0.42, flapTop + 0.02, front], [centerX + roof.width * 0.42, flapTop + 0.02, front])
+}
+
 export function rebuildCookieCart(model, materials)
 {
     const container = findChild(model, 'cookiePhysicalFixed')
@@ -194,8 +218,11 @@ export function rebuildCookieCart(model, materials)
         parts.prism('wood', 0.12, 0.12, 0.16, { position: [-0.8, bottom + 0.48, z], rotation: [Math.PI / 2, 0, 0] }, 6)
     }
     parts.box('iron', [1.8, 0.2, 1.1], { position: [-0.8, counterTop + 0.1, -0.3] })
-    for(const x of [-1.3, -0.3])
-        parts.add('iron', new THREE.SphereGeometry(1, 6, 3), { position: [x, counterTop + 0.22, -0.3], scale: [0.36, 0.06, 0.2] })
+    for(const [x, z] of POJANGMACHA.molds)
+    {
+        parts.box('metalDark', [0.5, 0.05, 0.3], { position: [x, counterTop + 0.22, z] })
+        parts.add('bungeoppang', bungeoppangGeometry(), { position: [x, counterTop + 0.27, z], scale: [0.62, 0.62, 0.62] })
+    }
     parts.box('woodDark', [2.02, 0.12, 2.1], { position: [-0.8, -0.03, -0.91] })
     parts.box('woodDark', [2.02, 0.12, 2.1], { position: [-0.8, 1.64, -0.91] })
     for(const x of [-1.75, 0.15])
@@ -207,12 +234,7 @@ export function rebuildCookieCart(model, materials)
     for(const x of [-2.35, 0.75])
         for(const z of [-1.55, 0.65])
             parts.rod('woodDark', 0.05, [x, counterTop, z], [x, 2.55, z])
-    const stripes = 7
-    for(let index = 0; index < stripes; index++)
-    {
-        const x = -2.55 + (index + 0.5) * (3.5 / stripes)
-        parts.box(index % 2 === 0 ? 'tarpOrange' : 'tarpLight', [3.5 / stripes, 0.08, 2.7], { position: [x, 2.62, -0.45], rotation: [0.12, 0, 0] })
-    }
+    pojangmachaTent(parts)
     parts.rod('woodDark', 0.11, [4.71, bottom, 0.22], [4.71, 2.5, 0.22], 6)
     container.add(parts.build(materials))
 }
@@ -293,28 +315,6 @@ function cairn(parts, random, { size, matrix })
     }
 }
 
-function jangseung(parts, { size, matrix })
-{
-    const radius = Math.min(size.x, size.z) * 0.32
-    const bottom = -size.y / 2
-    const bodyHeight = size.y * 0.82
-    parts.prism('jangseungWood', radius, radius * 1.1, bodyHeight, { position: [0, bottom + bodyHeight / 2, 0], matrix }, 8)
-    const face = bottom + bodyHeight * 0.78
-    for(const facing of [1, -1])
-    {
-        const depth = facing * radius * 0.98
-        for(const side of [-1, 1])
-        {
-            parts.box('ink', [radius * 0.45, radius * 0.18, 0.08], { position: [side * radius * 0.4, face, depth], matrix })
-            parts.box('ink', [radius * 0.55, radius * 0.08, 0.08], { position: [side * radius * 0.4, face + radius * 0.3, depth], matrix })
-        }
-        parts.box('obangRed', [radius * 0.9, radius * 0.16, 0.08], { position: [0, face - radius * 0.65, depth], matrix })
-        parts.box('ink', [radius * 0.14, radius * 0.4, 0.1], { position: [0, face - radius * 0.25, depth * 1.04], matrix })
-    }
-    parts.prism('obangBlack', radius * 1.9, radius * 1.9, 0.08, { position: [0, bottom + bodyHeight + 0.04, 0], matrix }, 12)
-    parts.prism('obangBlack', radius * 0.75, radius * 0.85, size.y * 0.14, { position: [0, bottom + bodyHeight + size.y * 0.07, 0], matrix }, 10)
-}
-
 function geumjul(parts, random, points)
 {
     for(let index = 0; index < points.length - 1; index++)
@@ -357,12 +357,13 @@ export function rebuildSeonangdang(model, materials)
     const tall = pillars.slice(0, 3)
     for(const frame of tall)
         cairn(parts, random, frame)
-    for(const frame of pillars.slice(3))
-        jangseung(parts, frame)
+    const generals = [GENERALS.heaven, GENERALS.earth]
+    const plates = pillars.slice(3).map(({ size, matrix }, index) =>
+        jangseungFigure(parts, { height: size.y, radius: Math.min(size.x, size.z) * 0.32, bottom: -size.y / 2, matrix, general: generals[index % generals.length] }))
     const ropePoints = tall.map((frame) => new THREE.Vector3().setFromMatrixPosition(frame.matrix).add(new THREE.Vector3(0, frame.size.y * 0.32, 0)))
     ropePoints.sort((a, b) => Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x))
     geumjul(parts, random, ropePoints)
-    container.add(parts.build(materials))
+    container.add(parts.build(materials), ...plates)
 }
 
 function removeVisualMeshes(container)

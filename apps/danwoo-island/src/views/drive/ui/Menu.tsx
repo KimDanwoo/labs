@@ -2,7 +2,6 @@ import type { ComponentType } from 'react';
 
 import { MENU_SECTIONS, type MenuSectionName } from '../config/menu';
 import { worldAsset } from '../config/worldAsset';
-import { BehindTheSceneContent } from './BehindTheSceneContent';
 import { CircuitContent } from './CircuitContent';
 import { CloseButton } from './CloseButton';
 import { ControlsContent } from './ControlsContent';
@@ -14,7 +13,6 @@ const CONTENT_BY_SECTION = {
   options: OptionsContent,
   controls: ControlsContent,
   circuit: CircuitContent,
-  behindTheScene: BehindTheSceneContent,
 } satisfies Record<MenuSectionName, ComponentType>;
 
 export function Menu() {

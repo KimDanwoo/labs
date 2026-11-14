@@ -3,7 +3,6 @@ const ISLAND_TEXTURES = {
     circuitWebgl: 'areas/island/circuitWebgl.png',
     circuitWebgpu: 'areas/island/circuitWebgpu.png',
     circuitThreejs: 'areas/island/circuitThreejs.png',
-    airDancer: 'areas/island/airDancer.png',
     cookieBanner: 'areas/island/cookieBanner.png',
     projectsCarpet: 'areas/island/projectsCarpet.png',
     labCarpet: 'areas/island/labCarpet.png',

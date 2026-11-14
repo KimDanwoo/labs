@@ -54,7 +54,7 @@ function buildContent() {
       distinctions: [],
       images: [path.basename(project.image)],
     })),
-    lab: [{ title: 'Danwoo Lab', url: LAB_URL, image: 'hub.png', imageMini: 'hub.png' }],
+    lab: [{ title: 'Danwoo Lab', url: LAB_URL, image: 'lab.webp', imageMini: 'lab.webp' }],
     social: links
       .map((part) => ({ name: part.label, url: validateUrl(part.href), align: 'right' }))
       .concat([{ name: 'Danwoo Lab', url: LAB_URL, align: 'left' }]),

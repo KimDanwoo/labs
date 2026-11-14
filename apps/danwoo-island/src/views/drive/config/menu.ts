@@ -1,11 +1,10 @@
 const LANDING_PREVIEW = 'danwoo/landing-preview.webp';
 
 export const MENU_SECTIONS = [
-  { name: 'home', icon: 'ui/home.svg', preview: LANDING_PREVIEW },
-  { name: 'options', icon: 'ui/gear.svg', preview: LANDING_PREVIEW },
-  { name: 'controls', icon: 'ui/controls/gamepad.svg', preview: LANDING_PREVIEW },
-  { name: 'circuit', icon: 'ui/wheel.svg', preview: 'ui/previews/circuit.webp' },
-  { name: 'behindTheScene', icon: 'ui/question.svg', preview: 'ui/previews/behindTheScene.webp' },
+  { name: 'home', icon: 'ui/ink/home.png', preview: LANDING_PREVIEW },
+  { name: 'options', icon: 'ui/ink/gear.png', preview: LANDING_PREVIEW },
+  { name: 'controls', icon: 'ui/ink/gamepad.png', preview: LANDING_PREVIEW },
+  { name: 'circuit', icon: 'ui/ink/flag.png', preview: 'ui/previews/circuit.webp' },
 ] as const;
 
 export type MenuSectionName = (typeof MENU_SECTIONS)[number]['name'];

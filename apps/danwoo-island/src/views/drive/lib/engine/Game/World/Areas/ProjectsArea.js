@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { rebuildVillageProps } from '../islandVillage.js'
 import { rebuildProjectsGate } from '../islandStructures.js'
+import { removeAwardsTable } from '../islandReskins.js'
 import { Game } from '../../Game.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import gsap from 'gsap'
@@ -17,6 +18,7 @@ export class ProjectsArea extends Area
     {
         rebuildVillageProps(this.model, this.game.materials)
         rebuildProjectsGate(this.model, this.game.materials)
+        removeAwardsTable(this.model)
         super.setObjects()
     }
 
@@ -56,7 +58,6 @@ export class ProjectsArea extends Area
         this.setAdjacents()
         this.setTitle()
         this.setUrl()
-        this.setDistinctions()
         this.setBlackBoard()
         this.setOven()
         this.setGrinder()
@@ -1043,69 +1044,6 @@ export class ProjectsArea extends Area
         }
     }
 
-    setDistinctions()
-    {
-        this.distinctions = {}
-        this.distinctions.status = 'hidden'
-        this.distinctions.group = this.references.items.get('distinctions')[0]
-        this.distinctions.names = ['awwwards', 'cssda', 'fwa']
-        this.distinctions.items = {}
-        this.distinctions.items.awwwards = this.distinctions.group.children.find(_child => _child.name.startsWith('awwwards'))
-        this.distinctions.items.fwa = this.distinctions.group.children.find(_child => _child.name.startsWith('fwa'))
-        this.distinctions.items.cssda = this.distinctions.group.children.find(_child => _child.name.startsWith('cssda'))
-
-        this.distinctions.positions = [
-            [
-                [0, 0],
-            ],
-            [
-                [-0.4582188129425049, -0.2090435028076172],
-                [0.4859628677368164, 0.47049903869628906],
-            ],
-            [
-                [-0.7032163143157959, -0.2090439796447754],
-                [0.8216180801391602, -0.16075992584228516],
-                [0.1332714557647705, 0.47049903869628906],
-            ],
-        ]
-
-        this.distinctions.update = () =>
-        {
-            if(this.distinctions.status === 'hiding')
-                return
-
-            this.distinctions.status = 'hiding'
-            let i = 0
-            for(const name of this.distinctions.names)
-            {
-                const item = this.distinctions.items[name]
-
-                gsap.to(item.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.5, delay: 0.1 * i, ease: 'power2.in', overwrite: true })
-                i++
-            }
-
-            gsap.delayedCall(1, () =>
-            {
-                this.distinctions.status = 'visible'
-
-                let i = 0
-                const positions = this.distinctions.positions[this.navigation.current.distinctions.length - 1]
-                for(const name of this.navigation.current.distinctions)
-                {
-                    const item = this.distinctions.items[name]
-
-                    item.visible = true
-                    gsap.to(item.scale, { x: 1, y: 1, z: 1, duration: 1, delay: 0.2 * i, ease: 'back.out(2)', overwrite: true })
-
-                    item.position.x = positions[i][0]
-                    item.position.z = positions[i][1]
-
-                    i++
-                }
-            })
-        }
-    }
-
     setPendulum()
     {
         this.references.items.get('balls')[0].rotation.reorder('YXZ')
@@ -1488,7 +1426,6 @@ export class ProjectsArea extends Area
         this.adjacents.update()
         this.title.update(direction)
         this.url.update(direction)
-        this.distinctions.update()
 
         // Change image
         let imageIndex = null

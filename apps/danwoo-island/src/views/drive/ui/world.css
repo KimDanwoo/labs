@@ -1730,15 +1730,6 @@ html:not(.is-mode-touch) .discord .content .item .button-container .button:hover
   left: calc(50% - 8px);
   transform: rotate(45deg);
 }
-.behindTheScene-content p.text {
-  margin-bottom: 1em;
-}
-.behindTheScene-content p.text a {
-  font-weight: 700;
-}
-.behindTheScene-content h2 {
-  font-size: 2rem;
-}
 .map-trigger {
   z-index: 9;
   -webkit-user-select: none;
@@ -2092,9 +2083,9 @@ html.is-mode-touch .map .location .name {
   position: fixed;
 }
 .island-symbol {
-  font-size: 46px;
-  font-weight: 400;
-  line-height: 1;
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(0 1px 6px #130c1e38);
 }
 .island-dot {
   color: var(--island-accent);
@@ -2105,7 +2096,8 @@ html.is-mode-touch .map .location .name {
     font-size: 17px;
   }
   .island-symbol {
-    font-size: 34px;
+    width: 34px;
+    height: 34px;
   }
 }
 @font-face {
@@ -2214,4 +2206,89 @@ body:has(.menu.is-displayed) .island-identity {
 .island-startup button:focus-visible {
   outline-offset: 4px;
   outline: 2px solid #ffb27e;
+}
+:root {
+  --hanji: #efe2c4;
+  --hanji-deep: #e3d0a8;
+  --ink: #2b2420;
+  --seal: #c8372d;
+}
+.menu {
+  color: var(--ink);
+}
+.menu ::selection {
+  color: var(--hanji);
+  background-color: var(--ink);
+}
+.menu .contents,
+.menu .contents .content,
+.menu .previews {
+  background: var(--hanji);
+}
+.menu .previews:after,
+.menu .navigation .item .button-inner:after,
+.menu .close .button-inner:after {
+  border-color: var(--ink);
+}
+.menu .navigation .item .button-inner {
+  background: var(--hanji-deep);
+}
+.menu .navigation .item.is-active .button-inner {
+  background: var(--hanji);
+}
+.menu .navigation .item .button-inner .icon-container {
+  color: var(--ink);
+}
+.menu .navigation .item .button-inner .icon-container img,
+.menu .close .button-inner .icon-container .icon.is-default {
+  width: 26px;
+  height: 26px;
+}
+.menu .close .button-inner,
+.menu-trigger .button-inner,
+.map-trigger .button-inner {
+  background: var(--seal);
+}
+.menu .close .button-inner .icon-container .icon.is-default,
+.menu-trigger .menu-icon,
+.map-trigger .map-icon {
+  filter: invert(93%) sepia(14%) saturate(437%) hue-rotate(338deg);
+}
+.menu-trigger .menu-icon,
+.map-trigger .map-icon {
+  width: 24px;
+  height: 24px;
+}
+.menu .button {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink) 55%, transparent);
+}
+html:not(.is-mode-touch) .menu .button:not(.is-disabled):hover {
+  color: var(--seal);
+  border-color: var(--seal);
+}
+.menu .button .icon,
+.menu .tabs .tabs-navigation .tab .icon-gamepad,
+.menu .tabs .tabs-navigation .tab .icon-mouse-keyboard,
+.menu .tabs .tabs-navigation .tab .icon-touch {
+  filter: invert(1) brightness(0.3);
+}
+.menu .tabs .tabs-navigation .tab .active-background {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+.menu .contents .controls-content .list .key {
+  border-color: color-mix(in srgb, var(--ink) 30%, transparent);
+}
+.menu .paint-options select,
+.menu .paint-options option {
+  color: var(--ink);
+  background: var(--hanji);
+  border-color: color-mix(in srgb, var(--ink) 45%, transparent);
+}
+.menu .contents .controls-content .list .is-gamepad-button.is-icon {
+  filter: invert(1) brightness(0.3);
+}
+.menu .close .button-inner .icon-container .icon.is-xbox {
+  color: var(--hanji);
+  border-color: var(--hanji);
 }

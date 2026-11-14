@@ -1,6 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
-import { createParts, FULL_TURN, meshComponents, SHADES, seededRandom } from './islandGeometry.js'
+import { bungeoppangGeometry, createParts, FULL_TURN, meshComponents, SHADES, seededRandom } from './islandGeometry.js'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { color } from 'three/tsl'
 
@@ -125,42 +124,56 @@ function yutBoard(parts, frame)
     }
 }
 
+const PAENGI_PROFILE = [[0, -0.5], [0.08, -0.42], [0.55, 0.05], [0.95, 0.32], [1, 0.38], [0.9, 0.42], [0.3, 0.46], [0, 0.47]]
+const PAENGI_BANDS = [{ shade: 'obangRed', y: 0.18, scale: 0.78 }, { shade: 'obangYellow', y: 0.26, scale: 0.88 }, { shade: 'obangBlue', y: 0.34, scale: 0.98 }]
+
 function paengi(parts, container)
 {
     const colliders = collidersOf(container)
     const base = colliders.find((item) => !item.isTube)
     const spinner = colliders.find((item) => item.isTube)
     if(base)
+    {
         parts.box('wood', [base.size.x, base.size.y, base.size.z], { matrix: base.matrix })
+        parts.rod('timber', 0.025, new THREE.Vector3(-base.size.x * 0.4, base.size.y / 2 + 0.03, -base.size.z * 0.3).applyMatrix4(base.matrix).toArray(), new THREE.Vector3(base.size.x * 0.35, base.size.y / 2 + 0.03, base.size.z * 0.2).applyMatrix4(base.matrix).toArray())
+    }
     if(!spinner)
         return
     const { radius, height, matrix } = spinner
-    parts.prism('timber', 0.04, radius, height * 0.6, { position: [0, -height / 2 + height * 0.3, 0], matrix }, 12)
-    const stripes = ['obangRed', 'obangYellow', 'obangBlue']
-    stripes.forEach((stripe, index) =>
-        parts.prism(stripe, radius * (1 - index * 0.04), radius * (1 - index * 0.04), height * 0.08, { position: [0, -height / 2 + height * (0.64 + index * 0.08), 0], matrix }, 12))
-    parts.prism('woodDark', 0.06, 0.08, height * 0.14, { position: [0, height / 2 - height * 0.07, 0], matrix }, 8)
+    lathe(parts, 'timber', PAENGI_PROFILE.map(([r, y]) => [r * radius, y * height]), { matrix }, 16)
+    for(const { shade, y, scale } of PAENGI_BANDS)
+        parts.add(shade, new THREE.TorusGeometry(radius * scale, height * 0.035, 4, 16), { position: [0, y * height, 0], rotation: [Math.PI / 2, 0, 0], matrix })
+    parts.prism('woodDark', radius * 0.12, radius * 0.16, height * 0.12, { position: [0, height * 0.52, 0], matrix }, 8)
 }
+
+const JANGGU = { lacing: 10, cord: 0.014, waist: 0.2 }
+const JANGGU_PROFILE = [[0, -0.9], [0.92, -0.9], [0.98, -0.84], [0.86, -0.58], [0.5, -0.3], [JANGGU.waist, -0.08], [JANGGU.waist, 0.08], [0.5, 0.3], [0.86, 0.58], [0.98, 0.84], [0.92, 0.9], [0, 0.9]]
 
 function janggu(parts, frame)
 {
     const { size, matrix } = frame
-    const center = new THREE.Vector3().setFromMatrixPosition(matrix)
     const half = size.x / 2
+    const radius = size.y * 0.42
+    const alongX = { rotation: [0, 0, Math.PI / 2], matrix }
+    lathe(parts, 'pillarRed', JANGGU_PROFILE.map(([r, y]) => [r * radius, y * half * 0.86]), alongX, 16)
+    const rimX = half * 0.9
     for(const side of [-1, 1])
     {
-        parts.prism('pillarRed', size.y * 0.15, size.y * 0.42, half * 0.85, { position: [side * half * 0.42, 0, 0], rotation: [0, 0, side * Math.PI / 2], matrix }, 12)
-        parts.prism('hanji', size.y * 0.47, size.y * 0.47, 0.06, { position: [side * half * 0.88, 0, 0], rotation: [0, 0, Math.PI / 2], matrix }, 14)
+        parts.prism('hanji', size.y * 0.5, size.y * 0.5, 0.05, { position: [side * rimX, 0, 0], ...alongX }, 16)
+        parts.add('iron', new THREE.TorusGeometry(size.y * 0.5, 0.025, 4, 18), { position: [side * rimX, 0, 0], rotation: [0, Math.PI / 2, 0], matrix })
+        parts.add('obangYellow', new THREE.TorusGeometry(radius * 0.9, 0.018, 4, 16), { position: [side * half * 0.62, 0, 0], rotation: [0, Math.PI / 2, 0], matrix })
     }
-    for(let index = 0; index < 8; index++)
+    const ring = (x, angle) => new THREE.Vector3(x, Math.cos(angle) * size.y * 0.47, Math.sin(angle) * size.y * 0.47).applyMatrix4(matrix).toArray()
+    for(let index = 0; index < JANGGU.lacing; index++)
     {
-        const angle = (index / 8) * FULL_TURN
-        const y = Math.cos(angle) * size.y * 0.44
-        const z = Math.sin(angle) * size.y * 0.44
-        const from = new THREE.Vector3(-half * 0.86, y, z).add(center)
-        const to = new THREE.Vector3(half * 0.86, -y * 0.3, -z * 0.3).add(center)
-        parts.rod('obangRed', 0.02, from.toArray(), to.toArray())
+        const angle = (index / JANGGU.lacing) * FULL_TURN
+        const next = ((index + 0.5) / JANGGU.lacing) * FULL_TURN
+        parts.rod('obangWhite', JANGGU.cord, ring(-rimX, angle), ring(rimX, next))
+        parts.rod('obangWhite', JANGGU.cord, ring(rimX, next), ring(-rimX, angle + FULL_TURN / JANGGU.lacing))
+        const tab = new THREE.Vector3(rimX * 0.55, Math.cos(next) * size.y * 0.46, Math.sin(next) * size.y * 0.46).applyMatrix4(matrix)
+        parts.box('woodDark', [0.08, 0.05, 0.05], { position: tab.toArray() })
     }
+    parts.rod('timber', 0.018, ring(-half * 0.2, -0.2), new THREE.Vector3(half * 0.5, size.y * 0.75, size.y * 0.1).applyMatrix4(matrix).toArray())
 }
 
 function obangFlag(parts, frame)
@@ -484,14 +497,24 @@ function stonePillar(parts, frame)
     parts.prism('stone', radius * 0.3, radius * 0.62, 0.18, { position: [0, size.y / 2 - 0.09, 0], matrix })
 }
 
-function taegeukFan(parts)
+const PINWHEEL = { radius: 0.44, centerY: 0.25, twist: 0.16, blades: ['obangRed', 'obangBlue', 'obangYellow', 'dancheongGreen'] }
+
+function pinwheelBlade(radius, twist)
 {
-    const radius = 0.5
-    const centerY = 0.2
-    parts.add('obangRed', new THREE.CylinderGeometry(radius, radius, 0.05, 12, 1, false, 0, Math.PI), { position: [0, centerY, 0], rotation: [Math.PI / 2, 0, 0] })
-    parts.add('obangBlue', new THREE.CylinderGeometry(radius, radius, 0.05, 12, 1, false, Math.PI, Math.PI), { position: [0, centerY, 0], rotation: [Math.PI / 2, 0, 0] })
-    parts.add('obangYellow', new THREE.TorusGeometry(radius, 0.035, 4, 16), { position: [0, centerY, 0] })
-    parts.rod('woodDark', 0.04, [0, -0.65, 0], [0, centerY - radius + 0.05, 0])
+    const root = [0, 0, 0]
+    const edge = [radius, 0, 0]
+    const tip = [radius, radius, twist]
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute([...root, ...edge, ...tip, ...root, ...tip, ...edge], 3))
+    return geometry
+}
+
+function pinwheel(parts)
+{
+    const { radius, centerY, twist, blades } = PINWHEEL
+    blades.forEach((shade, index) => parts.add(shade, pinwheelBlade(radius, twist), { position: [0, centerY, 0], rotation: [0, 0, (index * Math.PI) / 2] }))
+    parts.prism('obangYellow', 0.05, 0.05, 0.08, { position: [0, centerY, 0.04], rotation: [Math.PI / 2, 0, 0] }, 6)
+    parts.rod('woodDark', 0.03, [0, -0.65, -0.03], [0, centerY, -0.03])
 }
 
 function sortedColliders(container)
@@ -577,12 +600,11 @@ const BUILDERS = [
 
 const UNCOLLIDED_BUILDERS = [
     { pattern: /^sword$/, build: obangFlag },
-    { pattern: /^table002$/, build: (parts, frame) => workTable(parts, frame) },
     { pattern: /^Cube006$/, build: badukBoard },
     { pattern: /^Cylinder$/, build: watermelonTray },
     { pattern: /^Plane005$/, build: dotjari },
     { pattern: /^refPillar$/, build: stonePillar },
-    { pattern: /^refFan$/, build: (parts) => taegeukFan(parts) },
+    { pattern: /^refFan$/, build: (parts) => pinwheel(parts) },
 ]
 
 const CIRCUIT_OBJECT = /^refObjectsPhysicalDynamic/
@@ -789,10 +811,9 @@ function dancerChest(parts)
 {
     for(const [x, z] of CIRCUIT_DECORATION.dancerBases)
     {
-        parts.box('cabinetWood', [1.1, 0.9, 1.1], { position: [x, -0.5, z] })
-        parts.box('woodDark', [1.16, 0.1, 1.16], { position: [x, -0.02, z] })
-        for(const [cx, cz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]])
-            parts.box('obangYellow', [0.14, 0.92, 0.14], { position: [x + cx * 0.5, -0.5, z + cz * 0.5] })
+        parts.box('basalt', [1.2, 0.9, 1.2], { position: [x, -0.5, z] })
+        parts.box('stone', [1.3, 0.12, 1.3], { position: [x, -0.02, z] })
+        parts.box('basaltDark', [1.32, 0.12, 1.32], { position: [x, -0.9, z] })
     }
 }
 
@@ -845,23 +866,7 @@ export function reshapeCircuitDecoration(model, materials)
 
 export function makeBungeoppang(cookie)
 {
-    const body = new THREE.SphereGeometry(1, 10, 6)
-    body.scale(0.5, 0.16, 0.3)
-    const tail = new THREE.ConeGeometry(0.22, 0.32, 3)
-    tail.rotateZ(Math.PI / 2)
-    tail.scale(1, 0.55, 1.3)
-    tail.translate(0.58, 0, 0)
-    const fin = new THREE.ConeGeometry(0.1, 0.18, 3)
-    fin.translate(0, 0.16, 0)
-    const pieces = [body, tail, fin].map((geometry) =>
-    {
-        const flat = geometry.index ? geometry.toNonIndexed() : geometry
-        if(flat.hasAttribute('uv'))
-            flat.deleteAttribute('uv')
-        flat.computeVertexNormals()
-        return flat
-    })
-    cookie.geometry = mergeGeometries(pieces)
+    cookie.geometry = bungeoppangGeometry()
     const material = new MeshDefaultMaterial({ colorNode: color(SHADES.bungeoppang), hasCoreShadows: true, hasDropShadows: true })
     material.userData.prevent = true
     cookie.material = material

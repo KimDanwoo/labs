@@ -1,4 +1,5 @@
 import { createParts, islandMaterial, removeComponents } from './islandGeometry.js'
+import { GENERALS, jangseungFigure } from './islandJangseung.js'
 
 const CAREER_PAINT = {
     emissiveWhiteRadialGradient: 'hanji',
@@ -6,6 +7,10 @@ const CAREER_PAINT = {
     emissivePurpleRadialGradient: 'obangRed',
     emissiveBlueRadialGradient: 'obangBlue',
 }
+
+const AWARDS_TABLE = ['table002', 'cube024', 'refel003', 'medal', 'refDistinctions']
+
+const CIRCUIT_JANGSEUNG = { height: 4.3, radius: 0.42, generals: [GENERALS.heaven, GENERALS.earth] }
 
 const STEPPING_STONES = ['slabes', 'Cube001', 'Cube002']
 
@@ -73,4 +78,25 @@ export function rebuildBowlingScreenStand(model, materials)
     SCREEN_STAND.legX.forEach((x) => trestle(parts, x, ground))
     parts.rod('woodDark', 0.05, [left, 0.95, SCREEN_STAND.z], [right, 0.95, SCREEN_STAND.z])
     body.add(parts.build(materials))
+}
+
+export function removeAwardsTable(model)
+{
+    for(const name of AWARDS_TABLE)
+        model.getObjectByName(name)?.removeFromParent()
+}
+
+export function replaceAirDancers(model, materials)
+{
+    const dancers = model.children.filter((child) => /^refAirDancers/.test(child.name))
+    dancers.forEach((dancer, index) =>
+    {
+        dancer.updateMatrix()
+        const parts = createParts()
+        const plate = jangseungFigure(parts, { height: CIRCUIT_JANGSEUNG.height, radius: CIRCUIT_JANGSEUNG.radius, matrix: dancer.matrix, general: CIRCUIT_JANGSEUNG.generals[index % CIRCUIT_JANGSEUNG.generals.length] })
+        const figure = parts.build(materials)
+        figure.name = 'jangseung'
+        model.add(figure, plate)
+        dancer.removeFromParent()
+    })
 }

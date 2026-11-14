@@ -49,7 +49,7 @@ export class Map
         this.locations = {}
         this.locations.items = [
             { name: '서낭당', respawnName: 'altar', offset: { x: 0, y: -0.05 } },
-            { name: '크레딧', respawnName: 'behindTheScene', offset: { x: 0.01, y: 0 } },
+            { name: '공사장', respawnName: 'behindTheScene', offset: { x: 0.01, y: 0 } },
             { name: '볼링장', respawnName: 'bowling', offset: { x: -0.08, y: 0.03 } },
             { name: '소개·이력서', respawnName: 'career', offset: { x: 0, y: -0.06 } },
             { name: '서킷', respawnName: 'circuit', offset: { x: -0.08, y: -0.05 } },

@@ -1,9 +1,9 @@
+import { worldAsset } from '../config/worldAsset';
+
 export function IslandIdentity() {
   return (
     <header className="island-identity" aria-label="Danwoo Island">
-      <span className="island-symbol" aria-hidden="true">
-        ✳
-      </span>
+      <img className="island-symbol" src={worldAsset('ui/islandSeal.png')} alt="" aria-hidden="true" />
       <span>
         DANWOO
         <br />

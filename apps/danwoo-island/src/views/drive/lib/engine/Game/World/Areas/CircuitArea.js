@@ -1,12 +1,13 @@
 import * as THREE from 'three/webgpu'
 import { rebuildCircuitObjects, rebuildPodium, reshapeCircuitDecoration } from '../islandVillage.js'
+import { replaceAirDancers } from '../islandReskins.js'
 import { Game } from '../../Game.js'
 import { lerp, segmentCircleIntersection } from '../../utilities/maths.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
 import gsap from 'gsap'
 import { Player } from '../../Player.js'
 import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
-import { add, color, float, Fn, max, mix, normalGeometry, objectPosition, PI, positionGeometry, positionWorld, rotateUV, sin, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
+import { add, color, Fn, max, mix, PI, sin, texture, uniform, uv, vec2, vec4 } from 'three/tsl'
 import { alea } from 'seedrandom'
 import { Area } from './Area.js'
 import { timeToRaceString } from '../../utilities/time.js'
@@ -18,6 +19,7 @@ export class CircuitArea extends Area
         rebuildCircuitObjects(this.model, this.game.materials)
         rebuildPodium(this.model, this.game.materials)
         reshapeCircuitDecoration(this.model, this.game.materials)
+        replaceAirDancers(this.model, this.game.materials)
         super.setObjects()
     }
 
@@ -54,7 +56,6 @@ export class CircuitArea extends Area
         this.setStartAnimation()
         this.setRespawn()
         this.setBounds()
-        this.setAirDancers()
         this.setBanners()
         this.setMenu()
         this.setCourseSign()
@@ -717,73 +718,6 @@ export class CircuitArea extends Area
         this.bounds = {}
         this.bounds.threshold = 0
         this.bounds.isOut = false
-    }
-
-    setAirDancers()
-    {
-        const baseAirDancers = this.references.items.get('airDancers')
-        const height = 5
-        const colorNode = uniform(color('#d684ff'))
-
-        const material = baseAirDancers[0].material.clone()
-
-        const rotation = float(0).toVarying()
-        const intensity = float(0).toVarying()
-
-        material.positionNode = Fn(() =>
-        {
-            const newPosition = positionGeometry.toVar()
-
-            const localTime = this.game.ticker.elapsedScaledUniform
-
-            intensity.assign(
-                localTime
-                    .mul(0.34)
-                    .sub(positionGeometry.y.div(height * 2))
-                    .fract()
-                    .sub(0.5)
-                    .mul(2)
-                    .abs()
-            )
-
-            const heightFade = positionGeometry.y.div(height)
-
-            const rotation1 = sin(localTime.mul(0.678)).mul(0.7)
-            const rotation2 = sin(localTime.mul(1.4)).mul(0.35)
-            const rotation3 = sin(localTime.mul(2.4)).mul(0.2)
-            rotation.assign(add(rotation1, rotation2, rotation3).mul(heightFade).mul(intensity).mul(this.game.wind.strength.remap(0, 1, 0.25, 1)))
-
-            const rotationCenter = vec2(0, 0)
-            newPosition.xy.assign(rotateUV(newPosition.xy, rotation, rotationCenter))
-
-            return newPosition
-        })()
-
-        material.normalNode = Fn(() =>
-        {
-            const newNormalGeometry = normalGeometry.toVar()
-            newNormalGeometry.xy.assign(rotateUV(newNormalGeometry.xy, rotation, vec2(0)))
-            return newNormalGeometry
-        })()
-
-        // material.outputNode = Fn(() =>
-        // {
-        //     return vec4(vec3(intensity), 1)
-        // })()
-
-        for(const baseAirDancer of baseAirDancers)
-        {
-            baseAirDancer.material = material
-        }
-
-        // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({ title: 'airDancers' })
-            this.game.debug.addThreeColorBinding(debugPanel, colorNode.value, 'color')
-
-            // debugPanel.addBinding(doorIntensity, 'value', { label: 'intensity', min: 0, max: 5, step: 0.01 })
-        }
     }
 
     setBanners()
