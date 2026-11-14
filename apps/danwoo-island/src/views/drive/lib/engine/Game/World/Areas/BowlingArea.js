@@ -493,33 +493,6 @@ export class BowlingArea extends Area
         points.position.z = 0.5
         this.references.items.get('jukebox')[0].add(points)
 
-        // Interactive point
-        this.game.interactivePoints.create(
-            this.references.items.get('jukeboxInteractivePoint')[0].position,
-            '노래 바꾸기',
-            InteractivePoints.ALIGN_LEFT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
-            {
-                if(this.game.audio.mute.active)
-                    this.game.audio.mute.deactivate()
-
-                this.game.audio.playlist.next()
-            },
-            () =>
-            {
-                this.game.inputs.interactiveButtons.addItems(['interact'])
-            },
-            () =>
-            {
-                this.game.inputs.interactiveButtons.removeItems(['interact'])
-            },
-            () =>
-            {
-                this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
-
         // Debug
         if(this.game.debug.active)
         {
