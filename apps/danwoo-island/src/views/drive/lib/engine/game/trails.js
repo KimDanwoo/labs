@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { attribute, cross, dot, float, Fn, mat3, modelViewMatrix, positionGeometry, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
 
 const getRotationMatrix = Fn(([u, v]) =>
@@ -25,7 +25,7 @@ export class Trails
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.subdivisions = 32
         this.texel = 1 / this.subdivisions

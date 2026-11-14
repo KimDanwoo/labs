@@ -1,5 +1,5 @@
 import { Events } from './events'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { Inputs } from './inputs/inputs'
 import { Tabs } from './tabs'
 import { CircuitArea } from './world/areas/circuitArea'
@@ -13,7 +13,7 @@ export class Menu
 
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
         this.state = Menu.CLOSED
         this.element = document.querySelector('.js-menu')
         this.current = null

@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { rebuildCircuitObjects, rebuildPodium, reshapeCircuitDecoration } from '../islandVillage'
 import { replaceAirDancers } from '../islandReskins'
-import { Game } from '../../game'
+import { getGame } from '../../gameContext'
 import { lerp, segmentCircleIntersection } from '../../utilities/maths'
 import { InteractivePoints } from '../../interactivePoints'
 import gsap from 'gsap'

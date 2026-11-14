@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import gsap from 'gsap'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { InstancedGroup } from '../instancedGroup'
 import { createCoconutCrate } from './islandProps'
 
@@ -8,7 +8,7 @@ export class ExplosiveCrates
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.explosiveCratesModel.scene.children)
         this.references = references

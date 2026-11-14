@@ -1,17 +1,16 @@
 import { abs, atan, float, Fn, If, max, min, PI, positionGeometry, positionWorld, step, uniform, vec2, vec3, vec4 } from 'three/tsl'
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { clamp } from 'three/src/math/MathUtils.js'
 import { smallestAngle } from '../utilities/maths'
 import gsap from 'gsap'
 import { Events } from '../events'
-import { Inputs } from './inputs'
 
 export class Nipple
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.events = new Events()
         this.position = new THREE.Vector3()

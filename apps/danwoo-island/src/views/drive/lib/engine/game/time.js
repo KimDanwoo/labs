@@ -1,5 +1,5 @@
 
-import { Game } from './game'
+import { getGame } from './gameContext'
 import gsap from 'gsap'
 import { clamp, remap } from './utilities/maths'
 
@@ -7,7 +7,7 @@ export class Time
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.defaultScale = 2
         this._scale = this.defaultScale

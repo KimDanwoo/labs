@@ -1,6 +1,6 @@
 import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { blendOverlay, color, float, Fn, hash, linearDepth, max, mix, output, positionGeometry, positionLocal, positionWorld, screenUV, select, sin, smoothstep, step, texture, uniform, uv, vec2, vec3, vec4, viewportLinearDepth, viewportSharedTexture } from 'three/tsl'
 import { lerp, remap, remapClamp } from '../utilities/maths'
 import { hashBlur } from 'three/examples/jsm/tsl/display/hashBlur.js'
@@ -11,7 +11,7 @@ export class WaterSurface
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.hasRipples = false
         this.hasIce = false

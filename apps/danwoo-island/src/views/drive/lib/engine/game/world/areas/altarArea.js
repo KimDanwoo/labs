@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { rebuildSeonangdang } from '../islandStructures'
-import { Game } from '../../game'
+import { getGame } from '../../gameContext'
 import { attribute, clamp, color, float, Fn, instancedArray, instanceIndex, luminance, max, min, mix, smoothstep, step, texture, uniform, uv, varying, vec2, vec3, vec4 } from 'three/tsl'
 import gsap from 'gsap'
 import { alea } from 'seedrandom'

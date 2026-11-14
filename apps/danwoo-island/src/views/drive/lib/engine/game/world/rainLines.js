@@ -1,6 +1,6 @@
 import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { attribute, clamp, color, float, Fn, fract, hash, instancedArray, instanceIndex, max, mod, normalWorld, positionGeometry, rotateUV, sin, smoothstep, step, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
 import { lerp, remap, remapClamp } from '../utilities/maths'
@@ -9,7 +9,7 @@ export class RainLines
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.count = Math.pow(2, 11)
         this.speed = 0.25

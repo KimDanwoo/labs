@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { rebuildVillageProps } from '../islandVillage'
-import { Game } from '../../game'
+import { getGame } from '../../gameContext'
 import { InteractivePoints } from '../../interactivePoints'
 import socialData from '../../../data/social'
 import { InstancedGroup } from '../../instancedGroup'

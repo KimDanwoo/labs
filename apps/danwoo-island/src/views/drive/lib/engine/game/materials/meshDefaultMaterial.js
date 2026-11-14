@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { Fn, color, float, frontFacing, If, max, mix, normalWorld, positionWorld, vec2, vec3, vec4 } from 'three/tsl'
 
 export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
@@ -21,7 +21,7 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
     {
         super()
 
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.depthWrite = parameters.depthWrite ?? true
         this.depthTest = parameters.depthTest ?? true

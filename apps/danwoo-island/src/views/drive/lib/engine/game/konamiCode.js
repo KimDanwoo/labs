@@ -1,12 +1,13 @@
+import { modelResource } from './resourcesLoader'
 import * as THREE from 'three/webgpu'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { VisualVehicle } from './world/visualVehicle'
 
 export class KonamiCode
 {
     constructor(once = false)
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         let index = 0
         this.activationCount = 0
@@ -57,7 +58,7 @@ export class KonamiCode
         ]
 
         const resources = await this.game.resourcesLoader.load([
-            [ 'vehicle', `${files[this.activationCount % 2]}?cb=${this.activationCount}`, 'gltf' ],
+            modelResource('vehicle', `${files[this.activationCount % 2]}?cb=${this.activationCount}`),
         ])
 
         this.game.world.visualVehicle.destroy()

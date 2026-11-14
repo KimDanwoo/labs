@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { Foliage } from './foliage'
 import { color, uniform } from 'three/tsl'
 
@@ -7,7 +7,7 @@ export class Trees
 {
     constructor(name, visual, references, colorA, colorB)
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.visual = visual
         this.references = references

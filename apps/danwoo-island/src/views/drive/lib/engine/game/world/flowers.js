@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { attribute, color, float, Fn, instance, instancedBufferAttribute, instanceIndex, luminance, mix, normalWorld, positionLocal, texture, uniform, uniformArray, uv, vec3, vec4 } from 'three/tsl'
 import { remap, smoothstep } from '../utilities/maths'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
@@ -12,7 +12,7 @@ export class Flowers
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.setClusters()
 

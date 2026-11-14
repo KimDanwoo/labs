@@ -1,6 +1,6 @@
 import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { attribute, cameraNormalMatrix, color, cross, dot, float, Fn, hash, If, materialNormal, min, mix, modelNormalMatrix, modelViewMatrix, normalWorld, PI, PI2, positionGeometry, positionLocal, positionWorld, rotateUV, step, texture, time, uniform, uv, uvec4, varying, vec2, vec3, vec4, viewportSize } from 'three/tsl'
 import { clamp, remapClamp } from '../utilities/maths'
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
@@ -9,7 +9,7 @@ export class Snow
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.size = this.game.view.optimalArea.radius * 2
         this.halfSize = this.size * 0.5

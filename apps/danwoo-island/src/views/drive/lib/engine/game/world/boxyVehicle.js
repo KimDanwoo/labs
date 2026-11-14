@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu'
 import { color, mix, normalWorld } from 'three/tsl'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
 
 const HALF_TURN = Math.PI / 2
@@ -184,7 +184,7 @@ function addRear(parts)
 
 export function createBoxyVehicle(original)
 {
-    const game = Game.getInstance()
+    const game = getGame()
     const sourceWheels = original.getObjectByName('wheelContainer') ?? original.children.find(child => /^wheelContainer/.test(child.name))
     if(!sourceWheels)
         throw new Error('차량 바퀴 연결 모델이 없습니다.')

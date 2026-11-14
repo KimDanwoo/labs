@@ -1,7 +1,7 @@
 import { color, float, Fn, max, PI, positionWorld, texture, uniform, uv, vec3 } from 'three/tsl'
 import { rebuildBridge } from './islandStructures'
 import { paintSteppingStones } from './islandReskins'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { References } from '../references'
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
 
@@ -9,7 +9,7 @@ export class Scenery
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.references = new References()
         const model = [...this.game.resources.sceneryModel.scene.children]

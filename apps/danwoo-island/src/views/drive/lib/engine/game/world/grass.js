@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { mul, max, step, output, color, sin, smoothstep, mix, matcapUV, float, mod, texture, transformNormalToView, uniformArray, varying, vertexIndex, rotateUV, cameraPosition, vec4, atan, vec3, vec2, modelWorldMatrix, Fn, attribute, uniform, normalWorld } from 'three/tsl'
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
 
@@ -9,7 +9,7 @@ export class Grass
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.subdivisions = 280
         const halfExtent = this.game.view.optimalArea.radius

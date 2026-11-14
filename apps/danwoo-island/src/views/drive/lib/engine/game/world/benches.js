@@ -1,4 +1,4 @@
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { InstancedGroup } from '../instancedGroup'
 import { createBeachBench } from './islandProps'
 
@@ -6,7 +6,7 @@ export class Benches
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.benchesModel.scene.children)
         base.castShadow = true

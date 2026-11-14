@@ -1,5 +1,5 @@
 import { Events } from '../events'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { Gamepad } from './gamepad'
 import { Pointer } from './pointer'
 import Keyboard from './keyboard'
@@ -16,7 +16,7 @@ export class Inputs
 
     constructor(actions = [], filters = [])
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
         this.events = new Events()
 
         this.actions = new Map()
@@ -321,5 +321,10 @@ export class Inputs
         this.pointer.update()
         this.gamepad.update()
         this.nipple.update()
+    }
+
+    clearInteractiveButtons()
+    {
+        this.interactiveButtons.clearItems()
     }
 }

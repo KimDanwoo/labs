@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { InstancedGroup } from '../instancedGroup'
 import { createLampPost } from './islandProps'
 import { hash, instancedArray, instanceIndex, sin, uniform, vec3 } from 'three/tsl'
@@ -9,7 +9,7 @@ export class PoleLights
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.poleLightsModel.scene.children)
         this.references = references

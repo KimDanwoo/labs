@@ -1,5 +1,5 @@
 import { clamp } from 'three/src/math/MathUtils.js'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { worldAsset } from '../../../config/worldAsset'
 import { createElement } from './utilities/createElement'
 
@@ -12,7 +12,7 @@ export class Map
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.initiated = false
         this.modal = this.game.modals.items.get('map')

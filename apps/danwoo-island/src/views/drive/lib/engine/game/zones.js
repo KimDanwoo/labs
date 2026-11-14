@@ -1,12 +1,12 @@
 import * as THREE from 'three/webgpu'
 import { Events } from './events'
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 export class Zones
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.items = []
 

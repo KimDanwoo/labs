@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { Floor } from './floor'
 import { Grid } from './grid'
 import { Grass } from './grass'
@@ -31,7 +31,7 @@ export class World
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.step(0)
     }
@@ -145,5 +145,25 @@ export class World
                 colliders: [ { shape: 'cuboid', parameters: [ 0.5, 0.5, 0.5 ], category: 'floor' } ]
             }
         )
+    }
+
+    updateLoadingProgress(ratio)
+    {
+        this.intro.updateProgress(ratio)
+    }
+
+    refreshAfterReset()
+    {
+        this.explosiveCrates?.reset()
+        this.areas.bowling?.restart()
+        if(this.areas.cookie)
+            this.areas.cookie.cookies.instancedGroup.needsUpdate = true
+        if(this.areas.toilet)
+            this.areas.toilet.cabin.down = false
+        if(this.areas.social)
+            this.areas.social.fans.instancedGroup.needsUpdate = true
+        for(const decoration of [this.benches, this.fences, this.bricks, this.lanterns])
+            if(decoration)
+                decoration.instancedGroup.needsUpdate = true
     }
 }

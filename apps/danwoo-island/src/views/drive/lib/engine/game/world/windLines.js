@@ -1,6 +1,6 @@
 import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { attribute, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraViewMatrix, color, cross, float, floor, Fn, If, modelNormalMatrix, modelViewMatrix, modelWorldMatrix, mul, positionGeometry, positionLocal, positionWorld, uniform, vec2, vec3, vec4, vertexIndex, viewport } from 'three/tsl'
 import gsap from 'gsap'
 import { WindLineGeometry } from '../geometries/windLineGeometry'
@@ -11,7 +11,7 @@ class WindLine
 {
     constructor(thickness = 0.1, _tangent = vec3(0, 1, -1))
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.available = true
 
@@ -62,7 +62,7 @@ export class WindLines
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.intervalRange = { min: 300, max: 2000 }
         this.duration = 4

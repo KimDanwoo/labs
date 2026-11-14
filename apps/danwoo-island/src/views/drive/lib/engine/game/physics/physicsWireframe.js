@@ -1,11 +1,11 @@
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import * as THREE from 'three/webgpu'
 
 export class PhysicsWireframe
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
         this.active = false
 
         this.geometry = new THREE.BufferGeometry()

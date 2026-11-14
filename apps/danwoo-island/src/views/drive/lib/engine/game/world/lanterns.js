@@ -1,4 +1,4 @@
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { InstancedGroup } from '../instancedGroup'
 import { createGardenLamp } from './islandProps'
 
@@ -6,7 +6,7 @@ export class Lanterns
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.lanternsModel.scene.children)
 

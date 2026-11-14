@@ -1,11 +1,11 @@
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { createElement } from './utilities/createElement'
 
 export class Options
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
         this.element = this.game.menu.items.get('options').contentElement
 
         this.setSound()

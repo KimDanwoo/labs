@@ -1,11 +1,11 @@
 import { color, float, mix, positionWorld, rangeFogFactor, screenCoordinate, uniform, vec2, vec3, viewportUV } from 'three/tsl'
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 export class Fog
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.colorA = uniform(color('#ff0000'))
         this.colorB = uniform(color('#0000ff'))

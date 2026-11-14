@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { pass, mrt, output, emissive, renderOutput, vec4 } from 'three/tsl'
 import { bloom } from 'three/addons/tsl/display/BloomNode.js'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { cheapDOF } from './passes/cheapDOF'
 import { Inspector } from 'three/addons/inspector/Inspector.js'
 
@@ -9,12 +9,11 @@ export class Rendering
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
     }
 
     start()
     {
-        this.setStats()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -93,23 +92,6 @@ export class Rendering
         this.game.quality.events.on('change', qualityChange)
     }
 
-    setStats()
-    {
-        if(!location.hash.match(/stats/i))
-            return
-
-        this.stats = {}
-        this.stats.feed = {}
-        this.stats.update = () =>
-        {
-            this.stats.feed.drawCalls = this.renderer.info.render.drawCalls.toLocaleString()
-            this.stats.feed.triangles = this.renderer.info.render.triangles.toLocaleString()
-            this.stats.feed.geometries = this.renderer.info.memory.geometries.toLocaleString()
-            this.stats.feed.textures = this.renderer.info.memory.textures.toLocaleString()
-        }
-
-        this.stats.update()
-    }
 
     resize()
     {
@@ -121,13 +103,10 @@ export class Rendering
     {
         this.postProcessing.render()
 
-        if(this.stats)
-            this.stats.update()
+    }
 
-        if(this.game.monitoring?.stats)
-        {
-            this.game.rendering.renderer.resolveTimestampsAsync(THREE.TimestampQuery.RENDER)
-            this.game.monitoring.stats.update()
-        }
+    isWebGPU()
+    {
+        return this.renderer.backend.isWebGPUBackend === true
     }
 }

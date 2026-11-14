@@ -1,11 +1,11 @@
 import { Events } from './events'
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 export class Quality
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.events = new Events()
 

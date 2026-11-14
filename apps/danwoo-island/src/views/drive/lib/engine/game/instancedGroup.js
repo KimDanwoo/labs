@@ -1,11 +1,11 @@
 import * as THREE from 'three/webgpu'
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 export class InstancedGroup
 {
     constructor(references = [], group = null, autoUpdate = true)
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.references = references
         this.group = group

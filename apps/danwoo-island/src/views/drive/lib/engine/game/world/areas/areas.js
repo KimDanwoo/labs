@@ -1,4 +1,4 @@
-import { Game } from '../../game'
+import { getGame } from '../../gameContext'
 import { AltarArea } from './altarArea'
 import { CookieArea } from './cookieArea'
 import { LandingArea } from './landingArea'
@@ -19,7 +19,7 @@ export class Areas
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         const list = [
             [ 'achievements', AchievementsArea ],

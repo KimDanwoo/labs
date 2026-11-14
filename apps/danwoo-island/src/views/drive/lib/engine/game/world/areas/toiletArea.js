@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { rebuildOuthouse } from '../islandStructures'
 import { rebuildVillageProps } from '../islandVillage'
-import { Game } from '../../game'
+import { getGame } from '../../gameContext'
 import { Area } from './area'
 
 export class ToiletArea extends Area

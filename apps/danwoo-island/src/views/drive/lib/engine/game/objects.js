@@ -1,11 +1,11 @@
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 let i = 0
 export class Objects
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
         this.list = new Map()
         this.key = 0
         this.roundedViewPosition = { x: 0, z: 0 }

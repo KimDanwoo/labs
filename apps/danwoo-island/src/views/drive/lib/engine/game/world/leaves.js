@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { color, float, Fn, hash, instancedArray, instanceIndex, materialNormal, max, mix, mod, modelViewMatrix, normalWorld, positionGeometry, remapClamp, rotateUV, sin, smoothstep, step, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
 import { remap } from '../utilities/maths'
 import gsap from 'gsap'
@@ -9,7 +9,7 @@ export class Leaves
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         const power = Math.round(remap((this.game.yearCycles.properties.leaves.value), [0.25, 1], [7, 11]))
         this.count = Math.pow(2, power)

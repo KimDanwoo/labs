@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Howl, Howler } from 'howler'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { worldAsset } from '../../../config/worldAsset'
 import { createElement } from './utilities/createElement'
 import { WORLD_CONFIG } from '../worldConfig'
@@ -14,7 +14,7 @@ export class Audio
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.initiated = false
         this.groups = new Map()
