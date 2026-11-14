@@ -1,7 +1,7 @@
-import './threejs-override.js'
+import './threejs-override'
 import { DefaultLoadingManager } from 'three/webgpu'
 import { worldAsset } from '../../config/worldAsset'
-import { Game } from './Game/Game.js'
+import { Game } from './game/game'
 
 DefaultLoadingManager.setURLModifier(worldAsset)
 

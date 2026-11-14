@@ -22,9 +22,9 @@ src/views/drive/
   ui/world.css               원본 Stylus의 Vite 결과 CSS (URL만 /world/로 교체)
   config/                    메뉴 섹션·조작표 데이터, worldAsset() 에셋 경로 헬퍼
   lib/bootWorld.ts           엔진 동적 import·중복 부팅 방지·분리된 DOM이면 새로고침
-  lib/engine/                포크한 원본 엔진(JS, ESLint 제외). world.js가 진입점
+  lib/engine/                포크한 엔진. TS 전환 중 — 남은 .js만 ESLint 제외, 파일 camelCase·폴더 kebab-case. world가 진입점
   lib/engine/data/danwoo.js  허브 projects·profile에서 생성(커밋하지 않음)
-  lib/engine/Game/World/islandProps.js  한국 섬마을 소품(석등·청사초롱·평상·싸리 울타리·옹기·돌담 돌) 형상
+  lib/engine/game/world/island*  열대 섬 소품·랜드마크·구조물(GLB 모델은 world-overrides/areas/island/models)
 world-overrides/            world:sync가 public/world 위에 덮어쓰는 자체 에셋(벚꽃잎 잎 SDF 등)
 ```
 

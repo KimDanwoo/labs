@@ -1,3 +1,3 @@
-import content from './danwoo.js'
+import content from './danwoo'
 
 export default content.lab
