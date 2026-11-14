@@ -43,9 +43,9 @@ export class Terrain
         const context = canvas.getContext('2d')
 
         this.colors = [
-            { stop: 0.1, value: '#ffa94e' },
-            { stop: 0.3, value: '#5bc2b9' },
-            { stop: 0.9, value: '#13375f' },
+            { stop: 0.1, value: '#f2d7a5' },
+            { stop: 0.3, value: '#42c9c6' },
+            { stop: 0.9, value: '#14658b' },
         ]
 
         const update = () =>
@@ -82,7 +82,7 @@ export class Terrain
 
     setNodes()
     {
-        this.grassColorUniform = uniform(color('#b8b62e'))
+        this.grassColorUniform = uniform(color('#79b94d'))
         this.tracksDelta = uniform(vec2(0))
 
         const worldPositionToUvNode = Fn(([position]) =>
