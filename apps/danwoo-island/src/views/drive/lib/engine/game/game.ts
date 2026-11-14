@@ -45,6 +45,7 @@ import { Ticker } from './ticker';
 import { Time } from './time';
 import { Title } from './title';
 import { Tracks } from './tracks';
+import { requireElement } from './utilities/requireElement';
 import { View } from './view';
 import { Viewport } from './viewport';
 import { Water } from './water';
@@ -116,12 +117,6 @@ const CACHE_BUSTER = '?cb=1';
 const REVEAL_DELAY_FRAMES = 3;
 const FIRST_STEP = 1;
 const FONT_FACES = ['400 24px MaruBuri', '700 24px MaruBuri'];
-
-function requireElement<T extends Element>(root: ParentNode, selector: string, type: new () => T): T {
-  const element = root.querySelector(selector);
-  if (!(element instanceof type)) throw new Error(`Missing ${selector}`);
-  return element;
-}
 
 function assetNames(): AssetNames {
   const isCompressed = WORLD_CONFIG.compressedAssets;
