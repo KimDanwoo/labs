@@ -415,11 +415,6 @@ function stonePagoda(parts, { x, y, z })
     parts.add('stone', new THREE.IcosahedronGeometry(0.1, 0), { position: [x, level + 0.32, z] })
 }
 
-export function removeHareubang(model)
-{
-    findChild(model, 'refStatuePhysicalDynamic').removeFromParent()
-}
-
 export function rebuildWaterfallPagoda(model, materials)
 {
     findChild(model, 'Cube089').removeFromParent()

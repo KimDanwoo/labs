@@ -1,15 +1,16 @@
 import * as THREE from 'three/webgpu'
 
 const ISLAND_MODELS = {
-    haetae: 'areas/island/models/haetae.glb',
-    dongjaseok: 'areas/island/models/dongjaseok.glb',
-    jindo: 'areas/island/models/jindo.glb',
     jangseungHeaven: 'areas/island/models/jangseungHeaven.glb',
     jangseungEarth: 'areas/island/models/jangseungEarth.glb',
     gamepad: 'areas/island/models/gamepad.glb',
     onggi: 'areas/island/models/onggi.glb',
     stele: 'areas/island/models/stele.glb',
     pedestal: 'areas/island/models/pedestal.glb',
+    shellFountain: 'areas/island/models/shellFountain.glb',
+    lighthouse: 'areas/island/models/lighthouse.glb',
+    palmHammock: 'areas/island/models/palmHammock.glb',
+    surfCorner: 'areas/island/models/surfCorner.glb',
 }
 
 const resourceName = (key) => `islandModel${key[0].toUpperCase()}${key.slice(1)}`

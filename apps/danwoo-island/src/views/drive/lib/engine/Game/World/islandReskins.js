@@ -1,6 +1,5 @@
-import * as THREE from 'three/webgpu'
 import { createParts, islandMaterial, removeComponents } from './islandGeometry.js'
-import { islandModelMesh } from './islandModels.js'
+import { fixedLandmark, LIGHTHOUSE } from './islandLandmarks.js'
 
 const CAREER_PAINT = {
     emissiveWhiteRadialGradient: 'hanji',
@@ -11,8 +10,6 @@ const CAREER_PAINT = {
 
 const AWARDS_TABLE = ['table002', 'cube024', 'refel003', 'medal', 'refDistinctions']
 
-const JANGSEUNG_PAIR = ['jangseungHeaven', 'jangseungEarth']
-const CIRCUIT_JANGSEUNG_SIZE = new THREE.Vector3(0.86, 4.3, 0.86)
 
 const STEPPING_STONES = ['slabes', 'Cube001', 'Cube002']
 
@@ -91,11 +88,9 @@ export function removeAwardsTable(model)
 export function replaceAirDancers(model, materials)
 {
     const dancers = model.children.filter((child) => /^refAirDancers/.test(child.name))
-    dancers.forEach((dancer, index) =>
+    for(const dancer of dancers)
     {
-        dancer.updateMatrix()
-        const standing = dancer.matrix.clone().multiply(new THREE.Matrix4().makeTranslation(0, CIRCUIT_JANGSEUNG_SIZE.y / 2, 0))
-        model.add(islandModelMesh(materials, JANGSEUNG_PAIR[index % JANGSEUNG_PAIR.length], standing, CIRCUIT_JANGSEUNG_SIZE))
+        model.add(fixedLandmark(materials, LIGHTHOUSE, dancer.position, dancer.quaternion))
         dancer.removeFromParent()
-    })
+    }
 }

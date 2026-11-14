@@ -1,5 +1,4 @@
 import * as THREE from 'three/webgpu'
-import { removeHareubang } from '../islandStructures.js'
 import { rebuildVillageProps } from '../islandVillage.js'
 import { Game } from '../../Game.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
@@ -12,7 +11,6 @@ export class SocialArea extends Area
 {
     setObjects()
     {
-        removeHareubang(this.model)
         rebuildVillageProps(this.model, this.game.materials)
         reshapeSocialPlaza(this.model, this.game.materials)
         recordSteleFrames(this.model)

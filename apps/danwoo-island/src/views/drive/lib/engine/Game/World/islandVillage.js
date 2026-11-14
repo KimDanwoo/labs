@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { bungeoppangGeometry, createParts, FULL_TURN, meshComponents, SHADES, seededRandom } from './islandGeometry.js'
-import { propMaterial, texturedMesh } from './islandTextured.js'
+import { placeLandmarks } from './islandLandmarks.js'
 import { islandModelMesh } from './islandModels.js'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { color } from 'three/tsl'
@@ -93,83 +93,6 @@ function referenceCenter(container, pattern)
 function lathe(parts, name, profile, transform, segments = 10)
 {
     parts.add(name, new THREE.LatheGeometry(profile.map(([x, y]) => new THREE.Vector2(x, y)), segments), transform)
-}
-
-const YUT_TABLE = {
-    sticks: [{ z: -0.3, turn: -12, isFlatUp: false }, { z: -0.1, turn: 5, isFlatUp: true }, { z: 0.1, turn: -6, isFlatUp: false }, { z: 0.3, turn: 10, isFlatUp: true }],
-    stickX: -0.27,
-    stickLength: 0.34,
-    boardX: 0.23,
-}
-
-function yutStickGeometry(radius, length)
-{
-    const shape = new THREE.Shape()
-    shape.moveTo(-radius, 0)
-    shape.absarc(0, 0, radius, Math.PI, 0, true)
-    shape.lineTo(-radius, 0)
-    const geometry = new THREE.ExtrudeGeometry(shape, { depth: length, bevelEnabled: false, curveSegments: 6 })
-    geometry.translate(0, 0, -length / 2)
-    return geometry
-}
-
-function yutStick(parts, { x, y, z, turn, isFlatUp, length, radius, matrix })
-{
-    const heading = Math.PI / 2 + (turn * Math.PI) / 180
-    const place = new THREE.Matrix4().makeTranslation(x, y + (isFlatUp ? radius : 0), z)
-        .multiply(new THREE.Matrix4().makeRotationY(heading))
-        .multiply(new THREE.Matrix4().makeRotationZ(isFlatUp ? Math.PI : 0))
-    const transform = matrix.clone().multiply(place)
-    parts.add('timber', yutStickGeometry(radius, length), { matrix: transform })
-    if(!isFlatUp)
-        return
-    for(const offset of [-0.15, 0.15])
-        parts.box('ink', [radius * 1.6, 0.006, length * 0.035], { position: [0, -0.004, offset * length], matrix: transform })
-}
-
-function yutTable(parts, container, materials)
-{
-    const { size, matrix } = collidersOf(container)[0]
-    const { x: W, y: H, z: D } = size
-    const at = (t) => (t - 0.5) * H
-    for(const sx of [-1, 1])
-        for(const sz of [-1, 1])
-            parts.box('woodDark', [0.08 * W, 0.3 * H, 0.12 * D], { position: [sx * 0.37 * W, at(0.15), sz * 0.34 * D], matrix })
-    for(const sz of [-1, 1])
-        parts.box('woodDark', [0.86 * W, 0.1 * H, 0.07 * D], { position: [0, at(0.32), sz * 0.36 * D], matrix })
-    parts.box('wood', [0.94 * W, 0.1 * H, 0.9 * D], { position: [0, at(0.39), 0], matrix })
-    const boardSize = Math.min(0.85 * D, 0.45 * W)
-    const boardX = YUT_TABLE.boardX * W
-    parts.box('thatch', [boardSize, 0.025 * H, boardSize], { position: [boardX, at(0.455), 0], matrix })
-    const board = new THREE.PlaneGeometry(boardSize, boardSize)
-    board.rotateX(-Math.PI / 2)
-    board.translate(boardX, at(0.469), 0)
-    container.add(texturedMesh(board, propMaterial(materials, 'yutBoard'), { name: 'yutBoard', matrix, castShadow: false }))
-    const radius = Math.min(0.045 * D, 0.1 * H)
-    for(const stick of YUT_TABLE.sticks)
-        yutStick(parts, { ...stick, x: YUT_TABLE.stickX * W, y: at(0.44), z: stick.z * D, length: YUT_TABLE.stickLength * W, radius, matrix })
-}
-
-const PAENGI_PROFILE = [[0, -0.5], [0.08, -0.42], [0.55, 0.05], [0.95, 0.32], [1, 0.38], [0.9, 0.42], [0.3, 0.46], [0, 0.47]]
-const PAENGI_BANDS = [{ shade: 'obangRed', y: 0.18, scale: 0.78 }, { shade: 'obangYellow', y: 0.26, scale: 0.88 }, { shade: 'obangBlue', y: 0.34, scale: 0.98 }]
-
-function paengi(parts, container)
-{
-    const colliders = collidersOf(container)
-    const base = colliders.find((item) => !item.isTube)
-    const spinner = colliders.find((item) => item.isTube)
-    if(base)
-    {
-        parts.box('wood', [base.size.x, base.size.y, base.size.z], { matrix: base.matrix })
-        parts.rod('timber', 0.025, new THREE.Vector3(-base.size.x * 0.4, base.size.y / 2 + 0.03, -base.size.z * 0.3).applyMatrix4(base.matrix).toArray(), new THREE.Vector3(base.size.x * 0.35, base.size.y / 2 + 0.03, base.size.z * 0.2).applyMatrix4(base.matrix).toArray())
-    }
-    if(!spinner)
-        return
-    const { radius, height, matrix } = spinner
-    lathe(parts, 'timber', PAENGI_PROFILE.map(([r, y]) => [r * radius, y * height]), { matrix }, 16)
-    for(const { shade, y, scale } of PAENGI_BANDS)
-        parts.add(shade, new THREE.TorusGeometry(radius * scale, height * 0.035, 4, 16), { position: [0, y * height, 0], rotation: [Math.PI / 2, 0, 0], matrix })
-    parts.prism('woodDark', radius * 0.12, radius * 0.16, height * 0.12, { position: [0, height * 0.52, 0], matrix }, 8)
 }
 
 const GAMEPAD_SIZE = new THREE.Vector3(1.62, 0.54, 1.28)
@@ -522,27 +445,7 @@ function pinwheel(parts)
     parts.rod('woodDark', 0.03, [0, -0.65, -0.03], [0, centerY, -0.03])
 }
 
-function sortedColliders(container)
-{
-    return collidersOf(container).sort((a, b) => b.size.x * b.size.y * b.size.z - a.size.x * a.size.y * a.size.z)
-}
-
-function placeModel(container, materials, key)
-{
-    const [frame] = sortedColliders(container)
-    container.add(islandModelMesh(materials, key, frame.matrix, frame.size))
-}
-
-const SOCIAL_OBJECTS = [
-    { pattern: /^baguiraPhysicalDynamic/, build: (parts, container, materials) => placeModel(container, materials, 'haetae') },
-    { pattern: /^boyPhysicalDynamic/, build: (parts, container, materials) => placeModel(container, materials, 'dongjaseok') },
-    { pattern: /^sudoPhysicalDynamic/, build: (parts, container, materials) => placeModel(container, materials, 'jindo') },
-]
-
 const BUILDERS = [
-    ...SOCIAL_OBJECTS,
-    { pattern: /^gamepadPhysicalDynamic/, keepEmissive: false, build: yutTable },
-    { pattern: /^phonePhysicalDynamic/, keepEmissive: false, build: paengi },
     { pattern: /^gizmoPhysicalDynamic$/, build: (parts, container, materials) => placeGamepad(container, materials) },
     { pattern: /^blackBoardPhysicalDynamic/, build: slateBoards },
     { pattern: /^grinderPhysicalDynamic$/, build: grinderStand },
@@ -585,6 +488,7 @@ function rebuildChild(child, materials, { build, keepEmissive = true })
 
 export function rebuildVillageProps(model, materials)
 {
+    placeLandmarks(model, materials)
     for(const child of [...model.children])
     {
         const uncollided = UNCOLLIDED_BUILDERS.find((item) => item.pattern.test(child.name))
