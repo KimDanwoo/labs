@@ -1,3 +1,4 @@
+import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
 import { Game } from '../game'
 import { blendOverlay, color, float, Fn, hash, linearDepth, max, mix, output, positionGeometry, positionLocal, positionWorld, screenUV, select, sin, smoothstep, step, texture, uniform, uv, vec2, vec3, vec4, viewportLinearDepth, viewportSharedTexture } from 'three/tsl'
@@ -17,38 +18,6 @@ export class WaterSurface
         this.hasSplashes = false
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🌊 Water surface',
-                expanded: false,
-            })
-
-            this.ripplesDebugPanel = this.debugPanel.addFolder({
-                title: 'Ripples',
-                expanded: true,
-            })
-
-            this.iceDebugPanel = this.debugPanel.addFolder({
-                title: 'Ice',
-                expanded: true,
-            })
-
-            this.splashesDebugPanel = this.debugPanel.addFolder({
-                title: 'Splashes',
-                expanded: true,
-            })
-
-            this.shoreDebugPanel = this.debugPanel.addFolder({
-                title: 'shore',
-                expanded: true,
-            })
-
-            this.blurDebugPanel = this.debugPanel.addFolder({
-                title: 'blur',
-                expanded: true,
-            })
-        }
 
         this.setGeometry()
         this.setNodes()
@@ -78,16 +47,10 @@ export class WaterSurface
         const ripplesNoiseFrequency = uniform(0.1)
         const ripplesNoiseOffset = uniform(0.345)
 
-        this.ripplesRatioBinding = this.game.debug.addManualBinding(
-            this.ripplesDebugPanel,
-            this.ripplesRatio,
-            'value',
-            { label: 'ripplesRatio', min: 0, max: 1, step: 0.001 },
-            () =>
+        this.ripplesRatioBinding = autoBinding(this.ripplesRatio, 'value', () =>
             {
                 return remapClamp(this.game.weather.temperature.value, 0, -3, 1, 0)
-            }
-        )
+            })
 
         const ripplesNode = Fn(([terrainData]) =>
         {           
@@ -112,12 +75,6 @@ export class WaterSurface
         })
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.ripplesDebugPanel.addBinding(ripplesSlopeFrequency, 'value', { label: 'ripplesSlopeFrequency', min: 0, max: 50, step: 0.01 })
-            this.ripplesDebugPanel.addBinding(ripplesNoiseFrequency, 'value', { label: 'ripplesNoiseFrequency', min: 0, max: 1, step: 0.01 })
-            this.ripplesDebugPanel.addBinding(ripplesNoiseOffset, 'value', { label: 'ripplesNoiseOffset', min: 0, max: 1, step: 0.001 })
-        }
 
         /**
          * Ice
@@ -125,16 +82,10 @@ export class WaterSurface
         this.iceRatio = uniform(0)
         const iceNoiseFrequency = uniform(0.3)
 
-        this.iceRatioBinding = this.game.debug.addManualBinding(
-            this.iceDebugPanel,
-            this.iceRatio,
-            'value',
-            { label: 'iceRatio', min: 0, max: 1, step: 0.001 },
-            () =>
+        this.iceRatioBinding = autoBinding(this.iceRatio, 'value', () =>
             {
                 return remapClamp(this.game.weather.temperature.value, 0, -5, 0, 1)
-            }
-        )
+            })
 
         const iceNode = Fn(([terrainData]) =>
         {
@@ -150,10 +101,6 @@ export class WaterSurface
         })
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.iceDebugPanel.addBinding(iceNoiseFrequency, 'value', { label: 'iceNoiseFrequency', min: 0, max: 1, step: 0.01 })
-        }
 
         /**
          * Splashes
@@ -165,16 +112,10 @@ export class WaterSurface
         const splashesEdgeAttenuationLow = uniform(0.14)
         const splashesEdgeAttenuationHigh = uniform(1)
 
-        this.splashesRatioBinding = this.game.debug.addManualBinding(
-            this.splashesDebugPanel,
-            this.splashesRatio,
-            'value',
-            { label: 'splashesRatio', min: 0, max: 1, step: 0.001 },
-            () =>
+        this.splashesRatioBinding = autoBinding(this.splashesRatio, 'value', () =>
             {
                 return Math.pow(this.game.weather.rain.value, 2)
-            }
-        )
+            })
 
         const splashesNode = Fn(() =>
         {
@@ -211,14 +152,6 @@ export class WaterSurface
         })
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.splashesDebugPanel.addBinding(splashesNoiseFrequency, 'value', { label: 'splashesNoiseFrequency', min: 0, max: 1, step: 0.01 })
-            this.splashesDebugPanel.addBinding(splashesTimeFrequency, 'value', { label: 'splashesTimeFrequency', min: 0, max: 100, step: 0.1 })
-            this.splashesDebugPanel.addBinding(splashesThickness, 'value', { label: 'splashesThickness', min: 0, max: 1, step: 0.01 })
-            this.splashesDebugPanel.addBinding(splashesEdgeAttenuationLow, 'value', { label: 'splashesEdgeAttenuationLow', min: 0, max: 1, step: 0.01 })
-            this.splashesDebugPanel.addBinding(splashesEdgeAttenuationHigh, 'value', { label: 'splashesEdgeAttenuationHigh', min: 0, max: 1, step: 0.01 })
-        }
 
         /**
          * Shore
@@ -231,10 +164,6 @@ export class WaterSurface
         })
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.shoreDebugPanel.addBinding(shoreEdge, 'value', { label: 'shoreEdge', min: 0, max: 0.3, step: 0.001 })
-        }
 
         /**
          * Details mask
@@ -289,10 +218,6 @@ export class WaterSurface
          })
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.blurDebugPanel.addBinding(blurStrength, 'value', { label: 'blurStrength', min: 0, max: 0.1 })
-        }
     }
 
     setMaterial()

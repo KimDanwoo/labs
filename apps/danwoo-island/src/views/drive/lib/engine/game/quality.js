@@ -13,28 +13,6 @@ export class Quality
         this.level = isMobile ? 1 : 0 // 0 = highest quality
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.game.debug.panel.addFolder({
-                title: '⚙️ Quality',
-                expanded: false,
-            })
-
-            this.game.debug.addButtons(
-                debugPanel,
-                {
-                    low: () =>
-                    {
-                        this.changeLevel(1)
-                    },
-                    high: () =>
-                    {
-                        this.changeLevel(0)
-                    },
-                },
-                'change'
-            )
-        }
     }
 
     changeLevel(level = 0)

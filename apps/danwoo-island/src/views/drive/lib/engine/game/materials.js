@@ -10,13 +10,6 @@ export class Materials
         this.game = Game.getInstance()
         this.list = new Map()
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🎨 Materials',
-                expanded: false,
-            })
-        }
 
         this.setGradient()
         this.setLuminance()
@@ -24,13 +17,13 @@ export class Materials
 
         this.createPalette()
 
-        this.createEmissiveGradient('emissiveOrangeRadialGradient', '#ff8641', '#ff3e00', 1.7, true, this.debugPanel?.addFolder({ title: 'emissiveOrangeRadialGradient' }))
-        this.createEmissiveGradient('emissivePurpleRadialGradient', '#454bbc', '#ff2eb4', 1.7, true, this.debugPanel?.addFolder({ title: 'emissivePurpleRadialGradient' }))
-        this.createEmissiveGradient('emissiveBlueRadialGradient', '#91f0ff', '#128fff', 1.7, true, this.debugPanel?.addFolder({ title: 'emissiveBlueRadialGradient' }))
-        this.createEmissiveGradient('emissiveGreenRadialGradient', '#f8ffa6', '#74ff00', 1.5, true, this.debugPanel?.addFolder({ title: 'emissiveGreenRadialGradient' }))
-        this.createEmissiveGradient('emissiveWhiteRadialGradient', '#ffffff', '#666666', 2.7, false, this.debugPanel?.addFolder({ title: 'emissiveWhiteRadialGradient' }))
+        this.createEmissiveGradient('emissiveOrangeRadialGradient', '#ff8641', '#ff3e00', 1.7, true)
+        this.createEmissiveGradient('emissivePurpleRadialGradient', '#454bbc', '#ff2eb4', 1.7, true)
+        this.createEmissiveGradient('emissiveBlueRadialGradient', '#91f0ff', '#128fff', 1.7, true)
+        this.createEmissiveGradient('emissiveGreenRadialGradient', '#f8ffa6', '#74ff00', 1.5, true)
+        this.createEmissiveGradient('emissiveWhiteRadialGradient', '#ffffff', '#666666', 2.7, false)
         
-        this.createGradient('redGradient', '#ff3a3a', '#721551', this.debugPanel?.addFolder({ title: 'redGradient' }))
+        this.createGradient('redGradient', '#ff3a3a', '#721551')
     }
 
     createPalette()
@@ -84,16 +77,6 @@ export class Materials
         // canvas.style.height = `256px`
         // document.body.append(canvas)
         
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({ title: 'gradient' })
-
-            for(const color of colors)
-            {
-                debugPanel.addBinding(color, 'stop', { min: 0, max: 1, step: 0.001 }).on('change', update)
-                debugPanel.addBinding(color, 'value', { view: 'color' }).on('change', update)
-            }
-        }
     }
 
 
@@ -110,7 +93,7 @@ export class Materials
     }
 
     // Create materials functions
-    createEmissive(_name = 'material', _color = '#ffffff', _intensity = 3, debugPanel = null)
+    createEmissive(_name = 'material', _color = '#ffffff', _intensity = 3)
     {
         const baseColor = uniform(color(_color))
         const intensity = uniform(_intensity)
@@ -120,16 +103,11 @@ export class Materials
         material.fog = false
         this.save(_name, material)
   
-        if(this.game.debug.active && debugPanel)
-        {
-            this.game.debug.addThreeColorBinding(debugPanel, baseColor.value, 'color')
-            debugPanel.addBinding(intensity, 'value', { min: 0, max: 10, step: 0.01 })
-        }
 
         return material
     }
 
-    createEmissiveGradient(_name = 'material', _colorA = '#ffffff', _colorB = '#ff0000', _intensity = 3, normalize = true, debugPanel = null)
+    createEmissiveGradient(_name = 'material', _colorA = '#ffffff', _colorB = '#ff0000', _intensity = 3, normalize = true)
     {
         const colorA = uniform(color(_colorA))
         const colorB = uniform(color(_colorB))
@@ -153,12 +131,6 @@ export class Materials
         material.fog = false
         this.save(_name, material)
 
-        if(this.game.debug.active && debugPanel)
-        {
-            this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'colorA')
-            this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
-            debugPanel.addBinding(intensity, 'value', { min: 0, max: 10, step: 0.01 })
-        }
         
         // const update = () =>
         // {
@@ -177,7 +149,7 @@ export class Materials
         return material
     }
 
-    createGradient(_name = 'material', _colorA = 'red', _colorB = 'blue', debugPanel = null)
+    createGradient(_name = 'material', _colorA = 'red', _colorB = 'blue')
     {
         const colorA = uniform(new THREE.Color(_colorA))
         const colorB = uniform(new THREE.Color(_colorB))
@@ -190,11 +162,6 @@ export class Materials
         
         this.save(_name, material)
 
-        if(this.game.debug.active && debugPanel)
-        {
-            this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'colorA')
-            this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
-        }
 
         return material
     }
@@ -256,10 +223,6 @@ export class Materials
         }
         
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(this.previews.group, 'visible', { label: 'previewsVisibile' })
-        }
     }
 
     save(name, material)

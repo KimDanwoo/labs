@@ -1,3 +1,4 @@
+import { autoBinding } from '../../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
 import { rebuildVillageProps } from '../islandVillage'
 import { rebuildProjectsGate } from '../islandStructures'
@@ -34,13 +35,6 @@ export class ProjectsArea extends Area
         super(model)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🔨 Projects',
-                expanded: false,
-            })
-        }
 
         this.state = ProjectsArea.STATE_CLOSED
 
@@ -66,11 +60,6 @@ export class ProjectsArea extends Area
         this.changeProject(0, ProjectsArea.DIRECTION_NEXT, false, true)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addButton({ title: 'open', label: 'open' }).on('click', () => { this.open() })
-            this.debugPanel.addButton({ title: 'close', label: 'close' }).on('click', () => { this.close() })
-        }
     }
 
     setSounds()
@@ -202,19 +191,6 @@ export class ProjectsArea extends Area
         applyPositionAndTarget()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({
-                title: 'cinematic',
-                expanded: false,
-            })
-            debugPanel.addBinding(this.cinematic.positionOffset, 'x', { label: 'positionX', min: - 10, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-            debugPanel.addBinding(this.cinematic.positionOffset, 'y', { label: 'positionY', min: 0, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-            debugPanel.addBinding(this.cinematic.positionOffset, 'z', { label: 'positionZ', min: - 10, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-            debugPanel.addBinding(this.cinematic.targetOffset, 'x', { label: 'targetX', min: - 10, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-            debugPanel.addBinding(this.cinematic.targetOffset, 'y', { label: 'targetY', min: 0, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-            debugPanel.addBinding(this.cinematic.targetOffset, 'z', { label: 'targetZ', min: - 10, max: 10, step: 0.05 }).on('change', applyPositionAndTarget)
-        }
     }
 
     setShadeMix()
@@ -232,32 +208,6 @@ export class ProjectsArea extends Area
         this.shadeMix.texts.mixUniform = uniform(this.shadeMix.texts.min)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.debugPanel.addFolder({
-                title: 'Shader mix',
-                expanded: true,
-            })
-
-            const debugUpdate = () =>
-            {
-                if(this.state === ProjectsArea.STATE_OPEN || this.state === ProjectsArea.STATE_OPENING)
-                {
-                    this.shadeMix.images.mixUniform.value = this.shadeMix.images.max
-                    this.shadeMix.texts.mixUniform.value = this.shadeMix.texts.max
-                }
-                else
-                {
-                    this.shadeMix.images.mixUniform.value = this.shadeMix.images.min
-                    this.shadeMix.texts.mixUniform.value = this.shadeMix.texts.min
-                }
-            }
-
-            debugPanel.addBinding(this.shadeMix.images, 'min', { label: 'imagesMin', min: 0, max: 1, step: 0.001 }).on('change', debugUpdate)
-            debugPanel.addBinding(this.shadeMix.images, 'max', { label: 'imagesMax', min: 0, max: 1, step: 0.001 }).on('change', debugUpdate)
-            debugPanel.addBinding(this.shadeMix.texts, 'min', { label: 'textsMin', min: 0, max: 1, step: 0.001 }).on('change', debugUpdate)
-            debugPanel.addBinding(this.shadeMix.texts, 'max', { label: 'textsMax', min: 0, max: 1, step: 0.001 }).on('change', debugUpdate)
-        }
     }
 
     setTexts()
@@ -1177,13 +1127,7 @@ export class ProjectsArea extends Area
         this.oven.charcoal.material = material
 
         // Debug
-        this.oven.thresholdBinding = this.game.debug.addManualBinding(
-            this.debugPanel,
-            this.oven.threshold,
-            'value',
-            { label: 'ovenThreshold', min: 0, max: 1, step: 0.001 },
-            () => - Math.sin(this.game.ticker.elapsedScaled - 0.5) * 0.1 + 0.25
-        )
+        this.oven.thresholdBinding = autoBinding(this.oven.threshold, 'value', () => - Math.sin(this.game.ticker.elapsedScaled - 0.5) * 0.1 + 0.25)
     }
 
     setGrinder()

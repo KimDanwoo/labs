@@ -18,13 +18,6 @@ export class AltarArea extends Area
     {
         super(model)
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '💀 Altar',
-                expanded: false,
-            })
-        }
 
         this.value = 0
         this.position = this.references.items.get('altar')[0].position.clone()
@@ -40,11 +33,6 @@ export class AltarArea extends Area
         this.setDeathZone()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.color.value, 'color')
-            this.debugPanel.addBinding(this.emissive, 'value', { label: 'emissive', min: 0, max: 10, step: 0.1 })
-        }
     }
 
     setSounds()

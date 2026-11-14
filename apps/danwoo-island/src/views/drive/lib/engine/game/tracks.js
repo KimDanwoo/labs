@@ -41,25 +41,6 @@ export class Tracks
         }, 9)
     }
 
-    setDebugPlane()
-    {
-        const material = new THREE.MeshBasicNodeMaterial({ map: this.renderTarget.texture, transparent: false, depthTest: false, depthWrite: false })
-        material.vertexNode = Fn(() =>
-        {
-            const ratio = viewportSize.x.div(viewportSize.y)
-            const position = attribute('position').mul(vec3(1, ratio, 0)).mul(0.5).sub(vec3(0.75, 0.5, 0))
-            return vec4(position, 1)
-        })()
-     
-        const geometry = new THREE.PlaneGeometry(1, 1)   
-        const mesh = new THREE.Mesh(geometry, material)
-        
-        mesh.position.y = 5
-        mesh.position.x = - 3
-        mesh.frustumCulled = false
-        mesh.renderOrder = 1
-        this.game.scene.add(mesh)
-    }
 
     add(track)
     {
@@ -199,15 +180,6 @@ export class Track
         this.game.scene.add(this.trail.mesh)
     }
 
-    setDebugPlane()
-    {
-        this.debugPlane = new THREE.Mesh(
-            new THREE.PlaneGeometry(8, 1),
-            new THREE.MeshBasicMaterial({ map: this.dataTexture })
-        )
-        this.debugPlane.position.y = 2
-        this.game.scene.add(this.debugPlane)
-    }
 
     update(_position, _touching)
     {

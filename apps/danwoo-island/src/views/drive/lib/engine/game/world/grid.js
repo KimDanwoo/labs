@@ -12,13 +12,6 @@ export class Grid
     {
         this.game = Game.getInstance()
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🌐 Grid',
-                expanded: false,
-            })
-        }
 
         this.setVisual()
     }
@@ -65,23 +58,6 @@ export class Grid
         this.addPlane(uvGridMaterial)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(uvGridMaterial, 'scale', { min: 0, max: 0.002, step: 0.0001 })
-
-            for(const line of lines)
-            {
-                const lineDebugPanel = this.debugPanel.addFolder({
-                    title: 'Line',
-                    expanded: false,
-                })
-                lineDebugPanel.addBinding(line.scale, 'value', { label: 'scale', min: 0, max: 1, step: 0.001 })
-                lineDebugPanel.addBinding(line.thickness, 'value', { label: 'thickness', min: 0, max: 1, step: 0.001 })
-                lineDebugPanel.addBinding(line.offset, 'value', { label: 'offset', min: 0, max: 1, step: 0.001 })
-                lineDebugPanel.addBinding(line.cross, 'value', { label: 'cross', min: 0, max: 1, step: 0.001 })
-                lineDebugPanel.addBinding({ color: '#' + line.color.value.getHexString(THREE.SRGBColorSpace) }, 'color').on('change', tweak => line.color.value.set(tweak.value))
-            }
-        }
     }
 
     addPlane(material)

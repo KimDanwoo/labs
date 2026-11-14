@@ -10,13 +10,6 @@ export class Floor
         this.game = Game.getInstance()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '⏥ Floor',
-                expanded: false,
-            })
-        }
         this.geometry = this.game.resources.terrainModel.scene.children[0].geometry
         this.subdivision = this.game.terrain.subdivision
 
@@ -108,13 +101,6 @@ export class Floor
             this.mesh.geometry = geometry
         }, 2)
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(slabTextureFrequency, 'value', { label: 'slabTextureFrequency', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(slabNoiseFrequency, 'value', { label: 'slabNoiseFrequency', min: 0, max: 0.1, step: 0.001 })
-            this.game.debug.addThreeColorBinding(this.debugPanel, slabHighColor.value, 'slabHighColor')
-            this.game.debug.addThreeColorBinding(this.debugPanel, slabLowColor.value, 'slabLowColor')
-        }
     }
 
     setPhysical()

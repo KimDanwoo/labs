@@ -11,13 +11,6 @@ export class Confetti
         this.game = Game.getInstance()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🎉 Confetti',
-                expanded: false,
-            })
-        }
 
         this.pool = []
         this.poolSize = 4
@@ -33,13 +26,6 @@ export class Confetti
         this.createPool()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.colorsUniform.array[0], 'color0')
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.colorsUniform.array[1], 'color1')
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.colorsUniform.array[2], 'color2')
-            this.debugPanel.addButton({ title: 'pop' }).on('click', () => { this.pop(this.game.player.position) })
-        }
     }
 
     createPool()
@@ -135,10 +121,6 @@ export class Confetti
 
             this.game.scene.add(confetti.mesh)
 
-            if(this.game.debug.active)
-            {
-                this.debugPanel.addBinding(confetti.progressUniform, 'value', { label: 'confetti.progressUniform', min: 0, max: 1, step: 0.001 })
-            }
 
             confetti.pop = (position, radius, elevation) =>
             {

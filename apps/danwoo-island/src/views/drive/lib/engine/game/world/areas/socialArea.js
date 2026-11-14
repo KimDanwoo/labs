@@ -24,13 +24,6 @@ export class SocialArea extends Area
         this.center = this.references.items.get('center')[0].position
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '👨‍🦲 Social',
-                expanded: false,
-            })
-        }
 
         personalizeSocialSigns(this)
         this.setLinks()

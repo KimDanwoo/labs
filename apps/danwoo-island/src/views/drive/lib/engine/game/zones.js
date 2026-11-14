@@ -20,14 +20,6 @@ export class Zones
         this.previewGroup.userData.preventPreRender = true
         this.game.scene.add(this.previewGroup)
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🌐 Zones',
-                expanded: false,
-            })
-            this.debugPanel.addBinding(this.previewGroup, 'visible', { label: 'previewVisible' })
-        }
     }
 
     create(type = 'sphere', position, radius)

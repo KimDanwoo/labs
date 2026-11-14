@@ -15,13 +15,6 @@ export class Flowers
         this.game = Game.getInstance()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🌸 Flowers',
-                expanded: false,
-            })
-        }
 
         // this.setOne()
         this.setClusters()
@@ -143,10 +136,6 @@ export class Flowers
         })()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.game.debug.addThreeColorBinding(this.debugPanel, baseColor.value, 'baseColor')
-        }
     }
 
     setInstancedMesh()

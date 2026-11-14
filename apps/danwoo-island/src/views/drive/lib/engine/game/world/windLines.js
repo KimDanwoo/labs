@@ -1,3 +1,4 @@
+import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
 import { Game } from '../game'
 import { attribute, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraViewMatrix, color, cross, float, floor, Fn, If, modelNormalMatrix, modelViewMatrix, modelWorldMatrix, mul, positionGeometry, positionLocal, positionWorld, uniform, vec2, vec3, vec4, vertexIndex, viewport } from 'three/tsl'
@@ -63,13 +64,6 @@ export class WindLines
     {
         this.game = Game.getInstance()
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '⌇ Wind lines',
-                expanded: false,
-            })
-        }
         
         this.intervalRange = { min: 300, max: 2000 }
         this.duration = 4
@@ -94,47 +88,11 @@ export class WindLines
         }
 
         // Debug
-        this.durationBinding = this.game.debug.addManualBinding(
-            this.debugPanel,
-            this,
-            'duration',
-            { min: 0, max: 8, step: 0.001 },
-            () =>
+        this.durationBinding = autoBinding(this, 'duration', () =>
             {
                 return remapClamp(this.game.weather.wind.value, 0, 1, 8, 2)
-            }
-        )
-
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(this, 'intervalRange', {
-                min: 0,
-                max: 4000,
-                step: 1,
             })
 
-            this.debugPanel.addBinding(this, 'duration', {
-                min: 0,
-                max: 4,
-                step: 0.001,
-            })
-
-            this.debugPanel.addBinding(this, 'translation', {
-                min: 0,
-                max: 4,
-                step: 0.001,
-            })
-
-            this.debugPanel.addBinding(this, 'thickness', {
-                min: 0,
-                max: 1,
-                step: 0.001,
-            }).on('change', () =>
-            {
-                for(const windLine of this.pool)
-                    windLine.thickness.value = this.thickness
-            })
-        }
 
         displayInterval()
     }

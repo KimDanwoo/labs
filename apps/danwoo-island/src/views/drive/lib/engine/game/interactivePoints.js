@@ -17,13 +17,6 @@ export class InteractivePoints
     {
         this.game = Game.getInstance()
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🔹 Interactive Areas',
-                expanded: false,
-            })
-        }
 
         this.items = []
         this.activeItem = null
@@ -85,11 +78,6 @@ export class InteractivePoints
         this.frontColor = uniform(color('#ffffff'))
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.backColor.value, 'backColor')
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.frontColor.value, 'lineColor')
-        }
     }
 
     setKeyIcon()
@@ -561,14 +549,6 @@ export class InteractivePoints
         /**
          * Debug
          */
-        if(this.game.debug.active)
-        {
-            // this.game.debug.addThreeColorBinding(this.debugPanel, this.baseColor.value, 'this.baseColor')
-            this.debugPanel.addBinding(threshold, 'value', { label: 'threshold', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(lineThickness, 'value', { label: 'lineThickness', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(lineOffset, 'value', { label: 'lineOffset', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(labelOffset, 'value', { label: 'labelOffset', min: 0, max: 1, step: 0.001 })
-        }
 
         return item
     }

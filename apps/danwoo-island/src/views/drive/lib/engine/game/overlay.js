@@ -71,21 +71,6 @@ export class Overlay
         this.game.scene.add(this.mesh)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const debugPanel = this.game.debug.panel.addFolder({
-                title: '⬛️ Overlay',
-                expanded: false,
-            })
-            this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'colorA')
-            this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
-            debugPanel.addBinding(this.progress, 'value', { label: 'progress', min: 0, max: 1, step: 0.001 }).on('change', () => { this.mesh.visible = true })
-            debugPanel.addBinding(this.patternSize, 'value', { label: 'patternSize', min: 0, max: 500, step: 1 })
-            debugPanel.addBinding(this.strokeSize, 'value', { label: 'strokeSize', min: 0, max: 50, step: 1 })
-            debugPanel.addBinding(this.inverted, 'value', { label: 'inverted', min: 0, max: 1, step: 1 })
-            debugPanel.addButton({ title: 'show' }).on('click', () => { this.show() })
-            debugPanel.addButton({ title: 'hide' }).on('click', () => { this.hide() })
-        }
         this.game.viewport.events.on('change', () =>
         {
             this.patternSize.value = 200 * this.game.viewport.pixelRatio

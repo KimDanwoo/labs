@@ -135,9 +135,9 @@ export class VisualVehicle
 
         this.paints.choices = {}
         this.paints.choices.red = this.game.materials.getFromName('redGradient')
-        this.paints.choices.orange = this.game.materials.createGradient('orangeGradient', '#ff940d', '#af0071', this.game.materials.debugPanel?.addFolder({ title: 'orangeGradient' }))
-        this.paints.choices.white = this.game.materials.createGradient('whiteGradient', '#ffffff', '#b5b5b5', this.game.materials.debugPanel?.addFolder({ title: 'whiteGradient' }))
-        this.paints.choices.black = this.game.materials.createGradient('blackGradient', '#626262', '#262526', this.game.materials.debugPanel?.addFolder({ title: 'blackGradient' }))
+        this.paints.choices.orange = this.game.materials.createGradient('orangeGradient', '#ff940d', '#af0071')
+        this.paints.choices.white = this.game.materials.createGradient('whiteGradient', '#ffffff', '#b5b5b5')
+        this.paints.choices.black = this.game.materials.createGradient('blackGradient', '#626262', '#262526')
         if(this.model.name === 'islandBoxySUV')
             this.paints.choices.black = this.game.materials.createGradient('islandGraphite', '#434b53', '#171c23')
 
@@ -175,16 +175,6 @@ export class VisualVehicle
             this.paints.choices.flames = material
 
             // Debug
-            if(this.game.debug.active && this.game.materials.debugPanel)
-            {
-                const debugPanel = this.game.materials.debugPanel.addFolder({
-                    title: 'flames',
-                    expanded: true,
-                })
-                this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'flamesColorA')
-                this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'flamesColorB')
-                debugPanel.addBinding(emissiveStrength, 'value', { label: 'emissiveStrength', min: 1, max: 10, step: 0.001 })
-            }
         }
 
         // Abyssal
@@ -213,16 +203,6 @@ export class VisualVehicle
             this.paints.choices.abyssal = material
 
             // Debug
-            if(this.game.debug.active && this.game.materials.debugPanel)
-            {
-                const debugPanel = this.game.materials.debugPanel.addFolder({
-                    title: 'abyssal',
-                    expanded: true,
-                })
-                this.game.debug.addThreeColorBinding(debugPanel, fresnelColor.value, 'fresnelColor')
-                debugPanel.addBinding(fresnelIntensity, 'value', { label: 'fresnelIntensity', min: 1, max: 40, step: 0.001 })
-                debugPanel.addBinding(starsIntensity, 'value', { label: 'starsIntensity', min: 1, max: 40, step: 0.001 })
-            }
         }
 
         this.paints.changeTo = (name = 'red') =>

@@ -33,9 +33,6 @@ catalog:
   seedrandom: 3.0.5
   camera-controls: 3.1.2
   normalize-wheel: 1.0.1
-  tweakpane: 4.0.5
-  '@tweakpane/plugin-essentials': 0.2.1
-  '@tweakpane/plugin-camerakit': 0.3.0
   '@types/howler': 2.2.13
   '@types/seedrandom': 3.0.8
   '@types/normalize-wheel': 1.0.4

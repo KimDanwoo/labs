@@ -18,13 +18,6 @@ export class BehindTheSceneArea extends Area
         super(model)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🔳 Behind the scene',
-                expanded: false,
-            })
-        }
 
         this.center = this.references.items.get('center')[0].position
 
@@ -105,11 +98,6 @@ export class BehindTheSceneArea extends Area
         this.objects.hideable.push(this.slabs)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.chalkColor.value, 'chalkColor')
-            this.debugPanel.addBinding(this.chalkIntensity, 'value', { label: 'chalkIntensity', min: 0, max: 2, step: 0.001 })
-        }
     }
 
     update()

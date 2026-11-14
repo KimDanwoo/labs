@@ -11,13 +11,6 @@ export class Rendering
     {
         this.game = Game.getInstance()
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '📸 Rendering',
-                expanded: false,
-            })
-        }
     }
 
     start()
@@ -104,30 +97,6 @@ export class Rendering
         this.game.quality.events.on('change', qualityChange)
 
         // Debug
-        if(this.game.debug.active)
-        {
-            const bloomPanel = this.debugPanel.addFolder({
-                title: 'bloom',
-                expanded: false,
-            })
-
-            bloomPanel.addBinding(this.bloomPass.threshold, 'value', { label: 'threshold', min: 0, max: 2, step: 0.01 })
-            bloomPanel.addBinding(this.bloomPass.strength, 'value', { label: 'strength', min: 0, max: 3, step: 0.01 })
-            bloomPanel.addBinding(this.bloomPass.radius, 'value', { label: 'radius', min: 0, max: 1, step: 0.01 })
-            bloomPanel.addBinding(this.bloomPass.smoothWidth, 'value', { label: 'smoothWidth', min: 0, max: 1, step: 0.01 })
-
-            const blurPanel = this.debugPanel.addFolder({
-                title: 'blur',
-                expanded: true,
-            })
-
-            blurPanel.addBinding(this.cheapDOFPass.start, 'value', { label: 'start', min: 0, max: 0.5, step: 0.001 })
-            blurPanel.addBinding(this.cheapDOFPass.end, 'value', { label: 'end', min: 0, max: 0.5, step: 0.001 })
-            // blurPanel.addBinding(this.cheapDOFPass.size, 'value', { label: 'size', min: 1, max: 5, step: 1 })
-            // blurPanel.addBinding(this.cheapDOFPass.separation, 'value', { label: 'separation', min: 0, max: 5, step: 0.001 })
-            blurPanel.addBinding(this.cheapDOFPass.repeats, 'value', { label: 'repeats', min: 1, max: 100, step: 1 })
-            blurPanel.addBinding(this.cheapDOFPass.amount, 'value', { label: 'amount', min: 0, max: 0.02, step: 0.0001 })
-        }
     }
 
     setStats()
@@ -148,18 +117,6 @@ export class Rendering
         this.stats.update()
 
         // Debug
-        if(this.game.debug.active)
-        {
-             const debugPanel = this.debugPanel.addFolder({
-                title: 'Stats',
-                expanded: true,
-            })
-
-            for(const feedName in this.stats.feed)
-            {
-                debugPanel.addBinding(this.stats.feed, feedName, { readonly: true })
-            }
-        }
     }
 
     resize()

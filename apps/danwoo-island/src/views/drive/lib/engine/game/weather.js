@@ -1,3 +1,4 @@
+import { autoBinding } from './utilities/autoBinding'
 import gsap from 'gsap'
 import { Game } from './game'
 import { lerp, remapClamp } from './utilities/maths'
@@ -9,13 +10,6 @@ export class Weather
         this.game = Game.getInstance()
 
         // Debug
-        if(this.game.debug.active)
-        {
-            this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🌦️ Weather',
-                expanded: false,
-            })
-        }
 
         this.properties = []
         this.setOverride()
@@ -140,7 +134,6 @@ export class Weather
     {
         const property = {}
         property.name = name
-        property.manual = false
         property.min = min
         property.max = max
 
@@ -148,12 +141,7 @@ export class Weather
         property.overrideValue = null
 
         // Debug
-        property.binding = this.game.debug.addManualBinding(
-            this.debugPanel,
-            property,
-            'value',
-            { label: name, min: property.min, max: property.max, step: 0.001 },
-            () =>
+        property.binding = autoBinding(property, 'value', () =>
             {
                 let value = get()
                 
@@ -168,25 +156,8 @@ export class Weather
                 }
                 
                 return value
-            }
-        )
+            })
 
-        if(this.game.debug.active)
-        {
-            this.debugPanel.addBinding(property, 'value', { readonly: true })
-            this.debugPanel.addBinding(
-                property,
-                'value',
-                {
-                    label: `${property.min} -> ${property.max}`,
-                    readonly: true,
-                    view: 'graph',
-                    min: property.min,
-                    max: property.max,
-                }
-            )
-            this.debugPanel.addBlade({ view: 'separator' })
-        }
 
         this[name] = property
         this.properties.push(property)
