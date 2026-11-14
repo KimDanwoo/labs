@@ -1,6 +1,6 @@
 import { Game } from '../Game.js'
 import { InstancedGroup } from '../InstancedGroup.js'
-import { createStoneLantern } from './islandProps.js'
+import { createGardenLamp } from './islandProps.js'
 
 export class Lanterns
 {
@@ -56,7 +56,7 @@ export class Lanterns
         }
 
         // Instanced group
-        this.instancedGroup = new InstancedGroup(references, createStoneLantern(this.game.materials))
+        this.instancedGroup = new InstancedGroup(references, createGardenLamp(this.game.materials))
 
         // Tick update
         this.game.ticker.events.on('tick', () =>

@@ -19,7 +19,6 @@ import { Lighting } from './Ligthing.js'
 import { Materials } from './Materials.js'
 import { Objects } from './Objects.js'
 import { islandTextureResources } from './World/islandTextures.js'
-import { propTextureResources } from './World/islandTextured.js'
 import { islandModelResources } from './World/islandModels.js'
 import { Fog } from './Fog.js'
 import { DayCycles } from './Cycles/DayCycles.js'
@@ -50,7 +49,6 @@ import { PreRenderer } from './PreRenderer.js'
 import { Options } from './Options.js'
 import gsap from 'gsap'
 import { Map } from './Map.js'
-import { isInkLoading } from './World/inkLoading.js'
 
 export class Game
 {
@@ -104,7 +102,6 @@ export class Game
         const cb = '?cb=1'
         this.resources = await this.resourcesLoader.load([
             [ 'respawnsReferencesModel',    `respawns/respawnsReferences${compressedModelSuffix}.glb${cb}`, 'gltf' ],
-            ...(isInkLoading ? [[ 'inkBrushTexture', `ui/inkBrush.png${cb}`, 'texture', (resource) => { resource.minFilter = THREE.LinearFilter; resource.generateMipmaps = false } ]] : []),
             [ 'behindTheSceneStarsTexture', `behindTheScene/stars.${compressedTextureExtension}${cb}`,      compressedTextureFormat, (resource) => { resource.colorSpace = THREE.SRGBColorSpace; resource.minFilter = THREE.NearestFilter; resource.magFilter = THREE.NearestFilter; resource.generateMipmaps = false; resource.wrapS = THREE.RepeatWrapping; resource.wrapT = THREE.RepeatWrapping; } ],
             [ 'soundTexture',               `intro/sound.${compressedTextureExtension}${cb}`,               compressedTextureFormat, (resource) => { resource.minFilter = THREE.LinearFilter; resource.magFilter = THREE.LinearFilter; resource.generateMipmaps = false; resource.repeat.x = 0.5; } ],
             [ 'paletteTexture',             `palette.${compressedTextureExtension}${cb}`,                   compressedTextureFormat, (resource) => { resource.minFilter = THREE.NearestFilter; resource.magFilter = THREE.NearestFilter; resource.generateMipmaps = false; resource.colorSpace = THREE.SRGBColorSpace; } ],
@@ -176,7 +173,6 @@ export class Game
                 [ 'timeMachineScreenMGSTexture',           `timeMachine/timeMachineScreenMGS.${compressedTextureExtension}${cb}`,                compressedTextureFormat, (resource) => { resource.minFilter = THREE.NearestFilter; resource.magFilter = THREE.NearestFilter; resource.generateMipmaps = false; resource.wrapS = THREE.ClampToEdgeWrapping; resource.wrapT = THREE.ClampToEdgeWrapping; resource.colorSpace = THREE.SRGBColorSpace; } ],
                 [ 'timeMachineScreenFolioTexture',         `timeMachine/timeMachineScreenFolio.${compressedTextureExtension}${cb}`,              compressedTextureFormat, (resource) => { resource.minFilter = THREE.NearestFilter; resource.magFilter = THREE.NearestFilter; resource.generateMipmaps = false; resource.wrapS = THREE.ClampToEdgeWrapping; resource.wrapT = THREE.ClampToEdgeWrapping; resource.colorSpace = THREE.SRGBColorSpace; } ],
                 ...islandTextureResources(cb),
-                ...propTextureResources(cb),
                 ...islandModelResources(cb),
             ],
             (toLoad, total) =>
@@ -245,7 +241,6 @@ export class Game
             // Social
             if(this.world.areas.social)
             {
-                this.world.areas.social.statue.down = false
                 this.world.areas.social.fans.instancedGroup.needsUpdate = true
             }
 

@@ -1,13 +1,10 @@
 import * as THREE from 'three/webgpu'
-import { bungeoppangGeometry, createParts, FULL_TURN, meshComponents, SHADES, seededRandom } from './islandGeometry.js'
-import { propMaterial, texturedMesh } from './islandTextured.js'
+import { createParts, FULL_TURN, meshComponents, seededRandom } from './islandGeometry.js'
+import { placeLandmarks } from './islandLandmarks.js'
 import { islandModelMesh } from './islandModels.js'
-import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
-import { color } from 'three/tsl'
 
 const COLLIDER = /^(cuboid|hull|trimesh|tube|ball)/i
 const REFERENCE = /^ref/i
-const OBANG = ['obangBlue', 'obangRed', 'obangYellow', 'obangWhite', 'obangBlack']
 
 function hasReference(object)
 {
@@ -95,83 +92,6 @@ function lathe(parts, name, profile, transform, segments = 10)
     parts.add(name, new THREE.LatheGeometry(profile.map(([x, y]) => new THREE.Vector2(x, y)), segments), transform)
 }
 
-const YUT_TABLE = {
-    sticks: [{ z: -0.3, turn: -12, isFlatUp: false }, { z: -0.1, turn: 5, isFlatUp: true }, { z: 0.1, turn: -6, isFlatUp: false }, { z: 0.3, turn: 10, isFlatUp: true }],
-    stickX: -0.27,
-    stickLength: 0.34,
-    boardX: 0.23,
-}
-
-function yutStickGeometry(radius, length)
-{
-    const shape = new THREE.Shape()
-    shape.moveTo(-radius, 0)
-    shape.absarc(0, 0, radius, Math.PI, 0, true)
-    shape.lineTo(-radius, 0)
-    const geometry = new THREE.ExtrudeGeometry(shape, { depth: length, bevelEnabled: false, curveSegments: 6 })
-    geometry.translate(0, 0, -length / 2)
-    return geometry
-}
-
-function yutStick(parts, { x, y, z, turn, isFlatUp, length, radius, matrix })
-{
-    const heading = Math.PI / 2 + (turn * Math.PI) / 180
-    const place = new THREE.Matrix4().makeTranslation(x, y + (isFlatUp ? radius : 0), z)
-        .multiply(new THREE.Matrix4().makeRotationY(heading))
-        .multiply(new THREE.Matrix4().makeRotationZ(isFlatUp ? Math.PI : 0))
-    const transform = matrix.clone().multiply(place)
-    parts.add('timber', yutStickGeometry(radius, length), { matrix: transform })
-    if(!isFlatUp)
-        return
-    for(const offset of [-0.15, 0.15])
-        parts.box('ink', [radius * 1.6, 0.006, length * 0.035], { position: [0, -0.004, offset * length], matrix: transform })
-}
-
-function yutTable(parts, container, materials)
-{
-    const { size, matrix } = collidersOf(container)[0]
-    const { x: W, y: H, z: D } = size
-    const at = (t) => (t - 0.5) * H
-    for(const sx of [-1, 1])
-        for(const sz of [-1, 1])
-            parts.box('woodDark', [0.08 * W, 0.3 * H, 0.12 * D], { position: [sx * 0.37 * W, at(0.15), sz * 0.34 * D], matrix })
-    for(const sz of [-1, 1])
-        parts.box('woodDark', [0.86 * W, 0.1 * H, 0.07 * D], { position: [0, at(0.32), sz * 0.36 * D], matrix })
-    parts.box('wood', [0.94 * W, 0.1 * H, 0.9 * D], { position: [0, at(0.39), 0], matrix })
-    const boardSize = Math.min(0.85 * D, 0.45 * W)
-    const boardX = YUT_TABLE.boardX * W
-    parts.box('thatch', [boardSize, 0.025 * H, boardSize], { position: [boardX, at(0.455), 0], matrix })
-    const board = new THREE.PlaneGeometry(boardSize, boardSize)
-    board.rotateX(-Math.PI / 2)
-    board.translate(boardX, at(0.469), 0)
-    container.add(texturedMesh(board, propMaterial(materials, 'yutBoard'), { name: 'yutBoard', matrix, castShadow: false }))
-    const radius = Math.min(0.045 * D, 0.1 * H)
-    for(const stick of YUT_TABLE.sticks)
-        yutStick(parts, { ...stick, x: YUT_TABLE.stickX * W, y: at(0.44), z: stick.z * D, length: YUT_TABLE.stickLength * W, radius, matrix })
-}
-
-const PAENGI_PROFILE = [[0, -0.5], [0.08, -0.42], [0.55, 0.05], [0.95, 0.32], [1, 0.38], [0.9, 0.42], [0.3, 0.46], [0, 0.47]]
-const PAENGI_BANDS = [{ shade: 'obangRed', y: 0.18, scale: 0.78 }, { shade: 'obangYellow', y: 0.26, scale: 0.88 }, { shade: 'obangBlue', y: 0.34, scale: 0.98 }]
-
-function paengi(parts, container)
-{
-    const colliders = collidersOf(container)
-    const base = colliders.find((item) => !item.isTube)
-    const spinner = colliders.find((item) => item.isTube)
-    if(base)
-    {
-        parts.box('wood', [base.size.x, base.size.y, base.size.z], { matrix: base.matrix })
-        parts.rod('timber', 0.025, new THREE.Vector3(-base.size.x * 0.4, base.size.y / 2 + 0.03, -base.size.z * 0.3).applyMatrix4(base.matrix).toArray(), new THREE.Vector3(base.size.x * 0.35, base.size.y / 2 + 0.03, base.size.z * 0.2).applyMatrix4(base.matrix).toArray())
-    }
-    if(!spinner)
-        return
-    const { radius, height, matrix } = spinner
-    lathe(parts, 'timber', PAENGI_PROFILE.map(([r, y]) => [r * radius, y * height]), { matrix }, 16)
-    for(const { shade, y, scale } of PAENGI_BANDS)
-        parts.add(shade, new THREE.TorusGeometry(radius * scale, height * 0.035, 4, 16), { position: [0, y * height, 0], rotation: [Math.PI / 2, 0, 0], matrix })
-    parts.prism('woodDark', radius * 0.12, radius * 0.16, height * 0.12, { position: [0, height * 0.52, 0], matrix }, 8)
-}
-
 const GAMEPAD_SIZE = new THREE.Vector3(1.62, 0.54, 1.28)
 
 function placeGamepad(container, materials)
@@ -181,16 +101,14 @@ function placeGamepad(container, materials)
     container.add(islandModelMesh(materials, 'gamepad', resting, GAMEPAD_SIZE))
 }
 
-function obangFlag(parts, frame)
+const SURF_FLAG = { width: 1.2, height: 3.2, depth: 0.4, poleX: -0.5 }
+
+function surfFlag(parts, { size, matrix }, { container, materials })
 {
-    const { size, matrix } = frame
-    const bottom = -size.y / 2
-    parts.add('stone', new THREE.IcosahedronGeometry(1, 0), { position: [0, bottom + 0.1, 0], scale: [0.55, 0.3, 0.45], matrix })
-    parts.prism('woodDark', 0.05, 0.06, size.y, { matrix }, 8)
-    parts.add('obangYellow', new THREE.IcosahedronGeometry(0.09, 0), { position: [0, size.y / 2 + 0.05, 0], matrix })
-    const stripeHeight = 0.22
-    OBANG.forEach((shade, index) =>
-        parts.box(shade, [1.1 - index * 0.14, stripeHeight, 0.03], { position: [0.6 - index * 0.07, size.y / 2 - 0.25 - index * stripeHeight, 0], matrix }))
+    const scale = size.y / SURF_FLAG.height
+    const anchored = matrix.clone().multiply(new THREE.Matrix4().makeTranslation(-SURF_FLAG.poleX * scale, 0, 0))
+    const flagSize = new THREE.Vector3(SURF_FLAG.width * scale, size.y, SURF_FLAG.depth * scale)
+    container.add(islandModelMesh(materials, 'surfFlag', anchored, flagSize))
 }
 
 function slateBoards(parts, container)
@@ -483,12 +401,14 @@ function bowlingPin(parts)
     parts.prism('obangBlue', 0.23, 0.235, 0.08, { position: [0, 2.08, 0] }, 10)
 }
 
-function taegeukBall(parts, frame)
+const BEACH_BALL_PANELS = ['bunting2', 'bunting4', 'bunting1', 'bunting4', 'bunting3', 'bunting4']
+
+function beachBall(parts, frame)
 {
     const radius = frame.size.x / 2
-    parts.add('obangRed', new THREE.SphereGeometry(radius, 12, 4, 0, FULL_TURN, 0, Math.PI / 2))
-    parts.add('obangBlue', new THREE.SphereGeometry(radius, 12, 4, 0, FULL_TURN, Math.PI / 2, Math.PI / 2))
-    parts.add('obangYellow', new THREE.TorusGeometry(radius * 1.005, radius * 0.06, 4, 16), { rotation: [Math.PI / 2, 0, 0] })
+    const panel = FULL_TURN / BEACH_BALL_PANELS.length
+    BEACH_BALL_PANELS.forEach((shade, index) =>
+        parts.add(shade, new THREE.SphereGeometry(radius, 3, 8, index * panel, panel)))
 }
 
 function stonePillar(parts, frame)
@@ -522,27 +442,7 @@ function pinwheel(parts)
     parts.rod('woodDark', 0.03, [0, -0.65, -0.03], [0, centerY, -0.03])
 }
 
-function sortedColliders(container)
-{
-    return collidersOf(container).sort((a, b) => b.size.x * b.size.y * b.size.z - a.size.x * a.size.y * a.size.z)
-}
-
-function placeModel(container, materials, key)
-{
-    const [frame] = sortedColliders(container)
-    container.add(islandModelMesh(materials, key, frame.matrix, frame.size))
-}
-
-const SOCIAL_OBJECTS = [
-    { pattern: /^baguiraPhysicalDynamic/, build: (parts, container, materials) => placeModel(container, materials, 'haetae') },
-    { pattern: /^boyPhysicalDynamic/, build: (parts, container, materials) => placeModel(container, materials, 'dongjaseok') },
-    { pattern: /^sudoPhysicalDynamic/, build: (parts, container, materials) => placeModel(container, materials, 'jindo') },
-]
-
 const BUILDERS = [
-    ...SOCIAL_OBJECTS,
-    { pattern: /^gamepadPhysicalDynamic/, keepEmissive: false, build: yutTable },
-    { pattern: /^phonePhysicalDynamic/, keepEmissive: false, build: paengi },
     { pattern: /^gizmoPhysicalDynamic$/, build: (parts, container, materials) => placeGamepad(container, materials) },
     { pattern: /^blackBoardPhysicalDynamic/, build: slateBoards },
     { pattern: /^grinderPhysicalDynamic$/, build: grinderStand },
@@ -561,11 +461,11 @@ const BUILDERS = [
     { pattern: /^refTvPhysicalDynamic$/, build: tvCabinet },
     { pattern: /^blowerPhysicalDynamic/, build: (parts, container) => bellowsBase(parts, collidersOf(container)[0]) },
     { pattern: /^refPinPhysicalDynamic$/, build: (parts) => bowlingPin(parts) },
-    { pattern: /^refBallPhysicalDynamic$/, build: (parts, container) => taegeukBall(parts, collidersOf(container)[0]) },
+    { pattern: /^refBallPhysicalDynamic$/, build: (parts, container) => beachBall(parts, collidersOf(container)[0]) },
 ]
 
 const UNCOLLIDED_BUILDERS = [
-    { pattern: /^sword$/, build: obangFlag },
+    { pattern: /^sword$/, build: surfFlag },
     { pattern: /^Cube006$/, build: badukBoard },
     { pattern: /^Cylinder$/, build: watermelonTray },
     { pattern: /^Plane005$/, build: dotjari },
@@ -585,6 +485,7 @@ function rebuildChild(child, materials, { build, keepEmissive = true })
 
 export function rebuildVillageProps(model, materials)
 {
+    placeLandmarks(model, materials)
     for(const child of [...model.children])
     {
         const uncollided = UNCOLLIDED_BUILDERS.find((item) => item.pattern.test(child.name))
@@ -593,7 +494,7 @@ export function rebuildVillageProps(model, materials)
             const frame = boundsFrame(child)
             const container = prepare(child)
             const parts = createParts()
-            uncollided.build(parts, frame)
+            uncollided.build(parts, frame, { container, materials })
             container.add(parts.build(materials))
             continue
         }
@@ -830,10 +731,11 @@ export function reshapeCircuitDecoration(model, materials)
     decoration.add(parts.build(materials))
 }
 
-export function makeBungeoppang(cookie)
+export const COCONUT_SIZE = new THREE.Vector3(0.55, 0.48, 0.5)
+
+export function makeCoconut(cookie, materials)
 {
-    cookie.geometry = bungeoppangGeometry()
-    const material = new MeshDefaultMaterial({ colorNode: color(SHADES.bungeoppang), hasCoreShadows: true, hasDropShadows: true })
-    material.userData.prevent = true
-    cookie.material = material
+    const coconut = islandModelMesh(materials, 'coconut', new THREE.Matrix4(), COCONUT_SIZE)
+    cookie.geometry = coconut.geometry
+    cookie.material = coconut.material
 }

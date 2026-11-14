@@ -1,16 +1,23 @@
 import * as THREE from 'three/webgpu'
 
 const ISLAND_MODELS = {
-    hareubang: 'areas/island/models/hareubang.glb',
-    haetae: 'areas/island/models/haetae.glb',
-    dongjaseok: 'areas/island/models/dongjaseok.glb',
-    jindo: 'areas/island/models/jindo.glb',
-    jangseungHeaven: 'areas/island/models/jangseungHeaven.glb',
-    jangseungEarth: 'areas/island/models/jangseungEarth.glb',
     gamepad: 'areas/island/models/gamepad.glb',
-    onggi: 'areas/island/models/onggi.glb',
-    stele: 'areas/island/models/stele.glb',
-    pedestal: 'areas/island/models/pedestal.glb',
+    shellFountain: 'areas/island/models/shellFountain.glb',
+    lighthouse: 'areas/island/models/lighthouse.glb',
+    palmHammock: 'areas/island/models/palmHammock.glb',
+    surfCorner: 'areas/island/models/surfCorner.glb',
+    coconutCrate: 'areas/island/models/coconutCrate.glb',
+    beachBench: 'areas/island/models/beachBench.glb',
+    lampPost: 'areas/island/models/lampPost.glb',
+    gardenLamp: 'areas/island/models/gardenLamp.glb',
+    ropeFence: 'areas/island/models/ropeFence.glb',
+    surfboardStand: 'areas/island/models/surfboardStand.glb',
+    linkSign: 'areas/island/models/linkSign.glb',
+    rockBase: 'areas/island/models/rockBase.glb',
+    guideBoard: 'areas/island/models/guideBoard.glb',
+    snackShack: 'areas/island/models/snackShack.glb',
+    coconut: 'areas/island/models/coconut.glb',
+    surfFlag: 'areas/island/models/surfFlag.glb',
 }
 
 const resourceName = (key) => `islandModel${key[0].toUpperCase()}${key.slice(1)}`

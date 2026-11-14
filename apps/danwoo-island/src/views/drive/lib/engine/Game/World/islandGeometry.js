@@ -11,28 +11,21 @@ export const SHADES = {
     stoneDark: '#857c74',
     wood: '#9a5b34',
     woodDark: '#6b3d24',
-    twig: '#b07a45',
-    silkRed: '#d6453a',
-    silkBlue: '#3a56b5',
     onggi: '#5b2f1f',
     onggiLid: '#7c4127',
     fieldstone: '#9a948b',
     pillarRed: '#a5402c',
-    giwa: '#55555f',
+    giwa: '#c46a43',
     giwaRidge: '#3c3c46',
     dancheongGreen: '#3f8a6a',
-    dancheongRed: '#c8452f',
-    dancheongBlue: '#3d5fae',
     thatch: '#d6a548',
     thatchRope: '#a3772c',
     hanji: '#efe2c4',
     mapBlue: '#69a7c9',
-    tarpOrange: '#e8742f',
     iron: '#3b3a3f',
     glass: '#bfe3ea',
     earth: '#b9956b',
     ink: '#2b2420',
-    jangseungWood: '#cf7e33',
     basalt: '#625b58',
     basaltDark: '#423d3c',
     neonBoard: '#2a2230',
@@ -41,18 +34,21 @@ export const SHADES = {
     grille: '#c9b48a',
     timber: '#bb8650',
     slate: '#2f3a33',
-    bungeoppang: '#c98a3d',
     obangBlue: '#2f5fb3',
     obangRed: '#c9372c',
     obangYellow: '#e8b830',
     obangWhite: '#f2eee4',
     obangBlack: '#2a2a2e',
+    bunting1: '#36AFC0',
+    bunting2: '#F47F75',
+    bunting3: '#F6CF68',
+    bunting4: '#FFF1D6',
+    bunting5: '#AA91CC',
     bronze: '#b0803a',
 }
 
 const GLOW = {
     lantern: { name: 'emissiveSeokdeungGradient', inner: '#fff1b8', outer: '#ffad3d', intensity: 1.6 },
-    cheongsachorong: { name: 'emissiveCheongsachorongGradient', inner: '#ffd58a', outer: '#ff3b2f', intensity: 1.8 },
 }
 
 const SIGNAGE_FACES = new Set(['hanji', 'mapBlue', 'glass'])
@@ -236,23 +232,3 @@ export function removeComponents(mesh, shouldRemove)
     return removed
 }
 
-export function bungeoppangGeometry()
-{
-    const body = new THREE.SphereGeometry(1, 10, 6)
-    body.scale(0.5, 0.16, 0.3)
-    const tail = new THREE.ConeGeometry(0.22, 0.32, 3)
-    tail.rotateZ(Math.PI / 2)
-    tail.scale(1, 0.55, 1.3)
-    tail.translate(0.58, 0, 0)
-    const fin = new THREE.ConeGeometry(0.1, 0.18, 3)
-    fin.translate(0, 0.16, 0)
-    const pieces = [body, tail, fin].map((geometry) =>
-    {
-        const flat = geometry.index ? geometry.toNonIndexed() : geometry
-        if(flat.hasAttribute('uv'))
-            flat.deleteAttribute('uv')
-        flat.computeVertexNormals()
-        return flat
-    })
-    return mergeGeometries(pieces)
-}

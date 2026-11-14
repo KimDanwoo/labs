@@ -3,7 +3,7 @@ import { Game } from '../Game.js'
 import { mul, max, step, output, color, sin, smoothstep, mix, matcapUV, float, mod, texture, transformNormalToView, uniformArray, varying, vertexIndex, rotateUV, cameraPosition, vec4, atan, vec3, vec2, modelWorldMatrix, Fn, attribute, uniform, normalWorld } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 
-const GRASS_CLEARINGS = [{ x: 57.4, z: 32.4, radius: 2.4 }]
+const GRASS_CLEARINGS = [{ x: 58.4, z: 32.4, radius: 2.4 }]
 
 export class Grass
 {

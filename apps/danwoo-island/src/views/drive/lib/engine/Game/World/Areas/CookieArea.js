@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { makeBungeoppang, rebuildVillageProps } from '../islandVillage.js'
+import { COCONUT_SIZE, makeCoconut, rebuildVillageProps } from '../islandVillage.js'
 import { rebuildCookieCart } from '../islandStructures.js'
 import { Game } from '../../Game.js'
 import { color, float, Fn, instancedArray, mix, normalWorld, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
@@ -15,7 +15,7 @@ export class CookieArea extends Area
     setObjects()
     {
         rebuildVillageProps(this.model, this.game.materials)
-        makeBungeoppang(this.model.children.find((child) => child.name === 'refCookie'))
+        makeCoconut(this.model.children.find((child) => child.name === 'refCookie'), this.game.materials)
         rebuildCookieCart(this.model, this.game.materials)
         super.setObjects()
     }
@@ -247,7 +247,7 @@ export class CookieArea extends Area
                     sleeping: true,
                     enabled: onTable,
                     mass: this.cookies.mass,
-                    colliders: [ { shape: 'cylinder', parameters: [ 0.55 / 2, 1.25 / 2 ], category: 'object' } ],
+                    colliders: [ { shape: 'cylinder', parameters: [ COCONUT_SIZE.y / 2, COCONUT_SIZE.x / 2 ], category: 'object' } ],
                     waterGravityMultiplier: - 1
                 },
             )
@@ -262,7 +262,7 @@ export class CookieArea extends Area
     {
         this.game.interactivePoints.create(
             this.references.items.get('interactivePoint')[0].position,
-            '붕어빵 굽기',
+            '코코넛 따기',
             InteractivePoints.ALIGN_RIGHT,
             InteractivePoints.STATE_CONCEALED,
             () =>

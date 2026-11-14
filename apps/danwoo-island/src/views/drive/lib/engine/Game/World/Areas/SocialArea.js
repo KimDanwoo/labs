@@ -1,5 +1,4 @@
 import * as THREE from 'three/webgpu'
-import { rebuildHareubang } from '../islandStructures.js'
 import { rebuildVillageProps } from '../islandVillage.js'
 import { Game } from '../../Game.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
@@ -12,7 +11,6 @@ export class SocialArea extends Area
 {
     setObjects()
     {
-        rebuildHareubang(this.model, this.game.materials)
         rebuildVillageProps(this.model, this.game.materials)
         reshapeSocialPlaza(this.model, this.game.materials)
         recordSteleFrames(this.model)
@@ -38,7 +36,6 @@ export class SocialArea extends Area
         this.setLinks()
         this.setFans()
         this.setOnlyFans()
-        this.setStatue()
     }
 
     setLinks()
@@ -198,13 +195,6 @@ export class SocialArea extends Area
         )
     }
 
-    setStatue()
-    {
-        this.statue = {}
-        this.statue.body = this.references.items.get('statue')[0].userData.object.physical.body
-        this.statue.down = false
-    }
-
     update()
     {
         if(this.fans.visibleCount)
@@ -215,17 +205,6 @@ export class SocialArea extends Area
 
             if(!allFansSleeping)
                 this.fans.instancedGroup.updateBoundings()
-        }
-
-        if(this.statue && !this.statue.down && !this.statue.body.isSleeping())
-        {
-            const statueUp = new THREE.Vector3(0, 1, 0)
-            statueUp.applyQuaternion(this.statue.body.rotation())
-            if(statueUp.y < 0.25)
-            {
-                this.statue.down = true
-
-            }
         }
 
         for(const object of this.fans.objects)
