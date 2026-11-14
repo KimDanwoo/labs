@@ -99,9 +99,6 @@ catalogs:
     astro-expressive-code:
       specifier: 0.44.3
       version: 0.44.3
-    camera-controls:
-      specifier: 3.1.2
-      version: 3.1.2
     class-variance-authority:
       specifier: ^0.7.1
       version: 0.7.1
@@ -410,9 +407,6 @@ importers:
       '@dimforge/rapier3d-compat':
         specifier: 'catalog:'
         version: 0.19.3
-      camera-controls:
-        specifier: 'catalog:'
-        version: 3.1.2(three@0.187.0)
       gsap:
         specifier: 'catalog:'
         version: 3.15.1
