@@ -2,6 +2,7 @@ import * as THREE from 'three/webgpu'
 import { Fn, max, texture, uv, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { bungeoppangGeometry, createParts, FULL_TURN, seededRandom } from './islandGeometry.js'
+import { GENERALS, jangseungFigure } from './islandJangseung.js'
 
 const OBANG = ['obangBlue', 'obangRed', 'obangYellow', 'obangWhite', 'obangBlack']
 
@@ -314,28 +315,6 @@ function cairn(parts, random, { size, matrix })
     }
 }
 
-function jangseung(parts, { size, matrix })
-{
-    const radius = Math.min(size.x, size.z) * 0.32
-    const bottom = -size.y / 2
-    const bodyHeight = size.y * 0.82
-    parts.prism('jangseungWood', radius, radius * 1.1, bodyHeight, { position: [0, bottom + bodyHeight / 2, 0], matrix }, 8)
-    const face = bottom + bodyHeight * 0.78
-    for(const facing of [1, -1])
-    {
-        const depth = facing * radius * 0.98
-        for(const side of [-1, 1])
-        {
-            parts.box('ink', [radius * 0.45, radius * 0.18, 0.08], { position: [side * radius * 0.4, face, depth], matrix })
-            parts.box('ink', [radius * 0.55, radius * 0.08, 0.08], { position: [side * radius * 0.4, face + radius * 0.3, depth], matrix })
-        }
-        parts.box('obangRed', [radius * 0.9, radius * 0.16, 0.08], { position: [0, face - radius * 0.65, depth], matrix })
-        parts.box('ink', [radius * 0.14, radius * 0.4, 0.1], { position: [0, face - radius * 0.25, depth * 1.04], matrix })
-    }
-    parts.prism('obangBlack', radius * 1.9, radius * 1.9, 0.08, { position: [0, bottom + bodyHeight + 0.04, 0], matrix }, 12)
-    parts.prism('obangBlack', radius * 0.75, radius * 0.85, size.y * 0.14, { position: [0, bottom + bodyHeight + size.y * 0.07, 0], matrix }, 10)
-}
-
 function geumjul(parts, random, points)
 {
     for(let index = 0; index < points.length - 1; index++)
@@ -378,12 +357,13 @@ export function rebuildSeonangdang(model, materials)
     const tall = pillars.slice(0, 3)
     for(const frame of tall)
         cairn(parts, random, frame)
-    for(const frame of pillars.slice(3))
-        jangseung(parts, frame)
+    const generals = [GENERALS.heaven, GENERALS.earth]
+    const plates = pillars.slice(3).map(({ size, matrix }, index) =>
+        jangseungFigure(parts, { height: size.y, radius: Math.min(size.x, size.z) * 0.32, bottom: -size.y / 2, matrix, general: generals[index % generals.length] }))
     const ropePoints = tall.map((frame) => new THREE.Vector3().setFromMatrixPosition(frame.matrix).add(new THREE.Vector3(0, frame.size.y * 0.32, 0)))
     ropePoints.sort((a, b) => Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x))
     geumjul(parts, random, ropePoints)
-    container.add(parts.build(materials))
+    container.add(parts.build(materials), ...plates)
 }
 
 function removeVisualMeshes(container)

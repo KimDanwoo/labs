@@ -8,6 +8,8 @@ import { remap, remapClamp, clamp } from './utilities/maths.js'
 import gsap from 'gsap'
 import { Events } from './Events.js'
 
+const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+
 export class Audio
 {
     constructor()
@@ -152,16 +154,8 @@ export class Audio
         this.playlist = {}
         this.playlist.songs = [
             {
-                path: 'sounds/musics/Sudo.mp3',
-                name: 'Sudo.mp3'
-            },
-            {
-                path: 'sounds/musics/Boy.mp3',
-                name: 'Boy.mp3'
-            },
-            {
-                path: 'sounds/musics/Baguira.mp3',
-                name: 'Baguira.mp3'
+                path: 'sounds/musics/baram.mp3',
+                name: '바람 · danwoo0'
             },
         ]
         this.playlist.index = (Math.floor(Date.now() / 1000 / 60 / 3) % this.playlist.songs.length) // Different music every X minutes
@@ -175,7 +169,7 @@ export class Audio
             song.sound = new Howl({
                 src: [ worldAsset(song.path) ],
                 pool: 0,
-                html5: true,
+                html5: !IS_IOS,
                 autoplay: false,
                 loop: false,
                 preload: false,

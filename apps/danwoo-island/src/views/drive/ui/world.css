@@ -2285,3 +2285,10 @@ html:not(.is-mode-touch) .menu .button:not(.is-disabled):hover {
   background: var(--hanji);
   border-color: color-mix(in srgb, var(--ink) 45%, transparent);
 }
+.menu .contents .controls-content .list .is-gamepad-button.is-icon {
+  filter: invert(1) brightness(0.3);
+}
+.menu .close .button-inner .icon-container .icon.is-xbox {
+  color: var(--hanji);
+  border-color: var(--hanji);
+}

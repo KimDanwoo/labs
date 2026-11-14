@@ -1,11 +1,8 @@
-import * as THREE from 'three/webgpu'
-
 const ISLAND_TEXTURES = {
     circuitBrand: 'areas/island/circuitBrand.png',
     circuitWebgl: 'areas/island/circuitWebgl.png',
     circuitWebgpu: 'areas/island/circuitWebgpu.png',
     circuitThreejs: 'areas/island/circuitThreejs.png',
-    airDancer: 'areas/island/airDancer.png',
     cookieBanner: 'areas/island/cookieBanner.png',
     projectsCarpet: 'areas/island/projectsCarpet.png',
     labCarpet: 'areas/island/labCarpet.png',
@@ -14,8 +11,6 @@ const ISLAND_TEXTURES = {
     bowlingLabelStrike: 'areas/island/bowlingLabelStrike.png',
 }
 
-const REPEATING = new Set(['airDancer'])
-
 const resourceName = (materialName) => `island${materialName[0].toUpperCase()}${materialName.slice(1)}Texture`
 
 export function islandTextureResources(cacheBuster)
@@ -23,12 +18,12 @@ export function islandTextureResources(cacheBuster)
     return Object.entries(ISLAND_TEXTURES).map(([materialName, path]) => [ resourceName(materialName), `${path}${cacheBuster}`, 'texture' ])
 }
 
-function matchSampling(texture, original, isRepeating)
+function matchSampling(texture, original)
 {
     texture.flipY = original.flipY
     texture.colorSpace = original.colorSpace
-    texture.wrapS = isRepeating ? THREE.RepeatWrapping : original.wrapS
-    texture.wrapT = isRepeating ? THREE.RepeatWrapping : original.wrapT
+    texture.wrapS = original.wrapS
+    texture.wrapT = original.wrapT
     texture.needsUpdate = true
     return texture
 }
@@ -43,6 +38,6 @@ export function applyIslandTextures(root, resources)
 
         const replacement = resources[resourceName(material.name)]
         if(material.map !== replacement)
-            material.map = matchSampling(replacement, material.map, REPEATING.has(material.name))
+            material.map = matchSampling(replacement, material.map)
     })
 }

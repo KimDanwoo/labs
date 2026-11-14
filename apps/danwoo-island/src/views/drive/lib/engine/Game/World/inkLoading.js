@@ -60,6 +60,7 @@ export function inkSeaMaterial(game)
         hasLightBounce: false,
     })
     const material = new THREE.MeshBasicNodeMaterial({ side: THREE.DoubleSide })
+    material.addEventListener('dispose', () => waveTexture.dispose())
     material.outputNode = Fn(() =>
     {
         positionWorld.xz.sub(game.reveal.position2Uniform).length().lessThan(game.reveal.distance).discard()
@@ -76,6 +77,7 @@ export function inkRingGeometry(radius)
 export function inkBrushMaterial(progress, brushTexture, radius)
 {
     const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false })
+    material.addEventListener('dispose', () => brushTexture.dispose())
     material.outputNode = Fn(() =>
     {
         const angleProgress = atan(positionGeometry.y, positionGeometry.x).div(TWO_PI).add(0.5).oneMinus()

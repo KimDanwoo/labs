@@ -811,10 +811,9 @@ function dancerChest(parts)
 {
     for(const [x, z] of CIRCUIT_DECORATION.dancerBases)
     {
-        parts.box('cabinetWood', [1.1, 0.9, 1.1], { position: [x, -0.5, z] })
-        parts.box('woodDark', [1.16, 0.1, 1.16], { position: [x, -0.02, z] })
-        for(const [cx, cz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]])
-            parts.box('obangYellow', [0.14, 0.92, 0.14], { position: [x + cx * 0.5, -0.5, z + cz * 0.5] })
+        parts.box('basalt', [1.2, 0.9, 1.2], { position: [x, -0.5, z] })
+        parts.box('stone', [1.3, 0.12, 1.3], { position: [x, -0.02, z] })
+        parts.box('basaltDark', [1.32, 0.12, 1.32], { position: [x, -0.9, z] })
     }
 }
 

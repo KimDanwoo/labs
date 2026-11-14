@@ -113,6 +113,7 @@ function hipRoofGeometry(width, depth, height, ridgeRatio)
 }
 
 const SHADOW_MIN_RADIUS = 0.3
+const SHADOWLESS_SUFFIX = ':shadowless'
 
 function castsShadow(geometry)
 {
@@ -139,9 +140,10 @@ export function createParts()
         if(!GLOW[name] && flat.hasAttribute('uv'))
             flat.deleteAttribute('uv')
         flat.computeVertexNormals()
-        if(!batches.has(name))
-            batches.set(name, [])
-        batches.get(name).push(flat)
+        const key = `${name}${castsShadow(flat) ? '' : SHADOWLESS_SUFFIX}`
+        if(!batches.has(key))
+            batches.set(key, [])
+        batches.get(key).push(flat)
     }
 
     const box = (name, size, transform) => add(name, new THREE.BoxGeometry(...size), transform)
@@ -162,14 +164,16 @@ export function createParts()
     const build = (materials, matrix = new THREE.Matrix4()) =>
     {
         const group = new THREE.Group()
-        for(const [name, geometries] of batches)
+        for(const [key, geometries] of batches)
         {
+            const isShadowless = key.endsWith(SHADOWLESS_SUFFIX)
+            const name = isShadowless ? key.slice(0, -SHADOWLESS_SUFFIX.length) : key
             const mesh = new THREE.Mesh(mergeGeometries(geometries), islandMaterial(materials, name))
             for(const geometry of geometries)
                 geometry.dispose()
             mesh.name = name
-            mesh.castShadow = castsShadow(mesh.geometry)
-            mesh.userData.preventShadow = !mesh.castShadow
+            mesh.castShadow = !isShadowless
+            mesh.userData.preventShadow = isShadowless
             mesh.receiveShadow = true
             mesh.matrixAutoUpdate = false
             mesh.matrix.copy(matrix)
