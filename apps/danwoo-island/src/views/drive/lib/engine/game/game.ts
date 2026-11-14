@@ -27,7 +27,7 @@ import { PhysicsVehicle } from './physics/physicsVehicle';
 import { PhysicsWireframe } from './physics/physicsWireframe';
 import { Player } from './player';
 import { PreRenderer } from './preRenderer';
-import { Quality } from './quality';
+import { QUALITY, Quality } from './quality';
 import { RayCursor } from './rayCursor';
 import { Rendering } from './rendering';
 import {
@@ -115,7 +115,6 @@ interface AssetNames {
 const CACHE_BUSTER = '?cb=1';
 const REVEAL_DELAY_FRAMES = 3;
 const FIRST_STEP = 1;
-const LOWEST_QUALITY = 0;
 const FONT_FACES = ['400 24px MaruBuri', '700 24px MaruBuri'];
 
 function requireElement<T extends Element>(root: ParentNode, selector: string, type: new () => T): T {
@@ -420,7 +419,7 @@ export class Game {
     this.world.step(FIRST_STEP);
     this.#provide('overlay', new Overlay());
 
-    const shouldPreRender = this.quality.level === LOWEST_QUALITY && this.rendering.isWebGPU();
+    const shouldPreRender = this.quality.level === QUALITY.high && this.rendering.isWebGPU();
     if (shouldPreRender) PreRenderer.render();
     this.ticker.wait(REVEAL_DELAY_FRAMES, () => {
       this.reveal.updateStep(0);
