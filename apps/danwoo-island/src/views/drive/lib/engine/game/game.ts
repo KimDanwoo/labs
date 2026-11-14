@@ -1,3 +1,4 @@
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import * as THREE from 'three/webgpu';
 
 import { setStartupStage, STARTUP } from '../islandStartup';
@@ -31,6 +32,7 @@ import { QUALITY, Quality } from './quality';
 import { RayCursor } from './rayCursor';
 import { Rendering } from './rendering';
 import {
+  isModel,
   modelResource,
   type Resources,
   ResourcesLoader,
@@ -337,6 +339,18 @@ export class Game {
 
   get overlay(): Overlay {
     return this.#require('overlay');
+  }
+
+  model(name: string): GLTF {
+    const resource = this.resources[name];
+    if (!resource || !isModel(resource)) throw new Error(`Model ${name} is not loaded`);
+    return resource;
+  }
+
+  texture(name: string): THREE.Texture {
+    const resource = this.resources[name];
+    if (!resource || isModel(resource)) throw new Error(`Texture ${name} is not loaded`);
+    return resource;
   }
 
   async #start(): Promise<void> {

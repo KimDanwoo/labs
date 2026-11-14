@@ -26,6 +26,10 @@ export type LoadedResource = THREE.Texture | GLTF;
 export type Resources = Record<string, LoadedResource>;
 export type LoadProgress = (remaining: number, total: number) => void;
 
+export function isModel(resource: LoadedResource): resource is GLTF {
+  return 'scene' in resource;
+}
+
 const BASIS_TRANSCODER_PATH = './basis/';
 const DRACO_DECODER_PATH = './draco/';
 
