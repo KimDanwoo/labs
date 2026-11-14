@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import MeshGridMaterial, { MeshGridMaterialLine } from '../materials/meshGridMaterial'
 import { float, normalWorld, positionWorld, vec3, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
@@ -10,7 +10,7 @@ export class Grid
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.setVisual()
     }

@@ -1,10 +1,10 @@
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 export class Title
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.interval = 1/60
         this.lastTime = 0

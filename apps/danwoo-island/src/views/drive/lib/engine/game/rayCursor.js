@@ -1,11 +1,11 @@
 import * as THREE from 'three/webgpu'
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 export class RayCursor
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.currentIntersect = null
         this.intersects = []

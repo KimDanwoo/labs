@@ -1,12 +1,12 @@
 import * as THREE from 'three/webgpu'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { screenUV, mul, cos, sin, sign, atan, varying, float, uv, texture, Fn, vec2, vec3, vec4, positionGeometry, viewportSize, attribute } from 'three/tsl'
 
 export class Tracks
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.resolution = 512
         this.size = 40
@@ -71,7 +71,7 @@ export class Track
 {
     constructor(thickness = 1, channel = 'r')
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.subdivisions = 128
 

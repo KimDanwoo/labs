@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { color, uniform, vec2 } from 'three/tsl'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import gsap from 'gsap'
 import { isTideLoading, TIDE_REVEAL } from './world/tideLoading'
 
@@ -8,7 +8,7 @@ export class Reveal
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.step = -1
         const respawn = this.game.respawns.getDefault()

@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Events } from '../../events'
-import { Game } from '../../game'
+import { getGame } from '../../gameContext'
 import { References } from '../../references'
 import { circleIntersectsPolygon } from '../../utilities/maths'
 
@@ -8,7 +8,7 @@ export class Area
 {
     constructor(model)
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.model = model
         this.isIn = false

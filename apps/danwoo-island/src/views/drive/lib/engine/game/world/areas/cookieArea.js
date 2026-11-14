@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { COCONUT_SIZE, makeCoconut, rebuildVillageProps } from '../islandVillage'
 import { rebuildCookieCart } from '../islandStructures'
-import { Game } from '../../game'
+import { getGame } from '../../gameContext'
 import { color, float, Fn, instancedArray, mix, normalWorld, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import { InstancedGroup } from '../../instancedGroup'
 import gsap from 'gsap'

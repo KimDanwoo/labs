@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { rebuildBuildingSite } from '../islandStructures'
-import { Game } from '../../game'
+import { getGame } from '../../gameContext'
 import { PortalSlabsGeometry } from '../../geometries/portalSlabsGeometry'
 import { attribute, color, float, Fn, PI2, positionGeometry, sin, uniform, varying, vec2, vec4 } from 'three/tsl'
 import { Area } from './area'

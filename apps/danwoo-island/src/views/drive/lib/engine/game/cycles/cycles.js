@@ -1,6 +1,6 @@
 import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { lerp, remap, smoothstep } from '../utilities/maths'
 import { Events } from '../events'
 import gsap from 'gsap'
@@ -9,7 +9,7 @@ export class Cycles
 {
     constructor(name = 'Cycles', duration = 10, forcedProgress = null, manual = false)
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.name = name
         this.duration = duration

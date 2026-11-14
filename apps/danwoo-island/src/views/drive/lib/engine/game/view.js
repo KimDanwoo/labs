@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import CameraControls from 'camera-controls'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { clamp, lerp, remap, smoothstep } from './utilities/maths'
 import { mix, uniform, vec4, Fn, positionGeometry, attribute } from 'three/tsl'
 import gsap from 'gsap'
@@ -21,7 +21,7 @@ export class View
 
     constructor(idealRatio = 1920 / 1080)
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.mode = View.MODE_DEFAULT
         this.position = new THREE.Vector3()

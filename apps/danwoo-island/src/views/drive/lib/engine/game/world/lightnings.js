@@ -1,6 +1,6 @@
 import { autoBinding } from '../utilities/autoBinding'
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { attribute, cameraPosition, cameraProjectionMatrix, cameraViewMatrix, color, cross, float, floor, Fn, instancedArray, luminance, min, mix, modelWorldMatrix, mul, positionGeometry, positionWorld, remapClamp, step, uniform, varying, vec3, vec4, vertexIndex } from 'three/tsl'
 import { LineGeometry } from '../geometries/lineGeometry'
 import gsap from 'gsap'
@@ -13,7 +13,7 @@ export class Lightnings
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.frequency = 2
         this.hitChances = 0

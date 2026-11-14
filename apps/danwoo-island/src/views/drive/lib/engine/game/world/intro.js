@@ -1,6 +1,6 @@
 import { STARTUP, setStartupStage } from '../../islandStartup'
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { atan, color, float, Fn, PI, PI2, positionGeometry, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import gsap from 'gsap'
 import { Inputs } from '../inputs/inputs'
@@ -12,7 +12,7 @@ export class Intro
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         const respawn = this.game.respawns.getDefault()
         this.center = respawn.position.clone()

@@ -1,3 +1,4 @@
+import { textureResource } from '../resourcesLoader'
 const ISLAND_TEXTURES = {
     circuitBrand: 'areas/island/circuitBrand.png',
     circuitWebgl: 'areas/island/circuitWebgl.png',
@@ -15,7 +16,7 @@ const resourceName = (materialName) => `island${materialName[0].toUpperCase()}${
 
 export function islandTextureResources(cacheBuster)
 {
-    return Object.entries(ISLAND_TEXTURES).map(([materialName, path]) => [ resourceName(materialName), `${path}${cacheBuster}`, 'texture' ])
+    return Object.entries(ISLAND_TEXTURES).map(([materialName, path]) => textureResource(resourceName(materialName), `${path}${cacheBuster}`, 'texture'))
 }
 
 function matchSampling(texture, original)

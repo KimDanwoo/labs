@@ -1,11 +1,11 @@
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import * as THREE from 'three/webgpu'
 
 export class Physics
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.world = new this.game.RAPIER.World(
             { x: 0.0, y: -9.81, z: 0.0 },

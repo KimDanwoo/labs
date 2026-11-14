@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { Events } from '../events'
 import { lerp, remap, remapClamp, smallestAngle } from '../utilities/maths'
 
@@ -7,7 +7,7 @@ export class PhysicsVehicle
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.events = new Events()
 

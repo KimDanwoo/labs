@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { color, distance, float, Fn, max, min, mix, mul, normalWorld, positionWorld, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import gsap from 'gsap'
 import { Inputs } from './inputs/inputs'
@@ -15,7 +15,7 @@ export class InteractivePoints
 
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.items = []
         this.activeItem = null

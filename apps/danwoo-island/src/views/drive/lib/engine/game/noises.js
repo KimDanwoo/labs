@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 import { If, vec2, vec3, abs, sqrt, vec4, mod, Fn, dot, sin, fract, length, mul, min, float, uv, floor, ceil, smoothstep, int, mix, Loop, texture, viewportCoordinate, viewportUV } from 'three/tsl';
 
@@ -117,7 +117,7 @@ export class Noises
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
         this.quadMesh = new THREE.QuadMesh()
 
 		this.resolution = 128

@@ -1,12 +1,12 @@
 import * as THREE from 'three/webgpu'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { uniform, color, float, Fn, vec4, positionWorld, vec3, mix, max, If, frontFacing } from 'three/tsl'
 
 export class Lighting
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.useDayCycles = true
         this.phi = 0.63

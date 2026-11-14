@@ -1,13 +1,13 @@
 import { uniform } from 'three/tsl'
 import { Events } from './events'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import gsap from 'gsap'
 
 export class Ticker
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.elapsed = 0
         this.delta = 1 / 60

@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
 import { add, cameraProjectionMatrix, cameraViewMatrix, color, cos, float, Fn, instance, instancedArray, instanceIndex, modelWorldMatrix, positionGeometry, positionLocal, positionWorld, remapClamp, sin, uniform, uniformArray, vec3, vec4 } from 'three/tsl'
 import gsap from 'gsap'
@@ -8,7 +8,7 @@ export class Confetti
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.pool = []
         this.poolSize = 4

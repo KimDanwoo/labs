@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { color, float, Fn, materialNormal, min, mix, mul, normalWorld, positionLocal, positionWorld, texture, uniform, uv, vec3, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
 
@@ -7,7 +7,7 @@ export class Floor
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.geometry = this.game.resources.terrainModel.scene.children[0].geometry
         this.subdivision = this.game.terrain.subdivision

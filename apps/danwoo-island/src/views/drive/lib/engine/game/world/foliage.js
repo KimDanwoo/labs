@@ -2,7 +2,7 @@ import { alea } from 'seedrandom'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { float, Fn, instance, mix, normalWorld, positionLocal, rotateUV, screenSize, screenUV, smoothstep, texture, uniform, uv, vec2 } from 'three/tsl'
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
 
 const rng = new alea('foliage')
@@ -11,7 +11,7 @@ export class Foliage
 {
     constructor(references, colorANode, colorBNode, seeThrough = false)
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.references = references
         this.colorANode = colorANode

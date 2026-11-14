@@ -1,11 +1,11 @@
 import { uniform } from 'three/tsl'
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 export class Water
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.surfaceElevation = -0.3
         this.depthElevation = -1.5

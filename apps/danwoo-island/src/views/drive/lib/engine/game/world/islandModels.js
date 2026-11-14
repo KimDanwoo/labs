@@ -1,3 +1,4 @@
+import { modelResource } from '../resourcesLoader'
 import * as THREE from 'three/webgpu'
 
 const ISLAND_MODELS = {
@@ -24,7 +25,7 @@ const resourceName = (key) => `islandModel${key[0].toUpperCase()}${key.slice(1)}
 
 export function islandModelResources(cacheBuster)
 {
-    return Object.entries(ISLAND_MODELS).map(([key, path]) => [resourceName(key), `${path}${cacheBuster}`, 'gltf'])
+    return Object.entries(ISLAND_MODELS).map(([key, path]) => modelResource(resourceName(key), `${path}${cacheBuster}`))
 }
 
 function sourceMesh(materials, key)

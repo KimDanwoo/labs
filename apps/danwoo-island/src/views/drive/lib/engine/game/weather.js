@@ -1,13 +1,13 @@
 import { autoBinding } from './utilities/autoBinding'
 import gsap from 'gsap'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { lerp, remapClamp } from './utilities/maths'
 
 export class Weather
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.properties = []
         this.setOverride()

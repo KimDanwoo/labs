@@ -1,13 +1,13 @@
 import * as THREE from 'three/webgpu'
 import { Events } from './events'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { remapClamp } from './utilities/maths'
 
 export class Explosions
 {
     constructor()
     {
-        this.game = new Game()
+        this.game = getGame()
 
         this.events = new Events()
     }

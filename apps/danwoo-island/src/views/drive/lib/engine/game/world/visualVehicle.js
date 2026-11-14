@@ -1,6 +1,6 @@
 import { createBoxyVehicle } from './boxyVehicle'
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { Track } from '../tracks'
 import { Trails } from '../trails'
 import { remapClamp } from '../utilities/maths'
@@ -13,7 +13,7 @@ export class VisualVehicle
 {
     constructor(model)
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.model = model === this.game.resources.vehicle.scene ? createBoxyVehicle(model) : model
 

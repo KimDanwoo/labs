@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import MeshGridMaterial, { MeshGridMaterialLine } from './materials/meshGridMaterial'
 import { color, Fn, mix, round, smoothstep, texture, uniform, uv, vec2 } from 'three/tsl'
 
@@ -7,7 +7,7 @@ export class Terrain
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.subdivision = 128
         this.size = 192

@@ -1,10 +1,10 @@
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 export class Tabs
 {
     constructor(element)
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
         this.element = element
 
         this.setItems()

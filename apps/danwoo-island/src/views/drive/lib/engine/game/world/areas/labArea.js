@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { rebuildVillageProps } from '../islandVillage'
 import { rebuildLabGate } from '../islandStructures'
-import { Game } from '../../game'
+import { getGame } from '../../gameContext'
 import { InteractivePoints } from '../../interactivePoints'
 import gsap from 'gsap'
 import labData from '../../../data/lab'

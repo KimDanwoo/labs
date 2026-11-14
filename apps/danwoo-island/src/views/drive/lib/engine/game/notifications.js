@@ -1,4 +1,4 @@
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 export class Notifications
 {
@@ -8,7 +8,7 @@ export class Notifications
 
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.element = this.game.domElement.querySelector('.js-notifications')
         this.items = this.element.querySelector('.js-items')

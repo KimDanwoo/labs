@@ -1,11 +1,11 @@
 import * as THREE from 'three/webgpu'
-import { Game } from './game'
+import { getGame } from './gameContext'
 
 export class Respawns
 {
     constructor(defaultName = 'landing')
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
         this.defaultName = defaultName
 
         this.setItems()

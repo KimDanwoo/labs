@@ -1,4 +1,4 @@
-import { Game } from './game'
+import { getGame } from './gameContext'
 import gsap from 'gsap'
 import { remapClamp, smallestAngle } from './utilities/maths'
 import * as THREE from 'three/webgpu'
@@ -12,7 +12,7 @@ export class Player
 
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.state = Player.STATE_DEFAULT
         this.accelerating = 0
@@ -361,7 +361,7 @@ export class Player
         })
     }
 
-    respawn(respawnName = null, callback = null)
+    respawn(respawnName, callback)
     {
         this.game.overlay.show(() =>
         {

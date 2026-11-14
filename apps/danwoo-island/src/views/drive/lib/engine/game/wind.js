@@ -1,13 +1,13 @@
 import { autoBinding } from './utilities/autoBinding'
 import { vec2, Fn, texture, uniform } from 'three/tsl'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { remapClamp } from './utilities/maths'
 
 export class Wind
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.angle = Math.PI * 0.6
         this.direction = uniform(vec2(

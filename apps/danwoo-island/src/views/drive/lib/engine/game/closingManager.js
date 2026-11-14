@@ -1,4 +1,4 @@
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { Inputs } from './inputs/inputs'
 import { Menu } from './menu'
 import { Modals } from './modals'
@@ -10,7 +10,7 @@ export class ClosingManager
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.game.inputs.addActions([
             { name: 'close', categories: [ 'modal', 'menu', 'racing', 'cinematic', 'wandering' ], keys: [ 'Keyboard.Escape', 'Gamepad.cross' ] },

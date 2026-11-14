@@ -1,5 +1,5 @@
 import { Events } from './events'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { Tabs } from './tabs'
 
 export class Modals
@@ -11,7 +11,7 @@ export class Modals
 
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
         this.state = Modals.CLOSED
         this.element = document.querySelector('.js-modals')
         this.current = null

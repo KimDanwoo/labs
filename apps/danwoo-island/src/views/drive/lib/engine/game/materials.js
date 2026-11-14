@@ -1,13 +1,13 @@
 import * as THREE from 'three/webgpu'
 import { positionLocal, varying, uv, max, positionWorld, float, Fn, uniform, color, mix, vec3, vec4, normalWorld, texture, vec2, time, smoothstep, luminance } from 'three/tsl'
-import { Game } from './game'
+import { getGame } from './gameContext'
 import { MeshDefaultMaterial } from './materials/meshDefaultMaterial'
 
 export class Materials
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
         this.list = new Map()
 
         this.setGradient()

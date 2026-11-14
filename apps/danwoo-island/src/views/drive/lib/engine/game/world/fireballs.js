@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../game'
+import { getGame } from '../gameContext'
 import { Fn, mix, positionGeometry, texture, vec3, vec4, normalGeometry, dot, max, min, mul, add, color, luminance, step, uniform, positionWorld } from 'three/tsl'
 import gsap from 'gsap'
 
@@ -7,7 +7,7 @@ export class Fireballs
 {
     constructor()
     {
-        this.game = Game.getInstance()
+        this.game = getGame()
 
         this.geometry = new THREE.SphereGeometry(0.5, 12, 6)
 
