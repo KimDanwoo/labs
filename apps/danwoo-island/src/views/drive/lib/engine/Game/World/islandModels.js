@@ -1,7 +1,6 @@
 import * as THREE from 'three/webgpu'
 
 const ISLAND_MODELS = {
-    hareubang: 'areas/island/models/hareubang.glb',
     haetae: 'areas/island/models/haetae.glb',
     dongjaseok: 'areas/island/models/dongjaseok.glb',
     jindo: 'areas/island/models/jindo.glb',

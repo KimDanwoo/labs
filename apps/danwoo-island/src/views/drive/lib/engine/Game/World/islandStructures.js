@@ -415,17 +415,9 @@ function stonePagoda(parts, { x, y, z })
     parts.add('stone', new THREE.IcosahedronGeometry(0.1, 0), { position: [x, level + 0.32, z] })
 }
 
-function largestCuboid(container)
+export function removeHareubang(model)
 {
-    return container.children
-        .filter((child) => /^cuboid/.test(child.name))
-        .map(cuboidFrame)
-        .sort((a, b) => b.size.x * b.size.y * b.size.z - a.size.x * a.size.y * a.size.z)[0]
-}
-
-export function rebuildHareubang(model, materials)
-{
-    replaceVisual(model, 'refStatuePhysicalDynamic', (container) => islandModelMesh(materials, 'hareubang', largestCuboid(container).matrix))
+    findChild(model, 'refStatuePhysicalDynamic').removeFromParent()
 }
 
 export function rebuildWaterfallPagoda(model, materials)
