@@ -162,7 +162,7 @@ export class Intro
 
         this.text.updateTexture()
         this.game.inputs.gamepad.events.on('typeChange', this.text.updateTexture)
-        this.game.inputs.events.on('modeChange', this.text.updateTexture)
+        this.game.inputs.modeEvents.on('change', this.text.updateTexture)
     }
 
     setSoundButton()
@@ -294,6 +294,6 @@ export class Intro
 
         this.game.ticker.events.off('tick', this.update)
         this.game.inputs.gamepad.events.off('typeChange', this.text.updateTexture)
-        this.game.inputs.events.off('modeChange', this.text.updateTexture)
+        this.game.inputs.modeEvents.off('change', this.text.updateTexture)
     }
 }

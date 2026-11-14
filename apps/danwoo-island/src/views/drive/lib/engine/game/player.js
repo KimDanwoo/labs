@@ -485,7 +485,7 @@ export class Player
         this.game.tracks.focusPoint.set(this.position.x, this.position.z)
 
         this.rotationY = Math.atan2(this.game.physicalVehicle.forward.z, this.game.physicalVehicle.forward.x)
-        this.game.inputs.nipple.setCoordinates(this.position.x, this.position.y, this.position.z, this.rotationY)
+        this.game.inputs.nipple.setCoordinates(this.position, this.rotationY)
 
         if(this.game.physicalVehicle.wheels.justTouchedCount > 1)
         {

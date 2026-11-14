@@ -109,7 +109,7 @@ export class InteractivePoints
             }
         })
 
-        this.game.inputs.events.on('modeChange', () =>
+        this.game.inputs.modeEvents.on('change', () =>
         {
             if(this.game.inputs.mode === Inputs.MODE_GAMEPAD)
             {

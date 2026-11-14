@@ -975,7 +975,7 @@ export class ProjectsArea extends Area
         this.blackBoard.labelsGamepadPlaystation.visible = false
         this.blackBoard.labelsGamepadXbox.visible = false
 
-        this.game.inputs.events.on('modeChange', () =>
+        this.game.inputs.modeEvents.on('change', () =>
         {
             if(this.game.inputs.mode === Inputs.MODE_GAMEPAD)
             {
