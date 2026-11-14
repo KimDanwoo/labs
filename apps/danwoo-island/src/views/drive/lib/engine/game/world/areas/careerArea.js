@@ -139,14 +139,14 @@ export class CareerArea extends Area
     createProfileTexture(name)
     {
         const labels = {
-            careerFreelancer: ['DANWOO KIM', 'FRONTEND ENGINEER'],
+            careerFreelancer: ['김단우', 'FRONTEND ENGINEER'],
             careerHetic: ['PRODUCT', 'STRUCTURE & DATA'],
             careerImmersiveGarden: ['BUILD & SHIP', 'IDEAS INTO PRODUCTS'],
             careerIRLTeacher: ['DANWOO LAB', 'PROJECTS & EXPERIMENTS'],
             careerOnlineTeacher: ['DANSOON', 'DEVELOPMENT JOURNAL'],
             careerUzik: ['MY EXPERIENCE', 'OPEN RESUME'],
         }
-        const lines = labels[name] ?? ['DANWOO KIM', 'OPEN RESUME']
+        const lines = labels[name] ?? ['김단우', 'OPEN RESUME']
         const canvas = document.createElement('canvas')
         canvas.width = 1024
         canvas.height = 256
