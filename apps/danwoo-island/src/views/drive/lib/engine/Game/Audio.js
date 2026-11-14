@@ -175,6 +175,7 @@ export class Audio
             song.sound = new Howl({
                 src: [ worldAsset(song.path) ],
                 pool: 0,
+                html5: true,
                 autoplay: false,
                 loop: false,
                 preload: false,
@@ -222,7 +223,7 @@ export class Audio
                 // Notification
                 const content = createElement('div', 'top', [
                     createElement('div', 'title', [
-                        'Now playing',
+                        '지금 흐르는 곡',
                         document.createElement('br'),
                         createElement('span', 'song-name', [ this.playlist.current.name ]),
                     ]),
