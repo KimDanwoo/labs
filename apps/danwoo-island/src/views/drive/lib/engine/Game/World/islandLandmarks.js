@@ -12,7 +12,7 @@ const SHELL_FOUNTAIN = {
 const PALM_HAMMOCK = {
     key: 'palmHammock',
     size: new THREE.Vector3(3.8, 3.8, 2.4),
-    colliders: [collider([0.35, 3, 0.35], [-0.8, 1.5, 0.16]), collider([0.35, 3, 0.35], [0.8, 1.5, 0.16])],
+    colliders: [collider([0.35, 3, 0.35], [-0.85, 1.5, -0.27]), collider([0.35, 3, 0.35], [0.85, 1.5, -0.27])],
 }
 
 const SURF_CORNER = {
