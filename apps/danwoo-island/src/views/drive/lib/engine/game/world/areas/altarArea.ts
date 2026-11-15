@@ -16,8 +16,9 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
+import { worldAsset } from '../../../../../config/worldAsset';
 import type { AudioItem } from '../../audio';
-import { ISLAND_PLACES } from '../../islandPlaces';
+import { ISLAND_PLACES, type IslandPlace } from '../../islandPlaces';
 import { Player } from '../../player';
 import { createElement } from '../../utilities/createElement';
 import { rebuildSurfPoint } from '../islandStructures';
@@ -29,7 +30,7 @@ const DEBRIS = { count: 140, size: 0.18 } as const;
 const DUST = { radius: 3 } as const;
 const SPIN = { idle: 1, surge: 3.2, surgeIn: 0.4, surgeOut: 2.2 } as const;
 const TRIGGER = { radius: 2, maxHeight: 2.5, cooldown: 2 } as const;
-const LIFT = { upward: 7, spin: 6, carry: 0, duration: 1.2 } as const;
+const LIFT = { upward: 11, spin: 9, carry: 0, duration: 1.6, updraft: 14 } as const;
 const VISIT = { radius: 10, interval: 0.5 } as const;
 const COLORS = { sand: '#e9d7ae', dust: '#c9b28a', mist: '#f7f3ea', leaf: '#7cbf5a' } as const;
 const ORIGIN = 'altar';
@@ -45,8 +46,17 @@ function debrisData(): { seeds: Float32Array; heights: Float32Array } {
   return { seeds, heights };
 }
 
-function arrivalNotice(name: string): HTMLElement {
-  return createElement('div', 'top', [createElement('div', 'title', [`${name}(으)로 날아왔어요`])]);
+function arrivalNotice({ name, icon }: IslandPlace): HTMLElement {
+  const image = createElement('img', 'arrival-icon');
+  image.src = worldAsset(`ui/map/icons/${icon}.webp`);
+  image.alt = '';
+  return createElement('div', 'top', [
+    image,
+    createElement('div', 'arrival-text', [
+      createElement('span', 'arrival-label', ['회오리를 타고 도착했어요']),
+      createElement('strong', 'arrival-name', [name]),
+    ]),
+  ]);
 }
 
 export class AltarArea extends Area {
@@ -235,7 +245,7 @@ export class AltarArea extends Area {
       view.focusPoint.isTracking = true;
       this.#visited.add(place.respawnName);
       this.#endTravel();
-      notifications.show(arrivalNotice(place.name), { duration: NOTICE_DURATION });
+      notifications.show(arrivalNotice(place), { type: 'arrival', duration: NOTICE_DURATION });
     });
     this.#travelSequence = player.respawnSequence;
   }
@@ -261,6 +271,7 @@ export class AltarArea extends Area {
     const { ticker, player, respawns } = this.game;
     this.#swirlTime.value += ticker.deltaScaled * this.#spin.value;
     if (this.#travelSequence !== null && player.respawnSequence !== this.#travelSequence) this.#endTravel();
+    if (this.#liftCall) this.game.physicalVehicle.launch({ upward: LIFT.updraft * ticker.deltaScaled });
     this.#visitTimer -= ticker.delta;
     if (this.#visitTimer > 0) return;
     this.#visitTimer = VISIT.interval;
