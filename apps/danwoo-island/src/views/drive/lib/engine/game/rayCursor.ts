@@ -110,18 +110,28 @@ export class RayCursor {
     if (candidates.length === 0) return;
 
     this.#aimRaycaster();
-    let isAnyIntersecting = false;
+    const hits: Intersect[] = [];
     for (const intersect of candidates) {
       const isIntersecting = isHit(this.#raycaster, intersect.shape);
       if (isIntersecting !== intersect.isIntersecting) this.#setIntersecting(intersect, isIntersecting);
-      if (isIntersecting) isAnyIntersecting = true;
+      if (isIntersecting) hits.push(intersect);
     }
 
+    const isAnyIntersecting = hits.length > 0;
     if (isAnyIntersecting !== this.#isAnyIntersecting) {
       this.#isAnyIntersecting = isAnyIntersecting;
       this.game.canvasElement.style.cursor = isAnyIntersecting ? 'pointer' : '';
     }
-    if (!isAnyIntersecting) this.#current = null;
+    this.#current = this.#nearest(hits);
+  }
+
+  #nearest(hits: readonly Intersect[]): Intersect | null {
+    const { origin } = this.#raycaster.ray;
+    const distanceOf = ({ position }: Intersect): number => position?.distanceTo(origin) ?? Infinity;
+    return hits.reduce<Intersect | null>(
+      (nearest, hit) => (nearest === null || distanceOf(hit) < distanceOf(nearest) ? hit : nearest),
+      null,
+    );
   }
 
   #aimRaycaster(): void {
@@ -140,7 +150,6 @@ export class RayCursor {
       intersect.onLeave?.();
       return;
     }
-    this.#current = intersect;
     intersect.onEnter?.();
   }
 

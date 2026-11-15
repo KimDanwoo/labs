@@ -94,18 +94,21 @@ export class Reveal {
     const center = this.position.clone();
     center.y = 0;
 
-    const intersect = rayCursor.addIntersect({
-      active: true,
-      shape: new THREE.Sphere(center, OPEN_RADIUS),
-      onEnter: () => this.#tweenHover(HOVER_INTENSITY),
-      onLeave: () => this.#tweenHover(1),
-    });
+    const shapes = [new THREE.Sphere(center, OPEN_RADIUS), requireIntro().promptMesh].filter((shape) => shape !== null);
+    const intersects = shapes.map((shape) =>
+      rayCursor.addIntersect({
+        active: true,
+        shape,
+        onEnter: () => this.#tweenHover(HOVER_INTENSITY),
+        onLeave: () => this.#tweenHover(1),
+      }),
+    );
     const proceed = (): void => {
       this.#open();
       inputs.events.off('introStart', proceed);
-      rayCursor.removeIntersect(intersect);
+      for (const intersect of intersects) rayCursor.removeIntersect(intersect);
     };
-    intersect.onClick = proceed;
+    for (const intersect of intersects) intersect.onClick = proceed;
 
     inputs.addActions([{ name: 'introStart', categories: ['intro'], keys: START_KEYS }]);
     inputs.events.on('introStart', proceed);

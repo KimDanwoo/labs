@@ -83,6 +83,10 @@ function drawLabel(text: string, align: PointAlign): LabelArt {
   return { texture: labelTexture, width };
 }
 
+function concealedOffset(align: PointAlign): number {
+  return align === 'left' ? -1 : 1;
+}
+
 function oppositeAlign(align: PointAlign): PointAlign {
   return align === 'left' ? 'right' : 'left';
 }
@@ -190,6 +194,7 @@ export class InteractivePoint {
     const align = Math.abs(ndcX) < CENTER_BIAS_NDC ? this.#defaultAlign : oppositeAlign(awayFromCenter);
     if (align === this.#align || !this.#labelMap) return;
     this.#align = align;
+    this.#labelOffset.value = concealedOffset(align);
     const art = this.#art(this.#options.text ?? '', align);
     this.#labelMap.value = art.texture;
     this.#layoutLabel(this.#label, art);
@@ -269,8 +274,12 @@ export class InteractivePoint {
       this.#setDepthTest(true);
     });
     if (this.#points.isActive(this)) this.#points.shrinkKeyIcon();
-    const hiddenOffset = this.#align === 'left' ? -1 : 1;
-    gsap.to(this.#labelOffset, { value: hiddenOffset, ease: 'power2.in', duration: 0.6, overwrite: true });
+    gsap.to(this.#labelOffset, {
+      value: concealedOffset(this.#align),
+      ease: 'power2.in',
+      duration: 0.6,
+      overwrite: true,
+    });
     this.#shared.sounds.conceal.play();
     this.#options.onConceal?.();
   }

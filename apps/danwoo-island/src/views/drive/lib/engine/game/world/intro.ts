@@ -12,7 +12,7 @@ import { isTideLoading, TIDE_LABEL, tideRingGeometry, tideRingMaterial } from '.
 
 const LABEL_TINT = isTideLoading ? TIDE_LABEL : '#ffffff';
 const LABEL_HEIGHT = 1;
-const LABEL_DISTANCE = 6.6;
+const LABEL_DISTANCE = 6;
 const PROMPT_RENDER_ORDER = 10;
 const LABEL_HIDDEN_SCALE = 0.01;
 const RING = { radius: 3.5, thickness: 0.04, segments: 128, elevation: 0.001, smoothing: 10 } as const;
@@ -23,7 +23,7 @@ const TEXT_ASPECT = 4;
 const TEXT_CANVAS = { width: 1024, height: 256, maxWidth: 980 } as const;
 const PROMPT_FONT = `800 168px ${UI_FONT_FAMILY}`;
 
-const SOUND_BUTTON = { scale: 0.45, aspect: 50 / 38, x: 0, y: -0.75, hitRadius: 0.5, hoverIntensity: 1.5 } as const;
+const SOUND_BUTTON = { scale: 0.45, aspect: 50 / 38, x: 0, y: -0.62, hitRadius: 0.4, hoverIntensity: 1.5 } as const;
 const SOUND_MUTED_OFFSET = 0.5;
 
 function startPrompt(): string {
@@ -213,6 +213,10 @@ export class Intro {
         ring.removeFromParent();
       },
     });
+  }
+
+  get promptMesh(): THREE.Mesh | null {
+    return this.#text?.mesh ?? null;
   }
 
   createLabelContent(): void {
