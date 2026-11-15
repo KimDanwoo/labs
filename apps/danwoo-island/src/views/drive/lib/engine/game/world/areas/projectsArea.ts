@@ -5,6 +5,7 @@ import content from '../../../data/danwoo';
 import type { ProjectContent } from '../../../data/worldContent';
 import type { AudioItem } from '../../audio';
 import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
+import type { Intersect } from '../../rayCursor';
 import { removeAwardsTable } from '../islandReskins';
 import { rebuildProjectsGate } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
@@ -13,7 +14,7 @@ import { type AttributeName, ImagePagination, ProjectAdjacents, ProjectAttribute
 import { BlackBoard } from './showcaseBlackBoard';
 import { ShowcaseImages } from './showcaseImages';
 import { bindShowcaseInputs, ShowcaseSession, type ShowcaseState } from './showcaseSession';
-import { TitleSign, UrlSign } from './showcaseSigns';
+import { TitleSign, UrlSign, urlSignIntersect } from './showcaseSigns';
 import { createHoverMaterials, createShades, type Direction } from './showcaseVisuals';
 
 type ImageLanding = 'first' | 'last';
@@ -50,6 +51,7 @@ export class ProjectsArea extends Area {
   readonly #adjacents: ProjectAdjacents;
   readonly #title: TitleSign;
   readonly #url: UrlSign;
+  readonly #urlIntersect: Intersect;
   readonly #blackBoard: BlackBoard;
   readonly #session: ShowcaseSession;
   readonly #blower: THREE.Object3D;
@@ -94,12 +96,8 @@ export class ProjectsArea extends Area {
       onNext: () => this.#nextProject(),
     });
     this.#title = new TitleSign(require('title'), this.#shades, () => this.#current?.title ?? '');
-    this.#url = new UrlSign({
-      group: require('url'),
-      intersectMesh: require('intersectUrl'),
-      shades: this.#shades,
-      getUrl: () => this.#current?.url ?? '',
-    });
+    this.#url = new UrlSign({ group: require('url'), shades: this.#shades, getUrl: () => this.#current?.url ?? '' });
+    this.#urlIntersect = urlSignIntersect(this.#url, require('intersectUrl'));
     this.#blackBoard = new BlackBoard(require, () => this.#session.isHidden);
     this.#blower = require('blower');
     this.#fireCharcoal(require('charcoal'));
@@ -113,7 +111,7 @@ export class ProjectsArea extends Area {
       setIntersectsActive: (isActive) => {
         this.#pagination.setActive(isActive);
         this.#adjacents.setActive(isActive);
-        this.#url.intersect.active = isActive;
+        this.#urlIntersect.active = isActive;
       },
     });
 

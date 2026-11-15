@@ -18,13 +18,9 @@ function isInRace(): boolean {
 
 function closeOpenArea(): boolean {
   const { areas } = getGame().world;
-  const { projects, lab } = areas ?? {};
+  const { projects } = areas ?? {};
   if (projects?.isShown) {
     projects.close();
-    return true;
-  }
-  if (lab?.isShown) {
-    lab.close();
     return true;
   }
   return false;
