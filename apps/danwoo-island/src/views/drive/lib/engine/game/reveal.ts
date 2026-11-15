@@ -16,6 +16,7 @@ const HOVER_DURATION = 0.2;
 const OPEN_RADIUS = 4.3;
 const FULL_RADIUS = 30;
 const OPEN_DURATION = 1.8;
+const SETTLE_DURATION = 2.6;
 const UNBOUNDED_RADIUS = 99999;
 const INTRO_ZOOM = { start: 0.6, settled: 0.24, portraitSettled: 0.08 } as const;
 const INTRO_SEE_THROUGH = 0.5;
@@ -132,23 +133,12 @@ export class Reveal {
     requireIntro().hideLabel();
     game.inputs.filters.clear();
     game.inputs.filters.add('wandering');
-    const { focusPoint } = game.view;
-    focusPoint.magnet.active = false;
-    gsap.to(focusPoint.position, {
-      x: focusPoint.trackedPosition.x,
-      z: focusPoint.trackedPosition.z,
-      ease: 'power2.inOut',
-      duration: OPEN_DURATION / speed(),
-      overwrite: true,
-      onComplete: () => {
-        focusPoint.isTracking = true;
-      },
-    });
+    game.view.focusPoint.magnet.active = true;
 
     gsap.to(game.view.zoom, {
       baseRatio: 0,
-      ease: 'power2.inOut',
-      duration: OPEN_DURATION / speed(),
+      ease: 'sine.inOut',
+      duration: SETTLE_DURATION / speed(),
       overwrite: true,
       onComplete: () => this.#finish(),
     });
