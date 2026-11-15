@@ -25,11 +25,25 @@ function findParts(visual: THREE.Object3D): { body: THREE.Mesh; leaves: THREE.Me
   return { body, leaves };
 }
 
+export function addTrunkColliders(references: readonly THREE.Object3D[]): void {
+  const game = getGame();
+  for (const tree of references) {
+    game.objects.add(null, {
+      type: 'fixed',
+      position: tree.position.clone().add(new THREE.Vector3(0, TRUNK.halfHeight, 0)),
+      rotation: tree.quaternion,
+      friction: 0.7,
+      sleeping: true,
+      colliders: [{ shape: 'cylinder', parameters: [TRUNK.halfHeight, TRUNK.radius], category: 'object' }],
+      onCollision: (force, position) => game.audio.groups.get('hitDefault')?.playRandomNext(force, position),
+    });
+  }
+}
+
 export class Trees {
   readonly leaves: Foliage;
 
   constructor({ visual, references, colorA, colorB }: TreesOptions) {
-    const game = getGame();
     const parts = findParts(visual);
     this.#addTrunks(parts.body, references);
 
@@ -47,17 +61,7 @@ export class Trees {
       isSeeThrough: true,
     });
 
-    for (const tree of references) {
-      game.objects.add(null, {
-        type: 'fixed',
-        position: tree.position.clone().add(new THREE.Vector3(0, TRUNK.halfHeight, 0)),
-        rotation: tree.quaternion,
-        friction: 0.7,
-        sleeping: true,
-        colliders: [{ shape: 'cylinder', parameters: [TRUNK.halfHeight, TRUNK.radius], category: 'object' }],
-        onCollision: (force, position) => game.audio.groups.get('hitDefault')?.playRandomNext(force, position),
-      });
-    }
+    addTrunkColliders(references);
   }
 
   #addTrunks(body: THREE.Mesh, references: readonly THREE.Object3D[]): void {
