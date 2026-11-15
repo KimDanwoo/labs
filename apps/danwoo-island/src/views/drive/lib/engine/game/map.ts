@@ -7,14 +7,20 @@ import { ISLAND_PLACES, type IslandPlace, type PlaceIcon } from './islandPlaces'
 import type { ModalItem } from './modals';
 import { createElement } from './utilities/createElement';
 import { requireElement } from './utilities/requireElement';
+import type { OverviewFrame, ScreenInsets } from './view/overviewFrame';
 
 const MAP_ACTION = { name: 'map', categories: ['modal', 'menu', 'wandering'], keys: ['Keyboard.m', 'Keyboard.KeyM'] };
-const ISLAND_CENTER = new THREE.Vector3(4, 0, -4);
 const PIN_LIFT = 1.6;
 const FLIGHT = { rise: 1.3, land: 1.5, ease: 'power3.inOut' } as const;
 const TICK_ORDER = 14;
 const HIDDEN_CLASS = 'is-hidden';
 const SELECTED_CLASS = 'is-selected';
+const COMPACT_SCREEN = { width: 720, height: 500 } as const;
+const REFRAME_DURATION = 0.3;
+const FRAME_INSETS = {
+  wide: { top: 130, right: 290, bottom: 75, left: 60 },
+  compact: { top: 130, right: 125, bottom: 75, left: 40 },
+} as const satisfies Record<string, ScreenInsets>;
 
 interface Pin {
   readonly place: IslandPlace;
@@ -65,6 +71,7 @@ export class WorldMap {
     modal.events.on('open', () => this.#rise());
     modal.events.on('close', () => this.#land());
     game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.viewport.events.on('change', () => this.#reframe());
   }
 
   #ensurePins(): void {
@@ -113,10 +120,12 @@ export class WorldMap {
     this.#destination = null;
     this.#card.root.classList.add(HIDDEN_CLASS);
     world.grass?.setVisible(false);
+    const frame = this.#frame();
+    view.overview.radius = frame.radius;
     view.setOverviewWide(true);
     view.focusPoint.isTracking = false;
     view.focusPoint.magnet.active = false;
-    this.#flyFocus(ISLAND_CENTER, FLIGHT.rise);
+    this.#flyFocus(frame.center, FLIGHT.rise);
     gsap.to(view.overview, { amount: 1, duration: FLIGHT.rise, ease: FLIGHT.ease, overwrite: true });
   }
 
@@ -140,6 +149,23 @@ export class WorldMap {
         view.focusPoint.magnet.active = true;
       },
     });
+  }
+
+  #frame(): OverviewFrame {
+    const { view, viewport } = getGame();
+    const isCompact = viewport.width <= COMPACT_SCREEN.width || viewport.height <= COMPACT_SCREEN.height;
+    const insets = isCompact ? FRAME_INSETS.compact : FRAME_INSETS.wide;
+    return view.frameOverview(
+      this.#pins.map(({ anchor }) => anchor),
+      insets,
+    );
+  }
+
+  #reframe(): void {
+    if (!this.#modal.isOpen || this.#destination) return;
+    const frame = this.#frame();
+    this.#flyFocus(frame.center, REFRAME_DURATION);
+    gsap.to(getGame().view.overview, { radius: frame.radius, duration: REFRAME_DURATION, overwrite: 'auto' });
   }
 
   #flyFocus(target: THREE.Vector3, duration: number): void {

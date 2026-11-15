@@ -1086,6 +1086,7 @@ html.is-started .map-trigger {
   display: block;
 }
 html.input-filter-menu .map-trigger,
+html.input-filter-modal .map-trigger,
 html.input-filter-cinematic .map-trigger,
 html.input-filter-intro .map-trigger {
   pointer-events: none;
@@ -1952,6 +1953,11 @@ html:not(.is-mode-touch) .map-trigger:hover .button-inner {
 .menu-trigger .button-inner .icon-container,
 .map-trigger .button-inner .icon-container {
   inset: 0;
+}
+html:is(.input-filter-menu, .input-filter-modal, .input-filter-intro, .input-filter-cinematic)
+  :is(.menu-trigger, .map-trigger)
+  .button-inner {
+  transform: translate(calc(100% + 16px));
 }
 .menu-trigger .menu-icon,
 .map-trigger .map-icon {
