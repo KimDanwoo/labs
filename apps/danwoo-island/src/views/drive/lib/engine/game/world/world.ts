@@ -14,6 +14,7 @@ import { Grid } from './grid';
 import { Intro } from './intro';
 import { Lanterns } from './lanterns';
 import { Lightnings } from './lightnings';
+import { PalmTrees } from './palmTrees';
 import { PoleLights } from './poleLights';
 import { RainLines } from './rainLines';
 import { Scenery } from './scenery';
@@ -31,7 +32,6 @@ interface TreeSpecies {
 
 const BIRCH: TreeSpecies = { model: 'birchTrees', colorA: '#4F9B65', colorB: '#A8D878' };
 const OAK: TreeSpecies = { model: 'oakTrees', colorA: '#287A59', colorB: '#70BA69' };
-const CHERRY: TreeSpecies = { model: 'cherryTrees', colorA: '#EC879D', colorB: '#FFD1CB' };
 
 function plantTrees({ model, colorA, colorB }: TreeSpecies): Trees {
   const game = getGame();
@@ -57,7 +57,7 @@ export class World {
   bushes: Bushes | null = null;
   birchTrees: Trees | null = null;
   oakTrees: Trees | null = null;
-  cherryTrees: Trees | null = null;
+  palmTrees: PalmTrees | null = null;
   flowers: Flowers | null = null;
   bricks: Bricks | null = null;
   fences: Fences | null = null;
@@ -82,7 +82,7 @@ export class World {
     this.bushes = new Bushes();
     this.birchTrees = plantTrees(BIRCH);
     this.oakTrees = plantTrees(OAK);
-    this.cherryTrees = plantTrees(CHERRY);
+    this.palmTrees = new PalmTrees(getGame().model('cherryTreesReferencesModel').scene.children);
     this.flowers = new Flowers();
     this.bricks = new Bricks();
     this.fences = new Fences();
