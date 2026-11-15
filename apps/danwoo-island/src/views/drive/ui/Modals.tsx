@@ -15,12 +15,26 @@ export function Modals() {
           </div>
         </div>
       </div>
+      <div className="js-modal modal blog" data-name="blog">
+        <div className="panel-card">
+          <header className="panel-header">
+            <img className="panel-logo" src={worldAsset('ui/islandMark.png')} alt="" aria-hidden="true" />
+            <h2 className="panel-title">최신 글 게시판</h2>
+            <span className="panel-badge">BLOG</span>
+            <CloseButton />
+          </header>
+          <ul className="js-blog-posts blog-posts" />
+          <a className="blog-all" href="https://danwoo.dev/" target="_blank" rel="noopener noreferrer">
+            블로그 전체 보기
+          </a>
+        </div>
+      </div>
       <div className="js-modal modal map" data-name="map">
-        <div className="map-card">
-          <header className="map-header">
-            <img className="map-logo" src={worldAsset('ui/islandMark.png')} alt="" aria-hidden="true" />
-            <h2 className="map-title">Danwoo Island</h2>
-            <span className="map-badge">MAP</span>
+        <div className="panel-card">
+          <header className="panel-header">
+            <img className="panel-logo" src={worldAsset('ui/islandMark.png')} alt="" aria-hidden="true" />
+            <h2 className="panel-title">Danwoo Island</h2>
+            <span className="panel-badge">MAP</span>
             <CloseButton />
           </header>
           <div className="map-body">
@@ -34,7 +48,7 @@ export function Modals() {
               <ul className="js-map-places map-places-list" />
             </nav>
           </div>
-          <p className="map-hint">장소를 누르면 그곳으로 이동해요 · M 키로 열고 닫기</p>
+          <p className="panel-hint">장소를 누르면 그곳으로 이동해요 · M 키로 열고 닫기</p>
         </div>
       </div>
     </div>

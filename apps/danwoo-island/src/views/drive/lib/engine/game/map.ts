@@ -14,7 +14,7 @@ type MapIcon =
   | 'bowling'
   | 'cookie'
   | 'surf'
-  | 'construction'
+  | 'blog'
   | 'portal'
   | 'start';
 
@@ -39,7 +39,7 @@ const LOCATIONS: readonly MapLocation[] = [
   { name: '볼링장', respawnName: 'bowling', icon: 'bowling', offset: { x: -0.08, y: 0.03 } },
   { name: '코코넛 노점', respawnName: 'cookie', icon: 'cookie', offset: { x: -0.02, y: -0.01 } },
   { name: '서핑 포인트', respawnName: 'altar', icon: 'surf', offset: { x: 0, y: -0.05 } },
-  { name: '공사장', respawnName: 'behindTheScene', icon: 'construction', offset: { x: 0.01, y: 0 } },
+  { name: '최신 글 게시판', respawnName: 'behindTheScene', icon: 'blog', offset: { x: 0.01, y: 0 } },
   { name: 'Lab 포털', respawnName: 'timeMachine', icon: 'portal', offset: { x: 0, y: 0 } },
   { name: '출발점', respawnName: 'beachStart', icon: 'start', offset: { x: 0, y: 0 } },
 ];

@@ -1,42 +1,31 @@
 import gsap from 'gsap';
-import {
-  color,
-  float,
-  Fn,
-  instancedArray,
-  instanceIndex,
-  min,
-  mix,
-  smoothstep,
-  step,
-  texture,
-  uniform,
-  uv,
-  varying,
-  vec2,
-  vec3,
-  vec4,
-} from 'three/tsl';
+import { color, Fn, instancedArray, mix, smoothstep, step, texture, uniform, uv, vec2, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import type { AudioItem } from '../../audio';
-import { rebuildSeonangdang } from '../islandStructures';
+import { rebuildSurfPoint } from '../islandStructures';
 import { Area } from './area';
 
-const BEAM = { radius: 2.5, height: 6, segments: 32, attenuation: 2 } as const;
-const PARTICLES = { count: 150, size: 0.2, maxRadius: 5, duration: 3 } as const;
-const GLYPHS = { count: 40, columns: 32, maxElevation: 5, maxRadius: 8, scale: 0.2, renderOrder: 3 } as const;
-const DEATH_ZONE = { depth: 1.25, radius: 2.5, secondBellDelay: 2.2 } as const;
-const STAR_SCALE = 1.7;
-const GLOW_BOUNDS = { centerY: 2, radius: 5, delayFrames: 2 } as const;
+const COLUMN = {
+  radius: 2.5,
+  height: 6,
+  segments: 32,
+  restLevel: 2.2,
+  surgeDuration: 0.35,
+  settleDuration: 2.4,
+} as const;
+const SPRAY = { count: 150, size: 0.22, maxRadius: 5, duration: 2.2 } as const;
+const POOL = { radius: 2.5, triggerRadius: 2 } as const;
+const LAUNCH = { upward: 9, forward: 4, cooldown: 1.5 } as const;
+const WATER = { deep: '#0f6f8c', sea: '#2fc6d4', foam: '#f4fbff', glow: 1.6 } as const;
 
-function particleData(): { positions: Float32Array; scales: Float32Array; randoms: Float32Array } {
-  const positions = new Float32Array(PARTICLES.count * 3);
-  const scales = new Float32Array(PARTICLES.count);
-  const randoms = new Float32Array(PARTICLES.count);
-  for (let index = 0; index < PARTICLES.count; index += 1) {
+function sprayData(): { positions: Float32Array; scales: Float32Array; randoms: Float32Array } {
+  const positions = new Float32Array(SPRAY.count * 3);
+  const scales = new Float32Array(SPRAY.count);
+  const randoms = new Float32Array(SPRAY.count);
+  for (let index = 0; index < SPRAY.count; index += 1) {
     const spherical = new THREE.Spherical(
-      (1 - (1 - Math.random()) ** 2) * PARTICLES.maxRadius,
+      (1 - (1 - Math.random()) ** 2) * SPRAY.maxRadius,
       Math.random() * Math.PI * 0.4,
       Math.random() * Math.PI * 2,
     );
@@ -47,64 +36,40 @@ function particleData(): { positions: Float32Array; scales: Float32Array; random
   return { positions, scales, randoms };
 }
 
-function glyphData(): { positions: Float32Array; speeds: Float32Array } {
-  const positions = new Float32Array(GLYPHS.count * 3);
-  const speeds = new Float32Array(GLYPHS.count);
-  for (let index = 0; index < GLYPHS.count; index += 1) {
-    const angle = Math.PI * 2 * Math.random();
-    const elevation = Math.random() * GLYPHS.maxElevation;
-    const radius = Math.random() * GLYPHS.maxRadius;
-    positions.set([Math.sin(angle) * radius, elevation, Math.cos(angle) * radius], index * 3);
-    speeds[index] = 0.2 + Math.random() * 0.8;
-  }
-  return { positions, speeds };
-}
-
 export class AltarArea extends Area {
   readonly #position: THREE.Vector3;
-  readonly #color = uniform(color('#ffb347'));
-  readonly #emissive = uniform(8);
-  readonly #glyphProgress = uniform(0);
-  readonly #beamAttenuation = uniform(BEAM.attenuation);
-  readonly #particleProgress = uniform(0);
-  readonly #bells: { first: AudioItem; second: AudioItem };
+  readonly #sea = uniform(color(WATER.sea));
+  readonly #deep = uniform(color(WATER.deep));
+  readonly #foam = uniform(color(WATER.foam));
+  readonly #glow = uniform(WATER.glow);
+  readonly #columnLevel = uniform(COLUMN.restLevel);
+  readonly #sprayProgress = uniform(0);
+  readonly #swoosh: AudioItem;
+  #lastLaunch = -Infinity;
 
   constructor(model: THREE.Object3D) {
     super(model);
-    const altar = this.requireReference('altar');
-    this.#position = altar.position.clone();
+    const pool = this.requireReference('altar');
+    this.#position = pool.position.clone();
     const { audio } = this.game;
     audio.register({
-      path: 'sounds/magic/Ghostly Whisper Background Loop 9.mp3',
+      path: 'sounds/waves/lake-waves.mp3',
       autoplay: true,
       loop: true,
-      volume: 0.15,
-      positions: altar.position,
+      volume: 0.25,
+      positions: pool.position,
       distanceFade: 20,
     });
-    this.#bells = {
-      first: audio.register({ path: 'sounds/bell/Death Hit.mp3', autoplay: false, loop: false, volume: 0.4 }),
-      second: audio.register({
-        path: 'sounds/bell/Epic Bell Impact Hit.mp3',
-        autoplay: false,
-        loop: false,
-        volume: 0.4,
-      }),
-    };
-    this.#createBeam();
-    this.#createBeamParticles();
-    this.#createGlyphs();
-    this.#createDeathZone();
+    this.#swoosh = audio.register({ path: 'sounds/swoosh/Swoosh 05.mp3', autoplay: false, loop: false, volume: 0.5 });
+    this.#createColumn();
+    this.#createPoolSurface();
+    this.#createSpray();
+    this.#createLaunchZone();
   }
 
   override setObjects(): void {
-    rebuildSeonangdang(this.model);
+    rebuildSurfPoint(this.model);
     super.setObjects();
-  }
-
-  #gooColor(): THREE.Node<'vec3'> {
-    const { fog } = this.game;
-    return fog.strength.mix(vec3(0), fog.color);
   }
 
   #addHideable(mesh: THREE.Mesh): void {
@@ -112,142 +77,104 @@ export class AltarArea extends Area {
     this.objects.hideable.push(mesh);
   }
 
-  #createBeam(): void {
+  #createColumn(): void {
     const { ticker, noises } = this.game;
-    const cylinderGeometry = new THREE.CylinderGeometry(BEAM.radius, BEAM.radius, BEAM.height, BEAM.segments, 1, true);
-    cylinderGeometry.translate(0, BEAM.height * 0.5, 0);
-    const cylinderMaterial = new THREE.MeshBasicNodeMaterial({ side: THREE.DoubleSide });
-    cylinderMaterial.outputNode = Fn(() => {
+    const geometry = new THREE.CylinderGeometry(COLUMN.radius, COLUMN.radius, COLUMN.height, COLUMN.segments, 1, true);
+    geometry.translate(0, COLUMN.height * 0.5, 0);
+    const material = new THREE.MeshBasicNodeMaterial({ side: THREE.DoubleSide, transparent: true });
+    material.outputNode = Fn(() => {
       const baseUv = uv();
       const noiseUv = vec2(
-        baseUv.x.mul(6).add(baseUv.y.mul(-2)),
-        baseUv.y.mul(1).sub(ticker.elapsedScaledUniform.mul(0.2)),
+        baseUv.x.mul(5).add(baseUv.y.mul(-1.5)),
+        baseUv.y.mul(0.8).sub(ticker.elapsedScaledUniform.mul(0.35)),
       );
       const noise = texture(noises.perlin, noiseUv).r;
-      noise.addAssign(baseUv.y.mul(this.#beamAttenuation.add(1)));
-      const finalColor = mix(this.#color.mul(this.#emissive), this.#gooColor(), step(0.65, noise));
-      noise.greaterThan(1).discard();
-      return vec4(finalColor, 1);
+      const height = noise.add(baseUv.y.mul(this.#columnLevel.add(1)));
+      height.greaterThan(1).discard();
+      const foam = step(0.78, height);
+      const water = mix(this.#deep, this.#sea, baseUv.y.oneMinus()).mul(this.#glow);
+      return vec4(mix(water, this.#foam, foam), height.oneMinus().mul(2).clamp(0.35, 0.9));
     })();
-    const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-    cylinder.position.copy(this.#position);
-    this.#addHideable(cylinder);
-
-    const star = this.game.texture('satanStarTexture');
-    star.minFilter = THREE.NearestFilter;
-    star.magFilter = THREE.NearestFilter;
-    star.generateMipmaps = false;
-    const bottomMaterial = new THREE.MeshBasicNodeMaterial({ transparent: true });
-    bottomMaterial.outputNode = Fn(() => {
-      const starUv = uv().sub(0.5).mul(STAR_SCALE).add(0.5);
-      starUv.y.assign(starUv.y.oneMinus());
-      const starMask = texture(star, starUv).r;
-      return vec4(mix(this.#gooColor(), this.#color.mul(this.#emissive), starMask), 1);
-    })();
-    const bottom = new THREE.Mesh(new THREE.PlaneGeometry(BEAM.radius * 2, BEAM.radius * 2, 1, 1), bottomMaterial);
-    bottom.position.copy(this.#position);
-    bottom.rotation.x = -Math.PI * 0.5;
-    this.#addHideable(bottom);
+    const column = new THREE.Mesh(geometry, material);
+    column.position.copy(this.#position);
+    this.#addHideable(column);
   }
 
-  #animateBeam(): void {
-    gsap.to(this.#beamAttenuation, {
-      value: 0,
-      ease: 'power2.out',
-      duration: 0.4,
-      onComplete: () => {
-        gsap.to(this.#beamAttenuation, { value: BEAM.attenuation, ease: 'power2.in', duration: 3 });
-      },
-    });
+  #createPoolSurface(): void {
+    const { ticker, noises } = this.game;
+    const material = new THREE.MeshBasicNodeMaterial();
+    material.outputNode = Fn(() => {
+      const centered = uv().sub(0.5);
+      const radius = centered.length().mul(2);
+      radius.greaterThan(1).discard();
+      const angle = centered.y.atan(centered.x);
+      const swirlUv = vec2(
+        angle
+          .div(Math.PI * 2)
+          .add(radius.mul(0.6))
+          .add(ticker.elapsedScaledUniform.mul(0.08)),
+        radius.mul(1.5),
+      );
+      const ripple = texture(noises.perlin, swirlUv).r;
+      const water = mix(this.#sea, this.#deep, radius.add(ripple.mul(0.35)).clamp(0, 1));
+      const rim = smoothstep(0.82, 0.98, radius).add(step(0.62, ripple).mul(0.5)).clamp(0, 1);
+      return vec4(mix(water, this.#foam, rim), 1);
+    })();
+    const surface = new THREE.Mesh(new THREE.PlaneGeometry(POOL.radius * 2, POOL.radius * 2, 1, 1), material);
+    surface.position.copy(this.#position);
+    surface.rotation.x = -Math.PI * 0.5;
+    this.#addHideable(surface);
   }
 
-  #createBeamParticles(): void {
-    const { positions, scales, randoms } = particleData();
+  #createSpray(): void {
+    const { positions, scales, randoms } = sprayData();
     const position = instancedArray(positions, 'vec3').toAttribute();
     const scale = instancedArray(scales, 'float').toAttribute();
     const random = instancedArray(randoms, 'float').toAttribute();
-    const progress = this.#particleProgress;
+    const progress = this.#sprayProgress;
 
     const material = new THREE.SpriteNodeMaterial();
     material.outputNode = Fn(() => {
       const distanceToCenter = uv().sub(0.5).length();
-      const finalColor = mix(this.#gooColor(), this.#color.mul(this.#emissive), step(distanceToCenter, 0.35));
       distanceToCenter.greaterThan(0.5).discard();
-      return vec4(finalColor, 1);
+      return vec4(mix(this.#sea, this.#foam, step(distanceToCenter, 0.3)), 1);
     })();
     material.positionNode = Fn(() => {
-      const localProgress = progress.remapClamp(0, 0.5, 1, 0).pow(6).oneMinus();
+      const spread = progress.remapClamp(0, 0.5, 1, 0).pow(6).oneMinus();
       const finalPosition = position.toVar();
-      finalPosition.mulAssign(localProgress);
-      finalPosition.y.addAssign(progress.mul(random));
+      finalPosition.mulAssign(spread);
+      finalPosition.y.addAssign(progress.mul(random).mul(2));
       return finalPosition;
     })();
     material.scaleNode = Fn(() => smoothstep(1, 0.3, progress).mul(scale))();
 
-    const particles = new THREE.Mesh(new THREE.PlaneGeometry(PARTICLES.size, PARTICLES.size), material);
-    particles.count = PARTICLES.count;
-    particles.position.copy(this.#position);
-    particles.position.y -= 0.1;
-    this.#addHideable(particles);
+    const spray = new THREE.Mesh(new THREE.PlaneGeometry(SPRAY.size, SPRAY.size), material);
+    spray.count = SPRAY.count;
+    spray.position.copy(this.#position);
+    this.#addHideable(spray);
   }
 
-  #createGlyphs(): void {
-    const { ticker, materials } = this.game;
-    const { positions, speeds } = glyphData();
-    const positionAttribute = instancedArray(positions, 'vec3').toAttribute();
-    const speedAttribute = instancedArray(speeds, 'float').toAttribute();
-    const glyphs = this.game.texture('achievementsGlyphsTexture');
-    const blueGlow = materials.emissiveOutput('emissiveBlueRadialGradient');
-    const orangeGlow = materials.emissiveOutput('emissiveOrangeRadialGradient');
-
-    const material = new THREE.SpriteNodeMaterial({ transparent: true });
-    const progress = varying(float(0));
-    material.positionNode = Fn(() => {
-      progress.assign(ticker.elapsedScaledUniform.mul(0.05).add(float(instanceIndex).div(GLYPHS.count)).fract());
-      const newPosition = positionAttribute.toVar();
-      newPosition.y.addAssign(progress.mul(speedAttribute));
-      return newPosition;
-    })();
-    material.scaleNode = Fn(() =>
-      min(progress.remapClamp(0, 0.1, 0, 1), progress.remapClamp(0.7, 0.8, 1, 0), 1).mul(GLYPHS.scale),
-    )();
-    material.outputNode = Fn(() => {
-      const glyphUv = uv().toVar();
-      glyphUv.x.addAssign(instanceIndex);
-      glyphUv.x.divAssign(GLYPHS.columns);
-      texture(glyphs, glyphUv).r.lessThan(0.5).discard();
-      return mix(orangeGlow, blueGlow, float(instanceIndex).div(GLYPHS.count).step(this.#glyphProgress));
-    })();
-
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
-    mesh.renderOrder = GLYPHS.renderOrder;
-    mesh.position.set(this.#position.x, 0, this.#position.z);
-    mesh.count = GLYPHS.count;
-    this.#addHideable(mesh);
-
-    let needsBounds = true;
-    this.events.on('frustumIn', () => {
-      if (!needsBounds) return;
-      needsBounds = false;
-      this.game.ticker.wait(GLOW_BOUNDS.delayFrames, () => {
-        const bounds = mesh.geometry.boundingSphere;
-        if (!bounds) return;
-        bounds.center.y = GLOW_BOUNDS.centerY;
-        bounds.radius = GLOW_BOUNDS.radius;
-      });
+  #surge(): void {
+    gsap.to(this.#columnLevel, {
+      value: 0,
+      ease: 'power2.out',
+      duration: COLUMN.surgeDuration,
+      onComplete: () => {
+        gsap.to(this.#columnLevel, { value: COLUMN.restLevel, ease: 'power2.in', duration: COLUMN.settleDuration });
+      },
     });
+    gsap.fromTo(this.#sprayProgress, { value: 0 }, { value: 1, ease: 'linear', duration: SPRAY.duration });
   }
 
-  #createDeathZone(): void {
-    const position = this.#position.clone();
-    position.y -= DEATH_ZONE.depth;
-    const zone = this.game.zones.create('sphere', position, DEATH_ZONE.radius);
+  #createLaunchZone(): void {
+    const zone = this.game.zones.create('cylinder', this.#position.clone(), POOL.triggerRadius);
     zone.events.on('enter', () => {
-      this.#animateBeam();
-      gsap.fromTo(this.#particleProgress, { value: 0 }, { value: 1, ease: 'linear', duration: PARTICLES.duration });
-      this.game.player.die();
-      this.#bells.second.play();
-      gsap.delayedCall(DEATH_ZONE.secondBellDelay, () => this.#bells.first.play());
+      const now = this.game.ticker.elapsed;
+      if (now - this.#lastLaunch < LAUNCH.cooldown) return;
+      this.#lastLaunch = now;
+      this.game.physicalVehicle.launch({ upward: LAUNCH.upward, forward: LAUNCH.forward });
+      this.#surge();
+      this.#swoosh.play();
     });
   }
 }

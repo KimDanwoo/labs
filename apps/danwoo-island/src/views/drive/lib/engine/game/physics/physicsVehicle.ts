@@ -282,6 +282,16 @@ export class PhysicsVehicle {
     this.position.set(position.x, position.y, position.z);
   }
 
+  launch({ upward, forward }: { upward: number; forward: number }): void {
+    const { body } = this.chassis.physical;
+    const { mass } = this.chassis;
+    const heading = new THREE.Vector3(this.forward.x, 0, this.forward.z).normalize();
+    const impulse = UP.clone()
+      .multiplyScalar(upward * mass)
+      .addScaledVector(heading, forward * mass);
+    body.applyImpulse(impulse, true);
+  }
+
   activate(): void {
     const { body } = this.chassis.physical;
     body.setLinvel({ x: 0, y: 0, z: 0 }, false);

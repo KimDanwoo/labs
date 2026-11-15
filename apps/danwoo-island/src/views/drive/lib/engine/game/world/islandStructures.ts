@@ -5,7 +5,7 @@ import { MeshDefaultMaterial, revealNode } from '../materials/meshDefaultMateria
 import { createParts, FULL_TURN, type PartName, type Parts, seededRandom, type Triple } from './islandGeometry';
 import { islandModelMesh } from './islandModels';
 
-interface Frame {
+export interface Frame {
   readonly size: THREE.Vector3;
   readonly matrix: THREE.Matrix4;
 }
@@ -25,7 +25,6 @@ interface Pillar {
   readonly radius?: number;
 }
 
-const BUNTING: readonly PartName[] = ['bunting1', 'bunting2', 'bunting3', 'bunting4', 'bunting5'];
 const UNIT_SCALE = new THREE.Vector3(1, 1, 1);
 const CUBOID = /^cuboid/;
 const COLLIDER_NAME = /^(cuboid|hull|trimesh|tube|ball)/i;
@@ -134,45 +133,35 @@ export function rebuildLabGate(model: THREE.Object3D): void {
   });
 }
 
-const MAP_ASPECT = 1.5;
-const GUIDE_BOARD = { mapWidth: 0.68, mapHeight: 0.43, mapY: -0.01, mapFront: 0.11 } as const;
+const SCREEN_ASPECT = 1.5;
+const GUIDE_BOARD = { screenWidth: 0.68, screenHeight: 0.43, screenY: -0.01, screenFront: 0.11 } as const;
 
-function guideMap(
-  board: Frame,
-  mapTexture: THREE.Texture,
-  { width, height, y, z }: { width: number; height: number; y: number; z: number },
-): THREE.Mesh {
-  const geometry = new THREE.PlaneGeometry(width, height);
-  geometry.translate(0, y, z);
+function boardScreen(board: Frame, screen: THREE.Texture): THREE.Mesh {
+  const { x: boardWidth, y: boardHeight } = board.size;
+  const width = Math.min(GUIDE_BOARD.screenWidth * boardWidth, GUIDE_BOARD.screenHeight * boardHeight * SCREEN_ASPECT);
+  const geometry = new THREE.PlaneGeometry(width, width / SCREEN_ASPECT);
+  geometry.translate(0, GUIDE_BOARD.screenY * boardHeight, GUIDE_BOARD.screenFront);
   geometry.applyMatrix4(board.matrix);
   const material = new MeshDefaultMaterial({
-    colorNode: texture(mapTexture).rgb,
+    colorNode: texture(screen).rgb,
     hasCoreShadows: false,
     hasDropShadows: false,
   });
   material.userData.prevent = true;
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.name = 'guideMap';
+  mesh.name = 'boardScreen';
   mesh.receiveShadow = true;
   return mesh;
 }
 
+export function noticeBoard(board: Frame, screen: THREE.Texture): THREE.Group {
+  return new THREE.Group().add(islandModelMesh('guideBoard', board.matrix, board.size), boardScreen(board, screen));
+}
+
 export function rebuildKiosk(model: THREE.Object3D, mapTexture: THREE.Texture): void {
-  replaceVisual(model, 'physicalFixed009', (container) => {
-    const board = cuboidFrame(findChild(container, 'cuboid018'));
-    const { x: width, y: height } = board.size;
-    const group = new THREE.Group().add(islandModelMesh('guideBoard', board.matrix, board.size));
-    const mapWidth = Math.min(GUIDE_BOARD.mapWidth * width, GUIDE_BOARD.mapHeight * height * MAP_ASPECT);
-    group.add(
-      guideMap(board, mapTexture, {
-        width: mapWidth,
-        height: mapWidth / MAP_ASPECT,
-        y: GUIDE_BOARD.mapY * height,
-        z: GUIDE_BOARD.mapFront,
-      }),
-    );
-    return group;
-  });
+  replaceVisual(model, 'physicalFixed009', (container) =>
+    noticeBoard(cuboidFrame(findChild(container, 'cuboid018')), mapTexture),
+  );
 }
 
 const SNACK_SHACK = {
@@ -249,79 +238,37 @@ export function rebuildBridge(bridge: THREE.Object3D): void {
   replacement.add(parts.build());
 }
 
-function cairn(parts: Parts, random: () => number, { size, matrix }: Frame): void {
-  const layers = Math.max(3, Math.round(size.y / 0.7));
-  let y = -size.y / 2;
-  for (let index = 0; index < layers; index += 1) {
-    const shrink = 1 - (index / layers) * 0.65;
-    const height = (size.y / layers) * (0.9 + random() * 0.2);
-    parts.add(index % 2 === 0 ? 'stone' : 'stoneDark', new THREE.IcosahedronGeometry(1, 0), {
-      position: [(random() - 0.5) * 0.12, y + height / 2, (random() - 0.5) * 0.12],
-      rotation: [0, random() * FULL_TURN, 0],
-      scale: [(size.x / 2) * shrink, height / 2, (size.z / 2) * shrink],
-      matrix,
-    });
-    y += height;
-  }
-}
-
-function geumjul(parts: Parts, random: () => number, points: readonly THREE.Vector3[]): void {
-  for (const [index, start] of points.slice(0, -1).entries()) {
-    const end = points[index + 1];
-    if (!end) continue;
-    const middle = start
-      .clone()
-      .lerp(end, 0.5)
-      .add(new THREE.Vector3(0, -0.6, 0));
-    for (const [from, to] of [
-      [start, middle],
-      [middle, end],
-    ] as const) {
-      parts.rod('thatchRope', 0.05, from.toArray(), to.toArray(), 5);
-      const strips = Math.round(from.distanceTo(to) / 0.45);
-      for (let strip = 1; strip < strips; strip += 1) {
-        const anchor = from.clone().lerp(to, strip / strips);
-        const color = BUNTING[Math.floor(random() * BUNTING.length)] ?? 'bunting1';
-        parts.box(color, [0.16, 0.55, 0.03], {
-          position: [anchor.x, anchor.y - 0.3, anchor.z],
-          rotation: [0, random() * FULL_TURN, 0],
-        });
-      }
-    }
-  }
-}
-
 const SURFBOARD_PROPORTION = { width: 0.27, depth: 0.15 } as const;
 
 function surfboardSize(height: number): THREE.Vector3 {
   return new THREE.Vector3(height * SURFBOARD_PROPORTION.width, height, height * SURFBOARD_PROPORTION.depth);
 }
 
-export function rebuildSeonangdang(model: THREE.Object3D): void {
+const SURF_FLAG_PROPORTION = { width: 0.375, depth: 0.125 } as const;
+
+function surfFlagSize(height: number): THREE.Vector3 {
+  return new THREE.Vector3(height * SURF_FLAG_PROPORTION.width, height, height * SURF_FLAG_PROPORTION.depth);
+}
+
+export function rebuildSurfPoint(model: THREE.Object3D): void {
   findChild(model, 'Cube173').removeFromParent();
   findChild(model, 'refSkullEyes5').removeFromParent();
   const container = findChild(model, 'physicalFixed005');
-  const random = seededRandom(23);
   const parts = createParts();
   const ground = requireMesh(findChildMatching(container, /^trimesh/));
-  const groundGeometry = ground.geometry.clone();
   ground.updateMatrix();
-  parts.add('earth', groundGeometry, { matrix: ground.matrix });
+  parts.add('sand', ground.geometry.clone(), { matrix: ground.matrix });
   const pillars = container.children
     .filter((child) => CUBOID.test(child.name))
     .map(cuboidFrame)
     .sort((a, b) => b.size.y - a.size.y);
-  const tall = pillars.slice(0, 3);
-  for (const frame of tall) cairn(parts, random, frame);
-  const figures = pillars
+  const flags = pillars
+    .slice(0, 3)
+    .map(({ size, matrix }) => islandModelMesh('surfFlag', matrix, surfFlagSize(size.y)));
+  const boards = pillars
     .slice(3)
     .map(({ size, matrix }) => islandModelMesh('surfboardStand', matrix, surfboardSize(size.y)));
-  const ropePoints = tall.map((frame) =>
-    new THREE.Vector3().setFromMatrixPosition(frame.matrix).add(new THREE.Vector3(0, frame.size.y * 0.32, 0)),
-  );
-  ropePoints.sort((a, b) => Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x));
-  geumjul(parts, random, ropePoints);
-  container.add(parts.build(), ...figures);
+  container.add(parts.build(), ...flags, ...boards);
 }
 
 function removeVisualMeshes(container: THREE.Object3D): void {
