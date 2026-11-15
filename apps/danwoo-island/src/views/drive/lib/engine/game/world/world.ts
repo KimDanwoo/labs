@@ -13,7 +13,6 @@ import { Grass } from './grass';
 import { Grid } from './grid';
 import { Intro } from './intro';
 import { Lanterns } from './lanterns';
-import { Leaves } from './leaves';
 import { Lightnings } from './lightnings';
 import { PoleLights } from './poleLights';
 import { RainLines } from './rainLines';
@@ -51,7 +50,6 @@ export class World {
   grass: Grass | null = null;
   windLines: WindLines | null = null;
   confetti: Confetti | null = null;
-  leaves: Leaves | null = null;
   rain: RainLines | null = null;
   lightnings: Lightnings | null = null;
   fireballs: Fireballs | null = null;
@@ -77,7 +75,6 @@ export class World {
     this.grass = new Grass();
     this.windLines = new WindLines();
     this.confetti = new Confetti();
-    this.leaves = new Leaves();
     this.rain = new RainLines();
     this.lightnings = new Lightnings();
     this.fireballs = new Fireballs();

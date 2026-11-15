@@ -18,10 +18,8 @@ const IMPULSE_HORIZONTAL = 0.5;
 export class Explosions {
   explode(coordinates: THREE.Vector3, options: ExplosionOptions = {}): boolean {
     const game = getGame();
-    const radius = options.radius ?? DEFAULTS.radius;
     const distance = game.view.focusPoint.position.distanceTo(coordinates);
     game.view.roll.kick(remapClamp(distance, [...ROLL_KICK_RANGE], [1, 0]));
-    game.world.leaves?.explode(coordinates, radius);
 
     const vehicle = game.physicalVehicle.chassis.physical;
     if (options.isVehicleOnly) return this.#push(vehicle, coordinates, options);
