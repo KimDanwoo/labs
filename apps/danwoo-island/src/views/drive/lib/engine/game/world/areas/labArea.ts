@@ -118,7 +118,7 @@ export class LabArea extends Area {
 
   override setObjects(): void {
     rebuildVillageProps(this.model, this.game.materials);
-    rebuildLabGate(this.model, this.game.materials);
+    rebuildLabGate(this.model);
     super.setObjects();
   }
 

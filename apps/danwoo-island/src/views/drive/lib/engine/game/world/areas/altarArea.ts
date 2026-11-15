@@ -98,7 +98,7 @@ export class AltarArea extends Area {
   }
 
   override setObjects(): void {
-    rebuildSeonangdang(this.model, this.game.materials);
+    rebuildSeonangdang(this.model);
     super.setObjects();
   }
 

@@ -122,7 +122,7 @@ export class ProjectsArea extends Area {
 
   override setObjects(): void {
     rebuildVillageProps(this.model, this.game.materials);
-    rebuildProjectsGate(this.model, this.game.materials);
+    rebuildProjectsGate(this.model);
     removeAwardsTable(this.model);
     super.setObjects();
   }

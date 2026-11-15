@@ -47,7 +47,7 @@ export class LandingArea extends Area {
   override setObjects(): void {
     rebuildVillageProps(this.model, this.game.materials);
     replaceLandingName(this.model);
-    rebuildKiosk(this.model, this.game.materials, this.game.texture('islandMapTexture'));
+    rebuildKiosk(this.model, this.game.texture('islandMapTexture'));
     super.setObjects();
   }
 

@@ -97,7 +97,7 @@ export class CookieArea extends Area {
       this.model.children.find((child) => child.name === 'refCookie'),
       this.game.materials,
     );
-    rebuildCookieCart(this.model, this.game.materials);
+    rebuildCookieCart(this.model);
     super.setObjects();
   }
 

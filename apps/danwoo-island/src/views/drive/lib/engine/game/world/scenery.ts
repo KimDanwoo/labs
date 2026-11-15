@@ -18,7 +18,7 @@ export class Scenery {
     const game = getGame();
     const { scene } = game.model('sceneryModel');
     for (const bridge of [...scene.children].filter((child) => BRIDGE_PATTERN.test(child.name))) {
-      rebuildBridge(bridge, game.materials);
+      rebuildBridge(bridge);
     }
     paintSteppingStones(scene);
 

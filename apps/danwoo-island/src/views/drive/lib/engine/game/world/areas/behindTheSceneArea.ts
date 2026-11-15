@@ -33,7 +33,7 @@ export class BehindTheSceneArea extends Area {
   }
 
   override setObjects(): void {
-    rebuildBuildingSite(this.model, this.game.materials);
+    rebuildBuildingSite(this.model);
     super.setObjects();
   }
 
