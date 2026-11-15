@@ -29,11 +29,17 @@ function positionOf(shape: IntersectShape): THREE.Vector3 | null {
   return shape instanceof THREE.Sphere ? shape.center : null;
 }
 
-function isHit(raycaster: THREE.Raycaster, shape: IntersectShape): boolean {
-  if (shape instanceof THREE.Sphere) return raycaster.ray.intersectsSphere(shape);
-  if (shape instanceof THREE.Box3) return raycaster.ray.intersectsBox(shape);
-  if (shape instanceof THREE.Plane) return raycaster.ray.intersectsPlane(shape);
-  return raycaster.intersectObject(shape).length > 0;
+function rayPoint(raycaster: THREE.Raycaster, shape: Exclude<IntersectShape, THREE.Mesh>): THREE.Vector3 | null {
+  const { ray } = raycaster;
+  const point = new THREE.Vector3();
+  if (shape instanceof THREE.Sphere) return ray.intersectSphere(shape, point);
+  if (shape instanceof THREE.Box3) return ray.intersectBox(shape, point);
+  return ray.intersectPlane(shape, point);
+}
+
+function hitDistance(raycaster: THREE.Raycaster, shape: IntersectShape): number | null {
+  if (shape instanceof THREE.Mesh) return raycaster.intersectObject(shape)[0]?.distance ?? null;
+  return rayPoint(raycaster, shape)?.distanceTo(raycaster.ray.origin) ?? null;
 }
 
 export class RayCursor {
@@ -110,28 +116,30 @@ export class RayCursor {
     if (candidates.length === 0) return;
 
     this.#aimRaycaster();
-    const hits: Intersect[] = [];
+    const nearest = this.#nearestHit(candidates);
     for (const intersect of candidates) {
-      const isIntersecting = isHit(this.#raycaster, intersect.shape);
+      const isIntersecting = intersect === nearest;
       if (isIntersecting !== intersect.isIntersecting) this.#setIntersecting(intersect, isIntersecting);
-      if (isIntersecting) hits.push(intersect);
     }
 
-    const isAnyIntersecting = hits.length > 0;
+    const isAnyIntersecting = nearest !== null;
     if (isAnyIntersecting !== this.#isAnyIntersecting) {
       this.#isAnyIntersecting = isAnyIntersecting;
       this.game.canvasElement.style.cursor = isAnyIntersecting ? 'pointer' : '';
     }
-    this.#current = this.#nearest(hits);
+    this.#current = nearest;
   }
 
-  #nearest(hits: readonly Intersect[]): Intersect | null {
-    const { origin } = this.#raycaster.ray;
-    const distanceOf = ({ position }: Intersect): number => position?.distanceTo(origin) ?? Infinity;
-    return hits.reduce<Intersect | null>(
-      (nearest, hit) => (nearest === null || distanceOf(hit) < distanceOf(nearest) ? hit : nearest),
-      null,
-    );
+  #nearestHit(candidates: readonly Intersect[]): Intersect | null {
+    let nearest: Intersect | null = null;
+    let nearestDistance = Infinity;
+    for (const intersect of candidates) {
+      const distance = hitDistance(this.#raycaster, intersect.shape);
+      if (distance === null || distance >= nearestDistance) continue;
+      nearest = intersect;
+      nearestDistance = distance;
+    }
+    return nearest;
   }
 
   #aimRaycaster(): void {
