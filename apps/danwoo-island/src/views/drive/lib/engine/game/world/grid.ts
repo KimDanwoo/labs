@@ -24,8 +24,7 @@ function revealGridMaterial(): THREE.NodeMaterial {
     hasReveal: false,
     hasLightBounce: false,
   });
-  const shadedOutput = shaded.outputNode;
-  if (!shadedOutput) throw new Error('Grid shading is not ready');
+  const { shadedOutput } = shaded;
 
   const material = new THREE.NodeMaterial();
   material.side = THREE.DoubleSide;

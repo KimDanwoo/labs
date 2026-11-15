@@ -56,6 +56,7 @@ function isTwoSided(side: THREE.Side): boolean {
 }
 
 export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
+  readonly shadedOutput: THREE.Node<'vec4'>;
   readonly #features: Features;
   readonly #colorNode: ColorNode;
   readonly #normalNode: THREE.Node<'vec3'>;
@@ -88,7 +89,8 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
 
     this.normalNode = this.#normalNode;
     if (this.#features.hasDropShadows) this.receivedShadowNode = this.#catchShadow();
-    this.outputNode = Fn(() => this.#output())();
+    this.shadedOutput = Fn(() => this.#output())();
+    this.outputNode = this.shadedOutput;
   }
 
   #catchShadow(): (shadow?: THREE.Node<'vec4'>) => THREE.Node {
