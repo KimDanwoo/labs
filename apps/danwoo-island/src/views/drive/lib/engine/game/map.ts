@@ -1,48 +1,16 @@
 import { worldAsset } from '../../../config/worldAsset';
 import { getGame } from './gameContext';
+import { ISLAND_PLACES, type IslandPlace, type PlaceIcon } from './islandPlaces';
 import type { ModalItem } from './modals';
 import { createElement } from './utilities/createElement';
 import { clamp } from './utilities/maths';
 import { requireElement } from './utilities/requireElement';
-
-type MapIcon =
-  | 'projects'
-  | 'lab'
-  | 'career'
-  | 'social'
-  | 'circuit'
-  | 'bowling'
-  | 'cookie'
-  | 'surf'
-  | 'blog'
-  | 'portal'
-  | 'start';
-
-interface MapLocation {
-  name: string;
-  respawnName: string;
-  icon: MapIcon;
-  offset: { x: number; y: number };
-}
 
 interface MapPoint {
   x: number;
   y: number;
 }
 
-const LOCATIONS: readonly MapLocation[] = [
-  { name: '프로젝트', respawnName: 'projects', icon: 'projects', offset: { x: 0, y: -0.02 } },
-  { name: 'Danwoo Lab', respawnName: 'lab', icon: 'lab', offset: { x: -0.03, y: 0 } },
-  { name: '소개·이력서', respawnName: 'career', icon: 'career', offset: { x: 0, y: -0.06 } },
-  { name: '소셜', respawnName: 'social', icon: 'social', offset: { x: -0.01, y: -0.04 } },
-  { name: '서킷', respawnName: 'circuit', icon: 'circuit', offset: { x: -0.08, y: -0.05 } },
-  { name: '볼링장', respawnName: 'bowling', icon: 'bowling', offset: { x: -0.08, y: 0.03 } },
-  { name: '코코넛 노점', respawnName: 'cookie', icon: 'cookie', offset: { x: -0.02, y: -0.01 } },
-  { name: '서핑 포인트', respawnName: 'altar', icon: 'surf', offset: { x: 0, y: -0.05 } },
-  { name: '최신 글 게시판', respawnName: 'behindTheScene', icon: 'blog', offset: { x: 0.01, y: 0 } },
-  { name: 'Lab 포털', respawnName: 'timeMachine', icon: 'portal', offset: { x: 0, y: 0 } },
-  { name: '출발점', respawnName: 'beachStart', icon: 'start', offset: { x: 0, y: 0 } },
-];
 const MAP_IMAGES = { day: 'ui/map/map-day.webp', night: 'ui/map/map-night.webp' } as const;
 const MAP_ACTION = { name: 'map', categories: ['modal', 'menu', 'wandering'], keys: ['Keyboard.m', 'Keyboard.KeyM'] };
 const Z_INDEX_SCALE = 1000;
@@ -50,7 +18,7 @@ const LABEL_FLIP_X = 0.78;
 const PERCENT_PRECISION = 10;
 const TICK_ORDER = 14;
 
-function iconElement(icon: MapIcon, className: string): HTMLImageElement {
+function iconElement(icon: PlaceIcon, className: string): HTMLImageElement {
   const image = createElement('img', className);
   image.src = worldAsset(`ui/map/icons/${icon}.webp`);
   image.alt = '';
@@ -95,7 +63,7 @@ export class WorldMap {
 
   #init(): void {
     this.#isInitiated = true;
-    for (const location of LOCATIONS) {
+    for (const location of ISLAND_PLACES) {
       this.#container.append(this.#pinElement(location));
       this.#placesElement.append(this.#placeElement(location));
     }
@@ -111,7 +79,7 @@ export class WorldMap {
     game.modals.close();
   }
 
-  #pinElement({ name, respawnName, icon, offset }: MapLocation): HTMLElement {
+  #pinElement({ name, respawnName, icon, offset }: IslandPlace): HTMLElement {
     const { position } = getGame().respawns.getByName(respawnName);
     const point = worldToMap(position.x, position.z);
     const element = createElement('button', 'location', [
@@ -128,7 +96,7 @@ export class WorldMap {
     return element;
   }
 
-  #placeElement({ name, respawnName, icon }: MapLocation): HTMLElement {
+  #placeElement({ name, respawnName, icon }: IslandPlace): HTMLElement {
     const button = createElement('button', 'map-place', [iconElement(icon, 'map-place-icon'), name]);
     button.type = 'button';
     button.addEventListener('click', () => this.#travelTo(respawnName));
