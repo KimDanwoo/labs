@@ -31,8 +31,8 @@ export interface FoliageOptions {
 }
 
 const rng = alea('foliage');
-const PLANE_COUNT = 80;
-const PLANE_SIZE = 0.8;
+const PLANE_COUNT = 56;
+const PLANE_SIZE = 1.0;
 const NORMAL_BLEND = 0.85;
 const WIND_ROTATION = 2.2;
 const SEE_THROUGH_EDGE = { min: 3, max: 15 } as const;
