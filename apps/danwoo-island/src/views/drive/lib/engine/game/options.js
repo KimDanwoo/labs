@@ -20,7 +20,7 @@ export class Options
     {
         const element = this.element.querySelector('.js-audio-toggle')
 
-        element.addEventListener('click', this.game.audio.mute.toggle)
+        element.addEventListener('click', () => this.game.audio.mute.toggle())
     }
 
     setQuality()
