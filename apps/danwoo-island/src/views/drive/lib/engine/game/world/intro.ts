@@ -13,16 +13,14 @@ import { isTideLoading, TIDE_LABEL, tideRingGeometry, tideRingMaterial } from '.
 interface LabelLayout {
   offsetX: number;
   offsetZ: number;
-  rotationX: number;
 }
 
 const LABEL_TINT = isTideLoading ? TIDE_LABEL : '#ffffff';
 const LABEL_HEIGHT = 3.3;
-const LABEL_YAW = 0.4;
 const LABEL_HIDDEN_SCALE = 0.01;
-const HIGH_QUALITY_LAYOUT: LabelLayout = { offsetX: 6.5, offsetZ: 6.5, rotationX: -0.25 };
-const LOW_QUALITY_LAYOUT: LabelLayout = { offsetX: 1.4, offsetZ: -5.8, rotationX: -0.4 };
-const PORTRAIT_LAYOUT: LabelLayout = { offsetX: 7.2, offsetZ: 7.2, rotationX: -0.4 };
+const HIGH_QUALITY_LAYOUT: LabelLayout = { offsetX: 6.5, offsetZ: 6.5 };
+const LOW_QUALITY_LAYOUT: LabelLayout = { offsetX: 1.4, offsetZ: -5.8 };
+const PORTRAIT_LAYOUT: LabelLayout = { offsetX: 7.2, offsetZ: 7.2 };
 const RING = { radius: 3.5, thickness: 0.04, segments: 128, elevation: 0.001, smoothing: 10 } as const;
 const TICK_ORDER = 8;
 
@@ -126,7 +124,7 @@ class SoundButton {
     this.#texture.offset.x = isMuted === true ? SOUND_MUTED_OFFSET : 0;
   };
 
-  constructor(labelPosition: THREE.Vector3) {
+  constructor(label: THREE.Object3D) {
     const { audio, rayCursor } = getGame();
     this.#texture = getGame().texture('soundTexture');
     this.#syncTexture(audio.mute.active);
@@ -142,7 +140,7 @@ class SoundButton {
     this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(aspect * scale, scale), material);
     this.mesh.position.set(x, y, 0);
 
-    const hitCenter = labelPosition.clone().add(new THREE.Vector3(x, y, 0));
+    const hitCenter = new THREE.Vector3(x, y, 0).applyQuaternion(label.quaternion).add(label.position);
     this.intersect = rayCursor.addIntersect({
       active: true,
       shape: new THREE.Sphere(hitCenter, SOUND_BUTTON.hitRadius),
@@ -206,8 +204,8 @@ export class Intro {
     this.label.position.z += layout.offsetZ;
     this.label.position.y = LABEL_HEIGHT;
     this.label.rotation.reorder('YXZ');
-    this.label.rotation.y = LABEL_YAW;
-    this.label.rotation.x = layout.rotationX;
+    this.label.rotation.y = game.view.spherical.theta;
+    this.label.rotation.x = game.view.spherical.phi - Math.PI / 2;
     this.label.scale.setScalar(LABEL_HIDDEN_SCALE);
     game.scene.add(this.label);
   }
@@ -228,7 +226,7 @@ export class Intro {
 
   createLabelContent(): void {
     this.#text = new PromptText();
-    this.#soundButton = new SoundButton(this.label.position);
+    this.#soundButton = new SoundButton(this.label);
     this.label.add(this.#text.mesh, this.#soundButton.mesh);
   }
 
