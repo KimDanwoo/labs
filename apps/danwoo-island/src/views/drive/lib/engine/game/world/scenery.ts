@@ -23,7 +23,8 @@ export class Scenery {
     paintSteppingStones(scene, game.materials);
 
     for (const child of [...scene.children]) {
-      if (!child.userData.prevent) {
+      const prevent: unknown = child.userData.prevent;
+      if (prevent === undefined || prevent === false) {
         const mass: unknown = child.userData.mass;
         game.objects.addFromModel(
           child,

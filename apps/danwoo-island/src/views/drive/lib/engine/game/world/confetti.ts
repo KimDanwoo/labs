@@ -25,8 +25,14 @@ const DURATION = 5;
 const ELEVATION = 3;
 const DEFAULTS = { radius: 4, elevation: 6 } as const;
 
-function randomArray(sample: () => number): Float32Array {
-  return Float32Array.from({ length: PIECES }, sample);
+function randomPieces(): { progress: Float32Array; angles: Float32Array } {
+  const progress = new Float32Array(PIECES);
+  const angles = new Float32Array(PIECES);
+  for (let index = 0; index < PIECES; index += 1) {
+    progress[index] = Math.random();
+    angles[index] = Math.random() * Math.PI * 2;
+  }
+  return { progress, angles };
 }
 
 function randomOrientations(): THREE.InstancedBufferAttribute {
@@ -49,8 +55,7 @@ class ConfettiBurst {
   readonly #elevation = uniform(6);
 
   constructor(geometry: THREE.PlaneGeometry, colors: THREE.UniformArrayNode<'color'>) {
-    const randomProgress = randomArray(() => Math.random());
-    const angles = randomArray(() => Math.random() * Math.PI * 2);
+    const { progress: randomProgress, angles } = randomPieces();
     const progressBuffer = instancedArray(randomProgress, 'float').toAttribute();
     const angleBuffer = instancedArray(angles, 'float').toAttribute();
 
