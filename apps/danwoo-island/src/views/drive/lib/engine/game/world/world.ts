@@ -19,7 +19,6 @@ import { PoleLights } from './poleLights';
 import { RainLines } from './rainLines';
 import { Scenery } from './scenery';
 import { pruneShadowCasters } from './shadowCasters';
-import { Snow } from './snow';
 import { Trees } from './trees';
 import { VisualVehicle } from './visualVehicle';
 import { WaterSurface } from './waterSurface';
@@ -55,7 +54,6 @@ export class World {
   rain: RainLines | null = null;
   lightnings: Lightnings | null = null;
   fireballs: Fireballs | null = null;
-  snow: Snow | null = null;
   bushes: Bushes | null = null;
   oakTrees: Trees | null = null;
   palmTrees: PalmTrees | null = null;
@@ -79,7 +77,6 @@ export class World {
     this.rain = new RainLines();
     this.lightnings = new Lightnings();
     this.fireballs = new Fireballs();
-    this.snow = new Snow();
     this.bushes = new Bushes();
     this.oakTrees = plantTrees(JUNGLE);
     this.palmTrees = new PalmTrees(PALM_REFERENCE_MODELS.flatMap((name) => getGame().model(name).scene.children));
