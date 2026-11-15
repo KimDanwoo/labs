@@ -18,6 +18,7 @@ const UP = new THREE.Vector3(0, 1, 0);
 export class BehindTheSceneArea extends Area {
   readonly #vehicleRelativePosition = uniform(vec2());
   readonly #slabs: THREE.Mesh;
+  readonly #board: BlogBoard;
 
   constructor(model: THREE.Object3D) {
     super(model);
@@ -36,10 +37,10 @@ export class BehindTheSceneArea extends Area {
     this.#slabs.position.y += SLAB_ELEVATION;
     this.game.scene.add(this.#slabs);
     this.objects.hideable.push(this.#slabs);
-    this.#createBlogBoard();
+    this.#board = this.#createBlogBoard();
   }
 
-  #createBlogBoard(): void {
+  #createBlogBoard(): BlogBoard {
     const { modals, interactivePoints, inputs, scene } = this.game;
     const modal = modals.items.get('blog');
     if (!modal) throw new Error('Blog modal is missing');
@@ -66,6 +67,7 @@ export class BehindTheSceneArea extends Area {
       onConceal: () => interactiveButtons.removeItems(['interact']),
       onHide: () => interactiveButtons.removeItems(['interact']),
     });
+    return board;
   }
 
   override setObjects(): void {
@@ -114,7 +116,9 @@ export class BehindTheSceneArea extends Area {
   }
 
   override update(): void {
-    const { position } = this.game.physicalVehicle;
+    const { physicalVehicle, ticker } = this.game;
+    const { position } = physicalVehicle;
     this.#vehicleRelativePosition.value.set(position.x - this.#slabs.position.x, position.z - this.#slabs.position.z);
+    this.#board.update({ delta: ticker.deltaScaled, viewer: position });
   }
 }

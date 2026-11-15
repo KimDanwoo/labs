@@ -1,3 +1,5 @@
+import gsap from 'gsap';
+import { Fn, positionGeometry, sin, uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { type LatestPost, LATEST_POSTS_ENDPOINT, parseLatestPostsResponse } from '@entities/blog';
@@ -9,6 +11,9 @@ type BoardState = { status: 'loading' } | { status: 'ready'; posts: readonly Lat
 
 const CANVAS = { width: 1200, height: 800, padding: 70 } as const;
 const BOARD_SIZE = new THREE.Vector3(3.4, 3.4, 0.5);
+const PAPER_SEGMENTS = 24;
+const FLUTTER = { lift: 0.06, speed: 2.6, near: 6, far: 18, idle: 0.25, response: 3 } as const;
+const PAGE_TURN = { duration: 0.32, curl: 0.6 } as const;
 const UP = new THREE.Vector3(0, 1, 0);
 const COLORS = { paper: '#fbf3e4', rule: '#efdcb8', title: '#1f5f6e', ink: '#23434a', muted: '#6b7b7b' } as const;
 const FONTS = {
@@ -52,18 +57,24 @@ function statusText(state: BoardState): string | null {
   return state.posts.length === 0 ? STATUS_TEXT.empty : null;
 }
 
-function postCard(post: LatestPost): HTMLElement {
+function contentKey(state: BoardState): string {
+  return state.status === 'ready' ? `ready:${state.posts.map(({ url }) => url).join('|')}` : state.status;
+}
+
+function postImage(url: string): HTMLElement {
+  const image = createElement('img', 'blog-post-image');
+  image.src = url;
+  image.alt = '';
+  image.loading = 'lazy';
+  return createElement('span', 'blog-post-media', [image]);
+}
+
+function postCard(post: LatestPost, order: number): HTMLElement {
   const link = createElement('a', 'blog-post');
   link.href = post.url;
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
-  if (post.imageUrl) {
-    const image = createElement('img', 'blog-post-image');
-    image.src = post.imageUrl;
-    image.alt = '';
-    image.loading = 'lazy';
-    link.append(image);
-  }
+  if (post.imageUrl) link.append(postImage(post.imageUrl));
   link.append(
     createElement('div', 'blog-post-body', [
       createElement('span', 'blog-post-date', [formatDate(post.publishedAt)]),
@@ -71,7 +82,9 @@ function postCard(post: LatestPost): HTMLElement {
       createElement('p', 'blog-post-description', [post.description]),
     ]),
   );
-  return createElement('li', '', [link]);
+  const item = createElement('li', '', [link]);
+  item.style.setProperty('--order', String(order));
+  return item;
 }
 
 export class BlogBoard {
@@ -79,8 +92,14 @@ export class BlogBoard {
   readonly #context: CanvasRenderingContext2D;
   readonly #texture: THREE.CanvasTexture;
   readonly #listElement: HTMLElement;
+  readonly #center: THREE.Vector3;
+  readonly #time = uniform(0);
+  readonly #flutter = uniform(FLUTTER.idle);
+  readonly #turn = uniform(0);
   #state: BoardState = { status: 'loading' };
   #pending: Promise<void> | null = null;
+  #paintedKey: string | null = null;
+  #isTurning = false;
 
   constructor({
     position,
@@ -107,12 +126,25 @@ export class BlogBoard {
       new THREE.Quaternion().setFromAxisAngle(UP, rotation),
       new THREE.Vector3(1, 1, 1),
     );
-    this.group = noticeBoard({ size: BOARD_SIZE, matrix }, this.#texture);
+    this.#center = center;
+    const { group, screen } = noticeBoard({ size: BOARD_SIZE, matrix }, this.#texture, { segments: PAPER_SEGMENTS });
+    this.group = group;
+    screen.geometry.computeBoundingBox();
+    const top = screen.geometry.boundingBox?.max.y ?? 0;
+    screen.material.positionNode = this.#paperPosition(top, top * 2);
     this.#render();
   }
 
   get isReady(): boolean {
     return this.#state.status === 'ready';
+  }
+
+  update({ delta, viewer }: { delta: number; viewer: THREE.Vector3 }): void {
+    const distance = Math.hypot(viewer.x - this.#center.x, viewer.z - this.#center.z);
+    const closeness = THREE.MathUtils.clamp((FLUTTER.far - distance) / (FLUTTER.far - FLUTTER.near), 0, 1);
+    const target = THREE.MathUtils.lerp(FLUTTER.idle, 1, closeness);
+    this.#flutter.value = THREE.MathUtils.damp(this.#flutter.value, target, FLUTTER.response, delta);
+    this.#time.value += delta;
   }
 
   load(): Promise<void> {
@@ -138,12 +170,59 @@ export class BlogBoard {
     this.#render();
   }
 
+  #paperPosition(top: number, height: number): THREE.Node {
+    const time = this.#time;
+    const flutter = this.#flutter;
+    const turn = this.#turn;
+    return Fn(() => {
+      const position = positionGeometry.toVar();
+      const hang = position.y.negate().add(top);
+      const hangRatio = hang.div(height);
+      const wave = sin(time.mul(FLUTTER.speed).add(position.x.mul(2.2)).add(position.y.mul(1.4)))
+        .mul(sin(time.mul(FLUTTER.speed * 0.43).add(position.x.mul(0.9))))
+        .add(1)
+        .mul(0.5);
+      const lift = wave.mul(flutter).mul(hangRatio.pow(1.6)).mul(FLUTTER.lift);
+      const angle = turn.mul(Math.PI / 2).mul(hangRatio.mul(PAGE_TURN.curl).add(1 - PAGE_TURN.curl / 2));
+      position.y.assign(hang.mul(angle.cos()).negate().add(top));
+      position.z.assign(hang.mul(angle.sin()).add(lift));
+      return position;
+    })();
+  }
+
   #render(): void {
-    void document.fonts.load(FONTS.post).finally(() => this.#drawBoard());
+    void document.fonts.load(FONTS.post).finally(() => this.#requestDraw());
     this.#renderPanel();
   }
 
+  #requestDraw(): void {
+    if (this.#isTurning || contentKey(this.#state) === this.#paintedKey) return;
+    if (this.#paintedKey === null) {
+      this.#drawBoard();
+      return;
+    }
+    this.#isTurning = true;
+    gsap.to(this.#turn, {
+      value: 1,
+      duration: PAGE_TURN.duration,
+      ease: 'power2.in',
+      onComplete: () => {
+        this.#drawBoard();
+        gsap.to(this.#turn, {
+          value: 0,
+          duration: PAGE_TURN.duration * 1.4,
+          ease: 'back.out(1.6)',
+          onComplete: () => {
+            this.#isTurning = false;
+            this.#requestDraw();
+          },
+        });
+      },
+    });
+  }
+
   #drawBoard(): void {
+    this.#paintedKey = contentKey(this.#state);
     const context = this.#context;
     const { width, height, padding } = CANVAS;
     context.fillStyle = COLORS.paper;
@@ -186,6 +265,6 @@ export class BlogBoard {
       this.#listElement.replaceChildren(createElement('li', 'blog-status', [message]));
       return;
     }
-    this.#listElement.replaceChildren(...postsOf(this.#state).map(postCard));
+    this.#listElement.replaceChildren(...postsOf(this.#state).map((post, order) => postCard(post, order)));
   }
 }

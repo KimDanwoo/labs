@@ -136,12 +136,15 @@ export function rebuildLabGate(model: THREE.Object3D): void {
 const SCREEN_ASPECT = 1.5;
 const GUIDE_BOARD = { screenWidth: 0.68, screenHeight: 0.43, screenY: -0.01, screenFront: 0.11 } as const;
 
-function boardScreen(board: Frame, screen: THREE.Texture): THREE.Mesh {
+export interface NoticeBoard {
+  readonly group: THREE.Group;
+  readonly screen: THREE.Mesh<THREE.PlaneGeometry, MeshDefaultMaterial>;
+}
+
+function boardScreen(board: Frame, screen: THREE.Texture, segments: number): NoticeBoard['screen'] {
   const { x: boardWidth, y: boardHeight } = board.size;
   const width = Math.min(GUIDE_BOARD.screenWidth * boardWidth, GUIDE_BOARD.screenHeight * boardHeight * SCREEN_ASPECT);
-  const geometry = new THREE.PlaneGeometry(width, width / SCREEN_ASPECT);
-  geometry.translate(0, GUIDE_BOARD.screenY * boardHeight, GUIDE_BOARD.screenFront);
-  geometry.applyMatrix4(board.matrix);
+  const geometry = new THREE.PlaneGeometry(width, width / SCREEN_ASPECT, segments, segments);
   const material = new MeshDefaultMaterial({
     colorNode: texture(screen).rgb,
     hasCoreShadows: false,
@@ -151,16 +154,28 @@ function boardScreen(board: Frame, screen: THREE.Texture): THREE.Mesh {
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = 'boardScreen';
   mesh.receiveShadow = true;
+  mesh.matrixAutoUpdate = false;
+  mesh.matrix
+    .copy(board.matrix)
+    .multiply(new THREE.Matrix4().makeTranslation(0, GUIDE_BOARD.screenY * boardHeight, GUIDE_BOARD.screenFront));
   return mesh;
 }
 
-export function noticeBoard(board: Frame, screen: THREE.Texture): THREE.Group {
-  return new THREE.Group().add(islandModelMesh('guideBoard', board.matrix, board.size), boardScreen(board, screen));
+export function noticeBoard(
+  board: Frame,
+  screen: THREE.Texture,
+  { segments = 1 }: { segments?: number } = {},
+): NoticeBoard {
+  const screenMesh = boardScreen(board, screen, segments);
+  const group = new THREE.Group().add(islandModelMesh('guideBoard', board.matrix, board.size), screenMesh);
+  return { group, screen: screenMesh };
 }
 
 export function rebuildKiosk(model: THREE.Object3D, mapTexture: THREE.Texture): void {
-  replaceVisual(model, 'physicalFixed009', (container) =>
-    noticeBoard(cuboidFrame(findChild(container, 'cuboid018')), mapTexture),
+  replaceVisual(
+    model,
+    'physicalFixed009',
+    (container) => noticeBoard(cuboidFrame(findChild(container, 'cuboid018')), mapTexture).group,
   );
 }
 

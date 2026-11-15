@@ -2116,12 +2116,58 @@ html:not(.is-mode-touch) .blog .blog-post:hover,
   transform: translateY(-2px);
   box-shadow: 0 6px 16px #0d2b3322;
 }
-.blog .blog-post-image {
-  object-fit: cover;
+.blog .blog-post-media {
   border-radius: 12px;
   flex: none;
   width: 168px;
   height: 104px;
+  overflow: hidden;
+}
+.blog .blog-post-image {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: block;
+}
+html:not(.is-mode-touch) .blog .blog-post:hover .blog-post-image,
+.blog .blog-post:focus-visible .blog-post-image {
+  transform: scale(1.07);
+}
+html:not(.is-mode-touch) .blog .blog-post:hover .blog-post-title,
+.blog .blog-post:focus-visible .blog-post-title {
+  text-decoration-color: var(--map-sea);
+}
+.blog.is-displayed .panel-card {
+  animation: blog-card-in 0.42s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+.blog.is-displayed .blog-posts > li {
+  animation: blog-post-rise 0.56s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+  animation-delay: calc(140ms + var(--order, 0) * 90ms);
+}
+.blog.is-displayed .blog-all {
+  animation: blog-post-rise 0.56s cubic-bezier(0.2, 0.9, 0.25, 1) 0.42s both;
+}
+@keyframes blog-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.94);
+  }
+}
+@keyframes blog-post-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px) rotate(-1.2deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blog.is-displayed :is(.panel-card, .blog-posts > li, .blog-all) {
+    animation: none;
+  }
+  .blog .blog-post-image,
+  .blog .blog-post-title {
+    transition: none;
+  }
 }
 .blog .blog-post-body {
   flex-direction: column;
@@ -2139,6 +2185,9 @@ html:not(.is-mode-touch) .blog .blog-post:hover,
   font-size: 18px;
   font-weight: 800;
   line-height: 1.35;
+  text-decoration: underline 2px transparent;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.3s;
 }
 .blog .blog-post-description {
   color: var(--map-ink);
@@ -2175,7 +2224,7 @@ html:not(.is-mode-touch) .blog .blog-all:hover {
     flex-direction: column;
     align-items: stretch;
   }
-  .blog .blog-post-image {
+  .blog .blog-post-media {
     width: 100%;
     height: 140px;
   }
