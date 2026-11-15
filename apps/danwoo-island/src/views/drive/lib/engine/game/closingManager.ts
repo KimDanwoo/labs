@@ -1,7 +1,6 @@
 import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputs';
 import { isShown } from './panelState';
-import { CircuitArea } from './world/areas/circuitArea';
 import { LabArea } from './world/areas/labArea';
 import { ProjectsArea } from './world/areas/projectsArea';
 
@@ -11,17 +10,12 @@ const ACTIONS = [
   { name: 'pause', categories: ACTION_CATEGORIES, keys: ['Gamepad.start'] },
 ];
 
-function circuitState(): unknown {
-  return getGame().world.areas?.circuit?.state;
-}
-
 function isRacing(): boolean {
-  const state = circuitState();
-  return state === CircuitArea.STATE_RUNNING || state === CircuitArea.STATE_STARTING;
+  return getGame().world.areas?.circuit?.isRacing ?? false;
 }
 
 function isInRace(): boolean {
-  return isRacing() || circuitState() === CircuitArea.STATE_ENDING;
+  return isRacing() || getGame().world.areas?.circuit?.state === 'ending';
 }
 
 function closeOpenArea(): boolean {
