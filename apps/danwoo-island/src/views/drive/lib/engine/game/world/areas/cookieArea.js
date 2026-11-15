@@ -5,7 +5,6 @@ import { getGame } from '../../gameContext'
 import { color, float, Fn, instancedArray, mix, normalWorld, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import { InstancedGroup } from '../../instancedGroup'
 import gsap from 'gsap'
-import { InteractivePoints } from '../../interactivePoints'
 import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial'
 import { alea } from 'seedrandom'
 import { Area } from './area'
@@ -247,28 +246,28 @@ export class CookieArea extends Area
 
     setInteractivePoint()
     {
-        this.game.interactivePoints.create(
-            this.references.items.get('interactivePoint')[0].position,
-            '코코넛 따기',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        this.game.interactivePoints.create({
+            position: this.references.items.get('interactivePoint')[0].position,
+            text: '코코넛 따기',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () =>
             {
                 this.accept()
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     accept()

@@ -4,7 +4,6 @@ import { rebuildVillageProps } from '../islandVillage'
 import { rebuildProjectsGate } from '../islandStructures'
 import { removeAwardsTable } from '../islandReskins'
 import { getGame } from '../../gameContext'
-import { InteractivePoints } from '../../interactivePoints'
 import gsap from 'gsap'
 import content from '../../../data/danwoo'
 import { TextCanvas } from '../../textCanvas'
@@ -79,28 +78,28 @@ export class ProjectsArea extends Area
 
     setInteractivePoint()
     {
-        this.interactivePoint = this.game.interactivePoints.create(
-            this.references.items.get('interactivePoint')[0].position,
-            '프로젝트',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        this.interactivePoint = this.game.interactivePoints.create({
+            position: this.references.items.get('interactivePoint')[0].position,
+            text: '프로젝트',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () =>
             {
                 this.open()
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     setInputs()

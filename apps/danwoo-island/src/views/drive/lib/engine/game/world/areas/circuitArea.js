@@ -3,7 +3,6 @@ import { rebuildCircuitObjects, rebuildPodium, reshapeCircuitDecoration } from '
 import { replaceAirDancers } from '../islandReskins'
 import { getGame } from '../../gameContext'
 import { lerp, segmentCircleIntersection } from '../../utilities/maths'
-import { InteractivePoints } from '../../interactivePoints'
 import gsap from 'gsap'
 import { Player } from '../../player'
 import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial'
@@ -508,12 +507,12 @@ export class CircuitArea extends Area
 
     setInteractivePoint()
     {
-        this.interactivePoint = this.game.interactivePoints.create(
-            this.references.items.get('interactivePoint')[0].position,
-            '출발!',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        this.interactivePoint = this.game.interactivePoints.create({
+            position: this.references.items.get('interactivePoint')[0].position,
+            text: '출발!',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () =>
             {
                 const sound = this.game.audio.groups.get('click')
                 if(sound)
@@ -521,19 +520,19 @@ export class CircuitArea extends Area
 
                 this.restart()
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     setStartAnimation()
@@ -747,16 +746,16 @@ export class CircuitArea extends Area
         const resetInk = texture(resetMap, uv(1))
         resetMaterial.outputNode = vec4(mix(resetBase.rgb, resetInk.rgb, resetInk.a), resetBase.a)
         reset.material = resetMaterial
-        this.game.interactivePoints.create(
-            reset.position.clone().add(new THREE.Vector3(0, 1, 0)),
-            '장애물 다시 놓기',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () => this.resetObjects.reset(),
-            () => this.game.inputs.interactiveButtons.addItems(['interact']),
-            () => this.game.inputs.interactiveButtons.removeItems(['interact']),
-            () => this.game.inputs.interactiveButtons.removeItems(['interact'])
-        )
+        this.game.interactivePoints.create({
+            position: reset.position.clone().add(new THREE.Vector3(0, 1, 0)),
+            text: '장애물 다시 놓기',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () => this.resetObjects.reset(),
+            onReveal: () => this.game.inputs.interactiveButtons.addItems(['interact']),
+            onConceal: () => this.game.inputs.interactiveButtons.removeItems(['interact']),
+            onHide: () => this.game.inputs.interactiveButtons.removeItems(['interact']),
+        })
     }
 
     setEndModal()

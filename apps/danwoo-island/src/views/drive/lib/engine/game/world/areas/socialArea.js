@@ -1,7 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { rebuildVillageProps } from '../islandVillage'
 import { getGame } from '../../gameContext'
-import { InteractivePoints } from '../../interactivePoints'
 import content from '../../../data/danwoo'
 import { InstancedGroup } from '../../instancedGroup'
 import { Area } from './area'
@@ -39,28 +38,28 @@ export class SocialArea extends Area
             const position = object.visual.object3D.position.clone()
             position.y = 1
 
-            this.interactivePoint = this.game.interactivePoints.create(
-                position,
-                link.name,
-                link.align === 'left' ? InteractivePoints.ALIGN_LEFT : InteractivePoints.ALIGN_RIGHT,
-                InteractivePoints.STATE_CONCEALED,
-                () =>
+            this.interactivePoint = this.game.interactivePoints.create({
+                position: position,
+                text: link.name,
+                align: link.align === 'left' ? 'left' : 'right',
+                state: 'concealed',
+                onInteract: () =>
                 {
                     window.open(link.url, '_blank', 'noopener,noreferrer')
                 },
-                () =>
+                onReveal: () =>
                 {
                     this.game.inputs.interactiveButtons.addItems(['interact'])
                 },
-                () =>
+                onConceal: () =>
                 {
                     this.game.inputs.interactiveButtons.removeItems(['interact'])
                 },
-                () =>
+                onHide: () =>
                 {
                     this.game.inputs.interactiveButtons.removeItems(['interact'])
-                }
-            )
+                },
+            })
         }
     }
 
@@ -145,28 +144,28 @@ export class SocialArea extends Area
 
     setOnlyFans()
     {
-        const interactiveArea = this.game.interactivePoints.create(
-            this.references.items.get('onlyFans')[0].position,
-            '바람개비',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        const interactiveArea = this.game.interactivePoints.create({
+            position: this.references.items.get('onlyFans')[0].position,
+            text: '바람개비',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () =>
             {
                 this.fans.pop()
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     update()

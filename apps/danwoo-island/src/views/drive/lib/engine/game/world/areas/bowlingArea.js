@@ -3,7 +3,6 @@ import { rebuildVillageProps } from '../islandVillage'
 import { rebuildBowlingSign, rebuildRadioCabinet } from '../islandStructures'
 import { rebuildBowlingScreenStand } from '../islandReskins'
 import { getGame } from '../../gameContext'
-import { InteractivePoints } from '../../interactivePoints'
 import { clamp, lerp, remapClamp } from '../../utilities/maths'
 import gsap from 'gsap'
 import { color, float, Fn, instancedBufferAttribute, instanceIndex, max, min, mix, positionGeometry, sin, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
@@ -212,28 +211,28 @@ export class BowlingArea extends Area
 
     setRestart()
     {
-        this.restartInteractivePoint = this.game.interactivePoints.create(
-            this.references.items.get('restartInteractivePoint')[0].position,
-            '다시 하기',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_HIDDEN,
-            () =>
+        this.restartInteractivePoint = this.game.interactivePoints.create({
+            position: this.references.items.get('restartInteractivePoint')[0].position,
+            text: '다시 하기',
+            align: 'right',
+            state: 'hidden',
+            onInteract: () =>
             {
                 this.restart()
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     setScreen()
@@ -350,28 +349,28 @@ export class BowlingArea extends Area
             this.game.player.sounds.suspensions.play()
         }
 
-        this.game.interactivePoints.create(
-            this.references.items.get('bumpersInteractivePoint')[0].position,
-            '범퍼',
-            InteractivePoints.ALIGN_LEFT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        this.game.interactivePoints.create({
+            position: this.references.items.get('bumpersInteractivePoint')[0].position,
+            text: '범퍼',
+            align: 'left',
+            state: 'concealed',
+            onInteract: () =>
             {
                 this.bumpers.toggle()
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     setJukebox()
@@ -538,7 +537,7 @@ export class BowlingArea extends Area
             this.ball.speed = 0
         }
 
-        if(showRestartInteractivePoint && this.restartInteractivePoint.state === InteractivePoints.STATE_HIDDEN)
+        if(showRestartInteractivePoint && this.restartInteractivePoint.state === 'hidden')
             this.restartInteractivePoint.show()
     }
 }

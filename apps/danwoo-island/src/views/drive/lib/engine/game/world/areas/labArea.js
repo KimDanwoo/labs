@@ -2,7 +2,6 @@ import * as THREE from 'three/webgpu'
 import { rebuildVillageProps } from '../islandVillage'
 import { rebuildLabGate } from '../islandStructures'
 import { getGame } from '../../gameContext'
-import { InteractivePoints } from '../../interactivePoints'
 import gsap from 'gsap'
 import content from '../../../data/danwoo'
 import { TextCanvas } from '../../textCanvas'
@@ -82,28 +81,28 @@ export class LabArea extends Area
 
     setInteractivePoint()
     {
-        this.interactivePoint = this.game.interactivePoints.create(
-            this.references.items.get('interactivePoint')[0].position,
-            'Danwoo Lab',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        this.interactivePoint = this.game.interactivePoints.create({
+            position: this.references.items.get('interactivePoint')[0].position,
+            text: 'Danwoo Lab',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () =>
             {
                 window.open(content.labUrl, '_blank', 'noopener,noreferrer')
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     setInputs()
