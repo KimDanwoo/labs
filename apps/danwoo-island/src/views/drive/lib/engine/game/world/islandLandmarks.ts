@@ -1,5 +1,6 @@
 import * as THREE from 'three/webgpu';
 
+import { createFountainWater } from './fountainWater';
 import { type IslandModelKey, islandModelMesh } from './islandModels';
 
 interface LandmarkCollider {
@@ -11,6 +12,7 @@ export interface Landmark {
   readonly key: IslandModelKey;
   readonly size: THREE.Vector3;
   readonly colliders: readonly LandmarkCollider[];
+  readonly decorate?: () => THREE.Object3D;
 }
 
 interface PlacedLandmark extends Landmark {
@@ -32,6 +34,7 @@ const collider = (size: Triple, position: Triple): LandmarkCollider => ({
 
 const SHELL_FOUNTAIN: Landmark = {
   key: 'shellFountain',
+  decorate: createFountainWater,
   size: new THREE.Vector3(2.6, 2.4, 2.6),
   colliders: [collider([2.3, 1.2, 2.3], [0, 0.6, 0]), collider([1.4, 2.2, 1.4], [0, 1.1, 0])],
 };
@@ -88,7 +91,7 @@ function footprintOf(model: THREE.Object3D, object: THREE.Object3D): THREE.Vecto
 }
 
 export function fixedLandmark(
-  { key, size, colliders }: Landmark,
+  { key, size, colliders, decorate }: Landmark,
   base: THREE.Vector3,
   quaternion: THREE.Quaternion,
 ): THREE.Group {
@@ -97,6 +100,7 @@ export function fixedLandmark(
   landmark.position.copy(base);
   landmark.quaternion.copy(quaternion);
   landmark.add(islandModelMesh(key, new THREE.Matrix4().makeTranslation(0, size.y / 2, 0), size));
+  if (decorate) landmark.add(decorate());
   for (const { size: colliderSize, position } of colliders) {
     const cuboid = new THREE.Object3D();
     cuboid.name = 'cuboid';

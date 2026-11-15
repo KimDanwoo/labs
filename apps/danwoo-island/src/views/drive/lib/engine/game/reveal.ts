@@ -12,10 +12,11 @@ const SKIP_SPEED = 4;
 const TICK_ORDER = 10;
 const HOVER_INTENSITY = 1.22;
 const HOVER_DURATION = 0.2;
-const OPEN_RADIUS = 3.5;
+const OPEN_RADIUS = 5.2;
+const OPEN_CENTER_OFFSET = new THREE.Vector3(0.9, 0, -1.5);
 const FULL_RADIUS = 30;
 const UNBOUNDED_RADIUS = 99999;
-const INTRO_ZOOM = { start: 0.6, settled: 0.3 } as const;
+const INTRO_ZOOM = { start: 0.6, settled: 0.3, portraitSettled: 0 } as const;
 const INTRO_SEE_THROUGH = 0.5;
 const REVEAL_DEFAULTS = { thickness: 0.05, color: '#e88eff', intensity: 5.5 } as const;
 const START_KEYS = [
@@ -49,7 +50,7 @@ export class Reveal {
 
   constructor() {
     const game = getGame();
-    this.position = game.respawns.getDefault().position.clone();
+    this.position = game.respawns.getDefault().position.clone().add(OPEN_CENTER_OFFSET);
     this.position2Uniform = uniform(vec2(this.position.x, this.position.z));
     this.#sound = game.audio.register({
       path: 'sounds/reveal/reveal-1.mp3',
@@ -67,11 +68,15 @@ export class Reveal {
       game.world.grid.show();
       this.distance.value = 0;
       gsap.to(this.distance, { value: OPEN_RADIUS, ease: 'back.out(1.7)', duration: 2 / speed(), overwrite: true });
+      const { focusPoint } = game.view;
+      focusPoint.isTracking = false;
+      focusPoint.position.set(this.position.x, 0, this.position.z);
 
       const { zoom } = game.view;
       zoom.smoothedRatio = INTRO_ZOOM.start;
       zoom.baseRatio = INTRO_ZOOM.start;
-      gsap.to(zoom, { baseRatio: INTRO_ZOOM.settled, ease: 'power1.inOut', duration: 1.25 / speed(), overwrite: true });
+      const settled = innerHeight > innerWidth ? INTRO_ZOOM.portraitSettled : INTRO_ZOOM.settled;
+      gsap.to(zoom, { baseRatio: settled, ease: 'power1.inOut', duration: 1.25 / speed(), overwrite: true });
 
       const intro = requireIntro();
       intro.createLabelContent();

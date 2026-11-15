@@ -1491,10 +1491,16 @@ html.is-mode-touch .notifications {
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
-  background: radial-gradient(at 0 0, #251f2b, #1d1721);
+  color: #23434a;
+  background: #fbf3e4;
+  border: 3px solid #efdcb8;
+  border-radius: 18px;
   width: 100%;
-  padding: 12px 20px 15px 15px;
+  padding: 10px 14px 12px;
+  font-family: Nunito, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
   font-size: 16px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px #0d2b3333;
   transition: transform 0.6s cubic-bezier(0.4, 1.6, 0.65, 1);
   position: relative;
   transform: translateY(calc(-100% - 20px));
@@ -1513,11 +1519,11 @@ html:not(.is-mode-touch) .notifications .notification:hover .bottom .open-icon {
 .notifications .notification .time-bar {
   transform-origin: 100% 0;
   will-change: transform;
-  background: #ffceca;
+  background: #2bb3c0;
   width: 100%;
-  height: 2px;
+  height: 3px;
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
 }
 .notifications .notification.is-achievement .top {
@@ -1579,22 +1585,59 @@ html:not(.is-mode-touch) .notifications .notification:hover .bottom .open-icon {
 }
 .notifications .notification.is-song .top .title {
   text-align: left;
-  color: #ffc67b;
+  color: #6b7b7b;
   margin-bottom: 0;
-  font-size: 1.7rem;
-  line-height: 1em;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.notifications .notification.is-song .top .title br {
+  display: none;
 }
 .notifications .notification.is-song .top .title .song-name {
-  color: #fff;
+  color: #1f5f6e;
+  font-size: 17px;
+  font-weight: 800;
+  display: block;
 }
 .notifications .notification.is-song .top .music-note-icon {
-  background: url(/world/ui/music-note.svg);
-  width: 16px;
-  height: 18px;
+  background: #2bb3c0 url(/world/ui/music-note.svg) center / 13px 15px no-repeat;
+  border-radius: 50%;
+  flex: none;
+  width: 34px;
+  height: 34px;
   display: block;
 }
 .notifications .notification.is-song .time-bar {
-  background: #ffc67b;
+  background: #ff8a5b;
+}
+.notifications .notification.is-arrival .top {
+  align-items: center;
+  gap: 12px;
+  display: flex;
+}
+.notifications .notification.is-arrival .arrival-icon {
+  background: #fff;
+  border-radius: 12px;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 4px;
+}
+.notifications .notification.is-arrival .arrival-text {
+  flex-direction: column;
+  gap: 1px;
+  display: flex;
+}
+.notifications .notification.is-arrival .arrival-label {
+  color: #6b7b7b;
+  font-size: 13px;
+  font-weight: 700;
+}
+.notifications .notification.is-arrival .arrival-name {
+  color: #1f5f6e;
+  font-size: 19px;
+  font-weight: 800;
 }
 .notifications .notification.is-server-connected .top .title {
   text-align: left;

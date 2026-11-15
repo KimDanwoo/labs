@@ -19,8 +19,9 @@ const LABEL_TINT = isTideLoading ? TIDE_LABEL : '#ffffff';
 const LABEL_HEIGHT = 3.3;
 const LABEL_YAW = 0.4;
 const LABEL_HIDDEN_SCALE = 0.01;
-const HIGH_QUALITY_LAYOUT: LabelLayout = { offsetX: 3.5, offsetZ: -1, rotationX: 0 };
-const LOW_QUALITY_LAYOUT: LabelLayout = { offsetX: 2.3, offsetZ: -1.8, rotationX: -0.4 };
+const HIGH_QUALITY_LAYOUT: LabelLayout = { offsetX: 7.9, offsetZ: 0.2, rotationX: 0 };
+const LOW_QUALITY_LAYOUT: LabelLayout = { offsetX: 1.4, offsetZ: -5.8, rotationX: -0.4 };
+const PORTRAIT_LAYOUT: LabelLayout = { offsetX: 6.8, offsetZ: 6.8, rotationX: -0.4 };
 const RING = { radius: 3.5, thickness: 0.04, segments: 128, elevation: 0.001, smoothing: 10 } as const;
 const TICK_ORDER = 8;
 
@@ -196,7 +197,9 @@ export class Intro {
 
   #placeLabel(): void {
     const game = getGame();
-    const layout = game.quality.level === QUALITY.high ? HIGH_QUALITY_LAYOUT : LOW_QUALITY_LAYOUT;
+    const isPortrait = innerHeight > innerWidth;
+    const qualityLayout = game.quality.level === QUALITY.high ? HIGH_QUALITY_LAYOUT : LOW_QUALITY_LAYOUT;
+    const layout = isPortrait ? PORTRAIT_LAYOUT : qualityLayout;
     this.label.position.copy(this.center);
     this.label.position.x += layout.offsetX;
     this.label.position.z += layout.offsetZ;
