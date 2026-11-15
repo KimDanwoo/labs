@@ -77,21 +77,12 @@ function replaceVisual(
   return container;
 }
 
-function thatchRoof(parts: Parts, { center, width, depth, height }: Roof): void {
+const ROOF_OVERHANG = 1.12;
+
+function palmRoof({ center, width, depth, height }: Roof): THREE.Mesh {
   const [x, y, z] = center;
-  parts.add('thatch', new THREE.SphereGeometry(1, 12, 5, 0, FULL_TURN, 0, Math.PI / 2), {
-    position: [x, y, z],
-    scale: [width / 2, height, depth / 2],
-  });
-  parts.add('thatchRope', new THREE.TorusGeometry(1, 0.03, 4, 16), {
-    position: [x, y + height * 0.35, z],
-    rotation: [Math.PI / 2, 0, 0],
-    scale: [(width / 2) * 0.94, (depth / 2) * 0.94, 1],
-  });
-  parts.add('thatch', new THREE.SphereGeometry(1, 8, 4), {
-    position: [x, y + height * 0.98, z],
-    scale: [width * 0.12, height * 0.16, depth * 0.12],
-  });
+  const matrix = new THREE.Matrix4().makeTranslation(x, y + height / 2, z);
+  return islandModelMesh('palmRoof', matrix, new THREE.Vector3(width * ROOF_OVERHANG, height, depth * ROOF_OVERHANG));
 }
 
 function pillar(parts: Parts, material: PartName, { x, z, bottom, top, radius = 0.2 }: Pillar): void {
@@ -113,9 +104,12 @@ export function rebuildProjectsGate(model: THREE.Object3D): void {
     }
     parts.box('woodDark', [5.6, 0.3, 0.4], { position: [0, top - 0.1, 0] });
     parts.box('woodDark', [2.4, 0.22, 0.3], { position: [3.45, top - 0.6, 0.75], rotation: [0, -0.57, 0] });
-    thatchRoof(parts, { center: [0, top + 0.1, 0], width: 6.4, depth: 2.4, height: 1.05 });
-    thatchRoof(parts, { center: [4.6, top - 0.35, 1.5], width: 1.5, depth: 1.5, height: 0.6 });
-    return parts.build();
+    return parts
+      .build()
+      .add(
+        palmRoof({ center: [0, top + 0.1, 0], width: 6.4, depth: 2.4, height: 1.05 }),
+        palmRoof({ center: [4.6, top - 0.35, 1.5], width: 1.5, depth: 1.5, height: 0.6 }),
+      );
   });
 }
 
@@ -128,8 +122,7 @@ export function rebuildLabGate(model: THREE.Object3D): void {
     parts.box('woodDark', [7.9, 0.3, 0.4], { position: [1.42, top, 0.25] });
     parts.rod('woodDark', 0.08, [-2.25, top - 1.0, 0.25], [-1.35, top - 0.1, 0.25]);
     parts.rod('woodDark', 0.08, [2.25, top - 1.0, 0.25], [1.35, top - 0.1, 0.25]);
-    thatchRoof(parts, { center: [1.42, top + 0.12, 0.25], width: 9, depth: 2.8, height: 1.15 });
-    return parts.build();
+    return parts.build().add(palmRoof({ center: [1.42, top + 0.12, 0.25], width: 9, depth: 2.8, height: 1.15 }));
   });
 }
 
@@ -214,8 +207,7 @@ export function rebuildOuthouse(model: THREE.Object3D): void {
   }
   for (const y of [bottom + 0.7, top - 0.75]) parts.box('woodDark', [1.5, 0.12, 0.05], { position: [0, y, 0.79] });
   parts.prism('iron', 0.07, 0.07, 0.05, { position: [0.48, middle - 0.2, 0.8], rotation: [Math.PI / 2, 0, 0] }, 8);
-  thatchRoof(parts, { center: [0, top, -0.04], width: 3.1, depth: 3.0, height: 0.7 });
-  container.add(parts.build());
+  container.add(parts.build(), palmRoof({ center: [0, top, -0.04], width: 3.1, depth: 3.0, height: 0.7 }));
 }
 
 const BRIDGE = { plankPitch: 0.46, plankDepth: 0.42, railX: 2.09, posts: 6 } as const;
@@ -312,30 +304,11 @@ function boulderStack(
   }
 }
 
-const PAGODA_TIERS = [
-  [0.95, 0.62],
-  [0.75, 0.36],
-  [0.62, 0.32],
-] as const;
+const JUNGLE_TOP = { size: new THREE.Vector3(2.8, 1.9, 2.6), sink: 0.15 } as const;
 
-function stonePagoda(parts: Parts, { x, y, z }: { x: number; y: number; z: number }): void {
-  parts.box('stone', [2.0, 0.32, 2.0], { position: [x, y + 0.16, z] });
-  parts.box('stone', [1.6, 0.28, 1.6], { position: [x, y + 0.46, z] });
-  let level = y + 0.6;
-  for (const [width, height] of PAGODA_TIERS) {
-    parts.box('stone', [width, height, width], { position: [x, level + height / 2, z] });
-    level += height;
-    parts.box('stoneDark', [width + 0.75, 0.12, width + 0.75], { position: [x, level + 0.06, z] });
-    const corner = (width + 0.68) / 2;
-    for (const sideX of [-1, 1]) {
-      for (const sideZ of [-1, 1]) {
-        parts.box('stoneDark', [0.2, 0.08, 0.2], { position: [x + sideX * corner, level + 0.13, z + sideZ * corner] });
-      }
-    }
-    level += 0.12;
-  }
-  parts.prism('stoneDark', 0.1, 0.16, 0.25, { position: [x, level + 0.12, z] });
-  parts.add('stone', new THREE.IcosahedronGeometry(0.1, 0), { position: [x, level + 0.32, z] });
+function jungleTop({ x, y, z }: { x: number; y: number; z: number }): THREE.Mesh {
+  const matrix = new THREE.Matrix4().makeTranslation(x, y + JUNGLE_TOP.size.y / 2 - JUNGLE_TOP.sink, z);
+  return islandModelMesh('waterfallJungle', matrix);
 }
 
 export function rebuildWaterfallPagoda(model: THREE.Object3D): void {
@@ -360,11 +333,10 @@ export function rebuildWaterfallPagoda(model: THREE.Object3D): void {
   parts.add('fieldstone', hull.geometry.clone(), { matrix: hull.matrix });
   hull.geometry.computeBoundingBox();
   const bounds = hull.geometry.boundingBox;
-  if (bounds) {
-    const top = bounds.clone().applyMatrix4(hull.matrix);
-    stonePagoda(parts, { x: (top.min.x + top.max.x) / 2, y: top.max.y - 0.1, z: (top.min.z + top.max.z) / 2 });
-  }
   container.add(parts.build());
+  if (!bounds) return;
+  const top = bounds.clone().applyMatrix4(hull.matrix);
+  container.add(jungleTop({ x: (top.min.x + top.max.x) / 2, y: top.max.y, z: (top.min.z + top.max.z) / 2 }));
 }
 
 const NEON_GAIN = 2.2;
