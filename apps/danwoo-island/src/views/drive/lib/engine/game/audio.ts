@@ -49,6 +49,14 @@ const SOUND_POOL = 2;
 const RATE_RANGE = { min: 0.5, max: 4 } as const;
 const AUDIBLE_VOLUME = 0.01;
 const CAMERA_DEPTH_SCALE = 0.1;
+const PRELOAD_BATCH = 6;
+const IDLE_TIMEOUT_MS = 2000;
+
+function scheduleIdle(task: () => void): void {
+  if ('requestIdleCallback' in window) window.requestIdleCallback(task, { timeout: IDLE_TIMEOUT_MS });
+  else setTimeout(task, 0);
+}
+
 const SONG_ROTATION_MS = 3 * 60 * 1000;
 const SONG_SWITCH_DELAY = 3;
 const SONG_NOTICE_DURATION = 5;
@@ -156,7 +164,8 @@ export class AudioItem {
   readonly #antiSpam: number;
   readonly #onPlay: SoundHandler | null;
   readonly onPlaying: ((item: AudioItem) => void) | null;
-  #isLoaded: boolean;
+  #isLoaded = false;
+  readonly isEager: boolean;
   #lastPlay = -Infinity;
   #appliedRate = Number.NaN;
   #appliedVolume = Number.NaN;
@@ -172,7 +181,7 @@ export class AudioItem {
       autoplay: isPlaying,
       loop: options.loop ?? false,
       volume,
-      preload: options.preload ?? true,
+      preload: false,
       onloaderror: () => reportError(new Error(`Audio load error: ${options.path}`)),
       onend: () => {
         this.playing = false;
@@ -185,18 +194,22 @@ export class AudioItem {
     this.#antiSpam = options.antiSpam ?? DEFAULT_ANTI_SPAM;
     this.onPlaying = options.onPlaying ?? null;
     this.#onPlay = options.onPlay ?? null;
-    this.#isLoaded = options.preload ?? true;
+    this.isEager = options.preload ?? true;
     this.autoplay = options.autoplay ?? false;
     this.playing = isPlaying;
+    if (isPlaying) this.load();
+  }
+
+  load(): void {
+    if (this.#isLoaded) return;
+    this.#isLoaded = true;
+    this.howl.load();
   }
 
   play(...args: unknown[]): void {
     const game = getGame();
     if (!game.audio.initiated) return;
-    if (!this.#isLoaded) {
-      this.#isLoaded = true;
-      this.howl.load();
-    }
+    this.load();
     if (this.#antiSpam && game.ticker.elapsed - this.#lastPlay < this.#antiSpam) return;
 
     this.#onPlay?.(this, ...args);
@@ -345,6 +358,16 @@ export class Audio {
         if (item.autoplay && !item.playing) item.play();
       }
     }
+    this.#preloadEager();
+  }
+
+  #preloadEager(): void {
+    const pending = [...this.groups.values()].flatMap(({ items }) => items).filter((item) => item.isEager);
+    const loadBatch = (): void => {
+      for (const item of pending.splice(0, PRELOAD_BATCH)) item.load();
+      if (pending.length > 0) scheduleIdle(loadBatch);
+    };
+    scheduleIdle(loadBatch);
   }
 
   register(options: SoundOptions): AudioItem {
@@ -353,6 +376,7 @@ export class Audio {
     this.groups.set(groupName, group);
     const item = new AudioItem(options, group, this.initiated);
     group.items.push(item);
+    if (this.initiated && item.isEager) scheduleIdle(() => item.load());
     return item;
   }
 
