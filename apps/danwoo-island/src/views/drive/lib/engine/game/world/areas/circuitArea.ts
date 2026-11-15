@@ -10,7 +10,7 @@ import { objectOf, type WorldObject } from '../../objects';
 import { Player } from '../../player';
 import { segmentCircleIntersection } from '../../utilities/maths';
 import { requireElement } from '../../utilities/requireElement';
-import { reshapeCircuitDecoration } from '../circuitDecoration';
+import { rebuildTentCanopies, reshapeCircuitDecoration } from '../circuitDecoration';
 import { rebuildCircuitObjects, rebuildPodium } from '../circuitProps';
 import { replaceAirDancers } from '../islandReskins';
 import { Area } from './area';
@@ -174,6 +174,7 @@ export class CircuitArea extends Area {
     rebuildCircuitObjects(this.model);
     rebuildPodium(this.model);
     reshapeCircuitDecoration(this.model);
+    rebuildTentCanopies(this.model);
     replaceAirDancers(this.model);
     super.setObjects();
   }

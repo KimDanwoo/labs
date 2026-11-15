@@ -8,12 +8,15 @@ import {
   removeComponents,
   type Triple,
 } from './islandGeometry';
+import { islandModelMesh } from './islandModels';
 import { lathe, type Profile } from './villageKit';
 
 type DecorationKind = 'erase' | 'tentLeg' | 'keep';
 type Spot = readonly [number, number];
 
 const SIDES = [-1, 1] as const;
+const TENT_CANOPY = /^Cylinder0(22|37|39)$/;
+const START_LIGHT_FRAME_LIFT = 0.45;
 
 const box3 = (min: Triple, max: Triple): THREE.Box3 =>
   new THREE.Box3(new THREE.Vector3(...min), new THREE.Vector3(...max));
@@ -525,6 +528,32 @@ function tentPole(parts: Parts, box: THREE.Box3): void {
   );
 }
 
+function replaceTentCanopy(canopy: THREE.Mesh): void {
+  canopy.geometry.computeBoundingBox();
+  const box = canopy.geometry.boundingBox;
+  if (!box || !canopy.parent) return;
+  canopy.updateMatrix();
+  const matrix = canopy.matrix
+    .clone()
+    .multiply(new THREE.Matrix4().makeTranslation(box.getCenter(new THREE.Vector3())));
+  canopy.parent.add(islandModelMesh('beachCanopy', matrix, box.getSize(new THREE.Vector3())));
+  canopy.removeFromParent();
+}
+
+export function rebuildTentCanopies(model: THREE.Object3D): void {
+  const canopies: THREE.Mesh[] = [];
+  model.traverse((child) => {
+    if (child instanceof THREE.Mesh && TENT_CANOPY.test(child.name)) canopies.push(child);
+  });
+  for (const canopy of canopies) replaceTentCanopy(canopy);
+}
+
+function startLightFrame(): THREE.Mesh {
+  const center = CIRCUIT_DECORATION.startLights.getCenter(new THREE.Vector3());
+  center.y += START_LIGHT_FRAME_LIFT;
+  return islandModelMesh('startLightFrame', new THREE.Matrix4().makeTranslation(center));
+}
+
 export function reshapeCircuitDecoration(model: THREE.Object3D): void {
   const decoration = model.getObjectByName('Cube088');
   if (!(decoration instanceof THREE.Mesh)) return;
@@ -538,5 +567,5 @@ export function reshapeCircuitDecoration(model: THREE.Object3D): void {
   dancerChest(parts);
   bannerStand(parts);
   hongsalmun(parts);
-  decoration.add(parts.build());
+  decoration.add(parts.build(), startLightFrame());
 }

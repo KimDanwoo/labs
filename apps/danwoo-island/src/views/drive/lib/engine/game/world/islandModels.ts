@@ -23,6 +23,14 @@ const ISLAND_MODELS = {
   surfFlag: 'areas/island/models/surfFlag.glb',
   palmTree: 'areas/island/models/palmTree.glb',
   jukebox: 'areas/island/models/jukebox.glb',
+  beachCanopy: 'areas/island/models/beachCanopy.glb',
+  startLightFrame: 'areas/island/models/startLightFrame.glb',
+  palmRoof: 'areas/island/models/palmRoof.glb',
+  firePit: 'areas/island/models/firePit.glb',
+  bambooBucket: 'areas/island/models/bambooBucket.glb',
+  clayPot: 'areas/island/models/clayPot.glb',
+  ukuleleTable: 'areas/island/models/ukuleleTable.glb',
+  waterfallJungle: 'areas/island/models/waterfallJungle.glb',
 } as const;
 
 export type IslandModelKey = keyof typeof ISLAND_MODELS;
