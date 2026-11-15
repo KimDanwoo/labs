@@ -53,7 +53,7 @@ function arrivalNotice({ name, icon }: IslandPlace): HTMLElement {
   return createElement('div', 'top', [
     image,
     createElement('div', 'arrival-text', [
-      createElement('span', 'arrival-label', ['회오리를 타고 도착했어요']),
+      createElement('span', 'arrival-label', ['회오리 이동']),
       createElement('strong', 'arrival-name', [name]),
     ]),
   ]);
