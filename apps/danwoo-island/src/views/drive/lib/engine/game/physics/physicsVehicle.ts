@@ -235,7 +235,7 @@ export class PhysicsVehicle {
       ],
       canSleep: false,
       waterGravityMultiplier: 0,
-      onCollision: (force, position) => game.audio.groups.get('hitDefault').playRandomNext(force, position),
+      onCollision: (force, position) => game.audio.groups.get('hitDefault')?.playRandomNext(force, position),
     });
     if (!physical) throw new Error('Vehicle chassis has no physical body');
     return { physical, mass: physical.body.mass() };
@@ -326,7 +326,7 @@ export class PhysicsVehicle {
     const baseBrake = isReversing ? DRIVE.reverseBrake : idleOrPlayerBrake;
     return {
       engineForce: isReversing ? 0 : engineForce,
-      brake: baseBrake * DRIVE.brakeAmplitude * ticker.deltaScaled,
+      brake: baseBrake * (DRIVE.brakeAmplitude * ticker.deltaScaled),
     };
   }
 
