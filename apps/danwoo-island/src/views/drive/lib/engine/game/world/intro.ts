@@ -20,9 +20,9 @@ const LABEL_TINT = isTideLoading ? TIDE_LABEL : '#ffffff';
 const LABEL_HEIGHT = 3.3;
 const LABEL_YAW = 0.4;
 const LABEL_HIDDEN_SCALE = 0.01;
-const HIGH_QUALITY_LAYOUT: LabelLayout = { offsetX: 7.1, offsetZ: 7.1, rotationX: -0.25 };
+const HIGH_QUALITY_LAYOUT: LabelLayout = { offsetX: 6.5, offsetZ: 6.5, rotationX: -0.25 };
 const LOW_QUALITY_LAYOUT: LabelLayout = { offsetX: 1.4, offsetZ: -5.8, rotationX: -0.4 };
-const PORTRAIT_LAYOUT: LabelLayout = { offsetX: 6.8, offsetZ: 6.8, rotationX: -0.4 };
+const PORTRAIT_LAYOUT: LabelLayout = { offsetX: 7.2, offsetZ: 7.2, rotationX: -0.4 };
 const RING = { radius: 3.5, thickness: 0.04, segments: 128, elevation: 0.001, smoothing: 10 } as const;
 const TICK_ORDER = 8;
 
