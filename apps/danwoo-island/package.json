@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "world:sync": "node scripts/syncWorld.mjs",
+    "models:compress": "node tools/compressModels.mjs world-overrides/areas/island/models/*.glb",
     "dev": "node scripts/syncWorld.mjs && next dev",
     "build": "node scripts/syncWorld.mjs && next build",
     "start": "next start",
@@ -33,6 +34,7 @@
     "@types/react-dom": "catalog:",
     "@types/seedrandom": "catalog:",
     "@types/three": "catalog:",
+    "draco3d": "catalog:",
     "eslint": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"

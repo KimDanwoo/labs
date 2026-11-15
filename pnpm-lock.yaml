@@ -102,6 +102,9 @@ catalogs:
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
+    draco3d:
+      specifier: 1.5.7
+      version: 1.5.7
     eslint:
       specifier: ^9
       version: 9.39.5
@@ -456,6 +459,9 @@ importers:
       '@types/three':
         specifier: 'catalog:'
         version: 0.187.0
+      draco3d:
+        specifier: 'catalog:'
+        version: 1.5.7
       eslint:
         specifier: 'catalog:'
         version: 9.39.5(jiti@2.7.0)
