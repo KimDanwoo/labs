@@ -58,7 +58,7 @@ function scheduleIdle(task: () => void): void {
 }
 
 const SONG_ROTATION_MS = 3 * 60 * 1000;
-const SONG_SWITCH_DELAY = 3;
+const SONG_SWITCH_DELAY = 1;
 const SONG_NOTICE_DURATION = 5;
 const SONGS = [{ path: 'sounds/musics/baram.mp3', name: '바람 · danwoo0' }] as const;
 const AMBIENT_DISTANCE = 30;
@@ -296,11 +296,22 @@ class Playlist {
     });
   }
 
+  preload(): void {
+    const song = this.songs[this.#index];
+    if (song) this.#load(song);
+  }
+
+  #load(song: Song): void {
+    if (song.isLoaded) return;
+    song.isLoaded = true;
+    song.sound.load();
+  }
+
   #startCurrent(): Song {
     const song = this.songs[this.#index];
     if (!song) throw new Error('Playlist is empty');
     this.current = song;
-    if (!song.isLoaded) song.sound.load();
+    this.#load(song);
     song.sound.play();
     return song;
   }
@@ -407,11 +418,19 @@ export class Audio {
     this.playlist?.resume();
   }
 
-  #startPlaylist(): void {
-    this.playlist = new Playlist(
+  preloadMusic(): void {
+    if (WORLD_CONFIG.music) this.#ensurePlaylist().preload();
+  }
+
+  #ensurePlaylist(): Playlist {
+    this.playlist ??= new Playlist(
       () => this.initiated && WORLD_CONFIG.music && this.musicOwner === 'island' && !this.isBackground,
     );
-    this.playlist.resume();
+    return this.playlist;
+  }
+
+  #startPlaylist(): void {
+    this.#ensurePlaylist().resume();
   }
 
   #registerAmbients(): void {
