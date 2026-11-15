@@ -60,49 +60,6 @@ export function beachBall(parts: Parts, { size }: PropFrame): void {
   }
 }
 
-const CORAL_PILLAR = {
-  baseHeight: 0.28,
-  baseHeightRatio: 0.22,
-  capitalHeight: 0.24,
-  capitalHeightRatio: 0.18,
-  finialHeight: 0.18,
-  finialHeightRatio: 0.14,
-  shaftTopRadiusRatio: 0.78,
-  shaftBottomRadiusRatio: 0.82,
-  capitalTopRadiusRatio: 0.98,
-  capitalBottomRadiusRatio: 0.8,
-  finialTopRadiusRatio: 0.3,
-  finialBottomRadiusRatio: 0.62,
-  sides: 8,
-} as const;
-
-export function stonePillar(parts: Parts, { size, matrix }: PropFrame): void {
-  const design = CORAL_PILLAR;
-  const bottom = -size.y / 2;
-  const radius = Math.min(size.x, size.z) / 2;
-  const baseHeight = Math.min(design.baseHeight, size.y * design.baseHeightRatio);
-  const capitalHeight = Math.min(design.capitalHeight, size.y * design.capitalHeightRatio);
-  const finialHeight = Math.min(design.finialHeight, size.y * design.finialHeightRatio);
-  const shaftHeight = size.y - baseHeight - capitalHeight - finialHeight;
-  const shaftBottom = bottom + baseHeight;
-  const capitalBottom = shaftBottom + shaftHeight;
-  const finialBottom = capitalBottom + capitalHeight;
-  const tier = (shade: PartName, topRatio: number, bottomRatio: number, height: number, from: number): void =>
-    parts.prism(
-      shade,
-      radius * topRatio,
-      radius * bottomRatio,
-      height,
-      { position: [0, from + height / 2, 0], matrix },
-      design.sides,
-    );
-
-  tier('stoneDark', 1, 1, baseHeight, bottom);
-  tier('sand', design.shaftTopRadiusRatio, design.shaftBottomRadiusRatio, shaftHeight, shaftBottom);
-  tier('bunting1', design.capitalTopRadiusRatio, design.capitalBottomRadiusRatio, capitalHeight, capitalBottom);
-  tier('sand', design.finialTopRadiusRatio, design.finialBottomRadiusRatio, finialHeight, finialBottom);
-}
-
 const PINWHEEL = {
   radius: 0.44,
   centerY: 0.25,

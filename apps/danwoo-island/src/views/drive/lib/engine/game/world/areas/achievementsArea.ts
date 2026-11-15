@@ -19,7 +19,6 @@ import * as THREE from 'three/webgpu';
 
 import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
 import { paintAchievementsBasin } from '../islandReskins';
-import { rebuildWaterfallPagoda } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
 
@@ -61,7 +60,6 @@ export class AchievementsArea extends Area {
   }
 
   override setObjects(): void {
-    rebuildWaterfallPagoda(this.model);
     paintAchievementsBasin(this.model);
     rebuildVillageProps(this.model);
     super.setObjects();

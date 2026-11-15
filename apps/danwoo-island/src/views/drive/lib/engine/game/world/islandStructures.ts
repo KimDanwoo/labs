@@ -2,7 +2,7 @@ import { Fn, texture, uv, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { MeshDefaultMaterial, revealNode } from '../materials/meshDefaultMaterial';
-import { createParts, FULL_TURN, type PartName, type Parts, seededRandom, type Triple } from './islandGeometry';
+import { createParts, type PartName, type Parts, type Triple } from './islandGeometry';
 import { islandModelMesh } from './islandModels';
 
 export interface Frame {
@@ -284,59 +284,6 @@ function removeVisualMeshes(container: THREE.Object3D): void {
   )) {
     child.removeFromParent();
   }
-}
-
-function boulderStack(
-  parts: Parts,
-  random: () => number,
-  { size, matrix }: Frame,
-  shades: readonly PartName[] = ['fieldstone', 'stoneDark'],
-): void {
-  const layers = Math.max(1, Math.round(size.y / 1.3));
-  const layerHeight = size.y / layers;
-  for (let index = 0; index < layers; index += 1) {
-    parts.add(shades[index % shades.length] ?? 'fieldstone', new THREE.IcosahedronGeometry(1, 0), {
-      position: [(random() - 0.5) * 0.15, -size.y / 2 + layerHeight * (index + 0.5), (random() - 0.5) * 0.15],
-      rotation: [0, random() * FULL_TURN, 0],
-      scale: [(size.x / 2) * 1.12, (layerHeight / 2) * 1.2, (size.z / 2) * 1.12],
-      matrix,
-    });
-  }
-}
-
-const JUNGLE_TOP = { size: new THREE.Vector3(2.8, 1.9, 2.6), sink: 0.15 } as const;
-
-function jungleTop({ x, y, z }: { x: number; y: number; z: number }): THREE.Mesh {
-  const matrix = new THREE.Matrix4().makeTranslation(x, y + JUNGLE_TOP.size.y / 2 - JUNGLE_TOP.sink, z);
-  return islandModelMesh('waterfallJungle', matrix);
-}
-
-export function rebuildWaterfallPagoda(model: THREE.Object3D): void {
-  findChild(model, 'Cube089').removeFromParent();
-  const container = findChild(model, 'physicalFixed008');
-  const random = seededRandom(31);
-  const parts = createParts();
-  for (const cuboid of container.children.filter((child) => CUBOID.test(child.name))) {
-    const frame = cuboidFrame(cuboid);
-    const isPillarColumn = Math.hypot(cuboid.position.x, cuboid.position.z) < 0.1 && frame.size.y > 3;
-    if (isPillarColumn) continue;
-    if (frame.size.y > 3) boulderStack(parts, random, frame);
-    else if (frame.size.y <= 0.2) parts.box('stone', [frame.size.x, 0.2, frame.size.z], { matrix: frame.matrix });
-    else {
-      parts.box(frame.size.x < 0.5 ? 'stoneDark' : 'stone', [frame.size.x, frame.size.y, frame.size.z], {
-        matrix: frame.matrix,
-      });
-    }
-  }
-  const hull = requireMesh(findChildMatching(container, /^hull/));
-  hull.updateMatrix();
-  parts.add('fieldstone', hull.geometry.clone(), { matrix: hull.matrix });
-  hull.geometry.computeBoundingBox();
-  const bounds = hull.geometry.boundingBox;
-  container.add(parts.build());
-  if (!bounds) return;
-  const top = bounds.clone().applyMatrix4(hull.matrix);
-  container.add(jungleTop({ x: (top.min.x + top.max.x) / 2, y: top.max.y, z: (top.min.z + top.max.z) / 2 }));
 }
 
 const NEON_GAIN = 2.2;
