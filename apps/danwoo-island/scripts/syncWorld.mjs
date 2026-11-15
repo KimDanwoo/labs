@@ -16,7 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { preparePortfolioContent } from './portfolioContent.mjs';
 
-const SYNC_FORMAT_VERSION = '4';
+const SYNC_FORMAT_VERSION = '5';
 const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WORLD_COMMIT = '70764a94756cc4de564e493c8ba46c4b5fe03ed1';
 const WORLD_REPOSITORY = 'https://github.com/brunosimon/folio-2025.git';
@@ -43,7 +43,24 @@ const REQUIRED_STATIC_FILES = [
   'favicons/favicon.svg',
 ];
 
-const UNUSED_STATIC_DIRECTORIES = ['projects', 'lab'];
+const UNUSED_STATIC_DIRECTORIES = ['projects', 'lab', 'christmas', 'easter', 'whispers', 'blackFriday'];
+const UNUSED_STATIC_FILES = new Set([
+  'sounds/musics/Boy.mp3',
+  'sounds/musics/Baguira.mp3',
+  'sounds/musics/Sudo.mp3',
+  'ui/map/map-day.png',
+  'ui/map/map-night.png',
+  'draco/draco_encoder.js',
+  'draco/gltf/draco_encoder.js',
+  'social/share-image.png',
+  'ui/previews/easter.png',
+  'ui/previews/easter.webp',
+  'foliage/foliageSDF.ktx',
+  'birchTrees/birchTreesVisual-compressed.glb',
+  'cherryTrees/cherryTreesVisual-compressed.glb',
+  'vehicle/defaultAntenna-compressed.glb',
+]);
+const UNUSED_FONT_FORMATS = /^fonts\/Pally-(Variable\.|.*\.eot$)/;
 const UNCOMPRESSED_FILES_IN_USE = new Set(['vehicle/default.glb', 'vehicle/oldSchool.glb']);
 const COMPRESSED_COUNTERPART = [
   [/\.glb$/, '-compressed.glb'],
@@ -53,6 +70,7 @@ const COMPRESSED_COUNTERPART = [
 function isUnusedStatic(source, staticDirectory) {
   const relative = path.relative(staticDirectory, source).split(path.sep).join('/');
   if (UNUSED_STATIC_DIRECTORIES.includes(relative)) return true;
+  if (UNUSED_STATIC_FILES.has(relative) || UNUSED_FONT_FORMATS.test(relative)) return true;
   if (relative.endsWith('.wav')) return true;
   if (relative.endsWith('-compressed.glb') || UNCOMPRESSED_FILES_IN_USE.has(relative)) return false;
   return COMPRESSED_COUNTERPART.some(
