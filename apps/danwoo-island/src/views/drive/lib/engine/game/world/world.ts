@@ -18,6 +18,7 @@ import { PalmTrees } from './palmTrees';
 import { PoleLights } from './poleLights';
 import { RainLines } from './rainLines';
 import { Scenery } from './scenery';
+import { pruneShadowCasters } from './shadowCasters';
 import { Snow } from './snow';
 import { Trees } from './trees';
 import { VisualVehicle } from './visualVehicle';
@@ -91,6 +92,7 @@ export class World {
     this.lanterns = new Lanterns();
     this.scenery = new Scenery();
     this.areas = createAreas();
+    pruneShadowCasters(getGame().scene);
   }
 
   updateLoadingProgress(ratio: number): void {
