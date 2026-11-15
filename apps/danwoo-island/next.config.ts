@@ -9,9 +9,14 @@ const SECURITY_HEADERS = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
 ];
 
+const WORLD_ASSET_CACHE = [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }];
+
 const nextConfig: NextConfig = {
   async headers() {
-    return [{ source: '/(.*)', headers: SECURITY_HEADERS }];
+    return [
+      { source: '/(.*)', headers: SECURITY_HEADERS },
+      { source: '/world/:path*', headers: WORLD_ASSET_CACHE },
+    ];
   },
 };
 
