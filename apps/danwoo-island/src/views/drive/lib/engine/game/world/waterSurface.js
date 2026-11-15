@@ -256,20 +256,21 @@ export class WaterSurface
 
     setIce()
     {
-        this.ice = {}
-
-        this.ice.halfThickness = 0.5
-        this.ice.physical = this.game.physics.getPhysical({
-            type: 'kinematicPositionBased',
-            position: new THREE.Vector3(0, this.game.water.surfaceElevation - this.ice.halfThickness, 0),
-            frictionRule: 'min',
-            friction: 0.02,
-            enabled: false,
-            colliders:
-            [
-                { shape: 'cuboid', parameters: [ 256, this.ice.halfThickness, 256 ] },
-            ]
-        })
+        const halfThickness = 0.5
+        this.ice = {
+            halfThickness,
+            physical: this.game.physics.getPhysical({
+                type: 'kinematicPositionBased',
+                position: new THREE.Vector3(0, this.game.water.surfaceElevation - halfThickness, 0),
+                frictionRule: 'min',
+                friction: 0.02,
+                enabled: false,
+                colliders:
+                [
+                    { shape: 'cuboid', parameters: [ 256, halfThickness, 256 ] },
+                ]
+            })
+        }
     }
 
     update()
