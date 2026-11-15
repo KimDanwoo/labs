@@ -1,7 +1,6 @@
 import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputs';
 import { isShown } from './panelState';
-import { ProjectsArea } from './world/areas/projectsArea';
 
 const ACTION_CATEGORIES = ['modal', 'menu', 'racing', 'cinematic', 'wandering'];
 const ACTIONS = [
@@ -20,7 +19,7 @@ function isInRace(): boolean {
 function closeOpenArea(): boolean {
   const { areas } = getGame().world;
   const { projects, lab } = areas ?? {};
-  if (projects && (projects.state === ProjectsArea.STATE_OPEN || projects.state === ProjectsArea.STATE_OPENING)) {
+  if (projects?.isShown) {
     projects.close();
     return true;
   }
