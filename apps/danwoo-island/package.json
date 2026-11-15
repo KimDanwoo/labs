@@ -13,9 +13,6 @@
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "catalog:",
-    "@tweakpane/plugin-camerakit": "catalog:",
-    "@tweakpane/plugin-essentials": "catalog:",
-    "camera-controls": "catalog:",
     "gsap": "catalog:",
     "howler": "catalog:",
     "next": "catalog:",
@@ -23,16 +20,18 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "seedrandom": "catalog:",
-    "three": "catalog:",
-    "tweakpane": "catalog:"
+    "three": "catalog:"
   },
   "devDependencies": {
     "@config/tsconfig": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
+    "@types/howler": "catalog:",
     "@types/node": "catalog:",
+    "@types/normalize-wheel": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@types/seedrandom": "catalog:",
     "@types/three": "catalog:",
     "eslint": "catalog:",
     "tsx": "catalog:",

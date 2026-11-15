@@ -28,7 +28,8 @@ const STAGING_DIRECTORY = path.join(PUBLIC_DIRECTORY, '.world-staging');
 const PREVIOUS_DIRECTORY = path.join(PUBLIC_DIRECTORY, '.world-previous');
 const STAMP_FILE = '.stamp';
 const OVERRIDES_DIRECTORY = path.join(APP_ROOT, 'world-overrides');
-const CONTENT_MODULE = path.join(APP_ROOT, 'src/views/drive/lib/engine/data/danwoo.js');
+const CONTENT_MODULE = path.join(APP_ROOT, 'src/views/drive/lib/engine/data/danwoo.ts');
+const LEGACY_CONTENT_MODULE = path.join(APP_ROOT, 'src/views/drive/lib/engine/data/danwoo.js');
 const LOCK_DIRECTORY = path.join(tmpdir(), 'danwoo-island-world.lock');
 const LOCK_OWNER_FILE = path.join(LOCK_DIRECTORY, 'pid');
 const LOCK_POLL_MS = 500;
@@ -228,6 +229,7 @@ for (const [signal, exitCode] of Object.entries(EXIT_CODE_BY_SIGNAL))
 
 acquireLock();
 try {
+  rmSync(LEGACY_CONTENT_MODULE, { force: true });
   if (isUpToDate(stamp, content)) {
     process.stdout.write('월드 에셋이 최신이에요.\n');
   } else {

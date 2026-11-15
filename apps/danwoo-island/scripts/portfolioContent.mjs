@@ -60,7 +60,7 @@ function buildContent() {
 }
 
 export function preparePortfolioContent() {
-  const source = `// Generated from Danwoo Lab hub content by scripts/syncWorld.mjs. Edit the hub, then sync.\nexport default ${JSON.stringify(buildContent(), null, 2)}\n`;
+  const source = `import type { WorldContent } from './worldContent';\n\nexport default ${JSON.stringify(buildContent(), null, 2)} satisfies WorldContent;\n`;
   const assets = collectAssets();
   const fingerprint = createHash('sha256').update(source);
   for (const asset of assets) fingerprint.update(asset.destination).update(readFileSync(asset.source));
