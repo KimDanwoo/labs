@@ -1,7 +1,6 @@
 import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputs';
 import { isShown } from './panelState';
-import { LabArea } from './world/areas/labArea';
 import { ProjectsArea } from './world/areas/projectsArea';
 
 const ACTION_CATEGORIES = ['modal', 'menu', 'racing', 'cinematic', 'wandering'];
@@ -25,7 +24,7 @@ function closeOpenArea(): boolean {
     projects.close();
     return true;
   }
-  if (lab && (lab.state === LabArea.STATE_OPEN || lab.state === LabArea.STATE_OPENING)) {
+  if (lab?.isShown) {
     lab.close();
     return true;
   }
