@@ -26,7 +26,7 @@ import { Overlay } from './overlay';
 import { Physics } from './physics/physics';
 import { PhysicsVehicle } from './physics/physicsVehicle';
 import { Player } from './player';
-import { PreRenderer } from './preRenderer';
+import { preRender } from './preRenderer';
 import { QUALITY, Quality } from './quality';
 import { RayCursor } from './rayCursor';
 import { Rendering } from './rendering';
@@ -421,7 +421,7 @@ export class Game {
     this.#provide('overlay', new Overlay());
 
     const shouldPreRender = this.quality.level === QUALITY.high && this.rendering.isWebGPU();
-    if (shouldPreRender) PreRenderer.render();
+    if (shouldPreRender) preRender();
     this.ticker.wait(REVEAL_DELAY_FRAMES, () => {
       this.reveal.start();
     });

@@ -143,7 +143,7 @@ export class Confetti
         }
     }
 
-    pop(position = null, radius = 4, elevation = 6)
+    pop(position, radius = 4, elevation = 6)
     {
         const _position = position ?? new THREE.Vector3(this.game.player.position.x, 0, this.game.player.position.z)
         const availableConfetti = this.pool.find(confetti => confetti.available)

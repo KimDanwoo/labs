@@ -360,7 +360,7 @@ export class Lightnings
         {
             this.sounds.near[Math.floor(Math.random() * this.sounds.near.length)].play(coordinates)
 
-            const vehicleHit = this.game.explosions.explode(coordinates, 7, 4, true)
+            const vehicleHit = this.game.explosions.explode(coordinates, { radius: 7, strength: 4, isVehicleOnly: true })
 
             disposables.push(this.arc.create(coordinates, rng))
 

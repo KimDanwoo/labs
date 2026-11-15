@@ -73,7 +73,7 @@ export class Fireballs
         gsap.fromTo(mesh.rotation, { z: 0 }, { z: - 1 , duration: 2.25, delay: 0, ease: 'linear' })
         gsap.fromTo(progress, { value: 0.15 }, { value: 1, duration: 2, delay: 0.25, ease: 'linear' })
 
-        this.game.explosions.explode(coordinates, explosionRadius, 8)
+        this.game.explosions.explode(coordinates, { radius: explosionRadius, strength: 8 })
 
         gsap.delayedCall(2.25, () =>
         {
