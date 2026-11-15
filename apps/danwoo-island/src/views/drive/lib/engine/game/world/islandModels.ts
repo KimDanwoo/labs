@@ -30,6 +30,9 @@ const ISLAND_MODELS = {
   bambooBucket: 'areas/island/models/bambooBucket.glb',
   clayPot: 'areas/island/models/clayPot.glb',
   ukuleleTable: 'areas/island/models/ukuleleTable.glb',
+  waterfallCliff: 'areas/island/models/waterfallCliff.glb',
+  tikiTotem: 'areas/island/models/tikiTotem.glb',
+  waterfallBasin: 'areas/island/models/waterfallBasin.glb',
 } as const;
 
 export type IslandModelKey = keyof typeof ISLAND_MODELS;
