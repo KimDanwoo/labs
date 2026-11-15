@@ -4,6 +4,7 @@ import {
   cameraPosition,
   float,
   Fn,
+  mix,
   mod,
   modelWorldMatrix,
   rotateUV,
@@ -24,7 +25,8 @@ import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 const GRASS_CLEARINGS = [{ x: 58.4, z: 32.4, radius: 2.4 }] as const;
 const SUBDIVISIONS = 280;
 const SURFACE_IDEAL = 2000;
-const BLADE = { width: 0.1, height: 0.6, heightRandomness: 0.6 } as const;
+const BLADE = { width: 0.17, height: 0.46, heightRandomness: 0.55, lean: 1.4 } as const;
+const SHADE = { base: 0.7, tip: 1.22 } as const;
 const BLADE_SHAPE = [0, 1, 1, 0, -1, 0];
 const OVERFLOW_GROWTH = { initial: 0.5, resized: 0.4 } as const;
 const HIDDEN_THRESHOLD = 0.1;
@@ -119,7 +121,7 @@ export class Grass {
     const hidden = step(terrainData.g.sub(0.4), HIDDEN_THRESHOLD);
 
     const material = new MeshDefaultMaterial({
-      colorNode: game.terrain.colorNode(terrainData),
+      colorNode: game.terrain.colorNode(terrainData).mul(mix(SHADE.base, SHADE.tip, tipness)),
       normalNode: vec3(0, 1, 0),
       hasWater: false,
       hasLightBounce: false,
@@ -142,8 +144,9 @@ export class Grass {
         .mul(heightVariation)
         .mul(grassAmount);
       const shapeIndex = vertexLoopIndex.mod(3).mul(2);
+      const lean = attribute('heightRandomness', 'float').sub(0.5).mul(BLADE.lean).mul(tipness);
       const shape = vec3(
-        bladeShape.element(shapeIndex).mul(this.#bladeWidth).mul(grassAmount),
+        bladeShape.element(shapeIndex).add(lean).mul(this.#bladeWidth).mul(grassAmount),
         bladeShape.element(shapeIndex.add(1)).mul(height),
         0,
       );

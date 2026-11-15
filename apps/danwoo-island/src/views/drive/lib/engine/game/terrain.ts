@@ -15,7 +15,7 @@ const GRADIENT = [
   { stop: 0.3, value: '#42c9c6' },
   { stop: 0.9, value: '#14658b' },
 ] as const;
-const GRASS_COLOR = '#79b94d';
+const GRASS_COLOR = '#6cbf47';
 const TICK_ORDER = 10;
 
 function gradientTexture(): THREE.Texture {
