@@ -2160,15 +2160,6 @@ html:not(.is-mode-touch) .blog .blog-post:hover .blog-post-title,
     transform: translateY(22px) rotate(-1.2deg);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .blog.is-displayed :is(.panel-card, .blog-posts > li, .blog-all) {
-    animation: none;
-  }
-  .blog .blog-post-image,
-  .blog .blog-post-title {
-    transition: none;
-  }
-}
 .blog .blog-post-body {
   flex-direction: column;
   gap: 4px;
@@ -2198,6 +2189,15 @@ html:not(.is-mode-touch) .blog .blog-post:hover .blog-post-title,
   line-height: 1.5;
   display: -webkit-box;
   overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .blog.is-displayed :is(.panel-card, .blog-posts > li, .blog-all) {
+    animation: none;
+  }
+  .blog .blog-post-image,
+  .blog .blog-post-title {
+    transition: none;
+  }
 }
 .blog .blog-status {
   color: #6b7b7b;

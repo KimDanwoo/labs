@@ -29,7 +29,7 @@ const DEBRIS = { count: 140, size: 0.18 } as const;
 const DUST = { radius: 3 } as const;
 const SPIN = { idle: 1, surge: 3.2, surgeIn: 0.4, surgeOut: 2.2 } as const;
 const TRIGGER = { radius: 2, maxHeight: 2.5, cooldown: 2 } as const;
-const LIFT = { upward: 7, spin: 6, duration: 1.2, abortDistance: 10 } as const;
+const LIFT = { upward: 7, spin: 6, carry: 0, duration: 1.2 } as const;
 const VISIT = { radius: 10, interval: 0.5 } as const;
 const COLORS = { sand: '#e9d7ae', dust: '#c9b28a', mist: '#f7f3ea', leaf: '#7cbf5a' } as const;
 const ORIGIN = 'altar';
@@ -56,7 +56,8 @@ export class AltarArea extends Area {
   readonly #lift: AudioItem;
   readonly #visited = new Set<string>();
   #lastTrigger = -Infinity;
-  #isTraveling = false;
+  #travelSequence: number | null = null;
+  #liftCall: gsap.core.Tween | null = null;
   #visitTimer = 0;
 
   constructor(model: THREE.Object3D) {
@@ -190,6 +191,7 @@ export class AltarArea extends Area {
     material.scaleNode = Fn(() => seed.mul(0.6).add(0.4))();
     const debris = new THREE.Mesh(new THREE.PlaneGeometry(DEBRIS.size, DEBRIS.size), material);
     debris.count = DEBRIS.count;
+    debris.frustumCulled = false;
     debris.position.copy(this.#position);
     this.#addHideable(debris);
   }
@@ -203,19 +205,19 @@ export class AltarArea extends Area {
     const { player, physicalVehicle, ticker } = this.game;
     const isAirborne = player.position.y - this.#position.y > TRIGGER.maxHeight;
     const isCoolingDown = ticker.elapsed - this.#lastTrigger < TRIGGER.cooldown;
-    if (this.#isTraveling || isAirborne || isCoolingDown) return;
+    if (this.#travelSequence !== null || isAirborne || isCoolingDown) return;
     this.#lastTrigger = ticker.elapsed;
-    this.#isTraveling = true;
+    this.#travelSequence = player.respawnSequence;
     player.state = Player.STATE_LOCKED;
-    physicalVehicle.launch({ upward: LIFT.upward, spin: LIFT.spin });
+    physicalVehicle.launch({ upward: LIFT.upward, spin: LIFT.spin, carry: LIFT.carry });
     this.#lift.play();
     this.#surge();
-    gsap.delayedCall(LIFT.duration, () => this.#teleport());
+    this.#liftCall = gsap.delayedCall(LIFT.duration, () => this.#teleport());
   }
 
   #teleport(): void {
     const { player, view, notifications } = this.game;
-    const isStillHere = player.position.distanceTo(this.#position) < LIFT.abortDistance;
+    this.#liftCall = null;
     const destination = pickTornadoDestination({
       places: ISLAND_PLACES.map(({ respawnName }) => respawnName),
       visited: this.#visited,
@@ -223,17 +225,25 @@ export class AltarArea extends Area {
       random: Math.random,
     });
     const place = ISLAND_PLACES.find(({ respawnName }) => respawnName === destination);
-    if (!isStillHere || !place) {
-      this.#isTraveling = false;
-      player.state = Player.STATE_DEFAULT;
+    const isInterrupted = player.respawnSequence !== this.#travelSequence;
+    if (isInterrupted || !place) {
+      this.#endTravel();
+      if (!isInterrupted) player.state = Player.STATE_DEFAULT;
       return;
     }
-    this.#visited.add(place.respawnName);
     player.respawn(place.respawnName, () => {
       view.focusPoint.isTracking = true;
-      this.#isTraveling = false;
+      this.#visited.add(place.respawnName);
+      this.#endTravel();
       notifications.show(arrivalNotice(place.name), { duration: NOTICE_DURATION });
     });
+    this.#travelSequence = player.respawnSequence;
+  }
+
+  #endTravel(): void {
+    this.#liftCall?.kill();
+    this.#liftCall = null;
+    this.#travelSequence = null;
   }
 
   #surge(): void {
@@ -250,6 +260,7 @@ export class AltarArea extends Area {
   #tick(): void {
     const { ticker, player, respawns } = this.game;
     this.#swirlTime.value += ticker.deltaScaled * this.#spin.value;
+    if (this.#travelSequence !== null && player.respawnSequence !== this.#travelSequence) this.#endTravel();
     this.#visitTimer -= ticker.delta;
     if (this.#visitTimer > 0) return;
     this.#visitTimer = VISIT.interval;

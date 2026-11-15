@@ -132,6 +132,7 @@ export class BlogBoard {
     screen.geometry.computeBoundingBox();
     const top = screen.geometry.boundingBox?.max.y ?? 0;
     screen.material.positionNode = this.#paperPosition(top, top * 2);
+    screen.frustumCulled = false;
     this.#render();
   }
 
