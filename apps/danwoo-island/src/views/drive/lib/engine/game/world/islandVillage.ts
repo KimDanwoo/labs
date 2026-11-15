@@ -14,7 +14,7 @@ import {
 } from './villageKit';
 import { dotjari, tvCabinet, watermelonTray } from './villageLeisure';
 import { barCounter, bench, gochujangJar, logStool, makgeolliBowl, oilBottle, soban } from './villageLounge';
-import { beachBall, bowlingPin, pinwheel, stonePillar } from './villageToys';
+import { beachBall, bowlingPin, pinwheel } from './villageToys';
 import {
   anvil,
   bellowsBase,
@@ -93,7 +93,6 @@ const UNCOLLIDED_BUILDERS: readonly Matched<UncollidedBuilder>[] = [
   { pattern: /^Cube006$/, build: ukuleleTable },
   { pattern: /^Cylinder$/, build: watermelonTray },
   { pattern: /^Plane005$/, build: dotjari },
-  { pattern: /^refPillar$/, build: stonePillar },
   { pattern: /^refFan$/, build: pinwheel },
 ];
 
