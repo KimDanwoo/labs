@@ -24,6 +24,7 @@ import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
 
 const PARTICLE_COUNT = 100;
+const STILL_FOAM = 1.35;
 const WATERFALL_MATERIAL = { hasLightBounce: false, hasWater: false, hasReveal: false } as const;
 
 type GeometryObject = THREE.Object3D & { geometry: THREE.BufferGeometry };
@@ -88,7 +89,7 @@ export class AchievementsArea extends Area {
       const uv4 = foamUv.sub(vec2(ticker.elapsedScaledUniform.mul(0.041), 0)).mul(vec2(0.75, 1.28));
       const noise = min(texture(noises.voronoi, uv3).r, texture(noises.voronoi, uv4).r);
       const threshold = baseUv.x.sub(0.5).abs().mul(2).add(0.5).mul(0.5).oneMinus();
-      baseColor.assign(mix(baseColor, color('#ffffff'), noise.step(threshold)));
+      baseColor.assign(mix(baseColor, color('#ffffff'), noise.step(threshold.mul(STILL_FOAM))));
       return vec3(baseColor);
     })();
     this.#assignMaterial('waterfallStill', new MeshDefaultMaterial({ colorNode, ...WATERFALL_MATERIAL }));

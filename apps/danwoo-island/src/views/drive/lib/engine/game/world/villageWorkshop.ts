@@ -31,17 +31,6 @@ export function slateBoards(parts: Parts, container: THREE.Object3D): void {
   }
 }
 
-const GRINDER_WHEEL = { halfWidth: 1.01, axleZ: 0.37, bottom: -0.96 } as const;
-
-export function grinderStand(parts: Parts): void {
-  const { halfWidth, axleZ, bottom } = GRINDER_WHEEL;
-  for (const side of SIDES) {
-    parts.box('woodDark', [0.18, -bottom, 0.22], { position: [side * (halfWidth + 0.14), bottom / 2, axleZ] });
-  }
-  parts.box('wood', [halfWidth * 2 + 0.6, 0.22, 1.4], { position: [0, bottom + 0.11, axleZ] });
-  parts.rod('iron', 0.05, [-(halfWidth + 0.24), 0, axleZ], [halfWidth + 0.24, 0, axleZ], 8);
-}
-
 const WORK_TABLE_DESIGN = {
   topThickness: 0.12,
   topHeightRatio: 0.15,
@@ -117,91 +106,6 @@ export function candleSticks(parts: Parts, container: THREE.Object3D, tableTop: 
       design.shellProfile.map(([radius, y]) => [radius * design.shellRadius, tableTop + y * shellHeight] as const),
       { position: [center.x, 0, center.z] },
       design.segments,
-    );
-  }
-}
-
-const ANVIL_DESIGN = {
-  stumpRadiusRatio: 0.4,
-  stumpTopRatio: 0.84,
-  stumpHeightRatio: 0.56,
-  headWidthRatio: 0.5,
-  headHeightRatio: 0.3,
-  headDepthRatio: 0.62,
-  headLevel: 0.71,
-  hornTipWidthRatio: 0.025,
-  hornTipHeightRatio: 0.04,
-  hornBaseWidthRatio: 0.16,
-  hornBaseHeightRatio: 0.13,
-  hornLengthRatio: 0.32,
-  hornLevel: 0.74,
-  hornDepthRatio: 0.31,
-  hornRotation: Math.PI / 2,
-  stumpSegments: 10,
-  hornSegments: 8,
-} as const;
-
-export function anvil(parts: Parts, { size, matrix }: PropFrame): void {
-  const design = ANVIL_DESIGN;
-  const bottom = -size.y / 2;
-  const stumpHeight = size.y * design.stumpHeightRatio;
-  const stumpRadius = Math.min(size.x, size.z) * design.stumpRadiusRatio;
-
-  parts.prism(
-    'timber',
-    stumpRadius * design.stumpTopRatio,
-    stumpRadius,
-    stumpHeight,
-    { position: [0, bottom + stumpHeight / 2, 0], matrix },
-    design.stumpSegments,
-  );
-  parts.box('iron', [size.x * design.headWidthRatio, size.y * design.headHeightRatio, size.z * design.headDepthRatio], {
-    position: [0, bottom + size.y * design.headLevel, 0],
-    matrix,
-  });
-  parts.prism(
-    'iron',
-    Math.min(size.x * design.hornTipWidthRatio, size.y * design.hornTipHeightRatio),
-    Math.min(size.x * design.hornBaseWidthRatio, size.y * design.hornBaseHeightRatio),
-    size.z * design.hornLengthRatio,
-    {
-      position: [0, bottom + size.y * design.hornLevel, size.z * design.hornDepthRatio],
-      rotation: [design.hornRotation, 0, 0],
-      matrix,
-    },
-    design.hornSegments,
-  );
-}
-
-const ISLAND_BELLOWS = {
-  bodyWidthRatio: 0.92,
-  bodyDepthRatio: 0.92,
-  bodyHeight: 0.2,
-  runnerWidth: 0.14,
-  runnerWidthRatio: 0.16,
-  runnerHeight: 0.08,
-  runnerHeightRatio: 0.3,
-  runnerDepthRatio: 0.96,
-  runnerSpread: 0.36,
-  bodyLiftRatio: 0.75,
-} as const;
-
-export function bellowsBase(parts: Parts, { size, matrix }: PropFrame): void {
-  const design = ISLAND_BELLOWS;
-  const bottom = -size.y / 2;
-  const runnerHeight = Math.min(design.runnerHeight, size.y * design.runnerHeightRatio);
-  const bodyLift = runnerHeight * design.bodyLiftRatio;
-  const bodyHeight = Math.min(design.bodyHeight, size.y - bodyLift);
-
-  parts.box('coconutShell', [size.x * design.bodyWidthRatio, bodyHeight, size.z * design.bodyDepthRatio], {
-    position: [0, bottom + bodyLift + bodyHeight / 2, 0],
-    matrix,
-  });
-  for (const side of SIDES) {
-    parts.box(
-      'bamboo',
-      [Math.min(design.runnerWidth, size.x * design.runnerWidthRatio), runnerHeight, size.z * design.runnerDepthRatio],
-      { position: [side * size.x * design.runnerSpread, bottom + runnerHeight / 2, 0], matrix },
     );
   }
 }

@@ -1,9 +1,8 @@
-import { color, Fn, luminance, mix, texture, uniform, uv, vec4 } from 'three/tsl';
+import { color, Fn, texture, uniform, uv } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import content from '../../../data/danwoo';
 import type { ProjectContent } from '../../../data/worldContent';
-import type { AudioItem } from '../../audio';
 import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
 import type { Intersect } from '../../rayCursor';
 import { removeAwardsTable } from '../islandReskins';
@@ -21,11 +20,7 @@ type ImageLanding = 'first' | 'last';
 
 const CINEMATIC_OFFSETS = { position: new THREE.Vector3(4.65, 4, 4.85), target: new THREE.Vector3(-3.0, 1.6, -4.6) };
 const CHARCOAL_COLOR = 0x6f6a87;
-const BLADE = { base: '#a88c7f', colorA: '#ff8641', colorB: '#ff3e00', intensity: 1.7, spread: 10 } as const;
-const ANVIL = { frequency: 1, phase: Math.PI * 0.25, sharpness: 5 } as const;
-const BLOWER = { base: 0.8, amplitude: 0.2 } as const;
 const CHARCOAL_THRESHOLD = { base: 0.25, amplitude: 0.1, phase: 0.5, initial: 0.2 } as const;
-const GRINDER_SPEED = 0.75;
 
 function wrapIndex(index: number, count: number): number {
   if (index > count - 1) return 0;
@@ -37,13 +32,22 @@ function assignMaterial(object: THREE.Object3D, material: THREE.Material): void 
   if (object instanceof THREE.Mesh) object.material = material;
 }
 
+const FORGE_TOOLS = ['hammer', 'blade', 'grinder', 'blower'] as const;
+
+function hideForgeTools(require: (name: string) => THREE.Object3D): void {
+  for (const name of FORGE_TOOLS) {
+    require(name).traverse((child) => {
+      if (child instanceof THREE.Mesh) child.geometry = new THREE.BufferGeometry();
+    });
+  }
+}
+
 export class ProjectsArea extends Area {
   readonly #projects = content.projects;
   #index = 0;
   #current: ProjectContent | null = null;
   #imageIndex = 0;
   #imageDirection: Direction = 'next';
-  readonly #anvilSound: AudioItem;
   readonly #shades = createShades();
   readonly #images: ShowcaseImages;
   readonly #pagination: ImagePagination;
@@ -54,16 +58,11 @@ export class ProjectsArea extends Area {
   readonly #urlIntersect: Intersect;
   readonly #blackBoard: BlackBoard;
   readonly #session: ShowcaseSession;
-  readonly #blower: THREE.Object3D;
   readonly #charcoalThreshold = uniform(CHARCOAL_THRESHOLD.initial);
-  readonly #grinder: THREE.Object3D;
-  readonly #hammer: THREE.Object3D;
-  #anvilLoopTime = 0;
 
   constructor(model: THREE.Object3D) {
     super(model);
     const require = (name: string): THREE.Object3D => this.requireReference(name);
-    this.#anvilSound = this.#registerAnvilSound();
     this.#createInteractivePoint();
     bindShowcaseInputs({
       isOpen: () => this.#session.isOpen,
@@ -99,10 +98,8 @@ export class ProjectsArea extends Area {
     this.#url = new UrlSign({ group: require('url'), shades: this.#shades, getUrl: () => this.#current?.url ?? '' });
     this.#urlIntersect = urlSignIntersect(this.#url, require('intersectUrl'));
     this.#blackBoard = new BlackBoard(require, () => this.#session.isHidden);
-    this.#blower = require('blower');
     this.#fireCharcoal(require('charcoal'));
-    this.#grinder = require('grinder');
-    this.#hammer = this.#forgeBlade(require);
+    hideForgeTools(require);
     this.#session = new ShowcaseSession({
       anchor: require('interactivePoint').position,
       offsets: CINEMATIC_OFFSETS,
@@ -131,22 +128,6 @@ export class ProjectsArea extends Area {
 
   get isShown(): boolean {
     return this.#session.isShown;
-  }
-
-  #registerAnvilSound(): AudioItem {
-    return this.game.audio.register({
-      path: 'sounds/anvil/METLImpt_Anvil Single Hammer Strike Hammers_GENHD1-01372.mp3',
-      autoplay: false,
-      loop: false,
-      volume: 0.5,
-      antiSpam: 0.1,
-      positions: this.requireReference('anvil').position,
-      distanceFade: 18,
-      onPlay: (item) => {
-        item.volume = 0.1 + Math.random() * 0.1;
-        item.rate = 1 + Math.random() * 0.02;
-      },
-    });
   }
 
   #createInteractivePoint(): void {
@@ -199,23 +180,6 @@ export class ProjectsArea extends Area {
         hasLightBounce: false,
       }),
     );
-  }
-
-  #forgeBlade(require: (name: string) => THREE.Object3D): THREE.Object3D {
-    const hammer = require('hammer');
-    hammer.rotation.reorder('ZXY');
-    const material = new MeshDefaultMaterial({ colorNode: color(BLADE.base).rgb });
-    const colorA = uniform(color(BLADE.colorA));
-    const colorB = uniform(color(BLADE.colorB));
-    const intensity = uniform(BLADE.intensity);
-    const base = material.shadedOutput;
-    material.outputNode = Fn(() => {
-      const emberColor = mix(colorA, colorB, uv().sub(0.5).length().mul(BLADE.spread));
-      const ember = emberColor.div(luminance(emberColor)).mul(intensity);
-      return vec4(mix(base.rgb, ember, uv(1).toVar().y.smoothstep(0.4, 0.9)).rgb, 1);
-    })();
-    assignMaterial(require('blade'), material);
-    return hammer;
   }
 
   open(): void {
@@ -308,15 +272,7 @@ export class ProjectsArea extends Area {
 
   override update(): void {
     const { elapsedScaled } = this.game.ticker;
-    this.#blower.scale.y = Math.sin(elapsedScaled) * BLOWER.amplitude + BLOWER.base;
     this.#charcoalThreshold.value =
       -Math.sin(elapsedScaled - CHARCOAL_THRESHOLD.phase) * CHARCOAL_THRESHOLD.amplitude + CHARCOAL_THRESHOLD.base;
-    this.#grinder.rotation.z = -elapsedScaled * GRINDER_SPEED;
-
-    const time = elapsedScaled * ANVIL.frequency + ANVIL.phase;
-    this.#hammer.rotation.x = (1 - Math.abs(Math.sin(time))) ** ANVIL.sharpness - 1;
-    const loopTime = (time / Math.PI) % 1;
-    if (loopTime < this.#anvilLoopTime) this.#anvilSound.play();
-    this.#anvilLoopTime = loopTime;
   }
 }

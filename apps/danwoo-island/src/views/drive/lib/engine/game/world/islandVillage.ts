@@ -15,16 +15,7 @@ import {
 import { dotjari, tvCabinet, watermelonTray } from './villageLeisure';
 import { barCounter, bench, gochujangJar, logStool, makgeolliBowl, oilBottle, soban } from './villageLounge';
 import { beachBall, bowlingPin, pinwheel } from './villageToys';
-import {
-  anvil,
-  bellowsBase,
-  candleSticks,
-  grinderStand,
-  placeGamepad,
-  slateBoards,
-  surfFlag,
-  workTable,
-} from './villageWorkshop';
+import { candleSticks, placeGamepad, slateBoards, surfFlag, workTable } from './villageWorkshop';
 
 type UncollidedBuilder = (parts: Parts, frame: PropFrame, container: THREE.Object3D) => void;
 
@@ -60,13 +51,13 @@ const onFirstCollider =
 const BUILDERS: readonly Matched<PropBuilder>[] = [
   { pattern: /^gizmoPhysicalDynamic$/, build: (_parts, container) => placeGamepad(container) },
   { pattern: /^blackBoardPhysicalDynamic/, build: slateBoards },
-  { pattern: /^grinderPhysicalDynamic$/, build: grinderStand },
+  { pattern: /^grinderPhysicalDynamic$/, build: modelOnFirstCollider('coconutCrate') },
   {
     pattern: /^(main|side)TablePhysicalDynamic/,
     build: (parts, container) => candleSticks(parts, container, workTable(parts, firstCollider(container))),
   },
   { pattern: /^quenchPhysicalDynamic/, build: modelOnFirstCollider('bambooBucket') },
-  { pattern: /^refAnvilPhysicalDynamic$/, build: onFirstCollider(anvil) },
+  { pattern: /^refAnvilPhysicalDynamic$/, build: modelOnFirstCollider('surfboardStand') },
   { pattern: /^refOvenPhysicalDynamic$/, build: modelOnFirstCollider('firePit', CHARCOAL_FOOTPRINT) },
   { pattern: /^cauldronPhysicalDynamic$/, build: clayPot },
   { pattern: /^couchPhysicalDynamic/, build: bench },
@@ -83,7 +74,7 @@ const BUILDERS: readonly Matched<PropBuilder>[] = [
   { pattern: /^barPhysicalDynamic/, build: barCounter },
   { pattern: /^cupPhysicalDynamic/, build: onFirstCollider(makgeolliBowl) },
   { pattern: /^refTvPhysicalDynamic$/, build: tvCabinet },
-  { pattern: /^blowerPhysicalDynamic/, build: onFirstCollider(bellowsBase) },
+  { pattern: /^blowerPhysicalDynamic/, build: modelOnFirstCollider('coconutCrate') },
   { pattern: /^refPinPhysicalDynamic$/, build: bowlingPin },
   { pattern: /^refBallPhysicalDynamic$/, build: onFirstCollider(beachBall) },
 ];
