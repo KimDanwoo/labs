@@ -232,10 +232,12 @@ export class AudioItem {
 class Playlist {
   readonly songs: Song[];
   current: Song | null = null;
+  readonly #canPlay: () => boolean;
   #index: number;
-  #isSwitching = false;
+  #switchCall: gsap.core.Tween | null = null;
 
-  constructor() {
+  constructor(canPlay: () => boolean) {
+    this.#canPlay = canPlay;
     this.songs = SONGS.map(({ path, name }) => ({
       path,
       name,
@@ -254,21 +256,27 @@ class Playlist {
     this.#index = Math.floor(Date.now() / SONG_ROTATION_MS) % this.songs.length;
   }
 
-  play(): void {
+  resume(): void {
+    if (!this.#canPlay() || this.#switchCall || this.current?.sound.playing()) return;
     this.#startCurrent();
   }
 
+  pause(): void {
+    this.#switchCall?.kill();
+    this.#switchCall = null;
+    this.current?.sound.pause();
+  }
+
   next(): void {
-    if (this.#isSwitching) return;
-    this.#isSwitching = true;
+    if (this.#switchCall || !this.#canPlay()) return;
     getGame().audio.groups.get('discChange')?.play();
     this.current?.sound.stop();
-
-    gsap.delayedCall(SONG_SWITCH_DELAY, () => {
+    this.#switchCall = gsap.delayedCall(SONG_SWITCH_DELAY, () => {
+      this.#switchCall = null;
+      if (!this.#canPlay()) return;
       this.#index = (this.#index + 1) % this.songs.length;
       const song = this.#startCurrent();
       getGame().notifications.show(nowPlayingNotice(song.name), { type: 'song', duration: SONG_NOTICE_DURATION });
-      this.#isSwitching = false;
     });
   }
 
@@ -282,7 +290,7 @@ class Playlist {
   }
 }
 
-function nowPlayingNotice(songName: string): HTMLElement {
+export function nowPlayingNotice(songName: string): HTMLElement {
   return createElement('div', 'top', [
     createElement('div', 'title', [
       '지금 흐르는 곡',
@@ -308,12 +316,16 @@ const HIT_VOLUME: Record<keyof typeof HIT_SOUNDS, (force: number) => number> = {
   hitMetal: (force) => remapClamp(force, [5, 20], [0, 1]) ** 2,
 };
 
+export type MusicOwner = 'island' | 'jukebox';
+
 export class Audio {
-  readonly events = new Events<{ muteChange: [isMuted: boolean] }>();
+  readonly events = new Events<{ muteChange: [isMuted: boolean]; backgroundChange: [isBackground: boolean] }>();
   readonly groups = new Map<string, AudioGroup>();
   readonly mute: AudioMute;
   initiated = false;
   playlist: Playlist | null = null;
+  musicOwner: MusicOwner = 'island';
+  isBackground = false;
   #globalRate = 1;
 
   constructor() {
@@ -344,9 +356,21 @@ export class Audio {
     return item;
   }
 
+  claimMusic(): void {
+    this.musicOwner = 'jukebox';
+    this.playlist?.pause();
+  }
+
+  releaseMusic(): void {
+    this.musicOwner = 'island';
+    this.playlist?.resume();
+  }
+
   #startPlaylist(): void {
-    this.playlist = new Playlist();
-    if (WORLD_CONFIG.music) this.playlist.play();
+    this.playlist = new Playlist(
+      () => this.initiated && WORLD_CONFIG.music && this.musicOwner === 'island' && !this.isBackground,
+    );
+    this.playlist.resume();
   }
 
   #registerAmbients(): void {
@@ -562,15 +586,22 @@ export class Audio {
     inputs.events.on('mute', (action) => {
       if (action.active) this.mute.toggle();
     });
-    window.addEventListener('blur', () => {
+    window.addEventListener('blur', () => this.#setBackground(true));
+    window.addEventListener('focus', () => this.#setBackground(false));
+    document.addEventListener('visibilitychange', () => this.#setBackground(document.hidden || !document.hasFocus()));
+  }
+
+  #setBackground(isBackground: boolean): void {
+    if (this.isBackground === isBackground) return;
+    this.isBackground = isBackground;
+    if (isBackground) {
       Howler.mute(true);
-      this.playlist?.current?.sound.pause();
-    });
-    window.addEventListener('focus', () => {
-      if (this.mute.active) return;
-      Howler.mute(false);
-      this.playlist?.current?.sound.play();
-    });
+      this.playlist?.pause();
+    } else {
+      if (!this.mute.active) Howler.mute(false);
+      this.playlist?.resume();
+    }
+    this.events.trigger('backgroundChange', isBackground);
   }
 
   update(): void {
