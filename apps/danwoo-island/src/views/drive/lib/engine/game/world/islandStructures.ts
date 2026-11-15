@@ -388,3 +388,23 @@ export function rebuildBuildingSite(model: THREE.Object3D): void {
     replaceVisual(model, cone.name, stackedTiles);
   }
 }
+
+const WATERFALL_LIP_GROUND = new THREE.Vector3(69.665, 0, 7.29);
+
+export function rebuildWaterfallCliff(model: THREE.Object3D): void {
+  findChild(model, 'Cube089').removeFromParent();
+  model.updateMatrixWorld(true);
+  const anchor = model.worldToLocal(WATERFALL_LIP_GROUND.clone());
+  const matrix = new THREE.Matrix4().makeTranslation(anchor);
+  model.add(islandModelMesh('waterfallCliff', matrix), islandModelMesh('waterfallBasin', matrix));
+}
+
+const TOTEM = { base: 0.42, size: new THREE.Vector3(0.9, 3.2, 0.9) } as const;
+
+export function replaceWithTotem(pillar: THREE.Object3D): void {
+  if (!(pillar instanceof THREE.Mesh)) return;
+  const lift = new THREE.Matrix4().makeTranslation(0, TOTEM.base + TOTEM.size.y / 2, 0);
+  const totem = islandModelMesh('tikiTotem', lift, TOTEM.size);
+  pillar.geometry = totem.geometry;
+  pillar.material = totem.material;
+}

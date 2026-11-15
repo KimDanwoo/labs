@@ -19,11 +19,11 @@ import * as THREE from 'three/webgpu';
 
 import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
 import { paintAchievementsBasin } from '../islandReskins';
+import { rebuildWaterfallCliff, replaceWithTotem } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
 
 const PARTICLE_COUNT = 100;
-const PILLAR = { speed: 0.1, amplitude: 0.25 } as const;
 const WATERFALL_MATERIAL = { hasLightBounce: false, hasWater: false, hasReveal: false } as const;
 
 type GeometryObject = THREE.Object3D & { geometry: THREE.BufferGeometry };
@@ -46,6 +46,7 @@ export class AchievementsArea extends Area {
   constructor(model: THREE.Object3D) {
     super(model);
     this.#pillar = this.requireReference('pillar');
+    replaceWithTotem(this.#pillar);
     this.game.audio.register({
       path: 'sounds/magic/Mountain Audio - Small Chimes - Loop.mp3',
       autoplay: true,
@@ -60,6 +61,7 @@ export class AchievementsArea extends Area {
   }
 
   override setObjects(): void {
+    rebuildWaterfallCliff(this.model);
     paintAchievementsBasin(this.model);
     rebuildVillageProps(this.model);
     super.setObjects();
@@ -150,9 +152,5 @@ export class AchievementsArea extends Area {
     mesh.count = PARTICLE_COUNT;
     this.game.scene.add(mesh);
     this.objects.hideable.push(mesh);
-  }
-
-  override update(): void {
-    this.#pillar.position.y = Math.sin(this.game.ticker.elapsedScaled * PILLAR.speed) * PILLAR.amplitude;
   }
 }
