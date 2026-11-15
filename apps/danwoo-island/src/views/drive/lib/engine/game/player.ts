@@ -114,6 +114,7 @@ export class Player {
   rotationY = 0;
   readonly sounds: PlayerSounds;
   #unstuckDelay: gsap.core.Tween | null = null;
+  #respawnSequence = 0;
   #nippleJumpTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
@@ -320,8 +321,13 @@ export class Player {
     });
   }
 
+  get respawnSequence(): number {
+    return this.#respawnSequence;
+  }
+
   respawn(respawnName?: string | null, callback?: () => void): void {
     const game = getGame();
+    this.#respawnSequence += 1;
     game.overlay.show(() => {
       callback?.();
       const respawn = respawnName ? game.respawns.getByName(respawnName) : game.respawns.getClosest(this.position);

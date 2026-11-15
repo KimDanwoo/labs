@@ -282,14 +282,27 @@ export class PhysicsVehicle {
     this.position.set(position.x, position.y, position.z);
   }
 
-  launch({ upward, forward }: { upward: number; forward: number }): void {
+  launch({
+    upward,
+    forward = 0,
+    spin = 0,
+    carry = 1,
+  }: {
+    upward: number;
+    forward?: number;
+    spin?: number;
+    carry?: number;
+  }): void {
     const { body } = this.chassis.physical;
     const { mass } = this.chassis;
+    const velocity = body.linvel();
+    body.setLinvel({ x: velocity.x * carry, y: velocity.y, z: velocity.z * carry }, true);
     const heading = new THREE.Vector3(this.forward.x, 0, this.forward.z).normalize();
     const impulse = UP.clone()
       .multiplyScalar(upward * mass)
       .addScaledVector(heading, forward * mass);
     body.applyImpulse(impulse, true);
+    if (spin !== 0) body.applyTorqueImpulse(UP.clone().multiplyScalar(spin * mass), true);
   }
 
   activate(): void {

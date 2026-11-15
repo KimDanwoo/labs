@@ -1,70 +1,84 @@
 import gsap from 'gsap';
-import { color, Fn, instancedArray, mix, smoothstep, step, texture, uniform, uv, vec2, vec4 } from 'three/tsl';
+import {
+  color,
+  Fn,
+  instancedArray,
+  mix,
+  positionGeometry,
+  sin,
+  smoothstep,
+  texture,
+  uniform,
+  uv,
+  vec2,
+  vec3,
+  vec4,
+} from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import type { AudioItem } from '../../audio';
+import { ISLAND_PLACES } from '../../islandPlaces';
+import { Player } from '../../player';
+import { createElement } from '../../utilities/createElement';
 import { rebuildSurfPoint } from '../islandStructures';
 import { Area } from './area';
+import { pickTornadoDestination } from './tornadoRoute';
 
-const COLUMN = {
-  radius: 2.5,
-  height: 6,
-  segments: 32,
-  restLevel: 2.2,
-  surgeDuration: 0.35,
-  settleDuration: 2.4,
-} as const;
-const SPRAY = { count: 150, size: 0.22, maxRadius: 5, duration: 2.2 } as const;
-const POOL = { radius: 2.5, triggerRadius: 2 } as const;
-const LAUNCH = { upward: 9, forward: 4, cooldown: 1.5, maxHeight: 2.5 } as const;
-const WATER = { deep: '#0f6f8c', sea: '#2fc6d4', foam: '#f4fbff', glow: 1.6 } as const;
+const FUNNEL = { height: 9, bottomRadius: 0.7, topRadius: 3.4, segments: 48, rows: 24, sway: 0.35 } as const;
+const DEBRIS = { count: 140, size: 0.18 } as const;
+const DUST = { radius: 3 } as const;
+const SPIN = { idle: 1, surge: 3.2, surgeIn: 0.4, surgeOut: 2.2 } as const;
+const TRIGGER = { radius: 2, maxHeight: 2.5, cooldown: 2 } as const;
+const LIFT = { upward: 7, spin: 6, carry: 0, duration: 1.2 } as const;
+const VISIT = { radius: 10, interval: 0.5 } as const;
+const COLORS = { sand: '#e9d7ae', dust: '#c9b28a', mist: '#f7f3ea', leaf: '#7cbf5a' } as const;
+const ORIGIN = 'altar';
+const NOTICE_DURATION = 3;
 
-function sprayData(): { positions: Float32Array; scales: Float32Array; randoms: Float32Array } {
-  const positions = new Float32Array(SPRAY.count * 3);
-  const scales = new Float32Array(SPRAY.count);
-  const randoms = new Float32Array(SPRAY.count);
-  for (let index = 0; index < SPRAY.count; index += 1) {
-    const spherical = new THREE.Spherical(
-      (1 - (1 - Math.random()) ** 2) * SPRAY.maxRadius,
-      Math.random() * Math.PI * 0.4,
-      Math.random() * Math.PI * 2,
-    );
-    new THREE.Vector3().setFromSpherical(spherical).toArray(positions, index * 3);
-    scales[index] = Math.random();
-    randoms[index] = Math.random();
+function debrisData(): { seeds: Float32Array; heights: Float32Array } {
+  const seeds = new Float32Array(DEBRIS.count);
+  const heights = new Float32Array(DEBRIS.count);
+  for (let index = 0; index < DEBRIS.count; index += 1) {
+    seeds[index] = Math.random();
+    heights[index] = Math.random();
   }
-  return { positions, scales, randoms };
+  return { seeds, heights };
+}
+
+function arrivalNotice(name: string): HTMLElement {
+  return createElement('div', 'top', [createElement('div', 'title', [`${name}(으)로 날아왔어요`])]);
 }
 
 export class AltarArea extends Area {
   readonly #position: THREE.Vector3;
-  readonly #sea = uniform(color(WATER.sea));
-  readonly #deep = uniform(color(WATER.deep));
-  readonly #foam = uniform(color(WATER.foam));
-  readonly #glow = uniform(WATER.glow);
-  readonly #columnLevel = uniform(COLUMN.restLevel);
-  readonly #sprayProgress = uniform(0);
-  readonly #swoosh: AudioItem;
-  #lastLaunch = -Infinity;
+  readonly #spin = uniform(SPIN.idle);
+  readonly #swirlTime = uniform(0);
+  readonly #lift: AudioItem;
+  readonly #visited = new Set<string>();
+  #lastTrigger = -Infinity;
+  #travelSequence: number | null = null;
+  #liftCall: gsap.core.Tween | null = null;
+  #visitTimer = 0;
 
   constructor(model: THREE.Object3D) {
     super(model);
-    const pool = this.requireReference('altar');
-    this.#position = pool.position.clone();
+    this.#position = this.requireReference('altar').position.clone();
     const { audio } = this.game;
     audio.register({
-      path: 'sounds/waves/lake-waves.mp3',
+      path: 'sounds/wind/13582-wind-in-forest-loop.mp3',
       autoplay: true,
       loop: true,
-      volume: 0.25,
-      positions: pool.position,
-      distanceFade: 20,
+      volume: 0.35,
+      positions: this.#position,
+      distanceFade: 22,
     });
-    this.#swoosh = audio.register({ path: 'sounds/swoosh/Swoosh 05.mp3', autoplay: false, loop: false, volume: 0.5 });
-    this.#createColumn();
-    this.#createPoolSurface();
-    this.#createSpray();
-    this.#createLaunchZone();
+    this.#lift = audio.register({ path: 'sounds/swoosh/Swoosh 02.mp3', autoplay: false, loop: false, volume: 0.6 });
+    this.#createFunnel(1, 1);
+    this.#createFunnel(0.72, -1.4);
+    this.#createDust();
+    this.#createDebris();
+    this.#createTrigger();
+    this.game.ticker.events.on('tick', () => this.#tick());
   }
 
   override setObjects(): void {
@@ -77,32 +91,58 @@ export class AltarArea extends Area {
     this.objects.hideable.push(mesh);
   }
 
-  #createColumn(): void {
-    const { ticker, noises } = this.game;
-    const geometry = new THREE.CylinderGeometry(COLUMN.radius, COLUMN.radius, COLUMN.height, COLUMN.segments, 1, true);
-    geometry.translate(0, COLUMN.height * 0.5, 0);
-    const material = new THREE.MeshBasicNodeMaterial({ side: THREE.DoubleSide, transparent: true });
+  #createFunnel(scale: number, direction: number): void {
+    const { noises } = this.game;
+    const geometry = new THREE.CylinderGeometry(
+      FUNNEL.topRadius * scale,
+      FUNNEL.bottomRadius * scale,
+      FUNNEL.height,
+      FUNNEL.segments,
+      FUNNEL.rows,
+      true,
+    );
+    geometry.translate(0, FUNNEL.height / 2, 0);
+    const material = new THREE.MeshBasicNodeMaterial({ side: THREE.DoubleSide, transparent: true, depthWrite: false });
+    const time = this.#swirlTime;
+    material.positionNode = Fn(() => {
+      const position = positionGeometry.toVar();
+      const height = position.y.div(FUNNEL.height);
+      position.x.addAssign(
+        sin(time.mul(1.3).add(position.y.mul(0.45)))
+          .mul(FUNNEL.sway)
+          .mul(height),
+      );
+      position.z.addAssign(
+        sin(time.mul(1.1).add(position.y.mul(0.35)).add(1.7))
+          .mul(FUNNEL.sway)
+          .mul(height),
+      );
+      return position;
+    })();
     material.outputNode = Fn(() => {
       const baseUv = uv();
-      const noiseUv = vec2(
-        baseUv.x.mul(5).add(baseUv.y.mul(-1.5)),
-        baseUv.y.mul(0.8).sub(ticker.elapsedScaledUniform.mul(0.35)),
+      const bandUv = vec2(
+        baseUv.x
+          .mul(3)
+          .add(time.mul(0.6 * direction))
+          .add(baseUv.y.mul(1.2)),
+        baseUv.y.mul(2).sub(time.mul(0.25)),
       );
-      const noise = texture(noises.perlin, noiseUv).r;
-      const height = noise.add(baseUv.y.mul(this.#columnLevel.add(1)));
-      height.greaterThan(1).discard();
-      const foam = step(0.78, height);
-      const water = mix(this.#deep, this.#sea, baseUv.y.oneMinus()).mul(this.#glow);
-      return vec4(mix(water, this.#foam, foam), height.oneMinus().mul(2).clamp(0.35, 0.9));
+      const bands = texture(noises.perlin, bandUv).r;
+      const edge = smoothstep(0, 0.12, baseUv.y).mul(smoothstep(1, 0.75, baseUv.y));
+      const alpha = smoothstep(0.38, 0.72, bands).mul(edge).mul(0.85);
+      alpha.lessThan(0.02).discard();
+      return vec4(mix(color(COLORS.dust), color(COLORS.mist), bands), alpha);
     })();
-    const column = new THREE.Mesh(geometry, material);
-    column.position.copy(this.#position);
-    this.#addHideable(column);
+    const funnel = new THREE.Mesh(geometry, material);
+    funnel.position.copy(this.#position);
+    this.#addHideable(funnel);
   }
 
-  #createPoolSurface(): void {
-    const { ticker, noises } = this.game;
-    const material = new THREE.MeshBasicNodeMaterial();
+  #createDust(): void {
+    const { noises } = this.game;
+    const time = this.#swirlTime;
+    const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false });
     material.outputNode = Fn(() => {
       const centered = uv().sub(0.5);
       const radius = centered.length().mul(2);
@@ -111,71 +151,124 @@ export class AltarArea extends Area {
       const swirlUv = vec2(
         angle
           .div(Math.PI * 2)
-          .add(radius.mul(0.6))
-          .add(ticker.elapsedScaledUniform.mul(0.08)),
-        radius.mul(1.5),
+          .add(radius.mul(0.8))
+          .sub(time.mul(0.12)),
+        radius.mul(2),
       );
-      const ripple = texture(noises.perlin, swirlUv).r;
-      const water = mix(this.#sea, this.#deep, radius.add(ripple.mul(0.35)).clamp(0, 1));
-      const rim = smoothstep(0.82, 0.98, radius).add(step(0.62, ripple).mul(0.5)).clamp(0, 1);
-      return vec4(mix(water, this.#foam, rim), 1);
+      const swirl = texture(noises.perlin, swirlUv).r;
+      const alpha = smoothstep(0.4, 0.7, swirl)
+        .mul(smoothstep(1, 0.3, radius))
+        .mul(0.7);
+      return vec4(mix(color(COLORS.dust), color(COLORS.sand), swirl), alpha);
     })();
-    const surface = new THREE.Mesh(new THREE.PlaneGeometry(POOL.radius * 2, POOL.radius * 2, 1, 1), material);
-    surface.position.copy(this.#position);
-    surface.rotation.x = -Math.PI * 0.5;
-    this.#addHideable(surface);
+    const dust = new THREE.Mesh(new THREE.PlaneGeometry(DUST.radius * 2, DUST.radius * 2), material);
+    dust.position.copy(this.#position);
+    dust.position.y += 0.03;
+    dust.rotation.x = -Math.PI / 2;
+    this.#addHideable(dust);
   }
 
-  #createSpray(): void {
-    const { positions, scales, randoms } = sprayData();
-    const position = instancedArray(positions, 'vec3').toAttribute();
-    const scale = instancedArray(scales, 'float').toAttribute();
-    const random = instancedArray(randoms, 'float').toAttribute();
-    const progress = this.#sprayProgress;
-
+  #createDebris(): void {
+    const { seeds, heights } = debrisData();
+    const seed = instancedArray(seeds, 'float').toAttribute();
+    const height = instancedArray(heights, 'float').toAttribute();
+    const time = this.#swirlTime;
     const material = new THREE.SpriteNodeMaterial();
+    material.positionNode = Fn(() => {
+      const radius = mix(FUNNEL.bottomRadius, FUNNEL.topRadius, height).mul(seed.mul(0.5).add(0.75));
+      const angle = seed.mul(Math.PI * 2).add(time.mul(2.4).div(radius.add(0.4)));
+      const rise = height
+        .add(time.mul(0.05).mul(seed.add(0.5)))
+        .fract()
+        .mul(FUNNEL.height);
+      return vec3(angle.cos().mul(radius), rise, angle.sin().mul(radius));
+    })();
     material.outputNode = Fn(() => {
       const distanceToCenter = uv().sub(0.5).length();
       distanceToCenter.greaterThan(0.5).discard();
-      return vec4(mix(this.#sea, this.#foam, step(distanceToCenter, 0.3)), 1);
+      return vec4(mix(color(COLORS.dust), color(COLORS.leaf), smoothstep(0.7, 0.75, seed)), 1);
     })();
-    material.positionNode = Fn(() => {
-      const spread = progress.remapClamp(0, 0.5, 1, 0).pow(6).oneMinus();
-      const finalPosition = position.toVar();
-      finalPosition.mulAssign(spread);
-      finalPosition.y.addAssign(progress.mul(random).mul(2));
-      return finalPosition;
-    })();
-    material.scaleNode = Fn(() => smoothstep(1, 0.3, progress).mul(scale))();
+    material.scaleNode = Fn(() => seed.mul(0.6).add(0.4))();
+    const debris = new THREE.Mesh(new THREE.PlaneGeometry(DEBRIS.size, DEBRIS.size), material);
+    debris.count = DEBRIS.count;
+    debris.frustumCulled = false;
+    debris.position.copy(this.#position);
+    this.#addHideable(debris);
+  }
 
-    const spray = new THREE.Mesh(new THREE.PlaneGeometry(SPRAY.size, SPRAY.size), material);
-    spray.count = SPRAY.count;
-    spray.position.copy(this.#position);
-    this.#addHideable(spray);
+  #createTrigger(): void {
+    const zone = this.game.zones.create('cylinder', this.#position.clone(), TRIGGER.radius);
+    zone.events.on('enter', () => this.#startTravel());
+  }
+
+  #startTravel(): void {
+    const { player, physicalVehicle, ticker } = this.game;
+    const isAirborne = player.position.y - this.#position.y > TRIGGER.maxHeight;
+    const isCoolingDown = ticker.elapsed - this.#lastTrigger < TRIGGER.cooldown;
+    if (this.#travelSequence !== null || isAirborne || isCoolingDown) return;
+    this.#lastTrigger = ticker.elapsed;
+    this.#travelSequence = player.respawnSequence;
+    player.state = Player.STATE_LOCKED;
+    physicalVehicle.launch({ upward: LIFT.upward, spin: LIFT.spin, carry: LIFT.carry });
+    this.#lift.play();
+    this.#surge();
+    this.#liftCall = gsap.delayedCall(LIFT.duration, () => this.#teleport());
+  }
+
+  #teleport(): void {
+    const { player, view, notifications } = this.game;
+    this.#liftCall = null;
+    const destination = pickTornadoDestination({
+      places: ISLAND_PLACES.map(({ respawnName }) => respawnName),
+      visited: this.#visited,
+      origin: ORIGIN,
+      random: Math.random,
+    });
+    const place = ISLAND_PLACES.find(({ respawnName }) => respawnName === destination);
+    const isInterrupted = player.respawnSequence !== this.#travelSequence;
+    if (isInterrupted || !place) {
+      this.#endTravel();
+      if (!isInterrupted) player.state = Player.STATE_DEFAULT;
+      return;
+    }
+    player.respawn(place.respawnName, () => {
+      view.focusPoint.isTracking = true;
+      this.#visited.add(place.respawnName);
+      this.#endTravel();
+      notifications.show(arrivalNotice(place.name), { duration: NOTICE_DURATION });
+    });
+    this.#travelSequence = player.respawnSequence;
+  }
+
+  #endTravel(): void {
+    this.#liftCall?.kill();
+    this.#liftCall = null;
+    this.#travelSequence = null;
   }
 
   #surge(): void {
-    gsap.to(this.#columnLevel, {
-      value: 0,
+    gsap.to(this.#spin, {
+      value: SPIN.surge,
+      duration: SPIN.surgeIn,
       ease: 'power2.out',
-      duration: COLUMN.surgeDuration,
       onComplete: () => {
-        gsap.to(this.#columnLevel, { value: COLUMN.restLevel, ease: 'power2.in', duration: COLUMN.settleDuration });
+        gsap.to(this.#spin, { value: SPIN.idle, duration: SPIN.surgeOut, ease: 'power2.inOut' });
       },
     });
-    gsap.fromTo(this.#sprayProgress, { value: 0 }, { value: 1, ease: 'linear', duration: SPRAY.duration });
   }
 
-  #createLaunchZone(): void {
-    const zone = this.game.zones.create('cylinder', this.#position.clone(), POOL.triggerRadius);
-    zone.events.on('enter', () => {
-      const now = this.game.ticker.elapsed;
-      const isAirborne = this.game.player.position.y - this.#position.y > LAUNCH.maxHeight;
-      if (isAirborne || now - this.#lastLaunch < LAUNCH.cooldown) return;
-      this.#lastLaunch = now;
-      this.game.physicalVehicle.launch({ upward: LAUNCH.upward, forward: LAUNCH.forward });
-      this.#surge();
-      this.#swoosh.play();
-    });
+  #tick(): void {
+    const { ticker, player, respawns } = this.game;
+    this.#swirlTime.value += ticker.deltaScaled * this.#spin.value;
+    if (this.#travelSequence !== null && player.respawnSequence !== this.#travelSequence) this.#endTravel();
+    this.#visitTimer -= ticker.delta;
+    if (this.#visitTimer > 0) return;
+    this.#visitTimer = VISIT.interval;
+    for (const { respawnName } of ISLAND_PLACES) {
+      const { position } = respawns.getByName(respawnName);
+      if (Math.hypot(position.x - player.position.x, position.z - player.position.z) < VISIT.radius) {
+        this.#visited.add(respawnName);
+      }
+    }
   }
 }
