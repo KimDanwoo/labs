@@ -6,6 +6,7 @@ import type { AudioItem } from './audio';
 import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputs';
 import type { Intersect } from './rayCursor';
+import { UI_FONT_FAMILY } from './utilities/canvasFont';
 
 export type PointAlign = 'left' | 'right';
 export type PointState = 'hidden' | 'open' | 'concealed';
@@ -31,7 +32,8 @@ interface SharedParts {
   sounds: { reveal: AudioItem; conceal: AudioItem };
 }
 
-const LABEL = { height: 64, nearPadding: 60, farPadding: 12, offsetVertical: 2, scale: 0.75 } as const;
+const LABEL = { height: 128, fontSize: 92, nearPadding: 116, farPadding: 44, offsetVertical: 4, scale: 0.85 } as const;
+const CENTER_BIAS_NDC = 0.15;
 const GROUP = { pitch: -Math.PI * 0.15, yaw: Math.PI * 0.25, scale: 0.85 } as const;
 const RENDER_ORDER = { label: 6, diamond: 7, keyIcon: 8 } as const;
 const HIT_RADIUS = 0.75;
@@ -49,32 +51,40 @@ function flippedUvTexture(map: THREE.Texture): THREE.Node<'float'> {
   return texture(map, vec2(uv().x, uv().y.oneMinus())).r;
 }
 
-function drawLabel(text: string, align: PointAlign): { texture: THREE.Texture; width: number } {
-  const font = `700 ${LABEL.height}px "MaruBuri"`;
+interface LabelArt {
+  texture: THREE.Texture;
+  width: number;
+}
+
+function drawLabel(text: string, align: PointAlign): LabelArt {
+  const font = `700 ${LABEL.fontSize}px ${UI_FONT_FAMILY}`;
   const paddingLeft = align === 'left' ? LABEL.nearPadding : LABEL.farPadding;
   const paddingRight = align === 'left' ? LABEL.farPadding : LABEL.nearPadding;
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
   if (!context) throw new Error('2D canvas is not supported');
   context.font = font;
-  const width = Math.ceil(context.measureText(text).width) + paddingLeft + paddingRight + 2;
+  const width = Math.ceil(context.measureText(text).width) + paddingLeft + paddingRight;
   canvas.width = width;
   canvas.height = LABEL.height;
 
-  context.fillStyle = '#000000';
-  context.fillRect(0, 0, width, LABEL.height);
+  context.fillStyle = '#00ff00';
+  context.beginPath();
+  context.roundRect(0, 0, width, LABEL.height, LABEL.height / 2);
+  context.fill();
   context.font = font;
-  context.fillStyle = '#ffffff';
+  context.fillStyle = '#ffff00';
   context.textAlign = 'start';
   context.textBaseline = 'middle';
-  context.fillText(text, paddingLeft + 1, LABEL.height * 0.5 + LABEL.offsetVertical);
+  context.fillText(text, paddingLeft, LABEL.height * 0.5 + LABEL.offsetVertical);
 
-  const labelTexture = new THREE.Texture(canvas);
-  labelTexture.minFilter = THREE.NearestFilter;
-  labelTexture.magFilter = THREE.NearestFilter;
-  labelTexture.generateMipmaps = false;
-  labelTexture.needsUpdate = true;
+  const labelTexture = new THREE.CanvasTexture(canvas);
+  labelTexture.colorSpace = THREE.NoColorSpace;
   return { texture: labelTexture, width };
+}
+
+function oppositeAlign(align: PointAlign): PointAlign {
+  return align === 'left' ? 'right' : 'left';
 }
 
 function foggedBackColor(shared: SharedParts): THREE.Node<'vec3'> {
@@ -91,7 +101,10 @@ export class InteractivePoint {
   readonly #points: InteractivePoints;
   readonly #shared: SharedParts;
   readonly #options: InteractivePointOptions;
-  readonly #align: PointAlign;
+  readonly #defaultAlign: PointAlign;
+  readonly #labelArt = new Map<PointAlign, LabelArt>();
+  #align: PointAlign;
+  #labelMap: ReturnType<typeof texture> | null = null;
   readonly #group = new THREE.Group();
   readonly #label: THREE.Mesh;
   readonly #diamond: THREE.Mesh;
@@ -107,7 +120,8 @@ export class InteractivePoint {
     this.#points = points;
     this.#shared = shared;
     this.#options = options;
-    this.#align = options.align ?? 'left';
+    this.#defaultAlign = options.align ?? 'left';
+    this.#align = this.#defaultAlign;
     this.position = new THREE.Vector2(options.position.x, options.position.z);
     this.state = isHidden ? 'hidden' : state;
     this.recoveryState = state;
@@ -134,26 +148,51 @@ export class InteractivePoint {
   }
 
   #createLabel(text: string): THREE.Mesh {
-    const { texture: labelTexture, width } = drawLabel(text, this.#align);
+    const art = this.#art(text, this.#align);
+    const labelUv = vec2(uv().x.sub(this.#labelOffset), uv().y);
+    const labelMap = texture(art.texture, labelUv);
+    this.#labelMap = labelMap;
     const material = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: true });
     this.#materials.push(material);
     material.outputNode = Fn(() => {
-      const labelUv = vec2(uv().x.sub(this.#labelOffset), uv().y);
-      const glyph = texture(labelTexture, labelUv).r;
       labelUv.x.greaterThan(1).discard();
       labelUv.x.lessThan(0).discard();
-      return vec4(vec3(mix(foggedBackColor(this.#shared), this.#shared.frontColor, glyph)), 1);
+      return vec4(vec3(mix(foggedBackColor(this.#shared), this.#shared.frontColor, labelMap.r)), labelMap.g);
     })();
 
     const label = new THREE.Mesh(this.#shared.label, material);
     label.renderOrder = RENDER_ORDER.label;
-    label.scale.x = (LABEL.scale * width) / LABEL.height;
-    label.scale.y = LABEL.scale;
     label.position.z = -0.01;
-    label.position.x = this.#align === 'left' ? 0 : -label.scale.x;
     label.visible = false;
     this.#group.add(label);
+    this.#layoutLabel(label, art);
     return label;
+  }
+
+  #art(text: string, align: PointAlign): LabelArt {
+    const cached = this.#labelArt.get(align);
+    if (cached) return cached;
+    const art = drawLabel(text, align);
+    this.#labelArt.set(align, art);
+    return art;
+  }
+
+  #layoutLabel(label: THREE.Mesh, { width }: LabelArt): void {
+    label.scale.x = (LABEL.scale * width) / LABEL.height;
+    label.scale.y = LABEL.scale;
+    label.position.x = this.#align === 'left' ? 0 : -label.scale.x;
+  }
+
+  #alignTowardScreenCenter(): void {
+    const { camera } = getGame().view;
+    const ndcX = this.#group.getWorldPosition(new THREE.Vector3()).project(camera).x;
+    const awayFromCenter = ndcX < 0 ? 'right' : 'left';
+    const align = Math.abs(ndcX) < CENTER_BIAS_NDC ? this.#defaultAlign : oppositeAlign(awayFromCenter);
+    if (align === this.#align || !this.#labelMap) return;
+    this.#align = align;
+    const art = this.#art(this.#options.text ?? '', align);
+    this.#labelMap.value = art.texture;
+    this.#layoutLabel(this.#label, art);
   }
 
   #createDiamond(): THREE.Mesh {
@@ -208,6 +247,7 @@ export class InteractivePoint {
     this.state = 'open';
     this.intersect.active = true;
     this.#diamond.visible = true;
+    this.#alignTowardScreenCenter();
     this.#label.visible = true;
     this.#group.add(this.#shared.keyIcon);
     this.#tweenDiamond(DIAMOND.open, { ease: 'elastic.out(1.3,0.4)', duration: 1.5 });
