@@ -18,7 +18,7 @@ export class ExplosiveCrates
 
         this.game.materials.updateObject(base)
 
-        this.instancedGroup = new InstancedGroup(this.references, createCoconutCrate(this.game.materials))
+        this.instancedGroup = new InstancedGroup(this.references, createCoconutCrate())
 
         this.items = []
 

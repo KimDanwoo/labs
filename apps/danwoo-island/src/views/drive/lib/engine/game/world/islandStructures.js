@@ -79,7 +79,7 @@ export function rebuildProjectsGate(model, materials)
         parts.box('woodDark', [2.4, 0.22, 0.3], { position: [3.45, top - 0.6, 0.75], rotation: [0, -0.57, 0] })
         thatchRoof(parts, { center: [0, top + 0.1, 0], width: 6.4, depth: 2.4, height: 1.05 })
         thatchRoof(parts, { center: [4.6, top - 0.35, 1.5], width: 1.5, depth: 1.5, height: 0.6 })
-        return parts.build(materials)
+        return parts.build()
     })
 }
 
@@ -96,7 +96,7 @@ export function rebuildLabGate(model, materials)
         parts.rod('woodDark', 0.08, [-2.25, top - 1.0, 0.25], [-1.35, top - 0.1, 0.25])
         parts.rod('woodDark', 0.08, [2.25, top - 1.0, 0.25], [1.35, top - 0.1, 0.25])
         thatchRoof(parts, { center: [1.42, top + 0.12, 0.25], width: 9, depth: 2.8, height: 1.15 })
-        return parts.build(materials)
+        return parts.build()
     })
 }
 
@@ -138,7 +138,7 @@ export function rebuildCookieCart(model, materials)
     const { size, center, pole } = SNACK_SHACK
     const parts = createParts()
     parts.rod('woodDark', 0.11, [pole.x, pole.bottom, pole.z], [pole.x, pole.top, pole.z], 6)
-    container.add(parts.build(materials), islandModelMesh('snackShack', new THREE.Matrix4().makeTranslation(...center), size))
+    container.add(parts.build(), islandModelMesh('snackShack', new THREE.Matrix4().makeTranslation(...center), size))
 }
 
 export function rebuildOuthouse(model, materials)
@@ -162,7 +162,7 @@ export function rebuildOuthouse(model, materials)
         parts.box('woodDark', [1.5, 0.12, 0.05], { position: [0, y, 0.79] })
     parts.prism('iron', 0.07, 0.07, 0.05, { position: [0.48, bottom + height / 2 - 0.2, 0.8], rotation: [Math.PI / 2, 0, 0] }, 8)
     thatchRoof(parts, { center: [0, top, -0.04], width: 3.1, depth: 3.0, height: 0.7 })
-    container.add(parts.build(materials))
+    container.add(parts.build())
 }
 
 export function rebuildBridge(bridge, materials)
@@ -196,7 +196,7 @@ export function rebuildBridge(bridge, materials)
         for(const z of [front - 0.1, back + 0.1])
             parts.box('stone', [0.7, 0.5, 0.8], { position: [x, top - 0.3, z] })
     }
-    replacement.add(parts.build(materials))
+    replacement.add(parts.build())
 }
 
 function cairn(parts, random, { size, matrix })
@@ -270,7 +270,7 @@ export function rebuildSeonangdang(model, materials)
     const ropePoints = tall.map((frame) => new THREE.Vector3().setFromMatrixPosition(frame.matrix).add(new THREE.Vector3(0, frame.size.y * 0.32, 0)))
     ropePoints.sort((a, b) => Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x))
     geumjul(parts, random, ropePoints)
-    container.add(parts.build(materials), ...figures)
+    container.add(parts.build(), ...figures)
 }
 
 function removeVisualMeshes(container)
@@ -336,7 +336,7 @@ export function rebuildWaterfallPagoda(model, materials)
     hull.geometry.computeBoundingBox()
     const top = hull.geometry.boundingBox.clone().applyMatrix4(hull.matrix)
     stonePagoda(parts, { x: (top.min.x + top.max.x) / 2, y: top.max.y - 0.1, z: (top.min.z + top.max.z) / 2 })
-    container.add(parts.build(materials))
+    container.add(parts.build())
 }
 
 function neonMaterial(neonTexture)
@@ -362,7 +362,7 @@ export function rebuildBowlingSign(model, materials, neonTexture)
     parts.box('neonBoard', [4.0, 2.05, 0.12], { position: [0.05, -0.04, -0.08] })
     for(const side of [-1, 1])
         parts.box('metalDark', [0.14, 4.4, 0.14], { position: [side * 1.6, -3.1, -0.12] })
-    const group = parts.build(materials)
+    const group = parts.build()
     const neon = new THREE.Mesh(new THREE.PlaneGeometry(3.86, 1.9), neonMaterial(neonTexture))
     neon.name = 'neon'
     neon.position.set(0.05, -0.04, 0.0)
@@ -389,7 +389,7 @@ export function rebuildRadioCabinet(model, materials)
     parts.box('lantern', [width - 1.0, 0.36, 0.04], { position: [0, height * 0.18, depth / 2 - 0.03], ...frame })
     for(const x of [-0.75, 0.75])
         parts.prism('woodDark', 0.13, 0.13, 0.08, { position: [x, height * 0.02, depth / 2], rotation: [Math.PI / 2, 0, 0], ...frame }, 10)
-    container.add(parts.build(materials))
+    container.add(parts.build())
 }
 
 function timberPile(parts, { size, matrix })
@@ -429,7 +429,7 @@ export function rebuildBuildingSite(model, materials)
         parts.box('wood', [crossbar.size.x * 0.9, crossbar.size.y * 0.8, crossbar.size.z], { matrix: crossbar.matrix })
         for(const z of [-crossbar.size.z * 0.42, crossbar.size.z * 0.42])
             hangingLantern(parts, { matrix: crossbar.matrix, z, y: -0.45 })
-        generator.add(parts.build(materials))
+        generator.add(parts.build())
     }
     for(const cone of model.children.filter((child) => /^refObjectsPhysicalDynamic/.test(child.name)))
     {
@@ -443,7 +443,7 @@ export function rebuildBuildingSite(model, materials)
                     rotation: [0, index % 2 === 0 ? 0 : Math.PI / 2, Math.PI / 2],
                     scale: [1, 1, 0.55],
                 })
-            return parts.build(materials)
+            return parts.build()
         })
     }
 }

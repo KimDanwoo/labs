@@ -1514,7 +1514,7 @@ function rebuildChild(child, materials, { build, keepEmissive = true })
     const container = prepare(child, { keepEmissive })
     const parts = createParts()
     build(parts, container, materials)
-    container.add(parts.build(materials))
+    container.add(parts.build())
 }
 
 export function rebuildVillageProps(model, materials)
@@ -1529,7 +1529,7 @@ export function rebuildVillageProps(model, materials)
             const container = prepare(child)
             const parts = createParts()
             uncollided.build(parts, frame, { container, materials })
-            container.add(parts.build(materials))
+            container.add(parts.build())
             continue
         }
         const builder = BUILDERS.find((item) => item.pattern.test(child.name))
@@ -1717,7 +1717,7 @@ export function rebuildPodium(model, materials)
     const parts = createParts()
     steps.forEach((frame, index) => podiumStep(parts, frame, index + 1))
     podiumBackdrop(parts)
-    podium.add(parts.build(materials))
+    podium.add(parts.build())
 }
 
 const box3 = (min, max) => new THREE.Box3(new THREE.Vector3(...min), new THREE.Vector3(...max))
@@ -2221,7 +2221,7 @@ export function reshapeCircuitDecoration(model, materials)
         if(!removed.has(offset))
             kept.push(index[offset], index[offset + 1], index[offset + 2])
     decoration.geometry.setIndex(kept)
-    decoration.add(parts.build(materials))
+    decoration.add(parts.build())
 }
 
 export const COCONUT_SIZE = new THREE.Vector3(0.55, 0.48, 0.5)

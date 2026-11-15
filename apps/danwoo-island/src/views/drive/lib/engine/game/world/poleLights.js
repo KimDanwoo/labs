@@ -23,7 +23,7 @@ export class PoleLights
 
         this.game.materials.updateObject(base)
 
-        this.instancedGroup = new InstancedGroup(this.references, createLampPost(this.game.materials), { isAutoUpdated: false })
+        this.instancedGroup = new InstancedGroup(this.references, createLampPost(), { isAutoUpdated: false })
 
         this.glass = this.instancedGroup.meshes.find(mesh => mesh.instance.name === 'glass').instance
 
