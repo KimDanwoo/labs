@@ -17,7 +17,7 @@ export type CollisionCategory = 'floor' | 'object' | 'bumper';
 export type FrictionRule = 'average' | 'min' | 'max' | 'multiply';
 export type CollisionHandler = (force: number, position: Vector) => void;
 
-type ShapeParameters =
+export type ShapeParameters =
   | { shape: 'cuboid'; parameters: [hx: number, hy: number, hz: number] }
   | { shape: 'ball'; parameters: [radius: number] }
   | { shape: 'cylinder'; parameters: [halfHeight: number, radius: number] }
