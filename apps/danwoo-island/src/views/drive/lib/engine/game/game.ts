@@ -25,7 +25,6 @@ import { Options } from './options';
 import { Overlay } from './overlay';
 import { Physics } from './physics/physics';
 import { PhysicsVehicle } from './physics/physicsVehicle';
-import { PhysicsWireframe } from './physics/physicsWireframe';
 import { Player } from './player';
 import { PreRenderer } from './preRenderer';
 import { QUALITY, Quality } from './quality';
@@ -97,7 +96,6 @@ interface GameSystems {
   RAPIER: Rapier;
   terrain: Terrain;
   physics: Physics;
-  wireframe: PhysicsWireframe;
   physicalVehicle: PhysicsVehicle;
   zones: Zones;
   player: Player;
@@ -300,10 +298,6 @@ export class Game {
     return this.#require('physics');
   }
 
-  get wireframe(): PhysicsWireframe {
-    return this.#require('wireframe');
-  }
-
   get physicalVehicle(): PhysicsVehicle {
     return this.#require('physicalVehicle');
   }
@@ -415,7 +409,6 @@ export class Game {
     this.#provide('resources', { ...driveResources, ...this.resources });
     this.#provide('terrain', new Terrain());
     this.#provide('physics', new Physics());
-    this.#provide('wireframe', new PhysicsWireframe());
     this.#provide('physicalVehicle', new PhysicsVehicle());
     this.#provide('zones', new Zones());
     this.#provide('player', new Player());
