@@ -116,6 +116,7 @@ interface AssetNames {
 const CACHE_BUSTER = '?cb=1';
 const REVEAL_DELAY_FRAMES = 3;
 const FONT_FACES = ['400 24px MaruBuri', '700 24px MaruBuri'];
+const FONT_SAMPLE = '김단우 섬 Aa1';
 
 function assetNames(): AssetNames {
   const isCompressed = WORLD_CONFIG.compressedAssets;
@@ -398,7 +399,7 @@ export class Game {
   }
 
   async #startDrive(): Promise<void> {
-    const fontsReady = Promise.all(FONT_FACES.map((face) => document.fonts.load(face)));
+    const fontsReady = Promise.all(FONT_FACES.map((face) => document.fonts.load(face, FONT_SAMPLE)));
     const resourcesReady = this.resourcesLoader.load(this.#driveResources(), (remaining, total) => {
       this.world.updateLoadingProgress(1 - remaining / total);
     });
@@ -497,11 +498,6 @@ export class Game {
       modelResource('sceneryModel', `scenery/scenery${modelSuffix}.glb${cb}`),
       modelResource('areasModel', `areas/areas${modelSuffix}.glb${cb}`),
       modelResource('poleLightsModel', `poleLights/poleLights${modelSuffix}.glb${cb}`),
-      textureResource('satanStarTexture', `areas/lotusMark.png${cb}`, 'texture', (resource) => {
-        resource.minFilter = THREE.LinearFilter;
-        resource.magFilter = THREE.LinearFilter;
-        resource.generateMipmaps = false;
-      }),
       textureResource(
         'overlayPatternTexture',
         `overlay/overlayPattern.${textureExtension}${cb}`,

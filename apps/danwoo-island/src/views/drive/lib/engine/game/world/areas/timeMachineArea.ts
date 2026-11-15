@@ -7,7 +7,7 @@ import { objectOf } from '../../objects';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
 
-const HUB_SCREEN = 'danwoo/hub.png';
+const HUB_SCREEN = 'areas/island/tvHub.webp';
 const COLLIDE_COOLDOWN = 1;
 const STRIPE_SPEED = 0.1;
 

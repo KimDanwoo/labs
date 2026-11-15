@@ -192,7 +192,11 @@ export class BlogBoard {
   }
 
   #render(): void {
-    void document.fonts.load(FONTS.post).finally(() => this.#requestDraw());
+    const text = postsOf(this.#state)
+      .map(({ title }) => title)
+      .join('');
+    const faces = [FONTS.heading, FONTS.post, FONTS.date].map((font) => document.fonts.load(font, `${text}최신 글0`));
+    void Promise.allSettled(faces).finally(() => this.#requestDraw());
     this.#renderPanel();
   }
 

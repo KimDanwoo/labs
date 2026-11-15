@@ -2379,15 +2379,45 @@ html:not(.is-mode-touch) .jukebox .jukebox-track:hover {
 }
 @font-face {
   font-family: MaruBuri;
-  src: url(/world/danwoo/fonts/MaruBuri-Regular.woff2) format('woff2');
+  src: url(/world/danwoo/fonts/MaruBuri-Regular.symbols.woff2) format('woff2');
   font-weight: 400;
   font-display: swap;
+  unicode-range: U+0100-2FFF, U+3190-33FF, U+FB00-FFFF, U+1F100-1F1FF;
 }
 @font-face {
   font-family: MaruBuri;
-  src: url(/world/danwoo/fonts/MaruBuri-Bold.woff2) format('woff2');
+  src: url(/world/danwoo/fonts/MaruBuri-Regular.ko-common.woff2) format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+3130-318F, U+AC00-D7A3;
+}
+@font-face {
+  font-family: MaruBuri;
+  src: url(/world/danwoo/fonts/MaruBuri-Regular.latin.woff2) format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F, U+20A9, U+3000-303F;
+}
+@font-face {
+  font-family: MaruBuri;
+  src: url(/world/danwoo/fonts/MaruBuri-Bold.symbols.woff2) format('woff2');
   font-weight: 700;
   font-display: swap;
+  unicode-range: U+0100-2FFF, U+3190-33FF, U+FB00-FFFF, U+1F100-1F1FF;
+}
+@font-face {
+  font-family: MaruBuri;
+  src: url(/world/danwoo/fonts/MaruBuri-Bold.ko-common.woff2) format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+3130-318F, U+AC00-D7A3;
+}
+@font-face {
+  font-family: MaruBuri;
+  src: url(/world/danwoo/fonts/MaruBuri-Bold.latin.woff2) format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F, U+20A9, U+3000-303F;
 }
 html,
 body,
