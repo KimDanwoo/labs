@@ -9,7 +9,6 @@ import {
   type Triple,
 } from './islandGeometry';
 import { islandModelMesh } from './islandModels';
-import { lathe, type Profile } from './villageKit';
 
 type DecorationKind = 'erase' | 'tentLeg' | 'keep';
 type Spot = readonly [number, number];
@@ -161,107 +160,6 @@ function byeotgari(parts: Parts): void {
       style.flameSides,
     );
   }
-}
-
-const ANGBUILGU = {
-  baseSize: [0.9, 0.55, 0.9] satisfies Triple,
-  collarRadius: 0.5,
-  collarHeight: 0.08,
-  collarY: 0.59,
-  sides: 12,
-  shellProfile: [
-    [0, 0.63],
-    [0.25, 0.69],
-    [0.43, 0.87],
-    [0.53, 1.08],
-    [0.56, 1.22],
-    [0.5, 1.22],
-    [0.46, 1.08],
-    [0.3, 0.9],
-    [0, 0.86],
-  ] satisfies Profile,
-  dialRadius: 0.29,
-  dialHeight: 0.03,
-  dialY: 0.89,
-  needleY: 0.915,
-  needleLength: 0.28,
-  needleHalfWidth: 0.075,
-  markerRadius: 0.51,
-  markerSize: [0.06, 0.035, 0.09] satisfies Triple,
-  markerY: 1.22,
-  markerAngles: [0, Math.PI / 2, Math.PI, Math.PI * 1.5],
-  needleShades: ['bunting2', 'bunting3'] satisfies readonly PartName[],
-  pinRadius: 0.035,
-  pinHeight: 0.13,
-  pinY: 0.975,
-  pinSides: 6,
-} as const;
-
-function needleGeometry(direction: number): THREE.BufferGeometry {
-  const style = ANGBUILGU;
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute(
-      [0, 0, direction * style.needleLength, -style.needleHalfWidth, 0, 0, style.needleHalfWidth, 0, 0],
-      3,
-    ),
-  );
-  geometry.setIndex(direction < 0 ? [0, 1, 2] : [0, 2, 1]);
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function angbuilgu(parts: Parts): void {
-  const style = ANGBUILGU;
-  const center = CIRCUIT_DECORATION.clock.getCenter(new THREE.Vector3());
-  const bottom = CIRCUIT_DECORATION.clock.min.y;
-
-  parts.box('sand', style.baseSize, { position: [center.x, bottom + style.baseSize[1] / 2, center.z] });
-  parts.prism(
-    'bunting1',
-    style.collarRadius,
-    style.collarRadius,
-    style.collarHeight,
-    { position: [center.x, bottom + style.collarY, center.z] },
-    style.sides,
-  );
-  lathe(
-    parts,
-    'bunting4',
-    style.shellProfile.map(([radius, y]) => [radius, bottom + y] as const),
-    { position: [center.x, 0, center.z] },
-    style.sides,
-  );
-  parts.prism(
-    'bunting1',
-    style.dialRadius,
-    style.dialRadius,
-    style.dialHeight,
-    { position: [center.x, bottom + style.dialY, center.z] },
-    style.sides,
-  );
-  for (const [index, shade] of style.needleShades.entries()) {
-    parts.add(shade, needleGeometry(index === 0 ? -1 : 1), { position: [center.x, bottom + style.needleY, center.z] });
-  }
-  for (const angle of style.markerAngles) {
-    parts.box('bunting3', style.markerSize, {
-      position: [
-        center.x + Math.sin(angle) * style.markerRadius,
-        bottom + style.markerY,
-        center.z + Math.cos(angle) * style.markerRadius,
-      ],
-      rotation: [0, angle, 0],
-    });
-  }
-  parts.prism(
-    'bronze',
-    style.pinRadius,
-    style.pinRadius,
-    style.pinHeight,
-    { position: [center.x, bottom + style.pinY, center.z] },
-    style.pinSides,
-  );
 }
 
 const HONGSALMUN = {
@@ -563,7 +461,6 @@ export function reshapeCircuitDecoration(model: THREE.Object3D): void {
     if (classifyDecoration(component) === 'tentLeg') tentPole(parts, component.box);
   }
   byeotgari(parts);
-  angbuilgu(parts);
   dancerChest(parts);
   bannerStand(parts);
   hongsalmun(parts);

@@ -21,6 +21,7 @@ import { islandModelGeometry } from './islandModels';
 import { addTrunkColliders } from './trees';
 
 const TRUNK_BASE_X = 0.9;
+const TRUNK_RADIUS = 0.26;
 const SWAY = { start: 1.5, wind: 0.35, flutter: 0.06, flutterSpeed: 1.7 } as const;
 const CROWN_START = 4.3;
 const SCALE_RANGE = [1.1, 1.35] as const;
@@ -76,7 +77,7 @@ export class PalmTrees {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     game.scene.add(mesh);
-    addTrunkColliders(references);
+    addTrunkColliders(references, TRUNK_RADIUS);
     game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
   }
 

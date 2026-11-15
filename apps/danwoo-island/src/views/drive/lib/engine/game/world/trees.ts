@@ -25,7 +25,7 @@ function findParts(visual: THREE.Object3D): { body: THREE.Mesh; leaves: THREE.Me
   return { body, leaves };
 }
 
-export function addTrunkColliders(references: readonly THREE.Object3D[]): void {
+export function addTrunkColliders(references: readonly THREE.Object3D[], radius: number = TRUNK.radius): void {
   const game = getGame();
   for (const tree of references) {
     game.objects.add(null, {
@@ -34,7 +34,7 @@ export function addTrunkColliders(references: readonly THREE.Object3D[]): void {
       rotation: tree.quaternion,
       friction: 0.7,
       sleeping: true,
-      colliders: [{ shape: 'cylinder', parameters: [TRUNK.halfHeight, TRUNK.radius], category: 'object' }],
+      colliders: [{ shape: 'cylinder', parameters: [TRUNK.halfHeight, radius], category: 'object' }],
       onCollision: (force, position) => game.audio.groups.get('hitDefault')?.playRandomNext(force, position),
     });
   }

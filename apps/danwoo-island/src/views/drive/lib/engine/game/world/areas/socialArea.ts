@@ -20,6 +20,7 @@ const LINK_MODELS = new Map<string, string>([
   ['Danwoo Lab', 'x'],
 ]);
 const LINK_ELEVATION = 1;
+const UNLINKED_SIGNS = /^(bluesky001|linkedIn|discord)Physical/;
 const FAN_COUNT = 30;
 const FAN_MASS = 0.02;
 const FAN_HIDDEN_LIFT = 99;
@@ -50,6 +51,7 @@ export class SocialArea extends Area {
   }
 
   override setObjects(): void {
+    for (const sign of this.model.children.filter((child) => UNLINKED_SIGNS.test(child.name))) sign.removeFromParent();
     rebuildVillageProps(this.model);
     reshapeSocialPlaza(this.model);
     recordSteleFrames(this.model);
