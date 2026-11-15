@@ -71,12 +71,9 @@ export class PoleLights {
 
   #addFireflies(): void {
     const game = getGame();
-    const glow = game.materials.get('emissiveOrangeRadialGradient');
-    if (!(glow instanceof THREE.NodeMaterial)) throw new Error('Firefly glow material is missing');
-
     const positions = fireflyPositions(this.#references);
     const material = new THREE.SpriteNodeMaterial();
-    material.outputNode = glow.outputNode;
+    material.outputNode = game.materials.emissiveOutput('emissiveOrangeRadialGradient');
     const baseTime = game.ticker.elapsedScaledUniform.add(hash(instanceIndex).mul(999));
     const flyOffset = vec3(sin(baseTime.mul(0.4)).mul(0.5), sin(baseTime).mul(0.2), sin(baseTime.mul(0.3)).mul(0.5));
     material.positionNode = instancedArray(positions, 'vec3').toAttribute().add(flyOffset);

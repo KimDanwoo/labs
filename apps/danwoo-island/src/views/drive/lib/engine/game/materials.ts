@@ -72,6 +72,7 @@ function convert(base: ConvertibleMaterial): MeshDefaultMaterial {
 export class Materials {
   readonly trailGradient = trailGradientTexture();
   readonly #named = new Map<string, THREE.Material>();
+  readonly #emissiveOutputs = new Map<string, THREE.Node<'vec4'>>();
 
   constructor() {
     this.#named.set(
@@ -104,10 +105,18 @@ export class Materials {
     const baseColor = isNormalized ? gradient.div(luminance(gradient)) : gradient;
     const intensityUniform = uniform(intensity);
     const material = new THREE.MeshBasicNodeMaterial({ transparent: true });
-    material.outputNode = Fn(() => vec4(revealNode(baseColor.mul(intensityUniform)), 1))();
+    const outputNode = Fn(() => vec4(revealNode(baseColor.mul(intensityUniform)), 1))();
+    material.outputNode = outputNode;
+    this.#emissiveOutputs.set(name, outputNode);
     material.fog = false;
     this.#named.set(name, material);
     return material;
+  }
+
+  emissiveOutput(name: string): THREE.Node<'vec4'> {
+    const output = this.#emissiveOutputs.get(name);
+    if (!output) throw new Error(`Unknown emissive material: ${name}`);
+    return output;
   }
 
   createGradient(name: string, top: THREE.ColorRepresentation, bottom: THREE.ColorRepresentation): THREE.Material {
