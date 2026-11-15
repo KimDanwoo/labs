@@ -117,7 +117,6 @@ interface AssetNames {
 
 const CACHE_BUSTER = '?cb=1';
 const REVEAL_DELAY_FRAMES = 3;
-const FIRST_STEP = 1;
 const FONT_FACES = ['400 24px MaruBuri', '700 24px MaruBuri'];
 
 function assetNames(): AssetNames {
@@ -425,13 +424,13 @@ export class Game {
     this.#provide('konamiCode', new KonamiCode());
     this.#provide('map', new WorldMap());
     this.#provide('title', new Title());
-    this.world.step(FIRST_STEP);
+    this.world.populate();
     this.#provide('overlay', new Overlay());
 
     const shouldPreRender = this.quality.level === QUALITY.high && this.rendering.isWebGPU();
     if (shouldPreRender) PreRenderer.render();
     this.ticker.wait(REVEAL_DELAY_FRAMES, () => {
-      this.reveal.updateStep(0);
+      this.reveal.start();
     });
   }
 

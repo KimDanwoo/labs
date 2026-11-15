@@ -323,4 +323,9 @@ export class CookieArea extends Area
                 object.visual.object3D.needsUpdate = true
         }
     }
+
+    refreshAfterReset()
+    {
+        this.cookies.instancedGroup.needsUpdate = true
+    }
 }

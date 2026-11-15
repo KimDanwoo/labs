@@ -7,6 +7,7 @@ import { WORLD_CONFIG } from '../worldConfig'
 import { remap, remapClamp, clamp } from './utilities/maths'
 import gsap from 'gsap'
 import { Events } from './events'
+import { AudioMute } from './audioMute'
 
 const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 
@@ -19,6 +20,7 @@ export class Audio
         this.initiated = false
         this.groups = new Map()
         this.events = new Events()
+        this.mute = new AudioMute((isMuted) => this.events.trigger('muteChange', isMuted))
 
         this.setMute()
 
@@ -603,46 +605,6 @@ export class Audio
 
     setMute()
     {
-        this.mute = {}
-
-        this.mute.active = false
-
-        this.mute.toggle = () =>
-        {
-            if(this.mute.active)
-                this.mute.deactivate()
-            else
-                this.mute.activate()
-        }
-
-        this.mute.activate = () =>
-        {
-            if(this.mute.active)
-                return
-
-            Howler.mute(true)
-            this.mute.active = true
-            localStorage.setItem('soundToggle', '1')
-            document.documentElement.classList.add('is-audio-muted')
-            this.events.trigger('muteChange', true)
-        }
-
-        this.mute.deactivate = () =>
-        {
-            if(!this.mute.active)
-                return
-
-            Howler.mute(false)
-            this.mute.active = false
-            localStorage.setItem('soundToggle', '0')
-            document.documentElement.classList.remove('is-audio-muted')
-            this.events.trigger('muteChange', false)
-        }
-
-        const soundToggleLocal = localStorage.getItem('soundToggle')
-        if(soundToggleLocal !== null && soundToggleLocal === '1')
-            this.mute.activate()
-
         this.game.inputs.addActions([
             { name: 'mute', categories: [ 'intro', 'modal', 'menu', 'racing', 'cinematic', 'wandering' ], keys: [ 'Keyboard.l' ] },
         ])

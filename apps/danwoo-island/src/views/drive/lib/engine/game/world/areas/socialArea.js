@@ -187,4 +187,9 @@ export class SocialArea extends Area
                 object.visual.object3D.needsUpdate = true
         }
     }
+
+    refreshAfterReset()
+    {
+        this.fans.instancedGroup.needsUpdate = true
+    }
 }

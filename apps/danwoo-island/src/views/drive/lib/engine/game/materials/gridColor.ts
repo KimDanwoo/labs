@@ -1,9 +1,9 @@
-import { clamp, Fn, If, mix, normalWorld, smoothstep, step, uniform, uv, vec3, vec4 } from 'three/tsl';
+import { clamp, Fn, If, mix, normalWorld, smoothstep, step, uniform, uv, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 type FloatNode = THREE.Node<'float'>;
 type Vec2Node = THREE.Node<'vec2'>;
-type ColorNode = THREE.Node<'vec3'> | THREE.Node<'color'>;
+export type ColorNode = THREE.Node<'vec3'> | THREE.Node<'color'>;
 
 export interface GridLine {
   color: THREE.ColorRepresentation;
@@ -12,10 +12,9 @@ export interface GridLine {
   cross: number;
 }
 
-export interface MeshGridMaterialOptions {
+export interface GridColorOptions {
   color: THREE.ColorRepresentation;
   scale: number;
-  side: THREE.Side;
   lines: readonly GridLine[];
 }
 
@@ -77,26 +76,21 @@ function gridNode({ position, scale, thickness, offset, cross, derivativeMask }:
   return antialiasedGrid(position, scale, thickness, offset, cross, derivativeMask);
 }
 
-export class MeshGridMaterial extends THREE.NodeMaterial {
-  constructor({ color, scale, side, lines }: MeshGridMaterialOptions) {
-    super();
-    this.side = side;
-
-    const scaleUniform = uniform(scale);
-    const derivativeMask = dominantAxis(normalWorld).fwidth().length().oneMinus().clamp(0, 1);
-    const offset = uniform(new THREE.Vector2());
-    let gridColor: ColorNode = uniform(new THREE.Color(color));
-    for (const line of lines) {
-      const grid = gridNode({
-        position: uv(),
-        scale: uniform(line.scale).mul(scaleUniform),
-        thickness: uniform(line.thickness),
-        offset,
-        cross: uniform(line.cross),
-        derivativeMask,
-      });
-      gridColor = mix(gridColor, uniform(new THREE.Color(line.color)), grid);
-    }
-    this.outputNode = vec4(gridColor, 1);
+export function gridColorNode({ color, scale, lines }: GridColorOptions): ColorNode {
+  const scaleUniform = uniform(scale);
+  const derivativeMask = dominantAxis(normalWorld).fwidth().length().oneMinus().clamp(0, 1);
+  const offset = uniform(new THREE.Vector2());
+  let gridColor: ColorNode = uniform(new THREE.Color(color));
+  for (const line of lines) {
+    const grid = gridNode({
+      position: uv(),
+      scale: uniform(line.scale).mul(scaleUniform),
+      thickness: uniform(line.thickness),
+      offset,
+      cross: uniform(line.cross),
+      derivativeMask,
+    });
+    gridColor = mix(gridColor, uniform(new THREE.Color(line.color)), grid);
   }
+  return gridColor;
 }

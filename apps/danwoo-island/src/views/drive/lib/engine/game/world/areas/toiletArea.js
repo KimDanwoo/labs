@@ -51,4 +51,9 @@ export class ToiletArea extends Area
             }
         }
     }
+
+    refreshAfterReset()
+    {
+        this.cabin.down = false
+    }
 }
