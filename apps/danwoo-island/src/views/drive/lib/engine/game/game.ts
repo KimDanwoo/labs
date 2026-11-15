@@ -14,7 +14,7 @@ import { Inputs } from './inputs/inputs';
 import { InteractivePoints } from './interactivePoints';
 import { KonamiCode } from './konamiCode';
 import { Lighting } from './lighting';
-import { Map as WorldMap } from './map';
+import { WorldMap } from './map';
 import { Materials } from './materials';
 import { Menu } from './menu';
 import { Modals } from './modals';
