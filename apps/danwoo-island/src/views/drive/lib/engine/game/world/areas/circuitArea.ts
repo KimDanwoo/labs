@@ -10,8 +10,9 @@ import { objectOf, type WorldObject } from '../../objects';
 import { Player } from '../../player';
 import { segmentCircleIntersection } from '../../utilities/maths';
 import { requireElement } from '../../utilities/requireElement';
+import { reshapeCircuitDecoration } from '../circuitDecoration';
+import { rebuildCircuitObjects, rebuildPodium } from '../circuitProps';
 import { replaceAirDancers } from '../islandReskins';
-import { rebuildCircuitObjects, rebuildPodium, reshapeCircuitDecoration } from '../islandVillage';
 import { Area } from './area';
 import { paintCourseSign, paintObstacleResetSign } from './circuitSigns';
 import { CircuitTimer } from './circuitTimer';
@@ -170,10 +171,9 @@ export class CircuitArea extends Area {
   }
 
   override setObjects(): void {
-    const { materials } = this.game;
-    rebuildCircuitObjects(this.model, materials);
-    rebuildPodium(this.model, materials);
-    reshapeCircuitDecoration(this.model, materials);
+    rebuildCircuitObjects(this.model);
+    rebuildPodium(this.model);
+    reshapeCircuitDecoration(this.model);
     replaceAirDancers(this.model);
     super.setObjects();
   }

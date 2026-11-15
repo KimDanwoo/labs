@@ -92,11 +92,8 @@ export class CookieArea extends Area {
   }
 
   override setObjects(): void {
-    rebuildVillageProps(this.model, this.game.materials);
-    makeCoconut(
-      this.model.children.find((child) => child.name === 'refCookie'),
-      this.game.materials,
-    );
+    rebuildVillageProps(this.model);
+    makeCoconut(this.model.children.find((child) => child.name === 'refCookie'));
     rebuildCookieCart(this.model);
     super.setObjects();
   }

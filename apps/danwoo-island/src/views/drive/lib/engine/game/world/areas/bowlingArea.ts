@@ -168,8 +168,7 @@ export class BowlingArea extends Area {
   }
 
   override setObjects(): void {
-    const { materials } = this.game;
-    rebuildVillageProps(this.model, materials);
+    rebuildVillageProps(this.model);
     rebuildBowlingSign(this.model, this.game.texture('bowlingNeonTexture'));
     rebuildRadioCabinet(this.model);
     rebuildBowlingScreenStand(this.model);

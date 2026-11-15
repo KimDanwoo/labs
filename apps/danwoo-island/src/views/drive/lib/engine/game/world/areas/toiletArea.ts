@@ -27,7 +27,7 @@ export class ToiletArea extends Area {
 
   override setObjects(): void {
     rebuildOuthouse(this.model);
-    rebuildVillageProps(this.model, this.game.materials);
+    rebuildVillageProps(this.model);
     super.setObjects();
   }
 

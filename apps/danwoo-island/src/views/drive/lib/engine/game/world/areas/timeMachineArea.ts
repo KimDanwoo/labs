@@ -19,7 +19,7 @@ export class TimeMachineArea extends Area {
   }
 
   override setObjects(): void {
-    rebuildVillageProps(this.model, this.game.materials);
+    rebuildVillageProps(this.model);
     super.setObjects();
   }
 

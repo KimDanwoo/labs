@@ -50,7 +50,7 @@ export class SocialArea extends Area {
   }
 
   override setObjects(): void {
-    rebuildVillageProps(this.model, this.game.materials);
+    rebuildVillageProps(this.model);
     reshapeSocialPlaza(this.model);
     recordSteleFrames(this.model);
     super.setObjects();
