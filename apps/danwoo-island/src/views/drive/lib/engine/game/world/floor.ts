@@ -7,6 +7,7 @@ import type { Physical } from '../physics/physics';
 
 const CELL_SIZE = 1.5;
 const EDGE_FADE = 20;
+const MAX_SUBDIVISIONS = 320;
 const DEPTH_SCALE = -1.5;
 const BED_ROCK = { halfHeight: 0.5, halfWidth: 6 } as const;
 const TICK_ORDER = 10;
@@ -17,7 +18,8 @@ function floorSize(): number {
 }
 
 function planeGeometry(size: number, subdivisions: number): THREE.PlaneGeometry {
-  const geometry = new THREE.PlaneGeometry(size, size, subdivisions, subdivisions);
+  const segments = Math.min(subdivisions, MAX_SUBDIVISIONS);
+  const geometry = new THREE.PlaneGeometry(size, size, segments, segments);
   geometry.rotateX(-Math.PI * 0.5);
   geometry.deleteAttribute('normal');
   return geometry;

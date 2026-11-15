@@ -9,6 +9,7 @@ import { clamp, lerp, remap, smoothstep } from './utilities/maths';
 import { CameraRoll } from './view/cameraRoll';
 import { Cinematic } from './view/cinematic';
 import { OptimalArea } from './view/optimalArea';
+import { frameOverview, type OverviewFrame, type ScreenInsets } from './view/overviewFrame';
 import { SpeedLines } from './view/speedLines';
 
 const IDEAL_RATIO = 1920 / 1080;
@@ -51,7 +52,7 @@ const SPHERICAL = {
   nonIdealRatioOffset: 9,
 } as const;
 const FOCUS = { magnetMultiplier: 0.25, easingSpeed: 10 } as const;
-const OVERVIEW = { radius: 300, phi: Math.PI * 0.2, far: 700, portraitRatio: 0.9 } as const;
+const OVERVIEW = { radius: 300, phi: Math.PI * 0.2, nearRatio: 0.3, farRatio: 2.4 } as const;
 const MAP_DRAG = { scale: 10, multiplier: 2, gamepadSpeed: 20 } as const;
 const MIN_PAN_TOUCHES = 2;
 
@@ -93,7 +94,7 @@ export class View {
   readonly optimalArea = new OptimalArea();
   readonly cinematic: Cinematic;
   readonly speedLines: SpeedLines;
-  readonly overview = { amount: 0 };
+  readonly overview: { amount: number; radius: number } = { amount: 0, radius: OVERVIEW.radius };
   #isOverviewWide = false;
 
   constructor() {
@@ -166,18 +167,29 @@ export class View {
     this.ratioOverflow = Math.max(1, IDEAL_RATIO / this.game.viewport.ratio) - 1;
   }
 
-  setOverviewWide(isWide: boolean): void {
-    if (this.#isOverviewWide === isWide) return;
-    this.#isOverviewWide = isWide;
+  enterOverview(radius: number): void {
+    this.overview.radius = radius;
+    this.#isOverviewWide = true;
     this.game.viewport.events.trigger('throttleChange');
   }
 
-  #overviewScale(): number {
-    return Math.max(1, OVERVIEW.portraitRatio / this.game.viewport.ratio);
+  leaveOverview(): void {
+    if (!this.#isOverviewWide) return;
+    this.#isOverviewWide = false;
+    this.game.viewport.events.trigger('throttleChange');
   }
 
-  #overviewRadius(): number {
-    return OVERVIEW.radius * this.#overviewScale();
+  frameOverview(points: readonly THREE.Vector3[], insets: ScreenInsets): OverviewFrame {
+    const { width, height } = this.game.viewport;
+    return frameOverview({
+      points,
+      phi: OVERVIEW.phi,
+      theta: this.spherical.theta,
+      fov: CAMERA.fov,
+      width,
+      height,
+      insets,
+    });
   }
 
   #maxRadius(): number {
@@ -281,16 +293,10 @@ export class View {
     const { spherical, defaultCamera, focusPoint } = this;
     const driveRadius = lerp(SPHERICAL.radius.min, this.#maxRadius(), 1 - this.zoom.smoothedRatio);
     const { amount } = this.overview;
-    spherical.radius.current = lerp(driveRadius, this.#overviewRadius(), amount);
+    spherical.radius.current = lerp(driveRadius, this.overview.radius, amount);
     const phi = lerp(spherical.phi, OVERVIEW.phi, amount);
     spherical.offset.setFromSphericalCoords(spherical.radius.current, phi, spherical.theta);
-    const far = lerp(CAMERA.far, OVERVIEW.far * this.#overviewScale(), amount);
-    if (defaultCamera.far !== far) {
-      defaultCamera.far = far;
-      defaultCamera.updateProjectionMatrix();
-      this.camera.far = far;
-      this.camera.updateProjectionMatrix();
-    }
+    this.#applyClipping(amount);
     this.position.copy(focusPoint.smoothedPosition).add(spherical.offset);
     this.delta = this.position.clone().sub(defaultCamera.position);
     defaultCamera.position.copy(this.position);
@@ -299,12 +305,23 @@ export class View {
     defaultCamera.rotation.z += this.roll.advance(this.game.ticker.deltaScaled);
   }
 
+  #applyClipping(amount: number): void {
+    const near = lerp(CAMERA.near, this.overview.radius * OVERVIEW.nearRatio, amount);
+    const far = lerp(CAMERA.far, this.overview.radius * OVERVIEW.farRatio, amount);
+    if (this.defaultCamera.near === near && this.defaultCamera.far === far) return;
+    for (const camera of [this.camera, this.defaultCamera]) {
+      camera.near = near;
+      camera.far = far;
+      camera.updateProjectionMatrix();
+    }
+  }
+
   #measureOptimalArea(): void {
     const camera = this.defaultCamera;
     const savedPosition = camera.position.clone();
     const savedQuaternion = camera.quaternion.clone();
     const speedZoom = this.game.quality.level === QUALITY.high ? 1 - ZOOM.speedAmplitude : 1;
-    const radius = this.#isOverviewWide ? this.#overviewRadius() : this.#maxRadius() * speedZoom;
+    const radius = this.#isOverviewWide ? this.overview.radius : this.#maxRadius() * speedZoom;
     const phi = this.#isOverviewWide ? OVERVIEW.phi : this.spherical.phi;
     camera.position.setFromSphericalCoords(radius, phi, this.spherical.theta);
     camera.lookAt(new THREE.Vector3());

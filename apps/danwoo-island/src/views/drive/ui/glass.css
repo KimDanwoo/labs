@@ -560,6 +560,10 @@ html:not(.is-mode-touch) .modals .map .map-place:hover {
   transform: translateX(-50%);
 }
 
+html.is-mode-touch .modals .map .map-hint-keys {
+  display: none;
+}
+
 .modals .map .is-hidden:not(.map-card) {
   visibility: hidden;
 }
@@ -583,7 +587,7 @@ html:not(.is-mode-touch) .modals .map .map-place:hover {
   }
 }
 
-@media only screen and (width<=720px) {
+@media only screen and (width<=720px), only screen and (height<=500px) {
   .modals .map .map-places {
     display: none;
   }
@@ -616,4 +620,9 @@ html:not(.is-mode-touch) .modals .map .map-place:hover {
 :is(.menu-trigger, .map-trigger):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+
+html:is(.input-filter-menu, .input-filter-modal, .input-filter-intro, .input-filter-cinematic)
+  :is(.menu-trigger, .map-trigger):focus-visible {
+  outline: none;
 }
