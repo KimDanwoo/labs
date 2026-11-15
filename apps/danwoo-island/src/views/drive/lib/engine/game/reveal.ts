@@ -15,6 +15,8 @@ const HOVER_INTENSITY = 1.22;
 const HOVER_DURATION = 0.2;
 const OPEN_RADIUS = 4.3;
 const FULL_RADIUS = 30;
+const OPEN_DURATION = 1.8;
+const SETTLE_DURATION = 2.6;
 const UNBOUNDED_RADIUS = 99999;
 const INTRO_ZOOM = { start: 0.6, settled: 0.24, portraitSettled: 0.08 } as const;
 const INTRO_SEE_THROUGH = 0.5;
@@ -120,8 +122,8 @@ export class Reveal {
 
     gsap.to(this.distance, {
       value: FULL_RADIUS,
-      ease: 'back.in(1.3)',
-      duration: 2 / speed(),
+      ease: 'power2.in',
+      duration: OPEN_DURATION / speed(),
       overwrite: true,
       onComplete: () => {
         this.distance.value = UNBOUNDED_RADIUS;
@@ -131,13 +133,12 @@ export class Reveal {
     requireIntro().hideLabel();
     game.inputs.filters.clear();
     game.inputs.filters.add('wandering');
-    game.view.focusPoint.isTracking = true;
-    game.view.focusPoint.magnet.active = false;
+    game.view.focusPoint.magnet.active = true;
 
     gsap.to(game.view.zoom, {
       baseRatio: 0,
-      ease: 'back.in(1.5)',
-      duration: 1.75 / speed(),
+      ease: 'sine.inOut',
+      duration: SETTLE_DURATION / speed(),
       overwrite: true,
       onComplete: () => this.#finish(),
     });
