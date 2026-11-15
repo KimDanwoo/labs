@@ -1,8 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-import type { Parts, Triple } from './islandGeometry';
+import type { Parts } from './islandGeometry';
 import { islandModelMesh } from './islandModels';
-import { collidersOf, firstCollider, lathe, type PropFrame, referenceCenter, scaleProfile } from './villageKit';
+import { collidersOf, firstCollider, lathe, type PropFrame, referenceCenter } from './villageKit';
 
 const SIDES = [-1, 1] as const;
 
@@ -121,56 +121,6 @@ export function candleSticks(parts: Parts, container: THREE.Object3D, tableTop: 
   }
 }
 
-const WATER_JAR_DESIGN = {
-  profile: [
-    [0, 0],
-    [0.76, 0],
-    [0.92, 0.12],
-    [0.96, 0.28],
-    [0.96, 0.78],
-    [0.87, 1],
-    [0.77, 1],
-    [0.83, 0.84],
-    [0, 0.84],
-  ],
-  waterRadiusRatio: 0.82,
-  waterHeightRatio: 0.88,
-  waterThicknessRatio: 0.02,
-  hoopRadiusRatio: 0.98,
-  hoopThicknessRatio: 0.065,
-  hoopLevels: [0.25, 0.72],
-  segments: 12,
-} as const;
-
-export function waterJar(parts: Parts, { size, matrix }: PropFrame): void {
-  const design = WATER_JAR_DESIGN;
-  const bottom = -size.y / 2;
-  const height = size.y;
-  const radius = Math.min(size.x, size.z) / 2;
-
-  lathe(parts, 'wood', scaleProfile(design.profile, { radius, bottom, height }), { matrix }, design.segments);
-  const waterRadius = radius * design.waterRadiusRatio;
-  parts.prism(
-    'lagoon',
-    waterRadius,
-    waterRadius,
-    height * design.waterThicknessRatio,
-    { position: [0, bottom + height * design.waterHeightRatio, 0], matrix },
-    design.segments,
-  );
-  const hoopRadius = radius * design.hoopRadiusRatio;
-  for (const level of design.hoopLevels) {
-    parts.prism(
-      'woodDark',
-      hoopRadius,
-      hoopRadius,
-      height * design.hoopThicknessRatio,
-      { position: [0, bottom + height * level, 0], matrix },
-      design.segments,
-    );
-  }
-}
-
 const ANVIL_DESIGN = {
   stumpRadiusRatio: 0.4,
   stumpTopRatio: 0.84,
@@ -221,124 +171,6 @@ export function anvil(parts: Parts, { size, matrix }: PropFrame): void {
     },
     design.hornSegments,
   );
-}
-
-const CHARCOAL_FOOTPRINT = { x: 1.62, z: 1.52 } as const;
-
-const HWARO_DESIGN = {
-  top: 0.38,
-  foundationHeightRatio: 0.3,
-  sideThickness: 0.16,
-  endThickness: 0.14,
-  capThickness: 0.06,
-  capDepth: 0.18,
-  charcoalHeightRatio: 0.06,
-  charcoalLevel: 0.32,
-  emberWidthRatio: 0.64,
-  emberDepthRatio: 0.64,
-  emberHeightRatio: 0.02,
-  emberLevel: 0.36,
-  grillThickness: 0.035,
-  grillDepth: 0.045,
-  grillOffsets: [-0.32, -0.16, 0, 0.16, 0.32],
-} as const;
-
-export function hwaro(parts: Parts, frame: PropFrame): void {
-  const { matrix } = frame;
-  const design = HWARO_DESIGN;
-  const size = {
-    x: Math.max(frame.size.x, CHARCOAL_FOOTPRINT.x),
-    y: frame.size.y,
-    z: Math.max(frame.size.z, CHARCOAL_FOOTPRINT.z),
-  };
-  const bottom = -size.y / 2;
-  const top = design.top;
-  const height = top - bottom;
-  const innerWidth = size.x - design.sideThickness * 2;
-  const innerDepth = size.z - design.endThickness * 2;
-  const capThickness = Math.min(design.capThickness, height);
-  const grillThickness = Math.min(design.grillThickness, height);
-
-  parts.box('stoneDark', [size.x, height * design.foundationHeightRatio, size.z], {
-    position: [0, bottom + (height * design.foundationHeightRatio) / 2, 0],
-    matrix,
-  });
-  for (const side of SIDES) {
-    parts.box('stone', [design.sideThickness, height, size.z], {
-      position: [(side * (size.x - design.sideThickness)) / 2, bottom + height / 2, 0],
-      matrix,
-    });
-    parts.box('stone', [size.x, height, design.endThickness], {
-      position: [0, bottom + height / 2, (side * (size.z - design.endThickness)) / 2],
-      matrix,
-    });
-    parts.box('sand', [size.x, capThickness, design.capDepth], {
-      position: [0, top - capThickness / 2, (side * (size.z - design.capDepth)) / 2],
-      matrix,
-    });
-  }
-  parts.box('basaltDark', [innerWidth, height * design.charcoalHeightRatio, innerDepth], {
-    position: [0, bottom + height * design.charcoalLevel, 0],
-    matrix,
-  });
-  parts.box(
-    'bunting2',
-    [innerWidth * design.emberWidthRatio, height * design.emberHeightRatio, innerDepth * design.emberDepthRatio],
-    { position: [0, bottom + height * design.emberLevel, 0], matrix },
-  );
-  for (const offset of design.grillOffsets) {
-    parts.box('iron', [innerWidth, grillThickness, design.grillDepth], {
-      position: [0, top - grillThickness / 2, innerDepth * offset],
-      matrix,
-    });
-  }
-}
-
-const GAMASOT_DESIGN = {
-  profile: [
-    [0, -0.55],
-    [0.34, -0.55],
-    [0.62, -0.4],
-    [0.86, -0.13],
-    [0.92, 0.19],
-    [0.87, 0.34],
-    [0.79, 0.34],
-    [0.77, 0.17],
-    [0.62, -0.12],
-    [0, -0.24],
-  ],
-  rimProfile: [
-    [0.79, 0.31],
-    [0.87, 0.31],
-    [0.89, 0.35],
-    [0.86, 0.38],
-    [0.78, 0.38],
-    [0.79, 0.31],
-  ],
-  waterRadius: 0.78,
-  waterThickness: 0.035,
-  waterLevel: 0.205,
-  handleSize: [0.16, 0.09, 0.22] satisfies Triple,
-  handleOffset: 0.89,
-  handleLevel: 0.15,
-  segments: 14,
-} as const;
-
-export function gamasot(parts: Parts): void {
-  const design = GAMASOT_DESIGN;
-  lathe(parts, 'sand', design.profile, {}, design.segments);
-  lathe(parts, 'bunting3', design.rimProfile, {}, design.segments);
-  parts.prism(
-    'lagoon',
-    design.waterRadius,
-    design.waterRadius,
-    design.waterThickness,
-    { position: [0, design.waterLevel, 0] },
-    design.segments,
-  );
-  for (const side of SIDES) {
-    parts.box('bunting4', design.handleSize, { position: [side * design.handleOffset, design.handleLevel, 0] });
-  }
 }
 
 const ISLAND_BELLOWS = {
