@@ -16,7 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { preparePortfolioContent } from './portfolioContent.mjs';
 
-const SYNC_FORMAT_VERSION = '5';
+const SYNC_FORMAT_VERSION = '6';
 const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WORLD_COMMIT = '70764a94756cc4de564e493c8ba46c4b5fe03ed1';
 const WORLD_REPOSITORY = 'https://github.com/brunosimon/folio-2025.git';
@@ -43,7 +43,7 @@ const REQUIRED_STATIC_FILES = [
   'favicons/favicon.svg',
 ];
 
-const UNUSED_STATIC_DIRECTORIES = ['projects', 'lab', 'christmas', 'easter', 'whispers', 'blackFriday'];
+const UNUSED_STATIC_DIRECTORIES = ['projects', 'lab', 'christmas', 'easter', 'whispers', 'blackFriday', 'sounds/jingleBells'];
 const UNUSED_STATIC_FILES = new Set([
   'sounds/musics/Boy.mp3',
   'sounds/musics/Baguira.mp3',
