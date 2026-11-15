@@ -2,7 +2,7 @@ import { Fn, texture, uv, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { MeshDefaultMaterial, revealNode } from '../materials/meshDefaultMaterial';
-import { createParts, type PartName, type Parts, type Triple } from './islandGeometry';
+import { createParts, type PartName, type Parts, removeComponents, type Triple } from './islandGeometry';
 import { islandModelMesh } from './islandModels';
 
 export interface Frame {
@@ -301,8 +301,24 @@ function neonMaterial(neonTexture: THREE.Texture): THREE.MeshBasicNodeMaterial {
   return material;
 }
 
+const BOWLING_SIGN_ART = { mesh: 'Plane043', reach: 2.5, minTop: 3 } as const;
+
+function removeOldSignArt(model: THREE.Object3D, sign: THREE.Object3D): void {
+  const art = requireMesh(findChild(model, BOWLING_SIGN_ART.mesh));
+  model.updateMatrixWorld(true);
+  const anchor = art.worldToLocal(sign.getWorldPosition(new THREE.Vector3()));
+  removeComponents(art, ({ box }) => {
+    const center = box.getCenter(new THREE.Vector3());
+    return (
+      Math.hypot(center.x - anchor.x, center.z - anchor.z) < BOWLING_SIGN_ART.reach &&
+      box.max.y > BOWLING_SIGN_ART.minTop
+    );
+  });
+}
+
 export function rebuildBowlingSign(model: THREE.Object3D, neonTexture: THREE.Texture): void {
   findChild(model, 'sign001').removeFromParent();
+  removeOldSignArt(model, findChild(model, 'sign002'));
   const sign = swapForGroup(findChild(model, 'sign002'));
   const parts = createParts();
   parts.box('neonBoard', [4.0, 2.05, 0.12], { position: [0.05, -0.04, -0.08] });
