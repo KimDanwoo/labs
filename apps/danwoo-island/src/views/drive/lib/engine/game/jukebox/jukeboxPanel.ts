@@ -17,6 +17,7 @@ const MILLISECONDS_PER_SECOND = 1000;
 const SECONDS_PER_MINUTE = 60;
 const ACTIVE_CLASS = 'is-active';
 const PLAYING_CLASS = 'is-playing';
+const STARTING_CLASS = 'is-starting';
 
 function formatDuration(milliseconds: number): string {
   const totalSeconds = Math.round(milliseconds / MILLISECONDS_PER_SECOND);
@@ -105,6 +106,7 @@ export class JukeboxPanel {
     const track = trackIndex === null ? null : this.#player.tracks[trackIndex];
     const isPlaying = status === 'playing';
     this.#root.classList.toggle(PLAYING_CLASS, isPlaying);
+    this.#root.classList.toggle(STARTING_CLASS, status === 'starting' || status === 'loading');
     this.#status.textContent = STATUS_TEXT[status];
     this.#title.textContent = track?.title ?? `직접 만든 노래 ${this.#player.tracks.length}곡`;
     this.#progress.style.transform = `scaleX(${progress})`;

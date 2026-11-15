@@ -166,3 +166,15 @@ test('음소거 상태로 준비되면 위젯 볼륨을 0으로 맞춘다', asyn
   widget.emit('READY');
   assert.ok(widget.calls.includes('volume 0'));
 });
+
+test('미리 준비해 두면 첫 곡 선택이 다시 불러오지 않고 바로 재생한다', async () => {
+  const { player, widget } = setup();
+  void player.prepare();
+  await flush();
+  widget.emit('READY');
+  assert.equal(player.state.status, 'ready');
+  assert.equal(player.state.trackIndex, null);
+  player.select(0);
+  assert.equal(widget.calls.at(-1), 'play');
+  assert.ok(!widget.calls.some((call) => call.startsWith('load')));
+});
