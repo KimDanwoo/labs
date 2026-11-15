@@ -37,6 +37,7 @@ const ICE_FRICTION = { melted: 0.5, frozen: 0.02 } as const;
 const ICE_HIDDEN_DEPTH = -1.5;
 const MIN_RATIO = 0.0001;
 const BLUR = { amount: 0.01, repeats: 25 } as const;
+const RIPPLES = { frequency: 7, opacity: 0.6 } as const;
 const TICK_ORDER = 10;
 const THROTTLE_ORDER = 2;
 
@@ -88,7 +89,7 @@ export class WaterSurface {
 
   #ripplesNode(terrainData: Vec4Node): THREE.Node<'float'> {
     const { wind, noises } = getGame();
-    const slopeFrequency = uniform(10);
+    const slopeFrequency = uniform(RIPPLES.frequency);
     const noiseFrequency = uniform(0.1);
     const noiseOffset = uniform(0.345);
     const rippleIndex = terrainData.b.add(wind.localTime.mul(0.5)).mul(slopeFrequency).floor();
@@ -102,7 +103,7 @@ export class WaterSurface {
       .mod(1)
       .sub(terrainData.b.remap(0, 1, -0.3, 1).oneMinus())
       .add(ripplesNoise);
-    ripples.assign(this.#ripplesRatio.remap(0, 1, -1, -0.4).step(ripples));
+    ripples.assign(this.#ripplesRatio.remap(0, 1, -1, -0.4).step(ripples).mul(RIPPLES.opacity));
     return ripples;
   }
 

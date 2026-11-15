@@ -77,7 +77,7 @@ function replaceVisual(
   return container;
 }
 
-const ROOF_OVERHANG = 1.12;
+const ROOF_OVERHANG = 1.04;
 
 function palmRoof({ center, width, depth, height }: Roof): THREE.Mesh {
   const [x, y, z] = center;
@@ -107,8 +107,8 @@ export function rebuildProjectsGate(model: THREE.Object3D): void {
     return parts
       .build()
       .add(
-        palmRoof({ center: [0, top + 0.1, 0], width: 6.4, depth: 2.4, height: 1.05 }),
-        palmRoof({ center: [4.6, top - 0.35, 1.5], width: 1.5, depth: 1.5, height: 0.6 }),
+        palmRoof({ center: [0, top + 0.18, 0], width: 6.0, depth: 2.2, height: 0.7 }),
+        palmRoof({ center: [4.6, top - 0.3, 1.5], width: 1.4, depth: 1.4, height: 0.45 }),
       );
   });
 }
@@ -122,7 +122,7 @@ export function rebuildLabGate(model: THREE.Object3D): void {
     parts.box('woodDark', [7.9, 0.3, 0.4], { position: [1.42, top, 0.25] });
     parts.rod('woodDark', 0.08, [-2.25, top - 1.0, 0.25], [-1.35, top - 0.1, 0.25]);
     parts.rod('woodDark', 0.08, [2.25, top - 1.0, 0.25], [1.35, top - 0.1, 0.25]);
-    return parts.build().add(palmRoof({ center: [1.42, top + 0.12, 0.25], width: 9, depth: 2.8, height: 1.15 }));
+    return parts.build().add(palmRoof({ center: [1.42, top + 0.18, 0.25], width: 8.4, depth: 2.6, height: 0.75 }));
   });
 }
 
