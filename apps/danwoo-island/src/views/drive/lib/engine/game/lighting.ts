@@ -8,11 +8,14 @@ const SUN = { phi: 0.63, theta: 0.72, phiAmplitude: 0.62, thetaAmplitude: 1.25, 
 const SHADOW = { near: 1, bias: -0.001, normalBias: 0.1 } as const;
 const SHADOW_MAP_SIZE = { [QUALITY.high]: 2048, [QUALITY.low]: 512 } satisfies Record<QualityLevel, number>;
 const SHADOW_RADIUS = { [QUALITY.high]: 3, [QUALITY.low]: 2 } satisfies Record<QualityLevel, number>;
+const SHADOW_FRAME_INTERVAL = { [QUALITY.high]: 1, [QUALITY.low]: 2 } satisfies Record<QualityLevel, number>;
 const LIGHT_INTENSITY = 5;
 const TICK_ORDER = 9;
 const THROTTLED_RESIZE_ORDER = 3;
 
 export class Lighting {
+  #shadowInterval = 1;
+  #shadowFrame = 0;
   readonly game = getGame();
   readonly spherical: THREE.Spherical;
   readonly direction = new THREE.Vector3();
@@ -51,6 +54,7 @@ export class Lighting {
   }
 
   update(): void {
+    this.#scheduleShadow();
     const angle = -(this.game.dayCycles.progress + SUN.cycleOffset) * Math.PI * 2;
     this.spherical.theta = SUN.theta + Math.sin(angle) * SUN.thetaAmplitude;
     this.spherical.phi = SUN.phi + Math.cos(angle) * 0.5 * SUN.phiAmplitude;
@@ -78,8 +82,18 @@ export class Lighting {
     shadow.camera.updateProjectionMatrix();
   }
 
+  #scheduleShadow(): void {
+    const { shadow } = this.light;
+    if (shadow.autoUpdate) return;
+    this.#shadowFrame = (this.#shadowFrame + 1) % this.#shadowInterval;
+    if (this.#shadowFrame === 0) shadow.needsUpdate = true;
+  }
+
   #applyQuality(level: QualityLevel): void {
     this.light.shadow.mapSize.set(SHADOW_MAP_SIZE[level], SHADOW_MAP_SIZE[level]);
     this.light.shadow.radius = SHADOW_RADIUS[level];
+    this.#shadowInterval = SHADOW_FRAME_INTERVAL[level];
+    this.light.shadow.autoUpdate = this.#shadowInterval === 1;
+    this.light.shadow.needsUpdate = true;
   }
 }
