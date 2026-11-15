@@ -78,48 +78,24 @@ export class TitleSign {
 }
 
 export class UrlSign {
-  readonly intersect: Intersect;
+  readonly highlight = uniform(0);
   readonly #flip: FlipSign;
   readonly #canvas = showcaseTextCanvas(URL_CANVAS);
   readonly #panel: THREE.Object3D;
   readonly #getUrl: () => string;
 
-  constructor({
-    group,
-    intersectMesh,
-    shades,
-    getUrl,
-  }: {
-    group: THREE.Object3D;
-    intersectMesh: THREE.Object3D;
-    shades: Shades;
-    getUrl: () => string;
-  }) {
+  constructor({ group, shades, getUrl }: { group: THREE.Object3D; shades: Shades; getUrl: () => string }) {
     const inner = firstChild(group);
     this.#flip = new FlipSign(inner, URL_FLIP_DELAY);
     this.#panel = childStartingWith(inner, 'panel');
     this.#getUrl = getUrl;
 
-    const highlight = uniform(0);
     const textMesh = childStartingWith(inner, 'text');
     textMesh.castShadow = false;
     textMesh.receiveShadow = false;
-    if (textMesh instanceof THREE.Mesh)
-      textMesh.material = highlightTextMaterial(this.#canvas.texture, shades, highlight);
-
-    if (!(intersectMesh instanceof THREE.Mesh)) throw new Error('URL intersect is not a mesh');
-    intersectMesh.visible = false;
-    this.intersect = getGame().rayCursor.addIntersect({
-      active: false,
-      shape: intersectMesh,
-      onClick: () => this.open(),
-      onEnter: () => {
-        highlight.value = 1;
-      },
-      onLeave: () => {
-        highlight.value = 0;
-      },
-    });
+    if (textMesh instanceof THREE.Mesh) {
+      textMesh.material = highlightTextMaterial(this.#canvas.texture, shades, this.highlight);
+    }
   }
 
   update(direction: Direction): void {
@@ -133,6 +109,26 @@ export class UrlSign {
     const url = this.#getUrl();
     if (url) window.open(url, '_blank', 'noopener,noreferrer');
   }
+}
+
+export function hideIntersectMesh(intersectMesh: THREE.Object3D): THREE.Mesh {
+  if (!(intersectMesh instanceof THREE.Mesh)) throw new Error(`Intersect is not a mesh: ${intersectMesh.name}`);
+  intersectMesh.visible = false;
+  return intersectMesh;
+}
+
+export function urlSignIntersect(sign: UrlSign, intersectMesh: THREE.Object3D): Intersect {
+  return getGame().rayCursor.addIntersect({
+    active: false,
+    shape: hideIntersectMesh(intersectMesh),
+    onClick: () => sign.open(),
+    onEnter: () => {
+      sign.highlight.value = 1;
+    },
+    onLeave: () => {
+      sign.highlight.value = 0;
+    },
+  });
 }
 
 export function sphereIntersect(reference: THREE.Object3D): THREE.Sphere {
