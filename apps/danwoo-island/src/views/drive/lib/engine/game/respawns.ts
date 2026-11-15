@@ -10,7 +10,7 @@ export interface Respawn {
 
 const SPAWN_HEIGHT = 4;
 const RESPAWN_PREFIX = /^respawn(.+)$/i;
-const EXTRA_RESPAWNS = [{ name: 'beachStart', x: 54.6, z: 41.6, rotation: 0.7 }] as const;
+const EXTRA_RESPAWNS = [{ name: 'beachStart', x: 54.6, z: 41.6, rotation: -1.15 }] as const;
 
 const lowerFirst = (value: string): string => value.charAt(0).toLowerCase() + value.slice(1);
 
