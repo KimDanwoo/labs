@@ -245,7 +245,7 @@ class Playlist {
     gsap.delayedCall(SONG_SWITCH_DELAY, () => {
       this.#index = (this.#index + 1) % this.songs.length;
       const song = this.#startCurrent();
-      getGame().notifications.show(nowPlayingNotice(song.name), 'song', SONG_NOTICE_DURATION);
+      getGame().notifications.show(nowPlayingNotice(song.name), { type: 'song', duration: SONG_NOTICE_DURATION });
       this.#isSwitching = false;
     });
   }
