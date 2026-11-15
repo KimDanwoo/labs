@@ -113,7 +113,7 @@ interface AssetNames {
   textureExtension: string;
 }
 
-const CACHE_BUSTER = '?cb=1';
+const CACHE_BUSTER = '';
 const REVEAL_DELAY_FRAMES = 3;
 const FONT_FACES = ['400 24px MaruBuri', '700 24px MaruBuri'];
 const FONT_SAMPLE = '김단우 섬 Aa1';
