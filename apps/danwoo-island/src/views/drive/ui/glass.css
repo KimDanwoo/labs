@@ -1,0 +1,613 @@
+:root:root {
+  --glass: rgb(16 52 60 / 46%);
+  --glass-strong: rgb(12 40 47 / 62%);
+  --glass-raised: rgb(255 255 255 / 10%);
+  --glass-hover: rgb(255 255 255 / 16%);
+  --glass-border: rgb(255 255 255 / 26%);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 30%);
+  --glass-shadow: 0 24px 70px rgb(4 24 30 / 38%);
+  --glass-blur: blur(22px) saturate(150%);
+  --glass-text: #ffffff;
+  --glass-muted: rgb(255 255 255 / 72%);
+  --glass-faint: rgb(255 255 255 / 52%);
+  --accent: #2bb3c0;
+  --accent-strong: #1f9aa6;
+  --accent-warm: #ff8a5b;
+  --accent-sun: #f6cf68;
+  --glass-radius: 24px;
+  --glass-ease: cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+.menu ::selection,
+.modals ::selection {
+  color: #fff;
+  background-color: var(--accent);
+}
+
+.menu .container {
+  background: var(--glass);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+.menu.is-visible .container {
+  animation: glass-rise 0.45s var(--glass-ease) both;
+}
+
+.menu .contents .title {
+  font-weight: 800;
+}
+
+.menu .contents .text {
+  color: var(--glass-muted);
+}
+
+.menu .navigation .item.is-active .button-inner,
+html:not(.is-mode-touch) .menu .navigation .item.is-active:hover .button-inner {
+  background: var(--accent);
+  box-shadow: 0 6px 18px rgb(43 179 192 / 45%);
+}
+
+.menu .options td {
+  color: var(--glass-text);
+  font-weight: 600;
+}
+
+.menu .button,
+.menu select.button {
+  color: var(--glass-text);
+  background: var(--glass-raised);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  font-family: var(--ui-font);
+  font-weight: 700;
+  box-shadow: var(--glass-highlight);
+  transition:
+    background 0.2s,
+    transform 0.2s var(--glass-ease);
+}
+
+html:not(.is-mode-touch) .menu .button:not(.is-disabled):hover {
+  background: var(--glass-hover);
+  transform: translateY(-1px);
+}
+
+.menu .button.is-success {
+  color: #fff;
+  background: rgb(43 179 192 / 55%);
+  border-color: rgb(43 179 192 / 80%);
+}
+
+.menu .button .tooltip {
+  color: #fff;
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+:is(.map, .blog, .jukebox) {
+  --map-cream: var(--glass);
+  --map-sand: var(--glass-border);
+  --map-sea: var(--accent);
+  --map-deep: var(--glass-text);
+  --map-ink: var(--glass-muted);
+  font-family: var(--ui-font);
+}
+
+.modals :is(.map, .blog, .jukebox) .panel-card {
+  color: var(--glass-text);
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+.modals :is(.map, .blog, .jukebox).is-displayed .panel-card {
+  animation: glass-rise 0.45s var(--glass-ease) both;
+}
+
+.modals :is(.map, .blog, .jukebox) .panel-title {
+  color: var(--glass-text);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.modals :is(.map, .blog, .jukebox) .panel-badge {
+  color: #06343a;
+  background: var(--accent-sun);
+}
+
+.modals :is(.map, .blog, .jukebox) .close .button-inner {
+  color: var(--glass-text);
+  background: var(--glass-raised);
+  border: 1px solid var(--glass-border);
+}
+
+.modals :is(.map, .blog, .jukebox) .panel-hint {
+  color: var(--glass-muted);
+  background: var(--glass-raised);
+}
+
+.modals .blog .blog-post,
+.modals .jukebox .jukebox-now,
+.modals .jukebox .jukebox-track {
+  color: var(--glass-text);
+  background: var(--glass-raised);
+  border: 1px solid rgb(255 255 255 / 12%);
+  box-shadow: none;
+}
+
+html:not(.is-mode-touch) .modals .blog .blog-post:hover,
+.modals .blog .blog-post:focus-visible,
+html:not(.is-mode-touch) .modals .jukebox .jukebox-track:hover {
+  background: var(--glass-hover);
+  box-shadow: 0 10px 30px rgb(4 24 30 / 30%);
+}
+
+.modals .blog .blog-post-title,
+.modals .jukebox .jukebox-title {
+  color: var(--glass-text);
+}
+
+.modals .blog .blog-post-description,
+.modals .jukebox .jukebox-track-title {
+  color: var(--glass-muted);
+}
+
+.modals .blog .blog-post-date,
+.modals .blog .blog-status,
+.modals .jukebox .jukebox-status,
+.modals .jukebox .jukebox-track-duration {
+  color: var(--glass-faint);
+}
+
+html:not(.is-mode-touch) .modals .blog .blog-post:hover .blog-post-title,
+.modals .blog .blog-post:focus-visible .blog-post-title {
+  text-decoration-color: var(--accent-sun);
+}
+
+.modals .blog .blog-all {
+  background: var(--accent);
+  box-shadow: 0 8px 24px rgb(43 179 192 / 40%);
+}
+
+.modals .jukebox .is-active .jukebox-track {
+  background: rgb(43 179 192 / 30%);
+  border-color: rgb(43 179 192 / 70%);
+}
+
+.modals .jukebox .jukebox-progress {
+  background: rgb(255 255 255 / 18%);
+}
+
+.modals .jukebox .jukebox-progress-bar {
+  background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+}
+
+.modals .jukebox .jukebox-button {
+  background: var(--glass-raised);
+  border: 1px solid var(--glass-border);
+}
+
+.modals .jukebox .jukebox-button.is-toggle {
+  background: var(--accent-warm);
+  border-color: transparent;
+  box-shadow: 0 8px 22px rgb(255 138 91 / 45%);
+}
+
+.modals .jukebox .is-previous .jukebox-icon {
+  border-right-color: #fff;
+}
+
+.modals .jukebox .is-next .jukebox-icon {
+  border-left-color: #fff;
+}
+
+.modals .jukebox :is(.is-previous, .is-next) .jukebox-icon:after {
+  background: #fff;
+}
+
+.modals .jukebox .jukebox-stop {
+  color: var(--glass-text);
+  border-color: var(--glass-border);
+}
+
+.modals .jukebox .jukebox-source {
+  color: var(--accent-sun);
+}
+
+.notifications .notification {
+  color: var(--glass-text);
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+.notifications .notification.is-song .top .title,
+.notifications .notification.is-arrival .arrival-label {
+  color: var(--glass-muted);
+}
+
+.notifications .notification.is-song .top .title .song-name,
+.notifications .notification.is-arrival .arrival-name {
+  color: var(--glass-text);
+}
+
+.notifications .notification.is-arrival .arrival-icon {
+  background: rgb(255 255 255 / 85%);
+}
+
+@keyframes glass-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu.is-visible .container,
+  .modals :is(.map, .blog, .jukebox).is-displayed .panel-card {
+    animation: none;
+  }
+}
+
+.modals .modal.map {
+  pointer-events: none;
+  width: auto;
+  max-width: none;
+  position: fixed;
+  inset: 0;
+}
+
+.modals .map .map-hud > * {
+  pointer-events: auto;
+}
+
+.modals .map :is(.map-chip, .map-card, .map-places, .map-hint) {
+  color: var(--glass-text);
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+.modals .map.is-displayed :is(.map-chip, .map-places, .map-hint) {
+  animation: glass-rise 0.6s var(--glass-ease) 0.35s both;
+}
+
+.modals .map .map-chip {
+  border-radius: 999px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px 8px 10px;
+  display: flex;
+  position: absolute;
+  top: calc(20px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.modals:has(.map.is-displayed) {
+  pointer-events: none;
+}
+
+.modals .map .map-hud {
+  pointer-events: none;
+}
+
+.modals .map .map-chip-logo {
+  width: 30px;
+  height: 30px;
+}
+
+.modals .map .map-chip-title {
+  letter-spacing: 0.12em;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.modals .map .close {
+  position: absolute;
+  top: calc(20px + env(safe-area-inset-top));
+  right: calc(20px + env(safe-area-inset-right));
+}
+
+.modals .map .map-pins {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.modals .map .map-pin {
+  pointer-events: auto;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  width: 0;
+  height: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+.modals .map .map-pin > * {
+  position: absolute;
+}
+
+.modals .map .map-pin-bubble {
+  background: rgb(255 255 255 / 92%);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  transition:
+    transform 0.25s var(--glass-ease),
+    box-shadow 0.25s;
+  display: grid;
+  box-shadow: 0 8px 22px rgb(4 24 30 / 35%);
+  bottom: 18px;
+  left: 0;
+  transform: translateX(-50%);
+}
+
+.modals .map .map-pin-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.modals .map .map-pin-label {
+  color: #fff;
+  white-space: nowrap;
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: var(--ui-font);
+  font-size: 12px;
+  font-weight: 800;
+  bottom: 30px;
+  left: 26px;
+}
+
+.modals .map .map-pin-ring {
+  border: 2px solid rgb(43 179 192 / 85%);
+  border-radius: 50%;
+  width: 18px;
+  height: 8px;
+  animation: map-ring 2.2s ease-out infinite;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.modals .map .map-pin.is-selected .map-pin-bubble,
+html:not(.is-mode-touch) .modals .map .map-pin:hover .map-pin-bubble {
+  transform: translateX(-50%) scale(1.18);
+  box-shadow:
+    0 0 0 4px rgb(43 179 192 / 55%),
+    0 10px 26px rgb(4 24 30 / 40%);
+}
+
+.modals .map .map-pin.is-selected .map-pin-label {
+  background: var(--accent);
+}
+
+.modals .map .map-car {
+  pointer-events: none;
+  background: var(--accent-warm);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-shadow: 0 0 0 0 rgb(255 138 91 / 60%);
+  animation: map-car 1.6s ease-out infinite;
+}
+
+.modals .map .map-card {
+  border-radius: var(--glass-radius);
+  align-items: center;
+  gap: 14px;
+  width: min(360px, calc(100vw - 40px));
+  padding: 14px;
+  transition:
+    opacity 0.25s,
+    transform 0.3s var(--glass-ease);
+  display: flex;
+  position: absolute;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.modals .map .map-card.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 14px);
+}
+
+.modals .map .map-card-icon {
+  background: #fff;
+  border-radius: 16px;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  padding: 6px;
+}
+
+.modals .map .map-card-body {
+  flex-direction: column;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+  display: flex;
+}
+
+.modals .map .map-card-title {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.modals .map .map-card-text {
+  color: var(--glass-muted);
+  margin: 0;
+  font-size: 13px;
+}
+
+.modals .map .map-card-go {
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--accent);
+  border: 0;
+  border-radius: 999px;
+  flex: none;
+  padding: 10px 16px;
+  font-family: var(--ui-font);
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 8px 22px rgb(43 179 192 / 45%);
+}
+
+.modals .map .map-places {
+  border-radius: var(--glass-radius);
+  width: 220px;
+  max-height: calc(100vh - 200px);
+  padding: 14px;
+  position: absolute;
+  top: 50%;
+  right: calc(20px + env(safe-area-inset-right));
+  overflow-y: auto;
+  transform: translateY(-50%);
+}
+
+.modals .map .map-places-title {
+  color: var(--glass-muted);
+  letter-spacing: 0.04em;
+  margin: 2px 6px 10px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.modals .map .map-places-list {
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+
+.modals .map .map-place {
+  color: var(--glass-text);
+  cursor: pointer;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 14px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  font-family: var(--ui-font);
+  font-size: 14px;
+  font-weight: 700;
+  transition: background 0.2s;
+  display: flex;
+}
+
+html:not(.is-mode-touch) .modals .map .map-place:hover {
+  background: var(--glass-hover);
+}
+
+.modals .map .map-place-icon {
+  background: rgb(255 255 255 / 85%);
+  border-radius: 10px;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 3px;
+}
+
+.modals .map .map-hint {
+  color: var(--glass-muted);
+  white-space: nowrap;
+  border-radius: 999px;
+  margin: 0;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  position: absolute;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.modals .map .is-hidden:not(.map-card) {
+  visibility: hidden;
+}
+
+@keyframes map-ring {
+  from {
+    opacity: 1;
+    width: 14px;
+    height: 6px;
+  }
+  to {
+    opacity: 0;
+    width: 46px;
+    height: 18px;
+  }
+}
+
+@keyframes map-car {
+  to {
+    box-shadow: 0 0 0 16px rgb(255 138 91 / 0%);
+  }
+}
+
+@media only screen and (width<=720px) {
+  .modals .map .map-places {
+    display: none;
+  }
+
+  .modals .map .map-hint {
+    white-space: normal;
+    text-align: center;
+    width: max-content;
+    max-width: calc(100vw - 40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modals .map :is(.map-pin-ring, .map-car) {
+    animation: none;
+  }
+}
+
+.modals .map .map-pin-bubble::after {
+  content: '';
+  background: rgb(255 255 255 / 85%);
+  width: 2px;
+  height: 16px;
+  position: absolute;
+  top: 100%;
+  left: calc(50% - 1px);
+}

@@ -1,22 +1,26 @@
+import gsap from 'gsap';
+import * as THREE from 'three/webgpu';
+
 import { worldAsset } from '../../../config/worldAsset';
 import { getGame } from './gameContext';
 import { ISLAND_PLACES, type IslandPlace, type PlaceIcon } from './islandPlaces';
 import type { ModalItem } from './modals';
 import { createElement } from './utilities/createElement';
-import { clamp } from './utilities/maths';
 import { requireElement } from './utilities/requireElement';
 
-interface MapPoint {
-  x: number;
-  y: number;
-}
-
-const MAP_IMAGES = { day: 'ui/map/map-day.webp', night: 'ui/map/map-night.webp' } as const;
 const MAP_ACTION = { name: 'map', categories: ['modal', 'menu', 'wandering'], keys: ['Keyboard.m', 'Keyboard.KeyM'] };
-const Z_INDEX_SCALE = 1000;
-const LABEL_FLIP_X = 0.78;
-const PERCENT_PRECISION = 10;
+const ISLAND_CENTER = new THREE.Vector3(4, 0, -4);
+const PIN_LIFT = 1.6;
+const FLIGHT = { rise: 1.3, land: 1.5, ease: 'power3.inOut' } as const;
 const TICK_ORDER = 14;
+const HIDDEN_CLASS = 'is-hidden';
+const SELECTED_CLASS = 'is-selected';
+
+interface Pin {
+  readonly place: IslandPlace;
+  readonly element: HTMLElement;
+  readonly anchor: THREE.Vector3;
+}
 
 function iconElement(icon: PlaceIcon, className: string): HTMLImageElement {
   const image = createElement('img', className);
@@ -25,90 +29,131 @@ function iconElement(icon: PlaceIcon, className: string): HTMLImageElement {
   return image;
 }
 
-function worldToMap(x: number, z: number): MapPoint {
-  const { size } = getGame().terrain;
-  return { x: clamp(x / size + 0.5, 0, 1), y: clamp(z / size + 0.5, 0, 1) };
-}
-
-function toPercent(ratio: number): number {
-  return Math.round(ratio * 100 * PERCENT_PRECISION) / PERCENT_PRECISION;
-}
-
 export class WorldMap {
   readonly #modal: ModalItem;
-  readonly #container: HTMLElement;
+  readonly #pinsElement: HTMLElement;
   readonly #placesElement: HTMLElement;
-  readonly #playerElement: HTMLElement;
-  readonly #textureElement: HTMLImageElement;
-  readonly #roundedPlayer = { x: 0, z: 0 };
-  #isInitiated = false;
-  #textureUrl: string | null = null;
+  readonly #carElement: HTMLElement;
+  readonly #card: { root: HTMLElement; icon: HTMLImageElement; title: HTMLElement; text: HTMLElement; go: HTMLElement };
+  readonly #projected = new THREE.Vector3();
+  #pins: Pin[] = [];
+  #selected: IslandPlace | null = null;
+  #destination: IslandPlace | null = null;
 
   constructor() {
     const game = getGame();
     const modal = game.modals.items.get('map');
     if (!modal) throw new Error('Map modal is missing');
     this.#modal = modal;
-    this.#container = requireElement(modal.element, '.js-map-container', HTMLElement);
-    this.#playerElement = requireElement(this.#container, '.js-player', HTMLElement);
-    this.#textureElement = requireElement(this.#container, '.js-texture', HTMLImageElement);
-    this.#placesElement = requireElement(modal.element, '.js-map-places', HTMLElement);
+    const root = modal.element;
+    this.#pinsElement = requireElement(root, '.js-map-pins', HTMLElement);
+    this.#placesElement = requireElement(root, '.js-map-places', HTMLElement);
+    this.#carElement = requireElement(root, '.js-map-car', HTMLElement);
+    this.#card = {
+      root: requireElement(root, '.js-map-card', HTMLElement),
+      icon: requireElement(root, '.js-map-card-icon', HTMLImageElement),
+      title: requireElement(root, '.js-map-card-title', HTMLElement),
+      text: requireElement(root, '.js-map-card-text', HTMLElement),
+      go: requireElement(root, '.js-map-card-go', HTMLElement),
+    };
+    this.#card.go.addEventListener('click', () => {
+      if (this.#selected) this.#travelTo(this.#selected);
+    });
     this.#bindTrigger();
     this.#bindInput();
-    modal.events.on('open', () => {
-      if (!this.#isInitiated) this.#init();
-      this.#updateTexture();
+    modal.events.on('open', () => this.#rise());
+    modal.events.on('close', () => this.#land());
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+  }
+
+  #ensurePins(): void {
+    if (this.#pins.length > 0) return;
+    const { respawns } = getGame();
+    this.#pins = ISLAND_PLACES.map((place) => {
+      const element = createElement('button', 'map-pin', [
+        createElement('span', 'map-pin-bubble', [iconElement(place.icon, 'map-pin-icon')]),
+        createElement('span', 'map-pin-label', [place.name]),
+        createElement('span', 'map-pin-ring'),
+      ]);
+      element.type = 'button';
+      element.setAttribute('aria-label', place.name);
+      element.addEventListener('pointerenter', () => this.#select(place));
+      element.addEventListener('focus', () => this.#select(place));
+      element.addEventListener('click', () => this.#select(place));
+      this.#pinsElement.append(element);
+      const anchor = respawns.getByName(place.respawnName).position.clone().setY(PIN_LIFT);
+      return { place, element, anchor };
     });
+    this.#placesElement.replaceChildren(...ISLAND_PLACES.map((place) => this.#placeItem(place)));
   }
 
-  #init(): void {
-    this.#isInitiated = true;
-    for (const location of ISLAND_PLACES) {
-      this.#container.append(this.#pinElement(location));
-      this.#placesElement.append(this.#placeElement(location));
-    }
-    this.#textureElement.addEventListener('load', () => this.#textureElement.classList.add('is-visible'));
-    getGame().ticker.events.on('tick', () => this.update(), TICK_ORDER);
-  }
-
-  #travelTo(respawnName: string): void {
-    const game = getGame();
-    game.player.respawn(respawnName, () => {
-      game.view.focusPoint.isTracking = true;
-    });
-    game.modals.close();
-  }
-
-  #pinElement({ name, respawnName, icon, offset }: IslandPlace): HTMLElement {
-    const { position } = getGame().respawns.getByName(respawnName);
-    const point = worldToMap(position.x, position.z);
-    const element = createElement('button', 'location', [
-      iconElement(icon, 'pin'),
-      createElement('span', 'name', [name]),
-    ]);
-    element.type = 'button';
-    element.setAttribute('aria-label', `${name}(으)로 이동`);
-    if (point.x + offset.x > LABEL_FLIP_X) element.classList.add('is-label-left');
-    element.style.left = `${(point.x + offset.x) * 100}%`;
-    element.style.top = `${(point.y + offset.y) * 100}%`;
-    element.style.zIndex = String(Math.round(point.y * Z_INDEX_SCALE));
-    element.addEventListener('click', () => this.#travelTo(respawnName));
-    return element;
-  }
-
-  #placeElement({ name, respawnName, icon }: IslandPlace): HTMLElement {
-    const button = createElement('button', 'map-place', [iconElement(icon, 'map-place-icon'), name]);
+  #placeItem(place: IslandPlace): HTMLElement {
+    const button = createElement('button', 'map-place', [iconElement(place.icon, 'map-place-icon'), place.name]);
     button.type = 'button';
-    button.addEventListener('click', () => this.#travelTo(respawnName));
+    button.addEventListener('click', () => this.#select(place, { isPanning: true }));
     return createElement('li', '', [button]);
   }
 
-  #updateTexture(): void {
-    const url = getGame().dayCycles.isInInterval('night') ? MAP_IMAGES.night : MAP_IMAGES.day;
-    if (url === this.#textureUrl) return;
-    this.#textureElement.classList.remove('is-visible');
-    this.#textureUrl = url;
-    this.#textureElement.src = worldAsset(url);
+  #select(place: IslandPlace, { isPanning = false }: { isPanning?: boolean } = {}): void {
+    this.#selected = place;
+    this.#card.icon.src = worldAsset(`ui/map/icons/${place.icon}.webp`);
+    this.#card.title.textContent = place.name;
+    this.#card.text.textContent = place.description;
+    this.#card.root.classList.remove(HIDDEN_CLASS);
+    for (const pin of this.#pins) pin.element.classList.toggle(SELECTED_CLASS, pin.place === place);
+    if (!isPanning) return;
+    const pin = this.#pins.find((item) => item.place === place);
+    if (pin) this.#flyFocus(pin.anchor, FLIGHT.rise);
+  }
+
+  #rise(): void {
+    const { view, world } = getGame();
+    this.#ensurePins();
+    this.#destination = null;
+    this.#card.root.classList.add(HIDDEN_CLASS);
+    world.grass?.setVisible(false);
+    view.setOverviewWide(true);
+    view.focusPoint.isTracking = false;
+    view.focusPoint.magnet.active = false;
+    this.#flyFocus(ISLAND_CENTER, FLIGHT.rise);
+    gsap.to(view.overview, { amount: 1, duration: FLIGHT.rise, ease: FLIGHT.ease, overwrite: true });
+  }
+
+  #land(): void {
+    const { view, world, player, physicalVehicle, respawns } = getGame();
+    const destination = this.#destination;
+    if (destination) {
+      const respawn = respawns.getByName(destination.respawnName);
+      physicalVehicle.moveTo(respawn.position, respawn.rotation);
+    }
+    this.#flyFocus(destination ? respawns.getByName(destination.respawnName).position : player.position, FLIGHT.land);
+    gsap.to(view.overview, {
+      amount: 0,
+      duration: FLIGHT.land,
+      ease: FLIGHT.ease,
+      overwrite: true,
+      onComplete: () => {
+        view.setOverviewWide(false);
+        world.grass?.setVisible(true);
+        view.focusPoint.isTracking = true;
+        view.focusPoint.magnet.active = true;
+      },
+    });
+  }
+
+  #flyFocus(target: THREE.Vector3, duration: number): void {
+    gsap.to(getGame().view.focusPoint.position, {
+      x: target.x,
+      z: target.z,
+      duration,
+      ease: FLIGHT.ease,
+      overwrite: true,
+    });
+  }
+
+  #travelTo(place: IslandPlace): void {
+    this.#destination = place;
+    getGame().modals.close();
   }
 
   #bindTrigger(): void {
@@ -128,18 +173,21 @@ export class WorldMap {
     });
   }
 
+  #place(element: HTMLElement, world: THREE.Vector3): void {
+    const { camera } = getGame().view;
+    const { width, height } = getGame().viewport;
+    this.#projected.copy(world).project(camera);
+    const isVisible = this.#projected.z < 1 && Math.abs(this.#projected.x) < 1.1 && Math.abs(this.#projected.y) < 1.1;
+    element.classList.toggle(HIDDEN_CLASS, !isVisible);
+    if (!isVisible) return;
+    const x = (this.#projected.x * 0.5 + 0.5) * width;
+    const y = (-this.#projected.y * 0.5 + 0.5) * height;
+    element.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+  }
+
   update(): void {
     if (!this.#modal.isOpen) return;
-    const { player, physicalVehicle } = getGame();
-    const x = Math.round(player.position.x);
-    const z = Math.round(player.position.z);
-    if (x === this.#roundedPlayer.x && z === this.#roundedPlayer.z) return;
-
-    this.#roundedPlayer.x = x;
-    this.#roundedPlayer.z = z;
-    const point = worldToMap(x, z);
-    this.#playerElement.style.left = `${toPercent(point.x)}%`;
-    this.#playerElement.style.top = `${toPercent(point.y)}%`;
-    this.#playerElement.style.transform = `rotate(${-physicalVehicle.yRotation}rad)`;
+    for (const pin of this.#pins) this.#place(pin.element, pin.anchor);
+    this.#place(this.#carElement, getGame().player.position);
   }
 }

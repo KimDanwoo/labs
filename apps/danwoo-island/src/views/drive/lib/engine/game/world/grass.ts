@@ -164,6 +164,10 @@ export class Grass {
     return material;
   }
 
+  setVisible(isVisible: boolean): void {
+    this.#mesh.visible = isVisible;
+  }
+
   update(): void {
     const { position } = getGame().view.optimalArea;
     this.#center.value.set(position.x, position.z);

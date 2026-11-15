@@ -9,6 +9,7 @@ import { MenuTrigger } from './MenuTrigger';
 import { Modals } from './Modals';
 import { TouchButtons } from './TouchButtons';
 import { WorldBoot } from './WorldBoot';
+import './glass.css';
 import './world.css';
 
 export function DriveView() {
