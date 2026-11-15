@@ -18,7 +18,7 @@ export function Modals() {
       <div className="js-modal modal jukebox" data-name="jukebox">
         <div className="panel-card">
           <header className="panel-header">
-            <img className="panel-logo" src={worldAsset('ui/islandMark.png')} alt="" aria-hidden="true" />
+            <img className="panel-logo" src={worldAsset('ui/islandMark.webp')} alt="" aria-hidden="true" />
             <h2 className="panel-title">쥬크박스</h2>
             <span className="panel-badge">MUSIC</span>
             <CloseButton />
@@ -30,7 +30,7 @@ export function Modals() {
       <div className="js-modal modal blog" data-name="blog">
         <div className="panel-card">
           <header className="panel-header">
-            <img className="panel-logo" src={worldAsset('ui/islandMark.png')} alt="" aria-hidden="true" />
+            <img className="panel-logo" src={worldAsset('ui/islandMark.webp')} alt="" aria-hidden="true" />
             <h2 className="panel-title">최신 글 게시판</h2>
             <span className="panel-badge">BLOG</span>
             <CloseButton />
@@ -44,7 +44,7 @@ export function Modals() {
       <div className="js-modal modal map" data-name="map">
         <div className="map-hud">
           <header className="map-chip">
-            <img className="map-chip-logo" src={worldAsset('ui/islandMark.png')} alt="" aria-hidden="true" />
+            <img className="map-chip-logo" src={worldAsset('ui/islandMark.webp')} alt="" aria-hidden="true" />
             <h2 className="map-chip-title">MAP</h2>
           </header>
           <div className="js-map-pins map-pins" />

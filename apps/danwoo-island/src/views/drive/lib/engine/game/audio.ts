@@ -49,6 +49,14 @@ const SOUND_POOL = 2;
 const RATE_RANGE = { min: 0.5, max: 4 } as const;
 const AUDIBLE_VOLUME = 0.01;
 const CAMERA_DEPTH_SCALE = 0.1;
+const MAX_PARALLEL_LOADS = 4;
+const IDLE_TIMEOUT_MS = 2000;
+
+function scheduleIdle(task: () => void): void {
+  if ('requestIdleCallback' in window) window.requestIdleCallback(task, { timeout: IDLE_TIMEOUT_MS });
+  else setTimeout(task, 0);
+}
+
 const SONG_ROTATION_MS = 3 * 60 * 1000;
 const SONG_SWITCH_DELAY = 3;
 const SONG_NOTICE_DURATION = 5;
@@ -156,7 +164,8 @@ export class AudioItem {
   readonly #antiSpam: number;
   readonly #onPlay: SoundHandler | null;
   readonly onPlaying: ((item: AudioItem) => void) | null;
-  #isLoaded: boolean;
+  #loading: Promise<void> | null = null;
+  readonly isEager: boolean;
   #lastPlay = -Infinity;
   #appliedRate = Number.NaN;
   #appliedVolume = Number.NaN;
@@ -172,7 +181,7 @@ export class AudioItem {
       autoplay: isPlaying,
       loop: options.loop ?? false,
       volume,
-      preload: options.preload ?? true,
+      preload: false,
       onloaderror: () => reportError(new Error(`Audio load error: ${options.path}`)),
       onend: () => {
         this.playing = false;
@@ -185,18 +194,25 @@ export class AudioItem {
     this.#antiSpam = options.antiSpam ?? DEFAULT_ANTI_SPAM;
     this.onPlaying = options.onPlaying ?? null;
     this.#onPlay = options.onPlay ?? null;
-    this.#isLoaded = options.preload ?? true;
+    this.isEager = options.preload ?? true;
     this.autoplay = options.autoplay ?? false;
     this.playing = isPlaying;
+    if (isPlaying) void this.load();
+  }
+
+  load(): Promise<void> {
+    this.#loading ??= new Promise((resolve) => {
+      this.howl.once('load', () => resolve());
+      this.howl.once('loaderror', () => resolve());
+      this.howl.load();
+    });
+    return this.#loading;
   }
 
   play(...args: unknown[]): void {
     const game = getGame();
     if (!game.audio.initiated) return;
-    if (!this.#isLoaded) {
-      this.#isLoaded = true;
-      this.howl.load();
-    }
+    void this.load();
     if (this.#antiSpam && game.ticker.elapsed - this.#lastPlay < this.#antiSpam) return;
 
     this.#onPlay?.(this, ...args);
@@ -324,6 +340,8 @@ export class Audio {
   readonly mute: AudioMute;
   initiated = false;
   playlist: Playlist | null = null;
+  readonly #loadQueue: AudioItem[] = [];
+  #activeLoads = 0;
   musicOwner: MusicOwner = 'island';
   isBackground = false;
   #globalRate = 1;
@@ -336,14 +354,36 @@ export class Audio {
   }
 
   init(): void {
-    this.initiated = true;
-    this.#startPlaylist();
     this.#registerAmbients();
     this.#registerOneOffs();
+    this.initiated = true;
+    this.#startPlaylist();
     for (const group of this.groups.values()) {
       for (const item of group.items) {
         if (item.autoplay && !item.playing) item.play();
       }
+    }
+    this.#preloadEager();
+  }
+
+  #preloadEager(): void {
+    this.#queueLoad([...this.groups.values()].flatMap(({ items }) => items).filter((item) => item.isEager));
+  }
+
+  #queueLoad(items: readonly AudioItem[]): void {
+    this.#loadQueue.push(...items);
+    scheduleIdle(() => this.#pumpLoads());
+  }
+
+  #pumpLoads(): void {
+    while (this.#activeLoads < MAX_PARALLEL_LOADS) {
+      const item = this.#loadQueue.shift();
+      if (!item) return;
+      this.#activeLoads += 1;
+      void item.load().then(() => {
+        this.#activeLoads -= 1;
+        this.#pumpLoads();
+      });
     }
   }
 
@@ -353,6 +393,7 @@ export class Audio {
     this.groups.set(groupName, group);
     const item = new AudioItem(options, group, this.initiated);
     group.items.push(item);
+    if (this.initiated && item.isEager) this.#queueLoad([item]);
     return item;
   }
 
@@ -461,27 +502,13 @@ export class Audio {
   #registerWeather(): void {
     const game = getGame();
     this.register({
-      group: 'jingleBells',
-      path: 'sounds/jingleBells/Mountain Audio - Christmas Bells.mp3',
-      autoplay: true,
-      loop: true,
-      volume: 0,
-      onPlaying: (item) => {
-        const sine = Math.sin(game.ticker.elapsedScaled * 0.1) * 0.5 + 0.5;
-        const targetVolume = Math.max(0, game.weather.snow.value) * 0.35 * sine;
-        const easing = targetVolume > item.volume ? 0.005 : 0.05;
-        item.volume += (targetVolume - item.volume) * game.ticker.deltaScaled * easing;
-      },
-    });
-    this.register({
       group: 'rain',
       path: 'sounds/rain/soundjay_rain-on-leaves_main-01.mp3',
       autoplay: true,
       loop: true,
       volume: 0,
       onPlaying: (item) => {
-        const snowAttenuation = remapClamp(game.weather.snow.value, [0, 0.6], [1, 0]);
-        item.volume = remapClamp(game.weather.rain.value, [0.1, 0.6], [0, 1]) * snowAttenuation;
+        item.volume = remapClamp(game.weather.rain.value, [0.1, 0.6], [0, 1]);
       },
     });
     this.register({

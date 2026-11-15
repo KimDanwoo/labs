@@ -1,8 +1,8 @@
 export const MENU_SECTIONS = [
-  { name: 'home', icon: 'ui/line/home.png' },
-  { name: 'options', icon: 'ui/line/gear.png' },
-  { name: 'controls', icon: 'ui/line/gamepad.png' },
-  { name: 'circuit', icon: 'ui/line/flag.png' },
+  { name: 'home', label: '홈', icon: 'ui/line/home.png' },
+  { name: 'options', label: '설정', icon: 'ui/line/gear.png' },
+  { name: 'controls', label: '조작법', icon: 'ui/line/gamepad.png' },
+  { name: 'circuit', label: '서킷', icon: 'ui/line/flag.png' },
 ] as const;
 
 export type MenuSectionName = (typeof MENU_SECTIONS)[number]['name'];

@@ -611,3 +611,9 @@ html:not(.is-mode-touch) .modals .map .map-place:hover {
   top: 100%;
   left: calc(50% - 1px);
 }
+
+:is(.menu, .modals, .island-identity, .menu-trigger, .map-trigger) :is(button, select, a):focus-visible,
+:is(.menu-trigger, .map-trigger):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}

@@ -1,4 +1,3 @@
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import {
   attribute,
   Fn,
@@ -51,10 +50,9 @@ function heightAttributes(geometry: THREE.BufferGeometry): void {
   geometry.setAttribute('crown', new THREE.BufferAttribute(crown, 1));
 }
 
-function plantedGeometry(base: THREE.BufferGeometry, tree: THREE.Object3D): THREE.BufferGeometry {
+function plantedMatrix(tree: THREE.Object3D): THREE.Matrix4 {
   const scale = THREE.MathUtils.randFloat(...SCALE_RANGE);
-  const matrix = tree.matrix.clone().multiply(new THREE.Matrix4().makeScale(scale, scale, scale));
-  return base.clone().applyMatrix4(matrix);
+  return tree.matrix.clone().multiply(new THREE.Matrix4().makeScale(scale, scale, scale));
 }
 
 export class PalmTrees {
@@ -67,12 +65,10 @@ export class PalmTrees {
     const base = palmGeometry();
     base.computeBoundingBox();
     heightAttributes(base);
-    const merged = mergeGeometries(references.map((tree) => plantedGeometry(base, tree)));
-    if (!merged) throw new Error('Palm trees could not be merged');
-    merged.computeBoundingSphere();
-    if (merged.boundingSphere) merged.boundingSphere.radius += SWAY_MARGIN;
-
-    const mesh = new THREE.Mesh(merged, this.#material());
+    const mesh = new THREE.InstancedMesh(base, this.#material(), references.length);
+    for (const [index, tree] of references.entries()) mesh.setMatrixAt(index, plantedMatrix(tree));
+    mesh.computeBoundingSphere();
+    if (mesh.boundingSphere) mesh.boundingSphere.radius += SWAY_MARGIN;
     mesh.name = 'palmTrees';
     mesh.castShadow = true;
     mesh.receiveShadow = true;

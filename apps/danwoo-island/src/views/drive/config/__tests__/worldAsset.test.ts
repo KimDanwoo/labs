@@ -6,8 +6,8 @@ import { worldAsset } from '../worldAsset';
 describe('worldAsset', () => {
   it('월드 에셋 상대 경로에 /world/를 붙인다', () => {
     assert.equal(
-      worldAsset('respawns/respawnsReferences-compressed.glb?cb=1'),
-      '/world/respawns/respawnsReferences-compressed.glb?cb=1',
+      worldAsset('respawns/respawnsReferences-compressed.glb'),
+      '/world/respawns/respawnsReferences-compressed.glb',
     );
     assert.equal(worldAsset('./basis/basis_transcoder.js'), '/world/basis/basis_transcoder.js');
   });

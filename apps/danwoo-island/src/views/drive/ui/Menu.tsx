@@ -21,8 +21,8 @@ export function Menu() {
       <div className="inner">
         <CloseButton />
         <div className="js-navigation navigation">
-          {MENU_SECTIONS.map(({ name, icon }) => (
-            <button key={name} className="js-navigation-item item" data-name={name}>
+          {MENU_SECTIONS.map(({ name, label, icon }) => (
+            <button key={name} className="js-navigation-item item" data-name={name} aria-label={label} title={label}>
               <div className="button-inner">
                 <div className="icon-container">
                   <img src={worldAsset(icon)} alt="" loading="lazy" />

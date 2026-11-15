@@ -1,5 +1,5 @@
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { color } from 'three/tsl';
+import { attribute, color } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
@@ -79,6 +79,27 @@ const DEFAULT_RIDGE_RATIO = 0.55;
 const ROD_SIDES = 5;
 const LCG = { multiplier: 1664525, increment: 1013904223, modulus: 4294967296 } as const;
 const shadedMaterials = new Map<string, MeshDefaultMaterial>();
+const VERTEX_COLOR_KEY = 'shaded';
+let vertexColorMaterial: MeshDefaultMaterial | null = null;
+
+function sharedVertexColorMaterial(): MeshDefaultMaterial {
+  if (vertexColorMaterial) return vertexColorMaterial;
+  vertexColorMaterial = new MeshDefaultMaterial({ colorNode: attribute('color', 'vec3') });
+  vertexColorMaterial.userData.prevent = true;
+  return vertexColorMaterial;
+}
+
+function isVertexColored(name: PartName): name is ShadeName {
+  return !isGlow(name) && !SIGNAGE_FACES.has(name);
+}
+
+function paintVertices(geometry: THREE.BufferGeometry, name: ShadeName): void {
+  const { count } = geometry.getAttribute('position');
+  const { r, g, b } = new THREE.Color(SHADES[name]);
+  const colors = new Float32Array(count * 3);
+  for (let index = 0; index < count; index += 1) colors.set([r, g, b], index * 3);
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+}
 
 function isGlow(name: string): name is keyof typeof GLOW {
   return name in GLOW;
@@ -180,7 +201,9 @@ export function createParts(): Parts {
     if (flat !== geometry) geometry.dispose();
     if (!isGlow(name) && flat.hasAttribute('uv')) flat.deleteAttribute('uv');
     flat.computeVertexNormals();
-    const key = `${name}${castsShadow(flat) ? '' : SHADOWLESS_SUFFIX}`;
+    if (isVertexColored(name)) paintVertices(flat, name);
+    const batchName = isVertexColored(name) ? VERTEX_COLOR_KEY : name;
+    const key = `${batchName}${castsShadow(flat) ? '' : SHADOWLESS_SUFFIX}`;
     const batch = batches.get(key) ?? [];
     batch.push(flat);
     batches.set(key, batch);
@@ -240,6 +263,7 @@ function isPartName(name: string): name is PartName {
 }
 
 function islandMaterialByKey(name: string): THREE.Material {
+  if (name === VERTEX_COLOR_KEY) return sharedVertexColorMaterial();
   if (!isPartName(name)) throw new Error(`Unknown island material: ${name}`);
   return islandMaterial(name);
 }

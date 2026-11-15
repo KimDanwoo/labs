@@ -1,63 +1,3 @@
-@font-face {
-  font-family: Pally-Regular;
-  src:
-    url(/world/fonts/Pally-Regular.woff2) format('woff2'),
-    url(/world/fonts/Pally-Regular.woff) format('woff'),
-    url(/world/fonts/Pally-Regular.ttf) format('truetype');
-  font-weight: 400;
-  font-display: swap;
-  font-style: normal;
-}
-@font-face {
-  font-family: Pally-Medium;
-  src:
-    url(/world/fonts/Pally-Medium.woff2) format('woff2'),
-    url(/world/fonts/Pally-Medium.woff) format('woff'),
-    url(/world/fonts/Pally-Medium.ttf) format('truetype');
-  font-weight: 500;
-  font-display: swap;
-  font-style: normal;
-}
-@font-face {
-  font-family: Pally-Bold;
-  src:
-    url(/world/fonts/Pally-Bold.woff2) format('woff2'),
-    url(/world/fonts/Pally-Bold.woff) format('woff'),
-    url(/world/fonts/Pally-Bold.ttf) format('truetype');
-  font-weight: 700;
-  font-display: swap;
-  font-style: normal;
-}
-.fonts-loader {
-  position: fixed;
-  top: calc(100% + 1px);
-  left: 0;
-}
-.fonts-loader .nunito {
-  font-optical-sizing: auto;
-  font-family: Nunito, sans-serif;
-  font-style: normal;
-  font-weight: 400;
-}
-.fonts-loader .amatic-sc {
-  font-family:
-    Amatic SC,
-    sans-serif;
-  font-weight: 700;
-}
-.fonts-loader .pally {
-  font-family: Pally-Medium, sans-serif;
-  font-weight: 500;
-}
-.tp-dfwv {
-  width: 400px !important;
-  top: 20px !important;
-  left: 30px !important;
-  right: 30px !important;
-}
-.tp-lblv_v {
-  width: 200px !important;
-}
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -86,7 +26,7 @@ body,
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
   height: 100%;
-  font-family: Nunito, sans-serif;
+  font-family: var(--ui-font);
   font-style: normal;
   font-weight: 400;
   position: fixed;
@@ -143,21 +83,6 @@ ol {
 }
 .text-small {
   font-size: 0.8rem;
-}
-.text-danger {
-  color: #ff87a2;
-}
-.text-danger .icon {
-  vertical-align: sub;
-}
-.text-faded {
-  opacity: 0.8;
-}
-.text-align-right {
-  text-align: right;
-}
-.text-align-center {
-  text-align: center;
 }
 .horizontal-group {
   justify-content: center;
@@ -230,206 +155,6 @@ html:not(.is-mode-touch) .button:not(.is-disabled):hover {
 .button .icon.icon-controller {
   top: -1px;
 }
-.input-group {
-  height: 58px;
-  display: flex;
-}
-.input-group.is-message {
-  width: 100%;
-  margin-top: 1.5em;
-}
-.input-group.is-message .input-text {
-  width: calc(100% - 124px);
-  padding: 0 15px 0 5px;
-}
-.input-group.is-name-tag .input-text {
-  letter-spacing: 8px;
-  text-transform: uppercase;
-  width: 100px;
-  font-size: 25px;
-  font-weight: 700;
-}
-.input-group.is-name-tag .input-text::placeholder {
-  letter-spacing: 14px;
-  padding-left: 4px;
-}
-.input-group > * {
-  border-top: 1px solid #555;
-  border-bottom: 1px solid #555;
-}
-.input-group > :first-child {
-  border-left: 1px solid #555;
-  border-radius: 8px 0 0 8px;
-}
-.input-group.is-valide button {
-  cursor: pointer;
-  color: #ffceca;
-  border-color: #ffceca;
-}
-.input-group.is-valide button.has-icon svg * {
-  stroke: #ffceca;
-}
-.input-group .input-text {
-  padding: 0 15px 0 5px;
-}
-.input-group .submit {
-  cursor: default;
-  color: #555;
-  border: 1px solid #555;
-  border-radius: 0 8px 8px 0;
-}
-.input-group .submit.has-text {
-  padding: 0 20px;
-}
-.input-group .submit.has-icon {
-  width: 62px;
-  padding: 0 8px 0 4px;
-}
-.input-group .submit.has-icon svg * {
-  stroke: #555;
-}
-.input-group .input-flag {
-  width: 62px;
-  font-size: 16px;
-  position: relative;
-}
-.input-group .input-flag .flag-button {
-  cursor: pointer;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.input-group .input-flag .flag-button.has-flag .flag {
-  display: block;
-}
-.input-group .input-flag .flag-button.has-flag svg {
-  display: none;
-}
-.input-group .input-flag .flag-button .flag {
-  width: 27px;
-  height: 18px;
-  display: none;
-}
-html:not(.is-mode-touch) .input-group .input-flag .flag-button:hover svg * {
-  fill: #ccc;
-}
-.input-group .input-flag .flag-button svg {
-  display: block;
-}
-.input-group .input-flag .flag-button svg * {
-  fill: #555;
-}
-.input-group .input-flag .flag-select {
-  white-space: nowrap;
-  z-index: 1;
-  background: radial-gradient(at 0 0, #251f2b, #1d1721);
-  border: 1px solid #767676;
-  border-bottom: none;
-  border-radius: 8px 8px 0 0;
-  width: 350px;
-  height: 240px;
-  display: none;
-  position: absolute;
-  bottom: 0;
-  left: 8px;
-  overflow: hidden;
-}
-.input-group .input-flag .flag-select.is-visible {
-  display: block;
-}
-.input-group .input-flag .flag-select .close-mini {
-  opacity: 0.65;
-  cursor: pointer;
-  justify-content: center;
-  align-items: center;
-  width: 34px;
-  height: 40px;
-  display: flex;
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-html:not(.is-mode-touch) .input-group .input-flag .flag-select .close-mini:hover {
-  opacity: 1;
-}
-.input-group .input-flag .flag-select .close-mini img {
-  position: relative;
-  top: 4px;
-  left: -3px;
-}
-.input-group .input-flag .flag-select .remove {
-  opacity: 0.65;
-  cursor: pointer;
-  justify-content: center;
-  align-items: center;
-  width: 34px;
-  height: 40px;
-  display: flex;
-  position: absolute;
-  top: 0;
-  right: 30px;
-}
-html:not(.is-mode-touch) .input-group .input-flag .flag-select .remove:hover {
-  opacity: 1;
-}
-.input-group .input-flag .flag-select .remove img {
-  position: relative;
-  top: 3px;
-}
-.input-group .input-flag .flag-select .search {
-  width: 100%;
-  height: 40px;
-  padding: 4px 35px 0 10px;
-}
-.input-group .input-flag .flag-select .no-result {
-  opacity: 0.65;
-  pointer-events: none;
-  justify-content: center;
-  align-items: center;
-  display: none;
-  position: absolute;
-  inset: 30px 0 0;
-}
-.input-group .input-flag .flag-select .no-result.is-visible {
-  display: flex;
-}
-.input-group .input-flag .flag-select .choices {
-  position: absolute;
-  inset: 40px 0 0;
-}
-.input-group .input-flag .flag-select .choices .scroller {
-  width: calc(100% + 20px);
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  overflow: hidden scroll;
-}
-.input-group .input-flag .flag-select .choices .choice {
-  cursor: pointer;
-  padding: 4px 8px;
-  display: flex;
-}
-html:not(.is-mode-touch) .input-group .input-flag .flag-select .choices .choice:hover .label {
-  opacity: 1;
-}
-.input-group .input-flag .flag-select .choices .choice .label {
-  opacity: 0.65;
-}
-.input-group .input-flag .flag-select .choices .choice .flag {
-  width: 27px;
-  height: 18px;
-  margin-right: 8px;
-}
-html:not(.is-server-offline) .offline-element,
-html:not(.is-server-online) .online-element {
-  display: none !important;
-}
 .modals {
   color: #fff;
   opacity: 0;
@@ -455,21 +180,6 @@ html:not(.is-server-online) .online-element {
 }
 .modals .modal.is-displayed {
   display: block;
-}
-.modals .preview {
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 10%;
-  display: flex;
-  position: relative;
-}
-.modals .preview .background {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 .modals .content {
   background: radial-gradient(at 0 0, #251f2b, #1d1721);
@@ -659,51 +369,6 @@ html.input-filter-cinematic .menu-trigger .button-inner {
   .menu .container {
     flex-direction: column;
   }
-}
-.menu .previews {
-  background: radial-gradient(at 0 0, #251f2b, #1d1721);
-  justify-content: center;
-  align-items: center;
-  width: 50%;
-  display: flex;
-  position: relative;
-}
-@media only screen and (orientation: portrait) {
-  .menu .previews {
-    width: auto;
-    height: 30%;
-  }
-}
-.menu .previews:after {
-  content: '';
-  opacity: 0.35;
-  pointer-events: none;
-  border: 1px solid #fff;
-  position: absolute;
-  inset: 3px;
-}
-.menu .previews .background {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.menu .previews .preview {
-  opacity: 0;
-  pointer-events: none;
-  width: 100%;
-  height: 100%;
-  transition: opacity 0.3s 0.3s;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.menu .previews .preview.is-visible {
-  opacity: 1;
-  pointer-events: auto;
-  transition-delay: 0s;
 }
 .menu .contents {
   background: radial-gradient(at 0 0, #251f2b, #1d1721);
@@ -1008,165 +673,6 @@ html:not(.is-mode-touch) .tabs .tabs-navigation .tab:hover .label,
   pointer-events: inherit;
   transition-delay: 0.15s;
 }
-.menu .contents .achievements-content .title {
-  text-align: center;
-  margin-bottom: 0;
-}
-.menu .contents .achievements-content .global-progress {
-  text-align: center;
-  margin-bottom: 1em;
-  position: relative;
-}
-.menu .contents .achievements-content .global-progress.is-achieved .ratio {
-  color: #d5ff95;
-}
-.menu .contents .achievements-content .global-progress.is-achieved .time {
-  font-weight: 700;
-  display: inline;
-}
-.menu .contents .achievements-content .global-progress.is-achieved .time:before {
-  content: 'in ';
-  opacity: 0.65;
-  font-weight: 400;
-}
-.menu .contents .achievements-content .global-progress .ratio {
-  color: #ffceca;
-  font-weight: 700;
-}
-.menu .contents .achievements-content .global-progress .time {
-  display: none;
-}
-.menu .contents .achievements-content .rewards-container {
-  margin-bottom: 2em;
-}
-.menu .contents .achievements-content .rewards-container .title {
-  text-align: center;
-  margin-bottom: 0.5em;
-  font-size: 1.7rem;
-}
-.menu .contents .achievements-content .rewards-container .rewards {
-  justify-content: center;
-  gap: 10px;
-  display: flex;
-}
-@media only screen and (width<=440px) {
-  .menu .contents .achievements-content .rewards-container .rewards {
-    gap: 2px;
-  }
-}
-.menu .contents .achievements-content .rewards-container .reward {
-  display: block;
-  position: relative;
-}
-.menu .contents .achievements-content .rewards-container .reward .tooltip {
-  --width: 130px;
-}
-.menu .contents .achievements-content .rewards-container .reward.is-active:after {
-  opacity: 0.75;
-  border-color: #d5ff95;
-}
-.menu .contents .achievements-content .rewards-container .reward.is-locked {
-  cursor: not-allowed;
-}
-.menu .contents .achievements-content .rewards-container .reward.is-locked .lock {
-  display: block;
-}
-html:not(.is-mode-touch) .menu .contents .achievements-content .rewards-container .reward:hover:after {
-  opacity: 0.75;
-}
-html:not(.is-mode-touch) .menu .contents .achievements-content .rewards-container .reward:hover .lock .lock-icon {
-  opacity: 1;
-}
-.menu .contents .achievements-content .rewards-container .reward:after {
-  content: '';
-  opacity: 0.35;
-  border: 1px solid #fff;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: -1px;
-  left: -1px;
-}
-.menu .contents .achievements-content .rewards-container .reward .picture {
-  width: 40px;
-  height: 40px;
-  margin: 3px;
-  display: block;
-}
-.menu .contents .achievements-content .rewards-container .reward .lock {
-  background: #0005;
-  width: 100%;
-  height: 100%;
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.menu .contents .achievements-content .rewards-container .reward .lock .lock-icon {
-  opacity: 0.75;
-  position: absolute;
-  top: calc(50% - 11px);
-  left: calc(50% - 8px);
-}
-.menu .contents .achievements-content .items {
-  margin-bottom: 2em;
-}
-.menu .contents .achievements-content .achievement {
-  margin-bottom: 1em;
-}
-.menu .contents .achievements-content .achievement.is-achieved .title,
-.menu .contents .achievements-content .achievement.is-achieved .description .progress {
-  color: #d5ff95;
-}
-.menu .contents .achievements-content .achievement.is-achieved .description .progress .check-icon {
-  display: block;
-}
-.menu .contents .achievements-content .achievement.is-achieved .bar .fill {
-  background: #d5ff95;
-}
-.menu .contents .achievements-content .achievement .title {
-  text-align: left;
-  color: #ffceca;
-  margin-bottom: 0;
-  font-size: 1.7rem;
-}
-.menu .contents .achievements-content .achievement .description {
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 0.5em;
-  display: flex;
-}
-.menu .contents .achievements-content .achievement .description .text {
-  margin-bottom: 0;
-}
-.menu .contents .achievements-content .achievement .description .progress {
-  color: #ffceca;
-  align-items: center;
-  font-weight: 700;
-  display: flex;
-}
-.menu .contents .achievements-content .achievement .description .progress .check-icon {
-  background: url(/world/ui/achievements/check.svg);
-  width: 17px;
-  height: 13px;
-  margin-right: 10px;
-  display: none;
-}
-.menu .contents .achievements-content .achievement .bar {
-  border: 1px solid #ffffff59;
-  height: 18px;
-  position: relative;
-}
-.menu .contents .achievements-content .achievement .bar .fill {
-  transform-origin: 0 0;
-  background: #ffceca;
-  position: absolute;
-  inset: 4px;
-  transform: scaleX(0);
-}
-.menu .contents .achievements-content .button-reset {
-  width: 215px;
-}
 .menu .contents .options-content .content-inner {
   flex-direction: column;
   justify-content: flex-start;
@@ -1200,38 +706,6 @@ html.is-audio-muted .menu .contents .options-content .audio-toggle img.audio-off
   align-items: center;
   width: 100%;
   display: flex;
-}
-.circuit-content .leaderboard-container {
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1.5em;
-  display: flex;
-}
-.circuit-content .leaderboard-container.has-no-score .no-score {
-  display: block;
-}
-.circuit-content .leaderboard-container .leaderboard {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  font-weight: 700;
-}
-.circuit-content .leaderboard-container .leaderboard tr td:first-child {
-  opacity: 0.5;
-  text-align: center;
-  padding-right: 30px;
-}
-.circuit-content .leaderboard-container .leaderboard tr td:nth-child(2),
-.circuit-content .leaderboard-container .leaderboard tr td:nth-child(3) {
-  padding-right: 30px;
-}
-.circuit-content .leaderboard-container .no-score {
-  margin-top: 30px;
-  font-weight: 700;
-  display: none;
-}
-.circuit-content .leaderboard-container .reset-time {
-  font-weight: 700;
 }
 .circuit-content .racing-buttons {
   display: none;
@@ -1311,66 +785,11 @@ html.is-audio-muted .menu .contents .options-content .audio-toggle img.audio-off
   width: 14px;
   height: 13px;
 }
-.circuit-end .content .your-time {
-  text-align: center;
-  margin-top: 0.5em;
-  margin-bottom: 1em;
-}
-.circuit-end .content .your-time .value {
-  font-size: 30px;
-  font-weight: 900;
-}
 .circuit-end .content .or {
   padding: 12px;
 }
-.circuit-end .content .offline-element {
-  text-align: center;
-}
-.circuit-end .content .not-top-10 {
-  text-align: center;
-  display: block;
-}
-.circuit-end .content .input-group,
-.circuit-end .content .or,
-.circuit-end.is-top-10 .content .not-top-10 {
+.circuit-end .content .or {
   display: none;
-}
-.circuit-end.is-top-10 .content .input-group {
-  display: flex;
-}
-.circuit-end.is-top-10 .content .or {
-  display: block;
-}
-.menu .whispers-preview {
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 80px;
-  display: flex;
-}
-.menu .whispers-preview .message {
-  background: #251f2b;
-  padding: 0 4px 4px;
-  position: relative;
-}
-.menu .whispers-preview .message .text {
-  white-space: nowrap;
-  color: #fff;
-  border: none;
-  outline: none;
-  font-size: 2.5rem;
-}
-.menu .whispers-preview .message .flag {
-  background: red 0 0 / cover;
-  width: 54px;
-  height: 36px;
-  display: none;
-  position: absolute;
-  bottom: calc(100% - 12px);
-  right: -16px;
-  transform: rotate(15deg);
-}
-.menu .whispers-preview .message .flag.is-visible {
-  display: block;
 }
 .touch-buttons {
   pointer-events: none;
@@ -1497,7 +916,7 @@ html.is-mode-touch .notifications {
   border-radius: 18px;
   width: 100%;
   padding: 10px 14px 12px;
-  font-family: Nunito, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  font-family: var(--ui-font);
   font-size: 16px;
   overflow: hidden;
   box-shadow: 0 14px 34px #0d2b3333;
@@ -1513,9 +932,6 @@ html.is-mode-touch .notifications {
   transition-timing-function: cubic-bezier(0.42, 0, 0.47, -0.55);
   transform: translateY(calc(20px - 100%)) scale(0);
 }
-html:not(.is-mode-touch) .notifications .notification:hover .bottom .open-icon {
-  opacity: 1;
-}
 .notifications .notification .time-bar {
   transform-origin: 100% 0;
   will-change: transform;
@@ -1525,58 +941,6 @@ html:not(.is-mode-touch) .notifications .notification:hover .bottom .open-icon {
   position: absolute;
   bottom: 0;
   left: 0;
-}
-.notifications .notification.is-achievement .top {
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 5px;
-  display: flex;
-}
-.notifications .notification.is-achievement .top .title {
-  text-align: left;
-  color: #d5ff95;
-  margin-bottom: 0.25em;
-  margin-right: 10px;
-  font-size: 1.7rem;
-  line-height: 1em;
-}
-.notifications .notification.is-achievement .top .progress {
-  color: #d5ff95;
-  align-items: center;
-  font-weight: 700;
-  display: flex;
-}
-.notifications .notification.is-achievement .top .progress .check-icon {
-  background: url(/world/ui/achievements/check.svg);
-  width: 17px;
-  height: 13px;
-  margin-right: 10px;
-  display: block;
-}
-.notifications .notification.is-achievement .bottom {
-  justify-content: space-between;
-  align-items: flex-start;
-  display: flex;
-}
-.notifications .notification.is-achievement .bottom .description {
-  color: #fff;
-  margin-bottom: 0;
-  margin-right: 10px;
-  font-size: 16px;
-  line-height: 1em;
-}
-.notifications .notification.is-achievement .bottom .open-icon {
-  opacity: 0;
-  background: url(/world/ui/actions/actions-icon-open.webp) 0 0/19px 19px;
-  width: 19px;
-  height: 19px;
-  transition: opacity 0.1s;
-  display: block;
-  position: relative;
-  top: 1px;
-}
-.notifications .notification.is-achievement .time-bar {
-  background: #d5ff95;
 }
 .notifications .notification.is-song .top {
   justify-content: space-between;
@@ -1639,34 +1003,9 @@ html:not(.is-mode-touch) .notifications .notification:hover .bottom .open-icon {
   font-size: 19px;
   font-weight: 800;
 }
-.notifications .notification.is-server-connected .top .title {
-  text-align: left;
-  color: #d5ff95;
-  margin-bottom: 0;
-  font-size: 1.7rem;
-  line-height: 1em;
-}
-.notifications .notification.is-server-connected .time-bar {
-  background: #d5ff95;
-}
-.notifications .notification.is-server-disconnected .top .title {
-  text-align: left;
-  color: #ff6a7c;
-  margin-bottom: 0;
-  font-size: 1.7rem;
-  line-height: 1em;
-}
-.notifications .notification.is-server-disconnected .time-bar {
-  background: #ff6a7c;
-}
 .discord .content > .title {
   text-align: center;
   margin-bottom: 2rem;
-}
-@media only screen and (width<=870px) {
-  .discord .content .optional {
-    display: none;
-  }
 }
 .discord .content .items {
   gap: 30px;
@@ -1694,48 +1033,6 @@ html:not(.is-mode-touch) .notifications .notification:hover .bottom .open-icon {
   .discord .content .item {
     width: auto;
   }
-}
-.discord .content .item .title-container {
-  align-items: center;
-  gap: 10px;
-  height: 0;
-  display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-}
-.discord .content .item .title-container .line {
-  background: #ffceca;
-  flex: 1;
-  height: 1px;
-}
-.discord .content .item .title-container .title {
-  color: #ffceca;
-  white-space: nowrap;
-  flex: 1;
-  margin-bottom: 0;
-  font-size: 1.7rem;
-}
-.discord .content .item .button-container {
-  justify-content: center;
-  align-items: center;
-  height: 0;
-  display: flex;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-.discord .content .item .button-container .button {
-  opacity: 1;
-  color: #ffceca;
-  background: #251f2b;
-  border-color: #ffceca;
-}
-html:not(.is-mode-touch) .discord .content .item .button-container .button:hover {
-  color: #fff;
-  border-color: #fff;
 }
 .has-tooltip {
   position: relative;
@@ -1845,7 +1142,7 @@ html.input-filter-cinematic .map-trigger .button-inner {
   user-select: none;
   max-width: 94vw;
   position: relative;
-  font-family: Nunito, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  font-family: var(--ui-font);
 }
 .blog {
   width: min(760px, 94vw);
@@ -2353,9 +1650,7 @@ html:not(.is-mode-touch) .jukebox .jukebox-track:hover {
   align-items: center;
   gap: 12px;
   font:
-    700 22px/0.93 Nunito,
-    system-ui,
-    sans-serif;
+    700 22px/0.93 var(--ui-font);
   display: flex;
   position: fixed;
 }
@@ -2379,15 +1674,45 @@ html:not(.is-mode-touch) .jukebox .jukebox-track:hover {
 }
 @font-face {
   font-family: MaruBuri;
-  src: url(/world/danwoo/fonts/MaruBuri-Regular.woff2) format('woff2');
+  src: url(/world/danwoo/fonts/MaruBuri-Regular.symbols.woff2) format('woff2');
   font-weight: 400;
   font-display: swap;
+  unicode-range: U+0100-2FFF, U+3190-33FF, U+FB00-FFFF, U+1F100-1F1FF;
 }
 @font-face {
   font-family: MaruBuri;
-  src: url(/world/danwoo/fonts/MaruBuri-Bold.woff2) format('woff2');
+  src: url(/world/danwoo/fonts/MaruBuri-Regular.ko-common.woff2) format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+3130-318F, U+AC00-D7A3;
+}
+@font-face {
+  font-family: MaruBuri;
+  src: url(/world/danwoo/fonts/MaruBuri-Regular.latin.woff2) format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F, U+20A9, U+3000-303F;
+}
+@font-face {
+  font-family: MaruBuri;
+  src: url(/world/danwoo/fonts/MaruBuri-Bold.symbols.woff2) format('woff2');
   font-weight: 700;
   font-display: swap;
+  unicode-range: U+0100-2FFF, U+3190-33FF, U+FB00-FFFF, U+1F100-1F1FF;
+}
+@font-face {
+  font-family: MaruBuri;
+  src: url(/world/danwoo/fonts/MaruBuri-Bold.ko-common.woff2) format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+3130-318F, U+AC00-D7A3;
+}
+@font-face {
+  font-family: MaruBuri;
+  src: url(/world/danwoo/fonts/MaruBuri-Bold.latin.woff2) format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F, U+20A9, U+3000-303F;
 }
 html,
 body,
@@ -2516,14 +1841,6 @@ body:has(.menu.is-displayed) .island-identity {
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   backdrop-filter: blur(24px) saturate(140%);
   box-sizing: border-box;
-}
-.menu .previews {
-  background: transparent;
-  border-radius: 16px;
-  overflow: hidden;
-}
-.menu .previews:after {
-  display: none;
 }
 .menu .contents,
 .menu .contents .content {
@@ -2669,15 +1986,12 @@ html:not(.is-mode-touch) .menu .button:not(.is-disabled):hover {
 }
 .menu .inner {
   width: min(480px, 100% - 32px);
-  height: min(560px, 100% - 64px);
+  height: min(640px, 100% - 64px);
   transform: translateY(14px) scale(0.97);
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .menu.is-visible .inner {
   transform: none;
-}
-.menu .previews {
-  display: none;
 }
 .menu .contents {
   width: 100%;
@@ -2695,7 +2009,7 @@ html:not(.is-mode-touch) .menu .button:not(.is-disabled):hover {
 @media only screen and (orientation: portrait) {
   .menu .inner {
     width: min(480px, 100% - 24px);
-    height: min(620px, 100% - 48px);
+    height: min(660px, 100% - 48px);
   }
   .menu .contents {
     height: 100%;

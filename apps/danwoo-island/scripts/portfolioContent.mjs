@@ -10,6 +10,7 @@ import { TRACKS } from '../../soundlab/src/entities/track/model/constants/tracks
 const HUB_ROOT = fileURLToPath(new URL('../../hub/', import.meta.url));
 const FONT_ROOT = fileURLToPath(new URL('../../../packages/tokens/fonts/', import.meta.url));
 const LAB_URL = 'https://lab.danwoo.dev/';
+const FONT_SUBSETS = ['latin', 'ko-common', 'symbols'];
 const PROJECT_IMAGE_PATH = /^\/projects\/[a-z0-9-]+\.webp$/;
 const SOUNDCLOUD_HOST = 'soundcloud.com';
 const ARTWORK_HOST = 'i1.sndcdn.com';
@@ -56,13 +57,14 @@ function collectAssets() {
       destination: `danwoo/${path.basename(project.image)}`,
     };
   });
-  const fonts = ['Regular', 'Bold'].map((weight) => ({
-    source: path.join(FONT_ROOT, `source/MaruBuri-${weight}.woff2`),
-    destination: `danwoo/fonts/MaruBuri-${weight}.woff2`,
-  }));
+  const fonts = ['Regular', 'Bold'].flatMap((weight) =>
+    FONT_SUBSETS.map((subset) => ({
+      source: path.join(FONT_ROOT, `MaruBuri-${weight}.${subset}.woff2`),
+      destination: `danwoo/fonts/MaruBuri-${weight}.${subset}.woff2`,
+    })),
+  );
   return [
     ...projectImages,
-    { source: path.join(HUB_ROOT, 'app/opengraph-image.png'), destination: 'danwoo/hub.png' },
     ...fonts,
     { source: path.join(FONT_ROOT, 'LICENSE.md'), destination: 'danwoo/fonts/LICENSE.md' },
   ];

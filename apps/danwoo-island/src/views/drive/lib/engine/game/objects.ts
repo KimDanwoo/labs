@@ -33,6 +33,10 @@ export interface WorldObject {
 export type ModelPhysicalDescription = Omit<PhysicalDescription, 'colliders'>;
 
 const TICK_ORDER = 4;
+
+const markInstanceDirty = (object3D: THREE.Object3D): void => {
+  if ('needsUpdate' in object3D) object3D.needsUpdate = true;
+};
 const PHYSICAL_PATTERN = /physical/i;
 const BODY_TYPE_TAGS = /physical|fixed|dynamic|kinematicPositionBased/gi;
 const BODY_TYPE_BY_TAG: readonly [RegExp, BodyType][] = [
@@ -237,6 +241,7 @@ export class Objects {
     if (visual.parent && visual.parent !== visual.object3D.parent) visual.parent.add(visual.object3D);
     visual.object3D.position.copy(initialState.position);
     visual.object3D.quaternion.copy(initialState.rotation);
+    markInstanceDirty(visual.object3D);
   }
 
   resetAll(): void {
@@ -256,6 +261,8 @@ export class Objects {
     if (visual && visual.parent !== visual.object3D.parent) visual.parent?.add(visual.object3D);
   }
 
+  readonly #awake = new WeakSet<WorldObject>();
+
   update(): void {
     const game = getGame();
     const { focusPoint, optimalArea } = game.view;
@@ -269,12 +276,18 @@ export class Objects {
       const { physical, visual } = object;
       if (!physical) continue;
       const { body } = physical;
+      const isResting = body.isSleeping() || !body.isEnabled();
+      const wasAwake = this.#awake.has(object);
+      if (isResting) this.#awake.delete(object);
+      else this.#awake.add(object);
+      if (isResting && !object.needsUpdate && !wasAwake) continue;
       const position = body.translation();
 
-      if (visual && (object.needsUpdate || (!body.isSleeping() && body.isEnabled()))) {
+      if (visual && (object.needsUpdate || wasAwake || !isResting)) {
         object.needsUpdate = false;
         visual.object3D.position.copy(position);
         visual.object3D.quaternion.copy(body.rotation());
+        markInstanceDirty(visual.object3D);
       }
       if (position.y < game.water.depthElevation) this.resetObject(object);
       if (!hasViewMoved) continue;

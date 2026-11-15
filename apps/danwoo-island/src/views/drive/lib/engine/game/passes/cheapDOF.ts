@@ -1,8 +1,8 @@
 import { hashBlur } from 'three/addons/tsl/display/hashBlur.js';
-import { convertToTexture, Fn, mix, nodeObject, uniform, uv } from 'three/tsl';
+import { Fn, mix, nodeObject, uniform, uv } from 'three/tsl';
 import { Node, type TextureNode } from 'three/webgpu';
 
-const DOF = { start: 0.2, end: 0.5, repeats: 25, amount: 0.003 } as const;
+const DOF = { start: 0.2, end: 0.5, repeats: 12, amount: 0.003 } as const;
 
 class CheapDOFNode extends Node<'vec4'> {
   static get type(): string {
@@ -30,4 +30,4 @@ class CheapDOFNode extends Node<'vec4'> {
   }
 }
 
-export const cheapDOF = (node: Node): Node<'vec4'> => nodeObject(new CheapDOFNode(convertToTexture(node)));
+export const cheapDOF = (texture: TextureNode): Node<'vec4'> => nodeObject(new CheapDOFNode(texture));

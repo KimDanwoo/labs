@@ -4,16 +4,16 @@ import { isModel, textureResource, type ResourceSpec, type Resources } from '../
 
 const ISLAND_TEXTURES = new Map<string, string>(
   Object.entries({
-    circuitBrand: 'areas/island/circuitBrand.png',
-    circuitWebgl: 'areas/island/circuitWebgl.png',
-    circuitWebgpu: 'areas/island/circuitWebgpu.png',
-    circuitThreejs: 'areas/island/circuitThreejs.png',
-    cookieBanner: 'areas/island/cookieBanner.png',
-    projectsCarpet: 'areas/island/projectsCarpet.png',
-    labCarpet: 'areas/island/labCarpet.png',
-    blackboardLabels: 'areas/island/blackboardLabels.png',
-    projectsLabels: 'areas/island/projectsLabels.png',
-    bowlingLabelStrike: 'areas/island/bowlingLabelStrike.png',
+    circuitBrand: 'areas/island/circuitBrand.webp',
+    circuitWebgl: 'areas/island/circuitWebgl.webp',
+    circuitWebgpu: 'areas/island/circuitWebgpu.webp',
+    circuitThreejs: 'areas/island/circuitThreejs.webp',
+    cookieBanner: 'areas/island/cookieBanner.webp',
+    projectsCarpet: 'areas/island/projectsCarpet.webp',
+    labCarpet: 'areas/island/labCarpet.webp',
+    blackboardLabels: 'areas/island/blackboardLabels.webp',
+    projectsLabels: 'areas/island/projectsLabels.webp',
+    bowlingLabelStrike: 'areas/island/bowlingLabelStrike.webp',
   }),
 );
 

@@ -47,9 +47,8 @@ export class Ticker {
 
   #averageDelta(): number {
     this.#recentDeltas.unshift(this.delta);
-    const countBeforeTrim = this.#recentDeltas.length;
-    this.#recentDeltas.length = Math.min(countBeforeTrim, AVERAGE_WINDOW);
-    return this.#recentDeltas.reduce((total, value) => total + value, 0) / countBeforeTrim;
+    this.#recentDeltas.length = Math.min(this.#recentDeltas.length, AVERAGE_WINDOW);
+    return this.#recentDeltas.reduce((total, value) => total + value, 0) / this.#recentDeltas.length;
   }
 
   #syncUniforms(): void {
