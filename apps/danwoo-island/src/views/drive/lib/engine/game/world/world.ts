@@ -25,21 +25,20 @@ import { WaterSurface } from './waterSurface';
 import { WindLines } from './windLines';
 
 interface TreeSpecies {
-  name: string;
   model: string;
   colorA: string;
   colorB: string;
 }
 
-const BIRCH: TreeSpecies = { name: 'Birch Tree', model: 'birchTrees', colorA: '#4F9B65', colorB: '#A8D878' };
-const OAK: TreeSpecies = { name: 'Oak Tree', model: 'oakTrees', colorA: '#287A59', colorB: '#70BA69' };
-const CHERRY: TreeSpecies = { name: 'Cherry Tree', model: 'cherryTrees', colorA: '#EC879D', colorB: '#FFD1CB' };
+const BIRCH: TreeSpecies = { model: 'birchTrees', colorA: '#4F9B65', colorB: '#A8D878' };
+const OAK: TreeSpecies = { model: 'oakTrees', colorA: '#287A59', colorB: '#70BA69' };
+const CHERRY: TreeSpecies = { model: 'cherryTrees', colorA: '#EC879D', colorB: '#FFD1CB' };
 
-function plantTrees({ name, model, colorA, colorB }: TreeSpecies): Trees {
+function plantTrees({ model, colorA, colorB }: TreeSpecies): Trees {
   const game = getGame();
   const visual = game.model(`${model}VisualModel`).scene;
   const references = game.model(`${model}ReferencesModel`).scene.children;
-  return new Trees(name, visual, references, colorA, colorB);
+  return new Trees({ visual, references, colorA, colorB });
 }
 
 export class World {
