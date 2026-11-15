@@ -8,6 +8,7 @@ const QUANTIZATION_BITS = { POSITION: 14, NORMAL: 10, TEXCOORD_0: 14 };
 const COMPONENTS = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 };
 const ARRAY_BY_COMPONENT = { 5121: Uint8Array, 5123: Uint16Array, 5125: Uint32Array, 5126: Float32Array };
 const MAX_BOUNDS_DRIFT = 1e-3;
+const TRIANGLES = 4;
 const GLB = { magic: 0x46546c67, version: 2, json: 0x4e4f534a, bin: 0x004e4942 };
 
 const align4 = (value) => (value + 3) & ~3;
@@ -66,7 +67,30 @@ function encodePrimitive(json, bin, primitive) {
   return { bytes, attributeIds, faceCount: indices.length / 3 };
 }
 
-function decodedPointCount({ bytes, attributeIds, faceCount }, expectedBounds) {
+function attributeBounds(dracoDecoder, mesh, attributeId, components) {
+  const values = new decoder.DracoFloat32Array();
+  dracoDecoder.GetAttributeFloatForAllPoints(mesh, dracoDecoder.GetAttributeByUniqueId(mesh, attributeId), values);
+  const min = Array.from({ length: components }, () => Infinity);
+  const max = Array.from({ length: components }, () => -Infinity);
+  for (let index = 0; index < values.size(); index += 1) {
+    const axis = index % components;
+    min[axis] = Math.min(min[axis], values.GetValue(index));
+    max[axis] = Math.max(max[axis], values.GetValue(index));
+  }
+  decoder.destroy(values);
+  return { min, max };
+}
+
+function assertSameSize(decoded, expected) {
+  const extent = Math.max(...expected.max.map((value, axis) => value - expected.min[axis]));
+  const drift = Math.max(
+    ...decoded.min.map((value, axis) => Math.abs(value - expected.min[axis])),
+    ...decoded.max.map((value, axis) => Math.abs(value - expected.max[axis])),
+  );
+  if (drift > extent * MAX_BOUNDS_DRIFT) throw new Error('압축 후 모델 크기가 달라졌어요.');
+}
+
+function decodeAccessors(json, primitive, { bytes, attributeIds, faceCount }) {
   const buffer = new decoder.DecoderBuffer();
   buffer.Init(new Int8Array(bytes.buffer), bytes.byteLength);
   const dracoDecoder = new decoder.Decoder();
@@ -75,25 +99,23 @@ function decodedPointCount({ bytes, attributeIds, faceCount }, expectedBounds) {
   if (!status.ok()) throw new Error(`압축 결과를 풀지 못했어요: ${status.error_msg()}`);
   if (mesh.num_faces() !== faceCount) throw new Error('압축 전후 면 수가 달라요.');
 
-  const positions = new decoder.DracoFloat32Array();
-  dracoDecoder.GetAttributeFloatForAllPoints(mesh, dracoDecoder.GetAttributeByUniqueId(mesh, attributeIds.POSITION), positions);
-  const min = [Infinity, Infinity, Infinity];
-  const max = [-Infinity, -Infinity, -Infinity];
-  for (let index = 0; index < positions.size(); index += 1) {
-    const axis = index % 3;
-    min[axis] = Math.min(min[axis], positions.GetValue(index));
-    max[axis] = Math.max(max[axis], positions.GetValue(index));
-  }
-  const extent = Math.max(...expectedBounds.max.map((value, axis) => value - expectedBounds.min[axis]));
-  const drift = Math.max(
-    ...min.map((value, axis) => Math.abs(value - expectedBounds.min[axis])),
-    ...max.map((value, axis) => Math.abs(value - expectedBounds.max[axis])),
-  );
-  if (drift > extent * MAX_BOUNDS_DRIFT) throw new Error('압축 후 모델 크기가 달라졌어요.');
-
+  const accessors = Object.entries(primitive.attributes).map(([name, index]) => {
+    const accessor = json.accessors[index];
+    const bounds = attributeBounds(dracoDecoder, mesh, attributeIds[name], COMPONENTS[accessor.type]);
+    if (name === 'POSITION') assertSameSize(bounds, accessor);
+    return { accessor, bounds };
+  });
   const pointCount = mesh.num_points();
-  for (const object of [positions, mesh, dracoDecoder, buffer]) decoder.destroy(object);
-  return pointCount;
+  for (const object of [mesh, dracoDecoder, buffer]) decoder.destroy(object);
+  return { pointCount, accessors };
+}
+
+function assertSupported(json, primitive) {
+  const accessors = [primitive.indices, ...Object.values(primitive.attributes)].map((index) => json.accessors[index]);
+  if ((primitive.mode ?? TRIANGLES) !== TRIANGLES) throw new Error('삼각형 메시만 압축할 수 있어요.');
+  if (primitive.indices === undefined) throw new Error('인덱스가 없는 메시는 압축할 수 없어요.');
+  if (primitive.targets) throw new Error('모프 타깃이 있는 메시는 압축할 수 없어요.');
+  if (accessors.some((accessor) => accessor.sparse)) throw new Error('sparse accessor는 압축할 수 없어요.');
 }
 
 function packBuffers(json, bin, encoded, replacedAccessors) {
@@ -167,10 +189,15 @@ function compress(file) {
   const encoded = [];
   const replacedAccessors = new Set();
   for (const primitive of json.meshes.flatMap(({ primitives }) => primitives)) {
+    assertSupported(json, primitive);
     const result = encodePrimitive(json, bin, primitive);
-    const pointCount = decodedPointCount(result, json.accessors[primitive.attributes.POSITION]);
+    const { pointCount, accessors } = decodeAccessors(json, primitive, result);
+    for (const { accessor, bounds } of accessors) {
+      accessor.count = pointCount;
+      if (accessor.min) accessor.min = bounds.min;
+      if (accessor.max) accessor.max = bounds.max;
+    }
     for (const index of [primitive.indices, ...Object.values(primitive.attributes)]) replacedAccessors.add(index);
-    for (const index of Object.values(primitive.attributes)) json.accessors[index].count = pointCount;
     primitive.extensions = { ...primitive.extensions, [EXTENSION]: { bufferView: -1, attributes: result.attributeIds } };
     encoded.push({ primitive, bytes: result.bytes });
   }
