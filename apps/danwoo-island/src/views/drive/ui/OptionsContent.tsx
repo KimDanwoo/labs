@@ -63,18 +63,22 @@ export function OptionsContent() {
               </button>
             </td>
           </tr>
+          <tr>
+            <td>
+              <label htmlFor="vehicle-paint">차량 도색</label>
+            </td>
+            <td>
+              <select id="vehicle-paint" className="js-paint-select button">
+                {PAINT_OPTIONS.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </td>
+          </tr>
         </tbody>
       </table>
-      <div className="paint-options">
-        <label htmlFor="vehicle-paint">차량 도색</label>
-        <select id="vehicle-paint" className="js-paint-select button">
-          {PAINT_OPTIONS.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
     </div>
   );
 }

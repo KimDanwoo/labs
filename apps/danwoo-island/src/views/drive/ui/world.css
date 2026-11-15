@@ -673,17 +673,15 @@ html:not(.is-mode-touch) .tabs .tabs-navigation .tab:hover .label,
   pointer-events: inherit;
   transition-delay: 0.15s;
 }
-.menu .contents .options-content .content-inner {
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  display: flex;
-}
 .menu .contents .options-content table {
   border-spacing: 0 10px;
+  width: 100%;
 }
 .menu .contents .options-content table td:first-child {
-  padding-right: 40px;
+  padding-right: 24px;
+}
+.menu .contents .options-content table td:last-child {
+  width: 132px;
 }
 .menu .contents .options-content .audio-toggle img {
   width: 29px;
@@ -721,6 +719,7 @@ html.is-audio-muted .menu .contents .options-content .audio-toggle img.audio-off
 }
 .menu .contents .controls-content .list table {
   border-spacing: 0 10px;
+  width: 100%;
 }
 @media only screen and (height<=620px) {
   .menu .contents .controls-content .list table {
@@ -734,6 +733,7 @@ html.is-audio-muted .menu .contents .options-content .audio-toggle img.audio-off
 }
 .menu .contents .controls-content .list tr td:first-child {
   text-align: right;
+  width: 50%;
   padding-right: 15px;
 }
 .menu .contents .controls-content .list .key {
@@ -1735,21 +1735,9 @@ body,
   font-size: 1.65rem;
   line-height: 1.5;
 }
-.paint-options {
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
-  display: flex;
-}
-.paint-options select {
-  max-width: 65%;
-  font-family: inherit;
-  font-size: 1rem;
-}
-.paint-options option {
+.menu .options option {
   color: #fff;
-  background: #251f2b;
+  background: #10343c;
 }
 .circuit-end .content {
   padding: 1.5rem;
@@ -1757,17 +1745,6 @@ body,
 .circuit-end .time {
   margin-block: 1rem;
   font-size: 2rem;
-}
-.paint-options label {
-  white-space: nowrap;
-}
-.paint-options select {
-  color: #fff;
-  background: #251f2b;
-  border: 1px solid #a7a1ad;
-  border-radius: 0.35rem;
-  min-width: 7rem;
-  padding: 0.6rem;
 }
 body:has(.menu.is-displayed) .island-identity {
   visibility: hidden;

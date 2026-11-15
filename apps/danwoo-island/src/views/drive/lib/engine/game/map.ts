@@ -15,11 +15,14 @@ const FLIGHT = { rise: 1.3, land: 1.5, ease: 'power3.inOut' } as const;
 const TICK_ORDER = 14;
 const HIDDEN_CLASS = 'is-hidden';
 const SELECTED_CLASS = 'is-selected';
+const LABEL_LEFT_CLASS = 'is-label-left';
+const LABEL_FLIP_MARGIN = 150;
 const COMPACT_SCREEN = { width: 720, height: 500 } as const;
 const REFRAME_DURATION = 0.3;
 const FRAME_INSETS = {
   wide: { top: 130, right: 290, bottom: 75, left: 60 },
-  compact: { top: 130, right: 125, bottom: 75, left: 40 },
+  compact: { top: 120, right: 40, bottom: 80, left: 40 },
+  short: { top: 120, right: 340, bottom: 80, left: 40 },
 } as const satisfies Record<string, ScreenInsets>;
 
 interface Pin {
@@ -43,6 +46,7 @@ export class WorldMap {
   readonly #card: { root: HTMLElement; icon: HTMLImageElement; title: HTMLElement; text: HTMLElement; go: HTMLElement };
   readonly #projected = new THREE.Vector3();
   readonly #placements = new WeakMap<HTMLElement, string>();
+  readonly #chips = new Map<IslandPlace, HTMLElement>();
   #pins: Pin[] = [];
   #selected: IslandPlace | null = null;
   #destination: IslandPlace | null = null;
@@ -99,6 +103,7 @@ export class WorldMap {
     const button = createElement('button', 'map-place', [iconElement(place.icon, 'map-place-icon'), place.name]);
     button.type = 'button';
     button.addEventListener('click', () => this.#select(place, { isPanning: true }));
+    this.#chips.set(place, button);
     return createElement('li', '', [button]);
   }
 
@@ -109,6 +114,8 @@ export class WorldMap {
     this.#card.text.textContent = place.description;
     this.#card.root.classList.remove(HIDDEN_CLASS);
     for (const pin of this.#pins) pin.element.classList.toggle(SELECTED_CLASS, pin.place === place);
+    for (const [chipPlace, chip] of this.#chips) chip.classList.toggle(SELECTED_CLASS, chipPlace === place);
+    this.#chips.get(place)?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
     if (!isPanning) return;
     const pin = this.#pins.find((item) => item.place === place);
     if (pin) this.#flyFocus(pin.anchor, FLIGHT.rise);
@@ -152,12 +159,17 @@ export class WorldMap {
 
   #frame(): OverviewFrame {
     const { view, viewport } = getGame();
-    const isCompact = viewport.width <= COMPACT_SCREEN.width || viewport.height <= COMPACT_SCREEN.height;
-    const insets = isCompact ? FRAME_INSETS.compact : FRAME_INSETS.wide;
     return view.frameOverview(
       this.#pins.map(({ anchor }) => anchor),
-      insets,
+      this.#insets(viewport.width, viewport.height),
     );
+  }
+
+  #insets(width: number, height: number): ScreenInsets {
+    const isNarrow = width <= COMPACT_SCREEN.width;
+    const isShort = height <= COMPACT_SCREEN.height;
+    if (isShort && !isNarrow) return FRAME_INSETS.short;
+    return isNarrow ? FRAME_INSETS.compact : FRAME_INSETS.wide;
   }
 
   #reframe(): void {
@@ -215,6 +227,7 @@ export class WorldMap {
     if (this.#placements.get(element) === placement) return;
     this.#placements.set(element, placement);
     element.classList.toggle(HIDDEN_CLASS, !isVisible);
+    element.classList.toggle(LABEL_LEFT_CLASS, x > width - LABEL_FLIP_MARGIN);
     if (isVisible) element.style.transform = placement;
   }
 

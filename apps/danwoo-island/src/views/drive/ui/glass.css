@@ -383,6 +383,15 @@ html:not(.is-mode-touch) .modals .blog .blog-post:hover .blog-post-title,
   left: 26px;
 }
 
+.modals .map .map-pin.is-label-left .map-pin-label {
+  left: auto;
+  right: 26px;
+}
+
+.modals .map .map-place.is-selected {
+  background: var(--glass-hover);
+}
+
 .modals .map .map-pin-ring {
   border: 2px solid rgb(43 179 192 / 85%);
   border-radius: 50%;
@@ -588,15 +597,100 @@ html.is-mode-touch .modals .map .map-hint-keys {
 }
 
 @media only screen and (width<=720px), only screen and (height<=500px) {
-  .modals .map .map-places {
-    display: none;
+  body:has(.modals .map.is-displayed) .island-identity {
+    visibility: hidden;
   }
 
   .modals .map .map-hint {
-    white-space: normal;
-    text-align: center;
+    display: none;
+  }
+
+  .modals .map .map-places {
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    width: auto;
+    max-height: none;
+    padding: 4px 16px;
+    top: auto;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    overflow: auto hidden;
+    transform: none;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .modals .map .map-places::-webkit-scrollbar {
+    display: none;
+  }
+
+  .modals .map .map-places-title {
+    display: none;
+  }
+
+  .modals .map .map-places-list {
+    flex-direction: row;
+    gap: 8px;
     width: max-content;
-    max-width: calc(100vw - 40px);
+  }
+
+  .modals .map .map-place {
+    white-space: nowrap;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    gap: 8px;
+    width: auto;
+    padding: 5px 14px 5px 5px;
+    font-size: 13px;
+    box-shadow: var(--glass-highlight);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+
+  .modals .map .map-place.is-selected {
+    background: var(--accent);
+    border-color: transparent;
+  }
+
+  .modals .map .map-place-icon {
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+  }
+
+  .modals .map .map-card {
+    bottom: calc(70px + env(safe-area-inset-bottom));
+  }
+
+  .modals .map .map-pin-bubble {
+    width: 36px;
+    height: 36px;
+    bottom: 16px;
+  }
+
+  .modals .map .map-pin-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .modals .map .map-pin-label {
+    bottom: 24px;
+    left: 22px;
+  }
+
+  .modals .map .map-pin.is-label-left .map-pin-label {
+    left: auto;
+    right: 22px;
+  }
+
+  .modals .map .map-pin:not(.is-selected) .map-pin-label {
+    display: none;
   }
 }
 
@@ -625,4 +719,112 @@ html.is-mode-touch .modals .map .map-hint-keys {
 html:is(.input-filter-menu, .input-filter-modal, .input-filter-intro, .input-filter-cinematic)
   :is(.menu-trigger, .map-trigger):focus-visible {
   outline: none;
+}
+
+.menu .options select.button {
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: center;
+  text-align-last: center;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--glass-text) 50%),
+    linear-gradient(135deg, var(--glass-text) 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) 50%,
+    calc(100% - 15px) 50%;
+  background-repeat: no-repeat;
+  background-size: 5px 5px;
+  padding: 0 30px;
+  font-size: inherit;
+}
+
+:is(.menu, .modals, .notifications) {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+@media only screen and (width<=720px) {
+  body:has(.modals .modal.is-displayed) .island-identity {
+    visibility: hidden;
+  }
+}
+
+.modals .circuit-end .content {
+  color: var(--glass-text);
+  text-align: center;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  font-family: var(--ui-font);
+  min-width: min(320px, calc(100vw - 40px));
+  padding: 28px 28px 24px;
+}
+
+.modals .circuit-end.is-displayed .content {
+  animation: glass-rise 0.45s var(--glass-ease) both;
+}
+
+.modals .circuit-end .title {
+  font-family: var(--ui-font);
+  letter-spacing: -0.02em;
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.modals .circuit-end .text {
+  color: var(--glass-muted);
+  font-family: var(--ui-font);
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.modals .circuit-end .time {
+  font-variant-numeric: tabular-nums;
+  margin-block: 6px 20px;
+  font-family: var(--ui-font);
+  font-size: 34px;
+  font-weight: 800;
+}
+
+.modals .circuit-end .horizontal-group {
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modals .circuit-end .button {
+  color: var(--glass-text);
+  background: var(--glass-raised);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  height: 44px;
+  padding: 0 20px;
+  font-family: var(--ui-font);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 42px;
+}
+
+.modals .circuit-end .js-button-restart {
+  background: var(--accent);
+  border-color: transparent;
+}
+
+@media only screen and (height<=500px) and (width>720px) {
+  .modals .map .map-card {
+    width: 300px;
+    top: 50%;
+    bottom: auto;
+    left: auto;
+    right: calc(20px + env(safe-area-inset-right));
+    transform: translateY(-50%);
+  }
+
+  .modals .map .map-card.is-hidden {
+    transform: translate(14px, -50%);
+  }
 }
