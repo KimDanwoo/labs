@@ -18,6 +18,7 @@ import content from '../../data/danwoo';
 import { nowPlayingNotice } from '../audio';
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
+import { prefersDataSaving, runWhenIdle } from './idle';
 import { JukeboxPanel } from './jukeboxPanel';
 import { JukeboxPlayer } from './jukeboxPlayer';
 
@@ -30,6 +31,7 @@ const PALETTE_SLOTS = 32;
 const ARCH_SLOTS = [3, 10, 18] as const;
 const GLOW = { strength: 1.4, speed: 3.2 } as const;
 const MODEL_NAME = 'jukebox';
+const PREWARM = { delayMs: 6000, timeoutMs: 4000 } as const;
 
 export class JukeboxStation {
   readonly player: JukeboxPlayer;
@@ -46,6 +48,7 @@ export class JukeboxStation {
       announce: (title) => notifications.show(nowPlayingNotice(title), { type: 'song', duration: NOTICE_DURATION }),
     });
     this.#panel = new JukeboxPanel({ element: modal.element, player: this.player });
+    if (!prefersDataSaving()) runWhenIdle(() => void this.player.prepare(), PREWARM);
     anchor.add(this.#createNotes());
     this.#applyGlow(anchor);
     this.#createPoint(pointPosition);

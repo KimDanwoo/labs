@@ -2304,6 +2304,21 @@ html:not(.is-mode-touch) .blog .blog-all:hover {
 .jukebox.is-playing .jukebox-disc {
   animation: jukebox-spin 3.2s linear infinite;
 }
+.jukebox.is-starting .jukebox-disc {
+  animation: jukebox-spin 1.6s linear infinite;
+  opacity: 0.85;
+}
+.jukebox.is-starting .jukebox-progress-bar {
+  animation: jukebox-buffer 1s ease-in-out infinite alternate;
+}
+@keyframes jukebox-buffer {
+  from {
+    transform: scaleX(0.04);
+  }
+  to {
+    transform: scaleX(0.22);
+  }
+}
 .jukebox .jukebox-meta {
   flex-direction: column;
   flex: 1;
@@ -2484,7 +2499,7 @@ html:not(.is-mode-touch) .jukebox .jukebox-track:hover {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .jukebox.is-playing .jukebox-disc {
+  .jukebox:is(.is-playing, .is-starting) :is(.jukebox-disc, .jukebox-progress-bar) {
     animation: none;
   }
 }

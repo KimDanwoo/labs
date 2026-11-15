@@ -160,7 +160,8 @@ export class JukeboxPlayer {
     this.#applyVolume();
     const requested = this.#requestedIndex;
     if (!this.#wantsPlayback || requested === null) {
-      this.#setState({ status: 'ready', trackIndex: this.#state.trackIndex ?? loadedIndex });
+      this.#requestedIndex ??= loadedIndex;
+      this.#setState({ status: 'ready' });
       return;
     }
     if (requested === loadedIndex) this.#start();
