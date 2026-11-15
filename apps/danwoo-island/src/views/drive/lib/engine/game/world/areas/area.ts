@@ -73,6 +73,12 @@ export class Area {
     if (isHideable && object.visual) this.objects.hideable.push(object.visual.object3D);
   }
 
+  requireReference(name: string): THREE.Object3D {
+    const reference = this.references.items.get(name)?.[0];
+    if (!reference) throw new Error(`Area reference is missing: ${name}`);
+    return reference;
+  }
+
   update(): void {}
 
   #watchBounding(): void {

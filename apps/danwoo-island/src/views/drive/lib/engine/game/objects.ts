@@ -128,6 +128,16 @@ function stopBody({ body }: Physical): void {
   body.resetTorques(false);
 }
 
+function isWorldObject(value: unknown): value is WorldObject {
+  return typeof value === 'object' && value !== null && 'physical' in value && 'visual' in value;
+}
+
+export function objectOf(object3D: THREE.Object3D): WorldObject {
+  const object: unknown = object3D.userData.object;
+  if (!isWorldObject(object)) throw new Error(`Object3D has no world object: ${object3D.name}`);
+  return object;
+}
+
 export class Objects {
   readonly list = new Map<number, WorldObject>();
   #key = 0;
