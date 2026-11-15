@@ -50,7 +50,7 @@ export const PROJECTS: Project[] = [
   },
   {
     title: 'Danwoo Island',
-    description: '한국 섬마을을 검정 SUV로 달리며 프로젝트를 둘러봐요',
+    description: '작은 열대 섬을 차로 누비며 곳곳에 놓인 작업물을 만나요',
     href: 'https://world.danwoo.dev/',
     image: '/projects/danwoo-island-cover.webp',
     imagePosition: 'center',
