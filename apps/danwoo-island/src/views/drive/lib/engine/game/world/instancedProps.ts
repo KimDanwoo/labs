@@ -1,8 +1,7 @@
 import type * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
-import { InstancedGroup, type InstanceReference } from '../instancedGroup';
-import type { WorldObject } from '../objects';
+import { InstancedGroup } from '../instancedGroup';
 import type { ColliderDescription, CollisionHandler } from '../physics/physics';
 
 export interface InstancedPropsOptions {
@@ -16,21 +15,14 @@ export interface InstancedPropsOptions {
 }
 
 const PROP_PHYSICS = { friction: 0.7, mass: 0.1, waterGravityMultiplier: -1 } as const;
-const TICK_ORDER = 10;
 
 export function modelColliders(base: THREE.Object3D): readonly ColliderDescription[] {
   const [, physical] = getGame().objects.getFromModel(base, {}, {});
   return physical?.colliders ?? [];
 }
 
-interface PropItem {
-  reference: InstanceReference;
-  object: WorldObject;
-}
-
 export class InstancedProps {
   readonly instancedGroup: InstancedGroup;
-  readonly #items: PropItem[];
 
   constructor({
     modelName,
@@ -48,9 +40,8 @@ export class InstancedProps {
     game.materials.updateObject(base);
 
     const shadows = hasOwnShadows ? {} : { castShadow: false, receiveShadow: false };
-    this.#items = references.map((reference) => ({
-      reference,
-      object: game.objects.add(
+    for (const reference of references) {
+      game.objects.add(
         { model: reference, updateMaterials: false, parent: null, ...shadows },
         {
           type: 'dynamic',
@@ -62,16 +53,8 @@ export class InstancedProps {
           contactThreshold,
           onCollision,
         },
-      ),
-    }));
-    this.instancedGroup = new InstancedGroup(references, template());
-    game.ticker.events.on('tick', () => this.#markMoving(), TICK_ORDER);
-  }
-
-  #markMoving(): void {
-    for (const { reference, object } of this.#items) {
-      const body = object.physical?.body;
-      if (body && !body.isSleeping() && body.isEnabled()) reference.needsUpdate = true;
+      );
     }
+    this.instancedGroup = new InstancedGroup(references, template());
   }
 }

@@ -33,6 +33,10 @@ export interface WorldObject {
 export type ModelPhysicalDescription = Omit<PhysicalDescription, 'colliders'>;
 
 const TICK_ORDER = 4;
+
+const markInstanceDirty = (object3D: THREE.Object3D): void => {
+  if ('needsUpdate' in object3D) object3D.needsUpdate = true;
+};
 const PHYSICAL_PATTERN = /physical/i;
 const BODY_TYPE_TAGS = /physical|fixed|dynamic|kinematicPositionBased/gi;
 const BODY_TYPE_BY_TAG: readonly [RegExp, BodyType][] = [
@@ -282,6 +286,7 @@ export class Objects {
         object.needsUpdate = false;
         visual.object3D.position.copy(position);
         visual.object3D.quaternion.copy(body.rotation());
+        markInstanceDirty(visual.object3D);
       }
       if (position.y < game.water.depthElevation) this.resetObject(object);
       if (!hasViewMoved) continue;

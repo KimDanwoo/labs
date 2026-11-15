@@ -412,7 +412,6 @@ export class BowlingArea extends Area {
         pin.isSleeping = isSleeping;
         if (!isSleeping) hasWoken = true;
       }
-      if (!isSleeping) pin.group.needsUpdate = true;
     }
     return { hasWoken, hasFallen };
   }
