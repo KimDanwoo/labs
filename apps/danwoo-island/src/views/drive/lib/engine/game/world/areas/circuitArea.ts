@@ -174,7 +174,7 @@ export class CircuitArea extends Area {
     rebuildCircuitObjects(this.model, materials);
     rebuildPodium(this.model, materials);
     reshapeCircuitDecoration(this.model, materials);
-    replaceAirDancers(this.model, materials);
+    replaceAirDancers(this.model);
     super.setObjects();
   }
 

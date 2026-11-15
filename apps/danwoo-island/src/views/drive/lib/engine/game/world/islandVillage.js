@@ -1519,7 +1519,7 @@ function rebuildChild(child, materials, { build, keepEmissive = true })
 
 export function rebuildVillageProps(model, materials)
 {
-    placeLandmarks(model, materials)
+    placeLandmarks(model)
     for(const child of [...model.children])
     {
         const uncollided = UNCOLLIDED_BUILDERS.find((item) => item.pattern.test(child.name))

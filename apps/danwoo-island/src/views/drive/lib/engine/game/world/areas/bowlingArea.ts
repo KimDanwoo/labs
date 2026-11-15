@@ -172,7 +172,7 @@ export class BowlingArea extends Area {
     rebuildVillageProps(this.model, materials);
     rebuildBowlingSign(this.model, materials, this.game.texture('bowlingNeonTexture'));
     rebuildRadioCabinet(this.model, materials);
-    rebuildBowlingScreenStand(this.model, materials);
+    rebuildBowlingScreenStand(this.model);
     super.setObjects();
   }
 

@@ -20,7 +20,7 @@ export class Scenery {
     for (const bridge of [...scene.children].filter((child) => BRIDGE_PATTERN.test(child.name))) {
       rebuildBridge(bridge, game.materials);
     }
-    paintSteppingStones(scene, game.materials);
+    paintSteppingStones(scene);
 
     for (const child of [...scene.children]) {
       const prevent: unknown = child.userData.prevent;

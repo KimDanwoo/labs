@@ -62,7 +62,7 @@ export class AchievementsArea extends Area {
 
   override setObjects(): void {
     rebuildWaterfallPagoda(this.model, this.game.materials);
-    paintAchievementsBasin(this.model, this.game.materials);
+    paintAchievementsBasin(this.model);
     rebuildVillageProps(this.model, this.game.materials);
     super.setObjects();
   }

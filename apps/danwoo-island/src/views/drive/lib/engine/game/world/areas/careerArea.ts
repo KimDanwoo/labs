@@ -130,7 +130,7 @@ export class CareerArea extends Area {
   }
 
   override setObjects(): void {
-    paintCareerLines(this.model, this.game.materials);
+    paintCareerLines(this.model);
     super.setObjects();
   }
 
