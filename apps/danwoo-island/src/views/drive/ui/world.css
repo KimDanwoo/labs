@@ -1,63 +1,3 @@
-@font-face {
-  font-family: Pally-Regular;
-  src:
-    url(/world/fonts/Pally-Regular.woff2) format('woff2'),
-    url(/world/fonts/Pally-Regular.woff) format('woff'),
-    url(/world/fonts/Pally-Regular.ttf) format('truetype');
-  font-weight: 400;
-  font-display: swap;
-  font-style: normal;
-}
-@font-face {
-  font-family: Pally-Medium;
-  src:
-    url(/world/fonts/Pally-Medium.woff2) format('woff2'),
-    url(/world/fonts/Pally-Medium.woff) format('woff'),
-    url(/world/fonts/Pally-Medium.ttf) format('truetype');
-  font-weight: 500;
-  font-display: swap;
-  font-style: normal;
-}
-@font-face {
-  font-family: Pally-Bold;
-  src:
-    url(/world/fonts/Pally-Bold.woff2) format('woff2'),
-    url(/world/fonts/Pally-Bold.woff) format('woff'),
-    url(/world/fonts/Pally-Bold.ttf) format('truetype');
-  font-weight: 700;
-  font-display: swap;
-  font-style: normal;
-}
-.fonts-loader {
-  position: fixed;
-  top: calc(100% + 1px);
-  left: 0;
-}
-.fonts-loader .nunito {
-  font-optical-sizing: auto;
-  font-family: Nunito, sans-serif;
-  font-style: normal;
-  font-weight: 400;
-}
-.fonts-loader .amatic-sc {
-  font-family:
-    Amatic SC,
-    sans-serif;
-  font-weight: 700;
-}
-.fonts-loader .pally {
-  font-family: Pally-Medium, sans-serif;
-  font-weight: 500;
-}
-.tp-dfwv {
-  width: 400px !important;
-  top: 20px !important;
-  left: 30px !important;
-  right: 30px !important;
-}
-.tp-lblv_v {
-  width: 200px !important;
-}
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -86,7 +26,7 @@ body,
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
   height: 100%;
-  font-family: Nunito, sans-serif;
+  font-family: var(--ui-font);
   font-style: normal;
   font-weight: 400;
   position: fixed;
@@ -1497,7 +1437,7 @@ html.is-mode-touch .notifications {
   border-radius: 18px;
   width: 100%;
   padding: 10px 14px 12px;
-  font-family: Nunito, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  font-family: var(--ui-font);
   font-size: 16px;
   overflow: hidden;
   box-shadow: 0 14px 34px #0d2b3333;
@@ -1845,7 +1785,7 @@ html.input-filter-cinematic .map-trigger .button-inner {
   user-select: none;
   max-width: 94vw;
   position: relative;
-  font-family: Nunito, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  font-family: var(--ui-font);
 }
 .blog {
   width: min(760px, 94vw);
@@ -2353,9 +2293,7 @@ html:not(.is-mode-touch) .jukebox .jukebox-track:hover {
   align-items: center;
   gap: 12px;
   font:
-    700 22px/0.93 Nunito,
-    system-ui,
-    sans-serif;
+    700 22px/0.93 var(--ui-font);
   display: flex;
   position: fixed;
 }

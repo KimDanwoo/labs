@@ -1,7 +1,6 @@
 import { preload } from 'react-dom';
 
 import { CRITICAL_WORLD_ASSETS, worldAsset } from '../config/worldAsset';
-import { FontsLoader } from './FontsLoader';
 import { IslandIdentity } from './IslandIdentity';
 import { MapTrigger } from './MapTrigger';
 import { Menu } from './Menu';
@@ -18,7 +17,6 @@ export function DriveView() {
   return (
     <>
       <IslandIdentity />
-      <FontsLoader />
       <div className="game">
         <canvas className="js-canvas" />
         <TouchButtons />

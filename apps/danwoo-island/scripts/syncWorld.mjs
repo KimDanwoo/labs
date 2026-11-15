@@ -60,7 +60,7 @@ const UNUSED_STATIC_FILES = new Set([
   'cherryTrees/cherryTreesVisual-compressed.glb',
   'vehicle/defaultAntenna-compressed.glb',
 ]);
-const UNUSED_FONT_FORMATS = /^fonts\/Pally-(Variable\.|.*\.eot$)/;
+const UNUSED_FONT_FORMATS = /^fonts\/Pally-/;
 const UNCOMPRESSED_FILES_IN_USE = new Set(['vehicle/default.glb', 'vehicle/oldSchool.glb']);
 const COMPRESSED_COUNTERPART = [
   [/\.glb$/, '-compressed.glb'],
