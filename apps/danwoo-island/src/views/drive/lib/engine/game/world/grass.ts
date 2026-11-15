@@ -90,7 +90,6 @@ export class Grass {
     game.viewport.events.on('throttleChange', () => this.#resize(), THROTTLE_ORDER);
     game.quality.events.on('change', (level) => {
       this.#subdivisions = SUBDIVISIONS_BY_QUALITY[level];
-      this.#fragmentSize = this.#size.value / this.#subdivisions;
       this.#resize();
     });
   }
@@ -103,6 +102,7 @@ export class Grass {
     const size = getGame().view.optimalArea.radius * 2;
     const overflow = surfaceOverflow(size);
     this.#size.value = size;
+    this.#fragmentSize = size / this.#subdivisions;
     this.#bladeWidth.value = this.#widthScale() * BLADE.width * (1 + overflow * OVERFLOW_GROWTH.resized);
     this.#bladeHeight.value = BLADE.height * (1 + overflow * OVERFLOW_GROWTH.resized);
     this.#mesh.geometry.dispose();

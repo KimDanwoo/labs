@@ -337,6 +337,8 @@ export class Audio {
   readonly mute: AudioMute;
   initiated = false;
   playlist: Playlist | null = null;
+  readonly #loadQueue: AudioItem[] = [];
+  #isDraining = false;
   musicOwner: MusicOwner = 'island';
   isBackground = false;
   #globalRate = 1;
@@ -349,10 +351,10 @@ export class Audio {
   }
 
   init(): void {
-    this.initiated = true;
-    this.#startPlaylist();
     this.#registerAmbients();
     this.#registerOneOffs();
+    this.initiated = true;
+    this.#startPlaylist();
     for (const group of this.groups.values()) {
       for (const item of group.items) {
         if (item.autoplay && !item.playing) item.play();
@@ -362,12 +364,19 @@ export class Audio {
   }
 
   #preloadEager(): void {
-    const pending = [...this.groups.values()].flatMap(({ items }) => items).filter((item) => item.isEager);
-    const loadBatch = (): void => {
-      for (const item of pending.splice(0, PRELOAD_BATCH)) item.load();
-      if (pending.length > 0) scheduleIdle(loadBatch);
+    this.#queueLoad([...this.groups.values()].flatMap(({ items }) => items).filter((item) => item.isEager));
+  }
+
+  #queueLoad(items: readonly AudioItem[]): void {
+    this.#loadQueue.push(...items);
+    if (this.#isDraining) return;
+    this.#isDraining = true;
+    const drain = (): void => {
+      for (const item of this.#loadQueue.splice(0, PRELOAD_BATCH)) item.load();
+      if (this.#loadQueue.length > 0) scheduleIdle(drain);
+      else this.#isDraining = false;
     };
-    scheduleIdle(loadBatch);
+    scheduleIdle(drain);
   }
 
   register(options: SoundOptions): AudioItem {
@@ -376,7 +385,7 @@ export class Audio {
     this.groups.set(groupName, group);
     const item = new AudioItem(options, group, this.initiated);
     group.items.push(item);
-    if (this.initiated && item.isEager) scheduleIdle(() => item.load());
+    if (this.initiated && item.isEager) this.#queueLoad([item]);
     return item;
   }
 

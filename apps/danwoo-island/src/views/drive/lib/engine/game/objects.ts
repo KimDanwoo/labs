@@ -256,6 +256,8 @@ export class Objects {
     if (visual && visual.parent !== visual.object3D.parent) visual.parent?.add(visual.object3D);
   }
 
+  readonly #awake = new WeakSet<WorldObject>();
+
   update(): void {
     const game = getGame();
     const { focusPoint, optimalArea } = game.view;
@@ -270,10 +272,13 @@ export class Objects {
       if (!physical) continue;
       const { body } = physical;
       const isResting = body.isSleeping() || !body.isEnabled();
-      if (isResting && !object.needsUpdate) continue;
+      const wasAwake = this.#awake.has(object);
+      if (isResting) this.#awake.delete(object);
+      else this.#awake.add(object);
+      if (isResting && !object.needsUpdate && !wasAwake) continue;
       const position = body.translation();
 
-      if (visual && (object.needsUpdate || (!body.isSleeping() && body.isEnabled()))) {
+      if (visual && (object.needsUpdate || wasAwake || !isResting)) {
         object.needsUpdate = false;
         visual.object3D.position.copy(position);
         visual.object3D.quaternion.copy(body.rotation());
