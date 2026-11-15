@@ -99,6 +99,10 @@ function isVectorLike(value: unknown): value is VectorLike {
   return typeof value === 'object' && value !== null && 'x' in value && 'y' in value && 'z' in value;
 }
 
+export function moveSoundTo(item: AudioItem, position: unknown): void {
+  if (isVectorLike(position)) item.firstPosition().copy(position);
+}
+
 function randomOffset(distance: number): number {
   return Math.random() < 0.5 ? distance : -distance;
 }
