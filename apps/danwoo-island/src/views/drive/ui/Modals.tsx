@@ -42,25 +42,29 @@ export function Modals() {
         </div>
       </div>
       <div className="js-modal modal map" data-name="map">
-        <div className="panel-card">
-          <header className="panel-header">
-            <img className="panel-logo" src={worldAsset('ui/islandMark.png')} alt="" aria-hidden="true" />
-            <h2 className="panel-title">Danwoo Island</h2>
-            <span className="panel-badge">MAP</span>
-            <CloseButton />
+        <div className="map-hud">
+          <header className="map-chip">
+            <img className="map-chip-logo" src={worldAsset('ui/islandMark.png')} alt="" aria-hidden="true" />
+            <h2 className="map-chip-title">MAP</h2>
           </header>
-          <div className="map-body">
-            <div className="js-map-container map-container">
-              <img className="js-texture texture" alt="" loading="lazy" />
-              <img className="map-compass" src={worldAsset('ui/map/icons/compass.webp')} alt="" aria-hidden="true" />
-              <div className="js-player player" />
+          <div className="js-map-pins map-pins" />
+          <div className="js-map-car map-car" aria-hidden="true" />
+          <section className="js-map-card map-card is-hidden" aria-live="polite">
+            <img className="js-map-card-icon map-card-icon" alt="" />
+            <div className="map-card-body">
+              <strong className="js-map-card-title map-card-title" />
+              <p className="js-map-card-text map-card-text" />
             </div>
-            <nav className="map-places" aria-label="장소 목록">
-              <h3 className="map-places-title">어디로 갈까요?</h3>
-              <ul className="js-map-places map-places-list" />
-            </nav>
-          </div>
-          <p className="panel-hint">장소를 누르면 그곳으로 이동해요 · M 키로 열고 닫기</p>
+            <button type="button" className="js-map-card-go map-card-go">
+              여기로 이동
+            </button>
+          </section>
+          <nav className="map-places" aria-label="장소 목록">
+            <h3 className="map-places-title">장소</h3>
+            <ul className="js-map-places map-places-list" />
+          </nav>
+          <p className="map-hint">핀을 눌러 고르고 이동 · 드래그로 둘러보기 · M 닫기</p>
+          <CloseButton />
         </div>
       </div>
     </div>
