@@ -1,0 +1,188 @@
+import gsap from 'gsap';
+import { color, float, Fn, instancedArray, step, texture, uniform, uv } from 'three/tsl';
+import * as THREE from 'three/webgpu';
+
+import { INPUT_MODE, type InputMode } from '../../inputs/inputs';
+import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
+import { objectOf } from '../../objects';
+import { rebuildKiosk } from '../islandStructures';
+import { rebuildVillageProps } from '../islandVillage';
+import { Area } from './area';
+import { replaceLandingName } from './landingName';
+
+const LETTER_CONTACT_THRESHOLD = 5;
+const EMBERS = { count: 30, elevation: 5, size: 0.5, segments: 8, hideAt: 0.8, hideLift: 100 } as const;
+const BURN_DELAY = 2;
+const EMBER_BOUNDS = { centerY: 2, radius: 2, delayFrames: 2 } as const;
+const TIME_SPEED = 0.1;
+const CONTROLS_TAB: Record<InputMode, string> = {
+  [INPUT_MODE.gamepad]: 'gamepad',
+  [INPUT_MODE.mouseKeyboard]: 'mouse-keyboard',
+  [INPUT_MODE.touch]: 'touch',
+};
+
+function emberData(): { positions: Float32Array; scales: Float32Array } {
+  const positions = new Float32Array(EMBERS.count * 3);
+  const scales = new Float32Array(EMBERS.count);
+  for (let index = 0; index < EMBERS.count; index += 1) {
+    const angle = Math.PI * 2 * Math.random();
+    const radius = Math.random() ** 1.5 * 1;
+    positions.set([Math.cos(angle) * radius, Math.random(), Math.sin(angle) * radius], index * 3);
+    scales[index] = 0.02 + Math.random() * 0.06;
+  }
+  return { positions, scales };
+}
+
+export class LandingArea extends Area {
+  readonly #localTime = uniform(0);
+
+  constructor(model: THREE.Object3D) {
+    super(model);
+    this.#makeLettersAudible();
+    this.#createKioskPoint();
+    this.#createControlsPoint();
+    this.#createBonfire();
+  }
+
+  override setObjects(): void {
+    rebuildVillageProps(this.model);
+    replaceLandingName(this.model);
+    rebuildKiosk(this.model, this.game.texture('islandMapTexture'));
+    super.setObjects();
+  }
+
+  #interactButtons(): { onReveal: () => void; onConceal: () => void; onHide: () => void } {
+    const { interactiveButtons } = this.game.inputs;
+    return {
+      onReveal: () => interactiveButtons.addItems(['interact']),
+      onConceal: () => interactiveButtons.removeItems(['interact']),
+      onHide: () => interactiveButtons.removeItems(['interact']),
+    };
+  }
+
+  #makeLettersAudible(): void {
+    const { RAPIER, audio } = this.game;
+    for (const letter of this.references.items.get('letters') ?? []) {
+      const physical = objectOf(letter).physical;
+      const collider = physical?.colliders[0];
+      if (!physical || !collider) continue;
+      collider.setActiveEvents(RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS);
+      collider.setContactForceEventThreshold(LETTER_CONTACT_THRESHOLD);
+      physical.onCollision = (force, position) => audio.groups.get('hitBrick')?.playRandomNext(force, position);
+    }
+  }
+
+  #createKioskPoint(): void {
+    this.game.interactivePoints.create({
+      position: this.requireReference('kioskInteractivePoint').position,
+      text: '지도',
+      align: 'right',
+      state: 'concealed',
+      onInteract: () => {
+        this.game.inputs.interactiveButtons.clearItems();
+        this.game.modals.open('map');
+      },
+      ...this.#interactButtons(),
+    });
+  }
+
+  #createControlsPoint(): void {
+    const { inputs, menu } = this.game;
+    const point = this.game.interactivePoints.create({
+      position: this.requireReference('controlsInteractivePoint').position,
+      text: '조작법',
+      align: 'right',
+      state: 'concealed',
+      onInteract: () => {
+        inputs.interactiveButtons.clearItems();
+        menu.open('controls');
+        point.hide();
+      },
+      ...this.#interactButtons(),
+    });
+    const controls = menu.items.get('controls');
+    if (!controls) return;
+    controls.events.on('close', () => point.show());
+    controls.events.on('open', () => controls.tabs?.goTo(CONTROLS_TAB[inputs.mode]));
+  }
+
+  #createEmbers(position: THREE.Vector3): THREE.Mesh {
+    const { materials, wind } = this.game;
+    const { positions, scales } = emberData();
+    const positionAttribute = instancedArray(positions, 'vec3').toAttribute();
+    const scaleAttribute = instancedArray(scales, 'float').toAttribute();
+    const elevation = uniform(EMBERS.elevation);
+    const material = new THREE.SpriteNodeMaterial();
+    material.outputNode = materials.emissiveOutput('emissiveOrangeRadialGradient');
+
+    const progress = float(0).toVar();
+    material.positionNode = Fn(() => {
+      const newPosition = positionAttribute.toVar();
+      progress.assign(newPosition.y.add(this.#localTime.mul(newPosition.y)).fract());
+      newPosition.y.assign(progress.mul(elevation));
+      newPosition.xz.addAssign(wind.direction.mul(progress));
+      newPosition.y.addAssign(step(EMBERS.hideAt, progress).mul(EMBERS.hideLift));
+      return newPosition;
+    })();
+    material.scaleNode = Fn(() => scaleAttribute.mul(progress.remapClamp(0.5, 1, 1, 0)))();
+
+    const embers = new THREE.Mesh(new THREE.CircleGeometry(EMBERS.size, EMBERS.segments), material);
+    embers.visible = false;
+    embers.position.copy(position);
+    embers.count = EMBERS.count;
+    this.game.scene.add(embers);
+    return embers;
+  }
+
+  #paintAshes(): void {
+    const { noises } = this.game;
+    const alphaNode = Fn(() => {
+      const baseUv = uv(1);
+      const voronoi = texture(noises.voronoi, baseUv).g;
+      voronoi.subAssign(baseUv.sub(0.5).length().remap(0, 0.5, 0.3, 0));
+      return voronoi;
+    })();
+    const ashes = this.requireReference('bonfireHashes');
+    if (!(ashes instanceof THREE.Mesh)) return;
+    ashes.material = new MeshDefaultMaterial({
+      colorNode: color(0x6f6a87).rgb,
+      alphaNode,
+      hasWater: false,
+      hasLightBounce: false,
+    });
+  }
+
+  #createBonfire(): void {
+    const position = this.requireReference('bonfireHashes').position;
+    const embers = this.#createEmbers(position);
+    this.#paintAshes();
+    const burn = this.requireReference('bonfireBurn');
+    burn.visible = false;
+
+    this.game.interactivePoints.create({
+      position: this.requireReference('bonfireInteractivePoint').position,
+      text: '초기화',
+      align: 'right',
+      state: 'concealed',
+      onInteract: () => {
+        this.game.reset();
+        gsap.delayedCall(BURN_DELAY, () => {
+          embers.visible = true;
+          burn.visible = true;
+          this.game.ticker.wait(EMBER_BOUNDS.delayFrames, () => {
+            const bounds = embers.geometry.boundingSphere;
+            if (!bounds) return;
+            bounds.center.y = EMBER_BOUNDS.centerY;
+            bounds.radius = EMBER_BOUNDS.radius;
+          });
+          this.game.audio.groups.get('campfire')?.items[0]?.positions?.push(position);
+        });
+      },
+      ...this.#interactButtons(),
+    });
+  }
+
+  override update(): void {
+    this.#localTime.value += this.game.ticker.deltaScaled * TIME_SPEED;
+  }
+}

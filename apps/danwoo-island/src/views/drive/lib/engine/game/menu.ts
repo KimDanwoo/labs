@@ -4,7 +4,6 @@ import { INPUT_MODE } from './inputs/inputs';
 import { isShown, type PanelState } from './panelState';
 import { Tabs } from './tabs';
 import { requireElement } from './utilities/requireElement';
-import { CircuitArea } from './world/areas/circuitArea';
 
 type PanelEvents = { open: []; close: []; opened: []; closed: [] };
 
@@ -26,8 +25,7 @@ const GAMEPAD_ACTIONS = [
 ];
 
 function isRacing(): boolean {
-  const state: unknown = getGame().world.areas?.circuit?.state;
-  return state === CircuitArea.STATE_RUNNING || state === CircuitArea.STATE_STARTING;
+  return getGame().world.areas?.circuit?.isRacing ?? false;
 }
 
 function onNextFrame(callback: () => void): void {

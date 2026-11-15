@@ -13,10 +13,6 @@ function isPaintName(value: unknown): value is PaintName {
   return PAINTS.some((paint) => paint === value);
 }
 
-function canChangePaint(value: unknown): value is { changeTo: (name: PaintName) => void } {
-  return typeof value === 'object' && value !== null && 'changeTo' in value && typeof value.changeTo === 'function';
-}
-
 function storedPaint(): PaintName {
   const stored = localStorage.getItem(PAINT_STORAGE_KEY);
   return isPaintName(stored) ? stored : DEFAULT_PAINT;
@@ -88,8 +84,7 @@ export class Options {
       if (!isPaintName(select.value)) return;
       this.paintName = select.value;
       localStorage.setItem(PAINT_STORAGE_KEY, this.paintName);
-      const paints: unknown = getGame().world.visualVehicle?.paints;
-      if (canChangePaint(paints)) paints.changeTo(this.paintName);
+      getGame().world.visualVehicle?.changePaint(this.paintName);
     });
   }
 }
