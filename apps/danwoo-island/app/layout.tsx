@@ -1,14 +1,16 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
-const TITLE = 'Danwoo Island';
-const DESCRIPTION = '벚꽃과 강, 숲 사이를 자유롭게 달리는 작은 세계';
+const SITE_NAME = 'Danwoo Island';
+const TITLE = 'Danwoo Island — 차로 누비는 열대 섬';
+const DESCRIPTION =
+  '작은 열대 섬을 차로 누비며 프로젝트와 글, 직접 만든 노래를 만나요. 회오리를 타면 아직 안 가 본 곳으로 날아가요.';
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  applicationName: TITLE,
-  appleWebApp: { title: TITLE },
+  applicationName: SITE_NAME,
+  appleWebApp: { title: SITE_NAME },
   icons: {
     icon: [
       { url: '/world/favicons/favicon-96x96.png', type: 'image/png', sizes: '96x96' },
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
     shortcut: '/world/favicons/favicon.ico',
     apple: { url: '/world/favicons/apple-touch-icon.png', sizes: '180x180' },
   },
-  openGraph: { siteName: TITLE, type: 'website', title: TITLE, description: DESCRIPTION },
+  openGraph: { siteName: SITE_NAME, type: 'website', title: TITLE, description: DESCRIPTION },
   twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
 };
 
