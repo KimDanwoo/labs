@@ -27,7 +27,11 @@ const nextConfig: NextConfig = {
     return [
       { source: '/(.*)', headers: SECURITY_HEADERS },
       { source: '/world/:path*', headers: WORLD_ASSET_CACHE },
-      { source: '/world/:path*', has: [{ type: 'query', key: 'v' }], headers: VERSIONED_ASSET_CACHE },
+      {
+        source: '/world/:path*',
+        has: [{ type: 'query', key: 'v', value: worldVersion || undefined }],
+        headers: VERSIONED_ASSET_CACHE,
+      },
     ];
   },
 };
