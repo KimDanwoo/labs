@@ -32,6 +32,8 @@ interface Song {
   name: string;
   sound: Howl;
   isLoaded: boolean;
+  isRetrying: boolean;
+  loadRetries: number;
 }
 
 interface VectorLike {
@@ -59,6 +61,7 @@ function scheduleIdle(task: () => void): void {
 
 const SONG_ROTATION_MS = 3 * 60 * 1000;
 const SONG_SWITCH_DELAY = 1;
+const SONG_LOAD_RETRY = { delay: 3, attempts: 3 } as const;
 const SONG_NOTICE_DURATION = 5;
 const SONGS = [{ path: 'sounds/musics/baram.mp3', name: '바람 · danwoo0' }] as const;
 const AMBIENT_DISTANCE = 30;
@@ -254,21 +257,17 @@ class Playlist {
 
   constructor(canPlay: () => boolean) {
     this.#canPlay = canPlay;
-    this.songs = SONGS.map(({ path, name }) => ({
-      path,
-      name,
-      isLoaded: false,
-      sound: new Howl({
-        src: [worldAsset(path)],
-        pool: 0,
-        html5: !IS_IOS,
-        autoplay: false,
-        loop: false,
-        preload: false,
-        volume: 0.2,
-        onend: () => this.next(),
-      }),
-    }));
+    this.songs = SONGS.map(({ path, name }) => {
+      const song: Song = {
+        path,
+        name,
+        isLoaded: false,
+        isRetrying: false,
+        loadRetries: 0,
+        sound: this.#createSound(path, (failed) => this.#retryLoad(song, failed)),
+      };
+      return song;
+    });
     this.#index = Math.floor(Date.now() / SONG_ROTATION_MS) % this.songs.length;
   }
 
@@ -305,6 +304,35 @@ class Playlist {
     if (song.isLoaded) return;
     song.isLoaded = true;
     song.sound.load();
+  }
+
+  #createSound(path: string, onLoadError: (sound: Howl) => void): Howl {
+    const sound: Howl = new Howl({
+      src: [worldAsset(path)],
+      pool: 0,
+      html5: !IS_IOS,
+      autoplay: false,
+      loop: false,
+      preload: false,
+      volume: 0.2,
+      onend: () => this.next(),
+      onloaderror: () => onLoadError(sound),
+    });
+    return sound;
+  }
+
+  #retryLoad(song: Song, failed: Howl): void {
+    if (song.sound !== failed || song.isRetrying || song.loadRetries >= SONG_LOAD_RETRY.attempts) return;
+    song.isRetrying = true;
+    song.loadRetries += 1;
+    gsap.delayedCall(SONG_LOAD_RETRY.delay, () => {
+      song.isRetrying = false;
+      song.sound.unload();
+      song.sound = this.#createSound(song.path, (sound) => this.#retryLoad(song, sound));
+      song.isLoaded = false;
+      if (this.current === song && this.#canPlay()) this.#startCurrent();
+      else this.#load(song);
+    });
   }
 
   #startCurrent(): Song {
