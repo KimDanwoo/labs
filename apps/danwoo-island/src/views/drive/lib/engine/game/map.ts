@@ -36,6 +36,7 @@ export class WorldMap {
   readonly #carElement: HTMLElement;
   readonly #card: { root: HTMLElement; icon: HTMLImageElement; title: HTMLElement; text: HTMLElement; go: HTMLElement };
   readonly #projected = new THREE.Vector3();
+  readonly #placements = new WeakMap<HTMLElement, string>();
   #pins: Pin[] = [];
   #selected: IslandPlace | null = null;
   #destination: IslandPlace | null = null;
@@ -178,11 +179,13 @@ export class WorldMap {
     const { width, height } = getGame().viewport;
     this.#projected.copy(world).project(camera);
     const isVisible = this.#projected.z < 1 && Math.abs(this.#projected.x) < 1.1 && Math.abs(this.#projected.y) < 1.1;
-    element.classList.toggle(HIDDEN_CLASS, !isVisible);
-    if (!isVisible) return;
     const x = (this.#projected.x * 0.5 + 0.5) * width;
     const y = (-this.#projected.y * 0.5 + 0.5) * height;
-    element.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+    const placement = isVisible ? `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)` : HIDDEN_CLASS;
+    if (this.#placements.get(element) === placement) return;
+    this.#placements.set(element, placement);
+    element.classList.toggle(HIDDEN_CLASS, !isVisible);
+    if (isVisible) element.style.transform = placement;
   }
 
   update(): void {

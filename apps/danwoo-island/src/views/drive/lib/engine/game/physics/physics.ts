@@ -133,6 +133,7 @@ export class Physics {
   readonly world: World;
   readonly #eventQueue: EventQueue;
   readonly #physicals: Physical[] = [];
+  readonly #submerged = new WeakMap<Physical, boolean>();
   readonly #physicalByBody = new Map<number, Physical>();
 
   constructor() {
@@ -227,9 +228,12 @@ export class Physics {
     this.#eventQueue.drainContactForceEvents((event) => this.#dispatchContact(event));
   }
 
-  #applyWaterDamping({ body, linearDamping, angularDamping }: Physical, surfaceElevation: number): void {
-    const waterDepth = Math.max(-body.translation().y, surfaceElevation);
-    const isSubmerged = waterDepth > 0;
+  #applyWaterDamping(physical: Physical, surfaceElevation: number): void {
+    const { body, linearDamping, angularDamping } = physical;
+    if (!body.isDynamic() || !body.isEnabled() || body.isSleeping()) return;
+    const isSubmerged = Math.max(-body.translation().y, surfaceElevation) > 0;
+    if (this.#submerged.get(physical) === isSubmerged) return;
+    this.#submerged.set(physical, isSubmerged);
     body.setLinearDamping(isSubmerged ? SUBMERGED_DAMPING : linearDamping);
     body.setAngularDamping(isSubmerged ? SUBMERGED_DAMPING : angularDamping);
   }

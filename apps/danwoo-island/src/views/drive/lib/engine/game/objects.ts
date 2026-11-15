@@ -269,6 +269,8 @@ export class Objects {
       const { physical, visual } = object;
       if (!physical) continue;
       const { body } = physical;
+      const isResting = body.isSleeping() || !body.isEnabled();
+      if (isResting && !object.needsUpdate) continue;
       const position = body.translation();
 
       if (visual && (object.needsUpdate || (!body.isSleeping() && body.isEnabled()))) {

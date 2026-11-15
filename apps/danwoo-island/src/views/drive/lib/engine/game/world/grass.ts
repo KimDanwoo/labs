@@ -21,9 +21,10 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
+import { QUALITY } from '../quality';
 
 const GRASS_CLEARINGS = [{ x: 58.4, z: 32.4, radius: 2.4 }] as const;
-const SUBDIVISIONS = 280;
+const SUBDIVISIONS_BY_QUALITY = { [QUALITY.high]: 280, [QUALITY.low]: 200 } as const;
 const SURFACE_IDEAL = 2000;
 const BLADE = { width: 0.17, height: 0.46, heightRandomness: 0.55, lean: 1.4 } as const;
 const SHADE = { base: 0.7, tip: 1.22 } as const;
@@ -39,15 +40,15 @@ function surfaceOverflow(size: number): number {
   return Math.max(0, size * size - SURFACE_IDEAL) / SURFACE_IDEAL;
 }
 
-function bladeGeometry(size: number, fragmentSize: number): THREE.BufferGeometry {
-  const count = SUBDIVISIONS * SUBDIVISIONS;
+function bladeGeometry(size: number, fragmentSize: number, subdivisions: number): THREE.BufferGeometry {
+  const count = subdivisions * subdivisions;
   const position = new Float32Array(count * 3 * 2);
   const heightRandomness = new Float32Array(count * 3);
-  for (let x = 0; x < SUBDIVISIONS; x += 1) {
-    const fragmentX = (x / SUBDIVISIONS - 0.5) * size + fragmentSize * 0.5;
-    for (let z = 0; z < SUBDIVISIONS; z += 1) {
-      const fragmentZ = (z / SUBDIVISIONS - 0.5) * size + fragmentSize * 0.5;
-      const blade = x * SUBDIVISIONS + z;
+  for (let x = 0; x < subdivisions; x += 1) {
+    const fragmentX = (x / subdivisions - 0.5) * size + fragmentSize * 0.5;
+    for (let z = 0; z < subdivisions; z += 1) {
+      const fragmentZ = (z / subdivisions - 0.5) * size + fragmentSize * 0.5;
+      const blade = x * subdivisions + z;
       const positionX = fragmentX + (Math.random() - 0.5) * fragmentSize;
       const positionZ = fragmentZ + (Math.random() - 0.5) * fragmentSize;
       position.set([positionX, positionZ, positionX, positionZ, positionX, positionZ], blade * 6);
@@ -66,35 +67,46 @@ export class Grass {
   readonly #size: THREE.UniformNode<'float', number>;
   readonly #bladeWidth: THREE.UniformNode<'float', number>;
   readonly #bladeHeight: THREE.UniformNode<'float', number>;
-  readonly #fragmentSize: number;
+  #subdivisions: number;
+  #fragmentSize: number;
   readonly #mesh: THREE.Mesh;
 
   constructor() {
     const game = getGame();
     const size = game.view.optimalArea.radius * 2;
     const overflow = surfaceOverflow(size);
-    this.#fragmentSize = size / SUBDIVISIONS;
+    this.#subdivisions = SUBDIVISIONS_BY_QUALITY[game.quality.level];
+    this.#fragmentSize = size / this.#subdivisions;
     this.#size = uniform(size);
-    this.#bladeWidth = uniform(BLADE.width * (1 + overflow * OVERFLOW_GROWTH.initial));
+    this.#bladeWidth = uniform(this.#widthScale() * BLADE.width * (1 + overflow * OVERFLOW_GROWTH.initial));
     this.#bladeHeight = uniform(BLADE.height * (1 + overflow * OVERFLOW_GROWTH.initial));
 
-    this.#mesh = new THREE.Mesh(bladeGeometry(size, this.#fragmentSize), this.#material());
+    this.#mesh = new THREE.Mesh(bladeGeometry(size, this.#fragmentSize, this.#subdivisions), this.#material());
     this.#mesh.frustumCulled = false;
     this.#mesh.receiveShadow = true;
     game.scene.add(this.#mesh);
 
     game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
     game.viewport.events.on('throttleChange', () => this.#resize(), THROTTLE_ORDER);
+    game.quality.events.on('change', (level) => {
+      this.#subdivisions = SUBDIVISIONS_BY_QUALITY[level];
+      this.#fragmentSize = this.#size.value / this.#subdivisions;
+      this.#resize();
+    });
+  }
+
+  #widthScale(): number {
+    return SUBDIVISIONS_BY_QUALITY[QUALITY.high] / this.#subdivisions;
   }
 
   #resize(): void {
     const size = getGame().view.optimalArea.radius * 2;
     const overflow = surfaceOverflow(size);
     this.#size.value = size;
-    this.#bladeWidth.value = BLADE.width * (1 + overflow * OVERFLOW_GROWTH.resized);
+    this.#bladeWidth.value = this.#widthScale() * BLADE.width * (1 + overflow * OVERFLOW_GROWTH.resized);
     this.#bladeHeight.value = BLADE.height * (1 + overflow * OVERFLOW_GROWTH.resized);
     this.#mesh.geometry.dispose();
-    this.#mesh.geometry = bladeGeometry(size, this.#fragmentSize);
+    this.#mesh.geometry = bladeGeometry(size, this.#fragmentSize, this.#subdivisions);
   }
 
   #material(): MeshDefaultMaterial {
