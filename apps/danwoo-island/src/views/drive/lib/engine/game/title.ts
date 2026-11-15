@@ -12,6 +12,7 @@ const CAR_POSITION = 10;
 const TREE_INTERVAL = 18;
 const GLYPH_SIZE = 4;
 const TITLE_PREFIX = 'Danwoo Island ';
+const NON_BREAKING_SPACE = '\u00a0';
 const TICK_ORDER = 14;
 
 function glyphsAt(offset: number): Glyph[] {
@@ -35,7 +36,7 @@ function separateOverlaps(glyphs: Glyph[]): void {
 }
 
 function render(glyphs: Glyph[]): string {
-  const cells: string[] = Array.from({ length: LINE_LENGTH }, () => ' ');
+  const cells: string[] = Array.from({ length: LINE_LENGTH }, () => NON_BREAKING_SPACE);
   for (const [index, glyph] of glyphs.entries()) {
     cells.splice(glyph.position, glyph.size, glyph.character);
     for (const next of glyphs.slice(index + 1)) next.position -= glyph.size - 1;
