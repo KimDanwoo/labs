@@ -10,6 +10,7 @@ export interface Respawn {
 
 const SPAWN_HEIGHT = 4;
 const RESPAWN_PREFIX = /^respawn(.+)$/i;
+const EXTRA_RESPAWNS = [{ name: 'beachStart', x: 54, z: 42.3, rotation: -0.23 }] as const;
 
 const lowerFirst = (value: string): string => value.charAt(0).toLowerCase() + value.slice(1);
 
@@ -28,6 +29,9 @@ export class Respawns {
         position: new THREE.Vector3(child.position.x, SPAWN_HEIGHT, child.position.z),
         rotation: child.rotation.y,
       });
+    }
+    for (const { name, x, z, rotation } of EXTRA_RESPAWNS) {
+      this.#items.set(name, { name, position: new THREE.Vector3(x, SPAWN_HEIGHT, z), rotation });
     }
   }
 

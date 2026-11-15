@@ -12,7 +12,7 @@ interface WorldConfig {
 export const WORLD_CONFIG: Readonly<WorldConfig> = Object.freeze({
   compressedAssets: true,
   music: true,
-  playerSpawn: 'landing',
+  playerSpawn: 'beachStart',
   loadingStyle: 'tide',
   dayCycleProgress: null,
   yearCycleProgress: null,
