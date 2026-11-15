@@ -29,6 +29,7 @@ const CASES = [
   { width: 721, height: 390, insets: INSETS.short },
   { width: 740, height: 390, insets: INSETS.short },
   { width: 844, height: 390, insets: INSETS.short },
+  { width: 721, height: 241, insets: INSETS.short },
   { width: 1440, height: 900, insets: INSETS.wide },
 ] as const;
 

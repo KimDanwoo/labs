@@ -42,7 +42,8 @@ interface CameraBasis {
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const FULL_WINDOW: NdcWindow = { low: -1, high: 1 };
 const MIN_RADIUS = 50;
-const CENTERING_STEPS = 6;
+const MAX_CENTERING_STEPS = 40;
+const SETTLED_SHIFT = 0.01;
 
 function ndcWindow(size: number, startInset: number, endInset: number): NdcWindow {
   const low = -1 + (2 * startInset) / size;
@@ -102,14 +103,16 @@ export function frameOverview({ points, phi, theta, fov, width, height, insets }
     .setFromPoints([...points])
     .getCenter(new THREE.Vector3())
     .setY(0);
-  for (let step = 0; step < CENTERING_STEPS; step += 1) {
+  for (let step = 0; step < MAX_CENTERING_STEPS; step += 1) {
     const local = toCamera(points, center, basis);
     const radius = fittingRadius(local, windows, tanX, tanY);
     const ndcX = middle(local.map(({ x, depth }) => x / ((radius + depth) * tanX)));
     const ndcY = middle(local.map(({ y, depth }) => y / ((radius + depth) * tanY)));
-    center
+    const shift = new THREE.Vector3()
       .addScaledVector(basis.right, (ndcX - windowMiddle(windows.x)) * radius * tanX)
       .addScaledVector(ground, ((ndcY - windowMiddle(windows.y)) * radius * tanY) / groundLift);
+    center.add(shift);
+    if (shift.length() < SETTLED_SHIFT) break;
   }
   return { center, radius: fittingRadius(toCamera(points, center, basis), windows, tanX, tanY) };
 }
