@@ -118,9 +118,9 @@ export class RayCursor {
     this.#aimRaycaster();
     const nearest = this.#nearestHit(candidates);
     for (const intersect of candidates) {
-      const isIntersecting = intersect === nearest;
-      if (isIntersecting !== intersect.isIntersecting) this.#setIntersecting(intersect, isIntersecting);
+      if (intersect !== nearest && intersect.isIntersecting) this.#setIntersecting(intersect, false);
     }
+    if (nearest && !nearest.isIntersecting) this.#setIntersecting(nearest, true);
 
     const isAnyIntersecting = nearest !== null;
     if (isAnyIntersecting !== this.#isAnyIntersecting) {
