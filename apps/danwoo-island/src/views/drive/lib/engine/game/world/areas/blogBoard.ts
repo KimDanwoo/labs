@@ -80,6 +80,7 @@ export class BlogBoard {
   readonly #texture: THREE.CanvasTexture;
   readonly #listElement: HTMLElement;
   #state: BoardState = { status: 'loading' };
+  #pending: Promise<void> | null = null;
 
   constructor({
     position,
@@ -114,7 +115,14 @@ export class BlogBoard {
     return this.#state.status === 'ready';
   }
 
-  async load(): Promise<void> {
+  load(): Promise<void> {
+    this.#pending ??= this.#fetchPosts().finally(() => {
+      this.#pending = null;
+    });
+    return this.#pending;
+  }
+
+  async #fetchPosts(): Promise<void> {
     this.#setState({ status: 'loading' });
     try {
       const response = await fetch(LATEST_POSTS_ENDPOINT);

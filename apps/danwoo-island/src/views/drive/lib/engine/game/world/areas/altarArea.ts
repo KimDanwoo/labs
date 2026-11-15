@@ -16,7 +16,7 @@ const COLUMN = {
 } as const;
 const SPRAY = { count: 150, size: 0.22, maxRadius: 5, duration: 2.2 } as const;
 const POOL = { radius: 2.5, triggerRadius: 2 } as const;
-const LAUNCH = { upward: 9, forward: 4, cooldown: 1.5 } as const;
+const LAUNCH = { upward: 9, forward: 4, cooldown: 1.5, maxHeight: 2.5 } as const;
 const WATER = { deep: '#0f6f8c', sea: '#2fc6d4', foam: '#f4fbff', glow: 1.6 } as const;
 
 function sprayData(): { positions: Float32Array; scales: Float32Array; randoms: Float32Array } {
@@ -170,7 +170,8 @@ export class AltarArea extends Area {
     const zone = this.game.zones.create('cylinder', this.#position.clone(), POOL.triggerRadius);
     zone.events.on('enter', () => {
       const now = this.game.ticker.elapsed;
-      if (now - this.#lastLaunch < LAUNCH.cooldown) return;
+      const isAirborne = this.game.player.position.y - this.#position.y > LAUNCH.maxHeight;
+      if (isAirborne || now - this.#lastLaunch < LAUNCH.cooldown) return;
       this.#lastLaunch = now;
       this.game.physicalVehicle.launch({ upward: LAUNCH.upward, forward: LAUNCH.forward });
       this.#surge();

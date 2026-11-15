@@ -2,30 +2,70 @@ import { BLOG_ORIGIN, isBlogAssetUrl, isBlogPostUrl, LATEST_POSTS_LIMIT, type La
 
 const RSS_URL = `${BLOG_ORIGIN}/rss.xml`;
 const REVALIDATE_SECONDS = 3600;
-const ITEM = /<item>([\s\S]*?)<\/item>/g;
-const CDATA = /^<!\[CDATA\[([\s\S]*)\]\]>$/;
-const MEDIA_URL = /<media:content[^>]*\surl="([^"]+)"/;
-const ENTITIES: Readonly<Record<string, string>> = {
-  '&amp;': '&',
-  '&lt;': '<',
-  '&gt;': '>',
-  '&quot;': '"',
-  '&#39;': "'",
-  '&apos;': "'",
-};
+const MAX_RSS_LENGTH = 2_000_000;
+const FEED_ROOT = /<rss[\s>]/;
+const CDATA_OPEN = '<![CDATA[';
+const CDATA_CLOSE = ']]>';
+const MEDIA_TAG = '<media:content';
+const URL_ATTRIBUTE = /\surl="([^"]*)"/;
+const NAMED_ENTITIES: Readonly<Record<string, string>> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+const ENTITY = /&(#x[0-9a-f]+|#[0-9]+|[a-z]+);/gi;
+const HEX_RADIX = 16;
+const DECIMAL_RADIX = 10;
+const MAX_CODE_POINT = 0x10ffff;
+const HEX_ENTITY = /^#x/i;
+
+function codePoint(digits: string, radix: number): number | null {
+  const value = Number.parseInt(digits, radix);
+  return Number.isInteger(value) && value >= 0 && value <= MAX_CODE_POINT ? value : null;
+}
+
+function numericEntity(name: string): number | null {
+  if (HEX_ENTITY.test(name)) return codePoint(name.slice(2), HEX_RADIX);
+  if (name.startsWith('#')) return codePoint(name.slice(1), DECIMAL_RADIX);
+  return null;
+}
+
+function decodeEntity(entity: string, name: string): string {
+  const numeric = numericEntity(name);
+  if (numeric !== null) return String.fromCodePoint(numeric);
+  return NAMED_ENTITIES[name.toLowerCase()] ?? entity;
+}
 
 function decode(text: string): string {
-  const raw = CDATA.exec(text.trim())?.[1] ?? text.trim();
-  return raw.replace(/&(?:amp|lt|gt|quot|apos|#39);/g, (entity) => ENTITIES[entity] ?? entity);
+  const trimmed = text.trim();
+  if (trimmed.startsWith(CDATA_OPEN) && trimmed.endsWith(CDATA_CLOSE)) {
+    return trimmed.slice(CDATA_OPEN.length, -CDATA_CLOSE.length);
+  }
+  return trimmed.replace(ENTITY, decodeEntity);
+}
+
+function between(source: string, open: string, close: string, from = 0): { text: string; end: number } | null {
+  const start = source.indexOf(open, from);
+  if (start === -1) return null;
+  const end = source.indexOf(close, start + open.length);
+  if (end === -1) return null;
+  return { text: source.slice(start + open.length, end), end: end + close.length };
+}
+
+function items(rss: string): string[] {
+  const found: string[] = [];
+  let cursor = 0;
+  for (let item = between(rss, '<item>', '</item>'); item; item = between(rss, '<item>', '</item>', cursor)) {
+    found.push(item.text);
+    cursor = item.end;
+  }
+  return found;
 }
 
 function tag(item: string, name: string): string | null {
-  const match = new RegExp(`<${name}>([\\s\\S]*?)</${name}>`).exec(item);
-  return match?.[1] === undefined ? null : decode(match[1]);
+  const content = between(item, `<${name}>`, `</${name}>`);
+  return content === null ? null : decode(content.text);
 }
 
 function mediaImage(item: string): string | null {
-  const raw = MEDIA_URL.exec(item)?.[1];
+  const media = between(item, MEDIA_TAG, '>');
+  const raw = media === null ? undefined : URL_ATTRIBUTE.exec(media.text)?.[1];
   if (raw === undefined) return null;
   const url = decode(raw);
   return isBlogAssetUrl(url) ? url : null;
@@ -48,8 +88,9 @@ function toLatestPost(item: string): LatestPost | null {
 }
 
 export function parseLatestPosts(rss: string, limit = LATEST_POSTS_LIMIT): LatestPost[] {
-  return [...rss.matchAll(ITEM)]
-    .map(([, item]) => (item === undefined ? null : toLatestPost(item)))
+  if (rss.length > MAX_RSS_LENGTH || !FEED_ROOT.test(rss)) throw new Error('Blog RSS is not a feed');
+  return items(rss)
+    .map(toLatestPost)
     .filter((post): post is LatestPost => post !== null)
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
     .slice(0, limit);
