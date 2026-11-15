@@ -1960,13 +1960,6 @@ html:not(.is-mode-touch) .menu .button:not(.is-disabled):hover {
   background: var(--glass-raised);
   border-radius: 6px;
 }
-.menu .paint-options select,
-.menu .paint-options option {
-  color: var(--glass-text);
-  background: #1a1d24;
-  border: 1px solid var(--glass-border);
-  border-radius: 10px;
-}
 .menu .inner {
   width: min(480px, 100% - 32px);
   height: min(640px, 100% - 64px);

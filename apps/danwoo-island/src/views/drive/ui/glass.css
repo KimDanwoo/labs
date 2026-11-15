@@ -597,10 +597,6 @@ html.is-mode-touch .modals .map .map-hint-keys {
 }
 
 @media only screen and (width<=720px), only screen and (height<=500px) {
-  body:has(.modals .map.is-displayed) .island-identity {
-    visibility: hidden;
-  }
-
   .modals .map .map-hint {
     display: none;
   }
@@ -743,7 +739,7 @@ html:is(.input-filter-menu, .input-filter-modal, .input-filter-intro, .input-fil
   overflow-wrap: break-word;
 }
 
-@media only screen and (width<=720px) {
+@media only screen and (width<=720px), only screen and (height<=500px) {
   body:has(.modals .modal.is-displayed) .island-identity {
     visibility: hidden;
   }

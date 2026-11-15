@@ -42,6 +42,7 @@ interface CameraBasis {
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const FULL_WINDOW: NdcWindow = { low: -1, high: 1 };
 const MIN_RADIUS = 50;
+const CENTERING_STEPS = 6;
 
 function ndcWindow(size: number, startInset: number, endInset: number): NdcWindow {
   const low = -1 + (2 * startInset) / size;
@@ -85,32 +86,30 @@ function fittingRadius(
   return Math.max(MIN_RADIUS, ...radii);
 }
 
+function windowMiddle({ low, high }: NdcWindow): number {
+  return (low + high) / 2;
+}
+
 export function frameOverview({ points, phi, theta, fov, width, height, insets }: OverviewFrameInput): OverviewFrame {
   const basis = cameraBasis(phi, theta);
   const ground = basis.up.clone().setY(0).normalize();
+  const groundLift = ground.dot(basis.up);
   const tanY = Math.tan(THREE.MathUtils.degToRad(fov / 2));
   const tanX = tanY * (width / height);
   const windows = { x: ndcWindow(width, insets.left, insets.right), y: ndcWindow(height, insets.bottom, insets.top) };
 
-  const origin = new THREE.Box3()
+  const center = new THREE.Box3()
     .setFromPoints([...points])
     .getCenter(new THREE.Vector3())
     .setY(0);
-  const centered = toCamera(points, origin, basis);
-  const xMid = middle(centered.map(({ x }) => x));
-  const yMid = middle(centered.map(({ y }) => y));
-  const roughRadius = fittingRadius(
-    centered.map(({ x, y, depth }) => ({ x: x - xMid, y: y - yMid, depth })),
-    windows,
-    tanX,
-    tanY,
-  );
-
-  const shiftX = xMid - ((windows.x.low + windows.x.high) / 2) * roughRadius * tanX;
-  const shiftY = yMid - ((windows.y.low + windows.y.high) / 2) * roughRadius * tanY;
-  const center = origin
-    .clone()
-    .addScaledVector(basis.right, shiftX)
-    .addScaledVector(ground, shiftY / ground.dot(basis.up));
+  for (let step = 0; step < CENTERING_STEPS; step += 1) {
+    const local = toCamera(points, center, basis);
+    const radius = fittingRadius(local, windows, tanX, tanY);
+    const ndcX = middle(local.map(({ x, depth }) => x / ((radius + depth) * tanX)));
+    const ndcY = middle(local.map(({ y, depth }) => y / ((radius + depth) * tanY)));
+    center
+      .addScaledVector(basis.right, (ndcX - windowMiddle(windows.x)) * radius * tanX)
+      .addScaledVector(ground, ((ndcY - windowMiddle(windows.y)) * radius * tanY) / groundLift);
+  }
   return { center, radius: fittingRadius(toCamera(points, center, basis), windows, tanX, tanY) };
 }
