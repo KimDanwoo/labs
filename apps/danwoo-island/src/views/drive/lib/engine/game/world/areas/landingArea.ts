@@ -1,11 +1,10 @@
 import gsap from 'gsap';
-import { color, float, Fn, instancedArray, step, texture, uniform, uv } from 'three/tsl';
+import { float, Fn, instancedArray, step, uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { INPUT_MODE, type InputMode } from '../../inputs/inputs';
-import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
 import { objectOf } from '../../objects';
-import { rebuildKiosk } from '../islandStructures';
+import { rebuildKiosk, replaceBonfireBase } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
 import { replaceLandingName } from './landingName';
@@ -45,6 +44,7 @@ export class LandingArea extends Area {
   }
 
   override setObjects(): void {
+    replaceBonfireBase(this.model);
     rebuildVillageProps(this.model);
     replaceLandingName(this.model);
     rebuildKiosk(this.model, this.game.texture('islandMapTexture'));
@@ -134,28 +134,9 @@ export class LandingArea extends Area {
     return embers;
   }
 
-  #paintAshes(): void {
-    const { noises } = this.game;
-    const alphaNode = Fn(() => {
-      const baseUv = uv(1);
-      const voronoi = texture(noises.voronoi, baseUv).g;
-      voronoi.subAssign(baseUv.sub(0.5).length().remap(0, 0.5, 0.3, 0));
-      return voronoi;
-    })();
-    const ashes = this.requireReference('bonfireHashes');
-    if (!(ashes instanceof THREE.Mesh)) return;
-    ashes.material = new MeshDefaultMaterial({
-      colorNode: color(0x6f6a87).rgb,
-      alphaNode,
-      hasWater: false,
-      hasLightBounce: false,
-    });
-  }
-
   #createBonfire(): void {
     const position = this.requireReference('bonfireHashes').position;
     const embers = this.#createEmbers(position);
-    this.#paintAshes();
     const burn = this.requireReference('bonfireBurn');
     burn.visible = false;
 

@@ -286,7 +286,8 @@ function removeVisualMeshes(container: THREE.Object3D): void {
   }
 }
 
-const NEON_GAIN = 2.2;
+const NEON_GAIN = 1.6;
+const BOWLING_SIGN = { scale: 0.65, poleBottom: 5.3 } as const;
 
 function neonMaterial(neonTexture: THREE.Texture): THREE.MeshBasicNodeMaterial {
   neonTexture.colorSpace = THREE.SRGBColorSpace;
@@ -311,6 +312,8 @@ export function rebuildBowlingSign(model: THREE.Object3D, neonTexture: THREE.Tex
   neon.name = 'neon';
   neon.position.set(0.05, -0.04, 0.0);
   group.add(neon);
+  group.scale.setScalar(BOWLING_SIGN.scale);
+  group.position.y = -BOWLING_SIGN.poleBottom * (1 - BOWLING_SIGN.scale);
   sign.add(group);
 }
 
@@ -340,44 +343,33 @@ function timberPile(parts: Parts, { size, matrix }: Frame): void {
   }
 }
 
-function hangingLantern(parts: Parts, { matrix, z, y }: { matrix: THREE.Matrix4; z: number; y: number }): void {
-  parts.box('woodDark', [0.02, 0.1, 0.02], { position: [0, y + 0.17, z], matrix });
-  for (const offsetY of [0.13, -0.13])
-    parts.box('woodDark', [0.3, 0.04, 0.3], { position: [0, y + offsetY, z], matrix });
-  parts.box('lantern', [0.24, 0.22, 0.24], { position: [0, y, z], matrix });
-}
+const GENERATOR_TORCH = { size: new THREE.Vector3(0.62, 3.5, 0.62) } as const;
 
 function rebuildGenerator(generator: THREE.Object3D): void {
   removeVisualMeshes(generator);
-  const cuboids = generator.children
-    .filter((child) => CUBOID.test(child.name))
-    .map(cuboidFrame)
-    .sort((a, b) => b.size.y - a.size.y);
-  const pole = cuboids[0];
-  const pile = cuboids.find((frame) => frame !== pole && frame.size.x > 1);
-  const crossbar = cuboids.find((frame) => frame !== pole && frame !== pile);
-  if (!pole || !pile || !crossbar) throw new Error('발전기 충돌체 구성이 예상과 달라요.');
+  const cuboids = generator.children.filter((child) => CUBOID.test(child.name)).sort((a, b) => b.scale.y - a.scale.y);
+  const [poleCuboid] = cuboids;
+  const pileCuboid = cuboids.find((cuboid) => cuboid !== poleCuboid && cuboid.scale.x > 1);
+  if (!poleCuboid || !pileCuboid) throw new Error('발전기 충돌체 구성이 예상과 달라요.');
+  for (const extra of cuboids.filter((cuboid) => cuboid !== poleCuboid && cuboid !== pileCuboid))
+    extra.removeFromParent();
+  const pole = cuboidFrame(poleCuboid);
   const parts = createParts();
-  timberPile(parts, pile);
-  parts.box('woodDark', [pole.size.x * 0.9, pole.size.y, pole.size.z * 0.9], { matrix: pole.matrix });
-  parts.box('wood', [crossbar.size.x * 0.9, crossbar.size.y * 0.8, crossbar.size.z], { matrix: crossbar.matrix });
-  for (const z of [-crossbar.size.z * 0.42, crossbar.size.z * 0.42]) {
-    hangingLantern(parts, { matrix: crossbar.matrix, z, y: -0.45 });
-  }
-  generator.add(parts.build());
+  timberPile(parts, cuboidFrame(pileCuboid));
+  const bottom = new THREE.Vector3(0, -pole.size.y / 2, 0).applyMatrix4(pole.matrix);
+  const torchHeight = Math.min(GENERATOR_TORCH.size.y, pole.size.y);
+  const torchMatrix = new THREE.Matrix4().makeTranslation(bottom.x, bottom.y + torchHeight / 2, bottom.z);
+  const torchSize = GENERATOR_TORCH.size.clone().setY(torchHeight);
+  generator.add(parts.build(), islandModelMesh('lampPost', torchMatrix, torchSize));
 }
 
-function stackedTiles(): THREE.Group {
-  const parts = createParts();
-  parts.box('stoneDark', [0.85, 0.1, 0.85], { position: [0, -0.46, 0] });
-  for (let index = 0; index < 6; index += 1) {
-    parts.add('terracotta', new THREE.CylinderGeometry(0.3, 0.3, 0.62, 8, 1, false, 0, Math.PI), {
-      position: [0, -0.38 + index * 0.15, 0],
-      rotation: [0, index % 2 === 0 ? 0 : Math.PI / 2, Math.PI / 2],
-      scale: [1, 1, 0.55],
-    });
-  }
-  return parts.build();
+const CRATE_STACK = {
+  size: new THREE.Vector3(0.85, 0.85, 1.0),
+  upright: new THREE.Matrix4().makeRotationX(-Math.PI / 2),
+} as const;
+
+function coconutCrateStack(): THREE.Mesh {
+  return islandModelMesh('coconutCrate', CRATE_STACK.upright, CRATE_STACK.size);
 }
 
 export function rebuildBuildingSite(model: THREE.Object3D): void {
@@ -385,7 +377,7 @@ export function rebuildBuildingSite(model: THREE.Object3D): void {
     rebuildGenerator(generator);
   }
   for (const cone of model.children.filter((child) => /^refObjectsPhysicalDynamic/.test(child.name))) {
-    replaceVisual(model, cone.name, stackedTiles);
+    replaceVisual(model, cone.name, coconutCrateStack);
   }
 }
 
@@ -407,4 +399,26 @@ export function replaceWithTotem(pillar: THREE.Object3D): void {
   const totem = islandModelMesh('tikiTotem', lift, TOTEM.size);
   pillar.geometry = totem.geometry;
   pillar.material = totem.material;
+}
+
+const BONFIRE = {
+  base: 'base015',
+  ashes: 'refBonfireHashes',
+  size: new THREE.Vector3(2.2, 0.9, 1.6),
+  sink: 0.15,
+} as const;
+
+export function replaceBonfireBase(model: THREE.Object3D): void {
+  const base = findChild(model, BONFIRE.base);
+  const ashes = findChild(model, BONFIRE.ashes);
+  base.removeFromParent();
+  const marker = new THREE.Object3D();
+  marker.name = ashes.name;
+  marker.position.copy(ashes.position);
+  ashes.parent?.add(marker);
+  ashes.removeFromParent();
+  ashes.updateMatrix();
+  const { x, y, z } = ashes.position;
+  const matrix = new THREE.Matrix4().makeTranslation(x, y + BONFIRE.size.y / 2 - BONFIRE.sink, z);
+  model.add(islandModelMesh('firePit', matrix, BONFIRE.size));
 }

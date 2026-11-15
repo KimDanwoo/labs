@@ -1,4 +1,4 @@
-import { color, float, Fn, PI, positionWorld, texture, uniform, uv, vec3 } from 'three/tsl';
+import { color, dot, float, Fn, mix, PI, positionWorld, smoothstep, texture, uniform, uv, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
@@ -8,6 +8,8 @@ import { paintSteppingStones } from './islandReskins';
 import { rebuildBridge } from './islandStructures';
 
 const BRIDGE_PATTERN = /^bridgePhysicalFixed/;
+const BASALT_PATTERN = /^basaltRocks/;
+const BASALT_TONE = { dark: '#5f554d', light: '#a8998a', luminance: [0.3, 0.59, 0.11] } as const;
 const GLITTER_SPEED = { time: 0.004, view: 0.004 } as const;
 
 export class Scenery {
@@ -21,6 +23,7 @@ export class Scenery {
       rebuildBridge(bridge);
     }
     paintSteppingStones(scene);
+    this.#paintBasalt(scene);
 
     for (const child of [...scene.children]) {
       const prevent: unknown = child.userData.prevent;
@@ -41,6 +44,19 @@ export class Scenery {
     }
     this.#paintRoad();
     game.ticker.events.on('tick', () => this.update());
+  }
+
+  #paintBasalt(scene: THREE.Object3D): void {
+    const palette = getGame().texture('paletteTexture');
+    const colorNode = Fn(() => {
+      const luminance = dot(texture(palette, uv()).rgb, vec3(...BASALT_TONE.luminance));
+      return mix(color(BASALT_TONE.dark), color(BASALT_TONE.light), smoothstep(0.25, 0.75, luminance));
+    })();
+    const material = new MeshDefaultMaterial({ colorNode });
+    material.userData.prevent = true;
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && BASALT_PATTERN.test(child.name)) child.material = material;
+    });
   }
 
   #paintRoad(): void {

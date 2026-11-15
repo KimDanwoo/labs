@@ -12,13 +12,10 @@ interface SteleFrame {
 
 const LABELS = new Map<string, string>([
   ['x', 'LAB'],
-  ['bluesky001', '✦'],
   ['youtube', 'MUSIC'],
   ['mail', '이력서'],
   ['twitch', '블로그'],
   ['gitHub', 'CODE'],
-  ['linkedIn', '⌘'],
-  ['discord', '∞'],
   ['onlyfans', '바람'],
 ]);
 const STELE = { maxThickness: 0.3, labelHeight: 0.58 } as const;
