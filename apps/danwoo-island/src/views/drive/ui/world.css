@@ -1793,127 +1793,104 @@ html.input-filter-cinematic .map-trigger .button-inner {
   inset: 0 0 0 3px;
 }
 .map {
-  aspect-ratio: 1;
+  --map-cream: #fbf3e4;
+  --map-sand: #efdcb8;
+  --map-sea: #2bb3c0;
+  --map-deep: #1f5f6e;
+  --map-ink: #23434a;
   -webkit-user-select: none;
   user-select: none;
-  background: radial-gradient(at 0 0, #251f2b, #1d1721);
-  width: 1024px;
-  max-width: 100vmin;
-  height: 1024px;
-  max-height: 100vmin;
+  width: fit-content;
+  max-width: 94vw;
   position: relative;
+  font-family: Nunito, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
 }
-@media only screen and (width<=1100px) {
-  .map {
-    width: 768px;
-    height: 768px;
-  }
+.map .map-card {
+  background: var(--map-cream);
+  border: 6px solid var(--map-sand);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px #0d2b3333;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 92vh;
+  padding: 16px 22px;
+  display: flex;
+  overflow: auto;
 }
-@media only screen and (width<=800px) {
-  .map {
-    width: 512px;
-    height: 512px;
-  }
+.map .map-header {
+  align-items: center;
+  gap: 10px;
+  display: flex;
+}
+.map .map-logo {
+  width: 40px;
+  height: 40px;
+}
+.map .map-title {
+  color: var(--map-deep);
+  letter-spacing: -0.02em;
+  font-size: 30px;
+  font-weight: 800;
+  margin: 0;
+}
+.map .map-badge {
+  color: #fff;
+  background: var(--map-sea);
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 14px;
+  font-weight: 800;
 }
 .map .close {
-  --hover-translate: 4px;
-  width: 50px;
+  cursor: pointer;
+  background: var(--map-sea);
+  border: 0;
+  border-radius: 50%;
+  flex: none;
+  width: 44px;
   height: 44px;
-  position: absolute;
-  bottom: 100%;
-  right: 10px;
+  margin-left: auto;
+  padding: 0;
+  transition: transform 0.2s;
 }
-@media only screen and (width<=520px) {
-  .map .close {
-    right: 0;
-  }
+html:not(.is-mode-touch) .map .close:hover {
+  transform: scale(1.08);
 }
-@media only screen and (width<=440px) {
-  .map .close {
-    width: 43px;
-    height: 40px;
-  }
-}
-@media only screen and (width<=360px) {
-  .map .close {
-    z-index: 1;
-    width: 44px;
-    top: 10px;
-    bottom: auto;
-    right: -1px;
-    transform: rotate(-90deg);
-  }
-}
-html:not(.is-mode-touch) .map .close:hover .button-inner {
-  transform: translateY(-4px);
-}
-html:not(.is-mode-touch) .map .close:hover .button-inner:after {
-  opacity: 0.8;
-}
-.map .close .button-inner {
+.map .close .button-inner,
+.map .close .icon-container {
+  place-items: center;
   width: 100%;
-  height: calc(100% + var(--hover-translate));
-  background: radial-gradient(at 100% 0, #c21515, #46123b);
-  transition: transform 0.15s;
-  position: absolute;
-  top: 0;
-  right: 0;
+  height: 100%;
+  display: grid;
 }
-.map .close .button-inner:after {
-  content: '';
-  opacity: 0.35;
-  border: 1px solid #fff;
-  border-bottom: none;
-  transition: opacity 0.15s;
-  display: block;
-  position: absolute;
-  inset: 3px 3px 0;
-}
-.map .close .button-inner .icon-container {
-  top: 3px;
-  left: 3px;
-  right: 3px;
-  bottom: var(--hover-translate);
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  position: absolute;
-}
-.map .close .button-inner .icon-container .icon.is-default {
+.map .close .icon.is-default {
   width: 18px;
   height: 18px;
 }
-.is-mode-gamepad.is-gamepad-xbox .map .close .button-inner .icon-container .icon.is-default {
+.map .close .icon.is-xbox {
+  color: #fff;
+  font-weight: 800;
   display: none;
 }
-.map .close .button-inner .icon-container .icon.is-xbox {
-  vertical-align: bottom;
-  border: 2px solid #fff;
-  border-radius: 15px;
-  justify-content: center;
-  align-items: center;
-  width: 30px;
-  height: 30px;
+.is-mode-gamepad.is-gamepad-xbox .map .close .icon.is-default {
   display: none;
 }
-.is-mode-gamepad.is-gamepad-xbox .map .close .button-inner .icon-container .icon.is-xbox {
+.is-mode-gamepad.is-gamepad-xbox .map .close .icon.is-xbox {
   display: block;
 }
-.map .map-container {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  overflow: hidden;
+.map .map-body {
+  grid-template-columns: auto 260px;
+  align-items: start;
+  gap: 18px;
+  display: grid;
 }
-.map .map-container:after {
-  content: '';
-  opacity: 0.35;
-  pointer-events: none;
-  border: 1px solid #fff;
-  position: absolute;
-  inset: 3px;
+.map .map-container {
+  aspect-ratio: 1;
+  background: #1c6f8a;
+  border-radius: 18px;
+  width: min(calc(94vw - 340px), calc(92vh - 170px), 900px);
+  position: relative;
+  overflow: hidden;
 }
 .map .texture {
   pointer-events: none;
@@ -1923,141 +1900,188 @@ html:not(.is-mode-touch) .map .close:hover .button-inner:after {
   transition: opacity 0.3s;
   display: block;
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
 }
 .map .texture.is-visible {
   opacity: 1;
 }
+.map .map-compass {
+  pointer-events: none;
+  z-index: 1001;
+  width: 54px;
+  height: 54px;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
 .map .player {
   pointer-events: none;
-  display: block;
+  z-index: 1002;
   position: absolute;
   top: 0;
   left: 0;
 }
-.map .player.is-bouncing:after {
-  animation: 1s 0.5s map-player-animation;
-}
-@keyframes map-player-animation {
-  0% {
-    transform: scale(1);
-  }
-  20% {
-    transform: scale(1.2);
-  }
-  40% {
-    transform: scale(1);
-  }
-  60% {
-    transform: scale(1.2);
-  }
-  80% {
-    transform: scale(1);
-  }
-}
 .map .player:after {
   content: '';
-  background: url(/world/ui/map/player.webp) 0 0 / cover;
-  width: 80px;
-  height: 80px;
+  filter: drop-shadow(0 2px 3px #0006);
+  background: url(/world/ui/map/icons/player.webp) center / contain no-repeat;
+  width: 46px;
+  height: 46px;
   position: absolute;
-  top: -40px;
-  left: -40px;
-}
-@media only screen and (width<=800px) {
-  .map .player:after {
-    width: 60px;
-    height: 60px;
-    top: -30px;
-    left: -30px;
-  }
-}
-@media only screen and (width<=440px) {
-  .map .player:after {
-    width: 40px;
-    height: 40px;
-    top: -20px;
-    left: -20px;
-  }
+  top: -23px;
+  left: -23px;
 }
 .map .location {
-  --size: 40px;
-  width: var(--size);
-  height: var(--size);
-  margin-top: calc(var(--size) / -2);
-  margin-left: calc(var(--size) / -2);
   cursor: pointer;
-  position: absolute;
-}
-html:not(.is-mode-touch) .map .location:hover .name,
-html.is-mode-touch .map .location .name {
-  transition-timing-function: cubic-bezier(0.49, 2.2, 0.53, 0.75);
-  transform: scale(1);
-}
-@media only screen and (width<=1100px) {
-  html:not(.is-mode-touch) .map .location:hover .name,
-  html.is-mode-touch .map .location .name {
-    transform: scale(0.8);
-  }
-}
-@media only screen and (width<=520px) {
-  html:not(.is-mode-touch) .map .location:hover .name,
-  html.is-mode-touch .map .location .name {
-    transform: scale(0.65);
-  }
-}
-.map .location .pin {
-  --size: 20px;
-  top: calc(50% - calc(var(--size) / 2));
-  left: calc(50% - calc(var(--size) / 2));
-  width: var(--size);
-  height: var(--size);
-  background: #fff;
-  border: 4px solid #251f2b;
-  position: absolute;
-  transform: rotate(45deg);
-  box-shadow: 0 0 4px #251f2b77;
-}
-@media only screen and (width<=520px) {
-  .map .location .pin {
-    --size: 12px;
-    border-width: 3px;
-  }
-}
-.map .location .name-container {
-  pointer-events: none;
-  justify-content: center;
-  width: 0;
+  font: inherit;
+  background: none;
+  border: 0;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
   display: flex;
   position: absolute;
-  bottom: calc(100% - 4px);
-  left: 50%;
+  transform: translate(-18px, -50%);
 }
-@media only screen and (width<=520px) {
-  .map .location .name-container {
-    bottom: calc(100% - 12px);
+.map .location .pin {
+  filter: drop-shadow(0 2px 3px #0005);
+  width: 36px;
+  height: 36px;
+  transition: transform 0.2s;
+}
+.map .location.is-label-left {
+  flex-direction: row-reverse;
+  transform: translate(calc(-100% + 18px), -50%);
+}
+.map .location .name {
+  font-family: inherit;
+  color: var(--map-ink);
+  white-space: nowrap;
+  background: #fff;
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 13px;
+  font-weight: 700;
+  transition:
+    background 0.2s,
+    color 0.2s;
+  box-shadow: 0 2px 6px #0003;
+}
+html:not(.is-mode-touch) .map .location:hover .pin,
+.map .location:focus-visible .pin {
+  transform: scale(1.12);
+}
+html:not(.is-mode-touch) .map .location:hover .name,
+.map .location:focus-visible .name {
+  color: #fff;
+  background: var(--map-sea);
+}
+.map .map-places-title {
+  color: var(--map-deep);
+  margin: 4px 0 12px;
+  font-size: 22px;
+  font-weight: 800;
+}
+.map .map-places-list {
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+.map .map-place {
+  color: var(--map-ink);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  background: #fff;
+  border: 0;
+  border-radius: 999px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 5px 16px 5px 6px;
+  font-size: 16px;
+  font-weight: 700;
+  transition:
+    background 0.2s,
+    color 0.2s;
+  display: flex;
+  box-shadow: 0 1px 0 var(--map-sand);
+}
+.map .map-place-icon {
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+html:not(.is-mode-touch) .map .map-place:hover,
+.map .map-place:focus-visible {
+  color: #fff;
+  background: var(--map-sea);
+}
+.map .map-hint {
+  color: #5b6b6b;
+  text-align: center;
+  background: #f3e6cc;
+  border-radius: 999px;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+@media only screen and (width<=900px) {
+  .map .map-body {
+    grid-template-columns: 1fr;
+  }
+  .map .map-container {
+    justify-self: center;
+    width: min(calc(94vw - 48px), 62vh);
+  }
+  .map .map-places-list {
+    flex-flow: wrap;
+  }
+  .map .map-places-list li {
+    flex: 1 1 140px;
   }
 }
-.map .location .name-container .name {
-  text-transform: uppercase;
-  color: #fff;
-  letter-spacing: 1px;
-  text-align: center;
-  white-space: nowrap;
-  transform-origin: 50% 80%;
-  background: #000;
-  padding: 2px 6px;
-  transition: transform 0.3s cubic-bezier(0.65, -1, 0.45, 1);
-  transform: scale(0);
-  box-shadow: 0 0 4px #0007;
-}
-.map .location .name-container .name br {
-  display: none;
-}
 @media only screen and (width<=520px) {
-  .map .location .name-container .name br {
-    display: initial;
+  .map .map-card {
+    border-width: 4px;
+    border-radius: 20px;
+    gap: 10px;
+    padding: 12px;
+  }
+  .map .map-title {
+    font-size: 22px;
+  }
+  .map .map-logo {
+    width: 32px;
+    height: 32px;
+  }
+  .map .location .pin {
+    width: 26px;
+    height: 26px;
+  }
+  .map .location .name {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+  .map .map-compass {
+    width: 38px;
+    height: 38px;
+  }
+  .map .player:after {
+    width: 34px;
+    height: 34px;
+    top: -17px;
+    left: -17px;
+  }
+  .map .map-place {
+    font-size: 14px;
+  }
+  .map .map-hint {
+    display: none;
   }
 }
 :root {

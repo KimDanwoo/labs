@@ -5,9 +5,23 @@ import { createElement } from './utilities/createElement';
 import { clamp } from './utilities/maths';
 import { requireElement } from './utilities/requireElement';
 
+type MapIcon =
+  | 'projects'
+  | 'lab'
+  | 'career'
+  | 'social'
+  | 'circuit'
+  | 'bowling'
+  | 'cookie'
+  | 'surf'
+  | 'construction'
+  | 'portal'
+  | 'start';
+
 interface MapLocation {
   name: string;
   respawnName: string;
+  icon: MapIcon;
   offset: { x: number; y: number };
 }
 
@@ -17,26 +31,30 @@ interface MapPoint {
 }
 
 const LOCATIONS: readonly MapLocation[] = [
-  { name: '서핑 포인트', respawnName: 'altar', offset: { x: 0, y: -0.05 } },
-  { name: '공사장', respawnName: 'behindTheScene', offset: { x: 0.01, y: 0 } },
-  { name: '볼링장', respawnName: 'bowling', offset: { x: -0.08, y: 0.03 } },
-  { name: '소개·이력서', respawnName: 'career', offset: { x: 0, y: -0.06 } },
-  { name: '서킷', respawnName: 'circuit', offset: { x: -0.08, y: -0.05 } },
-  { name: '코코넛 노점', respawnName: 'cookie', offset: { x: -0.02, y: -0.01 } },
-  { name: 'Danwoo Lab', respawnName: 'lab', offset: { x: -0.03, y: 0 } },
-  { name: '출발점', respawnName: 'landing', offset: { x: 0.02, y: 0 } },
-  { name: '프로젝트', respawnName: 'projects', offset: { x: 0, y: -0.02 } },
-  { name: '소셜', respawnName: 'social', offset: { x: -0.01, y: -0.04 } },
-  { name: 'Lab 포털', respawnName: 'timeMachine', offset: { x: 0, y: 0 } },
+  { name: '프로젝트', respawnName: 'projects', icon: 'projects', offset: { x: 0, y: -0.02 } },
+  { name: 'Danwoo Lab', respawnName: 'lab', icon: 'lab', offset: { x: -0.03, y: 0 } },
+  { name: '소개·이력서', respawnName: 'career', icon: 'career', offset: { x: 0, y: -0.06 } },
+  { name: '소셜', respawnName: 'social', icon: 'social', offset: { x: -0.01, y: -0.04 } },
+  { name: '서킷', respawnName: 'circuit', icon: 'circuit', offset: { x: -0.08, y: -0.05 } },
+  { name: '볼링장', respawnName: 'bowling', icon: 'bowling', offset: { x: -0.08, y: 0.03 } },
+  { name: '코코넛 노점', respawnName: 'cookie', icon: 'cookie', offset: { x: -0.02, y: -0.01 } },
+  { name: '서핑 포인트', respawnName: 'altar', icon: 'surf', offset: { x: 0, y: -0.05 } },
+  { name: '공사장', respawnName: 'behindTheScene', icon: 'construction', offset: { x: 0.01, y: 0 } },
+  { name: 'Lab 포털', respawnName: 'timeMachine', icon: 'portal', offset: { x: 0, y: 0 } },
+  { name: '출발점', respawnName: 'beachStart', icon: 'start', offset: { x: 0, y: 0 } },
 ];
 const MAP_IMAGES = { day: 'ui/map/map-day.webp', night: 'ui/map/map-night.webp' } as const;
 const MAP_ACTION = { name: 'map', categories: ['modal', 'menu', 'wandering'], keys: ['Keyboard.m', 'Keyboard.KeyM'] };
 const Z_INDEX_SCALE = 1000;
+const LABEL_FLIP_X = 0.78;
 const PERCENT_PRECISION = 10;
 const TICK_ORDER = 14;
 
-function toLines(text: string): (string | HTMLElement)[] {
-  return text.split('\n').flatMap((line, index) => (index === 0 ? [line] : [document.createElement('br'), line]));
+function iconElement(icon: MapIcon, className: string): HTMLImageElement {
+  const image = createElement('img', className);
+  image.src = worldAsset(`ui/map/icons/${icon}.webp`);
+  image.alt = '';
+  return image;
 }
 
 function worldToMap(x: number, z: number): MapPoint {
@@ -51,6 +69,7 @@ function toPercent(ratio: number): number {
 export class WorldMap {
   readonly #modal: ModalItem;
   readonly #container: HTMLElement;
+  readonly #placesElement: HTMLElement;
   readonly #playerElement: HTMLElement;
   readonly #textureElement: HTMLImageElement;
   readonly #roundedPlayer = { x: 0, z: 0 };
@@ -65,6 +84,7 @@ export class WorldMap {
     this.#container = requireElement(modal.element, '.js-map-container', HTMLElement);
     this.#playerElement = requireElement(this.#container, '.js-player', HTMLElement);
     this.#textureElement = requireElement(this.#container, '.js-texture', HTMLImageElement);
+    this.#placesElement = requireElement(modal.element, '.js-map-places', HTMLElement);
     this.#bindTrigger();
     this.#bindInput();
     modal.events.on('open', () => {
@@ -75,29 +95,44 @@ export class WorldMap {
 
   #init(): void {
     this.#isInitiated = true;
-    for (const location of LOCATIONS) this.#container.append(this.#locationElement(location));
+    for (const location of LOCATIONS) {
+      this.#container.append(this.#pinElement(location));
+      this.#placesElement.append(this.#placeElement(location));
+    }
     this.#textureElement.addEventListener('load', () => this.#textureElement.classList.add('is-visible'));
     getGame().ticker.events.on('tick', () => this.update(), TICK_ORDER);
   }
 
-  #locationElement({ name, respawnName, offset }: MapLocation): HTMLElement {
+  #travelTo(respawnName: string): void {
     const game = getGame();
-    const { position } = game.respawns.getByName(respawnName);
+    game.player.respawn(respawnName, () => {
+      game.view.focusPoint.isTracking = true;
+    });
+    game.modals.close();
+  }
+
+  #pinElement({ name, respawnName, icon, offset }: MapLocation): HTMLElement {
+    const { position } = getGame().respawns.getByName(respawnName);
     const point = worldToMap(position.x, position.z);
-    const element = createElement('div', 'location', [
-      createElement('div', 'pin'),
-      createElement('div', 'name-container', [createElement('div', 'name', toLines(name))]),
+    const element = createElement('button', 'location', [
+      iconElement(icon, 'pin'),
+      createElement('span', 'name', [name]),
     ]);
+    element.type = 'button';
+    element.setAttribute('aria-label', `${name}(으)로 이동`);
+    if (point.x + offset.x > LABEL_FLIP_X) element.classList.add('is-label-left');
     element.style.left = `${(point.x + offset.x) * 100}%`;
     element.style.top = `${(point.y + offset.y) * 100}%`;
     element.style.zIndex = String(Math.round(point.y * Z_INDEX_SCALE));
-    element.addEventListener('click', () => {
-      game.player.respawn(respawnName, () => {
-        game.view.focusPoint.isTracking = true;
-      });
-      game.modals.close();
-    });
+    element.addEventListener('click', () => this.#travelTo(respawnName));
     return element;
+  }
+
+  #placeElement({ name, respawnName, icon }: MapLocation): HTMLElement {
+    const button = createElement('button', 'map-place', [iconElement(icon, 'map-place-icon'), name]);
+    button.type = 'button';
+    button.addEventListener('click', () => this.#travelTo(respawnName));
+    return createElement('li', '', [button]);
   }
 
   #updateTexture(): void {

@@ -1,3 +1,4 @@
+import { worldAsset } from '../config/worldAsset';
 import { CloseButton } from './CloseButton';
 
 export function Modals() {
@@ -15,10 +16,25 @@ export function Modals() {
         </div>
       </div>
       <div className="js-modal modal map" data-name="map">
-        <CloseButton />
-        <div className="js-map-container map-container">
-          <img className="js-texture texture" alt="" loading="lazy" />
-          <div className="js-player player" />
+        <div className="map-card">
+          <header className="map-header">
+            <img className="map-logo" src={worldAsset('ui/islandMark.png')} alt="" aria-hidden="true" />
+            <h2 className="map-title">Danwoo Island</h2>
+            <span className="map-badge">MAP</span>
+            <CloseButton />
+          </header>
+          <div className="map-body">
+            <div className="js-map-container map-container">
+              <img className="js-texture texture" alt="" loading="lazy" />
+              <img className="map-compass" src={worldAsset('ui/map/icons/compass.webp')} alt="" aria-hidden="true" />
+              <div className="js-player player" />
+            </div>
+            <nav className="map-places" aria-label="장소 목록">
+              <h3 className="map-places-title">어디로 갈까요?</h3>
+              <ul className="js-map-places map-places-list" />
+            </nav>
+          </div>
+          <p className="map-hint">장소를 누르면 그곳으로 이동해요 · M 키로 열고 닫기</p>
         </div>
       </div>
     </div>
