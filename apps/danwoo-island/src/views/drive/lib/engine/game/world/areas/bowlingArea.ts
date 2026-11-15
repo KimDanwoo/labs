@@ -1,29 +1,16 @@
 import type { RigidBody } from '@dimforge/rapier3d-compat';
 import gsap from 'gsap';
-import {
-  color,
-  Fn,
-  instancedBufferAttribute,
-  instanceIndex,
-  positionGeometry,
-  sin,
-  step,
-  texture,
-  uniform,
-  uv,
-  vec2,
-  vec3,
-  vec4,
-} from 'three/tsl';
+import { color, Fn, positionGeometry, step, texture, uniform, uv, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { type AudioItem, moveSoundTo } from '../../audio';
 import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
 import type { InteractivePoint } from '../../interactivePoints';
+import { JukeboxStation } from '../../jukebox/jukeboxStation';
 import { objectOf, type WorldObject } from '../../objects';
 import { clamp, remapClamp } from '../../utilities/maths';
 import { rebuildBowlingScreenStand } from '../islandReskins';
-import { rebuildBowlingSign, rebuildRadioCabinet } from '../islandStructures';
+import { rebuildBowlingSign, rebuildJukebox } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
 
@@ -76,7 +63,6 @@ const SCREEN = { travel: 28.2 - 3.81, easing: 2, offset: 0.1, activeTolerance: 0
 const STRIKE_BLINK = { period: 3, visible: 1.5 } as const;
 const STRIKE_CONFETTI_OFFSETS = [new THREE.Vector3(-1, -1, 0), new THREE.Vector3(-3.4, -1, 0)] as const;
 const BUMPER_DURATION = 1;
-const JUKEBOX = { count: 8, spread: 1, speed: 0.2, size: 1.5, offset: new THREE.Vector3(0, 1, 0.5) } as const;
 const ZERO = { x: 0, y: 0, z: 0 } as const;
 
 function isMesh(object: THREE.Object3D): object is THREE.Mesh {
@@ -149,6 +135,7 @@ export class BowlingArea extends Area {
   readonly #ball: Ball;
   readonly #screen: Screen;
   readonly #restartPoint: InteractivePoint;
+  readonly jukebox: JukeboxStation;
   #isWon = false;
   #wonTime = 0;
   #pinsAllSleeping = true;
@@ -164,13 +151,16 @@ export class BowlingArea extends Area {
     this.#restartPoint = this.#createRestartPoint();
     this.#screen = this.#createScreen();
     this.#createBumpers();
-    this.#createJukeboxNotes();
+    this.jukebox = new JukeboxStation({
+      anchor: this.requireReference('jukebox'),
+      pointPosition: this.requireReference('jukeboxInteractivePoint').position,
+    });
   }
 
   override setObjects(): void {
     rebuildVillageProps(this.model);
     rebuildBowlingSign(this.model, this.game.texture('bowlingNeonTexture'));
-    rebuildRadioCabinet(this.model);
+    rebuildJukebox(this.model);
     rebuildBowlingScreenStand(this.model);
     super.setObjects();
   }
@@ -387,43 +377,6 @@ export class BowlingArea extends Area {
       },
     });
     this.game.player.sounds.suspensions.play();
-  }
-
-  #createJukeboxNotes(): void {
-    const positions = new Float32Array(JUKEBOX.count * 3);
-    for (let index = 0; index < positions.length; index += 1) positions[index] = (Math.random() - 0.5) * JUKEBOX.spread;
-    const positionAttribute = new THREE.InstancedBufferAttribute(positions, 3);
-
-    const { ticker } = this.game;
-    const notes = this.game.texture('jukeboxMusicNotes');
-    const progress = ticker.elapsedScaledUniform
-      .mul(JUKEBOX.speed)
-      .add(instanceIndex.toFloat().div(JUKEBOX.count))
-      .fract()
-      .toVarying();
-    const notesColor = uniform(color('#ff994d'));
-    const notesStrength = uniform(3.5);
-
-    const material = new THREE.PointsNodeMaterial({ size: JUKEBOX.size, sizeAttenuation: true, alphaToCoverage: true });
-    material.outputNode = Fn(() => {
-      const noteMask = texture(notes, vec2(uv().x, uv().y.oneMinus())).r;
-      return vec4(notesColor.mul(notesStrength), noteMask);
-    })();
-    material.positionNode = Fn(() => {
-      const newPosition = instancedBufferAttribute<'vec3'>(positionAttribute, 'vec3').toVar();
-      newPosition.z.addAssign(progress.oneMinus().pow(3).oneMinus());
-      newPosition.y.addAssign(progress);
-      return newPosition;
-    })();
-    material.rotationNode = Fn(() =>
-      sin(ticker.elapsedScaledUniform.mul(4).add(instanceIndex.toFloat())).add(1).mul(0.5).pow(2).oneMinus(),
-    )();
-    material.scaleNode = Fn(() => progress.sub(0.5).abs().mul(2).oneMinus().mul(3).min(1))();
-
-    const points = new THREE.Sprite(material);
-    points.count = JUKEBOX.count;
-    points.position.copy(JUKEBOX.offset);
-    this.requireReference('jukebox').add(points);
   }
 
   #updateScreen(): void {

@@ -20,10 +20,19 @@ export interface SocialLink {
   align: 'left' | 'right';
 }
 
+export interface JukeboxTrack {
+  id: number;
+  title: string;
+  url: string;
+  artwork: string;
+  durationMs: number;
+}
+
 export interface WorldContent {
   labUrl: string;
   resumeUrl: string;
   projects: ProjectContent[];
   lab: LabContent[];
   social: SocialLink[];
+  tracks: JukeboxTrack[];
 }
