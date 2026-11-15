@@ -1,13 +1,14 @@
 import type { JukeboxTrack } from '../../data/worldContent';
-import { type Audio, nowPlayingNotice } from '../audio';
 import { Events } from '../events';
-import type { Notifications } from '../notifications';
 import {
   loadWidgetApi,
   mountWidgetFrame,
+  type SoundCloudGlobal,
   type SoundCloudWidget,
   trackApiUrl,
-  type WidgetProgress,
+  type WidgetEvent,
+  type WidgetFrame,
+  type WidgetPayload,
 } from './soundcloudWidget';
 
 export type JukeboxStatus = 'idle' | 'loading' | 'ready' | 'starting' | 'playing' | 'paused' | 'error';
@@ -18,50 +19,65 @@ export interface JukeboxState {
   readonly progress: number;
 }
 
-interface JukeboxPlayerOptions {
+export interface MusicHost {
+  readonly isBackground: boolean;
+  readonly mute: { readonly active: boolean };
+  readonly events: Events<{ muteChange: [isMuted: boolean]; backgroundChange: [isBackground: boolean] }>;
+  claimMusic(): void;
+  releaseMusic(): void;
+}
+
+export interface JukeboxPlayerOptions {
   tracks: readonly JukeboxTrack[];
-  audio: Audio;
-  notifications: Notifications;
+  music: MusicHost;
+  announce: (title: string) => void;
+  loadApi?: () => Promise<SoundCloudGlobal>;
+  mountFrame?: (trackId: number) => WidgetFrame;
 }
 
 const VOLUME = 70;
 const START_TIMEOUT_MS = 8000;
-const NOTICE_DURATION = 5;
+const READY_TIMEOUT_MS = 12_000;
 
 export class JukeboxPlayer {
   readonly events = new Events<{ change: [state: JukeboxState] }>();
   readonly tracks: readonly JukeboxTrack[];
-  readonly #audio: Audio;
-  readonly #notifications: Notifications;
+  readonly #music: MusicHost;
+  readonly #announce: (title: string) => void;
+  readonly #loadApi: () => Promise<SoundCloudGlobal>;
+  readonly #mountFrame: (trackId: number) => WidgetFrame;
   #widget: SoundCloudWidget | null = null;
   #preparing: Promise<void> | null = null;
-  #loadedIndex: number | null = null;
-  #pendingIndex: number | null = null;
+  #requestedIndex: number | null = null;
   #announcedIndex: number | null = null;
   #wantsPlayback = false;
   #startTimer: ReturnType<typeof setTimeout> | null = null;
   #state: JukeboxState = { status: 'idle', trackIndex: null, progress: 0 };
 
-  constructor({ tracks, audio, notifications }: JukeboxPlayerOptions) {
+  constructor({
+    tracks,
+    music,
+    announce,
+    loadApi = loadWidgetApi,
+    mountFrame = mountWidgetFrame,
+  }: JukeboxPlayerOptions) {
     this.tracks = tracks;
-    this.#audio = audio;
-    this.#notifications = notifications;
-    audio.events.on('muteChange', () => this.#applyVolume());
-    audio.events.on('backgroundChange', (isBackground) => this.#handleBackground(isBackground));
+    this.#music = music;
+    this.#announce = announce;
+    this.#loadApi = loadApi;
+    this.#mountFrame = mountFrame;
+    music.events.on('muteChange', () => this.#applyVolume());
+    music.events.on('backgroundChange', (isBackground) => this.#handleBackground(isBackground));
   }
 
   get state(): JukeboxState {
     return this.#state;
   }
 
-  get isPlaying(): boolean {
-    return this.#state.status === 'playing';
-  }
-
   prepare(): Promise<void> {
     this.#preparing ??= this.#mount().catch((error: unknown) => {
       this.#preparing = null;
-      this.#setState({ status: 'error' });
+      this.#fail();
       reportError(error);
     });
     return this.#preparing;
@@ -70,27 +86,28 @@ export class JukeboxPlayer {
   select(index: number): void {
     if (!this.tracks[index]) return;
     this.#wantsPlayback = true;
-    this.#audio.claimMusic();
+    this.#music.claimMusic();
+    const isSameTrack = index === this.#requestedIndex;
+    this.#requestedIndex = index;
     if (!this.#widget) {
-      this.#pendingIndex = index;
       this.#setState({ status: 'loading', trackIndex: index, progress: 0 });
       void this.prepare();
       return;
     }
-    if (index === this.#loadedIndex) {
-      this.#start(index);
-      return;
-    }
-    this.#load(index);
+    if (isSameTrack) this.#start();
+    else this.#load(index);
   }
 
   toggle(): void {
-    if (this.#state.status === 'playing' || this.#state.status === 'starting') {
+    const { status, trackIndex } = this.#state;
+    if (status === 'playing' || status === 'starting') {
       this.#wantsPlayback = false;
+      this.#clearStartTimer();
       this.#widget?.pause();
+      this.#setState({ status: 'paused' });
       return;
     }
-    this.select(this.#state.trackIndex ?? 0);
+    this.select(trackIndex ?? 0);
   }
 
   next(): void {
@@ -106,112 +123,128 @@ export class JukeboxPlayer {
     this.#clearStartTimer();
     this.#widget?.pause();
     this.#setState({ status: this.#widget ? 'ready' : 'idle', progress: 0 });
-    this.#audio.releaseMusic();
+    this.#music.releaseMusic();
   }
 
   async #mount(): Promise<void> {
-    const api = await loadWidgetApi();
-    const firstIndex = this.#pendingIndex ?? 0;
+    const api = await this.#loadApi();
+    const firstIndex = this.#requestedIndex ?? 0;
     const firstTrack = this.tracks[firstIndex];
     if (!firstTrack) throw new Error('Jukebox has no tracks');
-    const widget = api.Widget(mountWidgetFrame(firstTrack.id));
-    const { Events: WIDGET_EVENTS } = api.Widget;
-    const bind = (name: string, handler: (payload?: WidgetProgress) => void): void => {
-      const event = WIDGET_EVENTS[name];
-      if (event) widget.bind(event, handler);
+    const frame = this.#mountFrame(firstTrack.id);
+    const widget = api.Widget(frame);
+    const bind = (name: WidgetEvent, handler: (payload: WidgetPayload) => void): void => {
+      const event = api.Widget.Events[name];
+      if (event) widget.bind(event, (payload) => handler(payload ?? {}));
     };
-    bind('READY', () => this.#handleReady(widget, firstIndex));
-    bind('PLAY', () => this.#handlePlay());
-    bind('PAUSE', () => this.#handlePause());
-    bind('FINISH', () => this.next());
-    bind('PLAY_PROGRESS', (payload) => this.#handleProgress(payload));
-    bind('ERROR', () => this.#handleError());
+    bind('PLAY', ({ soundId }) => this.#handlePlay(soundId));
+    bind('PAUSE', ({ soundId }) => this.#handlePause(soundId));
+    bind('FINISH', ({ soundId }) => this.#handleFinish(soundId));
+    bind('PLAY_PROGRESS', ({ soundId, relativePosition }) => this.#handleProgress(soundId, relativePosition));
+    bind('ERROR', () => this.#fail());
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        frame.remove();
+        reject(new Error('SoundCloud widget was not ready in time'));
+      }, READY_TIMEOUT_MS);
+      bind('READY', () => {
+        clearTimeout(timer);
+        if (!this.#widget) this.#handleReady(widget, firstIndex);
+        resolve();
+      });
+    });
   }
 
-  #handleReady(widget: SoundCloudWidget, firstIndex: number): void {
-    if (this.#widget) return;
+  #handleReady(widget: SoundCloudWidget, loadedIndex: number): void {
     this.#widget = widget;
-    this.#loadedIndex = firstIndex;
     this.#applyVolume();
-    const pending = this.#pendingIndex;
-    this.#pendingIndex = null;
-    if (pending === null) {
-      this.#setState({ status: 'ready', trackIndex: this.#state.trackIndex ?? firstIndex });
+    const requested = this.#requestedIndex;
+    if (!this.#wantsPlayback || requested === null) {
+      this.#setState({ status: 'ready', trackIndex: this.#state.trackIndex ?? loadedIndex });
       return;
     }
-    this.select(pending);
+    if (requested === loadedIndex) this.#start();
+    else this.#load(requested);
   }
 
   #load(index: number): void {
     const track = this.tracks[index];
     if (!track || !this.#widget) return;
-    this.#loadedIndex = index;
     this.#setState({ status: 'starting', trackIndex: index, progress: 0 });
     this.#armStartTimer();
     this.#widget.load(trackApiUrl(track.id), {
       auto_play: true,
       callback: () => {
-        if (this.#loadedIndex === index) this.#applyVolume();
+        if (this.#requestedIndex === index) this.#applyVolume();
       },
     });
   }
 
-  #start(index: number): void {
-    this.#setState({ status: 'starting', trackIndex: index });
+  #start(): void {
+    this.#setState({ status: 'starting', trackIndex: this.#requestedIndex });
     this.#armStartTimer();
     this.#widget?.play();
   }
 
-  #handlePlay(): void {
-    this.#clearStartTimer();
-    if (!this.#wantsPlayback || this.#audio.isBackground) {
+  #isRequested(soundId: number | undefined): boolean {
+    if (soundId === undefined || this.#requestedIndex === null) return true;
+    return this.tracks[this.#requestedIndex]?.id === soundId;
+  }
+
+  #handlePlay(soundId: number | undefined): void {
+    if (!this.#wantsPlayback || this.#music.isBackground) {
       this.#widget?.pause();
       return;
     }
+    if (!this.#isRequested(soundId)) return;
+    this.#clearStartTimer();
     this.#setState({ status: 'playing' });
-    this.#announce();
+    this.#announceCurrent();
   }
 
-  #handlePause(): void {
-    const { status } = this.#state;
-    if (status === 'starting' || status === 'ready') return;
+  #handlePause(soundId: number | undefined): void {
+    if (!this.#isRequested(soundId) || this.#state.status !== 'playing') return;
     this.#setState({ status: 'paused' });
   }
 
-  #handleProgress(payload?: WidgetProgress): void {
-    const progress = payload?.relativePosition;
-    if (typeof progress === 'number' && Number.isFinite(progress)) this.#setState({ progress });
+  #handleFinish(soundId: number | undefined): void {
+    if (this.#wantsPlayback && this.#isRequested(soundId)) this.next();
   }
 
-  #handleError(): void {
+  #handleProgress(soundId: number | undefined, progress: number | undefined): void {
+    if (!this.#isRequested(soundId) || typeof progress !== 'number' || !Number.isFinite(progress)) return;
+    this.#setState({ progress });
+  }
+
+  #fail(): void {
+    this.#wantsPlayback = false;
     this.#clearStartTimer();
     this.#setState({ status: 'error' });
+    this.#music.releaseMusic();
   }
 
   #handleBackground(isBackground: boolean): void {
     if (!this.#widget || !this.#wantsPlayback) return;
-    if (isBackground) {
-      this.#widget.pause();
-      return;
-    }
-    if (this.#state.trackIndex !== null) this.#start(this.#state.trackIndex);
+    if (isBackground) this.#widget.pause();
+    else this.#start();
   }
 
-  #announce(): void {
+  #announceCurrent(): void {
     const index = this.#state.trackIndex;
     if (index === null || index === this.#announcedIndex) return;
     this.#announcedIndex = index;
     const track = this.tracks[index];
-    if (track) this.#notifications.show(nowPlayingNotice(track.title), { type: 'song', duration: NOTICE_DURATION });
+    if (track) this.#announce(track.title);
   }
 
   #applyVolume(): void {
-    this.#widget?.setVolume(this.#audio.mute.active ? 0 : VOLUME);
+    this.#widget?.setVolume(this.#music.mute.active ? 0 : VOLUME);
   }
 
   #armStartTimer(): void {
     this.#clearStartTimer();
     this.#startTimer = setTimeout(() => {
+      this.#startTimer = null;
       if (this.#state.status === 'starting') this.#setState({ status: 'paused' });
     }, START_TIMEOUT_MS);
   }

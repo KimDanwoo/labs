@@ -2297,11 +2297,13 @@ html:not(.is-mode-touch) .blog .blog-all:hover {
   transform: scaleX(0);
 }
 .jukebox .jukebox-controls {
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   display: flex;
 }
 .jukebox .jukebox-button {
+  flex-shrink: 0;
   background: var(--map-cream);
   border: 0;
   border-radius: 50%;

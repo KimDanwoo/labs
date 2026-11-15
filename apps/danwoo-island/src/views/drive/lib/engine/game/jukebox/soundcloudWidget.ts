@@ -3,21 +3,27 @@ const WIDGET_PLAYER = 'https://w.soundcloud.com/player/';
 const API_TIMEOUT_MS = 10_000;
 const FRAME_STYLE = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
 
-export interface WidgetProgress {
-  currentPosition?: number;
+export type WidgetEvent = 'READY' | 'PLAY' | 'PAUSE' | 'FINISH' | 'PLAY_PROGRESS' | 'ERROR';
+
+export interface WidgetPayload {
+  soundId?: number;
   relativePosition?: number;
 }
 
 export interface SoundCloudWidget {
-  bind(event: string, callback: (payload?: WidgetProgress) => void): void;
+  bind(event: string, callback: (payload?: WidgetPayload) => void): void;
   load(url: string, options?: { auto_play?: boolean; callback?: () => void }): void;
   play(): void;
   pause(): void;
   setVolume(volume: number): void;
 }
 
-interface SoundCloudGlobal {
-  Widget: ((element: HTMLIFrameElement) => SoundCloudWidget) & { Events: Record<string, string> };
+export interface WidgetFrame {
+  remove(): void;
+}
+
+export interface SoundCloudGlobal {
+  Widget: ((element: WidgetFrame) => SoundCloudWidget) & { Events: Partial<Record<WidgetEvent, string>> };
 }
 
 declare global {
@@ -77,6 +83,7 @@ export function mountWidgetFrame(trackId: number): HTMLIFrameElement {
   frame.style.cssText = FRAME_STYLE;
   frame.allow = 'autoplay';
   frame.setAttribute('aria-hidden', 'true');
+  frame.tabIndex = -1;
   frame.title = 'SoundCloud player';
   frame.src = `${WIDGET_PLAYER}?${params}`;
   document.body.append(frame);

@@ -15,6 +15,7 @@ import {
 import * as THREE from 'three/webgpu';
 
 import content from '../../data/danwoo';
+import { nowPlayingNotice } from '../audio';
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import { JukeboxPanel } from './jukeboxPanel';
@@ -24,6 +25,7 @@ const NOTES = { count: 8, spread: 1, speed: 0.2, size: 1.5, offset: new THREE.Ve
 const NOTES_COLOR = '#ff994d';
 const NOTES_STRENGTH = 3.5;
 const FADE_DURATION = 0.6;
+const NOTICE_DURATION = 5;
 const PALETTE_SLOTS = 32;
 const ARCH_SLOTS = [3, 10, 18] as const;
 const GLOW = { strength: 1.4, speed: 3.2 } as const;
@@ -38,7 +40,11 @@ export class JukeboxStation {
     const { audio, notifications, modals } = getGame();
     const modal = modals.items.get('jukebox');
     if (!modal) throw new Error('Jukebox modal is missing');
-    this.player = new JukeboxPlayer({ tracks: content.tracks, audio, notifications });
+    this.player = new JukeboxPlayer({
+      tracks: content.tracks,
+      music: audio,
+      announce: (title) => notifications.show(nowPlayingNotice(title), { type: 'song', duration: NOTICE_DURATION }),
+    });
     this.#panel = new JukeboxPanel({ element: modal.element, player: this.player });
     anchor.add(this.#createNotes());
     this.#applyGlow(anchor);
