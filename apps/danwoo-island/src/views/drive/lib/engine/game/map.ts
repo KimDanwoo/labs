@@ -121,8 +121,7 @@ export class WorldMap {
     this.#card.root.classList.add(HIDDEN_CLASS);
     world.grass?.setVisible(false);
     const frame = this.#frame();
-    view.overview.radius = frame.radius;
-    view.setOverviewWide(true);
+    view.enterOverview(frame.radius);
     view.focusPoint.isTracking = false;
     view.focusPoint.magnet.active = false;
     this.#flyFocus(frame.center, FLIGHT.rise);
@@ -143,7 +142,7 @@ export class WorldMap {
       ease: FLIGHT.ease,
       overwrite: true,
       onComplete: () => {
-        view.setOverviewWide(false);
+        view.leaveOverview();
         world.grass?.setVisible(true);
         view.focusPoint.isTracking = true;
         view.focusPoint.magnet.active = true;
@@ -165,7 +164,12 @@ export class WorldMap {
     if (!this.#modal.isOpen || this.#destination) return;
     const frame = this.#frame();
     this.#flyFocus(frame.center, REFRAME_DURATION);
-    gsap.to(getGame().view.overview, { radius: frame.radius, duration: REFRAME_DURATION, overwrite: 'auto' });
+    gsap.to(getGame().view.overview, {
+      radius: frame.radius,
+      duration: REFRAME_DURATION,
+      ease: FLIGHT.ease,
+      overwrite: 'auto',
+    });
   }
 
   #flyFocus(target: THREE.Vector3, duration: number): void {

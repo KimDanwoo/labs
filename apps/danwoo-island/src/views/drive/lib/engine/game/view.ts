@@ -167,9 +167,15 @@ export class View {
     this.ratioOverflow = Math.max(1, IDEAL_RATIO / this.game.viewport.ratio) - 1;
   }
 
-  setOverviewWide(isWide: boolean): void {
-    if (this.#isOverviewWide === isWide) return;
-    this.#isOverviewWide = isWide;
+  enterOverview(radius: number): void {
+    this.overview.radius = radius;
+    this.#isOverviewWide = true;
+    this.game.viewport.events.trigger('throttleChange');
+  }
+
+  leaveOverview(): void {
+    if (!this.#isOverviewWide) return;
+    this.#isOverviewWide = false;
     this.game.viewport.events.trigger('throttleChange');
   }
 

@@ -621,3 +621,8 @@ html.is-mode-touch .modals .map .map-hint-keys {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
+
+html:is(.input-filter-menu, .input-filter-modal, .input-filter-intro, .input-filter-cinematic)
+  :is(.menu-trigger, .map-trigger):focus-visible {
+  outline: none;
+}

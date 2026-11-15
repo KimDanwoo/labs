@@ -18,7 +18,7 @@ function floorSize(): number {
 }
 
 function planeGeometry(size: number, subdivisions: number): THREE.PlaneGeometry {
-  const segments = Math.min(Math.round(subdivisions), MAX_SUBDIVISIONS);
+  const segments = Math.min(subdivisions, MAX_SUBDIVISIONS);
   const geometry = new THREE.PlaneGeometry(size, size, segments, segments);
   geometry.rotateX(-Math.PI * 0.5);
   geometry.deleteAttribute('normal');
