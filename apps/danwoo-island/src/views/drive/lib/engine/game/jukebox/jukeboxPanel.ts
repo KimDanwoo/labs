@@ -4,12 +4,12 @@ import { requireElement } from '../utilities/requireElement';
 import type { JukeboxPlayer, JukeboxState, JukeboxStatus } from './jukeboxPlayer';
 
 const STATUS_TEXT = {
-  idle: '듣고 싶은 곡을 골라 주세요',
-  loading: '쥬크박스를 깨우는 중이에요',
-  ready: '재생을 눌러 주세요',
-  starting: '곧 흘러나와요',
-  playing: '지금 흐르는 곡',
-  paused: '잠시 멈췄어요. 재생을 눌러 주세요',
+  idle: '곡을 골라 주세요',
+  loading: '불러오는 중',
+  ready: '재생할 수 있어요',
+  starting: '불러오는 중',
+  playing: '재생 중',
+  paused: '일시정지',
   error: '재생하지 못했어요. SoundCloud에서 들어 주세요',
 } satisfies Record<JukeboxStatus, string>;
 
@@ -75,7 +75,7 @@ export class JukeboxPanel {
   #mountNowPlaying(container: HTMLElement): void {
     const previous = iconButton('is-previous', '이전 곡');
     const next = iconButton('is-next', '다음 곡');
-    const stop = createElement('button', 'jukebox-stop', ['섬 배경음으로']);
+    const stop = createElement('button', 'jukebox-stop', ['쥬크박스 끄기']);
     stop.type = 'button';
     previous.addEventListener('click', () => this.#player.previous());
     this.#toggle.addEventListener('click', () => this.#player.toggle());
@@ -108,7 +108,7 @@ export class JukeboxPanel {
     this.#root.classList.toggle(PLAYING_CLASS, isPlaying);
     this.#root.classList.toggle(STARTING_CLASS, status === 'starting' || status === 'loading');
     this.#status.textContent = STATUS_TEXT[status];
-    this.#title.textContent = track?.title ?? `직접 만든 노래 ${this.#player.tracks.length}곡`;
+    this.#title.textContent = track?.title ?? `${this.#player.tracks.length}곡`;
     this.#progress.style.transform = `scaleX(${progress})`;
     this.#toggle.setAttribute('aria-label', isPlaying ? '일시정지' : '재생');
     this.#toggle.classList.toggle(PLAYING_CLASS, isPlaying);

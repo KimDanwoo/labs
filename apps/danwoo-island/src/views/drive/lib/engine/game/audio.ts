@@ -293,7 +293,7 @@ class Playlist {
 export function nowPlayingNotice(songName: string): HTMLElement {
   return createElement('div', 'top', [
     createElement('div', 'title', [
-      '지금 흐르는 곡',
+      '재생 중',
       document.createElement('br'),
       createElement('span', 'song-name', [songName]),
     ]),

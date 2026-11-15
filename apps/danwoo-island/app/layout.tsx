@@ -2,9 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
 const SITE_NAME = 'Danwoo Island';
-const TITLE = 'Danwoo Island — 차로 누비는 열대 섬';
-const DESCRIPTION =
-  '작은 열대 섬을 차로 누비며 프로젝트와 글, 직접 만든 노래를 만나요. 회오리를 타면 아직 안 가 본 곳으로 날아가요.';
+const TITLE = 'Danwoo Island — 3D 포트폴리오';
+const DESCRIPTION = '차를 몰고 열대 섬을 돌아다니며 프로젝트, 블로그 글, 음악을 볼 수 있는 3D 포트폴리오예요.';
 
 export const metadata: Metadata = {
   title: TITLE,
