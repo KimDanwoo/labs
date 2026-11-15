@@ -59,7 +59,7 @@ export function fixedLandmark(materials, { key, size, colliders }, base, quatern
     landmark.name = `${key}PhysicalFixed`
     landmark.position.copy(base)
     landmark.quaternion.copy(quaternion)
-    landmark.add(islandModelMesh(materials, key, new THREE.Matrix4().makeTranslation(0, size.y / 2, 0), size))
+    landmark.add(islandModelMesh(key, new THREE.Matrix4().makeTranslation(0, size.y / 2, 0), size))
     for(const { size: colliderSize, position } of colliders)
     {
         const cuboid = new THREE.Object3D()

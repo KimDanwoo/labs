@@ -122,7 +122,7 @@ export function rebuildKiosk(model, materials, mapTexture)
     {
         const board = cuboidFrame(container.children.find((child) => child.name === 'cuboid018'))
         const { x: W, y: H } = board.size
-        const group = new THREE.Group().add(islandModelMesh(materials, 'guideBoard', board.matrix, board.size))
+        const group = new THREE.Group().add(islandModelMesh('guideBoard', board.matrix, board.size))
         const mapWidth = Math.min(GUIDE_BOARD.mapWidth * W, GUIDE_BOARD.mapHeight * H * MAP_ASPECT)
         group.add(guideMap(board, mapTexture, { width: mapWidth, height: mapWidth / MAP_ASPECT, y: GUIDE_BOARD.mapY * H, z: GUIDE_BOARD.mapFront }))
         return group
@@ -138,7 +138,7 @@ export function rebuildCookieCart(model, materials)
     const { size, center, pole } = SNACK_SHACK
     const parts = createParts()
     parts.rod('woodDark', 0.11, [pole.x, pole.bottom, pole.z], [pole.x, pole.top, pole.z], 6)
-    container.add(parts.build(materials), islandModelMesh(materials, 'snackShack', new THREE.Matrix4().makeTranslation(...center), size))
+    container.add(parts.build(materials), islandModelMesh('snackShack', new THREE.Matrix4().makeTranslation(...center), size))
 }
 
 export function rebuildOuthouse(model, materials)
@@ -266,7 +266,7 @@ export function rebuildSeonangdang(model, materials)
     const tall = pillars.slice(0, 3)
     for(const frame of tall)
         cairn(parts, random, frame)
-    const figures = pillars.slice(3).map(({ size, matrix }) => islandModelMesh(materials, 'surfboardStand', matrix, surfboardSize(size.y)))
+    const figures = pillars.slice(3).map(({ size, matrix }) => islandModelMesh('surfboardStand', matrix, surfboardSize(size.y)))
     const ropePoints = tall.map((frame) => new THREE.Vector3().setFromMatrixPosition(frame.matrix).add(new THREE.Vector3(0, frame.size.y * 0.32, 0)))
     ropePoints.sort((a, b) => Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x))
     geumjul(parts, random, ropePoints)

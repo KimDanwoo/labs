@@ -7,7 +7,7 @@ const LAMP_GLASS = 'lantern'
 function modelMesh(materials, key, offset)
 {
     const matrix = new THREE.Matrix4().makeTranslation(...offset)
-    const mesh = new THREE.Mesh(islandModelGeometry(materials, key, { matrix }), islandPaletteMaterial(materials, key))
+    const mesh = new THREE.Mesh(islandModelGeometry(key, { matrix }), islandPaletteMaterial(key))
     mesh.castShadow = true
     mesh.receiveShadow = true
     return mesh
@@ -45,7 +45,7 @@ export function createRopeFence(materials)
 export function createCoconutCrate(materials)
 {
     const upright = new THREE.Matrix4().makeRotationX(-Math.PI / 2)
-    const mesh = new THREE.Mesh(islandModelGeometry(materials, 'coconutCrate', { matrix: upright }), islandPaletteMaterial(materials, 'coconutCrate'))
+    const mesh = new THREE.Mesh(islandModelGeometry('coconutCrate', { matrix: upright }), islandPaletteMaterial('coconutCrate'))
     mesh.castShadow = true
     mesh.receiveShadow = true
     return new THREE.Group().add(mesh)
