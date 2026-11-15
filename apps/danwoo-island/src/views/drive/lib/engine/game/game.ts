@@ -490,7 +490,6 @@ export class Game {
         resource.magFilter = THREE.LinearFilter;
         resource.generateMipmaps = false;
       }),
-      modelResource('birchTreesVisualModel', `birchTrees/birchTreesVisual${modelSuffix}.glb${cb}`),
       modelResource('birchTreesReferencesModel', `birchTrees/birchTreesReferences${modelSuffix}.glb${cb}`),
       modelResource('oakTreesVisualModel', `oakTrees/oakTreesVisual${modelSuffix}.glb${cb}`),
       modelResource('oakTreesReferencesModel', `oakTrees/oakTreesReferences${modelSuffix}.glb${cb}`),

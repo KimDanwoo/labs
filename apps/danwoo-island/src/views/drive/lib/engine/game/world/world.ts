@@ -30,8 +30,9 @@ interface TreeSpecies {
   colorB: string;
 }
 
-const BIRCH: TreeSpecies = { model: 'birchTrees', colorA: '#4F9B65', colorB: '#A8D878' };
-const OAK: TreeSpecies = { model: 'oakTrees', colorA: '#287A59', colorB: '#70BA69' };
+const JUNGLE: TreeSpecies = { model: 'oakTrees', colorA: '#1d6a47', colorB: '#8fcf5c' };
+
+const PALM_REFERENCE_MODELS = ['cherryTreesReferencesModel', 'birchTreesReferencesModel'] as const;
 
 function plantTrees({ model, colorA, colorB }: TreeSpecies): Trees {
   const game = getGame();
@@ -55,7 +56,6 @@ export class World {
   fireballs: Fireballs | null = null;
   snow: Snow | null = null;
   bushes: Bushes | null = null;
-  birchTrees: Trees | null = null;
   oakTrees: Trees | null = null;
   palmTrees: PalmTrees | null = null;
   flowers: Flowers | null = null;
@@ -80,9 +80,8 @@ export class World {
     this.fireballs = new Fireballs();
     this.snow = new Snow();
     this.bushes = new Bushes();
-    this.birchTrees = plantTrees(BIRCH);
-    this.oakTrees = plantTrees(OAK);
-    this.palmTrees = new PalmTrees(getGame().model('cherryTreesReferencesModel').scene.children);
+    this.oakTrees = plantTrees(JUNGLE);
+    this.palmTrees = new PalmTrees(PALM_REFERENCE_MODELS.flatMap((name) => getGame().model(name).scene.children));
     this.flowers = new Flowers();
     this.bricks = new Bricks();
     this.fences = new Fences();

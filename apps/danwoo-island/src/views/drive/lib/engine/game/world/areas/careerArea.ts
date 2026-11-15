@@ -23,18 +23,18 @@ interface CareerLine {
 }
 
 const LINE_COLORS: Record<LineColor, string> = {
-  blue: '#5390ff',
-  orange: '#ff8039',
-  purple: '#b65fff',
-  green: '#a2ffab',
+  blue: '#2bb3c0',
+  orange: '#ff8a5b',
+  purple: '#f6cf68',
+  green: '#7cbf5a',
 };
 const PROFILE_LABELS = new Map<string, readonly [string, string]>([
   ['careerFreelancer', ['김단우', 'FRONTEND ENGINEER']],
-  ['careerHetic', ['PRODUCT', 'STRUCTURE & DATA']],
-  ['careerImmersiveGarden', ['BUILD & SHIP', 'IDEAS INTO PRODUCTS']],
-  ['careerIRLTeacher', ['DANWOO LAB', 'PROJECTS & EXPERIMENTS']],
-  ['careerOnlineTeacher', ['DANSOON', 'DEVELOPMENT JOURNAL']],
-  ['careerUzik', ['MY EXPERIENCE', 'OPEN RESUME']],
+  ['careerHetic', ['제품을 키우는', 'PRODUCT']],
+  ['careerImmersiveGarden', ['구조부터 다듬는', 'ARCHITECTURE']],
+  ['careerIRLTeacher', ['데이터로 판단하는', 'DATA']],
+  ['careerOnlineTeacher', ['AI와 함께 만드는', 'WITH AI']],
+  ['careerUzik', ['아이디어를 배포하는', 'OPEN RESUME']],
 ]);
 const DEFAULT_LABEL = ['김단우', 'OPEN RESUME'] as const;
 const ACTIVE_ELEVATION = 2.5;
