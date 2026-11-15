@@ -1986,7 +1986,7 @@ html:not(.is-mode-touch) .menu .button:not(.is-disabled):hover {
 }
 .menu .inner {
   width: min(480px, 100% - 32px);
-  height: min(560px, 100% - 64px);
+  height: min(640px, 100% - 64px);
   transform: translateY(14px) scale(0.97);
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -2009,7 +2009,7 @@ html:not(.is-mode-touch) .menu .button:not(.is-disabled):hover {
 @media only screen and (orientation: portrait) {
   .menu .inner {
     width: min(480px, 100% - 24px);
-    height: min(620px, 100% - 48px);
+    height: min(660px, 100% - 48px);
   }
   .menu .contents {
     height: 100%;
