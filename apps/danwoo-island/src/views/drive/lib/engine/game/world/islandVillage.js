@@ -98,7 +98,7 @@ function placeGamepad(container, materials)
 {
     const { size, matrix } = collidersOf(container)[0]
     const resting = matrix.clone().multiply(new THREE.Matrix4().makeTranslation(0, (GAMEPAD_SIZE.y - size.y) / 2, 0))
-    container.add(islandModelMesh(materials, 'gamepad', resting, GAMEPAD_SIZE))
+    container.add(islandModelMesh('gamepad', resting, GAMEPAD_SIZE))
 }
 
 const SURF_FLAG = { width: 1.2, height: 3.2, depth: 0.4, poleX: -0.5 }
@@ -108,7 +108,7 @@ function surfFlag(parts, { size, matrix }, { container, materials })
     const scale = size.y / SURF_FLAG.height
     const anchored = matrix.clone().multiply(new THREE.Matrix4().makeTranslation(-SURF_FLAG.poleX * scale, 0, 0))
     const flagSize = new THREE.Vector3(SURF_FLAG.width * scale, size.y, SURF_FLAG.depth * scale)
-    container.add(islandModelMesh(materials, 'surfFlag', anchored, flagSize))
+    container.add(islandModelMesh('surfFlag', anchored, flagSize))
 }
 
 function slateBoards(parts, container)
@@ -1514,7 +1514,7 @@ function rebuildChild(child, materials, { build, keepEmissive = true })
     const container = prepare(child, { keepEmissive })
     const parts = createParts()
     build(parts, container, materials)
-    container.add(parts.build(materials))
+    container.add(parts.build())
 }
 
 export function rebuildVillageProps(model, materials)
@@ -1529,7 +1529,7 @@ export function rebuildVillageProps(model, materials)
             const container = prepare(child)
             const parts = createParts()
             uncollided.build(parts, frame, { container, materials })
-            container.add(parts.build(materials))
+            container.add(parts.build())
             continue
         }
         const builder = BUILDERS.find((item) => item.pattern.test(child.name))
@@ -1717,7 +1717,7 @@ export function rebuildPodium(model, materials)
     const parts = createParts()
     steps.forEach((frame, index) => podiumStep(parts, frame, index + 1))
     podiumBackdrop(parts)
-    podium.add(parts.build(materials))
+    podium.add(parts.build())
 }
 
 const box3 = (min, max) => new THREE.Box3(new THREE.Vector3(...min), new THREE.Vector3(...max))
@@ -2221,14 +2221,14 @@ export function reshapeCircuitDecoration(model, materials)
         if(!removed.has(offset))
             kept.push(index[offset], index[offset + 1], index[offset + 2])
     decoration.geometry.setIndex(kept)
-    decoration.add(parts.build(materials))
+    decoration.add(parts.build())
 }
 
 export const COCONUT_SIZE = new THREE.Vector3(0.55, 0.48, 0.5)
 
 export function makeCoconut(cookie, materials)
 {
-    const coconut = islandModelMesh(materials, 'coconut', new THREE.Matrix4(), COCONUT_SIZE)
+    const coconut = islandModelMesh('coconut', new THREE.Matrix4(), COCONUT_SIZE)
     cookie.geometry = coconut.geometry
     cookie.material = coconut.material
 }

@@ -7,7 +7,7 @@ import { remapClamp } from '../utilities/maths'
 import { cameraPosition, color, Fn, min, mix, normalWorld, positionViewDirection, positionWorld, screenCoordinate, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import { clamp } from 'three/src/math/MathUtils.js'
 import gsap from 'gsap'
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
+import { MeshDefaultMaterial, revealNode } from '../materials/meshDefaultMaterial'
 
 export class VisualVehicle
 {
@@ -128,7 +128,7 @@ export class VisualVehicle
         this.paints = {}
 
         this.paints.choices = {}
-        this.paints.choices.red = this.game.materials.getFromName('redGradient')
+        this.paints.choices.red = this.game.materials.get('redGradient')
         this.paints.choices.orange = this.game.materials.createGradient('orangeGradient', '#ff940d', '#af0071')
         this.paints.choices.white = this.game.materials.createGradient('whiteGradient', '#ffffff', '#b5b5b5')
         this.paints.choices.black = this.game.materials.createGradient('blackGradient', '#626262', '#262526')
@@ -184,7 +184,7 @@ export class VisualVehicle
                 const fresnelFinalColor = fresnelColor.mul(fresnelIntensity)
                 const finalColor = mix(starsColor, fresnelFinalColor, fresnel)
 
-                finalColor.assign(MeshDefaultMaterial.revealDiscardNodeBuilder(this.game, finalColor))
+                finalColor.assign(revealNode(finalColor))
 
                 return vec4(finalColor, 1)
             })()
@@ -359,7 +359,7 @@ export class VisualVehicle
 
         if(this.parts.energy)
         {
-            const emissiveOuput = this.game.materials.getFromName('emissivePurpleRadialGradient').outputNode
+            const emissiveOuput = this.game.materials.get('emissivePurpleRadialGradient').outputNode
             const defaultOutput = this.parts.energy.material.outputNode
 
             const material = new THREE.MeshLambertNodeMaterial()
@@ -444,7 +444,7 @@ export class VisualVehicle
             if(this.parts.backLights)
             {
                 this.parts.backLights.visible = true
-                this.parts.backLights.material = this.game.materials.getFromName('emissiveOrangeRadialGradient')
+                this.parts.backLights.material = this.game.materials.get('emissiveOrangeRadialGradient')
             }
         }
         else
@@ -466,7 +466,7 @@ export class VisualVehicle
             }
         }
 
-        const trailAlpha = physicalVehicle.goingForward && this.game.player.boosting && this.game.player.accelerating > 0 ? 1 : 0
+        const trailAlpha = physicalVehicle.isGoingForward && this.game.player.boosting && this.game.player.accelerating > 0 ? 1 : 0
         this.boostTrails.leftReference.getWorldPosition(this.boostTrails.left.position)
         this.boostTrails.left.alpha = trailAlpha
         this.boostTrails.rightReference.getWorldPosition(this.boostTrails.right.position)

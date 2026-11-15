@@ -4,7 +4,6 @@ import { rebuildKiosk } from '../islandStructures'
 import * as THREE from 'three/webgpu'
 import { color, float, Fn, instancedArray, mix, normalWorld, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import { Inputs } from '../../inputs/inputs'
-import { InteractivePoints } from '../../interactivePoints'
 import { Area } from './area'
 import gsap from 'gsap'
 import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial'
@@ -49,57 +48,57 @@ export class LandingArea extends Area
 
     setKiosk()
     {
-        const interactivePoint = this.game.interactivePoints.create(
-            this.references.items.get('kioskInteractivePoint')[0].position,
-            '지도',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        const interactivePoint = this.game.interactivePoints.create({
+            position: this.references.items.get('kioskInteractivePoint')[0].position,
+            text: '지도',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () =>
             {
                 this.game.inputs.interactiveButtons.clearItems()
                 this.game.modals.open('map')
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     setControls()
     {
-        const interactivePoint = this.game.interactivePoints.create(
-            this.references.items.get('controlsInteractivePoint')[0].position,
-            '조작법',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        const interactivePoint = this.game.interactivePoints.create({
+            position: this.references.items.get('controlsInteractivePoint')[0].position,
+            text: '조작법',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () =>
             {
                 this.game.inputs.interactiveButtons.clearItems()
                 this.game.menu.open('controls')
                 interactivePoint.hide()
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
 
         const menuInstance = this.game.menu.items.get('controls')
 
@@ -125,7 +124,7 @@ export class LandingArea extends Area
 
         let particles = null
         {
-            const emissiveMaterial = this.game.materials.getFromName('emissiveOrangeRadialGradient')
+            const emissiveMaterial = this.game.materials.get('emissiveOrangeRadialGradient')
 
             const count = 30
             const elevation = uniform(5)
@@ -211,12 +210,12 @@ export class LandingArea extends Area
         const burn = this.references.items.get('bonfireBurn')[0]
         burn.visible = false
 
-        this.game.interactivePoints.create(
-            this.references.items.get('bonfireInteractivePoint')[0].position,
-            '초기화',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        this.game.interactivePoints.create({
+            position: this.references.items.get('bonfireInteractivePoint')[0].position,
+            text: '초기화',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () =>
             {
                 this.game.reset()
 
@@ -233,19 +232,19 @@ export class LandingArea extends Area
                     this.game.audio.groups.get('campfire').items[0].positions.push(position)
                 })
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     update()

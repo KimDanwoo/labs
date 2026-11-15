@@ -4,7 +4,6 @@ import gsap from 'gsap'
 import { clamp } from 'three/src/math/MathUtils.js'
 import { Area } from './area'
 import { paintCareerLines } from '../islandReskins'
-import { InteractivePoints } from '../../interactivePoints'
 import content from '../../../data/danwoo'
 
 export class CareerArea extends Area
@@ -171,16 +170,16 @@ export class CareerArea extends Area
     {
         const position = this.references.items.get('year')[0].position.clone()
         position.y = 1
-        this.interactivePoint = this.game.interactivePoints.create(
-            position,
-            '이력서 보기',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () => window.open(content.resumeUrl, '_blank', 'noopener,noreferrer'),
-            () => this.game.inputs.interactiveButtons.addItems(['interact']),
-            () => this.game.inputs.interactiveButtons.removeItems(['interact']),
-            () => this.game.inputs.interactiveButtons.removeItems(['interact'])
-        )
+        this.interactivePoint = this.game.interactivePoints.create({
+            position: position,
+            text: '이력서 보기',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () => window.open(content.resumeUrl, '_blank', 'noopener,noreferrer'),
+            onReveal: () => this.game.inputs.interactiveButtons.addItems(['interact']),
+            onConceal: () => this.game.inputs.interactiveButtons.removeItems(['interact']),
+            onHide: () => this.game.inputs.interactiveButtons.removeItems(['interact']),
+        })
     }
 
     update()

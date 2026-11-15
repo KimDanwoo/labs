@@ -2,7 +2,6 @@ import * as THREE from 'three/webgpu'
 import { rebuildVillageProps } from '../islandVillage'
 import { rebuildLabGate } from '../islandStructures'
 import { getGame } from '../../gameContext'
-import { InteractivePoints } from '../../interactivePoints'
 import gsap from 'gsap'
 import content from '../../../data/danwoo'
 import { TextCanvas } from '../../textCanvas'
@@ -82,28 +81,28 @@ export class LabArea extends Area
 
     setInteractivePoint()
     {
-        this.interactivePoint = this.game.interactivePoints.create(
-            this.references.items.get('interactivePoint')[0].position,
-            'Danwoo Lab',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        this.interactivePoint = this.game.interactivePoints.create({
+            position: this.references.items.get('interactivePoint')[0].position,
+            text: 'Danwoo Lab',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () =>
             {
                 window.open(content.labUrl, '_blank', 'noopener,noreferrer')
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     setInputs()
@@ -510,15 +509,7 @@ export class LabArea extends Area
         this.title.group = this.references.items.get('title')[0]
         this.title.inner = this.title.group.children[0]
         this.title.textMesh = this.title.inner.children.find(_child => _child.name.startsWith('text'))
-        this.title.textCanvas = new TextCanvas(
-            this.texts.fontFamily,
-            this.texts.fontWeight,
-            this.texts.fontSizeMultiplier * 0.4,
-            4,
-            0.6,
-            this.texts.density,
-            'center'
-        )
+        this.title.textCanvas = new TextCanvas({ fontFamily: this.texts.fontFamily, fontWeight: this.texts.fontWeight, fontSize: this.texts.fontSizeMultiplier * 0.4, width: 4, height: 0.6, density: this.texts.density, align: 'center' })
         this.texts.createMaterialOnMesh(this.title.textMesh, this.title.textCanvas.texture)
 
         this.title.update = (direction) =>
@@ -551,15 +542,7 @@ export class LabArea extends Area
 
         this.url.textMesh = this.url.inner.children.find(_child => _child.name.startsWith('text'))
         this.url.panel = this.url.inner.children.find(_child => _child.name.startsWith('panel'))
-        this.url.textCanvas = new TextCanvas(
-            this.texts.fontFamily,
-            this.texts.fontWeight,
-            this.texts.fontSizeMultiplier * 0.23,
-            4,
-            0.2,
-            this.texts.density,
-            'center'
-        )
+        this.url.textCanvas = new TextCanvas({ fontFamily: this.texts.fontFamily, fontWeight: this.texts.fontWeight, fontSize: this.texts.fontSizeMultiplier * 0.23, width: 4, height: 0.2, density: this.texts.density, align: 'center' })
         this.url.mixStrength = uniform(0)
 
         const material = new MeshDefaultMaterial({
@@ -784,16 +767,7 @@ export class LabArea extends Area
                 {
                     mini.textMixStrength = uniform(0)
 
-                    const textCanvas = new TextCanvas(
-                        this.texts.fontFamily,
-                        this.texts.fontWeight,
-                        this.texts.fontSizeMultiplier * 0.18,
-                        1.5,
-                        0.2,
-                        this.texts.density,
-                        'center',
-                        0.2
-                    )
+                    const textCanvas = new TextCanvas({ fontFamily: this.texts.fontFamily, fontWeight: this.texts.fontWeight, fontSize: this.texts.fontSizeMultiplier * 0.18, width: 1.5, height: 0.2, density: this.texts.density, align: 'center', lineHeight: 0.2 })
                     textCanvas.updateText(project.title)
 
                     const ratio = textCanvas.getMeasure().width / this.texts.density
@@ -1015,7 +989,7 @@ export class LabArea extends Area
     {
         const meshes = this.references.items.get('candleFlame')
 
-        const baseMaterial = this.game.materials.getFromName('emissiveOrangeRadialGradient')
+        const baseMaterial = this.game.materials.get('emissiveOrangeRadialGradient')
         const material = new THREE.MeshBasicNodeMaterial({ transparent: true })
         material.outputNode = baseMaterial.outputNode
         material.positionNode = Fn(() =>
@@ -1087,7 +1061,7 @@ export class LabArea extends Area
         }
 
         {
-            const baseMaterial = this.game.materials.getFromName('palette')
+            const baseMaterial = this.game.materials.get('palette')
             const material = baseMaterial.clone()
 
             const colorA = uniform(color('#ff6b2b'))

@@ -25,7 +25,7 @@ const SCREEN_STAND = {
 function paint(mesh, materials, shade)
 {
     if(mesh?.isMesh)
-        mesh.material = islandMaterial(materials, shade)
+        mesh.material = islandMaterial(shade)
 }
 
 export function paintCareerLines(model, materials)
@@ -75,7 +75,7 @@ export function rebuildBowlingScreenStand(model, materials)
     const [left, right] = SCREEN_STAND.legX
     SCREEN_STAND.legX.forEach((x) => trestle(parts, x, ground))
     parts.rod('woodDark', 0.05, [left, 0.95, SCREEN_STAND.z], [right, 0.95, SCREEN_STAND.z])
-    body.add(parts.build(materials))
+    body.add(parts.build())
 }
 
 export function removeAwardsTable(model)

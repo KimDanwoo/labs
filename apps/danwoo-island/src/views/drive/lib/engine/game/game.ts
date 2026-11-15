@@ -14,7 +14,7 @@ import { Inputs } from './inputs/inputs';
 import { InteractivePoints } from './interactivePoints';
 import { KonamiCode } from './konamiCode';
 import { Lighting } from './lighting';
-import { Map as WorldMap } from './map';
+import { WorldMap } from './map';
 import { Materials } from './materials';
 import { Menu } from './menu';
 import { Modals } from './modals';
@@ -25,9 +25,8 @@ import { Options } from './options';
 import { Overlay } from './overlay';
 import { Physics } from './physics/physics';
 import { PhysicsVehicle } from './physics/physicsVehicle';
-import { PhysicsWireframe } from './physics/physicsWireframe';
 import { Player } from './player';
-import { PreRenderer } from './preRenderer';
+import { preRender } from './preRenderer';
 import { QUALITY, Quality } from './quality';
 import { RayCursor } from './rayCursor';
 import { Rendering } from './rendering';
@@ -97,7 +96,6 @@ interface GameSystems {
   RAPIER: Rapier;
   terrain: Terrain;
   physics: Physics;
-  wireframe: PhysicsWireframe;
   physicalVehicle: PhysicsVehicle;
   zones: Zones;
   player: Player;
@@ -117,7 +115,6 @@ interface AssetNames {
 
 const CACHE_BUSTER = '?cb=1';
 const REVEAL_DELAY_FRAMES = 3;
-const FIRST_STEP = 1;
 const FONT_FACES = ['400 24px MaruBuri', '700 24px MaruBuri'];
 
 function assetNames(): AssetNames {
@@ -301,10 +298,6 @@ export class Game {
     return this.#require('physics');
   }
 
-  get wireframe(): PhysicsWireframe {
-    return this.#require('wireframe');
-  }
-
   get physicalVehicle(): PhysicsVehicle {
     return this.#require('physicalVehicle');
   }
@@ -416,7 +409,6 @@ export class Game {
     this.#provide('resources', { ...driveResources, ...this.resources });
     this.#provide('terrain', new Terrain());
     this.#provide('physics', new Physics());
-    this.#provide('wireframe', new PhysicsWireframe());
     this.#provide('physicalVehicle', new PhysicsVehicle());
     this.#provide('zones', new Zones());
     this.#provide('player', new Player());
@@ -425,13 +417,13 @@ export class Game {
     this.#provide('konamiCode', new KonamiCode());
     this.#provide('map', new WorldMap());
     this.#provide('title', new Title());
-    this.world.step(FIRST_STEP);
+    this.world.populate();
     this.#provide('overlay', new Overlay());
 
     const shouldPreRender = this.quality.level === QUALITY.high && this.rendering.isWebGPU();
-    if (shouldPreRender) PreRenderer.render();
+    if (shouldPreRender) preRender();
     this.ticker.wait(REVEAL_DELAY_FRAMES, () => {
-      this.reveal.updateStep(0);
+      this.reveal.start();
     });
   }
 

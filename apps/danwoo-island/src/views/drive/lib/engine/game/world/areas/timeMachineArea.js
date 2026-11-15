@@ -1,6 +1,5 @@
 import * as THREE from 'three/webgpu'
 import { rebuildVillageProps } from '../islandVillage'
-import { InteractivePoints } from '../../interactivePoints'
 import { Area } from './area'
 import { Fn, texture, uv, vec2, vec3, vec4 } from 'three/tsl'
 import gsap from 'gsap'
@@ -24,28 +23,28 @@ export class TimeMachineArea extends Area
 
     setInteractivePoint()
     {
-        this.interactivePoint = this.game.interactivePoints.create(
-            this.references.items.get('interactivePoint')[0].position,
-            'Danwoo Lab 가기',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
+        this.interactivePoint = this.game.interactivePoints.create({
+            position: this.references.items.get('interactivePoint')[0].position,
+            text: 'Danwoo Lab 가기',
+            align: 'right',
+            state: 'concealed',
+            onInteract: () =>
             {
                 window.open(content.labUrl, '_blank', 'noopener,noreferrer')
             },
-            () =>
+            onReveal: () =>
             {
                 this.game.inputs.interactiveButtons.addItems(['interact'])
             },
-            () =>
+            onConceal: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             },
-            () =>
+            onHide: () =>
             {
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
+            },
+        })
     }
 
     setTV()
