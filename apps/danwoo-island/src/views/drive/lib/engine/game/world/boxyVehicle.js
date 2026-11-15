@@ -205,7 +205,7 @@ export function createBoxyVehicle(original)
 
     const glass = new MeshDefaultMaterial({ colorNode: mix(color('#152b3d'), color('#4b7182'), normalWorld.y.abs().mul(0.4)) })
     glass.userData.prevent = true
-    const headlight = game.materials.list.get('islandHeadlight') ?? game.materials.createEmissiveGradient('islandHeadlight', '#fff9e8', '#b9d9de', 1.6, false)
+    const headlight = game.materials.emissiveGradient('islandHeadlight', { inner: '#fff9e8', outer: '#b9d9de', intensity: 1.6, isNormalized: false })
     headlight.userData.prevent = true
     const blink = new THREE.MeshBasicMaterial({ name: 'emissiveOrangeRadialGradient' })
     const chassis = parts.build({

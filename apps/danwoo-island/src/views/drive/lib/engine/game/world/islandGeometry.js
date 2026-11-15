@@ -65,9 +65,7 @@ export function islandMaterial(materials, name)
     const glow = GLOW[name]
     if(!glow)
         return shadedMaterial(name)
-    if(!materials.list.has(glow.name))
-        materials.createEmissiveGradient(glow.name, glow.inner, glow.outer, glow.intensity, true)
-    return materials.list.get(glow.name)
+    return materials.emissiveGradient(glow.name, { inner: glow.inner, outer: glow.outer, intensity: glow.intensity, isNormalized: true })
 }
 
 export function seededRandom(seed)

@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { getGame } from '../gameContext'
-import MeshGridMaterial, { MeshGridMaterialLine } from '../materials/meshGridMaterial'
+import { MeshGridMaterial } from '../materials/meshGridMaterial'
 import { float, normalWorld, positionWorld, vec3, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
 import { Fn } from 'three/tsl'
@@ -23,18 +23,14 @@ export class Grid
             return
         }
 
-        const lines = [
-            new MeshGridMaterialLine('#8d55ff', 10, 0.02, 0.2),
-            new MeshGridMaterialLine('#675369', 100, 0.002, 1),
-        ]
-
         const uvGridMaterial = new MeshGridMaterial({
             color: 0x1b191f,
             scale: 0.001,
-            antialiased: true,
-            reference: 'uv',
             side: THREE.DoubleSide,
-            lines
+            lines: [
+                { color: '#8d55ff', scale: 10, thickness: 0.02, cross: 0.2 },
+                { color: '#675369', scale: 100, thickness: 0.002, cross: 1 },
+            ],
         })
 
         const defaultMaterial = new MeshDefaultMaterial({

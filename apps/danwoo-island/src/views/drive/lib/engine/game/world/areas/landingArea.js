@@ -125,7 +125,7 @@ export class LandingArea extends Area
 
         let particles = null
         {
-            const emissiveMaterial = this.game.materials.getFromName('emissiveOrangeRadialGradient')
+            const emissiveMaterial = this.game.materials.get('emissiveOrangeRadialGradient')
 
             const count = 30
             const elevation = uniform(5)

@@ -1015,7 +1015,7 @@ export class LabArea extends Area
     {
         const meshes = this.references.items.get('candleFlame')
 
-        const baseMaterial = this.game.materials.getFromName('emissiveOrangeRadialGradient')
+        const baseMaterial = this.game.materials.get('emissiveOrangeRadialGradient')
         const material = new THREE.MeshBasicNodeMaterial({ transparent: true })
         material.outputNode = baseMaterial.outputNode
         material.positionNode = Fn(() =>
@@ -1087,7 +1087,7 @@ export class LabArea extends Area
         }
 
         {
-            const baseMaterial = this.game.materials.getFromName('palette')
+            const baseMaterial = this.game.materials.get('palette')
             const material = baseMaterial.clone()
 
             const colorA = uniform(color('#ff6b2b'))

@@ -159,6 +159,7 @@ export class AchievementsArea extends Area
                 hasWater: false,
                 hasReveal: false,
                 alphaTest: 0.1,
+                alphaNode: uv().sub(0.5).length().oneMinus().sub(0.5),
             })
 
             material.positionNode = Fn(() =>
@@ -174,12 +175,6 @@ export class AchievementsArea extends Area
                 finalPosition.y.addAssign(sin(angleAttribute).mul(distance).mul(2))
                 finalPosition.x.addAssign(cos(angleAttribute).mul(distance).mul(1.5))
                 return finalPosition
-            })()
-
-            material._alphaNode = Fn(() =>
-            {
-                const distanceToCenter = uv().sub(0.5).length().oneMinus().sub(0.5)
-                return distanceToCenter
             })()
 
             const geometry = new THREE.PlaneGeometry(1, 1)

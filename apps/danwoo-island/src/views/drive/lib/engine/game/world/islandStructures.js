@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Fn, max, texture, uv, vec4 } from 'three/tsl'
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial'
+import { MeshDefaultMaterial, revealNode } from '../materials/meshDefaultMaterial'
 import { createParts, FULL_TURN, seededRandom } from './islandGeometry'
 import { islandModelMesh } from './islandModels'
 
@@ -339,7 +339,7 @@ export function rebuildWaterfallPagoda(model, materials)
     container.add(parts.build(materials))
 }
 
-function neonMaterial(game, neonTexture)
+function neonMaterial(neonTexture)
 {
     neonTexture.colorSpace = THREE.SRGBColorSpace
     const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false })
@@ -347,7 +347,7 @@ function neonMaterial(game, neonTexture)
     {
         const sample = texture(neonTexture, uv())
         const glow = vec4(sample.rgb.mul(2.2), max(sample.r, max(sample.g, sample.b)))
-        return MeshDefaultMaterial.revealDiscardNodeBuilder(game, glow)
+        return revealNode(glow)
     })()
     material.fog = false
     material.userData.prevent = true
@@ -363,7 +363,7 @@ export function rebuildBowlingSign(model, materials, neonTexture)
     for(const side of [-1, 1])
         parts.box('metalDark', [0.14, 4.4, 0.14], { position: [side * 1.6, -3.1, -0.12] })
     const group = parts.build(materials)
-    const neon = new THREE.Mesh(new THREE.PlaneGeometry(3.86, 1.9), neonMaterial(materials.game, neonTexture))
+    const neon = new THREE.Mesh(new THREE.PlaneGeometry(3.86, 1.9), neonMaterial(neonTexture))
     neon.name = 'neon'
     neon.position.set(0.05, -0.04, 0.0)
     group.add(neon)

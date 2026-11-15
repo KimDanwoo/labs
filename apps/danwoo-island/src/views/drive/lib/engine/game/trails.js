@@ -103,7 +103,7 @@ export class Trails
                 0.5,
                 ratio.oneMinus().sub(fresnel.oneMinus().mul(this.fresnelOffset))
             )
-            const baseColor = texture(this.game.materials.gradientTexture, gradientUv).rgb.mul(this.emissiveMultiplier)
+            const baseColor = texture(this.game.materials.trailGradient, gradientUv).rgb.mul(this.emissiveMultiplier)
 
             return vec4(vec3(baseColor), ratio.oneMinus().mul(alpha))
         })()

@@ -53,8 +53,8 @@ export class CircuitArea extends Area
         this.setEndModal()
         this.setPodium()
 
-        this.game.materials.getFromName('circuitBrand').map.minFilter = THREE.LinearFilter
-        this.game.materials.getFromName('circuitBrand').map.magFilter = THREE.LinearFilter
+        this.game.materials.get('circuitBrand').map.minFilter = THREE.LinearFilter
+        this.game.materials.get('circuitBrand').map.magFilter = THREE.LinearFilter
     }
 
     setSounds()
@@ -120,8 +120,8 @@ export class CircuitArea extends Area
         this.startingLights = {}
         this.startingLights.mesh = this.references.items.get('startingLights')[0]
         this.startingLights.mesh.visible = false
-        this.startingLights.redMaterial = this.game.materials.getFromName('emissiveOrangeRadialGradient')
-        this.startingLights.greenMaterial = this.game.materials.getFromName('emissiveGreenRadialGradient')
+        this.startingLights.redMaterial = this.game.materials.get('emissiveOrangeRadialGradient')
+        this.startingLights.greenMaterial = this.game.materials.get('emissiveGreenRadialGradient')
         this.startingLights.baseZ = this.startingLights.mesh.position.z
 
         this.startingLights.reset = () =>

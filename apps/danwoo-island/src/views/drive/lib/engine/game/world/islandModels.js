@@ -1,3 +1,4 @@
+import { getGame } from '../gameContext'
 import { modelResource } from '../resourcesLoader'
 import * as THREE from 'three/webgpu'
 
@@ -30,7 +31,7 @@ export function islandModelResources(cacheBuster)
 
 function sourceMesh(materials, key)
 {
-    const source = materials.game.resources[resourceName(key)]?.scene?.getObjectByProperty('isMesh', true)
+    const source = getGame().resources[resourceName(key)]?.scene?.getObjectByProperty('isMesh', true)
     if(!source)
         throw new Error(`섬 모델 ${key}을 불러오지 못했어요.`)
     source.updateWorldMatrix(true, false)
@@ -66,5 +67,5 @@ export function islandModelMesh(materials, key, matrix, size = null)
 export function islandPaletteMaterial(materials, key)
 {
     const { material } = sourceMesh(materials, key)
-    return materials.getFromName(material.name, material)
+    return materials.resolve(material)
 }

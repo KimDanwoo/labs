@@ -261,8 +261,8 @@ export class AltarArea extends Area
             return scale.mul(0.2)
         })()
 
-        const emissiveAMaterial = this.game.materials.getFromName('emissiveBlueRadialGradient')
-        const emissiveBMaterial = this.game.materials.getFromName('emissiveOrangeRadialGradient')
+        const emissiveAMaterial = this.game.materials.get('emissiveBlueRadialGradient')
+        const emissiveBMaterial = this.game.materials.get('emissiveOrangeRadialGradient')
 
         material.outputNode = Fn(() =>
         {
