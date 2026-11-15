@@ -619,16 +619,7 @@ export class ProjectsArea extends Area
             item.visible = false
             item.group.visible = false
             const textMesh = item.group.children.find(_child => _child.name.startsWith('text'))
-            item.textCanvas = new TextCanvas(
-                this.texts.fontFamily,
-                this.texts.fontWeight,
-                this.texts.fontSizeMultiplier * 0.23,
-                1.4,
-                0.45,
-                this.texts.density,
-                'center',
-                0.2
-            )
+            item.textCanvas = new TextCanvas({ fontFamily: this.texts.fontFamily, fontWeight: this.texts.fontWeight, fontSize: this.texts.fontSizeMultiplier * 0.23, width: 1.4, height: 0.45, density: this.texts.density, align: 'center', lineHeight: 0.2 })
 
             this.texts.createMaterialOnMesh(textMesh, item.textCanvas.texture)
 
@@ -688,16 +679,7 @@ export class ProjectsArea extends Area
         this.adjacents.previous.inner = this.adjacents.previous.group.children[0]
 
         this.adjacents.previous.textMesh = this.adjacents.previous.inner.children.find(_child => _child.name.startsWith('text'))
-        this.adjacents.previous.textCanvas = new TextCanvas(
-            this.texts.fontFamily,
-            this.texts.fontWeight,
-            this.texts.fontSizeMultiplier * 0.3,
-            1.25,
-            0.75,
-            this.texts.density,
-            'center',
-            0.3
-        )
+        this.adjacents.previous.textCanvas = new TextCanvas({ fontFamily: this.texts.fontFamily, fontWeight: this.texts.fontWeight, fontSize: this.texts.fontSizeMultiplier * 0.3, width: 1.25, height: 0.75, density: this.texts.density, align: 'center', lineHeight: 0.3 })
         this.texts.createMaterialOnMesh(this.adjacents.previous.textMesh, this.adjacents.previous.textCanvas.texture)
 
         const arrowPrevious = this.references.items.get('arrowPreviousProject')[0]
@@ -729,16 +711,7 @@ export class ProjectsArea extends Area
         this.adjacents.next.inner = this.adjacents.next.group.children[0]
 
         this.adjacents.next.textMesh = this.adjacents.next.inner.children.find(_child => _child.name.startsWith('text'))
-        this.adjacents.next.textCanvas = new TextCanvas(
-            this.texts.fontFamily,
-            this.texts.fontWeight,
-            this.texts.fontSizeMultiplier * 0.3,
-            1.25,
-            0.75,
-            this.texts.density,
-            'center',
-            0.3
-        )
+        this.adjacents.next.textCanvas = new TextCanvas({ fontFamily: this.texts.fontFamily, fontWeight: this.texts.fontWeight, fontSize: this.texts.fontSizeMultiplier * 0.3, width: 1.25, height: 0.75, density: this.texts.density, align: 'center', lineHeight: 0.3 })
         this.texts.createMaterialOnMesh(this.adjacents.next.textMesh, this.adjacents.next.textCanvas.texture)
 
         const arrowNext = this.references.items.get('arrowNextProject')[0]
@@ -796,15 +769,7 @@ export class ProjectsArea extends Area
         this.title.group = this.references.items.get('title')[0]
         this.title.inner = this.title.group.children[0]
         this.title.textMesh = this.title.inner.children.find(_child => _child.name.startsWith('text'))
-        this.title.textCanvas = new TextCanvas(
-            this.texts.fontFamily,
-            this.texts.fontWeight,
-            this.texts.fontSizeMultiplier * 0.4,
-            4,
-            0.6,
-            this.texts.density,
-            'center'
-        )
+        this.title.textCanvas = new TextCanvas({ fontFamily: this.texts.fontFamily, fontWeight: this.texts.fontWeight, fontSize: this.texts.fontSizeMultiplier * 0.4, width: 4, height: 0.6, density: this.texts.density, align: 'center' })
         this.texts.createMaterialOnMesh(this.title.textMesh, this.title.textCanvas.texture)
 
         this.title.update = (direction) =>
@@ -837,15 +802,7 @@ export class ProjectsArea extends Area
 
         this.url.textMesh = this.url.inner.children.find(_child => _child.name.startsWith('text'))
         this.url.panel = this.url.inner.children.find(_child => _child.name.startsWith('panel'))
-        this.url.textCanvas = new TextCanvas(
-            this.texts.fontFamily,
-            this.texts.fontWeight,
-            this.texts.fontSizeMultiplier * 0.23,
-            4,
-            0.2,
-            this.texts.density,
-            'center'
-        )
+        this.url.textCanvas = new TextCanvas({ fontFamily: this.texts.fontFamily, fontWeight: this.texts.fontWeight, fontSize: this.texts.fontSizeMultiplier * 0.23, width: 4, height: 0.2, density: this.texts.density, align: 'center' })
         this.url.mixStrength = uniform(0)
 
         const material = new MeshDefaultMaterial({
