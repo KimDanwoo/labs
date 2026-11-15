@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu';
 
 import { createParts, type Parts } from './islandGeometry';
 import { placeLandmarks } from './islandLandmarks';
-import { islandModelMesh } from './islandModels';
+import { type IslandModelKey, islandModelMesh } from './islandModels';
 import {
   boundsFrame,
   collidersOf,
@@ -12,20 +12,17 @@ import {
   type PropFrame,
   rebuildChild,
 } from './villageKit';
-import { badukBoard, dotjari, tvCabinet, watermelonTray } from './villageLeisure';
+import { dotjari, tvCabinet, watermelonTray } from './villageLeisure';
 import { barCounter, bench, gochujangJar, logStool, makgeolliBowl, oilBottle, soban } from './villageLounge';
 import { beachBall, bowlingPin, pinwheel, stonePillar } from './villageToys';
 import {
   anvil,
   bellowsBase,
   candleSticks,
-  gamasot,
   grinderStand,
-  hwaro,
   placeGamepad,
   slateBoards,
   surfFlag,
-  waterJar,
   workTable,
 } from './villageWorkshop';
 
@@ -35,6 +32,25 @@ interface Matched<B> {
   readonly pattern: RegExp;
   readonly build: B;
 }
+
+const CHARCOAL_FOOTPRINT = { x: 1.62, z: 1.52 } as const;
+const CLAY_POT = { center: new THREE.Vector3(0, -0.085, 0), size: new THREE.Vector3(1.85, 0.93, 1.85) } as const;
+
+const modelOnFirstCollider =
+  (key: IslandModelKey, minimum: { x: number; z: number } = { x: 0, z: 0 }): PropBuilder =>
+  (_parts, container) => {
+    const { size, matrix } = firstCollider(container);
+    const fitted = new THREE.Vector3(Math.max(size.x, minimum.x), size.y, Math.max(size.z, minimum.z));
+    container.add(islandModelMesh(key, matrix, fitted));
+  };
+
+const clayPot: PropBuilder = (_parts, container) => {
+  container.add(islandModelMesh('clayPot', new THREE.Matrix4().makeTranslation(CLAY_POT.center), CLAY_POT.size));
+};
+
+const ukuleleTable: UncollidedBuilder = (_parts, { size, matrix }, container) => {
+  container.add(islandModelMesh('ukuleleTable', matrix, size));
+};
 
 const onFirstCollider =
   (build: (parts: Parts, frame: PropFrame) => void): PropBuilder =>
@@ -49,10 +65,10 @@ const BUILDERS: readonly Matched<PropBuilder>[] = [
     pattern: /^(main|side)TablePhysicalDynamic/,
     build: (parts, container) => candleSticks(parts, container, workTable(parts, firstCollider(container))),
   },
-  { pattern: /^quenchPhysicalDynamic/, build: onFirstCollider(waterJar) },
+  { pattern: /^quenchPhysicalDynamic/, build: modelOnFirstCollider('bambooBucket') },
   { pattern: /^refAnvilPhysicalDynamic$/, build: onFirstCollider(anvil) },
-  { pattern: /^refOvenPhysicalDynamic$/, build: onFirstCollider(hwaro) },
-  { pattern: /^cauldronPhysicalDynamic$/, build: gamasot },
+  { pattern: /^refOvenPhysicalDynamic$/, build: modelOnFirstCollider('firePit', CHARCOAL_FOOTPRINT) },
+  { pattern: /^cauldronPhysicalDynamic$/, build: clayPot },
   { pattern: /^couchPhysicalDynamic/, build: bench },
   { pattern: /^stoolPhysicalDynamic/, build: onFirstCollider(logStool) },
   {
@@ -74,7 +90,7 @@ const BUILDERS: readonly Matched<PropBuilder>[] = [
 
 const UNCOLLIDED_BUILDERS: readonly Matched<UncollidedBuilder>[] = [
   { pattern: /^sword$/, build: surfFlag },
-  { pattern: /^Cube006$/, build: badukBoard },
+  { pattern: /^Cube006$/, build: ukuleleTable },
   { pattern: /^Cylinder$/, build: watermelonTray },
   { pattern: /^Plane005$/, build: dotjari },
   { pattern: /^refPillar$/, build: stonePillar },
