@@ -241,6 +241,7 @@ export class Objects {
     if (visual.parent && visual.parent !== visual.object3D.parent) visual.parent.add(visual.object3D);
     visual.object3D.position.copy(initialState.position);
     visual.object3D.quaternion.copy(initialState.rotation);
+    markInstanceDirty(visual.object3D);
   }
 
   resetAll(): void {
