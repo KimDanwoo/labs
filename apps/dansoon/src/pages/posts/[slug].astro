@@ -1,6 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { getImage, Image } from 'astro:assets';
+import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import AdFit from '~/components/AdFit.astro';
 import CategoryBadge from '~/components/CategoryBadge.astro';
@@ -14,6 +14,7 @@ import TagChips from '~/components/TagChips.astro';
 import Toc from '~/components/Toc.astro';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import { formatLongDate, readingMinutes } from '~/lib/format';
+import { postOgImagePath } from '~/lib/postImage';
 import { filterBySeries, getAdjacentPosts, getPublishedPosts, getRelatedPosts, postPath, type Post } from '~/lib/posts';
 
 export const getStaticPaths = (async () => {
@@ -27,16 +28,13 @@ type Props = {
 };
 
 const { post, posts } = Astro.props;
-const { title, description, publishedAt, updatedAt, category, tags, thumbnail, cover, series } = post.data;
+const { title, description, publishedAt, updatedAt, category, tags, cover, series } = post.data;
 const { Content, headings } = await render(post);
 const { older, newer } = getAdjacentPosts(posts, post);
 const COVER_WIDTH = 1344;
 const COVER_WIDTHS = [640, 960, COVER_WIDTH];
 const COVER_SIZES = '(min-width: 42rem) 42rem, 100vw';
-const OG_IMAGE_WIDTH = 1200;
-const ogImage = thumbnail
-  ? (await getImage({ src: thumbnail, width: OG_IMAGE_WIDTH, format: 'jpg' })).src
-  : `/og/posts/${post.id}.png`;
+const ogImage = await postOgImagePath(post);
 
 const structuredData = {
   '@context': 'https://schema.org',
