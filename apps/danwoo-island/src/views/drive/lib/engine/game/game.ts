@@ -543,7 +543,7 @@ export class Game {
       textureResource('islandMapTexture', `areas/island/islandMap.webp${cb}`, 'texture', (resource) => {
         resource.colorSpace = THREE.SRGBColorSpace;
       }),
-      textureResource('bowlingNeonTexture', `bowling/neonSign.png${cb}`, 'texture', (resource) => {
+      textureResource('bowlingNeonTexture', `bowling/neonSign.webp${cb}`, 'texture', (resource) => {
         resource.colorSpace = THREE.SRGBColorSpace;
         resource.generateMipmaps = false;
         resource.minFilter = THREE.LinearFilter;
