@@ -158,6 +158,8 @@ export class AudioItem {
   readonly onPlaying: ((item: AudioItem) => void) | null;
   #isLoaded: boolean;
   #lastPlay = -Infinity;
+  #appliedRate = Number.NaN;
+  #appliedVolume = Number.NaN;
 
   constructor(options: SoundOptions, group: AudioGroup, isInitiated: boolean) {
     const volume = options.volume ?? DEFAULT_VOLUME;
@@ -208,6 +210,22 @@ export class AudioItem {
     const position = this.positions?.[0];
     if (!position) throw new Error('Sound has no position');
     return position;
+  }
+
+  applyMix(rate: number, volume: number): void {
+    if (!this.howl.playing()) {
+      this.#appliedRate = Number.NaN;
+      this.#appliedVolume = Number.NaN;
+      return;
+    }
+    if (rate !== this.#appliedRate) {
+      this.howl.rate(rate);
+      this.#appliedRate = rate;
+    }
+    if (volume === this.#appliedVolume) return;
+    this.howl.volume(volume);
+    this.howl.mute(volume < AUDIBLE_VOLUME);
+    this.#appliedVolume = volume;
   }
 }
 
@@ -566,10 +584,7 @@ export class Audio {
   #updateItem(item: AudioItem): void {
     item.onPlaying?.(item);
     const fade = item.positions && item.howl.playing() ? this.#spatialize(item, item.positions) : 1;
-    item.howl.rate(clamp(item.rate * this.#globalRate, RATE_RANGE.min, RATE_RANGE.max));
-    const volume = item.volume * fade;
-    item.howl.volume(volume);
-    item.howl.mute(volume < AUDIBLE_VOLUME);
+    item.applyMix(clamp(item.rate * this.#globalRate, RATE_RANGE.min, RATE_RANGE.max), item.volume * fade);
   }
 
   #spatialize(item: AudioItem, positions: readonly THREE.Vector3[]): number {
