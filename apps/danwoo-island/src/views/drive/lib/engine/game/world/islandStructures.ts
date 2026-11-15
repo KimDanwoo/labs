@@ -395,42 +395,14 @@ export function rebuildBowlingSign(model: THREE.Object3D, neonTexture: THREE.Tex
   sign.add(group);
 }
 
-export function rebuildRadioCabinet(model: THREE.Object3D): void {
+export function rebuildJukebox(model: THREE.Object3D): THREE.Mesh {
   const container = findChild(model, 'refJukeboxPhysicalDynamic');
+  container.name = 'refJukeboxPhysicalFixed';
   removeVisualMeshes(container);
   const collider = cuboidFrame(findChildMatching(container, CUBOID));
-  const { x: width, y: height, z: depth } = collider.size;
-  const frame = { matrix: collider.matrix };
-  const parts = createParts();
-  parts.box('cabinetWood', [width - 0.1, height - 0.36, depth - 0.1], { position: [0, -0.06, 0], ...frame });
-  parts.box('woodDark', [width, 0.12, depth], { position: [0, height / 2 - 0.18, 0], ...frame });
-  for (const x of [-1, 1]) {
-    for (const z of [-1, 1]) {
-      parts.box('woodDark', [0.16, 0.24, 0.16], {
-        position: [x * (width / 2 - 0.2), -height / 2 + 0.12, z * (depth / 2 - 0.2)],
-        ...frame,
-      });
-    }
-  }
-  parts.box('grille', [width - 0.6, height * 0.4, 0.04], { position: [0, -height * 0.18, depth / 2 - 0.03], ...frame });
-  for (let index = 0; index < 5; index += 1) {
-    parts.box('cabinetWood', [width - 0.6, 0.03, 0.05], {
-      position: [0, -height * 0.36 + index * (height * 0.09), depth / 2 - 0.01],
-      ...frame,
-    });
-  }
-  parts.box('lantern', [width - 1.0, 0.36, 0.04], { position: [0, height * 0.18, depth / 2 - 0.03], ...frame });
-  for (const x of [-0.75, 0.75]) {
-    parts.prism(
-      'woodDark',
-      0.13,
-      0.13,
-      0.08,
-      { position: [x, height * 0.02, depth / 2], rotation: [Math.PI / 2, 0, 0], ...frame },
-      10,
-    );
-  }
-  container.add(parts.build());
+  const mesh = islandModelMesh('jukebox', collider.matrix, collider.size);
+  container.add(mesh);
+  return mesh;
 }
 
 function timberPile(parts: Parts, { size, matrix }: Frame): void {

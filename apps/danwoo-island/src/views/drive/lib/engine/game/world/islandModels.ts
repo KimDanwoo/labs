@@ -22,6 +22,7 @@ const ISLAND_MODELS = {
   coconut: 'areas/island/models/coconut.glb',
   surfFlag: 'areas/island/models/surfFlag.glb',
   palmTree: 'areas/island/models/palmTree.glb',
+  jukebox: 'areas/island/models/jukebox.glb',
 } as const;
 
 export type IslandModelKey = keyof typeof ISLAND_MODELS;

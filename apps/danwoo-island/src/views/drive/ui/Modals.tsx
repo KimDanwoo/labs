@@ -15,6 +15,18 @@ export function Modals() {
           </div>
         </div>
       </div>
+      <div className="js-modal modal jukebox" data-name="jukebox">
+        <div className="panel-card">
+          <header className="panel-header">
+            <img className="panel-logo" src={worldAsset('ui/islandMark.png')} alt="" aria-hidden="true" />
+            <h2 className="panel-title">쥬크박스</h2>
+            <span className="panel-badge">MUSIC</span>
+            <CloseButton />
+          </header>
+          <section className="js-jukebox-now jukebox-now" aria-live="polite" />
+          <ul className="js-jukebox-tracks jukebox-tracks" />
+        </div>
+      </div>
       <div className="js-modal modal blog" data-name="blog">
         <div className="panel-card">
           <header className="panel-header">

@@ -8,6 +8,7 @@
         "$TURBO_ROOT$/apps/hub/src/views/home/model/constants/profileContent.ts",
         "$TURBO_ROOT$/apps/hub/public/projects/**",
         "$TURBO_ROOT$/apps/hub/app/opengraph-image.png",
+        "$TURBO_ROOT$/apps/soundlab/src/entities/track/model/constants/tracks.ts",
         "$TURBO_ROOT$/packages/tokens/fonts/**"
       ],
       "outputs": [
@@ -15,7 +16,7 @@
         "!.next/cache/**",
         "!.next/dev/**",
         "public/world/**",
-        "src/views/drive/lib/engine/data/danwoo.js"
+        "src/views/drive/lib/engine/data/danwoo.ts"
       ]
     }
   }
