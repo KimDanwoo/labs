@@ -2,10 +2,10 @@ import { createParts, islandMaterial, removeComponents } from './islandGeometry.
 import { fixedLandmark, LIGHTHOUSE } from './islandLandmarks.js'
 
 const CAREER_PAINT = {
-    emissiveWhiteRadialGradient: 'hanji',
-    emissiveOrangeRadialGradient: 'obangYellow',
-    emissivePurpleRadialGradient: 'obangRed',
-    emissiveBlueRadialGradient: 'obangBlue',
+    emissiveWhiteRadialGradient: 'bunting4',
+    emissiveOrangeRadialGradient: 'bunting3',
+    emissivePurpleRadialGradient: 'bunting5',
+    emissiveBlueRadialGradient: 'bunting1',
 }
 
 const AWARDS_TABLE = ['table002', 'cube024', 'refel003', 'medal', 'refDistinctions']

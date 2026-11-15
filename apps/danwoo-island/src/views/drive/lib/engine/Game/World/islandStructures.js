@@ -438,7 +438,7 @@ export function rebuildBuildingSite(model, materials)
             const parts = createParts()
             parts.box('stoneDark', [0.85, 0.1, 0.85], { position: [0, -0.46, 0] })
             for(let index = 0; index < 6; index++)
-                parts.add('giwa', new THREE.CylinderGeometry(0.3, 0.3, 0.62, 8, 1, false, 0, Math.PI), {
+                parts.add('terracotta', new THREE.CylinderGeometry(0.3, 0.3, 0.62, 8, 1, false, 0, Math.PI), {
                     position: [0, -0.38 + index * 0.15, 0],
                     rotation: [0, index % 2 === 0 ? 0 : Math.PI / 2, Math.PI / 2],
                     scale: [1, 1, 0.55],

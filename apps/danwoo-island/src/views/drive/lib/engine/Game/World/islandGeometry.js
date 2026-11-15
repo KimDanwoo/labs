@@ -11,21 +11,12 @@ export const SHADES = {
     stoneDark: '#857c74',
     wood: '#9a5b34',
     woodDark: '#6b3d24',
-    onggi: '#5b2f1f',
-    onggiLid: '#7c4127',
     fieldstone: '#9a948b',
-    pillarRed: '#a5402c',
-    giwa: '#c46a43',
-    giwaRidge: '#3c3c46',
-    dancheongGreen: '#3f8a6a',
     thatch: '#d6a548',
     thatchRope: '#a3772c',
-    hanji: '#efe2c4',
-    mapBlue: '#69a7c9',
     iron: '#3b3a3f',
     glass: '#bfe3ea',
     earth: '#b9956b',
-    ink: '#2b2420',
     basalt: '#625b58',
     basaltDark: '#423d3c',
     neonBoard: '#2a2230',
@@ -34,24 +25,27 @@ export const SHADES = {
     grille: '#c9b48a',
     timber: '#bb8650',
     slate: '#2f3a33',
-    obangBlue: '#2f5fb3',
-    obangRed: '#c9372c',
-    obangYellow: '#e8b830',
-    obangWhite: '#f2eee4',
-    obangBlack: '#2a2a2e',
     bunting1: '#36AFC0',
     bunting2: '#F47F75',
     bunting3: '#F6CF68',
     bunting4: '#FFF1D6',
     bunting5: '#AA91CC',
     bronze: '#b0803a',
+    bamboo: '#D7B66F',
+    coconutShell: '#76503A',
+    palmLeaf: '#398767',
+    sand: '#F1DEB7',
+    lagoon: '#49BDC5',
+    mango: '#F4B94F',
+    pineapple: '#EDBC46',
+    terracotta: '#c46a43',
 }
 
 const GLOW = {
     lantern: { name: 'emissiveSeokdeungGradient', inner: '#fff1b8', outer: '#ffad3d', intensity: 1.6 },
 }
 
-const SIGNAGE_FACES = new Set(['hanji', 'mapBlue', 'glass'])
+const SIGNAGE_FACES = new Set(['glass'])
 
 const shadedMaterials = new Map()
 
