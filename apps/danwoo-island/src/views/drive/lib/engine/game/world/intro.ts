@@ -5,6 +5,7 @@ import * as THREE from 'three/webgpu';
 import { setStartupStage, STARTUP } from '../../islandStartup';
 import { getGame } from '../gameContext';
 import { INPUT_MODE } from '../inputs/inputs';
+import { introCenter } from '../introCenter';
 import { QUALITY } from '../quality';
 import type { Intersect } from '../rayCursor';
 import { isTideLoading, TIDE_LABEL, tideRingGeometry, tideRingMaterial } from './tideLoading';
@@ -19,7 +20,7 @@ const LABEL_TINT = isTideLoading ? TIDE_LABEL : '#ffffff';
 const LABEL_HEIGHT = 3.3;
 const LABEL_YAW = 0.4;
 const LABEL_HIDDEN_SCALE = 0.01;
-const HIGH_QUALITY_LAYOUT: LabelLayout = { offsetX: 7.9, offsetZ: 0.2, rotationX: 0 };
+const HIGH_QUALITY_LAYOUT: LabelLayout = { offsetX: 7.1, offsetZ: 7.1, rotationX: -0.25 };
 const LOW_QUALITY_LAYOUT: LabelLayout = { offsetX: 1.4, offsetZ: -5.8, rotationX: -0.4 };
 const PORTRAIT_LAYOUT: LabelLayout = { offsetX: 6.8, offsetZ: 6.8, rotationX: -0.4 };
 const RING = { radius: 3.5, thickness: 0.04, segments: 128, elevation: 0.001, smoothing: 10 } as const;
@@ -172,7 +173,7 @@ export class Intro {
 
   constructor() {
     const game = getGame();
-    this.center = game.respawns.getDefault().position.clone();
+    this.center = introCenter(game.respawns);
     this.#ring = this.#createRing();
     this.#placeLabel();
     game.ticker.events.on('tick', this.#update, TICK_ORDER);

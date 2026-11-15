@@ -3,6 +3,7 @@ import * as THREE from 'three/webgpu';
 import { getGame } from './gameContext';
 import type { Action } from './inputs/inputs';
 import { Pointer } from './inputs/pointer';
+import { introCenter } from './introCenter';
 import { QUALITY } from './quality';
 import { clamp, lerp, remap, smoothstep } from './utilities/maths';
 import { CameraRoll } from './view/cameraRoll';
@@ -94,15 +95,14 @@ export class View {
 
   constructor() {
     this.#updateRatioOverflow();
-    const spawn = this.game.respawns.getDefault().position;
-    const tracked = new THREE.Vector3(spawn.x, 0, spawn.z);
+    const center = introCenter(this.game.respawns);
     this.focusPoint = {
-      trackedPosition: tracked,
-      isTracking: true,
-      position: tracked.clone(),
-      smoothedPosition: tracked.clone(),
+      trackedPosition: center.clone(),
+      isTracking: false,
+      position: center.clone(),
+      smoothedPosition: center.clone(),
       easing: 1,
-      magnet: { active: true, multiplier: FOCUS.magnetMultiplier },
+      magnet: { active: false, multiplier: FOCUS.magnetMultiplier },
     };
     this.spherical = {
       phi: Math.PI * SPHERICAL.phiByQuality[this.game.quality.level],
