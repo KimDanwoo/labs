@@ -38,7 +38,7 @@ export function createGardenLamp(): THREE.Group {
 }
 
 export function createLampPost(): THREE.Group {
-  return withGlass(modelMesh('lampPost', [0.305, -0.03, 0]), { size: [0.32, 0.4, 0.32], position: [0.62, 1, 0] });
+  return withGlass(modelMesh('lampPost', [0, -0.03, 0]), { size: [0.32, 0.38, 0.32], position: [0, 1.39, 0] });
 }
 
 export function createBeachBench(): THREE.Group {
