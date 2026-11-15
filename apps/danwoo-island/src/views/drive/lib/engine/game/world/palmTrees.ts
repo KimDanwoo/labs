@@ -7,7 +7,6 @@ import {
   screenSize,
   screenUV,
   sin,
-  smoothstep,
   step,
   texture,
   uniform,
@@ -25,8 +24,8 @@ const TRUNK_BASE_X = 0.9;
 const SWAY = { start: 1.5, wind: 0.35, flutter: 0.06, flutterSpeed: 1.7 } as const;
 const CROWN_START = 4.3;
 const SCALE_RANGE = [1.1, 1.35] as const;
-const SEE_THROUGH_EDGE = { min: 2.5, max: 3.5 } as const;
-const SEE_THROUGH_CUT = 0.5;
+const SEE_THROUGH_RADIUS = 3;
+const SWAY_MARGIN = 0.5;
 const TICK_ORDER = 10;
 
 function palmGeometry(): THREE.BufferGeometry {
@@ -60,8 +59,7 @@ function plantedGeometry(base: THREE.BufferGeometry, tree: THREE.Object3D): THRE
 export class PalmTrees {
   seeThroughMultiplier = 1;
   readonly #seeThroughPosition = uniform(vec2());
-  readonly #seeThroughEdgeMin = uniform(0);
-  readonly #seeThroughEdgeMax = uniform(0);
+  readonly #seeThroughRadius = uniform(0);
 
   constructor(references: readonly THREE.Object3D[]) {
     const game = getGame();
@@ -70,6 +68,8 @@ export class PalmTrees {
     heightAttributes(base);
     const merged = mergeGeometries(references.map((tree) => plantedGeometry(base, tree)));
     if (!merged) throw new Error('Palm trees could not be merged');
+    merged.computeBoundingSphere();
+    if (merged.boundingSphere) merged.boundingSphere.radius += SWAY_MARGIN;
 
     const mesh = new THREE.Mesh(merged, this.#material());
     mesh.name = 'palmTrees';
@@ -86,8 +86,7 @@ export class PalmTrees {
     const crown = attribute('crown', 'float');
     const alphaNode = Fn(() => {
       const toVehicle = screenUV.sub(this.#seeThroughPosition).mul(vec2(screenSize.x.div(screenSize.y), 1));
-      const distanceFade = smoothstep(this.#seeThroughEdgeMin, this.#seeThroughEdgeMax, toVehicle.length());
-      return mix(1, step(SEE_THROUGH_CUT, distanceFade), crown);
+      return mix(1, step(this.#seeThroughRadius, toVehicle.length()), crown);
     })();
     const material = new MeshDefaultMaterial({
       colorNode: texture(game.texture('paletteTexture')).rgb,
@@ -109,7 +108,6 @@ export class PalmTrees {
     const screenPosition = world.visualVehicle?.screenPosition;
     if (screenPosition) this.#seeThroughPosition.value.copy(screenPosition);
     const radius = view.spherical.radius.current;
-    this.#seeThroughEdgeMin.value = (SEE_THROUGH_EDGE.min / radius) * this.seeThroughMultiplier;
-    this.#seeThroughEdgeMax.value = (SEE_THROUGH_EDGE.max / radius) * this.seeThroughMultiplier;
+    this.#seeThroughRadius.value = (SEE_THROUGH_RADIUS / radius) * this.seeThroughMultiplier;
   }
 }
