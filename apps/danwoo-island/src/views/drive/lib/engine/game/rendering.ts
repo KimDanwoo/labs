@@ -1,5 +1,5 @@
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
-import { add, pass, renderOutput } from 'three/tsl';
+import { add, pass } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
@@ -12,10 +12,8 @@ const BLOOM = {
   threshold: 1,
   strength: 0.25,
   smoothWidth: 1,
-  mipsByQuality: { [QUALITY.high]: 5, [QUALITY.low]: 2 },
+  resolutionByQuality: { [QUALITY.high]: 0.5, [QUALITY.low]: 0.25 },
 } as const;
-
-const BLOOM_MIPS_FIELD = '_nMips';
 
 interface Sortable {
   renderOrder: number | null;
@@ -64,10 +62,11 @@ export class Rendering {
     bloomPass.threshold.value = BLOOM.threshold;
     bloomPass.strength.value = BLOOM.strength;
     bloomPass.smoothWidth.value = BLOOM.smoothWidth;
-    Reflect.set(bloomPass, BLOOM_MIPS_FIELD, BLOOM.mipsByQuality[this.game.quality.level]);
-    const dofPass = cheapDOF(renderOutput(scenePass));
+
+    const dofPass = cheapDOF(sceneColor);
 
     const applyQuality = (level: QualityLevel): void => {
+      bloomPass.setResolutionScale(BLOOM.resolutionByQuality[level]);
       pipeline.outputNode = add(level === QUALITY.high ? dofPass : sceneColor, bloomPass);
       pipeline.needsUpdate = true;
     };
