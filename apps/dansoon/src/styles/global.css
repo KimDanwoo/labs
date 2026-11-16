@@ -292,7 +292,7 @@
   --motion-exit: 120ms;
 }
 
-/* 페이지 이동: 보이던 화면과 새 화면을 겹쳐 바꾼다.
+/* 페이지 이동: 보이던 화면을 먼저 흐리게 지우고 새 화면을 띄운다.
    데스크톱은 화면 높이로 고정된 본문 영역만 캡처한다 — 사이드바를 캡처하지 않아야 전환 중에도 실제 DOM이 휠을 받는다(#252).
    모바일은 문서 전체가 스크롤되므로 보이던 화면 그대로(root) 캡처한다. 본문만 캡처하면 스크롤을 내린 상태에서 옛 글의 맨 위가 비쳤다.
    전환 레이어가 입력을 가로채지 않게 한다 — https://www.bram.us/2025/01/29/view-transitions-page-interactivity/ */
@@ -321,9 +321,10 @@
     animation: var(--motion-exit) ease-out both motion-fade-out;
   }
 
+  /* 옛 화면이 다 사라진 뒤에 새 화면을 띄운다 — 두 화면이 겹쳐 보이는 순간이 어색했다 */
   ::view-transition-new(page),
   ::view-transition-new(root) {
-    animation: var(--motion-base) var(--motion-ease) both motion-rise-in;
+    animation: var(--motion-base) var(--motion-ease) var(--motion-exit) both motion-rise-in;
   }
 
   @supports not (view-transition-name: none) {
