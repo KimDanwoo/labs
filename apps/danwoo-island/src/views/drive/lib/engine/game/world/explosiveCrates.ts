@@ -58,6 +58,16 @@ function registerSounds(): { trigger: AudioItem; explosions: AudioItem[] } {
   return { trigger, explosions };
 }
 
+const SHOWER_CLEARANCE = { center: new THREE.Vector3(65.53, 0, 63.55), radius: 3.4 } as const;
+
+function moveOutOfShowerLane(reference: InstanceReference): void {
+  const { center, radius } = SHOWER_CLEARANCE;
+  const outward = new THREE.Vector3(reference.position.x - center.x, 0, reference.position.z - center.z);
+  if (outward.length() >= radius) return;
+  outward.setLength(radius);
+  reference.position.set(center.x + outward.x, reference.position.y, center.z + outward.z);
+}
+
 export class ExplosiveCrates {
   readonly instancedGroup: InstancedGroup;
   readonly #crates: Crate[];
@@ -71,6 +81,7 @@ export class ExplosiveCrates {
     base.castShadow = true;
     base.receiveShadow = true;
     game.materials.updateObject(base);
+    for (const reference of references) moveOutOfShowerLane(reference);
     this.instancedGroup = new InstancedGroup(references, createCoconutCrate());
     this.#crates = references.map((reference) => this.#createCrate(reference));
     this.#sounds = registerSounds();

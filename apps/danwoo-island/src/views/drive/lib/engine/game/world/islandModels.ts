@@ -6,6 +6,7 @@ import { isModel, modelResource, type ResourceSpec } from '../resourcesLoader';
 const ISLAND_MODELS = {
   gamepad: 'areas/island/models/gamepad.glb',
   shellFountain: 'areas/island/models/shellFountain.glb',
+  beachShower: 'areas/island/models/beachShower.glb',
   lighthouse: 'areas/island/models/lighthouse.glb',
   palmHammock: 'areas/island/models/palmHammock.glb',
   surfCorner: 'areas/island/models/surfCorner.glb',
