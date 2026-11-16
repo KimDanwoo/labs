@@ -1,8 +1,10 @@
 import gsap from 'gsap';
-import type * as THREE from 'three/webgpu';
+import * as THREE from 'three/webgpu';
 
 import { getGame } from '../../gameContext';
 import { INPUT_MODE } from '../../inputs/inputs';
+import { QUARTER_TURN } from '../islandGeometry';
+import { islandModelMesh, islandPaletteMaterial } from '../islandModels';
 
 type Require = (name: string) => THREE.Object3D;
 
@@ -21,6 +23,8 @@ const WOBBLE = [
   { x: 0, at: 1.05, duration: 0.3 },
 ] as const;
 const REPEAT_DELAY = 5;
+const LABEL_PREFIX = /^refBlackboardLabels/;
+const MENU_SIGN_OFFSET = 0.34;
 
 function showGamepadLabels({ xbox, playstation }: Labels): void {
   const isXbox = getGame().inputs.gamepad.type === 'xbox';
@@ -28,7 +32,19 @@ function showGamepadLabels({ xbox, playstation }: Labels): void {
   playstation.visible = !isXbox;
 }
 
-export function bindBlackBoardLabels(require: Require): void {
+function dressMenuSign(board: THREE.Object3D): void {
+  for (const child of board.children) {
+    if (child instanceof THREE.Mesh && !LABEL_PREFIX.test(child.name)) child.geometry.setDrawRange(0, 0);
+  }
+  const matrix = new THREE.Matrix4()
+    .makeTranslation(MENU_SIGN_OFFSET, 0, 0)
+    .multiply(new THREE.Matrix4().makeRotationY(QUARTER_TURN));
+  const sign = islandModelMesh('surfMenuSign', matrix);
+  sign.material = islandPaletteMaterial('surfMenuSign');
+  board.add(sign);
+}
+
+function bindBlackBoardLabels(require: Require): void {
   const group = require('blackBoard');
   const parent = group.parent;
   const labels: Labels = {
@@ -60,6 +76,11 @@ export function bindBlackBoardLabels(require: Require): void {
   });
 }
 
+export function setUpBlackBoard(require: Require): void {
+  dressMenuSign(require('blackBoard'));
+  bindBlackBoardLabels(require);
+}
+
 export class BlackBoard {
   isActive = true;
   readonly #timeline: gsap.core.Timeline;
@@ -77,7 +98,7 @@ export class BlackBoard {
     this.#timeline.to(group.position, { y: JUMP.height, ease: 'power2.out', duration: JUMP.duration }, JUMP.start);
     this.#timeline.to(group.position, { y: 0, ease: 'power2.in', duration: JUMP.duration }, JUMP.duration + JUMP.start);
     for (const { x, at, duration } of WOBBLE) this.#timeline.to(group.rotation, { x, duration }, at + JUMP.start);
-    bindBlackBoardLabels(require);
+    setUpBlackBoard(require);
   }
 
   resume(): void {

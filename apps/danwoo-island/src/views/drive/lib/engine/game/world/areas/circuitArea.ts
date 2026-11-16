@@ -14,7 +14,7 @@ import { rebuildTentCanopies, reshapeCircuitDecoration } from '../circuitDecorat
 import { rebuildCircuitObjects, rebuildPodium } from '../circuitProps';
 import { replaceAirDancers } from '../islandReskins';
 import { Area } from './area';
-import { paintCourseSign, paintObstacleResetSign } from './circuitSigns';
+import { frameCourseSigns, paintCourseSign, paintObstacleResetSign } from './circuitSigns';
 import { CircuitTimer } from './circuitTimer';
 
 export type CircuitState = 'pending' | 'starting' | 'running' | 'ending';
@@ -410,8 +410,10 @@ export class CircuitArea extends Area {
 
   #createCourseSign(): void {
     const reset = this.requireReference('leaderboardReset');
-    paintCourseSign(this.requireReference('leaderboard'), this.objects.items);
+    const board = this.requireReference('leaderboard');
+    paintCourseSign(board, this.objects.items);
     paintObstacleResetSign(reset);
+    frameCourseSigns(board, reset);
     const { interactiveButtons } = this.game.inputs;
     this.game.interactivePoints.create({
       position: reset.position.clone().add(new THREE.Vector3(0, 1, 0)),

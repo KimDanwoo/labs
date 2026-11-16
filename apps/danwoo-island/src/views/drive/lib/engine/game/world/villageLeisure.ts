@@ -1,95 +1,12 @@
 import * as THREE from 'three/webgpu';
 
-import type { PartName, Parts, Triple } from './islandGeometry';
-import { collidersOf, type PropFrame } from './villageKit';
+import type { PartName, Parts } from './islandGeometry';
+import { islandModelMesh } from './islandModels';
+import { type PropFrame } from './villageKit';
 
 const SIDES = [-1, 1] as const;
-
-const TV_BODY = { halfWidth: 0.97, bottom: -1.15, top: 0.84, back: -0.5, front: 0.33 } as const;
-const TV_SCREEN = { halfWidth: 0.71, bottom: -0.68, top: 0.55 } as const;
-const TV_ISLAND = {
-  rearHeightLimit: 1.5,
-  rearScale: [0.8, 0.9, 0.95],
-  frameOffset: 0.04,
-  barWidth: 0.1,
-  barDepth: 0.08,
-  grilleSize: [1.2, 0.24, 0.03] satisfies Triple,
-  grillePosition: [-0.12, -0.93],
-  grilleOffset: 0.015,
-  slatSize: [1.16, 0.025, 0.035] satisfies Triple,
-  slatRows: [-0.85, -0.93, -1.01],
-  slatOffset: 0.02,
-  knobRadius: 0.06,
-  knobDepth: 0.06,
-  knobPosition: [0.79, -0.8],
-  knobOffset: 0.03,
-  knobSides: 8,
-  roofOverhang: 0.12,
-  roofHeight: 0.06,
-  ribHeight: 0.02,
-  ribCount: 6,
-  ribWidthRatio: 0.045,
-  ribDepthRatio: 0.96,
-  ribSpread: 0.84,
-  frontRotation: Math.PI / 2,
-} as const;
-
-export function tvCabinet(parts: Parts, container: THREE.Object3D): void {
-  const { halfWidth, bottom, top, back, front } = TV_BODY;
-  const design = TV_ISLAND;
-  const depth = front - back;
-  const centerZ = (front + back) / 2;
-
-  parts.box('cabinetWood', [halfWidth * 2, top - bottom, depth], { position: [0, (top + bottom) / 2, centerZ] });
-
-  const rear = collidersOf(container).find((frame) => frame.size.y < design.rearHeightLimit);
-  if (rear) {
-    const [scaleX, scaleY, scaleZ] = design.rearScale;
-    parts.box('coconutShell', [rear.size.x * scaleX, rear.size.y * scaleY, rear.size.z * scaleZ], {
-      matrix: rear.matrix,
-    });
-  }
-
-  const frameZ = front + design.frameOffset;
-  const bar = design.barWidth;
-  const screenHeight = TV_SCREEN.top - TV_SCREEN.bottom;
-  for (const y of [TV_SCREEN.top + bar / 2, TV_SCREEN.bottom - bar / 2]) {
-    parts.box('bamboo', [TV_SCREEN.halfWidth * 2 + bar * 2, bar, design.barDepth], { position: [0, y, frameZ] });
-  }
-  for (const side of SIDES) {
-    parts.box('bamboo', [bar, screenHeight, design.barDepth], {
-      position: [side * (TV_SCREEN.halfWidth + bar / 2), (TV_SCREEN.top + TV_SCREEN.bottom) / 2, frameZ],
-    });
-  }
-
-  const [grilleX, grilleY] = design.grillePosition;
-  parts.box('bunting1', design.grilleSize, { position: [grilleX, grilleY, front + design.grilleOffset] });
-  for (const y of design.slatRows) {
-    parts.box('bamboo', design.slatSize, { position: [grilleX, y, front + design.slatOffset] });
-  }
-
-  const [knobX, knobY] = design.knobPosition;
-  parts.prism(
-    'bunting2',
-    design.knobRadius,
-    design.knobRadius,
-    design.knobDepth,
-    { position: [knobX, knobY, front + design.knobOffset], rotation: [design.frontRotation, 0, 0] },
-    design.knobSides,
-  );
-
-  const roofWidth = halfWidth * 2 + design.roofOverhang;
-  const roofDepth = depth + design.roofOverhang;
-  parts.box('thatch', [roofWidth, design.roofHeight, roofDepth], {
-    position: [0, top + design.roofHeight / 2, centerZ],
-  });
-  for (let index = 0; index < design.ribCount; index += 1) {
-    const x = (index / (design.ribCount - 1) - 0.5) * roofWidth * design.ribSpread;
-    parts.box('bamboo', [roofWidth * design.ribWidthRatio, design.ribHeight, roofDepth * design.ribDepthRatio], {
-      position: [x, top + design.roofHeight + design.ribHeight / 2, centerZ],
-    });
-  }
-}
+const PORTAL_BACK_Z = -0.45;
+const CUBOID = /^cuboid/i;
 
 const TROPICAL_PLATTER = {
   trayWidthRatio: 0.95,
@@ -236,4 +153,12 @@ export function dotjari(parts: Parts, { size, matrix }: PropFrame): void {
       });
     }
   }
+}
+
+export function portalArch(_parts: Parts, container: THREE.Object3D): void {
+  const rearColliders = container.children.filter(
+    ({ name, position }) => CUBOID.test(name) && position.z < PORTAL_BACK_Z,
+  );
+  for (const collider of rearColliders) collider.removeFromParent();
+  container.add(islandModelMesh('portalArch', null));
 }

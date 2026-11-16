@@ -21,6 +21,7 @@ import * as THREE from 'three/webgpu';
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import { TICK_ORDER } from '../tickOrder';
+import { PALETTE_SLOTS } from './islandGeometry';
 import { type IslandModelKey, islandModelGeometry } from './islandModels';
 
 export interface TreeSpecies {
@@ -41,7 +42,6 @@ const TRUNK_HALF_HEIGHT = 2.5;
 const SWAY = { wind: 0.35, flutter: 0.06, flutterSpeed: 1.7, curve: 1.5 } as const;
 const SEE_THROUGH_RADIUS = 3;
 const SWAY_MARGIN = 0.5;
-const PALETTE_SLOTS = 32;
 const LEAF_SLOTS = { deep: 9, light: 12 } as const;
 const LEAF_COLORS = { deep: '#4f9a45', light: '#8fcc56' } as const;
 

@@ -3,6 +3,8 @@ import * as THREE from 'three/webgpu';
 
 import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
 import type { WorldObject } from '../../objects';
+import { QUARTER_TURN } from '../islandGeometry';
+import { type IslandModelKey, islandModelMesh, islandPaletteMaterial } from '../islandModels';
 
 interface SignLine {
   readonly text: string;
@@ -12,6 +14,10 @@ interface SignLine {
 }
 
 const BOARD_COLOR = '#463f35';
+const SIGN_FRAMES = {
+  course: { model: 'circuitBoard', panelLift: 0.6 },
+  reset: { model: 'resetSign', panelLift: 0.25 },
+} as const satisfies Record<string, { model: IslandModelKey; panelLift: number }>;
 const INK_COLOR = '#ede7d6';
 const HIDDEN_TITLE = 'Text002';
 const COURSE_SIGN = {
@@ -67,4 +73,25 @@ export function paintCourseSign(board: THREE.Object3D, objects: readonly WorldOb
 
 export function paintObstacleResetSign(sign: THREE.Object3D): void {
   if (sign instanceof THREE.Mesh) sign.material = inkedMaterial(signTexture(RESET_SIGN));
+}
+
+function panelHalfHeight(panel: THREE.Mesh): number {
+  panel.geometry.computeBoundingBox();
+  return (panel.geometry.boundingBox?.getSize(new THREE.Vector3()).y ?? 0) / 2;
+}
+
+function frameSign(panel: THREE.Object3D, { model, panelLift }: (typeof SIGN_FRAMES)[keyof typeof SIGN_FRAMES]): void {
+  if (!(panel instanceof THREE.Mesh) || !panel.parent) return;
+  const ground = panel.position.y - panelHalfHeight(panel) - panelLift;
+  const matrix = new THREE.Matrix4()
+    .makeTranslation(panel.position.x, ground, panel.position.z)
+    .multiply(new THREE.Matrix4().makeRotationY(QUARTER_TURN));
+  const frame = islandModelMesh(model, matrix);
+  frame.material = islandPaletteMaterial(model);
+  panel.parent.add(frame);
+}
+
+export function frameCourseSigns(board: THREE.Object3D, reset: THREE.Object3D): void {
+  frameSign(board, SIGN_FRAMES.course);
+  frameSign(reset, SIGN_FRAMES.reset);
 }

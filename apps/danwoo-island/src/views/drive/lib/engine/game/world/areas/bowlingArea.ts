@@ -9,7 +9,7 @@ import type { InteractivePoint } from '../../interactivePoint';
 import { JukeboxStation } from '../../jukebox/jukeboxStation';
 import { objectOf, type WorldObject } from '../../objects';
 import { clamp, remapClamp } from '../../utilities/maths';
-import { rebuildBowlingScreenStand } from '../islandReskins';
+import { rebuildTikiScoreboard } from '../islandReskins';
 import { rebuildBowlingSign, rebuildJukebox } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
@@ -161,7 +161,7 @@ export class BowlingArea extends Area {
     rebuildVillageProps(this.model);
     rebuildBowlingSign(this.model, this.game.texture('bowlingNeonTexture'));
     rebuildJukebox(this.model);
-    rebuildBowlingScreenStand(this.model);
+    rebuildTikiScoreboard(this.model);
     super.setObjects();
   }
 

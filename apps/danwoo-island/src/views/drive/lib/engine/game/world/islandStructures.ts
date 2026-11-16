@@ -3,7 +3,7 @@ import * as THREE from 'three/webgpu';
 
 import { MeshDefaultMaterial, revealNode } from '../materials/meshDefaultMaterial';
 import { createParts, type PartName, type Parts, removeComponents, type Triple } from './islandGeometry';
-import { islandModelMesh } from './islandModels';
+import { islandModelGeometry, islandModelMesh, islandPaletteMaterial } from './islandModels';
 
 export interface Frame {
   readonly size: THREE.Vector3;
@@ -164,7 +164,27 @@ export function noticeBoard(
   return { group, screen: screenMesh };
 }
 
+const KEYBOARD_DECK = 'Plane002';
+const OLD_MAP_PLAQUE = 'stylizedMap';
+
+export function rebuildKeyboardDeck(model: THREE.Object3D): void {
+  const deck = model.getObjectByName(KEYBOARD_DECK);
+  if (!(deck instanceof THREE.Mesh)) throw new Error('컨트롤 키보드 받침을 찾지 못했어요.');
+  deck.geometry.dispose();
+  deck.geometry = islandModelGeometry('driftKeyboard');
+  deck.material = islandPaletteMaterial('driftKeyboard');
+}
+
+function hideOldMapPlaque(model: THREE.Object3D): void {
+  model.traverse((child) => {
+    if (child instanceof THREE.Mesh && !Array.isArray(child.material) && child.material.name === OLD_MAP_PLAQUE) {
+      child.geometry.setDrawRange(0, 0);
+    }
+  });
+}
+
 export function rebuildKiosk(model: THREE.Object3D, mapTexture: THREE.Texture): void {
+  hideOldMapPlaque(model);
   replaceVisual(
     model,
     'physicalFixed009',

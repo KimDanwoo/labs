@@ -12,7 +12,7 @@ import {
   type PropFrame,
   rebuildChild,
 } from './villageKit';
-import { dotjari, tvCabinet, watermelonTray } from './villageLeisure';
+import { dotjari, watermelonTray } from './villageLeisure';
 import { barCounter, bench, gochujangJar, logStool, makgeolliBowl, oilBottle, soban } from './villageLounge';
 import { beachBall, bowlingPin, pinwheel } from './villageToys';
 import { candleSticks, placeGamepad, slateBoards, surfFlag, workTable } from './villageWorkshop';
@@ -73,7 +73,10 @@ const BUILDERS: readonly Matched<PropBuilder>[] = [
   { pattern: /^sauceMustardPhysicalDynamic/, build: onFirstCollider(oilBottle) },
   { pattern: /^barPhysicalDynamic/, build: barCounter },
   { pattern: /^cupPhysicalDynamic/, build: onFirstCollider(makgeolliBowl) },
-  { pattern: /^refTvPhysicalDynamic$/, build: tvCabinet },
+  {
+    pattern: /^refTvPhysicalDynamic$/,
+    build: (_parts, container) => container.add(islandModelMesh('portalArch', null)),
+  },
   { pattern: /^blowerPhysicalDynamic/, build: modelOnFirstCollider('coconutCrate') },
   { pattern: /^refPinPhysicalDynamic$/, build: bowlingPin },
   { pattern: /^refBallPhysicalDynamic$/, build: onFirstCollider(beachBall) },
