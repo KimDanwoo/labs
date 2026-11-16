@@ -17,20 +17,10 @@ import { AudioMute } from './audioMute';
 import { Events } from './events';
 import { getGame } from './gameContext';
 import { MusicStream } from './musicStream';
+import { Playlist } from './playlist';
 import { TICK_ORDER } from './tickOrder';
 import { createElement } from './utilities/createElement';
 import { clamp, remapClamp } from './utilities/maths';
-
-type SongLoadState = 'idle' | 'loading' | 'loaded' | 'failed';
-
-interface Song {
-  path: string;
-  name: string;
-  sound: MusicStream;
-  loadState: SongLoadState;
-  loadRetries: number;
-  retryCall: gsap.core.Tween | null;
-}
 
 const IS_IOS =
   /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -44,10 +34,7 @@ function scheduleIdle(task: () => void): void {
   else setTimeout(task, 0);
 }
 
-const SONG_ROTATION_MS = 3 * 60 * 1000;
-const SONG_SWITCH_DELAY = 1;
 const SONG_VOLUME = 0.2;
-const SONG_LOAD_RETRY = { delay: 3, attempts: 3 } as const;
 const SONG_NOTICE_DURATION = 5;
 const SONGS = [{ path: 'sounds/musics/baram.mp3', name: '바람 · danwoo0' }] as const;
 const AMBIENT_DISTANCE = 30;
@@ -111,140 +98,6 @@ function closestTo(
     if (!closest || distance < closest.distance) closest = { position, distance };
   }
   return closest;
-}
-
-interface SoundLoadHandlers {
-  onLoad: (sound: MusicStream) => void;
-  onLoadError: (sound: MusicStream) => void;
-}
-
-class Playlist {
-  readonly songs: Song[];
-  current: Song | null = null;
-  readonly #canPlay: () => boolean;
-  #index: number;
-  #switchCall: gsap.core.Tween | null = null;
-
-  constructor(canPlay: () => boolean) {
-    this.#canPlay = canPlay;
-    this.songs = SONGS.map(({ path, name }) => {
-      const song: Song = {
-        path,
-        name,
-        loadState: 'idle',
-        loadRetries: 0,
-        retryCall: null,
-        sound: this.#createSound(
-          path,
-          this.#loadHandlers(() => song),
-        ),
-      };
-      return song;
-    });
-    this.#index = Math.floor(Date.now() / SONG_ROTATION_MS) % this.songs.length;
-  }
-
-  resume(): void {
-    if (!this.#canPlay() || this.#switchCall || this.current?.sound.playing()) return;
-    this.#renewRetries();
-    this.#startCurrent();
-  }
-
-  pause(): void {
-    this.#switchCall?.kill();
-    this.#switchCall = null;
-    this.current?.sound.pause();
-  }
-
-  next(): void {
-    if (this.#switchCall || !this.#canPlay()) return;
-    getGame().audio.groups.get('discChange')?.play();
-    this.current?.sound.stop();
-    this.#switchCall = gsap.delayedCall(SONG_SWITCH_DELAY, () => {
-      this.#switchCall = null;
-      if (!this.#canPlay()) return;
-      this.#index = (this.#index + 1) % this.songs.length;
-      this.#renewRetries();
-      const song = this.#startCurrent();
-      getGame().notifications.show(nowPlayingNotice(song.name), { type: 'song', duration: SONG_NOTICE_DURATION });
-    });
-  }
-
-  preload(): void {
-    const song = this.songs[this.#index];
-    if (song) this.#load(song);
-  }
-
-  #load(song: Song): void {
-    if (song.loadState === 'failed') this.#rebuild(song);
-    if (song.loadState !== 'idle') return;
-    song.loadState = 'loading';
-    song.sound.load();
-  }
-
-  #createSound(path: string, handlers: SoundLoadHandlers): MusicStream {
-    const sound: MusicStream = new MusicStream({
-      src: worldAsset(path),
-      volume: SONG_VOLUME,
-      needsGestureUnlock: IS_IOS,
-      onLoad: () => handlers.onLoad(sound),
-      onLoadError: () => handlers.onLoadError(sound),
-      onEnd: () => this.next(),
-    });
-    return sound;
-  }
-
-  #loadHandlers(songOf: () => Song): SoundLoadHandlers {
-    return {
-      onLoad: (sound) => this.#handleLoaded(songOf(), sound),
-      onLoadError: (sound) => this.#handleLoadError(songOf(), sound),
-    };
-  }
-
-  #rebuild(song: Song): void {
-    song.retryCall?.kill();
-    song.retryCall = null;
-    song.sound.unload();
-    song.sound = this.#createSound(
-      song.path,
-      this.#loadHandlers(() => song),
-    );
-    song.loadState = 'idle';
-  }
-
-  #handleLoaded(song: Song, sound: MusicStream): void {
-    if (song.sound !== sound) return;
-    song.loadState = 'loaded';
-    song.loadRetries = 0;
-  }
-
-  #handleLoadError(song: Song, sound: MusicStream): void {
-    if (song.sound !== sound || song.retryCall) return;
-    song.loadState = 'failed';
-    if (song.loadRetries >= SONG_LOAD_RETRY.attempts) return;
-    song.loadRetries += 1;
-    song.retryCall = gsap.delayedCall(SONG_LOAD_RETRY.delay, () => {
-      song.retryCall = null;
-      if (song.sound !== sound || song.loadState !== 'failed') return;
-      const shouldPlay = this.current === song && this.#canPlay();
-      if (shouldPlay) this.#startCurrent();
-      else this.#load(song);
-    });
-  }
-
-  #renewRetries(): void {
-    const song = this.songs[this.#index];
-    if (song?.loadState === 'failed') song.loadRetries = 0;
-  }
-
-  #startCurrent(): Song {
-    const song = this.songs[this.#index];
-    if (!song) throw new Error('Playlist is empty');
-    this.current = song;
-    this.#load(song);
-    song.sound.play();
-    return song;
-  }
 }
 
 export function nowPlayingNotice(songName: string): HTMLElement {
@@ -358,9 +211,16 @@ export class Audio {
   }
 
   #ensurePlaylist(): Playlist {
-    this.playlist ??= new Playlist(
-      () => this.initiated && WORLD_CONFIG.music && this.musicOwner === 'island' && !this.isBackground,
-    );
+    this.playlist ??= new Playlist(SONGS, {
+      canPlay: () => this.initiated && WORLD_CONFIG.music && this.musicOwner === 'island' && !this.isBackground,
+      createStream: (path, handlers) =>
+        new MusicStream({ src: worldAsset(path), volume: SONG_VOLUME, needsGestureUnlock: IS_IOS, ...handlers }),
+      delay: (seconds, callback) => gsap.delayedCall(seconds, callback),
+      playDiscChange: () => this.groups.get('discChange')?.play(),
+      announce: (songName) =>
+        getGame().notifications.show(nowPlayingNotice(songName), { type: 'song', duration: SONG_NOTICE_DURATION }),
+      now: () => Date.now(),
+    });
     return this.playlist;
   }
 
