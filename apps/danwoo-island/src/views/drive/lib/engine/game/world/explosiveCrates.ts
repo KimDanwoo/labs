@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import { type AudioItem, moveSoundTo } from '../audio';
+import { type AudioItem, moveSoundTo } from '../audioItem';
 import { getGame } from '../gameContext';
 import { InstancedGroup, type InstanceReference } from '../instancedGroup';
 import type { WorldObject } from '../objects';

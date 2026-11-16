@@ -17,7 +17,7 @@ import {
 import * as THREE from 'three/webgpu';
 
 import { worldAsset } from '../../../../../config/worldAsset';
-import type { AudioItem } from '../../audio';
+import type { AudioItem } from '../../audioItem';
 import { ISLAND_PLACES, type IslandPlace } from '../../islandPlaces';
 import { Player } from '../../player';
 import { TICK_ORDER } from '../../tickOrder';

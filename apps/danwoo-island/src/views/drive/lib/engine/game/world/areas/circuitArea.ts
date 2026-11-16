@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import { color, Fn, uniform, uv, vec2, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import type { AudioItem } from '../../audio';
+import type { AudioItem } from '../../audioItem';
 import type { Action } from '../../inputs/inputs';
 import type { InteractivePoint } from '../../interactivePoint';
 import { objectOf, type WorldObject } from '../../objects';

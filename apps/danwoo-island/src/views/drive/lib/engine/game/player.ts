@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import type { AudioItem } from './audio';
+import type { AudioItem } from './audioItem';
 import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputs';
 import type { SuspensionState } from './physics/physicsVehicle';

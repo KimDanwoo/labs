@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import { color, Fn, positionGeometry, step, texture, uniform, uv, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { type AudioItem, moveSoundTo } from '../../audio';
+import { type AudioItem, moveSoundTo } from '../../audioItem';
 import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
 import type { InteractivePoint } from '../../interactivePoint';
 import { JukeboxStation } from '../../jukebox/jukeboxStation';

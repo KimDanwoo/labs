@@ -27,7 +27,7 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { type AudioItem, moveSoundTo } from '../audio';
+import { type AudioItem, moveSoundTo } from '../audioItem';
 import { getGame } from '../gameContext';
 import { LineGeometry } from '../geometries/lineGeometry';
 import { TICK_ORDER } from '../tickOrder';
