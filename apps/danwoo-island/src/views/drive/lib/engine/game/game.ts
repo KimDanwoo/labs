@@ -7,6 +7,7 @@ import { Audio } from './audio';
 import { ClosingManager } from './closingManager';
 import { DayCycles } from './cycles/dayCycles';
 import { YearCycles } from './cycles/yearCycles';
+import { exposeDevProbe } from './devProbe';
 import { Explosions } from './explosions';
 import { Fog } from './fog';
 import { bindGame } from './gameContext';
@@ -138,6 +139,7 @@ export class Game {
 
   constructor() {
     bindGame(this);
+    exposeDevProbe(this);
     this.#start().catch((error: unknown) => {
       setStartupStage(STARTUP.error);
       reportError(error);
