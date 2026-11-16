@@ -171,5 +171,5 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 - Server Action의 권한 검사는 화면·미들웨어와 독립적으로 수행한다. 관리자 DB 클라이언트 생성 전에 인증과 관리자 권한을 확인한다.
 - `'use client'`·`'use server'`는 모듈 맨 앞의 지시문이어야 한다. import를 그 앞에 추가하지 않는다.
 - 파일 이동 후 상대 경로·공개 export·Web Worker URL·라우트 타입·테스트 경로를 함께 확인한다.
-- 기본 검증은 `pnpm lint`, `pnpm typecheck`, `pnpm test`다. 동작을 바꿨다면 해당 사용자 흐름의 브라우저 검증도 수행한다. 외부 DB에 쓰는 시드·마이그레이션은 검증 명령으로 실행하지 않는다.
+- 기본 검증은 `pnpm lint`, `pnpm typecheck`, `pnpm test`다. 동작을 바꿨다면 해당 사용자 흐름의 브라우저 검증도 수행한다. 에이전트가 직접 하는 브라우저 검증(화면 확인·캡처·조작)은 ego-browser로 한다(`ego-browser skill`로 사용법 확인). Playwright는 CI에서 도는 `e2e/*.spec.ts`와 수집 스크립트에만 쓴다. 외부 DB에 쓰는 시드·마이그레이션은 검증 명령으로 실행하지 않는다.
 - 자동 검사가 통과한 범위와 실제 브라우저·외부 서비스에서 확인한 범위를 구분해 보고한다. 검증하지 않은 동작을 완벽하다고 표현하지 않는다.
