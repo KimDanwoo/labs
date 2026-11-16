@@ -28,6 +28,9 @@ jobs:
       # 구조 검사(check:architecture, scripts/__tests__/*.test.mjs)는 저장소 전체 규칙이라 항상 돈다.
       AFFECTED: ${{ github.event_name == 'pull_request' && '--affected' || '' }}
       TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+      # Vercel 원격 캐시. 포크 PR·Dependabot에는 시크릿이 없어 캐시 없이 돈다.
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

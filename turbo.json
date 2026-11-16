@@ -7,7 +7,21 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", "dist/**", "generated/**"]
+      "env": ["ANALYZE"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*",
+        "!**/*.test.*",
+        "!**/*.spec.*",
+        "!**/__tests__/**",
+        "!e2e/**",
+        "!playwright.config.*",
+        "!vitest.config.*"
+      ],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", "dist/**", "out/**", "generated/**"]
+    },
+    "transit": {
+      "dependsOn": ["^transit"]
     },
     "dev": {
       "dependsOn": ["^build"],
@@ -15,12 +29,14 @@
       "persistent": true
     },
     "typecheck": {
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "lint": {
       "dependsOn": ["^build"]
     },
     "test": {
+      "dependsOn": ["transit"],
       "outputs": []
     }
   }
