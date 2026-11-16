@@ -5,6 +5,7 @@ import { worldAsset } from '../../../config/worldAsset';
 import { getGame } from './gameContext';
 import { ISLAND_PLACES, type IslandPlace, type PlaceIcon } from './islandPlaces';
 import type { ModalItem } from './modals';
+import { TICK_ORDER } from './tickOrder';
 import { createElement } from './utilities/createElement';
 import { requireElement } from './utilities/requireElement';
 import type { OverviewFrame, ScreenInsets } from './view/overviewFrame';
@@ -12,7 +13,6 @@ import type { OverviewFrame, ScreenInsets } from './view/overviewFrame';
 const MAP_ACTION = { name: 'map', categories: ['modal', 'menu', 'wandering'], keys: ['Keyboard.m', 'Keyboard.KeyM'] };
 const PIN_LIFT = 1.6;
 const FLIGHT = { rise: 1.3, land: 1.5, ease: 'power3.inOut' } as const;
-const TICK_ORDER = 14;
 const HIDDEN_CLASS = 'is-hidden';
 const SELECTED_CLASS = 'is-selected';
 const LABEL_LEFT_CLASS = 'is-label-left';
@@ -74,7 +74,7 @@ export class WorldMap {
     this.#bindInput();
     modal.events.on('open', () => this.#rise());
     modal.events.on('close', () => this.#land());
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.map);
     game.viewport.events.on('change', () => this.#reframe());
   }
 

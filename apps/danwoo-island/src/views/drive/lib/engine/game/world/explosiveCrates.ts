@@ -5,6 +5,7 @@ import { type AudioItem, moveSoundTo } from '../audio';
 import { getGame } from '../gameContext';
 import { InstancedGroup, type InstanceReference } from '../instancedGroup';
 import type { WorldObject } from '../objects';
+import { TICK_ORDER } from '../tickOrder';
 import { createCoconutCrate } from './islandProps';
 
 interface Crate {
@@ -18,7 +19,6 @@ const CRATE_HALF_SIZE: [number, number, number] = [0.5, 0.5, 0.5];
 const FUSE_DELAY = 0.4;
 const HIDDEN_OFFSET = 100;
 const REENABLE_DELAY_FRAMES = 2;
-const TICK_ORDER = 10;
 const EXPLOSION_PATHS = [
   'sounds/explosions/SmallImpactMediumE PE281202.mp3',
   'sounds/explosions/SmallImpactMediumE PE281203.mp3',
@@ -74,7 +74,7 @@ export class ExplosiveCrates {
     this.instancedGroup = new InstancedGroup(references, createCoconutCrate());
     this.#crates = references.map((reference) => this.#createCrate(reference));
     this.#sounds = registerSounds();
-    game.ticker.events.on('tick', () => this.#markMoving(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.#markMoving(), TICK_ORDER.explosiveCrates);
   }
 
   #createCrate(reference: InstanceReference): Crate {

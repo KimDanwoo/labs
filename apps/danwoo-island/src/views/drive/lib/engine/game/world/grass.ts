@@ -22,6 +22,7 @@ import * as THREE from 'three/webgpu';
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import { QUALITY } from '../quality';
+import { TICK_ORDER } from '../tickOrder';
 
 const GRASS_CLEARINGS = [{ x: 58.4, z: 32.4, radius: 2.4 }] as const;
 const SUBDIVISIONS_BY_QUALITY = { [QUALITY.high]: 280, [QUALITY.low]: 200 } as const;
@@ -33,7 +34,6 @@ const OVERFLOW_GROWTH = { initial: 0.5, resized: 0.4 } as const;
 const HIDDEN_THRESHOLD = 0.1;
 const HIDDEN_LIFT = 100;
 const HEIGHT_NOISE_SCALE = 0.0321;
-const TICK_ORDER = 10;
 const THROTTLE_ORDER = 2;
 
 function surfaceOverflow(size: number): number {
@@ -86,7 +86,7 @@ export class Grass {
     this.#mesh.receiveShadow = true;
     game.scene.add(this.#mesh);
 
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.grass);
     game.viewport.events.on('throttleChange', () => this.#resize(), THROTTLE_ORDER);
     game.quality.events.on('change', (level) => {
       this.#subdivisions = SUBDIVISIONS_BY_QUALITY[level];

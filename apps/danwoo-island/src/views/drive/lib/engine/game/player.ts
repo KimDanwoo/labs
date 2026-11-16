@@ -5,10 +5,10 @@ import type { AudioItem } from './audio';
 import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputs';
 import type { SuspensionState } from './physics/physicsVehicle';
+import { TICK_ORDER } from './tickOrder';
 import { clamp, remapClamp } from './utilities/maths';
 
 const WHEEL_COUNT = 4;
-const TICK_ORDER = { prePhysics: 1, postPhysics: 6 } as const;
 const UNSTUCK_DELAY = 3;
 const DIE_RESPAWN_DELAY = 2;
 const HONK_DURATION = 0.15;
@@ -135,8 +135,8 @@ export class Player {
     initialState.position.z = respawn.position.z;
     game.physicalVehicle.moveTo(respawn.position, respawn.rotation);
 
-    game.ticker.events.on('tick', () => this.#updatePrePhysics(), TICK_ORDER.prePhysics);
-    game.ticker.events.on('tick', () => this.#updatePostPhysics(), TICK_ORDER.postPhysics);
+    game.ticker.events.on('tick', () => this.#updatePrePhysics(), TICK_ORDER.playerPrePhysics);
+    game.ticker.events.on('tick', () => this.#updatePostPhysics(), TICK_ORDER.playerPostPhysics);
   }
 
   #registerSounds(): PlayerSounds {

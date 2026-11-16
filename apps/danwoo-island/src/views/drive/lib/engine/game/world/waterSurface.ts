@@ -21,6 +21,7 @@ import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import type { WorldObject } from '../objects';
 import type { Physical } from '../physics/physics';
 import { QUALITY, type QualityLevel } from '../quality';
+import { TICK_ORDER } from '../tickOrder';
 import { lerp, remapClamp } from '../utilities/maths';
 
 type Vec4Node = THREE.Node<'vec4'>;
@@ -38,7 +39,6 @@ const ICE_HIDDEN_DEPTH = -1.5;
 const MIN_RATIO = 0.0001;
 const BLUR = { amount: 0.01, repeats: 12 } as const;
 const RIPPLES = { frequency: 7, opacity: 0.6 } as const;
-const TICK_ORDER = 10;
 const THROTTLE_ORDER = 2;
 
 export class WaterSurface {
@@ -71,7 +71,7 @@ export class WaterSurface {
 
     this.ice = { ...this.#createIce(), halfThickness: ICE_HALF_THICKNESS };
     game.quality.events.on('change', (level) => this.#applyQuality(level));
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.waterSurface);
   }
 
   #createIce(): WorldObject & { physical: Physical } {

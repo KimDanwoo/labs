@@ -5,8 +5,8 @@ import * as THREE from 'three/webgpu';
 import { getGame } from './gameContext';
 import { cheapDOF } from './passes/cheapDOF';
 import { QUALITY, type QualityLevel } from './quality';
+import { TICK_ORDER } from './tickOrder';
 
-const TICK_ORDER = 998;
 const MAX_ANTIALIAS_PIXEL_RATIO = 2;
 const BLOOM = {
   threshold: 1,
@@ -48,7 +48,7 @@ export class Rendering {
   }
 
   start(): void {
-    this.game.ticker.events.on('tick', () => this.render(), TICK_ORDER);
+    this.game.ticker.events.on('tick', () => this.render(), TICK_ORDER.rendering);
     this.game.viewport.events.on('change', () => this.resize());
   }
 

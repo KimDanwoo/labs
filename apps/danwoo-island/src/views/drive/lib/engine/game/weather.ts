@@ -1,12 +1,12 @@
 import gsap from 'gsap';
 
 import { getGame } from './gameContext';
+import { TICK_ORDER } from './tickOrder';
 import { lerp, remapClamp } from './utilities/maths';
 
 export type WeatherName = 'temperature' | 'humidity' | 'electricField' | 'clouds' | 'wind' | 'rain' | 'snow';
 export type WeatherOverrides = Partial<Record<WeatherName, number>>;
 
-const TICK_ORDER = 8;
 const DEFAULT_OVERRIDE_DURATION = 5;
 const NOISE_FREQUENCY = {
   temperature: 0.4,
@@ -116,7 +116,7 @@ export class Weather {
       this.snow,
     ];
     this.override = new WeatherOverride(this.#properties);
-    ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    ticker.events.on('tick', () => this.update(), TICK_ORDER.weather);
   }
 
   update(): void {

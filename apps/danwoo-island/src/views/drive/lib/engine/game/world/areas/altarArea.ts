@@ -20,6 +20,7 @@ import { worldAsset } from '../../../../../config/worldAsset';
 import type { AudioItem } from '../../audio';
 import { ISLAND_PLACES, type IslandPlace } from '../../islandPlaces';
 import { Player } from '../../player';
+import { TICK_ORDER } from '../../tickOrder';
 import { createElement } from '../../utilities/createElement';
 import { rebuildSurfPoint } from '../islandStructures';
 import { Area } from './area';
@@ -88,7 +89,7 @@ export class AltarArea extends Area {
     this.#createDust();
     this.#createDebris();
     this.#createTrigger();
-    this.game.ticker.events.on('tick', () => this.#tick());
+    this.game.ticker.events.on('tick', () => this.#tick(), TICK_ORDER.altar);
   }
 
   override setObjects(): void {

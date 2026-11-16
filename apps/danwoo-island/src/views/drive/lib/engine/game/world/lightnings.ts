@@ -30,6 +30,7 @@ import * as THREE from 'three/webgpu';
 import { type AudioItem, moveSoundTo } from '../audio';
 import { getGame } from '../gameContext';
 import { LineGeometry } from '../geometries/lineGeometry';
+import { TICK_ORDER } from '../tickOrder';
 import { remapClamp } from '../utilities/maths';
 
 type Random = () => number;
@@ -51,7 +52,6 @@ const EXPLOSION = { count: 128, duration: 4, fall: 1, scale: 0.1, radius: 3, eas
 const STRIKE_EXPLOSION = { radius: 7, strength: 4, isVehicleOnly: true } as const;
 const DISTANT_SEED_OFFSET = 999;
 const RENDER_ORDER = 2;
-const TICK_ORDER = 10;
 
 function pick<T>(items: readonly T[]): T | undefined {
   return items[Math.floor(Math.random() * items.length)];
@@ -130,7 +130,7 @@ export class Lightnings {
       position: instancedArray(explosion.positions, 'vec3').toAttribute(),
       scale: instancedArray(explosion.scales, 'float').toAttribute(),
     };
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.lightnings);
   }
 
   #registerNearThunder(): AudioItem[] {

@@ -1,4 +1,5 @@
 import { getGame } from './gameContext';
+import { TICK_ORDER } from './tickOrder';
 import { requireElement } from './utilities/requireElement';
 
 export interface NotificationOptions {
@@ -20,7 +21,6 @@ interface VisibleNotice {
 type NotificationState = 'visible' | 'hiding' | 'hidden';
 
 const DEFAULT_DURATION = 3;
-const TICK_ORDER = 14;
 
 export class Notifications {
   readonly #items: HTMLElement;
@@ -35,7 +35,7 @@ export class Notifications {
     const game = getGame();
     const element = requireElement(game.domElement, '.js-notifications', HTMLElement);
     this.#items = requireElement(element, '.js-items', HTMLElement);
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.notifications);
   }
 
   show(content: HTMLElement, { type = '', duration = DEFAULT_DURATION }: NotificationOptions = {}): void {

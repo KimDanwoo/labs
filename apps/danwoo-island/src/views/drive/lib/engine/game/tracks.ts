@@ -18,13 +18,13 @@ import {
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
+import { TICK_ORDER } from './tickOrder';
 
 export type TrackChannel = 'r' | 'g' | 'b';
 
 const RESOLUTION = 512;
 const AREA_SIZE = 40;
 const CAMERA_HEIGHT = 5;
-const TICK_ORDER = 9;
 const SUBDIVISIONS = 128;
 const RGBA = 4;
 const TIME_THROTTLE = 1 / 30;
@@ -123,7 +123,7 @@ export class Tracks {
     this.#camera.position.y = CAMERA_HEIGHT;
     this.#camera.rotation.x = -Math.PI * 0.5;
     this.#scene.add(this.#camera);
-    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER.tracks);
   }
 
   add(track: Track): Track {

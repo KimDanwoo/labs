@@ -11,6 +11,7 @@ import type {
 } from '@dimforge/rapier3d-compat';
 
 import { getGame } from '../gameContext';
+import { TICK_ORDER } from '../tickOrder';
 
 export type BodyType = 'dynamic' | 'fixed' | 'kinematicPositionBased' | 'kinematicVelocityBased';
 export type CollisionCategory = 'floor' | 'object' | 'bumper';
@@ -89,7 +90,6 @@ const DEFAULTS = {
 const UNIT_INERTIA = { x: 1, y: 1, z: 1 };
 const IDENTITY_ROTATION = { x: 0, y: 0, z: 0, w: 1 };
 const SUBMERGED_DAMPING = 1;
-const TICK_ORDER = 3;
 
 const isAtOrigin = ({ x, y, z }: Vector): boolean => x === 0 && y === 0 && z === 0;
 
@@ -140,7 +140,7 @@ export class Physics {
     const game = getGame();
     this.world = new game.RAPIER.World(GRAVITY);
     this.#eventQueue = new game.RAPIER.EventQueue(true);
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.physics);
   }
 
   getPhysical(description: PhysicalDescription): Physical {

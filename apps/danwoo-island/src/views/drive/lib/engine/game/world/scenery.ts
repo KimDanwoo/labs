@@ -4,6 +4,7 @@ import * as THREE from 'three/webgpu';
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import { References } from '../references';
+import { TICK_ORDER } from '../tickOrder';
 import { paintSteppingStones } from './islandReskins';
 import { rebuildBridge } from './islandStructures';
 
@@ -43,7 +44,7 @@ export class Scenery {
       this.references.parse(child);
     }
     this.#paintRoad();
-    game.ticker.events.on('tick', () => this.update());
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.scenery);
   }
 
   #paintBasalt(scene: THREE.Object3D): void {

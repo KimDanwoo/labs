@@ -4,13 +4,13 @@ import * as THREE from 'three/webgpu';
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import type { Physical } from '../physics/physics';
+import { TICK_ORDER } from '../tickOrder';
 
 const CELL_SIZE = 1.5;
 const EDGE_FADE = 20;
 const MAX_SUBDIVISIONS = 320;
 const DEPTH_SCALE = -1.5;
 const BED_ROCK = { halfHeight: 0.5, halfWidth: 6 } as const;
-const TICK_ORDER = 10;
 const THROTTLE_ORDER = 2;
 
 function floorSize(): number {
@@ -58,7 +58,7 @@ export class Floor {
       enabled: true,
       colliders: [{ shape: 'cuboid', parameters: [BED_ROCK.halfWidth, BED_ROCK.halfHeight, BED_ROCK.halfWidth] }],
     });
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.floor);
   }
 
   #createVisual(): THREE.Mesh {

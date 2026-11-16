@@ -6,6 +6,7 @@ import type { AudioItem } from './audio';
 import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputs';
 import type { Intersect } from './rayCursor';
+import { TICK_ORDER } from './tickOrder';
 import { UI_FONT_FAMILY } from './utilities/canvasFont';
 
 export type PointAlign = 'left' | 'right';
@@ -40,7 +41,6 @@ const HIT_RADIUS = 0.75;
 const NEAR_DISTANCE = 2.5;
 const RETEST_DISTANCE = 0.2;
 const KEY_ICON_SCALE = 0.25;
-const TICK_ORDER = 9;
 const DIAMOND = {
   hidden: { threshold: 0, thickness: 0.15, offset: 0.175 },
   open: { threshold: 0.5, thickness: 0.075, offset: 0.15 },
@@ -345,7 +345,7 @@ export class InteractivePoints {
       },
     };
     this.#bindInteract();
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.interactivePoints);
   }
 
   #createKeyIcon(plane: THREE.PlaneGeometry, frontColor: SharedParts['frontColor']): THREE.Mesh {

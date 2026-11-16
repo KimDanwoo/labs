@@ -1,4 +1,5 @@
 import { getGame } from './gameContext';
+import { TICK_ORDER } from './tickOrder';
 
 interface Glyph {
   character: string;
@@ -13,7 +14,6 @@ const TREE_INTERVAL = 18;
 const GLYPH_SIZE = 4;
 const TITLE_PREFIX = 'Danwoo Island ';
 const NON_BREAKING_SPACE = '\u00a0';
-const TICK_ORDER = 14;
 
 function glyphsAt(offset: number): Glyph[] {
   const glyphs: Glyph[] = [];
@@ -50,7 +50,7 @@ export class Title {
   #roundedOffset = 0;
 
   constructor() {
-    getGame().ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    getGame().ticker.events.on('tick', () => this.update(), TICK_ORDER.title);
   }
 
   update(): void {

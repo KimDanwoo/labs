@@ -3,6 +3,7 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
 import { QUALITY, type QualityLevel } from './quality';
+import { TICK_ORDER } from './tickOrder';
 
 const SUN = { phi: 0.63, theta: 0.72, phiAmplitude: 0.62, thetaAmplitude: 1.25, cycleOffset: 9 / 16 } as const;
 const SHADOW = { near: 1, bias: -0.001, normalBias: 0.1 } as const;
@@ -10,7 +11,6 @@ const SHADOW_MAP_SIZE = { [QUALITY.high]: 2048, [QUALITY.low]: 512 } satisfies R
 const SHADOW_RADIUS = { [QUALITY.high]: 3, [QUALITY.low]: 2 } satisfies Record<QualityLevel, number>;
 const SHADOW_FRAME_INTERVAL = { [QUALITY.high]: 1, [QUALITY.low]: 2 } satisfies Record<QualityLevel, number>;
 const LIGHT_INTENSITY = 5;
-const TICK_ORDER = 9;
 const THROTTLED_RESIZE_ORDER = 3;
 
 export class Lighting {
@@ -42,7 +42,7 @@ export class Lighting {
     this.#applyQuality(this.game.quality.level);
 
     this.game.quality.events.on('change', (level) => this.#applyQuality(level));
-    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER.lighting);
     this.game.viewport.events.on(
       'throttleChange',
       () => {

@@ -8,6 +8,7 @@ import { AudioMute } from './audioMute';
 import { Events } from './events';
 import { getGame } from './gameContext';
 import { MusicStream } from './musicStream';
+import { TICK_ORDER } from './tickOrder';
 import { createElement } from './utilities/createElement';
 import { clamp, remapClamp } from './utilities/maths';
 
@@ -47,7 +48,6 @@ interface VectorLike {
 
 const IS_IOS =
   /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-const TICK_ORDER = 14;
 const DEFAULT_VOLUME = 0.5;
 const DEFAULT_ANTI_SPAM = 0.1;
 const SOUND_POOL = 2;
@@ -430,7 +430,7 @@ export class Audio {
     const game = getGame();
     this.mute = new AudioMute((isMuted) => this.events.trigger('muteChange', isMuted));
     this.#bindMuteControls();
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.audio);
   }
 
   init(): void {

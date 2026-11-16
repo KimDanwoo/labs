@@ -14,6 +14,17 @@ describe('Events', () => {
     assert.deepEqual(calls, ['early:16', 'default:16', 'late:16']);
   });
 
+  it('같은 order는 등록한 순서대로 호출한다', () => {
+    const events = new Events<{ tick: [] }>();
+    const calls: string[] = [];
+    events.on('tick', () => calls.push('first'), 10);
+    events.on('tick', () => calls.push('early'), 0);
+    events.on('tick', () => calls.push('second'), 10);
+    events.on('tick', () => calls.push('third'), 10);
+    events.trigger('tick');
+    assert.deepEqual(calls, ['early', 'first', 'second', 'third']);
+  });
+
   it('off는 지정한 리스너만, 인자가 없으면 이벤트 전체를 지운다', () => {
     const events = new Events<{ ping: [] }>();
     let count = 0;

@@ -3,6 +3,7 @@ import * as THREE from 'three/webgpu';
 
 import { Events } from '../events';
 import { getGame } from '../gameContext';
+import { TICK_ORDER } from '../tickOrder';
 import { lerp, smoothstep } from '../utilities/maths';
 
 export type CycleValue = number | THREE.Color;
@@ -43,7 +44,6 @@ interface ResolvedKeyframe {
 
 const MILLISECONDS_PER_SECOND = 1000;
 const OVERRIDE_SECONDS = 5;
-const TICK_ORDER = 8;
 const FIRST_FRAME_DELAY = 1;
 
 const valuesOf = (values: object): Map<string, CycleValue> =>
@@ -125,7 +125,7 @@ export abstract class Cycles<P extends Record<keyof P, CycleValue>, N extends st
     this.progress = this.absoluteProgress % 1;
     this.properties = this.#initialProperties(keyframes);
     this.override = new CycleOverride(this.properties);
-    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER.cycles);
     this.#advance((emit) => this.game.ticker.wait(FIRST_FRAME_DELAY, emit));
   }
 

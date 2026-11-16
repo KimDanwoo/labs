@@ -2,6 +2,7 @@ import { color, Fn, mix, texture, uniform, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
+import { TICK_ORDER } from './tickOrder';
 
 type Vec2Node = THREE.Node<'vec2'>;
 type Vec4Node = THREE.Node<'vec4'>;
@@ -16,7 +17,6 @@ const GRADIENT = [
   { stop: 0.9, value: '#14658b' },
 ] as const;
 const GRASS_COLOR = '#6cbf47';
-const TICK_ORDER = 10;
 
 function gradientTexture(): THREE.Texture {
   const canvas = document.createElement('canvas');
@@ -61,7 +61,7 @@ export class Terrain {
   });
 
   constructor() {
-    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER.terrain);
   }
 
   update(): void {
