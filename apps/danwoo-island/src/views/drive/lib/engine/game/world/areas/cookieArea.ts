@@ -16,7 +16,7 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import type { AudioItem } from '../../audio';
+import type { AudioItem } from '../../audioItem';
 import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
 import type { WorldObject } from '../../objects';
 import { rebuildCookieCart } from '../islandStructures';

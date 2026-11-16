@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import { color, Fn, If, mix, positionGeometry, screenUV, texture, uniform, vec4, viewportCoordinate } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import type { AudioItem } from './audio';
+import type { AudioItem } from './audioItem';
 import { getGame } from './gameContext';
 
 const COLORS = { start: '#251f2b', end: '#1d1721' } as const;

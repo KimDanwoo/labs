@@ -4,6 +4,15 @@ import * as THREE from 'three/webgpu';
 
 import { worldAsset } from '../../../config/worldAsset';
 import { WORLD_CONFIG } from '../worldConfig';
+import {
+  AudioGroup,
+  AudioItem,
+  DEFAULT_ANTI_SPAM,
+  isVectorLike,
+  type SoundHandler,
+  type SoundHost,
+  type SoundOptions,
+} from './audioItem';
 import { AudioMute } from './audioMute';
 import { Events } from './events';
 import { getGame } from './gameContext';
@@ -11,23 +20,6 @@ import { MusicStream } from './musicStream';
 import { TICK_ORDER } from './tickOrder';
 import { createElement } from './utilities/createElement';
 import { clamp, remapClamp } from './utilities/maths';
-
-export type SoundHandler = (item: AudioItem, ...args: unknown[]) => void;
-
-export interface SoundOptions {
-  path: string;
-  group?: string;
-  autoplay?: boolean;
-  loop?: boolean;
-  volume?: number;
-  preload?: boolean;
-  positions?: THREE.Vector3 | THREE.Vector3[];
-  distanceFade?: number;
-  rate?: number;
-  antiSpam?: number;
-  onPlay?: SoundHandler;
-  onPlaying?: (item: AudioItem) => void;
-}
 
 type SongLoadState = 'idle' | 'loading' | 'loaded' | 'failed';
 
@@ -40,19 +32,9 @@ interface Song {
   retryCall: gsap.core.Tween | null;
 }
 
-interface VectorLike {
-  x: number;
-  y: number;
-  z: number;
-}
-
 const IS_IOS =
   /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-const DEFAULT_VOLUME = 0.5;
-const DEFAULT_ANTI_SPAM = 0.1;
-const SOUND_POOL = 2;
 const RATE_RANGE = { min: 0.5, max: 4 } as const;
-const AUDIBLE_VOLUME = 0.01;
 const CAMERA_DEPTH_SCALE = 0.1;
 const MAX_PARALLEL_LOADS = 4;
 const IDLE_TIMEOUT_MS = 2000;
@@ -110,14 +92,6 @@ const HIT_SOUNDS = {
 
 const HIT_GROUPS = ['hitDefault', 'hitBrick', 'hitMetal'] as const satisfies readonly (keyof typeof HIT_SOUNDS)[];
 
-function isVectorLike(value: unknown): value is VectorLike {
-  return typeof value === 'object' && value !== null && 'x' in value && 'y' in value && 'z' in value;
-}
-
-export function moveSoundTo(item: AudioItem, position: unknown): void {
-  if (isVectorLike(position)) item.firstPosition().copy(position);
-}
-
 function randomOffset(distance: number): number {
   return Math.random() < 0.5 ? distance : -distance;
 }
@@ -125,11 +99,6 @@ function randomOffset(distance: number): number {
 function randomNearbyPosition(distance = AMBIENT_DISTANCE): THREE.Vector3 {
   const { position } = getGame().view.focusPoint;
   return new THREE.Vector3(position.x + randomOffset(distance), position.y, position.z + randomOffset(distance));
-}
-
-function toPositions(positions: SoundOptions['positions']): THREE.Vector3[] | null {
-  if (!positions) return null;
-  return Array.isArray(positions) ? positions : [positions];
 }
 
 function closestTo(
@@ -142,114 +111,6 @@ function closestTo(
     if (!closest || distance < closest.distance) closest = { position, distance };
   }
   return closest;
-}
-
-export class AudioGroup {
-  readonly items: AudioItem[] = [];
-  lastPlayedId = -1;
-
-  play(...args: unknown[]): void {
-    this.items[(this.lastPlayedId + 1) % this.items.length]?.play(...args);
-  }
-
-  playRandomNext(...args: unknown[]): void {
-    const delta = 1 + Math.floor(Math.random() * (this.items.length - 2));
-    this.items[(this.lastPlayedId + delta) % this.items.length]?.play(...args);
-  }
-}
-
-export class AudioItem {
-  readonly howl: Howl;
-  readonly positions: THREE.Vector3[] | null;
-  readonly distanceFade: number | null;
-  readonly autoplay: boolean;
-  readonly id: number;
-  rate: number;
-  volume: number;
-  playing: boolean;
-  readonly #group: AudioGroup;
-  readonly #antiSpam: number;
-  readonly #onPlay: SoundHandler | null;
-  readonly onPlaying: ((item: AudioItem) => void) | null;
-  #loading: Promise<void> | null = null;
-  readonly isEager: boolean;
-  #lastPlay = -Infinity;
-  #appliedRate = Number.NaN;
-  #appliedVolume = Number.NaN;
-
-  constructor(options: SoundOptions, group: AudioGroup, isInitiated: boolean) {
-    const volume = options.volume ?? DEFAULT_VOLUME;
-    const isPlaying = isInitiated && (options.autoplay ?? false);
-    this.#group = group;
-    this.id = group.items.length;
-    this.howl = new Howl({
-      src: [worldAsset(options.path)],
-      pool: SOUND_POOL,
-      autoplay: isPlaying,
-      loop: options.loop ?? false,
-      volume,
-      preload: false,
-      onloaderror: () => reportError(new Error(`Audio load error: ${options.path}`)),
-      onend: () => {
-        this.playing = false;
-      },
-    });
-    this.positions = toPositions(options.positions);
-    this.distanceFade = options.distanceFade ?? null;
-    this.rate = options.rate ?? 1;
-    this.volume = volume;
-    this.#antiSpam = options.antiSpam ?? DEFAULT_ANTI_SPAM;
-    this.onPlaying = options.onPlaying ?? null;
-    this.#onPlay = options.onPlay ?? null;
-    this.isEager = options.preload ?? true;
-    this.autoplay = options.autoplay ?? false;
-    this.playing = isPlaying;
-    if (isPlaying) void this.load();
-  }
-
-  load(): Promise<void> {
-    this.#loading ??= new Promise((resolve) => {
-      this.howl.once('load', () => resolve());
-      this.howl.once('loaderror', () => resolve());
-      this.howl.load();
-    });
-    return this.#loading;
-  }
-
-  play(...args: unknown[]): void {
-    const game = getGame();
-    if (!game.audio.initiated) return;
-    void this.load();
-    if (this.#antiSpam && game.ticker.elapsed - this.#lastPlay < this.#antiSpam) return;
-
-    this.#onPlay?.(this, ...args);
-    this.howl.play();
-    this.#lastPlay = game.ticker.elapsed;
-    this.playing = true;
-    this.#group.lastPlayedId = this.id;
-  }
-
-  firstPosition(): THREE.Vector3 {
-    const position = this.positions?.[0];
-    if (!position) throw new Error('Sound has no position');
-    return position;
-  }
-
-  applyMix(rate: number, volume: number): void {
-    if (!this.howl.playing()) {
-      this.#appliedRate = Number.NaN;
-      this.#appliedVolume = Number.NaN;
-      return;
-    }
-    if (rate !== this.#appliedRate) {
-      this.howl.rate(rate);
-      this.#appliedRate = rate;
-    }
-    if (volume === this.#appliedVolume) return;
-    this.howl.volume(volume);
-    this.howl.mute(volume < AUDIBLE_VOLUME);
-    this.#appliedVolume = volume;
-  }
 }
 
 interface SoundLoadHandlers {
@@ -425,6 +286,11 @@ export class Audio {
   musicOwner: MusicOwner = 'island';
   isBackground = false;
   #globalRate = 1;
+  readonly #soundHost: SoundHost = {
+    isInitiated: () => this.initiated,
+    elapsed: () => getGame().ticker.elapsed,
+    createPlayer: (options) => new Howl(options),
+  };
 
   constructor() {
     const game = getGame();
@@ -471,7 +337,7 @@ export class Audio {
     const groupName = options.group ?? 'all';
     const group = this.groups.get(groupName) ?? new AudioGroup();
     this.groups.set(groupName, group);
-    const item = new AudioItem(options, group, this.initiated);
+    const item = new AudioItem(options, group, this.#soundHost);
     group.items.push(item);
     if (this.initiated && item.isEager) this.#queueLoad([item]);
     return item;

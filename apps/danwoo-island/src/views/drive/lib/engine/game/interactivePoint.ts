@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import { Fn, max, mix, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import type { AudioItem } from './audio';
+import type { AudioItem } from './audioItem';
 import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputs';
 import {

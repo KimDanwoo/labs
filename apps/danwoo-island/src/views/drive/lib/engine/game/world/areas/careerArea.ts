@@ -3,7 +3,7 @@ import { color, Fn, luminance, max, mix, step, texture, uniform, uv, vec4 } from
 import * as THREE from 'three/webgpu';
 
 import content from '../../../data/danwoo';
-import { type AudioItem, moveSoundTo } from '../../audio';
+import { type AudioItem, moveSoundTo } from '../../audioItem';
 import { clamp } from '../../utilities/maths';
 import { paintCareerLines } from '../islandReskins';
 import { Area } from './area';
