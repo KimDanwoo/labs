@@ -13,9 +13,9 @@ import { CookieArea } from './cookieArea';
 import { LabArea } from './labArea';
 import { LandingArea } from './landingArea';
 import { ProjectsArea } from './projectsArea';
+import { ShowerArea } from './showerArea';
 import { SocialArea } from './socialArea';
 import { TimeMachineArea } from './timeMachineArea';
-import { ToiletArea } from './toiletArea';
 
 interface AreaTypes {
   achievements: AchievementsArea;
@@ -29,7 +29,7 @@ interface AreaTypes {
   landing: LandingArea;
   projects: ProjectsArea;
   social: SocialArea;
-  toilet: ToiletArea;
+  toilet: ShowerArea;
   timeMachine: TimeMachineArea;
 }
 
@@ -48,7 +48,7 @@ const AREA_BUILDERS: { [K in AreaName]: (model: THREE.Object3D) => AreaTypes[K] 
   landing: (model) => new LandingArea(model),
   projects: (model) => new ProjectsArea(model),
   social: (model) => new SocialArea(model),
-  toilet: (model) => new ToiletArea(model),
+  toilet: (model) => new ShowerArea(model),
   timeMachine: (model) => new TimeMachineArea(model),
 };
 

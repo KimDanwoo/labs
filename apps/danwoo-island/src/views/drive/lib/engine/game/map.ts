@@ -4,6 +4,7 @@ import * as THREE from 'three/webgpu';
 import { worldAsset } from '../../../config/worldAsset';
 import { getGame } from './gameContext';
 import { ISLAND_PLACES, type IslandPlace, type PlaceIcon } from './islandPlaces';
+import { bindMapDrag, type MapDrag } from './mapDrag';
 import type { ModalItem } from './modals';
 import { TICK_ORDER } from './tickOrder';
 import { createElement } from './utilities/createElement';
@@ -19,6 +20,7 @@ const LABEL_LEFT_CLASS = 'is-label-left';
 const LABEL_FLIP_MARGIN = 150;
 const COMPACT_SCREEN = { width: 720, height: 500 } as const;
 const REFRAME_DURATION = 0.3;
+const PAN_REACH = 0.6;
 const FRAME_INSETS = {
   wide: { top: 130, right: 290, bottom: 75, left: 60 },
   compact: { top: 120, right: 40, bottom: 80, left: 40 },
@@ -50,6 +52,8 @@ export class WorldMap {
   #pins: Pin[] = [];
   #selected: IslandPlace | null = null;
   #destination: IslandPlace | null = null;
+  #bounds: OverviewFrame | null = null;
+  readonly #drag: MapDrag;
 
   constructor() {
     const game = getGame();
@@ -72,8 +76,12 @@ export class WorldMap {
     });
     this.#bindTrigger();
     this.#bindInput();
+    this.#drag = this.#bindDrag();
     modal.events.on('open', () => this.#rise());
-    modal.events.on('close', () => this.#land());
+    modal.events.on('close', () => {
+      this.#drag.cancel();
+      this.#land();
+    });
     game.ticker.events.on('tick', () => this.update(), TICK_ORDER.map);
     game.viewport.events.on('change', () => this.#reframe());
   }
@@ -128,6 +136,7 @@ export class WorldMap {
     this.#card.root.classList.add(HIDDEN_CLASS);
     world.grass?.setVisible(false);
     const frame = this.#frame();
+    this.#bounds = frame;
     view.enterOverview(frame.radius);
     view.focusPoint.isTracking = false;
     view.focusPoint.magnet.active = false;
@@ -175,6 +184,7 @@ export class WorldMap {
   #reframe(): void {
     if (!this.#modal.isOpen || this.#destination) return;
     const frame = this.#frame();
+    this.#bounds = frame;
     this.#flyFocus(frame.center, REFRAME_DURATION);
     gsap.to(getGame().view.overview, {
       radius: frame.radius,
@@ -214,6 +224,28 @@ export class WorldMap {
       if (this.#modal.isOpen) modals.close();
       else modals.open('map');
     });
+  }
+
+  #bindDrag(): MapDrag {
+    const { view, viewport } = getGame();
+    return bindMapDrag(window, {
+      isActive: () => this.#modal.isOpen && !this.#destination,
+      camera: () => view.camera,
+      viewport: () => viewport,
+      focus: () => view.focusPoint.position,
+      startPan: () => gsap.killTweensOf(view.focusPoint.position),
+      panTo: (focus) => this.#panTo(focus),
+    });
+  }
+
+  #panTo(focus: THREE.Vector3): void {
+    const bounds = this.#bounds;
+    if (!bounds) return;
+    const offset = new THREE.Vector2(focus.x - bounds.center.x, focus.z - bounds.center.z);
+    offset.clampLength(0, bounds.radius * PAN_REACH);
+    const { position } = getGame().view.focusPoint;
+    position.x = bounds.center.x + offset.x;
+    position.z = bounds.center.z + offset.y;
   }
 
   #place(element: HTMLElement, world: THREE.Vector3): void {

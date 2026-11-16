@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 const SITE_URL = 'https://world.danwoo.dev';
 const SITE_NAME = 'Danwoo Island';
 const TITLE = 'Danwoo Island — 3D 포트폴리오';
-const DESCRIPTION = '차를 몰고 열대 섬을 돌아다니며 프로젝트, 블로그 글, 음악을 볼 수 있는 3D 포트폴리오예요.';
+const DESCRIPTION = 'AI Agent와 three.js로 구현한 해변 탐험';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

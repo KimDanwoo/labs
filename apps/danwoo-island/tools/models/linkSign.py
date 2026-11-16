@@ -2,7 +2,8 @@
 Blender 5.3
 실행: blender -b --factory-startup --disable-autoexec --python /absolute/path/to/linkSign.py
 렌더 생략: 명령 끝에 -- --skip-render 추가.
-메시·GLB 직렬화는 메모리에서 검증했다. 렌더·파일 저장은 실행하지 않았다.
+수정 형상의 메시·앞뒤 대칭·글씨 칸·GLB 직렬화를 메모리에서 검증했다(삼각형 1,260개).
+파일 저장과 최종 PNG의 시각적 결과는 검증하지 않았다.
 """
 import argparse
 import json
@@ -13,7 +14,7 @@ from pathlib import Path
 
 import bmesh
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 ROOT = Path(
     "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
@@ -21,28 +22,47 @@ ROOT = Path(
 )
 SOURCE = ROOT / "upstream-blend/folio-2025.blend"
 PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/island2"
+OUTPUT = ROOT / "codex-work/polish3"
 NAME = "linkSign"
 TARGET = Vector((1.00, 0.30, 1.40))
 EPSILON = 1e-5
-SLOTS = {"cream": 23, "sand": 1, "wood": 14, "light_wood": 18}
 PANEL_Y = 0.15
+LABEL_Z = (0.58 - 0.5) * TARGET.z
 
-REFERENCE_NAMES = {
-    "statue": "refStatuePhysicalDynamic",
-    "anvil": "Cube.094",
-    "cauldron": "body.001",
-    "lantern": "base",
-    "bench": "benchPhysicalDynamic",
-    "hut": "wood.002",
-    "jukebox": "refJukeboxPhysicalDynamic",
+SLOTS = {
+    "sand": 1,
+    "turquoise": 3,
+    "basalt": 5,
+    "gray": 6,
+    "green": 9,
+    "coral": 10,
+    "light_wood": 11,
+    "vein": 12,
+    "wood": 14,
+    "pink": 17,
+    "mango": 18,
+    "cream": 23,
+}
+USED_SLOTS = {10, 14, 17, 23}
+EXPECTED_RGB = {
+    1: (235, 209, 163),
+    3: (61, 187, 231),
+    5: (74, 65, 60),
+    6: (87, 90, 94),
+    9: (145, 173, 120),
+    10: (228, 154, 120),
+    11: (152, 129, 101),
+    12: (171, 174, 43),
+    14: (179, 109, 69),
+    17: (253, 230, 226),
+    18: (248, 166, 88),
+    23: (255, 242, 232),
 }
 
 
 def bounds(points):
     points = list(points)
-    if not points:
-        raise RuntimeError("Empty geometry")
+    assert points
 
     return (
         Vector(tuple(min(p[a] for p in points) for a in range(3))),
@@ -50,11 +70,11 @@ def bounds(points):
     )
 
 
-def check_uv(value):
-    u, v = value
+def check_uv(uv):
+    u, v = uv
     slot = round(u * 32 - 0.5)
 
-    assert slot in SLOTS.values()
+    assert slot in USED_SLOTS
     assert abs(u - (slot + 0.5) / 32) < 1e-7
     assert abs(v - 0.5) < 1e-7
 
@@ -63,10 +83,10 @@ def check_uv(value):
 
 def load_source():
     if bpy.app.version[:2] != (5, 3):
-        raise RuntimeError("Blender 5.3 is required")
+        raise RuntimeError("Blender 5.3이 필요합니다.")
 
     if "--disable-autoexec" not in sys.argv:
-        raise RuntimeError("Start Blender with --disable-autoexec")
+        raise RuntimeError("--disable-autoexec로 실행하세요.")
 
     for path in (SOURCE, PALETTE):
         if not path.is_file():
@@ -78,41 +98,14 @@ def load_source():
         use_scripts=False,
     )
 
-    references = {}
-
-    for label, name in REFERENCE_NAMES.items():
-        obj = bpy.data.objects.get(name)
-
-        if obj is None or obj.type != "MESH":
-            raise RuntimeError("Missing source reference: " + name)
-
-        obj.data.calc_loop_triangles()
-        references[label] = obj
-
-        print(json.dumps({
-            "reference": label,
-            "object": name,
-            "triangles": len(obj.data.loop_triangles),
-            "smooth_faces": sum(p.use_smooth for p in obj.data.polygons),
-            "bevels": [
-                {"width": m.width, "segments": m.segments}
-                for m in obj.modifiers
-                if m.type == "BEVEL"
-            ],
-        }, ensure_ascii=False))
-
     material = bpy.data.materials.get("palette")
-
-    if material is None or material.node_tree is None:
-        raise RuntimeError("Missing source palette material")
+    assert material is not None and material.node_tree is not None
 
     textures = [
-        n for n in material.node_tree.nodes
-        if n.type == "TEX_IMAGE"
+        node for node in material.node_tree.nodes
+        if node.type == "TEX_IMAGE"
     ]
-
-    if len(textures) != 1:
-        raise RuntimeError("Expected one palette image texture")
+    assert len(textures) == 1
 
     image = bpy.data.images.load(str(PALETTE), check_existing=False)
     assert tuple(image.size) == (128, 4)
@@ -120,17 +113,18 @@ def load_source():
     image.colorspace_settings.name = "sRGB"
     pixels = list(image.pixels)
 
+    # 칸 경계의 혼색을 피하고 각 칸의 중앙 픽셀만 검사한다.
     for label, slot in SLOTS.items():
+        assert 0 <= slot < 32
+
+        offset = 4 * (2 * 128 + slot * 4 + 2)
         rgb = tuple(
-            round(pixels[4 * (2 * 128 + slot * 4 + 2) + c] * 255)
-            for c in range(3)
+            round(pixels[offset + channel] * 255)
+            for channel in range(3)
         )
 
-        print(json.dumps({
-            "color": label,
-            "slot": slot,
-            "actual": rgb,
-        }, ensure_ascii=False))
+        assert rgb == EXPECTED_RGB[slot], (label, slot, rgb)
+        assert abs(pixels[offset + 3] - 1) < EPSILON
 
     texture = textures[0]
     texture.image = image
@@ -140,56 +134,92 @@ def load_source():
     material.node_tree.nodes.active = texture
     image.pack()
 
-    return references
+    for node in material.node_tree.nodes:
+        if node.type == "BSDF_PRINCIPLED":
+            node.inputs["Metallic"].default_value = 0
+            node.inputs["Roughness"].default_value = 0.82
+
+    assert any(
+        link.from_node == texture
+        and link.to_node.type == "BSDF_PRINCIPLED"
+        and link.to_socket.name == "Base Color"
+        for link in material.node_tree.links
+    )
+
+    for collection in (bpy.data.objects, bpy.data.meshes):
+        old = collection.get(NAME)
+        if old is not None:
+            old.name = NAME + "-source"
 
 
-def arch_outline(half_width, bottom, shoulder, top):
-    cut = 0.055 * half_width / 0.5
-
-    points = [
-        (-half_width + cut, bottom),
-        (half_width - cut, bottom),
+def cubic(a, b, c, d, steps):
+    return [
+        tuple(
+            (1 - t) ** 3 * a[k]
+            + 3 * (1 - t) ** 2 * t * b[k]
+            + 3 * (1 - t) * t * t * c[k]
+            + t ** 3 * d[k]
+            for k in range(2)
+        )
+        for t in (i / steps for i in range(1, steps + 1))
     ]
 
-    for i in range(1, 4):
-        angle = -math.pi / 2 + i * math.pi / 6
 
-        points.append((
-            half_width - cut + cut * math.cos(angle),
-            bottom + cut + cut * math.sin(angle),
-        ))
+def shell_outline():
+    upper = [(0.405, -0.17)]
 
-    for i in range(1, 7):
-        points.append((
-            half_width
-            - 0.006 * (half_width / 0.5) * math.sin(i * math.pi / 6) ** 2,
-            bottom + cut + (shoulder - bottom - cut) * i / 6,
-        ))
+    # 肩を広げ、中央との谷を内側へ寄せて、上三つ・左右二つの丸い塊にする。
+    segments = (
+        ((0.55, -0.09), (0.55, 0.17), (0.43, 0.18)),
+        ((0.49, 0.60), (0.29, 0.75), (0.205, 0.47)),
+        (
+            (0.16, 0.7766666666666667),
+            (-0.16, 0.7766666666666667),
+            (-0.205, 0.47),
+        ),
+        ((-0.29, 0.75), (-0.49, 0.60), (-0.43, 0.18)),
+        ((-0.55, 0.17), (-0.55, -0.09), (-0.405, -0.17)),
+    )
 
-    for i in range(1, 17):
-        angle = i * math.pi / 16
+    for b, c, d in segments:
+        upper.extend(cubic(upper[-1], b, c, d, 8))
 
-        points.append((
-            half_width * math.cos(angle),
-            shoulder + (top - shoulder) * math.sin(angle),
-        ))
+    bottom = [upper[-1]]
+    bottom.extend(cubic(
+        bottom[-1],
+        (-0.38, -0.23),
+        (-0.20, -0.29),
+        (-0.12, -0.40),
+        8,
+    ))
+    bottom.extend(
+        (x, -0.40)
+        for x in (-0.06, 0, 0.06, 0.12)
+    )
+    bottom.extend(cubic(
+        bottom[-1],
+        (0.20, -0.29),
+        (0.38, -0.23),
+        upper[0],
+        8,
+    ))
 
-    for i in range(1, 7):
-        points.append((
-            -half_width
-            + 0.004 * (half_width / 0.5) * math.sin(i * math.pi / 6) ** 2,
-            shoulder + (bottom + cut - shoulder) * i / 6,
-        ))
+    half_width = max(abs(x) for x, z in upper)
+    upper = [
+        (x * 0.5 / half_width, z)
+        for x, z in upper
+    ]
+    bottom = [
+        (x * 0.5 / half_width, z)
+        for x, z in bottom
+    ]
+    outline = upper + bottom[1:-1]
 
-    for i in range(1, 3):
-        angle = math.pi + i * math.pi / 6
+    assert len(outline) == len(set(outline))
+    assert abs(max(z for x, z in outline) - 0.70) < EPSILON
+    assert abs(min(z for x, z in outline) + 0.40) < EPSILON
 
-        points.append((
-            -half_width + cut + cut * math.cos(angle),
-            bottom + cut + cut * math.sin(angle),
-        ))
-
-    return points
+    return outline, len(upper), len(bottom)
 
 
 class Builder:
@@ -199,83 +229,119 @@ class Builder:
         self.slots = []
 
     def ring(self, points):
-        first = len(self.vertices)
-        self.vertices.extend(tuple(p) for p in points)
-        return list(range(first, len(self.vertices)))
+        start = len(self.vertices)
+        self.vertices.extend(tuple(point) for point in points)
+        return list(range(start, len(self.vertices)))
 
     def face(self, indices, slot):
         indices = tuple(indices)
 
         assert len(indices) >= 3
-        assert len(set(indices)) == len(indices)
+        assert len(indices) == len(set(indices))
+        assert slot in USED_SLOTS
 
         self.faces.append(indices)
         self.slots.append(slot)
 
-    def bridge(self, first, second, slot):
+    def bridge(self, first, second, slots):
         assert len(first) == len(second)
 
         for i in range(len(first)):
             j = (i + 1) % len(first)
-            color = slot[i] if isinstance(slot, (list, tuple)) else slot
+            slot = slots[i] if isinstance(slots, (tuple, list)) else slots
 
             self.face(
                 (first[i], first[j], second[j], second[i]),
-                color,
-            )
-
-    def cap(self, ring, point, slot):
-        center = self.ring([point])[0]
-
-        for i in range(len(ring)):
-            self.face(
-                (ring[i], ring[(i + 1) % len(ring)], center),
                 slot,
             )
+
+    def shell_cap(self, ring, upper_count, bottom_count, sign):
+        upper = ring[:upper_count]
+        bottom = (
+            [ring[upper_count - 1]]
+            + ring[upper_count:]
+            + [ring[0]]
+        )
+        assert len(bottom) == bottom_count
+
+        left = Vector(self.vertices[bottom[0]])
+        right = Vector(self.vertices[bottom[-1]])
+        seam = [bottom[0]]
+
+        # 방사형 골의 윗경계를 글씨 칸 아래에 둔다.
+        for i in range(1, bottom_count - 1):
+            t = i / (bottom_count - 1)
+            x = left.x * (1 - t) + right.x * t
+            z = left.z - 0.012 * math.sin(math.pi * t)
+
+            seam.extend(self.ring([(x, sign * PANEL_Y, z)]))
+
+        seam.append(bottom[-1])
+
+        self.face(
+            upper + seam[1:-1],
+            SLOTS["cream"],
+        )
+
+        middle = []
+
+        for outside, inside in zip(bottom, seam, strict=True):
+            a = Vector(self.vertices[outside])
+            b = Vector(self.vertices[inside])
+
+            if outside == inside:
+                middle.append(outside)
+                continue
+
+            point = a.lerp(b, 0.48)
+            point.y = sign * (PANEL_Y - 0.007)
+            middle.extend(self.ring([point]))
+
+        for i in range(bottom_count - 1):
+            slot = SLOTS["pink"] if i % 2 else SLOTS["coral"]
+
+            for first, second in ((bottom, middle), (middle, seam)):
+                face = list(dict.fromkeys((
+                    first[i],
+                    first[i + 1],
+                    second[i + 1],
+                    second[i],
+                )))
+
+                if len(face) >= 3:
+                    self.face(face, slot)
 
     def leg(self, x):
         rings = []
 
-        for z, width, depth in (
-            (0.000, 0.120, 0.170),
-            (0.022, 0.148, 0.202),
-            (0.245, 0.134, 0.180),
-            (0.325, 0.120, 0.160),
+        for z, half_size, cut in (
+            (-0.700, 0.043, 0.009),
+            (-0.690, 0.050, 0.010),
+            (-0.330, 0.050, 0.010),
+            (-0.235, 0.050, 0.010),
+            (-0.225, 0.043, 0.009),
         ):
-            cut = 0.022
-            hx, hy = width / 2, depth / 2
+            h = half_size
 
             rings.append(self.ring([
-                (x - hx + cut, -hy, z),
-                (x + hx - cut, -hy, z),
-                (x + hx, -hy + cut, z),
-                (x + hx, hy - cut, z),
-                (x + hx - cut, hy, z),
-                (x - hx + cut, hy, z),
-                (x - hx, hy - cut, z),
-                (x - hx, -hy + cut, z),
+                (x - h + cut, -h, z),
+                (x + h - cut, -h, z),
+                (x + h, -h + cut, z),
+                (x + h, h - cut, z),
+                (x + h - cut, h, z),
+                (x - h + cut, h, z),
+                (x - h, h - cut, z),
+                (x - h, -h + cut, z),
             ]))
 
         self.face(reversed(rings[0]), SLOTS["wood"])
 
-        for i in range(1, len(rings)):
-            self.bridge(rings[i - 1], rings[i], [
-                SLOTS["light_wood"],
-                SLOTS["sand"],
-                SLOTS["wood"],
-                SLOTS["light_wood"],
-                SLOTS["light_wood"],
-                SLOTS["sand"],
-                SLOTS["wood"],
-                SLOTS["light_wood"],
-            ])
+        for first, second in zip(rings, rings[1:]):
+            self.bridge(first, second, SLOTS["wood"])
 
         self.face(rings[-1], SLOTS["wood"])
 
     def finish(self):
-        if bpy.data.objects.get(NAME) or bpy.data.meshes.get(NAME):
-            raise RuntimeError("Object name already exists: " + NAME)
-
         mesh = bpy.data.meshes.new(NAME)
         mesh.from_pydata(self.vertices, [], self.faces)
         mesh.update()
@@ -285,26 +351,17 @@ class Builder:
         mesh.materials.append(bpy.data.materials["palette"])
         uv = mesh.uv_layers.new(name="UVMap")
 
-        for face, slot in zip(mesh.polygons, self.slots, strict=True):
-            face.use_smooth = False
-            face.material_index = 0
+        for polygon, slot in zip(mesh.polygons, self.slots, strict=True):
+            polygon.use_smooth = False
+            polygon.material_index = 0
 
-            for index in face.loop_indices:
+            for index in polygon.loop_indices:
                 uv.data[index].uv = ((slot + 0.5) / 32, 0.5)
-
-        lower, upper = bounds(v.co for v in mesh.vertices)
-        assert (upper - lower - TARGET).length < EPSILON
-
-        center = (lower + upper) / 2
-
-        for vertex in mesh.vertices:
-            vertex.co -= center
 
         bm = bmesh.new()
 
         try:
             bm.from_mesh(mesh)
-
             bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
             bmesh.ops.triangulate(
                 bm,
@@ -315,14 +372,14 @@ class Builder:
             bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
             assert all(
-                e.is_manifold and e.is_contiguous
-                for e in bm.edges
+                edge.is_manifold and edge.is_contiguous
+                for edge in bm.edges
             )
-            assert all(v.is_manifold for v in bm.verts)
-            assert all(f.calc_area() > 1e-10 for f in bm.faces)
+            assert all(vertex.is_manifold for vertex in bm.verts)
+            assert all(face.calc_area() > 1e-10 for face in bm.faces)
 
             remaining = set(bm.faces)
-            components = 0
+            components = []
 
             while remaining:
                 component = {remaining.pop()}
@@ -339,23 +396,38 @@ class Builder:
                                 pending.append(neighbor)
 
                 volume = sum(
-                    f.verts[0].co.dot(
-                        f.verts[1].co.cross(f.verts[2].co)
+                    face.verts[0].co.dot(
+                        face.verts[1].co.cross(face.verts[2].co)
                     ) / 6
-                    for f in component
+                    for face in component
                 )
-
                 assert abs(volume) > 1e-10
 
                 if volume < 0:
-                    bmesh.ops.reverse_faces(
-                        bm,
-                        faces=list(component),
-                    )
+                    bmesh.ops.reverse_faces(bm, faces=list(component))
 
-                components += 1
+                components.append(component)
 
-            assert components == 3
+            assert len(components) == 3
+
+            for component in components:
+                lower, upper = bounds(
+                    vertex.co
+                    for face in component
+                    for vertex in face.verts
+                )
+
+                if lower.z < -0.69:
+                    assert abs(
+                        abs((lower.x + upper.x) / 2) - 0.28
+                    ) < EPSILON
+                    assert abs(upper.x - lower.x - 0.10) < EPSILON
+                    assert abs(upper.y - lower.y - 0.10) < EPSILON
+                    assert abs(lower.z + 0.70) < EPSILON
+                else:
+                    assert abs(lower.z + 0.40) < EPSILON
+                    assert abs(upper.z - 0.70) < EPSILON
+
             bm.to_mesh(mesh)
 
         finally:
@@ -364,17 +436,16 @@ class Builder:
         mesh.update()
         mesh.calc_loop_triangles()
 
-        assert 600 <= len(mesh.loop_triangles) <= 2000
+        assert 600 <= len(mesh.loop_triangles) <= 2500
 
-        lower, upper = bounds(v.co for v in mesh.vertices)
+        lower, upper = bounds(vertex.co for vertex in mesh.vertices)
 
         assert (upper - lower - TARGET).length < EPSILON
-        assert ((upper + lower) / 2).length < EPSILON
-        assert abs(lower.z + TARGET.z / 2) < EPSILON
-
+        assert ((lower + upper) / 2).length < EPSILON
+        assert abs(lower.z + 0.70) < EPSILON
         assert sum(
-            abs(v.co.z - lower.z) < EPSILON
-            for v in mesh.vertices
+            abs(vertex.co.z + 0.70) < EPSILON
+            for vertex in mesh.vertices
         ) == 16
 
         assert not mesh.color_attributes
@@ -385,14 +456,23 @@ class Builder:
 
         for polygon in mesh.polygons:
             values = [
-                tuple(mesh.uv_layers.active.data[i].uv)
-                for i in polygon.loop_indices
+                tuple(mesh.uv_layers.active.data[index].uv)
+                for index in polygon.loop_indices
             ]
-
             used.update(check_uv(value) for value in values)
+
             assert all(value == values[0] for value in values)
 
-        assert used == set(SLOTS.values())
+        assert used == USED_SLOTS
+
+        positions = {
+            tuple(round(component, 6) for component in vertex.co)
+            for vertex in mesh.vertices
+        }
+        assert positions == {
+            (x, -y, z)
+            for x, y, z in positions
+        }
 
         obj = bpy.data.objects.new(NAME, mesh)
         bpy.context.scene.collection.objects.link(obj)
@@ -405,85 +485,166 @@ class Builder:
         return obj
 
 
+def clipped_label_area(points):
+    polygon = [(point.x, point.z) for point in points]
+
+    for axis, boundary, direction in (
+        (0, -0.33, 1),
+        (0, 0.33, -1),
+        (1, LABEL_Z - 0.20, 1),
+        (1, LABEL_Z + 0.20, -1),
+    ):
+        if not polygon:
+            return 0
+
+        clipped = []
+        previous = polygon[-1]
+        previous_inside = direction * (previous[axis] - boundary) >= 0
+
+        for current in polygon:
+            current_inside = direction * (current[axis] - boundary) >= 0
+
+            if current_inside != previous_inside:
+                t = (
+                    (boundary - previous[axis])
+                    / (current[axis] - previous[axis])
+                )
+                clipped.append(tuple(
+                    previous[k] + t * (current[k] - previous[k])
+                    for k in range(2)
+                ))
+
+            if current_inside:
+                clipped.append(current)
+
+            previous = current
+            previous_inside = current_inside
+
+        polygon = clipped
+
+    return abs(sum(
+        polygon[i][0] * polygon[(i + 1) % len(polygon)][1]
+        - polygon[(i + 1) % len(polygon)][0] * polygon[i][1]
+        for i in range(len(polygon))
+    )) / 2
+
+
 def verify_panels(obj):
-    # 다양한 가로세로 배율에서 글씨 판이 차지할 수 있는 최대 영역.
+    for vertex in obj.data.vertices:
+        x, y, z = vertex.co
+
+        assert abs(y) <= PANEL_Y + EPSILON
+
+        if (
+            abs(x) < 0.33
+            and abs(z - LABEL_Z) < 0.20
+            and abs(y) > 0.10
+        ):
+            assert abs(abs(y) - PANEL_Y) < EPSILON, tuple(vertex.co)
+
     for sign in (-1, 1):
-        for x in (-0.28, 0, 0.28):
-            for fraction in (0.376, 0.58, 0.784):
-                z = (fraction - 0.5) * TARGET.z
+        covered = 0
+
+        for polygon in obj.data.polygons:
+            points = [
+                obj.data.vertices[index].co
+                for index in polygon.vertices
+            ]
+
+            if not all(
+                abs(point.y - sign * PANEL_Y) < EPSILON
+                for point in points
+            ):
+                continue
+
+            if not all(
+                check_uv(obj.data.uv_layers.active.data[index].uv)
+                == SLOTS["cream"]
+                for index in polygon.loop_indices
+            ):
+                continue
+
+            assert polygon.normal.y * sign > 0.999
+            covered += clipped_label_area(points)
+
+        assert abs(covered - 0.66 * 0.40) < EPSILON, (sign, covered)
+
+        for ix in range(17):
+            x = -0.33 + 0.66 * ix / 16
+
+            for iz in range(13):
+                z = LABEL_Z - 0.20 + 0.40 * iz / 12
 
                 hit, point, normal, index = obj.ray_cast(
-                    Vector((x, sign * 0.25, z)),
+                    Vector((x, sign * 0.30, z)),
                     Vector((0, -sign, 0)),
                 )
 
-                assert hit
-                assert abs(point.y - sign * PANEL_Y) < EPSILON
+                assert hit, (x, z)
+                assert abs(point.y - sign * PANEL_Y) < EPSILON, (
+                    tuple(point), x, z
+                )
                 assert normal.dot(Vector((0, sign, 0))) > 0.999
 
                 polygon = obj.data.polygons[index]
 
-                for i in polygon.loop_indices:
-                    assert check_uv(
-                        obj.data.uv_layers.active.data[i].uv
-                    ) == SLOTS["cream"]
+                assert all(
+                    check_uv(obj.data.uv_layers.active.data[i].uv)
+                    == SLOTS["cream"]
+                    for i in polygon.loop_indices
+                ), (x, z, index)
 
 
 def build_sign():
+    outline, upper_count, bottom_count = shell_outline()
     builder = Builder()
 
-    # 양쪽 면을 같은 깊이에 두어 정면과 뒷면 모두 글씨를 붙일 수 있다.
+    # 앞뒤의 크림 칸·분홍 띠·산호 띠를 각각 y=±0.15에 평평하게 둔다.
+    # 둥근 단면 대신 작은 모서리 베벨과 곧은 측면으로 판의 두께를 표현한다.
     profiles = (
-        (-0.150, 0.405, 0.324, 1.307, "cream"),
-        (-0.150, 0.420, 0.310, 1.320, "cream"),
-        (-0.150, 0.435, 0.294, 1.337, "sand"),
-        (-0.137, 0.473, 0.255, 1.376, "light_wood"),
-        (-0.095, 0.500, 0.230, 1.400, "wood"),
-        (0.095, 0.500, 0.230, 1.400, "wood"),
-        (0.137, 0.473, 0.255, 1.376, "light_wood"),
-        (0.150, 0.435, 0.294, 1.337, "sand"),
-        (0.150, 0.420, 0.310, 1.320, "cream"),
-        (0.150, 0.405, 0.324, 1.307, "cream"),
+        (-0.150, 0.870, 0.880),
+        (-0.150, 0.935, 0.940),
+        (-0.150, 0.985, 0.985),
+        (-0.135, 1.000, 1.000),
+        (0.135, 1.000, 1.000),
+        (0.150, 0.985, 0.985),
+        (0.150, 0.935, 0.940),
+        (0.150, 0.870, 0.880),
+    )
+
+    assert profiles == tuple(
+        (-y, scale_x, scale_z)
+        for y, scale_x, scale_z in reversed(profiles)
     )
 
     rings = [
         builder.ring(
-            (x, y, z)
-            for x, z in arch_outline(width, bottom, 0.99, top)
+            (x * scale_x, y, 0.12 + (z - 0.12) * scale_z)
+            for x, z in outline
         )
-        for y, width, bottom, top, slot in profiles
+        for y, scale_x, scale_z in profiles
     ]
 
-    builder.cap(
+    builder.shell_cap(
         rings[0],
-        (0, -PANEL_Y, 0.80),
-        SLOTS["cream"],
+        upper_count,
+        bottom_count,
+        -1,
     )
 
     for i in range(1, len(rings)):
-        slot = SLOTS[profiles[i][4]]
+        slot = SLOTS["pink"] if i in (1, 7) else SLOTS["coral"]
+        builder.bridge(rings[i - 1], rings[i], slot)
 
-        if i == 5:
-            colors = [
-                SLOTS["light_wood"]
-                if j in (0, 7, 8, 17, 18, 29)
-                else slot
-                for j in range(len(rings[i]))
-            ]
-        else:
-            colors = slot
-
-        builder.bridge(rings[i - 1], rings[i], colors)
-
-    builder.cap(
+    builder.shell_cap(
         rings[-1],
-        (0, PANEL_Y, 0.80),
-        SLOTS["cream"],
+        upper_count,
+        bottom_count,
+        1,
     )
 
-    # 다리는 판에 조금 겹쳐 틈을 없애며, 각 부품은 닫힌 형상이다.
-    builder.leg(-0.285)
-    builder.leg(0.285)
+    builder.leg(-0.28)
+    builder.leg(0.28)
 
     return builder.finish()
 
@@ -505,7 +666,11 @@ def accessor_rows(document, binary, index):
         "VEC4": 4,
     }
 
-    fmt = "<" + formats[accessor["componentType"]] * widths[accessor["type"]]
+    fmt = (
+        "<"
+        + formats[accessor["componentType"]]
+        * widths[accessor["type"]]
+    )
     size = struct.calcsize(fmt)
     view = document["bufferViews"][accessor["bufferView"]]
 
@@ -514,6 +679,8 @@ def accessor_rows(document, binary, index):
     stride = view.get("byteStride", size)
     start = view.get("byteOffset", 0) + accessor.get("byteOffset", 0)
 
+    assert accessor["count"] > 0
+    assert stride >= size
     assert start + (accessor["count"] - 1) * stride + size <= (
         view.get("byteOffset", 0) + view["byteLength"]
     )
@@ -539,6 +706,7 @@ def verify_glb(data, obj):
 
         assert size % 4 == 0
         assert kind not in chunks
+        assert offset + 8 + size <= len(data)
 
         chunks[kind] = data[offset + 8:offset + 8 + size]
         offset += 8 + size
@@ -571,36 +739,39 @@ def verify_glb(data, obj):
     attributes = primitive["attributes"]
 
     assert {"POSITION", "NORMAL", "TEXCOORD_0"}.issubset(attributes)
-    assert not any(k.startswith("COLOR_") for k in attributes)
+    assert not any(
+        key.startswith("COLOR_")
+        for key in attributes
+    )
 
     points = [
-        Vector(p)
-        for p in accessor_rows(document, binary, attributes["POSITION"])
+        Vector(point)
+        for point in accessor_rows(
+            document, binary, attributes["POSITION"]
+        )
     ]
     normals = accessor_rows(
-        document,
-        binary,
-        attributes["NORMAL"],
+        document, binary, attributes["NORMAL"]
     )
     uvs = accessor_rows(
-        document,
-        binary,
-        attributes["TEXCOORD_0"],
+        document, binary, attributes["TEXCOORD_0"]
     )
 
     assert len(points) == len(normals) == len(uvs)
-    assert {check_uv(uv) for uv in uvs} == set(SLOTS.values())
+    assert {check_uv(uv) for uv in uvs} == USED_SLOTS
 
     indices = [
         row[0]
-        for row in accessor_rows(document, binary, primitive["indices"])
+        for row in accessor_rows(
+            document, binary, primitive["indices"]
+        )
     ]
 
     assert len(indices) % 3 == 0
 
     triangles = len(indices) // 3
 
-    assert 600 <= triangles <= 2000
+    assert 600 <= triangles <= 2500
     assert triangles == len(obj.data.loop_triangles)
 
     for i in range(0, len(indices), 3):
@@ -613,10 +784,9 @@ def verify_glb(data, obj):
             .cross(points[c] - points[a])
             .length > 2e-10
         )
-
         assert all(
-            abs(uvs[a][axis] - uvs[v][axis]) < 1e-7
-            for v in (b, c)
+            abs(uvs[a][axis] - uvs[index][axis]) < 1e-7
+            for index in (b, c)
             for axis in range(2)
         )
 
@@ -625,48 +795,48 @@ def verify_glb(data, obj):
     assert (
         upper - lower - Vector((TARGET.x, TARGET.z, TARGET.y))
     ).length < EPSILON
-    assert ((upper + lower) / 2).length < EPSILON
+    assert ((lower + upper) / 2).length < EPSILON
+    assert abs(lower.y + 0.70) < EPSILON
 
-    # Blender -Y 정면은 Y-up GLB의 +Z 정면이다.
-    def yup(point):
-        x, y, z = point
-        return Vector((x, z, -y))
-
-    expected = [yup(v.co) for v in obj.data.vertices]
-    expected_positions = {
-        tuple(round(c, 6) for c in p)
-        for p in expected
+    # Blender -Y 정면은 export_yup 적용 후 GLB +Z 정면이다.
+    expected = {
+        (
+            round(vertex.co.x, 6),
+            round(vertex.co.z, 6),
+            round(-vertex.co.y, 6),
+        )
+        for vertex in obj.data.vertices
     }
+    actual = {
+        tuple(round(component, 6) for component in point)
+        for point in points
+    }
+    assert actual == expected
 
-    assert all(
-        tuple(round(c, 6) for c in p) in expected_positions
-        for p in points
-    )
-
-    label_y = (0.58 - 0.5) * TARGET.z
+    for point in points:
+        if (
+            abs(point.x) < 0.33
+            and abs(point.y - LABEL_Z) < 0.20
+            and abs(point.z) > 0.10
+        ):
+            assert abs(abs(point.z) - PANEL_Y) < EPSILON
 
     for sign in (-1, 1):
-        candidates = [
-            i for i, p in enumerate(points)
-            if abs(p.z - sign * PANEL_Y) < EPSILON
-            and abs(p.x) < 0.41
-            and 0.31 - TARGET.z / 2 < p.y < 1.32 - TARGET.z / 2
-        ]
-
-        assert candidates
         assert any(
-            normals[i][2] * sign > 0.999
+            abs(point.z - sign * PANEL_Y) < EPSILON
+            and normals[i][2] * sign > 0.999
             and check_uv(uvs[i]) == SLOTS["cream"]
-            for i in candidates
+            for i, point in enumerate(points)
         )
-
-    assert lower.y < label_y < upper.y
 
     texture, = document["textures"]
     image, = document["images"]
 
     assert texture["source"] == 0
-    assert material["pbrMetallicRoughness"]["baseColorTexture"]["index"] == 0
+    assert (
+        material["pbrMetallicRoughness"]["baseColorTexture"]["index"]
+        == 0
+    )
     assert image["mimeType"] == "image/png"
     assert "uri" not in image
 
@@ -678,11 +848,15 @@ def verify_glb(data, obj):
     assert struct.unpack_from(">II", png, 16) == (128, 4)
 
     return {
+        "file": str(OUTPUT / (NAME + ".glb")),
         "triangles": triangles,
+        "closed_components": 3,
         "blender_dimensions": tuple(TARGET),
         "glb_dimensions": tuple(upper - lower),
-        "palette_slots": SLOTS,
-        "label_height": 0.58,
+        "label_center_z": LABEL_Z,
+        "label_minimum_size": [0.66, 0.40],
+        "label_planes_y": [-PANEL_Y, PANEL_Y],
+        "palette_slots_used": sorted(USED_SLOTS),
     }
 
 
@@ -720,150 +894,128 @@ def export_glb(obj):
 
     assert result == {"FINISHED"}
 
-    report = verify_glb(path.read_bytes(), obj)
-    report["file"] = str(path)
-
-    return report
+    return verify_glb(path.read_bytes(), obj)
 
 
-def clone_for_preview(scene, source, position, height):
-    mesh = source.data.copy()
-    clone = bpy.data.objects.new("preview-" + source.name, mesh)
-    scene.collection.objects.link(clone)
-
-    points = [
-        source.matrix_world @ v.co
-        for v in source.data.vertices
-    ]
-    lower, upper = bounds(points)
-
-    center = Vector((
-        (lower.x + upper.x) / 2,
-        (lower.y + upper.y) / 2,
-        lower.z,
-    ))
-    scale = height / max(upper - lower)
-
-    for vertex, point in zip(mesh.vertices, points, strict=True):
-        vertex.co = (point - center) * scale + position
-
-    mesh.update()
-    return clone
-
-
-def make_render_scene(obj, references):
-    scene = bpy.data.scenes.new(NAME + "-compare")
+def make_render_scene(obj):
+    scene = bpy.data.scenes.new(NAME + "-front-and-upper45")
     scene.render.engine = "BLENDER_WORKBENCH"
-    scene.render.resolution_x = 2400
-    scene.render.resolution_y = 1100
-    scene.render.resolution_percentage = 100
-    scene.render.image_settings.file_format = "PNG"
-    scene.render.film_transparent = False
-
-    scene.view_settings.view_transform = "Standard"
-    scene.world = bpy.data.worlds.new(NAME + "-world")
-    scene.world.color = (0.045, 0.045, 0.045)
 
     shading = scene.display.shading
     shading.light = "STUDIO"
+    shading.studio_light = "paint.sl"
     shading.color_type = "TEXTURE"
-    shading.background_type = "WORLD"
-    shading.show_shadows = True
+    shading.background_type = "VIEWPORT"
+    shading.background_color = (0.86, 0.79, 0.68)
+
+    # 팔레트 비교에서 그림자·캐비티·광택이 색을 과장하지 않도록 한다.
+    shading.show_shadows = False
     shading.show_cavity = False
+    shading.show_specular_highlight = False
+    shading.show_object_outline = False
+    shading.show_backface_culling = False
 
-    direction = Vector((0.52, -0.82, 0.48)).normalized()
-    rotation = (-direction).to_track_quat("-Z", "Y")
-    basis = rotation.to_matrix()
-    screen_right = basis @ Vector((1, 0, 0))
+    scene.render.resolution_x = 2000
+    scene.render.resolution_y = 1400
+    scene.render.resolution_percentage = 100
+    scene.render.image_settings.file_format = "PNG"
+    scene.render.image_settings.color_mode = "RGBA"
+    scene.render.film_transparent = False
+    scene.render.use_sequencer = False
+    scene.render.use_compositing = False
 
-    clones = [
-        clone_for_preview(
-            scene,
-            obj,
-            screen_right * -3.0,
-            3.4,
+    scene.view_settings.view_transform = "Standard"
+    scene.view_settings.look = "None"
+    scene.view_settings.exposure = 0.0
+    scene.view_settings.gamma = 1.0
+
+    scene.world = bpy.data.worlds.new(NAME + "-preview-world")
+    scene.world.color = (0.86, 0.79, 0.68)
+
+    clones = []
+
+    # 같은 정사영 카메라에서 왼쪽은 정면, 오른쪽은 정면 위 45도.
+    for label, x, angle in (
+        ("front", -0.70, 0),
+        ("upper45", 0.70, math.pi / 4),
+    ):
+        clone = bpy.data.objects.new(
+            NAME + "-" + label,
+            obj.data.copy(),
         )
-    ]
+        scene.collection.objects.link(clone)
 
-    labels = list(REFERENCE_NAMES)
+        rotation = Matrix.Rotation(angle, 4, "X")
 
-    for index, label in enumerate(labels):
-        column = index % 4
-        row = index // 4
+        for vertex in clone.data.vertices:
+            vertex.co = rotation @ vertex.co
 
-        position = screen_right * (-0.1 + column * 1.5)
-        position += Vector((0, 0, 1.7 if row == 0 else 0))
+        lower, upper = bounds(
+            vertex.co for vertex in clone.data.vertices
+        )
+        center = (lower + upper) / 2
 
-        clones.append(clone_for_preview(
-            scene,
-            references[label],
-            position,
-            1.35,
-        ))
+        for vertex in clone.data.vertices:
+            vertex.co -= center
 
-    print(
-        "COMPARE: linkSign left; original references right:",
-        ", ".join(labels),
-    )
-    print(
-        "COMPARE: display sizes normalized separately; "
-        "GLB dimensions are unchanged."
-    )
+        clone.location.x = x
+        clone.data.update()
+        clones.append(clone)
 
     camera = bpy.data.objects.new(
-        NAME + "-camera",
-        bpy.data.cameras.new(NAME + "-camera"),
+        NAME + "-preview-camera",
+        bpy.data.cameras.new(NAME + "-preview-camera"),
     )
     scene.collection.objects.link(camera)
     scene.camera = camera
 
+    camera.location = (0, -8, 0)
+    camera.rotation_euler = (
+        Vector((0, 1, 0))
+        .to_track_quat("-Z", "Y")
+        .to_euler()
+    )
     camera.data.type = "ORTHO"
     camera.data.clip_start = 0.01
     camera.data.clip_end = 100
 
     points = [
-        v.co.copy()
+        vertex.co + clone.location
         for clone in clones
-        for v in clone.data.vertices
+        for vertex in clone.data.vertices
     ]
     lower, upper = bounds(points)
-    center = (lower + upper) / 2
-
-    view_points = [
-        basis.transposed() @ (p - center)
-        for p in points
-    ]
-    screen_lower, screen_upper = bounds(view_points)
-
-    center += basis @ Vector((
-        (screen_lower.x + screen_upper.x) / 2,
-        (screen_lower.y + screen_upper.y) / 2,
-        0,
-    ))
-
-    camera.location = center + direction * 20
-    camera.rotation_euler = rotation.to_euler()
-
     aspect = (
         scene.render.resolution_x
         / scene.render.resolution_y
     )
+
     camera.data.ortho_scale = max(
-        screen_upper.x - screen_lower.x,
-        (screen_upper.y - screen_lower.y) * aspect,
-    ) * 1.12
+        upper.x - lower.x,
+        (upper.z - lower.z) * aspect,
+    ) * 1.14
 
     return scene
 
 
-def render_comparison(obj, references):
-    scene = make_render_scene(obj, references)
+def render_comparison(obj):
+    scene = make_render_scene(obj)
     scene.render.filepath = str(OUTPUT / (NAME + ".png"))
 
-    bpy.ops.render.render(
+    bpy.context.window.scene = scene
+    bpy.context.view_layer.update()
+
+    result = bpy.ops.render.render(
         write_still=True,
         scene=scene.name,
     )
+    assert result == {"FINISHED"}
+
+    path = OUTPUT / (NAME + ".png")
+    data = path.read_bytes()
+
+    assert data[:8] == b"\x89PNG\r\n\x1a\n"
+    assert struct.unpack_from(">II", data, 16) == (2000, 1400)
 
 
 def main():
@@ -877,7 +1029,7 @@ def main():
     )
     args = parser.parse_args(argv)
 
-    references = load_source()
+    load_source()
 
     scene = bpy.data.scenes.new(NAME + "-export")
     bpy.context.window.scene = scene
@@ -889,7 +1041,8 @@ def main():
     report = export_glb(obj)
 
     if not args.skip_render:
-        render_comparison(obj, references)
+        render_comparison(obj)
+        report["preview"] = str(OUTPUT / (NAME + ".png"))
 
     print(json.dumps(report, ensure_ascii=False))
 

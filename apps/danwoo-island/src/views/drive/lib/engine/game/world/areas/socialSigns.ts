@@ -18,8 +18,9 @@ const LABELS = new Map<string, string>([
   ['gitHub', 'CODE'],
   ['onlyfans', '바람'],
 ]);
-const STELE = { maxThickness: 0.3, labelHeight: 0.58 } as const;
-const PLAZA = { name: 'Cube133', pedestalMaxHeight: 0.6, centerMinWidth: 2.5 } as const;
+const STELE = { maxThickness: 0.3, labelHeight: 0.58, labelWidth: 0.6, labelAspect: 0.5 } as const;
+const LABEL_COLORS = { ink: '#1f5f6e', glow: '#fbf3e4' } as const;
+const PLAZA = { name: 'Cube133', pedestalMaxHeight: 0.6, centerMinWidth: 2.5, signReach: 1.2 } as const;
 const COLLIDER = /^(cuboid|tube)/i;
 const TUBE = /^tube/i;
 const TUBE_INNER = { width: 0.9, depth: 0.4 } as const;
@@ -36,9 +37,9 @@ function labelTexture(label: string): THREE.CanvasTexture {
   context.font = LABEL_CANVAS.font;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
-  context.fillStyle = '#1a1716';
-  context.fillText(label, 260, 132, LABEL_CANVAS.maxWidth);
-  context.fillStyle = '#efe2c4';
+  context.fillStyle = LABEL_COLORS.glow;
+  context.fillText(label, 258, 131, LABEL_CANVAS.maxWidth);
+  context.fillStyle = LABEL_COLORS.ink;
   context.fillText(label, 256, 128, LABEL_CANVAS.maxWidth);
   const map = new THREE.CanvasTexture(canvas);
   map.colorSpace = THREE.SRGBColorSpace;
@@ -82,10 +83,15 @@ function buildStele(mesh: THREE.Mesh, label: string, { size, matrix: baseMatrix 
 
   mesh.geometry = islandModelGeometry('linkSign', { size: new THREE.Vector3(width, height, thickness), matrix });
   mesh.material = islandPaletteMaterial('linkSign');
-  const textSize = Math.min(width * 0.8, height * 1.2);
+  const labelWidth = width * STELE.labelWidth;
   const labelMaterial = canvasMaterial(labelTexture(label));
   for (const isBack of [false, true]) {
-    const text = labelCard(textSize * 0.68, textSize * 0.34, (isBack ? -1 : 1) * (thickness / 2 + 0.006), isBack);
+    const text = labelCard(
+      labelWidth,
+      labelWidth * STELE.labelAspect,
+      (isBack ? -1 : 1) * (thickness / 2 + 0.006),
+      isBack,
+    );
     text.translate(0, (STELE.labelHeight - 0.5) * height, 0);
     mesh.add(texturedMesh(text, labelMaterial, { name: 'steleLabel', matrix, castShadow: false }));
   }
@@ -112,16 +118,28 @@ function pedestalMesh({ box }: MeshComponent, angle: number): THREE.Mesh {
   return islandModelMesh('rockBase', matrix, new THREE.Vector3(side, height, side));
 }
 
+function signPositionsIn(model: THREE.Object3D, plaza: THREE.Object3D): THREE.Vector3[] {
+  model.updateMatrixWorld(true);
+  return model.children
+    .filter((child) => LABELS.has(child.name.replace(PHYSICAL_SUFFIX, '')))
+    .map((sign) => plaza.worldToLocal(sign.getWorldPosition(new THREE.Vector3())));
+}
+
 export function reshapeSocialPlaza(model: THREE.Object3D): void {
   const plaza = model.getObjectByName(PLAZA.name);
   if (!(plaza instanceof THREE.Mesh)) return;
+  const signs = signPositionsIn(model, plaza);
+  const holdsSign = (center: THREE.Vector3): boolean =>
+    signs.some((sign) => Math.hypot(sign.x - center.x, sign.z - center.z) < PLAZA.signReach);
   const pedestals: THREE.Mesh[] = [];
   removeComponents(plaza, (component) => {
     const { box } = component;
     const isPlinth = box.max.x - box.min.x > PLAZA.centerMinWidth;
     if (!isPlinth && box.max.y > PLAZA.pedestalMaxHeight) return false;
     const center = box.getCenter(new THREE.Vector3());
-    pedestals.push(pedestalMesh(component, isPlinth ? 0 : Math.atan2(center.x, center.z)));
+    if (isPlinth || holdsSign(center)) {
+      pedestals.push(pedestalMesh(component, isPlinth ? 0 : Math.atan2(center.x, center.z)));
+    }
     return true;
   });
   plaza.add(...pedestals);

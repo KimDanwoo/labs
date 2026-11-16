@@ -64,7 +64,7 @@ export function Modals() {
             <ul className="js-map-places map-places-list" />
           </nav>
           <p className="map-hint">
-            핀을 눌러 고르고 이동<span className="map-hint-keys"> · M 닫기</span>
+            끌어서 둘러보고 핀을 눌러 이동<span className="map-hint-keys"> · M 닫기</span>
           </p>
           <CloseButton />
         </div>
