@@ -40,9 +40,19 @@ world-overrides/            world:sync가 public/world 위에 덮어쓰는 자�
 - 작은 화면/터치 기기는 DPR 최대 1.5·150만 픽셀, 데스크톱은 DPR 최대 2·400만 픽셀로 렌더한다.
 - `/work`는 `/`로 이동한다.
 
+## 새 구역 추가
+
+1. 모델: `areas/areas*.glb` 최상위 자식 이름을 구역 이름으로 시작한다(예: `bowling…`). 이름 접두사가 맞는 구역은 모두 만들어진다.
+2. 클래스: `world/areas/<name>Area.ts`에 `Area`를 상속한다. 매 프레임 일은 `update()`를 덮어쓰면 `TICK_ORDER.area` 순서로 돈다. 모델에 `zoneFrustum` 참조가 있으면 화면에 보일 때만 돈다.
+3. 등록: `world/areas/areas.ts`의 `AreaTypes`와 `AREA_BUILDERS`에 한 줄씩 추가한다.
+4. 이동 지점: `respawns/respawnsReferences*.glb` 최상위에 `respawn<Name>` 오브젝트를 두거나(`respawnNewArea` → `newArea`) `respawns.ts`의 `EXTRA_RESPAWNS`에 좌표를 넣는다. 지도 항목의 `respawnName`이 여기 없으면 지도를 열 때 오류가 난다.
+5. 지도: `islandPlaces.ts`의 `ISLAND_PLACES`에 항목을 넣는다. 새 아이콘이면 `PlaceIcon`에 이름을 추가하고 `world-overrides/ui/map/icons/<icon>.webp`를 둔다.
+6. 상호작용: `this.game.interactivePoints.create({ position, text, onInteract })`. 근처 점이 겹치면 숨겨지지 않은 점 중 마지막에 만든 점이 열린다.
+7. 별도 프레임 갱신이 필요하면 `tickOrder.ts` 표에 실행 순서를 정해 넣는다.
+
 ## 검증
 
-루트 `pnpm lint`, `pnpm typecheck`, `pnpm test`와 `pnpm --filter danwoo-island build`. 자동 테스트는 에셋 경로 헬퍼만 다룬다. 주행·메뉴·지도·오디오·터치 흐름은 GPU 브라우저에서 확인한다.
+루트 `pnpm lint`, `pnpm typecheck`, `pnpm test`와 `pnpm --filter danwoo-island build`. 자동 테스트는 엔진의 순수 로직(갱신 순서·클릭 판정·근접 선택·구역 매칭·지도 맞춤 등)과 에셋 경로 헬퍼를 다룬다. 주행·메뉴·지도·오디오·터치 흐름은 GPU 브라우저에서 확인한다.
 
 개발 서버(`NODE_ENV=development`)에서는 `window.__islandProbe`가 열린다. 엔진 내부 이름이 바뀌어도 화면 비교 스크립트가 그대로 돌도록 둔 고정 창구다.
 
