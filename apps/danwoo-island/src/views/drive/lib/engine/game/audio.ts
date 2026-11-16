@@ -285,6 +285,7 @@ class Playlist {
 
   resume(): void {
     if (!this.#canPlay() || this.#switchCall || this.current?.sound.playing()) return;
+    this.#renewRetries();
     this.#startCurrent();
   }
 
@@ -302,6 +303,7 @@ class Playlist {
       this.#switchCall = null;
       if (!this.#canPlay()) return;
       this.#index = (this.#index + 1) % this.songs.length;
+      this.#renewRetries();
       const song = this.#startCurrent();
       getGame().notifications.show(nowPlayingNotice(song.name), { type: 'song', duration: SONG_NOTICE_DURATION });
     });
@@ -369,11 +371,15 @@ class Playlist {
     });
   }
 
+  #renewRetries(): void {
+    const song = this.songs[this.#index];
+    if (song?.loadState === 'failed') song.loadRetries = 0;
+  }
+
   #startCurrent(): Song {
     const song = this.songs[this.#index];
     if (!song) throw new Error('Playlist is empty');
     this.current = song;
-    if (song.loadState === 'failed') song.loadRetries = 0;
     this.#load(song);
     song.sound.play();
     return song;
