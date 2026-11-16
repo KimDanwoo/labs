@@ -1,6 +1,6 @@
 import { alea } from 'seedrandom';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { color, Fn, positionLocal, uniform, vec3 } from 'three/tsl';
+import { color, Fn, hash, instanceIndex, mix, positionLocal, step, uniform, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
@@ -14,6 +14,9 @@ const PETAL_SIZE = 0.08;
 const PETAL_DROP = 0.75;
 const SHADOW_OFFSET = 0.25;
 const UP = new THREE.Vector3(0, 1, 0);
+const BLOSSOMS = { plumeria: '#fff2d6', hibiscus: '#f0786a', orchid: '#f59ac0', allamanda: '#ffd25a' } as const;
+const BLOSSOM_SHARE = { bright: 0.45, allamanda: 0.7, orchid: 0.5 } as const;
+const BLOSSOM_SEED = { pale: 7, bright: 13 } as const;
 
 function clusterMatrices(references: readonly THREE.Object3D[]): THREE.Matrix4[] {
   return references.flatMap(({ position: center }) => {
@@ -48,6 +51,20 @@ function petal(): THREE.PlaneGeometry {
   return plane;
 }
 
+function blossomColor(): THREE.Node<'vec3'> {
+  const pale = mix(
+    color(BLOSSOMS.plumeria),
+    color(BLOSSOMS.allamanda),
+    step(BLOSSOM_SHARE.allamanda, hash(instanceIndex.add(BLOSSOM_SEED.pale))),
+  );
+  const bright = mix(
+    color(BLOSSOMS.hibiscus),
+    color(BLOSSOMS.orchid),
+    step(BLOSSOM_SHARE.orchid, hash(instanceIndex.add(BLOSSOM_SEED.bright))),
+  );
+  return mix(pale, bright, step(BLOSSOM_SHARE.bright, hash(instanceIndex))).rgb;
+}
+
 export class Flowers {
   constructor() {
     const game = getGame();
@@ -71,7 +88,7 @@ export class Flowers {
     const game = getGame();
     const material = new MeshDefaultMaterial({
       side: THREE.DoubleSide,
-      colorNode: uniform(color('#ffffff')).rgb,
+      colorNode: blossomColor(),
       hasWater: false,
     });
     material.receivedShadowPositionNode = positionLocal.add(game.lighting.directionUniform.mul(uniform(SHADOW_OFFSET)));

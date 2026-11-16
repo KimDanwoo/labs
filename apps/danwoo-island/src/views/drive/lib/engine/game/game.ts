@@ -494,7 +494,6 @@ export class Game {
         resource.generateMipmaps = false;
       }),
       modelResource('birchTreesReferencesModel', `birchTrees/birchTreesReferences${modelSuffix}.glb${cb}`),
-      modelResource('oakTreesVisualModel', `oakTrees/oakTreesVisual${modelSuffix}.glb${cb}`),
       modelResource('oakTreesReferencesModel', `oakTrees/oakTreesReferences${modelSuffix}.glb${cb}`),
       modelResource('cherryTreesReferencesModel', `cherryTrees/cherryTreesReferences${modelSuffix}.glb${cb}`),
       modelResource('sceneryModel', `scenery/scenery${modelSuffix}.glb${cb}`),
