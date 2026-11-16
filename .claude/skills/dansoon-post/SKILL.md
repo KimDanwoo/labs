@@ -35,7 +35,7 @@ category: "dev"            # dev | retro | reading
 tags: ["ai", "side-project"] # src/lib/taxonomy.ts의 TAG_IDS만
 draft: true                # 초안은 true, 발행 때 false
 thumbnail: "./thumbnail.jpg"
-cover: "./cover.jpg"
+cover: "./cover.webp"
 ---
 ```
 
@@ -46,18 +46,22 @@ cover: "./cover.jpg"
 
 이미지는 직접 그리지 않고 `codexgen` 스킬로 만든다(`~/.claude/skills/codexgen/codexgen.sh <out.png> "<영문 프롬프트>"`). 여러 장은 순차 호출.
 
-**cover.jpg** — 글 상단 + 썸네일 배경
+**cover.webp** — 글 상단 + 썸네일 배경
 
 - 3:2, **제목·글자 없음**, **모티프는 오른쪽, 왼쪽 절반 이상은 비운다**(썸네일 스크립트가 왼쪽에 제목을 얹는다).
 - 글마다 은유와 화풍을 바꾼다. 큰 한글 제목 + 파란 강조 + 연회색 배경 + 플랫 UI 아이콘(브라우저 창·톱니·화살표) 템플릿은 피한다.
-- 변환: `sips -s format jpeg -s formatOptions 82 -z 1024 1536 cover.png --out cover.jpg` 후 png 삭제.
+
+**WebP 변환** — cover와 본문 이미지는 최종적으로 webp다. 썸네일 스크립트는 `cover.webp`만 읽는다.
+
+1. png → jpg: `sips -s format jpeg -s formatOptions 82 -z 1024 1536 <이름>.png --out <이름>.jpg` 후 png 삭제. png를 그대로 두면 다음 단계가 무손실 webp로 만들어 용량이 커진다.
+2. jpg → webp: 앱 폴더에서 `node scripts/optimizeImages.mjs <slug>`. jpg를 webp로 바꾸고 `index.md`의 `./<이름>.jpg` 참조(frontmatter 포함)를 `.webp`로 고친 뒤 jpg를 지운다. 같은 이름의 webp가 이미 있으면 멈춘다.
 
 **thumbnail.jpg** — 목록·링크 미리보기(1200×630)
 
-- **직접 자르지 않는다.** 앱 폴더에서 `node scripts/make-thumbnails.ts <slug>`로 만든다.
+- **직접 자르지 않는다.** WebP 변환 뒤 앱 폴더에서 `node scripts/make-thumbnails.ts <slug>`로 만든다. `cover.webp`가 없으면 아무것도 출력하지 않고 건너뛴다.
 - **제목이나 카테고리를 바꾸면 그 글의 썸네일을 반드시 다시 만든다.** 여러 글 제목을 고쳤으면 slug를 모두 넘긴다.
 
-**본문 이미지** — 최소 1장. 구성도·은유 그림 등 글 내용을 보여 주는 것. 3:2 jpg, `![설명](./이름.jpg)`.
+**본문 이미지** — 최소 1장. 구성도·은유 그림 등 글 내용을 보여 주는 것. 3:2, 처음엔 `![설명](./이름.jpg)`로 쓰고 WebP 변환이 `.webp`로 바꾼다.
 
 만든 이미지는 Read로 열어 눈으로 확인한다(글자가 섞였는지, 왼쪽이 비었는지, 썸네일 제목이 모티프와 겹치는지).
 
