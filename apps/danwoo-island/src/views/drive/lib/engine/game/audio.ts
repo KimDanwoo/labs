@@ -7,6 +7,7 @@ import { WORLD_CONFIG } from '../worldConfig';
 import { AudioMute } from './audioMute';
 import { Events } from './events';
 import { getGame } from './gameContext';
+import { MusicStream } from './musicStream';
 import { createElement } from './utilities/createElement';
 import { clamp, remapClamp } from './utilities/maths';
 
@@ -32,7 +33,7 @@ type SongLoadState = 'idle' | 'loading' | 'loaded' | 'failed';
 interface Song {
   path: string;
   name: string;
-  sound: Howl;
+  sound: MusicStream;
   loadState: SongLoadState;
   loadRetries: number;
   retryCall: gsap.core.Tween | null;
@@ -63,6 +64,7 @@ function scheduleIdle(task: () => void): void {
 
 const SONG_ROTATION_MS = 3 * 60 * 1000;
 const SONG_SWITCH_DELAY = 1;
+const SONG_VOLUME = 0.2;
 const SONG_LOAD_RETRY = { delay: 3, attempts: 3 } as const;
 const SONG_NOTICE_DURATION = 5;
 const SONGS = [{ path: 'sounds/musics/baram.mp3', name: '바람 · danwoo0' }] as const;
@@ -251,8 +253,8 @@ export class AudioItem {
 }
 
 interface SoundLoadHandlers {
-  onLoad: (sound: Howl) => void;
-  onLoadError: (sound: Howl) => void;
+  onLoad: (sound: MusicStream) => void;
+  onLoadError: (sound: MusicStream) => void;
 }
 
 class Playlist {
@@ -317,18 +319,14 @@ class Playlist {
     song.sound.load();
   }
 
-  #createSound(path: string, handlers: SoundLoadHandlers): Howl {
-    const sound: Howl = new Howl({
-      src: [worldAsset(path)],
-      pool: 0,
-      html5: !IS_IOS,
-      autoplay: false,
-      loop: false,
-      preload: false,
-      volume: 0.2,
-      onend: () => this.next(),
-      onload: () => handlers.onLoad(sound),
-      onloaderror: () => handlers.onLoadError(sound),
+  #createSound(path: string, handlers: SoundLoadHandlers): MusicStream {
+    const sound: MusicStream = new MusicStream({
+      src: worldAsset(path),
+      volume: SONG_VOLUME,
+      needsGestureUnlock: IS_IOS,
+      onLoad: () => handlers.onLoad(sound),
+      onLoadError: () => handlers.onLoadError(sound),
+      onEnd: () => this.next(),
     });
     return sound;
   }
@@ -351,13 +349,13 @@ class Playlist {
     song.loadState = 'idle';
   }
 
-  #handleLoaded(song: Song, sound: Howl): void {
+  #handleLoaded(song: Song, sound: MusicStream): void {
     if (song.sound !== sound) return;
     song.loadState = 'loaded';
     song.loadRetries = 0;
   }
 
-  #handleLoadError(song: Song, sound: Howl): void {
+  #handleLoadError(song: Song, sound: MusicStream): void {
     if (song.sound !== sound || song.retryCall) return;
     song.loadState = 'failed';
     if (song.loadRetries >= SONG_LOAD_RETRY.attempts) return;
