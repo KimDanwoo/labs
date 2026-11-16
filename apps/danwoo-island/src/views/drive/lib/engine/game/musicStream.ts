@@ -9,26 +9,33 @@ export interface MusicStreamOptions {
   onEnd: () => void;
 }
 
+interface Mixer {
+  context: AudioContext;
+  source: MediaElementAudioSourceNode;
+  gain: GainNode;
+}
+
 const GESTURE_EVENTS = ['touchend', 'click', 'keydown'] as const;
+const PLAYBACK_BLOCKED = 'NotAllowedError';
+
+function isPlaybackBlocked(error: unknown): boolean {
+  return error instanceof DOMException && error.name === PLAYBACK_BLOCKED;
+}
 
 export class MusicStream {
   readonly #element = new Audio();
   readonly #options: MusicStreamOptions;
-  #mixer: { source: MediaElementAudioSourceNode; gain: GainNode } | null = null;
-  #isRouted = false;
-  #isUnlocked: boolean;
-  #isPlayPending = false;
+  #mixer: Mixer | null = null;
+  #wantsPlay = false;
+  #isWaitingForGesture = false;
 
   constructor(options: MusicStreamOptions) {
     this.#options = options;
-    this.#isUnlocked = !options.needsGestureUnlock;
     this.#element.preload = 'auto';
     this.#element.addEventListener('canplay', options.onLoad);
     this.#element.addEventListener('error', options.onLoadError);
     this.#element.addEventListener('ended', options.onEnd);
-    if (!this.#isUnlocked) {
-      for (const name of GESTURE_EVENTS) document.addEventListener(name, this.#unlock, { capture: true });
-    }
+    if (options.needsGestureUnlock) this.#waitForGesture();
   }
 
   load(): void {
@@ -37,20 +44,17 @@ export class MusicStream {
   }
 
   play(): void {
-    this.#routeThroughMixer();
-    this.#isPlayPending = true;
-    this.#element
-      .play()
-      .then(() => {
-        this.#isPlayPending = false;
-      })
-      .catch(() => {
-        this.#isPlayPending = !this.#isUnlocked;
-      });
+    const mixer = this.#ensureMixer();
+    if (!mixer) return;
+    this.#wantsPlay = true;
+    if (mixer.context.state !== 'running') mixer.context.resume().catch(() => this.#waitForGesture());
+    this.#element.play().catch((error: unknown) => {
+      if (this.#wantsPlay && isPlaybackBlocked(error)) this.#waitForGesture();
+    });
   }
 
   pause(): void {
-    this.#isPlayPending = false;
+    this.#wantsPlay = false;
     this.#element.pause();
   }
 
@@ -60,12 +64,13 @@ export class MusicStream {
   }
 
   playing(): boolean {
-    return !this.#element.paused && !this.#element.ended;
+    const isAudible = this.#mixer?.context.state === 'running';
+    return isAudible && !this.#element.paused && !this.#element.ended;
   }
 
   unload(): void {
     this.pause();
-    this.#removeGestureListeners();
+    this.#stopWaitingForGesture();
     this.#mixer?.source.disconnect();
     this.#mixer?.gain.disconnect();
     this.#mixer = null;
@@ -73,29 +78,35 @@ export class MusicStream {
     this.#element.load();
   }
 
-  readonly #unlock = (): void => {
-    this.#isUnlocked = true;
-    this.#removeGestureListeners();
-    if (this.#isPlayPending) this.play();
-    else this.load();
-  };
-
-  #removeGestureListeners(): void {
-    for (const name of GESTURE_EVENTS) document.removeEventListener(name, this.#unlock, { capture: true });
-  }
-
-  #routeThroughMixer(): void {
-    if (this.#isRouted) return;
-    this.#isRouted = true;
-    if (!Howler.usingWebAudio) {
-      this.#element.volume = this.#options.volume;
+  readonly #handleGesture = (): void => {
+    this.#stopWaitingForGesture();
+    if (this.#wantsPlay) {
+      this.play();
       return;
     }
-    const { ctx, masterGain } = Howler;
-    const gain = ctx.createGain();
+    if (this.#element.paused) this.load();
+  };
+
+  #waitForGesture(): void {
+    if (this.#isWaitingForGesture) return;
+    this.#isWaitingForGesture = true;
+    for (const name of GESTURE_EVENTS) document.addEventListener(name, this.#handleGesture, { capture: true });
+  }
+
+  #stopWaitingForGesture(): void {
+    this.#isWaitingForGesture = false;
+    for (const name of GESTURE_EVENTS) document.removeEventListener(name, this.#handleGesture, { capture: true });
+  }
+
+  #ensureMixer(): Mixer | null {
+    if (this.#mixer) return this.#mixer;
+    if (!Howler.usingWebAudio) return null;
+    const { ctx: context, masterGain } = Howler;
+    const gain = context.createGain();
     gain.gain.value = this.#options.volume;
-    const source = ctx.createMediaElementSource(this.#element);
+    const source = context.createMediaElementSource(this.#element);
     source.connect(gain).connect(masterGain);
-    this.#mixer = { source, gain };
+    this.#mixer = { context, source, gain };
+    return this.#mixer;
   }
 }
