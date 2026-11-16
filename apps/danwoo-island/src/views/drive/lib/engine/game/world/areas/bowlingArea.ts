@@ -5,7 +5,7 @@ import * as THREE from 'three/webgpu';
 
 import { type AudioItem, moveSoundTo } from '../../audio';
 import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
-import type { InteractivePoint } from '../../interactivePoints';
+import type { InteractivePoint } from '../../interactivePoint';
 import { JukeboxStation } from '../../jukebox/jukeboxStation';
 import { objectOf, type WorldObject } from '../../objects';
 import { clamp, remapClamp } from '../../utilities/maths';

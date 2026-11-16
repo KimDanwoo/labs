@@ -5,7 +5,7 @@ import * as THREE from 'three/webgpu';
 
 import type { AudioItem } from '../../audio';
 import type { Action } from '../../inputs/inputs';
-import type { InteractivePoint } from '../../interactivePoints';
+import type { InteractivePoint } from '../../interactivePoint';
 import { objectOf, type WorldObject } from '../../objects';
 import { Player } from '../../player';
 import { segmentCircleIntersection } from '../../utilities/maths';
