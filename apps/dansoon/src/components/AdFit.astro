@@ -25,6 +25,16 @@
     });
   }
 
+  // 카카오 로더가 넣는 iframe에는 제목이 없어 스크린 리더가 "프레임"으로만 읽는다 — 들어오는 대로 붙인다
+  const AD_FRAME_TITLE = '광고';
+  const labelAdFrames = new MutationObserver(() =>
+    document
+      .querySelectorAll<HTMLIFrameElement>('.adfit-slot iframe:not([title])')
+      .forEach((frame) => frame.setAttribute('title', AD_FRAME_TITLE)),
+  );
+  // 페이지를 옮기면 body가 통째로 바뀌므로 그대로 남는 html을 지켜본다
+  labelAdFrames.observe(document.documentElement, { childList: true, subtree: true });
+
   document.addEventListener('astro:page-load', renderAds);
 </script>
 

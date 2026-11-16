@@ -20,7 +20,7 @@ const { tags, counts } = Astro.props;
             class="inline-flex items-center gap-xs rounded-md bg-muted px-sm py-xs text-sm text-muted-foreground transition-colors hover:bg-primary-subtle hover:text-primary"
           >
             #{TAG_LABEL[tag]}
-            {counts && <span class="text-xs opacity-70">{counts.get(tag)}</span>}
+            {counts && <span class="text-xs">{counts.get(tag)}</span>}
           </a>
         </li>
       ))}
