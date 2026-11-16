@@ -2,26 +2,18 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
 import type { ActionTrigger } from './inputs/inputs';
+import { focusTarget, isClickTravel, nearestHit, pressTarget, type RayTarget, releaseTargets } from './rayTargets';
 
 export type IntersectShape = THREE.Sphere | THREE.Box3 | THREE.Plane | THREE.Mesh;
 
-export interface IntersectDescription {
-  active: boolean;
+export interface IntersectDescription extends Omit<RayTarget, 'isIntersecting' | 'isDown'> {
   shape: IntersectShape;
-  onEnter?: () => void;
-  onLeave?: () => void;
-  onDown?: () => void;
-  onUp?: () => void;
-  onClick?: () => void;
 }
 
-export interface Intersect extends IntersectDescription {
+export interface Intersect extends IntersectDescription, RayTarget {
   readonly position: THREE.Vector3 | null;
-  isIntersecting: boolean;
-  isDown: boolean;
 }
 
-const CLICK_TOLERANCE = 25;
 const POINTER_CATEGORIES = ['intro', 'wandering', 'racing', 'cinematic'];
 
 function positionOf(shape: IntersectShape): THREE.Vector3 | null {
@@ -88,10 +80,7 @@ export class RayCursor {
     }
     this.#trackTravel(trigger);
     this.#hover();
-    if (trigger === 'start' && this.#current) {
-      this.#current.isDown = true;
-      this.#current.onDown?.();
-    }
+    if (trigger === 'start' && this.#current) pressTarget(this.#current);
   }
 
   #trackTravel(trigger: Exclude<ActionTrigger, 'end'>): void {
@@ -116,11 +105,8 @@ export class RayCursor {
     if (candidates.length === 0) return;
 
     this.#aimRaycaster();
-    const nearest = this.#nearestHit(candidates);
-    for (const intersect of candidates) {
-      if (intersect !== nearest && intersect.isIntersecting) this.#setIntersecting(intersect, false);
-    }
-    if (nearest && !nearest.isIntersecting) this.#setIntersecting(nearest, true);
+    const nearest = nearestHit(candidates, ({ shape }) => hitDistance(this.#raycaster, shape));
+    focusTarget(candidates, nearest);
 
     const isAnyIntersecting = nearest !== null;
     if (isAnyIntersecting !== this.#isAnyIntersecting) {
@@ -128,18 +114,6 @@ export class RayCursor {
       this.game.canvasElement.style.cursor = isAnyIntersecting ? 'pointer' : '';
     }
     this.#current = nearest;
-  }
-
-  #nearestHit(candidates: readonly Intersect[]): Intersect | null {
-    let nearest: Intersect | null = null;
-    let nearestDistance = Infinity;
-    for (const intersect of candidates) {
-      const distance = hitDistance(this.#raycaster, intersect.shape);
-      if (distance === null || distance >= nearestDistance) continue;
-      nearest = intersect;
-      nearestDistance = distance;
-    }
-    return nearest;
   }
 
   #aimRaycaster(): void {
@@ -152,23 +126,7 @@ export class RayCursor {
     this.#raycaster.setFromCamera(ndc, this.game.view.camera);
   }
 
-  #setIntersecting(intersect: Intersect, isIntersecting: boolean): void {
-    intersect.isIntersecting = isIntersecting;
-    if (!isIntersecting) {
-      intersect.onLeave?.();
-      return;
-    }
-    intersect.onEnter?.();
-  }
-
   #release(): void {
-    const isClick = Math.hypot(this.#travel.x, this.#travel.y) < CLICK_TOLERANCE;
-    for (const intersect of this.#intersects.filter(({ active }) => active)) {
-      if (intersect.isIntersecting) intersect.onUp?.();
-      if (!intersect.isDown) continue;
-      intersect.isDown = false;
-      if (intersect.isIntersecting && isClick) intersect.onClick?.();
-      if (!intersect.isIntersecting) intersect.onUp?.();
-    }
+    releaseTargets(this.#intersects, isClickTravel(this.#travel));
   }
 }
