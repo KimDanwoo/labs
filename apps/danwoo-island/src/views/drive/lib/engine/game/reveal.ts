@@ -5,6 +5,7 @@ import * as THREE from 'three/webgpu';
 import type { Audio } from './audio';
 import { getGame } from './gameContext';
 import { introCenter } from './introCenter';
+import { prefersDataSaving } from './jukebox/idle';
 import type { Intro } from './world/intro';
 import { isTideLoading, TIDE_REVEAL } from './world/tideLoading';
 
@@ -90,7 +91,8 @@ export class Reveal {
   }
 
   #waitForStart(): void {
-    const { inputs, rayCursor } = getGame();
+    const { audio, inputs, rayCursor } = getGame();
+    if (!prefersDataSaving()) audio.preloadMusic();
     const center = this.position.clone();
     center.y = 0;
 
