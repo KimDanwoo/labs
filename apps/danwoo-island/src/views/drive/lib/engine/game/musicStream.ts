@@ -28,6 +28,7 @@ export class MusicStream {
   #mixer: Mixer | null = null;
   #wantsPlay = false;
   #isWaitingForGesture = false;
+  #isUnloaded = false;
 
   constructor(options: MusicStreamOptions) {
     this.#options = options;
@@ -44,10 +45,11 @@ export class MusicStream {
   }
 
   play(): void {
+    if (this.#isUnloaded) return;
     const mixer = this.#ensureMixer();
     if (!mixer) return;
     this.#wantsPlay = true;
-    if (mixer.context.state !== 'running') mixer.context.resume().catch(() => this.#waitForGesture());
+    if (mixer.context.state !== 'running') this.#resumeContext(mixer.context);
     this.#element.play().catch((error: unknown) => {
       if (this.#wantsPlay && isPlaybackBlocked(error)) this.#waitForGesture();
     });
@@ -65,10 +67,12 @@ export class MusicStream {
 
   playing(): boolean {
     const isAudible = this.#mixer?.context.state === 'running';
-    return isAudible && !this.#element.paused && !this.#element.ended;
+    const element = this.#element;
+    return isAudible && !element.paused && !element.ended && element.error === null;
   }
 
   unload(): void {
+    this.#isUnloaded = true;
     this.pause();
     this.#stopWaitingForGesture();
     this.#mixer?.source.disconnect();
@@ -87,8 +91,19 @@ export class MusicStream {
     if (this.#element.paused) this.load();
   };
 
+  #resumeContext(context: AudioContext): void {
+    this.#waitForGesture();
+    context
+      .resume()
+      .then(() => {
+        if (!this.#wantsPlay || this.#element.paused) return;
+        this.#stopWaitingForGesture();
+      })
+      .catch(() => undefined);
+  }
+
   #waitForGesture(): void {
-    if (this.#isWaitingForGesture) return;
+    if (this.#isUnloaded || this.#isWaitingForGesture) return;
     this.#isWaitingForGesture = true;
     for (const name of GESTURE_EVENTS) document.addEventListener(name, this.#handleGesture, { capture: true });
   }

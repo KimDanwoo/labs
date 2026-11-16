@@ -373,6 +373,7 @@ class Playlist {
     const song = this.songs[this.#index];
     if (!song) throw new Error('Playlist is empty');
     this.current = song;
+    if (song.loadState === 'failed') song.loadRetries = 0;
     this.#load(song);
     song.sound.play();
     return song;
