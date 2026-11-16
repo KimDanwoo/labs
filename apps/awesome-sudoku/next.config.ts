@@ -1,13 +1,22 @@
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import { createSecurityHeaders } from '@repo/security-headers';
 import type { NextConfig } from 'next';
 
-const SECURITY_HEADERS = [
-  { key: 'X-Frame-Options', value: 'DENY' },
-  { key: 'X-Content-Type-Options', value: 'nosniff' },
-  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-];
+const firebaseAuthDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN;
+
+// Firebase 인증(Google 팝업 로그인)과 Firestore — https://firebase.google.com/docs/auth/web/redirect-best-practices
+const SECURITY_HEADERS = createSecurityHeaders({
+  sources: {
+    'script-src': ['https://apis.google.com'],
+    'connect-src': [
+      'https://identitytoolkit.googleapis.com',
+      'https://securetoken.googleapis.com',
+      'https://firestore.googleapis.com',
+    ],
+    'frame-src': firebaseAuthDomain ? [`https://${firebaseAuthDomain}`] : [],
+    'img-src': ['https://lh3.googleusercontent.com'],
+  },
+});
 
 const nextConfig: NextConfig = {
   async headers() {
