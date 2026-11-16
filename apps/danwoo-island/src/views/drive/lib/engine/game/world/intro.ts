@@ -6,37 +6,31 @@ import { setStartupStage, STARTUP } from '../../islandStartup';
 import { getGame } from '../gameContext';
 import { INPUT_MODE } from '../inputs/inputs';
 import { introCenter } from '../introCenter';
-import { QUALITY } from '../quality';
 import type { Intersect } from '../rayCursor';
+import { UI_FONT_FAMILY } from '../utilities/canvasFont';
 import { isTideLoading, TIDE_LABEL, tideRingGeometry, tideRingMaterial } from './tideLoading';
 
-interface LabelLayout {
-  offsetX: number;
-  offsetZ: number;
-}
-
 const LABEL_TINT = isTideLoading ? TIDE_LABEL : '#ffffff';
-const LABEL_HEIGHT = 3.3;
+const LABEL_HEIGHT = 1;
+const LABEL_DISTANCE = 6;
+const PROMPT_RENDER_ORDER = 10;
 const LABEL_HIDDEN_SCALE = 0.01;
-const HIGH_QUALITY_LAYOUT: LabelLayout = { offsetX: 6.5, offsetZ: 6.5 };
-const LOW_QUALITY_LAYOUT: LabelLayout = { offsetX: 1.4, offsetZ: -5.8 };
-const PORTRAIT_LAYOUT: LabelLayout = { offsetX: 7.2, offsetZ: 7.2 };
 const RING = { radius: 3.5, thickness: 0.04, segments: 128, elevation: 0.001, smoothing: 10 } as const;
 const TICK_ORDER = 8;
 
-const TEXT_SCALE = 1.3;
-const TEXT_CANVAS = { width: 1024, height: 512, maxWidth: 960 } as const;
-const PROMPT_LINE = { font: '700 152px MaruBuri', y: 150 } as const;
-const START_LINE = { font: '700 224px MaruBuri', y: 355, text: '출발' } as const;
+const TEXT_SCALE = 0.9;
+const TEXT_ASPECT = 4;
+const TEXT_CANVAS = { width: 1024, height: 256, maxWidth: 980 } as const;
+const PROMPT_FONT = `800 168px ${UI_FONT_FAMILY}`;
 
-const SOUND_BUTTON = { scale: 0.5, aspect: 50 / 38, x: 0.38, y: -1, hitRadius: 0.5, hoverIntensity: 1.5 } as const;
+const SOUND_BUTTON = { scale: 0.45, aspect: 50 / 38, x: 0, y: -0.62, hitRadius: 0.4, hoverIntensity: 1.5 } as const;
 const SOUND_MUTED_OFFSET = 0.5;
 
 function startPrompt(): string {
   const { inputs } = getGame();
-  if (inputs.mode === INPUT_MODE.gamepad) return inputs.gamepad.type === 'xbox' ? 'A 버튼으로' : '× 버튼으로';
+  if (inputs.mode === INPUT_MODE.gamepad) return inputs.gamepad.type === 'xbox' ? 'press A!' : 'press ×!';
   const isTouch = inputs.mode === INPUT_MODE.touch || window.matchMedia('(pointer: coarse)').matches;
-  return isTouch ? '터치해서' : '클릭해서';
+  return isTouch ? 'tap me!' : 'click me!';
 }
 
 function drawPrompt(prompt: string): THREE.CanvasTexture {
@@ -50,11 +44,8 @@ function drawPrompt(prompt: string): THREE.CanvasTexture {
   context.fillStyle = '#ffffff';
   context.textAlign = 'center';
   context.textBaseline = 'middle';
-  const centerX = canvas.width / 2;
-  context.font = PROMPT_LINE.font;
-  context.fillText(prompt, centerX, PROMPT_LINE.y, TEXT_CANVAS.maxWidth);
-  context.font = START_LINE.font;
-  context.fillText(START_LINE.text, centerX, START_LINE.y, TEXT_CANVAS.maxWidth);
+  context.font = PROMPT_FONT;
+  context.fillText(prompt, canvas.width / 2, canvas.height / 2, TEXT_CANVAS.maxWidth);
   return new THREE.CanvasTexture(canvas);
 }
 
@@ -90,8 +81,9 @@ class PromptText {
   readonly #refresh = (): void => this.#update();
 
   constructor() {
-    const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false });
-    this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(2 * TEXT_SCALE, TEXT_SCALE), material);
+    const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, depthTest: false });
+    this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(TEXT_SCALE * TEXT_ASPECT, TEXT_SCALE), material);
+    this.mesh.renderOrder = PROMPT_RENDER_ORDER;
     this.#update();
     const { inputs } = getGame();
     inputs.gamepad.events.on('typeChange', this.#refresh);
@@ -132,12 +124,14 @@ class SoundButton {
     const intensity = uniform(1);
     const material = new THREE.MeshBasicNodeMaterial({
       alphaTest: 0.5,
+      depthTest: false,
       alphaMap: this.#texture,
       transparent: true,
     });
     material.outputNode = vec4(vec3(1).mul(intensity), 1);
     const { scale, aspect, x, y } = SOUND_BUTTON;
     this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(aspect * scale, scale), material);
+    this.mesh.renderOrder = PROMPT_RENDER_ORDER;
     this.mesh.position.set(x, y, 0);
 
     const hitCenter = new THREE.Vector3(x, y, 0).applyQuaternion(label.quaternion).add(label.position);
@@ -196,16 +190,13 @@ export class Intro {
 
   #placeLabel(): void {
     const game = getGame();
-    const isPortrait = innerHeight > innerWidth;
-    const qualityLayout = game.quality.level === QUALITY.high ? HIGH_QUALITY_LAYOUT : LOW_QUALITY_LAYOUT;
-    const layout = isPortrait ? PORTRAIT_LAYOUT : qualityLayout;
-    this.label.position.copy(this.center);
-    this.label.position.x += layout.offsetX;
-    this.label.position.z += layout.offsetZ;
+    const { theta, phi } = game.view.spherical;
+    const towardCamera = new THREE.Vector3(Math.sin(theta), 0, Math.cos(theta));
+    this.label.position.copy(this.center).addScaledVector(towardCamera, LABEL_DISTANCE);
     this.label.position.y = LABEL_HEIGHT;
     this.label.rotation.reorder('YXZ');
-    this.label.rotation.y = game.view.spherical.theta;
-    this.label.rotation.x = game.view.spherical.phi - Math.PI / 2;
+    this.label.rotation.y = theta;
+    this.label.rotation.x = phi - Math.PI / 2;
     this.label.scale.setScalar(LABEL_HIDDEN_SCALE);
     game.scene.add(this.label);
   }
@@ -222,6 +213,10 @@ export class Intro {
         ring.removeFromParent();
       },
     });
+  }
+
+  get promptMesh(): THREE.Mesh | null {
+    return this.#text?.mesh ?? null;
   }
 
   createLabelContent(): void {
