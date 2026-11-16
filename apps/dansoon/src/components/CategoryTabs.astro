@@ -15,7 +15,8 @@ const tabs = [
 ];
 ---
 
-<nav aria-label="카테고리" data-overlay-scroll class="-mx-md overflow-x-auto px-md sm:mx-0 sm:px-0">
+<!-- 가로 스크롤 영역은 세로도 잘라 칩 밖으로 4px 나오는 포커스 테두리가 잘렸다 — 안쪽 여백을 두고 같은 크기의 음수 마진으로 자리를 되돌린다 -->
+<nav aria-label="카테고리" data-overlay-scroll class="-mx-md -my-xs overflow-x-auto px-md py-xs sm:-mx-xs sm:px-xs">
   <ul class="flex gap-xs">
     {
       tabs.map((tab) => (
