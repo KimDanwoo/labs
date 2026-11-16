@@ -54,11 +54,22 @@ robots.txt를 읽다 보니 수집기를 막은 것보다 봇을 나눈 방식�
 | Tier 5 | CCBot, Bytespider, Scrapy, FirecrawlAgent 등 | 전면 차단 |
 | 그 외 | 목록에 없는 모든 봇 | 전면 차단 |
 
-검색엔진 봇의 용도는 [Google 크롤러 목록](https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers), [Bing 크롤러 안내](https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0), [네이버 서치어드바이저의 robots.txt 안내](https://searchadvisor.naver.com/guide/seo-basic-robots)에서 확인할 수 있다.
+검색엔진 봇의 용도는 [Google 크롤러 목록](https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers), [Bing 크롤러 안내](https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0), [네이버 서치어드바이저의 robots.txt 안내](https://searchadvisor.naver.com/guide/seo-basic-robots)에서 확인할 수 있다. 구글과 네이버 크롤러가 페이지를 읽는 방식의 차이는 [SEO의 구조적 진화](/posts/seo-structural-evolution/)에 정리해 두었다.
 
 Tier 1과 Tier 2의 규칙을 비교해 보면 다른 줄은 `Crawl-delay`(3초와 5초)와 Tier 2의 허용 경로 하나뿐이다. 구글은 [robots.txt 문서](https://developers.google.com/search/docs/crawling-indexing/robots/robots_txt)에서 `crawl-delay`를 지원하지 않는다고 밝히고 있어서 Googlebot에는 이 차이도 의미가 없다. 등급 번호가 우선순위를 뜻하는지는 파일에 설명이 없다.
 
-설명이 붙은 묶음은 Tier 3 하나다. "AI training / mixed-use collection: disallowed"라는 주석이 달려 있고 특정 봇 이름을 막는 방식이라 모든 학습을 막는다는 보장은 아니라고 스스로 적어 두었다.
+설명이 붙은 묶음은 Tier 3 하나다. "AI training / mixed-use collection: disallowed"라는 주석이 달려 있고 특정 봇 이름을 막는 방식이라 모든 학습을 막는다는 보장은 아니라고 스스로 적어 두었다. 학습용 봇만 골라 막는 방법이 궁금하다면 이 묶음이 그대로 예시가 된다.
+
+```txt
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Amazonbot
+User-agent: Meta-ExternalAgent
+User-agent: cohere-ai
+Disallow: /
+```
 
 흥미롭게도 같은 회사의 봇이 양쪽으로 갈린다.
 
@@ -67,7 +78,7 @@ Tier 1과 Tier 2의 규칙을 비교해 보면 다른 줄은 `Crawl-delay`(3초�
 
 정리하면 사람이 질문해서 가져가는 접속과 검색 노출은 받고 학습용 수집과 SEO 분석, 범용 수집, 목록에 없는 봇은 막는다.
 
-표에서는 Googlebot과 Claude-User가 같은 "허용" 쪽에 있지만 둘이 하는 일은 꽤 다르다고 본다. 구글봇은 페이지를 미리 모아 두는 수집기다. AI 에이전트는 사람이 물어볼 때 그 자리에서 페이지를 읽고, 읽은 내용으로 판단해서 답을 만든다. 학습용 수집기는 구글봇처럼 모아 가는 쪽이지만 검색 결과로 사람을 다시 보내 주지는 않는다. 내 해석으로는 알라딘의 기준이 "AI냐 아니냐"보다 "이 접속이 결국 사람에게 닿느냐"에 가깝다.
+표에서는 Googlebot과 Claude-User가 같은 "허용" 쪽에 있지만 둘이 하는 일은 꽤 다르다고 본다. 구글봇은 페이지를 미리 모아 두는 수집기다. AI 에이전트는 사람이 물어볼 때 그 자리에서 페이지를 읽고 읽은 내용으로 판단해서 답을 만든다. 학습용 수집기는 구글봇처럼 모아 가는 쪽이지만 검색 결과로 사람을 다시 보내 주지는 않는다. 내 해석으로는 알라딘의 기준이 "AI냐 아니냐"보다 "이 접속이 결국 사람에게 닿느냐"에 가깝다.
 
 ![사람 대신 들어오는 AI와 학습용 수집기가 서로 다른 문 앞에 선 모습](./gates.webp)
 
@@ -94,9 +105,7 @@ API 하나가 비자 세 군데가 같이 흔들렸다. 그래서 역할을 하�
 
 ## 정리
 
-이번 일로 정리한 것은 세 가지다.
-
-1. **성공한 워크플로도 결과를 봐야 한다.** 초록 체크는 스크립트가 끝까지 돌았다는 뜻이지 데이터가 제대로 들어왔다는 뜻이 아니었다. 지금 수집기는 빈 목록을 받으면 그 서점을 빼고 집계를 이어 간다. 0건이면 실패로 처리하는 검사를 다음에 넣는다.
+1. **성공한 워크플로도 결과를 봐야 한다.** 초록 체크는 스크립트가 끝까지 돌았다는 표시였을 뿐, 데이터가 제대로 들어왔는지는 알려 주지 않았다. 지금 수집기는 빈 목록을 받으면 그 서점을 빼고 집계를 이어 간다. 0건이면 실패로 처리하는 검사를 다음에 넣는다.
 2. **출처를 뺄 때는 그 출처가 맡던 일부터 센다.** 순위 하나만 빠지는 줄 알았는데 장르, 출판사, 검증까지 알라딘에 걸려 있었다. 출처마다 무슨 역할을 하는지 적어 두었다면 빈 목록이 온 날 영향 범위를 바로 알았을 것이다.
 3. **막히면 우회보다 출처를 바꾼다.** 크롤러를 만들기 전에 robots.txt를 열어 본 덕에 멈출 수 있었다. YES24로 장르 기준을 옮기고 나니 장르를 정하지 못한 책은 오히려 줄었다.
 
