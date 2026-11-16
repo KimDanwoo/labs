@@ -27,13 +27,15 @@ export interface SoundOptions {
   onPlaying?: (item: AudioItem) => void;
 }
 
+type SongLoadState = 'idle' | 'loading' | 'loaded' | 'failed';
+
 interface Song {
   path: string;
   name: string;
   sound: Howl;
-  isLoaded: boolean;
-  isRetrying: boolean;
+  loadState: SongLoadState;
   loadRetries: number;
+  retryCall: gsap.core.Tween | null;
 }
 
 interface VectorLike {
@@ -248,6 +250,11 @@ export class AudioItem {
   }
 }
 
+interface SoundLoadHandlers {
+  onLoad: (sound: Howl) => void;
+  onLoadError: (sound: Howl) => void;
+}
+
 class Playlist {
   readonly songs: Song[];
   current: Song | null = null;
@@ -261,10 +268,13 @@ class Playlist {
       const song: Song = {
         path,
         name,
-        isLoaded: false,
-        isRetrying: false,
+        loadState: 'idle',
         loadRetries: 0,
-        sound: this.#createSound(path, (failed) => this.#retryLoad(song, failed)),
+        retryCall: null,
+        sound: this.#createSound(
+          path,
+          this.#loadHandlers(() => song),
+        ),
       };
       return song;
     });
@@ -301,12 +311,13 @@ class Playlist {
   }
 
   #load(song: Song): void {
-    if (song.isLoaded) return;
-    song.isLoaded = true;
+    if (song.loadState === 'failed') this.#rebuild(song);
+    if (song.loadState !== 'idle') return;
+    song.loadState = 'loading';
     song.sound.load();
   }
 
-  #createSound(path: string, onLoadError: (sound: Howl) => void): Howl {
+  #createSound(path: string, handlers: SoundLoadHandlers): Howl {
     const sound: Howl = new Howl({
       src: [worldAsset(path)],
       pool: 0,
@@ -316,21 +327,46 @@ class Playlist {
       preload: false,
       volume: 0.2,
       onend: () => this.next(),
-      onloaderror: () => onLoadError(sound),
+      onload: () => handlers.onLoad(sound),
+      onloaderror: () => handlers.onLoadError(sound),
     });
     return sound;
   }
 
-  #retryLoad(song: Song, failed: Howl): void {
-    if (song.sound !== failed || song.isRetrying || song.loadRetries >= SONG_LOAD_RETRY.attempts) return;
-    song.isRetrying = true;
+  #loadHandlers(songOf: () => Song): SoundLoadHandlers {
+    return {
+      onLoad: (sound) => this.#handleLoaded(songOf(), sound),
+      onLoadError: (sound) => this.#handleLoadError(songOf(), sound),
+    };
+  }
+
+  #rebuild(song: Song): void {
+    song.retryCall?.kill();
+    song.retryCall = null;
+    song.sound.unload();
+    song.sound = this.#createSound(
+      song.path,
+      this.#loadHandlers(() => song),
+    );
+    song.loadState = 'idle';
+  }
+
+  #handleLoaded(song: Song, sound: Howl): void {
+    if (song.sound !== sound) return;
+    song.loadState = 'loaded';
+    song.loadRetries = 0;
+  }
+
+  #handleLoadError(song: Song, sound: Howl): void {
+    if (song.sound !== sound || song.retryCall) return;
+    song.loadState = 'failed';
+    if (song.loadRetries >= SONG_LOAD_RETRY.attempts) return;
     song.loadRetries += 1;
-    gsap.delayedCall(SONG_LOAD_RETRY.delay, () => {
-      song.isRetrying = false;
-      song.sound.unload();
-      song.sound = this.#createSound(song.path, (sound) => this.#retryLoad(song, sound));
-      song.isLoaded = false;
-      if (this.current === song && this.#canPlay()) this.#startCurrent();
+    song.retryCall = gsap.delayedCall(SONG_LOAD_RETRY.delay, () => {
+      song.retryCall = null;
+      if (song.sound !== sound || song.loadState !== 'failed') return;
+      const shouldPlay = this.current === song && this.#canPlay();
+      if (shouldPlay) this.#startCurrent();
       else this.#load(song);
     });
   }
