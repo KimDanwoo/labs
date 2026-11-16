@@ -30,10 +30,11 @@
     "tailwind-merge": "catalog:"
   },
   "devDependencies": {
-    "@playwright/test": "catalog:",
     "@config/tsconfig": "workspace:*",
+    "@playwright/test": "catalog:",
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
+    "@repo/security-headers": "workspace:*",
     "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

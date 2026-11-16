@@ -303,6 +303,9 @@ importers:
       '@repo/prettier-config':
         specifier: workspace:*
         version: link:../../packages/prettier-config
+      '@repo/security-headers':
+        specifier: workspace:*
+        version: link:../../packages/security-headers
       '@tailwindcss/postcss':
         specifier: 'catalog:'
         version: 4.3.0
@@ -452,6 +455,9 @@ importers:
       '@repo/prettier-config':
         specifier: workspace:*
         version: link:../../packages/prettier-config
+      '@repo/security-headers':
+        specifier: workspace:*
+        version: link:../../packages/security-headers
       '@types/howler':
         specifier: 'catalog:'
         version: 2.2.13
@@ -513,6 +519,9 @@ importers:
       '@repo/prettier-config':
         specifier: workspace:*
         version: link:../../packages/prettier-config
+      '@repo/security-headers':
+        specifier: workspace:*
+        version: link:../../packages/security-headers
       '@tailwindcss/postcss':
         specifier: 'catalog:'
         version: 4.3.0
@@ -598,6 +607,9 @@ importers:
       '@repo/prettier-config':
         specifier: workspace:*
         version: link:../../packages/prettier-config
+      '@repo/security-headers':
+        specifier: workspace:*
+        version: link:../../packages/security-headers
       '@tailwindcss/postcss':
         specifier: 'catalog:'
         version: 4.3.0
@@ -656,6 +668,9 @@ importers:
       '@repo/prettier-config':
         specifier: workspace:*
         version: link:../../packages/prettier-config
+      '@repo/security-headers':
+        specifier: workspace:*
+        version: link:../../packages/security-headers
       '@tailwindcss/postcss':
         specifier: 'catalog:'
         version: 4.3.0
@@ -766,6 +781,9 @@ importers:
       '@repo/prettier-config':
         specifier: workspace:*
         version: link:../../packages/prettier-config
+      '@repo/security-headers':
+        specifier: workspace:*
+        version: link:../../packages/security-headers
       '@tailwindcss/postcss':
         specifier: 'catalog:'
         version: 4.3.0
@@ -824,6 +842,9 @@ importers:
       '@repo/prettier-config':
         specifier: workspace:*
         version: link:../../packages/prettier-config
+      '@repo/security-headers':
+        specifier: workspace:*
+        version: link:../../packages/security-headers
       '@tailwindcss/postcss':
         specifier: 'catalog:'
         version: 4.3.0
@@ -892,6 +913,8 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+
+  packages/security-headers: {}
 
   packages/tokens:
     devDependencies:

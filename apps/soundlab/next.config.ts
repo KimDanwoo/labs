@@ -1,12 +1,16 @@
+import { createSecurityHeaders } from '@repo/security-headers';
 import type { NextConfig } from 'next';
 
-const SECURITY_HEADERS = [
-  { key: 'X-Frame-Options', value: 'DENY' },
-  { key: 'X-Content-Type-Options', value: 'nosniff' },
-  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-];
+const SOUNDCLOUD_WIDGET = 'https://w.soundcloud.com';
+
+const SECURITY_HEADERS = createSecurityHeaders({
+  sources: {
+    'script-src': [SOUNDCLOUD_WIDGET],
+    'frame-src': [SOUNDCLOUD_WIDGET],
+    'img-src': ['https://i1.sndcdn.com'],
+    'connect-src': ['https://wave.sndcdn.com'],
+  },
+});
 
 const nextConfig: NextConfig = {
   async headers() {

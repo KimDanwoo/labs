@@ -27,6 +27,7 @@
     "@config/tsconfig": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
+    "@repo/security-headers": "workspace:*",
     "@types/howler": "catalog:",
     "@types/node": "catalog:",
     "@types/normalize-wheel": "catalog:",
