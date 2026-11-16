@@ -41,6 +41,8 @@
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
+    /* Tab으로 옮길 때 브라우저가 요소를 스크롤 영역 끝에 딱 붙여, 바깥으로 4px 나오는 테두리가 잘렸다 */
+    scroll-margin-block: var(--spacing-sm);
   }
 
   @media (prefers-reduced-motion: no-preference) {
