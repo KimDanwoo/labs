@@ -198,32 +198,55 @@ document.addEventListener('click', (event) => {
   if (target?.closest('[data-search-open]') && nav?.open) nav.close();
 });
 
+/**
+ * 라우터는 포커스가 유지되는 영역(사이드바) 안에 있을 때만 되돌린다. 본문 링크로 옮기면 포커스가 body로 떨어져
+ * 키보드·스크린 리더 사용자가 문서 맨 앞부터 다시 읽게 되므로 새 글의 제목으로 옮긴다.
+ * 앵커로 들어왔거나 그사이 사용자가 다른 곳에 포커스를 두었다면 건드리지 않는다.
+ */
+function focusPageHeading() {
+  if (window.location.hash) return;
+  const hasUserFocus = document.activeElement !== null && document.activeElement !== document.body;
+  if (hasUserFocus) return;
+  const heading = document.querySelector<HTMLElement>('#main h1') ?? document.querySelector<HTMLElement>('#main');
+  if (!heading) return;
+  if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
+  heading.focus({ preventScroll: true });
+}
+
+let shouldFocusHeading = false;
+
 document.addEventListener('astro:before-preparation', (event) => {
   lastNavigationType = event.navigationType;
   if (contentScroller) contentScrollTops.set(currentEntryKey, contentScroller.scrollTop);
 });
 document.addEventListener('astro:before-swap', (event) => {
-  // View Transition 애니메이션이 도는 동안(약 0.35초) 브라우저가 휠 입력을 받지 않아 사이드바 스크롤이 씹혔다.
-  // 건너뛰면 ready가 거절된다 — 의도한 동작이라 받아 두지 않으면 매 이동마다 콘솔에 에러가 남는다
+  // 이어서 다른 링크로 옮기면 진행 중인 전환이 취소되며 ready가 거절된다 — 받아 두지 않으면 콘솔에 에러가 남는다
   event.viewTransition.ready.catch(() => undefined);
-  event.viewTransition.skipTransition();
   event.newDocument.documentElement.dataset.navigated = '';
+  shouldFocusHeading = lastNavigationType !== 'traverse';
   sidebarScrollTop = sidebarScroller?.scrollTop ?? 0;
   OverlayScrollbars(document.body)?.destroy();
 });
-document.addEventListener('astro:after-swap', restoreSidebarScroll);
+// 새 화면을 캡처하기 전에 스크롤 영역과 뒤로가기 위치를 맞춘다 — page-load에서 하면 전환 도중 화면이 튄다
+document.addEventListener('astro:after-swap', () => {
+  restoreSidebarScroll();
+  currentEntryKey = historyEntryKey();
+  syncPageScroller();
+  if (lastNavigationType === 'traverse') restoreTraversedScroll();
+});
 
 document.addEventListener('astro:page-load', () => {
   // 스크롤바 라이브러리가 크기를 다시 잴 때 위치가 흔들릴 수 있어 한 번 더 맞춘다
   restoreSidebarScroll();
   syncSidebarCurrent(sidebarHost);
   syncSidebarCurrent(mobileNavContent);
-  currentEntryKey = historyEntryKey();
-  syncPageScroller();
-  if (lastNavigationType === 'traverse') restoreTraversedScroll();
   mobileNav()?.close();
   document.querySelectorAll<HTMLElement>('[data-overlay-scroll]').forEach(attachScrollbar);
+  if (!shouldFocusHeading) return;
+  shouldFocusHeading = false;
+  focusPageHeading();
 });
 
+syncPageScroller();
 scrollSidebarToCurrent();
 sidebarScrollTop = sidebarScroller?.scrollTop ?? 0;

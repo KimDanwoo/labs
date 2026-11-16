@@ -289,20 +289,78 @@
   interpolate-size: allow-keywords;
   --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --motion-base: 260ms;
+  --motion-exit: 120ms;
 }
 
-/* 페이지 이동: 사이드바·상단바는 그대로 두고 새 본문만 아래에서 올라온다(첫 방문에는 걸지 않는다).
-   View Transition은 쓰지 않는다 — 전환이 도는 동안 브라우저가 휠 입력을 받지 않아 사이드바 스크롤이 씹혔다(layout.ts) */
+/* 페이지 이동: 보이던 화면과 새 화면을 겹쳐 바꾼다.
+   데스크톱은 화면 높이로 고정된 본문 영역만 캡처한다 — 사이드바를 캡처하지 않아야 전환 중에도 실제 DOM이 휠을 받는다(#252).
+   모바일은 문서 전체가 스크롤되므로 보이던 화면 그대로(root) 캡처한다. 본문만 캡처하면 스크롤을 내린 상태에서 옛 글의 맨 위가 비쳤다.
+   전환 레이어가 입력을 가로채지 않게 한다 — https://www.bram.us/2025/01/29/view-transitions-page-interactivity/ */
+@media (width >= 64rem) {
+  :root {
+    view-transition-name: none;
+  }
+
+  [data-content-scroll] {
+    view-transition-name: page;
+  }
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-group(page),
+::view-transition-group(root) {
+  animation: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  html[data-navigated] #main {
+  ::view-transition-old(page),
+  ::view-transition-old(root) {
+    animation: var(--motion-exit) ease-out both motion-fade-out;
+  }
+
+  ::view-transition-new(page),
+  ::view-transition-new(root) {
     animation: var(--motion-base) var(--motion-ease) both motion-rise-in;
+  }
+
+  @supports not (view-transition-name: none) {
+    html[data-navigated] #main {
+      animation: var(--motion-base) var(--motion-ease) both motion-rise-in;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(page),
+  ::view-transition-new(page),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
 }
 
 @keyframes motion-rise-in {
   from {
     opacity: 0;
-    transform: translateY(0.75rem);
+    transform: translateY(0.25rem);
+  }
+}
+
+@keyframes motion-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* 테마 원형 전환(ThemeToggle)은 화면 전체를 한 장으로 캡처해야 원형 마스크가 본문까지 덮는다 */
+html.theme-transition {
+  view-transition-name: root;
+
+  & [data-content-scroll] {
+    view-transition-name: none;
   }
 }
 
