@@ -103,11 +103,10 @@ export class World {
   }
 
   refreshAfterReset(): void {
-    const { bowling, cookie, toilet, social } = this.areas ?? {};
+    const { bowling, cookie, social } = this.areas ?? {};
     this.explosiveCrates?.reset();
     bowling?.restart();
     cookie?.refreshAfterReset();
-    toilet?.refreshAfterReset();
     social?.refreshAfterReset();
     for (const decoration of [this.benches, this.fences, this.bricks, this.lanterns]) {
       if (decoration) decoration.instancedGroup.needsUpdate = true;

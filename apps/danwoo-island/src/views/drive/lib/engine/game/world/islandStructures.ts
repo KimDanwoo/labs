@@ -187,27 +187,45 @@ export function rebuildCookieCart(model: THREE.Object3D): void {
   container.add(parts.build(), islandModelMesh('snackShack', new THREE.Matrix4().makeTranslation(...center), size));
 }
 
-export function rebuildOuthouse(model: THREE.Object3D): void {
+const SHOWER_STATION = {
+  floor: -1.9,
+  postSize: new THREE.Vector3(0.3, 2.7, 0.3),
+  posts: [
+    [-1.45, -0.85],
+    [1.45, -0.85],
+    [-1.45, 0.85],
+    [1.45, 0.85],
+  ],
+  lantern: { size: [0.2, 0.26, 0.2], position: [-1.64, 1.65, 1.0] },
+} as const;
+
+export const SHOWER_PARTS = { waterAnchor: 'showerWaterAnchor', lanternGlow: 'showerLanternGlow' } as const;
+
+const TOILET_PAPER = /^paper/;
+
+export function rebuildShowerStation(model: THREE.Object3D): void {
+  for (const roll of model.children.filter((child) => TOILET_PAPER.test(child.name))) roll.removeFromParent();
   const container = findChild(model, 'refCabinPhysicalDynamic');
-  findChild(container, 'wood002').removeFromParent();
+  container.name = 'refCabinPhysicalFixed';
+  for (const child of [...container.children]) child.removeFromParent();
+  const { floor, postSize, posts, lantern } = SHOWER_STATION;
+  container.add(islandModelMesh('beachShower', new THREE.Matrix4().makeTranslation(0, floor, 0)));
+  for (const [x, z] of posts) {
+    const collider = new THREE.Object3D();
+    collider.name = 'cuboid';
+    collider.scale.copy(postSize);
+    collider.position.set(x, floor + postSize.y / 2, z);
+    container.add(collider);
+  }
   const parts = createParts();
-  const bottom = -1.9;
-  const top = 1.3;
-  const height = top - bottom;
-  const middle = bottom + height / 2;
-  parts.box('stone', [1.9, 0.18, 1.85], { position: [0, bottom + 0.09, -0.04] });
-  for (const x of [-0.82, 0.82]) {
-    for (const z of [-0.82, 0.74]) parts.box('woodDark', [0.16, height, 0.16], { position: [x, middle, z] });
-  }
-  parts.box('wood', [0.08, height - 0.3, 1.5], { position: [-0.84, middle, -0.04] });
-  parts.box('wood', [0.08, height - 0.3, 1.5], { position: [0.84, middle, -0.04] });
-  parts.box('wood', [1.6, height - 0.3, 0.08], { position: [0, middle, -0.86] });
-  for (let index = 0; index < 4; index += 1) {
-    parts.box('wood', [0.36, height - 0.4, 0.07], { position: [-0.57 + index * 0.38, middle - 0.05, 0.74] });
-  }
-  for (const y of [bottom + 0.7, top - 0.75]) parts.box('woodDark', [1.5, 0.12, 0.05], { position: [0, y, 0.79] });
-  parts.prism('iron', 0.07, 0.07, 0.05, { position: [0.48, middle - 0.2, 0.8], rotation: [Math.PI / 2, 0, 0] }, 8);
-  container.add(parts.build(), palmRoof({ center: [0, top, -0.04], width: 3.1, depth: 3.0, height: 0.7 }));
+  const [x, y, z] = lantern.position;
+  parts.box('lantern', [...lantern.size], { position: [x, floor + y, z] });
+  const lanternGlow = parts.build();
+  lanternGlow.name = SHOWER_PARTS.lanternGlow;
+  const waterAnchor = new THREE.Group();
+  waterAnchor.name = SHOWER_PARTS.waterAnchor;
+  waterAnchor.position.y = floor;
+  container.add(lanternGlow, waterAnchor);
 }
 
 const BRIDGE = { plankPitch: 0.46, plankDepth: 0.42, railX: 2.09, posts: 6 } as const;
@@ -301,19 +319,19 @@ function neonMaterial(neonTexture: THREE.Texture): THREE.MeshBasicNodeMaterial {
   return material;
 }
 
-const BOWLING_SIGN_ART = { mesh: 'Plane043', reach: 2.5, minTop: 3 } as const;
+const BOWLING_SIGN_ART = { meshes: ['Plane042', 'Plane043'], reach: 2.5 } as const;
 
 function removeOldSignArt(model: THREE.Object3D, sign: THREE.Object3D): void {
-  const art = requireMesh(findChild(model, BOWLING_SIGN_ART.mesh));
   model.updateMatrixWorld(true);
-  const anchor = art.worldToLocal(sign.getWorldPosition(new THREE.Vector3()));
-  removeComponents(art, ({ box }) => {
-    const center = box.getCenter(new THREE.Vector3());
-    return (
-      Math.hypot(center.x - anchor.x, center.z - anchor.z) < BOWLING_SIGN_ART.reach &&
-      box.max.y > BOWLING_SIGN_ART.minTop
-    );
-  });
+  const signPosition = sign.getWorldPosition(new THREE.Vector3());
+  for (const name of BOWLING_SIGN_ART.meshes) {
+    const art = requireMesh(findChild(model, name));
+    const anchor = art.worldToLocal(signPosition.clone());
+    removeComponents(art, ({ box }) => {
+      const center = box.getCenter(new THREE.Vector3());
+      return Math.hypot(center.x - anchor.x, center.z - anchor.z) < BOWLING_SIGN_ART.reach;
+    });
+  }
 }
 
 export function rebuildBowlingSign(model: THREE.Object3D, neonTexture: THREE.Texture): void {
@@ -359,7 +377,7 @@ function timberPile(parts: Parts, { size, matrix }: Frame): void {
   }
 }
 
-const GENERATOR_TORCH = { size: new THREE.Vector3(0.62, 3.5, 0.62) } as const;
+const GENERATOR_SURFBOARD_HEIGHT = 2.6;
 
 function rebuildGenerator(generator: THREE.Object3D): void {
   removeVisualMeshes(generator);
@@ -373,10 +391,9 @@ function rebuildGenerator(generator: THREE.Object3D): void {
   const parts = createParts();
   timberPile(parts, cuboidFrame(pileCuboid));
   const bottom = new THREE.Vector3(0, -pole.size.y / 2, 0).applyMatrix4(pole.matrix);
-  const torchHeight = Math.min(GENERATOR_TORCH.size.y, pole.size.y);
-  const torchMatrix = new THREE.Matrix4().makeTranslation(bottom.x, bottom.y + torchHeight / 2, bottom.z);
-  const torchSize = GENERATOR_TORCH.size.clone().setY(torchHeight);
-  generator.add(parts.build(), islandModelMesh('lampPost', torchMatrix, torchSize));
+  const boardHeight = Math.min(GENERATOR_SURFBOARD_HEIGHT, pole.size.y);
+  const boardMatrix = new THREE.Matrix4().makeTranslation(bottom.x, bottom.y + boardHeight / 2, bottom.z);
+  generator.add(parts.build(), islandModelMesh('surfboardStand', boardMatrix, surfboardSize(boardHeight)));
 }
 
 const CRATE_STACK = {
