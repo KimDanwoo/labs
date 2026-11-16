@@ -43,3 +43,12 @@ world-overrides/            world:sync가 public/world 위에 덮어쓰는 자�
 ## 검증
 
 루트 `pnpm lint`, `pnpm typecheck`, `pnpm test`와 `pnpm --filter danwoo-island build`. 자동 테스트는 에셋 경로 헬퍼만 다룬다. 주행·메뉴·지도·오디오·터치 흐름은 GPU 브라우저에서 확인한다.
+
+개발 서버(`NODE_ENV=development`)에서는 `window.__islandProbe`가 열린다. 엔진 내부 이름이 바뀌어도 화면 비교 스크립트가 그대로 돌도록 둔 고정 창구다.
+
+- `freezeDay(progress)`: 낮밤·계절을 즉시 고정한다. 낮 0.05, 밤 0.45.
+- `moveTo(place)`: 차를 respawn 지점으로 옮긴다(`beachStart`, `projects`, `circuit` 등).
+- `press(key)` / `release(key)`: 입력 키를 누르고 뗀다(`Keyboard.ArrowUp` 형식).
+- `snapshot()`: 경과 시간, 차 위치·회전·속도, 카메라 위치를 반환한다.
+
+빌드(production)에는 노출되지 않는다.
