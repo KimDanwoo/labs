@@ -63,7 +63,6 @@ const imageUrl = new URL(image, Astro.site).href;
     <meta name="twitter:card" content="summary_large_image" />
     <slot name="head" />
     <ClientRouter />
-    <Analytics />
 
     <!-- 첫 페인트 전에 테마를 정해 깜빡임을 막는다. 저장값이 없으면 OS 설정을 따른다.
          페이지를 옮기면 ClientRouter가 <html> 속성을 새 문서 것으로 바꾸므로, 바꾼 직후에도 다시 적용한다. -->
@@ -139,6 +138,9 @@ const imageUrl = new URL(image, Astro.site).href;
       </div>
     </dialog>
     <SearchDialog />
+    <!-- <vercel-analytics>는 head에 둘 수 없는 요소라 head에 두면 파서가 거기서 head를 닫고, 뒤따르던 스타일시트가 body로 밀려
+         페이지를 옮길 때마다 다시 붙으며 폰트를 새로 불러왔다. body에 두면 이동마다 새로 만들어져 페이지 조회를 보내는 동작은 그대로다 -->
+    <Analytics />
 
     <script>
       import '~/scripts/analytics';

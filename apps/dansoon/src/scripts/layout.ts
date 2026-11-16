@@ -1,4 +1,4 @@
-import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
+import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars';
 
 const SCROLLBAR_OPTIONS: PartialOptions = {
@@ -89,7 +89,8 @@ function syncSidebarCurrent(root: ParentNode | null) {
 // 같은 글을 여러 번 방문해도 섞이지 않도록 방문 기록 항목(ClientRouter가 붙이는 history.state.index)별로 기억한다.
 const contentScrollTops = new Map<string, number>();
 let contentScroller: HTMLElement | null = null;
-let lastNavigationType: TransitionBeforePreparationEvent['navigationType'] | undefined;
+// 이동 준비는 연달아 겹칠 수 있어(뒤로가기 직후 다른 링크) 실제로 화면을 바꾼 이동의 종류만 들고 있는다
+let swapNavigationType: TransitionBeforeSwapEvent['navigationType'] | undefined;
 
 const historyEntryKey = () => {
   const index: unknown = window.history.state?.index;
@@ -215,24 +216,25 @@ function focusPageHeading() {
 
 let shouldFocusHeading = false;
 
-document.addEventListener('astro:before-preparation', (event) => {
-  lastNavigationType = event.navigationType;
+document.addEventListener('astro:before-preparation', () => {
   if (contentScroller) contentScrollTops.set(currentEntryKey, contentScroller.scrollTop);
 });
 document.addEventListener('astro:before-swap', (event) => {
   // 이어서 다른 링크로 옮기면 진행 중인 전환이 취소되며 ready가 거절된다 — 받아 두지 않으면 콘솔에 에러가 남는다
   event.viewTransition.ready.catch(() => undefined);
   event.newDocument.documentElement.dataset.navigated = '';
-  shouldFocusHeading = lastNavigationType !== 'traverse';
+  swapNavigationType = event.navigationType;
+  shouldFocusHeading = event.navigationType !== 'traverse';
   sidebarScrollTop = sidebarScroller?.scrollTop ?? 0;
   OverlayScrollbars(document.body)?.destroy();
 });
-// 새 화면을 캡처하기 전에 스크롤 영역과 뒤로가기 위치를 맞춘다 — page-load에서 하면 전환 도중 화면이 튄다
+// 새 화면을 캡처하기 전에 서랍을 닫고 스크롤 영역·뒤로가기 위치를 맞춘다 — page-load에서 하면 열린 서랍이 새 화면에 찍히고 전환 도중 화면이 튄다
 document.addEventListener('astro:after-swap', () => {
+  mobileNav()?.close();
   restoreSidebarScroll();
   currentEntryKey = historyEntryKey();
   syncPageScroller();
-  if (lastNavigationType === 'traverse') restoreTraversedScroll();
+  if (swapNavigationType === 'traverse') restoreTraversedScroll();
 });
 
 document.addEventListener('astro:page-load', () => {
@@ -240,7 +242,6 @@ document.addEventListener('astro:page-load', () => {
   restoreSidebarScroll();
   syncSidebarCurrent(sidebarHost);
   syncSidebarCurrent(mobileNavContent);
-  mobileNav()?.close();
   document.querySelectorAll<HTMLElement>('[data-overlay-scroll]').forEach(attachScrollbar);
   if (!shouldFocusHeading) return;
   shouldFocusHeading = false;
