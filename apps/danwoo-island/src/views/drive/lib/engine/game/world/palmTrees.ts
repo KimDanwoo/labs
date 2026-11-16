@@ -16,6 +16,7 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
+import { TICK_ORDER } from '../tickOrder';
 import { islandModelGeometry } from './islandModels';
 import { addTrunkColliders } from './trees';
 
@@ -26,7 +27,6 @@ const CROWN_START = 4.3;
 const SCALE_RANGE = [1.1, 1.35] as const;
 const SEE_THROUGH_RADIUS = 3;
 const SWAY_MARGIN = 0.5;
-const TICK_ORDER = 10;
 
 function palmGeometry(): THREE.BufferGeometry {
   const geometry = islandModelGeometry('palmTree');
@@ -74,7 +74,7 @@ export class PalmTrees {
     mesh.receiveShadow = true;
     game.scene.add(mesh);
     addTrunkColliders(references, TRUNK_RADIUS);
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.palmTrees);
   }
 
   #material(): MeshDefaultMaterial {

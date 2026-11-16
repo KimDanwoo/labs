@@ -5,6 +5,7 @@ import type { Action } from './inputs/inputs';
 import { Pointer } from './inputs/pointer';
 import { introCenter } from './introCenter';
 import { QUALITY } from './quality';
+import { TICK_ORDER } from './tickOrder';
 import { clamp, lerp, remap, smoothstep } from './utilities/maths';
 import { CameraRoll } from './view/cameraRoll';
 import { Cinematic } from './view/cinematic';
@@ -14,7 +15,6 @@ import { SpeedLines } from './view/speedLines';
 
 const IDEAL_RATIO = 1920 / 1080;
 const CAMERA = { fov: 25, near: 0.1, far: 200 } as const;
-const TICK_ORDER = 7;
 const THROTTLED_RESIZE_ORDER = 1;
 const FOCUS_ACTIONS = new Set([
   'forward',
@@ -131,7 +131,7 @@ export class View {
     this.#listenFocusActions();
     this.#listenZoom();
     this.#listenMapDrag();
-    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER.view);
     this.update();
     this.game.viewport.events.on('change', () => this.resize());
     this.game.viewport.events.on('throttleChange', () => this.#measureOptimalArea(), THROTTLED_RESIZE_ORDER);

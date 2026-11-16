@@ -1,8 +1,7 @@
 import { color, mix, rangeFogFactor, uniform, vec2, viewportUV } from 'three/tsl';
 
 import { getGame } from './gameContext';
-
-const TICK_ORDER = 10;
+import { TICK_ORDER } from './tickOrder';
 
 export class Fog {
   readonly game = getGame();
@@ -22,7 +21,7 @@ export class Fog {
 
   constructor() {
     this.game.scene.backgroundNode = this.color;
-    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER.fog);
   }
 
   update(): void {

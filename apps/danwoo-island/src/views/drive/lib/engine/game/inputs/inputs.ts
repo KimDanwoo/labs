@@ -1,5 +1,6 @@
 import { Events } from '../events';
 import { getGame } from '../gameContext';
+import { TICK_ORDER } from '../tickOrder';
 import { ObservableSet, type SetChange } from '../utilities/observableSet';
 import { type ButtonState, Gamepad } from './gamepad';
 import { InteractiveButtons } from './interactiveButtons';
@@ -37,7 +38,6 @@ const MODE_CLASS = {
   [INPUT_MODE.gamepad]: 'gamepad',
   [INPUT_MODE.touch]: 'touch',
 } satisfies Record<InputMode, string>;
-const TICK_ORDER = 0;
 const NIPPLE_ACTION: ActionDefinition = {
   name: 'nipplePointer',
   categories: ['wandering', 'racing'],
@@ -84,7 +84,7 @@ export class Inputs {
     this.#listenNipple();
     this.addActions(actions);
     for (const filter of filters) this.filters.add(filter);
-    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER.inputs);
     document.documentElement.classList.add(`is-mode-${MODE_CLASS[this.mode]}`);
   }
 

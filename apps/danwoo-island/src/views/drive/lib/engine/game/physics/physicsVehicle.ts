@@ -4,6 +4,7 @@ import * as THREE from 'three/webgpu';
 import { Events } from '../events';
 import { getGame } from '../gameContext';
 import { QUALITY } from '../quality';
+import { TICK_ORDER } from '../tickOrder';
 import { lerp, smallestAngle } from '../utilities/maths';
 import type { Physical } from './physics';
 
@@ -80,7 +81,6 @@ const SPAWN_POSITION = new THREE.Vector3(0, 4, 0);
 const CHASSIS_FRICTION = 0.4;
 const DOWN = new THREE.Vector3(0, -1, 0);
 const UP = new THREE.Vector3(0, 1, 0);
-const TICK_ORDER = { prePhysics: 2, postPhysics: 5 } as const;
 
 const SUSPENSION_STATES = new Set<unknown>(['low', 'mid', 'high']);
 
@@ -205,8 +205,8 @@ export class PhysicsVehicle {
     this.chassis = this.#createChassis();
     this.#controller = game.physics.world.createVehicleController(this.chassis.physical.body);
     this.wheels = this.#createWheels();
-    game.ticker.events.on('tick', () => this.#updatePrePhysics(), TICK_ORDER.prePhysics);
-    game.ticker.events.on('tick', () => this.#updatePostPhysics(), TICK_ORDER.postPhysics);
+    game.ticker.events.on('tick', () => this.#updatePrePhysics(), TICK_ORDER.vehiclePrePhysics);
+    game.ticker.events.on('tick', () => this.#updatePostPhysics(), TICK_ORDER.vehiclePostPhysics);
   }
 
   #createChassis(): { physical: Physical; mass: number } {

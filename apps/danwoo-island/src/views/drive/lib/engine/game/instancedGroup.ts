@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
+import { TICK_ORDER } from './tickOrder';
 
 export type InstanceReference = THREE.Object3D & { needsUpdate?: boolean };
 
@@ -12,8 +13,6 @@ interface InstancedPart {
   localMatrix: THREE.Matrix4;
   instance: THREE.InstancedMesh;
 }
-
-const TICK_ORDER = 13;
 
 export function referencesFromChildren(children: readonly THREE.Object3D[]): InstanceReference[] {
   return children.map((child) => {
@@ -55,7 +54,7 @@ export class InstancedGroup {
     group.traverse((child) => {
       if (child instanceof THREE.Mesh) this.meshes.push(this.#instance(child));
     });
-    if (isAutoUpdated) game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    if (isAutoUpdated) game.ticker.events.on('tick', () => this.update(), TICK_ORDER.instancedGroup);
     this.update();
   }
 

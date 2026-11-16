@@ -3,6 +3,7 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
+import { TICK_ORDER } from '../tickOrder';
 import { lerp, remapClamp } from '../utilities/maths';
 
 const COUNT = 2 ** 11;
@@ -12,7 +13,6 @@ const SNOW = { length: 0.03, speed: 0.05 } as const;
 const MIN_VISIBLE_RATIO = 0.00001;
 const HIDDEN_LIFT = 99;
 const MESH_OFFSET_Y = -0.3;
-const TICK_ORDER = 10;
 const THROTTLE_ORDER = 2;
 
 function lineGeometry(): THREE.BufferGeometry {
@@ -70,7 +70,7 @@ export class RainLines {
     this.#mesh.renderOrder = 1;
     game.scene.add(this.#mesh);
 
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.rainLines);
     game.viewport.events.on(
       'throttleChange',
       () => {

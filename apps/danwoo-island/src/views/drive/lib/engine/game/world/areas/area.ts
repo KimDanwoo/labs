@@ -4,6 +4,7 @@ import { Events } from '../../events';
 import { getGame } from '../../gameContext';
 import type { WorldObject } from '../../objects';
 import { References } from '../../references';
+import { TICK_ORDER } from '../../tickOrder';
 import { circleIntersectsPolygon } from '../../utilities/maths';
 
 type AreaEvents = { boundingIn: []; boundingOut: []; frustumIn: []; frustumOut: [] };
@@ -14,8 +15,6 @@ interface AreaFrustum {
   isIn: boolean | null;
   alwaysVisible: boolean;
 }
-
-const TICK_ORDER = 10;
 
 function numberData(object: THREE.Object3D, key: string): number | undefined {
   const value: unknown = object.userData[key];
@@ -42,7 +41,7 @@ export class Area {
         this.#testFrustum();
         if (!this.frustum || this.frustum.isIn) this.update();
       },
-      TICK_ORDER,
+      TICK_ORDER.area,
     );
   }
 

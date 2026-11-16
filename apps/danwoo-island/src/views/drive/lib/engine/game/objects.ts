@@ -9,6 +9,7 @@ import type {
   PhysicalDescription,
   ShapeParameters,
 } from './physics/physics';
+import { TICK_ORDER } from './tickOrder';
 
 export interface VisualDescription {
   model?: THREE.Object3D;
@@ -31,8 +32,6 @@ export interface WorldObject {
 }
 
 export type ModelPhysicalDescription = Omit<PhysicalDescription, 'colliders'>;
-
-const TICK_ORDER = 4;
 
 const markInstanceDirty = (object3D: THREE.Object3D): void => {
   if ('needsUpdate' in object3D) object3D.needsUpdate = true;
@@ -148,7 +147,7 @@ export class Objects {
   readonly #roundedView = { x: 0, z: 0 };
 
   constructor() {
-    getGame().ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    getGame().ticker.events.on('tick', () => this.update(), TICK_ORDER.objects);
   }
 
   add(

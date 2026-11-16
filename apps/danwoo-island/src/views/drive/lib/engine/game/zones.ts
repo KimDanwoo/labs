@@ -2,6 +2,7 @@ import * as THREE from 'three/webgpu';
 
 import { Events } from './events';
 import { getGame } from './gameContext';
+import { TICK_ORDER } from './tickOrder';
 
 export type ZoneShape = 'sphere' | 'cylinder';
 
@@ -12,8 +13,6 @@ export interface Zone {
   isIn: boolean;
   events: Events<{ enter: [Zone]; leave: [Zone] }>;
 }
-
-const TICK_ORDER = 8;
 
 const flatten = (point: THREE.Vector3): THREE.Vector2 => new THREE.Vector2(point.x, point.z);
 
@@ -27,7 +26,7 @@ export class Zones {
   readonly #items: Zone[] = [];
 
   constructor() {
-    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER.zones);
   }
 
   create(type: ZoneShape, position: THREE.Vector3, radius: number): Zone {

@@ -19,6 +19,7 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
+import { TICK_ORDER } from '../tickOrder';
 import { applyInstanceMatrix } from '../utilities/instanceMatrix';
 
 type ColorUniform = THREE.UniformNode<'color', THREE.Color>;
@@ -36,7 +37,6 @@ const PLANE_SIZE = 1.0;
 const NORMAL_BLEND = 0.85;
 const WIND_ROTATION = 2.2;
 const SEE_THROUGH_EDGE = { min: 3, max: 15 } as const;
-const TICK_ORDER = 10;
 
 function leafPlane(): THREE.PlaneGeometry {
   const plane = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE);
@@ -100,7 +100,7 @@ export class Foliage {
     this.#instanceMatrix.setUsage(THREE.StaticDrawUsage);
     for (const [index, matrix] of matrices.entries()) matrix.toArray(this.#instanceMatrix.array, index * 16);
 
-    game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    game.ticker.events.on('tick', () => this.update(), TICK_ORDER.foliage);
   }
 
   #material(colorA: ColorUniform, colorB: ColorUniform): MeshDefaultMaterial {

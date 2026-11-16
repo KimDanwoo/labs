@@ -19,6 +19,7 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial, revealNode } from '../materials/meshDefaultMaterial';
+import { TICK_ORDER } from '../tickOrder';
 import { Track } from '../tracks';
 import { type Trail, Trails } from '../trails';
 import { clamp, remapClamp } from '../utilities/maths';
@@ -81,7 +82,6 @@ const MAIN_TRACK_MAX_ELEVATION = 1.5;
 const BOOST = { speed: 1.2, easePower: 7 } as const;
 const TRAIL_OFFSETS = { left: [-1.28, 0.1, -0.55], right: [-1.28, 0.1, 0.55] } as const;
 const ANTENNA_TARGET = new THREE.Vector3(0, 2, 0);
-const TICK_ORDER = 8;
 
 function findParts(model: THREE.Object3D): Map<string, THREE.Object3D> {
   const parts = new Map<string, THREE.Object3D>();
@@ -154,7 +154,7 @@ export class VisualVehicle {
     this.#paints = this.#createPaints();
     this.changePaint(game.options.paintName);
 
-    game.ticker.events.on('tick', this.#tick, TICK_ORDER);
+    game.ticker.events.on('tick', this.#tick, TICK_ORDER.visualVehicle);
   }
 
   #part(name: PartName): THREE.Object3D | undefined {

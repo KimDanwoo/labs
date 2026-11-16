@@ -1,12 +1,12 @@
 import gsap from 'gsap';
 
 import { getGame } from './gameContext';
+import { TICK_ORDER } from './tickOrder';
 import { clamp, remap } from './utilities/maths';
 
 const DEFAULT_SCALE = 2;
 const BULLET_TIME = { scale: 0.5, inSpeed: 3, outSpeed: 0.3, defaultSeconds: 1.5 } as const;
 const MILLISECONDS_PER_SECOND = 1000;
-const TICK_ORDER = 0;
 
 class BulletTime {
   isActive = false;
@@ -35,7 +35,7 @@ export class Time {
 
   constructor() {
     this.scale = DEFAULT_SCALE;
-    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER.time);
   }
 
   get scale(): number {

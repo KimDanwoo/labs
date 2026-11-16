@@ -7,6 +7,7 @@ import { getGame } from '../gameContext';
 import { INPUT_MODE } from '../inputs/inputs';
 import { introCenter } from '../introCenter';
 import type { Intersect } from '../rayCursor';
+import { TICK_ORDER } from '../tickOrder';
 import { UI_FONT_FAMILY } from '../utilities/canvasFont';
 import { isTideLoading, TIDE_LABEL, tideRingGeometry, tideRingMaterial } from './tideLoading';
 
@@ -16,7 +17,6 @@ const LABEL_DISTANCE = 6;
 const PROMPT_RENDER_ORDER = 10;
 const LABEL_HIDDEN_SCALE = 0.01;
 const RING = { radius: 3.5, thickness: 0.04, segments: 128, elevation: 0.001, smoothing: 10 } as const;
-const TICK_ORDER = 8;
 
 const TEXT_SCALE = 0.9;
 const TEXT_ASPECT = 4;
@@ -168,7 +168,7 @@ export class Intro {
     this.center = introCenter(game.respawns);
     this.#ring = this.#createRing();
     this.#placeLabel();
-    game.ticker.events.on('tick', this.#update, TICK_ORDER);
+    game.ticker.events.on('tick', this.#update, TICK_ORDER.intro);
   }
 
   #createRing(): THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicNodeMaterial> {

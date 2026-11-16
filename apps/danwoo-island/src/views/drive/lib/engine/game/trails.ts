@@ -16,6 +16,7 @@ import {
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
+import { TICK_ORDER } from './tickOrder';
 
 type Vec3Node = THREE.Node<'vec3'>;
 
@@ -35,7 +36,6 @@ const DECAY = 0.2;
 const CHANNELS = 4;
 const RADIUS = 0.1;
 const RADIAL_SEGMENTS = 4;
-const TICK_ORDER = 10;
 
 const rotationBetween = Fn(([from, to]: [Vec3Node, Vec3Node]): THREE.Node<'mat3'> => {
   const cosTheta = dot(from, to);
@@ -75,7 +75,7 @@ export class Trails {
   readonly #fresnelOffset = uniform(0.25);
 
   constructor() {
-    getGame().ticker.events.on('tick', () => this.update(), TICK_ORDER);
+    getGame().ticker.events.on('tick', () => this.update(), TICK_ORDER.trails);
   }
 
   create(): Trail {

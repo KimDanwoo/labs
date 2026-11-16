@@ -6,12 +6,12 @@ import type { Audio } from './audio';
 import { getGame } from './gameContext';
 import { introCenter } from './introCenter';
 import { prefersDataSaving } from './jukebox/idle';
+import { TICK_ORDER } from './tickOrder';
 import type { Intro } from './world/intro';
 import { isTideLoading, TIDE_REVEAL } from './world/tideLoading';
 
 const SKIP_PATTERN = /skip/i;
 const SKIP_SPEED = 4;
-const TICK_ORDER = 10;
 const HOVER_INTENSITY = 1.22;
 const HOVER_DURATION = 0.2;
 const OPEN_RADIUS = 4.3;
@@ -62,7 +62,7 @@ export class Reveal {
       volume: 0.5,
       preload: true,
     });
-    game.ticker.events.on('tick', this.#update, TICK_ORDER);
+    game.ticker.events.on('tick', this.#update, TICK_ORDER.reveal);
   }
 
   start(): void {
