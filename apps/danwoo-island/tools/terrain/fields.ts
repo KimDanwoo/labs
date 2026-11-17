@@ -11,6 +11,7 @@ import {
   ISLANDS,
   TRACK,
   WORLD_SIZE,
+  type Bounds,
   type Point,
 } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
 
@@ -65,7 +66,7 @@ export function boxDistance(point: Point, from: Point, to: Point): number {
 }
 
 const TRACK_BED = 6.5;
-const ZONE_SHORE = 7;
+const ZONE_SHORE = 7.5;
 const WORLD_EDGE = 3;
 
 export function landDistance(point: Point): number {
@@ -79,16 +80,19 @@ export function landDistance(point: Point): number {
   return Math.min(land, boxDistance(point, TRACK.waterJump.from, TRACK.waterJump.to));
 }
 
+const openGrounds = Object.values(AREA_ANCHORS).flatMap(({ placed, bounds, runUp }) =>
+  [bounds, ...(runUp ? [runUp] : [])].map((box) => zoneBox(placed, box)),
+);
+
+export function zoneBox(placed: Point, [west, north, east, south]: Bounds): readonly [from: Point, to: Point] {
+  return [
+    [placed[0] + west, placed[1] + north],
+    [placed[0] + east, placed[1] + south],
+  ];
+}
+
 export function padDistance(point: Point): number {
-  return Math.min(
-    ...Object.values(AREA_ANCHORS).map(({ placed, bounds }) =>
-      boxDistance(
-        point,
-        [placed[0] + bounds[0], placed[1] + bounds[1]],
-        [placed[0] + bounds[2], placed[1] + bounds[3]],
-      ),
-    ),
-  );
+  return Math.min(...openGrounds.map(([from, to]) => boxDistance(point, from, to)));
 }
 
 export interface TerrainSample {

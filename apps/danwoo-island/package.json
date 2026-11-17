@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "world:sync": "node scripts/syncWorld.mjs",
-    "world:terrain": "node --import tsx tools/terrain/buildTerrain.ts",
+    "world:terrain": "node --import tsx tools/terrain/buildTerrain.ts && node --import tsx tools/terrain/checkLayout.ts",
     "models:compress": "node tools/compressModels.mjs world-overrides/areas/island/models/*.glb",
     "dev": "node scripts/syncWorld.mjs && next dev",
     "build": "node scripts/syncWorld.mjs && next build",
