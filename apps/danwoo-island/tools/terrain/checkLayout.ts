@@ -1,9 +1,12 @@
 import {
   AREA_ANCHORS,
   BRIDGES,
+  RESPAWN_POINTS,
+  respawnPosition,
   type AreaKey,
   type BridgeSpan,
   type Point,
+  type RespawnPoint,
 } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
 import { ISLAND_SCATTER } from '../../src/views/drive/lib/engine/game/world/layout/islandScatter';
 import { boxDistance, landDistance, trackClearance, zoneBox } from './fields';
@@ -14,6 +17,10 @@ const STEP = 1;
 const ENTRY_MARGIN = 5;
 const TRACK_ROOM = 1;
 const BRIDGE_SAMPLES = 10;
+const BRIDGE_WET_SHARE = 0.4;
+const RESPAWN_SHORE = 3;
+const RESPAWN_TRACK_ROOM = 2;
+const RESPAWN_PROP_ROOM = 3;
 
 const zones = Object.entries(AREA_ANCHORS) as [AreaKey, (typeof AREA_ANCHORS)[AreaKey]][];
 const props = Object.values(ISLAND_SCATTER).flatMap((list) => list.map(([x, z]): Point => [x, z]));
@@ -73,16 +80,35 @@ function runUpProblems(name: AreaKey): string[] {
   ];
 }
 
+function respawnProblems(name: string, respawn: RespawnPoint): string[] {
+  const point = respawnPosition(respawn);
+  const intruded = zones.filter(
+    ([other, anchor]) => other !== respawn.area && isInside(point, zoneBox(anchor.placed, anchor.bounds)),
+  );
+  const nearestProp = Math.min(...props.map(([x, z]) => Math.hypot(point[0] - x, point[1] - z)));
+  return [
+    landDistance(point) < RESPAWN_SHORE ? `리스폰 ${name}: 물가 ${RESPAWN_SHORE}m 안` : '',
+    respawn.area !== 'circuit' && trackClearance(point) < RESPAWN_TRACK_ROOM ? `리스폰 ${name}: 트랙 위` : '',
+    nearestProp < RESPAWN_PROP_ROOM ? `리스폰 ${name}: 소품이 ${nearestProp.toFixed(1)}m 앞` : '',
+    ...intruded.map(([other]) => `리스폰 ${name}: ${other} 구역 안`),
+  ];
+}
+
 function bridgeProblems(): string[] {
-  return BRIDGES.filter((bridge) => bridgeSamples(bridge).every((point) => landDistance(point) >= 0)).map(
-    ({ from, to }) => `다리 [${from.join(', ')}]→[${to.join(', ')}]: 물을 건너지 않음`,
+  const wetShare = (bridge: BridgeSpan): number =>
+    bridgeSamples(bridge).filter((point) => landDistance(point) < 0).length / (BRIDGE_SAMPLES + 1);
+  return BRIDGES.filter((bridge) => wetShare(bridge) < BRIDGE_WET_SHARE).map(
+    (bridge) =>
+      `다리 [${bridge.from.join(', ')}]→[${bridge.to.join(', ')}]: 물 위 구간이 ${Math.round(wetShare(bridge) * 100)}%뿐`,
   );
 }
 
 function layoutProblems(): string[] {
-  return [...zones.flatMap(([name]) => [...zoneProblems(name), ...runUpProblems(name)]), ...bridgeProblems()].filter(
-    Boolean,
-  );
+  return [
+    ...zones.flatMap(([name]) => [...zoneProblems(name), ...runUpProblems(name)]),
+    ...Object.entries(RESPAWN_POINTS).flatMap(([name, respawn]) => respawnProblems(name, respawn)),
+    ...bridgeProblems(),
+  ].filter(Boolean);
 }
 
 const problems = layoutProblems();

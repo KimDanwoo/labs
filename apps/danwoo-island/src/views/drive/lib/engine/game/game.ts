@@ -431,10 +431,9 @@ export class Game {
   }
 
   #introResources(): ResourceSpec[] {
-    const { modelSuffix, textureFormat, textureExtension } = assetNames();
+    const { textureFormat, textureExtension } = assetNames();
     const cb = CACHE_BUSTER;
     return [
-      modelResource('respawnsReferencesModel', `respawns/respawnsReferences${modelSuffix}.glb${cb}`),
       textureResource(
         'behindTheSceneStarsTexture',
         `behindTheScene/stars.${textureExtension}${cb}`,

@@ -4,11 +4,15 @@ import path from 'node:path';
 import {
   closedCurve,
   loopDistance,
+  segmentDistance,
   signedLoopDistance,
 } from '../../src/views/drive/lib/engine/game/world/layout/curves';
 import {
   AREA_ANCHORS,
+  BRIDGES,
   ISLANDS,
+  RESPAWN_POINTS,
+  respawnPosition,
   TRACK,
   WORLD_SIZE,
   type Bounds,
@@ -67,17 +71,40 @@ export function boxDistance(point: Point, from: Point, to: Point): number {
 
 const TRACK_BED = 6.5;
 const ZONE_SHORE = 7.5;
+const SHORE_WAVE = { height: 2.5, lengths: [17, 23, 31] } as const;
 const WORLD_EDGE = 3;
+const BRIDGE_WATER = { abutment: 0.2, reach: 3 } as const;
+
+const along = (from: Point, to: Point, share: number): Point => [
+  from[0] + (to[0] - from[0]) * share,
+  from[1] + (to[1] - from[1]) * share,
+];
+
+const bridgeSpans = BRIDGES.map(({ from, to }): readonly [Point, Point] => [
+  along(from, to, BRIDGE_WATER.abutment),
+  along(from, to, 1 - BRIDGE_WATER.abutment),
+]);
+
+function bridgeWater(point: Point): number {
+  return Math.min(...bridgeSpans.map(([from, to]) => segmentDistance(point, from, to) - BRIDGE_WATER.reach));
+}
+
+function shoreWave([x, z]: Point): number {
+  const [a, b, c] = SHORE_WAVE.lengths;
+  const wave =
+    Math.sin((x * Math.PI * 2) / a) + Math.sin((z * Math.PI * 2) / b) + Math.sin(((x + z) * Math.PI * 2) / c);
+  return (SHORE_WAVE.height * (wave + 3)) / 6;
+}
 
 export function landDistance(point: Point): number {
   const islands = islandLoops.map((loop) => signedLoopDistance(point, loop));
   const trackBed = TRACK.width / 2 + TRACK_BED - loopDistance(point, trackLoop);
   const zoneShore = Math.min(
-    ZONE_SHORE - padDistance(point),
+    ZONE_SHORE + shoreWave(point) - padDistance(point),
     WORLD_SIZE / 2 - WORLD_EDGE - Math.max(Math.abs(point[0]), Math.abs(point[1])),
   );
   const land = Math.max(trackBed, zoneShore, ...islands);
-  return Math.min(land, boxDistance(point, TRACK.waterJump.from, TRACK.waterJump.to));
+  return Math.min(land, boxDistance(point, TRACK.waterJump.from, TRACK.waterJump.to), bridgeWater(point));
 }
 
 const openGrounds = Object.values(AREA_ANCHORS).flatMap(({ placed, bounds, runUp }) =>
@@ -116,4 +143,10 @@ export function sampleTerrain(point: Point): TerrainSample {
 
 export function trackClearance(point: Point): number {
   return loopDistance(point, trackLoop) - TRACK.width / 2;
+}
+
+const respawnPoints = Object.values(RESPAWN_POINTS).map(respawnPosition);
+
+export function respawnDistance(point: Point): number {
+  return Math.min(...respawnPoints.map(([x, z]) => Math.hypot(point[0] - x, point[1] - z)));
 }

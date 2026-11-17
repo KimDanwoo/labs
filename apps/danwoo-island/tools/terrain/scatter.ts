@@ -8,7 +8,7 @@ import {
   TRACK,
   WORLD_SIZE,
 } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
-import { landDistance, padDistance, sampleTerrain, trackClearance } from './fields';
+import { landDistance, padDistance, respawnDistance, sampleTerrain, trackClearance } from './fields';
 
 const OUTPUT = path.resolve(import.meta.dirname, '../../src/views/drive/lib/engine/game/world/layout/islandScatter.ts');
 const HALF_WORLD = WORLD_SIZE / 2;
@@ -17,6 +17,7 @@ const SEED = 20261117;
 const PALM_COAST = 12;
 const CRATE_RING = 3;
 const PAD_LIGHT_GAP = 2;
+const RESPAWN_CLEARANCE = 5;
 
 interface Rule {
   readonly spacing: number;
@@ -39,7 +40,10 @@ const bridgeDistance = (point: Point): number =>
   Math.min(...BRIDGES.flatMap(({ from, to }) => [from, to]).map(([x, z]) => Math.hypot(point[0] - x, point[1] - z)));
 
 const isClear = (point: Point, track: number, pad: number): boolean =>
-  trackClearance(point) > track && padDistance(point) > pad && bridgeDistance(point) > BRIDGE_CLEARANCE;
+  trackClearance(point) > track &&
+  padDistance(point) > pad &&
+  bridgeDistance(point) > BRIDGE_CLEARANCE &&
+  respawnDistance(point) > RESPAWN_CLEARANCE;
 
 const round = (value: number): number => Math.round(value * 10) / 10;
 
@@ -107,7 +111,7 @@ export function writeScatter(): void {
     .map(asPlacement);
   const lanterns = BRIDGES.flatMap(({ from, to }) => [from, to])
     .flatMap(([x, z]) => ringAround([x, z], BRIDGE_CLEARANCE - 2, 2))
-    .filter((point) => onLand(point, 0.5) && trackClearance(point) > 3)
+    .filter((point) => onLand(point, 0.5) && trackClearance(point) > 3 && respawnDistance(point) > RESPAWN_CLEARANCE)
     .map(asPlacement);
   const crates = TRACK.kickers
     .flatMap((point) => ringAround(point, TRACK.width / 2 + CRATE_RING + 3, 3))

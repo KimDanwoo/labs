@@ -35,7 +35,7 @@ export function loopLength(points: readonly Point[]): number {
   }, 0);
 }
 
-function segmentDistance(point: Point, from: Point, to: Point): number {
+export function segmentDistance(point: Point, from: Point, to: Point): number {
   const dx = to[0] - from[0];
   const dz = to[1] - from[1];
   const lengthSquared = dx * dx + dz * dz;

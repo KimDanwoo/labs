@@ -380,32 +380,34 @@ export const ISLANDS: readonly IslandShape[] = [
 export const BRIDGES: readonly BridgeSpan[] = [
   { from: [-66, 2], to: [-60, 6], width: 5 },
   { from: [-80.5, 10], to: [-80.5, 20], width: 5 },
-  { from: [-61, 33], to: [-53, 27], width: 5 },
-  { from: [-60, 64], to: [-51, 71], width: 5 },
-  { from: [-9, 12], to: [4, 12], width: 5 },
+  { from: [-61.5, 33], to: [-53.5, 27], width: 5 },
+  { from: [-58.5, 64], to: [-49.5, 71], width: 5 },
 ];
 
-export const RESPAWN_AREAS: Readonly<Record<string, AreaKey>> = {
-  achievements: 'achievements',
-  altar: 'altar',
-  beachStart: 'landing',
-  behindTheScene: 'behindTheScene',
-  bonfire: 'landing',
-  bowling: 'bowling',
-  bridge: 'social',
-  career: 'career',
-  circuit: 'circuit',
-  controls: 'landing',
-  cookie: 'cookie',
-  lab: 'lab',
-  landing: 'landing',
-  onlyFans: 'social',
-  projects: 'projects',
-  social: 'social',
-  test: 'social',
-  timeMachine: 'timeMachine',
-  toilet: 'toilet',
-};
+export interface RespawnPoint {
+  readonly area: AreaKey;
+  readonly offset: Point;
+  readonly rotation: number;
+}
+
+export const RESPAWN_POINTS = {
+  achievements: { area: 'achievements', offset: [-2, -10.5], rotation: -1.57 },
+  altar: { area: 'altar', offset: [-0.6, 13.3], rotation: 1.12 },
+  beachStart: { area: 'landing', offset: [4.4, 3.3], rotation: -1.15 },
+  behindTheScene: { area: 'behindTheScene', offset: [-1.8, -0.2], rotation: -0.19 },
+  bonfire: { area: 'landing', offset: [4.9, 5.7], rotation: -2.2 },
+  bowling: { area: 'bowling', offset: [15, -3.8], rotation: -2.59 },
+  career: { area: 'career', offset: [0, 11.4], rotation: 1.57 },
+  circuit: { area: 'circuit', offset: [0.7, 15.4], rotation: 0.04 },
+  controls: { area: 'landing', offset: [-1, -3.7], rotation: 0 },
+  cookie: { area: 'cookie', offset: [2.8, 1.6], rotation: 2.92 },
+  lab: { area: 'lab', offset: [5.6, 3.3], rotation: 2.75 },
+  landing: { area: 'landing', offset: [-10.7, -0.5], rotation: -0.23 },
+  projects: { area: 'projects', offset: [1, 7.7], rotation: 1.16 },
+  social: { area: 'social', offset: [-3.3, 10.7], rotation: 0.56 },
+  timeMachine: { area: 'timeMachine', offset: [-3.4, -2.3], rotation: 0 },
+  toilet: { area: 'toilet', offset: [5.2, 2.3], rotation: -2.89 },
+} as const satisfies Record<string, RespawnPoint>;
 
 export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
   bowling: {
@@ -418,7 +420,7 @@ export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
   social: { original: [29, -25.2], placed: [-30, 4], bounds: [-8.8, -8.6, 11.6, 8.8] },
   projects: { original: [34.8, 9.9], placed: [10, -62], bounds: [-4.6, -3.6, 5.6, 4.1] },
   lab: { original: [12.3, 15.55], placed: [-29, -14], bounds: [-4.5, -4.8, 4.5, 2.9] },
-  cookie: { original: [12.8, 34.75], placed: [-43, 22], bounds: [-4.0, -4.8, 4.0, 4.8] },
+  cookie: { original: [12.8, 34.75], placed: [-42, 22], bounds: [-4.0, -4.8, 4.0, 4.8] },
   career: { original: [26.3, -1.75], placed: [-72, 36], bounds: [-4.3, -4.9, 4.3, 8.8] },
   behindTheScene: { original: [50.65, -11.3], placed: [-70, 56], bounds: [-4.3, -5.8, 4.2, 5.8] },
   timeMachine: { original: [-55.15, -67.3], placed: [46, -62], bounds: [-0.6, -2.3, 2.1, 2.5] },
@@ -427,3 +429,8 @@ export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
   altar: { original: [75.35, -27.35], placed: [35, -12], bounds: [-6.8, -7.6, 6.8, 7.5] },
   circuit: { original: [-11.3, -0.5], placed: [18.2, 33.8], bounds: [-20.5, -11.7, 16.4, 33.9], rotation: 0.204 },
 };
+
+export function respawnPosition({ area, offset }: RespawnPoint): Point {
+  const { placed } = AREA_ANCHORS[area];
+  return [placed[0] + offset[0], placed[1] + offset[1]];
+}
