@@ -8,7 +8,14 @@ export {
 } from './api/gameRecordService';
 export { atIndex, cellAt } from './lib/gridAccess';
 export { BOARD_SIZE, KEY_NUMBER, SUDOKU_CELL_COUNT } from './model/constants/board';
-export { GAME_LEVEL, GAME_LEVEL_LABELS, GAME_MODE, HINTS_REMAINING, MAX_MISTAKES } from './model/constants/game';
+export {
+  GAME_LEVEL,
+  GAME_LEVEL_LABELS,
+  GAME_MODE,
+  GAME_PHASE,
+  HINTS_REMAINING,
+  MAX_MISTAKES,
+} from './model/constants/game';
 export { LEADERBOARD_RECORD_LIMIT } from './model/constants/record';
 export { formatTime } from './model/services/common';
 export { getRecordPoint } from './model/services/recordUtils';
@@ -38,6 +45,7 @@ export {
   timerActiveAtom,
 } from './model/store/primitives';
 export { selectCellAtom } from './model/store/selectionAtoms';
+export { gamePhaseAtom } from './model/store/statusAtoms';
 export { incrementTimerAtom, toggleTimerAtom } from './model/store/timerAtoms';
 export type { CageInfo, CellHighlight, CellProps, SudokuCell } from './model/types/board';
 export type { Difficulty, GameMode, KillerCage } from './model/types/game';

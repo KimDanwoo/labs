@@ -21,6 +21,14 @@ export const GAME_MODE = {
   KILLER: 'killer',
 } as const;
 
+export const GAME_PHASE = {
+  GENERATING: 'generating',
+  PLAYING: 'playing',
+  PAUSED: 'paused',
+  WON: 'won',
+  FAILED: 'failed',
+} as const;
+
 export const TECHNIQUE = {
   SINGLE: 1,
   LOCKED: 2,

@@ -1,7 +1,8 @@
-import { GAME_LEVEL, GAME_MODE, TECHNIQUE } from '../constants/game';
+import { GAME_LEVEL, GAME_MODE, GAME_PHASE, TECHNIQUE } from '../constants/game';
 import type { GridPosition, SudokuBoard } from './board';
 
 export type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE];
+export type GamePhase = (typeof GAME_PHASE)[keyof typeof GAME_PHASE];
 export type Difficulty = (typeof GAME_LEVEL)[keyof typeof GAME_LEVEL];
 export type Technique = (typeof TECHNIQUE)[keyof typeof TECHNIQUE];
 

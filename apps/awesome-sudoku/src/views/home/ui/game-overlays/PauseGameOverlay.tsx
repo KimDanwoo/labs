@@ -1,25 +1,16 @@
-import {
-  difficultyAtom,
-  initializeGameAtom,
-  isCompletedAtom,
-  isGeneratingAtom,
-  timerActiveAtom,
-  toggleTimerAtom,
-} from '@entities/game';
+import { GAME_PHASE, difficultyAtom, gamePhaseAtom, initializeGameAtom, toggleTimerAtom } from '@entities/game';
 import { cn } from '@shared/lib/cn';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { FC } from 'react';
 import { VscPlay } from 'react-icons/vsc';
 
 export const PauseGameOverlay: FC = () => {
-  const timerActive = useAtomValue(timerActiveAtom);
-  const isCompleted = useAtomValue(isCompletedAtom);
-  const isGenerating = useAtomValue(isGeneratingAtom);
+  const gamePhase = useAtomValue(gamePhaseAtom);
   const toggleTimer = useSetAtom(toggleTimerAtom);
   const initializeGame = useSetAtom(initializeGameAtom);
   const difficulty = useAtomValue(difficultyAtom);
 
-  if (timerActive || isCompleted || isGenerating) return null;
+  if (gamePhase !== GAME_PHASE.PAUSED) return null;
 
   return (
     <div

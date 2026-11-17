@@ -1,10 +1,14 @@
 import { atom } from 'jotai';
 import { BOARD_MAX_INDEX } from '../constants/board';
+import { GAME_PHASE } from '../constants/game';
 import { fillCellAtom, toggleNoteAtom } from './cellValueAtoms';
 import { isNoteModeAtom, selectedCellAtom } from './primitives';
 import { selectCellAtom } from './selectionAtoms';
+import { gamePhaseAtom } from './statusAtoms';
 
 export const handleKeyInputAtom = atom(null, (get, set, key: string) => {
+  if (get(gamePhaseAtom) !== GAME_PHASE.PLAYING) return;
+
   const isNoteMode = get(isNoteModeAtom);
 
   if (key === 'Backspace' || key === 'Delete') {

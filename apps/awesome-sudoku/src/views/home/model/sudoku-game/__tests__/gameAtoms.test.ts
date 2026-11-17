@@ -3,6 +3,7 @@ import {
   CLASSIC_DIFFICULTY,
   GAME_LEVEL,
   GAME_MODE,
+  GAME_PHASE,
   HINTS_REMAINING,
   MAX_MISTAKES,
 } from '@entities/game/model/constants/game';
@@ -26,6 +27,7 @@ import {
   solutionAtom,
   timerActiveAtom,
 } from '@entities/game/model/store/primitives';
+import { gamePhaseAtom } from '@entities/game/model/store/statusAtoms';
 import type { Grid, SudokuBoard } from '@entities/game/model/types/board';
 import type { KillerCage } from '@entities/game/model/types/game';
 import { createStore } from 'jotai';
@@ -376,5 +378,40 @@ describe('undoAtom / redoAtom — 히스토리', () => {
       .get(boardAtom)
       .flatMap((row, r) => row.flatMap((cell, c) => (cell.isSelected ? [[r, c]] : [])));
     expect(selectedCells).toEqual([[8, 8]]);
+  });
+});
+
+describe('gamePhaseAtom — 판의 단계', () => {
+  it('생성 중 > 끝난 판(성공·실패) > 진행·일시정지 순으로 한 단계만 가리킨다', () => {
+    const store = setupStore([[0, 0]]);
+    expect(store.get(gamePhaseAtom)).toBe(GAME_PHASE.PLAYING);
+
+    store.set(timerActiveAtom, false);
+    expect(store.get(gamePhaseAtom)).toBe(GAME_PHASE.PAUSED);
+
+    store.set(isCompletedAtom, true);
+    expect(store.get(gamePhaseAtom)).toBe(GAME_PHASE.FAILED);
+
+    store.set(isSuccessAtom, true);
+    expect(store.get(gamePhaseAtom)).toBe(GAME_PHASE.WON);
+
+    store.set(isGeneratingAtom, true);
+    expect(store.get(gamePhaseAtom)).toBe(GAME_PHASE.GENERATING);
+  });
+
+  it('일시정지 중 키 입력은 무시된다 — 값이 놓이지 않고 타이머도 다시 돌지 않는다', () => {
+    const store = setupStore([
+      [0, 0],
+      [8, 8],
+    ]);
+    store.set(selectedCellAtom, { row: 0, col: 0 });
+    store.set(timerActiveAtom, false);
+
+    store.set(handleKeyInputAtom, '5');
+    store.set(handleKeyInputAtom, 'ArrowRight');
+
+    expect(cellAt(store.get(boardAtom), 0, 0).value).toBeNull();
+    expect(store.get(timerActiveAtom)).toBe(false);
+    expect(store.get(selectedCellAtom)).toEqual({ row: 0, col: 0 });
   });
 });
