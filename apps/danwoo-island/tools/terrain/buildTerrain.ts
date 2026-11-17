@@ -1,10 +1,9 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { deflateSync } from 'node:zlib';
 
 import {
   closedCurve,
-  isInsideLoop,
   loopDistance,
   signedLoopDistance,
 } from '../../src/views/drive/lib/engine/game/world/layout/curves';
@@ -21,24 +20,45 @@ const TEXTURE_SIZE = 512;
 const GRID_ROWS = 129;
 const DEPTH_SCALE = 1.5;
 const CURVE_SAMPLES = 12;
-const BEACH = { inland: 2, offshore: -10 } as const;
-const GRASS = { from: 5, to: 8, trackClearance: 4, padClearance: 0.5, edge: 1.5 } as const;
+const BEACH = { inland: 1.5, offshore: -4 } as const;
+const GRASS = { coast: 2, trackClearance: 3, padClearance: 0, edge: 1.5 } as const;
 const PAVED = { shoulder: 2.5, edge: 1.5 } as const;
-const PATCH = { frequency: 0.06, threshold: -0.45, edge: 0.2, seed: 7 } as const;
+const GRASS_MASK = readGrayscale(path.resolve(import.meta.dirname, 'grassMask.pgm'));
 
 const trackLoop = closedCurve(TRACK.centerline, CURVE_SAMPLES);
-const islandLoops = ISLANDS.map(({ outline }) => closedCurve(outline, CURVE_SAMPLES));
+const islandLoops = ISLANDS.map(({ outline }) => outline);
+
+interface Grayscale {
+  readonly size: number;
+  readonly values: Uint8Array;
+}
+
+function readGrayscale(file: string): Grayscale {
+  const bytes = readFileSync(file);
+  const header = bytes.subarray(0, 32).toString('ascii').split(/\s+/);
+  const size = Number(header[1]);
+  const offset = bytes.length - size * size;
+  return { size, values: new Uint8Array(bytes.subarray(offset)) };
+}
+
+function sampleMask({ size, values }: Grayscale, [x, z]: Point): number {
+  const u = Math.min(size - 1, Math.max(0, (x / WORLD_SIZE + 0.5) * size - 0.5));
+  const v = Math.min(size - 1, Math.max(0, (z / WORLD_SIZE + 0.5) * size - 0.5));
+  const x0 = Math.floor(u);
+  const z0 = Math.floor(v);
+  const x1 = Math.min(size - 1, x0 + 1);
+  const z1 = Math.min(size - 1, z0 + 1);
+  const at = (column: number, row: number): number => (values[row * size + column] ?? 0) / 255;
+  const top = at(x0, z0) + (at(x1, z0) - at(x0, z0)) * (u - x0);
+  const bottom = at(x0, z1) + (at(x1, z1) - at(x0, z1)) * (u - x0);
+  return top + (bottom - top) * (v - z0);
+}
 
 const clamp01 = (value: number): number => Math.min(1, Math.max(0, value));
 const smoothstep = (edge0: number, edge1: number, value: number): number => {
   const t = clamp01((value - edge0) / (edge1 - edge0));
   return t * t * (3 - 2 * t);
 };
-
-function circuitLand(point: Point): number {
-  const distance = loopDistance(point, trackLoop);
-  return isInsideLoop(point, trackLoop) ? TRACK.coastMargin + distance : TRACK.coastMargin - distance;
-}
 
 function boxDistance(point: Point, from: Point, to: Point): number {
   const halfX = Math.abs(to[0] - from[0]) / 2;
@@ -50,40 +70,20 @@ function boxDistance(point: Point, from: Point, to: Point): number {
 
 function landDistance(point: Point): number {
   const islands = islandLoops.map((loop) => signedLoopDistance(point, loop));
-  const land = Math.max(circuitLand(point), ...islands);
+  const land = Math.max(...islands);
   return Math.min(land, boxDistance(point, TRACK.waterJump.from, TRACK.waterJump.to));
 }
 
 function padDistance(point: Point): number {
   return Math.min(
-    ...Object.values(AREA_ANCHORS).map(({ placed, footprint }) =>
-      boxDistance(
-        point,
-        [placed[0] - footprint[0] / 2, placed[1] - footprint[1] / 2],
-        [placed[0] + footprint[0] / 2, placed[1] + footprint[1] / 2],
-      ),
-    ),
+    ...Object.values(AREA_ANCHORS).map(({ placed, footprint, rotation = 0 }) => {
+      const cos = Math.abs(Math.cos(rotation));
+      const sin = Math.abs(Math.sin(rotation));
+      const halfX = (cos * footprint[0] + sin * footprint[1]) / 2;
+      const halfZ = (sin * footprint[0] + cos * footprint[1]) / 2;
+      return boxDistance(point, [placed[0] - halfX, placed[1] - halfZ], [placed[0] + halfX, placed[1] + halfZ]);
+    }),
   );
-}
-
-const HASH = { x: 0x27d4eb2d, z: 0x165667b1, mix: 0x85ebca6b, shift: 13, scale: 2 ** 32 } as const;
-
-function hash(x: number, z: number): number {
-  let value = Math.imul(x, HASH.x) ^ Math.imul(z, HASH.z) ^ PATCH.seed;
-  value = Math.imul(value ^ (value >>> HASH.shift), HASH.mix);
-  return ((value ^ (value >>> HASH.shift)) >>> 0) / HASH.scale;
-}
-
-function valueNoise([x, z]: Point): number {
-  const ix = Math.floor(x);
-  const iz = Math.floor(z);
-  const fx = x - ix;
-  const fz = z - iz;
-  const ux = fx * fx * (3 - 2 * fx);
-  const uz = fz * fz * (3 - 2 * fz);
-  const top = hash(ix, iz) + (hash(ix + 1, iz) - hash(ix, iz)) * ux;
-  const bottom = hash(ix, iz + 1) + (hash(ix + 1, iz + 1) - hash(ix, iz + 1)) * ux;
-  return (top + (bottom - top) * uz) * 2 - 1;
 }
 
 interface TerrainSample {
@@ -97,16 +97,11 @@ function sampleTerrain(point: Point): TerrainSample {
   const track = loopDistance(point, trackLoop) - TRACK.width / 2;
   const depth = smoothstep(BEACH.inland, BEACH.offshore, land);
   const paved = land > 0 ? smoothstep(PAVED.shoulder + PAVED.edge, PAVED.shoulder, track) : 0;
-  const patch = smoothstep(
-    PATCH.threshold,
-    PATCH.threshold + PATCH.edge,
-    valueNoise([point[0] * PATCH.frequency, point[1] * PATCH.frequency]),
-  );
   const grass =
-    smoothstep(GRASS.from, GRASS.to, land) *
+    sampleMask(GRASS_MASK, point) *
+    smoothstep(GRASS.coast, GRASS.coast + GRASS.edge, land) *
     smoothstep(GRASS.trackClearance, GRASS.trackClearance + GRASS.edge, track) *
-    smoothstep(GRASS.padClearance, GRASS.padClearance + GRASS.edge, padDistance(point)) *
-    patch;
+    smoothstep(GRASS.padClearance, GRASS.padClearance + GRASS.edge, padDistance(point));
   return { paved, grass, depth };
 }
 

@@ -2,7 +2,7 @@ import type * as THREE from 'three/webgpu';
 
 import { getGame } from '../../gameContext';
 import { applyIslandTextures } from '../islandTextures';
-import { areaShift } from '../layout/areaPlacement';
+import { areaQuaternion, placedInArea } from '../layout/areaPlacement';
 import { AchievementsArea } from './achievementsArea';
 import { AltarArea } from './altarArea';
 import { forEachAreaModel } from './areaModels';
@@ -57,7 +57,8 @@ const isAreaName = (name: string): name is AreaName => name in AREA_BUILDERS;
 const AREA_NAMES = Object.keys(AREA_BUILDERS).filter(isAreaName);
 
 function buildArea<K extends AreaName>(areas: Areas, name: K, model: THREE.Object3D): void {
-  model.position.add(areaShift(name));
+  model.position.copy(placedInArea(name, model.position));
+  model.quaternion.premultiply(areaQuaternion(name));
   areas[name] = AREA_BUILDERS[name](model);
 }
 

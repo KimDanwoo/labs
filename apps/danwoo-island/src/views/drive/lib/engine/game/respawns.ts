@@ -1,8 +1,8 @@
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
-import { placedInArea } from './world/layout/areaPlacement';
-import { RESPAWN_AREAS } from './world/layout/islandLayout';
+import { areaRotation, placedInArea } from './world/layout/areaPlacement';
+import { type AreaKey, RESPAWN_AREAS } from './world/layout/islandLayout';
 
 export interface Respawn {
   name: string;
@@ -19,11 +19,17 @@ const EXTRA_RESPAWNS = [
 
 const lowerFirst = (value: string): string => value.charAt(0).toLowerCase() + value.slice(1);
 
-function placedRespawn(name: string, x: number, z: number): THREE.Vector3 {
+function respawnArea(name: string): AreaKey {
   const area = RESPAWN_AREAS[name];
   if (!area) throw new Error(`리스폰 ${name}이 어느 구역에 속하는지 정해지지 않았어요.`);
-  return placedInArea(area, new THREE.Vector3(x, SPAWN_HEIGHT, z));
+  return area;
 }
+
+function placedRespawn(name: string, x: number, z: number): THREE.Vector3 {
+  return placedInArea(respawnArea(name), new THREE.Vector3(x, SPAWN_HEIGHT, z));
+}
+
+const respawnTurn = (name: string): number => areaRotation(respawnArea(name));
 
 export class Respawns {
   readonly game = getGame();
@@ -38,11 +44,11 @@ export class Respawns {
       this.#items.set(name, {
         name,
         position: placedRespawn(name, child.position.x, child.position.z),
-        rotation: child.rotation.y,
+        rotation: child.rotation.y + respawnTurn(name),
       });
     }
     for (const { name, x, z, rotation } of EXTRA_RESPAWNS) {
-      this.#items.set(name, { name, position: placedRespawn(name, x, z), rotation });
+      this.#items.set(name, { name, position: placedRespawn(name, x, z), rotation: rotation + respawnTurn(name) });
     }
   }
 

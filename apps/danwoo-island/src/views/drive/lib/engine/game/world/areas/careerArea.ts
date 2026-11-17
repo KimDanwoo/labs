@@ -17,6 +17,7 @@ interface CareerLine {
   readonly hasEnd: boolean;
   readonly stone: THREE.Object3D;
   readonly origin: THREE.Vector3;
+  readonly toLocal: THREE.Matrix4;
   readonly labelReveal: THREE.UniformNode<'float', number>;
   isIn: boolean;
   isUp: boolean;
@@ -46,6 +47,12 @@ const RAISED_THRESHOLD = 1;
 const RESUME_ELEVATION = 1;
 const EMISSIVE_STRENGTH = 1.7;
 const MASK_COLOR = '#251f2b';
+const LINE_AXIS = new THREE.Vector3(0, 0, 1);
+
+function worldToLocalMatrix(object: THREE.Object3D): THREE.Matrix4 {
+  object.updateMatrixWorld(true);
+  return object.matrixWorld.clone().invert();
+}
 
 function isLineColor(value: unknown): value is LineColor {
   return typeof value === 'string' && value in LINE_COLORS;
@@ -96,6 +103,7 @@ export class CareerArea extends Area {
   readonly #lines: CareerLine[];
   readonly #stoneOut: AudioItem;
   readonly #stoneIn: AudioItem;
+  readonly #playerLocal = new THREE.Vector3();
 
   constructor(model: THREE.Object3D) {
     super(model);
@@ -138,7 +146,8 @@ export class CareerArea extends Area {
 
   #createLines(): CareerLine[] {
     const lines = (this.references.items.get('line') ?? []).map((group) => this.#createLine(group));
-    lines.sort((a, b) => b.origin.z - a.origin.z);
+    const along = LINE_AXIS.clone().applyQuaternion(this.model.quaternion);
+    lines.sort((a, b) => b.origin.dot(along) - a.origin.dot(along));
     return lines.map((line, index) => ({ ...line, index }));
   }
 
@@ -161,6 +170,7 @@ export class CareerArea extends Area {
       hasEnd: Boolean(userData.hasEnd),
       stone,
       origin: group.position.clone(),
+      toLocal: worldToLocalMatrix(group),
       labelReveal,
       isIn: false,
       isUp: false,
@@ -192,7 +202,7 @@ export class CareerArea extends Area {
 
   #updateLine(line: CareerLine): void {
     const { player, ticker } = this.game;
-    const delta = line.origin.z - player.position.z;
+    const delta = -this.#playerLocal.copy(player.position).applyMatrix4(line.toLocal).z;
     const isInside = delta > -PADDING && delta < line.size + PADDING * 2;
     if (isInside !== line.isIn) {
       line.isIn = isInside;

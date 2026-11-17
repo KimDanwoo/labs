@@ -58,8 +58,8 @@ export class Area {
       child,
       {},
       {
-        position: child.position.add(this.model.position),
-        rotation: child.quaternion,
+        position: child.position.applyQuaternion(this.model.quaternion).add(this.model.position),
+        rotation: child.quaternion.premultiply(this.model.quaternion),
         sleeping: true,
         mass: numberData(child, 'mass'),
       },
