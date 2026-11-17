@@ -384,11 +384,22 @@ export const SHORE_PATCHES: readonly ShorePatch[] = [
     name: 'bowlingShore',
     outline: [
       [-66, -47],
-      [-53, -47],
-      [-50, -41],
-      [-50, -19],
-      [-53, -13],
+      [-49, -47],
+      [-46, -41],
+      [-46, -19],
+      [-49, -13],
       [-66, -13],
+    ],
+  },
+  {
+    name: 'bowlingWest',
+    outline: [
+      [-92, -44],
+      [-80, -46],
+      [-80, -14],
+      [-92, -16],
+      [-95, -24],
+      [-95, -36],
     ],
   },
   {
@@ -408,24 +419,24 @@ export const WATER_CUTS: readonly ShorePatch[] = [
   {
     name: 'bowlingStrait',
     outline: [
-      [-48, -50],
-      [-43, -50],
-      [-42, -40],
-      [-42, -20],
-      [-43, -10],
-      [-48, -10],
+      [-44, -50],
+      [-39, -50],
+      [-38, -40],
+      [-38, -20],
+      [-39, -10],
+      [-44, -10],
     ],
   },
 ];
 
 export const BRIDGES: readonly BridgeSpan[] = [
   { from: [-38, -42], to: [-38, -31], width: 5 },
-  { from: [-51, -27], to: [-40, -27], width: 5 },
+  { from: [-47, -14], to: [-35, -14], width: 5 },
   { from: [-66, 2], to: [-60, 6], width: 5 },
   { from: [-80.5, 10], to: [-80.5, 20], width: 5 },
   { from: [-61, 33], to: [-53, 27], width: 5 },
   { from: [-60, 64], to: [-51, 71], width: 5 },
-  { from: [-5, 2], to: [3, 2], width: 5 },
+  { from: [-9, 12], to: [4, 12], width: 5 },
   { from: [26, 81], to: [37, 75], width: 5 },
 ];
 
@@ -452,11 +463,11 @@ export const RESPAWN_AREAS: Readonly<Record<string, AreaKey>> = {
 };
 
 export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
-  bowling: { original: [6.3, 66], placed: [-74, -30], footprint: [43, 25] },
+  bowling: { original: [6.3, 66], placed: [-70, -30], footprint: [43, 25] },
   achievements: { original: [70.75, 8.9], placed: [36, 60], footprint: [10, 14] },
   social: { original: [29, -25.2], placed: [-30, 4], footprint: [23, 18] },
   projects: { original: [34.8, 9.9], placed: [10, -62], footprint: [12, 12] },
-  lab: { original: [12.3, 15.55], placed: [-36, -28], footprint: [9, 10] },
+  lab: { original: [12.3, 15.55], placed: [-29, -30], footprint: [9, 10] },
   cookie: { original: [12.8, 34.75], placed: [-46, 24], footprint: [8, 10] },
   career: { original: [26.3, -1.75], placed: [-72, 36], footprint: [9, 18] },
   behindTheScene: { original: [50.65, -11.3], placed: [-70, 56], footprint: [8, 12] },
