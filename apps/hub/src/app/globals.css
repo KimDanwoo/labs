@@ -18,6 +18,17 @@ body {
   overflow-x: clip;
 }
 
+/* 레이어 안에 둬야 Tailwind 유틸리티(outline-hidden 등)가 덮어쓸 수 있다 */
+@layer base {
+  html {
+    scroll-padding-top: var(--spacing-3xl);
+  }
+
+  :focus-visible {
+    @apply rounded-sm outline-2 outline-offset-2 outline-ring;
+  }
+}
+
 .font-display {
   font-family: var(--font-display);
 }
@@ -87,117 +98,8 @@ body {
   animation: text-flow 6s ease-in-out infinite alternate;
 }
 
-@property --border-angle {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes border-spin {
-  to {
-    --border-angle: 360deg;
-  }
-}
-
-.spotlight-host {
-  --mx: 50%;
-  --my: 50%;
-  --tilt-x: 0deg;
-  --tilt-y: 0deg;
-  --shift-x: 0px;
-  --shift-y: 0px;
-  --spotlight-radius: 22rem;
-}
-
-/* 측정용 링크(host)는 그대로 두고 안쪽 레이어만 기울여 좌표 계산이 흔들리지 않게 한다 */
-.spotlight-card {
-  position: relative;
-  isolation: isolate;
-  transform: perspective(60rem) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.spotlight-host:hover .spotlight-card {
-  transition-duration: 0.15s;
-}
-
-.spotlight-card::before,
-.spotlight-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease-out;
-}
-
-.spotlight-card::before {
-  background: radial-gradient(
-    var(--spotlight-radius) circle at var(--mx) var(--my),
-    color-mix(in oklab, var(--color-primary) 28%, transparent),
-    transparent 60%
-  );
-}
-
-.spotlight-card::after {
-  padding: 1px;
-  background: conic-gradient(
-    from var(--border-angle),
-    transparent 0deg,
-    var(--color-primary) 70deg,
-    var(--color-primary-accent) 130deg,
-    transparent 200deg
-  );
-  mask:
-    linear-gradient(black 0 0) content-box,
-    linear-gradient(black 0 0);
-  mask-composite: exclude;
-}
-
-.spotlight-host:hover .spotlight-card::before,
-.spotlight-host:hover .spotlight-card::after,
-.spotlight-host:focus-visible .spotlight-card::before,
-.spotlight-host:focus-visible .spotlight-card::after {
-  opacity: 1;
-}
-
-.spotlight-host:hover .spotlight-card::after {
-  animation: border-spin 3s linear infinite;
-}
-
-.spotlight-cover {
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.spotlight-host:hover .spotlight-cover {
-  transform: translate(var(--shift-x), var(--shift-y)) scale(1.08);
-}
-
 .fade-up {
   animation: fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes reveal-up {
-  from {
-    opacity: 0;
-    translate: 0 var(--spacing-2xl);
-    scale: 0.94;
-  }
-  to {
-    opacity: 1;
-    translate: 0 0;
-    scale: 1;
-  }
-}
-
-@keyframes hero-recede {
-  to {
-    opacity: 0.25;
-    translate: 0 var(--spacing-2xl);
-    scale: 0.96;
-  }
 }
 
 @keyframes header-condense {
@@ -206,24 +108,116 @@ body {
   }
 }
 
-@supports (animation-timeline: view()) {
-  .scroll-reveal {
-    animation: reveal-up linear both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 30%;
-    animation-delay: 0s !important;
-  }
-
-  .hero-recede {
-    animation: hero-recede linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0 70vh;
-  }
-
+@supports (animation-timeline: scroll()) {
   .header-condense {
     animation: header-condense linear both;
     animation-timeline: scroll(root);
     animation-range: 0 var(--spacing-3xl);
+  }
+}
+
+/* 테마 전환: 색 토큰을 색 타입으로 등록해 두면 <html>에서 값이 바뀔 때 토큰 자체가 서서히 넘어간다.
+   요소마다 color를 전환시키면 상속받는 글자색이 프레임마다 다시 시작돼 제각각 늦게 끝난다 */
+@property --color-background {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-primary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-primary-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-primary-foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-secondary-foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-muted {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-muted-foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-card-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-glass {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-glass-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-glow {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-ring {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-info {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@layer base {
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      transition-property:
+        --color-background, --color-foreground, --color-primary, --color-primary-accent, --color-primary-foreground,
+        --color-secondary-foreground, --color-muted, --color-muted-foreground, --color-border, --color-card-border,
+        --color-glass, --color-glass-border, --color-glow, --color-ring, --color-info;
+      transition-duration: 300ms;
+      transition-timing-function: ease;
+    }
   }
 }
 
@@ -232,20 +226,9 @@ body {
   .hero-glow,
   .word-reveal,
   .text-flow,
-  .scroll-reveal,
-  .hero-recede,
   .header-condense {
     animation: none !important;
     opacity: 1;
-  }
-
-  .spotlight-card,
-  .spotlight-host:hover .spotlight-cover {
-    transform: none;
-  }
-
-  .spotlight-host:hover .spotlight-card::after {
-    animation: none;
   }
 
   *,

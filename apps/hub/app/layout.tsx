@@ -2,16 +2,10 @@ import '@app/globals.css';
 import { AppProviders } from '@app/providers/AppProviders';
 import '@tokens/css/fonts.css';
 import type { Metadata, Viewport } from 'next';
-import { Geist_Mono } from 'next/font/google';
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
 
 const SITE_URL = 'https://lab.danwoo.dev';
 const SITE_NAME = 'Danwoo Lab';
-const SITE_DESCRIPTION = 'AI로 아이디어를 현실로 만드는 프론트엔드 개발자의 실험실';
+const SITE_DESCRIPTION = '아이디어를 구현해요';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -49,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
