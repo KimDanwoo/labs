@@ -402,17 +402,17 @@ export const RESPAWN_AREAS: Readonly<Record<string, AreaKey>> = {
 };
 
 export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
-  bowling: { original: [6.3, 66], placed: [-76, -28], footprint: [43, 25], rotation: Math.PI / 2 },
-  achievements: { original: [70.75, 8.9], placed: [-78, 3], footprint: [10, 14] },
-  social: { original: [29, -25.2], placed: [-32, 2], footprint: [23, 18] },
-  projects: { original: [34.8, 9.9], placed: [-20, -12], footprint: [12, 12] },
-  lab: { original: [12.3, 15.55], placed: [-37, -26], footprint: [9, 10] },
-  cookie: { original: [12.8, 34.75], placed: [-47, 22], footprint: [8, 10] },
-  career: { original: [26.3, -1.75], placed: [-72, 40], footprint: [9, 18], rotation: -Math.PI / 2 },
-  behindTheScene: { original: [50.65, -11.3], placed: [-52, -2], footprint: [8, 12] },
-  timeMachine: { original: [-55.15, -67.3], placed: [-50, -36], footprint: [4, 5] },
+  bowling: { original: [6.3, 66], placed: [-76, -30], footprint: [43, 25], rotation: Math.PI / 2 },
+  achievements: { original: [70.75, 8.9], placed: [34, 46], footprint: [10, 14] },
+  social: { original: [29, -25.2], placed: [-30, 4], footprint: [23, 18] },
+  projects: { original: [34.8, 9.9], placed: [10, -62], footprint: [12, 12] },
+  lab: { original: [12.3, 15.55], placed: [-36, -28], footprint: [9, 10] },
+  cookie: { original: [12.8, 34.75], placed: [-46, 24], footprint: [8, 10] },
+  career: { original: [26.3, -1.75], placed: [-72, 36], footprint: [9, 18], rotation: -Math.PI / 2 },
+  behindTheScene: { original: [50.65, -11.3], placed: [-70, 56], footprint: [8, 12] },
+  timeMachine: { original: [-55.15, -67.3], placed: [46, -62], footprint: [4, 5] },
   landing: { original: [50.2, 38.3], placed: [-24, 77], footprint: [21, 20] },
   toilet: { original: [65.75, 63.7], placed: [5, 74], footprint: [14, 14] },
-  altar: { original: [75.35, -27.35], placed: [56, 89], footprint: [14, 15] },
+  altar: { original: [75.35, -27.35], placed: [32, -12], footprint: [14, 15] },
   circuit: { original: [-11.3, -0.5], placed: [10, 3], footprint: [24, 24] },
 };
