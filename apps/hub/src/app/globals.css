@@ -116,6 +116,111 @@ body {
   }
 }
 
+/* 테마 전환: 색 토큰을 색 타입으로 등록해 두면 <html>에서 값이 바뀔 때 토큰 자체가 서서히 넘어간다.
+   요소마다 color를 전환시키면 상속받는 글자색이 프레임마다 다시 시작돼 제각각 늦게 끝난다 */
+@property --color-background {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-primary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-primary-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-primary-foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-secondary-foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-muted {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-muted-foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-card-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-glass {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-glass-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-glow {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-ring {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --color-info {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@layer base {
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      transition-property:
+        --color-background, --color-foreground, --color-primary, --color-primary-accent, --color-primary-foreground,
+        --color-secondary-foreground, --color-muted, --color-muted-foreground, --color-border, --color-card-border,
+        --color-glass, --color-glass-border, --color-glow, --color-ring, --color-info;
+      transition-duration: 300ms;
+      transition-timing-function: ease;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fade-up,
   .hero-glow,
