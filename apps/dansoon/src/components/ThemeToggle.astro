@@ -74,6 +74,8 @@ import Icon from '~/components/Icon.astro';
     );
   }
 
+  let latestTransition: ViewTransition | undefined;
+
   function changeTheme(trigger: Element) {
     if (!canAnimateThemeChange()) {
       applyTheme();
@@ -82,15 +84,17 @@ import Icon from '~/components/Icon.astro';
 
     const root = document.documentElement;
     const direction: IrisDirection = root.classList.contains('dark') ? 'expand' : 'collapse';
-    const transitionClasses =
-      direction === 'collapse' ? [THEME_TRANSITION_CLASS, COLLAPSE_CLASS] : [THEME_TRANSITION_CLASS];
-    root.classList.add(...transitionClasses);
+    root.classList.add(THEME_TRANSITION_CLASS);
+    root.classList.toggle(COLLAPSE_CLASS, direction === 'collapse');
     const transition = document.startViewTransition(applyTheme);
+    latestTransition = transition;
     // 페이지 이동 전환과 겹쳐 건너뛰면 ready가 거절된다 — 테마는 이미 바뀌었으므로 애니메이션만 생략한다
     const iris = transition.ready.then(() => animateIris(direction, centerOf(trigger))).catch(() => undefined);
     // fill: forwards 애니메이션을 남겨 두면 다음 전환의 같은 의사 요소에 다시 걸려 화면이 비므로 끝나면 지운다
+    // 전환 중에 다시 누르면 앞 전환은 건너뛰어져 finished가 먼저 끝난다 — 뒤 전환이 쓰는 클래스를 지우지 않도록 마지막 전환만 정리한다
+    // https://developer.mozilla.org/en-US/docs/Web/API/ViewTransition/finished
     transition.finished.finally(async () => {
-      root.classList.remove(...transitionClasses);
+      if (latestTransition === transition) root.classList.remove(THEME_TRANSITION_CLASS, COLLAPSE_CLASS);
       (await iris)?.cancel();
     });
   }
