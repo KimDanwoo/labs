@@ -14,7 +14,7 @@ import { useSnackbar } from '@shared/lib/useSnackbar';
 import { BottomSheet } from '@shared/ui/bottom-sheet';
 import { Snackbar } from '@shared/ui/Snackbar';
 import { useAtomValue } from 'jotai';
-import { memo, useEffect, useRef } from 'react';
+import { memo, useCallback } from 'react';
 import { useSaveGameRecord } from '../../model/game-record/hooks/useSaveGameRecord';
 import { GoogleSignInButton } from '../auth/GoogleSignInButton';
 import { FailureIcon } from '../sudoku-game/FailureIcon';
@@ -28,24 +28,12 @@ export const GameResultSheet = memo(() => {
   const mistakeCount = useAtomValue(mistakeCountAtom);
 
   const user = useAtomValue(userAtom);
-  const { save, isSaving, pointResult } = useSaveGameRecord();
-  const saveRef = useRef(save);
-  useEffect(() => {
-    saveRef.current = save;
-  }, [save]);
-
-  const { isOpen: isSheetOpen, dismiss } = useDismissible(isCompleted);
-
   const snackbar = useSnackbar();
   const { show: showSnackbar } = snackbar;
+  const handleSaved = useCallback(() => showSnackbar('기록이 저장되었습니다', 'success'), [showSnackbar]);
+  const { save, isSaving, error: saveError, pointResult } = useSaveGameRecord({ onSaved: handleSaved });
 
-  useEffect(() => {
-    if (isCompleted && isSuccess && user) {
-      saveRef.current().then((id) => {
-        if (id) showSnackbar('기록이 저장되었습니다', 'success');
-      });
-    }
-  }, [isCompleted, isSuccess, user, showSnackbar]);
+  const { isOpen: isSheetOpen, dismiss } = useDismissible(isCompleted);
 
   return (
     <>
@@ -86,6 +74,19 @@ export const GameResultSheet = memo(() => {
 
             {isSaving && (
               <p className={cn('text-xs animate-pulse', 'text-[rgb(var(--color-text-tertiary))]')}>기록 저장 중...</p>
+            )}
+
+            {saveError && !isSaving && (
+              <div className="space-y-2 pt-2">
+                <p className={cn('text-sm', 'text-[rgb(var(--color-error))]')}>기록을 저장하지 못했어요.</p>
+                <button
+                  type="button"
+                  onClick={save}
+                  className={cn('text-sm font-bold underline underline-offset-4', 'text-[rgb(var(--color-accent))]')}
+                >
+                  다시 저장하기
+                </button>
+              </div>
             )}
 
             {!user && !isSaving && (

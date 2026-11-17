@@ -112,4 +112,34 @@ describe('useSaveGameRecord', () => {
     expect(saveGameRecordMock).toHaveBeenCalledTimes(1);
     expect(gameStore.get(isRecordSavedAtom)).toBe(true);
   });
+
+  it('저장에 성공하면 한 번만 알린다', async () => {
+    saveGameRecordMock.mockResolvedValue('record-id');
+    const onSaved = vi.fn();
+    renderHook(() => useSaveGameRecord({ onSaved }), { wrapper });
+
+    act(() => winGame(FIRST_GAME));
+    await waitFor(() => expect(gameStore.get(isRecordSavedAtom)).toBe(true));
+
+    expect(onSaved).toHaveBeenCalledTimes(1);
+  });
+
+  it('저장에 실패하면 오류를 알리고, 다시 저장하면 저장된다', async () => {
+    saveGameRecordMock.mockRejectedValueOnce(new Error('offline')).mockResolvedValue('record-id');
+    const onSaved = vi.fn();
+    const { result } = renderHook(() => useSaveGameRecord({ onSaved }), { wrapper });
+
+    act(() => winGame(FIRST_GAME));
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+    expect(gameStore.get(isRecordSavedAtom)).toBe(false);
+    expect(onSaved).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.save();
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(gameStore.get(isRecordSavedAtom)).toBe(true);
+    expect(onSaved).toHaveBeenCalledTimes(1);
+  });
 });
