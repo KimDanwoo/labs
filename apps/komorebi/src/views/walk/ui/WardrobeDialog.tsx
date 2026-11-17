@@ -16,6 +16,11 @@ export function WardrobeDialog({ isOpen, appearance, onChange, onClose }: Props)
   const titleId = useId();
   const [isChanging, setIsChanging] = useState(false);
   const [error, setError] = useState('');
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (wasOpen !== isOpen) {
+    setWasOpen(isOpen);
+    setError('');
+  }
   async function choose(next: Appearance) {
     if (isChanging) return;
     setIsChanging(true);
