@@ -9,9 +9,11 @@ import {
 import {
   AREA_ANCHORS,
   ISLANDS,
-  type Point,
+  SHORE_PATCHES,
   TRACK,
+  WATER_CUTS,
   WORLD_SIZE,
+  type Point,
 } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
 
 const CURVE_SAMPLES = 12;
@@ -69,7 +71,9 @@ const TRACK_BED = 4.5;
 export function landDistance(point: Point): number {
   const islands = islandLoops.map((loop) => signedLoopDistance(point, loop));
   const trackBed = TRACK.width / 2 + TRACK_BED - loopDistance(point, trackLoop);
-  const land = Math.max(trackBed, ...islands);
+  const patches = SHORE_PATCHES.map(({ outline }) => signedLoopDistance(point, outline));
+  const cuts = WATER_CUTS.map(({ outline }) => -signedLoopDistance(point, outline));
+  const land = Math.min(Math.max(trackBed, ...islands, ...patches), ...cuts);
   return Math.min(land, boxDistance(point, TRACK.waterJump.from, TRACK.waterJump.to));
 }
 
