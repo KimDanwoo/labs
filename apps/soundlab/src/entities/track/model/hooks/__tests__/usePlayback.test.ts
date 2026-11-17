@@ -5,7 +5,7 @@ import test, { type TestContext } from 'node:test';
 import { act, createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { ScWidget } from '../../../api/widget';
-import { currentIndexAtom, frameState } from '../../store/playback';
+import { currentIndexAtom, frameState, isPlayingAtom } from '../../store/playback';
 import type { Track } from '../../types/track';
 import { useKeyboard } from '../useKeyboard';
 import { usePlayback, type Playback } from '../usePlayback';
@@ -271,4 +271,54 @@ test('engine readiness alone never starts a song', async (t) => {
   await app.emit('ready');
   assert.deepEqual(app.skips, []);
   assert.deepEqual(app.loads, []);
+});
+
+test('pausing while a track switch is still in flight pauses the new track when it starts', async (t) => {
+  const app = await player(t);
+  await app.emit('ready');
+  await app.select(0);
+  await app.emit('play');
+  await app.select(1);
+  await app.select(1);
+  const pausesBeforeSwitchLands = app.pauseCount();
+
+  await app.emit('play');
+
+  assert.equal(app.pauseCount(), pausesBeforeSwitchLands + 1);
+
+  await app.emit('pause');
+  assert.equal(app.store.get(isPlayingAtom), false);
+});
+
+test('pressing play again during a track switch lets the new track play', async (t) => {
+  const app = await player(t);
+  await app.emit('ready');
+  await app.select(0);
+  await app.emit('play');
+  await app.select(1);
+  await app.select(1);
+  await app.emit('pause');
+  await app.select(1);
+  const pausesBeforeSwitchLands = app.pauseCount();
+
+  await app.emit('play');
+
+  assert.equal(app.pauseCount(), pausesBeforeSwitchLands);
+  assert.equal(app.store.get(isPlayingAtom), true);
+});
+
+test('playing a highlight during a track switch cancels an earlier pause', async (t) => {
+  const app = await player(t);
+  await app.emit('ready');
+  await app.select(0);
+  await app.emit('play');
+  await app.select(1);
+  await app.select(1);
+  await app.playFrom(1000);
+  const pausesBeforeSwitchLands = app.pauseCount();
+
+  await app.emit('play');
+
+  assert.equal(app.pauseCount(), pausesBeforeSwitchLands);
+  assert.equal(app.store.get(isPlayingAtom), true);
 });
