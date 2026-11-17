@@ -14,6 +14,18 @@ const GISCUS = {
 <script>
   const GISCUS_ORIGIN = 'https://giscus.app';
   const themeName = () => (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+  const giscusFrame = () => document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+
+  const sendTheme = () =>
+    giscusFrame()?.contentWindow?.postMessage({ giscus: { setConfig: { theme: themeName() } } }, GISCUS_ORIGIN);
+
+  const isFrameResize = (data: unknown) =>
+    typeof data === 'object' &&
+    data !== null &&
+    'giscus' in data &&
+    typeof data.giscus === 'object' &&
+    data.giscus !== null &&
+    'resizeHeight' in data.giscus;
 
   function mountGiscus() {
     const container = document.querySelector<HTMLElement>('.giscus[data-giscus-config]');
@@ -40,8 +52,12 @@ const GISCUS = {
   }
 
   document.addEventListener('astro:page-load', mountGiscus);
-  document.addEventListener('themechange', () => {
-    const frame = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
-    frame?.contentWindow?.postMessage({ giscus: { setConfig: { theme: themeName() } } }, GISCUS_ORIGIN);
+  document.addEventListener('themechange', sendTheme);
+  // 댓글 iframe은 화면에 들어와야 뜨고(data-loading: lazy) 로그아웃하면 처음 주소로 다시 뜬다. 뜨기 전에 보낸 테마는
+  // 버려지므로, iframe이 떴다고 알리는 높이 메시지를 받을 때마다 지금 테마를 다시 보낸다
+  // https://github.com/giscus/giscus/blob/main/client.ts
+  window.addEventListener('message', (event: MessageEvent<unknown>) => {
+    const isFromFrame = event.origin === GISCUS_ORIGIN && event.source === giscusFrame()?.contentWindow;
+    if (isFromFrame && isFrameResize(event.data)) sendTheme();
   });
 </script>
