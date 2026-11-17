@@ -27,8 +27,8 @@ const NO_SELECTION: ReadonlySet<string> = new Set();
 export function QuestionsListPage() {
   const params = useQuestionListParams();
   const { page, category, difficulty, search } = params;
-  const [selectedIds, setSelectedIds] = useState(NO_SELECTION);
-  const clearSelection = () => setSelectedIds(NO_SELECTION);
+  const [checkedIds, setCheckedIds] = useState(NO_SELECTION);
+  const clearSelection = () => setCheckedIds(NO_SELECTION);
 
   const { data: categories = [] } = useQuery({
     queryKey: ['admin-categories'],
@@ -45,7 +45,8 @@ export function QuestionsListPage() {
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const categoryMap = new Map(categories.map((item) => [item.id, item]));
 
-  const selectedQuestions = questions.filter((question) => selectedIds.has(question.id));
+  const selectedQuestions = questions.filter((question) => checkedIds.has(question.id));
+  const selectedIds: ReadonlySet<string> = new Set(selectedQuestions.map((question) => question.id));
   const countVisible = (field: QuestionVisibilityField) =>
     selectedQuestions.filter((question) => question[field]).length;
   const hasSelection = selectedIds.size > 0;
@@ -65,7 +66,7 @@ export function QuestionsListPage() {
     mutate(
       () => deleteQuestion(id),
       '삭제 실패',
-      () => setSelectedIds((previous) => new Set([...previous].filter((selectedId) => selectedId !== id))),
+      () => setCheckedIds((previous) => new Set([...previous].filter((checkedId) => checkedId !== id))),
     );
   }
 
@@ -158,7 +159,7 @@ export function QuestionsListPage() {
         categoryMap={categoryMap}
         loading={!list}
         selectedIds={selectedIds}
-        onSelectionChange={setSelectedIds}
+        onSelectionChange={setCheckedIds}
         onDelete={handleDelete}
       />
 
