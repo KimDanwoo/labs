@@ -1,6 +1,5 @@
 import * as THREE from 'three/webgpu';
 
-import { type Point } from './layout/islandLayout';
 import { isOverWaterJump, sideOf, type TrackSample } from './layout/trackPath';
 
 export interface StripEdge {
@@ -42,8 +41,4 @@ export function stripGeometry(samples: readonly TrackSample[], { from, to }: Str
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
   return geometry;
-}
-
-export function transformedPoint(point: Point, matrix: THREE.Matrix4): THREE.Vector3 {
-  return new THREE.Vector3(point[0], 0, point[1]).applyMatrix4(matrix);
 }

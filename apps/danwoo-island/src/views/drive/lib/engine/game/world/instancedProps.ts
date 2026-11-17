@@ -17,11 +17,6 @@ export interface InstancedPropsOptions {
 
 const PROP_PHYSICS = { friction: 0.7, mass: 0.1, waterGravityMultiplier: -1 } as const;
 
-export function modelColliders(base: THREE.Object3D): readonly ColliderDescription[] {
-  const [, physical] = getGame().objects.getFromModel(base, {}, {});
-  return physical?.colliders ?? [];
-}
-
 export class InstancedProps {
   readonly instancedGroup: InstancedGroup;
 

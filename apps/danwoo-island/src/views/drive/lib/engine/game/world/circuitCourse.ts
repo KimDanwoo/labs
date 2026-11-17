@@ -49,6 +49,11 @@ function placeAt(object: THREE.Object3D, { position, yaw }: Placement, toLocal: 
   object.rotation.set(0, yaw - turn, 0, 'YXZ');
 }
 
+function placeOnGround(object: THREE.Object3D, placement: Placement, toLocal: THREE.Matrix4, turn: number): void {
+  placeAt(object, placement, toLocal, turn);
+  object.position.y = placement.position.clone().applyMatrix4(toLocal).y;
+}
+
 function sampleAt(samples: readonly TrackSample[], distance: number): TrackSample {
   const length = samples.length * SAMPLE_SPACING;
   const wrapped = ((distance % length) + length) % length;
@@ -132,7 +137,7 @@ function rebuildCheckpoints(model: THREE.Object3D, samples: readonly TrackSample
     const gate = new THREE.Object3D();
     gate.name = `refCheckpoints${String(index).padStart(3, '0')}`;
     gate.scale.set(TRACK.width + CHECKPOINT_MARGIN, 1, 1);
-    placeAt(gate, gatePlacement(sampleAt(samples, distance)), toLocal, turn);
+    placeOnGround(gate, gatePlacement(sampleAt(samples, distance)), toLocal, turn);
     model.add(gate);
   });
 }

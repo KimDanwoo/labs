@@ -64,9 +64,12 @@ export function boxDistance(point: Point, from: Point, to: Point): number {
   return Math.hypot(Math.max(dx, 0), Math.max(dz, 0)) + Math.min(Math.max(dx, dz), 0);
 }
 
+const TRACK_BED = 4.5;
+
 export function landDistance(point: Point): number {
   const islands = islandLoops.map((loop) => signedLoopDistance(point, loop));
-  const land = Math.max(...islands);
+  const trackBed = TRACK.width / 2 + TRACK_BED - loopDistance(point, trackLoop);
+  const land = Math.max(trackBed, ...islands);
   return Math.min(land, boxDistance(point, TRACK.waterJump.from, TRACK.waterJump.to));
 }
 

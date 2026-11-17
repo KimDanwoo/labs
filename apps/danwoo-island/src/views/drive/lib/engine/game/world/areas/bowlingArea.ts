@@ -66,6 +66,12 @@ const BUMPER_DURATION = 1;
 const ZERO = { x: 0, y: 0, z: 0 } as const;
 const LANE_AXIS = new THREE.Vector3(1, 0, 0);
 
+function worldPose(object: THREE.Object3D): THREE.Object3D {
+  const pose = new THREE.Object3D();
+  object.matrixWorld.decompose(pose.position, pose.quaternion, pose.scale);
+  return pose;
+}
+
 function isMesh(object: THREE.Object3D): object is THREE.Mesh {
   return object instanceof THREE.Mesh;
 }
@@ -213,7 +219,9 @@ export class BowlingArea extends Area {
   }
 
   #createPins(): { pins: Pin[]; group: InstancedGroup } {
-    const references = InstancedGroup.getReferencesFromChildren(this.requireReference('pinPositions').children);
+    const pinPositions = this.requireReference('pinPositions');
+    pinPositions.updateMatrixWorld(true);
+    const references = InstancedGroup.getReferencesFromChildren(pinPositions.children.map(worldPose));
     const basePin = this.requireReference('pinPhysicalDynamic');
     basePin.castShadow = true;
     basePin.receiveShadow = true;
