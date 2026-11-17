@@ -1,26 +1,23 @@
 import { getGame } from '../gameContext';
 import { type Areas, createAreas } from './areas/areas';
-import type { Benches } from './benches';
-import type { Bricks } from './bricks';
-import type { Bushes } from './bushes';
+import { Bushes } from './bushes';
 import { buildCircuitJumps } from './circuitJumps';
 import { CircuitTrack } from './circuitTrack';
 import { Confetti } from './confetti';
-import type { ExplosiveCrates } from './explosiveCrates';
-import type { Fences } from './fences';
+import { ExplosiveCrates } from './explosiveCrates';
 import { Fireballs } from './fireballs';
 import { Floor } from './floor';
-import type { Flowers } from './flowers';
+import { Flowers } from './flowers';
 import { Grass } from './grass';
 import { Grid } from './grid';
 import { Intro } from './intro';
 import { placeIslandBridges } from './islandBridges';
 import type { IslandTrees } from './islandTrees';
-import type { Lanterns } from './lanterns';
+import { Lanterns } from './lanterns';
 import { Lightnings } from './lightnings';
-import type { PoleLights } from './poleLights';
+import { PoleLights } from './poleLights';
 import { RainLines } from './rainLines';
-import type { Scenery } from './scenery';
+import { placeShoreRocks, plantScatteredTrees, replantScatteredModels } from './scatterPlanting';
 import { pruneShadowCasters } from './shadowCasters';
 import { VisualVehicle } from './visualVehicle';
 import { WaterSurface } from './waterSurface';
@@ -42,13 +39,9 @@ export class World {
   bushes: Bushes | null = null;
   islandTrees: IslandTrees | null = null;
   flowers: Flowers | null = null;
-  bricks: Bricks | null = null;
-  fences: Fences | null = null;
-  benches: Benches | null = null;
   explosiveCrates: ExplosiveCrates | null = null;
   poleLights: PoleLights | null = null;
   lanterns: Lanterns | null = null;
-  scenery: Scenery | null = null;
   circuitTrack: CircuitTrack | null = null;
   areas: Areas | null = null;
 
@@ -62,6 +55,14 @@ export class World {
     this.rain = new RainLines();
     this.lightnings = new Lightnings();
     this.fireballs = new Fireballs();
+    replantScatteredModels();
+    this.bushes = new Bushes();
+    this.islandTrees = plantScatteredTrees();
+    this.flowers = new Flowers();
+    this.explosiveCrates = new ExplosiveCrates();
+    this.poleLights = new PoleLights();
+    this.lanterns = new Lanterns();
+    placeShoreRocks();
     placeIslandBridges();
     this.circuitTrack = new CircuitTrack();
     buildCircuitJumps();
@@ -85,8 +86,6 @@ export class World {
     bowling?.restart();
     cookie?.refreshAfterReset();
     social?.refreshAfterReset();
-    for (const decoration of [this.benches, this.fences, this.bricks, this.lanterns]) {
-      if (decoration) decoration.instancedGroup.needsUpdate = true;
-    }
+    if (this.lanterns) this.lanterns.instancedGroup.needsUpdate = true;
   }
 }

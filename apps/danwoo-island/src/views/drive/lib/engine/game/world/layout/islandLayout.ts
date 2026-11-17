@@ -381,7 +381,7 @@ export const BRIDGES: readonly BridgeSpan[] = [
   { from: [-80.5, 10], to: [-80.5, 20], width: 5 },
   { from: [-61, 33], to: [-53, 27], width: 5 },
   { from: [-60, 64], to: [-51, 71], width: 5 },
-  { from: [-5, 2], to: [7, 2], width: 5 },
+  { from: [-5, 2], to: [3, 2], width: 5 },
   { from: [26, 81], to: [37, 75], width: 5 },
 ];
 
@@ -420,5 +420,5 @@ export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
   landing: { original: [50.2, 38.3], placed: [-24, 77], footprint: [21, 20] },
   toilet: { original: [65.75, 63.7], placed: [5, 74], footprint: [14, 14] },
   altar: { original: [75.35, -27.35], placed: [32, -12], footprint: [14, 15] },
-  circuit: { original: [-11.3, -0.5], placed: [16.8, 23.9], footprint: [24, 24], rotation: -3.13 },
+  circuit: { original: [-11.3, -0.5], placed: [16.8, 23.9], footprint: [30, 30], rotation: -3.13 },
 };

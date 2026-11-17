@@ -45,6 +45,8 @@ const ISLAND_MODELS = {
   jumpTakeoff: 'areas/island/models/jumpTakeoff.glb',
   jumpLanding: 'areas/island/models/jumpLanding.glb',
   jumpKicker: 'areas/island/models/jumpKicker.glb',
+  bridgeDeck: 'areas/island/models/bridgeDeck.glb',
+  bridgeEnd: 'areas/island/models/bridgeEnd.glb',
   steppingStoneA: 'areas/island/models/steppingStoneA.glb',
   steppingStoneB: 'areas/island/models/steppingStoneB.glb',
   steppingStoneC: 'areas/island/models/steppingStoneC.glb',

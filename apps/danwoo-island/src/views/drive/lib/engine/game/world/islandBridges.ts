@@ -1,11 +1,11 @@
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
-import { createParts } from './islandGeometry';
+import { islandModelGeometry, islandPaletteMaterial } from './islandModels';
 import { BRIDGES, type BridgeSpan } from './layout/islandLayout';
 
-const DECK = { top: 0.12, thickness: 0.3, landing: 3, plank: 0.55, gap: 0.08 } as const;
-const RAIL = { radius: 0.07, height: 0.85, inset: 0.2, postEvery: 2.4 } as const;
+const DECK = { top: 0.12, thickness: 0.3, landing: 3, segment: 2.4 } as const;
 const UP = new THREE.Vector3(0, 1, 0);
 
 interface SpanFrame {
@@ -24,33 +24,31 @@ function spanFrame({ from, to }: BridgeSpan): SpanFrame {
   };
 }
 
-function bridgeVisual(width: number, length: number): THREE.Group {
-  const parts = createParts();
-  const planks = Math.floor(length / (DECK.plank + DECK.gap));
-  const start = -((planks - 1) * (DECK.plank + DECK.gap)) / 2;
-  for (let index = 0; index < planks; index += 1) {
-    const z = start + index * (DECK.plank + DECK.gap);
-    parts.box(index % 2 ? 'wood' : 'woodDark', [width, DECK.thickness, DECK.plank], {
-      position: [0, DECK.top - DECK.thickness / 2, z],
-    });
-  }
-  const railX = width / 2 - RAIL.inset;
-  const half = length / 2;
-  for (const side of [-1, 1]) {
-    const x = side * railX;
-    parts.rod('timber', RAIL.radius, [x, RAIL.height, -half], [x, RAIL.height, half]);
-    for (let z = -half; z <= half; z += RAIL.postEvery)
-      parts.rod('timber', RAIL.radius, [x, 0, z], [x, RAIL.height, z]);
-  }
-  return parts.build();
+function bridgeGeometry(length: number): THREE.BufferGeometry {
+  const count = Math.max(1, Math.round(length / DECK.segment));
+  const stretch = length / (count * DECK.segment);
+  const decks = Array.from({ length: count }, (_, index) => {
+    const z = (index + 0.5) * DECK.segment * stretch - length / 2;
+    const matrix = new THREE.Matrix4().makeTranslation(0, 0, z).scale(new THREE.Vector3(1, 1, stretch));
+    return islandModelGeometry('bridgeDeck', { matrix });
+  });
+  const ends = [-1, 1].map((side) =>
+    islandModelGeometry('bridgeEnd', { matrix: new THREE.Matrix4().makeTranslation(0, 0, (side * length) / 2) }),
+  );
+  const merged = mergeGeometries([...decks, ...ends]);
+  if (!merged) throw new Error('다리 형상을 합치지 못했어요.');
+  return merged;
 }
 
 export function placeIslandBridges(): void {
   const { objects } = getGame();
+  const material = islandPaletteMaterial('bridgeDeck');
   for (const span of BRIDGES) {
     const { center, length, rotation } = spanFrame(span);
+    const mesh = new THREE.Mesh(bridgeGeometry(length), material);
+    mesh.name = 'islandBridge';
     objects.add(
-      { model: bridgeVisual(span.width, length) },
+      { model: mesh },
       {
         type: 'fixed',
         position: center,
