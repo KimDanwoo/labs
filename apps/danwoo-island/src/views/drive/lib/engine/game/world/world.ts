@@ -3,6 +3,7 @@ import { type Areas, createAreas } from './areas/areas';
 import type { Benches } from './benches';
 import type { Bricks } from './bricks';
 import type { Bushes } from './bushes';
+import { buildCircuitJumps } from './circuitJumps';
 import { CircuitTrack } from './circuitTrack';
 import { Confetti } from './confetti';
 import type { ExplosiveCrates } from './explosiveCrates';
@@ -63,6 +64,7 @@ export class World {
     this.fireballs = new Fireballs();
     placeIslandBridges();
     this.circuitTrack = new CircuitTrack();
+    buildCircuitJumps();
     this.areas = createAreas();
     pruneShadowCasters(getGame().scene);
   }

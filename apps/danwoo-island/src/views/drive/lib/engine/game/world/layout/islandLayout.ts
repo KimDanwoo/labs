@@ -92,11 +92,17 @@ export const TRACK = {
     [10.8, -10.6],
     [11.1, 0.2],
   ],
-  waterJump: { from: [2, -12], to: [22, -6] },
+  waterJump: { from: [2, -10.5], to: [22, -7.5] },
+  kickers: [
+    [51.5, -22.25],
+    [61.5, 24],
+    [66.5, 46.5],
+  ],
 } as const satisfies {
   width: number;
   centerline: readonly Point[];
   waterJump: { from: Point; to: Point };
+  kickers: readonly Point[];
 };
 
 export const ISLANDS: readonly IslandShape[] = [
@@ -414,5 +420,5 @@ export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
   landing: { original: [50.2, 38.3], placed: [-24, 77], footprint: [21, 20] },
   toilet: { original: [65.75, 63.7], placed: [5, 74], footprint: [14, 14] },
   altar: { original: [75.35, -27.35], placed: [32, -12], footprint: [14, 15] },
-  circuit: { original: [-11.3, -0.5], placed: [10, 3], footprint: [24, 24] },
+  circuit: { original: [-11.3, -0.5], placed: [16.8, 23.9], footprint: [24, 24], rotation: -3.13 },
 };

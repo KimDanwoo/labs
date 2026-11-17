@@ -1,58 +1,18 @@
-import { color, float, Fn, PI, positionWorld, texture, uniform, uv, vec3 } from 'three/tsl';
+import { color, float, Fn, mix, PI, positionWorld, step, texture, uniform, uv, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import { TICK_ORDER } from '../tickOrder';
-import { closedCurve } from './layout/curves';
-import { type Point, TRACK } from './layout/islandLayout';
+import { TRACK } from './layout/islandLayout';
+import { trackSamples } from './layout/trackPath';
+import { stripGeometry } from './trackGeometry';
 
-const SAMPLES_PER_SPAN = 16;
+const SAMPLE_SPACING = 1;
 const ROAD_LIFT = 0.03;
+const CURB = { width: 1.2, lift: 0.06, stripe: 2, red: '#e8473a', white: '#fff4ea' } as const;
 const ROAD_COLOR = '#384246';
 const GLITTER = { scarcity: 100, intensity: 0.3, perlin: 0.05, hash: 0.2, time: 0.004, view: 0.004 } as const;
-
-function isOverWater([x, z]: Point): boolean {
-  const { from, to } = TRACK.waterJump;
-  return (
-    x > Math.min(from[0], to[0]) &&
-    x < Math.max(from[0], to[0]) &&
-    z > Math.min(from[1], to[1]) &&
-    z < Math.max(from[1], to[1])
-  );
-}
-
-function ribbonGeometry(centerline: readonly Point[]): THREE.BufferGeometry {
-  const half = TRACK.width / 2;
-  const positions: number[] = [];
-  const uvs: number[] = [];
-  const indices: number[] = [];
-  let distance = 0;
-  centerline.forEach((point, index) => {
-    const previous = centerline[(index - 1 + centerline.length) % centerline.length] ?? point;
-    const next = centerline[(index + 1) % centerline.length] ?? point;
-    const tangent = new THREE.Vector2(next[0] - previous[0], next[1] - previous[1]).normalize();
-    if (index > 0) distance += Math.hypot(point[0] - previous[0], point[1] - previous[1]);
-    for (const side of [-1, 1]) {
-      positions.push(point[0] - tangent.y * half * side, ROAD_LIFT, point[1] + tangent.x * half * side);
-      uvs.push(distance / TRACK.width, side < 0 ? 0 : 1);
-    }
-  });
-  centerline.forEach((point, index) => {
-    const nextIndex = (index + 1) % centerline.length;
-    const next = centerline[nextIndex] ?? point;
-    if (isOverWater(point) || isOverWater(next)) return;
-    const a = index * 2;
-    const b = nextIndex * 2;
-    indices.push(a, a + 1, b, a + 1, b + 1, b);
-  });
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  return geometry;
-}
 
 function roadMaterial(glitterVariation: THREE.UniformNode<'float', number>): MeshDefaultMaterial {
   const { noises } = getGame();
@@ -76,18 +36,47 @@ function roadMaterial(glitterVariation: THREE.UniformNode<'float', number>): Mes
   return new MeshDefaultMaterial({ colorNode, hasLightBounce: false, hasWater: false });
 }
 
+function curbMaterial(): MeshDefaultMaterial {
+  const stripe = step(
+    0.5,
+    uv()
+      .x.div(CURB.stripe * 2)
+      .fract(),
+  );
+  const colorNode = mix(color(CURB.red), color(CURB.white), stripe);
+  return new MeshDefaultMaterial({ colorNode, hasLightBounce: false, hasWater: false });
+}
+
+function trackMesh(name: string, geometry: THREE.BufferGeometry, material: THREE.Material): THREE.Mesh {
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.name = name;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
 export class CircuitTrack {
   readonly #glitterVariation = uniform(0);
 
   constructor() {
     const game = getGame();
-    const road = new THREE.Mesh(
-      ribbonGeometry(closedCurve(TRACK.centerline, SAMPLES_PER_SPAN)),
-      roadMaterial(this.#glitterVariation),
+    const samples = trackSamples(SAMPLE_SPACING);
+    const half = TRACK.width / 2;
+    const road = stripGeometry(samples, {
+      from: { offset: -half, height: ROAD_LIFT },
+      to: { offset: half, height: ROAD_LIFT },
+    });
+    const curbs = [
+      [-half - CURB.width, -half],
+      [half, half + CURB.width],
+    ].map(([from = 0, to = 0]) =>
+      stripGeometry(samples, { from: { offset: from, height: CURB.lift }, to: { offset: to, height: CURB.lift } }),
     );
-    road.name = 'circuitRoad';
-    road.receiveShadow = true;
-    game.objects.add({ model: road, updateMaterials: false, castShadow: false });
+    const material = curbMaterial();
+    const meshes = [
+      trackMesh('circuitRoad', road, roadMaterial(this.#glitterVariation)),
+      ...curbs.map((geometry) => trackMesh('circuitCurb', geometry, material)),
+    ];
+    for (const mesh of meshes) game.objects.add({ model: mesh, updateMaterials: false, castShadow: false });
     game.ticker.events.on('tick', () => this.update(), TICK_ORDER.scenery);
   }
 
