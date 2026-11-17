@@ -1,7 +1,7 @@
 """
 Blender 5.3
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/gardenLamp.py
+blender -b --factory-startup --disable-autoexec --python tools/models/gardenLamp.py
 
 형상·UV·카메라 구성은 Blender 5.3 메모리 검사로 확인했습니다.
 GLB 출력과 실제 비교 렌더는 스크립트 실행 시 수행합니다.
@@ -23,12 +23,11 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/props"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "props"
 
 NAME = "gardenLamp"
 TARGET = Vector((0.90, 0.90, 1.26))

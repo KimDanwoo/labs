@@ -1,7 +1,7 @@
 """
 Blender 5.3
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/tropicalTrees.py
+blender -b --factory-startup --disable-autoexec --python tools/models/tropicalTrees.py
 
 Blender 5.3 메모리 형상 검사 통과: 삼각형 4452 / 6774 / 5962.
 이 검토에서는 파일 내보내기·렌더·게임 화면을 실행 검증하지 않았다.
@@ -21,12 +21,11 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/env"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "env"
 EPSILON = 1e-5
 
 SLOTS = {

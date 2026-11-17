@@ -1,6 +1,6 @@
 """
 Blender 5.3
-실행: Blender -b --factory-startup --disable-autoexec --python /absolute/path/to/coconut.py
+실행: Blender -b --factory-startup --disable-autoexec --python tools/models/coconut.py
 출력: coconut.glb, coconut.png(원작 소품 비교 렌더).
 384삼각형. 메시·자기 교차·GLB 직렬화·비교 장면 구성을 메모리에서 검증했다.
 파일 저장·렌더는 실행하지 않았다.
@@ -16,13 +16,12 @@ import bmesh
 import bpy
 from mathutils import Vector
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-SOURCE = ROOT / "upstream-blend/folio-2025.blend"
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/island3"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+SOURCE = SOURCES / "folio-2025.blend"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "island3"
 NAME = "coconut"
 TARGET = Vector((0.55, 0.50, 0.48))
 EPSILON = 1e-5

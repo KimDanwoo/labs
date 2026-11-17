@@ -1,7 +1,7 @@
 """
 Blender 5.3
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/islandPropsB.py
+blender -b --factory-startup --disable-autoexec --python tools/models/islandPropsB.py
 
 원본 blend 없이 생성한다. 정면은 Blender -Y, GLB +Z이다.
 디딤돌 무늬는 윗면을 실제 분할한 같은 높이의 색 면이다.
@@ -21,12 +21,11 @@ from mathutils import Vector
 from mathutils.geometry import delaunay_2d_cdt
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/props"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "props"
 
 EXPECTED = {
     1: "#EBD1A3",

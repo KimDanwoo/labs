@@ -1,6 +1,6 @@
 """
 Blender 5.3
-실행: Blender -b --factory-startup --disable-autoexec --python /absolute/path/to/palm_hammock.py
+실행: Blender -b --factory-startup --disable-autoexec --python tools/models/palm_hammock.py
 메시·GLB 메모리 검증 통과: 2,920 triangles. 파일 저장은 실행하지 않았다.
 비교 장면 구성은 확인했으며, 현재 환경의 Metal 장치 부재로 렌더 결과는 검증하지 못했다.
 """
@@ -17,13 +17,12 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-SOURCE = ROOT / "upstream-blend/folio-2025.blend"
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/island"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+SOURCE = SOURCES / "folio-2025.blend"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "island"
 NAME = "palmHammock"
 TARGET = Vector((3.8, 2.4, 3.8))
 EPSILON = 1e-5

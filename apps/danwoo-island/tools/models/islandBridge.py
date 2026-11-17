@@ -2,7 +2,7 @@
 Blender 5.3
 
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/islandBridge.py
+blender -b --factory-startup --disable-autoexec --python tools/models/islandBridge.py
 
 판자 피치 0.60m = 판자 0.55m + 틈 0.05m.
 양 끝 0.025m 여유를 합쳐 타일 경계에서도 같은 틈을 유지한다.
@@ -28,12 +28,11 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/bridge"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "bridge"
 
 EPS = 1e-6
 LENGTH = 2.4

@@ -1,7 +1,7 @@
 """
 Blender 5.3
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/lampPost.py
+blender -b --factory-startup --disable-autoexec --python tools/models/lampPost.py
 
 Blender 5.3 메모리상 형상 생성·GLB 검증 통과: 2,944삼각형.
 파일 저장·비교 렌더는 실행하지 않았습니다.
@@ -20,12 +20,11 @@ import bmesh
 import bpy
 from mathutils import Vector
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/props"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "props"
 NAME = "lampPost"
 TARGET = Vector((0.62, 0.62, 3.50))
 GLASS_CENTER = Vector((0, 0, 1.42))

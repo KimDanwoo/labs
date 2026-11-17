@@ -2,7 +2,7 @@
 Blender 5.3
 
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/careerRope.py
+blender -b --factory-startup --disable-autoexec --python tools/models/careerRope.py
 
 고리의 원형 내경 0.21과 ±0.205 사각 금지 영역은 대각선에서 충돌한다.
 축 방향 안쪽 반지름은 0.21로 유지하고 대각선 구멍을 넓혀 기둥 공간을 확보한다.
@@ -23,12 +23,11 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/career"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "career"
 
 TAU = math.tau
 EPS = 1e-6
