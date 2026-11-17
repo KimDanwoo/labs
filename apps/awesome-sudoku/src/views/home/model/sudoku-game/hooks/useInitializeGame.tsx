@@ -1,16 +1,17 @@
-import { GAME_LEVEL, boardAtom, initializeGameAtom } from '@entities/game';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { PERSISTED_GAME_ATOMS, resumeOrStartGameAtom } from '@entities/game';
+import { useSetAtom, useStore } from 'jotai';
 import { useEffect } from 'react';
 
 export const useInitializeGame = () => {
-  const initializeGame = useSetAtom(initializeGameAtom);
-  const board = useAtomValue(boardAtom);
+  const store = useStore();
+  const resumeOrStartGame = useSetAtom(resumeOrStartGameAtom);
 
   useEffect(() => {
-    const isEmpty = board.every((row) => row.every((cell) => cell.value === null && !cell.isInitial));
+    // jotai는 저장된 값을 atom이 구독될 때 읽는다. 화면이 구독하지 않는 정답까지 모두 읽어 온 뒤에 이어 할지 새로 시작할지 정한다
+    // https://jotai.org/docs/utilities/storage#atomwithstorage
+    const unsubscribes = PERSISTED_GAME_ATOMS.map((persistedAtom) => store.sub(persistedAtom, () => undefined));
+    void resumeOrStartGame();
 
-    if (isEmpty) {
-      initializeGame(GAME_LEVEL.MEDIUM);
-    }
-  }, [board, initializeGame]);
+    return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
+  }, [store, resumeOrStartGame]);
 };

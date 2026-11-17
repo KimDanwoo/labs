@@ -21,6 +21,24 @@ export const mistakeCountAtom = atomWithStorage<number>('sudoku:mistakeCount', 0
 export const gameModeAtom = atomWithStorage<GameMode>('sudoku:gameMode', GAME_MODE.CLASSIC);
 export const cagesAtom = atomWithStorage<KillerCage[]>('sudoku:cages', []);
 
+export const PERSISTED_GAME_ATOMS = [
+  boardAtom,
+  solutionAtom,
+  selectedCellAtom,
+  isCompletedAtom,
+  isSuccessAtom,
+  isRecordSavedAtom,
+  currentTimeAtom,
+  timerActiveAtom,
+  difficultyAtom,
+  numberCountsAtom,
+  hintsRemainingAtom,
+  mistakeCountAtom,
+  gameModeAtom,
+  cagesAtom,
+] as const;
+
 export const isNoteModeAtom = atom(false);
 export const isGeneratingAtom = atom(false);
+export const isGameReadyAtom = atom(false);
 export const highlightedCellsAtom = atom<Record<string, CellHighlight>>(createEmptyHighlights());

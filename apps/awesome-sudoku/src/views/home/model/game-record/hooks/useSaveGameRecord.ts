@@ -10,6 +10,7 @@ import {
   isSuccessAtom,
   mistakeCountAtom,
   saveGameRecord,
+  solutionAtom,
   type GameRecord,
   type PointResult,
 } from '@entities/game';
@@ -24,11 +25,13 @@ interface SaveGameRecordResult {
   pointResult: PointResult | null;
 }
 
+const gameKeyOf = (solution: number[][]) => solution.flat().join('');
+
 export function useSaveGameRecord(): SaveGameRecordResult {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [pointResult, setPointResult] = useState<PointResult | null>(null);
-  const savingRef = useRef(false);
+  const savingGameKey = useRef<string | null>(null);
 
   const user = useAtomValue(userAtom);
   const difficulty = useAtomValue(difficultyAtom);
@@ -48,11 +51,15 @@ export function useSaveGameRecord(): SaveGameRecordResult {
       }),
     );
   }
+  if (!isSuccess && pointResult) {
+    setPointResult(null);
+  }
 
   const save = useCallback(async (): Promise<string | null> => {
-    if (savingRef.current) return null;
-    if (!user || !isSuccess || isRecordSaved) return null;
-    savingRef.current = true;
+    const gameKey = gameKeyOf(gameStore.get(solutionAtom));
+    if (savingGameKey.current === gameKey) return null;
+    if (!user || !isSuccess || gameStore.get(isRecordSavedAtom)) return null;
+    savingGameKey.current = gameKey;
 
     const hintsUsed = HINTS_REMAINING - hintsRemaining;
     const result =
@@ -83,16 +90,18 @@ export function useSaveGameRecord(): SaveGameRecordResult {
 
     try {
       const recordId = await saveGameRecord(record);
-      gameStore.set(isRecordSavedAtom, true);
+      if (gameKeyOf(gameStore.get(solutionAtom)) === gameKey) gameStore.set(isRecordSavedAtom, true);
       return recordId;
     } catch (err) {
-      savingRef.current = false;
       setError(err instanceof Error ? err : new Error('저장 실패'));
       return null;
     } finally {
-      setIsSaving(false);
+      if (savingGameKey.current === gameKey) {
+        savingGameKey.current = null;
+        setIsSaving(false);
+      }
     }
-  }, [user, isSuccess, isRecordSaved, difficulty, gameMode, currentTime, hintsRemaining, mistakeCount, pointResult]);
+  }, [user, isSuccess, difficulty, gameMode, currentTime, hintsRemaining, mistakeCount, pointResult]);
 
   const saveRef = useRef(save);
   useEffect(() => {

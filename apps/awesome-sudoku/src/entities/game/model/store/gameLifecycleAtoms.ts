@@ -2,6 +2,8 @@ import { atom } from 'jotai';
 import { requestPuzzle } from '../../lib/puzzleService';
 import { GAME_LEVEL, HINTS_REMAINING } from '../constants/game';
 import { createEmptyHighlights } from '../services/common';
+import { isBoardPosition, isRestorableGame } from '../services/savedGame';
+import { clearCellSelection } from '../services/update';
 import type { Difficulty, GameMode } from '../types/game';
 import { clearHistoryAtom } from './historyAtoms';
 import {
@@ -13,6 +15,7 @@ import {
   highlightedCellsAtom,
   hintsRemainingAtom,
   isCompletedAtom,
+  isGameReadyAtom,
   isGeneratingAtom,
   isNoteModeAtom,
   isRecordSavedAtom,
@@ -21,6 +24,7 @@ import {
   selectedCellAtom,
   solutionAtom,
 } from './primitives';
+import { selectCellAtom } from './selectionAtoms';
 import { countBoardNumbersAtom } from './statusAtoms';
 import { toggleTimerAtom } from './timerAtoms';
 
@@ -32,7 +36,10 @@ export const initializeGameAtom = atom(null, async (get, set, difficulty: Diffic
   const requestId = ++latestRequest;
   set(isGeneratingAtom, true);
 
-  const { solution, board, cages } = await requestPuzzle(gameMode, difficulty);
+  const { solution, board, cages } = await requestPuzzle(gameMode, difficulty).catch((error: unknown) => {
+    if (requestId === latestRequest) set(isGeneratingAtom, false);
+    throw error;
+  });
   if (requestId !== latestRequest) return;
 
   set(boardAtom, board);
@@ -50,9 +57,37 @@ export const initializeGameAtom = atom(null, async (get, set, difficulty: Diffic
   set(mistakeCountAtom, 0);
   set(isNoteModeAtom, false);
   set(isGeneratingAtom, false);
+  set(isGameReadyAtom, true);
 
   set(toggleTimerAtom, true);
   set(countBoardNumbersAtom);
+});
+
+export const resumeOrStartGameAtom = atom(null, async (get, set) => {
+  if (get(isGeneratingAtom)) return;
+
+  const savedGame = {
+    board: get(boardAtom),
+    solution: get(solutionAtom),
+    gameMode: get(gameModeAtom),
+    cages: get(cagesAtom),
+  };
+  const isFinishedOnLastVisit = !get(isGameReadyAtom) && get(isCompletedAtom);
+  if (isFinishedOnLastVisit || !isRestorableGame(savedGame)) {
+    await set(initializeGameAtom, GAME_LEVEL.MEDIUM);
+    return;
+  }
+
+  set(isGameReadyAtom, true);
+  set(countBoardNumbersAtom);
+  const selectedCell: unknown = get(selectedCellAtom);
+  if (isBoardPosition(selectedCell)) {
+    set(selectCellAtom, selectedCell);
+    return;
+  }
+  set(boardAtom, clearCellSelection(savedGame.board));
+  set(selectedCellAtom, null);
+  set(highlightedCellsAtom, createEmptyHighlights());
 });
 
 export const switchGameModeAtom = atom(null, (get, set, args: { mode: GameMode; difficulty?: Difficulty }) => {

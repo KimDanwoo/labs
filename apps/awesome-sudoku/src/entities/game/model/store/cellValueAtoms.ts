@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { cellAt } from '../../lib/gridAccess';
-import { HINTS_REMAINING, MAX_MISTAKES } from '../constants/game';
+import { GAME_PHASE, HINTS_REMAINING, MAX_MISTAKES } from '../constants/game';
 import { buildGameResultState, resolveBoardState } from '../services/gameResult';
 import {
   canFillCell,
@@ -27,11 +27,11 @@ import {
   timerActiveAtom,
 } from './primitives';
 import { deselectCellAtom, updateHighlightsAtom } from './selectionAtoms';
-import { countBoardNumbersAtom } from './statusAtoms';
+import { countBoardNumbersAtom, gamePhaseAtom } from './statusAtoms';
 import { toggleTimerAtom } from './timerAtoms';
 
 export const fillCellAtom = atom(null, (get, set, value: number | null) => {
-  if (get(isCompletedAtom)) return;
+  if (get(gamePhaseAtom) !== GAME_PHASE.PLAYING) return;
   const board = get(boardAtom);
   const selectedCell = get(selectedCellAtom);
 
@@ -80,7 +80,7 @@ export const fillCellAtom = atom(null, (get, set, value: number | null) => {
 });
 
 export const toggleNoteAtom = atom(null, (get, set, value: number) => {
-  if (get(isCompletedAtom)) return;
+  if (get(gamePhaseAtom) !== GAME_PHASE.PLAYING) return;
   const board = get(boardAtom);
   const selectedCell = get(selectedCellAtom);
 

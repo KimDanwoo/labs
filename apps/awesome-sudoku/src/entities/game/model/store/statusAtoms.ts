@@ -1,16 +1,25 @@
 import { atom } from 'jotai';
 import { NUMBER_COUNTS } from '../constants/board';
+import { GAME_PHASE } from '../constants/game';
 import { buildGameResultState, resolveBoardState } from '../services/gameResult';
+import type { GamePhase } from '../types/game';
 import {
   boardAtom,
   cagesAtom,
   gameModeAtom,
   isCompletedAtom,
+  isGeneratingAtom,
   isSuccessAtom,
   numberCountsAtom,
   solutionAtom,
   timerActiveAtom,
 } from './primitives';
+
+export const gamePhaseAtom = atom<GamePhase>((get) => {
+  if (get(isGeneratingAtom)) return GAME_PHASE.GENERATING;
+  if (get(isCompletedAtom)) return get(isSuccessAtom) ? GAME_PHASE.WON : GAME_PHASE.FAILED;
+  return get(timerActiveAtom) ? GAME_PHASE.PLAYING : GAME_PHASE.PAUSED;
+});
 
 export const countBoardNumbersAtom = atom(null, (get, set) => {
   const board = get(boardAtom);

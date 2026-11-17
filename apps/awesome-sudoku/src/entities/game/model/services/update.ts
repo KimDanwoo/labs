@@ -50,6 +50,10 @@ export function updateCellSelection(board: SudokuBoard, selectedRow: number, sel
   return hasChanges ? nextBoard : board;
 }
 
+const NO_CELL = -1;
+
+export const clearCellSelection = (board: SudokuBoard): SudokuBoard => updateCellSelection(board, NO_CELL, NO_CELL);
+
 export function updateCellNotes(board: SudokuBoard, row: number, col: number, notes: number[]): SudokuBoard {
   return updateSingleCell(board, row, col, { notes: [...notes] });
 }
