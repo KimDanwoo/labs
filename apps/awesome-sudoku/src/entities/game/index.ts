@@ -42,6 +42,7 @@ export {
   mistakeCountAtom,
   numberCountsAtom,
   selectedCellAtom,
+  solutionAtom,
   timerActiveAtom,
 } from './model/store/primitives';
 export { selectCellAtom } from './model/store/selectionAtoms';
