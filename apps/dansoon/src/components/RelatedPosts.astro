@@ -19,7 +19,9 @@ const { posts } = Astro.props;
         {posts.map((post) => (
           <li>
             <a href={postPath(post)} class="group flex items-baseline justify-between gap-md py-sm">
-              <span class="leading-snug font-normal transition-colors group-hover:text-primary">{post.data.title}</span>
+              <span class="leading-snug font-normal text-pretty transition-colors group-hover:text-primary group-active:text-primary">
+                {post.data.title}
+              </span>
               <time
                 datetime={post.data.publishedAt.toISOString()}
                 class="shrink-0 text-sm text-muted-foreground tabular-nums"

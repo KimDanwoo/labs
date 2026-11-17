@@ -33,7 +33,7 @@ const indentOf = (depth: number) => (depth === 2 ? 'pl-md' : 'pl-xl');
       </nav>
     ) : (
       <details class="motion-details group rounded-lg bg-muted text-sm">
-        <summary class="flex cursor-pointer list-none items-center justify-between px-md py-sm font-bold">
+        <summary class="flex min-h-10 cursor-pointer list-none items-center justify-between rounded-lg px-md py-sm font-bold [&::-webkit-details-marker]:hidden">
           <span class="flex items-center gap-sm">
             <Icon name="list" class="size-3.5" />
             목차
@@ -46,7 +46,10 @@ const indentOf = (depth: number) => (depth === 2 ? 'pl-md' : 'pl-xl');
               <a
                 href={`#${heading.slug}`}
                 data-toc-link
-                class:list={['block rounded-md py-xs hover:text-foreground', indentOf(heading.depth)]}
+                class:list={[
+                  'block rounded-md py-1.5 leading-snug hover:text-foreground active:text-foreground',
+                  indentOf(heading.depth),
+                ]}
               >
                 {heading.text}
               </a>

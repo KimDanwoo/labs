@@ -15,7 +15,9 @@ const position = posts.findIndex((post) => post.id === currentId) + 1;
 ---
 
 <details class="motion-details group rounded-lg border border-border text-sm">
-  <summary class="flex cursor-pointer list-none items-center justify-between gap-md px-md py-sm">
+  <summary
+    class="flex cursor-pointer list-none items-center justify-between gap-md rounded-lg px-md py-sm transition-colors hover:bg-muted active:bg-muted [&::-webkit-details-marker]:hidden"
+  >
     <span class="flex min-w-0 items-center gap-sm">
       <Icon name="layers" class="size-3.5 shrink-0 text-muted-foreground" />
       <span class="truncate"><span class="text-muted-foreground">연재</span> <b>{label}</b></span>
@@ -28,14 +30,17 @@ const position = posts.findIndex((post) => post.id === currentId) + 1;
   <ol class="border-t border-border px-md py-sm">
     {
       posts.map((post, index) => (
-        <li class="flex gap-sm py-xs">
-          <span class="w-5 shrink-0 text-right text-muted-foreground tabular-nums">{index + 1}</span>
+        <li class="flex gap-sm">
+          <span class="w-5 shrink-0 py-xs text-right text-muted-foreground tabular-nums">{index + 1}</span>
           {post.id === currentId ? (
-            <span aria-current="page" class="leading-snug font-bold">
+            <span aria-current="page" class="py-xs leading-snug font-bold">
               {post.data.title}
             </span>
           ) : (
-            <a href={postPath(post)} class="leading-snug text-muted-foreground transition-colors hover:text-foreground">
+            <a
+              href={postPath(post)}
+              class="py-xs leading-snug text-muted-foreground transition-colors hover:text-foreground active:text-foreground"
+            >
               {post.data.title}
             </a>
           )}

@@ -24,7 +24,7 @@ const tabs = [
           <a
             href={tab.href}
             aria-current={tab.id === active ? 'page' : undefined}
-            class="inline-flex h-9 items-center gap-xs rounded-full px-md text-sm whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted hover:text-foreground aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground"
+            class="inline-flex h-10 items-center gap-xs rounded-full px-md text-sm whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:bg-muted aria-[current=page]:bg-primary aria-[current=page]:font-bold aria-[current=page]:text-primary-foreground sm:h-9"
           >
             {tab.id !== 'all' && <span data-category={tab.id} class="category-dot" aria-hidden="true" />}
             {tab.label}
