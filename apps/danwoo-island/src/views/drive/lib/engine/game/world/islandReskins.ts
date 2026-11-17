@@ -1,13 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-import {
-  islandMaterial,
-  paletteSlot,
-  type PartName,
-  repaintSlots,
-  type SlotRepaint,
-  type Triple,
-} from './islandGeometry';
+import { islandMaterial, type PartName, type Triple } from './islandGeometry';
 import { fixedLandmark, LIGHTHOUSE } from './islandLandmarks';
 import { islandModelMesh } from './islandModels';
 
@@ -18,13 +11,7 @@ const CAREER_PAINT = new Map<string, PartName>([
 ]);
 
 const AWARDS_TABLE = ['table002', 'cube024', 'refel003', 'medal', 'refDistinctions'];
-const STEPPING_STONES = ['slabes', 'Cube001', 'Cube002'];
 const AIR_DANCER = /^refAirDancers/;
-const CURB_REPAINT: SlotRepaint = new Map([
-  [16, 10],
-  [17, 23],
-]);
-const FLAT_PAINT_HEIGHT = 0.01;
 
 const SCOREBOARD = {
   frame: 'Cube180',
@@ -51,27 +38,6 @@ export function paintCareerLines(model: THREE.Object3D): void {
 
 export function paintAchievementsBasin(model: THREE.Object3D): void {
   paint(model.getObjectByName('Cube110'), 'stone');
-}
-
-export function steppingStoneSlabs(scenery: THREE.Object3D): THREE.Mesh[] {
-  return STEPPING_STONES.map((name) => scenery.getObjectByName(name)).filter(
-    (slab): slab is THREE.Mesh => slab instanceof THREE.Mesh,
-  );
-}
-
-function isCurbPaint(mesh: THREE.Mesh): boolean {
-  const uv = mesh.geometry.getAttribute('uv');
-  if (!uv) return false;
-  mesh.geometry.computeBoundingBox();
-  const height = mesh.geometry.boundingBox?.getSize(new THREE.Vector3()).y ?? Infinity;
-  const slots = new Set(Array.from({ length: uv.count }, (_, vertex) => paletteSlot(uv.getX(vertex))));
-  return height < FLAT_PAINT_HEIGHT && [...slots].every((slot) => CURB_REPAINT.has(slot));
-}
-
-export function paintCurbs(scenery: THREE.Object3D): void {
-  for (const child of scenery.children) {
-    if (child instanceof THREE.Mesh && isCurbPaint(child)) repaintSlots(child.geometry, CURB_REPAINT);
-  }
 }
 
 export function rebuildTikiScoreboard(model: THREE.Object3D): void {

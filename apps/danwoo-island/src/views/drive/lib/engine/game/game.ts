@@ -474,12 +474,7 @@ export class Game {
       }),
       modelResource('bushesReferences', `bushes/bushesReferences${modelSuffix}.glb${cb}`),
       modelResource('vehicle', `vehicle/default${modelSuffix}.glb${cb}`),
-      modelResource('playgroundVisual', `playground/playgroundVisual${modelSuffix}.glb${cb}`),
-      modelResource('playgroundPhysical', `playground/playgroundPhysical${modelSuffix}.glb${cb}`),
       modelResource('flowersReferencesModel', `flowers/flowersReferences${modelSuffix}.glb${cb}`),
-      modelResource('bricksModel', `bricks/bricks${modelSuffix}.glb${cb}`),
-      modelResource('fencesModel', `fences/fences${modelSuffix}.glb${cb}`),
-      modelResource('benchesModel', `benches/benches${modelSuffix}.glb${cb}`),
       modelResource('explosiveCratesModel', `explosiveCrates/explosiveCrates${modelSuffix}.glb${cb}`),
       modelResource('lanternsModel', `lanterns/lanterns${modelSuffix}.glb${cb}`),
       textureResource('terrainTexture', `terrain/terrain.png${cb}`, 'texture', (resource) => {
@@ -493,10 +488,6 @@ export class Game {
         resource.magFilter = THREE.LinearFilter;
         resource.generateMipmaps = false;
       }),
-      modelResource('birchTreesReferencesModel', `birchTrees/birchTreesReferences${modelSuffix}.glb${cb}`),
-      modelResource('oakTreesReferencesModel', `oakTrees/oakTreesReferences${modelSuffix}.glb${cb}`),
-      modelResource('cherryTreesReferencesModel', `cherryTrees/cherryTreesReferences${modelSuffix}.glb${cb}`),
-      modelResource('sceneryModel', `scenery/scenery${modelSuffix}.glb${cb}`),
       modelResource('areasModel', `areas/areas${modelSuffix}.glb${cb}`),
       modelResource('poleLightsModel', `poleLights/poleLights${modelSuffix}.glb${cb}`),
       textureResource(

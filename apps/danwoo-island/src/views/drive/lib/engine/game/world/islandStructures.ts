@@ -273,41 +273,6 @@ export function rebuildShowerStation(model: THREE.Object3D): void {
   container.add(lanternGlow, waterAnchor);
 }
 
-const BRIDGE = { plankPitch: 0.46, plankDepth: 0.42, railX: 2.09, posts: 6 } as const;
-
-export function rebuildBridge(bridge: THREE.Object3D): void {
-  const replacement = swapForGroup(bridge);
-  const deck = replacement.children.find((child) => CUBOID.test(child.name) && child.scale.x > 3);
-  if (!deck) throw new Error('다리 상판 충돌체를 찾지 못했어요.');
-  const parts = createParts();
-  const top = deck.position.y + deck.scale.y / 2;
-  const halfWidth = deck.scale.x / 2;
-  const front = deck.position.z - deck.scale.z / 2;
-  const back = deck.position.z + deck.scale.z / 2;
-  const planks = Math.round((back - front) / BRIDGE.plankPitch);
-  for (let index = 0; index < planks; index += 1) {
-    const z = front + 0.23 + index * ((back - front - BRIDGE.plankPitch) / (planks - 1));
-    parts.box('wood', [halfWidth * 2, 0.14, BRIDGE.plankDepth], { position: [deck.position.x, top - 0.07, z] });
-  }
-  for (const x of [-halfWidth + 0.5, halfWidth - 0.5]) {
-    parts.box('woodDark', [0.3, 0.32, back - front], { position: [x, top - 0.3, deck.position.z] });
-  }
-  const railStart = front + 0.6;
-  const railEnd = back - 1.15;
-  for (const side of [-1, 1]) {
-    const x = side * BRIDGE.railX;
-    for (let index = 0; index < BRIDGE.posts; index += 1) {
-      const z = railStart + (index * (railEnd - railStart)) / (BRIDGE.posts - 1);
-      parts.prism('woodDark', 0.1, 0.11, 1.05, { position: [x, top + 0.52, z] });
-      parts.add('wood', new THREE.SphereGeometry(0.13, 6, 4), { position: [x, top + 1.1, z] });
-    }
-    parts.rod('wood', 0.07, [x, top + 0.95, railStart], [x, top + 0.95, railEnd], 6);
-    parts.rod('wood', 0.05, [x, top + 0.5, railStart], [x, top + 0.5, railEnd], 6);
-    for (const z of [front - 0.1, back + 0.1]) parts.box('stone', [0.7, 0.5, 0.8], { position: [x, top - 0.3, z] });
-  }
-  replacement.add(parts.build());
-}
-
 const SURFBOARD_PROPORTION = { width: 0.27, depth: 0.15 } as const;
 
 function surfboardSize(height: number): THREE.Vector3 {
