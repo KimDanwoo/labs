@@ -1,9 +1,11 @@
 'use client';
 
 import { createClient } from '@shared/api/supabaseClient';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createFeedback } from '../actions/feedbackActions';
 import type { FeedbackType, SubmitStatus } from '../types/types';
+
+const CLOSE_AFTER_SUCCESS_MS = 1500;
 
 interface UseFeedbackFormOptions {
   questionId?: string;
@@ -19,13 +21,23 @@ export function useFeedbackForm({ questionId, fixedType }: UseFeedbackFormOption
   const [content, setContent] = useState('');
   const [status, setStatus] = useState<SubmitStatus>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       setIsLoggedIn(!!user);
     });
+    return () => clearTimeout(closeTimer.current);
   }, []);
+
+  const handleOpenChange = (isOpen: boolean) => {
+    clearTimeout(closeTimer.current);
+    setOpen(isOpen);
+    if (status === 'submitting') return;
+    setStatus('idle');
+    setErrorMsg('');
+  };
 
   const handleSubmit = async () => {
     if (!content.trim()) return;
@@ -36,15 +48,26 @@ export function useFeedbackForm({ questionId, fixedType }: UseFeedbackFormOption
       await createFeedback({ type, content: content.trim(), questionId });
       setStatus('success');
       setContent('');
-      setTimeout(() => {
+      closeTimer.current = setTimeout(() => {
         setOpen(false);
         setStatus('idle');
-      }, 1500);
+      }, CLOSE_AFTER_SUCCESS_MS);
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : '제출에 실패했습니다.');
       setStatus('error');
     }
   };
 
-  return { isLoggedIn, open, setOpen, type, setType, content, setContent, status, errorMsg, handleSubmit };
+  return {
+    isLoggedIn,
+    open,
+    setOpen: handleOpenChange,
+    type,
+    setType,
+    content,
+    setContent,
+    status,
+    errorMsg,
+    handleSubmit,
+  };
 }

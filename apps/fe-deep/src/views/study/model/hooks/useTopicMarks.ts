@@ -120,5 +120,15 @@ export function useTopicMarks(docSlug: string, { table, storageKey }: TopicMarkS
     [docSlug, marked, table, storageKey],
   );
 
-  return { marked, isLoaded, toggle };
+  const remove = useCallback(
+    (topicTitles: string[]) => {
+      const next = new Set([...marked].filter((title) => !topicTitles.includes(title)));
+      setMarked(next);
+      saveLocal(storageKey, docSlug, next);
+      topicTitles.forEach((title) => void syncToggle(table, docSlug, title, false));
+    },
+    [docSlug, marked, table, storageKey],
+  );
+
+  return { marked, isLoaded, toggle, remove };
 }

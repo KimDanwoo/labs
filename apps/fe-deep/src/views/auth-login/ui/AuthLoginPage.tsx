@@ -2,20 +2,29 @@
 
 import { createClient } from '@shared/api/supabaseClient';
 import { Button, Card } from '@ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function AuthLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) setIsLoading(false);
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
+
   const handleOAuth = async (provider: 'google') => {
     setIsLoading(true);
     const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
+    if (error) setIsLoading(false);
   };
 
   return (

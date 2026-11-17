@@ -5,6 +5,8 @@ import { BookOpen, Brain, CheckCircle, Flame, Target } from 'lucide-react';
 import { useProgressStats } from '../model/hooks/useProgressStats';
 import { StudyHeatmap } from './StudyHeatmap';
 
+const NOT_LOADED = '–';
+
 export function ProgressPage() {
   const { categories, stats, categoryStats, heatmap, streak, overallPercent } = useProgressStats();
 
@@ -38,7 +40,7 @@ export function ProgressPage() {
             <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-study/10">
               <BookOpen className="h-5 w-5 text-study" />
             </div>
-            <div className="text-2xl font-bold tabular-nums">{stats.total}</div>
+            <div className="text-2xl font-bold tabular-nums">{stats?.total ?? NOT_LOADED}</div>
             <div className="text-xs text-muted-foreground mt-0.5">전체 문제</div>
           </Card.Content>
         </Card>
@@ -47,7 +49,7 @@ export function ProgressPage() {
             <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-success-subtle">
               <CheckCircle className="h-5 w-5 text-success" />
             </div>
-            <div className="text-2xl font-bold tabular-nums">{stats.mastered}</div>
+            <div className="text-2xl font-bold tabular-nums">{stats?.mastered ?? NOT_LOADED}</div>
             <div className="text-xs text-muted-foreground mt-0.5">마스터</div>
           </Card.Content>
         </Card>
@@ -56,7 +58,7 @@ export function ProgressPage() {
             <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-warning-subtle">
               <Brain className="h-5 w-5 text-warning" />
             </div>
-            <div className="text-2xl font-bold tabular-nums">{stats.learning}</div>
+            <div className="text-2xl font-bold tabular-nums">{stats?.learning ?? NOT_LOADED}</div>
             <div className="text-xs text-muted-foreground mt-0.5">학습 중</div>
           </Card.Content>
         </Card>
@@ -65,7 +67,7 @@ export function ProgressPage() {
             <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
               <Target className="h-5 w-5 text-muted-foreground" />
             </div>
-            <div className="text-2xl font-bold tabular-nums">{stats.unseen}</div>
+            <div className="text-2xl font-bold tabular-nums">{stats?.unseen ?? NOT_LOADED}</div>
             <div className="text-xs text-muted-foreground mt-0.5">미학습</div>
           </Card.Content>
         </Card>
@@ -75,7 +77,9 @@ export function ProgressPage() {
         <Card.Content className="p-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-normal">전체 진도</span>
-            <span className="text-sm font-normal tabular-nums text-primary">{overallPercent}%</span>
+            <span className="text-sm font-normal tabular-nums text-primary">
+              {stats ? `${overallPercent}%` : NOT_LOADED}
+            </span>
           </div>
           <Progress value={overallPercent} className="h-2" />
         </Card.Content>
