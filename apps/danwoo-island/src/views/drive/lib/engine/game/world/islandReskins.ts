@@ -12,7 +12,6 @@ import { fixedLandmark, LIGHTHOUSE } from './islandLandmarks';
 import { islandModelMesh } from './islandModels';
 
 const CAREER_PAINT = new Map<string, PartName>([
-  ['emissiveWhiteRadialGradient', 'bunting4'],
   ['emissiveOrangeRadialGradient', 'bunting3'],
   ['emissivePurpleRadialGradient', 'bunting5'],
   ['emissiveBlueRadialGradient', 'bunting1'],

@@ -5,6 +5,7 @@ import * as THREE from 'three/webgpu';
 import content from '../../../data/danwoo';
 import { type AudioItem, moveSoundTo } from '../../audioItem';
 import { clamp } from '../../utilities/maths';
+import { tieCareerRopes } from '../careerRopes';
 import { paintCareerLines } from '../islandReskins';
 import { Area } from './area';
 
@@ -131,6 +132,7 @@ export class CareerArea extends Area {
 
   override setObjects(): void {
     paintCareerLines(this.model);
+    tieCareerRopes(this.model);
     super.setObjects();
   }
 
