@@ -4,6 +4,8 @@ import { frameState, usePlaybackControls } from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
 import { useEffect, useRef } from 'react';
 
+const DRAG_END_EVENTS = ['pointerup', 'pointercancel', 'blur'] as const;
+
 export function Scrubber() {
   const { seek } = usePlaybackControls();
   const bar = useRef<HTMLDivElement | null>(null);
@@ -48,14 +50,14 @@ export function Scrubber() {
       bar.current.style.setProperty('--p', shown.current.p);
       seek(ratio);
     };
-    const up = () => {
+    const release = () => {
       dragging.current = false;
     };
     window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
+    DRAG_END_EVENTS.forEach((type) => window.addEventListener(type, release));
     return () => {
       window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
+      DRAG_END_EVENTS.forEach((type) => window.removeEventListener(type, release));
     };
   }, [seek]);
 
