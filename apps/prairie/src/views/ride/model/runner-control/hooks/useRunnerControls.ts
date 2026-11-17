@@ -14,11 +14,11 @@ export function useRunnerControls(): void {
       const action = KEY_BINDINGS[event.code];
       if (!action) return;
       event.preventDefault();
-      setRunnerAction(action, true);
+      setRunnerAction(action, true, event.code);
     };
     const handleKeyUp = (event: KeyboardEvent) => {
       const action = KEY_BINDINGS[event.code];
-      if (action) setRunnerAction(action, false);
+      if (action) setRunnerAction(action, false, event.code);
     };
 
     const handleVisibility = () => {
