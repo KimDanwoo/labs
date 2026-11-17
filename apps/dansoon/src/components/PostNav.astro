@@ -7,7 +7,7 @@ type Props = {
   newer?: Post;
 };
 
-const THUMBNAIL_WIDTH = 192;
+const COVER_WIDTH = 128;
 
 const { older, newer } = Astro.props;
 const entries = [
@@ -25,23 +25,23 @@ const entries = [
             href={postPath(post)}
             rel={rel}
             class:list={[
-              'group flex items-center gap-md rounded-lg p-md transition-colors hover:bg-primary-subtle hover:text-primary',
+              'group flex items-center gap-md rounded-lg p-md transition-colors hover:bg-primary-subtle hover:text-primary active:bg-primary-subtle dark:hover:text-primary-accent',
               isNewer && 'sm:flex-row-reverse sm:text-right',
             ]}
           >
-            {post.data.thumbnail && (
-              <span class="aspect-40/21 w-24 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border">
+            {post.data.cover && (
+              <span class="size-16 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border">
                 <Image
-                  src={post.data.thumbnail}
+                  src={post.data.cover}
                   alt=""
-                  width={THUMBNAIL_WIDTH}
-                  class="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                  width={COVER_WIDTH}
+                  class="size-full object-cover object-right transition-transform duration-300 ease-out group-hover:scale-105 motion-reduce:transition-none"
                 />
               </span>
             )}
             <span class="flex min-w-0 flex-1 flex-col gap-xs">
               <span class="text-sm text-muted-foreground">{label}</span>
-              <span class="line-clamp-2 leading-snug font-bold">{post.data.title}</span>
+              <span class="line-clamp-2 leading-snug font-bold text-pretty">{post.data.title}</span>
             </span>
           </a>
         ) : (

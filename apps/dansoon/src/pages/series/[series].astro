@@ -22,6 +22,7 @@ const { label, description } = SERIES_INFO[series];
   lead={`${description} 모두 ${posts.length}편이에요.`}
   title={`${label} 연재`}
   description={description}
+  eyebrow={{ label: '연재' }}
 >
-  <PostList posts={posts} />
+  <PostList posts={posts} numbered />
 </ListPage>

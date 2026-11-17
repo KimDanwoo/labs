@@ -6,16 +6,29 @@ type Props = {
   lead?: string;
   title?: string;
   description?: string;
+  /** 제목이 무엇의 이름인지 알려 주는 윗줄. href가 있으면 그 모음으로 돌아가는 링크가 된다 */
+  eyebrow?: { label: string; href?: string };
 };
 
-const { heading, lead, title, description } = Astro.props;
+const { heading, lead, title, description, eyebrow } = Astro.props;
+const eyebrowClass = 'inline-block py-xs text-sm font-bold text-primary dark:text-primary-accent';
 ---
 
 <BaseLayout title={title ?? heading} description={description ?? lead}>
   <div class="mx-auto max-w-(--container-2xl) px-md pt-2xl pb-xl sm:px-xl sm:pt-3xl">
     <header class="mb-xl">
-      <h1 class="text-3xl font-bold tracking-tight">{heading}</h1>
-      {lead && <p class="mt-sm leading-relaxed text-muted-foreground">{lead}</p>}
+      {
+        eyebrow &&
+          (eyebrow.href ? (
+            <a href={eyebrow.href} class:list={[eyebrowClass, 'underline-offset-4 hover:underline']}>
+              {eyebrow.label}
+            </a>
+          ) : (
+            <p class={eyebrowClass}>{eyebrow.label}</p>
+          ))
+      }
+      <h1 class="text-3xl leading-tight font-bold tracking-tight text-balance">{heading}</h1>
+      {lead && <p class="mt-sm leading-relaxed text-pretty text-muted-foreground">{lead}</p>}
       <slot name="header" />
     </header>
     <slot />

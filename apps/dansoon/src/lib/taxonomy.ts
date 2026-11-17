@@ -11,6 +11,12 @@ export const CATEGORY_LABEL = {
   reading: '독서',
 } satisfies Record<CategoryId, string>;
 
+export const CATEGORY_DESCRIPTION = {
+  dev: '직접 부딪히며 해결한 문제, 구조와 설계에 대한 고민, 새로 익힌 도구 이야기를 적어요.',
+  retro: '한 해와 분기를 돌아보며, 교육 과정을 마치며 정리한 생각을 적어요.',
+  reading: '읽은 책에서 남기고 싶은 문장과 생각을 적어요.',
+} satisfies Record<CategoryId, string>;
+
 export const TAG_IDS = [
   'ai',
   'architecture',
