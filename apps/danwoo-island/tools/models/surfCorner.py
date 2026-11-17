@@ -1,6 +1,6 @@
 """
 Blender 5.3
-실행: blender -b --factory-startup --disable-autoexec --python /absolute/path/to/surf_corner.py
+실행: blender -b --factory-startup --disable-autoexec --python tools/models/surf_corner.py
 메시·GLB 직렬화는 메모리에서 검증했다(2,842삼각형). 렌더·파일 저장은 실행하지 않았다.
 """
 
@@ -15,13 +15,12 @@ import bmesh
 import bpy
 from mathutils import Euler, Vector
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-SOURCE = ROOT / "upstream-blend/folio-2025.blend"
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/island"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+SOURCE = SOURCES / "folio-2025.blend"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "island"
 NAME = "surfCorner"
 TARGET = Vector((3.4, 2.6, 2.8))
 EPSILON = 1e-5

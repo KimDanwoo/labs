@@ -1,7 +1,7 @@
 """
 Blender 5.3
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/beachCanopy.py
+blender -b --factory-startup --disable-autoexec --python tools/models/beachCanopy.py
 
 지붕만 생성한다. 기둥·바닥·받침은 GLB에 포함하지 않는다.
 """
@@ -21,12 +21,11 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/props"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "props"
 
 NAME = "beachCanopy"
 TARGET = Vector((3.60, 3.60, 1.40))

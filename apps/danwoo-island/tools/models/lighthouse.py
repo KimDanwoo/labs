@@ -1,6 +1,6 @@
 """
 Blender 5.3
-실행: Blender -b --factory-startup --disable-autoexec --python /absolute/path/to/lighthouse.py
+실행: Blender -b --factory-startup --disable-autoexec --python tools/models/lighthouse.py
 메시·GLB 직렬화 메모리 검사 통과: 3,008 triangles, Blender 치수 (1.5, 1.5, 4.6).
 파일 저장은 실행하지 않았으며, 비교 렌더는 검사 환경의 Metal 장치 부재로 미검증.
 """
@@ -17,13 +17,12 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-SOURCE = ROOT / "upstream-blend/folio-2025.blend"
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/island"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+SOURCE = SOURCES / "folio-2025.blend"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "island"
 
 NAME = "lighthouse"
 TARGET = Vector((1.5, 1.5, 4.6))

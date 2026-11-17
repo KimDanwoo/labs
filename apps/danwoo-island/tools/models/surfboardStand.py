@@ -1,6 +1,6 @@
 """
 Blender 5.3
-실행: Blender -b --factory-startup --disable-autoexec --python /absolute/path/to/surfboard_stand.py
+실행: Blender -b --factory-startup --disable-autoexec --python tools/models/surfboard_stand.py
 968삼각형·닫힌 형상·치수·UV·GLB 직렬화를 Blender 5.3 메모리에서 검증했다.
 렌더와 파일 저장은 이 스크립트를 실행할 때 수행한다.
 """
@@ -15,13 +15,12 @@ import bmesh
 import bpy
 from mathutils import Vector
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-SOURCE = ROOT / "upstream-blend/folio-2025.blend"
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/island2"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+SOURCE = SOURCES / "folio-2025.blend"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "island2"
 NAME = "surfboardStand"
 TARGET = Vector((0.80, 0.45, 3.00))
 EPSILON = 1e-5

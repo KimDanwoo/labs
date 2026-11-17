@@ -1,6 +1,6 @@
 """
 Blender 5.3
-실행: blender -b --factory-startup --disable-autoexec --python /absolute/path/to/shellFountain.py
+실행: blender -b --factory-startup --disable-autoexec --python tools/models/shellFountain.py
 렌더 생략: 명령 끝에 -- --skip-render 추가.
 
 원본 blend 없이 새 형상을 생성한다. 물은 미리보기에만 포함한다.
@@ -21,12 +21,11 @@ from mathutils.bvhtree import BVHTree
 from mathutils.geometry import closest_point_on_tri, intersect_ray_tri
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/fountain"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "fountain"
 NAME = "shellFountain"
 EPS = 1e-6
 

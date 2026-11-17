@@ -1,6 +1,6 @@
 """
 Blender 5.3
-실행: /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --disable-autoexec --python /absolute/path/to/landing.py
+실행: /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --disable-autoexec --python tools/models/landing.py
 메시·GLB 직렬화는 메모리에서 검증했으며, 렌더·파일 저장은 실행하지 않았다.
 """
 
@@ -16,13 +16,12 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-SOURCE = ROOT / "upstream-blend/folio-2025.blend"
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/landing"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+SOURCE = SOURCES / "folio-2025.blend"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "landing"
 
 TARGETS = {
     "gamepad": (1.62, 1.28, 0.54),

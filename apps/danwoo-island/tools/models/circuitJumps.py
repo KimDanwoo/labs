@@ -2,7 +2,7 @@
 Blender 5.3 — circuitJumps.py
 
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/circuitJumps.py
+blender -b --factory-startup --disable-autoexec --python tools/models/circuitJumps.py
 
 Blender 좌표: X 가로, +Y 진행, Z 위. 각 모델의 원점·회전·스케일을 유지한다.
 끝면의 지지 통나무는 안쪽으로 파인 홈에 배치하여 지정 길이를 넘지 않는다.
@@ -29,12 +29,11 @@ from mathutils.bvhtree import BVHTree
 from mathutils.geometry import tessellate_polygon
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/jumps"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "jumps"
 
 EPS = 1e-5
 IMAGE_SIZE = (1800, 1200)

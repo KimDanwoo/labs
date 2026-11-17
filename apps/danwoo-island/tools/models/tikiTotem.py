@@ -1,7 +1,7 @@
 """
 Blender 5.3
 실행:
-blender -b --factory-startup --disable-autoexec --python-exit-code 1 --python /absolute/path/to/tikiTotem.py
+blender -b --factory-startup --disable-autoexec --python-exit-code 1 --python tools/models/tikiTotem.py
 
 Blender 5.3 메모리 검증: 3,276개 삼각형, 71개 닫힌 부품.
 GLB 내보내기와 비교 렌더의 파일 검사는 스크립트 실행 시 수행한다.
@@ -22,12 +22,11 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/props"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "props"
 
 NAME = "tikiTotem"
 TARGET = Vector((0.90, 0.90, 3.20))

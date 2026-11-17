@@ -1,10 +1,10 @@
 """
 Blender 5.3
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/circuitSigns.py
+blender -b --factory-startup --disable-autoexec --python tools/models/circuitSigns.py
 
 파일 쓰기 없이 기하 검사만:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/circuitSigns.py -- --check-only
+blender -b --factory-startup --disable-autoexec --python tools/models/circuitSigns.py -- --check-only
 
 좌표: X 오른쪽, Y 뒤, Z 위. 정면 -Y, 원점 바닥 중심.
 비교 PNG: 왼쪽 circuitBoard, 오른쪽 resetSign. 각각 정면 위 30도.
@@ -30,12 +30,11 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/circuit"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "circuit"
 EPS = 1e-6
 
 EXPECTED = {

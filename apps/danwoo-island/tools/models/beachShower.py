@@ -1,9 +1,9 @@
 """
 Blender 5.3
 실행:
-  blender -b --factory-startup --disable-autoexec --python /absolute/path/to/beachShower.py
+  blender -b --factory-startup --disable-autoexec --python tools/models/beachShower.py
 렌더 생략:
-  blender -b --factory-startup --disable-autoexec --python /absolute/path/to/beachShower.py -- --skip-render
+  blender -b --factory-startup --disable-autoexec --python tools/models/beachShower.py -- --skip-render
 
 좌표: X 오른쪽, Y 뒤, Z 위. 정면 -Y, 원점은 바닥 중심.
 검증: Blender 5.3 메모리에서 6816삼각형·167개 닫힌 부품·GLB 직렬화 검사 통과.
@@ -26,13 +26,12 @@ import bpy
 from mathutils import Matrix, Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-SOURCE = ROOT / "upstream-blend/folio-2025.blend"
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/polish3"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+SOURCE = SOURCES / "folio-2025.blend"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "polish3"
 NAME = "beachShower"
 EPSILON = 1e-5
 

@@ -1,7 +1,7 @@
 """
 Blender 5.3
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/clayPot.py
+blender -b --factory-startup --disable-autoexec --python tools/models/clayPot.py
 """
 
 import argparse
@@ -19,12 +19,11 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/props"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "props"
 
 NAME = "clayPot"
 TARGET = Vector((1.85, 1.85, 0.95))

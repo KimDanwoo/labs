@@ -1,6 +1,6 @@
 """
 Blender 5.3
-실행: blender -b --factory-startup --disable-autoexec --python /absolute/path/to/linkSign.py
+실행: blender -b --factory-startup --disable-autoexec --python tools/models/linkSign.py
 렌더 생략: 명령 끝에 -- --skip-render 추가.
 수정 형상의 메시·앞뒤 대칭·글씨 칸·GLB 직렬화를 메모리에서 검증했다(삼각형 1,260개).
 파일 저장과 최종 PNG의 시각적 결과는 검증하지 않았다.
@@ -16,13 +16,12 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-SOURCE = ROOT / "upstream-blend/folio-2025.blend"
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/polish3"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+SOURCE = SOURCES / "folio-2025.blend"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "polish3"
 NAME = "linkSign"
 TARGET = Vector((1.00, 0.30, 1.40))
 EPSILON = 1e-5

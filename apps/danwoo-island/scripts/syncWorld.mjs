@@ -15,11 +15,10 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { preparePortfolioContent } from './portfolioContent.mjs';
+import { WORLD_COMMIT, WORLD_REPOSITORY } from './worldSource.mjs';
 
 const SYNC_FORMAT_VERSION = '7';
 const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const WORLD_COMMIT = '70764a94756cc4de564e493c8ba46c4b5fe03ed1';
-const WORLD_REPOSITORY = 'https://github.com/brunosimon/folio-2025.git';
 const SPARSE_PATHS = ['/static/', '/license.md'];
 const CHECKOUT_DIRECTORY = path.join(tmpdir(), `danwoo-island-world-${WORLD_COMMIT.slice(0, 7)}`);
 const PUBLIC_DIRECTORY = path.join(APP_ROOT, 'public');

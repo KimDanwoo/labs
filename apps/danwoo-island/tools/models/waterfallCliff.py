@@ -1,7 +1,7 @@
 """
 Blender 5.3
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/waterfallCliff.py
+blender -b --factory-startup --disable-autoexec --python tools/models/waterfallCliff.py
 
 좌표 조건 충돌: 물길 판의 Y=-0.02는 4번 금지 영역에 들어가므로
 앞끝을 Y=0.0으로 설정한다. 원점은 이동하지 않는다.
@@ -23,12 +23,11 @@ import bpy
 from mathutils import Matrix, Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/props"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "props"
 
 NAME = "waterfallCliff"
 PANEL_WIDTH = 1024

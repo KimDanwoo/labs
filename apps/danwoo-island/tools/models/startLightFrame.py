@@ -2,7 +2,7 @@
 Blender 5.3
 
 실행:
-blender -b --factory-startup --disable-autoexec --python /absolute/path/to/startLightFrame.py
+blender -b --factory-startup --disable-autoexec --python tools/models/startLightFrame.py
 
 기본 실행은 startLightFrame.glb와 정면/정면 위 45도 비교 PNG를 생성한다.
 """
@@ -22,12 +22,11 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/props"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "props"
 
 NAME = "startLightFrame"
 TARGET = Vector((5.60, 1.60, 2.80))

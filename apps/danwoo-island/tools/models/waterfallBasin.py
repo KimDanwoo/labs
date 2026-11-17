@@ -1,7 +1,7 @@
 """
 Blender 5.3
 실행:
-blender -b --factory-startup --disable-autoexec --python-exit-code 1 --python /absolute/path/to/waterfallBasin.py
+blender -b --factory-startup --disable-autoexec --python-exit-code 1 --python tools/models/waterfallBasin.py
 
 원점: 폭포 lip 바로 아래 지면. Blender X 오른쪽, Y 뒤, 정면 -Y, Z 위.
 재중심화하지 않는다. 물 메시는 생성하지 않는다.
@@ -25,12 +25,11 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/props"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "props"
 
 NAME = "waterfallBasin"
 PANEL_WIDTH = PANEL_HEIGHT = 1024

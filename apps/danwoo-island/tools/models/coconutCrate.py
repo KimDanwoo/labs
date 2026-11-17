@@ -1,6 +1,6 @@
 """
 Blender 5.3
-실행: Blender -b --factory-startup --disable-autoexec --python /absolute/path/to/coconutCrate.py
+실행: Blender -b --factory-startup --disable-autoexec --python tools/models/coconutCrate.py
 출력: coconutCrate.glb, coconutCrate.png(원작 소품 비교 렌더).
 Blender 5.3에서 메시·GLB 직렬화를 메모리 검증했다(1,690삼각형).
 파일 저장·렌더는 실행하지 않았다.
@@ -17,13 +17,12 @@ import bpy
 from mathutils import Euler, Vector
 from mathutils.bvhtree import BVHTree
 
-ROOT = Path(
-    "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
-    "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
-)
-SOURCE = ROOT / "upstream-blend/folio-2025.blend"
-PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/island2"
+APP_ROOT = Path(__file__).resolve().parents[2]
+SOURCES = APP_ROOT / "tools/models/.sources"
+WORK = APP_ROOT / "tools/models/.work"
+SOURCE = SOURCES / "folio-2025.blend"
+PALETTE = SOURCES / "palette.png"
+OUTPUT = WORK / "island2"
 NAME = "coconutCrate"
 TARGET = Vector((0.95, 0.95, 0.95))
 EPSILON = 1e-5
