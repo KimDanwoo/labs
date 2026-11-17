@@ -379,10 +379,30 @@ export const ISLANDS: readonly IslandShape[] = [
 
 export const BRIDGES: readonly BridgeSpan[] = [
   { from: [-66, 2], to: [-60, 6], width: 5 },
-  { from: [-80.5, 10], to: [-80.5, 20], width: 5 },
-  { from: [-61.5, 33], to: [-53.5, 27], width: 5 },
-  { from: [-58.5, 64], to: [-49.5, 71], width: 5 },
+  { from: [-80.5, 8], to: [-80.5, 18], width: 5 },
+  { from: [-65, 35], to: [-57, 29], width: 5 },
+  { from: [-57, 68], to: [-48, 75], width: 5 },
 ];
+
+export interface Pond {
+  readonly center: Point;
+  readonly radius: number;
+}
+
+export const PONDS: readonly Pond[] = [
+  { center: [-17, 20], radius: 6 },
+  { center: [-82, 54], radius: 4.5 },
+  { center: [-78, -44], radius: 4.5 },
+  { center: [62, 2], radius: 6.5 },
+  { center: [50, 56], radius: 6 },
+];
+
+export interface Lagoon {
+  readonly center: Point;
+  readonly radii: Point;
+}
+
+export const LAGOON: Lagoon = { center: [-32, 46], radii: [17, 11] };
 
 export interface RespawnPoint {
   readonly area: AreaKey;
@@ -393,7 +413,7 @@ export interface RespawnPoint {
 export const RESPAWN_POINTS = {
   achievements: { area: 'achievements', offset: [-2, -10.5], rotation: -1.57 },
   altar: { area: 'altar', offset: [-0.6, 13.3], rotation: 1.12 },
-  beachStart: { area: 'landing', offset: [4.4, 3.3], rotation: -1.15 },
+  beachStart: { area: 'landing', offset: [-0.5, 2.5], rotation: -1.15 },
   behindTheScene: { area: 'behindTheScene', offset: [-1.8, -0.2], rotation: -0.19 },
   bonfire: { area: 'landing', offset: [4.9, 5.7], rotation: -2.2 },
   bowling: { area: 'bowling', offset: [15, -3.8], rotation: -2.59 },
@@ -401,10 +421,10 @@ export const RESPAWN_POINTS = {
   circuit: { area: 'circuit', offset: [0.7, 15.4], rotation: 0.04 },
   controls: { area: 'landing', offset: [-1, -3.7], rotation: 0 },
   cookie: { area: 'cookie', offset: [2.8, 1.6], rotation: 2.92 },
-  lab: { area: 'lab', offset: [5.6, 3.3], rotation: 2.75 },
+  lab: { area: 'lab', offset: [-7, 7], rotation: 1.57 },
   landing: { area: 'landing', offset: [-10.7, -0.5], rotation: -0.23 },
   projects: { area: 'projects', offset: [1, 7.7], rotation: 1.16 },
-  social: { area: 'social', offset: [-3.3, 10.7], rotation: 0.56 },
+  social: { area: 'social', offset: [0, -11.5], rotation: -1.57 },
   timeMachine: { area: 'timeMachine', offset: [-3.4, -2.3], rotation: 0 },
   toilet: { area: 'toilet', offset: [5.2, 2.3], rotation: -2.89 },
 } as const satisfies Record<string, RespawnPoint>;
@@ -412,21 +432,21 @@ export const RESPAWN_POINTS = {
 export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
   bowling: {
     original: [6.3, 66],
-    placed: [-65, -30],
+    placed: [-62, -19],
     bounds: [-21.5, -12.7, 20.2, 12.7],
-    runUp: [20.2, -3.3, 45, 6.9],
+    runUp: [-21.5, -1.7, 45, 5.3],
   },
-  achievements: { original: [70.75, 8.9], placed: [47, 57], bounds: [-5, -7, 5, 7] },
-  social: { original: [29, -25.2], placed: [-30, 4], bounds: [-8.8, -8.6, 11.6, 8.8] },
-  projects: { original: [34.8, 9.9], placed: [10, -62], bounds: [-4.6, -3.6, 5.6, 4.1] },
-  lab: { original: [12.3, 15.55], placed: [-29, -14], bounds: [-4.5, -4.8, 4.5, 2.9] },
-  cookie: { original: [12.8, 34.75], placed: [-42, 22], bounds: [-4.0, -4.8, 4.0, 4.8] },
-  career: { original: [26.3, -1.75], placed: [-72, 36], bounds: [-4.3, -4.9, 4.3, 8.8] },
-  behindTheScene: { original: [50.65, -11.3], placed: [-70, 56], bounds: [-4.3, -5.8, 4.2, 5.8] },
-  timeMachine: { original: [-55.15, -67.3], placed: [46, -62], bounds: [-0.6, -2.3, 2.1, 2.5] },
-  landing: { original: [50.2, 38.3], placed: [-24, 77], bounds: [-10.6, -10.1, 10.7, 9.8] },
-  toilet: { original: [65.75, 63.7], placed: [5, 74], bounds: [-4.5, -3.7, 3.9, 5.7] },
-  altar: { original: [75.35, -27.35], placed: [35, -12], bounds: [-6.8, -7.6, 6.8, 7.5] },
+  achievements: { original: [70.75, 8.9], placed: [27, -48], bounds: [-5, -7, 5, 7] },
+  social: { original: [29, -25.2], placed: [-41, 18], bounds: [-8.8, -8.6, 11.6, 8.8] },
+  projects: { original: [34.8, 9.9], placed: [53, -63], bounds: [-4.6, -3.6, 5.6, 4.1] },
+  lab: { original: [12.3, 15.55], placed: [-9.5, -3], bounds: [-4.5, -4.8, 4.5, 2.9] },
+  cookie: { original: [12.8, 34.75], placed: [-58, 55], bounds: [-4.0, -4.8, 4.0, 4.8] },
+  career: { original: [26.3, -1.75], placed: [-76.5, 29], bounds: [-4.3, -4.9, 4.3, 8.8] },
+  behindTheScene: { original: [50.65, -11.3], placed: [-76.5, 77], bounds: [-4.3, -5.8, 4.2, 5.8] },
+  timeMachine: { original: [-55.15, -67.3], placed: [2, -62], bounds: [-0.6, -2.3, 2.1, 2.5] },
+  landing: { original: [50.2, 38.3], placed: [-28.5, 73], bounds: [-10.6, -10.1, 10.7, 9.8] },
+  toilet: { original: [65.75, 63.7], placed: [7, 77], bounds: [-4.5, -3.7, 3.9, 5.7] },
+  altar: { original: [75.35, -27.35], placed: [38, -3], bounds: [-6.8, -7.6, 6.8, 7.5] },
   circuit: { original: [-11.3, -0.5], placed: [18.2, 33.8], bounds: [-20.5, -11.7, 16.4, 33.9], rotation: 0.204 },
 };
 

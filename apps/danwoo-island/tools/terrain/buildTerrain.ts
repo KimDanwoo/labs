@@ -3,8 +3,9 @@ import path from 'node:path';
 import { deflateSync } from 'node:zlib';
 
 import { type Point, WORLD_SIZE } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
-import { clamp01, sampleTerrain } from './fields';
+import { clamp01 } from './fields';
 import { writeScatter } from './scatter';
+import { sampleTerrain } from './surface';
 
 const OUTPUT = path.resolve(import.meta.dirname, '../../world-overrides/terrain');
 const TEXTURE_SIZE = 512;

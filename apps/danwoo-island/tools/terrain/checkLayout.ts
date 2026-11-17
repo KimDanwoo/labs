@@ -1,6 +1,7 @@
 import {
   AREA_ANCHORS,
   BRIDGES,
+  PONDS,
   RESPAWN_POINTS,
   respawnPosition,
   type AreaKey,
@@ -15,15 +16,19 @@ type Box = readonly [from: Point, to: Point];
 
 const STEP = 1;
 const ENTRY_MARGIN = 5;
-const TRACK_ROOM = 1;
+const TRACK_ROOM = 5;
+const ZONE_GAP = 15;
+const CIRCUIT_GAP = 5;
+const POND_TRACK_ROOM = 3;
 const BRIDGE_SAMPLES = 10;
 const BRIDGE_WET_SHARE = 0.4;
-const RESPAWN_SHORE = 3;
+const RESPAWN_SHORE = 6;
 const RESPAWN_TRACK_ROOM = 2;
 const RESPAWN_PROP_ROOM = 3;
 
 const zones = Object.entries(AREA_ANCHORS) as [AreaKey, (typeof AREA_ANCHORS)[AreaKey]][];
-const props = Object.values(ISLAND_SCATTER).flatMap((list) => list.map(([x, z]): Point => [x, z]));
+const STANDING = ['palms', 'jungle', 'rocks', 'lights', 'lanterns', 'crates'] as const;
+const props = STANDING.flatMap((kind) => ISLAND_SCATTER[kind].map(([x, z]): Point => [x, z]));
 
 const grown = ([from, to]: Box, margin: number): Box => [
   [from[0] - margin, from[1] - margin],
@@ -31,6 +36,9 @@ const grown = ([from, to]: Box, margin: number): Box => [
 ];
 
 const isInside = (point: Point, [from, to]: Box): boolean => boxDistance(point, from, to) < 0;
+
+const gapBetween = ([aFrom, aTo]: Box, [bFrom, bTo]: Box): number =>
+  Math.hypot(Math.max(0, aFrom[0] - bTo[0], bFrom[0] - aTo[0]), Math.max(0, aFrom[1] - bTo[1], bFrom[1] - aTo[1]));
 
 const overlaps = ([aFrom, aTo]: Box, [bFrom, bTo]: Box): boolean =>
   aFrom[0] < bTo[0] && bFrom[0] < aTo[0] && aFrom[1] < bTo[1] && bFrom[1] < aTo[1];
@@ -94,6 +102,22 @@ function respawnProblems(name: string, respawn: RespawnPoint): string[] {
   ];
 }
 
+function spacingProblems(): string[] {
+  return zones.flatMap(([name, anchor], index) =>
+    zones.slice(index + 1).flatMap(([other, otherAnchor]) => {
+      const gap = gapBetween(zoneBox(anchor.placed, anchor.bounds), zoneBox(otherAnchor.placed, otherAnchor.bounds));
+      const wanted = name === 'circuit' || other === 'circuit' ? CIRCUIT_GAP : ZONE_GAP;
+      return gap < wanted ? [`${name}↔${other}: 간격 ${gap.toFixed(1)}m (최소 ${wanted}m)`] : [];
+    }),
+  );
+}
+
+function pondProblems(): string[] {
+  return PONDS.filter(({ center, radius }) => trackClearance(center) < radius + POND_TRACK_ROOM).map(
+    ({ center }) => `연못 [${center.join(', ')}]: 트랙에서 ${POND_TRACK_ROOM}m 안`,
+  );
+}
+
 function bridgeProblems(): string[] {
   const wetShare = (bridge: BridgeSpan): number =>
     bridgeSamples(bridge).filter((point) => landDistance(point) < 0).length / (BRIDGE_SAMPLES + 1);
@@ -107,6 +131,8 @@ function layoutProblems(): string[] {
   return [
     ...zones.flatMap(([name]) => [...zoneProblems(name), ...runUpProblems(name)]),
     ...Object.entries(RESPAWN_POINTS).flatMap(([name, respawn]) => respawnProblems(name, respawn)),
+    ...spacingProblems(),
+    ...pondProblems(),
     ...bridgeProblems(),
   ].filter(Boolean);
 }
