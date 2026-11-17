@@ -7,17 +7,17 @@ import { RevealWord } from './RevealWord';
 import { ScrambleKeyword } from './ScrambleKeyword';
 
 const LINK_CLASS =
-  'font-normal text-primary underline-offset-4 hover:underline transition-colors duration-150 hover:text-primary-accent';
+  'py-xs text-primary underline decoration-primary/40 underline-offset-4 hover:text-primary-accent hover:decoration-primary-accent hover:transition-colors hover:duration-150 active:text-primary-accent';
 
 export function ProfileHeader() {
   return (
-    <header className="relative isolate flex flex-col gap-xl py-xl">
+    <header className="relative isolate flex flex-col gap-lg py-lg sm:gap-xl sm:py-xl">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute top-0 left-0 -z-10 size-72 rounded-full bg-glow blur-3xl hero-glow"
       />
 
-      <h1 className="origin-left font-display text-3xl leading-tight font-bold tracking-tight text-foreground hero-recede min-[400px]:text-4xl sm:text-5xl lg:text-6xl">
+      <h1 className="font-display text-3xl leading-tight font-bold tracking-tight text-foreground min-[400px]:text-4xl sm:text-5xl lg:text-6xl">
         <RevealWord order={0}>
           <ScrambleKeyword keywords={HEADLINE_KEYWORDS} />
         </RevealWord>
@@ -31,12 +31,13 @@ export function ProfileHeader() {
       </h1>
 
       <div
+        aria-hidden="true"
         className="h-px bg-linear-to-r from-card-border to-transparent fade-up"
         style={{ animationDelay: '240ms' }}
       />
 
       <div
-        className="flex max-w-(--container-3xl) flex-col gap-md text-sm leading-[1.75] text-muted-foreground sm:text-base fade-up"
+        className="flex max-w-(--container-2xl) flex-col gap-md text-base leading-[1.8] text-secondary-foreground sm:text-lg fade-up"
         style={{ animationDelay: '300ms' }}
       >
         {PROFILE_PARAGRAPHS.map((paragraph, paragraphIndex) => (
@@ -51,6 +52,7 @@ export function ProfileHeader() {
                   className={LINK_CLASS}
                 >
                   {segment.label}
+                  <span className="sr-only"> (새 탭에서 열림)</span>
                 </a>
               ) : (
                 <Fragment key={segmentIndex}>{segment}</Fragment>
