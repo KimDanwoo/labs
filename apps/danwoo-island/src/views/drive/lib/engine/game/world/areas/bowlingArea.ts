@@ -36,12 +36,12 @@ interface Ball {
 interface Screen {
   readonly group: THREE.Object3D;
   readonly object: WorldObject;
-  readonly min: number;
-  readonly max: number;
+  readonly home: THREE.Vector3;
+  readonly lane: THREE.Vector3;
   readonly labelStrike: THREE.Object3D;
   readonly pinStates: Uint8Array;
   readonly dataTexture: THREE.DataTexture;
-  x: number;
+  travel: number;
 }
 
 interface Bumpers {
@@ -64,6 +64,13 @@ const STRIKE_BLINK = { period: 3, visible: 1.5 } as const;
 const STRIKE_CONFETTI_OFFSETS = [new THREE.Vector3(-1, -1, 0), new THREE.Vector3(-3.4, -1, 0)] as const;
 const BUMPER_DURATION = 1;
 const ZERO = { x: 0, y: 0, z: 0 } as const;
+const LANE_AXIS = new THREE.Vector3(1, 0, 0);
+
+function worldPose(object: THREE.Object3D): THREE.Object3D {
+  const pose = new THREE.Object3D();
+  object.matrixWorld.decompose(pose.position, pose.quaternion, pose.scale);
+  return pose;
+}
 
 function isMesh(object: THREE.Object3D): object is THREE.Mesh {
   return object instanceof THREE.Mesh;
@@ -134,6 +141,7 @@ export class BowlingArea extends Area {
   readonly #pinGroup: InstancedGroup;
   readonly #ball: Ball;
   readonly #screen: Screen;
+  readonly #screenTarget = new THREE.Vector3();
   readonly #restartPoint: InteractivePoint;
   readonly jukebox: JukeboxStation;
   #isWon = false;
@@ -211,7 +219,9 @@ export class BowlingArea extends Area {
   }
 
   #createPins(): { pins: Pin[]; group: InstancedGroup } {
-    const references = InstancedGroup.getReferencesFromChildren(this.requireReference('pinPositions').children);
+    const pinPositions = this.requireReference('pinPositions');
+    pinPositions.updateMatrixWorld(true);
+    const references = InstancedGroup.getReferencesFromChildren(pinPositions.children.map(worldPose));
     const basePin = this.requireReference('pinPhysicalDynamic');
     basePin.castShadow = true;
     basePin.receiveShadow = true;
@@ -325,16 +335,15 @@ export class BowlingArea extends Area {
     if (isMesh(labelStrike)) labelStrike.material = strikeLabelMaterial(labelStrike);
     labelStrike.visible = false;
 
-    const max = group.position.x;
     return {
       group,
       object: objectOf(group),
-      min: max - SCREEN.travel,
-      max,
+      home: group.position.clone(),
+      lane: LANE_AXIS.clone().applyQuaternion(this.model.quaternion),
       labelStrike,
       pinStates,
       dataTexture,
-      x: max,
+      travel: 0,
     };
   }
 
@@ -382,13 +391,12 @@ export class BowlingArea extends Area {
   #updateScreen(): void {
     const { player, ticker } = this.game;
     const screen = this.#screen;
-    const targetX = clamp(player.position.x, screen.min, screen.max);
-    screen.x += (targetX - screen.x) * ticker.deltaScaled * SCREEN.easing;
-    screen.object.physical?.body.setNextKinematicTranslation({
-      x: screen.x,
-      y: screen.group.position.y,
-      z: screen.group.position.z,
-    });
+    const along = this.#screenTarget.copy(player.position).sub(screen.home).dot(screen.lane);
+    const target = clamp(along, -SCREEN.travel, 0);
+    screen.travel += (target - screen.travel) * ticker.deltaScaled * SCREEN.easing;
+    screen.object.physical?.body.setNextKinematicTranslation(
+      this.#screenTarget.copy(screen.home).addScaledVector(screen.lane, screen.travel),
+    );
     screen.object.needsUpdate = true;
     screen.labelStrike.visible =
       this.#isWon && (ticker.elapsedScaled - this.#wonTime) % STRIKE_BLINK.period < STRIKE_BLINK.visible;
@@ -424,7 +432,9 @@ export class BowlingArea extends Area {
     const confetti = world.confetti;
     if (!confetti) return;
     confetti.pop(player.position.clone());
-    for (const offset of STRIKE_CONFETTI_OFFSETS) confetti.pop(this.#screen.group.position.clone().add(offset));
+    for (const offset of STRIKE_CONFETTI_OFFSETS) {
+      confetti.pop(this.#screen.group.position.clone().add(offset.clone().applyQuaternion(this.model.quaternion)));
+    }
   }
 
   #updateBoundings(): void {

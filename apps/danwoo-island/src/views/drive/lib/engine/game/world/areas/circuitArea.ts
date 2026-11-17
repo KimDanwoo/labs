@@ -10,6 +10,7 @@ import { objectOf, type WorldObject } from '../../objects';
 import { Player } from '../../player';
 import { segmentCircleIntersection } from '../../utilities/maths';
 import { requireElement } from '../../utilities/requireElement';
+import { layCircuitCourse, trackSideAt } from '../circuitCourse';
 import { rebuildTentCanopies, reshapeCircuitDecoration } from '../circuitDecoration';
 import { rebuildCircuitObjects, rebuildPodium } from '../circuitProps';
 import { replaceAirDancers } from '../islandReskins';
@@ -37,6 +38,7 @@ interface Door {
 interface Obstacle {
   readonly object: WorldObject;
   readonly basePosition: THREE.Vector3;
+  readonly side: THREE.Vector3;
   readonly phase: number;
 }
 
@@ -154,7 +156,8 @@ export class CircuitArea extends Area {
     this.#resettables = this.#references('objects').map(objectOf);
     this.#obstacles = this.#references('obstacles').map((reference, index) => {
       const object = objectOf(reference);
-      return { object, basePosition: (object.visual?.object3D ?? reference).position.clone(), phase: -index };
+      const basePosition = (object.visual?.object3D ?? reference).position.clone();
+      return { object, basePosition, side: trackSideAt(basePosition), phase: -index };
     });
     this.#roadBody = requireBody(objectOf(this.requireReference('road')));
     this.#roadBody.setEnabled(false);
@@ -176,6 +179,7 @@ export class CircuitArea extends Area {
     reshapeCircuitDecoration(this.model);
     rebuildTentCanopies(this.model);
     replaceAirDancers(this.model);
+    layCircuitCourse(this.model);
     super.setObjects();
   }
 
@@ -411,7 +415,7 @@ export class CircuitArea extends Area {
   #createCourseSign(): void {
     const reset = this.requireReference('leaderboardReset');
     const board = this.requireReference('leaderboard');
-    paintCourseSign(board, this.objects.items);
+    paintCourseSign(board, this.objects.items, this.#checkpoints.length);
     paintObstacleResetSign(reset);
     frameCourseSigns(board, reset);
     const { interactiveButtons } = this.game.inputs;
@@ -549,9 +553,9 @@ export class CircuitArea extends Area {
       if (segmentCircleIntersection(checkpoint.a, checkpoint.b, sensor).length) this.#reach(checkpoint);
     }
 
-    for (const { object, basePosition, phase } of this.#obstacles) {
-      const position = basePosition.clone();
-      position.z += Math.sin(this.#timer.elapsedTime * OBSTACLE.frequency + phase) * OBSTACLE.amplitude;
+    for (const { object, basePosition, side, phase } of this.#obstacles) {
+      const sway = Math.sin(this.#timer.elapsedTime * OBSTACLE.frequency + phase) * OBSTACLE.amplitude;
+      const position = basePosition.clone().addScaledVector(side, sway);
       object.physical?.body.setNextKinematicTranslation(position);
       object.needsUpdate = true;
     }

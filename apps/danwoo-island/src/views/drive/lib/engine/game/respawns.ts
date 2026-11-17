@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
+import { RESPAWN_POINTS, type RespawnPoint, respawnPosition } from './world/layout/islandLayout';
 
 export interface Respawn {
   name: string;
@@ -9,33 +9,19 @@ export interface Respawn {
 }
 
 const SPAWN_HEIGHT = 4;
-const RESPAWN_PREFIX = /^respawn(.+)$/i;
-const EXTRA_RESPAWNS = [
-  { name: 'beachStart', x: 54.6, z: 41.6, rotation: -1.15 },
-  { name: 'timeMachine', x: -58.5, z: -69.6, rotation: 0 },
-] as const;
 
-const lowerFirst = (value: string): string => value.charAt(0).toLowerCase() + value.slice(1);
+function placedRespawn(name: string, point: RespawnPoint): Respawn {
+  const [x, z] = respawnPosition(point);
+  return { name, position: new THREE.Vector3(x, SPAWN_HEIGHT, z), rotation: point.rotation };
+}
 
 export class Respawns {
-  readonly game = getGame();
   readonly #items = new Map<string, Respawn>();
   readonly #defaultName: string;
 
   constructor(defaultName = 'landing') {
     this.#defaultName = defaultName;
-    for (const child of this.game.model('respawnsReferencesModel').scene.children) {
-      child.rotation.reorder('YXZ');
-      const name = lowerFirst(child.name.replace(RESPAWN_PREFIX, '$1'));
-      this.#items.set(name, {
-        name,
-        position: new THREE.Vector3(child.position.x, SPAWN_HEIGHT, child.position.z),
-        rotation: child.rotation.y,
-      });
-    }
-    for (const { name, x, z, rotation } of EXTRA_RESPAWNS) {
-      this.#items.set(name, { name, position: new THREE.Vector3(x, SPAWN_HEIGHT, z), rotation });
-    }
+    for (const [name, point] of Object.entries(RESPAWN_POINTS)) this.#items.set(name, placedRespawn(name, point));
   }
 
   getByName(name: string): Respawn {

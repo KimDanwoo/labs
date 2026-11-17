@@ -1,40 +1,27 @@
-import type * as THREE from 'three/webgpu';
-
 import { getGame } from '../gameContext';
 import { type Areas, createAreas } from './areas/areas';
-import { Benches } from './benches';
-import { Bricks } from './bricks';
 import { Bushes } from './bushes';
+import { buildCircuitJumps } from './circuitJumps';
+import { CircuitTrack } from './circuitTrack';
 import { Confetti } from './confetti';
 import { ExplosiveCrates } from './explosiveCrates';
-import { Fences } from './fences';
 import { Fireballs } from './fireballs';
 import { Floor } from './floor';
 import { Flowers } from './flowers';
 import { Grass } from './grass';
 import { Grid } from './grid';
 import { Intro } from './intro';
-import { IslandTrees, JUNGLE_SPECIES, mixGroves, PALM } from './islandTrees';
+import { placeIslandBridges } from './islandBridges';
+import type { IslandTrees } from './islandTrees';
 import { Lanterns } from './lanterns';
 import { Lightnings } from './lightnings';
 import { PoleLights } from './poleLights';
 import { RainLines } from './rainLines';
-import { Scenery } from './scenery';
+import { placeShoreRocks, plantScatteredTrees, replantScatteredModels } from './scatterPlanting';
 import { pruneShadowCasters } from './shadowCasters';
 import { VisualVehicle } from './visualVehicle';
 import { WaterSurface } from './waterSurface';
 import { WindLines } from './windLines';
-
-const PALM_REFERENCE_MODELS = ['cherryTreesReferencesModel', 'birchTreesReferencesModel'] as const;
-const JUNGLE_REFERENCE_MODEL = 'oakTreesReferencesModel';
-
-function plantIslandTrees(): IslandTrees {
-  const references = (name: string): THREE.Object3D[] => getGame().model(name).scene.children;
-  return new IslandTrees([
-    { species: PALM, references: PALM_REFERENCE_MODELS.flatMap(references) },
-    ...mixGroves(JUNGLE_SPECIES, references(JUNGLE_REFERENCE_MODEL)),
-  ]);
-}
 
 export class World {
   readonly grid = new Grid();
@@ -52,13 +39,10 @@ export class World {
   bushes: Bushes | null = null;
   islandTrees: IslandTrees | null = null;
   flowers: Flowers | null = null;
-  bricks: Bricks | null = null;
-  fences: Fences | null = null;
-  benches: Benches | null = null;
   explosiveCrates: ExplosiveCrates | null = null;
   poleLights: PoleLights | null = null;
   lanterns: Lanterns | null = null;
-  scenery: Scenery | null = null;
+  circuitTrack: CircuitTrack | null = null;
   areas: Areas | null = null;
 
   populate(): void {
@@ -71,16 +55,17 @@ export class World {
     this.rain = new RainLines();
     this.lightnings = new Lightnings();
     this.fireballs = new Fireballs();
+    replantScatteredModels();
     this.bushes = new Bushes();
-    this.islandTrees = plantIslandTrees();
+    this.islandTrees = plantScatteredTrees();
     this.flowers = new Flowers();
-    this.bricks = new Bricks();
-    this.fences = new Fences();
-    this.benches = new Benches();
     this.explosiveCrates = new ExplosiveCrates();
     this.poleLights = new PoleLights();
     this.lanterns = new Lanterns();
-    this.scenery = new Scenery();
+    placeShoreRocks();
+    placeIslandBridges();
+    this.circuitTrack = new CircuitTrack();
+    buildCircuitJumps();
     this.areas = createAreas();
     pruneShadowCasters(getGame().scene);
   }
@@ -101,8 +86,6 @@ export class World {
     bowling?.restart();
     cookie?.refreshAfterReset();
     social?.refreshAfterReset();
-    for (const decoration of [this.benches, this.fences, this.bricks, this.lanterns]) {
-      if (decoration) decoration.instancedGroup.needsUpdate = true;
-    }
+    if (this.lanterns) this.lanterns.instancedGroup.needsUpdate = true;
   }
 }

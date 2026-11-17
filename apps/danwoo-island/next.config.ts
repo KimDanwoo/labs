@@ -21,6 +21,8 @@ const SECURITY_HEADERS = createSecurityHeaders({
 
 const VERSIONED_ASSET_CACHE = [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }];
 const WORLD_ASSET_CACHE = [{ key: 'Cache-Control', value: 'public, max-age=3600, stale-while-revalidate=86400' }];
+const DEVELOPMENT_ASSET_CACHE = [{ key: 'Cache-Control', value: 'no-cache' }];
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 const WORLD_STAMP = path.join(process.cwd(), 'public/world/.stamp');
 const WORLD_VERSION_LENGTH = 12;
@@ -28,18 +30,22 @@ const worldVersion = existsSync(WORLD_STAMP)
   ? readFileSync(WORLD_STAMP, 'utf8').trim().slice(0, WORLD_VERSION_LENGTH)
   : '';
 
-const nextConfig: NextConfig = {
-  env: { NEXT_PUBLIC_WORLD_VERSION: worldVersion },
-  async headers() {
-    return [
-      { source: '/(.*)', headers: SECURITY_HEADERS },
-      { source: '/world/:path*', headers: WORLD_ASSET_CACHE },
+const WORLD_ASSETS = '/world/:path*';
+const worldAssetHeaders = isDevelopment
+  ? [{ source: WORLD_ASSETS, headers: DEVELOPMENT_ASSET_CACHE }]
+  : [
+      { source: WORLD_ASSETS, headers: WORLD_ASSET_CACHE },
       {
-        source: '/world/:path*',
-        has: [{ type: 'query', key: 'v', value: worldVersion || undefined }],
+        source: WORLD_ASSETS,
+        has: [{ type: 'query' as const, key: 'v', value: worldVersion || undefined }],
         headers: VERSIONED_ASSET_CACHE,
       },
     ];
+
+const nextConfig: NextConfig = {
+  env: { NEXT_PUBLIC_WORLD_VERSION: worldVersion },
+  async headers() {
+    return [{ source: '/(.*)', headers: SECURITY_HEADERS }, ...worldAssetHeaders];
   },
 };
 

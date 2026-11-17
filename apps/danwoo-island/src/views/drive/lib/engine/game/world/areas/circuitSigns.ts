@@ -20,15 +20,19 @@ const SIGN_FRAMES = {
 } as const satisfies Record<string, { model: IslandModelKey; panelLift: number }>;
 const INK_COLOR = '#ede7d6';
 const HIDDEN_TITLE = 'Text002';
-const COURSE_SIGN = {
-  size: [512, 512],
-  lines: [
-    { text: '서킷', font: '700 64px MaruBuri', y: 135 },
-    { text: '8개의 체크포인트를 따라', font: '400 28px MaruBuri', y: 240, maxWidth: 440 },
-    { text: '한 바퀴 달려보세요', font: '400 28px MaruBuri', y: 290, maxWidth: 440 },
-    { text: '출발선에서 시작할 수 있어요', font: '400 28px MaruBuri', y: 400, maxWidth: 440 },
-  ],
-} as const satisfies { size: readonly [number, number]; lines: readonly SignLine[] };
+const COURSE_SIGN_SIZE = [512, 512] as const;
+
+function courseSign(checkpointCount: number): { size: readonly [number, number]; lines: readonly SignLine[] } {
+  return {
+    size: COURSE_SIGN_SIZE,
+    lines: [
+      { text: '서킷', font: '700 64px MaruBuri', y: 135 },
+      { text: `${checkpointCount}개의 체크포인트를 따라`, font: '400 28px MaruBuri', y: 240, maxWidth: 440 },
+      { text: '한 바퀴 달려보세요', font: '400 28px MaruBuri', y: 290, maxWidth: 440 },
+      { text: '출발선에서 시작할 수 있어요', font: '400 28px MaruBuri', y: 400, maxWidth: 440 },
+    ],
+  };
+}
 const RESET_SIGN = {
   size: [256, 64],
   lines: [{ text: '장애물', font: '700 32px MaruBuri', y: 32 }],
@@ -66,9 +70,9 @@ function hideTitle(objects: readonly WorldObject[]): void {
   if (title instanceof THREE.Mesh) title.geometry.setDrawRange(0, 0);
 }
 
-export function paintCourseSign(board: THREE.Object3D, objects: readonly WorldObject[]): void {
+export function paintCourseSign(board: THREE.Object3D, objects: readonly WorldObject[], checkpointCount: number): void {
   hideTitle(objects);
-  if (board instanceof THREE.Mesh) board.material = inkedMaterial(signTexture(COURSE_SIGN));
+  if (board instanceof THREE.Mesh) board.material = inkedMaterial(signTexture(courseSign(checkpointCount)));
 }
 
 export function paintObstacleResetSign(sign: THREE.Object3D): void {
@@ -85,6 +89,7 @@ function frameSign(panel: THREE.Object3D, { model, panelLift }: (typeof SIGN_FRA
   const ground = panel.position.y - panelHalfHeight(panel) - panelLift;
   const matrix = new THREE.Matrix4()
     .makeTranslation(panel.position.x, ground, panel.position.z)
+    .multiply(new THREE.Matrix4().makeRotationFromQuaternion(panel.quaternion))
     .multiply(new THREE.Matrix4().makeRotationY(QUARTER_TURN));
   const frame = islandModelMesh(model, matrix);
   frame.material = islandPaletteMaterial(model);

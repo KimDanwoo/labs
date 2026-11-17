@@ -5,12 +5,7 @@ const WORLD_VERSION = VERSION_PATTERN.test(process.env.NEXT_PUBLIC_WORLD_VERSION
   ? process.env.NEXT_PUBLIC_WORLD_VERSION
   : null;
 
-export const CRITICAL_WORLD_ASSETS = [
-  'respawns/respawnsReferences-compressed.glb',
-  'behindTheScene/stars.ktx',
-  'intro/sound.ktx',
-  'palette.ktx',
-] as const;
+export const CRITICAL_WORLD_ASSETS = ['behindTheScene/stars.ktx', 'intro/sound.ktx', 'palette.ktx'] as const;
 
 const RESOLVED_URL = /^(?:[a-z][a-z0-9+.-]*:|\/)/i;
 const CURRENT_DIRECTORY_PREFIX = /^\.\//;
