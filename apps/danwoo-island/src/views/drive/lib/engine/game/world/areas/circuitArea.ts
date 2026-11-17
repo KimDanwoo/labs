@@ -415,7 +415,7 @@ export class CircuitArea extends Area {
   #createCourseSign(): void {
     const reset = this.requireReference('leaderboardReset');
     const board = this.requireReference('leaderboard');
-    paintCourseSign(board, this.objects.items);
+    paintCourseSign(board, this.objects.items, this.#checkpoints.length);
     paintObstacleResetSign(reset);
     frameCourseSigns(board, reset);
     const { interactiveButtons } = this.game.inputs;
