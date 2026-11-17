@@ -4,6 +4,7 @@ import * as THREE from 'three/webgpu';
 import { MeshDefaultMaterial, revealNode } from '../materials/meshDefaultMaterial';
 import { createParts, type PartName, type Parts, removeComponents, type Triple } from './islandGeometry';
 import { islandModelGeometry, islandModelMesh, islandPaletteMaterial } from './islandModels';
+import { pushOutOfShowerBay, SHOWER_SCALE } from './showerBay';
 
 export interface Frame {
   readonly size: THREE.Vector3;
@@ -222,29 +223,52 @@ const SHOWER_STATION = {
 export const SHOWER_PARTS = { waterAnchor: 'showerWaterAnchor', lanternGlow: 'showerLanternGlow' } as const;
 
 const TOILET_PAPER = /^paper/;
+const LOOSE_PROP = /^stool/;
+const BASE_STONES = /^rocks/;
+
+const scaled = (value: number): number => value * SHOWER_SCALE;
+
+function growWithStation(object: THREE.Object3D, center: THREE.Vector3): void {
+  object.position.x = center.x + scaled(object.position.x - center.x);
+  object.position.z = center.z + scaled(object.position.z - center.z);
+  object.scale.multiplyScalar(SHOWER_SCALE);
+}
 
 export function rebuildShowerStation(model: THREE.Object3D): void {
   for (const roll of model.children.filter((child) => TOILET_PAPER.test(child.name))) roll.removeFromParent();
   const container = findChild(model, 'refCabinPhysicalDynamic');
   container.name = 'refCabinPhysicalFixed';
+  for (const prop of model.children.filter((child) => LOOSE_PROP.test(child.name))) {
+    pushOutOfShowerBay(prop.position, container.position);
+  }
+  for (const stones of model.children.filter((child) => BASE_STONES.test(child.name))) {
+    growWithStation(stones, container.position);
+  }
   for (const child of [...container.children]) child.removeFromParent();
   const { floor, postSize, posts, lantern } = SHOWER_STATION;
-  container.add(islandModelMesh('beachShower', new THREE.Matrix4().makeTranslation(0, floor, 0)));
+  const modelMatrix = new THREE.Matrix4()
+    .makeTranslation(0, floor, 0)
+    .scale(new THREE.Vector3().setScalar(SHOWER_SCALE));
+  container.add(islandModelMesh('beachShower', modelMatrix));
   for (const [x, z] of posts) {
     const collider = new THREE.Object3D();
     collider.name = 'cuboid';
-    collider.scale.copy(postSize);
-    collider.position.set(x, floor + postSize.y / 2, z);
+    collider.scale.copy(postSize).multiplyScalar(SHOWER_SCALE);
+    collider.position.set(scaled(x), floor + scaled(postSize.y) / 2, scaled(z));
     container.add(collider);
   }
   const parts = createParts();
   const [x, y, z] = lantern.position;
-  parts.box('lantern', [...lantern.size], { position: [x, floor + y, z] });
+  const [width, height, depth] = lantern.size;
+  parts.box('lantern', [scaled(width), scaled(height), scaled(depth)], {
+    position: [scaled(x), floor + scaled(y), scaled(z)],
+  });
   const lanternGlow = parts.build();
   lanternGlow.name = SHOWER_PARTS.lanternGlow;
   const waterAnchor = new THREE.Group();
   waterAnchor.name = SHOWER_PARTS.waterAnchor;
   waterAnchor.position.y = floor;
+  waterAnchor.scale.setScalar(SHOWER_SCALE);
   container.add(lanternGlow, waterAnchor);
 }
 
