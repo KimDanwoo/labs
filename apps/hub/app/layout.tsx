@@ -5,7 +5,7 @@ import type { Metadata, Viewport } from 'next';
 
 const SITE_URL = 'https://lab.danwoo.dev';
 const SITE_NAME = 'Danwoo Lab';
-const SITE_DESCRIPTION = 'AI로 아이디어를 현실로 만드는 프론트엔드 개발자의 실험실';
+const SITE_DESCRIPTION = '아이디어를 구현해요';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

@@ -23,7 +23,7 @@ export function ProfileHeader() {
         </RevealWord>
         <br />
         <RevealWord order={1}>
-          <span className="text-flow">프론트엔드</span>
+          <span className="text-flow">프로덕트</span>
         </RevealWord>{' '}
         <RevealWord order={2}>
           <span className="text-flow">엔지니어</span>예요
