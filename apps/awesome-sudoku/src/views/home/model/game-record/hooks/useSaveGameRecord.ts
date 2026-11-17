@@ -18,6 +18,10 @@ import { userAtom } from '@entities/session';
 import { useAtomValue } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+interface SaveGameRecordOptions {
+  onSaved?: () => void;
+}
+
 interface SaveGameRecordResult {
   save: () => Promise<string | null>;
   isSaving: boolean;
@@ -27,7 +31,7 @@ interface SaveGameRecordResult {
 
 const gameKeyOf = (solution: number[][]) => solution.flat().join('');
 
-export function useSaveGameRecord(): SaveGameRecordResult {
+export function useSaveGameRecord({ onSaved }: SaveGameRecordOptions = {}): SaveGameRecordResult {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [pointResult, setPointResult] = useState<PointResult | null>(null);
@@ -53,6 +57,9 @@ export function useSaveGameRecord(): SaveGameRecordResult {
   }
   if (!isSuccess && pointResult) {
     setPointResult(null);
+  }
+  if (!isSuccess && error) {
+    setError(null);
   }
 
   const save = useCallback(async (): Promise<string | null> => {
@@ -90,7 +97,10 @@ export function useSaveGameRecord(): SaveGameRecordResult {
 
     try {
       const recordId = await saveGameRecord(record);
-      if (gameKeyOf(gameStore.get(solutionAtom)) === gameKey) gameStore.set(isRecordSavedAtom, true);
+      if (gameKeyOf(gameStore.get(solutionAtom)) === gameKey) {
+        gameStore.set(isRecordSavedAtom, true);
+        onSaved?.();
+      }
       return recordId;
     } catch (err) {
       setError(err instanceof Error ? err : new Error('저장 실패'));
@@ -101,7 +111,7 @@ export function useSaveGameRecord(): SaveGameRecordResult {
         setIsSaving(false);
       }
     }
-  }, [user, isSuccess, difficulty, gameMode, currentTime, hintsRemaining, mistakeCount, pointResult]);
+  }, [user, isSuccess, difficulty, gameMode, currentTime, hintsRemaining, mistakeCount, pointResult, onSaved]);
 
   const saveRef = useRef(save);
   useEffect(() => {
