@@ -166,7 +166,7 @@ function byeotgari(parts: Parts): void {
 }
 
 const HONGSALMUN = {
-  postX: [-14.2, -0.5],
+  postX: [-16.4, -2.7],
   z: -16.32,
   bottom: -1,
   lowerBeam: 3.72,
