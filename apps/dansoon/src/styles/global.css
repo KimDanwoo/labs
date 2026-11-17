@@ -432,12 +432,14 @@ html.theme-transition-collapse::view-transition-old(root) {
   z-index: 1;
 }
 
+/* 펼치는 시간이 길이와 무관하면 긴 목록은 같은 시간에 훨씬 먼 거리를 움직여 너무 빨라 보인다 —
+   목록이 긴 곳은 --details-duration으로 시간을 늘린다(AppSidebar) */
 .motion-details::details-content {
   block-size: 0;
   overflow-y: clip;
   transition:
-    block-size var(--motion-base) var(--motion-ease),
-    content-visibility var(--motion-base) allow-discrete;
+    block-size var(--details-duration, var(--motion-base)) var(--motion-ease),
+    content-visibility var(--details-duration, var(--motion-base)) allow-discrete;
 }
 
 .motion-details[open]::details-content {

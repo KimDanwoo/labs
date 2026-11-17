@@ -6,13 +6,16 @@ import { postPath, type Post } from '~/lib/posts';
 
 type Props = {
   posts: Post[];
+  /** 한 카테고리만 모은 목록에서는 줄마다 같은 배지가 반복되므로 끈다 */
+  showCategory?: boolean;
+  /** 연재처럼 읽는 순서가 있는 목록에서 몇 번째 글인지 보여 준다 */
+  numbered?: boolean;
 };
 
-// 2배 해상도 화면을 고려해 표시 너비(최대 11rem)의 두 배로 만든다. 썸네일은 1200×630이라 높이는 비율대로 정해진다
-const THUMBNAIL_WIDTH = 352;
-const MOBILE_COVER_WIDTH = 240;
+// 2배 해상도 화면을 고려해 표시 너비(최대 7rem)의 두 배로 만든다
+const COVER_WIDTH = 224;
 
-const { posts } = Astro.props;
+const { posts, showCategory = true, numbered = false } = Astro.props;
 ---
 
 {
@@ -20,41 +23,31 @@ const { posts } = Astro.props;
     <p class="py-2xl text-center text-muted-foreground">아직 글이 없어요.</p>
   ) : (
     <ul class="divide-y divide-border border-t border-border">
-      {posts.map((post) => (
+      {posts.map((post, index) => (
         <li>
-          <a href={postPath(post)} class="group flex items-start gap-lg py-lg">
+          <a href={postPath(post)} class="group flex items-start gap-md py-lg sm:gap-lg">
             <div class="min-w-0 flex-1">
-              <p class="flex items-center gap-sm text-sm text-muted-foreground">
-                <CategoryBadge category={post.data.category} />
+              <h2 class="text-lg leading-snug font-bold tracking-tight text-pretty transition-colors group-hover:text-primary group-active:text-primary sm:text-xl">
+                {post.data.title}
+              </h2>
+              <p class="mt-sm line-clamp-2 leading-relaxed text-muted-foreground">{post.data.description}</p>
+              <p class="mt-sm flex flex-wrap items-center gap-x-sm gap-y-xs text-sm text-muted-foreground">
+                {numbered && <span class="font-bold text-foreground tabular-nums">{index + 1}편</span>}
+                {showCategory && <CategoryBadge category={post.data.category} />}
                 <time datetime={post.data.publishedAt.toISOString()} class="tabular-nums">
                   {formatShortDate(post.data.publishedAt)}
                 </time>
                 <span aria-hidden="true">·</span>
-                <span>{readingMinutes(post.body)}분</span>
+                <span>{readingMinutes(post.body)}분 분량</span>
               </p>
-              <h2 class="mt-sm text-xl leading-snug font-bold tracking-tight transition-colors group-hover:text-primary">
-                {post.data.title}
-              </h2>
-              <p class="mt-sm line-clamp-2 leading-relaxed text-muted-foreground">{post.data.description}</p>
             </div>
-            {post.data.thumbnail && (
-              <div class="mt-xs size-20 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border sm:aspect-40/21 sm:h-auto sm:w-44">
-                {post.data.cover && (
-                  <Image
-                    src={post.data.cover}
-                    alt=""
-                    width={MOBILE_COVER_WIDTH}
-                    class="size-full object-cover object-right sm:hidden"
-                  />
-                )}
+            {post.data.cover && (
+              <div class="mt-xs size-20 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border sm:size-28">
                 <Image
-                  src={post.data.thumbnail}
+                  src={post.data.cover}
                   alt=""
-                  width={THUMBNAIL_WIDTH}
-                  class:list={[
-                    'size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105',
-                    post.data.cover && 'max-sm:hidden',
-                  ]}
+                  width={COVER_WIDTH}
+                  class="size-full object-cover object-right transition-transform duration-300 ease-out group-hover:scale-105 motion-reduce:transition-none"
                 />
               </div>
             )}

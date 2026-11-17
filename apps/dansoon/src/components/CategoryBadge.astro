@@ -14,7 +14,7 @@ const Tag = asLink ? 'a' : 'span';
 <Tag
   href={asLink ? categoryPath(category) : undefined}
   data-category={category}
-  class:list={['category-badge', asLink && 'transition-opacity hover:opacity-80']}
+  class:list={['category-badge', asLink && 'min-h-6 transition-opacity hover:opacity-80 active:opacity-70']}
 >
   {CATEGORY_LABEL[category]}
 </Tag>
