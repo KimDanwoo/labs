@@ -44,7 +44,7 @@ export const PROJECTS: Project[] = [
     description: 'three.js로 만든 초원을 유니콘을 타고 달리고 날아요',
     href: 'https://prairie.danwoo.dev/',
     scope: ['3D 그래픽', 'GLSL 셰이더', '비행 역학'],
-    image: '/projects/unicorn-rush-cover.webp',
+    image: '/projects/unicorn-rush-card.webp',
     imagePosition: 'center',
   },
   {
@@ -52,7 +52,7 @@ export const PROJECTS: Project[] = [
     description: '여름 시골길을 픽셀 아트로 산책해요',
     href: 'https://komorebi.danwoo.dev/',
     scope: ['3D 그래픽', '셰이더', '오디오 합성'],
-    image: '/projects/komorebi-cover.webp',
+    image: '/projects/komorebi-card.webp',
     imagePosition: 'center',
   },
   {
@@ -60,7 +60,7 @@ export const PROJECTS: Project[] = [
     description: '차를 몰고 열대 섬을 돌아다니는 3D 포트폴리오',
     href: 'https://world.danwoo.dev/',
     scope: ['3D 엔진 이식', '에셋 파이프라인', '월드 제작'],
-    image: '/projects/danwoo-island-cover.webp',
+    image: '/projects/danwoo-island-card.webp',
     imagePosition: 'center',
   },
 ];
