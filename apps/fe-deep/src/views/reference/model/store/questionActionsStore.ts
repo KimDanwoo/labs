@@ -1,4 +1,4 @@
-import { getProgressForQuestion, updateQuestionProgress, type ProgressStatus } from '@entities/progress';
+import { getProgressForQuestion, markQuestionMastered, type ProgressStatus } from '@entities/progress';
 import { isBookmarked, toggleBookmark } from '@features/bookmark';
 
 const MASTERED: ProgressStatus = 'mastered';
@@ -34,6 +34,12 @@ function emit(questionId: string) {
   listeners.get(questionId)?.forEach((listener) => listener());
 }
 
+/** 보는 컴포넌트가 없어진 질문은 잊는다 — 다른 화면(학습·북마크 목록)에서 바뀐 값을 다음에 저장소에서 다시 읽는다. */
+function forget(questionId: string) {
+  listeners.delete(questionId);
+  cache.delete(questionId);
+}
+
 export function subscribe(questionId: string, listener: () => void) {
   let set = listeners.get(questionId);
   if (!set) {
@@ -43,6 +49,7 @@ export function subscribe(questionId: string, listener: () => void) {
   set.add(listener);
   return () => {
     set.delete(listener);
+    if (set.size === 0) forget(questionId);
   };
 }
 
@@ -61,7 +68,7 @@ export function toggleQuestionBookmark(questionId: string) {
 }
 
 export function markQuestionLearned(questionId: string) {
-  updateQuestionProgress(questionId, true);
-  cache.set(questionId, { ...getState(questionId), status: MASTERED });
+  const { status } = markQuestionMastered(questionId);
+  cache.set(questionId, { ...getState(questionId), status });
   emit(questionId);
 }

@@ -4,6 +4,7 @@ export {
   getProgressByCategory,
   getProgressForQuestion,
   getStudyHeatmap,
+  markQuestionMastered,
   updateQuestionProgress,
 } from './model/services/progressApi';
 export { getLocalProgress } from './model/services/progressStorage';

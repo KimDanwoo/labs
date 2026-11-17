@@ -39,9 +39,10 @@ export function getCurrentStreak(heatmap?: Record<string, number>): number {
   return streak;
 }
 
-export function updateQuestionProgress(questionId: string, knew: boolean): UserProgress {
-  const allProgress = getLocalProgress();
-  const existing = allProgress[questionId];
+const MASTERED_CORRECT_COUNT = 3;
+
+function reviewedProgress(questionId: string, knew: boolean): UserProgress {
+  const existing = getLocalProgress()[questionId];
   const today = todayString();
 
   const updated: UserProgress = {
@@ -61,14 +62,17 @@ export function updateQuestionProgress(questionId: string, knew: boolean): UserP
       addDays(today, knew ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION),
   };
 
-  if (updated.correct_count >= 3) {
+  if (updated.correct_count >= MASTERED_CORRECT_COUNT) {
     updated.status = 'mastered';
   } else if (updated.correct_count > 0 || updated.wrong_count > 0) {
     updated.status = 'learning';
   }
 
-  allProgress[questionId] = updated;
-  saveLocalProgress(allProgress);
+  return updated;
+}
+
+function saveQuestionProgress(updated: UserProgress): UserProgress {
+  saveLocalProgress({ ...getLocalProgress(), [updated.question_id]: updated });
 
   // Supabase write-through (lazy import로 순환 의존성 방지)
   import('../../api/progressSync')
@@ -78,6 +82,19 @@ export function updateQuestionProgress(questionId: string, knew: boolean): UserP
     .catch(() => {});
 
   return updated;
+}
+
+export function updateQuestionProgress(questionId: string, knew: boolean): UserProgress {
+  return saveQuestionProgress(reviewedProgress(questionId, knew));
+}
+
+export function markQuestionMastered(questionId: string): UserProgress {
+  const reviewed = reviewedProgress(questionId, true);
+  return saveQuestionProgress({
+    ...reviewed,
+    status: 'mastered',
+    correct_count: Math.max(reviewed.correct_count, MASTERED_CORRECT_COUNT),
+  });
 }
 
 export function getProgressForQuestion(questionId: string): UserProgress | null {
