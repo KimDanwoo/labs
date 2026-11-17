@@ -204,10 +204,10 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
 
         instance.bind(EVENTS.ready, () => {
           if (disposed) return;
-          clearTimeout(readyTimer);
-          setEngineError(null);
           instance.getSounds((sounds) => {
             if (disposed) return;
+            clearTimeout(readyTimer);
+            setEngineError(null);
             soundIds.current = readSoundIds(sounds);
             holdsSet.current = soundIds.current.length > 1;
             setEngineMode(holdsSet.current ? 'set' : 'single');
