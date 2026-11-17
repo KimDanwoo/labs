@@ -1,4 +1,8 @@
-import { type Point, WORLD_SIZE } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
+import {
+  introRingCenter,
+  type Point,
+  WORLD_SIZE,
+} from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
 import { bridgeDistance, landDistance, objectDistance, padDistance, respawnDistance, trackClearance } from './fields';
 import { random } from './random';
 
@@ -48,7 +52,7 @@ const isBare = (point: Point, greens: readonly Point[]): boolean =>
   greens.every(([x, z]) => Math.hypot(point[0] - x, point[1] - z) >= GLADE.apart);
 
 function openGlades(): Point[] {
-  const glades: Point[] = [];
+  const glades: Point[] = [introRingCenter()];
   for (let z = -HALF_WORLD + GLADE.spacing / 2; z < HALF_WORLD; z += GLADE.spacing) {
     for (let x = -HALF_WORLD + GLADE.spacing / 2; x < HALF_WORLD; x += GLADE.spacing) {
       const spot: Point = [x, z];

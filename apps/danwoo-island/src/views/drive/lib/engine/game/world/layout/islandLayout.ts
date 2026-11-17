@@ -419,7 +419,7 @@ export const RESPAWN_POINTS = {
   bowling: { area: 'bowling', offset: [15, -3.8], rotation: -2.59 },
   career: { area: 'career', offset: [0, 11.4], rotation: 1.57 },
   circuit: { area: 'circuit', offset: [0.7, 15.4], rotation: 0.04 },
-  controls: { area: 'landing', offset: [-1, -3.7], rotation: 0 },
+  controls: { area: 'landing', offset: [-1, -6.5], rotation: 0 },
   cookie: { area: 'cookie', offset: [2.8, 1.6], rotation: 2.92 },
   lab: { area: 'lab', offset: [-7, 7], rotation: 1.57 },
   landing: { area: 'landing', offset: [-10.7, -0.5], rotation: -0.23 },
@@ -453,4 +453,11 @@ export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
 export function respawnPosition({ area, offset }: RespawnPoint): Point {
   const { placed } = AREA_ANCHORS[area];
   return [placed[0] + offset[0], placed[1] + offset[1]];
+}
+
+export const INTRO_RING = { offset: [0.6, -2], radius: 3.5 } as const satisfies { offset: Point; radius: number };
+
+export function introRingCenter(): Point {
+  const [x, z] = respawnPosition(RESPAWN_POINTS.beachStart);
+  return [x + INTRO_RING.offset[0], z + INTRO_RING.offset[1]];
 }

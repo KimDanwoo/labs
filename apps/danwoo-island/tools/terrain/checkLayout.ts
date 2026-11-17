@@ -1,6 +1,8 @@
 import {
   AREA_ANCHORS,
   BRIDGES,
+  INTRO_RING,
+  introRingCenter,
   PONDS,
   RESPAWN_POINTS,
   respawnPosition,
@@ -28,7 +30,11 @@ const RESPAWN_PROP_ROOM = 3;
 
 const zones = Object.entries(AREA_ANCHORS) as [AreaKey, (typeof AREA_ANCHORS)[AreaKey]][];
 const STANDING = ['palms', 'jungle', 'rocks', 'lights', 'lanterns', 'crates'] as const;
-const props = STANDING.flatMap((kind) => ISLAND_SCATTER[kind].map(([x, z]): Point => [x, z]));
+const [ringX, ringZ] = introRingCenter();
+const isStartGarden = ([x, z]: Point): boolean => Math.hypot(x - ringX, z - ringZ) <= INTRO_RING.radius;
+const props = STANDING.flatMap((kind) => ISLAND_SCATTER[kind].map(([x, z]): Point => [x, z])).filter(
+  (point) => !isStartGarden(point),
+);
 
 const grown = ([from, to]: Box, margin: number): Box => [
   [from[0] - margin, from[1] - margin],

@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   AREA_ANCHORS,
   BRIDGES,
+  introRingCenter,
   type Point,
   TRACK,
   WORLD_SIZE,
@@ -97,6 +98,22 @@ const TRACK_HEDGE = { spacing: 4, jitter: 0.8, belt: [3.2, 5.5] } as const;
 const SINGLE: Planting['count'] = [1, 1];
 const BELT_TREE: Planting = { isTall: true, count: SINGLE, reach: [0, 0], gap: 3.4, inland: 3, track: 4, pad: 3 };
 const BELT_BUSH: Planting = { count: SINGLE, reach: [0, 0], gap: 2.2, inland: 2, track: 3, pad: 1.5 };
+const START_GARDEN = {
+  palms: [[-3.2, -0.6]],
+  rocks: [[3.2, 0.5]],
+  bushes: [
+    [-2.6, -1.6],
+    [-3, 1.7],
+  ],
+  flowers: [
+    [-1.8, 0.6],
+    [-2.9, 0.9],
+    [1.3, 1.9],
+    [3, -1.4],
+    [-0.8, -2.8],
+    [0.5, 3],
+  ],
+} as const satisfies Record<string, readonly Point[]>;
 const CAMERA_SIDE: Point = [Math.SQRT1_2, Math.SQRT1_2];
 const TREE_COVER = { reach: 12, step: 2, pad: 3, respawn: 5 } as const;
 const SHORE_ROCKS = { spacing: 11, jitter: 0.8, shore: [-1, 2.5], track: 5, pad: 3 } as const;
@@ -215,13 +232,16 @@ export function writeScatter(): void {
   const rocks = jitteredGrid(SHORE_ROCKS.spacing, SHORE_ROCKS.jitter, next).filter(
     (point) => isShoreRock(point) && isApart(point, solid, TREES.gap),
   );
+  const [ringX, ringZ] = introRingCenter();
+  const inStartGarden = (kind: keyof typeof START_GARDEN): Point[] =>
+    START_GARDEN[kind].map(([x, z]): Point => [ringX + x, ringZ + z]);
   const plant = asPlant(next);
   const scatterSet = {
-    palms: trees.filter((point) => landDistance(point) < PALM_COAST).map(plant),
+    palms: [...trees.filter((point) => landDistance(point) < PALM_COAST), ...inStartGarden('palms')].map(plant),
     jungle: trees.filter((point) => landDistance(point) >= PALM_COAST).map(plant),
-    rocks: rocks.map(plant),
-    bushes: bushes.map(plant),
-    flowers: flowers.map(plant),
+    rocks: [...rocks, ...inStartGarden('rocks')].map(plant),
+    bushes: [...bushes, ...inStartGarden('bushes')].map(plant),
+    flowers: [...flowers, ...inStartGarden('flowers')].map(plant),
     lights: padCorners()
       .filter((point) => hasRoom(point, { inland: 1, track: 3, pad: -0.5 }))
       .map(asPlacement),

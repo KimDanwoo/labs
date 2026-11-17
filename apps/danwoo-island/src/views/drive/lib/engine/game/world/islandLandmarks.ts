@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu';
 
 import { createFountainWater } from './fountainWater';
 import { type IslandModelKey, islandModelMesh } from './islandModels';
-import { placedInArea } from './layout/areaPlacement';
+import { introRingCenter, type Point } from './layout/islandLayout';
 
 interface LandmarkCollider {
   readonly size: THREE.Vector3;
@@ -74,11 +74,17 @@ const LANDMARKS: readonly PlacedLandmark[] = [
   { pattern: /^gamepadPhysicalDynamic/, ...PALM_HAMMOCK, offset: new THREE.Vector3(1, 0, 0) },
 ];
 
+const SURF_CORNER_SPOT: Point = [0.8, -2];
+
 const BEACH_SPOTS: readonly BeachSpot[] = [
   {
     pattern: /^gamepadPhysicalDynamic/,
     ...SURF_CORNER,
-    position: placedInArea('landing', new THREE.Vector3(56, 0, 37.6)),
+    position: new THREE.Vector3(
+      introRingCenter()[0] + SURF_CORNER_SPOT[0],
+      0,
+      introRingCenter()[1] + SURF_CORNER_SPOT[1],
+    ),
   },
 ];
 
