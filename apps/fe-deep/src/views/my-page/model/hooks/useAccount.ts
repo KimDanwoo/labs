@@ -23,9 +23,9 @@ export function useAccount() {
     setDeleting(true);
     setError('');
 
-    const res = await fetch('/api/account/delete', { method: 'DELETE' });
+    const res = await fetch('/api/account/delete', { method: 'DELETE' }).catch(() => null);
 
-    if (!res.ok) {
+    if (!res?.ok) {
       setError('계정 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.');
       setDeleting(false);
       return;
