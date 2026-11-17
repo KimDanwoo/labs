@@ -1,3 +1,5 @@
+import type * as THREE from 'three/webgpu';
+
 import { getGame } from '../gameContext';
 import { type Areas, createAreas } from './areas/areas';
 import { Benches } from './benches';
@@ -12,33 +14,26 @@ import { Flowers } from './flowers';
 import { Grass } from './grass';
 import { Grid } from './grid';
 import { Intro } from './intro';
+import { IslandTrees, JUNGLE_SPECIES, mixGroves, PALM } from './islandTrees';
 import { Lanterns } from './lanterns';
 import { Lightnings } from './lightnings';
-import { PalmTrees } from './palmTrees';
 import { PoleLights } from './poleLights';
 import { RainLines } from './rainLines';
 import { Scenery } from './scenery';
 import { pruneShadowCasters } from './shadowCasters';
-import { Trees } from './trees';
 import { VisualVehicle } from './visualVehicle';
 import { WaterSurface } from './waterSurface';
 import { WindLines } from './windLines';
 
-interface TreeSpecies {
-  model: string;
-  colorA: string;
-  colorB: string;
-}
-
-const JUNGLE: TreeSpecies = { model: 'oakTrees', colorA: '#1d6a47', colorB: '#8fcf5c' };
-
 const PALM_REFERENCE_MODELS = ['cherryTreesReferencesModel', 'birchTreesReferencesModel'] as const;
+const JUNGLE_REFERENCE_MODEL = 'oakTreesReferencesModel';
 
-function plantTrees({ model, colorA, colorB }: TreeSpecies): Trees {
-  const game = getGame();
-  const visual = game.model(`${model}VisualModel`).scene;
-  const references = game.model(`${model}ReferencesModel`).scene.children;
-  return new Trees({ visual, references, colorA, colorB });
+function plantIslandTrees(): IslandTrees {
+  const references = (name: string): THREE.Object3D[] => getGame().model(name).scene.children;
+  return new IslandTrees([
+    { species: PALM, references: PALM_REFERENCE_MODELS.flatMap(references) },
+    ...mixGroves(JUNGLE_SPECIES, references(JUNGLE_REFERENCE_MODEL)),
+  ]);
 }
 
 export class World {
@@ -55,8 +50,7 @@ export class World {
   lightnings: Lightnings | null = null;
   fireballs: Fireballs | null = null;
   bushes: Bushes | null = null;
-  oakTrees: Trees | null = null;
-  palmTrees: PalmTrees | null = null;
+  islandTrees: IslandTrees | null = null;
   flowers: Flowers | null = null;
   bricks: Bricks | null = null;
   fences: Fences | null = null;
@@ -78,8 +72,7 @@ export class World {
     this.lightnings = new Lightnings();
     this.fireballs = new Fireballs();
     this.bushes = new Bushes();
-    this.oakTrees = plantTrees(JUNGLE);
-    this.palmTrees = new PalmTrees(PALM_REFERENCE_MODELS.flatMap((name) => getGame().model(name).scene.children));
+    this.islandTrees = plantIslandTrees();
     this.flowers = new Flowers();
     this.bricks = new Bricks();
     this.fences = new Fences();

@@ -25,7 +25,7 @@ export const TICK_ORDER = {
   fog: 10,
   trails: 10,
   grass: 10,
-  palmTrees: 10,
+  islandTrees: 10,
   foliage: 10,
   explosiveCrates: 10,
   floor: 10,

@@ -82,8 +82,8 @@ export class Reveal {
       intro.createLabelContent();
       game.ticker.wait(1, () => intro.showLabel());
 
-      const { palmTrees } = game.world;
-      if (palmTrees) palmTrees.seeThroughMultiplier = INTRO_SEE_THROUGH;
+      const { islandTrees } = game.world;
+      if (islandTrees) islandTrees.seeThroughMultiplier = INTRO_SEE_THROUGH;
 
       if (isSkipping()) this.#open();
       else this.#waitForStart();
@@ -148,9 +148,9 @@ export class Reveal {
       onComplete: () => this.#finish(),
     });
 
-    const { palmTrees } = game.world;
-    if (palmTrees) {
-      gsap.to(palmTrees, { seeThroughMultiplier: 1, ease: 'power1.inOut', duration: 2 / speed(), overwrite: true });
+    const { islandTrees } = game.world;
+    if (islandTrees) {
+      gsap.to(islandTrees, { seeThroughMultiplier: 1, ease: 'power1.inOut', duration: 2 / speed(), overwrite: true });
     }
   }
 

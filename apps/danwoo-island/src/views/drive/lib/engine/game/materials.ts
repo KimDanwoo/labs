@@ -64,10 +64,13 @@ function convert(base: ConvertibleMaterial): MeshDefaultMaterial {
   const colorNode = map ? texture(map).rgb : vec3(base.color.r, base.color.g, base.color.b);
   const alphaNode = isLabel ? texture(map).r : baseAlpha(base);
   const material = new MeshDefaultMaterial({ colorNode, alphaNode, transparent: isLabel || base.transparent });
+  material.name = base.name;
   material.premultipliedAlpha = isLabel;
   material.map = map;
   return material;
 }
+
+const PALETTE = 'palette';
 
 export class Materials {
   readonly trailGradient = trailGradientTexture();
@@ -75,10 +78,9 @@ export class Materials {
   readonly #emissiveOutputs = new Map<string, THREE.Node<'vec4'>>();
 
   constructor() {
-    this.#named.set(
-      'palette',
-      new MeshDefaultMaterial({ colorNode: texture(getGame().texture('paletteTexture')).rgb }),
-    );
+    const palette = new MeshDefaultMaterial({ colorNode: texture(getGame().texture('paletteTexture')).rgb });
+    palette.name = PALETTE;
+    this.#named.set(PALETTE, palette);
     for (const [name, options] of Object.entries(EMISSIVE_GRADIENTS)) this.emissiveGradient(name, options);
     this.createGradient(RED_GRADIENT.name, RED_GRADIENT.top, RED_GRADIENT.bottom);
   }
@@ -105,6 +107,7 @@ export class Materials {
     const baseColor = isNormalized ? gradient.div(luminance(gradient)) : gradient;
     const intensityUniform = uniform(intensity);
     const material = new THREE.MeshBasicNodeMaterial({ transparent: true });
+    material.name = name;
     const outputNode = Fn(() => vec4(revealNode(baseColor.mul(intensityUniform)), 1))();
     material.outputNode = outputNode;
     this.#emissiveOutputs.set(name, outputNode);
@@ -122,6 +125,7 @@ export class Materials {
   createGradient(name: string, top: THREE.ColorRepresentation, bottom: THREE.ColorRepresentation): THREE.Material {
     const colorNode = mix(uniform(new THREE.Color(top)), uniform(new THREE.Color(bottom)), uv().y);
     const material = new MeshDefaultMaterial({ colorNode });
+    material.name = name;
     this.#named.set(name, material);
     return material;
   }

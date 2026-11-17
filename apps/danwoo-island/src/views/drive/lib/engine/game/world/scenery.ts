@@ -1,4 +1,4 @@
-import { color, dot, float, Fn, mix, PI, positionWorld, smoothstep, texture, uniform, uv, vec3 } from 'three/tsl';
+import { color, float, Fn, PI, positionWorld, texture, uniform, uv, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
@@ -7,11 +7,20 @@ import { References } from '../references';
 import { TICK_ORDER } from '../tickOrder';
 import { paintSteppingStones } from './islandReskins';
 import { rebuildBridge } from './islandStructures';
+import { replaceBasalt, scatterShells } from './tropicalRocks';
 
 const BRIDGE_PATTERN = /^bridgePhysicalFixed/;
 const BASALT_PATTERN = /^basaltRocks/;
-const BASALT_TONE = { dark: '#5f554d', light: '#a8998a', luminance: [0.3, 0.59, 0.11] } as const;
+const PEBBLES_NAME = 'Cube157';
 const GLITTER_SPEED = { time: 0.004, view: 0.004 } as const;
+
+function basaltMeshes(scene: THREE.Object3D): THREE.Mesh[] {
+  const meshes: THREE.Mesh[] = [];
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh && BASALT_PATTERN.test(child.name)) meshes.push(child);
+  });
+  return meshes;
+}
 
 export class Scenery {
   readonly references = new References();
@@ -24,7 +33,10 @@ export class Scenery {
       rebuildBridge(bridge);
     }
     paintSteppingStones(scene);
-    this.#paintBasalt(scene);
+    replaceBasalt(basaltMeshes(scene));
+    const pebbles = scene.getObjectByName(PEBBLES_NAME);
+    if (!(pebbles instanceof THREE.Mesh)) throw new Error('바닥 조약돌 메시를 찾지 못했어요.');
+    scatterShells(pebbles);
 
     for (const child of [...scene.children]) {
       const prevent: unknown = child.userData.prevent;
@@ -45,19 +57,6 @@ export class Scenery {
     }
     this.#paintRoad();
     game.ticker.events.on('tick', () => this.update(), TICK_ORDER.scenery);
-  }
-
-  #paintBasalt(scene: THREE.Object3D): void {
-    const palette = getGame().texture('paletteTexture');
-    const colorNode = Fn(() => {
-      const luminance = dot(texture(palette, uv()).rgb, vec3(...BASALT_TONE.luminance));
-      return mix(color(BASALT_TONE.dark), color(BASALT_TONE.light), smoothstep(0.25, 0.75, luminance));
-    })();
-    const material = new MeshDefaultMaterial({ colorNode });
-    material.userData.prevent = true;
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && BASALT_PATTERN.test(child.name)) child.material = material;
-    });
   }
 
   #paintRoad(): void {
