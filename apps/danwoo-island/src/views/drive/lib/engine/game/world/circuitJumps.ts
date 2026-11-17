@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
-import { islandMaterial } from './islandGeometry';
+import { type IslandModelKey, islandModelMesh } from './islandModels';
 import { TRACK } from './layout/islandLayout';
 import { isOverWaterJump, nearestSample, sideOf, type TrackSample, trackSamples } from './layout/trackPath';
 
@@ -13,6 +13,7 @@ const KICKER = { length: 3, height: 0.45, tail: 0.6 } as const;
 type Profile = (along: number) => number;
 
 interface Ramp {
+  readonly model: IslandModelKey;
   readonly from: number;
   readonly to: number;
   readonly height: Profile;
@@ -72,29 +73,49 @@ function circuitRamps(samples: readonly TrackSample[]): Ramp[] {
   const kickers = TRACK.kickers.map((point): Ramp => {
     const center = nearestSample(samples, point).distance;
     return {
+      model: 'jumpKicker',
       from: center - KICKER.length,
       to: center + KICKER.tail,
       height: (along) => KICKER.height * Math.min(1, along / KICKER.length),
     };
   });
   return [
-    { from: entry - TAKEOFF.length, to: entry, height: (along) => (TAKEOFF.height * along) / TAKEOFF.length },
-    { from: exit, to: exit + LANDING.length, height: (along) => LANDING.height * (1 - along / LANDING.length) },
+    {
+      model: 'jumpTakeoff',
+      from: entry - TAKEOFF.length,
+      to: entry,
+      height: (along) => (TAKEOFF.height * along) / TAKEOFF.length,
+    },
+    {
+      model: 'jumpLanding',
+      from: exit,
+      to: exit + LANDING.length,
+      height: (along) => LANDING.height * (1 - along / LANDING.length),
+    },
     ...kickers,
   ];
+}
+
+function rampModel(model: IslandModelKey, { point, forward }: TrackSample): THREE.Mesh {
+  const heading = Math.atan2(-forward[0], -forward[1]);
+  const matrix = new THREE.Matrix4()
+    .makeTranslation(point[0], 0, point[1])
+    .multiply(new THREE.Matrix4().makeRotationY(heading));
+  return islandModelMesh(model, matrix);
 }
 
 export function buildCircuitJumps(): void {
   const { objects } = getGame();
   const samples = trackSamples(SAMPLE_SPACING);
-  const material = islandMaterial('wood');
   for (const ramp of circuitRamps(samples)) {
-    const rings = samplesBetween(samples, ramp).map((sample) => rampCorners(sample, ramp.height(sample.distance)));
-    const geometry = rampGeometry(rings);
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.name = 'circuitJump';
-    const points = geometry.attributes.position?.array;
-    if (!(points instanceof Float32Array)) continue;
-    objects.add({ model: mesh }, { type: 'fixed', colliders: [{ shape: 'hull', parameters: [points] }] });
+    const along = samplesBetween(samples, ramp);
+    const first = along[0];
+    const hull = rampGeometry(along.map((sample) => rampCorners(sample, ramp.height(sample.distance)))).attributes
+      .position?.array;
+    if (!first || !(hull instanceof Float32Array)) continue;
+    objects.add(
+      { model: rampModel(ramp.model, first) },
+      { type: 'fixed', colliders: [{ shape: 'hull', parameters: [hull] }] },
+    );
   }
 }
