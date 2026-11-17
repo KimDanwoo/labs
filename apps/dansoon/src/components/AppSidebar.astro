@@ -19,11 +19,22 @@ const SHORTCUTS = [
 ];
 const isShortcutActive = ({ href, activePrefixes }: (typeof SHORTCUTS)[number]) =>
   pathname === href || activePrefixes.some((prefix) => pathname.startsWith(prefix));
-const groups = CATEGORY_IDS.map((category) => ({
-  category,
-  label: CATEGORY_LABEL[category],
-  posts: filterByCategory(posts, category),
-}));
+// global.css의 --motion-base와 같은 값에서 시작해 글 수만큼 늘린다
+const EXPAND_BASE_MS = 260;
+const EXPAND_MS_PER_POST = 12;
+const EXPAND_MAX_MS = 640;
+const expandDurationOf = (postCount: number) =>
+  `${Math.min(EXPAND_BASE_MS + postCount * EXPAND_MS_PER_POST, EXPAND_MAX_MS)}ms`;
+
+const groups = CATEGORY_IDS.map((category) => {
+  const categoryPosts = filterByCategory(posts, category);
+  return {
+    category,
+    label: CATEGORY_LABEL[category],
+    posts: categoryPosts,
+    expandDuration: expandDurationOf(categoryPosts.length),
+  };
+});
 const seriesLinks = SERIES_IDS.map((series) => ({
   href: seriesPath(series),
   label: SERIES_INFO[series].label,
@@ -60,6 +71,7 @@ const navLinkClass =
         <details
           name="sidebar-category"
           open={group.category === currentPost?.data.category}
+          style={`--details-duration: ${group.expandDuration}`}
           class="motion-details group mb-sm"
         >
           <summary class="flex cursor-pointer list-none items-center gap-xs rounded-md px-sm py-1.5 text-sm font-bold transition-colors hover:bg-muted active:bg-muted [&::-webkit-details-marker]:hidden">
