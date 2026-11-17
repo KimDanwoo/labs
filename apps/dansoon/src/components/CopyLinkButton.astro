@@ -17,6 +17,7 @@ import Icon from '~/components/Icon.astro';
   function initCopyLink() {
     for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy-link]')) {
       const label = button.querySelector('[data-copy-label]');
+      let resetTimer: ReturnType<typeof setTimeout> | undefined;
       button.addEventListener('click', async () => {
         if (!label) return;
         try {
@@ -25,7 +26,8 @@ import Icon from '~/components/Icon.astro';
         } catch {
           label.textContent = '복사하지 못했어요';
         }
-        setTimeout(() => (label.textContent = '링크 복사'), RESET_DELAY_MS);
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => (label.textContent = '링크 복사'), RESET_DELAY_MS);
       });
     }
   }
