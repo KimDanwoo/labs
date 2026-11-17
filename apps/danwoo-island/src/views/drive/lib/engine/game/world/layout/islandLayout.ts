@@ -20,21 +20,18 @@ export interface IslandShape {
   readonly outline: readonly Point[];
 }
 
-export interface ShorePatch {
-  readonly name: string;
-  readonly outline: readonly Point[];
-}
-
 export interface BridgeSpan {
   readonly from: Point;
   readonly to: Point;
   readonly width: number;
 }
 
+export type Bounds = readonly [minX: number, minZ: number, maxX: number, maxZ: number];
+
 export interface AreaAnchor {
   readonly original: Point;
   readonly placed: Point;
-  readonly footprint: Point;
+  readonly bounds: Bounds;
   readonly rotation?: number;
 }
 
@@ -379,59 +376,8 @@ export const ISLANDS: readonly IslandShape[] = [
   },
 ];
 
-export const SHORE_PATCHES: readonly ShorePatch[] = [
-  {
-    name: 'bowlingShore',
-    outline: [
-      [-66, -47],
-      [-49, -47],
-      [-46, -41],
-      [-46, -19],
-      [-49, -13],
-      [-66, -13],
-    ],
-  },
-  {
-    name: 'bowlingWest',
-    outline: [
-      [-92, -44],
-      [-80, -46],
-      [-80, -14],
-      [-92, -16],
-      [-95, -24],
-      [-95, -36],
-    ],
-  },
-  {
-    name: 'startBeach',
-    outline: [
-      [-4, 20],
-      [10, 16],
-      [12, 56],
-      [-2, 58],
-      [-8, 48],
-      [-8, 28],
-    ],
-  },
-];
-
-export const WATER_CUTS: readonly ShorePatch[] = [
-  {
-    name: 'bowlingStrait',
-    outline: [
-      [-44, -50],
-      [-39, -50],
-      [-38, -40],
-      [-38, -20],
-      [-39, -10],
-      [-44, -10],
-    ],
-  },
-];
-
 export const BRIDGES: readonly BridgeSpan[] = [
   { from: [-38, -42], to: [-38, -31], width: 5 },
-  { from: [-47, -14], to: [-35, -14], width: 5 },
   { from: [-66, 2], to: [-60, 6], width: 5 },
   { from: [-80.5, 10], to: [-80.5, 20], width: 5 },
   { from: [-61, 33], to: [-53, 27], width: 5 },
@@ -463,17 +409,17 @@ export const RESPAWN_AREAS: Readonly<Record<string, AreaKey>> = {
 };
 
 export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
-  bowling: { original: [6.3, 66], placed: [-70, -30], footprint: [43, 25] },
-  achievements: { original: [70.75, 8.9], placed: [36, 60], footprint: [10, 14] },
-  social: { original: [29, -25.2], placed: [-30, 4], footprint: [23, 18] },
-  projects: { original: [34.8, 9.9], placed: [10, -62], footprint: [12, 12] },
-  lab: { original: [12.3, 15.55], placed: [-29, -30], footprint: [9, 10] },
-  cookie: { original: [12.8, 34.75], placed: [-46, 24], footprint: [8, 10] },
-  career: { original: [26.3, -1.75], placed: [-72, 36], footprint: [9, 18] },
-  behindTheScene: { original: [50.65, -11.3], placed: [-70, 56], footprint: [8, 12] },
-  timeMachine: { original: [-55.15, -67.3], placed: [46, -62], footprint: [4, 5] },
-  landing: { original: [50.2, 38.3], placed: [-24, 77], footprint: [21, 20] },
-  toilet: { original: [65.75, 63.7], placed: [5, 74], footprint: [14, 14] },
-  altar: { original: [75.35, -27.35], placed: [32, -12], footprint: [14, 15] },
-  circuit: { original: [-11.3, -0.5], placed: [18.2, 33.8], footprint: [30, 30], rotation: 0.204 },
+  bowling: { original: [6.3, 66], placed: [-67, -30], bounds: [-21.5, -12.7, 20.2, 12.7] },
+  achievements: { original: [70.75, 8.9], placed: [48, 60], bounds: [-5, -7, 5, 7] },
+  social: { original: [29, -25.2], placed: [-30, 4], bounds: [-8.8, -8.6, 11.6, 8.8] },
+  projects: { original: [34.8, 9.9], placed: [10, -62], bounds: [-4.6, -3.6, 5.6, 4.1] },
+  lab: { original: [12.3, 15.55], placed: [-29, -30], bounds: [-4.5, -4.8, 4.5, 2.9] },
+  cookie: { original: [12.8, 34.75], placed: [-46, 24], bounds: [-4.0, -4.8, 4.0, 4.8] },
+  career: { original: [26.3, -1.75], placed: [-72, 36], bounds: [-4.3, -4.9, 4.3, 8.8] },
+  behindTheScene: { original: [50.65, -11.3], placed: [-70, 56], bounds: [-4.3, -5.8, 4.2, 5.8] },
+  timeMachine: { original: [-55.15, -67.3], placed: [46, -62], bounds: [-0.6, -2.3, 2.1, 2.5] },
+  landing: { original: [50.2, 38.3], placed: [-24, 77], bounds: [-10.6, -10.1, 10.7, 9.8] },
+  toilet: { original: [65.75, 63.7], placed: [5, 74], bounds: [-4.5, -3.7, 3.9, 5.7] },
+  altar: { original: [75.35, -27.35], placed: [32, -12], bounds: [-6.8, -7.6, 6.8, 7.5] },
+  circuit: { original: [-11.3, -0.5], placed: [18.2, 33.8], bounds: [-20.5, -11.7, 16.4, 33.9], rotation: 0.204 },
 };

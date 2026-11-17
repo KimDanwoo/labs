@@ -16,6 +16,7 @@ const BRIDGE_CLEARANCE = 6;
 const SEED = 20261117;
 const PALM_COAST = 12;
 const CRATE_RING = 3;
+const PAD_LIGHT_GAP = 2;
 
 interface Rule {
   readonly spacing: number;
@@ -59,16 +60,10 @@ function scatter(rule: Rule, next: () => number, taken: Point[]): Placement[] {
 }
 
 function padCorners(): Point[] {
-  return Object.values(AREA_ANCHORS).flatMap(({ placed, footprint, rotation = 0 }) => {
-    const cos = Math.abs(Math.cos(rotation));
-    const sin = Math.abs(Math.sin(rotation));
-    const halfX = (cos * footprint[0] + sin * footprint[1]) / 2 + 2;
-    const halfZ = (sin * footprint[0] + cos * footprint[1]) / 2 + 2;
-    return [
-      [placed[0] - halfX, placed[1] - halfZ],
-      [placed[0] + halfX, placed[1] + halfZ],
-    ] satisfies Point[];
-  });
+  return Object.values(AREA_ANCHORS).flatMap(({ placed, bounds }) => [
+    [placed[0] + bounds[0] - PAD_LIGHT_GAP, placed[1] + bounds[1] - PAD_LIGHT_GAP] satisfies Point,
+    [placed[0] + bounds[2] + PAD_LIGHT_GAP, placed[1] + bounds[3] + PAD_LIGHT_GAP] satisfies Point,
+  ]);
 }
 
 function ringAround(center: Point, radius: number, count: number): Point[] {

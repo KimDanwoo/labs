@@ -9,9 +9,7 @@ import {
 import {
   AREA_ANCHORS,
   ISLANDS,
-  SHORE_PATCHES,
   TRACK,
-  WATER_CUTS,
   WORLD_SIZE,
   type Point,
 } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
@@ -66,26 +64,30 @@ export function boxDistance(point: Point, from: Point, to: Point): number {
   return Math.hypot(Math.max(dx, 0), Math.max(dz, 0)) + Math.min(Math.max(dx, dz), 0);
 }
 
-const TRACK_BED = 4.5;
+const TRACK_BED = 6.5;
+const ZONE_SHORE = 7;
+const WORLD_EDGE = 3;
 
 export function landDistance(point: Point): number {
   const islands = islandLoops.map((loop) => signedLoopDistance(point, loop));
   const trackBed = TRACK.width / 2 + TRACK_BED - loopDistance(point, trackLoop);
-  const patches = SHORE_PATCHES.map(({ outline }) => signedLoopDistance(point, outline));
-  const cuts = WATER_CUTS.map(({ outline }) => -signedLoopDistance(point, outline));
-  const land = Math.min(Math.max(trackBed, ...islands, ...patches), ...cuts);
+  const zoneShore = Math.min(
+    ZONE_SHORE - padDistance(point),
+    WORLD_SIZE / 2 - WORLD_EDGE - Math.max(Math.abs(point[0]), Math.abs(point[1])),
+  );
+  const land = Math.max(trackBed, zoneShore, ...islands);
   return Math.min(land, boxDistance(point, TRACK.waterJump.from, TRACK.waterJump.to));
 }
 
 export function padDistance(point: Point): number {
   return Math.min(
-    ...Object.values(AREA_ANCHORS).map(({ placed, footprint, rotation = 0 }) => {
-      const cos = Math.abs(Math.cos(rotation));
-      const sin = Math.abs(Math.sin(rotation));
-      const halfX = (cos * footprint[0] + sin * footprint[1]) / 2;
-      const halfZ = (sin * footprint[0] + cos * footprint[1]) / 2;
-      return boxDistance(point, [placed[0] - halfX, placed[1] - halfZ], [placed[0] + halfX, placed[1] + halfZ]);
-    }),
+    ...Object.values(AREA_ANCHORS).map(({ placed, bounds }) =>
+      boxDistance(
+        point,
+        [placed[0] + bounds[0], placed[1] + bounds[1]],
+        [placed[0] + bounds[2], placed[1] + bounds[3]],
+      ),
+    ),
   );
 }
 
