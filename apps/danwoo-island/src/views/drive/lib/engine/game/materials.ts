@@ -131,6 +131,7 @@ export class Materials {
   }
 
   resolve(base: THREE.Material): THREE.Material {
+    if (!base.name) return isConvertible(base) ? convert(base) : base;
     const existing = this.#named.get(base.name);
     if (existing) return existing;
     const material = isConvertible(base) ? convert(base) : base;
