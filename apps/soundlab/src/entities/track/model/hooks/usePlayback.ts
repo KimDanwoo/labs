@@ -140,6 +140,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   // 곡을 바꿔도 듣던 지점부터 난다 — 곡이 바뀔 때만 세우고 play 시점에 되감는다.
   // 일시정지 후 재생이나 스크럽 후 재생은 세우지 않으므로 그 위치를 지킨다.
   const shouldRewind = useRef(false);
+  const pauseAfterSwitch = useRef(false);
   const resume = useRef<{ index: number; ms: number } | null>(null);
   const savedAt = useRef(0);
   // 전환 요청의 세대. 위젯 콜백은 postMessage 왕복이라 빠른 연속 선택 시 낡은 응답이 늦게 도착한다
@@ -236,6 +237,11 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
             resume.current = null;
             instance.seekTo(at);
             anchor(at);
+            if (pauseAfterSwitch.current) {
+              pauseAfterSwitch.current = false;
+              instance.pause();
+              return;
+            }
           }
           restoreVolume(instance);
           playing.current = true;
@@ -327,6 +333,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       holdsSet.current = false;
       soundIds.current = [];
       playing.current = false;
+      pauseAfterSwitch.current = false;
       goSeq.current++;
       for (const event of Object.values(EVENTS)) owned?.unbind(event);
       setIsReady(false);
@@ -367,6 +374,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       const stale = () => goSeq.current !== seq || widget.current !== instance || !ready.current;
       reported.current = { ms: 0, at: performance.now(), live: false };
       shouldRewind.current = true;
+      pauseAfterSwitch.current = false;
       if (resume.current?.index !== next) resume.current = null;
       heldIndex.current = next;
       frameState.position = 0;
@@ -429,8 +437,18 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     [flushListening, setEngineError, setEngineMode, silence, tracks],
   );
 
+  // 곡을 바꾸는 도중에는 위젯이 새 곡을 곧 재생하므로, 지금 멈춰도 다시 튼다 — 새 곡이 시작되는 순간에 멈춘다
+  const pause = useCallback(
+    (instance: ScWidget) => {
+      pauseAfterSwitch.current = shouldRewind.current;
+      pauseFaded(instance);
+    },
+    [pauseFaded],
+  );
+
   const start = useCallback(
     (instance: ScWidget) => {
+      pauseAfterSwitch.current = false;
       const track = tracks[index];
       if (heldIndex.current === index || !track) {
         playFaded(instance);
@@ -457,14 +475,14 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
           queued.current = next;
           return;
         }
-        if (playing.current) pauseFaded(instance);
+        if (playing.current) pause(instance);
         else start(instance);
         return;
       }
       setIndex(next);
       goTo(next, track);
     },
-    [flushListening, goTo, index, pauseFaded, setIndex, setQueue, setResumeNotice, start, tracks],
+    [flushListening, goTo, index, pause, setIndex, setQueue, setResumeNotice, start, tracks],
   );
 
   const toggle = useCallback(() => {
@@ -474,9 +492,9 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       queued.current = PLAY_CURRENT;
       return;
     }
-    if (playing.current) pauseFaded(instance);
+    if (playing.current) pause(instance);
     else start(instance);
-  }, [index, pauseFaded, start, tracks]);
+  }, [index, pause, start, tracks]);
 
   const startQueue = useCallback(
     (requested: PlaybackQueue) => {
@@ -539,6 +557,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         frameState.position = position / track.durationMs;
         resume.current = null;
         setResumeNotice(null);
+        pauseAfterSwitch.current = false;
         playFaded(instance);
         return;
       }
