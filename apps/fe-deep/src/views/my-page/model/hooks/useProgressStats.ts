@@ -15,7 +15,7 @@ type CategoryStats = Record<string, { mastered: number; learning: number; unseen
 
 export function useProgressStats() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [stats, setStats] = useState<OverallStats>({ total: 0, mastered: 0, learning: 0, unseen: 0 });
+  const [stats, setStats] = useState<OverallStats | null>(null);
   const [categoryStats, setCategoryStats] = useState<CategoryStats>({});
   const [heatmap, setHeatmap] = useState<Record<string, number>>({});
   const [streak, setStreak] = useState(0);
@@ -65,7 +65,8 @@ export function useProgressStats() {
     };
   }, []);
 
-  const overallPercent = stats.total > 0 ? Math.round(((stats.mastered + stats.learning) / stats.total) * 100) : 0;
+  const overallPercent =
+    stats && stats.total > 0 ? Math.round(((stats.mastered + stats.learning) / stats.total) * 100) : 0;
 
   if (error) throw error;
 
