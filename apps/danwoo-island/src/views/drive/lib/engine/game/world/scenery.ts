@@ -5,9 +5,9 @@ import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import { References } from '../references';
 import { TICK_ORDER } from '../tickOrder';
-import { paintSteppingStones } from './islandReskins';
+import { paintCurbs, steppingStoneSlabs } from './islandReskins';
 import { rebuildBridge } from './islandStructures';
-import { replaceBasalt, scatterShells } from './tropicalRocks';
+import { replaceBasalt, replaceSteppingStones, scatterShells } from './tropicalRocks';
 
 const BRIDGE_PATTERN = /^bridgePhysicalFixed/;
 const BASALT_PATTERN = /^basaltRocks/;
@@ -32,7 +32,8 @@ export class Scenery {
     for (const bridge of [...scene.children].filter((child) => BRIDGE_PATTERN.test(child.name))) {
       rebuildBridge(bridge);
     }
-    paintSteppingStones(scene);
+    replaceSteppingStones(steppingStoneSlabs(scene));
+    paintCurbs(scene);
     replaceBasalt(basaltMeshes(scene));
     const pebbles = scene.getObjectByName(PEBBLES_NAME);
     if (!(pebbles instanceof THREE.Mesh)) throw new Error('바닥 조약돌 메시를 찾지 못했어요.');

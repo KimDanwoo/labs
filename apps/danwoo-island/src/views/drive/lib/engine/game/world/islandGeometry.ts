@@ -7,6 +7,7 @@ import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 
 export const OCTAGON = 8;
 export const FULL_TURN = Math.PI * 2;
+export const QUARTER_TURN = FULL_TURN / 4;
 
 export const SHADES = {
   stone: '#a39a90',
@@ -328,4 +329,23 @@ export function removeComponents(
   }
   mesh.geometry.setIndex(kept);
   return removed;
+}
+
+export const PALETTE_SLOTS = 32;
+const PALETTE_ROW = 0.5;
+
+export type SlotRepaint = ReadonlyMap<number, number>;
+
+export function paletteSlot(u: number): number {
+  return Math.floor(u * PALETTE_SLOTS);
+}
+
+export function repaintSlots(geometry: THREE.BufferGeometry, repaint: SlotRepaint): void {
+  const uv = geometry.getAttribute('uv');
+  if (!uv) return;
+  for (let vertex = 0; vertex < uv.count; vertex += 1) {
+    const slot = repaint.get(paletteSlot(uv.getX(vertex)));
+    if (slot !== undefined) uv.setXY(vertex, (slot + 0.5) / PALETTE_SLOTS, PALETTE_ROW);
+  }
+  uv.needsUpdate = true;
 }

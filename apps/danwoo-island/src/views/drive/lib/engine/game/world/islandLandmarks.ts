@@ -32,11 +32,22 @@ const collider = (size: Triple, position: Triple): LandmarkCollider => ({
   position: new THREE.Vector3(...position),
 });
 
+const FOUNTAIN_SCALE = 1.35;
+
 const SHELL_FOUNTAIN: Landmark = {
   key: 'shellFountain',
-  decorate: createFountainWater,
-  size: new THREE.Vector3(2.6, 2.4, 2.6),
-  colliders: [collider([2.3, 1.2, 2.3], [0, 0.6, 0]), collider([1.4, 2.2, 1.4], [0, 1.1, 0])],
+  decorate: () => {
+    const water = createFountainWater();
+    water.scale.setScalar(FOUNTAIN_SCALE);
+    return water;
+  },
+  size: new THREE.Vector3(2.6, 2.4, 2.6).multiplyScalar(FOUNTAIN_SCALE),
+  colliders: [collider([2.3, 1.2, 2.3], [0, 0.6, 0]), collider([1.4, 2.2, 1.4], [0, 1.1, 0])].map(
+    ({ size, position }) => ({
+      size: size.multiplyScalar(FOUNTAIN_SCALE),
+      position: position.multiplyScalar(FOUNTAIN_SCALE),
+    }),
+  ),
 };
 
 const PALM_HAMMOCK: Landmark = {

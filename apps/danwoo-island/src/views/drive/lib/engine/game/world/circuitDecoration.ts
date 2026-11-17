@@ -22,6 +22,7 @@ const box3 = (min: Triple, max: Triple): THREE.Box3 =>
 
 const CIRCUIT_DECORATION = {
   resetLetters: box3([-17.33, -0.03, 2.38], [-17.15, 0.47, 4.47]),
+  courseBoard: box3([-18.9, -1.1, -3.1], [-17, 6.2, 5]),
   tires: [box3([-27.45, -1.05, -3.25], [-23.98, 0.5, 0.1]), box3([-2.35, -1.05, 10.9], [0.85, 0.5, 14.55])],
   clock: box3([-17.8, -1.05, 4.68], [-16.6, 0.6, 6.2]),
   gantry: box3([-14.6, -1.1, -18.3], [-0.1, 4, -14.6]),
@@ -48,7 +49,9 @@ function classifyDecoration({ box }: MeshComponent): DecorationKind {
   const isProp = [...design.dancerBases, ...design.bannerStands].some(
     ([x, z]) => Math.hypot(center.x - x, center.z - z) < design.propReach,
   );
-  const isMarking = [design.resetLetters, design.clock, ...design.tires].some((region) => region.containsPoint(center));
+  const isMarking = [design.resetLetters, design.courseBoard, design.clock, ...design.tires].some((region) =>
+    region.containsPoint(center),
+  );
   const isGantryPaint =
     design.gantry.containsPoint(center) && !design.startLights.containsBox(box) && box.max.y > design.groundPaintTop;
   if (isProp || isMarking || isGantryPaint) return 'erase';

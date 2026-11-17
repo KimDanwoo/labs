@@ -4,7 +4,7 @@ import * as THREE from 'three/webgpu';
 
 import { INPUT_MODE, type InputMode } from '../../inputs/inputs';
 import { objectOf } from '../../objects';
-import { rebuildKiosk, replaceBonfireBase } from '../islandStructures';
+import { rebuildKeyboardDeck, rebuildKiosk, replaceBonfireBase } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
 import { replaceLandingName } from './landingName';
@@ -48,6 +48,7 @@ export class LandingArea extends Area {
     rebuildVillageProps(this.model);
     replaceLandingName(this.model);
     rebuildKiosk(this.model, this.game.texture('islandMapTexture'));
+    rebuildKeyboardDeck(this.model);
     super.setObjects();
   }
 

@@ -75,6 +75,7 @@ const PALETTE = 'palette';
 export class Materials {
   readonly trailGradient = trailGradientTexture();
   readonly #named = new Map<string, THREE.Material>();
+  readonly #unnamed = new WeakMap<THREE.Material, THREE.Material>();
   readonly #emissiveOutputs = new Map<string, THREE.Node<'vec4'>>();
 
   constructor() {
@@ -131,10 +132,20 @@ export class Materials {
   }
 
   resolve(base: THREE.Material): THREE.Material {
+    if (!base.name) return this.#resolveUnnamed(base);
     const existing = this.#named.get(base.name);
     if (existing) return existing;
     const material = isConvertible(base) ? convert(base) : base;
     this.#named.set(base.name, material);
+    return material;
+  }
+
+  #resolveUnnamed(base: THREE.Material): THREE.Material {
+    const known = this.#unnamed.get(base);
+    if (known) return known;
+    const material = isConvertible(base) ? convert(base) : base;
+    this.#unnamed.set(base, material);
+    this.#unnamed.set(material, material);
     return material;
   }
 

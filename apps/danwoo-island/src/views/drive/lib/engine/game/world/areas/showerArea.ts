@@ -2,10 +2,11 @@ import * as THREE from 'three/webgpu';
 
 import { rebuildShowerStation, SHOWER_PARTS } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
+import { SHOWER_SCALE } from '../showerBay';
 import { ShowerWater } from '../showerWater';
 import { Area } from './area';
 
-const LANE = { halfWidth: 1.2, halfLength: 1.1 } as const;
+const LANE = { halfWidth: 1.2 * SHOWER_SCALE, halfLength: 1.1 * SHOWER_SCALE } as const;
 const SOUND = { path: 'sounds/rain/soundjay_rain-on-leaves_main-01.mp3', volume: 0.6, distanceFade: 14 } as const;
 
 function requireChild(parent: THREE.Object3D, name: string): THREE.Object3D {

@@ -2,7 +2,7 @@ import { alea } from 'seedrandom';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import * as THREE from 'three/webgpu';
 
-import { FULL_TURN, meshComponents } from './islandGeometry';
+import { FULL_TURN, meshComponents, QUARTER_TURN } from './islandGeometry';
 import { type IslandModelKey, islandModelGeometry, islandPaletteMaterial } from './islandModels';
 
 const ROCK_MODELS = [
@@ -13,9 +13,15 @@ const ROCK_MODELS = [
 ] as const satisfies readonly IslandModelKey[];
 const CLUSTER_GAP = 0.35;
 const SHELL_SIZE = { min: 0.5, max: 0.8 } as const;
+const STEPPING_STONES = [
+  'steppingStoneA',
+  'steppingStoneB',
+  'steppingStoneC',
+  'steppingStoneD',
+] as const satisfies readonly IslandModelKey[];
+const STEPPING_STONE = { height: 0.18, rise: 0.03 } as const;
 const SHELL_EMBED = 0.06;
 const TURN_STEPS = 4;
-const QUARTER_TURN = FULL_TURN / TURN_STEPS;
 const HULL_PATTERN = /^hull/i;
 
 function clusterBoxes(boxes: readonly THREE.Box3[]): THREE.Box3[] {
@@ -86,16 +92,47 @@ function shellGeometry(box: THREE.Box3, random: () => number): THREE.BufferGeome
   return geometry.applyMatrix4(matrix);
 }
 
+function bakedComponentBoxes(mesh: THREE.Mesh): THREE.Box3[] {
+  mesh.updateMatrix();
+  const placed = mesh.geometry.clone().applyMatrix4(mesh.matrix);
+  return meshComponents(placed).components.map(({ box }) => box);
+}
+
+function replaceBakedGeometry(mesh: THREE.Mesh, geometries: THREE.BufferGeometry[], key: IslandModelKey): void {
+  const merged = mergeGeometries(geometries);
+  if (!merged) throw new Error(`${mesh.name} 자리에 ${key} 형상을 합치지 못했어요.`);
+  mesh.geometry.dispose();
+  mesh.geometry = merged;
+  mesh.material = islandPaletteMaterial(key);
+  mesh.position.set(0, 0, 0);
+  mesh.quaternion.identity();
+  mesh.scale.setScalar(1);
+}
+
 export function scatterShells(pebbles: THREE.Mesh): void {
   const random = alea('beachShells');
-  pebbles.updateMatrix();
-  const placed = pebbles.geometry.clone().applyMatrix4(pebbles.matrix);
-  const shells = mergeGeometries(meshComponents(placed).components.map(({ box }) => shellGeometry(box, random)));
-  if (!shells) throw new Error('조개 형상을 합치지 못했어요.');
-  pebbles.geometry.dispose();
-  pebbles.geometry = shells;
-  pebbles.material = islandPaletteMaterial('beachShells');
-  pebbles.position.set(0, 0, 0);
-  pebbles.quaternion.identity();
-  pebbles.scale.setScalar(1);
+  replaceBakedGeometry(
+    pebbles,
+    bakedComponentBoxes(pebbles).map((box) => shellGeometry(box, random)),
+    'beachShells',
+  );
+}
+
+function steppingStoneGeometry(box: THREE.Box3, random: () => number): THREE.BufferGeometry {
+  const model = STEPPING_STONES[Math.floor(random() * STEPPING_STONES.length)] ?? STEPPING_STONES[0];
+  const { x, z } = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3()).setY(box.max.y - STEPPING_STONE.height / 2 + STEPPING_STONE.rise);
+  const matrix = new THREE.Matrix4()
+    .makeTranslation(center)
+    .multiply(new THREE.Matrix4().makeRotationY(random() * FULL_TURN));
+  const size = Math.min(x, z);
+  return islandModelGeometry(model, { size: new THREE.Vector3(size, STEPPING_STONE.height, size), matrix });
+}
+
+export function replaceSteppingStones(slabs: readonly THREE.Mesh[]): void {
+  const random = alea('steppingStones');
+  for (const mesh of slabs) {
+    const stones = bakedComponentBoxes(mesh).map((box) => steppingStoneGeometry(box, random));
+    replaceBakedGeometry(mesh, stones, STEPPING_STONES[0]);
+  }
 }

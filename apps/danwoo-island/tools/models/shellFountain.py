@@ -3,157 +3,159 @@ Blender 5.3
 실행: blender -b --factory-startup --disable-autoexec --python /absolute/path/to/shellFountain.py
 렌더 생략: 명령 끝에 -- --skip-render 추가.
 
-수정 메시 6,376개 삼각형과 GLB 직렬화를 Blender 5.3에서 메모리 검증했다.
-그릇 내면의 위쪽 법선, 진주 가시성, 기존 홈·수면 좌표도 검증했다.
-최종 PNG 렌더와 출력 파일 저장은 실행하지 않았다.
-
-새 줄기 치수와 충돌하는 반경 0.221 제한은 Z 0.42 이상에서만 0.30으로 조정했다.
-덤불 높이 0.45는 테두리의 뿌리 Z 0.40부터 측정하며 최고 Z 0.85로 검사한다.
-나머지 파이프라인·출력 경로·수면 및 홈 좌표·메시/GLB 검사는 유지한다.
+원본 blend 없이 새 형상을 생성한다. 물은 미리보기에만 포함한다.
+출구 접합면 안쪽은 그릇이며, 출구 평면 바깥의 물줄기 통로는 완전히 비운다.
 """
 import argparse
+from collections import Counter
 import json
 import math
+from pathlib import Path
 import struct
 import sys
-from pathlib import Path
 
 import bmesh
 import bpy
 from mathutils import Vector
+from mathutils.bvhtree import BVHTree
+from mathutils.geometry import closest_point_on_tri, intersect_ray_tri
 
 
 ROOT = Path(
     "/private/tmp/claude-501/-Users-duse-Dev-danwoo-labs/"
     "13c85364-e479-440e-9a47-6ff23149a17c/scratchpad"
 )
-SOURCE = ROOT / "upstream-blend/folio-2025.blend"
 PALETTE = ROOT / "style/palette.png"
-OUTPUT = ROOT / "codex-work/polish3"
+OUTPUT = ROOT / "codex-work/fountain"
 NAME = "shellFountain"
-
-EPSILON = 1e-5
-MINIMUM = Vector((-1.3, -1.3, 0.0))
-MAXIMUM = Vector((1.3, 1.3, 2.4))
+EPS = 1e-6
 
 SLOTS = {
     "sand": 1,
     "turquoise": 3,
-    "basalt": 5,
-    "gray": 6,
+    "peach": 7,
     "green": 9,
-    "coral": 10,
-    "light_wood": 11,
-    "vein": 12,
-    "wood": 14,
+    "lime": 12,
+    "khaki": 13,
+    "orange": 15,
     "pink": 17,
     "mango": 18,
-    "white": 23,
+    "cream": 23,
 }
-CENTER_RGB = {
+RGB = {
     1: (235, 209, 163),
     3: (61, 187, 231),
-    5: (74, 65, 60),
-    6: (87, 90, 94),
+    7: (238, 195, 175),
     9: (145, 173, 120),
-    10: (228, 154, 120),
-    11: (152, 129, 101),
     12: (171, 174, 43),
-    14: (179, 109, 69),
+    13: (164, 152, 118),
+    15: (228, 98, 2),
     17: (253, 230, 226),
     18: (248, 166, 88),
     23: (255, 242, 232),
 }
-USED_SLOTS = {1, 3, 9, 10, 12, 17, 23}
+USED = set(SLOTS.values())
 
-GROOVE_ANGLES = (-35, 0, 35)
-GROOVE_DEPTH = 0.05
-POOL_SURFACE = 0.35
-POOL_RADIUS = 1.0
-BOWL_SURFACE = 1.02
-BOWL_RADIUS = 0.62
+SPOUTS = tuple(
+    Vector(p)
+    for p in (
+        (-0.445, -0.636, 1.03),
+        (0.0, -0.78, 1.03),
+        (0.445, -0.636, 1.03),
+    )
+)
+OUTWARD = tuple(
+    Vector((p.x, p.y, 0)).normalized()
+    for p in SPOUTS
+)
+
+SHELL_THICKNESS = 0.14
+LOW = (-1.3, -1.3, 0.0)
+HIGH = (1.3, 1.3, 2.4)
+SPOUT_ANGLE = math.atan2(0.445, 0.636)
+SPOUT_RADIUS = math.hypot(0.445, 0.636)
 
 
 def bounds(points):
     points = list(points)
-    assert points
     return (
-        Vector(tuple(min(p[a] for p in points) for a in range(3))),
-        Vector(tuple(max(p[a] for p in points) for a in range(3))),
+        tuple(min(p[k] for p in points) for k in range(3)),
+        tuple(max(p[k] for p in points) for k in range(3)),
     )
 
 
-def check_bounds(points, lower=MINIMUM, upper=MAXIMUM):
-    actual_lower, actual_upper = bounds(points)
-    assert (actual_lower - lower).length < EPSILON, tuple(actual_lower)
-    assert (actual_upper - upper).length < EPSILON, tuple(actual_upper)
+def assert_bounds(points, low=LOW, high=HIGH):
+    actual = bounds(points)
+    assert all(
+        abs(a - b) < 0.01
+        for row, goal in zip(actual, (low, high), strict=True)
+        for a, b in zip(row, goal, strict=True)
+    ), actual
+    return {
+        "min": list(actual[0]),
+        "max": list(actual[1]),
+    }
 
 
-def check_uv(value):
-    u, v = value
-    slot = round(u * 32 - 0.5)
-    assert slot in USED_SLOTS
-    assert abs(u - (slot + 0.5) / 32) < 1e-7
-    assert abs(v - 0.5) < 1e-7
+def slot_of(uv):
+    slot = round(uv[0] * 32 - 0.5)
+    assert slot in USED
+    assert abs(uv[0] - (slot + 0.5) / 32) < 1e-7
+    assert abs(uv[1] - 0.5) < 1e-7
     return slot
 
 
-def load_source():
-    if bpy.app.version[:2] != (5, 3):
-        raise RuntimeError("Blender 5.3 is required")
-
-    if "--disable-autoexec" not in sys.argv:
-        raise RuntimeError("Start Blender with --disable-autoexec")
-
-    for path in (SOURCE, PALETTE):
-        if not path.is_file():
-            raise FileNotFoundError(path)
-
-    bpy.ops.wm.open_mainfile(
-        filepath=str(SOURCE),
-        load_ui=False,
-        use_scripts=False,
-    )
-
-    material = bpy.data.materials.get("palette")
-    if material is None or material.node_tree is None:
-        raise RuntimeError("Missing source palette material")
-
-    textures = [
-        node for node in material.node_tree.nodes
-        if node.type == "TEX_IMAGE"
-    ]
-    assert len(textures) == 1
-    assert tuple(SLOTS.values()) == (
-        1, 3, 5, 6, 9, 10, 11, 12, 14, 17, 18, 23,
-    )
+def load_palette():
+    assert bpy.app.version[:2] == (5, 3), bpy.app.version_string
+    assert "--disable-autoexec" in sys.argv
+    assert PALETTE.is_file(), str(PALETTE)
 
     image = bpy.data.images.load(str(PALETTE), check_existing=False)
-    assert tuple(image.size) == (128, 4)
     image.colorspace_settings.name = "sRGB"
-    pixels = list(image.pixels)
+    assert tuple(image.size) == (128, 4)
 
-    for label, slot in SLOTS.items():
+    pixels = list(image.pixels)
+    for slot, expected in RGB.items():
         offset = 4 * (2 * 128 + slot * 4 + 2)
-        rgb = tuple(round(pixels[offset + c] * 255) for c in range(3))
-        assert rgb == CENTER_RGB[slot], (label, slot, rgb)
+        actual = tuple(
+            round(pixels[offset + c] * 255)
+            for c in range(3)
+        )
+        assert actual == expected, (slot, actual, expected)
         assert pixels[offset + 3] > 0.999
 
-        print(json.dumps({
-            "color": label,
-            "slot": slot,
-            "center_rgb": rgb,
-        }))
+    image.pack()
 
-    texture = textures[0]
+    old = bpy.data.materials.get("palette")
+    if old:
+        bpy.data.materials.remove(old, do_unlink=True)
+
+    material = bpy.data.materials.new("palette")
+    material.use_nodes = True
+    material.use_backface_culling = True
+
+    nodes = material.node_tree.nodes
+    nodes.clear()
+
+    output = nodes.new("ShaderNodeOutputMaterial")
+    shader = nodes.new("ShaderNodeBsdfPrincipled")
+    shader.inputs["Roughness"].default_value = 0.84
+    shader.inputs["Metallic"].default_value = 0
+
+    texture = nodes.new("ShaderNodeTexImage")
     texture.image = image
     texture.interpolation = "Closest"
     texture.extension = "EXTEND"
-    texture.mute = False
-    material.node_tree.nodes.active = texture
-    material.use_backface_culling = True
-    image.pack()
+    nodes.active = texture
 
+    material.node_tree.links.new(
+        texture.outputs["Color"],
+        shader.inputs["Base Color"],
+    )
+    material.node_tree.links.new(
+        shader.outputs["BSDF"],
+        output.inputs["Surface"],
+    )
     return material
 
 
@@ -162,20 +164,29 @@ class Builder:
         self.vertices = []
         self.faces = []
         self.slots = []
-        self.parts = {}
+        self.tags = []
+        self.names = []
+        self.part = ""
+        self.shell_pairs = []
+        self.rim_vertices = []
 
     def ring(self, points):
-        first = len(self.vertices)
-        self.vertices.extend(tuple(point) for point in points)
-        return list(range(first, len(self.vertices)))
+        start = len(self.vertices)
+        self.vertices.extend(tuple(p) for p in points)
+        return list(range(start, len(self.vertices)))
 
     def face(self, indices, slot):
         indices = tuple(indices)
         assert len(indices) >= 3
-        assert len(set(indices)) == len(indices)
-        assert slot in USED_SLOTS
+        assert len(indices) == len(set(indices))
+        assert slot in USED
+
+        if self.part not in self.names:
+            self.names.append(self.part)
+
         self.faces.append(indices)
         self.slots.append(slot)
+        self.tags.append(self.names.index(self.part))
 
     def bridge(self, first, second, slot, closed=True):
         assert len(first) == len(second)
@@ -185,7 +196,7 @@ class Builder:
             j = (i + 1) % len(first)
             color = (
                 slot[i % len(slot)]
-                if isinstance(slot, (list, tuple))
+                if isinstance(slot, (tuple, list))
                 else slot
             )
             self.face(
@@ -193,32 +204,35 @@ class Builder:
                 color,
             )
 
-    def cap(self, ring, point, slot):
-        center = self.ring([point])[0]
-
+    def cap(self, ring, center, slot):
+        middle = self.ring([center])[0]
         for i in range(len(ring)):
             self.face(
-                (ring[i], ring[(i + 1) % len(ring)], center),
+                (ring[i], ring[(i + 1) % len(ring)], middle),
                 slot,
             )
 
-    def lathe(self, profile, segments, closed_profile=False):
+    def lathe(self, profile, segments=48, closed=False):
         rings = [
             self.ring(
                 (
-                    radius * math.cos(i * math.tau / segments),
-                    radius * math.sin(i * math.tau / segments),
+                    r * math.cos(math.tau * i / segments),
+                    r * math.sin(math.tau * i / segments),
                     z,
                 )
                 for i in range(segments)
             )
-            for radius, z, slot in profile
+            for r, z, slot in profile
         ]
 
         for i in range(1, len(rings)):
-            self.bridge(rings[i - 1], rings[i], profile[i][2])
+            self.bridge(
+                rings[i - 1],
+                rings[i],
+                profile[i][2],
+            )
 
-        if closed_profile:
+        if closed:
             self.bridge(rings[-1], rings[0], profile[0][2])
         else:
             self.cap(
@@ -232,40 +246,81 @@ class Builder:
                 profile[-1][2],
             )
 
-    def add_part(self, name, build):
-        start = len(self.vertices)
-        build()
-        self.parts[name] = (start, len(self.vertices))
+    def ellipsoid(
+        self,
+        center,
+        scale,
+        slots,
+        segments=12,
+        latitudes=6,
+        radial=None,
+        tangent=None,
+    ):
+        center = Vector(center)
+        radial = Vector((0, 1, 0)) if radial is None else radial
+        tangent = Vector((1, 0, 0)) if tangent is None else tangent
+
+        rings = []
+        for j in range(1, latitudes):
+            phi = math.pi * j / latitudes
+            rings.append(
+                self.ring(
+                    center
+                    + tangent * (
+                        scale[0]
+                        * math.sin(phi)
+                        * math.cos(math.tau * i / segments)
+                    )
+                    + radial * (
+                        scale[1]
+                        * math.sin(phi)
+                        * math.sin(math.tau * i / segments)
+                    )
+                    + Vector((0, 0, scale[2] * math.cos(phi)))
+                    for i in range(segments)
+                )
+            )
+
+        self.cap(
+            rings[0],
+            center + Vector((0, 0, scale[2])),
+            slots[0],
+        )
+        for j in range(1, len(rings)):
+            self.bridge(
+                rings[j - 1],
+                rings[j],
+                slots[min(j, len(slots) - 1)],
+            )
+        self.cap(
+            rings[-1],
+            center - Vector((0, 0, scale[2])),
+            slots[-1],
+        )
 
     def finish(self, material):
-        if bpy.data.objects.get(NAME) or bpy.data.meshes.get(NAME):
-            raise RuntimeError("Object name already exists: " + NAME)
-
-        check_bounds(self.vertices)
-
-        for point in self.vertices:
-            verify_clearance(Vector(point))
-
         mesh = bpy.data.meshes.new(NAME)
         mesh.from_pydata(self.vertices, [], self.faces)
         mesh.update()
-        assert not mesh.validate(verbose=False)
+        assert not mesh.validate()
 
         mesh.materials.append(material)
         uv = mesh.uv_layers.new(name="UVMap")
+        tag = mesh.attributes.new("part_id", "INT", "FACE")
 
-        for polygon, slot in zip(mesh.polygons, self.slots, strict=True):
-            polygon.material_index = 0
-            polygon.use_smooth = False
-
-            for index in polygon.loop_indices:
-                uv.data[index].uv = ((slot + 0.5) / 32, 0.5)
+        for polygon, slot, part in zip(
+            mesh.polygons,
+            self.slots,
+            self.tags,
+            strict=True,
+        ):
+            tag.data[polygon.index].value = part
+            for loop in polygon.loop_indices:
+                uv.data[loop].uv = ((slot + 0.5) / 32, 0.5)
 
         bm = bmesh.new()
-
         try:
             bm.from_mesh(mesh)
-            bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
             bmesh.ops.triangulate(
                 bm,
                 faces=list(bm.faces),
@@ -275,23 +330,19 @@ class Builder:
             bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
             assert all(
-                edge.is_manifold and edge.is_contiguous
-                for edge in bm.edges
+                e.is_manifold and e.is_contiguous
+                for e in bm.edges
             )
-            assert all(vertex.is_manifold for vertex in bm.verts)
-            assert all(face.calc_area() > 1e-10 for face in bm.faces)
+            assert all(v.is_manifold for v in bm.verts)
+            assert all(f.calc_area() > 1e-10 for f in bm.faces)
 
             remaining = set(bm.faces)
-            components = 0
-
             while remaining:
                 component = {remaining.pop()}
                 pending = list(component)
 
                 while pending:
-                    face = pending.pop()
-
-                    for edge in face.edges:
+                    for edge in pending.pop().edges:
                         for neighbor in edge.link_faces:
                             if neighbor in remaining:
                                 remaining.remove(neighbor)
@@ -299,12 +350,11 @@ class Builder:
                                 pending.append(neighbor)
 
                 volume = sum(
-                    face.verts[0].co.dot(
-                        face.verts[1].co.cross(face.verts[2].co)
+                    f.verts[0].co.dot(
+                        f.verts[1].co.cross(f.verts[2].co)
                     ) / 6
-                    for face in component
+                    for f in component
                 )
-
                 assert abs(volume) > 1e-10
 
                 if volume < 0:
@@ -313,376 +363,305 @@ class Builder:
                         faces=list(component),
                     )
 
-                components += 1
-
-            assert components == 17, components
             bm.to_mesh(mesh)
-
         finally:
             bm.free()
 
         mesh.update()
         mesh.calc_loop_triangles()
 
-        assert 2500 <= len(mesh.loop_triangles) <= 7000
-        assert not mesh.color_attributes
-        assert len(mesh.materials) == 1
-        assert mesh.materials[0].name == "palette"
-        assert {
-            check_uv(loop.uv)
-            for loop in mesh.uv_layers.active.data
-        } == USED_SLOTS
+        assert len(mesh.vertices) == len(self.vertices)
+        for actual, expected in zip(
+            mesh.vertices,
+            self.vertices,
+            strict=True,
+        ):
+            assert (actual.co - Vector(expected)).length < EPS
 
-        check_bounds(vertex.co for vertex in mesh.vertices)
-
-        for vertex in mesh.vertices:
-            verify_clearance(vertex.co)
-
-        for face in mesh.polygons:
-            values = [
-                tuple(mesh.uv_layers.active.data[i].uv)
-                for i in face.loop_indices
-            ]
-            assert all(value == values[0] for value in values)
-
-            points = [mesh.vertices[i].co for i in face.vertices]
-
-            for a, b in zip(points, points[1:] + points[:1]):
-                for fraction in (0.25, 0.5, 0.75):
-                    verify_clearance(a.lerp(b, fraction))
-
-            verify_clearance(sum(points, Vector()) / 3)
+        for polygon in mesh.polygons:
+            polygon.use_smooth = False
 
         obj = bpy.data.objects.new(NAME, mesh)
         bpy.context.scene.collection.objects.link(obj)
         bpy.context.view_layer.update()
-
-        assert obj.location.length == 0
-        assert tuple(obj.rotation_euler) == (0, 0, 0)
-        assert tuple(obj.scale) == (1, 1, 1)
-
-        verify_water_disks(obj)
-        verify_open_bowl_and_pearl(obj)
-
         return obj
 
 
-def verify_clearance(point):
-    radius = math.hypot(point.x, point.y)
+def build_base(b):
+    b.part = "base_lower"
+    b.lathe(
+        [
+            (1.245, 0.000, 13),
+            (1.300, 0.035, 13),
+            (1.300, 0.115, 1),
+            (1.275, 0.165, 1),
+            (1.220, 0.200, 23),
+        ],
+        segments=64,
+    )
 
-    if (
-        radius < POOL_RADIUS - EPSILON
-        and 0.30 - EPSILON <= point.z <= 0.55 + EPSILON
-    ):
-        # 太くした支柱以外の水面領域を引き続き空ける。
-        allowed = 0.30 if point.z >= 0.42 - EPSILON else 0.221
-        assert radius <= allowed + EPSILON, (
-            "pool intrusion",
-            tuple(point),
-        )
+    b.part = "pool_rim"
+    b.lathe(
+        [
+            (1.080, 0.200, 1),
+            (1.125, 0.225, 1),
+            (1.150, 0.265, 1),
+            (1.150, 0.385, 1),
+            (1.130, 0.435, 23),
+            (1.100, 0.460, 23),
+            (1.070, 0.460, 23),
+            (1.045, 0.435, 23),
+            (1.045, 0.395, 1),
+            (1.045, 0.285, 3),
+            (1.060, 0.220, 3),
+        ],
+        closed=True,
+    )
 
-    if radius < BOWL_RADIUS - EPSILON:
-        assert not (
-            0.95 + EPSILON < point.z < BOWL_SURFACE - EPSILON
-        ), ("bowl intrusion", tuple(point))
+    b.part = "pool_floor"
+    b.lathe(
+        [
+            (1.060, 0.205, 3),
+            (1.060, 0.280, 3),
+            (0.970, 0.270, 3),
+            (0.680, 0.245, 3),
+            (0.320, 0.300, 3),
+        ]
+    )
 
-
-def verify_water_disks(obj):
-    for surface, radius, floor, exclusion in (
-        (POOL_SURFACE, POOL_RADIUS, 0.28, 0.24),
-        (BOWL_SURFACE, BOWL_RADIUS, 0.95, 0.15),
-    ):
-        for fraction in (0.28, 0.50, 0.78, 0.99):
-            r = radius * fraction
-
-            if r <= exclusion:
-                continue
-
-            for i in range(48):
-                angle = i * math.tau / 48
-                origin = Vector((
-                    r * math.cos(angle),
-                    r * math.sin(angle),
-                    surface - EPSILON,
-                ))
-
-                hit, point, normal, index = obj.ray_cast(
-                    origin,
-                    Vector((0, 0, -1)),
-                )
-
-                assert hit and point.z <= floor + EPSILON, (
-                    surface,
-                    tuple(origin),
-                    tuple(point),
-                )
-
-
-def verify_open_bowl_and_pearl(obj):
-    for radius in (0.20, 0.45, 0.60):
-        for degrees in range(0, 360, 30):
-            angle = math.radians(degrees)
-            origin = Vector((
-                radius * math.cos(angle),
-                radius * math.sin(angle),
-                1.40,
-            ))
-            hit, point, normal, index = obj.ray_cast(
-                origin,
-                Vector((0, 0, -1)),
-            )
-
-            assert hit and abs(point.z - 0.95) < EPSILON
-            assert normal.z > 0.99, (
-                "inverted bowl interior",
-                tuple(normal),
-            )
-
-            face = obj.data.polygons[index]
-            assert check_uv(
-                obj.data.uv_layers.active.data[face.loop_start].uv
-            ) == SLOTS["white"]
-
-    center = Vector((0, 0, 1.20))
-
-    for direction in (
-        Vector((0, -1, 0)),
-        Vector((0, -1, 1)).normalized(),
-    ):
-        hit, point, normal, index = obj.ray_cast(
-            center + direction * 3,
-            -direction,
-        )
-
-        assert hit
-        assert 0.145 <= (point - center).length <= 0.16 + EPSILON
-
-        face = obj.data.polygons[index]
-        assert check_uv(
-            obj.data.uv_layers.active.data[face.loop_start].uv
-        ) == SLOTS["white"]
-
-
-def build_basin(builder):
-    sand = SLOTS["sand"]
-
-    # 내벽의 다각형 면까지 반지름 1.0 수면 바깥에 둔다.
-    inner = POOL_RADIUS / math.cos(math.pi / 64)
-
-    builder.lathe([
-        (1.040, 0.000, sand),
-        (1.245, 0.000, sand),
-        (1.300, 0.045, sand),
-        (1.300, 0.130, sand),
-        (1.255, 0.180, sand),
-        (1.195, 0.195, sand),
-        (1.195, 0.225, sand),
-        (1.240, 0.265, sand),
-        (1.240, 0.365, sand),
-        (1.195, 0.420, sand),
-        (1.055, 0.420, sand),
-        (inner, 0.375, sand),
-        (inner, 0.255, sand),
-        (inner, 0.030, sand),
-    ], 64, closed_profile=True)
-
-    builder.lathe([
-        (1.065, 0.035, sand),
-        (1.065, 0.260, SLOTS["turquoise"]),
-    ], 64)
-
-
-def build_stem(builder):
-    sand = SLOTS["sand"]
-
-    builder.lathe([
-        (0.270, 0.420, sand),
-        (0.300, 0.455, sand),
-        (0.300, 0.745, sand),
-        (0.265, 0.800, sand),
-    ], 16)
-
-
-def notch_weight(angle):
-    half_width = math.radians(8)
-    result = 0.0
-
-    for degrees in GROOVE_ANGLES:
-        delta = angle - math.radians(degrees)
-        distance = abs(math.atan2(math.sin(delta), math.cos(delta)))
-
-        if distance < half_width:
-            result = max(
-                result,
-                math.cos(distance / half_width * math.pi / 2) ** 2,
-            )
-
-    return result
-
-
-def bowl_radius(radius, angle):
-    # 기존 게임용 홈 좌표를 계산하는 반지름 함수는 유지한다.
-    relief = max(0, min(1, (radius - 0.62) / 0.16))
-
-    return radius * (
-        1 - 0.018 * (1 - math.cos(12 * angle)) / 2 * relief
+    b.part = "pillar"
+    b.lathe(
+        [
+            (0.285, 0.300, 1),
+            (0.320, 0.325, 23),
+            (0.320, 0.370, 23),
+            (0.305, 0.405, 1),
+            (0.305, 0.585, 1),
+            (0.290, 0.650, 23),
+        ],
+        segments=24,
     )
 
 
-def bowl_outline_radius(radius, angle):
-    relief = max(0.0, min(1.0, (radius - 0.64) / 0.14))
-    scallop = 0.055 * (1.0 - math.cos(10 * angle)) / 2
-
-    # 큰 물결을 추가해도 홈 세 곳은 기존 좌표에 고정한다.
-    return bowl_radius(radius, angle) - (
-        scallop * relief * (1.0 - notch_weight(angle))
+def notch(angle):
+    return max(
+        math.exp(
+            -(
+                math.atan2(
+                    math.sin(angle - a),
+                    math.cos(angle - a),
+                )
+                / math.radians(5)
+            ) ** 2
+        )
+        for a in (-SPOUT_ANGLE, 0, SPOUT_ANGLE)
     )
 
 
-def build_bowl(builder):
-    pink = SLOTS["pink"]
-    white = SLOTS["white"]
+def outline(angle):
+    a = abs(math.atan2(math.sin(angle), math.cos(angle)))
+    knots = (
+        (0.0, 0.78),
+        (SPOUT_ANGLE / 2, 0.685),
+        (SPOUT_ANGLE, SPOUT_RADIUS),
+        (SPOUT_ANGLE + 0.25, 0.720),
+        (math.pi / 2, 0.850),
+        (2.15, 0.770),
+        (math.pi, 0.730),
+    )
 
+    for (a0, r0), (a1, r1) in zip(knots, knots[1:]):
+        if a <= a1:
+            t = (a - a0) / (a1 - a0)
+            return r0 + (r1 - r0) * (
+                0.5 - 0.5 * math.cos(math.pi * t)
+            )
+
+    return knots[-1][1]
+
+
+def build_bowl(b):
+    angles = sorted(
+        set(
+            [i * math.tau / 72 for i in range(72)]
+            + [
+                (a + offset) % math.tau
+                for a in (-SPOUT_ANGLE, SPOUT_ANGLE)
+                for offset in (
+                    0,
+                    -math.radians(5),
+                    math.radians(5),
+                )
+            ]
+        )
+    )
+
+    b.part = "lower_shell"
     profiles = [
-        (0.08, 0.780, pink, 0.0),
-        (0.30, 0.800, pink, 0.0),
-        (0.52, 0.845, pink, 0.0),
-        (0.66, 0.915, pink, 0.0),
-        (0.74, 1.020, pink, 0.0),
-        (0.78, 1.060, pink, 1.0),
-        (0.78, 1.080, white, 1.0),
-        (0.74, 1.065, white, 1.0),
-        (0.68, 1.040, white, 1.0),
-        (0.635, 0.950, white, 0.0),
-        (0.44, 0.950, white, 0.0),
-        (0.20, 0.950, white, 0.0),
-        (0.06, 0.950, white, 0.0),
+        (0.28, 0.620, 0.00, 0.000),
+        (0.43, 0.685, 0.12, 0.000),
+        (0.56, 0.790, 0.25, 0.000),
+        (0.66, 0.910, 0.55, 0.000),
+        (0.76, 1.015, 1.00, 0.025),
+        (0.78, 1.060, 1.00, 0.030),
+        (0.73, 1.052, 1.00, 0.047),
+        (0.61, 0.985, 0.00, 0.000),
+        (0.44, 0.950, 0.00, 0.000),
+        (0.16, 0.940, 0.00, 0.000),
     ]
 
     rings = []
-
-    for radius, z, slot, groove in profiles:
-        points = []
-
-        for i in range(72):
-            angle = i * math.tau / 72
-            r = bowl_outline_radius(radius, angle)
-            rib = 0.0
-
-            if slot == pink and radius > 0.30:
-                rib = 0.008 * (math.cos(10 * angle) - 1)
-
-            points.append((
-                r * math.sin(angle),
-                -r * math.cos(angle),
-                z + rib - GROOVE_DEPTH * groove * notch_weight(angle),
-            ))
-
-        rings.append(builder.ring(points))
-
-    builder.cap(rings[0], (0, 0, 0.780), pink)
-
-    for i in range(1, len(rings)):
-        builder.bridge(
-            rings[i - 1],
-            rings[i],
-            profiles[i][2],
+    for row, (radius, z, scallop, dip) in enumerate(profiles):
+        rings.append(
+            b.ring(
+                (
+                    (
+                        radius + scallop * (outline(a) - 0.78)
+                        - (
+                            0.0, 0.012, 0.022, 0.014, 0.0,
+                            0.0, 0.0, 0.0, 0.0, 0.0,
+                        )[row]
+                        * (0.5 + 0.5 * math.cos(12 * a)) ** 4
+                    ) * math.sin(a),
+                    -(
+                        radius + scallop * (outline(a) - 0.78)
+                        - (
+                            0.0, 0.012, 0.022, 0.014, 0.0,
+                            0.0, 0.0, 0.0, 0.0, 0.0,
+                        )[row]
+                        * (0.5 + 0.5 * math.cos(12 * a)) ** 4
+                    ) * math.cos(a),
+                    z - dip * notch(a),
+                )
+                for a in angles
+            )
         )
 
-    builder.cap(rings[-1], (0, 0, 0.950), white)
+    b.rim_vertices = rings[5]
+    b.cap(rings[0], (0, 0, 0.620), 1)
+
+    for i in range(1, len(rings)):
+        if i >= 7:
+            colors = 3
+        elif i == 6:
+            colors = [
+                3 if notch(a) > 0.35 else 23
+                for a in angles
+            ]
+        else:
+            colors = [
+                7 if int((a % math.tau) / math.tau * 12) % 2 else 1
+                for a in angles
+            ]
+
+        b.bridge(rings[i - 1], rings[i], colors)
+
+    b.cap(rings[-1], (0, 0, 0.940), 3)
 
 
-def build_upper_shell(builder):
-    hinge = Vector((0, 0.70, 1.04))
-    tilt = math.radians(15)
-    up = Vector((0, math.sin(tilt), math.cos(tilt)))
-    front = Vector((0, -math.cos(tilt), math.sin(tilt)))
+def build_upper_shell(b):
+    lobe_count = 7
+    segments = 84
+    fractions = (0.10, 0.26, 0.44, 0.63, 0.80, 0.965, 1.0)
+    hinge_y = 0.625
+    hinge_z = 0.96
+    lean = math.tan(math.radians(20))
+    wrap_depth = 0.40
+    groove_half_angle = math.radians(0.28)
 
-    segments = 52
-    fractions = (0.12, 0.30, 0.50, 0.70, 0.86, 0.96, 1.0)
-    angles = [
-        -math.pi / 2 + i * math.pi / segments
-        for i in range(segments + 1)
+    boundaries = [
+        -math.pi / 2 + math.pi * i / lobe_count
+        for i in range(1, lobe_count)
     ]
-
-    x_extent = max(
-        abs(math.sin(angle) * (1 + 0.035 * math.cos(26 * angle)))
-        for angle in angles
+    angles = sorted(
+        set(
+            [
+                -math.pi / 2 + math.pi * i / segments
+                for i in range(segments + 1)
+            ]
+            + [
+                a + offset
+                for a in boundaries
+                for offset in (-groove_half_angle, groove_half_angle)
+            ]
+        )
     )
-    height_scale = (
-        (2.4 - hinge.z - 0.077 * front.z)
-        / (1.4 * 1.035 * up.z)
+    segments = len(angles) - 1
+
+    def silhouette(a):
+        inset = 0.06 * (1 - math.cos(2 * lobe_count * a))
+        return (
+            (1.25 - inset) * math.sin(a),
+            0.16 + (1.28 - inset) * math.cos(a),
+        )
+
+    x_scale = 1.25 / max(
+        abs(silhouette(a)[0])
+        for a in angles
+    )
+    z_scale = (2.4 - hinge_z) / max(
+        silhouette(a)[1]
+        for a in angles
     )
 
+    def front_color(a):
+        if any(
+            abs(a - boundary) < groove_half_angle
+            for boundary in boundaries
+        ):
+            return 18
+
+        band = min(
+            lobe_count - 1,
+            int((a + math.pi / 2) / math.pi * lobe_count),
+        )
+        return 7 if band % 2 == 0 else 1
+
+    front_colors = [
+        front_color((a + c) / 2)
+        for a, c in zip(angles, angles[1:])
+    ]
     surfaces = []
+    all_indices = []
 
-    for is_front in (True, False):
-        apex = builder.ring([
-            hinge if is_front else hinge - front * 0.065,
-        ])[0]
+    for side in ("front", "back"):
+        b.part = "upper_" + side
+        offset = 0 if side == "front" else SHELL_THICKNESS
+        apex = b.ring([(0, hinge_y + offset, hinge_z)])[0]
 
         rings = []
-
-        for fraction in fractions:
+        for f in fractions:
             points = []
 
-            for angle in angles:
-                wave = math.cos(26 * angle)
-                scallop = 1 + 0.035 * wave
-
-                x = (
-                    0.95
-                    * math.sin(angle)
-                    * scallop
-                    * fraction
-                    / x_extent
+            for a in angles:
+                sx, sz = silhouette(a)
+                x = x_scale * sx * f
+                h = z_scale * sz * f
+                y = (
+                    hinge_y
+                    + lean * h
+                    - wrap_depth * (x / 1.25) ** 2
+                    + 0.008 * f * f
+                    * (1 - math.cos(2 * lobe_count * a))
+                    + offset
                 )
-                h = (
-                    (0.12 + 1.28 * math.cos(angle))
-                    * scallop
-                    * height_scale
-                    * fraction
-                )
-                depth = (
-                    0.022 * fraction
-                    - 0.115 * math.sin(math.pi * fraction)
-                    + 0.055 * fraction ** 0.8 * wave
-                )
+                points.append((x, y, hinge_z + h))
 
-                if not is_front:
-                    depth -= (
-                        0.065
-                        + 0.020 * math.sin(math.pi * fraction)
-                    )
+            rings.append(b.ring(points))
 
-                points.append(
-                    hinge
-                    + Vector((x, 0, 0))
-                    + up * h
-                    + front * depth
-                )
-
-            rings.append(builder.ring(points))
-
-        slot = SLOTS["white"] if is_front else SLOTS["pink"]
+        colors = front_colors if side == "front" else 7
 
         for i in range(segments):
-            builder.face(
+            b.face(
                 (apex, rings[0][i], rings[0][i + 1]),
-                slot,
+                colors[i] if isinstance(colors, list) else colors,
             )
 
-        for index in range(1, len(rings)):
-            band_slot = (
-                SLOTS["pink"]
-                if not is_front or index == len(rings) - 1
-                else slot
-            )
-
-            builder.bridge(
-                rings[index - 1],
-                rings[index],
-                band_slot,
+        for j in range(1, len(rings)):
+            b.bridge(
+                rings[j - 1],
+                rings[j],
+                7 if j == len(rings) - 1 else colors,
                 closed=False,
             )
 
@@ -690,237 +669,651 @@ def build_upper_shell(builder):
             [apex]
             + [ring[0] for ring in rings]
             + rings[-1][1:]
-            + [ring[-1] for ring in reversed(rings[:-1])]
+            + [
+                ring[-1]
+                for ring in reversed(rings[:-1])
+            ]
         )
         surfaces.append(boundary)
+        all_indices.append(
+            [apex] + [v for ring in rings for v in ring]
+        )
 
-    builder.bridge(
-        surfaces[0],
-        surfaces[1],
-        SLOTS["pink"],
+    b.part = "upper_edge"
+    b.bridge(surfaces[0], surfaces[1], 17)
+    b.shell_pairs = list(
+        zip(all_indices[0], all_indices[1], strict=True)
+    )
+
+    b.part = "hinge"
+    b.ellipsoid(
+        (0, 0.71, 0.99),
+        (0.27, 0.075, 0.10),
+        (7, 7, 1),
+    )
+
+    b.part = "pearl_seat"
+    b.lathe(
+        [
+            (0.09, 0.94, 23),
+            (0.105, 0.98, 23),
+            (0.08, 1.045, 23),
+        ],
+        segments=16,
+    )
+
+    b.part = "pearl"
+    b.ellipsoid(
+        (0, 0, 1.16),
+        (0.13, 0.13, 0.13),
+        (23,),
+        segments=12,
+        latitudes=7,
     )
 
 
-def build_pearl(builder):
-    center = Vector((0, 0, 1.20))
-    radius = 0.16
-    segments = 16
-    latitudes = 8
-    rings = []
-
-    for latitude in range(1, latitudes):
-        phi = math.pi * latitude / latitudes
-
-        rings.append(builder.ring(
-            center + radius * Vector((
-                math.sin(phi) * math.cos(i * math.tau / segments),
-                math.sin(phi) * math.sin(i * math.tau / segments),
-                math.cos(phi),
-            ))
-            for i in range(segments)
-        ))
-
-    white = SLOTS["white"]
-
-    builder.cap(
-        rings[0],
-        center + Vector((0, 0, radius)),
-        white,
+def build_bush(b, side):
+    b.part = "leaves_left" if side < 0 else "leaves_right"
+    root_angle = math.radians(23)
+    leaves = (
+        (-0.52, 0.55, 0.17, 0.135),
+        (-0.36, 0.59, 0.15, 0.150),
+        (-0.21, 0.64, 0.12, 0.155),
+        (-0.08, 0.70, 0.07, 0.145),
+        (0.06, 0.67, 0.10, 0.155),
+        (0.21, 0.63, 0.13, 0.160),
+        (0.36, 0.59, 0.15, 0.150),
+        (0.51, 0.56, 0.17, 0.140),
+        (0.63, 0.55, 0.14, 0.125),
     )
 
-    for first, second in zip(rings, rings[1:]):
-        builder.bridge(first, second, white)
+    for spread, height, reach, half_width in leaves:
+        rings = []
 
-    builder.cap(
-        rings[-1],
-        center - Vector((0, 0, radius)),
-        white,
-    )
+        for f, width_factor in (
+            (0.0, 0.045),
+            (0.22, 0.65),
+            (0.48, 1.0),
+            (0.73, 0.72),
+            (0.90, 0.32),
+        ):
+            angle = root_angle + spread * f
+            radial = Vector(
+                (side * math.cos(angle), math.sin(angle), 0)
+            )
+            tangent = Vector(
+                (-side * math.sin(angle), math.cos(angle), 0)
+            )
+            center = (
+                radial * (1.075 + reach * f)
+                + Vector(
+                    (
+                        0,
+                        0,
+                        0.455 + height * math.sin(math.pi * f / 2),
+                    )
+                )
+            )
+            width = half_width * width_factor
+            fold = 0.008 + 0.050 * math.sin(math.pi * f)
+
+            rings.append(
+                b.ring(
+                    center
+                    + tangent * across
+                    + Vector((0, 0, dz))
+                    for across, dz in (
+                        (-width, 0),
+                        (0, fold),
+                        (width, 0),
+                        (0, -0.012),
+                    )
+                )
+            )
+
+        b.face(reversed(rings[0]), 9)
+
+        for first, second in zip(rings, rings[1:]):
+            b.bridge(first, second, (12, 9, 9, 9))
+
+        angle = root_angle + spread
+        tip = b.ring(
+            [
+                (
+                    side * math.cos(angle) * (1.075 + reach),
+                    math.sin(angle) * (1.075 + reach),
+                    0.455 + height,
+                )
+            ]
+        )[0]
+
+        for i in range(4):
+            b.face(
+                (rings[-1][i], rings[-1][(i + 1) % 4], tip),
+                12 if i == 0 else 9,
+            )
 
 
-def build_starfish(builder):
-    angle = math.radians(37)
-    center = Vector((
-        1.13 * math.sin(angle),
-        -1.13 * math.cos(angle),
-        0.435,
-    ))
+def build_decorations(b):
+    a = math.radians(43)
+    radial = Vector((math.sin(a), -math.cos(a), 0))
+    tangent = Vector((-radial.y, radial.x, 0))
+    center = radial * 1.118 + Vector((0, 0, 0.452))
+
+    b.part = "starfish"
     rings = []
 
     for scale, height in (
-        (0.86, -0.025),
-        (1.0, 0.0),
-        (0.86, 0.030),
+        (0.83, -0.012),
+        (1.0, 0.009),
+        (0.81, 0.035),
     ):
-        rings.append(builder.ring(
-            center + Vector((
-                0.125
-                * scale
-                * (1 if i % 2 == 0 else 0.46)
-                * math.cos(i * math.pi / 5 + 0.23),
-                0.125
-                * scale
-                * (1 if i % 2 == 0 else 0.46)
-                * math.sin(i * math.pi / 5 + 0.23),
-                height,
-            ))
-            for i in range(10)
-        ))
+        rings.append(
+            b.ring(
+                center
+                + tangent * (
+                    0.1473
+                    * scale
+                    * (1 if i % 2 == 0 else 0.44)
+                    * math.sin(i * math.pi / 5)
+                )
+                + radial * (
+                    0.072
+                    * scale
+                    * (1 if i % 2 == 0 else 0.44)
+                    * math.cos(i * math.pi / 5)
+                )
+                + Vector((0, 0, height))
+                for i in range(10)
+            )
+        )
 
-    coral = SLOTS["coral"]
-
-    builder.cap(
+    b.cap(
         rings[0],
-        center + Vector((0, 0, -0.025)),
-        coral,
+        center + Vector((0, 0, -0.012)),
+        18,
     )
-    builder.bridge(rings[0], rings[1], coral)
-    builder.bridge(rings[1], rings[2], coral)
-    builder.cap(
+    b.bridge(rings[0], rings[1], 18)
+    b.bridge(
+        rings[1],
         rings[2],
-        center + Vector((0, 0, 0.065)),
-        coral,
+        (18, 15, 18, 18, 18),
+    )
+
+    peak = b.ring(
+        [center + Vector((0, 0, 0.069))]
+    )[0]
+
+    for i in range(10):
+        b.face(
+            (
+                rings[2][i],
+                rings[2][(i + 1) % 10],
+                peak,
+            ),
+            15 if i in (2, 7) else 18,
+        )
+
+    b.part = "pebble"
+    a = math.radians(-49)
+    radial = Vector((math.sin(a), -math.cos(a), 0))
+    tangent = Vector((-radial.y, radial.x, 0))
+    center = radial * 1.108 + Vector((0, 0, 0.485))
+
+    b.ellipsoid(
+        center,
+        (0.11, 0.057, 0.067),
+        (23, 23, 23, 17),
+        radial=radial,
+        tangent=tangent,
     )
 
 
-def build_bush(builder, side):
-    root = Vector((side * 1.01, 0.50, 0.40))
-    radial = Vector((root.x, root.y, 0)).normalized()
-    tangent = Vector((-radial.y, radial.x, 0))
+def stream_point(index, t):
+    start = SPOUTS[index]
+    control = start + OUTWARD[index] * 0.12
+    end = OUTWARD[index] * 0.95 + Vector((0, 0, 0.35))
 
-    spreads = (-0.27, -0.15, 0.0, 0.15, 0.27)
-    heights = (0.29, 0.38, 0.446, 0.38, 0.29)
-
-    for spread, height in zip(spreads, heights, strict=True):
-        rings = []
-
-        for fraction, width in (
-            (0.0, 0.014),
-            (0.24, 0.075),
-            (0.50, 0.100),
-            (0.78, 0.065),
-            (1.0, 0.008),
-        ):
-            center = (
-                root
-                + tangent * (spread * fraction)
-                + radial * (0.035 * math.sin(math.pi * fraction))
-                + Vector((0, 0, height * fraction))
-            )
-
-            vein = min(0.008, width * 0.25)
-            lift = 0.004 + 0.022 * math.sin(math.pi * fraction)
-            cross_section = (
-                (-width, 0),
-                (-vein, lift * 0.75),
-                (0, lift),
-                (vein, lift * 0.75),
-                (width, 0),
-                (0, -lift * 0.60),
-            )
-
-            rings.append(builder.ring(
-                center + radial * across + Vector((0, 0, dz))
-                for across, dz in cross_section
-            ))
-
-        builder.face(reversed(rings[0]), SLOTS["green"])
-
-        for first, second in zip(rings, rings[1:]):
-            builder.bridge(first, second, [
-                SLOTS["green"],
-                SLOTS["vein"],
-                SLOTS["vein"],
-                SLOTS["green"],
-                SLOTS["green"],
-                SLOTS["green"],
-            ])
-
-        builder.face(rings[-1], SLOTS["green"])
+    return (
+        (1 - t) ** 2 * start
+        + 2 * (1 - t) * t * control
+        + t * t * end
+    )
 
 
 def build_fountain(material):
-    builder = Builder()
+    b = Builder()
+    build_base(b)
+    build_bowl(b)
+    build_upper_shell(b)
+    build_bush(b, -1)
+    build_bush(b, 1)
+    build_decorations(b)
 
-    for name, build in (
-        ("basin_and_tile", lambda: build_basin(builder)),
-        ("stem", lambda: build_stem(builder)),
-        ("lower_shell", lambda: build_bowl(builder)),
-        ("upper_shell", lambda: build_upper_shell(builder)),
-        ("pearl", lambda: build_pearl(builder)),
-        ("starfish", lambda: build_starfish(builder)),
-        ("left_bush", lambda: build_bush(builder, -1)),
-        ("right_bush", lambda: build_bush(builder, 1)),
-    ):
-        builder.add_part(name, build)
+    obj = b.finish(material)
+    return obj, b
 
-    for name in ("left_bush", "right_bush"):
-        first, last = builder.parts[name]
-        assert max(
-            point[2]
-            for point in builder.vertices[first:last]
-        ) <= 0.85 + EPSILON
 
-    first, last = builder.parts["upper_shell"]
-    assert all(
-        abs(point[0]) <= 0.95 + EPSILON
-        for point in builder.vertices[first:last]
+def clip_polygon(points, signed_distance):
+    if not points:
+        return []
+
+    clipped = []
+    previous = points[-1]
+    previous_d = signed_distance(previous)
+
+    for current in points:
+        current_d = signed_distance(current)
+
+        if (previous_d >= 0) != (current_d >= 0):
+            t = previous_d / (previous_d - current_d)
+            clipped.append(previous.lerp(current, t))
+
+        if current_d >= 0:
+            clipped.append(current)
+
+        previous, previous_d = current, current_d
+
+    return clipped
+
+
+def radial_range(points):
+    minimum = float("inf")
+    inside = False
+
+    for a, b in zip(points, points[1:] + points[:1]):
+        dx, dy = b.x - a.x, b.y - a.y
+        length2 = dx * dx + dy * dy
+        t = (
+            max(
+                0,
+                min(
+                    1,
+                    -(a.x * dx + a.y * dy) / length2,
+                ),
+            )
+            if length2
+            else 0
+        )
+        minimum = min(
+            minimum,
+            math.hypot(a.x + t * dx, a.y + t * dy),
+        )
+
+        if (a.y > 0) != (b.y > 0):
+            if a.x + (b.x - a.x) * (-a.y) / (b.y - a.y) > 0:
+                inside = not inside
+
+    return (
+        0 if inside else minimum,
+        max(math.hypot(p.x, p.y) for p in points),
     )
 
-    grooves = []
 
-    for degrees in GROOVE_ANGLES:
-        angle = math.radians(degrees)
-        radius = bowl_radius(0.78, angle)
-        position = (
-            radius * math.sin(angle),
-            -radius * math.cos(angle),
-            1.08 - GROOVE_DEPTH,
+def segment_distance(p1, q1, p2, q2):
+    d1 = q1 - p1
+    d2 = q2 - p2
+    r = p1 - p2
+    a = d1.dot(d1)
+    e = d2.dot(d2)
+
+    if a < 1e-16 and e < 1e-16:
+        return (p1 - p2).length
+
+    if a < 1e-16:
+        s = 0.0
+        t = max(0, min(1, d2.dot(r) / e))
+    else:
+        c = d1.dot(r)
+
+        if e < 1e-16:
+            s = max(0, min(1, -c / a))
+            t = 0.0
+        else:
+            bb = d1.dot(d2)
+            f = d2.dot(r)
+            denominator = a * e - bb * bb
+
+            s = (
+                max(
+                    0,
+                    min(1, (bb * f - c * e) / denominator),
+                )
+                if denominator > 1e-16
+                else 0.0
+            )
+            t = (bb * s + f) / e
+
+            if t < 0:
+                t = 0.0
+                s = max(0, min(1, -c / a))
+            elif t > 1:
+                t = 1.0
+                s = max(0, min(1, (bb - c) / a))
+
+    return (
+        (p1 + d1 * s) - (p2 + d2 * t)
+    ).length
+
+
+def segment_triangle_distance(p, q, a, b, c):
+    direction = q - p
+    hit = intersect_ray_tri(
+        a,
+        b,
+        c,
+        direction,
+        p,
+        True,
+    )
+
+    if hit is not None:
+        t = (
+            (hit - p).dot(direction)
+            / direction.length_squared
         )
+        if -EPS <= t <= 1 + EPS:
+            return 0.0
 
-        assert any(
-            (Vector(point) - Vector(position)).length < EPSILON
-            for point in builder.vertices
-        )
+    return min(
+        (p - closest_point_on_tri(p, a, b, c)).length,
+        (q - closest_point_on_tri(q, a, b, c)).length,
+        segment_distance(p, q, a, b),
+        segment_distance(p, q, b, c),
+        segment_distance(p, q, c, a),
+    )
 
-        grooves.append({
-            "angle_from_front_degrees": degrees,
-            "position": list(position),
-        })
 
-    metadata = {
-        "coordinate_system": (
-            "Blender: X right, Y back, Z up; front -Y; floor origin"
-        ),
-        "glb_transform": "(x,y,z) -> (x,z,-y)",
-        "grooves": grooves,
-        "groove_depth": GROOVE_DEPTH,
-        "bowl_water": {
-            "center": [0, 0, BOWL_SURFACE],
-            "height": BOWL_SURFACE,
-            "radius": BOWL_RADIUS,
-        },
-        "basin_water": {
-            "center": [0, 0, POOL_SURFACE],
-            "height": POOL_SURFACE,
-            "radius": POOL_RADIUS,
-        },
-        "water_geometry_exported": False,
-        "palette_slots": SLOTS,
-        "palette_slots_used": sorted(USED_SLOTS),
-        "bounds_blender": {
-            "min": [-1.3, -1.3, 0.0],
-            "max": [1.3, 1.3, 2.4],
-        },
+def verify_clearances(mesh, names):
+    curves = [
+        [stream_point(i, j / 64) for j in range(65)]
+        for i in range(3)
+    ]
+
+    # 곡선의 64분할 현과 실제 곡선 사이 오차까지 포함한다.
+    safe_radius = 0.08005
+    curve_boxes = [bounds(curve) for curve in curves]
+    closest = float("inf")
+
+    decorations = {
+        "starfish",
+        "pebble",
+        "leaves_left",
+        "leaves_right",
     }
 
-    obj = builder.finish(material)
-    return obj, metadata
+    for face in mesh.polygons:
+        points = [
+            mesh.vertices[i].co.copy()
+            for i in face.vertices
+        ]
+        name = names[
+            mesh.attributes["part_id"].data[face.index].value
+        ]
+
+        clipped = clip_polygon(
+            points,
+            lambda p: p.z - 0.36,
+        )
+        clipped = clip_polygon(
+            clipped,
+            lambda p: 0.42 - p.z,
+        )
+
+        if clipped:
+            low, high = radial_range(clipped)
+            assert (
+                high < 0.5 - EPS
+                or low > 1.0 + EPS
+            ), ("연못 낙하 링 침범", name, low, high)
+
+        if name in decorations:
+            assert radial_range(points)[0] >= 1.03 - EPS, (
+                "장식 위치",
+                name,
+            )
+
+        triangle_box = bounds(points)
+
+        for i, curve in enumerate(curves):
+            low, high = curve_boxes[i]
+
+            if any(
+                triangle_box[1][axis] < low[axis] - safe_radius
+                or triangle_box[0][axis] > high[axis] + safe_radius
+                for axis in range(3)
+            ):
+                continue
+
+            # 출구 평면 자체는 물과 껍데기의 접합면이다.
+            outside = clip_polygon(
+                points,
+                lambda p: (
+                    (p - SPOUTS[i]).dot(OUTWARD[i]) - EPS
+                ),
+            )
+
+            for j in range(1, len(outside) - 1):
+                tri = (
+                    outside[0],
+                    outside[j],
+                    outside[j + 1],
+                )
+
+                if (
+                    (tri[1] - tri[0])
+                    .cross(tri[2] - tri[0])
+                    .length < 1e-12
+                ):
+                    continue
+
+                distance = min(
+                    segment_triangle_distance(a, b, *tri)
+                    for a, b in zip(curve, curve[1:])
+                )
+                closest = min(closest, distance)
+
+                assert distance >= safe_radius, (
+                    "물줄기 통로 침범",
+                    name,
+                    i,
+                    distance,
+                    [tuple(p) for p in tri],
+                )
+
+    return closest
+
+
+def verify_shell(mesh, builder):
+    front = []
+    back = []
+
+    for face in mesh.polygons:
+        name = builder.names[
+            mesh.attributes["part_id"].data[face.index].value
+        ]
+        if name == "upper_front":
+            front.append(face)
+        elif name == "upper_back":
+            back.append(face)
+
+    assert front and back
+
+    for a, b in builder.shell_pairs:
+        delta = (
+            mesh.vertices[b].co
+            - mesh.vertices[a].co
+        )
+        assert abs(delta.length - SHELL_THICKNESS) < EPS
+        assert abs(delta.x) < EPS
+        assert abs(delta.z) < EPS
+
+    slab_minimum = min(
+        abs(face.normal.y) * SHELL_THICKNESS
+        for face in front
+    )
+    assert slab_minimum >= 0.1, (
+        "법선 방향 껍데기 두께",
+        slab_minimum,
+    )
+
+    tree = BVHTree.FromPolygons(
+        [v.co for v in mesh.vertices],
+        [tuple(f.vertices) for f in back],
+        all_triangles=True,
+    )
+
+    minimum = float("inf")
+    for face in front:
+        a, b, c = [
+            mesh.vertices[i].co
+            for i in face.vertices
+        ]
+
+        for point in (
+            a,
+            b,
+            c,
+            (a + b) / 2,
+            (b + c) / 2,
+            (c + a) / 2,
+            (a + b + c) / 3,
+        ):
+            nearest = tree.find_nearest(point)
+            assert nearest[0] is not None
+            minimum = min(minimum, nearest[3])
+
+    assert minimum >= 0.1, (
+        "앞뒤 표면 최소 거리",
+        minimum,
+    )
+
+    return {
+        "axial": SHELL_THICKNESS,
+        "normal_lower_bound": slab_minimum,
+        "sampled_surface_minimum": minimum,
+    }
+
+
+def verify_water_floors(obj):
+    result = {}
+
+    for name, z, radii, floor_low, floor_high in (
+        (
+            "pool",
+            0.35,
+            (0.45, 0.70, 0.95, 0.995),
+            0.20,
+            0.30,
+        ),
+        (
+            "bowl",
+            1.02,
+            (0.18, 0.35, 0.54, 0.595),
+            0.92,
+            1.00,
+        ),
+    ):
+        count = 0
+
+        for radius in radii:
+            for j in range(48):
+                a = math.tau * j / 48
+                origin = Vector(
+                    (
+                        radius * math.cos(a),
+                        radius * math.sin(a),
+                        z - EPS,
+                    )
+                )
+                hit, point, normal, index = obj.ray_cast(
+                    origin,
+                    Vector((0, 0, -1)),
+                )
+
+                assert (
+                    hit
+                    and floor_low - EPS <= point.z <= floor_high + EPS
+                ), (
+                    name,
+                    tuple(origin),
+                    hit,
+                    tuple(point),
+                )
+                assert normal.z > 0.75
+
+                face = obj.data.polygons[index]
+                uv = obj.data.uv_layers.active.data[face.loop_start].uv
+                assert slot_of(uv) == 3
+
+                count += 1
+
+        result[name] = count
+
+    return result
+
+
+def verify_model(obj, builder):
+    mesh = obj.data
+
+    assert len(mesh.materials) == 1
+    assert mesh.materials[0].name == "palette"
+    assert not mesh.color_attributes
+    assert 3000 <= len(mesh.polygons) <= 9000, len(mesh.polygons)
+
+    counts = Counter()
+    parts = Counter()
+
+    for face in mesh.polygons:
+        assert len(face.vertices) == 3
+        assert face.area > 1e-10
+
+        values = [
+            tuple(mesh.uv_layers.active.data[i].uv)
+            for i in face.loop_indices
+        ]
+        assert all(value == values[0] for value in values)
+
+        counts[slot_of(values[0])] += 1
+
+        part = builder.names[
+            mesh.attributes["part_id"].data[face.index].value
+        ]
+        parts[part] += 1
+
+    assert set(counts) == USED
+
+    outlet_errors = [
+        min(
+            (mesh.vertices[i].co - point).length
+            for i in builder.rim_vertices
+        )
+        for point in SPOUTS
+    ]
+    assert max(outlet_errors) < 0.06
+    assert max(outlet_errors) < 1e-5
+
+    return {
+        "triangles": len(mesh.polygons),
+        "triangles_by_slot": dict(sorted(counts.items())),
+        "triangles_by_part": dict(sorted(parts.items())),
+        "bounds_blender": assert_bounds(
+            v.co for v in mesh.vertices
+        ),
+        "outlet_vertex_errors": outlet_errors,
+        "minimum_stream_clearance": verify_clearances(
+            mesh,
+            builder.names,
+        ),
+        "shell_thickness": verify_shell(mesh, builder),
+        "water_floor_rays": verify_water_floors(obj),
+    }
 
 
 def accessor_rows(document, binary, index):
     accessor = document["accessors"][index]
     assert "sparse" not in accessor
+    assert accessor["count"] > 0
 
     formats = {
         5121: "B",
@@ -961,7 +1354,7 @@ def accessor_rows(document, binary, index):
     ]
 
 
-def verify_glb(data, obj):
+def verify_glb(data, obj, expected_counts):
     assert struct.unpack_from("<4sII", data) == (
         b"glTF",
         2,
@@ -975,112 +1368,96 @@ def verify_glb(data, obj):
         size, kind = struct.unpack_from("<I4s", data, offset)
         assert size % 4 == 0
         assert kind not in chunks
+        assert offset + 8 + size <= len(data)
 
         chunks[kind] = data[offset + 8:offset + 8 + size]
-        offset += 8 + size
+        offset += size + 8
 
     assert offset == len(data)
 
-    document = json.loads(chunks[b"JSON"])
+    doc = json.loads(chunks[b"JSON"])
     binary = chunks[b"BIN\x00"]
 
-    buffer, = document["buffers"]
+    node, = doc["nodes"]
+    mesh, = doc["meshes"]
+    material, = doc["materials"]
+    primitive, = mesh["primitives"]
+    buffer, = doc["buffers"]
+
     assert "uri" not in buffer
-
-    mesh, = document["meshes"]
-    material, = document["materials"]
-    node, = document["nodes"]
-
-    assert mesh["name"] == node["name"] == NAME
-    assert material["name"] == "palette"
+    assert node["name"] == mesh["name"] == NAME
     assert node["mesh"] == 0
     assert "matrix" not in node
     assert node.get("translation", [0, 0, 0]) == [0, 0, 0]
     assert node.get("rotation", [0, 0, 0, 1]) == [0, 0, 0, 1]
     assert node.get("scale", [1, 1, 1]) == [1, 1, 1]
-
-    primitive, = mesh["primitives"]
-    assert primitive.get("mode", 4) == 4
+    assert material["name"] == "palette"
     assert primitive["material"] == 0
+    assert primitive.get("mode", 4) == 4
 
     attributes = primitive["attributes"]
-    assert {
+    assert set(attributes) == {
         "POSITION",
         "NORMAL",
         "TEXCOORD_0",
-    }.issubset(attributes)
-    assert not any(
-        key.startswith("COLOR_")
-        for key in attributes
-    )
+    }
 
     positions = [
-        Vector(point)
-        for point in accessor_rows(
-            document,
+        Vector(p)
+        for p in accessor_rows(
+            doc,
             binary,
             attributes["POSITION"],
         )
     ]
     normals = accessor_rows(
-        document,
+        doc,
         binary,
         attributes["NORMAL"],
     )
     uvs = accessor_rows(
-        document,
+        doc,
         binary,
         attributes["TEXCOORD_0"],
     )
 
     assert len(positions) == len(normals) == len(uvs)
-    assert {check_uv(uv) for uv in uvs} == USED_SLOTS
+    assert all(
+        abs(Vector(n).length - 1) < 1e-4
+        for n in normals
+    )
+    assert {slot_of(uv) for uv in uvs} == USED
 
-    check_bounds(
+    assert_bounds(
         positions,
-        Vector((-1.3, 0, -1.3)),
-        Vector((1.3, 2.4, 1.3)),
+        (-1.3, 0, -1.3),
+        (1.3, 2.4, 1.3),
     )
 
     expected = {
-        tuple(round(c, 5) for c in (
-            vertex.co.x,
-            vertex.co.z,
-            -vertex.co.y,
-        ))
-        for vertex in obj.data.vertices
+        tuple(
+            round(c, 5)
+            for c in (v.co.x, v.co.z, -v.co.y)
+        )
+        for v in obj.data.vertices
     }
-    assert {
-        tuple(round(c, 5) for c in point)
-        for point in positions
-    } == expected
-
-    for point in positions:
-        verify_clearance(Vector((
-            point.x,
-            -point.z,
-            point.y,
-        )))
-
-    assert all(
-        abs(Vector(normal).length - 1) < 1e-4
-        for normal in normals
-    )
+    actual = {
+        tuple(round(c, 5) for c in p)
+        for p in positions
+    }
+    assert actual == expected
 
     indices = [
-        row[0]
-        for row in accessor_rows(
-            document,
+        r[0]
+        for r in accessor_rows(
+            doc,
             binary,
             primitive["indices"],
         )
     ]
-    assert len(indices) % 3 == 0
+    assert len(indices) == len(obj.data.polygons) * 3
 
-    triangles = len(indices) // 3
-    assert 2500 <= triangles <= 7000
-    assert triangles == len(obj.data.loop_triangles)
-
+    counts = Counter()
     for i in range(0, len(indices), 3):
         a, b, c = indices[i:i + 3]
 
@@ -1091,14 +1468,14 @@ def verify_glb(data, obj):
             .cross(positions[c] - positions[a])
             .length > 2e-10
         )
-        assert all(
-            abs(uvs[a][axis] - uvs[vertex][axis]) < 1e-7
-            for vertex in (b, c)
-            for axis in range(2)
-        )
+        assert uvs[a] == uvs[b] == uvs[c]
 
-    texture, = document["textures"]
-    image, = document["images"]
+        counts[slot_of(uvs[a])] += 1
+
+    assert dict(counts) == expected_counts
+
+    texture, = doc["textures"]
+    image, = doc["images"]
 
     assert texture["source"] == 0
     assert (
@@ -1108,16 +1485,21 @@ def verify_glb(data, obj):
     assert image["mimeType"] == "image/png"
     assert "uri" not in image
 
-    view = document["bufferViews"][image["bufferView"]]
+    view = doc["bufferViews"][image["bufferView"]]
     start = view.get("byteOffset", 0)
     png = binary[start:start + view["byteLength"]]
 
     assert png[:8] == b"\x89PNG\r\n\x1a\n"
     assert struct.unpack_from(">II", png, 16) == (128, 4)
+    assert png == PALETTE.read_bytes(), (
+        "팔레트 PNG 바이트가 변경됨"
+    )
 
     return {
-        "triangles": triangles,
-        "glb_dimensions": [2.6, 2.4, 2.6],
+        "bytes": len(data),
+        "triangles": len(indices) // 3,
+        "embedded_palette_unchanged": True,
+        "export_yup_verified": True,
     }
 
 
@@ -1155,53 +1537,161 @@ def export_glb(obj):
     )
 
     assert result == {"FINISHED"}
-    return verify_glb(path.read_bytes(), obj)
+    return path
 
 
-def preview_clone(scene, source, direction, screen_x):
-    rotation = (-direction).to_track_quat("-Z", "Y")
-    inverse = rotation.to_matrix().transposed()
-
-    points = [
-        inverse @ vertex.co
-        for vertex in source.data.vertices
-    ]
-    lower, upper = bounds(points)
-    center = (lower + upper) / 2
-
-    mesh = source.data.copy()
-
-    for vertex, point in zip(mesh.vertices, points, strict=True):
-        point -= center
-        vertex.co = (
-            point.x + screen_x,
-            -point.z,
-            point.y,
-        )
-
+def preview_mesh(
+    scene,
+    name,
+    vertices,
+    faces,
+    material,
+    uv_slot=None,
+):
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(vertices, [], faces)
     mesh.update()
+    mesh.materials.append(material)
 
-    clone = bpy.data.objects.new(
-        "preview-" + str(screen_x),
-        mesh,
+    if uv_slot is not None:
+        uv = mesh.uv_layers.new(name="UVMap")
+        for loop in uv.data:
+            loop.uv = ((uv_slot + 0.5) / 32, 0.5)
+
+    obj = bpy.data.objects.new(name, mesh)
+    scene.collection.objects.link(obj)
+    return obj
+
+
+def preview_disk(scene, name, radius, z, material):
+    count = 96
+
+    vertices = [(0, 0, z)] + [
+        (
+            radius * math.cos(math.tau * i / count),
+            radius * math.sin(math.tau * i / count),
+            z,
+        )
+        for i in range(count)
+    ]
+    faces = [
+        (0, i + 1, (i + 1) % count + 1)
+        for i in range(count)
+    ]
+
+    return preview_mesh(
+        scene,
+        name,
+        vertices,
+        faces,
+        material,
+        uv_slot=3,
     )
-    scene.collection.objects.link(clone)
+
+
+def preview_tube(
+    scene,
+    name,
+    points,
+    radius,
+    material,
+    slot,
+):
+    points = [Vector(p) for p in points]
+    vertices = []
+    faces = []
+    sides = 8
+
+    for i, point in enumerate(points):
+        direction = (
+            points[min(i + 1, len(points) - 1)]
+            - points[max(0, i - 1)]
+        ).normalized()
+
+        reference = (
+            Vector((0, 0, 1))
+            if abs(direction.z) < 0.9
+            else Vector((1, 0, 0))
+        )
+        side = direction.cross(reference).normalized()
+        up = direction.cross(side).normalized()
+
+        for j in range(sides):
+            a = math.tau * j / sides
+            vertices.append(
+                point
+                + radius * (
+                    side * math.cos(a)
+                    + up * math.sin(a)
+                )
+            )
+
+        if i:
+            for j in range(sides):
+                first = (i - 1) * sides
+                second = i * sides
+                k = (j + 1) % sides
+
+                faces.append(
+                    (
+                        first + j,
+                        first + k,
+                        second + k,
+                        second + j,
+                    )
+                )
+
+    faces.append(tuple(reversed(range(sides))))
+    faces.append(
+        tuple(range(len(vertices) - sides, len(vertices)))
+    )
+
+    return preview_mesh(
+        scene,
+        name,
+        vertices,
+        faces,
+        material,
+        uv_slot=slot,
+    )
+
+
+def srgb_to_linear(value):
+    return (
+        value / 12.92
+        if value <= 0.04045
+        else ((value + 0.055) / 1.055) ** 2.4
+    )
+
+
+def preview_material(name, rgb, alpha):
+    material = bpy.data.materials.new(name)
+    material.diffuse_color = tuple(
+        srgb_to_linear(c)
+        for c in rgb
+    ) + (alpha,)
+    material.roughness = 0.5
+    return material
 
 
 def make_render_scene(obj):
-    scene = bpy.data.scenes.new(NAME + "-compare")
-    scene.render.engine = "BLENDER_WORKBENCH"
+    scene = bpy.data.scenes.new(NAME + "-preview")
+    scene.collection.objects.link(obj)
 
-    scene.render.resolution_x = 2200
+    scene.render.engine = "BLENDER_WORKBENCH"
+    scene.render.resolution_x = 1000
     scene.render.resolution_y = 1200
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "PNG"
+    scene.render.image_settings.color_mode = "RGBA"
     scene.render.film_transparent = False
+    scene.render.filepath = str(OUTPUT / "fountain.png")
 
     scene.view_settings.view_transform = "Standard"
     scene.view_settings.look = "None"
-    scene.view_settings.exposure = 0.0
-    scene.view_settings.gamma = 1.0
+    scene.view_settings.exposure = 0
+    scene.view_settings.gamma = 1
+    scene.display.render_aa = "32"
 
     shading = scene.display.shading
     shading.color_type = "TEXTURE"
@@ -1211,59 +1701,184 @@ def make_render_scene(obj):
     shading.show_shadows = True
     shading.show_cavity = True
     shading.cavity_type = "BOTH"
-    shading.curvature_ridge_factor = 1.1
-    shading.curvature_valley_factor = 1.1
-    shading.cavity_ridge_factor = 1.0
-    shading.cavity_valley_factor = 1.2
+    shading.curvature_ridge_factor = 0.85
+    shading.curvature_valley_factor = 0.8
+    shading.cavity_ridge_factor = 0.7
+    shading.cavity_valley_factor = 0.9
     shading.show_specular_highlight = False
     shading.show_object_outline = False
+    shading.show_xray = False
 
-    scene.world = bpy.data.worlds.new(NAME + "-preview-world")
-    scene.world.color = (0.90, 0.84, 0.73)
+    scene.world = bpy.data.worlds.new(NAME + "-world")
+    scene.world.color = tuple(
+        srgb_to_linear(c)
+        for c in (1.0, 0.953, 0.867)
+    )
 
-    preview_clone(
-        scene,
-        obj,
-        Vector((0, -1, 0)),
-        -1.65,
+    # TEXTURE 모드도 이미지 없는 재질은 diffuse_color와 알파를 사용한다.
+    # https://github.com/blender/blender/blob/main/source/blender/draw/engines/workbench/workbench_engine.cc
+    water = preview_material(
+        "preview-water",
+        (0.498, 0.878, 0.894),
+        0.58,
     )
-    preview_clone(
-        scene,
-        obj,
-        Vector((0, -1, 1)).normalized(),
-        1.65,
+    stream = preview_material(
+        "preview-stream",
+        (0.40, 0.82, 0.84),
+        0.78,
     )
+    foam = preview_material(
+        "preview-foam",
+        (0.96, 0.985, 0.95),
+        1,
+    )
+    ground = preview_material(
+        "preview-ground",
+        (1.0, 0.953, 0.867),
+        1,
+    )
+
+    preview_mesh(
+        scene,
+        "preview-ground",
+        [
+            (-200, -200, -0.012),
+            (200, -200, -0.012),
+            (200, 200, -0.012),
+            (-200, 200, -0.012),
+        ],
+        [(0, 1, 2, 3)],
+        ground,
+    )
+    preview_disk(
+        scene,
+        "preview-pool",
+        1.0,
+        0.35,
+        water,
+    )
+    preview_disk(
+        scene,
+        "preview-bowl",
+        0.6,
+        1.02,
+        water,
+    )
+
+    for i in range(3):
+        preview_tube(
+            scene,
+            "preview-stream-" + str(i),
+            [
+                stream_point(i, j / 40)
+                for j in range(41)
+            ],
+            0.047,
+            stream,
+            3,
+        )
+
+        direction = OUTWARD[i]
+        preview_tube(
+            scene,
+            "preview-channel-" + str(i),
+            [
+                direction * 0.59 + Vector((0, 0, 1.022)),
+                direction * 0.69 + Vector((0, 0, 1.025)),
+                SPOUTS[i],
+            ],
+            0.025,
+            stream,
+            3,
+        )
+
+        impact = stream_point(i, 1)
+
+        for radius, start, end in (
+            (0.075, 0.0, 5.5),
+            (0.13, 0.6, 2.7),
+        ):
+            points = [
+                impact + Vector(
+                    (
+                        radius * math.cos(
+                            start + (end - start) * j / 24
+                        ),
+                        radius * math.sin(
+                            start + (end - start) * j / 24
+                        ),
+                        0.009,
+                    )
+                )
+                for j in range(25)
+            ]
+
+            preview_tube(
+                scene,
+                "preview-impact",
+                points,
+                0.008,
+                foam,
+                23,
+            )
+
+    for radius, start, end in (
+        (0.25, 0.1, 5.3),
+        (0.45, 0.3, 2.2),
+    ):
+        points = [
+            (
+                radius * math.cos(
+                    start + (end - start) * j / 32
+                ),
+                radius * math.sin(
+                    start + (end - start) * j / 32
+                ),
+                1.027,
+            )
+            for j in range(33)
+        ]
+
+        preview_tube(
+            scene,
+            "preview-bowl-ripple",
+            points,
+            0.006,
+            foam,
+            23,
+        )
 
     camera = bpy.data.objects.new(
-        NAME + "-camera",
-        bpy.data.cameras.new(NAME + "-camera"),
+        "preview-camera",
+        bpy.data.cameras.new("preview-camera"),
     )
     scene.collection.objects.link(camera)
 
-    camera.location = (0, -20, 0)
+    target = Vector((0, 0, 1.04))
+    azimuth = math.radians(12)
+    elevation = math.radians(30)
+
+    direction = Vector(
+        (
+            -math.sin(azimuth) * math.cos(elevation),
+            -math.cos(azimuth) * math.cos(elevation),
+            math.sin(elevation),
+        )
+    )
+
+    camera.location = target + direction * 8
     camera.rotation_euler = (
-        Vector((0, 1, 0))
+        (-direction)
         .to_track_quat("-Z", "Y")
         .to_euler()
     )
     camera.data.type = "ORTHO"
+    camera.data.ortho_scale = 3.9
     camera.data.clip_start = 0.01
-    camera.data.clip_end = 100
-    camera.data.ortho_scale = 6.65
+    camera.data.clip_end = 1000
 
     scene.camera = camera
-    scene.render.filepath = str(OUTPUT / (NAME + ".png"))
-
     return scene
-
-
-def render_comparison(obj):
-    scene = make_render_scene(obj)
-
-    assert bpy.ops.render.render(
-        write_still=True,
-        scene=scene.name,
-    ) == {"FINISHED"}
 
 
 def main():
@@ -1277,33 +1892,95 @@ def main():
     )
     args = parser.parse_args(argv)
 
-    material = load_source()
+    material = load_palette()
 
     scene = bpy.data.scenes.new(NAME + "-export")
     bpy.context.window.scene = scene
     scene.unit_settings.system = "METRIC"
-    scene.unit_settings.scale_length = 1.0
+    scene.unit_settings.scale_length = 1
 
-    obj, metadata = build_fountain(material)
-    bpy.context.view_layer.update()
+    obj, builder = build_fountain(material)
+    metadata = verify_model(obj, builder)
+
+    metadata.update(
+        {
+            "file": str(OUTPUT / (NAME + ".glb")),
+            "coordinate_system": (
+                "Blender X right, Y back, Z up; front -Y"
+            ),
+            "glb_transform": "(x,y,z) -> (x,z,-y)",
+            "palette_file": str(PALETTE),
+            "palette_slots": SLOTS,
+            "palette_center_rgb": RGB,
+            "water_geometry_exported": False,
+            "basin_water": {
+                "center": [0, 0, 0.35],
+                "radius": 1.0,
+            },
+            "bowl_water": {
+                "center": [0, 0, 1.02],
+                "radius": 0.6,
+            },
+            "spouts": [list(p) for p in SPOUTS],
+            "streams": [
+                {
+                    "start": list(SPOUTS[i]),
+                    "control": list(
+                        SPOUTS[i] + OUTWARD[i] * 0.12
+                    ),
+                    "end": list(stream_point(i, 1)),
+                    "clearance_radius": 0.08,
+                }
+                for i in range(3)
+            ],
+            "clearance_domain": (
+                "각 출구 평면 바깥의 베지어 곡선 주위 반지름 0.08"
+            ),
+        }
+    )
 
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    metadata.update(export_glb(obj))
-    metadata["file"] = str(OUTPUT / (NAME + ".glb"))
+
+    path = export_glb(obj)
+    metadata["glb"] = verify_glb(
+        path.read_bytes(),
+        obj,
+        metadata["triangles_by_slot"],
+    )
 
     if not args.skip_render:
-        render_comparison(obj)
+        preview = make_render_scene(obj)
+
+        assert bpy.ops.render.render(
+            write_still=True,
+            scene=preview.name,
+        ) == {"FINISHED"}
+
+        png = (OUTPUT / "fountain.png").read_bytes()
+        assert png[:8] == b"\x89PNG\r\n\x1a\n"
+        assert struct.unpack_from(">II", png, 16) == (
+            1000,
+            1200,
+        )
+
         metadata["preview"] = {
-            "file": str(OUTPUT / (NAME + ".png")),
-            "left": "front Blender -Y",
-            "right": "front from 45 degrees above",
-            "scale": "identical",
+            "file": str(OUTPUT / "fountain.png"),
+            "engine": "BLENDER_WORKBENCH",
+            "color_type": "TEXTURE",
+            "elevation_degrees": 30,
+            "azimuth_left_degrees": 12,
+            "water_alpha": 0.58,
         }
 
     (OUTPUT / (NAME + ".json")).write_text(
-        json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
+        json.dumps(
+            metadata,
+            ensure_ascii=False,
+            indent=2,
+        ) + "\n",
         encoding="utf-8",
     )
+
     print(json.dumps(metadata, ensure_ascii=False))
 
 

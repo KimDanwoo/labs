@@ -3,6 +3,7 @@ import type * as THREE from 'three/webgpu';
 import { getGame } from '../gameContext';
 import { InstancedGroup } from '../instancedGroup';
 import type { ColliderDescription, CollisionHandler } from '../physics/physics';
+import { pushOutOfShowerBay } from './showerBay';
 
 export interface InstancedPropsOptions {
   modelName: string;
@@ -41,6 +42,7 @@ export class InstancedProps {
 
     const shadows = hasOwnShadows ? {} : { castShadow: false, receiveShadow: false };
     for (const reference of references) {
+      pushOutOfShowerBay(reference.position);
       game.objects.add(
         { model: reference, updateMaterials: false, parent: null, ...shadows },
         {

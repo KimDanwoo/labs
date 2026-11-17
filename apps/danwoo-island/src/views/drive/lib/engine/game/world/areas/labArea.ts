@@ -8,7 +8,7 @@ import { rebuildLabGate } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
 import { LabScroller } from './labScroller';
-import { bindBlackBoardLabels } from './showcaseBlackBoard';
+import { setUpBlackBoard } from './showcaseBlackBoard';
 import { ShowcaseImages } from './showcaseImages';
 import { hideIntersectMesh, TitleSign, UrlSign } from './showcaseSigns';
 import { createHoverMaterials, createShades, swingPendulum } from './showcaseVisuals';
@@ -47,7 +47,7 @@ export class LabArea extends Area {
     hideIntersectMesh(require('intersectUrl'));
     const scroller = new LabScroller({ require, projects, shades });
     swingPendulum(this.references.items.get('balls') ?? []);
-    bindBlackBoardLabels(require);
+    setUpBlackBoard(require);
     this.#lightCandles();
     this.#heatCauldron();
 
