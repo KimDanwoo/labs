@@ -20,7 +20,15 @@ const LABELS = new Map<string, string>([
 ]);
 const STELE = { maxThickness: 0.3, labelHeight: 0.58, labelWidth: 0.6, labelAspect: 0.5 } as const;
 const LABEL_COLORS = { ink: '#1f5f6e', glow: '#fbf3e4' } as const;
-const PLAZA = { name: 'Cube133', pedestalMaxHeight: 0.6, centerMinWidth: 2.5, signReach: 1.2 } as const;
+const PLAZA = {
+  name: 'Cube133',
+  colliders: 'physicalFixed002',
+  plinthHull: 'hull',
+  fountain: 'shellFountainPhysicalFixed',
+  pedestalMaxHeight: 0.6,
+  centerMinWidth: 2.5,
+  signReach: 1.2,
+} as const;
 const COLLIDER = /^(cuboid|tube)/i;
 const TUBE = /^tube/i;
 const TUBE_INNER = { width: 0.9, depth: 0.4 } as const;
@@ -132,15 +140,24 @@ export function reshapeSocialPlaza(model: THREE.Object3D): void {
   const holdsSign = (center: THREE.Vector3): boolean =>
     signs.some((sign) => Math.hypot(sign.x - center.x, sign.z - center.z) < PLAZA.signReach);
   const pedestals: THREE.Mesh[] = [];
+  let plinthFloor: number | undefined;
   removeComponents(plaza, (component) => {
     const { box } = component;
-    const isPlinth = box.max.x - box.min.x > PLAZA.centerMinWidth;
-    if (!isPlinth && box.max.y > PLAZA.pedestalMaxHeight) return false;
-    const center = box.getCenter(new THREE.Vector3());
-    if (isPlinth || holdsSign(center)) {
-      pedestals.push(pedestalMesh(component, isPlinth ? 0 : Math.atan2(center.x, center.z)));
+    if (box.max.x - box.min.x > PLAZA.centerMinWidth) {
+      plinthFloor = box.min.y;
+      return true;
     }
+    if (box.max.y > PLAZA.pedestalMaxHeight) return false;
+    const center = box.getCenter(new THREE.Vector3());
+    if (holdsSign(center)) pedestals.push(pedestalMesh(component, Math.atan2(center.x, center.z)));
     return true;
   });
   plaza.add(...pedestals);
+  if (plinthFloor !== undefined) seatFountainOnPlaza(model, plaza.position.y + plinthFloor);
+}
+
+function seatFountainOnPlaza(model: THREE.Object3D, floor: number): void {
+  model.getObjectByName(PLAZA.colliders)?.getObjectByName(PLAZA.plinthHull)?.removeFromParent();
+  const fountain = model.getObjectByName(PLAZA.fountain);
+  if (fountain) fountain.position.y = floor;
 }
