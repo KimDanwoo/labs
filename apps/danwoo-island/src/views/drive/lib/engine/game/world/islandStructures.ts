@@ -4,6 +4,7 @@ import * as THREE from 'three/webgpu';
 import { MeshDefaultMaterial, revealNode } from '../materials/meshDefaultMaterial';
 import { createParts, type PartName, type Parts, removeComponents, type Triple } from './islandGeometry';
 import { islandModelGeometry, islandModelMesh, islandPaletteMaterial } from './islandModels';
+import { placedInArea } from './layout/areaPlacement';
 import { pushOutOfShowerBay, SHOWER_SCALE } from './showerBay';
 
 export interface Frame {
@@ -458,7 +459,7 @@ export function rebuildBuildingSite(model: THREE.Object3D): void {
   }
 }
 
-const WATERFALL_LIP_GROUND = new THREE.Vector3(69.665, 0, 7.29);
+const WATERFALL_LIP_GROUND = placedInArea('achievements', new THREE.Vector3(69.665, 0, 7.29));
 
 export function rebuildWaterfallCliff(model: THREE.Object3D): void {
   findChild(model, 'Cube089').removeFromParent();

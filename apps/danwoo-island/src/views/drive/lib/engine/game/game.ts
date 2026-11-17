@@ -482,10 +482,10 @@ export class Game {
       modelResource('benchesModel', `benches/benches${modelSuffix}.glb${cb}`),
       modelResource('explosiveCratesModel', `explosiveCrates/explosiveCrates${modelSuffix}.glb${cb}`),
       modelResource('lanternsModel', `lanterns/lanterns${modelSuffix}.glb${cb}`),
-      textureResource('terrainTexture', `terrain/terrain.${textureExtension}${cb}`, textureFormat, (resource) => {
+      textureResource('terrainTexture', `terrain/terrain.png${cb}`, 'texture', (resource) => {
         resource.flipY = false;
       }),
-      modelResource('terrainModel', `terrain/terrain${modelSuffix}.glb${cb}`),
+      modelResource('terrainModel', `terrain/terrain.glb${cb}`),
       textureResource('floorSlabsTexture', `floor/slabs.${textureExtension}`, textureFormat, (resource) => {
         resource.wrapS = THREE.RepeatWrapping;
         resource.wrapT = THREE.RepeatWrapping;

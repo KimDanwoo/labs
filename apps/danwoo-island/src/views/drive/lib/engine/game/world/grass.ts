@@ -23,8 +23,10 @@ import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import { QUALITY } from '../quality';
 import { TICK_ORDER } from '../tickOrder';
+import { placedInArea } from './layout/areaPlacement';
 
-const GRASS_CLEARINGS = [{ x: 58.4, z: 32.4, radius: 2.4 }] as const;
+const LANDING_CLEARING = placedInArea('landing', new THREE.Vector3(58.4, 0, 32.4));
+const GRASS_CLEARINGS = [{ x: LANDING_CLEARING.x, z: LANDING_CLEARING.z, radius: 2.4 }] as const;
 const SUBDIVISIONS_BY_QUALITY = { [QUALITY.high]: 280, [QUALITY.low]: 200 } as const;
 const SURFACE_IDEAL = 2000;
 const BLADE = { width: 0.17, height: 0.46, heightRandomness: 0.55, lean: 1.4 } as const;

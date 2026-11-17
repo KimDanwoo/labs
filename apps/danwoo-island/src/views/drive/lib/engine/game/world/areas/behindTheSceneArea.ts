@@ -4,6 +4,7 @@ import * as THREE from 'three/webgpu';
 import { PortalSlabsGeometry } from '../../geometries/portalSlabsGeometry';
 import { requireElement } from '../../utilities/requireElement';
 import { rebuildBuildingSite } from '../islandStructures';
+import { placedInArea } from '../layout/areaPlacement';
 import { Area } from './area';
 import { BlogBoard } from './blogBoard';
 
@@ -11,7 +12,7 @@ const SLAB_SIZE = 1.5;
 const SLAB_COLUMNS = 6;
 const SLAB_ELEVATION = 0.01;
 const SLAB_LINE_COLOR = '#3aa6a0';
-const BOARD_POSITION = new THREE.Vector3(50.4, 0, -17.4);
+const BOARD_POSITION = placedInArea('behindTheScene', new THREE.Vector3(50.4, 0, -17.4));
 const BOARD_ROTATION = 0.5;
 const BOARD_POINT_OFFSET = new THREE.Vector3(0, 1.5, 1.6);
 const UP = new THREE.Vector3(0, 1, 0);

@@ -1,6 +1,8 @@
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
+import { placedInArea } from './world/layout/areaPlacement';
+import { RESPAWN_AREAS } from './world/layout/islandLayout';
 
 export interface Respawn {
   name: string;
@@ -17,6 +19,12 @@ const EXTRA_RESPAWNS = [
 
 const lowerFirst = (value: string): string => value.charAt(0).toLowerCase() + value.slice(1);
 
+function placedRespawn(name: string, x: number, z: number): THREE.Vector3 {
+  const area = RESPAWN_AREAS[name];
+  if (!area) throw new Error(`리스폰 ${name}이 어느 구역에 속하는지 정해지지 않았어요.`);
+  return placedInArea(area, new THREE.Vector3(x, SPAWN_HEIGHT, z));
+}
+
 export class Respawns {
   readonly game = getGame();
   readonly #items = new Map<string, Respawn>();
@@ -29,12 +37,12 @@ export class Respawns {
       const name = lowerFirst(child.name.replace(RESPAWN_PREFIX, '$1'));
       this.#items.set(name, {
         name,
-        position: new THREE.Vector3(child.position.x, SPAWN_HEIGHT, child.position.z),
+        position: placedRespawn(name, child.position.x, child.position.z),
         rotation: child.rotation.y,
       });
     }
     for (const { name, x, z, rotation } of EXTRA_RESPAWNS) {
-      this.#items.set(name, { name, position: new THREE.Vector3(x, SPAWN_HEIGHT, z), rotation });
+      this.#items.set(name, { name, position: placedRespawn(name, x, z), rotation });
     }
   }
 
