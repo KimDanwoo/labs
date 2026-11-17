@@ -21,12 +21,13 @@ export { formatTime } from './model/services/common';
 export { getRecordPoint } from './model/services/recordUtils';
 export { calculatePoint, formatScore } from './model/services/scoreCalculator';
 export { fillCellAtom, resetUserInputsAtom, toggleNoteAtom, toggleNoteModeAtom } from './model/store/cellValueAtoms';
-export { initializeGameAtom, switchGameModeAtom } from './model/store/gameLifecycleAtoms';
+export { initializeGameAtom, resumeOrStartGameAtom, switchGameModeAtom } from './model/store/gameLifecycleAtoms';
 export { gameStore } from './model/store/gameStore';
 export { getHintAtom } from './model/store/hintAtoms';
 export { canRedoAtom, canUndoAtom, redoAtom, undoAtom } from './model/store/historyAtoms';
 export { handleKeyInputAtom } from './model/store/keyboardAtoms';
 export {
+  PERSISTED_GAME_ATOMS,
   boardAtom,
   cagesAtom,
   currentTimeAtom,

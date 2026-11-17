@@ -25,18 +25,19 @@ const saveGameRecordMock = vi.mocked(saveGameRecord);
 const USER = { uid: 'user-1', email: null, displayName: '단우', photoURL: null, emailVerified: true };
 
 interface GameSpec {
+  solution: number[][];
   difficulty: Difficulty;
   completionTime: number;
 }
 
-const FIRST_GAME: GameSpec = { difficulty: GAME_LEVEL.EASY, completionTime: 100 };
-const SECOND_GAME: GameSpec = { difficulty: GAME_LEVEL.EXPERT, completionTime: 300 };
+const FIRST_GAME: GameSpec = { solution: [[1, 2]], difficulty: GAME_LEVEL.EASY, completionTime: 100 };
+const SECOND_GAME: GameSpec = { solution: [[2, 1]], difficulty: GAME_LEVEL.EXPERT, completionTime: 300 };
 
-const pointOf = ({ difficulty, completionTime }: GameSpec) =>
+const pointOf = ({ difficulty, completionTime }: Pick<GameSpec, 'difficulty' | 'completionTime'>) =>
   calculatePoint({ difficulty, gameMode: GAME_MODE.CLASSIC, completionTime }).totalPoint;
 
-const startGame = ({ difficulty }: GameSpec) => {
-  gameStore.set(solutionAtom, [[1]]);
+const startGame = ({ solution, difficulty }: GameSpec) => {
+  gameStore.set(solutionAtom, solution);
   gameStore.set(difficultyAtom, difficulty);
   gameStore.set(currentTimeAtom, 0);
   gameStore.set(isSuccessAtom, false);
@@ -92,5 +93,23 @@ describe('useSaveGameRecord', () => {
     await act(async () => finishSaving('record-id'));
 
     expect(gameStore.get(isRecordSavedAtom)).toBe(false);
+  });
+
+  it('저장 중에 같은 판의 정답 배열이 새로 읽혀도(복원·다른 탭) 한 번만 저장하고 저장된 것으로 표시한다', async () => {
+    let finishSaving: (recordId: string) => void = () => undefined;
+    saveGameRecordMock.mockReturnValue(new Promise((resolve) => (finishSaving = resolve)));
+    const { result } = renderHook(() => useSaveGameRecord(), { wrapper });
+
+    act(() => winGame(FIRST_GAME));
+    await waitFor(() => expect(saveGameRecordMock).toHaveBeenCalledTimes(1));
+
+    act(() => gameStore.set(solutionAtom, structuredClone(FIRST_GAME.solution)));
+    await act(async () => {
+      await result.current.save();
+    });
+    await act(async () => finishSaving('record-id'));
+
+    expect(saveGameRecordMock).toHaveBeenCalledTimes(1);
+    expect(gameStore.get(isRecordSavedAtom)).toBe(true);
   });
 });

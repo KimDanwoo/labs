@@ -25,11 +25,13 @@ interface SaveGameRecordResult {
   pointResult: PointResult | null;
 }
 
+const gameKeyOf = (solution: number[][]) => solution.flat().join('');
+
 export function useSaveGameRecord(): SaveGameRecordResult {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [pointResult, setPointResult] = useState<PointResult | null>(null);
-  const savingGameKey = useRef<number[][] | null>(null);
+  const savingGameKey = useRef<string | null>(null);
 
   const user = useAtomValue(userAtom);
   const difficulty = useAtomValue(difficultyAtom);
@@ -54,7 +56,7 @@ export function useSaveGameRecord(): SaveGameRecordResult {
   }
 
   const save = useCallback(async (): Promise<string | null> => {
-    const gameKey = gameStore.get(solutionAtom);
+    const gameKey = gameKeyOf(gameStore.get(solutionAtom));
     if (savingGameKey.current === gameKey) return null;
     if (!user || !isSuccess || gameStore.get(isRecordSavedAtom)) return null;
     savingGameKey.current = gameKey;
@@ -88,7 +90,7 @@ export function useSaveGameRecord(): SaveGameRecordResult {
 
     try {
       const recordId = await saveGameRecord(record);
-      if (gameStore.get(solutionAtom) === gameKey) gameStore.set(isRecordSavedAtom, true);
+      if (gameKeyOf(gameStore.get(solutionAtom)) === gameKey) gameStore.set(isRecordSavedAtom, true);
       return recordId;
     } catch (err) {
       setError(err instanceof Error ? err : new Error('저장 실패'));
