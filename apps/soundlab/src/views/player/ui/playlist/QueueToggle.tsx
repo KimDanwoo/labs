@@ -1,8 +1,11 @@
 'use client';
 
-import { currentIndexAtom, PLAYER_SCREEN, playerPath, playerScreenAtom, TRACKS } from '@entities/track';
-import { FLOATING_BUTTON } from '@shared/lib/floatingButton';
 import { useAtom, useAtomValue } from 'jotai';
+
+import { currentIndexAtom, PLAYER_SCREEN, playerPath, playerScreenAtom, TRACKS } from '@entities/track';
+import { FloatingButton } from '@shared/ui/FloatingButton';
+
+import { PLAYLIST_ID } from '../../config/layout';
 import { QueueIcon } from './QueueIcon';
 
 /**
@@ -11,16 +14,9 @@ import { QueueIcon } from './QueueIcon';
  * Link/router가 아니라 pushState다 — 라우터로 이동하면 트리가 리마운트되고 재생 엔진 iframe이 사라진다.
  * 주소는 진짜 라우트(/t/<id>/queue)라서 새로고침·공유·뒤로가기가 그대로 동작한다.
  */
-const QUEUE_BUTTON = [
-  FLOATING_BUTTON,
-  'ring-hairline bg-void/80 text-paper ring-1 hover:bg-void hover:text-white focus-visible:bg-void',
-  'aria-[pressed=true]:ring-brass/40 aria-[pressed=true]:bg-brass/20 aria-[pressed=true]:text-brass',
-].join(' ');
-
 export function QueueToggle() {
   const [screen, setScreen] = useAtom(playerScreenAtom);
-  const index = useAtomValue(currentIndexAtom);
-  const track = TRACKS[index];
+  const track = TRACKS[useAtomValue(currentIndexAtom)];
   const isQueue = screen === PLAYER_SCREEN.queue;
   const label = isQueue ? '현재 재생으로' : '재생목록';
 
@@ -31,16 +27,15 @@ export function QueueToggle() {
   };
 
   return (
-    <button
-      type="button"
+    <FloatingButton
       aria-pressed={isQueue}
-      aria-controls="playlist"
+      aria-controls={PLAYLIST_ID}
       aria-label={label}
       title={label}
-      className={QUEUE_BUTTON}
+      className="ring-hairline bg-void/80 text-paper ring-1 hover:bg-void hover:text-white focus-visible:bg-void aria-[pressed=true]:ring-brass/40 aria-[pressed=true]:bg-brass/20 aria-[pressed=true]:text-brass"
       onClick={handleClick}
     >
       <QueueIcon />
-    </button>
+    </FloatingButton>
   );
 }
