@@ -11,9 +11,9 @@ import type { GameRecord } from '../model/types/record';
 const COLLECTION_NAME = 'gameRecords';
 
 export async function saveGameRecord(record: Omit<GameRecord, 'id' | 'createdAt'>): Promise<string> {
-  const { addDoc, collection, Timestamp } = await import('firebase/firestore');
+  const { addDoc, collection, serverTimestamp } = await import('firebase/firestore');
   const db = await getDb();
-  const docRef = await addDoc(collection(db, COLLECTION_NAME), { ...record, createdAt: Timestamp.now() });
+  const docRef = await addDoc(collection(db, COLLECTION_NAME), { ...record, createdAt: serverTimestamp() });
   return docRef.id;
 }
 

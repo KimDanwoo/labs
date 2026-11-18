@@ -130,3 +130,4 @@ catalog:
 catalogs:
   fb11:
     firebase: ^11.9.1
+    '@firebase/rules-unit-testing': ^4.0.1
