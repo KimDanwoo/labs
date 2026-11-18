@@ -2,7 +2,9 @@
 
 import { useAtomValue } from 'jotai';
 
-import { currentIndexAtom, formatSeconds, TRACKS } from '@entities/track';
+import { TRACKS } from '@entities/track';
+import { formatSeconds } from '../../lib/formatTrack';
+import { currentIndexAtom } from '../../model/store/playback';
 
 import { MS_PER_SECOND } from '../../config/time';
 import { useElapsedClock } from '../../model/hooks/useElapsedClock';

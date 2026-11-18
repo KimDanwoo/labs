@@ -1,15 +1,9 @@
-import {
-  currentIndexAtom,
-  isPlayingAtom,
-  PLAYER_SCREEN,
-  playerPath,
-  playerScreenAtom,
-  TRACKS,
-  type PlayerScreen,
-} from '@entities/track';
+import { PLAYER_SCREEN, TRACKS, type PlayerScreen } from '@entities/track';
 import { useAtom, useAtomValue } from 'jotai';
 import Link from 'next/link';
 import type { JSX, MouseEvent } from 'react';
+import { playerPath } from '../lib/playerUrl';
+import { currentIndexAtom, isPlayingAtom, playerScreenAtom } from '../model/store/playback';
 import { QueueToggle } from './playlist/QueueToggle';
 import { ShareButton } from './transport/ShareButton';
 

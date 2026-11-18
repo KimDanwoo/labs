@@ -1,9 +1,11 @@
 'use client';
 
-import { artworkUrl, currentIndexAtom, formatTrackNumber, TRACKS } from '@entities/track';
+import { artworkUrl, TRACKS } from '@entities/track';
 import { useAtomValue } from 'jotai';
 import { useCallback, useRef, useState } from 'react';
 import { ARTWORK_TEXTURE_SIZE } from '../../config/stage';
+import { formatTrackNumber } from '../../lib/formatTrack';
+import { currentIndexAtom } from '../../model/store/playback';
 import { VISUAL_MODE, visualModeAtom } from '../../model/visual';
 import { FavoriteButton } from '../library/FavoriteButton';
 import { ParticleCanvas } from './ParticleCanvas';

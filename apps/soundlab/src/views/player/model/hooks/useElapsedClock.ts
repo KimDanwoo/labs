@@ -1,8 +1,9 @@
 import { useRef } from 'react';
 
-import { formatSeconds, frameState } from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
 import { MS_PER_SECOND } from '../../config/time';
+import { formatSeconds } from '../../lib/formatTrack';
+import { frameState } from '../store/playback';
 
 export function useElapsedClock() {
   const elapsedRef = useRef<HTMLElement | null>(null);

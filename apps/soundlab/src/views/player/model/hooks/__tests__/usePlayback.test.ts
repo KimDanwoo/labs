@@ -1,3 +1,4 @@
+import type { Track } from '@entities/track';
 import { JSDOM } from 'jsdom';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
@@ -6,7 +7,6 @@ import { act, createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { ScWidget } from '../../../api/widget';
 import { currentIndexAtom, frameState, isPlayingAtom } from '../../store/playback';
-import type { Track } from '../../types/track';
 import { useKeyboard } from '../useKeyboard';
 import { usePlayback, type Playback } from '../usePlayback';
 

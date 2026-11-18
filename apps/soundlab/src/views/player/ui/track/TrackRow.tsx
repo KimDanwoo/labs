@@ -1,7 +1,7 @@
-import { GENRE_DOT_COLOR } from '../config/display';
-import { formatDurationMs, formatTrackNumber } from '../lib/formatTrack';
-import { hueOf } from '../model/constants/genreHue';
-import type { Track } from '../model/types/track';
+import type { Track } from '@entities/track';
+import { GENRE_DOT_COLOR } from '../../config/display';
+import { formatDurationMs, formatTrackNumber } from '../../lib/formatTrack';
+import { hueOf } from '../../model/constants/genreHue';
 import { LevelMeter } from './LevelMeter';
 
 interface TrackRowProps {

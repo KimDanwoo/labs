@@ -1,18 +1,12 @@
 import { useAtomValue } from 'jotai';
 
-import {
-  currentIndexAtom,
-  engineModeAtom,
-  isPlayingAtom,
-  playerScreenAtom,
-  TRACKS,
-  useKeyboard,
-  useMediaSession,
-  usePlayback,
-  useTrackUrl,
-  useWaveform,
-  type PlayerScreen,
-} from '@entities/track';
+import { TRACKS, type PlayerScreen } from '@entities/track';
+import { currentIndexAtom, engineModeAtom, isPlayingAtom, playerScreenAtom } from '../store/playback';
+import { useKeyboard } from './useKeyboard';
+import { useMediaSession } from './useMediaSession';
+import { usePlayback } from './usePlayback';
+import { useTrackUrl } from './useTrackUrl';
+import { useWaveform } from './useWaveform';
 
 export function usePlayerEngine(initialTrackId?: number, initialScreen?: PlayerScreen) {
   useTrackUrl(TRACKS, initialTrackId, initialScreen);

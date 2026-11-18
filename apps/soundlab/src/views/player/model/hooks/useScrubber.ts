@@ -1,7 +1,8 @@
 import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react';
 
-import { frameState, usePlaybackControls } from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
+import { frameState } from '../store/playback';
+import { usePlaybackControls } from './usePlaybackControls';
 
 import { ARIA_UPDATE_MS, DRAG_END_EVENTS, PERCENT, PRECISION } from '../../config/scrubber';
 

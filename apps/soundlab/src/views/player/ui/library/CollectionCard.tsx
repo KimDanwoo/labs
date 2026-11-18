@@ -1,9 +1,10 @@
-import { TRACKS, usePlaybackControls } from '@entities/track';
+import { TRACKS } from '@entities/track';
 import { Button } from '@shared/ui/Button';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX } from 'react';
 import type { Collection } from '../../config/collections';
 import { collectionFilterAtom, LIBRARY_FILTER, libraryFilterAtom, searchAtom } from '../../model/browse';
+import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
 
 type Props = { collection: Collection };
 export function CollectionCard({ collection }: Props): JSX.Element {

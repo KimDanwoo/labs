@@ -1,7 +1,7 @@
-import { clearHistoryAtom, libraryAtom, storageNoticeAtom } from '@entities/track';
 import { Button } from '@shared/ui/Button';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX } from 'react';
+import { clearHistoryAtom, libraryAtom, storageNoticeAtom } from '../../model/library';
 
 export function ListeningHistory(): JSX.Element {
   const library = useAtomValue(libraryAtom);

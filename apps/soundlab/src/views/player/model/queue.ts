@@ -1,4 +1,4 @@
-import type { Track } from './types/track';
+import type { Track } from '@entities/track';
 
 export type PlaybackQueue = { ids: readonly number[]; label: string };
 

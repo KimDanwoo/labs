@@ -1,7 +1,7 @@
 import { useRef, type RefObject } from 'react';
 
-import { frameState } from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
+import { frameState } from '../store/playback';
 
 import { BEAT_RIPPLE, DECAY, FRAME, MORPH, TRAIL } from '../../config/stage';
 import type { Renderer } from '../../lib/stage/renderer';

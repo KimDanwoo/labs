@@ -1,7 +1,9 @@
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 
-import { currentIndexAtom, frameState, shareUrl, TRACKS } from '@entities/track';
+import { TRACKS } from '@entities/track';
+import { shareUrl } from '../../lib/playerUrl';
+import { currentIndexAtom, frameState } from '../store/playback';
 
 import {
   ABORT_ERROR_NAME,

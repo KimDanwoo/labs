@@ -1,10 +1,9 @@
 'use client';
 
+import { artworkUrl, type ArtworkSize, type Track } from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
 import { useEffect, useRef } from 'react';
-import { artworkUrl } from '../../api/widget';
 import { frameState } from '../store/playback';
-import type { ArtworkSize, Track } from '../types/track';
 import type { Playback } from './usePlayback';
 
 /**

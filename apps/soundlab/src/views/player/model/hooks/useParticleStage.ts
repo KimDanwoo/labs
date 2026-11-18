@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 import type { RefObject } from 'react';
 
-import { currentIndexAtom } from '@entities/track';
+import { currentIndexAtom } from '../store/playback';
 
 import { VISUAL_MODE, visualModeAtom } from '../visual';
 import { useArtworkSwap } from './useArtworkSwap';

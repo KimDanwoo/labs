@@ -1,7 +1,8 @@
 'use client';
 
-import { PlaybackProvider, PLAYER_SCREEN, type PlayerScreen } from '@entities/track';
+import { PLAYER_SCREEN, type PlayerScreen } from '@entities/track';
 import { cn } from '@shared/lib/cn';
+import { PlaybackProvider } from './PlaybackProvider';
 
 import { usePlayerEngine } from '../model/hooks/usePlayerEngine';
 import { Archive } from './archive/Archive';
