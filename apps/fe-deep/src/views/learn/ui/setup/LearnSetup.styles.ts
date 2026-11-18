@@ -1,0 +1,17 @@
+export const styles = {
+  root: 'container mx-auto max-w-168 px-4 py-8 sm:py-12 animate-fade-in',
+  title: 'text-3xl font-bold tracking-tight mb-2',
+  description: 'text-muted-foreground mb-8',
+  card: 'p-6 space-y-6',
+  fieldLabel: 'text-sm font-normal mb-3 block',
+  orderOptions: 'grid grid-cols-2 gap-1.5',
+  orderOption: 'gap-1.5 transition-all duration-200',
+  orderIcon: 'h-3.5 w-3.5',
+  difficultyOptions: 'grid grid-cols-4 gap-1.5',
+  difficultyOption: 'transition-all duration-200',
+  start: 'w-full gap-2 h-12 shadow-md hover:shadow-lg transition-all duration-300',
+  empty: 'text-sm text-muted-foreground text-center',
+  tip: 'mt-6 p-4 rounded-xl bg-muted/40 border border-border/50',
+  tipText: 'text-xs text-muted-foreground leading-relaxed',
+  tipLabel: 'text-foreground/70',
+} as const;
