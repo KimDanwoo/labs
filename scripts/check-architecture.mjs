@@ -15,6 +15,10 @@ const TOKEN_EXCEPTION = /token-exception:\s*\S/;
 const UNSUPPORTED_WEIGHT = /\bfont-(?:thin|extralight|light|medium|extrabold|black)\b/;
 const DEPLOYMENT_ENABLED = { '**': false, main: true };
 const BUILD_FILTER = /--filter=(\S+)/;
+const TIDY_APPS = new Set(['danwoo-island']);
+const COMPONENT_WRAPPER = /^(?:memo|forwardRef|dynamic|lazy)$/;
+const STYLE_HOME =
+  /^src\/app\/(?:globals\.css|styles\/[^/]+\.css)$|^src\/(?:views|features|entities)\/[^/]+\/styles\/[^/]+\.css$/;
 
 export function validateManifest(manifest, workspaceNames, catalogNames) {
   const problems = [];
@@ -83,6 +87,36 @@ export function validateDesignTokens(text) {
       problems.push(`${at}: 마루부리에 없는 굵기 ${weight} 대신 font-normal·font-semibold·font-bold를 쓴다.`);
   });
   return problems;
+}
+
+function isComponentOrHook(name, initializer, source) {
+  if (!initializer) return false;
+  const isFunction = ts.isArrowFunction(initializer) || ts.isFunctionExpression(initializer);
+  const isWrapped = ts.isCallExpression(initializer) && COMPONENT_WRAPPER.test(initializer.expression.getText(source));
+  if (/^use[A-Z]/.test(name)) return isFunction;
+  return /^[A-Z]/.test(name) && (isFunction || isWrapped);
+}
+
+export function validateComponentModule(text, filename) {
+  const source = ts.createSourceFile(filename, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const problems = [];
+  for (const statement of source.statements) {
+    if (ts.isFunctionDeclaration(statement) && statement.name && !/^(?:[A-Z]|use[A-Z])/.test(statement.name.text))
+      problems.push(`${statement.name.text}: tsx에는 컴포넌트만 둔다. 보조 함수는 lib/로 옮긴다.`);
+    if (!ts.isVariableStatement(statement)) continue;
+    for (const declaration of statement.declarationList.declarations) {
+      const name = declaration.name.getText(source);
+      if (!isComponentOrHook(name, declaration.initializer, source))
+        problems.push(`${name}: tsx 최상위에는 컴포넌트만 둔다. 상수는 config/, 상태 로직은 model/hooks로 옮긴다.`);
+    }
+  }
+  return problems;
+}
+
+export function findMisplacedStyles(appRelativePaths) {
+  return appRelativePaths
+    .filter((file) => file.endsWith('.css') && !STYLE_HOME.test(file))
+    .map((file) => `${file}: CSS 파일은 src/app/styles/ 또는 슬라이스의 styles/에 둔다.`);
 }
 
 export function findImportCycles(graph) {
@@ -198,6 +232,15 @@ export function checkRepository(root = ROOT) {
       }
     }
     const sources = [...walk(path.join(dir, 'src')), ...walk(path.join(dir, 'app'))];
+    if (TIDY_APPS.has(path.basename(dir))) {
+      const appSources = sources.filter((f) => !f.includes(`${path.sep}__tests__${path.sep}`));
+      for (const file of appSources.filter((f) => f.endsWith('.tsx') && f.startsWith(path.join(dir, 'src')))) {
+        for (const problem of validateComponentModule(readFileSync(file, 'utf8'), file))
+          problems.push(`${path.relative(root, file)}: ${problem}`);
+      }
+      for (const problem of findMisplacedStyles(appSources.map((f) => path.relative(dir, f))))
+        problems.push(`${relative}/${problem}`);
+    }
     if (existsSync(path.join(dir, 'src/app/styles/theme.css'))) {
       for (const file of sources.filter((f) => /\.(ts|tsx|astro)$/.test(f))) {
         for (const problem of validateDesignTokens(readFileSync(file, 'utf8')))
