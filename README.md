@@ -2,27 +2,29 @@
 
 아이디어를 구현하는 실험실이에요. 모든 프로젝트는 허브 [lab.danwoo.dev](https://lab.danwoo.dev)에서 한눈에 볼 수 있어요.
 
+<sub>공통: Next.js 16 · React 19 · TypeScript · Tailwind CSS 4 · pnpm·Turborepo 모노레포 (Dansoon만 Astro)</sub>
+
 [![Danwoo Lab 허브](docs/readme/hub.webp)](https://lab.danwoo.dev)
 
 ## 프로젝트
 
-| [![청연사주](apps/hub/public/projects/cheongyeon-saju.webp)](https://saju.danwoo.dev)          | [![Dansoon](apps/hub/public/projects/dansoon-card.webp)](https://danwoo.dev)                   |
-| :--------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------- |
-| **[청연사주](https://saju.danwoo.dev)**                                                        | **[Dansoon](https://danwoo.dev)**                                                              |
-| 사주 풀이를 웹툰 컷으로 읽어요.                                                                | 프론트엔드 개발 기록을 모아요.                                                                 |
-| [![Danwoo Island](apps/hub/public/projects/danwoo-island-card.webp)](https://world.danwoo.dev) | [![Unicorn Rush](apps/hub/public/projects/unicorn-rush-card.webp)](https://prairie.danwoo.dev) |
-| **[Danwoo Island](https://world.danwoo.dev)**                                                  | **[Unicorn Rush](https://prairie.danwoo.dev)**                                                 |
-| 차를 몰고 열대 섬을 돌아다니는 3D 포트폴리오예요.                                              | three.js로 만든 초원을 유니콘을 타고 달리고 날아요.                                            |
-| [![코모레비](apps/hub/public/projects/komorebi-card.webp)](https://komorebi.danwoo.dev)        | [![soundlab](apps/hub/public/projects/soundlab.webp)](https://sound.danwoo.dev)                |
-| **[코모레비](https://komorebi.danwoo.dev)**                                                    | **[soundlab](https://sound.danwoo.dev)**                                                       |
-| 여름 시골길을 픽셀 아트로 산책해요.                                                            | 직접 만든 노래를 픽셀 파티클 비주얼라이저로 들어요.                                            |
+| [![청연사주](apps/hub/public/projects/cheongyeon-saju.webp)](https://saju.danwoo.dev)                  | [![Dansoon](apps/hub/public/projects/dansoon-card.webp)](https://danwoo.dev)                             |
+| :----------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------- |
+| **[청연사주](https://saju.danwoo.dev)**                                                                | **[Dansoon](https://danwoo.dev)**                                                                        |
+| 사주 풀이를 웹툰 컷으로 읽어요.<br><sub>Supabase · React Query · Jotai · Playwright</sub>              | 프론트엔드 개발 기록을 모아요.<br><sub>Astro · Satori(OG 이미지)</sub>                                   |
+| [![Danwoo Island](apps/hub/public/projects/danwoo-island-card.webp)](https://world.danwoo.dev)         | [![Unicorn Rush](apps/hub/public/projects/unicorn-rush-card.webp)](https://prairie.danwoo.dev)           |
+| **[Danwoo Island](https://world.danwoo.dev)**                                                          | **[Unicorn Rush](https://prairie.danwoo.dev)**                                                           |
+| 차를 몰고 열대 섬을 돌아다니는 3D 포트폴리오예요.<br><sub>three.js · Rapier 물리 · GSAP · Howler</sub> | three.js로 만든 초원을 유니콘을 타고 달리고 날아요.<br><sub>React Three Fiber · drei · GLSL 셰이더</sub> |
+| [![코모레비](apps/hub/public/projects/komorebi-card.webp)](https://komorebi.danwoo.dev)                | [![soundlab](apps/hub/public/projects/soundlab.webp)](https://sound.danwoo.dev)                          |
+| **[코모레비](https://komorebi.danwoo.dev)**                                                            | **[soundlab](https://sound.danwoo.dev)**                                                                 |
+| 여름 시골길을 픽셀 아트로 산책해요.<br><sub>three.js · Web Audio</sub>                                 | 직접 만든 노래를 픽셀 파티클 비주얼라이저로 들어요.<br><sub>WebGL · Jotai</sub>                          |
 
 ## 그 밖의 앱
 
-| [![프딥](apps/hub/public/projects/fe-deep.webp)](https://fe-deep.danwoo.dev) | [![스도쿠](apps/hub/public/projects/sudoku.webp)](https://sudoku.danwoo.dev) |
-| :--------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
-| **[프딥](https://fe-deep.danwoo.dev)**                                       | **[스도쿠](https://sudoku.danwoo.dev)**                                      |
-| 프론트엔드 개념을 깊게 파고든 기록을 모아 둬요.                              | 난이도를 골라 가볍게 한 판 즐겨요.                                           |
+| [![프딥](apps/hub/public/projects/fe-deep.webp)](https://fe-deep.danwoo.dev)                                             | [![스도쿠](apps/hub/public/projects/sudoku.webp)](https://sudoku.danwoo.dev) |
+| :----------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
+| **[프딥](https://fe-deep.danwoo.dev)**                                                                                   | **[스도쿠](https://sudoku.danwoo.dev)**                                      |
+| 프론트엔드 개념을 깊게 파고든 기록을 모아 둬요.<br><sub>React Query · Framer Motion · 마크다운 콘텐츠 · Playwright</sub> | 난이도를 골라 가볍게 한 판 즐겨요.<br><sub>Web Worker · Jotai · Vitest</sub> |
 
 ## 라이선스
 
