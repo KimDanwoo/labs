@@ -1,4 +1,4 @@
-import { TIME, type TimeOfDay, type Weather } from '../model/constants/walk';
+import { TIME, type TimeOfDay, type Weather } from '../config/walk';
 import { SURFACE, type Surface } from '../model/world/surfaces';
 import { PLACE_ACTION, type PlaceAction, type Region } from '../model/world/world';
 import { ambienceMix, type AmbienceMix } from './ambienceMix';

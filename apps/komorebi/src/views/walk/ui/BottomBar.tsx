@@ -2,15 +2,15 @@ import { LANDMARKS } from '../model/world/world';
 import { ControlsHint } from './ControlsHint';
 import { Icon } from './Icon';
 
-type Props = {
+interface BottomBarProps {
   place: string;
   visited: readonly string[];
   shouldShowHint: boolean;
   isPaused?: boolean;
   onOpenJournal: () => void;
-};
+}
 
-export function BottomBar({ place, visited, shouldShowHint, isPaused = false, onOpenJournal }: Props) {
+export function BottomBar({ place, visited, shouldShowHint, isPaused = false, onOpenJournal }: BottomBarProps) {
   return (
     <footer className="bottom-bar">
       <div className="location">

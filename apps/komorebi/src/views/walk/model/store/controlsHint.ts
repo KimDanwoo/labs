@@ -1,4 +1,4 @@
-import { CONTROLS_SEEN_STORAGE_KEY } from '../constants/walk';
+import { CONTROLS_SEEN_STORAGE_KEY } from '../../config/walk';
 
 let seenBeforeThisVisit: boolean | null = null;
 

@@ -1,14 +1,14 @@
 import { Joystick } from './Joystick';
 
-type Props = {
+interface MobileControlsProps {
   isReady: boolean;
   isPaused: boolean;
   isSprinting: boolean;
   onInput: (key: string, pressed: boolean) => void;
   onToggleSprint: () => void;
-};
+}
 
-export function MobileControls({ isReady, isPaused, isSprinting, onInput, onToggleSprint }: Props) {
+export function MobileControls({ isReady, isPaused, isSprinting, onInput, onToggleSprint }: MobileControlsProps) {
   return (
     <div className="mobile-controls" aria-label="터치 이동">
       <Joystick disabled={!isReady || isPaused} onInput={onInput} />

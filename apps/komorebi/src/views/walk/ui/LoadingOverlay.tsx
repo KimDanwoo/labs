@@ -1,6 +1,8 @@
-type Props = { error: string };
+interface LoadingOverlayProps {
+  error: string;
+}
 
-export function LoadingOverlay({ error }: Props) {
+export function LoadingOverlay({ error }: LoadingOverlayProps) {
   return (
     <div className="loading">
       <p>{error || '여름을 한 장씩 펼치고 있어요…'}</p>

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
+import { MS_PER_SECOND } from '../config/time';
+import { TIME, WEATHER, type TimeOfDay, type Weather } from '../config/walk';
 import { BALL_PHASE, BALL_ROLE, BALL_TIMING, type BallGame } from '../model/ballGame';
-import { TIME, WEATHER, type TimeOfDay, type Weather } from '../model/constants/walk';
 import {
   nearestSchoolmate,
   schoolmateGreetingPosition,
@@ -819,7 +820,7 @@ export async function createScene(
       return;
     }
     nextFrame = nextRenderTime(time, nextFrame, rate);
-    const dt = last ? Math.min((time - last) / 1000, 0.05) : 0;
+    const dt = last ? Math.min((time - last) / MS_PER_SECOND, 0.05) : 0;
     last = time;
     elapsed += dt;
     companionAge += dt;

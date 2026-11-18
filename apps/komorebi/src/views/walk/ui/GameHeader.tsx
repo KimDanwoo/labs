@@ -1,8 +1,11 @@
-import { TIME_LABEL, type TimeOfDay } from '../model/constants/walk';
+import { TIME_LABEL, type TimeOfDay } from '../config/walk';
 
-type Props = { timeOfDay: TimeOfDay; day: number };
+interface GameHeaderProps {
+  timeOfDay: TimeOfDay;
+  day: number;
+}
 
-export function GameHeader({ timeOfDay, day }: Props) {
+export function GameHeader({ timeOfDay, day }: GameHeaderProps) {
   return (
     <header className="game-header">
       <h1 className="game-name">여름빛 산책</h1>

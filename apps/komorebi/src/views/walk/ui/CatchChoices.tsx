@@ -9,7 +9,12 @@ import {
 } from '../lib/companions';
 import { companionStore } from '../model/store/companions';
 
-export function CatchChoices({ uid, onReact }: { uid: string | null; onReact: (reaction: CompanionReaction) => void }) {
+interface CatchChoicesProps {
+  uid: string | null;
+  onReact: (reaction: CompanionReaction) => void;
+}
+
+export function CatchChoices({ uid, onReact }: CatchChoicesProps) {
   const state = useSyncExternalStore(companionStore.subscribe, companionStore.get, companionStore.getServer);
   const [message, setMessage] = useState('');
   const fish = state.fish.find((item) => item.uid === uid);

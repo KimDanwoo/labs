@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { TIME, WEATHER, type TimeOfDay, type Weather } from '../../config/walk';
 import { createAmbience } from '../../lib/audio';
-import { TIME, WEATHER, type TimeOfDay, type Weather } from '../constants/walk';
 import type { Region } from '../world/world';
 
 type Ambience = ReturnType<typeof createAmbience>;

@@ -4,14 +4,14 @@ import { OUTFIT_DEFINITIONS, type Appearance } from '../model/world/appearance';
 import { CharacterPreview } from './CharacterPreview';
 import { Icon } from './Icon';
 
-type Props = {
+interface WardrobeDialogProps {
   isOpen: boolean;
   appearance: Appearance;
   onChange: (next: Appearance) => Promise<boolean>;
   onClose: () => void;
-};
+}
 
-export function WardrobeDialog({ isOpen, appearance, onChange, onClose }: Props): JSX.Element {
+export function WardrobeDialog({ isOpen, appearance, onChange, onClose }: WardrobeDialogProps): JSX.Element {
   const ref = useModal(isOpen);
   const titleId = useId();
   const [isChanging, setIsChanging] = useState(false);

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { WEATHER, type Weather } from '../../config/walk';
 import { wakeFromSleep, weatherAfterRest, weatherDelay } from '../../lib/dayCycle';
-import { WEATHER, type Weather } from '../constants/walk';
 import { villageDayStore } from '../store/villageDay';
 
 export function useVillageDay(isPaused: boolean) {

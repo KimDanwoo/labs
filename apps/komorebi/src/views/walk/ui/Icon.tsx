@@ -13,9 +13,11 @@ export type IconName =
   | 'arrow'
   | 'home'
   | 'shirt';
-type Props = { name: IconName };
+interface IconProps {
+  name: IconName;
+}
 
-export function Icon({ name }: Props) {
+export function Icon({ name }: IconProps) {
   const paths: Record<IconName, ReactNode> = {
     shirt: <path d="m8 3-5 3-2 5 4 2 2-3v11h10V10l2 3 4-2-2-5-5-3a4 4 0 0 1-8 0Z" />,
     sun: (

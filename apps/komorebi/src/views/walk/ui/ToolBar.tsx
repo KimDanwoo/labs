@@ -1,8 +1,8 @@
-import { TIME_LABEL, type TimeOfDay } from '../model/constants/walk';
+import { TIME_LABEL, type TimeOfDay } from '../config/walk';
 import { Icon } from './Icon';
 import { TIME_ICON } from './timeIcon';
 
-type Props = {
+interface ToolBarProps {
   timeOfDay: TimeOfDay;
   isRaining: boolean;
   isSoundOn: boolean;
@@ -11,7 +11,7 @@ type Props = {
   onPhoto: () => void;
   onOpenMap: () => void;
   onOpenWardrobe: () => void;
-};
+}
 
 export function ToolBar({
   timeOfDay,
@@ -22,7 +22,7 @@ export function ToolBar({
   onPhoto,
   onOpenMap,
   onOpenWardrobe,
-}: Props) {
+}: ToolBarProps) {
   const soundLabel = isSoundOn ? '자연 소리 끄기' : '자연 소리 켜기';
   return (
     <nav className="tools" aria-label="산책 설정">

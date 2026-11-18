@@ -1,4 +1,5 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { MS_PER_SECOND } from '../../config/time';
 import { advanceBallGame, BALL_PHASE, createBallGame, returnBall, type BallGame } from '../ballGame';
 
 type Options = { onFrame: (frame: BallGame | null) => boolean };
@@ -15,7 +16,7 @@ export function useBallGame({ onFrame }: Options): GameControls {
     let isPositioned = false;
     function tick(now: number) {
       const canAdvance = isPositioned || current.current.phase !== BALL_PHASE.ready;
-      const dt = previous && !document.hidden && canAdvance ? (now - previous) / 1000 : 0;
+      const dt = previous && !document.hidden && canAdvance ? (now - previous) / MS_PER_SECOND : 0;
       previous = now;
       const before = current.current;
       current.current = advanceBallGame(before, dt);
