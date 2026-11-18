@@ -1,27 +1,27 @@
 import { Card } from '@shared/ui/Card';
+
 import { getStudyDocs } from '../model/server/studyDocs';
 import { parseStudySort, sortStudyDocs } from '../model/services/studySort';
+import { StudyDocTable } from './doc-table/StudyDocTable';
 import { StudyDevReload } from './StudyDevReload';
-import { StudyDocTable } from './StudyDocTable';
 import { StudySortTabs } from './StudySortTabs';
+import { styles } from './StudyView.styles';
 
-export const metadata = { title: '면접 학습' };
-
-interface AdminStudyListPageProps {
+interface StudyViewProps {
   searchParams: Promise<{ sort?: string }>;
 }
 
-export async function StudyView({ searchParams }: AdminStudyListPageProps) {
+export async function StudyView({ searchParams }: StudyViewProps) {
   const sort = parseStudySort((await searchParams).sort);
   const docs = sortStudyDocs(await getStudyDocs(), sort);
 
   return (
-    <div className="container mx-auto max-w-4xl space-y-6 px-4 py-8 sm:py-12">
+    <div className={styles.root}>
       <StudyDevReload />
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className={styles.header}>
         <div>
-          <h1 className="text-2xl font-bold">면접 학습</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className={styles.title}>면접 학습</h1>
+          <p className={styles.description}>
             문서 {docs.length}개 · <code>content/study/</code> 마크다운, 맨 위 <code>date: YYYY-MM-DD</code>로 정렬
           </p>
         </div>
@@ -30,7 +30,7 @@ export async function StudyView({ searchParams }: AdminStudyListPageProps) {
 
       {docs.length === 0 ? (
         <Card>
-          <Card.Content className="py-10 text-center text-sm text-muted-foreground">
+          <Card.Content className={styles.empty}>
             아직 문서가 없습니다. <code>content/study/이름.md</code>를 추가해주세요.
           </Card.Content>
         </Card>
