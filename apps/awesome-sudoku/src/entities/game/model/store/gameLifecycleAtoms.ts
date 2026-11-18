@@ -18,7 +18,6 @@ import {
   isGameReadyAtom,
   isGeneratingAtom,
   isNoteModeAtom,
-  isRecordSavedAtom,
   isSuccessAtom,
   mistakeCountAtom,
   selectedCellAtom,
@@ -49,7 +48,6 @@ export const initializeGameAtom = atom(null, async (get, set, difficulty: Diffic
   set(selectedCellAtom, null);
   set(isCompletedAtom, false);
   set(isSuccessAtom, false);
-  set(isRecordSavedAtom, false);
   set(currentTimeAtom, 0);
   set(difficultyAtom, difficulty);
   set(highlightedCellsAtom, createEmptyHighlights());

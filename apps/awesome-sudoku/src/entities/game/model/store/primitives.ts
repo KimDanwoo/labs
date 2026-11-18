@@ -11,7 +11,6 @@ export const solutionAtom = atomWithStorage<number[][]>('sudoku:solution', creat
 export const selectedCellAtom = atomWithStorage<Position | null>('sudoku:selectedCell', null);
 export const isCompletedAtom = atomWithStorage<boolean>('sudoku:isCompleted', false);
 export const isSuccessAtom = atomWithStorage<boolean>('sudoku:isSuccess', false);
-export const isRecordSavedAtom = atomWithStorage<boolean>('sudoku:isRecordSaved', false);
 export const currentTimeAtom = atomWithStorage<number>('sudoku:currentTime', 0);
 export const timerActiveAtom = atomWithStorage<boolean>('sudoku:timerActive', false);
 export const difficultyAtom = atomWithStorage<Difficulty>('sudoku:difficulty', GAME_LEVEL.MEDIUM);
@@ -27,7 +26,6 @@ export const PERSISTED_GAME_ATOMS = [
   selectedCellAtom,
   isCompletedAtom,
   isSuccessAtom,
-  isRecordSavedAtom,
   currentTimeAtom,
   timerActiveAtom,
   difficultyAtom,

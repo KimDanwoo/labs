@@ -1,8 +1,6 @@
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import { configDefaults, defineConfig } from 'vitest/config';
-
-export const FIRESTORE_RULES_TEST = '__tests__/firestore.rules.test.ts';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react()],
@@ -10,7 +8,6 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     globals: true,
-    exclude: [...configDefaults.exclude, FIRESTORE_RULES_TEST],
   },
   resolve: {
     alias: {
