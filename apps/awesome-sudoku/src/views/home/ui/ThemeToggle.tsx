@@ -1,19 +1,12 @@
 'use client';
 
-import { resolvedThemeAtom, setThemeAtom } from '@entities/theme';
 import { cn } from '@shared/lib/cn';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { memo, useCallback } from 'react';
+import { memo } from 'react';
 import { LuMoon, LuSun } from 'react-icons/lu';
+import { useThemeToggle } from '../model/theme/hooks/useThemeToggle';
 
 export const ThemeToggle = memo(() => {
-  const resolvedTheme = useAtomValue(resolvedThemeAtom);
-  const setTheme = useSetAtom(setThemeAtom);
-  const isDark = resolvedTheme === 'dark';
-
-  const handleToggle = useCallback(() => {
-    setTheme(isDark ? 'light' : 'dark');
-  }, [isDark, setTheme]);
+  const { isDark, handleToggle } = useThemeToggle();
 
   return (
     <button

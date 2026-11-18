@@ -52,19 +52,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              '(function(){try{' +
-              "var t=JSON.parse(localStorage.getItem('sudoku-theme')||'\"system\"');" +
-              "var d=t==='dark'||(t==='system'&&window.matchMedia(" +
-              "'(prefers-color-scheme: dark)').matches);" +
-              "if(d)document.documentElement.classList.add('dark')" +
-              '}catch(e){}})();',
-          }}
-        />
-      </head>
       <body className="antialiased">
         <AppProviders>{children}</AppProviders>
       </body>
