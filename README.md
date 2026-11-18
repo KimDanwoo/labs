@@ -57,8 +57,4 @@
 다음은 MIT 적용 대상이 아니다.
 
 - **글과 직접 만든 미디어**: 블로그 글(`apps/dansoon/contents`)과 저장소의 이미지·음원 등 직접 만든 미디어 파일은 별도 표기가 없는 한 저작권자가 모든 권리를 갖는다(All rights reserved).
-- **외부에서 가져온 코드·에셋**: 각 원본 라이선스를 따른다.
-  - Danwoo Island 월드 엔진 — Bruno Simon `folio-2025`, MIT ([upstream/LICENSE](apps/danwoo-island/upstream/LICENSE))
-  - Unicorn Rush 잔디·하늘 — Wilson Ko `ghibli-grass-v2`, MIT ([CREDITS.md](apps/prairie/CREDITS.md))
-  - 코모레비 발소리 — Kenney Impact Sounds, CC0
-  - 마루부리 서체 — NAVER Corp. ([fonts/LICENSE.md](packages/tokens/fonts/LICENSE.md))
+- **외부에서 가져온 코드·에셋**: 해당 폴더의 라이선스 파일을 따른다.
