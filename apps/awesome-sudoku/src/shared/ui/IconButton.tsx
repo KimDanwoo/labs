@@ -9,7 +9,7 @@ interface IconButtonProps {
   'aria-label'?: string;
   className?: string;
   disabled?: boolean;
-  variant?: 'default' | 'primary' | 'subtle';
+  variant?: 'default' | 'primary';
   badge?: string | number;
 }
 
@@ -38,10 +38,6 @@ export const IconButton = ({
       variant === 'primary' &&
         !disabled &&
         'hover:brightness-110 hover:shadow-xl hover:shadow-[rgb(var(--color-gradient-from))]/40 active:scale-95',
-      variant === 'subtle' && 'bg-transparent text-[rgb(var(--color-text-secondary))]',
-      variant === 'subtle' &&
-        !disabled &&
-        'hover:bg-[rgb(var(--color-hover))] hover:text-[rgb(var(--color-text-primary))] active:scale-95',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40 relative',
       className,
     )}
@@ -59,5 +55,3 @@ export const IconButton = ({
     )}
   </button>
 );
-
-export default IconButton;
