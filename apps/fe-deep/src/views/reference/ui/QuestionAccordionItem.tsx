@@ -1,7 +1,7 @@
 'use client';
 
 import { type Question, QuestionAnswer, QuestionMeta } from '@entities/question';
-import { AccordionContent, AccordionItem, AccordionTrigger } from '@ui/react';
+import { AccordionContent, AccordionItem, AccordionTrigger } from '@shared/ui/Accordion';
 import { useQuestionActions } from '../model/hooks/useQuestionActions';
 import { QuestionActions } from './QuestionActions';
 

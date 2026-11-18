@@ -1,8 +1,7 @@
 @import 'tailwindcss';
 
 @import '@tokens/css/theme.css';
-
-@source '../../../../packages/ui/src/**/*.{ts,tsx}';
+@import './styles/colors.css';
 
 /*
  * soundlab은 의도적으로 단일 다크 테마다. 공유 semantic 토큰(primary/muted…)으로는

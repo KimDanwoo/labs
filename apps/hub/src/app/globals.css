@@ -1,8 +1,7 @@
 @import 'tailwindcss';
 
 @import '@tokens/css/theme.css';
-
-@source '../../../../packages/ui/src/**/*.{ts,tsx}';
+@import './styles/colors.css';
 
 :root {
   --font-display: var(--font-sans);

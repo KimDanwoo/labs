@@ -1,8 +1,11 @@
 'use client';
 
 import { DifficultyBadge } from '@entities/question';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@shared/ui/Accordion';
+import { Badge } from '@shared/ui/Badge';
+import { Card } from '@shared/ui/Card';
+import { Input } from '@shared/ui/Input';
 import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card, Input } from '@ui/react';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 import { useSearch } from '../model/hooks/useSearch';

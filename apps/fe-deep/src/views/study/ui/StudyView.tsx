@@ -1,4 +1,4 @@
-import { Card } from '@ui/react';
+import { Card } from '@shared/ui/Card';
 import { getStudyDocs } from '../model/server/studyDocs';
 import { parseStudySort, sortStudyDocs } from '../model/services/studySort';
 import { StudyDevReload } from './StudyDevReload';

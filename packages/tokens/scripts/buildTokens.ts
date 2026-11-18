@@ -2,8 +2,6 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { colors } from '../src/colors';
-import { rootScalars } from '../src/palette';
 import { shadow } from '../src/shadow';
 import { container, radius, spacing } from '../src/spacing';
 import { fontFamily, fontSize, fontWeight } from '../src/typography';
@@ -12,20 +10,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = resolve(__dirname, '../generated/theme.css');
 
 const indent = (lines: string[]) => lines.map((l) => `  ${l}`).join('\n');
-
-function buildColorVars() {
-  const rootLines: string[] = [];
-  const darkLines: string[] = [];
-  for (const [name, value] of Object.entries(colors)) {
-    rootLines.push(`--color-${name}: ${value.light};`);
-    darkLines.push(`--color-${name}: ${value.dark};`);
-  }
-  return { rootLines, darkLines };
-}
-
-function buildRootScalars() {
-  return Object.entries(rootScalars).map(([name, value]) => `--${name}: ${value};`);
-}
 
 function buildStaticVars() {
   const lines: string[] = [];
@@ -55,9 +39,6 @@ function buildStaticVars() {
 
 function buildThemeMap() {
   const lines: string[] = [];
-  for (const name of Object.keys(colors)) {
-    lines.push(`--color-${name}: var(--color-${name});`);
-  }
   for (const name of Object.keys(fontFamily)) {
     lines.push(`--font-${name}: var(--font-${name});`);
   }
@@ -95,8 +76,6 @@ function buildMaxWidthGuard() {
 }
 
 function generate() {
-  const { rootLines, darkLines } = buildColorVars();
-  const scalarLines = buildRootScalars();
   const staticLines = buildStaticVars();
   const themeLines = buildThemeMap();
 
@@ -105,27 +84,12 @@ function generate() {
  * 토큰 변경은 packages/tokens/src/*.ts 에서 한 뒤 \`pnpm tokens\`를 실행하세요.
  */
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
-  color-scheme: light;
-${indent([...scalarLines, '', ...rootLines, '', ...staticLines])}
-}
-
-.dark {
-  color-scheme: dark;
-${indent(darkLines)}
+${indent(staticLines)}
 }
 
 @theme inline {
 ${indent(themeLines)}
-}
-
-/* 색을 지정하지 않은 \`border\`가 글자색(currentColor) 대신 border 토큰을 쓰게 한다. */
-@layer base {
-  * {
-    border-color: var(--color-border);
-  }
 }
 `;
 

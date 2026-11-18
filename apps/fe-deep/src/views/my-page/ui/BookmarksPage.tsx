@@ -1,8 +1,11 @@
 'use client';
 
 import { DifficultyBadge } from '@entities/question';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@shared/ui/Accordion';
+import { Badge } from '@shared/ui/Badge';
+import { Button } from '@shared/ui/Button';
+import { Card } from '@shared/ui/Card';
 import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Button, Card } from '@ui/react';
 import { Bookmark, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useBookmarkedQuestions } from '../model/hooks/useBookmarkedQuestions';

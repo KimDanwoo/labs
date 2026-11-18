@@ -1,7 +1,8 @@
 'use client';
 
 import { currentIndexAtom, playbackQueueAtom, TRACKS, usePlaybackControls } from '@entities/track';
-import { Button, ScrollArea } from '@ui/react';
+import { Button } from '@shared/ui/Button';
+import { ScrollArea } from '@shared/ui/ScrollArea';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useRef, type JSX } from 'react';
 import { COLLECTIONS } from '../../config/collections';

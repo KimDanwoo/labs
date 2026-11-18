@@ -173,9 +173,9 @@ export function checkRepository(root = ROOT) {
       }
     }
     const sources = [...walk(path.join(dir, 'src')), ...walk(path.join(dir, 'app'))];
-    const usesTokens =
-      manifest.name === '@ui/react' ||
-      walk(dir).some((f) => f.endsWith('.css') && readFileSync(f, 'utf8').includes('@tokens/css/theme.css'));
+    const usesTokens = walk(dir).some(
+      (f) => f.endsWith('.css') && readFileSync(f, 'utf8').includes('@tokens/css/theme.css'),
+    );
     if (usesTokens) {
       for (const file of sources.filter((f) => /\.(ts|tsx|astro)$/.test(f))) {
         for (const problem of validateDesignTokens(readFileSync(file, 'utf8')))

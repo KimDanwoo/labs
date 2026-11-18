@@ -1,7 +1,9 @@
 'use client';
 
 import { DIFFICULTY_CONFIG, DIFFICULTY_VALUES, type Category, type Difficulty } from '@entities/question';
-import { Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/react';
+import { Button } from '@shared/ui/Button';
+import { Card } from '@shared/ui/Card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/Select';
 import { ArrowDownAZ, Shuffle, type LucideIcon } from 'lucide-react';
 import { useState } from 'react';
 import { ALL_CATEGORIES, STUDY_ORDER, type StudyOrder, type StudySettings } from '../model/constants/study';

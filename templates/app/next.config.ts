@@ -5,7 +5,7 @@ import type { NextConfig } from 'next';
 const SECURITY_HEADERS = createSecurityHeaders();
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@ui/react', '@tokens/css'],
+  transpilePackages: ['@tokens/css'],
 
   async headers() {
     return [{ source: '/(.*)', headers: SECURITY_HEADERS }];

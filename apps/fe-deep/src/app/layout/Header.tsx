@@ -1,18 +1,10 @@
 'use client';
 
 import { cn } from '@shared/lib/cn';
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-  ThemeToggle,
-} from '@ui/react';
+import { Button } from '@shared/ui/Button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/ui/DropdownMenu';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui/Sheet';
+import { ThemeToggle } from '@shared/ui/ThemeToggle';
 import { Bookmark, BookOpen, GraduationCap, Menu, NotebookPen, Search, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';

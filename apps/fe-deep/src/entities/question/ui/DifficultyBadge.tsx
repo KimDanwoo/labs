@@ -1,4 +1,4 @@
-import { Badge } from '@ui/react';
+import { Badge } from '@shared/ui/Badge';
 import { DIFFICULTY_CONFIG } from '../model/constants/constants';
 import type { Difficulty } from '../model/types/types';
 

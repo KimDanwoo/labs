@@ -1,5 +1,6 @@
 import { currentIndexAtom, HIGHLIGHTS, TRACKS, usePlaybackControls } from '@entities/track';
-import { Button, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@ui/react';
+import { Button } from '@shared/ui/Button';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@shared/ui/Sheet';
 import { useAtomValue } from 'jotai';
 import type { JSX } from 'react';
 import { collectionsForTrack } from '../../config/collections';

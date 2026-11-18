@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@ui/react';
+import { Button } from '@shared/ui/Button';
 import { Flame, Trophy } from 'lucide-react';
 import Link from 'next/link';
 

@@ -1,10 +1,11 @@
 'use client';
 
 import { cn } from '@shared/lib/cn';
+import { Badge, type BadgeVariant } from '@shared/ui/Badge';
+import { Card } from '@shared/ui/Card';
 import { KeywordCheck } from '@shared/ui/KeywordCheck';
 import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
 import { SpeakButton } from '@shared/ui/SpeakButton';
-import { Badge, Card, type BadgeVariant } from '@ui/react';
 import { Lightbulb } from 'lucide-react';
 import { STEP_KIND, type StudyStep } from '../lib/parseHandbook';
 import { AiFeedback } from './AiFeedback';

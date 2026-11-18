@@ -2,8 +2,8 @@
 
 import { getCurrentStreak } from '@entities/progress';
 import { getAllCategories, type Question } from '@entities/question';
+import { Button } from '@shared/ui/Button';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@ui/react';
 import { X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { loadStudyQuestions } from '../api/loadStudyQuestions';
