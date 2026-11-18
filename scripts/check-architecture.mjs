@@ -91,6 +91,7 @@ export function validateDesignTokens(text) {
 
 function isComponentOrHook(name, initializer, source) {
   if (!initializer) return false;
+  if (ts.isCallExpression(initializer) && initializer.expression.getText(source) === 'cva') return true;
   const isFunction = ts.isArrowFunction(initializer) || ts.isFunctionExpression(initializer);
   const isWrapped = ts.isCallExpression(initializer) && COMPONENT_WRAPPER.test(initializer.expression.getText(source));
   if (/^use[A-Z]/.test(name)) return isFunction;
