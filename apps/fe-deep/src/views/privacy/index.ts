@@ -1,1 +1,2 @@
-export { PrivacyView, metadata } from './ui/PrivacyView';
+export { metadata } from './config/metadata';
+export { PrivacyView } from './ui/PrivacyView';
