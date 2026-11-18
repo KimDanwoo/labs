@@ -107,7 +107,7 @@ export function findServerLeaks(graph, clients, serverModules, actions) {
 function walk(dir) {
   if (!existsSync(dir)) return [];
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    if (['node_modules', '.next', 'dist', 'out', '.astro', '.git', '.turbo', '.omc'].includes(entry.name)) return [];
+    if (['node_modules', '.next', 'dist', 'out', '.astro', '.git', '.turbo'].includes(entry.name)) return [];
     const full = path.join(dir, entry.name);
     return entry.isDirectory() ? walk(full) : [full];
   });
