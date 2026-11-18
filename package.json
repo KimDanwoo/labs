@@ -12,7 +12,6 @@
     "lint": "pnpm check:architecture && turbo run lint",
     "test": "node --test \"scripts/__tests__/*.test.mjs\" && turbo run test",
     "check:architecture": "node scripts/check-architecture.mjs",
-    "tokens": "turbo run tokens",
     "typecheck": "turbo run typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,css,md}\""
   },

@@ -1,6 +1,6 @@
 """마루부리 원본(fonts/source)을 unicode-range 조각으로 나누고 fonts/maruburi.css를 생성한다.
 
-실행: python3 packages/tokens/scripts/subsetFonts.py  (fonttools, brotli 필요 — 원본 교체 시에만)
+실행: python3 packages/fonts/scripts/subsetFonts.py  (fonttools, brotli 필요 — 원본 교체 시에만)
 
 같은 패밀리에서 unicode-range가 겹치면 나중에 선언한 face부터 확인하고, 글리프가 없으면 다음 face로 넘어간다
 (CSS Fonts 4 font matching). 그래서 한글 두 조각은 같은 범위로 선언하되 상용 조각을 뒤에 두면,

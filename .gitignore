@@ -31,9 +31,6 @@ apps/danwoo-island/src/views/drive/lib/engine/data/danwoo.ts
 # turbo
 .turbo
 
-# generated design tokens
-packages/tokens/generated
-
 # misc
 .DS_Store
 *.pem

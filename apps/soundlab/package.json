@@ -17,7 +17,7 @@
     "build:highlights": "node scripts/check-signals.mjs --write"
   },
   "dependencies": {
-    "@tokens/css": "workspace:*",
+    "@repo/fonts": "workspace:*",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "jotai": "catalog:",

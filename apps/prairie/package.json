@@ -14,7 +14,7 @@
   "dependencies": {
     "@react-three/drei": "catalog:",
     "@react-three/fiber": "catalog:",
-    "@tokens/css": "workspace:*",
+    "@repo/fonts": "workspace:*",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

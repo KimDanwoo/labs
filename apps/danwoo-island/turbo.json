@@ -9,7 +9,7 @@
         "$TURBO_ROOT$/apps/hub/public/projects/**",
         "$TURBO_ROOT$/apps/hub/app/opengraph-image.png",
         "$TURBO_ROOT$/apps/soundlab/src/entities/track/model/constants/tracks.ts",
-        "$TURBO_ROOT$/packages/tokens/fonts/**"
+        "$TURBO_ROOT$/packages/fonts/fonts/**"
       ],
       "outputs": [
         ".next/**",

@@ -1,7 +1,7 @@
 import '@app/globals.css';
 import { AppProviders } from '@app/providers/AppProviders';
+import '@repo/fonts/fonts.css';
 import { SITE_URL } from '@shared/config/site';
-import '@tokens/css/fonts.css';
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
 

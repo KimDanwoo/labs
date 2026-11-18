@@ -198,10 +198,7 @@ export function checkRepository(root = ROOT) {
       }
     }
     const sources = [...walk(path.join(dir, 'src')), ...walk(path.join(dir, 'app'))];
-    const usesTokens = walk(dir).some(
-      (f) => f.endsWith('.css') && readFileSync(f, 'utf8').includes('@tokens/css/theme.css'),
-    );
-    if (usesTokens) {
+    if (existsSync(path.join(dir, 'src/app/styles/theme.css'))) {
       for (const file of sources.filter((f) => /\.(ts|tsx|astro)$/.test(f))) {
         for (const problem of validateDesignTokens(readFileSync(file, 'utf8')))
           problems.push(`${path.relative(root, file)}:${problem}`);

@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "catalog:",
-    "@tokens/css": "workspace:*",
+    "@repo/fonts": "workspace:*",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "framer-motion": "catalog:",

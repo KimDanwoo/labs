@@ -2,9 +2,6 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "tasks": {
-    "tokens": {
-      "outputs": ["generated/**"]
-    },
     "build": {
       "dependsOn": ["^build"],
       "env": ["ANALYZE"],
@@ -18,7 +15,7 @@
         "!playwright.config.*",
         "!vitest.config.*"
       ],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", "dist/**", "out/**", "generated/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", "dist/**", "out/**"]
     },
     "transit": {
       "dependsOn": ["^transit"]
