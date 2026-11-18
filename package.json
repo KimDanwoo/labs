@@ -13,7 +13,6 @@
     "test": "node --test \"scripts/__tests__/*.test.mjs\" && turbo run test",
     "check:architecture": "node scripts/check-architecture.mjs",
     "tokens": "turbo run tokens",
-    "new-app": "node scripts/new-app.mjs",
     "typecheck": "turbo run typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,css,md}\""
   },

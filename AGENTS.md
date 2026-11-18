@@ -26,8 +26,6 @@ packages/             # 공유 토큰 + 공유 설정
   config/  @config/tsconfig         # 공유 tsconfig(base / next)
   eslint-config/  @repo/eslint-config    # 공유 ESLint(flat): next + FSD 경계 강제
   prettier-config/ @repo/prettier-config # 공유 Prettier
-templates/app/        # 새 앱 스캐폴드 원본
-scripts/new-app.mjs   # 새 앱 생성기
 ```
 
 ## 모노레포 핵심 규칙
@@ -43,7 +41,7 @@ scripts/new-app.mjs   # 새 앱 생성기
    - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateDesignTokens`): `theme.css`를 쓰는 앱에서 기본 팔레트 색 클래스, 임의 색 값(`bg-[#...]`), 서체에 없는 굵기를 막는다. 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
    - 대비·포커스·누르는 영역·움직임 줄이기·화면 세 개 확인은 DESIGN_RULES.md의 체크리스트로 PR 전에 확인한다.
 
-3. **새 앱은 스캐폴드로**: 손으로 만들지 말고 `pnpm new-app <name>`(소문자/숫자/하이픈). `templates/app`을 복제하고 `<name>`으로 채운다.
+3. **새 앱은 기존 앱 구성을 따른다**: `apps/<name>`(소문자/숫자/하이픈)에 공유 tsconfig·ESLint(next + FSD)·`@repo/security-headers`·FSD 경로 별칭·catalog 의존성을 연결하고, `pnpm check:architecture`로 확인한다. `vercel.json`은 아래 배포 규칙을 따른다.
 
 4. **TS 엄격 옵션 준수**(`@config/tsconfig`): `verbatimModuleSyntax` → 타입은 `import type`로. `noUncheckedIndexedAccess` → 인덱스 접근 결과는 `undefined` 가능성을 좁힌 뒤 사용. `any` 금지(`unknown`에서 좁히기).
 
@@ -142,11 +140,10 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 | `pnpm dev`                | `turbo run dev` — 모든 앱 dev    |
 | `pnpm build`              | `turbo run build`                |
 | `pnpm lint`               | 구조 검사 + `turbo run lint`     |
-| `pnpm check:architecture` | 워크스페이스·템플릿 구조 검사    |
+| `pnpm check:architecture` | 워크스페이스 구조 검사           |
 | `pnpm typecheck`          | 전체 타입 검사                   |
 | `pnpm test`               | 공유 규칙·앱별 회귀 테스트       |
 | `pnpm tokens`             | 디자인 토큰 → `theme.css` 재생성 |
-| `pnpm new-app <name>`     | 새 앱 스캐폴드                   |
 | `pnpm format`             | Prettier 전체 포맷               |
 
 - 특정 앱만: `pnpm --filter hub dev`.
@@ -161,7 +158,7 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 - 기존 `ignoreCommand`는 빌드 단계의 보조 검사다. 이것만으로는 배포 횟수 한도를 절약할 수 없으므로 Vercel의 Skip deployment 설정이 필요하다.
 - **Settings → Deployment Checks → Add Checks → GitHub → `CI / verify`**를 켠다. Vercel이 `main` 배포를 빌드한 뒤 CI가 통과해야 운영 도메인에 연결한다. 급하면 배포 상세의 Force Promote로 넘긴다. CI는 저장소 전체 작업 하나라 다른 앱 실패도 함께 막는다.
 - **danwoo-island는 Skip deployment를 끈다.** 빌드가 `hub`(프로필·프로젝트·이미지)·`soundlab`(곡 목록)·`packages/tokens/fonts`를 직접 읽지만 package.json 의존성에는 없어서, Skip deployment는 이 변경을 섬과 무관하다고 본다. 대신 `vercel.json`의 `ignoreCommand`가 이 경로들까지 `git diff`로 확인한다.
-- `pnpm new-app`으로 생성한 앱도 `main` 제한을 상속한다. Vercel에 새 프로젝트를 연결할 때 위 프로젝트 설정을 함께 적용한다.
+- 새 앱의 `vercel.json`에도 `main` 제한과 `"ignoreCommand": "npx turbo-ignore <앱>"`을 둔다. Vercel에 새 프로젝트를 연결할 때 위 프로젝트 설정을 함께 적용한다.
 
 참고: [Git 배포 브랜치 제한](https://vercel.com/docs/project-configuration/git-configuration), [변경 없는 앱 건너뛰기](https://vercel.com/docs/monorepos#skipping-unaffected-projects).
 
