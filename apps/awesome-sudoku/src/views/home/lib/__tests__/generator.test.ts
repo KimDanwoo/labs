@@ -131,9 +131,9 @@ describe('generateKillerBoard', () => {
     expect(gradePuzzle(toGrid(board), cages)).toBeLessThanOrEqual(TECHNIQUE.ADVANCED);
   });
 
-  it('1칸 케이지(값이 드러나는 케이지)가 없다', () => {
-    const cages = generateKillerCages(generateSolution(), 3);
-    expect(cages.every((cage) => cage.cells.length >= 2)).toBe(true);
+  it('1칸 케이지(값이 드러나는 케이지)가 없다 — 이웃 케이지가 꽉 차 있어도', () => {
+    const layouts = Array.from({ length: 200 }, () => generateKillerCages(generateSolution(), 3));
+    expect(layouts.every((cages) => cages.every((cage) => cage.cells.length >= 2))).toBe(true);
   });
 
   it('easy → medium → hard 순으로 힌트가 줄어든다', () => {
