@@ -1,0 +1,102 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-bg-primary: 250, 250, 252;
+  --color-bg-secondary: 255, 255, 255;
+  --color-bg-tertiary: 245, 245, 247;
+
+  --color-text-primary: 28, 28, 30;
+  --color-text-secondary: 99, 99, 102;
+  --color-text-tertiary: 142, 142, 147;
+
+  --color-accent: 0, 122, 255;
+  --color-accent-light: 230, 242, 255;
+  --color-accent-soft: 245, 249, 255;
+
+  --color-cell-selected: 220, 235, 255;
+  --color-cell-related: 245, 248, 255;
+  --color-cell-same-value: 200, 225, 255;
+
+  --color-border-light: 229, 229, 234;
+  --color-border-medium: 199, 199, 204;
+  --color-border-strong: 58, 58, 60;
+
+  --color-error: 255, 59, 48;
+  --color-success: 52, 199, 89;
+
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  --color-surface-primary: 255, 255, 255;
+  --color-surface-secondary: 248, 250, 252;
+  --color-surface-tertiary: 241, 245, 249;
+  --color-surface-elevated: 255, 255, 255;
+
+  --color-glass: 255, 255, 255;
+  --glass-opacity: 0.7;
+  --overlay-opacity: 0.9;
+
+  --color-hover: 248, 250, 252;
+  --color-active: 241, 245, 249;
+
+  --color-gradient-from: 59, 130, 246;
+  --color-gradient-to: 99, 102, 241;
+
+  --color-error-bg: 254, 226, 226;
+  --color-error-text: 225, 29, 72;
+  --color-success-bg: 209, 250, 229;
+  --color-success-text: 5, 150, 105;
+
+  --color-hint-text: 16, 185, 129;
+
+  --color-divider: 241, 245, 249;
+}
+
+.dark {
+  --color-bg-primary: 22, 22, 24;
+  --color-bg-secondary: 28, 28, 30;
+  --color-bg-tertiary: 36, 36, 38;
+
+  --color-text-primary: 242, 242, 247;
+  --color-text-secondary: 174, 174, 178;
+  --color-text-tertiary: 124, 124, 128;
+
+  --color-accent: 10, 132, 255;
+  --color-accent-light: 20, 40, 70;
+  --color-accent-soft: 15, 25, 50;
+
+  --color-cell-selected: 30, 60, 110;
+  --color-cell-related: 38, 40, 58;
+  --color-cell-same-value: 28, 55, 100;
+
+  --color-border-light: 48, 48, 52;
+  --color-border-medium: 62, 62, 66;
+  --color-border-strong: 174, 174, 178;
+
+  --color-error: 255, 69, 58;
+  --color-success: 48, 209, 88;
+
+  --color-surface-primary: 28, 28, 30;
+  --color-surface-secondary: 22, 22, 24;
+  --color-surface-tertiary: 36, 36, 38;
+  --color-surface-elevated: 44, 44, 46;
+
+  --color-glass: 28, 28, 30;
+  --glass-opacity: 0.8;
+  --overlay-opacity: 0.95;
+
+  --color-hover: 44, 44, 46;
+  --color-active: 54, 54, 58;
+
+  --color-gradient-from: 10, 132, 255;
+  --color-gradient-to: 94, 92, 230;
+
+  --color-error-bg: 50, 20, 20;
+  --color-error-text: 255, 69, 58;
+  --color-success-bg: 15, 45, 25;
+  --color-success-text: 48, 209, 88;
+
+  --color-hint-text: 52, 211, 153;
+
+  --color-divider: 44, 44, 46;
+}
