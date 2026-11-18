@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@shared/ui/Button';
-import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
+import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 import { Progress } from '@shared/ui/Progress';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui/Sheet';
 import { BookmarkPlus, CheckCircle2, ChevronLeft, ChevronRight, List, RotateCcw, SkipForward } from 'lucide-react';

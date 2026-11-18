@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@s
 import { Badge } from '@shared/ui/Badge';
 import { Card } from '@shared/ui/Card';
 import { Input } from '@shared/ui/Input';
-import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
+import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 import { useSearch } from '../model/hooks/useSearch';

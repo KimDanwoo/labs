@@ -4,7 +4,7 @@ import { cn } from '@shared/lib/cn';
 import { Badge, type BadgeVariant } from '@shared/ui/Badge';
 import { Card } from '@shared/ui/Card';
 import { KeywordCheck } from '@shared/ui/KeywordCheck';
-import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
+import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 import { SpeakButton } from '@shared/ui/SpeakButton';
 import { Lightbulb } from 'lucide-react';
 import { STEP_KIND, type StudyStep } from '../lib/parseHandbook';

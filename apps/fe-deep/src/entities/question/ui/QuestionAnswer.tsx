@@ -1,5 +1,7 @@
-import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
+import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 import { SpeakButton } from '@shared/ui/SpeakButton';
+
+import { styles } from './QuestionAnswer.styles';
 
 interface QuestionAnswerProps {
   answer: string;
@@ -8,7 +10,7 @@ interface QuestionAnswerProps {
 export function QuestionAnswer({ answer }: QuestionAnswerProps) {
   return (
     <div>
-      <div className="mb-2 flex justify-end">
+      <div className={styles.actions}>
         <SpeakButton text={answer} />
       </div>
       <MarkdownRenderer content={answer} />

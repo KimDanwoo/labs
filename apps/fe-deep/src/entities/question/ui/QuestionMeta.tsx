@@ -1,6 +1,8 @@
 import { CheckCircle } from 'lucide-react';
+
 import type { Difficulty } from '../model/types/types';
 import { DifficultyBadge } from './DifficultyBadge';
+import { styles } from './QuestionMeta.styles';
 
 interface QuestionMetaProps {
   difficulty: Difficulty;
@@ -10,10 +12,10 @@ interface QuestionMetaProps {
 
 export function QuestionMeta({ difficulty, subCategory, isMastered }: QuestionMetaProps) {
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className={styles.root}>
       <DifficultyBadge difficulty={difficulty} />
-      {subCategory && <span className="text-xs text-muted-foreground">{subCategory}</span>}
-      {isMastered && <CheckCircle className="h-3.5 w-3.5 text-success" />}
+      {subCategory && <span className={styles.subCategory}>{subCategory}</span>}
+      {isMastered && <CheckCircle className={styles.mastered} />}
     </div>
   );
 }
