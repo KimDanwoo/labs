@@ -2,6 +2,7 @@ const PASCAL_CASE = /^[A-Z][a-zA-Z0-9]*$/;
 const CAMEL_CASE = /^[a-z][a-zA-Z0-9]*$/;
 const KEBAB_CASE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const HOOK_NAME = /^use[A-Z]/;
+const COMPONENT_STYLES = /\.styles\.ts$/;
 
 // Next가 이름을 소유하는 라우팅·메타데이터 파일.
 const ROUTE_FILE =
@@ -19,8 +20,9 @@ const filenameCase = {
         const base = segments.pop().split('.')[0];
         if (base === 'index' || ROUTE_FILE.test(base)) return;
 
-        // 훅은 JSX를 담아 .tsx여도 camelCase다.
-        const isComponent = context.filename.endsWith('.tsx') && !HOOK_NAME.test(base);
+        // 훅은 JSX를 담아 .tsx여도 camelCase다. 컴포넌트 짝인 `<컴포넌트>.styles.ts`는 PascalCase다.
+        const isComponent =
+          (context.filename.endsWith('.tsx') && !HOOK_NAME.test(base)) || COMPONENT_STYLES.test(context.filename);
         if (!(isComponent ? PASCAL_CASE : CAMEL_CASE).test(base)) {
           context.report({ node, message: `파일명은 ${isComponent ? 'PascalCase' : 'camelCase'}여야 한다: ${base}` });
         }
