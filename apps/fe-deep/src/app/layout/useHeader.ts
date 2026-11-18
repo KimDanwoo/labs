@@ -2,9 +2,10 @@
 
 import { clearUserIdCache, syncProgress } from '@entities/progress';
 import { createClient } from '@shared/api/supabaseClient';
-import { isAdmin } from '@shared/lib/isAdmin';
+import { getIsAdminUser } from '@shared/lib/getIsAdminUser';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
 export function useHeader() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
@@ -29,7 +30,12 @@ export function useHeader() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const isAdminUser = useMemo(() => isAdmin(user?.email), [user]);
+  const { data: isAdminUser = false } = useQuery({
+    queryKey: ['is-admin-user', user?.id],
+    queryFn: () => getIsAdminUser(),
+    enabled: user !== null,
+    staleTime: Infinity,
+  });
 
   const handleSignOut = async () => {
     const supabase = createClient();
