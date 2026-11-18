@@ -17,10 +17,6 @@ function score(voice: VoiceLike): number {
   return (NEURAL_NAME.test(voice.name) ? 2 : 0) + (voice.localService ? 0 : 1);
 }
 
-export function listKoreanVoices<T extends VoiceLike>(voices: readonly T[]): T[] {
-  return voices.filter(isKorean);
-}
-
 export function pickKoreanVoice<T extends VoiceLike>(voices: readonly T[], preferredName?: string): T | undefined {
   const korean = voices.filter(isKorean);
   const preferred = preferredName ? korean.find((voice) => voice.name === preferredName) : undefined;
