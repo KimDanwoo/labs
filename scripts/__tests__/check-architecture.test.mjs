@@ -7,6 +7,7 @@ import {
   validateManifest,
   validateSourceTypes,
   validateTypeScript,
+  validateVercelConfig,
 } from '../check-architecture.mjs';
 
 test('dependency rules reject raw versions, missing catalog entries and incompatible workspace references', () => {
@@ -66,6 +67,39 @@ test('client imports through a barrel cannot expose server IO; explicit Server A
     ['screen', 'index', 'filesystem'],
   ]);
   assert.deepEqual(findServerLeaks(graph, new Set(['screen']), new Set(['filesystem']), new Set(['index'])), []);
+});
+
+test('apps deploy only main, skip unchanged builds and point Vercel commands at themselves', () => {
+  const mainOnly = { git: { deploymentEnabled: { '**': false, main: true } } };
+  assert.deepEqual(validateVercelConfig({ ...mainOnly, ignoreCommand: 'npx turbo-ignore hub' }, 'hub'), []);
+  assert.deepEqual(
+    validateVercelConfig(
+      { ...mainOnly, ignoreCommand: 'git diff --quiet "$VERCEL_GIT_PREVIOUS_SHA" HEAD -- .' },
+      'hub',
+    ),
+    [],
+  );
+  assert.equal(validateVercelConfig({ ignoreCommand: 'npx turbo-ignore hub' }, 'hub').length, 1);
+  assert.equal(
+    validateVercelConfig(
+      { git: { deploymentEnabled: { '**': false, main: true, dev: true } }, ignoreCommand: 'npx turbo-ignore hub' },
+      'hub',
+    ).length,
+    1,
+  );
+  assert.equal(validateVercelConfig(mainOnly, 'hub').length, 1);
+  assert.equal(validateVercelConfig({ ...mainOnly, ignoreCommand: 'npx turbo-ignore soundlab' }, 'hub').length, 1);
+  assert.equal(
+    validateVercelConfig(
+      {
+        ...mainOnly,
+        ignoreCommand: 'npx turbo-ignore hub',
+        buildCommand: 'pnpm exec turbo run build --filter=soundlab',
+      },
+      'hub',
+    ).length,
+    1,
+  );
 });
 
 test('unsafe any is rejected in libraries too, while strings and comments remain valid', () => {
