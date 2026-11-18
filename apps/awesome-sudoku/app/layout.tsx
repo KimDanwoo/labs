@@ -1,5 +1,5 @@
 import '@app/globals.css';
-import { AppProviders } from '@app/providers';
+import { AppProviders } from '@app/providers/AppProviders';
 import '@tokens/css/fonts.css';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
