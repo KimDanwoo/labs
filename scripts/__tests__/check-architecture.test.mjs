@@ -126,6 +126,7 @@ test('component modules hold only components and hooks; constants, helpers and s
     'export const Panel = () => null;',
     'const Chart = dynamic(() => import("./Chart"));',
     'export const Row = memo(function Row() { return null; });',
+    'export const Card = Object.assign(CardRoot, { Header: CardHeader });',
     'export function useToggle() { return true; }',
     'interface CardProps { title: string }',
   ].join('\n');
