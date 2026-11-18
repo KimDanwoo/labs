@@ -2,7 +2,7 @@ name: Soundlab Weekly Tracks
 
 on:
   schedule:
-    - cron: '0 2 * * 1' # 매주 월요일 오전 11시 KST (UTC 02:00) — dansoon 잡과 한 시간 띄운다
+    - cron: '0 2 * * 1' # 매주 월요일 오전 11시 KST (UTC 02:00)
   workflow_dispatch:
 
 permissions:

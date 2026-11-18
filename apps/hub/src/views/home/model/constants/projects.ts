@@ -10,9 +10,9 @@ export const PROJECTS: Project[] = [
   },
   {
     title: 'Dansoon',
-    description: '프론트엔드 개발 기록과 매주 바뀌는 책 순위를 모아요',
+    description: '프론트엔드 개발 기록을 모아요',
     href: 'https://danwoo.dev/',
-    scope: ['정적 사이트', '크롤링 자동화', 'AI 파싱', 'OG 이미지 생성'],
+    scope: ['정적 사이트', '검색·목차', 'OG 이미지 생성'],
     image: '/projects/dansoon.webp',
     imagePosition: 'center',
   },

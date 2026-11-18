@@ -4,8 +4,8 @@ dansoon 사이트의 실제 톤을 그대로 가져온다 — GitHub Dark 배경
 카드에서 360px 폭까지 축소돼 표시되므로 요소는 크고 적게 두고, 세 섹션은
 글자가 흐려져도 '칩 3개'로 읽히게 구성한다.
 
-색 출처: apps/dansoon/src/styles/global.css (다크 테마 토큰)
-문구 출처: apps/dansoon/README.md 의 자동화 스크립트 3종
+색 출처: dansoon-blog 레포 src/styles/global.css (다크 테마 토큰)
+문구 출처: dansoon-blog 레포 README.md 의 자동화 스크립트 3종
 """
 
 from pathlib import Path

@@ -5,10 +5,7 @@ import { describe, it } from 'node:test';
 import { createSecurityHeaders } from '../index.mjs';
 
 /** 정적 앱은 next.config 헤더가 적용되지 않아 vercel.json에 같은 값을 적어 둔다 — 공유 값과 어긋나지 않는지 확인한다 */
-const STATIC_APPS = [
-  { name: 'dansoon', frameAncestors: 'self' },
-  { name: 'komorebi', frameAncestors: 'none' },
-];
+const STATIC_APPS = [{ name: 'komorebi', frameAncestors: 'none' }];
 
 const HARDENING_DIRECTIVES = ["object-src 'none'", "base-uri 'self'", "form-action 'self'", "script-src-attr 'none'"];
 
