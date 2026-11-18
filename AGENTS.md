@@ -26,6 +26,7 @@ packages/             # 공유 토큰 + 공유 설정
   config/  @config/tsconfig         # 공유 tsconfig(base / next)
   eslint-config/  @repo/eslint-config    # 공유 ESLint(flat): next + FSD 경계 강제
   prettier-config/ @repo/prettier-config # 공유 Prettier
+  security-headers/ @repo/security-headers # 앱 공통 CSP·보안 헤더
 ```
 
 ## 모노레포 핵심 규칙
@@ -61,7 +62,7 @@ packages/             # 공유 토큰 + 공유 설정
 - **`widgets` 레이어는 쓰지 않는다.** 한 화면 전용 블록은 그 view에, 여러 화면에서 쓰는 동작은 `features`에, 앱 전체 레이아웃은 `src/app`에 둔다.
 - 위반 시 `pnpm lint`가 에러로 막는다. 구조 규칙을 `eslint-disable`로 우회하지 않는다.
 
-**어디에 둘지 (pages-first)**: 먼저 쓰는 화면의 `views/<화면>`에 둔다. `features`·`entities`로 내리는 건 **지금 실제로 여러 화면에서 쓸 때만** 한다. 쓰는 곳이 하나뿐인 feature·entity는 그 view로 되돌린다. 화면이 하나뿐인 앱은 `src/app` + `views/<화면>` + (필요하면) `shared`만 가진다.
+**어디에 둘지 (pages-first)**: 먼저 쓰는 화면의 `views/<화면>`에 둔다. `features`·`entities`로 내리는 건 **지금 실제로 여러 화면에서 쓸 때만** 한다. 쓰는 곳이 하나뿐인 feature·entity는 그 view로 되돌린다. 화면이 하나뿐인 앱은 `src/app` + `views/<화면>` + (필요하면) `shared`만 가진다. 단, `src/app`(프로바이더 등)이나 Next 라우트 파일(`sitemap.ts`·`route.ts`·동적 라우트)도 함께 쓰는 도메인 코드는 views에서 가져올 수 없으므로 화면이 하나여도 `entities`에 둔다.
 
 **경로 별칭** (앱 `tsconfig.json`의 `paths`): `@app/` `@views/` `@features/` `@entities/` `@shared/` → `./src/<layer>/`. `@app/`은 **FSD app 레이어(`src/app/`)**를 가리킨다 — 루트 라우팅 `app/`은 Next 진입점이라 별칭이 없다.
 
@@ -111,7 +112,7 @@ apps/<app>/
 ## 코드 컨벤션
 
 - Lint/포맷은 **공유 설정 패키지**로 통일한다. 앱 `eslint.config.mjs`는 `@repo/eslint-config`의 `next.eslint.config.mjs` + `fsd.config.mjs`를 spread하고, 루트 `package.json`의 `"prettier": "@repo/prettier-config"`로 포맷을 맞춘다. Prettier: singleQuote, trailingComma: all, **printWidth 120**, `prettier-plugin-organize-imports`(import 정렬 자동). 앱별로 규칙을 따로 두지 않는다.
-- 함수 컴포넌트만(`React.FC` 지양). `type` 우선(확장 필요 시만 `interface`).
+- 함수 컴포넌트만(`React.FC` 지양). 객체 계약(props 등)은 `interface`, 유니온·유틸리티 조합·별칭은 `type`.
 - **Enum-like 매직 스트링 금지**: status/variant/step 같은 literal union은 `as const` 객체로 빼고 타입을 거기서 파생. 사용처는 상수 참조만(비교·세팅 둘 다 매직 리터럴 금지).
   ```ts
   const VARIANT = { primary: '...', outline: '...' } as const;
@@ -170,7 +171,7 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 ## AI 작업 완료 조건
 
 - 이 파일이 Codex·Claude 등 모든 코딩 에이전트의 공통 규칙이다. 도구별 문서에 다른 아키텍처를 중복 정의하지 않는다.
-- `pnpm check:architecture`는 전체 워크스페이스와 새 앱 템플릿의 catalog·경로 별칭·공유 설정·TypeScript 엄격 옵션·`any`·구조 규칙 우회·동적 import를 포함한 순환 참조·서버/클라이언트 경계를 검사한다. `pnpm lint`에서 자동 실행된다.
+- `pnpm check:architecture`는 전체 워크스페이스의 catalog·`vercel.json` 배포 설정·경로 별칭·공유 설정·TypeScript 엄격 옵션·`any`·구조 규칙 우회·동적 import를 포함한 순환 참조·서버/클라이언트 경계를 검사한다. `pnpm lint`에서 자동 실행된다.
 - 공유 ESLint는 레이어 역참조, 슬라이스 교차 참조, 공개 API 우회, 세그먼트 구조, 컴포넌트 파일, 라우팅 위치, 전역 atom 위치를 검사한다. 공유 규칙 자체에도 회귀 테스트가 있다.
 - Server Action의 권한 검사는 화면·미들웨어와 독립적으로 수행한다. 관리자 DB 클라이언트 생성 전에 인증과 관리자 권한을 확인한다.
 - `'use client'`·`'use server'`는 모듈 맨 앞의 지시문이어야 한다. import를 그 앞에 추가하지 않는다.
