@@ -16,7 +16,7 @@ export const ThemeToggle = memo(() => {
       aria-label="다크 모드 토글"
       data-theme-toggle
       onClick={handleToggle}
-      className="group relative flex items-center shrink-0 w-[52px] h-7 rounded-full p-[3px] hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40"
+      className="group relative flex items-center shrink-0 w-[52px] h-7 rounded-full p-[3px] hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
     >
       <div
         className={cn(

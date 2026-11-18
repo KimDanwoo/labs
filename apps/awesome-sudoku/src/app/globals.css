@@ -12,8 +12,8 @@ body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: auto;
   height: 100dvh;
-  background: linear-gradient(180deg, rgb(var(--color-bg-primary)) 0%, rgb(var(--color-bg-secondary)) 100%);
-  color: rgb(var(--color-text-primary));
+  background: linear-gradient(180deg, rgb(var(--rgb-bg-primary)) 0%, rgb(var(--rgb-bg-secondary)) 100%);
+  color: rgb(var(--rgb-text-primary));
 }
 
 html {
@@ -21,7 +21,7 @@ html {
 }
 
 ::selection {
-  background: rgba(var(--color-accent), 0.2);
+  background: rgba(var(--rgb-accent), 0.2);
 }
 
 .font-tabular {
@@ -46,10 +46,10 @@ html {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: rgba(var(--color-glass), var(--glass-opacity));
+  background: rgba(var(--rgb-glass), var(--glass-opacity));
   backdrop-filter: blur(24px);
   border-bottom-width: 1px;
-  border-bottom-color: rgba(var(--color-border-light), 0.5);
+  border-bottom-color: rgba(var(--rgb-border-light), 0.5);
 }
 
 .press-effect:active {
@@ -58,7 +58,7 @@ html {
 
 .focus-ring:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.3);
+  box-shadow: 0 0 0 3px rgba(var(--rgb-accent), 0.3);
 }
 
 @keyframes slide-up {

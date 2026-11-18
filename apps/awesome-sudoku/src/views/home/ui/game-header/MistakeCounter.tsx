@@ -13,9 +13,7 @@ export const MistakeCounter: FC = () => {
       className={cn(
         'flex items-center gap-1 text-sm',
         'font-normal font-tabular',
-        mistakeCount >= MAX_MISTAKES - 1
-          ? 'text-[rgb(var(--color-error-text))]'
-          : 'text-[rgb(var(--color-text-secondary))]',
+        mistakeCount >= MAX_MISTAKES - 1 ? 'text-error-text' : 'text-text-secondary',
       )}
     >
       <span>오답</span>
