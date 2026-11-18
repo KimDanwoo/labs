@@ -15,7 +15,7 @@ const TOKEN_EXCEPTION = /token-exception:\s*\S/;
 const UNSUPPORTED_WEIGHT = /\bfont-(?:thin|extralight|light|medium|extrabold|black)\b/;
 const DEPLOYMENT_ENABLED = { '**': false, main: true };
 const BUILD_FILTER = /--filter=(\S+)/;
-const TIDY_APPS = new Set(['danwoo-island', 'fe-deep', 'hub']);
+const TIDY_APPS = new Set(['danwoo-island', 'fe-deep', 'hub', 'soundlab']);
 const COMPONENT_WRAPPER = /^(?:memo|forwardRef|dynamic|lazy|Object\.assign)$/;
 const STYLE_HOME =
   /^src\/app\/(?:globals\.css|styles\/[^/]+\.css)$|^src\/(?:views|features|entities)\/[^/]+\/styles\/[^/]+\.css$|^src\/(?:.*\/)?ui\/(?:.*\/)?[A-Z][A-Za-z0-9]*\.module\.css$/;
