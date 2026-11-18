@@ -33,7 +33,7 @@
 - **의존성 버전은 한 곳에서 관리한다.** 모든 버전은 `pnpm-workspace.yaml`의 `catalog:`에 두고, 앱이 버전을 직접 적으면 `pnpm lint`가 막는다. 의존성 업데이트는 Dependabot이 올린다.
 - **앱 내부 구조는 FSD 규칙을 lint로 강제한다.** `app → views → features → entities → shared` 방향만 허용하고, 위반은 `@repo/eslint-config`가 에러로 처리한다.
 - **디자인 토큰 밖의 값을 막는다.** 공유 토큰을 쓰는 앱에서 임의 색 값이나 서체에 없는 굵기를 쓰면 `scripts/check-architecture.mjs`가 실패시킨다.
-- **보안 헤더는 공통 패키지로 붙인다.** 배포하는 앱은 `@repo/security-headers`로 CSP와 보안 헤더를 같은 기준으로 적용한다.
+- **배포하는 앱은 모두 CSP와 보안 헤더를 붙인다.** 대부분은 공통 패키지 `@repo/security-headers`를 쓰고, komorebi와 dansoon은 `vercel.json`에 직접 둔다.
 - **CI를 통과해야 운영에 반영된다.** `main`은 PR로만 바뀌고, Vercel이 빌드한 배포는 CI가 통과한 뒤에 운영 도메인에 연결된다. 빌드 결과는 Turborepo 원격 캐시로 재사용한다.
 - **AI 에이전트와 같은 규칙으로 일한다.** 구조·검증·커밋 규칙을 [AGENTS.md](AGENTS.md)에 두고, 사람과 에이전트 모두 이 문서를 따른다.
 
