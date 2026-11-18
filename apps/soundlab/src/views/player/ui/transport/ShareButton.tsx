@@ -2,7 +2,7 @@
 
 import { currentIndexAtom, frameState, shareUrl, TRACKS } from '@entities/track';
 import { FLOATING_BUTTON } from '@shared/lib/floatingButton';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/ui/DropdownMenu';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState, type JSX } from 'react';
 import { LinkIcon } from './LinkIcon';

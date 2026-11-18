@@ -1,5 +1,5 @@
 import { TRACKS, usePlaybackControls } from '@entities/track';
-import { Button } from '@ui/react';
+import { Button } from '@shared/ui/Button';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX } from 'react';
 import type { Collection } from '../../config/collections';

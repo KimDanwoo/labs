@@ -2,8 +2,6 @@
 
 @import '@tokens/css/theme.css';
 
-@source '../../../../packages/ui/src/**/*.{ts,tsx}';
-
 /*
  * soundlab은 의도적으로 단일 다크 테마다. 공유 semantic 토큰(primary/muted…)으로는
  * 이 화면의 색을 표현할 수 없어 앱 전용 토큰을 여기서 정의한다.
