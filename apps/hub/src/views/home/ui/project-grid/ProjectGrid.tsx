@@ -6,7 +6,6 @@ import { planProjectCardLayouts } from '../../lib/projectGridLayout';
 import { revealDelay } from '../../lib/revealDelay';
 import { PROJECTS } from '../../model/constants/projects';
 import { ProjectCard } from './ProjectCard';
-import { styles } from './ProjectGrid.styles';
 
 export function ProjectGrid() {
   const layouts = planProjectCardLayouts(PROJECTS.length);
@@ -34,7 +33,10 @@ export function ProjectGrid() {
           return (
             <li
               key={project.href}
-              className={cn(styles.desktopSpan[layout.rowSize], layout.isFullRowOnTablet && 'sm:col-span-2')}
+              className={cn(
+                { 1: 'lg:col-span-6', 2: 'lg:col-span-3', 3: 'lg:col-span-2' }[layout.rowSize],
+                layout.isFullRowOnTablet && 'sm:col-span-2',
+              )}
             >
               <ProjectCard project={project} index={index} coverSizes={layout.coverSizes} />
             </li>

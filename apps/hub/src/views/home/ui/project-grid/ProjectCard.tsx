@@ -7,7 +7,6 @@ import { DEFAULT_IMAGE_POSITION } from '../../config/projectGrid';
 import { revealDelay } from '../../lib/revealDelay';
 import type { Project } from '../../model/types/project';
 import { ArrowUpRightIcon } from './ArrowUpRightIcon';
-import { styles } from './ProjectCard.styles';
 
 interface ProjectCardProps {
   project: Project;
@@ -17,6 +16,9 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, index, coverSizes }: ProjectCardProps) {
   const host = new URL(project.href).host;
+  const imagePositionClass = { top: 'object-top', center: 'object-center' }[
+    project.imagePosition ?? DEFAULT_IMAGE_POSITION
+  ];
 
   return (
     <a
@@ -35,7 +37,7 @@ export function ProjectCard({ project, index, coverSizes }: ProjectCardProps) {
             sizes={coverSizes}
             className={cn(
               'object-cover transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.03]',
-              styles.imagePosition[project.imagePosition ?? DEFAULT_IMAGE_POSITION],
+              imagePositionClass,
             )}
           />
         ) : (
