@@ -18,13 +18,13 @@
 
 ## 그 밖의 앱
 
-| 앱                                      | 설명                                                     | 주요 스택                     | 라이브                                           |
-| --------------------------------------- | -------------------------------------------------------- | ----------------------------- | ------------------------------------------------ |
-| [`dansoon`](apps/dansoon)               | 프론트엔드 개발 기록과 매주 바뀌는 책 순위를 모은 블로그 | Astro                         | [danwoo.dev](https://danwoo.dev)                 |
-| [`fe-deep`](apps/fe-deep)               | 프론트엔드 개념을 깊게 파고든 학습 기록                  | Next.js, Supabase             | [fe-deep.danwoo.dev](https://fe-deep.danwoo.dev) |
-| [`awesome-sudoku`](apps/awesome-sudoku) | 난이도를 고르는 온라인 스도쿠                            | Next.js, Firebase, Web Worker | [sudoku.danwoo.dev](https://sudoku.danwoo.dev)   |
-| [`hub`](apps/hub)                       | 프로젝트 갤러리                                          | Next.js, Tailwind CSS         | [lab.danwoo.dev](https://lab.danwoo.dev)         |
-| [`design`](apps/design)                 | 공유 디자인 시스템 미리보기                              | Next.js, `@ui/react`          | —                                                |
+| 앱                                      | 설명                                                     | 주요 스택             | 라이브                                           |
+| --------------------------------------- | -------------------------------------------------------- | --------------------- | ------------------------------------------------ |
+| [`dansoon`](apps/dansoon)               | 프론트엔드 개발 기록과 매주 바뀌는 책 순위를 모은 블로그 | Astro                 | [danwoo.dev](https://danwoo.dev)                 |
+| [`fe-deep`](apps/fe-deep)               | 프론트엔드 개념을 깊게 파고든 학습 기록                  | Next.js, Supabase     | [fe-deep.danwoo.dev](https://fe-deep.danwoo.dev) |
+| [`awesome-sudoku`](apps/awesome-sudoku) | 난이도를 고르는 온라인 스도쿠                            | Next.js, Web Worker   | [sudoku.danwoo.dev](https://sudoku.danwoo.dev)   |
+| [`hub`](apps/hub)                       | 프로젝트 갤러리                                          | Next.js, Tailwind CSS | [lab.danwoo.dev](https://lab.danwoo.dev)         |
+| [`design`](apps/design)                 | 공유 디자인 시스템 미리보기                              | Next.js, `@ui/react`  | —                                                |
 
 ---
 

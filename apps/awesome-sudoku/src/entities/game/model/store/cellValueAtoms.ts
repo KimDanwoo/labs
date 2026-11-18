@@ -19,7 +19,6 @@ import {
   hintsRemainingAtom,
   isCompletedAtom,
   isNoteModeAtom,
-  isRecordSavedAtom,
   isSuccessAtom,
   mistakeCountAtom,
   selectedCellAtom,
@@ -120,7 +119,6 @@ export const resetUserInputsAtom = atom(null, (get, set) => {
   set(currentTimeAtom, 0);
   set(isCompletedAtom, false);
   set(isSuccessAtom, false);
-  set(isRecordSavedAtom, false);
 
   set(toggleTimerAtom, true);
   set(countBoardNumbersAtom);

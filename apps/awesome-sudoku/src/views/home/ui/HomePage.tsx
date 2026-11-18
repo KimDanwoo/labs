@@ -3,7 +3,6 @@
 import { ThemeToggle } from '@features/theme';
 import { cn } from '@shared/lib/cn';
 import dynamic from 'next/dynamic';
-import { UserProfileMenu } from './auth/UserProfileMenu';
 import { SudokuBoard } from './game-board/SudokuBoard';
 import { Controls } from './game-controls/Controls';
 import { GameStatus } from './game-header/GameStatus';
@@ -54,10 +53,7 @@ export const HomePage = () => (
         )}
       >
         <GameModeSelector />
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <UserProfileMenu />
-        </div>
+        <ThemeToggle />
       </div>
     </header>
 

@@ -35,7 +35,7 @@ export const PROJECTS: Project[] = [
     title: '스도쿠',
     description: '난이도를 골라 가볍게 한 판 즐겨요',
     href: 'https://sudoku.danwoo.dev/',
-    scope: ['퍼즐 생성 알고리즘', 'Web Worker', '인증·DB'],
+    scope: ['퍼즐 생성 알고리즘', 'Web Worker'],
     image: '/projects/sudoku.webp',
     imagePosition: 'center',
   },
