@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-awesome-sudoku 'vitest run --config vitest.rules.config.ts'",
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@config/tsconfig": "workspace:*",
+    "@firebase/rules-unit-testing": "catalog:fb11",
     "@next/bundle-analyzer": "catalog:",
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",

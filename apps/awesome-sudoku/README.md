@@ -64,6 +64,17 @@ src/
 └── apps/         # 외부 서비스 초기화 (Firebase)
 ```
 
+## Firestore 보안 규칙
+
+규칙의 원본은 `firestore.rules`다. 게임 기록은 누구나 읽을 수 있고, 로그인한 사용자가 자기 기록만 만들 수 있으며 수정·삭제는 막는다. 기록을 만들 때 필드 목록, 난이도별 점수 범위(`POINT_RANGES`와 같은 값), 힌트·실수 개수, 서버 시각을 검사한다. 점수 계산식을 바꾸면 규칙의 범위도 함께 바꾼다.
+
+```bash
+pnpm --filter awesome-sudoku test:rules         # 에뮬레이터에서 규칙 테스트 (Java·firebase CLI 필요)
+firebase deploy --only firestore:rules          # apps/awesome-sudoku에서 실행, 운영 반영
+```
+
+`test:rules`는 에뮬레이터가 필요해 기본 `pnpm test`와 CI에서는 돌지 않는다. macOS에서는 `brew install openjdk` 후 `/opt/homebrew/opt/openjdk/bin`을 PATH에 둔다.
+
 ## License
 
 MIT
