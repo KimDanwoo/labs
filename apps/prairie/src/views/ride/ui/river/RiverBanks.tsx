@@ -9,13 +9,7 @@ import { coastDistanceAt, groundHeightAt, nearestRiverX, RIVER, riverWidthAt } f
 
 import { useEffect, useMemo, useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
-
-const CAPACITY = 96;
-const CELL = 24;
-const hash = (n: number) => {
-  const value = Math.sin(n * 127.1) * 43758.5453;
-  return value - Math.floor(value);
-};
+import { CAPACITY, CELL, hash } from '../../lib/river/riverBanks';
 
 // A small, deterministic pool adds irregular shoreline landmarks without a mesh per stone/stem.
 export function RiverBanks() {

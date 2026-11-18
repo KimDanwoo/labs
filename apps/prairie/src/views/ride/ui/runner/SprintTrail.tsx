@@ -2,13 +2,10 @@
 
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
-import { AdditiveBlending, InstancedMesh, Object3D } from 'three';
+import { AdditiveBlending, InstancedMesh } from 'three';
+import { dummy, lerp, maxMotes } from '../../lib/runner/sprintTrail';
 import { runnerState } from '../../model/ride-state/runnerState';
 import { SPRINT_TRAIL } from '../../model/runner/constants';
-
-const { maxMotes } = SPRINT_TRAIL;
-const dummy = new Object3D();
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 // 질주(Shift)·비행 중 발굽 근처에서 금빛 잔광이 튀어 뒤로 흘러간다. world 공간, 죽은 입자는 크기 0.
 export function SprintTrail() {

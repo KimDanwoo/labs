@@ -17,13 +17,11 @@ import { useLowDetail } from '../../model/ride-state/sceneQuality';
 import { makeBladeGeometry } from '../../lib/makeBladeGeometry';
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Color, DoubleSide, ShaderMaterial, Vector2, type BufferGeometry } from 'three';
+import { Color, DoubleSide, ShaderMaterial, type BufferGeometry } from 'three';
+import { gustOriginUniform, runnerXZUniform } from '../../lib/grass/grassField';
 import { GrassChunk } from './GrassChunk';
 
 type Cell = { x: number; z: number };
-
-const runnerXZUniform = new Vector2();
-const gustOriginUniform = new Vector2();
 
 type Props = { isSoftware: boolean };
 

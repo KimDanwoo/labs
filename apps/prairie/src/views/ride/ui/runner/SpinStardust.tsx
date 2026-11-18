@@ -3,10 +3,8 @@
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import { AdditiveBlending, Color, InstancedMesh, Object3D, Shape, ShapeGeometry, Vector3 } from 'three';
+import { COLORS, COUNT } from '../../lib/runner/spinStardust';
 import { runnerState } from '../../model/ride-state/runnerState';
-
-const COUNT = 180;
-const COLORS = ['#ffe09b', '#fff3d4', '#bceaff', '#e4c9ff'];
 
 export function SpinStardust() {
   const meshRef = useRef<InstancedMesh>(null);

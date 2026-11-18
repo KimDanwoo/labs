@@ -2,9 +2,8 @@
 
 import { useProgress } from '@react-three/drei';
 import { useEffect, useState } from 'react';
+import { FADE_MS } from '../../lib/scene/sceneLoader';
 import { useSceneReady } from '../../model/ride-state/sceneReady';
-
-const FADE_MS = 700;
 
 export function SceneLoader() {
   const { progress } = useProgress();

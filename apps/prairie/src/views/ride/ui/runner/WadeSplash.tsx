@@ -2,26 +2,19 @@
 
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
-import { InstancedMesh, Mesh, MeshBasicMaterial, Object3D, Vector3 } from 'three';
-import { RIVER } from '../../config/scene';
+import { InstancedMesh, Mesh, MeshBasicMaterial } from 'three';
+import {
+  RING_Y,
+  WATER_Y,
+  dummy,
+  lerp,
+  lookTarget,
+  maxDroplets,
+  ringCount,
+  splashIntensity,
+} from '../../lib/runner/wadeSplash';
 import { runnerState } from '../../model/ride-state/runnerState';
 import { WADE_SPLASH } from '../../model/runner/constants';
-
-const WATER_Y = -RIVER.waterDrop;
-const RING_Y = WATER_Y + 0.06;
-const { maxDroplets, ringCount } = WADE_SPLASH;
-
-const dummy = new Object3D();
-const lookTarget = new Vector3();
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-
-// 세기 0~1: 속도 비례, 물 밖이거나 공중이면 0.
-function splashIntensity(): number {
-  const speed = Math.abs(runnerState.speed);
-  const isInWater = runnerState.waterDepth >= WADE_SPLASH.minDepth && runnerState.airborneHeight <= 0;
-  if (!isInWater || speed < WADE_SPLASH.minSpeed) return 0;
-  return Math.min(speed / WADE_SPLASH.fullSplashSpeed, 1);
-}
 
 // 물보라(속도 방향으로 늘어난 물줄기, world 공간) + 발굽에서 퍼지는 파문 링. 죽은 입자·링은 크기 0.
 export function WadeSplash() {

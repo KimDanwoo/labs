@@ -4,6 +4,7 @@ import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { Vector3 } from 'three';
 import { terrainHeightAt } from '../../config/scene';
+import { centers } from '../../lib/exploration/explorationScene';
 import {
   getExploration,
   loadExploration,
@@ -11,12 +12,10 @@ import {
   updateExploration,
   useExploration,
 } from '../../model/exploration/store';
-import { crossesGate, GATES, LANDMARKS } from '../../model/exploration/world';
+import { crossesGate, LANDMARKS } from '../../model/exploration/world';
 import { runnerState } from '../../model/ride-state/runnerState';
 import { LivingLandmarks } from './LivingLandmarks';
 import { StarlightGate } from './StarlightGate';
-
-const centers = GATES.map((gate) => ({ x: gate.x, y: terrainHeightAt(gate.x, gate.z) + gate.height, z: gate.z }));
 
 export function ExplorationScene() {
   const progress = useExploration();

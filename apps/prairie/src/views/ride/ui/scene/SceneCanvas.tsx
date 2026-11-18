@@ -7,6 +7,7 @@ import { useIsCoarsePointer } from '@shared/lib/useCoarsePointer';
 import { Suspense, useState } from 'react';
 import { PCFShadowMap } from 'three';
 import { CAMERA, CINEMATIC, FOG, SCENE_COLORS, SUN, type FogQuality } from '../../config/scene';
+import { DPR } from '../../lib/scene/sceneCanvas';
 import { SceneQualityContext } from '../../model/ride-state/sceneQuality';
 import { ExplorationScene } from '../exploration/ExplorationScene';
 import { FloraField } from '../flora/FloraField';
@@ -22,11 +23,6 @@ import { RenderBudget } from './RenderBudget';
 import { RideSun } from './RideSun';
 import { SceneEffects } from './SceneEffects';
 import { SceneFailure } from './SceneFailure';
-
-const DPR = {
-  desktop: { max: 1.5, min: 1 },
-  mobile: { max: 1.25, min: 0.8 },
-} as const;
 
 export function SceneCanvas() {
   const coarse = useIsCoarsePointer();

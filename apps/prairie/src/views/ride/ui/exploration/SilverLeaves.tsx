@@ -6,9 +6,8 @@ import { runnerState } from '../../model/ride-state/runnerState';
 import { useLowDetail } from '../../model/ride-state/sceneQuality';
 
 import { useRef } from 'react';
-import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
-
-const silver = new Color('#dbe2c1');
+import { DoubleSide, InstancedMesh, Object3D } from 'three';
+import { silver } from '../../lib/exploration/silverLeaves';
 export function SilverLeaves() {
   const mobile = useLowDetail();
   const count = mobile ? 28 : 64;

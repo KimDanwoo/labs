@@ -1,14 +1,7 @@
 'use client';
 
-import type { PointerEvent } from 'react';
-import type { RunnerAction } from '../../model/runner-control/constants';
+import { handlePress } from '../../lib/runner-control/touchActions';
 import { setRunnerAction } from '../../model/runner-control/store/runnerInput';
-
-function handlePress(event: PointerEvent<HTMLButtonElement>, action: RunnerAction) {
-  event.preventDefault();
-  event.currentTarget.setPointerCapture(event.pointerId);
-  setRunnerAction(action, true);
-}
 
 export function TouchActions() {
   return (

@@ -1,11 +1,10 @@
 'use client';
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
-import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
+import { DoubleSide, InstancedMesh, Object3D } from 'three';
 import { terrainHeightAt } from '../../config/scene';
+import { flowerColors } from '../../lib/exploration/gardenPlanting';
 import { LANDMARKS } from '../../model/exploration/world';
-
-const flowerColors = ['#dca9c1', '#b5a5d9', '#f4e0a8'].map((hex) => new Color(hex));
 export function GardenPlanting() {
   const blooms = useRef<InstancedMesh>(null),
     stems = useRef<InstancedMesh>(null),
