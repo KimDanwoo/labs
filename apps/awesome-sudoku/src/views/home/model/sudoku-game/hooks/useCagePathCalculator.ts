@@ -1,5 +1,7 @@
-import { BOARD_SIZE, type CageInfo, type KillerCage } from '@entities/game';
 import { useMemo } from 'react';
+import { BOARD_SIZE } from '../../../config/board';
+import { type CageInfo } from '../../types/board';
+import { type KillerCage } from '../../types/game';
 import type { CellPosition } from './useTableDimensions';
 
 const CAGE_PADDING_RATIO = 0.1;

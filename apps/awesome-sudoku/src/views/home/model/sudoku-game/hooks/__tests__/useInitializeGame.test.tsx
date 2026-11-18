@@ -1,7 +1,11 @@
-import { cellAt } from '@entities/game/lib/gridAccess';
-import { requestPuzzle } from '@entities/game/lib/puzzleService';
-import { fillCellAtom } from '@entities/game/model/store/cellValueAtoms';
-import { resumeOrStartGameAtom } from '@entities/game/model/store/gameLifecycleAtoms';
+import { renderHook, waitFor } from '@testing-library/react';
+import { createStore, Provider } from 'jotai';
+import { StrictMode, type ReactNode } from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { cellAt } from '../../../../lib/gridAccess';
+import { requestPuzzle } from '../../../../lib/puzzleService';
+import { fillCellAtom } from '../../../store/cellValueAtoms';
+import { resumeOrStartGameAtom } from '../../../store/gameLifecycleAtoms';
 import {
   boardAtom,
   currentTimeAtom,
@@ -12,15 +16,11 @@ import {
   PERSISTED_GAME_ATOMS,
   selectedCellAtom,
   solutionAtom,
-} from '@entities/game/model/store/primitives';
-import type { Grid, SudokuBoard } from '@entities/game/model/types/board';
-import { renderHook, waitFor } from '@testing-library/react';
-import { createStore, Provider } from 'jotai';
-import { StrictMode, type ReactNode } from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+} from '../../../store/primitives';
+import type { Grid, SudokuBoard } from '../../../types/board';
 import { useInitializeGame } from '../useInitializeGame';
 
-vi.mock('@entities/game/lib/puzzleService', () => ({ requestPuzzle: vi.fn() }));
+vi.mock('../../../../lib/puzzleService', () => ({ requestPuzzle: vi.fn() }));
 
 const requestPuzzleMock = vi.mocked(requestPuzzle);
 

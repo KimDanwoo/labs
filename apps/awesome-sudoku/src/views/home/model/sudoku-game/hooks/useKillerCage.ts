@@ -1,7 +1,9 @@
-import { GAME_MODE, cagesAtom, gameModeAtom, type CageInfo } from '@entities/game';
 import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useState } from 'react';
 import { DEFAULT_CELL_SIZE } from '../../../config/board';
+import { GAME_MODE } from '../../../config/game';
+import { cagesAtom, gameModeAtom } from '../../store/primitives';
+import { type CageInfo } from '../../types/board';
 import { useCagePathCalculator } from './useCagePathCalculator';
 import { useTableDimensions, type CellPosition } from './useTableDimensions';
 

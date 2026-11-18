@@ -1,4 +1,4 @@
-import { GAME_LEVEL, GAME_LEVEL_LABELS } from '@entities/game';
+import { GAME_LEVEL, GAME_LEVEL_LABELS } from '../../../config/game';
 
 export const options = [
   { label: GAME_LEVEL_LABELS[GAME_LEVEL.EASY], value: GAME_LEVEL.EASY },

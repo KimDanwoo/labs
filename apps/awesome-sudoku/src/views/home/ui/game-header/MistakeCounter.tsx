@@ -1,8 +1,9 @@
 'use client';
-import { MAX_MISTAKES, mistakeCountAtom } from '@entities/game';
 import { cn } from '@shared/lib/cn';
 import { useAtomValue } from 'jotai';
 import type { FC } from 'react';
+import { MAX_MISTAKES } from '../../config/game';
+import { mistakeCountAtom } from '../../model/store/primitives';
 
 export const MistakeCounter: FC = () => {
   const mistakeCount = useAtomValue(mistakeCountAtom);

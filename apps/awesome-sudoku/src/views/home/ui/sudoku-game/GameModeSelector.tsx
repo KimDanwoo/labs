@@ -1,8 +1,10 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback } from 'react';
 
-import { gameModeAtom, switchGameModeAtom, type GameMode } from '@entities/game';
 import { cn } from '@shared/lib/cn';
+import { switchGameModeAtom } from '../../model/store/gameLifecycleAtoms';
+import { gameModeAtom } from '../../model/store/primitives';
+import { type GameMode } from '../../model/types/game';
 
 import { GAME_MODE_TABS } from '../../config/gameMode';
 

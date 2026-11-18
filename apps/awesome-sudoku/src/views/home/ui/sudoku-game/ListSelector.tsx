@@ -1,7 +1,9 @@
-import { difficultyAtom, initializeGameAtom, type Difficulty } from '@entities/game';
 import { cn } from '@shared/lib/cn';
 import { useAtomValue, useSetAtom } from 'jotai';
+import { initializeGameAtom } from '../../model/store/gameLifecycleAtoms';
+import { difficultyAtom } from '../../model/store/primitives';
 import { options } from '../../model/sudoku-game/constants/gameDifficultySelector';
+import { type Difficulty } from '../../model/types/game';
 
 export const ListSelector = () => {
   const difficulty = useAtomValue(difficultyAtom);

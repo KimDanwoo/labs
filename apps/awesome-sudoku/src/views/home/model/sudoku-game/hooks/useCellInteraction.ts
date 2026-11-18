@@ -1,5 +1,6 @@
-import { gameStore, handleKeyInputAtom } from '@entities/game';
+import { useSetAtom } from 'jotai';
 import { type KeyboardEvent, useCallback } from 'react';
+import { handleKeyInputAtom } from '../../store/keyboardAtoms';
 
 interface UseCellInteractionProps {
   row: number;
@@ -9,6 +10,8 @@ interface UseCellInteractionProps {
 }
 
 export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellInteractionProps) => {
+  const handleKeyInput = useSetAtom(handleKeyInputAtom);
+
   const handleClick = useCallback(() => {
     if (timerActive) {
       onSelect(row, col);
@@ -31,7 +34,7 @@ export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellI
         event.stopPropagation();
         onSelect(row, col);
         setTimeout(() => {
-          gameStore.set(handleKeyInputAtom, keyPressed);
+          handleKeyInput(keyPressed);
         }, 0);
       }
 
@@ -40,11 +43,11 @@ export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellI
         event.stopPropagation();
         onSelect(row, col);
         setTimeout(() => {
-          gameStore.set(handleKeyInputAtom, keyPressed);
+          handleKeyInput(keyPressed);
         }, 0);
       }
     },
-    [timerActive, onSelect, row, col],
+    [timerActive, onSelect, row, col, handleKeyInput],
   );
 
   return {
