@@ -1,6 +1,6 @@
 import '@app/globals.css';
 import { AppProviders } from '@app/providers/AppProviders';
-import '@tokens/css/fonts.css';
+import '@repo/fonts/fonts.css';
 import type { Metadata, Viewport } from 'next';
 
 const SITE_URL = 'https://lab.danwoo.dev';

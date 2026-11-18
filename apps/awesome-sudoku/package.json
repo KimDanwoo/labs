@@ -14,7 +14,7 @@
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
-    "@tokens/css": "workspace:*",
+    "@repo/fonts": "workspace:*",
     "clsx": "catalog:",
     "jotai": "catalog:",
     "next": "catalog:",

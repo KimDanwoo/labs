@@ -11,15 +11,15 @@ import {
 } from '../check-architecture.mjs';
 
 test('dependency rules reject raw versions, missing catalog entries and incompatible workspace references', () => {
-  const workspaces = new Set(['@tokens/css']);
+  const workspaces = new Set(['@repo/fonts']);
   const catalog = new Set(['react']);
   assert.deepEqual(
-    validateManifest({ dependencies: { react: 'catalog:', '@tokens/css': 'workspace:*' } }, workspaces, catalog),
+    validateManifest({ dependencies: { react: 'catalog:', '@repo/fonts': 'workspace:*' } }, workspaces, catalog),
     [],
   );
   assert.equal(validateManifest({ dependencies: { react: '^19' } }, workspaces, catalog).length, 1);
   assert.equal(validateManifest({ dependencies: { missing: 'catalog:' } }, workspaces, catalog).length, 1);
-  assert.equal(validateManifest({ dependencies: { '@tokens/css': '*' } }, workspaces, catalog).length, 1);
+  assert.equal(validateManifest({ dependencies: { '@repo/fonts': '*' } }, workspaces, catalog).length, 1);
 });
 
 test('compatibility peer ranges remain valid and child overrides are rejected', () => {

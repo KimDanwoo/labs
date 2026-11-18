@@ -8,7 +8,7 @@ import { PROJECTS } from '../../hub/src/views/home/model/constants/projects.ts';
 import { TRACKS } from '../../soundlab/src/entities/track/model/constants/tracks.ts';
 
 const HUB_ROOT = fileURLToPath(new URL('../../hub/', import.meta.url));
-const FONT_ROOT = fileURLToPath(new URL('../../../packages/tokens/fonts/', import.meta.url));
+const FONT_ROOT = fileURLToPath(new URL('../../../packages/fonts/fonts/', import.meta.url));
 const LAB_URL = 'https://lab.danwoo.dev/';
 const FONT_SUBSETS = ['latin', 'ko-common', 'symbols'];
 const PROJECT_IMAGE_PATH = /^\/projects\/[a-z0-9-]+\.webp$/;
