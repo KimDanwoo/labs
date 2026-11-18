@@ -1,5 +1,4 @@
 export const styles = {
-  root: 'group relative flex h-7 w-[52px] shrink-0 items-center rounded-full p-[3px] transition-shadow hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
   dayBackground: {
     base: 'absolute inset-0 rounded-full bg-gradient-to-r from-toggle-day-start to-toggle-day-end transition-opacity duration-500',
     light: 'opacity-100',

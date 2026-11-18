@@ -1,5 +1,3 @@
-import { styles } from './ArrowUpRightIcon.styles';
-
 export function ArrowUpRightIcon() {
   return (
     <svg
@@ -10,7 +8,7 @@ export function ArrowUpRightIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className={styles.icon}
+      className="size-3.5 transition-transform duration-200 ease-out motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:translate-x-0.5"
     >
       <path d="M7 17 17 7M7 7h10v10" />
     </svg>
