@@ -3,6 +3,7 @@ import { FISH, type Catch } from './fishing';
 export const COMPANION_KEY = 'komorebi-companions-v1';
 export const TANK_CAPACITY = 8;
 export const BAG_CAPACITY = 24;
+export const FRIENDSHIP_MAX = 5;
 export const COMPANION_PANEL = { none: 'none', aquarium: 'aquarium', cat: 'cat' } as const;
 export type CompanionPanelKind = (typeof COMPANION_PANEL)[keyof typeof COMPANION_PANEL];
 export const FISH_HOME = { bag: 'bag', tank: 'tank' } as const;
@@ -15,7 +16,8 @@ export type CompanionAction =
   | { kind: Exclude<(typeof COMPANION_ACTION)[keyof typeof COMPANION_ACTION], 'keep'>; uid: string };
 
 export function catBond(friendship: number) {
-  if (friendship >= 5) return { level: 2, name: '낚시 단짝', hint: '잡으면 나도 같이 폴짝! 늘 옆에서 기다릴게.' };
+  if (friendship >= FRIENDSHIP_MAX)
+    return { level: 2, name: '낚시 단짝', hint: '잡으면 나도 같이 폴짝! 늘 옆에서 기다릴게.' };
   if (friendship >= 2) return { level: 1, name: '반가운 친구', hint: '이제 네 옆에서 낚시를 구경할게.' };
   return { level: 0, name: '조심스러운 첫 만남', hint: '조금 떨어져 구경 중이에요. 물고기를 나눠 줘 볼까요?' };
 }
@@ -47,7 +49,7 @@ export function parseCompanions(raw: string | null): Companions {
       }
     const friendship =
       typeof data.friendship === 'number' && Number.isSafeInteger(data.friendship)
-        ? Math.max(0, Math.min(5, data.friendship))
+        ? Math.max(0, Math.min(FRIENDSHIP_MAX, data.friendship))
         : 0;
     return { fish, friendship };
   } catch {
@@ -68,7 +70,7 @@ export function changeCompanions(state: Companions, action: CompanionAction): Co
     if (fish.home !== FISH_HOME.bag) return state;
     return {
       fish: state.fish.filter((item) => item.uid !== action.uid),
-      friendship: Math.min(5, state.friendship + Number(action.kind === COMPANION_ACTION.share)),
+      friendship: Math.min(FRIENDSHIP_MAX, state.friendship + Number(action.kind === COMPANION_ACTION.share)),
     };
   }
   const home = action.kind === COMPANION_ACTION.tank ? FISH_HOME.tank : FISH_HOME.bag;

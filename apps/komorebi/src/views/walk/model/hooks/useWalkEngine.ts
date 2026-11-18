@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useState, type RefObject } from 'react';
+import type { TimeOfDay, Weather } from '../../config/walk';
 import { createScene, type SceneOptions, type SceneStatus, type WalkEngine } from '../../lib/scene';
-import type { TimeOfDay, Weather } from '../constants/walk';
 import type { Appearance } from '../world/appearance';
 import { SPAWN } from '../world/world';
 

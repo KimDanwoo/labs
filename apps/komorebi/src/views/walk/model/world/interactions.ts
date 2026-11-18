@@ -1,5 +1,16 @@
 import { WORLD_OBJECTS } from './objects';
-import { CLASSROOM_BOARD, HOME_BED, HOME_DESK, HOME_WARDROBE, LANDMARKS, type Point, type Region } from './world';
+import {
+  CLASSROOM_BOARD,
+  FISHING_PIER,
+  HOME_AQUARIUM,
+  HOME_BED,
+  HOME_DESK,
+  HOME_WARDROBE,
+  LANDMARKS,
+  PIER_CAT,
+  type Point,
+  type Region,
+} from './world';
 
 const futon = WORLD_OBJECTS.find((object) => object.id === 'home-futon')!;
 export function isNearHomeBed(point: Point, reach = 3.5) {
@@ -40,4 +51,20 @@ export function interactionDestination(point: Point, region: Region): Point | nu
   return (
     LANDMARKS.find((place) => place.region === region && Math.hypot(point.x - place.x, point.z - place.z) < 3) ?? null
   );
+}
+
+type Spot = { region: Region; point: Point; reach: number };
+const SPOTS = {
+  aquarium: { region: 'home', point: HOME_AQUARIUM, reach: 3 },
+  cat: { region: 'coast', point: PIER_CAT, reach: 3 },
+  pier: { region: 'coast', point: FISHING_PIER, reach: 1.6 },
+  desk: { region: 'home', point: HOME_DESK, reach: 4.5 },
+  wardrobe: { region: 'home', point: HOME_WARDROBE, reach: 4.5 },
+  board: { region: 'classroom', point: CLASSROOM_BOARD, reach: 4.5 },
+} satisfies Record<string, Spot>;
+export type SpotId = keyof typeof SPOTS;
+
+export function isNearSpot(id: SpotId, point: Point, region: Region) {
+  const spot = SPOTS[id];
+  return region === spot.region && Math.hypot(point.x - spot.point.x, point.z - spot.point.z) < spot.reach;
 }

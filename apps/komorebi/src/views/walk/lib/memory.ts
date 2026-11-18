@@ -1,4 +1,4 @@
-import { TIME, TIME_LABEL, TIME_ORDER, type TimeOfDay } from '../model/constants/walk';
+import { TIME, TIME_LABEL, TIME_ORDER, type TimeOfDay } from '../config/walk';
 import type { Memory } from '../model/types/memory';
 import type { Landmark } from '../model/world/world';
 

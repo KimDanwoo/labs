@@ -1,13 +1,18 @@
 import { useId } from 'react';
-import { TIME_ORDER } from '../model/constants/walk';
+import { TIME_ORDER } from '../config/walk';
 import { useModal } from '../model/hooks/useModal';
 import type { Memory } from '../model/types/memory';
 import { LANDMARKS } from '../model/world/world';
 import { Icon } from './Icon';
 
-type Props = { isOpen: boolean; memory: Memory | null; pageCount: number; onClose: () => void };
+interface MemoryDialogProps {
+  isOpen: boolean;
+  memory: Memory | null;
+  pageCount: number;
+  onClose: () => void;
+}
 
-export function MemoryDialog({ isOpen, memory, pageCount, onClose }: Props) {
+export function MemoryDialog({ isOpen, memory, pageCount, onClose }: MemoryDialogProps) {
   const ref = useModal(isOpen);
   const titleId = useId();
   const hasSeveralPages = (memory?.pages.length ?? 0) > 1;

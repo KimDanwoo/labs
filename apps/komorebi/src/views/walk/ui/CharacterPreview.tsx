@@ -1,7 +1,11 @@
 import type { JSX } from 'react';
 import { characterLayers, type Appearance } from '../model/world/appearance';
 
-export function CharacterPreview({ appearance }: { appearance: Appearance }): JSX.Element {
+interface CharacterPreviewProps {
+  appearance: Appearance;
+}
+
+export function CharacterPreview({ appearance }: CharacterPreviewProps): JSX.Element {
   const layers = characterLayers(appearance);
   return (
     <span

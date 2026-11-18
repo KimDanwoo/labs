@@ -1,0 +1,1 @@
+export const COMPANION_REACTION_MS = 3000;

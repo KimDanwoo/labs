@@ -1,20 +1,16 @@
-import { TIME_LABEL, TIME_ORDER, type TimeOfDay } from '../model/constants/walk';
+import { TIME_ORDER, type TimeOfDay } from '../config/walk';
+import { keptLabel } from '../lib/discovery';
 import { LANDMARKS } from '../model/world/world';
 
-type Props = {
+interface DiscoveryListProps {
   pages: Record<TimeOfDay, readonly string[]>;
   isReady: boolean;
   isJournal?: boolean;
   onGuide: (id: string) => void;
   onRead: (id: string) => void;
-};
-
-function keptLabel(times: TimeOfDay[]) {
-  if (!times.length) return '아직 만나지 않은 풍경';
-  return `${times.map((time) => TIME_LABEL[time]).join(' · ')}의 추억`;
 }
 
-export function DiscoveryList({ pages, isReady, isJournal = false, onGuide, onRead }: Props) {
+export function DiscoveryList({ pages, isReady, isJournal = false, onGuide, onRead }: DiscoveryListProps) {
   return (
     <div className="discovery-list">
       {LANDMARKS.map((p) => {

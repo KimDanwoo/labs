@@ -1,9 +1,12 @@
 import { useEffect, useEffectEvent } from 'react';
 import { SLEEP_TIMING } from '../lib/bedRest';
 
-type Props = { onWake: () => void; onDone: () => void };
+interface SleepTransitionProps {
+  onWake: () => void;
+  onDone: () => void;
+}
 
-export function SleepTransition({ onWake, onDone }: Props) {
+export function SleepTransition({ onWake, onDone }: SleepTransitionProps) {
   const wake = useEffectEvent(onWake);
   const done = useEffectEvent(onDone);
   useEffect(() => {

@@ -24,3 +24,11 @@ export const WEATHER = { clear: 'clear', rain: 'rain' } as const;
 export type Weather = (typeof WEATHER)[keyof typeof WEATHER];
 
 export const TOAST_DURATION_MS = 3_500;
+
+export const FIRST_LOOK_LABEL = {
+  day: '잠깐 머물러 보기',
+  evening: '노을빛으로 머물러 보기',
+  night: '밤의 풍경 바라보기',
+} satisfies Record<TimeOfDay, string>;
+
+export const FRIEND_ACTIVITY = { none: 'none', greeting: 'greeting', ball: 'ball' } as const;

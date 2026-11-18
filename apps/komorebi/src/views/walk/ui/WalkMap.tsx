@@ -1,14 +1,14 @@
+import { mapX, mapY } from '../lib/mapProjection';
 import { getWorldPortals } from '../model/world/portals';
 import { DESTINATIONS, WORLDS, type Point, type Region } from '../model/world/world';
 
-type Props = { region: Region; position: Point; visited: readonly string[] };
+interface WalkMapProps {
+  region: Region;
+  position: Point;
+  visited: readonly string[];
+}
 
-const MAP_SCALE_X = 4;
-const MAP_SCALE_Y = 3;
-const mapX = (x: number) => x * MAP_SCALE_X;
-const mapY = (z: number) => z * MAP_SCALE_Y;
-
-export function WalkMap({ region, position, visited }: Props) {
+export function WalkMap({ region, position, visited }: WalkMapProps) {
   const world = WORLDS[region];
   const nodeById = new Map(world.nodes.map((node) => [node.id, node]));
   return (

@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { TIME_ORDER, type TimeOfDay } from '../constants/walk';
+import { TIME_ORDER, type TimeOfDay } from '../../config/walk';
 import { pageStores, type DiscoveryStore } from '../store/discoveries';
 import { LANDMARKS } from '../world/world';
 

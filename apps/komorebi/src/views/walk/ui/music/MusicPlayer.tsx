@@ -2,9 +2,13 @@ import { useRef, useState, type JSX } from 'react';
 import { MUSIC_STATUS, musicTime, musicWidgetSrc } from '../../lib/music/soundcloud';
 import { useMusicPlayer } from '../../model/hooks/music/useMusicPlayer';
 
-type Props = { source: string; initialVolume: number; profile: string };
+interface MusicPlayerProps {
+  source: string;
+  initialVolume: number;
+  profile: string;
+}
 
-export function MusicPlayer({ source, initialVolume, profile }: Props): JSX.Element {
+export function MusicPlayer({ source, initialVolume, profile }: MusicPlayerProps): JSX.Element {
   const { iframe: iframeRef, ...player } = useMusicPlayer(source, initialVolume);
   const [isExpanded, setIsExpanded] = useState(false);
   const toggleButton = useRef<HTMLButtonElement>(null);

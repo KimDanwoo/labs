@@ -1,13 +1,13 @@
 import { useId } from 'react';
-import { TIME_ORDER } from '../model/constants/walk';
+import { journeyLine } from '../lib/journey';
 import type { Collection } from '../model/hooks/useCollection';
 import { useModal } from '../model/hooks/useModal';
-import { FISHING_PIER, HOME, HOME_AQUARIUM, LANDMARKS, PIER_CAT, type Point, type Region } from '../model/world/world';
+import { FISHING_PIER, HOME, HOME_AQUARIUM, PIER_CAT, type Point, type Region } from '../model/world/world';
 import { DiscoveryList } from './DiscoveryList';
 import { Icon } from './Icon';
 import { WalkMap } from './WalkMap';
 
-type Props = {
+interface MapDialogProps {
   isOpen: boolean;
   isJournal?: boolean;
   isReady: boolean;
@@ -19,14 +19,6 @@ type Props = {
   onGuide: (id: string) => void;
   onRead: (id: string) => void;
   onReset: () => void;
-};
-
-const ALL_PAGES = LANDMARKS.length * TIME_ORDER.length;
-
-function journeyLine(placeCount: number, pageCount: number, steps: number) {
-  if (pageCount === ALL_PAGES) return '스물한 장의 여름, 낮도 노을도 밤도 모두 모았어요.';
-  if (placeCount === LANDMARKS.length) return '일곱 곳을 모두 걸었어요. 다른 시간에도 와 볼까요?';
-  return `${steps.toLocaleString()} 걸음만큼 쌓인 여름`;
 }
 
 export function MapDialog({
@@ -41,7 +33,7 @@ export function MapDialog({
   onGuide,
   onRead,
   onReset,
-}: Props) {
+}: MapDialogProps) {
   const ref = useModal(isOpen);
   const titleId = useId();
   return (

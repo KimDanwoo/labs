@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { TIME, WEATHER } from '../../model/constants/walk';
+import { TIME, WEATHER } from '../../config/walk';
 import { FIRST_DAY, wakeFromSleep, weatherAfterRest, weatherDelay } from '../dayCycle';
 
 test('sleep advances the light, and only sleeping through the night starts a new day', () => {

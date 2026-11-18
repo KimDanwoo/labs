@@ -5,7 +5,7 @@ import {
   NIGHT_PAGE_STORAGE_KEY,
   TIME,
   type TimeOfDay,
-} from '../constants/walk';
+} from '../../config/walk';
 import { LANDMARKS } from '../world/world';
 
 const NO_PAGES: readonly string[] = [];

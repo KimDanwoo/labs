@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
+import { MS_PER_SECOND } from '../../../config/time';
 import {
   DEFAULT_MUSIC,
   MUSIC_STATUS,
@@ -73,7 +74,7 @@ export function useMusicPlayer(source: string, initialVolume: number): MusicPlay
               previousSecond.current = -1;
             },
             progress: (next) => {
-              const second = Math.floor(next / 1000);
+              const second = Math.floor(next / MS_PER_SECOND);
               if (second === previousSecond.current) return;
               previousSecond.current = second;
               setPosition(next);

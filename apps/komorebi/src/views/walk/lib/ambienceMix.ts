@@ -1,4 +1,4 @@
-import { TIME, WEATHER, type TimeOfDay, type Weather } from '../model/constants/walk';
+import { TIME, WEATHER, type TimeOfDay, type Weather } from '../config/walk';
 import { isIndoors, type Region } from '../model/world/world';
 
 export type AmbienceMix = {

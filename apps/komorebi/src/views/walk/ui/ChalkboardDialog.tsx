@@ -1,19 +1,17 @@
 import { useId, useRef, useState, useSyncExternalStore } from 'react';
-import { CHALK_LAYER, CHALK_TOOL, type ChalkColor } from '../lib/chalkboard';
+import { CHALKS } from '../config/chalkboard';
+import { CHALK_LAYER, CHALK_TOOL } from '../lib/chalkboard';
 import { CHALK_NOTICE, useChalkPad, type ChalkBrush, type ChalkNotice } from '../model/hooks/useChalkPad';
 import { useModal } from '../model/hooks/useModal';
 import { chalkboardStore } from '../model/store/chalkboard';
 import { Icon } from './Icon';
 
-type Props = { isOpen: boolean; onClose: () => void };
+interface ChalkboardDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
-const CHALKS: { id: ChalkColor; name: string }[] = [
-  { id: 'white', name: '흰 분필' },
-  { id: 'yellow', name: '노란 분필' },
-  { id: 'pink', name: '분홍 분필' },
-];
-
-export function ChalkboardDialog({ isOpen, onClose }: Props) {
+export function ChalkboardDialog({ isOpen, onClose }: ChalkboardDialogProps) {
   const ref = useModal(isOpen);
   const titleId = useId();
   const canvasRef = useRef<HTMLCanvasElement>(null);

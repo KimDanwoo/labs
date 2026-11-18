@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { MS_PER_SECOND } from '../config/time';
 import { sleepingPortrait, type CharacterTemplate } from '../model/world/appearance';
 import type { Point } from '../model/world/world';
 import { lightSprite } from './nightLights';
@@ -76,7 +77,7 @@ export function createBedRest(scene: THREE.Scene, painting: THREE.ShaderMaterial
     },
     update(darkness: number, glow: number, isStill: boolean) {
       if (!origin) return null;
-      clock = (performance.now() - startedAt) / 1000;
+      clock = (performance.now() - startedAt) / MS_PER_SECOND;
       const enter = smooth(clock / 0.75);
       const bedside = origin.x > 76 ? { x: 82, z: 69 } : { x: 69.5, z: 68.5 };
       const leave = smooth((clock - 3.85) / 0.65);
