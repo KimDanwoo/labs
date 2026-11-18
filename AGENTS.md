@@ -76,7 +76,7 @@ apps/<app>/
     views/home/
       index.ts                 # 공개 API — 슬라이스의 유일한 출입구
       index.server.ts          # 서버 전용 코드가 있을 때만
-      ui/                      # 컴포넌트 (HomeView.tsx 포함) + 필요할 때만 <이름>.styles.ts(변형 표)·<이름>.module.css
+      ui/                      # 컴포넌트 (HomeView.tsx 포함) + 필요할 때만 <이름>.module.css
       model/                   # 상태·비즈니스 로직·타입 (model/hooks, model/store, model/types …)
       api/                     # 백엔드 통신
       lib/                     # 슬라이스 내부 보조 코드(알고리즘·그래픽)
@@ -116,7 +116,8 @@ tsx 파일은 "무엇을 그리는가"만 담는다. 값·로직·스타일은 �
 - **스타일 — 기준은 줄 수가 아니라 "다음 디자인 변경 때 몇 군데를 고치는가"**:
   - 한 번만 쓰는 레이아웃 클래스는 길어도 `className`에 그대로 둔다.
   - 여러 곳에서 반복되는 모양은 공용 컴포넌트로 뺀다(`PageContainer`·`PageTitle`·`EmptyState`처럼 앱 `shared/ui`, 한 슬라이스 안이면 그 `ui/`).
-  - 상태·변형별로 고르는 클래스 표(`styles.heat[level]`, `cva`)만 컴포넌트 옆 `ui/<이름>.styles.ts`에 둔다. tsx 최상위에는 상수를 둘 수 없어서다.
+  - 상태·변형별 클래스는 컴포넌트 안에서 분기마다 완성된 문자열로 고른다(`isDark ? '…' : '…'`, `{ sm: '…', lg: '…' }[size]`). 클래스를 `bg-${color}-500`처럼 조립하지 않는다. 조합이 정말 복잡한 공용 프리미티브만 같은 파일에 `cva`를 쓴다(검사가 최상위 `cva()`를 허용한다). `styles.ts`로 클래스를 옮기지 않는다.
+  - 정적 문자열만 든 `cn('a', 'b')`을 문자열로 합칠 때는 tailwind-merge가 지우던 충돌 클래스(예: `font-mono`와 앱 전용 `font-*`)가 되살아나지 않는지 `twMerge`로 확인한다.
   - 공용 컴포넌트로 뺀 뒤에도 상태·자식 선택자가 뒤엉켜 읽기 힘든 부분만 컴포넌트 옆 `ui/<이름>.module.css`로 분리한다. 모듈 안에서는 `@apply` 대신 테마 CSS 변수(`var(--color-primary)`)를 쓴다 — `@apply`는 모듈마다 `@reference`가 필요하고 Tailwind가 모듈 수만큼 다시 돈다([Tailwind: CSS modules](https://tailwindcss.com/docs/compatibility#css-modules)).
   - 인라인 `style`은 계산된 값(위치·진행률·`config` 값으로 만든 등장 지연 등)에만 쓴다.
   - 일반 CSS 파일은 앱 전역이면 `src/app/styles/`, 한 슬라이스 전용이면 그 슬라이스의 `styles/`에 둔다. `ui/`에는 `<이름>.module.css`만 둔다.
