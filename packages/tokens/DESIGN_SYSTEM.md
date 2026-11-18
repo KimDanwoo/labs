@@ -5,7 +5,7 @@
 ## 1. 목표 & 원칙
 
 - **하나의 시스템을 돌려쓴다.** 소스 오브 트루스는 `packages/tokens`(→ `@tokens/css`).
-- **베이스(공유)**: 중립 스케일·상태색·시맨틱 토큰 _이름 계약_·서체·간격·반경·그림자·`@ui/react` 컴포넌트.
+- **베이스(공유)**: 중립 스케일·상태색·시맨틱 토큰 _이름 계약_·서체·간격·반경·그림자. 컴포넌트는 앱마다 따로 둔다.
 - **스킨(앱별, 최소)**: `--brand-hue`·`--brand-chroma`. 그 밖의 오버라이드는 7절 예외만 허용한다.
 - **절제된 모던 유지**: 그라데이션·큰 글로우·grain·shimmer 지양. 강조는 단색 브랜드 1곳.
 
@@ -95,13 +95,13 @@ oklch(0.48 calc(0.20 * var(--brand-chroma)) var(--brand-hue))
 
 - **서체**: `font-sans` = `var(--font-maruburi)`(마루부리), `font-mono` = Geist Mono. `--font-maruburi`·`@font-face`는 `@tokens/css/fonts.css`가 정의하므로 앱은 함께 import한다.
 - **굵기**: `font-normal`(400)·`font-semibold`(600)·`font-bold`(700)만 토큰으로 둔다(마루부리가 400·600·700만 제공). `font-medium` 등은 `font-mono`와 함께일 때만 쓴다.
-- **간격은 두 스케일**: 앱 레이아웃은 이름 토큰(`xs` 4px ~ `3xl` 64px, `px-lg`·`gap-3xl`), `packages/ui`(shadcn 계열)와 fe-deep 내부는 Tailwind 숫자 스케일(`p-4` = 1rem). 임의 px 매직값은 쓰지 않는다.
+- **간격은 두 스케일**: 앱 레이아웃은 이름 토큰(`xs` 4px ~ `3xl` 64px, `px-lg`·`gap-3xl`), 앱 `src/shared/ui`의 shadcn 계열 컴포넌트와 fe-deep 내부는 Tailwind 숫자 스케일(`p-4` = 1rem). 임의 px 매직값은 쓰지 않는다.
 
 ## 9. 파이프라인 & 검사
 
 - `packages/tokens/src/{palette,colors,typography,spacing,shadow}.ts`가 유일 소스 → `scripts/buildTokens.ts` → `generated/theme.css`. 로컬은 `pnpm tokens`, 빌드는 turbo가 생성한다.
 - **`generated/theme.css`는 AUTO-GENERATED — 직접 수정 금지**(gitignore 대상).
-- **`pnpm lint`가 강제한다**(`scripts/check-architecture.mjs`의 `validateDesignTokens`): CSS에서 `@tokens/css/theme.css`를 import하는 워크스페이스와 `packages/ui`의 `.ts`·`.tsx`·`.astro`에서
+- **`pnpm lint`가 강제한다**(`scripts/check-architecture.mjs`의 `validateDesignTokens`): CSS에서 `@tokens/css/theme.css`를 import하는 워크스페이스의 `.ts`·`.tsx`·`.astro`에서
   - Tailwind 기본 팔레트 색 클래스
   - 임의 색 값(`bg-[#...]`, `[rgb(...)]`, `[oklch(...)]` 등)
   - 마루부리에 없는 굵기(`thin`·`extralight`·`light`·`medium`·`extrabold`·`black`, `font-mono`와 같은 줄이면 허용)

@@ -94,7 +94,7 @@ Tailwind v4는 `max-w-*`를 `--max-width` → `--spacing` → `--container` 순�
 ## 간격 스케일 두 가지
 
 - **이름 토큰** — `xs` 4px · `sm` 8px · `md` 16px · `lg` 24px · `xl` 32px · `2xl` 48px · `3xl` 64px. `px-lg`, `gap-3xl`처럼 쓴다. hub·design·soundlab·prairie 등 앱 레이아웃 간격에 쓴다.
-- **Tailwind 숫자 스케일** — `p-4` = 1rem. shadcn 기반인 `packages/ui`와 fe-deep에서 쓴다.
+- **Tailwind 숫자 스케일** — `p-4` = 1rem. 앱 `src/shared/ui`의 shadcn 계열 컴포넌트와 fe-deep에서 쓴다.
 
 임의 px 값(`p-[13px]` 등)은 쓰지 않는다. `spacing`에 `none` 키를 두지 않는다(`max-w-none`이 0으로 덮인다, `spacing.ts` 주석).
 

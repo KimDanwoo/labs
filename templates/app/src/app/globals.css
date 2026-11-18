@@ -2,8 +2,6 @@
 
 @import '@tokens/css/theme.css';
 
-@source '../../../../packages/ui/src/**/*.{ts,tsx}';
-
 body {
   background: var(--color-background);
   color: var(--color-foreground);

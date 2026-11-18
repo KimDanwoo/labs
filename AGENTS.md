@@ -15,16 +15,14 @@
 ```
 apps/
   hub/                # 포트폴리오 허브
-  design/             # 공유 디자인 시스템 미리보기
   fe-deep/            # 프론트엔드 학습 플랫폼
   awesome-sudoku/     # 스도쿠
   soundlab/           # 음악 플레이어
   komorebi/           # 픽셀 아트 산책
   prairie/            # 3D 초원
   danwoo-island/      # 포트폴리오 섬 드라이브(folio-2025 포크)
-packages/             # 공유 디자인 시스템 + 공유 설정
+packages/             # 공유 토큰 + 공유 설정
   tokens/  @tokens/css            # 디자인 토큰(TS) → theme.css 생성
-  ui/      @ui/react              # 앱 공용 표시 컴포넌트(Button/Card/ThemeToggle)
   config/  @config/tsconfig         # 공유 tsconfig(base / next)
   eslint-config/  @repo/eslint-config    # 공유 ESLint(flat): next + FSD 경계 강제
   prettier-config/ @repo/prettier-config # 공유 Prettier
@@ -40,11 +38,11 @@ scripts/new-app.mjs   # 새 앱 생성기
    - **`generated/theme.css`는 AUTO-GENERATED — 직접 수정 금지.**
    - **색은 2-tier**: atomic 팔레트(`palette.ts`의 `themeColors`/`commonColors`, 스케일 50–900) → semantic alias(`colors.ts`, primary/secondary/muted/accent/card + success/error/warning/info × base·foreground·subtle, light/dark). semantic은 atomic 스텝을 참조한다. `muted`는 표면색이고 흐린 글자는 `muted-foreground`다.
    - 스타일은 토큰 기반 Tailwind 유틸로만: 색 `bg-primary`/`text-muted-foreground`, 간격 `px-lg`/`gap-3xl`, 반경 `rounded-md`, 그림자 `shadow-md`/`shadow-glow` 등. **임의 hex/px 매직값 금지.**
-   - **간격은 두 스케일**: 앱 레이아웃은 이름 토큰(`xs` 4px ~ `3xl` 64px, `px-lg`), 공유 UI(`packages/ui`)와 fe-deep 내부는 Tailwind 숫자 스케일(`p-4` = 1rem)을 쓴다. `max-w-md` 같은 폭 유틸은 컨테이너 값(28rem)으로 생성된다.
+   - **간격은 두 스케일**: 앱 레이아웃은 이름 토큰(`xs` 4px ~ `3xl` 64px, `px-lg`), 앱 `src/shared/ui`의 shadcn 계열 컴포넌트와 fe-deep 내부는 Tailwind 숫자 스케일(`p-4` = 1rem)을 쓴다. `max-w-md` 같은 폭 유틸은 컨테이너 값(28rem)으로 생성된다.
    - **굵기는 `font-normal`·`font-semibold`·`font-bold`만**: 공통 서체 마루부리가 400·600·700만 제공한다. `font-medium` 등은 500을 가진 고정폭 서체(`font-mono`)에만 쓴다.
    - **앱 전용 색은 그 앱의 `@theme`에**: 상태·역할이 아닌 색(장식색, 카테고리색 등)은 공유 토큰에 넣지 않고 앱 전역 CSS에 토큰으로 정의해 쓴다. 상태색을 다른 의미로 빌려 쓰지 않는다.
    - **예외 앱**: komorebi·prairie·danwoo-island는 독립 디자인 프로젝트, awesome-sudoku는 자체 팔레트다(공유 색 토큰 미적용).
-   - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateDesignTokens`): 공유 토큰을 쓰는 앱과 `packages/ui`에서 기본 팔레트 색 클래스, 임의 색 값(`bg-[#...]`), 서체에 없는 굵기를 막는다. 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
+   - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateDesignTokens`): 공유 토큰을 쓰는 앱에서 기본 팔레트 색 클래스, 임의 색 값(`bg-[#...]`), 서체에 없는 굵기를 막는다. 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
 
 3. **새 앱은 스캐폴드로**: 손으로 만들지 말고 `pnpm new-app <name>`(소문자/숫자/하이픈). `templates/app`을 복제하고 `<name>`으로 채운다.
 
@@ -52,7 +50,7 @@ scripts/new-app.mjs   # 새 앱 생성기
 
 ## FSD 아키텍처 (앱 내부)
 
-각 앱은 `apps/<app>/src/` 아래에 FSD로 구성한다. 기준은 공식 FSD 2.1이다. **공유 디자인 시스템(`packages/ui`·`packages/tokens`)이 FSD의 `shared` UI 레이어 역할**을 하므로, 앱의 표시 프리미티브는 `@ui/react`에서 가져오고 앱 `src/shared`에는 그 앱 전용 공용 코드만 둔다.
+각 앱은 `apps/<app>/src/` 아래에 FSD로 구성한다. 기준은 공식 FSD 2.1이다. **공유 UI 패키지는 없다.** Button·Card 같은 표시 프리미티브도 각 앱의 `src/shared/ui`에 두고, 앱끼리 컴포넌트를 공유하지 않는다.
 
 **Next 라우팅과 FSD `app` 레이어는 분리한다 (합치기 금지).**
 
@@ -62,7 +60,7 @@ scripts/new-app.mjs   # 새 앱 생성기
 
 **레이어 의존성** (단방향, `@repo/eslint-config`의 `fsd.config.mjs`로 **lint 강제**): `app → views → features → entities → shared`
 
-- 하위 레이어는 상위를 import 불가. 같은 레이어의 다른 슬라이스 참조 금지. `packages/ui`·`@tokens/css`는 모든 레이어에서 사용 가능.
+- 하위 레이어는 상위를 import 불가. 같은 레이어의 다른 슬라이스 참조 금지. `@tokens/css`는 모든 레이어에서 사용 가능.
 - **`widgets` 레이어는 쓰지 않는다.** 한 화면 전용 블록은 그 view에, 여러 화면에서 쓰는 동작은 `features`에, 앱 전체 레이아웃은 `src/app`에 둔다.
 - 위반 시 `pnpm lint`가 에러로 막는다. 구조 규칙을 `eslint-disable`로 우회하지 않는다.
 
@@ -101,13 +99,13 @@ apps/<app>/
 
 **컴포넌트 인라인 선언 금지**: `views`·`features`·`entities`의 컴포넌트는 파일 하나에 하나씩, 이름과 파일명을 일치시켜 슬라이스의 `ui/` 세그먼트에 둔다.
 
-**Import 순서**: `prettier-plugin-organize-imports`가 저장/포맷 시 자동 정렬한다(수동 정렬 불필요, alphabetical). 큰 흐름은 내장 모듈 → 외부 패키지 → 절대경로(`@ui`/`@tokens`/`@app`…`@shared`) → 상대경로 → type import.
+**Import 순서**: `prettier-plugin-organize-imports`가 저장/포맷 시 자동 정렬한다(수동 정렬 불필요, alphabetical). 큰 흐름은 내장 모듈 → 외부 패키지 → 절대경로(`@tokens`/`@app`…`@shared`) → 상대경로 → type import.
 
 ## 컴포넌트 분리 원칙
 
 - **부모는 분기·합성, 자식은 구독·실행**: 메인 뷰는 블록 조합만, 각 블록 컴포넌트가 필요한 데이터를 직접 가져온다.
-- **표시-only 컴포넌트는 표시용 데이터만 props로** 받는다(도메인 상태를 알지 않는다). 예: `Card`/`Button`(`@ui/react`), `ProjectCard`(`project`만 받음).
-- **재사용 판단으로 위치 결정**: 여러 앱 공용 → `packages/ui`, 특정 앱 전용 → 그 앱의 적절한 FSD 레이어. 무리한 추상화는 피한다.
+- **표시-only 컴포넌트는 표시용 데이터만 props로** 받는다(도메인 상태를 알지 않는다). 예: `Card`/`Button`(`@shared/ui`), `ProjectCard`(`project`만 받음).
+- **컴포넌트는 앱 안에 둔다**: 다른 앱에 같은 컴포넌트가 필요하면 그 앱으로 복사해 맞게 고친다. 공유 패키지로 올리지 않는다. 앱 안에서는 FSD 위치 규칙을 따른다.
 
 ## 상태 관리 (도입 시)
 
