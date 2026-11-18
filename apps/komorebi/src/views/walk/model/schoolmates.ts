@@ -1,7 +1,7 @@
 import { CHARACTER, OUTFIT, type CharacterTemplate, type Outfit } from './world/appearance';
-import { canWalk, findRoute, type Point, type Region } from './world/world';
+import { canWalk, findRoute, REGION, type Point, type Region } from './world/world';
 
-export const SCHOOL_REGION = { yard: 'school', hallway: 'hallway', classroom: 'classroom' } as const;
+export const SCHOOL_REGION = { yard: REGION.school, hallway: REGION.hallway, classroom: REGION.classroom } as const;
 export type SchoolRegion = (typeof SCHOOL_REGION)[keyof typeof SCHOOL_REGION];
 export const SCHOOLMATE_ID = { boy: 'boy', girl: 'girl' } as const;
 export type SchoolmateId = (typeof SCHOOLMATE_ID)[keyof typeof SCHOOLMATE_ID];

@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import { COAST_BOAT_OUTLINE } from '../model/world/coastBoat';
 import { WATER } from '../model/world/water';
-import type { Region } from '../model/world/world';
+import { type Region, REGION } from '../model/world/world';
 import { canvasTexture } from './art';
 
 const SIZE = { width: 384, height: 256 };
 const STILL = 'rgb(0, 128, 128)';
-const BOAT_REGION: Region = 'coast';
+const BOAT_REGION: Region = REGION.coast;
 const EDGE_BLUR = 'blur(2px)';
 const FOAM_URL = '/art/sea-foam.webp';
 const GLITTER_URL = '/art/sea-glitter.webp';

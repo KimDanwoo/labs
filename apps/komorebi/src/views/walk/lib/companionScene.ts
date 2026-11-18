@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT, type Point, type Region } from '../model/world/world';
+import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT, REGION, type Point, type Region } from '../model/world/world';
 import { AQUARIUM_ART, aquariumFishArt, aquariumPose } from './aquarium';
 import { catchCelebration } from './catchCelebration';
 import {
@@ -161,8 +161,8 @@ export function createCompanionScene(scene: THREE.Scene, loader?: THREE.TextureL
       reducedMotion: boolean,
     ) {
       reactionAge += Math.max(0, dt);
-      tank.visible = region === 'home';
-      cat.visible = region === 'coast';
+      tank.visible = region === REGION.home;
+      cat.visible = region === REGION.coast;
       const feed = reaction === COMPANION_REACTION.feed && reactionAge < 3;
       const kept = state.fish.filter((fish) => fish.home === FISH_HOME.tank);
       swimmers.forEach(({ group, body }, i) => {

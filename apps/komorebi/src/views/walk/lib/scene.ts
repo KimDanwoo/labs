@@ -11,13 +11,13 @@ import {
 import { companionStore } from '../model/store/companions';
 import { DEFAULT_APPEARANCE, characterLayers, type Appearance } from '../model/world/appearance';
 import { FOREGROUNDS, foregroundOrder } from '../model/world/foreground';
-import { isAtHomeBed, isNearHomeBed } from '../model/world/interactions';
+import { isAtHomeBed, isNearHomeBed, isNearSpot } from '../model/world/interactions';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '../model/world/portals';
 import { surfaceAt, type Surface } from '../model/world/surfaces';
 import {
   DESTINATIONS,
-  FISHING_PIER,
   HOME_BED,
+  REGION,
   SPAWN,
   WORLDS,
   closestLandmark,
@@ -66,9 +66,9 @@ import { createSchoolmates } from './schoolmatesScene';
 import { createWaterMaps } from './water';
 import { createWaves } from './waves';
 
-const START_REGION: Region = 'village';
-const SEA_REGION: Region = 'coast';
-const CHALK_REGION: Region = 'classroom';
+const START_REGION: Region = REGION.village;
+const SEA_REGION: Region = REGION.coast;
+const CHALK_REGION: Region = REGION.classroom;
 const CAMERA_EPSILON = 0.01;
 const WARMTH_EPSILON = 0.002;
 const CHILD_ORDER = 4;
@@ -438,7 +438,7 @@ export async function createScene(
     jump.velocity = 0;
     jump.landing = 0;
     region = next;
-    if (next === 'home') void bedRest.prepare(currentAppearance.character);
+    if (next === REGION.home) void bedRest.prepare(currentAppearance.character);
     slide.direction = null;
     slide.input = null;
     position = { ...spawn };
@@ -448,8 +448,8 @@ export async function createScene(
     background.uniforms.lamps!.value = lamps.values;
     background.uniforms.waterMap!.value = waterMaps.of(next);
     background.uniforms.isSea!.value = next === SEA_REGION ? 1 : 0;
-    background.uniforms.isVillage!.value = next === 'village' ? 1 : 0;
-    background.uniforms.isHome!.value = next === 'home' ? 1 : 0;
+    background.uniforms.isVillage!.value = next === REGION.village ? 1 : 0;
+    background.uniforms.isHome!.value = next === REGION.home ? 1 : 0;
     background.uniforms.hasChalk!.value = next === CHALK_REGION ? 1 : 0;
     background.uniforms.sceneryStyle!.value = SCENERY_STYLE[next];
     background.uniforms.lampCount!.value = lamps.count;
@@ -549,7 +549,7 @@ export async function createScene(
     });
   };
   async function startSleep() {
-    const canSleep = () => !disposed && !paused && region === 'home' && !isAirborne(jump) && isAtHomeBed(position);
+    const canSleep = () => !disposed && !paused && region === REGION.home && !isAirborne(jump) && isAtHomeBed(position);
     if (preparingSleep || sleepBlocked || !canSleep()) return;
     preparingSleep = true;
     const template = currentAppearance.character;
@@ -617,8 +617,8 @@ export async function createScene(
     return { walking, sprinting, frameTravel };
   }
   function arriveAt() {
-    if (region !== 'home' || !isNearHomeBed(position)) sleepBlocked = false;
-    if (region === 'home' && isAtHomeBed(position)) void startSleep();
+    if (region !== REGION.home || !isNearHomeBed(position)) sleepBlocked = false;
+    if (region === REGION.home && isAtHomeBed(position)) void startSleep();
     if (blockedPortal && !isInsidePortal(position, blockedPortal)) {
       blockedPortal = null;
       cancelledPortal = null;
@@ -895,7 +895,7 @@ export async function createScene(
         currentAppearance = next;
         character.setOutfit(texture);
         container.dataset.appearance = `${next.character}-${next.outfit}`;
-        if (region === 'home') void bedRest.prepare(next.character);
+        if (region === REGION.home) void bedRest.prepare(next.character);
         wake();
         return true;
       } catch {
@@ -948,7 +948,7 @@ export async function createScene(
       wake();
     },
     setBallGame(frame) {
-      if (frame && (!greetingId || region !== 'school' || weather === WEATHER.rain)) return false;
+      if (frame && (!greetingId || region !== REGION.school || weather === WEATHER.rain)) return false;
       if (frame && !ballFrame) {
         const friend = schoolmates.standing.find((friend) => friend.id === greetingId);
         const spot = friend ? schoolmatePlayPosition({ player: position, friend }) : null;
@@ -972,7 +972,7 @@ export async function createScene(
     },
     setFishing(frame) {
       if (frame && !fishingFrame) {
-        if (region !== 'coast' || Math.hypot(position.x - FISHING_PIER.x, position.z - FISHING_PIER.z) >= 1.6) return;
+        if (!isNearSpot('pier', position, region)) return;
         route = [];
         destination = null;
         keys.clear();

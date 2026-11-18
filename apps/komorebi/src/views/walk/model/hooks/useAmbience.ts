@@ -1,14 +1,14 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { TIME, WEATHER, type TimeOfDay, type Weather } from '../../config/walk';
 import { createAmbience } from '../../lib/audio';
-import type { Region } from '../world/world';
+import { REGION, type Region } from '../world/world';
 
 type Ambience = ReturnType<typeof createAmbience>;
 type Scene = { region: Region; time: TimeOfDay; weather: Weather };
 
 export function useAmbience(onUnavailable: () => void) {
   const audio = useRef<Ambience | null>(null);
-  const scene = useRef<Scene>({ region: 'village', time: TIME.day, weather: WEATHER.clear });
+  const scene = useRef<Scene>({ region: REGION.village, time: TIME.day, weather: WEATHER.clear });
   const [isOn, setIsOn] = useState(false);
   const [sound] = useState(() => ({
     step: (...args: Parameters<Ambience['step']>) => audio.current?.step(...args),

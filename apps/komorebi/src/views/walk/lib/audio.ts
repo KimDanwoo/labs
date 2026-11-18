@@ -1,6 +1,6 @@
 import { TIME, type TimeOfDay, type Weather } from '../config/walk';
 import { SURFACE, type Surface } from '../model/world/surfaces';
-import { PLACE_ACTION, type PlaceAction, type Region } from '../model/world/world';
+import { PLACE_ACTION, type PlaceAction, type Region, REGION } from '../model/world/world';
 import { ambienceMix, type AmbienceMix } from './ambienceMix';
 
 const MASTER_VOLUME = 0.22;
@@ -146,7 +146,7 @@ export function createAmbience() {
   const rainfall = layer(LAYER_VOLUME.rain);
   filteredNoise('highpass', 1_800, rainfall.gain);
 
-  let mix: AmbienceMix = ambienceMix('village', TIME.day);
+  let mix: AmbienceMix = ambienceMix(REGION.village, TIME.day);
   const callTimer = window.setInterval(() => {
     if (context.state !== 'running') return;
     if (mix.birds > 0) call(context, master, { pitch: 1_800, count: 3, gap: 0.19, level: mix.birds });
