@@ -131,8 +131,6 @@ export function checkRepository(root = ROOT) {
       .split(/^catalog:\s*$/m)[1]
       ?.split(/^[a-z]/m)[0] ?? '';
   const catalogNames = new Set([...catalog.matchAll(/^  ['"]?([^'":\n]+)['"]?:/gm)].map((match) => match[1]));
-  const template = path.join(root, 'templates/app');
-  if (existsSync(template)) roots.push(template);
   for (const dir of roots) {
     const relative = path.relative(root, dir) || '.';
     const manifest = JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'));
@@ -257,13 +255,13 @@ export function checkRepository(root = ROOT) {
     problems.push(`런타임 순환 참조: ${cycle.map((file) => path.relative(root, file)).join(' → ')}`);
   for (const leak of findServerLeaks(graph, clients, serverModules, actions))
     problems.push(`클라이언트의 서버 전용 코드 참조: ${leak.map((file) => path.relative(root, file)).join(' → ')}`);
-  return { problems, workspaceCount: workspaceNames.size, templateCount: roots.length - workspaceNames.size };
+  return { problems, workspaceCount: workspaceNames.size };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { problems, workspaceCount, templateCount } = checkRepository();
+  const { problems, workspaceCount } = checkRepository();
   if (problems.length) {
     console.error(problems.join('\n'));
     process.exitCode = 1;
-  } else console.log(`Architecture: ${workspaceCount} workspaces and ${templateCount} template checked.`);
+  } else console.log(`Architecture: ${workspaceCount} workspaces checked.`);
 }
