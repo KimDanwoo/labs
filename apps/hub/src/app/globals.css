@@ -2,8 +2,6 @@
 
 @import '@tokens/css/theme.css';
 
-@source '../../../../packages/ui/src/**/*.{ts,tsx}';
-
 :root {
   --font-display: var(--font-sans);
 }

@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     return [{ source: '/(.*)', headers: SECURITY_HEADERS }];
   },
 
-  transpilePackages: ['@ui/react', '@tokens/css'],
+  transpilePackages: ['@tokens/css'],
 };
 
 export default nextConfig;

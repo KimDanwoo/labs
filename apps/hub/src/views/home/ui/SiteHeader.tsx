@@ -1,4 +1,4 @@
-import { ThemeToggle } from '@ui/react';
+import { ThemeToggle } from '@shared/ui/ThemeToggle';
 import Link from 'next/link';
 
 export function SiteHeader() {
