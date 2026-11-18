@@ -124,6 +124,18 @@ const neighborsOf = ([r, c]: GridPosition): GridPosition[] =>
     ([nr, nc]) => nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE,
   );
 
+function isConnected(cells: GridPosition[]): boolean {
+  const remaining = new Set(cells.map(([r, c]) => key(r, c)));
+  const stack = cells.slice(0, 1);
+  stack.forEach(([r, c]) => remaining.delete(key(r, c)));
+  for (let current = stack.pop(); current; current = stack.pop()) {
+    for (const next of neighborsOf(current)) {
+      if (remaining.delete(key(...next))) stack.push(next);
+    }
+  }
+  return remaining.size === 0;
+}
+
 function layoutCages(solution: Grid, maxCageSize: number): GridPosition[][] {
   const cageOf = new Array<number>(SUDOKU_CELL_COUNT).fill(-1);
   const cages: GridPosition[][] = [];
@@ -149,19 +161,38 @@ function layoutCages(solution: Grid, maxCageSize: number): GridPosition[][] {
     cages.push(cage);
   }
 
+  const ownerOf = (p: GridPosition): GridPosition[] | undefined => cages[atIndex(cageOf, key(...p))];
+  const canDonate = (p: GridPosition, taker: GridPosition[]): boolean => {
+    const owner = ownerOf(p);
+    if (!owner || owner === taker || owner.length <= MIN_CAGE_SIZE || hasValue(taker, valueAt(p))) return false;
+    return isConnected(owner.filter((q) => key(...q) !== key(...p)));
+  };
+
   for (const cage of cages) {
     if (cage.length !== 1) continue;
     const cell = atIndex(cage, 0);
-    const host = neighborsOf(cell)
-      .map((p) => cages[atIndex(cageOf, key(...p))])
+    const neighbors = neighborsOf(cell);
+    const host = neighbors
+      .map(ownerOf)
       .find(
         (other) =>
           other !== undefined && other !== cage && other.length < maxCageSize && !hasValue(other, valueAt(cell)),
       );
-    if (!host) continue;
-    host.push(cell);
-    cageOf[key(...cell)] = cages.indexOf(host);
-    cage.length = 0;
+    if (host) {
+      host.push(cell);
+      cageOf[key(...cell)] = cages.indexOf(host);
+      cage.length = 0;
+      continue;
+    }
+    const donor = neighbors.find((p) => canDonate(p, cage));
+    const owner = donor && ownerOf(donor);
+    if (!donor || !owner) continue;
+    owner.splice(
+      owner.findIndex((q) => key(...q) === key(...donor)),
+      1,
+    );
+    cage.push(donor);
+    cageOf[key(...donor)] = cages.indexOf(cage);
   }
 
   return cages.filter((cage) => cage.length > 0);
