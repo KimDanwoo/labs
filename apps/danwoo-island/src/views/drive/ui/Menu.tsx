@@ -1,19 +1,7 @@
-import type { ComponentType } from 'react';
-
-import { MENU_SECTIONS, type MenuSectionName } from '../config/menu';
+import { MENU_SECTIONS } from '../config/menu';
 import { worldAsset } from '../config/worldAsset';
-import { CircuitContent } from './CircuitContent';
 import { CloseButton } from './CloseButton';
-import { ControlsContent } from './ControlsContent';
-import { HomeContent } from './HomeContent';
-import { OptionsContent } from './OptionsContent';
-
-const CONTENT_BY_SECTION = {
-  home: HomeContent,
-  options: OptionsContent,
-  controls: ControlsContent,
-  circuit: CircuitContent,
-} satisfies Record<MenuSectionName, ComponentType>;
+import { MENU_SECTION_CONTENTS } from './menuSectionContents';
 
 export function Menu() {
   return (
@@ -34,7 +22,7 @@ export function Menu() {
         <div className="container">
           <div className="contents js-contents">
             {MENU_SECTIONS.map(({ name }) => {
-              const Content = CONTENT_BY_SECTION[name];
+              const Content = MENU_SECTION_CONTENTS[name];
               return (
                 <div key={name} className={`js-content content ${name}-content`}>
                   <Content />

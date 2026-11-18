@@ -1,23 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-import { bootWorld } from '../lib/bootWorld';
-
-function reloadPage() {
-  window.location.reload();
-}
+import { reloadPage } from '../lib/reloadPage';
+import { useWorldBoot } from '../model/hooks/useWorldBoot';
 
 export function WorldBoot() {
-  const [hasFailed, setHasFailed] = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-    bootWorld(() => isMounted).catch(() => setHasFailed(true));
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { hasFailed } = useWorldBoot();
 
   if (!hasFailed) return null;
 

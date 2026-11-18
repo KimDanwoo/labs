@@ -47,3 +47,9 @@ export const GAMEPAD_CONTROLS: readonly GamepadControl[] = [
   { kind: 'shared', key: 'Select', action: '초기화' },
   { kind: 'shared', key: 'Start', action: '일시정지' },
 ];
+
+export const CONTROL_TABS = [
+  { name: 'mouse-keyboard', label: '키보드·마우스' },
+  { name: 'touch', label: '모바일·태블릿' },
+  { name: 'gamepad', label: '게임패드' },
+] as const;

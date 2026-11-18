@@ -1485,7 +1485,9 @@ html:not(.is-mode-touch) .blog .blog-all:hover {
   place-items: center;
   width: 40px;
   height: 40px;
-  transition: transform 0.15s, background-color 0.15s;
+  transition:
+    transform 0.15s,
+    background-color 0.15s;
   display: grid;
 }
 .jukebox .jukebox-button.is-toggle {
@@ -1581,7 +1583,9 @@ html:not(.is-mode-touch) .jukebox .jukebox-button:hover {
   gap: 10px;
   width: 100%;
   padding: 6px 10px 6px 6px;
-  transition: border-color 0.15s, transform 0.15s;
+  transition:
+    border-color 0.15s,
+    transform 0.15s;
   display: flex;
 }
 html:not(.is-mode-touch) .jukebox .jukebox-track:hover {
@@ -1650,8 +1654,7 @@ html:not(.is-mode-touch) .jukebox .jukebox-track:hover {
   text-shadow: 0 1px 16px #130c1e38;
   align-items: center;
   gap: 12px;
-  font:
-    700 22px/0.93 var(--ui-font);
+  font: 700 22px/0.93 var(--ui-font);
   display: flex;
   position: fixed;
 }
@@ -1794,7 +1797,9 @@ body:has(.menu.is-displayed) .island-identity {
   --glass-text: #f5f3f0;
   --glass-muted: rgb(245 243 240 / 70%);
   --accent: #e5533d;
-  --ui-font: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  --ui-font:
+    -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', 'Malgun Gothic', system-ui,
+    sans-serif;
 }
 .menu,
 .island-identity {
