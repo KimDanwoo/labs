@@ -1,7 +1,8 @@
-import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom, type CellProps } from '@entities/game';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { EMPTY_HIGHLIGHT } from '../../../config/board';
+import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom } from '../../store/primitives';
+import { type CellProps } from '../../types/board';
 import { useCellAccessibility } from './useCellAccessibility';
 import { useCellInteraction } from './useCellInteraction';
 import { useCellStyles } from './useCellStyles';

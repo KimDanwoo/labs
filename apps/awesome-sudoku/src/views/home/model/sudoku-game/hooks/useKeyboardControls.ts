@@ -1,6 +1,7 @@
-import { handleKeyInputAtom, selectedCellAtom } from '@entities/game';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
+import { handleKeyInputAtom } from '../../store/keyboardAtoms';
+import { selectedCellAtom } from '../../store/primitives';
 
 export const useKeyboardControls = () => {
   const handleKeyInput = useSetAtom(handleKeyInputAtom);

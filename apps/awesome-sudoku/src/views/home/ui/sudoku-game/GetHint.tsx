@@ -1,7 +1,8 @@
-import { getHintAtom, hintsRemainingAtom, timerActiveAtom } from '@entities/game';
 import { IconButton } from '@shared/ui/IconButton';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuLightbulb } from 'react-icons/lu';
+import { getHintAtom } from '../../model/store/hintAtoms';
+import { hintsRemainingAtom, timerActiveAtom } from '../../model/store/primitives';
 
 export const GetHint = () => {
   const getHint = useSetAtom(getHintAtom);

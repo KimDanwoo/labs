@@ -1,7 +1,8 @@
-import { fillCellAtom, timerActiveAtom } from '@entities/game';
 import { IconButton } from '@shared/ui/IconButton';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuEraser } from 'react-icons/lu';
+import { fillCellAtom } from '../../model/store/cellValueAtoms';
+import { timerActiveAtom } from '../../model/store/primitives';
 
 export const RemoveNumber = () => {
   const timerActive = useAtomValue(timerActiveAtom);

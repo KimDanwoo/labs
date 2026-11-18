@@ -1,6 +1,6 @@
-import { KillerCageLine } from '@entities/game';
 import { memo, useMemo } from 'react';
 import { useKillerCage } from '../../model/sudoku-game/hooks/useKillerCage';
+import { KillerCageLine } from './KillerCageLine';
 
 import { CageSumLabel } from './CageSumLabel';
 

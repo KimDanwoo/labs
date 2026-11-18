@@ -1,5 +1,5 @@
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@entities/game';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../../../config/board';
 
 export interface CellPosition {
   x: number;

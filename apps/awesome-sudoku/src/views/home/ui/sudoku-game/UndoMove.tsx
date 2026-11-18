@@ -1,7 +1,8 @@
-import { canUndoAtom, timerActiveAtom, undoAtom } from '@entities/game';
 import { IconButton } from '@shared/ui/IconButton';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuUndo2 } from 'react-icons/lu';
+import { canUndoAtom, undoAtom } from '../../model/store/historyAtoms';
+import { timerActiveAtom } from '../../model/store/primitives';
 
 export const UndoMove = () => {
   const undo = useSetAtom(undoAtom);

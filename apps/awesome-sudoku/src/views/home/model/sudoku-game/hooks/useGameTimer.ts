@@ -1,14 +1,9 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
 
-import {
-  currentTimeAtom,
-  formatTime,
-  incrementTimerAtom,
-  isCompletedAtom,
-  timerActiveAtom,
-  toggleTimerAtom,
-} from '@entities/game';
+import { formatTime } from '../../services/common';
+import { currentTimeAtom, isCompletedAtom, timerActiveAtom } from '../../store/primitives';
+import { incrementTimerAtom, toggleTimerAtom } from '../../store/timerAtoms';
 
 import { TIMER_STATE, TIMER_TICK_MS, type TimerState } from '../../../config/timer';
 

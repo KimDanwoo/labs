@@ -1,18 +1,16 @@
 'use client';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { type FC, useCallback, useMemo } from 'react';
+import { BOARD_SIZE, KEY_NUMBER } from '../../config/board';
+import { cellAt } from '../../lib/gridAccess';
+import { fillCellAtom, toggleNoteAtom } from '../../model/store/cellValueAtoms';
 import {
-  BOARD_SIZE,
-  KEY_NUMBER,
   boardAtom,
-  cellAt,
-  fillCellAtom,
   isNoteModeAtom,
   numberCountsAtom,
   selectedCellAtom,
   timerActiveAtom,
-  toggleNoteAtom,
-} from '@entities/game';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { type FC, useCallback, useMemo } from 'react';
+} from '../../model/store/primitives';
 import { NumberButton } from './NumberButton';
 
 export const SelectNumber: FC = () => {

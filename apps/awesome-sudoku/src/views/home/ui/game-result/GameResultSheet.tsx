@@ -1,16 +1,11 @@
 'use client';
-import {
-  MAX_MISTAKES,
-  currentTimeAtom,
-  formatTime,
-  isCompletedAtom,
-  isSuccessAtom,
-  mistakeCountAtom,
-} from '@entities/game';
 import { useDismissible } from '@shared/lib/useDismissible';
 import { BottomSheet } from '@shared/ui/bottom-sheet';
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
+import { MAX_MISTAKES } from '../../config/game';
+import { formatTime } from '../../model/services/common';
+import { currentTimeAtom, isCompletedAtom, isSuccessAtom, mistakeCountAtom } from '../../model/store/primitives';
 import { FailureIcon } from '../sudoku-game/FailureIcon';
 import { ListSelector } from '../sudoku-game/ListSelector';
 import { SuccessIcon } from '../sudoku-game/SuccessIcon';
