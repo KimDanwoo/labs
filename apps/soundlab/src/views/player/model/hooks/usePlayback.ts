@@ -12,8 +12,15 @@ import {
   trackUrl,
   widgetSrc,
 } from '../../api/widget';
-import { PLAYBACK_MESSAGE, READY_TIMEOUT_MS, RESUME_TAIL_MS, WIDGET_EVENT } from '../../config/playback';
+import {
+  PLAYBACK_MESSAGE,
+  READY_TIMEOUT_MS,
+  RESUME_TAIL_MS,
+  REWIND_ATTEMPT_LIMIT,
+  WIDGET_EVENT,
+} from '../../config/playback';
 import { MS_PER_SECOND } from '../../config/time';
+import { type PendingRewind, hasLostRewind, isRewindWatched } from '../../lib/rewindGuard';
 import { isValidPosition, validDuration } from '../../lib/widgetPayload';
 import { REPEAT_MODE } from '../constants/repeatMode';
 import { readStartTarget } from '../lastPlayed';
@@ -88,6 +95,9 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   // 곡을 바꿔도 듣던 지점부터 난다 — 곡이 바뀔 때만 세우고 play 시점에 되감는다.
   // 일시정지 후 재생이나 스크럽 후 재생은 세우지 않으므로 그 위치를 지킨다.
   const shouldRewind = useRef(false);
+  // play 직후 보낸 seekTo는 곧이어 위젯이 그 곡의 기억해 둔 위치로 덮어쓸 때가 있다(실측: 0을 한 번 보고한 뒤 ~20ms 만에 87초로).
+  // 되감은 뒤 잠시 progress를 지켜보고, 기억된 위치로 튀면 다시 되감는다.
+  const pendingRewind = useRef<PendingRewind | null>(null);
   const pauseAfterSwitch = useRef(false);
   const resume = useRef<{ index: number; ms: number } | null>(null);
   // 전환 요청의 세대. 위젯 콜백은 postMessage 왕복이라 빠른 연속 선택 시 낡은 응답이 늦게 도착한다
@@ -173,6 +183,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
             resume.current = null;
             instance.seekTo(at);
             anchor(at);
+            pendingRewind.current = { ms: at, since: performance.now(), attempts: 0 };
             if (pauseAfterSwitch.current) {
               pauseAfterSwitch.current = false;
               instance.pause();
@@ -209,9 +220,24 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
           playing.current = false;
           setIsPlaying(false);
         });
+        const isRewinding = (position: number) => {
+          const pending = pendingRewind.current;
+          if (!pending) return false;
+          const now = performance.now();
+          if (!isRewindWatched(pending, now) || pending.attempts >= REWIND_ATTEMPT_LIMIT) {
+            pendingRewind.current = null;
+            return false;
+          }
+          if (!hasLostRewind(pending, position, now)) return false;
+          pendingRewind.current = { ms: pending.ms, since: now, attempts: pending.attempts + 1 };
+          instance.seekTo(pending.ms);
+          anchor(pending.ms);
+          return true;
+        };
         instance.bind(WIDGET_EVENT.progress, (payload) => {
           writeBuffered(payload.loadedProgress);
           if (!isValidPosition(payload.currentPosition)) return;
+          if (isRewinding(payload.currentPosition)) return;
           trackListening(tracks[heldIndex.current]?.id ?? 0, payload.currentPosition, playing.current);
           report(payload.currentPosition);
           rememberIfDue(payload.currentPosition);
@@ -243,6 +269,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       ready.current = false;
       heldIndex.current = -1;
       holdsSet.current = false;
+      pendingRewind.current = null;
       soundIds.current = [];
       playing.current = false;
       pauseAfterSwitch.current = false;
@@ -290,6 +317,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       const stale = () => goSeq.current !== seq || widget.current !== instance || !ready.current;
       anchor(0);
       shouldRewind.current = true;
+      pendingRewind.current = null;
       pauseAfterSwitch.current = false;
       if (resume.current?.index !== next) resume.current = null;
       heldIndex.current = next;
@@ -467,6 +495,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       const position = Math.min(track.durationMs - 1, Math.max(0, ms));
       const instance = widget.current;
       if (instance && ready.current && heldIndex.current === index) {
+        pendingRewind.current = null;
         instance.seekTo(position);
         settle(position);
         frameState.position = position / track.durationMs;
@@ -529,6 +558,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       if (!Number.isFinite(ratio)) return;
       const clamped = Math.min(1, Math.max(0, ratio));
       const ms = clamped * frameState.durationMs;
+      pendingRewind.current = null;
       settle(ms);
       frameState.position = clamped;
       widget.current?.seekTo(ms);

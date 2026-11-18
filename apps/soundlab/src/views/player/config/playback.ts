@@ -13,6 +13,9 @@ export const READY_TIMEOUT_MS = 10_000;
 
 export const SAVE_INTERVAL_MS = 5000;
 export const RESUME_TAIL_MS = 5000;
+export const REWIND_TOLERANCE_MS = 1500;
+export const REWIND_WATCH_MS = 2000;
+export const REWIND_ATTEMPT_LIMIT = 3;
 export const LISTEN_STEP_LIMIT_MS = 5000;
 export const SESSION_EVENT_LIMIT = 2;
 
