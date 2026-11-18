@@ -44,3 +44,7 @@ export const frameState = {
   buffered: 0,
   durationMs: 0,
 };
+
+export const writeBuffered = (loaded: number | undefined) => {
+  if (typeof loaded === 'number' && Number.isFinite(loaded)) frameState.buffered = Math.min(1, Math.max(0, loaded));
+};

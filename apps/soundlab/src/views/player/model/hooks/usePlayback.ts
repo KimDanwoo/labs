@@ -1,14 +1,22 @@
 'use client';
 
 import type { Track } from '@entities/track';
-import { useFrame } from '@shared/lib/frame';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { type ScWidget, loadWidgetApi, mountEngineFrame, setUrl, soundId, trackUrl, widgetSrc } from '../../api/widget';
-import { type PositionReport, advanceClock, estimatePosition } from '../../lib/playbackClock';
+import {
+  type ScWidget,
+  loadWidgetApi,
+  mountEngineFrame,
+  readSoundIds,
+  setUrl,
+  trackUrl,
+  widgetSrc,
+} from '../../api/widget';
+import { PLAYBACK_MESSAGE, READY_TIMEOUT_MS, RESUME_TAIL_MS, WIDGET_EVENT } from '../../config/playback';
+import { MS_PER_SECOND } from '../../config/time';
+import { isValidPosition, validDuration } from '../../lib/widgetPayload';
 import { REPEAT_MODE } from '../constants/repeatMode';
-import { readStartTarget, writeLastPlayed } from '../lastPlayed';
-import { LISTEN_SOURCE, recordListeningAtom, recordSessionAtom, SESSION_EVENT } from '../library';
+import { readStartTarget } from '../lastPlayed';
 import { type PlaybackQueue, adjacentTrack, playableIds, resolveQueue } from '../queue';
 import {
   currentIndexAtom,
@@ -22,45 +30,14 @@ import {
   repeatModeAtom,
   resumeNoticeAtom,
   shuffleAtom,
+  writeBuffered,
 } from '../store/playback';
+import { useLastPlayed } from './useLastPlayed';
+import { useListeningLog } from './useListeningLog';
+import { usePlaybackClock } from './usePlaybackClock';
 import { useVolumeFade } from './useVolumeFade';
 
-/** 위젯 콜백은 undefined를 줄 수 있다. 비유한값이 frameState로 새면 시간 표시가 NaN이 된다. */
-const validDuration = (value: unknown, fallback: number) =>
-  typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : fallback;
-
 const PLAY_CURRENT = -1;
-
-/** 위젯이 준 사운드 목록을 위치 그대로 id 배열로 옮긴다. 자리를 지우지 않는 게 핵심이다. */
-const readSoundIds = (sounds: unknown[]) => (Array.isArray(sounds) ? sounds.map(soundId) : []);
-
-const EVENTS = {
-  ready: 'ready',
-  play: 'play',
-  pause: 'pause',
-  finish: 'finish',
-  progress: 'playProgress',
-  buffer: 'loadProgress',
-  error: 'error',
-} as const;
-
-/** ready가 이 안에 안 오면 엔진이 막힌 것으로 본다 — w.soundcloud.com은 광고 차단기가 흔히 막는다. */
-const READY_TIMEOUT_MS = 10_000;
-const ENGINE_BLOCKED_MESSAGE =
-  '재생 엔진이 응답하지 않습니다. 광고 차단기가 soundcloud.com을 막고 있는지 확인해 주세요.';
-const TRACK_FAILED_MESSAGE = '곡을 재생할 수 없습니다. 잠시 후 다시 시도해 주세요.';
-
-const MS_PER_SECOND = 1000;
-
-const isValidPosition = (value: unknown): value is number =>
-  typeof value === 'number' && Number.isFinite(value) && value >= 0;
-
-const writeBuffered = (loaded: number | undefined) => {
-  if (typeof loaded === 'number' && Number.isFinite(loaded)) frameState.buffered = Math.min(1, Math.max(0, loaded));
-};
-
-const SAVE_INTERVAL_MS = 5000;
-const RESUME_TAIL_MS = 5000;
 
 export type Playback = {
   startQueue: (queue: PlaybackQueue) => void;
@@ -82,26 +59,10 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   const [queue, setQueue] = useAtom(playbackQueueAtom);
   const setResumeNotice = useSetAtom(resumeNoticeAtom);
   const setRecoveryNotice = useSetAtom(recoveryNoticeAtom);
-  const recordListening = useSetAtom(recordListeningAtom);
-  const recordSession = useSetAtom(recordSessionAtom);
-  const sessionTracks = useRef(new Set<number>());
-  const openedAt = useRef(0);
-  useEffect(() => {
-    openedAt.current = performance.now();
-  }, []);
   const [retryGeneration, setRetryGeneration] = useState(0);
   const queueRef = useRef(queue);
-  const listening = useRef({ id: 0, ms: 0, position: 0, at: 0 });
-  const flushListening = useCallback(() => {
-    const pending = listening.current;
-    if (pending.ms > 0)
-      recordListening({
-        id: pending.id,
-        elapsedMs: pending.ms,
-        source: queueRef.current ? LISTEN_SOURCE.collection : LISTEN_SOURCE.all,
-      });
-    pending.ms = 0;
-  }, [recordListening]);
+  const listening = useListeningLog(queueRef);
+  const flushListening = listening.flush;
   useEffect(() => {
     queueRef.current = queue;
   }, [queue]);
@@ -112,12 +73,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   // api.js가 로드되면 widget.current는 곧바로 채워지지만, iframe이 ready를 보내기 전까지
   // 메서드 호출(postMessage)은 받는 쪽이 없어 그대로 사라진다 — 첫 클릭이 삼켜지는 창이다.
   const ready = useRef(false);
-  // PLAY_PROGRESS는 수백 ms 간격이라 60fps에 부족하다. 마지막 보고값과 시각을 남겨 rAF에서 보간한다.
-  // live = 그 보고가 "지금 흐르는 소리"의 것인가. play 이벤트는 버퍼링 전에 오므로
-  // 첫 보고를 받기 전까지 보간을 세워둔다 — 안 세우면 소리 없이 시간이 흐르다 0으로 되돌아간다.
-  const reported = useRef<PositionReport>({ ms: 0, at: 0, live: false });
-  const smoothMs = useRef(0);
   const playing = useRef(false);
+  const clock = usePlaybackClock(playing);
   const advance = useRef<() => void>(() => {});
   // 위젯이 지금 세트를 들고 있는가. 들고 있으면 전환이 skip으로 끝나 새 재생을 시작하지 않는다
   // — 백그라운드 자동 전환의 조건이다. 세트 밖 곡을 load하면 세트를 잃고 false가 된다.
@@ -133,36 +90,28 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   const shouldRewind = useRef(false);
   const pauseAfterSwitch = useRef(false);
   const resume = useRef<{ index: number; ms: number } | null>(null);
-  const savedAt = useRef(0);
   // 전환 요청의 세대. 위젯 콜백은 postMessage 왕복이라 빠른 연속 선택 시 낡은 응답이 늦게 도착한다
   // — 그대로 두면 나중에 온 이전 곡의 skip이 이겨서 "누른 곡이 아니라 아까 곡"이 난다.
   const goSeq = useRef(0);
   const queued = useRef<number | null>(null);
   const flushQueued = useRef<() => void>(() => {});
   const { playFaded, pauseFaded, restoreVolume, silence, stopFade } = useVolumeFade();
+  const { remember, rememberIfDue } = useLastPlayed(tracks, heldIndex);
+  const { anchor, report, settle, interpolated, reportedMs } = clock;
+  const { track: trackListening, restart: restartListening } = listening;
 
   useEffect(() => {
     playing.current = isPlaying;
   }, [isPlaying]);
 
-  const remember = useCallback(
-    (ms: number) => {
-      const track = tracks[heldIndex.current];
-      if (!track || !Number.isFinite(ms)) return;
-      savedAt.current = performance.now();
-      writeLastPlayed({ id: track.id, ms: Math.round(Math.max(0, ms)) });
-    },
-    [tracks],
-  );
-
   useEffect(() => {
     const onHide = () => {
-      remember(reported.current.ms);
+      remember(reportedMs());
       flushListening();
     };
     window.addEventListener('pagehide', onHide);
     return () => window.removeEventListener('pagehide', onHide);
-  }, [flushListening, remember]);
+  }, [flushListening, remember, reportedMs]);
 
   // 소리를 자동으로 내지는 않는다 — 브라우저가 제스처 없는 재생을 막는다. 첫 재생 조작에서 이어진다.
   useEffect(() => {
@@ -175,8 +124,8 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     resume.current = { index: at, ms: target.ms };
     setResumeNotice(target.ms);
     frameState.durationMs = track.durationMs;
-    reported.current = { ms: target.ms, at: performance.now(), live: false };
-  }, [initialTrackId, setIndex, setResumeNotice, tracks]);
+    anchor(target.ms);
+  }, [anchor, initialTrackId, setIndex, setResumeNotice, tracks]);
 
   useEffect(() => {
     let disposed = false;
@@ -184,7 +133,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     const frame = mountEngineFrame(widgetSrc(setUrl(tracks) ?? (first ? trackUrl(first) : '')));
 
     const readyTimer = setTimeout(() => {
-      setEngineError(ENGINE_BLOCKED_MESSAGE);
+      setEngineError(PLAYBACK_MESSAGE.engineBlocked);
       setIsReady(false);
     }, READY_TIMEOUT_MS);
 
@@ -194,7 +143,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         const instance = sc.Widget(frame);
         widget.current = instance;
 
-        instance.bind(EVENTS.ready, () => {
+        instance.bind(WIDGET_EVENT.ready, () => {
           if (disposed) return;
           instance.getSounds((sounds) => {
             if (disposed) return;
@@ -213,13 +162,9 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
             frameState.durationMs = validDuration(ms, frameState.durationMs);
           });
         });
-        // 보간을 지금 값에 못 박고 세운다. 일시정지 중 흐른 벽시계 시간이 재생 순간 점프로 새지 않게.
-        const anchor = (ms: number) => {
-          reported.current = { ms, at: performance.now(), live: false };
-        };
-        const interpolated = () => estimatePosition(reported.current, playing.current, performance.now());
 
-        instance.bind(EVENTS.play, () => {
+        // 보간을 지금 값에 못 박고 세운다. 일시정지 중 흐른 벽시계 시간이 재생 순간 점프로 새지 않게.
+        instance.bind(WIDGET_EVENT.play, () => {
           anchor(interpolated());
           // 볼륨이 아직 0인 지금 되감아야 이전 위치가 소리로 새지 않는다.
           if (shouldRewind.current) {
@@ -256,52 +201,28 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
             });
           }
         });
-        instance.bind(EVENTS.pause, () => {
+        instance.bind(WIDGET_EVENT.pause, () => {
           // 마지막 보고는 최대 수백 ms 낡았다. 보간해온 값으로 고정해야 멈춘 순간 시간이 뒤로 안 튄다.
           anchor(interpolated());
-          remember(reported.current.ms);
+          remember(reportedMs());
           flushListening();
           playing.current = false;
           setIsPlaying(false);
         });
-        instance.bind(EVENTS.progress, (payload) => {
+        instance.bind(WIDGET_EVENT.progress, (payload) => {
           writeBuffered(payload.loadedProgress);
           if (!isValidPosition(payload.currentPosition)) return;
-          const pending = listening.current;
-          const currentId = tracks[heldIndex.current]?.id ?? 0;
-          const now = performance.now();
-          if (
-            playing.current &&
-            currentId > 0 &&
-            payload.currentPosition > 0 &&
-            !sessionTracks.current.has(currentId)
-          ) {
-            if (sessionTracks.current.size < 2)
-              recordSession({
-                kind: sessionTracks.current.size === 0 ? SESSION_EVENT.firstPlay : SESSION_EVENT.continued,
-                waitMs: now - openedAt.current,
-              });
-            sessionTracks.current.add(currentId);
-          }
-          const elapsed = payload.currentPosition - pending.position;
-          const wall = now - pending.at;
-          if (pending.id === currentId && elapsed > 0 && elapsed < 5000 && wall > 0 && wall < 5000) {
-            pending.ms += Math.min(elapsed, wall);
-          }
-          pending.id = currentId;
-          pending.position = payload.currentPosition;
-          pending.at = now;
-          if (pending.ms >= SAVE_INTERVAL_MS) flushListening();
-          reported.current = { ms: payload.currentPosition, at: performance.now(), live: true };
-          if (performance.now() - savedAt.current >= SAVE_INTERVAL_MS) remember(payload.currentPosition);
+          trackListening(tracks[heldIndex.current]?.id ?? 0, payload.currentPosition, playing.current);
+          report(payload.currentPosition);
+          rememberIfDue(payload.currentPosition);
         });
-        instance.bind(EVENTS.buffer, (payload) => writeBuffered(payload.loadedProgress));
-        instance.bind(EVENTS.error, () => {
-          setEngineError(TRACK_FAILED_MESSAGE);
+        instance.bind(WIDGET_EVENT.buffer, (payload) => writeBuffered(payload.loadedProgress));
+        instance.bind(WIDGET_EVENT.error, () => {
+          setEngineError(PLAYBACK_MESSAGE.trackFailed);
           setIsPlaying(false);
           flushListening();
         });
-        instance.bind(EVENTS.finish, () => {
+        instance.bind(WIDGET_EVENT.finish, () => {
           // 다음 곡(또는 반복)은 0부터다. 끝난 위치를 물고 있으면 그 곡의 첫 순간이 끝 시간으로 보인다.
           flushListening();
           anchor(0);
@@ -311,7 +232,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       .catch(() => {
         if (disposed) return;
         clearTimeout(readyTimer);
-        setEngineError('재생 엔진을 불러오지 못했습니다. 연결을 확인하고 다시 시도해 주세요.');
+        setEngineError(PLAYBACK_MESSAGE.engineFailed);
       });
 
     return () => {
@@ -325,8 +246,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       soundIds.current = [];
       playing.current = false;
       pauseAfterSwitch.current = false;
-      goSeq.current++;
-      for (const event of Object.values(EVENTS)) owned?.unbind(event);
+      for (const event of Object.values(WIDGET_EVENT)) owned?.unbind(event);
       setIsReady(false);
       setIsPlaying(false);
       clearTimeout(readyTimer);
@@ -334,9 +254,13 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       frame.remove();
     };
   }, [
+    anchor,
     flushListening,
+    interpolated,
     remember,
-    recordSession,
+    rememberIfDue,
+    report,
+    reportedMs,
     restoreVolume,
     retryGeneration,
     setEngineError,
@@ -347,6 +271,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     setResumeNotice,
     setRecoveryNotice,
     stopFade,
+    trackListening,
     tracks,
   ]);
 
@@ -354,7 +279,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     (next: number, track: Track) => {
       if (track.isAvailable === false) return;
       flushListening();
-      listening.current = { id: track.id, ms: 0, position: 0, at: 0 };
+      restartListening(track.id);
       setEngineError(null);
       const instance = widget.current;
       if (!instance || !ready.current) {
@@ -363,7 +288,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       }
       const seq = ++goSeq.current;
       const stale = () => goSeq.current !== seq || widget.current !== instance || !ready.current;
-      reported.current = { ms: 0, at: performance.now(), live: false };
+      anchor(0);
       shouldRewind.current = true;
       pauseAfterSwitch.current = false;
       if (resume.current?.index !== next) resume.current = null;
@@ -425,7 +350,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
         });
       });
     },
-    [flushListening, setEngineError, setEngineMode, silence, tracks],
+    [anchor, flushListening, restartListening, setEngineError, setEngineMode, silence, tracks],
   );
 
   // 곡을 바꾸는 도중에는 위젯이 새 곡을 곧 재생하므로, 지금 멈춰도 다시 튼다 — 새 곡이 시작되는 순간에 멈춘다
@@ -526,14 +451,14 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
   const retry = useCallback(() => {
     const track = tracks[index];
     if (!track || track.isAvailable === false) return;
-    resume.current = { index, ms: Math.max(0, reported.current.ms) };
+    resume.current = { index, ms: Math.max(0, reportedMs()) };
     heldIndex.current = -1;
     queued.current = index;
     ready.current = false;
     setEngineError(null);
     setRecoveryNotice(true);
     setRetryGeneration((generation) => generation + 1);
-  }, [index, setEngineError, setRecoveryNotice, tracks]);
+  }, [index, reportedMs, setEngineError, setRecoveryNotice, tracks]);
 
   const playFrom = useCallback(
     (ms: number) => {
@@ -543,8 +468,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       const instance = widget.current;
       if (instance && ready.current && heldIndex.current === index) {
         instance.seekTo(position);
-        reported.current = { ms: position, at: performance.now(), live: true };
-        smoothMs.current = position;
+        settle(position);
         frameState.position = position / track.durationMs;
         resume.current = null;
         setResumeNotice(null);
@@ -555,7 +479,7 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
       resume.current = { index, ms: position };
       goTo(index, track);
     },
-    [goTo, index, playFaded, setResumeNotice, tracks],
+    [goTo, index, playFaded, setResumeNotice, settle, tracks],
   );
 
   useEffect(() => {
@@ -600,15 +524,17 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     };
   }, [index, queue, repeatMode, setIsPlaying, shuffle, step, tracks]);
 
-  const seek = useCallback((ratio: number) => {
-    if (!Number.isFinite(ratio)) return;
-    const clamped = Math.min(1, Math.max(0, ratio));
-    const ms = clamped * frameState.durationMs;
-    reported.current = { ms, at: performance.now(), live: true };
-    smoothMs.current = ms;
-    frameState.position = clamped;
-    widget.current?.seekTo(ms);
-  }, []);
+  const seek = useCallback(
+    (ratio: number) => {
+      if (!Number.isFinite(ratio)) return;
+      const clamped = Math.min(1, Math.max(0, ratio));
+      const ms = clamped * frameState.durationMs;
+      settle(ms);
+      frameState.position = clamped;
+      widget.current?.seekTo(ms);
+    },
+    [settle],
+  );
 
   const seekBy = useCallback(
     (seconds: number) => {
@@ -622,19 +548,6 @@ export function usePlayback(tracks: readonly Track[], initialTrackId?: number): 
     const track = tracks[index];
     if (track) frameState.durationMs = validDuration(frameState.durationMs, track.durationMs);
   }, [index, tracks]);
-
-  useFrame((delta) => {
-    const { durationMs } = frameState;
-    if (!Number.isFinite(durationMs) || durationMs <= 0) return;
-    smoothMs.current = advanceClock({
-      smoothMs: smoothMs.current,
-      delta,
-      report: reported.current,
-      isPlaying: playing.current,
-      now: performance.now(),
-    });
-    frameState.position = Math.min(1, smoothMs.current / durationMs);
-  });
 
   return { select, toggle, step, seek, seekBy, startQueue, retry, playFrom };
 }

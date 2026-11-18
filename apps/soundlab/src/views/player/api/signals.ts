@@ -1,7 +1,8 @@
+import { REQUEST_TIMEOUT_MS, SIGNAL_DURATION_TOLERANCE_MS } from '../config/network';
 import { parseBandSignals, parseWaveform } from '../lib/signals';
 
 export async function fetchWaveform(url: string): Promise<Float32Array> {
-  const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+  const response = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   if (!response.ok) throw new Error(`파형 요청 실패: ${response.status}`);
   return parseWaveform(await response.json());
 }
@@ -21,7 +22,7 @@ const decodeBand = (base64: string) => {
 let manifest: Promise<Set<number>> | null = null;
 
 function fetchSignalManifest(): Promise<Set<number>> {
-  manifest ??= fetch('/signals/index.json', { signal: AbortSignal.timeout(10_000) })
+  manifest ??= fetch('/signals/index.json', { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) })
     .then(async (response): Promise<unknown> => (response.ok ? response.json() : []))
     .then(
       (ids) =>
@@ -37,10 +38,10 @@ function fetchSignalManifest(): Promise<Set<number>> {
 
 export async function fetchBands(trackId: number, durationMs: number) {
   if (!(await fetchSignalManifest()).has(trackId)) return null;
-  const response = await fetch(`/signals/${trackId}.json`, { signal: AbortSignal.timeout(10_000) });
+  const response = await fetch(`/signals/${trackId}.json`, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   if (!response.ok) return null;
   const raw = parseBandSignals(await response.json());
-  if (!raw || Math.abs(raw.audioMs - durationMs) > 250) return null;
+  if (!raw || Math.abs(raw.audioMs - durationMs) > SIGNAL_DURATION_TOLERANCE_MS) return null;
   return {
     fps: raw.fps,
     low: decodeBand(raw.low),
