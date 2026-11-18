@@ -3,7 +3,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { SPEECH_LANG, SPEECH_RATE } from '../../config/speech';
 
 import { pickKoreanVoice } from '../../lib/koreanVoice';
-import { getPreferredVoiceName, getSynth } from '../../lib/speechVoice';
+import { getSynth } from '../../lib/speechVoice';
 import { toSpeechChunks } from '../../lib/toSpeechChunks';
 
 const subscribeNever = () => () => {};
@@ -35,7 +35,7 @@ export function useSpeech(text: string) {
     const chunks = toSpeechChunks(text);
     if (chunks.length === 0) return;
 
-    const voice = pickKoreanVoice(synth.getVoices(), getPreferredVoiceName());
+    const voice = pickKoreanVoice(synth.getVoices());
     const stopSpeaking = () => setSpeakingText(null);
 
     chunks.forEach((chunk, index) => {
