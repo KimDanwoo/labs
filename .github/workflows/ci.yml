@@ -6,7 +6,7 @@ on:
     # 봇이 커밋하는 경로는 CI 대상에서 제외한다.
     paths-ignore:
       - 'apps/soundlab/src/entities/track/model/constants/tracks.ts'
-      - 'apps/soundlab/src/entities/track/model/constants/highlights.ts'
+      - 'apps/soundlab/src/views/player/model/constants/highlights.ts'
       - 'apps/soundlab/assets/og-title.ttf'
   push:
     branches: [main]
