@@ -20,6 +20,7 @@
 
 | 앱                                      | 설명                                    | 주요 스택             | 라이브                                           |
 | --------------------------------------- | --------------------------------------- | --------------------- | ------------------------------------------------ |
+| 청연사주 (별도 비공개 레포)             | 사주 풀이를 웹툰 컷으로 읽는 서비스     | Next.js, Supabase     | [saju.danwoo.dev](https://saju.danwoo.dev)       |
 | Dansoon (별도 비공개 레포)              | 프론트엔드 개발 기록 블로그             | Astro                 | [danwoo.dev](https://danwoo.dev)                 |
 | [`fe-deep`](apps/fe-deep)               | 프론트엔드 개념을 깊게 파고든 학습 기록 | Next.js, Markdown     | [fe-deep.danwoo.dev](https://fe-deep.danwoo.dev) |
 | [`awesome-sudoku`](apps/awesome-sudoku) | 난이도를 고르는 온라인 스도쿠           | Next.js, Web Worker   | [sudoku.danwoo.dev](https://sudoku.danwoo.dev)   |
