@@ -1,0 +1,3 @@
+export const FEEDBACK_LABEL_SEPARATOR = ':';
+
+export const MAX_FEEDBACK_LABEL_LENGTH = 20;

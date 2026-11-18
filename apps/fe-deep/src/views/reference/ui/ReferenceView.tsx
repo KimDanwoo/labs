@@ -1,14 +1,20 @@
+import { PageContainer } from '@shared/ui/PageContainer';
+import { PageTitle } from '@shared/ui/PageTitle';
+import Link from 'next/link';
+
 import { loadQuestionContent } from '@entities/question/index.server';
 import { Card } from '@shared/ui/Card';
-import Link from 'next/link';
+
+import { CATEGORY_CARD_STAGGER_MS } from '../config/motion';
+import { categoryHref } from '../lib/categoryHref';
 
 export async function ReferenceView() {
   const { categories } = await loadQuestionContent();
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-12">
+    <PageContainer width="wide">
       <div className="mb-10 animate-fade-in">
-        <h1 className="text-3xl font-bold tracking-tight mb-3">레퍼런스</h1>
+        <PageTitle className="mb-3">레퍼런스</PageTitle>
         <p className="text-muted-foreground">카테고리별 프론트엔드 핵심 개념을 탐색하세요.</p>
       </div>
 
@@ -16,9 +22,9 @@ export async function ReferenceView() {
         {categories.map((category, index) => (
           <Link
             key={category.id}
-            href={`/reference/${category.slug}`}
+            href={categoryHref(category.slug)}
             className="animate-fade-in-up"
-            style={{ animationDelay: `${index * 60}ms` }}
+            style={{ animationDelay: `${index * CATEGORY_CARD_STAGGER_MS}ms` }}
           >
             <Card className="card-hover hover:border-primary/30 cursor-pointer h-full group">
               <Card.Header>
@@ -36,6 +42,6 @@ export async function ReferenceView() {
           </Link>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }

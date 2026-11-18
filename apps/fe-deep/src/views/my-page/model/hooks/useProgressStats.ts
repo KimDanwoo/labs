@@ -1,17 +1,31 @@
 'use client';
 
-import { getCurrentStreak, getLocalProgress, getProgressByCategory, getStudyHeatmap } from '@entities/progress';
+import {
+  getCurrentStreak,
+  getLocalProgress,
+  getProgressByCategory,
+  getStudyHeatmap,
+  PROGRESS_STATUS,
+} from '@entities/progress';
 import { getAllCategories, getAllQuestions, type Category } from '@entities/question';
 import { useEffect, useState } from 'react';
 
-interface OverallStats {
+import { toPercent } from '../../lib/toPercent';
+
+export interface OverallStats {
   total: number;
   mastered: number;
   learning: number;
   unseen: number;
 }
 
-type CategoryStats = Record<string, { mastered: number; learning: number; unseen: number }>;
+export interface CategoryProgress {
+  mastered: number;
+  learning: number;
+  unseen: number;
+}
+
+type CategoryStats = Record<string, CategoryProgress>;
 
 export function useProgressStats() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -44,8 +58,8 @@ export function useProgressStats() {
       let mastered = 0;
       let learning = 0;
       for (const p of Object.values(progress)) {
-        if (p.status === 'mastered') mastered++;
-        else if (p.status === 'learning') learning++;
+        if (p.status === PROGRESS_STATUS.mastered) mastered++;
+        else if (p.status === PROGRESS_STATUS.learning) learning++;
       }
       setStats({ total: allQuestions.length, mastered, learning, unseen: allQuestions.length - mastered - learning });
 
@@ -65,8 +79,7 @@ export function useProgressStats() {
     };
   }, []);
 
-  const overallPercent =
-    stats && stats.total > 0 ? Math.round(((stats.mastered + stats.learning) / stats.total) * 100) : 0;
+  const overallPercent = stats ? toPercent(stats.mastered + stats.learning, stats.total) : 0;
 
   if (error) throw error;
 

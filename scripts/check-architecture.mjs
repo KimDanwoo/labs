@@ -15,10 +15,10 @@ const TOKEN_EXCEPTION = /token-exception:\s*\S/;
 const UNSUPPORTED_WEIGHT = /\bfont-(?:thin|extralight|light|medium|extrabold|black)\b/;
 const DEPLOYMENT_ENABLED = { '**': false, main: true };
 const BUILD_FILTER = /--filter=(\S+)/;
-const TIDY_APPS = new Set(['danwoo-island', 'hub']);
-const COMPONENT_WRAPPER = /^(?:memo|forwardRef|dynamic|lazy)$/;
+const TIDY_APPS = new Set(['danwoo-island', 'fe-deep', 'hub']);
+const COMPONENT_WRAPPER = /^(?:memo|forwardRef|dynamic|lazy|Object\.assign)$/;
 const STYLE_HOME =
-  /^src\/app\/(?:globals\.css|styles\/[^/]+\.css)$|^src\/(?:views|features|entities)\/[^/]+\/styles\/[^/]+\.css$/;
+  /^src\/app\/(?:globals\.css|styles\/[^/]+\.css)$|^src\/(?:views|features|entities)\/[^/]+\/styles\/[^/]+\.css$|^src\/(?:.*\/)?ui\/(?:.*\/)?[A-Z][A-Za-z0-9]*\.module\.css$/;
 
 export function validateManifest(manifest, workspaceNames, catalogNames) {
   const problems = [];
@@ -116,7 +116,7 @@ export function validateComponentModule(text, filename) {
 export function findMisplacedStyles(appRelativePaths) {
   return appRelativePaths
     .filter((file) => file.endsWith('.css') && !STYLE_HOME.test(file))
-    .map((file) => `${file}: CSS 파일은 src/app/styles/ 또는 슬라이스의 styles/에 둔다.`);
+    .map((file) => `${file}: CSS 파일은 src/app/styles/, 슬라이스의 styles/, 컴포넌트 옆 <이름>.module.css에만 둔다.`);
 }
 
 export function findImportCycles(graph) {

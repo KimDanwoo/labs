@@ -1,21 +1,24 @@
 'use client';
 
-import { Button } from '@shared/ui/Button';
+import { PageContainer } from '@shared/ui/PageContainer';
+import { PageTitle } from '@shared/ui/PageTitle';
 import { Flame, Trophy } from 'lucide-react';
 import Link from 'next/link';
 
-type LearnDoneProps = {
+import { Button } from '@shared/ui/Button';
+
+interface LearnDoneProps {
   questionCount: number;
   streak: number;
   onRestart: () => void;
-};
+}
 
 export function LearnDone({ questionCount, streak, onRestart }: LearnDoneProps) {
   return (
-    <div className="container mx-auto max-w-168 px-4 py-8 sm:py-12 animate-fade-in-up">
+    <PageContainer width="narrow" enter="rise">
       <div className="text-center py-16">
         <Trophy className="h-16 w-16 text-highlight mx-auto mb-5" />
-        <h1 className="text-3xl font-bold tracking-tight mb-3">학습 완료!</h1>
+        <PageTitle className="mb-3">학습 완료!</PageTitle>
         <p className="text-muted-foreground mb-6">{questionCount}문제를 모두 학습했습니다.</p>
 
         {streak > 0 && (
@@ -34,6 +37,6 @@ export function LearnDone({ questionCount, streak, onRestart }: LearnDoneProps) 
           </Button>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

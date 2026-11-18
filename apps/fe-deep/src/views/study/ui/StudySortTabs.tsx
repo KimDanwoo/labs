@@ -1,9 +1,11 @@
 import Link from 'next/link';
+
+import { studySortHref } from '../lib/studyHref';
 import { STUDY_SORT, STUDY_SORT_LABELS, type StudySort } from '../model/services/studySort';
 
-type StudySortTabsProps = {
+interface StudySortTabsProps {
   current: StudySort;
-};
+}
 
 export function StudySortTabs({ current }: StudySortTabsProps) {
   return (
@@ -11,7 +13,7 @@ export function StudySortTabs({ current }: StudySortTabsProps) {
       {Object.values(STUDY_SORT).map((sort) => (
         <Link
           key={sort}
-          href={`/study?sort=${sort}`}
+          href={studySortHref(sort)}
           aria-current={sort === current ? 'page' : undefined}
           className="rounded-md px-3 py-1 text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-background aria-[current=page]:font-normal aria-[current=page]:text-foreground aria-[current=page]:shadow-sm"
         >

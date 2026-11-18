@@ -1,22 +1,22 @@
 import { Card } from '@shared/ui/Card';
+import { PageContainer } from '@shared/ui/PageContainer';
+
 import { getStudyDocs } from '../model/server/studyDocs';
 import { parseStudySort, sortStudyDocs } from '../model/services/studySort';
+import { StudyDocTable } from './doc-table/StudyDocTable';
 import { StudyDevReload } from './StudyDevReload';
-import { StudyDocTable } from './StudyDocTable';
 import { StudySortTabs } from './StudySortTabs';
 
-export const metadata = { title: '면접 학습' };
-
-interface AdminStudyListPageProps {
+interface StudyViewProps {
   searchParams: Promise<{ sort?: string }>;
 }
 
-export async function StudyView({ searchParams }: AdminStudyListPageProps) {
+export async function StudyView({ searchParams }: StudyViewProps) {
   const sort = parseStudySort((await searchParams).sort);
   const docs = sortStudyDocs(await getStudyDocs(), sort);
 
   return (
-    <div className="container mx-auto max-w-4xl space-y-6 px-4 py-8 sm:py-12">
+    <PageContainer width="medium" className="space-y-6">
       <StudyDevReload />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -37,6 +37,6 @@ export async function StudyView({ searchParams }: AdminStudyListPageProps) {
       ) : (
         <StudyDocTable docs={docs} />
       )}
-    </div>
+    </PageContainer>
   );
 }

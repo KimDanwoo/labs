@@ -1,7 +1,8 @@
-import { loadQuestionContent } from '@entities/question/index.server';
-import { Button } from '@shared/ui/Button';
 import { ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
+
+import { loadQuestionContent } from '@entities/question/index.server';
+import { Button } from '@shared/ui/Button';
 
 export async function HomeView() {
   const { categories } = await loadQuestionContent();
