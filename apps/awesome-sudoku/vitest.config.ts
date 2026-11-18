@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./vitest.setup.ts'],
     globals: true,
   },
   resolve: {
@@ -16,7 +16,6 @@ export default defineConfig({
       '@entities': resolve(__dirname, './src/entities'),
       '@features': resolve(__dirname, './src/features'),
       '@shared': resolve(__dirname, './src/shared'),
-      '@test': resolve(__dirname, './src/test'),
     },
   },
 });
