@@ -26,6 +26,29 @@
 | **[프딥](https://fe-deep.danwoo.dev)**                                                                                   | **[스도쿠](https://sudoku.danwoo.dev)**                                      |
 | 프론트엔드 개념을 깊게 파고든 기록을 모아 둬요.<br><sub>React Query · Framer Motion · 마크다운 콘텐츠 · Playwright</sub> | 난이도를 골라 가볍게 한 판 즐겨요.<br><sub>Web Worker · Jotai · Vitest</sub> |
 
+## 구성
+
+하나의 레포에서 여러 앱을 같이 관리해요.
+
+```
+apps/
+  hub/               허브 (lab.danwoo.dev)
+  danwoo-island/     Danwoo Island
+  prairie/           Unicorn Rush
+  komorebi/          코모레비
+  soundlab/          soundlab
+  fe-deep/           프딥
+  awesome-sudoku/    스도쿠
+  cheongyeon-saju/   청연사주 (분리)
+  dansoon/           Dansoon (분리)
+packages/
+  tokens/            디자인 기본 룰과 공유 토큰(서체·간격 등)
+  config/            TypeScript 설정
+  eslint-config/     ESLint 설정(FSD 구조 규칙 포함)
+  prettier-config/   코드 포맷 설정
+  security-headers/  앱 공통 보안 헤더
+```
+
 ## 라이선스
 
 코드는 [MIT 라이선스](LICENSE)예요. 직접 만든 이미지와 음원은 따로 표시가 없으면 제가 권리를 가지고 있어요. 외부에서 가져온 코드와 에셋은 해당 폴더의 라이선스 파일을 따라요.
