@@ -1,0 +1,20 @@
+/* shadcn@4.23.0 dist/tailwind.css(MIT)에서 이 앱이 쓰는 아코디언 키프레임만 옮김 — https://github.com/shadcn-ui/ui */
+@theme inline {
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height, var(--accordion-panel-height, auto));
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height, var(--accordion-panel-height, auto));
+    }
+    to {
+      height: 0;
+    }
+  }
+}
