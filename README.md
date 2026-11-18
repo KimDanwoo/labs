@@ -18,13 +18,13 @@
 
 ## 그 밖의 앱
 
-| 앱                                      | 설명                                                     | 주요 스택             | 라이브                                           |
-| --------------------------------------- | -------------------------------------------------------- | --------------------- | ------------------------------------------------ |
-| [`dansoon`](apps/dansoon)               | 프론트엔드 개발 기록과 매주 바뀌는 책 순위를 모은 블로그 | Astro                 | [danwoo.dev](https://danwoo.dev)                 |
-| [`fe-deep`](apps/fe-deep)               | 프론트엔드 개념을 깊게 파고든 학습 기록                  | Next.js, Markdown     | [fe-deep.danwoo.dev](https://fe-deep.danwoo.dev) |
-| [`awesome-sudoku`](apps/awesome-sudoku) | 난이도를 고르는 온라인 스도쿠                            | Next.js, Web Worker   | [sudoku.danwoo.dev](https://sudoku.danwoo.dev)   |
-| [`hub`](apps/hub)                       | 프로젝트 갤러리                                          | Next.js, Tailwind CSS | [lab.danwoo.dev](https://lab.danwoo.dev)         |
-| [`design`](apps/design)                 | 공유 디자인 시스템 미리보기                              | Next.js, `@ui/react`  | —                                                |
+| 앱                                      | 설명                                    | 주요 스택             | 라이브                                           |
+| --------------------------------------- | --------------------------------------- | --------------------- | ------------------------------------------------ |
+| Dansoon (별도 비공개 레포)              | 프론트엔드 개발 기록 블로그             | Astro                 | [danwoo.dev](https://danwoo.dev)                 |
+| [`fe-deep`](apps/fe-deep)               | 프론트엔드 개념을 깊게 파고든 학습 기록 | Next.js, Markdown     | [fe-deep.danwoo.dev](https://fe-deep.danwoo.dev) |
+| [`awesome-sudoku`](apps/awesome-sudoku) | 난이도를 고르는 온라인 스도쿠           | Next.js, Web Worker   | [sudoku.danwoo.dev](https://sudoku.danwoo.dev)   |
+| [`hub`](apps/hub)                       | 프로젝트 갤러리                         | Next.js, Tailwind CSS | [lab.danwoo.dev](https://lab.danwoo.dev)         |
+| [`design`](apps/design)                 | 공유 디자인 시스템 미리보기             | Next.js, `@ui/react`  | —                                                |
 
 ---
 
@@ -33,7 +33,7 @@
 - **의존성 버전은 한 곳에서 관리한다.** 모든 버전은 `pnpm-workspace.yaml`의 `catalog:`에 두고, 앱이 버전을 직접 적으면 `pnpm lint`가 막는다. 의존성 업데이트는 Dependabot이 올린다.
 - **앱 내부 구조는 FSD 규칙을 lint로 강제한다.** `app → views → features → entities → shared` 방향만 허용하고, 위반은 `@repo/eslint-config`가 에러로 처리한다.
 - **디자인 토큰 밖의 값을 막는다.** 공유 토큰을 쓰는 앱에서 임의 색 값이나 서체에 없는 굵기를 쓰면 `scripts/check-architecture.mjs`가 실패시킨다.
-- **배포하는 앱은 모두 CSP와 보안 헤더를 붙인다.** 대부분은 공통 패키지 `@repo/security-headers`를 쓰고, komorebi와 dansoon은 `vercel.json`에 직접 둔다.
+- **배포하는 앱은 모두 CSP와 보안 헤더를 붙인다.** 대부분은 공통 패키지 `@repo/security-headers`를 쓰고, komorebi는 `vercel.json`에 직접 둔다.
 - **CI를 통과해야 운영에 반영된다.** `main`은 PR로만 바뀌고, Vercel이 빌드한 배포는 CI가 통과한 뒤에 운영 도메인에 연결된다. 빌드 결과는 Turborepo 원격 캐시로 재사용한다.
 - **AI 에이전트와 같은 규칙으로 일한다.** 구조·검증·커밋 규칙을 [AGENTS.md](AGENTS.md)에 두고, 사람과 에이전트 모두 이 문서를 따른다.
 
@@ -56,5 +56,5 @@
 
 다음은 MIT 적용 대상이 아니다.
 
-- **글과 직접 만든 미디어**: 블로그 글(`apps/dansoon/contents`)과 저장소의 이미지·음원 등 직접 만든 미디어 파일은 별도 표기가 없는 한 저작권자가 모든 권리를 갖는다(All rights reserved).
+- **글과 직접 만든 미디어**: 저장소의 이미지·음원 등 직접 만든 미디어 파일은 별도 표기가 없는 한 저작권자가 모든 권리를 갖는다(All rights reserved).
 - **외부에서 가져온 코드·에셋**: 해당 폴더의 라이선스 파일을 따른다.

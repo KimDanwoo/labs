@@ -79,7 +79,7 @@ oklch(0.48 calc(0.20 * var(--brand-chroma)) var(--brand-hue))
 | `--brand-chroma` | 브랜드 램프 채도 배율(낮추면 톤이 가라앉음) | `0.8`  |
 
 - 그 외 공유 토큰 오버라이드는 하지 않는다. 새 시맨틱 색이 필요하면 베이스에 추가한다.
-- **앱 전용 색은 그 앱 전역 CSS에**: 상태·역할이 아닌 색(장식색·카테고리색 등)은 공유 토큰에 넣지 않는다. 상태색을 다른 의미로 빌려 쓰지 않는다. 예) soundlab 팔레트(`void`·`paper`·`brass` 등), fe-deep `streak`·`highlight`·`study`·`heat-1..4`, prairie `prairie-*`, dansoon `--category-*`.
+- **앱 전용 색은 그 앱 전역 CSS에**: 상태·역할이 아닌 색(장식색·카테고리색 등)은 공유 토큰에 넣지 않는다. 상태색을 다른 의미로 빌려 쓰지 않는다. 예) soundlab 팔레트(`void`·`paper`·`brass` 등), fe-deep `streak`·`highlight`·`study`·`heat-1..4`, prairie `prairie-*`.
 
 ### 예외
 

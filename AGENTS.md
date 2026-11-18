@@ -22,7 +22,6 @@ apps/
   komorebi/           # 픽셀 아트 산책
   prairie/            # 3D 초원
   danwoo-island/      # 포트폴리오 섬 드라이브(folio-2025 포크)
-  dansoon/            # Astro 블로그
 packages/             # 공유 디자인 시스템 + 공유 설정
   tokens/  @tokens/css            # 디자인 토큰(TS) → theme.css 생성
   ui/      @ui/react              # 앱 공용 표시 컴포넌트(Button/Card/ThemeToggle)
@@ -117,7 +116,6 @@ apps/<app>/
 ## 코드 컨벤션
 
 - Lint/포맷은 **공유 설정 패키지**로 통일한다. 앱 `eslint.config.mjs`는 `@repo/eslint-config`의 `next.eslint.config.mjs` + `fsd.config.mjs`를 spread하고, 루트 `package.json`의 `"prettier": "@repo/prettier-config"`로 포맷을 맞춘다. Prettier: singleQuote, trailingComma: all, **printWidth 120**, `prettier-plugin-organize-imports`(import 정렬 자동). 앱별로 규칙을 따로 두지 않는다.
-  - **예외 — `dansoon`(Astro 앱)**: next 기반 공유 eslint·FSD는 프레임워크가 달라 적용하지 않는다. lint는 `astro check`에 맡기고, **포맷만 공유 규칙을 따른다** — 로컬 `prettier.config.cjs`가 `@repo/prettier-config`를 확장하고 `.astro` 파싱용 `prettier-plugin-astro`만 추가한다. Astro 앱이 dansoon 하나뿐이라 공유 eslint 프리셋은 만들지 않는다(YAGNI).
 - 함수 컴포넌트만(`React.FC` 지양). `type` 우선(확장 필요 시만 `interface`).
 - **Enum-like 매직 스트링 금지**: status/variant/step 같은 literal union은 `as const` 객체로 빼고 타입을 거기서 파생. 사용처는 상수 참조만(비교·세팅 둘 다 매직 리터럴 금지).
   ```ts
@@ -134,7 +132,7 @@ apps/<app>/
 Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬래시 커맨드가 이 규칙대로 커밋한다.)
 
 - **type**: `feat`(기능) · `fix`(버그) · `refactor`(동작 불변 구조 개선) · `chore`(빌드·설정·의존성) · `docs`(문서) · `style`(포맷 등 비로직) · `test`(테스트).
-- **scope**: 앱/패키지 이름(`soundlab`·`komorebi`·`hub`·`dansoon`·`tokens`·`ui` 등). repo 전역이면 생략.
+- **scope**: 앱/패키지 이름(`soundlab`·`komorebi`·`hub`·`tokens`·`ui` 등). repo 전역이면 생략.
 - **설명**: 한국어·명령형·간결. 무엇을 왜 했는지. 부연이 필요하면 `— 이유/절충`으로 덧붙인다(예: `feat(soundlab): 곡 공유 링크에 재생 위치 포함`).
 - **원자적 커밋**: 한 커밋 = 한 논리적 변경. 서로 다른 앱/관심사가 섞이면 나눠서 커밋한다.
 - **`main` 직접 커밋 금지**: main에서 작업했더라도 커밋 전 `<type>/<kebab-요약>` 브랜치를 파고(`git switch -c`) 거기에 커밋한다. push는 요청 시에만.
