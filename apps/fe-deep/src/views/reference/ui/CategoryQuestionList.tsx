@@ -1,7 +1,7 @@
 'use client';
 
 import { DIFFICULTY_CONFIG, DIFFICULTY_VALUES, type Difficulty, type Question } from '@entities/question';
-import { Button } from '@ui/react';
+import { Button } from '@shared/ui/Button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';

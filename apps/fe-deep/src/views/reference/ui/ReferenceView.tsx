@@ -1,5 +1,5 @@
 import { loadQuestionContent } from '@entities/question/index.server';
-import { Card } from '@ui/react';
+import { Card } from '@shared/ui/Card';
 import Link from 'next/link';
 
 export async function ReferenceView() {

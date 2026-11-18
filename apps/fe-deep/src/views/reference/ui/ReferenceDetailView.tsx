@@ -1,7 +1,8 @@
 import { findCategoryBySlug, questionsInCategory } from '@entities/question';
 import { loadQuestionContent } from '@entities/question/index.server';
 import { SITE_URL } from '@shared/config/site';
-import { Button, Sheet, SheetContent, SheetTitle, SheetTrigger } from '@ui/react';
+import { Button } from '@shared/ui/Button';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui/Sheet';
 import { Menu } from 'lucide-react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';

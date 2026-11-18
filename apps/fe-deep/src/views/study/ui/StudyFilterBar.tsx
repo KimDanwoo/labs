@@ -1,6 +1,7 @@
 'use client';
 
-import { Button, Checkbox } from '@ui/react';
+import { Button } from '@shared/ui/Button';
+import { Checkbox } from '@shared/ui/Checkbox';
 import {
   STUDY_FILTER,
   STUDY_TIER,

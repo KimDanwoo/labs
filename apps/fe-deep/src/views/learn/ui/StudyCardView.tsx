@@ -2,9 +2,12 @@
 
 import { type FollowUp, type Question, DifficultyBadge } from '@entities/question';
 import { cn } from '@shared/lib/cn';
+import { Badge } from '@shared/ui/Badge';
+import { Button } from '@shared/ui/Button';
+import { Card } from '@shared/ui/Card';
 import { KeywordCheck } from '@shared/ui/KeywordCheck';
 import { MarkdownRenderer } from '@shared/ui/MarkdownRenderer';
-import { Badge, Button, Card, Progress } from '@ui/react';
+import { Progress } from '@shared/ui/Progress';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Eye, RotateCcw, SkipForward } from 'lucide-react';
 

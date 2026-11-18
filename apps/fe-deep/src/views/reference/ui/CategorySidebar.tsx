@@ -2,7 +2,7 @@
 
 import type { Category } from '@entities/question';
 import { cn } from '@shared/lib/cn';
-import { ScrollArea } from '@ui/react';
+import { ScrollArea } from '@shared/ui/ScrollArea';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

@@ -1,6 +1,8 @@
 'use client';
 
-import { Badge, Card, Progress } from '@ui/react';
+import { Badge } from '@shared/ui/Badge';
+import { Card } from '@shared/ui/Card';
+import { Progress } from '@shared/ui/Progress';
 import { BookOpen, Brain, CheckCircle, Flame, Target } from 'lucide-react';
 import { useProgressStats } from '../model/hooks/useProgressStats';
 import { StudyHeatmap } from './StudyHeatmap';

@@ -7,8 +7,8 @@ import {
   setPreferredVoiceName,
   subscribePreferredVoice,
 } from '@shared/lib/speechVoice';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/Select';
 import { SpeakButton } from '@shared/ui/SpeakButton';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/react';
 import { useSyncExternalStore } from 'react';
 
 /** Radix Select는 빈 문자열 value를 허용하지 않아 자동 선택에 별도 값을 쓴다. */

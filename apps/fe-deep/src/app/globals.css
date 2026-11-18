@@ -7,9 +7,6 @@
 @import './styles/syntax-highlight.css';
 @import './styles/markdown.css';
 
-/* @ui/react 공용 컴포넌트의 Tailwind 클래스를 스캔 대상에 포함 (없으면 Button 간격 등 유틸이 생성 안 됨) */
-@source '../../../../packages/ui/src/**/*.{ts,tsx}';
-
 @layer base {
   * {
     @apply outline-ring/50;
