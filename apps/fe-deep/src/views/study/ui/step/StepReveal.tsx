@@ -1,6 +1,6 @@
-import { KeywordCheck } from '@shared/ui/KeywordCheck';
+import { KeywordCheck } from '@features/keyword-check';
+import { SpeakButton } from '@features/read-aloud';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
-import { SpeakButton } from '@shared/ui/SpeakButton';
 
 import type { StudyStep } from '../../lib/parseHandbook';
 import { AiFeedback } from './AiFeedback';

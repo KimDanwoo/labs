@@ -1,11 +1,12 @@
 'use client';
 
-import { QuestionAnswer, QuestionMeta, type Question } from '@entities/question';
+import { QuestionMeta, type Question } from '@entities/question';
 import { CardAccordionItem } from '@shared/ui/CardAccordionItem';
 
 import { formatQuestionNumber } from '../lib/formatQuestionNumber';
 import { useQuestionActions } from '../model/hooks/useQuestionActions';
 import { QuestionActions } from './QuestionActions';
+import { QuestionAnswer } from './QuestionAnswer';
 
 interface QuestionAccordionItemProps {
   question: Question;
