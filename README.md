@@ -1,6 +1,8 @@
 # Danwoo Lab
 
-아이디어를 구현하는 실험실이에요. 전체 목록은 [lab.danwoo.dev](https://lab.danwoo.dev)에서 볼 수 있어요.
+아이디어를 구현하는 실험실이에요. 모든 프로젝트는 허브 [lab.danwoo.dev](https://lab.danwoo.dev)에서 한눈에 볼 수 있어요.
+
+[![Danwoo Lab 허브](docs/readme/hub.webp)](https://lab.danwoo.dev)
 
 ## 프로젝트
 
@@ -21,9 +23,6 @@
 | :--------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
 | **[프딥](https://fe-deep.danwoo.dev)**                                       | **[스도쿠](https://sudoku.danwoo.dev)**                                      |
 | 프론트엔드 개념을 깊게 파고든 기록을 모아 둬요.                              | 난이도를 골라 가볍게 한 판 즐겨요.                                           |
-| [![hub](docs/readme/hub.webp)](https://lab.danwoo.dev)                       |                                                                              |
-| **[hub](https://lab.danwoo.dev)**                                            |                                                                              |
-| 이 프로젝트들을 모아 보여주는 소개 페이지예요.                               |                                                                              |
 
 ## 라이선스
 
