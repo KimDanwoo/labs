@@ -6,14 +6,20 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
 import { useState } from 'react';
 
-export function AppProviders({ children }: { children: React.ReactNode }) {
+import { THEME } from '../config/theme';
+
+interface AppProvidersProps {
+  children: React.ReactNode;
+}
+
+export function AppProviders({ children }: AppProvidersProps) {
   const [queryClient] = useState(makeQueryClient);
 
   useAutoHideScrollbar();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+      <ThemeProvider attribute="class" defaultTheme={THEME.dark} enableSystem>
         {children}
       </ThemeProvider>
     </QueryClientProvider>
