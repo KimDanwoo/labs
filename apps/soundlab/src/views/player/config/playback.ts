@@ -14,6 +14,7 @@ export const READY_TIMEOUT_MS = 10_000;
 export const SAVE_INTERVAL_MS = 5000;
 export const RESUME_TAIL_MS = 5000;
 export const LISTEN_STEP_LIMIT_MS = 5000;
+export const SESSION_EVENT_LIMIT = 2;
 
 export const PLAYBACK_MESSAGE = {
   engineBlocked: '재생 엔진이 응답하지 않습니다. 광고 차단기가 soundcloud.com을 막고 있는지 확인해 주세요.',

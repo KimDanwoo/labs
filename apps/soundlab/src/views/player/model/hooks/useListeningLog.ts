@@ -2,11 +2,9 @@
 
 import { useSetAtom } from 'jotai';
 import { type RefObject, useCallback, useEffect, useRef } from 'react';
-import { LISTEN_STEP_LIMIT_MS, SAVE_INTERVAL_MS } from '../../config/playback';
+import { LISTEN_STEP_LIMIT_MS, SAVE_INTERVAL_MS, SESSION_EVENT_LIMIT } from '../../config/playback';
 import { LISTEN_SOURCE, recordListeningAtom, recordSessionAtom, SESSION_EVENT } from '../library';
 import type { PlaybackQueue } from '../queue';
-
-const SESSION_EVENT_LIMIT = 2;
 
 export function useListeningLog(queue: RefObject<PlaybackQueue | null>) {
   const recordListening = useSetAtom(recordListeningAtom);
