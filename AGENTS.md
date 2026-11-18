@@ -62,7 +62,7 @@ packages/             # 공유 서체 + 공유 설정
 - **`widgets` 레이어는 쓰지 않는다.** 한 화면 전용 블록은 그 view에, 여러 화면에서 쓰는 동작은 `features`에, 앱 전체 레이아웃은 `src/app`에 둔다.
 - 위반 시 `pnpm lint`가 에러로 막는다. 구조 규칙을 `eslint-disable`로 우회하지 않는다.
 
-**어디에 둘지 (pages-first)**: 먼저 쓰는 화면의 `views/<화면>`에 둔다. `features`·`entities`로 내리는 건 **지금 실제로 여러 화면에서 쓸 때만** 한다. 쓰는 곳이 하나뿐인 feature·entity는 그 view로 되돌린다. 화면이 하나뿐인 앱은 `src/app` + `views/<화면>` + (필요하면) `shared`만 가진다. 단, `src/app`(프로바이더 등)이나 Next 라우트 파일(`sitemap.ts`·`route.ts`·동적 라우트)도 함께 쓰는 도메인 코드는 views에서 가져올 수 없으므로 화면이 하나여도 `entities`에 둔다.
+**어디에 둘지 (pages-first)**: 먼저 쓰는 화면의 `views/<화면>`에 둔다. `features`·`entities`로 내리는 건 **지금 실제로 여러 화면에서 쓸 때만** 한다. 쓰는 곳이 하나뿐인 feature·entity는 그 view로 되돌린다. 화면이 하나뿐인 앱은 `src/app` + `views/<화면>` + (필요하면) `shared`만 가진다. 단, `src/app`(프로바이더 등)이나 Next 라우트 파일(`sitemap.ts`·`route.ts`·동적 라우트)도 함께 쓰는 도메인 코드는 views에서 가져올 수 없으므로 화면이 하나여도 `entities`에 둔다. 이때 `entities`에는 **그 바깥 파일이 실제로 가져다 쓰는 것만**(곡 목록·타입·URL 함수 등) 두고, 화면만 쓰는 상태·훅·UI는 view에 둔다. 프로바이더에 store 하나를 넘기려고 도메인 전체를 entities에 두지 않는다 — 프로바이더가 store를 직접 만들게 한다.
 
 **경로 별칭** (앱 `tsconfig.json`의 `paths`): `@app/` `@views/` `@features/` `@entities/` `@shared/` → `./src/<layer>/`. `@app/`은 **FSD app 레이어(`src/app/`)**를 가리킨다 — 루트 라우팅 `app/`은 Next 진입점이라 별칭이 없다.
 
@@ -87,7 +87,7 @@ apps/<app>/
 ```
 
 - 세그먼트 이름은 `ui`·`model`·`api`·`lib`·`config`만 쓴다(목적 기준). CSS 파일만 담는 `styles/`는 예외로 둔다. 필요한 것만 만든다. `hooks`·`types`·`constants`·`services` 같은 종류 기준 이름은 세그먼트 **안**의 하위 폴더로만 쓴다. 슬라이스가 커지면 세그먼트 아래에 도메인 하위 폴더를 둔다(`ui/scene/`, `model/runner/`).
-- **밖에서는 슬라이스 루트로만 import한다**: `from '@entities/game'`, 서버 전용은 `from '@views/study/index.server'`. `@entities/game/model/types`처럼 안쪽 경로로 가져오지 않는다.
+- **밖에서는 슬라이스 루트로만 import한다**: `from '@entities/question'`, 서버 전용은 `from '@views/study/index.server'`. `@entities/question/model/types`처럼 안쪽 경로로 가져오지 않는다.
 - **슬라이스 안에서는 상대경로**로 파일을 직접 import한다(`./Card`, `../model/types/game`). 자기 `index.ts`를 거치지 않는다(순환 참조).
 - `index.ts`는 **밖에서 실제로 쓰는 것만**, 이름을 하나씩 적어 내보낸다. `export *` 금지. 타입은 `export type` 또는 `type` 한정자.
 - **세그먼트 안에 `index.ts`(배럴)를 두지 않는다.** 출입구는 슬라이스 루트 하나다.
