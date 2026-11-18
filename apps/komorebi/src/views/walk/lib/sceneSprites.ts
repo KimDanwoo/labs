@@ -47,7 +47,6 @@ export function createBackgroundMaterial(
   });
 }
 
-/** 전경은 배경과 같은 uniform을 공유해야 시간·날씨가 한 장의 그림처럼 함께 바뀐다. */
 export function createForegroundMaterial(background: THREE.ShaderMaterial) {
   const material = background.clone();
   material.uniforms = background.uniforms;
