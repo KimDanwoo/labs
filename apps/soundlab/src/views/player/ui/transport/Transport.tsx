@@ -3,10 +3,9 @@
 import { useAtomValue } from 'jotai';
 
 import { TRACKS } from '@entities/track';
-import { formatSeconds } from '../../lib/formatTrack';
+import { formatDurationMs } from '../../lib/formatTrack';
 import { currentIndexAtom } from '../../model/store/playback';
 
-import { MS_PER_SECOND } from '../../config/time';
 import { useElapsedClock } from '../../model/hooks/useElapsedClock';
 import { PlaybackButtons } from './PlaybackButtons';
 import { Scrubber } from './Scrubber';
@@ -34,7 +33,7 @@ export function Transport() {
             래퍼를 contents로 지워 자식이 직접 그리드 아이템이 되게 하고, 820px부터 래퍼를 되살려 한 줄로 묶는다. */}
         <span className="contents min-[820px]:col-start-3 min-[820px]:row-start-1 min-[820px]:flex min-[820px]:items-center min-[820px]:justify-end min-[820px]:gap-xs min-[820px]:text-right">
           <span className="col-start-2 row-start-1 justify-self-end">
-            {track ? formatSeconds(track.durationMs / MS_PER_SECOND) : '0:00'}
+            {track ? formatDurationMs(track.durationMs) : '0:00'}
           </span>
           <span className="col-start-1 col-end-3 row-start-3 flex items-center justify-center">
             {track ? (
