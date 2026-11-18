@@ -13,6 +13,8 @@ const PALETTE_CLASS =
 const ARBITRARY_COLOR = /\b[a-z-]+-\[(?:#[0-9a-fA-F]{3,8}|(?:rgba?|hsla?|oklch|oklab|color-mix)\()/g;
 const TOKEN_EXCEPTION = /token-exception:\s*\S/;
 const UNSUPPORTED_WEIGHT = /\bfont-(?:thin|extralight|light|medium|extrabold|black)\b/;
+const DEPLOYMENT_ENABLED = { '**': false, main: true };
+const BUILD_FILTER = /--filter=(\S+)/;
 
 export function validateManifest(manifest, workspaceNames, catalogNames) {
   const problems = [];
@@ -36,6 +38,23 @@ export function validateTypeScript(config) {
   return PROTECTED_OPTIONS.filter((option) => config.compilerOptions?.[option] === false).map(
     (option) => `${option}: 공유 TypeScript 엄격 옵션을 해제할 수 없다.`,
   );
+}
+
+export function validateVercelConfig(config, appName) {
+  const problems = [];
+  const deploymentEnabled = config.git?.deploymentEnabled ?? {};
+  const isMainOnly =
+    Object.keys(deploymentEnabled).length === Object.keys(DEPLOYMENT_ENABLED).length &&
+    Object.entries(DEPLOYMENT_ENABLED).every(([branch, enabled]) => deploymentEnabled[branch] === enabled);
+  if (!isMainOnly) problems.push('git.deploymentEnabled는 {"**": false, "main": true}로 main만 배포한다.');
+  const { ignoreCommand, buildCommand } = config;
+  if (typeof ignoreCommand !== 'string' || !ignoreCommand.trim())
+    problems.push(`ignoreCommand로 변경 없는 배포를 건너뛴다(npx turbo-ignore ${appName}).`);
+  else if (ignoreCommand.includes('turbo-ignore') && ignoreCommand !== `npx turbo-ignore ${appName}`)
+    problems.push(`ignoreCommand는 이 앱을 가리킨다: npx turbo-ignore ${appName}`);
+  const buildFilter = typeof buildCommand === 'string' ? buildCommand.match(BUILD_FILTER)?.[1] : undefined;
+  if (buildFilter && buildFilter !== appName) problems.push(`buildCommand의 --filter는 이 앱(${appName})을 가리킨다.`);
+  return problems;
 }
 
 export function validateSourceTypes(text, filename) {
@@ -136,6 +155,14 @@ export function checkRepository(root = ROOT) {
     const manifest = JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'));
     for (const problem of validateManifest(manifest, workspaceNames, catalogNames))
       problems.push(`${relative}/package.json: ${problem}`);
+    if (path.dirname(dir) === path.join(root, 'apps')) {
+      const vercelPath = path.join(dir, 'vercel.json');
+      if (!existsSync(vercelPath))
+        problems.push(`${relative}: main 배포 제한과 ignoreCommand를 담은 vercel.json이 필요하다.`);
+      else
+        for (const problem of validateVercelConfig(JSON.parse(readFileSync(vercelPath, 'utf8')), manifest.name))
+          problems.push(`${relative}/vercel.json: ${problem}`);
+    }
     const configPath = path.join(dir, 'tsconfig.json');
     let compilerOptions = {};
     if (existsSync(configPath)) {

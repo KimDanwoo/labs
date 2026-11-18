@@ -158,7 +158,7 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 - 기존 `ignoreCommand`는 빌드 단계의 보조 검사다. 이것만으로는 배포 횟수 한도를 절약할 수 없으므로 Vercel의 Skip deployment 설정이 필요하다.
 - **Settings → Deployment Checks → Add Checks → GitHub → `CI / verify`**를 켠다. Vercel이 `main` 배포를 빌드한 뒤 CI가 통과해야 운영 도메인에 연결한다. 급하면 배포 상세의 Force Promote로 넘긴다. CI는 저장소 전체 작업 하나라 다른 앱 실패도 함께 막는다.
 - **danwoo-island는 Skip deployment를 끈다.** 빌드가 `hub`(프로필·프로젝트·이미지)·`soundlab`(곡 목록)·`packages/tokens/fonts`를 직접 읽지만 package.json 의존성에는 없어서, Skip deployment는 이 변경을 섬과 무관하다고 본다. 대신 `vercel.json`의 `ignoreCommand`가 이 경로들까지 `git diff`로 확인한다.
-- 새 앱의 `vercel.json`에도 `main` 제한과 `"ignoreCommand": "npx turbo-ignore <앱>"`을 둔다. Vercel에 새 프로젝트를 연결할 때 위 프로젝트 설정을 함께 적용한다.
+- 새 앱의 `vercel.json`에도 `main` 제한과 `"ignoreCommand": "npx turbo-ignore <앱>"`을 둔다. `pnpm check:architecture`가 `main` 제한, `ignoreCommand` 유무, `turbo-ignore`·`buildCommand --filter`가 자기 앱을 가리키는지 검사한다. Vercel에 새 프로젝트를 연결할 때 위 프로젝트 설정을 함께 적용한다.
 
 참고: [Git 배포 브랜치 제한](https://vercel.com/docs/project-configuration/git-configuration), [변경 없는 앱 건너뛰기](https://vercel.com/docs/monorepos#skipping-unaffected-projects).
 
