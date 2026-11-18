@@ -1,7 +1,7 @@
 'use client';
 
 import { addDays, todayString } from '../../lib/progressDates';
-import { SM2_CONSTANTS } from '../constants/constants';
+import { PROGRESS_STATUS, SM2_CONSTANTS } from '../constants/constants';
 import type { UserProgress } from '../types/types';
 import { getLocalProgress, saveLocalProgress } from './progressStorage';
 export { getLocalProgress, saveLocalProgress } from './progressStorage';
@@ -49,7 +49,7 @@ function reviewedProgress(questionId: string, knew: boolean): UserProgress {
     id: existing?.id ?? questionId,
     user_id: existing?.user_id ?? 'local',
     question_id: questionId,
-    status: knew ? 'mastered' : 'learning',
+    status: knew ? PROGRESS_STATUS.mastered : PROGRESS_STATUS.learning,
     correct_count: (existing?.correct_count ?? 0) + (knew ? 1 : 0),
     wrong_count: (existing?.wrong_count ?? 0) + (knew ? 0 : 1),
     last_reviewed: new Date().toISOString(),
@@ -63,9 +63,9 @@ function reviewedProgress(questionId: string, knew: boolean): UserProgress {
   };
 
   if (updated.correct_count >= MASTERED_CORRECT_COUNT) {
-    updated.status = 'mastered';
+    updated.status = PROGRESS_STATUS.mastered;
   } else if (updated.correct_count > 0 || updated.wrong_count > 0) {
-    updated.status = 'learning';
+    updated.status = PROGRESS_STATUS.learning;
   }
 
   return updated;
@@ -84,7 +84,7 @@ export function markQuestionMastered(questionId: string): UserProgress {
   const reviewed = reviewedProgress(questionId, true);
   return saveQuestionProgress({
     ...reviewed,
-    status: 'mastered',
+    status: PROGRESS_STATUS.mastered,
     correct_count: Math.max(reviewed.correct_count, MASTERED_CORRECT_COUNT),
   });
 }
@@ -111,7 +111,7 @@ export function getProgressByCategory(
     const progress = allProgress[qId];
     if (!progress) {
       unseen++;
-    } else if (progress.status === 'mastered') {
+    } else if (progress.status === PROGRESS_STATUS.mastered) {
       mastered++;
     } else {
       learning++;

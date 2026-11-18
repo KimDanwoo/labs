@@ -1,7 +1,5 @@
-import { getProgressForQuestion, markQuestionMastered, type ProgressStatus } from '@entities/progress';
+import { getProgressForQuestion, markQuestionMastered, PROGRESS_STATUS, type ProgressStatus } from '@entities/progress';
 import { isBookmarked, toggleBookmark } from '@features/bookmark';
-
-const MASTERED: ProgressStatus = 'mastered';
 
 type QuestionActionState = {
   isBookmarked: boolean;
@@ -58,7 +56,7 @@ export function getSnapshot(questionId: string): QuestionActionState {
 }
 
 export function isMasteredStatus(status: ProgressStatus | undefined): boolean {
-  return status === MASTERED;
+  return status === PROGRESS_STATUS.mastered;
 }
 
 export function toggleQuestionBookmark(questionId: string) {

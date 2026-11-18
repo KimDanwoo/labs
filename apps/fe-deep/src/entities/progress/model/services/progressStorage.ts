@@ -1,7 +1,7 @@
 'use client';
 import { STORAGE_KEYS } from '@shared/config/storageKeys';
 import { todayString } from '../../lib/progressDates';
-import { SM2_CONSTANTS } from '../constants/constants';
+import { PROGRESS_STATUS, SM2_CONSTANTS } from '../constants/constants';
 import type { UserProgress } from '../types/types';
 
 export function getLocalProgress(): Record<string, UserProgress> {
@@ -38,14 +38,16 @@ function migrateProgress(old: Partial<UserProgress> & { question_id: string }): 
     id: old.id ?? old.question_id,
     user_id: old.user_id ?? 'local',
     question_id: old.question_id,
-    status: old.status ?? 'learning',
+    status: old.status ?? PROGRESS_STATUS.learning,
     correct_count: old.correct_count ?? 0,
     wrong_count: old.wrong_count ?? 0,
     last_reviewed: old.last_reviewed ?? today,
     easiness_factor: 2.5,
     interval:
-      old.status === 'mastered' ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION,
-    repetition: old.status === 'mastered' ? 2 : 0,
+      old.status === PROGRESS_STATUS.mastered
+        ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION
+        : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION,
+    repetition: old.status === PROGRESS_STATUS.mastered ? 2 : 0,
     next_review: today,
   };
 }

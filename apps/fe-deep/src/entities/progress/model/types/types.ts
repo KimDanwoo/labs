@@ -1,4 +1,6 @@
-export type ProgressStatus = 'unseen' | 'learning' | 'mastered';
+import type { PROGRESS_STATUS } from '../constants/constants';
+
+export type ProgressStatus = (typeof PROGRESS_STATUS)[keyof typeof PROGRESS_STATUS];
 
 export interface UserProgress {
   id: string;
