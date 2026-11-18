@@ -6,7 +6,6 @@ import { cn } from '@shared/lib/cn';
 
 import { hasLeadingNumber } from '../../lib/hasLeadingNumber';
 import type { StudyTopic } from '../../lib/parseHandbook';
-import { styles } from './TopicToc.styles';
 
 interface TopicTocProps {
   topics: StudyTopic[];
@@ -31,7 +30,12 @@ export function TopicToc({ topics, activeIndex, understood, review, onSelect }: 
                 type="button"
                 onClick={() => onSelect(index)}
                 aria-current={isActive ? 'true' : undefined}
-                className={cn(styles.item.base, isActive ? styles.item.active : styles.item.inactive)}
+                className={cn(
+                  'flex w-full items-start gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
+                  isActive
+                    ? 'bg-muted font-normal text-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                )}
               >
                 {!hasLeadingNumber(topic.title) && (
                   <span className="shrink-0 pt-0.5 text-xs tabular-nums opacity-60">{index + 1}</span>

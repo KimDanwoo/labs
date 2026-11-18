@@ -5,8 +5,6 @@ import { Check, X } from 'lucide-react';
 import { cn } from '@shared/lib/cn';
 import { matchKeywords } from '@shared/lib/matchKeywords';
 
-import { styles } from './KeywordCheck.styles';
-
 interface KeywordCheckProps {
   keywords: string[];
   recall: string;
@@ -25,7 +23,10 @@ export function KeywordCheck({ keywords, recall }: KeywordCheckProps) {
         {matches.map(({ keyword, isMatched }) => (
           <li
             key={keyword}
-            className={cn(styles.keyword.base, isMatched ? styles.keyword.matched : styles.keyword.missed)}
+            className={cn(
+              'flex items-center gap-1 rounded-md px-2 py-1 text-xs',
+              isMatched ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground',
+            )}
           >
             {isMatched ? <Check className="size-3" /> : <X className="size-3 opacity-50" />}
             {keyword}
