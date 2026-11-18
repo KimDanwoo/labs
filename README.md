@@ -4,8 +4,6 @@
 
 <sub>공통: Next.js 16 · React 19 · TypeScript · Tailwind CSS 4 · pnpm·Turborepo 모노레포 (Dansoon만 Astro)</sub>
 
-[![Danwoo Lab 허브](docs/readme/hub.webp)](https://lab.danwoo.dev)
-
 ## 프로젝트
 
 | [![청연사주](apps/hub/public/projects/cheongyeon-saju.webp)](https://saju.danwoo.dev)                  | [![Dansoon](apps/hub/public/projects/dansoon-card.webp)](https://danwoo.dev)                             |
@@ -26,9 +24,15 @@
 | **[프딥](https://fe-deep.danwoo.dev)**                                                                                   | **[스도쿠](https://sudoku.danwoo.dev)**                                      |
 | 프론트엔드 개념을 깊게 파고든 기록을 모아 둬요.<br><sub>React Query · Framer Motion · 마크다운 콘텐츠 · Playwright</sub> | 난이도를 골라 가볍게 한 판 즐겨요.<br><sub>Web Worker · Jotai · Vitest</sub> |
 
-## 구성
+## 모노레포 구성
 
-하나의 레포에서 여러 앱을 같이 관리해요.
+| 항목          | 내용                                                                                      |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| 빌드          | Turborepo — 앱별 작업을 병렬로 돌리고 원격 캐시로 결과를 재사용해요                       |
+| 패키지 매니저 | pnpm workspace — 모든 의존성 버전은 `pnpm-workspace.yaml`의 `catalog:` 한 곳에서 관리해요 |
+| 아키텍처      | 앱마다 FSD(Feature-Sliced Design)로 나누고, 레이어 규칙은 lint로 막아요                   |
+| 코드 품질     | 공유 ESLint·Prettier 설정으로 모든 앱의 스타일을 맞춰요                                   |
+| 디자인        | 색과 컴포넌트는 앱마다 따로 가지고, 서체·간격 같은 기본 룰만 공유해요                     |
 
 ```
 apps/
@@ -41,13 +45,18 @@ apps/
   awesome-sudoku/    스도쿠
   cheongyeon-saju/   청연사주 (분리)
   dansoon/           Dansoon (분리)
-packages/
-  tokens/            디자인 기본 룰과 공유 토큰(서체·간격 등)
-  config/            TypeScript 설정
-  eslint-config/     ESLint 설정(FSD 구조 규칙 포함)
-  prettier-config/   코드 포맷 설정
-  security-headers/  앱 공통 보안 헤더
+packages/            공유 패키지
 ```
+
+## 공유 패키지
+
+| 패키지                      | 이름                     | 역할                                              |
+| --------------------------- | ------------------------ | ------------------------------------------------- |
+| `packages/tokens`           | `@tokens/css`            | 디자인 기본 룰과 공유 토큰(서체·간격·반경·그림자) |
+| `packages/config`           | `@config/tsconfig`       | 공유 TypeScript 설정(base / next)                 |
+| `packages/eslint-config`    | `@repo/eslint-config`    | 공유 ESLint 설정 — Next.js 규칙과 FSD 경계 검사   |
+| `packages/prettier-config`  | `@repo/prettier-config`  | 공유 Prettier 설정                                |
+| `packages/security-headers` | `@repo/security-headers` | 앱 공통 CSP·보안 헤더                             |
 
 ## 라이선스
 
