@@ -22,7 +22,7 @@ apps/
   prairie/            # 3D 초원
   danwoo-island/      # 포트폴리오 섬 드라이브(folio-2025 포크)
 packages/             # 공유 토큰 + 공유 설정
-  tokens/  @tokens/css            # 디자인 토큰(TS) → theme.css 생성
+  tokens/  @tokens/css            # 공유 토큰(서체·간격 등, 색 없음) + 디자인 기본 룰
   config/  @config/tsconfig         # 공유 tsconfig(base / next)
   eslint-config/  @repo/eslint-config    # 공유 ESLint(flat): next + FSD 경계 강제
   prettier-config/ @repo/prettier-config # 공유 Prettier
@@ -34,15 +34,14 @@ scripts/new-app.mjs   # 새 앱 생성기
 
 1. **의존성 버전은 catalog 단일 관리**: 모든 버전은 `pnpm-workspace.yaml`의 `catalog:`에 두고 각 `package.json`은 `"catalog:"`로 참조. 워크스페이스 간 참조는 `"workspace:*"`. **package.json에 raw 버전을 박지 않는다.** 버전 변경은 catalog 한 곳만 수정 후 `pnpm install`.
 
-2. **디자인 토큰 워크플로**: `packages/tokens/src/*.ts`(palette / colors / typography / spacing / shadow)가 **source of truth**. 수정 후 `pnpm tokens`로 `packages/tokens/generated/theme.css`를 생성한다.
-   - **`generated/theme.css`는 AUTO-GENERATED — 직접 수정 금지.**
-   - **색은 2-tier**: atomic 팔레트(`palette.ts`의 `themeColors`/`commonColors`, 스케일 50–900) → semantic alias(`colors.ts`, primary/secondary/muted/accent/card + success/error/warning/info × base·foreground·subtle, light/dark). semantic은 atomic 스텝을 참조한다. `muted`는 표면색이고 흐린 글자는 `muted-foreground`다.
-   - 스타일은 토큰 기반 Tailwind 유틸로만: 색 `bg-primary`/`text-muted-foreground`, 간격 `px-lg`/`gap-3xl`, 반경 `rounded-md`, 그림자 `shadow-md`/`shadow-glow` 등. **임의 hex/px 매직값 금지.**
+2. **디자인은 앱마다, 기본 룰만 공유**: 공유 디자인 시스템은 없다. 기본 룰은 [`packages/tokens/DESIGN_RULES.md`](packages/tokens/DESIGN_RULES.md)가 단일 원본이다.
+   - **공유 토큰(`@tokens/css`)에는 색이 없다**: 서체·크기·굵기·간격·반경·그림자(sm·md·lg)·컨테이너 폭만 담는다. 소스는 `packages/tokens/src/*.ts`, `pnpm tokens`로 `generated/theme.css`를 생성한다(**AUTO-GENERATED — 직접 수정 금지**).
+   - **색은 앱의 `src/app/styles/colors.css`에**: 라이트·다크 값, 다크 모드 variant, 색이 섞인 그림자(`shadow-glow`)를 앱이 소유한다. 장식색·카테고리색도 그 앱 CSS에 토큰으로 둔다. 다른 앱 색을 바꾸려고 공유 토큰을 고치지 않는다.
+   - 스타일은 토큰 기반 Tailwind 유틸로: 색 `bg-primary`/`text-muted-foreground`(앱 토큰), 간격 `px-lg`/`gap-3xl`, 반경 `rounded-md`, 그림자 `shadow-md` 등. **임의 hex/px 매직값 금지.**
    - **간격은 두 스케일**: 앱 레이아웃은 이름 토큰(`xs` 4px ~ `3xl` 64px, `px-lg`), 앱 `src/shared/ui`의 shadcn 계열 컴포넌트와 fe-deep 내부는 Tailwind 숫자 스케일(`p-4` = 1rem)을 쓴다. `max-w-md` 같은 폭 유틸은 컨테이너 값(28rem)으로 생성된다.
    - **굵기는 `font-normal`·`font-semibold`·`font-bold`만**: 공통 서체 마루부리가 400·600·700만 제공한다. `font-medium` 등은 500을 가진 고정폭 서체(`font-mono`)에만 쓴다.
-   - **앱 전용 색은 그 앱의 `@theme`에**: 상태·역할이 아닌 색(장식색, 카테고리색 등)은 공유 토큰에 넣지 않고 앱 전역 CSS에 토큰으로 정의해 쓴다. 상태색을 다른 의미로 빌려 쓰지 않는다.
-   - **예외 앱**: komorebi·prairie·danwoo-island는 독립 디자인 프로젝트, awesome-sudoku는 자체 팔레트다(공유 색 토큰 미적용).
-   - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateDesignTokens`): 공유 토큰을 쓰는 앱에서 기본 팔레트 색 클래스, 임의 색 값(`bg-[#...]`), 서체에 없는 굵기를 막는다. 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
+   - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateDesignTokens`): `theme.css`를 쓰는 앱에서 기본 팔레트 색 클래스, 임의 색 값(`bg-[#...]`), 서체에 없는 굵기를 막는다. 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
+   - 대비·포커스·누르는 영역·움직임 줄이기·화면 세 개 확인은 DESIGN_RULES.md의 체크리스트로 PR 전에 확인한다.
 
 3. **새 앱은 스캐폴드로**: 손으로 만들지 말고 `pnpm new-app <name>`(소문자/숫자/하이픈). `templates/app`을 복제하고 `<name>`으로 채운다.
 
