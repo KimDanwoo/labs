@@ -7,13 +7,12 @@ import {
   isSuccessAtom,
   mistakeCountAtom,
 } from '@entities/game';
-import { cn } from '@shared/lib/cn';
 import { useDismissible } from '@shared/lib/useDismissible';
 import { BottomSheet } from '@shared/ui/bottom-sheet';
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
 import { FailureIcon } from '../sudoku-game/FailureIcon';
-import { GameDifficultySelector } from '../sudoku-game/GameDifficultySelector';
+import { ListSelector } from '../sudoku-game/ListSelector';
 import { SuccessIcon } from '../sudoku-game/SuccessIcon';
 
 export const GameResultSheet = memo(() => {
@@ -31,8 +30,8 @@ export const GameResultSheet = memo(() => {
           <SuccessIcon />
 
           <div>
-            <p className={cn('text-sm', 'text-[rgb(var(--color-text-secondary))]')}>완료 시간</p>
-            <p className={cn('text-3xl font-mono font-bold', 'font-tabular', 'text-[rgb(var(--color-text-primary))]')}>
+            <p className="text-sm text-[rgb(var(--color-text-secondary))]">완료 시간</p>
+            <p className="text-3xl font-bold font-tabular text-[rgb(var(--color-text-primary))]">
               {formatTime(currentTime)}
             </p>
           </div>
@@ -40,14 +39,14 @@ export const GameResultSheet = memo(() => {
       ) : (
         <div className="text-center space-y-4">
           <FailureIcon />
-          <p className={cn('text-[rgb(var(--color-text-secondary))]')}>
+          <p className="text-[rgb(var(--color-text-secondary))]">
             오답 {mistakeCount}/{MAX_MISTAKES}회로 게임이 종료되었습니다.
           </p>
         </div>
       )}
 
       <div className="mt-6">
-        <GameDifficultySelector.List />
+        <ListSelector />
       </div>
     </BottomSheet>
   );

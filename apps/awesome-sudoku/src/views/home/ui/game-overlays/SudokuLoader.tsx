@@ -1,75 +1,49 @@
 'use client';
 
+import { memo } from 'react';
+
 import { cn } from '@shared/lib/cn';
-import { memo, useMemo } from 'react';
+
+import {
+  LOADER_DELAY_STEP_S,
+  LOADER_GRID_DIVISIONS,
+  LOADER_SIZE,
+  SUDOKU_NUMBERS,
+  type LoaderSize,
+} from '../../config/loader';
+import styles from './SudokuLoader.module.css';
 
 interface SudokuLoaderProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: LoaderSize;
   className?: string;
 }
 
-const sizeConfig = {
-  sm: { grid: 48, cell: 14, text: 'text-[8px]', gap: 1 },
-  md: { grid: 72, cell: 22, text: 'text-[11px]', gap: 1.5 },
-  lg: { grid: 96, cell: 30, text: 'text-sm', gap: 2 },
-};
-
-const SUDOKU_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
 export const SudokuLoader = memo<SudokuLoaderProps>(({ size = 'md', className }) => {
-  const config = sizeConfig[size];
-
-  const cells = useMemo(
-    () =>
-      SUDOKU_NUMBERS.map((num, index) => ({
-        num,
-        delay: index * 0.1,
-      })),
-    [],
-  );
+  const config = LOADER_SIZE[size];
+  const lineSpacing = config.grid / LOADER_GRID_DIVISIONS;
 
   return (
     <div className={cn('flex flex-col items-center gap-3', className)}>
       <div
-        className="relative grid grid-cols-3 rounded-lg overflow-hidden shadow-lg"
-        style={{
-          width: config.grid,
-          height: config.grid,
-          gap: config.gap,
-          background:
-            'linear-gradient(135deg,' +
-            ' rgb(var(--color-surface-secondary)) 0%,' +
-            ' rgb(var(--color-bg-tertiary)) 100%)',
-          padding: config.gap,
-        }}
+        className={cn(styles.grid, 'relative grid grid-cols-3 rounded-lg overflow-hidden shadow-lg')}
+        style={{ width: config.grid, height: config.grid, gap: config.gap, padding: config.gap }}
       >
-        {cells.map(({ num, delay }) => (
+        {SUDOKU_NUMBERS.map((num, index) => (
           <div
             key={num}
             className={cn(
-              'flex items-center justify-center',
-              'bg-[rgb(var(--color-surface-primary))] rounded-sm',
-              'font-bold text-[rgb(var(--color-accent))]',
+              'flex items-center justify-center bg-[rgb(var(--color-surface-primary))] rounded-sm font-bold text-[rgb(var(--color-accent))] animate-[sudokuPulse_1.8s_ease-in-out_infinite]',
               config.text,
             )}
-            style={{
-              animation: 'sudokuPulse 1.8s ease-in-out infinite',
-              animationDelay: `${delay}s`,
-            }}
+            style={{ animationDelay: `${index * LOADER_DELAY_STEP_S}s` }}
           >
             {num}
           </div>
         ))}
 
         <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(var(--color-accent), 0.3) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(var(--color-accent), 0.3) 1px, transparent 1px)
-            `,
-            backgroundSize: `${config.grid / 3}px ${config.grid / 3}px`,
-          }}
+          className={cn(styles.gridLines, 'absolute inset-0 pointer-events-none')}
+          style={{ backgroundSize: `${lineSpacing}px ${lineSpacing}px` }}
         />
       </div>
     </div>

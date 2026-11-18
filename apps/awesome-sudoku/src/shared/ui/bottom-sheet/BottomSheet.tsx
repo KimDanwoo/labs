@@ -62,14 +62,10 @@ export function BottomSheet({ isOpen, onClose, children, title, className }: Bot
       >
         {!isDesktop && (
           <div
-            className={cn(
-              'flex justify-center pt-3 pb-2',
-              'cursor-grab active:cursor-grabbing',
-              'touch-none select-none',
-            )}
+            className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none"
             {...dragHandlers}
           >
-            <div className={cn('w-10 h-1.5 rounded-full', 'bg-[rgb(var(--color-border-medium))]')} />
+            <div className="w-10 h-1.5 rounded-full bg-[rgb(var(--color-border-medium))]" />
           </div>
         )}
         {title && (

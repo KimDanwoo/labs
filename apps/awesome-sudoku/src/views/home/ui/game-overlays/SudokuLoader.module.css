@@ -1,0 +1,9 @@
+.grid {
+  background: linear-gradient(135deg, rgb(var(--color-surface-secondary)) 0%, rgb(var(--color-bg-tertiary)) 100%);
+}
+
+.gridLines {
+  background-image:
+    linear-gradient(to right, rgba(var(--color-accent), 0.3) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(var(--color-accent), 0.3) 1px, transparent 1px);
+}
