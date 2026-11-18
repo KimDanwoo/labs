@@ -11,7 +11,6 @@ import {
   timerActiveAtom,
   toggleNoteAtom,
 } from '@entities/game';
-import { cn } from '@shared/lib/cn';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { type FC, useCallback, useMemo } from 'react';
 import { NumberButton } from './NumberButton';
@@ -44,12 +43,7 @@ export const SelectNumber: FC = () => {
   );
 
   return (
-    <div
-      className={cn(
-        'grid grid-cols-9 md:grid-cols-3 gap-1.5 xs:gap-2 md:gap-2.5 lg:gap-3',
-        'h-full place-content-center place-items-center',
-      )}
-    >
+    <div className="grid grid-cols-9 md:grid-cols-3 gap-1.5 xs:gap-2 md:gap-2.5 lg:gap-3 h-full place-content-center place-items-center">
       {KEY_NUMBER.map((num) => (
         <NumberButton
           key={num}
