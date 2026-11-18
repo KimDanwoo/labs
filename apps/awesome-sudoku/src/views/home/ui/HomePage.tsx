@@ -1,6 +1,5 @@
 'use client';
 
-import { ThemeToggle } from '@features/theme';
 import { cn } from '@shared/lib/cn';
 import dynamic from 'next/dynamic';
 import { SudokuBoard } from './game-board/SudokuBoard';
@@ -8,6 +7,7 @@ import { Controls } from './game-controls/Controls';
 import { GameStatus } from './game-header/GameStatus';
 import { GameModeSelector } from './sudoku-game/GameModeSelector';
 import { SelectNumber } from './sudoku-game/SelectNumber';
+import { ThemeToggle } from './ThemeToggle';
 
 const PauseGameOverlay = dynamic(() => import('./game-overlays/PauseGameOverlay'), { ssr: false });
 const GeneratingOverlay = dynamic(() => import('./game-overlays/GeneratingOverlay'), { ssr: false });
