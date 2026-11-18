@@ -1,0 +1,19 @@
+/* container-type: 손잡이를 100cqw로 옮긴다 — % translate는 자기 크기(7px) 기준이라 못 쓴다. */
+.bar {
+  container-type: inline-size;
+}
+
+.buffered {
+  transform: scaleX(var(--b, 0));
+  opacity: calc(1 - var(--b, 0));
+}
+
+/* width·left로 움직이면 매 프레임 레이아웃이 돈다. 변형은 합성 단계에서만 처리된다. */
+.progress {
+  transform: scaleX(var(--p, 0));
+}
+
+.thumb {
+  transform: translateX(calc(var(--p, 0) * 100cqw - 50%));
+  box-shadow: 0 0 calc(3px + var(--glow, 0) * 14px) rgb(255 255 255 / calc(0.2 + var(--glow, 0) * 0.6));
+}

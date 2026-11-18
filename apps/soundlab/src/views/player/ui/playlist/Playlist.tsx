@@ -4,8 +4,8 @@ import { currentIndexAtom, playbackQueueAtom, TRACKS, usePlaybackControls } from
 import { Button } from '@shared/ui/Button';
 import { ScrollArea } from '@shared/ui/ScrollArea';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect, useRef, type JSX } from 'react';
 import { COLLECTIONS } from '../../config/collections';
+import { PLAYLIST_ID } from '../../config/layout';
 import {
   collectionFilterAtom,
   FILTER_LABELS,
@@ -13,12 +13,13 @@ import {
   searchAtom,
   visibleTracksAtom,
 } from '../../model/browse';
+import { useScrollCurrentIntoView } from '../../model/hooks/useScrollCurrentIntoView';
 import { BrowseControls } from '../library/BrowseControls';
 import { CollectionCard } from '../library/CollectionCard';
 import { LibraryTrack } from '../library/LibraryTrack';
 import { ListeningHistory } from '../library/ListeningHistory';
 
-export function Playlist(): JSX.Element {
+export function Playlist() {
   const index = useAtomValue(currentIndexAtom);
   const tracks = useAtomValue(visibleTracksAtom);
   const filter = useAtomValue(libraryFilterAtom);
@@ -26,16 +27,13 @@ export function Playlist(): JSX.Element {
   const queue = useAtomValue(playbackQueueAtom);
   const setSearch = useSetAtom(searchAtom);
   const { startQueue } = usePlaybackControls();
-  const list = useRef<HTMLDivElement | null>(null);
+  const listRef = useScrollCurrentIntoView(index);
   const collection = COLLECTIONS.find((item) => item.id === selectedCollection);
   const label = collection?.title ?? FILTER_LABELS[filter];
   const availableCount = TRACKS.filter((track) => track.isAvailable !== false).length;
-  useEffect(() => {
-    list.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' });
-  }, [index]);
   return (
     <aside
-      id="playlist"
+      id={PLAYLIST_ID}
       aria-label="음악 라이브러리"
       className="absolute inset-x-0 top-0 bottom-0 z-20 order-2 row-start-2 row-end-3 flex min-h-0 flex-col border-hairline bg-void player:static player:order-1 player:row-auto player:border-r"
     >
@@ -43,7 +41,7 @@ export function Playlist(): JSX.Element {
         <h1 className="font-label text-sm tracking-mark text-paper">SOUNDLAB</h1>
         <p className="mt-xs text-xs text-dim">{availableCount}곡</p>
       </div>
-      <ScrollArea ref={list} className="min-h-0 flex-1">
+      <ScrollArea ref={listRef} className="min-h-0 flex-1">
         <div className="space-y-md p-md">
           <details>
             <summary className="cursor-pointer text-xs text-dim">플레이리스트</summary>

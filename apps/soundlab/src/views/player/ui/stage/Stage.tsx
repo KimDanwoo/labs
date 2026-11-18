@@ -1,8 +1,9 @@
 'use client';
 
-import { artworkUrl, currentIndexAtom, TRACKS } from '@entities/track';
+import { artworkUrl, currentIndexAtom, formatTrackNumber, TRACKS } from '@entities/track';
 import { useAtomValue } from 'jotai';
 import { useCallback, useRef, useState } from 'react';
+import { ARTWORK_TEXTURE_SIZE } from '../../config/stage';
 import { VISUAL_MODE, visualModeAtom } from '../../model/visual';
 import { FavoriteButton } from '../library/FavoriteButton';
 import { ParticleCanvas } from './ParticleCanvas';
@@ -30,7 +31,7 @@ export function Stage() {
       <div className="stage-caption absolute top-md inset-x-md flex justify-between font-label text-xs text-mute">
         <span>현재 곡</span>
         <span>
-          {String(index + 1).padStart(2, '0')} / {TRACKS.length}
+          {formatTrackNumber(index)} / {TRACKS.length}
         </span>
       </div>
       {!isStill ? <ParticleCanvas slotRef={slot} onReady={handleReady} /> : null}
@@ -39,7 +40,12 @@ export function Stage() {
       <div ref={slot} className="aspect-square w-[min(84%,46dvh)] shrink-0 min-[820px]:w-[min(64%,58vh)]">
         {track && (!canvasReady || isStill) ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={artworkUrl(track, 't500x500')} alt="" className="size-full object-cover" draggable={false} />
+          <img
+            src={artworkUrl(track, ARTWORK_TEXTURE_SIZE)}
+            alt=""
+            className="size-full object-cover"
+            draggable={false}
+          />
         ) : null}
       </div>
       <div className="flex max-w-[34ch] flex-col items-center gap-xs text-center">
