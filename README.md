@@ -1,11 +1,14 @@
 # Danwoo Lab
 
-만들고 싶은 게 생기면 하나씩 만들어 보는 개인 프로젝트 모음이에요. 전체 목록은 [lab.danwoo.dev](https://lab.danwoo.dev)에서 볼 수 있어요.
+아이디어를 구현하는 실험실이에요. 전체 목록은 [lab.danwoo.dev](https://lab.danwoo.dev)에서 볼 수 있어요.
 
 ## 프로젝트
 
-| [![Danwoo Island](apps/hub/public/projects/danwoo-island-card.webp)](https://world.danwoo.dev) | [![Unicorn Rush](apps/hub/public/projects/unicorn-rush-card.webp)](https://prairie.danwoo.dev) |
+| [![청연사주](apps/hub/public/projects/cheongyeon-saju.webp)](https://saju.danwoo.dev)          | [![Dansoon](apps/hub/public/projects/dansoon-card.webp)](https://danwoo.dev)                   |
 | :--------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------- |
+| **[청연사주](https://saju.danwoo.dev)**                                                        | **[Dansoon](https://danwoo.dev)**                                                              |
+| 사주 풀이를 웹툰 컷으로 읽어요.                                                                | 프론트엔드 개발 기록을 모아요.                                                                 |
+| [![Danwoo Island](apps/hub/public/projects/danwoo-island-card.webp)](https://world.danwoo.dev) | [![Unicorn Rush](apps/hub/public/projects/unicorn-rush-card.webp)](https://prairie.danwoo.dev) |
 | **[Danwoo Island](https://world.danwoo.dev)**                                                  | **[Unicorn Rush](https://prairie.danwoo.dev)**                                                 |
 | 차를 몰고 열대 섬을 돌아다니는 3D 포트폴리오예요.                                              | three.js로 만든 초원을 유니콘을 타고 달리고 날아요.                                            |
 | [![코모레비](apps/hub/public/projects/komorebi-card.webp)](https://komorebi.danwoo.dev)        | [![soundlab](apps/hub/public/projects/soundlab.webp)](https://sound.danwoo.dev)                |
