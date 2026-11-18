@@ -3,7 +3,7 @@
 import { Check, X } from 'lucide-react';
 
 import { cn } from '@shared/lib/cn';
-import { matchKeywords } from '@shared/lib/matchKeywords';
+import { matchKeywords } from '../lib/matchKeywords';
 
 interface KeywordCheckProps {
   keywords: string[];

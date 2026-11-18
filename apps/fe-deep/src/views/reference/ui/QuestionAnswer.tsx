@@ -1,5 +1,5 @@
+import { SpeakButton } from '@features/read-aloud';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
-import { SpeakButton } from '@shared/ui/SpeakButton';
 
 interface QuestionAnswerProps {
   answer: string;

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-import { KeywordCheck } from '@shared/ui/KeywordCheck';
+import { KeywordCheck } from '@features/keyword-check';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 
 import { ANSWER_REVEAL_MOTION } from '../../config/motion';

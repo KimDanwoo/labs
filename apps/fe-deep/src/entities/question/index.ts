@@ -9,5 +9,4 @@ export { DIFFICULTY_CONFIG, DIFFICULTY_VALUES } from './model/constants/constant
 export { findCategoryBySlug, questionsInCategory } from './model/services/questionQueries';
 export type { Category, Difficulty, FollowUp, Question, SearchResult } from './model/types/types';
 export { DifficultyBadge } from './ui/DifficultyBadge';
-export { QuestionAnswer } from './ui/QuestionAnswer';
 export { QuestionMeta } from './ui/QuestionMeta';

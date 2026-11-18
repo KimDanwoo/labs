@@ -2,8 +2,8 @@
 
 import { Square, Volume2 } from 'lucide-react';
 
-import { useSpeech } from '@shared/lib/useSpeech';
 import { Button } from '@shared/ui/Button';
+import { useSpeech } from '../model/hooks/useSpeech';
 
 interface SpeakButtonProps {
   text: string;
