@@ -1,9 +1,12 @@
+import { COPYRIGHT, SITE_NAME } from '../config/page';
+import { styles } from './LabFooter.styles';
+
 export function LabFooter() {
   return (
-    <footer className="border-t border-border">
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-md px-lg py-lg text-sm text-muted-foreground">
-        <span className="font-display font-bold text-foreground">Danwoo Lab</span>
-        <span>© 2026 김단우</span>
+    <footer className={styles.footer}>
+      <div className={styles.inner}>
+        <span className={styles.brand}>{SITE_NAME}</span>
+        <span>{COPYRIGHT}</span>
       </div>
     </footer>
   );

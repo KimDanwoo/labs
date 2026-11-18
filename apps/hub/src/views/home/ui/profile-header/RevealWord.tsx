@@ -1,13 +1,16 @@
 import type { ReactNode } from 'react';
 
-const WORD_STAGGER_MS = 110;
-const WORD_START_DELAY_MS = 120;
+import { WORD_REVEAL } from '../../config/motion';
+import { revealDelay } from '../../lib/revealDelay';
 
-type RevealWordProps = { order: number; children: ReactNode };
+interface RevealWordProps {
+  order: number;
+  children: ReactNode;
+}
 
 export function RevealWord({ order, children }: RevealWordProps) {
   return (
-    <span className="word-reveal" style={{ animationDelay: `${WORD_START_DELAY_MS + order * WORD_STAGGER_MS}ms` }}>
+    <span className="word-reveal" style={revealDelay(WORD_REVEAL.startDelayMs + order * WORD_REVEAL.staggerMs)}>
       {children}
     </span>
   );
