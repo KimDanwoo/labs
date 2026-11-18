@@ -2,6 +2,7 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import '@tokens/css/theme.css';
+@import './styles/colors.css';
 @import './styles/design-system.css';
 @import './styles/reset.css';
 @import './styles/syntax-highlight.css';
