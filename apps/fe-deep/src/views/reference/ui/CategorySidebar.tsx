@@ -1,10 +1,14 @@
 'use client';
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
 import type { Category } from '@entities/question';
 import { cn } from '@shared/lib/cn';
 import { ScrollArea } from '@shared/ui/ScrollArea';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+
+import { categoryHref } from '../lib/categoryHref';
+import { styles } from './CategorySidebar.styles';
 
 interface CategorySidebarProps {
   categories: Category[];
@@ -14,23 +18,18 @@ export function CategorySidebar({ categories }: CategorySidebarProps) {
   const pathname = usePathname();
 
   return (
-    <ScrollArea type="scroll" className="max-h-[calc(100vh-8rem)]">
-      <nav className="flex flex-col gap-1 p-2">
+    <ScrollArea type="scroll" className={styles.scroller}>
+      <nav className={styles.nav}>
         {categories.map((category) => {
-          const isActive = pathname === `/reference/${category.slug}`;
+          const href = categoryHref(category.slug);
           return (
             <Link
               key={category.id}
-              href={`/reference/${category.slug}`}
-              className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 mx-1 text-sm transition-all duration-200',
-                isActive
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-              )}
+              href={href}
+              className={cn(styles.link.base, pathname === href ? styles.link.active : styles.link.inactive)}
             >
-              <span className="text-base">{category.icon}</span>
-              <span className="truncate">{category.title}</span>
+              <span className={styles.icon}>{category.icon}</span>
+              <span className={styles.title}>{category.title}</span>
             </Link>
           );
         })}

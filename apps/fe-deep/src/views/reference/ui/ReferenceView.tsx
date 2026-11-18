@@ -1,36 +1,37 @@
+import Link from 'next/link';
+
 import { loadQuestionContent } from '@entities/question/index.server';
 import { Card } from '@shared/ui/Card';
-import Link from 'next/link';
+
+import { CATEGORY_CARD_STAGGER_MS } from '../config/motion';
+import { categoryHref } from '../lib/categoryHref';
+import { styles } from './ReferenceView.styles';
 
 export async function ReferenceView() {
   const { categories } = await loadQuestionContent();
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-12">
-      <div className="mb-10 animate-fade-in">
-        <h1 className="text-3xl font-bold tracking-tight mb-3">레퍼런스</h1>
-        <p className="text-muted-foreground">카테고리별 프론트엔드 핵심 개념을 탐색하세요.</p>
+    <div className={styles.root}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>레퍼런스</h1>
+        <p className={styles.description}>카테고리별 프론트엔드 핵심 개념을 탐색하세요.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className={styles.grid}>
         {categories.map((category, index) => (
           <Link
             key={category.id}
-            href={`/reference/${category.slug}`}
-            className="animate-fade-in-up"
-            style={{ animationDelay: `${index * 60}ms` }}
+            href={categoryHref(category.slug)}
+            className={styles.cardLink}
+            style={{ animationDelay: `${index * CATEGORY_CARD_STAGGER_MS}ms` }}
           >
-            <Card className="card-hover hover:border-primary/30 cursor-pointer h-full group">
+            <Card className={styles.card}>
               <Card.Header>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-3xl group-hover:scale-110 transition-transform duration-300">
-                    {category.icon}
-                  </span>
+                <div className={styles.iconRow}>
+                  <span className={styles.icon}>{category.icon}</span>
                 </div>
-                <Card.Title className="group-hover:text-primary transition-colors duration-200">
-                  {category.title}
-                </Card.Title>
-                <Card.Description className="text-sm leading-relaxed">{category.description}</Card.Description>
+                <Card.Title className={styles.cardTitle}>{category.title}</Card.Title>
+                <Card.Description className={styles.cardDescription}>{category.description}</Card.Description>
               </Card.Header>
             </Card>
           </Link>

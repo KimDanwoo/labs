@@ -1,0 +1,1 @@
+export const CATEGORY_CARD_STAGGER_MS = 60;
