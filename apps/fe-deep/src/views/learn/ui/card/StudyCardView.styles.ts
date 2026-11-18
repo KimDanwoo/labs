@@ -9,12 +9,6 @@ export const styles = {
   progress: 'h-1.5',
   card: 'min-h-[300px] p-6 relative shadow-sm',
   cardMeta: 'flex items-center gap-2 mb-5',
-  steps: 'ml-auto flex items-center gap-1.5',
-  stepDot: {
-    base: 'size-1.5 rounded-full transition-colors',
-    reached: 'bg-primary',
-    upcoming: 'bg-muted-foreground/25',
-  },
   promptBox: 'flex flex-col items-center justify-center min-h-[120px] mb-6',
   prompt: 'text-lg font-normal text-center leading-relaxed whitespace-pre-line',
   hints: 'mb-5',

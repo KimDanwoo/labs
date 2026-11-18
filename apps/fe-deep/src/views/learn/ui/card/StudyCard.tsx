@@ -2,11 +2,11 @@ import { DifficultyBadge, type FollowUp, type Question } from '@entities/questio
 import { Badge } from '@shared/ui/Badge';
 import { Card } from '@shared/ui/Card';
 
+import { StepDots } from '@shared/ui/StepDots';
 import { FALLBACK_DIFFICULTY } from '../../config/studyCard';
 import { AnswerReveal } from './AnswerReveal';
 import { KeywordHints } from './KeywordHints';
 import { RecallInput } from './RecallInput';
-import { StepDots } from './StepDots';
 import { styles } from './StudyCardView.styles';
 
 interface StudyCardProps {

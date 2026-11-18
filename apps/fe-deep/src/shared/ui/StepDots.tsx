@@ -1,6 +1,6 @@
 import { cn } from '@shared/lib/cn';
 
-import { styles } from './StudyCardView.styles';
+import { styles } from './StepDots.styles';
 
 interface StepDotsProps {
   stepIndex: number;
@@ -9,11 +9,11 @@ interface StepDotsProps {
 
 export function StepDots({ stepIndex, stepCount }: StepDotsProps) {
   return (
-    <div className={styles.steps} aria-label={`${stepIndex + 1}단계 / 총 ${stepCount}단계`}>
+    <div className={styles.root} aria-label={`${stepIndex + 1}단계 / 총 ${stepCount}단계`}>
       {Array.from({ length: stepCount }, (_, index) => (
         <span
           key={index}
-          className={cn(styles.stepDot.base, index <= stepIndex ? styles.stepDot.reached : styles.stepDot.upcoming)}
+          className={cn(styles.dot.base, index <= stepIndex ? styles.dot.reached : styles.dot.upcoming)}
         />
       ))}
     </div>
