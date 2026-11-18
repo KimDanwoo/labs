@@ -1,4 +1,5 @@
 import type { Track } from '@entities/track';
+import { REQUEST_TIMEOUT_MS } from '../config/network';
 
 const WIDGET_API_SRC = 'https://w.soundcloud.com/player/api.js';
 
@@ -42,7 +43,7 @@ export function loadWidgetApi(): Promise<ScGlobal> {
       const timer = setTimeout(() => {
         script.remove();
         reject(new Error('재생 API 연결 시간 초과'));
-      }, 10_000);
+      }, REQUEST_TIMEOUT_MS);
       script.onload = () => {
         clearTimeout(timer);
         if (globalThis.SC) resolve(globalThis.SC);
@@ -82,10 +83,13 @@ export function setUrl(tracks: readonly Track[]): string | null {
   return `${scheme}//${host}/${user}`;
 }
 
-export function soundId(sound: unknown): number | null {
+function soundId(sound: unknown): number | null {
   if (typeof sound !== 'object' || sound === null || !('id' in sound)) return null;
   return typeof sound.id === 'number' && Number.isSafeInteger(sound.id) && sound.id > 0 ? sound.id : null;
 }
+
+/** 위젯이 준 사운드 목록을 위치 그대로 id 배열로 옮긴다. 자리를 지우지 않는 게 핵심이다. */
+export const readSoundIds = (sounds: unknown[]) => (Array.isArray(sounds) ? sounds.map(soundId) : []);
 
 const ENGINE_FRAME_STYLE = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
 
