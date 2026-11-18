@@ -13,7 +13,7 @@ export const PROJECTS: Project[] = [
     description: '프론트엔드 개발 기록을 모아요',
     href: 'https://danwoo.dev/',
     scope: ['정적 사이트', '검색·목차', 'OG 이미지 생성'],
-    image: '/projects/dansoon.webp',
+    image: '/projects/dansoon-card.webp',
     imagePosition: 'center',
   },
   {
