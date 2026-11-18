@@ -1,4 +1,7 @@
-export type ProfileLink = { label: string; href: string };
+export interface ProfileLink {
+  label: string;
+  href: string;
+}
 
 export type ProfileSegment = string | ProfileLink;
 
