@@ -18,7 +18,7 @@ const GameResultSheet = dynamic(() => import('./game-result/GameResultSheet').th
 });
 
 export const HomePage = () => (
-  <main className="min-h-svh min-w-[360px] bg-[rgb(var(--color-surface-secondary))] relative overflow-x-hidden">
+  <main className="min-h-svh min-w-[360px] bg-surface-secondary relative overflow-x-hidden">
     <BackgroundGlow />
 
     <header className="glass-header">

@@ -53,7 +53,7 @@ export function BottomSheet({ isOpen, onClose, children, title, className }: Bot
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
         className={cn(
-          'absolute bg-[rgb(var(--color-surface-primary))]',
+          'absolute bg-surface-primary',
           'shadow-xl max-h-[85vh]',
           isDesktop ? 'left-1/2 top-1/2 rounded-2xl w-full max-w-md' : 'bottom-0 left-0 right-0 rounded-t-2xl',
           className,
@@ -65,17 +65,13 @@ export function BottomSheet({ isOpen, onClose, children, title, className }: Bot
             className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none"
             {...dragHandlers}
           >
-            <div className="w-10 h-1.5 rounded-full bg-[rgb(var(--color-border-medium))]" />
+            <div className="w-10 h-1.5 rounded-full bg-border-medium" />
           </div>
         )}
         {title && (
           <div
             id={titleId}
-            className={cn(
-              'px-6 text-lg font-bold',
-              isDesktop ? 'pt-6 pb-3' : 'py-3',
-              'text-[rgb(var(--color-text-primary))]',
-            )}
+            className={cn('px-6 text-lg font-bold', isDesktop ? 'pt-6 pb-3' : 'py-3', 'text-text-primary')}
           >
             {title}
           </div>

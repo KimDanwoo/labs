@@ -11,17 +11,17 @@ export function getCellBorderStyles(row: number, col: number) {
 export function getCellHighlightStyles(highlight: CellHighlight, isConflict: boolean, isHint: boolean) {
   return {
     bgColor: cn(
-      'bg-[rgb(var(--color-surface-primary))]',
-      highlight.related && 'bg-[rgb(var(--color-cell-related))]',
-      highlight.sameValue && 'bg-[rgb(var(--color-cell-selected))]',
-      highlight.selected && 'bg-[rgb(var(--color-cell-selected))]',
+      'bg-surface-primary',
+      highlight.related && 'bg-cell-related',
+      highlight.sameValue && 'bg-cell-selected',
+      highlight.selected && 'bg-cell-selected',
     ),
     textColor: cn(
-      'text-[rgb(var(--color-text-primary))]',
-      isHint && 'text-[rgb(var(--color-hint-text))]',
-      isConflict && 'text-[rgb(var(--color-error-text))] animate-subtle-pulse',
+      'text-text-primary',
+      isHint && 'text-hint-text',
+      isConflict && 'text-error-text animate-subtle-pulse',
     ),
-    borderColor: 'border-[rgb(var(--color-border-light))]',
+    borderColor: 'border-border-light',
   };
 }
 
@@ -47,8 +47,8 @@ export function buildCellClassName(
     bgColor,
     textColor,
     isInitial ? 'font-semibold' : 'font-normal',
-    isRightBlockBorder && 'border-r-[1.5px] border-r-[rgb(var(--color-text-tertiary))]',
-    isBottomBlockBorder && 'border-b-[1.5px] border-b-[rgb(var(--color-text-tertiary))]',
-    'hover:bg-[rgb(var(--color-cell-related))]',
+    isRightBlockBorder && 'border-r-[1.5px] border-r-text-tertiary',
+    isBottomBlockBorder && 'border-b-[1.5px] border-b-text-tertiary',
+    'hover:bg-cell-related',
   );
 }

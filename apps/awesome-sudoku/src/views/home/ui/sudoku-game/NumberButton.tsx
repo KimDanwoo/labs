@@ -18,9 +18,9 @@ export const NumberButton: React.FC<NumberButtonProps> = memo(({ value, onClick,
       'flex items-center justify-center',
       'transition-all duration-200 ease-out',
       isDisabled
-        ? 'text-[rgb(var(--color-text-tertiary))] cursor-not-allowed bg-[rgb(var(--color-bg-tertiary))]/50 border border-[rgb(var(--color-border-light))]'
-        : 'text-[rgb(var(--color-text-primary))] bg-gradient-to-b from-[rgb(var(--color-surface-primary))] to-[rgb(var(--color-bg-tertiary))] shadow-sm border border-[rgb(var(--color-border-light))]/60 hover:from-[rgb(var(--color-accent-light))] hover:to-[rgb(var(--color-surface-primary))] hover:text-[rgb(var(--color-accent))] hover:shadow-md hover:border-[rgb(var(--color-accent))]/30 hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40',
+        ? 'text-text-tertiary cursor-not-allowed bg-bg-tertiary/50 border border-border-light'
+        : 'text-text-primary bg-gradient-to-b from-surface-primary to-bg-tertiary shadow-sm border border-border-light/60 hover:from-accent-light hover:to-surface-primary hover:text-accent hover:shadow-md hover:border-accent/30 hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
     )}
     aria-label={`숫자 ${value}`}
     onClick={onClick}

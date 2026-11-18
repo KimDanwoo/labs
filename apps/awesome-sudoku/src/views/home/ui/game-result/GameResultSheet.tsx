@@ -25,16 +25,14 @@ export const GameResultSheet = memo(() => {
           <SuccessIcon />
 
           <div>
-            <p className="text-sm text-[rgb(var(--color-text-secondary))]">완료 시간</p>
-            <p className="text-3xl font-bold font-tabular text-[rgb(var(--color-text-primary))]">
-              {formatTime(currentTime)}
-            </p>
+            <p className="text-sm text-text-secondary">완료 시간</p>
+            <p className="text-3xl font-bold font-tabular text-text-primary">{formatTime(currentTime)}</p>
           </div>
         </div>
       ) : (
         <div className="text-center space-y-4">
           <FailureIcon />
-          <p className="text-[rgb(var(--color-text-secondary))]">
+          <p className="text-text-secondary">
             오답 {mistakeCount}/{MAX_MISTAKES}회로 게임이 종료되었습니다.
           </p>
         </div>

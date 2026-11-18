@@ -12,19 +12,18 @@ export const TimerControl = memo(() => {
 
   return (
     <div className="flex items-center gap-2.5">
-      <div className="px-3 py-1.5 rounded-lg bg-[rgb(var(--color-bg-tertiary))]/80 backdrop-blur-sm text-base font-semibold tracking-wide text-[rgb(var(--color-text-primary))] font-tabular">
+      <div className="px-3 py-1.5 rounded-lg bg-bg-tertiary/80 backdrop-blur-sm text-base font-semibold tracking-wide text-text-primary font-tabular">
         {formattedTime}
       </div>
 
       <button
         className={cn(
-          'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))]/40',
-          state === TIMER_STATE.completed &&
-            'bg-[rgb(var(--color-bg-tertiary))] text-[rgb(var(--color-text-tertiary))] cursor-not-allowed',
+          'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
+          state === TIMER_STATE.completed && 'bg-bg-tertiary text-text-tertiary cursor-not-allowed',
           state === TIMER_STATE.running &&
-            'bg-[rgb(var(--color-surface-primary))]/80 text-[rgb(var(--color-text-secondary))] shadow-sm hover:bg-[rgb(var(--color-surface-primary))] hover:text-[rgb(var(--color-text-primary))] active:scale-95',
+            'bg-surface-primary/80 text-text-secondary shadow-sm hover:bg-surface-primary hover:text-text-primary active:scale-95',
           state === TIMER_STATE.paused &&
-            'bg-gradient-to-b from-[rgb(var(--color-gradient-from))] to-[rgb(var(--color-gradient-to))] text-white shadow-[0_4px_12px_rgba(var(--color-gradient-from),0.3)] hover:shadow-[0_6px_16px_rgba(var(--color-gradient-from),0.4)] active:scale-95',
+            'bg-gradient-to-b from-gradient-from to-gradient-to text-white shadow-[0_4px_12px_rgba(var(--rgb-gradient-from),0.3)] hover:shadow-[0_6px_16px_rgba(var(--rgb-gradient-from),0.4)] active:scale-95',
         )}
         aria-label={timerActive ? '일시정지' : '재생'}
         disabled={isCompleted}

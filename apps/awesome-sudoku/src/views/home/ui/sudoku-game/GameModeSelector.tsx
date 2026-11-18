@@ -21,7 +21,7 @@ export const GameModeSelector = memo(() => {
   );
 
   return (
-    <div className="flex items-center gap-1 p-1 bg-[rgb(var(--color-bg-tertiary))]/80 rounded-xl backdrop-blur-sm">
+    <div className="flex items-center gap-1 p-1 bg-bg-tertiary/80 rounded-xl backdrop-blur-sm">
       {GAME_MODE_TABS.map(({ value, label }) => (
         <button
           key={value}
@@ -29,8 +29,8 @@ export const GameModeSelector = memo(() => {
           className={cn(
             'px-4 py-1.5 rounded-lg text-sm font-normal transition-all duration-200 ease-out',
             gameMode === value
-              ? 'bg-[rgb(var(--color-surface-primary))] text-[rgb(var(--color-text-primary))] shadow-sm'
-              : 'text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))]',
+              ? 'bg-surface-primary text-text-primary shadow-sm'
+              : 'text-text-secondary hover:text-text-primary',
           )}
         >
           {label}

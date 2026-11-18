@@ -26,7 +26,7 @@ export const useCellStyles = ({ cell, row, col, highlight, timerActive }: UseCel
   const stateClasses = useMemo(() => {
     const classes = [];
     if (!timerActive) classes.push('opacity-60');
-    if (cell.isSelected) classes.push('ring-2 ring-[rgb(var(--color-accent))]');
+    if (cell.isSelected) classes.push('ring-2 ring-accent');
     if (cell.isConflict) classes.push('animate-pulse');
     return classes.join(' ');
   }, [timerActive, cell.isSelected, cell.isConflict]);
