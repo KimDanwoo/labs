@@ -2,8 +2,7 @@
 
 import { Environment } from '@react-three/drei';
 import { useIsCoarsePointer } from '@shared/lib/useCoarsePointer';
-
-const SKY_ROTATION: [number, number, number] = [0, -1.5, 0];
+import { SKY_ROTATION } from '../../lib/scenery/sky';
 
 export function Sky() {
   const coarse = useIsCoarsePointer();

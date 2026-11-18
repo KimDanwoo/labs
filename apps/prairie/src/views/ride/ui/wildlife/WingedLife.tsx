@@ -14,12 +14,11 @@ import {
 } from '../../config/scene';
 
 import { useRef } from 'react';
-import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
+import { DoubleSide, InstancedMesh, Object3D } from 'three';
+import { colors, wingPositions } from '../../lib/wildlife/wingedLife';
 import { createCreatureState, habitatSeed, updateCreature } from '../../model/wildlife/behavior';
 
 type Kind = 'bird' | 'butterfly' | 'dragonfly';
-const colors = ['#ebc57c', '#adbbec', '#e6a9bc', '#f4e5b8'].map((color) => new Color(color));
-const wingPositions = new Float32Array([0, 0, 0, 1, 0, -0.22, 0.65, 0, 0.36]);
 
 // Fixed instance budgets; open-world habitats recycle only beyond the near field.
 export function WingedLife({ kind, anchor }: { kind: Kind; anchor?: readonly [number, number, number] }) {

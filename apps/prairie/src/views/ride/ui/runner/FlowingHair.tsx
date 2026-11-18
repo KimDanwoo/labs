@@ -7,10 +7,10 @@ import {
   Color,
   Float32BufferAttribute,
   Mesh,
-  Vector3,
   type Object3D,
   type WebGLProgramParametersWithUniforms,
 } from 'three';
+import { makeUniforms } from '../../lib/runner/flowingHair';
 import { runnerState } from '../../model/ride-state/runnerState';
 import { useLowDetail } from '../../model/ride-state/sceneQuality';
 import { RUNNER_FINISH } from '../../model/runner/constants';
@@ -144,15 +144,4 @@ export function FlowingHair({ head, neck, speedRef, isTail = false }: FlowingHai
       />
     </mesh>
   );
-}
-
-function makeUniforms() {
-  return {
-    uTop: { value: new Vector3() },
-    uBottom: { value: new Vector3() },
-    uTime: { value: 0 },
-    uFlow: { value: 0 },
-    uTail: { value: 0 },
-    uStrandCount: { value: RUNNER_FINISH.strands as number },
-  };
 }

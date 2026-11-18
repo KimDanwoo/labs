@@ -14,14 +14,8 @@ import {
 import { makeFlowerGeometry } from '../../lib/flora/makeFlowerGeometry';
 
 import { useMemo, useRef } from 'react';
-import { Color, InstancedMesh, Object3D } from 'three';
-
-const COLORS = ['#f7eac2', '#ead2a2', '#b9add9', '#e2d8f2'].map((hex) => new Color(hex));
-const hash = (n: number) => {
-  const x = Math.sin(n * 127.1) * 43758.5453;
-  return x - Math.floor(x);
-};
-const TILE = 16;
+import { InstancedMesh, Object3D } from 'three';
+import { COLORS, hash, TILE } from '../../lib/flora/meadowFlowers';
 
 // 셀마다 작은 야생화 군락. 두 번의 draw call로 그리고 강 골에는 심지 않는다.
 export function MeadowFlowers() {

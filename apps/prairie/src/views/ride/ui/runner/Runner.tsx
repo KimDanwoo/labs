@@ -7,14 +7,9 @@ import { Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, typ
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { terrainHeightAt } from '../../config/scene';
 import { gaitWeights } from '../../lib/runner/gaitWeights';
+import { position, rotationY, scale } from '../../lib/runner/runner';
 import { runnerState } from '../../model/ride-state/runnerState';
-import {
-  RUNNER_ANIM,
-  RUNNER_ANIM_TUNING,
-  RUNNER_MODEL_TRANSFORM,
-  RUNNER_MODEL_URL,
-  UNICORN_TINT,
-} from '../../model/runner/constants';
+import { RUNNER_ANIM, RUNNER_ANIM_TUNING, RUNNER_MODEL_URL, UNICORN_TINT } from '../../model/runner/constants';
 import { FlowingHair } from './FlowingHair';
 import { HeadCrown } from './HeadCrown';
 import { Horn } from './Horn';
@@ -27,7 +22,6 @@ type Gaits = {
   run: AnimationAction | null;
   flight: AnimationAction | null;
 };
-const { scale, rotationY, position } = RUNNER_MODEL_TRANSFORM;
 
 export function Runner({ speedRef }: RunnerProps) {
   const root = useRef<Group>(null);
