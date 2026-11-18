@@ -28,7 +28,7 @@ export const PROJECTS: Project[] = [
     title: '프딥',
     description: '프론트엔드 개념을 깊게 파고든 기록을 모아 둬요',
     href: 'https://fe-deep.danwoo.dev/',
-    scope: ['프론트엔드', '인증·DB', '관리자 기능', 'E2E 테스트'],
+    scope: ['프론트엔드', '마크다운 콘텐츠', '정적 생성', 'E2E 테스트'],
     image: '/projects/fe-deep.webp',
   },
   {

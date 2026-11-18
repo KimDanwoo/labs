@@ -1,4 +1,3 @@
-export { clearUserIdCache, getCurrentUserId, syncProgress } from './api/progressSync';
 export {
   getCurrentStreak,
   getProgressByCategory,

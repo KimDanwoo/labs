@@ -1,9 +1,0 @@
-{
-  "$schema": "https://turbo.build/schema.json",
-  "extends": ["//"],
-  "tasks": {
-    "build": {
-      "env": ["ADMIN_EMAILS", "GEMINI_API_KEY", "SUPABASE_SERVICE_ROLE_KEY", "WEATHER_API_KEY"]
-    }
-  }
-}

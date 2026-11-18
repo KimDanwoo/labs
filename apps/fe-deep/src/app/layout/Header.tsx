@@ -2,14 +2,10 @@
 
 import { cn } from '@shared/lib/cn';
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Sheet,
   SheetContent,
@@ -17,35 +13,26 @@ import {
   SheetTrigger,
   ThemeToggle,
 } from '@ui/react';
-import {
-  Bookmark,
-  BookOpen,
-  GraduationCap,
-  LogIn,
-  LogOut,
-  Menu,
-  NotebookPen,
-  Search,
-  Settings,
-  Shield,
-  User,
-} from 'lucide-react';
+import { Bookmark, BookOpen, GraduationCap, Menu, NotebookPen, Search, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useHeader } from './useHeader';
+import { useState } from 'react';
 
 const navItems = [
   { href: '/reference', label: '레퍼런스', icon: BookOpen },
   { href: '/learn', label: '학습', icon: GraduationCap },
   { href: '/search', label: '검색', icon: Search },
+  { href: '/study', label: '면접 학습', icon: NotebookPen },
 ];
 
-const adminNavItems = [{ href: '/study', label: '면접 학습', icon: NotebookPen }];
+const myPageItems = [
+  { href: '/mypage/progress', label: '학습 현황', icon: User },
+  { href: '/mypage/bookmarks', label: '북마크', icon: Bookmark },
+];
 
 export function Header() {
   const pathname = usePathname();
-  const { user, open, setOpen, isAdminUser, handleSignOut } = useHeader();
-  const visibleNavItems = isAdminUser ? [...navItems, ...adminNavItems] : navItems;
+  const [open, setOpen] = useState(false);
 
   return (
     <header
@@ -61,7 +48,7 @@ export function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center space-x-1 flex-1" aria-label="메인 네비게이션">
-          {visibleNavItems.map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
@@ -78,63 +65,26 @@ export function Header() {
         <div className="flex items-center gap-2 ml-auto">
           <ThemeToggle />
 
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full" aria-label="사용자 메뉴">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.user_metadata?.avatar_url} alt={`${user.email ?? '사용자'} 프로필`} />
-                    <AvatarFallback>
-                      <User className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/mypage/progress">
-                    <User className="h-4 w-4 mr-2" />
-                    학습 현황
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/mypage/bookmarks">
-                    <Bookmark className="h-4 w-4 mr-2" />
-                    북마크
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/mypage/account">
-                    <Settings className="h-4 w-4 mr-2" />
-                    계정 설정
-                  </Link>
-                </DropdownMenuItem>
-                {isAdminUser && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/admin">
-                        <Shield className="h-4 w-4 mr-2" />
-                        관리자
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  로그아웃
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button variant="outline" size="sm" className="gap-2" asChild>
-              <Link href="/auth/login" aria-label="로그인">
-                <LogIn className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">로그인</span>
-              </Link>
-            </Button>
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full" aria-label="내 학습 메뉴">
+                <User className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {myPageItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <DropdownMenuItem asChild key={item.href}>
+                    <Link href={item.href}>
+                      <Icon className="h-4 w-4 mr-2" />
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild className="md:hidden">
@@ -145,7 +95,7 @@ export function Header() {
             <SheetContent side="right" className="w-[280px]">
               <SheetTitle className="sr-only">메뉴</SheetTitle>
               <nav className="flex flex-col gap-1 mt-8 px-2">
-                {visibleNavItems.map((item) => {
+                {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                   return (
@@ -162,49 +112,18 @@ export function Header() {
                     </Button>
                   );
                 })}
-                {user && (
-                  <>
-                    <div className="my-2 border-t" />
-                    <Button variant="ghost" className="w-full justify-start gap-3" asChild>
-                      <Link href="/mypage/progress" onClick={() => setOpen(false)}>
-                        <User className="h-4 w-4" />
-                        학습 현황
+                <div className="my-2 border-t" />
+                {myPageItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Button variant="ghost" className="w-full justify-start gap-3" asChild key={item.href}>
+                      <Link href={item.href} onClick={() => setOpen(false)}>
+                        <Icon className="h-4 w-4" />
+                        {item.label}
                       </Link>
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start gap-3" asChild>
-                      <Link href="/mypage/bookmarks" onClick={() => setOpen(false)}>
-                        <Bookmark className="h-4 w-4" />
-                        북마크
-                      </Link>
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start gap-3" asChild>
-                      <Link href="/mypage/account" onClick={() => setOpen(false)}>
-                        <Settings className="h-4 w-4" />
-                        계정 설정
-                      </Link>
-                    </Button>
-                    {isAdminUser && (
-                      <Button variant="ghost" className="w-full justify-start gap-3" asChild>
-                        <Link href="/admin" onClick={() => setOpen(false)}>
-                          <Shield className="h-4 w-4" />
-                          관리자
-                        </Link>
-                      </Button>
-                    )}
-                    <div className="my-2 border-t" />
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start gap-3"
-                      onClick={() => {
-                        handleSignOut();
-                        setOpen(false);
-                      }}
-                    >
-                      <LogOut className="h-4 w-4" />
-                      로그아웃
-                    </Button>
-                  </>
-                )}
+                  );
+                })}
               </nav>
             </SheetContent>
           </Sheet>

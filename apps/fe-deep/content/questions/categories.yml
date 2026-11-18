@@ -1,0 +1,95 @@
+- id: cat-1
+  slug: html
+  title: HTML
+  icon: 🌐
+  description: HTML 기초 및 시맨틱 마크업
+- id: cat-2
+  slug: css
+  title: CSS
+  icon: 🎨
+  description: CSS 레이아웃, 반응형, 애니메이션
+- id: cat-3
+  slug: javascript
+  title: JavaScript
+  icon: ⚡
+  description: 자바스크립트 핵심 개념
+- id: cat-4
+  slug: typescript
+  title: TypeScript
+  icon: 🔷
+  description: 타입스크립트 타입 시스템
+- id: cat-5
+  slug: react
+  title: React
+  icon: ⚛️
+  description: 리액트 핵심 개념과 훅
+- id: cat-6
+  slug: nextjs
+  title: Next.js
+  icon: ▲
+  description: Next.js 프레임워크
+- id: cat-7
+  slug: browser
+  title: 브라우저
+  icon: 🖥️
+  description: 브라우저 동작 원리
+- id: cat-8
+  slug: network
+  title: 네트워크
+  icon: 🌍
+  description: HTTP, REST API, 통신
+- id: cat-9
+  slug: performance
+  title: 성능 최적화
+  icon: 🚀
+  description: 웹 성능 최적화 전략
+- id: cat-10
+  slug: security
+  title: 보안
+  icon: 🔒
+  description: 웹 보안 취약점과 대응
+- id: cat-11
+  slug: data-structure
+  title: 자료구조
+  icon: 🏗️
+  description: 프론트엔드 자료구조
+- id: cat-12
+  slug: algorithm
+  title: 알고리즘
+  icon: 🧮
+  description: 알고리즘 기초
+- id: cat-13
+  slug: design-pattern
+  title: 디자인패턴
+  icon: 🧩
+  description: 소프트웨어 디자인 패턴
+- id: cat-14
+  slug: git
+  title: Git
+  icon: 📦
+  description: 버전 관리와 협업
+- id: cat-15
+  slug: testing
+  title: 테스트
+  icon: 🧪
+  description: 프론트엔드 테스팅
+- id: cat-16
+  slug: cs-fundamentals
+  title: CS 기초
+  icon: 💻
+  description: 운영체제, 프로세스, 메모리
+- id: cat-17
+  slug: build-tooling
+  title: 빌드·배포
+  icon: ⚙️
+  description: 번들러, 패키지 매니저, 빌드 파이프라인과 배포
+- id: cat-18
+  slug: ai-frontend
+  title: AI 프론트엔드
+  icon: 🤖
+  description: LLM 연동 UI, 스트리밍, 토큰·컨텍스트 관리
+- id: cat-ubiquitous
+  slug: ubiquitous
+  title: 유비쿼터스 컴퓨팅
+  icon: 📡
+  description: 유비쿼터스 컴퓨팅

@@ -1,20 +1,18 @@
 'use client';
 
-import { getCurrentUserId } from '@entities/progress';
-import { createClient } from '@shared/api/supabaseClient';
-import { useCallback, useEffect, useState } from 'react';
-
-// 로그인: 서버 테이블이 진실 — 로드 시 로컬 전용 항목을 서버로 올리고 합집합 사용
+import { useCallback, useSyncExternalStore } from 'react';
 
 type MarkMap = Record<string, string[]>;
 
-interface TopicMarkStore {
-  table: string;
-  storageKey: string;
+const SERVER_MARKS = new Set<string>();
+const cache = new Map<string, Set<string>>();
+const listeners = new Map<string, Set<() => void>>();
+
+function toCacheKey(storageKey: string, docSlug: string): string {
+  return JSON.stringify([storageKey, docSlug]);
 }
 
 function readLocal(storageKey: string): MarkMap {
-  if (typeof window === 'undefined') return {};
   try {
     const raw = localStorage.getItem(storageKey);
     return raw ? JSON.parse(raw) : {};
@@ -23,111 +21,69 @@ function readLocal(storageKey: string): MarkMap {
   }
 }
 
-function saveLocal(storageKey: string, docSlug: string, titles: Set<string>): void {
+function getMarks(storageKey: string, docSlug: string): Set<string> {
+  const key = toCacheKey(storageKey, docSlug);
+  const cached = cache.get(key);
+  if (cached) return cached;
+  const marks = new Set(readLocal(storageKey)[docSlug] ?? []);
+  cache.set(key, marks);
+  return marks;
+}
+
+function writeMarks(storageKey: string, docSlug: string, marks: Set<string>): void {
   const map = readLocal(storageKey);
-  map[docSlug] = [...titles];
+  map[docSlug] = [...marks];
   localStorage.setItem(storageKey, JSON.stringify(map));
+
+  const key = toCacheKey(storageKey, docSlug);
+  cache.set(key, marks);
+  listeners.get(key)?.forEach((listener) => listener());
 }
 
-async function syncToggle(table: string, docSlug: string, topicKey: string, isAdding: boolean): Promise<void> {
-  const userId = await getCurrentUserId();
-  if (!userId) return;
-
-  const supabase = createClient();
-  const { error } = isAdding
-    ? await supabase
-        .from(table)
-        .upsert(
-          { user_id: userId, doc_slug: docSlug, topic_key: topicKey },
-          { onConflict: 'user_id,doc_slug,topic_key' },
-        )
-    : await supabase.from(table).delete().match({ user_id: userId, doc_slug: docSlug, topic_key: topicKey });
-
-  if (error) console.error(`syncToggle(${table}) error:`, error);
+function subscribe(key: string, listener: () => void): () => void {
+  const set = listeners.get(key) ?? new Set();
+  listeners.set(key, set);
+  set.add(listener);
+  return () => {
+    set.delete(listener);
+    if (set.size > 0) return;
+    listeners.delete(key);
+    cache.delete(key);
+  };
 }
 
-export function useTopicMarks(docSlug: string, { table, storageKey }: TopicMarkStore) {
-  const [marked, setMarked] = useState<Set<string>>(new Set());
-  const [isLoaded, setIsLoaded] = useState(false);
+const subscribeNothing = () => () => {};
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      const local = new Set(readLocal(storageKey)[docSlug] ?? []);
-      const userId = await getCurrentUserId();
-
-      if (!userId) {
-        if (!cancelled) {
-          setMarked(local);
-          setIsLoaded(true);
-        }
-        return;
-      }
-
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from(table)
-        .select('topic_key')
-        .eq('user_id', userId)
-        .eq('doc_slug', docSlug);
-
-      if (error) {
-        console.error(`loadTopicMarks(${table}) error:`, error);
-        if (!cancelled) {
-          setMarked(local);
-          setIsLoaded(true);
-        }
-        return;
-      }
-
-      const remote = new Set((data ?? []).map((row) => row.topic_key as string));
-      const merged = new Set([...local, ...remote]);
-
-      const localOnly = [...local].filter((title) => !remote.has(title));
-      if (localOnly.length > 0) {
-        const rows = localOnly.map((title) => ({ user_id: userId, doc_slug: docSlug, topic_key: title }));
-        const { error: upsertError } = await supabase
-          .from(table)
-          .upsert(rows, { onConflict: 'user_id,doc_slug,topic_key' });
-        if (upsertError) console.error(`uploadLocalTopicMarks(${table}) error:`, upsertError);
-      }
-
-      if (!cancelled) {
-        saveLocal(storageKey, docSlug, merged);
-        setMarked(merged);
-        setIsLoaded(true);
-      }
-    }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [docSlug, table, storageKey]);
+export function useTopicMarks(docSlug: string, storageKey: string) {
+  const key = toCacheKey(storageKey, docSlug);
+  const subscribeToMarks = useCallback((listener: () => void) => subscribe(key, listener), [key]);
+  const marked = useSyncExternalStore(
+    subscribeToMarks,
+    () => getMarks(storageKey, docSlug),
+    () => SERVER_MARKS,
+  );
+  const isLoaded = useSyncExternalStore(
+    subscribeNothing,
+    () => true,
+    () => false,
+  );
 
   const toggle = useCallback(
     (topicTitle: string) => {
-      const next = new Set(marked);
-      const isAdding = !next.has(topicTitle);
-      if (isAdding) next.add(topicTitle);
-      else next.delete(topicTitle);
-
-      setMarked(next);
-      saveLocal(storageKey, docSlug, next);
-      void syncToggle(table, docSlug, topicTitle, isAdding);
+      const next = new Set(getMarks(storageKey, docSlug));
+      if (next.has(topicTitle)) next.delete(topicTitle);
+      else next.add(topicTitle);
+      writeMarks(storageKey, docSlug, next);
     },
-    [docSlug, marked, table, storageKey],
+    [docSlug, storageKey],
   );
 
   const remove = useCallback(
     (topicTitles: string[]) => {
-      const next = new Set([...marked].filter((title) => !topicTitles.includes(title)));
-      setMarked(next);
-      saveLocal(storageKey, docSlug, next);
-      topicTitles.forEach((title) => void syncToggle(table, docSlug, title, false));
+      const next = new Set([...getMarks(storageKey, docSlug)].filter((title) => !topicTitles.includes(title)));
+      writeMarks(storageKey, docSlug, next);
     },
-    [docSlug, marked, table, storageKey],
+    [docSlug, storageKey],
   );
 
   return { marked, isLoaded, toggle, remove };

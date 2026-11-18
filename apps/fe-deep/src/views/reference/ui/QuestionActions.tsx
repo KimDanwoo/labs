@@ -1,16 +1,14 @@
 'use client';
 
-import { FeedbackForm } from '@features/feedback';
 import { Button } from '@ui/react';
 import { Bookmark, BookmarkCheck, CheckCircle } from 'lucide-react';
 import { useQuestionActions } from '../model/hooks/useQuestionActions';
 
 interface QuestionActionsProps {
   questionId: string;
-  questionText: string;
 }
 
-export function QuestionActions({ questionId, questionText }: QuestionActionsProps) {
+export function QuestionActions({ questionId }: QuestionActionsProps) {
   const { isBookmarked, isMastered, handleBookmarkToggle, handleMarkLearned } = useQuestionActions(questionId);
 
   return (
@@ -25,7 +23,6 @@ export function QuestionActions({ questionId, questionText }: QuestionActionsPro
           학습 완료
         </Button>
       )}
-      <FeedbackForm questionId={questionId} questionText={questionText} fixedType="edit_question" label="수정 요청" />
     </div>
   );
 }

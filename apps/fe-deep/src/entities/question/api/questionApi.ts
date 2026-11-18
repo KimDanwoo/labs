@@ -1,213 +1,57 @@
-import { createClient } from '@shared/api/supabaseClient';
-import { toContainsPattern } from '@shared/lib/postgrestFilter';
-import { shuffleArray } from '@shared/lib/shuffle';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type {
-  Category,
-  Difficulty,
-  FollowUp,
-  PaginatedResult,
-  Question,
-  SearchResult,
-  VisibilityFilter,
-} from '../model/types/types';
+import {
+  findCategoryBySlug,
+  pickQuestionsByIds,
+  questionsInCategory,
+  searchQuestionContent,
+} from '../model/services/questionQueries';
+import type { Category, Question, QuestionContent, SearchResult } from '../model/types/types';
 
-// 조회 실패는 호출자에게 전달한다. 정상적인 결과 없음만 빈 배열 또는 undefined로 반환한다.
+const QUESTION_CONTENT_PATH = '/api/questions';
 
-const QUESTION_COLUMNS =
-  'id, category_id, question, answer, sub_category, difficulty, order_num, tags, show_in_daily, show_in_flashcard, follow_ups';
+let contentRequest: Promise<QuestionContent> | undefined;
 
-const CATEGORY_COLUMNS = 'id, slug, title, order_num, icon, description';
-
-type CategoryWithCountRow = Omit<Category, 'question_count'> & { questions: { count: number }[] | null };
-
-type QuestionWithCategoryRow = Omit<Question, 'follow_ups'> & {
-  follow_ups: FollowUp[] | null;
-  categories: Category | null;
-};
-
-/**
- * Supabase 클라이언트를 반환한다.
- * Server Component에서는 createServerSupabaseClient() 결과를 전달하고,
- * Client Component에서는 파라미터 없이 호출하면 브라우저 클라이언트를 생성한다.
- */
-function getClient(supabase?: SupabaseClient) {
-  return supabase ?? createClient();
+function isQuestionContent(value: unknown): value is QuestionContent {
+  if (typeof value !== 'object' || value === null) return false;
+  const { categories, questions } = value as Partial<Record<keyof QuestionContent, unknown>>;
+  return Array.isArray(categories) && Array.isArray(questions);
 }
 
-export async function getAllCategories(supabase?: SupabaseClient): Promise<Category[]> {
-  const client = getClient(supabase);
-  const { data, error } = await client
-    .from('categories')
-    .select(`${CATEGORY_COLUMNS}, questions(count)`)
-    .order('order_num')
-    .overrideTypes<CategoryWithCountRow[], { merge: false }>();
-
-  if (error) throw error;
-
-  return (data ?? []).map(({ questions, ...category }) => ({
-    ...category,
-    question_count: questions?.[0]?.count ?? 0,
-  }));
+async function requestQuestionContent(): Promise<QuestionContent> {
+  const response = await fetch(QUESTION_CONTENT_PATH);
+  if (!response.ok) throw new Error(`질문 데이터를 불러오지 못했습니다 (${response.status}).`);
+  const data: unknown = await response.json();
+  if (!isQuestionContent(data)) throw new Error('질문 데이터 형식이 올바르지 않습니다.');
+  return data;
 }
 
-export async function getCategoryBySlug(slug: string, supabase?: SupabaseClient): Promise<Category | undefined> {
-  const client = getClient(supabase);
-  const { data, error } = await client.from('categories').select(CATEGORY_COLUMNS).eq('slug', slug).maybeSingle();
-
-  if (error) throw error;
-  if (!data) return undefined;
-
-  return data as Category;
-}
-
-export async function getQuestionsByCategory(categoryId: string, supabase?: SupabaseClient): Promise<Question[]> {
-  const client = getClient(supabase);
-  const { data, error } = await client
-    .from('questions')
-    .select(QUESTION_COLUMNS)
-    .eq('category_id', categoryId)
-    .order('order_num');
-
-  if (error) throw error;
-
-  return (data ?? []) as Question[];
-}
-
-export async function getQuestionsByCategorySlug(slug: string, supabase?: SupabaseClient): Promise<Question[]> {
-  const client = getClient(supabase);
-  const category = await getCategoryBySlug(slug, client);
-  if (!category) return [];
-  return getQuestionsByCategory(category.id, client);
-}
-
-export async function getQuestionsByCategorySlugPaginated(
-  slug: string,
-  page: number = 1,
-  pageSize: number = 10,
-  supabase?: SupabaseClient,
-  difficulty?: Difficulty,
-): Promise<PaginatedResult<Question>> {
-  const client = getClient(supabase);
-  const category = await getCategoryBySlug(slug, client);
-  if (!category) return { data: [], total: 0, page, pageSize, totalPages: 0 };
-
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
-
-  let query = client.from('questions').select(QUESTION_COLUMNS, { count: 'exact' }).eq('category_id', category.id);
-  if (difficulty) query = query.eq('difficulty', difficulty);
-
-  const { data, count, error } = await query.order('order_num').range(from, to);
-
-  if (error) throw error;
-
-  const total = count ?? 0;
-  return {
-    data: (data ?? []) as Question[],
-    total,
-    page,
-    pageSize,
-    totalPages: Math.ceil(total / pageSize),
-  };
-}
-
-export async function getQuestionById(id: string, supabase?: SupabaseClient): Promise<Question | undefined> {
-  const client = getClient(supabase);
-  const { data, error } = await client.from('questions').select(QUESTION_COLUMNS).eq('id', id).maybeSingle();
-
-  if (error) throw error;
-  if (!data) return undefined;
-
-  return data as Question;
-}
-
-export async function getQuestionsByIds(ids: string[], supabase?: SupabaseClient): Promise<Question[]> {
-  if (ids.length === 0) return [];
-  const client = getClient(supabase);
-  const { data, error } = await client.from('questions').select(QUESTION_COLUMNS).in('id', ids);
-
-  if (error) throw error;
-
-  return (data ?? []) as Question[];
-}
-
-export async function getAllQuestions(supabase?: SupabaseClient): Promise<Question[]> {
-  const client = getClient(supabase);
-  const { data, error } = await client.from('questions').select(QUESTION_COLUMNS);
-
-  if (error) throw error;
-
-  return (data ?? []) as Question[];
-}
-
-function findMatchType(question: Question, lowerQuery: string): SearchResult['matchType'] | undefined {
-  if (question.question.toLowerCase().includes(lowerQuery)) return 'question';
-  if (question.answer.toLowerCase().includes(lowerQuery)) return 'answer';
-  if (question.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))) return 'tag';
-  return undefined;
-}
-
-export async function searchQuestions(query: string, supabase?: SupabaseClient): Promise<SearchResult[]> {
-  if (!query.trim()) return [];
-
-  const client = getClient(supabase);
-  const pattern = toContainsPattern(query);
-
-  const { data, error } = await client
-    .from('questions')
-    .select(`${QUESTION_COLUMNS}, categories(${CATEGORY_COLUMNS})`)
-    .or(`question.ilike.${pattern},answer.ilike.${pattern}`)
-    .overrideTypes<QuestionWithCategoryRow[], { merge: false }>();
-
-  if (error) throw error;
-
-  const lowerQuery = query.toLowerCase();
-
-  return (data ?? []).flatMap(({ categories: category, follow_ups: followUps, ...row }) => {
-    if (!category) return [];
-    const question: Question = { ...row, follow_ups: followUps ?? [] };
-    const matchType = findMatchType(question, lowerQuery);
-    return matchType ? [{ question, category, matchType }] : [];
+function fetchQuestionContent(): Promise<QuestionContent> {
+  contentRequest ??= requestQuestionContent().catch((error: unknown) => {
+    contentRequest = undefined;
+    throw error;
   });
+  return contentRequest;
 }
 
-export async function getQuestionsByDifficulty(difficulty: Difficulty, supabase?: SupabaseClient): Promise<Question[]> {
-  const client = getClient(supabase);
-  const { data, error } = await client.from('questions').select(QUESTION_COLUMNS).eq('difficulty', difficulty);
-
-  if (error) throw error;
-
-  return (data ?? []) as Question[];
+export async function getAllCategories(): Promise<Category[]> {
+  return (await fetchQuestionContent()).categories;
 }
 
-export async function getRandomQuestions(
-  count: number,
-  categorySlug?: string,
-  supabase?: SupabaseClient,
-  options?: { visibilityFilter?: VisibilityFilter },
-): Promise<Question[]> {
-  const client = getClient(supabase);
+export async function getAllQuestions(): Promise<Question[]> {
+  return (await fetchQuestionContent()).questions;
+}
 
-  let query = client.from('questions').select('id');
-  if (categorySlug) {
-    const category = await getCategoryBySlug(categorySlug, client);
-    if (!category) return [];
-    query = query.eq('category_id', category.id);
-  }
-  if (options?.visibilityFilter === 'daily') {
-    query = query.eq('show_in_daily', true);
-  } else if (options?.visibilityFilter === 'flashcard') {
-    query = query.eq('show_in_flashcard', true);
-  }
+export async function getQuestionsByCategorySlug(slug: string): Promise<Question[]> {
+  const content = await fetchQuestionContent();
+  const category = findCategoryBySlug(content, slug);
+  return category ? questionsInCategory(content, category.id) : [];
+}
 
-  const { data: idRows, error: idError } = await query;
-  if (idError) throw idError;
-  if (!idRows || idRows.length === 0) return [];
+export async function getQuestionsByIds(ids: string[]): Promise<Question[]> {
+  if (ids.length === 0) return [];
+  return pickQuestionsByIds(await fetchQuestionContent(), ids);
+}
 
-  const pickedIds = shuffleArray(idRows)
-    .slice(0, count)
-    .map((r) => r.id as string);
-
-  return getQuestionsByIds(pickedIds, client);
+export async function searchQuestions(query: string): Promise<SearchResult[]> {
+  if (!query.trim()) return [];
+  return searchQuestionContent(await fetchQuestionContent(), query);
 }

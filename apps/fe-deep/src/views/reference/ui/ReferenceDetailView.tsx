@@ -1,50 +1,33 @@
-import {
-  DIFFICULTY_CONFIG,
-  DIFFICULTY_VALUES,
-  getAllCategories,
-  getCategoryBySlug,
-  getQuestionsByCategorySlugPaginated,
-  type Difficulty,
-} from '@entities/question';
-import { FeedbackForm } from '@features/feedback';
-import { createClient } from '@supabase/supabase-js';
+import { findCategoryBySlug, questionsInCategory } from '@entities/question';
+import { loadQuestionContent } from '@entities/question/index.server';
+import { SITE_URL } from '@shared/config/site';
 import { Button, Sheet, SheetContent, SheetTitle, SheetTrigger } from '@ui/react';
-import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
+import { CategoryQuestionList, QUESTIONS_PER_PAGE } from './CategoryQuestionList';
 import { CategorySidebar } from './CategorySidebar';
 import { QuestionAccordion } from './QuestionAccordion';
 
-const PAGE_SIZE = 10;
+const FAQ_ANSWER_LENGTH = 500;
 
 interface CategoryPageProps {
   params: Promise<{ categorySlug: string }>;
-  searchParams: Promise<{ page?: string; difficulty?: string }>;
 }
 
-function isDifficulty(value: string | undefined): value is Difficulty {
-  return DIFFICULTY_VALUES.includes(value as Difficulty);
-}
-
-function buildHref(categorySlug: string, page: number, difficulty?: Difficulty): string {
-  const query = new URLSearchParams();
-  if (page > 1) query.set('page', String(page));
-  if (difficulty) query.set('difficulty', difficulty);
-  const qs = query.toString();
-  return `/reference/${categorySlug}${qs ? `?${qs}` : ''}`;
+function toJsonLd(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
 export async function generateStaticParams() {
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-  const categories = await getAllCategories(supabase);
+  const { categories } = await loadQuestionContent();
   return categories.map((c) => ({ categorySlug: c.slug }));
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { categorySlug } = await params;
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-  const category = await getCategoryBySlug(categorySlug, supabase);
+  const category = findCategoryBySlug(await loadQuestionContent(), categorySlug);
   if (!category) return {};
 
   return {
@@ -57,43 +40,27 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   };
 }
 
-export async function ReferenceDetailView({ params, searchParams }: CategoryPageProps) {
+export async function ReferenceDetailView({ params }: CategoryPageProps) {
   const { categorySlug } = await params;
-  const { page: pageParam, difficulty: difficultyParam } = await searchParams;
-  const page = Math.max(1, Number(pageParam) || 1);
-  const difficulty = isDifficulty(difficultyParam) ? difficultyParam : undefined;
-
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-
-  const category = await getCategoryBySlug(categorySlug, supabase);
+  const content = await loadQuestionContent();
+  const category = findCategoryBySlug(content, categorySlug);
   if (!category) notFound();
 
-  const [result, categories] = await Promise.all([
-    getQuestionsByCategorySlugPaginated(categorySlug, page, PAGE_SIZE, supabase, difficulty),
-    getAllCategories(supabase),
-  ]);
+  const { categories } = content;
+  const questions = questionsInCategory(content, category.id);
+  const firstPage = questions.slice(0, QUESTIONS_PER_PAGE);
 
-  if (page > 1 && result.data.length === 0) notFound();
-
-  const difficultyFilters: { value: Difficulty | undefined; label: string }[] = [
-    { value: undefined, label: '전체' },
-    ...DIFFICULTY_VALUES.map((value) => ({
-      value: value as Difficulty | undefined,
-      label: DIFFICULTY_CONFIG[value].label,
-    })),
-  ];
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fedeep.kr';
+  const siteUrl = SITE_URL;
 
   const faqSchema =
-    result.data.length > 0
+    firstPage.length > 0
       ? {
           '@context': 'https://schema.org',
           '@type': 'FAQPage',
-          mainEntity: result.data.map((q) => ({
+          mainEntity: firstPage.map((q) => ({
             '@type': 'Question',
             name: q.question,
-            acceptedAnswer: { '@type': 'Answer', text: q.answer.slice(0, 500) },
+            acceptedAnswer: { '@type': 'Answer', text: q.answer.slice(0, FAQ_ANSWER_LENGTH) },
           })),
         }
       : null;
@@ -110,10 +77,8 @@ export async function ReferenceDetailView({ params, searchParams }: CategoryPage
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in">
-      {faqSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      )}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(faqSchema) }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(breadcrumbSchema) }} />
 
       <div className="flex gap-8">
         <aside className="hidden lg:block w-64 shrink-0">
@@ -150,94 +115,14 @@ export async function ReferenceDetailView({ params, searchParams }: CategoryPage
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {category.description}
-                {result.total > 0 && <span className="ml-2 tabular-nums">({result.total}개 질문)</span>}
+                {questions.length > 0 && <span className="ml-2 tabular-nums">({questions.length}개 질문)</span>}
               </p>
-              <FeedbackForm fixedType="add_question" label="질문 추가 요청" className="-ml-2 mt-1" />
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-1.5 mb-5" role="group" aria-label="난이도 필터">
-            {difficultyFilters.map(({ value, label }) => (
-              <Button
-                key={label}
-                variant={difficulty === value ? 'default' : 'outline'}
-                size="sm"
-                asChild={difficulty !== value}
-                className="shadow-sm"
-              >
-                {difficulty === value ? (
-                  <span>{label}</span>
-                ) : (
-                  <Link href={buildHref(categorySlug, 1, value)}>{label}</Link>
-                )}
-              </Button>
-            ))}
-          </div>
-
-          {result.data.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-10 text-center">이 난이도의 질문이 없습니다.</p>
-          ) : (
-            <QuestionAccordion questions={result.data} startIndex={(page - 1) * PAGE_SIZE} />
-          )}
-
-          {result.totalPages > 1 && (
-            <nav className="flex items-center justify-center gap-2 mt-10" aria-label="페이지네이션">
-              {page > 1 ? (
-                <Button variant="outline" size="sm" asChild className="shadow-sm">
-                  <Link href={buildHref(categorySlug, page - 1, difficulty)}>
-                    <ChevronLeft className="size-4" />
-                  </Link>
-                </Button>
-              ) : (
-                <Button variant="outline" size="sm" disabled>
-                  <ChevronLeft className="size-4" />
-                </Button>
-              )}
-
-              {Array.from({ length: result.totalPages }, (_, i) => i + 1)
-                .filter((p) => p === 1 || p === result.totalPages || Math.abs(p - page) <= 2)
-                .reduce<(number | 'ellipsis')[]>((acc, p, idx, arr) => {
-                  if (idx > 0 && p - (arr[idx - 1] as number) > 1) {
-                    acc.push('ellipsis');
-                  }
-                  acc.push(p);
-                  return acc;
-                }, [])
-                .map((item, idx) =>
-                  item === 'ellipsis' ? (
-                    <span key={`e-${idx}`} className="px-1 text-muted-foreground">
-                      ...
-                    </span>
-                  ) : (
-                    <Button
-                      key={item}
-                      variant={page === item ? 'default' : 'outline'}
-                      size="sm"
-                      className="min-w-8 tabular-nums shadow-sm"
-                      asChild={page !== item}
-                    >
-                      {page === item ? (
-                        <span>{item}</span>
-                      ) : (
-                        <Link href={buildHref(categorySlug, item, difficulty)}>{item}</Link>
-                      )}
-                    </Button>
-                  ),
-                )}
-
-              {page < result.totalPages ? (
-                <Button variant="outline" size="sm" asChild className="shadow-sm">
-                  <Link href={buildHref(categorySlug, page + 1, difficulty)}>
-                    <ChevronRight className="size-4" />
-                  </Link>
-                </Button>
-              ) : (
-                <Button variant="outline" size="sm" disabled>
-                  <ChevronRight className="size-4" />
-                </Button>
-              )}
-            </nav>
-          )}
+          <Suspense fallback={<QuestionAccordion questions={firstPage} />}>
+            <CategoryQuestionList categorySlug={categorySlug} questions={questions} />
+          </Suspense>
         </div>
       </div>
     </div>

@@ -83,13 +83,12 @@ catalog:
   react-markdown: ^10.1.0
   rehype-highlight: ^7.0.2
   remark-gfm: ^4.0.1
+  yaml: ^2.9.1
 
   # icons
   react-icons: ^5.5.0
 
   # backend / data
-  '@supabase/ssr': ^0.8.0
-  '@supabase/supabase-js': ^2.106.1
   '@tanstack/react-query': ^5.100.14
 
   # analytics
