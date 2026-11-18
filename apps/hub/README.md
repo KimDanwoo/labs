@@ -16,7 +16,7 @@
 | 언어          | TypeScript 5                    |
 | 스타일        | Tailwind CSS 4                  |
 | 패키지 매니저 | pnpm (monorepo)                 |
-| 공용 패키지   | `@tokens/css`                   |
+| 공용 패키지   | `@repo/fonts`                   |
 
 ## 구조
 
