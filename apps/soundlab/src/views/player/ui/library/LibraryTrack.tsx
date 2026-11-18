@@ -1,6 +1,9 @@
-import { currentIndexAtom, TrackRow, TRACKS, usePlaybackControls, type Track } from '@entities/track';
+import { TRACKS, type Track } from '@entities/track';
 import { useAtomValue } from 'jotai';
 import type { JSX } from 'react';
+import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
+import { currentIndexAtom } from '../../model/store/playback';
+import { TrackRow } from '../track/TrackRow';
 import { FavoriteButton } from './FavoriteButton';
 
 type Props = { track: Track; position: number };

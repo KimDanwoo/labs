@@ -1,7 +1,7 @@
-import { libraryAtom, toggleFavoriteAtom } from '@entities/track';
 import { Button } from '@shared/ui/Button';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX } from 'react';
+import { libraryAtom, toggleFavoriteAtom } from '../../model/library';
 import { HeartIcon } from './HeartIcon';
 
 type Props = { trackId: number; title: string };

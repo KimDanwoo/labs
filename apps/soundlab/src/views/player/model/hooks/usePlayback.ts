@@ -1,21 +1,13 @@
 'use client';
 
+import type { Track } from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  type ScWidget,
-  loadWidgetApi,
-  mountEngineFrame,
-  readStartTarget,
-  setUrl,
-  soundId,
-  trackUrl,
-  widgetSrc,
-  writeLastPlayed,
-} from '../../api/widget';
+import { type ScWidget, loadWidgetApi, mountEngineFrame, setUrl, soundId, trackUrl, widgetSrc } from '../../api/widget';
 import { type PositionReport, advanceClock, estimatePosition } from '../../lib/playbackClock';
 import { REPEAT_MODE } from '../constants/repeatMode';
+import { readStartTarget, writeLastPlayed } from '../lastPlayed';
 import { LISTEN_SOURCE, recordListeningAtom, recordSessionAtom, SESSION_EVENT } from '../library';
 import { type PlaybackQueue, adjacentTrack, playableIds, resolveQueue } from '../queue';
 import {
@@ -31,7 +23,6 @@ import {
   resumeNoticeAtom,
   shuffleAtom,
 } from '../store/playback';
-import type { Track } from '../types/track';
 import { useVolumeFade } from './useVolumeFade';
 
 /** 위젯 콜백은 undefined를 줄 수 있다. 비유한값이 frameState로 새면 시간 표시가 NaN이 된다. */

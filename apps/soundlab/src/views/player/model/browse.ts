@@ -1,6 +1,8 @@
-import { libraryAtom, playbackQueueAtom, TRACKS } from '@entities/track';
+import { TRACKS } from '@entities/track';
 import { atom } from 'jotai';
 import { COLLECTIONS } from '../config/collections';
+import { libraryAtom } from './library';
+import { playbackQueueAtom } from './store/playback';
 
 export const LIBRARY_FILTER = { all: 'all', favorites: 'favorites', recent: 'recent', queue: 'queue' } as const;
 export type LibraryFilter = (typeof LIBRARY_FILTER)[keyof typeof LIBRARY_FILTER];

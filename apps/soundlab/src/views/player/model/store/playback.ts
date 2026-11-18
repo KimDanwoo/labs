@@ -1,5 +1,5 @@
+import { type PlayerScreen, PLAYER_SCREEN } from '@entities/track';
 import { atom } from 'jotai/vanilla';
-import { type PlayerScreen, PLAYER_SCREEN } from '../constants/playerScreen';
 import { type RepeatMode, REPEAT_MODE } from '../constants/repeatMode';
 import type { PlaybackQueue } from '../queue';
 

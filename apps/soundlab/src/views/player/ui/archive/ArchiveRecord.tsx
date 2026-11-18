@@ -1,16 +1,9 @@
-import {
-  artworkUrl,
-  currentIndexAtom,
-  isPlayingAtom,
-  PLAYER_SCREEN,
-  playerPath,
-  playerScreenAtom,
-  TRACKS,
-  usePlaybackControls,
-  type Track,
-} from '@entities/track';
+import { artworkUrl, PLAYER_SCREEN, TRACKS, type Track } from '@entities/track';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX, MouseEvent } from 'react';
+import { playerPath } from '../../lib/playerUrl';
+import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
+import { currentIndexAtom, isPlayingAtom, playerScreenAtom } from '../../model/store/playback';
 
 type Props = { track: Track; position: number };
 

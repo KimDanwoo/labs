@@ -1,6 +1,6 @@
 'use client';
 
-import { currentIndexAtom, playbackQueueAtom, TRACKS, usePlaybackControls } from '@entities/track';
+import { TRACKS } from '@entities/track';
 import { Button } from '@shared/ui/Button';
 import { ScrollArea } from '@shared/ui/ScrollArea';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -13,7 +13,9 @@ import {
   searchAtom,
   visibleTracksAtom,
 } from '../../model/browse';
+import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
 import { useScrollCurrentIntoView } from '../../model/hooks/useScrollCurrentIntoView';
+import { currentIndexAtom, playbackQueueAtom } from '../../model/store/playback';
 import { BrowseControls } from '../library/BrowseControls';
 import { CollectionCard } from '../library/CollectionCard';
 import { LibraryTrack } from '../library/LibraryTrack';

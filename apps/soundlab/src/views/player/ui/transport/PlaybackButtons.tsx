@@ -1,16 +1,9 @@
 import { useAtom, useAtomValue } from 'jotai';
 
-import {
-  REPEAT_LABEL,
-  REPEAT_MODE,
-  TRACKS,
-  currentIndexAtom,
-  isPlayingAtom,
-  nextRepeatMode,
-  repeatModeAtom,
-  shuffleAtom,
-  usePlaybackControls,
-} from '@entities/track';
+import { TRACKS } from '@entities/track';
+import { REPEAT_LABEL, REPEAT_MODE, nextRepeatMode } from '../../model/constants/repeatMode';
+import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
+import { currentIndexAtom, isPlayingAtom, repeatModeAtom, shuffleAtom } from '../../model/store/playback';
 
 import { TRACK_STEP } from '../../config/layout';
 import { NextIcon } from './NextIcon';
