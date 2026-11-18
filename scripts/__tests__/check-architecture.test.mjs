@@ -137,17 +137,20 @@ test('component modules hold only components and hooks; constants, helpers and s
   assert.equal(validateComponentModule('const useless = () => null;', 'Card.tsx').length, 1);
 });
 
-test('CSS files live in src/app/styles or a slice styles/ folder, never next to ui components', () => {
+test('CSS files live in src/app/styles or a slice styles/ folder; only <Component>.module.css sits next to ui components', () => {
   assert.deepEqual(
     findMisplacedStyles([
       'src/app/globals.css',
       'src/app/styles/colors.css',
       'src/views/drive/styles/world.css',
       'src/views/drive/ui/Menu.tsx',
+      'src/views/drive/ui/Menu.module.css',
+      'src/shared/ui/sheet/Sheet.module.css',
     ]),
     [],
   );
   assert.equal(findMisplacedStyles(['src/views/drive/ui/world.css']).length, 1);
+  assert.equal(findMisplacedStyles(['src/views/drive/ui/menu.module.css']).length, 1);
   assert.equal(findMisplacedStyles(['src/shared/ui/sheet.css']).length, 1);
   assert.equal(findMisplacedStyles(['app/page.css']).length, 1);
 });
