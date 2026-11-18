@@ -10,6 +10,10 @@ export function characterScale(depth: number) {
 
 const SCENE_HALF_WIDTH = 60;
 const SCENE_HALF_HEIGHT = 40;
+const SCENE_WIDTH = 120;
+const SCENE_HEIGHT = 80;
+const PAINTING_WIDTH = 1536;
+const PAINTING_HEIGHT = 1024;
 const SCENE_SCALE_X = 1.2;
 const SCENE_SCALE_Z = 0.8;
 
@@ -19,3 +23,13 @@ export const worldFromScene = (x: number, y: number) => ({
   x: (x + SCENE_HALF_WIDTH) / SCENE_SCALE_X,
   z: (SCENE_HALF_HEIGHT - y) / SCENE_SCALE_Z,
 });
+
+export const paintingToScene = (x: number, y: number): [number, number] => [
+  (x / PAINTING_WIDTH) * SCENE_WIDTH - SCENE_HALF_WIDTH,
+  SCENE_HALF_HEIGHT - (y / PAINTING_HEIGHT) * SCENE_HEIGHT,
+];
+
+export const sceneToUv = (x: number, y: number): [number, number] => [
+  (x + SCENE_HALF_WIDTH) / SCENE_WIDTH,
+  (y + SCENE_HALF_HEIGHT) / SCENE_HEIGHT,
+];

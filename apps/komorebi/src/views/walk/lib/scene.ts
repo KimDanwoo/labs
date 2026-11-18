@@ -10,7 +10,7 @@ import {
 } from '../model/schoolmates';
 import { companionStore } from '../model/store/companions';
 import { DEFAULT_APPEARANCE, characterLayers, type Appearance } from '../model/world/appearance';
-import { FOREGROUNDS, foregroundOrder } from '../model/world/foreground';
+import { foregroundOrder } from '../model/world/foreground';
 import { isAtHomeBed, isNearHomeBed, isNearSpot } from '../model/world/interactions';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '../model/world/portals';
 import { surfaceAt, type Surface } from '../model/world/surfaces';
@@ -31,8 +31,7 @@ import {
   type Point,
   type Region,
 } from '../model/world/world';
-import { CANVAS_FONT_FAMILY, canvasTexture } from './art';
-import { BACKGROUND_FRAGMENT, BACKGROUND_VERTEX } from './backgroundShader';
+import { CANVAS_FONT_FAMILY } from './art';
 import { createBallScene } from './ballScene';
 import { createBedRest } from './bedRest';
 import { createBoats } from './boats';
@@ -62,6 +61,15 @@ import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './reg
 import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
 import { createRoamers } from './roamers';
 import { createSceneLife } from './sceneLife';
+import {
+  createBackgroundMaterial,
+  createDestinationMarkers,
+  createForegroundMaterial,
+  createForegrounds,
+  createMarkerTexture,
+  createShadow,
+  createTargetMarker,
+} from './sceneSprites';
 import { createSchoolmates } from './schoolmatesScene';
 import { createWaterMaps } from './water';
 import { createWaves } from './waves';
@@ -201,33 +209,7 @@ export async function createScene(
   camera.position.set(0, 0, 100);
   const geo = new THREE.PlaneGeometry(120, 80, 1, 1);
   const waterMaps = createWaterMaps(loader);
-  const background = new THREE.ShaderMaterial({
-    uniforms: {
-      map: { value: startPlate.value },
-      time: { value: 0 },
-      evening: { value: 0 },
-      night: { value: 0 },
-      rain: { value: 0 },
-      lamps: { value: lampUniforms(START_REGION).values },
-      lampCount: { value: lampUniforms(START_REGION).count },
-      walker: { value: new THREE.Vector2(0.5, 0.2) },
-      waterMap: { value: waterMaps.of(START_REGION) },
-      foam: waterMaps.foam,
-      glitter: waterMaps.glitter,
-      isSea: { value: 0 },
-      isVillage: { value: 1 },
-      isHome: { value: 0 },
-      chalk: { value: null },
-      hasChalk: { value: 0 },
-      outdoorRain: { value: 0 },
-      sceneryStyle: { value: SCENERY_STYLE[START_REGION] },
-      sceneryTime: { value: 0 },
-      renderDpr: { value: 1 },
-      fade: { value: 1 },
-    },
-    vertexShader: BACKGROUND_VERTEX,
-    fragmentShader: BACKGROUND_FRAGMENT,
-  });
+  const background = createBackgroundMaterial(startPlate.value, START_REGION, waterMaps);
   scene.add(new THREE.Mesh(geo, background));
   const child = character.group;
   scene.add(child);
@@ -242,71 +224,15 @@ export async function createScene(
   child.children.forEach((part) => {
     part.renderOrder = CHILD_ORDER;
   });
-  const foregroundMaterial = background.clone();
-  foregroundMaterial.uniforms = background.uniforms;
-  foregroundMaterial.transparent = true;
-  foregroundMaterial.depthTest = false;
-  foregroundMaterial.depthWrite = false;
+  const foregroundMaterial = createForegroundMaterial(background);
   const bedRest = createBedRest(scene, foregroundMaterial);
-  const foregrounds = FOREGROUNDS.map((layer) => {
-    const shapes = (layer.pieces ?? [layer.outline]).map(
-      (outline) =>
-        new THREE.Shape(outline.map(([x, y]) => new THREE.Vector2((x / 1536) * 120 - 60, 40 - (y / 1024) * 80))),
-    );
-    const geometry = new THREE.ShapeGeometry(shapes);
-    const vertices = geometry.getAttribute('position');
-    const uv = geometry.getAttribute('uv');
-    for (let i = 0; i < vertices.count; i++) uv.setXY(i, (vertices.getX(i) + 60) / 120, (vertices.getY(i) + 40) / 80);
-    const mesh = new THREE.Mesh(geometry, foregroundMaterial);
-    mesh.visible = false;
-    scene.add(mesh);
-    return { ...layer, mesh };
-  });
-  const shadowTexture = canvasTexture(128, 64, (c) => {
-    const g = c.createRadialGradient(64, 32, 2, 64, 32, 53);
-    g.addColorStop(0, '#17332b77');
-    g.addColorStop(1, '#17332b00');
-    c.fillStyle = g;
-    c.scale(1, 0.5);
-    c.fillRect(0, 0, 128, 128);
-  });
+  const foregrounds = createForegrounds(scene, foregroundMaterial);
+  const { sprite: shadow, material: shadowMat, texture: shadowTexture } = createShadow(scene);
   loaded.push(shadowTexture);
-  const shadowMat = new THREE.SpriteMaterial({
-    map: shadowTexture,
-    transparent: true,
-    depthTest: false,
-  });
-  const shadow = new THREE.Sprite(shadowMat);
-  shadow.renderOrder = 3;
-  scene.add(shadow);
   const dust = createDust(scene);
-  const markerMap = canvasTexture(64, 64, (c) => {
-    c.strokeStyle = '#fff8ca';
-    c.lineWidth = 3;
-    c.beginPath();
-    c.moveTo(32, 9);
-    c.lineTo(45, 32);
-    c.lineTo(32, 55);
-    c.lineTo(19, 32);
-    c.closePath();
-    c.stroke();
-    c.fillStyle = '#ffefaa';
-    c.beginPath();
-    c.arc(32, 32, 3, 0, Math.PI * 2);
-    c.fill();
-  });
+  const markerMap = createMarkerTexture();
   loaded.push(markerMap);
-  const markerMats = DESTINATIONS.map(
-    () => new THREE.SpriteMaterial({ map: markerMap, transparent: true, depthTest: false }),
-  );
-  const markers = DESTINATIONS.map((p, i) => {
-    const s = new THREE.Sprite(markerMats[i]);
-    s.position.set(sceneX(p.x), sceneY(p.z) + 2, 1);
-    s.scale.set(1.7, 1.7, 1);
-    s.renderOrder = 2;
-    scene.add(s);
-    return s;
-  });
+  const { sprites: markers, materials: markerMats } = createDestinationMarkers(scene, markerMap);
   const portalVisuals = createPortals(scene);
   const fireflies = createFireflies(scene);
   const placeEffects = createPlaceEffects(scene);
@@ -323,17 +249,7 @@ export async function createScene(
   const leaves = createDriftingLeaves(scene);
   let sceneryTime = 0;
   const rain = createRain(scene);
-  const targetMat = new THREE.SpriteMaterial({
-    map: markerMap,
-    color: '#fff9cf',
-    transparent: true,
-    depthTest: false,
-  });
-  const targetMarker = new THREE.Sprite(targetMat);
-  targetMarker.scale.set(1, 1, 1);
-  targetMarker.renderOrder = 2;
-  targetMarker.visible = false;
-  scene.add(targetMarker);
+  const { sprite: targetMarker, material: targetMat } = createTargetMarker(scene, markerMap);
 
   let region: Region = START_REGION,
     position = { ...SPAWN },
