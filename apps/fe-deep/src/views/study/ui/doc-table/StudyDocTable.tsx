@@ -1,6 +1,5 @@
 import type { StudyDoc } from '../../lib/parseHandbook';
 import { StudyDocRow } from './StudyDocRow';
-import { styles } from './StudyDocTable.styles';
 
 interface StudyDocTableProps {
   docs: StudyDoc[];
@@ -8,18 +7,18 @@ interface StudyDocTableProps {
 
 export function StudyDocTable({ docs }: StudyDocTableProps) {
   return (
-    <div className={styles.frame}>
-      <table className={styles.table}>
+    <div className="overflow-hidden rounded-xl border bg-card">
+      <table className="w-full text-sm">
         <thead>
-          <tr className={styles.headRow}>
-            <th className={styles.docHead}>문서</th>
-            <th className={styles.countHead}>주제</th>
-            <th className={styles.countHead}>카드</th>
-            <th className={styles.dateHead}>날짜</th>
-            <th className={styles.arrowHead} aria-hidden />
+          <tr className="border-b text-xs text-muted-foreground">
+            <th className="px-5 py-3 text-left font-normal">문서</th>
+            <th className="hidden w-20 px-3 py-3 text-right font-normal sm:table-cell">주제</th>
+            <th className="hidden w-20 px-3 py-3 text-right font-normal sm:table-cell">카드</th>
+            <th className="w-28 px-3 py-3 text-right font-normal">날짜</th>
+            <th className="w-10" aria-hidden />
           </tr>
         </thead>
-        <tbody className={styles.body}>
+        <tbody className="divide-y">
           {docs.map((doc) => (
             <StudyDocRow key={doc.slug} doc={doc} />
           ))}

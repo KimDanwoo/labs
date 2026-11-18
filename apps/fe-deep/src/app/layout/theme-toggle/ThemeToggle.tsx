@@ -18,7 +18,7 @@ export function ThemeToggle() {
       aria-label="라이트/다크 모드 전환"
       onClick={toggleTheme}
       suppressHydrationWarning
-      className={styles.root}
+      className="group relative flex h-7 w-[52px] shrink-0 items-center rounded-full p-[3px] transition-shadow hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
     >
       <span suppressHydrationWarning className={cn(styles.dayBackground.base, styles.dayBackground[theme])} />
       <span suppressHydrationWarning className={cn(styles.nightBackground.base, styles.nightBackground[theme])} />

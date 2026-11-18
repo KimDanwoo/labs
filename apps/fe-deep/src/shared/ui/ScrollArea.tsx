@@ -5,13 +5,15 @@ import type { ComponentProps } from 'react';
 
 import { cn } from '@shared/lib/cn';
 
-import { styles } from './ScrollArea.styles';
 import { ScrollBar } from './ScrollBar';
 
 export function ScrollArea({ className, children, ...props }: ComponentProps<typeof ScrollAreaPrimitive.Root>) {
   return (
-    <ScrollAreaPrimitive.Root data-slot="scroll-area" className={cn(styles.root, className)} {...props}>
-      <ScrollAreaPrimitive.Viewport data-slot="scroll-area-viewport" className={styles.viewport}>
+    <ScrollAreaPrimitive.Root data-slot="scroll-area" className={cn('relative overflow-hidden', className)} {...props}>
+      <ScrollAreaPrimitive.Viewport
+        data-slot="scroll-area-viewport"
+        className="focus-visible:ring-ring/50 size-full max-h-[inherit] rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1"
+      >
         {children}
       </ScrollAreaPrimitive.Viewport>
       <ScrollBar />

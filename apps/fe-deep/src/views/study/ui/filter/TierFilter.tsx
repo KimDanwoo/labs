@@ -2,7 +2,6 @@ import { Checkbox } from '@shared/ui/Checkbox';
 
 import { TIER_LABELS } from '../../config/filters';
 import { STUDY_TIER_ORDER, type StudyTier } from '../../model/services/studyFilter';
-import { styles } from './StudyFilterBar.styles';
 
 interface TierFilterProps {
   selected: Set<StudyTier>;
@@ -12,13 +11,13 @@ interface TierFilterProps {
 
 export function TierFilter({ selected, counts, onToggle }: TierFilterProps) {
   return (
-    <div className={styles.tierGroup} role="group" aria-label="티어 필터">
-      <span className={styles.groupLabel}>티어</span>
+    <div className="flex flex-wrap items-center gap-3" role="group" aria-label="티어 필터">
+      <span className="text-xs text-muted-foreground">티어</span>
       {STUDY_TIER_ORDER.map((tier) => (
-        <label key={tier} className={styles.tierOption}>
+        <label key={tier} className="flex cursor-pointer items-center gap-1.5 text-sm">
           <Checkbox checked={selected.has(tier)} onCheckedChange={() => onToggle(tier)} />
           {TIER_LABELS[tier]}
-          <span className={styles.count}>{counts[tier]}</span>
+          <span className="text-xs tabular-nums opacity-60">{counts[tier]}</span>
         </label>
       ))}
     </div>

@@ -9,7 +9,7 @@ interface StepDotsProps {
 
 export function StepDots({ stepIndex, stepCount }: StepDotsProps) {
   return (
-    <div className={styles.root} aria-label={`${stepIndex + 1}단계 / 총 ${stepCount}단계`}>
+    <div className="ml-auto flex items-center gap-1.5" aria-label={`${stepIndex + 1}단계 / 총 ${stepCount}단계`}>
       {Array.from({ length: stepCount }, (_, index) => (
         <span
           key={index}

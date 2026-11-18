@@ -11,12 +11,12 @@ interface HeatCellProps {
 }
 
 export function HeatCell({ cell, maxCount }: HeatCellProps) {
-  if (cell.kind === CELL_KIND.outside) return <div className={styles.outsideCell} />;
-  if (cell.kind === CELL_KIND.future) return <div className={styles.futureCell} />;
+  if (cell.kind === CELL_KIND.outside) return <div className="h-3 w-3" />;
+  if (cell.kind === CELL_KIND.future) return <div className="h-3 w-3 rounded-[2px] bg-muted/40" />;
 
   return (
     <div
-      className={cn(styles.dayCell, styles.heat[heatIntensity(cell.count, maxCount)])}
+      className={cn('h-3 w-3 rounded-[2px]', styles.heat[heatIntensity(cell.count, maxCount)])}
       title={`${cell.date}: ${cell.count}문제`}
     />
   );

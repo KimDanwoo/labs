@@ -5,7 +5,6 @@ import type { StudyDoc } from '../../lib/parseHandbook';
 import { useStudyRunView } from '../../model/hooks/useStudyRunView';
 import { StudyFilterBar } from '../filter/StudyFilterBar';
 import { StudyRunner } from './StudyRunner';
-import { styles } from './StudyRunView.styles';
 
 interface StudyRunViewProps {
   doc: StudyDoc;
@@ -25,7 +24,7 @@ export function StudyRunView({ doc }: StudyRunViewProps) {
         onChangeFilter={view.handleChangeFilter}
       />
       {view.visibleTopics.length === 0 ? (
-        <div className={styles.empty}>{EMPTY_MESSAGES[view.filter]}</div>
+        <div className="py-16 text-center text-sm text-muted-foreground">{EMPTY_MESSAGES[view.filter]}</div>
       ) : (
         <StudyRunner
           key={view.runnerKey}

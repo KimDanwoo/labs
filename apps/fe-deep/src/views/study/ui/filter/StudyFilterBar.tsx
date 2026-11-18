@@ -2,7 +2,6 @@
 
 import type { StudyFilter, StudyTier } from '../../model/services/studyFilter';
 import { ProgressFilter } from './ProgressFilter';
-import { styles } from './StudyFilterBar.styles';
 import { TierFilter } from './TierFilter';
 
 interface StudyFilterBarProps {
@@ -23,7 +22,7 @@ export function StudyFilterBar({
   onChangeFilter,
 }: StudyFilterBarProps) {
   return (
-    <div className={styles.root}>
+    <div className="mb-4 space-y-2">
       <TierFilter selected={tiers} counts={tierCounts} onToggle={onToggleTier} />
       <ProgressFilter selected={filter} counts={counts} onChange={onChangeFilter} />
     </div>

@@ -2,12 +2,10 @@ import { Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 import { DifficultyBadge, type Category, type Question } from '@entities/question';
-import { AccordionContent, AccordionItem, AccordionTrigger } from '@shared/ui/Accordion';
 import { Badge } from '@shared/ui/Badge';
 import { Button } from '@shared/ui/Button';
+import { CardAccordionItem } from '@shared/ui/CardAccordionItem';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
-
-import { styles } from './BookmarksPage.styles';
 
 interface BookmarkItemProps {
   question: Question;
@@ -17,34 +15,34 @@ interface BookmarkItemProps {
 
 export function BookmarkItem({ question, category, onRemove }: BookmarkItemProps) {
   return (
-    <AccordionItem value={question.id} className={styles.item}>
-      <AccordionTrigger className={styles.trigger}>
-        <div className={styles.summary}>
-          <span className={styles.question}>{question.question}</span>
-          <div className={styles.meta}>
+    <CardAccordionItem
+      value={question.id}
+      trigger={
+        <div className="flex flex-col gap-1.5 text-left flex-1 mr-4">
+          <span className="font-normal text-sm leading-relaxed">{question.question}</span>
+          <div className="flex items-center gap-2 flex-wrap">
             {category && (
-              <Badge variant="outline" className={styles.categoryBadge}>
+              <Badge variant="outline" className="text-xs">
                 {category.icon} {category.title}
               </Badge>
             )}
             <DifficultyBadge difficulty={question.difficulty} />
           </div>
         </div>
-      </AccordionTrigger>
-      <AccordionContent className={styles.content}>
-        <MarkdownRenderer content={question.answer} />
-        <div className={styles.actions}>
-          <Button variant="ghost" size="sm" onClick={() => onRemove(question.id)} className={styles.remove}>
-            <Trash2 className={styles.removeIcon} />
-            북마크 삭제
+      }
+    >
+      <MarkdownRenderer content={question.answer} />
+      <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/50">
+        <Button variant="ghost" size="sm" onClick={() => onRemove(question.id)} className="gap-2 text-error">
+          <Trash2 className="h-4 w-4" />
+          북마크 삭제
+        </Button>
+        {category && (
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={`/reference/${category.slug}`}>{category.title}에서 보기 →</Link>
           </Button>
-          {category && (
-            <Button variant="ghost" size="sm" asChild>
-              <Link href={`/reference/${category.slug}`}>{category.title}에서 보기 →</Link>
-            </Button>
-          )}
-        </div>
-      </AccordionContent>
-    </AccordionItem>
+        )}
+      </div>
+    </CardAccordionItem>
   );
 }

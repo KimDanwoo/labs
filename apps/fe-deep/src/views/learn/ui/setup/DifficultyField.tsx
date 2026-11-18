@@ -1,8 +1,8 @@
 import { DIFFICULTY_CONFIG, DIFFICULTY_VALUES, type Difficulty } from '@entities/question';
 import { Button } from '@shared/ui/Button';
+import { FieldLabel } from './FieldLabel';
 
 import { selectedVariant } from '../../lib/selectedVariant';
-import { styles } from './LearnSetup.styles';
 
 interface DifficultyFieldProps {
   selected: Difficulty[];
@@ -13,13 +13,13 @@ interface DifficultyFieldProps {
 export function DifficultyField({ selected, onToggle, onClear }: DifficultyFieldProps) {
   return (
     <div>
-      <label className={styles.fieldLabel}>난이도</label>
-      <div className={styles.difficultyOptions}>
+      <FieldLabel>난이도</FieldLabel>
+      <div className="grid grid-cols-4 gap-1.5">
         <Button
           variant={selectedVariant(selected.length === 0)}
           size="sm"
           onClick={onClear}
-          className={styles.difficultyOption}
+          className="transition-all duration-200"
         >
           전체
         </Button>
@@ -29,7 +29,7 @@ export function DifficultyField({ selected, onToggle, onClear }: DifficultyField
             variant={selectedVariant(selected.includes(difficulty))}
             size="sm"
             onClick={() => onToggle(difficulty)}
-            className={styles.difficultyOption}
+            className="transition-all duration-200"
           >
             {DIFFICULTY_CONFIG[difficulty].label}
           </Button>

@@ -1,11 +1,11 @@
 'use client';
 
+import { PageContainer } from '@shared/ui/PageContainer';
+import { PageTitle } from '@shared/ui/PageTitle';
 import { Flame, Trophy } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@shared/ui/Button';
-
-import { styles } from './LearnDone.styles';
 
 interface LearnDoneProps {
   questionCount: number;
@@ -15,28 +15,28 @@ interface LearnDoneProps {
 
 export function LearnDone({ questionCount, streak, onRestart }: LearnDoneProps) {
   return (
-    <div className={styles.root}>
-      <div className={styles.body}>
-        <Trophy className={styles.trophy} />
-        <h1 className={styles.title}>학습 완료!</h1>
-        <p className={styles.summary}>{questionCount}문제를 모두 학습했습니다.</p>
+    <PageContainer width="narrow" enter="rise">
+      <div className="text-center py-16">
+        <Trophy className="h-16 w-16 text-highlight mx-auto mb-5" />
+        <PageTitle className="mb-3">학습 완료!</PageTitle>
+        <p className="text-muted-foreground mb-6">{questionCount}문제를 모두 학습했습니다.</p>
 
         {streak > 0 && (
-          <div className={styles.streak}>
-            <Flame className={styles.streakIcon} />
-            <span className={styles.streakText}>{streak}일 연속 학습 중!</span>
+          <div className="inline-flex items-center gap-2 rounded-full bg-streak/10 border border-streak/20 px-4 py-2 mb-8">
+            <Flame className="h-5 w-5 text-streak" />
+            <span className="text-lg font-bold">{streak}일 연속 학습 중!</span>
           </div>
         )}
 
-        <div className={styles.actions}>
-          <Button onClick={onRestart} variant="outline" className={styles.restart}>
+        <div className="flex gap-3 justify-center">
+          <Button onClick={onRestart} variant="outline" className="gap-2 shadow-sm">
             다시 학습하기
           </Button>
-          <Button variant="ghost" className={styles.progressLink} asChild>
+          <Button variant="ghost" className="gap-2" asChild>
             <Link href="/mypage/progress">학습 현황 보기</Link>
           </Button>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -1,3 +1,4 @@
+import { PageContainer } from '@shared/ui/PageContainer';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -14,7 +15,6 @@ import { QuestionAccordion } from '../QuestionAccordion';
 import { CategoryHeading } from './CategoryHeading';
 import { JsonLdScript } from './JsonLdScript';
 import { MobileCategoryMenu } from './MobileCategoryMenu';
-import { styles } from './ReferenceDetailView.styles';
 
 export async function ReferenceDetailView({ params }: CategoryPageProps) {
   const { categorySlug } = await params;
@@ -28,19 +28,19 @@ export async function ReferenceDetailView({ params }: CategoryPageProps) {
   const faqSchema = buildFaqSchema(firstPage);
 
   return (
-    <div className={styles.root}>
+    <PageContainer width="wide" enter="fade">
       {faqSchema && <JsonLdScript data={faqSchema} />}
       <JsonLdScript data={buildBreadcrumbSchema(SITE_URL, category)} />
 
-      <div className={styles.layout}>
-        <aside className={styles.aside}>
-          <div className={styles.asideCard}>
+      <div className="flex gap-8">
+        <aside className="hidden lg:block w-64 shrink-0">
+          <div className="sticky top-20 border border-border/60 rounded-xl shadow-sm">
             <CategorySidebar categories={categories} />
           </div>
         </aside>
 
-        <div className={styles.main}>
-          <div className={styles.heading}>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start gap-3 mb-8">
             <MobileCategoryMenu categories={categories} />
             <CategoryHeading category={category} questionCount={questions.length} />
           </div>
@@ -50,6 +50,6 @@ export async function ReferenceDetailView({ params }: CategoryPageProps) {
           </Suspense>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

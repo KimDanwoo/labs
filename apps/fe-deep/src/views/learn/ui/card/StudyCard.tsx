@@ -7,7 +7,6 @@ import { FALLBACK_DIFFICULTY } from '../../config/studyCard';
 import { AnswerReveal } from './AnswerReveal';
 import { KeywordHints } from './KeywordHints';
 import { RecallInput } from './RecallInput';
-import { styles } from './StudyCardView.styles';
 
 interface StudyCardProps {
   question: Question | undefined;
@@ -36,23 +35,23 @@ export function StudyCard({
   const shouldShowHints = keywords.length > 0 && !(isFlipped && recallInput.trim());
 
   return (
-    <Card className={styles.card}>
-      <div className={styles.cardMeta}>
+    <Card className="min-h-[300px] p-6 relative shadow-sm">
+      <div className="flex items-center gap-2 mb-5">
         {followUp ? (
-          <Badge className={styles.badge}>꼬꼬무</Badge>
+          <Badge className="text-xs">꼬꼬무</Badge>
         ) : (
           <DifficultyBadge difficulty={question?.difficulty ?? FALLBACK_DIFFICULTY} />
         )}
         {!followUp && question?.sub_category && (
-          <Badge variant="secondary" className={styles.badge}>
+          <Badge variant="secondary" className="text-xs">
             {question.sub_category}
           </Badge>
         )}
         {stepCount > 1 && <StepDots stepIndex={stepIndex} stepCount={stepCount} />}
       </div>
 
-      <div className={styles.promptBox}>
-        <p className={styles.prompt}>{prompt}</p>
+      <div className="flex flex-col items-center justify-center min-h-[120px] mb-6">
+        <p className="text-lg font-normal text-center leading-relaxed whitespace-pre-line">{prompt}</p>
       </div>
 
       {shouldShowHints && <KeywordHints keywords={keywords} />}

@@ -11,7 +11,7 @@ export interface LegalSectionContent {
 export function LegalSection({ title, paragraph, items }: LegalSectionContent) {
   return (
     <section>
-      <h2 className={styles.sectionTitle}>{title}</h2>
+      <h2 className="text-lg font-semibold mb-3">{title}</h2>
       {paragraph && <p>{paragraph}</p>}
       {items && (
         <ul className={cn(styles.list.base, paragraph && styles.list.afterParagraph)}>

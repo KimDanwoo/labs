@@ -1,4 +1,5 @@
-import { styles } from './LegalDocument.styles';
+import { PageContainer } from '@shared/ui/PageContainer';
+import { PageTitle } from '@shared/ui/PageTitle';
 import { LegalSection, type LegalSectionContent } from './LegalSection';
 
 export interface LegalDocumentContent {
@@ -9,15 +10,15 @@ export interface LegalDocumentContent {
 
 export function LegalDocument({ title, effectiveDate, sections }: LegalDocumentContent) {
   return (
-    <div className={styles.root}>
-      <h1 className={styles.title}>{title}</h1>
+    <PageContainer width="document">
+      <PageTitle className="mb-8">{title}</PageTitle>
 
-      <div className={styles.body}>
-        <p className={styles.effectiveDate}>{effectiveDate}</p>
+      <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-sm leading-relaxed">
+        <p className="text-muted-foreground">{effectiveDate}</p>
         {sections.map((section) => (
           <LegalSection key={section.title} {...section} />
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }

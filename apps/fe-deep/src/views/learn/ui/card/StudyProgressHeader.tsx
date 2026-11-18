@@ -3,8 +3,6 @@ import type { ReactNode } from 'react';
 import { Badge } from '@shared/ui/Badge';
 import { Progress } from '@shared/ui/Progress';
 
-import { styles } from './StudyCardView.styles';
-
 interface StudyProgressHeaderProps {
   currentIndex: number;
   totalCount: number;
@@ -23,25 +21,25 @@ export function StudyProgressHeader({
   action,
 }: StudyProgressHeaderProps) {
   return (
-    <div className={styles.header}>
-      <div className={styles.headerRow}>
-        <div className={styles.headerGroup}>
-          <span className={styles.counter}>
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-normal tabular-nums text-muted-foreground">
             {currentIndex + 1} / {totalCount}
           </span>
           {isNewCard && (
-            <Badge variant="secondary" className={styles.badge}>
+            <Badge variant="secondary" className="text-xs">
               NEW
             </Badge>
           )}
         </div>
-        <div className={styles.headerGroup}>
-          {!isFlipped && <span className={styles.shortcutHint}>Space 또는 ⌘/Ctrl+Enter</span>}
-          {isFlipped && <span className={styles.shortcutHint}>Space/Enter로 다음</span>}
+        <div className="flex items-center gap-2">
+          {!isFlipped && <span className="text-xs text-muted-foreground/70">Space 또는 ⌘/Ctrl+Enter</span>}
+          {isFlipped && <span className="text-xs text-muted-foreground/70">Space/Enter로 다음</span>}
           {action}
         </div>
       </div>
-      <Progress value={progressPercent} className={styles.progress} />
+      <Progress value={progressPercent} className="h-1.5" />
     </div>
   );
 }

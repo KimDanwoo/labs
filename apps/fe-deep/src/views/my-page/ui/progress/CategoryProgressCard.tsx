@@ -5,7 +5,6 @@ import { Progress } from '@shared/ui/Progress';
 
 import { toPercent } from '../../lib/toPercent';
 import type { CategoryProgress } from '../../model/hooks/useProgressStats';
-import { styles } from './ProgressPage.styles';
 
 interface CategoryProgressCardProps {
   category: Category;
@@ -17,24 +16,24 @@ export function CategoryProgressCard({ category, progress }: CategoryProgressCar
   const percent = toPercent(progress.mastered + progress.learning, total);
 
   return (
-    <Card className={styles.categoryCard}>
-      <Card.Content className={styles.categoryContent}>
-        <div className={styles.categoryRow}>
-          <span className={styles.categoryIcon}>{category.icon}</span>
-          <div className={styles.categoryBody}>
-            <div className={styles.categoryHeader}>
-              <span className={styles.categoryName}>{category.title}</span>
-              <div className={styles.categoryCounts}>
-                <Badge variant="success" className={styles.countBadge}>
+    <Card className="shadow-sm">
+      <Card.Content className="p-4">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-xl">{category.icon}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-normal truncate">{category.title}</span>
+              <div className="flex items-center gap-2 ml-2 shrink-0">
+                <Badge variant="success" className="tabular-nums">
                   {progress.mastered}
                 </Badge>
-                <Badge variant="warning" className={styles.countBadge}>
+                <Badge variant="warning" className="tabular-nums">
                   {progress.learning}
                 </Badge>
-                <span className={styles.categoryPercent}>{percent}%</span>
+                <span className="text-xs text-muted-foreground tabular-nums">{percent}%</span>
               </div>
             </div>
-            <Progress value={percent} className={styles.categoryBar} />
+            <Progress value={percent} className="h-1.5 mt-2" />
           </div>
         </div>
       </Card.Content>

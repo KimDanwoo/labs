@@ -9,7 +9,6 @@ import { useState } from 'react';
 
 import { MAIN_NAV_ITEMS, MY_PAGE_NAV_ITEMS } from '../config/navigation';
 import { isActivePath } from '../lib/isActivePath';
-import { styles } from './MobileNav.styles';
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -18,32 +17,32 @@ export function MobileNav() {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild className={styles.trigger}>
+      <SheetTrigger asChild className="md:hidden">
         <Button variant="ghost" size="icon" aria-label="메뉴 열기">
-          <Menu className={styles.triggerIcon} aria-hidden="true" />
+          <Menu className="h-5 w-5" aria-hidden="true" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className={styles.content}>
+      <SheetContent side="right" className="w-[280px]">
         <SheetTitle className="sr-only">메뉴</SheetTitle>
-        <nav className={styles.nav}>
+        <nav className="flex flex-col gap-1 mt-8 px-2">
           {MAIN_NAV_ITEMS.map(({ href, label, icon: Icon }) => (
             <Button
               key={href}
               variant={isActivePath(pathname, href) ? 'secondary' : 'ghost'}
-              className={styles.item}
+              className="w-full justify-start gap-3"
               asChild
             >
               <Link href={href} onClick={handleNavigate}>
-                <Icon className={styles.itemIcon} />
+                <Icon className="h-4 w-4" />
                 {label}
               </Link>
             </Button>
           ))}
-          <div className={styles.divider} />
+          <div className="my-2 border-t" />
           {MY_PAGE_NAV_ITEMS.map(({ href, label, icon: Icon }) => (
-            <Button key={href} variant="ghost" className={styles.item} asChild>
+            <Button key={href} variant="ghost" className="w-full justify-start gap-3" asChild>
               <Link href={href} onClick={handleNavigate}>
-                <Icon className={styles.itemIcon} />
+                <Icon className="h-4 w-4" />
                 {label}
               </Link>
             </Button>

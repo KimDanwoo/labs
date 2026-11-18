@@ -6,7 +6,6 @@ import { StepDots } from '@shared/ui/StepDots';
 
 import { STEP_BADGE } from '../../config/step';
 import type { StudyStep } from '../../lib/parseHandbook';
-import { styles } from './StepCard.styles';
 import { StepHints } from './StepHints';
 import { StepRecallInput } from './StepRecallInput';
 import { StepReveal } from './StepReveal';
@@ -26,15 +25,15 @@ export function StepCard({ step, stepIndex, stepCount, isRevealed, recall, onRec
   const shouldShowHints = step.keywords.length > 0 && !(isRevealed && recall.trim());
 
   return (
-    <Card className={styles.card}>
-      <div className={styles.meta}>
-        <Badge variant={badge.variant} className={styles.badge}>
+    <Card className="p-5 shadow-sm sm:p-6">
+      <div className="mb-5 flex items-center gap-2">
+        <Badge variant={badge.variant} className="text-xs">
           {badge.label}
         </Badge>
         <StepDots stepIndex={stepIndex} stepCount={stepCount} />
       </div>
 
-      <p className={styles.prompt}>{step.prompt}</p>
+      <p className="break-keep text-lg font-semibold leading-relaxed sm:text-xl">{step.prompt}</p>
 
       {shouldShowHints && <StepHints keywords={step.keywords} />}
 

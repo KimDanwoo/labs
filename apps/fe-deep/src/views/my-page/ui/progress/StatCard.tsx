@@ -11,13 +11,13 @@ interface StatCardProps {
 
 export function StatCard({ config: { label, Icon, tone }, value }: StatCardProps) {
   return (
-    <Card className={styles.statCard}>
-      <Card.Content className={styles.statContent}>
+    <Card className="shadow-sm">
+      <Card.Content className="p-5 text-center">
         <div className={cn(styles.statIcon.base, styles.statIcon[tone])}>
           <Icon className={cn(styles.statGlyph.base, styles.statGlyph[tone])} />
         </div>
-        <div className={styles.statValue}>{value}</div>
-        <div className={styles.statLabel}>{label}</div>
+        <div className="text-2xl font-bold tabular-nums">{value}</div>
+        <div className="text-xs text-muted-foreground mt-0.5">{label}</div>
       </Card.Content>
     </Card>
   );

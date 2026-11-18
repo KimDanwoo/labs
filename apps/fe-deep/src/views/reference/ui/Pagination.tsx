@@ -7,7 +7,6 @@ import { Button } from '@shared/ui/Button';
 import { FIRST_PAGE, PAGE_ELLIPSIS } from '../config/pagination';
 import { buildListHref } from '../lib/buildListHref';
 import { buildPageItems } from '../lib/buildPageItems';
-import { styles } from './CategoryQuestionList.styles';
 import { PageStepButton } from './PageStepButton';
 
 interface PaginationProps {
@@ -21,12 +20,12 @@ export function Pagination({ categorySlug, page, totalPages, difficulty }: Pagin
   const hrefFor = (target: number) => buildListHref(categorySlug, target, difficulty);
 
   return (
-    <nav className={styles.pagination} aria-label="페이지네이션">
+    <nav className="flex items-center justify-center gap-2 mt-10" aria-label="페이지네이션">
       <PageStepButton href={page > FIRST_PAGE ? hrefFor(page - 1) : null} label="이전 페이지" Icon={ChevronLeft} />
 
       {buildPageItems(totalPages, page).map((item, index) =>
         item === PAGE_ELLIPSIS ? (
-          <span key={`e-${index}`} className={styles.ellipsis}>
+          <span key={`e-${index}`} className="px-1 text-muted-foreground">
             ...
           </span>
         ) : (
@@ -34,7 +33,7 @@ export function Pagination({ categorySlug, page, totalPages, difficulty }: Pagin
             key={item}
             variant={page === item ? 'default' : 'outline'}
             size="sm"
-            className={styles.pageNumber}
+            className="min-w-8 tabular-nums shadow-sm"
             asChild={page !== item}
           >
             {page === item ? <span>{item}</span> : <Link href={hrefFor(item)}>{item}</Link>}

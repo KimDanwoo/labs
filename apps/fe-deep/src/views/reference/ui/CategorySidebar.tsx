@@ -18,8 +18,8 @@ export function CategorySidebar({ categories }: CategorySidebarProps) {
   const pathname = usePathname();
 
   return (
-    <ScrollArea type="scroll" className={styles.scroller}>
-      <nav className={styles.nav}>
+    <ScrollArea type="scroll" className="max-h-[calc(100vh-8rem)]">
+      <nav className="flex flex-col gap-1 p-2">
         {categories.map((category) => {
           const href = categoryHref(category.slug);
           return (
@@ -28,8 +28,8 @@ export function CategorySidebar({ categories }: CategorySidebarProps) {
               href={href}
               className={cn(styles.link.base, pathname === href ? styles.link.active : styles.link.inactive)}
             >
-              <span className={styles.icon}>{category.icon}</span>
-              <span className={styles.title}>{category.title}</span>
+              <span className="text-base">{category.icon}</span>
+              <span className="truncate">{category.title}</span>
             </Link>
           );
         })}

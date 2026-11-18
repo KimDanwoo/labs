@@ -17,17 +17,17 @@ export function KeywordCheck({ keywords, recall }: KeywordCheckProps) {
   const matchedCount = matches.filter((match) => match.isMatched).length;
 
   return (
-    <div className={styles.root}>
-      <p className={styles.summary}>
+    <div className="rounded-lg border border-border/60 p-4">
+      <p className="mb-2 text-xs font-normal text-muted-foreground">
         키워드 {matchedCount}/{matches.length} 언급
       </p>
-      <ul className={styles.list}>
+      <ul className="flex flex-wrap gap-1.5">
         {matches.map(({ keyword, isMatched }) => (
           <li
             key={keyword}
             className={cn(styles.keyword.base, isMatched ? styles.keyword.matched : styles.keyword.missed)}
           >
-            {isMatched ? <Check className={styles.matchedIcon} /> : <X className={styles.missedIcon} />}
+            {isMatched ? <Check className="size-3" /> : <X className="size-3 opacity-50" />}
             {keyword}
           </li>
         ))}

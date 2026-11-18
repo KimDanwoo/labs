@@ -5,7 +5,6 @@ import { SpeakButton } from '@shared/ui/SpeakButton';
 import type { StudyStep } from '../../lib/parseHandbook';
 import { AiFeedback } from './AiFeedback';
 import { AnswerFramePrompt } from './AnswerFramePrompt';
-import { styles } from './StepCard.styles';
 
 interface StepRevealProps {
   step: StudyStep;
@@ -16,18 +15,18 @@ export function StepReveal({ step, recall }: StepRevealProps) {
   const hasRecall = Boolean(recall.trim());
 
   return (
-    <div className={styles.reveal}>
+    <div className="mt-6 space-y-5 border-t border-border/50 pt-5">
       {hasRecall && (
-        <div className={styles.recallBox}>
-          <p className={styles.recallLabel}>내가 말한 것</p>
-          <p className={styles.recallText}>{recall}</p>
+        <div className="rounded-lg bg-muted/40 p-4">
+          <p className="mb-2 text-xs font-normal text-muted-foreground">내가 말한 것</p>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed">{recall}</p>
         </div>
       )}
       {hasRecall && step.keywords.length > 0 && <KeywordCheck keywords={step.keywords} recall={recall} />}
       {hasRecall && <AiFeedback key={step.id} question={step.prompt} modelAnswer={step.reveal} recall={recall} />}
       {step.reveal ? (
         <div>
-          <div className={styles.speak}>
+          <div className="mb-2 flex justify-end">
             <SpeakButton text={step.reveal} />
           </div>
           <MarkdownRenderer content={step.reveal} />

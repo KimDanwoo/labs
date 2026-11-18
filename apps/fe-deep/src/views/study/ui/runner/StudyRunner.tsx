@@ -7,7 +7,6 @@ import { useStudyRun } from '../../model/hooks/useStudyRun';
 import { StepCard } from '../step/StepCard';
 import { RunnerControls } from './RunnerControls';
 import { RunnerHeader } from './RunnerHeader';
-import { styles } from './StudyRunner.styles';
 import { TopicNotes } from './TopicNotes';
 import { TopicToc } from './TopicToc';
 
@@ -32,7 +31,7 @@ export function StudyRunner({
 
   if (!run.topic || !run.step) {
     return (
-      <div className={styles.empty}>
+      <div className="py-16 text-center text-sm text-muted-foreground">
         학습할 내용이 없습니다. 마크다운에 <code>{'# 주제'}</code>와 <code>{'## 30초 답변'}</code>을 넣어주세요.
       </div>
     );
@@ -41,7 +40,7 @@ export function StudyRunner({
   const topicTitle = run.topic.title;
 
   return (
-    <div className={styles.root}>
+    <div className="min-w-0">
       <RunnerHeader
         docTitle={docTitle}
         topicTitle={topicTitle}
@@ -60,7 +59,7 @@ export function StudyRunner({
         }
       />
 
-      <Progress value={run.progressPercent} className={styles.progress} />
+      <Progress value={run.progressPercent} className="mb-6 h-1.5" />
 
       <StepCard
         step={run.step}
@@ -82,7 +81,9 @@ export function StudyRunner({
 
       {run.topic.notes && <TopicNotes topicTitle={topicTitle} notes={run.topic.notes} />}
 
-      <p className={styles.shortcuts}>Space 또는 → 다음 · ← 이전 · ⌘/Ctrl + Enter 답 확인</p>
+      <p className="mt-4 hidden text-xs text-muted-foreground/70 lg:block">
+        Space 또는 → 다음 · ← 이전 · ⌘/Ctrl + Enter 답 확인
+      </p>
     </div>
   );
 }

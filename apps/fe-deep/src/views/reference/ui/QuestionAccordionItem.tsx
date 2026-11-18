@@ -1,11 +1,10 @@
 'use client';
 
 import { QuestionAnswer, QuestionMeta, type Question } from '@entities/question';
-import { AccordionContent, AccordionItem, AccordionTrigger } from '@shared/ui/Accordion';
+import { CardAccordionItem } from '@shared/ui/CardAccordionItem';
 
 import { formatQuestionNumber } from '../lib/formatQuestionNumber';
 import { useQuestionActions } from '../model/hooks/useQuestionActions';
-import { styles } from './QuestionAccordionItem.styles';
 import { QuestionActions } from './QuestionActions';
 
 interface QuestionAccordionItemProps {
@@ -17,12 +16,15 @@ export function QuestionAccordionItem({ question, number }: QuestionAccordionIte
   const { isMastered } = useQuestionActions(question.id);
 
   return (
-    <AccordionItem value={question.id} className={styles.item}>
-      <AccordionTrigger className={styles.trigger}>
-        <div className={styles.summary}>
-          <span className={styles.number}>{formatQuestionNumber(number)}</span>
-          <div className={styles.body}>
-            <span className={styles.question}>{question.question}</span>
+    <CardAccordionItem
+      value={question.id}
+      trigger={
+        <div className="flex items-start gap-3 text-left flex-1 mr-4">
+          <span className="text-muted-foreground/60 text-sm font-mono mt-0.5 shrink-0 tabular-nums">
+            {formatQuestionNumber(number)}
+          </span>
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <span className="font-normal text-sm leading-relaxed">{question.question}</span>
             <QuestionMeta
               difficulty={question.difficulty}
               subCategory={question.sub_category}
@@ -30,13 +32,12 @@ export function QuestionAccordionItem({ question, number }: QuestionAccordionIte
             />
           </div>
         </div>
-      </AccordionTrigger>
-      <AccordionContent className={styles.content}>
-        <div className={styles.answer}>
-          <QuestionAnswer answer={question.answer} />
-          <QuestionActions questionId={question.id} />
-        </div>
-      </AccordionContent>
-    </AccordionItem>
+      }
+    >
+      <div className="pl-4 sm:pl-8 overflow-hidden">
+        <QuestionAnswer answer={question.answer} />
+        <QuestionActions questionId={question.id} />
+      </div>
+    </CardAccordionItem>
   );
 }

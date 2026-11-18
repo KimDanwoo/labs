@@ -5,8 +5,6 @@ import { Square, Volume2 } from 'lucide-react';
 import { useSpeech } from '@shared/lib/useSpeech';
 import { Button } from '@shared/ui/Button';
 
-import { styles } from './SpeakButton.styles';
-
 interface SpeakButtonProps {
   text: string;
   className?: string;
@@ -26,7 +24,7 @@ export function SpeakButton({ text, className }: SpeakButtonProps) {
       aria-pressed={isSpeaking}
       className={className}
     >
-      {isSpeaking ? <Square className={styles.icon} /> : <Volume2 className={styles.icon} />}
+      {isSpeaking ? <Square className="size-4" /> : <Volume2 className="size-4" />}
     </Button>
   );
 }

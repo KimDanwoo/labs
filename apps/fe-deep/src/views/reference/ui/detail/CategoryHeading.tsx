@@ -1,7 +1,5 @@
 import type { Category } from '@entities/question';
 
-import { styles } from './ReferenceDetailView.styles';
-
 interface CategoryHeadingProps {
   category: Category;
   questionCount: number;
@@ -9,14 +7,14 @@ interface CategoryHeadingProps {
 
 export function CategoryHeading({ category, questionCount }: CategoryHeadingProps) {
   return (
-    <div className={styles.titleBlock}>
-      <div className={styles.titleRow}>
-        <span className={styles.categoryIcon}>{category.icon}</span>
-        <h1 className={styles.title}>{category.title}</h1>
+    <div className="min-w-0">
+      <div className="flex items-center gap-2.5 mb-1.5">
+        <span className="text-2xl">{category.icon}</span>
+        <h1 className="text-2xl font-bold tracking-tight">{category.title}</h1>
       </div>
-      <p className={styles.description}>
+      <p className="text-sm text-muted-foreground leading-relaxed">
         {category.description}
-        {questionCount > 0 && <span className={styles.count}>({questionCount}개 질문)</span>}
+        {questionCount > 0 && <span className="ml-2 tabular-nums">({questionCount}개 질문)</span>}
       </p>
     </div>
   );

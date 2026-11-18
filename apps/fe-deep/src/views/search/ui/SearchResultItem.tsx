@@ -1,12 +1,11 @@
 import Link from 'next/link';
 
 import { DifficultyBadge, type SearchResult } from '@entities/question';
-import { AccordionContent, AccordionItem, AccordionTrigger } from '@shared/ui/Accordion';
 import { Badge } from '@shared/ui/Badge';
+import { CardAccordionItem } from '@shared/ui/CardAccordionItem';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 
 import { MATCH_TYPE_LABEL } from '../config/matchType';
-import { styles } from './SearchContent.styles';
 
 interface SearchResultItemProps {
   result: SearchResult;
@@ -14,29 +13,32 @@ interface SearchResultItemProps {
 
 export function SearchResultItem({ result: { question, category, matchType } }: SearchResultItemProps) {
   return (
-    <AccordionItem value={question.id} className={styles.item}>
-      <AccordionTrigger className={styles.trigger}>
-        <div className={styles.itemSummary}>
-          <span className={styles.question}>{question.question}</span>
-          <div className={styles.meta}>
-            <Badge variant="outline" className={styles.badge}>
+    <CardAccordionItem
+      value={question.id}
+      trigger={
+        <div className="flex flex-col gap-1.5 text-left flex-1 mr-4">
+          <span className="font-normal text-sm leading-relaxed">{question.question}</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge variant="outline" className="text-xs">
               {category.icon} {category.title}
             </Badge>
             <DifficultyBadge difficulty={question.difficulty} />
-            <Badge variant="secondary" className={styles.badge}>
+            <Badge variant="secondary" className="text-xs">
               {MATCH_TYPE_LABEL[matchType]}
             </Badge>
           </div>
         </div>
-      </AccordionTrigger>
-      <AccordionContent className={styles.content}>
-        <MarkdownRenderer content={question.answer} />
-        <div className={styles.more}>
-          <Link href={`/reference/${category.slug}`} className={styles.moreLink}>
-            {category.title}에서 더 보기 →
-          </Link>
-        </div>
-      </AccordionContent>
-    </AccordionItem>
+      }
+    >
+      <MarkdownRenderer content={question.answer} />
+      <div className="mt-4 pt-3 border-t border-border/50">
+        <Link
+          href={`/reference/${category.slug}`}
+          className="text-sm text-primary hover:underline transition-colors duration-200"
+        >
+          {category.title}에서 더 보기 →
+        </Link>
+      </div>
+    </CardAccordionItem>
   );
 }

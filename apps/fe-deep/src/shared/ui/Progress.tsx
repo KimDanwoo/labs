@@ -5,14 +5,16 @@ import type { ComponentProps } from 'react';
 
 import { cn } from '@shared/lib/cn';
 
-import { styles } from './Progress.styles';
-
 export function Progress({ className, value, ...props }: ComponentProps<typeof ProgressPrimitive.Root>) {
   return (
-    <ProgressPrimitive.Root data-slot="progress" className={cn(styles.root, className)} {...props}>
+    <ProgressPrimitive.Root
+      data-slot="progress"
+      className={cn('bg-primary/20 relative h-2 w-full overflow-hidden rounded-full', className)}
+      {...props}
+    >
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
-        className={styles.indicator}
+        className="h-full w-full flex-1 transition-all bg-gradient-to-r from-primary to-primary/70"
         style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
       />
     </ProgressPrimitive.Root>

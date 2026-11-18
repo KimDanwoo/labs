@@ -4,7 +4,6 @@ import { Suspense } from 'react';
 import { getStudyDoc } from '../model/server/studyDocs';
 import type { StudyDocPageProps } from '../model/server/studyRoute';
 import { StudyRunView } from './runner/StudyRunView';
-import { styles } from './StudyDetailView.styles';
 import { StudyDevReload } from './StudyDevReload';
 
 export async function StudyDetailView({ params }: StudyDocPageProps) {
@@ -13,7 +12,7 @@ export async function StudyDetailView({ params }: StudyDocPageProps) {
   if (!doc) notFound();
 
   return (
-    <div className={styles.root}>
+    <div className="container mx-auto max-w-168 px-4 py-6 sm:py-10">
       <StudyDevReload />
       <Suspense>
         <StudyRunView doc={doc} />

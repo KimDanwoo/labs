@@ -1,6 +1,5 @@
 import { summarizeHeatmap } from '../../lib/summarizeHeatmap';
 import { YearHeatmap } from './YearHeatmap';
-import { styles } from './YearHeatmap.styles';
 
 interface StudyHeatmapProps {
   heatmap: Record<string, number>;
@@ -11,7 +10,7 @@ export function StudyHeatmap({ heatmap }: StudyHeatmapProps) {
   const { maxCount, displayYears } = summarizeHeatmap(heatmap, today.getFullYear());
 
   return (
-    <div className={styles.scroller}>
+    <div className="overflow-x-auto">
       {displayYears.map((year) => (
         <YearHeatmap key={year} year={year} heatmap={heatmap} maxCount={maxCount} today={today} />
       ))}

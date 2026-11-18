@@ -5,7 +5,6 @@ import { Button } from '@shared/ui/Button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui/Sheet';
 
 import { CategorySidebar } from '../CategorySidebar';
-import { styles } from './ReferenceDetailView.styles';
 
 interface MobileCategoryMenuProps {
   categories: Category[];
@@ -14,14 +13,14 @@ interface MobileCategoryMenuProps {
 export function MobileCategoryMenu({ categories }: MobileCategoryMenuProps) {
   return (
     <Sheet>
-      <SheetTrigger asChild className={styles.menuTrigger}>
-        <Button variant="outline" size="icon" aria-label="카테고리 메뉴 열기" className={styles.menuButton}>
-          <Menu className={styles.menuIcon} />
+      <SheetTrigger asChild className="lg:hidden">
+        <Button variant="outline" size="icon" aria-label="카테고리 메뉴 열기" className="shadow-sm shrink-0 mt-1">
+          <Menu className="h-4 w-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className={styles.menuContent}>
+      <SheetContent side="left" className="w-72 p-0">
         <SheetTitle className="sr-only">카테고리 목록</SheetTitle>
-        <div className={styles.menuBody}>
+        <div className="pt-8">
           <CategorySidebar categories={categories} />
         </div>
       </SheetContent>

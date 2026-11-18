@@ -1,8 +1,8 @@
 import type { Category } from '@entities/question';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/Select';
+import { FieldLabel } from './FieldLabel';
 
 import { ALL_CATEGORIES } from '../../model/constants/study';
-import { styles } from './LearnSetup.styles';
 
 interface CategoryFieldProps {
   categories: Category[];
@@ -14,7 +14,7 @@ interface CategoryFieldProps {
 export function CategoryField({ categories, value, isLoading, onChange }: CategoryFieldProps) {
   return (
     <div>
-      <label className={styles.fieldLabel}>카테고리</label>
+      <FieldLabel>카테고리</FieldLabel>
       <Select value={value} onValueChange={onChange} disabled={isLoading}>
         <SelectTrigger>
           <SelectValue placeholder={isLoading ? '카테고리 불러오는 중...' : '카테고리 선택'} />

@@ -6,7 +6,6 @@ import { Button } from '@shared/ui/Button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui/Sheet';
 
 import { STUDY_LIST_HREF } from '../../lib/studyHref';
-import { styles } from './StudyRunner.styles';
 
 interface RunnerHeaderProps {
   docTitle: string;
@@ -28,32 +27,32 @@ export function RunnerHeader({
   toc,
 }: RunnerHeaderProps) {
   return (
-    <div className={styles.header}>
+    <div className="mb-3 flex items-center gap-2">
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" aria-label="주제 목차 열기" className={styles.tocButton}>
-            <List className={styles.tocIcon} />
+          <Button variant="outline" size="icon" aria-label="주제 목차 열기" className="shrink-0">
+            <List className="size-4" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className={styles.tocSheet}>
+        <SheetContent side="left" className="w-72 overflow-y-auto p-0">
           <SheetTitle className="sr-only">주제 목차</SheetTitle>
-          <div className={styles.tocBody}>{toc}</div>
+          <div className="pt-8">{toc}</div>
         </SheetContent>
       </Sheet>
 
-      <div className={styles.titleBlock}>
-        <Link href={STUDY_LIST_HREF} className={styles.docLink}>
+      <div className="min-w-0">
+        <Link href={STUDY_LIST_HREF} className="text-xs text-muted-foreground hover:text-foreground">
           {docTitle}
         </Link>
-        <p className={styles.topicTitle}>
-          <span className={styles.topicPosition}>
+        <p className="truncate text-sm font-normal">
+          <span className="tabular-nums text-muted-foreground">
             {topicPosition}/{topicCount}
           </span>{' '}
           {topicTitle}
         </p>
       </div>
 
-      <span className={styles.stepCounter}>
+      <span className="ml-auto shrink-0 text-xs tabular-nums text-muted-foreground">
         {doneSteps}/{totalSteps}
       </span>
     </div>

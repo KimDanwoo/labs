@@ -6,7 +6,6 @@ import { Button } from '@shared/ui/Button';
 import { DIFFICULTY_FILTERS } from '../config/filters';
 import { FIRST_PAGE } from '../config/pagination';
 import { buildListHref } from '../lib/buildListHref';
-import { styles } from './CategoryQuestionList.styles';
 
 interface DifficultyFilterBarProps {
   categorySlug: string;
@@ -15,7 +14,7 @@ interface DifficultyFilterBarProps {
 
 export function DifficultyFilterBar({ categorySlug, selected }: DifficultyFilterBarProps) {
   return (
-    <div className={styles.filters} role="group" aria-label="난이도 필터">
+    <div className="flex flex-wrap gap-1.5 mb-5" role="group" aria-label="난이도 필터">
       {DIFFICULTY_FILTERS.map(({ value, label }) => {
         const isSelected = selected === value;
         return (
@@ -24,7 +23,7 @@ export function DifficultyFilterBar({ categorySlug, selected }: DifficultyFilter
             variant={isSelected ? 'default' : 'outline'}
             size="sm"
             asChild={!isSelected}
-            className={styles.filter}
+            className="shadow-sm"
           >
             {isSelected ? (
               <span>{label}</span>

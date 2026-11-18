@@ -1,5 +1,6 @@
 'use client';
 
+import { PageContainer } from '@shared/ui/PageContainer';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
@@ -8,7 +9,6 @@ import type { FollowUp, Question } from '@entities/question';
 import { CARD_SLIDE_MOTION } from '../../config/motion';
 import { StudyActions } from './StudyActions';
 import { StudyCard } from './StudyCard';
-import { styles } from './StudyCardView.styles';
 import { StudyProgressHeader } from './StudyProgressHeader';
 
 interface StudyCardViewProps {
@@ -49,7 +49,7 @@ export function StudyCardView({
   headerAction,
 }: StudyCardViewProps) {
   return (
-    <div className={styles.root}>
+    <PageContainer width="narrow">
       <StudyProgressHeader
         currentIndex={currentIndex}
         totalCount={totalCount}
@@ -82,6 +82,6 @@ export function StudyCardView({
         onRetry={onRetry}
         onSkip={onSkip}
       />
-    </div>
+    </PageContainer>
   );
 }

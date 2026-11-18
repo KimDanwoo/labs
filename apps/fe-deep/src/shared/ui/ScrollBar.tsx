@@ -17,7 +17,10 @@ export function ScrollBar({
       className={cn(styles.scrollbar.base, styles.scrollbar[orientation], className)}
       {...props}
     >
-      <ScrollAreaPrimitive.ScrollAreaThumb data-slot="scroll-area-thumb" className={styles.thumb} />
+      <ScrollAreaPrimitive.ScrollAreaThumb
+        data-slot="scroll-area-thumb"
+        className="bg-border relative flex-1 rounded-full"
+      />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>
   );
 }
