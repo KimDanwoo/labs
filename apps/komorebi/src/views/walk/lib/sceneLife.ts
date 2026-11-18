@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Region } from '../model/world/world';
+import { REGION, type Region } from '../model/world/world';
 import { FLIGHT, flyFor, startFlight, stepButterfly, stepDragonfly, type Bounds, type Flight } from './flight';
 import { lampGlowAt, lightSprite } from './nightLights';
 import { characterScale, sceneX, sceneY } from './perspective';
@@ -7,7 +7,7 @@ import { characterScale, sceneX, sceneY } from './perspective';
 const CAT_URL = '/art/cat-sleeping.webp';
 const FLYER_ORDER = 3.6;
 const CAT_ORDER = 2.5;
-const CAT_SPOT = { region: 'village' as Region, x: 14.5, z: 35.5 };
+const CAT_SPOT = { region: REGION.village as Region, x: 14.5, z: 35.5 };
 
 const INSECT = { butterfly: 'butterfly', dragonfly: 'dragonfly' } as const;
 type Insect = (typeof INSECT)[keyof typeof INSECT];

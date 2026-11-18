@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Point, Region } from '../model/world/world';
+import { type Point, type Region, REGION } from '../model/world/world';
 import { canvasTexture } from './art';
 import { lightSprite } from './nightLights';
 import { characterScale, sceneX, sceneY } from './perspective';
@@ -218,7 +218,7 @@ export function createCountryside(scene: THREE.Scene) {
       isRaining: boolean;
       player: Point;
     }) {
-      const visible = region === 'village';
+      const visible = region === REGION.village;
       if (visible && !isStill) time.value += dt;
       rope.visible = visible;
       lightSprite(ropeMaterial.color, darkness, 0);

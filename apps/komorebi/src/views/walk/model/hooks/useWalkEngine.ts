@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useState, type RefObject } from 'react';
 import type { TimeOfDay, Weather } from '../../config/walk';
 import { createScene, type SceneOptions, type SceneStatus, type WalkEngine } from '../../lib/scene';
 import type { Appearance } from '../world/appearance';
-import { SPAWN } from '../world/world';
+import { REGION, SPAWN } from '../world/world';
 
 type EngineSettings = {
   timeOfDay: TimeOfDay;
@@ -17,7 +17,7 @@ type EngineSettings = {
 
 const INITIAL_STATUS: SceneStatus = {
   ...SPAWN,
-  region: 'village',
+  region: REGION.village,
   walking: false,
   nearby: null,
   steps: 0,

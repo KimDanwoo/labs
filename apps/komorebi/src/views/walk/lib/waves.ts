@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Region } from '../model/world/world';
+import { type Region, REGION } from '../model/world/world';
 import { lampGlowAt, lightSprite } from './nightLights';
 import { characterScale, sceneX, sceneY } from './perspective';
 
@@ -45,7 +45,7 @@ const STILL_FADE = 0.4;
 const RAIN_HURRY = 0.25;
 const NIGHT_DIM = 0.6;
 const WAVE_ORDER = 1;
-const SEA: Region = 'coast';
+const SEA: Region = REGION.coast;
 
 type Wave = {
   kind: Kind;

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Region } from '../model/world/world';
+import { type Region, REGION } from '../model/world/world';
 import { canvasTexture } from './art';
 import { lightSprite } from './nightLights';
 import { sceneX, sceneY } from './perspective';
@@ -225,10 +225,10 @@ export function createBoats(scene: THREE.Scene) {
   let clock = 0;
   return {
     update({ region, dt, darkness, isStill }: { region: Region; dt: number; darkness: number; isStill: boolean }) {
-      if (!isStill && region === 'coast') clock += dt;
+      if (!isStill && region === REGION.coast) clock += dt;
       for (const entry of boats) {
         const { route, boat, material, direction, wake, wakeMaterial, reflection, reflectionMaterial } = entry;
-        entry.cabin.visible = boat.visible = wake.visible = reflection.visible = region === 'coast';
+        entry.cabin.visible = boat.visible = wake.visible = reflection.visible = region === REGION.coast;
         if (!boat.visible) continue;
         const phase = (clock / route.duration + route.phase) % 1;
         const x = sceneX(THREE.MathUtils.lerp(route.from, route.to, phase));

@@ -10,6 +10,7 @@ import {
   PIER_CAT,
   type Point,
   type Region,
+  REGION,
 } from './world';
 
 const futon = WORLD_OBJECTS.find((object) => object.id === 'home-futon')!;
@@ -55,12 +56,12 @@ export function interactionDestination(point: Point, region: Region): Point | nu
 
 type Spot = { region: Region; point: Point; reach: number };
 const SPOTS = {
-  aquarium: { region: 'home', point: HOME_AQUARIUM, reach: 3 },
-  cat: { region: 'coast', point: PIER_CAT, reach: 3 },
-  pier: { region: 'coast', point: FISHING_PIER, reach: 1.6 },
-  desk: { region: 'home', point: HOME_DESK, reach: 4.5 },
-  wardrobe: { region: 'home', point: HOME_WARDROBE, reach: 4.5 },
-  board: { region: 'classroom', point: CLASSROOM_BOARD, reach: 4.5 },
+  aquarium: { region: REGION.home, point: HOME_AQUARIUM, reach: 3 },
+  cat: { region: REGION.coast, point: PIER_CAT, reach: 3 },
+  pier: { region: REGION.coast, point: FISHING_PIER, reach: 1.6 },
+  desk: { region: REGION.home, point: HOME_DESK, reach: 4.5 },
+  wardrobe: { region: REGION.home, point: HOME_WARDROBE, reach: 4.5 },
+  board: { region: REGION.classroom, point: CLASSROOM_BOARD, reach: 4.5 },
 } satisfies Record<string, Spot>;
 export type SpotId = keyof typeof SPOTS;
 

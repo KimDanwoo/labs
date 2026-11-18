@@ -1,7 +1,18 @@
 import { hasGroundBetween, isOnGround } from './ground';
 
-export type Region = 'village' | 'river' | 'coast' | 'forest' | 'school' | 'shops' | 'home' | 'hallway' | 'classroom';
-const INDOOR_REGIONS: readonly Region[] = ['home', 'hallway', 'classroom'];
+export const REGION = {
+  village: 'village',
+  river: 'river',
+  coast: 'coast',
+  forest: 'forest',
+  school: 'school',
+  shops: 'shops',
+  home: 'home',
+  hallway: 'hallway',
+  classroom: 'classroom',
+} as const;
+export type Region = (typeof REGION)[keyof typeof REGION];
+const INDOOR_REGIONS: readonly Region[] = [REGION.home, REGION.hallway, REGION.classroom];
 export const isIndoors = (region: Region) => INDOOR_REGIONS.includes(region);
 export type Point = { x: number; z: number };
 export type RouteNode = Point & { id: string };
@@ -135,7 +146,7 @@ export const LANDMARKS = [
 export type Landmark = (typeof LANDMARKS)[number];
 export const FISHING_PIER = {
   id: 'fishing-pier',
-  region: 'coast' as const,
+  region: REGION.coast,
   name: '바다 낚시 부두',
   short: '낚시 부두',
   icon: '🎣',
@@ -144,7 +155,7 @@ export const FISHING_PIER = {
 };
 export const HOME_AQUARIUM = {
   id: 'home-aquarium',
-  region: 'home' as const,
+  region: REGION.home,
   name: '창가의 작은 수조',
   short: '우리 집 수조',
   icon: '🐠',
@@ -153,7 +164,7 @@ export const HOME_AQUARIUM = {
 };
 export const PIER_CAT = {
   id: 'pier-cat',
-  region: 'coast' as const,
+  region: REGION.coast,
   name: '부두의 삼색 고양이',
   short: '부두 고양이',
   icon: '🐈',
@@ -424,7 +435,7 @@ export function nextRegionStep(from: Region, to: Region): Region | null {
   return null;
 }
 /** Ground outlines define movement; guide routes never restrict where the player can stand. */
-export function canWalk(x: number, z: number, region: Region = 'village') {
+export function canWalk(x: number, z: number, region: Region = REGION.village) {
   return (
     Number.isFinite(x) && Number.isFinite(z) && x >= 0 && x <= 100 && z >= 0 && z <= 100 && isOnGround(x, z, region)
   );
@@ -461,7 +472,13 @@ function slideStep(position: Point, dx: number, dz: number, region: Region, slid
   return best;
 }
 
-export function movePlayer(position: Point, dx: number, dz: number, region: Region = 'village', slide?: SlideMotion) {
+export function movePlayer(
+  position: Point,
+  dx: number,
+  dz: number,
+  region: Region = REGION.village,
+  slide?: SlideMotion,
+) {
   if (!Number.isFinite(dx) || !Number.isFinite(dz)) return { ...position };
   const distance = Math.hypot(dx, dz);
   if (slide) {
@@ -491,7 +508,7 @@ export function movePlayer(position: Point, dx: number, dz: number, region: Regi
   }
   return next;
 }
-export function closestLandmark(x: number, z: number, region: Region = 'village') {
+export function closestLandmark(x: number, z: number, region: Region = REGION.village) {
   return LANDMARKS.find((p) => p.region === region && Math.hypot(p.x - x, p.z - z) < 3.8) ?? null;
 }
 function clearSegment(from: Point, to: Point, region: Region) {
