@@ -1,4 +1,5 @@
 export { artworkUrl, playerPath, shareUrl } from './api/widget';
+export { formatSeconds, formatTrackNumber } from './lib/formatTrack';
 export { HIGHLIGHTS } from './model/constants/highlights';
 export { PLAYER_SCREEN, type PlayerScreen } from './model/constants/playerScreen';
 export { REPEAT_LABEL, REPEAT_MODE, nextRepeatMode } from './model/constants/repeatMode';
