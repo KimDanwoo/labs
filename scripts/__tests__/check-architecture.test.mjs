@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   findImportCycles,
+  findMisplacedStyles,
   findServerLeaks,
+  validateComponentModule,
   validateDesignTokens,
   validateManifest,
   validateSourceTypes,
@@ -116,4 +118,35 @@ test('styles use design tokens: default palette, arbitrary colors and unsupporte
   assert.deepEqual(validateDesignTokens('<code className="font-mono font-medium" />'), []);
   assert.deepEqual(validateDesignTokens('<p className="text-[13px] max-w-[20rem]" />'), []);
   assert.deepEqual(validateDesignTokens('{/* token-exception: 고정폭 서체 */}\n<p className="font-medium" />'), []);
+});
+
+test('component modules hold only components and hooks; constants, helpers and stray consts are rejected', () => {
+  const valid = [
+    'export function Card() { return null; }',
+    'export const Panel = () => null;',
+    'const Chart = dynamic(() => import("./Chart"));',
+    'export const Row = memo(function Row() { return null; });',
+    'export function useToggle() { return true; }',
+    'interface CardProps { title: string }',
+  ].join('\n');
+  assert.deepEqual(validateComponentModule(valid, 'Card.tsx'), []);
+  assert.equal(validateComponentModule('const MAX_ITEMS = 3;', 'Card.tsx').length, 1);
+  assert.equal(validateComponentModule('const TABS = [{ name: "a" }] as const;', 'Card.tsx').length, 1);
+  assert.equal(validateComponentModule('function formatTime() { return ""; }', 'Card.tsx').length, 1);
+  assert.equal(validateComponentModule('const useless = () => null;', 'Card.tsx').length, 1);
+});
+
+test('CSS files live in src/app/styles or a slice styles/ folder, never next to ui components', () => {
+  assert.deepEqual(
+    findMisplacedStyles([
+      'src/app/globals.css',
+      'src/app/styles/colors.css',
+      'src/views/drive/styles/world.css',
+      'src/views/drive/ui/Menu.tsx',
+    ]),
+    [],
+  );
+  assert.equal(findMisplacedStyles(['src/views/drive/ui/world.css']).length, 1);
+  assert.equal(findMisplacedStyles(['src/shared/ui/sheet.css']).length, 1);
+  assert.equal(findMisplacedStyles(['app/page.css']).length, 1);
 });

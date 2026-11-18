@@ -76,16 +76,17 @@ apps/<app>/
     views/home/
       index.ts                 # 공개 API — 슬라이스의 유일한 출입구
       index.server.ts          # 서버 전용 코드가 있을 때만
-      ui/                      # 컴포넌트 (HomeView.tsx 포함)
+      ui/                      # 컴포넌트 (HomeView.tsx 포함) + 컴포넌트별 <이름>.styles.ts
       model/                   # 상태·비즈니스 로직·타입 (model/hooks, model/store, model/types …)
       api/                     # 백엔드 통신
       lib/                     # 슬라이스 내부 보조 코드(알고리즘·그래픽)
-      config/                  # 설정·상수
+      config/                  # 설정·상수·그림 데이터
+      styles/                  # 이 슬라이스 전용 CSS 파일(.css만)
     shared/
       ui/ lib/ api/ config/    # 세그먼트만. 도메인 폴더 금지
 ```
 
-- 세그먼트 이름은 `ui`·`model`·`api`·`lib`·`config`만 쓴다(목적 기준). 필요한 것만 만든다. `hooks`·`types`·`constants`·`services` 같은 종류 기준 이름은 세그먼트 **안**의 하위 폴더로만 쓴다. 슬라이스가 커지면 세그먼트 아래에 도메인 하위 폴더를 둔다(`ui/scene/`, `model/runner/`).
+- 세그먼트 이름은 `ui`·`model`·`api`·`lib`·`config`만 쓴다(목적 기준). CSS 파일만 담는 `styles/`는 예외로 둔다. 필요한 것만 만든다. `hooks`·`types`·`constants`·`services` 같은 종류 기준 이름은 세그먼트 **안**의 하위 폴더로만 쓴다. 슬라이스가 커지면 세그먼트 아래에 도메인 하위 폴더를 둔다(`ui/scene/`, `model/runner/`).
 - **밖에서는 슬라이스 루트로만 import한다**: `from '@entities/game'`, 서버 전용은 `from '@views/study/index.server'`. `@entities/game/model/types`처럼 안쪽 경로로 가져오지 않는다.
 - **슬라이스 안에서는 상대경로**로 파일을 직접 import한다(`./Card`, `../model/types/game`). 자기 `index.ts`를 거치지 않는다(순환 참조).
 - `index.ts`는 **밖에서 실제로 쓰는 것만**, 이름을 하나씩 적어 내보낸다. `export *` 금지. 타입은 `export type` 또는 `type` 한정자.
@@ -104,6 +105,17 @@ apps/<app>/
 - **부모는 분기·합성, 자식은 구독·실행**: 메인 뷰는 블록 조합만, 각 블록 컴포넌트가 필요한 데이터를 직접 가져온다.
 - **표시-only 컴포넌트는 표시용 데이터만 props로** 받는다(도메인 상태를 알지 않는다). 예: `Card`/`Button`(`@shared/ui`), `ProjectCard`(`project`만 받음).
 - **컴포넌트는 앱 안에 둔다**: 다른 앱에 같은 컴포넌트가 필요하면 그 앱으로 복사해 맞게 고친다. 공유 패키지로 올리지 않는다. 앱 안에서는 FSD 위치 규칙을 따른다.
+
+## 코드 정돈 규칙
+
+tsx 파일은 "무엇을 그리는가"만 담는다. 값·로직·스타일은 각자 자리로 보낸다.
+
+- **tsx 최상위에는 컴포넌트만**: 상수·설정 배열·조회 표는 슬라이스 `config/`로, 보조 함수는 `lib/`로 옮긴다. 컴포넌트를 값으로 갖는 표(섹션 → 컴포넌트)만 같은 `ui/`의 `.ts` 모듈에 둔다(`config/`가 `ui/`를 import하지 않게). Props `interface`는 컴포넌트 파일에 둔다.
+- **훅 분리**: 상태·효과·ref를 엮는 로직(`useEffect`가 있거나 훅 호출이 여러 개)은 `model/hooks/useXxx.ts`로 빼고, 컴포넌트는 훅을 부르고 그리기만 한다. 훅 하나는 책임 하나 — 커지면 쪼갠다.
+- **하드코딩 금지**: 조정하는 값(속도·시간·간격·임계값·개수)은 `config/`의 이름 있는 상수로 둔다. 상태·모드 비교는 `as const` 객체를 참조한다(`'playing'` 같은 문자열 리터럴 비교 금지). 좌표·형상처럼 숫자가 많은 그림 데이터는 숫자마다 이름 붙이지 않고 `config/`의 데이터 파일로 묶는다.
+- **스타일은 ui 밖으로**: Tailwind 클래스 묶음과 상태별 변형은 컴포넌트 옆 `ui/<이름>.styles.ts`에 객체로 두고 tsx는 `styles.root`처럼 이름으로만 참조한다. 인라인 `style`은 계산된 값(위치·진행률 등)에만 쓴다. CSS 파일은 앱 전역이면 `src/app/styles/`, 한 슬라이스 전용이면 그 슬라이스의 `styles/`에 둔다. `ui/` 안에 CSS 파일을 두지 않는다.
+- **반복되는 애니메이션은 모듈로**: 모달·시트·오버레이의 열림/닫힘처럼 여러 곳에서 같은 전환을 쓰면 훅(`useModal`, `useSheetPhase` 등)과 스타일·키프레임을 한 모듈로 만들어 함께 쓴다. 컴포넌트마다 전환 상태를 따로 구현하지 않는다.
+- **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateComponentModule`·`findMisplacedStyles`): `src`의 tsx 최상위 비컴포넌트 선언과 자리를 벗어난 CSS 파일을 막는다. 정돈을 마친 앱부터 `TIDY_APPS`에 넣어 적용하고, 모든 앱이 끝나면 목록을 없애 전체에 적용한다. 하드코딩·훅 분리·styles.ts 분리는 리뷰에서 확인한다.
 
 ## 상태 관리 (도입 시)
 
