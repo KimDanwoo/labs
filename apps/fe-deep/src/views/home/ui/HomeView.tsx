@@ -1,12 +1,10 @@
-import { getAllCategories } from '@entities/question';
-import { createServerSupabaseClient } from '@shared/api/supabaseServer';
+import { loadQuestionContent } from '@entities/question/index.server';
 import { Button } from '@ui/react';
 import { ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 
 export async function HomeView() {
-  const supabase = await createServerSupabaseClient();
-  const categories = await getAllCategories(supabase);
+  const { categories } = await loadQuestionContent();
 
   return (
     <div className="flex flex-col">

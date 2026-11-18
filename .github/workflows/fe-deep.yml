@@ -1,7 +1,7 @@
 name: FE Deep
 
 # fe-deep이나 그것이 쓰는 공유 패키지가 바뀐 PR에서만 데이터 오류·재시도 흐름 e2e를 돌린다.
-# 빌드는 하지 않는다(빌드 시점에 DB 시크릿이 필요하다). e2e는 자체 dev 서버로 돈다.
+# e2e는 자체 dev 서버로 돈다.
 on:
   pull_request:
     paths:

@@ -1,56 +1,56 @@
 import { expect, test, type Page } from '@playwright/test';
-import { CATEGORY, QUESTION } from './fixtures.mjs';
+import { CONTENT, EMPTY_CONTENT, QUESTION } from './fixtures.mjs';
 
-async function mockData(page: Page, questions: () => { status: number; body: unknown }) {
-  await page.route('**/rest/v1/**', async (route) => {
-    const headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Expose-Headers': 'Retry-After, Content-Range',
-      'Retry-After': '0',
-    };
-    if (route.request().method() === 'OPTIONS') {
-      await route.fulfill({ status: 204, headers });
-      return;
-    }
-    const url = new URL(route.request().url());
-    const response = url.pathname.endsWith('/categories') ? { status: 200, body: [CATEGORY] } : questions();
-    await route.fulfill({ status: response.status, json: response.body, headers });
+const QUESTION_CONTENT_ROUTE = '**/api/questions';
+
+async function mockContent(page: Page, respond: () => { status: number; body: unknown }) {
+  await page.route(QUESTION_CONTENT_ROUTE, async (route) => {
+    const { status, body } = respond();
+    await route.fulfill({ status, json: body });
   });
 }
 
-const failed = () => ({ status: 503, body: { code: '08006', message: 'test database unavailable' } });
+const failed = () => ({ status: 503, body: { message: 'test content unavailable' } });
 
-test('server-rendered reference reads categories through the data layer', async ({ page }) => {
+test('reference pages render categories and questions from content files', async ({ page }) => {
   const response = await page.goto('/reference');
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole('link', { name: /JavaScript/ }).first()).toBeVisible();
+  await page
+    .getByRole('link', { name: /JavaScript/ })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/\/reference\/javascript$/);
+  await expect(page.getByRole('navigation', { name: '페이지네이션' })).toBeVisible();
+});
+
+test('reference difficulty filter and paging live in the URL', async ({ page }) => {
+  await page.goto('/reference/javascript');
+  await page.getByRole('group', { name: '난이도 필터' }).getByRole('link', { name: '쉬움' }).click();
+  await expect(page).toHaveURL(/difficulty=easy/);
+  await page.goto('/reference/javascript?page=2');
+  await expect(page.getByRole('navigation', { name: '페이지네이션' }).getByText('2', { exact: true })).toBeVisible();
 });
 
 test('an empty search result renders the empty state', async ({ page }) => {
-  await mockData(page, () => ({ status: 200, body: [] }));
-  await page.goto('/search?q=JavaScript');
+  await page.goto('/search?q=존재하지않는검색어zz');
   await expect(page.getByText('검색 결과가 없습니다. 다른 키워드로 검색해보세요.')).toBeVisible();
   await expect(page.getByRole('heading', { name: '문제가 발생했습니다' })).toHaveCount(0);
 });
 
 test('a failed search shows the error boundary and retry recovers', async ({ page }) => {
   let failure = true;
-  await mockData(page, () => (failure ? failed() : { status: 200, body: [QUESTION] }));
+  await mockContent(page, () => (failure ? failed() : { status: 200, body: CONTENT }));
   await page.goto('/search?q=JavaScript');
   await expect(page.getByRole('heading', { name: '문제가 발생했습니다' })).toBeVisible();
-  await expect(page.getByText('검색 결과가 없습니다. 다른 키워드로 검색해보세요.')).toHaveCount(0);
   failure = false;
   await page.getByRole('button', { name: '다시 시도', exact: true }).click();
   await expect(page.getByRole('button', { name: /JavaScript는 무엇인가요/ })).toBeVisible();
 });
 
-test('a failed study start recovers and an empty question list stays a normal result', async ({ page }) => {
+test('a failed study load recovers and an empty question list stays a normal result', async ({ page }) => {
   let failure = true;
-  await mockData(page, () => (failure ? failed() : { status: 200, body: [] }));
+  await mockContent(page, () => (failure ? failed() : { status: 200, body: EMPTY_CONTENT }));
   await page.goto('/learn');
-  await page.getByRole('button', { name: '학습 시작', exact: true }).click();
   await expect(page.getByRole('heading', { name: '문제가 발생했습니다' })).toBeVisible();
   failure = false;
   await page.getByRole('button', { name: '다시 시도', exact: true }).click();
@@ -59,10 +59,10 @@ test('a failed study start recovers and an empty question list stays a normal re
 });
 
 for (const route of ['/mypage/bookmarks', '/mypage/progress']) {
-  test(`${route}: database failures reach the error boundary and retry recovers`, async ({ page }) => {
-    await page.addInitScript(() => localStorage.setItem('fe-interview-bookmarks', '["q-1"]'));
+  test(`${route}: content failures reach the error boundary and retry recovers`, async ({ page }) => {
+    await page.addInitScript((id) => localStorage.setItem('fe-interview-bookmarks', JSON.stringify([id])), QUESTION.id);
     let failure = true;
-    await mockData(page, () => (failure ? failed() : { status: 200, body: [QUESTION] }));
+    await mockContent(page, () => (failure ? failed() : { status: 200, body: CONTENT }));
     await page.goto(route);
     await expect(page.getByRole('heading', { name: '문제가 발생했습니다' })).toBeVisible();
     failure = false;

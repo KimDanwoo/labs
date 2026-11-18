@@ -5,7 +5,7 @@ export const CATEGORY = {
   order_num: 1,
   icon: 'JS',
   description: 'JavaScript 학습',
-  questions: [{ count: 1 }],
+  question_count: 1,
 };
 
 export const QUESTION = {
@@ -20,5 +20,7 @@ export const QUESTION = {
   show_in_daily: true,
   show_in_flashcard: true,
   follow_ups: [],
-  categories: CATEGORY,
 };
+
+export const CONTENT = { categories: [CATEGORY], questions: [QUESTION] };
+export const EMPTY_CONTENT = { categories: [{ ...CATEGORY, question_count: 0 }], questions: [] };

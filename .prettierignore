@@ -2,6 +2,9 @@
 # Prettier가 강조 기호·목록 들여쓰기를 바꾸면 원문 대조와 재실행 결과가 어긋난다.
 apps/dansoon/contents/
 
+# 프딥 문제 — 로더가 YAML frontmatter와 마크다운 본문을 그대로 읽는다.
+apps/fe-deep/content/questions/
+
 # 빌드 산출물
 **/.next/
 **/dist/

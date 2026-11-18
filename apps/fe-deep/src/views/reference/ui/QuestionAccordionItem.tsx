@@ -34,7 +34,7 @@ export function QuestionAccordionItem({ question, number }: QuestionAccordionIte
       <AccordionContent className="pb-4">
         <div className="pl-4 sm:pl-8 overflow-hidden">
           <QuestionAnswer answer={question.answer} />
-          <QuestionActions questionId={question.id} questionText={question.question} />
+          <QuestionActions questionId={question.id} />
         </div>
       </AccordionContent>
     </AccordionItem>

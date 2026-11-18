@@ -73,14 +73,6 @@ function reviewedProgress(questionId: string, knew: boolean): UserProgress {
 
 function saveQuestionProgress(updated: UserProgress): UserProgress {
   saveLocalProgress({ ...getLocalProgress(), [updated.question_id]: updated });
-
-  // Supabase write-through (lazy import로 순환 의존성 방지)
-  import('../../api/progressSync')
-    .then(({ syncSingleCard }) => {
-      syncSingleCard(updated).catch(() => {});
-    })
-    .catch(() => {});
-
   return updated;
 }
 

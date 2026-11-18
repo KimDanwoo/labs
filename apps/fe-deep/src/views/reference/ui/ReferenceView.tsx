@@ -1,11 +1,9 @@
-import { getAllCategories } from '@entities/question';
-import { createClient } from '@supabase/supabase-js';
+import { loadQuestionContent } from '@entities/question/index.server';
 import { Card } from '@ui/react';
 import Link from 'next/link';
 
 export async function ReferenceView() {
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-  const categories = await getAllCategories(supabase);
+  const { categories } = await loadQuestionContent();
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-12">
