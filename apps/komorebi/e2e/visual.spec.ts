@@ -25,7 +25,7 @@ test('desktop states', async ({ page }) => {
   await page.screenshot({ path: `${DIR}/memory.png` });
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: '산책 지도 열기' }).click();
-  await page.locator('.home-guide').click();
+  await page.getByRole('button', { name: /집에 돌아가 쉬어 가기/ }).click();
   await page.locator('.landscape[data-region=home]').waitFor({ timeout: 25_000 });
   await page.waitForTimeout(800);
   await page.screenshot({ path: `${DIR}/home.png` });
