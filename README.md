@@ -50,47 +50,6 @@
 
 ---
 
-## 시작하기
-
-Node.js 24(`.nvmrc` 고정, `engine-strict=true`)와 pnpm 9.12.1이 필요하다.
-
-```bash
-nvm use
-pnpm install
-pnpm dev                    # 모든 앱 개발 서버 동시 실행
-pnpm --filter prairie dev   # 특정 앱만 실행
-```
-
-| 명령                      | 동작                                                       |
-| ------------------------- | ---------------------------------------------------------- |
-| `pnpm build`              | 전체 빌드                                                  |
-| `pnpm lint`               | 구조 규칙 검사 + 전체 lint                                 |
-| `pnpm check:architecture` | 전체 워크스페이스·템플릿 구조 검사                         |
-| `pnpm typecheck`          | 전체 TypeScript 검사                                       |
-| `pnpm test`               | 구조 규칙·앱별 회귀 테스트                                 |
-| `pnpm tokens`             | 디자인 토큰 → `packages/tokens/generated/theme.css` 재생성 |
-| `pnpm new-app <name>`     | `templates/app`을 복제해 새 앱 스캐폴드 생성               |
-| `pnpm format`             | Prettier 전체 포맷                                         |
-
-브라우저 회귀 검증은 `pnpm --filter fe-deep test:e2e`, `pnpm --filter komorebi test:e2e`로 실행한다. Komorebi는 먼저 `pnpm --filter komorebi build`가 필요하다.
-
-<details>
-<summary><b>배포 설정 (Vercel)</b></summary>
-
-- 각 앱의 `vercel.json`은 `main` 브랜치만 자동 배포하도록 제한한다. 작업 브랜치와 PR에서는 GitHub CI만 실행한다.
-- Vercel 프로젝트의 Production Branch는 `main`, Root Directory는 해당 `apps/<앱>`으로 설정한다.
-- **Settings → Build and Deployment → Root Directory → Skip deployment**를 켠다. 해당 앱이나 의존하는 공유 패키지가 변경된 경우에만 배포한다. 워크스페이스 밖의 공통 파일 변경은 전체 앱에 영향을 줄 수 있다.
-- 기존 `ignoreCommand`는 빌드 단계의 보조 검사다. 이것만으로는 배포 횟수 한도를 절약할 수 없으므로 Vercel의 Skip deployment 설정이 필요하다.
-- **Settings → Deployment Checks → Add Checks → GitHub → `CI / verify`**를 켠다. Vercel이 `main` 배포를 빌드한 뒤 CI가 통과해야 운영 도메인에 연결한다. 급하면 배포 상세의 Force Promote로 넘긴다. CI는 저장소 전체 작업 하나라 다른 앱 실패도 함께 막는다.
-- **danwoo-island는 Skip deployment를 끈다.** 빌드가 `hub`(프로필·프로젝트·이미지)·`soundlab`(곡 목록)·`packages/tokens/fonts`를 직접 읽지만 package.json 의존성에는 없어서, Skip deployment는 이 변경을 섬과 무관하다고 본다. 대신 `vercel.json`의 `ignoreCommand`가 이 경로들까지 `git diff`로 확인한다.
-- `pnpm new-app`으로 생성한 앱도 `main` 제한을 상속한다. Vercel에 새 프로젝트를 연결할 때 위 프로젝트 설정을 함께 적용한다.
-
-참고: [Git 배포 브랜치 제한](https://vercel.com/docs/project-configuration/git-configuration), [변경 없는 앱 건너뛰기](https://vercel.com/docs/monorepos#skipping-unaffected-projects).
-
-</details>
-
----
-
 ## 라이선스
 
 소스 코드는 [MIT 라이선스](LICENSE)를 따른다.

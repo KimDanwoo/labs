@@ -158,6 +158,18 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 - 앱 전용 검증은 앱별 워크플로가 그 앱(또는 `packages/`)이 바뀐 PR에서만 돌린다: prairie 빌드(`prairie.yml`), fe-deep e2e(`fe-deep.yml`). prairie e2e는 GPU 없는 러너에서 실제 화면을 검증하지 못해 자동화하지 않는다(로컬 GPU에서 `pnpm --filter prairie test:e2e`로 수동 실행).
 - main은 GitHub ruleset으로 PR로만 반영한다. 로컬 git 훅은 쓰지 않는다.
 
+## 배포 (Vercel)
+
+- 각 앱의 `vercel.json`은 `main` 브랜치만 자동 배포하도록 제한한다. 작업 브랜치와 PR에서는 GitHub CI만 실행한다.
+- Vercel 프로젝트의 Production Branch는 `main`, Root Directory는 해당 `apps/<앱>`으로 설정한다.
+- **Settings → Build and Deployment → Root Directory → Skip deployment**를 켠다. 해당 앱이나 의존하는 공유 패키지가 변경된 경우에만 배포한다. 워크스페이스 밖의 공통 파일 변경은 전체 앱에 영향을 줄 수 있다.
+- 기존 `ignoreCommand`는 빌드 단계의 보조 검사다. 이것만으로는 배포 횟수 한도를 절약할 수 없으므로 Vercel의 Skip deployment 설정이 필요하다.
+- **Settings → Deployment Checks → Add Checks → GitHub → `CI / verify`**를 켠다. Vercel이 `main` 배포를 빌드한 뒤 CI가 통과해야 운영 도메인에 연결한다. 급하면 배포 상세의 Force Promote로 넘긴다. CI는 저장소 전체 작업 하나라 다른 앱 실패도 함께 막는다.
+- **danwoo-island는 Skip deployment를 끈다.** 빌드가 `hub`(프로필·프로젝트·이미지)·`soundlab`(곡 목록)·`packages/tokens/fonts`를 직접 읽지만 package.json 의존성에는 없어서, Skip deployment는 이 변경을 섬과 무관하다고 본다. 대신 `vercel.json`의 `ignoreCommand`가 이 경로들까지 `git diff`로 확인한다.
+- `pnpm new-app`으로 생성한 앱도 `main` 제한을 상속한다. Vercel에 새 프로젝트를 연결할 때 위 프로젝트 설정을 함께 적용한다.
+
+참고: [Git 배포 브랜치 제한](https://vercel.com/docs/project-configuration/git-configuration), [변경 없는 앱 건너뛰기](https://vercel.com/docs/monorepos#skipping-unaffected-projects).
+
 ## 응답 스타일 (사용자 선호)
 
 - 응답은 **한국어**. 코드 변경 전 what·why 설명, 후 리뷰 포인트. 더 나은 대안이 있으면 항상 제시.
