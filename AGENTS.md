@@ -21,8 +21,8 @@ apps/
   komorebi/           # 픽셀 아트 산책
   prairie/            # 3D 초원
   danwoo-island/      # 포트폴리오 섬 드라이브(folio-2025 포크)
-packages/             # 공유 토큰 + 공유 설정
-  tokens/  @tokens/css            # 공유 토큰(서체·간격 등, 색 없음) + 디자인 기본 룰
+packages/             # 공유 서체 + 공유 설정
+  fonts/  @repo/fonts             # 마루부리 서체(fonts.css)
   config/  @config/tsconfig         # 공유 tsconfig(base / next)
   eslint-config/  @repo/eslint-config    # 공유 ESLint(flat): next + FSD 경계 강제
   prettier-config/ @repo/prettier-config # 공유 Prettier
@@ -33,13 +33,13 @@ packages/             # 공유 토큰 + 공유 설정
 
 1. **의존성 버전은 catalog 단일 관리**: 모든 버전은 `pnpm-workspace.yaml`의 `catalog:`에 두고 각 `package.json`은 `"catalog:"`로 참조. 워크스페이스 간 참조는 `"workspace:*"`. **package.json에 raw 버전을 박지 않는다.** 버전 변경은 catalog 한 곳만 수정 후 `pnpm install`.
 
-2. **디자인은 앱마다, 기본 룰만 공유**: 공유 디자인 시스템은 없다. 기본 룰은 [`packages/tokens/DESIGN_RULES.md`](packages/tokens/DESIGN_RULES.md)가 단일 원본이다.
-   - **공유 토큰(`@tokens/css`)에는 색이 없다**: 서체·크기·굵기·간격·반경·그림자(sm·md·lg)·컨테이너 폭만 담는다. 소스는 `packages/tokens/src/*.ts`, `pnpm tokens`로 `generated/theme.css`를 생성한다(**AUTO-GENERATED — 직접 수정 금지**).
-   - **색은 앱의 `src/app/styles/colors.css`에**: 라이트·다크 값, 다크 모드 variant, 색이 섞인 그림자(`shadow-glow`)를 앱이 소유한다. 장식색·카테고리색도 그 앱 CSS에 토큰으로 둔다. 다른 앱 색을 바꾸려고 공유 토큰을 고치지 않는다.
-   - 스타일은 토큰 기반 Tailwind 유틸로: 색 `bg-primary`/`text-muted-foreground`(앱 토큰), 간격 `px-lg`/`gap-3xl`, 반경 `rounded-md`, 그림자 `shadow-md` 등. **임의 hex/px 매직값 금지.**
-   - **간격은 두 스케일**: 앱 레이아웃은 이름 토큰(`xs` 4px ~ `3xl` 64px, `px-lg`), 앱 `src/shared/ui`의 shadcn 계열 컴포넌트와 fe-deep 내부는 Tailwind 숫자 스케일(`p-4` = 1rem)을 쓴다. `max-w-md` 같은 폭 유틸은 컨테이너 값(28rem)으로 생성된다.
-   - **굵기는 `font-normal`·`font-semibold`·`font-bold`만**: 공통 서체 마루부리가 400·600·700만 제공한다. `font-medium` 등은 500을 가진 고정폭 서체(`font-mono`)에만 쓴다.
-   - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateDesignTokens`): `theme.css`를 쓰는 앱에서 기본 팔레트 색 클래스, 임의 색 값(`bg-[#...]`), 서체에 없는 굵기를 막는다. 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
+2. **디자인은 앱마다, 서체와 기본 룰만 공유**: 공유 디자인 시스템도 공유 토큰도 없다. 앱마다 느낌이 달라 크기·간격·색·컴포넌트를 앱이 소유한다. 기본 룰은 루트 [`DESIGN_RULES.md`](DESIGN_RULES.md)가 단일 원본이다.
+   - **공유는 서체뿐**: `@repo/fonts/fonts.css`(마루부리)를 앱 루트 레이아웃에서 import한다. 원하지 않는 앱은 쓰지 않는다.
+   - **크기·간격·반경·그림자·컨테이너 폭은 앱의 `src/app/styles/theme.css`에**(쓰는 앱만). 다른 앱 값을 맞추려고 공유 패키지를 만들지 않는다. 필요하면 복사해서 고친다.
+   - **색은 앱의 `src/app/styles/colors.css`에**: 라이트·다크 값, 다크 모드 variant, 색이 섞인 그림자(`shadow-glow`)를 앱이 소유한다. 장식색·카테고리색도 그 앱 CSS에 토큰으로 둔다.
+   - 스타일은 그 앱의 토큰 기반 Tailwind 유틸로: 색 `bg-primary`/`text-muted-foreground`, 간격 `px-lg`/`gap-3xl`, 반경 `rounded-md`, 그림자 `shadow-md` 등. **임의 hex/px 매직값 금지.**
+   - **굵기는 `font-normal`·`font-semibold`·`font-bold`만**(마루부리를 쓰는 앱): 마루부리가 400·600·700만 제공한다. `font-medium` 등은 500을 가진 고정폭 서체(`font-mono`)에만 쓴다.
+   - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateDesignTokens`): `src/app/styles/theme.css`가 있는 앱에서 기본 팔레트 색 클래스, 임의 색 값(`bg-[#...]`), 서체에 없는 굵기를 막는다. 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
    - 대비·포커스·누르는 영역·움직임 줄이기·화면 세 개 확인은 DESIGN_RULES.md의 체크리스트로 PR 전에 확인한다.
 
 3. **새 앱은 기존 앱 구성을 따른다**: `apps/<name>`(소문자/숫자/하이픈)에 공유 tsconfig·ESLint(next + FSD)·`@repo/security-headers`·FSD 경로 별칭·catalog 의존성을 연결하고, `pnpm check:architecture`로 확인한다. `vercel.json`은 아래 배포 규칙을 따른다.
@@ -58,7 +58,7 @@ packages/             # 공유 토큰 + 공유 설정
 
 **레이어 의존성** (단방향, `@repo/eslint-config`의 `fsd.config.mjs`로 **lint 강제**): `app → views → features → entities → shared`
 
-- 하위 레이어는 상위를 import 불가. 같은 레이어의 다른 슬라이스 참조 금지. `@tokens/css`는 모든 레이어에서 사용 가능.
+- 하위 레이어는 상위를 import 불가. 같은 레이어의 다른 슬라이스 참조 금지. `@repo/fonts`는 루트 레이아웃에서 import한다.
 - **`widgets` 레이어는 쓰지 않는다.** 한 화면 전용 블록은 그 view에, 여러 화면에서 쓰는 동작은 `features`에, 앱 전체 레이아웃은 `src/app`에 둔다.
 - 위반 시 `pnpm lint`가 에러로 막는다. 구조 규칙을 `eslint-disable`로 우회하지 않는다.
 
@@ -97,7 +97,7 @@ apps/<app>/
 
 **컴포넌트 인라인 선언 금지**: `views`·`features`·`entities`의 컴포넌트는 파일 하나에 하나씩, 이름과 파일명을 일치시켜 슬라이스의 `ui/` 세그먼트에 둔다.
 
-**Import 순서**: `prettier-plugin-organize-imports`가 저장/포맷 시 자동 정렬한다(수동 정렬 불필요, alphabetical). 큰 흐름은 내장 모듈 → 외부 패키지 → 절대경로(`@tokens`/`@app`…`@shared`) → 상대경로 → type import.
+**Import 순서**: `prettier-plugin-organize-imports`가 저장/포맷 시 자동 정렬한다(수동 정렬 불필요, alphabetical). 큰 흐름은 내장 모듈 → 외부 패키지 → 절대경로(`@repo`/`@app`…`@shared`) → 상대경로 → type import.
 
 ## 컴포넌트 분리 원칙
 
@@ -128,7 +128,7 @@ apps/<app>/
 Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬래시 커맨드가 이 규칙대로 커밋한다.)
 
 - **type**: `feat`(기능) · `fix`(버그) · `refactor`(동작 불변 구조 개선) · `chore`(빌드·설정·의존성) · `docs`(문서) · `style`(포맷 등 비로직) · `test`(테스트).
-- **scope**: 앱/패키지 이름(`soundlab`·`komorebi`·`hub`·`tokens`·`ui` 등). repo 전역이면 생략.
+- **scope**: 앱/패키지 이름(`soundlab`·`komorebi`·`hub`·`fonts` 등). repo 전역이면 생략.
 - **설명**: 한국어·명령형·간결. 무엇을 왜 했는지. 부연이 필요하면 `— 이유/절충`으로 덧붙인다(예: `feat(soundlab): 곡 공유 링크에 재생 위치 포함`).
 - **원자적 커밋**: 한 커밋 = 한 논리적 변경. 서로 다른 앱/관심사가 섞이면 나눠서 커밋한다.
 - **`main` 직접 커밋 금지**: main에서 작업했더라도 커밋 전 `<type>/<kebab-요약>` 브랜치를 파고(`git switch -c`) 거기에 커밋한다. push는 요청 시에만.
@@ -136,16 +136,15 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 
 ## 스크립트 (루트에서)
 
-| 명령                      | 동작                             |
-| ------------------------- | -------------------------------- |
-| `pnpm dev`                | `turbo run dev` — 모든 앱 dev    |
-| `pnpm build`              | `turbo run build`                |
-| `pnpm lint`               | 구조 검사 + `turbo run lint`     |
-| `pnpm check:architecture` | 워크스페이스 구조 검사           |
-| `pnpm typecheck`          | 전체 타입 검사                   |
-| `pnpm test`               | 공유 규칙·앱별 회귀 테스트       |
-| `pnpm tokens`             | 디자인 토큰 → `theme.css` 재생성 |
-| `pnpm format`             | Prettier 전체 포맷               |
+| 명령                      | 동작                          |
+| ------------------------- | ----------------------------- |
+| `pnpm dev`                | `turbo run dev` — 모든 앱 dev |
+| `pnpm build`              | `turbo run build`             |
+| `pnpm lint`               | 구조 검사 + `turbo run lint`  |
+| `pnpm check:architecture` | 워크스페이스 구조 검사        |
+| `pnpm typecheck`          | 전체 타입 검사                |
+| `pnpm test`               | 공유 규칙·앱별 회귀 테스트    |
+| `pnpm format`             | Prettier 전체 포맷            |
 
 - 특정 앱만: `pnpm --filter hub dev`.
 - 앱 전용 검증은 앱별 워크플로가 그 앱(또는 `packages/`)이 바뀐 PR에서만 돌린다: prairie 빌드(`prairie.yml`), fe-deep e2e(`fe-deep.yml`). prairie e2e는 GPU 없는 러너에서 실제 화면을 검증하지 못해 자동화하지 않는다(로컬 GPU에서 `pnpm --filter prairie test:e2e`로 수동 실행).
@@ -158,7 +157,7 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 - **Settings → Build and Deployment → Root Directory → Skip deployment**를 켠다. 해당 앱이나 의존하는 공유 패키지가 변경된 경우에만 배포한다. 워크스페이스 밖의 공통 파일 변경은 전체 앱에 영향을 줄 수 있다.
 - 기존 `ignoreCommand`는 빌드 단계의 보조 검사다. 이것만으로는 배포 횟수 한도를 절약할 수 없으므로 Vercel의 Skip deployment 설정이 필요하다.
 - **Settings → Deployment Checks → Add Checks → GitHub → `CI / verify`**를 켠다. Vercel이 `main` 배포를 빌드한 뒤 CI가 통과해야 운영 도메인에 연결한다. 급하면 배포 상세의 Force Promote로 넘긴다. CI는 저장소 전체 작업 하나라 다른 앱 실패도 함께 막는다.
-- **danwoo-island는 Skip deployment를 끈다.** 빌드가 `hub`(프로필·프로젝트·이미지)·`soundlab`(곡 목록)·`packages/tokens/fonts`를 직접 읽지만 package.json 의존성에는 없어서, Skip deployment는 이 변경을 섬과 무관하다고 본다. 대신 `vercel.json`의 `ignoreCommand`가 이 경로들까지 `git diff`로 확인한다.
+- **danwoo-island는 Skip deployment를 끈다.** 빌드가 `hub`(프로필·프로젝트·이미지)·`soundlab`(곡 목록)·`packages/fonts/fonts`를 직접 읽지만 package.json 의존성에는 없어서, Skip deployment는 이 변경을 섬과 무관하다고 본다. 대신 `vercel.json`의 `ignoreCommand`가 이 경로들까지 `git diff`로 확인한다.
 - 새 앱의 `vercel.json`에도 `main` 제한과 `"ignoreCommand": "npx turbo-ignore <앱>"`을 둔다. `pnpm check:architecture`가 `main` 제한, `ignoreCommand` 유무, `turbo-ignore`·`buildCommand --filter`가 자기 앱을 가리키는지 검사한다. Vercel에 새 프로젝트를 연결할 때 위 프로젝트 설정을 함께 적용한다.
 
 참고: [Git 배포 브랜치 제한](https://vercel.com/docs/project-configuration/git-configuration), [변경 없는 앱 건너뛰기](https://vercel.com/docs/monorepos#skipping-unaffected-projects).

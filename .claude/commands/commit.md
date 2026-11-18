@@ -24,7 +24,7 @@ CLAUDE.md의 "커밋 컨벤션" 섹션을 source of truth로 삼아 커밋한다
 ## 규칙 (CLAUDE.md 커밋 컨벤션 요약)
 
 - **type**: `feat` · `fix` · `refactor` · `chore` · `docs` · `style` · `test`
-- **scope**: 앱·패키지명(`plco`/`gymlog`/`hub`/`tokens`/`ui` …), 전역이면 생략
+- **scope**: 앱·패키지명(`hub`/`soundlab`/`komorebi`/`fonts` …), 전역이면 생략
 - **설명**: 한국어·간결·명령형, 제목 끝 마침표 금지, 필요 시 `— 이유/절충` 부연
 - **원자적**: 한 커밋 = 한 논리적 변경
 

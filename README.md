@@ -50,13 +50,13 @@ packages/            공유 패키지
 
 ## 공유 패키지
 
-| 패키지                      | 이름                     | 역할                                              |
-| --------------------------- | ------------------------ | ------------------------------------------------- |
-| `packages/tokens`           | `@tokens/css`            | 디자인 기본 룰과 공유 토큰(서체·간격·반경·그림자) |
-| `packages/config`           | `@config/tsconfig`       | 공유 TypeScript 설정(base / next)                 |
-| `packages/eslint-config`    | `@repo/eslint-config`    | 공유 ESLint 설정 — Next.js 규칙과 FSD 경계 검사   |
-| `packages/prettier-config`  | `@repo/prettier-config`  | 공유 Prettier 설정                                |
-| `packages/security-headers` | `@repo/security-headers` | 앱 공통 CSP·보안 헤더                             |
+| 패키지                      | 이름                     | 역할                                            |
+| --------------------------- | ------------------------ | ----------------------------------------------- |
+| `packages/fonts`            | `@repo/fonts`            | 공유 마루부리 서체                              |
+| `packages/config`           | `@config/tsconfig`       | 공유 TypeScript 설정(base / next)               |
+| `packages/eslint-config`    | `@repo/eslint-config`    | 공유 ESLint 설정 — Next.js 규칙과 FSD 경계 검사 |
+| `packages/prettier-config`  | `@repo/prettier-config`  | 공유 Prettier 설정                              |
+| `packages/security-headers` | `@repo/security-headers` | 앱 공통 CSP·보안 헤더                           |
 
 ## 라이선스
 
