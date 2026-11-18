@@ -1,3 +1,5 @@
+import { FIGHT_GAUGE_MAX, TENSION } from '../config/fishing';
+
 export const FISHING_PHASE = {
   idle: 'idle',
   casting: 'casting',
@@ -271,16 +273,22 @@ export function stepFight(state: Fight, isReeling: boolean, seconds: number, siz
   const surge = fishSurge(id, elapsed);
   const tension = Math.max(
     0,
-    Math.min(100, state.tension + (isReeling ? 23 + strength * 12 + (surge ? 20 : 0) : -30 + (surge ? 12 : 0)) * dt),
+    Math.min(
+      FIGHT_GAUGE_MAX,
+      state.tension + (isReeling ? 23 + strength * 12 + (surge ? 20 : 0) : -30 + (surge ? 12 : 0)) * dt,
+    ),
   );
   const progress = Math.max(
     0,
-    Math.min(100, state.progress + (isReeling && tension >= 20 && tension <= 80 ? 28 - strength * 8 : -3) * dt),
+    Math.min(
+      FIGHT_GAUGE_MAX,
+      state.progress + (isReeling && tension >= TENSION.low && tension <= TENSION.high ? 28 - strength * 8 : -3) * dt,
+    ),
   );
   let outcome: Fight['outcome'] = FIGHT_OUTCOME.active;
-  if (tension >= 100) outcome = FIGHT_OUTCOME.snapped;
+  if (tension >= FIGHT_GAUGE_MAX) outcome = FIGHT_OUTCOME.snapped;
   else if (tension <= 0 || progress <= 0) outcome = FIGHT_OUTCOME.escaped;
-  else if (progress >= 100) outcome = FIGHT_OUTCOME.landed;
+  else if (progress >= FIGHT_GAUGE_MAX) outcome = FIGHT_OUTCOME.landed;
   return { tension, progress, elapsed, outcome };
 }
 
