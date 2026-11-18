@@ -15,7 +15,6 @@ const TOKEN_EXCEPTION = /token-exception:\s*\S/;
 const UNSUPPORTED_WEIGHT = /\bfont-(?:thin|extralight|light|medium|extrabold|black)\b/;
 const DEPLOYMENT_ENABLED = { '**': false, main: true };
 const BUILD_FILTER = /--filter=(\S+)/;
-const TIDY_APPS = new Set(['awesome-sudoku', 'danwoo-island', 'fe-deep', 'hub', 'prairie', 'soundlab']);
 const COMPONENT_WRAPPER = /^(?:memo|forwardRef|dynamic|lazy|Object\.assign)$/;
 const STYLE_HOME =
   /^src\/app\/(?:globals\.css|styles\/[^/]+\.css)$|^src\/(?:views|features|entities)\/[^/]+\/styles\/[^/]+\.css$|^src\/(?:.*\/)?ui\/(?:.*\/)?[A-Z][A-Za-z0-9]*\.module\.css$/;
@@ -233,15 +232,13 @@ export function checkRepository(root = ROOT) {
       }
     }
     const sources = [...walk(path.join(dir, 'src')), ...walk(path.join(dir, 'app'))];
-    if (TIDY_APPS.has(path.basename(dir))) {
-      const appSources = sources.filter((f) => !f.includes(`${path.sep}__tests__${path.sep}`));
-      for (const file of appSources.filter((f) => f.endsWith('.tsx') && f.startsWith(path.join(dir, 'src')))) {
-        for (const problem of validateComponentModule(readFileSync(file, 'utf8'), file))
-          problems.push(`${path.relative(root, file)}: ${problem}`);
-      }
-      for (const problem of findMisplacedStyles(appSources.map((f) => path.relative(dir, f))))
-        problems.push(`${relative}/${problem}`);
+    const appSources = sources.filter((f) => !f.includes(`${path.sep}__tests__${path.sep}`));
+    for (const file of appSources.filter((f) => f.endsWith('.tsx') && f.startsWith(path.join(dir, 'src')))) {
+      for (const problem of validateComponentModule(readFileSync(file, 'utf8'), file))
+        problems.push(`${path.relative(root, file)}: ${problem}`);
     }
+    for (const problem of findMisplacedStyles(appSources.map((f) => path.relative(dir, f))))
+      problems.push(`${relative}/${problem}`);
     if (existsSync(path.join(dir, 'src/app/styles/theme.css'))) {
       for (const file of sources.filter((f) => /\.(ts|tsx|astro)$/.test(f))) {
         for (const problem of validateDesignTokens(readFileSync(file, 'utf8')))

@@ -122,7 +122,7 @@ tsx 파일은 "무엇을 그리는가"만 담는다. 값·로직·스타일은 �
   - 인라인 `style`은 계산된 값(위치·진행률·`config` 값으로 만든 등장 지연 등)에만 쓴다.
   - 일반 CSS 파일은 앱 전역이면 `src/app/styles/`, 한 슬라이스 전용이면 그 슬라이스의 `styles/`에 둔다. `ui/`에는 `<이름>.module.css`만 둔다.
 - **반복되는 애니메이션은 모듈로**: 모달·시트·오버레이의 열림/닫힘처럼 여러 곳에서 같은 전환을 쓰면 훅(`useModal`, `useSheetPhase` 등)과 스타일·키프레임을 한 모듈로 만들어 함께 쓴다. 컴포넌트마다 전환 상태를 따로 구현하지 않는다.
-- **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateComponentModule`·`findMisplacedStyles`): `src`의 tsx 최상위 비컴포넌트 선언과 자리를 벗어난 CSS 파일을 막는다. 정돈을 마친 앱부터 `TIDY_APPS`에 넣어 적용하고, 모든 앱이 끝나면 목록을 없애 전체에 적용한다. 하드코딩·훅 분리·반복 모양의 컴포넌트화는 리뷰에서 확인한다.
+- **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateComponentModule`·`findMisplacedStyles`): 모든 앱 `src`의 tsx 최상위 비컴포넌트 선언과 자리를 벗어난 CSS 파일을 막는다. 하드코딩·훅 분리·반복 모양의 컴포넌트화는 리뷰에서 확인한다.
 
 ## 상태 관리 (도입 시)
 
