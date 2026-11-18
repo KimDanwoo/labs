@@ -1,11 +1,10 @@
 import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom, type CellProps } from '@entities/game';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
+import { EMPTY_HIGHLIGHT } from '../../../config/board';
 import { useCellAccessibility } from './useCellAccessibility';
 import { useCellInteraction } from './useCellInteraction';
 import { useCellStyles } from './useCellStyles';
-
-const EMPTY_HIGHLIGHT = { selected: false, related: false, sameValue: false } as const;
 
 export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
   const cellKey = `${row}-${col}`;

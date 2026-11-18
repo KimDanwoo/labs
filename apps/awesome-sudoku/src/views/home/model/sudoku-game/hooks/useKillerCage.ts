@@ -1,10 +1,9 @@
 import { GAME_MODE, cagesAtom, gameModeAtom, type CageInfo } from '@entities/game';
 import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useState } from 'react';
+import { DEFAULT_CELL_SIZE } from '../../../config/board';
 import { useCagePathCalculator } from './useCagePathCalculator';
 import { useTableDimensions, type CellPosition } from './useTableDimensions';
-
-const DEFAULT_CELL_SIZE = 40;
 
 export const useKillerCage = () => {
   const cages = useAtomValue(cagesAtom);
