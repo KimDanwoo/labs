@@ -3,7 +3,6 @@ import { cn } from '@shared/lib/cn';
 import { CELL_KIND } from '../../config/heatmap';
 import type { HeatmapCell } from '../../lib/buildYearGrid';
 import { heatIntensity } from '../../lib/heatIntensity';
-import { styles } from './YearHeatmap.styles';
 
 interface HeatCellProps {
   cell: HeatmapCell;
@@ -16,7 +15,12 @@ export function HeatCell({ cell, maxCount }: HeatCellProps) {
 
   return (
     <div
-      className={cn('h-3 w-3 rounded-[2px]', styles.heat[heatIntensity(cell.count, maxCount)])}
+      className={cn(
+        'h-3 w-3 rounded-[2px]',
+        { 0: 'bg-muted', 1: 'bg-heat-1', 2: 'bg-heat-2', 3: 'bg-heat-3', 4: 'bg-heat-4' }[
+          heatIntensity(cell.count, maxCount)
+        ],
+      )}
       title={`${cell.date}: ${cell.count}문제`}
     />
   );

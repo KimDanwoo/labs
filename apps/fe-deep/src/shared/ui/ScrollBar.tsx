@@ -3,8 +3,6 @@ import type { ComponentProps } from 'react';
 
 import { cn } from '@shared/lib/cn';
 
-import { styles } from './ScrollArea.styles';
-
 export function ScrollBar({
   className,
   orientation = 'vertical',
@@ -14,7 +12,15 @@ export function ScrollBar({
     <ScrollAreaPrimitive.ScrollAreaScrollbar
       data-slot="scroll-area-scrollbar"
       orientation={orientation}
-      className={cn(styles.scrollbar.base, styles.scrollbar[orientation], className)}
+      className={cn(
+        'flex touch-none p-px transition-colors select-none',
+        {
+          base: 'flex touch-none p-px transition-colors select-none',
+          vertical: 'h-full w-2.5 border-l border-l-transparent',
+          horizontal: 'h-2.5 flex-col border-t border-t-transparent',
+        }[orientation],
+        className,
+      )}
       {...props}
     >
       <ScrollAreaPrimitive.ScrollAreaThumb

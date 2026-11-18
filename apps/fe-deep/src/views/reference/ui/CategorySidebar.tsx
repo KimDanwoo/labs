@@ -8,7 +8,6 @@ import { cn } from '@shared/lib/cn';
 import { ScrollArea } from '@shared/ui/ScrollArea';
 
 import { categoryHref } from '../lib/categoryHref';
-import { styles } from './CategorySidebar.styles';
 
 interface CategorySidebarProps {
   categories: Category[];
@@ -26,7 +25,12 @@ export function CategorySidebar({ categories }: CategorySidebarProps) {
             <Link
               key={category.id}
               href={href}
-              className={cn(styles.link.base, pathname === href ? styles.link.active : styles.link.inactive)}
+              className={cn(
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 mx-1 text-sm transition-all duration-200',
+                pathname === href
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+              )}
             >
               <span className="text-base">{category.icon}</span>
               <span className="truncate">{category.title}</span>
