@@ -4,7 +4,6 @@ import { addDays, todayString } from '../../lib/progressDates';
 import { PROGRESS_STATUS, SM2_CONSTANTS } from '../constants/constants';
 import type { UserProgress } from '../types/types';
 import { getLocalProgress, saveLocalProgress } from './progressStorage';
-export { getLocalProgress, saveLocalProgress } from './progressStorage';
 
 export function getStudyHeatmap(preloaded?: Record<string, UserProgress>): Record<string, number> {
   const allProgress = preloaded ?? getLocalProgress();
@@ -46,8 +45,6 @@ function reviewedProgress(questionId: string, knew: boolean): UserProgress {
   const today = todayString();
 
   const updated: UserProgress = {
-    id: existing?.id ?? questionId,
-    user_id: existing?.user_id ?? 'local',
     question_id: questionId,
     status: knew ? PROGRESS_STATUS.mastered : PROGRESS_STATUS.learning,
     correct_count: (existing?.correct_count ?? 0) + (knew ? 1 : 0),

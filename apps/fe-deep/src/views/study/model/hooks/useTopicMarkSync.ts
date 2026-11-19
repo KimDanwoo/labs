@@ -14,7 +14,7 @@ export function useTopicMarkSync(docSlug: string) {
   const { review, isLoaded: isReviewLoaded, toggle: toggleReview } = useReviewTopics(docSlug);
   const isMarksLoaded = isUnderstoodLoaded && isReviewLoaded;
 
-  // 다른 기기에서 표시하면 한 주제가 두 목록에 같이 들어올 수 있다. 다시 볼 주제를 놓치지 않도록 오답노트 쪽을 남긴다.
+  // 같은 문서를 연 두 탭에서 따로 표시하면 한 주제가 두 목록에 같이 들어올 수 있다. 다시 볼 주제를 놓치지 않도록 오답노트 쪽을 남긴다.
   const doubleMarkedTopics = useMemo(
     () => (isMarksLoaded ? [...understood].filter((topicTitle) => review.has(topicTitle)) : []),
     [isMarksLoaded, understood, review],
