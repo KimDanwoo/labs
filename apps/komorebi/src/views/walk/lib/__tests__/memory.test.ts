@@ -1,6 +1,6 @@
+import { LANDMARKS } from '@views/walk/model/world/landmarks';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { LANDMARKS } from '../../model/world/world';
 import { diaryMemory, liveMemory } from '../memory';
 
 const landmark = LANDMARKS[0]!;

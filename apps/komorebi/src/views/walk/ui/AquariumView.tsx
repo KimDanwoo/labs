@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AQUARIUM_ART, aquariumFishArt } from '../lib/aquarium';
 import type { KeptFish } from '../lib/companions';
-import { FISH } from '../lib/fishing';
+import { FISH } from '../lib/fishTable';
 import { useAquariumSwim } from '../model/hooks/useAquariumSwim';
 
 interface AquariumViewProps {

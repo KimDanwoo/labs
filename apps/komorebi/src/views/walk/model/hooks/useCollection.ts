@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { TIME_ORDER, type TimeOfDay } from '../../config/walk';
 import { pageStores, type DiscoveryStore } from '../store/discoveries';
-import { LANDMARKS } from '../world/world';
+import { LANDMARKS } from '../world/landmarks';
 
 function usePages(store: DiscoveryStore): readonly string[] {
   return useSyncExternalStore(store.subscribe, store.get, store.getServer);

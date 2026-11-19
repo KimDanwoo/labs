@@ -1,4 +1,5 @@
-import { FISH, type FishCollection } from '../lib/fishing';
+import { type FishCollection } from '../lib/fishing';
+import { FISH } from '../lib/fishTable';
 
 interface FishJournalProps {
   collection: FishCollection;

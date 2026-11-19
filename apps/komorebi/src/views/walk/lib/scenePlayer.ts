@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { BALL_PHASE, BALL_ROLE } from '../model/ballGame';
+import { DESTINATIONS } from '../model/world/landmarks';
+import { movePlayer } from '../model/world/movement';
 import { surfaceAt } from '../model/world/surfaces';
-import { DESTINATIONS, HOME_BED, movePlayer } from '../model/world/world';
+import { HOME_BED } from '../model/world/world';
 import { createBedRest } from './bedRest';
 import { constrainCameraAxis } from './cameraBounds';
 import { FISHING_PHASE } from './fishing';

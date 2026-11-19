@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { SURFACE, surfaceAt } from '../surfaces';
-import { WORLDS } from '../world';
+import { WORLDS } from '../worlds';
 
 test('bridges sound like wood and the rest of each painting keeps its own ground', () => {
   assert.equal(surfaceAt({ x: 50, z: 48 }, 'river'), SURFACE.wood);

@@ -1,7 +1,7 @@
 'use client';
 
 import type { JSX } from 'react';
-import { DANWOO_PROFILE, DEFAULT_MUSIC } from '../../lib/music/soundcloud';
+import { DANWOO_PROFILE, DEFAULT_MUSIC } from '../../lib/music/musicSettings';
 import { MusicPlayer } from './MusicPlayer';
 
 export function MusicDock(): JSX.Element {

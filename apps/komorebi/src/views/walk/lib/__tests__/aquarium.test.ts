@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { aquariumFishArt, aquariumPose } from '../aquarium';
 import { FISH_HOME } from '../companions';
-import { FISH } from '../fishing';
+import { FISH } from '../fishTable';
 
 test('every fish stays inside painted water at all sizes, turns and feeding stages', () => {
   for (const species of FISH) {

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { DEFAULT_APPEARANCE, characterLayers } from '../model/world/appearance';
-import { createSlideMotion } from '../model/world/world';
+import { createSlideMotion } from '../model/world/movement';
 import { createBallScene } from './ballScene';
 import { createBedRest } from './bedRest';
 import { createBoats } from './boats';

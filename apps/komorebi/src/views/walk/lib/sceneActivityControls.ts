@@ -2,8 +2,9 @@ import { WEATHER } from '../config/walk';
 import { BALL_PHASE } from '../model/ballGame';
 import { schoolmateGreetingPosition, schoolmatePlayPosition } from '../model/schoolmates';
 import { isNearSpot } from '../model/world/interactions';
-import { REGION, findRoute } from '../model/world/world';
-import type { SceneContext, WalkEngine } from './sceneContext';
+import { findRoute } from '../model/world/routing';
+import { REGION } from '../model/world/world';
+import { type SceneContext, type WalkEngine } from './sceneContext';
 
 export function createActivityControls({
   container,

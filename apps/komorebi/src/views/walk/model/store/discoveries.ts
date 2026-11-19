@@ -6,7 +6,7 @@ import {
   TIME,
   type TimeOfDay,
 } from '../../config/walk';
-import { LANDMARKS } from '../world/world';
+import { LANDMARKS } from '../world/landmarks';
 
 const NO_PAGES: readonly string[] = [];
 

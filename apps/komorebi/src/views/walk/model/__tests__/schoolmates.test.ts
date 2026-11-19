@@ -1,19 +1,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { SCHOOL_REGION, SCHOOLMATE_ID, SCHOOLMATES } from '../schoolmateRoster';
 import {
   advanceSchoolmate,
   createSchoolmate,
   GREETING_DISTANCE,
   nearestSchoolmate,
-  SCHOOL_REGION,
-  SCHOOLMATE_ID,
   schoolmateGreetingPosition,
   schoolmatePlayPosition,
-  SCHOOLMATES,
   schoolRegion,
 } from '../schoolmates';
+import { canWalk } from '../world/movement';
 import { portalAt } from '../world/portals';
-import { canWalk } from '../world/world';
 
 const DT = 1 / 30;
 const AWAY = { x: 0, z: 0 };

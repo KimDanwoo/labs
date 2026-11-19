@@ -1,19 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { hasGroundBetween, isOnGround } from '../ground';
-import {
-  LANDMARKS,
-  SPAWN,
-  WORLDS,
-  canWalk,
-  closestLandmark,
-  createSlideMotion,
-  findRoute,
-  isIndoors,
-  movePlayer,
-  nextRegionStep,
-  type Region,
-} from '../world';
+import { LANDMARKS, closestLandmark } from '../landmarks';
+import { canWalk, createSlideMotion, movePlayer } from '../movement';
+import { findRoute, nextRegionStep } from '../routing';
+import { SPAWN, isIndoors, type Region } from '../world';
+import { WORLDS } from '../worlds';
 
 test('spawn, every landmark and every portal arrival are on walkable lanes', () => {
   assert.ok(canWalk(SPAWN.x, SPAWN.z));

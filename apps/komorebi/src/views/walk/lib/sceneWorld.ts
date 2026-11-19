@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { TIME, WEATHER, type TimeOfDay } from '../config/walk';
-import { foregroundOrder } from '../model/world/foreground';
-import { DESTINATIONS, isIndoors } from '../model/world/world';
+import { foregroundOrder } from '../model/world/foregroundOrder';
+import { DESTINATIONS } from '../model/world/landmarks';
+import { isIndoors } from '../model/world/world';
 import { lampGlowAt } from './nightLights';
 import { sceneX, sceneY } from './perspective';
 import { settle } from './renderBudget';

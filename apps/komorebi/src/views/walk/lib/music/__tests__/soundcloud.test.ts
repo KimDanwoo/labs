@@ -3,15 +3,13 @@ import { test } from 'node:test';
 import {
   DANWOO_PROFILE,
   DEFAULT_MUSIC,
-  bindMusicWidget,
   musicSource,
   musicTime,
   musicWidgetSrc,
   parseMusicPreferences,
   parseMusicTracks,
-  type MusicWidget,
-  type WidgetPayload,
-} from '../soundcloud';
+} from '../musicSettings';
+import { bindMusicWidget, type MusicWidget, type WidgetPayload } from '../soundcloud';
 
 test('only DANWOO public profile and playlist links become embed sources', () => {
   assert.equal(musicSource(`${DANWOO_PROFILE}/`), DANWOO_PROFILE);

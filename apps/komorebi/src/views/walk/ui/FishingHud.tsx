@@ -1,6 +1,7 @@
 import type { createAmbience } from '../lib/audio';
 import type { CompanionReaction } from '../lib/companions';
-import { FISH, FISHING_PHASE, FISH_RARITY, type FishingFrame } from '../lib/fishing';
+import { FISH, FISH_RARITY } from '../lib/fishTable';
+import { FISHING_PHASE, type FishingFrame } from '../lib/fishing';
 import { catchBadge, fishingActionLabel, fishingMessage } from '../lib/fishingCopy';
 import { useFishingSession } from '../model/hooks/useFishingSession';
 import { CatchChoices } from './CatchChoices';

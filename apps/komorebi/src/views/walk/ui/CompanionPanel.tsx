@@ -7,7 +7,7 @@ import {
   type CompanionPanelKind,
   type CompanionReaction,
 } from '../lib/companions';
-import { FISH } from '../lib/fishing';
+import { FISH } from '../lib/fishTable';
 import { useCompanionPanel } from '../model/hooks/useCompanionPanel';
 import { AquariumView } from './AquariumView';
 

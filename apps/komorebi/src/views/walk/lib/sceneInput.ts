@@ -1,4 +1,4 @@
-import { findRoute } from '../model/world/world';
+import { findRoute } from '../model/world/routing';
 import { gameKey, isControlTarget } from './input';
 import { startJump } from './motion';
 import { createPointerPick } from './pointerPick';

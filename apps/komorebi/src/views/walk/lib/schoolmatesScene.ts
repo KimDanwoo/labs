@@ -1,15 +1,12 @@
 import * as THREE from 'three';
 import { BALL_ROLE, type BallGame } from '../model/ballGame';
+import { SCHOOL_REGION, SCHOOLMATES, type SchoolmateId, type SchoolRegion } from '../model/schoolmateRoster';
 import {
   advanceSchoolmate,
   createSchoolmate,
   nearestSchoolmate,
-  SCHOOL_REGION,
-  SCHOOLMATES,
   schoolRegion,
   type Schoolmate,
-  type SchoolmateId,
-  type SchoolRegion,
 } from '../model/schoolmates';
 import { characterLayers } from '../model/world/appearance';
 import type { Point, Region } from '../model/world/world';

@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { FOREGROUNDS, foregroundOrder, isForegroundInFront } from '../foreground';
-import { WORLDS, canWalk, type Region } from '../world';
+import { FOREGROUNDS } from '../foreground';
+import { foregroundOrder, isForegroundInFront } from '../foregroundOrder';
+import { canWalk } from '../movement';
+import type { Region } from '../world';
+import { WORLDS } from '../worlds';
 
 function covered(region: Region, x: number, y: number, feetDepth: number) {
   return FOREGROUNDS.some((layer) => {

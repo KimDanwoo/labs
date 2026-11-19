@@ -5,23 +5,22 @@ import { MS_PER_SECOND } from '../../config/time';
 import type { createAmbience } from '../../lib/audio';
 import { CATCH_CELEBRATION_SECONDS } from '../../lib/catchCelebration';
 import { COMPANION_ACTION } from '../../lib/companions';
+import { FIGHT_OUTCOME, type Fight } from '../../lib/fishFight';
 import {
   BITE_WINDOW_MS,
   CAST_SECONDS,
-  FIGHT_OUTCOME,
   FISHING_PHASE,
   FISHING_STORAGE_KEY,
   addCatch,
   isBiteOnTime,
-  isRareFish,
   parseCollection,
   rollCatch,
   type Catch,
-  type Fight,
   type FishCollection,
   type FishingFrame,
   type FishingPhase,
 } from '../../lib/fishing';
+import { isRareFish } from '../../lib/fishTable';
 import { companionStore } from '../store/companions';
 
 interface FishingSessionInput {

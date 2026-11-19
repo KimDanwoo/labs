@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { getWorldPortals, type WorldPortal } from '../model/world/portals';
-import { WORLDS, type Region } from '../model/world/world';
+import type { Region } from '../model/world/world';
+import { WORLDS } from '../model/world/worlds';
 import { CANVAS_FONT_FAMILY, canvasTexture } from './art';
 import { sceneX, sceneY } from './perspective';
 

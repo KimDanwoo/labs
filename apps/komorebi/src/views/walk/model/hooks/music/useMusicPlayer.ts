@@ -4,14 +4,12 @@ import {
   DEFAULT_MUSIC,
   MUSIC_STATUS,
   MUSIC_STORAGE_KEY,
-  bindMusicWidget,
-  loadMusicApi,
   parseMusicPreferences,
   type MusicPreferences,
   type MusicStatus,
   type MusicTrack,
-  type MusicWidget,
-} from '../../../lib/music/soundcloud';
+} from '../../../lib/music/musicSettings';
+import { bindMusicWidget, loadMusicApi, type MusicWidget } from '../../../lib/music/soundcloud';
 
 type MusicPlayerModel = {
   attempt: number;

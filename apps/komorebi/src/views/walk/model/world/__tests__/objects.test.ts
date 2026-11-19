@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { FOREGROUNDS, isForegroundInFront } from '../foreground';
+import { FOREGROUNDS } from '../foreground';
+import { isForegroundInFront } from '../foregroundOrder';
 import { hasGroundBetween } from '../ground';
+import { canWalk, createSlideMotion, movePlayer } from '../movement';
 import { WORLD_OBJECTS } from '../objects';
-import { canWalk, createSlideMotion, findRoute, movePlayer } from '../world';
+import { findRoute } from '../routing';
 
 const point = (x: number, y: number) => ({ x: x / 15.36, z: y / 10.24 });
 

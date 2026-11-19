@@ -2,16 +2,8 @@ import { useEffect, useEffectEvent, useRef, useState, type KeyboardEvent, type P
 
 import { FIGHT_TICK_MS, REEL_KEY, REEL_KEYS, VIBRATION } from '../../config/fishing';
 import { MS_PER_SECOND } from '../../config/time';
-import {
-  FIGHT_OUTCOME,
-  FISHING_PHASE,
-  fishSurge,
-  startFight,
-  stepFight,
-  type Catch,
-  type Fight,
-  type FishingFrame,
-} from '../../lib/fishing';
+import { FIGHT_OUTCOME, fishSurge, startFight, stepFight, type Fight } from '../../lib/fishFight';
+import { FISHING_PHASE, type Catch, type FishingFrame } from '../../lib/fishing';
 
 interface FishingFightInput {
   fish: Catch;

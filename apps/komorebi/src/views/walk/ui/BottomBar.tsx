@@ -1,4 +1,4 @@
-import { LANDMARKS } from '../model/world/world';
+import { LANDMARKS } from '../model/world/landmarks';
 import { ControlsHint } from './ControlsHint';
 import { Icon } from './Icon';
 
