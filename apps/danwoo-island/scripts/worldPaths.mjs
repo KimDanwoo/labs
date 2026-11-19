@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WORLD_COMMIT } from './worldSource.mjs';
 
-export const SYNC_FORMAT_VERSION = '7';
+export const SYNC_FORMAT_VERSION = '8';
 
 export const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
