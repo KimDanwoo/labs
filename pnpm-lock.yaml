@@ -550,6 +550,9 @@ importers:
       '@repo/prettier-config':
         specifier: workspace:*
         version: link:../../packages/prettier-config
+      '@repo/security-headers':
+        specifier: workspace:*
+        version: link:../../packages/security-headers
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
