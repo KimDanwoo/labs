@@ -40,6 +40,7 @@ packages/             # 공유 서체 + 공유 설정
    - 스타일은 그 앱의 토큰 기반 Tailwind 유틸로: 색 `bg-primary`/`text-muted-foreground`, 간격 `px-lg`/`gap-3xl`, 반경 `rounded-md`, 그림자 `shadow-md` 등. **임의 hex/px 매직값 금지.**
    - **굵기는 `font-normal`·`font-semibold`·`font-bold`만**(마루부리를 쓰는 앱): 마루부리가 400·600·700만 제공한다. `font-medium` 등은 500을 가진 고정폭 서체(`font-mono`)에만 쓴다.
    - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateDesignTokens`): `src/app/styles/theme.css`가 있는 앱에서 기본 팔레트 색 클래스, 임의 색 값(`bg-[#...]`), 서체에 없는 굵기를 막는다. 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
+   - **Tailwind v4 표기**(`validateTailwindNames`, Tailwind를 쓰는 앱의 ts/tsx): v3 시절 이름은 v4 표기로 쓴다 — `bg-gradient-to-*`→`bg-linear-to-*`, `flex-shrink`·`flex-grow`→`shrink`·`grow`, `aria-[current=true]:`→`aria-current:`, `/[0.03]`→`/3`. px 임의값(`size-[7px]`)은 그대로 둔다(스케일 표기로 바꾸지 않는다).
    - 대비·포커스·누르는 영역·움직임 줄이기·화면 세 개 확인은 DESIGN_RULES.md의 체크리스트로 PR 전에 확인한다.
 
 3. **새 앱은 기존 앱 구성을 따른다**: `apps/<name>`(소문자/숫자/하이픈)에 공유 tsconfig·ESLint(next + FSD)·`@repo/security-headers`·FSD 경로 별칭·catalog 의존성을 연결하고, `pnpm check:architecture`로 확인한다. `vercel.json`은 아래 배포 규칙을 따른다.

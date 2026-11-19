@@ -92,6 +92,35 @@ export function validateDesignTokens(text) {
   return problems;
 }
 
+function opacityPercent(fraction) {
+  const percent = Number(`0.${fraction}`) * 100;
+  return Number.isInteger(Math.round(percent * 1e6) / 1e6) ? `/${Math.round(percent)}` : null;
+}
+
+const LEGACY_TAILWIND = [
+  [/\bbg-gradient-to-(tr|tl|br|bl|t|r|b|l)\b/g, (side) => `bg-linear-to-${side}`],
+  [/\bflex-shrink(-0)?\b/g, (zero = '') => `shrink${zero}`],
+  [/\bflex-grow(-0)?\b/g, (zero = '') => `grow${zero}`],
+  [/aria-\[current=true\]:/g, () => 'aria-current:'],
+  [/\/\[0?\.(\d+)\]/g, opacityPercent],
+];
+
+export function validateTailwindNames(text) {
+  const problems = [];
+  text.split('\n').forEach((line, index) => {
+    for (const [pattern, canonical] of LEGACY_TAILWIND) {
+      for (const [match, group] of line.matchAll(pattern)) {
+        const replacement = canonical(group);
+        if (replacement)
+          problems.push(
+            `${index + 1}행: Tailwind v3 표기 ${match} 대신 ${replacement}를 쓴다(px 임의값은 그대로 둔다).`,
+          );
+      }
+    }
+  });
+  return problems;
+}
+
 function isComponentOrHook(name, initializer, source) {
   if (!initializer) return false;
   if (ts.isCallExpression(initializer) && initializer.expression.getText(source) === 'cva') return true;
@@ -347,6 +376,12 @@ export function checkRepository(root = ROOT) {
     }
     for (const problem of findMisplacedStyles(appSources.map((f) => path.relative(dir, f))))
       problems.push(`${relative}/${problem}`);
+    if (manifest.dependencies?.tailwindcss ?? manifest.devDependencies?.tailwindcss) {
+      for (const file of sources.filter((f) => /\.tsx?$/.test(f))) {
+        for (const problem of validateTailwindNames(readFileSync(file, 'utf8')))
+          problems.push(`${path.relative(root, file)}:${problem}`);
+      }
+    }
     if (existsSync(path.join(dir, 'src/app/styles/theme.css'))) {
       for (const file of sources.filter((f) => /\.(ts|tsx|astro)$/.test(f))) {
         for (const problem of validateDesignTokens(readFileSync(file, 'utf8')))
