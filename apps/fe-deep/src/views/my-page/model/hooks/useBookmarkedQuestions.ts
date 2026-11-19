@@ -39,3 +39,5 @@ export function useBookmarkedQuestions() {
 
   return { bookmarkedQuestions, handleRemoveBookmark, getCategoryForQuestion };
 }
+
+export type BookmarksModel = ReturnType<typeof useBookmarkedQuestions>;

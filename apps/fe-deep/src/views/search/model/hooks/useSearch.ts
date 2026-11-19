@@ -32,10 +32,22 @@ export function useSearch() {
     };
   }, [debouncedQuery]);
 
-  const displayResults = debouncedQuery.trim() ? results : [];
-  const isSearching = debouncedQuery.trim() !== '' && debouncedQuery !== lastSearchedQuery;
+  const hasQuery = debouncedQuery.trim() !== '';
+  const displayResults = hasQuery ? results : [];
+  const isSearching = hasQuery && debouncedQuery !== lastSearchedQuery;
 
   if (error) throw error;
 
-  return { query, setQuery, debouncedQuery, displayResults, isSearching };
+  return {
+    query,
+    setQuery,
+    debouncedQuery,
+    displayResults,
+    isSearching,
+    hasQuery,
+    hasResults: displayResults.length > 0,
+    isEmptyResult: debouncedQuery !== '' && !isSearching && displayResults.length === 0,
+  };
 }
+
+export type SearchModel = ReturnType<typeof useSearch>;

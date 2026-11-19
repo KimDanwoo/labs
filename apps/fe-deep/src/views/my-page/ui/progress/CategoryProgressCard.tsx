@@ -1,10 +1,10 @@
 import type { Category } from '@entities/question';
-import { Badge } from '@shared/ui/Badge';
 import { Card } from '@shared/ui/Card';
 import { Progress } from '@shared/ui/Progress';
 
 import { toPercent } from '../../lib/toPercent';
 import type { CategoryProgress } from '../../model/hooks/useProgressStats';
+import { CategoryProgressCounts } from './CategoryProgressCounts';
 
 interface CategoryProgressCardProps {
   category: Category;
@@ -21,18 +21,7 @@ export function CategoryProgressCard({ category, progress }: CategoryProgressCar
         <div className="flex items-center gap-3 mb-2">
           <span className="text-xl">{category.icon}</span>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-normal truncate">{category.title}</span>
-              <div className="flex items-center gap-2 ml-2 shrink-0">
-                <Badge variant="success" className="tabular-nums">
-                  {progress.mastered}
-                </Badge>
-                <Badge variant="warning" className="tabular-nums">
-                  {progress.learning}
-                </Badge>
-                <span className="text-xs text-muted-foreground tabular-nums">{percent}%</span>
-              </div>
-            </div>
+            <CategoryProgressCounts title={category.title} progress={progress} percent={percent} />
             <Progress value={percent} className="h-1.5 mt-2" />
           </div>
         </div>

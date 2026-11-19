@@ -2,7 +2,12 @@ import { Search } from 'lucide-react';
 
 import { EmptyState } from '@shared/ui/EmptyState';
 
-export function EmptySearchPrompt() {
+import { useSearchContext } from '../../model/hooks/useSearchContext';
+
+export function SearchPrompt() {
+  const { debouncedQuery } = useSearchContext();
+  if (debouncedQuery) return null;
+
   return (
     <EmptyState
       icon={<Search className="h-7 w-7 text-muted-foreground/50" />}
