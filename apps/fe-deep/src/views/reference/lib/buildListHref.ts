@@ -1,7 +1,6 @@
-import type { Difficulty } from '@entities/question';
+import { categoryHref, type Difficulty } from '@entities/question';
 
 import { FIRST_PAGE, LIST_SEARCH_PARAM } from '../config/pagination';
-import { categoryHref } from './categoryHref';
 
 export function buildListHref(categorySlug: string, page: number, difficulty?: Difficulty): string {
   const query = new URLSearchParams();

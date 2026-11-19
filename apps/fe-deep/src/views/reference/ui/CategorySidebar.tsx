@@ -3,11 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import type { Category } from '@entities/question';
+import { categoryHref, type Category } from '@entities/question';
 import { cn } from '@shared/lib/cn';
 import { ScrollArea } from '@shared/ui/ScrollArea';
-
-import { categoryHref } from '../lib/categoryHref';
 
 interface CategorySidebarProps {
   categories: Category[];
