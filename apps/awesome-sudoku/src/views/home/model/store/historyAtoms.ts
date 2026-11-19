@@ -1,9 +1,10 @@
 import { atom } from 'jotai';
+import { GAME_PHASE } from '../../config/game';
 import { updateCellSelection } from '../services/update';
 import type { SudokuBoard } from '../types/board';
-import { boardAtom, isCompletedAtom, selectedCellAtom } from './primitives';
+import { boardAtom, selectedCellAtom } from './primitives';
 import { updateHighlightsAtom } from './selectionAtoms';
-import { countBoardNumbersAtom } from './statusAtoms';
+import { countBoardNumbersAtom, gamePhaseAtom } from './statusAtoms';
 
 const MAX_HISTORY_SIZE = 50;
 /** 어느 칸과도 겹치지 않는 좌표 — updateCellSelection에 넘기면 선택 표시가 모두 꺼진다 */
@@ -35,7 +36,7 @@ const restoreBoardAtom = atom(null, (get, set, board: SudokuBoard) => {
 });
 
 export const undoAtom = atom(null, (get, set) => {
-  if (get(isCompletedAtom)) return;
+  if (get(gamePhaseAtom) !== GAME_PHASE.PLAYING) return;
   const past = get(pastAtom);
   const previous = past.at(-1);
   if (!previous) return;
@@ -46,7 +47,7 @@ export const undoAtom = atom(null, (get, set) => {
 });
 
 export const redoAtom = atom(null, (get, set) => {
-  if (get(isCompletedAtom)) return;
+  if (get(gamePhaseAtom) !== GAME_PHASE.PLAYING) return;
   const future = get(futureAtom);
   const next = future.at(-1);
   if (!next) return;

@@ -1,6 +1,7 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
+import { elapsedTicks } from '../../../lib/elapsedTicks';
 import { formatTime } from '../../services/common';
 import { currentTimeAtom, isCompletedAtom, timerActiveAtom } from '../../store/primitives';
 import { incrementTimerAtom, toggleTimerAtom } from '../../store/timerAtoms';
@@ -18,19 +19,19 @@ export function useGameTimer() {
   const isCompleted = useAtomValue(isCompletedAtom);
   const incrementTimer = useSetAtom(incrementTimerAtom);
   const toggleTimer = useSetAtom(toggleTimerAtom);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (timerActive && !isCompleted) {
-      timerRef.current = setInterval(incrementTimer, TIMER_TICK_MS);
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
+    if (!timerActive || isCompleted) return undefined;
+    let last = Date.now();
+    let carryMs = 0;
+    const id = setInterval(() => {
+      const now = Date.now();
+      const elapsed = elapsedTicks(now - last + carryMs, TIMER_TICK_MS);
+      last = now;
+      carryMs = elapsed.carryMs;
+      if (elapsed.ticks > 0) incrementTimer(elapsed.ticks);
+    }, TIMER_TICK_MS);
+    return () => clearInterval(id);
   }, [timerActive, isCompleted, incrementTimer]);
 
   const state = toTimerState(isCompleted, timerActive);
