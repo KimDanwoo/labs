@@ -3,7 +3,6 @@ import { SpeakButton } from '@features/read-aloud';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 
 import type { StudyStep } from '../../lib/studyDoc';
-import { AiFeedback } from './AiFeedback';
 import { AnswerFramePrompt } from './AnswerFramePrompt';
 
 interface StepRevealProps {
@@ -23,7 +22,6 @@ export function StepReveal({ step, recall }: StepRevealProps) {
         </div>
       )}
       {hasRecall && step.keywords.length > 0 && <KeywordCheck keywords={step.keywords} recall={recall} />}
-      {hasRecall && <AiFeedback key={step.id} question={step.prompt} modelAnswer={step.reveal} recall={recall} />}
       {step.reveal ? (
         <div>
           <div className="mb-2 flex justify-end">
