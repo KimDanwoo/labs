@@ -2,6 +2,7 @@ import { BLOG_ORIGIN, isBlogAssetUrl, isBlogPostUrl, LATEST_POSTS_LIMIT, type La
 
 const RSS_URL = `${BLOG_ORIGIN}/rss.xml`;
 const REVALIDATE_SECONDS = 3600;
+const RSS_TIMEOUT_MS = 5000;
 const MAX_RSS_LENGTH = 2_000_000;
 const FEED_ROOT = /<rss[\s>]/;
 const CDATA_OPEN = '<![CDATA[';
@@ -97,7 +98,10 @@ export function parseLatestPosts(rss: string, limit = LATEST_POSTS_LIMIT): Lates
 }
 
 export async function fetchLatestPosts(): Promise<LatestPost[]> {
-  const response = await fetch(RSS_URL, { next: { revalidate: REVALIDATE_SECONDS } });
+  const response = await fetch(RSS_URL, {
+    next: { revalidate: REVALIDATE_SECONDS },
+    signal: AbortSignal.timeout(RSS_TIMEOUT_MS),
+  });
   if (!response.ok) throw new Error(`Blog RSS responded ${response.status}`);
   return parseLatestPosts(await response.text());
 }
