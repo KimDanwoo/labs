@@ -65,7 +65,7 @@ catalog:
   '@testing-library/react': ^16.3.3
 
   # types (Node 24 고정 — .nvmrc)
-  '@types/node': ^26.0.0
+  '@types/node': ^24.19.2
   '@types/react': ^19
   '@types/react-dom': ^19
 
