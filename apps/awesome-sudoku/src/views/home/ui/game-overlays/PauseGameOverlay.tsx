@@ -22,7 +22,7 @@ export const PauseGameOverlay: FC = () => {
         onClick={() => toggleTimer()}
         className="flex flex-col items-center gap-4 p-8 rounded-3xl transition-all duration-300 hover:scale-105 active:scale-95"
       >
-        <div className="w-20 h-20 rounded-full bg-gradient-to-b from-gradient-from to-gradient-to shadow-[0_8px_32px_rgba(var(--rgb-gradient-from),0.4)] flex items-center justify-center transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(var(--rgb-gradient-from),0.5)]">
+        <div className="w-20 h-20 rounded-full bg-linear-to-b from-gradient-from to-gradient-to shadow-[0_8px_32px_rgba(var(--rgb-gradient-from),0.4)] flex items-center justify-center transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(var(--rgb-gradient-from),0.5)]">
           <VscPlay className="text-white text-3xl ml-1" />
         </div>
         <span className="text-sm font-normal text-text-secondary">탭하여 계속하기</span>

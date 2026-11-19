@@ -22,7 +22,7 @@ export function ThemeToggle() {
       <span
         suppressHydrationWarning
         className={cn(
-          'absolute inset-0 rounded-full bg-gradient-to-r from-toggle-day-start to-toggle-day-end transition-opacity duration-500',
+          'absolute inset-0 rounded-full bg-linear-to-r from-toggle-day-start to-toggle-day-end transition-opacity duration-500',
           isDark ? 'opacity-0' : 'opacity-100',
         )}
       />

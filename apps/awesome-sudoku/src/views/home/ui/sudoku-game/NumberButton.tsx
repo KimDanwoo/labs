@@ -19,7 +19,7 @@ export const NumberButton: React.FC<NumberButtonProps> = memo(({ value, onClick,
       'transition-all duration-200 ease-out',
       isDisabled
         ? 'text-text-tertiary cursor-not-allowed bg-bg-tertiary/50 border border-border-light'
-        : 'text-text-primary bg-gradient-to-b from-surface-primary to-bg-tertiary shadow-sm border border-border-light/60 hover:from-accent-light hover:to-surface-primary hover:text-accent hover:shadow-md hover:border-accent/30 hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
+        : 'text-text-primary bg-linear-to-b from-surface-primary to-bg-tertiary shadow-sm border border-border-light/60 hover:from-accent-light hover:to-surface-primary hover:text-accent hover:shadow-md hover:border-accent/30 hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
     )}
     aria-label={`숫자 ${value}`}

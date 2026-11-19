@@ -21,7 +21,7 @@ export const ThemeToggle = memo(() => {
       <div
         className={cn(
           'absolute inset-0 rounded-full',
-          'bg-gradient-to-r from-sky-200 to-amber-200',
+          'bg-linear-to-r from-sky-200 to-amber-200',
           'transition-opacity duration-500',
           isDark ? 'opacity-0' : 'opacity-100',
         )}
