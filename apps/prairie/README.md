@@ -41,6 +41,6 @@ pnpm --filter prairie test:e2e
 
 바람의 나무·꽃잠 정원·노을의 문을 발견하고, 하늘의 빛 고리 7개를 순서대로 통과하는 바람길에 도전할 수 있다. 발견과 최고 기록은 `prairie.exploration.v1`로 이 브라우저에 저장한다. 저장 공간을 사용할 수 없어도 플레이는 계속된다.
 
-`runner.glb`는 Quaternius의 CC0 원본으로 보존한다. 화면에서 사용하는 `unicorn.glb`는 원본 리그·애니메이션을 유지하면서 곡면 세분화와 꼬리 털 다발을 적용한 파생 모델이다. `pnpm --filter prairie exec node scripts/refine-runner.mjs`로 재생성할 수 있다. 테스트는 뼈대·애니메이션 보존과 가중치·법선·인덱스·삼각형 예산도 검사한다.
+원본 `runner.glb`(Quaternius CC0)는 생성 스크립트 입력이라 `scripts/runner/source/`에 보존한다. 화면에서 사용하는 `unicorn.glb`는 원본 리그·애니메이션을 유지하면서 곡면 세분화와 꼬리 털 다발을 적용한 파생 모델이다. `pnpm --filter prairie exec node scripts/refine-runner.mjs`로 재생성할 수 있다. 테스트는 뼈대·애니메이션 보존과 가중치·법선·인덱스·삼각형 예산도 검사한다.
 
 잔디 셰이더의 바람·색 그라데이션 기반은 [ghibli-grass-v2](https://github.com/Carbine28/ghibli-grass-v2), MIT, Copyright 2024 Wilson Ko다. 라이선스 원문은 [CREDITS.md](CREDITS.md)에 보존한다. HDR 하늘 출처는 [환경 에셋](public/environments/README.md)을 참고한다.

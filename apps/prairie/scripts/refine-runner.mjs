@@ -7,7 +7,7 @@ import { closeBoundaryLoops, computeNormals, stripPlateTail, weldMesh } from './
 import { loopSubdivide } from './runner/subdivide.mjs';
 import { addTailStrands } from './runner/tailStrands.mjs';
 
-const { gltf, binary } = readGlb(new URL('../public/models/runner.glb', import.meta.url));
+const { gltf, binary } = readGlb(new URL('./runner/source/runner.glb', import.meta.url));
 const { mesh: stripped, tailSource } = stripPlateTail(weldMesh(gltf, binary));
 closeBoundaryLoops(stripped);
 let mesh = stripped;
