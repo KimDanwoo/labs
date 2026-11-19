@@ -110,6 +110,9 @@ apps/<app>/
   - 파트 안의 하위 블록(`AtlasGuides`, `DiscoveryList`)도 같은 context를 구독해도 된다. 상태를 들고 마운트·리셋 시점이 중요한 HUD·리프(`CompanionPanel`, `KeywordHints` 등)는 표시용 props를 그대로 받고, 마운트 조건·`key`는 파트가 갖는다.
   - 내용(아이콘·라벨·배지·버튼 묶음)은 prop이 아니라 children 파트로 조립한다. 버튼·입력 기본 속성은 `ComponentProps<'button'>`을 확장해 받는다.
   - `pnpm lint`가 강제한다(`check-architecture.mjs`의 `validateComponentProps`): 컴포넌트 props는 최대 5개(확장한 기본 속성은 세지 않음).
+- **한 컴포넌트에 마크업을 쌓지 않는다**: 화면 컴포넌트는 이름 붙은 구획(`HomeHero`, `HomeCategories`)을 나열하고, 각 구획이 필요한 데이터를 직접 가져와 해당할 때만 그린다(조건부 표시를 부모가 계산해 넘기지 않는다).
+  - `pnpm lint`가 강제한다(`validateComponentMarkup`): 컴포넌트 하나의 JSX 깊이 최대 5, HTML·three 요소(소문자 태그) 최대 15개.
+  - 기존 위반은 `scripts/component-markup-debt.mjs` 한 곳에만 둔다. 목록은 줄어들기만 한다 — 새 위반은 실패하고, 고친 항목이 목록에 남아 있어도 실패한다.
 - **컴포넌트는 앱 안에 둔다**: 다른 앱에 같은 컴포넌트가 필요하면 그 앱으로 복사해 맞게 고친다. 공유 패키지로 올리지 않는다. 앱 안에서는 FSD 위치 규칙을 따른다.
 
 ## 코드 정돈 규칙
