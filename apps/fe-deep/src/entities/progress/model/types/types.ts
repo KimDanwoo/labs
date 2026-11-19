@@ -3,8 +3,6 @@ import type { PROGRESS_STATUS } from '../constants/constants';
 export type ProgressStatus = (typeof PROGRESS_STATUS)[keyof typeof PROGRESS_STATUS];
 
 export interface UserProgress {
-  id: string;
-  user_id: string;
   question_id: string;
   status: ProgressStatus;
   correct_count: number;

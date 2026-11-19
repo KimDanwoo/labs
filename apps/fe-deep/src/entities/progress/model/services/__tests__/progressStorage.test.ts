@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { getStudyHeatmap } from '../progressApi';
+import { getStudyHeatmap } from '../progressRecords';
 import { getLocalProgress, saveLocalProgress } from '../progressStorage';
 
 test('local progress remains safe on the server without browser storage', () => {

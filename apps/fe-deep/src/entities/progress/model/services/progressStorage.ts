@@ -35,8 +35,6 @@ export function saveLocalProgress(progress: Record<string, UserProgress>) {
 function migrateProgress(old: Partial<UserProgress> & { question_id: string }): UserProgress {
   const today = todayString();
   return {
-    id: old.id ?? old.question_id,
-    user_id: old.user_id ?? 'local',
     question_id: old.question_id,
     status: old.status ?? PROGRESS_STATUS.learning,
     correct_count: old.correct_count ?? 0,

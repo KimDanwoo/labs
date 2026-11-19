@@ -6,6 +6,6 @@ export {
   getStudyHeatmap,
   markQuestionMastered,
   updateQuestionProgress,
-} from './model/services/progressApi';
+} from './model/services/progressRecords';
 export { getLocalProgress } from './model/services/progressStorage';
 export type { ProgressStatus } from './model/types/types';
