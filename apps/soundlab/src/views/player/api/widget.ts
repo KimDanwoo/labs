@@ -91,9 +91,13 @@ function soundId(sound: unknown): number | null {
 /** 위젯이 준 사운드 목록을 위치 그대로 id 배열로 옮긴다. 자리를 지우지 않는 게 핵심이다. */
 export const readSoundIds = (sounds: unknown[]) => (Array.isArray(sounds) ? sounds.map(soundId) : []);
 
-const ENGINE_FRAME_STYLE = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
+const ENGINE_FRAME_SIZE = { width: 320, height: 166 };
+const ENGINE_FRAME_STYLE = `position:fixed;left:0;top:0;width:${ENGINE_FRAME_SIZE.width}px;height:${ENGINE_FRAME_SIZE.height}px;opacity:0;pointer-events:none;border:0`;
 
-/** 소리만 내는 숨은 위젯 iframe을 문서에 붙인다. display:none은 일부 엔진에서 미디어 재생을 막아 1×1 투명으로 둔다. */
+/**
+ * 소리만 내는 숨은 위젯 iframe을 문서에 붙인다. display:none은 일부 엔진에서 미디어 재생을 막아 투명으로 둔다.
+ * 크기는 기본 플레이어만큼 둔다 — 너무 작으면 위젯 안의 파형 캔버스 폭이 0이 되어 createPattern 오류가 난다.
+ */
 export function mountEngineFrame(src: string): HTMLIFrameElement {
   const frame = document.createElement('iframe');
   frame.style.cssText = ENGINE_FRAME_STYLE;
