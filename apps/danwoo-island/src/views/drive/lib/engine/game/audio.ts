@@ -4,129 +4,30 @@ import * as THREE from 'three/webgpu';
 
 import { worldAsset } from '../../../config/worldAsset';
 import { WORLD_CONFIG } from '../worldConfig';
+import { registerAmbients } from './ambientSounds';
 import {
-  AudioGroup,
-  AudioItem,
-  DEFAULT_ANTI_SPAM,
-  isVectorLike,
-  type SoundHandler,
-  type SoundHost,
-  type SoundOptions,
-} from './audioItem';
+  CAMERA_DEPTH_SCALE,
+  IS_IOS,
+  MAX_PARALLEL_LOADS,
+  MUTE_KEY,
+  type MusicOwner,
+  RATE_RANGE,
+  SONGS,
+  SONG_NOTICE_DURATION,
+  SONG_VOLUME,
+  closestTo,
+  nowPlayingNotice,
+  scheduleIdle,
+} from './audioConfig';
+import { AudioGroup, AudioItem, type SoundHost, type SoundOptions } from './audioItem';
 import { AudioMute } from './audioMute';
 import { Events } from './events';
 import { getGame } from './gameContext';
 import { MusicStream } from './musicStream';
+import { registerOneOffs } from './oneOffSounds';
 import { Playlist } from './playlist';
 import { TICK_ORDER } from './tickOrder';
-import { createElement } from './utilities/createElement';
 import { clamp, remapClamp } from './utilities/maths';
-
-const IS_IOS =
-  /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-const RATE_RANGE = { min: 0.5, max: 4 } as const;
-const CAMERA_DEPTH_SCALE = 0.1;
-const MAX_PARALLEL_LOADS = 4;
-const IDLE_TIMEOUT_MS = 2000;
-
-function scheduleIdle(task: () => void): void {
-  if ('requestIdleCallback' in window) window.requestIdleCallback(task, { timeout: IDLE_TIMEOUT_MS });
-  else setTimeout(task, 0);
-}
-
-const SONG_VOLUME = 0.2;
-const SONG_NOTICE_DURATION = 5;
-const SONGS = [{ path: 'sounds/musics/baram.mp3', name: '바람 · danwoo0' }] as const;
-const AMBIENT_DISTANCE = 30;
-const FIRE_FADE_DISTANCE = 13;
-const HIT_FADE_DISTANCE = 20;
-const CRICKETS_VOLUME = 0.65;
-const MUTE_KEY = {
-  name: 'mute',
-  categories: ['intro', 'modal', 'menu', 'racing', 'cinematic', 'wandering'],
-  keys: ['Keyboard.l'],
-};
-const BIRD_TWEETS = [
-  'sounds/birdTweets/24074 small bird tweet calling-full-1.mp3',
-  'sounds/birdTweets/24074 small bird tweet calling-full-2.mp3',
-  'sounds/birdTweets/20711 finch bird isolated tweet-full.mp3',
-  'sounds/birdTweets/30673 Yellowhammer bird tweet 3-full.mp3',
-  'sounds/birdTweets/31062 Ortolan bird tweet-full.mp3',
-  'sounds/birdTweets/31451 Ortolan bunting bird isolated tweet-full.mp3',
-];
-const HIT_SOUNDS = {
-  hitDefault: [
-    ['sounds/hits/defaults/Stone_Hit_Crash_106-2.mp3', 0.35],
-    ['sounds/hits/defaults/Stone_Hit_Crash_071-1.mp3', 0.35],
-    ['sounds/hits/defaults/Stone_Hit_Crash_106-1.mp3', 0.35],
-    ['sounds/hits/defaults/Impact Soft 01.mp3', 0.8],
-    ['sounds/hits/defaults/Impact Soft 02.mp3', 0.8],
-    ['sounds/hits/defaults/Impact Soft 03.mp3', 0.8],
-    ['sounds/hits/defaults/Impact Soft 04.mp3', 0.8],
-  ],
-  hitBrick: [
-    ['sounds/hits/bricks/24445 brick light hitting-full-2.mp3', 0.6],
-    ['sounds/hits/bricks/41559 Stone brick fall hit 01-full-1.mp3', 0.6],
-    ['sounds/hits/bricks/41563 Stone brick fall hit 05-full-1.mp3', 0.6],
-    ['sounds/hits/bricks/BrickSetDown_BW.5803-1.mp3', 0.6],
-  ],
-  hitMetal: [
-    ['sounds/hits/metal/EQUIPTact_Fire Gear_SDFIRE0411.mp3', 0.6],
-    ['sounds/hits/metal/Metal Clip Hit.mp3', 0.6],
-    ['sounds/hits/metal/Metalic 3.mp3', 0.6],
-  ],
-} as const satisfies Record<string, readonly (readonly [string, number])[]>;
-
-const HIT_GROUPS = ['hitDefault', 'hitBrick', 'hitMetal'] as const satisfies readonly (keyof typeof HIT_SOUNDS)[];
-
-function randomOffset(distance: number): number {
-  return Math.random() < 0.5 ? distance : -distance;
-}
-
-function randomNearbyPosition(distance = AMBIENT_DISTANCE): THREE.Vector3 {
-  const { position } = getGame().view.focusPoint;
-  return new THREE.Vector3(position.x + randomOffset(distance), position.y, position.z + randomOffset(distance));
-}
-
-function closestTo(
-  positions: readonly THREE.Vector3[],
-  target: THREE.Vector3,
-): { position: THREE.Vector3; distance: number } | null {
-  let closest: { position: THREE.Vector3; distance: number } | null = null;
-  for (const position of positions) {
-    const distance = position.distanceTo(target);
-    if (!closest || distance < closest.distance) closest = { position, distance };
-  }
-  return closest;
-}
-
-export function nowPlayingNotice(songName: string): HTMLElement {
-  return createElement('div', 'top', [
-    createElement('div', 'title', [
-      '재생 중',
-      document.createElement('br'),
-      createElement('span', 'song-name', [songName]),
-    ]),
-    createElement('div', 'music-note-icon'),
-  ]);
-}
-
-function hitHandler(baseVolume: number, volumeOf: (force: number) => number): SoundHandler {
-  return (item, force, position) => {
-    if (typeof force !== 'number' || !isVectorLike(position)) return;
-    item.firstPosition().copy(position);
-    item.volume = baseVolume * volumeOf(force);
-    item.rate = 0.9 + Math.random() * 0.2;
-  };
-}
-
-const HIT_VOLUME: Record<keyof typeof HIT_SOUNDS, (force: number) => number> = {
-  hitDefault: (force) => remapClamp(force, [0, 200], [0, 1]),
-  hitBrick: (force) => remapClamp(force, [5, 20], [0, 1]) ** 2,
-  hitMetal: (force) => remapClamp(force, [5, 20], [0, 1]) ** 2,
-};
-
-export type MusicOwner = 'island' | 'jukebox';
 
 export class Audio {
   readonly events = new Events<{ muteChange: [isMuted: boolean]; backgroundChange: [isBackground: boolean] }>();
@@ -153,8 +54,8 @@ export class Audio {
   }
 
   init(): void {
-    this.#registerAmbients();
-    this.#registerOneOffs();
+    registerAmbients(this);
+    registerOneOffs(this);
     this.initiated = true;
     this.#startPlaylist();
     for (const group of this.groups.values()) {
@@ -226,199 +127,6 @@ export class Audio {
 
   #startPlaylist(): void {
     this.#ensurePlaylist().resume();
-  }
-
-  #registerAmbients(): void {
-    const { dayCycles } = getGame();
-    this.#registerBirds();
-    this.#registerOwl();
-
-    const rooster = this.#randomlyPlaced('rooster', 'sounds/rooster/rooster-crowing.mp3', 0.1, (item) => {
-      item.volume = 0.1 + Math.random() * 0.2;
-    });
-    dayCycles.events.on('night', (isNight) => {
-      if (!isNight) rooster.play();
-    });
-
-    const wolf = this.#randomlyPlaced(
-      'wolf',
-      'sounds/wolf/TimberWolvesGroupHowlingSomeWhimpering_S2h0E_04.mp3',
-      0.1,
-      (item) => {
-        item.volume = 0.1 + Math.random() * 0.2;
-      },
-    );
-    dayCycles.events.on('deepNight', (isDeepNight) => {
-      if (isDeepNight) wolf.play();
-    });
-
-    const crickets = this.register({
-      group: 'crickets',
-      path: 'sounds/crickets/Crickets.mp3',
-      autoplay: true,
-      loop: true,
-      volume: dayCycles.isInInterval('night') ? CRICKETS_VOLUME : 0,
-    });
-    dayCycles.events.on('night', (isNight) => {
-      gsap.to(crickets, { volume: isNight ? CRICKETS_VOLUME : 0, duration: 15, overwrite: true });
-    });
-
-    this.#registerWeather();
-    this.#registerFires();
-  }
-
-  #randomlyPlaced(group: string, path: string, volume: number, vary: (item: AudioItem) => void): AudioItem {
-    return this.register({
-      group,
-      path,
-      autoplay: false,
-      loop: false,
-      volume,
-      positions: new THREE.Vector3(),
-      onPlay: (item) => {
-        vary(item);
-        item.firstPosition().copy(randomNearbyPosition());
-      },
-    });
-  }
-
-  #registerBirds(): void {
-    const { dayCycles } = getGame();
-    const tweets = BIRD_TWEETS.map((path) =>
-      this.#randomlyPlaced('birdTweet', path, 0.3, (item) => {
-        item.volume = 0.2 + Math.random() * 0.3;
-        item.rate = 1 + Math.random() * 0.7;
-      }),
-    );
-    const tryPlay = (): void => {
-      if (!dayCycles.isInInterval('night') && Math.random() < 0.5) {
-        tweets[Math.floor(Math.random() * tweets.length)]?.play();
-      }
-      gsap.delayedCall(0.5 + Math.random() * 5, tryPlay);
-    };
-    tryPlay();
-  }
-
-  #registerOwl(): void {
-    const { dayCycles } = getGame();
-    const owl = this.#randomlyPlaced('owl', 'sounds/owl/OwlHootingReverberantSeveral_Rik8a_03.mp3', 0.3, (item) => {
-      item.volume = 0.2 + Math.random() * 0.25;
-      item.rate = 1 + Math.random() * 0.3;
-    });
-    const delay = (): number => 30 + Math.random() * 60;
-    const tryPlay = (): void => {
-      if (dayCycles.isInInterval('night') && Math.random() < 0.5) owl.play();
-      gsap.delayedCall(delay(), tryPlay);
-    };
-    gsap.delayedCall(delay(), tryPlay);
-  }
-
-  #registerWeather(): void {
-    const game = getGame();
-    this.register({
-      group: 'rain',
-      path: 'sounds/rain/soundjay_rain-on-leaves_main-01.mp3',
-      autoplay: true,
-      loop: true,
-      volume: 0,
-      onPlaying: (item) => {
-        item.volume = remapClamp(game.weather.rain.value, [0.1, 0.6], [0, 1]);
-      },
-    });
-    this.register({
-      group: 'wind',
-      path: 'sounds/wind/13582-wind-in-forest-loop.mp3',
-      autoplay: true,
-      loop: true,
-      volume: 0,
-      onPlaying: (item) => {
-        item.volume = remapClamp(game.weather.wind.value, [0.3, 1], [0, 1]) ** 3 * 0.7;
-      },
-    });
-    this.register({
-      group: 'waves',
-      path: 'sounds/waves/lake-waves.mp3',
-      autoplay: true,
-      loop: true,
-      volume: 0,
-      onPlaying: (item) => {
-        const halfSize = game.terrain.size / 2;
-        const distanceToSide = Math.min(
-          halfSize - Math.abs(game.player.position.x),
-          halfSize - Math.abs(game.player.position.z),
-        );
-        item.volume = remapClamp(distanceToSide, [0, 40], [1, 0.1]) ** 2 * 0.7;
-      },
-    });
-  }
-
-  #registerFires(): void {
-    const areas = getGame().world.areas;
-    const ovens = [
-      areas?.cookie?.references.items.get('spawner')?.[0]?.position,
-      areas?.projects?.references.items.get('oven')?.[0]?.position,
-    ].filter((position): position is THREE.Vector3 => position instanceof THREE.Vector3);
-    if (ovens.length > 0) {
-      this.register({
-        group: 'ovenFire',
-        path: 'sounds/fire/Mountain Audio - Fire Burning in a Wood Stove 1.mp3',
-        autoplay: true,
-        loop: true,
-        volume: 0.8,
-        positions: ovens,
-        distanceFade: FIRE_FADE_DISTANCE,
-      });
-    }
-
-    const campfire = areas?.lab?.references.items.get('fire')?.[0]?.position;
-    if (campfire instanceof THREE.Vector3) {
-      this.register({
-        group: 'campfire',
-        path: 'sounds/fire/Fire Burning.mp3',
-        autoplay: true,
-        loop: true,
-        volume: 1,
-        positions: [campfire],
-        distanceFade: FIRE_FADE_DISTANCE,
-      });
-    }
-  }
-
-  #registerOneOffs(): void {
-    this.register({
-      group: 'discChange',
-      path: 'sounds/jukebox/DVDPlayerChangeDisc_BW.49824.mp3',
-      autoplay: false,
-      loop: false,
-      volume: 0.3,
-    });
-    this.register({ group: 'slide', path: 'sounds/mecanism/slide.mp3', autoplay: false, volume: 0.18 });
-    this.register({
-      group: 'click',
-      path: 'sounds/mecanism/click.mp3',
-      autoplay: false,
-      volume: 0.25,
-      onPlay: (item, isOpen = true) => {
-        item.rate = isOpen ? 1 : 0.6;
-      },
-    });
-    this.register({ group: 'assemble', path: 'sounds/mecanism/assemble.mp3', autoplay: false, volume: 0.3 });
-
-    for (const group of HIT_GROUPS) {
-      const volumeOf = HIT_VOLUME[group];
-      for (const [path, baseVolume] of HIT_SOUNDS[group]) {
-        this.register({
-          group,
-          path,
-          autoplay: false,
-          volume: baseVolume,
-          antiSpam: DEFAULT_ANTI_SPAM,
-          positions: new THREE.Vector3(),
-          distanceFade: HIT_FADE_DISTANCE,
-          onPlay: hitHandler(baseVolume, volumeOf),
-        });
-      }
-    }
   }
 
   #bindMuteControls(): void {
