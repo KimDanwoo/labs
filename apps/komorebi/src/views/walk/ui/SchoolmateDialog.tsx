@@ -1,21 +1,21 @@
 import { useId, type JSX } from 'react';
 import { SCHOOLMATE_GREETING } from '../config/schoolmate';
-import { TIME, type TimeOfDay } from '../config/walk';
+import { TIME } from '../config/walk';
 import { gameKey } from '../lib/input';
 import { useModal } from '../model/hooks/useModal';
-import { type SchoolRegion } from '../model/schoolmateRoster';
+import { useWalkContext } from '../model/hooks/useWalkContext';
+import type { SCHOOLMATES, SchoolRegion } from '../model/schoolmateRoster';
 import { Icon } from './Icon';
 
 interface SchoolmateDialogProps {
-  name: string;
+  friend: (typeof SCHOOLMATES)[number];
   region: SchoolRegion;
-  time: TimeOfDay;
-  canPlay: boolean;
-  onPlay: () => void;
-  onClose: () => void;
 }
 
-export function SchoolmateDialog({ name, region, time, canPlay, onPlay, onClose }: SchoolmateDialogProps): JSX.Element {
+export function SchoolmateDialog({ friend, region }: SchoolmateDialogProps): JSX.Element {
+  const { timeOfDay: time, canPlayBall: canPlay, activities } = useWalkContext();
+  const name = friend.name;
+  const onClose = activities.closeFriend;
   const ref = useModal(true);
   const titleId = useId();
   return (
@@ -51,7 +51,7 @@ export function SchoolmateDialog({ name, region, time, canPlay, onPlay, onClose 
       <p>{SCHOOLMATE_GREETING[region]}</p>
       <div className="schoolmate-actions">
         {canPlay && (
-          <button className="wardrobe-done" onClick={onPlay}>
+          <button className="wardrobe-done" onClick={() => activities.playBall(friend)}>
             공 주고받기
           </button>
         )}

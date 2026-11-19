@@ -1,16 +1,12 @@
-import { TIME_ORDER, type TimeOfDay } from '../config/walk';
+import { DIALOG, TIME_ORDER } from '../config/walk';
 import { keptLabel } from '../lib/discovery';
+import { useWalkContext } from '../model/hooks/useWalkContext';
 import { LANDMARKS } from '../model/world/landmarks';
 
-interface DiscoveryListProps {
-  pages: Record<TimeOfDay, readonly string[]>;
-  isReady: boolean;
-  isJournal?: boolean;
-  onGuide: (id: string) => void;
-  onRead: (id: string) => void;
-}
-
-export function DiscoveryList({ pages, isReady, isJournal = false, onGuide, onRead }: DiscoveryListProps) {
+export function DiscoveryList() {
+  const { dialog, collection, isReady, guideTo: onGuide, readMemory: onRead } = useWalkContext();
+  const { pages } = collection;
+  const isJournal = dialog === DIALOG.journal;
   return (
     <div className="discovery-list">
       {LANDMARKS.map((p) => {

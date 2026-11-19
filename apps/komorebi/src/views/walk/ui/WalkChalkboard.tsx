@@ -1,17 +1,17 @@
 import { useId, useRef, useState, useSyncExternalStore } from 'react';
 import { CHALKS } from '../config/chalkboard';
+import { DIALOG } from '../config/walk';
 import { CHALK_LAYER, CHALK_TOOL } from '../lib/chalkboard';
 import { CHALK_NOTICE, useChalkPad, type ChalkBrush, type ChalkNotice } from '../model/hooks/useChalkPad';
 import { useModal } from '../model/hooks/useModal';
+import { useWalkContext } from '../model/hooks/useWalkContext';
 import { chalkboardStore } from '../model/store/chalkboard';
 import { Icon } from './Icon';
 
-interface ChalkboardDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function ChalkboardDialog({ isOpen, onClose }: ChalkboardDialogProps) {
+export function WalkChalkboard() {
+  const { dialog, closeDialog } = useWalkContext();
+  const isOpen = dialog === DIALOG.chalkboard;
+  const onClose = () => closeDialog(DIALOG.chalkboard);
   const ref = useModal(isOpen);
   const titleId = useId();
   const canvasRef = useRef<HTMLCanvasElement>(null);

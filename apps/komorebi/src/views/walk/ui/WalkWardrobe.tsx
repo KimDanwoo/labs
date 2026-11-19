@@ -1,17 +1,15 @@
 import { useId, useState, type JSX } from 'react';
+import { DIALOG } from '../config/walk';
 import { useModal } from '../model/hooks/useModal';
+import { useWalkContext } from '../model/hooks/useWalkContext';
 import { OUTFIT_DEFINITIONS, type Appearance } from '../model/world/appearance';
 import { CharacterPreview } from './CharacterPreview';
 import { Icon } from './Icon';
 
-interface WardrobeDialogProps {
-  isOpen: boolean;
-  appearance: Appearance;
-  onChange: (next: Appearance) => Promise<boolean>;
-  onClose: () => void;
-}
-
-export function WardrobeDialog({ isOpen, appearance, onChange, onClose }: WardrobeDialogProps): JSX.Element {
+export function WalkWardrobe(): JSX.Element {
+  const { dialog, appearance, changeAppearance: onChange, closeDialog } = useWalkContext();
+  const isOpen = dialog === DIALOG.wardrobe;
+  const onClose = () => closeDialog(DIALOG.wardrobe);
   const ref = useModal(isOpen);
   const titleId = useId();
   const [isChanging, setIsChanging] = useState(false);
