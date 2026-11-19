@@ -2,6 +2,7 @@
 
 import { Environment } from '@react-three/drei';
 import { useIsCoarsePointer } from '@shared/lib/useCoarsePointer';
+import { SKY_FILES } from '../../config/scene';
 import { SKY_ROTATION } from '../../lib/scenery/sky';
 
 export function Sky() {
@@ -9,7 +10,7 @@ export function Sky() {
   return (
     <Environment
       background
-      files={coarse ? '/environments/golden-meadow-1k.hdr' : '/environments/golden-meadow-2k.hdr'}
+      files={coarse ? SKY_FILES.coarse : SKY_FILES.fine}
       environmentIntensity={0.65}
       environmentRotation={SKY_ROTATION}
       backgroundRotation={SKY_ROTATION}

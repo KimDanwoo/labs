@@ -1,3 +1,4 @@
+import { preloadSceneAssets } from '../lib/scene/preloadSceneAssets';
 import { Hud } from './hud/Hud';
 import { TouchControls } from './runner-control/TouchControls';
 import { SceneBoundary } from './scene/SceneBoundary';
@@ -5,6 +6,7 @@ import { SceneCanvas } from './scene/SceneCanvas';
 import { SceneLoader } from './scene/SceneLoader';
 
 export function RideView() {
+  preloadSceneAssets();
   return (
     <main className="relative h-dvh w-full touch-none select-none overflow-hidden overscroll-none">
       <SceneBoundary>
