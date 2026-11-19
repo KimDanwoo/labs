@@ -1,317 +1,72 @@
-import * as THREE from 'three';
 import { MS_PER_SECOND } from '../config/time';
-import { TIME, WEATHER, type TimeOfDay, type Weather } from '../config/walk';
-import { BALL_PHASE, BALL_ROLE, BALL_TIMING, type BallGame } from '../model/ballGame';
-import {
-  nearestSchoolmate,
-  schoolmateGreetingPosition,
-  schoolmatePlayPosition,
-  type SchoolmateId,
-} from '../model/schoolmates';
+import { BALL_PHASE, BALL_TIMING } from '../model/ballGame';
 import { companionStore } from '../model/store/companions';
-import { DEFAULT_APPEARANCE, characterLayers, type Appearance } from '../model/world/appearance';
-import { foregroundOrder } from '../model/world/foreground';
-import { isAtHomeBed, isNearHomeBed, isNearSpot } from '../model/world/interactions';
-import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '../model/world/portals';
-import { surfaceAt, type Surface } from '../model/world/surfaces';
-import {
-  DESTINATIONS,
-  HOME_BED,
-  REGION,
-  SPAWN,
-  WORLDS,
-  closestLandmark,
-  createSlideMotion,
-  findRoute,
-  isIndoors,
-  movePlayer,
-  nextRegionStep,
-  type Landmark,
-  type PlaceAction,
-  type Point,
-  type Region,
-} from '../model/world/world';
-import { CANVAS_FONT_FAMILY } from './art';
-import { createBallScene } from './ballScene';
-import { createBedRest } from './bedRest';
-import { createBoats } from './boats';
-import { SCENERY_STYLE } from './breeze';
-import { constrainCameraAxis } from './cameraBounds';
+import { DEFAULT_APPEARANCE } from '../model/world/appearance';
+import { isIndoors } from '../model/world/world';
 import { catchCelebration } from './catchCelebration';
 import { createChalkLayer } from './chalkLayer';
-import { createChild } from './child';
-import { createCompanionScene } from './companionScene';
-import type { CompanionReaction } from './companions';
-import { createCountryside } from './countryside';
-import { createDriftingLeaves } from './driftingLeaves';
-import { createDust } from './dust';
-import { createFireflies } from './fireflies';
-import { FISHING_PHASE, type FishingFrame } from './fishing';
-import { gameKey, isControlTarget, keyboardDirection } from './input';
-import { advanceJump, createJump, isAirborne, startJump } from './motion';
-import { createNightLights, lampGlowAt, lampUniforms } from './nightLights';
-import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
-import { createPierFishing } from './pierFishing';
-import { createPlaceEffects } from './placeEffects';
-import { createPointerPick } from './pointerPick';
-import { createPortalInput } from './portalInput';
-import { createPortals } from './portals';
-import { createRain } from './rain';
-import { createRegionPlates, nearbyRegions, preparePaintingTexture } from './regionPlates';
-import { RENDER_RATE, nextRenderTime, renderPixelRatio, settle, shouldRenderFrame } from './renderBudget';
-import { createRoamers } from './roamers';
-import { createSceneLife } from './sceneLife';
-import {
-  createBackgroundMaterial,
-  createDestinationMarkers,
-  createForegroundMaterial,
-  createForegrounds,
-  createMarkerTexture,
-  createShadow,
-  createTargetMarker,
-} from './sceneSprites';
-import { createSchoolmates } from './schoolmatesScene';
-import { createWaterMaps } from './water';
-import { createWaves } from './waves';
+import { FISHING_PHASE } from './fishing';
+import { advanceJump, isAirborne } from './motion';
+import { nearbyRegions } from './regionPlates';
+import { RENDER_RATE, nextRenderTime, renderPixelRatio, shouldRenderFrame } from './renderBudget';
+import type { SceneContext, SceneOptions, WalkEngine } from './sceneContext';
+import { createWalkControls } from './sceneControls';
+import { MOVE_KEYS, bindSceneInput } from './sceneInput';
+import { createPlayerMotion } from './scenePlayer';
+import { createSceneParts } from './sceneSetup';
+import { createStatusReporter } from './sceneStatus';
+import { createSceneTravel } from './sceneTravel';
+import { createWorldMotion } from './sceneWorld';
+import { START_REGION, createWalkState } from './walkState';
 
-const START_REGION: Region = REGION.village;
-const SEA_REGION: Region = REGION.coast;
-const CHALK_REGION: Region = REGION.classroom;
-const CAMERA_EPSILON = 0.01;
-const WARMTH_EPSILON = 0.002;
-const CHILD_ORDER = 4;
-const WARMTH_BY_TIME = { day: 0, evening: 1, night: 0.35 } satisfies Record<TimeOfDay, number>;
-const MOVE_KEYS = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
-const LANDING_LOUDNESS = 1.6;
-const NEAREST_SCALE = characterScale(100);
-const ACTION_LOCK_MS = 2_200;
-const RUN_SPEED = 24;
-const SPRINT_SPEED = 36;
+export type { SceneOptions, WalkEngine } from './sceneContext';
+export type { SceneStatus } from './sceneStatus';
 
-function motionLabel(isAirborne: boolean, isMoving: boolean, isSprinting: boolean) {
-  if (isAirborne) return 'jumping';
-  if (!isMoving) return 'idle';
-  return isSprinting ? 'sprinting' : 'running';
-}
-
-const easeLight = (current: number, target: number, lambda: number, dt: number) =>
-  settle(THREE.MathUtils.damp(current, target, lambda, dt), target, WARMTH_EPSILON);
-
-const STATUS_KEYS = [
-  'x',
-  'z',
-  'region',
-  'walking',
-  'nearby',
-  'steps',
-  'schoolmateId',
-] as const satisfies (keyof SceneStatus)[];
-const hasStatusChanged = (previous: SceneStatus, next: SceneStatus) =>
-  STATUS_KEYS.some((key) => previous[key] !== next[key]);
-
-type Stride = { walking: boolean; sprinting: boolean; frameTravel: number };
-type BedRestFrame = NonNullable<ReturnType<ReturnType<typeof createBedRest>['update']>>;
-
-export type SceneStatus = Point & {
-  region: Region;
-  walking: boolean;
-  nearby: Landmark | null;
-  steps: number;
-  schoolmateId: SchoolmateId | null;
-};
-export type SceneOptions = {
-  onStatus: (status: SceneStatus) => void;
-  onNotice: (message: string) => void;
-  onStep: (surface: Surface, loudness: number) => void;
-  onSleep: () => void;
-  appearance?: Appearance;
-  signal?: AbortSignal;
-};
-export type WalkEngine = {
-  dispose: () => void;
-  setPaused: (value: boolean) => void;
-  finishSleep: () => void;
-  setFishing: (frame: FishingFrame | null) => void;
-  greetSchoolmate: (id: SchoolmateId) => boolean;
-  endSchoolmateGreeting: () => void;
-  setBallGame: (frame: BallGame | null) => boolean;
-  reactToCompanion: (reaction: CompanionReaction) => void;
-  setAppearance: (appearance: Appearance) => Promise<boolean>;
-  setTimeOfDay: (value: TimeOfDay) => void;
-  setWeather: (value: Weather) => void;
-  setInput: (key: string, pressed: boolean) => void;
-  reset: () => void;
-  photo: () => Promise<boolean>;
-  travelTo: (id: string) => void;
-  playAction: (kind: PlaceAction, at: Point) => boolean;
-};
-
-export async function createScene(
-  container: HTMLElement,
-  { onStatus, onNotice, onStep, onSleep, appearance = DEFAULT_APPEARANCE, signal }: SceneOptions,
-): Promise<WalkEngine> {
-  const loader = new THREE.TextureLoader();
-  const plates = createRegionPlates(loader, [START_REGION]);
-  const loaded: THREE.Texture[] = [];
-  const releaseTextures = () => {
-    plates.dispose();
-    loaded.forEach((texture) => texture.dispose());
-  };
-  const layerUrls = characterLayers(appearance);
-  const [startPlate, bodyAtlas, outfitAtlas] = await Promise.allSettled([
-    plates.ensure(START_REGION),
-    loader.loadAsync(layerUrls.body),
-    loader.loadAsync(layerUrls.outfit),
-  ]);
-  for (const atlas of [bodyAtlas, outfitAtlas]) {
-    if (atlas.status === 'fulfilled') loaded.push(preparePaintingTexture(atlas.value));
-  }
-  if (
-    startPlate.status === 'rejected' ||
-    bodyAtlas.status === 'rejected' ||
-    outfitAtlas.status === 'rejected' ||
-    signal?.aborted
-  ) {
-    releaseTextures();
-    const failure = [startPlate, bodyAtlas, outfitAtlas].find((result) => result.status === 'rejected');
-    throw failure?.reason ?? new DOMException('Scene cancelled', 'AbortError');
-  }
-  const outfits = new Map<string, THREE.Texture>([[layerUrls.outfit, outfitAtlas.value]]);
-  let currentAppearance = appearance;
-  let appearanceRequest = 0;
-  let character: ReturnType<typeof createChild>;
-  try {
-    character = createChild({
-      body: bodyAtlas.value,
-      outfit: outfitAtlas.value,
-      bodyPoseOffsets: layerUrls.bodyPoseOffsets,
-    });
-  } catch (error) {
-    releaseTextures();
-    throw error;
-  }
-  let renderer: THREE.WebGLRenderer;
-  try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: false });
-  } catch (error) {
-    character.dispose();
-    releaseTextures();
-    throw error;
-  }
-  const touchDevice = window.matchMedia('(pointer: coarse)').matches;
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.setClearColor('#1b352b');
-  renderer.domElement.setAttribute('aria-label', '햇빛이 비치는 시골길. 길을 클릭하거나 방향키를 눌러 걸어 보세요.');
-  container.appendChild(renderer.domElement);
-  const scene = new THREE.Scene();
-  // Every layer shares the painted map coordinates; depth must not shift feet off the path.
-  const camera = new THREE.OrthographicCamera(-60, 60, 40, -40, 0.1, 200);
-  camera.position.set(0, 0, 100);
-  const geo = new THREE.PlaneGeometry(120, 80, 1, 1);
-  const waterMaps = createWaterMaps(loader);
-  const background = createBackgroundMaterial(startPlate.value, START_REGION, waterMaps);
-  scene.add(new THREE.Mesh(geo, background));
-  const child = character.group;
-  scene.add(child);
-  const pierFishing = createPierFishing(scene);
-  const companions = createCompanionScene(scene, loader);
-  let fishingFrame: FishingFrame | null = null;
-  let fishingAge = 0;
-  let fishingLift = 0;
-  let companionAge = 10;
-  // Group order sorts before mesh order: keep the group at the scene default
-  // so the foreground can render after the character's individual sprites.
-  child.children.forEach((part) => {
-    part.renderOrder = CHILD_ORDER;
-  });
-  const foregroundMaterial = createForegroundMaterial(background);
-  const bedRest = createBedRest(scene, foregroundMaterial);
-  const foregrounds = createForegrounds(scene, foregroundMaterial);
-  const { sprite: shadow, material: shadowMat, texture: shadowTexture } = createShadow(scene);
-  loaded.push(shadowTexture);
-  const dust = createDust(scene);
-  const markerMap = createMarkerTexture();
-  loaded.push(markerMap);
-  const { sprites: markers, materials: markerMats } = createDestinationMarkers(scene, markerMap);
-  const portalVisuals = createPortals(scene);
-  const fireflies = createFireflies(scene);
-  const placeEffects = createPlaceEffects(scene);
-  const nightLights = createNightLights(scene);
-  const life = createSceneLife(scene, loader);
-  const roamers = createRoamers(scene, loader);
-  const schoolmates = createSchoolmates(scene, loader, onNotice);
-  const ball = createBallScene(scene);
-  let greetingId: SchoolmateId | null = null;
-  let ballFrame: BallGame | null = null;
-  const waves = createWaves(scene, loader);
-  const boats = createBoats(scene);
-  const countryside = createCountryside(scene);
-  const leaves = createDriftingLeaves(scene);
-  let sceneryTime = 0;
-  const rain = createRain(scene);
-  const { sprite: targetMarker, material: targetMat } = createTargetMarker(scene, markerMap);
-
-  let region: Region = START_REGION,
-    position = { ...SPAWN },
-    route: Point[] = [],
-    destination: string | null = null;
-  let elapsed = 0,
-    last = 0,
-    nextFrame = 0,
-    statusTime = -1,
-    distance = 0,
-    animation = 0,
-    disposed = false,
-    timeOfDay: TimeOfDay = TIME.day,
-    darkness = 0,
-    weather: Weather = WEATHER.clear,
-    wetness = 0,
-    paused = false,
-    sleeping = false,
-    preparingSleep = false,
-    sleepBlocked = false,
-    isSettling = true,
-    warmth = 0,
-    transition = 1;
-  let blockedPortal: WorldPortal | null = null;
-  let waitingPortal: WorldPortal | null = null;
-  let actionEndsAt = 0;
-  /** An exit the player turned away from while it loaded; choosing it again lifts the block (a failed load does not). */
-  let cancelledPortal: WorldPortal | null = null;
-  let heading = 0,
-    moveSpeed = 0,
-    touchSprint = false;
-  const jump = createJump();
-  const slide = createSlideMotion();
-  const keys = new Set<string>();
-  const portalInput = createPortalInput();
+export async function createScene(container: HTMLElement, options: SceneOptions): Promise<WalkEngine> {
+  const { appearance = DEFAULT_APPEARANCE } = options;
+  const parts = await createSceneParts(container, options);
+  const {
+    plates,
+    renderer,
+    touchDevice,
+    scene,
+    camera,
+    background,
+    child,
+    pierFishing,
+    companions,
+    placeEffects,
+    schoolmates,
+    ball,
+    dust,
+    jump,
+    keys,
+  } = parts;
+  const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const state = createWalkState(appearance, motionQuery.matches);
   const wake = () => {
-    isSettling = true;
-    nextFrame = 0;
+    state.isSettling = true;
+    state.nextFrame = 0;
   };
   const unsubscribeCompanions = companionStore.subscribe(wake);
   const chalkLayer = createChalkLayer(wake);
   background.uniforms.chalk!.value = chalkLayer.texture;
-  const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let reducedMotion = motionQuery.matches;
   const motionPreference = (event: MediaQueryListEvent) => {
-    reducedMotion = event.matches;
-    if (reducedMotion) placeEffects.clear();
+    state.reducedMotion = event.matches;
+    if (state.reducedMotion) placeEffects.clear();
     wake();
   };
-  let halfWidth = 60,
-    halfHeight = 40;
   const resize = () => {
     const w = Math.max(container.clientWidth, 1),
       h = Math.max(container.clientHeight, 1),
       aspect = w / h;
     const fullHeight = Math.min(80, 120 / aspect);
-    halfHeight = fullHeight * 0.47;
-    halfWidth = halfHeight * aspect;
-    camera.left = -halfWidth;
-    camera.right = halfWidth;
-    camera.top = halfHeight;
-    camera.bottom = -halfHeight;
+    state.halfHeight = fullHeight * 0.47;
+    state.halfWidth = state.halfHeight * aspect;
+    camera.left = -state.halfWidth;
+    camera.right = state.halfWidth;
+    camera.top = state.halfHeight;
+    camera.bottom = -state.halfHeight;
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(renderPixelRatio(w, h, window.devicePixelRatio, touchDevice));
     background.uniforms.renderDpr!.value = renderer.getPixelRatio();
@@ -321,694 +76,103 @@ export async function createScene(
   const observer = new ResizeObserver(resize);
   observer.observe(container);
   resize();
-  const plan = (): WorldPortal | null => {
-    if (!destination) return null;
-    const point = DESTINATIONS.find((p) => p.id === destination);
-    if (!point) return null;
-    if (point.region === region) {
-      route = findRoute(position, point, region);
-      return null;
-    }
-    const portal = getWorldPortals(region).find((p) => p.to === nextRegionStep(region, point.region))!;
-    route = findRoute(position, portal.center, region);
-    return portal;
-  };
-  const redirect = (exit: WorldPortal | null) => {
-    if (exit && exit === cancelledPortal) {
-      blockedPortal = null;
-      cancelledPortal = null;
-      return;
-    }
-    if (!waitingPortal || waitingPortal === exit) return;
-    blockedPortal = waitingPortal;
-    cancelledPortal = waitingPortal;
-    waitingPortal = null;
-  };
-  const switchRegion = (next: Region, spawn: Point, plate: THREE.Texture) => {
-    if (isIndoors(region) || isIndoors(next)) {
-      portalInput.arrive(keys);
-      keys.clear();
-      moveSpeed = 0;
-    }
-    jump.height = 0;
-    jump.velocity = 0;
-    jump.landing = 0;
-    region = next;
-    if (next === REGION.home) void bedRest.prepare(currentAppearance.character);
-    slide.direction = null;
-    slide.input = null;
-    position = { ...spawn };
-    route = [];
-    background.uniforms.map!.value = plate;
-    const lamps = lampUniforms(next);
-    background.uniforms.lamps!.value = lamps.values;
-    background.uniforms.waterMap!.value = waterMaps.of(next);
-    background.uniforms.isSea!.value = next === SEA_REGION ? 1 : 0;
-    background.uniforms.isVillage!.value = next === REGION.village ? 1 : 0;
-    background.uniforms.isHome!.value = next === REGION.home ? 1 : 0;
-    background.uniforms.hasChalk!.value = next === CHALK_REGION ? 1 : 0;
-    background.uniforms.sceneryStyle!.value = SCENERY_STYLE[next];
-    background.uniforms.lampCount!.value = lamps.count;
-    const nearby = [...new Set([START_REGION, ...nearbyRegions(next)])];
-    plates.focus(nearby);
-    transition = reducedMotion ? 1 : 0.25;
-    blockedPortal = portalAt(position, region);
-    waitingPortal = null;
-    cancelledPortal = null;
-    placeEffects.clear();
-    plan();
-    wake();
-    container.dataset.region = next;
-  };
-  container.dataset.region = region;
-  container.dataset.appearance = `${currentAppearance.character}-${currentAppearance.outfit}`;
-  const keyDown = (event: KeyboardEvent) => {
-    if (paused || (event.target instanceof HTMLElement && isControlTarget(event.target))) return;
-    const key = gameKey(event);
-    if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) event.preventDefault();
-    if (portalInput.isBlocked(key)) return;
-    if (key === ' ' && !event.repeat) startJump(jump);
-    keys.add(key);
-    if (MOVE_KEYS.includes(key)) {
-      route = [];
-      destination = null;
-    }
-  };
-  let previousStatus: SceneStatus | undefined;
-  const keyUp = (event: KeyboardEvent) => {
-    const key = gameKey(event);
-    keys.delete(key);
-    portalInput.release(key);
-  };
-  const clear = () => {
-    keys.clear();
-    portalInput.clear();
-    last = 0;
-    nextFrame = 0;
-  };
-  const visibility = () => {
-    clear();
-    cancelAnimationFrame(animation);
-    if (!document.hidden && !disposed) animation = requestAnimationFrame(tick);
-  };
-  const pick = createPointerPick({ canvas: renderer.domElement, camera, portals: portalVisuals, markers });
-  const hover = (event: PointerEvent) => {
-    if (event.pointerType !== 'mouse' || paused) return;
-    const target = pick(event, region);
-    let cursor = 'default';
-    if (target) cursor = target.interactive ? 'pointer' : 'crosshair';
-    renderer.domElement.style.cursor = cursor;
-  };
-  const click = (event: PointerEvent) => {
-    if (paused || event.button !== 0) return;
-    renderer.domElement.focus({ preventScroll: true });
-    const target = pick(event, region);
-    if (!target) return;
-    const { point, portal } = target;
-    if (portal) {
-      destination = null;
-      redirect(portal);
-      route = findRoute(position, portal.center, region);
-      return;
-    }
-    destination = null;
-    redirect(null);
-    route = findRoute(position, point, region);
-  };
-  renderer.domElement.tabIndex = 0;
-  renderer.domElement.setAttribute('aria-label', '산책 게임. 방향키 또는 WASD로 이동, Shift로 전력 질주, Space로 점프');
+  const ctx: SceneContext = { container, options, state, parts, wake };
+  const travel = createSceneTravel(ctx);
+  const { arriveAt } = travel;
+  container.dataset.region = state.region;
+  container.dataset.appearance = `${state.currentAppearance.character}-${state.currentAppearance.outfit}`;
   const listening = new AbortController();
   const listen = { signal: listening.signal };
-  window.addEventListener('keydown', keyDown, listen);
-  window.addEventListener('keyup', keyUp, listen);
-  window.addEventListener('blur', clear, listen);
-  document.addEventListener('visibilitychange', visibility, listen);
-  renderer.domElement.addEventListener('pointerdown', click, listen);
-  renderer.domElement.addEventListener('pointermove', hover, listen);
+  bindSceneInput(ctx, travel, tick, listen);
   motionQuery.addEventListener('change', motionPreference, listen);
-  const enterPortal = (portal: WorldPortal) => {
-    const plate = plates.get(portal.to);
-    if (plate) {
-      waitingPortal = null;
-      switchRegion(portal.to, portal.spawn, plate);
-      return;
-    }
-    if (waitingPortal === portal) return;
-    waitingPortal = portal;
-    onNotice(`${WORLDS[portal.to].name} 풍경을 펼치고 있어요…`);
-    plates.ensure(portal.to).catch(() => {
-      if (disposed || waitingPortal !== portal) return;
-      waitingPortal = null;
-      blockedPortal = portal;
-      cancelledPortal = null;
-      onNotice('풍경을 불러오지 못했어요. 길을 잠시 벗어났다가 다시 들어가 보세요.');
-    });
-  };
-  async function startSleep() {
-    const canSleep = () => !disposed && !paused && region === REGION.home && !isAirborne(jump) && isAtHomeBed(position);
-    if (preparingSleep || sleepBlocked || !canSleep()) return;
-    preparingSleep = true;
-    const template = currentAppearance.character;
-    const ready = await bedRest.prepare(template);
-    preparingSleep = false;
-    if (!canSleep() || template !== currentAppearance.character) return;
-    sleepBlocked = true;
-    if (!ready) {
-      onNotice('잠자리를 준비하지 못했어요. 잠시 벗어났다가 다시 와 주세요.');
-      return;
-    }
-    sleeping = true;
-    paused = true;
-    keys.clear();
-    route = [];
-    destination = null;
-    bedRest.start(position);
-    onSleep();
-    wake();
-  }
-  function walk(dt: number) {
-    const canMove = !paused || (ballFrame?.phase === BALL_PHASE.ready && route.length > 0);
-    let { dx, dz } = keyboardDirection(keys);
-    const keyboardWalking = Math.hypot(dx, dz) > 0;
-    if (!keyboardWalking || !canMove) {
-      slide.direction = null;
-      slide.input = null;
-    }
-    let routeDistance = Infinity;
-    if (canMove && !keyboardWalking) {
-      while (route.length && Math.hypot(route[0]!.x - position.x, route[0]!.z - position.z) < 0.02) route.shift();
-      if (route.length) {
-        const next = route[0]!;
-        routeDistance = Math.hypot(next.x - position.x, next.z - position.z);
-        dx = (next.x - position.x) / routeDistance;
-        dz = (next.z - position.z) / routeDistance;
-      } else if (destination && DESTINATIONS.find((p) => p.id === destination)?.region === region) {
-        destination = null;
-      }
-    }
-    const sprinting = !paused && (keys.has('shift') || touchSprint);
-    const magnitude = Math.hypot(dx, dz);
-    let walking = magnitude > 0 && canMove;
-    let frameTravel = 0;
-    const targetSpeed = sprinting ? SPRINT_SPEED : RUN_SPEED;
-    moveSpeed = THREE.MathUtils.damp(moveSpeed, walking ? targetSpeed : 0, 24, dt);
-    if (walking) {
-      dx /= magnitude;
-      dz /= magnitude;
-      const perspective = THREE.MathUtils.clamp((position.z - 15) / 70, 0.45, 1);
-      const speed = moveSpeed * Math.max(perspective, 0.75);
-      const step = Math.min(speed * dt, routeDistance);
-      const next = movePlayer(position, dx * step, dz * step, region, keyboardWalking ? slide : undefined);
-      const moved = Math.hypot(next.x - position.x, next.z - position.z);
-      distance += moved;
-      frameTravel = moved / Math.max(perspective, 0.45);
-      walking = moved > 0.0001;
-      if (walking) heading = Math.atan2(next.x - position.x, next.z - position.z);
-      position = next;
-      if (moved < 0.0001 && route.length && dt > 0) {
-        route = [];
-        destination = null;
-      }
-    }
-    return { walking, sprinting, frameTravel };
-  }
-  function arriveAt() {
-    if (region !== REGION.home || !isNearHomeBed(position)) sleepBlocked = false;
-    if (region === REGION.home && isAtHomeBed(position)) void startSleep();
-    if (blockedPortal && !isInsidePortal(position, blockedPortal)) {
-      blockedPortal = null;
-      cancelledPortal = null;
-    }
-    const portal = portalAt(position, region);
-    if (!portal) waitingPortal = null;
-    else if (portal !== blockedPortal) enterPortal(portal);
-  }
-  function fishingHeading() {
-    if (fishingFrame?.phase === FISHING_PHASE.caught && fishingAge > 0.8) return 0;
-    return Math.PI / 2;
-  }
-  function animateCharacter(dt: number, { walking, frameTravel }: Stride) {
-    const scale = characterScale(position.z);
-    const size = scale * CHILD_SIZE;
-    const rest = sleeping ? bedRest.update(darkness, lampGlowAt(region, HOME_BED), reducedMotion) : null;
-    let characterDt = paused && !fishingFrame && !walking ? 0 : dt;
-    let characterTravel = jump.height > 0 ? frameTravel * 0.2 : frameTravel;
-    if (rest) {
-      characterDt = dt;
-      characterTravel = rest.walking ? dt * 6 : 0;
-    }
-    child.scale.setScalar(size);
-    character.setOpacity(rest?.opacity ?? 1);
-    const { hasStepped } = character.update({
-      dt: characterDt,
-      travel: characterTravel,
-      heading: fishingFrame ? fishingHeading() : (rest?.heading ?? heading),
-      isWalking: rest?.walking ?? walking,
-      isRunning: true,
-      isStill: reducedMotion,
-      jumpHeight: jump.height + fishingLift,
-      landing: jump.landing,
-    });
-    character.setFishingPose({ frame: fishingFrame, elapsed: fishingAge, isStill: reducedMotion });
-    if (!fishingFrame && paused && !walking) character.setCompanionPose({ age: companionAge, isStill: reducedMotion });
-    character.setBallPose({
-      game: walking ? null : ballFrame,
-      role: BALL_ROLE.player,
-      heading,
-      isStill: reducedMotion,
-    });
-    return { scale, size, rest, hasStepped };
-  }
-  function placeCharacter(scale: number, size: number, rest: BedRestFrame | null) {
-    const visualPosition = rest?.point ?? position;
-    child.position.set(
-      sceneX(visualPosition.x),
-      sceneY(visualPosition.z) + jump.height * scale + fishingLift * size,
-      2,
-    );
-    shadow.position.set(child.position.x + scale * 0.3, sceneY(visualPosition.z) - 0.08, 1);
-    const shadowSize = 1 - Math.min((jump.height + fishingLift) * 0.12, 0.3);
-    shadow.scale.set(3.8 * size * shadowSize, 1.1 * size * shadowSize, 1);
-    shadowMat.opacity = (rest?.opacity ?? 1) * (1 - Math.min(jump.height * 0.22, 0.55));
-  }
-  function playFootfall(hasLanded: boolean, scale: number) {
-    const surface = surfaceAt(position, region);
-    container.dataset.surface = surface;
-    onStep(surface, ((hasLanded ? LANDING_LOUDNESS : 1) * scale) / NEAREST_SCALE);
-  }
-  function followCamera(dt: number, size: number) {
-    const maxX = Math.max(0, 60 - halfWidth),
-      maxY = Math.max(0, 40 - halfHeight);
-    const friend = ballFrame ? schoolmates.standing.find((friend) => friend.id === greetingId) : null;
-    const focusX = friend ? (child.position.x + sceneX(friend.x)) / 2 : child.position.x;
-    const cameraX = THREE.MathUtils.clamp(focusX * (halfWidth < 35 ? 1 : 0), -maxX, maxX);
-    const cameraY = friend ? -maxY : THREE.MathUtils.clamp(Math.min(0, child.position.y + halfHeight - 7), -maxY, maxY);
-    const characterHeight = 10.4 * size;
-    const characterHalfWidth = 3.9 * size;
-    const keepX = (x: number) =>
-      constrainCameraAxis(
-        x,
-        halfWidth,
-        60,
-        child.position.x - characterHalfWidth,
-        child.position.x + characterHalfWidth,
-      );
-    const keepY = (y: number) =>
-      constrainCameraAxis(y, halfHeight, 40, child.position.y - 1, child.position.y + characterHeight);
-    // Damp toward a target that already respects the painting edges, so the camera can actually arrive.
-    const targetX = keepX(cameraX);
-    const targetY = keepY(cameraY);
-    const cameraLag = reducedMotion ? 100 : 3;
-    camera.position.x = keepX(
-      settle(THREE.MathUtils.damp(camera.position.x, targetX, cameraLag, dt), targetX, CAMERA_EPSILON),
-    );
-    camera.position.y = keepY(
-      settle(THREE.MathUtils.damp(camera.position.y, targetY, cameraLag, dt), targetY, CAMERA_EPSILON),
-    );
-    return camera.position.x !== targetX || camera.position.y !== targetY;
-  }
-  function placeMarkers() {
-    markers.forEach((marker, i) => {
-      const point = DESTINATIONS[i]!;
-      marker.visible = point.region === region && !sleeping;
-      marker.position.y = sceneY(point.z) + 2 + (reducedMotion ? 0 : Math.sin(sceneryTime * 1.5 + i) * 0.17);
-    });
-    portalVisuals.update(region);
-    targetMarker.visible = route.length > 0;
-    if (route.length) {
-      const target = route[route.length - 1]!;
-      targetMarker.position.set(sceneX(target.x), sceneY(target.z) + 0.5, 1);
-    }
-  }
-  function easeAtmosphere(dt: number) {
-    const targetWarmth = WARMTH_BY_TIME[timeOfDay];
-    const targetDarkness = timeOfDay === TIME.night ? 1 : 0;
-    const targetWetness = weather === WEATHER.rain ? 1 : 0;
-    warmth = easeLight(warmth, targetWarmth, 2, dt);
-    darkness = easeLight(darkness, targetDarkness, 2, dt);
-    wetness = easeLight(wetness, targetWetness, 1.5, dt);
-    return warmth !== targetWarmth || darkness !== targetDarkness || wetness !== targetWetness;
-  }
-  function paintBackground(dt: number, size: number) {
-    transition = Math.min(1, transition + dt * 1.8);
-    background.uniforms.night!.value = darkness;
-    background.uniforms.walker!.value.set((child.position.x + 60) / 120, (child.position.y + 40 + 1.8 * size) / 80);
-    background.uniforms.rain!.value = isIndoors(region) ? 0 : wetness;
-    background.uniforms.outdoorRain!.value = wetness;
-    background.uniforms.time!.value = reducedMotion ? 0 : sceneryTime;
-    background.uniforms.evening!.value = warmth;
-    background.uniforms.fade!.value = transition;
-  }
-  function animateLife(worldDt: number, isResting: boolean) {
-    const isRaining = wetness > 0.5;
-    fireflies.update(sceneryTime, isIndoors(region) ? 0 : darkness, reducedMotion);
-    nightLights.update(region, darkness, sceneryTime, reducedMotion);
-    placeEffects.update(worldDt);
-    rain.update(worldDt, isIndoors(region) ? 0 : wetness, camera.position, reducedMotion, darkness);
-    life.update({ region, dt: worldDt, elapsed: sceneryTime, darkness, isStill: reducedMotion, isRaining });
-    waves.update({ region, dt: worldDt, darkness, isStill: reducedMotion, rain: wetness });
-    boats.update({ region, dt: worldDt, darkness, isStill: reducedMotion });
-    leaves.update(region, worldDt, darkness, wetness, reducedMotion);
-    countryside.update({ region, dt: worldDt, darkness, isStill: reducedMotion, isRaining, player: position });
-    roamers.update({ region, dt: worldDt, darkness, isStill: reducedMotion, isRaining, childZ: position.z });
-    container.dataset.visitor = roamers.visitor;
-    schoolmates.update({
-      region,
-      dt: paused ? 0 : worldDt,
-      darkness,
-      isStill: reducedMotion,
-      isRaining,
-      player: position,
-    });
-    container.dataset.schoolmates = String(schoolmates.standing.length);
-    const walkers = [
-      isResting ? null : { ...position, order: CHILD_ORDER },
-      roamers.standing,
-      ...schoolmates.standing,
-    ].filter((walker) => walker !== null);
-    foregrounds.forEach((layer) => {
-      const order = foregroundOrder(layer, walkers, region);
-      layer.mesh.visible = order !== null;
-      layer.mesh.renderOrder = order ?? 0;
-    });
-    container.dataset.playerOccluders = String(
-      foregrounds.filter((layer) => layer.mesh.visible && layer.mesh.renderOrder > CHILD_ORDER).length,
-    );
-    character.setLight(darkness, lampGlowAt(region, position));
-  }
-  function reportStatus({ walking, sprinting }: Stride, rest: BedRestFrame | null) {
-    container.dataset.position = `${position.x.toFixed(2)},${position.z.toFixed(2)}`;
-    const ballFriend = ballFrame ? schoolmates.standing.find((friend) => friend.id === greetingId) : null;
-    container.dataset.ballDistance = ballFriend
-      ? Math.hypot(ballFriend.x - position.x, ballFriend.z - position.z).toFixed(2)
-      : '';
-    container.dataset.schoolmatePositions = schoolmates.standing
-      .map(({ x, z }) => `${x.toFixed(2)},${z.toFixed(2)}`)
-      .join(' ');
-    container.dataset.motion = sleeping ? 'sleeping' : motionLabel(jump.height > 0, walking, sprinting);
-    let restLabel = sleeping ? 'settling' : '';
-    if (rest && rest.tucked > 0.99) restLabel = 'tucked';
-    container.dataset.rest = restLabel;
-    const nextStatus: SceneStatus = {
-      ...position,
-      region,
-      walking,
-      nearby: closestLandmark(position.x, position.z, region),
-      steps: Math.floor(distance * 5),
-      schoolmateId: nearestSchoolmate(schoolmates.standing, position),
-    };
-    if (previousStatus && !hasStatusChanged(previousStatus, nextStatus)) return;
-    previousStatus = nextStatus;
-    onStatus(nextStatus);
-  }
+  const { walk, animateCharacter, placeCharacter, playFootfall, followCamera } = createPlayerMotion(ctx);
+  const { placeMarkers, easeAtmosphere, paintBackground, animateLife } = createWorldMotion(ctx);
+  const reportStatus = createStatusReporter(ctx);
   function tick(time: number) {
-    if (disposed || document.hidden) return;
+    if (state.disposed || document.hidden) return;
     const wasAirborne = isAirborne(jump);
     const hasMoveKey = MOVE_KEYS.some((key) => keys.has(key));
-    const isMoving = !paused && (hasMoveKey || route.length > 0 || wasAirborne || moveSpeed > 0.05);
+    const isMoving = !state.paused && (hasMoveKey || state.route.length > 0 || wasAirborne || state.moveSpeed > 0.05);
     const isBallMoving =
-      ballFrame !== null &&
-      ballFrame.phase !== BALL_PHASE.complete &&
-      !(ballFrame.phase === BALL_PHASE.missed && ballFrame.elapsed >= BALL_TIMING.miss);
-    const rate = isMoving || isSettling || fishingFrame || isBallMoving ? RENDER_RATE.active : RENDER_RATE.idle;
-    if (!shouldRenderFrame(time, nextFrame, rate)) {
-      animation = requestAnimationFrame(tick);
+      state.ballFrame !== null &&
+      state.ballFrame.phase !== BALL_PHASE.complete &&
+      !(state.ballFrame.phase === BALL_PHASE.missed && state.ballFrame.elapsed >= BALL_TIMING.miss);
+    const rate =
+      isMoving || state.isSettling || state.fishingFrame || isBallMoving ? RENDER_RATE.active : RENDER_RATE.idle;
+    if (!shouldRenderFrame(time, state.nextFrame, rate)) {
+      state.animation = requestAnimationFrame(tick);
       return;
     }
-    nextFrame = nextRenderTime(time, nextFrame, rate);
-    const dt = last ? Math.min((time - last) / MS_PER_SECOND, 0.05) : 0;
-    last = time;
-    elapsed += dt;
-    companionAge += dt;
-    if (fishingFrame) fishingAge += dt;
-    fishingLift =
-      fishingFrame?.phase === FISHING_PHASE.caught ? catchCelebration(fishingAge, reducedMotion).childLift : 0;
-    if ((!paused || fishingFrame) && !reducedMotion) sceneryTime += dt;
-    background.uniforms.sceneryTime!.value = reducedMotion ? 0 : sceneryTime;
-    if (!paused) advanceJump(jump, dt);
-    const hasLanded = !paused && wasAirborne && !isAirborne(jump);
-    const regionBefore = region;
+    state.nextFrame = nextRenderTime(time, state.nextFrame, rate);
+    const dt = state.last ? Math.min((time - state.last) / MS_PER_SECOND, 0.05) : 0;
+    state.last = time;
+    state.elapsed += dt;
+    state.companionAge += dt;
+    if (state.fishingFrame) state.fishingAge += dt;
+    state.fishingLift =
+      state.fishingFrame?.phase === FISHING_PHASE.caught
+        ? catchCelebration(state.fishingAge, state.reducedMotion).childLift
+        : 0;
+    if ((!state.paused || state.fishingFrame) && !state.reducedMotion) state.sceneryTime += dt;
+    background.uniforms.sceneryTime!.value = state.reducedMotion ? 0 : state.sceneryTime;
+    if (!state.paused) advanceJump(jump, dt);
+    const hasLanded = !state.paused && wasAirborne && !isAirborne(jump);
+    const regionBefore = state.region;
     const stride = walk(dt);
-    if (!paused) arriveAt();
+    if (!state.paused) arriveAt();
     const { scale, size, rest, hasStepped } = animateCharacter(dt, stride);
     const isFootfall =
-      (!paused || ballFrame?.phase === BALL_PHASE.ready) && region === regionBefore && (hasLanded || hasStepped);
+      (!state.paused || state.ballFrame?.phase === BALL_PHASE.ready) &&
+      state.region === regionBefore &&
+      (hasLanded || hasStepped);
     if (isFootfall) playFootfall(hasLanded, scale);
     placeCharacter(scale, size, rest);
-    pierFishing.update(fishingAge, fishingFrame, child.position, size, reducedMotion);
-    companions.update(dt, elapsed, region, companionStore.get(), fishingFrame, fishingAge, reducedMotion);
+    pierFishing.update(state.fishingAge, state.fishingFrame, child.position, size, state.reducedMotion);
+    companions.update(
+      dt,
+      state.elapsed,
+      state.region,
+      companionStore.get(),
+      state.fishingFrame,
+      state.fishingAge,
+      state.reducedMotion,
+    );
     const isCameraMoving = followCamera(dt, size);
     placeMarkers();
     const isAtmosphereChanging = easeAtmosphere(dt);
     paintBackground(dt, size);
-    animateLife(paused && !fishingFrame ? 0 : dt, rest !== null);
+    animateLife(state.paused && !state.fishingFrame ? 0 : dt, rest !== null);
     ball.update({
-      game: ballFrame,
-      player: position,
-      friend: schoolmates.standing.find((friend) => friend.id === greetingId) ?? null,
-      isStill: reducedMotion,
+      game: state.ballFrame,
+      player: state.position,
+      friend: schoolmates.standing.find((friend) => friend.id === state.greetingId) ?? null,
+      isStill: state.reducedMotion,
     });
     dust.update({
       dt,
-      elapsed,
-      isIndoors: isIndoors(region),
-      darkness,
-      wetness,
-      isStill: reducedMotion || paused,
+      elapsed: state.elapsed,
+      isIndoors: isIndoors(state.region),
+      darkness: state.darkness,
+      wetness: state.wetness,
+      isStill: state.reducedMotion || state.paused,
     });
-    isSettling =
+    state.isSettling =
       isCameraMoving ||
       isAtmosphereChanging ||
-      (!paused && placeEffects.isPlaying) ||
-      transition < 1 ||
-      (!paused && jump.landing > 0.01) ||
-      sleeping;
-    if (elapsed - statusTime > 0.12) {
+      (!state.paused && placeEffects.isPlaying) ||
+      state.transition < 1 ||
+      (!state.paused && jump.landing > 0.01) ||
+      state.sleeping;
+    if (state.elapsed - state.statusTime > 0.12) {
       reportStatus(stride, rest);
-      statusTime = elapsed;
+      state.statusTime = state.elapsed;
     }
     renderer.render(scene, camera);
-    animation = requestAnimationFrame(tick);
+    state.animation = requestAnimationFrame(tick);
   }
-  animation = requestAnimationFrame(tick);
+  state.animation = requestAnimationFrame(tick);
   plates.focus(nearbyRegions(START_REGION));
-  return {
-    async setAppearance(next) {
-      const request = ++appearanceRequest;
-      const url = characterLayers(next).outfit;
-      try {
-        let texture = outfits.get(url);
-        if (!texture) {
-          texture = preparePaintingTexture(await loader.loadAsync(url));
-          if (disposed) {
-            texture.dispose();
-            return false;
-          }
-          outfits.set(url, texture);
-          loaded.push(texture);
-        }
-        if (disposed || request !== appearanceRequest) return false;
-        currentAppearance = next;
-        character.setOutfit(texture);
-        container.dataset.appearance = `${next.character}-${next.outfit}`;
-        if (region === REGION.home) void bedRest.prepare(next.character);
-        wake();
-        return true;
-      } catch {
-        return false;
-      }
-    },
-    finishSleep() {
-      sleeping = false;
-      bedRest.finish();
-      character.setOpacity(1);
-      wake();
-    },
-    setWeather(value) {
-      weather = value;
-      wake();
-    },
-    setTimeOfDay(value) {
-      timeOfDay = value;
-      wake();
-    },
-    reactToCompanion(reaction) {
-      companionAge = 0;
-      companions.react(reaction);
-      wake();
-    },
-    greetSchoolmate(id) {
-      const friend = schoolmates.greet(id, position);
-      if (!friend) return false;
-      const standing = schoolmateGreetingPosition({ player: position, friend, region });
-      if (!standing) {
-        schoolmates.endGreeting();
-        return false;
-      }
-      position = standing;
-      greetingId = id;
-      route = [];
-      destination = null;
-      keys.clear();
-      moveSpeed = 0;
-      heading = Math.atan2(friend.x - position.x, friend.z - position.z);
-      wake();
-      return true;
-    },
-    endSchoolmateGreeting() {
-      schoolmates.endGreeting();
-      greetingId = null;
-      ballFrame = null;
-      route = [];
-      moveSpeed = 0;
-      wake();
-    },
-    setBallGame(frame) {
-      if (frame && (!greetingId || region !== REGION.school || weather === WEATHER.rain)) return false;
-      if (frame && !ballFrame) {
-        const friend = schoolmates.standing.find((friend) => friend.id === greetingId);
-        const spot = friend ? schoolmatePlayPosition({ player: position, friend }) : null;
-        if (!spot) return false;
-        route = findRoute(position, spot, region);
-        destination = null;
-        jump.height = 0;
-        jump.velocity = 0;
-      }
-      if (frame === ballFrame) return route.length === 0;
-      const hasPhaseChanged = frame?.phase !== ballFrame?.phase;
-      if (frame?.phase === BALL_PHASE.returning && ballFrame?.phase !== BALL_PHASE.returning) companionAge = 0;
-      ballFrame = frame;
-      schoolmates.setBallGame(frame);
-      if (hasPhaseChanged) wake();
-      if (route.length === 0 && greetingId) {
-        const friend = schoolmates.standing.find((friend) => friend.id === greetingId);
-        if (friend) heading = Math.atan2(friend.x - position.x, friend.z - position.z);
-      }
-      return route.length === 0;
-    },
-    setFishing(frame) {
-      if (frame && !fishingFrame) {
-        if (!isNearSpot('pier', position, region)) return;
-        route = [];
-        destination = null;
-        keys.clear();
-        heading = Math.PI / 2;
-        moveSpeed = 0;
-        jump.height = 0;
-        jump.velocity = 0;
-      }
-      if (frame?.phase !== fishingFrame?.phase) fishingAge = 0;
-      fishingFrame = frame;
-      container.dataset.fishing = frame?.phase ?? 'none';
-      wake();
-    },
-    setPaused(value) {
-      paused = value;
-      keys.clear();
-      // A dialog covers the scenery, so a half-played action is dropped rather than frozen under it.
-      if (value) placeEffects.clear();
-      wake();
-    },
-    setInput(key, pressed) {
-      if (!pressed) portalInput.release(key);
-      if (pressed && portalInput.isBlocked(key)) return;
-      if (key === 'shift') {
-        touchSprint = pressed;
-        return;
-      }
-      if (key === ' ') {
-        if (pressed && !paused) startJump(jump);
-        return;
-      }
-      if (pressed && paused) return;
-      if (pressed) {
-        keys.add(key);
-        if (key !== 'shift') {
-          route = [];
-          destination = null;
-        }
-      } else keys.delete(key);
-    },
-    playAction(kind, at) {
-      const now = performance.now();
-      if (now < actionEndsAt) return false;
-      actionEndsAt = now + ACTION_LOCK_MS;
-      if (!reducedMotion) placeEffects.play(kind, at);
-      wake();
-      return true;
-    },
-    travelTo(id) {
-      destination = id;
-      redirect(plan());
-    },
-    reset() {
-      destination = null;
-      switchRegion(START_REGION, SPAWN, startPlate.value);
-      keys.clear();
-    },
-    photo() {
-      renderer.render(scene, camera);
-      const canvas = document.createElement('canvas');
-      canvas.width = renderer.domElement.width;
-      canvas.height = renderer.domElement.height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return Promise.resolve(false);
-      ctx.drawImage(renderer.domElement, 0, 0);
-      ctx.fillStyle = '#fff9e8';
-      ctx.font = `${Math.max(20, canvas.width / 55)}px ${CANVAS_FONT_FAMILY}`;
-      ctx.shadowColor = '#18372c';
-      ctx.shadowBlur = 5;
-      ctx.fillText('여름빛 산책', canvas.width * 0.04, canvas.height * 0.95);
-      return new Promise<boolean>((resolve) => {
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            resolve(false);
-            return;
-          }
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.download = `komorebi-${region}-${Date.now()}.png`;
-          a.href = url;
-          a.click();
-          setTimeout(() => URL.revokeObjectURL(url), 1000);
-          resolve(true);
-        });
-      });
-    },
-    dispose() {
-      if (disposed) return;
-      disposed = true;
-      cancelAnimationFrame(animation);
-      observer.disconnect();
-      listening.abort();
-      foregrounds.forEach(({ mesh }) => mesh.geometry.dispose());
-      foregroundMaterial.dispose();
-      bedRest.dispose();
-      pierFishing.dispose();
-      companions.dispose();
-      unsubscribeCompanions();
-      portalVisuals.dispose();
-      fireflies.dispose();
-      placeEffects.dispose();
-      chalkLayer.dispose();
-      nightLights.dispose();
-      life.dispose();
-      roamers.dispose();
-      schoolmates.dispose();
-      ball.dispose();
-      waves.dispose();
-      boats.dispose();
-      countryside.dispose();
-      leaves.dispose();
-      waterMaps.dispose();
-      rain.dispose();
-      geo.dispose();
-      dust.dispose();
-      [background, shadowMat, targetMat, ...markerMats].forEach((m) => m.dispose());
-      releaseTextures();
-      character.dispose();
-      renderer.dispose();
-      renderer.domElement.remove();
-    },
-  };
+  state.animation = requestAnimationFrame(tick);
+  plates.focus(nearbyRegions(START_REGION));
+  return createWalkControls(ctx, travel, { observer, listening, unsubscribeCompanions, chalkLayer });
 }
