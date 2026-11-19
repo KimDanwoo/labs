@@ -25,8 +25,7 @@ export const metadata: Metadata = {
     template: '%s | 어썸 스도쿠',
   },
   description:
-    '클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임. ' +
-    '4단계 난이도, 메모 기능, 포인트 시스템으로 두뇌를 깨우세요.',
+    '클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임. ' + '4단계 난이도와 메모 기능으로 두뇌를 깨우세요.',
   openGraph: {
     title: '어썸 스도쿠 — 온라인 퍼즐 게임',
     description: '클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임.',
@@ -41,7 +40,6 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
   },
 };
 
