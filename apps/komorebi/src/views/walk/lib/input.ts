@@ -42,3 +42,8 @@ const CONTROL_TAGS = new Set(['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'A']);
 export function isControlTarget(target: { tagName: string; isContentEditable: boolean }): boolean {
   return CONTROL_TAGS.has(target.tagName) || target.isContentEditable;
 }
+
+/** ⌘·Ctrl·Alt 조합은 브라우저·OS 단축키다. 맥은 ⌘를 누른 동안 다른 키의 keyup을 보내지 않는다. */
+export function hasShortcutModifier(event: { metaKey: boolean; ctrlKey: boolean; altKey: boolean }): boolean {
+  return event.metaKey || event.ctrlKey || event.altKey;
+}

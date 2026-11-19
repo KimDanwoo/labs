@@ -1,12 +1,12 @@
 import { useEffect, useEffectEvent } from 'react';
-import { gameKey, isControlTarget } from '../../lib/input';
+import { gameKey, hasShortcutModifier, isControlTarget } from '../../lib/input';
 
 type Shortcuts = { isEnabled: boolean; onDiscover: () => void; onOpenMap: () => void };
 
 export function useShortcuts({ isEnabled, onDiscover, onOpenMap }: Shortcuts) {
   const handleKey = useEffectEvent((event: KeyboardEvent) => {
     const isOnControl = event.target instanceof HTMLElement && isControlTarget(event.target);
-    if (!isEnabled || event.repeat || isOnControl) return;
+    if (!isEnabled || event.repeat || isOnControl || hasShortcutModifier(event)) return;
     const key = gameKey(event);
     if (key === 'e') onDiscover();
     if (key === 'm') onOpenMap();

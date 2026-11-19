@@ -45,6 +45,22 @@ test('the map opens with M, closes with Escape and returns focus to the walk', a
   await expect(map).toBeVisible();
 });
 
+test('browser shortcuts with ⌘ or Ctrl neither open the map nor leave the walker running', async ({ page }) => {
+  await openWalk(page);
+  const canvas = page.locator('.landscape canvas');
+  await canvas.focus();
+  await page.keyboard.press('Control+KeyM');
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await expect(page.getByRole('dialog', { name: '여름을 걷는 지도' })).toBeHidden();
+
+  await page.keyboard.down('ArrowRight');
+  await expect(landscape(page)).toHaveAttribute('data-motion', 'running');
+  await page.keyboard.down('Meta');
+  await expect(landscape(page)).toHaveAttribute('data-motion', 'idle');
+  await page.keyboard.up('Meta');
+  await page.keyboard.up('ArrowRight');
+});
+
 test('corrupt or duplicated saved discoveries are cleaned on load', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('komorebi-discoveries-v1', JSON.stringify(['fields', 'fields', 'nowhere', 7]));
