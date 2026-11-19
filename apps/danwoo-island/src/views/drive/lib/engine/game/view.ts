@@ -1,84 +1,37 @@
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
-import type { Action } from './inputs/inputTypes';
-import { Pointer } from './inputs/pointer';
 import { introCenter } from './introCenter';
 import { QUALITY } from './quality';
 import { TICK_ORDER } from './tickOrder';
-import { clamp, lerp, remap, smoothstep } from './utilities/maths';
+import { lerp, smoothstep } from './utilities/maths';
 import { CameraRoll } from './view/cameraRoll';
 import { Cinematic } from './view/cinematic';
 import { OptimalArea } from './view/optimalArea';
 import { frameOverview, type OverviewFrame, type ScreenInsets } from './view/overviewFrame';
 import { SpeedLines } from './view/speedLines';
-
-const IDEAL_RATIO = 1920 / 1080;
-const CAMERA = { fov: 25, near: 0.1, far: 200 } as const;
-const THROTTLED_RESIZE_ORDER = 1;
-const FOCUS_ACTIONS = new Set([
-  'forward',
-  'right',
-  'backward',
-  'left',
-  'boost',
-  'brake',
-  'respawn',
-  'suspensions',
-  'suspensionsFront',
-  'suspensionsBack',
-  'suspensionsRight',
-  'suspensionsLeft',
-  'suspensionsFrontLeft',
-  'suspensionsFrontRight',
-  'suspensionsBackRight',
-  'suspensionsBackLeft',
-  'interact',
-  'whisper',
-]);
-const ZOOM = {
-  base: 0.6,
-  speedAmplitude: -0.4,
-  speedEdge: { min: 5, max: 40 },
-  wheelSensitivity: 0.05,
-  pinchSensitivity: 0.005,
-  toggleStep: 0.01,
-  smoothing: 10,
-} as const;
-const SPHERICAL = {
-  phiByQuality: { [QUALITY.high]: 0.31, [QUALITY.low]: 0.27 },
-  theta: Math.PI * 0.25,
-  radius: { min: 15, max: 30 },
-  nonIdealRatioOffset: 9,
-} as const;
-const FOCUS = { magnetMultiplier: 0.25, easingSpeed: 10 } as const;
-const OVERVIEW = { radius: 300, phi: Math.PI * 0.2, nearRatio: 0.3, farRatio: 2.4 } as const;
-const MAP_DRAG = { scale: 10, multiplier: 2, gamepadSpeed: 20 } as const;
-const MIN_PAN_TOUCHES = 2;
-
-interface FocusPoint {
-  trackedPosition: THREE.Vector3;
-  isTracking: boolean;
-  position: THREE.Vector3;
-  smoothedPosition: THREE.Vector3;
-  easing: number;
-  magnet: { active: boolean; multiplier: number };
-}
-
-interface Zoom {
-  baseRatio: number;
-  ratio: number;
-  smoothedRatio: number;
-  toggle: number;
-  toggleLast: number;
-}
-
-interface Spherical {
-  phi: number;
-  theta: number;
-  radius: { current: number };
-  offset: THREE.Vector3;
-}
+import {
+  CAMERA,
+  FOCUS,
+  IDEAL_RATIO,
+  OVERVIEW,
+  SPHERICAL,
+  THROTTLED_RESIZE_ORDER,
+  ZOOM,
+  type FocusPoint,
+  type Spherical,
+  type Zoom,
+} from './view/viewConfig';
+import {
+  createSpherical,
+  followTarget,
+  listenFocusActions,
+  listenMapDrag,
+  listenZoom,
+  nudgeZoom,
+  panWithGamepad,
+  smoothFocus,
+} from './view/viewControls';
 
 export class View {
   readonly game = getGame();
@@ -108,16 +61,9 @@ export class View {
       easing: 1,
       magnet: { active: false, multiplier: FOCUS.magnetMultiplier },
     };
-    this.spherical = {
-      phi: Math.PI * SPHERICAL.phiByQuality[this.game.quality.level],
-      theta: SPHERICAL.theta,
-      radius: { current: lerp(SPHERICAL.radius.min, SPHERICAL.radius.max, 1 - this.zoom.smoothedRatio) },
-      offset: new THREE.Vector3(),
-    };
-    this.spherical.offset.setFromSphericalCoords(
-      this.spherical.radius.current,
-      this.spherical.phi,
-      this.spherical.theta,
+    this.spherical = createSpherical(
+      Math.PI * SPHERICAL.phiByQuality[this.game.quality.level],
+      this.zoom.smoothedRatio,
     );
 
     this.camera = new THREE.PerspectiveCamera(CAMERA.fov, this.game.viewport.ratio, CAMERA.near, CAMERA.far);
@@ -128,9 +74,9 @@ export class View {
     this.speedLines = new SpeedLines(this.game.ticker.elapsedScaledUniform);
     this.game.scene.add(this.speedLines.mesh);
 
-    this.#listenFocusActions();
-    this.#listenZoom();
-    this.#listenMapDrag();
+    listenFocusActions(this);
+    listenZoom(this);
+    listenMapDrag(this);
     this.game.ticker.events.on('tick', () => this.update(), TICK_ORDER.view);
     this.update();
     this.game.viewport.events.on('change', () => this.resize());
@@ -148,9 +94,9 @@ export class View {
 
   update(): void {
     const { delta } = this.game.ticker;
-    this.#panWithGamepad(delta);
-    this.#followTarget(delta);
-    const focusSpeed = this.#smoothFocus(delta);
+    panWithGamepad(this, delta);
+    followTarget(this.focusPoint, delta);
+    const focusSpeed = smoothFocus(this.focusPoint, delta);
     this.#updateZoom(focusSpeed, delta);
     this.#placeCamera();
     this.cinematic.blendInto(this.defaultCamera);
@@ -196,93 +142,8 @@ export class View {
     return SPHERICAL.radius.max + this.ratioOverflow * SPHERICAL.nonIdealRatioOffset;
   }
 
-  #listenFocusActions(): void {
-    this.game.inputs.events.on('actionStart', (action) => {
-      if (FOCUS_ACTIONS.has(action.name)) this.focusPoint.isTracking = true;
-    });
-  }
-
-  #listenZoom(): void {
-    this.game.inputs.addActions([
-      { name: 'zoom', categories: ['wandering', 'racing'], keys: ['Wheel.roll'] },
-      { name: 'zoomToggle', categories: ['wandering', 'racing'], keys: ['Gamepad.r3'] },
-    ]);
-    this.game.inputs.events.on('zoom', ({ value }) => {
-      if (typeof value === 'number') this.#nudgeZoom(-value * ZOOM.wheelSensitivity);
-    });
-    this.game.inputs.events.on('zoomToggle', ({ active }) => {
-      if (!active) {
-        this.zoom.toggle = 0;
-        return;
-      }
-      this.zoom.toggle -= this.zoom.toggleLast;
-      this.zoom.toggleLast = this.zoom.toggle;
-    });
-  }
-
-  #nudgeZoom(amount: number): void {
-    this.zoom.baseRatio = clamp(this.zoom.baseRatio + amount, 0, 1);
-  }
-
-  #listenMapDrag(): void {
-    this.game.inputs.addActions([
-      { name: 'viewMapPointer', categories: ['intro', 'wandering'], keys: ['Pointer.any'] },
-    ]);
-    this.game.inputs.events.on('viewMapPointer', (action) => this.#dragMap(action));
-  }
-
-  #dragMap({ active }: Action): void {
-    if (!active) return;
-    const { pointer } = this.game.inputs;
-    const isPanning = pointer.mode === Pointer.MODE_MOUSE || pointer.touches.length >= MIN_PAN_TOUCHES;
-    if (isPanning) {
-      this.focusPoint.isTracking = false;
-      const smallestSide = Math.min(this.game.viewport.width, this.game.viewport.height);
-      const movement = new THREE.Vector2(pointer.delta.x, pointer.delta.y)
-        .rotateAround(new THREE.Vector2(), -this.spherical.theta)
-        .multiplyScalar(MAP_DRAG.scale / smallestSide);
-      this.focusPoint.position.x -= movement.x * MAP_DRAG.multiplier;
-      this.focusPoint.position.z -= movement.y * MAP_DRAG.multiplier;
-    }
-    this.#nudgeZoom(pointer.pinch.distanceDelta * ZOOM.pinchSensitivity);
-  }
-
-  #panWithGamepad(delta: number): void {
-    const { right } = this.game.inputs.gamepad.joysticks;
-    if (!right.active || this.cinematic.active) return;
-    this.focusPoint.isTracking = false;
-    const movement = new THREE.Vector2(right.x, right.y)
-      .rotateAround(new THREE.Vector2(), -this.spherical.theta)
-      .multiplyScalar(MAP_DRAG.gamepadSpeed * delta);
-    this.focusPoint.position.x += movement.x;
-    this.focusPoint.position.z += movement.y;
-  }
-
-  #followTarget(delta: number): void {
-    const { position, trackedPosition, magnet } = this.focusPoint;
-    if (this.focusPoint.isTracking) {
-      position.x = trackedPosition.x;
-      position.z = trackedPosition.z;
-    }
-    if (!magnet.active) return;
-    const dx = trackedPosition.x - position.x;
-    const dz = trackedPosition.z - position.z;
-    const strength = Math.hypot(dx, dz) * magnet.multiplier;
-    position.x += strength * dx * delta;
-    position.z += strength * dz * delta;
-  }
-
-  #smoothFocus(delta: number): number {
-    const { smoothedPosition, position, easing } = this.focusPoint;
-    const ratio = remap(easing, [0, 1], [1, delta * FOCUS.easingSpeed]);
-    const next = smoothedPosition.clone().lerp(position, ratio);
-    const moved = next.clone().sub(smoothedPosition);
-    smoothedPosition.copy(next);
-    return Math.hypot(moved.x, moved.z) / delta;
-  }
-
   #updateZoom(focusSpeed: number, delta: number): void {
-    if (this.zoom.toggle !== 0) this.#nudgeZoom(this.zoom.toggle * ZOOM.toggleStep);
+    if (this.zoom.toggle !== 0) nudgeZoom(this.zoom, this.zoom.toggle * ZOOM.toggleStep);
     const speedRatio = smoothstep(focusSpeed, ZOOM.speedEdge.min, ZOOM.speedEdge.max);
     const isSpeedZoom = this.focusPoint.isTracking && this.game.quality.level === QUALITY.high;
     this.zoom.ratio = this.zoom.baseRatio + (isSpeedZoom ? ZOOM.speedAmplitude * speedRatio : 0);
