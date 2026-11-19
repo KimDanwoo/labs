@@ -1,10 +1,11 @@
 import { boundedDpr, RENDER_PIXELS } from '@shared/lib/renderBudget';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { MEADOW_PATH, meadowPathDistanceAt, meadowPathX, RIDGES, waterDepthAt } from '../../config/scene';
+import { MEADOW_PATH, RIDGES } from '../../config/scene';
 import { LANDMARKS } from '../../model/exploration/world';
 import { makeLeafCanopy } from '../makeLeafCanopy';
 import { makeRidgeTexture } from '../makeRidgeTexture';
+import { meadowPathDistanceAt, meadowPathX, waterDepthAt } from '../scene/terrain';
 
 test('leaf canopy has finite normals and a bounded geometry budget at both detail levels', () => {
   for (const count of [100, 180, 240]) {

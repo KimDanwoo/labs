@@ -3,8 +3,8 @@
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { Mesh } from 'three';
-import { terrainHeightAt } from '../../config/scene';
 import { SLOPE_SAMPLE, across, along, basis, normal, shadowMaterial } from '../../lib/runner/groundShadow';
+import { terrainHeightAt } from '../../lib/scene/terrain';
 import { runnerState } from '../../model/ride-state/runnerState';
 import { GROUND_SHADOW } from '../../model/runner/constants';
 

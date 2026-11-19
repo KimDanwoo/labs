@@ -1,6 +1,6 @@
 'use client';
 import { memo } from 'react';
-import { terrainHeightAt } from '../../config/scene';
+import { terrainHeightAt } from '../../lib/scene/terrain';
 import { LANDMARKS } from '../../model/exploration/world';
 import { WingedLife } from '../wildlife/WingedLife';
 

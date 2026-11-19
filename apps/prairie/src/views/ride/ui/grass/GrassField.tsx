@@ -3,14 +3,13 @@ import { FOG, SCENE_COLORS } from '../../config/scene';
 import {
   chunkSeed,
   GRASS_FIELD,
-  GRASS_FRAGMENT_SHADER,
   GRASS_QUALITY,
-  GRASS_VERTEX_SHADER,
   grassLodForRing,
   grassViewRadius,
   GUST,
   type GrassQuality,
 } from '../../model/grass/constants';
+import { GRASS_FRAGMENT_SHADER, GRASS_VERTEX_SHADER } from '../../model/grass/shaders';
 import { runnerState } from '../../model/ride-state/runnerState';
 import { useLowDetail } from '../../model/ride-state/sceneQuality';
 

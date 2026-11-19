@@ -1,5 +1,5 @@
 'use client';
-import { terrainHeightAt } from '../../config/scene';
+import { terrainHeightAt } from '../../lib/scene/terrain';
 import { LANDMARKS } from '../../model/exploration/world';
 
 import { Branch } from './Branch';

@@ -5,7 +5,8 @@ import { useLowDetail } from '../../model/ride-state/sceneQuality';
 import { makeBladeGeometry } from '../../lib/makeBladeGeometry';
 
 import { useFrame } from '@react-three/fiber';
-import { coastDistanceAt, groundHeightAt, nearestRiverX, RIVER, riverWidthAt } from '../../config/scene';
+import { RIVER } from '../../config/scene';
+import { coastDistanceAt, groundHeightAt, nearestRiverX, riverWidthAt } from '../../lib/scene/terrain';
 
 import { useEffect, useMemo, useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
