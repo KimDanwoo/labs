@@ -1,8 +1,8 @@
-import type { StudyDoc } from '../../lib/studyDoc';
+import type { StudyDocSummary } from '../../lib/studyDocSummary';
 import { StudyDocRow } from './StudyDocRow';
 
 interface StudyDocTableProps {
-  docs: StudyDoc[];
+  docs: StudyDocSummary[];
 }
 
 export function StudyDocTable({ docs }: StudyDocTableProps) {
