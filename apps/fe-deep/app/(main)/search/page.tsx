@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 export const metadata: Metadata = {
   title: '검색',
   description: '프론트엔드 면접 질문과 답변을 키워드로 검색하세요.',
+  robots: { index: false, follow: true },
 };
 
 export default function SearchPage() {
