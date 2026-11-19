@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
+import { COMPONENT_MARKUP_DEBT } from './component-markup-debt.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROTECTED_OPTIONS = ['strict', 'noUncheckedIndexedAccess', 'verbatimModuleSyntax'];
@@ -17,6 +18,8 @@ const DEPLOYMENT_ENABLED = { '**': false, main: true };
 const BUILD_FILTER = /--filter=(\S+)/;
 const COMPONENT_WRAPPER = /^(?:memo|forwardRef|dynamic|lazy|Object\.assign)$/;
 const MAX_COMPONENT_PROPS = 5;
+const MAX_JSX_DEPTH = 5;
+const MAX_HOST_ELEMENTS = 15;
 const STYLE_HOME =
   /^src\/app\/(?:globals\.css|styles\/[^/]+\.css)$|^src\/(?:views|features|entities)\/[^/]+\/styles\/[^/]+\.css$|^src\/(?:.*\/)?ui\/(?:.*\/)?[A-Z][A-Za-z0-9]*\.module\.css$/;
 
@@ -153,6 +156,67 @@ export function validateComponentProps(text, filename) {
   return problems;
 }
 
+function componentFunction(statement) {
+  if (ts.isFunctionDeclaration(statement) && statement.name && /^[A-Z]/.test(statement.name.text))
+    return { name: statement.name.text, node: statement };
+  if (!ts.isVariableStatement(statement)) return null;
+  const [declaration] = statement.declarationList.declarations;
+  const name = declaration?.name.getText();
+  if (!name || !/^[A-Z]/.test(name) || !declaration.initializer) return null;
+  return { name, node: declaration.initializer };
+}
+
+function isJsxElement(node) {
+  return ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node);
+}
+
+function isHostElement(node) {
+  const tag = ts.isJsxElement(node) ? node.openingElement.tagName : node.tagName;
+  return /^[a-z]/.test(tag.getText());
+}
+
+function measureMarkup(root) {
+  const markup = { hostElements: 0, depth: 0 };
+  const visit = (node, depth) => {
+    const nextDepth = isJsxElement(node) ? depth + 1 : depth;
+    if (isJsxElement(node)) {
+      markup.depth = Math.max(markup.depth, nextDepth);
+      if (isHostElement(node)) markup.hostElements += 1;
+    }
+    ts.forEachChild(node, (child) => visit(child, nextDepth));
+  };
+  visit(root, 0);
+  return markup;
+}
+
+export function validateComponentMarkup(text, filename) {
+  const source = ts.createSourceFile(filename, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const problems = [];
+  for (const statement of source.statements) {
+    const component = componentFunction(statement);
+    if (!component) continue;
+    const { hostElements, depth } = measureMarkup(component.node);
+    if (depth <= MAX_JSX_DEPTH && hostElements <= MAX_HOST_ELEMENTS) continue;
+    problems.push({
+      component: component.name,
+      message: `JSX 깊이 ${depth}(최대 ${MAX_JSX_DEPTH})·HTML 요소 ${hostElements}개(최대 ${MAX_HOST_ELEMENTS}). 구획을 이름 붙은 하위 컴포넌트로 나누고, 반복 모양은 설정 배열 + map이나 공용 컴포넌트로 바꾼다.`,
+    });
+  }
+  return problems;
+}
+
+export function applyMarkupDebt(found, debt) {
+  const problems = found.filter(({ key }) => !debt.has(key)).map(({ key, message }) => `${key}: ${message}`);
+  const foundKeys = new Set(found.map(({ key }) => key));
+  for (const key of debt) {
+    if (!foundKeys.has(key))
+      problems.push(
+        `${key}: 마크업 부채 목록에 있지만 이제 기준을 지킨다. scripts/component-markup-debt.mjs에서 지운다.`,
+      );
+  }
+  return problems;
+}
+
 export function findMisplacedStyles(appRelativePaths) {
   return appRelativePaths
     .filter((file) => file.endsWith('.css') && !STYLE_HOME.test(file))
@@ -208,6 +272,7 @@ function walk(dir) {
 
 export function checkRepository(root = ROOT) {
   const problems = [];
+  const markupFindings = [];
   const modules = new Map();
   const roots = [root];
   for (const group of ['apps', 'packages']) {
@@ -277,6 +342,8 @@ export function checkRepository(root = ROOT) {
       const text = readFileSync(file, 'utf8');
       for (const problem of [...validateComponentModule(text, file), ...validateComponentProps(text, file)])
         problems.push(`${path.relative(root, file)}: ${problem}`);
+      for (const { component, message } of validateComponentMarkup(text, file))
+        markupFindings.push({ key: `${path.relative(root, file)}#${component}`, message });
     }
     for (const problem of findMisplacedStyles(appSources.map((f) => path.relative(dir, f))))
       problems.push(`${relative}/${problem}`);
@@ -357,6 +424,7 @@ export function checkRepository(root = ROOT) {
     dynamicImports(ast);
     graph.set(file, targets);
   }
+  problems.push(...applyMarkupDebt(markupFindings, new Set(COMPONENT_MARKUP_DEBT)));
   for (const cycle of findImportCycles(graph))
     problems.push(`런타임 순환 참조: ${cycle.map((file) => path.relative(root, file)).join(' → ')}`);
   for (const leak of findServerLeaks(graph, clients, serverModules, actions))

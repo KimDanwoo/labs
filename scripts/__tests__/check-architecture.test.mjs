@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  applyMarkupDebt,
   findImportCycles,
   findMisplacedStyles,
   findServerLeaks,
+  validateComponentMarkup,
   validateComponentModule,
   validateComponentProps,
   validateDesignTokens,
@@ -137,6 +139,30 @@ test('component modules hold only components and hooks; constants, helpers and s
   assert.equal(validateComponentModule('const TABS = [{ name: "a" }] as const;', 'Card.tsx').length, 1);
   assert.equal(validateComponentModule('function formatTime() { return ""; }', 'Card.tsx').length, 1);
   assert.equal(validateComponentModule('const useless = () => null;', 'Card.tsx').length, 1);
+});
+
+test('a component that piles up deep or many HTML elements must be split into named parts', () => {
+  const nest = (depth) => (depth === 0 ? 'x' : `<div>${nest(depth - 1)}</div>`);
+  const view = (body) => `export function View() { return ${body}; }`;
+  assert.deepEqual(validateComponentMarkup(view(nest(5)), 'View.tsx'), []);
+  assert.equal(validateComponentMarkup(view(nest(6)), 'View.tsx')[0]?.component, 'View');
+  const spans = (count) => `<>${'<span />'.repeat(count)}</>`;
+  assert.deepEqual(validateComponentMarkup(view(spans(15)), 'View.tsx'), []);
+  assert.equal(validateComponentMarkup(view(spans(16)), 'View.tsx').length, 1);
+  const composed = view('<Page.Root><Page.Header /><Page.Body><Card><Card.Title /></Card></Page.Body></Page.Root>');
+  assert.deepEqual(validateComponentMarkup(composed, 'View.tsx'), []);
+});
+
+test('markup debt only shrinks: listed offenders pass, new ones fail, fixed ones must be removed from the list', () => {
+  const found = [
+    { key: 'apps/a/src/Old.tsx#Old', message: 'too deep' },
+    { key: 'apps/a/src/New.tsx#New', message: 'too deep' },
+  ];
+  const debt = new Set(['apps/a/src/Old.tsx#Old', 'apps/a/src/Fixed.tsx#Fixed']);
+  const problems = applyMarkupDebt(found, debt);
+  assert.equal(problems.length, 2);
+  assert.ok(problems[0]?.startsWith('apps/a/src/New.tsx#New'));
+  assert.ok(problems[1]?.startsWith('apps/a/src/Fixed.tsx#Fixed'));
 });
 
 test('components with more than five props must be split into composed parts', () => {
