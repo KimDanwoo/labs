@@ -1,4 +1,4 @@
-import { Bookmark, BookOpen, GraduationCap, NotebookPen, Search, User, type LucideIcon } from 'lucide-react';
+import { Bookmark, BookOpen, GraduationCap, Search, User, type LucideIcon } from 'lucide-react';
 
 export interface NavItem {
   href: string;
@@ -17,7 +17,6 @@ export const MAIN_NAV_ITEMS: readonly NavItem[] = [
   { href: '/reference', label: '레퍼런스', icon: BookOpen },
   { href: '/learn', label: '학습', icon: GraduationCap },
   { href: '/search', label: '검색', icon: Search },
-  { href: '/study', label: '면접 학습', icon: NotebookPen },
 ];
 
 export const MY_PAGE_NAV_ITEMS: readonly NavItem[] = [

@@ -32,7 +32,6 @@ export const TERMS_DOCUMENT: LegalDocumentContent = {
         '카드 기반 인출 학습',
         '데일리 학습 및 진도 관리',
         '북마크 및 검색 기능',
-        '면접 학습 문서 열람',
       ],
     },
     {

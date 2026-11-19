@@ -57,13 +57,11 @@ follow_ups: # 선택
 - 필드가 빠지거나 `difficulty`가 잘못되거나 `id`가 겹치면 빌드와 `pnpm --filter fe-deep test`가 파일 경로와 함께 실패한다.
 - Prettier가 frontmatter를 바꾸지 않도록 `content/questions/`는 `.prettierignore`에 들어 있다.
 
-면접 학습(`/study`) 문서는 `content/study/`의 마크다운이다.
-
 ## Architecture — FSD 2.1
 
 ```
-app/                      # Next 라우팅 진입점 (/, reference, learn, search, study, mypage, privacy, terms)
-content/                  # 문제·면접 학습 원본 마크다운
+app/                      # Next 라우팅 진입점 (/, reference, learn, search, mypage, privacy, terms)
+content/                  # 문제 원본 마크다운
 src/
 ├── app/                  # FSD app 레이어 — 프로바이더, 전역 스타일, 헤더·푸터
 ├── views/                # 화면
