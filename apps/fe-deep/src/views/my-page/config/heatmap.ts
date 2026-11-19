@@ -25,6 +25,4 @@ export const YEAR_END = { monthIndex: 11, day: 31 } as const;
 
 export const DATE_KEY_YEAR_LENGTH = 4;
 
-export const DATE_PART_LENGTH = 2;
-
 export const CELL_KIND = { outside: 'outside', future: 'future', day: 'day' } as const;

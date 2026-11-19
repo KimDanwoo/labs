@@ -1,3 +1,4 @@
+export { localDateKey } from './lib/progressDates';
 export { PROGRESS_STATUS } from './model/constants/constants';
 export {
   getCurrentStreak,

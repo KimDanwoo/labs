@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { localDateKey } from '../../../lib/progressDates';
 import { getStudyHeatmap } from '../progressRecords';
 import { getLocalProgress, saveLocalProgress } from '../progressStorage';
 
@@ -33,6 +34,6 @@ test('legacy progress migrates locally and heatmaps preserve its reviewed day', 
   assert.equal(migrated.question_id, 'q-1');
   assert.equal(migrated.easiness_factor, 2.5);
   assert.equal(migrated.status, 'mastered');
-  assert.deepEqual(getStudyHeatmap(progress), { '2026-10-01': 1 });
+  assert.deepEqual(getStudyHeatmap(progress), { [localDateKey(new Date('2026-10-01T12:00:00Z'))]: 1 });
   assert.equal(JSON.parse(values.get('fe-interview-progress')!)['q-1'].question_id, 'q-1');
 });
