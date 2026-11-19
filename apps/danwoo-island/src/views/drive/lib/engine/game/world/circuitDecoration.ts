@@ -1,7 +1,8 @@
 import * as THREE from 'three/webgpu';
 
+import { byeotgari } from './byeotgari';
 import { type DecorationKind, CIRCUIT_DECORATION, START_LIGHT_FRAME_LIFT } from './circuitDecorationConfig';
-import { byeotgari, hongsalmun } from './circuitGates';
+import { hongsalmun } from './circuitGates';
 import { bannerStand, dancerChest, tentPole } from './circuitStands';
 import { createParts } from './islandGeometry';
 import { islandModelMesh } from './islandModels';

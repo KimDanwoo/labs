@@ -3,12 +3,10 @@ import {
   color,
   float,
   Fn,
-  hash,
   max,
   positionWorld,
   screenUV,
   select,
-  texture,
   uniform,
   vec3,
   vec4,
@@ -31,10 +29,9 @@ import {
   ICE_HALF_THICKNESS,
   ICE_HIDDEN_DEPTH,
   MIN_RATIO,
-  RIPPLES,
   THROTTLE_ORDER,
-  type Vec4Node,
 } from './waterSurfaceConfig';
+import { iceNode, ripplesNode, splashesNode } from './waterSurfaceNodes';
 
 export class WaterSurface {
   readonly ice: WorldObject & { physical: Physical; halfThickness: number };
@@ -82,58 +79,15 @@ export class WaterSurface {
     return { visual: null, physical, needsUpdate: false, isResetting: false };
   }
 
-  #ripplesNode(terrainData: Vec4Node): THREE.Node<'float'> {
-    const { wind, noises } = getGame();
-    const slopeFrequency = uniform(RIPPLES.frequency);
-    const noiseFrequency = uniform(0.1);
-    const noiseOffset = uniform(0.345);
-    const rippleIndex = terrainData.b.add(wind.localTime.mul(0.5)).mul(slopeFrequency).floor();
-    const ripplesNoise = texture(
-      noises.perlin,
-      positionWorld.xz.add(rippleIndex.div(noiseOffset)).mul(noiseFrequency),
-    ).r;
-    const ripples = terrainData.b
-      .add(wind.localTime.mul(0.5))
-      .mul(slopeFrequency)
-      .mod(1)
-      .sub(terrainData.b.remap(0, 1, -0.3, 1).oneMinus())
-      .add(ripplesNoise);
-    ripples.assign(this.#ripplesRatio.remap(0, 1, -1, -0.4).step(ripples).mul(RIPPLES.opacity));
-    return ripples;
-  }
-
-  #iceNode(terrainData: Vec4Node): THREE.Node<'float'> {
-    const iceVoronoi = texture(getGame().noises.voronoi, positionWorld.xz.mul(uniform(0.3))).g;
-    const ice = terrainData.b.remapClamp(0, this.iceRatio, 0, 1).toVar();
-    ice.assign(iceVoronoi.step(ice));
-    return ice;
-  }
-
-  #splashesNode(): THREE.Node<'float'> {
-    const { noises, wind } = getGame();
-    const noiseFrequency = uniform(0.33);
-    const voronoi = texture(noises.voronoi, positionWorld.xz.mul(noiseFrequency));
-    const perlin = texture(noises.perlin, positionWorld.xz.mul(noiseFrequency.mul(0.25))).r;
-    const splash = voronoi.r;
-    const splashTime = wind.localTime.mul(uniform(6)).add(hash(voronoi.b.mul(123456)).add(perlin));
-    splash.assign(splash.sub(splashTime).mod(1));
-    const edgeMultiplier = voronoi.g.remapClamp(uniform(0.14), uniform(1), 0, 1);
-    splash.assign(splash.step(uniform(0.3).mul(edgeMultiplier)).oneMinus());
-    const visible = hash(voronoi.b.mul(654321)).add(perlin).mod(1);
-    visible.assign(this.#splashesRatio.step(visible));
-    splash.assign(splash.mul(visible));
-    return splash;
-  }
-
   #detailsMask(): THREE.Node<'float'> {
     const { terrain } = getGame();
     const shoreEdge = uniform(0.17);
     return Fn(() => {
       const terrainData = terrain.terrainNode(positionWorld.xz);
       const value = float(0);
-      if (this.#details.hasRipples) value.assign(max(value, this.#ripplesNode(terrainData)));
-      if (this.#details.hasIce) value.assign(max(value, this.#iceNode(terrainData)));
-      if (this.#details.hasSplashes) value.assign(max(value, this.#splashesNode()));
+      if (this.#details.hasRipples) value.assign(max(value, ripplesNode(terrainData, this.#ripplesRatio)));
+      if (this.#details.hasIce) value.assign(max(value, iceNode(terrainData, this.iceRatio)));
+      if (this.#details.hasSplashes) value.assign(max(value, splashesNode(this.#splashesRatio)));
       value.assign(max(value, shoreEdge.step(terrainData.b)));
       return value;
     })();
