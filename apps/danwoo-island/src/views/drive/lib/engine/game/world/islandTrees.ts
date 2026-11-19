@@ -21,7 +21,7 @@ import * as THREE from 'three/webgpu';
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import { TICK_ORDER } from '../tickOrder';
-import { PALETTE_SLOTS } from './islandGeometry';
+import { PALETTE_SLOTS } from './islandMaterials';
 import { type IslandModelKey, islandModelGeometry } from './islandModels';
 
 export interface TreeSpecies {

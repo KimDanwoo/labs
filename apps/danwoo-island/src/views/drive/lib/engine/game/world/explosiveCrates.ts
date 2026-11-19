@@ -4,7 +4,7 @@ import * as THREE from 'three/webgpu';
 import { type AudioItem, moveSoundTo } from '../audioItem';
 import { getGame } from '../gameContext';
 import { InstancedGroup, type InstanceReference } from '../instancedGroup';
-import type { WorldObject } from '../objects';
+import type { WorldObject } from '../objectColliders';
 import { TICK_ORDER } from '../tickOrder';
 import { createCoconutCrate } from './islandProps';
 import { pushOutOfShowerBay } from './showerBay';

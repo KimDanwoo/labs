@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu';
 
-import type { PartName, Parts } from './islandGeometry';
+import type { Parts } from './islandGeometry';
+import type { PartName } from './islandMaterials';
 import { islandModelMesh } from './islandModels';
 import { type PropFrame } from './villageKit';
 

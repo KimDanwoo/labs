@@ -6,7 +6,7 @@ import { getGame } from '../gameContext';
 import { QUALITY } from '../quality';
 import { TICK_ORDER } from '../tickOrder';
 import { lerp, smallestAngle } from '../utilities/maths';
-import type { Physical } from './physics';
+import type { Physical } from './physicsTypes';
 
 export type SuspensionState = 'low' | 'mid' | 'high';
 

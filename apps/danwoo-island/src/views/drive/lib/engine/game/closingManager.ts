@@ -1,5 +1,5 @@
 import { getGame } from './gameContext';
-import { INPUT_MODE } from './inputs/inputs';
+import { INPUT_MODE } from './inputs/inputTypes';
 import { isShown } from './panelState';
 
 const ACTION_CATEGORIES = ['modal', 'menu', 'racing', 'cinematic', 'wandering'];

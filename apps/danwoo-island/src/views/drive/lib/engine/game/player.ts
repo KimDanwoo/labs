@@ -3,7 +3,7 @@ import * as THREE from 'three/webgpu';
 
 import type { AudioItem } from './audioItem';
 import { getGame } from './gameContext';
-import { INPUT_MODE } from './inputs/inputs';
+import { INPUT_MODE } from './inputs/inputTypes';
 import type { SuspensionState } from './physics/physicsVehicle';
 import { TICK_ORDER } from './tickOrder';
 import { clamp, remapClamp } from './utilities/maths';

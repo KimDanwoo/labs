@@ -1,7 +1,7 @@
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import * as THREE from 'three/webgpu';
 
-import { repaintSlots } from './islandGeometry';
+import { repaintSlots } from './islandMaterials';
 import { type IslandModelKey, islandModelGeometry, islandPaletteMaterial } from './islandModels';
 
 interface Lane {

@@ -3,6 +3,7 @@ import * as THREE from 'three/webgpu';
 import { createParts, type Parts } from './islandGeometry';
 import { placeLandmarks } from './islandLandmarks';
 import { type IslandModelKey, islandModelMesh } from './islandModels';
+import { bench, logStool, soban } from './villageFurniture';
 import {
   boundsFrame,
   collidersOf,
@@ -13,7 +14,8 @@ import {
   rebuildChild,
 } from './villageKit';
 import { dotjari, watermelonTray } from './villageLeisure';
-import { barCounter, bench, gochujangJar, logStool, makgeolliBowl, oilBottle, soban } from './villageLounge';
+import { barCounter } from './villageLounge';
+import { gochujangJar, makgeolliBowl, oilBottle } from './villagePantry';
 import { beachBall, bowlingPin, pinwheel } from './villageToys';
 import { candleSticks, placeGamepad, slateBoards, surfFlag, workTable } from './villageWorkshop';
 

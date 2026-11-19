@@ -2,7 +2,7 @@ import { color, mix, texture, uv, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
-import type { WorldObject } from '../../objects';
+import type { WorldObject } from '../../objectColliders';
 import { QUARTER_TURN } from '../islandGeometry';
 import { type IslandModelKey, islandModelMesh, islandPaletteMaterial } from '../islandModels';
 

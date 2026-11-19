@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
-import type { Action } from './inputs/inputs';
+import type { Action } from './inputs/inputTypes';
 import { Pointer } from './inputs/pointer';
 import { introCenter } from './introCenter';
 import { QUALITY } from './quality';

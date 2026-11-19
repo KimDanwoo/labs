@@ -18,9 +18,9 @@ import * as THREE from 'three/webgpu';
 
 import type { AudioItem } from '../../audioItem';
 import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
-import type { WorldObject } from '../../objects';
-import { rebuildCookieCart } from '../islandStructures';
+import type { WorldObject } from '../../objectColliders';
 import { COCONUT_SIZE, makeCoconut, rebuildVillageProps } from '../islandVillage';
+import { rebuildCookieCart } from '../villageStructures';
 import { Area } from './area';
 
 interface Coconut {
