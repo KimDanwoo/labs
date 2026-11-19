@@ -1,84 +1,53 @@
-import { PAINT_OPTIONS } from '../config/menu';
-import { worldAsset } from '../config/worldAsset';
+import { AudioToggleIcons } from './AudioToggleIcons';
+import { OptionRow } from './OptionRow';
+import { OptionsTable } from './OptionsTable';
+import { PaintSelect } from './PaintSelect';
+import { TooltipButton } from './TooltipButton';
 
 export function OptionsContent() {
   return (
     <div className="content-inner">
       <div className="title">설정</div>
-      <table className="options">
-        <tbody>
-          <tr>
-            <td>소리</td>
-            <td>
-              <button className="js-audio-toggle audio-toggle button is-small has-tooltip">
-                <div className="tooltip">소리를 켜고 꺼요</div>
-                <img
-                  className="icon icon-audio audio-on"
-                  src={worldAsset('ui/audio/audioOn.svg')}
-                  alt=""
-                  loading="lazy"
-                />{' '}
-                <img
-                  className="icon icon-audio audio-off"
-                  src={worldAsset('ui/audio/audioOff.svg')}
-                  alt=""
-                  loading="lazy"
-                />
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>그래픽</td>
-            <td>
-              <button className="js-quality-toggle quality-toggle button is-small has-tooltip">
-                <div className="tooltip">일부 효과를 켜고 꺼요</div>
-                <span>낮음</span>
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>차가 끼었어요</td>
-            <td>
-              <button className="js-respawn button is-small has-tooltip">
-                <div className="tooltip">가까운 출발 지점으로 옮겨요</div>
-                복귀
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>초기화</td>
-            <td>
-              <button className="js-reset button is-small has-tooltip">
-                <div className="tooltip">모든 물건을 제자리로 돌려요</div>
-                초기화
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>렌더러</td>
-            <td>
-              <button className="js-renderer button is-small is-disabled is-success has-tooltip">
-                <div className="js-tooltip tooltip">성능이 가장 좋아요</div>
-                <span>WebGPU</span>
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label htmlFor="vehicle-paint">차량 도색</label>
-            </td>
-            <td>
-              <select id="vehicle-paint" className="js-paint-select button">
-                {PAINT_OPTIONS.map(({ value, label }) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <OptionsTable>
+        <OptionRow label="소리">
+          <TooltipButton
+            className="js-audio-toggle audio-toggle button is-small has-tooltip"
+            tooltip="소리를 켜고 꺼요"
+          >
+            <AudioToggleIcons />
+          </TooltipButton>
+        </OptionRow>
+        <OptionRow label="그래픽">
+          <TooltipButton
+            className="js-quality-toggle quality-toggle button is-small has-tooltip"
+            tooltip="일부 효과를 켜고 꺼요"
+          >
+            <span>낮음</span>
+          </TooltipButton>
+        </OptionRow>
+        <OptionRow label="차가 끼었어요">
+          <TooltipButton className="js-respawn button is-small has-tooltip" tooltip="가까운 출발 지점으로 옮겨요">
+            복귀
+          </TooltipButton>
+        </OptionRow>
+        <OptionRow label="초기화">
+          <TooltipButton className="js-reset button is-small has-tooltip" tooltip="모든 물건을 제자리로 돌려요">
+            초기화
+          </TooltipButton>
+        </OptionRow>
+        <OptionRow label="렌더러">
+          <TooltipButton
+            className="js-renderer button is-small is-disabled is-success has-tooltip"
+            tooltip="성능이 가장 좋아요"
+            tooltipClassName="js-tooltip tooltip"
+          >
+            <span>WebGPU</span>
+          </TooltipButton>
+        </OptionRow>
+        <OptionRow label={<label htmlFor="vehicle-paint">차량 도색</label>}>
+          <PaintSelect />
+        </OptionRow>
+      </OptionsTable>
     </div>
   );
 }

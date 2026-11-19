@@ -5,7 +5,12 @@ export const MENU_SECTIONS = [
   { name: 'circuit', label: '서킷', icon: 'ui/line/flag.png' },
 ] as const;
 
-export type MenuSectionName = (typeof MENU_SECTIONS)[number]['name'];
+export type MenuSection = (typeof MENU_SECTIONS)[number];
+export type MenuSectionName = MenuSection['name'];
+
+export const ISLAND_MARK_ASSET = 'ui/islandMark.webp';
+
+export const BLOG_URL = 'https://danwoo.dev/';
 
 export const PAINT_OPTIONS = [
   { value: 'black', label: '검정' },
