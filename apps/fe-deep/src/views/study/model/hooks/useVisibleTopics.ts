@@ -1,6 +1,6 @@
 import { useEffect, useState, type RefObject } from 'react';
 
-import type { StudyTopic } from '../../lib/parseHandbook';
+import type { StudyTopic } from '../../lib/studyDoc';
 import { filterTopics, parseStudyTiers, type StudyFilter, type TopicMarks } from '../services/studyFilter';
 
 interface VisibleTopicsInput {

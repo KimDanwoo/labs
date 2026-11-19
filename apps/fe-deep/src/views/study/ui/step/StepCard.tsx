@@ -5,7 +5,7 @@ import { Card } from '@shared/ui/Card';
 import { StepDots } from '@shared/ui/StepDots';
 
 import { STEP_BADGE } from '../../config/step';
-import type { StudyStep } from '../../lib/parseHandbook';
+import type { StudyStep } from '../../lib/studyDoc';
 import { StepHints } from './StepHints';
 import { StepRecallInput } from './StepRecallInput';
 import { StepReveal } from './StepReveal';

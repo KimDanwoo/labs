@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { STEP_KIND, parseStudyDoc } from '../parseHandbook';
+import { parseStudyDoc } from '../parseHandbook';
+import { STEP_KIND } from '../studyDoc';
 
 const SAMPLE = `# 핸드북
 

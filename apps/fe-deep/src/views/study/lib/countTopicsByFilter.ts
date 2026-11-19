@@ -1,5 +1,5 @@
 import { STUDY_FILTER, getTopicTier, type StudyFilter, type StudyTier } from '../model/services/studyFilter';
-import type { StudyTopic } from './parseHandbook';
+import type { StudyTopic } from './studyDoc';
 
 interface TopicCountInput {
   topics: StudyTopic[];

@@ -1,5 +1,5 @@
 import { countTopicsByFilter } from '../../lib/countTopicsByFilter';
-import type { StudyDoc } from '../../lib/parseHandbook';
+import type { StudyDoc } from '../../lib/studyDoc';
 import { countByTier } from '../services/studyFilter';
 import { useStudyFilterParams } from './useStudyFilterParams';
 import { useTopicMarkSync } from './useTopicMarkSync';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import type { StudyTopic } from '../../lib/parseHandbook';
+import type { StudyTopic } from '../../lib/studyDoc';
 
 const SKIP_SHORTCUT_TAGS = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT'];
 

@@ -1,4 +1,4 @@
-import type { StudyDoc } from '../../lib/parseHandbook';
+import type { StudyDoc } from '../../lib/studyDoc';
 
 export const STUDY_SORT = { latest: 'latest', oldest: 'oldest' } as const;
 

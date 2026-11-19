@@ -5,7 +5,7 @@ import { BookmarkPlus, Check } from 'lucide-react';
 import { cn } from '@shared/lib/cn';
 
 import { hasLeadingNumber } from '../../lib/hasLeadingNumber';
-import type { StudyTopic } from '../../lib/parseHandbook';
+import type { StudyTopic } from '../../lib/studyDoc';
 
 interface TopicTocProps {
   topics: StudyTopic[];

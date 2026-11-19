@@ -2,7 +2,7 @@
 
 import { Progress } from '@shared/ui/Progress';
 
-import type { StudyTopic } from '../../lib/parseHandbook';
+import type { StudyTopic } from '../../lib/studyDoc';
 import { useStudyRun } from '../../model/hooks/useStudyRun';
 import { StepCard } from '../step/StepCard';
 import { RunnerControls } from './RunnerControls';
