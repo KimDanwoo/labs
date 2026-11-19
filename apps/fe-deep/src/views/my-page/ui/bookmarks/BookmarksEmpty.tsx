@@ -4,7 +4,12 @@ import Link from 'next/link';
 import { Button } from '@shared/ui/Button';
 import { EmptyState } from '@shared/ui/EmptyState';
 
-export function EmptyBookmarks() {
+import { useBookmarksContext } from '../../model/hooks/useBookmarksContext';
+
+export function BookmarksEmpty() {
+  const { bookmarkedQuestions } = useBookmarksContext();
+  if (bookmarkedQuestions.length > 0) return null;
+
   return (
     <EmptyState
       icon={<Bookmark className="h-8 w-8 text-muted-foreground/50" />}

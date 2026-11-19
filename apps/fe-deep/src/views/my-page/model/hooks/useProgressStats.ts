@@ -85,3 +85,5 @@ export function useProgressStats() {
 
   return { categories, stats, categoryStats, heatmap, streak, overallPercent };
 }
+
+export type ProgressStatsModel = ReturnType<typeof useProgressStats>;

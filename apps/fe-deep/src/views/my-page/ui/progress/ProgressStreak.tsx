@@ -2,11 +2,11 @@ import { Flame } from 'lucide-react';
 
 import { Card } from '@shared/ui/Card';
 
-interface StreakCardProps {
-  streak: number;
-}
+import { useProgressStatsContext } from '../../model/hooks/useProgressStatsContext';
 
-export function StreakCard({ streak }: StreakCardProps) {
+export function ProgressStreak() {
+  const { streak } = useProgressStatsContext();
+
   return (
     <Card className="shadow-sm mb-6">
       <Card.Content className="p-5 flex items-center gap-4">
