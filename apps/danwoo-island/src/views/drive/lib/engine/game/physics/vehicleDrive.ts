@@ -4,6 +4,7 @@ import * as THREE from 'three/webgpu';
 import { getGame } from '../gameContext';
 import { QUALITY } from '../quality';
 import { lerp } from '../utilities/maths';
+import type { PhysicsStep } from './physicsTypes';
 import {
   DRIVE,
   FIXED_STEP,
@@ -21,13 +22,16 @@ import {
 
 import type { PhysicsVehicle } from './physicsVehicle';
 
-function engineAndBrake(speed: number, isGoingForward: boolean): { engineForce: number; brake: number } {
-  const { player, ticker } = getGame();
+function engineAndBrake(
+  speed: number,
+  isGoingForward: boolean,
+  stepScaled: number,
+): { engineForce: number; brake: number } {
+  const { player } = getGame();
   const topSpeed = lerp(DRIVE.topSpeed, DRIVE.topSpeedBoost, player.boosting);
   const overflowSpeed = Math.max(0, speed - topSpeed);
   const boost = 1 + player.boosting * DRIVE.boostMultiplier;
-  const engineForce =
-    ((player.accelerating * boost * DRIVE.engineForceAmplitude) / (1 + overflowSpeed)) * ticker.deltaScaled;
+  const engineForce = ((player.accelerating * boost * DRIVE.engineForceAmplitude) / (1 + overflowSpeed)) * stepScaled;
 
   const isIdle = !player.braking && Math.abs(player.accelerating) < DRIVE.idleAcceleration;
   const isReversing =
@@ -37,7 +41,7 @@ function engineAndBrake(speed: number, isGoingForward: boolean): { engineForce: 
   const baseBrake = isReversing ? DRIVE.reverseBrake : idleOrPlayerBrake;
   return {
     engineForce: isReversing ? 0 : engineForce,
-    brake: baseBrake * (DRIVE.brakeAmplitude * ticker.deltaScaled),
+    brake: baseBrake * (DRIVE.brakeAmplitude * stepScaled),
   };
 }
 
@@ -53,9 +57,10 @@ export function driveController(
   controller: DynamicRayCastVehicleController,
   speed: number,
   isGoingForward: boolean,
+  step: PhysicsStep,
 ): void {
   const game = getGame();
-  const { engineForce, brake } = engineAndBrake(speed, isGoingForward);
+  const { engineForce, brake } = engineAndBrake(speed, isGoingForward, step.scaled);
   const steer = game.player.steering * DRIVE.steeringAmplitude;
   for (const index of STEERED_WHEELS) controller.setWheelSteering(index, steer);
 
@@ -72,7 +77,7 @@ export function driveController(
   }
 
   const isLowQuality = game.quality.level === QUALITY.low;
-  controller.updateVehicle(isLowQuality ? FIXED_STEP : Math.min(FIXED_STEP, game.ticker.deltaAverage));
+  controller.updateVehicle(isLowQuality ? FIXED_STEP : Math.min(FIXED_STEP, step.real));
 }
 
 export function updateKinematics(vehicle: PhysicsVehicle): void {

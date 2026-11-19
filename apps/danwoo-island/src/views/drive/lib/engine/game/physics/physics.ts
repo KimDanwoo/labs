@@ -1,5 +1,6 @@
 import type { ColliderDesc, EventQueue, TempContactForceEvent, World } from '@dimforge/rapier3d-compat';
 
+import { Events } from '../events';
 import { getGame } from '../gameContext';
 import { TICK_ORDER } from '../tickOrder';
 import {
@@ -13,12 +14,15 @@ import {
   isAtOrigin,
   type Physical,
   type PhysicalDescription,
+  type PhysicsStep,
   shapeDesc,
+  splitStep,
   SUBMERGED_DAMPING,
   UNIT_INERTIA,
 } from './physicsTypes';
 
 export class Physics {
+  readonly events = new Events<{ step: [PhysicsStep] }>();
   readonly world: World;
   readonly #eventQueue: EventQueue;
   readonly #physicals: Physical[] = [];
@@ -110,9 +114,15 @@ export class Physics {
   }
 
   update(): void {
-    const game = getGame();
-    this.world.timestep = game.ticker.deltaScaled;
-    for (const physical of this.#physicals) this.#applyWaterDamping(physical, game.water.surfaceElevation);
+    const { ticker, water } = getGame();
+    const step = splitStep(ticker.deltaScaled, ticker.scale);
+    this.world.timestep = step.scaled;
+    for (let index = 0; index < step.count; index += 1) this.#step(step, water.surfaceElevation);
+  }
+
+  #step(step: PhysicsStep, surfaceElevation: number): void {
+    this.events.trigger('step', step);
+    for (const physical of this.#physicals) this.#applyWaterDamping(physical, surfaceElevation);
     this.world.step(this.#eventQueue);
     this.#eventQueue.drainContactForceEvents((event) => this.#dispatchContact(event));
   }

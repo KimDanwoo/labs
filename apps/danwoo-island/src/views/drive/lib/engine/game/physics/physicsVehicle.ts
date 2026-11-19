@@ -62,11 +62,7 @@ export class PhysicsVehicle {
     this.chassis = createChassis(this.position);
     this.#controller = game.physics.world.createVehicleController(this.chassis.physical.body);
     this.wheels = createWheels(this.#controller);
-    game.ticker.events.on(
-      'tick',
-      () => driveController(this.#controller, this.speed, this.isGoingForward),
-      TICK_ORDER.vehiclePrePhysics,
-    );
+    game.physics.events.on('step', (step) => driveController(this.#controller, this.speed, this.isGoingForward, step));
     game.ticker.events.on('tick', () => this.#updatePostPhysics(), TICK_ORDER.vehiclePostPhysics);
   }
 
