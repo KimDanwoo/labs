@@ -15,7 +15,7 @@ catalog:
   '@tailwindcss/postcss': ^4
 
   # state
-  jotai: ^2.20.0
+  jotai: ^3.0.2
 
   # 3d (life-simulation 앱)
   three: 0.187.0
