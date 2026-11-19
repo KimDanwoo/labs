@@ -166,7 +166,7 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 | `pnpm format`             | Prettier 전체 포맷            |
 
 - 특정 앱만: `pnpm --filter hub dev`.
-- 앱 전용 검증은 앱별 워크플로가 그 앱(또는 `packages/`)이 바뀐 PR에서만 돌린다: prairie 빌드(`prairie.yml`), fe-deep e2e(`fe-deep.yml`). prairie e2e는 GPU 없는 러너에서 실제 화면을 검증하지 못해 자동화하지 않는다(로컬 GPU에서 `pnpm --filter prairie test:e2e`로 수동 실행).
+- CI(`ci.yml`)는 lint·타입 검사·테스트에 더해 바뀐 앱의 배포 빌드까지 돌린다. soundlab은 빌드 직전에 SoundCloud에서 곡 목록을 받아 파일을 다시 쓰므로 CI 빌드에서 뺀다. 앱 전용 검증은 앱별 워크플로가 그 앱이 바뀐 PR에서만 돌린다: fe-deep e2e(`fe-deep.yml`). prairie e2e는 GPU 없는 러너에서 실제 화면을 검증하지 못해 자동화하지 않는다(로컬 GPU에서 `pnpm --filter prairie test:e2e`로 수동 실행).
 - main은 GitHub ruleset으로 PR로만 반영한다. 로컬 git 훅은 쓰지 않는다.
 
 ## 배포 (Vercel)
