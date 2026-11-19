@@ -22,8 +22,6 @@
 
 문제는 `content/questions/`에서 관리한다. 빌드할 때 읽어서 화면을 정적으로 만들고, 브라우저 화면(학습·검색·마이페이지)은 같은 데이터를 정적 JSON(`/api/questions`)으로 받는다.
 
-`pnpm --filter fe-deep build`는 빌드 뒤 `scripts/check-static-build.mjs`로 서버 없이 배포되는지 검사한다. 요청 때 서버에서 실행되는 기능(`searchParams`·`cookies()`를 읽는 화면, POST 라우트, `revalidate`, 미리 만들지 않은 동적 경로, `proxy.ts`, Server Action)이 생기면 빌드가 실패한다. 주소 쿼리는 클라이언트 컴포넌트에서 `useSearchParams`로 읽는다(`/study`의 정렬 참고).
-
 ```
 content/questions/
 ├── categories.yml        # 카테고리 목록 — 나열 순서가 화면 순서
