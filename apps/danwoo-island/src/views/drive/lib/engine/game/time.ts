@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { getGame } from './gameContext';
 import { TICK_ORDER } from './tickOrder';
 import { clamp, remap } from './utilities/maths';
+import { prefersReducedMotion } from './utilities/reducedMotion';
 
 const DEFAULT_SCALE = 2;
 const BULLET_TIME = { scale: 0.5, inSpeed: 3, outSpeed: 0.3, defaultSeconds: 1.5 } as const;
@@ -14,6 +15,7 @@ class BulletTime {
   #endTime = 0;
 
   activate = (seconds: number = BULLET_TIME.defaultSeconds): void => {
+    if (prefersReducedMotion()) return;
     const endTime = Date.now() + seconds * MILLISECONDS_PER_SECOND;
     this.#endTime = this.isActive ? Math.max(this.#endTime, endTime) : endTime;
     this.isActive = true;
