@@ -39,6 +39,7 @@ import { Respawns } from './respawns';
 import { Reveal } from './reveal';
 import { Terrain } from './terrain';
 import { Ticker } from './ticker';
+import { TICK_ORDER } from './tickOrder';
 import { Time } from './time';
 import { Title } from './title';
 import { Tracks } from './tracks';
@@ -94,6 +95,7 @@ export class Game extends GameRegistry {
     this.provide('quality', new Quality());
     this.provide('ticker', new Ticker());
     this.provide('time', new Time());
+    this.ticker.events.on('tick', () => this.quality.observeFrame(this.ticker), TICK_ORDER.quality);
     this.provide('dayCycles', new DayCycles());
     this.provide('yearCycles', new YearCycles());
     this.provide('inputs', new Inputs([], ['intro']));
