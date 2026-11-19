@@ -1,0 +1,61 @@
+'use client';
+
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useEffect } from 'react';
+import { REPEAT_MODE } from '../constants/repeatMode';
+import { playableIds, resolveQueue } from '../queue';
+import { currentIndexAtom, isPlayingAtom, playbackQueueAtom, repeatModeAtom, shuffleAtom } from '../store/playback';
+import type { PlaybackEngine } from './useEngineRefs';
+
+export function useAutoAdvance({ tracks, refs }: PlaybackEngine, step: (direction: 1 | -1) => void) {
+  const { widgetRef, advanceRef, holdsSetRef, soundIdsRef, shouldRewindRef } = refs;
+  const index = useAtomValue(currentIndexAtom);
+  const queue = useAtomValue(playbackQueueAtom);
+  const shuffle = useAtomValue(shuffleAtom);
+  const repeatMode = useAtomValue(repeatModeAtom);
+  const setIsPlaying = useSetAtom(isPlayingAtom);
+
+  useEffect(() => {
+    advanceRef.current = () => {
+      if (repeatMode === REPEAT_MODE.one) {
+        widgetRef.current?.seekTo(0);
+        widgetRef.current?.play();
+        return;
+      }
+
+      // 세트 안이고 뒤에 곡이 더 남았으면 위젯이 스스로 넘긴다(play 이벤트로 인덱스가 동기화된다).
+      // 새 재생을 시작하지 않는 경로라 백그라운드에서도 이어지므로, 여기서 가로채지 않는다.
+      // 세트의 마지막 사운드였다면 위젯은 멈추므로 아래로 내려가 직접 넘긴다.
+      const soundIndex = soundIdsRef.current.indexOf(tracks[index]?.id ?? -1);
+      const widgetAdvances =
+        !queue && holdsSetRef.current && !shuffle && soundIndex >= 0 && soundIndex < soundIdsRef.current.length - 1;
+      if (widgetAdvances) {
+        shouldRewindRef.current = true;
+        return;
+      }
+
+      // step(1)은 목록 끝에서 첫 곡으로 되돌아간다. 반복이 꺼져 있으면 거기서 멈춰야 한다.
+      const ids = queue ? resolveQueue(tracks, queue.ids) : playableIds(tracks);
+      const isLastTrack = tracks[index]?.id === ids.at(-1);
+      if (isLastTrack && repeatMode === REPEAT_MODE.off) {
+        widgetRef.current?.pause();
+        setIsPlaying(false);
+        return;
+      }
+      step(1);
+    };
+  }, [
+    advanceRef,
+    holdsSetRef,
+    index,
+    queue,
+    repeatMode,
+    setIsPlaying,
+    shouldRewindRef,
+    shuffle,
+    soundIdsRef,
+    step,
+    tracks,
+    widgetRef,
+  ]);
+}
