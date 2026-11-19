@@ -115,7 +115,8 @@ node apps/komorebi/e2e/serve.mjs apps/komorebi/out 3011
 - `src/views/walk/lib/scene.ts`: 장면을 조립하고 프레임 루프(렌더 예산)를 돌린다. 나머지는 역할별 파일로 나뉜다
   - `sceneSetup.ts`(텍스처·렌더러·장면 요소 생성), `walkState.ts`(프레임 사이에 바뀌는 상태), `sceneContext.ts`(엔진 계약·공유 타입)
   - `sceneTravel.ts`(목적지·포털·지역 전환·잠자리), `sceneInput.ts`(키보드·포인터), `scenePlayer.ts`(이동·캐릭터·카메라)
-  - `sceneWorld.ts`(표지·빛·배경·생물), `sceneStatus.ts`(상태 보고), `sceneControls.ts`(UI가 부르는 엔진 메서드)
+  - `sceneWorld.ts`(표지·빛·배경·생물), `sceneStatus.ts`(상태 보고)
+  - `sceneControls.ts`(UI가 부르는 엔진 메서드를 모음): `sceneMovementControls.ts`(일시정지·입력·장소 행동·목적지), `sceneActivityControls.ts`(동물·친구·공놀이·낚시·잠), `sceneLookControls.ts`(옷·날씨·시간·사진), `sceneDispose.ts`(정리)
 - `src/views/walk/lib/regionPlates.ts`: 지역 배경의 지연·순차 로딩과 해제(현재+이웃 지역만 유지, 요청 공유, 실패 시 재시도)
 - `src/views/walk/lib/child.ts`: 밀짚모자 캐릭터와 선택한 옷의 4방향 정지·보행·공중 원화 애니메이션
 - `src/views/walk/lib/audio.ts`: Web Audio 바람과 지역별 물·파도·매미, 노을·밤의 풀벌레, 빗소리, 바닥별 발소리, 장소 행동 효과음
