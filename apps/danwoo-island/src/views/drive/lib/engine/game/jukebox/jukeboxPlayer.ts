@@ -1,58 +1,30 @@
 import type { JukeboxTrack } from '../../data/worldContent';
-import { Events } from '../events';
+import { JukeboxStateStore, createAnnouncer, isRequestedSound, offsetIndex } from './jukeboxState';
+import type { JukeboxPlayerOptions, JukeboxState, MusicHost } from './jukeboxTypes';
+import { bindJukeboxWidget } from './jukeboxWidget';
 import {
   loadWidgetApi,
   mountWidgetFrame,
+  trackApiUrl,
   type SoundCloudGlobal,
   type SoundCloudWidget,
-  trackApiUrl,
-  type WidgetEvent,
   type WidgetFrame,
-  type WidgetPayload,
 } from './soundcloudWidget';
 
-export type JukeboxStatus = 'idle' | 'loading' | 'ready' | 'starting' | 'playing' | 'paused' | 'error';
-
-export interface JukeboxState {
-  readonly status: JukeboxStatus;
-  readonly trackIndex: number | null;
-  readonly progress: number;
-}
-
-export interface MusicHost {
-  readonly isBackground: boolean;
-  readonly mute: { readonly active: boolean };
-  readonly events: Events<{ muteChange: [isMuted: boolean]; backgroundChange: [isBackground: boolean] }>;
-  claimMusic(): void;
-  releaseMusic(): void;
-}
-
-export interface JukeboxPlayerOptions {
-  tracks: readonly JukeboxTrack[];
-  music: MusicHost;
-  announce: (title: string) => void;
-  loadApi?: () => Promise<SoundCloudGlobal>;
-  mountFrame?: (trackId: number) => WidgetFrame;
-}
-
 const VOLUME = 70;
-const START_TIMEOUT_MS = 8000;
-const READY_TIMEOUT_MS = 12_000;
 
 export class JukeboxPlayer {
-  readonly events = new Events<{ change: [state: JukeboxState] }>();
+  readonly #store = new JukeboxStateStore();
+  readonly events = this.#store.events;
   readonly tracks: readonly JukeboxTrack[];
   readonly #music: MusicHost;
-  readonly #announce: (title: string) => void;
+  readonly #announce: (index: number | null) => void;
   readonly #loadApi: () => Promise<SoundCloudGlobal>;
   readonly #mountFrame: (trackId: number) => WidgetFrame;
   #widget: SoundCloudWidget | null = null;
   #preparing: Promise<void> | null = null;
   #requestedIndex: number | null = null;
-  #announcedIndex: number | null = null;
   #wantsPlayback = false;
-  #startTimer: ReturnType<typeof setTimeout> | null = null;
-  #state: JukeboxState = { status: 'idle', trackIndex: null, progress: 0 };
 
   constructor({
     tracks,
@@ -63,7 +35,7 @@ export class JukeboxPlayer {
   }: JukeboxPlayerOptions) {
     this.tracks = tracks;
     this.#music = music;
-    this.#announce = announce;
+    this.#announce = createAnnouncer(tracks, announce);
     this.#loadApi = loadApi;
     this.#mountFrame = mountFrame;
     music.events.on('muteChange', () => this.#applyVolume());
@@ -71,7 +43,7 @@ export class JukeboxPlayer {
   }
 
   get state(): JukeboxState {
-    return this.#state;
+    return this.#store.current;
   }
 
   prepare(): Promise<void> {
@@ -90,7 +62,7 @@ export class JukeboxPlayer {
     const isSameTrack = index === this.#requestedIndex;
     this.#requestedIndex = index;
     if (!this.#widget) {
-      this.#setState({ status: 'loading', trackIndex: index, progress: 0 });
+      this.#store.set({ status: 'loading', trackIndex: index, progress: 0 });
       void this.prepare();
       return;
     }
@@ -99,30 +71,30 @@ export class JukeboxPlayer {
   }
 
   toggle(): void {
-    const { status, trackIndex } = this.#state;
+    const { status, trackIndex } = this.#store.current;
     if (status === 'playing' || status === 'starting') {
       this.#wantsPlayback = false;
-      this.#clearStartTimer();
+      this.#store.clearStartTimer();
       this.#widget?.pause();
-      this.#setState({ status: 'paused' });
+      this.#store.set({ status: 'paused' });
       return;
     }
     this.select(trackIndex ?? 0);
   }
 
   next(): void {
-    this.select(this.#offsetIndex(1));
+    this.select(offsetIndex(this.#store.current.trackIndex, 1, this.tracks.length));
   }
 
   previous(): void {
-    this.select(this.#offsetIndex(-1));
+    this.select(offsetIndex(this.#store.current.trackIndex, -1, this.tracks.length));
   }
 
   stop(): void {
     this.#wantsPlayback = false;
-    this.#clearStartTimer();
+    this.#store.clearStartTimer();
     this.#widget?.pause();
-    this.#setState({ status: this.#widget ? 'ready' : 'idle', progress: 0 });
+    this.#store.set({ status: this.#widget ? 'ready' : 'idle', progress: 0 });
     this.#music.releaseMusic();
   }
 
@@ -132,26 +104,15 @@ export class JukeboxPlayer {
     const firstTrack = this.tracks[firstIndex];
     if (!firstTrack) throw new Error('Jukebox has no tracks');
     const frame = this.#mountFrame(firstTrack.id);
-    const widget = api.Widget(frame);
-    const bind = (name: WidgetEvent, handler: (payload: WidgetPayload) => void): void => {
-      const event = api.Widget.Events[name];
-      if (event) widget.bind(event, (payload) => handler(payload ?? {}));
-    };
-    bind('PLAY', ({ soundId }) => this.#handlePlay(soundId));
-    bind('PAUSE', ({ soundId }) => this.#handlePause(soundId));
-    bind('FINISH', ({ soundId }) => this.#handleFinish(soundId));
-    bind('PLAY_PROGRESS', ({ soundId, relativePosition }) => this.#handleProgress(soundId, relativePosition));
-    bind('ERROR', () => this.#fail());
-    await new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(() => {
-        frame.remove();
-        reject(new Error('SoundCloud widget was not ready in time'));
-      }, READY_TIMEOUT_MS);
-      bind('READY', () => {
-        clearTimeout(timer);
+    await bindJukeboxWidget(api, frame, {
+      onPlay: (soundId) => this.#handlePlay(soundId),
+      onPause: (soundId) => this.#handlePause(soundId),
+      onFinish: (soundId) => this.#handleFinish(soundId),
+      onProgress: (soundId, relativePosition) => this.#handleProgress(soundId, relativePosition),
+      onError: () => this.#fail(),
+      onReady: (widget) => {
         if (!this.#widget) this.#handleReady(widget, firstIndex);
-        resolve();
-      });
+      },
     });
   }
 
@@ -161,7 +122,7 @@ export class JukeboxPlayer {
     const requested = this.#requestedIndex;
     if (!this.#wantsPlayback || requested === null) {
       this.#requestedIndex ??= loadedIndex;
-      this.#setState({ status: 'ready' });
+      this.#store.set({ status: 'ready' });
       return;
     }
     if (requested === loadedIndex) this.#start();
@@ -171,8 +132,8 @@ export class JukeboxPlayer {
   #load(index: number): void {
     const track = this.tracks[index];
     if (!track || !this.#widget) return;
-    this.#setState({ status: 'starting', trackIndex: index, progress: 0 });
-    this.#armStartTimer();
+    this.#store.set({ status: 'starting', trackIndex: index, progress: 0 });
+    this.#store.armStartTimer();
     this.#widget.load(trackApiUrl(track.id), {
       auto_play: true,
       callback: () => {
@@ -182,14 +143,9 @@ export class JukeboxPlayer {
   }
 
   #start(): void {
-    this.#setState({ status: 'starting', trackIndex: this.#requestedIndex });
-    this.#armStartTimer();
+    this.#store.set({ status: 'starting', trackIndex: this.#requestedIndex });
+    this.#store.armStartTimer();
     this.#widget?.play();
-  }
-
-  #isRequested(soundId: number | undefined): boolean {
-    if (soundId === undefined || this.#requestedIndex === null) return true;
-    return this.tracks[this.#requestedIndex]?.id === soundId;
   }
 
   #handlePlay(soundId: number | undefined): void {
@@ -197,30 +153,36 @@ export class JukeboxPlayer {
       this.#widget?.pause();
       return;
     }
-    if (!this.#isRequested(soundId)) return;
-    this.#clearStartTimer();
-    this.#setState({ status: 'playing' });
-    this.#announceCurrent();
+    if (!isRequestedSound(this.tracks, this.#requestedIndex, soundId)) return;
+    this.#store.clearStartTimer();
+    this.#store.set({ status: 'playing' });
+    this.#announce(this.#store.current.trackIndex);
   }
 
   #handlePause(soundId: number | undefined): void {
-    if (!this.#isRequested(soundId) || this.#state.status !== 'playing') return;
-    this.#setState({ status: 'paused' });
+    if (!isRequestedSound(this.tracks, this.#requestedIndex, soundId) || this.#store.current.status !== 'playing')
+      return;
+    this.#store.set({ status: 'paused' });
   }
 
   #handleFinish(soundId: number | undefined): void {
-    if (this.#wantsPlayback && this.#isRequested(soundId)) this.next();
+    if (this.#wantsPlayback && isRequestedSound(this.tracks, this.#requestedIndex, soundId)) this.next();
   }
 
   #handleProgress(soundId: number | undefined, progress: number | undefined): void {
-    if (!this.#isRequested(soundId) || typeof progress !== 'number' || !Number.isFinite(progress)) return;
-    this.#setState({ progress });
+    if (
+      !isRequestedSound(this.tracks, this.#requestedIndex, soundId) ||
+      typeof progress !== 'number' ||
+      !Number.isFinite(progress)
+    )
+      return;
+    this.#store.set({ progress });
   }
 
   #fail(): void {
     this.#wantsPlayback = false;
-    this.#clearStartTimer();
-    this.#setState({ status: 'error' });
+    this.#store.clearStartTimer();
+    this.#store.set({ status: 'error' });
     this.#music.releaseMusic();
   }
 
@@ -230,39 +192,7 @@ export class JukeboxPlayer {
     else this.#start();
   }
 
-  #announceCurrent(): void {
-    const index = this.#state.trackIndex;
-    if (index === null || index === this.#announcedIndex) return;
-    this.#announcedIndex = index;
-    const track = this.tracks[index];
-    if (track) this.#announce(track.title);
-  }
-
   #applyVolume(): void {
     this.#widget?.setVolume(this.#music.mute.active ? 0 : VOLUME);
-  }
-
-  #armStartTimer(): void {
-    this.#clearStartTimer();
-    this.#startTimer = setTimeout(() => {
-      this.#startTimer = null;
-      if (this.#state.status === 'starting') this.#setState({ status: 'paused' });
-    }, START_TIMEOUT_MS);
-  }
-
-  #clearStartTimer(): void {
-    if (this.#startTimer !== null) clearTimeout(this.#startTimer);
-    this.#startTimer = null;
-  }
-
-  #offsetIndex(offset: number): number {
-    const count = this.tracks.length;
-    const current = this.#state.trackIndex ?? 0;
-    return (current + offset + count) % count;
-  }
-
-  #setState(patch: Partial<JukeboxState>): void {
-    this.#state = { ...this.#state, ...patch };
-    this.events.trigger('change', this.#state);
   }
 }

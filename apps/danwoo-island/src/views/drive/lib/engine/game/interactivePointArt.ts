@@ -52,3 +52,17 @@ export function concealedOffset(align: PointAlign): number {
 export function oppositeAlign(align: PointAlign): PointAlign {
   return align === 'left' ? 'right' : 'left';
 }
+
+export function cachedLabelArt(cache: Map<PointAlign, LabelArt>, text: string, align: PointAlign): LabelArt {
+  const cached = cache.get(align);
+  if (cached) return cached;
+  const art = drawLabel(text, align);
+  cache.set(align, art);
+  return art;
+}
+
+export function layoutLabel(label: THREE.Mesh, { width }: LabelArt, align: PointAlign): void {
+  label.scale.x = (LABEL.scale * width) / LABEL.height;
+  label.scale.y = LABEL.scale;
+  label.position.x = align === 'left' ? 0 : -label.scale.x;
+}

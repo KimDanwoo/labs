@@ -3,7 +3,7 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputTypes';
-import type { SharedParts } from './interactivePoint';
+import type { SharedParts } from './interactivePointShared';
 
 export const KEY_ICON_RENDER_ORDER = 8;
 export const KEY_ICON_SCALE = 0.25;
