@@ -66,7 +66,6 @@ test.describe('phone', () => {
     await expect(page.locator('.joystick-thumb')).toHaveAttribute('style', /translate\(0px, 0px\)/);
     await touch('touchEnd', []);
     await page.getByRole('button', { name: '지도 닫기' }).click();
-    await page.waitForTimeout(500);
     await expect(landscape(page)).toHaveAttribute('data-motion', 'idle');
   });
 });

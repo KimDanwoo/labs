@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { interactPrompt, WALK_TO_PROMPT } from './prompts';
 
 const landscape = (page: Page) => page.locator('.landscape');
 
@@ -166,7 +167,7 @@ test('choosing a new destination while an exit is loading cancels that crossing'
   });
   await guideTo(page, '바람이 머무는 논');
   release();
-  await expect(page.locator('.interact')).toContainText('바람이 머무는 논', { timeout: 15_000 });
+  await expect(interactPrompt(page, '바람이 머무는 논')).toBeVisible(WALK_TO_PROMPT);
   await expect(landscape(page)).toHaveAttribute('data-region', 'village');
 });
 
@@ -175,15 +176,15 @@ test('a place found at dusk keeps a dusk page that the diary can reread', async 
   await openWalk(page);
   await sleepAtHome(page);
   await guideTo(page, '바람이 머무는 논');
-  await expect(page.locator('.interact')).toContainText('노을빛으로 머물러 보기', { timeout: 15_000 });
-  await page.locator('.interact').click();
+  await expect(interactPrompt(page, '노을빛으로 머물러 보기')).toBeVisible(WALK_TO_PROMPT);
+  await interactPrompt(page, '노을빛으로 머물러 보기').click();
   const memory = page.getByRole('dialog', { name: '바람이 머무는 논' });
   await expect(memory).toContainText('노을이 논물 위에 길게 눕는다');
   await memory.getByRole('button', { name: '추억 닫기' }).click();
   await sleepAtHome(page, 2);
   await guideTo(page, '바람이 머무는 논');
-  await expect(page.locator('.interact')).toContainText('잠깐 머물러 보기', { timeout: 20_000 });
-  await page.locator('.interact').click();
+  await expect(interactPrompt(page, '잠깐 머물러 보기')).toBeVisible({ timeout: 20_000 });
+  await interactPrompt(page, '잠깐 머물러 보기').click();
   await expect(memory).toContainText('초록빛 파도가 발끝까지 밀려온다');
   await memory.getByRole('button', { name: '추억 닫기' }).click();
   await page.getByRole('button', { name: '산책 지도 열기' }).click();
@@ -235,8 +236,8 @@ test('sleeping at home advances the day and a night visit keeps a night page', a
   await sleepAtHome(page, 2);
   await expect(page.locator('main.walk')).toHaveClass(/is-night/);
   await guideTo(page, '바람이 머무는 논');
-  await expect(page.locator('.interact')).toContainText('밤의 풍경 바라보기', { timeout: 15_000 });
-  await page.locator('.interact').click();
+  await expect(interactPrompt(page, '밤의 풍경 바라보기')).toBeVisible(WALK_TO_PROMPT);
+  await interactPrompt(page, '밤의 풍경 바라보기').click();
   const memory = page.getByRole('dialog', { name: '바람이 머무는 논' });
   await expect(memory).toContainText('논물에 별이 하나씩 내려앉는다');
   await expect(memory).toContainText('여름의 조각 1 / 21');
@@ -349,7 +350,7 @@ test('home is a walkable map with a bed and a doorway back to the village', asyn
   await page.keyboard.up('ArrowUp');
   await expect(landscape(page)).toHaveAttribute('data-motion', 'idle');
   await page.screenshot({ path: '/tmp/komorebi-home-desk.png' });
-  await expect(page.locator('.interact')).toContainText('그림일기 펼치기');
+  await expect(interactPrompt(page, '그림일기 펼치기')).toBeVisible(WALK_TO_PROMPT);
   await page.keyboard.press('KeyE');
   const journal = page.getByRole('dialog', { name: '나의 여름 그림일기' });
   await expect(journal).toBeVisible();
@@ -380,7 +381,6 @@ test('tapping the painted quilt and desk walks to their usable side', async ({ p
   await canvas.click({ position: { x: 975, y: 580 } });
   await expect(landscape(page)).toHaveAttribute('data-rest', 'tucked', { timeout: 15_000 });
   await expect(page.locator('.sleep-transition')).toHaveCount(0, { timeout: 6_000 });
-  await page.waitForTimeout(400);
   await expect(landscape(page)).toHaveAttribute('data-rest', '');
   await expect(landscape(page)).toHaveAttribute('data-motion', 'idle');
   await canvas.click({ position: { x: 495, y: 395 } });

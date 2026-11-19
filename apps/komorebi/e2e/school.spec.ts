@@ -1,4 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
+import { CLASSROOM_BOARD } from '../src/views/walk/model/world/world';
+import { interactPrompt, WALK_TO_PROMPT, walkToPrompt } from './prompts';
 
 async function guideTo(page: Page, name: string): Promise<void> {
   await page.getByRole('button', { name: '산책 지도 열기' }).click();
@@ -7,13 +9,7 @@ async function guideTo(page: Page, name: string): Promise<void> {
 
 async function openBoard(page: Page): Promise<void> {
   await expect(page.locator('.landscape')).toHaveAttribute('data-motion', 'idle');
-  await page.locator('.landscape canvas').focus();
-  await page.keyboard.down('ArrowLeft');
-  try {
-    await expect(page.locator('.interact')).toContainText('칠판에 낙서하기');
-  } finally {
-    await page.keyboard.up('ArrowLeft');
-  }
+  await walkToPrompt(page, '칠판에 낙서하기', CLASSROOM_BOARD);
   await page.keyboard.press('KeyE');
   await expect(page.getByRole('dialog', { name: '칠판에 낙서하기' })).toBeVisible();
 }
@@ -117,7 +113,7 @@ for (const screen of [
     expect(bounds).not.toBeNull();
     if (!bounds) return;
     await canvas.click({ position: { x: bounds.width * 0.16, y: bounds.height * 0.75 } });
-    await expect(page.locator('.interact')).toContainText('친구에게 인사하기', { timeout: 15_000 });
+    await expect(interactPrompt(page, '친구에게 인사하기')).toBeVisible(WALK_TO_PROMPT);
     await page.keyboard.press('KeyE');
     const greeting = page.getByRole('dialog', { name: '하루의 인사' });
     await expect(greeting).toBeVisible();
