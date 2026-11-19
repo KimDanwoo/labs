@@ -16,9 +16,14 @@ export function DriveView() {
 
   return (
     <>
+      <h1 className="visually-hidden">Danwoo Island — 3D 포트폴리오</h1>
       <IslandIdentity />
       <div className="game">
-        <canvas className="js-canvas" />
+        <canvas
+          className="js-canvas"
+          role="img"
+          aria-label="Danwoo Island 3D 섬. 방향키나 WASD로 차를 몰아 섬의 구역을 둘러볼 수 있어요."
+        />
         <TouchButtons />
         <MenuTrigger />
         <MapTrigger />

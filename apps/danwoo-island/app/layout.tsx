@@ -8,6 +8,7 @@ const DESCRIPTION = 'AI Agent와 three.js로 구현한 해변 탐험';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  alternates: { canonical: '/' },
   title: TITLE,
   description: DESCRIPTION,
   applicationName: SITE_NAME,
