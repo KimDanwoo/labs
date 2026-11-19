@@ -1,4 +1,4 @@
-import { IconButton } from '@shared/ui/IconButton';
+import { IconButton } from '@shared/ui/icon-button';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuUndo2 } from 'react-icons/lu';
 import { canUndoAtom, undoAtom } from '../../model/store/historyAtoms';
@@ -10,11 +10,11 @@ export const UndoMove = () => {
   const timerActive = useAtomValue(timerActiveAtom);
 
   return (
-    <IconButton
-      icon={<LuUndo2 strokeWidth={2} />}
-      label="되돌리기"
-      onClick={undo}
-      disabled={!timerActive || !canUndo}
-    />
+    <IconButton.Root onClick={undo} disabled={!timerActive || !canUndo}>
+      <IconButton.Icon>
+        <LuUndo2 strokeWidth={2} />
+      </IconButton.Icon>
+      <IconButton.Label>되돌리기</IconButton.Label>
+    </IconButton.Root>
   );
 };

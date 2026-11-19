@@ -1,4 +1,4 @@
-import { IconButton } from '@shared/ui/IconButton';
+import { IconButton } from '@shared/ui/icon-button';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuEraser } from 'react-icons/lu';
 import { fillCellAtom } from '../../model/store/cellValueAtoms';
@@ -9,11 +9,11 @@ export const RemoveNumber = () => {
   const fillCell = useSetAtom(fillCellAtom);
 
   return (
-    <IconButton
-      icon={<LuEraser strokeWidth={2} />}
-      label="지우기"
-      onClick={() => fillCell(null)}
-      disabled={!timerActive}
-    />
+    <IconButton.Root onClick={() => fillCell(null)} disabled={!timerActive}>
+      <IconButton.Icon>
+        <LuEraser strokeWidth={2} />
+      </IconButton.Icon>
+      <IconButton.Label>지우기</IconButton.Label>
+    </IconButton.Root>
   );
 };

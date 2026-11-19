@@ -1,4 +1,4 @@
-import { IconButton } from '@shared/ui/IconButton';
+import { IconButton } from '@shared/ui/icon-button';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuRedo2 } from 'react-icons/lu';
 import { canRedoAtom, redoAtom } from '../../model/store/historyAtoms';
@@ -10,6 +10,11 @@ export const RedoMove = () => {
   const timerActive = useAtomValue(timerActiveAtom);
 
   return (
-    <IconButton icon={<LuRedo2 strokeWidth={2} />} label="재실행" onClick={redo} disabled={!timerActive || !canRedo} />
+    <IconButton.Root onClick={redo} disabled={!timerActive || !canRedo}>
+      <IconButton.Icon>
+        <LuRedo2 strokeWidth={2} />
+      </IconButton.Icon>
+      <IconButton.Label>재실행</IconButton.Label>
+    </IconButton.Root>
   );
 };
