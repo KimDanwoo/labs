@@ -80,3 +80,6 @@ export function useCompanionPanel({ kind, onClose, onReact }: CompanionPanelInpu
     react,
   };
 }
+
+export type CompanionPanelModel = ReturnType<typeof useCompanionPanel>;
+export type CompanionFish = CompanionPanelModel['tank'][number];

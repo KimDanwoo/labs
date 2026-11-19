@@ -5,7 +5,7 @@ import { gameKey } from '../lib/input';
 import { useModal } from '../model/hooks/useModal';
 import { useWalkContext } from '../model/hooks/useWalkContext';
 import type { SCHOOLMATES, SchoolRegion } from '../model/schoolmateRoster';
-import { Icon } from './Icon';
+import { DialogHeading } from './DialogHeading';
 
 interface SchoolmateDialogProps {
   friend: (typeof SCHOOLMATES)[number];
@@ -38,15 +38,13 @@ export function SchoolmateDialog({ friend, region }: SchoolmateDialogProps): JSX
         }
       }}
     >
-      <div className="dialog-heading">
-        <div>
-          <span className="eyebrow">학교에서 만난 친구</span>
-          <h2 id={titleId}>{name}의 인사</h2>
-        </div>
-        <button className="tool" aria-label="친구 인사 닫기" onClick={onClose}>
-          <Icon name="close" />
-        </button>
-      </div>
+      <DialogHeading
+        eyebrow="학교에서 만난 친구"
+        title={`${name}의 인사`}
+        titleId={titleId}
+        closeLabel="친구 인사 닫기"
+        onClose={onClose}
+      />
       <p>{time === TIME.evening ? '노을이 예뻐서 조금 더 있다 가려고.' : '어, 너도 학교에 놀러 왔구나!'}</p>
       <p>{SCHOOLMATE_GREETING[region]}</p>
       <div className="schoolmate-actions">
