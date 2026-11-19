@@ -1,8 +1,4 @@
 export const COMPONENT_MARKUP_DEBT = [
-  'apps/danwoo-island/src/views/drive/ui/ControlsContent.tsx#ControlsContent',
-  'apps/danwoo-island/src/views/drive/ui/Menu.tsx#Menu',
-  'apps/danwoo-island/src/views/drive/ui/Modals.tsx#Modals',
-  'apps/danwoo-island/src/views/drive/ui/OptionsContent.tsx#OptionsContent',
   'apps/komorebi/src/views/walk/ui/CompanionPanel.tsx#CompanionPanel',
   'apps/komorebi/src/views/walk/ui/Icon.tsx#Icon',
   'apps/komorebi/src/views/walk/ui/music/MusicPlayer.tsx#MusicPlayer',
