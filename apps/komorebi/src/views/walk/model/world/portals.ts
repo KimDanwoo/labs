@@ -1,4 +1,6 @@
-import { WORLDS, canWalk, type Point, type Region } from './world';
+import { canWalk } from './movement';
+import { type Point, type Region } from './world';
+import { WORLDS } from './worlds';
 
 export type WorldPortal = {
   node: string;

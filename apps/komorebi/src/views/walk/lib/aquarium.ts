@@ -1,5 +1,5 @@
 import type { KeptFish } from './companions';
-import { FISH, FISH_SHAPE } from './fishing';
+import { FISH, FISH_SHAPE } from './fishTable';
 
 export const AQUARIUM_ART = '/art/aquarium-painted-v2.webp';
 export function aquariumFishArt(id: string) {

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { WORLDS, type Region } from '../model/world/world';
+import type { Region } from '../model/world/world';
+import { WORLDS } from '../model/world/worlds';
 
 type TextureSource = { loadAsync: (url: string) => Promise<THREE.Texture> };
 

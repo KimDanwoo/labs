@@ -1,5 +1,5 @@
 import { TIME_ORDER } from '../config/walk';
-import { LANDMARKS } from '../model/world/world';
+import { LANDMARKS } from '../model/world/landmarks';
 
 const ALL_PAGES = LANDMARKS.length * TIME_ORDER.length;
 

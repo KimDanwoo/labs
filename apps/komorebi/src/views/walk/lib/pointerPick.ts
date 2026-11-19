@@ -1,9 +1,11 @@
 import * as THREE from 'three';
 import { interactionDestination } from '../model/world/interactions';
-import type { WorldPortal } from '../model/world/portals';
-import { DESTINATIONS, canWalk, type Point, type Region } from '../model/world/world';
+import { DESTINATIONS } from '../model/world/landmarks';
+import { canWalk } from '../model/world/movement';
+import { type WorldPortal } from '../model/world/portals';
+import { type Point, type Region } from '../model/world/world';
 import { worldFromScene } from './perspective';
-import type { createPortals } from './portals';
+import { createPortals } from './portals';
 
 export type PickTarget = { point: Point; portal: WorldPortal | null; interactive: boolean };
 

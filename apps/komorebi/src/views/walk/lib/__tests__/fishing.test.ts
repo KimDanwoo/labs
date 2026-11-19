@@ -1,17 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  FIGHT_OUTCOME,
-  FISH,
-  FISH_TOTAL_WEIGHT,
-  addCatch,
-  fishSurge,
-  isBiteOnTime,
-  parseCollection,
-  rollCatch,
-  startFight,
-  stepFight,
-} from '../fishing';
+import { FIGHT_OUTCOME, fishSurge, startFight, stepFight } from '../fishFight';
+import { addCatch, isBiteOnTime, parseCollection, rollCatch } from '../fishing';
+import { FISH, FISH_TOTAL_WEIGHT } from '../fishTable';
 
 test('fishing draws common and rare fish at the pool boundaries', () => {
   assert.deepEqual(

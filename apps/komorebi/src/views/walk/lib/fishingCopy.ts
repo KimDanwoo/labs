@@ -1,5 +1,6 @@
 import { TENSION } from '../config/fishing';
-import { FISHING_PHASE, fishSurge, type Catch, type Fight, type FishingPhase } from './fishing';
+import { fishSurge, type Fight } from './fishFight';
+import { FISHING_PHASE, type Catch, type FishingPhase } from './fishing';
 
 interface MessageInput {
   phase: FishingPhase;

@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { canWalk, movePlayer } from '../movement';
 import { getWorldPortals, isInsidePortal, portalAt } from '../portals';
-import { WORLDS, canWalk, findRoute, movePlayer, type Region } from '../world';
+import { findRoute } from '../routing';
+import type { Region } from '../world';
+import { WORLDS } from '../worlds';
 
 const regions = Object.keys(WORLDS) as Region[];
 

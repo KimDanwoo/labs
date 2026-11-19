@@ -1,6 +1,6 @@
 import { TIME, WEATHER, type TimeOfDay, type Weather } from '../config/walk';
 import type { BallGame } from '../model/ballGame';
-import type { SchoolmateId } from '../model/schoolmates';
+import type { SchoolmateId } from '../model/schoolmateRoster';
 import type { Appearance } from '../model/world/appearance';
 import type { WorldPortal } from '../model/world/portals';
 import { REGION, SPAWN, type Point, type Region } from '../model/world/world';

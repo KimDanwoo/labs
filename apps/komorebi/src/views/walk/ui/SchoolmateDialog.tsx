@@ -3,7 +3,7 @@ import { SCHOOLMATE_GREETING } from '../config/schoolmate';
 import { TIME, type TimeOfDay } from '../config/walk';
 import { gameKey } from '../lib/input';
 import { useModal } from '../model/hooks/useModal';
-import { type SchoolRegion } from '../model/schoolmates';
+import { type SchoolRegion } from '../model/schoolmateRoster';
 import { Icon } from './Icon';
 
 interface SchoolmateDialogProps {

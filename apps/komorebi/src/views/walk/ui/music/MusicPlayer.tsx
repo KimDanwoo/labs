@@ -1,5 +1,5 @@
 import { useRef, useState, type JSX } from 'react';
-import { MUSIC_STATUS, musicTime, musicWidgetSrc } from '../../lib/music/soundcloud';
+import { MUSIC_STATUS, musicTime, musicWidgetSrc } from '../../lib/music/musicSettings';
 import { useMusicPlayer } from '../../model/hooks/music/useMusicPlayer';
 
 interface MusicPlayerProps {

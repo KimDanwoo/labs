@@ -1,7 +1,7 @@
+import { SCHOOL_REGION, SCHOOLMATES } from '@views/walk/model/schoolmateRoster';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { SCHOOL_REGION, SCHOOLMATES } from '../../model/schoolmates';
 import { createSchoolmates } from '../schoolmatesScene';
 
 const paint = { createRadialGradient: () => ({ addColorStop() {} }), fillRect() {} };

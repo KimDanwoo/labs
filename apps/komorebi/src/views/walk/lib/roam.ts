@@ -1,4 +1,6 @@
-import { WORLDS, findRoute, type Point, type Region } from '../model/world/world';
+import { findRoute } from '../model/world/routing';
+import { type Point, type Region } from '../model/world/world';
+import { WORLDS } from '../model/world/worlds';
 
 export function laneEnds(region: Region): Point[] {
   const { nodes, routes } = WORLDS[region];

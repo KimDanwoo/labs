@@ -1,16 +1,10 @@
 import * as THREE from 'three';
 import { isAtHomeBed, isNearHomeBed } from '../model/world/interactions';
+import { DESTINATIONS } from '../model/world/landmarks';
 import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '../model/world/portals';
-import {
-  DESTINATIONS,
-  REGION,
-  WORLDS,
-  findRoute,
-  isIndoors,
-  nextRegionStep,
-  type Point,
-  type Region,
-} from '../model/world/world';
+import { findRoute, nextRegionStep } from '../model/world/routing';
+import { REGION, isIndoors, type Point, type Region } from '../model/world/world';
+import { WORLDS } from '../model/world/worlds';
 import { SCENERY_STYLE } from './breeze';
 import { isAirborne } from './motion';
 import { lampUniforms } from './nightLights';

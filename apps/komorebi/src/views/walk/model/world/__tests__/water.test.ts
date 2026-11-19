@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { WATER } from '../water';
-import { WORLDS, type Region } from '../world';
+import type { Region } from '../world';
+import { WORLDS } from '../worlds';
 
 const inside = (outline: [number, number][], x: number, z: number) => {
   let isInside = false;

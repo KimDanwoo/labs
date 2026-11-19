@@ -1,7 +1,8 @@
+import { WORLDS } from '@views/walk/model/world/worlds';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { WORLDS, type Region } from '../../model/world/world';
+import type { Region } from '../../model/world/world';
 import { createRegionPlates, nearbyRegions } from '../regionPlates';
 
 test('nearby regions are the current painting and the ones its exits lead to', () => {

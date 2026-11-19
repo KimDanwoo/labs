@@ -1,6 +1,7 @@
+import { WORLDS } from '@views/walk/model/world/worlds';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { WORLDS, isIndoors } from '../../model/world/world';
+import { isIndoors } from '../../model/world/world';
 import { INDOOR_RAIN_ROOMS, WINDOW_RAIN_VELOCITY } from '../indoorWeather';
 
 test('every sheltered map has its own outdoor rain mask', () => {

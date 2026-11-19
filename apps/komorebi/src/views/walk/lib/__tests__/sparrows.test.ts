@@ -1,6 +1,8 @@
+import { canWalk } from '@views/walk/model/world/movement';
+import { findRoute } from '@views/walk/model/world/routing';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canWalk, findRoute, HOME, HOME_DOOR, SPAWN } from '../../model/world/world';
+import { HOME, HOME_DOOR, SPAWN } from '../../model/world/world';
 import { BIRD_STATE, startSparrow, stepSparrow } from '../sparrows';
 
 test('sparrows flee approaching feet, wait on their branch, then return once the lane is clear', () => {

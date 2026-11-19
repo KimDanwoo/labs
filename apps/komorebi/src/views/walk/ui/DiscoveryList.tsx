@@ -1,6 +1,6 @@
 import { TIME_ORDER, type TimeOfDay } from '../config/walk';
 import { keptLabel } from '../lib/discovery';
-import { LANDMARKS } from '../model/world/world';
+import { LANDMARKS } from '../model/world/landmarks';
 
 interface DiscoveryListProps {
   pages: Record<TimeOfDay, readonly string[]>;

@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 import { FOREGROUNDS } from '../model/world/foreground';
-import { DESTINATIONS, REGION, type Region } from '../model/world/world';
+import { DESTINATIONS } from '../model/world/landmarks';
+import { REGION, type Region } from '../model/world/world';
 import { canvasTexture } from './art';
 import { BACKGROUND_FRAGMENT, BACKGROUND_VERTEX } from './backgroundShader';
 import { SCENERY_STYLE } from './breeze';
 import { lampUniforms } from './nightLights';
 import { paintingToScene, sceneToUv, sceneX, sceneY } from './perspective';
-import type { createWaterMaps } from './water';
+import { createWaterMaps } from './water';
 
 const SHADOW_ORDER = 3;
 const MARKER_ORDER = 2;

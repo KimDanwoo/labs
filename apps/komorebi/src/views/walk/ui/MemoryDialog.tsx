@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { TIME_ORDER } from '../config/walk';
 import { useModal } from '../model/hooks/useModal';
 import type { Memory } from '../model/types/memory';
-import { LANDMARKS } from '../model/world/world';
+import { LANDMARKS } from '../model/world/landmarks';
 import { Icon } from './Icon';
 
 interface MemoryDialogProps {

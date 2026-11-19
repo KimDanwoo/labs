@@ -1,7 +1,10 @@
+import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT } from '@views/walk/model/world/landmarks';
+import { canWalk } from '@views/walk/model/world/movement';
+import { findRoute } from '@views/walk/model/world/routing';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as THREE from 'three';
-import { FISHING_PIER, HOME, HOME_AQUARIUM, PIER_CAT, canWalk, findRoute } from '../../model/world/world';
+import { HOME } from '../../model/world/world';
 import { catPosition, createCompanionScene } from '../companionScene';
 import {
   BAG_CAPACITY,
