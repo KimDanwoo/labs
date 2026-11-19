@@ -1,6 +1,6 @@
 import { Bookmark, BookOpen, GraduationCap, Search, User, type LucideIcon } from 'lucide-react';
 
-interface NavItem {
+export interface NavItem {
   href: string;
   label: string;
   icon: LucideIcon;
