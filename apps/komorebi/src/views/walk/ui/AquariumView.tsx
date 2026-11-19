@@ -30,7 +30,6 @@ export function AquariumView({ fish, isFeeding }: AquariumViewProps) {
             aria-label={`${FISH.find((entry) => entry.id === item.id)?.name}, ${item.size} cm 자세히 보기`}
             onClick={() => setSelected(item.uid)}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={aquariumFishArt(item.id).src} alt="" draggable={false} />
           </button>
         ))}

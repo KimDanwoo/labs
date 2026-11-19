@@ -32,7 +32,6 @@ export function ArchiveRecord({ track, position }: Props): JSX.Element {
         aria-label={`${track.title} 감상`}
       >
         <div className="record-art relative aspect-square overflow-hidden bg-hairline-soft">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={artworkUrl(track, 't500x500')}
             alt=""
