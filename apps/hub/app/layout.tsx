@@ -9,6 +9,7 @@ const SITE_DESCRIPTION = '아이디어를 구현해요';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  alternates: { canonical: '/' },
   title: { default: SITE_NAME, template: `%s · ${SITE_NAME}` },
   description: SITE_DESCRIPTION,
   openGraph: {
