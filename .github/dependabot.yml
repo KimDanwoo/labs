@@ -8,3 +8,11 @@ updates:
     groups:
       github-actions:
         patterns: ['*']
+  # npm 의존성은 pnpm catalog(pnpm-workspace.yaml)째 올린다 — 부·패치는 한 PR, 주 버전은 따로
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm-minor-patch:
+        update-types: ['minor', 'patch']
