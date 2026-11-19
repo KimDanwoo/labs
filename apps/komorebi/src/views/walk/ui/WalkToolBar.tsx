@@ -1,28 +1,12 @@
-import { TIME_LABEL, type TimeOfDay } from '../config/walk';
+import { DIALOG, TIME_LABEL } from '../config/walk';
+import { useWalkContext } from '../model/hooks/useWalkContext';
 import { Icon } from './Icon';
 import { TIME_ICON } from './timeIcon';
 
-interface ToolBarProps {
-  timeOfDay: TimeOfDay;
-  isRaining: boolean;
-  isSoundOn: boolean;
-  isReady: boolean;
-  onToggleSound: () => void;
-  onPhoto: () => void;
-  onOpenMap: () => void;
-  onOpenWardrobe: () => void;
-}
-
-export function ToolBar({
-  timeOfDay,
-  isRaining,
-  isSoundOn,
-  isReady,
-  onToggleSound,
-  onPhoto,
-  onOpenMap,
-  onOpenWardrobe,
-}: ToolBarProps) {
+export function WalkToolBar() {
+  const { timeOfDay, isRaining, ambience, isReady: isSceneReady, isBusy, takePhoto, openDialog } = useWalkContext();
+  const isSoundOn = ambience.isOn;
+  const isReady = isSceneReady && !isBusy;
   const soundLabel = isSoundOn ? '자연 소리 끄기' : '자연 소리 켜기';
   return (
     <nav className="tools" aria-label="산책 설정">
@@ -40,7 +24,7 @@ export function ToolBar({
         title={soundLabel}
         aria-label={soundLabel}
         aria-pressed={isSoundOn}
-        onClick={onToggleSound}
+        onClick={ambience.toggle}
       >
         <Icon name={isSoundOn ? 'sound' : 'mute'} />
       </button>
@@ -50,11 +34,17 @@ export function ToolBar({
         title="산책 옷 고르기"
         aria-label="산책 옷 고르기"
         disabled={!isReady}
-        onClick={onOpenWardrobe}
+        onClick={() => openDialog(DIALOG.wardrobe)}
       >
         <Icon name="shirt" />
       </button>
-      <button className="tool" title="풍경 사진 저장" aria-label="풍경 사진 저장" disabled={!isReady} onClick={onPhoto}>
+      <button
+        className="tool"
+        title="풍경 사진 저장"
+        aria-label="풍경 사진 저장"
+        disabled={!isReady}
+        onClick={takePhoto}
+      >
         <Icon name="camera" />
       </button>
       <button
@@ -62,7 +52,7 @@ export function ToolBar({
         title="산책 지도 (M)"
         aria-label="산책 지도 열기"
         disabled={!isReady}
-        onClick={onOpenMap}
+        onClick={() => openDialog(DIALOG.map)}
       >
         <Icon name="map" />
       </button>

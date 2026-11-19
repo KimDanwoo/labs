@@ -1,8 +1,8 @@
-interface LoadingOverlayProps {
-  error: string;
-}
+import { useWalkContext } from '../model/hooks/useWalkContext';
 
-export function LoadingOverlay({ error }: LoadingOverlayProps) {
+export function WalkLoading() {
+  const { isReady, error } = useWalkContext();
+  if (isReady) return null;
   return (
     <div className="loading">
       <p>{error || '여름을 한 장씩 펼치고 있어요…'}</p>

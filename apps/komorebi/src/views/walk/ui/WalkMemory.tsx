@@ -1,19 +1,15 @@
 import { useId } from 'react';
-import { TIME_ORDER } from '../config/walk';
+import { DIALOG, TIME_ORDER } from '../config/walk';
 import { useModal } from '../model/hooks/useModal';
-import type { Memory } from '../model/types/memory';
+import { useWalkContext } from '../model/hooks/useWalkContext';
 import { LANDMARKS } from '../model/world/landmarks';
 import { Icon } from './Icon';
 
-interface MemoryDialogProps {
-  isOpen: boolean;
-  memory: Memory | null;
-  pageCount: number;
-  onClose: () => void;
-}
-
-export function MemoryDialog({ isOpen, memory, pageCount, onClose }: MemoryDialogProps) {
-  const ref = useModal(isOpen);
+export function WalkMemory() {
+  const { dialog, memory, collection, closeDialog } = useWalkContext();
+  const pageCount = collection.pageCount;
+  const onClose = () => closeDialog(DIALOG.memory);
+  const ref = useModal(dialog === DIALOG.memory);
   const titleId = useId();
   const hasSeveralPages = (memory?.pages.length ?? 0) > 1;
   return (

@@ -1,27 +1,14 @@
 import type { JSX } from 'react';
-import type { NearbySpots } from '../model/hooks/useWalkInteraction';
-import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT, type Landmark } from '../model/world/landmarks';
+import { useWalkContext } from '../model/hooks/useWalkContext';
+import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT } from '../model/world/landmarks';
 import { CLASSROOM_BOARD, HOME_DESK, HOME_WARDROBE } from '../model/world/world';
 import { InteractPrompt } from './InteractPrompt';
 
-interface InteractPromptsProps {
-  isPaused: boolean;
-  spots: NearbySpots;
-  friendName: string | undefined;
-  nearby: Landmark | null;
-  promptHint: (landmark: Landmark) => string;
-  onInteract: () => void;
-}
-
-export function InteractPrompts({
-  isPaused,
-  spots,
-  friendName,
-  nearby,
-  promptHint,
-  onInteract,
-}: InteractPromptsProps): JSX.Element | null {
+export function WalkPrompts(): JSX.Element | null {
+  const { isPaused, spots, nearbyFriend, status, promptHint, interact: onInteract } = useWalkContext();
   if (isPaused) return null;
+  const friendName = nearbyFriend?.name;
+  const nearby = status.nearby;
   const { isNearDesk, isNearWardrobe, isNearBoard, isAtPier, isNearCat, isNearAquarium } = spots;
   const isNearPlace = !friendName && !isAtPier && !isNearCat && !isNearAquarium && !isNearBoard;
   return (
