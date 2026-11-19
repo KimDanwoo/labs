@@ -1,5 +1,5 @@
-import { terrainHeightAt } from '../../config/scene';
 import { GATES } from '../../model/exploration/world';
+import { terrainHeightAt } from '../scene/terrain';
 
 export const centers = GATES.map((gate) => ({
   x: gate.x,

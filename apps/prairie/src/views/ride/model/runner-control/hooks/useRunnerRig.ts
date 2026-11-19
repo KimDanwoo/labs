@@ -1,39 +1,18 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
-import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three';
+import { Group, Vector3 } from 'three';
 
-import {
-  CAMERA,
-  CINEMATIC,
-  coastDistanceAt,
-  distanceToRiver,
-  groundHeightAt,
-  RIVER,
-  riverBearing,
-  riverWidthAt,
-  terrainHeightAt,
-  waterDepthAt,
-} from '../../../config/scene';
-import {
-  camDirVec,
-  desiredCam,
-  desiredTarget,
-  forwardVec,
-  FOV_RESPONSE,
-  RIG,
-  smoothTarget,
-  SPRINT_FOV_BOOST,
-} from '../../../lib/runner-control/runnerRig';
-import { FLORA, pushOutOfFlora } from '../../flora/constants';
+import { CINEMATIC, RIVER } from '../../../config/scene';
+import { RIG } from '../../../lib/runner-control/runnerRig';
+import { coastDistanceAt, distanceToRiver, riverBearing, riverWidthAt } from '../../../lib/scene/terrain';
 import { CAMERA_MODE, CAMERA_PRESETS } from '../../ride-settings/constants';
 import { cameraSettings } from '../../ride-settings/store/cameraSettings';
 import { setRideRiver } from '../../ride-state/rideStore';
-import { setRideTelemetry } from '../../ride-state/rideTelemetry';
-import { runnerState } from '../../ride-state/runnerState';
-import { RUNNER_PHYSICS } from '../constants';
-import { createDashState, DASH_SKILL, updateDash } from '../services/dashSkill';
-import { createFlightState, updateFlight } from '../services/flightDynamics';
-import { createSpinState, updateSpin } from '../services/spinSkill';
+import { createDashState } from '../services/dashSkill';
+import { createFlightState } from '../services/flightDynamics';
+import { followRunnerCamera } from '../services/runnerCamera';
+import { advanceRunner } from '../services/runnerMotion';
+import { createSpinState } from '../services/spinSkill';
 import { getRunnerInput } from '../store/runnerInput';
 import { usePointerLook } from './usePointerLook';
 import { useRunnerControls } from './useRunnerControls';
@@ -65,8 +44,8 @@ export function useRunnerRig() {
 
   useFrame((state, rawDelta) => {
     const delta = Math.min(rawDelta, RIG.maxFrameDelta);
-    const { forward, backward, left, right, sprint, jump, spin, dash, descend } = getRunnerInput();
-    const physics = RUNNER_PHYSICS;
+    const input = getRunnerInput();
+    const { forward, backward, left, right, jump, dash } = input;
     const now = state.clock.elapsedTime;
     let cameraSetting = cameraSettings.get();
     if (cameraSetting.mode === CAMERA_MODE.hero && (forward || backward || left || right || jump || dash)) {
@@ -80,155 +59,34 @@ export function useRunnerRig() {
     }
     const cameraPreset = CAMERA_PRESETS[cameraSetting.mode];
 
-    const air = airborneRef.current;
-    const isGrounded = air.height <= 0;
-    updateDash(dashRef.current, dash, air.height, delta);
-    runnerState.dashStrength = dashRef.current.strength;
-    updateSpin(spinRef.current, spin, air.height, delta);
-    runnerState.isSpinning = spinRef.current.active;
-    runnerState.spinAngle = spinRef.current.angle;
-    if (rollRef.current) rollRef.current.rotation.z = spinRef.current.angle;
-
-    // 말은 하상 프로파일을 따라 골로 내려가고, 수심에 비례해 최고속도가 떨어진다. 공중에선 물이 발에 안 닿으니 감속 없음.
-    const waterDepth = waterDepthAt(positionRef.current.x, positionRef.current.z);
-    const wade = isGrounded ? Math.min(waterDepth / RIVER.wadeDepthRef, 1) : 0;
-    const maxSpeed = physics.maxSpeed * MathUtils.lerp(1, RIVER.wadeSpeedScale, wade);
-
-    // 질주: 최고속도·가속 배율. 발동 순간 돌풍 파동 원점을 기록한다.
-    const isSprinting = sprint && forward;
-    if (isSprinting && !wasSprintingRef.current) {
-      runnerState.gustOrigin.set(positionRef.current.x, positionRef.current.z);
-      runnerState.gustStartedAt = now;
-    }
-    wasSprintingRef.current = isSprinting;
-    const sprintMax = isSprinting ? physics.sprintMaxMultiplier : 1;
-    const sprintAccel = isSprinting ? physics.sprintAccelMultiplier : 1;
-
-    let speed = speedRef.current;
-    if (forward) speed += physics.accel * sprintAccel * delta;
-    else if (backward) speed -= physics.brake * delta;
-    else {
-      const drag = physics.coastDecel * (isGrounded ? 1 : RIG.airborneDragFactor) * delta;
-      speed -= MathUtils.clamp(speed, -drag, drag);
-    }
-    const normalMax = maxSpeed * sprintMax;
-    const dashSpeed = MathUtils.lerp(normalMax, DASH_SKILL.speed, dashRef.current.strength);
-    if (dashRef.current.active) speed = Math.max(speed, DASH_SKILL.speed * dashRef.current.strength);
-    // 부스트가 끝나면 속도를 즉시 자르지 않고 일반 최고속도로 감속한다.
-    const speedLimit = Math.max(dashSpeed, speedRef.current - physics.brake * delta);
-    speed = MathUtils.clamp(speed, -physics.maxReverse, speedLimit);
-    speedRef.current = speed;
-
-    const steer = (left ? 1 : 0) - (right ? 1 : 0);
-    const direction = speed < 0 ? -1 : 1;
-    const turnAuthority = MathUtils.clamp(Math.abs(speed) / RIG.fullTurnSpeed, physics.turnFloor, 1);
-    headingRef.current +=
-      steer *
-      physics.steerRate *
-      delta *
-      turnAuthority *
-      direction *
-      (1 - dashRef.current.strength * RIG.dashSteerDamping);
-    const heading = headingRef.current;
-
-    forwardVec.set(Math.sin(heading), 0, Math.cos(heading));
-    const position = positionRef.current;
-    position.addScaledVector(forwardVec, speed * delta);
-    // 줄기·바위 충돌: 밀어내고 속도를 깎는다. 줄기 높이 위로 날면 통과.
-    if (air.height < FLORA.trunk.height && pushOutOfFlora(position) > 0)
-      speedRef.current = speed * RIG.collisionSpeedFactor;
-
-    // 이동과 충돌 보정 뒤의 위치에서 지면을 샘플링해 발이 언덕에 묻히지 않게 한다.
-    // Buoyancy keeps the horse above deep water instead of walking along the seabed.
-    const currentWaterDepth = waterDepthAt(position.x, position.z);
-    const bedY = groundHeightAt(position.x, position.z);
-    const groundY = currentWaterDepth > 0 ? Math.max(bedY, -RIVER.waterDrop - RIG.floatClearance) : bedY;
-    const impact = updateFlight(
-      air,
+    const motion = advanceRunner(
       {
-        lift: jump,
-        launch: jump && !wasJumpPressedRef.current,
-        descend,
-        holdAltitude: spinRef.current.active || dashRef.current.active,
-        speed: speedRef.current,
+        rootRef,
+        rollRef,
+        speedRef,
+        dashRef,
+        spinRef,
+        headingRef,
+        positionRef,
+        airborneRef,
+        wasSprintingRef,
+        wasJumpPressedRef,
+        telemetryAtRef,
       },
-      groundY,
+      input,
+      delta,
+      now,
+    );
+    const { position } = motion;
+    const camYaw = followRunnerCamera(
+      { viewYawRef, viewPitchRef, restingYawRef, initializedRef },
+      camera,
+      state.camera,
+      cameraPreset,
+      motion,
+      dashRef.current.strength,
       delta,
     );
-    wasJumpPressedRef.current = jump;
-    if (impact !== null) {
-      runnerState.landedAt = now;
-      runnerState.landingImpact = impact;
-    }
-    const visualY = groundY + air.height;
-    const root = rootRef.current;
-    if (root) {
-      root.position.copy(position).setY(visualY);
-      root.rotation.y = heading;
-    }
-
-    runnerState.position.copy(position).setY(visualY);
-    runnerState.heading = heading;
-    runnerState.speed = speedRef.current;
-    runnerState.waterDepth = currentWaterDepth;
-    runnerState.isSprinting = isSprinting;
-    runnerState.airborneHeight = air.height;
-    runnerState.verticalSpeed = air.velocity;
-    if (now - telemetryAtRef.current > RIG.telemetryIntervalS) {
-      setRideTelemetry(speedRef.current, air.height);
-      telemetryAtRef.current = now;
-    }
-
-    const frameCamera = state.camera;
-    if (frameCamera instanceof PerspectiveCamera) {
-      const targetFov =
-        CAMERA.fov + Math.max(isSprinting ? SPRINT_FOV_BOOST : 0, dashRef.current.strength * DASH_SKILL.fovBoost);
-      const nextFov = MathUtils.damp(frameCamera.fov, targetFov, FOV_RESPONSE, delta);
-      if (Math.abs(nextFov - frameCamera.fov) > RIG.fovEpsilon) {
-        frameCamera.fov = nextFov;
-        frameCamera.updateProjectionMatrix();
-      }
-    }
-
-    // 카메라 방향 = 말의 heading + 마우스 드래그 yaw 오프셋(말은 heading 그대로, 카메라만 좌우로 돈다).
-    restingYawRef.current = MathUtils.damp(
-      restingYawRef.current,
-      cameraPreset.yaw * (1 - MathUtils.smoothstep(Math.abs(speed), RIG.restingYawFade.from, RIG.restingYawFade.to)),
-      CINEMATIC.camera.response,
-      delta,
-    );
-    const camYaw = heading + viewYawRef.current + restingYawRef.current;
-    camDirVec.set(Math.sin(camYaw), 0, Math.cos(camYaw));
-    const speedFraming = MathUtils.clamp(Math.abs(speed) / RIG.framing.fullSpeed, 0, 1);
-    desiredCam
-      .copy(position)
-      .addScaledVector(camDirVec, -(cameraPreset.distance + speedFraming * RIG.framing.distance))
-      .setY(
-        visualY +
-          cameraPreset.height +
-          viewPitchRef.current * cameraPreset.distance +
-          speedFraming * RIG.framing.height,
-      );
-    // 말 뒤 언덕이 솟아 있으면 카메라가 지면 아래로 묻힌다 → 그 자리 지형 위 최소 높이를 보장.
-    desiredCam.y = Math.max(desiredCam.y, terrainHeightAt(desiredCam.x, desiredCam.z) + CAMERA.groundClearance);
-    desiredTarget
-      .copy(position)
-      .addScaledVector(forwardVec, speedFraming * RIG.framing.lookAhead)
-      .setY(cameraPreset.targetHeight + visualY);
-
-    if (!initializedRef.current) {
-      camera.position.copy(desiredCam);
-      smoothTarget.copy(desiredTarget);
-      initializedRef.current = true;
-    } else {
-      camera.position.lerp(desiredCam, 1 - Math.pow(1 - CAMERA.positionLerp, delta * RIG.lerpFrameRate));
-      smoothTarget.lerp(desiredTarget, 1 - Math.pow(1 - CAMERA.targetLerp, delta * RIG.lerpFrameRate));
-    }
-    // Smoothing must never move the actual camera through a hill.
-    camera.position.setY(
-      Math.max(camera.position.y, terrainHeightAt(camera.position.x, camera.position.z) + CAMERA.groundClearance),
-    );
-    camera.lookAt(smoothTarget);
 
     setRideRiver(
       Math.max(0, distanceToRiver(position.x, position.z) - RIVER.halfWidth) * riverWidthAt(position.z),

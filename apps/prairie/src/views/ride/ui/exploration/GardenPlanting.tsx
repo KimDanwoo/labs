@@ -2,8 +2,8 @@
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { DoubleSide, InstancedMesh, Object3D } from 'three';
-import { terrainHeightAt } from '../../config/scene';
 import { flowerColors } from '../../lib/exploration/gardenPlanting';
+import { terrainHeightAt } from '../../lib/scene/terrain';
 import { LANDMARKS } from '../../model/exploration/world';
 export function GardenPlanting() {
   const blooms = useRef<InstancedMesh>(null),

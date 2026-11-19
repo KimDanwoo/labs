@@ -3,15 +3,9 @@
 import { useLowDetail } from '../../model/ride-state/sceneQuality';
 
 import { useFrame } from '@react-three/fiber';
-import {
-  coastDistanceAt,
-  distanceToRiver,
-  MEADOW_PATH,
-  meadowPathDistanceAt,
-  RIVER_TRENCH_HALF_WIDTH,
-  terrainHeightAt,
-} from '../../config/scene';
+import { MEADOW_PATH, RIVER_TRENCH_HALF_WIDTH } from '../../config/scene';
 import { makeFlowerGeometry } from '../../lib/flora/makeFlowerGeometry';
+import { coastDistanceAt, distanceToRiver, meadowPathDistanceAt, terrainHeightAt } from '../../lib/scene/terrain';
 
 import { useMemo, useRef } from 'react';
 import { InstancedMesh, Object3D } from 'three';

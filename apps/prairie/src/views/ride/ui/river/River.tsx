@@ -4,7 +4,8 @@ import { runnerState } from '../../model/ride-state/runnerState';
 import { useLowDetail } from '../../model/ride-state/sceneQuality';
 
 import { useFrame, useThree } from '@react-three/fiber';
-import { coastDistanceAt, FOG, nearestRiverX, RIVER, riverOffsetAt } from '../../config/scene';
+import { FOG, RIVER } from '../../config/scene';
+import { coastDistanceAt, nearestRiverX, riverOffsetAt } from '../../lib/scene/terrain';
 
 import { useLayoutEffect, useRef } from 'react';
 import { Group } from 'three';

@@ -7,16 +7,9 @@ import {
   Object3D,
   type ShaderMaterial,
 } from 'three';
-import {
-  coastDistanceAt,
-  distanceToRiver,
-  groundHeightAt,
-  MEADOW_PATH,
-  meadowPathDistanceAt,
-  RIVER,
-  RIVER_TRENCH_HALF_WIDTH,
-} from '../../config/scene';
+import { MEADOW_PATH, RIVER, RIVER_TRENCH_HALF_WIDTH } from '../../config/scene';
 import { clumpAt, makeRng } from '../../lib/grass/grassChunk';
+import { coastDistanceAt, distanceToRiver, groundHeightAt, meadowPathDistanceAt } from '../../lib/scene/terrain';
 import { GRASS_FIELD } from '../../model/grass/constants';
 
 type GrassChunkProps = {

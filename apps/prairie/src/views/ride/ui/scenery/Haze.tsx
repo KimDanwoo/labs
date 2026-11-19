@@ -3,8 +3,9 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import { BackSide, Color, MathUtils, Mesh, ShaderMaterial } from 'three';
-import { coastDistanceAt, HAZE, RIDGES, SCENE_COLORS } from '../../config/scene';
+import { HAZE, RIDGES, SCENE_COLORS } from '../../config/scene';
 import { makeRidgeTexture } from '../../lib/makeRidgeTexture';
+import { coastDistanceAt } from '../../lib/scene/terrain';
 import { CENTER_Y, FRAGMENT, HEIGHT, inlandFog, seaFog, VERTEX } from '../../lib/scenery/haze';
 
 export function Haze() {

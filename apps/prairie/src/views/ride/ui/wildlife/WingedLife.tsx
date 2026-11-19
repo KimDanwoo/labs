@@ -4,14 +4,14 @@ import { runnerState } from '../../model/ride-state/runnerState';
 import { useLowDetail } from '../../model/ride-state/sceneQuality';
 
 import { useFrame } from '@react-three/fiber';
+import { RIVER_TRENCH_HALF_WIDTH } from '../../config/scene';
 import {
   coastDistanceAt,
   distanceToRiver,
   nearestRiverX,
-  RIVER_TRENCH_HALF_WIDTH,
   riverWidthAt,
   terrainHeightAt,
-} from '../../config/scene';
+} from '../../lib/scene/terrain';
 
 import { useRef } from 'react';
 import { DoubleSide, InstancedMesh, Object3D } from 'three';

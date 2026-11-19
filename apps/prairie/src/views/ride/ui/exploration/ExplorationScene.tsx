@@ -3,8 +3,8 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { Vector3 } from 'three';
-import { terrainHeightAt } from '../../config/scene';
 import { centers } from '../../lib/exploration/explorationScene';
+import { terrainHeightAt } from '../../lib/scene/terrain';
 import {
   getExploration,
   loadExploration,

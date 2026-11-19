@@ -1,4 +1,18 @@
 // 강 배치 불변식 체크
+import {
+  coastDistanceAt,
+  distanceToRiver,
+  groundHeightAt,
+  nearestRiverX,
+  riverBearing,
+  riverBedDepthAt,
+  riverOffsetAt,
+  riverWaterDepthAt,
+  riverWidthAt,
+  terrainHeightAt,
+  waterBedDepthAt,
+  waterDepthAt,
+} from '@views/ride/lib/scene/terrain';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
@@ -8,27 +22,7 @@ import {
   grassViewRadius,
   type GrassQuality,
 } from '../../model/grass/constants';
-import {
-  coastDistanceAt,
-  distanceToRiver,
-  FOG,
-  groundHeightAt,
-  HAZE,
-  nearestRiverX,
-  OCEAN,
-  RIDGES,
-  RIVER,
-  RIVER_TRENCH_HALF_WIDTH,
-  riverBearing,
-  riverBedDepthAt,
-  riverOffsetAt,
-  riverWaterDepthAt,
-  riverWidthAt,
-  TERRAIN,
-  terrainHeightAt,
-  waterBedDepthAt,
-  waterDepthAt,
-} from '../scene';
+import { FOG, HAZE, OCEAN, RIDGES, RIVER, RIVER_TRENCH_HALF_WIDTH, TERRAIN } from '../scene';
 
 const QUALITIES = Object.keys(GRASS_QUALITY) as GrassQuality[];
 
