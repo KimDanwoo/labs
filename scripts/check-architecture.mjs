@@ -16,6 +16,7 @@ const UNSUPPORTED_WEIGHT = /\bfont-(?:thin|extralight|light|medium|extrabold|bla
 const DEPLOYMENT_ENABLED = { '**': false, main: true };
 const BUILD_FILTER = /--filter=(\S+)/;
 const COMPONENT_WRAPPER = /^(?:memo|forwardRef|dynamic|lazy|Object\.assign)$/;
+const MAX_COMPONENT_PROPS = 5;
 const STYLE_HOME =
   /^src\/app\/(?:globals\.css|styles\/[^/]+\.css)$|^src\/(?:views|features|entities)\/[^/]+\/styles\/[^/]+\.css$|^src\/(?:.*\/)?ui\/(?:.*\/)?[A-Z][A-Za-z0-9]*\.module\.css$/;
 
@@ -109,6 +110,45 @@ export function validateComponentModule(text, filename) {
       if (!isComponentOrHook(name, declaration.initializer, source))
         problems.push(`${name}: tsx 최상위에는 컴포넌트만 둔다. 상수는 config/, 상태 로직은 model/hooks로 옮긴다.`);
     }
+  }
+  return problems;
+}
+
+function propsMemberCounts(source) {
+  const counts = new Map();
+  for (const statement of source.statements) {
+    if (ts.isInterfaceDeclaration(statement)) counts.set(statement.name.text, statement.members.length);
+    if (ts.isTypeAliasDeclaration(statement) && ts.isTypeLiteralNode(statement.type))
+      counts.set(statement.name.text, statement.type.members.length);
+  }
+  return counts;
+}
+
+function componentPropsType(statement) {
+  if (ts.isFunctionDeclaration(statement) && statement.name && /^[A-Z]/.test(statement.name.text))
+    return { name: statement.name.text, type: statement.parameters[0]?.type };
+  if (!ts.isVariableStatement(statement)) return null;
+  const [declaration] = statement.declarationList.declarations;
+  const initializer = declaration?.initializer;
+  if (!declaration || !initializer || !/^[A-Z]/.test(declaration.name.getText())) return null;
+  if (!ts.isArrowFunction(initializer) && !ts.isFunctionExpression(initializer)) return null;
+  return { name: declaration.name.getText(), type: initializer.parameters[0]?.type };
+}
+
+export function validateComponentProps(text, filename) {
+  const source = ts.createSourceFile(filename, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const counts = propsMemberCounts(source);
+  const problems = [];
+  for (const statement of source.statements) {
+    const component = componentPropsType(statement);
+    if (!component?.type) continue;
+    const count = ts.isTypeLiteralNode(component.type)
+      ? component.type.members.length
+      : counts.get(component.type.getText(source));
+    if (count !== undefined && count > MAX_COMPONENT_PROPS)
+      problems.push(
+        `${component.name}: props ${count}개(최대 ${MAX_COMPONENT_PROPS}). 합성 컴포넌트로 나눈다 — Root가 모델을 받아 context로 내려주고 파트가 구독하거나, 내용은 children으로 조립한다.`,
+      );
   }
   return problems;
 }
@@ -234,7 +274,8 @@ export function checkRepository(root = ROOT) {
     const sources = [...walk(path.join(dir, 'src')), ...walk(path.join(dir, 'app'))];
     const appSources = sources.filter((f) => !f.includes(`${path.sep}__tests__${path.sep}`));
     for (const file of appSources.filter((f) => f.endsWith('.tsx') && f.startsWith(path.join(dir, 'src')))) {
-      for (const problem of validateComponentModule(readFileSync(file, 'utf8'), file))
+      const text = readFileSync(file, 'utf8');
+      for (const problem of [...validateComponentModule(text, file), ...validateComponentProps(text, file)])
         problems.push(`${path.relative(root, file)}: ${problem}`);
     }
     for (const problem of findMisplacedStyles(appSources.map((f) => path.relative(dir, f))))

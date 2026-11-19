@@ -104,6 +104,12 @@ apps/<app>/
 
 - **부모는 분기·합성, 자식은 구독·실행**: 메인 뷰는 블록 조합만, 각 블록 컴포넌트가 필요한 데이터를 직접 가져온다.
 - **표시-only 컴포넌트는 표시용 데이터만 props로** 받는다(도메인 상태를 알지 않는다). 예: `Card`/`Button`(`@shared/ui`), `ProjectCard`(`project`만 받음).
+- **props를 늘리지 말고 합성 컴포넌트로 나눈다**: 화면 상태를 중간 컴포넌트가 props로 릴레이하지 않는다. 호출부는 화면 목차처럼 읽혀야 한다.
+  - 모양: `<StudySession.Root session={session}>` 안에 `<StudySession.Header />`·`<StudySession.Card>…</StudySession.Card>`를 나열한다(fe-deep `views/learn`, komorebi `views/walk`, awesome-sudoku `shared/ui/icon-button`이 기준 예).
+  - 자리: 모델 훅 `model/hooks/useXxx.ts`가 상태를 조립하고, context는 `model/store/xxxContext.ts`, 구독 훅은 `model/hooks/useXxxContext.ts`(Root 밖에서 쓰면 throw)에 둔다. `XxxRoot.tsx`가 Provider를 연다 — 기본은 Root가 모델 훅을 직접 호출하고(상태 변화가 context 구독자만 다시 그리게), 상위 흐름이 이미 모델을 들고 분기에 쓰면(fe-deep `LearnPage`) Root가 그 모델을 prop으로 받는다. 파트는 `XxxPart.tsx` 한 파일에 하나씩, 묶음은 같은 폴더의 `xxx.ts`(shared 항목은 `index.ts`)에 `export const Xxx = { Root, Part… }`로 둔다.
+  - 파트 안의 하위 블록(`AtlasGuides`, `DiscoveryList`)도 같은 context를 구독해도 된다. 상태를 들고 마운트·리셋 시점이 중요한 HUD·리프(`CompanionPanel`, `KeywordHints` 등)는 표시용 props를 그대로 받고, 마운트 조건·`key`는 파트가 갖는다.
+  - 내용(아이콘·라벨·배지·버튼 묶음)은 prop이 아니라 children 파트로 조립한다. 버튼·입력 기본 속성은 `ComponentProps<'button'>`을 확장해 받는다.
+  - `pnpm lint`가 강제한다(`check-architecture.mjs`의 `validateComponentProps`): 컴포넌트 props는 최대 5개(확장한 기본 속성은 세지 않음).
 - **컴포넌트는 앱 안에 둔다**: 다른 앱에 같은 컴포넌트가 필요하면 그 앱으로 복사해 맞게 고친다. 공유 패키지로 올리지 않는다. 앱 안에서는 FSD 위치 규칙을 따른다.
 
 ## 코드 정돈 규칙
