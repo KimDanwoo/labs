@@ -3,18 +3,18 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputTypes';
-import type { SuspensionState } from './physics/physicsVehicle';
+import type { SuspensionState } from './physics/vehicleConfig';
 import {
-  ACTIONS,
-  DIE_RESPAWN_DELAY,
-  HONK_DURATION,
-  NIPPLE_JUMP_DURATION,
-  numberOrZero,
-  SUSPENSION_ACTIONS,
-  UNSTUCK_DELAY,
-  WHEEL_COUNT,
-  WHEEL_SUSPENSION_ACTIONS,
-  type PlayerSounds,
+    ACTIONS,
+    DIE_RESPAWN_DELAY,
+    HONK_DURATION,
+    NIPPLE_JUMP_DURATION,
+    numberOrZero,
+    SUSPENSION_ACTIONS,
+    UNSTUCK_DELAY,
+    WHEEL_COUNT,
+    WHEEL_SUSPENSION_ACTIONS,
+    type PlayerSounds,
 } from './playerConfig';
 import { readNipple, syncAfterPhysics } from './playerControls';
 import { registerDrivingSounds, registerPlayerSounds } from './playerSounds';
