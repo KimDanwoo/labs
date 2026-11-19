@@ -1,16 +1,15 @@
 import gsap from 'gsap';
-import { color, Fn, uniform, vec2, vec4 } from 'three/tsl';
+import { color, uniform, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
-import { INPUT_MODE } from './inputs/inputTypes';
 import {
   InteractivePoint,
   type InteractivePointOptions,
   type PointRegistry,
   type SharedParts,
 } from './interactivePoint';
-import { flippedUvTexture, KEY_ICON_RENDER_ORDER, KEY_ICON_SCALE } from './keyIcon';
+import { createKeyIcon, KEY_ICON_SCALE } from './keyIcon';
 import { lastVisiblePoint, nearbyPoints, needsRetest } from './pointProximity';
 import { TICK_ORDER } from './tickOrder';
 
@@ -33,7 +32,7 @@ export class InteractivePoints implements PointRegistry {
       frontColor,
       backColor: uniform(color('#251f2b')),
       playerPosition: uniform(vec2()),
-      keyIcon: this.#createKeyIcon(plane, frontColor),
+      keyIcon: createKeyIcon(plane, frontColor),
       sounds: {
         reveal: game.audio.register({
           group: 'reveal',
@@ -51,39 +50,6 @@ export class InteractivePoints implements PointRegistry {
     };
     this.#bindInteract();
     game.ticker.events.on('tick', () => this.update(), TICK_ORDER.interactivePoints);
-  }
-
-  #createKeyIcon(plane: THREE.PlaneGeometry, frontColor: SharedParts['frontColor']): THREE.Mesh {
-    const game = getGame();
-    const material = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: false });
-    const iconOutput = Fn(([iconAlpha]: [THREE.Node<'float'>]): THREE.Node<'vec4'> => {
-      iconAlpha.lessThan(0.5).discard();
-      return vec4(frontColor, 1);
-    });
-    const useIcon = (name: string): void => {
-      material.outputNode = iconOutput(flippedUvTexture(game.texture(name)));
-      material.needsUpdate = true;
-    };
-    material.outputNode = iconOutput(flippedUvTexture(game.texture('interactivePointsKeyIconEnterTexture')));
-
-    const mesh = new THREE.Mesh(plane, material);
-    mesh.renderOrder = KEY_ICON_RENDER_ORDER;
-    mesh.scale.setScalar(0);
-    mesh.position.z = 0.01;
-    mesh.visible = false;
-
-    const gamepadIcon = (): string =>
-      game.inputs.gamepad.type === 'xbox' ? 'interactivePointsKeyIconATexture' : 'interactivePointsKeyIconCrossTexture';
-    game.inputs.gamepad.events.on('typeChange', () => {
-      if (game.inputs.mode === INPUT_MODE.gamepad) useIcon(gamepadIcon());
-    });
-    game.inputs.modeEvents.on('change', () => {
-      const { mode } = game.inputs;
-      if (mode === INPUT_MODE.gamepad) useIcon(gamepadIcon());
-      else if (mode === INPUT_MODE.mouseKeyboard) useIcon('interactivePointsKeyIconEnterTexture');
-      else if (mode === INPUT_MODE.touch) mesh.visible = false;
-    });
-    return mesh;
   }
 
   #bindInteract(): void {

@@ -1,6 +1,5 @@
 import * as THREE from 'three/webgpu';
 
-import content from '../../../data/danwoo';
 import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
@@ -13,11 +12,10 @@ import {
   FAN_MASS,
   FAN_SPREAD,
   FAN_SWAY,
-  LINK_ELEVATION,
-  LINK_MODELS,
   RESET_SETTLE_FRAMES,
   UNLINKED_SIGNS,
 } from './socialAreaConfig';
+import { createSocialLinks, interactButtons } from './socialLinks';
 import { personalizeSocialSigns, recordSteleFrames, reshapeSocialPlaza } from './socialSigns';
 
 export class SocialArea extends Area {
@@ -32,7 +30,7 @@ export class SocialArea extends Area {
   constructor(model: THREE.Object3D) {
     super(model);
     personalizeSocialSigns(this.objects.items);
-    this.#createLinks();
+    createSocialLinks(this);
     this.#spawnerPosition = this.requireReference('onlyFans').position;
     const baseFan = this.#prepareBaseFan();
     this.#fans = Array.from({ length: FAN_COUNT }, () => this.#createFan());
@@ -51,33 +49,6 @@ export class SocialArea extends Area {
     reshapeSocialPlaza(this.model);
     recordSteleFrames(this.model);
     super.setObjects();
-  }
-
-  #interactButtons(): { onReveal: () => void; onConceal: () => void; onHide: () => void } {
-    const { interactiveButtons } = this.game.inputs;
-    return {
-      onReveal: () => interactiveButtons.addItems(['interact']),
-      onConceal: () => interactiveButtons.removeItems(['interact']),
-      onHide: () => interactiveButtons.removeItems(['interact']),
-    };
-  }
-
-  #createLinks(): void {
-    for (const link of content.social) {
-      const modelName = LINK_MODELS.get(link.name);
-      const object = this.objects.items.find((item) => item.visual?.object3D.name === modelName);
-      if (!object?.visual) continue;
-      const position = object.visual.object3D.position.clone();
-      position.y = LINK_ELEVATION;
-      this.game.interactivePoints.create({
-        position,
-        text: link.name,
-        align: link.align === 'left' ? 'left' : 'right',
-        state: 'concealed',
-        onInteract: () => window.open(link.url, '_blank', 'noopener,noreferrer'),
-        ...this.#interactButtons(),
-      });
-    }
   }
 
   #prepareBaseFan(): THREE.Object3D {
@@ -119,7 +90,7 @@ export class SocialArea extends Area {
       align: 'right',
       state: 'concealed',
       onInteract: () => this.#popFan(),
-      ...this.#interactButtons(),
+      ...interactButtons(this),
     });
   }
 

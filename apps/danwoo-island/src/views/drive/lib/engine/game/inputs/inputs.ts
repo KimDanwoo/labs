@@ -3,7 +3,7 @@ import { getGame } from '../gameContext';
 import { TICK_ORDER } from '../tickOrder';
 import { ObservableSet } from '../utilities/observableSet';
 import { Gamepad } from './gamepad';
-import { type ButtonState } from './gamepadMapping';
+import { listenGamepad, listenKeyboard, listenWheel } from './inputListeners';
 import {
   INPUT_MODE,
   isSameValue,
@@ -41,10 +41,10 @@ export class Inputs {
   readonly nipple = new Nipple();
 
   constructor(actions: readonly ActionDefinition[] = [], filters: readonly string[] = []) {
-    this.#listenKeyboard();
-    this.#listenGamepad();
+    listenKeyboard(this);
+    listenGamepad(this);
     this.#listenPointer();
-    this.#listenWheel();
+    listenWheel(this);
     this.#listenNipple();
     this.addActions(actions);
     for (const filter of filters) this.filters.add(filter);
@@ -150,36 +150,6 @@ export class Inputs {
     return { x: this.pointer.current.x, y: this.pointer.current.y };
   }
 
-  #listenKeyboard(): void {
-    this.keyboard.events.on('down', (code, key) => {
-      this.updateMode(INPUT_MODE.mouseKeyboard);
-      this.start(`Keyboard.${code}`);
-      this.start(`Keyboard.${key}`);
-    });
-    this.keyboard.events.on('up', (code, key) => {
-      this.updateMode(INPUT_MODE.mouseKeyboard);
-      this.end(`Keyboard.${code}`);
-      this.end(`Keyboard.${key}`);
-    });
-  }
-
-  #listenGamepad(): void {
-    const gamepadKey = (button: ButtonState): string => `Gamepad.${button.name}`;
-    this.gamepad.events.on('down', (button) => {
-      this.updateMode(INPUT_MODE.gamepad);
-      this.start(gamepadKey(button), button.value);
-    });
-    this.gamepad.events.on('up', (button) => {
-      this.updateMode(INPUT_MODE.gamepad);
-      this.end(gamepadKey(button));
-    });
-    this.gamepad.events.on('typeChange', () => this.updateMode(INPUT_MODE.gamepad));
-    this.gamepad.events.on('change', (button) => {
-      this.updateMode(INPUT_MODE.gamepad);
-      this.change(gamepadKey(button), button.value);
-    });
-  }
-
   #listenPointer(): void {
     this.pointer.events.on('down', () => {
       this.updateMode(this.#pointerMode());
@@ -190,13 +160,6 @@ export class Inputs {
       this.end('Pointer.any', this.#pointerPosition());
     });
     this.pointer.events.on('move', () => this.change('Pointer.any', this.#pointerPosition()));
-  }
-
-  #listenWheel(): void {
-    this.wheel.events.on('roll', (spin) => {
-      this.updateMode(INPUT_MODE.mouseKeyboard);
-      this.pulse('Wheel.roll', spin);
-    });
   }
 
   #listenNipple(): void {
