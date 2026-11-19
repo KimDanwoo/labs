@@ -7,8 +7,8 @@ packages:
 catalog:
   # framework / runtime
   next: 16.4.6
-  react: 19.2.8
-  react-dom: 19.2.8
+  react: 19.3.1
+  react-dom: 19.3.1
 
   # styling
   tailwindcss: ^4
@@ -19,12 +19,12 @@ catalog:
 
   # 3d (life-simulation 앱)
   three: 0.187.0
-  '@react-three/fiber': 9.7.0
-  '@react-three/drei': 10.7.8
+  '@react-three/fiber': 9.8.2
+  '@react-three/drei': 10.7.9
   '@types/three': 0.187.0
 
   # danwoo-island 월드 엔진 — folio-2025 lockfile과 같은 버전으로 고정
-  '@dimforge/rapier3d-compat': 0.19.3
+  '@dimforge/rapier3d-compat': 0.21.0
   gsap: 3.15.1
   howler: 2.2.4
   seedrandom: 3.0.5
@@ -32,34 +32,34 @@ catalog:
   '@types/howler': 2.2.13
   '@types/seedrandom': 3.0.8
   '@types/normalize-wheel': 1.0.4
-  draco3d: 1.5.7
+  draco3d: 1.5.9
 
   # tooling
   # TS 7은 코드상 통과하지만 typescript-eslint가 아직 미지원이라 보류(2026-08-30 확인).
   typescript: ^5
-  tsx: ^4.19.2
-  turbo: ^2.10.12
-  '@playwright/test': 1.64.0
-  prettier: ^3.4.2
+  tsx: ^4.23.15
+  turbo: ^2.11.11
+  '@playwright/test': 1.65.1
+  prettier: ^3.10.1
   # ESLint 10은 eslint-config-next가 번들하는 eslint-plugin-react가 미지원(2026-08-30 확인).
   eslint: ^9
   eslint-config-next: 16.4.6
 
   # lint / format 공유 설정(@repo/eslint-config, @repo/prettier-config)에서 사용
-  '@typescript-eslint/parser': ^8.68.0
+  '@typescript-eslint/parser': ^8.72.2
   eslint-config-prettier: ^10.1.8
   eslint-import-resolver-typescript: ^4.4.5
   eslint-plugin-boundaries: ^7.4.4
-  eslint-plugin-import-x: ^4.16.2
-  eslint-plugin-prettier: ^5.5.6
+  eslint-plugin-import-x: ^4.18.1
+  eslint-plugin-prettier: ^5.5.7
   prettier-plugin-organize-imports: ^4.3.0
 
   # build 분석 (awesome-sudoku)
-  '@next/bundle-analyzer': ^16.1.6
+  '@next/bundle-analyzer': ^16.4.6
 
   # test (vitest)
   vitest: ^4.1.12
-  '@vitejs/plugin-react': ^6.1.1
+  '@vitejs/plugin-react': ^6.3.0
   jsdom: ^30.0.1
   '@testing-library/jest-dom': ^7.0.1
   '@testing-library/react': ^16.3.3
@@ -72,9 +72,9 @@ catalog:
   # ui utilities (shared across apps)
   clsx: ^2.1.1
   class-variance-authority: ^0.7.1
-  radix-ui: ^1.4.3
-  tailwind-merge: ^3.6.0
-  lucide-react: ^1.37.0
+  radix-ui: ^1.8.1
+  tailwind-merge: ^3.7.0
+  lucide-react: ^1.73.0
   framer-motion: ^13.1.1
   next-themes: ^0.4.6
 
@@ -88,12 +88,12 @@ catalog:
   react-icons: ^5.5.0
 
   # backend / data
-  '@tanstack/react-query': ^5.100.14
+  '@tanstack/react-query': ^5.107.1
 
   # analytics
 
   # i18n / locale
-  korean-lunar-calendar: ^0.3.6
+  korean-lunar-calendar: ^0.4.0
 
   # image processing
   sharp: ^0.35.5
