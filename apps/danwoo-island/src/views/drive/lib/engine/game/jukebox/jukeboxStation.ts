@@ -1,16 +1,16 @@
 import gsap from 'gsap';
 import {
-    color,
-    Fn,
-    instancedBufferAttribute,
-    instanceIndex,
-    sin,
-    step,
-    texture,
-    uniform,
-    uv,
-    vec2,
-    vec4,
+  color,
+  Fn,
+  instancedBufferAttribute,
+  instanceIndex,
+  sin,
+  step,
+  texture,
+  uniform,
+  uv,
+  vec2,
+  vec4,
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
