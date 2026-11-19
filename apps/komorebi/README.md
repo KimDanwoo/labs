@@ -112,7 +112,10 @@ node apps/komorebi/e2e/serve.mjs apps/komorebi/out 3011
 - `src/app/globals.css`: 게임 HUD 스타일
 - `src/views/walk/ui`: HUD·지도·그림일기·추억·터치 조작 컴포넌트(`Walk`가 합성)
 - `src/views/walk/model`: 엔진 수명주기·발견 기록·소리·단축키 훅, localStorage 저장소, 상수·타입
-- `src/views/walk/lib/scene.ts`: 배경화 평면과 방향별 캐릭터 합성, 카메라, 이동, 지역 전환, 일시정지·렌더 예산
+- `src/views/walk/lib/scene.ts`: 장면을 조립하고 프레임 루프(렌더 예산)를 돌린다. 나머지는 역할별 파일로 나뉜다
+  - `sceneSetup.ts`(텍스처·렌더러·장면 요소 생성), `walkState.ts`(프레임 사이에 바뀌는 상태), `sceneContext.ts`(엔진 계약·공유 타입)
+  - `sceneTravel.ts`(목적지·포털·지역 전환·잠자리), `sceneInput.ts`(키보드·포인터), `scenePlayer.ts`(이동·캐릭터·카메라)
+  - `sceneWorld.ts`(표지·빛·배경·생물), `sceneStatus.ts`(상태 보고), `sceneControls.ts`(UI가 부르는 엔진 메서드)
 - `src/views/walk/lib/regionPlates.ts`: 지역 배경의 지연·순차 로딩과 해제(현재+이웃 지역만 유지, 요청 공유, 실패 시 재시도)
 - `src/views/walk/lib/child.ts`: 밀짚모자 캐릭터와 선택한 옷의 4방향 정지·보행·공중 원화 애니메이션
 - `src/views/walk/lib/audio.ts`: Web Audio 바람과 지역별 물·파도·매미, 노을·밤의 풀벌레, 빗소리, 바닥별 발소리, 장소 행동 효과음
