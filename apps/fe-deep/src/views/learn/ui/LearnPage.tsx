@@ -2,25 +2,26 @@
 
 import { PHASE } from '../model/constants/study';
 import { useLearnFlow } from '../model/hooks/useLearnFlow';
-import { StudyCardView } from './card/StudyCardView';
 import { LearnDone } from './LearnDone';
 import { LearnExitButton } from './LearnExitButton';
-import { LearnSetup } from './setup/LearnSetup';
+import { StudySession } from './session/studySession';
+import { StudySetup } from './setup/studySetup';
 
 export function LearnPage() {
   const flow = useLearnFlow();
-  const { session } = flow;
 
   if (flow.phase === PHASE.setup || flow.phase === PHASE.loading) {
     return (
-      <LearnSetup
-        categories={flow.categories}
-        isLoadingCategories={flow.isLoadingCategories}
-        initialSettings={flow.settings}
-        isStarting={flow.phase === PHASE.loading}
-        isEmpty={flow.isEmpty}
-        onStart={flow.startStudy}
-      />
+      <StudySetup.Root setup={flow.setup}>
+        <StudySetup.Intro />
+        <StudySetup.Form>
+          <StudySetup.Category />
+          <StudySetup.Order />
+          <StudySetup.Difficulty />
+          <StudySetup.Start />
+        </StudySetup.Form>
+        <StudySetup.Tip />
+      </StudySetup.Root>
     );
   }
 
@@ -29,23 +30,17 @@ export function LearnPage() {
   }
 
   return (
-    <StudyCardView
-      currentIndex={session.currentIndex}
-      totalCount={flow.questionCount}
-      currentQuestion={session.currentQuestion}
-      currentFollowUp={session.currentFollowUp}
-      stepIndex={session.stepIndex}
-      stepCount={session.stepCount}
-      isFlipped={session.isFlipped}
-      onFlip={() => session.setIsFlipped(true)}
-      progressPercent={session.progressPercent}
-      isNewCard={session.isNewCard}
-      onNext={session.handleNext}
-      onSkip={session.handleSkip}
-      onRetry={session.handleRetry}
-      recallInput={session.recallInput}
-      onRecallChange={session.setRecallInput}
-      headerAction={<LearnExitButton onExit={flow.backToSetup} />}
-    />
+    <StudySession.Root session={flow.session}>
+      <StudySession.Header>
+        <LearnExitButton onExit={flow.backToSetup} />
+      </StudySession.Header>
+      <StudySession.Card>
+        <StudySession.Badges />
+        <StudySession.Prompt />
+        <StudySession.Hints />
+        <StudySession.Response />
+      </StudySession.Card>
+      <StudySession.Actions />
+    </StudySession.Root>
   );
 }

@@ -3,6 +3,7 @@
 import { getLocalProgress, updateQuestionProgress } from '@entities/progress';
 import type { FollowUp, Question } from '@entities/question';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { getStepContent, type StepContent } from '../../lib/stepContent';
 import { PHASE, type StudyPhase } from '../constants/study';
 
 interface UseCardStudySessionOptions {
@@ -11,18 +12,21 @@ interface UseCardStudySessionOptions {
   onComplete: () => void;
 }
 
-interface CardStudySession {
+export interface CardStudySession {
   currentIndex: number;
+  totalCount: number;
   currentQuestion: Question | undefined;
   currentFollowUp: FollowUp | undefined;
+  content: StepContent;
   stepIndex: number;
   stepCount: number;
+  isLastStep: boolean;
   isFlipped: boolean;
-  setIsFlipped: (v: boolean) => void;
   recallInput: string;
   setRecallInput: (v: string) => void;
   progressPercent: number;
   isNewCard: boolean;
+  handleFlip: () => void;
   handleNext: () => void;
   handleSkip: () => void;
   handleRetry: () => void;
@@ -86,6 +90,8 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
     advance();
   }, [currentQuestion, advance]);
 
+  const handleFlip = useCallback(() => setIsFlipped(true), []);
+
   const handleRetry = useCallback(() => {
     setIsFlipped(false);
     setRecallInput('');
@@ -119,16 +125,19 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
 
   return {
     currentIndex,
+    totalCount: questions.length,
     currentQuestion,
     currentFollowUp,
+    content: getStepContent(currentQuestion, currentFollowUp),
     stepIndex,
     stepCount,
+    isLastStep: stepIndex + 1 >= stepCount,
     isFlipped,
-    setIsFlipped,
     recallInput,
     setRecallInput,
     progressPercent,
     isNewCard,
+    handleFlip,
     handleNext,
     handleSkip,
     handleRetry,

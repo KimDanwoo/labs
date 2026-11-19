@@ -1,16 +1,13 @@
 import { Button } from '@shared/ui/Button';
-import { FieldLabel } from './FieldLabel';
 
 import { STUDY_ORDER_OPTIONS } from '../../config/setup';
 import { selectedVariant } from '../../lib/selectedVariant';
-import type { StudyOrder } from '../../model/constants/study';
+import { useStudySetupContext } from '../../model/hooks/useStudySetupContext';
+import { FieldLabel } from './FieldLabel';
 
-interface OrderFieldProps {
-  value: StudyOrder;
-  onChange: (order: StudyOrder) => void;
-}
+export function StudySetupOrder() {
+  const { settings, changeSettings } = useStudySetupContext();
 
-export function OrderField({ value, onChange }: OrderFieldProps) {
   return (
     <div>
       <FieldLabel>순서</FieldLabel>
@@ -18,9 +15,9 @@ export function OrderField({ value, onChange }: OrderFieldProps) {
         {STUDY_ORDER_OPTIONS.map(({ value: option, label, Icon }) => (
           <Button
             key={option}
-            variant={selectedVariant(value === option)}
+            variant={selectedVariant(settings.order === option)}
             size="sm"
-            onClick={() => onChange(option)}
+            onClick={() => changeSettings({ order: option })}
             className="gap-1.5 transition-all duration-200"
           >
             <Icon className="h-3.5 w-3.5" />

@@ -8,6 +8,7 @@ import { loadStudyQuestions } from '../../api/loadStudyQuestions';
 import { CATEGORIES_QUERY_KEY } from '../../config/queryKeys';
 import { DEFAULT_SETTINGS, PHASE, type StudyPhase, type StudySettings } from '../constants/study';
 import { useCardStudySession } from './useCardStudySession';
+import type { StudySetupSource } from './useStudySetup';
 
 export function useLearnFlow() {
   const [phase, setPhase] = useState<StudyPhase>(PHASE.setup);
@@ -54,16 +55,14 @@ export function useLearnFlow() {
   if (categories.error) throw new Error('학습 카테고리를 불러오지 못했습니다.', { cause: categories.error });
   if (loadError) throw loadError;
 
-  return {
-    phase,
-    settings,
-    questionCount: questions.length,
-    streak,
-    isEmpty,
+  const setup: StudySetupSource = {
     categories: categories.data ?? [],
     isLoadingCategories: categories.isPending,
-    startStudy,
-    backToSetup,
-    session,
+    initialSettings: settings,
+    isStarting: phase === PHASE.loading,
+    isEmpty,
+    onStart: startStudy,
   };
+
+  return { phase, questionCount: questions.length, streak, backToSetup, setup, session };
 }

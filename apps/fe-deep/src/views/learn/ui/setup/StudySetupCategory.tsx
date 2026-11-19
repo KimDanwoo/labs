@@ -1,23 +1,22 @@
-import type { Category } from '@entities/question';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/Select';
-import { FieldLabel } from './FieldLabel';
 
 import { ALL_CATEGORIES } from '../../model/constants/study';
+import { useStudySetupContext } from '../../model/hooks/useStudySetupContext';
+import { FieldLabel } from './FieldLabel';
 
-interface CategoryFieldProps {
-  categories: Category[];
-  value: string;
-  isLoading: boolean;
-  onChange: (categorySlug: string) => void;
-}
+export function StudySetupCategory() {
+  const { categories, isLoadingCategories, settings, changeSettings } = useStudySetupContext();
 
-export function CategoryField({ categories, value, isLoading, onChange }: CategoryFieldProps) {
   return (
     <div>
       <FieldLabel>카테고리</FieldLabel>
-      <Select value={value} onValueChange={onChange} disabled={isLoading}>
+      <Select
+        value={settings.categorySlug}
+        onValueChange={(categorySlug) => changeSettings({ categorySlug })}
+        disabled={isLoadingCategories}
+      >
         <SelectTrigger>
-          <SelectValue placeholder={isLoading ? '카테고리 불러오는 중...' : '카테고리 선택'} />
+          <SelectValue placeholder={isLoadingCategories ? '카테고리 불러오는 중...' : '카테고리 선택'} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL_CATEGORIES}>전체 카테고리</SelectItem>

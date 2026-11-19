@@ -1,16 +1,14 @@
-import { DIFFICULTY_CONFIG, DIFFICULTY_VALUES, type Difficulty } from '@entities/question';
+import { DIFFICULTY_CONFIG, DIFFICULTY_VALUES } from '@entities/question';
 import { Button } from '@shared/ui/Button';
-import { FieldLabel } from './FieldLabel';
 
 import { selectedVariant } from '../../lib/selectedVariant';
+import { useStudySetupContext } from '../../model/hooks/useStudySetupContext';
+import { FieldLabel } from './FieldLabel';
 
-interface DifficultyFieldProps {
-  selected: Difficulty[];
-  onToggle: (difficulty: Difficulty) => void;
-  onClear: () => void;
-}
+export function StudySetupDifficulty() {
+  const { settings, changeSettings, toggleDifficulty } = useStudySetupContext();
+  const selected = settings.difficulties;
 
-export function DifficultyField({ selected, onToggle, onClear }: DifficultyFieldProps) {
   return (
     <div>
       <FieldLabel>난이도</FieldLabel>
@@ -18,7 +16,7 @@ export function DifficultyField({ selected, onToggle, onClear }: DifficultyField
         <Button
           variant={selectedVariant(selected.length === 0)}
           size="sm"
-          onClick={onClear}
+          onClick={() => changeSettings({ difficulties: [] })}
           className="transition-all duration-200"
         >
           전체
@@ -28,7 +26,7 @@ export function DifficultyField({ selected, onToggle, onClear }: DifficultyField
             key={difficulty}
             variant={selectedVariant(selected.includes(difficulty))}
             size="sm"
-            onClick={() => onToggle(difficulty)}
+            onClick={() => toggleDifficulty(difficulty)}
             className="transition-all duration-200"
           >
             {DIFFICULTY_CONFIG[difficulty].label}
