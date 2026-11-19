@@ -63,7 +63,7 @@ export class Ticker {
       const wait = this.#waits[index];
       if (!wait) continue;
       wait.remaining -= 1;
-      if (wait.remaining !== 0) continue;
+      if (wait.remaining > 0) continue;
       wait.callback();
       this.#waits.splice(index, 1);
       index -= 1;
