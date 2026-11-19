@@ -20,6 +20,7 @@
     "eslint-import-resolver-typescript": "catalog:",
     "eslint-plugin-boundaries": "catalog:",
     "eslint-plugin-prettier": "catalog:",
+    "prettier": "catalog:",
     "typescript": "catalog:"
   }
 }
