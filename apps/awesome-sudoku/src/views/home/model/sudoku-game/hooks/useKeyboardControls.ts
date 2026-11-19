@@ -1,5 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
+import { isBoardShortcut } from '../../../lib/keyboardTarget';
 import { handleKeyInputAtom } from '../../store/keyboardAtoms';
 import { selectedCellAtom } from '../../store/primitives';
 
@@ -29,7 +30,7 @@ export const useKeyboardControls = () => {
         'Delete',
       ];
 
-      if (validKeys.includes(event.key)) {
+      if (validKeys.includes(event.key) && isBoardShortcut(event)) {
         event.preventDefault();
 
         handleKeyInput(event.key);

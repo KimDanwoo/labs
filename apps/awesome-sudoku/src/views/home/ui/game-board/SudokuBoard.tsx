@@ -27,7 +27,7 @@ export const SudokuBoard: React.FC = () => {
       <div className="relative bg-surface-primary overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
         {gameMode === GAME_MODE.KILLER && <KillerCage />}
 
-        <table aria-label="스도쿠 보드" className="border-collapse bg-surface-primary">
+        <table role="grid" aria-label="스도쿠 보드" className="border-collapse bg-surface-primary">
           <tbody>
             {board.map((row, rowIndex) => (
               <BoardRow key={`row-${rowIndex}`} row={row} rowIndex={rowIndex} onSelect={handleSelectCell} />

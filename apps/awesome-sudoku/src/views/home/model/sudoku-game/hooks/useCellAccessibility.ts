@@ -9,6 +9,7 @@ interface UseCellAccessibilityProps {
   gameMode: GameMode;
   isNoteMode: boolean;
   timerActive: boolean;
+  hasSelection: boolean;
 }
 
 export const useCellAccessibility = ({
@@ -18,6 +19,7 @@ export const useCellAccessibility = ({
   gameMode,
   isNoteMode,
   timerActive,
+  hasSelection,
 }: UseCellAccessibilityProps) => {
   const ariaLabel = useMemo(() => {
     const position = `${row + 1}행 ${col + 1}열`;
@@ -37,8 +39,9 @@ export const useCellAccessibility = ({
 
   const tabIndex = useMemo(() => {
     if (!timerActive) return -1;
-    return row === 0 && col === 0 ? 0 : -1;
-  }, [row, col, timerActive]);
+    const isEntryCell = hasSelection ? cell.isSelected : row === 0 && col === 0;
+    return isEntryCell ? 0 : -1;
+  }, [row, col, timerActive, hasSelection, cell.isSelected]);
 
   return {
     ariaLabel,

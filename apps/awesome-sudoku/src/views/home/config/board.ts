@@ -9,3 +9,7 @@ export const SUDOKU_CELL_COUNT = 81;
 export const DEFAULT_CELL_SIZE = 40;
 
 export const EMPTY_HIGHLIGHT = { selected: false, related: false, sameValue: false } as const;
+
+export const KEYBOARD_IGNORED_TARGETS = 'input, textarea, select, [contenteditable="true"], [role="dialog"]';
+
+export const CELL_FOCUS_RING = 'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent';

@@ -1,4 +1,5 @@
 import { cn } from '@shared/lib/cn';
+import { CELL_FOCUS_RING } from '../../config/board';
 import type { CellHighlight } from '../../model/types/board';
 
 export function getCellBorderStyles(row: number, col: number) {
@@ -41,7 +42,7 @@ export function buildCellClassName(
     'text-center align-middle',
     'cursor-pointer',
     'transition-all duration-150 ease-out',
-    'focus-visible:outline-none',
+    CELL_FOCUS_RING,
     'select-none',
     'touch-manipulation',
     bgColor,
