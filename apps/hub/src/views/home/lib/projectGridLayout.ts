@@ -1,7 +1,7 @@
 import { COVER_WIDTH, MEDIA_MIN_WIDTH } from '../config/projectGrid';
 import { planCardRowSizes, type RowSize } from './gridRows';
 
-export interface ProjectCardLayout {
+interface ProjectCardLayout {
   rowSize: RowSize;
   isFullRowOnTablet: boolean;
   coverSizes: string;

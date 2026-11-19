@@ -1,6 +1,6 @@
 import type { RunnerAction } from '../constants';
 
-export type RunnerInput = Record<RunnerAction, boolean>;
+type RunnerInput = Record<RunnerAction, boolean>;
 
 const TOUCH_SOURCE = 'touch';
 

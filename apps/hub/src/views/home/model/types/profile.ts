@@ -1,9 +1,9 @@
-export interface ProfileLink {
+interface ProfileLink {
   label: string;
   href: string;
 }
 
-export type ProfileSegment = string | ProfileLink;
+type ProfileSegment = string | ProfileLink;
 
 export type ProfileParagraph = readonly ProfileSegment[];
 

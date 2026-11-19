@@ -5,7 +5,7 @@ import { InstancedGroup } from '../instancedGroup';
 import type { ColliderDescription, CollisionHandler } from '../physics/physicsTypes';
 import { pushOutOfShowerBay } from './showerBay';
 
-export interface InstancedPropsOptions {
+interface InstancedPropsOptions {
   modelName: string;
   template: () => THREE.Object3D;
   prepareBase: (base: THREE.Object3D) => void;

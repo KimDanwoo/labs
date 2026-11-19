@@ -11,7 +11,7 @@ export const GRASS_FIELD = {
 // 거리별 LOD 링. ring = 카메라 셀에서의 체비쇼프 거리. 링은 blade "풀" 크기와 분할 수만 정한다 —
 // 실제로 보이는 밀도·크기는 셰이더가 카메라 거리로 연속 계산한다(GRASS_LOD). 그래서 링 경계에서 팝이 없다.
 // 원본 glb blade는 144삼각형이라 12만 개면 프레임당 1,700만 삼각형이었다.
-export type GrassLodRing = { maxRing: number; blades: number; segments: number };
+type GrassLodRing = { maxRing: number; blades: number; segments: number };
 
 // 연속 LOD: keep(d) = exp(-(d - nearFull) / falloff) → 거리 d에서 살리는 blade 비율(첫 링 풀 기준).
 // 각 blade는 인덱스 비율 aLodIndex = i / 첫 링 풀을 갖고, aLodIndex ≤ keep이면 보인다. 풀이 바뀌어도 보이는 집합이 같아 링 경계 팝이 없고,

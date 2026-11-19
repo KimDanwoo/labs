@@ -42,7 +42,7 @@ export function isBlogAssetUrl(url: string): boolean {
   }
 }
 
-export function isLatestPost(value: unknown): value is LatestPost {
+function isLatestPost(value: unknown): value is LatestPost {
   if (!isRecord(value)) return false;
   const [title, description, publishedAt, url, imageUrl]: unknown[] = [
     'title',

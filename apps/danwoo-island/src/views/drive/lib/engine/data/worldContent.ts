@@ -14,7 +14,7 @@ export interface LabContent {
   imageMini: string;
 }
 
-export interface SocialLink {
+interface SocialLink {
   name: string;
   url: string;
   align: 'left' | 'right';

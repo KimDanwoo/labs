@@ -4,9 +4,9 @@ import { getGame } from './gameContext';
 import type { ActionTrigger } from './inputs/inputTypes';
 import { focusTarget, isClickTravel, nearestHit, pressTarget, type RayTarget, releaseTargets } from './rayTargets';
 
-export type IntersectShape = THREE.Sphere | THREE.Box3 | THREE.Plane | THREE.Mesh;
+type IntersectShape = THREE.Sphere | THREE.Box3 | THREE.Plane | THREE.Mesh;
 
-export interface IntersectDescription extends Omit<RayTarget, 'isIntersecting' | 'isDown'> {
+interface IntersectDescription extends Omit<RayTarget, 'isIntersecting' | 'isDown'> {
   shape: IntersectShape;
 }
 

@@ -13,7 +13,7 @@ export interface SongStreamHandlers {
   onEnd: () => void;
 }
 
-export interface Cancelable {
+interface Cancelable {
   kill(): void;
 }
 
@@ -26,7 +26,7 @@ export interface PlaylistHost {
   now: () => number;
 }
 
-export interface SongEntry {
+interface SongEntry {
   path: string;
   name: string;
 }

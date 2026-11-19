@@ -18,7 +18,7 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
 
-export interface FireballOptions {
+interface FireballOptions {
   fireRadius?: number;
   explosionRadius?: number;
 }

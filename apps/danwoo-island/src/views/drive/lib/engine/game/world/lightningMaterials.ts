@@ -26,13 +26,13 @@ import * as THREE from 'three/webgpu';
 import { getGame } from '../gameContext';
 import { ANTICIPATION, ARC, EXPLOSION, type FloatUniform } from './lightningsConfig';
 
-export interface Palette {
+interface Palette {
   colorA: THREE.UniformNode<'color', THREE.Color>;
   colorB: THREE.UniformNode<'color', THREE.Color>;
   intensity: FloatUniform;
 }
 
-export interface InstanceAttributes {
+interface InstanceAttributes {
   position: THREE.Node<'vec3'>;
   scale: THREE.Node<'float'>;
 }

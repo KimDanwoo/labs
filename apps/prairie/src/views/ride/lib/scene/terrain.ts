@@ -42,7 +42,7 @@ export function coastDistanceAt(x: number, z: number): number {
   return z - (OCEAN.coastZ + 18 * Math.sin(x * 0.004) + 9 * Math.sin(x * 0.011));
 }
 
-export function coastBedDepthAt(x: number, z: number): number {
+function coastBedDepthAt(x: number, z: number): number {
   const coast = coastDistanceAt(x, z);
   return (
     RIVER.waterDrop * smoothstep(-OCEAN.beachWidth, 0, coast) + OCEAN.depth * smoothstep(0, OCEAN.shelfLength, coast)
@@ -61,8 +61,7 @@ export function waterDepthAt(x: number, z: number): number {
   return Math.max(0, waterBedDepthAt(x, z) - RIVER.waterDrop);
 }
 
-export const RIVER_BEARINGS = ['ahead', 'behind', 'left', 'right', 'crossing'] as const;
-export type RiverBearing = (typeof RIVER_BEARINGS)[number];
+export type RiverBearing = 'ahead' | 'behind' | 'left' | 'right' | 'crossing';
 // 화면 기준으로 강이 어느 쪽인지. 카메라가 말 뒤에서 +Z를 보는 배치라 화면 오른쪽 축은 world -X → -cos(yaw).
 // 현재 Z 단면의 물가 방향을 안내한다.
 

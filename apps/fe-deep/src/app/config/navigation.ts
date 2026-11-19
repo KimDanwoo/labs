@@ -1,12 +1,12 @@
 import { Bookmark, BookOpen, GraduationCap, Search, User, type LucideIcon } from 'lucide-react';
 
-export interface NavItem {
+interface NavItem {
   href: string;
   label: string;
   icon: LucideIcon;
 }
 
-export interface TextLink {
+interface TextLink {
   href: string;
   label: string;
 }

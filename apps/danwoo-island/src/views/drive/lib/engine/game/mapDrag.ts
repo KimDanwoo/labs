@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-export interface MapDragHost {
+interface MapDragHost {
   isActive: () => boolean;
   camera: () => THREE.Camera;
   viewport: () => { width: number; height: number };

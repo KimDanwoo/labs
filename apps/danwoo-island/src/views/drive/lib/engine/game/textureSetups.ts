@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-export type TextureSetup = (texture: THREE.Texture) => void;
+type TextureSetup = (texture: THREE.Texture) => void;
 
 export const withSetups =
   (...setups: TextureSetup[]): TextureSetup =>

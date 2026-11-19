@@ -1,6 +1,6 @@
 import { HEAT_LEVEL_COUNT } from '../config/heatmap';
 
-export type HeatLevel = 0 | 1 | 2 | 3 | 4;
+type HeatLevel = 0 | 1 | 2 | 3 | 4;
 
 export function heatIntensity(count: number, maxCount: number): HeatLevel {
   if (count <= 0) return 0;

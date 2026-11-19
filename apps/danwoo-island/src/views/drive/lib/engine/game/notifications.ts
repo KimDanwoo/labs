@@ -2,7 +2,7 @@ import { getGame } from './gameContext';
 import { TICK_ORDER } from './tickOrder';
 import { requireElement } from './utilities/requireElement';
 
-export interface NotificationOptions {
+interface NotificationOptions {
   type?: string;
   duration?: number;
 }

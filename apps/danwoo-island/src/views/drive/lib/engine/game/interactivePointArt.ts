@@ -9,7 +9,7 @@ export interface LabelArt {
   width: number;
 }
 
-export const LABEL = {
+const LABEL = {
   height: 128,
   fontSize: 92,
   nearPadding: 116,
@@ -18,7 +18,7 @@ export const LABEL = {
   scale: 0.85,
 } as const;
 
-export function drawLabel(text: string, align: PointAlign): LabelArt {
+function drawLabel(text: string, align: PointAlign): LabelArt {
   const font = `700 ${LABEL.fontSize}px ${UI_FONT_FAMILY}`;
   const paddingLeft = align === 'left' ? LABEL.nearPadding : LABEL.farPadding;
   const paddingRight = align === 'left' ? LABEL.farPadding : LABEL.nearPadding;

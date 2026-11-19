@@ -6,14 +6,14 @@ const IMMEDIATE = 0;
 
 type Triple = [number, number, number];
 
-export interface ProbeSnapshot {
+interface ProbeSnapshot {
   elapsed: number;
   elapsedScaled: number;
   vehicle: { position: Triple; quaternion: [number, number, number, number]; velocity: Triple; speed: number };
   camera: Triple;
 }
 
-export interface IslandProbe {
+interface IslandProbe {
   freezeDay: (progress: number) => void;
   moveTo: (place: string) => void;
   press: (key: string) => void;

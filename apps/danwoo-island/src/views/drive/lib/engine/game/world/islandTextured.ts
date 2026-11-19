@@ -3,7 +3,7 @@ import * as THREE from 'three/webgpu';
 
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 
-export interface TexturedMeshOptions {
+interface TexturedMeshOptions {
   name?: string;
   matrix?: THREE.Matrix4 | null;
   castShadow?: boolean;

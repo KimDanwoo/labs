@@ -4,8 +4,8 @@ import { getGame } from './gameContext';
 import { TICK_ORDER } from './tickOrder';
 import { lerp, remapClamp } from './utilities/maths';
 
-export type WeatherName = 'temperature' | 'humidity' | 'electricField' | 'clouds' | 'wind' | 'rain' | 'snow';
-export type WeatherOverrides = Partial<Record<WeatherName, number>>;
+type WeatherName = 'temperature' | 'humidity' | 'electricField' | 'clouds' | 'wind' | 'rain' | 'snow';
+type WeatherOverrides = Partial<Record<WeatherName, number>>;
 
 const DEFAULT_OVERRIDE_DURATION = 5;
 const NOISE_FREQUENCY = {
@@ -26,7 +26,7 @@ function cycleNoise(frequency: number): number {
   return noise(getGame().dayCycles.absoluteProgress * frequency);
 }
 
-export class WeatherProperty {
+class WeatherProperty {
   value: number;
   overrideValue: number | null = null;
 

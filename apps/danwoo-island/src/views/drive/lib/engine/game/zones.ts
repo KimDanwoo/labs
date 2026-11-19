@@ -4,9 +4,9 @@ import { Events } from './events';
 import { getGame } from './gameContext';
 import { TICK_ORDER } from './tickOrder';
 
-export type ZoneShape = 'sphere' | 'cylinder';
+type ZoneShape = 'sphere' | 'cylinder';
 
-export interface Zone {
+interface Zone {
   type: ZoneShape;
   position: THREE.Vector3;
   radius: number;

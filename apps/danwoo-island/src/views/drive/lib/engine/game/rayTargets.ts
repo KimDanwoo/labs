@@ -9,7 +9,7 @@ export interface RayTarget {
   onClick?: () => void;
 }
 
-export interface PointerTravel {
+interface PointerTravel {
   x: number;
   y: number;
 }

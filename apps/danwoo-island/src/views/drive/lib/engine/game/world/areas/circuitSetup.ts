@@ -120,7 +120,7 @@ export function createPodium(area: Area): Podium {
   return podium;
 }
 
-export function popPodiumConfetti(game: Area['game'], podium: Podium): void {
+function popPodiumConfetti(game: Area['game'], podium: Podium): void {
   const { world, view } = game;
   if (!world.confetti) return;
   const position = podium.confettiPositions[podium.confettiIndex % 2];

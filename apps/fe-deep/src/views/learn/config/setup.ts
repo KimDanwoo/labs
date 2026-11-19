@@ -2,7 +2,7 @@ import { ArrowDownAZ, Shuffle, type LucideIcon } from 'lucide-react';
 
 import { STUDY_ORDER, type StudyOrder } from '../model/constants/study';
 
-export interface StudyOrderOption {
+interface StudyOrderOption {
   value: StudyOrder;
   label: string;
   Icon: LucideIcon;

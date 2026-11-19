@@ -24,7 +24,7 @@ import { TICK_ORDER } from '../tickOrder';
 import { PALETTE_SLOTS } from './islandMaterials';
 import { type IslandModelKey, islandModelGeometry } from './islandModels';
 
-export interface TreeSpecies {
+interface TreeSpecies {
   readonly model: IslandModelKey;
   readonly trunkRadius: number;
   readonly baseOffsetX: number;
@@ -33,7 +33,7 @@ export interface TreeSpecies {
   readonly scaleRange: readonly [number, number];
 }
 
-export interface TreeGrove {
+interface TreeGrove {
   readonly species: TreeSpecies;
   readonly references: readonly THREE.Object3D[];
 }

@@ -43,7 +43,7 @@ export function rebuildLabGate(model: THREE.Object3D): void {
 const SCREEN_ASPECT = 1.5;
 const GUIDE_BOARD = { screenWidth: 0.68, screenHeight: 0.43, screenY: -0.01, screenFront: 0.11 } as const;
 
-export interface NoticeBoard {
+interface NoticeBoard {
   readonly group: THREE.Group;
   readonly screen: THREE.Mesh<THREE.PlaneGeometry, MeshDefaultMaterial>;
 }

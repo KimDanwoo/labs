@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu';
 
 import { LineGeometry } from './lineGeometry';
 
-export interface WindLineOptions {
+interface WindLineOptions {
   length?: number;
   handlesCount?: number;
   amplitude?: number;

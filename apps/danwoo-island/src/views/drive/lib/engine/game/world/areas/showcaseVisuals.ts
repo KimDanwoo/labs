@@ -55,7 +55,7 @@ export function fadeShades(shades: Shades, phase: keyof typeof SHADE_FADE): void
   }
 }
 
-export function textColor(): THREE.Node<'vec3'> {
+function textColor(): THREE.Node<'vec3'> {
   return color(TEXT_COLOR).rgb;
 }
 

@@ -2,12 +2,12 @@ import * as THREE from 'three/webgpu';
 
 import { isOverWaterJump, sideOf, type TrackSample } from './layout/trackPath';
 
-export interface StripEdge {
+interface StripEdge {
   readonly offset: number;
   readonly height: number;
 }
 
-export interface Strip {
+interface Strip {
   readonly from: StripEdge;
   readonly to: StripEdge;
 }

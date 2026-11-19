@@ -1,4 +1,4 @@
-export const WORLD_ASSET_BASE = '/world/';
+const WORLD_ASSET_BASE = '/world/';
 const VERSION_PARAMETER = 'v';
 const VERSION_PATTERN = /^[0-9a-f]{12}$/;
 const WORLD_VERSION = VERSION_PATTERN.test(process.env.NEXT_PUBLIC_WORLD_VERSION ?? '')

@@ -2,7 +2,7 @@ import { worldAsset } from '../../../config/worldAsset';
 import type { IslandPlace, PlaceIcon } from './islandPlaces';
 import { createElement } from './utilities/createElement';
 
-export function iconElement(icon: PlaceIcon, className: string): HTMLImageElement {
+function iconElement(icon: PlaceIcon, className: string): HTMLImageElement {
   const image = createElement('img', className);
   image.src = worldAsset(`ui/map/icons/${icon}.webp`);
   image.alt = '';

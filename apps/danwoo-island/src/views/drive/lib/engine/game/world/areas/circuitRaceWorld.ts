@@ -7,7 +7,7 @@ import { type Checkpoint, type Podium, RACE_DAY, RACE_WEATHER, requireBody } fro
 import { createPodium, createRails } from './circuitSetup';
 import { bindMenu, type MenuHandlers } from './circuitUi';
 
-export interface Pose {
+interface Pose {
   readonly position: THREE.Vector3;
   readonly rotation: number;
 }

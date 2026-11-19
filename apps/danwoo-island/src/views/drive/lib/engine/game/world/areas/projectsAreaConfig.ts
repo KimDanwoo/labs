@@ -10,14 +10,14 @@ export const CINEMATIC_OFFSETS = {
   position: new THREE.Vector3(4.65, 4, 4.85),
   target: new THREE.Vector3(-3.0, 1.6, -4.6),
 };
-export const CHARCOAL_COLOR = 0x6f6a87;
+const CHARCOAL_COLOR = 0x6f6a87;
 export const CHARCOAL_THRESHOLD = { base: 0.25, amplitude: 0.1, phase: 0.5, initial: 0.2 } as const;
 export function wrapIndex(index: number, count: number): number {
   if (index > count - 1) return 0;
   if (index < 0) return count - 1;
   return index;
 }
-export function assignMaterial(object: THREE.Object3D, material: THREE.Material): void {
+function assignMaterial(object: THREE.Object3D, material: THREE.Material): void {
   if (object instanceof THREE.Mesh) object.material = material;
 }
 const FORGE_TOOLS = ['hammer', 'blade', 'grinder', 'blower'] as const;

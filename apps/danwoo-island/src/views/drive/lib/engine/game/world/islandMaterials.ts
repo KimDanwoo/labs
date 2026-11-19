@@ -3,7 +3,7 @@ import * as THREE from 'three/webgpu';
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 
-export const SHADES = {
+const SHADES = {
   stone: '#a39a90',
   stoneDark: '#857c74',
   wood: '#9a5b34',
@@ -37,17 +37,17 @@ export const SHADES = {
   pineapple: '#EDBC46',
   terracotta: '#c46a43',
 } as const;
-export const GLOW = {
+const GLOW = {
   lantern: { name: 'emissiveSeokdeungGradient', inner: '#fff1b8', outer: '#ffad3d', intensity: 1.6 },
 } as const;
 
 export type PartName = ShadeName | keyof typeof GLOW;
-export const SIGNAGE_FACES = new Set<string>(['glass']);
-export function isPartName(name: string): name is PartName {
+const SIGNAGE_FACES = new Set<string>(['glass']);
+function isPartName(name: string): name is PartName {
   return name in SHADES || name in GLOW;
 }
 
-export type ShadeName = keyof typeof SHADES;
+type ShadeName = keyof typeof SHADES;
 const shadedMaterials = new Map<string, MeshDefaultMaterial>();
 export const VERTEX_COLOR_KEY = 'shaded';
 let vertexColorMaterial: MeshDefaultMaterial | null = null;
@@ -98,9 +98,9 @@ export function islandMaterialByKey(name: string): THREE.Material {
 export const PALETTE_SLOTS = 32;
 const PALETTE_ROW = 0.5;
 
-export type SlotRepaint = ReadonlyMap<number, number>;
+type SlotRepaint = ReadonlyMap<number, number>;
 
-export function paletteSlot(u: number): number {
+function paletteSlot(u: number): number {
   return Math.floor(u * PALETTE_SLOTS);
 }
 

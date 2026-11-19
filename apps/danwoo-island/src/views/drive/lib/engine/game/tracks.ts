@@ -20,7 +20,7 @@ import * as THREE from 'three/webgpu';
 import { getGame } from './gameContext';
 import { TICK_ORDER } from './tickOrder';
 
-export type TrackChannel = 'r' | 'g' | 'b';
+type TrackChannel = 'r' | 'g' | 'b';
 
 const RESOLUTION = 512;
 const AREA_SIZE = 40;

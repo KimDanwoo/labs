@@ -2,7 +2,7 @@ import type { SoundCloudGlobal, SoundCloudWidget, WidgetEvent, WidgetFrame, Widg
 
 const READY_TIMEOUT_MS = 12_000;
 
-export interface JukeboxWidgetHandlers {
+interface JukeboxWidgetHandlers {
   onPlay: (soundId: number | undefined) => void;
   onPause: (soundId: number | undefined) => void;
   onFinish: (soundId: number | undefined) => void;

@@ -15,7 +15,7 @@ export type AreaKey =
   | 'timeMachine'
   | 'toilet';
 
-export interface IslandShape {
+interface IslandShape {
   readonly name: string;
   readonly outline: readonly Point[];
 }
@@ -28,7 +28,7 @@ export interface BridgeSpan {
 
 export type Bounds = readonly [minX: number, minZ: number, maxX: number, maxZ: number];
 
-export interface AreaAnchor {
+interface AreaAnchor {
   readonly original: Point;
   readonly placed: Point;
   readonly bounds: Bounds;
@@ -384,7 +384,7 @@ export const BRIDGES: readonly BridgeSpan[] = [
   { from: [-57, 68], to: [-48, 75], width: 5 },
 ];
 
-export interface Pond {
+interface Pond {
   readonly center: Point;
   readonly radius: number;
 }
@@ -397,7 +397,7 @@ export const PONDS: readonly Pond[] = [
   { center: [50, 56], radius: 6 },
 ];
 
-export interface Lagoon {
+interface Lagoon {
   readonly center: Point;
   readonly radii: Point;
 }

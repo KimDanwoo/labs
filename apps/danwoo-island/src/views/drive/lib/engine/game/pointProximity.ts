@@ -1,10 +1,10 @@
 export type PointState = 'hidden' | 'open' | 'concealed';
 
-export interface PlanePosition<P> {
+interface PlanePosition<P> {
   distanceTo(other: P): number;
 }
 
-export interface ProximityPoint<P> {
+interface ProximityPoint<P> {
   readonly position: PlanePosition<P>;
   readonly state: PointState;
 }

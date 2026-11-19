@@ -11,7 +11,7 @@ export interface PropFrame {
   readonly matrix: THREE.Matrix4;
 }
 
-export interface ReferenceSpot {
+interface ReferenceSpot {
   readonly center: THREE.Vector3;
   readonly bottom: number;
 }

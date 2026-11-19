@@ -1,4 +1,4 @@
-export type LoadingStyle = 'original' | 'tide';
+type LoadingStyle = 'original' | 'tide';
 
 interface WorldConfig {
   compressedAssets: boolean;
