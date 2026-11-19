@@ -1,7 +1,7 @@
 'use client';
 
 import { EMPTY_MESSAGES } from '../../config/filters';
-import type { StudyDoc } from '../../lib/parseHandbook';
+import type { StudyDoc } from '../../lib/studyDoc';
 import { useStudyRunView } from '../../model/hooks/useStudyRunView';
 import { StudyFilterBar } from '../filter/StudyFilterBar';
 import { StudyRunner } from './StudyRunner';

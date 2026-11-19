@@ -1,54 +1,13 @@
-/**
- * 면접 핸드북 마크다운을 학습 단계로 분해한다.
- *
- * 계층은 "주제 레벨"을 기준으로 상대적으로 읽는다. 문서가 `#`을 주제로 쓰든 `##`을 쓰든 따라간다.
- *   주제        문서에서 처음 번호가 붙은 제목의 레벨. 그 레벨의 제목은 전부 주제다
- *   역할 섹션   주제보다 한 단계 깊은 제목. 키워드 / 답변 / 오답 / 보완할 점 / 꼬리질문 / 나머지(참고 자료)로 갈린다
- *   꼬리질문    `## 꼬리`·`## 꼬꼬무` 안의 목록이나 한 단계 깊은 제목, 또는 물음표로 끝나는 섹션 제목 자체
- *
- * 특수 문법은 없다. 제목 텍스트만으로 역할을 판별한다.
- */
-
-export const STEP_KIND = {
-  keywords: 'keywords',
-  answer: 'answer',
-  mistake: 'mistake',
-  followUp: 'followUp',
-  improve: 'improve',
-} as const;
-
-export type StepKind = (typeof STEP_KIND)[keyof typeof STEP_KIND];
-
-export type StudyStep = {
-  id: string;
-  kind: StepKind;
-  prompt: string;
-  keywords: string[];
-  reveal: string;
-};
-
-export type StudyTopic = {
-  id: string;
-  title: string;
-  steps: StudyStep[];
-  notes: string;
-};
-
-export type StudyDoc = {
-  slug: string;
-  title: string;
-  date: string | null;
-  intro: string;
-  topics: StudyTopic[];
-};
-
-type SectionRole = 'keyword' | 'answer' | 'mistake' | 'improve' | 'followUp' | 'question' | 'note';
-
-type Section = { heading: string; body: string };
-
-type FollowUp = { question: string; answer: string };
-
-type Block = { level: number; heading: string; body: string };
+import { extractKeywordLine, findTopicLevel, splitFrontmatter } from './handbookLines';
+import {
+  type FollowUp,
+  type Section,
+  classifySection,
+  extractItems,
+  splitBlocks,
+  splitFollowUps,
+} from './handbookSections';
+import { STEP_KIND, type StepKind, type StudyDoc, type StudyStep, type StudyTopic } from './studyDoc';
 
 type TopicDraft = {
   title: string;
@@ -60,187 +19,6 @@ type TopicDraft = {
   followUps: FollowUp[];
   notes: Section[];
 };
-
-const MAX_HEADING_LEVEL = 6;
-const DEFAULT_TOPIC_LEVEL = 2;
-
-const FENCE_PATTERN = /^\s*(?:```|~~~)/;
-const ANY_HEADING_PATTERN = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
-const TOPIC_NUMBER_PATTERN = /^\d+[.)]\s+/;
-const QUESTION_HEADING_PATTERN = /[?？]\s*$/;
-const TRAILING_RULE_PATTERN = /\n*[-*_]{3,}\s*$/;
-const LIST_MARKER_PATTERN = /^[-*+]\s+/;
-const ORDERED_MARKER_PATTERN = /^\d+\.\s+/;
-const ARROW_PREFIX_PATTERN = /^→\s*/;
-const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
-const DATE_FIELD_PATTERN = /^date:\s*(\d{4}-\d{2}-\d{2})\s*$/m;
-/** 꼬꼬무 안의 주의·참고류 제목은 질문이 아니라 직전 답변에 붙는 경고다. */
-const FOLLOW_UP_NOTE_PATTERN = /^(주의|위험|경고|금지|참고|중요)/;
-/** 꼬리질문 답변 첫 줄의 `키워드: a, b, c`는 본문이 아니라 그 질문의 키워드 목록이다. */
-const KEYWORD_LINE_PATTERN = /^키워드\s*[:：]\s*(.+)$/;
-
-function extractKeywordLine(answer: string): { keywords: string[]; body: string } {
-  const lines = answer.split('\n');
-  const firstIndex = lines.findIndex((line) => line.trim());
-  const first = firstIndex >= 0 ? lines[firstIndex]?.trim() : undefined;
-  const matched = first ? KEYWORD_LINE_PATTERN.exec(first) : null;
-  if (!matched?.[1]) return { keywords: [], body: answer };
-
-  return {
-    keywords: matched[1]
-      .split(/[,·]/)
-      .map((keyword) => keyword.trim())
-      .filter(Boolean),
-    body: lines
-      .slice(firstIndex + 1)
-      .join('\n')
-      .trim(),
-  };
-}
-
-function matchHeading(line: string): Pick<Block, 'level' | 'heading'> | null {
-  const matched = ANY_HEADING_PATTERN.exec(line);
-  if (!matched) return null;
-
-  const hashes = matched[1];
-  const heading = matched[2];
-  if (!hashes || !heading) return null;
-
-  return { level: hashes.length, heading };
-}
-
-function findTopicLevel(markdown: string): number {
-  let isInFence = false;
-  let firstHeadingLevel: number | null = null;
-
-  for (const line of markdown.split('\n')) {
-    if (FENCE_PATTERN.test(line)) {
-      isInFence = !isInFence;
-      continue;
-    }
-    if (isInFence) continue;
-
-    const heading = matchHeading(line);
-    if (!heading) continue;
-    if (TOPIC_NUMBER_PATTERN.test(heading.heading)) return heading.level;
-    firstHeadingLevel ??= heading.level;
-  }
-
-  return firstHeadingLevel ?? DEFAULT_TOPIC_LEVEL;
-}
-
-const ANSWER_HEADINGS = ['설명', '개념', '첫문장'];
-
-function classifySection(heading: string): SectionRole {
-  const text = heading.replace(/\s+/g, '');
-  if (QUESTION_HEADING_PATTERN.test(heading)) return 'question';
-  if (text.includes('오답')) return 'mistake';
-  if (text.includes('보완')) return 'improve';
-  if (text.includes('꼬꼬무') || text.includes('꼬리')) return 'followUp';
-  if (text.includes('키워드') || text.includes('암기')) return 'keyword';
-  if (text.includes('나쁜')) return 'note';
-  if (text.includes('답변') || text.includes('한줄') || ANSWER_HEADINGS.includes(text)) return 'answer';
-  return 'note';
-}
-
-/** 목록 마커가 붙은 줄만 뽑는다. 섹션 안내 문장이 질문으로 섞이는 걸 막는다. */
-function extractListItems(body: string): string[] {
-  return body
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => LIST_MARKER_PATTERN.test(line) || ORDERED_MARKER_PATTERN.test(line))
-    .map((line) => line.replace(LIST_MARKER_PATTERN, '').replace(ORDERED_MARKER_PATTERN, '').trim())
-    .filter(Boolean);
-}
-
-/**
- * 불릿 목록이든 코드펜스 안의 화살표 흐름이든 항목 배열로 만든다.
- * 펜스 안은 한 줄이 항목 하나, 펜스 밖은 목록 마커가 붙은 줄만 — 안내 문장이 항목으로 섞이지 않게.
- */
-function extractItems(body: string): string[] {
-  const items: string[] = [];
-  let isInFence = false;
-
-  for (const raw of body.split('\n')) {
-    if (FENCE_PATTERN.test(raw)) {
-      isInFence = !isInFence;
-      continue;
-    }
-    const line = raw.trim();
-    if (!line) continue;
-
-    if (isInFence) {
-      items.push(line.replace(ARROW_PREFIX_PATTERN, '').trim());
-    } else if (LIST_MARKER_PATTERN.test(line) || ORDERED_MARKER_PATTERN.test(line)) {
-      items.push(line.replace(LIST_MARKER_PATTERN, '').replace(ORDERED_MARKER_PATTERN, '').trim());
-    }
-  }
-
-  return items.filter(Boolean);
-}
-
-function splitFollowUps(body: string, questionLevel: number): FollowUp[] {
-  const questionPattern = new RegExp(`^#{${Math.min(questionLevel, MAX_HEADING_LEVEL)}}\\s+(.+?)\\s*#*\\s*$`);
-  const items: FollowUp[] = [];
-  let current: FollowUp | null = null;
-  let answerLines: string[] = [];
-  let isInFence = false;
-
-  const flush = () => {
-    if (current) items.push({ ...current, answer: answerLines.join('\n').trim() });
-    answerLines = [];
-  };
-
-  for (const line of body.split('\n')) {
-    if (FENCE_PATTERN.test(line)) isInFence = !isInFence;
-
-    const question = isInFence ? null : questionPattern.exec(line)?.[1];
-    if (question) {
-      if (FOLLOW_UP_NOTE_PATTERN.test(question)) {
-        answerLines.push(`**${question}**`);
-        continue;
-      }
-      flush();
-      current = { question, answer: '' };
-      continue;
-    }
-    if (current) answerLines.push(line);
-  }
-  flush();
-
-  if (items.length > 0) return items;
-  return extractListItems(body).map((question) => ({ question, answer: '' }));
-}
-
-function splitBlocks(markdown: string, maxLevel: number): { intro: string; blocks: Block[] } {
-  const blocks: Block[] = [];
-  const introLines: string[] = [];
-  let current: Pick<Block, 'level' | 'heading'> | null = null;
-  let bodyLines: string[] = [];
-  let isInFence = false;
-
-  const flush = () => {
-    if (current) blocks.push({ ...current, body: bodyLines.join('\n').trim().replace(TRAILING_RULE_PATTERN, '') });
-    bodyLines = [];
-  };
-
-  for (const line of markdown.split('\n')) {
-    if (FENCE_PATTERN.test(line)) isInFence = !isInFence;
-
-    const heading = isInFence ? null : matchHeading(line);
-    if (heading && heading.level <= maxLevel) {
-      flush();
-      current = heading;
-      continue;
-    }
-
-    if (current) bodyLines.push(line);
-    else introLines.push(line);
-  }
-  flush();
-
-  return { intro: introLines.join('\n').trim().replace(TRAILING_RULE_PATTERN, ''), blocks };
-}
 
 function createDraft(title: string, lead: string): TopicDraft {
   return { title, lead, keywordItems: [], answers: [], mistakes: [], improvements: [], followUps: [], notes: [] };
@@ -318,14 +96,6 @@ function buildTopic(draft: TopicDraft, index: number): StudyTopic {
   }
 
   return { id: `topic-${index}`, title: draft.title, steps, notes: isNotesConsumed ? '' : notes };
-}
-
-function splitFrontmatter(raw: string): { date: string | null; markdown: string } {
-  const matched = FRONTMATTER_PATTERN.exec(raw);
-  if (!matched) return { date: null, markdown: raw };
-
-  const date = DATE_FIELD_PATTERN.exec(matched[1] ?? '')?.[1] ?? null;
-  return { date, markdown: raw.slice(matched[0].length) };
 }
 
 export function parseStudyDoc(slug: string, raw: string): StudyDoc {

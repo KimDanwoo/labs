@@ -1,6 +1,7 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
-import { parseStudyDoc, type StudyDoc } from '../../lib/parseHandbook';
+import { parseStudyDoc } from '../../lib/parseHandbook';
+import { type StudyDoc } from '../../lib/studyDoc';
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'study');
 const MD_EXTENSION = '.md';

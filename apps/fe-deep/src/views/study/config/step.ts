@@ -1,6 +1,6 @@
 import type { BadgeVariant } from '@shared/ui/Badge';
 
-import { STEP_KIND, type StudyStep } from '../lib/parseHandbook';
+import { STEP_KIND, type StudyStep } from '../lib/studyDoc';
 
 export const ANSWER_FRAME: readonly string[] = ['왜?', '대안?', '왜 안 골랐나?', '단점?', '결과?', '다시 한다면?'];
 

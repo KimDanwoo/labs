@@ -1,4 +1,4 @@
-import type { StudyTopic } from '../../lib/parseHandbook';
+import type { StudyTopic } from '../../lib/studyDoc';
 
 export const STUDY_FILTER = {
   all: 'all',

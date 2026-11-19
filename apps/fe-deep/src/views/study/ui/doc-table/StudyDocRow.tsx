@@ -2,7 +2,8 @@ import { ChevronRight, FileText } from 'lucide-react';
 import Link from 'next/link';
 
 import { formatStudyDate } from '../../lib/formatStudyDate';
-import { countSteps, type StudyDoc } from '../../lib/parseHandbook';
+import { countSteps } from '../../lib/parseHandbook';
+import { type StudyDoc } from '../../lib/studyDoc';
 import { studyDocHref } from '../../lib/studyHref';
 
 interface StudyDocRowProps {

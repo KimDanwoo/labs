@@ -1,4 +1,4 @@
-import type { StudyDoc } from '../../lib/parseHandbook';
+import type { StudyDoc } from '../../lib/studyDoc';
 import { StudyDocRow } from './StudyDocRow';
 
 interface StudyDocTableProps {

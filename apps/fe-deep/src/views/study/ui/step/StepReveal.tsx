@@ -2,7 +2,7 @@ import { KeywordCheck } from '@features/keyword-check';
 import { SpeakButton } from '@features/read-aloud';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 
-import type { StudyStep } from '../../lib/parseHandbook';
+import type { StudyStep } from '../../lib/studyDoc';
 import { AiFeedback } from './AiFeedback';
 import { AnswerFramePrompt } from './AnswerFramePrompt';
 
