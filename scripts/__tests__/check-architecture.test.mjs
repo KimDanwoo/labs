@@ -5,6 +5,7 @@ import {
   findMisplacedStyles,
   findServerLeaks,
   validateComponentModule,
+  validateComponentProps,
   validateDesignTokens,
   validateManifest,
   validateSourceTypes,
@@ -136,6 +137,20 @@ test('component modules hold only components and hooks; constants, helpers and s
   assert.equal(validateComponentModule('const TABS = [{ name: "a" }] as const;', 'Card.tsx').length, 1);
   assert.equal(validateComponentModule('function formatTime() { return ""; }', 'Card.tsx').length, 1);
   assert.equal(validateComponentModule('const useless = () => null;', 'Card.tsx').length, 1);
+});
+
+test('components with more than five props must be split into composed parts', () => {
+  const five =
+    'interface CardProps { a: string; b: string; c: string; d: string; e: string }\nexport function Card(props: CardProps) { return null; }';
+  assert.deepEqual(validateComponentProps(five, 'Card.tsx'), []);
+  const six =
+    'interface CardProps { a: string; b: string; c: string; d: string; e: string; f: string }\nexport function Card(props: CardProps) { return null; }';
+  assert.equal(validateComponentProps(six, 'Card.tsx').length, 1);
+  const inline = 'export const Card = (props: { a: 1; b: 1; c: 1; d: 1; e: 1; f: 1 }) => null;';
+  assert.equal(validateComponentProps(inline, 'Card.tsx').length, 1);
+  const extended =
+    'interface ButtonProps extends ComponentProps<"button"> { variant?: string }\nexport function Button(props: ButtonProps) { return null; }';
+  assert.deepEqual(validateComponentProps(extended, 'Button.tsx'), []);
 });
 
 test('CSS files live in src/app/styles or a slice styles/ folder; only <Component>.module.css sits next to ui components', () => {
