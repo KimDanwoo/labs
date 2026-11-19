@@ -33,3 +33,15 @@ export interface CageInfo {
   paths: { id: number; path: string }[];
   sums: { id: number; sum: number; x: number; y: number }[];
 }
+
+export interface CellPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface TableDimensions {
+  tableRect: DOMRect | null;
+  cellPositions: Record<string, CellPosition>;
+}

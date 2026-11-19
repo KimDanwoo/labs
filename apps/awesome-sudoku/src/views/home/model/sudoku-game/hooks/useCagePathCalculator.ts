@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import { BOARD_SIZE } from '../../../config/board';
-import { type CageInfo } from '../../types/board';
+import type { CageInfo, CellPosition } from '../../types/board';
 import { type KillerCage } from '../../types/game';
-import type { CellPosition } from './useTableDimensions';
 
 const CAGE_PADDING_RATIO = 0.1;
 const CAGE_SUM_LABEL_OFFSET = 2;

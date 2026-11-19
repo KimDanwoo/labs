@@ -1,145 +1,45 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../../../config/board';
+import { useEffect, useRef, type RefObject } from 'react';
+import { measureTable } from '../../../lib/tableLayout';
+import type { TableDimensions } from '../../types/board';
 
-export interface CellPosition {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-interface TableDimensions {
-  tableRect: DOMRect | null;
-  cellPositions: Record<string, CellPosition>;
-}
-
-const DEBOUNCE_DELAY = 16;
-
-export const useTableDimensions = (onDimensionsChange: (dimensions: TableDimensions) => void, deps: unknown[]) => {
+export function useTableDimensions(
+  tableRef: RefObject<HTMLTableElement | null>,
+  onDimensionsChange: (dimensions: TableDimensions) => void,
+) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const resizeObserverRef = useRef<ResizeObserver | null>(null);
-  const mutationObserverRef = useRef<MutationObserver | null>(null);
-  const [isReady, setIsReady] = useState(false);
-
   const onDimensionsChangeRef = useRef(onDimensionsChange);
   useEffect(() => {
     onDimensionsChangeRef.current = onDimensionsChange;
   }, [onDimensionsChange]);
 
-  const depsKey = JSON.stringify(deps);
-
-  const calculateDimensions = useCallback(() => {
-    const table = document.querySelector('table.border-collapse');
-    if (!table) {
-      onDimensionsChangeRef.current({ tableRect: null, cellPositions: {} });
-      return;
-    }
-
-    const cells = table.querySelectorAll('td');
-    if (cells.length !== SUDOKU_CELL_COUNT) {
-      onDimensionsChangeRef.current({ tableRect: null, cellPositions: {} });
-      return;
-    }
-
-    const tableRect = table.getBoundingClientRect();
-    const cellPositions: Record<string, CellPosition> = {};
-
-    Array.from(cells).forEach((cell, index) => {
-      const row = Math.floor(index / BOARD_SIZE);
-      const col = index % BOARD_SIZE;
-      const rect = cell.getBoundingClientRect();
-
-      cellPositions[`${row}-${col}`] = {
-        x: rect.left - tableRect.left,
-        y: rect.top - tableRect.top,
-        width: rect.width,
-        height: rect.height,
-      };
-    });
-
-    if (overlayRef.current) {
-      overlayRef.current.style.width = `${tableRect.width}px`;
-      overlayRef.current.style.height = `${tableRect.height}px`;
-    }
-
-    onDimensionsChangeRef.current({ tableRect, cellPositions });
-    setIsReady(true);
-  }, []);
-
-  const scheduleCalculation = useCallback(() => {
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-    }
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      calculateDimensions();
-    });
-  }, [calculateDimensions]);
-
-  const cleanup = useCallback(() => {
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-    if (resizeObserverRef.current) {
-      resizeObserverRef.current.disconnect();
-      resizeObserverRef.current = null;
-    }
-    if (mutationObserverRef.current) {
-      mutationObserverRef.current.disconnect();
-      mutationObserverRef.current = null;
-    }
-  }, []);
-
   useEffect(() => {
-    scheduleCalculation();
+    const table = tableRef.current;
+    if (!table) return undefined;
+    let frame: number | null = null;
 
-    const setupObservers = () => {
-      const table = document.querySelector('table.border-collapse');
-      if (!table) return;
-
-      if (!resizeObserverRef.current) {
-        resizeObserverRef.current = new ResizeObserver(() => {
-          scheduleCalculation();
-        });
-        resizeObserverRef.current.observe(table);
+    const measure = () => {
+      frame = null;
+      const dimensions = measureTable(table);
+      const overlay = overlayRef.current;
+      if (overlay && dimensions.tableRect) {
+        overlay.style.width = `${dimensions.tableRect.width}px`;
+        overlay.style.height = `${dimensions.tableRect.height}px`;
       }
-
-      if (!mutationObserverRef.current) {
-        mutationObserverRef.current = new MutationObserver((mutations) => {
-          const hasRelevantChanges = mutations.some(
-            (mutation) =>
-              mutation.type === 'childList' ||
-              (mutation.type === 'attributes' && ['class', 'style'].includes(mutation.attributeName || '')),
-          );
-
-          if (hasRelevantChanges) {
-            scheduleCalculation();
-          }
-        });
-
-        mutationObserverRef.current.observe(table, {
-          attributes: true,
-          attributeFilter: ['class', 'style'],
-          childList: true,
-          subtree: true,
-        });
-      }
+      onDimensionsChangeRef.current(dimensions);
+    };
+    const scheduleMeasure = () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measure);
     };
 
-    const observerTimer = setTimeout(setupObservers, DEBOUNCE_DELAY);
-
+    const observer = new ResizeObserver(scheduleMeasure);
+    observer.observe(table);
+    scheduleMeasure();
     return () => {
-      clearTimeout(observerTimer);
-      cleanup();
+      observer.disconnect();
+      if (frame !== null) cancelAnimationFrame(frame);
     };
-  }, [depsKey, cleanup, scheduleCalculation]);
+  }, [tableRef]);
 
-  useEffect(() => cleanup, [cleanup]);
-
-  return {
-    overlayRef,
-    isReady,
-  };
-};
+  return { overlayRef };
+}
