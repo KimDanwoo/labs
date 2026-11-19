@@ -2,6 +2,8 @@ import { atom } from 'jotai';
 import { calculateHighlights, clearHighlights, updateCellSelection, updateSingleCell } from '../services/update';
 import { boardAtom, highlightedCellsAtom, selectedCellAtom } from './primitives';
 
+export const hasSelectedCellAtom = atom((get) => get(selectedCellAtom) !== null);
+
 export const updateHighlightsAtom = atom(null, (get, set, pos: { row: number; col: number }) => {
   const board = get(boardAtom);
   const highlightedCells = get(highlightedCellsAtom);

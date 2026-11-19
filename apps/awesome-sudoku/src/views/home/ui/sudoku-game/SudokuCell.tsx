@@ -8,10 +8,12 @@ import { CellValue } from './CellValue';
 
 export const SudokuCell: FC<CellProps> = memo((props) => {
   const { cell } = props;
-  const { className, ariaLabel, ariaDescription, handleClick, handleKeyDown, tabIndex, stateClasses } = useCell(props);
+  const { cellRef, className, ariaLabel, ariaDescription, handleClick, handleKeyDown, tabIndex, stateClasses } =
+    useCell(props);
 
   return (
     <td
+      ref={cellRef}
       className={cn(className, stateClasses)}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
@@ -26,7 +28,6 @@ export const SudokuCell: FC<CellProps> = memo((props) => {
         touchAction: 'manipulation',
         userSelect: 'none',
         WebkitTapHighlightColor: 'transparent',
-        outline: 'none',
         boxShadow: 'none',
       }}
     >

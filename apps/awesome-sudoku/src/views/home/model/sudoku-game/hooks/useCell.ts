@@ -2,10 +2,12 @@ import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { EMPTY_HIGHLIGHT } from '../../../config/board';
 import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom } from '../../store/primitives';
+import { hasSelectedCellAtom } from '../../store/selectionAtoms';
 import { type CellProps } from '../../types/board';
 import { useCellAccessibility } from './useCellAccessibility';
 import { useCellInteraction } from './useCellInteraction';
 import { useCellStyles } from './useCellStyles';
+import { useFocusWhenSelected } from './useFocusWhenSelected';
 
 export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
   const cellKey = `${row}-${col}`;
@@ -13,6 +15,7 @@ export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
   const gameMode = useAtomValue(gameModeAtom);
   const isNoteMode = useAtomValue(isNoteModeAtom);
   const timerActive = useAtomValue(timerActiveAtom);
+  const hasSelection = useAtomValue(hasSelectedCellAtom);
   const highlightedCells = useAtomValue(highlightedCellsAtom);
   const highlight = useMemo(() => highlightedCells[cellKey] ?? EMPTY_HIGHLIGHT, [highlightedCells, cellKey]);
 
@@ -31,6 +34,7 @@ export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
     gameMode,
     isNoteMode,
     timerActive,
+    hasSelection,
   });
 
   const { handleClick, handleKeyDown } = useCellInteraction({
@@ -40,7 +44,10 @@ export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
     timerActive,
   });
 
+  const cellRef = useFocusWhenSelected(cell.isSelected);
+
   return {
+    cellRef,
     className,
     ariaLabel,
     ariaDescription,
