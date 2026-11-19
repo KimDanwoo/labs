@@ -1,7 +1,8 @@
 const WIDGET_API_SRC = 'https://w.soundcloud.com/player/api.js';
 const WIDGET_PLAYER = 'https://w.soundcloud.com/player/';
 const API_TIMEOUT_MS = 10_000;
-const FRAME_STYLE = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
+const FRAME_SIZE = { width: 320, height: 166 };
+const FRAME_STYLE = `position:fixed;left:0;top:0;width:${FRAME_SIZE.width}px;height:${FRAME_SIZE.height}px;opacity:0;pointer-events:none;border:0`;
 
 export type WidgetEvent = 'READY' | 'PLAY' | 'PAUSE' | 'FINISH' | 'PLAY_PROGRESS' | 'ERROR';
 
