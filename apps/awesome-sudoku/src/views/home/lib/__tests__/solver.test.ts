@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { TECHNIQUE } from '../../config/game';
 import type { Grid, GridPosition } from '../../model/types/board';
 import type { KillerCage } from '../../model/types/game';
-import { generateKillerCages } from '../generator';
+import { countSolutions, generateRandomSolution, hasUniqueSolution } from '../backtrack';
+import { generateKillerCages } from '../cageLayout';
 import { atIndex, cellAt } from '../gridAccess';
-import { countSolutions, generateRandomSolution, gradePuzzle, hasUniqueSolution, solveLogically } from '../solver';
+import { gradePuzzle, solveLogically } from '../solver';
 import { isValidSolution } from '../validator';
 
 const parse = (rows: string[]): Grid => rows.map((row) => [...row].map((ch) => (ch === '.' ? 0 : Number(ch))));

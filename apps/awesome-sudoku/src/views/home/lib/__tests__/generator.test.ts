@@ -3,15 +3,11 @@ import { SUDOKU_CELL_COUNT } from '../../config/board';
 import { CLASSIC_DIFFICULTY, GAME_LEVEL, KILLER_DIFFICULTY, TECHNIQUE } from '../../config/game';
 import type { Grid, GridPosition, SudokuBoard } from '../../model/types/board';
 import type { Difficulty, KillerCage, Technique } from '../../model/types/game';
-import {
-  generateBoard,
-  generateKillerBoard,
-  generateKillerCages,
-  generateSolution,
-  retryUntilGraded,
-} from '../generator';
+import { countSolutions } from '../backtrack';
+import { generateKillerCages } from '../cageLayout';
+import { generateBoard, generateKillerBoard, generateSolution, retryUntilGraded } from '../generator';
 import { atIndex, cellAt } from '../gridAccess';
-import { countSolutions, gradePuzzle } from '../solver';
+import { gradePuzzle } from '../solver';
 import { isValidSolution } from '../validator';
 
 const DIFFICULTIES = Object.values(GAME_LEVEL) as Difficulty[];
