@@ -1,6 +1,7 @@
 'use client';
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/ui/DropdownMenu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@shared/ui/DropdownMenu';
+import { DropdownMenuItem } from '@shared/ui/DropdownMenuItems';
 import { FloatingButton } from '@shared/ui/FloatingButton';
 
 import { SHARE_KIND } from '../../config/share';

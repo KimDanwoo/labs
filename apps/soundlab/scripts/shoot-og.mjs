@@ -15,156 +15,23 @@ import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
-import { stripTypeScriptTypes } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { TRACKS } from '../src/entities/track/model/constants/tracks.ts';
+import { CHROME, CHROME_FLAGS, connect, poll } from './og/chrome.mjs';
+import { DEFAULT_TRACK, HEIGHT, MORPH, WIDTH } from './og/config.mjs';
+import { writeModuleGraph } from './og/moduleGraph.mjs';
+import { page } from './og/page.mjs';
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 const RENDERER = join(HERE, '../src/views/player/lib/stage/renderer.ts');
 const DEFAULT_OUT = join(HERE, '../app/opengraph-image.png');
 
-const WIDTH = 1200;
-const HEIGHT = 630;
-/**
- * 그림이 읽히면서도 가장자리 픽셀은 아직 흩어져 있는 지점.
- * 셰이더가 휘도별로 `delay`(최대 0.44)를 주기 때문에 실효 진행도는 이보다 한참 낮다 —
- * 0.6에서는 형체가 안 보이고 1.0이면 그냥 앨범 커버가 된다. 눈으로 스윕해 고른 값.
- */
-const MORPH = 0.97;
-/**
- * 액자 한 변. 흩어진 픽셀이 액자 밖 30px 남짓까지 날아가므로
- * (630 - SLOT) / 2 가 그보다 커야 아래위가 잘리지 않는다.
- */
-const SLOT = 410;
-const SLOT_CENTER_X = 796;
-const DEFAULT_TRACK = 20;
-
-const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const CHROME_FLAGS = [
-  '--headless=new',
-  '--disable-gpu',
-  '--enable-unsafe-swiftshader',
-  '--hide-scrollbars',
-  '--no-first-run',
-  '--no-default-browser-check',
-  `--window-size=${WIDTH},${HEIGHT}`,
-];
-
 const arg = (name) => process.argv.find((v) => v.startsWith(`--${name}=`))?.slice(name.length + 3);
 
 const artworkUrl = (track) => `${track.artworkBase}-t500x500${track.artworkExt}`;
-
-function page({ artwork, morph }) {
-  return `<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: ${WIDTH}px; height: ${HEIGHT}px; overflow: hidden; background: #050607; }
-  canvas { position: fixed; inset: 0; width: ${WIDTH}px; height: ${HEIGHT}px; }
-  /* 렌더러가 rect를 읽어 파티클이 모일 자리를 잡는다. 보이지는 않는다. */
-  #slot {
-    position: absolute; width: ${SLOT}px; height: ${SLOT}px;
-    left: ${SLOT_CENTER_X - SLOT / 2}px; top: ${(HEIGHT - SLOT) / 2}px;
-  }
-  #mark {
-    position: absolute; left: 78px; top: 50%; transform: translateY(-50%);
-    display: flex; flex-direction: column; gap: 18px;
-  }
-  #mark b {
-    font: 800 54px/1 'Gothic A1', system-ui, sans-serif;
-    letter-spacing: -0.02em; color: #f2f3f5;
-  }
-  #mark span {
-    font: 500 14px/1 'IBM Plex Mono', ui-monospace, monospace;
-    letter-spacing: 0.24em; text-transform: uppercase; color: #c8a97e;
-  }
-</style>
-</head>
-<body>
-<canvas id="stage"></canvas>
-<div id="slot"></div>
-<div id="mark"><b>soundlab</b><span>DANWOO · 24 TRACKS</span></div>
-<script type="module">
-import { createRenderer } from './renderer.js';
-
-const fail = (why) => { document.title = 'err:' + why; };
-
-const load = (src) => new Promise((resolve, reject) => {
-  const image = new Image();
-  image.onload = () => resolve(image);
-  image.onerror = () => reject(new Error('artwork'));
-  image.src = src;
-});
-
-try {
-  const renderer = createRenderer(document.getElementById('stage'));
-  if (!renderer) throw new Error('webgl2');
-
-  const [image] = await Promise.all([load(${JSON.stringify(artwork)}), document.fonts.ready]);
-
-  renderer.layout(document.getElementById('slot').getBoundingClientRect());
-  renderer.setArtwork(image);
-  // 누적 버퍼가 ping-pong이라 decay=0이어도 두 타깃이 모두 채워지도록 몇 프레임 돌린다.
-  for (let i = 0; i < 4; i++) renderer.render({ morph: ${morph}, level: 0, decay: 0 });
-
-  document.title = 'ok';
-} catch (error) {
-  fail(error.message);
-}
-</script>
-</body>
-</html>`;
-}
-
-function connect(url) {
-  const socket = new WebSocket(url);
-  const pending = new Map();
-  let seq = 0;
-
-  socket.addEventListener('message', (event) => {
-    const message = JSON.parse(event.data);
-    const settle = pending.get(message.id);
-    if (!settle) return;
-    pending.delete(message.id);
-    if (message.error) settle.reject(new Error(message.error.message));
-    else settle.resolve(message.result);
-  });
-
-  const open = new Promise((resolve, reject) => {
-    socket.addEventListener('open', resolve, { once: true });
-    socket.addEventListener('error', () => reject(new Error('CDP 연결 실패')), { once: true });
-  });
-
-  return {
-    open,
-    send: (method, params) =>
-      new Promise((resolve, reject) => {
-        const id = ++seq;
-        pending.set(id, { resolve, reject });
-        socket.send(JSON.stringify({ id, method, params }));
-      }),
-    close: () => socket.close(),
-  };
-}
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function poll(read, ok, { tries = 60, gap = 250, label }) {
-  for (let i = 0; i < tries; i++) {
-    const value = await read().catch(() => null);
-    if (value !== null && ok(value)) return value;
-    await sleep(gap);
-  }
-  throw new Error(`${label} 대기 시간 초과`);
-}
 
 async function main() {
   const indexes = (arg('tracks') ?? arg('track') ?? String(DEFAULT_TRACK)).split(',').map((v) => Number(v.trim()));
@@ -182,10 +49,7 @@ async function main() {
   let server;
 
   try {
-    await writeFile(
-      join(work, 'renderer.js'),
-      stripTypeScriptTypes(await readFile(RENDERER, 'utf8'), { mode: 'strip' }),
-    );
+    await writeModuleGraph(RENDERER, work, 'renderer.js');
 
     // 아트워크는 i1.sndcdn.com에 있다. 원격 이미지를 그대로 쓰면 texImage2D가 보안 오류로 막히므로
     // 받아서 같은 오리진으로 내보낸다.
