@@ -22,7 +22,7 @@ import { ISLAND_PLACES, type IslandPlace } from '../../islandPlaces';
 import { Player } from '../../player';
 import { TICK_ORDER } from '../../tickOrder';
 import { createElement } from '../../utilities/createElement';
-import { rebuildSurfPoint } from '../islandStructures';
+import { rebuildSurfPoint } from '../shoreStructures';
 import { Area } from './area';
 import { pickTornadoDestination } from './tornadoRoute';
 

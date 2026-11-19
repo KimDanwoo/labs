@@ -7,7 +7,7 @@ import { type AudioItem, moveSoundTo } from '../../audioItem';
 import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
 import type { InteractivePoint } from '../../interactivePoint';
 import { JukeboxStation } from '../../jukebox/jukeboxStation';
-import { objectOf, type WorldObject } from '../../objects';
+import { objectOf, type WorldObject } from '../../objectColliders';
 import { clamp, remapClamp } from '../../utilities/maths';
 import { rebuildTikiScoreboard } from '../islandReskins';
 import { rebuildBowlingSign, rebuildJukebox } from '../islandStructures';

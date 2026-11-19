@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu';
 
-import { rebuildShowerStation, SHOWER_PARTS } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
+import { rebuildShowerStation, SHOWER_PARTS } from '../shoreStructures';
 import { SHOWER_SCALE } from '../showerBay';
 import { ShowerWater } from '../showerWater';
 import { Area } from './area';

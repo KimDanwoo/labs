@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu';
 
-import { createParts, type PartName, type Parts, type PartTransform } from './islandGeometry';
+import { createParts, type Parts, type PartTransform } from './islandGeometry';
+import type { PartName } from './islandMaterials';
 
 export interface PropFrame {
   readonly isTube: boolean;

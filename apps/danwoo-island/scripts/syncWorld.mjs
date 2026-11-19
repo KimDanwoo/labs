@@ -1,177 +1,32 @@
-import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import {
-  cpSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  renameSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from 'node:fs';
-import { tmpdir } from 'node:os';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { preparePortfolioContent } from './portfolioContent.mjs';
-import { WORLD_COMMIT, WORLD_REPOSITORY } from './worldSource.mjs';
-
-const SYNC_FORMAT_VERSION = '7';
-const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SPARSE_PATHS = ['/static/', '/license.md'];
-const CHECKOUT_DIRECTORY = path.join(tmpdir(), `danwoo-island-world-${WORLD_COMMIT.slice(0, 7)}`);
-const PUBLIC_DIRECTORY = path.join(APP_ROOT, 'public');
-const WORLD_DIRECTORY = path.join(PUBLIC_DIRECTORY, 'world');
-const STAGING_DIRECTORY = path.join(PUBLIC_DIRECTORY, '.world-staging');
-const PREVIOUS_DIRECTORY = path.join(PUBLIC_DIRECTORY, '.world-previous');
-const STAMP_FILE = '.stamp';
-const OVERRIDES_DIRECTORY = path.join(APP_ROOT, 'world-overrides');
-const CONTENT_MODULE = path.join(APP_ROOT, 'src/views/drive/lib/engine/data/danwoo.ts');
-const LEGACY_CONTENT_MODULE = path.join(APP_ROOT, 'src/views/drive/lib/engine/data/danwoo.js');
-const LOCK_DIRECTORY = path.join(tmpdir(), 'danwoo-island-world.lock');
-const LOCK_OWNER_FILE = path.join(LOCK_DIRECTORY, 'pid');
-const LOCK_POLL_MS = 500;
-const LOCK_OWNER_GRACE_MS = 5_000;
-const LOCK_TIMEOUT_MS = 15 * 60 * 1000;
-const REQUIRED_STATIC_FILES = [
-  'palette.ktx',
-  'basis/basis_transcoder.js',
-  'draco/draco_decoder.js',
-  'favicons/favicon.svg',
-];
-
-const UNUSED_STATIC_DIRECTORIES = [
-  'projects',
-  'lab',
-  'christmas',
-  'easter',
-  'whispers',
-  'blackFriday',
-  'sounds/jingleBells',
-  'respawns',
-];
-const UNUSED_STATIC_FILES = new Set([
-  'sounds/musics/Boy.mp3',
-  'sounds/musics/Baguira.mp3',
-  'sounds/musics/Sudo.mp3',
-  'ui/map/map-day.png',
-  'ui/map/map-night.png',
-  'draco/draco_encoder.js',
-  'draco/gltf/draco_encoder.js',
-  'social/share-image.png',
-  'ui/previews/easter.png',
-  'ui/previews/easter.webp',
-  'foliage/foliageSDF.ktx',
-  'birchTrees/birchTreesVisual-compressed.glb',
-  'cherryTrees/cherryTreesVisual-compressed.glb',
-  'vehicle/defaultAntenna-compressed.glb',
-]);
-const UNUSED_FONT_FORMATS = /^fonts\/Pally-/;
-const UNCOMPRESSED_FILES_IN_USE = new Set(['vehicle/default.glb', 'vehicle/oldSchool.glb']);
-const COMPRESSED_COUNTERPART = [
-  [/\.glb$/, '-compressed.glb'],
-  [/\.png$/, '.ktx'],
-];
-
-function isUnusedStatic(source, staticDirectory) {
-  const relative = path.relative(staticDirectory, source).split(path.sep).join('/');
-  if (UNUSED_STATIC_DIRECTORIES.includes(relative)) return true;
-  if (UNUSED_STATIC_FILES.has(relative) || UNUSED_FONT_FORMATS.test(relative)) return true;
-  if (relative.endsWith('.wav')) return true;
-  if (relative.endsWith('-compressed.glb') || UNCOMPRESSED_FILES_IN_USE.has(relative)) return false;
-  return COMPRESSED_COUNTERPART.some(
-    ([extension, counterpart]) => extension.test(relative) && existsSync(source.replace(extension, counterpart)),
-  );
-}
-
-function sleep(milliseconds) {
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
-}
-
-function isProcessAlive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (error) {
-    return error.code === 'EPERM';
-  }
-}
-
-function isLockAbandoned() {
-  const owner = Number(readText(LOCK_OWNER_FILE));
-  if (Number.isInteger(owner) && owner > 0) return !isProcessAlive(owner);
-  const createdAt = statSync(LOCK_DIRECTORY, { throwIfNoEntry: false })?.mtimeMs ?? Date.now();
-  return Date.now() - createdAt > LOCK_OWNER_GRACE_MS;
-}
-
-function acquireLock() {
-  const deadline = Date.now() + LOCK_TIMEOUT_MS;
-  let hasAnnouncedWait = false;
-  while (true) {
-    try {
-      mkdirSync(LOCK_DIRECTORY);
-      writeFileSync(LOCK_OWNER_FILE, String(process.pid));
-      return;
-    } catch (error) {
-      if (error.code !== 'EEXIST') throw error;
-    }
-    if (isLockAbandoned()) {
-      rmSync(LOCK_DIRECTORY, { recursive: true, force: true });
-      continue;
-    }
-    if (Date.now() > deadline) throw new Error(`다른 월드 동기화가 끝나지 않았어요: ${LOCK_DIRECTORY}`);
-    if (!hasAnnouncedWait) process.stdout.write('다른 월드 동기화가 끝나기를 기다리고 있어요.\n');
-    hasAnnouncedWait = true;
-    sleep(LOCK_POLL_MS);
-  }
-}
-
-function releaseLock() {
-  if (readText(LOCK_OWNER_FILE) === String(process.pid)) rmSync(LOCK_DIRECTORY, { recursive: true, force: true });
-}
+import { checkoutWorldStatic } from './worldCheckout.mjs';
+import {
+  APP_ROOT,
+  CHECKOUT_DIRECTORY,
+  CONTENT_MODULE,
+  LEGACY_CONTENT_MODULE,
+  OVERRIDES_DIRECTORY,
+  PREVIOUS_DIRECTORY,
+  STAGING_DIRECTORY,
+  STAMP_FILE,
+  SYNC_FORMAT_VERSION,
+  WORLD_DIRECTORY,
+} from './worldPaths.mjs';
+import { WORLD_COMMIT } from './worldSource.mjs';
+import { REQUIRED_STATIC_FILES, isUnusedStatic } from './worldStaticFiles.mjs';
+import { acquireLock, releaseLock } from './worldSyncLock.mjs';
+import { readText } from './worldText.mjs';
 
 function cleanUp() {
   rmSync(STAGING_DIRECTORY, { recursive: true, force: true });
   releaseLock();
 }
 
-function git(args) {
-  const result = spawnSync('git', args, {
-    cwd: CHECKOUT_DIRECTORY,
-    stdio: ['ignore', 'pipe', 'pipe'],
-    encoding: 'utf8',
-  });
-  if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error(`git ${args.join(' ')} 실패\n${result.stderr}`);
-  return result.stdout.trim();
-}
-
-function hasCommit() {
-  return spawnSync('git', ['cat-file', '-e', `${WORLD_COMMIT}^{commit}`], { cwd: CHECKOUT_DIRECTORY }).status === 0;
-}
-
-function checkoutWorldStatic() {
-  mkdirSync(CHECKOUT_DIRECTORY, { recursive: true });
-  if (!existsSync(path.join(CHECKOUT_DIRECTORY, '.git'))) git(['init', '--quiet']);
-  const remotes = git(['remote']).split('\n');
-  git(
-    remotes.includes('origin')
-      ? ['remote', 'set-url', 'origin', WORLD_REPOSITORY]
-      : ['remote', 'add', 'origin', WORLD_REPOSITORY],
-  );
-  git(['sparse-checkout', 'set', '--no-cone', ...SPARSE_PATHS]);
-  if (!hasCommit()) git(['fetch', '--quiet', '--depth', '1', '--filter=blob:none', 'origin', WORLD_COMMIT]);
-  git(['checkout', '--quiet', '--force', '--detach', WORLD_COMMIT]);
-  return path.join(CHECKOUT_DIRECTORY, 'static');
-}
-
 function findMissingFiles(directory) {
   return REQUIRED_STATIC_FILES.filter((file) => !existsSync(path.join(directory, file)));
-}
-
-function readText(file) {
-  return existsSync(file) ? readFileSync(file, 'utf8') : null;
 }
 
 function collectOverrides() {

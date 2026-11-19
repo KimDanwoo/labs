@@ -1,7 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-import { islandMaterial, type PartName, type Triple } from './islandGeometry';
+import { type Triple } from './islandGeometry';
 import { fixedLandmark, LIGHTHOUSE } from './islandLandmarks';
+import { type PartName, islandMaterial } from './islandMaterials';
 import { islandModelMesh } from './islandModels';
 
 const CAREER_PAINT = new Map<string, PartName>([

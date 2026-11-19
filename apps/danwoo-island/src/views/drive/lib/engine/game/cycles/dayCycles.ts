@@ -1,7 +1,8 @@
 import * as THREE from 'three/webgpu';
 
 import { WORLD_CONFIG } from '../../worldConfig';
-import { Cycles, type Keyframe } from './cycles';
+import { type Keyframe } from './cycleKeyframes';
+import { Cycles } from './cycles';
 
 interface DayPreset {
   revealColor: THREE.Color;

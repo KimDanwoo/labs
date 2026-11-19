@@ -1,5 +1,6 @@
 import { WORLD_CONFIG } from '../../worldConfig';
-import { Cycles, type Keyframe } from './cycles';
+import { type Keyframe } from './cycleKeyframes';
+import { Cycles } from './cycles';
 
 interface SeasonPreset {
   temperature: number;

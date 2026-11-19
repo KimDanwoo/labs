@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '../../gameContext';
-import type { Action } from '../../inputs/inputs';
+import type { Action } from '../../inputs/inputTypes';
 import type { BlackBoard } from './showcaseBlackBoard';
 import { fadeShades, type Shades } from './showcaseVisuals';
 

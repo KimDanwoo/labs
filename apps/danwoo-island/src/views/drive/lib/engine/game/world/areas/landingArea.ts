@@ -2,10 +2,11 @@ import gsap from 'gsap';
 import { float, Fn, instancedArray, step, uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { INPUT_MODE, type InputMode } from '../../inputs/inputs';
-import { objectOf } from '../../objects';
-import { rebuildKeyboardDeck, rebuildKiosk, replaceBonfireBase } from '../islandStructures';
+import { INPUT_MODE, type InputMode } from '../../inputs/inputTypes';
+import { objectOf } from '../../objectColliders';
+import { replaceBonfireBase } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
+import { rebuildKeyboardDeck, rebuildKiosk } from '../villageStructures';
 import { Area } from './area';
 import { replaceLandingName } from './landingName';
 

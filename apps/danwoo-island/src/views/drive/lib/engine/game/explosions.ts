@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
-import type { Physical } from './physics/physics';
+import type { Physical } from './physics/physicsTypes';
 import { remapClamp } from './utilities/maths';
 
 export interface ExplosionOptions {

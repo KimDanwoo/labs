@@ -18,28 +18,23 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import type { WorldObject } from '../objects';
-import type { Physical } from '../physics/physics';
+import type { WorldObject } from '../objectColliders';
+import type { Physical } from '../physics/physicsTypes';
 import { QUALITY, type QualityLevel } from '../quality';
 import { TICK_ORDER } from '../tickOrder';
 import { lerp, remapClamp } from '../utilities/maths';
-
-type Vec4Node = THREE.Node<'vec4'>;
-
-interface Details {
-  hasRipples: boolean;
-  hasIce: boolean;
-  hasSplashes: boolean;
-}
-
-const ICE_HALF_THICKNESS = 0.5;
-const ICE_HALF_EXTENT = 256;
-const ICE_FRICTION = { melted: 0.5, frozen: 0.02 } as const;
-const ICE_HIDDEN_DEPTH = -1.5;
-const MIN_RATIO = 0.0001;
-const BLUR = { amount: 0.01, repeats: 12 } as const;
-const RIPPLES = { frequency: 7, opacity: 0.6 } as const;
-const THROTTLE_ORDER = 2;
+import {
+  BLUR,
+  type Details,
+  ICE_FRICTION,
+  ICE_HALF_EXTENT,
+  ICE_HALF_THICKNESS,
+  ICE_HIDDEN_DEPTH,
+  MIN_RATIO,
+  RIPPLES,
+  THROTTLE_ORDER,
+  type Vec4Node,
+} from './waterSurfaceConfig';
 
 export class WaterSurface {
   readonly ice: WorldObject & { physical: Physical; halfThickness: number };

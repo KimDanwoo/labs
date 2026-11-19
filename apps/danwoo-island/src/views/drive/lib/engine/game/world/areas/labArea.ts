@@ -4,8 +4,8 @@ import * as THREE from 'three/webgpu';
 
 import content from '../../../data/danwoo';
 import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
-import { rebuildLabGate } from '../islandStructures';
 import { rebuildVillageProps } from '../islandVillage';
+import { rebuildLabGate } from '../villageStructures';
 import { Area } from './area';
 import { LabScroller } from './labScroller';
 import { setUpBlackBoard } from './showcaseBlackBoard';

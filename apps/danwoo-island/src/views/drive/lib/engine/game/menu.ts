@@ -1,6 +1,6 @@
 import { Events } from './events';
 import { getGame } from './gameContext';
-import { INPUT_MODE } from './inputs/inputs';
+import { INPUT_MODE } from './inputs/inputTypes';
 import { isShown, type PanelState } from './panelState';
 import { Tabs } from './tabs';
 import { requireElement } from './utilities/requireElement';

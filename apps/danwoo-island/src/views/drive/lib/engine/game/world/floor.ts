@@ -3,7 +3,7 @@ import * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import type { Physical } from '../physics/physics';
+import type { Physical } from '../physics/physicsTypes';
 import { TICK_ORDER } from '../tickOrder';
 
 const CELL_SIZE = 1.5;

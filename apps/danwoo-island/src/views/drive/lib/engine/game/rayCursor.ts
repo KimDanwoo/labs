@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
-import type { ActionTrigger } from './inputs/inputs';
+import type { ActionTrigger } from './inputs/inputTypes';
 import { focusTarget, isClickTravel, nearestHit, pressTarget, type RayTarget, releaseTargets } from './rayTargets';
 
 export type IntersectShape = THREE.Sphere | THREE.Box3 | THREE.Plane | THREE.Mesh;

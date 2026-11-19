@@ -2,7 +2,7 @@ import type * as THREE from 'three/webgpu';
 
 import { getGame } from '../gameContext';
 import { InstancedGroup } from '../instancedGroup';
-import type { ColliderDescription, CollisionHandler } from '../physics/physics';
+import type { ColliderDescription, CollisionHandler } from '../physics/physicsTypes';
 import { pushOutOfShowerBay } from './showerBay';
 
 export interface InstancedPropsOptions {

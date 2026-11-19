@@ -2,41 +2,23 @@ import * as THREE from 'three/webgpu';
 
 import content from '../../../data/danwoo';
 import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
-import type { WorldObject } from '../../objects';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
+import {
+  type Fan,
+  FAN_COUNT,
+  FAN_FLIGHT,
+  FAN_HALF_SIZE,
+  FAN_HIDDEN_LIFT,
+  FAN_MASS,
+  FAN_SPREAD,
+  FAN_SWAY,
+  LINK_ELEVATION,
+  LINK_MODELS,
+  RESET_SETTLE_FRAMES,
+  UNLINKED_SIGNS,
+} from './socialAreaConfig';
 import { personalizeSocialSigns, recordSteleFrames, reshapeSocialPlaza } from './socialSigns';
-
-interface FanFlight {
-  launchedAt: number;
-  phase: number;
-  heading: number;
-  spin: number;
-}
-
-interface Fan {
-  reference: InstanceReference;
-  object: WorldObject;
-  flight: FanFlight | null;
-}
-
-const LINK_MODELS = new Map<string, string>([
-  ['GitHub', 'gitHub'],
-  ['블로그', 'twitch'],
-  ['SoundCloud', 'youtube'],
-  ['이력서', 'mail'],
-  ['Danwoo Lab', 'x'],
-]);
-const LINK_ELEVATION = 1;
-const UNLINKED_SIGNS = /^(bluesky001|linkedIn|discord)Physical/;
-const FAN_COUNT = 30;
-const FAN_MASS = 0.02;
-const FAN_HIDDEN_LIFT = 99;
-const FAN_HALF_SIZE: [number, number, number] = [0.45, 0.65, 0.45];
-const FAN_SPREAD = { horizontal: 2, lift: 0.6 } as const;
-const FAN_FLIGHT = { rise: 0.8, spin: 5, lifetime: 9 } as const;
-const FAN_SWAY = { frequency: 1.6, amplitude: 0.9, tilt: 0.8 } as const;
-const RESET_SETTLE_FRAMES = 2;
 
 export class SocialArea extends Area {
   readonly fans: { instancedGroup: InstancedGroup };

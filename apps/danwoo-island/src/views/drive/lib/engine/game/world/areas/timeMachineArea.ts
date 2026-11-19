@@ -3,7 +3,7 @@ import { Fn, texture, uv, vec2, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import content from '../../../data/danwoo';
-import { objectOf } from '../../objects';
+import { objectOf } from '../../objectColliders';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
 
