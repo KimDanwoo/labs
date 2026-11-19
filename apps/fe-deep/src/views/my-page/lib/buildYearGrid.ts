@@ -1,5 +1,5 @@
+import { localDateKey } from '@entities/progress';
 import { CELL_KIND, DAYS_PER_WEEK, MONTH_LABELS, YEAR_END, YEAR_START } from '../config/heatmap';
-import { toDateKey } from './toDateKey';
 
 export type HeatmapCell =
   | { kind: typeof CELL_KIND.outside }
@@ -14,7 +14,7 @@ export interface YearGrid {
 function toCell(cursor: Date, start: Date, end: Date, today: Date, heatmap: Record<string, number>): HeatmapCell {
   if (cursor < start || cursor > end) return { kind: CELL_KIND.outside };
   if (cursor > today) return { kind: CELL_KIND.future };
-  const date = toDateKey(cursor);
+  const date = localDateKey(cursor);
   return { kind: CELL_KIND.day, date, count: heatmap[date] ?? 0 };
 }
 

@@ -5,3 +5,7 @@ export const SM2_CONSTANTS = {
 } as const;
 
 export const PROGRESS_STATUS = { unseen: 'unseen', learning: 'learning', mastered: 'mastered' } as const;
+
+export const DATE_PART_LENGTH = 2;
+
+export const MASTERED_CORRECT_STREAK = 3;
