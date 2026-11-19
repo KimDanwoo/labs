@@ -43,6 +43,16 @@ jobs:
       - name: Validate signal coverage and refresh listening moments
         run: node apps/soundlab/scripts/check-signals.mjs --write
 
+      # 바뀐 곡 목록은 CI를 거치지 않고 바로 머지되므로(paths-ignore), 머지 전에 soundlab 검사를 직접 돌린다.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck and test soundlab
+        run: pnpm turbo run typecheck test --filter=soundlab
+
       - name: Commit, open PR, and merge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
