@@ -1,13 +1,19 @@
-import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react';
+import {
+  useEffect,
+  useRef,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 
 import { useFrame } from '@shared/lib/frame';
 import { frameState } from '../store/playback';
 import { usePlaybackControls } from './usePlaybackControls';
 
-import { ARIA_UPDATE_MS, DRAG_END_EVENTS, PERCENT, PRECISION } from '../../config/scrubber';
+import { ARIA_UPDATE_MS, DRAG_END_EVENTS, KEY_SEEK_SEC, PERCENT, PRECISION } from '../../config/scrubber';
 
 export function useScrubber() {
-  const { seek } = usePlaybackControls();
+  const { seek, seekBy } = usePlaybackControls();
   const barRef = useRef<HTMLDivElement | null>(null);
   const dragging = useRef(false);
   const sinceAria = useRef(0);
@@ -67,5 +73,25 @@ export function useScrubber() {
     seek((event.clientX - rect.left) / rect.width);
   };
 
-  return { barRef, handlePointerDown };
+  // 클릭으로는 포커스를 가져가지 않는다. 포커스가 남으면 전역 단축키(Space·J/L)가 슬라이더 입력으로 무시된다.
+  const handleMouseDown = (event: ReactMouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    const keyActions: Record<string, () => void> = {
+      ArrowRight: () => seekBy(KEY_SEEK_SEC),
+      ArrowUp: () => seekBy(KEY_SEEK_SEC),
+      ArrowLeft: () => seekBy(-KEY_SEEK_SEC),
+      ArrowDown: () => seekBy(-KEY_SEEK_SEC),
+      Home: () => seek(0),
+      End: () => seek(1),
+    };
+    const action = keyActions[event.key];
+    if (!action) return;
+    event.preventDefault();
+    action();
+  };
+
+  return { barRef, handlePointerDown, handleMouseDown, handleKeyDown };
 }

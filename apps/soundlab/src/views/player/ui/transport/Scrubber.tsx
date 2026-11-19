@@ -6,7 +6,7 @@ import { useScrubber } from '../../model/hooks/useScrubber';
 import styles from './Scrubber.module.css';
 
 export function Scrubber() {
-  const { barRef, handlePointerDown } = useScrubber();
+  const { barRef, handlePointerDown, handleMouseDown, handleKeyDown } = useScrubber();
 
   return (
     <div
@@ -16,9 +16,11 @@ export function Scrubber() {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={0}
-      tabIndex={-1}
+      tabIndex={0}
       className={cn(styles.bar, 'relative flex h-[14px] cursor-pointer touch-none items-center')}
       onPointerDown={handlePointerDown}
+      onMouseDown={handleMouseDown}
+      onKeyDown={handleKeyDown}
     >
       <span aria-hidden className="bg-hairline absolute inset-x-0 h-[2px]" />
       <span aria-hidden className={cn(styles.buffered, 'bg-mute absolute inset-x-0 h-[2px] origin-left')} />
