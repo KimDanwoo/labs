@@ -1,5 +1,4 @@
 export const COMPONENT_MARKUP_DEBT = [
-  'apps/awesome-sudoku/src/views/home/ui/HomePage.tsx#HomePage',
   'apps/danwoo-island/src/views/drive/ui/ControlsContent.tsx#ControlsContent',
   'apps/danwoo-island/src/views/drive/ui/Menu.tsx#Menu',
   'apps/danwoo-island/src/views/drive/ui/Modals.tsx#Modals',
