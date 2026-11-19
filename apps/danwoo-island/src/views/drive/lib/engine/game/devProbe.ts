@@ -8,6 +8,7 @@ type Triple = [number, number, number];
 
 export interface ProbeSnapshot {
   elapsed: number;
+  elapsedScaled: number;
   vehicle: { position: Triple; quaternion: [number, number, number, number]; velocity: Triple; speed: number };
   camera: Triple;
 }
@@ -40,6 +41,7 @@ function createProbe(game: Game): IslandProbe {
       const { x, y, z, w } = vehicle.quaternion;
       return {
         elapsed: round(game.ticker.elapsed),
+        elapsedScaled: round(game.ticker.elapsedScaled),
         vehicle: {
           position: triple(vehicle.position),
           quaternion: [round(x), round(y), round(z), round(w)],

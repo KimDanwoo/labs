@@ -111,3 +111,18 @@ export function bodyDesc(type: BodyType): RigidBodyDesc {
   };
   return createByType[type]();
 }
+
+export const MAX_STEP_SCALED = 1 / 30;
+const STEP_TOLERANCE = 0.05;
+
+export interface PhysicsStep {
+  count: number;
+  scaled: number;
+  real: number;
+}
+
+export function splitStep(deltaScaled: number, scale: number): PhysicsStep {
+  const count = Math.max(1, Math.ceil(deltaScaled / MAX_STEP_SCALED - STEP_TOLERANCE));
+  const scaled = deltaScaled / count;
+  return { count, scaled, real: scale > 0 ? scaled / scale : 0 };
+}

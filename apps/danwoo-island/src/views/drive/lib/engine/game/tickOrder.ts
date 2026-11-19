@@ -4,7 +4,6 @@ export const TICK_ORDER = {
   playerPrePhysics: 1,
   scenery: 1,
   altar: 1,
-  vehiclePrePhysics: 2,
   physics: 3,
   objects: 4,
   vehiclePostPhysics: 5,
