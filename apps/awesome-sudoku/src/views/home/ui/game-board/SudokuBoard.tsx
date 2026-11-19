@@ -1,6 +1,6 @@
 'use client';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { GAME_MODE } from '../../config/game';
 import { boardAtom, gameModeAtom } from '../../model/store/primitives';
 import { selectCellAtom } from '../../model/store/selectionAtoms';
@@ -14,6 +14,7 @@ export const SudokuBoard: React.FC = () => {
   const gameMode = useAtomValue(gameModeAtom);
   const board = useAtomValue(boardAtom);
   const selectCell = useSetAtom(selectCellAtom);
+  const tableRef = useRef<HTMLTableElement>(null);
 
   useKeyboardControls();
   useInitializeGame();
@@ -25,9 +26,9 @@ export const SudokuBoard: React.FC = () => {
       <div className="absolute -inset-3 opacity-60 blur-2xl transition-opacity duration-500 bg-gradient-to-br from-blue-400/20 via-indigo-400/10 to-purple-400/20 dark:from-blue-500/10 dark:via-indigo-500/5 dark:to-purple-500/10 group-hover:opacity-80" />
 
       <div className="relative bg-surface-primary overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
-        {gameMode === GAME_MODE.KILLER && <KillerCage />}
+        {gameMode === GAME_MODE.KILLER && <KillerCage tableRef={tableRef} />}
 
-        <table role="grid" aria-label="스도쿠 보드" className="border-collapse bg-surface-primary">
+        <table ref={tableRef} role="grid" aria-label="스도쿠 보드" className="border-collapse bg-surface-primary">
           <tbody>
             {board.map((row, rowIndex) => (
               <BoardRow key={`row-${rowIndex}`} row={row} rowIndex={rowIndex} onSelect={handleSelectCell} />

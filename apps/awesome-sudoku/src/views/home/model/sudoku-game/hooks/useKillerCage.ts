@@ -1,19 +1,19 @@
 import { useAtomValue } from 'jotai';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type RefObject } from 'react';
 import { DEFAULT_CELL_SIZE } from '../../../config/board';
 import { GAME_MODE } from '../../../config/game';
 import { cagesAtom, gameModeAtom } from '../../store/primitives';
-import { type CageInfo } from '../../types/board';
+import type { CageInfo, CellPosition, TableDimensions } from '../../types/board';
 import { useCagePathCalculator } from './useCagePathCalculator';
-import { useTableDimensions, type CellPosition } from './useTableDimensions';
+import { useTableDimensions } from './useTableDimensions';
 
-export const useKillerCage = () => {
+export const useKillerCage = (tableRef: RefObject<HTMLTableElement | null>) => {
   const cages = useAtomValue(cagesAtom);
   const gameMode = useAtomValue(gameModeAtom);
   const [cellPositions, setCellPositions] = useState<Record<string, CellPosition>>({});
 
   const handleDimensionsChange = useCallback(
-    (dimensions: { tableRect: DOMRect | null; cellPositions: Record<string, CellPosition> }) => {
+    (dimensions: TableDimensions) => {
       if (gameMode !== GAME_MODE.KILLER) {
         setCellPositions({});
         return;
@@ -23,7 +23,7 @@ export const useKillerCage = () => {
     [gameMode],
   );
 
-  const { overlayRef } = useTableDimensions(handleDimensionsChange, [cages, gameMode]);
+  const { overlayRef } = useTableDimensions(tableRef, handleDimensionsChange);
 
   const cageInfo: CageInfo = useCagePathCalculator({
     cages: gameMode === GAME_MODE.KILLER ? cages : [],

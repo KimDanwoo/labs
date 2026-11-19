@@ -1,11 +1,15 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type RefObject } from 'react';
 import { useKillerCage } from '../../model/sudoku-game/hooks/useKillerCage';
 import { KillerCageLine } from './KillerCageLine';
 
 import { CageSumLabel } from './CageSumLabel';
 
-export const KillerCage = memo(() => {
-  const { overlayRef, cageInfo, cellSize } = useKillerCage();
+interface KillerCageProps {
+  tableRef: RefObject<HTMLTableElement | null>;
+}
+
+export const KillerCage = memo(({ tableRef }: KillerCageProps) => {
+  const { overlayRef, cageInfo, cellSize } = useKillerCage(tableRef);
 
   const fontSize = useMemo(() => `${Math.max(0.5, Math.min(0.65, cellSize / 75))}rem`, [cellSize]);
 
