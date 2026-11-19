@@ -1,9 +1,9 @@
 import { atom } from 'jotai';
 import { currentTimeAtom, timerActiveAtom } from './primitives';
 
-export const incrementTimerAtom = atom(null, (get, set) => {
+export const incrementTimerAtom = atom(null, (get, set, seconds: number = 1) => {
   if (get(timerActiveAtom)) {
-    set(currentTimeAtom, get(currentTimeAtom) + 1);
+    set(currentTimeAtom, get(currentTimeAtom) + seconds);
   }
 });
 

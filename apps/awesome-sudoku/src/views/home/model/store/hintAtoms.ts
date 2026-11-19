@@ -1,4 +1,5 @@
 import { atom } from 'jotai';
+import { GAME_PHASE } from '../../config/game';
 import { atIndex, cellAt } from '../../lib/gridAccess';
 import { buildGameResultState, resolveBoardState } from '../services/gameResult';
 import { updateCellValue, updateSingleCell } from '../services/update';
@@ -15,10 +16,10 @@ import {
   timerActiveAtom,
 } from './primitives';
 import { updateHighlightsAtom } from './selectionAtoms';
-import { countBoardNumbersAtom } from './statusAtoms';
+import { countBoardNumbersAtom, gamePhaseAtom } from './statusAtoms';
 
 export const getHintAtom = atom(null, (get, set) => {
-  if (get(isCompletedAtom)) return;
+  if (get(gamePhaseAtom) !== GAME_PHASE.PLAYING) return;
   const board = get(boardAtom);
   const solution = get(solutionAtom);
   const hintsRemaining = get(hintsRemainingAtom);
