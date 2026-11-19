@@ -11,7 +11,7 @@ export const PRIVACY_DOCUMENT: LegalDocumentContent = {
     {
       title: '2. 학습 기록의 저장 위치',
       items: [
-        '학습 진도, 북마크, 면접 학습 표시는 이용자의 브라우저(localStorage)에만 저장됩니다.',
+        '학습 진도와 북마크는 이용자의 브라우저(localStorage)에만 저장됩니다.',
         '이 정보는 프딥 서버로 전송되지 않으며, 다른 기기와 동기화되지 않습니다.',
         '브라우저의 사이트 데이터를 삭제하면 학습 기록도 함께 삭제되며 복구할 수 없습니다.',
       ],
