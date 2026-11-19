@@ -3,7 +3,8 @@ import { mock, test } from 'node:test';
 
 import type { JukeboxTrack } from '../../../data/worldContent';
 import { Events } from '../../events';
-import { JukeboxPlayer, type MusicHost } from '../jukeboxPlayer';
+import { JukeboxPlayer } from '../jukeboxPlayer';
+import { type MusicHost } from '../jukeboxTypes';
 import type { SoundCloudGlobal, SoundCloudWidget, WidgetEvent, WidgetPayload } from '../soundcloudWidget';
 
 const TRACKS: JukeboxTrack[] = [1, 2, 3].map((id) => ({

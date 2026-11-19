@@ -3,12 +3,8 @@ import { color, uniform, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from './gameContext';
-import {
-  InteractivePoint,
-  type InteractivePointOptions,
-  type PointRegistry,
-  type SharedParts,
-} from './interactivePoint';
+import { InteractivePoint } from './interactivePoint';
+import { type InteractivePointOptions, type PointRegistry, type SharedParts } from './interactivePointShared';
 import { createKeyIcon, KEY_ICON_SCALE } from './keyIcon';
 import { lastVisiblePoint, nearbyPoints, needsRetest } from './pointProximity';
 import { TICK_ORDER } from './tickOrder';
