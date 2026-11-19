@@ -21,6 +21,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   return {
     title: `${category.title} - 레퍼런스`,
     description,
+    alternates: { canonical: `/reference/${category.slug}` },
     openGraph: { title: `${category.title} - 프딥 레퍼런스`, description },
   };
 }

@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: '프딥 - 프론트엔드, 딥하게 알자',
     description: '프론트엔드를 딥하게 학습하는 플랫폼. 레퍼런스와 인출 학습으로 핵심 개념을 익히세요.',
   },
