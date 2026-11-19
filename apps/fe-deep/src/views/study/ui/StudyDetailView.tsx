@@ -4,7 +4,6 @@ import { Suspense } from 'react';
 import { getStudyDoc } from '../model/server/studyDocs';
 import type { StudyDocPageProps } from '../model/server/studyRoute';
 import { StudyRunView } from './runner/StudyRunView';
-import { StudyDevReload } from './StudyDevReload';
 
 export async function StudyDetailView({ params }: StudyDocPageProps) {
   const { slug } = await params;
@@ -13,7 +12,6 @@ export async function StudyDetailView({ params }: StudyDocPageProps) {
 
   return (
     <div className="container mx-auto max-w-168 px-4 py-6 sm:py-10">
-      <StudyDevReload />
       <Suspense>
         <StudyRunView doc={doc} />
       </Suspense>

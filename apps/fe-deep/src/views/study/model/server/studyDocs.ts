@@ -1,4 +1,4 @@
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { parseStudyDoc } from '../../lib/parseHandbook';
 import { type StudyDoc } from '../../lib/studyDoc';
@@ -28,18 +28,6 @@ export async function getStudyDoc(slug: string): Promise<StudyDoc | null> {
     return parseStudyDoc(slug, raw);
   } catch {
     return null;
-  }
-}
-
-export async function getStudyContentStamp(): Promise<number> {
-  try {
-    const files = await readdir(CONTENT_DIR);
-    const stats = await Promise.all(
-      files.filter((file) => file.endsWith(MD_EXTENSION)).map((file) => stat(path.join(CONTENT_DIR, file))),
-    );
-    return Math.max(0, ...stats.map((fileStat) => fileStat.mtimeMs));
-  } catch {
-    return 0;
   }
 }
 
