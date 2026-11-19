@@ -48,3 +48,12 @@ test('held keys give one step per axis, with WASD and arrows merged and opposite
   assert.deepEqual(keyboardDirection(new Set(['arrowup', 'arrowleft'])), { dx: -1, dz: -1 });
   assert.deepEqual(keyboardDirection(new Set(['s', 'shift'])), { dx: 0, dz: 1 });
 });
+
+test('browser and OS shortcuts (⌘·Ctrl·Alt) are not game input, Shift for sprinting is', async () => {
+  const { hasShortcutModifier } = await import('../input');
+  const plain = { metaKey: false, ctrlKey: false, altKey: false };
+  assert.equal(hasShortcutModifier(plain), false);
+  assert.equal(hasShortcutModifier({ ...plain, metaKey: true }), true);
+  assert.equal(hasShortcutModifier({ ...plain, ctrlKey: true }), true);
+  assert.equal(hasShortcutModifier({ ...plain, altKey: true }), true);
+});

@@ -1,5 +1,5 @@
 import { findRoute } from '../model/world/routing';
-import { gameKey, isControlTarget } from './input';
+import { gameKey, hasShortcutModifier, isControlTarget } from './input';
 import { startJump } from './motion';
 import { createPointerPick } from './pointerPick';
 import type { SceneContext } from './sceneContext';
@@ -16,6 +16,10 @@ export function bindSceneInput(
   const { renderer, camera, markers, portalVisuals, jump, keys, portalInput } = parts;
   const keyDown = (event: KeyboardEvent) => {
     if (state.paused || (event.target instanceof HTMLElement && isControlTarget(event.target))) return;
+    if (hasShortcutModifier(event)) {
+      keys.clear();
+      return;
+    }
     const key = gameKey(event);
     if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) event.preventDefault();
     if (portalInput.isBlocked(key)) return;
@@ -27,6 +31,7 @@ export function bindSceneInput(
     }
   };
   const keyUp = (event: KeyboardEvent) => {
+    if (event.key === 'Meta') keys.clear();
     const key = gameKey(event);
     keys.delete(key);
     portalInput.release(key);
