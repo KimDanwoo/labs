@@ -150,3 +150,8 @@ export const TERRAIN = {
   maskNear: 25,
   maskFar: 70,
 } as const;
+
+export const SKY_FILES = {
+  coarse: '/environments/golden-meadow-1k.hdr',
+  fine: '/environments/golden-meadow-2k.hdr',
+} as const;
