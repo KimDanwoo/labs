@@ -4,34 +4,20 @@ import { useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import type { ScWidget } from '../../api/widget';
 import { PLAYBACK_MESSAGE, WIDGET_EVENT } from '../../config/playback';
-import { validDuration } from '../../lib/widgetPayload';
-import {
-  currentIndexAtom,
-  engineErrorAtom,
-  frameState,
-  isPlayingAtom,
-  recoveryNoticeAtom,
-  resumeNoticeAtom,
-} from '../store/playback';
+import { engineErrorAtom, isPlayingAtom, recoveryNoticeAtom, resumeNoticeAtom } from '../store/playback';
 import type { PlaybackEngine } from './useEngineRefs';
+import { useHeldSoundSync } from './useHeldSoundSync';
+import { useSwitchRewind } from './useSwitchRewind';
 
-export function usePlaybackEvents({ tracks, refs, clock, listening, volume, lastPlayed }: PlaybackEngine) {
-  const {
-    playingRef,
-    advanceRef,
-    holdsSetRef,
-    soundIdsRef,
-    heldIndexRef,
-    shouldRewindRef,
-    pendingRewindRef,
-    pauseAfterSwitchRef,
-    resumeRef,
-  } = refs;
+export function usePlaybackEvents(engine: PlaybackEngine) {
+  const { refs, clock, listening, volume, lastPlayed } = engine;
+  const { playingRef, advanceRef } = refs;
   const { anchor, interpolated, reportedMs } = clock;
   const { flush: flushListening } = listening;
   const { restoreVolume } = volume;
   const { remember } = lastPlayed;
-  const setIndex = useSetAtom(currentIndexAtom);
+  const rewindOnSwitch = useSwitchRewind(engine);
+  const syncHeldSound = useHeldSoundSync(engine);
   const setIsPlaying = useSetAtom(isPlayingAtom);
   const setEngineError = useSetAtom(engineErrorAtom);
   const setResumeNotice = useSetAtom(resumeNoticeAtom);
@@ -43,40 +29,14 @@ export function usePlaybackEvents({ tracks, refs, clock, listening, volume, last
       instance.bind(WIDGET_EVENT.play, () => {
         anchor(interpolated());
         // 볼륨이 아직 0인 지금 되감아야 이전 위치가 소리로 새지 않는다.
-        if (shouldRewindRef.current) {
-          shouldRewindRef.current = false;
-          const at = resumeRef.current?.ms ?? 0;
-          resumeRef.current = null;
-          instance.seekTo(at);
-          anchor(at);
-          pendingRewindRef.current = { ms: at, since: performance.now(), attempts: 0 };
-          if (pauseAfterSwitchRef.current) {
-            pauseAfterSwitchRef.current = false;
-            instance.pause();
-            return;
-          }
-        }
+        if (rewindOnSwitch(instance)) return;
         restoreVolume(instance);
         playingRef.current = true;
         setIsPlaying(true);
         setResumeNotice(null);
         setRecoveryNotice(false);
         setEngineError(null);
-        if (holdsSetRef.current) {
-          // 위젯이 스스로 다음 곡으로 넘어간 경우도 여기로 들어온다 — 목록 하이라이트를 여기서 맞춘다.
-          instance.getCurrentSoundIndex((soundIndex) => {
-            const id = soundIdsRef.current[soundIndex];
-            if (typeof id !== 'number') return;
-            const next = tracks.findIndex((track) => track.id === id);
-            if (next < 0) return;
-            heldIndexRef.current = next;
-            setIndex(next);
-          });
-          instance.getDuration((ms) => {
-            if (isDisposed()) return;
-            frameState.durationMs = validDuration(ms, frameState.durationMs);
-          });
-        }
+        syncHeldSound(instance, isDisposed);
       });
       instance.bind(WIDGET_EVENT.pause, () => {
         // 마지막 보고는 최대 수백 ms 낡았다. 보간해온 값으로 고정해야 멈춘 순간 시간이 뒤로 안 튄다.
@@ -102,24 +62,17 @@ export function usePlaybackEvents({ tracks, refs, clock, listening, volume, last
       advanceRef,
       anchor,
       flushListening,
-      heldIndexRef,
-      holdsSetRef,
       interpolated,
-      pauseAfterSwitchRef,
-      pendingRewindRef,
       playingRef,
       remember,
       reportedMs,
       restoreVolume,
-      resumeRef,
+      rewindOnSwitch,
       setEngineError,
-      setIndex,
       setIsPlaying,
       setRecoveryNotice,
       setResumeNotice,
-      shouldRewindRef,
-      soundIdsRef,
-      tracks,
+      syncHeldSound,
     ],
   );
 }
