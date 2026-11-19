@@ -161,6 +161,6 @@ describe('BottomSheet 상호작용', () => {
     await advance(ANIMATION_MS * 2);
 
     expect(handleClose).not.toHaveBeenCalled();
-    expect(screen.getByRole('dialog').style.transform).toBe('translateY(0)');
+    expect(screen.getByRole('dialog').style.transform).toMatch(/^translateY\(0(px)?\)$/);
   });
 });
