@@ -1,4 +1,4 @@
-import { IconButton } from '@shared/ui/IconButton';
+import { IconButton } from '@shared/ui/icon-button';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuPencil } from 'react-icons/lu';
 import { toggleNoteModeAtom } from '../../model/store/cellValueAtoms';
@@ -10,12 +10,11 @@ export const ToggleNote = () => {
   const toggleNoteMode = useSetAtom(toggleNoteModeAtom);
 
   return (
-    <IconButton
-      icon={<LuPencil strokeWidth={2} />}
-      label="메모"
-      onClick={toggleNoteMode}
-      disabled={!timerActive}
-      variant={isNoteMode ? 'primary' : 'default'}
-    />
+    <IconButton.Root onClick={toggleNoteMode} disabled={!timerActive} variant={isNoteMode ? 'primary' : 'default'}>
+      <IconButton.Icon>
+        <LuPencil strokeWidth={2} />
+      </IconButton.Icon>
+      <IconButton.Label>메모</IconButton.Label>
+    </IconButton.Root>
   );
 };

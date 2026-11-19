@@ -1,4 +1,4 @@
-import { IconButton } from '@shared/ui/IconButton';
+import { IconButton } from '@shared/ui/icon-button';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuLightbulb } from 'react-icons/lu';
 import { getHintAtom } from '../../model/store/hintAtoms';
@@ -10,12 +10,12 @@ export const GetHint = () => {
   const hintsRemaining = useAtomValue(hintsRemainingAtom);
 
   return (
-    <IconButton
-      icon={<LuLightbulb strokeWidth={2} />}
-      label="힌트"
-      onClick={() => getHint()}
-      disabled={!timerActive || hintsRemaining <= 0}
-      badge={hintsRemaining}
-    />
+    <IconButton.Root onClick={() => getHint()} disabled={!timerActive || hintsRemaining <= 0}>
+      <IconButton.Icon>
+        <LuLightbulb strokeWidth={2} />
+      </IconButton.Icon>
+      <IconButton.Label>힌트</IconButton.Label>
+      <IconButton.Badge>{hintsRemaining}</IconButton.Badge>
+    </IconButton.Root>
   );
 };
