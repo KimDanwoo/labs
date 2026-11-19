@@ -6,5 +6,5 @@
       "main": true
     }
   },
-  "ignoreCommand": "git diff --quiet \"$VERCEL_GIT_PREVIOUS_SHA\" HEAD -- . ../hub/src/views/home/model/constants ../hub/public/projects ../soundlab/src/entities/track/model/constants ../../packages ../../pnpm-lock.yaml ../../package.json"
+  "ignoreCommand": "git diff --quiet \"$VERCEL_GIT_PREVIOUS_SHA\" HEAD -- . ../hub/src/views/home/model/constants ../hub/public/projects ../soundlab/src/entities/track/model/constants ../../packages ../../pnpm-lock.yaml ../../package.json || exit 1"
 }
