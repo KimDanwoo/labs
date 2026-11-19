@@ -1,6 +1,7 @@
 export const TICK_ORDER = {
   inputs: 0,
   time: 0,
+  quality: 0,
   playerPrePhysics: 1,
   scenery: 1,
   altar: 1,
