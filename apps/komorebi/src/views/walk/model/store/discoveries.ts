@@ -7,6 +7,7 @@ import {
   type TimeOfDay,
 } from '../../config/walk';
 import { LANDMARKS } from '../world/landmarks';
+import { createPersistentStore, type PersistentStore } from './persistentStore';
 
 const NO_PAGES: readonly string[] = [];
 
@@ -30,42 +31,23 @@ export function parseDayPages(dayRaw: string | null, legacyRaw: string | null): 
   return parseDiscoveries(dayRaw ?? legacyRaw);
 }
 
-export type DiscoveryStore = {
-  get: () => readonly string[];
-  getServer: () => readonly string[];
-  subscribe: (listener: () => void) => () => void;
+export interface DiscoveryStore extends Omit<PersistentStore<readonly string[]>, 'set'> {
   add: (id: string) => void;
-};
+}
 
 function createDiscoveryStore(storageKey: string, read: () => string[]): DiscoveryStore {
-  const listeners = new Set<() => void>();
-  let ids: readonly string[] | null = null;
-  const get = () => {
-    if (ids) return ids;
-    try {
-      ids = read();
-    } catch {
-      ids = NO_PAGES;
-    }
-    return ids;
-  };
+  const { get, getServer, subscribe, set } = createPersistentStore<readonly string[]>({
+    key: storageKey,
+    read,
+    fallback: NO_PAGES,
+  });
   return {
     get,
-    getServer: () => NO_PAGES,
-    subscribe(listener) {
-      listeners.add(listener);
-      return () => listeners.delete(listener);
-    },
+    getServer,
+    subscribe,
     add(id) {
       const current = get();
-      if (current.includes(id)) return;
-      ids = [...current, id];
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(ids));
-      } catch {
-        /* The walk remains playable for this visit when storage is unavailable. */
-      }
-      listeners.forEach((listener) => listener());
+      if (!current.includes(id)) set([...current, id]);
     },
   };
 }
