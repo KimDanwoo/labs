@@ -2,11 +2,11 @@ import { PageContainer } from '@shared/ui/PageContainer';
 import { PageTitle } from '@shared/ui/PageTitle';
 import Link from 'next/link';
 
+import { categoryHref } from '@entities/question';
 import { loadQuestionContent } from '@entities/question/index.server';
 import { Card } from '@shared/ui/Card';
 
 import { CATEGORY_CARD_STAGGER_MS } from '../config/motion';
-import { categoryHref } from '../lib/categoryHref';
 
 export async function ReferenceView() {
   const { categories } = await loadQuestionContent();

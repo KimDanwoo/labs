@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { DifficultyBadge, type SearchResult } from '@entities/question';
+import { categoryHref, DifficultyBadge, type SearchResult } from '@entities/question';
 import { Badge } from '@shared/ui/Badge';
 import { CardAccordionItem } from '@shared/ui/CardAccordionItem';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
@@ -33,7 +33,7 @@ export function SearchResultItem({ result: { question, category, matchType } }: 
       <MarkdownRenderer content={question.answer} />
       <div className="mt-4 pt-3 border-t border-border/50">
         <Link
-          href={`/reference/${category.slug}`}
+          href={categoryHref(category.slug)}
           className="text-sm text-primary hover:underline transition-colors duration-200"
         >
           {category.title}에서 더 보기 →
