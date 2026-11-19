@@ -17,6 +17,8 @@ const UNUSED_STATIC_DIRECTORIES = [
   'blackFriday',
   'sounds/jingleBells',
   'respawns',
+  'ui/previews',
+  'draco/gltf',
 ];
 
 const UNUSED_STATIC_FILES = new Set([
@@ -28,8 +30,6 @@ const UNUSED_STATIC_FILES = new Set([
   'draco/draco_encoder.js',
   'draco/gltf/draco_encoder.js',
   'social/share-image.png',
-  'ui/previews/easter.png',
-  'ui/previews/easter.webp',
   'foliage/foliageSDF.ktx',
   'birchTrees/birchTreesVisual-compressed.glb',
   'cherryTrees/cherryTreesVisual-compressed.glb',
