@@ -32,6 +32,7 @@ export function isModel(resource: LoadedResource): resource is GLTF {
 
 const BASIS_TRANSCODER_PATH = './basis/';
 const DRACO_DECODER_PATH = './draco/';
+const RETRY_DELAY_MS = 500;
 
 export function textureResource(
   name: string,
@@ -50,25 +51,45 @@ export class ResourcesLoader {
   readonly #cache = new Map<string, LoadedResource>();
   #textureLoader: THREE.TextureLoader | null = null;
   #ktx2Loader: KTX2Loader | null = null;
+  #dracoLoader: DRACOLoader | null = null;
   #gltfLoader: GLTFLoader | null = null;
+  #inFlight = 0;
 
   async load(specs: readonly ResourceSpec[], onProgress?: LoadProgress): Promise<Resources> {
     let remaining = specs.length;
-    const entries = await Promise.all(
-      specs.map(async (spec) => {
-        const resource = await this.#loadCached(spec);
-        remaining -= 1;
-        onProgress?.(remaining, specs.length);
-        return [spec.name, resource] as const;
-      }),
-    );
-    return Object.fromEntries(entries);
+    this.#inFlight += 1;
+    try {
+      const entries = await Promise.all(
+        specs.map(async (spec) => {
+          const resource = await this.#loadCached(spec);
+          remaining -= 1;
+          onProgress?.(remaining, specs.length);
+          return [spec.name, resource] as const;
+        }),
+      );
+      return Object.fromEntries(entries);
+    } finally {
+      this.#inFlight -= 1;
+      if (this.#inFlight === 0) this.#releaseDecoders();
+    }
+  }
+
+  /** Draco·KTX2 디코더 워커는 wasm을 들고 있어 쉬는 동안 메모리를 차지한다. 다음 불러오기 때 다시 만든다. */
+  #releaseDecoders(): void {
+    this.#dracoLoader?.dispose();
+    this.#ktx2Loader?.dispose();
+    this.#dracoLoader = null;
+    this.#ktx2Loader = null;
+    this.#gltfLoader = null;
   }
 
   async #loadCached(spec: ResourceSpec): Promise<LoadedResource> {
     const cached = this.#cache.get(spec.path);
     if (cached) return cached;
-    const resource = await this.#loadFresh(spec);
+    const resource = await this.#loadFresh(spec).catch(async () => {
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      return this.#loadFresh(spec);
+    });
     this.#cache.set(spec.path, resource);
     return resource;
   }
@@ -96,9 +117,9 @@ export class ResourcesLoader {
 
   #gltf(): GLTFLoader {
     if (this.#gltfLoader) return this.#gltfLoader;
-    const draco = new DRACOLoader().setDecoderPath(DRACO_DECODER_PATH);
-    draco.preload();
-    this.#gltfLoader = new GLTFLoader().setDRACOLoader(draco).setKTX2Loader(this.#ktx2());
+    this.#dracoLoader = new DRACOLoader().setDecoderPath(DRACO_DECODER_PATH);
+    this.#dracoLoader.preload();
+    this.#gltfLoader = new GLTFLoader().setDRACOLoader(this.#dracoLoader).setKTX2Loader(this.#ktx2());
     return this.#gltfLoader;
   }
 }
