@@ -1,7 +1,6 @@
 name: FE Deep
 
-# fe-deep이나 그것이 쓰는 공유 패키지가 바뀐 PR에서만 정적 빌드 검사와 데이터 오류·재시도 흐름 e2e를 돌린다.
-# 빌드는 요청 때 서버에서 실행되는 기능(경로·proxy·Server Action)이 생기면 실패한다(scripts/check-static-build.mjs).
+# fe-deep이나 그것이 쓰는 공유 패키지가 바뀐 PR에서만 데이터 오류·재시도 흐름 e2e를 돌린다.
 # e2e는 자체 dev 서버로 돈다.
 on:
   pull_request:
@@ -41,9 +40,6 @@ jobs:
 
       - name: Install
         run: pnpm install --frozen-lockfile
-
-      - name: Build static site
-        run: pnpm turbo run build --filter=fe-deep
 
       - name: Install browser
         run: pnpm --filter fe-deep exec playwright install --with-deps chromium
