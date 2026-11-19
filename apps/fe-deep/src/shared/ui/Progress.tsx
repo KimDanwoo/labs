@@ -14,7 +14,7 @@ export function Progress({ className, value, ...props }: ComponentProps<typeof P
     >
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
-        className="h-full w-full flex-1 transition-all bg-gradient-to-r from-primary to-primary/70"
+        className="h-full w-full flex-1 transition-all bg-linear-to-r from-primary to-primary/70"
         style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
       />
     </ProgressPrimitive.Root>

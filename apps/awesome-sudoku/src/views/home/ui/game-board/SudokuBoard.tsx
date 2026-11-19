@@ -22,10 +22,10 @@ export const SudokuBoard: React.FC = () => {
   const handleSelectCell = useCallback((row: number, col: number) => selectCell({ row, col }), [selectCell]);
 
   return (
-    <div className="relative group flex-shrink-0">
-      <div className="absolute -inset-3 opacity-60 blur-2xl transition-opacity duration-500 bg-gradient-to-br from-blue-400/20 via-indigo-400/10 to-purple-400/20 dark:from-blue-500/10 dark:via-indigo-500/5 dark:to-purple-500/10 group-hover:opacity-80" />
+    <div className="relative group shrink-0">
+      <div className="absolute -inset-3 opacity-60 blur-2xl transition-opacity duration-500 bg-linear-to-br from-blue-400/20 via-indigo-400/10 to-purple-400/20 dark:from-blue-500/10 dark:via-indigo-500/5 dark:to-purple-500/10 group-hover:opacity-80" />
 
-      <div className="relative bg-surface-primary overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
+      <div className="relative bg-surface-primary overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] ring-1 ring-black/3 dark:ring-white/5">
         {gameMode === GAME_MODE.KILLER && <KillerCage tableRef={tableRef} />}
 
         <table ref={tableRef} role="grid" aria-label="스도쿠 보드" className="border-collapse bg-surface-primary">

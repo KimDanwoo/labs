@@ -7,7 +7,7 @@ export default function NotFound() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="text-center space-y-6 max-w-[28rem] animate-fade-in-up">
         <div className="space-y-2">
-          <h1 className="text-8xl font-bold tracking-tighter bg-gradient-to-b from-foreground to-muted-foreground/50 bg-clip-text text-transparent">
+          <h1 className="text-8xl font-bold tracking-tighter bg-linear-to-b from-foreground to-muted-foreground/50 bg-clip-text text-transparent">
             404
           </h1>
           <p className="text-xl font-normal">페이지를 찾을 수 없습니다</p>

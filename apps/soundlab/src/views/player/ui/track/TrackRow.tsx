@@ -18,7 +18,7 @@ export function TrackRow({ track, index, position = index, isCurrent, onSelect }
       type="button"
       aria-current={isCurrent}
       onClick={() => onSelect(index)}
-      className="text-dim hover:text-paper hover:bg-hairline-soft focus-visible:text-paper focus-visible:bg-hairline-soft aria-[current=true]:text-paper aria-[current=true]:bg-hairline-soft aria-[current=true]:border-l-brass grid w-full grid-cols-[2.5em_minmax(0,1fr)_2.9em] items-center gap-sm border-l-2 border-l-transparent px-md py-sm text-left text-sm transition-colors duration-300 outline-none"
+      className="text-dim hover:text-paper hover:bg-hairline-soft focus-visible:text-paper focus-visible:bg-hairline-soft aria-current:text-paper aria-current:bg-hairline-soft aria-current:border-l-brass grid w-full grid-cols-[2.5em_minmax(0,1fr)_2.9em] items-center gap-sm border-l-2 border-l-transparent px-md py-sm text-left text-sm transition-colors duration-300 outline-none"
     >
       <span className={`font-label text-[10px] tracking-label tabular-nums ${isCurrent ? 'text-brass' : 'text-mute'}`}>
         {formatTrackNumber(position)}

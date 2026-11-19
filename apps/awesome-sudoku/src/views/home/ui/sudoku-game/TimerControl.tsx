@@ -23,7 +23,7 @@ export const TimerControl = memo(() => {
           state === TIMER_STATE.running &&
             'bg-surface-primary/80 text-text-secondary shadow-sm hover:bg-surface-primary hover:text-text-primary active:scale-95',
           state === TIMER_STATE.paused &&
-            'bg-gradient-to-b from-gradient-from to-gradient-to text-white shadow-[0_4px_12px_rgba(var(--rgb-gradient-from),0.3)] hover:shadow-[0_6px_16px_rgba(var(--rgb-gradient-from),0.4)] active:scale-95',
+            'bg-linear-to-b from-gradient-from to-gradient-to text-white shadow-[0_4px_12px_rgba(var(--rgb-gradient-from),0.3)] hover:shadow-[0_6px_16px_rgba(var(--rgb-gradient-from),0.4)] active:scale-95',
         )}
         aria-label={timerActive ? '일시정지' : '재생'}
         disabled={isCompleted}
