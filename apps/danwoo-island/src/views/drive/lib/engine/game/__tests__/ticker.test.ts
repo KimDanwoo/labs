@@ -18,6 +18,15 @@ describe('Ticker', () => {
     assert.deepEqual(calls, ['tick', 'wait', 'tick', 'tick']);
   });
 
+  it('0프레임 wait 콜백은 다음 프레임에 실행한다', () => {
+    const ticker = new Ticker();
+    const calls: string[] = [];
+    ticker.wait(0, () => calls.push('wait'));
+    ticker.update(FRAME_MS);
+    ticker.update(FRAME_MS * 2);
+    assert.deepEqual(calls, ['wait']);
+  });
+
   it('delta는 maxDelta로 제한하고 scale을 곱해 누적한다', () => {
     const ticker = new Ticker();
     ticker.update(1000);
