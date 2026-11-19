@@ -7,7 +7,7 @@ export interface ScreenInsets {
   left: number;
 }
 
-export interface OverviewFrameInput {
+interface OverviewFrameInput {
   points: readonly THREE.Vector3[];
   phi: number;
   theta: number;

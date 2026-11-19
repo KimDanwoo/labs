@@ -17,7 +17,7 @@ import * as THREE from 'three/webgpu';
 import { COLORS, DEBRIS, debrisData, DUST, FUNNEL } from './altarAreaConfig';
 import type { Area } from './area';
 
-export interface AltarEffectContext {
+interface AltarEffectContext {
   area: Area;
   position: THREE.Vector3;
   swirlTime: THREE.UniformNode<'float', number>;

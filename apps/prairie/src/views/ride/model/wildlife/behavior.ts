@@ -1,4 +1,4 @@
-export type CreatureState = { alert: number; rest: number };
+type CreatureState = { alert: number; rest: number };
 export const createCreatureState = (): CreatureState => ({ alert: 0, rest: 0 });
 
 // A short memory prevents jitter at the proximity boundary; animals settle after

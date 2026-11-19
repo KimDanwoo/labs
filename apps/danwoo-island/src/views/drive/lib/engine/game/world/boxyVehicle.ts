@@ -40,7 +40,7 @@ export interface VehicleParts {
   build: (materials: Record<PartName, THREE.Material>) => THREE.Group;
 }
 
-export interface BoxyVehicle {
+interface BoxyVehicle {
   model: THREE.Group;
   dispose: () => void;
 }

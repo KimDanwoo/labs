@@ -40,7 +40,7 @@ import type { Wind } from './wind';
 import type { World } from './world/world';
 import type { Zones } from './zones';
 
-export type Rapier = typeof import('@dimforge/rapier3d-compat');
+type Rapier = typeof import('@dimforge/rapier3d-compat');
 
 export interface GameSystems {
   domElement: HTMLElement;

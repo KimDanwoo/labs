@@ -1,6 +1,6 @@
 import { Howler } from 'howler';
 
-export interface MusicStreamOptions {
+interface MusicStreamOptions {
   src: string;
   volume: number;
   needsGestureUnlock: boolean;

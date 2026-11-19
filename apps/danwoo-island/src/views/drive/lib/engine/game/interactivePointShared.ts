@@ -38,7 +38,7 @@ export interface PointRegistry {
   shrinkKeyIcon(): void;
 }
 export const CENTER_BIAS_NDC = 0.15;
-export const GROUP = { pitch: -Math.PI * 0.15, yaw: Math.PI * 0.25, scale: 0.85 } as const;
+const GROUP = { pitch: -Math.PI * 0.15, yaw: Math.PI * 0.25, scale: 0.85 } as const;
 export const RENDER_ORDER = { label: 6, diamond: 7 } as const;
 export const HIT_RADIUS = 0.75;
 export const DIAMOND = {
@@ -46,7 +46,7 @@ export const DIAMOND = {
   open: { threshold: 0.5, thickness: 0.075, offset: 0.15 },
   concealed: { threshold: 0.25, thickness: 0.15, offset: 0.175 },
 } as const;
-export function foggedBackColor(shared: SharedParts): THREE.Node<'vec3'> {
+function foggedBackColor(shared: SharedParts): THREE.Node<'vec3'> {
   const { fog } = getGame();
   return fog.strength.mix(shared.backColor, fog.color);
 }

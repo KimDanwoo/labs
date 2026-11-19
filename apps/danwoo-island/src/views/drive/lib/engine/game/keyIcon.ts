@@ -5,9 +5,9 @@ import { getGame } from './gameContext';
 import { INPUT_MODE } from './inputs/inputTypes';
 import type { SharedParts } from './interactivePointShared';
 
-export const KEY_ICON_RENDER_ORDER = 8;
+const KEY_ICON_RENDER_ORDER = 8;
 export const KEY_ICON_SCALE = 0.25;
-export function flippedUvTexture(map: THREE.Texture): THREE.Node<'float'> {
+function flippedUvTexture(map: THREE.Texture): THREE.Node<'float'> {
   return texture(map, vec2(uv().x, uv().y.oneMinus())).r;
 }
 

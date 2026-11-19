@@ -1,6 +1,6 @@
 import { DIFFICULTY_CONFIG, DIFFICULTY_VALUES, type Difficulty } from '@entities/question';
 
-export interface DifficultyFilter {
+interface DifficultyFilter {
   value: Difficulty | undefined;
   label: string;
 }

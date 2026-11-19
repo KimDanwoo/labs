@@ -22,7 +22,7 @@ export const GATES = [
   { x: 5, z: 340, height: 23 },
 ] as const;
 export const GATE_RADIUS = 4.5;
-export type Point = { x: number; y: number; z: number };
+type Point = { x: number; y: number; z: number };
 
 // Sweep a small body volume through the aperture in either direction, including dashes.
 export function crossesGate(from: Point, to: Point, center: Point): boolean {

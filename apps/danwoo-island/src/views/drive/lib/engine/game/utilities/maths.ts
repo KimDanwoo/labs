@@ -1,14 +1,14 @@
-export interface Point2 {
+interface Point2 {
   x: number;
   y: number;
 }
 
-export interface Circle {
+interface Circle {
   center: Point2;
   radius: number;
 }
 
-export type Range = readonly [number, number];
+type Range = readonly [number, number];
 
 const TAU = 2 * Math.PI;
 
@@ -35,11 +35,6 @@ export function smoothstep(value: number, min: number, max: number): number {
 
 export function safeMod(value: number, modulo: number): number {
   return ((value % modulo) + modulo) % modulo;
-}
-
-export function signedModDelta(from: number, to: number, modulo: number): number {
-  const delta = (to - from + modulo) % modulo;
-  return delta > modulo / 2 ? delta - modulo : delta;
 }
 
 export function smallestAngle(current: number, target: number): number {

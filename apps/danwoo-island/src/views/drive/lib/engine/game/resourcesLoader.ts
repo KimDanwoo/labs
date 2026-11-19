@@ -22,9 +22,9 @@ interface ModelSpec {
 }
 
 export type ResourceSpec = TextureSpec | ModelSpec;
-export type LoadedResource = THREE.Texture | GLTF;
+type LoadedResource = THREE.Texture | GLTF;
 export type Resources = Record<string, LoadedResource>;
-export type LoadProgress = (remaining: number, total: number) => void;
+type LoadProgress = (remaining: number, total: number) => void;
 
 export function isModel(resource: LoadedResource): resource is GLTF {
   return 'scene' in resource;

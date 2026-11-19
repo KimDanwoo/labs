@@ -24,7 +24,7 @@ import { applyInstanceMatrix } from '../utilities/instanceMatrix';
 
 type ColorUniform = THREE.UniformNode<'color', THREE.Color>;
 
-export interface FoliageOptions {
+interface FoliageOptions {
   references: readonly THREE.Object3D[];
   colorA: ColorUniform;
   colorB: ColorUniform;

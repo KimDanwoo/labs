@@ -3,16 +3,16 @@ import * as THREE from 'three/webgpu';
 
 type FloatNode = THREE.Node<'float'>;
 type Vec2Node = THREE.Node<'vec2'>;
-export type ColorNode = THREE.Node<'vec3'> | THREE.Node<'color'>;
+type ColorNode = THREE.Node<'vec3'> | THREE.Node<'color'>;
 
-export interface GridLine {
+interface GridLine {
   color: THREE.ColorRepresentation;
   scale: number;
   thickness: number;
   cross: number;
 }
 
-export interface GridColorOptions {
+interface GridColorOptions {
   color: THREE.ColorRepresentation;
   scale: number;
   lines: readonly GridLine[];

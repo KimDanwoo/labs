@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu';
 
 import { RESPAWN_POINTS, type RespawnPoint, respawnPosition } from './world/layout/islandLayout';
 
-export interface Respawn {
+interface Respawn {
   name: string;
   position: THREE.Vector3;
   rotation: number;

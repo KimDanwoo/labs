@@ -1,8 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-export type TextAlign = 'left' | 'center' | 'right';
+type TextAlign = 'left' | 'center' | 'right';
 
-export interface TextCanvasOptions {
+interface TextCanvasOptions {
   fontFamily?: string;
   fontWeight?: string;
   fontSize?: number;

@@ -24,7 +24,7 @@ export interface CycleProperty {
   overrideValue: CycleValue | null;
 }
 
-export type CycleOverrideValues<P extends Record<keyof P, CycleValue>> = Partial<P> & { progress?: number };
+type CycleOverrideValues<P extends Record<keyof P, CycleValue>> = Partial<P> & { progress?: number };
 
 export interface CyclesOptions<P extends Record<keyof P, CycleValue>, N extends string> {
   durationSeconds: number;

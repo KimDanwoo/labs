@@ -4,7 +4,7 @@ import { getGame } from './gameContext';
 import type { Physical } from './physics/physicsTypes';
 import { remapClamp } from './utilities/maths';
 
-export interface ExplosionOptions {
+interface ExplosionOptions {
   radius?: number;
   strength?: number;
   isVehicleOnly?: boolean;

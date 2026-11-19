@@ -9,7 +9,7 @@ interface LandmarkCollider {
   readonly position: THREE.Vector3;
 }
 
-export interface Landmark {
+interface Landmark {
   readonly key: IslandModelKey;
   readonly size: THREE.Vector3;
   readonly colliders: readonly LandmarkCollider[];

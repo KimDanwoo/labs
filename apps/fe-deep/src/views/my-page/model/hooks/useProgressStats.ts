@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 
 import { toPercent } from '../../lib/toPercent';
 
-export interface OverallStats {
+interface OverallStats {
   total: number;
   mastered: number;
   learning: number;

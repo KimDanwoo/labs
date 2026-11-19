@@ -58,7 +58,7 @@ const ISLAND_MODELS = {
 
 export type IslandModelKey = keyof typeof ISLAND_MODELS;
 
-export interface ModelGeometryOptions {
+interface ModelGeometryOptions {
   size?: THREE.Vector3 | null;
   matrix?: THREE.Matrix4 | null;
 }

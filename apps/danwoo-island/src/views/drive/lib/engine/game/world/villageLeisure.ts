@@ -2,12 +2,9 @@ import * as THREE from 'three/webgpu';
 
 import type { Parts } from './islandGeometry';
 import type { PartName } from './islandMaterials';
-import { islandModelMesh } from './islandModels';
 import { type PropFrame } from './villageKit';
 
 const SIDES = [-1, 1] as const;
-const PORTAL_BACK_Z = -0.45;
-const CUBOID = /^cuboid/i;
 
 const TROPICAL_PLATTER = {
   trayWidthRatio: 0.95,
@@ -154,12 +151,4 @@ export function dotjari(parts: Parts, { size, matrix }: PropFrame): void {
       });
     }
   }
-}
-
-export function portalArch(_parts: Parts, container: THREE.Object3D): void {
-  const rearColliders = container.children.filter(
-    ({ name, position }) => CUBOID.test(name) && position.z < PORTAL_BACK_Z,
-  );
-  for (const collider of rearColliders) collider.removeFromParent();
-  container.add(islandModelMesh('portalArch', null));
 }

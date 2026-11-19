@@ -28,13 +28,6 @@ export function closedCurve(points: readonly Point[], samplesPerSpan: number): P
   });
 }
 
-export function loopLength(points: readonly Point[]): number {
-  return points.reduce((sum, point, index) => {
-    const next = wrapped(points, index + 1);
-    return sum + Math.hypot(next[0] - point[0], next[1] - point[1]);
-  }, 0);
-}
-
 export function segmentDistance(point: Point, from: Point, to: Point): number {
   const dx = to[0] - from[0];
   const dz = to[1] - from[1];
@@ -51,7 +44,7 @@ export function loopDistance(point: Point, loop: readonly Point[]): number {
   );
 }
 
-export function isInsideLoop(point: Point, loop: readonly Point[]): boolean {
+function isInsideLoop(point: Point, loop: readonly Point[]): boolean {
   return loop.reduce((inside, from, index) => {
     const to = wrapped(loop, index + 1);
     const crosses = from[1] > point[1] !== to[1] > point[1];

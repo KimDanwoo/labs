@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-export interface QuadPoint {
+interface QuadPoint {
   base: THREE.Vector2;
   offseted: THREE.Vector2;
 }

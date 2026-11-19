@@ -6,7 +6,7 @@ export type HeatmapCell =
   | { kind: typeof CELL_KIND.future }
   | { kind: typeof CELL_KIND.day; date: string; count: number };
 
-export interface YearGrid {
+interface YearGrid {
   weeks: HeatmapCell[][];
   monthLabelByWeek: Map<number, string>;
 }

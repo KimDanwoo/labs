@@ -1,6 +1,6 @@
 import { FIRST_PAGE, NEARBY_PAGES, PAGE_ELLIPSIS } from '../config/pagination';
 
-export type PageItem = number | typeof PAGE_ELLIPSIS;
+type PageItem = number | typeof PAGE_ELLIPSIS;
 
 export function buildPageItems(totalPages: number, page: number): PageItem[] {
   const visible = Array.from({ length: totalPages }, (_, index) => index + FIRST_PAGE).filter(

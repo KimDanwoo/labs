@@ -5,7 +5,7 @@ import { TICK_ORDER } from './tickOrder';
 
 export type InstanceReference = THREE.Object3D & { needsUpdate?: boolean };
 
-export interface InstancedGroupOptions {
+interface InstancedGroupOptions {
   isAutoUpdated?: boolean;
 }
 
@@ -14,7 +14,7 @@ interface InstancedPart {
   instance: THREE.InstancedMesh;
 }
 
-export function referencesFromChildren(children: readonly THREE.Object3D[]): InstanceReference[] {
+function referencesFromChildren(children: readonly THREE.Object3D[]): InstanceReference[] {
   return children.map((child) => {
     const reference: InstanceReference = new THREE.Object3D();
     reference.position.copy(child.position);
@@ -25,7 +25,7 @@ export function referencesFromChildren(children: readonly THREE.Object3D[]): Ins
   });
 }
 
-export function baseAndReferencesFromInstances(
+function baseAndReferencesFromInstances(
   instances: readonly THREE.Object3D[],
 ): [base: THREE.Object3D, references: InstanceReference[]] {
   const first = instances[0];

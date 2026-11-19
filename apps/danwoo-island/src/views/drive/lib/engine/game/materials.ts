@@ -6,7 +6,7 @@ import { MeshDefaultMaterial, revealNode } from './materials/meshDefaultMaterial
 
 type ConvertibleMaterial = THREE.MeshStandardMaterial | THREE.MeshLambertNodeMaterial;
 
-export interface EmissiveGradientOptions {
+interface EmissiveGradientOptions {
   inner: THREE.ColorRepresentation;
   outer: THREE.ColorRepresentation;
   intensity: number;

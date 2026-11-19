@@ -4,7 +4,7 @@ import { AREA_ANCHORS, type AreaKey } from './islandLayout';
 
 const UP = new THREE.Vector3(0, 1, 0);
 
-export function areaRotation(area: AreaKey): number {
+function areaRotation(area: AreaKey): number {
   return AREA_ANCHORS[area].rotation ?? 0;
 }
 
