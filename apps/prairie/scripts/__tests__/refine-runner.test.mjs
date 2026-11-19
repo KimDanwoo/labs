@@ -2,14 +2,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
-function load(name) {
-  const bytes = readFileSync(new URL(`../../public/models/${name}.glb`, import.meta.url));
+function load(path) {
+  const bytes = readFileSync(new URL(path, import.meta.url));
   const jsonLength = bytes.readUInt32LE(12);
   const gltf = JSON.parse(bytes.subarray(20, 20 + jsonLength).toString());
   return { gltf, bin: bytes.subarray(jsonLength + 28) };
 }
-const original = load('runner');
-const refined = load('unicorn');
+const original = load('../runner/source/runner.glb');
+const refined = load('../../public/models/unicorn.glb');
 
 function read(index) {
   const a = refined.gltf.accessors[index];
