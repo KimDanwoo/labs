@@ -1,55 +1,24 @@
 import gsap from 'gsap';
-import {
-  color,
-  float,
-  Fn,
-  instancedArray,
-  mix,
-  positionGeometry,
-  step,
-  texture,
-  uniform,
-  uv,
-  vec2,
-  vec3,
-  vec4,
-} from 'three/tsl';
+import { float, Fn, positionGeometry, texture, uniform, uv, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import type { AudioItem } from '../../audioItem';
 import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
-import type { WorldObject } from '../../objectColliders';
 import { COCONUT_SIZE, makeCoconut, rebuildVillageProps } from '../islandVillage';
 import { rebuildCookieCart } from '../villageStructures';
 import { Area } from './area';
-
-interface Coconut {
-  reference: InstanceReference;
-  object: WorldObject;
-}
-
-const SPAWNABLE = 20;
-const ON_TABLE = 2;
-const COCONUT_MASS = 0.02;
-const TABLE_STACK = 0.25;
-const HIDDEN_LIFT = 99;
-const EMBERS = { count: 30, elevation: 3, radius: 0.4, size: 0.015, segments: 8, hideAt: 0.8, hideLift: 100 } as const;
-const EMBER_BOUNDS = { centerY: 1, radius: 1, delayFrames: 2 } as const;
-const BANNER_WIND_DIRECTION = vec3(0.5, 0, 1);
-const IMPULSE_DELAY_FRAMES = 2;
-const HEAT_PULSE = { scale: 2, duration: 2, delay: 0.2 } as const;
-
-function emberData(): { positions: Float32Array; scales: Float32Array } {
-  const positions = new Float32Array(EMBERS.count * 3);
-  const scales = new Float32Array(EMBERS.count);
-  for (let index = 0; index < EMBERS.count; index += 1) {
-    const angle = Math.PI * 2 * Math.random();
-    const radius = Math.random() ** 1.5 * EMBERS.radius;
-    positions.set([Math.cos(angle) * radius, Math.random(), Math.sin(angle) * radius], index * 3);
-    scales[index] = Math.random() * 1 + 0.75;
-  }
-  return { positions, scales };
-}
+import {
+  BANNER_WIND_DIRECTION,
+  type Coconut,
+  COCONUT_MASS,
+  HEAT_PULSE,
+  HIDDEN_LIFT,
+  IMPULSE_DELAY_FRAMES,
+  ON_TABLE,
+  SPAWNABLE,
+  TABLE_STACK,
+} from './cookieAreaConfig';
+import { createEmbers, createOvenHeat } from './cookieEffects';
 
 export class CookieArea extends Area {
   readonly cookies: { instancedGroup: InstancedGroup };
@@ -77,8 +46,8 @@ export class CookieArea extends Area {
     });
     this.#blower = this.requireReference('blower');
     this.#waveBanner();
-    this.#createEmbers();
-    this.#ovenHeat = this.#createOvenHeat();
+    createEmbers(this, this.#localTime);
+    this.#ovenHeat = createOvenHeat(this);
     this.#spawnerPosition = this.requireReference('spawner').position;
     const baseCoconut = this.#prepareBaseCoconut();
     this.#coconuts = Array.from({ length: SPAWNABLE + ON_TABLE }, (_, index) => this.#createCoconut(index));
@@ -111,66 +80,6 @@ export class CookieArea extends Area {
       newPosition.addAssign(BANNER_WIND_DIRECTION.mul(windStrength));
       return newPosition;
     })();
-  }
-
-  #createEmbers(): void {
-    const { positions, scales } = emberData();
-    const positionAttribute = instancedArray(positions, 'vec3').toAttribute();
-    const scaleAttribute = instancedArray(scales, 'float').toAttribute();
-    const elevation = uniform(EMBERS.elevation);
-    const material = new THREE.SpriteNodeMaterial();
-    material.outputNode = this.game.materials.emissiveOutput('emissiveOrangeRadialGradient');
-
-    const progress = float(0).toVar();
-    material.positionNode = Fn(() => {
-      const newPosition = positionAttribute.toVar();
-      progress.assign(newPosition.y.add(this.#localTime.mul(newPosition.y)).fract());
-      newPosition.y.assign(progress.mul(elevation));
-      newPosition.y.addAssign(step(EMBERS.hideAt, progress).mul(EMBERS.hideLift));
-      return newPosition;
-    })();
-    material.scaleNode = Fn(() => scaleAttribute.mul(progress.remapClamp(0.5, 1, 1, 0)))();
-
-    const mesh = new THREE.Mesh(new THREE.CircleGeometry(EMBERS.size, EMBERS.segments), material);
-    mesh.position.copy(this.requireReference('chimney').position);
-    mesh.count = EMBERS.count;
-    this.game.scene.add(mesh);
-
-    let needsBounds = true;
-    this.events.on('frustumIn', () => {
-      if (!needsBounds) return;
-      needsBounds = false;
-      this.game.ticker.wait(EMBER_BOUNDS.delayFrames, () => {
-        const bounds = mesh.geometry.boundingSphere;
-        if (!bounds) return;
-        bounds.center.y = EMBER_BOUNDS.centerY;
-        bounds.radius = EMBER_BOUNDS.radius;
-      });
-    });
-    this.objects.hideable.push(mesh);
-  }
-
-  #createOvenHeat(): THREE.Object3D {
-    const { ticker, noises } = this.game;
-    const material = new THREE.MeshBasicNodeMaterial({
-      side: THREE.DoubleSide,
-      transparent: true,
-      depthTest: true,
-      depthWrite: false,
-    });
-    material.outputNode = Fn(() => {
-      const noiseUv = uv().mul(vec2(2, 0.2));
-      noiseUv.y.addAssign(ticker.elapsedScaledUniform.mul(0.05));
-      const strength = texture(noises.perlin, noiseUv).r.mul(uv().y.pow(2));
-      const emissiveColor = mix(color('#ff3e00'), color('#ff8641'), strength.smoothstep(0, 0.5)).mul(
-        strength.add(1).mul(2),
-      );
-      return vec4(vec3(emissiveColor), strength);
-    })();
-    const ovenHeat = this.requireReference('ovenHeat');
-    if (ovenHeat instanceof THREE.Mesh) ovenHeat.material = material;
-    ovenHeat.castShadow = false;
-    return ovenHeat;
   }
 
   #prepareBaseCoconut(): THREE.Object3D {

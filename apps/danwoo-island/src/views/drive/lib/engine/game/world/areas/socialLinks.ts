@@ -1,15 +1,7 @@
 import content from '../../../data/danwoo';
 import type { Area } from './area';
+import { interactButtons } from './areaPoint';
 import { LINK_ELEVATION, LINK_MODELS } from './socialAreaConfig';
-
-export function interactButtons(area: Area): { onReveal: () => void; onConceal: () => void; onHide: () => void } {
-  const { interactiveButtons } = area.game.inputs;
-  return {
-    onReveal: () => interactiveButtons.addItems(['interact']),
-    onConceal: () => interactiveButtons.removeItems(['interact']),
-    onHide: () => interactiveButtons.removeItems(['interact']),
-  };
-}
 
 export function createSocialLinks(area: Area): void {
   for (const link of content.social) {

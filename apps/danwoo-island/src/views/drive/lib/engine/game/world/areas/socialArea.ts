@@ -3,6 +3,7 @@ import * as THREE from 'three/webgpu';
 import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
 import { rebuildVillageProps } from '../islandVillage';
 import { Area } from './area';
+import { interactButtons } from './areaPoint';
 import {
   type Fan,
   FAN_COUNT,
@@ -15,7 +16,7 @@ import {
   RESET_SETTLE_FRAMES,
   UNLINKED_SIGNS,
 } from './socialAreaConfig';
-import { createSocialLinks, interactButtons } from './socialLinks';
+import { createSocialLinks } from './socialLinks';
 import { personalizeSocialSigns, recordSteleFrames, reshapeSocialPlaza } from './socialSigns';
 
 export class SocialArea extends Area {
