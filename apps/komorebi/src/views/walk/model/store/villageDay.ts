@@ -1,5 +1,6 @@
 import { TIME_ORDER, WEATHER } from '../../config/walk';
 import { FIRST_DAY, type VillageDay } from '../../lib/dayCycle';
+import { createPersistentStore } from './persistentStore';
 
 export const VILLAGE_DAY_KEY = 'komorebi-village-day-v1';
 
@@ -21,32 +22,8 @@ export function parseVillageDay(raw: string | null): VillageDay {
   }
 }
 
-let current: VillageDay | undefined;
-const listeners = new Set<() => void>();
-export const villageDayStore = {
-  get() {
-    if (current) return current;
-    try {
-      current = parseVillageDay(localStorage.getItem(VILLAGE_DAY_KEY));
-    } catch {
-      current = FIRST_DAY;
-    }
-    return current;
-  },
-  getServer: () => FIRST_DAY,
-  subscribe(listener: () => void) {
-    listeners.add(listener);
-    return () => {
-      listeners.delete(listener);
-    };
-  },
-  set(next: VillageDay) {
-    current = next;
-    try {
-      localStorage.setItem(VILLAGE_DAY_KEY, JSON.stringify(next));
-    } catch {
-      /* A blocked or full storage must never prevent playing. */
-    }
-    listeners.forEach((listener) => listener());
-  },
-};
+export const villageDayStore = createPersistentStore({
+  key: VILLAGE_DAY_KEY,
+  read: () => parseVillageDay(localStorage.getItem(VILLAGE_DAY_KEY)),
+  fallback: FIRST_DAY,
+});
