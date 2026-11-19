@@ -5,6 +5,7 @@ import { journeyLine } from '../lib/journey';
 import { useModal } from '../model/hooks/useModal';
 import { useWalkContext } from '../model/hooks/useWalkContext';
 import { AtlasGuides } from './AtlasGuides';
+import { DialogHeading } from './DialogHeading';
 import { DiscoveryList } from './DiscoveryList';
 import { Icon } from './Icon';
 
@@ -28,15 +29,13 @@ export function WalkAtlas() {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div className="dialog-heading">
-        <div>
-          <span className="eyebrow">{copy.eyebrow}</span>
-          <h2 id={titleId}>{copy.title}</h2>
-        </div>
-        <button className="tool" aria-label={copy.closeLabel} onClick={onClose}>
-          <Icon name="close" />
-        </button>
-      </div>
+      <DialogHeading
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        titleId={titleId}
+        closeLabel={copy.closeLabel}
+        onClose={onClose}
+      />
       <p className="dialog-intro">{copy.intro}</p>
       {!isJournal && <AtlasGuides />}
       <DiscoveryList />

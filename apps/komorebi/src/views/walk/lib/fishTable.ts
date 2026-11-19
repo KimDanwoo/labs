@@ -183,3 +183,7 @@ export function isRareFish(id: string) {
   const fish = FISH.find((item) => item.id === id);
   return fish?.rarity === FISH_RARITY.rare || fish?.rarity === FISH_RARITY.legendary;
 }
+
+export function fishName(id: string): string | undefined {
+  return FISH.find((item) => item.id === id)?.name;
+}
