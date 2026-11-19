@@ -1,3 +1,5 @@
+import { prefersReducedMotion } from '../utilities/reducedMotion';
+
 const ROLL = { damping: 4, pullStrength: 100, kickStrength: 1 } as const;
 
 export class CameraRoll {
@@ -5,6 +7,7 @@ export class CameraRoll {
   #speed = 0;
 
   kick = (strength = 1): void => {
+    if (prefersReducedMotion()) return;
     this.#speed = strength * ROLL.kickStrength * (Math.random() < 0.5 ? -1 : 1);
   };
 

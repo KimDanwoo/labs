@@ -5,6 +5,7 @@ import { introCenter } from './introCenter';
 import { QUALITY } from './quality';
 import { TICK_ORDER } from './tickOrder';
 import { lerp, smoothstep } from './utilities/maths';
+import { prefersReducedMotion } from './utilities/reducedMotion';
 import { CameraRoll } from './view/cameraRoll';
 import { Cinematic } from './view/cinematic';
 import { OptimalArea } from './view/optimalArea';
@@ -145,7 +146,8 @@ export class View {
   #updateZoom(focusSpeed: number, delta: number): void {
     if (this.zoom.toggle !== 0) nudgeZoom(this.zoom, this.zoom.toggle * ZOOM.toggleStep);
     const speedRatio = smoothstep(focusSpeed, ZOOM.speedEdge.min, ZOOM.speedEdge.max);
-    const isSpeedZoom = this.focusPoint.isTracking && this.game.quality.level === QUALITY.high;
+    const isSpeedZoom =
+      this.focusPoint.isTracking && this.game.quality.level === QUALITY.high && !prefersReducedMotion();
     this.zoom.ratio = this.zoom.baseRatio + (isSpeedZoom ? ZOOM.speedAmplitude * speedRatio : 0);
     this.zoom.smoothedRatio = lerp(this.zoom.smoothedRatio, this.zoom.ratio, delta * ZOOM.smoothing);
   }

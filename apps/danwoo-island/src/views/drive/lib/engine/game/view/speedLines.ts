@@ -1,6 +1,7 @@
 import { alea } from 'seedrandom';
 import { attribute, Fn, mix, positionGeometry, uniform, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
+import { prefersReducedMotion } from '../utilities/reducedMotion';
 
 const LINES = 30;
 const VERTICES_PER_LINE = 3;
@@ -82,6 +83,7 @@ export class SpeedLines {
   update(camera: THREE.Camera, delta: number): void {
     this.#clipSpaceTarget.value.copy(this.worldTarget).project(camera);
     const smoothed = this.#smoothedStrength.value;
-    this.#smoothedStrength.value = smoothed + (this.strength - smoothed) * delta * SMOOTHING;
+    const target = prefersReducedMotion() ? 0 : this.strength;
+    this.#smoothedStrength.value = smoothed + (target - smoothed) * delta * SMOOTHING;
   }
 }
