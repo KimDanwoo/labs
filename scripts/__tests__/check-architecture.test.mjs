@@ -11,6 +11,7 @@ import {
   validateDesignTokens,
   validateManifest,
   validateSourceTypes,
+  validateTailwindNames,
   validateTypeScript,
   validateVercelConfig,
 } from '../check-architecture.mjs';
@@ -139,6 +140,22 @@ test('component modules hold only components and hooks; constants, helpers and s
   assert.equal(validateComponentModule('const TABS = [{ name: "a" }] as const;', 'Card.tsx').length, 1);
   assert.equal(validateComponentModule('function formatTime() { return ""; }', 'Card.tsx').length, 1);
   assert.equal(validateComponentModule('const useless = () => null;', 'Card.tsx').length, 1);
+});
+
+test('Tailwind v3 names must use their v4 spelling while px arbitrary values stay allowed', () => {
+  assert.deepEqual(
+    validateTailwindNames(
+      '<div className="bg-linear-to-r shrink-0 grow aria-current:text-paper ring-black/3 size-[7px] top-[17px]" />',
+    ),
+    [],
+  );
+  const legacy = validateTailwindNames(
+    '<div className="bg-gradient-to-br flex-shrink-0 flex-grow aria-[current=true]:text-paper ring-black/[0.03]" />',
+  );
+  assert.equal(legacy.length, 5);
+  assert.ok(legacy[0]?.includes('bg-linear-to-br'));
+  assert.ok(legacy[4]?.includes('/3'));
+  assert.deepEqual(validateTailwindNames('<div className="bg-black/[0.035]" />'), []);
 });
 
 test('a component that piles up deep or many HTML elements must be split into named parts', () => {
