@@ -41,7 +41,6 @@ export function Stage() {
           dvh 천장은 세로가 짧은 기기에서만 걸린다 — vh는 모바일에서 주소창까지 포함해 실제보다 크다. */}
       <div ref={slot} className="aspect-square w-[min(84%,46dvh)] shrink-0 min-[820px]:w-[min(64%,58vh)]">
         {track && (!canvasReady || isStill) ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={artworkUrl(track, ARTWORK_TEXTURE_SIZE)}
             alt=""
