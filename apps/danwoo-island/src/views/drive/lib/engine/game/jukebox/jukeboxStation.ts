@@ -1,21 +1,21 @@
 import gsap from 'gsap';
 import {
-  color,
-  Fn,
-  instancedBufferAttribute,
-  instanceIndex,
-  sin,
-  step,
-  texture,
-  uniform,
-  uv,
-  vec2,
-  vec4,
+    color,
+    Fn,
+    instancedBufferAttribute,
+    instanceIndex,
+    sin,
+    step,
+    texture,
+    uniform,
+    uv,
+    vec2,
+    vec4,
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import content from '../../data/danwoo';
-import { nowPlayingNotice } from '../audio';
+import { nowPlayingNotice } from '../audioConfig';
 import { getGame } from '../gameContext';
 import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 import { prefersDataSaving, runWhenIdle } from './idle';
