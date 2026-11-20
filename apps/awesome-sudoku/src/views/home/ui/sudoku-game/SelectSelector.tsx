@@ -1,7 +1,7 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 
 import { cn } from '@shared/lib/cn';
-import { requestNewGameAtom } from '../../model/store/newGameAtoms';
+import { requestNewGameAtom } from '../../model/store/gameConfirmAtoms';
 import { difficultyAtom } from '../../model/store/primitives';
 import { type Difficulty } from '../../model/types/game';
 

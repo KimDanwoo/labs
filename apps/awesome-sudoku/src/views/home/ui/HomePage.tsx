@@ -8,7 +8,7 @@ import { DesktopControlPanel } from './game-controls/DesktopControlPanel';
 import { MobileControlPanel } from './game-controls/MobileControlPanel';
 import { HomeHeader } from './HomeHeader';
 
-const NewGameConfirmSheet = dynamic(() => import('./new-game/NewGameConfirmSheet').then((m) => m.NewGameConfirmSheet), {
+const GameConfirmSheet = dynamic(() => import('./game-confirm/GameConfirmSheet').then((m) => m.GameConfirmSheet), {
   ssr: false,
 });
 
@@ -28,6 +28,6 @@ export const HomePage = () => (
       </div>
     </div>
     <GameResultSheet />
-    <NewGameConfirmSheet />
+    <GameConfirmSheet />
   </main>
 );

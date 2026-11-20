@@ -1,30 +1,33 @@
 'use client';
 import { BottomSheet } from '@shared/ui/bottom-sheet';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { newGameLabel } from '../../lib/newGameLabel';
-import { confirmNewGameAtom, keepCurrentGameAtom, newGameConfirmAtom } from '../../model/store/newGameAtoms';
-import { NewGameActionButton } from './NewGameActionButton';
+import { GAME_CONFIRM_COPY } from '../../config/gameConfirm';
+import { discardDetail } from '../../lib/newGameLabel';
+import { confirmDiscardAtom, gameConfirmAtom, keepCurrentGameAtom } from '../../model/store/gameConfirmAtoms';
+import { GameConfirmButton } from './GameConfirmButton';
 
-export function NewGameConfirmSheet() {
-  const confirm = useAtomValue(newGameConfirmAtom);
-  const startNewGame = useSetAtom(confirmNewGameAtom);
+export function GameConfirmSheet() {
+  const confirm = useAtomValue(gameConfirmAtom);
+  const discard = useSetAtom(confirmDiscardAtom);
   const keepCurrentGame = useSetAtom(keepCurrentGameAtom);
 
   if (!confirm) return null;
+  const copy = GAME_CONFIRM_COPY[confirm.action.kind];
+  const detail = discardDetail(confirm.action);
 
   return (
-    <BottomSheet isOpen={confirm.isOpen} onClose={keepCurrentGame} title="새 게임을 시작할까요?">
+    <BottomSheet isOpen={confirm.isOpen} onClose={keepCurrentGame} title={copy.title}>
       <div className="text-center space-y-2">
-        <p className="text-lg font-semibold text-text-primary">{newGameLabel(confirm.request)}</p>
-        <p className="text-sm text-text-secondary">진행 중인 게임은 저장되지 않고 사라져요.</p>
+        {detail && <p className="text-lg font-semibold text-text-primary">{detail}</p>}
+        <p className="text-sm text-text-secondary break-keep">{copy.message}</p>
       </div>
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <NewGameActionButton variant="secondary" onClick={keepCurrentGame}>
+        <GameConfirmButton variant="secondary" onClick={keepCurrentGame}>
           계속하기
-        </NewGameActionButton>
-        <NewGameActionButton variant="primary" onClick={startNewGame}>
-          새 게임
-        </NewGameActionButton>
+        </GameConfirmButton>
+        <GameConfirmButton variant="primary" onClick={discard}>
+          {copy.confirm}
+        </GameConfirmButton>
       </div>
     </BottomSheet>
   );

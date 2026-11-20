@@ -1,35 +1,50 @@
 import { atom } from 'jotai';
 import { hasPlayerProgress } from '../services/playerProgress';
-import type { NewGameRequest } from '../types/game';
+import type { DiscardAction, NewGameRequest } from '../types/game';
+import { resetUserInputsAtom } from './cellValueAtoms';
 import { switchGameModeAtom } from './gameLifecycleAtoms';
 import { boardAtom, difficultyAtom, gameModeAtom, isCompletedAtom } from './primitives';
 
-interface NewGameConfirm {
-  request: NewGameRequest;
+interface GameConfirm {
+  action: DiscardAction;
   isOpen: boolean;
 }
 
-export const newGameConfirmAtom = atom<NewGameConfirm | null>(null);
+export const gameConfirmAtom = atom<GameConfirm | null>(null);
 
 const isGameInProgressAtom = atom((get) => !get(isCompletedAtom) && hasPlayerProgress(get(boardAtom)));
 
-export const requestNewGameAtom = atom(null, (get, set, change: Partial<NewGameRequest>) => {
-  const request = { mode: change.mode ?? get(gameModeAtom), difficulty: change.difficulty ?? get(difficultyAtom) };
-  if (get(isGameInProgressAtom)) {
-    set(newGameConfirmAtom, { request, isOpen: true });
+const runDiscardAtom = atom(null, (_get, set, action: DiscardAction) => {
+  if (action.kind === 'restart') {
+    set(resetUserInputsAtom);
     return;
   }
-  set(switchGameModeAtom, request);
+  set(switchGameModeAtom, action.request);
 });
 
-export const confirmNewGameAtom = atom(null, (get, set) => {
-  const confirm = get(newGameConfirmAtom);
+const requestDiscardAtom = atom(null, (get, set, action: DiscardAction) => {
+  if (get(isGameInProgressAtom)) {
+    set(gameConfirmAtom, { action, isOpen: true });
+    return;
+  }
+  set(runDiscardAtom, action);
+});
+
+export const requestNewGameAtom = atom(null, (get, set, change: Partial<NewGameRequest>) => {
+  const request = { mode: change.mode ?? get(gameModeAtom), difficulty: change.difficulty ?? get(difficultyAtom) };
+  set(requestDiscardAtom, { kind: 'newGame', request });
+});
+
+export const requestRestartAtom = atom(null, (_get, set) => set(requestDiscardAtom, { kind: 'restart' }));
+
+export const confirmDiscardAtom = atom(null, (get, set) => {
+  const confirm = get(gameConfirmAtom);
   if (!confirm?.isOpen) return;
-  set(newGameConfirmAtom, { ...confirm, isOpen: false });
-  set(switchGameModeAtom, confirm.request);
+  set(gameConfirmAtom, { ...confirm, isOpen: false });
+  set(runDiscardAtom, confirm.action);
 });
 
 export const keepCurrentGameAtom = atom(null, (get, set) => {
-  const confirm = get(newGameConfirmAtom);
-  if (confirm) set(newGameConfirmAtom, { ...confirm, isOpen: false });
+  const confirm = get(gameConfirmAtom);
+  if (confirm) set(gameConfirmAtom, { ...confirm, isOpen: false });
 });

@@ -1,14 +1,14 @@
 import { cn } from '@shared/lib/cn';
 import type { ReactNode } from 'react';
-import { NEW_GAME_ACTION_VARIANT } from '../../config/newGame';
+import { GAME_CONFIRM_BUTTON_VARIANT } from '../../config/gameConfirm';
 
-interface NewGameActionButtonProps {
-  variant: keyof typeof NEW_GAME_ACTION_VARIANT;
+interface GameConfirmButtonProps {
+  variant: keyof typeof GAME_CONFIRM_BUTTON_VARIANT;
   onClick: () => void;
   children: ReactNode;
 }
 
-export function NewGameActionButton({ variant, onClick, children }: NewGameActionButtonProps) {
+export function GameConfirmButton({ variant, onClick, children }: GameConfirmButtonProps) {
   return (
     <button
       type="button"
@@ -16,7 +16,7 @@ export function NewGameActionButton({ variant, onClick, children }: NewGameActio
       className={cn(
         'h-12 rounded-xl text-base font-semibold transition-all duration-200 ease-out active:scale-95',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
-        NEW_GAME_ACTION_VARIANT[variant],
+        GAME_CONFIRM_BUTTON_VARIANT[variant],
       )}
     >
       {children}
