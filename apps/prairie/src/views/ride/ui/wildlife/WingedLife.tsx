@@ -33,7 +33,6 @@ interface WingedLifeProps {
   anchor?: Anchor;
 }
 
-// Fixed instance budgets; open-world habitats recycle only beyond the near field.
 export function WingedLife({ kind, anchor }: WingedLifeProps) {
   const mobile = useLowDetail();
   const count = mobile ? WINGED_COUNT.mobile : WINGED_COUNT.desktop;
@@ -44,7 +43,8 @@ export function WingedLife({ kind, anchor }: WingedLifeProps) {
   const states = useRef(Array.from({ length: WINGED_MAX_COUNT }, createCreatureState));
   const homes = useRef(Array.from({ length: WINGED_MAX_COUNT }, () => ({ x: NaN, y: 0, z: 0 })));
   useFrame(({ clock }, delta) => {
-    if (!wings.current || !bodies.current) return;
+    if (!wings.current) return;
+    if (!bodies.current) return;
     const t = clock.elapsedTime;
     const rider = runnerState.position;
     const offshore = isOffshoreDragonfly(kind, anchor, rider);

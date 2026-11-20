@@ -6,8 +6,6 @@ import { GRID_STEP, groundTime, shadeGround, SHADOW_LAYER_LIFT, SHADOW_OPACITY }
 import { useRef } from 'react';
 import { Group } from 'three';
 
-// 바닥 평면이 카메라 XZ를 따라다녀 가장자리에 닿지 않는다 → 무한 들판.
-// 정점 간격으로 스냅해야 정점이 항상 같은 월드 지점의 높이를 샘플링한다(안 하면 기복이 카메라를 따라 꿈틀댄다).
 export function Ground() {
   const meshRef = useRef<Group>(null);
   const camera = useThree((state) => state.camera);

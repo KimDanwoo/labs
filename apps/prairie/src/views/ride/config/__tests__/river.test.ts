@@ -1,4 +1,3 @@
-// 강 배치 불변식 체크
 import { FOG, HAZE, OCEAN, RIDGES, RIVER, RIVER_TRENCH_HALF_WIDTH, TERRAIN } from '@views/ride/config/scene';
 import {
   coastDistanceAt,
@@ -42,14 +41,12 @@ test('강은 period 간격으로 좌우 양쪽에 반복된다', () => {
   }
 });
 
-// 이 불변식이 깨지면 강이 두 개 동시에 보여 평면 한 장으로는 부족해진다.
 test('강 사이 중간 지점에서 어느 강도 안개 시야 안에 들어오지 않는다', () => {
   const midpoint = RIVER.firstX - RIVER.period / 2;
   assert.equal(distanceToRiver(midpoint), RIVER.period / 2);
   for (const fog of Object.values(FOG)) assert.equal(RIVER.period / 2 > fog.far, true);
 });
 
-// 강 골과 그 주변 maskNear 폭은 평지여야 하상·수면·강둑 전제가 맞는다. 최대 경사는 말이 미끄러지지 않을 만큼 완만하게.
 test('지형 기복은 강 주변에서 0이고 경사가 완만하다', () => {
   for (const z of [0, 37, -120]) {
     const center = nearestRiverX(RIVER.firstX, z);
@@ -62,19 +59,16 @@ test('지형 기복은 강 주변에서 0이고 경사가 완만하다', () => {
   assert.notEqual(terrainHeightAt(0, 0), 0);
 });
 
-// 강 평면 한 장이 앞뒤 안개 시야를 덮어야 끝이 안 보인다.
 test('강 평면 길이가 안개 시야를 앞뒤로 덮는다', () => {
   for (const fog of Object.values(FOG)) assert.ok(RIVER.length > fog.far * 2, `${RIVER.length} > ${fog.far * 2}`);
 });
 
-// 헤이즈 원통 위 끝이 가장 높은 능선보다 높아야 봉우리가 평평하게 잘리지 않는다.
 test('능선 최고 높이가 헤이즈 원통 안에 든다', () => {
   for (const ridge of RIDGES) {
     assert.ok(ridge.baseY + ridge.ampY < HAZE.topY, `${ridge.baseY + ridge.ampY} < ${HAZE.topY}`);
   }
 });
 
-// blade는 청크 커버 끝보다 먼저 지면색에 완전히 녹아야 청크 경계가 안 보인다. 안개는 그 뒤에 닫힌다.
 test('잔디 blade가 청크 끝보다 먼저 지면에 녹는다', () => {
   for (const quality of QUALITIES) {
     const grass = GRASS_QUALITY[quality];
@@ -84,7 +78,6 @@ test('잔디 blade가 청크 끝보다 먼저 지면에 녹는다', () => {
   }
 });
 
-// 하상 프로파일: 중앙이 가장 깊고 골 가장자리에서 지면(0)과 만나야 Ground 구멍 테두리와 맞물린다.
 test('하상은 중앙에서 depth, 골 가장자리에서 0', () => {
   assert.equal(riverBedDepthAt(0), RIVER.depth);
   assert.equal(riverBedDepthAt(RIVER.slopeStart), RIVER.depth);
@@ -92,7 +85,6 @@ test('하상은 중앙에서 depth, 골 가장자리에서 0', () => {
   assert.equal(riverWaterDepthAt(RIVER_TRENCH_HALF_WIDTH), 0);
 });
 
-// halfWidth는 HUD·잔디가 쓰는 명목 수면 반폭. 프로파일이 거기서 수면과 만나지 않으면 안내와 실제 물가가 어긋난다.
 test('수면선이 halfWidth 근처에 온다', () => {
   const TOLERANCE_M = 0.03;
   assert.ok(Math.abs(riverBedDepthAt(RIVER.halfWidth) - RIVER.waterDrop) < TOLERANCE_M);
@@ -100,7 +92,6 @@ test('수면선이 halfWidth 근처에 온다', () => {
   assert.equal(riverWaterDepthAt(RIVER.halfWidth + 1), 0);
 });
 
-// 카메라가 말 뒤에서 +Z를 보므로 화면 오른쪽 축은 world -X다. 이 부호가 뒤집히면 안내가 반대를 가리킨다.
 test('강 방위는 화면 기준으로 나온다', () => {
   const RIGHT_ANGLE = Math.PI / 2;
   assert.equal(riverBearing(0, 0), 'left');
@@ -115,7 +106,6 @@ test('물속에서는 방위 대신 crossing', () => {
   assert.notEqual(riverBearing(RIVER.firstX + RIVER.halfWidth + 0.1, 0), 'crossing');
 });
 
-// 링 안쪽 경계에서 보여야 하는 blade 수(첫 링 풀 × keep)가 그 링의 풀보다 크면 경계에서 잔디가 튄다.
 test('LOD 링 풀이 경계 거리의 keep을 감당한다', () => {
   for (const quality of QUALITIES) {
     const grass = GRASS_QUALITY[quality];

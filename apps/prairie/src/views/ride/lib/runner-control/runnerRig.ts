@@ -10,7 +10,6 @@ export const desiredTarget = new Vector3();
 
 export const smoothTarget = new Vector3();
 
-// 질주 시 FOV를 벌려 속도감을 준다.
 export const SPRINT_FOV_BOOST = 8;
 
 export const FOV_RESPONSE = 5;

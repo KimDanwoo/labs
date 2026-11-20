@@ -94,7 +94,8 @@ export function stepStardust(
   rawDelta: number,
 ): void {
   const delta = Math.min(rawDelta, MAX_FRAME_DELTA);
-  s.accumulator = runnerState.isSpinning || runnerState.dashStrength > 0 ? s.accumulator + delta * SPAWN_RATE : 0;
+  const isSpawning = runnerState.isSpinning || runnerState.dashStrength > 0;
+  s.accumulator = isSpawning ? s.accumulator + delta * SPAWN_RATE : 0;
   while (s.accumulator >= 1) {
     s.accumulator -= 1;
     const index = s.cursor++ % COUNT;

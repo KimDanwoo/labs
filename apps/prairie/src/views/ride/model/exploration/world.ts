@@ -11,7 +11,6 @@ export const LANDMARKS = [
   { id: 'arch', name: '노을의 문', description: '초원의 끝을 향해 열린 돌 아치.', x: 5, z: 340, radius: 28 },
 ] as const;
 
-// Height is relative to terrain; every gate faces the route's forward (+Z) direction.
 export const GATES = [
   { x: 0, z: 62, height: 21 },
   { x: -10, z: 110, height: 25 },
@@ -24,7 +23,6 @@ export const GATES = [
 export const GATE_RADIUS = 4.5;
 type Point = { x: number; y: number; z: number };
 
-// Sweep a small body volume through the aperture in either direction, including dashes.
 export function crossesGate(from: Point, to: Point, center: Point): boolean {
   const depth = 0.65;
   const dz = to.z - from.z;
@@ -57,11 +55,13 @@ export function isExplorationClearing(x: number, z: number): boolean {
 export function parseProgress(raw: string | null): { discovered: string[]; best: number | null } {
   try {
     const data = JSON.parse(raw ?? '{}');
+    const best = data?.best;
+    const isValidBest = typeof best === 'number' && Number.isFinite(best) && best > 0;
     return {
       discovered: Array.isArray(data?.discovered)
         ? LANDMARKS.filter((place) => data.discovered.includes(place.id)).map((place) => place.id)
         : [],
-      best: typeof data?.best === 'number' && Number.isFinite(data.best) && data.best > 0 ? data.best : null,
+      best: isValidBest ? best : null,
     };
   } catch {
     return { discovered: [], best: null };

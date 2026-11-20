@@ -11,8 +11,6 @@ export const across = new Vector3();
 
 export const basis = new Matrix4();
 
-// 말 발밑 접지 그림자. 실제 그림자 맵 없이 타원 그라데이션 한 장 — 말이 땅에 붙어 보이게 하는 가장 싼 단서.
-// 공중에선 옅어지고 조금 퍼진다(높이감).
 export const shadowMaterial = new ShaderMaterial({
   uniforms: { uOpacity: { value: GROUND_SHADOW.opacity } },
   vertexShader: `

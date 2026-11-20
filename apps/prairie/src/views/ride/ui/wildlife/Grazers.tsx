@@ -33,13 +33,15 @@ export function Grazers() {
   const dummy = useRef(new Object3D());
   const herd = useRef(spawnHerd());
   useFrame(({ clock }, delta) => {
-    if (!fur.current || !dark.current || !eyes.current) return;
+    if (!fur.current) return;
+    if (!dark.current) return;
+    if (!eyes.current) return;
     const dt = Math.min(delta, GRAZER_MAX_DELTA),
       t = clock.elapsedTime,
       rider = runnerState.position;
-    const offshore = coastDistanceAt(rider.x, rider.z) > GRAZER_OFFSHORE_DISTANCE;
-    fur.current.visible = dark.current.visible = eyes.current.visible = !offshore;
-    if (offshore) return;
+    const isOffshore = coastDistanceAt(rider.x, rider.z) > GRAZER_OFFSHORE_DISTANCE;
+    fur.current.visible = dark.current.visible = eyes.current.visible = !isOffshore;
+    if (isOffshore) return;
     const meshes = { fur: fur.current, dark: dark.current, eyes: eyes.current };
     for (let i = 0; i < count; i++) {
       const animal = herd.current[i]!;

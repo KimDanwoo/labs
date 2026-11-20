@@ -127,7 +127,8 @@ function accumulateEmission(s: WadeState, intensity: number, delta: number): voi
 function stepDroplets(s: WadeState, mesh: InstancedMesh, emission: Emission, delta: number): void {
   for (let i = 0; i < maxDroplets; i += 1) {
     const isAlive = s.life[i]! > 0;
-    if (!isAlive && s.emitAccumulator >= 1) {
+    const shouldEmitFinal = !isAlive && s.emitAccumulator >= 1;
+    if (shouldEmitFinal) {
       s.emitAccumulator -= 1;
       spawnDroplet(s, i, emission);
     } else if (isAlive) {
@@ -148,7 +149,8 @@ function stepRings(
   const origin = runnerState.position;
   s.ringTimer += delta;
   const wantsRing = intensity > 0 || s.emitAccumulator >= WADE_SPLASH.landingBurst / 2;
-  if (wantsRing && s.ringTimer >= WADE_SPLASH.ringInterval) {
+  const shouldRing = wantsRing && s.ringTimer >= WADE_SPLASH.ringInterval;
+  if (shouldRing) {
     s.ringTimer = 0;
     const ring = rings[s.nextRing];
     if (ring) ring.position.set(origin.x, RING_Y, origin.z);

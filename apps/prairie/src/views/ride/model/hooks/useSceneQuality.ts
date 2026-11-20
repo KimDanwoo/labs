@@ -5,13 +5,12 @@ import { CINEMATIC, FOG, type FogQuality } from '@views/ride/config/scene';
 import { CANVAS_LABEL, DPR, isSoftwareRenderer, SOFTWARE_DPR_MAX } from '@views/ride/lib/scene/sceneCanvas';
 import { useState } from 'react';
 
-// 프레임이 떨어지면 해상도와 장면 품질을 낮추고, 여유가 생기면 되돌린다(적응형 DPR). 소프트웨어 렌더러는 계속 낮춘다.
 export function useSceneQuality() {
   const coarse = useIsCoarsePointer();
   const [degraded, setDegraded] = useState(false);
   const [isSoftware, setIsSoftware] = useState(false);
-  const lowDetail = coarse || degraded;
-  const quality: FogQuality = lowDetail ? 'mobile' : 'desktop';
+  const isLowDetail = coarse || degraded;
+  const quality: FogQuality = isLowDetail ? 'mobile' : 'desktop';
   const dprRange = DPR[quality];
   const [dpr, setDpr] = useState<number>(dprRange.max);
 
@@ -37,12 +36,12 @@ export function useSceneQuality() {
   };
 
   return {
-    lowDetail,
+    lowDetail: isLowDetail,
     isSoftware,
     fog: FOG[quality],
     desiredDpr: Math.min(dpr, isSoftware ? SOFTWARE_DPR_MAX : dprRange.max),
     pixelBudget: isSoftware ? RENDER_PIXELS.software : RENDER_PIXELS[quality],
-    hasEffects: !lowDetail && dpr > dprRange.min,
+    hasEffects: !isLowDetail && dpr > dprRange.min,
     handleCreated,
     handleDecline: lowerQuality,
     handleIncline,

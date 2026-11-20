@@ -1,15 +1,11 @@
-// Quaternius(CC0) 원본에 곡면 세분화·꼬리 털 다발을 적용한 파생 모델. scripts/refine-runner.mjs로 재생성한다.
 export const RUNNER_MODEL_URL = '/models/unicorn.glb';
 
-// 외부 모델 보정(앱 기준: +Z가 정면, 바닥 y=0). 모델마다 달라 여기서 튜닝한다.
-// 모델 정면이 진행 방향과 반대면 rotationY를 Math.PI로 뒤집는다.
 export const RUNNER_MODEL_TRANSFORM = {
   scale: 0.55,
   rotationY: 0,
   position: [0, 0, 0] as [number, number, number],
 };
 
-// 원본 리그의 대기·걷기·갤럽·공중 포즈를 가중치로 혼합한다.
 export const RUNNER_ANIM = {
   idle: 'AnimalArmature|Idle',
   walk: 'AnimalArmature|Walk',
@@ -17,7 +13,6 @@ export const RUNNER_ANIM = {
   run: 'AnimalArmature|Gallop',
 } as const;
 
-// 천마 룩: 모델 머티리얼 이름별 색 덮어쓰기(원본 glb는 그대로).
 export const UNICORN_TINT: Record<string, string> = {
   Main: '#e2e2de',
   Main_Light: '#b7c6d2',
@@ -39,8 +34,6 @@ export const RUNNER_FINISH = {
   strands: 48,
 } as const;
 
-// 뿔: Head 뼈에 붙인다. 뼈에 스케일 100이 들어 있어 자식은 boneScaleFix로 보정.
-// 위치·회전은 Head 로컬(+Z = 위·앞, +Y = 코 방향) 기준 모델 단위. 실측: 뼈 원점(0,4.18,2.53) → 이마 위(0,4.6,2.9).
 export const HORN = {
   boneScaleFix: 0.01,
   position: [0, 0.18, 0.4] as [number, number, number],
@@ -63,11 +56,9 @@ export const WINGS = {
   flapSpeedAir: 3.2,
   flapSpeedRising: 5.5,
   color: '#eee9df',
-  // 접히는 중에는 어깨 장식이 깃털과 함께 등 뒤로 밀려 몸통 밖에 떠 보인다
   trimVisibleOpen: 0.2,
 } as const;
 
-// 깃털 표면 bump. 주기/픽셀이 페이드 구간을 넘으면 결을 지워 모아레를 막는다.
 export const FEATHER_SURFACE = {
   shaftSharpness: 35,
   shaftHeight: 0.003,
@@ -79,26 +70,20 @@ export const FEATHER_SURFACE = {
   distanceFade: [8, 24],
 } as const;
 
-// 달리기 모션 튜닝값.
 export const RUNNER_ANIM_TUNING = {
-  // 달리기 클립이 자연스러운 기준 속도(m/s). 실제 속도 ÷ 이 값 = 재생 배속.
   runRefSpeed: 8.5,
-  // 재생 배속 하한·상한(너무 느리거나 빠르지 않게).
   minRunScale: 0.6,
   maxRunScale: 2.2,
-  // 프레임 시간에 독립적인 포즈 전환과 걷기↔갤럽 구간.
   blendRate: 9,
   walkRefSpeed: 2.6,
   gallopBlendStart: 4,
   gallopBlendEnd: 7,
 } as const;
 
-// 물속을 달릴 때의 물보라·파문. 세기(0~1)는 속도 ÷ fullSplashSpeed, 수심 minDepth 이상일 때만.
 export const WADE_SPLASH = {
   minDepth: 0.05,
   minSpeed: 0.8,
   fullSplashSpeed: 10,
-  // 물보라: 속도 방향으로 늘어난 물줄기. 세기 1일 때 초당 방출 수.
   maxDroplets: 256,
   emitPerSecond: 320,
   dropletMinSize: 0.08,
@@ -112,9 +97,7 @@ export const WADE_SPLASH = {
   lifeMax: 0.8,
   gravity: 12,
   spreadRadius: 1,
-  // 물에 착지하면 한 번에 터지는 물보라 수.
   landingBurst: 90,
-  // 파문 링: 일정 간격으로 발굽에서 퍼져나간다.
   ringCount: 6,
   ringInterval: 0.14,
   ringLife: 1.1,
@@ -123,7 +106,6 @@ export const WADE_SPLASH = {
   ringOpacity: 0.55,
 } as const;
 
-// 질주 중 발굽에서 흩날리는 금빛 잔광. 뒤로 흘러가며 작아진다.
 export const SPRINT_TRAIL = {
   maxMotes: 120,
   emitPerSecond: 90,
@@ -136,12 +118,10 @@ export const SPRINT_TRAIL = {
   rise: 0.9,
   jitter: 0.7,
   spawnHeight: 0.35,
-  // 이 높이 이상 떠 있으면 질주 여부와 무관하게 방출(비행 잔광).
   flyingHeight: 0.5,
   color: '#ffd27a',
 } as const;
 
-// 접지 그림자: 정규화한 말 크기에 맞춘 타원. 지면보다 hover만큼 띄워 z-fight를 피하고, fadeHeight 고도에서 완전히 사라진다.
 export const GROUND_SHADOW = {
   width: 1.6,
   length: 3.2,
@@ -150,6 +130,5 @@ export const GROUND_SHADOW = {
   hover: 0.04,
   fadeHeight: 8,
   airSpread: 0.6,
-  // 투명 패스에서 물 다음에 그린다 — 하상 위 그림자가 물을 통해 비친다.
   renderOrder: 1,
 } as const;

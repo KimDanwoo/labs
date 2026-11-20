@@ -58,7 +58,6 @@ function collectItems(cx: number, cz: number, viewRadius: number): FloraPlacemen
   for (let dx = -viewRadius; dx <= viewRadius; dx += 1) {
     for (let dz = -viewRadius; dz <= viewRadius; dz += 1) items.push(...floraInCell(cx + dx, cz + dz));
   }
-  // 넓어진 시야에서도 가까운 식생부터 예산을 배정한다.
   const centerX = cx * FLORA.cell;
   const centerZ = cz * FLORA.cell;
   items.sort((a, b) => (a.x - centerX) ** 2 + (a.z - centerZ) ** 2 - ((b.x - centerX) ** 2 + (b.z - centerZ) ** 2));
@@ -99,7 +98,6 @@ function placeConifer(cone: InstancedMesh, c: Counters, { item, groundY }: Site,
   tint.copy(CONIFER_COLORS[item.variant % CONIFER_COLORS.length]!);
   const { tiers, tierHeight } = FLORA.conifer;
   for (let t = 0; t < tiers; t += 1) {
-    // 아래 단이 넓고 위로 갈수록 좁고 높이 겹친다.
     const shrink = 1 - t * TIER_SHRINK;
     const y = groundY + trunkH * TIER_BASE + t * tierHeight * TIER_STEP * item.scale + (tierHeight / 2) * item.scale;
     dummy.position.set(item.x, y, item.z);
@@ -138,7 +136,6 @@ function blobShapeOf(seed: number, b: number, scale: number): BlobShape & { radi
   const r1 = hash(seed + b * 1.37);
   const r2 = hash(seed + b * 2.91 + 5);
   const r3 = hash(seed + b * 4.07 + 9);
-  // 첫 덩어리는 중심에 크게, 나머지는 주변에 작게·낮게 — 둥글되 울퉁불퉁한 실루엣.
   return {
     r1,
     r3,
@@ -168,7 +165,8 @@ function placeCanopy(meshes: FloraMeshes, c: Counters, site: Site, trunkH: numbe
     const slot = distant ? c.farBlobs++ : c.blobs++;
     foliage.setMatrixAt(slot, dummy.matrix);
     foliage.setColorAt(slot, tint);
-    if (!distant && b > 0 && b <= FLORA.branches) placeBranch(meshes.trunk, c, site, trunkH, blob);
+    const shouldPlaceBranch = !distant && b > 0 && b <= FLORA.branches;
+    if (shouldPlaceBranch) placeBranch(meshes.trunk, c, site, trunkH, blob);
   }
 }
 

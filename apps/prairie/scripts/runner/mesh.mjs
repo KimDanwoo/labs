@@ -31,7 +31,6 @@ export function weldMesh(gltf, binary) {
   return { vertices, faces };
 }
 
-// 넓은 판 모양의 꼬리를 제거하고 원본 가중치를 따라가는 가는 털 다발로 교체한다.
 export function stripPlateTail({ vertices, faces: allFaces }) {
   const tailSource = vertices.filter((v) => v.position[1] > 0.012 && v.position[2] > 0.012);
   const faces = allFaces.filter(
@@ -53,7 +52,6 @@ export function stripPlateTail({ vertices, faces: allFaces }) {
   return { mesh: { vertices: used, faces }, tailSource };
 }
 
-// 판 꼬리를 떼어낸 자리에 열린 경계 고리가 남아 엉덩이가 뚫려 보인다. 중심점 부채꼴로 막는다.
 function openBoundaryLoops(faces) {
   const halfEdges = new Set();
   for (const {
@@ -83,7 +81,6 @@ function openBoundaryLoops(faces) {
   return loops;
 }
 
-// 런타임은 Hair 재질 메시를 통째로 숨긴다(Runner.tsx). 구멍 둘레에 남은 Hair 면은 몸통으로 돌려야 보인다.
 function reclaimHairAround(faces, loop) {
   const pending = new Set(loop);
   const reached = new Set();
@@ -92,7 +89,8 @@ function reclaimHairAround(faces, loop) {
     pending.delete(vertex);
     reached.add(vertex);
     for (const face of faces) {
-      if (face.material !== HAIR_MATERIAL || !face.ids.includes(vertex)) continue;
+      if (face.material !== HAIR_MATERIAL) continue;
+      if (!face.ids.includes(vertex)) continue;
       face.material = BODY_MATERIAL;
       face.ids.filter((id) => !reached.has(id)).forEach((id) => pending.add(id));
     }

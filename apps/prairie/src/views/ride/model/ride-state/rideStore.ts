@@ -1,8 +1,6 @@
 import type { RiverBearing } from '@views/ride/lib/scene/terrain';
 import { useSyncExternalStore } from 'react';
 
-// Canvas(useFrame) 안의 주행 루프가 쓰고, DOM HUD가 읽는다.
-// r3f는 별도 React 루트를 쓰므로 컨텍스트 대신 모듈 레벨 외부 스토어로 양쪽을 잇는다.
 type RideSnapshot = {
   riverDistance: number;
   riverBearing: RiverBearing;
@@ -19,13 +17,12 @@ export function setRideRiver(distance: number, bearing: RiverBearing, coastDista
   const rounded = Math.round(distance);
   const seaDistance = Math.max(0, Math.round(-coastDistance / 10) * 10);
   const atSea = coastDistance >= 0;
-  if (
+  const isUnchanged =
     rounded === snapshot.riverDistance &&
     bearing === snapshot.riverBearing &&
     seaDistance === snapshot.seaDistance &&
-    atSea === snapshot.atSea
-  )
-    return;
+    atSea === snapshot.atSea;
+  if (isUnchanged) return;
   snapshot = { riverDistance: rounded, riverBearing: bearing, seaDistance, atSea };
   listeners.forEach((listen) => listen());
 }

@@ -6,7 +6,9 @@ export function createSpinState() {
 
 export function updateSpin(state: ReturnType<typeof createSpinState>, pressed: boolean, height: number, delta: number) {
   state.cooldown = Math.max(0, state.cooldown - delta);
-  if (pressed && !state.wasPressed && !state.active && state.cooldown === 0 && height >= SPIN_SKILL.minHeight) {
+  const shouldStartSpin =
+    pressed && !state.wasPressed && !state.active && state.cooldown === 0 && height >= SPIN_SKILL.minHeight;
+  if (shouldStartSpin) {
     state.active = true;
     state.elapsed = 0;
     state.cooldown = SPIN_SKILL.duration + SPIN_SKILL.cooldown;

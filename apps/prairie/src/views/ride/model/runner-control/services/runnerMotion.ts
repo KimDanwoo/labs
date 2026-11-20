@@ -40,10 +40,10 @@ function updateSkills(refs: RunnerMotionRefs, input: RunnerInput, airHeight: num
   if (rollRef.current) rollRef.current.rotation.z = spinRef.current.angle;
 }
 
-// 질주: 최고속도·가속 배율. 발동 순간 돌풍 파동 원점을 기록한다.
 function markSprintStart(refs: RunnerMotionRefs, isSprinting: boolean, now: number): void {
   const { wasSprintingRef, positionRef } = refs;
-  if (isSprinting && !wasSprintingRef.current) {
+  const hasStartedSprint = isSprinting && !wasSprintingRef.current;
+  if (hasStartedSprint) {
     runnerState.gustOrigin.set(positionRef.current.x, positionRef.current.z);
     runnerState.gustStartedAt = now;
   }
@@ -59,7 +59,6 @@ function accelerate(
 ): number {
   const { speedRef, dashRef, positionRef } = refs;
   const physics = RUNNER_PHYSICS;
-  // 말은 하상 프로파일을 따라 골로 내려가고, 수심에 비례해 최고속도가 떨어진다. 공중에선 물이 발에 안 닿으니 감속 없음.
   const waterDepth = waterDepthAt(positionRef.current.x, positionRef.current.z);
   const wade = isGrounded ? Math.min(waterDepth / RIVER.wadeDepthRef, 1) : 0;
   const maxSpeed = physics.maxSpeed * MathUtils.lerp(1, RIVER.wadeSpeedScale, wade);
@@ -76,7 +75,6 @@ function accelerate(
   const normalMax = maxSpeed * sprintMax;
   const dashSpeed = MathUtils.lerp(normalMax, DASH_SKILL.speed, dashRef.current.strength);
   if (dashRef.current.active) speed = Math.max(speed, DASH_SKILL.speed * dashRef.current.strength);
-  // 부스트가 끝나면 속도를 즉시 자르지 않고 일반 최고속도로 감속한다.
   const speedLimit = Math.max(dashSpeed, speedRef.current - physics.brake * delta);
   speed = MathUtils.clamp(speed, -physics.maxReverse, speedLimit);
   speedRef.current = speed;
@@ -104,9 +102,8 @@ function moveAndCollide(refs: RunnerMotionRefs, speed: number, heading: number, 
   forwardVec.set(Math.sin(heading), 0, Math.cos(heading));
   const position = positionRef.current;
   position.addScaledVector(forwardVec, speed * delta);
-  // 줄기·바위 충돌: 밀어내고 속도를 깎는다. 줄기 높이 위로 날면 통과.
-  if (airborneRef.current.height < FLORA.trunk.height && pushOutOfFlora(position) > 0)
-    speedRef.current = speed * RIG.collisionSpeedFactor;
+  const isPushedOutOfFlora = airborneRef.current.height < FLORA.trunk.height && pushOutOfFlora(position) > 0;
+  if (isPushedOutOfFlora) speedRef.current = speed * RIG.collisionSpeedFactor;
   return position;
 }
 
@@ -123,8 +120,6 @@ function flyAndLand(
   now: number,
 ): Landing {
   const { speedRef, dashRef, spinRef, airborneRef, wasJumpPressedRef } = refs;
-  // 이동과 충돌 보정 뒤의 위치에서 지면을 샘플링해 발이 언덕에 묻히지 않게 한다.
-  // Buoyancy keeps the horse above deep water instead of walking along the seabed.
   const waterDepth = waterDepthAt(position.x, position.z);
   const bedY = groundHeightAt(position.x, position.z);
   const groundY = waterDepth > 0 ? Math.max(bedY, -RIVER.waterDrop - RIG.floatClearance) : bedY;

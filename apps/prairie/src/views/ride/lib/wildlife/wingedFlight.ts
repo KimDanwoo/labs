@@ -144,10 +144,10 @@ export function placeWingedLife(
   meshes.bodies.setMatrixAt(i, d.matrix);
   for (let wing = 0; wing < wingCount; wing++) {
     const side = wing % 2;
-    const back = wing >= 2;
-    d.position.set(x + Math.sin(phase) * (back ? 0.12 : 0), y, z - Math.cos(phase) * (back ? 0.12 : 0));
+    const isBackWing = wing >= 2;
+    d.position.set(x + Math.sin(phase) * (isBackWing ? 0.12 : 0), y, z - Math.cos(phase) * (isBackWing ? 0.12 : 0));
     d.rotation.set(0, -phase + side * Math.PI, flap * (side ? -1 : 1));
-    d.scale.setScalar(scale * (back ? 0.75 : 1));
+    d.scale.setScalar(scale * (isBackWing ? 0.75 : 1));
     d.updateMatrix();
     meshes.wings.setMatrixAt(i * wingCount + wing, d.matrix);
     meshes.wings.setColorAt(i * wingCount + wing, kind === 'butterfly' ? colors[i % colors.length]! : colors[3]!);

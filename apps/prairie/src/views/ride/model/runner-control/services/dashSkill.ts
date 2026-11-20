@@ -14,7 +14,9 @@ export function createDashState() {
 
 export function updateDash(state: ReturnType<typeof createDashState>, pressed: boolean, height: number, delta: number) {
   state.cooldown = Math.max(0, state.cooldown - delta);
-  if (pressed && !state.wasPressed && !state.active && state.cooldown === 0 && height >= DASH_SKILL.minHeight) {
+  const shouldStartDash =
+    pressed && !state.wasPressed && !state.active && state.cooldown === 0 && height >= DASH_SKILL.minHeight;
+  if (shouldStartDash) {
     state.active = true;
     state.elapsed = 0;
     state.cooldown = DASH_SKILL.duration + DASH_SKILL.cooldown;
@@ -26,7 +28,8 @@ export function updateDash(state: ReturnType<typeof createDashState>, pressed: b
   const release = Math.min(1, (DASH_SKILL.duration - state.elapsed) / DASH_SKILL.release);
   const t = Math.max(0, Math.min(attack, release));
   state.strength = t * t * (3 - 2 * t);
-  if (state.elapsed === DASH_SKILL.duration || height <= 0) {
+  const hasDashEnded = state.elapsed === DASH_SKILL.duration || height <= 0;
+  if (hasDashEnded) {
     state.active = false;
     state.strength = 0;
   }

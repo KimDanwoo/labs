@@ -12,7 +12,6 @@ async function openRide(page: Page) {
   return errors;
 }
 
-/** Pixel diversity catches a blank WebGL/post-processing frame even when the HUD works. */
 async function verifyFrame(page: Page, info: TestInfo, name: string) {
   const frame = await page.locator('canvas').screenshot();
   await info.attach(name, { body: frame, contentType: 'image/png' });

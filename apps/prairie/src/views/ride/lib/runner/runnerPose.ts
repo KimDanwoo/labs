@@ -76,7 +76,10 @@ export function stopGaits(gaits: Gaits): void {
 
 export function readyGaits(gaits: Gaits): ReadyGaits | null {
   const { idle, walk, run, flight } = gaits;
-  if (!idle || !walk || !run || !flight) return null;
+  if (!idle) return null;
+  if (!walk) return null;
+  if (!run) return null;
+  if (!flight) return null;
   return { idle, walk, run, flight };
 }
 
@@ -102,7 +105,9 @@ function trackAcceleration(memory: PoseMemory, signedSpeed: number, delta: numbe
 
 function landingBounce(elapsed: number): number {
   const landingAge = elapsed - runnerState.landedAt;
-  if (runnerState.landedAt < 0 || landingAge < 0 || landingAge >= LANDING_WINDOW) return 0;
+  if (runnerState.landedAt < 0) return 0;
+  if (landingAge < 0) return 0;
+  if (landingAge >= LANDING_WINDOW) return 0;
   const impact = MathUtils.clamp(
     runnerState.landingImpact / LANDING_IMPACT_DIVISOR,
     LANDING_IMPACT_RANGE[0],

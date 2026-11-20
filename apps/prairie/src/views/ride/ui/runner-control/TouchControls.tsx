@@ -8,8 +8,6 @@ import { type PointerEvent, useRef, useState } from 'react';
 
 type Vec = { x: number; y: number };
 
-// 손 댄 자리에 조이스틱이 생기고, 끄는 방향으로 가속·조향한다(플로팅 조이스틱).
-// (pointer: coarse)에서만 노출 → PC에선 DOM에서 사라져 캔버스 드래그(시점 회전)와 충돌하지 않는다.
 export function TouchControls() {
   const [origin, setOrigin] = useState<Vec | null>(null);
   const [knob, setKnob] = useState<Vec>({ x: 0, y: 0 });

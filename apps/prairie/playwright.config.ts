@@ -11,7 +11,6 @@ export default defineConfig({
     channel: process.env.CI ? undefined : 'chrome',
     viewport: process.env.CI ? { width: 960, height: 640 } : { width: 1440, height: 960 },
     launchOptions: {
-      // GPU 없는 CI에서도 로컬 앱의 실제 WebGL 출력을 검증한다.
       args: process.env.CI ? ['--use-gl=angle', '--use-angle=swiftshader-webgl', '--enable-unsafe-swiftshader'] : [],
     },
     trace: 'retain-on-failure',

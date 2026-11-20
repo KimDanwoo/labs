@@ -3,7 +3,6 @@ import { DataTexture, LinearFilter, LinearMipmapLinearFilter, RedFormat, RepeatW
 export const SURFACE_KIND = { bark: 'bark', stone: 'stone', wool: 'wool' } as const;
 type SurfaceKind = (typeof SURFACE_KIND)[keyof typeof SURFACE_KIND];
 
-/** Small periodic relief maps add surface detail without external textures or extra geometry. */
 export function makeSurfaceBump(kind: SurfaceKind) {
   const size = 64;
   const data = new Uint8Array(size * size);

@@ -1,6 +1,5 @@
 import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three';
 
-/** Folded leaf diamonds share one geometry and remain batchable across the forest. */
 export function makeLeafCanopy(radius: number, leaves: number): BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];

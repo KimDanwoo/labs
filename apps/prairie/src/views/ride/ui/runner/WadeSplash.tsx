@@ -7,7 +7,6 @@ import { createRingMaterials, createWadeState, stepWadeSplash } from '@views/rid
 import { useMemo, useRef } from 'react';
 import { InstancedMesh, Mesh } from 'three';
 
-// 물보라(속도 방향으로 늘어난 물줄기, world 공간) + 발굽에서 퍼지는 파문 링. 죽은 입자·링은 크기 0.
 export function WadeSplash() {
   const dropletsRef = useRef<InstancedMesh>(null);
   const ringRefs = useRef<(Mesh | null)[]>([]);

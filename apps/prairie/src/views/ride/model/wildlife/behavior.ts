@@ -1,10 +1,9 @@
 export type CreatureState = { alert: number; rest: number };
 export const createCreatureState = (): CreatureState => ({ alert: 0, rest: 0 });
 
-// A short memory prevents jitter at the proximity boundary; animals settle after
-// the rider leaves instead of replaying a new escape on every frame.
 export function updateCreature(state: CreatureState, distance: number, radius: number, delta: number): void {
-  if (!Number.isFinite(delta) || delta <= 0) return;
+  if (!Number.isFinite(delta)) return;
+  if (delta <= 0) return;
   const dt = Math.min(delta, 0.1);
   if (distance < radius) state.rest = 2.5;
   else state.rest = Math.max(0, state.rest - dt);
@@ -24,7 +23,8 @@ export function crossedArch(
   y: number,
   z: number,
 ): boolean {
-  if (from.z < z === to.z < z || from.z === to.z) return false;
+  const isNotCrossing = from.z < z === to.z < z || from.z === to.z;
+  if (isNotCrossing) return false;
   const t = (z - from.z) / (to.z - from.z);
   const px = from.x + (to.x - from.x) * t - x;
   const py = from.y + (to.y - from.y) * t - y;

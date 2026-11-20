@@ -34,7 +34,8 @@ export function loopSubdivide({ vertices, faces: source }) {
         [border[0], 0.125],
         [border[1], 0.125],
       ]);
-    if (border.length > 0 || neighbors[i].size < 3) return v;
+    if (border.length > 0) return v;
+    if (neighbors[i].size < 3) return v;
     const n = neighbors[i].size;
     const beta = n === 3 ? 3 / 16 : 3 / (8 * n);
     return interpolate(vertices, [[i, 1 - n * beta], ...[...neighbors[i]].map((j) => [j, beta])]);

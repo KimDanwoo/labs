@@ -83,7 +83,6 @@ function pushFeather(buffers: Buffers, spine: FeatherSpine, layer: number, feath
   }
 }
 
-// 바깥 비행깃·안쪽 비행깃·덮깃을 겹친다. 모든 깃털을 같은 점에 모으면 밑동이 겹쳐 깜빡인다.
 export function makeWingGeometry(span: number, feathers: number): BufferGeometry {
   const buffers: Buffers = { positions: [], indices: [], uvs: [], colors: [] };
   const count = Math.ceil(feathers * FEATHER_SHARE);
