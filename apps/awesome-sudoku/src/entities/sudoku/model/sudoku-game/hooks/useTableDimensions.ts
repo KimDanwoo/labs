@@ -1,16 +1,13 @@
 import { measureTable } from '@entities/sudoku/lib/tableLayout';
 import type { TableDimensions } from '@entities/sudoku/model/types/board';
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useEffectEvent, useRef, type RefObject } from 'react';
 
 export function useTableDimensions(
   tableRef: RefObject<HTMLTableElement | null>,
   onDimensionsChange: (dimensions: TableDimensions) => void,
 ) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const onDimensionsChangeRef = useRef(onDimensionsChange);
-  useEffect(() => {
-    onDimensionsChangeRef.current = onDimensionsChange;
-  }, [onDimensionsChange]);
+  const notifyDimensions = useEffectEvent(onDimensionsChange);
 
   useEffect(() => {
     const table = tableRef.current;
@@ -25,7 +22,7 @@ export function useTableDimensions(
         overlay.style.width = `${dimensions.tableRect.width}px`;
         overlay.style.height = `${dimensions.tableRect.height}px`;
       }
-      onDimensionsChangeRef.current(dimensions);
+      notifyDimensions(dimensions);
     };
     const scheduleMeasure = () => {
       if (frame !== null) cancelAnimationFrame(frame);
