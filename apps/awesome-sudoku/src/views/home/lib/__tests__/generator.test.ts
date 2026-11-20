@@ -106,16 +106,23 @@ describe('generateKillerCages', () => {
   });
 });
 
-describe('generateKillerBoard', () => {
-  it.each(DIFFICULTIES)('%s: 케이지 크기 제한을 지키고 힌트가 목표 이상이다', (difficulty) => {
-    const solution = generateSolution();
-    const { board, cages } = generateKillerBoard(solution, difficulty);
-    const { clues, maxCageSize } = KILLER_DIFFICULTY[difficulty];
+/** expert는 SUBSET 이상만 찾느라 최대 10판을 만든다 — 단독 0.6~0.8초, 빌드·lint와 동시에 돌면 8초까지 늘어난다 */
+const KILLER_GENERATION_TIMEOUT_MS = 30_000;
 
-    expectBoardMatchesPuzzle(board, solution);
-    expect(cages.every((cage: KillerCage) => cage.cells.length <= maxCageSize)).toBe(true);
-    expect(countClues(board)).toBeGreaterThanOrEqual(clues);
-  });
+describe('generateKillerBoard', () => {
+  it.each(DIFFICULTIES)(
+    '%s: 케이지 크기 제한을 지키고 힌트가 목표 이상이다',
+    (difficulty) => {
+      const solution = generateSolution();
+      const { board, cages } = generateKillerBoard(solution, difficulty);
+      const { clues, maxCageSize } = KILLER_DIFFICULTY[difficulty];
+
+      expectBoardMatchesPuzzle(board, solution);
+      expect(cages.every((cage: KillerCage) => cage.cells.length <= maxCageSize)).toBe(true);
+      expect(countClues(board)).toBeGreaterThanOrEqual(clues);
+    },
+    KILLER_GENERATION_TIMEOUT_MS,
+  );
 
   it.each([GAME_LEVEL.EASY, GAME_LEVEL.MEDIUM])('%s: 케이지 제약 포함 유일해다', (difficulty) => {
     const { board, cages } = generateKillerBoard(generateSolution(), difficulty);
