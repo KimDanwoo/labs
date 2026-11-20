@@ -51,7 +51,7 @@ catalog:
   eslint-plugin-import-x: ^4.18.1
   eslint-plugin-prettier: ^5.5.7
   # 품질·FSD 잠금 규칙의 단일 원본(my-fe-harness/eslint). 태그로 고정한다.
-  my-fe-harness: github:KimDanwoo/my-fe-harness#v0.5.0
+  my-fe-harness: github:KimDanwoo/my-fe-harness#v0.5.1
   prettier-plugin-organize-imports: ^4.3.0
 
   # build 분석 (awesome-sudoku)
