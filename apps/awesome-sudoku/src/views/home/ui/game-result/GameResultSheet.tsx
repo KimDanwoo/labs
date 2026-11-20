@@ -1,12 +1,12 @@
 'use client';
+import { formatTime } from '@shared/lib/formatTime';
 import { useDismissible } from '@shared/lib/useDismissible';
 import { BottomSheet } from '@shared/ui/bottom-sheet';
+import { SuccessIcon } from '@shared/ui/SuccessIcon';
 import { MAX_MISTAKES } from '@views/home/config/game';
-import { formatTime } from '@views/home/model/services/common';
 import { currentTimeAtom, isCompletedAtom, isSuccessAtom, mistakeCountAtom } from '@views/home/model/store/primitives';
 import { FailureIcon } from '@views/home/ui/sudoku-game/FailureIcon';
 import { ListSelector } from '@views/home/ui/sudoku-game/ListSelector';
-import { SuccessIcon } from '@views/home/ui/sudoku-game/SuccessIcon';
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
 

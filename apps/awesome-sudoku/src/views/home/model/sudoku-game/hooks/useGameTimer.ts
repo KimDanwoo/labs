@@ -1,8 +1,8 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 
+import { formatTime } from '@shared/lib/formatTime';
 import { elapsedTicks } from '@views/home/lib/elapsedTicks';
-import { formatTime } from '@views/home/model/services/common';
 import { currentTimeAtom, isCompletedAtom, timerActiveAtom } from '@views/home/model/store/primitives';
 import { incrementTimerAtom, toggleTimerAtom } from '@views/home/model/store/timerAtoms';
 
