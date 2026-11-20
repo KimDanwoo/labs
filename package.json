@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "lint": "pnpm check:architecture && turbo run lint",
+    "lint": "pnpm check:architecture && pnpm lint:workspace && turbo run lint",
+    "lint:workspace": "eslint .",
     "test": "node --test \"scripts/__tests__/*.test.mjs\" && turbo run test",
     "check:architecture": "node scripts/check-architecture.mjs",
     "typecheck": "turbo run typecheck",
@@ -19,7 +20,10 @@
   "prettier": "@repo/prettier-config",
   "devDependencies": {
     "@playwright/test": "catalog:",
+    "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
+    "@typescript-eslint/parser": "catalog:",
+    "eslint": "catalog:",
     "prettier": "catalog:",
     "tsx": "catalog:",
     "turbo": "catalog:",

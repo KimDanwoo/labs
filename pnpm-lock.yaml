@@ -194,9 +194,18 @@ importers:
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.65.1
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:packages/eslint-config
       '@repo/prettier-config':
         specifier: workspace:*
         version: link:packages/prettier-config
+      '@typescript-eslint/parser':
+        specifier: 'catalog:'
+        version: 8.73.0(eslint@10.15.0(jiti@2.7.0))(typescript@5.9.3)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.15.0(jiti@2.7.0)
       prettier:
         specifier: 'catalog:'
         version: 3.8.5
@@ -7117,8 +7126,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.68.0(typescript@5.9.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.68.0(typescript@5.9.3)
-      '@typescript-eslint/types': 8.68.0
+      '@typescript-eslint/tsconfig-utils': 8.73.0(typescript@5.9.3)
+      '@typescript-eslint/types': 8.73.0
       debug: 4.4.3
       typescript: 5.9.3
     transitivePeerDependencies:

@@ -135,7 +135,7 @@ tsx 파일은 "무엇을 그리는가"만 담는다. 값·로직·스타일은 �
 - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateComponentModule`·`findMisplacedStyles`): 모든 앱 `src`의 tsx 최상위 비컴포넌트 선언과 자리를 벗어난 CSS 파일을 막는다. 훅 분리·반복 모양의 컴포넌트화는 리뷰에서 확인한다.
 - **함수 크기·숫자도 `pnpm lint`가 강제한다**(`@repo/eslint-config/quality.config.mjs`, my-fe-harness 기본 잠금과 같은 값): 순환 복잡도 10, 블록 중첩 3, 함수 120줄, 컴포넌트 파일 250줄 이하. 컴포넌트·훅의 숫자는 `-1·0·1·2·100` 말고 `config/`의 이름 있는 상수로 둔다(`config/`·`constants`·테스트는 제외).
   - 컴포넌트 본문도 같은 설정이 막는다(`rules/harness.mjs` — my-fe-harness `lint-guard-plugin.mjs` 사본, 원본과 함께 바꾼다): `quality/component-body`(본문 최상위 함수는 `handleXxx`·`onXxx`만, 중첩 컴포넌트 금지), `quality/no-direct-effect`(`useEffect`·`useLayoutEffect` 직접 호출 금지, `error.tsx` 제외), `quality/no-store-passthrough`(구독한 스토어 값을 도메인 컴포넌트에 props로 넘기지 않는다).
-  - 기존 위반은 앱별 `eslint-suppressions.json`에만 둔다(ESLint 일괄 억제). 줄어들기만 한다 — 새 위반이나 파일의 위반 수 증가는 실패하고, 고쳐서 남은 억제가 생겨도 실패한다. 고친 뒤 그 앱 폴더에서 `pnpm exec eslint . --prune-suppressions`로 정리한다. `--suppress-all`·`--suppress-rule`로 새 위반을 덧붙이지 않는다.
+  - 기존 위반은 앱별·루트 `eslint-suppressions.json`에만 둔다(ESLint 일괄 억제). 줄어들기만 한다 — 새 위반이나 파일의 위반 수 증가는 실패하고, 고쳐서 남은 억제가 생겨도 실패한다. 고친 뒤 그 앱 폴더(루트 `scripts/`·`packages/`면 루트)에서 `pnpm exec eslint . --prune-suppressions`로 정리한다. `--suppress-all`·`--suppress-rule`로 새 위반을 덧붙이지 않는다.
 
 ## 상태 관리 (도입 시)
 
@@ -168,15 +168,15 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 
 ## 스크립트 (루트에서)
 
-| 명령                      | 동작                          |
-| ------------------------- | ----------------------------- |
-| `pnpm dev`                | `turbo run dev` — 모든 앱 dev |
-| `pnpm build`              | `turbo run build`             |
-| `pnpm lint`               | 구조 검사 + `turbo run lint`  |
-| `pnpm check:architecture` | 워크스페이스 구조 검사        |
-| `pnpm typecheck`          | 전체 타입 검사                |
-| `pnpm test`               | 공유 규칙·앱별 회귀 테스트    |
-| `pnpm format`             | Prettier 전체 포맷            |
+| 명령                      | 동작                                                              |
+| ------------------------- | ----------------------------------------------------------------- |
+| `pnpm dev`                | `turbo run dev` — 모든 앱 dev                                     |
+| `pnpm build`              | `turbo run build`                                                 |
+| `pnpm lint`               | 구조 검사 + 루트 `scripts/`·`packages/` ESLint + `turbo run lint` |
+| `pnpm check:architecture` | 워크스페이스 구조 검사                                            |
+| `pnpm typecheck`          | 전체 타입 검사                                                    |
+| `pnpm test`               | 공유 규칙·앱별 회귀 테스트                                        |
+| `pnpm format`             | Prettier 전체 포맷                                                |
 
 - 특정 앱만: `pnpm --filter hub dev`.
 - CI(`ci.yml`)는 lint·타입 검사·테스트에 더해 바뀐 앱의 배포 빌드까지 돌린다. soundlab은 빌드 직전에 SoundCloud에서 곡 목록을 받아 파일을 다시 쓰므로 CI 빌드에서 뺀다. 앱 전용 검증은 앱별 워크플로가 그 앱이 바뀐 PR에서만 돌린다: fe-deep e2e(`fe-deep.yml`). prairie e2e는 GPU 없는 러너에서 실제 화면을 검증하지 못해 자동화하지 않는다(로컬 GPU에서 `pnpm --filter prairie test:e2e`로 수동 실행).
