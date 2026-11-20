@@ -1,4 +1,4 @@
-import qualityConfig from '@repo/eslint-config/quality.config.mjs';
+import quality from '@repo/eslint-config/quality.config.mjs';
 import typescriptParser from '@typescript-eslint/parser';
 
 const eslintConfig = [
@@ -12,7 +12,7 @@ const eslintConfig = [
       'no-nested-ternary': 'error',
     },
   },
-  ...qualityConfig,
+  ...quality(),
 ];
 
 export default eslintConfig;

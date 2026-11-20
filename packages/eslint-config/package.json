@@ -18,9 +18,8 @@
     "eslint": "catalog:",
     "eslint-config-next": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "eslint-import-resolver-typescript": "catalog:",
-    "eslint-plugin-boundaries": "catalog:",
     "eslint-plugin-prettier": "catalog:",
+    "my-fe-harness": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   }
