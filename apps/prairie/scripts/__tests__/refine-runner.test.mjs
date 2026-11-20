@@ -11,12 +11,17 @@ function load(path) {
 const original = load('../runner/source/runner.glb');
 const refined = load('../../public/models/unicorn.glb');
 
+const COMPONENT_READERS = {
+  5123: { size: 2, method: 'readUInt16LE' },
+  5125: { size: 4, method: 'readUInt32LE' },
+  default: { size: 4, method: 'readFloatLE' },
+};
+
 function read(index) {
   const a = refined.gltf.accessors[index];
   const view = refined.gltf.bufferViews[a.bufferView];
   const width = { SCALAR: 1, VEC3: 3, VEC4: 4 }[a.type];
-  const size = a.componentType === 5123 ? 2 : 4;
-  const method = a.componentType === 5123 ? 'readUInt16LE' : a.componentType === 5125 ? 'readUInt32LE' : 'readFloatLE';
+  const { size, method } = COMPONENT_READERS[a.componentType] ?? COMPONENT_READERS.default;
   return Array.from({ length: a.count }, (_, i) =>
     Array.from({ length: width }, (_, c) =>
       refined.bin[method]((view.byteOffset ?? 0) + (a.byteOffset ?? 0) + i * width * size + c * size),

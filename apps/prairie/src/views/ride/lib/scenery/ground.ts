@@ -75,3 +75,6 @@ export function shadeGround(shader: WebGLProgramParametersWithUniforms): void {
 }
 
 export const GRID_STEP = WORLD.groundSize / WORLD.groundSegments;
+
+export const SHADOW_LAYER_LIFT = 0.02;
+export const SHADOW_OPACITY = 0.3;

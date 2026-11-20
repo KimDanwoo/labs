@@ -2,13 +2,13 @@
 
 import { useLowDetail } from '../../model/ride-state/sceneQuality';
 
-import { useFrame } from '@react-three/fiber';
-import { useLayoutEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { DoubleSide, InstancedMesh } from 'three';
-import { FLORA, floraCellOf } from '../../model/flora/constants';
+import { FLORA_VIEW } from '../../config/floraView';
+import { FLORA } from '../../model/flora/constants';
 
-import { shadeCanopy, shadeConifer, timeUniform } from '../../lib/flora/floraField';
-import { placeFlora } from '../../lib/flora/placeFlora';
+import { shadeCanopy, shadeConifer } from '../../lib/flora/floraField';
+import { useFloraPlacement } from '../../model/flora/useFloraPlacement';
 import { useFloraResources } from '../../model/flora/useFloraResources';
 import { MeadowFlowers } from './MeadowFlowers';
 
@@ -24,65 +24,55 @@ export function FloraField() {
   const farCanopyRef = useRef<InstancedMesh>(null);
   const coneRef = useRef<InstancedMesh>(null);
   const rockRef = useRef<InstancedMesh>(null);
-  const centerRef = useRef({ x: Number.NaN, z: Number.NaN });
-
-  const rebuild = (cx: number, cz: number) => {
-    const trunk = trunkRef.current;
-    const canopy = canopyRef.current;
-    const farCanopy = farCanopyRef.current;
-    const cone = coneRef.current;
-    const rock = rockRef.current;
-    const shadow = shadowRef.current;
-    if (!trunk || !canopy || !farCanopy || !cone || !rock || !shadow) return;
-
-    placeFlora({ trunk, canopy, farCanopy, cone, rock, shadow }, cx, cz, viewRadius, coarse);
-  };
-
-  useLayoutEffect(() => {
-    centerRef.current = { x: Number.NaN, z: Number.NaN };
-  }, [viewRadius]);
-
-  useFrame((state) => {
-    timeUniform.value = state.clock.elapsedTime;
-    const cx = floraCellOf(state.camera.position.x);
-    const cz = floraCellOf(state.camera.position.z);
-    if (cx === centerRef.current.x && cz === centerRef.current.z) return;
-    centerRef.current = { x: cx, z: cz };
-    rebuild(cx, cz);
-  });
+  useFloraPlacement(
+    { trunk: trunkRef, canopy: canopyRef, farCanopy: farCanopyRef, cone: coneRef, rock: rockRef, shadow: shadowRef },
+    viewRadius,
+    coarse,
+  );
 
   return (
     <group>
       <MeadowFlowers />
       <instancedMesh ref={trunkRef} args={[geometry.trunk, undefined, FLORA.maxTrees * (FLORA.branches + 1)]}>
-        <meshStandardMaterial color={FLORA.colors.trunk} roughness={0.95} bumpMap={surface.bark} bumpScale={0.16} />
+        <meshStandardMaterial
+          color={FLORA.colors.trunk}
+          roughness={FLORA_VIEW.trunk.roughness}
+          bumpMap={surface.bark}
+          bumpScale={FLORA_VIEW.trunk.bumpScale}
+        />
       </instancedMesh>
       <instancedMesh ref={canopyRef} args={[geometry.canopy, undefined, FLORA.maxTrees * FLORA.canopy.blobs]}>
         <meshStandardMaterial
           vertexColors
           side={DoubleSide}
-          roughness={0.82}
-          envMapIntensity={0.25}
+          roughness={FLORA_VIEW.canopy.roughness}
+          envMapIntensity={FLORA_VIEW.canopy.envMapIntensity}
           onBeforeCompile={shadeCanopy}
         />
       </instancedMesh>
-      <instancedMesh ref={farCanopyRef} args={[geometry.farCanopy, undefined, FLORA.maxTrees * 6]}>
+      <instancedMesh ref={farCanopyRef} args={[geometry.farCanopy, undefined, FLORA.maxTrees * FLORA.canopy.farBlobs]}>
         <meshLambertMaterial onBeforeCompile={shadeCanopy} />
       </instancedMesh>
       <instancedMesh ref={coneRef} args={[geometry.conifer, undefined, FLORA.maxTrees * FLORA.conifer.tiers]}>
         <meshLambertMaterial onBeforeCompile={shadeConifer} />
       </instancedMesh>
       <instancedMesh ref={shadowRef} args={[undefined, undefined, FLORA.maxTrees + FLORA.maxRocks]}>
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial map={shadowTexture} color="#293221" transparent opacity={0.3} depthWrite={false} />
+        <planeGeometry args={FLORA_VIEW.shadow.geometry} />
+        <meshBasicMaterial
+          map={shadowTexture}
+          color={FLORA_VIEW.shadow.color}
+          transparent
+          opacity={FLORA_VIEW.shadow.opacity}
+          depthWrite={false}
+        />
       </instancedMesh>
       <instancedMesh ref={rockRef} args={[geometry.rock, undefined, FLORA.maxRocks]}>
         <meshStandardMaterial
           color={FLORA.colors.rock}
           vertexColors
-          roughness={0.95}
+          roughness={FLORA_VIEW.rock.roughness}
           bumpMap={surface.stone}
-          bumpScale={0.12}
+          bumpScale={FLORA_VIEW.rock.bumpScale}
         />
       </instancedMesh>
     </group>

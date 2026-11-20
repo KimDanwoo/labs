@@ -1,6 +1,6 @@
 'use client';
 
-import { BEARING } from '../../lib/hud/riverGuide';
+import { BEARING, SEA_NEAR_DISTANCE } from '../../lib/hud/riverGuide';
 import { useRideRiver } from '../../model/ride-state/rideStore';
 
 export function RiverGuide() {
@@ -8,7 +8,7 @@ export function RiverGuide() {
   const isCrossing = riverBearing === 'crossing';
   let description = isCrossing ? '물결 사이를 지나는 중' : '가까운 강까지';
   if (atSea) description = '강이 닿는 곳';
-  let destination = seaDistance < 400 ? '바다로 이어지는 하구' : '넓은 강을 지나는 중';
+  let destination = seaDistance < SEA_NEAR_DISTANCE ? '바다로 이어지는 하구' : '넓은 강을 지나는 중';
   if (atSea) destination = '탁 트인 바다';
 
   return (

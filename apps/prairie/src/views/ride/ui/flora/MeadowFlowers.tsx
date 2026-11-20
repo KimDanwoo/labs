@@ -1,21 +1,19 @@
 'use client';
 
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
-
 import { useFrame } from '@react-three/fiber';
-import { MEADOW_PATH, RIVER_TRENCH_HALF_WIDTH } from '../../config/scene';
-import { makeFlowerGeometry } from '../../lib/flora/makeFlowerGeometry';
-import { coastDistanceAt, distanceToRiver, meadowPathDistanceAt, terrainHeightAt } from '../../lib/scene/terrain';
-
 import { useMemo, useRef } from 'react';
 import { InstancedMesh, Object3D } from 'three';
-import { COLORS, hash, TILE } from '../../lib/flora/meadowFlowers';
+import { MEADOW_FLOWERS } from '../../config/meadowFlowersView';
+import { makeFlowerGeometry } from '../../lib/flora/makeFlowerGeometry';
+import { liftToBase, rebuildMeadowFlowers } from '../../lib/flora/meadowFlowerPlacement';
+import { TILE } from '../../lib/flora/meadowFlowers';
+import { useLowDetail } from '../../model/ride-state/sceneQuality';
 
 // 셀마다 작은 야생화 군락. 두 번의 draw call로 그리고 강 골에는 심지 않는다.
 export function MeadowFlowers() {
   const coarse = useLowDetail();
-  const radius = coarse ? 2 : 3;
-  const perCell = coarse ? 18 : 36;
+  const radius = coarse ? MEADOW_FLOWERS.radius.coarse : MEADOW_FLOWERS.radius.fine;
+  const perCell = coarse ? MEADOW_FLOWERS.perCell.coarse : MEADOW_FLOWERS.perCell.fine;
   const capacity = (radius * 2 + 1) ** 2 * perCell;
   const stems = useRef<InstancedMesh>(null);
   const flowers = useRef<InstancedMesh>(null);
@@ -23,56 +21,18 @@ export function MeadowFlowers() {
   const geometry = useMemo(() => makeFlowerGeometry(), []);
   const dummyRef = useRef(new Object3D());
   useFrame(({ camera }) => {
-    const dummy = dummyRef.current;
-    const stem = stems.current,
-      flower = flowers.current;
-    if (!stem || !flower) return;
+    if (!stems.current || !flowers.current) return;
     const cx = Math.floor(camera.position.x / TILE),
       cz = Math.floor(camera.position.z / TILE);
     if (cx === center.current.x && cz === center.current.z && capacity === center.current.capacity) return;
     center.current = { x: cx, z: cz, capacity };
-    let count = 0;
-    for (let dx = -radius; dx <= radius; dx += 1) {
-      for (let dz = -radius; dz <= radius; dz += 1) {
-        const seed = (cx + dx) * 73.13 + (cz + dz) * 37.71;
-        const patchX = (cx + dx + hash(seed)) * TILE;
-        const patchZ = (cz + dz + hash(seed + 3)) * TILE;
-        for (let i = 0; i < perCell; i += 1) {
-          const angle = hash(seed + i * 2.7) * Math.PI * 2;
-          const spread = Math.sqrt(hash(seed + i * 4.1 + 9)) * 4.5;
-          const x = patchX + Math.cos(angle) * spread,
-            z = patchZ + Math.sin(angle) * spread;
-          if (coastDistanceAt(x, z) > -32) continue;
-          if (meadowPathDistanceAt(x, z) < MEADOW_PATH.halfWidth + 0.6) continue;
-          if (distanceToRiver(x, z) < RIVER_TRENCH_HALF_WIDTH + 5) continue;
-          const y = terrainHeightAt(x, z);
-          const height = 0.22 + hash(seed + i * 1.1) * 0.34;
-          dummy.position.set(x, y, z);
-          dummy.rotation.set(0, angle, 0);
-          dummy.scale.set(1, height, 1);
-          dummy.updateMatrix();
-          stem.setMatrixAt(count, dummy.matrix);
-          dummy.position.y += height;
-          dummy.rotation.set(0.12, angle, 0.16);
-          dummy.scale.setScalar(0.5 + hash(seed + i * 5.3) * 0.5);
-          dummy.updateMatrix();
-          flower.setMatrixAt(count, dummy.matrix);
-          flower.setColorAt(count, COLORS[Math.floor(hash(seed + i * 6.1) * COLORS.length)]!);
-          count += 1;
-        }
-      }
-    }
-    for (const mesh of [stem, flower]) {
-      mesh.count = count;
-      mesh.instanceMatrix.needsUpdate = true;
-      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-      mesh.computeBoundingSphere();
-    }
+    const meshes = { stems: stems.current, flowers: flowers.current };
+    rebuildMeadowFlowers(meshes, dummyRef.current, { x: cx, z: cz }, { radius, perCell });
   });
   return (
     <group>
       <instancedMesh ref={stems} args={[undefined, undefined, capacity]}>
-        <cylinderGeometry args={[0.008, 0.012, 1, 4]} onUpdate={(g) => g.translate(0, 0.5, 0)} />
+        <cylinderGeometry args={MEADOW_FLOWERS.stemGeometry} onUpdate={liftToBase} />
         <meshLambertMaterial color="#526b38" />
       </instancedMesh>
       <instancedMesh ref={flowers} args={[geometry, undefined, capacity]}>

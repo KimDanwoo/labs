@@ -1,24 +1,29 @@
 'use client';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { CatmullRomCurve3, Vector3 } from 'three';
+import { BRANCH } from '../../config/branch';
 import { makeSurfaceBump, SURFACE_KIND } from '../../lib/makeSurfaceBump';
+import { useDispose } from '../../model/hooks/useDispose';
 
-export function Branch({
-  points,
-  radius = 0.3,
-  color = '#786a52',
-}: {
-  points: number[][];
+interface BranchProps {
+  points: readonly (readonly number[])[];
   radius?: number;
   color?: string;
-}) {
+}
+
+export function Branch({ points, radius = BRANCH.defaultRadius, color = BRANCH.defaultColor }: BranchProps) {
   const curve = useMemo(() => new CatmullRomCurve3(points.map((p) => new Vector3(p[0], p[1], p[2]))), [points]);
   const bark = useMemo(() => makeSurfaceBump(SURFACE_KIND.bark), []);
-  useEffect(() => () => bark.dispose(), [bark]);
+  useDispose(bark);
   return (
     <mesh castShadow>
-      <tubeGeometry args={[curve, 16, radius, 6, false]} />
-      <meshStandardMaterial color={color} roughness={0.95} bumpMap={bark} bumpScale={radius * 0.25} />
+      <tubeGeometry args={[curve, BRANCH.tubularSegments, radius, BRANCH.radialSegments, false]} />
+      <meshStandardMaterial
+        color={color}
+        roughness={BRANCH.roughness}
+        bumpMap={bark}
+        bumpScale={radius * BRANCH.bumpRatio}
+      />
     </mesh>
   );
 }

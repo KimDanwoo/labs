@@ -28,42 +28,47 @@ export type RunnerMotionRefs = {
 
 export type RunnerMotion = { position: Vector3; heading: number; speed: number; visualY: number; isSprinting: boolean };
 
-export function advanceRunner(
-  refs: RunnerMotionRefs,
-  { forward, backward, left, right, sprint, jump, spin, dash, descend }: ReturnType<typeof getRunnerInput>,
-  delta: number,
-  now: number,
-): RunnerMotion {
-  const { rootRef, rollRef, speedRef, dashRef, spinRef, headingRef, positionRef, airborneRef } = refs;
-  const { wasSprintingRef, wasJumpPressedRef, telemetryAtRef } = refs;
-  const physics = RUNNER_PHYSICS;
-  const air = airborneRef.current;
-  const isGrounded = air.height <= 0;
-  updateDash(dashRef.current, dash, air.height, delta);
+type RunnerInput = ReturnType<typeof getRunnerInput>;
+
+function updateSkills(refs: RunnerMotionRefs, input: RunnerInput, airHeight: number, delta: number): void {
+  const { rollRef, dashRef, spinRef } = refs;
+  updateDash(dashRef.current, input.dash, airHeight, delta);
   runnerState.dashStrength = dashRef.current.strength;
-  updateSpin(spinRef.current, spin, air.height, delta);
+  updateSpin(spinRef.current, input.spin, airHeight, delta);
   runnerState.isSpinning = spinRef.current.active;
   runnerState.spinAngle = spinRef.current.angle;
   if (rollRef.current) rollRef.current.rotation.z = spinRef.current.angle;
+}
 
-  // 말은 하상 프로파일을 따라 골로 내려가고, 수심에 비례해 최고속도가 떨어진다. 공중에선 물이 발에 안 닿으니 감속 없음.
-  const waterDepth = waterDepthAt(positionRef.current.x, positionRef.current.z);
-  const wade = isGrounded ? Math.min(waterDepth / RIVER.wadeDepthRef, 1) : 0;
-  const maxSpeed = physics.maxSpeed * MathUtils.lerp(1, RIVER.wadeSpeedScale, wade);
-
-  // 질주: 최고속도·가속 배율. 발동 순간 돌풍 파동 원점을 기록한다.
-  const isSprinting = sprint && forward;
+// 질주: 최고속도·가속 배율. 발동 순간 돌풍 파동 원점을 기록한다.
+function markSprintStart(refs: RunnerMotionRefs, isSprinting: boolean, now: number): void {
+  const { wasSprintingRef, positionRef } = refs;
   if (isSprinting && !wasSprintingRef.current) {
     runnerState.gustOrigin.set(positionRef.current.x, positionRef.current.z);
     runnerState.gustStartedAt = now;
   }
   wasSprintingRef.current = isSprinting;
+}
+
+function accelerate(
+  refs: RunnerMotionRefs,
+  input: RunnerInput,
+  isSprinting: boolean,
+  isGrounded: boolean,
+  delta: number,
+): number {
+  const { speedRef, dashRef, positionRef } = refs;
+  const physics = RUNNER_PHYSICS;
+  // 말은 하상 프로파일을 따라 골로 내려가고, 수심에 비례해 최고속도가 떨어진다. 공중에선 물이 발에 안 닿으니 감속 없음.
+  const waterDepth = waterDepthAt(positionRef.current.x, positionRef.current.z);
+  const wade = isGrounded ? Math.min(waterDepth / RIVER.wadeDepthRef, 1) : 0;
+  const maxSpeed = physics.maxSpeed * MathUtils.lerp(1, RIVER.wadeSpeedScale, wade);
   const sprintMax = isSprinting ? physics.sprintMaxMultiplier : 1;
   const sprintAccel = isSprinting ? physics.sprintAccelMultiplier : 1;
 
   let speed = speedRef.current;
-  if (forward) speed += physics.accel * sprintAccel * delta;
-  else if (backward) speed -= physics.brake * delta;
+  if (input.forward) speed += physics.accel * sprintAccel * delta;
+  else if (input.backward) speed -= physics.brake * delta;
   else {
     const drag = physics.coastDecel * (isGrounded ? 1 : RIG.airborneDragFactor) * delta;
     speed -= MathUtils.clamp(speed, -drag, drag);
@@ -75,8 +80,13 @@ export function advanceRunner(
   const speedLimit = Math.max(dashSpeed, speedRef.current - physics.brake * delta);
   speed = MathUtils.clamp(speed, -physics.maxReverse, speedLimit);
   speedRef.current = speed;
+  return speed;
+}
 
-  const steer = (left ? 1 : 0) - (right ? 1 : 0);
+function steerHeading(refs: RunnerMotionRefs, input: RunnerInput, speed: number, delta: number): number {
+  const { headingRef, dashRef } = refs;
+  const physics = RUNNER_PHYSICS;
+  const steer = (input.left ? 1 : 0) - (input.right ? 1 : 0);
   const direction = speed < 0 ? -1 : 1;
   const turnAuthority = MathUtils.clamp(Math.abs(speed) / RIG.fullTurnSpeed, physics.turnFloor, 1);
   headingRef.current +=
@@ -86,54 +96,90 @@ export function advanceRunner(
     turnAuthority *
     direction *
     (1 - dashRef.current.strength * RIG.dashSteerDamping);
-  const heading = headingRef.current;
+  return headingRef.current;
+}
 
+function moveAndCollide(refs: RunnerMotionRefs, speed: number, heading: number, delta: number): Vector3 {
+  const { speedRef, positionRef, airborneRef } = refs;
   forwardVec.set(Math.sin(heading), 0, Math.cos(heading));
   const position = positionRef.current;
   position.addScaledVector(forwardVec, speed * delta);
   // 줄기·바위 충돌: 밀어내고 속도를 깎는다. 줄기 높이 위로 날면 통과.
-  if (air.height < FLORA.trunk.height && pushOutOfFlora(position) > 0)
+  if (airborneRef.current.height < FLORA.trunk.height && pushOutOfFlora(position) > 0)
     speedRef.current = speed * RIG.collisionSpeedFactor;
+  return position;
+}
 
+interface Landing {
+  groundY: number;
+  waterDepth: number;
+}
+
+function flyAndLand(
+  refs: RunnerMotionRefs,
+  input: RunnerInput,
+  position: Vector3,
+  delta: number,
+  now: number,
+): Landing {
+  const { speedRef, dashRef, spinRef, airborneRef, wasJumpPressedRef } = refs;
   // 이동과 충돌 보정 뒤의 위치에서 지면을 샘플링해 발이 언덕에 묻히지 않게 한다.
   // Buoyancy keeps the horse above deep water instead of walking along the seabed.
-  const currentWaterDepth = waterDepthAt(position.x, position.z);
+  const waterDepth = waterDepthAt(position.x, position.z);
   const bedY = groundHeightAt(position.x, position.z);
-  const groundY = currentWaterDepth > 0 ? Math.max(bedY, -RIVER.waterDrop - RIG.floatClearance) : bedY;
+  const groundY = waterDepth > 0 ? Math.max(bedY, -RIVER.waterDrop - RIG.floatClearance) : bedY;
   const impact = updateFlight(
-    air,
+    airborneRef.current,
     {
-      lift: jump,
-      launch: jump && !wasJumpPressedRef.current,
-      descend,
+      lift: input.jump,
+      launch: input.jump && !wasJumpPressedRef.current,
+      descend: input.descend,
       holdAltitude: spinRef.current.active || dashRef.current.active,
       speed: speedRef.current,
     },
     groundY,
     delta,
   );
-  wasJumpPressedRef.current = jump;
+  wasJumpPressedRef.current = input.jump;
   if (impact !== null) {
     runnerState.landedAt = now;
     runnerState.landingImpact = impact;
   }
-  const visualY = groundY + air.height;
+  return { groundY, waterDepth };
+}
+
+function publishRunner(refs: RunnerMotionRefs, motion: RunnerMotion, waterDepth: number, now: number): void {
+  const { rootRef, speedRef, airborneRef, telemetryAtRef } = refs;
+  const air = airborneRef.current;
   const root = rootRef.current;
   if (root) {
-    root.position.copy(position).setY(visualY);
-    root.rotation.y = heading;
+    root.position.copy(motion.position).setY(motion.visualY);
+    root.rotation.y = motion.heading;
   }
-
-  runnerState.position.copy(position).setY(visualY);
-  runnerState.heading = heading;
+  runnerState.position.copy(motion.position).setY(motion.visualY);
+  runnerState.heading = motion.heading;
   runnerState.speed = speedRef.current;
-  runnerState.waterDepth = currentWaterDepth;
-  runnerState.isSprinting = isSprinting;
+  runnerState.waterDepth = waterDepth;
+  runnerState.isSprinting = motion.isSprinting;
   runnerState.airborneHeight = air.height;
   runnerState.verticalSpeed = air.velocity;
   if (now - telemetryAtRef.current > RIG.telemetryIntervalS) {
     setRideTelemetry(speedRef.current, air.height);
     telemetryAtRef.current = now;
   }
-  return { position, heading, speed, visualY, isSprinting };
+}
+
+export function advanceRunner(refs: RunnerMotionRefs, input: RunnerInput, delta: number, now: number): RunnerMotion {
+  const air = refs.airborneRef.current;
+  const isGrounded = air.height <= 0;
+  updateSkills(refs, input, air.height, delta);
+  const isSprinting = input.sprint && input.forward;
+  markSprintStart(refs, isSprinting, now);
+  const speed = accelerate(refs, input, isSprinting, isGrounded, delta);
+  const heading = steerHeading(refs, input, speed, delta);
+  const position = moveAndCollide(refs, speed, heading, delta);
+  const landing = flyAndLand(refs, input, position, delta, now);
+  const motion = { position, heading, speed, visualY: landing.groundY + air.height, isSprinting };
+  publishRunner(refs, motion, landing.waterDepth, now);
+  return motion;
 }

@@ -14,7 +14,7 @@ export const FLORA = {
   spawnClearRadius: 30,
   trunk: { radiusTop: 0.14, radiusBottom: 0.36, height: 4.1, segments: 9 },
   // 활엽수 수관: 거친 곡면 잎 군집을 비대칭으로 분산하고 일부 군집까지 가지를 뻗는다.
-  canopy: { radius: 2.2, detail: 3, blobs: 15 },
+  canopy: { radius: 2.2, detail: 3, blobs: 15, leaves: { mobile: 100, desktop: 180 }, farBlobs: 6 },
   branches: 5,
   // 침엽수: 원뿔 tiers단. 아래가 넓고 위로 좁아진다.
   conifer: { radius: 2.1, tierHeight: 1.8, tiers: 6, segments: 13 },
@@ -99,6 +99,19 @@ export function floraCellOf(v: number): number {
   return Math.round(v / FLORA.cell);
 }
 
+function pushOutOfItem(position: { x: number; z: number }, item: FloraPlacement): number {
+  const solid = item.kind === 'rock' ? FLORA.rock.radius * item.scale : FLORA.trunk.radiusBottom * item.scale;
+  const minDist = solid + FLORA.runnerRadius;
+  const ox = position.x - item.x;
+  const oz = position.z - item.z;
+  const dist = Math.hypot(ox, oz);
+  if (dist >= minDist || dist === 0) return 0;
+  const k = (minDist - dist) / dist;
+  position.x += ox * k;
+  position.z += oz * k;
+  return minDist - dist;
+}
+
 // 말을 줄기·바위 밖으로 밀어낸다. 주변 3×3 셀만 본다. 밀린 거리(m)를 돌려준다(0이면 충돌 없음).
 export function pushOutOfFlora(position: { x: number; z: number }): number {
   const cx = floraCellOf(position.x);
@@ -106,18 +119,7 @@ export function pushOutOfFlora(position: { x: number; z: number }): number {
   let pushed = 0;
   for (let dx = -1; dx <= 1; dx += 1) {
     for (let dz = -1; dz <= 1; dz += 1) {
-      for (const item of floraInCell(cx + dx, cz + dz)) {
-        const solid = item.kind === 'rock' ? FLORA.rock.radius * item.scale : FLORA.trunk.radiusBottom * item.scale;
-        const minDist = solid + FLORA.runnerRadius;
-        const ox = position.x - item.x;
-        const oz = position.z - item.z;
-        const dist = Math.hypot(ox, oz);
-        if (dist >= minDist || dist === 0) continue;
-        const k = (minDist - dist) / dist;
-        position.x += ox * k;
-        position.z += oz * k;
-        pushed += minDist - dist;
-      }
+      for (const item of floraInCell(cx + dx, cz + dz)) pushed += pushOutOfItem(position, item);
     }
   }
   return pushed;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   makeCanopyGeometry,
   makeConiferGeometry,
@@ -8,12 +8,13 @@ import {
 } from '../../lib/flora/makeFloraGeometry';
 import { makeLeafCanopy } from '../../lib/makeLeafCanopy';
 import { makeSurfaceBump, SURFACE_KIND } from '../../lib/makeSurfaceBump';
+import { useDispose } from '../hooks/useDispose';
 import { FLORA } from './constants';
 
 export function useFloraResources(coarse: boolean) {
   const geometry = useMemo(
     () => ({
-      canopy: makeLeafCanopy(FLORA.canopy.radius, coarse ? 100 : 180),
+      canopy: makeLeafCanopy(FLORA.canopy.radius, coarse ? FLORA.canopy.leaves.mobile : FLORA.canopy.leaves.desktop),
       farCanopy: makeCanopyGeometry(1),
       conifer: makeConiferGeometry(),
       trunk: makeTrunkGeometry(),
@@ -21,13 +22,13 @@ export function useFloraResources(coarse: boolean) {
     }),
     [coarse],
   );
-  useEffect(() => () => Object.values(geometry).forEach((g) => g.dispose()), [geometry]);
+  useDispose(geometry);
   const surface = useMemo(
     () => ({ bark: makeSurfaceBump(SURFACE_KIND.bark), stone: makeSurfaceBump(SURFACE_KIND.stone) }),
     [],
   );
-  useEffect(() => () => Object.values(surface).forEach((texture) => texture.dispose()), [surface]);
+  useDispose(surface);
   const shadowTexture = useMemo(() => makeShadowTexture(), []);
-  useEffect(() => () => shadowTexture.dispose(), [shadowTexture]);
+  useDispose(shadowTexture);
   return { geometry, surface, shadowTexture };
 }
