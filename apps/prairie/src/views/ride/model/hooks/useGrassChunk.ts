@@ -1,7 +1,7 @@
+import { fillGrassChunk, makeChunkGeometry, type GrassChunkLayout } from '@views/ride/lib/grass/grassChunk';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
 import { useLayoutEffect, useMemo, type RefObject } from 'react';
 import type { BufferGeometry, InstancedMesh } from 'three';
-import { fillGrassChunk, makeChunkGeometry, type GrassChunkLayout } from '../../lib/grass/grassChunk';
-import { useDispose } from './useDispose';
 
 export function useGrassChunk(
   meshRef: RefObject<InstancedMesh | null>,

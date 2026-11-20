@@ -1,5 +1,5 @@
+import { SPRINT_TRAIL } from '@views/ride/model/runner/constants';
 import { Object3D } from 'three';
-import { SPRINT_TRAIL } from '../../model/runner/constants';
 
 export const { maxMotes } = SPRINT_TRAIL;
 

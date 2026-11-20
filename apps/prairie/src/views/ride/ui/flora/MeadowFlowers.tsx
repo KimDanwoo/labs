@@ -1,13 +1,13 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { MEADOW_FLOWERS } from '@views/ride/config/meadowFlowersView';
+import { makeFlowerGeometry } from '@views/ride/lib/flora/makeFlowerGeometry';
+import { liftToBase, rebuildMeadowFlowers } from '@views/ride/lib/flora/meadowFlowerPlacement';
+import { TILE } from '@views/ride/lib/flora/meadowFlowers';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
 import { useMemo, useRef } from 'react';
 import { InstancedMesh, Object3D } from 'three';
-import { MEADOW_FLOWERS } from '../../config/meadowFlowersView';
-import { makeFlowerGeometry } from '../../lib/flora/makeFlowerGeometry';
-import { liftToBase, rebuildMeadowFlowers } from '../../lib/flora/meadowFlowerPlacement';
-import { TILE } from '../../lib/flora/meadowFlowers';
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
 
 // 셀마다 작은 야생화 군락. 두 번의 draw call로 그리고 강 골에는 심지 않는다.
 export function MeadowFlowers() {

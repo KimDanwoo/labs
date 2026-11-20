@@ -1,8 +1,6 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
-import { InstancedMesh, Object3D } from 'three';
 import {
   GRAZER_DARK_SLOTS,
   GRAZER_EYE_GEOMETRY,
@@ -14,13 +12,15 @@ import {
   GRAZER_HERD_SIZE_LOW,
   GRAZER_MAX_DELTA,
   GRAZER_OFFSHORE_DISTANCE,
-} from '../../config/grazers';
-import { makeSurfaceBump, SURFACE_KIND } from '../../lib/makeSurfaceBump';
-import { coastDistanceAt } from '../../lib/scene/terrain';
-import { placeGrazerParts, spawnHerd, stepGrazer } from '../../lib/wildlife/grazerHerd';
-import { useDispose } from '../../model/hooks/useDispose';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
+} from '@views/ride/config/grazers';
+import { makeSurfaceBump, SURFACE_KIND } from '@views/ride/lib/makeSurfaceBump';
+import { coastDistanceAt } from '@views/ride/lib/scene/terrain';
+import { placeGrazerParts, spawnHerd, stepGrazer } from '@views/ride/lib/wildlife/grazerHerd';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
+import { useMemo, useRef } from 'react';
+import { InstancedMesh, Object3D } from 'three';
 
 export function Grazers() {
   const mobile = useLowDetail();

@@ -1,9 +1,9 @@
 'use client';
 
 import { useProgress } from '@react-three/drei';
-import { loaderPercent } from '../../lib/scene/sceneLoader';
-import { useLoaderRemoval } from '../../model/hooks/useLoaderRemoval';
-import { useSceneReady } from '../../model/ride-state/sceneReady';
+import { loaderPercent } from '@views/ride/lib/scene/sceneLoader';
+import { useLoaderRemoval } from '@views/ride/model/hooks/useLoaderRemoval';
+import { useSceneReady } from '@views/ride/model/ride-state/sceneReady';
 
 export function SceneLoader() {
   const { progress } = useProgress();

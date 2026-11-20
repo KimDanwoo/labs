@@ -1,7 +1,7 @@
 'use client';
 
-import { handlePress } from '../../lib/runner-control/touchActions';
-import { setRunnerAction } from '../../model/runner-control/store/runnerInput';
+import { handlePress } from '@views/ride/lib/runner-control/touchActions';
+import { setRunnerAction } from '@views/ride/model/runner-control/store/runnerInput';
 
 export function TouchActions() {
   return (

@@ -1,13 +1,18 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { FLOWING_HAIR } from '@views/ride/config/flowingHair';
+import {
+  injectHairShader,
+  makeHairGeometry,
+  makeUniforms,
+  updateHairUniforms,
+} from '@views/ride/lib/runner/flowingHair';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
+import { RUNNER_FINISH } from '@views/ride/model/runner/constants';
 import { useMemo, useRef } from 'react';
 import { Mesh, type Object3D } from 'three';
-import { FLOWING_HAIR } from '../../config/flowingHair';
-import { injectHairShader, makeHairGeometry, makeUniforms, updateHairUniforms } from '../../lib/runner/flowingHair';
-import { useDispose } from '../../model/hooks/useDispose';
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
-import { RUNNER_FINISH } from '../../model/runner/constants';
 
 interface FlowingHairProps {
   head: Object3D;

@@ -3,20 +3,20 @@ import { useReducedMotion } from '@shared/lib/useReducedMotion';
 import { useRef } from 'react';
 import { Group, Vector3 } from 'three';
 
-import { CINEMATIC, RIVER } from '../../../config/scene';
-import { RIG } from '../../../lib/runner-control/runnerRig';
-import { coastDistanceAt, distanceToRiver, riverBearing, riverWidthAt } from '../../../lib/scene/terrain';
-import { CAMERA_MODE, CAMERA_PRESETS } from '../../ride-settings/constants';
-import { cameraSettings } from '../../ride-settings/store/cameraSettings';
-import { setRideRiver } from '../../ride-state/rideStore';
-import { createDashState } from '../services/dashSkill';
-import { createFlightState } from '../services/flightDynamics';
-import { followRunnerCamera, speedFovBoost } from '../services/runnerCamera';
-import { advanceRunner } from '../services/runnerMotion';
-import { createSpinState } from '../services/spinSkill';
-import { getRunnerInput } from '../store/runnerInput';
-import { usePointerLook } from './usePointerLook';
-import { useRunnerControls } from './useRunnerControls';
+import { CINEMATIC, RIVER } from '@views/ride/config/scene';
+import { RIG } from '@views/ride/lib/runner-control/runnerRig';
+import { coastDistanceAt, distanceToRiver, riverBearing, riverWidthAt } from '@views/ride/lib/scene/terrain';
+import { CAMERA_MODE, CAMERA_PRESETS } from '@views/ride/model/ride-settings/constants';
+import { cameraSettings } from '@views/ride/model/ride-settings/store/cameraSettings';
+import { setRideRiver } from '@views/ride/model/ride-state/rideStore';
+import { usePointerLook } from '@views/ride/model/runner-control/hooks/usePointerLook';
+import { useRunnerControls } from '@views/ride/model/runner-control/hooks/useRunnerControls';
+import { createDashState } from '@views/ride/model/runner-control/services/dashSkill';
+import { createFlightState } from '@views/ride/model/runner-control/services/flightDynamics';
+import { followRunnerCamera, speedFovBoost } from '@views/ride/model/runner-control/services/runnerCamera';
+import { advanceRunner } from '@views/ride/model/runner-control/services/runnerMotion';
+import { createSpinState } from '@views/ride/model/runner-control/services/spinSkill';
+import { getRunnerInput } from '@views/ride/model/runner-control/store/runnerInput';
 
 // 자유 이동: WASD/터치로 가속·방향 전환(말이 진행 방향을 바라봄). Shift 질주(돌풍 파동), Space 점프·누르면 비행.
 // 카메라는 말 뒤를 낮게 따라가며 말을 화면 중앙에 둔다. PC에선 드래그로 좌우 시점(yaw) 회전.

@@ -1,11 +1,11 @@
-import { Color, ShaderMaterial, Vector2, Vector3 } from 'three';
-import { FOG, RIVER_TRENCH_HALF_WIDTH, SCENE_COLORS, SUN } from '../../config/scene';
+import { FOG, RIVER_TRENCH_HALF_WIDTH, SCENE_COLORS, SUN } from '@views/ride/config/scene';
 import {
   RIVER_BED_FRAGMENT_SHADER,
   RIVER_BED_VERTEX_SHADER,
   RIVER_FRAGMENT_SHADER,
   RIVER_VERTEX_SHADER,
-} from '../../model/river/constants';
+} from '@views/ride/model/river/constants';
+import { Color, ShaderMaterial, Vector2, Vector3 } from 'three';
 
 export const TRENCH_WIDTH = (RIVER_TRENCH_HALF_WIDTH + 0.2) * 2;
 

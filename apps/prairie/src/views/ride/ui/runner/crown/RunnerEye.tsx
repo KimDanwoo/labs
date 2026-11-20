@@ -1,6 +1,6 @@
-import { HEAD_CROWN } from '../../../config/headCrown';
-import { mirrored } from '../../../lib/runner/headCrownGeometry';
-import { RUNNER_FINISH } from '../../../model/runner/constants';
+import { HEAD_CROWN } from '@views/ride/config/headCrown';
+import { mirrored } from '@views/ride/lib/runner/headCrownGeometry';
+import { RUNNER_FINISH } from '@views/ride/model/runner/constants';
 
 interface RunnerEyeProps {
   side: number;

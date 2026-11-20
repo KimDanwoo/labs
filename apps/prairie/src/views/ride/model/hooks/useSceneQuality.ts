@@ -1,9 +1,9 @@
 import type { RootState } from '@react-three/fiber';
 import { RENDER_PIXELS } from '@shared/lib/renderBudget';
 import { useIsCoarsePointer } from '@shared/lib/useCoarsePointer';
+import { CINEMATIC, FOG, type FogQuality } from '@views/ride/config/scene';
+import { CANVAS_LABEL, DPR, isSoftwareRenderer, SOFTWARE_DPR_MAX } from '@views/ride/lib/scene/sceneCanvas';
 import { useState } from 'react';
-import { CINEMATIC, FOG, type FogQuality } from '../../config/scene';
-import { CANVAS_LABEL, DPR, isSoftwareRenderer, SOFTWARE_DPR_MAX } from '../../lib/scene/sceneCanvas';
 
 // 프레임이 떨어지면 해상도와 장면 품질을 낮추고, 여유가 생기면 되돌린다(적응형 DPR). 소프트웨어 렌더러는 계속 낮춘다.
 export function useSceneQuality() {

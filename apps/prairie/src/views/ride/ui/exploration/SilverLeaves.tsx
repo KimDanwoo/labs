@@ -1,13 +1,13 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { SILVER_LEAVES } from '@views/ride/config/silverLeaves';
+import { advanceDrift, nearbyShare, placeSilverLeaves } from '@views/ride/lib/exploration/silverLeaves';
+import { LANDMARKS } from '@views/ride/model/exploration/world';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
 import { useRef } from 'react';
 import { DoubleSide, InstancedMesh, Object3D } from 'three';
-import { SILVER_LEAVES } from '../../config/silverLeaves';
-import { advanceDrift, nearbyShare, placeSilverLeaves } from '../../lib/exploration/silverLeaves';
-import { LANDMARKS } from '../../model/exploration/world';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
 
 export function SilverLeaves() {
   const mobile = useLowDetail();

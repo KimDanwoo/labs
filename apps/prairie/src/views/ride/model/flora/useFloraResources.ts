@@ -1,15 +1,15 @@
-import { useMemo } from 'react';
 import {
   makeCanopyGeometry,
   makeConiferGeometry,
   makeRockGeometry,
   makeShadowTexture,
   makeTrunkGeometry,
-} from '../../lib/flora/makeFloraGeometry';
-import { makeLeafCanopy } from '../../lib/makeLeafCanopy';
-import { makeSurfaceBump, SURFACE_KIND } from '../../lib/makeSurfaceBump';
-import { useDispose } from '../hooks/useDispose';
-import { FLORA } from './constants';
+} from '@views/ride/lib/flora/makeFloraGeometry';
+import { makeLeafCanopy } from '@views/ride/lib/makeLeafCanopy';
+import { makeSurfaceBump, SURFACE_KIND } from '@views/ride/lib/makeSurfaceBump';
+import { FLORA } from '@views/ride/model/flora/constants';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
+import { useMemo } from 'react';
 
 export function useFloraResources(coarse: boolean) {
   const geometry = useMemo(

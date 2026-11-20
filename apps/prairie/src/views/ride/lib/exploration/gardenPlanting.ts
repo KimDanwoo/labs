@@ -1,5 +1,5 @@
+import { GARDEN_PLANTING } from '@views/ride/config/gardenPlanting';
 import { Color, Matrix4, Object3D } from 'three';
-import { GARDEN_PLANTING } from '../../config/gardenPlanting';
 
 export const flowerColors = ['#dca9c1', '#b5a5d9', '#f4e0a8'].map((hex) => new Color(hex));
 

@@ -1,4 +1,4 @@
-import { KeyboardHints } from './KeyboardHints';
+import { KeyboardHints } from '@views/ride/ui/hud/KeyboardHints';
 
 export function RideControls() {
   return (

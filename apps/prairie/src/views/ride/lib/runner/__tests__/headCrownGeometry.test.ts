@@ -1,7 +1,7 @@
+import { makeHeadCrownGeometry, mirrored } from '@views/ride/lib/runner/headCrownGeometry';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { CatmullRomCurve3, TubeGeometry, Vector3 } from 'three';
-import { makeHeadCrownGeometry, mirrored } from '../headCrownGeometry';
 
 function legacyHeadCrown() {
   const brow = new TubeGeometry(

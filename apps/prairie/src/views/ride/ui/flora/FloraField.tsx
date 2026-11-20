@@ -1,16 +1,16 @@
 'use client';
 
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
 
+import { FLORA_VIEW } from '@views/ride/config/floraView';
+import { FLORA } from '@views/ride/model/flora/constants';
 import { useRef } from 'react';
 import { DoubleSide, InstancedMesh } from 'three';
-import { FLORA_VIEW } from '../../config/floraView';
-import { FLORA } from '../../model/flora/constants';
 
-import { shadeCanopy, shadeConifer } from '../../lib/flora/floraField';
-import { useFloraPlacement } from '../../model/flora/useFloraPlacement';
-import { useFloraResources } from '../../model/flora/useFloraResources';
-import { MeadowFlowers } from './MeadowFlowers';
+import { shadeCanopy, shadeConifer } from '@views/ride/lib/flora/floraField';
+import { useFloraPlacement } from '@views/ride/model/flora/useFloraPlacement';
+import { useFloraResources } from '@views/ride/model/flora/useFloraResources';
+import { MeadowFlowers } from '@views/ride/ui/flora/MeadowFlowers';
 
 // 줄기·가지, 잎 군집, 침엽수, 바위, 접지 음영을 다섯 InstancedMesh로 그린다.
 // 카메라 셀이 바뀔 때만 주변 셀의 배치를 다시 쓴다(수백 개 → 무시할 비용).

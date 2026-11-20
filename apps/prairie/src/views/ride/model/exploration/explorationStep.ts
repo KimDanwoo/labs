@@ -1,9 +1,9 @@
+import { centers } from '@views/ride/lib/exploration/explorationScene';
+import { terrainHeightAt } from '@views/ride/lib/scene/terrain';
+import { getExploration, saveExploration, updateExploration } from '@views/ride/model/exploration/store';
+import { crossesGate, LANDMARKS } from '@views/ride/model/exploration/world';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
 import { Vector3 } from 'three';
-import { centers } from '../../lib/exploration/explorationScene';
-import { terrainHeightAt } from '../../lib/scene/terrain';
-import { runnerState } from '../ride-state/runnerState';
-import { getExploration, saveExploration, updateExploration } from './store';
-import { crossesGate, LANDMARKS } from './world';
 
 type Snapshot = ReturnType<typeof getExploration>;
 

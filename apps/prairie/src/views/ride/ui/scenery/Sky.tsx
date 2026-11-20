@@ -2,8 +2,8 @@
 
 import { Environment } from '@react-three/drei';
 import { useIsCoarsePointer } from '@shared/lib/useCoarsePointer';
-import { SKY_FILES } from '../../config/scene';
-import { SKY_ROTATION } from '../../lib/scenery/sky';
+import { SKY_FILES } from '@views/ride/config/scene';
+import { SKY_ROTATION } from '@views/ride/lib/scenery/sky';
 
 export function Sky() {
   const coarse = useIsCoarsePointer();

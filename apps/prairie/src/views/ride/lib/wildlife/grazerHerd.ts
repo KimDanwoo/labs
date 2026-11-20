@@ -1,4 +1,3 @@
-import type { InstancedMesh, Object3D } from 'three';
 import {
   GRAZER_ALERT_RADIUS,
   GRAZER_BODY,
@@ -27,10 +26,22 @@ import {
   GRAZER_RIVER_PUSH,
   GRAZER_SPAWN,
   GRAZER_STRIDE,
-} from '../../config/grazers';
-import { RIVER_TRENCH_HALF_WIDTH } from '../../config/scene';
-import { createCreatureState, habitatSeed, updateCreature, type CreatureState } from '../../model/wildlife/behavior';
-import { coastDistanceAt, distanceToRiver, nearestRiverX, riverWidthAt, terrainHeightAt } from '../scene/terrain';
+} from '@views/ride/config/grazers';
+import { RIVER_TRENCH_HALF_WIDTH } from '@views/ride/config/scene';
+import {
+  coastDistanceAt,
+  distanceToRiver,
+  nearestRiverX,
+  riverWidthAt,
+  terrainHeightAt,
+} from '@views/ride/lib/scene/terrain';
+import {
+  createCreatureState,
+  habitatSeed,
+  updateCreature,
+  type CreatureState,
+} from '@views/ride/model/wildlife/behavior';
+import type { InstancedMesh, Object3D } from 'three';
 
 export interface Grazer extends CreatureState {
   x: number;

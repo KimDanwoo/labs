@@ -1,9 +1,9 @@
-import { HEAD_CROWN } from '../../config/headCrown';
-import { RUNNER_FINISH } from '../../model/runner/constants';
-import { useHeadCrownGeometry } from '../../model/runner/useHeadCrownGeometry';
-import { CrownGem } from './crown/CrownGem';
-import { CrownLocks } from './crown/CrownLocks';
-import { RunnerEye } from './crown/RunnerEye';
+import { HEAD_CROWN } from '@views/ride/config/headCrown';
+import { RUNNER_FINISH } from '@views/ride/model/runner/constants';
+import { useHeadCrownGeometry } from '@views/ride/model/runner/useHeadCrownGeometry';
+import { CrownGem } from '@views/ride/ui/runner/crown/CrownGem';
+import { CrownLocks } from '@views/ride/ui/runner/crown/CrownLocks';
+import { RunnerEye } from '@views/ride/ui/runner/crown/RunnerEye';
 
 export function HeadCrown() {
   const { brow, locks } = useHeadCrownGeometry();

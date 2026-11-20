@@ -1,5 +1,5 @@
-import { LANDMARKS } from '../../model/exploration/world';
-import { terrainHeightAt } from '../scene/terrain';
+import { terrainHeightAt } from '@views/ride/lib/scene/terrain';
+import { LANDMARKS } from '@views/ride/model/exploration/world';
 
 type Point = [number, number, number];
 

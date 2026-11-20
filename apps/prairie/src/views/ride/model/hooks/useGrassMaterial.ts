@@ -1,8 +1,8 @@
+import { applyGrassQuality, makeGrassMaterial } from '@views/ride/lib/grass/grassMaterial';
+import type { GrassQuality } from '@views/ride/model/grass/constants';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
 import { useLayoutEffect, useMemo } from 'react';
 import type { ShaderMaterial } from 'three';
-import { applyGrassQuality, makeGrassMaterial } from '../../lib/grass/grassMaterial';
-import type { GrassQuality } from '../grass/constants';
-import { useDispose } from './useDispose';
 
 export function useGrassMaterial(quality: GrassQuality): ShaderMaterial {
   const material = useMemo(() => makeGrassMaterial(), []);

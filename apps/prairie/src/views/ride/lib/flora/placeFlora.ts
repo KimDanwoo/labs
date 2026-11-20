@@ -1,8 +1,16 @@
+import { FOG } from '@views/ride/config/scene';
+import {
+  branchDirection,
+  CANOPY_COLORS,
+  CONIFER_COLORS,
+  dummy,
+  hash,
+  tint,
+  up,
+} from '@views/ride/lib/flora/floraField';
+import { groundHeightAt } from '@views/ride/lib/scene/terrain';
+import { FLORA, floraInCell, type FloraPlacement } from '@views/ride/model/flora/constants';
 import type { InstancedMesh } from 'three';
-import { FOG } from '../../config/scene';
-import { FLORA, floraInCell, type FloraPlacement } from '../../model/flora/constants';
-import { groundHeightAt } from '../scene/terrain';
-import { branchDirection, CANOPY_COLORS, CONIFER_COLORS, dummy, hash, tint, up } from './floraField';
 
 export type FloraMeshes = {
   trunk: InstancedMesh;

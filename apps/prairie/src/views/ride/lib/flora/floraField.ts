@@ -1,5 +1,5 @@
+import { FLORA } from '@views/ride/model/flora/constants';
 import { Color, Object3D, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
-import { FLORA } from '../../model/flora/constants';
 
 export const dummy = new Object3D();
 

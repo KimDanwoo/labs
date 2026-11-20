@@ -1,5 +1,4 @@
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef, useState } from 'react';
 import {
   chunkSeed,
   GRASS_FIELD,
@@ -7,14 +6,20 @@ import {
   grassLodForRing,
   grassViewRadius,
   type GrassQuality,
-} from '../../model/grass/constants';
-import { useDispose } from '../../model/hooks/useDispose';
-import { useGrassMaterial } from '../../model/hooks/useGrassMaterial';
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
+} from '@views/ride/model/grass/constants';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
+import { useGrassMaterial } from '@views/ride/model/hooks/useGrassMaterial';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
+import { useMemo, useRef, useState } from 'react';
 
-import { gridCells, makeGrassGeometries, updateGrassUniforms, type GrassCell } from '../../lib/grass/grassMaterial';
+import {
+  gridCells,
+  makeGrassGeometries,
+  updateGrassUniforms,
+  type GrassCell,
+} from '@views/ride/lib/grass/grassMaterial';
 
-import { GrassChunk } from './GrassChunk';
+import { GrassChunk } from '@views/ride/ui/grass/GrassChunk';
 
 interface GrassFieldProps {
   isSoftware: boolean;

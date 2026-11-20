@@ -1,6 +1,6 @@
+import { useGrassChunk } from '@views/ride/model/hooks/useGrassChunk';
 import { memo, useRef } from 'react';
 import { type BufferGeometry, type InstancedMesh, type ShaderMaterial } from 'three';
-import { useGrassChunk } from '../../model/hooks/useGrassChunk';
 
 interface GrassChunkProps {
   cellX: number;

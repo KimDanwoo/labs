@@ -1,12 +1,12 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { SUN } from '@views/ride/config/scene';
+import { makeRideSun } from '@views/ride/lib/scene/makeRideSun';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
 import { useMemo } from 'react';
 import { Object3D } from 'three';
-import { SUN } from '../../config/scene';
-import { makeRideSun } from '../../lib/scene/makeRideSun';
-import { useDispose } from '../../model/hooks/useDispose';
-import { runnerState } from '../../model/ride-state/runnerState';
 
 interface RideSunProps {
   mobile: boolean;

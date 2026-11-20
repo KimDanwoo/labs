@@ -1,6 +1,6 @@
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { WINGS } from '@views/ride/model/runner/constants';
 import { MathUtils, type Group, type Object3D, type Vector3 } from 'three';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { WINGS } from '../../model/runner/constants';
 
 export interface WingRig {
   root: Group;

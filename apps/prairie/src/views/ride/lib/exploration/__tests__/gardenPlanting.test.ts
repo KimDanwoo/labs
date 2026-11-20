@@ -1,7 +1,7 @@
+import { createGardenLayout, flowerColors, swayStemMatrix } from '@views/ride/lib/exploration/gardenPlanting';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Color, Matrix4, Object3D } from 'three';
-import { createGardenLayout, flowerColors, swayStemMatrix } from '../gardenPlanting';
 
 const heightAt = (x: number, z: number) => Math.sin(x * 0.7) * 0.4 + z * 0.02;
 

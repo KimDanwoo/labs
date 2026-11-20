@@ -1,14 +1,14 @@
 'use client';
 import { useFrame } from '@react-three/fiber';
+import { ELDER_TREE } from '@views/ride/config/elderTree';
+import { crownClusters, rootBranches } from '@views/ride/lib/exploration/elderTree';
+import { makeLeafCanopy } from '@views/ride/lib/makeLeafCanopy';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
 import { useMemo, useRef } from 'react';
 import { DoubleSide, Group } from 'three';
-import { ELDER_TREE } from '../../config/elderTree';
-import { crownClusters, rootBranches } from '../../lib/exploration/elderTree';
-import { makeLeafCanopy } from '../../lib/makeLeafCanopy';
-import { useDispose } from '../../model/hooks/useDispose';
 
-import { Branch } from './Branch';
-import { SilverLeaves } from './SilverLeaves';
+import { Branch } from '@views/ride/ui/exploration/Branch';
+import { SilverLeaves } from '@views/ride/ui/exploration/SilverLeaves';
 
 export function ElderTree() {
   const { crownCanopy, tipCanopy, trunk, sway, leafRoughness } = ELDER_TREE;

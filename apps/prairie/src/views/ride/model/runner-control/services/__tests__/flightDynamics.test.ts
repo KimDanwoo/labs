@@ -1,6 +1,12 @@
+import {
+  createFlightState,
+  FLIGHT,
+  updateFlight,
+  type FlightInput,
+  type FlightState,
+} from '@views/ride/model/runner-control/services/flightDynamics';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createFlightState, FLIGHT, updateFlight, type FlightInput, type FlightState } from '../flightDynamics';
 const controls: FlightInput = { lift: false, launch: false, descend: false, holdAltitude: false, speed: 12 };
 const airborne = (height = 12, velocity = 0): FlightState => ({ height, velocity, groundY: 0 });
 function simulate(state: FlightState, seconds: number, fps: number, input = controls, ground = 0) {

@@ -1,5 +1,5 @@
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
 import { Shape, ShapeGeometry, Vector3, type Color, type InstancedMesh, type Object3D, type Quaternion } from 'three';
-import { runnerState } from '../../model/ride-state/runnerState';
 
 export const COUNT = 180;
 

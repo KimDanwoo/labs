@@ -1,5 +1,5 @@
-import { HEAD_CROWN } from '../../../config/headCrown';
-import { RUNNER_FINISH } from '../../../model/runner/constants';
+import { HEAD_CROWN } from '@views/ride/config/headCrown';
+import { RUNNER_FINISH } from '@views/ride/model/runner/constants';
 
 export function CrownGem() {
   const { position, scale, detail, material } = HEAD_CROWN.gem;

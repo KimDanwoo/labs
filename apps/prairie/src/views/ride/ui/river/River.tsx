@@ -1,14 +1,14 @@
 'use client';
 
 import { useFrame, useThree } from '@react-three/fiber';
+import { RIVER } from '@views/ride/config/scene';
+import { bedMaterial, oceanMaterial, TRENCH_WIDTH, waterMaterial } from '@views/ride/lib/river/river';
+import { riverDetailFor, updateRiver } from '@views/ride/lib/river/riverFrame';
+import { useRiverFog } from '@views/ride/model/hooks/useRiverFog';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
+import { RiverBanks } from '@views/ride/ui/river/RiverBanks';
 import { useRef } from 'react';
 import { Group } from 'three';
-import { RIVER } from '../../config/scene';
-import { bedMaterial, oceanMaterial, TRENCH_WIDTH, waterMaterial } from '../../lib/river/river';
-import { riverDetailFor, updateRiver } from '../../lib/river/riverFrame';
-import { useRiverFog } from '../../model/hooks/useRiverFog';
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
-import { RiverBanks } from './RiverBanks';
 
 oceanMaterial.uniforms.uOcean!.value = 1;
 

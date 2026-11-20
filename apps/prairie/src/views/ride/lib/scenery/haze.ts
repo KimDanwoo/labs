@@ -1,6 +1,6 @@
+import { HAZE, RIDGES, SCENE_COLORS } from '@views/ride/config/scene';
+import { coastDistanceAt } from '@views/ride/lib/scene/terrain';
 import { Color, MathUtils, type Camera, type Mesh, type ShaderMaterial } from 'three';
-import { HAZE, RIDGES, SCENE_COLORS } from '../../config/scene';
-import { coastDistanceAt } from '../scene/terrain';
 
 export const HEIGHT = HAZE.topY - HAZE.bottomY;
 

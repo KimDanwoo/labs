@@ -1,8 +1,8 @@
+import { SPRINT_FOV_BOOST } from '@views/ride/lib/runner-control/runnerRig';
+import { DASH_SKILL } from '@views/ride/model/runner-control/services/dashSkill';
+import { speedFovBoost } from '@views/ride/model/runner-control/services/runnerCamera';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { SPRINT_FOV_BOOST } from '../../../../lib/runner-control/runnerRig';
-import { DASH_SKILL } from '../dashSkill';
-import { speedFovBoost } from '../runnerCamera';
 
 test('질주·대시는 시야를 넓히고, 둘이 겹치면 더 큰 쪽을 쓴다', () => {
   assert.equal(speedFovBoost(false, 0, false), 0);

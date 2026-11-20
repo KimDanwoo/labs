@@ -1,8 +1,8 @@
 'use client';
 
-import { CAMERA_MODE } from '../../model/ride-settings/constants';
-import { useCameraSettings } from '../../model/ride-settings/hooks/useCameraSettings';
-import { cameraSettings } from '../../model/ride-settings/store/cameraSettings';
+import { CAMERA_MODE } from '@views/ride/model/ride-settings/constants';
+import { useCameraSettings } from '@views/ride/model/ride-settings/hooks/useCameraSettings';
+import { cameraSettings } from '@views/ride/model/ride-settings/store/cameraSettings';
 
 export function RideCameraControls() {
   const { mode } = useCameraSettings();

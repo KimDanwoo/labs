@@ -1,9 +1,9 @@
 import { useFrame } from '@react-three/fiber';
+import { timeUniform } from '@views/ride/lib/flora/floraField';
+import { placeFlora } from '@views/ride/lib/flora/placeFlora';
+import { floraCellOf } from '@views/ride/model/flora/constants';
 import { useLayoutEffect, useRef, type RefObject } from 'react';
 import type { InstancedMesh } from 'three';
-import { timeUniform } from '../../lib/flora/floraField';
-import { placeFlora } from '../../lib/flora/placeFlora';
-import { floraCellOf } from './constants';
 
 export interface FloraMeshRefs {
   trunk: RefObject<InstancedMesh | null>;

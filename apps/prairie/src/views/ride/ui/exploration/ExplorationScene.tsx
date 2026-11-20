@@ -1,13 +1,13 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { centers } from '@views/ride/lib/exploration/explorationScene';
+import { createExplorationTracker, stepExploration } from '@views/ride/model/exploration/explorationStep';
+import { useExploration } from '@views/ride/model/exploration/store';
+import { useExplorationLoad } from '@views/ride/model/exploration/useExplorationLoad';
+import { LivingLandmarks } from '@views/ride/ui/exploration/LivingLandmarks';
+import { StarlightGate } from '@views/ride/ui/exploration/StarlightGate';
 import { useRef } from 'react';
-import { centers } from '../../lib/exploration/explorationScene';
-import { createExplorationTracker, stepExploration } from '../../model/exploration/explorationStep';
-import { useExploration } from '../../model/exploration/store';
-import { useExplorationLoad } from '../../model/exploration/useExplorationLoad';
-import { LivingLandmarks } from './LivingLandmarks';
-import { StarlightGate } from './StarlightGate';
 
 export function ExplorationScene() {
   const progress = useExploration();

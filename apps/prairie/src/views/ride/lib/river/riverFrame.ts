@@ -1,7 +1,4 @@
-import type { Camera, Group } from 'three';
-import { FOG, RIVER } from '../../config/scene';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { coastDistanceAt, nearestRiverX, riverOffsetAt } from '../scene/terrain';
+import { FOG, RIVER } from '@views/ride/config/scene';
 import {
   bedMaterial,
   oceanMaterial,
@@ -10,7 +7,10 @@ import {
   runnerDirUniform,
   runnerPosUniform,
   waterMaterial,
-} from './river';
+} from '@views/ride/lib/river/river';
+import { coastDistanceAt, nearestRiverX, riverOffsetAt } from '@views/ride/lib/scene/terrain';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import type { Camera, Group } from 'three';
 
 export interface RiverDetail {
   riverLength: number;

@@ -1,6 +1,6 @@
-import { HUD_PILL_BUTTON } from '../../../config/hud';
-import { useExploration } from '../../../model/exploration/store';
-import { LANDMARKS } from '../../../model/exploration/world';
+import { HUD_PILL_BUTTON } from '@views/ride/config/hud';
+import { useExploration } from '@views/ride/model/exploration/store';
+import { LANDMARKS } from '@views/ride/model/exploration/world';
 
 interface JournalToggleProps {
   isOpen: boolean;

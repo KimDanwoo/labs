@@ -1,6 +1,12 @@
+import {
+  crossesGate,
+  GATES,
+  isExplorationClearing,
+  LANDMARKS,
+  parseProgress,
+} from '@views/ride/model/exploration/world';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { crossesGate, GATES, isExplorationClearing, LANDMARKS, parseProgress } from '../world';
 
 test('gate crossing catches dash segments, accepts both directions and requires aperture', () => {
   const center = { x: 0, y: 10, z: 20 };

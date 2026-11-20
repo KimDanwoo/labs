@@ -1,4 +1,5 @@
 // 강 배치 불변식 체크
+import { FOG, HAZE, OCEAN, RIDGES, RIVER, RIVER_TRENCH_HALF_WIDTH, TERRAIN } from '@views/ride/config/scene';
 import {
   coastDistanceAt,
   distanceToRiver,
@@ -13,16 +14,15 @@ import {
   waterBedDepthAt,
   waterDepthAt,
 } from '@views/ride/lib/scene/terrain';
-import assert from 'node:assert/strict';
-import test from 'node:test';
 import {
   GRASS_FIELD,
   GRASS_QUALITY,
   grassKeepAt,
   grassViewRadius,
   type GrassQuality,
-} from '../../model/grass/constants';
-import { FOG, HAZE, OCEAN, RIDGES, RIVER, RIVER_TRENCH_HALF_WIDTH, TERRAIN } from '../scene';
+} from '@views/ride/model/grass/constants';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 
 const QUALITIES = Object.keys(GRASS_QUALITY) as GrassQuality[];
 

@@ -1,8 +1,6 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
-import { DoubleSide, InstancedMesh, Object3D } from 'three';
 import {
   WINGED_ALERT_RADIUS,
   WINGED_BODY_COLOR,
@@ -14,7 +12,7 @@ import {
   WINGED_WING_COUNT,
   WINGED_WING_DISC,
   type WingedKind,
-} from '../../config/wingedLife';
+} from '@views/ride/config/wingedLife';
 import {
   isOffshoreDragonfly,
   placeWingedLife,
@@ -22,11 +20,13 @@ import {
   settleHome,
   shapeInsectWing,
   type Anchor,
-} from '../../lib/wildlife/wingedFlight';
-import { wingPositions } from '../../lib/wildlife/wingedLife';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
-import { createCreatureState, updateCreature } from '../../model/wildlife/behavior';
+} from '@views/ride/lib/wildlife/wingedFlight';
+import { wingPositions } from '@views/ride/lib/wildlife/wingedLife';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
+import { createCreatureState, updateCreature } from '@views/ride/model/wildlife/behavior';
+import { useRef } from 'react';
+import { DoubleSide, InstancedMesh, Object3D } from 'three';
 
 interface WingedLifeProps {
   kind: WingedKind;

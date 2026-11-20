@@ -1,5 +1,5 @@
+import { applyRiverFog } from '@views/ride/lib/river/riverFrame';
 import { useLayoutEffect } from 'react';
-import { applyRiverFog } from '../../lib/river/riverFrame';
 
 export function useRiverFog(coarse: boolean): void {
   useLayoutEffect(() => {

@@ -1,14 +1,14 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { RIVER_BANKS_VIEW } from '@views/ride/config/riverBanksView';
+import { makeBladeGeometry } from '@views/ride/lib/makeBladeGeometry';
+import { bankKey, rebuildBanks } from '@views/ride/lib/river/riverBankPlacement';
+import { CAPACITY } from '@views/ride/lib/river/riverBanks';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
 import { useMemo, useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
-import { RIVER_BANKS_VIEW } from '../../config/riverBanksView';
-import { makeBladeGeometry } from '../../lib/makeBladeGeometry';
-import { bankKey, rebuildBanks } from '../../lib/river/riverBankPlacement';
-import { CAPACITY } from '../../lib/river/riverBanks';
-import { useDispose } from '../../model/hooks/useDispose';
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
 
 // A small, deterministic pool adds irregular shoreline landmarks without a mesh per stone/stem.
 export function RiverBanks() {

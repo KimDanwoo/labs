@@ -1,9 +1,20 @@
+import { RIVER_TRENCH_HALF_WIDTH } from '@views/ride/config/scene';
+import {
+  WINGED_DRAGONFLY_OFFSHORE,
+  WINGED_SCALE,
+  WINGED_WING_DISC,
+  type WingedKind,
+} from '@views/ride/config/wingedLife';
+import {
+  coastDistanceAt,
+  distanceToRiver,
+  nearestRiverX,
+  riverWidthAt,
+  terrainHeightAt,
+} from '@views/ride/lib/scene/terrain';
+import { colors } from '@views/ride/lib/wildlife/wingedLife';
+import { habitatSeed, type CreatureState } from '@views/ride/model/wildlife/behavior';
 import type { BufferGeometry, InstancedMesh, Object3D } from 'three';
-import { RIVER_TRENCH_HALF_WIDTH } from '../../config/scene';
-import { WINGED_DRAGONFLY_OFFSHORE, WINGED_SCALE, WINGED_WING_DISC, type WingedKind } from '../../config/wingedLife';
-import { habitatSeed, type CreatureState } from '../../model/wildlife/behavior';
-import { coastDistanceAt, distanceToRiver, nearestRiverX, riverWidthAt, terrainHeightAt } from '../scene/terrain';
-import { colors } from './wingedLife';
 
 export type Anchor = readonly [number, number, number];
 

@@ -1,4 +1,4 @@
-import { ELDER_TREE } from '../../config/elderTree';
+import { ELDER_TREE } from '@views/ride/config/elderTree';
 
 type Point = [number, number, number];
 

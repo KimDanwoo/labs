@@ -1,7 +1,7 @@
+import { gaitWeights } from '@views/ride/lib/runner/gaitWeights';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { gaitWeights } from '../gaitWeights';
 
 const weights = (speed: number, height: number) => gaitWeights(speed, height, 4, 7);
 

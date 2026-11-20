@@ -1,7 +1,7 @@
+import { MEADOW_LIGHT_GLSL } from '@views/ride/config/meadowGlsl';
+import { RIVER_GLSL, TERRAIN_GLSL } from '@views/ride/config/riverGlsl';
+import { MEADOW_PATH, SCENE_COLORS, WORLD } from '@views/ride/config/scene';
 import { Color, type WebGLProgramParametersWithUniforms } from 'three';
-import { MEADOW_LIGHT_GLSL } from '../../config/meadowGlsl';
-import { RIVER_GLSL, TERRAIN_GLSL } from '../../config/riverGlsl';
-import { MEADOW_PATH, SCENE_COLORS, WORLD } from '../../config/scene';
 
 // 2D 값 노이즈(해시 + 부드러운 보간). 0..1.
 const GROUND_NOISE_GLSL = `

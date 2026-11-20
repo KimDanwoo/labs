@@ -1,11 +1,11 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { STARLIGHT_GATE } from '@views/ride/config/starlightGate';
+import { fragmentShader, vertexShader } from '@views/ride/lib/exploration/starlightGate';
+import { GATE_RADIUS } from '@views/ride/model/exploration/world';
 import { useMemo, useRef } from 'react';
 import { AdditiveBlending, DoubleSide, type ShaderMaterial } from 'three';
-import { STARLIGHT_GATE } from '../../config/starlightGate';
-import { fragmentShader, vertexShader } from '../../lib/exploration/starlightGate';
-import { GATE_RADIUS } from '../../model/exploration/world';
 
 interface StarlightGateProps {
   active: boolean;

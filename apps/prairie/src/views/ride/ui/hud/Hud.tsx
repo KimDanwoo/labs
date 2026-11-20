@@ -1,12 +1,12 @@
 'use client';
 
+import { ExplorationHud } from '@views/ride/ui/exploration/ExplorationHud';
+import { PrairieMark } from '@views/ride/ui/hud/PrairieMark';
+import { RideCameraControls } from '@views/ride/ui/hud/RideCameraControls';
+import { RideControls } from '@views/ride/ui/hud/RideControls';
+import { RideTelemetry } from '@views/ride/ui/hud/RideTelemetry';
+import { RiverGuide } from '@views/ride/ui/hud/RiverGuide';
 import { useState } from 'react';
-import { ExplorationHud } from '../exploration/ExplorationHud';
-import { PrairieMark } from './PrairieMark';
-import { RideCameraControls } from './RideCameraControls';
-import { RideControls } from './RideControls';
-import { RideTelemetry } from './RideTelemetry';
-import { RiverGuide } from './RiverGuide';
 
 export function Hud() {
   const [isVisible, setIsVisible] = useState(true);

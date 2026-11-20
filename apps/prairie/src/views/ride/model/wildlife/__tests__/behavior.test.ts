@@ -1,6 +1,6 @@
+import { createCreatureState, crossedArch, habitatSeed, updateCreature } from '@views/ride/model/wildlife/behavior';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createCreatureState, crossedArch, habitatSeed, updateCreature } from '../behavior';
 
 test('wildlife reacts to proximity, remembers danger briefly, then settles', () => {
   const state = createCreatureState();

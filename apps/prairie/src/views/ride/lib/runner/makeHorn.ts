@@ -1,5 +1,5 @@
+import { HORN } from '@views/ride/model/runner/constants';
 import { CatmullRomCurve3, LatheGeometry, TubeGeometry, Vector2, Vector3 } from 'three';
-import { HORN } from '../../model/runner/constants';
 
 export type HornGeometry = {
   body: LatheGeometry;

@@ -1,5 +1,5 @@
+import { SUNSET_ARCH } from '@views/ride/config/sunsetArch';
 import { Vector3, type InstancedMesh, type Object3D } from 'three';
-import { SUNSET_ARCH } from '../../config/sunsetArch';
 
 type Vec3 = [number, number, number];
 

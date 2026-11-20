@@ -1,7 +1,7 @@
 'use client';
 
-import { BEARING, SEA_NEAR_DISTANCE } from '../../lib/hud/riverGuide';
-import { useRideRiver } from '../../model/ride-state/rideStore';
+import { BEARING, SEA_NEAR_DISTANCE } from '@views/ride/lib/hud/riverGuide';
+import { useRideRiver } from '@views/ride/model/ride-state/rideStore';
 
 export function RiverGuide() {
   const { riverDistance, riverBearing, seaDistance, atSea } = useRideRiver();

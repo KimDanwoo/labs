@@ -1,7 +1,7 @@
 'use client';
+import { GARDEN_BLOOM_COUNT, GARDEN_GEOMETRY, GARDEN_PLANTING } from '@views/ride/config/gardenPlanting';
+import { useGardenPlanting } from '@views/ride/model/exploration/useGardenPlanting';
 import { DoubleSide } from 'three';
-import { GARDEN_BLOOM_COUNT, GARDEN_GEOMETRY, GARDEN_PLANTING } from '../../config/gardenPlanting';
-import { useGardenPlanting } from '../../model/exploration/useGardenPlanting';
 
 export function GardenPlanting() {
   const { blooms, stems, leaves } = useGardenPlanting();

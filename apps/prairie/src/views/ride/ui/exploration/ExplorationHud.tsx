@@ -1,11 +1,11 @@
 'use client';
 
+import { CourseRetry } from '@views/ride/ui/exploration/hud/CourseRetry';
+import { CourseStatus } from '@views/ride/ui/exploration/hud/CourseStatus';
+import { ExplorationJournal } from '@views/ride/ui/exploration/hud/ExplorationJournal';
+import { ExplorationNotice } from '@views/ride/ui/exploration/hud/ExplorationNotice';
+import { JournalToggle } from '@views/ride/ui/exploration/hud/JournalToggle';
 import { useState } from 'react';
-import { CourseRetry } from './hud/CourseRetry';
-import { CourseStatus } from './hud/CourseStatus';
-import { ExplorationJournal } from './hud/ExplorationJournal';
-import { ExplorationNotice } from './hud/ExplorationNotice';
-import { JournalToggle } from './hud/JournalToggle';
 
 export function ExplorationHud() {
   const [isOpen, setIsOpen] = useState(false);

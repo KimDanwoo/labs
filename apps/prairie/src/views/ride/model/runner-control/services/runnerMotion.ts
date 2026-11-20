@@ -1,16 +1,16 @@
+import { RIVER } from '@views/ride/config/scene';
+import { forwardVec, RIG } from '@views/ride/lib/runner-control/runnerRig';
+import { groundHeightAt, waterDepthAt } from '@views/ride/lib/scene/terrain';
+import { FLORA, pushOutOfFlora } from '@views/ride/model/flora/constants';
+import { setRideTelemetry } from '@views/ride/model/ride-state/rideTelemetry';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { RUNNER_PHYSICS } from '@views/ride/model/runner-control/constants';
+import { type createDashState, DASH_SKILL, updateDash } from '@views/ride/model/runner-control/services/dashSkill';
+import { type createFlightState, updateFlight } from '@views/ride/model/runner-control/services/flightDynamics';
+import { type createSpinState, updateSpin } from '@views/ride/model/runner-control/services/spinSkill';
+import type { getRunnerInput } from '@views/ride/model/runner-control/store/runnerInput';
 import type { RefObject } from 'react';
 import { type Group, MathUtils, type Vector3 } from 'three';
-import { RIVER } from '../../../config/scene';
-import { forwardVec, RIG } from '../../../lib/runner-control/runnerRig';
-import { groundHeightAt, waterDepthAt } from '../../../lib/scene/terrain';
-import { FLORA, pushOutOfFlora } from '../../flora/constants';
-import { setRideTelemetry } from '../../ride-state/rideTelemetry';
-import { runnerState } from '../../ride-state/runnerState';
-import { RUNNER_PHYSICS } from '../constants';
-import type { getRunnerInput } from '../store/runnerInput';
-import { type createDashState, DASH_SKILL, updateDash } from './dashSkill';
-import { type createFlightState, updateFlight } from './flightDynamics';
-import { type createSpinState, updateSpin } from './spinSkill';
 
 export type RunnerMotionRefs = {
   rootRef: RefObject<Group | null>;

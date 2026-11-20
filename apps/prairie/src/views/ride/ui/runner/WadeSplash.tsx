@@ -1,11 +1,11 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { WADE_SPLASH_VIEW } from '@views/ride/config/wadeSplashView';
+import { maxDroplets } from '@views/ride/lib/runner/wadeSplash';
+import { createRingMaterials, createWadeState, stepWadeSplash } from '@views/ride/lib/runner/wadeSplashStep';
 import { useMemo, useRef } from 'react';
 import { InstancedMesh, Mesh } from 'three';
-import { WADE_SPLASH_VIEW } from '../../config/wadeSplashView';
-import { maxDroplets } from '../../lib/runner/wadeSplash';
-import { createRingMaterials, createWadeState, stepWadeSplash } from '../../lib/runner/wadeSplashStep';
 
 // 물보라(속도 방향으로 늘어난 물줄기, world 공간) + 발굽에서 퍼지는 파문 링. 죽은 입자·링은 크기 0.
 export function WadeSplash() {

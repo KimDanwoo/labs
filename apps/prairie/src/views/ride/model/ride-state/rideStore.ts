@@ -1,5 +1,5 @@
+import type { RiverBearing } from '@views/ride/lib/scene/terrain';
 import { useSyncExternalStore } from 'react';
-import type { RiverBearing } from '../../lib/scene/terrain';
 
 // Canvas(useFrame) 안의 주행 루프가 쓰고, DOM HUD가 읽는다.
 // r3f는 별도 React 루트를 쓰므로 컨텍스트 대신 모듈 레벨 외부 스토어로 양쪽을 잇는다.

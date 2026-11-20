@@ -1,7 +1,7 @@
+import { applyRunnerDetail, prepareRunnerModel } from '@views/ride/lib/runner/prepareRunnerModel';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { BoxGeometry, Group, Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
-import { applyRunnerDetail, prepareRunnerModel } from '../prepareRunnerModel';
 
 const PART_NAMES = ['Main', 'Hooves', 'Eye_Black'];
 

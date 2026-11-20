@@ -1,5 +1,5 @@
+import { GROUND_SHADOW } from '@views/ride/model/runner/constants';
 import { Matrix4, ShaderMaterial, Vector3 } from 'three';
-import { GROUND_SHADOW } from '../../model/runner/constants';
 
 export const SLOPE_SAMPLE = 0.5;
 

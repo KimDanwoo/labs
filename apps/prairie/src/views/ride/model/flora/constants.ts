@@ -1,6 +1,6 @@
-import { RIVER_TRENCH_HALF_WIDTH } from '../../config/scene';
-import { coastDistanceAt, distanceToRiver } from '../../lib/scene/terrain';
-import { isExplorationClearing } from '../exploration/world';
+import { RIVER_TRENCH_HALF_WIDTH } from '@views/ride/config/scene';
+import { coastDistanceAt, distanceToRiver } from '@views/ride/lib/scene/terrain';
+import { isExplorationClearing } from '@views/ride/model/exploration/world';
 
 // 나무·바위 배치. 셀 좌표 해시만으로 결정되므로 어디서 다시 와도 같은 자리에 같은 나무가 선다(저장 없음).
 // 렌더(FloraField)와 충돌(RunnerRig)이 같은 함수를 쓴다.

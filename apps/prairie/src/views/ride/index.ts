@@ -1,1 +1,1 @@
-export { RideView } from './ui/RideView';
+export { RideView } from '@views/ride/ui/RideView';
