@@ -107,7 +107,8 @@ export class ExplosiveCrates {
   #markMoving(): void {
     for (const { reference, object } of this.#crates) {
       const body = object.physical?.body;
-      if (body && !body.isSleeping() && body.isEnabled()) reference.needsUpdate = true;
+      const isAwake = body && !body.isSleeping() && body.isEnabled();
+      if (isAwake) reference.needsUpdate = true;
     }
   }
 
@@ -138,8 +139,10 @@ export class ExplosiveCrates {
     this.instancedGroup.needsUpdate = true;
 
     for (const { physical } of game.objects.list.values()) {
-      if (!physical || !physical.body.isEnabled()) continue;
-      if (physical.type !== 'dynamic' && physical.type !== 'kinematicPositionBased') continue;
+      if (!physical) continue;
+      if (!physical.body.isEnabled()) continue;
+      const isImmovable = physical.type !== 'dynamic' && physical.type !== 'kinematicPositionBased';
+      if (isImmovable) continue;
       physical.body.setEnabled(false);
       game.ticker.wait(1, () => {
         physical.body.setEnabled(true);

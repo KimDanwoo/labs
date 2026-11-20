@@ -21,7 +21,9 @@ import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 function snapStaticVisual(object: WorldObject, physicalDescription: PhysicalDescription): void {
   const { visual, physical } = object;
-  if (!visual || !physical || !isStatic(physicalDescription, physical)) return;
+  if (!visual) return;
+  if (!physical) return;
+  if (!isStatic(physicalDescription, physical)) return;
   visual.object3D.position.copy(physical.body.translation());
   visual.object3D.quaternion.copy(physical.body.rotation());
 }
@@ -34,7 +36,8 @@ function syncVisual(object: WorldObject, visual: ObjectVisual, body: Physical['b
 }
 
 function sleepIfFar(body: Physical['body'], isFar: boolean): void {
-  if (isFar && body.isEnabled() && !body.isSleeping()) body.sleep();
+  const shouldSleep = isFar && body.isEnabled() && !body.isSleeping();
+  if (shouldSleep) body.sleep();
 }
 
 export class Objects {
@@ -107,8 +110,10 @@ export class Objects {
 
   resetObject(object: WorldObject): void {
     const { physical, visual } = object;
-    if (!physical || object.isResetting) return;
-    if (physical.type !== 'dynamic' && physical.type !== 'kinematicPositionBased') return;
+    if (!physical) return;
+    if (object.isResetting) return;
+    const isImmovable = physical.type !== 'dynamic' && physical.type !== 'kinematicPositionBased';
+    if (isImmovable) return;
 
     object.isResetting = true;
     const { body, initialState } = physical;
@@ -129,7 +134,8 @@ export class Objects {
     });
 
     if (!visual) return;
-    if (visual.parent && visual.parent !== visual.object3D.parent) visual.parent.add(visual.object3D);
+    const isDetached = Boolean(visual.parent) && visual.parent !== visual.object3D.parent;
+    if (isDetached) visual.parent?.add(visual.object3D);
     visual.object3D.position.copy(initialState.position);
     visual.object3D.quaternion.copy(initialState.rotation);
     markInstanceDirty(visual.object3D);
@@ -149,7 +155,8 @@ export class Objects {
 
   enable({ physical, visual }: WorldObject): void {
     physical?.body.setEnabled(true);
-    if (visual && visual.parent !== visual.object3D.parent) visual.parent?.add(visual.object3D);
+    const isDetachedVisual = visual && visual.parent !== visual.object3D.parent;
+    if (isDetachedVisual) visual.parent?.add(visual.object3D);
   }
 
   readonly #awake = new WeakSet<WorldObject>();
@@ -182,7 +189,8 @@ export class Objects {
     const { body } = physical;
     const isResting = body.isSleeping() || !body.isEnabled();
     const wasAwake = this.#trackAwake(object, isResting);
-    if (!object.needsUpdate && !wasAwake && isResting) return;
+    const isStillAsleep = !object.needsUpdate && !wasAwake && isResting;
+    if (isStillAsleep) return;
     const position = body.translation();
 
     if (visual) syncVisual(object, visual, body);

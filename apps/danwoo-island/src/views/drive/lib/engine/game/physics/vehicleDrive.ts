@@ -49,7 +49,8 @@ function frictionSlip(groundBody: RigidBody | null): number {
   const { waterSurface } = getGame().world;
   const iceRatio = waterSurface?.iceRatio;
   const isOnIce = waterSurface?.ice !== undefined && groundBody === waterSurface.ice.physical.body;
-  if (!isOnIce || !iceRatio) return WHEEL_SETTINGS.frictionSlip;
+  if (!isOnIce) return WHEEL_SETTINGS.frictionSlip;
+  if (!iceRatio) return WHEEL_SETTINGS.frictionSlip;
   return lerp(WHEEL_SETTINGS.frictionSlip, ICE_FRICTION_SLIP, iceRatio.value);
 }
 
@@ -71,7 +72,8 @@ export function driveController(
     controller.setWheelSuspensionRestLength(index, SUSPENSION_HEIGHTS[suspension]);
     controller.setWheelSuspensionStiffness(index, SUSPENSION_STIFFNESS[suspension]);
     const groundObject = controller.wheelGroundObject(index);
-    if (groundObject && game.world.waterSurface) {
+    const isOverWater = groundObject && game.world.waterSurface;
+    if (isOverWater) {
       controller.setWheelFrictionSlip(index, frictionSlip(groundObject.parent()));
     }
   }
@@ -106,7 +108,8 @@ export function readWheelContacts(controller: DynamicRayCastVehicleController, w
   let inContactCount = 0;
   for (const [index, wheel] of wheels.items.entries()) {
     const inContact = controller.wheelIsInContact(index);
-    if (inContact && !wheel.inContact) wheel.lastTouchTime = elapsed;
+    const hasJustTouched = inContact && !wheel.inContact;
+    if (hasJustTouched) wheel.lastTouchTime = elapsed;
     wheel.inContact = inContact;
     wheel.contactPoint = controller.wheelContactPoint(index);
     wheel.suspensionLength = controller.wheelSuspensionLength(index);

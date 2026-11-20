@@ -104,10 +104,12 @@ export function prepareModel(
   { updateMaterials, castShadow, receiveShadow }: VisualDescription,
 ): void {
   if (updateMaterials) getGame().materials.updateObject(model);
-  if (!castShadow && !receiveShadow) return;
+  const isShadowless = !castShadow && !receiveShadow;
+  if (isShadowless) return;
   model.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
-    if (castShadow && !child.userData.preventShadow) child.castShadow = true;
+    const shouldCastShadow = castShadow && !child.userData.preventShadow;
+    if (shouldCastShadow) child.castShadow = true;
     if (receiveShadow) child.receiveShadow = true;
   });
 }

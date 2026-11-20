@@ -42,8 +42,10 @@ export function formatDate(iso: string): string {
 }
 export function fitText(context: CanvasRenderingContext2D, text: string, maxWidth: number): string {
   if (context.measureText(text).width <= maxWidth) return text;
+  const isOverflowingAt = (end: number): boolean =>
+    end > 0 && context.measureText(`${text.slice(0, end)}…`).width > maxWidth;
   let end = text.length;
-  while (end > 0 && context.measureText(`${text.slice(0, end)}…`).width > maxWidth) end -= 1;
+  while (isOverflowingAt(end)) end -= 1;
   return `${text.slice(0, end)}…`;
 }
 export function postsOf(state: BoardState): readonly LatestPost[] {

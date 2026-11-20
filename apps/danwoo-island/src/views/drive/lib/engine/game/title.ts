@@ -27,7 +27,8 @@ function glyphsAt(offset: number): Glyph[] {
 function separateOverlaps(glyphs: Glyph[]): void {
   for (const [index, left] of glyphs.entries()) {
     const right = glyphs[index + 1];
-    if (!right || left.position + left.size <= right.position) continue;
+    if (!right) continue;
+    if (left.position + left.size <= right.position) continue;
     const overlap = left.position + left.size - right.position;
     const leftShift = left.position - Math.ceil(overlap / 2) < 0 ? 0 : Math.ceil(overlap / 2);
     left.position -= leftShift;
@@ -58,7 +59,8 @@ export class Title {
     this.#offset += physicalVehicle.forwardSpeed * ticker.deltaScaled;
     const roundedOffset = Math.floor(this.#offset);
     const isDue = ticker.elapsed - this.#lastTime > FRAME_INTERVAL;
-    if (!isDue || roundedOffset === this.#roundedOffset) return;
+    if (!isDue) return;
+    if (roundedOffset === this.#roundedOffset) return;
 
     this.#lastTime = ticker.elapsed;
     this.#roundedOffset = roundedOffset;

@@ -89,7 +89,8 @@ function panelHalfHeight(panel: THREE.Mesh): number {
 }
 
 function frameSign(panel: THREE.Object3D, { model, panelLift }: (typeof SIGN_FRAMES)[keyof typeof SIGN_FRAMES]): void {
-  if (!(panel instanceof THREE.Mesh) || !panel.parent) return;
+  if (!(panel instanceof THREE.Mesh)) return;
+  if (!panel.parent) return;
   const ground = panel.position.y - panelHalfHeight(panel) - panelLift;
   const matrix = new THREE.Matrix4()
     .makeTranslation(panel.position.x, ground, panel.position.z)

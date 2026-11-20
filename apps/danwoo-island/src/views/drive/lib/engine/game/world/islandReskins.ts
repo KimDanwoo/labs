@@ -44,7 +44,9 @@ export function paintAchievementsBasin(model: THREE.Object3D): void {
 export function rebuildTikiScoreboard(model: THREE.Object3D): void {
   const frame = model.getObjectByName(SCOREBOARD.frame);
   const body = model.getObjectByName(SCOREBOARD.body);
-  if (!(frame instanceof THREE.Mesh) || !(body instanceof THREE.Mesh) || !body.parent) return;
+  if (!(frame instanceof THREE.Mesh)) return;
+  if (!(body instanceof THREE.Mesh)) return;
+  if (!body.parent) return;
   for (const mesh of [frame, body]) mesh.geometry.setDrawRange(0, 0);
   body.parent.add(islandModelMesh('tikiScoreboard', new THREE.Matrix4().makeTranslation(...SCOREBOARD.origin)));
 }

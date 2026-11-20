@@ -143,6 +143,7 @@ export function placeLandmarks(model: THREE.Object3D): void {
     for (const spot of BEACH_SPOTS.filter(({ pattern }) => pattern.test(child.name))) {
       model.add(fixedLandmark(spot, model.worldToLocal(spot.position.clone()), new THREE.Quaternion()));
     }
-    if (landmark || REMOVED.test(child.name)) child.removeFromParent();
+    const shouldRemove = landmark || REMOVED.test(child.name);
+    if (shouldRemove) child.removeFromParent();
   }
 }

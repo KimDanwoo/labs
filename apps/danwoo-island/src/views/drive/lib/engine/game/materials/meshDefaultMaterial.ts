@@ -105,7 +105,6 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
       this.#catchedShadow.mulAssign(shadow.r);
       return float(1);
     });
-    // @types/three는 인자 없는 함수로 선언하지만 three는 그림자 노드를 넘겨 호출한다 (three/src/nodes/lighting/ShadowNode.js)
     return (shadow) => {
       if (!shadow) throw new Error('receivedShadowNode needs a shadow node');
       return catchShadow(shadow);
@@ -131,7 +130,8 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
 
     outputColor.mulAssign(lighting.colorUniform.mul(lighting.intensityUniform));
 
-    if (hasCoreShadows || hasDropShadows) {
+    const hasShadows = hasCoreShadows || hasDropShadows;
+    if (hasShadows) {
       const coreShadowMix = hasCoreShadows
         ? normal.dot(lighting.directionUniform).smoothstep(lighting.coreShadowEdgeHigh, lighting.coreShadowEdgeLow)
         : float(0);

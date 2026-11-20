@@ -48,9 +48,11 @@ const COMPRESSED_COUNTERPART = [
 export function isUnusedStatic(source, staticDirectory) {
   const relative = path.relative(staticDirectory, source).split(path.sep).join('/');
   if (UNUSED_STATIC_DIRECTORIES.includes(relative)) return true;
-  if (UNUSED_STATIC_FILES.has(relative) || UNUSED_FONT_FORMATS.test(relative)) return true;
+  const isUnusedFile = UNUSED_STATIC_FILES.has(relative) || UNUSED_FONT_FORMATS.test(relative);
+  if (isUnusedFile) return true;
   if (relative.endsWith('.wav')) return true;
-  if (relative.endsWith('-compressed.glb') || UNCOMPRESSED_FILES_IN_USE.has(relative)) return false;
+  const isCompressedOrInUse = relative.endsWith('-compressed.glb') || UNCOMPRESSED_FILES_IN_USE.has(relative);
+  if (isCompressedOrInUse) return false;
   return COMPRESSED_COUNTERPART.some(
     ([extension, counterpart]) => extension.test(relative) && existsSync(source.replace(extension, counterpart)),
   );

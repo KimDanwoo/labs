@@ -133,7 +133,8 @@ export function configureImageTexture(map: THREE.Texture): void {
 }
 
 export function swingPendulum([first, second]: readonly THREE.Object3D[]): void {
-  if (!first || !second) return;
+  if (!first) return;
+  if (!second) return;
   first.rotation.reorder('YXZ');
   const tween = { ease: 'power2.out', delay: PENDULUM.delay, duration: PENDULUM.duration };
   gsap.timeline({ yoyo: true, repeat: -1 }).to(first.rotation, { x: PENDULUM.angle, ...tween });

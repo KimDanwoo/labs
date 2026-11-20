@@ -152,8 +152,10 @@ export class Materials {
   updateObject(object: THREE.Object3D): void {
     object.traverse((child) => {
       if (!(child instanceof THREE.Mesh)) return;
-      if (child.material instanceof THREE.Material && !isPreserved(child.material)) {
-        child.material = this.resolve(child.material);
+      const { material } = child;
+      const isReplaceable = material instanceof THREE.Material && !isPreserved(material);
+      if (isReplaceable) {
+        child.material = this.resolve(material);
       }
     });
   }

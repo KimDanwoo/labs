@@ -67,7 +67,8 @@ function dragMap(view: View, { active }: Action): void {
 
 export function panWithGamepad(view: View, delta: number): void {
   const { right } = view.game.inputs.gamepad.joysticks;
-  if (!right.active || view.cinematic.active) return;
+  if (!right.active) return;
+  if (view.cinematic.active) return;
   view.focusPoint.isTracking = false;
   const movement = new THREE.Vector2(right.x, right.y)
     .rotateAround(new THREE.Vector2(), -view.spherical.theta)

@@ -118,7 +118,8 @@ export function buildCircuitJumps(): void {
     const first = along[0];
     const hull = rampGeometry(along.map((sample) => rampCorners(sample, ramp.height(sample.distance)))).attributes
       .position?.array;
-    if (!first || !(hull instanceof Float32Array)) continue;
+    if (!first) continue;
+    if (!(hull instanceof Float32Array)) continue;
     objects.add(
       { model: rampModel(ramp.model, first) },
       { type: 'fixed', colliders: [{ shape: 'hull', parameters: [hull] }] },

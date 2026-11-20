@@ -10,7 +10,8 @@ import {
 export function readNipple(): { accelerating: number; steering: number } | null {
   const { inputs, view, ticker } = getGame();
   const { nipple } = inputs;
-  if (!nipple.active || nipple.progress <= 0) return null;
+  if (!nipple.active) return null;
+  if (nipple.progress <= 0) return null;
 
   if (!view.focusPoint.isTracking) {
     ticker.wait(NIPPLE_TRACKING_DELAY_FRAMES, () => {

@@ -102,7 +102,8 @@ export class SocialArea extends Area {
   #popFan(): void {
     const fan = this.#fans[this.#currentFan];
     const body = fan?.object.physical?.body;
-    if (!fan || !body) return;
+    if (!fan) return;
+    if (!body) return;
     const spread = (): number => (Math.random() - 0.5) * FAN_SPREAD.horizontal;
     const spawn = this.#spawnerPosition.clone().add(new THREE.Vector3(spread(), FAN_SPREAD.lift, spread()));
     body.setTranslation(spawn, false);
@@ -123,7 +124,8 @@ export class SocialArea extends Area {
 
   #sway({ object, flight }: Fan): void {
     const body = object.physical?.body;
-    if (!body || !flight) return;
+    if (!body) return;
+    if (!flight) return;
     const angle = (this.game.ticker.elapsed - flight.launchedAt) * FAN_SWAY.frequency + flight.phase;
     const side = Math.sin(angle) * FAN_SWAY.amplitude;
     const tilt = Math.cos(angle) * FAN_SWAY.tilt;
@@ -160,12 +162,14 @@ export class SocialArea extends Area {
       else this.#sway(fan);
     }
     const bodies = this.#fans.map(({ object }) => object.physical?.body);
-    if (this.#visibleFans && !bodies.every((body) => body?.isSleeping() ?? true)) {
+    const isAnyFanAwake = this.#visibleFans && !bodies.every((body) => body?.isSleeping() ?? true);
+    if (isAnyFanAwake) {
       this.fans.instancedGroup.updateBoundings();
     }
     for (const [index, body] of bodies.entries()) {
       const fan = this.#fans[index];
-      if (fan && body && !body.isSleeping() && body.isEnabled()) fan.reference.needsUpdate = true;
+      const isAwakeFan = fan && body && !body.isSleeping() && body.isEnabled();
+      if (isAwakeFan) fan.reference.needsUpdate = true;
     }
   }
 

@@ -28,7 +28,8 @@ function isProcessAlive(pid) {
 
 function isLockAbandoned() {
   const owner = Number(readText(LOCK_OWNER_FILE));
-  if (Number.isInteger(owner) && owner > 0) return !isProcessAlive(owner);
+  const isValidOwnerPid = Number.isInteger(owner) && owner > 0;
+  if (isValidOwnerPid) return !isProcessAlive(owner);
   const createdAt = statSync(LOCK_DIRECTORY, { throwIfNoEntry: false })?.mtimeMs ?? Date.now();
   return Date.now() - createdAt > LOCK_OWNER_GRACE_MS;
 }

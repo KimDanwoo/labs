@@ -53,14 +53,18 @@ export const MAIN_TRACK_MAX_ELEVATION = 1.5;
 export const BOOST = { speed: 1.2, easePower: 7 } as const;
 export const TRAIL_OFFSETS = { left: [-1.28, 0.1, -0.55], right: [-1.28, 0.1, 0.55] } as const;
 export const ANTENNA_TARGET = new THREE.Vector3(0, 2, 0);
+function enableBackSideShadows(child: THREE.Object3D): void {
+  if (!(child instanceof THREE.Mesh)) return;
+  if (!(child.material instanceof THREE.Material)) return;
+  child.receiveShadow = true;
+  child.castShadow = true;
+  child.material.shadowSide = THREE.BackSide;
+}
+
 export function findParts(model: THREE.Object3D): Map<string, THREE.Object3D> {
   const parts = new Map<string, THREE.Object3D>();
   model.traverse((child) => {
-    if (child instanceof THREE.Mesh && child.material instanceof THREE.Material) {
-      child.receiveShadow = true;
-      child.castShadow = true;
-      child.material.shadowSide = THREE.BackSide;
-    }
+    enableBackSideShadows(child);
     for (const pattern of PART_PATTERNS) {
       const match = pattern.exec(child.name);
       if (match) parts.set(match[0], child);

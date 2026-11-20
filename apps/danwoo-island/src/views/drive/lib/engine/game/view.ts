@@ -171,7 +171,8 @@ export class View {
   #applyClipping(amount: number): void {
     const near = lerp(CAMERA.near, this.overview.radius * OVERVIEW.nearRatio, amount);
     const far = lerp(CAMERA.far, this.overview.radius * OVERVIEW.farRatio, amount);
-    if (this.defaultCamera.near === near && this.defaultCamera.far === far) return;
+    const isUnchangedRange = this.defaultCamera.near === near && this.defaultCamera.far === far;
+    if (isUnchangedRange) return;
     for (const camera of [this.camera, this.defaultCamera]) {
       camera.near = near;
       camera.far = far;

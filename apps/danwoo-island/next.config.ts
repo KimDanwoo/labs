@@ -5,15 +5,15 @@ import { createSecurityHeaders } from '@repo/security-headers';
 import type { NextConfig } from 'next';
 
 const SOUNDCLOUD_WIDGET = 'https://w.soundcloud.com';
+const PHYSICS_AND_DECODER_WASM = "'wasm-unsafe-eval'";
+const KTX2_DECODER_RUNTIME_EVAL = "'unsafe-eval'";
+const DECODER_BLOB_WORKERS = 'blob:';
 
 const SECURITY_HEADERS = createSecurityHeaders({
   sources: {
-    // 물리 엔진(Rapier)·Draco/KTX2 디코더가 WebAssembly와 blob 워커를 쓴다.
-    // 'unsafe-eval'은 KTX2 Basis 디코더가 워커 안에서 Function()으로 코드를 만들기 때문이다 — 빼면 월드가 로딩에서 멈춘다.
-    // 로그인·사용자 데이터가 없는 앱이라 이 앱에만 허용한다
-    'script-src': ["'wasm-unsafe-eval'", "'unsafe-eval'", SOUNDCLOUD_WIDGET],
-    'worker-src': ['blob:'],
-    'connect-src': ['blob:'],
+    'script-src': [PHYSICS_AND_DECODER_WASM, KTX2_DECODER_RUNTIME_EVAL, SOUNDCLOUD_WIDGET],
+    'worker-src': [DECODER_BLOB_WORKERS],
+    'connect-src': [DECODER_BLOB_WORKERS],
     'frame-src': [SOUNDCLOUD_WIDGET],
     'img-src': ['https://i1.sndcdn.com', 'https://danwoo.dev'],
   },

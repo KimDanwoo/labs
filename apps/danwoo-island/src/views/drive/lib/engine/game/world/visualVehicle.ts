@@ -116,7 +116,8 @@ export class VisualVehicle {
 
   #mixEnergyGlow(): void {
     const energy = this.#part('energy');
-    if (!(energy instanceof THREE.Mesh) || !(energy.material instanceof MeshDefaultMaterial)) return;
+    if (!(energy instanceof THREE.Mesh)) return;
+    if (!(energy.material instanceof MeshDefaultMaterial)) return;
     const glow = getGame().materials.emissiveOutput('emissivePurpleRadialGradient');
     const material = new THREE.MeshLambertNodeMaterial();
     material.outputNode = mix(energy.material.shadedOutput, glow, this.#boostMix);
@@ -146,7 +147,8 @@ export class VisualVehicle {
     updateAntenna(this.#antenna, this.#chassis);
     this.#updateLights();
 
-    const trailAlpha = vehicle.isGoingForward && player.boosting && player.accelerating > 0 ? 1 : 0;
+    const isBoostTrailing = vehicle.isGoingForward && player.boosting && player.accelerating > 0;
+    const trailAlpha = isBoostTrailing ? 1 : 0;
     this.#trails.leftAnchor.getWorldPosition(this.#trails.left.position);
     this.#trails.left.alpha = trailAlpha;
     this.#trails.rightAnchor.getWorldPosition(this.#trails.right.position);

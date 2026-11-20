@@ -20,7 +20,8 @@ interface DeviceHints {
 
 export function initialLevel({ userAgent, maxTouchPoints }: DeviceHints): QualityLevel {
   const isTabletAsDesktop = DESKTOP_SAFARI_AGENT.test(userAgent) && maxTouchPoints > TABLET_TOUCH_POINTS;
-  return MOBILE_AGENT.test(userAgent) || isTabletAsDesktop ? QUALITY.low : QUALITY.high;
+  const isLowEndDevice = MOBILE_AGENT.test(userAgent) || isTabletAsDesktop;
+  return isLowEndDevice ? QUALITY.low : QUALITY.high;
 }
 
 export class Quality {
@@ -39,9 +40,9 @@ export class Quality {
     this.#apply(level);
   }
 
-  /** 고품질에서 평균 프레임이 오래 느리면 한 번 낮춘다. 사용자가 직접 고른 뒤에는 건드리지 않는다. */
   observeFrame({ elapsed, deltaAverage }: FrameTiming): void {
-    if (this.#isChosen || this.level === QUALITY.low) return;
+    if (this.#isChosen) return;
+    if (this.level === QUALITY.low) return;
     this.#firstSeen ??= elapsed;
     if (elapsed - this.#firstSeen < AUTO_LOW.warmupSeconds) return;
     if (deltaAverage <= AUTO_LOW.slowDelta) {

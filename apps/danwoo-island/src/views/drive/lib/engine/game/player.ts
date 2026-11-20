@@ -66,7 +66,8 @@ export class Player {
     inputs.addActions(ACTIONS);
 
     inputs.events.on('respawn', (action) => {
-      if (this.state === Player.STATE_DEFAULT && action.active) this.respawn();
+      const shouldRespawn = this.state === Player.STATE_DEFAULT && action.active;
+      if (shouldRespawn) this.respawn();
     });
     inputs.events.on('honk', (action) => {
       if (action.active) this.honk();
@@ -118,7 +119,8 @@ export class Player {
     this.#unstuckDelay = gsap.delayedCall(UNSTUCK_DELAY, () => {
       this.#unstuckDelay = null;
       const { physicalVehicle } = getGame();
-      if (this.state !== Player.STATE_DEFAULT || !physicalVehicle.upsideDown.active) return;
+      if (this.state !== Player.STATE_DEFAULT) return;
+      if (!physicalVehicle.upsideDown.active) return;
       physicalVehicle.flip.jump();
       this.sounds.suspensions.play(WHEEL_COUNT);
       this.#scheduleFlipCheck();
@@ -190,6 +192,7 @@ export class Player {
     if (this.#isActive('left')) this.steering += 1;
 
     const leftStick = getGame().inputs.gamepad.joysticks.left;
-    if (this.steering === 0 && leftStick.active) this.steering = -leftStick.safeX;
+    const shouldUseStick = this.steering === 0 && leftStick.active;
+    if (shouldUseStick) this.steering = -leftStick.safeX;
   }
 }

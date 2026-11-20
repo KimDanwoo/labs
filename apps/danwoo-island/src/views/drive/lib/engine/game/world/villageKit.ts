@@ -29,7 +29,8 @@ const UNIT_SCALE = new THREE.Vector3(1, 1, 1);
 function hasReference(object: THREE.Object3D): boolean {
   let isFound = false;
   object.traverse((child) => {
-    if (child !== object && REFERENCE.test(child.name)) isFound = true;
+    const isReferenceChild = child !== object && REFERENCE.test(child.name);
+    if (isReferenceChild) isFound = true;
   });
   return isFound;
 }
@@ -39,14 +40,10 @@ function materialName(mesh: THREE.Mesh): string {
 }
 
 function isReplaceable(child: THREE.Object3D, keepEmissive: boolean): boolean {
-  if (
-    !(child instanceof THREE.Mesh) ||
-    COLLIDER.test(child.name) ||
-    REFERENCE.test(child.name) ||
-    hasReference(child)
-  ) {
-    return false;
-  }
+  if (!(child instanceof THREE.Mesh)) return false;
+  if (COLLIDER.test(child.name)) return false;
+  if (REFERENCE.test(child.name)) return false;
+  if (hasReference(child)) return false;
   return !(keepEmissive && EMISSIVE.test(materialName(child)));
 }
 
@@ -109,7 +106,8 @@ export function referenceCenter(container: THREE.Object3D, pattern: RegExp): Ref
   container.updateMatrixWorld(true);
   const inverse = container.matrixWorld.clone().invert();
   container.traverse((child) => {
-    if (!(child instanceof THREE.Mesh) || !pattern.test(child.name)) return;
+    if (!(child instanceof THREE.Mesh)) return;
+    if (!pattern.test(child.name)) return;
     child.geometry.computeBoundingBox();
     const bounds = child.geometry.boundingBox;
     if (!bounds) return;

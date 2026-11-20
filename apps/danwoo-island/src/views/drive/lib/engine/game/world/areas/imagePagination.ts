@@ -78,12 +78,14 @@ export class ImagePagination {
   update({ imageCount, imageIndex, isShown }: { imageCount: number; imageIndex: number; isShown: boolean }): void {
     for (const dot of this.#dots) {
       const shouldShow = dot.index <= imageCount - 1;
-      if (shouldShow && !dot.isVisible) {
+      const shouldReveal = shouldShow && !dot.isVisible;
+      const shouldConceal = !shouldShow && dot.isVisible;
+      if (shouldReveal) {
         gsap.to(dot.mesh.scale, { x: 1, y: 1, z: 1, ...DOT_TWEEN, overwrite: true });
         dot.mesh.visible = true;
         dot.isVisible = true;
         dot.intersect.active = isShown;
-      } else if (!shouldShow && dot.isVisible) {
+      } else if (shouldConceal) {
         gsap.to(dot.mesh.scale, {
           x: DOT_HIDDEN_SCALE,
           y: DOT_HIDDEN_SCALE,

@@ -111,7 +111,8 @@ function transformGeometry(
 function finishGeometry(name: PartName, geometry: THREE.BufferGeometry): THREE.BufferGeometry {
   const flat = geometry.index ? geometry.toNonIndexed() : geometry;
   if (flat !== geometry) geometry.dispose();
-  if (!isGlow(name) && flat.hasAttribute('uv')) flat.deleteAttribute('uv');
+  const hasUnusedUv = !isGlow(name) && flat.hasAttribute('uv');
+  if (hasUnusedUv) flat.deleteAttribute('uv');
   flat.computeVertexNormals();
   if (isVertexColored(name)) paintVertices(flat, name);
   return flat;

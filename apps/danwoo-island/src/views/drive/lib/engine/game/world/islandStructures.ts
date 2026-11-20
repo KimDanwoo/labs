@@ -99,7 +99,8 @@ function rebuildGenerator(generator: THREE.Object3D): void {
   const cuboids = generator.children.filter((child) => CUBOID.test(child.name)).sort((a, b) => b.scale.y - a.scale.y);
   const [poleCuboid] = cuboids;
   const pileCuboid = cuboids.find((cuboid) => cuboid !== poleCuboid && cuboid.scale.x > 1);
-  if (!poleCuboid || !pileCuboid) throw new Error('발전기 충돌체 구성이 예상과 달라요.');
+  if (!poleCuboid) throw new Error('발전기 충돌체 구성이 예상과 달라요.');
+  if (!pileCuboid) throw new Error('발전기 충돌체 구성이 예상과 달라요.');
   for (const extra of cuboids.filter((cuboid) => cuboid !== poleCuboid && cuboid !== pileCuboid))
     extra.removeFromParent();
   const pole = cuboidFrame(poleCuboid);

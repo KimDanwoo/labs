@@ -56,7 +56,8 @@ function openGlades(): Point[] {
   for (let z = -HALF_WORLD + GLADE.spacing / 2; z < HALF_WORLD; z += GLADE.spacing) {
     for (let x = -HALF_WORLD + GLADE.spacing / 2; x < HALF_WORLD; x += GLADE.spacing) {
       const spot: Point = [x, z];
-      if (canGrow(spot) && isBare(spot, GROVES) && isBare(spot, glades)) glades.push(spot);
+      const isOpenGlade = canGrow(spot) && isBare(spot, GROVES) && isBare(spot, glades);
+      if (isOpenGlade) glades.push(spot);
     }
   }
   return glades;

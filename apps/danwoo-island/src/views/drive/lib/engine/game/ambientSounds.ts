@@ -83,7 +83,8 @@ export function registerBirds(audio: Audio): void {
     }),
   );
   const tryPlay = (): void => {
-    if (!dayCycles.isInInterval('night') && Math.random() < 0.5) {
+    const shouldPlayDaytimeSound = !dayCycles.isInInterval('night') && Math.random() < 0.5;
+    if (shouldPlayDaytimeSound) {
       tweets[Math.floor(Math.random() * tweets.length)]?.play();
     }
     gsap.delayedCall(0.5 + Math.random() * 5, tryPlay);
@@ -99,7 +100,8 @@ export function registerOwl(audio: Audio): void {
   });
   const delay = (): number => 30 + Math.random() * 60;
   const tryPlay = (): void => {
-    if (dayCycles.isInInterval('night') && Math.random() < 0.5) owl.play();
+    const shouldHoot = dayCycles.isInInterval('night') && Math.random() < 0.5;
+    if (shouldHoot) owl.play();
     gsap.delayedCall(delay(), tryPlay);
   };
   gsap.delayedCall(delay(), tryPlay);

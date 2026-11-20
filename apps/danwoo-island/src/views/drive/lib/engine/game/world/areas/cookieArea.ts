@@ -69,7 +69,8 @@ export class CookieArea extends Area {
 
   #waveBanner(): void {
     const banner = this.requireReference('banner');
-    if (!(banner instanceof THREE.Mesh) || !(banner.material instanceof THREE.NodeMaterial)) return;
+    if (!(banner instanceof THREE.Mesh)) return;
+    if (!(banner.material instanceof THREE.NodeMaterial)) return;
     const { ticker, noises, wind } = this.game;
     const windStrength = float(0).toVarying();
     banner.material.positionNode = Fn(() => {
@@ -171,12 +172,14 @@ export class CookieArea extends Area {
     this.#blower.scale.y = Math.sin(ticker.elapsedScaled + Math.PI) * 0.25 + 0.75;
 
     const bodies = this.#coconuts.map(({ object }) => object.physical?.body);
-    if (this.#visibleCount && !bodies.every((body) => body?.isSleeping() ?? true)) {
+    const isAnyCoconutAwake = this.#visibleCount && !bodies.every((body) => body?.isSleeping() ?? true);
+    if (isAnyCoconutAwake) {
       this.cookies.instancedGroup.updateBoundings();
     }
     for (const [index, body] of bodies.entries()) {
       const coconut = this.#coconuts[index];
-      if (coconut && body && !body.isSleeping() && body.isEnabled()) coconut.reference.needsUpdate = true;
+      const isAwakeCoconut = coconut && body && !body.isSleeping() && body.isEnabled();
+      if (isAwakeCoconut) coconut.reference.needsUpdate = true;
     }
   }
 

@@ -67,7 +67,8 @@ export class LandingArea extends Area {
     for (const letter of this.references.items.get('letters') ?? []) {
       const physical = objectOf(letter).physical;
       const collider = physical?.colliders[0];
-      if (!physical || !collider) continue;
+      if (!physical) continue;
+      if (!collider) continue;
       collider.setActiveEvents(RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS);
       collider.setContactForceEventThreshold(LETTER_CONTACT_THRESHOLD);
       physical.onCollision = (force, position) => audio.groups.get('hitBrick')?.playRandomNext(force, position);

@@ -75,13 +75,16 @@ export class InteractivePoints implements PointRegistry {
 
   focus(item: InteractivePoint): void {
     if (item.state === 'hidden') return;
-    if (this.#activeItem && this.#activeItem !== item) this.#activeItem.conceal();
+    const active = this.#activeItem;
+    const isOtherActive = active !== null && active !== item;
+    if (isOtherActive) active.conceal();
     this.#activeItem = item;
     item.reveal();
   }
 
   blur(item: InteractivePoint): void {
-    if (this.#activeItem !== item || item.state === 'hidden') return;
+    if (this.#activeItem !== item) return;
+    if (item.state === 'hidden') return;
     item.conceal();
     this.#activeItem = null;
   }
@@ -146,18 +149,22 @@ export class InteractivePoints implements PointRegistry {
 
   #concealLeftItems(nearby: InteractivePoint[]): void {
     for (const item of this.#items) {
-      if (nearby.includes(item) || !item.isIn) continue;
+      if (nearby.includes(item)) continue;
+      if (!item.isIn) continue;
       item.isIn = false;
       if (item.state !== 'hidden') item.conceal();
     }
   }
 
   #activate(nextActive: InteractivePoint): void {
-    if (this.#activeItem && nextActive !== this.#activeItem) {
-      this.#activeItem.isIn = false;
-      this.#activeItem.conceal();
+    const previous = this.#activeItem;
+    const isSwitching = previous !== null && nextActive !== previous;
+    if (isSwitching) {
+      previous.isIn = false;
+      previous.conceal();
     }
-    if (!nextActive.isIn || this.#activeItem === null) {
+    const shouldActivate = !nextActive.isIn || this.#activeItem === null;
+    if (shouldActivate) {
       this.#activeItem = nextActive;
       nextActive.isIn = true;
       nextActive.reveal();

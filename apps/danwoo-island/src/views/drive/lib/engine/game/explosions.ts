@@ -26,7 +26,9 @@ export class Explosions {
 
     let isVehicleHit = false;
     for (const { physical } of game.objects.list.values()) {
-      if (!physical || physical.type !== 'dynamic' || !physical.body.isEnabled()) continue;
+      if (!physical) continue;
+      if (physical.type !== 'dynamic') continue;
+      if (!physical.body.isEnabled()) continue;
       if (this.#push(physical, coordinates, options)) isVehicleHit = true;
     }
     return isVehicleHit;
@@ -49,7 +51,8 @@ export class Explosions {
 
     const isVehicle = physical === game.physicalVehicle.chassis.physical;
     const threshold = options.bulletTimeThreshold ?? DEFAULTS.bulletTimeThreshold;
-    if (!isVehicle || finalStrength <= threshold) return false;
+    if (!isVehicle) return false;
+    if (finalStrength <= threshold) return false;
     game.time.bulletTime.activate();
     return true;
   }

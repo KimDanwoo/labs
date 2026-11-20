@@ -145,7 +145,9 @@ export class Physics {
 
   #applyWaterDamping(physical: Physical, surfaceElevation: number): void {
     const { body, linearDamping, angularDamping } = physical;
-    if (!body.isDynamic() || !body.isEnabled() || body.isSleeping()) return;
+    if (!body.isDynamic()) return;
+    if (!body.isEnabled()) return;
+    if (body.isSleeping()) return;
     const isSubmerged = Math.max(-body.translation().y, surfaceElevation) > 0;
     if (this.#submerged.get(physical) === isSubmerged) return;
     this.#submerged.set(physical, isSubmerged);
@@ -156,11 +158,13 @@ export class Physics {
   #dispatchContact(event: TempContactForceEvent): void {
     const body1 = this.world.getCollider(event.collider1()).parent();
     const body2 = this.world.getCollider(event.collider2()).parent();
-    if (!body1 || !body2) return;
+    if (!body1) return;
+    if (!body2) return;
 
     const onCollision1 = this.#physicalByBody.get(body1.handle)?.onCollision;
     const onCollision2 = this.#physicalByBody.get(body2.handle)?.onCollision;
-    if (!onCollision1 && !onCollision2) return;
+    const hasNoHandlers = !onCollision1 && !onCollision2;
+    if (hasNoHandlers) return;
 
     const force = event.maxForceMagnitude() / (body1.mass() + body2.mass());
     const position1 = body1.translation();

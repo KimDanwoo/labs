@@ -74,7 +74,6 @@ export class ResourcesLoader {
     }
   }
 
-  /** Draco·KTX2 디코더 워커는 wasm을 들고 있어 쉬는 동안 메모리를 차지한다. 다음 불러오기 때 다시 만든다. */
   #releaseDecoders(): void {
     this.#dracoLoader?.dispose();
     this.#ktx2Loader?.dispose();

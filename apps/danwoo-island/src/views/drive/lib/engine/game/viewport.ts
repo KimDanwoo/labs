@@ -29,7 +29,8 @@ export class Viewport {
     this.ratio = width / height;
     this.pixelRatioPure = window.devicePixelRatio;
 
-    const size = matchMedia('(pointer: coarse)').matches || width < COMPACT_MAX_WIDTH ? 'compact' : 'regular';
+    const isCompact = matchMedia('(pointer: coarse)').matches || width < COMPACT_MAX_WIDTH;
+    const size = isCompact ? 'compact' : 'regular';
     const budgetRatio = Math.sqrt(PIXEL_BUDGET[size] / Math.max(1, width * height));
     this.pixelRatioMax = Math.min(MAX_PIXEL_RATIO[size], budgetRatio);
     this.pixelRatio = Math.min(this.pixelRatioPure, this.pixelRatioMax);

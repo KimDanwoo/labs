@@ -3,7 +3,8 @@ import type { Game } from '@views/drive/lib/engine/game/game';
 let current: Game | null = null;
 
 export function bindGame(game: Game): void {
-  if (current && current !== game) throw new Error('Game is already running');
+  const isOtherGameRunning = current && current !== game;
+  if (isOtherGameRunning) throw new Error('Game is already running');
   current = game;
 }
 

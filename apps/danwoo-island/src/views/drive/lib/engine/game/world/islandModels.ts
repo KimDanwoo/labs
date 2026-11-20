@@ -71,7 +71,8 @@ export function islandModelResources(cacheBuster: string): ResourceSpec[] {
 
 function sourceMesh(key: IslandModelKey): THREE.Mesh {
   const resource = getGame().resources[resourceName(key)];
-  const source = resource && isModel(resource) ? resource.scene.getObjectByProperty('isMesh', true) : undefined;
+  const isLoadedModel = resource && isModel(resource);
+  const source = isLoadedModel ? resource.scene.getObjectByProperty('isMesh', true) : undefined;
   if (!(source instanceof THREE.Mesh)) throw new Error(`섬 모델 ${key}을 불러오지 못했어요.`);
   source.updateWorldMatrix(true, false);
   return source;

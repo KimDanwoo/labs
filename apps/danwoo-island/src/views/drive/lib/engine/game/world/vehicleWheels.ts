@@ -25,7 +25,8 @@ export function createWheels(template: THREE.Object3D, chassis: THREE.Object3D):
     container.traverse((child) => {
       if (child.name.startsWith('wheelSuspension')) suspension = child;
       if (child.name.startsWith('wheelCylinder')) cylinder = child;
-      if (child.name.startsWith('wheelPainted') && child instanceof THREE.Mesh) painted = child;
+      const isPaintedWheel = child.name.startsWith('wheelPainted') && child instanceof THREE.Mesh;
+      if (isPaintedWheel) painted = child;
     });
     if (!cylinder) throw new Error('Wheel cylinder is missing');
     const wheelCylinder: THREE.Object3D = cylinder;
@@ -76,7 +77,9 @@ export function createAntenna(object: THREE.Object3D | undefined): Antenna | nul
   const head = game.model('vehicle').scene.getObjectByName('antennaHead');
   const headAxle = head?.children[0];
   const headReference = object.getObjectByName('antennaHeadReference');
-  if (!head || !headAxle || !headReference) throw new Error('Antenna parts are missing');
+  if (!head) throw new Error('Antenna parts are missing');
+  if (!headAxle) throw new Error('Antenna parts are missing');
+  if (!headReference) throw new Error('Antenna parts are missing');
   game.materials.updateObject(head);
   game.scene.add(head);
   return { object, head, headAxle, headReference };

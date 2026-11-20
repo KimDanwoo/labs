@@ -111,7 +111,8 @@ export class Modals {
   }
 
   close(): void {
-    if (!isShown(this.state) || !this.#current) return;
+    if (!isShown(this.state)) return;
+    if (!this.#current) return;
     getGame().audio.groups.get('click')?.play(false);
     this.#element.classList.remove('is-visible');
     this.state = 'closing';

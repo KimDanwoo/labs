@@ -67,7 +67,9 @@ export class AltarArea extends Area {
     const { player, physicalVehicle, ticker } = this.game;
     const isAirborne = player.position.y - this.#position.y > TRIGGER.maxHeight;
     const isCoolingDown = ticker.elapsed - this.#lastTrigger < TRIGGER.cooldown;
-    if (this.#travelSequence !== null || isAirborne || isCoolingDown) return;
+    if (this.#travelSequence !== null) return;
+    if (isAirborne) return;
+    if (isCoolingDown) return;
     this.#lastTrigger = ticker.elapsed;
     this.#travelSequence = player.respawnSequence;
     player.state = Player.STATE_LOCKED;
@@ -88,7 +90,8 @@ export class AltarArea extends Area {
     });
     const place = ISLAND_PLACES.find(({ respawnName }) => respawnName === destination);
     const isInterrupted = player.respawnSequence !== this.#travelSequence;
-    if (isInterrupted || !place) {
+    const shouldCancelTravel = isInterrupted || !place;
+    if (shouldCancelTravel) {
       this.#endTravel();
       if (!isInterrupted) player.state = Player.STATE_DEFAULT;
       return;
@@ -122,7 +125,8 @@ export class AltarArea extends Area {
   #tick(): void {
     const { ticker, player, respawns } = this.game;
     this.#swirlTime.value += ticker.deltaScaled * this.#spin.value;
-    if (this.#travelSequence !== null && player.respawnSequence !== this.#travelSequence) this.#endTravel();
+    const isTravelInterrupted = this.#travelSequence !== null && player.respawnSequence !== this.#travelSequence;
+    if (isTravelInterrupted) this.#endTravel();
     if (this.#liftCall) this.game.physicalVehicle.launch({ upward: LIFT.updraft * ticker.deltaScaled });
     this.#visitTimer -= ticker.delta;
     if (this.#visitTimer > 0) return;

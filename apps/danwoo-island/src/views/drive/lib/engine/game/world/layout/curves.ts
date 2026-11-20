@@ -20,7 +20,10 @@ function catmullRom(p0: number, p1: number, p2: number, p3: number, t: number): 
 export function closedCurve(points: readonly Point[], samplesPerSpan: number): Point[] {
   return [...points.keys()].flatMap((index) => {
     const [p0, p1, p2, p3] = [-1, 0, 1, 2].map((offset) => wrapped(points, index + offset));
-    if (!p0 || !p1 || !p2 || !p3) return [];
+    if (!p0) return [];
+    if (!p1) return [];
+    if (!p2) return [];
+    if (!p3) return [];
     return Array.from({ length: samplesPerSpan }, (_, step): Point => {
       const t = step / samplesPerSpan;
       return [catmullRom(p0[0], p1[0], p2[0], p3[0], t), catmullRom(p0[1], p1[1], p2[1], p3[1], t)];
@@ -47,8 +50,8 @@ export function loopDistance(point: Point, loop: readonly Point[]): number {
 function isInsideLoop(point: Point, loop: readonly Point[]): boolean {
   return loop.reduce((inside, from, index) => {
     const to = wrapped(loop, index + 1);
-    const crosses = from[1] > point[1] !== to[1] > point[1];
-    if (!crosses) return inside;
+    const isCrossing = from[1] > point[1] !== to[1] > point[1];
+    if (!isCrossing) return inside;
     const edgeX = from[0] + ((point[1] - from[1]) / (to[1] - from[1])) * (to[0] - from[0]);
     return point[0] < edgeX ? !inside : inside;
   }, false);

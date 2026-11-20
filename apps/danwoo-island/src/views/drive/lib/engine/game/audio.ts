@@ -60,7 +60,8 @@ export class Audio {
     this.#startPlaylist();
     for (const group of this.groups.values()) {
       for (const item of group.items) {
-        if (item.autoplay && !item.playing) item.play();
+        const shouldAutoplay = item.autoplay && !item.playing;
+        if (shouldAutoplay) item.play();
       }
     }
     this.#preloadEager();
@@ -93,7 +94,8 @@ export class Audio {
     this.groups.set(groupName, group);
     const item = new AudioItem(options, group, this.#soundHost);
     group.items.push(item);
-    if (this.initiated && item.isEager) this.#queueLoad([item]);
+    const shouldLoadEagerly = this.initiated && item.isEager;
+    if (shouldLoadEagerly) this.#queueLoad([item]);
     return item;
   }
 
@@ -163,7 +165,8 @@ export class Audio {
 
   #updateItem(item: AudioItem): void {
     item.onPlaying?.(item);
-    const fade = item.positions && item.howl.playing() ? this.#spatialize(item, item.positions) : 1;
+    const isPlayingSpatially = item.positions !== null && item.howl.playing();
+    const fade = isPlayingSpatially ? this.#spatialize(item, item.positions) : 1;
     item.applyMix(clamp(item.rate * this.#globalRate, RATE_RANGE.min, RATE_RANGE.max), item.volume * fade);
   }
 

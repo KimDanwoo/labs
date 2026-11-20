@@ -110,7 +110,8 @@ export function rebuildVillageProps(model: THREE.Object3D): void {
   placeLandmarks(model);
   for (const child of [...model.children]) {
     const uncollided = UNCOLLIDED_BUILDERS.find(({ pattern }) => pattern.test(child.name));
-    if (uncollided && child instanceof THREE.Mesh) {
+    const isUncollidedMesh = uncollided && child instanceof THREE.Mesh;
+    if (isUncollidedMesh) {
       rebuildUncollided(child, uncollided.build);
       continue;
     }

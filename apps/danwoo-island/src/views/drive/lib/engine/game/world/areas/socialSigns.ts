@@ -115,7 +115,8 @@ export function personalizeSocialSigns(items: readonly WorldObject[]): void {
     if (!(mesh instanceof THREE.Mesh)) continue;
     const label = LABELS.get(mesh.name);
     const frame = steleFrames.get(mesh);
-    if (label && frame) buildStele(mesh, label, frame);
+    const hasSteleParts = label && frame;
+    if (hasSteleParts) buildStele(mesh, label, frame);
   }
 }
 

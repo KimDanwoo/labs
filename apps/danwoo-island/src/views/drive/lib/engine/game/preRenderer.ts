@@ -10,7 +10,8 @@ const CAMERA_FAR = 100000;
 function revealHiddenObjects(scene: THREE.Scene): THREE.Object3D[] {
   const revealed: THREE.Object3D[] = [];
   scene.traverse((child) => {
-    if (child.visible || child.userData.preventPreRender !== undefined) return;
+    if (child.visible) return;
+    if (child.userData.preventPreRender !== undefined) return;
     child.visible = true;
     revealed.push(child);
   });

@@ -77,7 +77,8 @@ export class JukeboxPlayer {
 
   toggle(): void {
     const { status, trackIndex } = this.#store.current;
-    if (status === 'playing' || status === 'starting') {
+    const isActiveStatus = status === 'playing' || status === 'starting';
+    if (isActiveStatus) {
       this.#wantsPlayback = false;
       this.#store.clearStartTimer();
       this.#widget?.pause();
@@ -125,7 +126,8 @@ export class JukeboxPlayer {
     this.#widget = widget;
     this.#applyVolume();
     const requested = this.#requestedIndex;
-    if (!this.#wantsPlayback || requested === null) {
+    const shouldStopPlayback = !this.#wantsPlayback || requested === null;
+    if (shouldStopPlayback) {
       this.#requestedIndex ??= loadedIndex;
       this.#store.set({ status: 'ready' });
       return;
@@ -136,7 +138,8 @@ export class JukeboxPlayer {
 
   #load(index: number): void {
     const track = this.tracks[index];
-    if (!track || !this.#widget) return;
+    if (!track) return;
+    if (!this.#widget) return;
     this.#store.set({ status: 'starting', trackIndex: index, progress: 0 });
     this.#store.armStartTimer();
     this.#widget.load(trackApiUrl(track.id), {
@@ -154,7 +157,8 @@ export class JukeboxPlayer {
   }
 
   #handlePlay(soundId: number | undefined): void {
-    if (!this.#wantsPlayback || this.#music.isBackground) {
+    const shouldPauseWidget = !this.#wantsPlayback || this.#music.isBackground;
+    if (shouldPauseWidget) {
       this.#widget?.pause();
       return;
     }
@@ -165,22 +169,20 @@ export class JukeboxPlayer {
   }
 
   #handlePause(soundId: number | undefined): void {
-    if (!isRequestedSound(this.tracks, this.#requestedIndex, soundId) || this.#store.current.status !== 'playing')
-      return;
+    if (!isRequestedSound(this.tracks, this.#requestedIndex, soundId)) return;
+    if (this.#store.current.status !== 'playing') return;
     this.#store.set({ status: 'paused' });
   }
 
   #handleFinish(soundId: number | undefined): void {
-    if (this.#wantsPlayback && isRequestedSound(this.tracks, this.#requestedIndex, soundId)) this.next();
+    const shouldAdvance = this.#wantsPlayback && isRequestedSound(this.tracks, this.#requestedIndex, soundId);
+    if (shouldAdvance) this.next();
   }
 
   #handleProgress(soundId: number | undefined, progress: number | undefined): void {
-    if (
-      !isRequestedSound(this.tracks, this.#requestedIndex, soundId) ||
-      typeof progress !== 'number' ||
-      !Number.isFinite(progress)
-    )
-      return;
+    if (!isRequestedSound(this.tracks, this.#requestedIndex, soundId)) return;
+    if (typeof progress !== 'number') return;
+    if (!Number.isFinite(progress)) return;
     this.#store.set({ progress });
   }
 
@@ -192,7 +194,8 @@ export class JukeboxPlayer {
   }
 
   #handleBackground(isBackground: boolean): void {
-    if (!this.#widget || !this.#wantsPlayback) return;
+    if (!this.#widget) return;
+    if (!this.#wantsPlayback) return;
     if (isBackground) this.#widget.pause();
     else this.#start();
   }

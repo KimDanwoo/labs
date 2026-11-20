@@ -77,7 +77,8 @@ export class InstancedGroup {
   update(): void {
     let hasUpdated = false;
     for (const [index, reference] of this.references.entries()) {
-      if (!this.needsUpdate && !reference.needsUpdate) continue;
+      const isUnchanged = !this.needsUpdate && !reference.needsUpdate;
+      if (isUnchanged) continue;
       hasUpdated = true;
       reference.needsUpdate = false;
       reference.updateMatrixWorld();

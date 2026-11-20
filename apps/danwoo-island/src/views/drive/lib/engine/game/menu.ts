@@ -129,10 +129,12 @@ export class Menu {
     const { inputs } = getGame();
     inputs.addActions(GAMEPAD_ACTIONS);
     inputs.events.on('next', (action) => {
-      if (action.active && this.#current) this.open(this.#current.nextName);
+      if (!action.active) return;
+      if (this.#current) this.open(this.#current.nextName);
     });
     inputs.events.on('prev', (action) => {
-      if (action.active && this.#current) this.open(this.#current.prevName);
+      if (!action.active) return;
+      if (this.#current) this.open(this.#current.prevName);
     });
   }
 
@@ -140,7 +142,8 @@ export class Menu {
     const game = getGame();
     const item = this.items.get(name ?? this.#current?.name ?? this.#default.name);
     if (!item) return;
-    if (isShown(this.state) && item === this.#current) return;
+    const isAlreadyShowing = isShown(this.state) && item === this.#current;
+    if (isAlreadyShowing) return;
 
     game.audio.groups.get('click')?.play(true);
     this.#switchItem(item);
@@ -156,7 +159,8 @@ export class Menu {
   #announceOpen(item: MenuItem): void {
     const game = getGame();
     const { mainFocus } = item;
-    if (mainFocus && game.inputs.mode !== INPUT_MODE.touch) requestAnimationFrame(() => mainFocus.focus());
+    const shouldFocusMain = mainFocus && game.inputs.mode !== INPUT_MODE.touch;
+    if (shouldFocusMain) requestAnimationFrame(() => mainFocus.focus());
     game.inputs.filters.clear();
     game.inputs.filters.add('menu');
     this.events.trigger('open');
@@ -176,7 +180,8 @@ export class Menu {
   }
 
   close(): void {
-    if (!isShown(this.state) || !this.#current) return;
+    if (!isShown(this.state)) return;
+    if (!this.#current) return;
     getGame().audio.groups.get('click')?.play(false);
     this.#element.classList.remove('is-visible');
     this.state = 'closing';

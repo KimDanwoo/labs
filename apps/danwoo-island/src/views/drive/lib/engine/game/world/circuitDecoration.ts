@@ -24,9 +24,11 @@ function classifyDecoration({ box }: MeshComponent): DecorationKind {
   );
   const isGantryPaint =
     design.gantry.containsPoint(center) && !design.startLights.containsBox(box) && box.max.y > design.groundPaintTop;
-  if (isProp || isMarking || isGantryPaint) return 'erase';
+  const isErasable = isProp || isMarking || isGantryPaint;
+  if (isErasable) return 'erase';
   const isThinPole = size.x < design.legMaxWidth && size.z < design.legMaxWidth && size.y > design.legMinHeight;
-  if (design.tents.containsPoint(center) && isThinPole) return 'tentLeg';
+  const isTentLeg = design.tents.containsPoint(center) && isThinPole;
+  if (isTentLeg) return 'tentLeg';
   return 'keep';
 }
 
