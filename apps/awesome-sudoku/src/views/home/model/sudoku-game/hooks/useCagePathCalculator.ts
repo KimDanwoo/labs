@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { BOARD_SIZE } from '../../../config/board';
+import { cageLabelCell } from '../../../lib/cageLabelCell';
 import type { CageInfo, CellPosition } from '../../types/board';
 import { type KillerCage } from '../../types/game';
 
@@ -72,12 +72,7 @@ export const useCagePathCalculator = ({ cages, cellPositions }: UseCagePathCalcu
         });
       }
 
-      const topLeftCell = cage.cells.reduce(
-        (topLeft, [r, c]) => (r < topLeft[0] || (r === topLeft[0] && c < topLeft[1]) ? [r, c] : topLeft),
-        [BOARD_SIZE, BOARD_SIZE],
-      );
-
-      const sumCell = cellPositions[`${topLeftCell[0]}-${topLeftCell[1]}`];
+      const sumCell = cellPositions[cageLabelCell(cage).join('-')];
       if (sumCell) {
         sums.push({
           id: cage.id,
