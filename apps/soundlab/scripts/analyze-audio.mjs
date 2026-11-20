@@ -1,13 +1,4 @@
 #!/usr/bin/env node
-// 원곡 오디오에서 시각 신호를 뽑아 public/signals/{id}.json 으로 굽는다.
-//
-// 사클이 주는 waveform_url은 진폭 하나를 8.6Hz로 준다. 그걸로는 대역을 나눌 수 없고 비트도 못 잡는다.
-// 원곡을 직접 읽으면 43Hz 3채널 + 비트 격자가 나온다(측정: 대역 간 상관 -0.004~0.29 = 거의 독립).
-//
-// 오디오는 웹에 올리지 않는다. 이 스크립트는 로컬에서만 돌고, 커밋되는 건 곡당 수십 KB의 신호다.
-// 재생은 계속 SoundCloud 위젯이 한다.
-//
-// 사용: node scripts/analyze-audio.mjs <오디오폴더>
 import { existsSync, mkdirSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -32,7 +23,8 @@ if (process.argv[2] === '--selftest') {
 }
 
 const folder = process.argv[2];
-if (!folder || !existsSync(folder)) {
+const isMissingFolder = !folder || !existsSync(folder);
+if (isMissingFolder) {
   console.error('사용: node scripts/analyze-audio.mjs <오디오폴더> | --selftest');
   process.exit(1);
 }
@@ -91,10 +83,6 @@ for (const full of files) {
   candidates.get(track.id).files.push(full);
 }
 
-/**
- * 사클에 올라간 그 마스터를 고른다 — 길이가 맞는 파일이 정의상 그것이다.
- * 파일명 표기(remaster 등)에 의존하지 않는다. 이름이 어떻든 스트리밍본과 길이가 맞아야 신호가 박에 맞는다.
- */
 function pickMaster(entry) {
   const measured = entry.files.map((name) => {
     let drift = Number.NaN;
@@ -117,12 +105,12 @@ function pickMaster(entry) {
 
 function describeBeat(report) {
   const percent = (report.confidence * 100).toFixed(0);
-  if (report.beats > 0) return `비트 ${report.bpm.toFixed(1)}BPM ÷${report.subdivision} ${report.beats}개(신뢰도 ${percent}%)`;
+  if (report.beats > 0)
+    return `비트 ${report.bpm.toFixed(1)}BPM ÷${report.subdivision} ${report.beats}개(신뢰도 ${percent}%)`;
   return `비트 없음(신뢰도 ${percent}% < ${GRID_MIN_CONFIDENCE * 100}%)`;
 }
 
 function removeStaleSignal(track) {
-  // 낡은 신호가 남아 있으면 틀린 박에 계속 뛴다. 지운다.
   const stale = join(OUT_DIR, `${track.id}.json`);
   if (existsSync(stale)) unlinkSync(stale);
 }
@@ -145,7 +133,9 @@ function processEntry(entry) {
     }
     writeFileSync(join(OUT_DIR, `${track.id}.json`), JSON.stringify(payload));
     const size = (JSON.stringify(payload).length / 1024).toFixed(0);
-    console.log(`✓ ${track.title} — ${report.frames}프레임 ${size}KB, 온셋 ${report.onsets}개, ${describeBeat(report)}${others}`);
+    console.log(
+      `✓ ${track.title} — ${report.frames}프레임 ${size}KB, 온셋 ${report.onsets}개, ${describeBeat(report)}${others}`,
+    );
   } catch (error) {
     console.error(`✗ ${basename(name)}: ${error.message}`);
   }
@@ -155,7 +145,6 @@ for (const entry of candidates.values()) processEntry(entry);
 
 if (existsSync(TMP)) unlinkSync(TMP);
 
-// 어느 곡에 신호가 있는지 목록으로 남긴다. 앱이 곡마다 404를 두드리지 않아도 되게.
 const built = readdirSync(OUT_DIR)
   .filter((name) => /^\d+\.json$/.test(name))
   .map((name) => Number(name.replace('.json', '')));

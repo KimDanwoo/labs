@@ -15,7 +15,6 @@ const SITE_NAME = 'soundlab';
 const SITE_DESCRIPTION = 'DANWOO의 곡을 픽셀 파티클로 듣는 플레이어';
 
 export const metadata: Metadata = {
-  // 없으면 og:image가 상대경로로 나가 크롤러가 이미지를 못 읽는다.
   metadataBase: new URL(SITE_URL),
   title: SITE_NAME,
   description: SITE_DESCRIPTION,
@@ -31,12 +30,9 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  // 높이는 dvh — 100%/100vh는 모바일에서 주소창까지 포함해 하단 재생바가 브라우저 UI 뒤로 잘린다.
   return (
     <html lang="ko" className={`${label.variable} dark h-dvh`}>
       <body className="h-dvh">
-        {/* 첫 재생 전에 TLS를 미리 맺는다 — 재생 엔진(iframe·api.js)·아트워크·파형이 각각 다른 호스트다.
-            React가 head로 올린다. 마운트 직후 세 곳을 동시에 두드리므로 핸드셰이크가 임계경로에 그대로 얹힌다. */}
         <link rel="preconnect" href="https://w.soundcloud.com" />
         <link rel="preconnect" href="https://i1.sndcdn.com" />
         <link rel="preconnect" href="https://wave.sndcdn.com" />

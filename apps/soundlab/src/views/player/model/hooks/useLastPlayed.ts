@@ -11,7 +11,8 @@ export function useLastPlayed(tracks: readonly Track[], heldIndex: RefObject<num
   const remember = useCallback(
     (ms: number) => {
       const track = tracks[heldIndex.current];
-      if (!track || !Number.isFinite(ms)) return;
+      if (!track) return;
+      if (!Number.isFinite(ms)) return;
       savedAt.current = performance.now();
       writeLastPlayed({ id: track.id, ms: Math.round(Math.max(0, ms)) });
     },

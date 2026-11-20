@@ -29,11 +29,14 @@ function isId(value: unknown): value is number {
 }
 
 export function parseLibrary(raw: unknown): Library {
-  if (typeof raw !== 'object' || raw === null) return EMPTY_LIBRARY;
+  if (typeof raw !== 'object') return EMPTY_LIBRARY;
+  if (raw === null) return EMPTY_LIBRARY;
   const ids = (value: unknown): number[] =>
     Array.isArray(value) ? [...new Set(value.filter(isId))].slice(0, MAX_IDS) : [];
-  const duration = (value: unknown): number =>
-    typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : 0;
+  const duration = (value: unknown): number => {
+    const isValidDuration = typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+    return isValidDuration ? value : 0;
+  };
   return {
     favorites: ids('favorites' in raw ? raw.favorites : []),
     recent: ids('recent' in raw ? raw.recent : []).slice(0, MAX_RECENT),
@@ -59,7 +62,8 @@ export const libraryAtom = atom<Library>(EMPTY_LIBRARY);
 libraryAtom.onMount = (setLibrary) => {
   setLibrary(readLibrary());
   const handleStorage = (event: StorageEvent) => {
-    if (event.key === LIBRARY_KEY || event.key === null) setLibrary(readLibrary());
+    const isLibraryKey = event.key === LIBRARY_KEY || event.key === null;
+    if (isLibraryKey) setLibrary(readLibrary());
   };
   window.addEventListener('storage', handleStorage);
   return () => window.removeEventListener('storage', handleStorage);
@@ -87,7 +91,9 @@ export const toggleFavoriteAtom = atom(null, (get, set, id: number) => {
 export const recordListeningAtom = atom(
   null,
   (get, set, entry: { id: number; elapsedMs: number; source: ListenSource }) => {
-    if (!isId(entry.id) || !Number.isFinite(entry.elapsedMs) || entry.elapsedMs <= 0) return;
+    if (!isId(entry.id)) return;
+    if (!Number.isFinite(entry.elapsedMs)) return;
+    if (entry.elapsedMs <= 0) return;
     const library = get(libraryAtom);
     const elapsedMs = Math.round(Math.min(entry.elapsedMs, 10_000));
     set(saveLibraryAtom, {

@@ -13,7 +13,12 @@ export function PlayerHeader(): JSX.Element {
   const isPlaying = useAtomValue(isPlayingAtom);
   const track = TRACKS[index];
   const handleNavigate = (event: MouseEvent<HTMLAnchorElement>, next: PlayerScreen) => {
-    if (!track || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    if (!track) return;
+    if (event.metaKey) return;
+    if (event.ctrlKey) return;
+    if (event.shiftKey) return;
+    if (event.altKey) return;
+    if (event.button !== 0) return;
     event.preventDefault();
     window.history.pushState(window.history.state, '', playerPath(track, next));
     setScreen(next);

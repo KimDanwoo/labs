@@ -16,25 +16,10 @@ import { clearTargets, deleteTargets, gridUv, makeTargetPair, type Target } from
 import { createRenderPasses } from '@views/player/lib/stage/renderPasses';
 import { createRendererResources, disposeRendererResources } from '@views/player/lib/stage/rendererResources';
 
-/**
- * 픽셀 파티클 렌더러. React와 분리된 순수 WebGL2 모듈이다.
- *
- * 파이프라인: 파티클 → 누적 FBO(장노출 트레일) → 브라이트패스 → 블러 2패스 → 합성.
- * 누적 버퍼는 빛만 담고(검정으로 clear) 배경색은 합성 단계에서 더한다.
- * 그래야 트레일이 배경색과 정확히 맞물린다.
- *
- * 파라미터는 목업에서 headless 렌더로 검증한 값이다.
- */
-
 type RenderInput = {
   morph: number;
   level: number;
   decay: number;
-  /**
-   * 음악 신호 채널. 전부 생략 가능하고 없으면 0 — 신호 없는 상태가 곧 기본값이다.
-   * 필수로 두면 타입 검사가 닿지 않는 호출자(scripts/shoot-og.mjs가 문자열로 만드는 페이지)에서
-   * undefined가 uniform에 들어가 NaN이 되고 파티클이 전부 사라진다.
-   */
   swell?: number;
   pre?: number;
   hit?: number;
@@ -65,7 +50,6 @@ function hasLiveRipple(ripples: Float32Array | undefined): boolean {
 export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   const context = canvas.getContext('webgl2', { antialias: false, alpha: false, premultipliedAlpha: false });
   if (!context) return null;
-  // 호이스팅되는 function 선언 안에서는 narrowing이 유지되지 않는다. 타입을 확정해 둔다.
   const gl: WebGL2RenderingContext = context;
 
   const resources = createRendererResources(gl);
@@ -106,7 +90,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     cssWidth = canvas.clientWidth;
     cssHeight = canvas.clientHeight;
 
-    // 픽셀 예산을 넘는 화면에서는 dpr을 깎는다. 1 아래로는 안 내려간다 — 그 아래는 확대가 눈에 보인다.
     const area = Math.max(1, cssWidth * cssHeight);
     const wanted = Math.min(2, globalThis.devicePixelRatio || 1);
     dpr = Math.max(1, Math.min(wanted, Math.sqrt(MAX_DEVICE_PIXELS / area)));
@@ -114,7 +97,8 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
     const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
 
-    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight || !accum) {
+    const shouldResize = canvas.width !== pixelWidth || canvas.height !== pixelHeight || !accum;
+    if (shouldResize) {
       releaseTargets();
       canvas.width = pixelWidth;
       canvas.height = pixelHeight;
@@ -131,7 +115,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   }
 
   function setArtwork(image: TexImageSource) {
-    // 마지막 패스가 유닛 1을 잡아둔 채로 들어올 수 있다. 어느 유닛에 올릴지 명시한다.
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, artwork);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
@@ -142,7 +125,9 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   function render(input: RenderInput) {
     const { morph, level, decay, ripples, rippleSeeds } = input;
     const { swell, pre, hit, air } = accentsOf(input);
-    if (!accum || !bloom || count === 0) return;
+    if (!accum) return;
+    if (!bloom) return;
+    if (count === 0) return;
 
     const rippleAlive = hasLiveRipple(ripples);
     const accented = pre > 0 || hit > 0;
@@ -150,7 +135,8 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
 
     const source = accum[accumIndex];
     const destination = accum[accumIndex ^ 1];
-    if (!source || !destination) return;
+    if (!source) return;
+    if (!destination) return;
 
     passes.fadeInto(source, destination, decay);
     passes.drawParticles({
@@ -179,7 +165,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   }
 
   function dispose() {
-    // Strict Mode는 같은 canvas로 다시 setup한다. 컨텍스트는 유지하고 소유 자원만 해제한다.
     releaseTargets();
     disposeRendererResources(gl, resources);
   }

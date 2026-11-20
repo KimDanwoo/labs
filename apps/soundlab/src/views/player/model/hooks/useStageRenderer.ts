@@ -24,8 +24,6 @@ export function useStageRenderer({ slotRef, onReady, isCalmMode }: StageRenderer
   }, [isCalmMode]);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rendererRef = useRef<Renderer | null>(null);
-  // 렌더러가 안 서면 캔버스를 화면에서 뺀다. alpha:false로 만든 컨텍스트라 한 번도 안 그린 캔버스가
-  // 투명이 아니라 불투명으로 합성되는데, 이 캔버스는 뷰포트 전체를 덮으므로 body 배경이 통째로 가려진다.
   const [isDead, setIsDead] = useState(false);
   const layoutRef = useRef<StageLayout>({ x: 0, y: 0, half: 0 });
   const reducedMotionRef = useRef(false);
@@ -33,7 +31,8 @@ export function useStageRenderer({ slotRef, onReady, isCalmMode }: StageRenderer
   useEffect(() => {
     const node = canvasRef.current;
     const slot = slotRef.current;
-    if (!node || !slot) return undefined;
+    if (!node) return undefined;
+    if (!slot) return undefined;
 
     const instance = createRendererOrFallback(node);
     if (!instance) {
@@ -58,8 +57,6 @@ export function useStageRenderer({ slotRef, onReady, isCalmMode }: StageRenderer
     onReady(true);
     const observer = new ResizeObserver(relayout);
     observer.observe(slot);
-    // 슬롯은 크기가 그대로인 채 위치만 바뀔 수 있다(재생목록 접기 → 무대 열이 넓어짐).
-    // ResizeObserver는 위치 변화로는 안 울리므로, 크기가 실제로 변하는 무대 영역도 함께 본다.
     if (slot.parentElement) observer.observe(slot.parentElement);
     window.addEventListener('resize', relayout);
 
@@ -70,7 +67,8 @@ export function useStageRenderer({ slotRef, onReady, isCalmMode }: StageRenderer
     };
     reducedMotion.addEventListener('change', readReducedMotion);
     const handlePointerDown = (event: PointerEvent) => {
-      if (reducedMotion.matches || calmModeRef.current) return;
+      if (reducedMotion.matches) return;
+      if (calmModeRef.current) return;
       claimRipple(
         event.clientX - node.clientWidth / 2,
         node.clientHeight / 2 - event.clientY,

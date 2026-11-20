@@ -29,7 +29,8 @@ export function useSeekCommands(
 
   const retry = useCallback(() => {
     const track = tracks[index];
-    if (!track || track.isAvailable === false) return;
+    if (!track) return;
+    if (track.isAvailable === false) return;
     resumeRef.current = { index, ms: Math.max(0, reportedMs()) };
     heldIndexRef.current = -1;
     queuedRef.current = index;
@@ -53,10 +54,13 @@ export function useSeekCommands(
   const playFrom = useCallback(
     (ms: number) => {
       const track = tracks[index];
-      if (!track || track.isAvailable === false || !Number.isFinite(ms)) return;
+      if (!track) return;
+      if (track.isAvailable === false) return;
+      if (!Number.isFinite(ms)) return;
       const position = Math.min(track.durationMs - 1, Math.max(0, ms));
       const instance = widgetRef.current;
-      if (instance && readyRef.current && heldIndexRef.current === index) {
+      const canSeekInPlace = instance && readyRef.current && heldIndexRef.current === index;
+      if (canSeekInPlace) {
         pendingRewindRef.current = null;
         instance.seekTo(position);
         settle(position);

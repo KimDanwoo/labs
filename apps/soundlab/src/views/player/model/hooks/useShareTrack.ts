@@ -32,7 +32,8 @@ export function useShareTrack() {
     const url = shareUrl(track, ms, window.location.origin);
     setFallbackUrl('');
     try {
-      if (kind === SHARE_KIND.native && typeof navigator.share === 'function') {
+      const canShareNatively = kind === SHARE_KIND.native && typeof navigator.share === 'function';
+      if (canShareNatively) {
         await navigator.share({ title: `${track.title}${SHARE_TITLE_SUFFIX}`, text: track.title, url });
         setNotice('공유했습니다.');
         return;
@@ -40,7 +41,8 @@ export function useShareTrack() {
       await navigator.clipboard.writeText(url);
       setNotice(SHARE_NOTICE[kind]);
     } catch (error) {
-      if (error instanceof DOMException && error.name === ABORT_ERROR_NAME) return;
+      const isAbort = error instanceof DOMException && error.name === ABORT_ERROR_NAME;
+      if (isAbort) return;
       setFallbackUrl(url);
       setNotice('아래 링크를 직접 복사하세요.');
     }

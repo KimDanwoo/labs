@@ -48,7 +48,8 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export async function poll(read, ok, { tries = 60, gap = 250, label }) {
   for (let i = 0; i < tries; i++) {
     const value = await read().catch(() => null);
-    if (value !== null && ok(value)) return value;
+    const isAcceptable = value !== null && ok(value);
+    if (isAcceptable) return value;
     await sleep(gap);
   }
   throw new Error(`${label} 대기 시간 초과`);

@@ -1,16 +1,3 @@
-/**
- * OG 이미지를 실제 렌더러로 찍는다.
- *
- * Satori(`opengraph-image.tsx`)는 WebGL을 못 그려서 이 앱의 정체성을 담지 못한다.
- * 대신 `renderer.ts`를 Node의 타입 스트리핑으로 JS로 만들어 정적 페이지에 넣고,
- * morph를 원하는 값에 고정한 뒤 headless Chrome을 CDP로 붙여 캡처한다.
- * 앱 코드에 디버그 훅을 심지 않기 위한 선택이다 — 렌더러가 React와 분리돼 있어 가능하다.
- *
- *   pnpm --filter soundlab og                      # 기본 곡으로 app/opengraph-image.png 갱신
- *   pnpm --filter soundlab og --track=9
- *   pnpm --filter soundlab og --tracks=0,9,16 --outdir=/tmp/og   # 후보 비교용
- */
-
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
@@ -43,9 +30,11 @@ function parseTargets() {
   const morph = Number(arg('morph') ?? MORPH);
 
   for (const index of indexes) {
-    if (!Number.isInteger(index) || !TRACKS[index]) throw new Error(`트랙 인덱스가 범위 밖입니다: ${index}`);
+    if (!Number.isInteger(index)) throw new Error(`트랙 인덱스가 범위 밖입니다: ${index}`);
+    if (!TRACKS[index]) throw new Error(`트랙 인덱스가 범위 밖입니다: ${index}`);
   }
-  if (indexes.length > 1 && !outdir) throw new Error('여러 곡을 찍으려면 --outdir이 필요합니다');
+  const isMissingOutdir = indexes.length > 1 && !outdir;
+  if (isMissingOutdir) throw new Error('여러 곡을 찍으려면 --outdir이 필요합니다');
   return { indexes, outdir, morph };
 }
 
@@ -54,8 +43,6 @@ function contentTypeOf(name) {
   return extension ? CONTENT_TYPES[extension] : DEFAULT_CONTENT_TYPE;
 }
 
-// 아트워크는 i1.sndcdn.com에 있다. 원격 이미지를 그대로 쓰면 texImage2D가 보안 오류로 막히므로
-// 받아서 같은 오리진으로 내보낸다.
 async function writeAssets(work, indexes, morph) {
   for (const index of indexes) {
     const response = await fetch(artworkUrl(TRACKS[index]));
@@ -74,7 +61,6 @@ function serveDirectory(work) {
   });
 }
 
-// 포트를 0으로 열면 실제 포트는 stderr의 DevTools 배너로만 알 수 있다.
 function readDevtoolsPort(chrome) {
   return new Promise((resolve, reject) => {
     let buffer = '';
@@ -97,8 +83,6 @@ async function openPage(devtools) {
   const cdp = connect(targets.find((t) => t.type === 'page').webSocketDebuggerUrl);
   await cdp.open;
   await cdp.send('Page.enable');
-  // --window-size는 브라우저 크롬을 포함해 뷰포트가 더 작아진다(1200×630 → 1200×543).
-  // OG 비율(1.91:1)이 깨지므로 뷰포트를 정확히 강제한다.
   await cdp.send('Emulation.setDeviceMetricsOverride', {
     width: WIDTH,
     height: HEIGHT,
@@ -154,7 +138,6 @@ async function main() {
     cdp.close();
   } finally {
     if (chrome) {
-      // Chrome이 프로필에 쓰는 중에 지우면 ENOTEMPTY로 실패한다. 종료를 기다린다.
       chrome.kill();
       await once(chrome, 'exit').catch(() => undefined);
     }

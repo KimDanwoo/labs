@@ -84,7 +84,6 @@ export function createRenderPasses(
       bindTexture(gl, 0, scene.texture, bright.uniforms.uSrc ?? null);
       gl.uniform1f(bright.uniforms.uThreshold ?? null, BLOOM_THRESHOLD - hit * THRESHOLD_PER_HIT);
     });
-    // uDir은 uv 단위다. 블룸 타깃 크기가 아니라 캔버스로 나눠 화면상 반경을 축소배율과 무관하게 고정한다.
     quadPass(bloomB, blur, () => {
       bindTexture(gl, 0, bloomA.texture, blur.uniforms.uSrc ?? null);
       gl.uniform2f(blur.uniforms.uDir ?? null, BLUR_PX / canvas.width, 0);

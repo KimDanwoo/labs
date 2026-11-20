@@ -63,7 +63,6 @@ export function useWidgetEngine(engine: PlaybackEngine, retryGeneration: number)
             soundIdsRef.current = readSoundIds(sounds);
             holdsSetRef.current = soundIdsRef.current.length > 1;
             setEngineMode(holdsSetRef.current ? 'set' : 'single');
-            // soundIds가 채워진 뒤에 열어야 skip 경로가 올바른 위치를 찾는다.
             readyRef.current = true;
             setIsReady(true);
             flushQueuedRef.current();

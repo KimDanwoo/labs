@@ -13,11 +13,6 @@ import { VisualSettings } from '@views/player/ui/stage/VisualSettings';
 import { useAtomValue } from 'jotai';
 import { useCallback, useRef, useState } from 'react';
 
-/**
- * 파티클이 모일 자리를 .slot으로 예약한다. 렌더러가 이 요소의 rect를 읽어 좌표를 잡는다.
- * 캔버스가 붙기 전까지는 아트워크를 img로 깔아 빈 무대를 보여주지 않고,
- * WebGL2를 못 쓰는 환경에서는 그 img가 그대로 폴백이 된다.
- */
 export function Stage() {
   const index = useAtomValue(currentIndexAtom);
   const visualMode = useAtomValue(visualModeAtom);
@@ -28,6 +23,7 @@ export function Stage() {
 
   const handleReady = useCallback((ready: boolean) => setCanvasReady(ready), []);
 
+  const isPosterShown = track && (!canvasReady || isStill);
   return (
     <section className="stage order-1 relative flex min-h-0 flex-col items-center justify-center gap-md overflow-y-auto p-md pt-3xl min-[820px]:order-2">
       <div className="stage-caption absolute top-md inset-x-md flex justify-between font-label text-xs text-mute">
@@ -37,10 +33,8 @@ export function Stage() {
         </span>
       </div>
       {!isStill ? <ParticleCanvas slotRef={slot} onReady={handleReady} /> : null}
-      {/* 목록이 따로 화면을 가져가 무대가 넓어졌으니 커버를 폭 상한까지 키운다.
-          dvh 천장은 세로가 짧은 기기에서만 걸린다 — vh는 모바일에서 주소창까지 포함해 실제보다 크다. */}
       <div ref={slot} className="aspect-square w-[min(84%,46dvh)] shrink-0 min-[820px]:w-[min(64%,58vh)]">
-        {track && (!canvasReady || isStill) ? (
+        {isPosterShown ? (
           <img
             src={artworkUrl(track, ARTWORK_TEXTURE_SIZE)}
             alt=""

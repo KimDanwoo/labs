@@ -14,7 +14,6 @@ export function useHeldSoundSync({ tracks, refs }: PlaybackEngine) {
   return useCallback(
     (instance: ScWidget, isDisposed: () => boolean) => {
       if (!holdsSetRef.current) return;
-      // 위젯이 스스로 다음 곡으로 넘어간 경우도 여기로 들어온다 — 목록 하이라이트를 여기서 맞춘다.
       instance.getCurrentSoundIndex((soundIndex) => {
         const id = soundIdsRef.current[soundIndex];
         if (typeof id !== 'number') return;

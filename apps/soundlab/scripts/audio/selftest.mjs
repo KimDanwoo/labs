@@ -1,9 +1,5 @@
 import { GRID_MIN_CONFIDENCE, findGrid } from './grid.mjs';
 
-/**
- * 격자 탐색 자체 검증. `node scripts/analyze-audio.mjs --selftest`
- * 오디오 없이 도는 유일한 검증 지점이라 여기 둔다 — 격자를 잘못 잡으면 화면이 엉뚱한 박에 뛴다.
- */
 const percent = (value) => ((value ?? 0) * 100).toFixed(0);
 
 function check(label, ok, detail) {

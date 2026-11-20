@@ -10,12 +10,6 @@ import { currentIndexAtom, playerScreenAtom } from '@views/player/model/store/pl
 import { PLAYLIST_ID } from '@views/player/config/layout';
 import { QueueIcon } from '@views/player/ui/playlist/QueueIcon';
 
-/**
- * 재생목록 화면과 현재 재생 화면을 오간다.
- *
- * Link/router가 아니라 pushState다 — 라우터로 이동하면 트리가 리마운트되고 재생 엔진 iframe이 사라진다.
- * 주소는 진짜 라우트(/t/<id>/queue)라서 새로고침·공유·뒤로가기가 그대로 동작한다.
- */
 export function QueueToggle() {
   const [screen, setScreen] = useAtom(playerScreenAtom);
   const track = TRACKS[useAtomValue(currentIndexAtom)];

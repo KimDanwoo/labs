@@ -30,10 +30,8 @@ export function usePlaybackEvents(engine: PlaybackEngine) {
 
   return useCallback(
     (instance: ScWidget, isDisposed: () => boolean) => {
-      // 보간을 지금 값에 못 박고 세운다. 일시정지 중 흐른 벽시계 시간이 재생 순간 점프로 새지 않게.
       instance.bind(WIDGET_EVENT.play, () => {
         anchor(interpolated());
-        // 볼륨이 아직 0인 지금 되감아야 이전 위치가 소리로 새지 않는다.
         if (rewindOnSwitch(instance)) return;
         restoreVolume(instance);
         playingRef.current = true;
@@ -44,7 +42,6 @@ export function usePlaybackEvents(engine: PlaybackEngine) {
         syncHeldSound(instance, isDisposed);
       });
       instance.bind(WIDGET_EVENT.pause, () => {
-        // 마지막 보고는 최대 수백 ms 낡았다. 보간해온 값으로 고정해야 멈춘 순간 시간이 뒤로 안 튄다.
         anchor(interpolated());
         remember(reportedMs());
         flushListening();
@@ -57,7 +54,6 @@ export function usePlaybackEvents(engine: PlaybackEngine) {
         flushListening();
       });
       instance.bind(WIDGET_EVENT.finish, () => {
-        // 다음 곡(또는 반복)은 0부터다. 끝난 위치를 물고 있으면 그 곡의 첫 순간이 끝 시간으로 보인다.
         flushListening();
         anchor(0);
         advanceRef.current();

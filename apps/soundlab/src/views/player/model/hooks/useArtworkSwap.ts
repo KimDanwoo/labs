@@ -23,7 +23,8 @@ export function useArtworkSwap(index: number) {
 
   const takeReadyArtwork = () => {
     const image = readyRef.current;
-    if (pendingRef.current === null || !image) return null;
+    if (pendingRef.current === null) return null;
+    if (!image) return null;
     pendingRef.current = null;
     readyRef.current = null;
     wantRef.current = 1;

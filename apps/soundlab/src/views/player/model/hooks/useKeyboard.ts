@@ -3,7 +3,6 @@
 import type { Playback } from '@views/player/model/hooks/usePlayback';
 import { useEffect } from 'react';
 
-/** 방향키만 10초다. YouTube 원본은 5초이고 10초는 J/L. */
 const SEEK_SEC = 10;
 const DIGIT_SEEK_DIVISOR = 10;
 const IGNORED_TARGET_SELECTOR = 'input, textarea, select, [role=slider], [role=menu]';
@@ -56,12 +55,14 @@ export function useKeyboard({ toggle, step, seek, seekBy }: Playback) {
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (hasModifier(event) || isIgnoredTarget(event.target)) return;
+      if (hasModifier(event)) return;
+      if (isIgnoredTarget(event.target)) return;
       const key = normalizeKey(event);
 
-      if (event.code === 'Space' || key === 'k') {
-        // 버튼에 포커스가 있으면 Space는 브라우저가 클릭으로 처리한다. 이중 발동을 막는다.
-        if (event.target instanceof HTMLButtonElement && event.code === 'Space') return;
+      const isPlayPauseKey = event.code === 'Space' || key === 'k';
+      if (isPlayPauseKey) {
+        const isButtonSpace = event.target instanceof HTMLButtonElement && event.code === 'Space';
+        if (isButtonSpace) return;
         event.preventDefault();
         toggle();
         return;

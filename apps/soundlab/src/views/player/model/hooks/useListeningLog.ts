@@ -24,7 +24,8 @@ function isNewSessionTrack(currentId: number, position: number, isPlaying: boole
 function accumulate(pending: PendingListening, currentId: number, position: number, now: number): void {
   const elapsed = position - pending.position;
   const wall = now - pending.at;
-  if (pending.id === currentId && isPlausibleListenStep(elapsed, wall)) pending.ms += Math.min(elapsed, wall);
+  const isPlausibleCurrentStep = pending.id === currentId && isPlausibleListenStep(elapsed, wall);
+  if (isPlausibleCurrentStep) pending.ms += Math.min(elapsed, wall);
   pending.id = currentId;
   pending.position = position;
   pending.at = now;

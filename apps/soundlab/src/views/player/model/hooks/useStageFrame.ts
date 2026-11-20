@@ -37,7 +37,8 @@ function swapArtworkWhenHidden(
   target: number,
   morph: number,
 ): void {
-  if (target !== 0 || morph >= MORPH.swapThreshold) return;
+  if (target !== 0) return;
+  if (morph >= MORPH.swapThreshold) return;
   const image = artwork.takeReadyArtwork();
   if (image) instance.setArtwork(image);
 }
@@ -50,7 +51,8 @@ export function useStageFrame({ rendererRef, layoutRef, reducedMotionRef, isCalm
 
   useFrame((delta) => {
     const instance = rendererRef.current;
-    if (!instance || document.hidden) return;
+    if (!instance) return;
+    if (document.hidden) return;
     const step = Math.min(FRAME.maxStep, delta / FRAME.referenceMs);
     const shouldReduceMotion = reducedMotionRef.current || isCalmMode;
 

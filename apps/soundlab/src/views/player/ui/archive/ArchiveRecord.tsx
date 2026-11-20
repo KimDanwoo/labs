@@ -18,7 +18,11 @@ export function ArchiveRecord({ track, position }: Props): JSX.Element {
   const isCurrent = current === index && isPlaying;
   const href = playerPath(track, PLAYER_SCREEN.nowPlaying);
   const handleOpen = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    if (event.metaKey) return;
+    if (event.ctrlKey) return;
+    if (event.shiftKey) return;
+    if (event.altKey) return;
+    if (event.button !== 0) return;
     event.preventDefault();
     window.history.pushState(window.history.state, '', href);
     setScreen(PLAYER_SCREEN.nowPlaying);

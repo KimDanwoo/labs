@@ -2,10 +2,6 @@ import { artworkUrl, TRACKS } from '@entities/track';
 
 import { ARTWORK_TEXTURE_SIZE } from '@views/player/config/stage';
 
-/**
- * 아트워크는 다른 오리진이므로 crossOrigin 없이는 텍스처 업로드가 보안 오류로 막힌다.
- * 이미지가 아니라 약속을 캐시한다 — 선반입과 실제 전환이 겹쳐도 두 번 받지 않는다.
- */
 const images = new Map<number, Promise<HTMLImageElement>>();
 
 const NEIGHBOR_OFFSETS = [1, -1] as const;
@@ -24,7 +20,6 @@ export function loadArtwork(index: number): Promise<HTMLImageElement> {
     image.src = artworkUrl(track, ARTWORK_TEXTURE_SIZE);
   });
   images.set(index, loading);
-  // 실패한 약속을 캐시에 남기면 그 곡은 영구히 못 받는다. 다음 시도에 다시 받게 비운다.
   loading.catch(() => images.delete(index));
   return loading;
 }

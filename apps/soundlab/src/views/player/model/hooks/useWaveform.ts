@@ -9,14 +9,8 @@ import { cache, warm } from '@views/player/model/waveformCache';
 import { useEffect, useRef } from 'react';
 const LEVEL_SMOOTHING = 0.12;
 const SWELL_SMOOTHING = 0.04;
-/**
- * 비트 한 방이 hit 채널에 얹는 양과 사그라드는 시간.
- * 눈에 보이는 펄스는 파동이 맡고(무대가 beatId를 보고 쏜다) 여기선 블룸에 얇게 얹기만 한다 —
- * hit은 곡의 절정에 쓰는 채널이라 킥마다 최대로 때리면 PRD §6이 거부한 스터터가 된다.
- */
 const BEAT_HIT = 0.25;
 const BEAT_RELEASE_MS = 220;
-/** 이보다 오래 지난 비트는 발화 없이 넘긴다 — 랙·탭 복귀 뒤 밀린 비트가 몰아 터지면 전부 엇박이다. */
 const BEAT_STALE_MS = 150;
 
 const MAX_FRAME_STEP = 3;
@@ -59,7 +53,8 @@ function strikeBeats(beat: BeatState, data: Signals, nowMs: number, delta: numbe
   let struck = 0;
   while (beat.cursor < data.beats.length) {
     const line = data.beats[beat.cursor];
-    if (!line || line[0] > nowMs) break;
+    if (!line) break;
+    if (line[0] > nowMs) break;
     if (nowMs - line[0] <= BEAT_STALE_MS) {
       const strength = line[1] / BEAT_STRENGTH_MAX;
       beat.value = Math.max(beat.value, strength * BEAT_HIT);
@@ -72,10 +67,6 @@ function strikeBeats(beat: BeatState, data: Signals, nowMs: number, delta: numbe
   frameState.beatId++;
 }
 
-/**
- * 곡의 신호를 매 프레임 frameState에 채운다.
- * next는 미리 받아두기만 한다 — 전환 직후 신호가 한 박자 죽지 않게.
- */
 export function useWaveform(track: Track | undefined, next: Track | undefined, isPlaying: boolean) {
   const signals = useRef<Signals | null>(null);
   const playing = useRef(isPlaying);
@@ -106,7 +97,8 @@ export function useWaveform(track: Track | undefined, next: Track | undefined, i
     const step = Math.min(MAX_FRAME_STEP, delta / FRAME_MS);
     const nowMs = frameState.position * frameState.durationMs;
 
-    if (!data || !playing.current) {
+    const isIdle = !data || !playing.current;
+    if (isIdle) {
       relaxFrameState(step);
       return;
     }
@@ -115,7 +107,6 @@ export function useWaveform(track: Track | undefined, next: Track | undefined, i
     seekBeatCursor(beat.current, data, nowMs);
     strikeBeats(beat.current, data, nowMs, delta);
 
-    // 악센트는 이미 시간 램프라 다시 스무딩하지 않는다 — 뭉개면 들이쉼이 사라진다.
     const accent = accentAt(data.peakMs, nowMs);
     frameState.pre = accent.pre;
     frameState.hit = Math.max(accent.hit, beat.current.value);

@@ -10,7 +10,6 @@ import test, { type TestContext } from 'node:test';
 import { act, createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// TS 훅과 동일한 Jotai 엔트리를 사용한다. ESM/CJS 각각의 Provider 컨텍스트를 섞지 않는다.
 const jotai: typeof import('jotai') = createRequire(import.meta.url)('jotai');
 const { Provider, createStore } = jotai;
 
