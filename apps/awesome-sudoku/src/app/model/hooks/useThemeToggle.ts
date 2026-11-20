@@ -1,4 +1,4 @@
-import { THEME_TRANSITION_CLASS, THEME_TRANSITION_MS } from '@entities/sudoku/config/theme';
+import { THEME_TRANSITION_CLASS, THEME_TRANSITION_MS } from '@app/config/theme';
 import { useTheme } from 'next-themes';
 import { useCallback, useSyncExternalStore } from 'react';
 

@@ -1,3 +1,4 @@
+import { GAME_MODE_TITLES } from '@entities/sudoku/config/gameMode';
 import type { SudokuCell } from '@entities/sudoku/model/types/board';
 import type { GameMode } from '@entities/sudoku/model/types/game';
 import { useMemo } from 'react';
@@ -33,8 +34,7 @@ export const useCellAccessibility = ({
 
   const ariaDescription = useMemo(() => {
     const mode = isNoteMode ? '노트 모드' : '입력 모드';
-    const gameType = gameMode === 'killer' ? '킬러 스도쿠' : '클래식 스도쿠';
-    return `${gameType}, ${mode}`;
+    return `${GAME_MODE_TITLES[gameMode]}, ${mode}`;
   }, [isNoteMode, gameMode]);
 
   const tabIndex = useMemo(() => {
