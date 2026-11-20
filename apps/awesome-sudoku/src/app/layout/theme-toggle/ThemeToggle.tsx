@@ -1,6 +1,6 @@
 'use client';
 
-import { useThemeToggle } from '@entities/sudoku/model/theme/hooks/useThemeToggle';
+import { useThemeToggle } from '@app/model/hooks/useThemeToggle';
 import { cn } from '@shared/lib/cn';
 import { memo } from 'react';
 import { LuMoon, LuSun } from 'react-icons/lu';

@@ -2,7 +2,6 @@
 import { GAME_MODE } from '@entities/sudoku/config/game';
 import { boardAtom, gameModeAtom } from '@entities/sudoku/model/store/primitives';
 import { selectCellAtom } from '@entities/sudoku/model/store/selectionAtoms';
-import { useInitializeGame } from '@entities/sudoku/model/sudoku-game/hooks/useInitializeGame';
 import { useKeyboardControls } from '@entities/sudoku/model/sudoku-game/hooks/useKeyboardControls';
 import { KillerCage } from '@entities/sudoku/ui/sudoku-game/KillerCage';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -17,7 +16,6 @@ export const SudokuBoard: React.FC = () => {
   const tableRef = useRef<HTMLTableElement>(null);
 
   useKeyboardControls();
-  useInitializeGame();
 
   const handleSelectCell = useCallback((row: number, col: number) => selectCell({ row, col }), [selectCell]);
 

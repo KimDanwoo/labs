@@ -24,7 +24,7 @@ import {
 import { selectCellAtom } from '@entities/sudoku/model/store/selectionAtoms';
 import { countBoardNumbersAtom } from '@entities/sudoku/model/store/statusAtoms';
 import { toggleTimerAtom } from '@entities/sudoku/model/store/timerAtoms';
-import type { Difficulty, GameMode } from '@entities/sudoku/model/types/game';
+import type { Difficulty } from '@entities/sudoku/model/types/game';
 import { atom } from 'jotai';
 
 /** 마지막 요청만 반영한다 — 생성 중에 난이도를 연타하면 먼저 도착한 옛 판이 새 판을 덮어쓴다 */
@@ -88,10 +88,9 @@ export const resumeOrStartGameAtom = atom(null, async (get, set) => {
   set(highlightedCellsAtom, createEmptyHighlights());
 });
 
-export const switchGameModeAtom = atom(null, (get, set, args: { mode: GameMode; difficulty?: Difficulty }) => {
-  const currentDifficulty = args.difficulty ?? get(difficultyAtom);
-  set(gameModeAtom, args.mode);
-  set(initializeGameAtom, currentDifficulty);
+export const cancelPendingGenerationAtom = atom(null, (_get, set) => {
+  latestRequest += 1;
+  set(isGeneratingAtom, false);
 });
 
 export const restartGameAtom = atom(null, (get, set) => {

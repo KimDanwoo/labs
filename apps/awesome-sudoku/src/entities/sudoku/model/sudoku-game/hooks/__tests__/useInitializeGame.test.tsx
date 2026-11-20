@@ -1,10 +1,13 @@
+import { GAME_LEVEL, GAME_MODE } from '@entities/sudoku/config/game';
 import { cellAt } from '@entities/sudoku/lib/gridAccess';
 import { requestPuzzle } from '@entities/sudoku/lib/puzzleService';
 import { fillCellAtom } from '@entities/sudoku/model/store/cellValueAtoms';
 import { resumeOrStartGameAtom } from '@entities/sudoku/model/store/gameLifecycleAtoms';
+import { parkedGamesAtom } from '@entities/sudoku/model/store/parkedGameAtoms';
 import {
   boardAtom,
   currentTimeAtom,
+  gameModeAtom,
   highlightedCellsAtom,
   isCompletedAtom,
   isGeneratingAtom,
@@ -15,6 +18,7 @@ import {
 } from '@entities/sudoku/model/store/primitives';
 import { useInitializeGame } from '@entities/sudoku/model/sudoku-game/hooks/useInitializeGame';
 import type { Grid, SudokuBoard } from '@entities/sudoku/model/types/board';
+import type { GameMode } from '@entities/sudoku/model/types/game';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createStore, Provider } from 'jotai';
 import { StrictMode, type ReactNode } from 'react';
@@ -68,8 +72,8 @@ const SAVED_GAME = {
 
 type GameStore = ReturnType<typeof createStore>;
 
-const renderBoard = (store: GameStore) =>
-  renderHook(() => useInitializeGame(), {
+const renderBoard = (store: GameStore, mode: GameMode = GAME_MODE.CLASSIC) =>
+  renderHook(() => useInitializeGame(mode), {
     wrapper: ({ children }: { children: ReactNode }) => (
       <StrictMode>
         <Provider store={store}>{children}</Provider>
@@ -180,5 +184,78 @@ describe('useInitializeGame — 이어 하기와 새로 시작', () => {
     await waitFor(() => expect(store.get(solutionAtom)).toEqual(SOLUTION));
     expect(requestPuzzleMock).toHaveBeenCalledTimes(1);
     expect(store.get(currentTimeAtom)).toBe(0);
+  });
+});
+
+const KILLER_GAME = {
+  ...SAVED_GAME,
+  currentTime: SAVED_TIME + 1,
+  cages: [{ id: 0, sum: SOLUTION[0]?.[0] ?? 0, cells: [[0, 0]] }],
+};
+
+const deferred = <T,>() => {
+  let resolve: (value: T) => void = () => undefined;
+  const promise = new Promise<T>((settle) => {
+    resolve = settle;
+  });
+  return { promise, resolve };
+};
+
+describe('useInitializeGame — 주소별 모드와 쉬는 판', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    requestPuzzleMock.mockReset();
+    requestPuzzleMock.mockResolvedValue({ board: puzzleBoard(), solution: SOLUTION, cages: [] });
+  });
+
+  it('킬러를 하던 채로 클래식을 열면 킬러 판은 쉬는 판으로 남고 클래식은 새로 시작한다', async () => {
+    saveToStorage({ ...KILLER_GAME, gameMode: GAME_MODE.KILLER });
+
+    const store = renderOnFreshPage();
+
+    await waitFor(() => expect(requestPuzzleMock).toHaveBeenCalledWith(GAME_MODE.CLASSIC, GAME_LEVEL.MEDIUM));
+    expect(store.get(gameModeAtom)).toBe(GAME_MODE.CLASSIC);
+    expect(store.get(parkedGamesAtom)[GAME_MODE.KILLER]?.currentTime).toBe(KILLER_GAME.currentTime);
+    expect(store.get(parkedGamesAtom)[GAME_MODE.KILLER]?.board).toEqual(KILLER_GAME.board);
+  });
+
+  it('킬러로 돌아오면 쉬던 판을 그대로 이어 하고, 떠난 클래식 판은 쉬는 판이 된다', async () => {
+    saveToStorage({ ...KILLER_GAME, gameMode: GAME_MODE.KILLER });
+    const store = createStore();
+    renderBoard(store).unmount();
+    await waitFor(() => expect(store.get(solutionAtom)).toEqual(SOLUTION));
+
+    renderBoard(store, GAME_MODE.KILLER);
+
+    expect(requestPuzzleMock).toHaveBeenCalledTimes(1);
+    expect(store.get(gameModeAtom)).toBe(GAME_MODE.KILLER);
+    expect(store.get(boardAtom)).toEqual(KILLER_GAME.board);
+    expect(store.get(currentTimeAtom)).toBe(KILLER_GAME.currentTime);
+    expect(store.get(parkedGamesAtom)[GAME_MODE.KILLER]).toBeUndefined();
+    expect(store.get(parkedGamesAtom)[GAME_MODE.CLASSIC]?.solution).toEqual(SOLUTION);
+  });
+
+  it('새 판을 만드는 중에 다른 모드로 옮기면 늦게 도착한 판이 옮겨 간 판을 덮지 않는다', async () => {
+    const lateClassic = deferred<{ board: SudokuBoard; solution: Grid; cages: [] }>();
+    requestPuzzleMock.mockReturnValueOnce(lateClassic.promise);
+    saveToStorage({ parkedGames: { [GAME_MODE.KILLER]: KILLER_GAME } });
+    const store = createStore();
+    renderBoard(store).unmount();
+
+    renderBoard(store, GAME_MODE.KILLER);
+    lateClassic.resolve({ board: puzzleBoard(), solution: SOLUTION, cages: [] });
+    await lateClassic.promise;
+
+    expect(store.get(gameModeAtom)).toBe(GAME_MODE.KILLER);
+    expect(store.get(boardAtom)).toEqual(KILLER_GAME.board);
+    expect(store.get(isGeneratingAtom)).toBe(false);
+  });
+
+  it('쉬는 판이 망가져 있으면 버리고 그 모드의 새 판을 만든다', async () => {
+    saveToStorage({ parkedGames: { [GAME_MODE.KILLER]: { ...KILLER_GAME, solution: [[0]] } } });
+
+    renderBoard(createStore(), GAME_MODE.KILLER);
+
+    await waitFor(() => expect(requestPuzzleMock).toHaveBeenCalledWith(GAME_MODE.KILLER, GAME_LEVEL.MEDIUM));
   });
 });

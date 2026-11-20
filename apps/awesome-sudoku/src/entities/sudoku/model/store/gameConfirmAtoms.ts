@@ -1,8 +1,8 @@
 import { hasPlayerProgress } from '@entities/sudoku/model/services/playerProgress';
 import { resetUserInputsAtom } from '@entities/sudoku/model/store/cellValueAtoms';
-import { switchGameModeAtom } from '@entities/sudoku/model/store/gameLifecycleAtoms';
+import { initializeGameAtom } from '@entities/sudoku/model/store/gameLifecycleAtoms';
 import { boardAtom, difficultyAtom, gameModeAtom, isCompletedAtom } from '@entities/sudoku/model/store/primitives';
-import type { DiscardAction, NewGameRequest } from '@entities/sudoku/model/types/game';
+import type { Difficulty, DiscardAction } from '@entities/sudoku/model/types/game';
 import { atom } from 'jotai';
 
 interface GameConfirm {
@@ -19,7 +19,7 @@ const runDiscardAtom = atom(null, (_get, set, action: DiscardAction) => {
     set(resetUserInputsAtom);
     return;
   }
-  set(switchGameModeAtom, action.request);
+  void set(initializeGameAtom, action.request.difficulty);
 });
 
 const requestDiscardAtom = atom(null, (get, set, action: DiscardAction) => {
@@ -30,8 +30,8 @@ const requestDiscardAtom = atom(null, (get, set, action: DiscardAction) => {
   set(runDiscardAtom, action);
 });
 
-export const requestNewGameAtom = atom(null, (get, set, change: Partial<NewGameRequest>) => {
-  const request = { mode: change.mode ?? get(gameModeAtom), difficulty: change.difficulty ?? get(difficultyAtom) };
+export const requestNewGameAtom = atom(null, (get, set, difficulty: Difficulty = get(difficultyAtom)) => {
+  const request = { mode: get(gameModeAtom), difficulty };
   set(requestDiscardAtom, { kind: 'newGame', request });
 });
 

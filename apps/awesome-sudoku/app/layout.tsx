@@ -1,4 +1,5 @@
 import '@app/globals.css';
+import { AppHeader } from '@app/layout/AppHeader';
 import { AppProviders } from '@app/providers/AppProviders';
 import '@repo/fonts/fonts.css';
 import type { Metadata, Viewport } from 'next';
@@ -47,8 +48,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className="antialiased">
-        <AppProviders>{children}</AppProviders>
+      <body className="antialiased bg-surface-secondary">
+        <AppProviders>
+          <AppHeader />
+          {children}
+        </AppProviders>
       </body>
     </html>
   );
