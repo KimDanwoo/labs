@@ -8,6 +8,7 @@ import { prepareRunnerModel } from '../../lib/runner/prepareRunnerModel';
 import { position, rotationY, scale } from '../../lib/runner/runner';
 import { updateRunnerPose, type PoseMemory } from '../../lib/runner/runnerPose';
 import { useDispose } from '../../model/hooks/useDispose';
+import { useRunnerDetail } from '../../model/hooks/useRunnerDetail';
 import { useRunnerGaits } from '../../model/hooks/useRunnerGaits';
 import { RUNNER_MODEL_URL } from '../../model/runner/constants';
 import { FlowingHair } from './FlowingHair';
@@ -27,6 +28,7 @@ export function Runner({ speedRef }: RunnerProps) {
   const { actions } = useAnimations(animations, root);
   const gaitRef = useRunnerGaits(actions);
   useDispose(prepared.materials);
+  useRunnerDetail(prepared);
 
   useFrame((state, rawDelta) => {
     updateRunnerPose(
