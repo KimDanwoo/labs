@@ -99,9 +99,9 @@ export function rebuildKeyboardDeck(model: THREE.Object3D): void {
 }
 function hideOldMapPlaque(model: THREE.Object3D): void {
   model.traverse((child) => {
-    if (child instanceof THREE.Mesh && !Array.isArray(child.material) && child.material.name === OLD_MAP_PLAQUE) {
-      child.geometry.setDrawRange(0, 0);
-    }
+    if (!(child instanceof THREE.Mesh)) return;
+    if (Array.isArray(child.material)) return;
+    if (child.material.name === OLD_MAP_PLAQUE) child.geometry.setDrawRange(0, 0);
   });
 }
 

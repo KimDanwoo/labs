@@ -54,7 +54,9 @@ export function bindMapDrag(target: Window, host: MapDragHost): MapDrag {
   };
 
   target.addEventListener('pointerdown', (event) => {
-    if (drag || !host.isActive() || isInteractive(event.target)) return;
+    if (drag) return;
+    if (!host.isActive()) return;
+    if (isInteractive(event.target)) return;
     const camera = host.camera().clone();
     const grabbed = groundPoint(camera, host.viewport(), event);
     if (!grabbed) return;
@@ -64,7 +66,8 @@ export function bindMapDrag(target: Window, host: MapDragHost): MapDrag {
 
   target.addEventListener('pointermove', (event) => {
     if (event.pointerId !== drag?.pointerId) return;
-    if (!host.isActive() || isReleased(event)) {
+    const shouldEndDrag = !host.isActive() || isReleased(event);
+    if (shouldEndDrag) {
       cancel();
       return;
     }

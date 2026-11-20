@@ -34,7 +34,8 @@ function showGamepadLabels({ xbox, playstation }: Labels): void {
 
 function dressMenuSign(board: THREE.Object3D): void {
   for (const child of board.children) {
-    if (child instanceof THREE.Mesh && !LABEL_PREFIX.test(child.name)) child.geometry.setDrawRange(0, 0);
+    const isUnlabeledMesh = child instanceof THREE.Mesh && !LABEL_PREFIX.test(child.name);
+    if (isUnlabeledMesh) child.geometry.setDrawRange(0, 0);
   }
   const matrix = new THREE.Matrix4()
     .makeTranslation(MENU_SIGN_OFFSET, 0, 0)
@@ -92,7 +93,8 @@ export class BlackBoard {
       repeatDelay: REPEAT_DELAY,
       paused: true,
       onRepeat: () => {
-        if (isIdle() || !this.isActive) this.#timeline.pause();
+        const shouldPauseTimeline = isIdle() || !this.isActive;
+        if (shouldPauseTimeline) this.#timeline.pause();
       },
     });
     this.#timeline.to(group.position, { y: JUMP.height, ease: 'power2.out', duration: JUMP.duration }, JUMP.start);

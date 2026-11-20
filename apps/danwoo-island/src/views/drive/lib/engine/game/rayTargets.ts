@@ -21,7 +21,8 @@ export function nearestHit<T>(candidates: readonly T[], distanceOf: (candidate: 
   let nearestDistance = Infinity;
   for (const candidate of candidates) {
     const distance = distanceOf(candidate);
-    if (distance === null || distance >= nearestDistance) continue;
+    if (distance === null) continue;
+    if (distance >= nearestDistance) continue;
     nearest = candidate;
     nearestDistance = distance;
   }
@@ -36,9 +37,11 @@ function setIntersecting(target: RayTarget, isIntersecting: boolean): void {
 
 export function focusTarget(candidates: readonly RayTarget[], nearest: RayTarget | null): void {
   for (const candidate of candidates) {
-    if (candidate !== nearest && candidate.isIntersecting) setIntersecting(candidate, false);
+    const shouldClear = candidate !== nearest && candidate.isIntersecting;
+    if (shouldClear) setIntersecting(candidate, false);
   }
-  if (nearest && !nearest.isIntersecting) setIntersecting(nearest, true);
+  const shouldMarkNearest = nearest && !nearest.isIntersecting;
+  if (shouldMarkNearest) setIntersecting(nearest, true);
 }
 
 export function pressTarget(target: RayTarget): void {
@@ -55,7 +58,8 @@ export function releaseTargets(targets: readonly RayTarget[], isClick: boolean):
     if (target.isIntersecting) target.onUp?.();
     if (!target.isDown) continue;
     target.isDown = false;
-    if (target.isIntersecting && isClick) target.onClick?.();
+    const isClickedTarget = target.isIntersecting && isClick;
+    if (isClickedTarget) target.onClick?.();
     if (!target.isIntersecting) target.onUp?.();
   }
 }

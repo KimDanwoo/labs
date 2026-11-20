@@ -39,7 +39,8 @@ export class Area {
       'tick',
       () => {
         this.#testFrustum();
-        if (!this.frustum || this.frustum.isIn) this.update();
+        const isInView = !this.frustum || this.frustum.isIn;
+        if (isInView) this.update();
       },
       TICK_ORDER.area,
     );
@@ -48,7 +49,8 @@ export class Area {
   setObjects(): void {
     for (const child of [...this.model.children]) {
       const preventAutoAdd: unknown = child.userData.preventAutoAdd;
-      if (preventAutoAdd === undefined || preventAutoAdd === false) this.#addChild(child);
+      const shouldAutoAdd = preventAutoAdd === undefined || preventAutoAdd === false;
+      if (shouldAutoAdd) this.#addChild(child);
       this.references.parse(child);
     }
   }
@@ -69,7 +71,8 @@ export class Area {
     const preventFrustum: unknown = child.userData.preventFrustum;
     const isStaticVisual = Boolean(object.visual) && (!object.physical || object.physical.type === 'fixed');
     const isHideable = (isStaticVisual && preventFrustum === undefined) || preventFrustum === false;
-    if (isHideable && object.visual) this.objects.hideable.push(object.visual.object3D);
+    if (!isHideable) return;
+    if (object.visual) this.objects.hideable.push(object.visual.object3D);
   }
 
   requireReference(name: string): THREE.Object3D {

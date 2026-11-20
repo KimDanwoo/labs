@@ -108,7 +108,8 @@ export class InteractivePoint {
     const ndcX = this.#group.getWorldPosition(new THREE.Vector3()).project(camera).x;
     const awayFromCenter = ndcX < 0 ? 'right' : 'left';
     const align = Math.abs(ndcX) < CENTER_BIAS_NDC ? this.#defaultAlign : oppositeAlign(awayFromCenter);
-    if (align === this.#align || !this.#labelMap) return;
+    if (align === this.#align) return;
+    if (!this.#labelMap) return;
     this.#align = align;
     this.#labelOffset.value = concealedOffset(align);
     const art = cachedLabelArt(this.#labelArt, this.#options.text ?? '', align);

@@ -41,8 +41,10 @@ export class Respawns {
   getClosest(position: THREE.Vector3): Respawn {
     const distanceTo = (respawn: Respawn): number =>
       Math.hypot(respawn.position.x - position.x, respawn.position.z - position.z);
+    const isCloserThan = (respawn: Respawn, best: Respawn | null): boolean =>
+      best === null || distanceTo(respawn) < distanceTo(best);
     const closest = [...this.#items.values()].reduce<Respawn | null>(
-      (best, respawn) => (!best || distanceTo(respawn) < distanceTo(best) ? respawn : best),
+      (best, respawn) => (isCloserThan(respawn, best) ? respawn : best),
       null,
     );
     if (!closest) throw new Error('No respawns loaded');

@@ -144,10 +144,12 @@ export class PhysicsVehicle {
   }
 
   #testStop(): void {
-    if (this.speed < STOP_THRESHOLDS.low && !this.#isStopped) {
+    const hasJustStopped = this.speed < STOP_THRESHOLDS.low && !this.#isStopped;
+    const hasJustStarted = this.speed > STOP_THRESHOLDS.high && this.#isStopped;
+    if (hasJustStopped) {
       this.#isStopped = true;
       this.events.trigger('stop');
-    } else if (this.speed > STOP_THRESHOLDS.high && this.#isStopped) {
+    } else if (hasJustStarted) {
       this.#isStopped = false;
       this.events.trigger('start');
     }

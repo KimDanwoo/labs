@@ -52,8 +52,10 @@ export class Gamepad {
     const { value: previousValue, pressed: wasPressed } = button;
     button.value = value;
     button.pressed = value > BUTTON_PRESSED_ZONE;
-    if (button.pressed && !wasPressed) this.events.trigger('down', button);
-    if (!button.pressed && wasPressed) this.events.trigger('up', button);
+    const hasJustPressed = button.pressed && !wasPressed;
+    if (hasJustPressed) this.events.trigger('down', button);
+    const hasJustReleased = !button.pressed && wasPressed;
+    if (hasJustReleased) this.events.trigger('up', button);
     if (value !== previousValue) this.events.trigger('change', button);
   }
 

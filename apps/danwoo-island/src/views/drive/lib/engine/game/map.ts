@@ -146,7 +146,8 @@ export class WorldMap {
   }
 
   #reframe(): void {
-    if (!this.#modal.isOpen || this.#destination) return;
+    if (!this.#modal.isOpen) return;
+    if (this.#destination) return;
     const frame = this.#frame();
     this.#bounds = frame;
     flyFocus(frame.center, REFRAME_DURATION);

@@ -69,13 +69,15 @@ export class Game extends GameRegistry {
 
   model(name: string): GLTF {
     const resource = this.resources[name];
-    if (!resource || !isModel(resource)) throw new Error(`Model ${name} is not loaded`);
+    if (!resource) throw new Error(`Model ${name} is not loaded`);
+    if (!isModel(resource)) throw new Error(`Model ${name} is not loaded`);
     return resource;
   }
 
   texture(name: string): THREE.Texture {
     const resource = this.resources[name];
-    if (!resource || isModel(resource)) throw new Error(`Texture ${name} is not loaded`);
+    if (!resource) throw new Error(`Texture ${name} is not loaded`);
+    if (isModel(resource)) throw new Error(`Texture ${name} is not loaded`);
     return resource;
   }
 

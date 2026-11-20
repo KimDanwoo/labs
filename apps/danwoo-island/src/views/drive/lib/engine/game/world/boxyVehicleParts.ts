@@ -20,7 +20,8 @@ export function shadedMaterial(shade: string): MeshDefaultMaterial {
 function paintUv(geometry: THREE.BufferGeometry): void {
   const positions = geometry.attributes.position;
   const uv = geometry.attributes.uv;
-  if (!positions || !uv) return;
+  if (!positions) return;
+  if (!uv) return;
   for (let index = 0; index < uv.count; index += 1) {
     uv.setXY(
       index,

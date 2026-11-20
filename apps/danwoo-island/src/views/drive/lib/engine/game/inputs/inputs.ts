@@ -90,7 +90,8 @@ export class Inputs {
 
   change(key: string, value: ActionValue = 1): void {
     for (const action of this.#actionsFor(key)) {
-      if (!this.#isAllowed(action) || isSameValue(action.value, value)) continue;
+      if (!this.#isAllowed(action)) continue;
+      if (isSameValue(action.value, value)) continue;
       action.value = value;
       action.trigger = 'change';
       this.#emit('actionChange', action);
@@ -133,7 +134,8 @@ export class Inputs {
   }
 
   #isAllowed(action: Action): boolean {
-    if (this.filters.size === 0 || action.categories.length === 0) return true;
+    const isUnfiltered = this.filters.size === 0 || action.categories.length === 0;
+    if (isUnfiltered) return true;
     return action.categories.some((category) => this.filters.has(category));
   }
 
@@ -165,7 +167,8 @@ export class Inputs {
   #listenNipple(): void {
     this.addActions([NIPPLE_ACTION]);
     this.events.on(NIPPLE_ACTION.name, (action) => {
-      if (this.mode !== INPUT_MODE.touch || !action.trigger) return;
+      if (this.mode !== INPUT_MODE.touch) return;
+      if (!action.trigger) return;
       this.nipple.updateFromPointer(this.pointer, { trigger: action.trigger });
     });
   }

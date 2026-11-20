@@ -16,7 +16,8 @@ import type { OverviewFrame, ScreenInsets } from '@views/drive/lib/engine/game/v
 export function mapInsets(width: number, height: number): ScreenInsets {
   const isNarrow = width <= COMPACT_SCREEN.width;
   const isShort = height <= COMPACT_SCREEN.height;
-  if (isShort && !isNarrow) return FRAME_INSETS.short;
+  const isShortAndWide = isShort && !isNarrow;
+  if (isShortAndWide) return FRAME_INSETS.short;
   return isNarrow ? FRAME_INSETS.compact : FRAME_INSETS.wide;
 }
 

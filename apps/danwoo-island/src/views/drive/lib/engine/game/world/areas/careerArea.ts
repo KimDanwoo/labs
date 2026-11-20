@@ -83,7 +83,8 @@ export class CareerArea extends Area {
     const labelReveal = uniform(0);
     const textMesh = stone.children.find((child) => child.name.startsWith('careerText'));
     const lineColor: unknown = userData.color;
-    if (textMesh instanceof THREE.Mesh && isLineColor(lineColor)) {
+    const isColoredText = textMesh instanceof THREE.Mesh && isLineColor(lineColor);
+    if (isColoredText) {
       textMesh.castShadow = false;
       textMesh.receiveShadow = false;
       textMesh.material = labelMaterial(profileTexture(userData.texture), lineColor, labelReveal);
@@ -142,10 +143,12 @@ export class CareerArea extends Area {
   }
 
   #updateStoneState(line: CareerLine, delta: number): void {
-    if (line.isIn && !line.isUp) {
+    const shouldRise = line.isIn && !line.isUp;
+    const shouldSink = !line.isIn && (delta <= line.size || line.hasEnd);
+    if (shouldRise) {
       line.isUp = true;
       this.#stoneOut.play(line.origin, line.index);
-    } else if (!line.isIn && (delta <= line.size || line.hasEnd)) {
+    } else if (shouldSink) {
       this.#sink(line);
     }
   }

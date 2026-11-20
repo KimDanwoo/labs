@@ -41,7 +41,8 @@ export class KonamiCode {
     const path = VEHICLE_MODELS[count % VEHICLE_MODELS.length];
     const resources = await game.resourcesLoader.load([modelResource('vehicle', `${path}?cb=${count}`)]);
     const model = resources.vehicle;
-    if (!model || !isModel(model)) throw new Error('Vehicle model failed to load');
+    if (!model) throw new Error('Vehicle model failed to load');
+    if (!isModel(model)) throw new Error('Vehicle model failed to load');
 
     game.world.visualVehicle?.destroy();
     game.world.visualVehicle = new VisualVehicle(model.scene);

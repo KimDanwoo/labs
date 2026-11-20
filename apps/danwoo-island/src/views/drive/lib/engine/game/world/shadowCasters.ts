@@ -7,7 +7,8 @@ const size = new THREE.Vector3();
 const worldBox = new THREE.Box3();
 
 function isNegligibleCaster(mesh: THREE.Mesh): boolean {
-  if (mesh instanceof THREE.InstancedMesh || mesh.count > 1) return false;
+  const isMultiInstance = mesh instanceof THREE.InstancedMesh || mesh.count > 1;
+  if (isMultiInstance) return false;
   const { geometry } = mesh;
   if (!geometry.attributes.position) return false;
   if (!geometry.boundingBox) geometry.computeBoundingBox();
@@ -20,7 +21,9 @@ function isNegligibleCaster(mesh: THREE.Mesh): boolean {
 export function pruneShadowCasters(root: THREE.Object3D): void {
   root.updateMatrixWorld(true);
   root.traverse((child) => {
-    if (!(child instanceof THREE.Mesh) || !child.castShadow || !isNegligibleCaster(child)) return;
+    if (!(child instanceof THREE.Mesh)) return;
+    if (!child.castShadow) return;
+    if (!isNegligibleCaster(child)) return;
     child.castShadow = false;
     child.userData.preventShadow = true;
   });

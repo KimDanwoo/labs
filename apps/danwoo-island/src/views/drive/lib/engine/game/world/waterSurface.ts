@@ -120,7 +120,8 @@ export class WaterSurface {
   }
 
   #applyQuality(level: QualityLevel): void {
-    if (level === QUALITY.high && this.#blurredOutput) this.#material.outputNode = this.#blurredOutput;
+    const shouldBlurWater = level === QUALITY.high && this.#blurredOutput;
+    if (shouldBlurWater) this.#material.outputNode = this.#blurredOutput;
     else if (level === QUALITY.low) this.#material.outputNode = this.#material.shadedOutput;
     this.#material.needsUpdate = true;
   }
@@ -165,7 +166,9 @@ export class WaterSurface {
       z: 0,
     });
     const isEnabled = physical.body.isEnabled();
-    if (ratio > 0 && !isEnabled) objects.enable(this.ice);
-    else if (ratio <= 0 && isEnabled) objects.disable(this.ice);
+    const shouldEnableIce = ratio > 0 && !isEnabled;
+    const shouldDisableIce = ratio <= 0 && isEnabled;
+    if (shouldEnableIce) objects.enable(this.ice);
+    else if (shouldDisableIce) objects.disable(this.ice);
   }
 }

@@ -19,7 +19,8 @@ const ARTWORK_EXTENSIONS = new Set(['.jpg', '.png']);
 
 function validateUrl(value) {
   const url = new URL(value);
-  if (url.protocol !== 'https:' || url.username || url.password) throw new Error('포트폴리오 링크는 HTTPS여야 합니다.');
+  const isUnsafeUrl = url.protocol !== 'https:' || url.username || url.password;
+  if (isUnsafeUrl) throw new Error('포트폴리오 링크는 HTTPS여야 합니다.');
   return url.href;
 }
 
@@ -30,7 +31,8 @@ function requireHost(value, host) {
 }
 
 function toJukeboxTrack(track) {
-  if (!Number.isSafeInteger(track.id) || track.id <= 0) throw new Error(`잘못된 곡 ID입니다: ${track.id}`);
+  const isInvalidTrackId = !Number.isSafeInteger(track.id) || track.id <= 0;
+  if (isInvalidTrackId) throw new Error(`잘못된 곡 ID입니다: ${track.id}`);
   if (!(track.durationMs > 0)) throw new Error(`곡 길이가 없습니다: ${track.title}`);
   if (!ARTWORK_EXTENSIONS.has(track.artworkExt)) throw new Error(`잘못된 아트워크 확장자입니다: ${track.title}`);
   return {

@@ -48,7 +48,8 @@ const SETTLED_SHIFT = 0.01;
 function ndcWindow(size: number, startInset: number, endInset: number): NdcWindow {
   const low = -1 + (2 * startInset) / size;
   const high = 1 - (2 * endInset) / size;
-  return low < 0 && high > 0 ? { low, high } : FULL_WINDOW;
+  const isStraddlingZero = low < 0 && high > 0;
+  return isStraddlingZero ? { low, high } : FULL_WINDOW;
 }
 
 function cameraBasis(phi: number, theta: number): CameraBasis {

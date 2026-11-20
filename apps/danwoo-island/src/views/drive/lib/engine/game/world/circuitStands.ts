@@ -108,7 +108,8 @@ export function tentPole(parts: Parts, box: THREE.Box3): void {
 function replaceTentCanopy(canopy: THREE.Mesh): void {
   canopy.geometry.computeBoundingBox();
   const box = canopy.geometry.boundingBox;
-  if (!box || !canopy.parent) return;
+  if (!box) return;
+  if (!canopy.parent) return;
   canopy.updateMatrix();
   const matrix = canopy.matrix
     .clone()
@@ -120,7 +121,8 @@ function replaceTentCanopy(canopy: THREE.Mesh): void {
 export function rebuildTentCanopies(model: THREE.Object3D): void {
   const canopies: THREE.Mesh[] = [];
   model.traverse((child) => {
-    if (child instanceof THREE.Mesh && TENT_CANOPY.test(child.name)) canopies.push(child);
+    const isCanopy = child instanceof THREE.Mesh && TENT_CANOPY.test(child.name);
+    if (isCanopy) canopies.push(child);
   });
   for (const canopy of canopies) replaceTentCanopy(canopy);
 }

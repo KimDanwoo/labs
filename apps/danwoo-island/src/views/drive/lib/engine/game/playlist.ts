@@ -76,7 +76,9 @@ export class Playlist {
   }
 
   resume(): void {
-    if (!this.#host.canPlay() || this.#switchCall || this.current?.sound.playing()) return;
+    if (!this.#host.canPlay()) return;
+    if (this.#switchCall) return;
+    if (this.current?.sound.playing()) return;
     this.#renewRetries();
     this.#startCurrent();
   }
@@ -88,7 +90,8 @@ export class Playlist {
   }
 
   next(): void {
-    if (this.#switchCall || !this.#host.canPlay()) return;
+    if (this.#switchCall) return;
+    if (!this.#host.canPlay()) return;
     this.#host.playDiscChange();
     this.current?.sound.stop();
     this.#switchCall = this.#host.delay(SONG_SWITCH_DELAY, () => {
@@ -147,13 +150,15 @@ export class Playlist {
   }
 
   #handleLoadError(song: Song, sound: SongStream): void {
-    if (song.sound !== sound || song.retryCall) return;
+    if (song.sound !== sound) return;
+    if (song.retryCall) return;
     song.loadState = 'failed';
     if (song.loadRetries >= SONG_LOAD_RETRY.attempts) return;
     song.loadRetries += 1;
     song.retryCall = this.#host.delay(SONG_LOAD_RETRY.delay, () => {
       song.retryCall = null;
-      if (song.sound !== sound || song.loadState !== 'failed') return;
+      if (song.sound !== sound) return;
+      if (song.loadState !== 'failed') return;
       const shouldPlay = this.current === song && this.#host.canPlay();
       if (shouldPlay) this.#startCurrent();
       else this.#load(song);

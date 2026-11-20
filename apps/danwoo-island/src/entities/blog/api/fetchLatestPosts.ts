@@ -24,7 +24,8 @@ const HEX_ENTITY = /^#x/i;
 
 function codePoint(digits: string, radix: number): number | null {
   const value = Number.parseInt(digits, radix);
-  return Number.isInteger(value) && value >= 0 && value <= MAX_CODE_POINT ? value : null;
+  const isValidCodePoint = Number.isInteger(value) && value >= 0 && value <= MAX_CODE_POINT;
+  return isValidCodePoint ? value : null;
 }
 
 function numericEntity(name: string): number | null {
@@ -41,7 +42,8 @@ function decodeEntity(entity: string, name: string): string {
 
 function decode(text: string): string {
   const trimmed = text.trim();
-  if (trimmed.startsWith(CDATA_OPEN) && trimmed.endsWith(CDATA_CLOSE)) {
+  const isCdata = trimmed.startsWith(CDATA_OPEN) && trimmed.endsWith(CDATA_CLOSE);
+  if (isCdata) {
     return trimmed.slice(CDATA_OPEN.length, -CDATA_CLOSE.length);
   }
   return trimmed.replace(ENTITY, decodeEntity);
@@ -82,7 +84,10 @@ function toLatestPost(item: string): LatestPost | null {
   const title = tag(item, 'title');
   const url = tag(item, 'link');
   const pubDate = tag(item, 'pubDate');
-  if (!title || !url || !pubDate || !isBlogPostUrl(url)) return null;
+  if (!title) return null;
+  if (!url) return null;
+  if (!pubDate) return null;
+  if (!isBlogPostUrl(url)) return null;
   const publishedAt = new Date(pubDate);
   if (Number.isNaN(publishedAt.getTime())) return null;
   return {
@@ -95,7 +100,8 @@ function toLatestPost(item: string): LatestPost | null {
 }
 
 export function parseLatestPosts(rss: string, limit = LATEST_POSTS_LIMIT): LatestPost[] {
-  if (rss.length > MAX_RSS_LENGTH || !FEED_ROOT.test(rss)) throw new Error('Blog RSS is not a feed');
+  const isUnreadableFeed = rss.length > MAX_RSS_LENGTH || !FEED_ROOT.test(rss);
+  if (isUnreadableFeed) throw new Error('Blog RSS is not a feed');
   return items(rss)
     .map(toLatestPost)
     .filter((post): post is LatestPost => post !== null)

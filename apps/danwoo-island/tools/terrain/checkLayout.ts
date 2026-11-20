@@ -70,10 +70,11 @@ function zoneProblems(name: AreaKey): string[] {
   const { placed, bounds } = AREA_ANCHORS[name];
   const box = zoneBox(placed, bounds);
   const wet = wetCells(grown(box, ENTRY_MARGIN));
+  const isOverlappingTrack = name !== 'circuit' && touchesTrack(box);
   return [
     wet > 0 ? `${name}: 둘레 ${ENTRY_MARGIN}m 안에 물 ${wet}칸` : '',
     propsIn(box) > 0 ? `${name}: 구역 안에 소품 ${propsIn(box)}개` : '',
-    name !== 'circuit' && touchesTrack(box) ? `${name}: 트랙과 겹침` : '',
+    isOverlappingTrack ? `${name}: 트랙과 겹침` : '',
   ];
 }
 
@@ -100,9 +101,10 @@ function respawnProblems(name: string, respawn: RespawnPoint): string[] {
     ([other, anchor]) => other !== respawn.area && isInside(point, zoneBox(anchor.placed, anchor.bounds)),
   );
   const nearestProp = Math.min(...props.map(([x, z]) => Math.hypot(point[0] - x, point[1] - z)));
+  const isRespawnOnTrack = respawn.area !== 'circuit' && trackClearance(point) < RESPAWN_TRACK_ROOM;
   return [
     landDistance(point) < RESPAWN_SHORE ? `리스폰 ${name}: 물가 ${RESPAWN_SHORE}m 안` : '',
-    respawn.area !== 'circuit' && trackClearance(point) < RESPAWN_TRACK_ROOM ? `리스폰 ${name}: 트랙 위` : '',
+    isRespawnOnTrack ? `리스폰 ${name}: 트랙 위` : '',
     nearestProp < RESPAWN_PROP_ROOM ? `리스폰 ${name}: 소품이 ${nearestProp.toFixed(1)}m 앞` : '',
     ...intruded.map(([other]) => `리스폰 ${name}: ${other} 구역 안`),
   ];
@@ -112,7 +114,8 @@ function spacingProblems(): string[] {
   return zones.flatMap(([name, anchor], index) =>
     zones.slice(index + 1).flatMap(([other, otherAnchor]) => {
       const gap = gapBetween(zoneBox(anchor.placed, anchor.bounds), zoneBox(otherAnchor.placed, otherAnchor.bounds));
-      const wanted = name === 'circuit' || other === 'circuit' ? CIRCUIT_GAP : ZONE_GAP;
+      const isCircuitPair = name === 'circuit' || other === 'circuit';
+      const wanted = isCircuitPair ? CIRCUIT_GAP : ZONE_GAP;
       return gap < wanted ? [`${name}↔${other}: 간격 ${gap.toFixed(1)}m (최소 ${wanted}m)`] : [];
     }),
   );

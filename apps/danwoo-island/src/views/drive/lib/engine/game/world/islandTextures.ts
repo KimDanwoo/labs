@@ -51,9 +51,13 @@ function hasMap(material: unknown): material is THREE.Material & { map: THREE.Te
 export function applyIslandTextures(root: THREE.Object3D, resources: Resources): void {
   root.traverse((child) => {
     const material: unknown = child instanceof THREE.Mesh ? child.material : null;
-    if (!hasMap(material) || !material.map || !ISLAND_TEXTURES.has(material.name)) return;
+    if (!hasMap(material)) return;
+    if (!material.map) return;
+    if (!ISLAND_TEXTURES.has(material.name)) return;
     const replacement = resources[resourceName(material.name)];
-    if (!replacement || isModel(replacement) || material.map === replacement) return;
+    if (!replacement) return;
+    if (isModel(replacement)) return;
+    if (material.map === replacement) return;
     material.map = matchSampling(replacement, material.map);
   });
 }

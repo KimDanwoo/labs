@@ -74,15 +74,18 @@ export class Nipple {
       this.#end();
       return;
     }
-    if (trigger === 'start' && pointer.touches.length === 1) this.active = true;
+    const isFirstTouchStart = trigger === 'start' && pointer.touches.length === 1;
+    if (isFirstTouchStart) this.active = true;
     if (!this.active) return;
     if (pointer.touches.length !== 1) {
       this.active = false;
       return;
     }
     this.#aim(pointer);
-    if (trigger === 'start' && this.progress === 0) this.#isInRadiusLow = true;
-    if (trigger === 'change' && this.progress > 0) this.#isInRadiusLow = false;
+    const isStartAtCenter = trigger === 'start' && this.progress === 0;
+    if (isStartAtCenter) this.#isInRadiusLow = true;
+    const hasLeftCenter = trigger === 'change' && this.progress > 0;
+    if (hasLeftCenter) this.#isInRadiusLow = false;
   }
 
   jump(): void {

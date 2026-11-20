@@ -54,7 +54,8 @@ export class Notifications {
     element.append(content, timeBar);
 
     element.addEventListener('transitionend', (event) => {
-      if (event.target === element && element.classList.contains('is-leaving')) this.#remove(element);
+      const isLeaveEnd = event.target === element && element.classList.contains('is-leaving');
+      if (isLeaveEnd) this.#remove(element);
     });
     element.addEventListener(
       'click',
@@ -87,13 +88,16 @@ export class Notifications {
   }
 
   hide(): void {
-    if (this.#state !== 'visible' || !this.#current) return;
+    if (this.#state !== 'visible') return;
+    if (!this.#current) return;
     this.#state = 'hiding';
     this.#current.element.classList.add('is-leaving');
   }
 
   update(): void {
-    if (this.#state !== 'visible' || this.#isHeld || !this.#current) return;
+    if (this.#state !== 'visible') return;
+    if (this.#isHeld) return;
+    if (!this.#current) return;
     this.#timeLeft = Math.max(0, this.#timeLeft - getGame().ticker.delta);
     this.#current.timeBar.style.transform = `scaleX(${this.#timeLeft / this.#timeTotal})`;
     if (this.#timeLeft === 0) this.hide();

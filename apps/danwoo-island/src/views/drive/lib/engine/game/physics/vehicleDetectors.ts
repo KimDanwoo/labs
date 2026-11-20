@@ -33,7 +33,8 @@ export class FlipDetector {
   #roll = 0;
 
   test(contactCount: number, pitch: number, roll: number): number | null {
-    if (contactCount === 0 && !this.#isInAir) {
+    const hasJustLeftGround = contactCount === 0 && !this.#isInAir;
+    if (hasJustLeftGround) {
       this.#isInAir = true;
       this.#previousPitch = pitch;
       this.#pitch = 0;

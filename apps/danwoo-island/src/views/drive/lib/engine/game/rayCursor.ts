@@ -87,7 +87,8 @@ export class RayCursor {
     }
     this.#trackTravel(trigger);
     this.#hover();
-    if (trigger === 'start' && this.#current) pressTarget(this.#current);
+    if (trigger !== 'start') return;
+    if (this.#current) pressTarget(this.#current);
   }
 
   #trackTravel(trigger: Exclude<ActionTrigger, 'end'>): void {

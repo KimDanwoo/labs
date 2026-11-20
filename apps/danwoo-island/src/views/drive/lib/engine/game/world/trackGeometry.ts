@@ -30,7 +30,9 @@ export function stripGeometry(samples: readonly TrackSample[], { from, to }: Str
   samples.forEach((sample, index) => {
     const nextIndex = (index + 1) % samples.length;
     const next = samples[nextIndex];
-    if (!next || !isOpen(sample) || !isOpen(next)) return;
+    if (!next) return;
+    if (!isOpen(sample)) return;
+    if (!isOpen(next)) return;
     const a = index * 2;
     const b = nextIndex * 2;
     indices.push(a, a + 1, b, a + 1, b + 1, b);

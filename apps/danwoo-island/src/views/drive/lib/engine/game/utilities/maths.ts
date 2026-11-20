@@ -60,7 +60,8 @@ export function segmentCircleIntersection(start: Point2, end: Point2, { center, 
 
   const intersections: Point2[] = [];
   if (isOnSegment(near)) intersections.push(pointAt(near));
-  if (isOnSegment(far) && discriminant !== 0) intersections.push(pointAt(far));
+  const shouldAddFar = isOnSegment(far) && discriminant !== 0;
+  if (shouldAddFar) intersections.push(pointAt(far));
   return intersections;
 }
 
@@ -89,7 +90,8 @@ function pointInPolygon(point: Point2, polygon: readonly Point2[]): boolean {
   return edgesOf(polygon).reduce((inside, [current, next]) => {
     const crossesY = current.y > point.y !== next.y > point.y;
     const crossX = ((next.x - current.x) * (point.y - current.y)) / (next.y - current.y) + current.x;
-    return crossesY && point.x < crossX ? !inside : inside;
+    const isCrossingLeft = crossesY && point.x < crossX;
+    return isCrossingLeft ? !inside : inside;
   }, false);
 }
 

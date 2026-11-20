@@ -56,7 +56,8 @@ export class ProjectAttributes {
       for (const name of ATTRIBUTE_NAMES) {
         const item = this.#items.get(name);
         const attribute = attributes[name];
-        if (!item || !attribute) continue;
+        if (!item) continue;
+        if (!attribute) continue;
         item.group.visible = true;
         gsap.to(item.group.scale, {
           x: 1,

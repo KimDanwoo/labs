@@ -11,7 +11,8 @@ const RESOLVED_URL = /^(?:[a-z][a-z0-9+.-]*:|\/)/i;
 const CURRENT_DIRECTORY_PREFIX = /^\.\//;
 
 function withVersion(url: string): string {
-  if (!WORLD_VERSION || url.includes(`${VERSION_PARAMETER}=`)) return url;
+  const shouldSkipVersioning = !WORLD_VERSION || url.includes(`${VERSION_PARAMETER}=`);
+  if (shouldSkipVersioning) return url;
   return `${url}${url.includes('?') ? '&' : '?'}${VERSION_PARAMETER}=${WORLD_VERSION}`;
 }
 

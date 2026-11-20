@@ -121,7 +121,8 @@ export class BowlingArea extends Area {
     this.#pinsAllSleeping = true;
     for (const pin of this.#pins) {
       const isDown = new THREE.Vector3(0, 1, 0).applyQuaternion(pin.group.quaternion).y < PIN_DOWN_UP_Y;
-      if (isDown && !pin.isDown) {
+      const hasJustFallen = isDown && !pin.isDown;
+      if (hasJustFallen) {
         pin.isDown = true;
         hasFallen = true;
         this.#screen.pinStates[pin.index] = PIN_DOWN_VALUE;
@@ -177,10 +178,12 @@ export class BowlingArea extends Area {
     const pins = this.#updatePins();
     if (pins.hasFallen) {
       this.#screen.dataTexture.needsUpdate = true;
-      if (!this.#isWon && this.#pins.every((pin) => pin.isDown)) this.#celebrateStrike();
+      const isStrike = !this.#isWon && this.#pins.every((pin) => pin.isDown);
+      if (isStrike) this.#celebrateStrike();
     }
     this.#updateBoundings();
     const hasBallWoken = this.#updateBall();
-    if ((pins.hasWoken || hasBallWoken) && this.#restartPoint.state === 'hidden') this.#restartPoint.show();
+    const shouldOfferRestart = (pins.hasWoken || hasBallWoken) && this.#restartPoint.state === 'hidden';
+    if (shouldOfferRestart) this.#restartPoint.show();
   }
 }

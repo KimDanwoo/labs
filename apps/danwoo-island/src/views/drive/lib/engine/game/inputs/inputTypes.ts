@@ -41,6 +41,7 @@ export function reflectFilterChange(change: SetChange<string>): void {
   if (change.type === 'clear') for (const value of change.previousValues) classList.remove(filterClass(value));
 }
 export function isSameValue(current: ActionValue, next: ActionValue): boolean {
-  if (typeof current === 'number' || typeof next === 'number') return current === next;
+  const isNumericValue = typeof current === 'number' || typeof next === 'number';
+  if (isNumericValue) return current === next;
   return current.x === next.x && current.y === next.y;
 }

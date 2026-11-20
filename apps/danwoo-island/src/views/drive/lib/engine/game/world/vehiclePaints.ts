@@ -85,7 +85,8 @@ export function bindBlinkers(
   left: THREE.Object3D | undefined,
   right: THREE.Object3D | undefined,
 ): BlinkerCallbacks | null {
-  if (!left || !right) return null;
+  if (!left) return null;
+  if (!right) return null;
 
   const { inputs } = getGame();
   const isHeld = (name: string): boolean => inputs.actions.get(name)?.active ?? false;
@@ -98,11 +99,13 @@ export function bindBlinkers(
   const blink = (): void => {
     isOn = !isOn;
     render();
-    if (!isHeld('left') && !isHeld('right') && !isOn) isRunning = false;
+    const isIdle = !isHeld('left') && !isHeld('right') && !isOn;
+    if (isIdle) isRunning = false;
     else gsap.delayedCall(BLINK_INTERVAL, blink);
   };
   const start = (action: { active: boolean }): void => {
-    if (!action.active || isRunning) return;
+    if (!action.active) return;
+    if (isRunning) return;
     isRunning = true;
     isOn = true;
     render();

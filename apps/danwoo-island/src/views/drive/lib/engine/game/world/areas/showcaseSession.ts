@@ -118,13 +118,16 @@ export function bindShowcaseInputs({ isOpen, previous, next, openUrl, close }: S
   inputs.events.on('left', whenActive(previous));
   inputs.events.on('right', whenActive(next));
   inputs.events.on('forward', (action: Action) => {
-    if (action.active && !action.activeKeys.has('Gamepad.r2')) previous();
+    const isPreviousPress = action.active && !action.activeKeys.has('Gamepad.r2');
+    if (isPreviousPress) previous();
   });
   inputs.events.on('backward', (action: Action) => {
-    if (action.active && !action.activeKeys.has('Gamepad.l2')) next();
+    const isNextPress = action.active && !action.activeKeys.has('Gamepad.l2');
+    if (isNextPress) next();
   });
   inputs.events.on('interact', (action: Action) => {
-    if (!action.active && isOpen()) openUrl();
+    const shouldOpenUrl = !action.active && isOpen();
+    if (shouldOpenUrl) openUrl();
   });
 
   const whenOpen = (handler: () => void) => () => {

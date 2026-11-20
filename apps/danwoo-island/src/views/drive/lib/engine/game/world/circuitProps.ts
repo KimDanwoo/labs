@@ -137,7 +137,8 @@ function batdam(parts: Parts, container: THREE.Object3D): void {
 function circuitFiller(parts: Parts, container: THREE.Object3D): void {
   const [frame] = collidersOf(container);
   if (!frame) return;
-  if (frame.isTube && frame.radius > 0.5) bigDok(parts, frame);
+  const isBigTube = frame.isTube && frame.radius > 0.5;
+  if (isBigTube) bigDok(parts, frame);
   else strawBale(parts, frame);
 }
 

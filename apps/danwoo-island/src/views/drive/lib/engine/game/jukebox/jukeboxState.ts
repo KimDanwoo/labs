@@ -41,14 +41,16 @@ export function isRequestedSound(
   requestedIndex: number | null,
   soundId: number | undefined,
 ): boolean {
-  if (soundId === undefined || requestedIndex === null) return true;
+  if (soundId === undefined) return true;
+  if (requestedIndex === null) return true;
   return tracks[requestedIndex]?.id === soundId;
 }
 
 export function createAnnouncer(tracks: readonly JukeboxTrack[], announce: (title: string) => void) {
   let announcedIndex: number | null = null;
   return (index: number | null): void => {
-    if (index === null || index === announcedIndex) return;
+    if (index === null) return;
+    if (index === announcedIndex) return;
     announcedIndex = index;
     const track = tracks[index];
     if (track) announce(track.title);

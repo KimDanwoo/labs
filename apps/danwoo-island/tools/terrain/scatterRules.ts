@@ -39,8 +39,10 @@ export function plantCluster(center: Point, planting: Planting, next: Next, take
   const planted: Point[] = [];
   for (let attempt = 0; attempt < wanted * ATTEMPTS_PER_PLANT && planted.length < wanted; attempt += 1) {
     const point = around(center, planting.reach, next);
-    if (!hasRoom(point, planting) || !isApart(point, taken, planting.gap)) continue;
-    if (planting.isTall && hidesStage(point)) continue;
+    if (!hasRoom(point, planting)) continue;
+    if (!isApart(point, taken, planting.gap)) continue;
+    const isBlockingStage = planting.isTall && hidesStage(point);
+    if (isBlockingStage) continue;
     taken.push(point);
     planted.push(point);
   }

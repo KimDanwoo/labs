@@ -191,7 +191,8 @@ export class CircuitArea extends Area {
     swayObstacles(this.#obstacles, this.#timer.elapsedTime);
 
     const isOut = player.position.y < BOUNDS_THRESHOLD;
-    if (isOut && !this.#isOutOfBounds) this.respawn();
+    const hasJustLeftTrack = isOut && !this.#isOutOfBounds;
+    if (hasJustLeftTrack) this.respawn();
     this.#isOutOfBounds = isOut;
   }
 

@@ -104,7 +104,8 @@ export function pinIndicatorMaterial(
   return material;
 }
 export function strikeLabelMaterial(label: THREE.Object3D): THREE.MeshBasicNodeMaterial {
-  const map = isMesh(label) && !Array.isArray(label.material) ? Reflect.get(label.material, 'map') : null;
+  const isSingleMaterialMesh = isMesh(label) && !Array.isArray(label.material);
+  const map = isSingleMaterialMesh ? Reflect.get(label.material, 'map') : null;
   if (!(map instanceof THREE.Texture)) throw new Error('Bowling strike label has no texture');
   const material = new THREE.MeshBasicNodeMaterial();
   material.outputNode = Fn(() => {

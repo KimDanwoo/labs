@@ -20,7 +20,8 @@ export function readAccessor(json, bin, index) {
   const view = json.bufferViews[accessor.bufferView];
   const ArrayType = ARRAY_BY_COMPONENT[accessor.componentType];
   const components = COMPONENTS[accessor.type];
-  if (view.byteStride && view.byteStride !== ArrayType.BYTES_PER_ELEMENT * components) {
+  const hasMismatchedStride = view.byteStride && view.byteStride !== ArrayType.BYTES_PER_ELEMENT * components;
+  if (hasMismatchedStride) {
     throw new Error('인터리브된 정점 버퍼는 지원하지 않아요.');
   }
   const start = bin.byteOffset + (view.byteOffset ?? 0) + (accessor.byteOffset ?? 0);

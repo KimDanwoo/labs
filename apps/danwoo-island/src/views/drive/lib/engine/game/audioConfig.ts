@@ -75,7 +75,8 @@ export function closestTo(
   let closest: { position: THREE.Vector3; distance: number } | null = null;
   for (const position of positions) {
     const distance = position.distanceTo(target);
-    if (!closest || distance < closest.distance) closest = { position, distance };
+    const isCloser = !closest || distance < closest.distance;
+    if (isCloser) closest = { position, distance };
   }
   return closest;
 }
@@ -92,7 +93,8 @@ export function nowPlayingNotice(songName: string): HTMLElement {
 }
 export function hitHandler(baseVolume: number, volumeOf: (force: number) => number): SoundHandler {
   return (item, force, position) => {
-    if (typeof force !== 'number' || !isVectorLike(position)) return;
+    if (typeof force !== 'number') return;
+    if (!isVectorLike(position)) return;
     item.firstPosition().copy(position);
     item.volume = baseVolume * volumeOf(force);
     item.rate = 0.9 + Math.random() * 0.2;

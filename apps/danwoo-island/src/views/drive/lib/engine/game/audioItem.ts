@@ -150,7 +150,8 @@ export class AudioItem {
   play(...args: unknown[]): void {
     if (!this.#host.isInitiated()) return;
     void this.load();
-    if (this.#antiSpam && this.#host.elapsed() - this.#lastPlay < this.#antiSpam) return;
+    const isWithinAntiSpam = this.#antiSpam && this.#host.elapsed() - this.#lastPlay < this.#antiSpam;
+    if (isWithinAntiSpam) return;
 
     this.#onPlay?.(this, ...args);
     this.howl.play();

@@ -45,7 +45,8 @@ export class OptimalArea {
       return { center: nearPoint.clone().lerp(farPoint, 0.5), farPoint };
     });
     const [first, second] = centers;
-    if (!first || !second) return;
+    if (!first) return;
+    if (!second) return;
     this.basePosition = first.center.clone().lerp(second.center, 0.5);
     this.radius = this.basePosition.distanceTo(second.farPoint);
     this.nearDistance = camera.position.distanceTo(this.#intersect(camera, NEAR_EDGE));

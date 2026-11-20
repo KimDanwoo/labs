@@ -56,17 +56,20 @@ function isCycleValue(value: unknown): value is CycleValue {
 export const cloneValue = (value: CycleValue): CycleValue => (value instanceof THREE.Color ? value.clone() : value);
 
 export function blend(target: CycleValue, from: CycleValue, to: CycleValue, ratio: number): CycleValue {
-  if (target instanceof THREE.Color && from instanceof THREE.Color && to instanceof THREE.Color) {
+  const isColorTriple = target instanceof THREE.Color && from instanceof THREE.Color && to instanceof THREE.Color;
+  if (isColorTriple) {
     return target.lerpColors(from, to, ratio);
   }
-  if (typeof from === 'number' && typeof to === 'number') return lerp(from, to, ratio);
+  const isNumberPair = typeof from === 'number' && typeof to === 'number';
+  if (isNumberPair) return lerp(from, to, ratio);
   return target;
 }
 
 export function wrapKeyframes<P extends Record<keyof P, CycleValue>>(keyframes: readonly Keyframe<P>[]): Keyframe<P>[] {
   const first = keyframes[0];
   const last = keyframes.at(-1);
-  if (!first || !last) throw new Error('Cycles need at least one keyframe');
+  if (!first) throw new Error('Cycles need at least one keyframe');
+  if (!last) throw new Error('Cycles need at least one keyframe');
   const wrapped = [...keyframes];
   if (last.stop < 1) wrapped.push({ ...first, stop: 1 + first.stop });
   if (first.stop > 0) wrapped.unshift({ ...last, stop: -(1 - last.stop) });

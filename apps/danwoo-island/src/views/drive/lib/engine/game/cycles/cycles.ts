@@ -108,7 +108,8 @@ export abstract class Cycles<P extends Record<keyof P, CycleValue>, N extends st
 
   #overriddenProgress(progress: number): number {
     const { strength, progress: target } = this.override;
-    return strength > 0 && target !== null ? lerp(progress, target, strength) : progress;
+    const isOverriding = strength > 0 && target !== null;
+    return isOverriding ? lerp(progress, target, strength) : progress;
   }
 
   #interpolateProperties(): void {
@@ -118,17 +119,21 @@ export abstract class Cycles<P extends Record<keyof P, CycleValue>, N extends st
     );
     const previous = this.#keyframes[previousIndex];
     const next = this.#keyframes[(previousIndex + 1) % this.#keyframes.length];
-    if (!previous || !next) return;
+    if (!previous) return;
+    if (!next) return;
     const ratio = smoothstep(this.progress, previous.stop, next.stop);
     const { strength } = this.override;
 
     for (const [key, property] of Object.entries(this.properties)) {
       const from = previous.values.get(key);
       const to = next.values.get(key);
-      if (from === undefined || to === undefined) continue;
+      if (from === undefined) continue;
+      if (to === undefined) continue;
       property.value = blend(property.value, from, to, ratio);
-      if (strength > 0 && property.overrideValue !== null) {
-        property.value = blend(property.value, property.value, property.overrideValue, strength);
+      const { overrideValue } = property;
+      const hasOverride = strength > 0 && overrideValue !== null;
+      if (hasOverride) {
+        property.value = blend(property.value, property.value, overrideValue, strength);
       }
     }
   }

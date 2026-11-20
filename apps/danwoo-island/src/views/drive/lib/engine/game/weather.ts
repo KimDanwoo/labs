@@ -124,7 +124,8 @@ export class Weather {
     for (const property of this.#properties) {
       const value = property.compute();
       const { overrideValue } = property;
-      property.value = strength > 0 && overrideValue !== null ? lerp(value, overrideValue, strength) : value;
+      const isOverriding = strength > 0 && overrideValue !== null;
+      property.value = isOverriding ? lerp(value, overrideValue, strength) : value;
     }
   }
 }

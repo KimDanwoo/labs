@@ -28,7 +28,9 @@ function lineGeometry(): THREE.BufferGeometry {
     for (let corner = 0; corner < VERTICES_PER_LINE; corner += 1) {
       const vertex = line * VERTICES_PER_LINE + corner;
       positions.set([x, 0, z], vertex * 3);
-      offsets.set([corner === 0 || corner === 1 ? 1 : 0, corner === 0 || corner === 3 ? 1 : 0], vertex * 2);
+      const hasXOffset = corner === 0 || corner === 1;
+      const hasYOffset = corner === 0 || corner === 3;
+      offsets.set([hasXOffset ? 1 : 0, hasYOffset ? 1 : 0], vertex * 2);
       randoms[vertex] = random;
     }
     indices.set(

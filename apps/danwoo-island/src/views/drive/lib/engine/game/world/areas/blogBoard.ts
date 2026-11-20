@@ -120,7 +120,8 @@ export class BlogBoard {
   }
 
   #requestDraw(): void {
-    if (this.#isTurning || contentKey(this.#state) === this.#paintedKey) return;
+    if (this.#isTurning) return;
+    if (contentKey(this.#state) === this.#paintedKey) return;
     if (this.#paintedKey === null) {
       this.#drawBoard();
       return;
