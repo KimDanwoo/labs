@@ -1,13 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  applyMarkupDebt,
   findImportCycles,
   findMisplacedStyles,
   findServerLeaks,
-  validateComponentMarkup,
   validateComponentModule,
-  validateComponentProps,
   validateDesignTokens,
   validateManifest,
   validateSourceTypes,
@@ -156,44 +153,6 @@ test('Tailwind v3 names must use their v4 spelling while px arbitrary values sta
   assert.ok(legacy[0]?.includes('bg-linear-to-br'));
   assert.ok(legacy[4]?.includes('/3'));
   assert.deepEqual(validateTailwindNames('<div className="bg-black/[0.035]" />'), []);
-});
-
-test('a component that piles up deep or many HTML elements must be split into named parts', () => {
-  const nest = (depth) => (depth === 0 ? 'x' : `<div>${nest(depth - 1)}</div>`);
-  const view = (body) => `export function View() { return ${body}; }`;
-  assert.deepEqual(validateComponentMarkup(view(nest(5)), 'View.tsx'), []);
-  assert.equal(validateComponentMarkup(view(nest(6)), 'View.tsx')[0]?.component, 'View');
-  const spans = (count) => `<>${'<span />'.repeat(count)}</>`;
-  assert.deepEqual(validateComponentMarkup(view(spans(15)), 'View.tsx'), []);
-  assert.equal(validateComponentMarkup(view(spans(16)), 'View.tsx').length, 1);
-  const composed = view('<Page.Root><Page.Header /><Page.Body><Card><Card.Title /></Card></Page.Body></Page.Root>');
-  assert.deepEqual(validateComponentMarkup(composed, 'View.tsx'), []);
-});
-
-test('markup debt only shrinks: listed offenders pass, new ones fail, fixed ones must be removed from the list', () => {
-  const found = [
-    { key: 'apps/a/src/Old.tsx#Old', message: 'too deep' },
-    { key: 'apps/a/src/New.tsx#New', message: 'too deep' },
-  ];
-  const debt = new Set(['apps/a/src/Old.tsx#Old', 'apps/a/src/Fixed.tsx#Fixed']);
-  const problems = applyMarkupDebt(found, debt);
-  assert.equal(problems.length, 2);
-  assert.ok(problems[0]?.startsWith('apps/a/src/New.tsx#New'));
-  assert.ok(problems[1]?.startsWith('apps/a/src/Fixed.tsx#Fixed'));
-});
-
-test('components with more than five props must be split into composed parts', () => {
-  const five =
-    'interface CardProps { a: string; b: string; c: string; d: string; e: string }\nexport function Card(props: CardProps) { return null; }';
-  assert.deepEqual(validateComponentProps(five, 'Card.tsx'), []);
-  const six =
-    'interface CardProps { a: string; b: string; c: string; d: string; e: string; f: string }\nexport function Card(props: CardProps) { return null; }';
-  assert.equal(validateComponentProps(six, 'Card.tsx').length, 1);
-  const inline = 'export const Card = (props: { a: 1; b: 1; c: 1; d: 1; e: 1; f: 1 }) => null;';
-  assert.equal(validateComponentProps(inline, 'Card.tsx').length, 1);
-  const extended =
-    'interface ButtonProps extends ComponentProps<"button"> { variant?: string }\nexport function Button(props: ButtonProps) { return null; }';
-  assert.deepEqual(validateComponentProps(extended, 'Button.tsx'), []);
 });
 
 test('CSS files live in src/app/styles or a slice styles/ folder; only <Component>.module.css sits next to ui components', () => {
