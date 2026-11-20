@@ -1,13 +1,19 @@
+import { cn } from '@shared/lib/cn';
 import { memo } from 'react';
 import { KEY_NUMBER } from '../../config/board';
 
-export const CellNotes = memo(function CellNotes({ notes }: { notes: number[] }) {
+interface CellNotesProps {
+  notes: number[];
+  hasCageLabel: boolean;
+}
+
+export const CellNotes = memo(function CellNotes({ notes, hasCageLabel }: CellNotesProps) {
   return (
-    <div className="grid grid-cols-3 grid-rows-3 gap-0 w-full h-full p-0.5">
+    <div className={cn('grid grid-cols-3 grid-rows-3 gap-0 w-full h-full p-0.5', hasCageLabel && 'pt-3.5')}>
       {KEY_NUMBER.map((num) => (
         <div key={num} className="flex items-center justify-center w-full h-full">
           {notes.includes(num) && (
-            <span className="text-[6px] xs:text-[8px] lg:text-[10px] text-accent font-normal">{num}</span>
+            <span className="text-[9px] lg:text-[10px] leading-none text-accent-text font-normal">{num}</span>
           )}
         </div>
       ))}

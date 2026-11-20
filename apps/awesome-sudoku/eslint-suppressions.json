@@ -36,10 +36,5 @@
     "complexity": {
       "count": 1
     }
-  },
-  "src/views/home/ui/sudoku-game/KillerCage.tsx": {
-    "@typescript-eslint/no-magic-numbers": {
-      "count": 3
-    }
   }
 }

@@ -1,4 +1,5 @@
 import { memo, useMemo, type RefObject } from 'react';
+import { cageSumFontSize } from '../../lib/cageSumFontSize';
 import { useKillerCage } from '../../model/sudoku-game/hooks/useKillerCage';
 import { KillerCageLine } from './KillerCageLine';
 
@@ -11,7 +12,7 @@ interface KillerCageProps {
 export const KillerCage = memo(({ tableRef }: KillerCageProps) => {
   const { overlayRef, cageInfo, cellSize } = useKillerCage(tableRef);
 
-  const fontSize = useMemo(() => `${Math.max(0.5, Math.min(0.65, cellSize / 75))}rem`, [cellSize]);
+  const fontSize = cageSumFontSize(cellSize);
 
   const svgStyle = useMemo(() => ({ position: 'absolute' as const, top: 0, left: 0 }), []);
 

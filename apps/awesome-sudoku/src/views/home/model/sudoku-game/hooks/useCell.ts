@@ -1,6 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { EMPTY_HIGHLIGHT } from '../../../config/board';
+import { cageLabelCellsAtom } from '../../store/cageLabelAtoms';
 import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom } from '../../store/primitives';
 import { hasSelectedCellAtom } from '../../store/selectionAtoms';
 import { type CellProps } from '../../types/board';
@@ -17,6 +18,7 @@ export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
   const timerActive = useAtomValue(timerActiveAtom);
   const hasSelection = useAtomValue(hasSelectedCellAtom);
   const highlightedCells = useAtomValue(highlightedCellsAtom);
+  const hasCageLabel = useAtomValue(cageLabelCellsAtom).has(cellKey);
   const highlight = useMemo(() => highlightedCells[cellKey] ?? EMPTY_HIGHLIGHT, [highlightedCells, cellKey]);
 
   const { className, stateClasses } = useCellStyles({
@@ -55,5 +57,6 @@ export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
     handleKeyDown,
     tabIndex,
     stateClasses,
+    hasCageLabel,
   };
 };

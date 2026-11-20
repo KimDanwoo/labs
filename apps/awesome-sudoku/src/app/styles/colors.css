@@ -3,6 +3,7 @@
 @theme inline {
   --color-accent: rgb(var(--rgb-accent));
   --color-accent-light: rgb(var(--rgb-accent-light));
+  --color-accent-text: rgb(var(--rgb-accent-text));
   --color-bg-tertiary: rgb(var(--rgb-bg-tertiary));
   --color-border-light: rgb(var(--rgb-border-light));
   --color-border-medium: rgb(var(--rgb-border-medium));
@@ -31,6 +32,7 @@
   --rgb-text-tertiary: 142, 142, 147;
 
   --rgb-accent: 0, 122, 255;
+  --rgb-accent-text: 0, 88, 190;
   --rgb-accent-light: 230, 242, 255;
   --rgb-accent-soft: 245, 249, 255;
 
@@ -83,6 +85,7 @@
   --rgb-text-tertiary: 124, 124, 128;
 
   --rgb-accent: 10, 132, 255;
+  --rgb-accent-text: 120, 180, 255;
   --rgb-accent-light: 20, 40, 70;
   --rgb-accent-soft: 15, 25, 50;
 
