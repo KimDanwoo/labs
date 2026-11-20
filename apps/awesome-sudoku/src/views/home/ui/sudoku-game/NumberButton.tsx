@@ -10,10 +10,10 @@ interface NumberButtonProps {
 export const NumberButton: React.FC<NumberButtonProps> = memo(({ value, onClick, isDisabled }) => (
   <button
     className={cn(
-      'w-full aspect-square',
-      'max-w-8 xs:max-w-10 lg:max-w-[72px] xl:max-w-[88px]',
+      'w-full h-13 md:h-auto md:aspect-square',
+      'md:max-w-10 lg:max-w-[72px] xl:max-w-[88px]',
       'rounded-xl md:rounded-2xl',
-      'text-lg xs:text-xl md:text-3xl lg:text-4xl font-semibold',
+      'text-2xl md:text-3xl lg:text-4xl font-semibold',
       'font-tabular',
       'flex items-center justify-center',
       'transition-all duration-200 ease-out',
