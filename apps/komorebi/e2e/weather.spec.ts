@@ -20,25 +20,29 @@ test('indoor rain renders through home and school windows and falls downward', a
           throw new Error(gl.getShaderInfoLog(shader) ?? 'Compile failed');
         return shader;
       };
-      const program = gl.createProgram();
-      if (!program) throw new Error('Program allocation failed');
-      gl.attachShader(
-        program,
-        compile(
-          gl.VERTEX_SHADER,
-          'attribute vec2 position; varying vec2 uv; void main(){ uv=position*.5+.5; gl_Position=vec4(position,0.,1.); }',
-        ),
-      );
-      gl.attachShader(
-        program,
-        compile(
-          gl.FRAGMENT_SHADER,
-          `precision highp float; varying vec2 uv; uniform float sceneryStyle; uniform float sceneryTime; uniform float night; ${shader} void main(){gl_FragColor=vec4(indoorWeather(vec3(.6),uv),1.);}`,
-        ),
-      );
-      gl.linkProgram(program);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS))
-        throw new Error(gl.getProgramInfoLog(program) ?? 'Link failed');
+      const linkProgram = () => {
+        const program = gl.createProgram();
+        if (!program) throw new Error('Program allocation failed');
+        gl.attachShader(
+          program,
+          compile(
+            gl.VERTEX_SHADER,
+            'attribute vec2 position; varying vec2 uv; void main(){ uv=position*.5+.5; gl_Position=vec4(position,0.,1.); }',
+          ),
+        );
+        gl.attachShader(
+          program,
+          compile(
+            gl.FRAGMENT_SHADER,
+            `precision highp float; varying vec2 uv; uniform float sceneryStyle; uniform float sceneryTime; uniform float night; ${shader} void main(){gl_FragColor=vec4(indoorWeather(vec3(.6),uv),1.);}`,
+          ),
+        );
+        gl.linkProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+          throw new Error(gl.getProgramInfoLog(program) ?? 'Link failed');
+        return program;
+      };
+      const program = linkProgram();
       gl.useProgram(program);
       gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
@@ -55,6 +59,19 @@ test('indoor rain renders through home and school windows and falls downward', a
         return pixels;
       };
       const channel = (pixels: Uint8Array, x: number, y: number) => pixels[((1023 - y) * 1536 + x) * 4] ?? 0;
+      const sumDifference = (
+        first: Uint8Array,
+        second: Uint8Array,
+        area: { x: number; y: number; width: number; height: number },
+        shift: { dx: number; dy: number },
+      ) => {
+        let total = 0;
+        for (let y = area.y; y < area.y + area.height; y++) {
+          for (let x = area.x; x < area.x + area.width; x++)
+            total += Math.abs(channel(first, x, y) - channel(second, x + shift.dx, y + shift.dy));
+        }
+        return total;
+      };
       const panes = [
         { style: styles.home, x: 250, y: 450 },
         { style: styles.classroom, x: 165, y: 350 },
@@ -62,22 +79,20 @@ test('indoor rain renders through home and school windows and falls downward', a
       ].map(({ style, x, y }) => {
         const first = render(style, 1);
         const second = render(style, 1.015625);
-        let changes = 0;
-        for (let dy = -20; dy <= 20; dy++) {
-          for (let dx = -20; dx <= 20; dx++)
-            changes += Math.abs(channel(first, x + dx, y + dy) - channel(second, x + dx, y + dy));
-        }
-        return { window: channel(first, x, y), floor: channel(first, 800, 850), changes };
+        const area = { x: x - 20, y: y - 20, width: 41, height: 41 };
+        return {
+          window: channel(first, x, y),
+          floor: channel(first, 800, 850),
+          changes: sumDifference(first, second, area, { dx: 0, dy: 0 }),
+        };
       });
       const first = render(styles.home, 1);
       const second = render(styles.home, 1.015625);
+      const motionArea = { x: 200, y: 350, width: 130, height: 220 };
       let best = { error: Infinity, dx: 0, dy: 0 };
       for (let dy = -6; dy <= 6; dy++) {
         for (let dx = -2; dx <= 2; dx++) {
-          let error = 0;
-          for (let y = 350; y < 570; y++) {
-            for (let x = 200; x < 330; x++) error += Math.abs(channel(first, x, y) - channel(second, x + dx, y + dy));
-          }
+          const error = sumDifference(first, second, motionArea, { dx, dy });
           if (error < best.error) best = { error, dx, dy };
         }
       }

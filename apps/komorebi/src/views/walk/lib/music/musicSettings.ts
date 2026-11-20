@@ -50,20 +50,34 @@ export function musicWidgetSrc(source: string) {
   });
   return `https://w.soundcloud.com/player/?${params}`;
 }
+const SOUNDCLOUD_TRACK_URL = /^https:\/\/soundcloud\.com\/danwooking\/[^/?#]+$/;
+
+function isTrackId(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
+}
+
+function trackUrl(value: unknown) {
+  return typeof value === 'string' && SOUNDCLOUD_TRACK_URL.test(value) ? value : DANWOO_PROFILE;
+}
+
+function trackDuration(value: unknown) {
+  return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, value) : 0;
+}
+
 export function parseMusicTracks(sounds: unknown[]): MusicTrack[] {
   return sounds.flatMap((sound, index) => {
     if (!sound || typeof sound !== 'object') return [];
     const item = sound as Record<string, unknown>;
-    if (typeof item.id !== 'number' || !Number.isSafeInteger(item.id) || item.id <= 0 || typeof item.title !== 'string')
-      return [];
-    const url =
-      typeof item.permalink_url === 'string' &&
-      /^https:\/\/soundcloud\.com\/danwooking\/[^/?#]+$/.test(item.permalink_url)
-        ? item.permalink_url
-        : DANWOO_PROFILE;
-    const duration =
-      typeof item.duration === 'number' && Number.isFinite(item.duration) ? Math.max(0, item.duration) : 0;
-    return [{ id: item.id, index, title: item.title, url, duration }];
+    if (!isTrackId(item.id) || typeof item.title !== 'string') return [];
+    return [
+      {
+        id: item.id,
+        index,
+        title: item.title,
+        url: trackUrl(item.permalink_url),
+        duration: trackDuration(item.duration),
+      },
+    ];
   });
 }
 export function musicTime(milliseconds: number) {

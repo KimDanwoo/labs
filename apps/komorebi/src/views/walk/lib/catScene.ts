@@ -24,6 +24,34 @@ export type CatFrame = {
   reactionAge: number;
 };
 
+function isCatSuccess(fishing: FishingFrame | null, fishingAge: number, friendship: number) {
+  return fishing?.phase === FISHING_PHASE.caught && fishingAge < 2.4 && catBond(friendship).level === 2;
+}
+
+function catJump(isSuccess: boolean, fishingAge: number, reducedMotion: boolean) {
+  return isSuccess ? catchCelebration(fishingAge, reducedMotion).childLift * 0.7 : 0;
+}
+
+function catWobble(isAffectionate: boolean, reducedMotion: boolean, reactionAge: number) {
+  return isAffectionate && !reducedMotion ? Math.sin(reactionAge * 5) * 0.09 : 0;
+}
+
+function setCatWalkFrame(texture: THREE.Texture, isLeft: boolean, frame: number) {
+  texture.repeat.x = (isLeft ? -1 : 1) / 4;
+  texture.offset.x = (frame + Number(isLeft)) / 4;
+}
+
+function updateCatHeart(
+  heart: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>,
+  isActive: boolean,
+  age: number,
+  reducedMotion: boolean,
+) {
+  heart.visible = isActive && age < 2.4;
+  heart.position.y = 4.2 + (reducedMotion ? 0 : age * 0.7);
+  heart.material.opacity = Math.max(0, Math.sin((age / 2.4) * Math.PI));
+}
+
 export function createCatScene(
   scene: THREE.Scene,
   loader: THREE.TextureLoader | undefined,
@@ -78,22 +106,19 @@ export function createCatScene(
     position.z += (target.z - position.z) * ease;
     const moving = Math.hypot(target.x - position.x, target.z - position.z) > 0.05;
     const scale = characterScale(position.z) * CHILD_SIZE;
-    const success =
-      fishing?.phase === FISHING_PHASE.caught && fishingAge < 2.4 && catBond(state.friendship).level === 2;
-    const jump = success ? catchCelebration(fishingAge, reducedMotion).childLift * 0.7 : 0;
+    const success = isCatSuccess(fishing, fishingAge, state.friendship);
+    const jump = catJump(success, fishingAge, reducedMotion);
     cat.position.set(sceneX(position.x), sceneY(position.z) + jump * scale, 2);
     cat.scale.setScalar(scale);
     if (texture) {
       const left = moving && position.x < before;
-      texture.repeat.x = (left ? -1 : 1) / 4;
-      texture.offset.x = ((moving && !reducedMotion ? Math.floor(elapsed * 8) % 4 : 0) + Number(left)) / 4;
+      const frame = moving && !reducedMotion ? Math.floor(elapsed * 8) % 4 : 0;
+      setCatWalkFrame(texture, left, frame);
     }
     const affection = reaction !== COMPANION_REACTION.feed && reactionAge < 2.4;
     const age = success ? fishingAge : reactionAge;
-    catHeart.visible = (success || affection) && age < 2.4;
-    catHeart.position.y = 4.2 + (reducedMotion ? 0 : age * 0.7);
-    catHeart.material.opacity = Math.max(0, Math.sin((age / 2.4) * Math.PI));
-    spriteMaterial.rotation = affection && !reducedMotion ? Math.sin(reactionAge * 5) * 0.09 : 0;
+    updateCatHeart(catHeart, success || affection, age, reducedMotion);
+    spriteMaterial.rotation = catWobble(affection, reducedMotion, reactionAge);
   }
 
   return {

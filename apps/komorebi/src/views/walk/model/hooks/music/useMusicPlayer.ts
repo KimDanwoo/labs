@@ -11,6 +11,8 @@ import {
 } from '../../../lib/music/musicSettings';
 import { bindMusicWidget, loadMusicApi, type MusicWidget } from '../../../lib/music/soundcloud';
 
+const MUSIC_LOAD_TIMEOUT_MS = 25000;
+
 type MusicPlayerModel = {
   attempt: number;
   iframe: RefObject<HTMLIFrameElement | null>;
@@ -47,7 +49,7 @@ export function useMusicPlayer(source: string, initialVolume: number): MusicPlay
     let cleanup: (() => void) | undefined;
     const timer = window.setTimeout(() => {
       if (!cancelled) setStatus(MUSIC_STATUS.error);
-    }, 25000);
+    }, MUSIC_LOAD_TIMEOUT_MS);
     void loadMusicApi()
       .then((api) => {
         if (cancelled || !iframe.current) return;

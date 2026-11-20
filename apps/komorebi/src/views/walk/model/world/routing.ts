@@ -32,33 +32,46 @@ function groundConnections(region: Region) {
   navigationEdges.set(region, edges);
   return edges;
 }
-export function findRoute(start: Point, target: Point, region: Region): Point[] {
-  const world = WORLDS[region];
-  if (!canWalk(start.x, start.z, region) || !canWalk(target.x, target.z, region)) return [];
-  if (clearSegment(start, target, region)) return [{ ...target }];
-  // Evaluate every visible connection: the nearest node may lead backwards
-  // through the return portal even when the destination is in the other direction.
-  const costs = new Map<string, number>(
-      world.nodes
+interface NodeSearch {
+  costs: Map<string, number>;
+  previous: Map<string, string>;
+}
+
+function relaxNodeCosts(current: string, region: Region, { costs, previous }: NodeSearch) {
+  for (const edge of groundConnections(region).filter((e) => e.a.id === current || e.b.id === current)) {
+    const other = edge.a.id === current ? edge.b.id : edge.a.id;
+    const cost = costs.get(current)! + edge.distance;
+    if (cost < (costs.get(other) ?? Infinity)) {
+      costs.set(other, cost);
+      previous.set(other, current);
+    }
+  }
+}
+
+function searchNodes(start: Point, region: Region): NodeSearch {
+  const nodes = WORLDS[region].nodes;
+  const search: NodeSearch = {
+    costs: new Map<string, number>(
+      nodes
         .filter((node) => clearSegment(start, node, region))
         .map((node) => [node.id, Math.hypot(node.x - start.x, node.z - start.z)]),
     ),
-    previous = new Map<string, string>(),
-    unvisited = new Set(world.nodes.map((n) => n.id));
+    previous: new Map<string, string>(),
+  };
+  const unvisited = new Set(nodes.map((n) => n.id));
   while (unvisited.size) {
-    const current = [...unvisited].sort((a, b) => (costs.get(a) ?? Infinity) - (costs.get(b) ?? Infinity))[0]!;
-    if (!Number.isFinite(costs.get(current))) break;
+    const current = [...unvisited].sort(
+      (a, b) => (search.costs.get(a) ?? Infinity) - (search.costs.get(b) ?? Infinity),
+    )[0]!;
+    if (!Number.isFinite(search.costs.get(current))) break;
     unvisited.delete(current);
-    for (const edge of groundConnections(region).filter((e) => e.a.id === current || e.b.id === current)) {
-      const other = edge.a.id === current ? edge.b.id : edge.a.id;
-      const cost = costs.get(current)! + edge.distance;
-      if (cost < (costs.get(other) ?? Infinity)) {
-        costs.set(other, cost);
-        previous.set(other, current);
-      }
-    }
+    relaxNodeCosts(current, region, search);
   }
-  const to = world.nodes
+  return search;
+}
+
+function closestExitNode(target: Point, region: Region, costs: Map<string, number>): RouteNode | undefined {
+  return WORLDS[region].nodes
     .filter((node) => costs.has(node.id) && clearSegment(node, target, region))
     .sort(
       (a, b) =>
@@ -66,6 +79,16 @@ export function findRoute(start: Point, target: Point, region: Region): Point[] 
         Math.hypot(a.x - target.x, a.z - target.z) -
         (costs.get(b.id)! + Math.hypot(b.x - target.x, b.z - target.z)),
     )[0];
+}
+
+export function findRoute(start: Point, target: Point, region: Region): Point[] {
+  const world = WORLDS[region];
+  if (!canWalk(start.x, start.z, region) || !canWalk(target.x, target.z, region)) return [];
+  if (clearSegment(start, target, region)) return [{ ...target }];
+  // Evaluate every visible connection: the nearest node may lead backwards
+  // through the return portal even when the destination is in the other direction.
+  const { costs, previous } = searchNodes(start, region);
+  const to = closestExitNode(target, region, costs);
   if (!to) return findGroundRoute(start, target, region);
   const ids = [to.id];
   while (previous.has(ids[0]!)) ids.unshift(previous.get(ids[0]!)!);
@@ -79,80 +102,122 @@ export function findRoute(start: Point, target: Point, region: Region): Point[] 
 // A painted side path may contain no authored guide nodes. Search its actual floor.
 const GROUND_STEP = 0.5;
 const GROUND_SIZE = 201;
+const SEED_RANGE = 2;
+const NEIGHBOUR_RANGE = 1;
+const GOAL_RADIUS = 1.5;
 const groundGrids = new Map<Region, Uint8Array>();
-function findGroundRoute(start: Point, target: Point, region: Region): Point[] {
-  let grid = groundGrids.get(region);
-  if (!grid) {
-    grid = new Uint8Array(GROUND_SIZE * GROUND_SIZE);
-    for (let id = 0; id < grid.length; id++) {
-      grid[id] = Number(canWalk((id % GROUND_SIZE) * GROUND_STEP, Math.floor(id / GROUND_SIZE) * GROUND_STEP, region));
-    }
-    groundGrids.set(region, grid);
+
+interface GroundSearch {
+  grid: Uint8Array;
+  costs: Map<number, number>;
+  previous: Map<number, number>;
+  open: Set<number>;
+  closed: Set<number>;
+}
+
+const groundPoint = (id: number): Point => ({
+  x: (id % GROUND_SIZE) * GROUND_STEP,
+  z: Math.floor(id / GROUND_SIZE) * GROUND_STEP,
+});
+
+const gridIdAt = (x: number, z: number): number | null =>
+  x < 0 || x >= GROUND_SIZE || z < 0 || z >= GROUND_SIZE ? null : z * GROUND_SIZE + x;
+
+const isFreeCell = (search: GroundSearch, id: number | null): id is number =>
+  id !== null && !!search.grid[id] && !search.closed.has(id);
+
+function getGroundGrid(region: Region): Uint8Array {
+  const cached = groundGrids.get(region);
+  if (cached) return cached;
+  const grid = new Uint8Array(GROUND_SIZE * GROUND_SIZE);
+  for (let id = 0; id < grid.length; id++) {
+    grid[id] = Number(canWalk((id % GROUND_SIZE) * GROUND_STEP, Math.floor(id / GROUND_SIZE) * GROUND_STEP, region));
   }
-  const point = (id: number): Point => ({
-    x: (id % GROUND_SIZE) * GROUND_STEP,
-    z: Math.floor(id / GROUND_SIZE) * GROUND_STEP,
-  });
-  const costs = new Map<number, number>();
-  const previous = new Map<number, number>();
-  const open = new Set<number>();
-  const closed = new Set<number>();
+  groundGrids.set(region, grid);
+  return grid;
+}
+
+function seedGroundSearch(search: GroundSearch, start: Point, region: Region) {
   const sx = Math.round(start.x / GROUND_STEP),
     sz = Math.round(start.z / GROUND_STEP);
-  for (let dz = -2; dz <= 2; dz++)
-    for (let dx = -2; dx <= 2; dx++) {
-      const x = sx + dx,
-        z = sz + dz;
-      if (x < 0 || x >= GROUND_SIZE || z < 0 || z >= GROUND_SIZE) continue;
-      const id = z * GROUND_SIZE + x;
-      if (!grid[id] || !clearSegment(start, point(id), region)) continue;
-      costs.set(id, Math.hypot(point(id).x - start.x, point(id).z - start.z));
-      open.add(id);
+  for (let dz = -SEED_RANGE; dz <= SEED_RANGE; dz++)
+    for (let dx = -SEED_RANGE; dx <= SEED_RANGE; dx++) {
+      const id = gridIdAt(sx + dx, sz + dz);
+      if (!isFreeCell(search, id) || !clearSegment(start, groundPoint(id), region)) continue;
+      const cell = groundPoint(id);
+      search.costs.set(id, Math.hypot(cell.x - start.x, cell.z - start.z));
+      search.open.add(id);
     }
-  while (open.size) {
-    let current = -1,
-      best = Infinity;
-    for (const id of open) {
-      const p = point(id);
-      const score = costs.get(id)! + Math.hypot(target.x - p.x, target.z - p.z);
-      if (score < best) {
-        current = id;
-        best = score;
-      }
+}
+
+function bestOpenCell({ open, costs }: GroundSearch, target: Point): number {
+  let current = -1,
+    best = Infinity;
+  for (const id of open) {
+    const p = groundPoint(id);
+    const score = costs.get(id)! + Math.hypot(target.x - p.x, target.z - p.z);
+    if (score < best) {
+      current = id;
+      best = score;
     }
-    const from = point(current);
-    if (Math.hypot(from.x - target.x, from.z - target.z) <= 1.5 && clearSegment(from, target, region)) {
-      const path = [target, from];
-      while (previous.has(current)) {
-        current = previous.get(current)!;
-        path.push(point(current));
-      }
-      path.reverse();
-      const result: Point[] = [];
-      let anchor = start;
-      for (let i = 0; i < path.length; i++) {
-        if (i + 1 < path.length && clearSegment(anchor, path[i + 1]!, region)) continue;
-        anchor = path[i]!;
-        result.push(anchor);
-      }
-      return result;
+  }
+  return current;
+}
+
+function smoothPath(path: Point[], start: Point, region: Region): Point[] {
+  const result: Point[] = [];
+  let anchor = start;
+  for (let i = 0; i < path.length; i++) {
+    if (i + 1 < path.length && clearSegment(anchor, path[i + 1]!, region)) continue;
+    anchor = path[i]!;
+    result.push(anchor);
+  }
+  return result;
+}
+
+function tracePath(search: GroundSearch, goal: number, target: Point): Point[] {
+  const path = [target, groundPoint(goal)];
+  let current = goal;
+  while (search.previous.has(current)) {
+    current = search.previous.get(current)!;
+    path.push(groundPoint(current));
+  }
+  return path.reverse();
+}
+
+function expandGroundSearch(search: GroundSearch, current: number, region: Region) {
+  const from = groundPoint(current);
+  for (let dz = -NEIGHBOUR_RANGE; dz <= NEIGHBOUR_RANGE; dz++)
+    for (let dx = -NEIGHBOUR_RANGE; dx <= NEIGHBOUR_RANGE; dx++) {
+      if (!dx && !dz) continue;
+      const id = gridIdAt((current % GROUND_SIZE) + dx, Math.floor(current / GROUND_SIZE) + dz);
+      if (!isFreeCell(search, id)) continue;
+      const cost = search.costs.get(current)! + Math.hypot(dx, dz) * GROUND_STEP;
+      if (cost >= (search.costs.get(id) ?? Infinity) || !clearSegment(from, groundPoint(id), region)) continue;
+      search.costs.set(id, cost);
+      search.previous.set(id, current);
+      search.open.add(id);
     }
-    open.delete(current);
-    closed.add(current);
-    for (let dz = -1; dz <= 1; dz++)
-      for (let dx = -1; dx <= 1; dx++) {
-        if (!dx && !dz) continue;
-        const x = (current % GROUND_SIZE) + dx,
-          z = Math.floor(current / GROUND_SIZE) + dz;
-        if (x < 0 || x >= GROUND_SIZE || z < 0 || z >= GROUND_SIZE) continue;
-        const id = z * GROUND_SIZE + x;
-        if (!grid[id] || closed.has(id)) continue;
-        const cost = costs.get(current)! + Math.hypot(dx, dz) * GROUND_STEP;
-        if (cost >= (costs.get(id) ?? Infinity) || !clearSegment(from, point(id), region)) continue;
-        costs.set(id, cost);
-        previous.set(id, current);
-        open.add(id);
-      }
+}
+
+function findGroundRoute(start: Point, target: Point, region: Region): Point[] {
+  const search: GroundSearch = {
+    grid: getGroundGrid(region),
+    costs: new Map(),
+    previous: new Map(),
+    open: new Set(),
+    closed: new Set(),
+  };
+  seedGroundSearch(search, start, region);
+  while (search.open.size) {
+    const current = bestOpenCell(search, target);
+    const from = groundPoint(current);
+    if (Math.hypot(from.x - target.x, from.z - target.z) <= GOAL_RADIUS && clearSegment(from, target, region)) {
+      return smoothPath(tracePath(search, current, target), start, region);
+    }
+    search.open.delete(current);
+    search.closed.add(current);
+    expandGroundSearch(search, current, region);
   }
   return [];
 }

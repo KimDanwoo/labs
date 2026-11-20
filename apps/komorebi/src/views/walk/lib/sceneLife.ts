@@ -22,6 +22,50 @@ const FLYER_ORDER = 3.6;
 
 type Scene = { region: Region; dt: number; elapsed: number; darkness: number; isStill: boolean; isRaining: boolean };
 
+type GullPath = NonNullable<(typeof GULL_PATHS)[keyof typeof GULL_PATHS]>[number];
+
+interface Gull {
+  region: string;
+  path: GullPath;
+  rate: number;
+  phase: number;
+  sprite: THREE.Sprite;
+  material: THREE.SpriteMaterial;
+}
+
+interface Flying {
+  region: Region;
+  dusk: number;
+  isFlying: boolean;
+}
+
+function flyInsect(life: Life, { region, dt, elapsed, dusk, isFlying }: Flying & { dt: number; elapsed: number }) {
+  life.sprite.visible = isFlying && life.region === region && life.material.map !== null;
+  if (!life.sprite.visible) return;
+  const step = life.kind === INSECT.butterfly ? stepButterfly : stepDragonfly;
+  ({ flight: life.flight, clock: life.clock } = flyFor(life.flight, life.clock, dt, step, life.bounds, Math.random));
+  life.material.opacity = 1 - dusk;
+  drawInsect(life, elapsed, dt);
+}
+
+function showCell(map: THREE.Texture, frame: number, frames: number) {
+  map.repeat.set(1 / frames, 1);
+  map.offset.set(frame / frames, 0);
+}
+
+function glideGull(gull: Gull, { region, dusk, isFlying, elapsed }: Flying & { elapsed: number }) {
+  gull.sprite.visible = isFlying && gull.region === region && gull.material.map !== null;
+  if (!gull.sprite.visible) return;
+  const t = elapsed * gull.rate + gull.phase;
+  const x = gull.path.x + Math.sin(t) * gull.path.spread + Math.sin(t * 2.3) * gull.path.spread * 0.25;
+  const z = gull.path.z + Math.sin(t * 1.7 + 1) * 3;
+  const beat = WINGBEAT[Math.floor((elapsed * 3 + gull.phase) * WINGBEAT.length) % WINGBEAT.length]!;
+  showCell(gull.material.map!, beat, ATLAS.gull.frames);
+  gull.sprite.position.set(sceneX(x), sceneY(z), 1);
+  gull.sprite.scale.set(SIZE.gull * ATLAS.gull.aspect, SIZE.gull, 1);
+  gull.material.opacity = 1 - dusk;
+}
+
 export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader) {
   const sheets: THREE.Texture[] = [];
   const cells: THREE.Texture[] = [];
@@ -35,10 +79,6 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
     scene.add(created);
     waiting.push({ kind, frame, material });
     return { sprite: created, material };
-  };
-  const showCell = (map: THREE.Texture, frame: number, frames: number) => {
-    map.repeat.set(1 / frames, 1);
-    map.offset.set(frame / frames, 0);
   };
 
   const insects: Life[] = (Object.keys(PATCHES) as Region[]).flatMap((region) =>
@@ -60,7 +100,7 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
       }),
     ),
   );
-  const gulls = Object.entries(GULL_PATHS).flatMap(([region, paths]) =>
+  const gulls: Gull[] = Object.entries(GULL_PATHS).flatMap(([region, paths]) =>
     (paths ?? []).map((path) => ({
       region,
       path,
@@ -97,33 +137,8 @@ export function createSceneLife(scene: THREE.Scene, loader: THREE.TextureLoader)
     update({ region, dt, elapsed, darkness, isStill, isRaining }: Scene) {
       const dusk = THREE.MathUtils.smoothstep(darkness, DUSK[0], DUSK[1]);
       const isFlying = !isStill && !isRaining && dusk < 1;
-      for (const life of insects) {
-        life.sprite.visible = isFlying && life.region === region && life.material.map !== null;
-        if (!life.sprite.visible) continue;
-        const step = life.kind === INSECT.butterfly ? stepButterfly : stepDragonfly;
-        ({ flight: life.flight, clock: life.clock } = flyFor(
-          life.flight,
-          life.clock,
-          dt,
-          step,
-          life.bounds,
-          Math.random,
-        ));
-        life.material.opacity = 1 - dusk;
-        drawInsect(life, elapsed, dt);
-      }
-      for (const gull of gulls) {
-        gull.sprite.visible = isFlying && gull.region === region && gull.material.map !== null;
-        if (!gull.sprite.visible) continue;
-        const t = elapsed * gull.rate + gull.phase;
-        const x = gull.path.x + Math.sin(t) * gull.path.spread + Math.sin(t * 2.3) * gull.path.spread * 0.25;
-        const z = gull.path.z + Math.sin(t * 1.7 + 1) * 3;
-        const beat = WINGBEAT[Math.floor((elapsed * 3 + gull.phase) * WINGBEAT.length) % WINGBEAT.length]!;
-        showCell(gull.material.map!, beat, ATLAS.gull.frames);
-        gull.sprite.position.set(sceneX(x), sceneY(z), 1);
-        gull.sprite.scale.set(SIZE.gull * ATLAS.gull.aspect, SIZE.gull, 1);
-        gull.material.opacity = 1 - dusk;
-      }
+      for (const life of insects) flyInsect(life, { region, dt, elapsed, dusk, isFlying });
+      for (const gull of gulls) glideGull(gull, { region, elapsed, dusk, isFlying });
       sleepingCat.update(region, elapsed, darkness, isStill);
     },
     dispose() {

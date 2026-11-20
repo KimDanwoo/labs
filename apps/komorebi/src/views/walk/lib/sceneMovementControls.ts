@@ -11,6 +11,9 @@ export function createMovementControls(
   { plan, redirect, switchRegion }: SceneTravel,
 ): Pick<WalkEngine, 'setPaused' | 'setInput' | 'playAction' | 'travelTo' | 'reset'> {
   const { placeEffects, jump, keys, portalInput, startPlate } = parts;
+  const jumpOnPress = (pressed: boolean) => {
+    if (pressed && !state.paused) startJump(jump);
+  };
   return {
     setPaused(value) {
       state.paused = value;
@@ -27,17 +30,17 @@ export function createMovementControls(
         return;
       }
       if (key === ' ') {
-        if (pressed && !state.paused) startJump(jump);
+        jumpOnPress(pressed);
         return;
       }
       if (pressed && state.paused) return;
-      if (pressed) {
-        keys.add(key);
-        if (key !== 'shift') {
-          state.route = [];
-          state.destination = null;
-        }
-      } else keys.delete(key);
+      if (!pressed) {
+        keys.delete(key);
+        return;
+      }
+      keys.add(key);
+      state.route = [];
+      state.destination = null;
     },
     playAction(kind, at) {
       const now = performance.now();

@@ -36,32 +36,43 @@ export function returnBall(game: BallGame): BallGame {
   return { phase: BALL_PHASE.caught, elapsed: 0, rallies: game.rallies + 1 };
 }
 
-export function advanceBallGame(game: BallGame, seconds: number): BallGame {
-  if (game.phase === BALL_PHASE.complete || (game.phase === BALL_PHASE.missed && game.elapsed >= BALL_TIMING.miss))
-    return game;
-  const elapsed = game.elapsed + Math.max(0, Math.min(seconds, 0.05));
-  if (game.phase === BALL_PHASE.ready) {
-    return {
-      ...game,
-      elapsed: elapsed < BALL_TIMING.ready ? elapsed : 0,
-      phase: elapsed < BALL_TIMING.ready ? BALL_PHASE.ready : BALL_PHASE.incoming,
-    };
-  }
-  if (game.phase === BALL_PHASE.caught) {
-    return {
-      ...game,
-      elapsed: elapsed < BALL_TIMING.hold ? elapsed : 0,
-      phase: elapsed < BALL_TIMING.hold ? BALL_PHASE.caught : BALL_PHASE.returning,
-    };
-  }
-  if (game.phase === BALL_PHASE.missed) return { ...game, elapsed: Math.min(elapsed, BALL_TIMING.miss) };
-  if (game.phase === BALL_PHASE.incoming) {
-    return {
-      ...game,
-      elapsed: elapsed > BALL_TIMING.deadline ? 0 : elapsed,
-      phase: elapsed > BALL_TIMING.deadline ? BALL_PHASE.missed : BALL_PHASE.incoming,
-    };
-  }
+const MAX_FRAME_SECONDS = 0.05;
+
+type PhaseAdvance = (game: BallGame, elapsed: number) => BallGame;
+
+const advanceTimed =
+  (limit: number, phase: BallPhase, next: BallPhase): PhaseAdvance =>
+  (game, elapsed) => {
+    const isDone = elapsed >= limit;
+    return { ...game, elapsed: isDone ? 0 : elapsed, phase: isDone ? next : phase };
+  };
+
+const advanceIncoming: PhaseAdvance = (game, elapsed) => {
+  const isLate = elapsed > BALL_TIMING.deadline;
+  return { ...game, elapsed: isLate ? 0 : elapsed, phase: isLate ? BALL_PHASE.missed : BALL_PHASE.incoming };
+};
+
+const advanceMissed: PhaseAdvance = (game, elapsed) => ({ ...game, elapsed: Math.min(elapsed, BALL_TIMING.miss) });
+
+const advanceReturning: PhaseAdvance = (game, elapsed) => {
   if (elapsed < BALL_TIMING.returnFlight) return { ...game, elapsed };
   return { ...game, elapsed: 0, phase: game.rallies >= BALL_TIMING.target ? BALL_PHASE.complete : BALL_PHASE.ready };
+};
+
+const PHASE_ADVANCE: Record<BallPhase, PhaseAdvance> = {
+  [BALL_PHASE.ready]: advanceTimed(BALL_TIMING.ready, BALL_PHASE.ready, BALL_PHASE.incoming),
+  [BALL_PHASE.caught]: advanceTimed(BALL_TIMING.hold, BALL_PHASE.caught, BALL_PHASE.returning),
+  [BALL_PHASE.missed]: advanceMissed,
+  [BALL_PHASE.incoming]: advanceIncoming,
+  [BALL_PHASE.returning]: advanceReturning,
+  [BALL_PHASE.complete]: (game) => game,
+};
+
+const isBallGameFinished = (game: BallGame) =>
+  game.phase === BALL_PHASE.complete || (game.phase === BALL_PHASE.missed && game.elapsed >= BALL_TIMING.miss);
+
+export function advanceBallGame(game: BallGame, seconds: number): BallGame {
+  if (isBallGameFinished(game)) return game;
+  const elapsed = game.elapsed + Math.max(0, Math.min(seconds, MAX_FRAME_SECONDS));
+  return PHASE_ADVANCE[game.phase](game, elapsed);
 }

@@ -51,6 +51,14 @@ function parseStroke(value: unknown): ChalkStroke | null {
   return null;
 }
 
+function parseStrokes(strokes: unknown): ChalkStroke[] {
+  if (!Array.isArray(strokes) || strokes.length > CHALKBOARD_LIMIT.strokes) return [];
+  const valid = strokes.map(parseStroke);
+  if (valid.some((stroke) => stroke === null)) return [];
+  const board = valid.filter((stroke): stroke is ChalkStroke => stroke !== null);
+  return countPoints(board) > CHALKBOARD_LIMIT.points ? [] : board;
+}
+
 /** Untrusted storage: the whole board is dropped rather than half-replayed if any stroke is malformed. */
 export function parseChalkboard(raw: string | null): ChalkStroke[] {
   if (!raw || raw.length > CHALKBOARD_LIMIT.rawLength) return [];
@@ -58,12 +66,7 @@ export function parseChalkboard(raw: string | null): ChalkStroke[] {
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== 'object' || parsed === null) return [];
     const { version, strokes } = parsed as Record<string, unknown>;
-    if (version !== CHALKBOARD_VERSION || !Array.isArray(strokes) || strokes.length > CHALKBOARD_LIMIT.strokes)
-      return [];
-    const valid = strokes.map(parseStroke);
-    if (valid.some((stroke) => stroke === null)) return [];
-    const board = valid.filter((stroke): stroke is ChalkStroke => stroke !== null);
-    return countPoints(board) > CHALKBOARD_LIMIT.points ? [] : board;
+    return version === CHALKBOARD_VERSION ? parseStrokes(strokes) : [];
   } catch {
     return [];
   }

@@ -30,57 +30,87 @@ function isCatch(value: unknown): value is Catch {
     species && typeof size === 'number' && Number.isFinite(size) && size >= species.min && size <= species.max,
   );
 }
+const MAX_UID_LENGTH = 100;
+type FishHome = KeptFish['home'];
+
+function homeCapacity(home: FishHome) {
+  return home === FISH_HOME.tank ? TANK_CAPACITY : BAG_CAPACITY;
+}
+
+function countAt(fish: readonly KeptFish[], home: FishHome) {
+  return fish.filter((item) => item.home === home).length;
+}
+
+function isFreshUid(uid: unknown, ids: ReadonlySet<string>): uid is string {
+  return typeof uid === 'string' && Boolean(uid) && uid.length <= MAX_UID_LENGTH && !ids.has(uid);
+}
+
+function parseKeptFish(entry: unknown, fish: readonly KeptFish[], ids: ReadonlySet<string>): KeptFish | null {
+  if (!isCatch(entry)) return null;
+  const item = entry as Catch & Record<string, unknown>;
+  if (!isFreshUid(item.uid, ids)) return null;
+  if (item.home !== FISH_HOME.bag && item.home !== FISH_HOME.tank) return null;
+  if (countAt(fish, item.home) >= homeCapacity(item.home)) return null;
+  return { id: item.id, size: item.size, uid: item.uid, home: item.home };
+}
+
+function parseKeptFishList(raw: unknown): KeptFish[] {
+  if (!Array.isArray(raw)) return [];
+  const fish: KeptFish[] = [];
+  const ids = new Set<string>();
+  for (const entry of raw) {
+    const kept = parseKeptFish(entry, fish, ids);
+    if (!kept) continue;
+    ids.add(kept.uid);
+    fish.push(kept);
+  }
+  return fish;
+}
+
+function parseFriendship(value: unknown) {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value)) return 0;
+  return Math.max(0, Math.min(FRIENDSHIP_MAX, value));
+}
+
 export function parseCompanions(raw: string | null): Companions {
   try {
     const value: unknown = JSON.parse(raw ?? 'null');
     if (!value || typeof value !== 'object') return EMPTY_COMPANIONS;
     const data = value as Record<string, unknown>;
-    const fish: KeptFish[] = [];
-    const ids = new Set<string>();
-    if (Array.isArray(data.fish))
-      for (const entry of data.fish) {
-        if (!isCatch(entry)) continue;
-        const item = entry as Catch & Record<string, unknown>;
-        if (typeof item.uid !== 'string' || !item.uid || item.uid.length > 100 || ids.has(item.uid)) continue;
-        if (item.home !== FISH_HOME.bag && item.home !== FISH_HOME.tank) continue;
-        const capacity = item.home === FISH_HOME.tank ? TANK_CAPACITY : BAG_CAPACITY;
-        if (fish.filter((kept) => kept.home === item.home).length >= capacity) continue;
-        ids.add(item.uid);
-        fish.push({ id: item.id, size: item.size, uid: item.uid, home: item.home });
-      }
-    const friendship =
-      typeof data.friendship === 'number' && Number.isSafeInteger(data.friendship)
-        ? Math.max(0, Math.min(FRIENDSHIP_MAX, data.friendship))
-        : 0;
-    return { fish, friendship };
+    return { fish: parseKeptFishList(data.fish), friendship: parseFriendship(data.friendship) };
   } catch {
     return EMPTY_COMPANIONS;
   }
 }
 
+function keepCatch(state: Companions, caught: Catch, uid: string): Companions {
+  if (!isCatch(caught) || !uid || state.fish.some((fish) => fish.uid === uid)) return state;
+  if (countAt(state.fish, FISH_HOME.bag) >= BAG_CAPACITY) return state;
+  return { ...state, fish: [...state.fish, { ...caught, uid, home: FISH_HOME.bag }] };
+}
+
+function consumeFish(state: Companions, fish: KeptFish, isShare: boolean): Companions {
+  if (fish.home !== FISH_HOME.bag) return state;
+  return {
+    fish: state.fish.filter((item) => item.uid !== fish.uid),
+    friendship: Math.min(FRIENDSHIP_MAX, state.friendship + Number(isShare)),
+  };
+}
+
+function moveFish(state: Companions, fish: KeptFish, home: FishHome): Companions {
+  if (fish.home === home) return state;
+  if (countAt(state.fish, home) >= homeCapacity(home)) return state;
+  return { ...state, fish: state.fish.map((item) => (item.uid === fish.uid ? { ...item, home } : item)) };
+}
+
 /** Moving or sharing consumes the exact catch, never the permanent fishing journal. */
 export function changeCompanions(state: Companions, action: CompanionAction): Companions {
-  if (action.kind === COMPANION_ACTION.keep) {
-    if (!isCatch(action.fish) || !action.uid || state.fish.some((fish) => fish.uid === action.uid)) return state;
-    if (state.fish.filter((fish) => fish.home === FISH_HOME.bag).length >= BAG_CAPACITY) return state;
-    return { ...state, fish: [...state.fish, { ...action.fish, uid: action.uid, home: FISH_HOME.bag }] };
-  }
+  if (action.kind === COMPANION_ACTION.keep) return keepCatch(state, action.fish, action.uid);
   const fish = state.fish.find((item) => item.uid === action.uid);
   if (!fish) return state;
-  if (action.kind === COMPANION_ACTION.share || action.kind === COMPANION_ACTION.release) {
-    if (fish.home !== FISH_HOME.bag) return state;
-    return {
-      fish: state.fish.filter((item) => item.uid !== action.uid),
-      friendship: Math.min(FRIENDSHIP_MAX, state.friendship + Number(action.kind === COMPANION_ACTION.share)),
-    };
-  }
-  const home = action.kind === COMPANION_ACTION.tank ? FISH_HOME.tank : FISH_HOME.bag;
-  if (fish.home === home) return state;
-  if (
-    state.fish.filter((item) => item.home === home).length >= (home === FISH_HOME.tank ? TANK_CAPACITY : BAG_CAPACITY)
-  )
-    return state;
-  return { ...state, fish: state.fish.map((item) => (item.uid === action.uid ? { ...item, home } : item)) };
+  if (action.kind === COMPANION_ACTION.share || action.kind === COMPANION_ACTION.release)
+    return consumeFish(state, fish, action.kind === COMPANION_ACTION.share);
+  return moveFish(state, fish, action.kind === COMPANION_ACTION.tank ? FISH_HOME.tank : FISH_HOME.bag);
 }
 
 export const COMPANION_REACTION = { pet: 'pet', share: 'share', feed: 'feed' } as const;

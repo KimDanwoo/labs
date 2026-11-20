@@ -35,27 +35,59 @@ type Scene = {
 
 const between = ([min, max]: readonly [number, number]) => min + Math.random() * (max - min);
 
-export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
-  const textures: Partial<Record<Animal, THREE.Texture>> = {};
-  let isDisposed = false;
-  (Object.keys(ANIMAL) as Animal[]).forEach((animal) => {
-    loader
-      .loadAsync(ANIMAL[animal].url)
-      .then((texture) => {
-        if (isDisposed) {
-          texture.dispose();
-          return;
-        }
-        texture.colorSpace = THREE.SRGBColorSpace;
-        textures[animal] = texture;
-      })
-      .catch(() => undefined);
-  });
-  const material = new THREE.SpriteMaterial({ transparent: true, depthTest: false });
-  const sprite = new THREE.Sprite(material);
-  sprite.center.set(0.5, 0.04);
-  sprite.visible = false;
-  scene.add(sprite);
+interface Visitor {
+  animal: Animal;
+  region: Region;
+  gait: Gait;
+  length: number;
+  pause: number;
+  pauseAt: number;
+  frame: number;
+  opacity: number;
+  leaving: { from: number; seconds: number } | null;
+}
+
+function trackLeaving(visitor: Visitor, isRaining: boolean, dt: number) {
+  if (isRaining) visitor.leaving ??= { from: visitor.opacity, seconds: 0 };
+  if (visitor.leaving) visitor.leaving.seconds += dt;
+}
+
+function isPausingNow(visitor: Visitor, isStill: boolean) {
+  return !isStill && visitor.gait.walked >= visitor.pauseAt && visitor.pause < PAUSE_SECONDS;
+}
+
+function hasLeft(visitor: Visitor, strolled: Gait | null) {
+  return !strolled || (visitor.leaving?.seconds ?? 0) >= LEAVE_SECONDS;
+}
+
+function requestAnimalTexture(
+  loader: THREE.TextureLoader,
+  animal: Animal,
+  textures: Partial<Record<Animal, THREE.Texture>>,
+  isDisposed: () => boolean,
+) {
+  loader
+    .loadAsync(ANIMAL[animal].url)
+    .then((texture) => {
+      if (isDisposed()) {
+        texture.dispose();
+        return;
+      }
+      texture.colorSpace = THREE.SRGBColorSpace;
+      textures[animal] = texture;
+    })
+    .catch(() => undefined);
+}
+
+function loadAnimalTextures(
+  loader: THREE.TextureLoader,
+  textures: Partial<Record<Animal, THREE.Texture>>,
+  isDisposed: () => boolean,
+) {
+  (Object.keys(ANIMAL) as Animal[]).forEach((animal) => requestAnimalTexture(loader, animal, textures, isDisposed));
+}
+
+function createShadow(scene: THREE.Scene) {
   const shadowTexture = canvasTexture(64, 32, (c) => {
     const g = c.createRadialGradient(32, 16, 1, 32, 16, 30);
     g.addColorStop(0, '#17332b66');
@@ -68,19 +100,22 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
   shadow.renderOrder = 3;
   shadow.visible = false;
   scene.add(shadow);
+  return { shadowTexture, shadowMaterial, shadow };
+}
+
+export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
+  const textures: Partial<Record<Animal, THREE.Texture>> = {};
+  let isDisposed = false;
+  loadAnimalTextures(loader, textures, () => isDisposed);
+  const material = new THREE.SpriteMaterial({ transparent: true, depthTest: false });
+  const sprite = new THREE.Sprite(material);
+  sprite.center.set(0.5, 0.04);
+  sprite.visible = false;
+  scene.add(sprite);
+  const { shadowTexture, shadowMaterial, shadow } = createShadow(scene);
 
   let wait = between(FIRST_VISIT);
-  let visitor: {
-    animal: Animal;
-    region: Region;
-    gait: Gait;
-    length: number;
-    pause: number;
-    pauseAt: number;
-    frame: number;
-    opacity: number;
-    leaving: { from: number; seconds: number } | null;
-  } | null = null;
+  let visitor: Visitor | null = null;
   let standing: (Point & { order: number }) | null = null;
 
   function arrive(region: Region, darkness: number) {
@@ -104,7 +139,7 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     };
   }
 
-  function fadeFor({ length, leaving }: NonNullable<typeof visitor>, gait: Gait) {
+  function fadeFor({ length, leaving }: Visitor, gait: Gait) {
     const along = presence(gait.walked, length, FADE_IN, FADE_OUT);
     if (!leaving) return along;
     return Math.min(along, leaving.from * (1 - leaving.seconds / LEAVE_SECONDS));
@@ -133,6 +168,35 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     shadow.visible = true;
   }
 
+  function admit({ region, dt, darkness, isStill, isRaining }: Scene) {
+    if (visitor?.region !== region) hide();
+    if (visitor) return visitor;
+    wait -= dt;
+    if (wait > 0 || isStill || isRaining) return null;
+    wait = between(NEXT_VISIT);
+    arrive(region, darkness);
+    return visitor as Visitor | null;
+  }
+
+  function advance(active: Visitor, now: Scene) {
+    const { dt, darkness, isStill, isRaining } = now;
+    trackLeaving(active, isRaining, dt);
+    const spec = ANIMAL[active.animal];
+    const isPausing = isPausingNow(active, isStill);
+    if (isPausing) active.pause += dt;
+    const strolled = isPausing || isStill ? active.gait : walkOn(active.gait, spec, dt);
+    if (!strolled || hasLeft(active, strolled)) {
+      hide();
+      return;
+    }
+    active.gait = strolled;
+    if (!isStill) active.frame = isPausing ? 0 : Math.floor(strolled.phase) % FRAMES;
+    draw(strolled, active.frame, spec, now);
+    active.opacity = fadeFor(active, strolled);
+    material.opacity = active.opacity;
+    shadowMaterial.opacity = active.opacity * (1 - darkness * 0.6);
+  }
+
   return {
     get visitor() {
       return visitor?.animal ?? '';
@@ -141,36 +205,12 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
       return standing;
     },
     update(now: Scene) {
-      const { region, dt, darkness, isStill, isRaining } = now;
-      if (isIndoors(region)) {
+      if (isIndoors(now.region)) {
         hide();
         return;
       }
-      if (visitor?.region !== region) hide();
-      if (!visitor) {
-        wait -= dt;
-        if (wait > 0 || isStill || isRaining) return;
-        wait = between(NEXT_VISIT);
-        arrive(region, darkness);
-        if (!visitor) return;
-      }
-      if (isRaining) visitor.leaving ??= { from: visitor.opacity, seconds: 0 };
-      if (visitor.leaving) visitor.leaving.seconds += dt;
-      const spec = ANIMAL[visitor.animal];
-      const isPausing = !isStill && visitor.gait.walked >= visitor.pauseAt && visitor.pause < PAUSE_SECONDS;
-      if (isPausing) visitor.pause += dt;
-      const strolled = isPausing || isStill ? visitor.gait : walkOn(visitor.gait, spec, dt);
-      const isGone = !strolled || (visitor.leaving?.seconds ?? 0) >= LEAVE_SECONDS;
-      if (isGone) {
-        hide();
-        return;
-      }
-      visitor.gait = strolled;
-      if (!isStill) visitor.frame = isPausing ? 0 : Math.floor(strolled.phase) % FRAMES;
-      draw(strolled, visitor.frame, spec, now);
-      visitor.opacity = fadeFor(visitor, strolled);
-      material.opacity = visitor.opacity;
-      shadowMaterial.opacity = visitor.opacity * (1 - darkness * 0.6);
+      const active = admit(now);
+      if (active) advance(active, now);
     },
     dispose() {
       isDisposed = true;
