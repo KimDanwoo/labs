@@ -4,11 +4,12 @@ import { searchQuestions, type SearchResult } from '@entities/question';
 import { useDebounce } from '@shared/lib/useDebounce';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS } from '../../config/debounce';
 
 export function useSearch() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') ?? '');
-  const debouncedQuery = useDebounce(query, 300);
+  const debouncedQuery = useDebounce(query, SEARCH_DEBOUNCE_MS);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [lastSearchedQuery, setLastSearchedQuery] = useState('');
   const [error, setError] = useState<Error | null>(null);
