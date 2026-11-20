@@ -67,8 +67,8 @@ test('slices are imported through their public API only', () => {
   const api = (code, filename) => check('public-api', code, filename).length;
   assert.equal(api("import { Game } from '@entities/game';"), 0);
   assert.equal(api("import { loadGame } from '@entities/game/index.server';"), 0);
-  assert.equal(api("import { First } from './First';"), 0);
-  assert.equal(api("import { state } from '../model/store';"), 0);
+  assert.equal(api("import { First } from '@features/first/ui/First';"), 0);
+  assert.equal(api("import { state } from '@features/first/model/store';"), 0);
   assert.equal(api("import { cn } from '@shared/lib/cn';"), 0);
   assert.equal(api("import { SITE } from '@shared/config';"), 0);
   assert.equal(api("import { Home } from '@views/home';", 'app/page.tsx'), 0);
@@ -79,7 +79,10 @@ test('slices are imported through their public API only', () => {
     "const game = import('@entities/game/ui/Game');",
     'const game = import(`@entities/game/ui/Game`);',
     "type Game = import('@entities/game/model/types').Game;",
-    "import { state } from '@features/first/model/store';",
+    "import { First } from './First';",
+    "import { state } from '../model/store';",
+    "export { state } from '../model/store';",
+    "const state = import('../model/store');",
     "import { First } from '@features/first';",
     "import { First } from '../index';",
     "import { cn } from '@shared/lib';",
@@ -87,7 +90,12 @@ test('slices are imported through their public API only', () => {
   ])
     assert.equal(api(code), 1, code);
   assert.equal(api("import { Home } from '@views/home/ui/Home';", 'app/page.tsx'), 1);
-  assert.equal(api("import { variants } from './variants';", 'src/shared/ui/button/Button.tsx'), 0);
+  assert.equal(api("import { variants } from '@shared/ui/button/variants';", 'src/shared/ui/button/Button.tsx'), 0);
+  assert.equal(api("import { variants } from './variants';", 'src/shared/ui/button/Button.tsx'), 1);
+  assert.equal(api("import { theme } from './styles/theme.css';", 'src/app/providers/Providers.tsx'), 1);
+  assert.equal(api("import { Home } from '../src/views/home';", 'app/page.tsx'), 1);
+  assert.equal(api("import { Image } from './opengraph-image';", 'app/page.tsx'), 0);
+  assert.equal(api("import { state } from '../model/store';", 'src/features/first/__tests__/store.test.ts'), 1);
   assert.equal(api("import { cn } from '@shared/lib/cn';", 'src/shared/ui/button/Button.tsx'), 0);
   assert.equal(api("import { app } from '@shared/lib/firebase/config';", 'src/shared/ui/button/Button.tsx'), 1);
   assert.equal(api("import { app } from '../../lib/firebase/config';", 'src/shared/ui/button/Button.tsx'), 1);
@@ -95,12 +103,11 @@ test('slices are imported through their public API only', () => {
 });
 
 test('public entries name their exports', () => {
-  assert.equal(check('public-api', "export * from './ui/First';", 'src/features/first/index.ts').length, 1);
-  assert.equal(check('public-api', "export { First } from './ui/First';", 'src/features/first/index.ts').length, 0);
-  assert.equal(
-    check('public-api', "export type { First } from './model/types';", 'src/features/first/index.ts').length,
-    0,
-  );
+  const entry = (code) => check('public-api', code, 'src/features/first/index.ts').length;
+  assert.equal(entry("export * from '@features/first/ui/First';"), 1);
+  assert.equal(entry("export { First } from '@features/first/ui/First';"), 0);
+  assert.equal(entry("export type { First } from '@features/first/model/types';"), 0);
+  assert.equal(entry("export { First } from './ui/First';"), 1);
 });
 
 test('components require a matching file and cannot hide in a hook', () => {

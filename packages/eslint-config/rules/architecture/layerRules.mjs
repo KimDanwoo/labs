@@ -55,21 +55,22 @@ function sharedImportProblem(from, to) {
   return null;
 }
 
-function slicedImportProblem(from, to, source) {
+function slicedImportProblem(from, to) {
   const inner = to.rest.split('/').slice(1);
   const isEntry = inner.length === 0 || (inner.length === 1 && PUBLIC_ENTRY.test(inner[0]));
   const isOwnSlice = from?.layer === to.layer && from.slice === to.slice;
   if (!isOwnSlice) return isEntry ? null : `${to.layer}/${to.slice}는 공개 API(index.ts)로만 import한다.`;
   if (isEntry) return '슬라이스 안에서 자기 공개 API를 import하지 않는다(순환 참조).';
-  if (!source.startsWith('.')) return '슬라이스 안에서는 상대경로로 import한다.';
   return null;
 }
 
-function publicApiProblem(from, to, source) {
+function publicApiProblem(from, to) {
   if (to.layer === 'shared') return sharedImportProblem(from, to);
   if (!SLICED_LAYERS.has(to.layer)) return null;
-  return slicedImportProblem(from, to, source);
+  return slicedImportProblem(from, to);
 }
+
+const RELATIVE_IMPORT = '상대경로 대신 별칭 전체 경로(@app/ @views/ @features/ @entities/ @shared/)로 import한다.';
 
 export const publicApi = {
   meta: { type: 'problem', schema: [] },
@@ -78,10 +79,12 @@ export const publicApi = {
     const from = location(filename);
     const isEntryFile = from && INDEX_FILE.test(path.posix.basename(filename));
     function check(node, source) {
-      if (typeof source !== 'string' || TEST_FILE.test(filename)) return;
+      if (typeof source !== 'string') return;
       const to = moduleLocation(filename, source, context.cwd.replaceAll('\\', '/'));
       if (!to) return;
-      const message = publicApiProblem(from, to, source);
+      if (source.startsWith('.')) return context.report({ node, message: RELATIVE_IMPORT });
+      if (TEST_FILE.test(filename)) return;
+      const message = publicApiProblem(from, to);
       if (message) context.report({ node, message });
     }
     return {
