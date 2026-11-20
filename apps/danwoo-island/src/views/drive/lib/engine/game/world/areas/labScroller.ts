@@ -2,17 +2,17 @@ import gsap from 'gsap';
 import { color, Fn, mix, positionWorld, texture, uniform, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import type { LabContent } from '../../../data/worldContent';
-import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
-import { remapClamp, safeMod } from '../../utilities/maths';
-import { hideIntersectMesh } from './showcaseSigns';
+import type { LabContent } from '@views/drive/lib/engine/data/worldContent';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { remapClamp, safeMod } from '@views/drive/lib/engine/game/utilities/maths';
+import { hideIntersectMesh } from '@views/drive/lib/engine/game/world/areas/showcaseSigns';
 import {
   configureImageTexture,
   highlightTextMaterial,
   type Shades,
   showcaseTextCanvas,
   TEXT_DENSITY,
-} from './showcaseVisuals';
+} from '@views/drive/lib/engine/game/world/areas/showcaseVisuals';
 
 interface Mini {
   readonly y: number;

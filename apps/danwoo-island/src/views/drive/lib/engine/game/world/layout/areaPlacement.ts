@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-import { AREA_ANCHORS, type AreaKey } from './islandLayout';
+import { AREA_ANCHORS, type AreaKey } from '@views/drive/lib/engine/game/world/layout/islandLayout';
 
 const UP = new THREE.Vector3(0, 1, 0);
 

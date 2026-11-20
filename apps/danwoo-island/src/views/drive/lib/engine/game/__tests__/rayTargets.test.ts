@@ -1,7 +1,14 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { focusTarget, isClickTravel, nearestHit, pressTarget, type RayTarget, releaseTargets } from '../rayTargets';
+import {
+  focusTarget,
+  isClickTravel,
+  nearestHit,
+  pressTarget,
+  type RayTarget,
+  releaseTargets,
+} from '@views/drive/lib/engine/game/rayTargets';
 
 interface RecordedTarget extends RayTarget {
   name: string;

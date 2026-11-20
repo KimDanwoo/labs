@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-import { placedInArea } from './layout/areaPlacement';
+import { placedInArea } from '@views/drive/lib/engine/game/world/layout/areaPlacement';
 
 export const SHOWER_SCALE = 1.5;
 

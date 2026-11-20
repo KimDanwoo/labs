@@ -1,8 +1,8 @@
 import { color, Fn, mix, texture, uniform, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import { TICK_ORDER } from './tickOrder';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 type Vec2Node = THREE.Node<'vec2'>;
 type Vec4Node = THREE.Node<'vec4'>;

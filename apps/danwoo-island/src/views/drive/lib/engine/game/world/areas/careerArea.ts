@@ -2,12 +2,10 @@ import gsap from 'gsap';
 import { uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import content from '../../../data/danwoo';
-import { type AudioItem, moveSoundTo } from '../../audioItem';
-import { clamp } from '../../utilities/maths';
-import { tieCareerRopes } from '../careerRopes';
-import { paintCareerLines } from '../islandReskins';
-import { Area } from './area';
+import content from '@views/drive/lib/engine/data/danwoo';
+import { type AudioItem, moveSoundTo } from '@views/drive/lib/engine/game/audioItem';
+import { clamp } from '@views/drive/lib/engine/game/utilities/maths';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
 import {
   ACTIVE_ELEVATION,
   type CareerLine,
@@ -21,7 +19,9 @@ import {
   labelMaterial,
   profileTexture,
   worldToLocalMatrix,
-} from './careerArt';
+} from '@views/drive/lib/engine/game/world/areas/careerArt';
+import { tieCareerRopes } from '@views/drive/lib/engine/game/world/careerRopes';
+import { paintCareerLines } from '@views/drive/lib/engine/game/world/islandReskins';
 
 export class CareerArea extends Area {
   readonly #lines: CareerLine[];

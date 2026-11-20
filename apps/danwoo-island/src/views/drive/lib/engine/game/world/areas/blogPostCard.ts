@@ -1,6 +1,6 @@
 import type { LatestPost } from '@entities/blog';
+import { createElement } from '@views/drive/lib/engine/game/utilities/createElement';
 import * as THREE from 'three/webgpu';
-import { createElement } from '../../utilities/createElement';
 
 export type BoardState =
   | { status: 'loading' }

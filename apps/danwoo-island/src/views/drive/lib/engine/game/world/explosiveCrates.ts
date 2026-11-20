@@ -1,13 +1,13 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import { type AudioItem, moveSoundTo } from '../audioItem';
-import { getGame } from '../gameContext';
-import { InstancedGroup, type InstanceReference } from '../instancedGroup';
-import type { WorldObject } from '../objectColliders';
-import { TICK_ORDER } from '../tickOrder';
-import { createCoconutCrate } from './islandProps';
-import { pushOutOfShowerBay } from './showerBay';
+import { type AudioItem, moveSoundTo } from '@views/drive/lib/engine/game/audioItem';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { InstancedGroup, type InstanceReference } from '@views/drive/lib/engine/game/instancedGroup';
+import type { WorldObject } from '@views/drive/lib/engine/game/objectColliders';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { createCoconutCrate } from '@views/drive/lib/engine/game/world/islandProps';
+import { pushOutOfShowerBay } from '@views/drive/lib/engine/game/world/showerBay';
 
 interface Crate {
   readonly reference: InstanceReference;

@@ -1,5 +1,5 @@
-import { smallestAngle } from '../utilities/maths';
-import { FLIP, STUCK, WHEEL_COUNT } from './vehicleConfig';
+import { FLIP, STUCK, WHEEL_COUNT } from '@views/drive/lib/engine/game/physics/vehicleConfig';
+import { smallestAngle } from '@views/drive/lib/engine/game/utilities/maths';
 
 export class StuckDetector {
   active = false;

@@ -1,12 +1,17 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import { BIRD_TWEETS, CRICKETS_VOLUME, FIRE_FADE_DISTANCE, randomNearbyPosition } from './audioConfig';
-import { AudioItem } from './audioItem';
-import { getGame } from './gameContext';
-import { remapClamp } from './utilities/maths';
+import {
+  BIRD_TWEETS,
+  CRICKETS_VOLUME,
+  FIRE_FADE_DISTANCE,
+  randomNearbyPosition,
+} from '@views/drive/lib/engine/game/audioConfig';
+import { AudioItem } from '@views/drive/lib/engine/game/audioItem';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
 
-import type { Audio } from './audio';
+import type { Audio } from '@views/drive/lib/engine/game/audio';
 
 export function registerAmbients(audio: Audio): void {
   const { dayCycles } = getGame();

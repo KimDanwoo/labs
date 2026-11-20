@@ -1,6 +1,6 @@
-import { CloseButton } from './CloseButton';
-import { MenuContents } from './MenuContents';
-import { MenuNavigation } from './MenuNavigation';
+import { CloseButton } from '@views/drive/ui/CloseButton';
+import { MenuContents } from '@views/drive/ui/MenuContents';
+import { MenuNavigation } from '@views/drive/ui/MenuNavigation';
 
 export function Menu() {
   return (

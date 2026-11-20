@@ -1,6 +1,6 @@
 import { uniform } from 'three/tsl';
 
-import { Events } from './events';
+import { Events } from '@views/drive/lib/engine/game/events';
 
 interface FrameWait {
   remaining: number;

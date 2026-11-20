@@ -1,4 +1,10 @@
-import { BLOG_ORIGIN, isBlogAssetUrl, isBlogPostUrl, LATEST_POSTS_LIMIT, type LatestPost } from '../model/latestPost';
+import {
+  BLOG_ORIGIN,
+  isBlogAssetUrl,
+  isBlogPostUrl,
+  LATEST_POSTS_LIMIT,
+  type LatestPost,
+} from '@entities/blog/model/latestPost';
 
 const RSS_URL = `${BLOG_ORIGIN}/rss.xml`;
 const REVALIDATE_SECONDS = 3600;

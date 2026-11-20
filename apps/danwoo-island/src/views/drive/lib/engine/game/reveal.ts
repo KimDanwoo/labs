@@ -2,13 +2,13 @@ import gsap from 'gsap';
 import { color, uniform, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import type { Audio } from './audio';
-import { getGame } from './gameContext';
-import { introCenter } from './introCenter';
-import { prefersDataSaving } from './jukebox/idle';
-import { TICK_ORDER } from './tickOrder';
-import type { Intro } from './world/intro';
-import { isTideLoading, TIDE_REVEAL } from './world/tideLoading';
+import type { Audio } from '@views/drive/lib/engine/game/audio';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { introCenter } from '@views/drive/lib/engine/game/introCenter';
+import { prefersDataSaving } from '@views/drive/lib/engine/game/jukebox/idle';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import type { Intro } from '@views/drive/lib/engine/game/world/intro';
+import { isTideLoading, TIDE_REVEAL } from '@views/drive/lib/engine/game/world/tideLoading';
 
 const SKIP_PATTERN = /skip/i;
 const SKIP_SPEED = 4;

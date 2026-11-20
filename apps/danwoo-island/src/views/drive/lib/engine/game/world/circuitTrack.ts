@@ -1,12 +1,12 @@
 import { color, float, Fn, mix, PI, positionWorld, step, texture, uniform, uv, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { TICK_ORDER } from '../tickOrder';
-import { TRACK } from './layout/islandLayout';
-import { trackSamples } from './layout/trackPath';
-import { stripGeometry } from './trackGeometry';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { TRACK } from '@views/drive/lib/engine/game/world/layout/islandLayout';
+import { trackSamples } from '@views/drive/lib/engine/game/world/layout/trackPath';
+import { stripGeometry } from '@views/drive/lib/engine/game/world/trackGeometry';
 
 const SAMPLE_SPACING = 1;
 const ROAD_LIFT = 0.03;

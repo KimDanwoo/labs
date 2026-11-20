@@ -1,9 +1,9 @@
 import * as THREE from 'three/webgpu';
 
-import { type Triple } from './islandGeometry';
-import { fixedLandmark, LIGHTHOUSE } from './islandLandmarks';
-import { type PartName, islandMaterial } from './islandMaterials';
-import { islandModelMesh } from './islandModels';
+import { type Triple } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { fixedLandmark, LIGHTHOUSE } from '@views/drive/lib/engine/game/world/islandLandmarks';
+import { type PartName, islandMaterial } from '@views/drive/lib/engine/game/world/islandMaterials';
+import { islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
 
 const CAREER_PAINT = new Map<string, PartName>([
   ['emissiveOrangeRadialGradient', 'bunting3'],

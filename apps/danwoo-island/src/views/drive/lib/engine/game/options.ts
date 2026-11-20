@@ -1,7 +1,7 @@
-import { getGame } from './gameContext';
-import { QUALITY } from './quality';
-import { createElement } from './utilities/createElement';
-import { requireElement } from './utilities/requireElement';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { QUALITY } from '@views/drive/lib/engine/game/quality';
+import { createElement } from '@views/drive/lib/engine/game/utilities/createElement';
+import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
 
 const PAINTS = ['black', 'orange', 'white', 'red', 'flames', 'abyssal'] as const;
 type PaintName = (typeof PAINTS)[number];

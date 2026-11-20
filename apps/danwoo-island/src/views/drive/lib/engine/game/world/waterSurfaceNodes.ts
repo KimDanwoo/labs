@@ -1,8 +1,8 @@
 import { hash, positionWorld, texture, uniform } from 'three/tsl';
 import type * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { RIPPLES, type Vec4Node } from './waterSurfaceConfig';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { RIPPLES, type Vec4Node } from '@views/drive/lib/engine/game/world/waterSurfaceConfig';
 
 type RatioNode = THREE.UniformNode<'float', number>;
 

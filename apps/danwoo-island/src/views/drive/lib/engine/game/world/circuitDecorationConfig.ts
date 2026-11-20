@@ -1,5 +1,5 @@
+import type { Triple } from '@views/drive/lib/engine/game/world/islandGeometry';
 import * as THREE from 'three/webgpu';
-import type { Triple } from './islandGeometry';
 
 export type DecorationKind = 'erase' | 'tentLeg' | 'keep';
 export type Spot = readonly [number, number];

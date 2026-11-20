@@ -2,10 +2,10 @@ import gsap from 'gsap';
 import { Fn, texture, uv, vec2, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import content from '../../../data/danwoo';
-import { objectOf } from '../../objectColliders';
-import { rebuildVillageProps } from '../islandVillage';
-import { Area } from './area';
+import content from '@views/drive/lib/engine/data/danwoo';
+import { objectOf } from '@views/drive/lib/engine/game/objectColliders';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
 
 const HUB_SCREEN = 'areas/island/tvHub.webp';
 const COLLIDE_COOLDOWN = 1;

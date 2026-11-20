@@ -1,6 +1,6 @@
-import { worldAsset } from '../../../config/worldAsset';
-import type { IslandPlace, PlaceIcon } from './islandPlaces';
-import { createElement } from './utilities/createElement';
+import { worldAsset } from '@views/drive/config/worldAsset';
+import type { IslandPlace, PlaceIcon } from '@views/drive/lib/engine/game/islandPlaces';
+import { createElement } from '@views/drive/lib/engine/game/utilities/createElement';
 
 function iconElement(icon: PlaceIcon, className: string): HTMLImageElement {
   const image = createElement('img', className);

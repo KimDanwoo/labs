@@ -1,8 +1,8 @@
+import { SIDES } from '@views/drive/lib/engine/game/world/circuitProps';
+import { type Parts, createParts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import type { PartName } from '@views/drive/lib/engine/game/world/islandMaterials';
+import { type PropFrame, collidersOf } from '@views/drive/lib/engine/game/world/villageKit';
 import * as THREE from 'three/webgpu';
-import { SIDES } from './circuitProps';
-import { type Parts, createParts } from './islandGeometry';
-import type { PartName } from './islandMaterials';
-import { type PropFrame, collidersOf } from './villageKit';
 
 const PODIUM = /^refPodiumPhysicalFixed/;
 const PODIUM_BACKDROP = {

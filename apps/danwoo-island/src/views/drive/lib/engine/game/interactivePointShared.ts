@@ -1,11 +1,11 @@
+import type { AudioItem } from '@views/drive/lib/engine/game/audioItem';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { InteractivePoint } from '@views/drive/lib/engine/game/interactivePoint';
+import type { PointAlign } from '@views/drive/lib/engine/game/interactivePointArt';
+import type { PointState } from '@views/drive/lib/engine/game/pointProximity';
 import gsap from 'gsap';
 import { Fn, max, mix, step, uv, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import type { AudioItem } from './audioItem';
-import { getGame } from './gameContext';
-import type { InteractivePoint } from './interactivePoint';
-import type { PointAlign } from './interactivePointArt';
-import type { PointState } from './pointProximity';
 
 export interface InteractivePointOptions {
   position: THREE.Vector3;

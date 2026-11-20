@@ -1,12 +1,16 @@
 import * as THREE from 'three/webgpu';
 
-import { byeotgari } from './byeotgari';
-import { type DecorationKind, CIRCUIT_DECORATION, START_LIGHT_FRAME_LIFT } from './circuitDecorationConfig';
-import { hongsalmun } from './circuitGates';
-import { bannerStand, dancerChest, tentPole } from './circuitStands';
-import { createParts } from './islandGeometry';
-import { islandModelMesh } from './islandModels';
-import { type MeshComponent, removeComponents } from './meshComponents';
+import { byeotgari } from '@views/drive/lib/engine/game/world/byeotgari';
+import {
+  type DecorationKind,
+  CIRCUIT_DECORATION,
+  START_LIGHT_FRAME_LIFT,
+} from '@views/drive/lib/engine/game/world/circuitDecorationConfig';
+import { hongsalmun } from '@views/drive/lib/engine/game/world/circuitGates';
+import { bannerStand, dancerChest, tentPole } from '@views/drive/lib/engine/game/world/circuitStands';
+import { createParts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
+import { type MeshComponent, removeComponents } from '@views/drive/lib/engine/game/world/meshComponents';
 
 function classifyDecoration({ box }: MeshComponent): DecorationKind {
   const center = box.getCenter(new THREE.Vector3());

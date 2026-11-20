@@ -1,10 +1,10 @@
 import { color, Fn, min, mix, positionLocal, positionWorld, texture, uniform, uv, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import type { Physical } from '../physics/physicsTypes';
-import { TICK_ORDER } from '../tickOrder';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import type { Physical } from '@views/drive/lib/engine/game/physics/physicsTypes';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 const CELL_SIZE = 1.5;
 const EDGE_FADE = 20;

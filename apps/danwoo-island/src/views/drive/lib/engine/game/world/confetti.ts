@@ -13,9 +13,9 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { applyInstanceMatrix } from '../utilities/instanceMatrix';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { applyInstanceMatrix } from '@views/drive/lib/engine/game/utilities/instanceMatrix';
 
 const POOL_SIZE = 4;
 const PIECES = 500;

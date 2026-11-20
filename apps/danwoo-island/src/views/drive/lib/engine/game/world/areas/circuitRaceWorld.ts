@@ -1,11 +1,17 @@
 import type { RigidBody } from '@dimforge/rapier3d-compat';
 import type * as THREE from 'three/webgpu';
 
-import { objectOf, type WorldObject } from '../../objectColliders';
-import type { Area } from './area';
-import { type Checkpoint, type Podium, RACE_DAY, RACE_WEATHER, requireBody } from './circuitConfig';
-import { createPodium, createRails } from './circuitSetup';
-import { bindMenu, type MenuHandlers } from './circuitUi';
+import { objectOf, type WorldObject } from '@views/drive/lib/engine/game/objectColliders';
+import type { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import {
+  type Checkpoint,
+  type Podium,
+  RACE_DAY,
+  RACE_WEATHER,
+  requireBody,
+} from '@views/drive/lib/engine/game/world/areas/circuitConfig';
+import { createPodium, createRails } from '@views/drive/lib/engine/game/world/areas/circuitSetup';
+import { bindMenu, type MenuHandlers } from '@views/drive/lib/engine/game/world/areas/circuitUi';
 
 interface Pose {
   readonly position: THREE.Vector3;

@@ -1,5 +1,5 @@
-import type { AudioItem } from './audioItem';
-import { getGame } from './gameContext';
+import type { AudioItem } from '@views/drive/lib/engine/game/audioItem';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 
 export const WHEEL_COUNT = 4;
 export const UNSTUCK_DELAY = 3;

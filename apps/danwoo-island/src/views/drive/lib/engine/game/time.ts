@@ -1,9 +1,9 @@
 import gsap from 'gsap';
 
-import { getGame } from './gameContext';
-import { TICK_ORDER } from './tickOrder';
-import { clamp, remap } from './utilities/maths';
-import { prefersReducedMotion } from './utilities/reducedMotion';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { clamp, remap } from '@views/drive/lib/engine/game/utilities/maths';
+import { prefersReducedMotion } from '@views/drive/lib/engine/game/utilities/reducedMotion';
 
 const DEFAULT_SCALE = 2;
 const BULLET_TIME = { scale: 0.5, inSpeed: 3, outSpeed: 0.3, defaultSeconds: 1.5 } as const;

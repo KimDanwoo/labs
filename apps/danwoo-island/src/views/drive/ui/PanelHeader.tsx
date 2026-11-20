@@ -1,6 +1,6 @@
-import { ISLAND_MARK_ASSET } from '../config/menu';
-import { worldAsset } from '../config/worldAsset';
-import { CloseButton } from './CloseButton';
+import { ISLAND_MARK_ASSET } from '@views/drive/config/menu';
+import { worldAsset } from '@views/drive/config/worldAsset';
+import { CloseButton } from '@views/drive/ui/CloseButton';
 
 interface PanelHeaderProps {
   title: string;

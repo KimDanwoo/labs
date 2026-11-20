@@ -2,16 +2,20 @@ import gsap from 'gsap';
 import { color, Fn, luminance, mix, positionGeometry, sin, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import content from '../../../data/danwoo';
-import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
-import { rebuildVillageProps } from '../islandVillage';
-import { rebuildLabGate } from '../villageStructures';
-import { Area } from './area';
-import { LabScroller } from './labScroller';
-import { setUpBlackBoard } from './showcaseBlackBoard';
-import { ShowcaseImages } from './showcaseImages';
-import { hideIntersectMesh, TitleSign, UrlSign } from './showcaseSigns';
-import { createHoverMaterials, createShades, swingPendulum } from './showcaseVisuals';
+import content from '@views/drive/lib/engine/data/danwoo';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { LabScroller } from '@views/drive/lib/engine/game/world/areas/labScroller';
+import { setUpBlackBoard } from '@views/drive/lib/engine/game/world/areas/showcaseBlackBoard';
+import { ShowcaseImages } from '@views/drive/lib/engine/game/world/areas/showcaseImages';
+import { hideIntersectMesh, TitleSign, UrlSign } from '@views/drive/lib/engine/game/world/areas/showcaseSigns';
+import {
+  createHoverMaterials,
+  createShades,
+  swingPendulum,
+} from '@views/drive/lib/engine/game/world/areas/showcaseVisuals';
+import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
+import { rebuildLabGate } from '@views/drive/lib/engine/game/world/villageStructures';
 
 const FEATURED_INDEX = 0;
 const CANDLE = { sway: 0.06, speed: 0.3, frequency: 3, growDuration: 10 } as const;

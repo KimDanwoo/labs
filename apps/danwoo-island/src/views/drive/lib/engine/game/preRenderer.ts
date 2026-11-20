@@ -1,7 +1,7 @@
 import CubeRenderTarget from 'three/src/renderers/common/CubeRenderTarget.js';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 
 const CUBE_SIZE = 32;
 const CAMERA_NEAR = 1;

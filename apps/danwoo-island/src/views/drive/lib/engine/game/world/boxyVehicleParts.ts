@@ -1,9 +1,9 @@
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import type { PartName, VehicleParts } from '@views/drive/lib/engine/game/world/boxyVehicle';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { color } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import type { PartName, VehicleParts } from './boxyVehicle';
 
 const HALF_TURN = Math.PI / 2;
 const WHEEL_AXLES = [-0.9, 0.9] as const;

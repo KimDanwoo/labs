@@ -1,6 +1,6 @@
 import type { Vector } from '@dimforge/rapier3d-compat';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import * as THREE from 'three/webgpu';
-import { getGame } from '../gameContext';
 
 export type SuspensionState = 'low' | 'mid' | 'high';
 

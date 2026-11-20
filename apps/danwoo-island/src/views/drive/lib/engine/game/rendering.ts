@@ -2,10 +2,10 @@ import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 import { add, pass } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import { cheapDOF } from './passes/cheapDOF';
-import { QUALITY, type QualityLevel } from './quality';
-import { TICK_ORDER } from './tickOrder';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { cheapDOF } from '@views/drive/lib/engine/game/passes/cheapDOF';
+import { QUALITY, type QualityLevel } from '@views/drive/lib/engine/game/quality';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 const MAX_ANTIALIAS_PIXEL_RATIO = 2;
 const BLOOM = {

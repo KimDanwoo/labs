@@ -1,4 +1,4 @@
-import { requireElement } from './utilities/requireElement';
+import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
 
 interface Tab {
   name: string;

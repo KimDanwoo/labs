@@ -1,4 +1,4 @@
-import { getGame } from './gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import {
   easeRate,
   easeToward,
@@ -6,10 +6,10 @@ import {
   WHEEL_COUNT,
   WHEELS_ON_FLOOR_ELEVATION,
   type PlayerSounds,
-} from './playerConfig';
-import { clamp, remapClamp } from './utilities/maths';
+} from '@views/drive/lib/engine/game/playerConfig';
+import { clamp, remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
 
-import type { Player } from './player';
+import type { Player } from '@views/drive/lib/engine/game/player';
 
 export function registerPlayerSounds(): PlayerSounds {
   const { audio, inputs } = getGame();

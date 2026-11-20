@@ -1,6 +1,6 @@
+import { lerp } from '@views/drive/lib/engine/game/utilities/maths';
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
-import { lerp } from '../utilities/maths';
 
 export type CycleValue = number | THREE.Color;
 

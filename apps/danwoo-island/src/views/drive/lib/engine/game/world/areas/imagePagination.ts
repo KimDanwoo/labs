@@ -1,9 +1,9 @@
+import type { Intersect } from '@views/drive/lib/engine/game/rayCursor';
+import type { Require } from '@views/drive/lib/engine/game/world/areas/projectsPanels';
+import { hoverArrow, sphereIntersect } from '@views/drive/lib/engine/game/world/areas/showcaseSigns';
+import { firstChild, type HoverMaterials } from '@views/drive/lib/engine/game/world/areas/showcaseVisuals';
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
-import type { Intersect } from '../../rayCursor';
-import type { Require } from './projectsPanels';
-import { hoverArrow, sphereIntersect } from './showcaseSigns';
-import { firstChild, type HoverMaterials } from './showcaseVisuals';
 
 interface PageDot {
   readonly index: number;

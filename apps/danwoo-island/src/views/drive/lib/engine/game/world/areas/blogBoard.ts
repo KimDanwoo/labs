@@ -4,9 +4,8 @@ import * as THREE from 'three/webgpu';
 
 import { LATEST_POSTS_ENDPOINT, parseLatestPostsResponse } from '@entities/blog';
 
-import { createElement } from '../../utilities/createElement';
-import { noticeBoard } from '../villageStructures';
-import { paintBoard, paperPosition } from './blogBoardPaint';
+import { createElement } from '@views/drive/lib/engine/game/utilities/createElement';
+import { paintBoard, paperPosition } from '@views/drive/lib/engine/game/world/areas/blogBoardPaint';
 import {
   BOARD_SIZE,
   CANVAS,
@@ -20,7 +19,8 @@ import {
   postsOf,
   statusText,
   type BoardState,
-} from './blogPostCard';
+} from '@views/drive/lib/engine/game/world/areas/blogPostCard';
+import { noticeBoard } from '@views/drive/lib/engine/game/world/villageStructures';
 
 export class BlogBoard {
   readonly group: THREE.Group;

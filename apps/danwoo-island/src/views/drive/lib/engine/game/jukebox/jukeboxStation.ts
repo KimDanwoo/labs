@@ -14,13 +14,13 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import content from '../../data/danwoo';
-import { nowPlayingNotice } from '../audioConfig';
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { prefersDataSaving, runWhenIdle } from './idle';
-import { JukeboxPanel } from './jukeboxPanel';
-import { JukeboxPlayer } from './jukeboxPlayer';
+import content from '@views/drive/lib/engine/data/danwoo';
+import { nowPlayingNotice } from '@views/drive/lib/engine/game/audioConfig';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { prefersDataSaving, runWhenIdle } from '@views/drive/lib/engine/game/jukebox/idle';
+import { JukeboxPanel } from '@views/drive/lib/engine/game/jukebox/jukeboxPanel';
+import { JukeboxPlayer } from '@views/drive/lib/engine/game/jukebox/jukeboxPlayer';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 
 const NOTES = { count: 8, spread: 1, speed: 0.2, size: 1.5, offset: new THREE.Vector3(0, 1, 0.5) } as const;
 const NOTES_COLOR = '#ff994d';

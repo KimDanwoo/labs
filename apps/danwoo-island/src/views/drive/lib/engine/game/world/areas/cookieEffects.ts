@@ -1,8 +1,8 @@
 import { color, float, Fn, instancedArray, mix, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import type { Area } from './area';
-import { EMBER_BOUNDS, emberData, EMBERS } from './cookieAreaConfig';
+import type { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { EMBER_BOUNDS, emberData, EMBERS } from '@views/drive/lib/engine/game/world/areas/cookieAreaConfig';
 
 export function createEmbers(area: Area, localTime: THREE.UniformNode<'float', number>): void {
   const { positions, scales } = emberData();

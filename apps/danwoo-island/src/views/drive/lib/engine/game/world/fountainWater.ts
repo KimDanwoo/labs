@@ -17,7 +17,7 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 
 const SPOUTS = [
   new THREE.Vector3(-0.445, 1.03, 0.636),

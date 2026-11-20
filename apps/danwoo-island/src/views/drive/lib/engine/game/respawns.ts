@@ -1,6 +1,10 @@
 import * as THREE from 'three/webgpu';
 
-import { RESPAWN_POINTS, type RespawnPoint, respawnPosition } from './world/layout/islandLayout';
+import {
+  RESPAWN_POINTS,
+  type RespawnPoint,
+  respawnPosition,
+} from '@views/drive/lib/engine/game/world/layout/islandLayout';
 
 interface Respawn {
   name: string;

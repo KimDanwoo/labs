@@ -1,8 +1,14 @@
 import * as THREE from 'three/webgpu';
 
-import type { Parts } from './islandGeometry';
-import { islandModelMesh } from './islandModels';
-import { collidersOf, firstCollider, lathe, type PropFrame, referenceCenter } from './villageKit';
+import type { Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
+import {
+  collidersOf,
+  firstCollider,
+  lathe,
+  type PropFrame,
+  referenceCenter,
+} from '@views/drive/lib/engine/game/world/villageKit';
 
 const SIDES = [-1, 1] as const;
 

@@ -2,15 +2,23 @@ import gsap from 'gsap';
 import { uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import type { AudioItem } from '../../audioItem';
-import { ISLAND_PLACES } from '../../islandPlaces';
-import { Player } from '../../player';
-import { TICK_ORDER } from '../../tickOrder';
-import { rebuildSurfPoint } from '../shoreStructures';
-import { arrivalNotice, LIFT, NOTICE_DURATION, ORIGIN, SPIN, TRIGGER, VISIT } from './altarAreaConfig';
-import { createDebris, createDust, createFunnel } from './altarEffects';
-import { Area } from './area';
-import { pickTornadoDestination } from './tornadoRoute';
+import type { AudioItem } from '@views/drive/lib/engine/game/audioItem';
+import { ISLAND_PLACES } from '@views/drive/lib/engine/game/islandPlaces';
+import { Player } from '@views/drive/lib/engine/game/player';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import {
+  arrivalNotice,
+  LIFT,
+  NOTICE_DURATION,
+  ORIGIN,
+  SPIN,
+  TRIGGER,
+  VISIT,
+} from '@views/drive/lib/engine/game/world/areas/altarAreaConfig';
+import { createDebris, createDust, createFunnel } from '@views/drive/lib/engine/game/world/areas/altarEffects';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { pickTornadoDestination } from '@views/drive/lib/engine/game/world/areas/tornadoRoute';
+import { rebuildSurfPoint } from '@views/drive/lib/engine/game/world/shoreStructures';
 
 export class AltarArea extends Area {
   readonly #position: THREE.Vector3;

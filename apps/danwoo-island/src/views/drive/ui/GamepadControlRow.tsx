@@ -1,5 +1,5 @@
-import type { GamepadControl } from '../config/controls';
-import { PlaystationKey } from './PlaystationKey';
+import type { GamepadControl } from '@views/drive/config/controls';
+import { PlaystationKey } from '@views/drive/ui/PlaystationKey';
 
 interface GamepadControlRowProps {
   control: GamepadControl;

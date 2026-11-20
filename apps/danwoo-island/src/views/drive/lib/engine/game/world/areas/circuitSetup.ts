@@ -2,17 +2,11 @@ import gsap from 'gsap';
 import { color, Fn, uniform, uv, vec2, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import type { AudioItem } from '../../audioItem';
-import type { Action } from '../../inputs/inputTypes';
-import type { InteractivePoint } from '../../interactivePoint';
-import { objectOf, type WorldObject } from '../../objectColliders';
-import { layCircuitCourse, trackSideAt } from '../circuitCourse';
-import { reshapeCircuitDecoration } from '../circuitDecoration';
-import { rebuildPodium } from '../circuitPodiumProps';
-import { rebuildCircuitObjects } from '../circuitProps';
-import { rebuildTentCanopies } from '../circuitStands';
-import { replaceAirDancers } from '../islandReskins';
-import { Area } from './area';
+import type { AudioItem } from '@views/drive/lib/engine/game/audioItem';
+import type { Action } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import type { InteractivePoint } from '@views/drive/lib/engine/game/interactivePoint';
+import { objectOf, type WorldObject } from '@views/drive/lib/engine/game/objectColliders';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
 import {
   BANNER,
   DOOR,
@@ -28,7 +22,13 @@ import {
   type Door,
   type Obstacle,
   type Podium,
-} from './circuitConfig';
+} from '@views/drive/lib/engine/game/world/areas/circuitConfig';
+import { layCircuitCourse, trackSideAt } from '@views/drive/lib/engine/game/world/circuitCourse';
+import { reshapeCircuitDecoration } from '@views/drive/lib/engine/game/world/circuitDecoration';
+import { rebuildPodium } from '@views/drive/lib/engine/game/world/circuitPodiumProps';
+import { rebuildCircuitObjects } from '@views/drive/lib/engine/game/world/circuitProps';
+import { rebuildTentCanopies } from '@views/drive/lib/engine/game/world/circuitStands';
+import { replaceAirDancers } from '@views/drive/lib/engine/game/world/islandReskins';
 
 export function registerCircuitSounds(area: Area): CircuitSounds {
   const { audio } = area.game;

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { MAX_STEP_SCALED, splitStep } from '../physicsTypes';
+import { MAX_STEP_SCALED, splitStep } from '@views/drive/lib/engine/game/physics/physicsTypes';
 
 const SCALE = 2;
 const SIXTY_FPS = 1 / 60;

@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { AudioGroup, AudioItem, type SoundHost, type SoundOptions, type SoundPlayer } from '../audioItem';
+import {
+  AudioGroup,
+  AudioItem,
+  type SoundHost,
+  type SoundOptions,
+  type SoundPlayer,
+} from '@views/drive/lib/engine/game/audioItem';
 
 interface FakePlayer extends SoundPlayer {
   calls: string[];

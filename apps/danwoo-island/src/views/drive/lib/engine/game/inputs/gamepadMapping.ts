@@ -1,4 +1,4 @@
-import { remapClamp } from '../utilities/maths';
+import { remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
 
 export const BUTTON_NAMES = [
   'cross',

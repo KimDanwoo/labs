@@ -16,10 +16,10 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { WindLineGeometry } from '../geometries/windLineGeometry';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { remapClamp } from '../utilities/maths';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { WindLineGeometry } from '@views/drive/lib/engine/game/geometries/windLineGeometry';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
 
 const POOL_SIZE = 4;
 const INTERVAL_MS = { min: 300, max: 2000 } as const;

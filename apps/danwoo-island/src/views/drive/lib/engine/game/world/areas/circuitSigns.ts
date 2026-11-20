@@ -1,10 +1,14 @@
 import { color, mix, texture, uv, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
-import type { WorldObject } from '../../objectColliders';
-import { QUARTER_TURN } from '../islandGeometry';
-import { type IslandModelKey, islandModelMesh, islandPaletteMaterial } from '../islandModels';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import type { WorldObject } from '@views/drive/lib/engine/game/objectColliders';
+import { QUARTER_TURN } from '@views/drive/lib/engine/game/world/islandGeometry';
+import {
+  type IslandModelKey,
+  islandModelMesh,
+  islandPaletteMaterial,
+} from '@views/drive/lib/engine/game/world/islandModels';
 
 interface SignLine {
   readonly text: string;

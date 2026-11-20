@@ -3,10 +3,10 @@ import { clamp } from 'three/src/math/MathUtils.js';
 import { abs, atan, float, Fn, If, max, positionGeometry, step, uniform, vec2, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { Events } from '../events';
-import { getGame } from '../gameContext';
-import { smallestAngle } from '../utilities/maths';
-import type { Pointer } from './pointer';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { Pointer } from '@views/drive/lib/engine/game/inputs/pointer';
+import { smallestAngle } from '@views/drive/lib/engine/game/utilities/maths';
 
 type PointerTrigger = 'start' | 'change' | 'end';
 

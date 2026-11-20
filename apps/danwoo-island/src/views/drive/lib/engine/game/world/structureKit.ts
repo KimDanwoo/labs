@@ -1,7 +1,7 @@
+import type { Parts, Triple } from '@views/drive/lib/engine/game/world/islandGeometry';
+import type { PartName } from '@views/drive/lib/engine/game/world/islandMaterials';
+import { islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
 import * as THREE from 'three/webgpu';
-import type { Parts, Triple } from './islandGeometry';
-import type { PartName } from './islandMaterials';
-import { islandModelMesh } from './islandModels';
 
 export interface Frame {
   readonly size: THREE.Vector3;

@@ -13,7 +13,7 @@ import {
   formatDate,
   postsOf,
   statusText,
-} from './blogPostCard';
+} from '@views/drive/lib/engine/game/world/areas/blogPostCard';
 
 type FloatUniform = THREE.UniformNode<'float', number>;
 

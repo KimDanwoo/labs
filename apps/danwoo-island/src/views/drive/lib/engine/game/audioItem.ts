@@ -1,7 +1,7 @@
 import type { HowlOptions } from 'howler';
 import type * as THREE from 'three/webgpu';
 
-import { worldAsset } from '../../../config/worldAsset';
+import { worldAsset } from '@views/drive/config/worldAsset';
 
 export type SoundHandler = (item: AudioItem, ...args: unknown[]) => void;
 

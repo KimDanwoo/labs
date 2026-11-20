@@ -2,13 +2,13 @@ import gsap from 'gsap';
 import { float, Fn, instancedArray, step, uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { INPUT_MODE, type InputMode } from '../../inputs/inputTypes';
-import { objectOf } from '../../objectColliders';
-import { replaceBonfireBase } from '../islandStructures';
-import { rebuildVillageProps } from '../islandVillage';
-import { rebuildKeyboardDeck, rebuildKiosk } from '../villageStructures';
-import { Area } from './area';
-import { replaceLandingName } from './landingName';
+import { INPUT_MODE, type InputMode } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import { objectOf } from '@views/drive/lib/engine/game/objectColliders';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { replaceLandingName } from '@views/drive/lib/engine/game/world/areas/landingName';
+import { replaceBonfireBase } from '@views/drive/lib/engine/game/world/islandStructures';
+import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
+import { rebuildKeyboardDeck, rebuildKiosk } from '@views/drive/lib/engine/game/world/villageStructures';
 
 const LETTER_CONTACT_THRESHOLD = 5;
 const EMBERS = { count: 30, elevation: 5, size: 0.5, segments: 8, hideAt: 0.8, hideLift: 100 } as const;

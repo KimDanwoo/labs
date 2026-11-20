@@ -1,4 +1,4 @@
-import { Events } from '../events';
+import { Events } from '@views/drive/lib/engine/game/events';
 
 const EDITABLE = 'input, textarea, [contenteditable]';
 

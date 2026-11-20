@@ -1,10 +1,10 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../../gameContext';
-import { INPUT_MODE } from '../../inputs/inputTypes';
-import { QUARTER_TURN } from '../islandGeometry';
-import { islandModelMesh, islandPaletteMaterial } from '../islandModels';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { INPUT_MODE } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import { QUARTER_TURN } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { islandModelMesh, islandPaletteMaterial } from '@views/drive/lib/engine/game/world/islandModels';
 
 type Require = (name: string) => THREE.Object3D;
 

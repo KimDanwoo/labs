@@ -1,5 +1,5 @@
 import type { Collider, ColliderDesc, RigidBody, RigidBodyDesc, Rotation, Vector } from '@dimforge/rapier3d-compat';
-import { getGame } from '../gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 
 export type BodyType = 'dynamic' | 'fixed' | 'kinematicPositionBased' | 'kinematicVelocityBased';
 export type CollisionCategory = 'floor' | 'object' | 'bumper';

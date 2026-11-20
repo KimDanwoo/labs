@@ -1,9 +1,9 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import { INPUT_MODE } from './inputs/inputTypes';
-import type { SuspensionState } from './physics/vehicleConfig';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { INPUT_MODE } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import type { SuspensionState } from '@views/drive/lib/engine/game/physics/vehicleConfig';
 import {
   ACTIONS,
   DIE_RESPAWN_DELAY,
@@ -15,10 +15,10 @@ import {
   WHEEL_COUNT,
   WHEEL_SUSPENSION_ACTIONS,
   type PlayerSounds,
-} from './playerConfig';
-import { readNipple, syncAfterPhysics } from './playerControls';
-import { registerDrivingSounds, registerPlayerSounds } from './playerSounds';
-import { TICK_ORDER } from './tickOrder';
+} from '@views/drive/lib/engine/game/playerConfig';
+import { readNipple, syncAfterPhysics } from '@views/drive/lib/engine/game/playerControls';
+import { registerDrivingSounds, registerPlayerSounds } from '@views/drive/lib/engine/game/playerSounds';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 export class Player {
   static readonly STATE_DEFAULT = 1;

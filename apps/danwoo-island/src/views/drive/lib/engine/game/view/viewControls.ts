@@ -1,9 +1,9 @@
 import * as THREE from 'three/webgpu';
 
-import type { Action } from '../inputs/inputTypes';
-import { Pointer } from '../inputs/pointer';
-import { clamp, lerp, remap } from '../utilities/maths';
-import type { View } from '../view';
+import type { Action } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import { Pointer } from '@views/drive/lib/engine/game/inputs/pointer';
+import { clamp, lerp, remap } from '@views/drive/lib/engine/game/utilities/maths';
+import type { View } from '@views/drive/lib/engine/game/view';
 import {
   FOCUS,
   FOCUS_ACTIONS,
@@ -14,7 +14,7 @@ import {
   type Spherical,
   ZOOM,
   type Zoom,
-} from './viewConfig';
+} from '@views/drive/lib/engine/game/view/viewConfig';
 
 export function listenFocusActions(view: View): void {
   view.game.inputs.events.on('actionStart', (action) => {

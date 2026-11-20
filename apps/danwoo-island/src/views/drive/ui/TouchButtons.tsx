@@ -1,4 +1,4 @@
-import { TOUCH_BUTTONS } from '../config/menu';
+import { TOUCH_BUTTONS } from '@views/drive/config/menu';
 
 export function TouchButtons() {
   return (

@@ -1,1 +1,1 @@
-export { DriveView } from './ui/DriveView';
+export { DriveView } from '@views/drive/ui/DriveView';

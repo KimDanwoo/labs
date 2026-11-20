@@ -1,8 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-import { WORLD_CONFIG } from '../../worldConfig';
-import { type Keyframe } from './cycleKeyframes';
-import { Cycles } from './cycles';
+import { type Keyframe } from '@views/drive/lib/engine/game/cycles/cycleKeyframes';
+import { Cycles } from '@views/drive/lib/engine/game/cycles/cycles';
+import { WORLD_CONFIG } from '@views/drive/lib/engine/worldConfig';
 
 interface DayPreset {
   revealColor: THREE.Color;

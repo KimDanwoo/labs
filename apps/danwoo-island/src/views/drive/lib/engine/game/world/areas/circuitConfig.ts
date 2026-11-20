@@ -1,7 +1,7 @@
 import type { RigidBody } from '@dimforge/rapier3d-compat';
+import type { AudioItem } from '@views/drive/lib/engine/game/audioItem';
+import type { WorldObject } from '@views/drive/lib/engine/game/objectColliders';
 import * as THREE from 'three/webgpu';
-import type { AudioItem } from '../../audioItem';
-import type { WorldObject } from '../../objectColliders';
 
 export type CircuitState = 'pending' | 'starting' | 'running' | 'ending';
 export type RaceOutcome = 'finished' | 'aborted';

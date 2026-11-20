@@ -1,16 +1,16 @@
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import { introCenter } from './introCenter';
-import { QUALITY } from './quality';
-import { TICK_ORDER } from './tickOrder';
-import { lerp, smoothstep } from './utilities/maths';
-import { prefersReducedMotion } from './utilities/reducedMotion';
-import { CameraRoll } from './view/cameraRoll';
-import { Cinematic } from './view/cinematic';
-import { OptimalArea } from './view/optimalArea';
-import { frameOverview, type OverviewFrame, type ScreenInsets } from './view/overviewFrame';
-import { SpeedLines } from './view/speedLines';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { introCenter } from '@views/drive/lib/engine/game/introCenter';
+import { QUALITY } from '@views/drive/lib/engine/game/quality';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { lerp, smoothstep } from '@views/drive/lib/engine/game/utilities/maths';
+import { prefersReducedMotion } from '@views/drive/lib/engine/game/utilities/reducedMotion';
+import { CameraRoll } from '@views/drive/lib/engine/game/view/cameraRoll';
+import { Cinematic } from '@views/drive/lib/engine/game/view/cinematic';
+import { OptimalArea } from '@views/drive/lib/engine/game/view/optimalArea';
+import { frameOverview, type OverviewFrame, type ScreenInsets } from '@views/drive/lib/engine/game/view/overviewFrame';
+import { SpeedLines } from '@views/drive/lib/engine/game/view/speedLines';
 import {
   CAMERA,
   FOCUS,
@@ -22,7 +22,7 @@ import {
   type FocusPoint,
   type Spherical,
   type Zoom,
-} from './view/viewConfig';
+} from '@views/drive/lib/engine/game/view/viewConfig';
 import {
   createSpherical,
   followTarget,
@@ -32,7 +32,7 @@ import {
   nudgeZoom,
   panWithGamepad,
   smoothFocus,
-} from './view/viewControls';
+} from '@views/drive/lib/engine/game/view/viewControls';
 
 export class View {
   readonly game = getGame();

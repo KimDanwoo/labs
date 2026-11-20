@@ -8,7 +8,7 @@ import {
   paintVertices,
   VERTEX_COLOR_KEY,
   type PartName,
-} from './islandMaterials';
+} from '@views/drive/lib/engine/game/world/islandMaterials';
 
 export const OCTAGON = 8;
 export const FULL_TURN = Math.PI * 2;

@@ -1,8 +1,13 @@
 import gsap from 'gsap';
 import type * as THREE from 'three/webgpu';
 
-import type { Area } from './area';
-import { COUNTDOWN_INTERVAL, type CircuitSounds, LIGHT_STEP, startingLightsMesh } from './circuitConfig';
+import type { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import {
+  COUNTDOWN_INTERVAL,
+  type CircuitSounds,
+  LIGHT_STEP,
+  startingLightsMesh,
+} from '@views/drive/lib/engine/game/world/areas/circuitConfig';
 
 export class CircuitLights {
   readonly #lights: { mesh: THREE.Mesh; red: THREE.Material; green: THREE.Material; baseZ: number };

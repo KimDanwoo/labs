@@ -1,10 +1,10 @@
 import * as THREE from 'three/webgpu';
 
-import { rebuildVillageProps } from '../islandVillage';
-import { rebuildShowerStation, SHOWER_PARTS } from '../shoreStructures';
-import { SHOWER_SCALE } from '../showerBay';
-import { ShowerWater } from '../showerWater';
-import { Area } from './area';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
+import { rebuildShowerStation, SHOWER_PARTS } from '@views/drive/lib/engine/game/world/shoreStructures';
+import { SHOWER_SCALE } from '@views/drive/lib/engine/game/world/showerBay';
+import { ShowerWater } from '@views/drive/lib/engine/game/world/showerWater';
 
 const LANE = { halfWidth: 1.2 * SHOWER_SCALE, halfLength: 1.1 * SHOWER_SCALE } as const;
 const SOUND = { path: 'sounds/rain/soundjay_rain-on-leaves_main-01.mp3', volume: 0.6, distanceFade: 14 } as const;

@@ -1,7 +1,11 @@
 import * as THREE from 'three/webgpu';
 
-import { createParts, type Triple } from './islandGeometry';
-import { islandModelGeometry, islandPaletteMaterial, type IslandModelKey } from './islandModels';
+import { createParts, type Triple } from '@views/drive/lib/engine/game/world/islandGeometry';
+import {
+  islandModelGeometry,
+  islandPaletteMaterial,
+  type IslandModelKey,
+} from '@views/drive/lib/engine/game/world/islandModels';
 
 interface Glass {
   size: Triple;

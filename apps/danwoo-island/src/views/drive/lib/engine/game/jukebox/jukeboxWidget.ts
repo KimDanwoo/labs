@@ -1,4 +1,10 @@
-import type { SoundCloudGlobal, SoundCloudWidget, WidgetEvent, WidgetFrame, WidgetPayload } from './soundcloudWidget';
+import type {
+  SoundCloudGlobal,
+  SoundCloudWidget,
+  WidgetEvent,
+  WidgetFrame,
+  WidgetPayload,
+} from '@views/drive/lib/engine/game/jukebox/soundcloudWidget';
 
 const READY_TIMEOUT_MS = 12_000;
 

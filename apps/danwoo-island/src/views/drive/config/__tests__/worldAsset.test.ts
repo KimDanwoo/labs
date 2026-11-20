@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { worldAsset } from '../worldAsset';
+import { worldAsset } from '@views/drive/config/worldAsset';
 
 describe('worldAsset', () => {
   it('월드 에셋 상대 경로에 /world/를 붙인다', () => {

@@ -1,4 +1,4 @@
-import { worldAsset } from '../config/worldAsset';
+import { worldAsset } from '@views/drive/config/worldAsset';
 
 export function MenuTrigger() {
   return (

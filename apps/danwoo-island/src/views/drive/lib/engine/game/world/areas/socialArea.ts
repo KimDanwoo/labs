@@ -1,9 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
-import { rebuildVillageProps } from '../islandVillage';
-import { Area } from './area';
-import { interactButtons } from './areaPoint';
+import { InstancedGroup, type InstanceReference } from '@views/drive/lib/engine/game/instancedGroup';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { interactButtons } from '@views/drive/lib/engine/game/world/areas/areaPoint';
 import {
   type Fan,
   FAN_COUNT,
@@ -15,9 +14,14 @@ import {
   FAN_SWAY,
   RESET_SETTLE_FRAMES,
   UNLINKED_SIGNS,
-} from './socialAreaConfig';
-import { createSocialLinks } from './socialLinks';
-import { personalizeSocialSigns, recordSteleFrames, reshapeSocialPlaza } from './socialSigns';
+} from '@views/drive/lib/engine/game/world/areas/socialAreaConfig';
+import { createSocialLinks } from '@views/drive/lib/engine/game/world/areas/socialLinks';
+import {
+  personalizeSocialSigns,
+  recordSteleFrames,
+  reshapeSocialPlaza,
+} from '@views/drive/lib/engine/game/world/areas/socialSigns';
+import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
 
 export class SocialArea extends Area {
   readonly fans: { instancedGroup: InstancedGroup };

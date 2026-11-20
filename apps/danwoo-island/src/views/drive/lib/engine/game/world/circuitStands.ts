@@ -1,8 +1,8 @@
+import { CIRCUIT_DECORATION, SIDES, TENT_CANOPY } from '@views/drive/lib/engine/game/world/circuitDecorationConfig';
+import type { Parts, Triple } from '@views/drive/lib/engine/game/world/islandGeometry';
+import type { PartName } from '@views/drive/lib/engine/game/world/islandMaterials';
+import { islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
 import * as THREE from 'three/webgpu';
-import { CIRCUIT_DECORATION, SIDES, TENT_CANOPY } from './circuitDecorationConfig';
-import type { Parts, Triple } from './islandGeometry';
-import type { PartName } from './islandMaterials';
-import { islandModelMesh } from './islandModels';
 
 const DANCER_CHEST = {
   bodySize: [1.2, 0.9, 1.2] satisfies Triple,

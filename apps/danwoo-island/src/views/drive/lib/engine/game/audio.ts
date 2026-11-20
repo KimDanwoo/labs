@@ -2,9 +2,8 @@ import gsap from 'gsap';
 import { Howl, Howler } from 'howler';
 import * as THREE from 'three/webgpu';
 
-import { worldAsset } from '../../../config/worldAsset';
-import { WORLD_CONFIG } from '../worldConfig';
-import { registerAmbients } from './ambientSounds';
+import { worldAsset } from '@views/drive/config/worldAsset';
+import { registerAmbients } from '@views/drive/lib/engine/game/ambientSounds';
 import {
   CAMERA_DEPTH_SCALE,
   IS_IOS,
@@ -18,16 +17,17 @@ import {
   closestTo,
   nowPlayingNotice,
   scheduleIdle,
-} from './audioConfig';
-import { AudioGroup, AudioItem, type SoundHost, type SoundOptions } from './audioItem';
-import { AudioMute } from './audioMute';
-import { Events } from './events';
-import { getGame } from './gameContext';
-import { MusicStream } from './musicStream';
-import { registerOneOffs } from './oneOffSounds';
-import { Playlist } from './playlist';
-import { TICK_ORDER } from './tickOrder';
-import { clamp, remapClamp } from './utilities/maths';
+} from '@views/drive/lib/engine/game/audioConfig';
+import { AudioGroup, AudioItem, type SoundHost, type SoundOptions } from '@views/drive/lib/engine/game/audioItem';
+import { AudioMute } from '@views/drive/lib/engine/game/audioMute';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MusicStream } from '@views/drive/lib/engine/game/musicStream';
+import { registerOneOffs } from '@views/drive/lib/engine/game/oneOffSounds';
+import { Playlist } from '@views/drive/lib/engine/game/playlist';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { clamp, remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
+import { WORLD_CONFIG } from '@views/drive/lib/engine/worldConfig';
 
 export class Audio {
   readonly events = new Events<{ muteChange: [isMuted: boolean]; backgroundChange: [isBackground: boolean] }>();

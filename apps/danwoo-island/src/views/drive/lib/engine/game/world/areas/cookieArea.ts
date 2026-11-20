@@ -2,11 +2,9 @@ import gsap from 'gsap';
 import { float, Fn, positionGeometry, texture, uniform, uv, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import type { AudioItem } from '../../audioItem';
-import { InstancedGroup, type InstanceReference } from '../../instancedGroup';
-import { COCONUT_SIZE, makeCoconut, rebuildVillageProps } from '../islandVillage';
-import { rebuildCookieCart } from '../villageStructures';
-import { Area } from './area';
+import type { AudioItem } from '@views/drive/lib/engine/game/audioItem';
+import { InstancedGroup, type InstanceReference } from '@views/drive/lib/engine/game/instancedGroup';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
 import {
   BANNER_WIND_DIRECTION,
   type Coconut,
@@ -17,8 +15,10 @@ import {
   ON_TABLE,
   SPAWNABLE,
   TABLE_STACK,
-} from './cookieAreaConfig';
-import { createEmbers, createOvenHeat } from './cookieEffects';
+} from '@views/drive/lib/engine/game/world/areas/cookieAreaConfig';
+import { createEmbers, createOvenHeat } from '@views/drive/lib/engine/game/world/areas/cookieEffects';
+import { COCONUT_SIZE, makeCoconut, rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
+import { rebuildCookieCart } from '@views/drive/lib/engine/game/world/villageStructures';
 
 export class CookieArea extends Area {
   readonly cookies: { instancedGroup: InstancedGroup };

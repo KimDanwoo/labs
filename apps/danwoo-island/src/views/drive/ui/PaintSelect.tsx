@@ -1,4 +1,4 @@
-import { PAINT_OPTIONS } from '../config/menu';
+import { PAINT_OPTIONS } from '@views/drive/config/menu';
 
 export function PaintSelect() {
   return (

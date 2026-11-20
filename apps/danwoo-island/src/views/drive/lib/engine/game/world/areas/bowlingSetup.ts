@@ -1,12 +1,18 @@
 import * as THREE from 'three/webgpu';
 
-import { type AudioItem, moveSoundTo } from '../../audioItem';
-import { InstancedGroup } from '../../instancedGroup';
-import type { InteractivePoint } from '../../interactivePoint';
-import { objectOf } from '../../objectColliders';
-import { remapClamp } from '../../utilities/maths';
-import { Area } from './area';
-import { type Ball, type Pin, PIN_MASS, requireBody, worldPose } from './bowlingConfig';
+import { type AudioItem, moveSoundTo } from '@views/drive/lib/engine/game/audioItem';
+import { InstancedGroup } from '@views/drive/lib/engine/game/instancedGroup';
+import type { InteractivePoint } from '@views/drive/lib/engine/game/interactivePoint';
+import { objectOf } from '@views/drive/lib/engine/game/objectColliders';
+import { remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import {
+  type Ball,
+  type Pin,
+  PIN_MASS,
+  requireBody,
+  worldPose,
+} from '@views/drive/lib/engine/game/world/areas/bowlingConfig';
 
 export function registerBowlingSounds(area: Area, getBall: () => Ball): { strike: AudioItem; pin: AudioItem } {
   const { audio } = area.game;

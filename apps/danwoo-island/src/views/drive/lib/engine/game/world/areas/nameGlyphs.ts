@@ -1,4 +1,4 @@
-import type { GlyphOutline } from './landingName';
+import type { GlyphOutline } from '@views/drive/lib/engine/game/world/areas/landingName';
 
 export const NAME_GLYPHS: readonly GlyphOutline[] = [
   {

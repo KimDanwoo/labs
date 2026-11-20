@@ -1,5 +1,5 @@
-import { getGame } from './gameContext';
-import { TICK_ORDER } from './tickOrder';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 interface Glyph {
   character: string;

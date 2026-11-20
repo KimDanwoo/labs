@@ -1,7 +1,7 @@
-import { BlogModal } from './BlogModal';
-import { CircuitEndModal } from './CircuitEndModal';
-import { JukeboxModal } from './JukeboxModal';
-import { MapModal } from './MapModal';
+import { BlogModal } from '@views/drive/ui/BlogModal';
+import { CircuitEndModal } from '@views/drive/ui/CircuitEndModal';
+import { JukeboxModal } from '@views/drive/ui/JukeboxModal';
+import { MapModal } from '@views/drive/ui/MapModal';
 
 export function Modals() {
   return (

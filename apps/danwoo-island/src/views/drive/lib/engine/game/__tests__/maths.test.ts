@@ -7,7 +7,7 @@ import {
   remapClamp,
   segmentCircleIntersection,
   smallestAngle,
-} from '../utilities/maths';
+} from '@views/drive/lib/engine/game/utilities/maths';
 
 const SQUARE = [
   { x: 0, y: 0 },

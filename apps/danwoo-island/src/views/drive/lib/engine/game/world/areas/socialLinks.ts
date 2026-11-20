@@ -1,7 +1,7 @@
-import content from '../../../data/danwoo';
-import type { Area } from './area';
-import { interactButtons } from './areaPoint';
-import { LINK_ELEVATION, LINK_MODELS } from './socialAreaConfig';
+import content from '@views/drive/lib/engine/data/danwoo';
+import type { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { interactButtons } from '@views/drive/lib/engine/game/world/areas/areaPoint';
+import { LINK_ELEVATION, LINK_MODELS } from '@views/drive/lib/engine/game/world/areas/socialAreaConfig';
 
 export function createSocialLinks(area: Area): void {
   for (const link of content.social) {

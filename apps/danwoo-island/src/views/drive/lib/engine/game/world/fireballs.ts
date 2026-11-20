@@ -16,7 +16,7 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 
 interface FireballOptions {
   fireRadius?: number;

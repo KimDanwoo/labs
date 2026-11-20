@@ -2,8 +2,8 @@ import gsap from 'gsap';
 import { color, float, Fn, mix, texture, uniform, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
-import { TextCanvas } from '../../textCanvas';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { TextCanvas } from '@views/drive/lib/engine/game/textCanvas';
 
 export type Direction = 'previous' | 'next';
 

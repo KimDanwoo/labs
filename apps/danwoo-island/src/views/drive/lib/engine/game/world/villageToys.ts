@@ -1,8 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-import type { Parts } from './islandGeometry';
-import type { PartName } from './islandMaterials';
-import { lathe, type Profile, type PropFrame } from './villageKit';
+import type { Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import type { PartName } from '@views/drive/lib/engine/game/world/islandMaterials';
+import { lathe, type Profile, type PropFrame } from '@views/drive/lib/engine/game/world/villageKit';
 
 const PIN_PROFILE: Profile = [
   [0, 0.02],

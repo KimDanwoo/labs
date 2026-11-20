@@ -1,6 +1,6 @@
-import { getGame } from './gameContext';
-import { INPUT_MODE } from './inputs/inputTypes';
-import { isShown } from './panelState';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { INPUT_MODE } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import { isShown } from '@views/drive/lib/engine/game/panelState';
 
 const ACTION_CATEGORIES = ['modal', 'menu', 'racing', 'cinematic', 'wandering'];
 const ACTIONS = [

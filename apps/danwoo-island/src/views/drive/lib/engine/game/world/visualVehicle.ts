@@ -1,15 +1,20 @@
 import { mix, uniform, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { TICK_ORDER } from '../tickOrder';
-import { Track } from '../tracks';
-import { Trails } from '../trails';
-import { clamp, remapClamp } from '../utilities/maths';
-import { createBoxyVehicle } from './boxyVehicle';
-import { bindBlinkers, createPaints } from './vehiclePaints';
-import { createAntenna, createWheels, updateAntenna, updateWheels } from './vehicleWheels';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { Track } from '@views/drive/lib/engine/game/tracks';
+import { Trails } from '@views/drive/lib/engine/game/trails';
+import { clamp, remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
+import { createBoxyVehicle } from '@views/drive/lib/engine/game/world/boxyVehicle';
+import { bindBlinkers, createPaints } from '@views/drive/lib/engine/game/world/vehiclePaints';
+import {
+  createAntenna,
+  createWheels,
+  updateAntenna,
+  updateWheels,
+} from '@views/drive/lib/engine/game/world/vehicleWheels';
 import {
   type Antenna,
   BOOST,
@@ -22,7 +27,7 @@ import {
   TRAIL_OFFSETS,
   trailAnchor,
   type VisualWheel,
-} from './visualVehicleParts';
+} from '@views/drive/lib/engine/game/world/visualVehicleParts';
 
 export class VisualVehicle {
   readonly screenPosition = new THREE.Vector2(0, 0);

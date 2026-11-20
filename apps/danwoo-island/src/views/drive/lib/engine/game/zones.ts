@@ -1,8 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-import { Events } from './events';
-import { getGame } from './gameContext';
-import { TICK_ORDER } from './tickOrder';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 type ZoneShape = 'sphere' | 'cylinder';
 

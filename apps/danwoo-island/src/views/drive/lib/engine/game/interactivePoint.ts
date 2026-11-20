@@ -2,8 +2,8 @@ import gsap from 'gsap';
 import { texture, uniform, uv, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import { INPUT_MODE } from './inputs/inputTypes';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { INPUT_MODE } from '@views/drive/lib/engine/game/inputs/inputTypes';
 import {
   cachedLabelArt,
   concealedOffset,
@@ -11,7 +11,7 @@ import {
   layoutLabel,
   oppositeAlign,
   type PointAlign,
-} from './interactivePointArt';
+} from '@views/drive/lib/engine/game/interactivePointArt';
 import {
   CENTER_BIAS_NDC,
   DIAMOND,
@@ -26,9 +26,9 @@ import {
   setDepthTest,
   type SharedParts,
   tweenDiamond,
-} from './interactivePointShared';
-import type { PointState } from './pointProximity';
-import type { Intersect } from './rayCursor';
+} from '@views/drive/lib/engine/game/interactivePointShared';
+import type { PointState } from '@views/drive/lib/engine/game/pointProximity';
+import type { Intersect } from '@views/drive/lib/engine/game/rayCursor';
 
 export class InteractivePoint {
   state: PointState;

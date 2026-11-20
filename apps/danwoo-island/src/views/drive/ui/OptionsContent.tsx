@@ -1,8 +1,8 @@
-import { AudioToggleIcons } from './AudioToggleIcons';
-import { OptionRow } from './OptionRow';
-import { OptionsTable } from './OptionsTable';
-import { PaintSelect } from './PaintSelect';
-import { TooltipButton } from './TooltipButton';
+import { AudioToggleIcons } from '@views/drive/ui/AudioToggleIcons';
+import { OptionRow } from '@views/drive/ui/OptionRow';
+import { OptionsTable } from '@views/drive/ui/OptionsTable';
+import { PaintSelect } from '@views/drive/ui/PaintSelect';
+import { TooltipButton } from '@views/drive/ui/TooltipButton';
 
 export function OptionsContent() {
   return (

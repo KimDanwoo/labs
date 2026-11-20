@@ -1,8 +1,7 @@
 import type { ColliderDesc, EventQueue, TempContactForceEvent, World } from '@dimforge/rapier3d-compat';
 
-import { Events } from '../events';
-import { getGame } from '../gameContext';
-import { TICK_ORDER } from '../tickOrder';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import {
   bodyDesc,
   CATEGORIES,
@@ -19,7 +18,8 @@ import {
   splitStep,
   SUBMERGED_DAMPING,
   UNIT_INERTIA,
-} from './physicsTypes';
+} from '@views/drive/lib/engine/game/physics/physicsTypes';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 function configureBodyDesc(
   desc: ReturnType<typeof bodyDesc>,

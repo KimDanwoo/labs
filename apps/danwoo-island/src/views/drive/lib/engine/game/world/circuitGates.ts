@@ -1,6 +1,6 @@
+import type { Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import type { PartName } from '@views/drive/lib/engine/game/world/islandMaterials';
 import * as THREE from 'three/webgpu';
-import type { Parts } from './islandGeometry';
-import type { PartName } from './islandMaterials';
 const HONGSALMUN = {
   postX: [-16.4, -2.7],
   z: -16.32,

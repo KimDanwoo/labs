@@ -1,18 +1,26 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import { worldAsset } from '../../../config/worldAsset';
-import { getGame } from './gameContext';
-import { ISLAND_PLACES, type IslandPlace } from './islandPlaces';
-import { FLIGHT, HIDDEN_CLASS, MAP_ACTION, type Pin, PIN_LIFT, REFRAME_DURATION, SELECTED_CLASS } from './mapConfig';
-import { bindMapDrag, type MapDrag } from './mapDrag';
-import { createPinElement, createPlaceButton } from './mapPins';
-import { flyFocus, mapInsets, panWithin, placeOnScreen } from './mapView';
-import type { ModalItem } from './modals';
-import { TICK_ORDER } from './tickOrder';
-import { createElement } from './utilities/createElement';
-import { requireElement } from './utilities/requireElement';
-import type { OverviewFrame } from './view/overviewFrame';
+import { worldAsset } from '@views/drive/config/worldAsset';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { ISLAND_PLACES, type IslandPlace } from '@views/drive/lib/engine/game/islandPlaces';
+import {
+  FLIGHT,
+  HIDDEN_CLASS,
+  MAP_ACTION,
+  type Pin,
+  PIN_LIFT,
+  REFRAME_DURATION,
+  SELECTED_CLASS,
+} from '@views/drive/lib/engine/game/mapConfig';
+import { bindMapDrag, type MapDrag } from '@views/drive/lib/engine/game/mapDrag';
+import { createPinElement, createPlaceButton } from '@views/drive/lib/engine/game/mapPins';
+import { flyFocus, mapInsets, panWithin, placeOnScreen } from '@views/drive/lib/engine/game/mapView';
+import type { ModalItem } from '@views/drive/lib/engine/game/modals';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { createElement } from '@views/drive/lib/engine/game/utilities/createElement';
+import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
+import type { OverviewFrame } from '@views/drive/lib/engine/game/view/overviewFrame';
 
 export class WorldMap {
   readonly #modal: ModalItem;

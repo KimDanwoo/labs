@@ -1,7 +1,7 @@
 import { color, uniform } from 'three/tsl';
 
-import { getGame } from '../gameContext';
-import { Foliage } from './foliage';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { Foliage } from '@views/drive/lib/engine/game/world/foliage';
 
 export class Bushes {
   readonly foliage: Foliage;

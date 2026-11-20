@@ -1,5 +1,5 @@
-import { MENU_SECTIONS } from '../config/menu';
-import { MenuNavItem } from './MenuNavItem';
+import { MENU_SECTIONS } from '@views/drive/config/menu';
+import { MenuNavItem } from '@views/drive/ui/MenuNavItem';
 
 export function MenuNavigation() {
   return (

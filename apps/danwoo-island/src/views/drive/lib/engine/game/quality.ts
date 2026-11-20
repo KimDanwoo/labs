@@ -1,4 +1,4 @@
-import { Events } from './events';
+import { Events } from '@views/drive/lib/engine/game/events';
 
 export const QUALITY = { high: 0, low: 1 } as const;
 export type QualityLevel = (typeof QUALITY)[keyof typeof QUALITY];

@@ -1,12 +1,12 @@
 import { attribute, color, float, Fn, positionGeometry, sin, TWO_PI, uniform, varying, vec2, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { PortalSlabsGeometry } from '../../geometries/portalSlabsGeometry';
-import { requireElement } from '../../utilities/requireElement';
-import { rebuildBuildingSite } from '../islandStructures';
-import { placedInArea } from '../layout/areaPlacement';
-import { Area } from './area';
-import { BlogBoard } from './blogBoard';
+import { PortalSlabsGeometry } from '@views/drive/lib/engine/game/geometries/portalSlabsGeometry';
+import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { BlogBoard } from '@views/drive/lib/engine/game/world/areas/blogBoard';
+import { rebuildBuildingSite } from '@views/drive/lib/engine/game/world/islandStructures';
+import { placedInArea } from '@views/drive/lib/engine/game/world/layout/areaPlacement';
 
 const SLAB_SIZE = 1.5;
 const SLAB_COLUMNS = 6;

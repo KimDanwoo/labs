@@ -1,9 +1,9 @@
 import { Fn, texture, uniform, vec2 } from 'three/tsl';
 import type * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import { TICK_ORDER } from './tickOrder';
-import { remapClamp } from './utilities/maths';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
 
 type Vec2Node = THREE.Node<'vec2'>;
 

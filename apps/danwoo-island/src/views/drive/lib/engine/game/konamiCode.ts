@@ -1,8 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import { isModel, modelResource } from './resourcesLoader';
-import { VisualVehicle } from './world/visualVehicle';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { isModel, modelResource } from '@views/drive/lib/engine/game/resourcesLoader';
+import { VisualVehicle } from '@views/drive/lib/engine/game/world/visualVehicle';
 
 const SEQUENCE: readonly (readonly string[])[] = [
   ['ArrowUp', 'KeyW'],

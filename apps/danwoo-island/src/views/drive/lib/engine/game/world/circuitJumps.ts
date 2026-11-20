@@ -1,9 +1,15 @@
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { type IslandModelKey, islandModelMesh } from './islandModels';
-import { TRACK } from './layout/islandLayout';
-import { isOverWaterJump, nearestSample, sideOf, type TrackSample, trackSamples } from './layout/trackPath';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { type IslandModelKey, islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
+import { TRACK } from '@views/drive/lib/engine/game/world/layout/islandLayout';
+import {
+  isOverWaterJump,
+  nearestSample,
+  sideOf,
+  type TrackSample,
+  trackSamples,
+} from '@views/drive/lib/engine/game/world/layout/trackPath';
 
 const SAMPLE_SPACING = 0.5;
 const TAKEOFF = { length: 9, height: 1.8 } as const;

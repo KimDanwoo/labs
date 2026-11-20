@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-import { isOverWaterJump, sideOf, type TrackSample } from './layout/trackPath';
+import { isOverWaterJump, sideOf, type TrackSample } from '@views/drive/lib/engine/game/world/layout/trackPath';
 
 interface StripEdge {
   readonly offset: number;

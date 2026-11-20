@@ -1,8 +1,8 @@
-import { CONTROL_TABS, GAMEPAD_CONTROLS, KEYBOARD_CONTROLS, TOUCH_CONTROLS } from '../config/controls';
-import { ControlTab } from './ControlTab';
-import { ControlTabPanel } from './ControlTabPanel';
-import { GamepadControlRow } from './GamepadControlRow';
-import { KeyControlRow } from './KeyControlRow';
+import { CONTROL_TABS, GAMEPAD_CONTROLS, KEYBOARD_CONTROLS, TOUCH_CONTROLS } from '@views/drive/config/controls';
+import { ControlTab } from '@views/drive/ui/ControlTab';
+import { ControlTabPanel } from '@views/drive/ui/ControlTabPanel';
+import { GamepadControlRow } from '@views/drive/ui/GamepadControlRow';
+import { KeyControlRow } from '@views/drive/ui/KeyControlRow';
 
 export function ControlsContent() {
   return (

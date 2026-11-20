@@ -1,5 +1,5 @@
-import type { InstanceReference } from '../../instancedGroup';
-import type { WorldObject } from '../../objectColliders';
+import type { InstanceReference } from '@views/drive/lib/engine/game/instancedGroup';
+import type { WorldObject } from '@views/drive/lib/engine/game/objectColliders';
 
 interface FanFlight {
   launchedAt: number;

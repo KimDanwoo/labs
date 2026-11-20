@@ -22,7 +22,7 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 
 type FloatNode = THREE.Node<'float'>;
 type Vec2Node = THREE.Node<'vec2'>;

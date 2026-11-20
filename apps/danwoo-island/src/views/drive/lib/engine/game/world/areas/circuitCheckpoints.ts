@@ -1,9 +1,15 @@
 import * as THREE from 'three/webgpu';
 
-import { segmentCircleIntersection } from '../../utilities/maths';
-import type { Area } from './area';
-import { type Checkpoint, CHECKPOINT, type CircuitSounds, createCheckpoint, DOOR } from './circuitConfig';
-import { createDoor, placeDoor } from './circuitSetup';
+import { segmentCircleIntersection } from '@views/drive/lib/engine/game/utilities/maths';
+import type { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import {
+  type Checkpoint,
+  CHECKPOINT,
+  type CircuitSounds,
+  createCheckpoint,
+  DOOR,
+} from '@views/drive/lib/engine/game/world/areas/circuitConfig';
+import { createDoor, placeDoor } from '@views/drive/lib/engine/game/world/areas/circuitSetup';
 
 export class CircuitCheckpoints {
   readonly #area: Area;

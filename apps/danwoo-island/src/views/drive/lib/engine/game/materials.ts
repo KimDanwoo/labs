@@ -1,8 +1,8 @@
 import { float, Fn, luminance, mix, texture, uniform, uv, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import { MeshDefaultMaterial, revealNode } from './materials/meshDefaultMaterial';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial, revealNode } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 
 type ConvertibleMaterial = THREE.MeshStandardMaterial | THREE.MeshLambertNodeMaterial;
 

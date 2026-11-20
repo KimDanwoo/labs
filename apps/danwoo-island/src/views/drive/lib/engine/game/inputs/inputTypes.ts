@@ -1,4 +1,4 @@
-import type { SetChange } from '../utilities/observableSet';
+import type { SetChange } from '@views/drive/lib/engine/game/utilities/observableSet';
 
 export const INPUT_MODE = { mouseKeyboard: 1, gamepad: 2, touch: 3 } as const;
 export type InputMode = (typeof INPUT_MODE)[keyof typeof INPUT_MODE];

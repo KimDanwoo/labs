@@ -1,4 +1,4 @@
-import { Events } from '../events';
+import { Events } from '@views/drive/lib/engine/game/events';
 
 interface Point {
   x: number;

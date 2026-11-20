@@ -1,9 +1,9 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import type { Intersect } from '../../rayCursor';
-import type { TextCanvas } from '../../textCanvas';
-import { hoverArrow, sphereIntersect } from './showcaseSigns';
+import type { Intersect } from '@views/drive/lib/engine/game/rayCursor';
+import type { TextCanvas } from '@views/drive/lib/engine/game/textCanvas';
+import { hoverArrow, sphereIntersect } from '@views/drive/lib/engine/game/world/areas/showcaseSigns';
 import {
   applyTextMaterial,
   childStartingWith,
@@ -11,7 +11,7 @@ import {
   type HoverMaterials,
   type Shades,
   showcaseTextCanvas,
-} from './showcaseVisuals';
+} from '@views/drive/lib/engine/game/world/areas/showcaseVisuals';
 
 export type Require = (name: string) => THREE.Object3D;
 

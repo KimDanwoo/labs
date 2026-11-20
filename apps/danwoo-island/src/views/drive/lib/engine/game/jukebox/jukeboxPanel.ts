@@ -1,8 +1,8 @@
-import type { JukeboxTrack } from '../../data/worldContent';
-import { createElement } from '../utilities/createElement';
-import { requireElement } from '../utilities/requireElement';
-import type { JukeboxPlayer } from './jukeboxPlayer';
-import type { JukeboxState, JukeboxStatus } from './jukeboxTypes';
+import type { JukeboxTrack } from '@views/drive/lib/engine/data/worldContent';
+import type { JukeboxPlayer } from '@views/drive/lib/engine/game/jukebox/jukeboxPlayer';
+import type { JukeboxState, JukeboxStatus } from '@views/drive/lib/engine/game/jukebox/jukeboxTypes';
+import { createElement } from '@views/drive/lib/engine/game/utilities/createElement';
+import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
 
 const STATUS_TEXT = {
   idle: '곡을 골라 주세요',

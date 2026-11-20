@@ -1,5 +1,5 @@
-import { BLOG_URL } from '../config/menu';
-import { PanelHeader } from './PanelHeader';
+import { BLOG_URL } from '@views/drive/config/menu';
+import { PanelHeader } from '@views/drive/ui/PanelHeader';
 
 export function BlogModal() {
   return (

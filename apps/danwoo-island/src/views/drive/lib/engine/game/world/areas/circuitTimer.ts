@@ -1,8 +1,8 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../../gameContext';
-import { timeToRaceString } from '../../utilities/time';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { timeToRaceString } from '@views/drive/lib/engine/game/utilities/time';
 
 const DIGITS = { height: 32, ratio: 6 } as const;
 const DIGITS_WIDTH = DIGITS.height * DIGITS.ratio;

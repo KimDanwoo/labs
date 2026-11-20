@@ -17,10 +17,10 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { TICK_ORDER } from '../tickOrder';
-import { applyInstanceMatrix } from '../utilities/instanceMatrix';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { applyInstanceMatrix } from '@views/drive/lib/engine/game/utilities/instanceMatrix';
 
 type ColorUniform = THREE.UniformNode<'color', THREE.Color>;
 
