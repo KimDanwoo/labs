@@ -22,17 +22,21 @@ type CameraRefs = {
   initializedRef: { current: boolean };
 };
 
+/** 질주·대시의 시야 넓힘. 움직임 줄이기에서는 화면이 확대·축소되지 않게 끈다. */
+export const speedFovBoost = (isSprinting: boolean, dashStrength: number, isReducedMotion: boolean): number =>
+  isReducedMotion ? 0 : Math.max(isSprinting ? SPRINT_FOV_BOOST : 0, dashStrength * DASH_SKILL.fovBoost);
+
 export function followRunnerCamera(
   { viewYawRef, viewPitchRef, restingYawRef, initializedRef }: CameraRefs,
   camera: Camera,
   frameCamera: Camera,
   cameraPreset: (typeof CAMERA_PRESETS)[keyof typeof CAMERA_PRESETS],
-  { position, heading, speed, visualY, isSprinting }: RunnerMotion,
-  dashStrength: number,
+  { position, heading, speed, visualY }: RunnerMotion,
+  fovBoost: number,
   delta: number,
 ) {
   if (frameCamera instanceof PerspectiveCamera) {
-    const targetFov = CAMERA.fov + Math.max(isSprinting ? SPRINT_FOV_BOOST : 0, dashStrength * DASH_SKILL.fovBoost);
+    const targetFov = CAMERA.fov + fovBoost;
     const nextFov = MathUtils.damp(frameCamera.fov, targetFov, FOV_RESPONSE, delta);
     if (Math.abs(nextFov - frameCamera.fov) > RIG.fovEpsilon) {
       frameCamera.fov = nextFov;

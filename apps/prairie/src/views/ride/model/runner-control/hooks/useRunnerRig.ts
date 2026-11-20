@@ -1,4 +1,5 @@
 import { useFrame, useThree } from '@react-three/fiber';
+import { useReducedMotion } from '@shared/lib/useReducedMotion';
 import { useRef } from 'react';
 import { Group, Vector3 } from 'three';
 
@@ -10,7 +11,7 @@ import { cameraSettings } from '../../ride-settings/store/cameraSettings';
 import { setRideRiver } from '../../ride-state/rideStore';
 import { createDashState } from '../services/dashSkill';
 import { createFlightState } from '../services/flightDynamics';
-import { followRunnerCamera } from '../services/runnerCamera';
+import { followRunnerCamera, speedFovBoost } from '../services/runnerCamera';
 import { advanceRunner } from '../services/runnerMotion';
 import { createSpinState } from '../services/spinSkill';
 import { getRunnerInput } from '../store/runnerInput';
@@ -22,6 +23,7 @@ import { useRunnerControls } from './useRunnerControls';
 export function useRunnerRig() {
   useRunnerControls();
   const camera = useThree((state) => state.camera);
+  const isReducedMotion = useReducedMotion();
 
   const rootRef = useRef<Group>(null);
   const speedRef = useRef(0);
@@ -84,7 +86,7 @@ export function useRunnerRig() {
       state.camera,
       cameraPreset,
       motion,
-      dashRef.current.strength,
+      speedFovBoost(motion.isSprinting, dashRef.current.strength, isReducedMotion),
       delta,
     );
 
