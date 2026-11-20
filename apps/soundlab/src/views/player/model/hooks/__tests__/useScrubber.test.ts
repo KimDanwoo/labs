@@ -157,7 +157,8 @@ test('frames paint the playback position and update the slider value at a slower
   assert.equal(app.bar.style.getPropertyValue('--p'), '0.50000');
   assert.equal(app.bar.getAttribute('aria-valuenow'), null, 'one frame is too soon for assistive tech');
   let frames = 1;
-  while (!app.bar.hasAttribute('aria-valuenow') && frames < MAX_FRAMES) {
+  const isAwaitingAria = () => !app.bar.hasAttribute('aria-valuenow') && frames < MAX_FRAMES;
+  while (isAwaitingAria()) {
     await app.frame();
     frames += 1;
   }

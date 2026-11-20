@@ -17,7 +17,6 @@ const BAND_EDGES = [
   [4000, SAMPLE_RATE / 2],
 ];
 
-/** 디코드는 곡당 1초쯤 걸린다. 후보를 고를 때는 길이만 빠르게 묻는다. */
 export function probeDurationMs(file) {
   const out = execFileSync(
     'ffprobe',
@@ -124,7 +123,6 @@ export function spectra(pcm) {
   return { frames, bands, flux };
 }
 
-/** 곡별 p95로 0–1로 편다. 마스터링된 트랙은 절대값이 곡마다 달라 그대로 쓰면 비교가 안 된다. */
 export function normalize(values) {
   const sorted = Float32Array.from(values).sort();
   const ceil = sorted[Math.floor(sorted.length * 0.95)] || 1;
@@ -144,15 +142,16 @@ function isLocalPeak(flux, f) {
   return flux[f] >= flux[f - 1] && flux[f] >= flux[f + 1] && flux[f] >= flux[f - 2] && flux[f] >= flux[f + 2];
 }
 
-/** 적응 임계로 플럭스 봉우리를 고른다. 이건 격자를 찾기 위한 증거일 뿐, 그대로 내보내지 않는다. */
 export function detectOnsets(flux) {
   const span = Math.round(FPS);
   const found = [];
   for (let f = 3; f < flux.length - 3; f++) {
     const { mean, sd } = windowStats(flux, Math.max(0, f - span), Math.min(flux.length, f + span));
-    if (!isLocalPeak(flux, f) || flux[f] <= mean + 1.3 * sd) continue;
+    if (!isLocalPeak(flux, f)) continue;
+    if (flux[f] <= mean + 1.3 * sd) continue;
     const ms = (f / FPS) * 1000;
-    if (!found.length || ms - found.at(-1).ms > 90) found.push({ ms, strength: flux[f] });
+    const isNewOnset = !found.length || ms - found.at(-1).ms > 90;
+    if (isNewOnset) found.push({ ms, strength: flux[f] });
   }
   return found;
 }

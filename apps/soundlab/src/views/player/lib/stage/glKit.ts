@@ -40,7 +40,8 @@ export function link(
 export function makeTarget(gl: WebGL2RenderingContext, width: number, height: number): Target {
   const texture = gl.createTexture();
   const framebuffer = gl.createFramebuffer();
-  if (!texture || !framebuffer) throw new Error('렌더 타깃을 만들 수 없습니다');
+  if (!texture) throw new Error('렌더 타깃을 만들 수 없습니다');
+  if (!framebuffer) throw new Error('렌더 타깃을 만들 수 없습니다');
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);

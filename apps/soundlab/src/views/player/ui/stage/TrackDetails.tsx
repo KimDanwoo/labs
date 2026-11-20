@@ -17,6 +17,7 @@ export function TrackDetails(): JSX.Element | null {
   const collections = collectionsForTrack(track.id);
   const highlightMs = HIGHLIGHTS[track.id];
   const highlightLabel = highlightMs === undefined ? null : formatDurationMs(highlightMs);
+  const hasHighlight = highlightLabel !== null && track.isAvailable !== false;
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -37,7 +38,7 @@ export function TrackDetails(): JSX.Element | null {
               <p className="mt-sm text-xs text-mute">출처: SoundCloud</p>
             </div>
           ) : null}
-          {highlightLabel !== null && track.isAvailable !== false ? (
+          {hasHighlight ? (
             <div className="rounded-md border border-hairline p-md">
               <h3 className="font-semibold">분석 구간</h3>
               <p className="mt-xs text-sm leading-relaxed text-dim">음원 분석으로 찾은 에너지가 높은 구간입니다.</p>

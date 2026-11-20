@@ -13,7 +13,8 @@ async function load(track: Track): Promise<Signals> {
   return deriveSignals(await fetchWaveform(track.waveformUrl), track.durationMs);
 }
 export function warm(track: Track | undefined): Promise<void> {
-  if (!track || cache.has(track.id)) return Promise.resolve();
+  if (!track) return Promise.resolve();
+  if (cache.has(track.id)) return Promise.resolve();
   const existing = inFlight.get(track.id);
   if (existing) return existing;
 

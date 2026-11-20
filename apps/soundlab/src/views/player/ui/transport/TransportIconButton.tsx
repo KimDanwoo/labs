@@ -1,8 +1,5 @@
 import type { ComponentProps } from 'react';
 
-// 켜짐 표시를 hover/focus가 덮지 않게 변형을 겹쳐 특정도를 올린다.
-// (hover:text-paper 와 aria-[pressed=true]:text-brass 는 특정도가 같아 순서에 좌우된다 —
-//  클릭 직후엔 커서가 버튼 위에 있으므로 그때 정확히 꺼진 것처럼 보였다.)
 export function TransportIconButton({ type = 'button', ...props }: ComponentProps<'button'>) {
   return (
     <button

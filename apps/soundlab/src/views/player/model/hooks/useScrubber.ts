@@ -21,8 +21,8 @@ export function useScrubber() {
 
   useFrame((delta) => {
     const node = barRef.current;
-    if (!node || dragging.current) return;
-    // 변수 하나를 써도 이 서브트리 스타일이 다시 계산된다. 값이 그대로면 건드리지 않는다(정지 중엔 0회).
+    if (!node) return;
+    if (dragging.current) return;
     const p = frameState.position.toFixed(PRECISION.position);
     const glow = frameState.level.toFixed(PRECISION.level);
     const buffered = frameState.buffered.toFixed(PRECISION.buffered);
@@ -39,7 +39,6 @@ export function useScrubber() {
       node.style.setProperty('--b', buffered);
     }
 
-    // 보조기술에 60fps로 값을 흘리지 않는다.
     sinceAria.current += delta;
     if (sinceAria.current >= ARIA_UPDATE_MS) {
       sinceAria.current = 0;
@@ -49,7 +48,8 @@ export function useScrubber() {
 
   useEffect(() => {
     const move = (event: PointerEvent) => {
-      if (!dragging.current || !barRef.current) return;
+      if (!dragging.current) return;
+      if (!barRef.current) return;
       const rect = barRef.current.getBoundingClientRect();
       const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
       shown.current.p = ratio.toFixed(PRECISION.position);
@@ -73,7 +73,6 @@ export function useScrubber() {
     seek((event.clientX - rect.left) / rect.width);
   };
 
-  // 클릭으로는 포커스를 가져가지 않는다. 포커스가 남으면 전역 단축키(Space·J/L)가 슬라이더 입력으로 무시된다.
   const handleMouseDown = (event: ReactMouseEvent<HTMLDivElement>) => {
     event.preventDefault();
   };

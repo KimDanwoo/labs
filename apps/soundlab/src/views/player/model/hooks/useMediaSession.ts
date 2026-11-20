@@ -7,15 +7,6 @@ import type { Playback } from '@views/player/model/hooks/usePlayback';
 import { frameState } from '@views/player/model/store/playback';
 import { useEffect, useRef } from 'react';
 
-/**
- * 잠금화면·OS 미디어키·이어폰 버튼에 이 플레이어를 연결한다.
- *
- * 소리는 사운드클라우드 위젯 iframe이 낸다. 그 iframe도 자기 metadata를 세팅하므로
- * 마지막에 쓴 쪽이 이긴다 — 곡이 바뀔 때와 재생/정지가 바뀔 때 다시 써서 되찾는다.
- * 그 이상은 top 프레임에서 강제할 수단이 없다(실기기에서 확인 필요).
- */
-
-/** 잠금화면 진행바 갱신 주기. OS가 playbackRate로 사이를 메우므로 매 프레임 보낼 이유가 없다. */
 const POSITION_INTERVAL_MS = 1000;
 const SEEK_SEC = 10;
 
@@ -23,7 +14,6 @@ const ARTWORK_SIZES: readonly ArtworkSize[] = ['t200x200', 't300x300', 't500x500
 
 const hasSession = () => typeof navigator !== 'undefined' && 'mediaSession' in navigator;
 
-/** 브라우저가 모르는 액션은 예외를 던진다 — 나머지 손잡이까지 잃지 않게 하나씩 감싼다. */
 function bind(action: MediaSessionAction, handler: MediaSessionActionHandler | null) {
   try {
     navigator.mediaSession.setActionHandler(action, handler);
@@ -37,7 +27,8 @@ export function useMediaSession(track: Track | undefined, isPlaying: boolean, pl
   const sincePosition = useRef(POSITION_INTERVAL_MS);
 
   useEffect(() => {
-    if (!hasSession() || !track) return;
+    if (!hasSession()) return;
+    if (!track) return;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.title,
       artist: 'Danwoo',
@@ -53,7 +44,6 @@ export function useMediaSession(track: Track | undefined, isPlaying: boolean, pl
 
   useEffect(() => {
     if (!hasSession()) return undefined;
-    // toggle은 상태를 스스로 보고 뒤집는다. OS가 이미 맞는 상태에서 play/pause를 보내면 거꾸로 가므로 막는다.
     const actions: readonly (readonly [MediaSessionAction, MediaSessionActionHandler])[] = [
       ['play', () => (isPlaying ? undefined : toggle())],
       ['pause', () => (isPlaying ? toggle() : undefined)],
@@ -64,7 +54,8 @@ export function useMediaSession(track: Track | undefined, isPlaying: boolean, pl
       [
         'seekto',
         ({ seekTime }) => {
-          if (seekTime === undefined || frameState.durationMs <= 0) return;
+          if (seekTime === undefined) return;
+          if (frameState.durationMs <= 0) return;
           seek((seekTime * MS_PER_SECOND) / frameState.durationMs);
         },
       ],
@@ -83,8 +74,8 @@ export function useMediaSession(track: Track | undefined, isPlaying: boolean, pl
     sincePosition.current = 0;
 
     const duration = frameState.durationMs / MS_PER_SECOND;
-    // 음수·NaN이거나 position이 duration을 넘으면 setPositionState가 던진다. 공유 rAF 루프가 거기서 끊긴다.
-    if (!Number.isFinite(duration) || duration <= 0) return;
+    if (!Number.isFinite(duration)) return;
+    if (duration <= 0) return;
     navigator.mediaSession.setPositionState({
       duration,
       playbackRate: 1,

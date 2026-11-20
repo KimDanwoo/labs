@@ -36,11 +36,12 @@ export function useQueueSteps({ tracks, refs, queueRef, listening }: PlaybackEng
   const step = useCallback(
     (direction: 1 | -1) => {
       const ids = queue ? resolveQueue(tracks, queue.ids) : playableIds(tracks);
+      const isShuffledForward = shuffle && direction === 1;
       const id = adjacentTrack({
         ids,
         currentId: tracks[index]?.id ?? -1,
         direction,
-        random: shuffle && direction === 1 ? Math.random() : undefined,
+        random: isShuffledForward ? Math.random() : undefined,
       });
       const next = tracks.findIndex((track) => track.id === id);
       const track = tracks[next];

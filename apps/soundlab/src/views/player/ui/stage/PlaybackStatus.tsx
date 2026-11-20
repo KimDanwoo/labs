@@ -49,7 +49,8 @@ export function PlaybackStatus(): JSX.Element | null {
         연결됐습니다. 재생 버튼을 눌러주세요.
       </p>
     );
-  if (resumeMs !== null && resumeMs > 0)
+  const hasResumePoint = resumeMs !== null && resumeMs > 0;
+  if (hasResumePoint)
     return (
       <div className="flex flex-wrap items-center justify-center gap-xs text-xs text-dim">
         <span>{formatDurationMs(resumeMs)}부터 이어듣기</span>

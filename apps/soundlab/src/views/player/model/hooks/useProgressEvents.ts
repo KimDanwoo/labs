@@ -20,7 +20,8 @@ export function useProgressEvents({ tracks, refs, clock, listening, lastPlayed }
         const pending = pendingRewindRef.current;
         if (!pending) return false;
         const now = performance.now();
-        if (!isRewindWatched(pending, now) || pending.attempts >= REWIND_ATTEMPT_LIMIT) {
+        const hasGivenUpRewind = !isRewindWatched(pending, now) || pending.attempts >= REWIND_ATTEMPT_LIMIT;
+        if (hasGivenUpRewind) {
           pendingRewindRef.current = null;
           return false;
         }

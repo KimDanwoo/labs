@@ -4,21 +4,24 @@ const MAX_PAGES = 100;
 function safeUrl(value, hosts) {
   if (typeof value !== 'string') throw new Error('URL이 문자열이 아닙니다');
   const url = new URL(value);
-  if (url.protocol !== 'https:' || !hosts.includes(url.hostname) || url.username || url.password) {
-    throw new Error('허용하지 않은 음원 URL입니다');
-  }
+  if (url.protocol !== 'https:') throw new Error('허용하지 않은 음원 URL입니다');
+  if (!hosts.includes(url.hostname)) throw new Error('허용하지 않은 음원 URL입니다');
+  if (url.username) throw new Error('허용하지 않은 음원 URL입니다');
+  if (url.password) throw new Error('허용하지 않은 음원 URL입니다');
   return url.toString();
 }
 
 function readRawId(raw) {
-  if (!raw || typeof raw !== 'object' || !Number.isSafeInteger(raw.id) || raw.id <= 0) {
-    throw new Error('유효하지 않은 곡 ID입니다');
-  }
+  if (!raw) throw new Error('유효하지 않은 곡 ID입니다');
+  if (typeof raw !== 'object') throw new Error('유효하지 않은 곡 ID입니다');
+  if (!Number.isSafeInteger(raw.id)) throw new Error('유효하지 않은 곡 ID입니다');
+  if (raw.id <= 0) throw new Error('유효하지 않은 곡 ID입니다');
   return raw.id;
 }
 
 function readTitle(raw) {
-  const isValid = typeof raw.title === 'string' && raw.title.trim() && Number.isFinite(raw.duration) && raw.duration > 0;
+  const isValid =
+    typeof raw.title === 'string' && raw.title.trim() && Number.isFinite(raw.duration) && raw.duration > 0;
   if (!isValid) throw new Error(`곡 ${raw.id}의 제목 또는 길이가 잘못됐습니다`);
   return raw.title.normalize('NFC');
 }
@@ -30,7 +33,8 @@ function readArtwork(raw) {
 }
 
 function readGenre(raw) {
-  return typeof raw.genre === 'string' && raw.genre ? raw.genre.normalize('NFC') : 'Unclassified';
+  const hasGenre = typeof raw.genre === 'string' && raw.genre;
+  return hasGenre ? raw.genre.normalize('NFC') : 'Unclassified';
 }
 
 function readDescription(raw) {
@@ -57,13 +61,16 @@ export function toTrack(raw) {
 
 function assertPageUrl(next, seen) {
   const url = new URL(next);
-  if (url.origin !== API_ORIGIN || url.username || url.password || seen.has(next) || seen.size >= MAX_PAGES) {
-    throw new Error('곡 목록의 페이지 연결이 잘못됐습니다');
-  }
+  if (url.origin !== API_ORIGIN) throw new Error('곡 목록의 페이지 연결이 잘못됐습니다');
+  if (url.username) throw new Error('곡 목록의 페이지 연결이 잘못됐습니다');
+  if (url.password) throw new Error('곡 목록의 페이지 연결이 잘못됐습니다');
+  if (seen.has(next)) throw new Error('곡 목록의 페이지 연결이 잘못됐습니다');
+  if (seen.size >= MAX_PAGES) throw new Error('곡 목록의 페이지 연결이 잘못됐습니다');
 }
 
 function readNextHref(page) {
-  if (page.next_href != null && typeof page.next_href !== 'string') throw new Error('다음 페이지 URL이 잘못됐습니다');
+  const isInvalidNextHref = page.next_href != null && typeof page.next_href !== 'string';
+  if (isInvalidNextHref) throw new Error('다음 페이지 URL이 잘못됐습니다');
   return page.next_href || null;
 }
 
@@ -75,7 +82,8 @@ export async function fetchCatalog({ firstUrl, getJson }) {
     assertPageUrl(next, seen);
     seen.add(next);
     const page = await getJson(next);
-    if (!page || !Array.isArray(page.collection)) throw new Error('곡 목록 응답이 잘못됐습니다');
+    if (!page) throw new Error('곡 목록 응답이 잘못됐습니다');
+    if (!Array.isArray(page.collection)) throw new Error('곡 목록 응답이 잘못됐습니다');
     for (const raw of page.collection) {
       const track = toTrack(raw);
       tracks.set(track.id, track);

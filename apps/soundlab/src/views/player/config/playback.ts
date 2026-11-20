@@ -8,7 +8,6 @@ export const WIDGET_EVENT = {
   error: 'error',
 } as const;
 
-/** ready가 이 안에 안 오면 엔진이 막힌 것으로 본다 — w.soundcloud.com은 광고 차단기가 흔히 막는다. */
 export const READY_TIMEOUT_MS = 10_000;
 
 export const SAVE_INTERVAL_MS = 5000;

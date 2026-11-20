@@ -5,11 +5,16 @@ const LAST_PLAYED_KEY = 'soundlab:last-played';
 type LastPlayed = { id: number; ms: number };
 
 function parseLastPlayed(parsed: unknown): LastPlayed | null {
-  if (typeof parsed !== 'object' || parsed === null) return null;
-  if (!('id' in parsed) || !('ms' in parsed)) return null;
+  if (typeof parsed !== 'object') return null;
+  if (parsed === null) return null;
+  if (!('id' in parsed)) return null;
+  if (!('ms' in parsed)) return null;
   const { id, ms } = parsed;
-  if (typeof id !== 'number' || !Number.isInteger(id)) return null;
-  if (typeof ms !== 'number' || !Number.isFinite(ms) || ms < 0) return null;
+  if (typeof id !== 'number') return null;
+  if (!Number.isInteger(id)) return null;
+  if (typeof ms !== 'number') return null;
+  if (!Number.isFinite(ms)) return null;
+  if (ms < 0) return null;
   return { id, ms };
 }
 

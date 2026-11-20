@@ -1,30 +1,11 @@
 import { RIPPLE_SLOTS } from '@views/player/config/renderer';
 
 const LUM = 'vec3(0.2126, 0.7152, 0.0722)';
-/**
- * 파티클 균일 확대(level)와 들이쉼 수축(pre).
- * PRD §6은 확대 2%였는데 재매핑 뒤에도 폭이 5.2px뿐이라 3.5%(9.1px)로 올렸다 — PRD에서 의도적으로 벗어난 값이다.
- */
 const ZOOM_PER_LEVEL = '0.035';
 const SHRINK_PER_PRE = '0.012';
-/**
- * 클릭 파동의 렌즈 세기 — 마루가 파동 원점에서 멀어지는 방향으로 좌표를 얼마나 확대하는가.
- * 0.4를 넘으면 변위의 도함수가 -1 아래로 내려가 좌표가 접힌다(파면에 크레이즈·구멍).
- * 여유 1.8배를 두고 잡은 값이다.
- * ponytail: 여러 파동의 파면이 같은 반경에서 겹치면 합이 한계를 넘는다. 클릭 1발은 -0.55,
- * 클릭+비트가 반경까지 겹치는 최악이 -0.78 — 셋 이상 겹쳐야 접히므로 따로 막지 않았다.
- */
 const RIPPLE_LENS = '0.22';
-/**
- * 파동마다 흔드는 전파 속도와 파면 폭. 상수로 두면 연타할 때 같은 파동만 반복된다.
- * 폭을 속도와 같이 올려 speed/width 비를 8 이하로 묶는다 — 접힘 도함수를 지배하는 게 이 비다.
- */
 const RIPPLE_SPEED = '(0.68 + seed * 0.26)';
 const RIPPLE_WIDTH = '(0.085 + (speed - 0.68) * 0.19)';
-/**
- * 저주파 휘도를 읽을 밉 레벨. 500px 아트워크에서 lod 2 = 약 4px 저역 —
- * 이웃 4탭(E=0.006 ≈ 3px)과 같은 대역을 페치 1회로 얻는다.
- */
 const LUM_LOD = '2.0';
 export const VERT_POINTS = `#version 300 es
 precision highp float;

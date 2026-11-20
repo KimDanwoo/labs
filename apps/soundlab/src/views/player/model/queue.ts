@@ -19,7 +19,8 @@ export function adjacentTrack(options: {
 }): number | undefined {
   const { ids, currentId, direction, random } = options;
   if (!ids.length) return undefined;
-  if (random !== undefined && ids.length > 1) {
+  const shouldShuffle = random !== undefined && ids.length > 1;
+  if (shouldShuffle) {
     const others = ids.filter((id) => id !== currentId);
     return others[Math.min(others.length - 1, Math.floor(Math.max(0, random) * others.length))];
   }

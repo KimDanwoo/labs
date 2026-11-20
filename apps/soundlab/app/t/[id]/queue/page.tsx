@@ -18,7 +18,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const title = `${track.title} — DANWOO`;
   const description = `${track.genre} · soundlab 재생목록`;
-  // 부모 세그먼트의 opengraph-image.tsx를 명시적으로 가리킨다 — 파일 규약은 이 하위 라우트까지 안 내려온다.
   const images = [`/t/${track.id}/opengraph-image`];
   return {
     title,

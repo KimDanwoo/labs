@@ -25,8 +25,10 @@ export function useTrackCommands(engine: PlaybackEngine, goTo: GoTo) {
   const select = useCallback(
     (next: number) => {
       const track = tracks[next];
-      if (!track || track.isAvailable === false) return;
-      if (queueRef.current && !queueRef.current.ids.includes(track.id)) {
+      if (!track) return;
+      if (track.isAvailable === false) return;
+      const isOutsideQueue = queueRef.current && !queueRef.current.ids.includes(track.id);
+      if (isOutsideQueue) {
         flushListening();
         queueRef.current = null;
         setQueue(null);
@@ -34,7 +36,8 @@ export function useTrackCommands(engine: PlaybackEngine, goTo: GoTo) {
       setResumeNotice(null);
       if (next === index) {
         const instance = widgetRef.current;
-        if (!instance || !readyRef.current) {
+        const isWidgetPending = !instance || !readyRef.current;
+        if (isWidgetPending) {
           queuedRef.current = next;
           return;
         }
@@ -66,7 +69,8 @@ export function useTrackCommands(engine: PlaybackEngine, goTo: GoTo) {
   const toggle = useCallback(() => {
     if (tracks[index]?.isAvailable === false) return;
     const instance = widgetRef.current;
-    if (!instance || !readyRef.current) {
+    const isSeekWidgetPending = !instance || !readyRef.current;
+    if (isSeekWidgetPending) {
       queuedRef.current = PLAY_CURRENT;
       return;
     }

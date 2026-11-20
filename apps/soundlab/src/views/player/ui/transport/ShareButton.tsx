@@ -12,6 +12,7 @@ import { ShareNotice } from '@views/player/ui/transport/ShareNotice';
 export function ShareButton() {
   const { notice, fallbackUrl, share, clearFallback } = useShareTrack();
 
+  const hasNotice = notice || fallbackUrl;
   return (
     <div>
       <DropdownMenu>
@@ -26,7 +27,7 @@ export function ShareButton() {
           <DropdownMenuItem onSelect={() => void share(SHARE_KIND.native)}>다른 앱으로 공유</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {notice || fallbackUrl ? <ShareNotice notice={notice} fallbackUrl={fallbackUrl} onClose={clearFallback} /> : null}
+      {hasNotice ? <ShareNotice notice={notice} fallbackUrl={fallbackUrl} onClose={clearFallback} /> : null}
     </div>
   );
 }

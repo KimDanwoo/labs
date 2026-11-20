@@ -10,5 +10,4 @@ export const LEVEL_BAR_TRANSFORMS: readonly string[] = [
 
 export const LEVEL_PRECISION = 3;
 
-/** 목록 맨 앞 이만큼의 앨범아트는 지연 없이 바로 불러온다. */
 export const EAGER_ARTWORK_COUNT = 3;

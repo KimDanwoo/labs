@@ -1,19 +1,20 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { parseBandSignals } from '../src/views/player/lib/signals.ts';
 import { TRACKS } from '../src/entities/track/model/constants/tracks.ts';
+import { parseBandSignals } from '../src/views/player/lib/signals.ts';
 
 const directory = new URL('../public/signals/', import.meta.url);
 const manifest = JSON.parse(readFileSync(new URL('index.json', directory), 'utf8'));
-if (!Array.isArray(manifest) || !manifest.every((id) => Number.isSafeInteger(id) && id > 0))
-  throw new Error('잘못된 분석 신호 목록');
+if (!Array.isArray(manifest)) throw new Error('잘못된 분석 신호 목록');
+if (!manifest.every((id) => Number.isSafeInteger(id) && id > 0)) throw new Error('잘못된 분석 신호 목록');
 const missing = [];
 const invalid = [];
 const highlights = {};
 const available = TRACKS.filter((track) => track.isAvailable !== false);
 for (const track of available) {
   const path = new URL(`${track.id}.json`, directory);
-  if (!manifest.includes(track.id) || !existsSync(path)) {
+  const isUnlisted = !manifest.includes(track.id) || !existsSync(path);
+  if (isUnlisted) {
     missing.push(track);
     continue;
   }
@@ -23,7 +24,8 @@ for (const track of available) {
   } catch {
     data = null;
   }
-  if (!data || Math.abs(data.audioMs - track.durationMs) > 250) {
+  const isMismatched = !data || Math.abs(data.audioMs - track.durationMs) > 250;
+  if (isMismatched) {
     invalid.push(track);
     continue;
   }
@@ -39,7 +41,8 @@ for (const track of available) {
   for (let index = 0; index < mid.length; index++) {
     sum += mid[index];
     if (index >= window) sum -= mid[index - window];
-    if (index >= window - 1 && sum > best) {
+    const isBestWindow = index >= window - 1 && sum > best;
+    if (isBestWindow) {
       best = sum;
       start = index - window + 1;
     }
@@ -64,4 +67,5 @@ if (process.argv.includes('--write')) {
   );
   process.stdout.write(`감상 구간 ${Object.keys(highlights).length}개 생성: ${fileURLToPath(output)}\n`);
 }
-if (invalid.length || (process.argv.includes('--strict') && missing.length)) process.exitCode = 1;
+const shouldFail = invalid.length || (process.argv.includes('--strict') && missing.length);
+if (shouldFail) process.exitCode = 1;
