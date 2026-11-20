@@ -9,12 +9,37 @@ import { advanceRipples, claimRipple, rippleBuffer, seedBuffer } from '../../lib
 import type { useArtworkSwap } from './useArtworkSwap';
 import type { StageLayout } from './useStageRenderer';
 
+const STILL_SIGNALS = { level: 0, swell: 0, pre: 0, hit: 0, air: 0 } as const;
+
 interface StageFrameInput {
   rendererRef: RefObject<Renderer | null>;
   layoutRef: RefObject<StageLayout>;
   reducedMotionRef: RefObject<boolean>;
   isCalmMode: boolean;
   artwork: ReturnType<typeof useArtworkSwap>;
+}
+
+function spawnBeatRipple(layout: StageLayout): void {
+  const { x, y, half } = layout;
+  const reach = half * BEAT_RIPPLE.spread;
+  claimRipple(
+    x + (Math.random() * 2 - 1) * reach,
+    y + (Math.random() * 2 - 1) * reach,
+    frameState.beatStrength * BEAT_RIPPLE.amp,
+    BEAT_RIPPLE.ms,
+    false,
+  );
+}
+
+function swapArtworkWhenHidden(
+  instance: Renderer,
+  artwork: ReturnType<typeof useArtworkSwap>,
+  target: number,
+  morph: number,
+): void {
+  if (target !== 0 || morph >= MORPH.swapThreshold) return;
+  const image = artwork.takeReadyArtwork();
+  if (image) instance.setArtwork(image);
 }
 
 export function useStageFrame({ rendererRef, layoutRef, reducedMotionRef, isCalmMode, artwork }: StageFrameInput) {
@@ -33,10 +58,7 @@ export function useStageFrame({ rendererRef, layoutRef, reducedMotionRef, isCalm
     if (shouldReduceMotion) morph.current = target;
     morph.current += (target - morph.current) * (target > morph.current ? MORPH.inRate : MORPH.outRate) * step;
 
-    if (target === 0 && morph.current < MORPH.swapThreshold) {
-      const image = artwork.takeReadyArtwork();
-      if (image) instance.setArtwork(image);
-    }
+    swapArtworkWhenHidden(instance, artwork, target, morph.current);
 
     const speed = Math.abs(morph.current - prevMorph.current) / Math.max(FRAME.minSpeedStep, step);
     prevMorph.current = morph.current;
@@ -44,28 +66,19 @@ export function useStageFrame({ rendererRef, layoutRef, reducedMotionRef, isCalm
 
     if (frameState.beatId !== seenBeat.current) {
       seenBeat.current = frameState.beatId;
-      if (!shouldReduceMotion) {
-        const { x, y, half } = layoutRef.current;
-        const reach = half * BEAT_RIPPLE.spread;
-        claimRipple(
-          x + (Math.random() * 2 - 1) * reach,
-          y + (Math.random() * 2 - 1) * reach,
-          frameState.beatStrength * BEAT_RIPPLE.amp,
-          BEAT_RIPPLE.ms,
-          false,
-        );
-      }
+      if (!shouldReduceMotion) spawnBeatRipple(layoutRef.current);
     }
 
     const energy = advanceRipples(delta);
+    const signals = shouldReduceMotion ? STILL_SIGNALS : frameState;
 
     instance.render({
       morph: morph.current,
-      level: shouldReduceMotion ? 0 : frameState.level,
-      swell: shouldReduceMotion ? 0 : frameState.swell,
-      pre: shouldReduceMotion ? 0 : frameState.pre,
-      hit: shouldReduceMotion ? 0 : frameState.hit,
-      air: shouldReduceMotion ? 0 : frameState.air,
+      level: signals.level,
+      swell: signals.swell,
+      pre: signals.pre,
+      hit: signals.hit,
+      air: signals.air,
       decay: Math.min(DECAY.max, trail.current * DECAY.trail + energy * DECAY.energy),
       ripples: rippleBuffer,
       rippleSeeds: seedBuffer,

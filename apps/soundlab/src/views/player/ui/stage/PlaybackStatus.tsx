@@ -2,6 +2,7 @@ import { TRACKS } from '@entities/track';
 import { Button } from '@shared/ui/Button';
 import { useAtomValue } from 'jotai';
 import type { JSX } from 'react';
+import { formatDurationMs } from '../../lib/formatTrack';
 import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
 import {
   currentIndexAtom,
@@ -51,9 +52,7 @@ export function PlaybackStatus(): JSX.Element | null {
   if (resumeMs !== null && resumeMs > 0)
     return (
       <div className="flex flex-wrap items-center justify-center gap-xs text-xs text-dim">
-        <span>
-          {Math.floor(resumeMs / 60_000)}:{String(Math.floor(resumeMs / 1000) % 60).padStart(2, '0')}부터 이어듣기
-        </span>
+        <span>{formatDurationMs(resumeMs)}부터 이어듣기</span>
         <Button type="button" variant="ghost" size="sm" onClick={() => playFrom(0)}>
           처음부터
         </Button>

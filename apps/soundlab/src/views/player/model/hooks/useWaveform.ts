@@ -3,6 +3,7 @@
 import type { Track } from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
 import { useEffect, useRef } from 'react';
+import { MS_PER_SECOND } from '../../config/time';
 import { type Signals, accentAt } from '../../lib/waveformSignals';
 import { frameState } from '../store/playback';
 import { cache, warm } from '../waveformCache';
@@ -17,6 +18,59 @@ const BEAT_HIT = 0.25;
 const BEAT_RELEASE_MS = 220;
 /** 이보다 오래 지난 비트는 발화 없이 넘긴다 — 랙·탭 복귀 뒤 밀린 비트가 몰아 터지면 전부 엇박이다. */
 const BEAT_STALE_MS = 150;
+
+const MAX_FRAME_STEP = 3;
+const FRAME_MS = 16.7;
+const BEAT_STRENGTH_MAX = 255;
+
+interface BeatState {
+  value: number;
+  cursor: number;
+  atMs: number;
+}
+
+function relaxFrameState(step: number): void {
+  frameState.level += (0 - frameState.level) * LEVEL_SMOOTHING * step;
+  frameState.swell += (0 - frameState.swell) * SWELL_SMOOTHING * step;
+  frameState.bass += (0 - frameState.bass) * LEVEL_SMOOTHING * step;
+  frameState.air += (0 - frameState.air) * LEVEL_SMOOTHING * step;
+  frameState.pre = 0;
+  frameState.hit = 0;
+}
+
+function followSignals(data: Signals, nowMs: number, step: number): void {
+  const index = Math.min(data.level.length - 1, Math.max(0, Math.floor((nowMs / MS_PER_SECOND) * data.fps)));
+  frameState.level += ((data.level[index] ?? 0) - frameState.level) * LEVEL_SMOOTHING * step;
+  frameState.swell += ((data.swell[index] ?? 0) - frameState.swell) * SWELL_SMOOTHING * step;
+  frameState.bass += ((data.bass?.[index] ?? 0) - frameState.bass) * LEVEL_SMOOTHING * step;
+  frameState.air += ((data.air?.[index] ?? 0) - frameState.air) * LEVEL_SMOOTHING * step;
+}
+
+function seekBeatCursor(beat: BeatState, data: Signals, nowMs: number): void {
+  if (nowMs < beat.atMs) {
+    beat.cursor = data.beats.findIndex(([ms]) => ms >= nowMs);
+    if (beat.cursor < 0) beat.cursor = data.beats.length;
+  }
+  beat.atMs = nowMs;
+}
+
+function strikeBeats(beat: BeatState, data: Signals, nowMs: number, delta: number): void {
+  beat.value = Math.max(0, beat.value - delta / BEAT_RELEASE_MS);
+  let struck = 0;
+  while (beat.cursor < data.beats.length) {
+    const line = data.beats[beat.cursor];
+    if (!line || line[0] > nowMs) break;
+    if (nowMs - line[0] <= BEAT_STALE_MS) {
+      const strength = line[1] / BEAT_STRENGTH_MAX;
+      beat.value = Math.max(beat.value, strength * BEAT_HIT);
+      struck = Math.max(struck, strength);
+    }
+    beat.cursor++;
+  }
+  if (struck <= 0) return;
+  frameState.beatStrength = struck;
+  frameState.beatId++;
+}
 
 /**
  * 곡의 신호를 매 프레임 frameState에 채운다.
@@ -49,48 +103,17 @@ export function useWaveform(track: Track | undefined, next: Track | undefined, i
 
   useFrame((delta) => {
     const data = signals.current;
-    const step = Math.min(3, delta / 16.7);
+    const step = Math.min(MAX_FRAME_STEP, delta / FRAME_MS);
     const nowMs = frameState.position * frameState.durationMs;
-    const live = data && playing.current;
 
-    if (!live) {
-      frameState.level += (0 - frameState.level) * LEVEL_SMOOTHING * step;
-      frameState.swell += (0 - frameState.swell) * SWELL_SMOOTHING * step;
-      frameState.bass += (0 - frameState.bass) * LEVEL_SMOOTHING * step;
-      frameState.air += (0 - frameState.air) * LEVEL_SMOOTHING * step;
-      frameState.pre = 0;
-      frameState.hit = 0;
+    if (!data || !playing.current) {
+      relaxFrameState(step);
       return;
     }
 
-    const index = Math.min(data.level.length - 1, Math.max(0, Math.floor((nowMs / 1000) * data.fps)));
-    frameState.level += ((data.level[index] ?? 0) - frameState.level) * LEVEL_SMOOTHING * step;
-    frameState.swell += ((data.swell[index] ?? 0) - frameState.swell) * SWELL_SMOOTHING * step;
-    frameState.bass += ((data.bass?.[index] ?? 0) - frameState.bass) * LEVEL_SMOOTHING * step;
-    frameState.air += ((data.air?.[index] ?? 0) - frameState.air) * LEVEL_SMOOTHING * step;
-
-    if (nowMs < beat.current.atMs) {
-      beat.current.cursor = data.beats.findIndex(([ms]) => ms >= nowMs);
-      if (beat.current.cursor < 0) beat.current.cursor = data.beats.length;
-    }
-    beat.current.atMs = nowMs;
-
-    beat.current.value = Math.max(0, beat.current.value - delta / BEAT_RELEASE_MS);
-    let struck = 0;
-    while (beat.current.cursor < data.beats.length) {
-      const line = data.beats[beat.current.cursor];
-      if (!line || line[0] > nowMs) break;
-      if (nowMs - line[0] <= BEAT_STALE_MS) {
-        const strength = line[1] / 255;
-        beat.current.value = Math.max(beat.current.value, strength * BEAT_HIT);
-        struck = Math.max(struck, strength);
-      }
-      beat.current.cursor++;
-    }
-    if (struck > 0) {
-      frameState.beatStrength = struck;
-      frameState.beatId++;
-    }
+    followSignals(data, nowMs, step);
+    seekBeatCursor(beat.current, data, nowMs);
+    strikeBeats(beat.current, data, nowMs, delta);
 
     // 악센트는 이미 시간 램프라 다시 스무딩하지 않는다 — 뭉개면 들이쉼이 사라진다.
     const accent = accentAt(data.peakMs, nowMs);

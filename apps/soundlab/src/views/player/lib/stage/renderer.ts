@@ -50,6 +50,18 @@ export type Renderer = {
   dispose: () => void;
 };
 
+function accentsOf({ swell = 0, pre = 0, hit = 0, air = 0 }: RenderInput) {
+  return { swell, pre, hit, air };
+}
+
+function hasLiveRipple(ripples: Float32Array | undefined): boolean {
+  if (!ripples) return false;
+  for (let i = 2; i < ripples.length; i += 4) {
+    if ((ripples[i] ?? 1) < 1) return true;
+  }
+  return false;
+}
+
 export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   const context = canvas.getContext('webgl2', { antialias: false, alpha: false, premultipliedAlpha: false });
   if (!context) return null;
@@ -127,15 +139,12 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
     frameSkip.invalidate();
   }
 
-  function render({ morph, level, decay, swell = 0, pre = 0, hit = 0, air = 0, ripples, rippleSeeds }: RenderInput) {
+  function render(input: RenderInput) {
+    const { morph, level, decay, ripples, rippleSeeds } = input;
+    const { swell, pre, hit, air } = accentsOf(input);
     if (!accum || !bloom || count === 0) return;
 
-    let rippleAlive = false;
-    if (ripples) {
-      for (let i = 2; i < ripples.length; i += 4) {
-        if ((ripples[i] ?? 1) < 1) rippleAlive = true;
-      }
-    }
+    const rippleAlive = hasLiveRipple(ripples);
     const accented = pre > 0 || hit > 0;
     if (frameSkip.shouldSkip({ morph, level: level + swell + air, decay, rippleAlive, accented })) return;
 

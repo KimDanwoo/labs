@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { useAtomValue } from 'jotai';
 import type { JSX } from 'react';
 import { collectionsForTrack } from '../../config/collections';
+import { formatDurationMs } from '../../lib/formatTrack';
 import { HIGHLIGHTS } from '../../model/constants/highlights';
 import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
 import { currentIndexAtom } from '../../model/store/playback';
@@ -15,10 +16,7 @@ export function TrackDetails(): JSX.Element | null {
   if (!track) return null;
   const collections = collectionsForTrack(track.id);
   const highlightMs = HIGHLIGHTS[track.id];
-  const highlightLabel =
-    highlightMs === undefined
-      ? null
-      : `${Math.floor(highlightMs / 60_000)}:${String(Math.floor(highlightMs / 1000) % 60).padStart(2, '0')}`;
+  const highlightLabel = highlightMs === undefined ? null : formatDurationMs(highlightMs);
   return (
     <Sheet>
       <SheetTrigger asChild>

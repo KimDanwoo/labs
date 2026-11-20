@@ -58,21 +58,22 @@ export function createRenderPasses(
   }
 
   function drawParticles(input: ParticleUniforms) {
+    const at = (name: string) => points.uniforms[name] ?? null;
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.useProgram(points.program);
-    bindTexture(gl, 0, artwork, points.uniforms.uTex ?? null);
-    gl.uniform2f(points.uniforms.uRes ?? null, input.width, input.height);
-    gl.uniform2f(points.uniforms.uCenter ?? null, input.centerX, input.centerY);
-    gl.uniform1f(points.uniforms.uSide ?? null, input.side);
-    gl.uniform1f(points.uniforms.uMorph ?? null, input.morph);
-    gl.uniform1f(points.uniforms.uLevel ?? null, input.level);
-    gl.uniform1f(points.uniforms.uPre ?? null, input.pre);
-    gl.uniform1f(points.uniforms.uSize ?? null, input.size);
-    gl.uniform1f(points.uniforms.uDepth ?? null, input.depth);
-    gl.uniform1f(points.uniforms.uFocal ?? null, 1600);
-    gl.uniform4fv(points.uniforms['uRipples[0]'] ?? null, input.ripples ?? IDLE_RIPPLES);
-    gl.uniform1fv(points.uniforms['uRippleSeeds[0]'] ?? null, input.rippleSeeds ?? IDLE_SEEDS);
+    bindTexture(gl, 0, artwork, at('uTex'));
+    gl.uniform2f(at('uRes'), input.width, input.height);
+    gl.uniform2f(at('uCenter'), input.centerX, input.centerY);
+    gl.uniform1f(at('uSide'), input.side);
+    gl.uniform1f(at('uMorph'), input.morph);
+    gl.uniform1f(at('uLevel'), input.level);
+    gl.uniform1f(at('uPre'), input.pre);
+    gl.uniform1f(at('uSize'), input.size);
+    gl.uniform1f(at('uDepth'), input.depth);
+    gl.uniform1f(at('uFocal'), 1600);
+    gl.uniform4fv(at('uRipples[0]'), input.ripples ?? IDLE_RIPPLES);
+    gl.uniform1fv(at('uRippleSeeds[0]'), input.rippleSeeds ?? IDLE_SEEDS);
     gl.bindVertexArray(pointsVao);
     gl.drawArrays(gl.POINTS, 0, input.count);
     gl.disable(gl.BLEND);

@@ -7,6 +7,27 @@ import { playableIds, resolveQueue } from '../queue';
 import { currentIndexAtom, isPlayingAtom, playbackQueueAtom, repeatModeAtom, shuffleAtom } from '../store/playback';
 import type { PlaybackEngine } from './useEngineRefs';
 
+interface WidgetAdvanceInput {
+  hasQueue: boolean;
+  holdsSet: boolean;
+  shuffle: boolean;
+  soundIds: (number | null)[];
+  trackId: number;
+}
+
+function isWidgetAdvancing({ hasQueue, holdsSet, shuffle, soundIds, trackId }: WidgetAdvanceInput): boolean {
+  if (hasQueue || !holdsSet || shuffle) return false;
+  const soundIndex = soundIds.indexOf(trackId);
+  return soundIndex >= 0 && soundIndex < soundIds.length - 1;
+}
+
+type Widget = PlaybackEngine['refs']['widgetRef']['current'];
+
+function replayCurrent(widget: Widget): void {
+  widget?.seekTo(0);
+  widget?.play();
+}
+
 export function useAutoAdvance({ tracks, refs }: PlaybackEngine, step: (direction: 1 | -1) => void) {
   const { widgetRef, advanceRef, holdsSetRef, soundIdsRef, shouldRewindRef } = refs;
   const index = useAtomValue(currentIndexAtom);
@@ -18,17 +39,21 @@ export function useAutoAdvance({ tracks, refs }: PlaybackEngine, step: (directio
   useEffect(() => {
     advanceRef.current = () => {
       if (repeatMode === REPEAT_MODE.one) {
-        widgetRef.current?.seekTo(0);
-        widgetRef.current?.play();
+        replayCurrent(widgetRef.current);
         return;
       }
 
       // 세트 안이고 뒤에 곡이 더 남았으면 위젯이 스스로 넘긴다(play 이벤트로 인덱스가 동기화된다).
       // 새 재생을 시작하지 않는 경로라 백그라운드에서도 이어지므로, 여기서 가로채지 않는다.
       // 세트의 마지막 사운드였다면 위젯은 멈추므로 아래로 내려가 직접 넘긴다.
-      const soundIndex = soundIdsRef.current.indexOf(tracks[index]?.id ?? -1);
-      const widgetAdvances =
-        !queue && holdsSetRef.current && !shuffle && soundIndex >= 0 && soundIndex < soundIdsRef.current.length - 1;
+      const currentId = tracks[index]?.id ?? -1;
+      const widgetAdvances = isWidgetAdvancing({
+        hasQueue: Boolean(queue),
+        holdsSet: holdsSetRef.current,
+        shuffle,
+        soundIds: soundIdsRef.current,
+        trackId: currentId,
+      });
       if (widgetAdvances) {
         shouldRewindRef.current = true;
         return;

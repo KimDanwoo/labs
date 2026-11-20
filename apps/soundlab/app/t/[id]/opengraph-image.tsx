@@ -18,9 +18,12 @@ const PAPER = '#f2f3f5';
 const MUTE = '#f2f3f56b';
 const BRASS = '#c8a97e';
 
+const MS_PER_SECOND = 1000;
+const SECONDS_PER_MINUTE = 60;
+
 const clock = (ms: number) => {
-  const total = Math.round(ms / 1000);
-  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+  const total = Math.round(ms / MS_PER_SECOND);
+  return `${Math.floor(total / SECONDS_PER_MINUTE)}:${String(total % SECONDS_PER_MINUTE).padStart(2, '0')}`;
 };
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {

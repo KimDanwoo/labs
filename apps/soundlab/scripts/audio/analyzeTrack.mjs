@@ -15,10 +15,39 @@ import { GRID_MIN_CONFIDENCE, findGrid } from './grid.mjs';
  * mp3 인코더 패딩(수십 ms)은 흡수하되 실제 편집 차이는 걸리는 값이다.
  */
 const MASTER_DRIFT_MS = 250;
+const MS_PER_SECOND = 1000;
+
+function buildPayload({ track, audioMs, bands, accepted }) {
+  const [low, mid, high] = bands.map(normalize);
+  return {
+    id: track.id,
+    fps: Number(FPS.toFixed(4)),
+    // 신호는 절대 시각으로 인덱싱한다. 파일과 스트리밍본의 길이가 달라도 시작이 어긋나지 않는다.
+    audioMs: Math.round(audioMs),
+    low: toBase64(low),
+    mid: toBase64(mid),
+    high: toBase64(high),
+    bpm: accepted?.bpm ?? null,
+    beats: accepted?.beats ?? [],
+  };
+}
+
+function buildReport({ track, audioMs, frames, onsets, grid, accepted }) {
+  return {
+    frames,
+    audioMs,
+    onsets: onsets.length,
+    bpm: grid?.bpm ?? null,
+    subdivision: grid?.subdivision ?? 1,
+    confidence: grid?.confidence ?? 0,
+    beats: accepted?.beats.length ?? 0,
+    drift: Math.round(audioMs - track.durationMs),
+  };
+}
 
 export function analyze(file, track) {
   const pcm = decodeMono(file);
-  const audioMs = (pcm.length / SAMPLE_RATE) * 1000;
+  const audioMs = (pcm.length / SAMPLE_RATE) * MS_PER_SECOND;
   const drift = audioMs - track.durationMs;
   if (Math.abs(drift) > MASTER_DRIFT_MS) {
     return { mismatch: Math.round(drift) };
@@ -26,32 +55,12 @@ export function analyze(file, track) {
   const { frames, bands, flux } = spectra(pcm);
   if (frames === 0) throw new Error('프레임이 없습니다(너무 짧은 파일)');
 
-  const [low, mid, high] = bands.map(normalize);
   const onsets = detectOnsets(flux);
   const grid = findGrid(onsets, audioMs);
-  const useGrid = grid && grid.confidence >= GRID_MIN_CONFIDENCE;
+  const accepted = grid && grid.confidence >= GRID_MIN_CONFIDENCE ? grid : null;
 
   return {
-    payload: {
-      id: track.id,
-      fps: Number(FPS.toFixed(4)),
-      // 신호는 절대 시각으로 인덱싱한다. 파일과 스트리밍본의 길이가 달라도 시작이 어긋나지 않는다.
-      audioMs: Math.round(audioMs),
-      low: toBase64(low),
-      mid: toBase64(mid),
-      high: toBase64(high),
-      bpm: useGrid ? grid.bpm : null,
-      beats: useGrid ? grid.beats : [],
-    },
-    report: {
-      frames,
-      audioMs,
-      onsets: onsets.length,
-      bpm: grid?.bpm ?? null,
-      subdivision: grid?.subdivision ?? 1,
-      confidence: grid?.confidence ?? 0,
-      beats: useGrid ? grid.beats.length : 0,
-      drift: Math.round(audioMs - track.durationMs),
-    },
+    payload: buildPayload({ track, audioMs, bands, accepted }),
+    report: buildReport({ track, audioMs, frames, onsets, grid, accepted }),
   };
 }

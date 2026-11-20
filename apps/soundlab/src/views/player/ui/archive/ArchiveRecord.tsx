@@ -1,6 +1,8 @@
 import { artworkUrl, PLAYER_SCREEN, TRACKS, type Track } from '@entities/track';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX, MouseEvent } from 'react';
+import { EAGER_ARTWORK_COUNT } from '../../config/display';
+import { formatDurationMs } from '../../lib/formatTrack';
 import { playerPath } from '../../lib/playerUrl';
 import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
 import { currentIndexAtom, isPlayingAtom, playerScreenAtom } from '../../model/store/playback';
@@ -22,7 +24,6 @@ export function ArchiveRecord({ track, position }: Props): JSX.Element {
     setScreen(PLAYER_SCREEN.nowPlaying);
     select(index);
   };
-  const seconds = Math.floor(track.durationMs / 1000);
   return (
     <article className={`record ${position === 0 ? 'record-featured' : ''}`}>
       <a
@@ -35,7 +36,7 @@ export function ArchiveRecord({ track, position }: Props): JSX.Element {
           <img
             src={artworkUrl(track, 't500x500')}
             alt=""
-            loading={position < 3 ? 'eager' : 'lazy'}
+            loading={position < EAGER_ARTWORK_COUNT ? 'eager' : 'lazy'}
             decoding="async"
             className="size-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-105"
           />
@@ -54,9 +55,7 @@ export function ArchiveRecord({ track, position }: Props): JSX.Element {
             <h3 className="record-title text-base leading-snug font-normal text-paper">{track.title}</h3>
             <p className="mt-xs font-label text-xs text-mute">{isCurrent ? '재생 중' : track.genre}</p>
           </div>
-          <span className="shrink-0 pt-xs font-label text-xs text-mute">
-            {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, '0')}
-          </span>
+          <span className="shrink-0 pt-xs font-label text-xs text-mute">{formatDurationMs(track.durationMs)}</span>
         </div>
       </a>
     </article>

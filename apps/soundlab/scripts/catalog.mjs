@@ -10,27 +10,61 @@ function safeUrl(value, hosts) {
   return url.toString();
 }
 
-export function toTrack(raw) {
+function readRawId(raw) {
   if (!raw || typeof raw !== 'object' || !Number.isSafeInteger(raw.id) || raw.id <= 0) {
     throw new Error('유효하지 않은 곡 ID입니다');
   }
-  if (typeof raw.title !== 'string' || !raw.title.trim() || !Number.isFinite(raw.duration) || raw.duration <= 0) {
-    throw new Error(`곡 ${raw.id}의 제목 또는 길이가 잘못됐습니다`);
-  }
+  return raw.id;
+}
+
+function readTitle(raw) {
+  const isValid = typeof raw.title === 'string' && raw.title.trim() && Number.isFinite(raw.duration) && raw.duration > 0;
+  if (!isValid) throw new Error(`곡 ${raw.id}의 제목 또는 길이가 잘못됐습니다`);
+  return raw.title.normalize('NFC');
+}
+
+function readArtwork(raw) {
   const artwork = safeUrl(raw.artwork_url, ['i1.sndcdn.com']).match(/^(.*)-[a-z0-9]+(\.jpg|\.png)$/);
   if (!artwork) throw new Error(`곡 ${raw.id}의 아트워크 형식이 잘못됐습니다`);
+  return { artworkBase: artwork[1], artworkExt: artwork[2] };
+}
+
+function readGenre(raw) {
+  return typeof raw.genre === 'string' && raw.genre ? raw.genre.normalize('NFC') : 'Unclassified';
+}
+
+function readDescription(raw) {
+  return typeof raw.description === 'string' ? raw.description.normalize('NFC').trim() : '';
+}
+
+export function toTrack(raw) {
+  readRawId(raw);
+  const title = readTitle(raw);
+  const { artworkBase, artworkExt } = readArtwork(raw);
   return {
     id: raw.id,
-    title: raw.title.normalize('NFC'),
+    title,
     permalinkUrl: safeUrl(raw.permalink_url, ['soundcloud.com']),
-    artworkBase: artwork[1],
-    artworkExt: artwork[2],
+    artworkBase,
+    artworkExt,
     waveformUrl: safeUrl(raw.waveform_url, ['wave.sndcdn.com']),
     durationMs: raw.duration,
-    genre: typeof raw.genre === 'string' && raw.genre ? raw.genre.normalize('NFC') : 'Unclassified',
-    description: typeof raw.description === 'string' ? raw.description.normalize('NFC').trim() : '',
+    genre: readGenre(raw),
+    description: readDescription(raw),
     isAvailable: true,
   };
+}
+
+function assertPageUrl(next, seen) {
+  const url = new URL(next);
+  if (url.origin !== API_ORIGIN || url.username || url.password || seen.has(next) || seen.size >= MAX_PAGES) {
+    throw new Error('곡 목록의 페이지 연결이 잘못됐습니다');
+  }
+}
+
+function readNextHref(page) {
+  if (page.next_href != null && typeof page.next_href !== 'string') throw new Error('다음 페이지 URL이 잘못됐습니다');
+  return page.next_href || null;
 }
 
 export async function fetchCatalog({ firstUrl, getJson }) {
@@ -38,10 +72,7 @@ export async function fetchCatalog({ firstUrl, getJson }) {
   const tracks = new Map();
   let next = firstUrl;
   while (next) {
-    const url = new URL(next);
-    if (url.origin !== API_ORIGIN || url.username || url.password || seen.has(next) || seen.size >= MAX_PAGES) {
-      throw new Error('곡 목록의 페이지 연결이 잘못됐습니다');
-    }
+    assertPageUrl(next, seen);
     seen.add(next);
     const page = await getJson(next);
     if (!page || !Array.isArray(page.collection)) throw new Error('곡 목록 응답이 잘못됐습니다');
@@ -49,8 +80,7 @@ export async function fetchCatalog({ firstUrl, getJson }) {
       const track = toTrack(raw);
       tracks.set(track.id, track);
     }
-    if (page.next_href != null && typeof page.next_href !== 'string') throw new Error('다음 페이지 URL이 잘못됐습니다');
-    next = page.next_href || null;
+    next = readNextHref(page);
   }
   if (tracks.size === 0) throw new Error('빈 목록으로 기존 아카이브를 덮어쓸 수 없습니다');
   return [...tracks.values()];
