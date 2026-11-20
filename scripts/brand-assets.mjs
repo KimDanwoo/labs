@@ -22,7 +22,7 @@ const SUDOKU_URL = process.env.SUDOKU_URL ?? 'https://sudoku.danwoo.dev/';
 const BOARD_SELECTOR = 'table[role="grid"]';
 
 const APPS = {
-  komorebi: { og: { template: 'komorebi-og.html', file: 'opengraph-image.jpg' } },
+  komorebi: { og: { template: 'komorebi-og.html', file: 'opengraph-image.jpg' }, favicon: true },
   'awesome-sudoku': {
     og: { template: 'awesome-sudoku-og.html', file: 'opengraph-image.png', slots: { board: captureSudokuBoard } },
     favicon: true,
