@@ -24,7 +24,8 @@ export function WalkMap({ region, position, visited }: WalkMapProps) {
       {world.routes.map((edge) => {
         const a = nodeById.get(edge.a);
         const b = nodeById.get(edge.b);
-        if (!a || !b) return null;
+        if (!a) return null;
+        if (!b) return null;
         return (
           <line
             key={edge.a + edge.b}

@@ -1,7 +1,5 @@
-/** The slate inside the frame, measured on the 1536 × 1024 classroom painting. */
 export const BOARD_RECT = { x: 442, y: 255, width: 655, height: 207 } as const;
 
-/** One resolution for the slate in the scene and on the drawing pad, so a line looks alike in both. */
 export const CHALK_LAYER = { width: 1024, height: Math.round((1024 * BOARD_RECT.height) / BOARD_RECT.width) } as const;
 
 export const CHALK_COLOR = { white: '#f4f1e4', yellow: '#f7e17a', pink: '#f5a9bb' } as const;
@@ -9,7 +7,6 @@ export type ChalkColor = keyof typeof CHALK_COLOR;
 
 export const CHALK_TOOL = { chalk: 'chalk', eraser: 'eraser' } as const;
 
-/** Points are flat [x0, y0, x1, y1, …] pairs, 0–1 across and down the slate. */
 export type ChalkStroke =
   | { tool: typeof CHALK_TOOL.chalk; color: ChalkColor; points: number[] }
   | { tool: typeof CHALK_TOOL.eraser; points: number[] };
@@ -17,7 +14,6 @@ export type ChalkStroke =
 export const CHALKBOARD_LIMIT = { strokes: 300, points: 6_000, rawLength: 200_000 } as const;
 const CHALKBOARD_VERSION = 1;
 const PRECISION = 1_000;
-/** About 1.3 board pixels: finer pointer moves add nothing visible but use up the point budget. */
 export const MIN_POINT_DISTANCE = 0.002;
 
 const ASPECT = BOARD_RECT.width / BOARD_RECT.height;
@@ -42,29 +38,35 @@ const isChalkColor = (value: unknown): value is ChalkColor =>
   typeof value === 'string' && Object.hasOwn(CHALK_COLOR, value);
 
 function parseStroke(value: unknown): ChalkStroke | null {
-  if (typeof value !== 'object' || value === null) return null;
+  if (typeof value !== 'object') return null;
+  if (value === null) return null;
   const { tool, color, points } = value as Record<string, unknown>;
-  if (!Array.isArray(points) || points.length < 2 || points.length % 2 !== 0 || !points.every(isCoordinate))
-    return null;
+  if (!Array.isArray(points)) return null;
+  if (points.length < 2) return null;
+  if (points.length % 2 !== 0) return null;
+  if (!points.every(isCoordinate)) return null;
   if (tool === CHALK_TOOL.eraser) return { tool, points };
-  if (tool === CHALK_TOOL.chalk && isChalkColor(color)) return { tool, color, points };
+  const isChalkStroke = tool === CHALK_TOOL.chalk && isChalkColor(color);
+  if (isChalkStroke) return { tool, color, points };
   return null;
 }
 
 function parseStrokes(strokes: unknown): ChalkStroke[] {
-  if (!Array.isArray(strokes) || strokes.length > CHALKBOARD_LIMIT.strokes) return [];
+  if (!Array.isArray(strokes)) return [];
+  if (strokes.length > CHALKBOARD_LIMIT.strokes) return [];
   const valid = strokes.map(parseStroke);
   if (valid.some((stroke) => stroke === null)) return [];
   const board = valid.filter((stroke): stroke is ChalkStroke => stroke !== null);
   return countPoints(board) > CHALKBOARD_LIMIT.points ? [] : board;
 }
 
-/** Untrusted storage: the whole board is dropped rather than half-replayed if any stroke is malformed. */
 export function parseChalkboard(raw: string | null): ChalkStroke[] {
-  if (!raw || raw.length > CHALKBOARD_LIMIT.rawLength) return [];
+  if (!raw) return [];
+  if (raw.length > CHALKBOARD_LIMIT.rawLength) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
-    if (typeof parsed !== 'object' || parsed === null) return [];
+    if (typeof parsed !== 'object') return [];
+    if (parsed === null) return [];
     const { version, strokes } = parsed as Record<string, unknown>;
     return version === CHALKBOARD_VERSION ? parseStrokes(strokes) : [];
   } catch {
@@ -115,7 +117,6 @@ export function paintStroke(ctx: CanvasRenderingContext2D, stroke: ChalkStroke) 
   ctx.restore();
 }
 
-/** Chalk joins the painting before any lighting, so dusk, night and lamps fall on it like on the slate itself. */
 export const CHALK_GLSL = `
   uniform sampler2D chalk;
   uniform float hasChalk;

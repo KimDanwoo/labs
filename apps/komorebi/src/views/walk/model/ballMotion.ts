@@ -6,7 +6,8 @@ const BALL_ARC = 3.8;
 const HAND_HEIGHT = 3.8;
 
 export function ballFlight({ game, isStill }: { game: BallGame; isStill: boolean }): Flight {
-  if (game.phase === BALL_PHASE.ready || game.phase === BALL_PHASE.complete) return { progress: 0, arc: 0, spin: 0 };
+  const isAtRest = game.phase === BALL_PHASE.ready || game.phase === BALL_PHASE.complete;
+  if (isAtRest) return { progress: 0, arc: 0, spin: 0 };
   if (game.phase === BALL_PHASE.caught) return { progress: 1, arc: 0, spin: 0 };
   if (game.phase === BALL_PHASE.missed) {
     const fall = Math.min(1, game.elapsed / BALL_TIMING.miss);
@@ -27,12 +28,15 @@ const isThrowingPose = (game: BallGame, role: BallRole) =>
   (game.phase === BALL_PHASE.returning && role === BALL_ROLE.player);
 
 export function ballPose({ game, role, isStill }: { game: BallGame | null; role: BallRole; isStill: boolean }): Pose {
-  if (!game || isStill) return { lean: 0, compression: 1 };
-  if (game.phase === BALL_PHASE.ready && role === BALL_ROLE.friend) {
+  if (!game) return { lean: 0, compression: 1 };
+  if (isStill) return { lean: 0, compression: 1 };
+  const isFriendServing = game.phase === BALL_PHASE.ready && role === BALL_ROLE.friend;
+  if (isFriendServing) {
     const windup = Math.sin(Math.min(1, game.elapsed / BALL_TIMING.ready) * Math.PI);
     return { lean: -windup * 0.12, compression: 1 - windup * 0.035 };
   }
-  if (game.phase === BALL_PHASE.caught && role === BALL_ROLE.player) {
+  const isPlayerCatching = game.phase === BALL_PHASE.caught && role === BALL_ROLE.player;
+  if (isPlayerCatching) {
     const catchWeight = Math.sin(Math.min(1, game.elapsed / BALL_TIMING.hold) * Math.PI);
     return { lean: -catchWeight * 0.06, compression: 1 - catchWeight * 0.08 };
   }

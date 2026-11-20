@@ -85,8 +85,6 @@ export function createChild(initialLayers: ChildLayers): ChildCharacter {
       time += dt;
       const previousPhase = motion.phase;
       const m = advanceMotion(motion, dt, travel, heading, running, walking);
-      // Discrete artwork must follow the requested direction immediately. Smoothing
-      // a 180-degree turn displays unrelated side frames while walking backwards.
       facing = childFacing(facing, heading);
       const column = atlasColumn(jumpHeight > 0, walking && !reducedMotion, m.phase);
       const nextFrame = facing * CHARACTER_RIG.columns + column;
@@ -112,7 +110,8 @@ export function createChild(initialLayers: ChildLayers): ChildCharacter {
       return { hasStepped: walking && jumpHeight <= 0 && crossedFootfall(previousPhase, m.phase) };
     },
     setCompanionPose({ age, isStill: reducedMotion }: CompanionPose) {
-      if (reducedMotion || age >= 2.4) return;
+      if (reducedMotion) return;
+      if (age >= 2.4) return;
       const lean = Math.sin(Math.min(1, age / 2.4) * Math.PI) * 0.09;
       materials.forEach((material) => {
         material.rotation = lean;
@@ -120,7 +119,8 @@ export function createChild(initialLayers: ChildLayers): ChildCharacter {
       sprites.forEach((sprite) => sprite.scale.set(7.8, 10.4 * (1 - lean * 0.5), 1));
     },
     setFishingPose({ frame, elapsed, isStill: reducedMotion }: FishingPose) {
-      if (!frame || reducedMotion) return;
+      if (!frame) return;
+      if (reducedMotion) return;
       const isFighting = frame.phase === FISHING_PHASE.fighting;
       const isCasting = frame.phase === FISHING_PHASE.casting;
       let lean = 0.015;
@@ -132,7 +132,8 @@ export function createChild(initialLayers: ChildLayers): ChildCharacter {
       });
       sprites.forEach((sprite) => {
         sprite.scale.set(7.8, 10.4 * (1 - Math.abs(lean) * 0.2), 1);
-        sprite.position.y = isFighting && frame.isReeling ? Math.sin(elapsed * 14) * 0.06 : 0;
+        const isReelingFight = isFighting && frame.isReeling;
+        sprite.position.y = isReelingFight ? Math.sin(elapsed * 14) * 0.06 : 0;
       });
     },
     setBallPose(pose) {

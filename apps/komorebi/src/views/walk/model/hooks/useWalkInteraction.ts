@@ -86,7 +86,8 @@ export function useWalkInteraction(options: WalkInteractionOptions) {
       spotAction.run();
       return;
     }
-    if (nearbyFriend && engineRef.current?.greetSchoolmate(nearbyFriend.id)) {
+    const hasGreeted = nearbyFriend && engineRef.current?.greetSchoolmate(nearbyFriend.id);
+    if (hasGreeted) {
       onFriend({ kind: FRIEND_ACTIVITY.greeting, id: nearbyFriend.id });
       return;
     }

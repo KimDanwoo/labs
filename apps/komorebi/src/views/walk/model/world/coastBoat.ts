@@ -1,5 +1,3 @@
-// Conservative hull/cabin exclusion; not a production alpha matte.
-// Thin mast, aerial and mooring ropes require separate tracing.
 export const COAST_BOAT_OUTLINE: [number, number][] = [
   [52.3, 40.6],
   [54.8, 41.1],

@@ -55,12 +55,12 @@ async function loadStartTextures({ loader, plates, loaded, layerUrls, signal, re
   for (const atlas of [bodyAtlas, outfitAtlas]) {
     if (atlas.status === 'fulfilled') loaded.push(preparePaintingTexture(atlas.value));
   }
-  if (
+  const hasFailedStart =
     startPlate.status === 'rejected' ||
     bodyAtlas.status === 'rejected' ||
     outfitAtlas.status === 'rejected' ||
-    signal?.aborted
-  ) {
+    signal?.aborted;
+  if (hasFailedStart) {
     releaseTextures();
     const failure = [startPlate, bodyAtlas, outfitAtlas].find((result) => result.status === 'rejected');
     throw failure?.reason ?? new DOMException('Scene cancelled', 'AbortError');
@@ -113,7 +113,6 @@ export async function createSceneParts(
   }
   const { renderer, touchDevice } = createRenderer(container, character, releaseTextures);
   const scene = new THREE.Scene();
-  // Every layer shares the painted map coordinates; depth must not shift feet off the path.
   const camera = new THREE.OrthographicCamera(-60, 60, 40, -40, 0.1, 200);
   camera.position.set(0, 0, 100);
   const geo = new THREE.PlaneGeometry(120, 80, 1, 1);
@@ -124,8 +123,6 @@ export async function createSceneParts(
   scene.add(child);
   const pierFishing = createPierFishing(scene);
   const companions = createCompanionScene(scene, loader);
-  // Group order sorts before mesh order: keep the group at the scene default
-  // so the foreground can render after the character's individual sprites.
   child.children.forEach((part) => {
     part.renderOrder = CHILD_ORDER;
   });

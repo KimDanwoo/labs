@@ -42,7 +42,6 @@ export interface WalkState {
   blockedPortal: WorldPortal | null;
   waitingPortal: WorldPortal | null;
   actionEndsAt: number;
-  /** An exit the player turned away from while it loaded; choosing it again lifts the block (a failed load does not). */
   cancelledPortal: WorldPortal | null;
   heading: number;
   moveSpeed: number;

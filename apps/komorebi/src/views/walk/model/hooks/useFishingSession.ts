@@ -39,6 +39,11 @@ function readCollection(): FishCollection {
   }
 }
 
+function catchSoundOf(caught: Catch | null): 'rare' | 'success' {
+  const isRareCatch = caught !== null && isRareFish(caught.id);
+  return isRareCatch ? 'rare' : 'success';
+}
+
 function useFishingCue(phase: FishingPhase, caught: Catch | null, onSound: FishingSessionInput['onSound']) {
   const playSound = useEffectEvent(() => {
     if (phase === FISHING_PHASE.casting) onSound('cast');
@@ -47,7 +52,7 @@ function useFishingCue(phase: FishingPhase, caught: Catch | null, onSound: Fishi
       onSound('bite');
       navigator.vibrate?.([...VIBRATION.bite]);
     } else if (phase === FISHING_PHASE.fighting) onSound('hook');
-    else if (phase === FISHING_PHASE.caught) onSound(caught && isRareFish(caught.id) ? 'rare' : 'success');
+    else if (phase === FISHING_PHASE.caught) onSound(catchSoundOf(caught));
     else if (phase === FISHING_PHASE.missed) onSound('miss');
   });
   useEffect(() => {
@@ -98,7 +103,8 @@ function useFishingKeys(onAct: () => void, onClose: () => void) {
         handleClose();
         return;
       }
-      if (event.code === 'KeyE' && !event.repeat) {
+      const isFishingKey = event.code === 'KeyE' && !event.repeat;
+      if (isFishingKey) {
         event.preventDefault();
         handleAct();
       }
@@ -134,7 +140,8 @@ export function useFishingSession({ onClose, onSound, onFrame }: FishingSessionI
   function finishFight(outcome: Fight['outcome']) {
     if (hasFinished.current) return;
     hasFinished.current = true;
-    if (outcome !== FIGHT_OUTCOME.landed || !caught) {
+    const isLost = outcome !== FIGHT_OUTCOME.landed || !caught;
+    if (isLost) {
       setFailure(outcome === FIGHT_OUTCOME.snapped ? FISHING_FAILURE.snapped : FISHING_FAILURE.escaped);
       setPhase(FISHING_PHASE.missed);
       return;
@@ -157,11 +164,15 @@ export function useFishingSession({ onClose, onSound, onFrame }: FishingSessionI
   }
 
   function act() {
-    if (phase === FISHING_PHASE.fighting || phase === FISHING_PHASE.casting || isCelebrating) return;
-    if (phase === FISHING_PHASE.waiting || phase === FISHING_PHASE.bite) {
+    if (phase === FISHING_PHASE.fighting) return;
+    if (phase === FISHING_PHASE.casting) return;
+    if (isCelebrating) return;
+    const isWaitingForBite = phase === FISHING_PHASE.waiting || phase === FISHING_PHASE.bite;
+    if (isWaitingForBite) {
       if (hasReeled.current) return;
       hasReeled.current = true;
-      if (phase !== FISHING_PHASE.bite || !isBiteOnTime(Date.now(), deadline.current)) {
+      const hasMissedBite = phase !== FISHING_PHASE.bite || !isBiteOnTime(Date.now(), deadline.current);
+      if (hasMissedBite) {
         setPhase(FISHING_PHASE.missed);
         return;
       }

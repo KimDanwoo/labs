@@ -17,7 +17,8 @@ export function AquariumView({ fish, isFeeding }: AquariumViewProps) {
   let caption = fish.length
     ? '물고기에 손을 올리면 잠깐 멈춰요. 눌러서 만나 보세요.'
     : '작은 바다가 새 친구를 기다리고 있어요.';
-  if (chosen && species) caption = `${species.name} · ${chosen.size} cm · ${species.rarity} 만남`;
+  const hasChosenFish = chosen && species;
+  if (hasChosenFish) caption = `${species.name} · ${chosen.size} cm · ${species.rarity} 만남`;
   return (
     <div className="aquarium-gallery">
       <div className="aquarium-art" ref={root} style={{ backgroundImage: `url(${AQUARIUM_ART})` }}>

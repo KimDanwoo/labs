@@ -105,7 +105,6 @@ const roomMasks = INDOOR_RAIN_ROOMS.map(({ region, panes }) => {
   return `if(abs(sceneryStyle-${SCENERY_STYLE[region]}.0)<.5) return ${mask};`;
 }).join('\n');
 
-/** Window coordinates run downward, so subtracting their positive velocity makes streaks fall. */
 export const INDOOR_WEATHER_GLSL = `
   uniform float outdoorRain;
   float rainPaneEdge(vec2 p, vec2 a, vec2 b) {

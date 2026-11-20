@@ -24,6 +24,7 @@ export function FishingHud({ onClose, onFrame, onSound, onReact }: FishingHudPro
   const isLegendary = fish?.rarity === FISH_RARITY.legendary;
   const isCaught = phase === FISHING_PHASE.caught;
 
+  const isFightingCatch = phase === FISHING_PHASE.fighting && caught;
   return (
     <FishingContext.Provider value={{ ...session, onReact }}>
       <section className="pier-fishing-hud" aria-label="부두 낚시" data-phase={phase}>
@@ -45,7 +46,7 @@ export function FishingHud({ onClose, onFrame, onSound, onReact }: FishingHudPro
         <p role="status" className={phase === FISHING_PHASE.bite ? 'pier-bite-message' : ''}>
           {fishingMessage({ phase, failure: session.failure, fishName: fish?.name, caught, isNew })}
         </p>
-        {phase === FISHING_PHASE.fighting && caught ? (
+        {isFightingCatch ? (
           <FishingFight fish={caught} isPerfect={session.isPerfect} onFinish={session.finishFight} onFrame={onFrame} />
         ) : (
           <FishingActionButton />

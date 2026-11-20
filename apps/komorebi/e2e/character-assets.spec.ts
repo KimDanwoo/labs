@@ -33,7 +33,8 @@ test('body atlases keep every pose on the shared foot anchor and leave the costu
         for (let y = 0; y < frameHeight; y++) {
           for (let x = 0; x < frameWidth; x++) {
             const alpha = data[((row * frameHeight + y) * width + column * frameWidth + x) * 4 + 3];
-            if (alpha !== undefined && alpha > OPAQUE_ALPHA) bottom = y;
+            const isOpaque = alpha !== undefined && alpha > OPAQUE_ALPHA;
+            if (isOpaque) bottom = y;
           }
         }
         return bottom;
@@ -117,7 +118,8 @@ test('the shared PE uniform retains all 32 garment poses and transparent space a
               right = Math.max(right, x);
               bottom = Math.max(bottom, y);
             }
-            if (y < OUTSIDE_TOP || y > OUTSIDE_BOTTOM) outsideAlpha = Math.max(outsideAlpha, alpha);
+            const isOutsideBand = y < OUTSIDE_TOP || y > OUTSIDE_BOTTOM;
+            if (isOutsideBand) outsideAlpha = Math.max(outsideAlpha, alpha);
           }
         }
         return { bounds: [left, top, right, bottom], outsideAlpha };
@@ -144,7 +146,8 @@ test('the shared PE uniform retains all 32 garment poses and transparent space a
   const [summer, pe] = reports;
   expect(summer).toBeDefined();
   expect(pe).toBeDefined();
-  if (!summer || !pe) return;
+  if (!summer) return;
+  if (!pe) return;
   expect(pe.width).toBe(CHARACTER_RIG.width);
   expect(pe.height).toBe(CHARACTER_RIG.height);
   expect(pe.outsideAlpha).toBeLessThan(16);
@@ -202,7 +205,8 @@ test('side-facing idle feet point toward the face instead of keeping two front-f
     const profileToeOffset = (data: Uint8ClampedArray, width: number, row: number, source: string) => {
       const shoes = centroidX(data, width, row, isShoe);
       const socks = centroidX(data, width, row, isSock);
-      if (!shoes.count || !socks.count) throw new Error(`Missing profile shoes in ${source}`);
+      if (!shoes.count) throw new Error(`Missing profile shoes in ${source}`);
+      if (!socks.count) throw new Error(`Missing profile shoes in ${source}`);
       return shoes.mean - socks.mean;
     };
     const results: { source: string; direction: number; toeOffset: number }[] = [];

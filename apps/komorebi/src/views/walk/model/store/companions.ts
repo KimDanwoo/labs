@@ -17,7 +17,8 @@ function read() {
   }
 }
 function sync(event: StorageEvent) {
-  if (event.key !== COMPANION_KEY && event.key !== null) return;
+  const isOtherKey = event.key !== COMPANION_KEY && event.key !== null;
+  if (isOtherKey) return;
   current = read();
   listeners.forEach((listener) => listener());
 }

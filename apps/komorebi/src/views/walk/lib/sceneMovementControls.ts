@@ -12,19 +12,20 @@ export function createMovementControls(
 ): Pick<WalkEngine, 'setPaused' | 'setInput' | 'playAction' | 'travelTo' | 'reset'> {
   const { placeEffects, jump, keys, portalInput, startPlate } = parts;
   const jumpOnPress = (pressed: boolean) => {
-    if (pressed && !state.paused) startJump(jump);
+    const shouldJump = pressed && !state.paused;
+    if (shouldJump) startJump(jump);
   };
   return {
     setPaused(value) {
       state.paused = value;
       keys.clear();
-      // A dialog covers the scenery, so a half-played action is dropped rather than frozen under it.
       if (value) placeEffects.clear();
       wake();
     },
     setInput(key, pressed) {
       if (!pressed) portalInput.release(key);
-      if (pressed && portalInput.isBlocked(key)) return;
+      const isBlockedPortalKey = pressed && portalInput.isBlocked(key);
+      if (isBlockedPortalKey) return;
       if (key === 'shift') {
         state.touchSprint = pressed;
         return;
@@ -33,7 +34,8 @@ export function createMovementControls(
         jumpOnPress(pressed);
         return;
       }
-      if (pressed && state.paused) return;
+      const isPausedPress = pressed && state.paused;
+      if (isPausedPress) return;
       if (!pressed) {
         keys.delete(key);
         return;

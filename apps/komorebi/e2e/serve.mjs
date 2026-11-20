@@ -1,4 +1,3 @@
-// Static server for the exported site; python's http.server resets connections under parallel chunk loads.
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { createServer } from 'node:http';

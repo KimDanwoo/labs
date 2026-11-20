@@ -60,8 +60,8 @@ export function stepButterfly(f: Flight, dt: number, bounds: Bounds, random: Ran
     timer: f.timer - dt,
   };
   if (next.timer > 0) return next;
-  if (random() < BUTTERFLY.restChance && inside(bounds, next.x, next.z))
-    return { ...next, mode: FLIGHT.rest, timer: between(random, 1.5, 4.5) };
+  const shouldRest = random() < BUTTERFLY.restChance && inside(bounds, next.x, next.z);
+  if (shouldRest) return { ...next, mode: FLIGHT.rest, timer: between(random, 1.5, 4.5) };
   return { ...next, timer: between(random, 2, 6) };
 }
 
@@ -102,7 +102,8 @@ export function stepDragonfly(f: Flight, dt: number, bounds: Bounds, random: Ran
       wing: f.wing + dt * (isPerched ? 0 : DRAGONFLY.flap),
     };
   }
-  if (!isPerched && random() < DRAGONFLY.perchChance) return { ...f, mode: FLIGHT.rest, timer: between(random, 2, 5) };
+  const shouldPerch = !isPerched && random() < DRAGONFLY.perchChance;
+  if (shouldPerch) return { ...f, mode: FLIGHT.rest, timer: between(random, 2, 5) };
   const reach = between(random, 4, 14);
   const angle = random() * Math.PI * 2;
   const targetX = Math.min(bounds.maxX, Math.max(bounds.minX, f.x + Math.cos(angle) * reach));
@@ -118,10 +119,6 @@ export const FLIGHT_STEP = 1 / 60;
 const MAX_STEPS = 4;
 type Step = (f: Flight, dt: number, bounds: Bounds, random: Random) => Flight;
 
-/**
- * Advances a flight in fixed 1/60 s steps, whatever the frame rate, so an insect behaves the same whether the
- * scene draws at 30 or 60 fps. `clock` carries the leftover time; a long stall is dropped rather than replayed.
- */
 export function flyFor(f: Flight, clock: number, seconds: number, step: Step, bounds: Bounds, random: Random) {
   let flight = f;
   let left = Math.min(clock + seconds, FLIGHT_STEP * MAX_STEPS);

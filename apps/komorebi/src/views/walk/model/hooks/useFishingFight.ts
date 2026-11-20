@@ -77,7 +77,8 @@ export function useFishingFight({ fish, isPerfect, onFinish, onFrame }: FishingF
 
   const reelHandlers = {
     onPointerDown: (event: PointerEvent<HTMLButtonElement>) => {
-      if (event.button !== 0 || pointer.current !== null) return;
+      if (event.button !== 0) return;
+      if (pointer.current !== null) return;
       event.currentTarget.setPointerCapture(event.pointerId);
       pointer.current = event.pointerId;
     },

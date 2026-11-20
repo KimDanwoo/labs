@@ -4,9 +4,7 @@ const PORT = 3111;
 
 export default defineConfig({
   testDir: 'e2e',
-  // Several tests walk the child across a whole painting before they assert anything.
   timeout: 60_000,
-  // Parallel WebGL pages starve each other in headless Chrome and never finish loading.
   workers: 1,
   maxFailures: 1,
   use: { baseURL: `http://127.0.0.1:${PORT}`, channel: 'chrome', viewport: { width: 1280, height: 800 } },

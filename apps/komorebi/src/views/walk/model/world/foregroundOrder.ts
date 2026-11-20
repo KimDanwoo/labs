@@ -7,7 +7,6 @@ export function isForegroundInFront(layer: Foreground, position: Point, region: 
   const x = position.x * 15.36;
   const t = x2 === x1 ? 0 : Math.max(0, Math.min(1, (x - x1) / (x2 - x1)));
   const groundY = y1 + (y2 - y1) * t;
-  // Use grounded feet, never head height or the animated jump position.
   return position.z * 10.24 < groundY;
 }
 

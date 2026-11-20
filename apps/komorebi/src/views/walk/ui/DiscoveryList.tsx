@@ -12,12 +12,13 @@ export function DiscoveryList() {
       {LANDMARKS.map((p) => {
         const keptAt = TIME_ORDER.filter((time) => pages[time].includes(p.id));
         const isCollected = keptAt.length > 0;
+        const canReread = isJournal && isCollected;
         const stampTimes = keptAt.map((time) => `kept-${time}`).join(' ');
         return (
           <div key={p.id} className="discovery-item">
             <button
               className="discovery-guide"
-              aria-label={isJournal && isCollected ? `${p.name} 추억 다시 읽기` : undefined}
+              aria-label={canReread ? `${p.name} 추억 다시 읽기` : undefined}
               onClick={() => (isJournal ? onRead(p.id) : onGuide(p.id))}
               disabled={isJournal ? !isCollected : !isReady}
             >

@@ -26,7 +26,8 @@ export function createLookControls({
           outfits.set(url, texture);
           loaded.push(texture);
         }
-        if (state.disposed || request !== state.appearanceRequest) return false;
+        if (state.disposed) return false;
+        if (request !== state.appearanceRequest) return false;
         state.currentAppearance = next;
         character.setOutfit(texture);
         container.dataset.appearance = `${next.character}-${next.outfit}`;

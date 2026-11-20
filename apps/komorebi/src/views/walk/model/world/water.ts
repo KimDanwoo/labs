@@ -3,10 +3,6 @@ import type { Region } from '@views/walk/model/world/world';
 export const WATER_KIND = { stream: 'stream', river: 'river', sea: 'sea', paddy: 'paddy' } as const;
 type WaterKind = (typeof WATER_KIND)[keyof typeof WATER_KIND];
 
-/**
- * Visible water in each painting, in painting percent (x across, z down), traced from the artwork. `flow` is the
- * on-painting direction the water runs (still water has none) and `speed` its relative pace (0–1).
- */
 export type Water = { kind: WaterKind; outline: [number, number][]; flow: [number, number]; speed: number };
 
 const water = (kind: WaterKind, flow: [number, number], speed: number, outline: [number, number][]): Water => ({

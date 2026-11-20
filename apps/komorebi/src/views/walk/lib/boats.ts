@@ -154,7 +154,8 @@ export function createBoats(scene: THREE.Scene) {
   let clock = 0;
   return {
     update({ region, dt, darkness, isStill }: { region: Region; dt: number; darkness: number; isStill: boolean }) {
-      if (!isStill && region === REGION.coast) clock += dt;
+      const shouldAdvanceClock = !isStill && region === REGION.coast;
+      if (shouldAdvanceClock) clock += dt;
       for (const entry of boats) updateBoat(entry, { region, clock, darkness });
     },
     dispose() {

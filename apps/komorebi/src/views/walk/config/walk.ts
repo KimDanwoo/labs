@@ -1,4 +1,3 @@
-/** Before day pages had their own key, this list held every place visited at any time; it seeds the day pages. */
 export const LEGACY_DISCOVERY_STORAGE_KEY = 'komorebi-discoveries-v1';
 export const DAY_PAGE_STORAGE_KEY = 'komorebi-day-pages-v1';
 export const EVENING_DISCOVERY_STORAGE_KEY = 'komorebi-evening-discoveries-v1';

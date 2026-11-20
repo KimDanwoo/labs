@@ -32,7 +32,6 @@ test('school friends walk and pause, and classroom chalk survives leaving and re
 
   await page.getByRole('button', { name: '산책 지도 열기' }).click();
   await expect(landscape).toHaveAttribute('data-motion', 'idle');
-  // Positions are sampled less often than the animation; let the paused sample reach the DOM.
   await page.waitForTimeout(200);
   const paused = await landscape.getAttribute('data-schoolmate-positions');
   await page.waitForTimeout(500);

@@ -29,7 +29,8 @@ function tensionRate(isReeling: boolean, strength: number, isSurging: boolean) {
 
 function progressRate(isReeling: boolean, tension: number, strength: number) {
   const isInZone = tension >= TENSION.low && tension <= TENSION.high;
-  return isReeling && isInZone ? 28 - strength * 8 : -3;
+  const isPulling = isReeling && isInZone;
+  return isPulling ? 28 - strength * 8 : -3;
 }
 
 function clampGauge(value: number) {
@@ -38,7 +39,8 @@ function clampGauge(value: number) {
 
 function fightOutcome(tension: number, progress: number): Fight['outcome'] {
   if (tension >= FIGHT_GAUGE_MAX) return FIGHT_OUTCOME.snapped;
-  if (tension <= 0 || progress <= 0) return FIGHT_OUTCOME.escaped;
+  const hasEscaped = tension <= 0 || progress <= 0;
+  if (hasEscaped) return FIGHT_OUTCOME.escaped;
   if (progress >= FIGHT_GAUGE_MAX) return FIGHT_OUTCOME.landed;
   return FIGHT_OUTCOME.active;
 }

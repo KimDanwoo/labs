@@ -5,8 +5,10 @@ export function useModal(isOpen: boolean) {
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (isOpen && !dialog.open) dialog.showModal();
-    if (!isOpen && dialog.open) dialog.close();
+    const shouldOpen = isOpen && !dialog.open;
+    if (shouldOpen) dialog.showModal();
+    const shouldClose = !isOpen && dialog.open;
+    if (shouldClose) dialog.close();
   }, [isOpen]);
   return ref;
 }

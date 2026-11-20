@@ -12,7 +12,6 @@ export function createMotion(): ChildMotion {
 export function angleDelta(from: number, to: number) {
   return Math.atan2(Math.sin(to - from), Math.cos(to - from));
 }
-/** Travel-driven gait never resets its phase when Shift changes or a frame stalls. */
 export function advanceMotion(
   state: ChildMotion,
   dt: number,
@@ -23,7 +22,8 @@ export function advanceMotion(
 ) {
   const blend = 1 - Math.exp(-dt * 13);
   state.energy += ((moving ? 1 : 0) - state.energy) * blend;
-  state.run += ((running && moving ? 1 : 0) - state.run) * (1 - Math.exp(-dt * 9));
+  const isRunningMove = running && moving;
+  state.run += ((isRunningMove ? 1 : 0) - state.run) * (1 - Math.exp(-dt * 9));
   state.phase += (travel * Math.PI * 2) / (WALK_CYCLE_DISTANCE + state.run * 3);
   const delta = angleDelta(state.heading, heading);
   const turn = delta * (1 - Math.exp(-dt * 15));
@@ -56,17 +56,20 @@ export function createJump(): JumpMotion {
   return { height: 0, velocity: 0, landing: 0 };
 }
 export function startJump(jump: JumpMotion) {
-  if (jump.height > 0 || jump.velocity > 0) return false;
+  const isMidJump = jump.height > 0 || jump.velocity > 0;
+  if (isMidJump) return false;
   jump.velocity = 8;
   jump.landing = 0;
   return true;
 }
 export function advanceJump(jump: JumpMotion, dt: number) {
   jump.landing *= Math.exp(-dt * 12);
-  if (jump.height > 0 || jump.velocity > 0) {
+  const isJumping = jump.height > 0 || jump.velocity > 0;
+  if (isJumping) {
     jump.height += jump.velocity * dt - 20 * dt * dt;
     jump.velocity -= 40 * dt;
-    if (jump.height <= 0 && jump.velocity < 0) {
+    const hasLanded = jump.height <= 0 && jump.velocity < 0;
+    if (hasLanded) {
       jump.height = 0;
       jump.velocity = 0;
       jump.landing = 1;

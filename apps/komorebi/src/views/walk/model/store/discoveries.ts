@@ -11,7 +11,6 @@ import { LANDMARKS } from '@views/walk/model/world/landmarks';
 
 const NO_PAGES: readonly string[] = [];
 
-/** Untrusted storage: keep known landmark ids once each, in their original order. */
 export function parseDiscoveries(raw: string | null): string[] {
   try {
     const parsed: unknown = JSON.parse(raw ?? '[]');
@@ -23,10 +22,6 @@ export function parseDiscoveries(raw: string | null): string[] {
   }
 }
 
-/**
- * Day pages come from their own key once it exists. Until then they start from the legacy list, which held every
- * place visited at any time, so earlier players keep every page they could already read.
- */
 export function parseDayPages(dayRaw: string | null, legacyRaw: string | null): string[] {
   return parseDiscoveries(dayRaw ?? legacyRaw);
 }

@@ -2,11 +2,9 @@ import { SURFACE, type Surface } from '@views/walk/model/world/surfaces';
 
 const STEP_VOLUME = 0.4;
 
-/** Recorded footsteps (Kenney Impact Sounds, CC0), a few takes per ground so steps never repeat exactly. */
 const STEP_TAKES = 5;
 const STEP_SURFACES = Object.values(SURFACE);
 const stepUrl = (surface: Surface, take: number) => `/sounds/steps/${surface}-${take}.m4a`;
-/** Evens out the recordings: the soft dirt takes are about 8 dB quieter than the rest. */
 const STEP_GAIN = { [SURFACE.dirt]: 2, [SURFACE.stone]: 1, [SURFACE.wood]: 1, [SURFACE.sand]: 1 } satisfies Record<
   Surface,
   number
@@ -29,7 +27,8 @@ export function createFootsteps(context: AudioContext, master: AudioNode) {
 
   const step = (surface: Surface, loudness: number) => {
     const takes = steps.get(surface);
-    if (context.state !== 'running' || !takes) return;
+    if (context.state !== 'running') return;
+    if (!takes) return;
     const take = (lastTake + 1 + Math.floor(Math.random() * (takes.length - 1))) % takes.length;
     lastTake = take;
     const source = context.createBufferSource();

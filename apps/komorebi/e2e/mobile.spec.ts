@@ -59,7 +59,6 @@ test.describe('phone', () => {
     await touch('touchStart', [{ ...centre, id: 1 }]);
     await touch('touchMove', [{ x: centre.x, y: centre.y - pad.height / 2, id: 1 }]);
     await expect(landscape(page)).toHaveAttribute('data-motion', 'running');
-    // A second finger's tap is not turned into a click by the browser, so open the map with its shortcut.
     await page.keyboard.press('KeyM');
     await expect(page.getByRole('dialog', { name: '여름을 걷는 지도' })).toBeVisible();
     await expect(landscape(page)).toHaveAttribute('data-motion', 'idle');

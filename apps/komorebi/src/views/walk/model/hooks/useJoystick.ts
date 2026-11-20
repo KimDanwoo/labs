@@ -12,14 +12,15 @@ export function useJoystick({ onInput, disabled }: JoystickInput) {
   const pointer = useRef<number | null>(null);
   const padRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLSpanElement>(null);
-  // The thumb follows the finger every pointermove; styling it directly avoids a React render per event.
   function placeThumb(x: number, y: number) {
     if (thumbRef.current) thumbRef.current.style.transform = `translate(${x}px, ${y}px)`;
   }
   function stop() {
     const id = pointer.current;
     pointer.current = null;
-    if (id !== null && padRef.current?.hasPointerCapture(id)) padRef.current.releasePointerCapture(id);
+    const pad = padRef.current;
+    const isCapturing = id !== null && pad?.hasPointerCapture(id) === true;
+    if (isCapturing) pad?.releasePointerCapture(id);
     placeThumb(0, 0);
     JOYSTICK_DIRECTIONS.forEach((key) => onInput(key, false));
   }
@@ -58,7 +59,8 @@ export function useJoystick({ onInput, disabled }: JoystickInput) {
 
   const padHandlers = {
     onPointerDown: (event: PointerEvent<HTMLDivElement>) => {
-      if (disabled || pointer.current !== null) return;
+      if (disabled) return;
+      if (pointer.current !== null) return;
       pointer.current = event.pointerId;
       event.currentTarget.setPointerCapture(event.pointerId);
       move(event);

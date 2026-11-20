@@ -2,7 +2,8 @@ export const CATCH_CELEBRATION_SECONDS = 2.4;
 
 function hop(age: number, start: number, duration: number, height: number) {
   const t = (age - start) / duration;
-  if (t <= 0 || t >= 1) return 0;
+  const isOutsideRange = t <= 0 || t >= 1;
+  if (isOutsideRange) return 0;
   return Math.sin(t * Math.PI) * height;
 }
 

@@ -46,7 +46,8 @@ function stepGround(bird: Sparrow, isClose: boolean) {
 }
 
 function stepFlight(bird: Sparrow, isHomeClear: boolean) {
-  if (bird.state === BIRD_STATE.returning && !isHomeClear) launch(bird, BIRD_STATE.flying);
+  const shouldFlyAway = bird.state === BIRD_STATE.returning && !isHomeClear;
+  if (shouldFlyAway) launch(bird, BIRD_STATE.flying);
   const target = bird.state === BIRD_STATE.flying ? bird.perch : bird.home;
   const progress = Math.min(1, bird.clock / 1.65);
   const ease = progress * progress * (3 - 2 * progress);
@@ -69,7 +70,8 @@ export function stepSparrow(bird: Sparrow, player: Point, dt: number) {
     return;
   }
   if (bird.state === BIRD_STATE.perched) {
-    if (isHomeClear && bird.clock > 8 + bird.seed) launch(bird, BIRD_STATE.returning);
+    const shouldReturnHome = isHomeClear && bird.clock > 8 + bird.seed;
+    if (shouldReturnHome) launch(bird, BIRD_STATE.returning);
     return;
   }
   stepFlight(bird, isHomeClear);

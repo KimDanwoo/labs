@@ -6,7 +6,10 @@ type Shortcuts = { isEnabled: boolean; onDiscover: () => void; onOpenMap: () => 
 export function useShortcuts({ isEnabled, onDiscover, onOpenMap }: Shortcuts) {
   const handleKey = useEffectEvent((event: KeyboardEvent) => {
     const isOnControl = event.target instanceof HTMLElement && isControlTarget(event.target);
-    if (!isEnabled || event.repeat || isOnControl || hasShortcutModifier(event)) return;
+    if (!isEnabled) return;
+    if (event.repeat) return;
+    if (isOnControl) return;
+    if (hasShortcutModifier(event)) return;
     const key = gameKey(event);
     if (key === 'e') onDiscover();
     if (key === 'm') onOpenMap();

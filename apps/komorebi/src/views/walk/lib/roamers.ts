@@ -21,7 +21,6 @@ const PAUSE_SECONDS = 1.6;
 const FADE_IN = 3;
 const FADE_OUT = 4;
 const LEAVE_SECONDS = 0.8;
-/** Render order around the child's sprites (4): drawn over them when nearer the viewer, under them otherwise. */
 const ORDER = { front: 4.2, behind: 3.8 } as const;
 
 type Scene = {
@@ -123,7 +122,8 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     const animal: Animal = Math.random() < share ? 'cat' : 'dog';
     const path = passingRoute(region, Math.random);
     const texture = textures[animal];
-    if (!path || !texture) return;
+    if (!path) return;
+    if (!texture) return;
     material.map = texture;
     material.needsUpdate = true;
     visitor = {
@@ -153,7 +153,6 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
   }
 
   function draw(gait: Gait, frame: number, spec: (typeof ANIMAL)[Animal], { childZ, darkness, region }: Scene) {
-    // Sprites drop a negative scale's sign, so a left-facing walk mirrors the atlas instead.
     material.map!.repeat.set((gait.isFacingLeft ? -1 : 1) / FRAMES, 1);
     material.map!.offset.set((frame + (gait.isFacingLeft ? 1 : 0)) / FRAMES, 0);
     const height = spec.height * characterScale(gait.at.z) * CHILD_SIZE;
@@ -172,7 +171,9 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     if (visitor?.region !== region) hide();
     if (visitor) return visitor;
     wait -= dt;
-    if (wait > 0 || isStill || isRaining) return null;
+    if (wait > 0) return null;
+    if (isStill) return null;
+    if (isRaining) return null;
     wait = between(NEXT_VISIT);
     arrive(region, darkness);
     return visitor as Visitor | null;
@@ -184,8 +185,10 @@ export function createRoamers(scene: THREE.Scene, loader: THREE.TextureLoader) {
     const spec = ANIMAL[active.animal];
     const isPausing = isPausingNow(active, isStill);
     if (isPausing) active.pause += dt;
-    const strolled = isPausing || isStill ? active.gait : walkOn(active.gait, spec, dt);
-    if (!strolled || hasLeft(active, strolled)) {
+    const shouldHoldGait = isPausing || isStill;
+    const strolled = shouldHoldGait ? active.gait : walkOn(active.gait, spec, dt);
+    const hasFinishedStroll = !strolled || hasLeft(active, strolled);
+    if (hasFinishedStroll) {
       hide();
       return;
     }

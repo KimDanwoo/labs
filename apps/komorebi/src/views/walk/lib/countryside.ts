@@ -130,9 +130,9 @@ function birdTargetOpacity(isRaining: boolean, darkness: number) {
 }
 
 function birdPose(bird: Bird['bird'], facingLeft: boolean) {
-  const flying = bird.state === BIRD_STATE.flying || bird.state === BIRD_STATE.returning;
-  const peck = !flying && (bird.age + bird.seed) % 3.7 > 3.3;
-  const frame = flying ? 1 + (Math.floor(bird.age * 12) % 2) : 0;
+  const isFlying = bird.state === BIRD_STATE.flying || bird.state === BIRD_STATE.returning;
+  const peck = !isFlying && (bird.age + bird.seed) % 3.7 > 3.3;
+  const frame = isFlying ? 1 + (Math.floor(bird.age * 12) % 2) : 0;
   return { frame, rotation: Number(peck) * (facingLeft ? 0.22 : -0.22) };
 }
 
@@ -152,7 +152,8 @@ function updateBird(
   sprite.visible = entry.opacity > 0.005;
   if (!sprite.visible) return;
   const previousX = bird.at.x;
-  if (!isStill && dt > 0) stepSparrow(bird, player, dt);
+  const shouldStepSparrow = !isStill && dt > 0;
+  if (shouldStepSparrow) stepSparrow(bird, player, dt);
   if (Math.abs(bird.at.x - previousX) > 0.0005) entry.facingLeft = bird.at.x < previousX;
   const pose = birdPose(bird, entry.facingLeft);
   material.map = (entry.facingLeft ? maps.leftBirdMaps : maps.birdMaps)[pose.frame]!;
@@ -175,7 +176,8 @@ export function createCountryside(scene: THREE.Scene) {
     update(frame: CountrysideFrame) {
       const { region, dt, darkness, isStill } = frame;
       const visible = region === REGION.village;
-      if (visible && !isStill) time.value += dt;
+      const shouldAdvanceTime = visible && !isStill;
+      if (shouldAdvanceTime) time.value += dt;
       rope.visible = visible;
       lightSprite(ropeMaterial.color, darkness, 0);
       for (const { mesh, material } of cloths) {

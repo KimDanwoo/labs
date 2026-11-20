@@ -11,6 +11,7 @@ interface MessageInput {
 }
 
 export function fishingMessage({ phase, failure, fishName, caught, isNew }: MessageInput) {
+  const hasCaughtFish = fishName && caught;
   const messages = {
     [FISHING_PHASE.casting]: '낚싯대를 휘둘러 바다로 던져요…',
     [FISHING_PHASE.idle]: '바람을 느끼며 낚싯줄을 던져 보세요.',
@@ -18,8 +19,7 @@ export function fishingMessage({ phase, failure, fishName, caught, isNew }: Mess
     [FISHING_PHASE.bite]: '지금! 낚싯대를 올려요!',
     [FISHING_PHASE.missed]: failure,
     [FISHING_PHASE.fighting]: '쭉 당겨요! 물고기가 힘을 쓰면 잠깐 놓아 주세요.',
-    [FISHING_PHASE.caught]:
-      fishName && caught ? `${isNew ? '처음 만난 물고기! ' : ''}${fishName} · ${caught.size} cm` : '',
+    [FISHING_PHASE.caught]: hasCaughtFish ? `${isNew ? '처음 만난 물고기! ' : ''}${fishName} · ${caught.size} cm` : '',
   };
   return messages[phase];
 }
