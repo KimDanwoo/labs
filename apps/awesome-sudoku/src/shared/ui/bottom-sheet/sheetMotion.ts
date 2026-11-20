@@ -7,6 +7,8 @@ export const PHASE = {
 } as const;
 export type Phase = keyof typeof PHASE;
 
+export const isClosedOrClosing = (phase: Phase): boolean => phase === PHASE.idle || phase === PHASE.closing;
+
 export const ANIMATION_MS = 500;
 const SPRING = 'cubic-bezier(0.32, 0.72, 0, 1)';
 

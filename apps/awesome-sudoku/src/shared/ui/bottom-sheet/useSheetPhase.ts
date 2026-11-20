@@ -1,6 +1,12 @@
 'use client';
 
-import { ANIMATION_MS, overwriteDraggedStyleWithHidden, PHASE, type Phase } from '@shared/ui/bottom-sheet/sheetMotion';
+import {
+  ANIMATION_MS,
+  isClosedOrClosing,
+  overwriteDraggedStyleWithHidden,
+  PHASE,
+  type Phase,
+} from '@shared/ui/bottom-sheet/sheetMotion';
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 
 type UseSheetPhaseOptions = {
@@ -18,15 +24,17 @@ export function useSheetPhase({ isOpen, onClose, sheetRef, isDesktop }: UseSheet
   const [prevOpen, setPrevOpen] = useState(false);
   if (prevOpen !== isOpen) {
     setPrevOpen(isOpen);
-    if (isOpen && phase === PHASE.idle) setPhase(PHASE.mounted);
-    if (!isOpen && phase !== PHASE.idle && phase !== PHASE.closing) setPhase(PHASE.closing);
+    const shouldMount = isOpen && phase === PHASE.idle;
+    const shouldStartClosing = !isOpen && !isClosedOrClosing(phase);
+    if (shouldMount) setPhase(PHASE.mounted);
+    if (shouldStartClosing) setPhase(PHASE.closing);
   }
 
   const isClosedByUserRef = useRef(false);
 
   const close = useCallback(() => {
     isClosedByUserRef.current = true;
-    setPhase((current) => (current === PHASE.idle || current === PHASE.closing ? current : PHASE.closing));
+    setPhase((current) => (isClosedOrClosing(current) ? current : PHASE.closing));
   }, []);
 
   useLayoutEffect(() => {
