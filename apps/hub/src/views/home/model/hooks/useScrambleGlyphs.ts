@@ -8,7 +8,8 @@ export function useScrambleGlyphs(keywords: readonly string[]) {
 
   useEffect(() => {
     const isReducedMotion = matchMedia(REDUCED_MOTION_QUERY).matches;
-    if (isReducedMotion || keywords.length < MIN_SCRAMBLE_KEYWORDS) return undefined;
+    const shouldStayStill = isReducedMotion || keywords.length < MIN_SCRAMBLE_KEYWORDS;
+    if (shouldStayStill) return undefined;
 
     let keywordIndex = 0;
     let frameId = 0;
@@ -25,7 +26,8 @@ export function useScrambleGlyphs(keywords: readonly string[]) {
       function frame(now: number) {
         const elapsed = now - startedAt;
         const isDone = elapsed >= duration;
-        if (isDone || now - lastPaintAt >= SCRAMBLE_TIMING.glyphFrameMs) {
+        const shouldPaint = isDone || now - lastPaintAt >= SCRAMBLE_TIMING.glyphFrameMs;
+        if (shouldPaint) {
           setGlyphs(glyphsAt(plan, elapsed));
           lastPaintAt = now;
         }
