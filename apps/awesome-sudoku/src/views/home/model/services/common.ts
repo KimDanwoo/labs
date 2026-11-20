@@ -1,4 +1,3 @@
-import { MINUTE } from '@shared/config/time';
 import { BOARD_SIZE } from '@views/home/config/board';
 import { atIndex } from '@views/home/lib/gridAccess';
 import type { CellHighlight, Grid, SudokuBoard } from '@views/home/model/types/board';
@@ -14,12 +13,6 @@ export function shuffleArray<T>(array: T[]): void {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [atIndex(array, j), atIndex(array, i)];
   }
-}
-
-export function formatTime(seconds: number): string {
-  const mins = Math.floor(seconds / MINUTE);
-  const secs = seconds % MINUTE;
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
 export function createEmptyBoard(): SudokuBoard {
