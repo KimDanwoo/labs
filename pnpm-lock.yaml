@@ -97,8 +97,8 @@ catalogs:
       specifier: ^1.73.0
       version: 1.76.0
     my-fe-harness:
-      specifier: github:KimDanwoo/my-fe-harness#v0.5.1
-      version: 0.5.1
+      specifier: github:KimDanwoo/my-fe-harness#v0.6.0
+      version: 0.6.0
     next-themes:
       specifier: ^0.4.6
       version: 0.4.6
@@ -750,7 +750,7 @@ importers:
         version: 5.5.7(eslint-config-prettier@10.1.8(eslint@10.15.0(jiti@2.7.0)))(eslint@10.15.0(jiti@2.7.0))(prettier@3.8.5)
       my-fe-harness:
         specifier: 'catalog:'
-        version: https://codeload.github.com/KimDanwoo/my-fe-harness/tar.gz/8b9d10fb833f16f0a14ada0973c3c409a72bff7e
+        version: https://codeload.github.com/KimDanwoo/my-fe-harness/tar.gz/7e3df905abd546482403b42c91665d78672b7e5d
       prettier:
         specifier: 'catalog:'
         version: 3.8.5
@@ -4258,9 +4258,9 @@ packages:
     resolution: {integrity: sha512-dkEJPVvun4FryqBmZ5KhDo0K9iDXAwn08tMLDinNdRBNPcYEDiWYysLcc6k3mjTMlbP9KyylvRpd4wFtwrT9rw==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
-  my-fe-harness@https://codeload.github.com/KimDanwoo/my-fe-harness/tar.gz/8b9d10fb833f16f0a14ada0973c3c409a72bff7e:
-    resolution: {tarball: https://codeload.github.com/KimDanwoo/my-fe-harness/tar.gz/8b9d10fb833f16f0a14ada0973c3c409a72bff7e}
-    version: 0.5.1
+  my-fe-harness@https://codeload.github.com/KimDanwoo/my-fe-harness/tar.gz/7e3df905abd546482403b42c91665d78672b7e5d:
+    resolution: {tarball: https://codeload.github.com/KimDanwoo/my-fe-harness/tar.gz/7e3df905abd546482403b42c91665d78672b7e5d}
+    version: 0.6.0
     engines: {node: '>=18'}
     hasBin: true
 
@@ -9034,7 +9034,7 @@ snapshots:
   mute-stream@3.0.0:
     optional: true
 
-  my-fe-harness@https://codeload.github.com/KimDanwoo/my-fe-harness/tar.gz/8b9d10fb833f16f0a14ada0973c3c409a72bff7e: {}
+  my-fe-harness@https://codeload.github.com/KimDanwoo/my-fe-harness/tar.gz/7e3df905abd546482403b42c91665d78672b7e5d: {}
 
   nanoid@3.3.18: {}
 
