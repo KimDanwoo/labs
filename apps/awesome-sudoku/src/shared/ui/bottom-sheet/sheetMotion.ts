@@ -37,3 +37,9 @@ export const MOBILE_MOTION: SheetMotion = {
 };
 
 export const sheetMotion = (isDesktop: boolean): SheetMotion => (isDesktop ? DESKTOP_MOTION : MOBILE_MOTION);
+
+export const overwriteDraggedStyleWithHidden = (sheet: HTMLElement | null, isDesktop: boolean): void => {
+  if (!sheet) return;
+  const motion = sheetMotion(isDesktop);
+  Object.assign(sheet.style, { transition: motion.transition, ...motion.hidden });
+};

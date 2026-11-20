@@ -1,6 +1,6 @@
 'use client';
 
-import { ANIMATION_MS, PHASE, sheetMotion, type Phase } from '@shared/ui/bottom-sheet/sheetMotion';
+import { ANIMATION_MS, overwriteDraggedStyleWithHidden, PHASE, type Phase } from '@shared/ui/bottom-sheet/sheetMotion';
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 
 type UseSheetPhaseOptions = {
@@ -22,11 +22,10 @@ export function useSheetPhase({ isOpen, onClose, sheetRef, isDesktop }: UseSheet
     if (!isOpen && phase !== PHASE.idle && phase !== PHASE.closing) setPhase(PHASE.closing);
   }
 
-  /** 사용자가 닫은 경우에만 onClose를 통지 — 부모가 isOpen=false로 내려 닫힌 경우 통지하면 무한 루프/상태 오염 */
-  const closedByUserRef = useRef(false);
+  const isClosedByUserRef = useRef(false);
 
   const close = useCallback(() => {
-    closedByUserRef.current = true;
+    isClosedByUserRef.current = true;
     setPhase((current) => (current === PHASE.idle || current === PHASE.closing ? current : PHASE.closing));
   }, []);
 
@@ -45,16 +44,14 @@ export function useSheetPhase({ isOpen, onClose, sheetRef, isDesktop }: UseSheet
     return () => clearTimeout(id);
   }, [phase]);
 
-  // closing: 드래그가 DOM에 직접 써 둔 스타일은 React가 모르므로, 닫힘 스타일을 직접 다시 쓴 뒤 애니메이션 후 unmount
   useEffect(() => {
     if (phase !== PHASE.closing) return undefined;
-    const motion = sheetMotion(isDesktop);
-    if (sheetRef.current) Object.assign(sheetRef.current.style, { transition: motion.transition, ...motion.hidden });
+    overwriteDraggedStyleWithHidden(sheetRef.current, isDesktop);
 
     const id = setTimeout(() => {
       setPhase(PHASE.idle);
-      if (!closedByUserRef.current) return;
-      closedByUserRef.current = false;
+      if (!isClosedByUserRef.current) return;
+      isClosedByUserRef.current = false;
       notifyClose();
       previousFocusRef.current?.focus();
     }, ANIMATION_MS);
