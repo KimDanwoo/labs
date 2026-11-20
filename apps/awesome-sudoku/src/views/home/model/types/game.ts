@@ -10,6 +10,8 @@ export interface NewGameRequest {
   difficulty: Difficulty;
 }
 
+export type DiscardAction = { kind: 'newGame'; request: NewGameRequest } | { kind: 'restart' };
+
 export interface KillerPuzzle {
   solution: Grid;
   puzzle: Grid;
