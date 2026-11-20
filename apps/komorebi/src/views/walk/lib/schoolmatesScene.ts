@@ -1,21 +1,21 @@
-import * as THREE from 'three';
-import { BALL_ROLE, type BallGame } from '../model/ballGame';
-import { SCHOOL_REGION, SCHOOLMATES, type SchoolmateId, type SchoolRegion } from '../model/schoolmateRoster';
+import { canvasTexture } from '@views/walk/lib/art';
+import { createChild, type ChildLayers } from '@views/walk/lib/child';
+import { WALK_CYCLE_DISTANCE } from '@views/walk/lib/motion';
+import { lampGlowAt } from '@views/walk/lib/nightLights';
+import { characterScale, CHILD_SIZE, sceneX, sceneY } from '@views/walk/lib/perspective';
+import { preparePaintingTexture } from '@views/walk/lib/regionPlates';
+import { BALL_ROLE, type BallGame } from '@views/walk/model/ballGame';
+import { SCHOOL_REGION, SCHOOLMATES, type SchoolmateId, type SchoolRegion } from '@views/walk/model/schoolmateRoster';
 import {
   advanceSchoolmate,
   createSchoolmate,
   nearestSchoolmate,
   schoolRegion,
   type Schoolmate,
-} from '../model/schoolmates';
-import { characterLayers } from '../model/world/appearance';
-import type { Point, Region } from '../model/world/world';
-import { canvasTexture } from './art';
-import { createChild, type ChildLayers } from './child';
-import { WALK_CYCLE_DISTANCE } from './motion';
-import { lampGlowAt } from './nightLights';
-import { characterScale, CHILD_SIZE, sceneX, sceneY } from './perspective';
-import { preparePaintingTexture } from './regionPlates';
+} from '@views/walk/model/schoolmates';
+import { characterLayers } from '@views/walk/model/world/appearance';
+import type { Point, Region } from '@views/walk/model/world/world';
+import * as THREE from 'three';
 
 type Standing = Point & { order: number; id: SchoolmateId };
 type SchoolmateActor = {

@@ -1,6 +1,6 @@
-import { FRIEND_ACTIVITY } from '../config/walk';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { BallGameHud } from './BallGameHud';
+import { FRIEND_ACTIVITY } from '@views/walk/config/walk';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { BallGameHud } from '@views/walk/ui/BallGameHud';
 
 export function WalkBallGame() {
   const { engine, activities } = useWalkContext();

@@ -1,6 +1,6 @@
+import { MUSIC_STATUS } from '@views/walk/lib/music/musicSettings';
+import { useMusicPlayer } from '@views/walk/model/hooks/music/useMusicPlayer';
 import { useRef, useState } from 'react';
-import { MUSIC_STATUS } from '../../../lib/music/musicSettings';
-import { useMusicPlayer } from './useMusicPlayer';
 
 export function useMusicPanel(source: string, initialVolume: number, profile: string) {
   const { iframe, ...player } = useMusicPlayer(source, initialVolume);

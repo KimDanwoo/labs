@@ -1,7 +1,7 @@
+import { WEATHER, type Weather } from '@views/walk/config/walk';
+import { wakeFromSleep, weatherAfterRest, weatherDelay } from '@views/walk/lib/dayCycle';
+import { villageDayStore } from '@views/walk/model/store/villageDay';
 import { useEffect, useRef, useSyncExternalStore } from 'react';
-import { WEATHER, type Weather } from '../../config/walk';
-import { wakeFromSleep, weatherAfterRest, weatherDelay } from '../../lib/dayCycle';
-import { villageDayStore } from '../store/villageDay';
 
 export function useVillageDay(isPaused: boolean) {
   const today = useSyncExternalStore(villageDayStore.subscribe, villageDayStore.get, villageDayStore.getServer);

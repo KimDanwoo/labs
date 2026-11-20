@@ -1,6 +1,6 @@
-import { COMPANION_ACTION } from '../../lib/companions';
-import type { CompanionFish, CompanionPanelModel } from '../../model/hooks/useCompanionPanel';
-import { FishEntry } from './FishEntry';
+import { COMPANION_ACTION } from '@views/walk/lib/companions';
+import type { CompanionFish, CompanionPanelModel } from '@views/walk/model/hooks/useCompanionPanel';
+import { FishEntry } from '@views/walk/ui/companion/FishEntry';
 
 interface TankFishListProps {
   tank: readonly CompanionFish[];

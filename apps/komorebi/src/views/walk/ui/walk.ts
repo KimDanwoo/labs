@@ -1,22 +1,22 @@
-import { WalkAtlas } from './WalkAtlas';
-import { WalkBallGame } from './WalkBallGame';
-import { WalkBottomBar } from './WalkBottomBar';
-import { WalkCaption } from './WalkCaption';
-import { WalkChalkboard } from './WalkChalkboard';
-import { WalkCompanion } from './WalkCompanion';
-import { WalkControls } from './WalkControls';
-import { WalkFishing } from './WalkFishing';
-import { WalkHeader } from './WalkHeader';
-import { WalkLandscape } from './WalkLandscape';
-import { WalkLoading } from './WalkLoading';
-import { WalkMemory } from './WalkMemory';
-import { WalkPrompts } from './WalkPrompts';
-import { WalkRoot } from './WalkRoot';
-import { WalkSchoolmate } from './WalkSchoolmate';
-import { WalkSleep } from './WalkSleep';
-import { WalkToast } from './WalkToast';
-import { WalkToolBar } from './WalkToolBar';
-import { WalkWardrobe } from './WalkWardrobe';
+import { WalkAtlas } from '@views/walk/ui/WalkAtlas';
+import { WalkBallGame } from '@views/walk/ui/WalkBallGame';
+import { WalkBottomBar } from '@views/walk/ui/WalkBottomBar';
+import { WalkCaption } from '@views/walk/ui/WalkCaption';
+import { WalkChalkboard } from '@views/walk/ui/WalkChalkboard';
+import { WalkCompanion } from '@views/walk/ui/WalkCompanion';
+import { WalkControls } from '@views/walk/ui/WalkControls';
+import { WalkFishing } from '@views/walk/ui/WalkFishing';
+import { WalkHeader } from '@views/walk/ui/WalkHeader';
+import { WalkLandscape } from '@views/walk/ui/WalkLandscape';
+import { WalkLoading } from '@views/walk/ui/WalkLoading';
+import { WalkMemory } from '@views/walk/ui/WalkMemory';
+import { WalkPrompts } from '@views/walk/ui/WalkPrompts';
+import { WalkRoot } from '@views/walk/ui/WalkRoot';
+import { WalkSchoolmate } from '@views/walk/ui/WalkSchoolmate';
+import { WalkSleep } from '@views/walk/ui/WalkSleep';
+import { WalkToast } from '@views/walk/ui/WalkToast';
+import { WalkToolBar } from '@views/walk/ui/WalkToolBar';
+import { WalkWardrobe } from '@views/walk/ui/WalkWardrobe';
 
 export const Walk = {
   Root: WalkRoot,

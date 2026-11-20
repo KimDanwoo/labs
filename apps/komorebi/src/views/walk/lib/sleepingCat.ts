@@ -1,7 +1,7 @@
+import { lampGlowAt, lightSprite } from '@views/walk/lib/nightLights';
+import { characterScale, sceneX, sceneY } from '@views/walk/lib/perspective';
+import { REGION, type Region } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { REGION, type Region } from '../model/world/world';
-import { lampGlowAt, lightSprite } from './nightLights';
-import { characterScale, sceneX, sceneY } from './perspective';
 
 const CAT_URL = '/art/cat-sleeping.webp';
 const CAT_ORDER = 2.5;

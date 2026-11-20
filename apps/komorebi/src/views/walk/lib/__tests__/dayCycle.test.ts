@@ -1,7 +1,7 @@
+import { TIME, WEATHER } from '@views/walk/config/walk';
+import { FIRST_DAY, wakeFromSleep, weatherAfterRest, weatherDelay } from '@views/walk/lib/dayCycle';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { TIME, WEATHER } from '../../config/walk';
-import { FIRST_DAY, wakeFromSleep, weatherAfterRest, weatherDelay } from '../dayCycle';
 
 test('sleep advances the light, and only sleeping through the night starts a new day', () => {
   const dusk = wakeFromSleep(FIRST_DAY, 0.8);

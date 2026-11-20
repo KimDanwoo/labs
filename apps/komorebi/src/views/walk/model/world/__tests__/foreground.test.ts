@@ -1,10 +1,10 @@
+import { FOREGROUNDS } from '@views/walk/model/world/foreground';
+import { foregroundOrder, isForegroundInFront } from '@views/walk/model/world/foregroundOrder';
+import { canWalk } from '@views/walk/model/world/movement';
+import type { Region } from '@views/walk/model/world/world';
+import { WORLDS } from '@views/walk/model/world/worlds';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { FOREGROUNDS } from '../foreground';
-import { foregroundOrder, isForegroundInFront } from '../foregroundOrder';
-import { canWalk } from '../movement';
-import type { Region } from '../world';
-import { WORLDS } from '../worlds';
 
 function covered(region: Region, x: number, y: number, feetDepth: number) {
   return FOREGROUNDS.some((layer) => {

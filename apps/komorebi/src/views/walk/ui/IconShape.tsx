@@ -1,4 +1,4 @@
-import type { IconShape as Shape } from '../config/icons';
+import type { IconShape as Shape } from '@views/walk/config/icons';
 
 interface IconShapeProps {
   shape: Shape;

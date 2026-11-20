@@ -1,11 +1,11 @@
+import { catchCelebration } from '@views/walk/lib/catchCelebration';
+import type { PartKit } from '@views/walk/lib/companionParts';
+import { COMPANION_REACTION, catBond, type CompanionReaction, type Companions } from '@views/walk/lib/companions';
+import { FISHING_PHASE, type FishingFrame } from '@views/walk/lib/fishing';
+import { CHILD_SIZE, characterScale, sceneX, sceneY } from '@views/walk/lib/perspective';
+import { FISHING_PIER, PIER_CAT } from '@views/walk/model/world/landmarks';
+import type { Point } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { FISHING_PIER, PIER_CAT } from '../model/world/landmarks';
-import type { Point } from '../model/world/world';
-import { catchCelebration } from './catchCelebration';
-import type { PartKit } from './companionParts';
-import { COMPANION_REACTION, catBond, type CompanionReaction, type Companions } from './companions';
-import { FISHING_PHASE, type FishingFrame } from './fishing';
-import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
 
 export function catPosition(friendship: number, isFishing: boolean): Point {
   if (!isFishing) return { x: PIER_CAT.x - 2, z: PIER_CAT.z };

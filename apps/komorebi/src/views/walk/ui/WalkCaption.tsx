@@ -1,5 +1,5 @@
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { WORLDS } from '../model/world/worlds';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { WORLDS } from '@views/walk/model/world/worlds';
 
 export function WalkCaption() {
   const { status } = useWalkContext();

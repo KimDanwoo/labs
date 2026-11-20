@@ -1,5 +1,5 @@
-import type { Region } from '../model/world/world';
-import { SCENERY_STYLE } from './breeze';
+import { SCENERY_STYLE } from '@views/walk/lib/breeze';
+import type { Region } from '@views/walk/model/world/world';
 
 type Pixel = readonly [number, number];
 type Pane = readonly [Pixel, Pixel, Pixel, Pixel];

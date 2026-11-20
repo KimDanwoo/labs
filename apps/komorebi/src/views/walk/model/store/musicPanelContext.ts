@@ -1,6 +1,6 @@
 'use client';
 
+import type { MusicPanel } from '@views/walk/model/hooks/music/useMusicPanel';
 import { createContext } from 'react';
-import type { MusicPanel } from '../hooks/music/useMusicPanel';
 
 export const MusicPanelContext = createContext<MusicPanel | null>(null);

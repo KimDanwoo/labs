@@ -1,6 +1,6 @@
-import { TIME_ORDER, WEATHER } from '../../config/walk';
-import { FIRST_DAY, type VillageDay } from '../../lib/dayCycle';
-import { createPersistentStore } from './persistentStore';
+import { TIME_ORDER, WEATHER } from '@views/walk/config/walk';
+import { FIRST_DAY, type VillageDay } from '@views/walk/lib/dayCycle';
+import { createPersistentStore } from '@views/walk/model/store/persistentStore';
 
 export const VILLAGE_DAY_KEY = 'komorebi-village-day-v1';
 

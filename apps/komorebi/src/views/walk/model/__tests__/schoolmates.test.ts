@@ -1,6 +1,4 @@
-import assert from 'node:assert/strict';
-import test from 'node:test';
-import { SCHOOL_REGION, SCHOOLMATE_ID, SCHOOLMATES } from '../schoolmateRoster';
+import { SCHOOL_REGION, SCHOOLMATE_ID, SCHOOLMATES } from '@views/walk/model/schoolmateRoster';
 import {
   advanceSchoolmate,
   createSchoolmate,
@@ -9,9 +7,11 @@ import {
   schoolmateGreetingPosition,
   schoolmatePlayPosition,
   schoolRegion,
-} from '../schoolmates';
-import { canWalk } from '../world/movement';
-import { portalAt } from '../world/portals';
+} from '@views/walk/model/schoolmates';
+import { canWalk } from '@views/walk/model/world/movement';
+import { portalAt } from '@views/walk/model/world/portals';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 
 const DT = 1 / 30;
 const AWAY = { x: 0, z: 0 };

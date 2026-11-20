@@ -1,5 +1,5 @@
-import { CHARACTER, OUTFIT, type CharacterTemplate, type Outfit } from './world/appearance';
-import { REGION, type Point } from './world/world';
+import { CHARACTER, OUTFIT, type CharacterTemplate, type Outfit } from '@views/walk/model/world/appearance';
+import { REGION, type Point } from '@views/walk/model/world/world';
 
 export const SCHOOL_REGION = { yard: REGION.school, hallway: REGION.hallway, classroom: REGION.classroom } as const;
 export type SchoolRegion = (typeof SCHOOL_REGION)[keyof typeof SCHOOL_REGION];

@@ -1,5 +1,3 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
 import {
   DANWOO_PROFILE,
   DEFAULT_MUSIC,
@@ -8,8 +6,10 @@ import {
   musicWidgetSrc,
   parseMusicPreferences,
   parseMusicTracks,
-} from '../musicSettings';
-import { bindMusicWidget, type MusicWidget, type WidgetPayload } from '../soundcloud';
+} from '@views/walk/lib/music/musicSettings';
+import { bindMusicWidget, type MusicWidget, type WidgetPayload } from '@views/walk/lib/music/soundcloud';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 test('only DANWOO public profile and playlist links become embed sources', () => {
   assert.equal(musicSource(`${DANWOO_PROFILE}/`), DANWOO_PROFILE);

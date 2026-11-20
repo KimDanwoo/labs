@@ -1,5 +1,5 @@
-import { DEFAULT_APPEARANCE, parseAppearance } from '../world/appearance';
-import { createPersistentStore } from './persistentStore';
+import { createPersistentStore } from '@views/walk/model/store/persistentStore';
+import { DEFAULT_APPEARANCE, parseAppearance } from '@views/walk/model/world/appearance';
 
 export const APPEARANCE_KEY = 'komorebi-appearance-v1';
 

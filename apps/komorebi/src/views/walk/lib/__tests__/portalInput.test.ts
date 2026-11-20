@@ -1,6 +1,6 @@
+import { createPortalInput } from '@views/walk/lib/portalInput';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createPortalInput } from '../portalInput';
 
 test('a held direction cannot immediately walk back through the next doorway, including repeated keyboard and pad input', () => {
   const input = createPortalInput();

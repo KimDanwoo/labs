@@ -1,7 +1,7 @@
+import { TIME, WEATHER, type TimeOfDay, type Weather } from '@views/walk/config/walk';
+import { createAmbience } from '@views/walk/lib/audio';
+import { REGION, type Region } from '@views/walk/model/world/world';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { TIME, WEATHER, type TimeOfDay, type Weather } from '../../config/walk';
-import { createAmbience } from '../../lib/audio';
-import { REGION, type Region } from '../world/world';
 
 type Ambience = ReturnType<typeof createAmbience>;
 type Scene = { region: Region; time: TimeOfDay; weather: Weather };

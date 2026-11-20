@@ -1,5 +1,3 @@
-import assert from 'node:assert/strict';
-import test from 'node:test';
 import {
   CHALKBOARD_LIMIT,
   canAddPoint,
@@ -9,7 +7,9 @@ import {
   roundCoordinate,
   serializeChalkboard,
   type ChalkStroke,
-} from '../chalkboard';
+} from '@views/walk/lib/chalkboard';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 
 const chalk = (points: number[]): ChalkStroke => ({ tool: 'chalk', color: 'white', points });
 

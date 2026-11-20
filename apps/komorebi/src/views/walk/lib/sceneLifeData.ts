@@ -1,6 +1,6 @@
+import type { Bounds, Flight } from '@views/walk/lib/flight';
+import type { Region } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import type { Region } from '../model/world/world';
-import type { Bounds, Flight } from './flight';
 
 export const INSECT = { butterfly: 'butterfly', dragonfly: 'dragonfly' } as const;
 type Insect = (typeof INSECT)[keyof typeof INSECT];

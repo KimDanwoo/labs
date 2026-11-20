@@ -1,7 +1,7 @@
 'use client';
 
+import { FishingContext, type FishingModel } from '@views/walk/model/store/fishingContext';
 import { useContext } from 'react';
-import { FishingContext, type FishingModel } from '../store/fishingContext';
 
 export function useFishingContext(): FishingModel {
   const fishing = useContext(FishingContext);

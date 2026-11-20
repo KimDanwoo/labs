@@ -1,5 +1,5 @@
-import { ICON_SHAPES, type IconName } from '../config/icons';
-import { IconShape } from './IconShape';
+import { ICON_SHAPES, type IconName } from '@views/walk/config/icons';
+import { IconShape } from '@views/walk/ui/IconShape';
 
 interface IconProps {
   name: IconName;

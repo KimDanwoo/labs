@@ -1,6 +1,6 @@
+import { createPersistentStore } from '@views/walk/model/store/persistentStore';
 import assert from 'node:assert/strict';
 import { afterEach, test } from 'node:test';
-import { createPersistentStore } from '../persistentStore';
 
 const KEY = 'test-key';
 

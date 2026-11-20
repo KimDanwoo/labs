@@ -1,6 +1,6 @@
+import { createDustPositions, driftDustPositions } from '@views/walk/lib/dust';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createDustPositions, driftDustPositions } from '../dust';
 
 const COUNT = 45;
 const xOf = (positions: Float32Array, i: number) => positions[i * 3]!;

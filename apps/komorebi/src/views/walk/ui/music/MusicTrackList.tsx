@@ -1,5 +1,5 @@
-import { musicTime } from '../../lib/music/musicSettings';
-import { useMusicPanelContext } from '../../model/hooks/music/useMusicPanelContext';
+import { musicTime } from '@views/walk/lib/music/musicSettings';
+import { useMusicPanelContext } from '@views/walk/model/hooks/music/useMusicPanelContext';
 
 export function MusicTrackList() {
   const { player } = useMusicPanelContext();

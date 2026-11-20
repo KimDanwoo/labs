@@ -1,8 +1,8 @@
+import { createChild } from '@views/walk/lib/child';
+import { CHARACTER, CHARACTER_RIG, OUTFIT, characterLayers } from '@views/walk/model/world/appearance';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { CHARACTER, CHARACTER_RIG, OUTFIT, characterLayers } from '../../model/world/appearance';
-import { createChild } from '../child';
 
 test('body and clothes keep the same directional pose, transform and lighting', () => {
   const body = new THREE.Texture();

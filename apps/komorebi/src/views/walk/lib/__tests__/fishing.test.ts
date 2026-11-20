@@ -1,8 +1,8 @@
+import { FIGHT_OUTCOME, fishSurge, startFight, stepFight } from '@views/walk/lib/fishFight';
+import { addCatch, isBiteOnTime, parseCollection, rollCatch } from '@views/walk/lib/fishing';
+import { FISH, FISH_TOTAL_WEIGHT } from '@views/walk/lib/fishTable';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { FIGHT_OUTCOME, fishSurge, startFight, stepFight } from '../fishFight';
-import { addCatch, isBiteOnTime, parseCollection, rollCatch } from '../fishing';
-import { FISH, FISH_TOTAL_WEIGHT } from '../fishTable';
 
 test('fishing draws common and rare fish at the pool boundaries', () => {
   assert.deepEqual(

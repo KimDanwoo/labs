@@ -1,13 +1,13 @@
+import { ATLAS_COPY } from '@views/walk/config/map';
+import { DIALOG } from '@views/walk/config/walk';
+import { journeyLine } from '@views/walk/lib/journey';
+import { useModal } from '@views/walk/model/hooks/useModal';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { AtlasGuides } from '@views/walk/ui/AtlasGuides';
+import { DialogHeading } from '@views/walk/ui/DialogHeading';
+import { DiscoveryList } from '@views/walk/ui/DiscoveryList';
+import { Icon } from '@views/walk/ui/Icon';
 import { useId } from 'react';
-import { ATLAS_COPY } from '../config/map';
-import { DIALOG } from '../config/walk';
-import { journeyLine } from '../lib/journey';
-import { useModal } from '../model/hooks/useModal';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { AtlasGuides } from './AtlasGuides';
-import { DialogHeading } from './DialogHeading';
-import { DiscoveryList } from './DiscoveryList';
-import { Icon } from './Icon';
 
 export function WalkAtlas() {
   const { dialog, status, collection, closeAtlas: onClose, returnHome } = useWalkContext();

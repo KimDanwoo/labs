@@ -1,4 +1,4 @@
-import { TIME, TIME_ORDER, WEATHER, type TimeOfDay, type Weather } from '../config/walk';
+import { TIME, TIME_ORDER, WEATHER, type TimeOfDay, type Weather } from '@views/walk/config/walk';
 
 export type VillageDay = { day: number; time: TimeOfDay; weather: Weather };
 export const FIRST_DAY: VillageDay = { day: 1, time: TIME.day, weather: WEATHER.clear };

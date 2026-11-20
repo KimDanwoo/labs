@@ -1,6 +1,6 @@
-import { canWalk } from './movement';
-import { type Point, type Region } from './world';
-import { WORLDS } from './worlds';
+import { canWalk } from '@views/walk/model/world/movement';
+import { type Point, type Region } from '@views/walk/model/world/world';
+import { WORLDS } from '@views/walk/model/world/worlds';
 
 export type WorldPortal = {
   node: string;

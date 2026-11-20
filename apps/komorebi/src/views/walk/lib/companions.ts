@@ -1,5 +1,5 @@
-import { type Catch } from './fishing';
-import { FISH } from './fishTable';
+import { type Catch } from '@views/walk/lib/fishing';
+import { FISH } from '@views/walk/lib/fishTable';
 
 export const COMPANION_KEY = 'komorebi-companions-v1';
 export const TANK_CAPACITY = 8;

@@ -1,5 +1,5 @@
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { Joystick } from './Joystick';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { Joystick } from '@views/walk/ui/Joystick';
 
 export function WalkControls() {
   const { engine, isReady, isPaused, isSprinting, toggleSprint } = useWalkContext();

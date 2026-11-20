@@ -1,6 +1,6 @@
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { CLASSROOM_BOARD, HOME_DESK, HOME_WARDROBE } from '../model/world/world';
-import { InteractPrompt } from './InteractPrompt';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { CLASSROOM_BOARD, HOME_DESK, HOME_WARDROBE } from '@views/walk/model/world/world';
+import { InteractPrompt } from '@views/walk/ui/InteractPrompt';
 
 export function RoomPrompts() {
   const { spots, interact: onInteract } = useWalkContext();

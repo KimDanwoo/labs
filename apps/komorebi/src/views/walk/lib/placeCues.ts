@@ -1,5 +1,5 @@
-import { PLACE_ACTION, type PlaceAction } from '../model/world/world';
-import type { Voices } from './audioSynth';
+import type { Voices } from '@views/walk/lib/audioSynth';
+import { PLACE_ACTION, type PlaceAction } from '@views/walk/model/world/world';
 
 export type FishingCue = 'cast' | 'waiting' | 'bite' | 'hook' | 'success' | 'rare' | 'miss';
 

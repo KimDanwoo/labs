@@ -1,7 +1,5 @@
-import * as THREE from 'three';
-import { type Region, REGION } from '../model/world/world';
-import { lampGlowAt, lightSprite } from './nightLights';
-import { characterScale, sceneX, sceneY } from './perspective';
+import { lampGlowAt, lightSprite } from '@views/walk/lib/nightLights';
+import { characterScale, sceneX, sceneY } from '@views/walk/lib/perspective';
 import {
   COLUMNS,
   CREST_TRAVEL,
@@ -14,7 +12,9 @@ import {
   progressOf,
   showFrame,
   waveFrame,
-} from './waveSheets';
+} from '@views/walk/lib/waveSheets';
+import { type Region, REGION } from '@views/walk/model/world/world';
+import * as THREE from 'three';
 const REFERENCE_DEPTH = 40;
 const RAIN_HURRY = 0.25;
 const NIGHT_DIM = 0.6;

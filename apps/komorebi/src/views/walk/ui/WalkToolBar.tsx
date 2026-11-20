@@ -1,7 +1,7 @@
-import { DIALOG, TIME_LABEL } from '../config/walk';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { Icon } from './Icon';
-import { TIME_ICON } from './timeIcon';
+import { DIALOG, TIME_LABEL } from '@views/walk/config/walk';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { Icon } from '@views/walk/ui/Icon';
+import { TIME_ICON } from '@views/walk/ui/timeIcon';
 
 export function WalkToolBar() {
   const { timeOfDay, isRaining, ambience, isReady: isSceneReady, isBusy, takePhoto, openDialog } = useWalkContext();

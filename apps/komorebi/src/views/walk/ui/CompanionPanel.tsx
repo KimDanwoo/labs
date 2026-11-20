@@ -1,17 +1,17 @@
-import { COMPANION_PANEL_COPY } from '../config/companion';
+import { COMPANION_PANEL_COPY } from '@views/walk/config/companion';
 import {
   BAG_CAPACITY,
   TANK_CAPACITY,
   catBond,
   type CompanionPanelKind,
   type CompanionReaction,
-} from '../lib/companions';
-import { companionSummary } from '../lib/companionSummary';
-import { useCompanionPanel } from '../model/hooks/useCompanionPanel';
-import { AquariumView } from './AquariumView';
-import { BagFishList } from './companion/BagFishList';
-import { CompanionHeading } from './companion/CompanionHeading';
-import { TankFishList } from './companion/TankFishList';
+} from '@views/walk/lib/companions';
+import { companionSummary } from '@views/walk/lib/companionSummary';
+import { useCompanionPanel } from '@views/walk/model/hooks/useCompanionPanel';
+import { AquariumView } from '@views/walk/ui/AquariumView';
+import { BagFishList } from '@views/walk/ui/companion/BagFishList';
+import { CompanionHeading } from '@views/walk/ui/companion/CompanionHeading';
+import { TankFishList } from '@views/walk/ui/companion/TankFishList';
 
 interface CompanionPanelProps {
   kind: CompanionPanelKind;

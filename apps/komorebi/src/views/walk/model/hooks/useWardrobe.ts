@@ -1,5 +1,5 @@
+import type { Appearance } from '@views/walk/model/world/appearance';
 import { useState } from 'react';
-import type { Appearance } from '../world/appearance';
 
 export function useWardrobe(isOpen: boolean, onChange: (next: Appearance) => Promise<boolean>) {
   const [isChanging, setIsChanging] = useState(false);

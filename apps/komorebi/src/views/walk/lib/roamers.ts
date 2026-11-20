@@ -1,9 +1,9 @@
+import { canvasTexture } from '@views/walk/lib/art';
+import { lampGlowAt, lightSprite } from '@views/walk/lib/nightLights';
+import { CHILD_SIZE, characterScale, sceneX, sceneY } from '@views/walk/lib/perspective';
+import { passingRoute, presence, routeLength, startGait, walkOn, type Gait } from '@views/walk/lib/roam';
+import { isIndoors, type Point, type Region } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { isIndoors, type Point, type Region } from '../model/world/world';
-import { canvasTexture } from './art';
-import { lampGlowAt, lightSprite } from './nightLights';
-import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
-import { passingRoute, presence, routeLength, startGait, walkOn, type Gait } from './roam';
 
 const FRAMES = 4;
 const ANIMAL = {

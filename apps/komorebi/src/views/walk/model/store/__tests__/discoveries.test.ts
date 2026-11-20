@@ -1,7 +1,7 @@
+import { parseDayPages, parseDiscoveries } from '@views/walk/model/store/discoveries';
+import { LANDMARKS } from '@views/walk/model/world/landmarks';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { LANDMARKS } from '../../world/landmarks';
-import { parseDayPages, parseDiscoveries } from '../discoveries';
 
 test('stored discoveries keep known landmarks once, in order, and survive corrupt data', () => {
   const [first, second] = LANDMARKS;

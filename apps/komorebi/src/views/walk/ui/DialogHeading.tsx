@@ -1,4 +1,4 @@
-import { Icon } from './Icon';
+import { Icon } from '@views/walk/ui/Icon';
 
 interface DialogHeadingProps {
   eyebrow: string;

@@ -1,5 +1,5 @@
-import type { Catch } from '../lib/fishing';
-import type { FISH } from '../lib/fishTable';
+import type { Catch } from '@views/walk/lib/fishing';
+import type { FISH } from '@views/walk/lib/fishTable';
 
 interface CatchResultProps {
   fish: (typeof FISH)[number];

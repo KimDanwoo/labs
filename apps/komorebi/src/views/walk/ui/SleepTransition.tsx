@@ -1,5 +1,5 @@
-import { SLEEP_TIMING } from '../lib/bedRest';
-import { useSleepTimers } from '../model/hooks/useSleepTimers';
+import { SLEEP_TIMING } from '@views/walk/lib/bedRest';
+import { useSleepTimers } from '@views/walk/model/hooks/useSleepTimers';
 
 interface SleepTransitionProps {
   onWake: () => void;

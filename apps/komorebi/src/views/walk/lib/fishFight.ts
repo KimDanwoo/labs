@@ -1,5 +1,5 @@
-import { FIGHT_GAUGE_MAX, TENSION } from '../config/fishing';
-import { FISH, FISH_SHAPE, isRareFish } from './fishTable';
+import { FIGHT_GAUGE_MAX, TENSION } from '@views/walk/config/fishing';
+import { FISH, FISH_SHAPE, isRareFish } from '@views/walk/lib/fishTable';
 
 export const FIGHT_OUTCOME = { active: 'active', landed: 'landed', snapped: 'snapped', escaped: 'escaped' } as const;
 export type Fight = {

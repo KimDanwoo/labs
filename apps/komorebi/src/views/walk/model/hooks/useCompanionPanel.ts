@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react';
 
-import { COMPANION_REACTION_MS } from '../../config/companion';
+import { COMPANION_REACTION_MS } from '@views/walk/config/companion';
 import {
   COMPANION_ACTION,
   COMPANION_PANEL,
@@ -10,8 +10,8 @@ import {
   type CompanionAction,
   type CompanionPanelKind,
   type CompanionReaction,
-} from '../../lib/companions';
-import { companionStore } from '../store/companions';
+} from '@views/walk/lib/companions';
+import { companionStore } from '@views/walk/model/store/companions';
 
 interface CompanionPanelInput {
   kind: CompanionPanelKind;

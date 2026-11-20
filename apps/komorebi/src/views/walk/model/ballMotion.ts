@@ -1,4 +1,4 @@
-import { BALL_PHASE, BALL_ROLE, BALL_TIMING, type BallGame, type BallRole } from './ballGame';
+import { BALL_PHASE, BALL_ROLE, BALL_TIMING, type BallGame, type BallRole } from '@views/walk/model/ballGame';
 
 type Flight = { progress: number; arc: number; spin: number };
 type Pose = { lean: number; compression: number };

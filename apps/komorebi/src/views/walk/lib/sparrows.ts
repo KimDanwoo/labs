@@ -1,4 +1,4 @@
-import type { Point } from '../model/world/world';
+import type { Point } from '@views/walk/model/world/world';
 
 export const BIRD_STATE = { ground: 'ground', flying: 'flying', perched: 'perched', returning: 'returning' } as const;
 type BirdState = (typeof BIRD_STATE)[keyof typeof BIRD_STATE];

@@ -1,5 +1,5 @@
-import { WORLD_OBJECTS } from './objects';
-import type { Region } from './world';
+import { WORLD_OBJECTS } from '@views/walk/model/world/objects';
+import type { Region } from '@views/walk/model/world/world';
 
 type PixelPoint = readonly [number, number];
 type Baseline = readonly [PixelPoint, PixelPoint];

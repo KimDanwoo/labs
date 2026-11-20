@@ -1,9 +1,9 @@
-import { DIALOG } from '../config/walk';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { LANDMARKS } from '../model/world/landmarks';
-import { WORLDS } from '../model/world/worlds';
-import { ControlsHint } from './ControlsHint';
-import { Icon } from './Icon';
+import { DIALOG } from '@views/walk/config/walk';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { LANDMARKS } from '@views/walk/model/world/landmarks';
+import { WORLDS } from '@views/walk/model/world/worlds';
+import { ControlsHint } from '@views/walk/ui/ControlsHint';
+import { Icon } from '@views/walk/ui/Icon';
 
 export function WalkBottomBar() {
   const { status, collection, isFirstVisit, isReady, hasStarted, isBusy, openDialog } = useWalkContext();

@@ -1,8 +1,8 @@
+import { aquariumFishArt, aquariumPose } from '@views/walk/lib/aquarium';
+import { FISH_HOME } from '@views/walk/lib/companions';
+import { FISH } from '@views/walk/lib/fishTable';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { aquariumFishArt, aquariumPose } from '../aquarium';
-import { FISH_HOME } from '../companions';
-import { FISH } from '../fishTable';
 
 test('every fish stays inside painted water at all sizes, turns and feeding stages', () => {
   for (const species of FISH) {

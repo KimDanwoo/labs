@@ -1,9 +1,9 @@
+import { AQUARIUM_ART, aquariumFishArt, aquariumPose } from '@views/walk/lib/aquarium';
+import type { PartKit } from '@views/walk/lib/companionParts';
+import { TANK_CAPACITY, type Companions } from '@views/walk/lib/companions';
+import { CHILD_SIZE, characterScale, sceneX, sceneY } from '@views/walk/lib/perspective';
+import { HOME_AQUARIUM } from '@views/walk/model/world/landmarks';
 import * as THREE from 'three';
-import { HOME_AQUARIUM } from '../model/world/landmarks';
-import { AQUARIUM_ART, aquariumFishArt, aquariumPose } from './aquarium';
-import type { PartKit } from './companionParts';
-import { TANK_CAPACITY, type Companions } from './companions';
-import { CHILD_SIZE, characterScale, sceneX, sceneY } from './perspective';
 
 export type TankFrame = {
   elapsed: number;

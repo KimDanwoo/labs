@@ -1,10 +1,10 @@
+import { catPosition, createCatScene } from '@views/walk/lib/catScene';
+import { createPartKit } from '@views/walk/lib/companionParts';
+import { COMPANION_REACTION, FISH_HOME, type CompanionReaction, type Companions } from '@views/walk/lib/companions';
+import type { FishingFrame } from '@views/walk/lib/fishing';
+import { createTankScene } from '@views/walk/lib/tankScene';
+import { REGION, type Region } from '@views/walk/model/world/world';
 import type * as THREE from 'three';
-import { REGION, type Region } from '../model/world/world';
-import { catPosition, createCatScene } from './catScene';
-import { createPartKit } from './companionParts';
-import { COMPANION_REACTION, FISH_HOME, type CompanionReaction, type Companions } from './companions';
-import type { FishingFrame } from './fishing';
-import { createTankScene } from './tankScene';
 
 export { catPosition };
 

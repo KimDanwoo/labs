@@ -1,6 +1,6 @@
-import { GROUND } from './groundOutlines';
-import { WORLD_OBJECTS } from './objects';
-import type { Point, Region } from './world';
+import { GROUND } from '@views/walk/model/world/groundOutlines';
+import { WORLD_OBJECTS } from '@views/walk/model/world/objects';
+import type { Point, Region } from '@views/walk/model/world/world';
 
 export type PixelPoint = readonly [number, number];
 

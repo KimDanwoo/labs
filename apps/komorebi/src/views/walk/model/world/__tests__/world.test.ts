@@ -1,11 +1,11 @@
+import { hasGroundBetween, isOnGround } from '@views/walk/model/world/ground';
+import { LANDMARKS, closestLandmark } from '@views/walk/model/world/landmarks';
+import { canWalk, createSlideMotion, movePlayer } from '@views/walk/model/world/movement';
+import { findRoute, nextRegionStep } from '@views/walk/model/world/routing';
+import { SPAWN, isIndoors, type Region } from '@views/walk/model/world/world';
+import { WORLDS } from '@views/walk/model/world/worlds';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { hasGroundBetween, isOnGround } from '../ground';
-import { LANDMARKS, closestLandmark } from '../landmarks';
-import { canWalk, createSlideMotion, movePlayer } from '../movement';
-import { findRoute, nextRegionStep } from '../routing';
-import { SPAWN, isIndoors, type Region } from '../world';
-import { WORLDS } from '../worlds';
 
 interface Point {
   x: number;

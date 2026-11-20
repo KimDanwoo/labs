@@ -1,11 +1,11 @@
+import { childFacing } from '@views/walk/lib/atlas';
+import { FISHING_PHASE, type FishingFrame } from '@views/walk/lib/fishing';
+import { advanceMotion, createMotion, crossedFootfall } from '@views/walk/lib/motion';
+import { lightSprite } from '@views/walk/lib/nightLights';
+import type { BallGame, BallRole } from '@views/walk/model/ballGame';
+import { ballPose } from '@views/walk/model/ballMotion';
+import { CHARACTER_RIG, type BodyPoseOffsets } from '@views/walk/model/world/appearance';
 import * as THREE from 'three';
-import type { BallGame, BallRole } from '../model/ballGame';
-import { ballPose } from '../model/ballMotion';
-import { CHARACTER_RIG, type BodyPoseOffsets } from '../model/world/appearance';
-import { childFacing } from './atlas';
-import { FISHING_PHASE, type FishingFrame } from './fishing';
-import { advanceMotion, createMotion, crossedFootfall } from './motion';
-import { lightSprite } from './nightLights';
 
 export type ChildLayers = { body: THREE.Texture; outfit: THREE.Texture; bodyPoseOffsets?: BodyPoseOffsets };
 type ChildFrame = {

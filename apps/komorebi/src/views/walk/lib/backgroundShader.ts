@@ -1,9 +1,9 @@
-import { BREEZE_GLSL } from './breeze';
-import { CHALK_GLSL } from './chalkboard';
-import { FAN_GLSL } from './fan';
-import { INDOOR_WEATHER_GLSL } from './indoorWeather';
-import { MAX_LAMPS } from './nightLights';
-import { SEA_ATMOSPHERE_GLSL } from './seaAtmosphere';
+import { BREEZE_GLSL } from '@views/walk/lib/breeze';
+import { CHALK_GLSL } from '@views/walk/lib/chalkboard';
+import { FAN_GLSL } from '@views/walk/lib/fan';
+import { INDOOR_WEATHER_GLSL } from '@views/walk/lib/indoorWeather';
+import { MAX_LAMPS } from '@views/walk/lib/nightLights';
+import { SEA_ATMOSPHERE_GLSL } from '@views/walk/lib/seaAtmosphere';
 
 export const BACKGROUND_VERTEX =
   'varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}';

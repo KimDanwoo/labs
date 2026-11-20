@@ -1,4 +1,4 @@
-import { SURFACE, type Surface } from '../model/world/surfaces';
+import { SURFACE, type Surface } from '@views/walk/model/world/surfaces';
 
 const STEP_VOLUME = 0.4;
 

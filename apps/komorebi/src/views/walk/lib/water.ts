@@ -1,8 +1,8 @@
+import { canvasTexture } from '@views/walk/lib/art';
+import { COAST_BOAT_OUTLINE } from '@views/walk/model/world/coastBoat';
+import { WATER } from '@views/walk/model/world/water';
+import { type Region, REGION } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { COAST_BOAT_OUTLINE } from '../model/world/coastBoat';
-import { WATER } from '../model/world/water';
-import { type Region, REGION } from '../model/world/world';
-import { canvasTexture } from './art';
 
 const SIZE = { width: 384, height: 256 };
 const STILL = 'rgb(0, 128, 128)';

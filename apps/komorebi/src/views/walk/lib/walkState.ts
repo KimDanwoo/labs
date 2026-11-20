@@ -1,11 +1,11 @@
-import { TIME, WEATHER, type TimeOfDay, type Weather } from '../config/walk';
-import type { BallGame } from '../model/ballGame';
-import type { SchoolmateId } from '../model/schoolmateRoster';
-import type { Appearance } from '../model/world/appearance';
-import type { WorldPortal } from '../model/world/portals';
-import { REGION, SPAWN, type Point, type Region } from '../model/world/world';
-import type { FishingFrame } from './fishing';
-import type { SceneStatus } from './sceneStatus';
+import { TIME, WEATHER, type TimeOfDay, type Weather } from '@views/walk/config/walk';
+import type { FishingFrame } from '@views/walk/lib/fishing';
+import type { SceneStatus } from '@views/walk/lib/sceneStatus';
+import type { BallGame } from '@views/walk/model/ballGame';
+import type { SchoolmateId } from '@views/walk/model/schoolmateRoster';
+import type { Appearance } from '@views/walk/model/world/appearance';
+import type { WorldPortal } from '@views/walk/model/world/portals';
+import { REGION, SPAWN, type Point, type Region } from '@views/walk/model/world/world';
 
 export interface WalkState {
   currentAppearance: Appearance;

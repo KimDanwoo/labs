@@ -1,4 +1,4 @@
-import { BALL_PHASE, canReturnBall, type BallGame } from '../model/ballGame';
+import { BALL_PHASE, canReturnBall, type BallGame } from '@views/walk/model/ballGame';
 
 export function ballMessage(game: BallGame, name: string): string {
   if (game.phase === BALL_PHASE.complete) return '다섯 번이나 이어 받았다! 다음에도 같이 놀자.';

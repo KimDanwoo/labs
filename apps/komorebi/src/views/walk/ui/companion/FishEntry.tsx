@@ -1,5 +1,5 @@
-import { fishName } from '../../lib/fishTable';
-import type { CompanionFish } from '../../model/hooks/useCompanionPanel';
+import { fishName } from '@views/walk/lib/fishTable';
+import type { CompanionFish } from '@views/walk/model/hooks/useCompanionPanel';
 
 interface FishEntryProps {
   fish: CompanionFish;

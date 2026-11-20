@@ -1,6 +1,6 @@
+import { constrainCameraAxis } from '@views/walk/lib/cameraBounds';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { constrainCameraAxis } from '../cameraBounds';
 
 const ASPECTS = [390 / 844, 844 / 390, 1, 1.44, 16 / 9, 3];
 const OLD_CENTERS = [-100, 0, 100];

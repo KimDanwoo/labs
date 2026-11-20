@@ -1,7 +1,7 @@
 'use client';
 
-import { MusicDock } from './music/MusicDock';
-import { Walk } from './walk';
+import { MusicDock } from '@views/walk/ui/music/MusicDock';
+import { Walk } from '@views/walk/ui/walk';
 
 export function WalkView() {
   return (

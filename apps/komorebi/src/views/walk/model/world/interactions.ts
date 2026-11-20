@@ -1,6 +1,14 @@
-import { FISHING_PIER, HOME_AQUARIUM, LANDMARKS, PIER_CAT } from './landmarks';
-import { WORLD_OBJECTS } from './objects';
-import { CLASSROOM_BOARD, HOME_BED, HOME_DESK, HOME_WARDROBE, type Point, type Region, REGION } from './world';
+import { FISHING_PIER, HOME_AQUARIUM, LANDMARKS, PIER_CAT } from '@views/walk/model/world/landmarks';
+import { WORLD_OBJECTS } from '@views/walk/model/world/objects';
+import {
+  CLASSROOM_BOARD,
+  HOME_BED,
+  HOME_DESK,
+  HOME_WARDROBE,
+  type Point,
+  type Region,
+  REGION,
+} from '@views/walk/model/world/world';
 
 const futon = WORLD_OBJECTS.find((object) => object.id === 'home-futon')!;
 export function isNearHomeBed(point: Point, reach = 3.5) {

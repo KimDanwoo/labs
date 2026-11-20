@@ -1,9 +1,9 @@
-import { type SchoolmateId } from '../model/schoolmateRoster';
-import { nearestSchoolmate } from '../model/schoolmates';
-import { closestLandmark, type Landmark } from '../model/world/landmarks';
-import { type Point, type Region } from '../model/world/world';
-import { type SceneContext } from './sceneContext';
-import { type BedRestFrame, type Stride } from './scenePlayer';
+import { type SceneContext } from '@views/walk/lib/sceneContext';
+import { type BedRestFrame, type Stride } from '@views/walk/lib/scenePlayer';
+import { type SchoolmateId } from '@views/walk/model/schoolmateRoster';
+import { nearestSchoolmate } from '@views/walk/model/schoolmates';
+import { closestLandmark, type Landmark } from '@views/walk/model/world/landmarks';
+import { type Point, type Region } from '@views/walk/model/world/world';
 
 export type SceneStatus = Point & {
   region: Region;

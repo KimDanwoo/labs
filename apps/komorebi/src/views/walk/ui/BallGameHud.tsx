@@ -1,10 +1,10 @@
+import { ballMessage } from '@views/walk/lib/ballGameCopy';
+import { gameKey } from '@views/walk/lib/input';
+import { BALL_PHASE, BALL_TIMING, canReturnBall, type BallGame } from '@views/walk/model/ballGame';
+import { useBallGame } from '@views/walk/model/hooks/useBallGame';
+import { useModal } from '@views/walk/model/hooks/useModal';
+import { Icon } from '@views/walk/ui/Icon';
 import { useId, type JSX } from 'react';
-import { ballMessage } from '../lib/ballGameCopy';
-import { gameKey } from '../lib/input';
-import { BALL_PHASE, BALL_TIMING, canReturnBall, type BallGame } from '../model/ballGame';
-import { useBallGame } from '../model/hooks/useBallGame';
-import { useModal } from '../model/hooks/useModal';
-import { Icon } from './Icon';
 
 interface BallGameHudProps {
   name: string;

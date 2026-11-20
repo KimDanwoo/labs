@@ -1,4 +1,4 @@
-import type { Point, Region } from './world';
+import type { Point, Region } from '@views/walk/model/world/world';
 
 export const SURFACE = { dirt: 'dirt', stone: 'stone', wood: 'wood', sand: 'sand' } as const;
 export type Surface = (typeof SURFACE)[keyof typeof SURFACE];

@@ -1,5 +1,5 @@
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { FishingHud } from './FishingHud';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { FishingHud } from '@views/walk/ui/FishingHud';
 
 export function WalkFishing() {
   const { engine, activities, ambience } = useWalkContext();

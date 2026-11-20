@@ -1,6 +1,6 @@
-import { BAG_CAPACITY, COMPANION_ACTION } from '../../lib/companions';
-import type { CompanionFish, CompanionPanelModel } from '../../model/hooks/useCompanionPanel';
-import { FishEntry } from './FishEntry';
+import { BAG_CAPACITY, COMPANION_ACTION } from '@views/walk/lib/companions';
+import type { CompanionFish, CompanionPanelModel } from '@views/walk/model/hooks/useCompanionPanel';
+import { FishEntry } from '@views/walk/ui/companion/FishEntry';
 
 interface BagFishListProps {
   bag: readonly CompanionFish[];

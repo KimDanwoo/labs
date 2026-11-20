@@ -1,8 +1,8 @@
+import { INDOOR_RAIN_ROOMS, WINDOW_RAIN_VELOCITY } from '@views/walk/lib/indoorWeather';
+import { isIndoors } from '@views/walk/model/world/world';
 import { WORLDS } from '@views/walk/model/world/worlds';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { isIndoors } from '../../model/world/world';
-import { INDOOR_RAIN_ROOMS, WINDOW_RAIN_VELOCITY } from '../indoorWeather';
 
 test('every sheltered map has its own outdoor rain mask', () => {
   for (const world of Object.keys(WORLDS)) {

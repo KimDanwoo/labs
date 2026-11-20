@@ -1,4 +1,4 @@
-import { FISH, FISH_TOTAL_WEIGHT } from './fishTable';
+import { FISH, FISH_TOTAL_WEIGHT } from '@views/walk/lib/fishTable';
 
 export const FISHING_PHASE = {
   idle: 'idle',

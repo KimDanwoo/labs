@@ -1,11 +1,11 @@
+import { DIALOG } from '@views/walk/config/walk';
+import { useModal } from '@views/walk/model/hooks/useModal';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { useWardrobe } from '@views/walk/model/hooks/useWardrobe';
+import { DialogHeading } from '@views/walk/ui/DialogHeading';
+import { Icon } from '@views/walk/ui/Icon';
+import { WardrobeBody } from '@views/walk/ui/wardrobe/WardrobeBody';
 import { useId, type JSX } from 'react';
-import { DIALOG } from '../config/walk';
-import { useModal } from '../model/hooks/useModal';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { useWardrobe } from '../model/hooks/useWardrobe';
-import { DialogHeading } from './DialogHeading';
-import { Icon } from './Icon';
-import { WardrobeBody } from './wardrobe/WardrobeBody';
 
 export function WalkWardrobe(): JSX.Element {
   const { dialog, appearance, changeAppearance, closeDialog } = useWalkContext();

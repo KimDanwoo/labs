@@ -1,7 +1,7 @@
-import { FISHING_PHASE } from '../lib/fishing';
-import { useFishingContext } from '../model/hooks/useFishingContext';
-import { CatchChoices } from './CatchChoices';
-import { FishJournal } from './FishJournal';
+import { FISHING_PHASE } from '@views/walk/lib/fishing';
+import { useFishingContext } from '@views/walk/model/hooks/useFishingContext';
+import { CatchChoices } from '@views/walk/ui/CatchChoices';
+import { FishJournal } from '@views/walk/ui/FishJournal';
 
 export function FishingFooter() {
   const { phase, isCelebrating, keptUid, collection, hasSaveError, onReact } = useFishingContext();

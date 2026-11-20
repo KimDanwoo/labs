@@ -1,1 +1,1 @@
-export { WalkView } from './ui/WalkView';
+export { WalkView } from '@views/walk/ui/WalkView';

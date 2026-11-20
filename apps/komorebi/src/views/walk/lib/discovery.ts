@@ -1,4 +1,4 @@
-import { TIME_LABEL, type TimeOfDay } from '../config/walk';
+import { TIME_LABEL, type TimeOfDay } from '@views/walk/config/walk';
 
 export function keptLabel(times: TimeOfDay[]) {
   if (!times.length) return '아직 만나지 않은 풍경';

@@ -1,14 +1,14 @@
-import type { TimeOfDay, Weather } from '../config/walk';
-import type { BallGame } from '../model/ballGame';
-import type { SchoolmateId } from '../model/schoolmateRoster';
-import type { Appearance } from '../model/world/appearance';
-import type { Surface } from '../model/world/surfaces';
-import type { PlaceAction, Point } from '../model/world/world';
-import type { CompanionReaction } from './companions';
-import type { FishingFrame } from './fishing';
-import type { createSceneParts } from './sceneSetup';
-import type { SceneStatus } from './sceneStatus';
-import type { WalkState } from './walkState';
+import type { TimeOfDay, Weather } from '@views/walk/config/walk';
+import type { CompanionReaction } from '@views/walk/lib/companions';
+import type { FishingFrame } from '@views/walk/lib/fishing';
+import type { createSceneParts } from '@views/walk/lib/sceneSetup';
+import type { SceneStatus } from '@views/walk/lib/sceneStatus';
+import type { WalkState } from '@views/walk/lib/walkState';
+import type { BallGame } from '@views/walk/model/ballGame';
+import type { SchoolmateId } from '@views/walk/model/schoolmateRoster';
+import type { Appearance } from '@views/walk/model/world/appearance';
+import type { Surface } from '@views/walk/model/world/surfaces';
+import type { PlaceAction, Point } from '@views/walk/model/world/world';
 
 export type SceneOptions = {
   onStatus: (status: SceneStatus) => void;

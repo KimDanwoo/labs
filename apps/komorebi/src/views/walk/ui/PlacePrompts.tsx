@@ -1,5 +1,5 @@
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { InteractPrompt } from './InteractPrompt';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { InteractPrompt } from '@views/walk/ui/InteractPrompt';
 
 export function PlacePrompts() {
   const { spots, nearbyFriend, status, promptHint, interact: onInteract } = useWalkContext();

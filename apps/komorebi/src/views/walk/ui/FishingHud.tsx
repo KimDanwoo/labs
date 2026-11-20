@@ -1,14 +1,14 @@
-import type { createAmbience } from '../lib/audio';
-import type { CompanionReaction } from '../lib/companions';
-import { FISH, FISH_RARITY } from '../lib/fishTable';
-import { FISHING_PHASE, type FishingFrame } from '../lib/fishing';
-import { catchBadge, fishingMessage } from '../lib/fishingCopy';
-import { useFishingSession } from '../model/hooks/useFishingSession';
-import { FishingContext } from '../model/store/fishingContext';
-import { CatchResult } from './CatchResult';
-import { FishingActionButton } from './FishingActionButton';
-import { FishingFight } from './FishingFight';
-import { FishingFooter } from './FishingFooter';
+import type { createAmbience } from '@views/walk/lib/audio';
+import type { CompanionReaction } from '@views/walk/lib/companions';
+import { FISH, FISH_RARITY } from '@views/walk/lib/fishTable';
+import { FISHING_PHASE, type FishingFrame } from '@views/walk/lib/fishing';
+import { catchBadge, fishingMessage } from '@views/walk/lib/fishingCopy';
+import { useFishingSession } from '@views/walk/model/hooks/useFishingSession';
+import { FishingContext } from '@views/walk/model/store/fishingContext';
+import { CatchResult } from '@views/walk/ui/CatchResult';
+import { FishingActionButton } from '@views/walk/ui/FishingActionButton';
+import { FishingFight } from '@views/walk/ui/FishingFight';
+import { FishingFooter } from '@views/walk/ui/FishingFooter';
 
 interface FishingHudProps {
   onClose: () => void;

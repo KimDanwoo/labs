@@ -1,6 +1,6 @@
+import { childFacing, extractChildFrames } from '@views/walk/lib/atlas';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { childFacing, extractChildFrames } from '../atlas';
 
 const INK: [number, number, number, number] = [80, 50, 30, 255];
 

@@ -1,4 +1,3 @@
-import { useEffect, useRef, type PointerEvent, type RefObject } from 'react';
 import {
   CHALK_TOOL,
   canAddPoint,
@@ -9,8 +8,9 @@ import {
   roundCoordinate,
   type ChalkColor,
   type ChalkStroke,
-} from '../../lib/chalkboard';
-import { chalkboardStore } from '../store/chalkboard';
+} from '@views/walk/lib/chalkboard';
+import { chalkboardStore } from '@views/walk/model/store/chalkboard';
+import { useEffect, useRef, type PointerEvent, type RefObject } from 'react';
 
 export type ChalkBrush = ChalkColor | typeof CHALK_TOOL.eraser;
 

@@ -1,23 +1,23 @@
 'use client';
 
+import { DIALOG, WEATHER } from '@views/walk/config/walk';
+import type { WalkEngine } from '@views/walk/lib/scene';
+import { useActivities } from '@views/walk/model/hooks/useActivities';
+import { useAmbience, useAmbienceScene } from '@views/walk/model/hooks/useAmbience';
+import { useCollection } from '@views/walk/model/hooks/useCollection';
+import { useEngineCommands } from '@views/walk/model/hooks/useEngineCommands';
+import { useIsFirstVisit } from '@views/walk/model/hooks/useIsFirstVisit';
+import { useShortcuts } from '@views/walk/model/hooks/useShortcuts';
+import { useToast } from '@views/walk/model/hooks/useToast';
+import { useVillageDay } from '@views/walk/model/hooks/useVillageDay';
+import { useWalkDialog } from '@views/walk/model/hooks/useWalkDialog';
+import { useWalkEngine } from '@views/walk/model/hooks/useWalkEngine';
+import { useWalkInteraction } from '@views/walk/model/hooks/useWalkInteraction';
+import { SCHOOL_REGION } from '@views/walk/model/schoolmateRoster';
+import { schoolRegion } from '@views/walk/model/schoolmates';
+import { appearanceStore } from '@views/walk/model/store/appearance';
+import type { Memory } from '@views/walk/model/types/memory';
 import { useRef, useState, useSyncExternalStore } from 'react';
-import { DIALOG, WEATHER } from '../../config/walk';
-import type { WalkEngine } from '../../lib/scene';
-import { SCHOOL_REGION } from '../schoolmateRoster';
-import { schoolRegion } from '../schoolmates';
-import { appearanceStore } from '../store/appearance';
-import type { Memory } from '../types/memory';
-import { useActivities } from './useActivities';
-import { useAmbience, useAmbienceScene } from './useAmbience';
-import { useCollection } from './useCollection';
-import { useEngineCommands } from './useEngineCommands';
-import { useIsFirstVisit } from './useIsFirstVisit';
-import { useShortcuts } from './useShortcuts';
-import { useToast } from './useToast';
-import { useVillageDay } from './useVillageDay';
-import { useWalkDialog } from './useWalkDialog';
-import { useWalkEngine } from './useWalkEngine';
-import { useWalkInteraction } from './useWalkInteraction';
 
 export type WalkModel = ReturnType<typeof useWalk>;
 

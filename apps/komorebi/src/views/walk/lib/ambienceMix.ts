@@ -1,5 +1,5 @@
-import { TIME, WEATHER, type TimeOfDay, type Weather } from '../config/walk';
-import { isIndoors, type Region } from '../model/world/world';
+import { TIME, WEATHER, type TimeOfDay, type Weather } from '@views/walk/config/walk';
+import { isIndoors, type Region } from '@views/walk/model/world/world';
 
 export type AmbienceMix = {
   water: number;

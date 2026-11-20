@@ -1,4 +1,4 @@
-import { canvasTexture } from './art';
+import { canvasTexture } from '@views/walk/lib/art';
 
 type Painter = CanvasRenderingContext2D;
 

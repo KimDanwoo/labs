@@ -1,26 +1,23 @@
-import * as THREE from 'three';
-import { DEFAULT_APPEARANCE, characterLayers } from '../model/world/appearance';
-import { createSlideMotion } from '../model/world/movement';
-import { createBallScene } from './ballScene';
-import { createBedRest } from './bedRest';
-import { createBoats } from './boats';
-import { createChild } from './child';
-import { createCompanionScene } from './companionScene';
-import { createCountryside } from './countryside';
-import { createDriftingLeaves } from './driftingLeaves';
-import { createDust } from './dust';
-import { createFireflies } from './fireflies';
-import { createJump } from './motion';
-import { createNightLights } from './nightLights';
-import { createPierFishing } from './pierFishing';
-import { createPlaceEffects } from './placeEffects';
-import { createPortalInput } from './portalInput';
-import { createPortals } from './portals';
-import { createRain } from './rain';
-import { createRegionPlates, preparePaintingTexture } from './regionPlates';
-import { createRoamers } from './roamers';
-import type { SceneOptions } from './sceneContext';
-import { createSceneLife } from './sceneLife';
+import { createBallScene } from '@views/walk/lib/ballScene';
+import { createBedRest } from '@views/walk/lib/bedRest';
+import { createBoats } from '@views/walk/lib/boats';
+import { createChild } from '@views/walk/lib/child';
+import { createCompanionScene } from '@views/walk/lib/companionScene';
+import { createCountryside } from '@views/walk/lib/countryside';
+import { createDriftingLeaves } from '@views/walk/lib/driftingLeaves';
+import { createDust } from '@views/walk/lib/dust';
+import { createFireflies } from '@views/walk/lib/fireflies';
+import { createJump } from '@views/walk/lib/motion';
+import { createNightLights } from '@views/walk/lib/nightLights';
+import { createPierFishing } from '@views/walk/lib/pierFishing';
+import { createPlaceEffects } from '@views/walk/lib/placeEffects';
+import { createPortalInput } from '@views/walk/lib/portalInput';
+import { createPortals } from '@views/walk/lib/portals';
+import { createRain } from '@views/walk/lib/rain';
+import { createRegionPlates, preparePaintingTexture } from '@views/walk/lib/regionPlates';
+import { createRoamers } from '@views/walk/lib/roamers';
+import type { SceneOptions } from '@views/walk/lib/sceneContext';
+import { createSceneLife } from '@views/walk/lib/sceneLife';
 import {
   createBackgroundMaterial,
   createDestinationMarkers,
@@ -29,11 +26,14 @@ import {
   createMarkerTexture,
   createShadow,
   createTargetMarker,
-} from './sceneSprites';
-import { createSchoolmates } from './schoolmatesScene';
-import { START_REGION } from './walkState';
-import { createWaterMaps } from './water';
-import { createWaves } from './waves';
+} from '@views/walk/lib/sceneSprites';
+import { createSchoolmates } from '@views/walk/lib/schoolmatesScene';
+import { START_REGION } from '@views/walk/lib/walkState';
+import { createWaterMaps } from '@views/walk/lib/water';
+import { createWaves } from '@views/walk/lib/waves';
+import { DEFAULT_APPEARANCE, characterLayers } from '@views/walk/model/world/appearance';
+import { createSlideMotion } from '@views/walk/model/world/movement';
+import * as THREE from 'three';
 
 export const CHILD_ORDER = 4;
 

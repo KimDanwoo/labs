@@ -1,9 +1,9 @@
+import { DIALOG, TIME_ORDER } from '@views/walk/config/walk';
+import { useModal } from '@views/walk/model/hooks/useModal';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { LANDMARKS } from '@views/walk/model/world/landmarks';
+import { Icon } from '@views/walk/ui/Icon';
 import { useId } from 'react';
-import { DIALOG, TIME_ORDER } from '../config/walk';
-import { useModal } from '../model/hooks/useModal';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { LANDMARKS } from '../model/world/landmarks';
-import { Icon } from './Icon';
 
 export function WalkMemory() {
   const { dialog, memory, collection, closeDialog } = useWalkContext();
