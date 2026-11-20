@@ -2,7 +2,6 @@ import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from '@entities/sudoku/conf
 import { createEmptyGrid } from '@entities/sudoku/model/services/common';
 import type { Grid } from '@entities/sudoku/model/types/board';
 
-/** 후보는 비트마스크로 다룬다: 숫자 d ↔ 비트 (1 << d). 0번 비트는 쓰지 않는다. */
 export const ALL_DIGITS = 0b1111111110;
 export const EMPTY = 0;
 export const bit = (digit: number): number => 1 << digit;

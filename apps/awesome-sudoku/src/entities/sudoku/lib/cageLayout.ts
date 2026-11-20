@@ -58,7 +58,9 @@ function absorbSingle(state: LayoutState, cage: GridPosition[], maxCageSize: num
   const ownerOf = (p: GridPosition): GridPosition[] | undefined => cages[atIndex(cageOf, key(...p))];
   const canDonate = (p: GridPosition, taker: GridPosition[]): boolean => {
     const owner = ownerOf(p);
-    if (!owner || owner === taker || owner.length <= MIN_CAGE_SIZE || hasValue(taker, valueAt(p))) return false;
+    if (!owner) return false;
+    const canGiveCell = owner !== taker && owner.length > MIN_CAGE_SIZE && !hasValue(taker, valueAt(p));
+    if (!canGiveCell) return false;
     return isConnected(owner.filter((q) => key(...q) !== key(...p)));
   };
 
@@ -76,8 +78,9 @@ function absorbSingle(state: LayoutState, cage: GridPosition[], maxCageSize: num
     return;
   }
   const donor = neighbors.find((p) => canDonate(p, cage));
-  const owner = donor && ownerOf(donor);
-  if (!donor || !owner) return;
+  if (!donor) return;
+  const owner = ownerOf(donor);
+  if (!owner) return;
   owner.splice(
     owner.findIndex((q) => key(...q) === key(...donor)),
     1,

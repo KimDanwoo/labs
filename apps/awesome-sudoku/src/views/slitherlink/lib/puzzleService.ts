@@ -41,7 +41,8 @@ const createWorker = (): Worker | null => {
 
 const getWorker = (): Worker | null => {
   if (worker !== undefined) return worker;
-  worker = typeof window === 'undefined' || typeof Worker === 'undefined' ? null : createWorker();
+  const isWorkerUnavailable = typeof window === 'undefined' || typeof Worker === 'undefined';
+  worker = isWorkerUnavailable ? null : createWorker();
   return worker;
 };
 

@@ -24,7 +24,10 @@ export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellI
 
       const keyPressed = event.key;
 
-      if (keyPressed === 'Enter' || keyPressed === ' ') {
+      const isSelectKey = keyPressed === 'Enter' || keyPressed === ' ';
+      const isEraseKey = keyPressed === 'Backspace' || keyPressed === 'Delete';
+
+      if (isSelectKey) {
         event.preventDefault();
         onSelect(row, col);
       }
@@ -38,7 +41,7 @@ export const useCellInteraction = ({ row, col, onSelect, timerActive }: UseCellI
         }, 0);
       }
 
-      if (keyPressed === 'Backspace' || keyPressed === 'Delete') {
+      if (isEraseKey) {
         event.preventDefault();
         event.stopPropagation();
         onSelect(row, col);

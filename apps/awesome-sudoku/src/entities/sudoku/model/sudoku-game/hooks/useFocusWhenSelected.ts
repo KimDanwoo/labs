@@ -5,11 +5,13 @@ export const useFocusWhenSelected = (isSelected: boolean) => {
 
   useEffect(() => {
     const cell = cellRef.current;
-    if (!isSelected || !cell) return;
+    if (!isSelected) return;
+    if (!cell) return;
     const active = document.activeElement;
     const isFocusInBoard =
       active instanceof HTMLElement && active.closest('[role="grid"]') === cell.closest('[role="grid"]');
-    if (isFocusInBoard && active !== cell) cell.focus();
+    const shouldMoveFocus = isFocusInBoard && active !== cell;
+    if (shouldMoveFocus) cell.focus();
   }, [isSelected]);
 
   return cellRef;

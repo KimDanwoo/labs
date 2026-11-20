@@ -41,7 +41,6 @@ export const fillCellAtom = atom(null, (get, set, value: number | null) => {
 
   const solution = get(solutionAtom);
 
-  // 퍼즐은 유일해라 정답과 다른 값은 곧 오답이다 — 킬러의 케이지 규칙 위반까지 한 기준으로 잡힌다.
   const isMistake = value !== null && value !== cellAt(solution, row, col);
 
   if (isMistake) {
@@ -88,7 +87,8 @@ export const toggleNoteAtom = atom(null, (get, set, value: number) => {
   const { row, col } = selectedCell;
   const cell = cellAt(board, row, col);
 
-  if (cell.isInitial || cell.value !== null) return;
+  const isNoteBlocked = cell.isInitial || cell.value !== null;
+  if (isNoteBlocked) return;
 
   const currentNotes = cell.notes;
   const noteIndex = currentNotes.indexOf(value);

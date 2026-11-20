@@ -75,7 +75,8 @@ describe('update.ts 유틸리티 함수 테스트', () => {
 
       for (let row = 0; row < BOARD_SIZE; row++) {
         for (let col = 0; col < BOARD_SIZE; col++) {
-          if (row !== 2 || col !== 3) {
+          const isSelectedCell = row === 2 && col === 3;
+          if (!isSelectedCell) {
             expect(cellAt(updatedBoard, row, col).isSelected).toBe(false);
           }
         }

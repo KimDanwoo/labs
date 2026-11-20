@@ -22,7 +22,6 @@ const EASY_PUZZLE = parse([
   '..5.1.3..',
 ]);
 
-/** AI Escargot — 사람 기법(싱글·락드·서브셋)으로는 완주가 안 되는 판 */
 const ESCARGOT = parse([
   '1....7.9.',
   '.3..2...8',
@@ -129,12 +128,14 @@ describe('solveLogically 건전성', () => {
 });
 
 describe('킬러 해 개수 교차 검증', () => {
-  /** 독립 구현: 클래식 해를 전부 열거한 뒤 케이지 규칙으로 걸러 센다 */
   const bruteForceKillerCount = (grid: Grid, cages: KillerCage[]): number => {
     const g = grid.map((row) => [...row]);
     const solutions: Grid[] = [];
     const canPlace = (r: number, c: number, v: number): boolean => {
-      for (let i = 0; i < 9; i++) if (cellAt(g, r, i) === v || cellAt(g, i, c) === v) return false;
+      for (let i = 0; i < 9; i++) {
+        const isUsedInLine = cellAt(g, r, i) === v || cellAt(g, i, c) === v;
+        if (isUsedInLine) return false;
+      }
       const br = r - (r % 3);
       const bc = c - (c % 3);
       for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (cellAt(g, br + i, bc + j) === v) return false;

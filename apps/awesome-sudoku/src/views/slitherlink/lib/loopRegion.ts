@@ -43,7 +43,8 @@ const outsideReachesBorder = (region: readonly boolean[], size: number): boolean
   const stack = [...reached];
   for (let cell = stack.pop(); cell !== undefined; cell = stack.pop()) {
     for (const next of neighborsOf(size, cell)) {
-      if (itemAt(region, next) || reached.has(next)) continue;
+      const isInsideOrReached = itemAt(region, next) || reached.has(next);
+      if (isInsideOrReached) continue;
       reached.add(next);
       stack.push(next);
     }
@@ -57,10 +58,11 @@ const canGrowInto = (region: readonly boolean[], size: number, cell: number): bo
   return !touchesItselfAtCorner(grown, size, cell) && outsideReachesBorder(grown, size);
 };
 
+const isFrontierCell = (region: readonly boolean[], size: number, cell: number): boolean =>
+  !itemAt(region, cell) && neighborsOf(size, cell).some((next) => itemAt(region, next));
+
 const frontierOf = (region: readonly boolean[], size: number): number[] =>
-  region.flatMap((inside, cell) =>
-    !inside && neighborsOf(size, cell).some((next) => itemAt(region, next)) ? [cell] : [],
-  );
+  region.flatMap((_, cell) => (isFrontierCell(region, size, cell) ? [cell] : []));
 
 const insideNeighborCount = (region: readonly boolean[], size: number, cell: number): number =>
   neighborsOf(size, cell).filter((next) => itemAt(region, next)).length;

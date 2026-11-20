@@ -24,7 +24,8 @@ export function useFocusTrap({ containerRef, isActive, onEscape }: UseFocusTrapO
       const focusable = containerRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE);
       const first = focusable?.[0];
       const last = focusable?.[focusable.length - 1];
-      if (!first || !last) return;
+      if (!first) return;
+      if (!last) return;
 
       const [edge, wrapTo] = event.shiftKey ? [first, last] : [last, first];
       if (document.activeElement !== edge) return;

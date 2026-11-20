@@ -271,7 +271,8 @@ describe('validator.ts 테스트', () => {
         let cageId = 3;
         for (let row = 0; row < 9; row++) {
           for (let col = 0; col < 9; col++) {
-            if (!((row === 0 && (col === 0 || col === 1)) || (row === 1 && (col === 0 || col === 1)))) {
+            const isInFirstCage = row <= 1 && col <= 1;
+            if (!isInFirstCage) {
               const value = cellAt(board, row, col).value!;
               cages.push(createMockKillerCage(cageId++, [[row, col]], value));
             }

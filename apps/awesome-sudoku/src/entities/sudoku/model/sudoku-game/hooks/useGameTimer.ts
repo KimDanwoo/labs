@@ -21,7 +21,8 @@ export function useGameTimer() {
   const toggleTimer = useSetAtom(toggleTimerAtom);
 
   useEffect(() => {
-    if (!timerActive || isCompleted) return undefined;
+    const isTicking = timerActive && !isCompleted;
+    if (!isTicking) return undefined;
     let last = Date.now();
     let carryMs = 0;
     const id = setInterval(() => {

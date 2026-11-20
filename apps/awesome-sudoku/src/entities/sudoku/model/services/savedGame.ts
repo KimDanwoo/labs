@@ -40,7 +40,8 @@ export const isBoardPosition = (position: unknown): position is Position =>
   isBoardIndex(position.col);
 
 export function isRestorableGame({ board, solution, gameMode, cages }: SavedGame): boolean {
-  if (!isGridOf(board, isCell) || !isGridOf(solution, isDigit)) return false;
+  if (!isGridOf(board, isCell)) return false;
+  if (!isGridOf(solution, isDigit)) return false;
   if (!Array.isArray(cages)) return false;
   const isKillerBoard = cages.length > 0;
   if (isKillerBoard !== (gameMode === GAME_MODE.KILLER)) return false;

@@ -37,7 +37,8 @@ function isConnected(cells: GridPosition[]): boolean {
   for (const [row, col] of queue) {
     for (const [dr, dc] of NEIGHBORS) {
       const next: GridPosition = [row + dr, col + dc];
-      if (!inCage.has(keyOf(next)) || seen.has(keyOf(next))) continue;
+      const isOutsideOrVisited = !inCage.has(keyOf(next)) || seen.has(keyOf(next));
+      if (isOutsideOrVisited) continue;
       seen.add(keyOf(next));
       queue.push(next);
     }

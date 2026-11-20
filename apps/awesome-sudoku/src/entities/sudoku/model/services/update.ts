@@ -83,7 +83,8 @@ interface HighlightSelection {
 }
 
 function isRelatedCell(r: number, c: number, { row, col }: HighlightSelection): boolean {
-  if (r === row || c === col) return true;
+  const isSameLine = r === row || c === col;
+  if (isSameLine) return true;
   return (
     Math.floor(r / BLOCK_SIZE) === Math.floor(row / BLOCK_SIZE) &&
     Math.floor(c / BLOCK_SIZE) === Math.floor(col / BLOCK_SIZE)
@@ -137,7 +138,9 @@ export function clearHighlights(previousHighlights?: Record<string, CellHighligh
       const key = `${r}-${c}`;
       const prevHighlight = previousHighlights?.[key];
 
-      if (prevHighlight && !prevHighlight.selected && !prevHighlight.related && !prevHighlight.sameValue) {
+      const isUntouchedHighlight =
+        prevHighlight !== undefined && !prevHighlight.selected && !prevHighlight.related && !prevHighlight.sameValue;
+      if (isUntouchedHighlight) {
         nextHighlights[key] = prevHighlight;
       } else {
         nextHighlights[key] = {
@@ -176,15 +179,13 @@ export function validateBoard(
   return markWrongValues(ruleChecked, solution);
 }
 
-/**
- * @description 게임 완료 상태 확인 — validateBoard를 거친 보드여야 한다(충돌 표시가 정답 판정의 근거).
- * @param {SudokuBoard} board - 충돌 검사된 보드
- * @param {GameMode} gameMode - 게임 모드
- * @param {KillerCage[]} cages - 케이지 배열
- * @returns {GameCompletionResult} 게임 완료 결과
- */
-export function checkGameCompletion(board: SudokuBoard, gameMode: GameMode, cages: KillerCage[]): GameCompletionResult {
-  const completed = gameMode === GAME_MODE.KILLER ? isKillerBoardComplete(board, cages) : isBoardComplete(board);
+export function checkGameCompletion(
+  validatedBoard: SudokuBoard,
+  gameMode: GameMode,
+  cages: KillerCage[],
+): GameCompletionResult {
+  const completed =
+    gameMode === GAME_MODE.KILLER ? isKillerBoardComplete(validatedBoard, cages) : isBoardComplete(validatedBoard);
 
-  return { completed, success: completed, board };
+  return { completed, success: completed, board: validatedBoard };
 }

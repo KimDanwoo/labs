@@ -23,6 +23,8 @@ vi.mock('@entities/sudoku/lib/puzzleService', () => ({ requestPuzzle: vi.fn() })
 
 const requestPuzzleMock = vi.mocked(requestPuzzle);
 
+const isTopLeft = (row: number, col: number): boolean => row === 0 && col === 0;
+
 const board = (edit: Partial<SudokuBoard[number][number]> = {}): SudokuBoard =>
   Array.from({ length: 9 }, (_, row) =>
     Array.from({ length: 9 }, (_, col) => ({
@@ -32,7 +34,7 @@ const board = (edit: Partial<SudokuBoard[number][number]> = {}): SudokuBoard =>
       isConflict: false,
       isHint: false,
       notes: [],
-      ...(row === 0 && col === 0 ? edit : {}),
+      ...(isTopLeft(row, col) ? edit : {}),
     })),
   );
 

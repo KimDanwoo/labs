@@ -23,6 +23,24 @@ const FISH_ORIENTATIONS = [
 
 const CELL_INDEXES = Array.from({ length: SUDOKU_CELL_COUNT }, (_, i) => i);
 
+const paintCluster = (start: number, links: Map<number, number[]>, color: Map<number, number>): number[] => {
+  const cluster: number[] = [];
+  const stack = [start];
+  color.set(start, 0);
+  while (stack.length > 0) {
+    const i = stack.pop()!;
+    cluster.push(i);
+    for (const j of links.get(i)!) {
+      if (color.has(j)) continue;
+      color.set(j, 1 - color.get(i)!);
+      stack.push(j);
+    }
+  }
+  return cluster;
+};
+
+const seesAny = (i: number, group: number[]): boolean => group.some((j) => PEERS[i]!.includes(j));
+
 export function createAdvancedTechniques({ cells, cands, openSpots, eliminate, hasCandidate }: LogicBoard) {
   const eliminateFish = (chosen: FishLine[], covers: readonly number[][], d: number): boolean => {
     const coverIndexes = new Set(chosen.flatMap(({ line, spots }) => spots.map((i) => line.indexOf(i))));
@@ -67,7 +85,8 @@ export function createAdvancedTechniques({ cells, cands, openSpots, eliminate, h
         const b = atIndex(pair, 1);
         const sharedZ = atIndex(cands, a)! & atIndex(cands, b)! & ~cands[pivot]!;
         const coversPivot = ((atIndex(cands, a)! | atIndex(cands, b)!) & cands[pivot]!) === cands[pivot]!;
-        if (popcount(sharedZ) !== 1 || !coversPivot) continue;
+        const isWing = popcount(sharedZ) === 1 && coversPivot;
+        if (!isWing) continue;
         const targets = atIndex(PEERS, a)!.filter((i) => i !== b && i !== pivot && atIndex(PEERS, b)!.includes(i));
         progressed = eliminate(targets, sharedZ) || progressed;
       }
@@ -78,7 +97,8 @@ export function createAdvancedTechniques({ cells, cands, openSpots, eliminate, h
   const xyzWing = (): boolean => {
     let progressed = false;
     for (let pivot = 0; pivot < SUDOKU_CELL_COUNT; pivot++) {
-      if (cells[pivot] !== EMPTY || popcount(cands[pivot]!) !== 3) continue;
+      const isTriplePivot = cells[pivot] === EMPTY && popcount(cands[pivot]!) === 3;
+      if (!isTriplePivot) continue;
       const wings = PEERS[pivot]!.filter(
         (i) => cells[i] === EMPTY && popcount(cands[i]!) === 2 && (cands[i]! & cands[pivot]!) === cands[i]!,
       );
@@ -86,7 +106,8 @@ export function createAdvancedTechniques({ cells, cands, openSpots, eliminate, h
         const a = atIndex(pair, 0);
         const b = atIndex(pair, 1);
         const sharedZ = atIndex(cands, a)! & atIndex(cands, b)!;
-        if (popcount(sharedZ) !== 1 || (atIndex(cands, a)! | atIndex(cands, b)!) !== cands[pivot]!) continue;
+        const isXyzWing = popcount(sharedZ) === 1 && (atIndex(cands, a)! | atIndex(cands, b)!) === cands[pivot]!;
+        if (!isXyzWing) continue;
         const targets = PEERS[pivot]!.filter(
           (i) => i !== a && i !== b && atIndex(PEERS, a)!.includes(i) && atIndex(PEERS, b)!.includes(i),
         );
@@ -107,24 +128,6 @@ export function createAdvancedTechniques({ cells, cands, openSpots, eliminate, h
     }
     return links;
   };
-
-  const paintCluster = (start: number, links: Map<number, number[]>, color: Map<number, number>): number[] => {
-    const cluster: number[] = [];
-    const stack = [start];
-    color.set(start, 0);
-    while (stack.length > 0) {
-      const i = stack.pop()!;
-      cluster.push(i);
-      for (const j of links.get(i)!) {
-        if (color.has(j)) continue;
-        color.set(j, 1 - color.get(i)!);
-        stack.push(j);
-      }
-    }
-    return cluster;
-  };
-
-  const seesAny = (i: number, group: number[]): boolean => group.some((j) => PEERS[i]!.includes(j));
 
   const eliminateByColors = (cluster: number[], color: Map<number, number>, d: number): boolean => {
     const byColor = [cluster.filter((i) => color.get(i) === 0), cluster.filter((i) => color.get(i) === 1)];

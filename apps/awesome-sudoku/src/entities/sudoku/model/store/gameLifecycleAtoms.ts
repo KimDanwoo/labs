@@ -27,19 +27,18 @@ import { toggleTimerAtom } from '@entities/sudoku/model/store/timerAtoms';
 import type { Difficulty } from '@entities/sudoku/model/types/game';
 import { atom } from 'jotai';
 
-/** 마지막 요청만 반영한다 — 생성 중에 난이도를 연타하면 먼저 도착한 옛 판이 새 판을 덮어쓴다 */
-let latestRequest = 0;
+let latestRequestId = 0;
 
 export const initializeGameAtom = atom(null, async (get, set, difficulty: Difficulty = GAME_LEVEL.MEDIUM) => {
   const gameMode = get(gameModeAtom);
-  const requestId = ++latestRequest;
+  const requestId = ++latestRequestId;
   set(isGeneratingAtom, true);
 
   const { solution, board, cages } = await requestPuzzle(gameMode, difficulty).catch((error: unknown) => {
-    if (requestId === latestRequest) set(isGeneratingAtom, false);
+    if (requestId === latestRequestId) set(isGeneratingAtom, false);
     throw error;
   });
-  if (requestId !== latestRequest) return;
+  if (requestId !== latestRequestId) return;
 
   set(boardAtom, board);
   set(clearHistoryAtom);
@@ -71,7 +70,8 @@ export const resumeOrStartGameAtom = atom(null, async (get, set) => {
     cages: get(cagesAtom),
   };
   const isFinishedOnLastVisit = !get(isGameReadyAtom) && get(isCompletedAtom);
-  if (isFinishedOnLastVisit || !isRestorableGame(savedGame)) {
+  const shouldStartNewGame = isFinishedOnLastVisit || !isRestorableGame(savedGame);
+  if (shouldStartNewGame) {
     await set(initializeGameAtom, GAME_LEVEL.MEDIUM);
     return;
   }
@@ -89,7 +89,7 @@ export const resumeOrStartGameAtom = atom(null, async (get, set) => {
 });
 
 export const cancelPendingGenerationAtom = atom(null, (_get, set) => {
-  latestRequest += 1;
+  latestRequestId += 1;
   set(isGeneratingAtom, false);
 });
 

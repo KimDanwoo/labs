@@ -22,7 +22,8 @@ const isContiguous = (cells: GridPosition[]): boolean => {
   while (stack.length > 0) {
     const [r, c] = stack.pop()!;
     const key = `${r}-${c}`;
-    if (seen.has(key) || !keys.has(key)) continue;
+    const isVisitedOrOutside = seen.has(key) || !keys.has(key);
+    if (isVisitedOrOutside) continue;
     seen.add(key);
     stack.push([r + 1, c], [r - 1, c], [r, c + 1], [r, c - 1]);
   }
@@ -106,7 +107,6 @@ describe('generateKillerCages', () => {
   });
 });
 
-/** expert는 SUBSET 이상만 찾느라 최대 10판을 만든다 — 단독 0.6~0.8초, 빌드·lint와 동시에 돌면 8초까지 늘어난다 */
 const KILLER_GENERATION_TIMEOUT_MS = 30_000;
 
 describe('generateKillerBoard', () => {
