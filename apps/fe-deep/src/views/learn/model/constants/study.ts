@@ -6,7 +6,6 @@ export type StudyPhase = keyof typeof PHASE;
 export const STUDY_ORDER = { sequential: 'sequential', random: 'random' } as const;
 export type StudyOrder = keyof typeof STUDY_ORDER;
 
-/** 카테고리를 고르지 않은 상태. 카테고리 slug와 겹치지 않는 값이다. */
 export const ALL_CATEGORIES = 'all';
 
 export type StudySettings = {

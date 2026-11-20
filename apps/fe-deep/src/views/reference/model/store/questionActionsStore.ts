@@ -6,15 +6,9 @@ type QuestionActionState = {
   status: ProgressStatus | undefined;
 };
 
-/**
- * 질문 id별 북마크·진도 상태를 공유하는 외부 스토어.
- * 같은 id를 구독하는 여러 컴포넌트(헤더 완료 표시 · 액션 버튼)가 항상 동기화되도록,
- * 스냅샷 객체는 변경 시에만 새 참조로 교체한다(useSyncExternalStore 요구사항).
- */
 const cache = new Map<string, QuestionActionState>();
 const listeners = new Map<string, Set<() => void>>();
 
-/** SSR 스냅샷 — 서버에는 localStorage가 없으므로 항상 동일 참조를 반환한다. */
 export const SERVER_SNAPSHOT: QuestionActionState = { isBookmarked: false, status: undefined };
 
 function getState(questionId: string): QuestionActionState {
@@ -32,8 +26,7 @@ function emit(questionId: string) {
   listeners.get(questionId)?.forEach((listener) => listener());
 }
 
-/** 보는 컴포넌트가 없어진 질문은 잊는다 — 다른 화면(학습·북마크 목록)에서 바뀐 값을 다음에 저장소에서 다시 읽는다. */
-function forget(questionId: string) {
+function dropUnwatchedQuestion(questionId: string) {
   listeners.delete(questionId);
   cache.delete(questionId);
 }
@@ -47,7 +40,7 @@ export function subscribe(questionId: string, listener: () => void) {
   set.add(listener);
   return () => {
     set.delete(listener);
-    if (set.size === 0) forget(questionId);
+    if (set.size === 0) dropUnwatchedQuestion(questionId);
   };
 }
 

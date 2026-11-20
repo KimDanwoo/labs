@@ -12,7 +12,8 @@ interface YearGrid {
 }
 
 function toCell(cursor: Date, start: Date, end: Date, today: Date, heatmap: Record<string, number>): HeatmapCell {
-  if (cursor < start || cursor > end) return { kind: CELL_KIND.outside };
+  const isOutsideYear = cursor < start || cursor > end;
+  if (isOutsideYear) return { kind: CELL_KIND.outside };
   if (cursor > today) return { kind: CELL_KIND.future };
   const date = localDateKey(cursor);
   return { kind: CELL_KIND.day, date, count: heatmap[date] ?? 0 };
@@ -33,7 +34,8 @@ export function buildYearGrid(year: number, heatmap: Record<string, number>, tod
     for (let dayIndex = 0; dayIndex < DAYS_PER_WEEK; dayIndex++) {
       const isInYear = cursor >= start && cursor <= end;
       const month = cursor.getMonth();
-      if (isInYear && !seenMonths.has(month)) {
+      const isNewMonthInYear = isInYear && !seenMonths.has(month);
+      if (isNewMonthInYear) {
         seenMonths.add(month);
         monthLabelByWeek.set(weeks.length, MONTH_LABELS[month] ?? '');
       }

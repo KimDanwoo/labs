@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 
 import { CARD_SLIDE_MOTION } from '@views/learn/config/motion';
 import { useStudySessionContext } from '@views/learn/model/hooks/useStudySessionContext';
-import { StudySessionContext } from '@views/learn/model/store/studySessionContext';
+import { SessionSnapshotProvider } from '@views/learn/ui/session/SessionSnapshotProvider';
 
 interface StudySessionCardProps {
   children: ReactNode;
@@ -18,10 +18,9 @@ export function StudySessionCard({ children }: StudySessionCardProps) {
   return (
     <AnimatePresence mode="wait">
       <motion.div key={`${session.currentIndex}-${session.stepIndex}`} {...CARD_SLIDE_MOTION}>
-        {/* AnimatePresence keeps the leaving card's element as rendered, so this provider pins its step while it exits. */}
-        <StudySessionContext.Provider value={session}>
+        <SessionSnapshotProvider session={session}>
           <Card className="min-h-[300px] p-6 relative shadow-sm">{children}</Card>
-        </StudySessionContext.Provider>
+        </SessionSnapshotProvider>
       </motion.div>
     </AnimatePresence>
   );

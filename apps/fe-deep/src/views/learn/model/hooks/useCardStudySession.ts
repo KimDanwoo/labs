@@ -70,7 +70,8 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
   }, [currentIndex, questions.length, onComplete]);
 
   const handleNext = useCallback(() => {
-    if (!currentQuestion || isAdvancingRef.current) return;
+    if (!currentQuestion) return;
+    if (isAdvancingRef.current) return;
 
     if (stepIndex + 1 < stepCount) {
       setStepIndex((i) => i + 1);
@@ -85,7 +86,8 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
   }, [currentQuestion, stepIndex, stepCount, advance]);
 
   const handleSkip = useCallback(() => {
-    if (!currentQuestion || isAdvancingRef.current) return;
+    if (!currentQuestion) return;
+    if (isAdvancingRef.current) return;
     isAdvancingRef.current = true;
     advance();
   }, [currentQuestion, advance]);
@@ -101,8 +103,10 @@ export function useCardStudySession({ questions, phase, onComplete }: UseCardStu
     if (phase !== PHASE.study) return undefined;
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
-      if (e.key !== ' ' && e.key !== 'Enter') return;
+      const isTypingInField = e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement;
+      const isAdvanceKey = e.key === ' ' || e.key === 'Enter';
+      if (isTypingInField) return;
+      if (!isAdvanceKey) return;
 
       e.preventDefault();
       if (isFlipped) handleNext();

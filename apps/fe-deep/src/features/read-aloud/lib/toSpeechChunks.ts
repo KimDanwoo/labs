@@ -1,5 +1,4 @@
-/** 브라우저 TTS가 한 번에 안정적으로 읽는 길이. 크롬은 긴 발화를 도중에 끊는다. */
-const CHUNK_LIMIT = 180;
+const CHROME_SAFE_UTTERANCE_LENGTH = 180;
 
 function toSpeechText(markdown: string): string {
   return markdown
@@ -21,15 +20,14 @@ function toSpeechText(markdown: string): string {
     .trim();
 }
 
-/** 문장 단위로 잘라 CHUNK_LIMIT 안에서 다시 뭉친다. 짧은 발화로 나눠야 크롬이 중간에 끊지 않는다. */
 export function toSpeechChunks(markdown: string): string[] {
-  // ponytail: 마침표 없이 CHUNK_LIMIT을 넘는 한 문장은 그대로 둔다. 실제로 잘리면 쉼표 기준 분할 추가.
   const sentences = toSpeechText(markdown).match(/[^.!?。]+[.!?。]*\s*/g) ?? [];
 
   return sentences
     .reduce<string[]>((chunks, sentence) => {
       const last = chunks[chunks.length - 1];
-      if (last && last.length + sentence.length <= CHUNK_LIMIT) {
+      const canJoinLast = last !== undefined && last.length + sentence.length <= CHROME_SAFE_UTTERANCE_LENGTH;
+      if (canJoinLast) {
         chunks[chunks.length - 1] = last + sentence;
         return chunks;
       }

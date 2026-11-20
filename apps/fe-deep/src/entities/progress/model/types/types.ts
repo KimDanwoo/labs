@@ -8,7 +8,6 @@ export interface UserProgress {
   correct_count: number;
   wrong_count: number;
   last_reviewed: string;
-  /** SM-2 easiness factor (1.3 이상, 초기값 2.5) */
   easiness_factor: number;
   interval: number;
   repetition: number;

@@ -13,7 +13,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function numberOr(value: unknown, fallback: number): number {
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+  const isFiniteNumber = typeof value === 'number' && Number.isFinite(value);
+  return isFiniteNumber ? value : fallback;
 }
 
 function stringOr(value: unknown, fallback: string): string {

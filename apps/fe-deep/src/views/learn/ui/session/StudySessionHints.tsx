@@ -5,6 +5,8 @@ export function StudySessionHints() {
   const { content, isFlipped, recallInput } = useStudySessionContext();
   const hasAnsweredRecall = isFlipped && Boolean(recallInput.trim());
 
-  if (content.keywords.length === 0 || hasAnsweredRecall) return null;
+  const shouldHideHints = content.keywords.length === 0 || hasAnsweredRecall;
+
+  if (shouldHideHints) return null;
   return <KeywordHints keywords={content.keywords} />;
 }

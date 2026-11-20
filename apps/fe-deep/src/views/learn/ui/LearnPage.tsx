@@ -10,7 +10,9 @@ import { StudySetup } from '@views/learn/ui/setup/studySetup';
 export function LearnPage() {
   const flow = useLearnFlow();
 
-  if (flow.phase === PHASE.setup || flow.phase === PHASE.loading) {
+  const isPreparing = flow.phase === PHASE.setup || flow.phase === PHASE.loading;
+
+  if (isPreparing) {
     return (
       <StudySetup.Root setup={flow.setup}>
         <StudySetup.Intro />
