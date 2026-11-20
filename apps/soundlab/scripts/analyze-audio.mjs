@@ -115,12 +115,24 @@ function pickMaster(entry) {
   return { measured, best: usable[0] };
 }
 
-for (const entry of candidates.values()) {
+function describeBeat(report) {
+  const percent = (report.confidence * 100).toFixed(0);
+  if (report.beats > 0) return `비트 ${report.bpm.toFixed(1)}BPM ÷${report.subdivision} ${report.beats}개(신뢰도 ${percent}%)`;
+  return `비트 없음(신뢰도 ${percent}% < ${GRID_MIN_CONFIDENCE * 100}%)`;
+}
+
+function removeStaleSignal(track) {
+  // 낡은 신호가 남아 있으면 틀린 박에 계속 뛴다. 지운다.
+  const stale = join(OUT_DIR, `${track.id}.json`);
+  if (existsSync(stale)) unlinkSync(stale);
+}
+
+function processEntry(entry) {
   const track = entry.track;
   const { measured, best } = pickMaster(entry);
   if (!best) {
     mismatched.push({ title: track.title, drift: Number.NaN, tried: measured.map((m) => m.name) });
-    continue;
+    return;
   }
   const name = best.name;
   const others = measured.length > 1 ? `  (후보 ${measured.length}개 중 길이가 맞는 것)` : '';
@@ -128,22 +140,18 @@ for (const entry of candidates.values()) {
     const { payload, report, mismatch } = analyze(name, track);
     if (mismatch !== undefined) {
       mismatched.push({ title: track.title, drift: mismatch, tried: measured.map((m) => basename(m.name)) });
-      // 낡은 신호가 남아 있으면 틀린 박에 계속 뛴다. 지운다.
-      const stale = join(OUT_DIR, `${track.id}.json`);
-      if (existsSync(stale)) unlinkSync(stale);
-      continue;
+      removeStaleSignal(track);
+      return;
     }
     writeFileSync(join(OUT_DIR, `${track.id}.json`), JSON.stringify(payload));
     const size = (JSON.stringify(payload).length / 1024).toFixed(0);
-    const beat =
-      report.beats > 0
-        ? `비트 ${report.bpm.toFixed(1)}BPM ÷${report.subdivision} ${report.beats}개(신뢰도 ${(report.confidence * 100).toFixed(0)}%)`
-        : `비트 없음(신뢰도 ${(report.confidence * 100).toFixed(0)}% < ${GRID_MIN_CONFIDENCE * 100}%)`;
-    console.log(`✓ ${track.title} — ${report.frames}프레임 ${size}KB, 온셋 ${report.onsets}개, ${beat}${others}`);
+    console.log(`✓ ${track.title} — ${report.frames}프레임 ${size}KB, 온셋 ${report.onsets}개, ${describeBeat(report)}${others}`);
   } catch (error) {
     console.error(`✗ ${basename(name)}: ${error.message}`);
   }
 }
+
+for (const entry of candidates.values()) processEntry(entry);
 
 if (existsSync(TMP)) unlinkSync(TMP);
 

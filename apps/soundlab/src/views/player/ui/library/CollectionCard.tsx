@@ -3,6 +3,7 @@ import { Button } from '@shared/ui/Button';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX } from 'react';
 import type { Collection } from '../../config/collections';
+import { MS_PER_MINUTE } from '../../config/time';
 import { collectionFilterAtom, LIBRARY_FILTER, libraryFilterAtom, searchAtom } from '../../model/browse';
 import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
 
@@ -17,7 +18,7 @@ export function CollectionCard({ collection }: Props): JSX.Element {
     TRACKS.some((track) => track.id === id && track.isAvailable !== false),
   );
   const minutes = Math.round(
-    TRACKS.filter((track) => ids.includes(track.id)).reduce((sum, track) => sum + track.durationMs, 0) / 60_000,
+    TRACKS.filter((track) => ids.includes(track.id)).reduce((sum, track) => sum + track.durationMs, 0) / MS_PER_MINUTE,
   );
   const handleBrowse = () => {
     setCollection(selected === collection.id ? null : collection.id);

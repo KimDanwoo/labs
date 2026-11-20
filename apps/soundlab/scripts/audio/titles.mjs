@@ -28,6 +28,9 @@ export const titleKey = (value) =>
     .replace(/[\s_\-–—.,!?'"·]/g, '');
 
 /** 같은 곡의 파일이 여럿이고 길이도 같을 때의 우선순위. 리마스터를 올렸다는 게 사용자의 규칙이다. */
-export const versionRank = (stem) =>
-  /remaster|리마스터/i.test(stem) ? 2 : /v\d|verson|version|\d$/i.test(stem) ? 1 : 0;
+export const versionRank = (stem) => {
+  if (/remaster|리마스터/i.test(stem)) return 2;
+  if (/v\d|verson|version|\d$/i.test(stem)) return 1;
+  return 0;
+};
 export const DRIFT_TIE_MS = 150;

@@ -6,6 +6,30 @@ import { LISTEN_STEP_LIMIT_MS, SAVE_INTERVAL_MS, SESSION_EVENT_LIMIT } from '../
 import { LISTEN_SOURCE, recordListeningAtom, recordSessionAtom, SESSION_EVENT } from '../library';
 import type { PlaybackQueue } from '../queue';
 
+interface PendingListening {
+  id: number;
+  ms: number;
+  position: number;
+  at: number;
+}
+
+function isPlausibleListenStep(elapsed: number, wall: number): boolean {
+  return elapsed > 0 && elapsed < LISTEN_STEP_LIMIT_MS && wall > 0 && wall < LISTEN_STEP_LIMIT_MS;
+}
+
+function isNewSessionTrack(currentId: number, position: number, isPlaying: boolean, seen: Set<number>): boolean {
+  return isPlaying && currentId > 0 && position > 0 && !seen.has(currentId);
+}
+
+function accumulate(pending: PendingListening, currentId: number, position: number, now: number): void {
+  const elapsed = position - pending.position;
+  const wall = now - pending.at;
+  if (pending.id === currentId && isPlausibleListenStep(elapsed, wall)) pending.ms += Math.min(elapsed, wall);
+  pending.id = currentId;
+  pending.position = position;
+  pending.at = now;
+}
+
 export function useListeningLog(queue: RefObject<PlaybackQueue | null>) {
   const recordListening = useSetAtom(recordListeningAtom);
   const recordSession = useSetAtom(recordSessionAtom);
@@ -36,7 +60,7 @@ export function useListeningLog(queue: RefObject<PlaybackQueue | null>) {
     (currentId: number, position: number, isPlaying: boolean) => {
       const pending = listening.current;
       const now = performance.now();
-      if (isPlaying && currentId > 0 && position > 0 && !sessionTracks.current.has(currentId)) {
+      if (isNewSessionTrack(currentId, position, isPlaying, sessionTracks.current)) {
         if (sessionTracks.current.size < SESSION_EVENT_LIMIT)
           recordSession({
             kind: sessionTracks.current.size === 0 ? SESSION_EVENT.firstPlay : SESSION_EVENT.continued,
@@ -44,13 +68,7 @@ export function useListeningLog(queue: RefObject<PlaybackQueue | null>) {
           });
         sessionTracks.current.add(currentId);
       }
-      const elapsed = position - pending.position;
-      const wall = now - pending.at;
-      const isPlausibleStep = elapsed > 0 && elapsed < LISTEN_STEP_LIMIT_MS && wall > 0 && wall < LISTEN_STEP_LIMIT_MS;
-      if (pending.id === currentId && isPlausibleStep) pending.ms += Math.min(elapsed, wall);
-      pending.id = currentId;
-      pending.position = position;
-      pending.at = now;
+      accumulate(pending, currentId, position, now);
       if (pending.ms >= SAVE_INTERVAL_MS) flush();
     },
     [flush, recordSession],

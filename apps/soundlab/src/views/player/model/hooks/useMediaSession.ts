@@ -3,6 +3,7 @@
 import { artworkUrl, type ArtworkSize, type Track } from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
 import { useEffect, useRef } from 'react';
+import { MS_PER_SECOND } from '../../config/time';
 import { frameState } from '../store/playback';
 import type { Playback } from './usePlayback';
 
@@ -64,7 +65,7 @@ export function useMediaSession(track: Track | undefined, isPlaying: boolean, pl
         'seekto',
         ({ seekTime }) => {
           if (seekTime === undefined || frameState.durationMs <= 0) return;
-          seek((seekTime * 1000) / frameState.durationMs);
+          seek((seekTime * MS_PER_SECOND) / frameState.durationMs);
         },
       ],
     ];
@@ -81,7 +82,7 @@ export function useMediaSession(track: Track | undefined, isPlaying: boolean, pl
     if (sincePosition.current < POSITION_INTERVAL_MS) return;
     sincePosition.current = 0;
 
-    const duration = frameState.durationMs / 1000;
+    const duration = frameState.durationMs / MS_PER_SECOND;
     // 음수·NaN이거나 position이 duration을 넘으면 setPositionState가 던진다. 공유 rAF 루프가 거기서 끊긴다.
     if (!Number.isFinite(duration) || duration <= 0) return;
     navigator.mediaSession.setPositionState({

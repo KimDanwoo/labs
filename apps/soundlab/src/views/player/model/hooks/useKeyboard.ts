@@ -5,52 +5,68 @@ import type { Playback } from './usePlayback';
 
 /** 방향키만 10초다. YouTube 원본은 5초이고 10초는 J/L. */
 const SEEK_SEC = 10;
+const DIGIT_SEEK_DIVISOR = 10;
+const IGNORED_TARGET_SELECTOR = 'input, textarea, select, [role=slider], [role=menu]';
+const DIGIT_PATTERN = /^[0-9]$/;
+
+function hasModifier(event: KeyboardEvent): boolean {
+  return event.metaKey || event.ctrlKey || event.altKey || event.isComposing;
+}
+
+function isIgnoredTarget(target: EventTarget | null): boolean {
+  return (
+    target instanceof HTMLElement && (target.isContentEditable || target.closest(IGNORED_TARGET_SELECTOR) !== null)
+  );
+}
+
+function normalizeKey(event: KeyboardEvent): string {
+  return event.key.length === 1 ? event.key.toLowerCase() : event.key;
+}
 
 export function useKeyboard({ toggle, step, seek, seekBy }: Playback) {
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.metaKey || event.ctrlKey || event.altKey || event.isComposing) return;
-      const target = event.target;
-      if (
-        target instanceof HTMLElement &&
-        (target.isContentEditable || target.closest('input, textarea, select, [role=slider], [role=menu]'))
-      )
+    const runShortcut = (event: KeyboardEvent, key: string): void => {
+      const seekActions: Record<string, () => void> = {
+        ArrowRight: () => seekBy(SEEK_SEC),
+        ArrowLeft: () => seekBy(-SEEK_SEC),
+        Home: () => seek(0),
+        End: () => seek(1),
+      };
+      const keyActions: Record<string, () => void> = {
+        l: () => seekBy(SEEK_SEC),
+        j: () => seekBy(-SEEK_SEC),
+      };
+      const shiftKeyActions: Record<string, () => void> = {
+        n: () => step(1),
+        p: () => step(-1),
+      };
+
+      const codeAction = seekActions[event.code];
+      if (codeAction) {
+        if (event.code.startsWith('Arrow')) event.preventDefault();
+        codeAction();
         return;
-      // 버튼에 포커스가 있으면 Space는 브라우저가 클릭으로 처리한다. 이중 발동을 막는다.
-      const onButton = event.target instanceof HTMLButtonElement;
-      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      }
+      const action = keyActions[key] ?? (event.shiftKey ? shiftKeyActions[key] : undefined);
+      if (action) {
+        action();
+        return;
+      }
+      if (DIGIT_PATTERN.test(key)) seek(Number(key) / DIGIT_SEEK_DIVISOR);
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (hasModifier(event) || isIgnoredTarget(event.target)) return;
+      const key = normalizeKey(event);
 
       if (event.code === 'Space' || key === 'k') {
-        if (onButton && event.code === 'Space') return;
+        // 버튼에 포커스가 있으면 Space는 브라우저가 클릭으로 처리한다. 이중 발동을 막는다.
+        if (event.target instanceof HTMLButtonElement && event.code === 'Space') return;
         event.preventDefault();
         toggle();
         return;
       }
-      if (event.code === 'ArrowRight') {
-        event.preventDefault();
-        seekBy(SEEK_SEC);
-        return;
-      }
-      if (event.code === 'ArrowLeft') {
-        event.preventDefault();
-        seekBy(-SEEK_SEC);
-        return;
-      }
-      if (key === 'l') {
-        seekBy(10);
-      } else if (key === 'j') {
-        seekBy(-10);
-      } else if (key === 'n' && event.shiftKey) {
-        step(1);
-      } else if (key === 'p' && event.shiftKey) {
-        step(-1);
-      } else if (event.code === 'Home') {
-        seek(0);
-      } else if (event.code === 'End') {
-        seek(1);
-      } else if (key >= '0' && key <= '9') {
-        seek(Number(key) / 10);
-      }
+      runShortcut(event, key);
     };
 
     window.addEventListener('keydown', onKeyDown);

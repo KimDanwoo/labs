@@ -33,7 +33,11 @@ const arg = (name) => process.argv.find((v) => v.startsWith(`--${name}=`))?.slic
 
 const artworkUrl = (track) => `${track.artworkBase}-t500x500${track.artworkExt}`;
 
-async function main() {
+const CONTENT_TYPES = { '.html': 'text/html', '.js': 'text/javascript' };
+const DEFAULT_CONTENT_TYPE = 'image/*';
+const CHROME_START_TIMEOUT_MS = 20_000;
+
+function parseTargets() {
   const indexes = (arg('tracks') ?? arg('track') ?? String(DEFAULT_TRACK)).split(',').map((v) => Number(v.trim()));
   const outdir = arg('outdir');
   const morph = Number(arg('morph') ?? MORPH);
@@ -42,7 +46,87 @@ async function main() {
     if (!Number.isInteger(index) || !TRACKS[index]) throw new Error(`트랙 인덱스가 범위 밖입니다: ${index}`);
   }
   if (indexes.length > 1 && !outdir) throw new Error('여러 곡을 찍으려면 --outdir이 필요합니다');
+  return { indexes, outdir, morph };
+}
 
+function contentTypeOf(name) {
+  const extension = Object.keys(CONTENT_TYPES).find((ext) => name.endsWith(ext));
+  return extension ? CONTENT_TYPES[extension] : DEFAULT_CONTENT_TYPE;
+}
+
+// 아트워크는 i1.sndcdn.com에 있다. 원격 이미지를 그대로 쓰면 texImage2D가 보안 오류로 막히므로
+// 받아서 같은 오리진으로 내보낸다.
+async function writeAssets(work, indexes, morph) {
+  for (const index of indexes) {
+    const response = await fetch(artworkUrl(TRACKS[index]));
+    if (!response.ok) throw new Error(`아트워크 요청 실패(${index}): ${response.status}`);
+    await writeFile(join(work, `art-${index}.img`), Buffer.from(await response.arrayBuffer()));
+    await writeFile(join(work, `page-${index}.html`), page({ artwork: `./art-${index}.img`, morph }));
+  }
+}
+
+function serveDirectory(work) {
+  return createServer(async (request, response) => {
+    const name = decodeURIComponent(new URL(request.url, 'http://x').pathname).replace(/^\/+/, '');
+    const body = await readFile(join(work, name)).catch(() => null);
+    if (!body) return response.writeHead(404).end();
+    response.writeHead(200, { 'content-type': contentTypeOf(name) }).end(body);
+  });
+}
+
+// 포트를 0으로 열면 실제 포트는 stderr의 DevTools 배너로만 알 수 있다.
+function readDevtoolsPort(chrome) {
+  return new Promise((resolve, reject) => {
+    let buffer = '';
+    chrome.stderr.on('data', (chunk) => {
+      buffer += chunk;
+      const found = buffer.match(/ws:\/\/127\.0\.0\.1:(\d+)\//);
+      if (found) resolve(Number(found[1]));
+    });
+    chrome.on('exit', (code) => reject(new Error(`Chrome이 종료됨(${code})`)));
+    setTimeout(() => reject(new Error('Chrome 기동 시간 초과')), CHROME_START_TIMEOUT_MS);
+  });
+}
+
+async function openPage(devtools) {
+  const targets = await poll(
+    () => fetch(`http://127.0.0.1:${devtools}/json/list`).then((r) => r.json()),
+    (list) => list.some((t) => t.type === 'page'),
+    { label: 'DevTools 타깃' },
+  );
+  const cdp = connect(targets.find((t) => t.type === 'page').webSocketDebuggerUrl);
+  await cdp.open;
+  await cdp.send('Page.enable');
+  // --window-size는 브라우저 크롬을 포함해 뷰포트가 더 작아진다(1200×630 → 1200×543).
+  // OG 비율(1.91:1)이 깨지므로 뷰포트를 정확히 강제한다.
+  await cdp.send('Emulation.setDeviceMetricsOverride', {
+    width: WIDTH,
+    height: HEIGHT,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  return cdp;
+}
+
+async function shoot({ cdp, origin, index, outdir }) {
+  const track = TRACKS[index];
+  await cdp.send('Page.navigate', { url: `${origin}/page-${index}.html` });
+
+  const title = await poll(
+    () => cdp.send('Runtime.evaluate', { expression: 'document.title' }).then((r) => r.result.value ?? ''),
+    (value) => value === 'ok' || value.startsWith('err:'),
+    { label: `렌더 완료(${track.title})` },
+  );
+  if (title !== 'ok') throw new Error(`렌더 실패(${track.title}): ${title.slice(4)}`);
+
+  const shot = await cdp.send('Page.captureScreenshot', { format: 'png' });
+  const out = outdir ? join(outdir, `og-${index}.png`) : DEFAULT_OUT;
+  await writeFile(out, Buffer.from(shot.data, 'base64'));
+  console.log(`${out}  ←  ${index} ${track.title}`);
+}
+
+async function main() {
+  const { indexes, outdir, morph } = parseTargets();
   const work = await mkdtemp(join(tmpdir(), 'soundlab-og-'));
   const profile = await mkdtemp(join(tmpdir(), 'soundlab-chrome-'));
   let chrome;
@@ -50,23 +134,9 @@ async function main() {
 
   try {
     await writeModuleGraph(RENDERER, work, 'renderer.js');
+    await writeAssets(work, indexes, morph);
 
-    // 아트워크는 i1.sndcdn.com에 있다. 원격 이미지를 그대로 쓰면 texImage2D가 보안 오류로 막히므로
-    // 받아서 같은 오리진으로 내보낸다.
-    for (const index of indexes) {
-      const response = await fetch(artworkUrl(TRACKS[index]));
-      if (!response.ok) throw new Error(`아트워크 요청 실패(${index}): ${response.status}`);
-      await writeFile(join(work, `art-${index}.img`), Buffer.from(await response.arrayBuffer()));
-      await writeFile(join(work, `page-${index}.html`), page({ artwork: `./art-${index}.img`, morph }));
-    }
-
-    server = createServer(async (request, response) => {
-      const name = decodeURIComponent(new URL(request.url, 'http://x').pathname).replace(/^\/+/, '');
-      const body = await readFile(join(work, name)).catch(() => null);
-      if (!body) return response.writeHead(404).end();
-      const type = name.endsWith('.html') ? 'text/html' : name.endsWith('.js') ? 'text/javascript' : 'image/*';
-      response.writeHead(200, { 'content-type': type }).end(body);
-    });
+    server = serveDirectory(work);
     await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
     const origin = `http://127.0.0.1:${server.address().port}`;
 
@@ -77,51 +147,9 @@ async function main() {
         stdio: ['ignore', 'ignore', 'pipe'],
       },
     );
-    // 포트를 0으로 열면 실제 포트는 stderr의 DevTools 배너로만 알 수 있다.
-    const devtools = await new Promise((resolve, reject) => {
-      let buffer = '';
-      chrome.stderr.on('data', (chunk) => {
-        buffer += chunk;
-        const found = buffer.match(/ws:\/\/127\.0\.0\.1:(\d+)\//);
-        if (found) resolve(Number(found[1]));
-      });
-      chrome.on('exit', (code) => reject(new Error(`Chrome이 종료됨(${code})`)));
-      setTimeout(() => reject(new Error('Chrome 기동 시간 초과')), 20_000);
-    });
+    const cdp = await openPage(await readDevtoolsPort(chrome));
 
-    const targets = await poll(
-      () => fetch(`http://127.0.0.1:${devtools}/json/list`).then((r) => r.json()),
-      (list) => list.some((t) => t.type === 'page'),
-      { label: 'DevTools 타깃' },
-    );
-    const cdp = connect(targets.find((t) => t.type === 'page').webSocketDebuggerUrl);
-    await cdp.open;
-    await cdp.send('Page.enable');
-    // --window-size는 브라우저 크롬을 포함해 뷰포트가 더 작아진다(1200×630 → 1200×543).
-    // OG 비율(1.91:1)이 깨지므로 뷰포트를 정확히 강제한다.
-    await cdp.send('Emulation.setDeviceMetricsOverride', {
-      width: WIDTH,
-      height: HEIGHT,
-      deviceScaleFactor: 1,
-      mobile: false,
-    });
-
-    for (const index of indexes) {
-      const track = TRACKS[index];
-      await cdp.send('Page.navigate', { url: `${origin}/page-${index}.html` });
-
-      const title = await poll(
-        () => cdp.send('Runtime.evaluate', { expression: 'document.title' }).then((r) => r.result.value ?? ''),
-        (value) => value === 'ok' || value.startsWith('err:'),
-        { label: `렌더 완료(${track.title})` },
-      );
-      if (title !== 'ok') throw new Error(`렌더 실패(${track.title}): ${title.slice(4)}`);
-
-      const shot = await cdp.send('Page.captureScreenshot', { format: 'png' });
-      const out = outdir ? join(outdir, `og-${index}.png`) : DEFAULT_OUT;
-      await writeFile(out, Buffer.from(shot.data, 'base64'));
-      console.log(`${out}  ←  ${index} ${track.title}`);
-    }
+    for (const index of indexes) await shoot({ cdp, origin, index, outdir });
 
     cdp.close();
   } finally {

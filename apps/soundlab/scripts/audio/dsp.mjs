@@ -131,24 +131,28 @@ export function normalize(values) {
   return Float32Array.from(values, (v) => Math.min(1, v / ceil));
 }
 
+function windowStats(flux, from, to) {
+  let mean = 0;
+  for (let i = from; i < to; i++) mean += flux[i];
+  mean /= to - from;
+  let variance = 0;
+  for (let i = from; i < to; i++) variance += (flux[i] - mean) ** 2;
+  return { mean, sd: Math.sqrt(variance / (to - from)) };
+}
+
+function isLocalPeak(flux, f) {
+  return flux[f] >= flux[f - 1] && flux[f] >= flux[f + 1] && flux[f] >= flux[f - 2] && flux[f] >= flux[f + 2];
+}
+
 /** 적응 임계로 플럭스 봉우리를 고른다. 이건 격자를 찾기 위한 증거일 뿐, 그대로 내보내지 않는다. */
 export function detectOnsets(flux) {
   const span = Math.round(FPS);
   const found = [];
   for (let f = 3; f < flux.length - 3; f++) {
-    const from = Math.max(0, f - span);
-    const to = Math.min(flux.length, f + span);
-    let mean = 0;
-    for (let i = from; i < to; i++) mean += flux[i];
-    mean /= to - from;
-    let variance = 0;
-    for (let i = from; i < to; i++) variance += (flux[i] - mean) ** 2;
-    const sd = Math.sqrt(variance / (to - from));
-    const isPeak = flux[f] >= flux[f - 1] && flux[f] >= flux[f + 1] && flux[f] >= flux[f - 2] && flux[f] >= flux[f + 2];
-    if (isPeak && flux[f] > mean + 1.3 * sd) {
-      const ms = (f / FPS) * 1000;
-      if (!found.length || ms - found.at(-1).ms > 90) found.push({ ms, strength: flux[f] });
-    }
+    const { mean, sd } = windowStats(flux, Math.max(0, f - span), Math.min(flux.length, f + span));
+    if (!isLocalPeak(flux, f) || flux[f] <= mean + 1.3 * sd) continue;
+    const ms = (f / FPS) * 1000;
+    if (!found.length || ms - found.at(-1).ms > 90) found.push({ ms, strength: flux[f] });
   }
   return found;
 }
