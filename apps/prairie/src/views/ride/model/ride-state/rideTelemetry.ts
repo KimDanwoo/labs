@@ -8,7 +8,8 @@ const listeners = new Set<() => void>();
 
 export function setRideTelemetry(speed: number, altitude: number) {
   const next = { speed: Math.round(Math.abs(speed) * 3.6), altitude: Math.max(0, Math.round(altitude)) };
-  if (next.speed === snapshot.speed && next.altitude === snapshot.altitude) return;
+  const isUnchanged = next.speed === snapshot.speed && next.altitude === snapshot.altitude;
+  if (isUnchanged) return;
   snapshot = next;
   listeners.forEach((listener) => listener());
 }

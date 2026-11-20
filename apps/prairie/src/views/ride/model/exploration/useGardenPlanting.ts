@@ -21,7 +21,8 @@ export function useGardenPlanting() {
   useLayoutEffect(() => {
     const bloomMesh = blooms.current;
     const leafMesh = leaves.current;
-    if (!bloomMesh || !leafMesh) return;
+    if (!bloomMesh) return;
+    if (!leafMesh) return;
     layout.blooms.forEach((matrix, index) => bloomMesh.setMatrixAt(index, matrix));
     layout.bloomColors.forEach((color, index) => bloomMesh.setColorAt(index, color));
     layout.leaves.forEach((matrix, index) => leafMesh.setMatrixAt(index, matrix));

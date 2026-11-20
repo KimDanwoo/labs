@@ -10,7 +10,6 @@ import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
 import { useMemo, useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
 
-// A small, deterministic pool adds irregular shoreline landmarks without a mesh per stone/stem.
 export function RiverBanks() {
   const coarse = useLowDetail();
   const rocks = useRef<InstancedMesh>(null);
@@ -22,7 +21,8 @@ export function RiverBanks() {
   useDispose(reedGeometry);
 
   useFrame(({ camera }) => {
-    if (!rocks.current || !reeds.current) return;
+    if (!rocks.current) return;
+    if (!reeds.current) return;
     const key = bankKey(camera.position, coarse);
     if (key === cell.current) return;
     cell.current = key;

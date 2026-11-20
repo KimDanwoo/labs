@@ -19,7 +19,6 @@ export function River() {
   const coarse = useLowDetail();
   const { riverLength, riverSegments, oceanSize, bedWidthSegments, waterWidthSegments } = riverDetailFor(coarse);
 
-  // 안개 범위는 기기별(SceneCanvas의 scene fog와 동일 값).
   useRiverFog(coarse);
 
   useFrame((state, delta) => {

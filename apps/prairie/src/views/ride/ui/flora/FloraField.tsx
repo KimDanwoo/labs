@@ -12,8 +12,6 @@ import { useFloraPlacement } from '@views/ride/model/flora/useFloraPlacement';
 import { useFloraResources } from '@views/ride/model/flora/useFloraResources';
 import { MeadowFlowers } from '@views/ride/ui/flora/MeadowFlowers';
 
-// 줄기·가지, 잎 군집, 침엽수, 바위, 접지 음영을 다섯 InstancedMesh로 그린다.
-// 카메라 셀이 바뀔 때만 주변 셀의 배치를 다시 쓴다(수백 개 → 무시할 비용).
 export function FloraField() {
   const coarse = useLowDetail();
   const viewRadius = coarse ? FLORA.viewRadius.mobile : FLORA.viewRadius.desktop;

@@ -2,14 +2,14 @@ import { KEY_BINDINGS } from '@views/ride/model/runner-control/constants';
 import { resetRunnerInput, setRunnerAction } from '@views/ride/model/runner-control/store/runnerInput';
 import { useEffect } from 'react';
 
-// 키보드 입력을 공유 스토어에 반영한다(WASD + 방향키). 터치 컨트롤과 동일 스토어를 쓴다.
 export function useRunnerControls(): void {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) return;
       if (event.target instanceof Element) {
         if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
-        if (event.code === 'Space' && event.target.closest('button, a, summary')) return;
+        const isSpaceOnControl = event.code === 'Space' && event.target.closest('button, a, summary');
+        if (isSpaceOnControl) return;
       }
       const action = KEY_BINDINGS[event.code];
       if (!action) return;

@@ -20,8 +20,6 @@ export function hash(seed: number): number {
   return x - Math.floor(x);
 }
 
-// 캐노피 잎 머티리얼: 세로 명암(밑은 그늘, 위는 햇빛) + 인스턴스 위치로 위상을 흩은 바람 흔들림.
-// 오브젝트 좌표 y를 쓰므로 덩어리·원뿔 모두 "아래 어둡고 위 밝은" 결과가 된다.
 function makeFoliageShader(halfHeight: number) {
   return (shader: WebGLProgramParametersWithUniforms): void => {
     shader.uniforms.uTime = timeUniform;

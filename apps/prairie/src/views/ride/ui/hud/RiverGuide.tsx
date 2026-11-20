@@ -11,6 +11,7 @@ export function RiverGuide() {
   let destination = seaDistance < SEA_NEAR_DISTANCE ? '바다로 이어지는 하구' : '넓은 강을 지나는 중';
   if (atSea) destination = '탁 트인 바다';
 
+  const isAtSeaOrCrossing = atSea || isCrossing;
   return (
     <div className="absolute right-lg top-24 flex max-w-48 items-center gap-sm rounded-2xl border border-prairie-paper/20 bg-prairie-ink/60 px-md py-md backdrop-blur-md sm:static sm:max-w-none sm:gap-md sm:px-lg">
       <svg
@@ -26,7 +27,7 @@ export function RiverGuide() {
       <div>
         <p className="text-xs text-prairie-paper/70">{description}</p>
         <p className="flex items-baseline gap-sm text-sm">
-          {atSea || isCrossing ? (
+          {isAtSeaOrCrossing ? (
             <span>{destination}</span>
           ) : (
             <>

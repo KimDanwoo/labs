@@ -32,7 +32,6 @@ export function useSceneEffects(enabled: boolean, pixels: number): RefObject<Eff
     pipeline.addPass(render);
     pipeline.addPass(finite);
     pipeline.addPass(bloom);
-    // FXAA는 톤 매핑·sRGB 변환을 마친 최종 색에서 경계를 찾아야 한다
     pipeline.addPass(output);
     pipeline.addPass(smooth);
     const canvasSize = gl.getSize(new Vector2());

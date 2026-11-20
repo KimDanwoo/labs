@@ -25,11 +25,16 @@ export function useFloraPlacement(refs: FloraMeshRefs, viewRadius: number, coars
     timeUniform.value = state.clock.elapsedTime;
     const cx = floraCellOf(state.camera.position.x);
     const cz = floraCellOf(state.camera.position.z);
-    if (cx === centerRef.current.x && cz === centerRef.current.z) return;
+    const isSameCenter = cx === centerRef.current.x && cz === centerRef.current.z;
+    if (isSameCenter) return;
     centerRef.current = { x: cx, z: cz };
     const { trunk, canopy, farCanopy, cone, rock, shadow } = refs;
-    if (!trunk.current || !canopy.current || !farCanopy.current || !cone.current || !rock.current || !shadow.current)
-      return;
+    if (!trunk.current) return;
+    if (!canopy.current) return;
+    if (!farCanopy.current) return;
+    if (!cone.current) return;
+    if (!rock.current) return;
+    if (!shadow.current) return;
     const meshes = {
       trunk: trunk.current,
       canopy: canopy.current,

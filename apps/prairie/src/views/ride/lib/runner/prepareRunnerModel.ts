@@ -77,7 +77,8 @@ function finishCopies(
     material instanceof MeshPhysicalMaterial ? simpleCopy(material) : material,
   );
   for (const material of [...detailed, ...simple]) {
-    if (material instanceof MeshStandardMaterial && !materials.includes(material)) materials.push(material);
+    const isNewStandardMaterial = material instanceof MeshStandardMaterial && !materials.includes(material);
+    if (isNewStandardMaterial) materials.push(material);
   }
   return { detailed, simple };
 }
@@ -86,7 +87,8 @@ function prepareMesh(object: Mesh, prepared: PreparedRunner): void {
   object.castShadow = true;
   object.receiveShadow = true;
   const source = Array.isArray(object.material) ? object.material : [object.material];
-  if (source.length === 1 && source[0]?.name === 'Hair') {
+  const isSingleHair = source.length === 1 && source[0]?.name === 'Hair';
+  if (isSingleHair) {
     object.visible = false;
     return;
   }
@@ -104,7 +106,6 @@ export function prepareRunnerModel(scene: Group): PreparedRunner {
   return prepared;
 }
 
-/** 저사양에서는 광택·코팅·무지개빛을 뺀 재질로 바꾸고, 그림자 패스에서 유니콘을 뺀다(바닥 그림자는 GroundShadow가 그린다). */
 export function applyRunnerDetail({ meshes }: PreparedRunner, isLowDetail: boolean): void {
   for (const { mesh, detailed, simple } of meshes) {
     mesh.material = isLowDetail ? simple : detailed;

@@ -9,7 +9,6 @@ import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
 import { useMemo, useRef } from 'react';
 import { InstancedMesh, Object3D } from 'three';
 
-// 셀마다 작은 야생화 군락. 두 번의 draw call로 그리고 강 골에는 심지 않는다.
 export function MeadowFlowers() {
   const coarse = useLowDetail();
   const radius = coarse ? MEADOW_FLOWERS.radius.coarse : MEADOW_FLOWERS.radius.fine;
@@ -21,10 +20,12 @@ export function MeadowFlowers() {
   const geometry = useMemo(() => makeFlowerGeometry(), []);
   const dummyRef = useRef(new Object3D());
   useFrame(({ camera }) => {
-    if (!stems.current || !flowers.current) return;
+    if (!stems.current) return;
+    if (!flowers.current) return;
     const cx = Math.floor(camera.position.x / TILE),
       cz = Math.floor(camera.position.z / TILE);
-    if (cx === center.current.x && cz === center.current.z && capacity === center.current.capacity) return;
+    const isSameLayout = cx === center.current.x && cz === center.current.z && capacity === center.current.capacity;
+    if (isSameLayout) return;
     center.current = { x: cx, z: cz, capacity };
     const meshes = { stems: stems.current, flowers: flowers.current };
     rebuildMeadowFlowers(meshes, dummyRef.current, { x: cx, z: cz }, { radius, perCell });

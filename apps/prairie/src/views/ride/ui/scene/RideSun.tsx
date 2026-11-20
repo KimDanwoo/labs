@@ -12,7 +12,6 @@ interface RideSunProps {
   mobile: boolean;
 }
 
-// A compact shadow volume follows the rider instead of covering the entire world.
 export function RideSun({ mobile }: RideSunProps) {
   const target = useMemo(() => new Object3D(), []);
   const light = useMemo(() => makeRideSun(mobile, target), [mobile, target]);

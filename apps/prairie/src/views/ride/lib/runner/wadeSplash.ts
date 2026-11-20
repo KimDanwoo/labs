@@ -15,10 +15,10 @@ export const lookTarget = new Vector3();
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-// 세기 0~1: 속도 비례, 물 밖이거나 공중이면 0.
 export function splashIntensity(): number {
   const speed = Math.abs(runnerState.speed);
   const isInWater = runnerState.waterDepth >= WADE_SPLASH.minDepth && runnerState.airborneHeight <= 0;
-  if (!isInWater || speed < WADE_SPLASH.minSpeed) return 0;
+  if (!isInWater) return 0;
+  if (speed < WADE_SPLASH.minSpeed) return 0;
   return Math.min(speed / WADE_SPLASH.fullSplashSpeed, 1);
 }

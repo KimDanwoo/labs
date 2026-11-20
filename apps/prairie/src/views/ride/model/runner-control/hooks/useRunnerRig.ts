@@ -18,8 +18,6 @@ import { advanceRunner } from '@views/ride/model/runner-control/services/runnerM
 import { createSpinState } from '@views/ride/model/runner-control/services/spinSkill';
 import { getRunnerInput } from '@views/ride/model/runner-control/store/runnerInput';
 
-// 자유 이동: WASD/터치로 가속·방향 전환(말이 진행 방향을 바라봄). Shift 질주(돌풍 파동), Space 점프·누르면 비행.
-// 카메라는 말 뒤를 낮게 따라가며 말을 화면 중앙에 둔다. PC에선 드래그로 좌우 시점(yaw) 회전.
 export function useRunnerRig() {
   useRunnerControls();
   const camera = useThree((state) => state.camera);
@@ -50,7 +48,9 @@ export function useRunnerRig() {
     const { forward, backward, left, right, jump, dash } = input;
     const now = state.clock.elapsedTime;
     let cameraSetting = cameraSettings.get();
-    if (cameraSetting.mode === CAMERA_MODE.hero && (forward || backward || left || right || jump || dash)) {
+    const isHeroMoving =
+      cameraSetting.mode === CAMERA_MODE.hero && (forward || backward || left || right || jump || dash);
+    if (isHeroMoving) {
       cameraSettings.setMode(CAMERA_MODE.close);
       cameraSetting = cameraSettings.get();
     }

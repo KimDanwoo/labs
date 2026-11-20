@@ -29,7 +29,6 @@ function ridgeHeight(u: number, cells: number) {
   return (sum / norm) ** 1.5;
 }
 
-/** One row per ridge: height + precomputed slope lighting. Only 12 KiB for the full horizon. */
 export function makeRidgeTexture(ridges: readonly Ridge[]) {
   const pixels = new Uint8Array(TEXTURE_WIDTH * ridges.length * 4);
   for (const [row, ridge] of ridges.entries()) {

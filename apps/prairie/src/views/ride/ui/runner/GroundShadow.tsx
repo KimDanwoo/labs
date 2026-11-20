@@ -17,8 +17,6 @@ export function GroundShadow() {
     const { position, heading, airborneHeight } = runnerState;
     const lift = Math.min(airborneHeight / GROUND_SHADOW.fadeHeight, 1);
     mesh.position.set(position.x, position.y - airborneHeight + GROUND_SHADOW.hover, position.z);
-    // 지형 경사를 따라 눕힌다: 수치 기울기로 법선을 만들고, 진행 방향을 접평면에 투영해 긴 축(로컬 y)으로, 법선을 로컬 z로 둔다.
-    // lookAt은 법선이 수직일 때와 아닐 때 기준축이 달라져 회전이 어긋난다 → 기저를 직접 만든다.
     const dhdx =
       (terrainHeightAt(position.x + SLOPE_SAMPLE, position.z) -
         terrainHeightAt(position.x - SLOPE_SAMPLE, position.z)) /

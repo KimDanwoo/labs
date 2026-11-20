@@ -3,7 +3,6 @@ import { RIVER_GLSL, TERRAIN_GLSL } from '@views/ride/config/riverGlsl';
 import { MEADOW_PATH, SCENE_COLORS, WORLD } from '@views/ride/config/scene';
 import { Color, type WebGLProgramParametersWithUniforms } from 'three';
 
-// 2D 값 노이즈(해시 + 부드러운 보간). 0..1.
 const GROUND_NOISE_GLSL = `
   float groundHash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
   float groundNoise(vec2 p) {
@@ -18,9 +17,6 @@ const GROUND_NOISE_GLSL = `
   }
 `;
 
-// 강 골 자리의 바닥 픽셀을 버린다 → 그 아래 파인 하상이 보인다. 강 위치는 순수 수식이라 유니폼 갱신이 없다.
-// 지면은 unlit이라 색이 SCENE_COLORS.grass 그대로 → 잔디 blade가 멀어지며 정확히 이 색에 녹는다.
-// 그 위에 잔디 인상: 가늘고 긴 셀(멀리서 본 풀 다발) + 저주파 얼룩 + 미세 반점. 무늬는 안개 범위에 맞춰 멀어지면 흐려진다(에일리어싱 방지).
 export const groundTime = { value: 0 };
 
 export function shadeGround(shader: WebGLProgramParametersWithUniforms): void {
@@ -28,7 +24,6 @@ export function shadeGround(shader: WebGLProgramParametersWithUniforms): void {
   shader.uniforms.uSandColor = { value: new Color('#c8b68f') };
   shader.uniforms.uWetSandColor = { value: new Color('#8a947b') };
   shader.uniforms.uPathColor = { value: new Color(SCENE_COLORS.path) };
-  // 지형 기복: 월드 XZ로 높이를 구해 평면 법선(로컬 +z = 월드 +y) 방향으로 올린다. fog 깊이는 변위 뒤 정점으로 계산된다.
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', `#include <common>\nvarying vec2 vGroundWorldXZ;\n${RIVER_GLSL}\n${TERRAIN_GLSL}`)
     .replace(

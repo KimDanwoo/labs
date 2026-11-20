@@ -22,7 +22,6 @@ type CameraRefs = {
   initializedRef: { current: boolean };
 };
 
-/** 질주·대시의 시야 넓힘. 움직임 줄이기에서는 화면이 확대·축소되지 않게 끈다. */
 export const speedFovBoost = (isSprinting: boolean, dashStrength: number, isReducedMotion: boolean): number =>
   isReducedMotion ? 0 : Math.max(isSprinting ? SPRINT_FOV_BOOST : 0, dashStrength * DASH_SKILL.fovBoost);
 
@@ -44,7 +43,6 @@ export function followRunnerCamera(
     }
   }
 
-  // 카메라 방향 = 말의 heading + 마우스 드래그 yaw 오프셋(말은 heading 그대로, 카메라만 좌우로 돈다).
   restingYawRef.current = MathUtils.damp(
     restingYawRef.current,
     cameraPreset.yaw * (1 - MathUtils.smoothstep(Math.abs(speed), RIG.restingYawFade.from, RIG.restingYawFade.to)),
@@ -60,7 +58,6 @@ export function followRunnerCamera(
     .setY(
       visualY + cameraPreset.height + viewPitchRef.current * cameraPreset.distance + speedFraming * RIG.framing.height,
     );
-  // 말 뒤 언덕이 솟아 있으면 카메라가 지면 아래로 묻힌다 → 그 자리 지형 위 최소 높이를 보장.
   desiredCam.y = Math.max(desiredCam.y, terrainHeightAt(desiredCam.x, desiredCam.z) + CAMERA.groundClearance);
   desiredTarget
     .copy(position)
@@ -75,7 +72,6 @@ export function followRunnerCamera(
     camera.position.lerp(desiredCam, 1 - Math.pow(1 - CAMERA.positionLerp, delta * RIG.lerpFrameRate));
     smoothTarget.lerp(desiredTarget, 1 - Math.pow(1 - CAMERA.targetLerp, delta * RIG.lerpFrameRate));
   }
-  // Smoothing must never move the actual camera through a hill.
   camera.position.setY(
     Math.max(camera.position.y, terrainHeightAt(camera.position.x, camera.position.z) + CAMERA.groundClearance),
   );

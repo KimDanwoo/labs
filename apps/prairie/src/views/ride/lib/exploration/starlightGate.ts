@@ -6,8 +6,6 @@ export const vertexShader = `
   }
 `;
 
-// A transparent annulus leaves the flight aperture clear. Four-point stars and
-// drifting arc fragments share one plane, without bloom passes or point lights.
 export const fragmentShader = `
   uniform float uTime;
   uniform float uActive;

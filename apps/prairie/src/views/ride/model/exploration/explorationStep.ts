@@ -45,7 +45,8 @@ function recordNearby(position: Vector3): void {
       Math.abs(position.y - terrainHeightAt(place.x, place.z)) < LANDMARK_HEIGHT_RANGE,
   );
   if ((nearby?.name ?? '') !== current.nearby) updateExploration({ nearby: nearby?.name ?? '' });
-  if (nearby && !current.discovered.includes(nearby.id)) {
+  const isNewDiscovery = nearby && !current.discovered.includes(nearby.id);
+  if (isNewDiscovery) {
     updateExploration({
       discovered: [...current.discovered, nearby.id],
       notice: `${nearby.name} 발견 · ${nearby.description}`,
@@ -68,7 +69,8 @@ function finishRun(tracker: ExplorationTracker, current: Snapshot): void {
 
 function advanceGate(tracker: ExplorationTracker, position: Vector3, current: Snapshot): void {
   const center = centers[current.nextGate];
-  if (!center || !crossesGate(tracker.previous, position, center)) return;
+  if (!center) return;
+  if (!crossesGate(tracker.previous, position, center)) return;
   if (current.nextGate === centers.length - 1) {
     finishRun(tracker, current);
     return;
@@ -82,8 +84,8 @@ function advanceGate(tracker: ExplorationTracker, position: Vector3, current: Sn
 
 function syncTimer(tracker: ExplorationTracker): void {
   const current = getExploration();
-  if (current.active && floorTenth(tracker.elapsed) !== current.elapsed)
-    updateExploration({ elapsed: floorTenth(tracker.elapsed) });
+  const hasTickedTenth = current.active && floorTenth(tracker.elapsed) !== current.elapsed;
+  if (hasTickedTenth) updateExploration({ elapsed: floorTenth(tracker.elapsed) });
 }
 
 function expireNotice(tracker: ExplorationTracker, clock: number): void {
@@ -92,7 +94,8 @@ function expireNotice(tracker: ExplorationTracker, clock: number): void {
     tracker.lastNotice = current.notice;
     tracker.noticeUntil = clock + NOTICE_SECONDS;
   }
-  if (current.notice && clock > tracker.noticeUntil) updateExploration({ notice: '' });
+  const shouldClearNotice = current.notice && clock > tracker.noticeUntil;
+  if (shouldClearNotice) updateExploration({ notice: '' });
 }
 
 export function stepExploration(tracker: ExplorationTracker, clock: number, delta: number): void {

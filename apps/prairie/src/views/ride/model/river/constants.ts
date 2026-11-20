@@ -1,6 +1,5 @@
 import { RIVER_GLSL } from '@views/ride/config/riverGlsl';
 
-// River and ocean use the same world-space waves so the estuary has no moving seam.
 export const RIVER_VERTEX_SHADER = `
   uniform float uOcean;
   varying vec3 vWorldPos;

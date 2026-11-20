@@ -23,7 +23,9 @@ export function Haze() {
     [ridges],
   );
   useFrame(({ camera }) => {
-    if (meshRef.current && materialRef.current) updateHaze(meshRef.current, materialRef.current, camera);
+    if (!meshRef.current) return;
+    if (!materialRef.current) return;
+    updateHaze(meshRef.current, materialRef.current, camera);
   });
   return (
     <mesh ref={meshRef} position={[0, CENTER_Y, 0]}>

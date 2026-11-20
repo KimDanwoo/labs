@@ -47,7 +47,8 @@ export function SunsetArch() {
     const t = clock.elapsedTime,
       p = runnerState.position;
     const crossed = previous.current && crossedArch(previous.current, p, place.x, ground, place.z);
-    if (crossed && t - burst.current > burstSeconds) burst.current = t;
+    const shouldBurst = crossed && t - burst.current > burstSeconds;
+    if (shouldBurst) burst.current = t;
     previous.current = trackedPosition(previous.current, p);
     const age = t - burst.current,
       glow = glowAt(age);

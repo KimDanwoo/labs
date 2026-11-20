@@ -1,14 +1,13 @@
-// HDR 버퍼의 NaN·Inf 픽셀 하나를 bloom 블러가 넓게 번지게 해 화면이 검게 깜빡인다
 export const FINITE_COLOR_SHADER = {
   name: 'FiniteColorShader',
   uniforms: { tDiffuse: { value: null } },
-  vertexShader: /* glsl */ `
+  vertexShader: `
     varying vec2 vUv;
     void main() {
       vUv = uv;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }`,
-  fragmentShader: /* glsl */ `
+  fragmentShader: `
     uniform sampler2D tDiffuse;
     varying vec2 vUv;
     void main() {

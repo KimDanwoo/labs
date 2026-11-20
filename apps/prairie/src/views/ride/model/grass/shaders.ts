@@ -4,11 +4,7 @@ import { GRASS_LOD, GUST } from '@views/ride/model/grass/constants';
 
 const SUN_LENGTH = Math.hypot(...SUN.position);
 const SUN_DIRECTION_GLSL = `vec3(${SUN.position.map((component) => (component / SUN_LENGTH).toFixed(5)).join(',')})`;
-// 말 주변 잔디가 말을 피해 눕는 반경과 세기.
 const RUNNER_PUSH = { radius: 2.4, bend: 0.85 } as const;
-// 바람: 끝(uv.y=1)일수록 더 흔들리고, 완만한 돌풍(gust)으로 세기가 출렁인다.
-// blade별 위치 해시로 색·바람 위상을 흩어 군집감을 준다.
-// 말 위치·질주 돌풍 유니폼으로 잔디가 말에 반응한다(끝일수록 많이 밀림 = dispPower).
 
 export const GRASS_VERTEX_SHADER = `
   attribute float aLodIndex;
@@ -66,9 +62,6 @@ export const GRASS_VERTEX_SHADER = `
     gl_Position = projectionMatrix * modelViewMatrix * world;
   }
 `;
-// 밑동 진초록 → 끝 싱그러운 생초록 + blade별 색 변주. 거리에 따라 "그 자리 지면색(안개 적용)"으로 페이드해
-// blade가 끝나는 곳이 보이지 않는다 — 안개색으로 직접 페이드하면 아직 안개가 덜 낀 지면과 어긋나 띠가 생긴다.
-// 색은 선형 공간에서 섞고 마지막에 내장 머티리얼과 같은 tonemapping/colorspace include를 탄다 → Ground 평면과 정확히 같은 색에 녹는다.
 
 export const GRASS_FRAGMENT_SHADER = `
   uniform float uTime;

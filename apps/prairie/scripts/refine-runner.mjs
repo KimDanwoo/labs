@@ -1,5 +1,3 @@
-// CC0 원본의 리그·애니메이션을 보존하고 Loop subdivision으로 곡면을 굽는다.
-// 실행: node scripts/refine-runner.mjs (prairie 디렉토리에서)
 import { fileURLToPath } from 'node:url';
 
 import { readGlb, writeGlb } from './runner/glb.mjs';

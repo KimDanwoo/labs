@@ -76,7 +76,8 @@ export function stepSprintTrail(s: MoteState, mesh: InstancedMesh, rawDelta: num
   };
   for (let i = 0; i < maxMotes; i += 1) {
     const isAlive = s.life[i]! > 0;
-    if (!isAlive && s.emitAccumulator >= 1) {
+    const shouldEmitFinal = !isAlive && s.emitAccumulator >= 1;
+    if (shouldEmitFinal) {
       s.emitAccumulator -= 1;
       spawnMote(s, i, back);
     } else if (isAlive) {
