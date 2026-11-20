@@ -89,17 +89,17 @@ apps/<app>/
 
 - 세그먼트 이름은 `ui`·`model`·`api`·`lib`·`config`만 쓴다(목적 기준). CSS 파일만 담는 `styles/`는 예외로 둔다. 필요한 것만 만든다. `hooks`·`types`·`constants`·`services` 같은 종류 기준 이름은 세그먼트 **안**의 하위 폴더로만 쓴다. 슬라이스가 커지면 세그먼트 아래에 도메인 하위 폴더를 둔다(`ui/scene/`, `model/runner/`).
 - **밖에서는 슬라이스 루트로만 import한다**: `from '@entities/question'`, 서버 전용은 `from '@views/study/index.server'`. `@entities/question/model/types`처럼 안쪽 경로로 가져오지 않는다.
-- **슬라이스 안에서는 상대경로**로 파일을 직접 import한다(`./Card`, `../model/types/game`). 자기 `index.ts`를 거치지 않는다(순환 참조).
+- **슬라이스 안에서도 별칭 전체 경로**로 파일을 직접 import한다(`@features/game/ui/Card`, `@features/game/model/types/game`). 자기 `index.ts`를 거치지 않는다(순환 참조). `src` 안을 가리키는 상대경로(`./`·`../`)는 `pnpm lint`(`fsd/public-api`)가 막는다 — 테스트·`vi.mock` 경로도 같다. Worker·에셋의 `new URL('./…', import.meta.url)`은 import가 아니라 그대로 둔다.
 - `index.ts`는 **밖에서 실제로 쓰는 것만**, 이름을 하나씩 적어 내보낸다. `export *` 금지. 타입은 `export type` 또는 `type` 한정자.
 - **세그먼트 안에 `index.ts`(배럴)를 두지 않는다.** 출입구는 슬라이스 루트 하나다.
 - `shared`는 `@shared/<세그먼트>/<항목>`으로 import한다(`@shared/lib/cn`, `@shared/ui/BottomSheet`). `shared/ui`·`shared/lib` 전체를 묶는 `index.ts`는 만들지 않는다(공식 권장 — 하나만 써도 전부 딸려 온다). `shared/api`·`shared/config`는 세그먼트 `index.ts` 하나로 묶어도 된다. shared 안에서도 다른 항목은 진입점으로만 가져온다.
-- **테스트는 대상 코드 옆 `__tests__/<대상>.test.ts`(컴포넌트는 `.test.tsx`)에 둔다**(`.mjs` 스크립트·설정 패키지의 테스트는 `.test.mjs`). `scripts/`에 모으지 않는다. 테스트는 대상 파일을 직접 import해도 되고, 같은 슬라이스 안은 상대경로로 가져온다. 여러 테스트가 함께 쓰는 테스트 전용 헬퍼도 `__tests__/` 안에 `.test.` 없는 이름으로 둔다. 브라우저 테스트는 앱 루트 `e2e/*.spec.ts`다.
+- **테스트는 대상 코드 옆 `__tests__/<대상>.test.ts`(컴포넌트는 `.test.tsx`)에 둔다**(`.mjs` 스크립트·설정 패키지의 테스트는 `.test.mjs`). `scripts/`에 모으지 않는다. 테스트는 대상 파일을 별칭 전체 경로로 직접 import해도 된다. 여러 테스트가 함께 쓰는 테스트 전용 헬퍼도 `__tests__/` 안에 `.test.` 없는 이름으로 둔다. 브라우저 테스트는 앱 루트 `e2e/*.spec.ts`다.
 
 **서버 경계**: 서버 전용 코드(파일시스템, `next/headers`, `server-only`)와 그것을 쓰는 서버 컴포넌트는 `index.server.ts`로만 내보낸다. 클라이언트가 쓰는 `index.ts`에 섞지 않는다. Server Action은 `'use server'` 모듈(`model/actions/`)에 두고 `index.ts`에서 내보내도 된다. 서버 전용 데이터 로딩은 `model/server/` 또는 `api/`에 둔다.
 
 **컴포넌트 인라인 선언 금지**: `views`·`features`·`entities`의 컴포넌트는 파일 하나에 하나씩, 이름과 파일명을 일치시켜 슬라이스의 `ui/` 세그먼트에 둔다.
 
-**Import 순서**: `prettier-plugin-organize-imports`가 저장/포맷 시 자동 정렬한다(수동 정렬 불필요, alphabetical). 큰 흐름은 내장 모듈 → 외부 패키지 → 절대경로(`@repo`/`@app`…`@shared`) → 상대경로 → type import.
+**Import 순서**: `prettier-plugin-organize-imports`가 저장/포맷 시 자동 정렬한다(수동 정렬 불필요, alphabetical). 큰 흐름은 내장 모듈 → 외부 패키지 → 절대경로(`@repo`/`@app`…`@shared`) → type import. `src` 밖(루트 `app/`·`e2e/`처럼 별칭이 없는 곳)만 상대경로를 쓴다.
 
 ## 컴포넌트 분리 원칙
 
@@ -206,6 +206,6 @@ Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬�
 - 공유 ESLint는 레이어 역참조, 슬라이스 교차 참조, 공개 API 우회, 세그먼트 구조, 컴포넌트 파일, 라우팅 위치, 전역 atom 위치를 검사한다. 공유 규칙 자체에도 회귀 테스트가 있다.
 - Server Action의 권한 검사는 화면·미들웨어와 독립적으로 수행한다. 관리자 DB 클라이언트 생성 전에 인증과 관리자 권한을 확인한다.
 - `'use client'`·`'use server'`는 모듈 맨 앞의 지시문이어야 한다. import를 그 앞에 추가하지 않는다.
-- 파일 이동 후 상대 경로·공개 export·Web Worker URL·라우트 타입·테스트 경로를 함께 확인한다.
+- 파일 이동 후 별칭 경로·공개 export·Web Worker URL·라우트 타입·테스트 경로를 함께 확인한다.
 - 기본 검증은 `pnpm lint`, `pnpm typecheck`, `pnpm test`다. 동작을 바꿨다면 해당 사용자 흐름의 브라우저 검증도 수행한다. 에이전트가 직접 하는 브라우저 검증(화면 확인·캡처·조작)은 ego-browser로 한다(`ego-browser skill`로 사용법 확인). Playwright는 CI에서 도는 `e2e/*.spec.ts`와 수집 스크립트에만 쓴다. 외부 DB에 쓰는 시드·마이그레이션은 검증 명령으로 실행하지 않는다.
 - 자동 검사가 통과한 범위와 실제 브라우저·외부 서비스에서 확인한 범위를 구분해 보고한다. 검증하지 않은 동작을 완벽하다고 표현하지 않는다.
