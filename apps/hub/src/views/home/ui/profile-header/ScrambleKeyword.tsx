@@ -1,6 +1,6 @@
 'use client';
 
-import { useScrambleGlyphs } from '../../model/hooks/useScrambleGlyphs';
+import { useScrambleGlyphs } from '@views/home/model/hooks/useScrambleGlyphs';
 
 interface ScrambleKeywordProps {
   keywords: readonly string[];

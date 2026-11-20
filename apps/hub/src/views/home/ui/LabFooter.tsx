@@ -1,4 +1,4 @@
-import { COPYRIGHT, SITE_NAME } from '../config/page';
+import { COPYRIGHT, SITE_NAME } from '@views/home/config/page';
 
 export function LabFooter() {
   return (

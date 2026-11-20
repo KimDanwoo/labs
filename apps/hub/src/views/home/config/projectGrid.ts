@@ -1,5 +1,5 @@
-import type { RowSize } from '../lib/gridRows';
-import type { Project } from '../model/types/project';
+import type { RowSize } from '@views/home/lib/gridRows';
+import type { Project } from '@views/home/model/types/project';
 
 export const COVER_WIDTH = {
   desktop: { 1: '61rem', 2: '30rem', 3: '20rem' } satisfies Record<RowSize, string>,

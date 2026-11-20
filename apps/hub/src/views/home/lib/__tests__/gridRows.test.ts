@@ -1,6 +1,6 @@
+import { planCardRowSizes, planRowSizes } from '@views/home/lib/gridRows';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { planCardRowSizes, planRowSizes } from '../gridRows';
 
 test('multiples of three fill rows of three', () => {
   assert.deepEqual(planRowSizes(3), [3]);

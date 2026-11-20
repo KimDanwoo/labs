@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { WORD_REVEAL } from '../../config/motion';
-import { revealDelay } from '../../lib/revealDelay';
+import { WORD_REVEAL } from '@views/home/config/motion';
+import { revealDelay } from '@views/home/lib/revealDelay';
 
 interface RevealWordProps {
   order: number;

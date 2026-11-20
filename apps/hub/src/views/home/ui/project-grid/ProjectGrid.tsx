@@ -1,11 +1,11 @@
 import { cn } from '@shared/lib/cn';
 
-import { REVEAL_DELAY_MS } from '../../config/motion';
-import { PROJECTS_HEADING_ID } from '../../config/page';
-import { planProjectCardLayouts } from '../../lib/projectGridLayout';
-import { revealDelay } from '../../lib/revealDelay';
-import { PROJECTS } from '../../model/constants/projects';
-import { ProjectCard } from './ProjectCard';
+import { REVEAL_DELAY_MS } from '@views/home/config/motion';
+import { PROJECTS_HEADING_ID } from '@views/home/config/page';
+import { planProjectCardLayouts } from '@views/home/lib/projectGridLayout';
+import { revealDelay } from '@views/home/lib/revealDelay';
+import { PROJECTS } from '@views/home/model/constants/projects';
+import { ProjectCard } from '@views/home/ui/project-grid/ProjectCard';
 
 export function ProjectGrid() {
   const layouts = planProjectCardLayouts(PROJECTS.length);

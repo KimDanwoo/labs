@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { MIN_SCRAMBLE_KEYWORDS, REDUCED_MOTION_QUERY, SCRAMBLE_TIMING } from '../../config/motion';
-import { glyphsAt, planDuration, planScramble, toGlyphs, type ScrambleGlyph } from '../../lib/scramble';
+import { MIN_SCRAMBLE_KEYWORDS, REDUCED_MOTION_QUERY, SCRAMBLE_TIMING } from '@views/home/config/motion';
+import { glyphsAt, planDuration, planScramble, toGlyphs, type ScrambleGlyph } from '@views/home/lib/scramble';
 
 export function useScrambleGlyphs(keywords: readonly string[]) {
   const [glyphs, setGlyphs] = useState<ScrambleGlyph[]>(() => toGlyphs(keywords[0] ?? ''));
