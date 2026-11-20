@@ -6,7 +6,9 @@ import type { KillerCage } from '@entities/sudoku/model/types/game';
 
 export function isValidSolution(grid: Grid): boolean {
   for (let i = 0; i < BOARD_SIZE; i++) {
-    if (!isValidNumberSet(getRowNumbers(grid, i)) || !isValidNumberSet(getColumnNumbers(grid, i))) return false;
+    const hasValidRowAndColumn =
+      isValidNumberSet(getRowNumbers(grid, i)) && isValidNumberSet(getColumnNumbers(grid, i));
+    if (!hasValidRowAndColumn) return false;
   }
   for (let blockRow = 0; blockRow < BLOCKS_PER_ROW; blockRow++) {
     for (let blockCol = 0; blockCol < BLOCKS_PER_ROW; blockCol++) {
@@ -16,14 +18,12 @@ export function isValidSolution(grid: Grid): boolean {
   return true;
 }
 
-/**
- * @description 사용자가 채운 값이 정답과 다르면 충돌로 표시한다. 퍼즐은 유일해라 정답과 다른 값은 반드시 오답이다.
- */
 export function markWrongValues(board: SudokuBoard, solution: Grid): SudokuBoard {
   return board.map((row, r) =>
     row.map((cell, c) => {
       const isWrong = !cell.isInitial && cell.value !== null && cell.value !== cellAt(solution, r, c);
-      return isWrong && !cell.isConflict ? { ...cell, isConflict: true } : cell;
+      const shouldMarkConflict = isWrong && !cell.isConflict;
+      return shouldMarkConflict ? { ...cell, isConflict: true } : cell;
     }),
   );
 }
@@ -83,7 +83,8 @@ export function isBoardComplete(board: SudokuBoard): boolean {
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
       const cell = cellAt(board, row, col);
-      if (cell.value === null || cell.isConflict) {
+      const isUnfinishedCell = cell.value === null || cell.isConflict;
+      if (isUnfinishedCell) {
         return false;
       }
     }
@@ -133,7 +134,8 @@ export function isKillerBoardComplete(board: SudokuBoard, cages: KillerCage[]): 
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
       const cell = cellAt(board, row, col);
-      if (cell.value === null || cell.isConflict) {
+      const isUnfinishedCell = cell.value === null || cell.isConflict;
+      if (isUnfinishedCell) {
         return false;
       }
     }

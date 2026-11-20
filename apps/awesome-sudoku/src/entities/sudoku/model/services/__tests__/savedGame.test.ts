@@ -52,7 +52,10 @@ const classicGame = (board: unknown = CLASSIC_BOARD, solution: unknown = SOLUTIO
 describe('isRestorableGame — 저장된 판을 이어 할 수 있는지', () => {
   it('초기 칸이 정답과 맞는 판은 이어 할 수 있다 — 사용자가 틀리게 채운 칸이 있어도 된다', () => {
     const played = CLASSIC_BOARD.map((row, rowIndex) =>
-      row.map((cell, colIndex) => (rowIndex === 0 && colIndex === 1 ? { ...cell, value: WRONG_VALUE } : cell)),
+      row.map((cell, colIndex) => {
+        const isWrongCell = rowIndex === 0 && colIndex === 1;
+        return isWrongCell ? { ...cell, value: WRONG_VALUE } : cell;
+      }),
     );
 
     expect(isRestorableGame(classicGame())).toBe(true);
@@ -65,7 +68,10 @@ describe('isRestorableGame — 저장된 판을 이어 할 수 있는지', () =>
 
   it('정답이 비어 있거나 초기 칸이 정답과 다르면 이어 할 수 없다', () => {
     const mismatched = CLASSIC_BOARD.map((row, rowIndex) =>
-      row.map((cell, colIndex) => (rowIndex === 0 && colIndex === 0 ? { ...cell, value: WRONG_VALUE } : cell)),
+      row.map((cell, colIndex) => {
+        const isMismatchedGiven = rowIndex === 0 && colIndex === 0;
+        return isMismatchedGiven ? { ...cell, value: WRONG_VALUE } : cell;
+      }),
     );
 
     expect(isRestorableGame(classicGame(CLASSIC_BOARD, createEmptyGrid()))).toBe(false);

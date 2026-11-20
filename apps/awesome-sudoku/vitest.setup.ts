@@ -5,8 +5,8 @@ if (!global.structuredClone) {
   global.structuredClone = (obj: unknown) => JSON.parse(JSON.stringify(obj));
 }
 
-// jsdom 미구현 — 포인터 제스처 테스트에 필요 (MouseEvent가 clientX/clientY를 이미 지원한다)
-if (typeof window !== 'undefined' && !window.PointerEvent) {
+const shouldPolyfillPointerEvent = typeof window !== 'undefined' && !window.PointerEvent;
+if (shouldPolyfillPointerEvent) {
   class PointerEventPolyfill extends MouseEvent {
     readonly pointerId: number;
     readonly pointerType: string;
@@ -19,14 +19,15 @@ if (typeof window !== 'undefined' && !window.PointerEvent) {
   window.PointerEvent = PointerEventPolyfill as unknown as typeof PointerEvent;
   globalThis.PointerEvent = window.PointerEvent;
 }
-if (typeof Element !== 'undefined' && !Element.prototype.setPointerCapture) {
+const shouldPolyfillPointerCapture = typeof Element !== 'undefined' && !Element.prototype.setPointerCapture;
+if (shouldPolyfillPointerCapture) {
   Element.prototype.setPointerCapture = () => {};
   Element.prototype.releasePointerCapture = () => {};
   Element.prototype.hasPointerCapture = () => false;
 }
 
-// jsdom 미구현 — 반응형 훅이 있는 컴포넌트 렌더링에 필요
-if (typeof window !== 'undefined' && !window.matchMedia) {
+const shouldPolyfillMatchMedia = typeof window !== 'undefined' && !window.matchMedia;
+if (shouldPolyfillMatchMedia) {
   window.matchMedia = (query: string) =>
     ({
       matches: false,

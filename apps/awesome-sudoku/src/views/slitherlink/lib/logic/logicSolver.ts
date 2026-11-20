@@ -101,7 +101,8 @@ const propagate = (
 
     const { outcome, technique } = applyNextRule(edges, context, components, maxTechnique);
     if (outcome.step === STEP.CONTRADICTION) return { status: SOLVE_STATUS.CONTRADICTION, hardest };
-    if (outcome.step === STEP.STABLE || !spendStep(budget)) return { status: SOLVE_STATUS.STUCK, hardest };
+    const isStuck = outcome.step === STEP.STABLE || !spendStep(budget);
+    if (isStuck) return { status: SOLVE_STATUS.STUCK, hardest };
     hardest = harderOf(hardest, technique);
     seed = outcome.changed;
   }

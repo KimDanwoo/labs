@@ -11,6 +11,7 @@ function pathStartX(path: string | undefined): number | null {
 export function cellSizeFromPaths(paths: CageInfo['paths']): number {
   const firstX = pathStartX(paths[0]?.path);
   const secondX = pathStartX(paths[1]?.path);
-  if (firstX === null || secondX === null) return DEFAULT_CELL_SIZE;
+  if (firstX === null) return DEFAULT_CELL_SIZE;
+  if (secondX === null) return DEFAULT_CELL_SIZE;
   return Math.max(Math.abs(secondX - firstX), DEFAULT_CELL_SIZE);
 }

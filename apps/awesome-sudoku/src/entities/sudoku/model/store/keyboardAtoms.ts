@@ -20,7 +20,8 @@ function clampIndex(index: number): number {
 export const handleKeyInputAtom = atom(null, (get, set, key: string) => {
   if (get(gamePhaseAtom) !== GAME_PHASE.PLAYING) return;
 
-  if (key === 'Backspace' || key === 'Delete') {
+  const isEraseKey = key === 'Backspace' || key === 'Delete';
+  if (isEraseKey) {
     set(fillCellAtom, null);
     return;
   }
@@ -32,7 +33,8 @@ export const handleKeyInputAtom = atom(null, (get, set, key: string) => {
 
   const step = Object.hasOwn(ARROW_STEP, key) ? ARROW_STEP[key] : undefined;
   const selectedCell = get(selectedCellAtom);
-  if (!step || !selectedCell) return;
+  if (!step) return;
+  if (!selectedCell) return;
 
   set(selectCellAtom, { row: clampIndex(selectedCell.row + step.row), col: clampIndex(selectedCell.col + step.col) });
 });

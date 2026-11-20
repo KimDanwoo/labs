@@ -35,7 +35,8 @@ const startGenerating = (state: GameState, level: SlitherlinkLevel): GameState =
 });
 
 const loadPuzzle = (state: GameState, { requestId, puzzle }: LoadedAction): GameState => {
-  if (state.phase !== GAME_PHASE.GENERATING || requestId !== state.requestId) return state;
+  const isAwaitedPuzzle = state.phase === GAME_PHASE.GENERATING && requestId === state.requestId;
+  if (!isAwaitedPuzzle) return state;
   return {
     ...createInitialState(state.level),
     phase: GAME_PHASE.PLAYING,
@@ -106,7 +107,8 @@ const isBlockedByStroke = (state: GameState, action: PlayAction): boolean =>
 export const gameReducer = (state: GameState, action: GameAction): GameState => {
   if (action.type === GAME_ACTION.GENERATE) return startGenerating(state, action.level);
   if (action.type === GAME_ACTION.LOADED) return loadPuzzle(state, action);
-  if (state.phase !== GAME_PHASE.PLAYING || !state.puzzle) return state;
+  if (state.phase !== GAME_PHASE.PLAYING) return state;
+  if (!state.puzzle) return state;
   if (isBlockedByStroke(state, action)) return state;
   return playReducer(state, state.puzzle, action);
 };

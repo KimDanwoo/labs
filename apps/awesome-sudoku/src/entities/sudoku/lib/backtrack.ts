@@ -20,7 +20,6 @@ type SearchOptions = {
   limit: number;
   randomize: boolean;
   cages?: KillerCage[];
-  /** 방문 노드 상한. 넘기면 exhausted=true로 중단한다 — 힌트가 거의 없는 킬러 판에서 탐색이 폭발하는 것을 막는다. */
   nodeBudget?: number;
   exclude?: { index: number; digit: number };
 };
@@ -53,15 +52,14 @@ function search(
     if (cage) cage.usedMask |= bit(v);
   });
 
-  // 주어진 칸이 어떤 조합에도 맞지 않는 케이지(합 불일치·중복)는 해가 없다 — 탐색은 빈 칸에서만 케이지를 본다
-  const isInconsistent = cageStates.some(
+  const hasCageBrokenByGivens = cageStates.some(
     (cage) => !cage.combos.some((combo) => (combo & cage.usedMask) === cage.usedMask),
   );
-  if (isInconsistent) return { count: 0, solution: null, exhausted: false };
+  if (hasCageBrokenByGivens) return { count: 0, solution: null, exhausted: false };
 
   const candidatesOf = (i: number): number => {
     let mask = ALL_DIGITS & ~(rowUsed[rowOf(i)]! | colUsed[colOf(i)]! | boxUsed[boxOf(i)]!);
-    if (exclude && exclude.index === i) mask &= ~bit(exclude.digit);
+    if (exclude?.index === i) mask &= ~bit(exclude.digit);
     const cage = cageStates[cageOf[i]!];
     return cage ? mask & cageAllowedMask(cage) : mask;
   };
@@ -136,10 +134,6 @@ function search(
   step();
   return { count, solution, exhausted };
 }
-/**
- * @description 해의 개수를 limit까지 센다 (limit=2면 유일해 판정용). 0은 빈 칸.
- * 노드 예산을 넘겨 판정을 못 하면 limit을 돌려준다(유일하지 않은 것으로 간주 — 안전한 쪽).
- */
 
 export function countSolutions(grid: Grid, limit: number, cages?: KillerCage[], nodeBudget?: number): number {
   const { count, exhausted } = search(flatten(grid), { limit, randomize: false, cages, nodeBudget });
@@ -148,10 +142,6 @@ export function countSolutions(grid: Grid, limit: number, cages?: KillerCage[], 
 
 export const hasUniqueSolution = (grid: Grid, cages?: KillerCage[], nodeBudget?: number): boolean =>
   countSolutions(grid, 2, cages, nodeBudget) === 1;
-/**
- * @description 유일해였던 퍼즐에서 (row, col)을 비웠을 때도 유일한가 — 그 칸에 원래 값이 아닌 값을 넣은 해가 없어야 한다.
- * 해를 둘까지 세는 것보다 싸다: 이미 아는 해를 다시 찾지 않고 대안만 찾는다. 예산을 넘기면 유일하지 않은 것으로 본다.
- */
 
 export function staysUniqueWithout(
   grid: Grid,

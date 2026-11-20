@@ -40,7 +40,8 @@ export const applyLoopRule = (
 ): RuleOutcome => {
   const changed: number[] = [];
   for (let edge = 0; edge < edges.length; edge += 1) {
-    if (itemAt(edges, edge) !== EDGE.UNKNOWN || !closesLoop(topology, components, edge)) continue;
+    const isLoopClosingCandidate = itemAt(edges, edge) === EDGE.UNKNOWN && closesLoop(topology, components, edge);
+    if (!isLoopClosingCandidate) continue;
     const isFinalClosure = components.componentCount === 1 && cluesMetByClosing(edges, topology, clues, edge);
     if (isFinalClosure) continue;
     edges[edge] = EDGE.CROSS;

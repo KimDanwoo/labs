@@ -22,7 +22,8 @@ export function createBasicTechniques({ cells, cands, place, openSpots, eliminat
   const nakedSingles = (): boolean => {
     let progressed = false;
     for (let i = 0; i < SUDOKU_CELL_COUNT; i++) {
-      if (cells[i] !== EMPTY || popcount(cands[i]!) !== 1) continue;
+      const isNakedSingle = cells[i] === EMPTY && popcount(cands[i]!) === 1;
+      if (!isNakedSingle) continue;
       place(i, digitsOf(cands[i]!)[0]!);
       progressed = true;
     }

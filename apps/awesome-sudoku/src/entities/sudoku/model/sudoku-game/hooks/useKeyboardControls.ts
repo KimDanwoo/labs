@@ -30,7 +30,8 @@ export const useKeyboardControls = () => {
         'Delete',
       ];
 
-      if (validKeys.includes(event.key) && isBoardShortcut(event)) {
+      const isBoardKey = validKeys.includes(event.key) && isBoardShortcut(event);
+      if (isBoardKey) {
         event.preventDefault();
 
         handleKeyInput(event.key);

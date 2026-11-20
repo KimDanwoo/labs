@@ -16,7 +16,8 @@ async function killerExpertPuzzle(): Promise<GeneratedPuzzle> {
 }
 
 export async function generatePuzzle(gameMode: GameMode, difficulty: Difficulty): Promise<GeneratedPuzzle> {
-  if (gameMode === GAME_MODE.KILLER && difficulty === GAME_LEVEL.EXPERT) return killerExpertPuzzle();
+  const isKillerExpert = gameMode === GAME_MODE.KILLER && difficulty === GAME_LEVEL.EXPERT;
+  if (isKillerExpert) return killerExpertPuzzle();
   const solution = generateSolution();
   if (gameMode === GAME_MODE.KILLER) {
     const { board, cages } = generateKillerBoard(solution, difficulty);

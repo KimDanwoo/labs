@@ -7,7 +7,6 @@ type Pending = {
   reject: (error: Error) => void;
 };
 
-/** undefined = 아직 안 만들어봄 · null = 이 환경에선 못 씀(SSR·jsdom·생성 실패) → 동기 폴백 */
 let worker: Worker | null | undefined;
 const pending = new Map<number, Pending>();
 let nextRequestId = 1;
@@ -19,7 +18,8 @@ const failAllPending = (message: string): void => {
 
 const getWorker = (): Worker | null => {
   if (worker !== undefined) return worker;
-  if (typeof window === 'undefined' || typeof Worker === 'undefined') {
+  const isWorkerUnavailable = typeof window === 'undefined' || typeof Worker === 'undefined';
+  if (isWorkerUnavailable) {
     worker = null;
     return null;
   }
@@ -33,7 +33,6 @@ const getWorker = (): Worker | null => {
       if ('error' in event.data) settle.reject(new Error(event.data.error));
       else settle.resolve(event.data.puzzle);
     };
-    // 워커가 죽으면 이후 요청은 메인 스레드에서 처리한다 — 판을 못 주는 것보다 잠깐 버벅이는 게 낫다
     created.onerror = () => {
       worker = null;
       failAllPending('퍼즐 워커가 종료됨');

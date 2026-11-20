@@ -74,7 +74,8 @@ export const generateSlitherlink = (level: SlitherlinkLevel, random: Random = Ma
   let fallback: SlitherlinkPuzzle | null = null;
   for (let attempt = 0; attempt < GENERATION_ATTEMPTS; attempt += 1) {
     const graded = generateFromSpec(spec, random);
-    if (graded && graded.hardest >= spec.minTechnique) return graded.puzzle;
+    const isHardEnough = graded !== null && graded.hardest >= spec.minTechnique;
+    if (isHardEnough) return graded.puzzle;
     fallback = graded?.puzzle ?? fallback;
   }
   if (fallback) return fallback;

@@ -36,7 +36,8 @@ export function createLogicBoard(grid: Grid, cages: KillerCage[]) {
   const eliminate = (targets: number[], mask: number): boolean => {
     let progressed = false;
     for (const i of targets) {
-      if (cells[i] !== EMPTY || (cands[i]! & mask) === 0) continue;
+      const hasCandidateToRemove = cells[i] === EMPTY && (cands[i]! & mask) !== 0;
+      if (!hasCandidateToRemove) continue;
       cands[i]! &= ~mask;
       progressed = true;
     }

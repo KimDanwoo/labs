@@ -27,7 +27,6 @@ export const getHintAtom = atom(null, (get, set) => {
   const cages = get(cagesAtom);
   const selectedCell = get(selectedCellAtom);
 
-  // 힌트 소진·전부 정답이면 버튼이 이미 비활성이라 조용히 무시한다
   if (hintsRemaining <= 0) return;
 
   const isUnsolved = (r: number, c: number): boolean =>
@@ -38,10 +37,10 @@ export const getHintAtom = atom(null, (get, set) => {
 
   if (unsolvedCells.length === 0) return;
 
-  const { row, col } =
-    selectedCell && isUnsolved(selectedCell.row, selectedCell.col)
-      ? selectedCell
-      : atIndex(unsolvedCells, Math.floor(Math.random() * unsolvedCells.length));
+  const isSelectedUnsolved = selectedCell !== null && isUnsolved(selectedCell.row, selectedCell.col);
+  const { row, col } = isSelectedUnsolved
+    ? selectedCell
+    : atIndex(unsolvedCells, Math.floor(Math.random() * unsolvedCells.length));
   const value = cellAt(solution, row, col);
 
   let updatedBoard = updateCellValue(board, row, col, value);

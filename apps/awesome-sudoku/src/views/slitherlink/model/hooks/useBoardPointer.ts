@@ -45,7 +45,8 @@ export const useBoardPointer = (svgRef: RefObject<SVGSVGElement | null>): BoardP
 
   const ownedGesture = (event: BoardPointerEvent): Gesture | null => {
     const active = gesture.current;
-    return active && active.pointerId === event.pointerId ? active : null;
+    const isSamePointer = active !== null && active.pointerId === event.pointerId;
+    return isSamePointer ? active : null;
   };
 
   const updateHover = (event: BoardPointerEvent): void => {
@@ -65,7 +66,9 @@ export const useBoardPointer = (svgRef: RefObject<SVGSVGElement | null>): BoardP
 
   const onPointerDown = (event: BoardPointerEvent): void => {
     const point = pointOf(event);
-    if (!event.isPrimary || !game.isPlaying || !point) return;
+    const canStartGesture = event.isPrimary && game.isPlaying;
+    if (!canStartGesture) return;
+    if (!point) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     gesture.current = {
       pointerId: event.pointerId,
@@ -80,7 +83,8 @@ export const useBoardPointer = (svgRef: RefObject<SVGSVGElement | null>): BoardP
   const onPointerMove = (event: BoardPointerEvent): void => {
     const active = ownedGesture(event);
     if (!gesture.current) updateHover(event);
-    if (!active || !startDragIfMoved(active, event)) return;
+    if (!active) return;
+    if (!startDragIfMoved(active, event)) return;
     const point = pointOf(event);
     const vertex = point ? vertexWithin(size, point, SNAP_RADIUS) : null;
     if (vertex !== null) game.strokeTo(vertex);

@@ -1,9 +1,3 @@
-/**
- * 킬러 전문가 묶음을 만든다. 전문가 판(SUBSET 이상)은 무작위 생성의 몇 %만 해당해 실시간으로 만들 수 없다.
- *
- *   pnpm --filter awesome-sudoku puzzles:killer-expert
- */
-
 import { writeFile } from 'node:fs/promises';
 
 import { GAME_LEVEL, TECHNIQUE } from '../src/entities/sudoku/config/game';
@@ -45,8 +39,7 @@ function collect(): EncodedKillerPuzzle[] {
 
 const source = (puzzles: readonly EncodedKillerPuzzle[]): string =>
   [
-    '// 생성물 — 직접 고치지 않는다. `pnpm --filter awesome-sudoku puzzles:killer-expert`로 다시 만든다.',
-    "import type { EncodedKillerPuzzle } from '../model/types/game';",
+    "import type { EncodedKillerPuzzle } from '@entities/sudoku/model/types/game';",
     '',
     `export const KILLER_EXPERT_PUZZLES: readonly EncodedKillerPuzzle[] = ${JSON.stringify(puzzles)};`,
     '',

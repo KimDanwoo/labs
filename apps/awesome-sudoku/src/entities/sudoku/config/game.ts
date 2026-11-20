@@ -37,12 +37,6 @@ export const TECHNIQUE = {
   GUESS: 5,
 } as const;
 
-/**
- * 클래식: 남기는 힌트 수 + 허용 기법 범위. 힌트 수만으로는 난이도가 갈리지 않아
- * (무작위 제거는 22~28칸에서 멈춘다) 채점 결과가 범위를 벗어나면 다시 뽑는다.
- * expert도 ADVANCED(피시·윙·컬러링)까지만 허용해 추측 없이 풀리는 판을 보장한다.
- * 유일해 이론 최소는 17칸이라 그 아래는 목표로 두지 않는다.
- */
 export const CLASSIC_DIFFICULTY: Record<Difficulty, ClassicDifficultySpec> = {
   [GAME_LEVEL.EASY]: { clues: 40, minTechnique: TECHNIQUE.SINGLE, maxTechnique: TECHNIQUE.SINGLE },
   [GAME_LEVEL.MEDIUM]: { clues: 30, minTechnique: TECHNIQUE.SINGLE, maxTechnique: TECHNIQUE.LOCKED },
@@ -50,11 +44,6 @@ export const CLASSIC_DIFFICULTY: Record<Difficulty, ClassicDifficultySpec> = {
   [GAME_LEVEL.EXPERT]: { clues: 23, minTechnique: TECHNIQUE.ADVANCED, maxTechnique: TECHNIQUE.ADVANCED },
 };
 
-/**
- * 킬러: 케이지 합 제약이 있어 힌트를 훨씬 적게 남기고, 케이지가 클수록 조합이 많아 어렵다.
- * 기법 범위는 주로 "추측이 필요한 판 거부"용이다 — 케이지 조합·45규칙으로 대부분 SINGLE/LOCKED에서 풀린다.
- * expert(SUBSET 이상)는 무작위 생성의 ~1~4%만 해당해 실시간으로 만들 수 없다 → 미리 만든 묶음(killerExpertPuzzles)에서 꺼낸다.
- */
 export const KILLER_DIFFICULTY: Record<Difficulty, KillerDifficultySpec> = {
   [GAME_LEVEL.EASY]: { clues: 24, maxCageSize: 3, minTechnique: TECHNIQUE.SINGLE, maxTechnique: TECHNIQUE.SINGLE },
   [GAME_LEVEL.MEDIUM]: { clues: 14, maxCageSize: 4, minTechnique: TECHNIQUE.SINGLE, maxTechnique: TECHNIQUE.LOCKED },

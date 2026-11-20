@@ -6,7 +6,8 @@ import type { Clue, EdgeState, GridTopology, Step, StepBudget } from '@views/sli
 
 const applyClue = (edges: EdgeState[], cellEdges: readonly number[], clue: number): Step => {
   const { lines, unknowns } = tallyEdges(edges, cellEdges);
-  if (lines > clue || lines + unknowns < clue) return STEP.CONTRADICTION;
+  const isClueBroken = lines > clue || lines + unknowns < clue;
+  if (isClueBroken) return STEP.CONTRADICTION;
   if (lines === clue) return fillUnknownEdges(edges, cellEdges, EDGE.CROSS);
   if (lines + unknowns === clue) return fillUnknownEdges(edges, cellEdges, EDGE.LINE);
   return STEP.STABLE;
@@ -16,7 +17,8 @@ const applyVertex = (edges: EdgeState[], vertexEdges: readonly number[]): Step =
   const { lines, unknowns } = tallyEdges(edges, vertexEdges);
   if (lines > LOOP_VERTEX_DEGREE) return STEP.CONTRADICTION;
   if (lines === LOOP_VERTEX_DEGREE) return fillUnknownEdges(edges, vertexEdges, EDGE.CROSS);
-  if (lines === 1 && unknowns === 0) return STEP.CONTRADICTION;
+  const isDeadEnd = lines === 1 && unknowns === 0;
+  if (isDeadEnd) return STEP.CONTRADICTION;
   if (unknowns !== 1) return STEP.STABLE;
   return fillUnknownEdges(edges, vertexEdges, lines === 1 ? EDGE.LINE : EDGE.CROSS);
 };
