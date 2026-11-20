@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { KEEP_LAST_CARD_BOTTOM_BORDER } from '@shared/config/cardAccordion';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@shared/ui/Accordion';
 
 interface CardAccordionItemProps {
@@ -7,8 +8,6 @@ interface CardAccordionItemProps {
   trigger: ReactNode;
   children: ReactNode;
 }
-
-const KEEP_LAST_CARD_BOTTOM_BORDER = 'last:border-b';
 
 export function CardAccordionItem({ value, trigger, children }: CardAccordionItemProps) {
   return (
