@@ -46,23 +46,29 @@ export const structure = {
   },
 };
 
-function publicApiProblem(from, to, source) {
+function sharedImportProblem(from, to) {
+  const parts = to.rest.split('/').filter((part) => !PUBLIC_ENTRY.test(part));
+  if (from?.layer === 'shared' && sharedItem(from.rest) === sharedItem(to.rest)) return null;
+  if (parts.length > 2) return 'shared는 세그먼트 또는 항목 진입점까지만 import한다(@shared/lib/<항목>).';
+  if (parts.length === 1 && ITEM_ENTRY_SEGMENTS.has(parts[0]))
+    return `@shared/${parts[0]}/<항목>처럼 항목 진입점으로 import한다.`;
+  return null;
+}
+
+function slicedImportProblem(from, to, source) {
   const inner = to.rest.split('/').slice(1);
-  if (to.layer === 'shared') {
-    const parts = to.rest.split('/').filter((part) => !PUBLIC_ENTRY.test(part));
-    if (from?.layer === 'shared' && sharedItem(from.rest) === sharedItem(to.rest)) return null;
-    if (parts.length > 2) return 'shared는 세그먼트 또는 항목 진입점까지만 import한다(@shared/lib/<항목>).';
-    if (parts.length === 1 && ITEM_ENTRY_SEGMENTS.has(parts[0]))
-      return `@shared/${parts[0]}/<항목>처럼 항목 진입점으로 import한다.`;
-    return null;
-  }
-  if (!SLICED_LAYERS.has(to.layer)) return null;
   const isEntry = inner.length === 0 || (inner.length === 1 && PUBLIC_ENTRY.test(inner[0]));
   const isOwnSlice = from?.layer === to.layer && from.slice === to.slice;
   if (!isOwnSlice) return isEntry ? null : `${to.layer}/${to.slice}는 공개 API(index.ts)로만 import한다.`;
   if (isEntry) return '슬라이스 안에서 자기 공개 API를 import하지 않는다(순환 참조).';
   if (!source.startsWith('.')) return '슬라이스 안에서는 상대경로로 import한다.';
   return null;
+}
+
+function publicApiProblem(from, to, source) {
+  if (to.layer === 'shared') return sharedImportProblem(from, to);
+  if (!SLICED_LAYERS.has(to.layer)) return null;
+  return slicedImportProblem(from, to, source);
 }
 
 export const publicApi = {

@@ -23,17 +23,20 @@ const MAX_HOST_ELEMENTS = 15;
 const STYLE_HOME =
   /^src\/app\/(?:globals\.css|styles\/[^/]+\.css)$|^src\/(?:views|features|entities)\/[^/]+\/styles\/[^/]+\.css$|^src\/(?:.*\/)?ui\/(?:.*\/)?[A-Z][A-Za-z0-9]*\.module\.css$/;
 
+function dependencyProblem(name, version, workspaceNames, catalogNames) {
+  if (workspaceNames.has(name))
+    return version === 'workspace:*' ? null : `${name}: 워크스페이스 의존성은 workspace:*를 사용한다.`;
+  if (!version.startsWith('catalog:')) return `${name}: 버전은 pnpm-workspace.yaml의 catalog에서 관리한다.`;
+  if (version === 'catalog:' && !catalogNames.has(name)) return `${name}: 기본 catalog에 정의되지 않았다.`;
+  return null;
+}
+
 export function validateManifest(manifest, workspaceNames, catalogNames) {
   const problems = [];
   for (const field of ['dependencies', 'devDependencies', 'optionalDependencies']) {
     for (const [name, version] of Object.entries(manifest[field] ?? {})) {
-      if (workspaceNames.has(name)) {
-        if (version !== 'workspace:*') problems.push(`${name}: 워크스페이스 의존성은 workspace:*를 사용한다.`);
-      } else if (!version.startsWith('catalog:')) {
-        problems.push(`${name}: 버전은 pnpm-workspace.yaml의 catalog에서 관리한다.`);
-      } else if (version === 'catalog:' && !catalogNames.has(name)) {
-        problems.push(`${name}: 기본 catalog에 정의되지 않았다.`);
-      }
+      const problem = dependencyProblem(name, version, workspaceNames, catalogNames);
+      if (problem) problems.push(problem);
     }
   }
   if (manifest.pnpm?.overrides && manifest.name !== 'labs')
@@ -47,18 +50,29 @@ export function validateTypeScript(config) {
   );
 }
 
+function isMainOnlyDeployment(config) {
+  const deploymentEnabled = config.git?.deploymentEnabled ?? {};
+  return (
+    Object.keys(deploymentEnabled).length === Object.keys(DEPLOYMENT_ENABLED).length &&
+    Object.entries(DEPLOYMENT_ENABLED).every(([branch, enabled]) => deploymentEnabled[branch] === enabled)
+  );
+}
+
+function ignoreCommandProblem(ignoreCommand, appName) {
+  if (typeof ignoreCommand !== 'string' || !ignoreCommand.trim())
+    return `ignoreCommand로 변경 없는 배포를 건너뛴다(npx turbo-ignore ${appName}).`;
+  if (ignoreCommand.includes('turbo-ignore') && ignoreCommand !== `npx turbo-ignore ${appName}`)
+    return `ignoreCommand는 이 앱을 가리킨다: npx turbo-ignore ${appName}`;
+  return null;
+}
+
 export function validateVercelConfig(config, appName) {
   const problems = [];
-  const deploymentEnabled = config.git?.deploymentEnabled ?? {};
-  const isMainOnly =
-    Object.keys(deploymentEnabled).length === Object.keys(DEPLOYMENT_ENABLED).length &&
-    Object.entries(DEPLOYMENT_ENABLED).every(([branch, enabled]) => deploymentEnabled[branch] === enabled);
-  if (!isMainOnly) problems.push('git.deploymentEnabled는 {"**": false, "main": true}로 main만 배포한다.');
-  const { ignoreCommand, buildCommand } = config;
-  if (typeof ignoreCommand !== 'string' || !ignoreCommand.trim())
-    problems.push(`ignoreCommand로 변경 없는 배포를 건너뛴다(npx turbo-ignore ${appName}).`);
-  else if (ignoreCommand.includes('turbo-ignore') && ignoreCommand !== `npx turbo-ignore ${appName}`)
-    problems.push(`ignoreCommand는 이 앱을 가리킨다: npx turbo-ignore ${appName}`);
+  if (!isMainOnlyDeployment(config))
+    problems.push('git.deploymentEnabled는 {"**": false, "main": true}로 main만 배포한다.');
+  const ignoreProblem = ignoreCommandProblem(config.ignoreCommand, appName);
+  if (ignoreProblem) problems.push(ignoreProblem);
+  const { buildCommand } = config;
   const buildFilter = typeof buildCommand === 'string' ? buildCommand.match(BUILD_FILTER)?.[1] : undefined;
   if (buildFilter && buildFilter !== appName) problems.push(`buildCommand의 --filter는 이 앱(${appName})을 가리킨다.`);
   return problems;
@@ -156,15 +170,14 @@ function propsMemberCounts(source) {
   return counts;
 }
 
+function isFunctionNode(node) {
+  return ts.isFunctionDeclaration(node) || ts.isArrowFunction(node) || ts.isFunctionExpression(node);
+}
+
 function componentPropsType(statement) {
-  if (ts.isFunctionDeclaration(statement) && statement.name && /^[A-Z]/.test(statement.name.text))
-    return { name: statement.name.text, type: statement.parameters[0]?.type };
-  if (!ts.isVariableStatement(statement)) return null;
-  const [declaration] = statement.declarationList.declarations;
-  const initializer = declaration?.initializer;
-  if (!declaration || !initializer || !/^[A-Z]/.test(declaration.name.getText())) return null;
-  if (!ts.isArrowFunction(initializer) && !ts.isFunctionExpression(initializer)) return null;
-  return { name: declaration.name.getText(), type: initializer.parameters[0]?.type };
+  const component = componentFunction(statement);
+  if (!component || !isFunctionNode(component.node)) return null;
+  return { name: component.name, type: component.node.parameters[0]?.type };
 }
 
 export function validateComponentProps(text, filename) {
@@ -299,10 +312,7 @@ function walk(dir) {
   });
 }
 
-export function checkRepository(root = ROOT) {
-  const problems = [];
-  const markupFindings = [];
-  const modules = new Map();
+function listWorkspaceRoots(root) {
   const roots = [root];
   for (const group of ['apps', 'packages']) {
     for (const entry of readdirSync(path.join(root, group), { withFileTypes: true })) {
@@ -310,160 +320,238 @@ export function checkRepository(root = ROOT) {
         roots.push(path.join(root, group, entry.name));
     }
   }
-  const workspaceNames = new Set(
-    roots.map((dir) => JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8')).name),
-  );
+  return roots;
+}
+
+function readCatalogNames(root) {
   const catalog =
     readFileSync(path.join(root, 'pnpm-workspace.yaml'), 'utf8')
       .split(/^catalog:\s*$/m)[1]
       ?.split(/^[a-z]/m)[0] ?? '';
-  const catalogNames = new Set([...catalog.matchAll(/^  ['"]?([^'":\n]+)['"]?:/gm)].map((match) => match[1]));
-  for (const dir of roots) {
-    const relative = path.relative(root, dir) || '.';
-    const manifest = JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'));
-    for (const problem of validateManifest(manifest, workspaceNames, catalogNames))
-      problems.push(`${relative}/package.json: ${problem}`);
-    if (path.dirname(dir) === path.join(root, 'apps')) {
-      const vercelPath = path.join(dir, 'vercel.json');
-      if (!existsSync(vercelPath))
-        problems.push(`${relative}: main 배포 제한과 ignoreCommand를 담은 vercel.json이 필요하다.`);
-      else
-        for (const problem of validateVercelConfig(JSON.parse(readFileSync(vercelPath, 'utf8')), manifest.name))
-          problems.push(`${relative}/vercel.json: ${problem}`);
-    }
-    const configPath = path.join(dir, 'tsconfig.json');
-    let compilerOptions = {};
-    if (existsSync(configPath)) {
-      const { config, error } = ts.readConfigFile(configPath, ts.sys.readFile);
-      if (error)
-        problems.push(`${relative}/tsconfig.json: ${ts.flattenDiagnosticMessageText(error.messageText, '\n')}`);
-      else {
-        compilerOptions = ts.parseJsonConfigFileContent(config, ts.sys, dir).options;
-        for (const problem of validateTypeScript(config)) problems.push(`${relative}/tsconfig.json: ${problem}`);
-        if (manifest.dependencies?.next) {
-          if (config.extends !== '@config/tsconfig/next.json')
-            problems.push(`${relative}/tsconfig.json: 공유 Next 설정을 확장해야 한다.`);
-          for (const layer of LAYERS) {
-            if (
-              JSON.stringify(config.compilerOptions?.paths?.[`@${layer}/*`]) !== JSON.stringify([`./src/${layer}/*`])
-            ) {
-              problems.push(`${relative}/tsconfig.json: @${layer}/* 별칭은 ./src/${layer}/*를 가리켜야 한다.`);
-            }
-          }
-          if (config.compilerOptions?.paths?.['@widgets/*'] || existsSync(path.join(dir, 'src/widgets')))
-            problems.push(
-              `${relative}: widgets 레이어는 쓰지 않는다. 화면 전용 블록은 views, 공용 동작은 features로 옮긴다.`,
-            );
-        }
-      }
-    }
-    if (manifest.dependencies?.next) {
-      if (!existsSync(path.join(dir, 'app/layout.tsx'))) problems.push(`${relative}: 루트 app/layout.tsx가 필요하다.`);
-      const eslint = readFileSync(path.join(dir, 'eslint.config.mjs'), 'utf8');
-      for (const preset of ['next.eslint.config.mjs', 'fsd.config.mjs']) {
-        if (!eslint.includes(`@repo/eslint-config/${preset}`))
-          problems.push(`${relative}: 공유 ${preset}을 사용해야 한다.`);
-      }
-    }
-    const sources = [...walk(path.join(dir, 'src')), ...walk(path.join(dir, 'app'))];
-    const appSources = sources.filter((f) => !f.includes(`${path.sep}__tests__${path.sep}`));
-    for (const file of appSources.filter((f) => f.endsWith('.tsx') && f.startsWith(path.join(dir, 'src')))) {
-      const text = readFileSync(file, 'utf8');
-      for (const problem of [...validateComponentModule(text, file), ...validateComponentProps(text, file)])
-        problems.push(`${path.relative(root, file)}: ${problem}`);
-      for (const { component, message } of validateComponentMarkup(text, file))
-        markupFindings.push({ key: `${path.relative(root, file)}#${component}`, message });
-    }
-    for (const problem of findMisplacedStyles(appSources.map((f) => path.relative(dir, f))))
-      problems.push(`${relative}/${problem}`);
-    if (manifest.dependencies?.tailwindcss ?? manifest.devDependencies?.tailwindcss) {
-      for (const file of sources.filter((f) => /\.tsx?$/.test(f))) {
-        for (const problem of validateTailwindNames(readFileSync(file, 'utf8')))
-          problems.push(`${path.relative(root, file)}:${problem}`);
-      }
-    }
-    if (existsSync(path.join(dir, 'src/app/styles/theme.css'))) {
-      for (const file of sources.filter((f) => /\.(ts|tsx|astro)$/.test(f))) {
-        for (const problem of validateDesignTokens(readFileSync(file, 'utf8')))
-          problems.push(`${path.relative(root, file)}:${problem}`);
-      }
-    }
-    for (const file of sources.filter((f) => /\.(ts|tsx)$/.test(f))) {
-      const text = readFileSync(file, 'utf8');
-      for (const problem of validateSourceTypes(text, file)) problems.push(`${path.relative(root, file)}: ${problem}`);
-      if (/eslint-disable[^\n]*(?:fsd\/|no-restricted-imports)/.test(text))
-        problems.push(`${path.relative(root, file)}: 구조 규칙을 eslint-disable로 우회할 수 없다.`);
-      const ast = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true);
-      modules.set(file, { ast, compilerOptions });
-      for (const node of ast.statements) {
-        if (ts.isExpressionStatement(node)) {
-          const literal = ts.isParenthesizedExpression(node.expression) ? node.expression.expression : node.expression;
-          if (
-            ts.isStringLiteral(literal) &&
-            ['use client', 'use server'].includes(literal.text) &&
-            node !== ast.statements[0]
-          ) {
-            problems.push(`${path.relative(root, file)}: '${literal.text}'는 모듈의 첫 지시문이어야 한다.`);
-          }
-        }
-      }
+  return new Set([...catalog.matchAll(/^  ['"]?([^'":\n]+)['"]?:/gm)].map((match) => match[1]));
+}
+
+function vercelProblems({ root, dir, relative, manifest }) {
+  if (path.dirname(dir) !== path.join(root, 'apps')) return [];
+  const vercelPath = path.join(dir, 'vercel.json');
+  if (!existsSync(vercelPath)) return [`${relative}: main 배포 제한과 ignoreCommand를 담은 vercel.json이 필요하다.`];
+  return validateVercelConfig(JSON.parse(readFileSync(vercelPath, 'utf8')), manifest.name).map(
+    (problem) => `${relative}/vercel.json: ${problem}`,
+  );
+}
+
+function nextTsconfigProblems(relative, config, dir) {
+  const problems = [];
+  if (config.extends !== '@config/tsconfig/next.json')
+    problems.push(`${relative}/tsconfig.json: 공유 Next 설정을 확장해야 한다.`);
+  for (const layer of LAYERS) {
+    if (JSON.stringify(config.compilerOptions?.paths?.[`@${layer}/*`]) !== JSON.stringify([`./src/${layer}/*`])) {
+      problems.push(`${relative}/tsconfig.json: @${layer}/* 별칭은 ./src/${layer}/*를 가리켜야 한다.`);
     }
   }
+  if (config.compilerOptions?.paths?.['@widgets/*'] || existsSync(path.join(dir, 'src/widgets')))
+    problems.push(`${relative}: widgets 레이어는 쓰지 않는다. 화면 전용 블록은 views, 공용 동작은 features로 옮긴다.`);
+  return problems;
+}
+
+function tsconfigProblems({ dir, relative, manifest }) {
+  const configPath = path.join(dir, 'tsconfig.json');
+  if (!existsSync(configPath)) return { problems: [], compilerOptions: {} };
+  const { config, error } = ts.readConfigFile(configPath, ts.sys.readFile);
+  if (error) {
+    const message = ts.flattenDiagnosticMessageText(error.messageText, '\n');
+    return { problems: [`${relative}/tsconfig.json: ${message}`], compilerOptions: {} };
+  }
+  const compilerOptions = ts.parseJsonConfigFileContent(config, ts.sys, dir).options;
+  const problems = validateTypeScript(config).map((problem) => `${relative}/tsconfig.json: ${problem}`);
+  if (manifest.dependencies?.next) problems.push(...nextTsconfigProblems(relative, config, dir));
+  return { problems, compilerOptions };
+}
+
+function nextAppProblems({ dir, relative, manifest }) {
+  if (!manifest.dependencies?.next) return [];
+  const problems = [];
+  if (!existsSync(path.join(dir, 'app/layout.tsx'))) problems.push(`${relative}: 루트 app/layout.tsx가 필요하다.`);
+  const eslint = readFileSync(path.join(dir, 'eslint.config.mjs'), 'utf8');
+  for (const preset of ['next.eslint.config.mjs', 'fsd.config.mjs']) {
+    if (!eslint.includes(`@repo/eslint-config/${preset}`))
+      problems.push(`${relative}: 공유 ${preset}을 사용해야 한다.`);
+  }
+  return problems;
+}
+
+function misplacedDirectiveProblems(ast, label) {
+  const problems = [];
+  for (const node of ast.statements) {
+    if (!ts.isExpressionStatement(node)) continue;
+    const literal = ts.isParenthesizedExpression(node.expression) ? node.expression.expression : node.expression;
+    const isDirective = ts.isStringLiteral(literal) && ['use client', 'use server'].includes(literal.text);
+    if (isDirective && node !== ast.statements[0])
+      problems.push(`${label}: '${literal.text}'는 모듈의 첫 지시문이어야 한다.`);
+  }
+  return problems;
+}
+
+function checkSourceFile(root, file, compilerOptions, modules) {
+  const label = path.relative(root, file);
+  const text = readFileSync(file, 'utf8');
+  const problems = validateSourceTypes(text, file).map((problem) => `${label}: ${problem}`);
+  if (/eslint-disable[^\n]*(?:fsd\/|no-restricted-imports)/.test(text))
+    problems.push(`${label}: 구조 규칙을 eslint-disable로 우회할 수 없다.`);
+  const ast = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true);
+  modules.set(file, { ast, compilerOptions });
+  problems.push(...misplacedDirectiveProblems(ast, label));
+  return problems;
+}
+
+function componentProblems(root, dir, appSources, markupFindings) {
+  const problems = [];
+  const componentFiles = appSources.filter((f) => f.endsWith('.tsx') && f.startsWith(path.join(dir, 'src')));
+  for (const file of componentFiles) {
+    const text = readFileSync(file, 'utf8');
+    for (const problem of [...validateComponentModule(text, file), ...validateComponentProps(text, file)])
+      problems.push(`${path.relative(root, file)}: ${problem}`);
+    for (const { component, message } of validateComponentMarkup(text, file))
+      markupFindings.push({ key: `${path.relative(root, file)}#${component}`, message });
+  }
+  return problems;
+}
+
+function tailwindProblems(root, manifest, sources) {
+  if (!(manifest.dependencies?.tailwindcss ?? manifest.devDependencies?.tailwindcss)) return [];
+  const problems = [];
+  for (const file of sources.filter((f) => /\.tsx?$/.test(f))) {
+    for (const problem of validateTailwindNames(readFileSync(file, 'utf8')))
+      problems.push(`${path.relative(root, file)}:${problem}`);
+  }
+  return problems;
+}
+
+function tokenProblems(root, dir, sources) {
+  if (!existsSync(path.join(dir, 'src/app/styles/theme.css'))) return [];
+  const problems = [];
+  for (const file of sources.filter((f) => /\.(ts|tsx|astro)$/.test(f))) {
+    for (const problem of validateDesignTokens(readFileSync(file, 'utf8')))
+      problems.push(`${path.relative(root, file)}:${problem}`);
+  }
+  return problems;
+}
+
+function sourceProblems({ root, dir, relative, manifest }, compilerOptions, collected) {
+  const sources = [...walk(path.join(dir, 'src')), ...walk(path.join(dir, 'app'))];
+  const appSources = sources.filter((f) => !f.includes(`${path.sep}__tests__${path.sep}`));
+  const problems = componentProblems(root, dir, appSources, collected.markupFindings);
+  for (const problem of findMisplacedStyles(appSources.map((f) => path.relative(dir, f))))
+    problems.push(`${relative}/${problem}`);
+  problems.push(...tailwindProblems(root, manifest, sources), ...tokenProblems(root, dir, sources));
+  for (const file of sources.filter((f) => /\.(ts|tsx)$/.test(f)))
+    problems.push(...checkSourceFile(root, file, compilerOptions, collected.modules));
+  return problems;
+}
+
+function workspaceProblems(root, dir, shared, collected) {
+  const relative = path.relative(root, dir) || '.';
+  const manifest = JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'));
+  const workspace = { root, dir, relative, manifest };
+  const problems = validateManifest(manifest, shared.workspaceNames, shared.catalogNames).map(
+    (problem) => `${relative}/package.json: ${problem}`,
+  );
+  problems.push(...vercelProblems(workspace));
+  const tsconfig = tsconfigProblems(workspace);
+  problems.push(...tsconfig.problems, ...nextAppProblems(workspace));
+  problems.push(...sourceProblems(workspace, tsconfig.compilerOptions, collected));
+  return problems;
+}
+
+function isRuntimeModuleImport(node) {
+  const isModuleDeclaration = ts.isImportDeclaration(node) || ts.isExportDeclaration(node);
+  if (!isModuleDeclaration || !node.moduleSpecifier || !ts.isStringLiteral(node.moduleSpecifier)) return false;
+  return !(node.isTypeOnly || node.importClause?.isTypeOnly);
+}
+
+function isAllTypeNamedImport(node) {
+  const bindings = node.importClause?.namedBindings;
+  if (!bindings || !ts.isNamedImports(bindings)) return false;
+  return bindings.elements.length > 0 && bindings.elements.every((element) => element.isTypeOnly);
+}
+
+function resolveKnownModule(name, file, compilerOptions, modules) {
+  const target = ts.resolveModuleName(name, file, compilerOptions, ts.sys).resolvedModule?.resolvedFileName;
+  return target && modules.has(target) ? target : undefined;
+}
+
+function isDynamicImportCall(node) {
+  return (
+    ts.isCallExpression(node) &&
+    node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+    node.arguments[0] &&
+    ts.isStringLiteralLike(node.arguments[0])
+  );
+}
+
+function collectDynamicImports(node, scan) {
+  if (isDynamicImportCall(node)) {
+    const name = node.arguments[0].text;
+    if (SERVER_PACKAGE.test(name)) scan.serverModules.add(scan.file);
+    const target = resolveKnownModule(name, scan.file, scan.compilerOptions, scan.modules);
+    if (target) scan.targets.push(target);
+  }
+  ts.forEachChild(node, (child) => collectDynamicImports(child, scan));
+}
+
+function collectStaticImports(ast, scan) {
+  for (const node of ast.statements) {
+    if (!isRuntimeModuleImport(node) || isAllTypeNamedImport(node)) continue;
+    const name = node.moduleSpecifier.text;
+    if (SERVER_PACKAGE.test(name)) scan.serverModules.add(scan.file);
+    const target = resolveKnownModule(name, scan.file, scan.compilerOptions, scan.modules);
+    if (target) scan.targets.push(target);
+  }
+}
+
+function registerDirective(file, ast, graphState) {
+  const directive = ast.statements[0];
+  if (!directive || !ts.isExpressionStatement(directive) || !ts.isStringLiteral(directive.expression)) return;
+  if (directive.expression.text === 'use client') graphState.clients.add(file);
+  if (directive.expression.text === 'use server') graphState.actions.add(file);
+}
+
+function buildModuleGraph(modules) {
   const graph = new Map();
-  const clients = new Set();
-  const actions = new Set();
-  const serverModules = new Set();
+  const state = { clients: new Set(), actions: new Set(), serverModules: new Set() };
   for (const [file, { ast, compilerOptions }] of modules) {
-    const targets = [];
-    const directive = ast.statements[0];
-    if (directive && ts.isExpressionStatement(directive) && ts.isStringLiteral(directive.expression)) {
-      if (directive.expression.text === 'use client') clients.add(file);
-      if (directive.expression.text === 'use server') actions.add(file);
-    }
-    if (SERVER_MODULE.test(file)) serverModules.add(file);
-    for (const node of ast.statements) {
-      if (
-        !(ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) ||
-        !node.moduleSpecifier ||
-        !ts.isStringLiteral(node.moduleSpecifier)
-      )
-        continue;
-      if (node.isTypeOnly || node.importClause?.isTypeOnly) continue;
-      const bindings = node.importClause?.namedBindings;
-      if (
-        bindings &&
-        ts.isNamedImports(bindings) &&
-        bindings.elements.length &&
-        bindings.elements.every((element) => element.isTypeOnly)
-      )
-        continue;
-      if (SERVER_PACKAGE.test(node.moduleSpecifier.text)) serverModules.add(file);
-      const target = ts.resolveModuleName(node.moduleSpecifier.text, file, compilerOptions, ts.sys).resolvedModule
-        ?.resolvedFileName;
-      if (target && modules.has(target)) targets.push(target);
-    }
-    function dynamicImports(node) {
-      if (
-        ts.isCallExpression(node) &&
-        node.expression.kind === ts.SyntaxKind.ImportKeyword &&
-        node.arguments[0] &&
-        ts.isStringLiteralLike(node.arguments[0])
-      ) {
-        const name = node.arguments[0].text;
-        if (SERVER_PACKAGE.test(name)) serverModules.add(file);
-        const target = ts.resolveModuleName(name, file, compilerOptions, ts.sys).resolvedModule?.resolvedFileName;
-        if (target && modules.has(target)) targets.push(target);
-      }
-      ts.forEachChild(node, dynamicImports);
-    }
-    dynamicImports(ast);
-    graph.set(file, targets);
+    const scan = { file, compilerOptions, modules, targets: [], serverModules: state.serverModules };
+    registerDirective(file, ast, state);
+    if (SERVER_MODULE.test(file)) state.serverModules.add(file);
+    collectStaticImports(ast, scan);
+    collectDynamicImports(ast, scan);
+    graph.set(file, scan.targets);
   }
-  problems.push(...applyMarkupDebt(markupFindings, new Set(COMPONENT_MARKUP_DEBT)));
-  for (const cycle of findImportCycles(graph))
-    problems.push(`런타임 순환 참조: ${cycle.map((file) => path.relative(root, file)).join(' → ')}`);
-  for (const leak of findServerLeaks(graph, clients, serverModules, actions))
-    problems.push(`클라이언트의 서버 전용 코드 참조: ${leak.map((file) => path.relative(root, file)).join(' → ')}`);
+  return { graph, ...state };
+}
+
+function graphProblems(root, modules) {
+  const { graph, clients, actions, serverModules } = buildModuleGraph(modules);
+  const display = (chain, separator) => chain.map((file) => path.relative(root, file)).join(separator);
+  return [
+    ...findImportCycles(graph).map((cycle) => `런타임 순환 참조: ${display(cycle, ' → ')}`),
+    ...findServerLeaks(graph, clients, serverModules, actions).map(
+      (leak) => `클라이언트의 서버 전용 코드 참조: ${display(leak, ' → ')}`,
+    ),
+  ];
+}
+
+export function checkRepository(root = ROOT) {
+  const problems = [];
+  const collected = { modules: new Map(), markupFindings: [] };
+  const roots = listWorkspaceRoots(root);
+  const workspaceNames = new Set(
+    roots.map((dir) => JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8')).name),
+  );
+  const shared = { workspaceNames, catalogNames: readCatalogNames(root) };
+  for (const dir of roots) problems.push(...workspaceProblems(root, dir, shared, collected));
+  problems.push(...applyMarkupDebt(collected.markupFindings, new Set(COMPONENT_MARKUP_DEBT)));
+  problems.push(...graphProblems(root, collected.modules));
   return { problems, workspaceCount: workspaceNames.size };
 }
 
