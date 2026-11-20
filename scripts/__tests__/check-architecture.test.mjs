@@ -4,6 +4,7 @@ import {
   findImportCycles,
   findMisplacedStyles,
   findServerLeaks,
+  validateAgentRules,
   validateComponentModule,
   validateDesignTokens,
   validateManifest,
@@ -171,4 +172,15 @@ test('CSS files live in src/app/styles or a slice styles/ folder; only <Componen
   assert.equal(findMisplacedStyles(['src/views/drive/ui/menu.module.css']).length, 1);
   assert.equal(findMisplacedStyles(['src/shared/ui/sheet.css']).length, 1);
   assert.equal(findMisplacedStyles(['app/page.css']).length, 1);
+});
+
+test('Next apps keep next dev from rewriting AGENTS.md: agentRules is off and no managed block remains', () => {
+  const plainAgents = '## 이 Next.js는 학습한 Next.js와 다르다\n';
+  assert.deepEqual(validateAgentRules('const config = { agentRules: false };', plainAgents), []);
+  assert.equal(validateAgentRules('const config = {};', plainAgents).length, 1);
+  assert.equal(validateAgentRules('const config = { agentRules: true };', plainAgents).length, 1);
+  assert.equal(
+    validateAgentRules('const config = { agentRules: false };', '<!-- BEGIN:nextjs-agent-rules -->\n').length,
+    1,
+  );
 });
