@@ -1,6 +1,6 @@
+import { applyRunnerDetail, type PreparedRunner } from '@views/ride/lib/runner/prepareRunnerModel';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
 import { useLayoutEffect } from 'react';
-import { applyRunnerDetail, type PreparedRunner } from '../../lib/runner/prepareRunnerModel';
-import { useLowDetail } from '../ride-state/sceneQuality';
 
 export function useRunnerDetail(prepared: PreparedRunner): void {
   const isLowDetail = useLowDetail();

@@ -1,4 +1,4 @@
-import type { RunnerAction } from '../constants';
+import type { RunnerAction } from '@views/ride/model/runner-control/constants';
 
 type RunnerInput = Record<RunnerAction, boolean>;
 

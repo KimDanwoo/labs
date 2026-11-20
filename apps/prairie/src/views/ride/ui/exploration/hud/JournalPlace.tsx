@@ -1,4 +1,4 @@
-import type { LANDMARKS } from '../../../model/exploration/world';
+import type { LANDMARKS } from '@views/ride/model/exploration/world';
 
 interface JournalPlaceProps {
   place: (typeof LANDMARKS)[number];

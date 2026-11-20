@@ -1,13 +1,13 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { HAZE_VIEW } from '@views/ride/config/hazeView';
+import { HAZE, RIDGES, SCENE_COLORS } from '@views/ride/config/scene';
+import { makeRidgeTexture } from '@views/ride/lib/makeRidgeTexture';
+import { CENTER_Y, FRAGMENT, HEIGHT, updateHaze, VERTEX } from '@views/ride/lib/scenery/haze';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
 import { useMemo, useRef } from 'react';
 import { BackSide, Color, Mesh, ShaderMaterial } from 'three';
-import { HAZE_VIEW } from '../../config/hazeView';
-import { HAZE, RIDGES, SCENE_COLORS } from '../../config/scene';
-import { makeRidgeTexture } from '../../lib/makeRidgeTexture';
-import { CENTER_Y, FRAGMENT, HEIGHT, updateHaze, VERTEX } from '../../lib/scenery/haze';
-import { useDispose } from '../../model/hooks/useDispose';
 
 export function Haze() {
   const meshRef = useRef<Mesh>(null);

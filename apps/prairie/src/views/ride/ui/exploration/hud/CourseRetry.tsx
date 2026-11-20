@@ -1,6 +1,6 @@
-import { HUD_PILL_BUTTON } from '../../../config/hud';
-import { resetCourse, useExploration } from '../../../model/exploration/store';
-import { GATES } from '../../../model/exploration/world';
+import { HUD_PILL_BUTTON } from '@views/ride/config/hud';
+import { resetCourse, useExploration } from '@views/ride/model/exploration/store';
+import { GATES } from '@views/ride/model/exploration/world';
 
 export function CourseRetry() {
   const { nextGate } = useExploration();

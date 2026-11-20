@@ -1,7 +1,7 @@
+import { dummy, lerp, maxMotes } from '@views/ride/lib/runner/sprintTrail';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { SPRINT_TRAIL } from '@views/ride/model/runner/constants';
 import type { InstancedMesh } from 'three';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { SPRINT_TRAIL } from '../../model/runner/constants';
-import { dummy, lerp, maxMotes } from './sprintTrail';
 
 const MAX_FRAME_DELTA = 0.05;
 const VECTOR_SIZE = 3;

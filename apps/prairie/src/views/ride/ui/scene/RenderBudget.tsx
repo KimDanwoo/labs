@@ -1,6 +1,6 @@
 'use client';
 
-import { useRenderBudget } from '../../model/hooks/useRenderBudget';
+import { useRenderBudget } from '@views/ride/model/hooks/useRenderBudget';
 
 interface RenderBudgetProps {
   desired: number;

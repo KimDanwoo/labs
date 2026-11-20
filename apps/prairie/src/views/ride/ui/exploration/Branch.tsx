@@ -1,9 +1,9 @@
 'use client';
+import { BRANCH } from '@views/ride/config/branch';
+import { makeSurfaceBump, SURFACE_KIND } from '@views/ride/lib/makeSurfaceBump';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
 import { useMemo } from 'react';
 import { CatmullRomCurve3, Vector3 } from 'three';
-import { BRANCH } from '../../config/branch';
-import { makeSurfaceBump, SURFACE_KIND } from '../../lib/makeSurfaceBump';
-import { useDispose } from '../../model/hooks/useDispose';
 
 interface BranchProps {
   points: readonly (readonly number[])[];

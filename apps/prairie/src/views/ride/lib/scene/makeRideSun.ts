@@ -1,6 +1,6 @@
+import { RIDE_SUN } from '@views/ride/config/rideSun';
+import { SCENE_COLORS, SUN } from '@views/ride/config/scene';
 import { DirectionalLight, type Object3D } from 'three';
-import { RIDE_SUN } from '../../config/rideSun';
-import { SCENE_COLORS, SUN } from '../../config/scene';
 
 export function makeRideSun(mobile: boolean, target: Object3D): DirectionalLight {
   const sun = new DirectionalLight(SCENE_COLORS.sunLight, SUN.intensity);

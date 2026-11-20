@@ -1,5 +1,5 @@
+import { FADE_MS } from '@views/ride/lib/scene/sceneLoader';
 import { useEffect, useState } from 'react';
-import { FADE_MS } from '../../lib/scene/sceneLoader';
 
 export function useLoaderRemoval(ready: boolean): boolean {
   const [isRemoved, setIsRemoved] = useState(false);

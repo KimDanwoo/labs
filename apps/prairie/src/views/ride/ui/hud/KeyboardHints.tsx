@@ -1,5 +1,5 @@
-import { ControlHint } from './ControlHint';
-import { KeyCap } from './KeyCap';
+import { ControlHint } from '@views/ride/ui/hud/ControlHint';
+import { KeyCap } from '@views/ride/ui/hud/KeyCap';
 
 export function KeyboardHints() {
   return (

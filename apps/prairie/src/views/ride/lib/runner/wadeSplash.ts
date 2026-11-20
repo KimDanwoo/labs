@@ -1,7 +1,7 @@
+import { RIVER } from '@views/ride/config/scene';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { WADE_SPLASH } from '@views/ride/model/runner/constants';
 import { Object3D, Vector3 } from 'three';
-import { RIVER } from '../../config/scene';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { WADE_SPLASH } from '../../model/runner/constants';
 
 export const WATER_Y = -RIVER.waterDrop;
 

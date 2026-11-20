@@ -2,19 +2,19 @@
 
 import { useAnimations, useGLTF } from '@react-three/drei';
 import { createPortal, useFrame } from '@react-three/fiber';
+import { prepareRunnerModel } from '@views/ride/lib/runner/prepareRunnerModel';
+import { position, rotationY, scale } from '@views/ride/lib/runner/runner';
+import { updateRunnerPose, type PoseMemory } from '@views/ride/lib/runner/runnerPose';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
+import { useRunnerDetail } from '@views/ride/model/hooks/useRunnerDetail';
+import { useRunnerGaits } from '@views/ride/model/hooks/useRunnerGaits';
+import { RUNNER_MODEL_URL } from '@views/ride/model/runner/constants';
+import { FlowingHair } from '@views/ride/ui/runner/FlowingHair';
+import { HeadCrown } from '@views/ride/ui/runner/HeadCrown';
+import { Horn } from '@views/ride/ui/runner/Horn';
+import { MagicWings } from '@views/ride/ui/runner/MagicWings';
 import { useMemo, useRef } from 'react';
 import { Group } from 'three';
-import { prepareRunnerModel } from '../../lib/runner/prepareRunnerModel';
-import { position, rotationY, scale } from '../../lib/runner/runner';
-import { updateRunnerPose, type PoseMemory } from '../../lib/runner/runnerPose';
-import { useDispose } from '../../model/hooks/useDispose';
-import { useRunnerDetail } from '../../model/hooks/useRunnerDetail';
-import { useRunnerGaits } from '../../model/hooks/useRunnerGaits';
-import { RUNNER_MODEL_URL } from '../../model/runner/constants';
-import { FlowingHair } from './FlowingHair';
-import { HeadCrown } from './HeadCrown';
-import { Horn } from './Horn';
-import { MagicWings } from './MagicWings';
 
 interface RunnerProps {
   speedRef: { current: number };

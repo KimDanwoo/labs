@@ -1,7 +1,7 @@
+import { MEADOW_PATH, RIVER_TRENCH_HALF_WIDTH } from '@views/ride/config/scene';
+import { COLORS, hash, TILE } from '@views/ride/lib/flora/meadowFlowers';
+import { coastDistanceAt, distanceToRiver, meadowPathDistanceAt, terrainHeightAt } from '@views/ride/lib/scene/terrain';
 import type { InstancedMesh, Object3D } from 'three';
-import { MEADOW_PATH, RIVER_TRENCH_HALF_WIDTH } from '../../config/scene';
-import { coastDistanceAt, distanceToRiver, meadowPathDistanceAt, terrainHeightAt } from '../scene/terrain';
-import { COLORS, hash, TILE } from './meadowFlowers';
 
 const PATCH_SPREAD = 4.5;
 const COAST_LIMIT = -32;

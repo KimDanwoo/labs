@@ -1,5 +1,4 @@
-import { type Camera, MathUtils, PerspectiveCamera } from 'three';
-import { CAMERA, CINEMATIC } from '../../../config/scene';
+import { CAMERA, CINEMATIC } from '@views/ride/config/scene';
 import {
   camDirVec,
   desiredCam,
@@ -9,11 +8,12 @@ import {
   RIG,
   smoothTarget,
   SPRINT_FOV_BOOST,
-} from '../../../lib/runner-control/runnerRig';
-import { terrainHeightAt } from '../../../lib/scene/terrain';
-import type { CAMERA_PRESETS } from '../../ride-settings/constants';
-import { DASH_SKILL } from './dashSkill';
-import type { RunnerMotion } from './runnerMotion';
+} from '@views/ride/lib/runner-control/runnerRig';
+import { terrainHeightAt } from '@views/ride/lib/scene/terrain';
+import type { CAMERA_PRESETS } from '@views/ride/model/ride-settings/constants';
+import { DASH_SKILL } from '@views/ride/model/runner-control/services/dashSkill';
+import type { RunnerMotion } from '@views/ride/model/runner-control/services/runnerMotion';
+import { type Camera, MathUtils, PerspectiveCamera } from 'three';
 
 type CameraRefs = {
   viewYawRef: { current: number };

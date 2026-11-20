@@ -1,6 +1,6 @@
+import { UNICORN_TINT } from '@views/ride/model/runner/constants';
 import { Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type Group, type Material } from 'three';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
-import { UNICORN_TINT } from '../../model/runner/constants';
 
 interface RunnerMeshFinish {
   mesh: Mesh;

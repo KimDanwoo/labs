@@ -1,4 +1,4 @@
-import { OCEAN, RIVER, RIVER_TRENCH_HALF_WIDTH, TERRAIN } from './scene';
+import { OCEAN, RIVER, RIVER_TRENCH_HALF_WIDTH, TERRAIN } from '@views/ride/config/scene';
 
 const glslFloat = (value: number): string => value.toFixed(4);
 

@@ -1,3 +1,7 @@
+import { FLOWING_HAIR } from '@views/ride/config/flowingHair';
+import { HAIR_COMMON_GLSL, HAIR_NORMAL_GLSL, HAIR_VERTEX_GLSL } from '@views/ride/config/flowingHairGlsl';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { RUNNER_FINISH } from '@views/ride/model/runner/constants';
 import {
   BufferGeometry,
   Color,
@@ -6,10 +10,6 @@ import {
   type Object3D,
   type WebGLProgramParametersWithUniforms,
 } from 'three';
-import { FLOWING_HAIR } from '../../config/flowingHair';
-import { HAIR_COMMON_GLSL, HAIR_NORMAL_GLSL, HAIR_VERTEX_GLSL } from '../../config/flowingHairGlsl';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { RUNNER_FINISH } from '../../model/runner/constants';
 
 export function makeUniforms() {
   return {

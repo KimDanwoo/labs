@@ -1,9 +1,9 @@
-import { preloadSceneAssets } from '../lib/scene/preloadSceneAssets';
-import { Hud } from './hud/Hud';
-import { TouchControls } from './runner-control/TouchControls';
-import { SceneBoundary } from './scene/SceneBoundary';
-import { SceneCanvas } from './scene/SceneCanvas';
-import { SceneLoader } from './scene/SceneLoader';
+import { preloadSceneAssets } from '@views/ride/lib/scene/preloadSceneAssets';
+import { Hud } from '@views/ride/ui/hud/Hud';
+import { TouchControls } from '@views/ride/ui/runner-control/TouchControls';
+import { SceneBoundary } from '@views/ride/ui/scene/SceneBoundary';
+import { SceneCanvas } from '@views/ride/ui/scene/SceneCanvas';
+import { SceneLoader } from '@views/ride/ui/scene/SceneLoader';
 
 export function RideView() {
   preloadSceneAssets();

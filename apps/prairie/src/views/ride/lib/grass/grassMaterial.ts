@@ -1,10 +1,10 @@
+import { FOG, SCENE_COLORS } from '@views/ride/config/scene';
+import { gustOriginUniform, runnerXZUniform } from '@views/ride/lib/grass/grassField';
+import { makeBladeGeometry } from '@views/ride/lib/makeBladeGeometry';
+import { GRASS_QUALITY, GUST, type GrassQuality } from '@views/ride/model/grass/constants';
+import { GRASS_FRAGMENT_SHADER, GRASS_VERTEX_SHADER } from '@views/ride/model/grass/shaders';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
 import { Color, DoubleSide, ShaderMaterial, type BufferGeometry } from 'three';
-import { FOG, SCENE_COLORS } from '../../config/scene';
-import { GRASS_QUALITY, GUST, type GrassQuality } from '../../model/grass/constants';
-import { GRASS_FRAGMENT_SHADER, GRASS_VERTEX_SHADER } from '../../model/grass/shaders';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { makeBladeGeometry } from '../makeBladeGeometry';
-import { gustOriginUniform, runnerXZUniform } from './grassField';
 
 export interface GrassCell {
   x: number;

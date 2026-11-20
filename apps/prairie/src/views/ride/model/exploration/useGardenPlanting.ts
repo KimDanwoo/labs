@@ -1,9 +1,9 @@
 import { useFrame } from '@react-three/fiber';
+import { createGardenLayout, swayStemMatrix } from '@views/ride/lib/exploration/gardenPlanting';
+import { terrainHeightAt } from '@views/ride/lib/scene/terrain';
+import { LANDMARKS } from '@views/ride/model/exploration/world';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { Object3D, type InstancedMesh } from 'three';
-import { createGardenLayout, swayStemMatrix } from '../../lib/exploration/gardenPlanting';
-import { terrainHeightAt } from '../../lib/scene/terrain';
-import { LANDMARKS } from './world';
 
 function gardenLayout() {
   const place = LANDMARKS[1];

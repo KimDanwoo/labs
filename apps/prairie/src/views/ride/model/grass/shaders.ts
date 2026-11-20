@@ -1,6 +1,6 @@
-import { MEADOW_LIGHT_GLSL } from '../../config/meadowGlsl';
-import { SUN } from '../../config/scene';
-import { GRASS_LOD, GUST } from './constants';
+import { MEADOW_LIGHT_GLSL } from '@views/ride/config/meadowGlsl';
+import { SUN } from '@views/ride/config/scene';
+import { GRASS_LOD, GUST } from '@views/ride/model/grass/constants';
 
 const SUN_LENGTH = Math.hypot(...SUN.position);
 const SUN_DIRECTION_GLSL = `vec3(${SUN.position.map((component) => (component / SUN_LENGTH).toFixed(5)).join(',')})`;

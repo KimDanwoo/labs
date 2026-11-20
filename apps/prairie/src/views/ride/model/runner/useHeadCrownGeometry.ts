@@ -1,5 +1,5 @@
+import { makeHeadCrownGeometry } from '@views/ride/lib/runner/headCrownGeometry';
 import { useEffect, useMemo } from 'react';
-import { makeHeadCrownGeometry } from '../../lib/runner/headCrownGeometry';
 
 export function useHeadCrownGeometry() {
   const geometry = useMemo(() => makeHeadCrownGeometry(), []);

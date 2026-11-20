@@ -1,5 +1,5 @@
+import { HEAD_CROWN } from '@views/ride/config/headCrown';
 import { CatmullRomCurve3, TubeGeometry, Vector3 } from 'three';
-import { HEAD_CROWN } from '../../config/headCrown';
 
 type Vec3 = readonly [number, number, number];
 

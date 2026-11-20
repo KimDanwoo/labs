@@ -1,13 +1,13 @@
 'use client';
+import { LIVING_LANDMARKS } from '@views/ride/config/livingLandmarks';
+import { terrainHeightAt } from '@views/ride/lib/scene/terrain';
+import { LANDMARKS } from '@views/ride/model/exploration/world';
+import { WingedLife } from '@views/ride/ui/wildlife/WingedLife';
 import { memo } from 'react';
-import { LIVING_LANDMARKS } from '../../config/livingLandmarks';
-import { terrainHeightAt } from '../../lib/scene/terrain';
-import { LANDMARKS } from '../../model/exploration/world';
-import { WingedLife } from '../wildlife/WingedLife';
 
-import { ElderTree } from './ElderTree';
-import { FlowerGarden } from './FlowerGarden';
-import { SunsetArch } from './SunsetArch';
+import { ElderTree } from '@views/ride/ui/exploration/ElderTree';
+import { FlowerGarden } from '@views/ride/ui/exploration/FlowerGarden';
+import { SunsetArch } from '@views/ride/ui/exploration/SunsetArch';
 
 export const LivingLandmarks = memo(function LivingLandmarks() {
   const tree = LANDMARKS[0],

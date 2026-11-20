@@ -1,5 +1,5 @@
-import { JOYSTICK } from '../constants';
-import { setRunnerAction } from '../store/runnerInput';
+import { JOYSTICK } from '@views/ride/model/runner-control/constants';
+import { setRunnerAction } from '@views/ride/model/runner-control/store/runnerInput';
 
 export function applyJoystickDirection(dx: number, dy: number): void {
   const { deadzone } = JOYSTICK;

@@ -1,7 +1,7 @@
 import { COARSE_POINTER_QUERY, FINE_POINTER_QUERY } from '@shared/config/media';
+import { SKY_FILES } from '@views/ride/config/scene';
+import { RUNNER_MODEL_URL } from '@views/ride/model/runner/constants';
 import { preload } from 'react-dom';
-import { SKY_FILES } from '../../config/scene';
-import { RUNNER_MODEL_URL } from '../../model/runner/constants';
 
 const FETCH = { as: 'fetch', crossOrigin: 'anonymous' } as const;
 

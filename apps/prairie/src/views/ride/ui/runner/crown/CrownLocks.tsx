@@ -1,6 +1,6 @@
+import { HEAD_CROWN } from '@views/ride/config/headCrown';
+import { RUNNER_FINISH } from '@views/ride/model/runner/constants';
 import type { TubeGeometry } from 'three';
-import { HEAD_CROWN } from '../../../config/headCrown';
-import { RUNNER_FINISH } from '../../../model/runner/constants';
 
 interface CrownLocksProps {
   locks: TubeGeometry[];

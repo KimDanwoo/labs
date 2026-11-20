@@ -1,12 +1,12 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { SLOPE_SAMPLE, across, along, basis, normal, shadowMaterial } from '@views/ride/lib/runner/groundShadow';
+import { terrainHeightAt } from '@views/ride/lib/scene/terrain';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { GROUND_SHADOW } from '@views/ride/model/runner/constants';
 import { useRef } from 'react';
 import { Mesh } from 'three';
-import { SLOPE_SAMPLE, across, along, basis, normal, shadowMaterial } from '../../lib/runner/groundShadow';
-import { terrainHeightAt } from '../../lib/scene/terrain';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { GROUND_SHADOW } from '../../model/runner/constants';
 
 export function GroundShadow() {
   const meshRef = useRef<Mesh>(null);

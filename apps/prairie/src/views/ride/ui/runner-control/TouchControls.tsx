@@ -1,10 +1,10 @@
 'use client';
 
+import { JOYSTICK } from '@views/ride/model/runner-control/constants';
+import { applyJoystickDirection } from '@views/ride/model/runner-control/services/joystickDirection';
+import { setRunnerAction } from '@views/ride/model/runner-control/store/runnerInput';
+import { TouchActions } from '@views/ride/ui/runner-control/TouchActions';
 import { type PointerEvent, useRef, useState } from 'react';
-import { JOYSTICK } from '../../model/runner-control/constants';
-import { applyJoystickDirection } from '../../model/runner-control/services/joystickDirection';
-import { setRunnerAction } from '../../model/runner-control/store/runnerInput';
-import { TouchActions } from './TouchActions';
 
 type Vec = { x: number; y: number };
 

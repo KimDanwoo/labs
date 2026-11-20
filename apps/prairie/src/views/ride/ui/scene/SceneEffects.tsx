@@ -1,7 +1,7 @@
 'use client';
 
 import { useFrame, useThree } from '@react-three/fiber';
-import { useSceneEffects } from '../../model/hooks/useSceneEffects';
+import { useSceneEffects } from '@views/ride/model/hooks/useSceneEffects';
 
 interface SceneEffectsProps {
   enabled: boolean;

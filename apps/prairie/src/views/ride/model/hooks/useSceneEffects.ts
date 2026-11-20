@@ -1,5 +1,7 @@
 import { useThree } from '@react-three/fiber';
 import { boundedDpr } from '@shared/lib/renderBudget';
+import { CINEMATIC } from '@views/ride/config/scene';
+import { FINITE_COLOR_SHADER } from '@views/ride/lib/scene/sceneEffects';
 import { useEffect, useRef, type RefObject } from 'react';
 import { Vector2 } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -8,8 +10,6 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
-import { CINEMATIC } from '../../config/scene';
-import { FINITE_COLOR_SHADER } from '../../lib/scene/sceneEffects';
 
 export function useSceneEffects(enabled: boolean, pixels: number): RefObject<EffectComposer | null> {
   const { gl, scene, camera, size, viewport } = useThree();

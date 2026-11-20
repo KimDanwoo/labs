@@ -1,7 +1,7 @@
+import { RIVER } from '@views/ride/config/scene';
+import { CELL, hash } from '@views/ride/lib/river/riverBanks';
+import { coastDistanceAt, groundHeightAt, nearestRiverX, riverWidthAt } from '@views/ride/lib/scene/terrain';
 import type { Color, InstancedMesh, Object3D } from 'three';
-import { RIVER } from '../../config/scene';
-import { coastDistanceAt, groundHeightAt, nearestRiverX, riverWidthAt } from '../scene/terrain';
-import { CELL, hash } from './riverBanks';
 
 const RADIUS_COARSE = 3;
 const RADIUS_FINE = 5;

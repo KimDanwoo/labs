@@ -1,7 +1,7 @@
 'use client';
 
+import { parseProgress } from '@views/ride/model/exploration/world';
 import { useSyncExternalStore } from 'react';
-import { parseProgress } from './world';
 
 const KEY = 'prairie.exploration.v1';
 type Snapshot = {

@@ -1,7 +1,7 @@
 'use client';
 import { Component, type ReactNode } from 'react';
 
-import { SceneFailure } from './SceneFailure';
+import { SceneFailure } from '@views/ride/ui/scene/SceneFailure';
 
 export class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };

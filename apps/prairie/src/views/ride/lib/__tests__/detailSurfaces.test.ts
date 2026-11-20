@@ -1,8 +1,8 @@
+import { makeRockGeometry } from '@views/ride/lib/flora/makeFloraGeometry';
+import { makeSurfaceBump, SURFACE_KIND } from '@views/ride/lib/makeSurfaceBump';
+import { makeWingGeometry } from '@views/ride/lib/runner/makeWingGeometry';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { makeRockGeometry } from '../flora/makeFloraGeometry';
-import { makeSurfaceBump, SURFACE_KIND } from '../makeSurfaceBump';
-import { makeWingGeometry } from '../runner/makeWingGeometry';
 
 test('layered feathers have valid UVs, normals and colors within the existing geometry budget', () => {
   const wing = makeWingGeometry(4.4, 26);

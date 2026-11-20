@@ -1,6 +1,6 @@
+import { getRunnerInput, resetRunnerInput, setRunnerAction } from '@views/ride/model/runner-control/store/runnerInput';
 import assert from 'node:assert/strict';
 import test, { beforeEach } from 'node:test';
-import { getRunnerInput, resetRunnerInput, setRunnerAction } from '../runnerInput';
 
 beforeEach(resetRunnerInput);
 

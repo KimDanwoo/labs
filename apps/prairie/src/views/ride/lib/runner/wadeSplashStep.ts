@@ -1,7 +1,16 @@
+import {
+  RING_Y,
+  WATER_Y,
+  dummy,
+  lerp,
+  lookTarget,
+  maxDroplets,
+  ringCount,
+  splashIntensity,
+} from '@views/ride/lib/runner/wadeSplash';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { WADE_SPLASH } from '@views/ride/model/runner/constants';
 import { MeshBasicMaterial, type InstancedMesh, type Mesh } from 'three';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { WADE_SPLASH } from '../../model/runner/constants';
-import { RING_Y, WATER_Y, dummy, lerp, lookTarget, maxDroplets, ringCount, splashIntensity } from './wadeSplash';
 
 const MAX_FRAME_DELTA = 0.05;
 const VECTOR_SIZE = 3;

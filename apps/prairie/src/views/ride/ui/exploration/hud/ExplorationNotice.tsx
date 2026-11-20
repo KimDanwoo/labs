@@ -1,4 +1,4 @@
-import { useExploration } from '../../../model/exploration/store';
+import { useExploration } from '@views/ride/model/exploration/store';
 
 export function ExplorationNotice() {
   const { notice, nearby } = useExploration();

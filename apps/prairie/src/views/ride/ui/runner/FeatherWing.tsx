@@ -1,8 +1,8 @@
+import { FEATHER_WING } from '@views/ride/config/featherWing';
+import { shadeFeathers } from '@views/ride/lib/runner/featherSurface';
+import { RUNNER_FINISH, WINGS } from '@views/ride/model/runner/constants';
 import type { Ref } from 'react';
 import { DoubleSide, type BufferGeometry, type Group } from 'three';
-import { FEATHER_WING } from '../../config/featherWing';
-import { shadeFeathers } from '../../lib/runner/featherSurface';
-import { RUNNER_FINISH, WINGS } from '../../model/runner/constants';
 
 interface FeatherWingProps {
   geometry: BufferGeometry;

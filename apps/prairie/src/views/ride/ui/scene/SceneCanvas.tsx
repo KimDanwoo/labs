@@ -2,26 +2,26 @@
 
 import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
+import { CAMERA, SCENE_COLORS, SUN } from '@views/ride/config/scene';
+import { FILL_LIGHT_INTENSITY, FILL_LIGHT_POSITION, PERFORMANCE_FLIPFLOPS } from '@views/ride/lib/scene/sceneCanvas';
+import { useSceneQuality } from '@views/ride/model/hooks/useSceneQuality';
+import { SceneQualityContext } from '@views/ride/model/ride-state/sceneQuality';
+import { ExplorationScene } from '@views/ride/ui/exploration/ExplorationScene';
+import { FloraField } from '@views/ride/ui/flora/FloraField';
+import { GrassField } from '@views/ride/ui/grass/GrassField';
+import { River } from '@views/ride/ui/river/River';
+import { RunnerRig } from '@views/ride/ui/runner-control/RunnerRig';
+import { ReadySignal } from '@views/ride/ui/scene/ReadySignal';
+import { RenderBudget } from '@views/ride/ui/scene/RenderBudget';
+import { RideSun } from '@views/ride/ui/scene/RideSun';
+import { SceneEffects } from '@views/ride/ui/scene/SceneEffects';
+import { SceneFailure } from '@views/ride/ui/scene/SceneFailure';
+import { Ground } from '@views/ride/ui/scenery/Ground';
+import { Scenery } from '@views/ride/ui/scenery/Scenery';
+import { Grazers } from '@views/ride/ui/wildlife/Grazers';
+import { WingedLife } from '@views/ride/ui/wildlife/WingedLife';
 import { Suspense } from 'react';
 import { PCFShadowMap } from 'three';
-import { CAMERA, SCENE_COLORS, SUN } from '../../config/scene';
-import { FILL_LIGHT_INTENSITY, FILL_LIGHT_POSITION, PERFORMANCE_FLIPFLOPS } from '../../lib/scene/sceneCanvas';
-import { useSceneQuality } from '../../model/hooks/useSceneQuality';
-import { SceneQualityContext } from '../../model/ride-state/sceneQuality';
-import { ExplorationScene } from '../exploration/ExplorationScene';
-import { FloraField } from '../flora/FloraField';
-import { GrassField } from '../grass/GrassField';
-import { River } from '../river/River';
-import { RunnerRig } from '../runner-control/RunnerRig';
-import { Ground } from '../scenery/Ground';
-import { Scenery } from '../scenery/Scenery';
-import { Grazers } from '../wildlife/Grazers';
-import { WingedLife } from '../wildlife/WingedLife';
-import { ReadySignal } from './ReadySignal';
-import { RenderBudget } from './RenderBudget';
-import { RideSun } from './RideSun';
-import { SceneEffects } from './SceneEffects';
-import { SceneFailure } from './SceneFailure';
 
 export function SceneCanvas() {
   const {

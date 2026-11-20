@@ -1,4 +1,4 @@
-import { MEADOW_PATH, OCEAN, RIVER, RIVER_TRENCH_HALF_WIDTH, TERRAIN } from '../../config/scene';
+import { MEADOW_PATH, OCEAN, RIVER, RIVER_TRENCH_HALF_WIDTH, TERRAIN } from '@views/ride/config/scene';
 
 // CPU placement, collision and GPU river geometry share these wave parameters.
 

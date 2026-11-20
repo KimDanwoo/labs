@@ -1,4 +1,4 @@
-import { CAMERA, CINEMATIC } from '../../config/scene';
+import { CAMERA, CINEMATIC } from '@views/ride/config/scene';
 
 export const CAMERA_MODE = { close: 'close', wide: 'wide', hero: 'hero' } as const;
 export type CameraMode = (typeof CAMERA_MODE)[keyof typeof CAMERA_MODE];

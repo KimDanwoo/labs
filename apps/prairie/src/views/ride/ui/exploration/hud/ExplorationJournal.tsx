@@ -1,6 +1,6 @@
-import { useExploration } from '../../../model/exploration/store';
-import { LANDMARKS } from '../../../model/exploration/world';
-import { JournalPlace } from './JournalPlace';
+import { useExploration } from '@views/ride/model/exploration/store';
+import { LANDMARKS } from '@views/ride/model/exploration/world';
+import { JournalPlace } from '@views/ride/ui/exploration/hud/JournalPlace';
 
 export function ExplorationJournal() {
   const { discovered, best, storageUnavailable } = useExploration();

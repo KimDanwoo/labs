@@ -1,6 +1,6 @@
 'use client';
 
-import { useRideTelemetry } from '../../model/ride-state/rideTelemetry';
+import { useRideTelemetry } from '@views/ride/model/ride-state/rideTelemetry';
 
 export function RideTelemetry() {
   const { speed, altitude } = useRideTelemetry();

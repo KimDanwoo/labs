@@ -1,8 +1,8 @@
+import { HORN_VIEW } from '@views/ride/config/hornView';
+import { makeHorn } from '@views/ride/lib/runner/makeHorn';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
+import { HORN } from '@views/ride/model/runner/constants';
 import { useMemo } from 'react';
-import { HORN_VIEW } from '../../config/hornView';
-import { makeHorn } from '../../lib/runner/makeHorn';
-import { useDispose } from '../../model/hooks/useDispose';
-import { HORN } from '../../model/runner/constants';
 
 export function Horn() {
   const geometry = useMemo(() => makeHorn(), []);

@@ -1,8 +1,8 @@
+import { GARDEN_COLUMN } from '@views/ride/config/gardenColumn';
+import { makeGardenColumn } from '@views/ride/lib/exploration/makeGardenColumn';
+import { makeSurfaceBump, SURFACE_KIND } from '@views/ride/lib/makeSurfaceBump';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
 import { useMemo } from 'react';
-import { GARDEN_COLUMN } from '../../config/gardenColumn';
-import { makeGardenColumn } from '../../lib/exploration/makeGardenColumn';
-import { makeSurfaceBump, SURFACE_KIND } from '../../lib/makeSurfaceBump';
-import { useDispose } from '../../model/hooks/useDispose';
 
 interface GardenColumnProps {
   height: number;

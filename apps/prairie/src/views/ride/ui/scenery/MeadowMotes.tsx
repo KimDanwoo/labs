@@ -1,16 +1,16 @@
 'use client';
 
-import { runnerState } from '../../model/ride-state/runnerState';
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
 
 import { useFrame, useThree } from '@react-three/fiber';
 import { useReducedMotion } from '@shared/lib/useReducedMotion';
-import { CINEMATIC, SCENE_COLORS } from '../../config/scene';
+import { CINEMATIC, SCENE_COLORS } from '@views/ride/config/scene';
 
+import { FRAGMENT, makeMoteGeometry, VERTEX } from '@views/ride/lib/scenery/meadowMotes';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
 import { useMemo, useRef } from 'react';
 import { AdditiveBlending, Color, ShaderMaterial, Vector2 } from 'three';
-import { FRAGMENT, makeMoteGeometry, VERTEX } from '../../lib/scenery/meadowMotes';
-import { useDispose } from '../../model/hooks/useDispose';
 
 export function MeadowMotes() {
   const materialRef = useRef<ShaderMaterial>(null);

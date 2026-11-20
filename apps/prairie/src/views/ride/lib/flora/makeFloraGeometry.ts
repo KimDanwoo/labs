@@ -1,3 +1,4 @@
+import { FLORA } from '@views/ride/model/flora/constants';
 import {
   Color,
   ConeGeometry,
@@ -9,7 +10,6 @@ import {
   RGBAFormat,
 } from 'three';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { FLORA } from '../../model/flora/constants';
 
 export function makeCanopyGeometry(detail: number) {
   const base = new IcosahedronGeometry(FLORA.canopy.radius, detail);

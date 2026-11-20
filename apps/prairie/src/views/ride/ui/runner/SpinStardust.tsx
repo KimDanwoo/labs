@@ -1,9 +1,15 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import {
+  COLORS,
+  COUNT,
+  createStardustState,
+  makeStarGeometry,
+  stepStardust,
+} from '@views/ride/lib/runner/spinStardust';
 import { useMemo, useRef } from 'react';
 import { AdditiveBlending, Color, InstancedMesh, Object3D } from 'three';
-import { COLORS, COUNT, createStardustState, makeStarGeometry, stepStardust } from '../../lib/runner/spinStardust';
 
 export function SpinStardust() {
   const meshRef = useRef<InstancedMesh>(null);

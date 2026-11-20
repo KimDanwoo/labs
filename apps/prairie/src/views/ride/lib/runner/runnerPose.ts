@@ -1,9 +1,9 @@
+import { gaitWeights } from '@views/ride/lib/runner/gaitWeights';
+import { position } from '@views/ride/lib/runner/runner';
+import { terrainHeightAt } from '@views/ride/lib/scene/terrain';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { RUNNER_ANIM, RUNNER_ANIM_TUNING } from '@views/ride/model/runner/constants';
 import { MathUtils, type AnimationAction, type Group } from 'three';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { RUNNER_ANIM, RUNNER_ANIM_TUNING } from '../../model/runner/constants';
-import { terrainHeightAt } from '../scene/terrain';
-import { gaitWeights } from './gaitWeights';
-import { position } from './runner';
 
 export interface Gaits {
   idle: AnimationAction | null;

@@ -1,6 +1,6 @@
+import { RIVER_GLSL, TERRAIN_GLSL } from '@views/ride/config/riverGlsl';
+import { CINEMATIC } from '@views/ride/config/scene';
 import { BufferGeometry, Float32BufferAttribute } from 'three';
-import { RIVER_GLSL, TERRAIN_GLSL } from '../../config/riverGlsl';
-import { CINEMATIC } from '../../config/scene';
 
 export const VERTEX = `
   attribute float aSeed;

@@ -1,7 +1,7 @@
+import { MEADOW_PATH, RIVER, RIVER_TRENCH_HALF_WIDTH } from '@views/ride/config/scene';
+import { coastDistanceAt, distanceToRiver, groundHeightAt, meadowPathDistanceAt } from '@views/ride/lib/scene/terrain';
+import { GRASS_FIELD } from '@views/ride/model/grass/constants';
 import { InstancedBufferAttribute, MathUtils, Object3D, type BufferGeometry, type InstancedMesh } from 'three';
-import { MEADOW_PATH, RIVER, RIVER_TRENCH_HALF_WIDTH } from '../../config/scene';
-import { GRASS_FIELD } from '../../model/grass/constants';
-import { coastDistanceAt, distanceToRiver, groundHeightAt, meadowPathDistanceAt } from '../scene/terrain';
 
 // 시드 기반 결정적 PRNG(mulberry32) — 셀마다 항상 같은 잔디 배치.
 export function makeRng(seed: number): () => number {

@@ -1,11 +1,11 @@
 'use client';
+import { FLOWER_GARDEN } from '@views/ride/config/flowerGarden';
+import { gardenColumns } from '@views/ride/lib/exploration/flowerGarden';
 import { useMemo } from 'react';
-import { FLOWER_GARDEN } from '../../config/flowerGarden';
-import { gardenColumns } from '../../lib/exploration/flowerGarden';
 
-import { Branch } from './Branch';
-import { GardenColumn } from './GardenColumn';
-import { GardenPlanting } from './GardenPlanting';
+import { Branch } from '@views/ride/ui/exploration/Branch';
+import { GardenColumn } from '@views/ride/ui/exploration/GardenColumn';
+import { GardenPlanting } from '@views/ride/ui/exploration/GardenPlanting';
 
 export function FlowerGarden() {
   const columns = useMemo(() => gardenColumns(), []);

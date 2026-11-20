@@ -1,13 +1,13 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
+import { updateMagicWings, type WingMemory } from '@views/ride/lib/runner/magicWings';
+import { makeWingGeometry } from '@views/ride/lib/runner/makeWingGeometry';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
+import { WINGS } from '@views/ride/model/runner/constants';
+import { FeatherWing } from '@views/ride/ui/runner/FeatherWing';
 import { useMemo, useRef } from 'react';
 import { Group, Vector3, type Object3D } from 'three';
-import { updateMagicWings, type WingMemory } from '../../lib/runner/magicWings';
-import { makeWingGeometry } from '../../lib/runner/makeWingGeometry';
-import { useDispose } from '../../model/hooks/useDispose';
-import { WINGS } from '../../model/runner/constants';
-import { FeatherWing } from './FeatherWing';
 
 interface MagicWingsProps {
   anchor: Object3D;

@@ -1,9 +1,6 @@
 'use client';
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
-import { AdditiveBlending, Group, InstancedMesh, MeshBasicMaterial, Object3D, Vector3 } from 'three';
-import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
-import { SUNSET_ARCH } from '../../config/sunsetArch';
+import { SUNSET_ARCH } from '@views/ride/config/sunsetArch';
 import {
   floatingRocks,
   glowAt,
@@ -13,14 +10,17 @@ import {
   pillarBlocks,
   placeArchParticles,
   trackedPosition,
-} from '../../lib/exploration/sunsetArch';
-import { makeSurfaceBump, SURFACE_KIND } from '../../lib/makeSurfaceBump';
-import { terrainHeightAt } from '../../lib/scene/terrain';
-import { LANDMARKS } from '../../model/exploration/world';
-import { useDispose } from '../../model/hooks/useDispose';
-import { runnerState } from '../../model/ride-state/runnerState';
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
-import { crossedArch } from '../../model/wildlife/behavior';
+} from '@views/ride/lib/exploration/sunsetArch';
+import { makeSurfaceBump, SURFACE_KIND } from '@views/ride/lib/makeSurfaceBump';
+import { terrainHeightAt } from '@views/ride/lib/scene/terrain';
+import { LANDMARKS } from '@views/ride/model/exploration/world';
+import { useDispose } from '@views/ride/model/hooks/useDispose';
+import { runnerState } from '@views/ride/model/ride-state/runnerState';
+import { useLowDetail } from '@views/ride/model/ride-state/sceneQuality';
+import { crossedArch } from '@views/ride/model/wildlife/behavior';
+import { useMemo, useRef } from 'react';
+import { AdditiveBlending, Group, InstancedMesh, MeshBasicMaterial, Object3D, Vector3 } from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 export function SunsetArch() {
   const low = useLowDetail();
