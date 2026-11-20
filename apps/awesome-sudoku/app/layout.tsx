@@ -34,12 +34,9 @@ export const metadata: Metadata = {
     siteName: '어썸 스도쿠',
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: '어썸 스도쿠 — 온라인 퍼즐 게임',
     description: '클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임.',
-  },
-  icons: {
-    icon: '/favicon.ico',
   },
 };
 
