@@ -47,7 +47,7 @@ const getWorker = (): Worker | null => {
 
 const generate = (gameMode: GameMode, difficulty: Difficulty): Promise<GeneratedPuzzle> => {
   const active = getWorker();
-  if (!active) return Promise.resolve(generatePuzzle(gameMode, difficulty));
+  if (!active) return generatePuzzle(gameMode, difficulty);
 
   const id = nextRequestId++;
   return new Promise<GeneratedPuzzle>((resolve, reject) => {
