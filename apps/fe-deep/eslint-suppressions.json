@@ -1,0 +1,12 @@
+{
+  "src/entities/progress/model/services/progressRecords.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/search/model/hooks/useSearch.ts": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 1
+    }
+  }
+}
