@@ -1,12 +1,3 @@
-/**
- * 공유 미리보기(OG)와 아이콘을 앱의 실제 그림·글꼴로 찍는다.
- *
- *   pnpm brand-assets                 # 전부
- *   pnpm brand-assets fe-deep komorebi
- *
- * 스도쿠 OG의 보드는 운영 사이트 화면을 찍는다. 다른 주소는 SUDOKU_URL로 넘긴다.
- */
-
 import { chromium } from '@playwright/test';
 import { readFile, stat, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';

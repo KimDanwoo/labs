@@ -26,7 +26,8 @@ function dependencyProblem(name, version, workspaceNames, catalogNames) {
   if (workspaceNames.has(name))
     return version === 'workspace:*' ? null : `${name}: 워크스페이스 의존성은 workspace:*를 사용한다.`;
   if (!version.startsWith('catalog:')) return `${name}: 버전은 pnpm-workspace.yaml의 catalog에서 관리한다.`;
-  if (version === 'catalog:' && !catalogNames.has(name)) return `${name}: 기본 catalog에 정의되지 않았다.`;
+  const isUndefinedCatalog = version === 'catalog:' && !catalogNames.has(name);
+  if (isUndefinedCatalog) return `${name}: 기본 catalog에 정의되지 않았다.`;
   return null;
 }
 
@@ -38,8 +39,8 @@ export function validateManifest(manifest, workspaceNames, catalogNames) {
       if (problem) problems.push(problem);
     }
   }
-  if (manifest.pnpm?.overrides && manifest.name !== 'labs')
-    problems.push('pnpm.overrides는 루트 package.json에만 정의한다.');
+  const hasStrayOverrides = manifest.pnpm?.overrides && manifest.name !== 'labs';
+  if (hasStrayOverrides) problems.push('pnpm.overrides는 루트 package.json에만 정의한다.');
   return problems;
 }
 
@@ -58,10 +59,11 @@ function isMainOnlyDeployment(config) {
 }
 
 function ignoreCommandProblem(ignoreCommand, appName) {
-  if (typeof ignoreCommand !== 'string' || !ignoreCommand.trim())
+  if (typeof ignoreCommand !== 'string')
     return `ignoreCommand로 변경 없는 배포를 건너뛴다(npx turbo-ignore ${appName}).`;
-  if (ignoreCommand.includes('turbo-ignore') && ignoreCommand !== `npx turbo-ignore ${appName}`)
-    return `ignoreCommand는 이 앱을 가리킨다: npx turbo-ignore ${appName}`;
+  if (!ignoreCommand.trim()) return `ignoreCommand로 변경 없는 배포를 건너뛴다(npx turbo-ignore ${appName}).`;
+  const isWrongTurboIgnore = ignoreCommand.includes('turbo-ignore') && ignoreCommand !== `npx turbo-ignore ${appName}`;
+  if (isWrongTurboIgnore) return `ignoreCommand는 이 앱을 가리킨다: npx turbo-ignore ${appName}`;
   return null;
 }
 
@@ -84,7 +86,8 @@ export function validateVercelConfig(config, appName) {
   if (ignoreProblem) problems.push(ignoreProblem);
   const { buildCommand } = config;
   const buildFilter = typeof buildCommand === 'string' ? buildCommand.match(BUILD_FILTER)?.[1] : undefined;
-  if (buildFilter && buildFilter !== appName) problems.push(`buildCommand의 --filter는 이 앱(${appName})을 가리킨다.`);
+  const isForeignFilter = buildFilter && buildFilter !== appName;
+  if (isForeignFilter) problems.push(`buildCommand의 --filter는 이 앱(${appName})을 가리킨다.`);
   return problems;
 }
 
@@ -103,14 +106,16 @@ export function validateDesignTokens(text) {
   const problems = [];
   const lines = text.split('\n');
   lines.forEach((line, index) => {
-    if (TOKEN_EXCEPTION.test(line) || TOKEN_EXCEPTION.test(lines[index - 1] ?? '')) return;
+    const isTokenException = TOKEN_EXCEPTION.test(line) || TOKEN_EXCEPTION.test(lines[index - 1] ?? '');
+    if (isTokenException) return;
     const at = `${index + 1}행`;
     for (const [match] of line.matchAll(PALETTE_CLASS))
       problems.push(`${at}: 기본 팔레트 ${match} 대신 시맨틱 색 토큰을 쓴다.`);
     for (const [match] of line.matchAll(ARBITRARY_COLOR))
       problems.push(`${at}: 임의 색 값 ${match}… 대신 색 토큰을 쓴다.`);
     const weight = line.match(UNSUPPORTED_WEIGHT)?.[0];
-    if (weight && !/\bfont-mono\b/.test(line))
+    const isUnsupportedWeight = weight && !/\bfont-mono\b/.test(line);
+    if (isUnsupportedWeight)
       problems.push(`${at}: 마루부리에 없는 굵기 ${weight} 대신 font-normal·font-semibold·font-bold를 쓴다.`);
   });
   return problems;
@@ -147,7 +152,8 @@ export function validateTailwindNames(text) {
 
 function isComponentOrHook(name, initializer, source) {
   if (!initializer) return false;
-  if (ts.isCallExpression(initializer) && initializer.expression.getText(source) === 'cva') return true;
+  const isCvaCall = ts.isCallExpression(initializer) && initializer.expression.getText(source) === 'cva';
+  if (isCvaCall) return true;
   const isFunction = ts.isArrowFunction(initializer) || ts.isFunctionExpression(initializer);
   const isWrapped = ts.isCallExpression(initializer) && COMPONENT_WRAPPER.test(initializer.expression.getText(source));
   if (/^use[A-Z]/.test(name)) return isFunction;
@@ -158,7 +164,9 @@ export function validateComponentModule(text, filename) {
   const source = ts.createSourceFile(filename, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const problems = [];
   for (const statement of source.statements) {
-    if (ts.isFunctionDeclaration(statement) && statement.name && !/^(?:[A-Z]|use[A-Z])/.test(statement.name.text))
+    const isNonComponentFunction =
+      ts.isFunctionDeclaration(statement) && statement.name && !/^(?:[A-Z]|use[A-Z])/.test(statement.name.text);
+    if (isNonComponentFunction)
       problems.push(`${statement.name.text}: tsx에는 컴포넌트만 둔다. 보조 함수는 lib/로 옮긴다.`);
     if (!ts.isVariableStatement(statement)) continue;
     for (const declaration of statement.declarationList.declarations) {
@@ -200,7 +208,8 @@ export function findServerLeaks(graph, clients, serverModules, actions) {
   for (const client of clients) {
     const visited = new Set();
     function visit(file, chain) {
-      if (actions.has(file) || visited.has(file)) return;
+      if (actions.has(file)) return;
+      if (visited.has(file)) return;
       visited.add(file);
       const next = [...chain, file];
       if (serverModules.has(file)) {
@@ -227,8 +236,8 @@ function listWorkspaceRoots(root) {
   const roots = [root];
   for (const group of ['apps', 'packages']) {
     for (const entry of readdirSync(path.join(root, group), { withFileTypes: true })) {
-      if (entry.isDirectory() && existsSync(path.join(root, group, entry.name, 'package.json')))
-        roots.push(path.join(root, group, entry.name));
+      const isPackageDir = entry.isDirectory() && existsSync(path.join(root, group, entry.name, 'package.json'));
+      if (isPackageDir) roots.push(path.join(root, group, entry.name));
     }
   }
   return roots;
@@ -260,7 +269,8 @@ function nextTsconfigProblems(relative, config, dir) {
       problems.push(`${relative}/tsconfig.json: @${layer}/* 별칭은 ./src/${layer}/*를 가리켜야 한다.`);
     }
   }
-  if (config.compilerOptions?.paths?.['@widgets/*'] || existsSync(path.join(dir, 'src/widgets')))
+  const hasWidgetsLayer = config.compilerOptions?.paths?.['@widgets/*'] || existsSync(path.join(dir, 'src/widgets'));
+  if (hasWidgetsLayer)
     problems.push(`${relative}: widgets 레이어는 쓰지 않는다. 화면 전용 블록은 views, 공용 동작은 features로 옮긴다.`);
   return problems;
 }
@@ -305,8 +315,8 @@ function misplacedDirectiveProblems(ast, label) {
     if (!ts.isExpressionStatement(node)) continue;
     const literal = ts.isParenthesizedExpression(node.expression) ? node.expression.expression : node.expression;
     const isDirective = ts.isStringLiteral(literal) && ['use client', 'use server'].includes(literal.text);
-    if (isDirective && node !== ast.statements[0])
-      problems.push(`${label}: '${literal.text}'는 모듈의 첫 지시문이어야 한다.`);
+    const isMisplacedDirective = isDirective && node !== ast.statements[0];
+    if (isMisplacedDirective) problems.push(`${label}: '${literal.text}'는 모듈의 첫 지시문이어야 한다.`);
   }
   return problems;
 }
@@ -382,19 +392,23 @@ function workspaceProblems(root, dir, shared, collected) {
 
 function isRuntimeModuleImport(node) {
   const isModuleDeclaration = ts.isImportDeclaration(node) || ts.isExportDeclaration(node);
-  if (!isModuleDeclaration || !node.moduleSpecifier || !ts.isStringLiteral(node.moduleSpecifier)) return false;
+  if (!isModuleDeclaration) return false;
+  if (!node.moduleSpecifier) return false;
+  if (!ts.isStringLiteral(node.moduleSpecifier)) return false;
   return !(node.isTypeOnly || node.importClause?.isTypeOnly);
 }
 
 function isAllTypeNamedImport(node) {
   const bindings = node.importClause?.namedBindings;
-  if (!bindings || !ts.isNamedImports(bindings)) return false;
+  if (!bindings) return false;
+  if (!ts.isNamedImports(bindings)) return false;
   return bindings.elements.length > 0 && bindings.elements.every((element) => element.isTypeOnly);
 }
 
 function resolveKnownModule(name, file, compilerOptions, modules) {
   const target = ts.resolveModuleName(name, file, compilerOptions, ts.sys).resolvedModule?.resolvedFileName;
-  return target && modules.has(target) ? target : undefined;
+  const isKnownModule = target && modules.has(target);
+  return isKnownModule ? target : undefined;
 }
 
 function isDynamicImportCall(node) {
@@ -418,7 +432,8 @@ function collectDynamicImports(node, scan) {
 
 function collectStaticImports(ast, scan) {
   for (const node of ast.statements) {
-    if (!isRuntimeModuleImport(node) || isAllTypeNamedImport(node)) continue;
+    if (!isRuntimeModuleImport(node)) continue;
+    if (isAllTypeNamedImport(node)) continue;
     const name = node.moduleSpecifier.text;
     if (SERVER_PACKAGE.test(name)) scan.serverModules.add(scan.file);
     const target = resolveKnownModule(name, scan.file, scan.compilerOptions, scan.modules);
@@ -428,7 +443,9 @@ function collectStaticImports(ast, scan) {
 
 function registerDirective(file, ast, graphState) {
   const directive = ast.statements[0];
-  if (!directive || !ts.isExpressionStatement(directive) || !ts.isStringLiteral(directive.expression)) return;
+  if (!directive) return;
+  if (!ts.isExpressionStatement(directive)) return;
+  if (!ts.isStringLiteral(directive.expression)) return;
   if (directive.expression.text === 'use client') graphState.clients.add(file);
   if (directive.expression.text === 'use server') graphState.actions.add(file);
 }
@@ -471,7 +488,8 @@ export function checkRepository(root = ROOT) {
   return { problems, workspaceCount: workspaceNames.size };
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isDirectRun) {
   const { problems, workspaceCount } = checkRepository();
   if (problems.length) {
     console.error(problems.join('\n'));
