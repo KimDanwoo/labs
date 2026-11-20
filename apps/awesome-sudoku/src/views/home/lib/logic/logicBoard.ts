@@ -1,8 +1,8 @@
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../../config/board';
-import type { Grid } from '../../model/types/board';
-import type { KillerCage } from '../../model/types/game';
-import { cageCombos } from '../cageCombos';
-import { ALL_DIGITS, bit, EMPTY, flatten, PEERS } from '../solverGrid';
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@views/home/config/board';
+import { cageCombos } from '@views/home/lib/cageCombos';
+import { ALL_DIGITS, bit, EMPTY, flatten, PEERS } from '@views/home/lib/solverGrid';
+import type { Grid } from '@views/home/model/types/board';
+import type { KillerCage } from '@views/home/model/types/game';
 
 export type LogicCage = { cells: number[]; sum: number; combos: number[] };
 

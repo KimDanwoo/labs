@@ -1,6 +1,6 @@
-import { BLOCK_SIZE, BOARD_SIZE, KEY_NUMBER } from '../config/board';
-import type { Grid } from '../model/types/board';
-import { atIndex, cellAt } from './gridAccess';
+import { BLOCK_SIZE, BOARD_SIZE, KEY_NUMBER } from '@views/home/config/board';
+import { atIndex, cellAt } from '@views/home/lib/gridAccess';
+import type { Grid } from '@views/home/model/types/board';
 
 export function isValidNumberSet(numbers: readonly number[]): boolean {
   if (numbers.length !== BOARD_SIZE) return false;

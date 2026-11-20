@@ -1,6 +1,6 @@
+import { THEME_TRANSITION_CLASS, THEME_TRANSITION_MS } from '@views/home/config/theme';
 import { useTheme } from 'next-themes';
 import { useCallback, useSyncExternalStore } from 'react';
-import { THEME_TRANSITION_CLASS, THEME_TRANSITION_MS } from '../../../config/theme';
 
 const subscribeNothing = () => () => {};
 

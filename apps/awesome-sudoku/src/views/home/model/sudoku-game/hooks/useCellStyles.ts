@@ -1,6 +1,6 @@
+import { type CellHighlight, type SudokuCell } from '@views/home/model/types/board';
+import { buildCellClassName, getCellBorderStyles, getCellHighlightStyles } from '@views/home/ui/sudoku-game/boardStyle';
 import { useMemo } from 'react';
-import { buildCellClassName, getCellBorderStyles, getCellHighlightStyles } from '../../../ui/sudoku-game/boardStyle';
-import { type CellHighlight, type SudokuCell } from '../../types/board';
 
 interface UseCellStylesProps {
   cell: SudokuCell;

@@ -1,7 +1,7 @@
+import { BOARD_SIZE } from '@views/home/config/board';
+import { atIndex, cellAt } from '@views/home/lib/gridAccess';
+import { createEmptyBoard, createEmptyHighlights, formatTime, shuffleArray } from '@views/home/model/services/common';
 import { describe, expect, test } from 'vitest';
-import { BOARD_SIZE } from '../../../config/board';
-import { atIndex, cellAt } from '../../../lib/gridAccess';
-import { createEmptyBoard, createEmptyHighlights, formatTime, shuffleArray } from '../common';
 
 describe('스도쿠 유틸리티 함수 테스트', () => {
   describe('shuffleArray', () => {

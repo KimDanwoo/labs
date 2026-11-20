@@ -2,11 +2,11 @@
 
 import dynamic from 'next/dynamic';
 
-import { GameStatus } from '../game-header/GameStatus';
-import { SudokuBoard } from './SudokuBoard';
+import { SudokuBoard } from '@views/home/ui/game-board/SudokuBoard';
+import { GameStatus } from '@views/home/ui/game-header/GameStatus';
 
-const PauseGameOverlay = dynamic(() => import('../game-overlays/PauseGameOverlay'), { ssr: false });
-const GeneratingOverlay = dynamic(() => import('../game-overlays/GeneratingOverlay'), { ssr: false });
+const PauseGameOverlay = dynamic(() => import('@views/home/ui/game-overlays/PauseGameOverlay'), { ssr: false });
+const GeneratingOverlay = dynamic(() => import('@views/home/ui/game-overlays/GeneratingOverlay'), { ssr: false });
 
 export function GameColumn() {
   return (

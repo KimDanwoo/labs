@@ -1,8 +1,8 @@
-import { BOARD_MAX_INDEX } from '../config/board';
-import { createEmptyGrid } from '../model/services/common';
-import type { Grid, GridPosition } from '../model/types/board';
-import type { KillerPuzzle } from '../model/types/game';
-import { atIndex } from './gridAccess';
+import { BOARD_MAX_INDEX } from '@views/home/config/board';
+import { atIndex } from '@views/home/lib/gridAccess';
+import { createEmptyGrid } from '@views/home/model/services/common';
+import type { Grid, GridPosition } from '@views/home/model/types/board';
+import type { KillerPuzzle } from '@views/home/model/types/game';
 
 export type GridMove = (position: GridPosition) => GridPosition;
 

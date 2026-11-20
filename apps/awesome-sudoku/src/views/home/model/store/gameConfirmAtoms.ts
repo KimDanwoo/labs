@@ -1,9 +1,9 @@
+import { hasPlayerProgress } from '@views/home/model/services/playerProgress';
+import { resetUserInputsAtom } from '@views/home/model/store/cellValueAtoms';
+import { switchGameModeAtom } from '@views/home/model/store/gameLifecycleAtoms';
+import { boardAtom, difficultyAtom, gameModeAtom, isCompletedAtom } from '@views/home/model/store/primitives';
+import type { DiscardAction, NewGameRequest } from '@views/home/model/types/game';
 import { atom } from 'jotai';
-import { hasPlayerProgress } from '../services/playerProgress';
-import type { DiscardAction, NewGameRequest } from '../types/game';
-import { resetUserInputsAtom } from './cellValueAtoms';
-import { switchGameModeAtom } from './gameLifecycleAtoms';
-import { boardAtom, difficultyAtom, gameModeAtom, isCompletedAtom } from './primitives';
 
 interface GameConfirm {
   action: DiscardAction;

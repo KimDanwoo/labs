@@ -1,7 +1,7 @@
 'use client';
 
+import { MOBILE_MOTION } from '@shared/ui/bottom-sheet/sheetMotion';
 import { useRef, type PointerEvent, type RefObject } from 'react';
-import { MOBILE_MOTION } from './sheetMotion';
 
 const DISMISS_HEIGHT_RATIO = 0.35;
 /** 이보다 빠르게(px/초) 튕기면 거리가 짧아도 닫는다. */

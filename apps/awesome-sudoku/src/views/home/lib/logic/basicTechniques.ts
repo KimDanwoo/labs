@@ -1,4 +1,5 @@
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../../config/board';
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@views/home/config/board';
+import type { LogicBoard } from '@views/home/lib/logic/logicBoard';
 import {
   ALL_DIGITS,
   bit,
@@ -10,8 +11,7 @@ import {
   popcount,
   ROW_UNITS,
   UNITS,
-} from '../solverGrid';
-import type { LogicBoard } from './logicBoard';
+} from '@views/home/lib/solverGrid';
 
 const MAX_SUBSET_SIZE = 4;
 const MAX_HIDDEN_SUBSET_SIZE = 3;

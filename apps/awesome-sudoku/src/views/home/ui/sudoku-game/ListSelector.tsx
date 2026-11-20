@@ -1,9 +1,9 @@
 import { cn } from '@shared/lib/cn';
+import { initializeGameAtom } from '@views/home/model/store/gameLifecycleAtoms';
+import { difficultyAtom } from '@views/home/model/store/primitives';
+import { options } from '@views/home/model/sudoku-game/constants/gameDifficultySelector';
+import { type Difficulty } from '@views/home/model/types/game';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { initializeGameAtom } from '../../model/store/gameLifecycleAtoms';
-import { difficultyAtom } from '../../model/store/primitives';
-import { options } from '../../model/sudoku-game/constants/gameDifficultySelector';
-import { type Difficulty } from '../../model/types/game';
 
 export const ListSelector = () => {
   const difficulty = useAtomValue(difficultyAtom);

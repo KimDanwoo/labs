@@ -1,5 +1,5 @@
+import { isBoardShortcut } from '@views/home/lib/keyboardTarget';
 import { afterEach, describe, expect, it } from 'vitest';
-import { isBoardShortcut } from '../keyboardTarget';
 
 function keydownFrom(target: HTMLElement, init: KeyboardEventInit = {}): KeyboardEvent {
   let captured: KeyboardEvent | null = null;

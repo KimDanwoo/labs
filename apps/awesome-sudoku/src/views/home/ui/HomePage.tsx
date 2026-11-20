@@ -2,19 +2,25 @@
 
 import dynamic from 'next/dynamic';
 
-import { BackgroundGlow } from './BackgroundGlow';
-import { GameColumn } from './game-board/GameColumn';
-import { DesktopControlPanel } from './game-controls/DesktopControlPanel';
-import { MobileControlPanel } from './game-controls/MobileControlPanel';
-import { HomeHeader } from './HomeHeader';
+import { BackgroundGlow } from '@views/home/ui/BackgroundGlow';
+import { GameColumn } from '@views/home/ui/game-board/GameColumn';
+import { DesktopControlPanel } from '@views/home/ui/game-controls/DesktopControlPanel';
+import { MobileControlPanel } from '@views/home/ui/game-controls/MobileControlPanel';
+import { HomeHeader } from '@views/home/ui/HomeHeader';
 
-const GameConfirmSheet = dynamic(() => import('./game-confirm/GameConfirmSheet').then((m) => m.GameConfirmSheet), {
-  ssr: false,
-});
+const GameConfirmSheet = dynamic(
+  () => import('@views/home/ui/game-confirm/GameConfirmSheet').then((m) => m.GameConfirmSheet),
+  {
+    ssr: false,
+  },
+);
 
-const GameResultSheet = dynamic(() => import('./game-result/GameResultSheet').then((m) => m.GameResultSheet), {
-  ssr: false,
-});
+const GameResultSheet = dynamic(
+  () => import('@views/home/ui/game-result/GameResultSheet').then((m) => m.GameResultSheet),
+  {
+    ssr: false,
+  },
+);
 
 export const HomePage = () => (
   <main className="min-h-svh min-w-[360px] bg-surface-secondary relative overflow-x-hidden">

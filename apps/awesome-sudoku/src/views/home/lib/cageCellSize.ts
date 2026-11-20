@@ -1,5 +1,5 @@
-import { DEFAULT_CELL_SIZE } from '../config/board';
-import type { CageInfo } from '../model/types/board';
+import { DEFAULT_CELL_SIZE } from '@views/home/config/board';
+import type { CageInfo } from '@views/home/model/types/board';
 
 const PATH_START_PATTERN = /M([\d.]+),([\d.]+)/;
 

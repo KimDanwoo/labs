@@ -1,5 +1,3 @@
-import { createStore } from 'jotai';
-import { describe, expect, it } from 'vitest';
 import {
   CLASSIC_DIFFICULTY,
   GAME_LEVEL,
@@ -7,13 +5,13 @@ import {
   GAME_PHASE,
   HINTS_REMAINING,
   MAX_MISTAKES,
-} from '../../../config/game';
-import { cellAt } from '../../../lib/gridAccess';
-import { fillCellAtom } from '../../store/cellValueAtoms';
-import { initializeGameAtom } from '../../store/gameLifecycleAtoms';
-import { getHintAtom } from '../../store/hintAtoms';
-import { canRedoAtom, canUndoAtom, futureAtom, redoAtom, undoAtom } from '../../store/historyAtoms';
-import { handleKeyInputAtom } from '../../store/keyboardAtoms';
+} from '@views/home/config/game';
+import { cellAt } from '@views/home/lib/gridAccess';
+import { fillCellAtom } from '@views/home/model/store/cellValueAtoms';
+import { initializeGameAtom } from '@views/home/model/store/gameLifecycleAtoms';
+import { getHintAtom } from '@views/home/model/store/hintAtoms';
+import { canRedoAtom, canUndoAtom, futureAtom, redoAtom, undoAtom } from '@views/home/model/store/historyAtoms';
+import { handleKeyInputAtom } from '@views/home/model/store/keyboardAtoms';
 import {
   boardAtom,
   cagesAtom,
@@ -28,10 +26,12 @@ import {
   selectedCellAtom,
   solutionAtom,
   timerActiveAtom,
-} from '../../store/primitives';
-import { gamePhaseAtom } from '../../store/statusAtoms';
-import type { Grid, SudokuBoard } from '../../types/board';
-import type { KillerCage } from '../../types/game';
+} from '@views/home/model/store/primitives';
+import { gamePhaseAtom } from '@views/home/model/store/statusAtoms';
+import type { Grid, SudokuBoard } from '@views/home/model/types/board';
+import type { KillerCage } from '@views/home/model/types/game';
+import { createStore } from 'jotai';
+import { describe, expect, it } from 'vitest';
 
 const SOLUTION: Grid = [
   [5, 3, 4, 6, 7, 8, 9, 1, 2],

@@ -1,7 +1,7 @@
+import { resumeOrStartGameAtom } from '@views/home/model/store/gameLifecycleAtoms';
+import { PERSISTED_GAME_ATOMS } from '@views/home/model/store/primitives';
 import { useSetAtom, useStore } from 'jotai';
 import { useEffect } from 'react';
-import { resumeOrStartGameAtom } from '../../store/gameLifecycleAtoms';
-import { PERSISTED_GAME_ATOMS } from '../../store/primitives';
 
 export const useInitializeGame = () => {
   const store = useStore();

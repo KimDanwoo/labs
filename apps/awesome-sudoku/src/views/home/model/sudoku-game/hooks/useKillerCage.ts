@@ -1,12 +1,12 @@
+import { DEFAULT_CELL_SIZE } from '@views/home/config/board';
+import { GAME_MODE } from '@views/home/config/game';
+import { cellSizeFromPaths } from '@views/home/lib/cageCellSize';
+import { cagesAtom, gameModeAtom } from '@views/home/model/store/primitives';
+import { useCagePathCalculator } from '@views/home/model/sudoku-game/hooks/useCagePathCalculator';
+import { useTableDimensions } from '@views/home/model/sudoku-game/hooks/useTableDimensions';
+import type { CageInfo, CellPosition, TableDimensions } from '@views/home/model/types/board';
 import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useState, type RefObject } from 'react';
-import { DEFAULT_CELL_SIZE } from '../../../config/board';
-import { GAME_MODE } from '../../../config/game';
-import { cellSizeFromPaths } from '../../../lib/cageCellSize';
-import { cagesAtom, gameModeAtom } from '../../store/primitives';
-import type { CageInfo, CellPosition, TableDimensions } from '../../types/board';
-import { useCagePathCalculator } from './useCagePathCalculator';
-import { useTableDimensions } from './useTableDimensions';
 
 export const useKillerCage = (tableRef: RefObject<HTMLTableElement | null>) => {
   const cages = useAtomValue(cagesAtom);

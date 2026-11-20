@@ -1,6 +1,6 @@
-import { BOARD_SIZE } from '../config/board';
-import { shuffleArray } from '../model/services/common';
-import type { GridPosition } from '../model/types/board';
+import { BOARD_SIZE } from '@views/home/config/board';
+import { shuffleArray } from '@views/home/model/services/common';
+import type { GridPosition } from '@views/home/model/types/board';
 
 export const shuffledPositions = (): GridPosition[] => {
   const positions: GridPosition[] = [];

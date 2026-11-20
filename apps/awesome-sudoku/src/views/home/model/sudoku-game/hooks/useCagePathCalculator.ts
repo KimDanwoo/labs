@@ -1,7 +1,7 @@
+import { cageLabelCell } from '@views/home/lib/cageLabelCell';
+import type { CageInfo, CellPosition } from '@views/home/model/types/board';
+import { type KillerCage } from '@views/home/model/types/game';
 import { useMemo } from 'react';
-import { cageLabelCell } from '../../../lib/cageLabelCell';
-import type { CageInfo, CellPosition } from '../../types/board';
-import { type KillerCage } from '../../types/game';
 
 const CAGE_PADDING_RATIO = 0.1;
 const CAGE_SUM_LABEL_OFFSET = 2;

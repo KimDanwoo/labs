@@ -1,7 +1,7 @@
+import { deepCopyGrid } from '@views/home/lib/boardUtils';
+import { atIndex, cellAt } from '@views/home/lib/gridAccess';
+import type { Grid } from '@views/home/model/types/board';
 import { describe, expect, it } from 'vitest';
-import type { Grid } from '../../model/types/board';
-import { deepCopyGrid } from '../boardUtils';
-import { atIndex, cellAt } from '../gridAccess';
 
 describe('스도쿠 유틸리티 함수 테스트', () => {
   const sampleGrid: Grid = [

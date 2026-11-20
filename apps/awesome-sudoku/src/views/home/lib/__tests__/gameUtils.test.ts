@@ -1,8 +1,8 @@
+import { BLOCK_SIZE, BOARD_SIZE } from '@views/home/config/board';
+import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from '@views/home/lib/gameUtils';
+import { atIndex, cellAt } from '@views/home/lib/gridAccess';
+import type { Grid } from '@views/home/model/types/board';
 import { describe, expect, test } from 'vitest';
-import { BLOCK_SIZE, BOARD_SIZE } from '../../config/board';
-import type { Grid } from '../../model/types/board';
-import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from '../gameUtils';
-import { atIndex, cellAt } from '../gridAccess';
 
 function createValidSudokuGrid(): Grid {
   return [

@@ -10,8 +10,8 @@ import {
   LOADER_SIZE,
   SUDOKU_NUMBERS,
   type LoaderSize,
-} from '../../config/loader';
-import styles from './SudokuLoader.module.css';
+} from '@views/home/config/loader';
+import styles from '@views/home/ui/game-overlays/SudokuLoader.module.css';
 
 interface SudokuLoaderProps {
   size?: LoaderSize;

@@ -1,14 +1,14 @@
+import { SUDOKU_CELL_COUNT } from '@views/home/config/board';
+import { CLASSIC_DIFFICULTY, GAME_LEVEL, KILLER_DIFFICULTY, TECHNIQUE } from '@views/home/config/game';
+import { countSolutions } from '@views/home/lib/backtrack';
+import { generateKillerCages } from '@views/home/lib/cageLayout';
+import { generateBoard, generateKillerBoard, generateSolution, retryUntilGraded } from '@views/home/lib/generator';
+import { atIndex, cellAt } from '@views/home/lib/gridAccess';
+import { gradePuzzle } from '@views/home/lib/solver';
+import { isValidSolution } from '@views/home/lib/validator';
+import type { Grid, GridPosition, SudokuBoard } from '@views/home/model/types/board';
+import type { Difficulty, KillerCage, Technique } from '@views/home/model/types/game';
 import { describe, expect, it } from 'vitest';
-import { SUDOKU_CELL_COUNT } from '../../config/board';
-import { CLASSIC_DIFFICULTY, GAME_LEVEL, KILLER_DIFFICULTY, TECHNIQUE } from '../../config/game';
-import type { Grid, GridPosition, SudokuBoard } from '../../model/types/board';
-import type { Difficulty, KillerCage, Technique } from '../../model/types/game';
-import { countSolutions } from '../backtrack';
-import { generateKillerCages } from '../cageLayout';
-import { generateBoard, generateKillerBoard, generateSolution, retryUntilGraded } from '../generator';
-import { atIndex, cellAt } from '../gridAccess';
-import { gradePuzzle } from '../solver';
-import { isValidSolution } from '../validator';
 
 const DIFFICULTIES = Object.values(GAME_LEVEL) as Difficulty[];
 

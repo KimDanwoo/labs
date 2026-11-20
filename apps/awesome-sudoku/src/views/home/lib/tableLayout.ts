@@ -1,5 +1,5 @@
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../config/board';
-import type { CellPosition, TableDimensions } from '../model/types/board';
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@views/home/config/board';
+import type { CellPosition, TableDimensions } from '@views/home/model/types/board';
 
 const EMPTY_DIMENSIONS: TableDimensions = { tableRect: null, cellPositions: {} };
 

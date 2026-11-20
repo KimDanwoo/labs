@@ -1,9 +1,9 @@
+import { GAME_MODE } from '@views/home/config/game';
+import { createEmptyBoard, createEmptyGrid } from '@views/home/model/services/common';
+import { isBoardPosition, isRestorableGame } from '@views/home/model/services/savedGame';
+import type { Grid, SudokuBoard } from '@views/home/model/types/board';
+import type { KillerCage } from '@views/home/model/types/game';
 import { describe, expect, it } from 'vitest';
-import { GAME_MODE } from '../../../config/game';
-import type { Grid, SudokuBoard } from '../../types/board';
-import type { KillerCage } from '../../types/game';
-import { createEmptyBoard, createEmptyGrid } from '../common';
-import { isBoardPosition, isRestorableGame } from '../savedGame';
 
 const SOLUTION: Grid = [
   [5, 3, 4, 6, 7, 8, 9, 1, 2],

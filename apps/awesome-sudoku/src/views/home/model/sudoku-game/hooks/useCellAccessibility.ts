@@ -1,6 +1,6 @@
+import type { SudokuCell } from '@views/home/model/types/board';
+import type { GameMode } from '@views/home/model/types/game';
 import { useMemo } from 'react';
-import type { SudokuCell } from '../../types/board';
-import type { GameMode } from '../../types/game';
 
 interface UseCellAccessibilityProps {
   cell: SudokuCell;

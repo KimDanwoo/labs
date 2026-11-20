@@ -1,7 +1,7 @@
-import { BOARD_MAX_INDEX, BOARD_SIZE } from '../../config/board';
-import { GAME_MODE } from '../../config/game';
-import type { Position, SudokuCell } from '../types/board';
-import type { GameMode } from '../types/game';
+import { BOARD_MAX_INDEX, BOARD_SIZE } from '@views/home/config/board';
+import { GAME_MODE } from '@views/home/config/game';
+import type { Position, SudokuCell } from '@views/home/model/types/board';
+import type { GameMode } from '@views/home/model/types/game';
 
 interface SavedGame {
   board: unknown;

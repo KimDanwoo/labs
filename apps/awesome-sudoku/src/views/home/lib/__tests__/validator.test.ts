@@ -1,8 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BOARD_SIZE } from '../../config/board';
-import type { Grid, GridPosition, SudokuBoard, SudokuCell } from '../../model/types/board';
-import type { KillerCage } from '../../model/types/game';
-import { atIndex, cellAt } from '../gridAccess';
+import { BOARD_SIZE } from '@views/home/config/board';
+import { atIndex, cellAt } from '@views/home/lib/gridAccess';
 import {
   checkConflicts,
   isBoardComplete,
@@ -10,7 +7,10 @@ import {
   isValidSolution,
   markWrongValues,
   validateKillerCages,
-} from '../validator';
+} from '@views/home/lib/validator';
+import type { Grid, GridPosition, SudokuBoard, SudokuCell } from '@views/home/model/types/board';
+import type { KillerCage } from '@views/home/model/types/game';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('validator.ts 테스트', () => {
   const createMockSudokuCell = (value: number | null = null, isInitial = false, isConflict = false): SudokuCell => ({

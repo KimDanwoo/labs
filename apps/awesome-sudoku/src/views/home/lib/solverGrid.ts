@@ -1,6 +1,6 @@
-import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from '../config/board';
-import { createEmptyGrid } from '../model/services/common';
-import type { Grid } from '../model/types/board';
+import { BLOCK_SIZE, BOARD_SIZE, SUDOKU_CELL_COUNT } from '@views/home/config/board';
+import { createEmptyGrid } from '@views/home/model/services/common';
+import type { Grid } from '@views/home/model/types/board';
 
 /** 후보는 비트마스크로 다룬다: 숫자 d ↔ 비트 (1 << d). 0번 비트는 쓰지 않는다. */
 export const ALL_DIGITS = 0b1111111110;

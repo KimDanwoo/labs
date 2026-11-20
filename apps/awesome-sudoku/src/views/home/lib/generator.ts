@@ -1,13 +1,13 @@
-import { SUDOKU_CELL_COUNT } from '../config/board';
-import { CLASSIC_DIFFICULTY, KILLER_DIFFICULTY, TECHNIQUE } from '../config/game';
-import type { Grid, SudokuBoard } from '../model/types/board';
-import type { Difficulty, GradedDifficultySpec, KillerCage, Technique } from '../model/types/game';
-import { generateRandomSolution, staysUniqueWithout } from './backtrack';
-import { deepCopyGrid } from './boardUtils';
-import { generateKillerCages } from './cageLayout';
-import { atIndex, cellAt } from './gridAccess';
-import { shuffledPositions } from './random';
-import { gradePuzzle } from './solver';
+import { SUDOKU_CELL_COUNT } from '@views/home/config/board';
+import { CLASSIC_DIFFICULTY, KILLER_DIFFICULTY, TECHNIQUE } from '@views/home/config/game';
+import { generateRandomSolution, staysUniqueWithout } from '@views/home/lib/backtrack';
+import { deepCopyGrid } from '@views/home/lib/boardUtils';
+import { generateKillerCages } from '@views/home/lib/cageLayout';
+import { atIndex, cellAt } from '@views/home/lib/gridAccess';
+import { shuffledPositions } from '@views/home/lib/random';
+import { gradePuzzle } from '@views/home/lib/solver';
+import type { Grid, SudokuBoard } from '@views/home/model/types/board';
+import type { Difficulty, GradedDifficultySpec, KillerCage, Technique } from '@views/home/model/types/game';
 
 const EMPTY = 0;
 /**

@@ -1,5 +1,5 @@
-import { GameModeSelector } from './sudoku-game/GameModeSelector';
-import { ThemeToggle } from './ThemeToggle';
+import { GameModeSelector } from '@views/home/ui/sudoku-game/GameModeSelector';
+import { ThemeToggle } from '@views/home/ui/ThemeToggle';
 
 export function HomeHeader() {
   return (

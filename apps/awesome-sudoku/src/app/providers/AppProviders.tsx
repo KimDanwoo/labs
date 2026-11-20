@@ -1,8 +1,8 @@
 'use client';
 
+import { JotaiProvider } from '@app/providers/JotaiProvider';
 import { ThemeProvider } from 'next-themes';
 import type { ReactNode } from 'react';
-import { JotaiProvider } from './JotaiProvider';
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (

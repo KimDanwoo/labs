@@ -1,6 +1,6 @@
 import { cn } from '@shared/lib/cn';
-import { CELL_FOCUS_RING } from '../../config/board';
-import type { CellHighlight } from '../../model/types/board';
+import { CELL_FOCUS_RING } from '@views/home/config/board';
+import type { CellHighlight } from '@views/home/model/types/board';
 
 export function getCellBorderStyles(row: number, col: number) {
   return {

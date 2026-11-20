@@ -1,6 +1,6 @@
 import { cn } from '@shared/lib/cn';
+import { GAME_CONFIRM_BUTTON_VARIANT } from '@views/home/config/gameConfirm';
 import type { ReactNode } from 'react';
-import { GAME_CONFIRM_BUTTON_VARIANT } from '../../config/gameConfirm';
 
 interface GameConfirmButtonProps {
   variant: keyof typeof GAME_CONFIRM_BUTTON_VARIANT;

@@ -1,6 +1,6 @@
-import type { Difficulty, GameMode } from '../model/types/game';
-import type { PuzzleRequest, PuzzleResponse } from './puzzle.worker';
-import { generatePuzzle, type GeneratedPuzzle } from './puzzleGenerator';
+import type { PuzzleRequest, PuzzleResponse } from '@views/home/lib/puzzle.worker';
+import { generatePuzzle, type GeneratedPuzzle } from '@views/home/lib/puzzleGenerator';
+import type { Difficulty, GameMode } from '@views/home/model/types/game';
 
 type Pending = {
   resolve: (puzzle: GeneratedPuzzle) => void;

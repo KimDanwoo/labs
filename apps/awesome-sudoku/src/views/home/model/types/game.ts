@@ -1,5 +1,5 @@
-import { GAME_LEVEL, GAME_MODE, GAME_PHASE, TECHNIQUE } from '../../config/game';
-import type { Grid, GridPosition, SudokuBoard } from './board';
+import { GAME_LEVEL, GAME_MODE, GAME_PHASE, TECHNIQUE } from '@views/home/config/game';
+import type { Grid, GridPosition, SudokuBoard } from '@views/home/model/types/board';
 
 export type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE];
 export type GamePhase = (typeof GAME_PHASE)[keyof typeof GAME_PHASE];

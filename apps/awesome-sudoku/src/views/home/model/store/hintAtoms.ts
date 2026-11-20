@@ -1,9 +1,8 @@
-import { atom } from 'jotai';
-import { GAME_PHASE } from '../../config/game';
-import { atIndex, cellAt } from '../../lib/gridAccess';
-import { buildGameResultState, resolveBoardState } from '../services/gameResult';
-import { updateCellValue, updateSingleCell } from '../services/update';
-import { pushStateAtom } from './historyAtoms';
+import { GAME_PHASE } from '@views/home/config/game';
+import { atIndex, cellAt } from '@views/home/lib/gridAccess';
+import { buildGameResultState, resolveBoardState } from '@views/home/model/services/gameResult';
+import { updateCellValue, updateSingleCell } from '@views/home/model/services/update';
+import { pushStateAtom } from '@views/home/model/store/historyAtoms';
 import {
   boardAtom,
   cagesAtom,
@@ -14,9 +13,10 @@ import {
   selectedCellAtom,
   solutionAtom,
   timerActiveAtom,
-} from './primitives';
-import { updateHighlightsAtom } from './selectionAtoms';
-import { countBoardNumbersAtom, gamePhaseAtom } from './statusAtoms';
+} from '@views/home/model/store/primitives';
+import { updateHighlightsAtom } from '@views/home/model/store/selectionAtoms';
+import { countBoardNumbersAtom, gamePhaseAtom } from '@views/home/model/store/statusAtoms';
+import { atom } from 'jotai';
 
 export const getHintAtom = atom(null, (get, set) => {
   if (get(gamePhaseAtom) !== GAME_PHASE.PLAYING) return;

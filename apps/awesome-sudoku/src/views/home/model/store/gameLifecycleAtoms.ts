@@ -1,11 +1,9 @@
-import { atom } from 'jotai';
-import { GAME_LEVEL, HINTS_REMAINING } from '../../config/game';
-import { requestPuzzle } from '../../lib/puzzleService';
-import { createEmptyHighlights } from '../services/common';
-import { isBoardPosition, isRestorableGame } from '../services/savedGame';
-import { clearCellSelection } from '../services/update';
-import type { Difficulty, GameMode } from '../types/game';
-import { clearHistoryAtom } from './historyAtoms';
+import { GAME_LEVEL, HINTS_REMAINING } from '@views/home/config/game';
+import { requestPuzzle } from '@views/home/lib/puzzleService';
+import { createEmptyHighlights } from '@views/home/model/services/common';
+import { isBoardPosition, isRestorableGame } from '@views/home/model/services/savedGame';
+import { clearCellSelection } from '@views/home/model/services/update';
+import { clearHistoryAtom } from '@views/home/model/store/historyAtoms';
 import {
   boardAtom,
   cagesAtom,
@@ -22,10 +20,12 @@ import {
   mistakeCountAtom,
   selectedCellAtom,
   solutionAtom,
-} from './primitives';
-import { selectCellAtom } from './selectionAtoms';
-import { countBoardNumbersAtom } from './statusAtoms';
-import { toggleTimerAtom } from './timerAtoms';
+} from '@views/home/model/store/primitives';
+import { selectCellAtom } from '@views/home/model/store/selectionAtoms';
+import { countBoardNumbersAtom } from '@views/home/model/store/statusAtoms';
+import { toggleTimerAtom } from '@views/home/model/store/timerAtoms';
+import type { Difficulty, GameMode } from '@views/home/model/types/game';
+import { atom } from 'jotai';
 
 /** 마지막 요청만 반영한다 — 생성 중에 난이도를 연타하면 먼저 도착한 옛 판이 새 판을 덮어쓴다 */
 let latestRequest = 0;

@@ -1,15 +1,12 @@
-import { createStore } from 'jotai';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { GAME_LEVEL, GAME_MODE } from '../../../config/game';
-import { requestPuzzle } from '../../../lib/puzzleService';
-import type { SudokuBoard } from '../../types/board';
+import { GAME_LEVEL, GAME_MODE } from '@views/home/config/game';
+import { requestPuzzle } from '@views/home/lib/puzzleService';
 import {
   confirmDiscardAtom,
   gameConfirmAtom,
   keepCurrentGameAtom,
   requestNewGameAtom,
   requestRestartAtom,
-} from '../gameConfirmAtoms';
+} from '@views/home/model/store/gameConfirmAtoms';
 import {
   boardAtom,
   currentTimeAtom,
@@ -17,9 +14,12 @@ import {
   gameModeAtom,
   isCompletedAtom,
   mistakeCountAtom,
-} from '../primitives';
+} from '@views/home/model/store/primitives';
+import type { SudokuBoard } from '@views/home/model/types/board';
+import { createStore } from 'jotai';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../../lib/puzzleService', () => ({ requestPuzzle: vi.fn() }));
+vi.mock('@views/home/lib/puzzleService', () => ({ requestPuzzle: vi.fn() }));
 
 const requestPuzzleMock = vi.mocked(requestPuzzle);
 

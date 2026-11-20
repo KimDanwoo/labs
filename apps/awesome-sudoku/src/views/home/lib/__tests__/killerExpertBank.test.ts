@@ -1,16 +1,16 @@
+import { SUDOKU_CELL_COUNT } from '@views/home/config/board';
+import { GAME_LEVEL, GAME_MODE, KILLER_DIFFICULTY, TECHNIQUE } from '@views/home/config/game';
+import { cellAt } from '@views/home/lib/gridAccess';
+import { gridMove, moveKillerPuzzle } from '@views/home/lib/gridSymmetry';
+import { pickKillerExpertPuzzle } from '@views/home/lib/killerExpertBank';
+import { KILLER_EXPERT_PUZZLES } from '@views/home/lib/killerExpertPuzzles';
+import { decodeKillerPuzzle, encodeKillerPuzzle } from '@views/home/lib/killerPuzzleCodec';
+import { generatePuzzle } from '@views/home/lib/puzzleGenerator';
+import { gradePuzzle } from '@views/home/lib/solver';
+import { isValidSolution } from '@views/home/lib/validator';
+import type { GridPosition } from '@views/home/model/types/board';
+import type { KillerPuzzle } from '@views/home/model/types/game';
 import { describe, expect, it } from 'vitest';
-import { SUDOKU_CELL_COUNT } from '../../config/board';
-import { GAME_LEVEL, GAME_MODE, KILLER_DIFFICULTY, TECHNIQUE } from '../../config/game';
-import type { GridPosition } from '../../model/types/board';
-import type { KillerPuzzle } from '../../model/types/game';
-import { cellAt } from '../gridAccess';
-import { gridMove, moveKillerPuzzle } from '../gridSymmetry';
-import { pickKillerExpertPuzzle } from '../killerExpertBank';
-import { KILLER_EXPERT_PUZZLES } from '../killerExpertPuzzles';
-import { decodeKillerPuzzle, encodeKillerPuzzle } from '../killerPuzzleCodec';
-import { generatePuzzle } from '../puzzleGenerator';
-import { gradePuzzle } from '../solver';
-import { isValidSolution } from '../validator';
 
 const BANK_SIZE = 200;
 const GRADE_ALL_TIMEOUT_MS = 60_000;

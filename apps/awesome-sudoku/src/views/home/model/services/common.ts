@@ -1,7 +1,7 @@
 import { MINUTE } from '@shared/config/time';
-import { BOARD_SIZE } from '../../config/board';
-import { atIndex } from '../../lib/gridAccess';
-import type { CellHighlight, Grid, SudokuBoard } from '../types/board';
+import { BOARD_SIZE } from '@views/home/config/board';
+import { atIndex } from '@views/home/lib/gridAccess';
+import type { CellHighlight, Grid, SudokuBoard } from '@views/home/model/types/board';
 
 export function createEmptyGrid(): Grid {
   return Array(BOARD_SIZE)

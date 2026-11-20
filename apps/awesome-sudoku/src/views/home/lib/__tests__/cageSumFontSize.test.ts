@@ -1,5 +1,5 @@
+import { cageSumFontSize } from '@views/home/lib/cageSumFontSize';
 import { describe, expect, it } from 'vitest';
-import { cageSumFontSize } from '../cageSumFontSize';
 
 describe('케이지 합 글자 크기', () => {
   it.each([

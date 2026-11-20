@@ -1,5 +1,5 @@
+import { currentTimeAtom, timerActiveAtom } from '@views/home/model/store/primitives';
 import { atom } from 'jotai';
-import { currentTimeAtom, timerActiveAtom } from './primitives';
 
 export const incrementTimerAtom = atom(null, (get, set, seconds: number = 1) => {
   if (get(timerActiveAtom)) {

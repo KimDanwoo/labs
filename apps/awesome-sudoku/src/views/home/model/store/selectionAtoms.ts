@@ -1,6 +1,11 @@
+import {
+  calculateHighlights,
+  clearHighlights,
+  updateCellSelection,
+  updateSingleCell,
+} from '@views/home/model/services/update';
+import { boardAtom, highlightedCellsAtom, selectedCellAtom } from '@views/home/model/store/primitives';
 import { atom } from 'jotai';
-import { calculateHighlights, clearHighlights, updateCellSelection, updateSingleCell } from '../services/update';
-import { boardAtom, highlightedCellsAtom, selectedCellAtom } from './primitives';
 
 export const hasSelectedCellAtom = atom((get) => get(selectedCellAtom) !== null);
 

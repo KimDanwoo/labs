@@ -1,12 +1,12 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 
 import { cn } from '@shared/lib/cn';
-import { requestNewGameAtom } from '../../model/store/gameConfirmAtoms';
-import { difficultyAtom } from '../../model/store/primitives';
-import { type Difficulty } from '../../model/types/game';
+import { requestNewGameAtom } from '@views/home/model/store/gameConfirmAtoms';
+import { difficultyAtom } from '@views/home/model/store/primitives';
+import { type Difficulty } from '@views/home/model/types/game';
 
-import { options } from '../../model/sudoku-game/constants/gameDifficultySelector';
-import styles from './SelectSelector.module.css';
+import { options } from '@views/home/model/sudoku-game/constants/gameDifficultySelector';
+import styles from '@views/home/ui/sudoku-game/SelectSelector.module.css';
 
 export const SelectSelector = () => {
   const difficulty = useAtomValue(difficultyAtom);

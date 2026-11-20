@@ -1,6 +1,6 @@
-import { BOARD_SIZE } from '../config/board';
-import type { GridPosition } from '../model/types/board';
-import type { KillerCage } from '../model/types/game';
+import { BOARD_SIZE } from '@views/home/config/board';
+import type { GridPosition } from '@views/home/model/types/board';
+import type { KillerCage } from '@views/home/model/types/game';
 
 export const cageLabelCell = (cage: KillerCage): GridPosition =>
   cage.cells.reduce<GridPosition>(

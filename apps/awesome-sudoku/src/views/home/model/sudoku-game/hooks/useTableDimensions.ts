@@ -1,6 +1,6 @@
+import { measureTable } from '@views/home/lib/tableLayout';
+import type { TableDimensions } from '@views/home/model/types/board';
 import { useEffect, useRef, type RefObject } from 'react';
-import { measureTable } from '../../../lib/tableLayout';
-import type { TableDimensions } from '../../types/board';
 
 export function useTableDimensions(
   tableRef: RefObject<HTMLTableElement | null>,

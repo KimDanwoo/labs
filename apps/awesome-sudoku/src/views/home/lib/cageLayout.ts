@@ -1,8 +1,8 @@
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../config/board';
-import type { Grid, GridPosition } from '../model/types/board';
-import type { KillerCage } from '../model/types/game';
-import { atIndex, cellAt } from './gridAccess';
-import { randomInt, shuffledPositions } from './random';
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@views/home/config/board';
+import { atIndex, cellAt } from '@views/home/lib/gridAccess';
+import { randomInt, shuffledPositions } from '@views/home/lib/random';
+import type { Grid, GridPosition } from '@views/home/model/types/board';
+import type { KillerCage } from '@views/home/model/types/game';
 
 const MIN_CAGE_SIZE = 2;
 const CAGE_LAYOUT_ATTEMPTS = 20;

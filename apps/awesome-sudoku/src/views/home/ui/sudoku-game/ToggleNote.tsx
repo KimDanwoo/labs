@@ -1,8 +1,8 @@
 import { IconButton } from '@shared/ui/icon-button';
+import { toggleNoteModeAtom } from '@views/home/model/store/cellValueAtoms';
+import { isNoteModeAtom, timerActiveAtom } from '@views/home/model/store/primitives';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuPencil } from 'react-icons/lu';
-import { toggleNoteModeAtom } from '../../model/store/cellValueAtoms';
-import { isNoteModeAtom, timerActiveAtom } from '../../model/store/primitives';
 
 export const ToggleNote = () => {
   const isNoteMode = useAtomValue(isNoteModeAtom);
