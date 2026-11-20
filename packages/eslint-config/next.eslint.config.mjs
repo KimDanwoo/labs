@@ -3,14 +3,14 @@ import nextTs from 'eslint-config-next/typescript';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginPrettier from 'eslint-plugin-prettier';
 import namingConfig from './naming.config.mjs';
-import qualityConfig from './quality.config.mjs';
+import quality from './quality.config.mjs';
 
 const eslintConfig = [
   ...nextVitals,
   ...nextTs,
   // nextTs가 @typescript-eslint 플러그인을 등록한 뒤여야 한다.
   ...namingConfig,
-  ...qualityConfig,
+  ...quality([...nextVitals, ...nextTs]),
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: { prettier: eslintPluginPrettier },

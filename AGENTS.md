@@ -57,7 +57,7 @@ packages/             # 공유 서체 + 공유 설정
 - **`apps/<app>/src/app/`** (= FSD `app` 레이어, **라우팅 아님**): `providers/`(전역 프로바이더 합성 루트), `globals.css`(전역 스타일), 앱 전체 레이아웃 등 앱 전역 setup. 라우팅 파일(page/layout)을 여기에 두지 않는다.
 - FSD `pages` 레이어는 Next와 이름이 겹쳐 `views`로 부른다(공식 권장 `_pages`·`_app` 대신 이 저장소는 `views`·`src/app`으로 통일).
 
-**레이어 의존성** (단방향, `@repo/eslint-config`의 `fsd.config.mjs`로 **lint 강제**): `app → views → features → entities → shared`
+**레이어 의존성** (단방향, `@repo/eslint-config`의 `fsd.config.mjs` — my-fe-harness `fsd()` 프리셋 — 로 **lint 강제**): `app → views → features → entities → shared`
 
 - 하위 레이어는 상위를 import 불가. 같은 레이어의 다른 슬라이스 참조 금지. `@repo/fonts`는 루트 레이아웃에서 import한다.
 - **`widgets` 레이어는 쓰지 않는다.** 한 화면 전용 블록은 그 view에, 여러 화면에서 쓰는 동작은 `features`에, 앱 전체 레이아웃은 `src/app`에 둔다.
@@ -89,7 +89,7 @@ apps/<app>/
 
 - 세그먼트 이름은 `ui`·`model`·`api`·`lib`·`config`만 쓴다(목적 기준). CSS 파일만 담는 `styles/`는 예외로 둔다. 필요한 것만 만든다. `hooks`·`types`·`constants`·`services` 같은 종류 기준 이름은 세그먼트 **안**의 하위 폴더로만 쓴다. 슬라이스가 커지면 세그먼트 아래에 도메인 하위 폴더를 둔다(`ui/scene/`, `model/runner/`).
 - **밖에서는 슬라이스 루트로만 import한다**: `from '@entities/question'`, 서버 전용은 `from '@views/study/index.server'`. `@entities/question/model/types`처럼 안쪽 경로로 가져오지 않는다.
-- **슬라이스 안에서도 별칭 전체 경로**로 파일을 직접 import한다(`@features/game/ui/Card`, `@features/game/model/types/game`). 자기 `index.ts`를 거치지 않는다(순환 참조). `src` 안을 가리키는 상대경로(`./`·`../`)는 `pnpm lint`(`fsd/public-api`)가 막는다 — 테스트·`vi.mock` 경로도 같다. Worker·에셋의 `new URL('./…', import.meta.url)`은 import가 아니라 그대로 둔다.
+- **슬라이스 안에서도 별칭 전체 경로**로 파일을 직접 import한다(`@features/game/ui/Card`, `@features/game/model/types/game`). 자기 `index.ts`를 거치지 않는다(순환 참조). `src` 안을 가리키는 상대경로(`./`·`../`)는 `pnpm lint`(`harness/no-relative-import`, `--fix`로 별칭 경로로 바뀜)가 막는다. 루트 `app/`·루트 파일이 상대경로로 `src`를 가져오는 것도 `fsd.config.mjs`가 막는다. `vi.mock('./…')` 같은 문자열 경로는 검사하지 않으니 직접 별칭으로 쓴다. Worker·에셋의 `new URL('./…', import.meta.url)`은 import가 아니라 그대로 둔다.
 - `index.ts`는 **밖에서 실제로 쓰는 것만**, 이름을 하나씩 적어 내보낸다. `export *` 금지. 타입은 `export type` 또는 `type` 한정자.
 - **세그먼트 안에 `index.ts`(배럴)를 두지 않는다.** 출입구는 슬라이스 루트 하나다.
 - `shared`는 `@shared/<세그먼트>/<항목>`으로 import한다(`@shared/lib/cn`, `@shared/ui/BottomSheet`). `shared/ui`·`shared/lib` 전체를 묶는 `index.ts`는 만들지 않는다(공식 권장 — 하나만 써도 전부 딸려 온다). `shared/api`·`shared/config`는 세그먼트 `index.ts` 하나로 묶어도 된다. shared 안에서도 다른 항목은 진입점으로만 가져온다.
@@ -110,10 +110,9 @@ apps/<app>/
   - 자리: 모델 훅 `model/hooks/useXxx.ts`가 상태를 조립하고, context는 `model/store/xxxContext.ts`, 구독 훅은 `model/hooks/useXxxContext.ts`(Root 밖에서 쓰면 throw)에 둔다. `XxxRoot.tsx`가 Provider를 연다 — 기본은 Root가 모델 훅을 직접 호출하고(상태 변화가 context 구독자만 다시 그리게), 상위 흐름이 이미 모델을 들고 분기에 쓰면(fe-deep `LearnPage`) Root가 그 모델을 prop으로 받는다. 파트는 `XxxPart.tsx` 한 파일에 하나씩, 묶음은 같은 폴더의 `xxx.ts`(shared 항목은 `index.ts`)에 `export const Xxx = { Root, Part… }`로 둔다.
   - 파트 안의 하위 블록(`AtlasGuides`, `DiscoveryList`)도 같은 context를 구독해도 된다. 상태를 들고 마운트·리셋 시점이 중요한 HUD·리프(`CompanionPanel`, `KeywordHints` 등)는 표시용 props를 그대로 받고, 마운트 조건·`key`는 파트가 갖는다.
   - 내용(아이콘·라벨·배지·버튼 묶음)은 prop이 아니라 children 파트로 조립한다. 버튼·입력 기본 속성은 `ComponentProps<'button'>`을 확장해 받는다.
-  - `pnpm lint`가 강제한다(`check-architecture.mjs`의 `validateComponentProps`): 컴포넌트 props는 최대 5개(확장한 기본 속성은 세지 않음).
+  - `pnpm lint`가 강제한다(`harness/max-props`): 컴포넌트 props는 최대 5개(확장한 기본 속성은 세지 않음, `memo`·`forwardRef`로 감싼 컴포넌트 포함).
 - **한 컴포넌트에 마크업을 쌓지 않는다**: 화면 컴포넌트는 이름 붙은 구획(`HomeHero`, `HomeCategories`)을 나열하고, 각 구획이 필요한 데이터를 직접 가져와 해당할 때만 그린다(조건부 표시를 부모가 계산해 넘기지 않는다).
-  - `pnpm lint`가 강제한다(`validateComponentMarkup`): 컴포넌트 하나의 JSX 깊이 최대 5, HTML·three 요소(소문자 태그) 최대 15개.
-  - 기존 위반은 `scripts/component-markup-debt.mjs` 한 곳에만 둔다. 목록은 줄어들기만 한다 — 새 위반은 실패하고, 고친 항목이 목록에 남아 있어도 실패한다.
+  - `pnpm lint`가 강제한다(`harness/component-markup`): 컴포넌트 하나의 JSX 깊이 최대 5, HTML·three 요소(소문자 태그) 최대 15개.
 - **컴포넌트는 앱 안에 둔다**: 다른 앱에 같은 컴포넌트가 필요하면 그 앱으로 복사해 맞게 고친다. 공유 패키지로 올리지 않는다. 앱 안에서는 FSD 위치 규칙을 따른다.
 
 ## 코드 정돈 규칙
@@ -133,8 +132,9 @@ tsx 파일은 "무엇을 그리는가"만 담는다. 값·로직·스타일은 �
   - 일반 CSS 파일은 앱 전역이면 `src/app/styles/`, 한 슬라이스 전용이면 그 슬라이스의 `styles/`에 둔다. `ui/`에는 `<이름>.module.css`만 둔다.
 - **반복되는 애니메이션은 모듈로**: 모달·시트·오버레이의 열림/닫힘처럼 여러 곳에서 같은 전환을 쓰면 훅(`useModal`, `useSheetPhase` 등)과 스타일·키프레임을 한 모듈로 만들어 함께 쓴다. 컴포넌트마다 전환 상태를 따로 구현하지 않는다.
 - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateComponentModule`·`findMisplacedStyles`): 모든 앱 `src`의 tsx 최상위 비컴포넌트 선언과 자리를 벗어난 CSS 파일을 막는다. 훅 분리·반복 모양의 컴포넌트화는 리뷰에서 확인한다.
-- **함수 크기·숫자도 `pnpm lint`가 강제한다**(`@repo/eslint-config/quality.config.mjs`, my-fe-harness 기본 잠금과 같은 값): 순환 복잡도 10, 블록 중첩 3, 함수 120줄, 컴포넌트 파일 250줄 이하. 컴포넌트·훅의 숫자는 `-1·0·1·2·100` 말고 `config/`의 이름 있는 상수로 둔다(`config/`·`constants`·테스트는 제외).
-  - 컴포넌트 본문도 같은 설정이 막는다(`rules/harness.mjs` — my-fe-harness `lint-guard-plugin.mjs` 사본, 원본과 함께 바꾼다): `quality/component-body`(본문 최상위 함수는 `handleXxx`·`onXxx`만, 중첩 컴포넌트 금지), `quality/no-direct-effect`(`useEffect`·`useLayoutEffect` 직접 호출 금지, `error.tsx` 제외), `quality/no-store-passthrough`(구독한 스토어 값을 도메인 컴포넌트에 props로 넘기지 않는다).
+- **함수 크기·숫자도 `pnpm lint`가 강제한다**(`@repo/eslint-config/quality.config.mjs` — my-fe-harness `quality()`를 그대로 쓴다. 규칙 원본은 my-fe-harness이고 버전은 `pnpm-workspace.yaml` catalog의 태그로 고정한다): 순환 복잡도 10, 블록 중첩 3, 함수 120줄, 컴포넌트 파일 250줄 이하. 컴포넌트·훅의 숫자는 `-1·0·1·2·100` 말고 `config/`의 이름 있는 상수로 둔다(`config/`·`constants`·테스트는 제외).
+  - `public/`·`vendor/`·`generated/`·`storybook-static/`·`.turbo/`·`*.min.js`는 lint 대상이 아니다(하네스 기본 잠금의 제외 목록).
+  - 컴포넌트 본문도 같은 설정이 막는다: `harness/component-body`(본문 최상위 함수는 `handleXxx`·`onXxx`만, 중첩 컴포넌트 금지), `harness/no-direct-effect`(`useEffect`·`useLayoutEffect` 직접 호출 금지, `error.tsx` 제외), `harness/no-store-passthrough`(구독한 스토어 값을 도메인 컴포넌트에 props로 넘기지 않는다).
   - 기존 위반은 앱별·루트 `eslint-suppressions.json`에만 둔다(ESLint 일괄 억제). 줄어들기만 한다 — 새 위반이나 파일의 위반 수 증가는 실패하고, 고쳐서 남은 억제가 생겨도 실패한다. 고친 뒤 그 앱 폴더(루트 `scripts/`·`packages/`면 루트)에서 `pnpm exec eslint . --prune-suppressions`로 정리한다. `--suppress-all`·`--suppress-rule`로 새 위반을 덧붙이지 않는다.
 
 ## 상태 관리 (도입 시)
