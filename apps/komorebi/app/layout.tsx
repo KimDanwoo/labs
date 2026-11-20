@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   alternates: { canonical: '/' },
   openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', locale: 'ko_KR', url: '/' },
-  twitter: { card: 'summary', title: TITLE, description: DESCRIPTION },
+  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
