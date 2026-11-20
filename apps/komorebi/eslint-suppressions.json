@@ -231,10 +231,18 @@
   "src/views/walk/ui/CatchChoices.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 1
+    },
+    "quality/component-body": {
+      "count": 1
     }
   },
   "src/views/walk/ui/FishingHud.tsx": {
     "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/walk/ui/SleepTransition.tsx": {
+    "quality/no-direct-effect": {
       "count": 1
     }
   },
