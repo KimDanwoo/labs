@@ -30,6 +30,59 @@ const smooth = (v: number) => {
   return t * t * (3 - 2 * t);
 };
 
+function touchDown(state: FlightState): number {
+  const impact = Math.abs(state.velocity);
+  state.height = 0;
+  state.velocity = 0;
+  return impact;
+}
+
+// Takeoff needs a forward run-up and a fresh press; holding lift at rest
+// must not trigger an automatic launch once the rider starts moving.
+function beginLaunch(state: FlightState, input: FlightInput): boolean {
+  state.height = 0;
+  const canLaunch = input.launch && input.speed >= FLIGHT.minTakeoffRunSpeed;
+  state.velocity = canLaunch ? FLIGHT.takeoffSpeed : 0;
+  return canLaunch;
+}
+
+function targetVelocity(state: FlightState, input: FlightInput): number {
+  const glide = FLIGHT.glideSlow + (FLIGHT.glideFast - FLIGHT.glideSlow) * clamp(Math.abs(input.speed) / 18, 0, 1);
+  let target =
+    input.lift && !input.descend
+      ? FLIGHT.climbSpeed * smooth((FLIGHT.ceiling - state.height) / 4)
+      : -(input.descend ? FLIGHT.descendSpeed : glide);
+  if (input.holdAltitude) target = Math.max(0, target);
+  if (state.height > FLIGHT.ceiling) target = Math.min(target, -Math.min(3, state.height - FLIGHT.ceiling));
+  if (target < 0) {
+    const flare = smooth(state.height / FLIGHT.flareHeight);
+    target = -FLIGHT.landingSpeed + (target + FLIGHT.landingSpeed) * flare;
+  }
+  return target;
+}
+
+function responseRate(input: FlightInput): number {
+  if (input.descend) return 4;
+  return input.lift ? 3.5 : 3.2;
+}
+
+function integrateFlight(state: FlightState, input: FlightInput, delta: number): number | null {
+  // Small substeps keep apex/flare timing stable at 30, 60 and 120 fps.
+  const duration = Math.min(delta, 0.1);
+  const steps = Math.ceil(duration * 120);
+  const dt = duration / steps;
+  for (let i = 0; i < steps; i += 1) {
+    const target = targetVelocity(state, input);
+    state.velocity += (target - state.velocity) * (1 - Math.exp(-responseRate(input) * dt));
+    // Brake before contact even after a fast commanded descent.
+    const safeFall = Math.sqrt(FLIGHT.landingSpeed ** 2 + 2 * FLIGHT.flareDeceleration * Math.max(0, state.height));
+    state.velocity = Math.max(state.velocity, -safeFall);
+    state.height += state.velocity * dt;
+    if (state.height <= 0) return touchDown(state);
+  }
+  return null;
+}
+
 // Returns impact speed only on touchdown. Height is above terrain; world altitude is
 // preserved when the ground changes underneath an airborne rider.
 export function updateFlight(state: FlightState, input: FlightInput, groundY: number, delta: number): number | null {
@@ -37,50 +90,7 @@ export function updateFlight(state: FlightState, input: FlightInput, groundY: nu
   const wasAirborne = state.height > 0;
   if (wasAirborne && state.groundY !== null) state.height += state.groundY - groundY;
   state.groundY = groundY;
-  if (wasAirborne && state.height <= 0) {
-    const impact = Math.abs(state.velocity);
-    state.height = 0;
-    state.velocity = 0;
-    return impact;
-  }
-  if (state.height <= 0) {
-    state.height = 0;
-    // Takeoff needs a forward run-up and a fresh press; holding lift at rest
-    // must not trigger an automatic launch once the rider starts moving.
-    const canLaunch = input.launch && input.speed >= FLIGHT.minTakeoffRunSpeed;
-    state.velocity = canLaunch ? FLIGHT.takeoffSpeed : 0;
-    if (!canLaunch) return null;
-  }
-  // Small substeps keep apex/flare timing stable at 30, 60 and 120 fps.
-  const duration = Math.min(delta, 0.1);
-  const steps = Math.ceil(duration * 120);
-  const dt = duration / steps;
-  for (let i = 0; i < steps; i += 1) {
-    const glide = FLIGHT.glideSlow + (FLIGHT.glideFast - FLIGHT.glideSlow) * clamp(Math.abs(input.speed) / 18, 0, 1);
-    let target =
-      input.lift && !input.descend
-        ? FLIGHT.climbSpeed * smooth((FLIGHT.ceiling - state.height) / 4)
-        : -(input.descend ? FLIGHT.descendSpeed : glide);
-    if (input.holdAltitude) target = Math.max(0, target);
-    if (state.height > FLIGHT.ceiling) target = Math.min(target, -Math.min(3, state.height - FLIGHT.ceiling));
-    if (target < 0) {
-      const flare = smooth(state.height / FLIGHT.flareHeight);
-      target = -FLIGHT.landingSpeed + (target + FLIGHT.landingSpeed) * flare;
-    }
-    let response = 3.2;
-    if (input.lift) response = 3.5;
-    if (input.descend) response = 4;
-    state.velocity += (target - state.velocity) * (1 - Math.exp(-response * dt));
-    // Brake before contact even after a fast commanded descent.
-    const safeFall = Math.sqrt(FLIGHT.landingSpeed ** 2 + 2 * FLIGHT.flareDeceleration * Math.max(0, state.height));
-    state.velocity = Math.max(state.velocity, -safeFall);
-    state.height += state.velocity * dt;
-    if (state.height <= 0) {
-      const impact = Math.abs(state.velocity);
-      state.height = 0;
-      state.velocity = 0;
-      return impact;
-    }
-  }
-  return null;
+  if (wasAirborne && state.height <= 0) return touchDown(state);
+  if (state.height <= 0 && !beginLaunch(state, input)) return null;
+  return integrateFlight(state, input, delta);
 }

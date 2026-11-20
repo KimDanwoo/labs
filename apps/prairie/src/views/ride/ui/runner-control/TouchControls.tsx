@@ -2,6 +2,7 @@
 
 import { type PointerEvent, useRef, useState } from 'react';
 import { JOYSTICK } from '../../model/runner-control/constants';
+import { applyJoystickDirection } from '../../model/runner-control/services/joystickDirection';
 import { setRunnerAction } from '../../model/runner-control/store/runnerInput';
 import { TouchActions } from './TouchActions';
 
@@ -14,14 +15,6 @@ export function TouchControls() {
   const [knob, setKnob] = useState<Vec>({ x: 0, y: 0 });
   const originRef = useRef<Vec>({ x: 0, y: 0 });
   const pointerIdRef = useRef<number | null>(null);
-
-  const applyDirection = (dx: number, dy: number) => {
-    const { deadzone } = JOYSTICK;
-    setRunnerAction('forward', dy < -deadzone); // 화면 위로 = 가속
-    setRunnerAction('backward', dy > deadzone);
-    setRunnerAction('left', dx < -deadzone);
-    setRunnerAction('right', dx > deadzone);
-  };
 
   const handleDown = (event: PointerEvent<HTMLDivElement>) => {
     if (pointerIdRef.current !== null) return;
@@ -43,7 +36,7 @@ export function TouchControls() {
       dy *= scale;
     }
     setKnob({ x: dx, y: dy });
-    applyDirection(dx, dy);
+    applyJoystickDirection(dx, dy);
   };
 
   const handleEnd = (event: PointerEvent<HTMLDivElement>) => {

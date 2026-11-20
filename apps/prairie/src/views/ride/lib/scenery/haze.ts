@@ -1,5 +1,6 @@
-import { Color } from 'three';
+import { Color, MathUtils, type Camera, type Mesh, type ShaderMaterial } from 'three';
 import { HAZE, RIDGES, SCENE_COLORS } from '../../config/scene';
+import { coastDistanceAt } from '../scene/terrain';
 
 export const HEIGHT = HAZE.topY - HAZE.bottomY;
 
@@ -61,3 +62,17 @@ export const FRAGMENT = `
 export const inlandFog = new Color(SCENE_COLORS.fog);
 
 export const seaFog = new Color(SCENE_COLORS.oceanHorizon);
+
+const COASTAL_RANGE = [-300, -20] as const;
+
+export function updateHaze(mesh: Mesh, material: ShaderMaterial, camera: Camera): void {
+  const coastal = MathUtils.smoothstep(
+    coastDistanceAt(camera.position.x, camera.position.z),
+    COASTAL_RANGE[0],
+    COASTAL_RANGE[1],
+  );
+  material.uniforms.uCoastal!.value = coastal;
+  material.uniforms.uFog!.value.copy(inlandFog).lerp(seaFog, coastal);
+  mesh.position.x = camera.position.x;
+  mesh.position.z = camera.position.z;
+}

@@ -4,3 +4,5 @@ export const BEARING = {
   left: { label: '왼쪽', arrow: '←' },
   right: { label: '오른쪽', arrow: '→' },
 } as const;
+
+export const SEA_NEAR_DISTANCE = 400;

@@ -1,13 +1,13 @@
 'use client';
 
-import { useThree } from '@react-three/fiber';
-import { boundedDpr } from '@shared/lib/renderBudget';
-import { useEffect } from 'react';
+import { useRenderBudget } from '../../model/hooks/useRenderBudget';
 
-export function RenderBudget({ desired, pixels }: { desired: number; pixels: number }) {
-  const { size, setDpr } = useThree();
-  useEffect(() => {
-    setDpr(boundedDpr(size.width, size.height, desired, pixels));
-  }, [size.width, size.height, desired, pixels, setDpr]);
+interface RenderBudgetProps {
+  desired: number;
+  pixels: number;
+}
+
+export function RenderBudget({ desired, pixels }: RenderBudgetProps) {
+  useRenderBudget(desired, pixels);
   return null;
 }

@@ -1,16 +1,14 @@
 'use client';
 
-import { useLowDetail } from '../../model/ride-state/sceneQuality';
-
-import { makeBladeGeometry } from '../../lib/makeBladeGeometry';
-
 import { useFrame } from '@react-three/fiber';
-import { RIVER } from '../../config/scene';
-import { coastDistanceAt, groundHeightAt, nearestRiverX, riverWidthAt } from '../../lib/scene/terrain';
-
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Color, DoubleSide, InstancedMesh, Object3D } from 'three';
-import { CAPACITY, CELL, hash } from '../../lib/river/riverBanks';
+import { RIVER_BANKS_VIEW } from '../../config/riverBanksView';
+import { makeBladeGeometry } from '../../lib/makeBladeGeometry';
+import { bankKey, rebuildBanks } from '../../lib/river/riverBankPlacement';
+import { CAPACITY } from '../../lib/river/riverBanks';
+import { useDispose } from '../../model/hooks/useDispose';
+import { useLowDetail } from '../../model/ride-state/sceneQuality';
 
 // A small, deterministic pool adds irregular shoreline landmarks without a mesh per stone/stem.
 export function RiverBanks() {
@@ -20,58 +18,21 @@ export function RiverBanks() {
   const cell = useRef('');
   const dummy = useMemo(() => new Object3D(), []);
   const tint = useMemo(() => new Color(), []);
-  const reedGeometry = useMemo(() => makeBladeGeometry(3), []);
-  useEffect(() => () => reedGeometry.dispose(), [reedGeometry]);
+  const reedGeometry = useMemo(() => makeBladeGeometry(RIVER_BANKS_VIEW.reedBlades), []);
+  useDispose(reedGeometry);
 
   useFrame(({ camera }) => {
     if (!rocks.current || !reeds.current) return;
-    const center = Math.round(camera.position.z / CELL);
-    const river = Math.round((nearestRiverX(camera.position.x, camera.position.z) - RIVER.firstX) / RIVER.period);
-    const key = `${center}:${river}:${coarse}`;
+    const key = bankKey(camera.position, coarse);
     if (key === cell.current) return;
     cell.current = key;
-    let count = 0;
-    const radius = coarse ? 3 : 5;
-    for (let dz = -radius; dz <= radius; dz++) {
-      for (const side of [-1, 1]) {
-        for (let i = 0; i < 4; i++) {
-          const seed = (center + dz) * 91.7 + river * 317 + side * 17 + i * 7.3;
-          const z = (center + dz) * CELL + (hash(seed) - 0.5) * CELL;
-          const bank = RIVER.halfWidth + 1.2 + hash(seed + 1) * 4.2;
-          const x = nearestRiverX(RIVER.firstX + river * RIVER.period, z) + side * bank * riverWidthAt(z);
-          if (coastDistanceAt(x, z) > -26) continue;
-          const ground = groundHeightAt(x, z);
-          const size = 0.18 + hash(seed + 2) ** 3 * 0.65;
-          dummy.position.set(x, ground + size * 0.12, z);
-          dummy.rotation.set(hash(seed + 3) * 0.4, hash(seed + 4) * Math.PI, 0.2);
-          dummy.scale.set(size * 1.5, size * 0.65, size);
-          dummy.updateMatrix();
-          rocks.current.setMatrixAt(count, dummy.matrix);
-          tint.set('#9c9b85').multiplyScalar(0.8 + hash(seed + 5) * 0.35);
-          rocks.current.setColorAt(count, tint);
-          dummy.position.set(x + side * 0.65, ground + 0.02, z + 0.5);
-          dummy.rotation.set(0, seed, 0);
-          dummy.scale.setScalar(1.2 + hash(seed + 6) * 1.5);
-          dummy.updateMatrix();
-          reeds.current.setMatrixAt(count, dummy.matrix);
-          tint.set(hash(seed + 7) > 0.6 ? '#8a9360' : '#526e49');
-          reeds.current.setColorAt(count, tint);
-          count++;
-        }
-      }
-    }
-    for (const mesh of [rocks.current, reeds.current]) {
-      mesh.count = count;
-      mesh.instanceMatrix.needsUpdate = true;
-      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-      mesh.computeBoundingSphere();
-    }
+    rebuildBanks({ rocks: rocks.current, reeds: reeds.current }, dummy, tint, camera.position, coarse);
   });
 
   return (
     <group>
       <instancedMesh ref={rocks} args={[undefined, undefined, CAPACITY]}>
-        <icosahedronGeometry args={[1, 0]} />
+        <icosahedronGeometry args={RIVER_BANKS_VIEW.rockGeometry} />
         <meshLambertMaterial />
       </instancedMesh>
       <instancedMesh ref={reeds} args={[reedGeometry, undefined, CAPACITY]}>

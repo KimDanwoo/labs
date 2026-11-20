@@ -1,5 +1,6 @@
 'use client';
 import { memo } from 'react';
+import { LIVING_LANDMARKS } from '../../config/livingLandmarks';
 import { terrainHeightAt } from '../../lib/scene/terrain';
 import { LANDMARKS } from '../../model/exploration/world';
 import { WingedLife } from '../wildlife/WingedLife';
@@ -20,7 +21,10 @@ export const LivingLandmarks = memo(function LivingLandmarks() {
           {index === 2 && <SunsetArch />}
         </group>
       ))}
-      <WingedLife kind="bird" anchor={[tree.x, terrainHeightAt(tree.x, tree.z) + 19, tree.z]} />
+      <WingedLife
+        kind="bird"
+        anchor={[tree.x, terrainHeightAt(tree.x, tree.z) + LIVING_LANDMARKS.birdAnchorHeight, tree.z]}
+      />
       <WingedLife kind="butterfly" anchor={[garden.x, terrainHeightAt(garden.x, garden.z), garden.z]} />
     </group>
   );

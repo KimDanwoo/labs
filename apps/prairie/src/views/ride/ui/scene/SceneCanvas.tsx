@@ -7,7 +7,7 @@ import { useIsCoarsePointer } from '@shared/lib/useCoarsePointer';
 import { Suspense, useState } from 'react';
 import { PCFShadowMap } from 'three';
 import { CAMERA, CINEMATIC, FOG, SCENE_COLORS, SUN, type FogQuality } from '../../config/scene';
-import { DPR } from '../../lib/scene/sceneCanvas';
+import { DPR, FILL_LIGHT_POSITION, SOFTWARE_DPR_MAX } from '../../lib/scene/sceneCanvas';
 import { SceneQualityContext } from '../../model/ride-state/sceneQuality';
 import { ExplorationScene } from '../exploration/ExplorationScene';
 import { FloraField } from '../flora/FloraField';
@@ -34,7 +34,7 @@ export function SceneCanvas() {
   const dprRange = DPR[quality];
   // 프레임이 떨어지면 해상도를 낮추고, 여유가 생기면 되돌린다(적응형 DPR).
   const [dpr, setDpr] = useState<number>(dprRange.max);
-  const desiredDpr = Math.min(dpr, isSoftware ? 0.6 : dprRange.max);
+  const desiredDpr = Math.min(dpr, isSoftware ? SOFTWARE_DPR_MAX : dprRange.max);
   const pixelBudget = isSoftware ? RENDER_PIXELS.software : RENDER_PIXELS[quality];
 
   return (
@@ -91,7 +91,7 @@ export function SceneCanvas() {
           intensity={SUN.ambientIntensity}
         />
         <RideSun mobile={lowDetail} />
-        <directionalLight color={SCENE_COLORS.fillLight} intensity={0.7} position={[40, 35, -60]} />
+        <directionalLight color={SCENE_COLORS.fillLight} intensity={0.7} position={FILL_LIGHT_POSITION} />
 
         <Suspense fallback={null}>
           <Scenery />

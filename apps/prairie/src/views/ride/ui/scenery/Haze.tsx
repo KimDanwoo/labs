@@ -1,18 +1,19 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { useEffect, useMemo, useRef } from 'react';
-import { BackSide, Color, MathUtils, Mesh, ShaderMaterial } from 'three';
+import { useMemo, useRef } from 'react';
+import { BackSide, Color, Mesh, ShaderMaterial } from 'three';
+import { HAZE_VIEW } from '../../config/hazeView';
 import { HAZE, RIDGES, SCENE_COLORS } from '../../config/scene';
 import { makeRidgeTexture } from '../../lib/makeRidgeTexture';
-import { coastDistanceAt } from '../../lib/scene/terrain';
-import { CENTER_Y, FRAGMENT, HEIGHT, inlandFog, seaFog, VERTEX } from '../../lib/scenery/haze';
+import { CENTER_Y, FRAGMENT, HEIGHT, updateHaze, VERTEX } from '../../lib/scenery/haze';
+import { useDispose } from '../../model/hooks/useDispose';
 
 export function Haze() {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<ShaderMaterial>(null);
   const ridges = useMemo(() => makeRidgeTexture(RIDGES), []);
-  useEffect(() => () => ridges.dispose(), [ridges]);
+  useDispose(ridges);
   const uniforms = useMemo(
     () => ({
       uFog: { value: new Color(SCENE_COLORS.fog) },
@@ -22,18 +23,20 @@ export function Haze() {
     [ridges],
   );
   useFrame(({ camera }) => {
-    const mesh = meshRef.current;
-    const material = materialRef.current;
-    if (!mesh || !material) return;
-    const coastal = MathUtils.smoothstep(coastDistanceAt(camera.position.x, camera.position.z), -300, -20);
-    material.uniforms.uCoastal!.value = coastal;
-    material.uniforms.uFog!.value.copy(inlandFog).lerp(seaFog, coastal);
-    mesh.position.x = camera.position.x;
-    mesh.position.z = camera.position.z;
+    if (meshRef.current && materialRef.current) updateHaze(meshRef.current, materialRef.current, camera);
   });
   return (
     <mesh ref={meshRef} position={[0, CENTER_Y, 0]}>
-      <cylinderGeometry args={[HAZE.radius, HAZE.radius, HEIGHT, 256, 1, true]} />
+      <cylinderGeometry
+        args={[
+          HAZE.radius,
+          HAZE.radius,
+          HEIGHT,
+          HAZE_VIEW.radialSegments,
+          HAZE_VIEW.heightSegments,
+          HAZE_VIEW.openEnded,
+        ]}
+      />
       <shaderMaterial
         ref={materialRef}
         uniforms={uniforms}

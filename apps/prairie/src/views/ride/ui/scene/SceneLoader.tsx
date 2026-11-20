@@ -1,21 +1,15 @@
 'use client';
 
 import { useProgress } from '@react-three/drei';
-import { useEffect, useState } from 'react';
-import { FADE_MS } from '../../lib/scene/sceneLoader';
+import { loaderPercent } from '../../lib/scene/sceneLoader';
+import { useLoaderRemoval } from '../../model/hooks/useLoaderRemoval';
 import { useSceneReady } from '../../model/ride-state/sceneReady';
 
 export function SceneLoader() {
   const { progress } = useProgress();
   const ready = useSceneReady();
-  const [isRemoved, setIsRemoved] = useState(false);
-  const percent = ready ? 100 : Math.min(99, Math.round(progress));
-
-  useEffect(() => {
-    if (!ready) return undefined;
-    const id = setTimeout(() => setIsRemoved(true), FADE_MS);
-    return () => clearTimeout(id);
-  }, [ready]);
+  const isRemoved = useLoaderRemoval(ready);
+  const percent = loaderPercent(ready, progress);
 
   if (isRemoved) return null;
 

@@ -1,3 +1,4 @@
+import { BufferGeometry, Float32BufferAttribute } from 'three';
 import { RIVER_GLSL, TERRAIN_GLSL } from '../../config/riverGlsl';
 import { CINEMATIC } from '../../config/scene';
 
@@ -32,3 +33,30 @@ export const FRAGMENT = `
     #include <colorspace_fragment>
   }
 `;
+
+const FIELD_SIZE = 80;
+const HEIGHT_FLOOR = 0.4;
+const SEED_OFFSET = { height: 300, z: 600, seed: 900 } as const;
+const HASH = { scale: 127.1, shift: 3.7, amplitude: 43758.5453 } as const;
+
+function moteHash(i: number): number {
+  const value = Math.sin(i * HASH.scale + HASH.shift) * HASH.amplitude;
+  return value - Math.floor(value);
+}
+
+export function makeMoteGeometry(count: number): BufferGeometry {
+  const data = new BufferGeometry();
+  const positions: number[] = [];
+  const seeds: number[] = [];
+  for (let i = 0; i < count; i++) {
+    positions.push(
+      (moteHash(i) - 0.5) * FIELD_SIZE,
+      HEIGHT_FLOOR + moteHash(i + SEED_OFFSET.height) * CINEMATIC.dust.height,
+      (moteHash(i + SEED_OFFSET.z) - 0.5) * FIELD_SIZE,
+    );
+    seeds.push(moteHash(i + SEED_OFFSET.seed));
+  }
+  data.setAttribute('position', new Float32BufferAttribute(positions, 3));
+  data.setAttribute('aSeed', new Float32BufferAttribute(seeds, 1));
+  return data;
+}
