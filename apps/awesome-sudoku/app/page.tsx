@@ -1,5 +1,5 @@
-import { HomePage } from '@views/home';
+import { SudokuPage } from '@views/sudoku';
 
 export default function Home() {
-  return <HomePage />;
+  return <SudokuPage />;
 }

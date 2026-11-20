@@ -12,7 +12,7 @@
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
     "analyze": "ANALYZE=true next build",
-    "puzzles:killer-expert": "tsx scripts/generate-killer-expert.mts && prettier --write src/views/home/lib/killerExpertPuzzles.ts"
+    "puzzles:killer-expert": "tsx scripts/generate-killer-expert.mts && prettier --write src/entities/sudoku/lib/killerExpertPuzzles.ts"
   },
   "dependencies": {
     "@repo/fonts": "workspace:*",
