@@ -1,20 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 const MD_BREAKPOINT = '(min-width: 768px)';
 
+function subscribe(onChange: () => void): () => void {
+  const mql = window.matchMedia(MD_BREAKPOINT);
+  mql.addEventListener('change', onChange);
+  return () => mql.removeEventListener('change', onChange);
+}
+
+function getSnapshot(): boolean {
+  return window.matchMedia(MD_BREAKPOINT).matches;
+}
+
+function getServerSnapshot(): boolean {
+  return false;
+}
+
 export function useIsDesktop(): boolean {
-  const [isDesktop, setIsDesktop] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia(MD_BREAKPOINT).matches,
-  );
-
-  useEffect(() => {
-    const mql = window.matchMedia(MD_BREAKPOINT);
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mql.addEventListener('change', handler);
-    return () => mql.removeEventListener('change', handler);
-  }, []);
-
-  return isDesktop;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

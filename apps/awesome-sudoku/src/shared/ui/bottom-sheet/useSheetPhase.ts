@@ -1,7 +1,7 @@
 'use client';
 
 import { ANIMATION_MS, PHASE, sheetMotion, type Phase } from '@shared/ui/bottom-sheet/sheetMotion';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 
 type UseSheetPhaseOptions = {
   isOpen: boolean;
@@ -13,10 +13,7 @@ type UseSheetPhaseOptions = {
 export function useSheetPhase({ isOpen, onClose, sheetRef, isDesktop }: UseSheetPhaseOptions) {
   const [phase, setPhase] = useState<Phase>(PHASE.idle);
   const previousFocusRef = useRef<HTMLElement | null>(null);
-  const onCloseRef = useRef(onClose);
-  useEffect(() => {
-    onCloseRef.current = onClose;
-  }, [onClose]);
+  const notifyClose = useEffectEvent(onClose);
 
   const [prevOpen, setPrevOpen] = useState(false);
   if (prevOpen !== isOpen) {
@@ -58,7 +55,7 @@ export function useSheetPhase({ isOpen, onClose, sheetRef, isDesktop }: UseSheet
       setPhase(PHASE.idle);
       if (!closedByUserRef.current) return;
       closedByUserRef.current = false;
-      onCloseRef.current();
+      notifyClose();
       previousFocusRef.current?.focus();
     }, ANIMATION_MS);
     return () => clearTimeout(id);
