@@ -13,10 +13,12 @@
     "test": "node --test \"scripts/__tests__/*.test.mjs\" && turbo run test",
     "check:architecture": "node scripts/check-architecture.mjs",
     "typecheck": "turbo run typecheck",
-    "format": "prettier --write \"**/*.{ts,tsx,css,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,css,md}\"",
+    "brand-assets": "node scripts/brand-assets.mjs"
   },
   "prettier": "@repo/prettier-config",
   "devDependencies": {
+    "@playwright/test": "catalog:",
     "@repo/prettier-config": "workspace:*",
     "prettier": "catalog:",
     "tsx": "catalog:",
