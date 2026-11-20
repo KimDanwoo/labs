@@ -4,6 +4,7 @@ import type { NextConfig } from 'next';
 const SECURITY_HEADERS = createSecurityHeaders({ sources: { 'script-src': ["'wasm-unsafe-eval'"] } });
 
 const nextConfig: NextConfig = {
+  agentRules: false,
   async headers() {
     return [{ source: '/(.*)', headers: SECURITY_HEADERS }];
   },
