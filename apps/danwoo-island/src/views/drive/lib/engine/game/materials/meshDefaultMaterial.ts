@@ -55,6 +55,17 @@ function isTwoSided(side: THREE.Side): boolean {
   return side === THREE.DoubleSide || side === THREE.BackSide;
 }
 
+function resolveFeatures(options: MeshDefaultMaterialOptions): Features {
+  return {
+    hasCoreShadows: options.hasCoreShadows ?? true,
+    hasDropShadows: options.hasDropShadows ?? true,
+    hasLightBounce: options.hasLightBounce ?? true,
+    hasFog: options.hasFog ?? true,
+    hasWater: options.hasWater ?? true,
+    hasReveal: options.hasReveal ?? true,
+  };
+}
+
 export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
   readonly shadedOutput: THREE.Node<'vec4'>;
   readonly #features: Features;
@@ -66,22 +77,8 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
 
   constructor(options: MeshDefaultMaterialOptions = {}) {
     super();
-    this.depthWrite = options.depthWrite ?? true;
-    this.depthTest = options.depthTest ?? true;
-    this.side = options.side ?? THREE.FrontSide;
-    this.shadowSide = options.shadowSide ?? THREE.FrontSide;
-    this.wireframe = options.wireframe ?? false;
-    this.transparent = options.transparent ?? false;
-    this.alphaTest = options.alphaTest ?? DEFAULT_ALPHA_TEST;
-
-    this.#features = {
-      hasCoreShadows: options.hasCoreShadows ?? true,
-      hasDropShadows: options.hasDropShadows ?? true,
-      hasLightBounce: options.hasLightBounce ?? true,
-      hasFog: options.hasFog ?? true,
-      hasWater: options.hasWater ?? true,
-      hasReveal: options.hasReveal ?? true,
-    };
+    this.#applyRenderOptions(options);
+    this.#features = resolveFeatures(options);
     this.#colorNode = options.colorNode ?? vec3(1);
     this.#normalNode = options.normalNode ?? normalWorld;
     this.#alphaNode = options.alphaNode ?? float(1);
@@ -91,6 +88,16 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
     if (this.#features.hasDropShadows) this.receivedShadowNode = this.#catchShadow();
     this.shadedOutput = Fn(() => this.#output())();
     this.outputNode = this.shadedOutput;
+  }
+
+  #applyRenderOptions(options: MeshDefaultMaterialOptions): void {
+    this.depthWrite = options.depthWrite ?? true;
+    this.depthTest = options.depthTest ?? true;
+    this.side = options.side ?? THREE.FrontSide;
+    this.shadowSide = options.shadowSide ?? THREE.FrontSide;
+    this.wireframe = options.wireframe ?? false;
+    this.transparent = options.transparent ?? false;
+    this.alphaTest = options.alphaTest ?? DEFAULT_ALPHA_TEST;
   }
 
   #catchShadow(): (shadow?: THREE.Node<'vec4'>) => THREE.Node {

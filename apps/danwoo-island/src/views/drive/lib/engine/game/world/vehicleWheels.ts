@@ -53,15 +53,20 @@ export function updateWheels(wheels: readonly VisualWheel[], steering: number): 
     if (isRolling) wheel.cylinder.rotation.z += MIRRORED_WHEELS.has(index) ? wheelsRotation : -wheelsRotation;
     if (index === 0) wheel.container.rotation.y = Math.PI + steering;
     if (index === 1) wheel.container.rotation.y = steering;
+    placeWheel(wheel, physicalWheel, ticker.deltaScaled);
+  }
+}
 
-    const wheelY = Math.min(physicalWheel.basePosition.y - (physicalWheel.suspensionLength ?? 0), WHEEL_MAX_Y);
-    wheel.container.position.x = physicalWheel.basePosition.x;
-    wheel.container.position.y += (wheelY - wheel.container.position.y) * WHEEL_EASING * ticker.deltaScaled;
-    wheel.container.position.z = physicalWheel.basePosition.z;
-    if (wheel.suspension) wheel.suspension.scale.y = Math.abs(wheel.container.position.y) - 0.5;
-    if (physicalWheel.contactPoint) {
-      wheel.groundTrack.update(new THREE.Vector3().copy(physicalWheel.contactPoint), physicalWheel.inContact);
-    }
+type PhysicalWheel = ReturnType<typeof getGame>['physicalVehicle']['wheels']['items'][number];
+
+function placeWheel(wheel: VisualWheel, physicalWheel: PhysicalWheel, deltaScaled: number): void {
+  const wheelY = Math.min(physicalWheel.basePosition.y - (physicalWheel.suspensionLength ?? 0), WHEEL_MAX_Y);
+  wheel.container.position.x = physicalWheel.basePosition.x;
+  wheel.container.position.y += (wheelY - wheel.container.position.y) * WHEEL_EASING * deltaScaled;
+  wheel.container.position.z = physicalWheel.basePosition.z;
+  if (wheel.suspension) wheel.suspension.scale.y = Math.abs(wheel.container.position.y) - 0.5;
+  if (physicalWheel.contactPoint) {
+    wheel.groundTrack.update(new THREE.Vector3().copy(physicalWheel.contactPoint), physicalWheel.inContact);
   }
 }
 

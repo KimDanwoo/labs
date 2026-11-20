@@ -16,8 +16,26 @@ import {
   stopBody,
   surfaceOverrides,
 } from './objectColliders';
-import type { PhysicalDescription } from './physics/physicsTypes';
+import type { Physical, PhysicalDescription } from './physics/physicsTypes';
 import { TICK_ORDER } from './tickOrder';
+
+function snapStaticVisual(object: WorldObject, physicalDescription: PhysicalDescription): void {
+  const { visual, physical } = object;
+  if (!visual || !physical || !isStatic(physicalDescription, physical)) return;
+  visual.object3D.position.copy(physical.body.translation());
+  visual.object3D.quaternion.copy(physical.body.rotation());
+}
+
+function syncVisual(object: WorldObject, visual: ObjectVisual, body: Physical['body']): void {
+  object.needsUpdate = false;
+  visual.object3D.position.copy(body.translation());
+  visual.object3D.quaternion.copy(body.rotation());
+  markInstanceDirty(visual.object3D);
+}
+
+function sleepIfFar(body: Physical['body'], isFar: boolean): void {
+  if (isFar && body.isEnabled() && !body.isSleeping()) body.sleep();
+}
 
 export class Objects {
   readonly list = new Map<number, WorldObject>();
@@ -44,11 +62,7 @@ export class Objects {
     this.#key += 1;
     this.list.set(this.#key, object);
 
-    const { visual, physical } = object;
-    if (visual && physical && physicalDescription && isStatic(physicalDescription, physical)) {
-      visual.object3D.position.copy(physical.body.translation());
-      visual.object3D.quaternion.copy(physical.body.rotation());
-    }
+    if (physicalDescription) snapStaticVisual(object, physicalDescription);
     return object;
   }
 
@@ -142,7 +156,7 @@ export class Objects {
 
   update(): void {
     const game = getGame();
-    const { focusPoint, optimalArea } = game.view;
+    const { focusPoint } = game.view;
     const roundedX = Math.round(focusPoint.position.x);
     const roundedZ = Math.round(focusPoint.position.z);
     const hasViewMoved = roundedX !== this.#roundedView.x || roundedZ !== this.#roundedView.z;
@@ -150,27 +164,32 @@ export class Objects {
     this.#roundedView.z = roundedZ;
 
     for (const object of this.list.values()) {
-      const { physical, visual } = object;
-      if (!physical) continue;
-      const { body } = physical;
-      const isResting = body.isSleeping() || !body.isEnabled();
-      const wasAwake = this.#awake.has(object);
-      if (isResting) this.#awake.delete(object);
-      else this.#awake.add(object);
-      if (isResting && !object.needsUpdate && !wasAwake) continue;
-      const position = body.translation();
-
-      if (visual && (object.needsUpdate || wasAwake || !isResting)) {
-        object.needsUpdate = false;
-        visual.object3D.position.copy(position);
-        visual.object3D.quaternion.copy(body.rotation());
-        markInstanceDirty(visual.object3D);
-      }
-      if (position.y < game.water.depthElevation) this.resetObject(object);
-      if (!hasViewMoved) continue;
-
-      const distanceToView = Math.hypot(roundedX - position.x, roundedZ - position.z);
-      if (body.isEnabled() && !body.isSleeping() && distanceToView > optimalArea.radius) body.sleep();
+      this.#updateObject(object, hasViewMoved, roundedX, roundedZ);
     }
+  }
+
+  #trackAwake(object: WorldObject, isResting: boolean): boolean {
+    const wasAwake = this.#awake.has(object);
+    if (isResting) this.#awake.delete(object);
+    else this.#awake.add(object);
+    return wasAwake;
+  }
+
+  #updateObject(object: WorldObject, hasViewMoved: boolean, roundedX: number, roundedZ: number): void {
+    const game = getGame();
+    const { physical, visual } = object;
+    if (!physical) return;
+    const { body } = physical;
+    const isResting = body.isSleeping() || !body.isEnabled();
+    const wasAwake = this.#trackAwake(object, isResting);
+    if (!object.needsUpdate && !wasAwake && isResting) return;
+    const position = body.translation();
+
+    if (visual) syncVisual(object, visual, body);
+    if (position.y < game.water.depthElevation) this.resetObject(object);
+    if (!hasViewMoved) return;
+
+    const distanceToView = Math.hypot(roundedX - position.x, roundedZ - position.z);
+    sleepIfFar(body, distanceToView > game.view.optimalArea.radius);
   }
 }

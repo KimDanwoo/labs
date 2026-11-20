@@ -125,24 +125,33 @@ export class CareerArea extends Area {
   }
 
   #updateLine(line: CareerLine): void {
-    const { player, ticker } = this.game;
-    const delta = -this.#playerLocal.copy(player.position).applyMatrix4(line.toLocal).z;
-    const isInside = delta > -PADDING && delta < line.size + PADDING * 2;
-    if (isInside !== line.isIn) {
-      line.isIn = isInside;
-      const reveal = isInside
-        ? { value: 1, duration: 1, delay: 0.3, overwrite: true, ease: 'power2.inOut' }
-        : { value: 0, duration: 1, overwrite: true, ease: 'power2.inOut' };
-      gsap.to(line.labelReveal, reveal);
-    }
+    const delta = -this.#playerLocal.copy(this.game.player.position).applyMatrix4(line.toLocal).z;
+    this.#updateLabelReveal(line, delta);
+    this.#updateStoneState(line, delta);
+    this.#updateStoneMotion(line, delta);
+  }
 
+  #updateLabelReveal(line: CareerLine, delta: number): void {
+    const isInside = delta > -PADDING && delta < line.size + PADDING * 2;
+    if (isInside === line.isIn) return;
+    line.isIn = isInside;
+    const reveal = isInside
+      ? { value: 1, duration: 1, delay: 0.3, overwrite: true, ease: 'power2.inOut' }
+      : { value: 0, duration: 1, overwrite: true, ease: 'power2.inOut' };
+    gsap.to(line.labelReveal, reveal);
+  }
+
+  #updateStoneState(line: CareerLine, delta: number): void {
     if (line.isIn && !line.isUp) {
       line.isUp = true;
       this.#stoneOut.play(line.origin, line.index);
     } else if (!line.isIn && (delta <= line.size || line.hasEnd)) {
       this.#sink(line);
     }
+  }
 
+  #updateStoneMotion(line: CareerLine, delta: number): void {
+    const { ticker } = this.game;
     const elevationTarget = line.isUp ? ACTIVE_ELEVATION : 0;
     line.stone.position.y += (elevationTarget - line.stone.position.y) * ticker.deltaScaled * EASING.elevation;
 

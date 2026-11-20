@@ -5,23 +5,8 @@ export interface MeshComponent {
   box: THREE.Box3;
 }
 
-export function meshComponents(geometry: THREE.BufferGeometry): { index: number[]; components: MeshComponent[] } {
-  const { position } = geometry.attributes;
-  if (!position) throw new Error('Geometry has no positions');
-  const index = geometry.index
-    ? Array.from(geometry.index.array)
-    : Array.from({ length: position.count }, (_, vertex) => vertex);
+function weldVertices(position: THREE.BufferAttribute | THREE.InterleavedBufferAttribute, index: number[]): number[] {
   const canonical = new Map<string, number>();
-  const parent = Array.from({ length: position.count }, (_, vertex) => vertex);
-  const find = (start: number): number => {
-    let vertex = start;
-    while (parent[vertex] !== vertex) {
-      const grandparent = parent[parent[vertex] ?? vertex] ?? vertex;
-      parent[vertex] = grandparent;
-      vertex = grandparent;
-    }
-    return vertex;
-  };
   const representative = (vertex: number): number => {
     const key = [position.getX(vertex), position.getY(vertex), position.getZ(vertex)]
       .map((value) => value.toFixed(3))
@@ -31,13 +16,37 @@ export function meshComponents(geometry: THREE.BufferGeometry): { index: number[
     canonical.set(key, vertex);
     return vertex;
   };
-  const roots = index.map(representative);
+  return index.map(representative);
+}
+
+function connectTriangles(vertexCount: number, roots: number[]): (start: number) => number {
+  const parent = Array.from({ length: vertexCount }, (_, vertex) => vertex);
+  const find = (start: number): number => {
+    let vertex = start;
+    while (parent[vertex] !== vertex) {
+      const grandparent = parent[parent[vertex] ?? vertex] ?? vertex;
+      parent[vertex] = grandparent;
+      vertex = grandparent;
+    }
+    return vertex;
+  };
   for (let offset = 0; offset < roots.length; offset += 3) {
     const first = roots[offset] ?? 0;
     for (const other of [roots[offset + 1], roots[offset + 2]]) {
       if (other !== undefined) parent[find(other)] = find(first);
     }
   }
+  return find;
+}
+
+export function meshComponents(geometry: THREE.BufferGeometry): { index: number[]; components: MeshComponent[] } {
+  const { position } = geometry.attributes;
+  if (!position) throw new Error('Geometry has no positions');
+  const index = geometry.index
+    ? Array.from(geometry.index.array)
+    : Array.from({ length: position.count }, (_, vertex) => vertex);
+  const roots = weldVertices(position, index);
+  const find = connectTriangles(position.count, roots);
 
   const components = new Map<number, MeshComponent>();
   const point = new THREE.Vector3();
