@@ -13,6 +13,7 @@ type SearchOptions = {
   nodeBudget?: number;
   exclude?: { index: number; digit: number };
 };
+const NO_CELL = -1;
 type SearchResult = { count: number; solution: number[] | null; exhausted: boolean };
 function search(
   initial: number[],
@@ -73,6 +74,23 @@ function search(
     else cage.usedMask &= ~b;
   };
 
+  const pickBranchCell = (): { cell: number; mask: number } => {
+    let best = { cell: NO_CELL, mask: 0 };
+    let bestSize = BOARD_SIZE + 1;
+    for (let i = 0; i < SUDOKU_CELL_COUNT; i++) {
+      if (cells[i] !== EMPTY) continue;
+      const mask = candidatesOf(i);
+      const size = popcount(mask);
+      if (size === 0) return { cell: i, mask: 0 };
+      if (size < bestSize) {
+        bestSize = size;
+        best = { cell: i, mask };
+        if (size === 1) break;
+      }
+    }
+    return best;
+  };
+
   let count = 0;
   let nodes = 0;
   let exhausted = false;
@@ -84,28 +102,13 @@ function search(
       return true;
     }
 
-    let bestCell = -1;
-    let bestMask = 0;
-    let bestSize = BOARD_SIZE + 1;
-
-    for (let i = 0; i < SUDOKU_CELL_COUNT; i++) {
-      if (cells[i] !== EMPTY) continue;
-      const mask = candidatesOf(i);
-      const size = popcount(mask);
-      if (size === 0) return false;
-      if (size < bestSize) {
-        bestSize = size;
-        bestMask = mask;
-        bestCell = i;
-        if (size === 1) break;
-      }
-    }
-
-    if (bestCell === -1) {
+    const { cell: bestCell, mask: bestMask } = pickBranchCell();
+    if (bestCell === NO_CELL) {
       count++;
       solution ??= [...cells];
       return count >= limit;
     }
+    if (bestMask === 0) return false;
 
     const digits = digitsOf(bestMask);
     if (randomize) shuffleArray(digits);

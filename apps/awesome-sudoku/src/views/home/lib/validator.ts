@@ -28,75 +28,47 @@ export function markWrongValues(board: SudokuBoard, solution: Grid): SudokuBoard
   );
 }
 
+type CellPosition = [number, number];
+
+function range(length: number): number[] {
+  return Array.from({ length }, (_, index) => index);
+}
+
+function buildUnits(): CellPosition[][] {
+  const indices = range(BOARD_SIZE);
+  const rows = indices.map((row) => indices.map((col): CellPosition => [row, col]));
+  const cols = indices.map((col) => indices.map((row): CellPosition => [row, col]));
+  const blocks = range(BLOCKS_PER_ROW).flatMap((blockRow) =>
+    range(BLOCKS_PER_ROW).map((blockCol) =>
+      range(BLOCK_SIZE * BLOCK_SIZE).map((offset): CellPosition => {
+        const row = blockRow * BLOCK_SIZE + Math.floor(offset / BLOCK_SIZE);
+        const col = blockCol * BLOCK_SIZE + (offset % BLOCK_SIZE);
+        return [row, col];
+      }),
+    ),
+  );
+  return [...rows, ...cols, ...blocks];
+}
+
+const UNITS = buildUnits();
+
+function collectDuplicates(board: SudokuBoard, unit: CellPosition[], conflicts: Set<string>): void {
+  const seen = new Map<number, CellPosition[]>();
+  for (const [row, col] of unit) {
+    const value = cellAt(board, row, col).value;
+    if (value === null) continue;
+    seen.set(value, [...(seen.get(value) ?? []), [row, col]]);
+  }
+  for (const positions of seen.values()) {
+    if (positions.length > 1) positions.forEach(([row, col]) => conflicts.add(`${row}-${col}`));
+  }
+}
+
 export function checkConflicts(board: SudokuBoard): SudokuBoard {
   const newBoard = structuredClone(board);
-
   const conflicts = new Set<string>();
 
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    const seen = new Map<number, number[]>();
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      const value = cellAt(newBoard, row, col).value;
-      if (value !== null) {
-        if (!seen.has(value)) {
-          seen.set(value, []);
-        }
-        seen.get(value)!.push(col);
-      }
-    }
-
-    for (const [, positions] of seen) {
-      if (positions.length > 1) {
-        positions.forEach((col) => conflicts.add(`${row}-${col}`));
-      }
-    }
-  }
-
-  for (let col = 0; col < BOARD_SIZE; col++) {
-    const seen = new Map<number, number[]>();
-    for (let row = 0; row < BOARD_SIZE; row++) {
-      const value = cellAt(newBoard, row, col).value;
-      if (value !== null) {
-        if (!seen.has(value)) {
-          seen.set(value, []);
-        }
-        seen.get(value)!.push(row);
-      }
-    }
-
-    for (const [, positions] of seen) {
-      if (positions.length > 1) {
-        positions.forEach((row) => conflicts.add(`${row}-${col}`));
-      }
-    }
-  }
-
-  for (let blockRow = 0; blockRow < BLOCKS_PER_ROW; blockRow++) {
-    for (let blockCol = 0; blockCol < BLOCKS_PER_ROW; blockCol++) {
-      const seen = new Map<number, Array<[number, number]>>();
-
-      for (let r = 0; r < BLOCK_SIZE; r++) {
-        for (let c = 0; c < BLOCK_SIZE; c++) {
-          const row = blockRow * BLOCK_SIZE + r;
-          const col = blockCol * BLOCK_SIZE + c;
-          const value = cellAt(newBoard, row, col).value;
-
-          if (value !== null) {
-            if (!seen.has(value)) {
-              seen.set(value, []);
-            }
-            seen.get(value)!.push([row, col]);
-          }
-        }
-      }
-
-      for (const [, positions] of seen) {
-        if (positions.length > 1) {
-          positions.forEach(([row, col]) => conflicts.add(`${row}-${col}`));
-        }
-      }
-    }
-  }
+  for (const unit of UNITS) collectDuplicates(newBoard, unit, conflicts);
 
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
@@ -119,48 +91,39 @@ export function isBoardComplete(board: SudokuBoard): boolean {
   return true;
 }
 
-export function validateKillerCages(board: SudokuBoard, cages: KillerCage[]): SudokuBoard {
-  const newBoard = structuredClone(board);
+function cageHasConflict(board: SudokuBoard, cage: KillerCage): boolean {
+  let sum = 0;
+  let hasDuplicate = false;
+  let allFilled = true;
+  const usedNumbers = new Set<number>();
 
-  const boardWithBasicConflicts = checkConflicts(newBoard);
+  for (const [row, col] of cage.cells) {
+    const value = cellAt(board, row, col).value;
+    if (value === null) {
+      allFilled = false;
+      continue;
+    }
+    sum += value;
+    hasDuplicate ||= usedNumbers.has(value);
+    usedNumbers.add(value);
+  }
+
+  const isSumMismatch = allFilled && sum !== cage.sum;
+  return hasDuplicate || isSumMismatch || sum > cage.sum;
+}
+
+function markCageConflict(board: SudokuBoard, cage: KillerCage): void {
+  for (const [row, col] of cage.cells) {
+    const cell = cellAt(board, row, col);
+    if (cell.value !== null) cell.isConflict = true;
+  }
+}
+
+export function validateKillerCages(board: SudokuBoard, cages: KillerCage[]): SudokuBoard {
+  const boardWithBasicConflicts = checkConflicts(structuredClone(board));
 
   for (const cage of cages) {
-    let sum = 0;
-    const usedNumbers = new Set<number>();
-    let allFilled = true;
-    let hasConflict = false;
-
-    for (const [row, col] of cage.cells) {
-      const value = cellAt(boardWithBasicConflicts, row, col).value;
-
-      if (value === null) {
-        allFilled = false;
-        continue;
-      }
-
-      sum += value;
-
-      if (usedNumbers.has(value)) {
-        hasConflict = true;
-      }
-      usedNumbers.add(value);
-    }
-
-    if (allFilled && sum !== cage.sum) {
-      hasConflict = true;
-    }
-
-    if (sum > cage.sum) {
-      hasConflict = true;
-    }
-
-    if (hasConflict) {
-      for (const [row, col] of cage.cells) {
-        if (cellAt(boardWithBasicConflicts, row, col).value !== null) {
-          cellAt(boardWithBasicConflicts, row, col).isConflict = true;
-        }
-      }
-    }
+    if (cageHasConflict(boardWithBasicConflicts, cage)) markCageConflict(boardWithBasicConflicts, cage);
   }
 
   return boardWithBasicConflicts;

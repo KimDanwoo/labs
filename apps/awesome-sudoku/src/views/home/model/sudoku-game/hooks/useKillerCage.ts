@@ -2,6 +2,7 @@ import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useState, type RefObject } from 'react';
 import { DEFAULT_CELL_SIZE } from '../../../config/board';
 import { GAME_MODE } from '../../../config/game';
+import { cellSizeFromPaths } from '../../../lib/cageCellSize';
 import { cagesAtom, gameModeAtom } from '../../store/primitives';
 import type { CageInfo, CellPosition, TableDimensions } from '../../types/board';
 import { useCagePathCalculator } from './useCagePathCalculator';
@@ -32,27 +33,10 @@ export const useKillerCage = (tableRef: RefObject<HTMLTableElement | null>) => {
 
   const hasKillerCage = gameMode === GAME_MODE.KILLER && cageInfo.paths.length > 0;
 
-  const cellSize = useMemo(() => {
-    if (!hasKillerCage || cageInfo.paths.length === 0) return DEFAULT_CELL_SIZE;
-
-    try {
-      const firstPath = cageInfo.paths[0]?.path || '';
-      const match = firstPath.match(/M([\d.]+),([\d.]+)/);
-
-      if (match && cageInfo.paths.length > 1) {
-        const secondMatch = cageInfo.paths[1]?.path.match(/M([\d.]+),([\d.]+)/);
-        if (match[1] && secondMatch?.[1]) {
-          const x1 = parseFloat(match[1]);
-          const x2 = parseFloat(secondMatch[1]);
-          return Math.max(Math.abs(x2 - x1), DEFAULT_CELL_SIZE);
-        }
-      }
-    } catch {
-      // Silently handle cell size calculation error
-    }
-
-    return DEFAULT_CELL_SIZE;
-  }, [hasKillerCage, cageInfo.paths]);
+  const cellSize = useMemo(
+    () => (hasKillerCage ? cellSizeFromPaths(cageInfo.paths) : DEFAULT_CELL_SIZE),
+    [hasKillerCage, cageInfo.paths],
+  );
 
   return {
     overlayRef,

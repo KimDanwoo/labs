@@ -28,31 +28,33 @@ function isConnected(cells: GridPosition[]): boolean {
   }
   return remaining.size === 0;
 }
-function layoutCages(solution: Grid, maxCageSize: number): GridPosition[][] {
-  const cageOf = new Array<number>(SUDOKU_CELL_COUNT).fill(-1);
-  const cages: GridPosition[][] = [];
-  const valueAt = ([r, c]: GridPosition): number => cellAt(solution, r, c);
-  const hasValue = (cage: GridPosition[], value: number): boolean => cage.some((p) => valueAt(p) === value);
+interface LayoutState {
+  cageOf: number[];
+  cages: GridPosition[][];
+  valueAt: (position: GridPosition) => number;
+  hasValue: (cage: GridPosition[], value: number) => boolean;
+}
 
-  for (const start of shuffledPositions()) {
-    if (cageOf[key(...start)] !== -1) continue;
+function growCage(state: LayoutState, start: GridPosition, maxCageSize: number): void {
+  const { cageOf, cages, valueAt, hasValue } = state;
+  const cage: GridPosition[] = [start];
+  const cageIndex = cages.length;
+  cageOf[key(...start)] = cageIndex;
+  const targetSize = MIN_CAGE_SIZE + randomInt(maxCageSize - MIN_CAGE_SIZE + 1);
 
-    const cage: GridPosition[] = [start];
-    const cageIndex = cages.length;
-    cageOf[key(...start)] = cageIndex;
-    const targetSize = MIN_CAGE_SIZE + randomInt(maxCageSize - MIN_CAGE_SIZE + 1);
-
-    while (cage.length < targetSize) {
-      const frontier = cage.flatMap(neighborsOf).filter((p) => cageOf[key(...p)] === -1 && !hasValue(cage, valueAt(p)));
-      if (frontier.length === 0) break;
-      const next = atIndex(frontier, randomInt(frontier.length));
-      cage.push(next);
-      cageOf[key(...next)] = cageIndex;
-    }
-
-    cages.push(cage);
+  while (cage.length < targetSize) {
+    const frontier = cage.flatMap(neighborsOf).filter((p) => cageOf[key(...p)] === -1 && !hasValue(cage, valueAt(p)));
+    if (frontier.length === 0) break;
+    const next = atIndex(frontier, randomInt(frontier.length));
+    cage.push(next);
+    cageOf[key(...next)] = cageIndex;
   }
 
+  cages.push(cage);
+}
+
+function absorbSingle(state: LayoutState, cage: GridPosition[], maxCageSize: number): void {
+  const { cageOf, cages, valueAt, hasValue } = state;
   const ownerOf = (p: GridPosition): GridPosition[] | undefined => cages[atIndex(cageOf, key(...p))];
   const canDonate = (p: GridPosition, taker: GridPosition[]): boolean => {
     const owner = ownerOf(p);
@@ -60,34 +62,48 @@ function layoutCages(solution: Grid, maxCageSize: number): GridPosition[][] {
     return isConnected(owner.filter((q) => key(...q) !== key(...p)));
   };
 
-  for (const cage of cages) {
-    if (cage.length !== 1) continue;
-    const cell = atIndex(cage, 0);
-    const neighbors = neighborsOf(cell);
-    const host = neighbors
-      .map(ownerOf)
-      .find(
-        (other) =>
-          other !== undefined && other !== cage && other.length < maxCageSize && !hasValue(other, valueAt(cell)),
-      );
-    if (host) {
-      host.push(cell);
-      cageOf[key(...cell)] = cages.indexOf(host);
-      cage.length = 0;
-      continue;
-    }
-    const donor = neighbors.find((p) => canDonate(p, cage));
-    const owner = donor && ownerOf(donor);
-    if (!donor || !owner) continue;
-    owner.splice(
-      owner.findIndex((q) => key(...q) === key(...donor)),
-      1,
+  const cell = atIndex(cage, 0);
+  const neighbors = neighborsOf(cell);
+  const host = neighbors
+    .map(ownerOf)
+    .find(
+      (other) => other !== undefined && other !== cage && other.length < maxCageSize && !hasValue(other, valueAt(cell)),
     );
-    cage.push(donor);
-    cageOf[key(...donor)] = cages.indexOf(cage);
+  if (host) {
+    host.push(cell);
+    cageOf[key(...cell)] = cages.indexOf(host);
+    cage.length = 0;
+    return;
+  }
+  const donor = neighbors.find((p) => canDonate(p, cage));
+  const owner = donor && ownerOf(donor);
+  if (!donor || !owner) return;
+  owner.splice(
+    owner.findIndex((q) => key(...q) === key(...donor)),
+    1,
+  );
+  cage.push(donor);
+  cageOf[key(...donor)] = cages.indexOf(cage);
+}
+
+function layoutCages(solution: Grid, maxCageSize: number): GridPosition[][] {
+  const valueAt = ([r, c]: GridPosition): number => cellAt(solution, r, c);
+  const state: LayoutState = {
+    cageOf: new Array<number>(SUDOKU_CELL_COUNT).fill(-1),
+    cages: [],
+    valueAt,
+    hasValue: (cage, value) => cage.some((p) => valueAt(p) === value),
+  };
+
+  for (const start of shuffledPositions()) {
+    if (state.cageOf[key(...start)] === -1) growCage(state, start, maxCageSize);
   }
 
-  return cages.filter((cage) => cage.length > 0);
+  for (const cage of state.cages) {
+    if (cage.length === 1) absorbSingle(state, cage, maxCageSize);
+  }
+
+  return state.cages.filter((cage) => cage.length > 0);
 }
 
 export function generateKillerCages(solution: Grid, maxCageSize: number): KillerCage[] {
