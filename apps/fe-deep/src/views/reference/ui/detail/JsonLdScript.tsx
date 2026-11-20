@@ -1,4 +1,4 @@
-import { toJsonLd } from '../../lib/structuredData';
+import { toJsonLd } from '@views/reference/lib/structuredData';
 
 interface JsonLdScriptProps {
   data: unknown;

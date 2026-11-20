@@ -1,8 +1,8 @@
+import { localDateKey } from '@entities/progress/lib/progressDates';
+import { getStudyHeatmap, updateQuestionProgress } from '@entities/progress/model/services/progressRecords';
+import { getLocalProgress, saveLocalProgress } from '@entities/progress/model/services/progressStorage';
 import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
-import { localDateKey } from '../../../lib/progressDates';
-import { getStudyHeatmap, updateQuestionProgress } from '../progressRecords';
-import { getLocalProgress, saveLocalProgress } from '../progressStorage';
 
 function mockBrowserStorage(t: TestContext, values: Map<string, string>) {
   const names = ['window', 'localStorage'];

@@ -1,1 +1,1 @@
-export { LearnPage } from './ui/LearnPage';
+export { LearnPage } from '@views/learn/ui/LearnPage';

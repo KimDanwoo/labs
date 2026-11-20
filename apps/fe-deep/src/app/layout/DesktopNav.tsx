@@ -4,8 +4,8 @@ import { Button } from '@shared/ui/Button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { MAIN_NAV_ITEMS } from '../config/navigation';
-import { isActivePath } from '../lib/isActivePath';
+import { MAIN_NAV_ITEMS } from '@app/config/navigation';
+import { isActivePath } from '@app/lib/isActivePath';
 
 export function DesktopNav() {
   const pathname = usePathname();

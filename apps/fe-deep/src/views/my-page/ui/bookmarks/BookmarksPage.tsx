@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmarks } from './bookmarks';
+import { Bookmarks } from '@views/my-page/ui/bookmarks/bookmarks';
 
 export function BookmarksPage() {
   return (

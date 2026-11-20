@@ -1,4 +1,4 @@
-import { FIRST_PAGE, NEARBY_PAGES, PAGE_ELLIPSIS } from '../config/pagination';
+import { FIRST_PAGE, NEARBY_PAGES, PAGE_ELLIPSIS } from '@views/reference/config/pagination';
 
 type PageItem = number | typeof PAGE_ELLIPSIS;
 

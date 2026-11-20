@@ -1,8 +1,12 @@
+import {
+  parseCategories,
+  parseQuestionFile,
+  type CategoryEntry,
+} from '@entities/question/model/server/parseQuestionContent';
+import type { Question, QuestionContent } from '@entities/question/model/types/types';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { cache } from 'react';
-import type { Question, QuestionContent } from '../types/types';
-import { parseCategories, parseQuestionFile, type CategoryEntry } from './parseQuestionContent';
 
 const QUESTIONS_DIR = path.join(process.cwd(), 'content', 'questions');
 const CATEGORIES_FILE = 'categories.yml';

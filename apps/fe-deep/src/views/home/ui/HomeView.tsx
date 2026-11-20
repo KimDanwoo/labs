@@ -1,5 +1,5 @@
-import { HomeCategories } from './categories/HomeCategories';
-import { HomeHero } from './hero/HomeHero';
+import { HomeCategories } from '@views/home/ui/categories/HomeCategories';
+import { HomeHero } from '@views/home/ui/hero/HomeHero';
 
 export function HomeView() {
   return (

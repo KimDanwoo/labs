@@ -4,7 +4,7 @@ import type { Category } from '@entities/question';
 import { Button } from '@shared/ui/Button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@shared/ui/Sheet';
 
-import { CategorySidebar } from '../CategorySidebar';
+import { CategorySidebar } from '@views/reference/ui/CategorySidebar';
 
 interface MobileCategoryMenuProps {
   categories: Category[];

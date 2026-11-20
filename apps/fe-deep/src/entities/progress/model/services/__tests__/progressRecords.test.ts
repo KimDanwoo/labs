@@ -1,7 +1,7 @@
+import { addDays, localDateKey } from '@entities/progress/lib/progressDates';
+import { getStudyHeatmap, updateQuestionProgress } from '@entities/progress/model/services/progressRecords';
 import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
-import { addDays, localDateKey } from '../../../lib/progressDates';
-import { getStudyHeatmap, updateQuestionProgress } from '../progressRecords';
 
 function useMemoryStorage(t: TestContext): void {
   const values = new Map<string, string>();

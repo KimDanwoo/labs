@@ -1,10 +1,10 @@
 import Link from 'next/link';
 
-import { SITE_NAME } from '../config/navigation';
-import { DesktopNav } from './DesktopNav';
-import { MobileNav } from './MobileNav';
-import { MyPageMenu } from './MyPageMenu';
-import { ThemeToggle } from './theme-toggle/ThemeToggle';
+import { SITE_NAME } from '@app/config/navigation';
+import { DesktopNav } from '@app/layout/DesktopNav';
+import { MobileNav } from '@app/layout/MobileNav';
+import { MyPageMenu } from '@app/layout/MyPageMenu';
+import { ThemeToggle } from '@app/layout/theme-toggle/ThemeToggle';
 
 export function Header() {
   return (

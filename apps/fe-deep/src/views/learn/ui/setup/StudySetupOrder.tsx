@@ -1,9 +1,9 @@
 import { Button } from '@shared/ui/Button';
 
-import { STUDY_ORDER_OPTIONS } from '../../config/setup';
-import { selectedVariant } from '../../lib/selectedVariant';
-import { useStudySetupContext } from '../../model/hooks/useStudySetupContext';
-import { FieldLabel } from './FieldLabel';
+import { STUDY_ORDER_OPTIONS } from '@views/learn/config/setup';
+import { selectedVariant } from '@views/learn/lib/selectedVariant';
+import { useStudySetupContext } from '@views/learn/model/hooks/useStudySetupContext';
+import { FieldLabel } from '@views/learn/ui/setup/FieldLabel';
 
 export function StudySetupOrder() {
   const { settings, changeSettings } = useStudySetupContext();

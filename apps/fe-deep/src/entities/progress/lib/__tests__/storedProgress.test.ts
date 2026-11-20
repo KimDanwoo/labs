@@ -1,6 +1,6 @@
+import { parseStoredProgress } from '@entities/progress/lib/storedProgress';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parseStoredProgress } from '../storedProgress';
 
 const TODAY = '2026-11-19';
 const VALID = {

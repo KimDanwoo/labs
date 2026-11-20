@@ -2,8 +2,8 @@ import { DifficultyBadge } from '@entities/question';
 import { Badge } from '@shared/ui/Badge';
 import { StepDots } from '@shared/ui/StepDots';
 
-import { FALLBACK_DIFFICULTY } from '../../config/studyCard';
-import { useStudySessionContext } from '../../model/hooks/useStudySessionContext';
+import { FALLBACK_DIFFICULTY } from '@views/learn/config/studyCard';
+import { useStudySessionContext } from '@views/learn/model/hooks/useStudySessionContext';
 
 export function StudySessionBadges() {
   const { currentQuestion, currentFollowUp, stepIndex, stepCount } = useStudySessionContext();

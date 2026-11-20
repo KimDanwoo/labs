@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { FOOTER_NAV_LINKS, LEGAL_LINKS, SITE_NAME } from '../config/navigation';
+import { FOOTER_NAV_LINKS, LEGAL_LINKS, SITE_NAME } from '@app/config/navigation';
 
 export function Footer() {
   return (

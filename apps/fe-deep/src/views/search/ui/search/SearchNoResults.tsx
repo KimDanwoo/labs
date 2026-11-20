@@ -1,6 +1,6 @@
 import { EmptyState } from '@shared/ui/EmptyState';
 
-import { useSearchContext } from '../../model/hooks/useSearchContext';
+import { useSearchContext } from '@views/search/model/hooks/useSearchContext';
 
 export function SearchNoResults() {
   const { isEmptyResult } = useSearchContext();

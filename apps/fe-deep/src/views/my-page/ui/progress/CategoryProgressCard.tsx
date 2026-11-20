@@ -2,9 +2,9 @@ import type { Category } from '@entities/question';
 import { Card } from '@shared/ui/Card';
 import { Progress } from '@shared/ui/Progress';
 
-import { toPercent } from '../../lib/toPercent';
-import type { CategoryProgress } from '../../model/hooks/useProgressStats';
-import { CategoryProgressCounts } from './CategoryProgressCounts';
+import { toPercent } from '@views/my-page/lib/toPercent';
+import type { CategoryProgress } from '@views/my-page/model/hooks/useProgressStats';
+import { CategoryProgressCounts } from '@views/my-page/ui/progress/CategoryProgressCounts';
 
 interface CategoryProgressCardProps {
   category: Category;

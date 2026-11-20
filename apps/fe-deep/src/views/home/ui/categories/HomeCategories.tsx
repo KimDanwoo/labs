@@ -1,6 +1,6 @@
 import { loadQuestionContent } from '@entities/question/index.server';
 
-import { CategoryChip } from './CategoryChip';
+import { CategoryChip } from '@views/home/ui/categories/CategoryChip';
 
 export async function HomeCategories() {
   const { categories } = await loadQuestionContent();

@@ -1,8 +1,8 @@
 'use client';
 
+import type { StudySetup } from '@views/learn/model/hooks/useStudySetup';
+import { StudySetupContext } from '@views/learn/model/store/studySetupContext';
 import { useContext } from 'react';
-import { StudySetupContext } from '../store/studySetupContext';
-import type { StudySetup } from './useStudySetup';
 
 export function useStudySetupContext(): StudySetup {
   const setup = useContext(StudySetupContext);

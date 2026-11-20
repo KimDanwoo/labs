@@ -1,8 +1,8 @@
 import type { Category, Question } from '@entities/question';
 import { SITE_URL } from '@shared/config/site';
 
-import { buildBreadcrumbSchema, buildFaqSchema } from '../../lib/structuredData';
-import { JsonLdScript } from './JsonLdScript';
+import { buildBreadcrumbSchema, buildFaqSchema } from '@views/reference/lib/structuredData';
+import { JsonLdScript } from '@views/reference/ui/detail/JsonLdScript';
 
 interface CategorySchemasProps {
   category: Category;

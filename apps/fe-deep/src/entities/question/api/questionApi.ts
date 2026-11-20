@@ -3,8 +3,8 @@ import {
   pickQuestionsByIds,
   questionsInCategory,
   searchQuestionContent,
-} from '../model/services/questionQueries';
-import type { Category, Question, QuestionContent, SearchResult } from '../model/types/types';
+} from '@entities/question/model/services/questionQueries';
+import type { Category, Question, QuestionContent, SearchResult } from '@entities/question/model/types/types';
 
 const QUESTION_CONTENT_PATH = '/api/questions';
 

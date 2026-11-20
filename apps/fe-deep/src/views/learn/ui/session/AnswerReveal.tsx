@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { KeywordCheck } from '@features/keyword-check';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 
-import { ANSWER_REVEAL_MOTION } from '../../config/motion';
+import { ANSWER_REVEAL_MOTION } from '@views/learn/config/motion';
 
 interface AnswerRevealProps {
   answer: string;

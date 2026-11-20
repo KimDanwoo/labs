@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback, useSyncExternalStore } from 'react';
 import {
   SERVER_SNAPSHOT,
   getSnapshot,
@@ -8,7 +7,8 @@ import {
   markQuestionLearned,
   subscribe,
   toggleQuestionBookmark,
-} from '../store/questionActionsStore';
+} from '@views/reference/model/store/questionActionsStore';
+import { useCallback, useSyncExternalStore } from 'react';
 
 export function useQuestionActions(questionId: string) {
   const state = useSyncExternalStore(

@@ -1,6 +1,6 @@
-import { DAY_LABELS } from '../../config/heatmap';
-import { buildYearGrid } from '../../lib/buildYearGrid';
-import { HeatCell } from './HeatCell';
+import { DAY_LABELS } from '@views/my-page/config/heatmap';
+import { buildYearGrid } from '@views/my-page/lib/buildYearGrid';
+import { HeatCell } from '@views/my-page/ui/progress/HeatCell';
 
 interface YearHeatmapProps {
   year: number;

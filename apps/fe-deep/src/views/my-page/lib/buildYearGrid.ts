@@ -1,5 +1,5 @@
 import { localDateKey } from '@entities/progress';
-import { CELL_KIND, DAYS_PER_WEEK, MONTH_LABELS, YEAR_END, YEAR_START } from '../config/heatmap';
+import { CELL_KIND, DAYS_PER_WEEK, MONTH_LABELS, YEAR_END, YEAR_START } from '@views/my-page/config/heatmap';
 
 export type HeatmapCell =
   | { kind: typeof CELL_KIND.outside }

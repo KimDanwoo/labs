@@ -2,9 +2,9 @@
 
 import { getLocalProgress, updateQuestionProgress } from '@entities/progress';
 import type { FollowUp, Question } from '@entities/question';
+import { getStepContent, type StepContent } from '@views/learn/lib/stepContent';
+import { PHASE, type StudyPhase } from '@views/learn/model/constants/study';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { getStepContent, type StepContent } from '../../lib/stepContent';
-import { PHASE, type StudyPhase } from '../constants/study';
 
 interface UseCardStudySessionOptions {
   questions: Question[];

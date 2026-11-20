@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { findCategoryBySlug, questionsInCategory } from '@entities/question';
 import { loadQuestionContent } from '@entities/question/index.server';
 
-import { QUESTIONS_PER_PAGE } from '../../config/pagination';
+import { QUESTIONS_PER_PAGE } from '@views/reference/config/pagination';
 
 export async function loadCategoryPage(categorySlug: string) {
   const content = await loadQuestionContent();

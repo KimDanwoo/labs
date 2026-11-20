@@ -1,6 +1,6 @@
 import { Button } from '@shared/ui/Button';
 
-import { useStudySetupContext } from '../../model/hooks/useStudySetupContext';
+import { useStudySetupContext } from '@views/learn/model/hooks/useStudySetupContext';
 
 export function StudySetupStart() {
   const { isLoadingCategories, isStarting, isEmpty, start } = useStudySetupContext();

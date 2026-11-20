@@ -1,8 +1,8 @@
 'use client';
 
+import type { SearchModel } from '@views/search/model/hooks/useSearch';
+import { SearchContext } from '@views/search/model/store/searchContext';
 import { useContext } from 'react';
-import { SearchContext } from '../store/searchContext';
-import type { SearchModel } from './useSearch';
 
 export function useSearchContext(): SearchModel {
   const search = useContext(SearchContext);

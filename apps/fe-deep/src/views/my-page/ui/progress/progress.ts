@@ -1,10 +1,10 @@
-import { ProgressCategories } from './ProgressCategories';
-import { ProgressHeatmap } from './ProgressHeatmap';
-import { ProgressIntro } from './ProgressIntro';
-import { ProgressOverall } from './ProgressOverall';
-import { ProgressRoot } from './ProgressRoot';
-import { ProgressStats } from './ProgressStats';
-import { ProgressStreak } from './ProgressStreak';
+import { ProgressCategories } from '@views/my-page/ui/progress/ProgressCategories';
+import { ProgressHeatmap } from '@views/my-page/ui/progress/ProgressHeatmap';
+import { ProgressIntro } from '@views/my-page/ui/progress/ProgressIntro';
+import { ProgressOverall } from '@views/my-page/ui/progress/ProgressOverall';
+import { ProgressRoot } from '@views/my-page/ui/progress/ProgressRoot';
+import { ProgressStats } from '@views/my-page/ui/progress/ProgressStats';
+import { ProgressStreak } from '@views/my-page/ui/progress/ProgressStreak';
 
 export const Progress = {
   Root: ProgressRoot,

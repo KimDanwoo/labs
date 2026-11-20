@@ -1,6 +1,6 @@
+import { DIFFICULTY_CONFIG } from '@entities/question/model/constants/constants';
+import type { Difficulty } from '@entities/question/model/types/types';
 import { Badge } from '@shared/ui/Badge';
-import { DIFFICULTY_CONFIG } from '../model/constants/constants';
-import type { Difficulty } from '../model/types/types';
 
 interface DifficultyBadgeProps {
   difficulty: Difficulty;

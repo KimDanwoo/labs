@@ -1,5 +1,5 @@
+import type { Difficulty } from '@entities/question/model/types/types';
 import type { BadgeVariant } from '@shared/ui/Badge';
-import type { Difficulty } from '../types/types';
 
 export const DIFFICULTY_VALUES = ['easy', 'medium', 'hard'] as const;
 

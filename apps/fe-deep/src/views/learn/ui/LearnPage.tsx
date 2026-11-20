@@ -1,11 +1,11 @@
 'use client';
 
-import { PHASE } from '../model/constants/study';
-import { useLearnFlow } from '../model/hooks/useLearnFlow';
-import { LearnDone } from './LearnDone';
-import { LearnExitButton } from './LearnExitButton';
-import { StudySession } from './session/studySession';
-import { StudySetup } from './setup/studySetup';
+import { PHASE } from '@views/learn/model/constants/study';
+import { useLearnFlow } from '@views/learn/model/hooks/useLearnFlow';
+import { LearnDone } from '@views/learn/ui/LearnDone';
+import { LearnExitButton } from '@views/learn/ui/LearnExitButton';
+import { StudySession } from '@views/learn/ui/session/studySession';
+import { StudySetup } from '@views/learn/ui/setup/studySetup';
 
 export function LearnPage() {
   const flow = useLearnFlow();

@@ -1,8 +1,13 @@
 import { getProgressForQuestion } from '@entities/progress';
 import { toggleBookmark } from '@features/bookmark';
+import {
+  getSnapshot,
+  isMasteredStatus,
+  markQuestionLearned,
+  subscribe,
+} from '@views/reference/model/store/questionActionsStore';
 import assert from 'node:assert/strict';
 import test, { after, before, beforeEach } from 'node:test';
-import { getSnapshot, isMasteredStatus, markQuestionLearned, subscribe } from '../questionActionsStore';
 
 const BROWSER_GLOBALS = ['window', 'localStorage'];
 const previous = BROWSER_GLOBALS.map((name) => ({

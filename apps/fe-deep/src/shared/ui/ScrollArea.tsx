@@ -5,7 +5,7 @@ import type { ComponentProps } from 'react';
 
 import { cn } from '@shared/lib/cn';
 
-import { ScrollBar } from './ScrollBar';
+import { ScrollBar } from '@shared/ui/ScrollBar';
 
 export function ScrollArea({ className, children, ...props }: ComponentProps<typeof ScrollAreaPrimitive.Root>) {
   return (

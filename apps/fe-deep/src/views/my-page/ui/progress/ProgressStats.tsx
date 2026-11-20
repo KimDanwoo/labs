@@ -1,6 +1,6 @@
-import { NOT_LOADED, STAT_CARDS } from '../../config/progress';
-import { useProgressStatsContext } from '../../model/hooks/useProgressStatsContext';
-import { StatCard } from './StatCard';
+import { NOT_LOADED, STAT_CARDS } from '@views/my-page/config/progress';
+import { useProgressStatsContext } from '@views/my-page/model/hooks/useProgressStatsContext';
+import { StatCard } from '@views/my-page/ui/progress/StatCard';
 
 export function ProgressStats() {
   const { stats } = useProgressStatsContext();

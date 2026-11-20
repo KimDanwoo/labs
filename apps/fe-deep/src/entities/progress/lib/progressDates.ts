@@ -1,4 +1,4 @@
-import { DATE_PART_LENGTH } from '../model/constants/constants';
+import { DATE_PART_LENGTH } from '@entities/progress/model/constants/constants';
 
 const pad = (value: number) => String(value).padStart(DATE_PART_LENGTH, '0');
 

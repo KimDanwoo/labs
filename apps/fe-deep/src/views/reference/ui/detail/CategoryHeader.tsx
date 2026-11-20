@@ -1,7 +1,7 @@
 import type { Category } from '@entities/question';
 
-import { CategoryHeading } from './CategoryHeading';
-import { MobileCategoryMenu } from './MobileCategoryMenu';
+import { CategoryHeading } from '@views/reference/ui/detail/CategoryHeading';
+import { MobileCategoryMenu } from '@views/reference/ui/detail/MobileCategoryMenu';
 
 interface CategoryHeaderProps {
   category: Category;

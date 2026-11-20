@@ -1,11 +1,11 @@
-import { StudySessionActions } from './StudySessionActions';
-import { StudySessionBadges } from './StudySessionBadges';
-import { StudySessionCard } from './StudySessionCard';
-import { StudySessionHeader } from './StudySessionHeader';
-import { StudySessionHints } from './StudySessionHints';
-import { StudySessionPrompt } from './StudySessionPrompt';
-import { StudySessionResponse } from './StudySessionResponse';
-import { StudySessionRoot } from './StudySessionRoot';
+import { StudySessionActions } from '@views/learn/ui/session/StudySessionActions';
+import { StudySessionBadges } from '@views/learn/ui/session/StudySessionBadges';
+import { StudySessionCard } from '@views/learn/ui/session/StudySessionCard';
+import { StudySessionHeader } from '@views/learn/ui/session/StudySessionHeader';
+import { StudySessionHints } from '@views/learn/ui/session/StudySessionHints';
+import { StudySessionPrompt } from '@views/learn/ui/session/StudySessionPrompt';
+import { StudySessionResponse } from '@views/learn/ui/session/StudySessionResponse';
+import { StudySessionRoot } from '@views/learn/ui/session/StudySessionRoot';
 
 export const StudySession = {
   Root: StudySessionRoot,

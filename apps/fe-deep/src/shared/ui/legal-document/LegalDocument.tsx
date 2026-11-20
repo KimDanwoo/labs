@@ -1,6 +1,6 @@
 import { PageContainer } from '@shared/ui/PageContainer';
 import { PageTitle } from '@shared/ui/PageTitle';
-import { LegalSection, type LegalSectionContent } from './LegalSection';
+import { LegalSection, type LegalSectionContent } from '@shared/ui/legal-document/LegalSection';
 
 export interface LegalDocumentContent {
   title: string;

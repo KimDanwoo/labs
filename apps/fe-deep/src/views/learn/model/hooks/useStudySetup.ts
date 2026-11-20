@@ -1,7 +1,7 @@
 import type { Category } from '@entities/question';
 
-import type { StudySettings } from '../constants/study';
-import { useStudySettingsForm } from './useStudySettingsForm';
+import type { StudySettings } from '@views/learn/model/constants/study';
+import { useStudySettingsForm } from '@views/learn/model/hooks/useStudySettingsForm';
 
 export interface StudySetupSource {
   categories: Category[];

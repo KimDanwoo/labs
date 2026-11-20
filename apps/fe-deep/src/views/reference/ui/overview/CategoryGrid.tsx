@@ -1,6 +1,6 @@
 import { loadQuestionContent } from '@entities/question/index.server';
 
-import { CategoryCard } from './CategoryCard';
+import { CategoryCard } from '@views/reference/ui/overview/CategoryCard';
 
 export async function CategoryGrid() {
   const { categories } = await loadQuestionContent();

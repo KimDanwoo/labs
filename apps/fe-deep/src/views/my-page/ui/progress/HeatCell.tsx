@@ -1,8 +1,8 @@
 import { cn } from '@shared/lib/cn';
 
-import { CELL_KIND } from '../../config/heatmap';
-import type { HeatmapCell } from '../../lib/buildYearGrid';
-import { heatIntensity } from '../../lib/heatIntensity';
+import { CELL_KIND } from '@views/my-page/config/heatmap';
+import type { HeatmapCell } from '@views/my-page/lib/buildYearGrid';
+import { heatIntensity } from '@views/my-page/lib/heatIntensity';
 
 interface HeatCellProps {
   cell: HeatmapCell;

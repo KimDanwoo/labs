@@ -1,1 +1,1 @@
-export { getBookmarks, isBookmarked, toggleBookmark } from './model/services/bookmarkStorage';
+export { getBookmarks, isBookmarked, toggleBookmark } from '@features/bookmark/model/services/bookmarkStorage';

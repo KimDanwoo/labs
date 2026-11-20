@@ -1,6 +1,6 @@
 'use client';
 
-import { useScrollToTopOnRouteChange } from '../model/hooks/useScrollToTopOnRouteChange';
+import { useScrollToTopOnRouteChange } from '@app/model/hooks/useScrollToTopOnRouteChange';
 
 export function ScrollToTop() {
   useScrollToTopOnRouteChange();

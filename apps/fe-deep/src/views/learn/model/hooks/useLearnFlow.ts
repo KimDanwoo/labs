@@ -4,11 +4,11 @@ import { useCallback, useState } from 'react';
 import { getCurrentStreak } from '@entities/progress';
 import { getAllCategories, type Question } from '@entities/question';
 
-import { loadStudyQuestions } from '../../api/loadStudyQuestions';
-import { CATEGORIES_QUERY_KEY } from '../../config/queryKeys';
-import { DEFAULT_SETTINGS, PHASE, type StudyPhase, type StudySettings } from '../constants/study';
-import { useCardStudySession } from './useCardStudySession';
-import type { StudySetupSource } from './useStudySetup';
+import { loadStudyQuestions } from '@views/learn/api/loadStudyQuestions';
+import { CATEGORIES_QUERY_KEY } from '@views/learn/config/queryKeys';
+import { DEFAULT_SETTINGS, PHASE, type StudyPhase, type StudySettings } from '@views/learn/model/constants/study';
+import { useCardStudySession } from '@views/learn/model/hooks/useCardStudySession';
+import type { StudySetupSource } from '@views/learn/model/hooks/useStudySetup';
 
 export function useLearnFlow() {
   const [phase, setPhase] = useState<StudyPhase>(PHASE.setup);

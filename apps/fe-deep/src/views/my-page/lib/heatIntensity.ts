@@ -1,4 +1,4 @@
-import { HEAT_LEVEL_COUNT } from '../config/heatmap';
+import { HEAT_LEVEL_COUNT } from '@views/my-page/config/heatmap';
 
 type HeatLevel = 0 | 1 | 2 | 3 | 4;
 

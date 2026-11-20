@@ -5,7 +5,7 @@ import { Badge } from '@shared/ui/Badge';
 import { CardAccordionItem } from '@shared/ui/CardAccordionItem';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 
-import { MATCH_TYPE_LABEL } from '../config/matchType';
+import { MATCH_TYPE_LABEL } from '@views/search/config/matchType';
 
 interface SearchResultItemProps {
   result: SearchResult;

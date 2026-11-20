@@ -3,8 +3,8 @@
 import { PageContainer } from '@shared/ui/PageContainer';
 import type { ReactNode } from 'react';
 
-import type { CardStudySession } from '../../model/hooks/useCardStudySession';
-import { StudySessionContext } from '../../model/store/studySessionContext';
+import type { CardStudySession } from '@views/learn/model/hooks/useCardStudySession';
+import { StudySessionContext } from '@views/learn/model/store/studySessionContext';
 
 interface StudySessionRootProps {
   session: CardStudySession;

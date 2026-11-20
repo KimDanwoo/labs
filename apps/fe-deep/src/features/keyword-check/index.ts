@@ -1,1 +1,1 @@
-export { KeywordCheck } from './ui/KeywordCheck';
+export { KeywordCheck } from '@features/keyword-check/ui/KeywordCheck';
