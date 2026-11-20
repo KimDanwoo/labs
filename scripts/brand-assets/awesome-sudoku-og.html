@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../packages/fonts/fonts/maruburi.css" />
+    <style>
+      body {
+        margin: 0; width: 1200px; height: 630px; overflow: hidden; font-family: var(--font-maruburi); color: #1c1c1e;
+        background: radial-gradient(ellipse 55% 70% at 72% 45%, rgb(0 122 255 / 14%), transparent 70%), #f2f4f7;
+      }
+      .title { position: absolute; left: 80px; top: 50%; transform: translateY(-50%); }
+      .eyebrow { font-size: 20px; font-weight: 600; letter-spacing: 0.3em; color: #007aff; }
+      h1 { margin: 20px 0 0; font-size: 80px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; }
+      p { margin: 24px 0 0; font-size: 32px; font-weight: 600; color: #6e6e73; }
+      .board {
+        position: absolute; right: 80px; top: 65px; width: 500px; height: 500px; border-radius: 14px;
+        box-shadow: 0 28px 70px rgb(28 28 30 / 16%);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="title">
+      <div class="eyebrow">SUDOKU</div>
+      <h1>어썸 스도쿠</h1>
+      <p>클래식 · 킬러</p>
+    </div>
+    <img class="board" data-slot="board" alt="" />
+  </body>
+</html>
