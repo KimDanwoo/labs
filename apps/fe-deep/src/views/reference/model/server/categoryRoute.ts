@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 
 import { findCategoryBySlug } from '@entities/question';
 import { loadQuestionContent } from '@entities/question/index.server';
@@ -12,7 +12,7 @@ export async function generateStaticParams() {
   return categories.map((category) => ({ categorySlug: category.slug }));
 }
 
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: CategoryPageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const { categorySlug } = await params;
   const category = findCategoryBySlug(await loadQuestionContent(), categorySlug);
   if (!category) return {};
@@ -22,6 +22,6 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     title: `${category.title} - 레퍼런스`,
     description,
     alternates: { canonical: `/reference/${category.slug}` },
-    openGraph: { title: `${category.title} - 프딥 레퍼런스`, description },
+    openGraph: { title: `${category.title} - 프딥 레퍼런스`, description, images: (await parent).openGraph?.images },
   };
 }
