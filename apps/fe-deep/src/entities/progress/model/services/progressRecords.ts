@@ -36,32 +36,46 @@ export function getCurrentStreak(heatmap?: Record<string, number>): number {
   return streak;
 }
 
+const DEFAULT_EASINESS_FACTOR = 2.5;
+const KNEW_REPETITION = 2;
+
+function initialInterval(knew: boolean): number {
+  return knew ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION;
+}
+
+function reviewedCounts(existing: UserProgress | undefined, knew: boolean) {
+  return {
+    correct_count: knew ? (existing?.correct_count ?? 0) + 1 : 0,
+    wrong_count: (existing?.wrong_count ?? 0) + (knew ? 0 : 1),
+  };
+}
+
+function reviewedSchedule(existing: UserProgress | undefined, knew: boolean, today: string) {
+  return {
+    easiness_factor: existing?.easiness_factor ?? DEFAULT_EASINESS_FACTOR,
+    interval: existing?.interval ?? initialInterval(knew),
+    repetition: existing?.repetition ?? (knew ? KNEW_REPETITION : 0),
+    next_review: existing?.next_review ?? addDays(today, initialInterval(knew)),
+  };
+}
+
+function reviewedStatus(counts: ReturnType<typeof reviewedCounts>, knew: boolean): UserProgress['status'] {
+  if (counts.correct_count >= MASTERED_CORRECT_STREAK) return PROGRESS_STATUS.mastered;
+  if (counts.correct_count > 0 || counts.wrong_count > 0) return PROGRESS_STATUS.learning;
+  return knew ? PROGRESS_STATUS.mastered : PROGRESS_STATUS.learning;
+}
+
 function reviewedProgress(questionId: string, knew: boolean): UserProgress {
   const existing = getLocalProgress()[questionId];
   const today = todayString();
-
-  const updated: UserProgress = {
+  const counts = reviewedCounts(existing, knew);
+  return {
     question_id: questionId,
-    status: knew ? PROGRESS_STATUS.mastered : PROGRESS_STATUS.learning,
-    correct_count: knew ? (existing?.correct_count ?? 0) + 1 : 0,
-    wrong_count: (existing?.wrong_count ?? 0) + (knew ? 0 : 1),
+    status: reviewedStatus(counts, knew),
+    ...counts,
     last_reviewed: new Date().toISOString(),
-    easiness_factor: existing?.easiness_factor ?? 2.5,
-    interval:
-      existing?.interval ?? (knew ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION),
-    repetition: existing?.repetition ?? (knew ? 2 : 0),
-    next_review:
-      existing?.next_review ??
-      addDays(today, knew ? SM2_CONSTANTS.INTERVAL_SECOND_REPETITION : SM2_CONSTANTS.INTERVAL_FIRST_REPETITION),
+    ...reviewedSchedule(existing, knew, today),
   };
-
-  if (updated.correct_count >= MASTERED_CORRECT_STREAK) {
-    updated.status = PROGRESS_STATUS.mastered;
-  } else if (updated.correct_count > 0 || updated.wrong_count > 0) {
-    updated.status = PROGRESS_STATUS.learning;
-  }
-
-  return updated;
 }
 
 function saveQuestionProgress(updated: UserProgress): UserProgress {

@@ -1,11 +1,9 @@
 import { summarizeHeatmap } from '../../lib/summarizeHeatmap';
+import { useProgressStatsContext } from '../../model/hooks/useProgressStatsContext';
 import { YearHeatmap } from './YearHeatmap';
 
-interface StudyHeatmapProps {
-  heatmap: Record<string, number>;
-}
-
-export function StudyHeatmap({ heatmap }: StudyHeatmapProps) {
+export function StudyHeatmap() {
+  const { heatmap } = useProgressStatsContext();
   const today = new Date();
   const { maxCount, displayYears } = summarizeHeatmap(heatmap, today.getFullYear());
 
