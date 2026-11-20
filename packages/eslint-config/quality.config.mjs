@@ -7,9 +7,9 @@ const MAX_COMPONENT_FILE_LINES = 250;
 const ALLOWED_NUMBERS = [-1, 0, 1, 2, 100];
 const LENGTH_OPTIONS = { skipBlankLines: true, skipComments: true };
 
-const SOURCE_FILES = ['**/*.{js,jsx,ts,tsx}'];
+const SOURCE_FILES = ['**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}'];
 const COMPONENT_FILES = ['**/*.{jsx,tsx}'];
-const COMPONENTS_AND_HOOKS = ['**/*.{jsx,tsx}', '**/use[A-Z]*.{js,ts}'];
+const COMPONENTS_AND_HOOKS = ['**/*.{jsx,tsx}', '**/use[A-Z]*.{js,ts,mjs,mts}'];
 const NUMBER_HOMES = ['**/config/**', '**/constants/**', '**/constants.*', '**/*.config.*'];
 const TESTS = ['**/__tests__/**', '**/*.test.*', '**/*.spec.*', '**/e2e/**'];
 

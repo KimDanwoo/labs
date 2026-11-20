@@ -4,6 +4,44 @@
       "count": 3
     }
   },
+  "scripts/analyze-audio.mjs": {
+    "max-depth": {
+      "count": 1
+    }
+  },
+  "scripts/audio/analyzeTrack.mjs": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "scripts/audio/dsp.mjs": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "scripts/audio/grid.mjs": {
+    "complexity": {
+      "count": 1
+    },
+    "max-depth": {
+      "count": 3
+    }
+  },
+  "scripts/audio/selftest.mjs": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "scripts/catalog.mjs": {
+    "complexity": {
+      "count": 2
+    }
+  },
+  "scripts/shoot-og.mjs": {
+    "complexity": {
+      "count": 1
+    }
+  },
   "src/views/player/lib/signals.ts": {
     "complexity": {
       "count": 2
