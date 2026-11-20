@@ -8,6 +8,7 @@ export function buildPageItems(totalPages: number, page: number): PageItem[] {
   );
   return visible.flatMap((candidate, index): PageItem[] => {
     const previous = visible[index - 1];
-    return previous !== undefined && candidate - previous > 1 ? [PAGE_ELLIPSIS, candidate] : [candidate];
+    const hasSkippedPages = previous !== undefined && candidate - previous > 1;
+    return hasSkippedPages ? [PAGE_ELLIPSIS, candidate] : [candidate];
   });
 }

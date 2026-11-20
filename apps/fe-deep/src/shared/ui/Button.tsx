@@ -4,14 +4,15 @@ import type { ComponentProps } from 'react';
 
 import { cn } from '@shared/lib/cn';
 
-// primary는 default의 별칭이다(하위호환).
+const PRIMARY_BUTTON = 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90';
+
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-normal transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-error/20 dark:aria-invalid:ring-error/40 aria-invalid:border-error",
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90',
-        primary: 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90',
+        default: PRIMARY_BUTTON,
+        primary: PRIMARY_BUTTON,
         destructive:
           'bg-error text-white hover:bg-error/90 focus-visible:ring-error/20 dark:focus-visible:ring-error/40 dark:bg-error/60',
         outline:

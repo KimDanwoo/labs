@@ -11,7 +11,8 @@ const QUESTION_CONTENT_PATH = '/api/questions';
 let contentRequest: Promise<QuestionContent> | undefined;
 
 function isQuestionContent(value: unknown): value is QuestionContent {
-  if (typeof value !== 'object' || value === null) return false;
+  const isNonNullObject = typeof value === 'object' && value !== null;
+  if (!isNonNullObject) return false;
   const { categories, questions } = value as Partial<Record<keyof QuestionContent, unknown>>;
   return Array.isArray(categories) && Array.isArray(questions);
 }

@@ -61,7 +61,8 @@ function reviewedSchedule(existing: UserProgress | undefined, knew: boolean, tod
 
 function reviewedStatus(counts: ReturnType<typeof reviewedCounts>, knew: boolean): UserProgress['status'] {
   if (counts.correct_count >= MASTERED_CORRECT_STREAK) return PROGRESS_STATUS.mastered;
-  if (counts.correct_count > 0 || counts.wrong_count > 0) return PROGRESS_STATUS.learning;
+  const hasReviewHistory = counts.correct_count > 0 || counts.wrong_count > 0;
+  if (hasReviewHistory) return PROGRESS_STATUS.learning;
   return knew ? PROGRESS_STATUS.mastered : PROGRESS_STATUS.learning;
 }
 

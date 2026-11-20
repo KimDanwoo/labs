@@ -30,6 +30,8 @@ export function searchQuestionContent(content: QuestionContent, query: string): 
   return content.questions.flatMap((question) => {
     const category = categoryById.get(question.category_id);
     const matchType = findMatchType(question, lowerQuery);
-    return category && matchType ? [{ question, category, matchType }] : [];
+    if (!category) return [];
+    if (!matchType) return [];
+    return [{ question, category, matchType }];
   });
 }

@@ -23,7 +23,8 @@ function isRecord(value: unknown): value is UnknownRecord {
 
 function readString(record: UnknownRecord, key: string, source: string): string {
   const value = record[key];
-  if (typeof value !== 'string' || !value.trim()) fail(source, `${key}는 비어 있지 않은 문자열이어야 한다.`);
+  const isNonEmptyString = typeof value === 'string' && Boolean(value.trim());
+  if (!isNonEmptyString) fail(source, `${key}는 비어 있지 않은 문자열이어야 한다.`);
   return value;
 }
 
@@ -35,7 +36,8 @@ function readBoolean(record: UnknownRecord, key: string, source: string): boolea
 
 function readStringList(record: UnknownRecord, key: string, source: string): string[] {
   const value = record[key];
-  if (!Array.isArray(value) || !value.every((item) => typeof item === 'string')) {
+  const isStringList = Array.isArray(value) && value.every((item) => typeof item === 'string');
+  if (!isStringList) {
     fail(source, `${key}는 문자열 목록이어야 한다.`);
   }
   return value;

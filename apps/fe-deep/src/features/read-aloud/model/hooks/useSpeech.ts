@@ -10,15 +10,16 @@ const subscribeNever = () => () => {};
 const readIsSupported = () => Boolean(getSynth());
 const readServerIsSupported = () => false;
 
+function preloadVoices(): void {
+  getSynth()?.getVoices();
+}
+
 export function useSpeech(text: string) {
   const isSupported = useSyncExternalStore(subscribeNever, readIsSupported, readServerIsSupported);
   const [speakingText, setSpeakingText] = useState<string | null>(null);
   const isSpeaking = speakingText === text;
 
-  // 음성 목록은 비동기로 채워진다. 클릭 시점에 비어 있지 않도록 미리 깨워둔다.
-  useEffect(() => {
-    getSynth()?.getVoices();
-  }, []);
+  useEffect(preloadVoices, []);
 
   useEffect(() => () => getSynth()?.cancel(), [text]);
 
