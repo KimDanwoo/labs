@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { categoryHref, type Category } from '@entities/question';
 import { Card } from '@shared/ui/Card';
 
-import { CATEGORY_CARD_STAGGER_MS } from '../../config/motion';
+import { CATEGORY_CARD_STAGGER_MS } from '@views/reference/config/motion';
 
 interface CategoryCardProps {
   category: Category;

@@ -1,9 +1,9 @@
 import { DIFFICULTY_CONFIG, DIFFICULTY_VALUES } from '@entities/question';
 import { Button } from '@shared/ui/Button';
 
-import { selectedVariant } from '../../lib/selectedVariant';
-import { useStudySetupContext } from '../../model/hooks/useStudySetupContext';
-import { FieldLabel } from './FieldLabel';
+import { selectedVariant } from '@views/learn/lib/selectedVariant';
+import { useStudySetupContext } from '@views/learn/model/hooks/useStudySetupContext';
+import { FieldLabel } from '@views/learn/ui/setup/FieldLabel';
 
 export function StudySetupDifficulty() {
   const { settings, changeSettings, toggleDifficulty } = useStudySetupContext();

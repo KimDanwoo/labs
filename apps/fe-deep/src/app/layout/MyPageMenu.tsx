@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { User } from 'lucide-react';
 import Link from 'next/link';
 
-import { MY_PAGE_NAV_ITEMS } from '../config/navigation';
+import { MY_PAGE_NAV_ITEMS } from '@app/config/navigation';
 
 export function MyPageMenu() {
   return (

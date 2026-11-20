@@ -1,1 +1,1 @@
-export { SearchContent } from './ui/SearchContent';
+export { SearchContent } from '@views/search/ui/SearchContent';

@@ -2,7 +2,7 @@ import { Flame } from 'lucide-react';
 
 import { Card } from '@shared/ui/Card';
 
-import { useProgressStatsContext } from '../../model/hooks/useProgressStatsContext';
+import { useProgressStatsContext } from '@views/my-page/model/hooks/useProgressStatsContext';
 
 export function ProgressStreak() {
   const { streak } = useProgressStatsContext();

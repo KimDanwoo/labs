@@ -3,8 +3,8 @@
 import { PageContainer } from '@shared/ui/PageContainer';
 import type { ReactNode } from 'react';
 
-import { useSearch } from '../../model/hooks/useSearch';
-import { SearchContext } from '../../model/store/searchContext';
+import { useSearch } from '@views/search/model/hooks/useSearch';
+import { SearchContext } from '@views/search/model/store/searchContext';
 
 interface SearchRootProps {
   children: ReactNode;

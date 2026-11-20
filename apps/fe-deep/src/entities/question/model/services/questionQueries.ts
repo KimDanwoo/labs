@@ -1,4 +1,4 @@
-import type { Category, Question, QuestionContent, SearchResult } from '../types/types';
+import type { Category, Question, QuestionContent, SearchResult } from '@entities/question/model/types/types';
 
 export function findCategoryBySlug(content: QuestionContent, slug: string): Category | undefined {
   return content.categories.find((category) => category.slug === slug);

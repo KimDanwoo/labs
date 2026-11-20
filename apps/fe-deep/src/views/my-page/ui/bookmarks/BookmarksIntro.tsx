@@ -1,7 +1,7 @@
 import { PageTitle } from '@shared/ui/PageTitle';
 import { Bookmark } from 'lucide-react';
 
-import { useBookmarksContext } from '../../model/hooks/useBookmarksContext';
+import { useBookmarksContext } from '@views/my-page/model/hooks/useBookmarksContext';
 
 export function BookmarksIntro() {
   const { bookmarkedQuestions } = useBookmarksContext();

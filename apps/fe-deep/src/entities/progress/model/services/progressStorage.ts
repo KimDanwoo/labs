@@ -1,8 +1,8 @@
 'use client';
+import { todayString } from '@entities/progress/lib/progressDates';
+import { parseStoredProgress } from '@entities/progress/lib/storedProgress';
+import type { UserProgress } from '@entities/progress/model/types/types';
 import { STORAGE_KEYS } from '@shared/config/storageKeys';
-import { todayString } from '../../lib/progressDates';
-import { parseStoredProgress } from '../../lib/storedProgress';
-import type { UserProgress } from '../types/types';
 
 function readStoredProgress(): string | null {
   try {

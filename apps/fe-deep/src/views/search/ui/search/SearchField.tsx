@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 
 import { Input } from '@shared/ui/Input';
 
-import { useSearchContext } from '../../model/hooks/useSearchContext';
+import { useSearchContext } from '@views/search/model/hooks/useSearchContext';
 
 export function SearchField() {
   const { query, setQuery } = useSearchContext();

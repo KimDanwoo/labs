@@ -1,5 +1,5 @@
-export { localDateKey } from './lib/progressDates';
-export { PROGRESS_STATUS } from './model/constants/constants';
+export { localDateKey } from '@entities/progress/lib/progressDates';
+export { PROGRESS_STATUS } from '@entities/progress/model/constants/constants';
 export {
   getCurrentStreak,
   getProgressByCategory,
@@ -7,6 +7,6 @@ export {
   getStudyHeatmap,
   markQuestionMastered,
   updateQuestionProgress,
-} from './model/services/progressRecords';
-export { getLocalProgress } from './model/services/progressStorage';
-export type { ProgressStatus } from './model/types/types';
+} from '@entities/progress/model/services/progressRecords';
+export { getLocalProgress } from '@entities/progress/model/services/progressStorage';
+export type { ProgressStatus } from '@entities/progress/model/types/types';

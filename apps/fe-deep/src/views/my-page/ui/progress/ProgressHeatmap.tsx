@@ -1,6 +1,6 @@
 import { Card } from '@shared/ui/Card';
 
-import { StudyHeatmap } from './StudyHeatmap';
+import { StudyHeatmap } from '@views/my-page/ui/progress/StudyHeatmap';
 
 export function ProgressHeatmap() {
   return (

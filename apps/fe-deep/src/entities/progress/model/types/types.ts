@@ -1,4 +1,4 @@
-import type { PROGRESS_STATUS } from '../constants/constants';
+import type { PROGRESS_STATUS } from '@entities/progress/model/constants/constants';
 
 export type ProgressStatus = (typeof PROGRESS_STATUS)[keyof typeof PROGRESS_STATUS];
 

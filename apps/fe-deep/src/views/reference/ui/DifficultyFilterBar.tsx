@@ -3,9 +3,9 @@ import Link from 'next/link';
 import type { Difficulty } from '@entities/question';
 import { Button } from '@shared/ui/Button';
 
-import { DIFFICULTY_FILTERS } from '../config/filters';
-import { FIRST_PAGE } from '../config/pagination';
-import { buildListHref } from '../lib/buildListHref';
+import { DIFFICULTY_FILTERS } from '@views/reference/config/filters';
+import { FIRST_PAGE } from '@views/reference/config/pagination';
+import { buildListHref } from '@views/reference/lib/buildListHref';
 
 interface DifficultyFilterBarProps {
   categorySlug: string;

@@ -10,7 +10,7 @@ import {
 import { getAllCategories, getAllQuestions, type Category } from '@entities/question';
 import { useEffect, useState } from 'react';
 
-import { toPercent } from '../../lib/toPercent';
+import { toPercent } from '@views/my-page/lib/toPercent';
 
 interface OverallStats {
   total: number;

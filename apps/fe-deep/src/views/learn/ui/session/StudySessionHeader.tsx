@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { Badge } from '@shared/ui/Badge';
 import { Progress } from '@shared/ui/Progress';
 
-import { useStudySessionContext } from '../../model/hooks/useStudySessionContext';
+import { useStudySessionContext } from '@views/learn/model/hooks/useStudySessionContext';
 
 interface StudySessionHeaderProps {
   children?: ReactNode;

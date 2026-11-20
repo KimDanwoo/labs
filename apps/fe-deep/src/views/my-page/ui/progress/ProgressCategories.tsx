@@ -1,6 +1,6 @@
-import { EMPTY_CATEGORY_STATS } from '../../config/progress';
-import { useProgressStatsContext } from '../../model/hooks/useProgressStatsContext';
-import { CategoryProgressCard } from './CategoryProgressCard';
+import { EMPTY_CATEGORY_STATS } from '@views/my-page/config/progress';
+import { useProgressStatsContext } from '@views/my-page/model/hooks/useProgressStatsContext';
+import { CategoryProgressCard } from '@views/my-page/ui/progress/CategoryProgressCard';
 
 export function ProgressCategories() {
   const { categories, categoryStats } = useProgressStatsContext();

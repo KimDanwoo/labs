@@ -1,8 +1,8 @@
 'use client';
 
+import type { CardStudySession } from '@views/learn/model/hooks/useCardStudySession';
+import { StudySessionContext } from '@views/learn/model/store/studySessionContext';
 import { useContext } from 'react';
-import { StudySessionContext } from '../store/studySessionContext';
-import type { CardStudySession } from './useCardStudySession';
 
 export function useStudySessionContext(): CardStudySession {
   const session = useContext(StudySessionContext);

@@ -1,9 +1,9 @@
 'use client';
 
-import { addDays, localDateKey, reviewedDateKey, todayString } from '../../lib/progressDates';
-import { MASTERED_CORRECT_STREAK, PROGRESS_STATUS, SM2_CONSTANTS } from '../constants/constants';
-import type { UserProgress } from '../types/types';
-import { getLocalProgress, saveLocalProgress } from './progressStorage';
+import { addDays, localDateKey, reviewedDateKey, todayString } from '@entities/progress/lib/progressDates';
+import { MASTERED_CORRECT_STREAK, PROGRESS_STATUS, SM2_CONSTANTS } from '@entities/progress/model/constants/constants';
+import { getLocalProgress, saveLocalProgress } from '@entities/progress/model/services/progressStorage';
+import type { UserProgress } from '@entities/progress/model/types/types';
 
 export function getStudyHeatmap(preloaded?: Record<string, UserProgress>): Record<string, number> {
   const allProgress = preloaded ?? getLocalProgress();

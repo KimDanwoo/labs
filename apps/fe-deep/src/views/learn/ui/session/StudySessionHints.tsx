@@ -1,5 +1,5 @@
-import { useStudySessionContext } from '../../model/hooks/useStudySessionContext';
-import { KeywordHints } from './KeywordHints';
+import { useStudySessionContext } from '@views/learn/model/hooks/useStudySessionContext';
+import { KeywordHints } from '@views/learn/ui/session/KeywordHints';
 
 export function StudySessionHints() {
   const { content, isFlipped, recallInput } = useStudySessionContext();

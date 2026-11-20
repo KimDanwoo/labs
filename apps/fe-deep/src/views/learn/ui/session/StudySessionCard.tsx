@@ -4,9 +4,9 @@ import { Card } from '@shared/ui/Card';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
-import { CARD_SLIDE_MOTION } from '../../config/motion';
-import { useStudySessionContext } from '../../model/hooks/useStudySessionContext';
-import { StudySessionContext } from '../../model/store/studySessionContext';
+import { CARD_SLIDE_MOTION } from '@views/learn/config/motion';
+import { useStudySessionContext } from '@views/learn/model/hooks/useStudySessionContext';
+import { StudySessionContext } from '@views/learn/model/store/studySessionContext';
 
 interface StudySessionCardProps {
   children: ReactNode;

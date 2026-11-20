@@ -4,8 +4,8 @@ import dynamic from 'next/dynamic';
 
 import { MARKDOWN_REHYPE_PLUGINS, MARKDOWN_REMARK_PLUGINS } from '@shared/config/markdown';
 
-import { MARKDOWN_COMPONENTS } from './markdownComponents';
-import { MarkdownSkeleton } from './MarkdownSkeleton';
+import { MARKDOWN_COMPONENTS } from '@shared/ui/markdown-renderer/markdownComponents';
+import { MarkdownSkeleton } from '@shared/ui/markdown-renderer/MarkdownSkeleton';
 
 const ReactMarkdown = dynamic(() => import('react-markdown'), { loading: MarkdownSkeleton });
 

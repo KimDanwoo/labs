@@ -1,1 +1,1 @@
-export { SpeakButton } from './ui/SpeakButton';
+export { SpeakButton } from '@features/read-aloud/ui/SpeakButton';

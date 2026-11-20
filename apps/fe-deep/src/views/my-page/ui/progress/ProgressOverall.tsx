@@ -1,8 +1,8 @@
 import { Card } from '@shared/ui/Card';
 import { Progress } from '@shared/ui/Progress';
 
-import { NOT_LOADED } from '../../config/progress';
-import { useProgressStatsContext } from '../../model/hooks/useProgressStatsContext';
+import { NOT_LOADED } from '@views/my-page/config/progress';
+import { useProgressStatsContext } from '@views/my-page/model/hooks/useProgressStatsContext';
 
 export function ProgressOverall() {
   const { stats, overallPercent } = useProgressStatsContext();

@@ -1,4 +1,4 @@
-import { useStudySessionContext } from '../../model/hooks/useStudySessionContext';
+import { useStudySessionContext } from '@views/learn/model/hooks/useStudySessionContext';
 
 export function StudySessionPrompt() {
   const { content } = useStudySessionContext();

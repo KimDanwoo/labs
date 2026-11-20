@@ -1,6 +1,6 @@
+import { DIFFICULTY_VALUES } from '@entities/question/model/constants/constants';
+import type { Category, Difficulty, FollowUp, Question } from '@entities/question/model/types/types';
 import { parse } from 'yaml';
-import { DIFFICULTY_VALUES } from '../constants/constants';
-import type { Category, Difficulty, FollowUp, Question } from '../types/types';
 
 type UnknownRecord = Record<string, unknown>;
 export type CategoryEntry = Omit<Category, 'order_num' | 'question_count'>;

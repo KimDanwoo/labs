@@ -2,10 +2,10 @@
 
 import type { Question } from '@entities/question';
 
-import { useCategoryPagination } from '../model/hooks/useCategoryPagination';
-import { DifficultyFilterBar } from './DifficultyFilterBar';
-import { Pagination } from './Pagination';
-import { QuestionAccordion } from './QuestionAccordion';
+import { useCategoryPagination } from '@views/reference/model/hooks/useCategoryPagination';
+import { DifficultyFilterBar } from '@views/reference/ui/DifficultyFilterBar';
+import { Pagination } from '@views/reference/ui/Pagination';
+import { QuestionAccordion } from '@views/reference/ui/QuestionAccordion';
 
 interface CategoryQuestionListProps {
   categorySlug: string;

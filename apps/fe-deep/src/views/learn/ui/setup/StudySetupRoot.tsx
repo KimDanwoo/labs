@@ -3,8 +3,8 @@
 import { PageContainer } from '@shared/ui/PageContainer';
 import type { ReactNode } from 'react';
 
-import { useStudySetup, type StudySetupSource } from '../../model/hooks/useStudySetup';
-import { StudySetupContext } from '../../model/store/studySetupContext';
+import { useStudySetup, type StudySetupSource } from '@views/learn/model/hooks/useStudySetup';
+import { StudySetupContext } from '@views/learn/model/store/studySetupContext';
 
 interface StudySetupRootProps {
   setup: StudySetupSource;

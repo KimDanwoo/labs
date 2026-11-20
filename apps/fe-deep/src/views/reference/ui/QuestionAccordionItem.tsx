@@ -3,10 +3,10 @@
 import { QuestionMeta, type Question } from '@entities/question';
 import { CardAccordionItem } from '@shared/ui/CardAccordionItem';
 
-import { formatQuestionNumber } from '../lib/formatQuestionNumber';
-import { useQuestionActions } from '../model/hooks/useQuestionActions';
-import { QuestionActions } from './QuestionActions';
-import { QuestionAnswer } from './QuestionAnswer';
+import { formatQuestionNumber } from '@views/reference/lib/formatQuestionNumber';
+import { useQuestionActions } from '@views/reference/model/hooks/useQuestionActions';
+import { QuestionActions } from '@views/reference/ui/QuestionActions';
+import { QuestionAnswer } from '@views/reference/ui/QuestionAnswer';
 
 interface QuestionAccordionItemProps {
   question: Question;

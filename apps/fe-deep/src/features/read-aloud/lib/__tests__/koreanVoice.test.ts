@@ -1,6 +1,6 @@
+import { pickKoreanVoice } from '@features/read-aloud/lib/koreanVoice';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { pickKoreanVoice } from '../koreanVoice';
 
 const voice = (name: string, lang: string, localService = true) => ({ name, lang, localService });
 

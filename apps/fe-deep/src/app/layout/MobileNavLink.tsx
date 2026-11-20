@@ -1,7 +1,7 @@
 import { Button } from '@shared/ui/Button';
 import Link from 'next/link';
 
-import type { NavItem } from '../config/navigation';
+import type { NavItem } from '@app/config/navigation';
 
 interface MobileNavLinkProps {
   item: NavItem;

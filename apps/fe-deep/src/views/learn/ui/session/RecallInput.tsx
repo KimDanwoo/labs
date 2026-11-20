@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react';
 
 import { isSubmitShortcut } from '@shared/lib/isSubmitShortcut';
-import { RECALL_INPUT_ID, RECALL_INPUT_ROWS } from '../../config/studyCard';
+import { RECALL_INPUT_ID, RECALL_INPUT_ROWS } from '@views/learn/config/studyCard';
 
 interface RecallInputProps {
   value: string;

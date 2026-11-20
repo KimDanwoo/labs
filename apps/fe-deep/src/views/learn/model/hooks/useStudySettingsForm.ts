@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import type { Difficulty } from '@entities/question';
 
-import type { StudySettings } from '../constants/study';
+import type { StudySettings } from '@views/learn/model/constants/study';
 
 export function useStudySettingsForm(initialSettings: StudySettings) {
   const [settings, setSettings] = useState(initialSettings);

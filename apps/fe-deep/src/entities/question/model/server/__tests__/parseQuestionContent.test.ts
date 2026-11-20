@@ -1,6 +1,6 @@
+import { parseCategories, parseQuestionFile } from '@entities/question/model/server/parseQuestionContent';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parseCategories, parseQuestionFile } from '../parseQuestionContent';
 
 const META = { source: 'react/007.md', categoryId: 'cat-5', orderNum: 7 };
 

@@ -1,7 +1,7 @@
 import { cn } from '@shared/lib/cn';
 import { Card } from '@shared/ui/Card';
 
-import type { StatCardConfig } from '../../config/progress';
+import type { StatCardConfig } from '@views/my-page/config/progress';
 
 interface StatCardProps {
   config: StatCardConfig;

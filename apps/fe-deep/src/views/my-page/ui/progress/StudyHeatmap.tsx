@@ -1,6 +1,6 @@
-import { summarizeHeatmap } from '../../lib/summarizeHeatmap';
-import { useProgressStatsContext } from '../../model/hooks/useProgressStatsContext';
-import { YearHeatmap } from './YearHeatmap';
+import { summarizeHeatmap } from '@views/my-page/lib/summarizeHeatmap';
+import { useProgressStatsContext } from '@views/my-page/model/hooks/useProgressStatsContext';
+import { YearHeatmap } from '@views/my-page/ui/progress/YearHeatmap';
 
 export function StudyHeatmap() {
   const { heatmap } = useProgressStatsContext();

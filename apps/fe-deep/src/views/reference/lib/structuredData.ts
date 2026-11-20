@@ -1,6 +1,6 @@
 import { categoryHref, type Category, type Question } from '@entities/question';
 
-import { FAQ_ANSWER_LENGTH, SCHEMA_CONTEXT } from '../config/structuredData';
+import { FAQ_ANSWER_LENGTH, SCHEMA_CONTEXT } from '@views/reference/config/structuredData';
 
 export function toJsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, '\\u003c');

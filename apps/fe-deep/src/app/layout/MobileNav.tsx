@@ -4,10 +4,10 @@ import { Sheet, SheetContent, SheetTitle } from '@shared/ui/Sheet';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
-import { MAIN_NAV_ITEMS, MY_PAGE_NAV_ITEMS } from '../config/navigation';
-import { isActivePath } from '../lib/isActivePath';
-import { MobileNavLink } from './MobileNavLink';
-import { MobileNavTrigger } from './MobileNavTrigger';
+import { MAIN_NAV_ITEMS, MY_PAGE_NAV_ITEMS } from '@app/config/navigation';
+import { MobileNavLink } from '@app/layout/MobileNavLink';
+import { MobileNavTrigger } from '@app/layout/MobileNavTrigger';
+import { isActivePath } from '@app/lib/isActivePath';
 
 export function MobileNav() {
   const pathname = usePathname();

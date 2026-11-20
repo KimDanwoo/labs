@@ -2,8 +2,8 @@ import { useSearchParams } from 'next/navigation';
 
 import type { Question } from '@entities/question';
 
-import { FIRST_PAGE, LIST_SEARCH_PARAM, QUESTIONS_PER_PAGE } from '../../config/pagination';
-import { toDifficulty } from '../../lib/toDifficulty';
+import { FIRST_PAGE, LIST_SEARCH_PARAM, QUESTIONS_PER_PAGE } from '@views/reference/config/pagination';
+import { toDifficulty } from '@views/reference/lib/toDifficulty';
 
 export function useCategoryPagination(questions: Question[]) {
   const searchParams = useSearchParams();

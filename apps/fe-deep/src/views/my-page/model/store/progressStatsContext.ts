@@ -1,6 +1,6 @@
 'use client';
 
+import type { ProgressStatsModel } from '@views/my-page/model/hooks/useProgressStats';
 import { createContext } from 'react';
-import type { ProgressStatsModel } from '../hooks/useProgressStats';
 
 export const ProgressStatsContext = createContext<ProgressStatsModel | null>(null);

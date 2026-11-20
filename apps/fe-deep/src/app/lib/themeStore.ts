@@ -1,4 +1,4 @@
-import { THEME, THEME_CHANGE_EVENT, THEME_STORAGE_KEY } from '../config/theme';
+import { THEME, THEME_CHANGE_EVENT, THEME_STORAGE_KEY } from '@app/config/theme';
 
 export function subscribeTheme(onChange: () => void) {
   window.addEventListener(THEME_CHANGE_EVENT, onChange);

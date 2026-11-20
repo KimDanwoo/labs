@@ -1,6 +1,6 @@
+import { loadQuestionContent } from '@entities/question/model/server/loadQuestionContent';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { loadQuestionContent } from '../loadQuestionContent';
 
 test('every file in content/questions loads, and each category owns its questions', async () => {
   const { categories, questions } = await loadQuestionContent();

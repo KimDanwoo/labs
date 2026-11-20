@@ -1,6 +1,6 @@
 import { getAllQuestions, getQuestionsByCategorySlug, type Category, type Question } from '@entities/question';
 import { shuffleArray } from '@shared/lib/shuffle';
-import { ALL_CATEGORIES, STUDY_ORDER, type StudySettings } from '../model/constants/study';
+import { ALL_CATEGORIES, STUDY_ORDER, type StudySettings } from '@views/learn/model/constants/study';
 
 export async function loadStudyQuestions(
   { categorySlug, order, difficulties }: StudySettings,

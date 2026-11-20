@@ -1,14 +1,14 @@
 import { PageContainer } from '@shared/ui/PageContainer';
 import { Suspense } from 'react';
 
-import type { CategoryPageProps } from '../../model/server/categoryRoute';
-import { loadCategoryPage } from '../../model/server/loadCategoryPage';
-import { CategoryQuestionList } from '../CategoryQuestionList';
-import { CategorySidebar } from '../CategorySidebar';
-import { QuestionAccordion } from '../QuestionAccordion';
-import { CategoryHeader } from './CategoryHeader';
-import { CategorySchemas } from './CategorySchemas';
-import { ReferenceDetailLayout } from './ReferenceDetailLayout';
+import type { CategoryPageProps } from '@views/reference/model/server/categoryRoute';
+import { loadCategoryPage } from '@views/reference/model/server/loadCategoryPage';
+import { CategoryQuestionList } from '@views/reference/ui/CategoryQuestionList';
+import { CategorySidebar } from '@views/reference/ui/CategorySidebar';
+import { QuestionAccordion } from '@views/reference/ui/QuestionAccordion';
+import { CategoryHeader } from '@views/reference/ui/detail/CategoryHeader';
+import { CategorySchemas } from '@views/reference/ui/detail/CategorySchemas';
+import { ReferenceDetailLayout } from '@views/reference/ui/detail/ReferenceDetailLayout';
 
 export async function ReferenceDetailView({ params }: CategoryPageProps) {
   const { categorySlug } = await params;

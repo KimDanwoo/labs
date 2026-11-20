@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Button } from '@shared/ui/Button';
 import { EmptyState } from '@shared/ui/EmptyState';
 
-import { useBookmarksContext } from '../../model/hooks/useBookmarksContext';
+import { useBookmarksContext } from '@views/my-page/model/hooks/useBookmarksContext';
 
 export function BookmarksEmpty() {
   const { bookmarkedQuestions } = useBookmarksContext();

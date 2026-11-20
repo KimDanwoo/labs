@@ -1,6 +1,6 @@
 import { ArrowDownAZ, Shuffle, type LucideIcon } from 'lucide-react';
 
-import { STUDY_ORDER, type StudyOrder } from '../model/constants/study';
+import { STUDY_ORDER, type StudyOrder } from '@views/learn/model/constants/study';
 
 interface StudyOrderOption {
   value: StudyOrder;

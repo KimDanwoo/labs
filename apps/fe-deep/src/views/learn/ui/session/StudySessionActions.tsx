@@ -2,7 +2,7 @@ import { ArrowRight, Eye, RotateCcw, SkipForward } from 'lucide-react';
 
 import { Button } from '@shared/ui/Button';
 
-import { useStudySessionContext } from '../../model/hooks/useStudySessionContext';
+import { useStudySessionContext } from '@views/learn/model/hooks/useStudySessionContext';
 
 export function StudySessionActions() {
   const { isFlipped, isLastStep, handleFlip, handleNext, handleRetry, handleSkip } = useStudySessionContext();

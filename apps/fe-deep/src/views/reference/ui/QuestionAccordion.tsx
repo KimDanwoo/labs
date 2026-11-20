@@ -3,7 +3,7 @@
 import type { Question } from '@entities/question';
 import { Accordion } from '@shared/ui/Accordion';
 
-import { QuestionAccordionItem } from './QuestionAccordionItem';
+import { QuestionAccordionItem } from '@views/reference/ui/QuestionAccordionItem';
 
 interface QuestionAccordionProps {
   questions: Question[];

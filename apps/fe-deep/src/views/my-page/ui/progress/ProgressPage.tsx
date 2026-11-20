@@ -1,6 +1,6 @@
 'use client';
 
-import { Progress } from './progress';
+import { Progress } from '@views/my-page/ui/progress/progress';
 
 export function ProgressPage() {
   return (

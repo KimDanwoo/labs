@@ -1,8 +1,8 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/Select';
 
-import { ALL_CATEGORIES } from '../../model/constants/study';
-import { useStudySetupContext } from '../../model/hooks/useStudySetupContext';
-import { FieldLabel } from './FieldLabel';
+import { ALL_CATEGORIES } from '@views/learn/model/constants/study';
+import { useStudySetupContext } from '@views/learn/model/hooks/useStudySetupContext';
+import { FieldLabel } from '@views/learn/ui/setup/FieldLabel';
 
 export function StudySetupCategory() {
   const { categories, isLoadingCategories, settings, changeSettings } = useStudySetupContext();

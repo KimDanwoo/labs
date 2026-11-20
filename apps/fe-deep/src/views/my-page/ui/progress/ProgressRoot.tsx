@@ -3,8 +3,8 @@
 import { PageContainer } from '@shared/ui/PageContainer';
 import type { ReactNode } from 'react';
 
-import { useProgressStats } from '../../model/hooks/useProgressStats';
-import { ProgressStatsContext } from '../../model/store/progressStatsContext';
+import { useProgressStats } from '@views/my-page/model/hooks/useProgressStats';
+import { ProgressStatsContext } from '@views/my-page/model/store/progressStatsContext';
 
 interface ProgressRootProps {
   children: ReactNode;

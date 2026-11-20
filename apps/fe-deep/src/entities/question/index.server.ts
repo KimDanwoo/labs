@@ -1,1 +1,1 @@
-export { loadQuestionContent } from './model/server/loadQuestionContent';
+export { loadQuestionContent } from '@entities/question/model/server/loadQuestionContent';

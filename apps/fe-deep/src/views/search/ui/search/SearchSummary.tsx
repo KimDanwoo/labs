@@ -1,4 +1,4 @@
-import { useSearchContext } from '../../model/hooks/useSearchContext';
+import { useSearchContext } from '@views/search/model/hooks/useSearchContext';
 
 export function SearchSummary() {
   const { debouncedQuery, isSearching, displayResults } = useSearchContext();

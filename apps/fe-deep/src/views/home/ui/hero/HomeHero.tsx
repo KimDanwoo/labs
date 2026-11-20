@@ -1,7 +1,7 @@
-import { HeroActions } from './HeroActions';
-import { HeroBadge } from './HeroBadge';
-import { HeroSection } from './HeroSection';
-import { HeroTitle } from './HeroTitle';
+import { HeroActions } from '@views/home/ui/hero/HeroActions';
+import { HeroBadge } from '@views/home/ui/hero/HeroBadge';
+import { HeroSection } from '@views/home/ui/hero/HeroSection';
+import { HeroTitle } from '@views/home/ui/hero/HeroTitle';
 
 export function HomeHero() {
   return (

@@ -1,7 +1,7 @@
 import { Accordion } from '@shared/ui/Accordion';
 
-import { useSearchContext } from '../../model/hooks/useSearchContext';
-import { SearchResultItem } from '../SearchResultItem';
+import { useSearchContext } from '@views/search/model/hooks/useSearchContext';
+import { SearchResultItem } from '@views/search/ui/SearchResultItem';
 
 export function SearchResults() {
   const { hasResults, displayResults } = useSearchContext();

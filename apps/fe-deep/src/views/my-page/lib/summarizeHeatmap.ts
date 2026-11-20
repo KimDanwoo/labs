@@ -1,4 +1,4 @@
-import { DATE_KEY_YEAR_LENGTH } from '../config/heatmap';
+import { DATE_KEY_YEAR_LENGTH } from '@views/my-page/config/heatmap';
 
 export function summarizeHeatmap(heatmap: Record<string, number>, currentYear: number) {
   const maxCount = Math.max(1, ...Object.values(heatmap));

@@ -1,7 +1,12 @@
+import {
+  findCategoryBySlug,
+  pickQuestionsByIds,
+  questionsInCategory,
+  searchQuestionContent,
+} from '@entities/question/model/services/questionQueries';
+import type { Category, Question, QuestionContent } from '@entities/question/model/types/types';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type { Category, Question, QuestionContent } from '../../types/types';
-import { findCategoryBySlug, pickQuestionsByIds, questionsInCategory, searchQuestionContent } from '../questionQueries';
 
 const category = (id: string, slug: string): Category => ({
   id,

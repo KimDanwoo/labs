@@ -2,9 +2,9 @@
 
 import { searchQuestions, type SearchResult } from '@entities/question';
 import { useDebounce } from '@shared/lib/useDebounce';
+import { SEARCH_DEBOUNCE_MS } from '@views/search/config/debounce';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { SEARCH_DEBOUNCE_MS } from '../../config/debounce';
 
 export function useSearch() {
   const searchParams = useSearchParams();

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-import { applyTheme, readIsDark, readServerIsDark, subscribeTheme } from '../../lib/themeStore';
+import { applyTheme, readIsDark, readServerIsDark, subscribeTheme } from '@app/lib/themeStore';
 
 export function useTheme() {
   const isDark = useSyncExternalStore(subscribeTheme, readIsDark, readServerIsDark);

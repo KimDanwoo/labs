@@ -1,11 +1,11 @@
-import { StudySetupCategory } from './StudySetupCategory';
-import { StudySetupDifficulty } from './StudySetupDifficulty';
-import { StudySetupForm } from './StudySetupForm';
-import { StudySetupIntro } from './StudySetupIntro';
-import { StudySetupOrder } from './StudySetupOrder';
-import { StudySetupRoot } from './StudySetupRoot';
-import { StudySetupStart } from './StudySetupStart';
-import { StudySetupTip } from './StudySetupTip';
+import { StudySetupCategory } from '@views/learn/ui/setup/StudySetupCategory';
+import { StudySetupDifficulty } from '@views/learn/ui/setup/StudySetupDifficulty';
+import { StudySetupForm } from '@views/learn/ui/setup/StudySetupForm';
+import { StudySetupIntro } from '@views/learn/ui/setup/StudySetupIntro';
+import { StudySetupOrder } from '@views/learn/ui/setup/StudySetupOrder';
+import { StudySetupRoot } from '@views/learn/ui/setup/StudySetupRoot';
+import { StudySetupStart } from '@views/learn/ui/setup/StudySetupStart';
+import { StudySetupTip } from '@views/learn/ui/setup/StudySetupTip';
 
 export const StudySetup = {
   Root: StudySetupRoot,

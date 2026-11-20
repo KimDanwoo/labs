@@ -1,6 +1,6 @@
 'use client';
 
-import { Search } from './search/search';
+import { Search } from '@views/search/ui/search/search';
 
 export function SearchContent() {
   return (

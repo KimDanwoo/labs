@@ -1,6 +1,6 @@
 import { Badge } from '@shared/ui/Badge';
 
-import type { CategoryProgress } from '../../model/hooks/useProgressStats';
+import type { CategoryProgress } from '@views/my-page/model/hooks/useProgressStats';
 
 interface CategoryProgressCountsProps {
   title: string;

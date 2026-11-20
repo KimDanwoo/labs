@@ -1,7 +1,7 @@
-import { BookmarksEmpty } from './BookmarksEmpty';
-import { BookmarksIntro } from './BookmarksIntro';
-import { BookmarksList } from './BookmarksList';
-import { BookmarksRoot } from './BookmarksRoot';
+import { BookmarksEmpty } from '@views/my-page/ui/bookmarks/BookmarksEmpty';
+import { BookmarksIntro } from '@views/my-page/ui/bookmarks/BookmarksIntro';
+import { BookmarksList } from '@views/my-page/ui/bookmarks/BookmarksList';
+import { BookmarksRoot } from '@views/my-page/ui/bookmarks/BookmarksRoot';
 
 export const Bookmarks = {
   Root: BookmarksRoot,

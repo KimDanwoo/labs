@@ -1,2 +1,2 @@
-export { BookmarksPage } from './ui/bookmarks/BookmarksPage';
-export { ProgressPage } from './ui/progress/ProgressPage';
+export { BookmarksPage } from '@views/my-page/ui/bookmarks/BookmarksPage';
+export { ProgressPage } from '@views/my-page/ui/progress/ProgressPage';

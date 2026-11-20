@@ -1,7 +1,7 @@
 import { Accordion } from '@shared/ui/Accordion';
 
-import { useBookmarksContext } from '../../model/hooks/useBookmarksContext';
-import { BookmarkItem } from './BookmarkItem';
+import { useBookmarksContext } from '@views/my-page/model/hooks/useBookmarksContext';
+import { BookmarkItem } from '@views/my-page/ui/bookmarks/BookmarkItem';
 
 export function BookmarksList() {
   const { bookmarkedQuestions } = useBookmarksContext();

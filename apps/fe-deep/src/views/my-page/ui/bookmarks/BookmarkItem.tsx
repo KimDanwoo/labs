@@ -7,7 +7,7 @@ import { Button } from '@shared/ui/Button';
 import { CardAccordionItem } from '@shared/ui/CardAccordionItem';
 import { MarkdownRenderer } from '@shared/ui/markdown-renderer';
 
-import { useBookmarksContext } from '../../model/hooks/useBookmarksContext';
+import { useBookmarksContext } from '@views/my-page/model/hooks/useBookmarksContext';
 
 interface BookmarkItemProps {
   question: Question;

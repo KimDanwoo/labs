@@ -1,10 +1,10 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 
-import { SPEECH_LANG, SPEECH_RATE } from '../../config/speech';
+import { SPEECH_LANG, SPEECH_RATE } from '@features/read-aloud/config/speech';
 
-import { pickKoreanVoice } from '../../lib/koreanVoice';
-import { getSynth } from '../../lib/speechVoice';
-import { toSpeechChunks } from '../../lib/toSpeechChunks';
+import { pickKoreanVoice } from '@features/read-aloud/lib/koreanVoice';
+import { getSynth } from '@features/read-aloud/lib/speechVoice';
+import { toSpeechChunks } from '@features/read-aloud/lib/toSpeechChunks';
 
 const subscribeNever = () => () => {};
 const readIsSupported = () => Boolean(getSynth());

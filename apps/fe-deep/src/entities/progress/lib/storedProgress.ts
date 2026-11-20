@@ -1,5 +1,5 @@
-import { PROGRESS_STATUS, SM2_CONSTANTS } from '../model/constants/constants';
-import type { ProgressStatus, UserProgress } from '../model/types/types';
+import { PROGRESS_STATUS, SM2_CONSTANTS } from '@entities/progress/model/constants/constants';
+import type { ProgressStatus, UserProgress } from '@entities/progress/model/types/types';
 
 export interface StoredProgress {
   progress: Record<string, UserProgress>;
