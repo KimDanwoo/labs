@@ -1,8 +1,6 @@
-import * as THREE from 'three';
-import { type Region } from '../model/world/world';
-import { FLIGHT, flyFor, startFlight, stepButterfly, stepDragonfly } from './flight';
-import { drawInsect } from './insectPose';
-import { sceneX, sceneY } from './perspective';
+import { FLIGHT, flyFor, startFlight, stepButterfly, stepDragonfly } from '@views/walk/lib/flight';
+import { drawInsect } from '@views/walk/lib/insectPose';
+import { sceneX, sceneY } from '@views/walk/lib/perspective';
 import {
   ALTITUDE,
   ATLAS,
@@ -15,8 +13,10 @@ import {
   PATCHES,
   SIZE,
   WINGBEAT,
-} from './sceneLifeData';
-import { createSleepingCat } from './sleepingCat';
+} from '@views/walk/lib/sceneLifeData';
+import { createSleepingCat } from '@views/walk/lib/sleepingCat';
+import { type Region } from '@views/walk/model/world/world';
+import * as THREE from 'three';
 
 const FLYER_ORDER = 3.6;
 

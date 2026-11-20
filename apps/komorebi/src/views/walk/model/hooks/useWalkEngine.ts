@@ -1,8 +1,8 @@
+import type { TimeOfDay, Weather } from '@views/walk/config/walk';
+import { createScene, type SceneOptions, type SceneStatus, type WalkEngine } from '@views/walk/lib/scene';
+import type { Appearance } from '@views/walk/model/world/appearance';
+import { REGION, SPAWN } from '@views/walk/model/world/world';
 import { useEffect, useEffectEvent, useState, type RefObject } from 'react';
-import type { TimeOfDay, Weather } from '../../config/walk';
-import { createScene, type SceneOptions, type SceneStatus, type WalkEngine } from '../../lib/scene';
-import type { Appearance } from '../world/appearance';
-import { REGION, SPAWN } from '../world/world';
 
 type EngineSettings = {
   timeOfDay: TimeOfDay;

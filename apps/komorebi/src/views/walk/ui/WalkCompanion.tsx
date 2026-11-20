@@ -1,6 +1,6 @@
-import { COMPANION_PANEL } from '../lib/companions';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { CompanionPanel } from './CompanionPanel';
+import { COMPANION_PANEL } from '@views/walk/lib/companions';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { CompanionPanel } from '@views/walk/ui/CompanionPanel';
 
 export function WalkCompanion() {
   const { engine, activities } = useWalkContext();

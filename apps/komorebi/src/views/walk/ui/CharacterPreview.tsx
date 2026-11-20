@@ -1,5 +1,5 @@
+import { characterLayers, type Appearance } from '@views/walk/model/world/appearance';
 import type { JSX } from 'react';
-import { characterLayers, type Appearance } from '../model/world/appearance';
 
 interface CharacterPreviewProps {
   appearance: Appearance;

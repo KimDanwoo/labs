@@ -1,4 +1,4 @@
-import { canvasTexture } from './art';
+import { canvasTexture } from '@views/walk/lib/art';
 
 export function sparrowTexture(wing: number) {
   return canvasTexture(128, 96, (c) => {

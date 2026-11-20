@@ -1,6 +1,6 @@
+import { MS_PER_SECOND } from '@views/walk/config/time';
+import { advanceBallGame, BALL_PHASE, createBallGame, returnBall, type BallGame } from '@views/walk/model/ballGame';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { MS_PER_SECOND } from '../../config/time';
-import { advanceBallGame, BALL_PHASE, createBallGame, returnBall, type BallGame } from '../ballGame';
 
 const PUBLISH_INTERVAL_MS = 80;
 

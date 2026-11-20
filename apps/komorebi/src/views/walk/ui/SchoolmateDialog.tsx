@@ -1,11 +1,11 @@
+import { SCHOOLMATE_GREETING } from '@views/walk/config/schoolmate';
+import { TIME } from '@views/walk/config/walk';
+import { gameKey } from '@views/walk/lib/input';
+import { useModal } from '@views/walk/model/hooks/useModal';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import type { SCHOOLMATES, SchoolRegion } from '@views/walk/model/schoolmateRoster';
+import { DialogHeading } from '@views/walk/ui/DialogHeading';
 import { useId, type JSX } from 'react';
-import { SCHOOLMATE_GREETING } from '../config/schoolmate';
-import { TIME } from '../config/walk';
-import { gameKey } from '../lib/input';
-import { useModal } from '../model/hooks/useModal';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import type { SCHOOLMATES, SchoolRegion } from '../model/schoolmateRoster';
-import { DialogHeading } from './DialogHeading';
 
 interface SchoolmateDialogProps {
   friend: (typeof SCHOOLMATES)[number];

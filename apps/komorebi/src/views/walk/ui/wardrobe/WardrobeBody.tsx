@@ -1,6 +1,6 @@
-import { OUTFIT_DEFINITIONS, type Appearance } from '../../model/world/appearance';
-import { CharacterPreview } from '../CharacterPreview';
-import { OutfitOption } from './OutfitOption';
+import { OUTFIT_DEFINITIONS, type Appearance } from '@views/walk/model/world/appearance';
+import { CharacterPreview } from '@views/walk/ui/CharacterPreview';
+import { OutfitOption } from '@views/walk/ui/wardrobe/OutfitOption';
 
 interface WardrobeBodyProps {
   appearance: Appearance;

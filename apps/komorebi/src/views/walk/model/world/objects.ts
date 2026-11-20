@@ -1,4 +1,4 @@
-import type { Region } from './world';
+import type { Region } from '@views/walk/model/world/world';
 
 type WorldObject = {
   id: string;

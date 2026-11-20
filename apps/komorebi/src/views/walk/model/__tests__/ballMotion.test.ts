@@ -1,7 +1,7 @@
+import { BALL_PHASE, BALL_ROLE, BALL_TIMING, createBallGame } from '@views/walk/model/ballGame';
+import { ballFlight, ballPose } from '@views/walk/model/ballMotion';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { BALL_PHASE, BALL_ROLE, BALL_TIMING, createBallGame } from '../ballGame';
-import { ballFlight, ballPose } from '../ballMotion';
 
 test('the ball stays with the thrower during windup, reaches both hands and rises over the ground in flight', () => {
   const ready = createBallGame();

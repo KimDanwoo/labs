@@ -1,8 +1,8 @@
-import { FIGHT_GAUGE_MAX, TENSION } from '../config/fishing';
-import type { Fight } from '../lib/fishFight';
-import type { Catch, FishingFrame } from '../lib/fishing';
-import { fightGuidance } from '../lib/fishingCopy';
-import { useFishingFight } from '../model/hooks/useFishingFight';
+import { FIGHT_GAUGE_MAX, TENSION } from '@views/walk/config/fishing';
+import type { Fight } from '@views/walk/lib/fishFight';
+import type { Catch, FishingFrame } from '@views/walk/lib/fishing';
+import { fightGuidance } from '@views/walk/lib/fishingCopy';
+import { useFishingFight } from '@views/walk/model/hooks/useFishingFight';
 
 interface FishingFightProps {
   fish: Catch;

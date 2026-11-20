@@ -1,7 +1,7 @@
+import { FLIGHT } from '@views/walk/lib/flight';
+import { characterScale, sceneX, sceneY } from '@views/walk/lib/perspective';
+import { ALTITUDE, ATLAS, INSECT, LANDING_EASE, type Life } from '@views/walk/lib/sceneLifeData';
 import * as THREE from 'three';
-import { FLIGHT } from './flight';
-import { characterScale, sceneX, sceneY } from './perspective';
-import { ALTITUDE, ATLAS, INSECT, LANDING_EASE, type Life } from './sceneLifeData';
 
 export function drawInsect(life: Life, elapsed: number, dt: number) {
   const { flight, kind, sprite: s, material, size } = life;

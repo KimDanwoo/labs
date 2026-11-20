@@ -1,5 +1,5 @@
-import type { Foreground } from './foreground';
-import type { Point, Region } from './world';
+import type { Foreground } from '@views/walk/model/world/foreground';
+import type { Point, Region } from '@views/walk/model/world/world';
 
 export function isForegroundInFront(layer: Foreground, position: Point, region: Region) {
   if (layer.region !== region) return false;

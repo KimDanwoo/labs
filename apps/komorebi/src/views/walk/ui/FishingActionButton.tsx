@@ -1,6 +1,6 @@
-import { FISHING_PHASE } from '../lib/fishing';
-import { fishingActionLabel } from '../lib/fishingCopy';
-import { useFishingContext } from '../model/hooks/useFishingContext';
+import { FISHING_PHASE } from '@views/walk/lib/fishing';
+import { fishingActionLabel } from '@views/walk/lib/fishingCopy';
+import { useFishingContext } from '@views/walk/model/hooks/useFishingContext';
 
 export function FishingActionButton() {
   const { phase, isCelebrating, act } = useFishingContext();

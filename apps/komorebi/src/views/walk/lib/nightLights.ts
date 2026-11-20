@@ -1,7 +1,7 @@
+import { canvasTexture } from '@views/walk/lib/art';
+import { sceneX, sceneY } from '@views/walk/lib/perspective';
+import type { Point, Region } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import type { Point, Region } from '../model/world/world';
-import { canvasTexture } from './art';
-import { sceneX, sceneY } from './perspective';
 
 type Lamp = { x: number; z: number; reach: number; flicker?: boolean };
 type Twinkle = { x: number; z: number };

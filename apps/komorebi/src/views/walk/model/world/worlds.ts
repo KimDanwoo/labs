@@ -8,7 +8,7 @@ import {
   HOME_BED,
   HOME_DESK,
   HOME_DOOR,
-} from './world';
+} from '@views/walk/model/world/world';
 
 export const WORLDS: Record<
   Region,

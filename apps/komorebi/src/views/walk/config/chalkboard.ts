@@ -1,4 +1,4 @@
-import type { ChalkColor } from '../lib/chalkboard';
+import type { ChalkColor } from '@views/walk/lib/chalkboard';
 
 export const CHALKS: { id: ChalkColor; name: string }[] = [
   { id: 'white', name: '흰 분필' },

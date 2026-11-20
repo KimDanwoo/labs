@@ -1,8 +1,8 @@
 'use client';
 
+import { useWalk } from '@views/walk/model/hooks/useWalk';
+import { WalkContext } from '@views/walk/model/store/walkContext';
 import type { ReactNode } from 'react';
-import { useWalk } from '../model/hooks/useWalk';
-import { WalkContext } from '../model/store/walkContext';
 
 interface WalkRootProps {
   children: ReactNode;

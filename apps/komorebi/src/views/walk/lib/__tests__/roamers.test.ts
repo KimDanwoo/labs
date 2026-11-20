@@ -1,7 +1,7 @@
+import { createRoamers } from '@views/walk/lib/roamers';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { createRoamers } from '../roamers';
 
 const paint = { createRadialGradient: () => ({ addColorStop() {} }), fillRect() {} };
 Object.assign(globalThis, { document: { createElement: () => ({ getContext: () => paint }) } });

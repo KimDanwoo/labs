@@ -1,6 +1,6 @@
-import { FRIEND_ACTIVITY } from '../config/walk';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { SchoolmateDialog } from './SchoolmateDialog';
+import { FRIEND_ACTIVITY } from '@views/walk/config/walk';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { SchoolmateDialog } from '@views/walk/ui/SchoolmateDialog';
 
 export function WalkSchoolmate() {
   const { activities, friendRegion } = useWalkContext();

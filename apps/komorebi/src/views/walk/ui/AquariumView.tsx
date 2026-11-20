@@ -1,8 +1,8 @@
+import { AQUARIUM_ART, aquariumFishArt } from '@views/walk/lib/aquarium';
+import type { KeptFish } from '@views/walk/lib/companions';
+import { FISH } from '@views/walk/lib/fishTable';
+import { useAquariumSwim } from '@views/walk/model/hooks/useAquariumSwim';
 import { useState } from 'react';
-import { AQUARIUM_ART, aquariumFishArt } from '../lib/aquarium';
-import type { KeptFish } from '../lib/companions';
-import { FISH } from '../lib/fishTable';
-import { useAquariumSwim } from '../model/hooks/useAquariumSwim';
 
 interface AquariumViewProps {
   fish: KeptFish[];

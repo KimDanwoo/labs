@@ -1,10 +1,10 @@
-import { TIME, type TimeOfDay, type Weather } from '../config/walk';
-import { type Region, REGION } from '../model/world/world';
-import { createBeds } from './ambienceBeds';
-import { ambienceMix, type AmbienceMix } from './ambienceMix';
-import { brownNoise, call, createVoices } from './audioSynth';
-import { createFootsteps } from './footsteps';
-import { createCues } from './placeCues';
+import { TIME, type TimeOfDay, type Weather } from '@views/walk/config/walk';
+import { createBeds } from '@views/walk/lib/ambienceBeds';
+import { ambienceMix, type AmbienceMix } from '@views/walk/lib/ambienceMix';
+import { brownNoise, call, createVoices } from '@views/walk/lib/audioSynth';
+import { createFootsteps } from '@views/walk/lib/footsteps';
+import { createCues } from '@views/walk/lib/placeCues';
+import { type Region, REGION } from '@views/walk/model/world/world';
 
 const MASTER_VOLUME = 0.22;
 const FADE_SECONDS = 1.2;

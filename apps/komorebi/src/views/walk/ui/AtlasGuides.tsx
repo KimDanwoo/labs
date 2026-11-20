@@ -1,8 +1,8 @@
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT } from '../model/world/landmarks';
-import { HOME } from '../model/world/world';
-import { Icon } from './Icon';
-import { WalkMap } from './WalkMap';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT } from '@views/walk/model/world/landmarks';
+import { HOME } from '@views/walk/model/world/world';
+import { Icon } from '@views/walk/ui/Icon';
+import { WalkMap } from '@views/walk/ui/WalkMap';
 
 export function AtlasGuides() {
   const { isReady, status, collection, guideTo } = useWalkContext();

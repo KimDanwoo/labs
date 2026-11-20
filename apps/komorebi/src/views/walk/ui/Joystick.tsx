@@ -1,6 +1,6 @@
 'use client';
 
-import { useJoystick } from '../model/hooks/useJoystick';
+import { useJoystick } from '@views/walk/model/hooks/useJoystick';
 
 interface JoystickProps {
   onInput: (key: string, pressed: boolean) => void;

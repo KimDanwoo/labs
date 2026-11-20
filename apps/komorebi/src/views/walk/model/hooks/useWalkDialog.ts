@@ -1,6 +1,6 @@
+import { DIALOG, type Dialog } from '@views/walk/config/walk';
 import { useState } from 'react';
 import { flushSync } from 'react-dom';
-import { DIALOG, type Dialog } from '../../config/walk';
 
 export function useWalkDialog(isBusy: boolean, onFocusScene: () => void) {
   const [dialog, setDialog] = useState<Dialog>(DIALOG.none);

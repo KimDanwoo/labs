@@ -1,4 +1,4 @@
-import { useMusicPanelContext } from '../../model/hooks/music/useMusicPanelContext';
+import { useMusicPanelContext } from '@views/walk/model/hooks/music/useMusicPanelContext';
 
 export function MusicToggle() {
   const { player, isExpanded, toggleButton, toggle } = useMusicPanelContext();

@@ -1,9 +1,9 @@
+import { CANVAS_FONT_FAMILY, canvasTexture } from '@views/walk/lib/art';
+import { sceneX, sceneY } from '@views/walk/lib/perspective';
+import { getWorldPortals, type WorldPortal } from '@views/walk/model/world/portals';
+import type { Region } from '@views/walk/model/world/world';
+import { WORLDS } from '@views/walk/model/world/worlds';
 import * as THREE from 'three';
-import { getWorldPortals, type WorldPortal } from '../model/world/portals';
-import type { Region } from '../model/world/world';
-import { WORLDS } from '../model/world/worlds';
-import { CANVAS_FONT_FAMILY, canvasTexture } from './art';
-import { sceneX, sceneY } from './perspective';
 
 const SIGN_FONT = `bold 28px ${CANVAS_FONT_FAMILY}`;
 

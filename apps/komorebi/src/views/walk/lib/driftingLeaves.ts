@@ -1,8 +1,8 @@
+import { canvasTexture } from '@views/walk/lib/art';
+import { lightSprite } from '@views/walk/lib/nightLights';
+import { sceneX, sceneY } from '@views/walk/lib/perspective';
+import type { Region } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import type { Region } from '../model/world/world';
-import { canvasTexture } from './art';
-import { lightSprite } from './nightLights';
-import { sceneX, sceneY } from './perspective';
 
 const SOURCES: Record<Region, readonly [number, number][]> = {
   home: [],

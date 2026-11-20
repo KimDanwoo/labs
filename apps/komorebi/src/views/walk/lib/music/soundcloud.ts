@@ -1,4 +1,4 @@
-import { type MusicTrack, parseMusicTracks } from './musicSettings';
+import { type MusicTrack, parseMusicTracks } from '@views/walk/lib/music/musicSettings';
 export const WIDGET_API = 'https://w.soundcloud.com/player/api.js';
 export type WidgetPayload = { currentPosition?: number };
 export type MusicWidget = {

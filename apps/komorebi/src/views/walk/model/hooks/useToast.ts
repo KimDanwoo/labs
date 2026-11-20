@@ -1,5 +1,5 @@
+import { TOAST_DURATION_MS } from '@views/walk/config/walk';
 import { useEffect, useRef, useState } from 'react';
-import { TOAST_DURATION_MS } from '../../config/walk';
 
 export function useToast() {
   const [message, setMessage] = useState('');

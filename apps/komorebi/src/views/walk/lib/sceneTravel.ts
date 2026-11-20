@@ -1,16 +1,16 @@
+import { SCENERY_STYLE } from '@views/walk/lib/breeze';
+import { isAirborne } from '@views/walk/lib/motion';
+import { lampUniforms } from '@views/walk/lib/nightLights';
+import { nearbyRegions } from '@views/walk/lib/regionPlates';
+import type { SceneContext } from '@views/walk/lib/sceneContext';
+import { START_REGION } from '@views/walk/lib/walkState';
+import { isAtHomeBed, isNearHomeBed } from '@views/walk/model/world/interactions';
+import { DESTINATIONS } from '@views/walk/model/world/landmarks';
+import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '@views/walk/model/world/portals';
+import { findRoute, nextRegionStep } from '@views/walk/model/world/routing';
+import { REGION, isIndoors, type Point, type Region } from '@views/walk/model/world/world';
+import { WORLDS } from '@views/walk/model/world/worlds';
 import * as THREE from 'three';
-import { isAtHomeBed, isNearHomeBed } from '../model/world/interactions';
-import { DESTINATIONS } from '../model/world/landmarks';
-import { getWorldPortals, isInsidePortal, portalAt, type WorldPortal } from '../model/world/portals';
-import { findRoute, nextRegionStep } from '../model/world/routing';
-import { REGION, isIndoors, type Point, type Region } from '../model/world/world';
-import { WORLDS } from '../model/world/worlds';
-import { SCENERY_STYLE } from './breeze';
-import { isAirborne } from './motion';
-import { lampUniforms } from './nightLights';
-import { nearbyRegions } from './regionPlates';
-import type { SceneContext } from './sceneContext';
-import { START_REGION } from './walkState';
 
 const SEA_REGION: Region = REGION.coast;
 const CHALK_REGION: Region = REGION.classroom;

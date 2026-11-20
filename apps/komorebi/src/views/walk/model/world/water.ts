@@ -1,4 +1,4 @@
-import type { Region } from './world';
+import type { Region } from '@views/walk/model/world/world';
 
 export const WATER_KIND = { stream: 'stream', river: 'river', sea: 'sea', paddy: 'paddy' } as const;
 type WaterKind = (typeof WATER_KIND)[keyof typeof WATER_KIND];

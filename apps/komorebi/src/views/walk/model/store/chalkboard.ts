@@ -1,5 +1,5 @@
-import { parseChalkboard, serializeChalkboard, type ChalkStroke } from '../../lib/chalkboard';
-import { createPersistentStore } from './persistentStore';
+import { parseChalkboard, serializeChalkboard, type ChalkStroke } from '@views/walk/lib/chalkboard';
+import { createPersistentStore } from '@views/walk/model/store/persistentStore';
 
 export const CHALKBOARD_KEY = 'komorebi-chalkboard-v1';
 const BLANK: readonly ChalkStroke[] = [];

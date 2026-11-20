@@ -5,7 +5,7 @@ import {
   parseCompanions,
   type CompanionAction,
   type Companions,
-} from '../../lib/companions';
+} from '@views/walk/lib/companions';
 
 let current: Companions | undefined;
 const listeners = new Set<() => void>();

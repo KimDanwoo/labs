@@ -1,6 +1,6 @@
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT } from '../model/world/landmarks';
-import { InteractPrompt } from './InteractPrompt';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { FISHING_PIER, HOME_AQUARIUM, PIER_CAT } from '@views/walk/model/world/landmarks';
+import { InteractPrompt } from '@views/walk/ui/InteractPrompt';
 
 export function SpotPrompts() {
   const { spots, interact: onInteract } = useWalkContext();

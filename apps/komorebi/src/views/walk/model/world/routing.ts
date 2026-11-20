@@ -1,6 +1,6 @@
-import { canWalk, clearSegment } from './movement';
-import { type Point, type Region, type RouteNode } from './world';
-import { WORLDS } from './worlds';
+import { canWalk, clearSegment } from '@views/walk/model/world/movement';
+import { type Point, type Region, type RouteNode } from '@views/walk/model/world/world';
+import { WORLDS } from '@views/walk/model/world/worlds';
 
 export function nextRegionStep(from: Region, to: Region): Region | null {
   if (from === to) return null;

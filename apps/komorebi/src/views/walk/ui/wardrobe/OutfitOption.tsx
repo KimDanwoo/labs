@@ -1,5 +1,5 @@
-import type { Appearance, OUTFIT_DEFINITIONS } from '../../model/world/appearance';
-import { CharacterPreview } from '../CharacterPreview';
+import type { Appearance, OUTFIT_DEFINITIONS } from '@views/walk/model/world/appearance';
+import { CharacterPreview } from '@views/walk/ui/CharacterPreview';
 
 interface OutfitOptionProps {
   outfit: (typeof OUTFIT_DEFINITIONS)[keyof typeof OUTFIT_DEFINITIONS];

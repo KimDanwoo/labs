@@ -1,10 +1,10 @@
+import { canWalk, movePlayer } from '@views/walk/model/world/movement';
+import { getWorldPortals, isInsidePortal, portalAt } from '@views/walk/model/world/portals';
+import { findRoute } from '@views/walk/model/world/routing';
+import type { Region } from '@views/walk/model/world/world';
+import { WORLDS } from '@views/walk/model/world/worlds';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canWalk, movePlayer } from '../movement';
-import { getWorldPortals, isInsidePortal, portalAt } from '../portals';
-import { findRoute } from '../routing';
-import type { Region } from '../world';
-import { WORLDS } from '../worlds';
 
 const regions = Object.keys(WORLDS) as Region[];
 

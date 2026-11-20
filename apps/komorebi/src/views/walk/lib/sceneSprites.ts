@@ -1,13 +1,13 @@
+import { canvasTexture } from '@views/walk/lib/art';
+import { BACKGROUND_FRAGMENT, BACKGROUND_VERTEX } from '@views/walk/lib/backgroundShader';
+import { SCENERY_STYLE } from '@views/walk/lib/breeze';
+import { lampUniforms } from '@views/walk/lib/nightLights';
+import { paintingToScene, sceneToUv, sceneX, sceneY } from '@views/walk/lib/perspective';
+import { createWaterMaps } from '@views/walk/lib/water';
+import { FOREGROUNDS } from '@views/walk/model/world/foreground';
+import { DESTINATIONS } from '@views/walk/model/world/landmarks';
+import { REGION, type Region } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { FOREGROUNDS } from '../model/world/foreground';
-import { DESTINATIONS } from '../model/world/landmarks';
-import { REGION, type Region } from '../model/world/world';
-import { canvasTexture } from './art';
-import { BACKGROUND_FRAGMENT, BACKGROUND_VERTEX } from './backgroundShader';
-import { SCENERY_STYLE } from './breeze';
-import { lampUniforms } from './nightLights';
-import { paintingToScene, sceneToUv, sceneX, sceneY } from './perspective';
-import { createWaterMaps } from './water';
 
 const SHADOW_ORDER = 3;
 const MARKER_ORDER = 2;

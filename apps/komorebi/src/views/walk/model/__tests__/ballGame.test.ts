@@ -1,5 +1,3 @@
-import assert from 'node:assert/strict';
-import test from 'node:test';
 import {
   advanceBallGame,
   BALL_PHASE,
@@ -8,7 +6,9 @@ import {
   createBallGame,
   returnBall,
   type BallGame,
-} from '../ballGame';
+} from '@views/walk/model/ballGame';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 
 function advance(game: BallGame, seconds: number): BallGame {
   for (let elapsed = 0; elapsed < seconds; elapsed += 0.01) game = advanceBallGame(game, 0.01);

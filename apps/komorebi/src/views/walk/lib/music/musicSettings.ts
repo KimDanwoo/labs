@@ -1,4 +1,4 @@
-import { MS_PER_SECOND } from '../../config/time';
+import { MS_PER_SECOND } from '@views/walk/config/time';
 
 export const DANWOO_PROFILE = 'https://soundcloud.com/danwooking';
 export const MUSIC_STORAGE_KEY = 'komorebi-music-v1';

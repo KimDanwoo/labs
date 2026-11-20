@@ -1,5 +1,5 @@
-import type { createChalkLayer } from './chalkLayer';
-import type { SceneContext, WalkEngine } from './sceneContext';
+import type { createChalkLayer } from '@views/walk/lib/chalkLayer';
+import type { SceneContext, WalkEngine } from '@views/walk/lib/sceneContext';
 
 export interface SceneResources {
   observer: ResizeObserver;

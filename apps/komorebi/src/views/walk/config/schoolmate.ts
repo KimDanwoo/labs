@@ -1,4 +1,4 @@
-import { SCHOOL_REGION, type SchoolRegion } from '../model/schoolmateRoster';
+import { SCHOOL_REGION, type SchoolRegion } from '@views/walk/model/schoolmateRoster';
 
 export const SCHOOLMATE_GREETING = {
   [SCHOOL_REGION.yard]: '방학이라 운동장이 우리 둘 거네. 같이 공 던질래?',

@@ -1,15 +1,22 @@
+import {
+  DIALOG,
+  FIRST_LOOK_LABEL,
+  FRIEND_ACTIVITY,
+  TIME_ORDER,
+  type Dialog,
+  type TimeOfDay,
+} from '@views/walk/config/walk';
+import { COMPANION_PANEL, type CompanionPanelKind } from '@views/walk/lib/companions';
+import { diaryMemory, liveMemory } from '@views/walk/lib/memory';
+import type { SceneStatus, WalkEngine } from '@views/walk/lib/scene';
+import { SCHOOLMATES } from '@views/walk/model/schoolmateRoster';
+import { pageStores } from '@views/walk/model/store/discoveries';
+import type { FriendActivity } from '@views/walk/model/types/friendActivity';
+import type { Memory } from '@views/walk/model/types/memory';
+import { isNearSpot } from '@views/walk/model/world/interactions';
+import { LANDMARKS, type Landmark } from '@views/walk/model/world/landmarks';
+import type { PlaceAction } from '@views/walk/model/world/world';
 import type { RefObject } from 'react';
-import { DIALOG, FIRST_LOOK_LABEL, FRIEND_ACTIVITY, TIME_ORDER, type Dialog, type TimeOfDay } from '../../config/walk';
-import { COMPANION_PANEL, type CompanionPanelKind } from '../../lib/companions';
-import { diaryMemory, liveMemory } from '../../lib/memory';
-import type { SceneStatus, WalkEngine } from '../../lib/scene';
-import { SCHOOLMATES } from '../schoolmateRoster';
-import { pageStores } from '../store/discoveries';
-import type { FriendActivity } from '../types/friendActivity';
-import type { Memory } from '../types/memory';
-import { isNearSpot } from '../world/interactions';
-import { LANDMARKS, type Landmark } from '../world/landmarks';
-import type { PlaceAction } from '../world/world';
 
 interface WalkInteractionOptions {
   engineRef: RefObject<WalkEngine | null>;

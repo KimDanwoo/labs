@@ -1,11 +1,11 @@
 import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
 
-import { BITE_WAIT_MS, FISHING_FAILURE, PERFECT_HOOK_WINDOW_MS, VIBRATION } from '../../config/fishing';
-import { MS_PER_SECOND } from '../../config/time';
-import type { createAmbience } from '../../lib/audio';
-import { CATCH_CELEBRATION_SECONDS } from '../../lib/catchCelebration';
-import { COMPANION_ACTION } from '../../lib/companions';
-import { FIGHT_OUTCOME, type Fight } from '../../lib/fishFight';
+import { BITE_WAIT_MS, FISHING_FAILURE, PERFECT_HOOK_WINDOW_MS, VIBRATION } from '@views/walk/config/fishing';
+import { MS_PER_SECOND } from '@views/walk/config/time';
+import type { createAmbience } from '@views/walk/lib/audio';
+import { CATCH_CELEBRATION_SECONDS } from '@views/walk/lib/catchCelebration';
+import { COMPANION_ACTION } from '@views/walk/lib/companions';
+import { FIGHT_OUTCOME, type Fight } from '@views/walk/lib/fishFight';
 import {
   BITE_WINDOW_MS,
   CAST_SECONDS,
@@ -19,9 +19,9 @@ import {
   type FishCollection,
   type FishingFrame,
   type FishingPhase,
-} from '../../lib/fishing';
-import { isRareFish } from '../../lib/fishTable';
-import { companionStore } from '../store/companions';
+} from '@views/walk/lib/fishing';
+import { isRareFish } from '@views/walk/lib/fishTable';
+import { companionStore } from '@views/walk/model/store/companions';
 
 interface FishingSessionInput {
   onClose: () => void;

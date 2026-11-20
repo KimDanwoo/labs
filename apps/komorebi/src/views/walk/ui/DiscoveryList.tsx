@@ -1,7 +1,7 @@
-import { DIALOG, TIME_ORDER } from '../config/walk';
-import { keptLabel } from '../lib/discovery';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { LANDMARKS } from '../model/world/landmarks';
+import { DIALOG, TIME_ORDER } from '@views/walk/config/walk';
+import { keptLabel } from '@views/walk/lib/discovery';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { LANDMARKS } from '@views/walk/model/world/landmarks';
 
 export function DiscoveryList() {
   const { dialog, collection, isReady, guideTo: onGuide, readMemory: onRead } = useWalkContext();

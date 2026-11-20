@@ -1,8 +1,8 @@
-import { mapX, mapY } from '../lib/mapProjection';
-import { DESTINATIONS } from '../model/world/landmarks';
-import { getWorldPortals } from '../model/world/portals';
-import { type Point, type Region } from '../model/world/world';
-import { WORLDS } from '../model/world/worlds';
+import { mapX, mapY } from '@views/walk/lib/mapProjection';
+import { DESTINATIONS } from '@views/walk/model/world/landmarks';
+import { getWorldPortals } from '@views/walk/model/world/portals';
+import { type Point, type Region } from '@views/walk/model/world/world';
+import { WORLDS } from '@views/walk/model/world/worlds';
 
 interface WalkMapProps {
   region: Region;

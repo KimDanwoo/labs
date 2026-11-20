@@ -1,8 +1,8 @@
-import { characterLayers } from '../model/world/appearance';
-import { REGION } from '../model/world/world';
-import { CANVAS_FONT_FAMILY } from './art';
-import { preparePaintingTexture } from './regionPlates';
-import type { SceneContext, WalkEngine } from './sceneContext';
+import { CANVAS_FONT_FAMILY } from '@views/walk/lib/art';
+import { preparePaintingTexture } from '@views/walk/lib/regionPlates';
+import type { SceneContext, WalkEngine } from '@views/walk/lib/sceneContext';
+import { characterLayers } from '@views/walk/model/world/appearance';
+import { REGION } from '@views/walk/model/world/world';
 
 export function createLookControls({
   container,

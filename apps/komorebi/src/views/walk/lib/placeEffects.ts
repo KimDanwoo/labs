@@ -1,7 +1,7 @@
+import { canvasTexture } from '@views/walk/lib/art';
+import { sceneX, sceneY } from '@views/walk/lib/perspective';
+import { PLACE_ACTION, type PlaceAction, type Point } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { PLACE_ACTION, type PlaceAction, type Point } from '../model/world/world';
-import { canvasTexture } from './art';
-import { sceneX, sceneY } from './perspective';
 
 const RING_POOL = 6;
 const MOTE_POOL = 24;

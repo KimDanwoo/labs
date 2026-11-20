@@ -1,8 +1,8 @@
+import { catchCelebration, catchHeart } from '@views/walk/lib/catchCelebration';
+import { CAST_SECONDS, FISHING_PHASE, type FishingFrame } from '@views/walk/lib/fishing';
+import { FISH, FISH_RARITY, FISH_SHAPE, isRareFish } from '@views/walk/lib/fishTable';
+import type { PierFishingParts } from '@views/walk/lib/pierFishingParts';
 import * as THREE from 'three';
-import { catchCelebration, catchHeart } from './catchCelebration';
-import { CAST_SECONDS, FISHING_PHASE, type FishingFrame } from './fishing';
-import { FISH, FISH_RARITY, FISH_SHAPE, isRareFish } from './fishTable';
-import type { PierFishingParts } from './pierFishingParts';
 
 type Celebration = ReturnType<typeof catchCelebration>;
 type Species = (typeof FISH)[number];

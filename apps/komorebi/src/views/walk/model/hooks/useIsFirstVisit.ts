@@ -1,5 +1,5 @@
+import { wasControlsHintSeen } from '@views/walk/model/store/controlsHint';
 import { useSyncExternalStore } from 'react';
-import { wasControlsHintSeen } from '../store/controlsHint';
 
 const subscribeNever = () => () => {};
 

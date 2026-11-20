@@ -1,10 +1,10 @@
+import { canvasTexture } from '@views/walk/lib/art';
+import { laundryTexture, sparrowTexture } from '@views/walk/lib/countrysideTextures';
+import { lightSprite } from '@views/walk/lib/nightLights';
+import { characterScale, sceneX, sceneY } from '@views/walk/lib/perspective';
+import { BIRD_STATE, startSparrow, stepSparrow } from '@views/walk/lib/sparrows';
+import { type Point, type Region, REGION } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { type Point, type Region, REGION } from '../model/world/world';
-import { canvasTexture } from './art';
-import { laundryTexture, sparrowTexture } from './countrysideTextures';
-import { lightSprite } from './nightLights';
-import { characterScale, sceneX, sceneY } from './perspective';
-import { BIRD_STATE, startSparrow, stepSparrow } from './sparrows';
 
 type Time = { value: number };
 type Bird = ReturnType<typeof createBirds>[number];

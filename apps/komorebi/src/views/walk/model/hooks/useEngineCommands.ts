@@ -1,7 +1,7 @@
+import type { WalkEngine } from '@views/walk/lib/scene';
+import { appearanceStore } from '@views/walk/model/store/appearance';
+import type { Appearance } from '@views/walk/model/world/appearance';
 import type { RefObject } from 'react';
-import type { WalkEngine } from '../../lib/scene';
-import { appearanceStore } from '../store/appearance';
-import type { Appearance } from '../world/appearance';
 
 interface EngineCommandOptions {
   engineRef: RefObject<WalkEngine | null>;

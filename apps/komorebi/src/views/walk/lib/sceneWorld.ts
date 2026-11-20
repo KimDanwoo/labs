@@ -1,14 +1,14 @@
+import { TIME, WEATHER, type TimeOfDay } from '@views/walk/config/walk';
+import { lampGlowAt } from '@views/walk/lib/nightLights';
+import { sceneX, sceneY } from '@views/walk/lib/perspective';
+import { settle } from '@views/walk/lib/renderBudget';
+import type { SceneContext } from '@views/walk/lib/sceneContext';
+import { CHILD_ORDER } from '@views/walk/lib/sceneSetup';
+import type { WalkState } from '@views/walk/lib/walkState';
+import { foregroundOrder } from '@views/walk/model/world/foregroundOrder';
+import { DESTINATIONS } from '@views/walk/model/world/landmarks';
+import { isIndoors } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { TIME, WEATHER, type TimeOfDay } from '../config/walk';
-import { foregroundOrder } from '../model/world/foregroundOrder';
-import { DESTINATIONS } from '../model/world/landmarks';
-import { isIndoors } from '../model/world/world';
-import { lampGlowAt } from './nightLights';
-import { sceneX, sceneY } from './perspective';
-import { settle } from './renderBudget';
-import type { SceneContext } from './sceneContext';
-import { CHILD_ORDER } from './sceneSetup';
-import type { WalkState } from './walkState';
 
 const WARMTH_EPSILON = 0.002;
 const WARMTH_BY_TIME = { day: 0, evening: 1, night: 0.35 } satisfies Record<TimeOfDay, number>;

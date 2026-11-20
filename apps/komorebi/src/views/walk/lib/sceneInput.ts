@@ -1,9 +1,9 @@
-import { findRoute } from '../model/world/routing';
-import { gameKey, hasShortcutModifier, isControlTarget } from './input';
-import { startJump } from './motion';
-import { createPointerPick } from './pointerPick';
-import type { SceneContext } from './sceneContext';
-import type { SceneTravel } from './sceneTravel';
+import { gameKey, hasShortcutModifier, isControlTarget } from '@views/walk/lib/input';
+import { startJump } from '@views/walk/lib/motion';
+import { createPointerPick } from '@views/walk/lib/pointerPick';
+import type { SceneContext } from '@views/walk/lib/sceneContext';
+import type { SceneTravel } from '@views/walk/lib/sceneTravel';
+import { findRoute } from '@views/walk/model/world/routing';
 
 export const MOVE_KEYS = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
 

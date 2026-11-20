@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useRef, type PointerEvent } from 'react';
 
-import { JOYSTICK_DIRECTIONS, JOYSTICK_REACH_RATIO } from '../../config/joystick';
-import { padDirection } from '../../lib/input';
+import { JOYSTICK_DIRECTIONS, JOYSTICK_REACH_RATIO } from '@views/walk/config/joystick';
+import { padDirection } from '@views/walk/lib/input';
 
 interface JoystickInput {
   onInput: (key: string, pressed: boolean) => void;

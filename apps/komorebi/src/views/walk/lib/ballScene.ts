@@ -1,9 +1,9 @@
+import { canvasTexture } from '@views/walk/lib/art';
+import { characterScale, CHILD_SIZE, sceneX, sceneY } from '@views/walk/lib/perspective';
+import { BALL_PHASE, type BallGame } from '@views/walk/model/ballGame';
+import { ballFlight } from '@views/walk/model/ballMotion';
+import type { Point } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { BALL_PHASE, type BallGame } from '../model/ballGame';
-import { ballFlight } from '../model/ballMotion';
-import type { Point } from '../model/world/world';
-import { canvasTexture } from './art';
-import { characterScale, CHILD_SIZE, sceneX, sceneY } from './perspective';
 
 type BallScene = {
   update: (frame: { game: BallGame | null; player: Point; friend: Point | null; isStill: boolean }) => void;

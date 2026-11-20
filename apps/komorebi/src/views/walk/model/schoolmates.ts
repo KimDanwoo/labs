@@ -1,7 +1,12 @@
-import { SCHOOL_REGION, type SchoolmateId, type SchoolmateSpec, type SchoolRegion } from './schoolmateRoster';
-import { canWalk } from './world/movement';
-import { findRoute } from './world/routing';
-import { type Point, type Region } from './world/world';
+import {
+  SCHOOL_REGION,
+  type SchoolmateId,
+  type SchoolmateSpec,
+  type SchoolRegion,
+} from '@views/walk/model/schoolmateRoster';
+import { canWalk } from '@views/walk/model/world/movement';
+import { findRoute } from '@views/walk/model/world/routing';
+import { type Point, type Region } from '@views/walk/model/world/world';
 
 export type Schoolmate = {
   position: Point;

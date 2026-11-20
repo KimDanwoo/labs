@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 
-import { AQUARIUM_MOTION } from '../../config/aquarium';
-import { MS_PER_SECOND } from '../../config/time';
-import { aquariumPose } from '../../lib/aquarium';
-import type { KeptFish } from '../../lib/companions';
+import { AQUARIUM_MOTION } from '@views/walk/config/aquarium';
+import { MS_PER_SECOND } from '@views/walk/config/time';
+import { aquariumPose } from '@views/walk/lib/aquarium';
+import type { KeptFish } from '@views/walk/lib/companions';
 
 export function useAquariumSwim(fish: KeptFish[], isFeeding: boolean) {
   const rootRef = useRef<HTMLDivElement>(null);

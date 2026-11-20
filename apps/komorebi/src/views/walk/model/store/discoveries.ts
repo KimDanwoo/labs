@@ -5,9 +5,9 @@ import {
   NIGHT_PAGE_STORAGE_KEY,
   TIME,
   type TimeOfDay,
-} from '../../config/walk';
-import { LANDMARKS } from '../world/landmarks';
-import { createPersistentStore, type PersistentStore } from './persistentStore';
+} from '@views/walk/config/walk';
+import { createPersistentStore, type PersistentStore } from '@views/walk/model/store/persistentStore';
+import { LANDMARKS } from '@views/walk/model/world/landmarks';
 
 const NO_PAGES: readonly string[] = [];
 

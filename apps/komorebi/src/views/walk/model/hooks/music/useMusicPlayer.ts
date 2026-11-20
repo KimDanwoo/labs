@@ -1,5 +1,4 @@
-import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
-import { MS_PER_SECOND } from '../../../config/time';
+import { MS_PER_SECOND } from '@views/walk/config/time';
 import {
   DEFAULT_MUSIC,
   MUSIC_STATUS,
@@ -8,8 +7,9 @@ import {
   type MusicPreferences,
   type MusicStatus,
   type MusicTrack,
-} from '../../../lib/music/musicSettings';
-import { bindMusicWidget, loadMusicApi, type MusicWidget } from '../../../lib/music/soundcloud';
+} from '@views/walk/lib/music/musicSettings';
+import { bindMusicWidget, loadMusicApi, type MusicWidget } from '@views/walk/lib/music/soundcloud';
+import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
 
 const MUSIC_LOAD_TIMEOUT_MS = 25000;
 

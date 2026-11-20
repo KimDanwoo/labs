@@ -1,6 +1,6 @@
-import { MS_PER_SECOND } from '../../config/time';
-import { musicTime } from '../../lib/music/musicSettings';
-import { useMusicPanelContext } from '../../model/hooks/music/useMusicPanelContext';
+import { MS_PER_SECOND } from '@views/walk/config/time';
+import { musicTime } from '@views/walk/lib/music/musicSettings';
+import { useMusicPanelContext } from '@views/walk/model/hooks/music/useMusicPanelContext';
 
 export function MusicSeek() {
   const { player, isReady, duration, position } = useMusicPanelContext();

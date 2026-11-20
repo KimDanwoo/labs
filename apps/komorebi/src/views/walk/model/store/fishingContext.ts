@@ -1,8 +1,8 @@
 'use client';
 
+import type { CompanionReaction } from '@views/walk/lib/companions';
+import type { FishingSession } from '@views/walk/model/hooks/useFishingSession';
 import { createContext } from 'react';
-import type { CompanionReaction } from '../../lib/companions';
-import type { FishingSession } from '../hooks/useFishingSession';
 
 export interface FishingModel extends FishingSession {
   onReact: (reaction: CompanionReaction) => void;

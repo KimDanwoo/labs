@@ -1,5 +1,5 @@
+import { useMusicPanelContext } from '@views/walk/model/hooks/music/useMusicPanelContext';
 import type { ReactNode } from 'react';
-import { useMusicPanelContext } from '../../model/hooks/music/useMusicPanelContext';
 
 interface MusicPanelBodyProps {
   children: ReactNode;

@@ -1,9 +1,9 @@
+import { canvasTexture } from '@views/walk/lib/art';
+import { boatTexture } from '@views/walk/lib/boatTexture';
+import { lightSprite } from '@views/walk/lib/nightLights';
+import { sceneX, sceneY } from '@views/walk/lib/perspective';
+import { type Region, REGION } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { type Region, REGION } from '../model/world/world';
-import { canvasTexture } from './art';
-import { boatTexture } from './boatTexture';
-import { lightSprite } from './nightLights';
-import { sceneX, sceneY } from './perspective';
 
 const ROUTES = [
   { from: 72, to: 105, z: 29, width: 5.5, duration: 105, phase: 0.32, ferry: false },

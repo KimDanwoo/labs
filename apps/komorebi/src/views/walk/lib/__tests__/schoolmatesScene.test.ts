@@ -1,8 +1,8 @@
+import { createSchoolmates } from '@views/walk/lib/schoolmatesScene';
 import { SCHOOL_REGION, SCHOOLMATES } from '@views/walk/model/schoolmateRoster';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { createSchoolmates } from '../schoolmatesScene';
 
 const paint = { createRadialGradient: () => ({ addColorStop() {} }), fillRect() {} };
 Object.assign(globalThis, { document: { createElement: () => ({ getContext: () => paint }) } });

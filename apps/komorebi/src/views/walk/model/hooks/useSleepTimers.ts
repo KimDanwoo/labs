@@ -1,5 +1,5 @@
+import { SLEEP_TIMING } from '@views/walk/lib/bedRest';
 import { useEffect, useEffectEvent } from 'react';
-import { SLEEP_TIMING } from '../../lib/bedRest';
 
 export function useSleepTimers(onWake: () => void, onDone: () => void) {
   const wake = useEffectEvent(onWake);

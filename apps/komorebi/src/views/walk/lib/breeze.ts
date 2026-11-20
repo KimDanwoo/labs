@@ -1,4 +1,4 @@
-import type { Region } from '../model/world/world';
+import type { Region } from '@views/walk/model/world/world';
 
 export const SCENERY_STYLE = {
   home: 0,

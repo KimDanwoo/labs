@@ -1,10 +1,10 @@
-import { WEATHER } from '../config/walk';
-import { BALL_PHASE, type BallGame } from '../model/ballGame';
-import { schoolmateGreetingPosition, schoolmatePlayPosition } from '../model/schoolmates';
-import { isNearSpot } from '../model/world/interactions';
-import { findRoute } from '../model/world/routing';
-import { REGION } from '../model/world/world';
-import { type SceneContext, type WalkEngine } from './sceneContext';
+import { WEATHER } from '@views/walk/config/walk';
+import { type SceneContext, type WalkEngine } from '@views/walk/lib/sceneContext';
+import { BALL_PHASE, type BallGame } from '@views/walk/model/ballGame';
+import { schoolmateGreetingPosition, schoolmatePlayPosition } from '@views/walk/model/schoolmates';
+import { isNearSpot } from '@views/walk/model/world/interactions';
+import { findRoute } from '@views/walk/model/world/routing';
+import { REGION } from '@views/walk/model/world/world';
 
 export function createActivityControls({
   container,

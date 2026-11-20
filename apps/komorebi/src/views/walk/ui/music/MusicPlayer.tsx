@@ -1,14 +1,14 @@
+import { useMusicPanel } from '@views/walk/model/hooks/music/useMusicPanel';
+import { MusicPanelContext } from '@views/walk/model/store/musicPanelContext';
+import { MusicCredit } from '@views/walk/ui/music/MusicCredit';
+import { MusicEngine } from '@views/walk/ui/music/MusicEngine';
+import { MusicError } from '@views/walk/ui/music/MusicError';
+import { MusicNow } from '@views/walk/ui/music/MusicNow';
+import { MusicPanelBody } from '@views/walk/ui/music/MusicPanelBody';
+import { MusicSeek } from '@views/walk/ui/music/MusicSeek';
+import { MusicToggle } from '@views/walk/ui/music/MusicToggle';
+import { MusicTrackList } from '@views/walk/ui/music/MusicTrackList';
 import type { JSX, KeyboardEvent } from 'react';
-import { useMusicPanel } from '../../model/hooks/music/useMusicPanel';
-import { MusicPanelContext } from '../../model/store/musicPanelContext';
-import { MusicCredit } from './MusicCredit';
-import { MusicEngine } from './MusicEngine';
-import { MusicError } from './MusicError';
-import { MusicNow } from './MusicNow';
-import { MusicPanelBody } from './MusicPanelBody';
-import { MusicSeek } from './MusicSeek';
-import { MusicToggle } from './MusicToggle';
-import { MusicTrackList } from './MusicTrackList';
 
 interface MusicPlayerProps {
   source: string;

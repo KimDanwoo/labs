@@ -1,4 +1,4 @@
-import { HOME, PLACE_ACTION, REGION, type Region } from './world';
+import { HOME, PLACE_ACTION, REGION, type Region } from '@views/walk/model/world/world';
 
 export const LANDMARKS = [
   {

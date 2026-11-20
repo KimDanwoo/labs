@@ -1,8 +1,8 @@
 'use client';
 
+import type { WalkModel } from '@views/walk/model/hooks/useWalk';
+import { WalkContext } from '@views/walk/model/store/walkContext';
 import { useContext } from 'react';
-import { WalkContext } from '../store/walkContext';
-import type { WalkModel } from './useWalk';
 
 export function useWalkContext(): WalkModel {
   const walk = useContext(WalkContext);

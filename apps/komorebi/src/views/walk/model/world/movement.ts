@@ -1,5 +1,5 @@
-import { hasGroundBetween, isOnGround } from './ground';
-import { REGION, type Point, type Region } from './world';
+import { hasGroundBetween, isOnGround } from '@views/walk/model/world/ground';
+import { REGION, type Point, type Region } from '@views/walk/model/world/world';
 
 /** Ground outlines define movement; guide routes never restrict where the player can stand. */
 

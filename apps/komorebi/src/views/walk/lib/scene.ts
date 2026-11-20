@@ -1,21 +1,21 @@
-import { companionStore } from '../model/store/companions';
-import { DEFAULT_APPEARANCE } from '../model/world/appearance';
-import { createChalkLayer } from './chalkLayer';
-import { nearbyRegions } from './regionPlates';
-import { renderPixelRatio } from './renderBudget';
-import type { SceneContext, SceneOptions, WalkEngine } from './sceneContext';
-import { createWalkControls } from './sceneControls';
-import { bindSceneInput } from './sceneInput';
-import { createSceneLoop } from './sceneLoop';
-import { createPlayerMotion } from './scenePlayer';
-import { createSceneParts } from './sceneSetup';
-import { createStatusReporter } from './sceneStatus';
-import { createSceneTravel } from './sceneTravel';
-import { createWorldMotion } from './sceneWorld';
-import { START_REGION, createWalkState } from './walkState';
+import { createChalkLayer } from '@views/walk/lib/chalkLayer';
+import { nearbyRegions } from '@views/walk/lib/regionPlates';
+import { renderPixelRatio } from '@views/walk/lib/renderBudget';
+import type { SceneContext, SceneOptions, WalkEngine } from '@views/walk/lib/sceneContext';
+import { createWalkControls } from '@views/walk/lib/sceneControls';
+import { bindSceneInput } from '@views/walk/lib/sceneInput';
+import { createSceneLoop } from '@views/walk/lib/sceneLoop';
+import { createPlayerMotion } from '@views/walk/lib/scenePlayer';
+import { createSceneParts } from '@views/walk/lib/sceneSetup';
+import { createStatusReporter } from '@views/walk/lib/sceneStatus';
+import { createSceneTravel } from '@views/walk/lib/sceneTravel';
+import { createWorldMotion } from '@views/walk/lib/sceneWorld';
+import { START_REGION, createWalkState } from '@views/walk/lib/walkState';
+import { companionStore } from '@views/walk/model/store/companions';
+import { DEFAULT_APPEARANCE } from '@views/walk/model/world/appearance';
 
-export type { SceneOptions, WalkEngine } from './sceneContext';
-export type { SceneStatus } from './sceneStatus';
+export type { SceneOptions, WalkEngine } from '@views/walk/lib/sceneContext';
+export type { SceneStatus } from '@views/walk/lib/sceneStatus';
 
 export async function createScene(container: HTMLElement, options: SceneOptions): Promise<WalkEngine> {
   const { appearance = DEFAULT_APPEARANCE } = options;

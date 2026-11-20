@@ -1,4 +1,4 @@
-import { useWalkContext } from '../model/hooks/useWalkContext';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
 
 export function WalkLandscape() {
   const { landscapeRef } = useWalkContext();

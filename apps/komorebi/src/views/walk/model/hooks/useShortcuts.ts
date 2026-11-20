@@ -1,5 +1,5 @@
+import { gameKey, hasShortcutModifier, isControlTarget } from '@views/walk/lib/input';
 import { useEffect, useEffectEvent } from 'react';
-import { gameKey, hasShortcutModifier, isControlTarget } from '../../lib/input';
 
 type Shortcuts = { isEnabled: boolean; onDiscover: () => void; onOpenMap: () => void };
 

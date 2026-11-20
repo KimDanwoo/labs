@@ -1,11 +1,11 @@
+import { worldFromScene } from '@views/walk/lib/perspective';
+import { createPortals } from '@views/walk/lib/portals';
+import { interactionDestination } from '@views/walk/model/world/interactions';
+import { DESTINATIONS } from '@views/walk/model/world/landmarks';
+import { canWalk } from '@views/walk/model/world/movement';
+import { type WorldPortal } from '@views/walk/model/world/portals';
+import { type Point, type Region } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { interactionDestination } from '../model/world/interactions';
-import { DESTINATIONS } from '../model/world/landmarks';
-import { canWalk } from '../model/world/movement';
-import { type WorldPortal } from '../model/world/portals';
-import { type Point, type Region } from '../model/world/world';
-import { worldFromScene } from './perspective';
-import { createPortals } from './portals';
 
 export type PickTarget = { point: Point; portal: WorldPortal | null; interactive: boolean };
 

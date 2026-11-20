@@ -1,10 +1,10 @@
+import { FRIEND_ACTIVITY } from '@views/walk/config/walk';
+import { COMPANION_PANEL, type CompanionPanelKind } from '@views/walk/lib/companions';
+import type { WalkEngine } from '@views/walk/lib/scene';
+import { SCHOOLMATES } from '@views/walk/model/schoolmateRoster';
+import type { FriendActivity } from '@views/walk/model/types/friendActivity';
 import { useState, type RefObject } from 'react';
 import { flushSync } from 'react-dom';
-import { FRIEND_ACTIVITY } from '../../config/walk';
-import { COMPANION_PANEL, type CompanionPanelKind } from '../../lib/companions';
-import type { WalkEngine } from '../../lib/scene';
-import { SCHOOLMATES } from '../schoolmateRoster';
-import type { FriendActivity } from '../types/friendActivity';
 
 export function useActivities(engineRef: RefObject<WalkEngine | null>, onFocusScene: () => void) {
   const [companionPanel, setCompanionPanel] = useState<CompanionPanelKind>(COMPANION_PANEL.none);

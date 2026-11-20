@@ -1,9 +1,9 @@
+import { FISHING_PIER, LANDMARKS } from '@views/walk/model/world/landmarks';
+import { canWalk, movePlayer } from '@views/walk/model/world/movement';
+import { findRoute } from '@views/walk/model/world/routing';
+import type { Point } from '@views/walk/model/world/world';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { FISHING_PIER, LANDMARKS } from '../landmarks';
-import { canWalk, movePlayer } from '../movement';
-import { findRoute } from '../routing';
-import type { Point } from '../world';
 
 test('the fishing pier can be reached from the harbour entrance and the sea viewpoint without crossing water', () => {
   assert.ok(canWalk(FISHING_PIER.x, FISHING_PIER.z, 'coast'));

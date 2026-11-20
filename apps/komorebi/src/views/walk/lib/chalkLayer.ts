@@ -1,7 +1,7 @@
+import { canvasTexture } from '@views/walk/lib/art';
+import { CHALK_LAYER, paintChalk } from '@views/walk/lib/chalkboard';
+import { chalkboardStore } from '@views/walk/model/store/chalkboard';
 import * as THREE from 'three';
-import { chalkboardStore } from '../model/store/chalkboard';
-import { canvasTexture } from './art';
-import { CHALK_LAYER, paintChalk } from './chalkboard';
 
 export function createChalkLayer(onChange: () => void) {
   const texture = canvasTexture(CHALK_LAYER.width, CHALK_LAYER.height, (ctx) => paintChalk(ctx, chalkboardStore.get()));

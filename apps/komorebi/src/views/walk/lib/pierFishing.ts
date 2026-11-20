@@ -1,7 +1,7 @@
+import type { FishingFrame } from '@views/walk/lib/fishing';
+import { createPierFishingParts } from '@views/walk/lib/pierFishingParts';
+import { poseFishing } from '@views/walk/lib/poseFishing';
 import type * as THREE from 'three';
-import type { FishingFrame } from './fishing';
-import { createPierFishingParts } from './pierFishingParts';
-import { poseFishing } from './poseFishing';
 
 export function createPierFishing(scene: THREE.Scene) {
   const parts = createPierFishingParts(scene);

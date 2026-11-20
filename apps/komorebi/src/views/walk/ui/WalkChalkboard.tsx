@@ -1,12 +1,12 @@
+import { CHALKS } from '@views/walk/config/chalkboard';
+import { DIALOG } from '@views/walk/config/walk';
+import { CHALK_LAYER, CHALK_TOOL } from '@views/walk/lib/chalkboard';
+import { CHALK_NOTICE, useChalkPad, type ChalkBrush, type ChalkNotice } from '@views/walk/model/hooks/useChalkPad';
+import { useModal } from '@views/walk/model/hooks/useModal';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
+import { chalkboardStore } from '@views/walk/model/store/chalkboard';
+import { DialogHeading } from '@views/walk/ui/DialogHeading';
 import { useId, useRef, useState, useSyncExternalStore } from 'react';
-import { CHALKS } from '../config/chalkboard';
-import { DIALOG } from '../config/walk';
-import { CHALK_LAYER, CHALK_TOOL } from '../lib/chalkboard';
-import { CHALK_NOTICE, useChalkPad, type ChalkBrush, type ChalkNotice } from '../model/hooks/useChalkPad';
-import { useModal } from '../model/hooks/useModal';
-import { useWalkContext } from '../model/hooks/useWalkContext';
-import { chalkboardStore } from '../model/store/chalkboard';
-import { DialogHeading } from './DialogHeading';
 
 export function WalkChalkboard() {
   const { dialog, closeDialog } = useWalkContext();

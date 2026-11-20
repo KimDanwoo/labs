@@ -1,4 +1,3 @@
-import { useState, useSyncExternalStore } from 'react';
 import {
   COMPANION_ACTION,
   COMPANION_REACTION,
@@ -7,8 +6,9 @@ import {
   TANK_CAPACITY,
   catBond,
   type CompanionReaction,
-} from '../lib/companions';
-import { companionStore } from '../model/store/companions';
+} from '@views/walk/lib/companions';
+import { companionStore } from '@views/walk/model/store/companions';
+import { useState, useSyncExternalStore } from 'react';
 
 interface CatchChoicesProps {
   uid: string | null;

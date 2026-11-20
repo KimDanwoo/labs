@@ -1,9 +1,9 @@
+import { MS_PER_SECOND } from '@views/walk/config/time';
+import { lightSprite } from '@views/walk/lib/nightLights';
+import { preparePaintingTexture } from '@views/walk/lib/regionPlates';
+import { sleepingPortrait, type CharacterTemplate } from '@views/walk/model/world/appearance';
+import type { Point } from '@views/walk/model/world/world';
 import * as THREE from 'three';
-import { MS_PER_SECOND } from '../config/time';
-import { sleepingPortrait, type CharacterTemplate } from '../model/world/appearance';
-import type { Point } from '../model/world/world';
-import { lightSprite } from './nightLights';
-import { preparePaintingTexture } from './regionPlates';
 
 export const SLEEP_TIMING = { wake: 2800, finish: 4500 } as const;
 const smooth = (value: number) => THREE.MathUtils.smoothstep(value, 0, 1);

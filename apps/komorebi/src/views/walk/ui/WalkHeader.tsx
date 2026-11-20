@@ -1,5 +1,5 @@
-import { TIME_LABEL } from '../config/walk';
-import { useWalkContext } from '../model/hooks/useWalkContext';
+import { TIME_LABEL } from '@views/walk/config/walk';
+import { useWalkContext } from '@views/walk/model/hooks/useWalkContext';
 
 export function WalkHeader() {
   const { timeOfDay, today } = useWalkContext();

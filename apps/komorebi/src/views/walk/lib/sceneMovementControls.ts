@@ -1,8 +1,8 @@
-import { SPAWN } from '../model/world/world';
-import { startJump } from './motion';
-import type { SceneContext, WalkEngine } from './sceneContext';
-import type { SceneTravel } from './sceneTravel';
-import { START_REGION } from './walkState';
+import { startJump } from '@views/walk/lib/motion';
+import type { SceneContext, WalkEngine } from '@views/walk/lib/sceneContext';
+import type { SceneTravel } from '@views/walk/lib/sceneTravel';
+import { START_REGION } from '@views/walk/lib/walkState';
+import { SPAWN } from '@views/walk/model/world/world';
 
 const ACTION_LOCK_MS = 2_200;
 
