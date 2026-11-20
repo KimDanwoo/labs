@@ -32,7 +32,7 @@ function digCells(solution: Grid, targetClues: number, cages?: KillerCage[], nod
   return puzzle;
 }
 
-function toBoard(puzzle: Grid): SudokuBoard {
+export function toBoard(puzzle: Grid): SudokuBoard {
   return puzzle.map((row) =>
     row.map((value) => ({
       value: value === EMPTY ? null : value,

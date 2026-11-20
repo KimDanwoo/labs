@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "puzzles:killer-expert": "tsx scripts/generate-killer-expert.mts && prettier --write src/views/home/lib/killerExpertPuzzles.ts"
   },
   "dependencies": {
     "@repo/fonts": "workspace:*",
@@ -39,7 +40,9 @@
     "@vitejs/plugin-react": "catalog:",
     "eslint": "catalog:",
     "jsdom": "catalog:",
+    "prettier": "catalog:",
     "tailwindcss": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
