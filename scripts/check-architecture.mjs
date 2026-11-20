@@ -17,8 +17,8 @@ const DEPLOYMENT_ENABLED = { '**': false, main: true };
 const BUILD_FILTER = /--filter=(\S+)/;
 const COMPONENT_WRAPPER = /^(?:memo|forwardRef|dynamic|lazy|Object\.assign)$/;
 const NEXT_CONFIG_NAMES = ['next.config.ts', 'next.config.mjs', 'next.config.js'];
-const AGENT_RULES_OFF = /\bagentRules:\s*false\b/;
-const MANAGED_AGENT_RULES = '<!-- BEGIN:nextjs-agent-rules -->';
+const AGENT_RULES_OFF = /(?:^|[{,])\s*['"]?agentRules['"]?\s*:\s*false\b/m;
+const MANAGED_AGENT_RULES = /<!-- (?:BEGIN|END):nextjs-agent-rules -->/;
 const STYLE_HOME =
   /^src\/app\/(?:globals\.css|styles\/[^/]+\.css)$|^src\/(?:views|features|entities)\/[^/]+\/styles\/[^/]+\.css$|^src\/(?:.*\/)?ui\/(?:.*\/)?[A-Z][A-Za-z0-9]*\.module\.css$/;
 
@@ -71,7 +71,7 @@ export function validateAgentRules(nextConfig, agentsMd) {
     problems.push(
       'next.config: agentRules: false를 둔다. 켜 두면 next dev가 Next 버전마다 AGENTS.md를 다시 써서 커밋 안 된 변경이 생긴다.',
     );
-  if (agentsMd.includes(MANAGED_AGENT_RULES))
+  if (MANAGED_AGENT_RULES.test(agentsMd))
     problems.push('AGENTS.md: Next 관리 블록(nextjs-agent-rules) 대신 일반 문단으로 둔다.');
   return problems;
 }

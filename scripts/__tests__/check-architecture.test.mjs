@@ -183,4 +183,7 @@ test('Next apps keep next dev from rewriting AGENTS.md: agentRules is off and no
     validateAgentRules('const config = { agentRules: false };', '<!-- BEGIN:nextjs-agent-rules -->\n').length,
     1,
   );
+  assert.deepEqual(validateAgentRules('const config = {\n  agentRules : false,\n};', plainAgents), []);
+  assert.equal(validateAgentRules('const config = {\n  // agentRules: false,\n};', plainAgents).length, 1);
+  assert.equal(validateAgentRules('const config = {};', '<!-- END:nextjs-agent-rules -->\n').length, 2);
 });
