@@ -6,15 +6,15 @@
 
 import { writeFile } from 'node:fs/promises';
 
-import { GAME_LEVEL, TECHNIQUE } from '../src/views/home/config/game';
-import { generateKillerBoard, generateSolution } from '../src/views/home/lib/generator';
-import { encodeKillerPuzzle } from '../src/views/home/lib/killerPuzzleCodec';
-import { gradePuzzle } from '../src/views/home/lib/solver';
-import type { Grid } from '../src/views/home/model/types/board';
-import type { EncodedKillerPuzzle, KillerPuzzle } from '../src/views/home/model/types/game';
+import { GAME_LEVEL, TECHNIQUE } from '../src/entities/sudoku/config/game';
+import { generateKillerBoard, generateSolution } from '../src/entities/sudoku/lib/generator';
+import { encodeKillerPuzzle } from '../src/entities/sudoku/lib/killerPuzzleCodec';
+import { gradePuzzle } from '../src/entities/sudoku/lib/solver';
+import type { Grid } from '../src/entities/sudoku/model/types/board';
+import type { EncodedKillerPuzzle, KillerPuzzle } from '../src/entities/sudoku/model/types/game';
 
 const PUZZLE_COUNT = 200;
-const OUT = new URL('../src/views/home/lib/killerExpertPuzzles.ts', import.meta.url);
+const OUT = new URL('../src/entities/sudoku/lib/killerExpertPuzzles.ts', import.meta.url);
 const EMPTY = 0;
 
 const isExpert = ({ puzzle, cages }: KillerPuzzle): boolean => {
