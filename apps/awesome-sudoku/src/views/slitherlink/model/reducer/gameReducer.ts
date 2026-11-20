@@ -1,5 +1,5 @@
 import { EDGE } from '@views/slitherlink/config/board';
-import { GAME_ACTION, GAME_PHASE, HINTS_PER_GAME, STROKE_FOLLOW_UP_ACTIONS } from '@views/slitherlink/config/game';
+import { GAME_ACTION, GAME_PHASE, HINTS_BY_LEVEL, STROKE_FOLLOW_UP_ACTIONS } from '@views/slitherlink/config/game';
 import { JUDGEMENT } from '@views/slitherlink/config/judgement';
 import { nextEdgeState } from '@views/slitherlink/lib/edgeCycle';
 import { pickHint } from '@views/slitherlink/lib/hint';
@@ -20,7 +20,7 @@ export const createInitialState = (level: SlitherlinkLevel): GameState => ({
   edges: [],
   past: [],
   future: [],
-  hintsRemaining: HINTS_PER_GAME,
+  hintsRemaining: HINTS_BY_LEVEL[level],
   judgement: JUDGEMENT.DRAWING,
   lastHintEdge: null,
   stroke: null,

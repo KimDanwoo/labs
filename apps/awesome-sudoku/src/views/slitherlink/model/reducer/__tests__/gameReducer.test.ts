@@ -1,6 +1,6 @@
 import { EDGE } from '@views/slitherlink/config/board';
 import { SLITHERLINK_LEVEL } from '@views/slitherlink/config/difficulty';
-import { GAME_ACTION, GAME_PHASE, HINTS_PER_GAME } from '@views/slitherlink/config/game';
+import { GAME_ACTION, GAME_PHASE, HINTS_BY_LEVEL } from '@views/slitherlink/config/game';
 import { JUDGEMENT } from '@views/slitherlink/config/judgement';
 import { createInitialState, gameReducer } from '@views/slitherlink/model/reducer/gameReducer';
 import type { GameAction, GameState } from '@views/slitherlink/model/types/game';
@@ -63,7 +63,13 @@ describe('게임 수명', () => {
     expect(state.phase).toBe(GAME_PHASE.PLAYING);
     expect(state.edges.every((edge) => edge === UNKNOWN)).toBe(true);
     expect(state.past).toHaveLength(0);
-    expect(state.hintsRemaining).toBe(HINTS_PER_GAME);
+    expect(state.hintsRemaining).toBe(HINTS_BY_LEVEL[SLITHERLINK_LEVEL.EASY]);
+  });
+
+  it.each(Object.values(SLITHERLINK_LEVEL))('%s 판을 받으면 그 난이도의 힌트 개수로 시작한다', (level) => {
+    const generating = run(playing(), { type: GAME_ACTION.GENERATE, level });
+    const loaded = run(generating, { type: GAME_ACTION.LOADED, requestId: generating.requestId, puzzle: PUZZLE });
+    expect(loaded.hintsRemaining).toBe(HINTS_BY_LEVEL[level]);
   });
 
   it('생성 중에는 판 입력을 받지 않는다', () => {
@@ -154,7 +160,7 @@ describe('힌트', () => {
     const state = run(playing(), tap(2), hint());
     expect(state.edges[2]).toBe(CROSS);
     expect(state.lastHintEdge).toBe(2);
-    expect(state.hintsRemaining).toBe(HINTS_PER_GAME - 1);
+    expect(state.hintsRemaining).toBe(HINTS_BY_LEVEL[SLITHERLINK_LEVEL.EASY] - 1);
   });
 
   it('틀린 변이 없으면 아직 안 그은 정답 선을 긋는다', () => {
@@ -166,7 +172,7 @@ describe('힌트', () => {
   it('되돌려도 쓴 힌트 수는 돌아오지 않는다', () => {
     const state = run(playing(), hint(), UNDO);
     expect(linesOf(state)).toEqual([]);
-    expect(state.hintsRemaining).toBe(HINTS_PER_GAME - 1);
+    expect(state.hintsRemaining).toBe(HINTS_BY_LEVEL[SLITHERLINK_LEVEL.EASY] - 1);
   });
 
   it('힌트를 다 쓰면 더 쓰지 못한다', () => {

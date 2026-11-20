@@ -1,7 +1,11 @@
 import { SLITHERLINK_LEVEL } from '@views/slitherlink/config/difficulty';
 import type { SlitherlinkLevel } from '@views/slitherlink/model/types/slitherlink';
 
-export const HINTS_PER_GAME = 10;
+export const HINTS_BY_LEVEL: Record<SlitherlinkLevel, number> = {
+  [SLITHERLINK_LEVEL.EASY]: 10,
+  [SLITHERLINK_LEVEL.MEDIUM]: 6,
+  [SLITHERLINK_LEVEL.HARD]: 3,
+};
 
 export const INITIAL_LEVEL: SlitherlinkLevel = SLITHERLINK_LEVEL.EASY;
 
