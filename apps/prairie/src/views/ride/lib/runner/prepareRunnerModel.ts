@@ -2,8 +2,15 @@ import { Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type Group, type Mate
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { UNICORN_TINT } from '../../model/runner/constants';
 
+interface RunnerMeshFinish {
+  mesh: Mesh;
+  detailed: Material | Material[];
+  simple: Material | Material[];
+}
+
 export interface PreparedRunner {
   model: Group;
+  meshes: RunnerMeshFinish[];
   materials: MeshStandardMaterial[];
 }
 
@@ -55,7 +62,27 @@ function polishedCopy(material: MeshStandardMaterial): MeshPhysicalMaterial {
   return copy;
 }
 
-function prepareMesh(object: Mesh, materials: MeshStandardMaterial[]): void {
+function simpleCopy(polished: MeshStandardMaterial): MeshStandardMaterial {
+  return new MeshStandardMaterial().copy(polished);
+}
+
+function finishCopies(
+  source: Material[],
+  materials: MeshStandardMaterial[],
+): { detailed: Material[]; simple: Material[] } {
+  const detailed = source.map((material) =>
+    material instanceof MeshStandardMaterial ? polishedCopy(material) : material,
+  );
+  const simple = detailed.map((material) =>
+    material instanceof MeshPhysicalMaterial ? simpleCopy(material) : material,
+  );
+  for (const material of [...detailed, ...simple]) {
+    if (material instanceof MeshStandardMaterial && !materials.includes(material)) materials.push(material);
+  }
+  return { detailed, simple };
+}
+
+function prepareMesh(object: Mesh, prepared: PreparedRunner): void {
   object.castShadow = true;
   object.receiveShadow = true;
   const source = Array.isArray(object.material) ? object.material : [object.material];
@@ -63,20 +90,24 @@ function prepareMesh(object: Mesh, materials: MeshStandardMaterial[]): void {
     object.visible = false;
     return;
   }
-  const copies = source.map((material: Material) => {
-    if (!(material instanceof MeshStandardMaterial)) return material;
-    const copy = polishedCopy(material);
-    materials.push(copy);
-    return copy;
-  });
-  object.material = Array.isArray(object.material) ? copies : copies[0]!;
+  const { detailed, simple } = finishCopies(source, prepared.materials);
+  const pick = (copies: Material[]) => (Array.isArray(object.material) ? copies : copies[0]!);
+  prepared.meshes.push({ mesh: object, detailed: pick(detailed), simple: pick(simple) });
+  object.material = pick(detailed);
 }
 
 export function prepareRunnerModel(scene: Group): PreparedRunner {
-  const model = clone(scene) as Group;
-  const materials: MeshStandardMaterial[] = [];
-  model.traverse((object) => {
-    if (object instanceof Mesh) prepareMesh(object, materials);
+  const prepared: PreparedRunner = { model: clone(scene) as Group, meshes: [], materials: [] };
+  prepared.model.traverse((object) => {
+    if (object instanceof Mesh) prepareMesh(object, prepared);
   });
-  return { model, materials };
+  return prepared;
+}
+
+/** 저사양에서는 광택·코팅·무지개빛을 뺀 재질로 바꾸고, 그림자 패스에서 유니콘을 뺀다(바닥 그림자는 GroundShadow가 그린다). */
+export function applyRunnerDetail({ meshes }: PreparedRunner, isLowDetail: boolean): void {
+  for (const { mesh, detailed, simple } of meshes) {
+    mesh.material = isLowDetail ? simple : detailed;
+    mesh.castShadow = !isLowDetail;
+  }
 }
