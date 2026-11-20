@@ -53,12 +53,13 @@ export const CLASSIC_DIFFICULTY: Record<Difficulty, ClassicDifficultySpec> = {
 /**
  * 킬러: 케이지 합 제약이 있어 힌트를 훨씬 적게 남기고, 케이지가 클수록 조합이 많아 어렵다.
  * 기법 범위는 주로 "추측이 필요한 판 거부"용이다 — 케이지 조합·45규칙으로 대부분 SINGLE/LOCKED에서 풀린다.
+ * expert(SUBSET 이상)는 무작위 생성의 ~1~4%만 해당해 실시간으로 만들 수 없다 → 미리 만든 묶음(killerExpertPuzzles)에서 꺼낸다.
  */
 export const KILLER_DIFFICULTY: Record<Difficulty, KillerDifficultySpec> = {
   [GAME_LEVEL.EASY]: { clues: 24, maxCageSize: 3, minTechnique: TECHNIQUE.SINGLE, maxTechnique: TECHNIQUE.SINGLE },
   [GAME_LEVEL.MEDIUM]: { clues: 14, maxCageSize: 4, minTechnique: TECHNIQUE.SINGLE, maxTechnique: TECHNIQUE.LOCKED },
   [GAME_LEVEL.HARD]: { clues: 6, maxCageSize: 4, minTechnique: TECHNIQUE.LOCKED, maxTechnique: TECHNIQUE.SUBSET },
-  [GAME_LEVEL.EXPERT]: { clues: 0, maxCageSize: 5, minTechnique: TECHNIQUE.LOCKED, maxTechnique: TECHNIQUE.ADVANCED },
+  [GAME_LEVEL.EXPERT]: { clues: 0, maxCageSize: 5, minTechnique: TECHNIQUE.SUBSET, maxTechnique: TECHNIQUE.ADVANCED },
 };
 
 export const MAX_MISTAKES = 5;

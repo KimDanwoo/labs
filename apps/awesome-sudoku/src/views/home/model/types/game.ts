@@ -1,5 +1,5 @@
 import { GAME_LEVEL, GAME_MODE, GAME_PHASE, TECHNIQUE } from '../../config/game';
-import type { GridPosition, SudokuBoard } from './board';
+import type { Grid, GridPosition, SudokuBoard } from './board';
 
 export type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE];
 export type GamePhase = (typeof GAME_PHASE)[keyof typeof GAME_PHASE];
@@ -8,6 +8,18 @@ export type Difficulty = (typeof GAME_LEVEL)[keyof typeof GAME_LEVEL];
 export interface NewGameRequest {
   mode: GameMode;
   difficulty: Difficulty;
+}
+
+export interface KillerPuzzle {
+  solution: Grid;
+  puzzle: Grid;
+  cages: KillerCage[];
+}
+
+export interface EncodedKillerPuzzle {
+  solution: string;
+  givens: string;
+  cages: string;
 }
 
 export type Technique = (typeof TECHNIQUE)[keyof typeof TECHNIQUE];

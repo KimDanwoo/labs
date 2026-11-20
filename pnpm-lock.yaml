@@ -291,9 +291,15 @@ importers:
       jsdom:
         specifier: 'catalog:'
         version: 31.0.1
+      prettier:
+        specifier: 'catalog:'
+        version: 3.8.5
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.0
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
