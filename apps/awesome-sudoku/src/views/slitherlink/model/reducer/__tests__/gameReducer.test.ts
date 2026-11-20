@@ -170,7 +170,7 @@ describe('힌트', () => {
   });
 
   it('힌트를 다 쓰면 더 쓰지 못한다', () => {
-    const spent = run(playing(), hint(), hint(), hint());
+    const spent = run({ ...playing(), hintsRemaining: 1 }, hint());
     expect(spent.hintsRemaining).toBe(0);
     expect(run(spent, hint())).toBe(spent);
   });
