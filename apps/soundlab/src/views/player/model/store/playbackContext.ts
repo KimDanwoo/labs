@@ -1,6 +1,6 @@
 'use client';
 
+import type { Playback } from '@views/player/model/hooks/usePlayback';
 import { createContext } from 'react';
-import type { Playback } from '../hooks/usePlayback';
 
 export const PlaybackContext = createContext<Playback | null>(null);

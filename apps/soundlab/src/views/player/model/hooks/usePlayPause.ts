@@ -1,11 +1,11 @@
 'use client';
 
+import type { ScWidget } from '@views/player/api/widget';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import type { GoTo } from '@views/player/model/hooks/useTrackSwitch';
+import { currentIndexAtom } from '@views/player/model/store/playback';
 import { useAtomValue } from 'jotai';
 import { useCallback } from 'react';
-import type { ScWidget } from '../../api/widget';
-import { currentIndexAtom } from '../store/playback';
-import type { PlaybackEngine } from './useEngineRefs';
-import type { GoTo } from './useTrackSwitch';
 
 export function usePlayPause({ tracks, refs, volume }: PlaybackEngine, goTo: GoTo) {
   const { heldIndexRef, shouldRewindRef, pauseAfterSwitchRef } = refs;

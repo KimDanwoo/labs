@@ -1,14 +1,14 @@
 import type { Track } from '@entities/track';
+import type { ScWidget } from '@views/player/api/widget';
+import { useKeyboard } from '@views/player/model/hooks/useKeyboard';
+import { usePlayback, type Playback } from '@views/player/model/hooks/usePlayback';
+import { currentIndexAtom, frameState, isPlayingAtom } from '@views/player/model/store/playback';
 import { JSDOM } from 'jsdom';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import test, { type TestContext } from 'node:test';
 import { act, createElement } from 'react';
 import { createRoot } from 'react-dom/client';
-import type { ScWidget } from '../../../api/widget';
-import { currentIndexAtom, frameState, isPlayingAtom } from '../../store/playback';
-import { useKeyboard } from '../useKeyboard';
-import { usePlayback, type Playback } from '../usePlayback';
 
 // TS 훅과 동일한 Jotai 엔트리를 사용한다. ESM/CJS 각각의 Provider 컨텍스트를 섞지 않는다.
 const jotai: typeof import('jotai') = createRequire(import.meta.url)('jotai');

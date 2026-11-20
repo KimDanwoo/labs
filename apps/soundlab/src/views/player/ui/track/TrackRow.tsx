@@ -1,9 +1,9 @@
 import type { Track } from '@entities/track';
-import { GENRE_DOT_COLOR } from '../../config/display';
-import { formatDurationMs, formatTrackNumber } from '../../lib/formatTrack';
-import { hueOf } from '../../model/constants/genreHue';
-import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
-import { LevelMeter } from './LevelMeter';
+import { GENRE_DOT_COLOR } from '@views/player/config/display';
+import { formatDurationMs, formatTrackNumber } from '@views/player/lib/formatTrack';
+import { hueOf } from '@views/player/model/constants/genreHue';
+import { usePlaybackControls } from '@views/player/model/hooks/usePlaybackControls';
+import { LevelMeter } from '@views/player/ui/track/LevelMeter';
 
 interface TrackRowProps {
   track: Track;

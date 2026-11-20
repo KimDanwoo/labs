@@ -1,6 +1,6 @@
 import type { Track } from '@entities/track';
-import { fetchBands, fetchWaveform } from '../api/signals';
-import { deriveSignals, type Signals, withDerived } from '../lib/waveformSignals';
+import { fetchBands, fetchWaveform } from '@views/player/api/signals';
+import { deriveSignals, type Signals, withDerived } from '@views/player/lib/waveformSignals';
 
 export const cache = new Map<number, Signals>();
 const inFlight = new Map<number, Promise<void>>();

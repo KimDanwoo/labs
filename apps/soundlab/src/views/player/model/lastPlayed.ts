@@ -1,4 +1,4 @@
-import { readSharedStartMs } from '../lib/playerUrl';
+import { readSharedStartMs } from '@views/player/lib/playerUrl';
 
 const LAST_PLAYED_KEY = 'soundlab:last-played';
 

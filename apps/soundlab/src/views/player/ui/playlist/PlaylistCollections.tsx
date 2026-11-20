@@ -1,5 +1,5 @@
-import { COLLECTIONS } from '../../config/collections';
-import { CollectionCard } from '../library/CollectionCard';
+import { COLLECTIONS } from '@views/player/config/collections';
+import { CollectionCard } from '@views/player/ui/library/CollectionCard';
 
 export function PlaylistCollections() {
   return (

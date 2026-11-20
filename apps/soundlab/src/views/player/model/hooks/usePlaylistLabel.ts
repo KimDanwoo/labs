@@ -1,6 +1,6 @@
+import { COLLECTIONS } from '@views/player/config/collections';
+import { collectionFilterAtom, FILTER_LABELS, libraryFilterAtom } from '@views/player/model/browse';
 import { useAtomValue } from 'jotai';
-import { COLLECTIONS } from '../../config/collections';
-import { collectionFilterAtom, FILTER_LABELS, libraryFilterAtom } from '../browse';
 
 export function usePlaylistLabel(): string {
   const filter = useAtomValue(libraryFilterAtom);

@@ -1,5 +1,13 @@
-import { link } from './glKit';
-import { FRAG_BLUR, FRAG_BRIGHT, FRAG_COMPOSITE, FRAG_FADE, FRAG_POINTS, VERT_POINTS, VERT_QUAD } from './shaders';
+import { link } from '@views/player/lib/stage/glKit';
+import {
+  FRAG_BLUR,
+  FRAG_BRIGHT,
+  FRAG_COMPOSITE,
+  FRAG_FADE,
+  FRAG_POINTS,
+  VERT_POINTS,
+  VERT_QUAD,
+} from '@views/player/lib/stage/shaders';
 
 export type RendererResources = ReturnType<typeof createRendererResources>;
 

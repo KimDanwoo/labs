@@ -1,9 +1,9 @@
 import { TRACKS, type Track } from '@entities/track';
+import { currentIndexAtom } from '@views/player/model/store/playback';
+import { FavoriteButton } from '@views/player/ui/library/FavoriteButton';
+import { TrackRow } from '@views/player/ui/track/TrackRow';
 import { useAtomValue } from 'jotai';
 import type { JSX } from 'react';
-import { currentIndexAtom } from '../../model/store/playback';
-import { TrackRow } from '../track/TrackRow';
-import { FavoriteButton } from './FavoriteButton';
 
 type Props = { track: Track; position: number };
 export function LibraryTrack({ track, position }: Props): JSX.Element {

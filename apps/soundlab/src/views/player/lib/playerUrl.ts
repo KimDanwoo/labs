@@ -1,5 +1,5 @@
 import { PLAYER_SCREEN, type PlayerScreen, type Track } from '@entities/track';
-import { MS_PER_SECOND } from '../config/time';
+import { MS_PER_SECOND } from '@views/player/config/time';
 
 /** 공유 링크는 곡 id로 만든다. 제목을 고쳐도, 목록 순서가 바뀌어도 살아있다. */
 function trackPath(track: Track): string {

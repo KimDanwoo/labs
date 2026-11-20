@@ -4,10 +4,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@shared/
 import { DropdownMenuItem } from '@shared/ui/DropdownMenuItems';
 import { FloatingButton } from '@shared/ui/FloatingButton';
 
-import { SHARE_KIND } from '../../config/share';
-import { useShareTrack } from '../../model/hooks/useShareTrack';
-import { LinkIcon } from './LinkIcon';
-import { ShareNotice } from './ShareNotice';
+import { SHARE_KIND } from '@views/player/config/share';
+import { useShareTrack } from '@views/player/model/hooks/useShareTrack';
+import { LinkIcon } from '@views/player/ui/transport/LinkIcon';
+import { ShareNotice } from '@views/player/ui/transport/ShareNotice';
 
 export function ShareButton() {
   const { notice, fallbackUrl, share, clearFallback } = useShareTrack();

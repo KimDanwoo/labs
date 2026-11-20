@@ -2,10 +2,10 @@
 
 import { artworkUrl, type ArtworkSize, type Track } from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
+import { MS_PER_SECOND } from '@views/player/config/time';
+import type { Playback } from '@views/player/model/hooks/usePlayback';
+import { frameState } from '@views/player/model/store/playback';
 import { useEffect, useRef } from 'react';
-import { MS_PER_SECOND } from '../../config/time';
-import { frameState } from '../store/playback';
-import type { Playback } from './usePlayback';
 
 /**
  * 잠금화면·OS 미디어키·이어폰 버튼에 이 플레이어를 연결한다.

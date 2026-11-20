@@ -1,4 +1,4 @@
-import { REWIND_TOLERANCE_MS, REWIND_WATCH_MS } from '../config/playback';
+import { REWIND_TOLERANCE_MS, REWIND_WATCH_MS } from '@views/player/config/playback';
 
 export interface PendingRewind {
   ms: number;

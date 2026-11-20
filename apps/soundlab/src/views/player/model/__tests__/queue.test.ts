@@ -1,7 +1,7 @@
 import type { Track } from '@entities/track';
+import { adjacentTrack, resolveQueue } from '@views/player/model/queue';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { adjacentTrack, resolveQueue } from '../queue';
 
 const tracks: Track[] = [1, 2, 3].map((id) => ({
   id,

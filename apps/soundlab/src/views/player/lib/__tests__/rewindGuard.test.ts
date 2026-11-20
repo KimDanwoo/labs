@@ -1,7 +1,7 @@
+import { REWIND_TOLERANCE_MS, REWIND_WATCH_MS } from '@views/player/config/playback';
+import { hasLostRewind, isRewindWatched } from '@views/player/lib/rewindGuard';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { REWIND_TOLERANCE_MS, REWIND_WATCH_MS } from '../../config/playback';
-import { hasLostRewind, isRewindWatched } from '../rewindGuard';
 
 const pending = { ms: 0, since: 1000, attempts: 0 };
 

@@ -2,8 +2,8 @@ import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 
 import { TRACKS } from '@entities/track';
-import { shareUrl } from '../../lib/playerUrl';
-import { currentIndexAtom, frameState } from '../store/playback';
+import { shareUrl } from '@views/player/lib/playerUrl';
+import { currentIndexAtom, frameState } from '@views/player/model/store/playback';
 
 import {
   ABORT_ERROR_NAME,
@@ -12,7 +12,7 @@ import {
   SHARE_NOTICE_MS,
   SHARE_TITLE_SUFFIX,
   type ShareKind,
-} from '../../config/share';
+} from '@views/player/config/share';
 
 export function useShareTrack() {
   const index = useAtomValue(currentIndexAtom);

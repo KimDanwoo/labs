@@ -1,11 +1,11 @@
 'use client';
 
+import { RESUME_TAIL_MS } from '@views/player/config/playback';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import { readStartTarget } from '@views/player/model/lastPlayed';
+import { currentIndexAtom, frameState, resumeNoticeAtom } from '@views/player/model/store/playback';
 import { useSetAtom } from 'jotai';
 import { useEffect } from 'react';
-import { RESUME_TAIL_MS } from '../../config/playback';
-import { readStartTarget } from '../lastPlayed';
-import { currentIndexAtom, frameState, resumeNoticeAtom } from '../store/playback';
-import type { PlaybackEngine } from './useEngineRefs';
 
 export function useStartTarget({ tracks, refs, clock }: PlaybackEngine, initialTrackId?: number) {
   const { resumeRef } = refs;

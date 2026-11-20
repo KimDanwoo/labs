@@ -3,12 +3,12 @@
 import { useAtomValue } from 'jotai';
 
 import { TRACKS } from '@entities/track';
-import { formatDurationMs } from '../../lib/formatTrack';
-import { currentIndexAtom } from '../../model/store/playback';
+import { formatDurationMs } from '@views/player/lib/formatTrack';
+import { currentIndexAtom } from '@views/player/model/store/playback';
 
-import { useElapsedClock } from '../../model/hooks/useElapsedClock';
-import { PlaybackButtons } from './PlaybackButtons';
-import { Scrubber } from './Scrubber';
+import { useElapsedClock } from '@views/player/model/hooks/useElapsedClock';
+import { PlaybackButtons } from '@views/player/ui/transport/PlaybackButtons';
+import { Scrubber } from '@views/player/ui/transport/Scrubber';
 
 export function Transport() {
   const track = TRACKS[useAtomValue(currentIndexAtom)];

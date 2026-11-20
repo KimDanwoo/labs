@@ -1,5 +1,5 @@
-import { TRACK_NUMBER_DIGITS } from '../config/display';
-import { MS_PER_SECOND } from '../config/time';
+import { TRACK_NUMBER_DIGITS } from '@views/player/config/display';
+import { MS_PER_SECOND } from '@views/player/config/time';
 
 const SECONDS_PER_MINUTE = 60;
 const pad = (value: number) => String(value).padStart(TRACK_NUMBER_DIGITS, '0');

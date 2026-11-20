@@ -1,8 +1,8 @@
 'use client';
 
+import type { ScWidget } from '@views/player/api/widget';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
 import { useCallback } from 'react';
-import type { ScWidget } from '../../api/widget';
-import type { PlaybackEngine } from './useEngineRefs';
 
 export function useSwitchRewind({ refs, clock }: PlaybackEngine) {
   const { shouldRewindRef, resumeRef, pendingRewindRef, pauseAfterSwitchRef } = refs;

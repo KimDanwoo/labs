@@ -1,11 +1,11 @@
 'use client';
 
+import type { ScWidget } from '@views/player/api/widget';
+import { validDuration } from '@views/player/lib/widgetPayload';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import { currentIndexAtom, frameState } from '@views/player/model/store/playback';
 import { useSetAtom } from 'jotai';
 import { useCallback } from 'react';
-import type { ScWidget } from '../../api/widget';
-import { validDuration } from '../../lib/widgetPayload';
-import { currentIndexAtom, frameState } from '../store/playback';
-import type { PlaybackEngine } from './useEngineRefs';
 
 export function useHeldSoundSync({ tracks, refs }: PlaybackEngine) {
   const { holdsSetRef, soundIdsRef, heldIndexRef } = refs;

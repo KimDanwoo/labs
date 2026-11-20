@@ -1,5 +1,5 @@
+import type { ScWidget } from '@views/player/api/widget';
 import { useCallback, useEffect, useRef } from 'react';
-import type { ScWidget } from '../../api/widget';
 
 const FULL_VOLUME = 100;
 const FADE_MS = 220;

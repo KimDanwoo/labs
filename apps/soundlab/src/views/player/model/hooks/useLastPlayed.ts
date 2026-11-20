@@ -1,9 +1,9 @@
 'use client';
 
 import type { Track } from '@entities/track';
+import { SAVE_INTERVAL_MS } from '@views/player/config/playback';
+import { writeLastPlayed } from '@views/player/model/lastPlayed';
 import { type RefObject, useCallback, useRef } from 'react';
-import { SAVE_INTERVAL_MS } from '../../config/playback';
-import { writeLastPlayed } from '../lastPlayed';
 
 export function useLastPlayed(tracks: readonly Track[], heldIndex: RefObject<number>) {
   const savedAt = useRef(0);

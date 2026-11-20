@@ -4,11 +4,11 @@ import { useAtom, useAtomValue } from 'jotai';
 
 import { PLAYER_SCREEN, TRACKS } from '@entities/track';
 import { FloatingButton } from '@shared/ui/FloatingButton';
-import { playerPath } from '../../lib/playerUrl';
-import { currentIndexAtom, playerScreenAtom } from '../../model/store/playback';
+import { playerPath } from '@views/player/lib/playerUrl';
+import { currentIndexAtom, playerScreenAtom } from '@views/player/model/store/playback';
 
-import { PLAYLIST_ID } from '../../config/layout';
-import { QueueIcon } from './QueueIcon';
+import { PLAYLIST_ID } from '@views/player/config/layout';
+import { QueueIcon } from '@views/player/ui/playlist/QueueIcon';
 
 /**
  * 재생목록 화면과 현재 재생 화면을 오간다.

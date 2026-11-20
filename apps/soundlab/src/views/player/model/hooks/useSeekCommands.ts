@@ -1,12 +1,18 @@
 'use client';
 
+import { MS_PER_SECOND } from '@views/player/config/time';
+import { validDuration } from '@views/player/lib/widgetPayload';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import type { GoTo } from '@views/player/model/hooks/useTrackSwitch';
+import {
+  currentIndexAtom,
+  engineErrorAtom,
+  frameState,
+  recoveryNoticeAtom,
+  resumeNoticeAtom,
+} from '@views/player/model/store/playback';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { type Dispatch, type SetStateAction, useCallback, useEffect } from 'react';
-import { MS_PER_SECOND } from '../../config/time';
-import { validDuration } from '../../lib/widgetPayload';
-import { currentIndexAtom, engineErrorAtom, frameState, recoveryNoticeAtom, resumeNoticeAtom } from '../store/playback';
-import type { PlaybackEngine } from './useEngineRefs';
-import type { GoTo } from './useTrackSwitch';
 
 export function useSeekCommands(
   { tracks, refs, clock, volume }: PlaybackEngine,

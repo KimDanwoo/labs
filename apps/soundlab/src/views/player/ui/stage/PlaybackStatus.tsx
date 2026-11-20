@@ -1,16 +1,16 @@
 import { TRACKS } from '@entities/track';
 import { Button } from '@shared/ui/Button';
-import { useAtomValue } from 'jotai';
-import type { JSX } from 'react';
-import { formatDurationMs } from '../../lib/formatTrack';
-import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
+import { formatDurationMs } from '@views/player/lib/formatTrack';
+import { usePlaybackControls } from '@views/player/model/hooks/usePlaybackControls';
 import {
   currentIndexAtom,
   engineErrorAtom,
   isReadyAtom,
   recoveryNoticeAtom,
   resumeNoticeAtom,
-} from '../../model/store/playback';
+} from '@views/player/model/store/playback';
+import { useAtomValue } from 'jotai';
+import type { JSX } from 'react';
 
 export function PlaybackStatus(): JSX.Element | null {
   const error = useAtomValue(engineErrorAtom);

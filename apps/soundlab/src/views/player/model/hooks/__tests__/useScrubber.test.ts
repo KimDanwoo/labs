@@ -1,13 +1,13 @@
+import { ARIA_UPDATE_MS, KEY_SEEK_SEC } from '@views/player/config/scrubber';
+import type { Playback } from '@views/player/model/hooks/usePlayback';
+import { useScrubber } from '@views/player/model/hooks/useScrubber';
+import { frameState } from '@views/player/model/store/playback';
+import { PlaybackContext } from '@views/player/model/store/playbackContext';
 import { JSDOM } from 'jsdom';
 import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
 import { act, createElement } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ARIA_UPDATE_MS, KEY_SEEK_SEC } from '../../../config/scrubber';
-import { frameState } from '../../store/playback';
-import { PlaybackContext } from '../../store/playbackContext';
-import type { Playback } from '../usePlayback';
-import { useScrubber } from '../useScrubber';
 
 const BAR_LEFT = 100;
 const BAR_WIDTH = 200;

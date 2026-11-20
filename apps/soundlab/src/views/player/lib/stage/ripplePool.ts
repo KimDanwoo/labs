@@ -1,5 +1,5 @@
-import { RIPPLE_SLOTS } from '../../config/renderer';
-import { RIPPLE_MS } from '../../config/stage';
+import { RIPPLE_SLOTS } from '@views/player/config/renderer';
+import { RIPPLE_MS } from '@views/player/config/stage';
 
 const RIPPLE_STRIDE = 4;
 

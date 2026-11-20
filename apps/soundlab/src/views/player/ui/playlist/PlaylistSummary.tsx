@@ -1,8 +1,8 @@
 import { Button } from '@shared/ui/Button';
+import { visibleTracksAtom } from '@views/player/model/browse';
+import { usePlaybackControls } from '@views/player/model/hooks/usePlaybackControls';
+import { usePlaylistLabel } from '@views/player/model/hooks/usePlaylistLabel';
 import { useAtomValue } from 'jotai';
-import { visibleTracksAtom } from '../../model/browse';
-import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
-import { usePlaylistLabel } from '../../model/hooks/usePlaylistLabel';
 
 export function PlaylistSummary() {
   const tracks = useAtomValue(visibleTracksAtom);

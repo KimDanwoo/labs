@@ -1,10 +1,10 @@
 'use client';
 
+import { visibleTracksAtom } from '@views/player/model/browse';
+import { ArchiveRecord } from '@views/player/ui/archive/ArchiveRecord';
+import { BrowseControls } from '@views/player/ui/library/BrowseControls';
 import { useAtomValue } from 'jotai';
 import type { JSX } from 'react';
-import { visibleTracksAtom } from '../../model/browse';
-import { BrowseControls } from '../library/BrowseControls';
-import { ArchiveRecord } from './ArchiveRecord';
 
 export function Archive(): JSX.Element {
   const tracks = useAtomValue(visibleTracksAtom);

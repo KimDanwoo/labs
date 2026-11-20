@@ -1,8 +1,14 @@
 import { Button } from '@shared/ui/Button';
 import { Input } from '@shared/ui/Input';
+import {
+  FILTER_LABELS,
+  LIBRARY_FILTER,
+  collectionFilterAtom,
+  libraryFilterAtom,
+  searchAtom,
+} from '@views/player/model/browse';
 import { useAtom, useSetAtom } from 'jotai';
 import type { JSX } from 'react';
-import { FILTER_LABELS, LIBRARY_FILTER, collectionFilterAtom, libraryFilterAtom, searchAtom } from '../../model/browse';
 
 export function BrowseControls(): JSX.Element {
   const [query, setQuery] = useAtom(searchAtom);

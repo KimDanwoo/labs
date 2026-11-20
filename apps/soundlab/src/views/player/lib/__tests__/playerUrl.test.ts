@@ -1,7 +1,7 @@
 import { PLAYER_SCREEN, TRACKS } from '@entities/track';
+import { playerPath, screenFromPath } from '@views/player/lib/playerUrl';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { playerPath, screenFromPath } from '../playerUrl';
 
 test('archive and listening routes can be reopened without losing their screen', () => {
   const track = TRACKS[0];

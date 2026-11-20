@@ -1,11 +1,17 @@
 'use client';
 
+import { REPEAT_MODE } from '@views/player/model/constants/repeatMode';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import { playableIds, resolveQueue } from '@views/player/model/queue';
+import {
+  currentIndexAtom,
+  isPlayingAtom,
+  playbackQueueAtom,
+  repeatModeAtom,
+  shuffleAtom,
+} from '@views/player/model/store/playback';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
-import { REPEAT_MODE } from '../constants/repeatMode';
-import { playableIds, resolveQueue } from '../queue';
-import { currentIndexAtom, isPlayingAtom, playbackQueueAtom, repeatModeAtom, shuffleAtom } from '../store/playback';
-import type { PlaybackEngine } from './useEngineRefs';
 
 interface WidgetAdvanceInput {
   hasQueue: boolean;

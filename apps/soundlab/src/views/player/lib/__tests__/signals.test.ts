@@ -1,6 +1,6 @@
+import { parseBandSignals, parseWaveform } from '@views/player/lib/signals';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parseBandSignals, parseWaveform } from '../signals';
 
 const bands = {
   fps: 43,

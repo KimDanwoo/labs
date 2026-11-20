@@ -1,6 +1,6 @@
+import { advanceClock, estimatePosition, type PositionReport } from '@views/player/lib/playbackClock';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { advanceClock, estimatePosition, type PositionReport } from '../playbackClock';
 
 type ClockFrame = Parameters<typeof advanceClock>[0];
 

@@ -1,17 +1,17 @@
 'use client';
 
 import { artworkUrl, TRACKS } from '@entities/track';
+import { ARTWORK_TEXTURE_SIZE } from '@views/player/config/stage';
+import { formatTrackNumber } from '@views/player/lib/formatTrack';
+import { currentIndexAtom } from '@views/player/model/store/playback';
+import { VISUAL_MODE, visualModeAtom } from '@views/player/model/visual';
+import { FavoriteButton } from '@views/player/ui/library/FavoriteButton';
+import { ParticleCanvas } from '@views/player/ui/stage/ParticleCanvas';
+import { PlaybackStatus } from '@views/player/ui/stage/PlaybackStatus';
+import { TrackDetails } from '@views/player/ui/stage/TrackDetails';
+import { VisualSettings } from '@views/player/ui/stage/VisualSettings';
 import { useAtomValue } from 'jotai';
 import { useCallback, useRef, useState } from 'react';
-import { ARTWORK_TEXTURE_SIZE } from '../../config/stage';
-import { formatTrackNumber } from '../../lib/formatTrack';
-import { currentIndexAtom } from '../../model/store/playback';
-import { VISUAL_MODE, visualModeAtom } from '../../model/visual';
-import { FavoriteButton } from '../library/FavoriteButton';
-import { ParticleCanvas } from './ParticleCanvas';
-import { PlaybackStatus } from './PlaybackStatus';
-import { TrackDetails } from './TrackDetails';
-import { VisualSettings } from './VisualSettings';
 
 /**
  * 파티클이 모일 자리를 .slot으로 예약한다. 렌더러가 이 요소의 rect를 읽어 좌표를 잡는다.

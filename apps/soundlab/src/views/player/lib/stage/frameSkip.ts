@@ -1,4 +1,4 @@
-import { LEVEL_EPSILON, MORPH_EPSILON, STATIC_DECAY } from '../../config/renderer';
+import { LEVEL_EPSILON, MORPH_EPSILON, STATIC_DECAY } from '@views/player/config/renderer';
 
 export type FrameInput = {
   morph: number;

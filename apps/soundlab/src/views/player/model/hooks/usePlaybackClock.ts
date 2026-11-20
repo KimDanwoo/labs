@@ -1,9 +1,9 @@
 'use client';
 
 import { useFrame } from '@shared/lib/frame';
+import { type PositionReport, advanceClock, estimatePosition } from '@views/player/lib/playbackClock';
+import { frameState } from '@views/player/model/store/playback';
 import { type RefObject, useCallback, useRef } from 'react';
-import { type PositionReport, advanceClock, estimatePosition } from '../../lib/playbackClock';
-import { frameState } from '../store/playback';
 
 /**
  * PLAY_PROGRESS는 수백 ms 간격이라 60fps에 부족하다. 마지막 보고값과 시각을 남겨 rAF에서 보간한다.

@@ -7,10 +7,10 @@ import {
 } from 'react';
 
 import { useFrame } from '@shared/lib/frame';
-import { frameState } from '../store/playback';
-import { usePlaybackControls } from './usePlaybackControls';
+import { usePlaybackControls } from '@views/player/model/hooks/usePlaybackControls';
+import { frameState } from '@views/player/model/store/playback';
 
-import { ARIA_UPDATE_MS, DRAG_END_EVENTS, KEY_SEEK_SEC, PERCENT, PRECISION } from '../../config/scrubber';
+import { ARIA_UPDATE_MS, DRAG_END_EVENTS, KEY_SEEK_SEC, PERCENT, PRECISION } from '@views/player/config/scrubber';
 
 export function useScrubber() {
   const { seek, seekBy } = usePlaybackControls();

@@ -1,10 +1,10 @@
 'use client';
 
+import { LISTEN_STEP_LIMIT_MS, SAVE_INTERVAL_MS, SESSION_EVENT_LIMIT } from '@views/player/config/playback';
+import { LISTEN_SOURCE, recordListeningAtom, recordSessionAtom, SESSION_EVENT } from '@views/player/model/library';
+import type { PlaybackQueue } from '@views/player/model/queue';
 import { useSetAtom } from 'jotai';
 import { type RefObject, useCallback, useEffect, useRef } from 'react';
-import { LISTEN_STEP_LIMIT_MS, SAVE_INTERVAL_MS, SESSION_EVENT_LIMIT } from '../../config/playback';
-import { LISTEN_SOURCE, recordListeningAtom, recordSessionAtom, SESSION_EVENT } from '../library';
-import type { PlaybackQueue } from '../queue';
 
 interface PendingListening {
   id: number;

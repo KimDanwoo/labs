@@ -1,11 +1,11 @@
 import { TRACKS } from '@entities/track';
 import { Button } from '@shared/ui/Button';
+import type { Collection } from '@views/player/config/collections';
+import { MS_PER_MINUTE } from '@views/player/config/time';
+import { collectionFilterAtom, LIBRARY_FILTER, libraryFilterAtom, searchAtom } from '@views/player/model/browse';
+import { usePlaybackControls } from '@views/player/model/hooks/usePlaybackControls';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX } from 'react';
-import type { Collection } from '../../config/collections';
-import { MS_PER_MINUTE } from '../../config/time';
-import { collectionFilterAtom, LIBRARY_FILTER, libraryFilterAtom, searchAtom } from '../../model/browse';
-import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
 
 type Props = { collection: Collection };
 export function CollectionCard({ collection }: Props): JSX.Element {

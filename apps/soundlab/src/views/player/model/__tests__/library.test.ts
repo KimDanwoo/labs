@@ -1,6 +1,3 @@
-import { createStore } from 'jotai';
-import assert from 'node:assert/strict';
-import test from 'node:test';
 import {
   clearHistoryAtom,
   libraryAtom,
@@ -8,7 +5,10 @@ import {
   parseLibrary,
   recordListeningAtom,
   toggleFavoriteAtom,
-} from '../library';
+} from '@views/player/model/library';
+import { createStore } from 'jotai';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 
 test('malformed persisted data is narrowed, bounded and deduplicated', () => {
   const library = parseLibrary({

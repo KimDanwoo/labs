@@ -1,4 +1,4 @@
-import { OUTLINE, REPEAT_LOOP } from '../../model/constants/icons';
+import { OUTLINE, REPEAT_LOOP } from '@views/player/model/constants/icons';
 
 export function RepeatIcon() {
   return (

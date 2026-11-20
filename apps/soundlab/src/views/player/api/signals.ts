@@ -1,5 +1,5 @@
-import { REQUEST_TIMEOUT_MS, SIGNAL_DURATION_TOLERANCE_MS } from '../config/network';
-import { parseBandSignals, parseWaveform } from '../lib/signals';
+import { REQUEST_TIMEOUT_MS, SIGNAL_DURATION_TOLERANCE_MS } from '@views/player/config/network';
+import { parseBandSignals, parseWaveform } from '@views/player/lib/signals';
 
 export async function fetchWaveform(url: string): Promise<Float32Array> {
   const response = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });

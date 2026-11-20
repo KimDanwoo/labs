@@ -2,11 +2,11 @@
 
 import type { Track } from '@entities/track';
 import { useFrame } from '@shared/lib/frame';
+import { MS_PER_SECOND } from '@views/player/config/time';
+import { type Signals, accentAt } from '@views/player/lib/waveformSignals';
+import { frameState } from '@views/player/model/store/playback';
+import { cache, warm } from '@views/player/model/waveformCache';
 import { useEffect, useRef } from 'react';
-import { MS_PER_SECOND } from '../../config/time';
-import { type Signals, accentAt } from '../../lib/waveformSignals';
-import { frameState } from '../store/playback';
-import { cache, warm } from '../waveformCache';
 const LEVEL_SMOOTHING = 0.12;
 const SWELL_SMOOTHING = 0.04;
 /**

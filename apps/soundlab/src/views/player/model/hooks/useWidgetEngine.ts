@@ -1,14 +1,20 @@
 'use client';
 
+import { loadWidgetApi, mountEngineFrame, readSoundIds, setUrl, trackUrl, widgetSrc } from '@views/player/api/widget';
+import { PLAYBACK_MESSAGE, READY_TIMEOUT_MS, WIDGET_EVENT } from '@views/player/config/playback';
+import { validDuration } from '@views/player/lib/widgetPayload';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import { usePlaybackEvents } from '@views/player/model/hooks/usePlaybackEvents';
+import { useProgressEvents } from '@views/player/model/hooks/useProgressEvents';
+import {
+  engineErrorAtom,
+  engineModeAtom,
+  frameState,
+  isPlayingAtom,
+  isReadyAtom,
+} from '@views/player/model/store/playback';
 import { useSetAtom } from 'jotai';
 import { useEffect } from 'react';
-import { loadWidgetApi, mountEngineFrame, readSoundIds, setUrl, trackUrl, widgetSrc } from '../../api/widget';
-import { PLAYBACK_MESSAGE, READY_TIMEOUT_MS, WIDGET_EVENT } from '../../config/playback';
-import { validDuration } from '../../lib/widgetPayload';
-import { engineErrorAtom, engineModeAtom, frameState, isPlayingAtom, isReadyAtom } from '../store/playback';
-import type { PlaybackEngine } from './useEngineRefs';
-import { usePlaybackEvents } from './usePlaybackEvents';
-import { useProgressEvents } from './useProgressEvents';
 
 export function useWidgetEngine(engine: PlaybackEngine, retryGeneration: number) {
   const { tracks, refs, listening, volume } = engine;

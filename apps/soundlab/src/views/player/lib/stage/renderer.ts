@@ -10,11 +10,11 @@ import {
   GRID_MIN,
   MAX_DEVICE_PIXELS,
   SIZE_PER_HIT,
-} from '../../config/renderer';
-import { createFrameSkip } from './frameSkip';
-import { clearTargets, deleteTargets, gridUv, makeTargetPair, type Target } from './glKit';
-import { createRenderPasses } from './renderPasses';
-import { createRendererResources, disposeRendererResources } from './rendererResources';
+} from '@views/player/config/renderer';
+import { createFrameSkip } from '@views/player/lib/stage/frameSkip';
+import { clearTargets, deleteTargets, gridUv, makeTargetPair, type Target } from '@views/player/lib/stage/glKit';
+import { createRenderPasses } from '@views/player/lib/stage/renderPasses';
+import { createRendererResources, disposeRendererResources } from '@views/player/lib/stage/rendererResources';
 
 /**
  * 픽셀 파티클 렌더러. React와 분리된 순수 WebGL2 모듈이다.

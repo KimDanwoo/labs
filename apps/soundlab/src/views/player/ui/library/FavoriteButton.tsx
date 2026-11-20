@@ -1,8 +1,8 @@
 import { Button } from '@shared/ui/Button';
+import { libraryAtom, toggleFavoriteAtom } from '@views/player/model/library';
+import { HeartIcon } from '@views/player/ui/library/HeartIcon';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX } from 'react';
-import { libraryAtom, toggleFavoriteAtom } from '../../model/library';
-import { HeartIcon } from './HeartIcon';
 
 type Props = { trackId: number; title: string };
 export function FavoriteButton({ trackId, title }: Props): JSX.Element {

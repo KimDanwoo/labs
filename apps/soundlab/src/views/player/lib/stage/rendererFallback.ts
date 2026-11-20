@@ -1,4 +1,4 @@
-import { createRenderer, type Renderer } from './renderer';
+import { createRenderer, type Renderer } from '@views/player/lib/stage/renderer';
 
 /**
  * 셰이더 컴파일·링크는 드라이버와 컨텍스트 상태에 달렸다 — 같은 코드가 어떤 환경에선 실패한다.

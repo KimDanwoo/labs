@@ -1,11 +1,11 @@
 'use client';
 
 import { PLAYER_SCREEN, type PlayerScreen, type Track } from '@entities/track';
+import { playerPath, screenFromPath } from '@views/player/lib/playerUrl';
+import { currentIndexAtom, playerScreenAtom } from '@views/player/model/store/playback';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import { useEffect } from 'react';
-import { playerPath, screenFromPath } from '../../lib/playerUrl';
-import { currentIndexAtom, playerScreenAtom } from '../store/playback';
 
 /**
  * 주소창이 "지금 듣는 곡 + 지금 보는 화면"을 가리키게 한다 — 주소를 복사하면 그게 곧 공유 링크다.
