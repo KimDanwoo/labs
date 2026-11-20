@@ -61,7 +61,7 @@ packages/             # 공유 서체 + 공유 설정
 
 - 하위 레이어는 상위를 import 불가. 같은 레이어의 다른 슬라이스 참조 금지. `@repo/fonts`는 루트 레이아웃에서 import한다.
 - **`widgets` 레이어는 쓰지 않는다.** 한 화면 전용 블록은 그 view에, 여러 화면에서 쓰는 동작은 `features`에, 앱 전체 레이아웃은 `src/app`에 둔다.
-- 위반 시 `pnpm lint`가 에러로 막는다. 구조 규칙을 `eslint-disable`로 우회하지 않는다.
+- 위반 시 `pnpm lint`가 에러로 막는다. 인라인 규칙 끄기 주석(`eslint-disable` 등)은 무시된다(`noInlineConfig`) — 불가피한 예외는 앱 `eslint.config.mjs`에 이름 있는 파일 목록으로 둔다.
 
 **어디에 둘지 (pages-first)**: 먼저 쓰는 화면의 `views/<화면>`에 둔다. `features`·`entities`로 내리는 건 **지금 실제로 여러 화면에서 쓸 때만** 한다. 쓰는 곳이 하나뿐인 feature·entity는 그 view로 되돌린다. 화면이 하나뿐인 앱은 `src/app` + `views/<화면>` + (필요하면) `shared`만 가진다. 단, `src/app`(프로바이더 등)이나 Next 라우트 파일(`sitemap.ts`·`route.ts`·동적 라우트)도 함께 쓰는 도메인 코드는 views에서 가져올 수 없으므로 화면이 하나여도 `entities`에 둔다. 이때 `entities`에는 **그 바깥 파일이 실제로 가져다 쓰는 것만**(곡 목록·타입·URL 함수 등) 두고, 화면만 쓰는 상태·훅·UI는 view에 둔다. 프로바이더에 store 하나를 넘기려고 도메인 전체를 entities에 두지 않는다 — 프로바이더가 store를 직접 만들게 한다.
 
@@ -134,6 +134,7 @@ tsx 파일은 "무엇을 그리는가"만 담는다. 값·로직·스타일은 �
 - **반복되는 애니메이션은 모듈로**: 모달·시트·오버레이의 열림/닫힘처럼 여러 곳에서 같은 전환을 쓰면 훅(`useModal`, `useSheetPhase` 등)과 스타일·키프레임을 한 모듈로 만들어 함께 쓴다. 컴포넌트마다 전환 상태를 따로 구현하지 않는다.
 - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateComponentModule`·`findMisplacedStyles`): 모든 앱 `src`의 tsx 최상위 비컴포넌트 선언과 자리를 벗어난 CSS 파일을 막는다. 훅 분리·반복 모양의 컴포넌트화는 리뷰에서 확인한다.
 - **함수 크기·숫자도 `pnpm lint`가 강제한다**(`@repo/eslint-config/quality.config.mjs`, my-fe-harness 기본 잠금과 같은 값): 순환 복잡도 10, 블록 중첩 3, 함수 120줄, 컴포넌트 파일 250줄 이하. 컴포넌트·훅의 숫자는 `-1·0·1·2·100` 말고 `config/`의 이름 있는 상수로 둔다(`config/`·`constants`·테스트는 제외).
+  - 컴포넌트 본문도 같은 설정이 막는다(`rules/harness.mjs` — my-fe-harness `lint-guard-plugin.mjs` 사본, 원본과 함께 바꾼다): `quality/component-body`(본문 최상위 함수는 `handleXxx`·`onXxx`만, 중첩 컴포넌트 금지), `quality/no-direct-effect`(`useEffect`·`useLayoutEffect` 직접 호출 금지, `error.tsx` 제외), `quality/no-store-passthrough`(구독한 스토어 값을 도메인 컴포넌트에 props로 넘기지 않는다).
   - 기존 위반은 앱별 `eslint-suppressions.json`에만 둔다(ESLint 일괄 억제). 줄어들기만 한다 — 새 위반이나 파일의 위반 수 증가는 실패하고, 고쳐서 남은 억제가 생겨도 실패한다. 고친 뒤 그 앱 폴더에서 `pnpm exec eslint . --prune-suppressions`로 정리한다. `--suppress-all`·`--suppress-rule`로 새 위반을 덧붙이지 않는다.
 
 ## 상태 관리 (도입 시)

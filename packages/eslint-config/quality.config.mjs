@@ -1,5 +1,7 @@
 // my-fe-harness 기본 잠금(scripts/lint-guard-baseline.mjs)과 같은 값이다. 훅은 Claude가 고친 파일만 보므로,
 // 사람이 쓴 코드와 CI도 같은 기준을 받도록 저장소 lint에 둔다. 기존 위반은 앱별 eslint-suppressions.json에 묶여 있고 줄어들기만 한다.
+import qualityPlugin from './rules/harness.mjs';
+
 const MAX_COMPLEXITY = 10;
 const MAX_DEPTH = 3;
 const MAX_FUNCTION_LINES = 120;
@@ -15,7 +17,10 @@ const TESTS = ['**/__tests__/**', '**/*.test.*', '**/*.spec.*', '**/e2e/**'];
 
 const MAGIC_NUMBERS = '@typescript-eslint/no-magic-numbers';
 
+const COMPONENT_BODY_RULES = ['component-body', 'no-direct-effect', 'no-store-passthrough'];
+
 const qualityConfig = [
+  { linterOptions: { noInlineConfig: true } },
   {
     files: SOURCE_FILES,
     rules: {
@@ -45,6 +50,12 @@ const qualityConfig = [
         },
       ],
     },
+  },
+  {
+    files: COMPONENT_FILES,
+    ignores: TESTS,
+    plugins: { quality: qualityPlugin },
+    rules: Object.fromEntries(COMPONENT_BODY_RULES.map((rule) => [`quality/${rule}`, 'error'])),
   },
   { files: NUMBER_HOMES, rules: { [MAGIC_NUMBERS]: 'off' } },
   { files: TESTS, rules: { [MAGIC_NUMBERS]: 'off', 'max-lines-per-function': 'off' } },

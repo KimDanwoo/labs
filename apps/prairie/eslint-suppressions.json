@@ -38,11 +38,17 @@
   "src/views/ride/ui/exploration/Branch.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 3
+    },
+    "quality/no-direct-effect": {
+      "count": 1
     }
   },
   "src/views/ride/ui/exploration/ElderTree.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 38
+    },
+    "quality/no-direct-effect": {
+      "count": 1
     }
   },
   "src/views/ride/ui/exploration/ExplorationScene.tsx": {
@@ -50,6 +56,9 @@
       "count": 10
     },
     "complexity": {
+      "count": 1
+    },
+    "quality/no-direct-effect": {
       "count": 1
     }
   },
@@ -61,6 +70,9 @@
   "src/views/ride/ui/exploration/GardenColumn.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 24
+    },
+    "quality/no-direct-effect": {
+      "count": 2
     }
   },
   "src/views/ride/ui/exploration/LivingLandmarks.tsx": {
@@ -81,10 +93,19 @@
   "src/views/ride/ui/exploration/SunsetArch.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 63
+    },
+    "quality/no-direct-effect": {
+      "count": 2
     }
   },
   "src/views/ride/ui/flora/FloraField.tsx": {
     "@typescript-eslint/no-magic-numbers": {
+      "count": 1
+    },
+    "quality/component-body": {
+      "count": 1
+    },
+    "quality/no-direct-effect": {
       "count": 1
     }
   },
@@ -102,6 +123,14 @@
   "src/views/ride/ui/grass/GrassChunk.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 12
+    },
+    "quality/no-direct-effect": {
+      "count": 2
+    }
+  },
+  "src/views/ride/ui/grass/GrassField.tsx": {
+    "quality/no-direct-effect": {
+      "count": 4
     }
   },
   "src/views/ride/ui/hud/RiverGuide.tsx": {
@@ -112,6 +141,9 @@
   "src/views/ride/ui/river/River.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 22
+    },
+    "quality/no-direct-effect": {
+      "count": 1
     }
   },
   "src/views/ride/ui/river/RiverBanks.tsx": {
@@ -122,6 +154,14 @@
       "count": 1
     },
     "max-depth": {
+      "count": 1
+    },
+    "quality/no-direct-effect": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/runner-control/TouchControls.tsx": {
+    "quality/component-body": {
       "count": 1
     }
   },
@@ -136,16 +176,28 @@
     },
     "max-lines-per-function": {
       "count": 1
+    },
+    "quality/component-body": {
+      "count": 1
+    },
+    "quality/no-direct-effect": {
+      "count": 2
     }
   },
   "src/views/ride/ui/runner/Horn.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 18
+    },
+    "quality/no-direct-effect": {
+      "count": 1
     }
   },
   "src/views/ride/ui/runner/MagicWings.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 18
+    },
+    "quality/no-direct-effect": {
+      "count": 1
     }
   },
   "src/views/ride/ui/runner/Runner.tsx": {
@@ -157,6 +209,9 @@
     },
     "max-lines-per-function": {
       "count": 1
+    },
+    "quality/no-direct-effect": {
+      "count": 2
     }
   },
   "src/views/ride/ui/runner/SpinStardust.tsx": {
@@ -180,9 +235,17 @@
       "count": 1
     }
   },
+  "src/views/ride/ui/scene/RenderBudget.tsx": {
+    "quality/no-direct-effect": {
+      "count": 1
+    }
+  },
   "src/views/ride/ui/scene/RideSun.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 2
+    },
+    "quality/no-direct-effect": {
+      "count": 1
     }
   },
   "src/views/ride/ui/scene/SceneCanvas.tsx": {
@@ -190,8 +253,16 @@
       "count": 4
     }
   },
+  "src/views/ride/ui/scene/SceneEffects.tsx": {
+    "quality/no-direct-effect": {
+      "count": 2
+    }
+  },
   "src/views/ride/ui/scene/SceneLoader.tsx": {
     "@typescript-eslint/no-magic-numbers": {
+      "count": 1
+    },
+    "quality/no-direct-effect": {
       "count": 1
     }
   },
@@ -203,11 +274,17 @@
   "src/views/ride/ui/scenery/Haze.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 3
+    },
+    "quality/no-direct-effect": {
+      "count": 1
     }
   },
   "src/views/ride/ui/scenery/MeadowMotes.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 12
+    },
+    "quality/no-direct-effect": {
+      "count": 1
     }
   },
   "src/views/ride/ui/wildlife/Grazers.tsx": {
@@ -215,6 +292,9 @@
       "count": 78
     },
     "complexity": {
+      "count": 1
+    },
+    "quality/no-direct-effect": {
       "count": 1
     }
   },

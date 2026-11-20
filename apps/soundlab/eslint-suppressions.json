@@ -108,6 +108,11 @@
       "count": 1
     }
   },
+  "src/views/player/ui/library/LibraryTrack.tsx": {
+    "quality/no-store-passthrough": {
+      "count": 1
+    }
+  },
   "src/views/player/ui/library/ListeningHistory.tsx": {
     "@typescript-eslint/no-magic-numbers": {
       "count": 2
