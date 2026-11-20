@@ -1,1 +1,1 @@
-export { BottomSheet } from './BottomSheet';
+export { BottomSheet } from '@shared/ui/bottom-sheet/BottomSheet';

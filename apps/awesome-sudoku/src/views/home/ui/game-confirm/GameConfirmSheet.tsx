@@ -1,10 +1,10 @@
 'use client';
 import { BottomSheet } from '@shared/ui/bottom-sheet';
+import { GAME_CONFIRM_COPY } from '@views/home/config/gameConfirm';
+import { discardDetail } from '@views/home/lib/newGameLabel';
+import { confirmDiscardAtom, gameConfirmAtom, keepCurrentGameAtom } from '@views/home/model/store/gameConfirmAtoms';
+import { GameConfirmButton } from '@views/home/ui/game-confirm/GameConfirmButton';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { GAME_CONFIRM_COPY } from '../../config/gameConfirm';
-import { discardDetail } from '../../lib/newGameLabel';
-import { confirmDiscardAtom, gameConfirmAtom, keepCurrentGameAtom } from '../../model/store/gameConfirmAtoms';
-import { GameConfirmButton } from './GameConfirmButton';
 
 export function GameConfirmSheet() {
   const confirm = useAtomValue(gameConfirmAtom);

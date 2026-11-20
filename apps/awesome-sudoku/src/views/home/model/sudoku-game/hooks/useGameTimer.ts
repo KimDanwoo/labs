@@ -1,12 +1,12 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 
-import { elapsedTicks } from '../../../lib/elapsedTicks';
-import { formatTime } from '../../services/common';
-import { currentTimeAtom, isCompletedAtom, timerActiveAtom } from '../../store/primitives';
-import { incrementTimerAtom, toggleTimerAtom } from '../../store/timerAtoms';
+import { elapsedTicks } from '@views/home/lib/elapsedTicks';
+import { formatTime } from '@views/home/model/services/common';
+import { currentTimeAtom, isCompletedAtom, timerActiveAtom } from '@views/home/model/store/primitives';
+import { incrementTimerAtom, toggleTimerAtom } from '@views/home/model/store/timerAtoms';
 
-import { TIMER_STATE, TIMER_TICK_MS, type TimerState } from '../../../config/timer';
+import { TIMER_STATE, TIMER_TICK_MS, type TimerState } from '@views/home/config/timer';
 
 function toTimerState(isCompleted: boolean, timerActive: boolean): TimerState {
   if (isCompleted) return TIMER_STATE.completed;

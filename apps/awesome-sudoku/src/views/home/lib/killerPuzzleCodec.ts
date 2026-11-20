@@ -1,8 +1,8 @@
-import { BOARD_SIZE } from '../config/board';
-import { CAGE_ALPHABET, EMPTY_GIVEN } from '../config/killerCage';
-import type { Grid, GridPosition } from '../model/types/board';
-import type { EncodedKillerPuzzle, KillerCage, KillerPuzzle } from '../model/types/game';
-import { cellAt } from './gridAccess';
+import { BOARD_SIZE } from '@views/home/config/board';
+import { CAGE_ALPHABET, EMPTY_GIVEN } from '@views/home/config/killerCage';
+import { cellAt } from '@views/home/lib/gridAccess';
+import type { Grid, GridPosition } from '@views/home/model/types/board';
+import type { EncodedKillerPuzzle, KillerCage, KillerPuzzle } from '@views/home/model/types/game';
 
 const EMPTY = 0;
 

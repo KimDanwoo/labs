@@ -1,5 +1,5 @@
-import type { Difficulty, GameMode } from '../model/types/game';
-import { generatePuzzle, type GeneratedPuzzle } from './puzzleGenerator';
+import { generatePuzzle, type GeneratedPuzzle } from '@views/home/lib/puzzleGenerator';
+import type { Difficulty, GameMode } from '@views/home/model/types/game';
 
 export type PuzzleRequest = { id: number; gameMode: GameMode; difficulty: Difficulty };
 export type PuzzleResponse = { id: number; puzzle: GeneratedPuzzle } | { id: number; error: string };

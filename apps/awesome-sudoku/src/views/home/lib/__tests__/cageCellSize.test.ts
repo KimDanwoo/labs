@@ -1,6 +1,6 @@
+import { DEFAULT_CELL_SIZE } from '@views/home/config/board';
+import { cellSizeFromPaths } from '@views/home/lib/cageCellSize';
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_CELL_SIZE } from '../../config/board';
-import { cellSizeFromPaths } from '../cageCellSize';
 
 const pathAt = (x: number, id = 0) => ({ id, path: `M${x},0 L${x + 10},0` });
 

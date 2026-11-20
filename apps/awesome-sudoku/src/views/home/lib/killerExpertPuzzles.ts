@@ -1,5 +1,5 @@
 // 생성물 — 직접 고치지 않는다. `pnpm --filter awesome-sudoku puzzles:killer-expert`로 다시 만든다.
-import type { EncodedKillerPuzzle } from '../model/types/game';
+import type { EncodedKillerPuzzle } from '@views/home/model/types/game';
 
 export const KILLER_EXPERT_PUZZLES: readonly EncodedKillerPuzzle[] = [
   {

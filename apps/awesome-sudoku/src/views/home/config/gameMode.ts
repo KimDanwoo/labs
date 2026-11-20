@@ -1,5 +1,5 @@
-import { type GameMode } from '../model/types/game';
-import { GAME_MODE } from './game';
+import { GAME_MODE } from '@views/home/config/game';
+import { type GameMode } from '@views/home/model/types/game';
 
 export const GAME_MODE_LABELS: Record<GameMode, string> = {
   [GAME_MODE.CLASSIC]: '클래식',

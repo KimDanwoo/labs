@@ -1,15 +1,14 @@
-import { atom } from 'jotai';
-import { GAME_PHASE, HINTS_REMAINING, MAX_MISTAKES } from '../../config/game';
-import { cellAt } from '../../lib/gridAccess';
-import { buildGameResultState, resolveBoardState } from '../services/gameResult';
+import { GAME_PHASE, HINTS_REMAINING, MAX_MISTAKES } from '@views/home/config/game';
+import { cellAt } from '@views/home/lib/gridAccess';
+import { buildGameResultState, resolveBoardState } from '@views/home/model/services/gameResult';
 import {
   canFillCell,
   clearHighlights,
   resetUserInputs as resetUserInputsOptimized,
   updateCellNotes,
   updateCellValue,
-} from '../services/update';
-import { clearHistoryAtom, pushStateAtom } from './historyAtoms';
+} from '@views/home/model/services/update';
+import { clearHistoryAtom, pushStateAtom } from '@views/home/model/store/historyAtoms';
 import {
   boardAtom,
   cagesAtom,
@@ -24,10 +23,11 @@ import {
   selectedCellAtom,
   solutionAtom,
   timerActiveAtom,
-} from './primitives';
-import { deselectCellAtom, updateHighlightsAtom } from './selectionAtoms';
-import { countBoardNumbersAtom, gamePhaseAtom } from './statusAtoms';
-import { toggleTimerAtom } from './timerAtoms';
+} from '@views/home/model/store/primitives';
+import { deselectCellAtom, updateHighlightsAtom } from '@views/home/model/store/selectionAtoms';
+import { countBoardNumbersAtom, gamePhaseAtom } from '@views/home/model/store/statusAtoms';
+import { toggleTimerAtom } from '@views/home/model/store/timerAtoms';
+import { atom } from 'jotai';
 
 export const fillCellAtom = atom(null, (get, set, value: number | null) => {
   if (get(gamePhaseAtom) !== GAME_PHASE.PLAYING) return;

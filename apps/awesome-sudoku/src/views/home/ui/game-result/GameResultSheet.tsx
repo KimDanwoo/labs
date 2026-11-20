@@ -1,14 +1,14 @@
 'use client';
 import { useDismissible } from '@shared/lib/useDismissible';
 import { BottomSheet } from '@shared/ui/bottom-sheet';
+import { MAX_MISTAKES } from '@views/home/config/game';
+import { formatTime } from '@views/home/model/services/common';
+import { currentTimeAtom, isCompletedAtom, isSuccessAtom, mistakeCountAtom } from '@views/home/model/store/primitives';
+import { FailureIcon } from '@views/home/ui/sudoku-game/FailureIcon';
+import { ListSelector } from '@views/home/ui/sudoku-game/ListSelector';
+import { SuccessIcon } from '@views/home/ui/sudoku-game/SuccessIcon';
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
-import { MAX_MISTAKES } from '../../config/game';
-import { formatTime } from '../../model/services/common';
-import { currentTimeAtom, isCompletedAtom, isSuccessAtom, mistakeCountAtom } from '../../model/store/primitives';
-import { FailureIcon } from '../sudoku-game/FailureIcon';
-import { ListSelector } from '../sudoku-game/ListSelector';
-import { SuccessIcon } from '../sudoku-game/SuccessIcon';
 
 export const GameResultSheet = memo(() => {
   const isCompleted = useAtomValue(isCompletedAtom);

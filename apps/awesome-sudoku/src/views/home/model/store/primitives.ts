@@ -1,10 +1,10 @@
+import { NUMBER_COUNTS } from '@views/home/config/board';
+import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING } from '@views/home/config/game';
+import { createEmptyBoard, createEmptyGrid, createEmptyHighlights } from '@views/home/model/services/common';
+import type { CellHighlight, Position, SudokuCell } from '@views/home/model/types/board';
+import type { Difficulty, GameMode, KillerCage } from '@views/home/model/types/game';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import { NUMBER_COUNTS } from '../../config/board';
-import { GAME_LEVEL, GAME_MODE, HINTS_REMAINING } from '../../config/game';
-import { createEmptyBoard, createEmptyGrid, createEmptyHighlights } from '../services/common';
-import type { CellHighlight, Position, SudokuCell } from '../types/board';
-import type { Difficulty, GameMode, KillerCage } from '../types/game';
 
 export const boardAtom = atomWithStorage<SudokuCell[][]>('sudoku:board', createEmptyBoard());
 export const solutionAtom = atomWithStorage<number[][]>('sudoku:solution', createEmptyGrid());

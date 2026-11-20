@@ -1,8 +1,8 @@
-import { GAME_LEVEL, GAME_MODE } from '../config/game';
-import type { Grid, SudokuBoard } from '../model/types/board';
-import type { Difficulty, GameMode, KillerCage } from '../model/types/game';
-import { generateBoard, generateKillerBoard, generateSolution, toBoard } from './generator';
-import { pickKillerExpertPuzzle } from './killerExpertBank';
+import { GAME_LEVEL, GAME_MODE } from '@views/home/config/game';
+import { generateBoard, generateKillerBoard, generateSolution, toBoard } from '@views/home/lib/generator';
+import { pickKillerExpertPuzzle } from '@views/home/lib/killerExpertBank';
+import type { Grid, SudokuBoard } from '@views/home/model/types/board';
+import type { Difficulty, GameMode, KillerCage } from '@views/home/model/types/game';
 
 export type GeneratedPuzzle = {
   solution: Grid;

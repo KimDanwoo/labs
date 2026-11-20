@@ -1,4 +1,4 @@
-import type { DiscardAction } from '../model/types/game';
+import type { DiscardAction } from '@views/home/model/types/game';
 
 export const GAME_CONFIRM_BUTTON_VARIANT = {
   primary:

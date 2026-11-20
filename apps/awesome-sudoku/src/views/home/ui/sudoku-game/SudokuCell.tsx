@@ -1,10 +1,10 @@
 'use client';
 import { cn } from '@shared/lib/cn';
+import { useCell } from '@views/home/model/sudoku-game/hooks/useCell';
+import { type CellProps } from '@views/home/model/types/board';
+import { CellNotes } from '@views/home/ui/sudoku-game/CellNotes';
+import { CellValue } from '@views/home/ui/sudoku-game/CellValue';
 import { type FC, memo } from 'react';
-import { useCell } from '../../model/sudoku-game/hooks/useCell';
-import { type CellProps } from '../../model/types/board';
-import { CellNotes } from './CellNotes';
-import { CellValue } from './CellValue';
 
 export const SudokuCell: FC<CellProps> = memo((props) => {
   const { cell } = props;

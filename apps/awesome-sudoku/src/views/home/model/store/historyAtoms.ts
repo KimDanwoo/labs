@@ -1,10 +1,10 @@
+import { GAME_PHASE } from '@views/home/config/game';
+import { updateCellSelection } from '@views/home/model/services/update';
+import { boardAtom, selectedCellAtom } from '@views/home/model/store/primitives';
+import { updateHighlightsAtom } from '@views/home/model/store/selectionAtoms';
+import { countBoardNumbersAtom, gamePhaseAtom } from '@views/home/model/store/statusAtoms';
+import type { SudokuBoard } from '@views/home/model/types/board';
 import { atom } from 'jotai';
-import { GAME_PHASE } from '../../config/game';
-import { updateCellSelection } from '../services/update';
-import type { SudokuBoard } from '../types/board';
-import { boardAtom, selectedCellAtom } from './primitives';
-import { updateHighlightsAtom } from './selectionAtoms';
-import { countBoardNumbersAtom, gamePhaseAtom } from './statusAtoms';
 
 const MAX_HISTORY_SIZE = 50;
 /** 어느 칸과도 겹치지 않는 좌표 — updateCellSelection에 넘기면 선택 표시가 모두 꺼진다 */

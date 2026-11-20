@@ -1,8 +1,8 @@
 import { IconButton } from '@shared/ui/icon-button';
+import { requestRestartAtom } from '@views/home/model/store/gameConfirmAtoms';
+import { timerActiveAtom } from '@views/home/model/store/primitives';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuRotateCcw } from 'react-icons/lu';
-import { requestRestartAtom } from '../../model/store/gameConfirmAtoms';
-import { timerActiveAtom } from '../../model/store/primitives';
 
 export const RestartGame = () => {
   const requestRestart = useSetAtom(requestRestartAtom);

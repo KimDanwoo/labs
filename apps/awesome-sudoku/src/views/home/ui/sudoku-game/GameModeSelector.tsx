@@ -2,11 +2,11 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback } from 'react';
 
 import { cn } from '@shared/lib/cn';
-import { requestNewGameAtom } from '../../model/store/gameConfirmAtoms';
-import { gameModeAtom } from '../../model/store/primitives';
-import { type GameMode } from '../../model/types/game';
+import { requestNewGameAtom } from '@views/home/model/store/gameConfirmAtoms';
+import { gameModeAtom } from '@views/home/model/store/primitives';
+import { type GameMode } from '@views/home/model/types/game';
 
-import { GAME_MODE_TABS } from '../../config/gameMode';
+import { GAME_MODE_TABS } from '@views/home/config/gameMode';
 
 export const GameModeSelector = memo(() => {
   const gameMode = useAtomValue(gameModeAtom);

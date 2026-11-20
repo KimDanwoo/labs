@@ -1,9 +1,20 @@
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../config/board';
-import { createEmptyGrid, shuffleArray } from '../model/services/common';
-import type { Grid } from '../model/types/board';
-import type { KillerCage } from '../model/types/game';
-import { type CageState, cageAllowedMask, cageCombos } from './cageCombos';
-import { ALL_DIGITS, EMPTY, bit, boxOf, colOf, digitsOf, flatten, popcount, rowOf, unflatten } from './solverGrid';
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@views/home/config/board';
+import { type CageState, cageAllowedMask, cageCombos } from '@views/home/lib/cageCombos';
+import {
+  ALL_DIGITS,
+  EMPTY,
+  bit,
+  boxOf,
+  colOf,
+  digitsOf,
+  flatten,
+  popcount,
+  rowOf,
+  unflatten,
+} from '@views/home/lib/solverGrid';
+import { createEmptyGrid, shuffleArray } from '@views/home/model/services/common';
+import type { Grid } from '@views/home/model/types/board';
+import type { KillerCage } from '@views/home/model/types/game';
 
 type SearchOptions = {
   limit: number;

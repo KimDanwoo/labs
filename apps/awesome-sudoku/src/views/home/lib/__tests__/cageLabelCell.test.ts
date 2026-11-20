@@ -1,5 +1,5 @@
+import { cageLabelCell } from '@views/home/lib/cageLabelCell';
 import { describe, expect, it } from 'vitest';
-import { cageLabelCell } from '../cageLabelCell';
 
 describe('케이지 합 숫자가 놓이는 칸', () => {
   it('가장 위 줄에서 가장 왼쪽 칸을 고른다', () => {

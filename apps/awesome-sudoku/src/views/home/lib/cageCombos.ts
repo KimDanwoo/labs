@@ -1,5 +1,5 @@
-import { BOARD_SIZE } from '../config/board';
-import { bit } from './solverGrid';
+import { BOARD_SIZE } from '@views/home/config/board';
+import { bit } from '@views/home/lib/solverGrid';
 
 const cageCombosCache = new Map<string, number[]>();
 export const cageCombos = (size: number, sum: number): number[] => {

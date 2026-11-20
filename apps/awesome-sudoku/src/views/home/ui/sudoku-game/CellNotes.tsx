@@ -1,6 +1,6 @@
 import { cn } from '@shared/lib/cn';
+import { KEY_NUMBER } from '@views/home/config/board';
 import { memo } from 'react';
-import { KEY_NUMBER } from '../../config/board';
 
 interface CellNotesProps {
   notes: number[];

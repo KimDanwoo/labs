@@ -1,15 +1,15 @@
-import { BLOCK_SIZE, BOARD_SIZE } from '../../config/board';
-import { GAME_MODE } from '../../config/game';
-import { cellAt } from '../../lib/gridAccess';
+import { BLOCK_SIZE, BOARD_SIZE } from '@views/home/config/board';
+import { GAME_MODE } from '@views/home/config/game';
+import { cellAt } from '@views/home/lib/gridAccess';
 import {
   checkConflicts,
   isBoardComplete,
   isKillerBoardComplete,
   markWrongValues,
   validateKillerCages,
-} from '../../lib/validator';
-import type { CellHighlight, Grid, SudokuBoard, SudokuCell } from '../types/board';
-import type { GameCompletionResult, GameMode, KillerCage } from '../types/game';
+} from '@views/home/lib/validator';
+import type { CellHighlight, Grid, SudokuBoard, SudokuCell } from '@views/home/model/types/board';
+import type { GameCompletionResult, GameMode, KillerCage } from '@views/home/model/types/game';
 
 export function updateSingleCell(
   board: SudokuBoard,

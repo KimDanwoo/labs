@@ -1,17 +1,17 @@
 'use client';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { type FC, useCallback, useMemo } from 'react';
-import { BOARD_SIZE, KEY_NUMBER } from '../../config/board';
-import { cellAt } from '../../lib/gridAccess';
-import { fillCellAtom, toggleNoteAtom } from '../../model/store/cellValueAtoms';
+import { BOARD_SIZE, KEY_NUMBER } from '@views/home/config/board';
+import { cellAt } from '@views/home/lib/gridAccess';
+import { fillCellAtom, toggleNoteAtom } from '@views/home/model/store/cellValueAtoms';
 import {
   boardAtom,
   isNoteModeAtom,
   numberCountsAtom,
   selectedCellAtom,
   timerActiveAtom,
-} from '../../model/store/primitives';
-import { NumberButton } from './NumberButton';
+} from '@views/home/model/store/primitives';
+import { NumberButton } from '@views/home/ui/sudoku-game/NumberButton';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { type FC, useCallback, useMemo } from 'react';
 
 export const SelectNumber: FC = () => {
   const isNoteMode = useAtomValue(isNoteModeAtom);

@@ -1,7 +1,7 @@
 'use client';
 
+import { ANIMATION_MS, PHASE, sheetMotion, type Phase } from '@shared/ui/bottom-sheet/sheetMotion';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
-import { ANIMATION_MS, PHASE, sheetMotion, type Phase } from './sheetMotion';
 
 type UseSheetPhaseOptions = {
   isOpen: boolean;

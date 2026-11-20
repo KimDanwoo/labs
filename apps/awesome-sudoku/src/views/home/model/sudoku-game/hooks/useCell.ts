@@ -1,14 +1,19 @@
+import { EMPTY_HIGHLIGHT } from '@views/home/config/board';
+import { cageLabelCellsAtom } from '@views/home/model/store/cageLabelAtoms';
+import {
+  gameModeAtom,
+  highlightedCellsAtom,
+  isNoteModeAtom,
+  timerActiveAtom,
+} from '@views/home/model/store/primitives';
+import { hasSelectedCellAtom } from '@views/home/model/store/selectionAtoms';
+import { useCellAccessibility } from '@views/home/model/sudoku-game/hooks/useCellAccessibility';
+import { useCellInteraction } from '@views/home/model/sudoku-game/hooks/useCellInteraction';
+import { useCellStyles } from '@views/home/model/sudoku-game/hooks/useCellStyles';
+import { useFocusWhenSelected } from '@views/home/model/sudoku-game/hooks/useFocusWhenSelected';
+import { type CellProps } from '@views/home/model/types/board';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
-import { EMPTY_HIGHLIGHT } from '../../../config/board';
-import { cageLabelCellsAtom } from '../../store/cageLabelAtoms';
-import { gameModeAtom, highlightedCellsAtom, isNoteModeAtom, timerActiveAtom } from '../../store/primitives';
-import { hasSelectedCellAtom } from '../../store/selectionAtoms';
-import { type CellProps } from '../../types/board';
-import { useCellAccessibility } from './useCellAccessibility';
-import { useCellInteraction } from './useCellInteraction';
-import { useCellStyles } from './useCellStyles';
-import { useFocusWhenSelected } from './useFocusWhenSelected';
 
 export const useCell = ({ cell, row, col, onSelect }: CellProps) => {
   const cellKey = `${row}-${col}`;

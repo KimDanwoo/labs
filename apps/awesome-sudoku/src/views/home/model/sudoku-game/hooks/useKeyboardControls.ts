@@ -1,8 +1,8 @@
+import { isBoardShortcut } from '@views/home/lib/keyboardTarget';
+import { handleKeyInputAtom } from '@views/home/model/store/keyboardAtoms';
+import { selectedCellAtom } from '@views/home/model/store/primitives';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
-import { isBoardShortcut } from '../../../lib/keyboardTarget';
-import { handleKeyInputAtom } from '../../store/keyboardAtoms';
-import { selectedCellAtom } from '../../store/primitives';
 
 export const useKeyboardControls = () => {
   const handleKeyInput = useSetAtom(handleKeyInputAtom);

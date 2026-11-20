@@ -1,9 +1,9 @@
 'use client';
 
 import { cn } from '@shared/lib/cn';
+import { useThemeToggle } from '@views/home/model/theme/hooks/useThemeToggle';
 import { memo } from 'react';
 import { LuMoon, LuSun } from 'react-icons/lu';
-import { useThemeToggle } from '../model/theme/hooks/useThemeToggle';
 
 export const ThemeToggle = memo(() => {
   const { isDark, handleToggle } = useThemeToggle();

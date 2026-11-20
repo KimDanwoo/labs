@@ -1,6 +1,6 @@
-import { BLOCK_SIZE, BOARD_SIZE } from '../../config/board';
-import { ALL_DIGITS, bit, COL_UNITS, digitsOf, EMPTY, PEERS, ROW_UNITS, UNITS } from '../solverGrid';
-import type { LogicBoard, LogicCage } from './logicBoard';
+import { BLOCK_SIZE, BOARD_SIZE } from '@views/home/config/board';
+import type { LogicBoard, LogicCage } from '@views/home/lib/logic/logicBoard';
+import { ALL_DIGITS, bit, COL_UNITS, digitsOf, EMPTY, PEERS, ROW_UNITS, UNITS } from '@views/home/lib/solverGrid';
 
 const UNIT_SUM = 45;
 

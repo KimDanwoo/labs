@@ -1,9 +1,9 @@
+import { cageSumFontSize } from '@views/home/lib/cageSumFontSize';
+import { useKillerCage } from '@views/home/model/sudoku-game/hooks/useKillerCage';
+import { KillerCageLine } from '@views/home/ui/sudoku-game/KillerCageLine';
 import { memo, useMemo, type RefObject } from 'react';
-import { cageSumFontSize } from '../../lib/cageSumFontSize';
-import { useKillerCage } from '../../model/sudoku-game/hooks/useKillerCage';
-import { KillerCageLine } from './KillerCageLine';
 
-import { CageSumLabel } from './CageSumLabel';
+import { CageSumLabel } from '@views/home/ui/sudoku-game/CageSumLabel';
 
 interface KillerCageProps {
   tableRef: RefObject<HTMLTableElement | null>;

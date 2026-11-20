@@ -1,5 +1,5 @@
-import { SelectNumber } from '../sudoku-game/SelectNumber';
-import { Controls } from './Controls';
+import { Controls } from '@views/home/ui/game-controls/Controls';
+import { SelectNumber } from '@views/home/ui/sudoku-game/SelectNumber';
 
 export function DesktopControlPanel() {
   return (

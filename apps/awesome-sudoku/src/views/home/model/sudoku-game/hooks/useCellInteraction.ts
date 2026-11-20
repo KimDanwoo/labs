@@ -1,6 +1,6 @@
+import { handleKeyInputAtom } from '@views/home/model/store/keyboardAtoms';
 import { useSetAtom } from 'jotai';
 import { type KeyboardEvent, useCallback } from 'react';
-import { handleKeyInputAtom } from '../../store/keyboardAtoms';
 
 interface UseCellInteractionProps {
   row: number;

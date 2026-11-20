@@ -1,11 +1,11 @@
+import { GAME_PHASE } from '@views/home/config/game';
+import { initializeGameAtom } from '@views/home/model/store/gameLifecycleAtoms';
+import { difficultyAtom } from '@views/home/model/store/primitives';
+import { gamePhaseAtom } from '@views/home/model/store/statusAtoms';
+import { toggleTimerAtom } from '@views/home/model/store/timerAtoms';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { FC } from 'react';
 import { VscPlay } from 'react-icons/vsc';
-import { GAME_PHASE } from '../../config/game';
-import { initializeGameAtom } from '../../model/store/gameLifecycleAtoms';
-import { difficultyAtom } from '../../model/store/primitives';
-import { gamePhaseAtom } from '../../model/store/statusAtoms';
-import { toggleTimerAtom } from '../../model/store/timerAtoms';
 
 export const PauseGameOverlay: FC = () => {
   const gamePhase = useAtomValue(gamePhaseAtom);

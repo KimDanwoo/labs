@@ -1,8 +1,8 @@
-import { BLOCKS_PER_ROW, BLOCK_SIZE, BOARD_SIZE } from '../config/board';
-import type { Grid, SudokuBoard } from '../model/types/board';
-import type { KillerCage } from '../model/types/game';
-import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from './gameUtils';
-import { cellAt } from './gridAccess';
+import { BLOCKS_PER_ROW, BLOCK_SIZE, BOARD_SIZE } from '@views/home/config/board';
+import { getBlockNumbers, getColumnNumbers, getRowNumbers, isValidNumberSet } from '@views/home/lib/gameUtils';
+import { cellAt } from '@views/home/lib/gridAccess';
+import type { Grid, SudokuBoard } from '@views/home/model/types/board';
+import type { KillerCage } from '@views/home/model/types/game';
 
 export function isValidSolution(grid: Grid): boolean {
   for (let i = 0; i < BOARD_SIZE; i++) {

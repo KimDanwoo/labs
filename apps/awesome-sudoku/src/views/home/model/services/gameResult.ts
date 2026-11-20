@@ -1,6 +1,6 @@
-import type { SudokuBoard } from '../types/board';
-import type { GameCompletionResult, GameMode, KillerCage } from '../types/game';
-import { checkGameCompletion, validateBoard } from './update';
+import { checkGameCompletion, validateBoard } from '@views/home/model/services/update';
+import type { SudokuBoard } from '@views/home/model/types/board';
+import type { GameCompletionResult, GameMode, KillerCage } from '@views/home/model/types/game';
 
 export const buildGameResultState = (result: GameCompletionResult) => ({
   board: result.board,

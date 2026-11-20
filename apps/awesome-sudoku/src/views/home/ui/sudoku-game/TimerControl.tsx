@@ -4,8 +4,8 @@ import { VscPlay } from 'react-icons/vsc';
 
 import { cn } from '@shared/lib/cn';
 
-import { TIMER_ICON_SIZE, TIMER_STATE } from '../../config/timer';
-import { useGameTimer } from '../../model/sudoku-game/hooks/useGameTimer';
+import { TIMER_ICON_SIZE, TIMER_STATE } from '@views/home/config/timer';
+import { useGameTimer } from '@views/home/model/sudoku-game/hooks/useGameTimer';
 
 export const TimerControl = memo(() => {
   const { formattedTime, timerActive, isCompleted, state, toggle } = useGameTimer();

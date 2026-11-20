@@ -1,11 +1,11 @@
-import { TECHNIQUE } from '../config/game';
-import type { Grid } from '../model/types/board';
-import type { KillerCage, Technique } from '../model/types/game';
-import { createAdvancedTechniques } from './logic/advancedTechniques';
-import { createBasicTechniques } from './logic/basicTechniques';
-import { createCageTechniques } from './logic/cageTechniques';
-import { createLogicBoard } from './logic/logicBoard';
-import { unflatten } from './solverGrid';
+import { TECHNIQUE } from '@views/home/config/game';
+import { createAdvancedTechniques } from '@views/home/lib/logic/advancedTechniques';
+import { createBasicTechniques } from '@views/home/lib/logic/basicTechniques';
+import { createCageTechniques } from '@views/home/lib/logic/cageTechniques';
+import { createLogicBoard } from '@views/home/lib/logic/logicBoard';
+import { unflatten } from '@views/home/lib/solverGrid';
+import type { Grid } from '@views/home/model/types/board';
+import type { KillerCage, Technique } from '@views/home/model/types/game';
 
 export function solveLogically(grid: Grid, cages: KillerCage[] = []): { technique: Technique; grid: Grid } {
   const board = createLogicBoard(grid, cages);

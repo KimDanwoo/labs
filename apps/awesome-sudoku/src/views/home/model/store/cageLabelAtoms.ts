@@ -1,7 +1,7 @@
+import { GAME_MODE } from '@views/home/config/game';
+import { cageLabelCell } from '@views/home/lib/cageLabelCell';
+import { cagesAtom, gameModeAtom } from '@views/home/model/store/primitives';
 import { atom } from 'jotai';
-import { GAME_MODE } from '../../config/game';
-import { cageLabelCell } from '../../lib/cageLabelCell';
-import { cagesAtom, gameModeAtom } from './primitives';
 
 const NO_LABEL_CELLS: ReadonlySet<string> = new Set();
 

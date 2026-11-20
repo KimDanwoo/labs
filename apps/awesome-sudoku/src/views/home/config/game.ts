@@ -1,4 +1,4 @@
-import type { ClassicDifficultySpec, Difficulty, KillerDifficultySpec } from '../model/types/game';
+import type { ClassicDifficultySpec, Difficulty, KillerDifficultySpec } from '@views/home/model/types/game';
 
 export const HINTS_REMAINING = 3;
 

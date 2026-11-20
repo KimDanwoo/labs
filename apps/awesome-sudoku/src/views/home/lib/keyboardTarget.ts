@@ -1,4 +1,4 @@
-import { KEYBOARD_IGNORED_TARGETS } from '../config/board';
+import { KEYBOARD_IGNORED_TARGETS } from '@views/home/config/board';
 
 export function isBoardShortcut(event: KeyboardEvent): boolean {
   if (event.metaKey || event.ctrlKey || event.altKey || event.isComposing) return false;

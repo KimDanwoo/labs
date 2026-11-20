@@ -1,8 +1,8 @@
 import { IconButton } from '@shared/ui/icon-button';
+import { canRedoAtom, redoAtom } from '@views/home/model/store/historyAtoms';
+import { timerActiveAtom } from '@views/home/model/store/primitives';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { LuRedo2 } from 'react-icons/lu';
-import { canRedoAtom, redoAtom } from '../../model/store/historyAtoms';
-import { timerActiveAtom } from '../../model/store/primitives';
 
 export const RedoMove = () => {
   const redo = useSetAtom(redoAtom);

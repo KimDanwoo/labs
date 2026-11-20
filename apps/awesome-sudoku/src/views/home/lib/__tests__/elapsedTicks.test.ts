@@ -1,5 +1,5 @@
+import { elapsedTicks } from '@views/home/lib/elapsedTicks';
 import { describe, expect, it } from 'vitest';
-import { elapsedTicks } from '../elapsedTicks';
 
 const SECOND = 1000;
 

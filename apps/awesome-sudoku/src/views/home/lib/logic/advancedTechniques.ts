@@ -1,7 +1,7 @@
-import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '../../config/board';
-import { atIndex } from '../gridAccess';
-import { bit, COL_UNITS, combinations, EMPTY, PEERS, popcount, ROW_UNITS, UNITS } from '../solverGrid';
-import type { LogicBoard } from './logicBoard';
+import { BOARD_SIZE, SUDOKU_CELL_COUNT } from '@views/home/config/board';
+import { atIndex } from '@views/home/lib/gridAccess';
+import type { LogicBoard } from '@views/home/lib/logic/logicBoard';
+import { bit, COL_UNITS, combinations, EMPTY, PEERS, popcount, ROW_UNITS, UNITS } from '@views/home/lib/solverGrid';
 
 const MAX_FISH_SIZE = 3;
 

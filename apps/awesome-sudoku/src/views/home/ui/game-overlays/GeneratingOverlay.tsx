@@ -1,7 +1,7 @@
+import { isGeneratingAtom } from '@views/home/model/store/primitives';
+import { SudokuLoader } from '@views/home/ui/game-overlays/SudokuLoader';
 import { useAtomValue } from 'jotai';
 import type { FC } from 'react';
-import { isGeneratingAtom } from '../../model/store/primitives';
-import { SudokuLoader } from './SudokuLoader';
 
 export const GeneratingOverlay: FC = () => {
   const isGenerating = useAtomValue(isGeneratingAtom);

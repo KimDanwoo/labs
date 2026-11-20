@@ -1,10 +1,10 @@
+import { BOARD_MAX_INDEX } from '@views/home/config/board';
+import { GAME_PHASE } from '@views/home/config/game';
+import { fillCellAtom, toggleNoteAtom } from '@views/home/model/store/cellValueAtoms';
+import { isNoteModeAtom, selectedCellAtom } from '@views/home/model/store/primitives';
+import { selectCellAtom } from '@views/home/model/store/selectionAtoms';
+import { gamePhaseAtom } from '@views/home/model/store/statusAtoms';
 import { atom } from 'jotai';
-import { BOARD_MAX_INDEX } from '../../config/board';
-import { GAME_PHASE } from '../../config/game';
-import { fillCellAtom, toggleNoteAtom } from './cellValueAtoms';
-import { isNoteModeAtom, selectedCellAtom } from './primitives';
-import { selectCellAtom } from './selectionAtoms';
-import { gamePhaseAtom } from './statusAtoms';
 
 const ARROW_STEP: Record<string, { row: number; col: number }> = {
   ArrowUp: { row: -1, col: 0 },

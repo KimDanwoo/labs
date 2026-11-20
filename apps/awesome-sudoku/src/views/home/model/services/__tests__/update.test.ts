@@ -1,9 +1,6 @@
-import { describe, expect, it } from 'vitest';
-import { BOARD_SIZE } from '../../../config/board';
-import { GAME_MODE } from '../../../config/game';
-import { atIndex, cellAt } from '../../../lib/gridAccess';
-import type { SudokuBoard, SudokuCell } from '../../types/board';
-import type { KillerCage } from '../../types/game';
+import { BOARD_SIZE } from '@views/home/config/board';
+import { GAME_MODE } from '@views/home/config/game';
+import { atIndex, cellAt } from '@views/home/lib/gridAccess';
 import {
   calculateHighlights,
   canFillCell,
@@ -15,7 +12,10 @@ import {
   updateCellValue,
   updateSingleCell,
   validateBoard,
-} from '../update';
+} from '@views/home/model/services/update';
+import type { SudokuBoard, SudokuCell } from '@views/home/model/types/board';
+import type { KillerCage } from '@views/home/model/types/game';
+import { describe, expect, it } from 'vitest';
 
 describe('update.ts 유틸리티 함수 테스트', () => {
   const createTestBoard = (): SudokuBoard =>

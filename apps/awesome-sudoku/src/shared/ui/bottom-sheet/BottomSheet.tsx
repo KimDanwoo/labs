@@ -1,14 +1,14 @@
 'use client';
 
 import { cn } from '@shared/lib/cn';
+import { BACKDROP_TRANSITION, PHASE, sheetMotion } from '@shared/ui/bottom-sheet/sheetMotion';
+import { useBodyScrollLock } from '@shared/ui/bottom-sheet/useBodyScrollLock';
+import { useFocusTrap } from '@shared/ui/bottom-sheet/useFocusTrap';
+import { useIsDesktop } from '@shared/ui/bottom-sheet/useIsDesktop';
+import { useSheetDrag } from '@shared/ui/bottom-sheet/useSheetDrag';
+import { useSheetPhase } from '@shared/ui/bottom-sheet/useSheetPhase';
 import { useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { BACKDROP_TRANSITION, PHASE, sheetMotion } from './sheetMotion';
-import { useBodyScrollLock } from './useBodyScrollLock';
-import { useFocusTrap } from './useFocusTrap';
-import { useIsDesktop } from './useIsDesktop';
-import { useSheetDrag } from './useSheetDrag';
-import { useSheetPhase } from './useSheetPhase';
 
 type BottomSheetProps = {
   isOpen: boolean;

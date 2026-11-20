@@ -1,14 +1,14 @@
 'use client';
+import { GAME_MODE } from '@views/home/config/game';
+import { boardAtom, gameModeAtom } from '@views/home/model/store/primitives';
+import { selectCellAtom } from '@views/home/model/store/selectionAtoms';
+import { useInitializeGame } from '@views/home/model/sudoku-game/hooks/useInitializeGame';
+import { useKeyboardControls } from '@views/home/model/sudoku-game/hooks/useKeyboardControls';
+import { KillerCage } from '@views/home/ui/sudoku-game/KillerCage';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useRef } from 'react';
-import { GAME_MODE } from '../../config/game';
-import { boardAtom, gameModeAtom } from '../../model/store/primitives';
-import { selectCellAtom } from '../../model/store/selectionAtoms';
-import { useInitializeGame } from '../../model/sudoku-game/hooks/useInitializeGame';
-import { useKeyboardControls } from '../../model/sudoku-game/hooks/useKeyboardControls';
-import { KillerCage } from '../sudoku-game/KillerCage';
 
-import { BoardRow } from './BoardRow';
+import { BoardRow } from '@views/home/ui/game-board/BoardRow';
 
 export const SudokuBoard: React.FC = () => {
   const gameMode = useAtomValue(gameModeAtom);

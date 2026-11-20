@@ -1,8 +1,6 @@
-import { atom } from 'jotai';
-import { NUMBER_COUNTS } from '../../config/board';
-import { GAME_PHASE } from '../../config/game';
-import { buildGameResultState, resolveBoardState } from '../services/gameResult';
-import type { GamePhase } from '../types/game';
+import { NUMBER_COUNTS } from '@views/home/config/board';
+import { GAME_PHASE } from '@views/home/config/game';
+import { buildGameResultState, resolveBoardState } from '@views/home/model/services/gameResult';
 import {
   boardAtom,
   cagesAtom,
@@ -13,7 +11,9 @@ import {
   numberCountsAtom,
   solutionAtom,
   timerActiveAtom,
-} from './primitives';
+} from '@views/home/model/store/primitives';
+import type { GamePhase } from '@views/home/model/types/game';
+import { atom } from 'jotai';
 
 export const gamePhaseAtom = atom<GamePhase>((get) => {
   if (get(isGeneratingAtom)) return GAME_PHASE.GENERATING;
