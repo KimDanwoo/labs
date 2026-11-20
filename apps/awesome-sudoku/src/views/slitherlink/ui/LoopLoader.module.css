@@ -1,0 +1,37 @@
+.loop {
+  stroke-dasharray: 1;
+  animation: trace 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.dots {
+  animation: breathe 1.8s ease-in-out infinite;
+}
+
+@keyframes trace {
+  0% {
+    stroke-dashoffset: 1;
+  }
+  55% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -1;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loop,
+  .dots {
+    animation: none;
+  }
+}
