@@ -1,6 +1,6 @@
+import type { Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { collidersOf, type PropFrame } from '@views/drive/lib/engine/game/world/villageKit';
 import * as THREE from 'three/webgpu';
-import type { Parts } from './islandGeometry';
-import { collidersOf, type PropFrame } from './villageKit';
 
 const SIDES = [-1, 1] as const;
 const BENCH_DESIGN = {

@@ -1,6 +1,6 @@
-import type { JukeboxTrack } from '../../data/worldContent';
-import { Events } from '../events';
-import type { JukeboxState } from './jukeboxTypes';
+import type { JukeboxTrack } from '@views/drive/lib/engine/data/worldContent';
+import { Events } from '@views/drive/lib/engine/game/events';
+import type { JukeboxState } from '@views/drive/lib/engine/game/jukebox/jukeboxTypes';
 
 const START_TIMEOUT_MS = 8000;
 

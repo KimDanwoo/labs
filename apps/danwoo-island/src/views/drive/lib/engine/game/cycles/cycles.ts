@@ -1,9 +1,5 @@
 import * as THREE from 'three/webgpu';
 
-import { Events } from '../events';
-import { getGame } from '../gameContext';
-import { TICK_ORDER } from '../tickOrder';
-import { lerp, smoothstep } from '../utilities/maths';
 import {
   CycleOverride,
   type CycleProperty,
@@ -21,7 +17,11 @@ import {
   cloneValue,
   valuesOf,
   wrapKeyframes,
-} from './cycleKeyframes';
+} from '@views/drive/lib/engine/game/cycles/cycleKeyframes';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { lerp, smoothstep } from '@views/drive/lib/engine/game/utilities/maths';
 
 export abstract class Cycles<P extends Record<keyof P, CycleValue>, N extends string = never> {
   readonly game = getGame();

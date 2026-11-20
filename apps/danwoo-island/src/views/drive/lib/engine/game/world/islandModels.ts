@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { isModel, modelResource, type ResourceSpec } from '../resourcesLoader';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { isModel, modelResource, type ResourceSpec } from '@views/drive/lib/engine/game/resourcesLoader';
 
 const ISLAND_MODELS = {
   gamepad: 'areas/island/models/gamepad.glb',

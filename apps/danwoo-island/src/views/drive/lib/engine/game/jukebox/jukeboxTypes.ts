@@ -1,6 +1,6 @@
-import type { JukeboxTrack } from '../../data/worldContent';
-import type { Events } from '../events';
-import type { SoundCloudGlobal, WidgetFrame } from './soundcloudWidget';
+import type { JukeboxTrack } from '@views/drive/lib/engine/data/worldContent';
+import type { Events } from '@views/drive/lib/engine/game/events';
+import type { SoundCloudGlobal, WidgetFrame } from '@views/drive/lib/engine/game/jukebox/soundcloudWidget';
 
 export type JukeboxStatus = 'idle' | 'loading' | 'ready' | 'starting' | 'playing' | 'paused' | 'error';
 

@@ -1,6 +1,11 @@
 import * as THREE from 'three/webgpu';
 
-import { isModel, textureResource, type ResourceSpec, type Resources } from '../resourcesLoader';
+import {
+  isModel,
+  textureResource,
+  type ResourceSpec,
+  type Resources,
+} from '@views/drive/lib/engine/game/resourcesLoader';
 
 const ISLAND_TEXTURES = new Map<string, string>(
   Object.entries({

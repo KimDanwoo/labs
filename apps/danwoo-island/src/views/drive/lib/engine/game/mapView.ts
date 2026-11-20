@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import {
   COMPACT_SCREEN,
   FLIGHT,
@@ -10,8 +10,8 @@ import {
   LABEL_FLIP_MARGIN,
   LABEL_LEFT_CLASS,
   PAN_REACH,
-} from './mapConfig';
-import type { OverviewFrame, ScreenInsets } from './view/overviewFrame';
+} from '@views/drive/lib/engine/game/mapConfig';
+import type { OverviewFrame, ScreenInsets } from '@views/drive/lib/engine/game/view/overviewFrame';
 
 export function mapInsets(width: number, height: number): ScreenInsets {
   const isNarrow = width <= COMPACT_SCREEN.width;

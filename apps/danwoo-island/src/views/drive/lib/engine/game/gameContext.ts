@@ -1,4 +1,4 @@
-import type { Game } from './game';
+import type { Game } from '@views/drive/lib/engine/game/game';
 
 let current: Game | null = null;
 

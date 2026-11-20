@@ -1,5 +1,5 @@
-import type { Spot } from './circuitDecorationConfig';
-import type { Parts } from './islandGeometry';
+import type { Spot } from '@views/drive/lib/engine/game/world/circuitDecorationConfig';
+import type { Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
 
 const BYEOTGARI = {
   radius: 0.68,

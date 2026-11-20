@@ -1,8 +1,12 @@
 import * as THREE from 'three/webgpu';
 
-import { requireElement } from '../../utilities/requireElement';
-import { Area } from './area';
-import { frameCourseSigns, paintCourseSign, paintObstacleResetSign } from './circuitSigns';
+import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import {
+  frameCourseSigns,
+  paintCourseSign,
+  paintObstacleResetSign,
+} from '@views/drive/lib/engine/game/world/areas/circuitSigns';
 
 export interface MenuHandlers {
   isRacing: () => boolean;

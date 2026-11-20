@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu';
 
-import type { Respawns } from './respawns';
-import { INTRO_RING } from './world/layout/islandLayout';
+import type { Respawns } from '@views/drive/lib/engine/game/respawns';
+import { INTRO_RING } from '@views/drive/lib/engine/game/world/layout/islandLayout';
 
 const INTRO_CENTER_OFFSET = new THREE.Vector3(INTRO_RING.offset[0], 0, INTRO_RING.offset[1]);
 

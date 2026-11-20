@@ -1,4 +1,4 @@
-import { PanelHeader } from './PanelHeader';
+import { PanelHeader } from '@views/drive/ui/PanelHeader';
 
 export function JukeboxModal() {
   return (

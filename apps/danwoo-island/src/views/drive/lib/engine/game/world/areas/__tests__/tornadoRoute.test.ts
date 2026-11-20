@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { pickTornadoDestination } from '../tornadoRoute';
+import { pickTornadoDestination } from '@views/drive/lib/engine/game/world/areas/tornadoRoute';
 
 const PLACES = ['tornado', 'a', 'b', 'c', 'start'];
 

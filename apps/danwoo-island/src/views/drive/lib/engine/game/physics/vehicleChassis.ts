@@ -1,11 +1,16 @@
 import type { DynamicRayCastVehicleController } from '@dimforge/rapier3d-compat';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import type { Physical } from './physicsTypes';
-import { type VehicleWheel, CHASSIS_FRICTION, WHEEL_SETTINGS, wheelPositions } from './vehicleConfig';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { Physical } from '@views/drive/lib/engine/game/physics/physicsTypes';
+import {
+  type VehicleWheel,
+  CHASSIS_FRICTION,
+  WHEEL_SETTINGS,
+  wheelPositions,
+} from '@views/drive/lib/engine/game/physics/vehicleConfig';
 
-import type { PhysicsVehicle } from './physicsVehicle';
+import type { PhysicsVehicle } from '@views/drive/lib/engine/game/physics/physicsVehicle';
 
 export function createChassis(position: THREE.Vector3): { physical: Physical; mass: number } {
   const game = getGame();

@@ -1,4 +1,4 @@
-import { prefersReducedMotion } from '../utilities/reducedMotion';
+import { prefersReducedMotion } from '@views/drive/lib/engine/game/utilities/reducedMotion';
 
 const ROLL = { damping: 4, pullStrength: 100, kickStrength: 1 } as const;
 

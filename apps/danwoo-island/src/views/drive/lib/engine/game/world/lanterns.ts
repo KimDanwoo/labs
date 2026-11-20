@@ -1,6 +1,6 @@
-import { getGame } from '../gameContext';
-import { InstancedProps } from './instancedProps';
-import { createGardenLamp } from './islandProps';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { InstancedProps } from '@views/drive/lib/engine/game/world/instancedProps';
+import { createGardenLamp } from '@views/drive/lib/engine/game/world/islandProps';
 
 const TRAILING_NUMBER = /[0-9]+$/i;
 const SCALE = 0.5;

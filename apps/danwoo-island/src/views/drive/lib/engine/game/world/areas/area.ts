@@ -1,11 +1,11 @@
 import * as THREE from 'three/webgpu';
 
-import { Events } from '../../events';
-import { getGame } from '../../gameContext';
-import type { WorldObject } from '../../objectColliders';
-import { References } from '../../references';
-import { TICK_ORDER } from '../../tickOrder';
-import { circleIntersectsPolygon } from '../../utilities/maths';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { WorldObject } from '@views/drive/lib/engine/game/objectColliders';
+import { References } from '@views/drive/lib/engine/game/references';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { circleIntersectsPolygon } from '@views/drive/lib/engine/game/utilities/maths';
 
 type AreaEvents = { boundingIn: []; boundingOut: []; frustumIn: []; frustumOut: [] };
 

@@ -23,8 +23,8 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { ANTICIPATION, ARC, EXPLOSION, type FloatUniform } from './lightningsConfig';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { ANTICIPATION, ARC, EXPLOSION, type FloatUniform } from '@views/drive/lib/engine/game/world/lightningsConfig';
 
 interface Palette {
   colorA: THREE.UniformNode<'color', THREE.Color>;

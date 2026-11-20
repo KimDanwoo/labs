@@ -1,10 +1,10 @@
-import './objectCopyOverride';
+import '@views/drive/lib/engine/objectCopyOverride';
 
 import { DefaultLoadingManager } from 'three/webgpu';
 
-import { worldAsset } from '../../config/worldAsset';
-import { Game } from './game/game';
-import { peekGame } from './game/gameContext';
+import { worldAsset } from '@views/drive/config/worldAsset';
+import { Game } from '@views/drive/lib/engine/game/game';
+import { peekGame } from '@views/drive/lib/engine/game/gameContext';
 
 DefaultLoadingManager.setURLModifier(worldAsset);
 

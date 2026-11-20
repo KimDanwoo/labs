@@ -1,5 +1,5 @@
+import { QUALITY } from '@views/drive/lib/engine/game/quality';
 import * as THREE from 'three/webgpu';
-import { QUALITY } from '../quality';
 
 export const IDEAL_RATIO = 1920 / 1080;
 export const CAMERA = { fov: 25, near: 0.1, far: 200 } as const;

@@ -1,8 +1,14 @@
 import * as THREE from 'three/webgpu';
 
-import { AREA_ANCHORS, type Point, TRACK } from './layout/islandLayout';
-import { isOverWaterJump, nearestSample, sideOf, type TrackSample, trackSamples } from './layout/trackPath';
-import { stripGeometry } from './trackGeometry';
+import { AREA_ANCHORS, type Point, TRACK } from '@views/drive/lib/engine/game/world/layout/islandLayout';
+import {
+  isOverWaterJump,
+  nearestSample,
+  sideOf,
+  type TrackSample,
+  trackSamples,
+} from '@views/drive/lib/engine/game/world/layout/trackPath';
+import { stripGeometry } from '@views/drive/lib/engine/game/world/trackGeometry';
 
 const RETIRED = /^(blocks|jump|physicalFixed004|bumpersPhysicalFixed)/;
 const ROAD = /^refRoadPhysicalFixed/;

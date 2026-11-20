@@ -1,4 +1,4 @@
-import type { Point } from './islandLayout';
+import type { Point } from '@views/drive/lib/engine/game/world/layout/islandLayout';
 
 const CATMULL_ROM_HALF = 0.5;
 

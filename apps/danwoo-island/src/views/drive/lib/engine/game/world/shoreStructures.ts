@@ -1,8 +1,14 @@
+import { createParts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
+import { SHOWER_SCALE, pushOutOfShowerBay } from '@views/drive/lib/engine/game/world/showerBay';
+import {
+  CUBOID,
+  cuboidFrame,
+  findChild,
+  findChildMatching,
+  requireMesh,
+} from '@views/drive/lib/engine/game/world/structureKit';
 import * as THREE from 'three/webgpu';
-import { createParts } from './islandGeometry';
-import { islandModelMesh } from './islandModels';
-import { SHOWER_SCALE, pushOutOfShowerBay } from './showerBay';
-import { CUBOID, cuboidFrame, findChild, findChildMatching, requireMesh } from './structureKit';
 
 const SHOWER_STATION = {
   floor: -1.9,

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { parseLatestPostsResponse } from '../../model/latestPost';
-import { parseLatestPosts } from '../fetchLatestPosts';
+import { parseLatestPosts } from '@entities/blog/api/fetchLatestPosts';
+import { parseLatestPostsResponse } from '@entities/blog/model/latestPost';
 
 const feed = (body: string): string => `<rss><channel>${body}</channel></rss>`;
 const item = (slug: string, date: string, media = `https://danwoo.dev/_astro/${slug}.jpg`): string =>

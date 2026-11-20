@@ -1,9 +1,9 @@
-type WorldEngine = typeof import('./engine/world');
+type WorldEngine = typeof import('@views/drive/lib/engine/world');
 
 let enginePromise: Promise<WorldEngine> | null = null;
 
 function loadEngine(): Promise<WorldEngine> {
-  enginePromise ??= import('./engine/world').catch((error: unknown) => {
+  enginePromise ??= import('@views/drive/lib/engine/world').catch((error: unknown) => {
     enginePromise = null;
     throw error;
   });

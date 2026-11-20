@@ -1,5 +1,5 @@
-import { closedCurve } from './curves';
-import { type Point, TRACK } from './islandLayout';
+import { closedCurve } from '@views/drive/lib/engine/game/world/layout/curves';
+import { type Point, TRACK } from '@views/drive/lib/engine/game/world/layout/islandLayout';
 
 export interface TrackSample {
   readonly point: Point;

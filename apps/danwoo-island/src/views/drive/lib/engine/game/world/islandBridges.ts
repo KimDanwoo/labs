@@ -1,9 +1,9 @@
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { islandModelGeometry, islandPaletteMaterial } from './islandModels';
-import { BRIDGES, type BridgeSpan } from './layout/islandLayout';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { islandModelGeometry, islandPaletteMaterial } from '@views/drive/lib/engine/game/world/islandModels';
+import { BRIDGES, type BridgeSpan } from '@views/drive/lib/engine/game/world/layout/islandLayout';
 
 const DECK = { top: 0.12, thickness: 0.3, landing: 3, segment: 2.4 } as const;
 const UP = new THREE.Vector3(0, 1, 0);

@@ -1,4 +1,4 @@
-import type { PlaystationButton } from '../config/controls';
+import type { PlaystationButton } from '@views/drive/config/controls';
 
 interface PlaystationKeyProps {
   button: PlaystationButton;

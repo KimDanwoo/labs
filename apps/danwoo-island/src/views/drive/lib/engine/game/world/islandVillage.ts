@@ -1,9 +1,9 @@
 import * as THREE from 'three/webgpu';
 
-import { createParts, type Parts } from './islandGeometry';
-import { placeLandmarks } from './islandLandmarks';
-import { type IslandModelKey, islandModelMesh } from './islandModels';
-import { bench, logStool, soban } from './villageFurniture';
+import { createParts, type Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { placeLandmarks } from '@views/drive/lib/engine/game/world/islandLandmarks';
+import { type IslandModelKey, islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
+import { bench, logStool, soban } from '@views/drive/lib/engine/game/world/villageFurniture';
 import {
   boundsFrame,
   collidersOf,
@@ -12,12 +12,18 @@ import {
   type PropBuilder,
   type PropFrame,
   rebuildChild,
-} from './villageKit';
-import { dotjari, watermelonTray } from './villageLeisure';
-import { barCounter } from './villageLounge';
-import { gochujangJar, makgeolliBowl, oilBottle } from './villagePantry';
-import { beachBall, bowlingPin, pinwheel } from './villageToys';
-import { candleSticks, placeGamepad, slateBoards, surfFlag, workTable } from './villageWorkshop';
+} from '@views/drive/lib/engine/game/world/villageKit';
+import { dotjari, watermelonTray } from '@views/drive/lib/engine/game/world/villageLeisure';
+import { barCounter } from '@views/drive/lib/engine/game/world/villageLounge';
+import { gochujangJar, makgeolliBowl, oilBottle } from '@views/drive/lib/engine/game/world/villagePantry';
+import { beachBall, bowlingPin, pinwheel } from '@views/drive/lib/engine/game/world/villageToys';
+import {
+  candleSticks,
+  placeGamepad,
+  slateBoards,
+  surfFlag,
+  workTable,
+} from '@views/drive/lib/engine/game/world/villageWorkshop';
 
 type UncollidedBuilder = (parts: Parts, frame: PropFrame, container: THREE.Object3D) => void;
 

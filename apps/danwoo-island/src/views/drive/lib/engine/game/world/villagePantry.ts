@@ -1,6 +1,6 @@
+import type { Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { type PropFrame, lathe, scaleProfile } from '@views/drive/lib/engine/game/world/villageKit';
 import * as THREE from 'three/webgpu';
-import type { Parts } from './islandGeometry';
-import { type PropFrame, lathe, scaleProfile } from './villageKit';
 
 const GOCHUJANG_JAR_DESIGN = {
   profile: [

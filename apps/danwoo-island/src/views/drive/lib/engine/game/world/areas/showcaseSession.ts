@@ -1,10 +1,10 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../../gameContext';
-import type { Action } from '../../inputs/inputTypes';
-import type { BlackBoard } from './showcaseBlackBoard';
-import { fadeShades, type Shades } from './showcaseVisuals';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { Action } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import type { BlackBoard } from '@views/drive/lib/engine/game/world/areas/showcaseBlackBoard';
+import { fadeShades, type Shades } from '@views/drive/lib/engine/game/world/areas/showcaseVisuals';
 
 export type ShowcaseState = 'closed' | 'opening' | 'open' | 'closing';
 

@@ -1,7 +1,13 @@
+import type { Audio } from '@views/drive/lib/engine/game/audio';
+import {
+  HIT_FADE_DISTANCE,
+  HIT_GROUPS,
+  HIT_SOUNDS,
+  HIT_VOLUME,
+  hitHandler,
+} from '@views/drive/lib/engine/game/audioConfig';
+import { DEFAULT_ANTI_SPAM } from '@views/drive/lib/engine/game/audioItem';
 import * as THREE from 'three/webgpu';
-import type { Audio } from './audio';
-import { HIT_FADE_DISTANCE, HIT_GROUPS, HIT_SOUNDS, HIT_VOLUME, hitHandler } from './audioConfig';
-import { DEFAULT_ANTI_SPAM } from './audioItem';
 
 export function registerOneOffs(audio: Audio): void {
   audio.register({

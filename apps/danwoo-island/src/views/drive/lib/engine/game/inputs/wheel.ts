@@ -1,6 +1,6 @@
 import normalizeWheel from 'normalize-wheel';
 
-import { Events } from '../events';
+import { Events } from '@views/drive/lib/engine/game/events';
 
 export class Wheel {
   readonly events = new Events<{ roll: [spin: number] }>();

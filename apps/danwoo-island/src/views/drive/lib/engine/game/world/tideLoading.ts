@@ -1,8 +1,8 @@
 import { atan, color, float, Fn, fwidth, mix, positionGeometry, positionWorld, TWO_PI, vec2, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { WORLD_CONFIG } from '../../worldConfig';
-import { getGame } from '../gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { WORLD_CONFIG } from '@views/drive/lib/engine/worldConfig';
 
 type FloatNode = THREE.Node<'float'>;
 type Vec2Node = THREE.Node<'vec2'>;

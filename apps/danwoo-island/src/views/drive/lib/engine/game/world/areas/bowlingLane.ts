@@ -1,6 +1,5 @@
-import gsap from 'gsap';
-import { objectOf } from '../../objectColliders';
-import { Area } from './area';
+import { objectOf } from '@views/drive/lib/engine/game/objectColliders';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
 import {
   type Bumpers,
   type Screen,
@@ -11,7 +10,8 @@ import {
   requireBody,
   screenTexture,
   strikeLabelMaterial,
-} from './bowlingConfig';
+} from '@views/drive/lib/engine/game/world/areas/bowlingConfig';
+import gsap from 'gsap';
 
 export function createScreen(area: Area): Screen {
   const group = area.requireReference('screen');

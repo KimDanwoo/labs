@@ -1,8 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { Track } from '../tracks';
-import { remapClamp } from '../utilities/maths';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { Track } from '@views/drive/lib/engine/game/tracks';
+import { remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
 import {
   type Antenna,
   ANTENNA_TARGET,
@@ -12,7 +12,7 @@ import {
   WHEEL_EASING,
   WHEEL_MAX_Y,
   WHEEL_ROTATION_SCALE,
-} from './visualVehicleParts';
+} from '@views/drive/lib/engine/game/world/visualVehicleParts';
 
 export function createWheels(template: THREE.Object3D, chassis: THREE.Object3D): VisualWheel[] {
   const game = getGame();

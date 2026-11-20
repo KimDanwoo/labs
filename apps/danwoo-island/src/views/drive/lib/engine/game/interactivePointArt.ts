@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-import { UI_FONT_FAMILY } from './utilities/canvasFont';
+import { UI_FONT_FAMILY } from '@views/drive/lib/engine/game/utilities/canvasFont';
 
 export type PointAlign = 'left' | 'right';
 

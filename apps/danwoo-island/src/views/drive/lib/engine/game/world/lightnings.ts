@@ -3,12 +3,16 @@ import { alea } from 'seedrandom';
 import { color, instancedArray, uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { type AudioItem } from '../audioItem';
-import { getGame } from '../gameContext';
-import { LineGeometry } from '../geometries/lineGeometry';
-import { TICK_ORDER } from '../tickOrder';
-import { anticipationMaterial, arcMaterial, explosionMaterial } from './lightningMaterials';
-import { registerDistantThunder, registerNearThunder } from './lightningSounds';
+import { type AudioItem } from '@views/drive/lib/engine/game/audioItem';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { LineGeometry } from '@views/drive/lib/engine/game/geometries/lineGeometry';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import {
+  anticipationMaterial,
+  arcMaterial,
+  explosionMaterial,
+} from '@views/drive/lib/engine/game/world/lightningMaterials';
+import { registerDistantThunder, registerNearThunder } from '@views/drive/lib/engine/game/world/lightningSounds';
 import {
   ANTICIPATION,
   anticipationData,
@@ -21,7 +25,7 @@ import {
   RENDER_ORDER,
   STRIKE_EXPLOSION,
   type Random,
-} from './lightningsConfig';
+} from '@views/drive/lib/engine/game/world/lightningsConfig';
 
 export class Lightnings {
   readonly #group = new THREE.Group();

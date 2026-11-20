@@ -1,8 +1,8 @@
+import { type SoundHandler, isVectorLike } from '@views/drive/lib/engine/game/audioItem';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { createElement } from '@views/drive/lib/engine/game/utilities/createElement';
+import { remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
 import * as THREE from 'three/webgpu';
-import { type SoundHandler, isVectorLike } from './audioItem';
-import { getGame } from './gameContext';
-import { createElement } from './utilities/createElement';
-import { remapClamp } from './utilities/maths';
 
 export const IS_IOS =
   /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

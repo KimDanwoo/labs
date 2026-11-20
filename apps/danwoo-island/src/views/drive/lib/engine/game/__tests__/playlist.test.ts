@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { Playlist, type PlaylistHost, type SongStream, type SongStreamHandlers } from '../playlist';
+import {
+  Playlist,
+  type PlaylistHost,
+  type SongStream,
+  type SongStreamHandlers,
+} from '@views/drive/lib/engine/game/playlist';
 
 interface FakeStream extends SongStream {
   path: string;

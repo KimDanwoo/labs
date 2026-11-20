@@ -1,9 +1,9 @@
+import type { ProjectContent } from '@views/drive/lib/engine/data/worldContent';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import type { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import type { Direction } from '@views/drive/lib/engine/game/world/areas/showcaseVisuals';
 import { color, Fn, texture, uv } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import type { ProjectContent } from '../../../data/worldContent';
-import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
-import type { Area } from './area';
-import type { Direction } from './showcaseVisuals';
 
 export type ImageLanding = 'first' | 'last';
 export const CINEMATIC_OFFSETS = {

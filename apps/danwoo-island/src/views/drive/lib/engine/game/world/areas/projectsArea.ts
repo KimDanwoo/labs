@@ -1,16 +1,13 @@
 import { uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import content from '../../../data/danwoo';
-import type { ProjectContent } from '../../../data/worldContent';
-import type { Intersect } from '../../rayCursor';
-import { removeAwardsTable } from '../islandReskins';
-import { rebuildVillageProps } from '../islandVillage';
-import { rebuildProjectsGate } from '../villageStructures';
-import { Area } from './area';
-import { createAreaPoint, playGroups } from './areaPoint';
-import { ImagePagination } from './imagePagination';
-import { ProjectAttributes, type AttributeName } from './projectAttributes';
+import content from '@views/drive/lib/engine/data/danwoo';
+import type { ProjectContent } from '@views/drive/lib/engine/data/worldContent';
+import type { Intersect } from '@views/drive/lib/engine/game/rayCursor';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { createAreaPoint, playGroups } from '@views/drive/lib/engine/game/world/areas/areaPoint';
+import { ImagePagination } from '@views/drive/lib/engine/game/world/areas/imagePagination';
+import { ProjectAttributes, type AttributeName } from '@views/drive/lib/engine/game/world/areas/projectAttributes';
 import {
   adjacentTitles,
   CHARCOAL_THRESHOLD,
@@ -22,13 +19,24 @@ import {
   siblingImage,
   wrapIndex,
   type ImageLanding,
-} from './projectsAreaConfig';
-import { ProjectAdjacents } from './projectsPanels';
-import { BlackBoard } from './showcaseBlackBoard';
-import { ShowcaseImages } from './showcaseImages';
-import { bindShowcaseInputs, ShowcaseSession, type ShowcaseState } from './showcaseSession';
-import { TitleSign, UrlSign, urlSignIntersect } from './showcaseSigns';
-import { createHoverMaterials, createShades, type Direction } from './showcaseVisuals';
+} from '@views/drive/lib/engine/game/world/areas/projectsAreaConfig';
+import { ProjectAdjacents } from '@views/drive/lib/engine/game/world/areas/projectsPanels';
+import { BlackBoard } from '@views/drive/lib/engine/game/world/areas/showcaseBlackBoard';
+import { ShowcaseImages } from '@views/drive/lib/engine/game/world/areas/showcaseImages';
+import {
+  bindShowcaseInputs,
+  ShowcaseSession,
+  type ShowcaseState,
+} from '@views/drive/lib/engine/game/world/areas/showcaseSession';
+import { TitleSign, UrlSign, urlSignIntersect } from '@views/drive/lib/engine/game/world/areas/showcaseSigns';
+import {
+  createHoverMaterials,
+  createShades,
+  type Direction,
+} from '@views/drive/lib/engine/game/world/areas/showcaseVisuals';
+import { removeAwardsTable } from '@views/drive/lib/engine/game/world/islandReskins';
+import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
+import { rebuildProjectsGate } from '@views/drive/lib/engine/game/world/villageStructures';
 
 export class ProjectsArea extends Area {
   readonly #projects = content.projects;

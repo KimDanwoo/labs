@@ -1,11 +1,16 @@
 import assert from 'node:assert/strict';
 import { mock, test } from 'node:test';
 
-import type { JukeboxTrack } from '../../../data/worldContent';
-import { Events } from '../../events';
-import { JukeboxPlayer } from '../jukeboxPlayer';
-import { type MusicHost } from '../jukeboxTypes';
-import type { SoundCloudGlobal, SoundCloudWidget, WidgetEvent, WidgetPayload } from '../soundcloudWidget';
+import type { JukeboxTrack } from '@views/drive/lib/engine/data/worldContent';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { JukeboxPlayer } from '@views/drive/lib/engine/game/jukebox/jukeboxPlayer';
+import { type MusicHost } from '@views/drive/lib/engine/game/jukebox/jukeboxTypes';
+import type {
+  SoundCloudGlobal,
+  SoundCloudWidget,
+  WidgetEvent,
+  WidgetPayload,
+} from '@views/drive/lib/engine/game/jukebox/soundcloudWidget';
 
 const TRACKS: JukeboxTrack[] = [1, 2, 3].map((id) => ({
   id,

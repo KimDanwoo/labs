@@ -1,8 +1,13 @@
+import type { TextCanvas } from '@views/drive/lib/engine/game/textCanvas';
+import { SWAP_DELAY } from '@views/drive/lib/engine/game/world/areas/projectsPanels';
+import {
+  applyTextMaterial,
+  childStartingWith,
+  type Shades,
+  showcaseTextCanvas,
+} from '@views/drive/lib/engine/game/world/areas/showcaseVisuals';
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
-import type { TextCanvas } from '../../textCanvas';
-import { SWAP_DELAY } from './projectsPanels';
-import { applyTextMaterial, childStartingWith, type Shades, showcaseTextCanvas } from './showcaseVisuals';
 
 interface AttributeItem {
   readonly group: THREE.Object3D;

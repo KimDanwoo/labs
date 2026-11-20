@@ -1,8 +1,8 @@
 import type { RigidBody } from '@dimforge/rapier3d-compat';
+import type { InstanceReference } from '@views/drive/lib/engine/game/instancedGroup';
+import type { WorldObject } from '@views/drive/lib/engine/game/objectColliders';
 import { color, Fn, positionGeometry, step, texture, uniform, uv, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import type { InstanceReference } from '../../instancedGroup';
-import type { WorldObject } from '../../objectColliders';
 
 export interface Pin {
   readonly index: number;

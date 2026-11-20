@@ -1,4 +1,4 @@
-import { type AreaKey, type Bounds } from './islandLayout';
+import { type AreaKey, type Bounds } from '@views/drive/lib/engine/game/world/layout/islandLayout';
 
 export const AREA_FOOTPRINTS: Partial<Record<AreaKey, readonly Bounds[]>> = {
   altar: [[-6.8, -7.6, 6.8, 7.5]],

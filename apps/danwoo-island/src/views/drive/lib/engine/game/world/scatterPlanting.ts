@@ -1,9 +1,9 @@
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { type IslandModelKey, islandModelMesh } from './islandModels';
-import { IslandTrees, JUNGLE_SPECIES, mixGroves, PALM } from './islandTrees';
-import { ISLAND_SCATTER, type ScatterPlacement } from './layout/islandScatter';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { type IslandModelKey, islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
+import { IslandTrees, JUNGLE_SPECIES, mixGroves, PALM } from '@views/drive/lib/engine/game/world/islandTrees';
+import { ISLAND_SCATTER, type ScatterPlacement } from '@views/drive/lib/engine/game/world/layout/islandScatter';
 
 const SHORE_ROCKS: readonly IslandModelKey[] = ['tropicalRockSmall', 'tropicalRockCluster', 'tropicalRockFlat'];
 const ROCK_SINK = 0.2;

@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-import { LineGeometry } from './lineGeometry';
+import { LineGeometry } from '@views/drive/lib/engine/game/geometries/lineGeometry';
 
 interface WindLineOptions {
   length?: number;

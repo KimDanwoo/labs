@@ -1,9 +1,9 @@
 import type * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { InstancedGroup } from '../instancedGroup';
-import type { ColliderDescription, CollisionHandler } from '../physics/physicsTypes';
-import { pushOutOfShowerBay } from './showerBay';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { InstancedGroup } from '@views/drive/lib/engine/game/instancedGroup';
+import type { ColliderDescription, CollisionHandler } from '@views/drive/lib/engine/game/physics/physicsTypes';
+import { pushOutOfShowerBay } from '@views/drive/lib/engine/game/world/showerBay';
 
 interface InstancedPropsOptions {
   modelName: string;

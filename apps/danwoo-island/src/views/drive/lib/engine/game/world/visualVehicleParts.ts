@@ -1,6 +1,6 @@
+import type { Track } from '@views/drive/lib/engine/game/tracks';
+import type { Trail } from '@views/drive/lib/engine/game/trails';
 import * as THREE from 'three/webgpu';
-import type { Track } from '../tracks';
-import type { Trail } from '../trails';
 
 export type PaintName = 'red' | 'orange' | 'white' | 'black' | 'flames' | 'abyssal';
 export interface BlinkerCallbacks {

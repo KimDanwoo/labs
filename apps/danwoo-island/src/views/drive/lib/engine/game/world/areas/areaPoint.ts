@@ -1,5 +1,5 @@
-import type { PointAlign } from '../../interactivePointArt';
-import type { Area } from './area';
+import type { PointAlign } from '@views/drive/lib/engine/game/interactivePointArt';
+import type { Area } from '@views/drive/lib/engine/game/world/areas/area';
 
 export function interactButtons(area: Area): { onReveal: () => void; onConceal: () => void; onHide: () => void } {
   const { interactiveButtons } = area.game.inputs;

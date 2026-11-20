@@ -1,6 +1,6 @@
-import { getGame } from './gameContext';
-import { TICK_ORDER } from './tickOrder';
-import { requireElement } from './utilities/requireElement';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
 
 interface NotificationOptions {
   type?: string;

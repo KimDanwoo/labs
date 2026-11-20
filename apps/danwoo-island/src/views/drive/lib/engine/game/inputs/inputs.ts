@@ -1,9 +1,7 @@
-import { Events } from '../events';
-import { getGame } from '../gameContext';
-import { TICK_ORDER } from '../tickOrder';
-import { ObservableSet } from '../utilities/observableSet';
-import { Gamepad } from './gamepad';
-import { listenGamepad, listenKeyboard, listenWheel } from './inputListeners';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { Gamepad } from '@views/drive/lib/engine/game/inputs/gamepad';
+import { listenGamepad, listenKeyboard, listenWheel } from '@views/drive/lib/engine/game/inputs/inputListeners';
 import {
   INPUT_MODE,
   isSameValue,
@@ -15,12 +13,14 @@ import {
   type ActionValue,
   type InputMode,
   type PointValue,
-} from './inputTypes';
-import { InteractiveButtons } from './interactiveButtons';
-import { Keyboard } from './keyboard';
-import { Nipple } from './nipple';
-import { Pointer } from './pointer';
-import { Wheel } from './wheel';
+} from '@views/drive/lib/engine/game/inputs/inputTypes';
+import { InteractiveButtons } from '@views/drive/lib/engine/game/inputs/interactiveButtons';
+import { Keyboard } from '@views/drive/lib/engine/game/inputs/keyboard';
+import { Nipple } from '@views/drive/lib/engine/game/inputs/nipple';
+import { Pointer } from '@views/drive/lib/engine/game/inputs/pointer';
+import { Wheel } from '@views/drive/lib/engine/game/inputs/wheel';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { ObservableSet } from '@views/drive/lib/engine/game/utilities/observableSet';
 
 export class Inputs {
   static readonly MODE_MOUSEKEYBOARD = INPUT_MODE.mouseKeyboard;

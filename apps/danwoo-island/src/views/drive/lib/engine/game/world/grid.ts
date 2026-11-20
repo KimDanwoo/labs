@@ -1,10 +1,10 @@
 import { Fn, positionWorld, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { gridColorNode } from '../materials/gridColor';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { isTideLoading, tideSeaMaterial } from './tideLoading';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { gridColorNode } from '@views/drive/lib/engine/game/materials/gridColor';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { isTideLoading, tideSeaMaterial } from '@views/drive/lib/engine/game/world/tideLoading';
 
 const PLANE_SIZE = 100;
 const GRID_COLOR = {

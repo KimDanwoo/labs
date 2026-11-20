@@ -16,9 +16,13 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial, revealNode } from '../materials/meshDefaultMaterial';
-import { type BlinkerCallbacks, type PaintName, BLINK_INTERVAL } from './visualVehicleParts';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial, revealNode } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import {
+  type BlinkerCallbacks,
+  type PaintName,
+  BLINK_INTERVAL,
+} from '@views/drive/lib/engine/game/world/visualVehicleParts';
 
 function flamesPaint(red: THREE.Material): THREE.Material | undefined {
   if (!(red instanceof MeshDefaultMaterial)) return undefined;

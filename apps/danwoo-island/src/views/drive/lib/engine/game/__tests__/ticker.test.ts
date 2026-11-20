@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { Ticker } from '../ticker';
-import { TICK_ORDER } from '../tickOrder';
+import { Ticker } from '@views/drive/lib/engine/game/ticker';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 const FRAME_MS = 16;
 

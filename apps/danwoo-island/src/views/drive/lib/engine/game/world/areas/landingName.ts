@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-import { NAME_GLYPHS } from './nameGlyphs';
+import { NAME_GLYPHS } from '@views/drive/lib/engine/game/world/areas/nameGlyphs';
 
 type PathCommand =
   | readonly ['M' | 'L', number, number]

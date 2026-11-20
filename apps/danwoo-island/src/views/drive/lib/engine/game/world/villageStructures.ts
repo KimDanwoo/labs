@@ -1,9 +1,20 @@
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { createParts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import {
+  islandModelGeometry,
+  islandModelMesh,
+  islandPaletteMaterial,
+} from '@views/drive/lib/engine/game/world/islandModels';
+import {
+  cuboidFrame,
+  findChild,
+  palmRoof,
+  pillar,
+  replaceVisual,
+  type Frame,
+} from '@views/drive/lib/engine/game/world/structureKit';
 import { texture } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { createParts } from './islandGeometry';
-import { islandModelGeometry, islandModelMesh, islandPaletteMaterial } from './islandModels';
-import { cuboidFrame, findChild, palmRoof, pillar, replaceVisual, type Frame } from './structureKit';
 
 export function rebuildProjectsGate(model: THREE.Object3D): void {
   replaceVisual(model, 'Cube065', () => {

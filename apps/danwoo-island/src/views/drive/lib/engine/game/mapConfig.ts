@@ -1,6 +1,6 @@
+import type { IslandPlace } from '@views/drive/lib/engine/game/islandPlaces';
+import type { ScreenInsets } from '@views/drive/lib/engine/game/view/overviewFrame';
 import * as THREE from 'three/webgpu';
-import type { IslandPlace } from './islandPlaces';
-import type { ScreenInsets } from './view/overviewFrame';
 
 export const MAP_ACTION = {
   name: 'map',

@@ -1,11 +1,11 @@
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
-import type { InteractivePoint } from '../../interactivePoint';
-import { objectOf, type WorldObject } from '../../objectColliders';
-import { Player } from '../../player';
-import { Area } from './area';
-import { CircuitCheckpoints } from './circuitCheckpoints';
+import type { InteractivePoint } from '@views/drive/lib/engine/game/interactivePoint';
+import { objectOf, type WorldObject } from '@views/drive/lib/engine/game/objectColliders';
+import { Player } from '@views/drive/lib/engine/game/player';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { CircuitCheckpoints } from '@views/drive/lib/engine/game/world/areas/circuitCheckpoints';
 import {
   APPLAUSE_DELAY,
   BOUNDS_THRESHOLD,
@@ -16,9 +16,15 @@ import {
   type Obstacle,
   type RaceOutcome,
   RESPAWN_UNLOCK_DELAY,
-} from './circuitConfig';
-import { CircuitLights } from './circuitLights';
-import { createRaceWorld, enterRaceWorld, leaveRaceWorld, type RaceWorld, respawnPose } from './circuitRaceWorld';
+} from '@views/drive/lib/engine/game/world/areas/circuitConfig';
+import { CircuitLights } from '@views/drive/lib/engine/game/world/areas/circuitLights';
+import {
+  createRaceWorld,
+  enterRaceWorld,
+  leaveRaceWorld,
+  type RaceWorld,
+  respawnPose,
+} from '@views/drive/lib/engine/game/world/areas/circuitRaceWorld';
 import {
   createObstacles,
   createStartPoint,
@@ -29,9 +35,13 @@ import {
   swayObstacles,
   timerTarget,
   waveBanners,
-} from './circuitSetup';
-import { CircuitTimer } from './circuitTimer';
-import { bindEndModal, createCourseSign, sharpenBrandTexture } from './circuitUi';
+} from '@views/drive/lib/engine/game/world/areas/circuitSetup';
+import { CircuitTimer } from '@views/drive/lib/engine/game/world/areas/circuitTimer';
+import {
+  bindEndModal,
+  createCourseSign,
+  sharpenBrandTexture,
+} from '@views/drive/lib/engine/game/world/areas/circuitUi';
 
 export class CircuitArea extends Area {
   #state: CircuitState = 'pending';

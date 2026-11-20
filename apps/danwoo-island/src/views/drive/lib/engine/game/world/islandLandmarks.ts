@@ -1,8 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-import { createFountainWater } from './fountainWater';
-import { type IslandModelKey, islandModelMesh } from './islandModels';
-import { introRingCenter, type Point } from './layout/islandLayout';
+import { createFountainWater } from '@views/drive/lib/engine/game/world/fountainWater';
+import { type IslandModelKey, islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
+import { introRingCenter, type Point } from '@views/drive/lib/engine/game/world/layout/islandLayout';
 
 interface LandmarkCollider {
   readonly size: THREE.Vector3;

@@ -1,5 +1,5 @@
-import { Events } from '../events';
-import { requireElement } from '../utilities/requireElement';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
 
 interface ButtonItem {
   name: string;

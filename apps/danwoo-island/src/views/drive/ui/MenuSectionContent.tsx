@@ -1,5 +1,5 @@
-import type { MenuSectionName } from '../config/menu';
-import { MENU_SECTION_CONTENTS } from './menuSectionContents';
+import type { MenuSectionName } from '@views/drive/config/menu';
+import { MENU_SECTION_CONTENTS } from '@views/drive/ui/menuSectionContents';
 
 interface MenuSectionContentProps {
   name: MenuSectionName;

@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import type { KeyControl } from '../config/controls';
+import type { KeyControl } from '@views/drive/config/controls';
 
 interface KeyControlRowProps {
   control: KeyControl;

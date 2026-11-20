@@ -3,9 +3,9 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { color, Fn, hash, instanceIndex, mix, positionLocal, step, uniform, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { applyInstanceMatrix } from '../utilities/instanceMatrix';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { applyInstanceMatrix } from '@views/drive/lib/engine/game/utilities/instanceMatrix';
 
 const rng = alea('flowers');
 const CLUSTER = { minCount: 3, extraCount: 8, spread: 3, minScale: 0.6, scaleRange: 0.4 } as const;

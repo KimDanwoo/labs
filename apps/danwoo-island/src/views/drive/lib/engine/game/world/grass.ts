@@ -19,11 +19,11 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { QUALITY } from '../quality';
-import { TICK_ORDER } from '../tickOrder';
-import { placedInArea } from './layout/areaPlacement';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { QUALITY } from '@views/drive/lib/engine/game/quality';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { placedInArea } from '@views/drive/lib/engine/game/world/layout/areaPlacement';
 
 const LANDING_CLEARING = placedInArea('landing', new THREE.Vector3(58.4, 0, 32.4));
 const GRASS_CLEARINGS = [{ x: LANDING_CLEARING.x, z: LANDING_CLEARING.z, radius: 2.4 }] as const;

@@ -1,9 +1,9 @@
 import * as THREE from 'three/webgpu';
 
-import { type AudioItem, moveSoundTo } from '../audioItem';
-import { getGame } from '../gameContext';
-import { remapClamp } from '../utilities/maths';
-import { DISTANT_THUNDER, NEAR_THUNDER } from './lightningsConfig';
+import { type AudioItem, moveSoundTo } from '@views/drive/lib/engine/game/audioItem';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
+import { DISTANT_THUNDER, NEAR_THUNDER } from '@views/drive/lib/engine/game/world/lightningsConfig';
 
 export function registerNearThunder(): AudioItem[] {
   const { audio, player } = getGame();

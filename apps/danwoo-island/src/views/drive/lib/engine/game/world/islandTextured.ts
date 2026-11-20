@@ -1,7 +1,7 @@
 import { texture, uv } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 
 interface TexturedMeshOptions {
   name?: string;

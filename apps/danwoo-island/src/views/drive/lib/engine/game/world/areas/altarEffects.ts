@@ -14,8 +14,8 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { COLORS, DEBRIS, debrisData, DUST, FUNNEL } from './altarAreaConfig';
-import type { Area } from './area';
+import { COLORS, DEBRIS, debrisData, DUST, FUNNEL } from '@views/drive/lib/engine/game/world/areas/altarAreaConfig';
+import type { Area } from '@views/drive/lib/engine/game/world/areas/area';
 
 interface AltarEffectContext {
   area: Area;

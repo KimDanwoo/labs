@@ -1,5 +1,4 @@
-import * as THREE from 'three/webgpu';
-import { getGame } from './gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import type {
   BodyType,
   ColliderDescription,
@@ -7,7 +6,8 @@ import type {
   Physical,
   PhysicalDescription,
   ShapeParameters,
-} from './physics/physicsTypes';
+} from '@views/drive/lib/engine/game/physics/physicsTypes';
+import * as THREE from 'three/webgpu';
 
 export interface VisualDescription {
   model?: THREE.Object3D;

@@ -1,6 +1,6 @@
-import type { ButtonState } from './gamepadMapping';
-import { INPUT_MODE } from './inputTypes';
-import type { Inputs } from './inputs';
+import type { ButtonState } from '@views/drive/lib/engine/game/inputs/gamepadMapping';
+import { INPUT_MODE } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import type { Inputs } from '@views/drive/lib/engine/game/inputs/inputs';
 
 export function listenKeyboard(inputs: Inputs): void {
   inputs.keyboard.events.on('down', (code, key) => {

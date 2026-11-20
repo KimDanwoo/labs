@@ -1,5 +1,5 @@
-import { MENU_SECTIONS } from '../config/menu';
-import { MenuSectionContent } from './MenuSectionContent';
+import { MENU_SECTIONS } from '@views/drive/config/menu';
+import { MenuSectionContent } from '@views/drive/ui/MenuSectionContent';
 
 export function MenuContents() {
   return (

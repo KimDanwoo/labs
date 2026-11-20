@@ -1,11 +1,11 @@
-import { getGame } from './gameContext';
-import type { Player } from './player';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { Player } from '@views/drive/lib/engine/game/player';
 import {
   LANDING_SOUND_WHEELS,
   NIPPLE_ACCELERATION_POWER,
   NIPPLE_TRACKING_DELAY_FRAMES,
   SPEED_LINES_SPEED,
-} from './playerConfig';
+} from '@views/drive/lib/engine/game/playerConfig';
 
 export function readNipple(): { accelerating: number; steering: number } | null {
   const { inputs, view, ticker } = getGame();

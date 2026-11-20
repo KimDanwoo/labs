@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { Events } from '../events';
+import { Events } from '@views/drive/lib/engine/game/events';
 
 describe('Events', () => {
   it('order 오름차순으로 호출하고 인자를 그대로 넘긴다', () => {

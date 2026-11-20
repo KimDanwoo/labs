@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import {
   BODY_TYPE_TAGS,
   type ModelPhysicalDescription,
@@ -15,9 +15,9 @@ import {
   prepareModel,
   stopBody,
   surfaceOverrides,
-} from './objectColliders';
-import type { Physical, PhysicalDescription } from './physics/physicsTypes';
-import { TICK_ORDER } from './tickOrder';
+} from '@views/drive/lib/engine/game/objectColliders';
+import type { Physical, PhysicalDescription } from '@views/drive/lib/engine/game/physics/physicsTypes';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 function snapStaticVisual(object: WorldObject, physicalDescription: PhysicalDescription): void {
   const { visual, physical } = object;

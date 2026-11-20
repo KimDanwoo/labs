@@ -1,4 +1,4 @@
-import { Events } from './events';
+import { Events } from '@views/drive/lib/engine/game/events';
 
 const RESIZE_SETTLE_MS = 400;
 const COMPACT_MAX_WIDTH = 760;

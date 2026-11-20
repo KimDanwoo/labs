@@ -2,12 +2,16 @@ import gsap from 'gsap';
 import { color, uniform, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import { InteractivePoint } from './interactivePoint';
-import { type InteractivePointOptions, type PointRegistry, type SharedParts } from './interactivePointShared';
-import { createKeyIcon, KEY_ICON_SCALE } from './keyIcon';
-import { lastVisiblePoint, nearbyPoints, needsRetest } from './pointProximity';
-import { TICK_ORDER } from './tickOrder';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { InteractivePoint } from '@views/drive/lib/engine/game/interactivePoint';
+import {
+  type InteractivePointOptions,
+  type PointRegistry,
+  type SharedParts,
+} from '@views/drive/lib/engine/game/interactivePointShared';
+import { createKeyIcon, KEY_ICON_SCALE } from '@views/drive/lib/engine/game/keyIcon';
+import { lastVisiblePoint, nearbyPoints, needsRetest } from '@views/drive/lib/engine/game/pointProximity';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 export class InteractivePoints implements PointRegistry {
   readonly #items: InteractivePoint[] = [];

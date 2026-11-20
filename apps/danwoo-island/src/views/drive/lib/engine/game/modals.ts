@@ -1,7 +1,7 @@
-import { Events } from './events';
-import { getGame } from './gameContext';
-import { isShown, type PanelState } from './panelState';
-import { requireElement } from './utilities/requireElement';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { isShown, type PanelState } from '@views/drive/lib/engine/game/panelState';
+import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
 
 type PanelEvents = { open: []; close: []; opened: []; closed: [] };
 

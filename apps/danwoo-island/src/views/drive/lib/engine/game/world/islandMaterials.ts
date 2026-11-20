@@ -1,7 +1,7 @@
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 import { attribute, color } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
 
 const SHADES = {
   stone: '#a39a90',

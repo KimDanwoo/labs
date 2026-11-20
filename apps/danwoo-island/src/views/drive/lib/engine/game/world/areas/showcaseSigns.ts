@@ -2,8 +2,8 @@ import gsap from 'gsap';
 import { uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../../gameContext';
-import type { Intersect } from '../../rayCursor';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { Intersect } from '@views/drive/lib/engine/game/rayCursor';
 import {
   applyTextMaterial,
   childStartingWith,
@@ -14,7 +14,7 @@ import {
   type Shades,
   showcaseTextCanvas,
   TEXT_DENSITY,
-} from './showcaseVisuals';
+} from '@views/drive/lib/engine/game/world/areas/showcaseVisuals';
 
 const FLIP = { duration: 1, ease: 'power2.in', settleEase: 'back.out(2)' } as const;
 const TITLE_CANVAS = { fontSize: 0.4, width: 4, height: 0.6 } as const;

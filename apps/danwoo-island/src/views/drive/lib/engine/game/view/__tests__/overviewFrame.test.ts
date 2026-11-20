@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 
 import * as THREE from 'three';
 
-import { frameOverview, type ScreenInsets } from '../overviewFrame';
+import { frameOverview, type ScreenInsets } from '@views/drive/lib/engine/game/view/overviewFrame';
 
 const PHI = Math.PI * 0.2;
 const THETA = Math.PI * 0.25;

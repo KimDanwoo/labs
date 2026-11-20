@@ -1,11 +1,11 @@
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { INPUT_MODE } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import type { Intersect } from '@views/drive/lib/engine/game/rayCursor';
+import { UI_FONT_FAMILY } from '@views/drive/lib/engine/game/utilities/canvasFont';
+import { isTideLoading, TIDE_LABEL } from '@views/drive/lib/engine/game/world/tideLoading';
 import gsap from 'gsap';
 import { atan, color, Fn, positionGeometry, texture, TWO_PI, uniform, uv, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import { getGame } from '../gameContext';
-import { INPUT_MODE } from '../inputs/inputTypes';
-import type { Intersect } from '../rayCursor';
-import { UI_FONT_FAMILY } from '../utilities/canvasFont';
-import { isTideLoading, TIDE_LABEL } from './tideLoading';
 
 const LABEL_TINT = isTideLoading ? TIDE_LABEL : '#ffffff';
 

@@ -2,9 +2,9 @@ import gsap from 'gsap';
 import { hash, instancedArray, instanceIndex, sin, uniform, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { InstancedGroup, type InstanceReference } from '../instancedGroup';
-import { createLampPost } from './islandProps';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { InstancedGroup, type InstanceReference } from '@views/drive/lib/engine/game/instancedGroup';
+import { createLampPost } from '@views/drive/lib/engine/game/world/islandProps';
 
 const TRAILING_NUMBER = /[0-9]+$/i;
 const FIREFLIES_PER_LIGHT = 5;

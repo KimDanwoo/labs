@@ -17,11 +17,11 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
-import { paintAchievementsBasin } from '../islandReskins';
-import { rebuildWaterfallCliff, replaceWithTotem } from '../islandStructures';
-import { rebuildVillageProps } from '../islandVillage';
-import { Area } from './area';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { paintAchievementsBasin } from '@views/drive/lib/engine/game/world/islandReskins';
+import { rebuildWaterfallCliff, replaceWithTotem } from '@views/drive/lib/engine/game/world/islandStructures';
+import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
 
 const PARTICLE_COUNT = 100;
 const STILL_FOAM = 1.35;

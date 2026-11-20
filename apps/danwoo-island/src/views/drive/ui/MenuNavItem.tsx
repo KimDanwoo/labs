@@ -1,5 +1,5 @@
-import type { MenuSection } from '../config/menu';
-import { worldAsset } from '../config/worldAsset';
+import type { MenuSection } from '@views/drive/config/menu';
+import { worldAsset } from '@views/drive/config/worldAsset';
 
 interface MenuNavItemProps {
   section: MenuSection;

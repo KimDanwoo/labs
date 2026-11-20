@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu';
 
-import type { Parts } from './islandGeometry';
-import { collidersOf, type PropFrame } from './villageKit';
+import type { Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { collidersOf, type PropFrame } from '@views/drive/lib/engine/game/world/villageKit';
 
 const BAR_COUNTER_DESIGN = {
   capThickness: 0.08,

@@ -1,12 +1,12 @@
 import { Fn, texture, uv, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { revealNode } from '../materials/meshDefaultMaterial';
-import { createParts, type Parts } from './islandGeometry';
-import { islandModelMesh } from './islandModels';
-import { placedInArea } from './layout/areaPlacement';
-import { removeComponents } from './meshComponents';
-import { surfboardSize } from './shoreStructures';
+import { revealNode } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { createParts, type Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
+import { placedInArea } from '@views/drive/lib/engine/game/world/layout/areaPlacement';
+import { removeComponents } from '@views/drive/lib/engine/game/world/meshComponents';
+import { surfboardSize } from '@views/drive/lib/engine/game/world/shoreStructures';
 import {
   CUBOID,
   cuboidFrame,
@@ -17,7 +17,7 @@ import {
   requireMesh,
   swapForGroup,
   type Frame,
-} from './structureKit';
+} from '@views/drive/lib/engine/game/world/structureKit';
 
 const NEON_GAIN = 1.6;
 const BOWLING_SIGN = { scale: 0.65, poleBottom: 5.3 } as const;

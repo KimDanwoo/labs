@@ -1,6 +1,6 @@
+import type { InstanceReference } from '@views/drive/lib/engine/game/instancedGroup';
+import type { WorldObject } from '@views/drive/lib/engine/game/objectColliders';
 import { vec3 } from 'three/tsl';
-import type { InstanceReference } from '../../instancedGroup';
-import type { WorldObject } from '../../objectColliders';
 
 export interface Coconut {
   reference: InstanceReference;

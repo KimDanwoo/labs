@@ -18,11 +18,11 @@ import {
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
-import { TICK_ORDER } from '../tickOrder';
-import { PALETTE_SLOTS } from './islandMaterials';
-import { type IslandModelKey, islandModelGeometry } from './islandModels';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+import { PALETTE_SLOTS } from '@views/drive/lib/engine/game/world/islandMaterials';
+import { type IslandModelKey, islandModelGeometry } from '@views/drive/lib/engine/game/world/islandModels';
 
 interface TreeSpecies {
   readonly model: IslandModelKey;

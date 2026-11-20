@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { forEachAreaModel, type NamedModel } from '../areaModels';
+import { forEachAreaModel, type NamedModel } from '@views/drive/lib/engine/game/world/areas/areaModels';
 
 const model = (name: string): NamedModel => ({ name });
 

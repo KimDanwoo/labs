@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { lastVisiblePoint, nearbyPoints, needsRetest, type PointState } from '../pointProximity';
+import {
+  lastVisiblePoint,
+  nearbyPoints,
+  needsRetest,
+  type PointState,
+} from '@views/drive/lib/engine/game/pointProximity';
 
 class LinePosition {
   constructor(readonly x: number) {}

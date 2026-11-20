@@ -1,8 +1,14 @@
 import * as THREE from 'three/webgpu';
 
-import { type Parts, seededRandom } from './islandGeometry';
-import type { PartName } from './islandMaterials';
-import { collidersOf, lathe, type PropFrame, rebuildChild, scaleProfile } from './villageKit';
+import { type Parts, seededRandom } from '@views/drive/lib/engine/game/world/islandGeometry';
+import type { PartName } from '@views/drive/lib/engine/game/world/islandMaterials';
+import {
+  collidersOf,
+  lathe,
+  type PropFrame,
+  rebuildChild,
+  scaleProfile,
+} from '@views/drive/lib/engine/game/world/villageKit';
 
 export const SIDES = [-1, 1] as const;
 const CIRCUIT_OBJECT = /^refObjectsPhysicalDynamic/;

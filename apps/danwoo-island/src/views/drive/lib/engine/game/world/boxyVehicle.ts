@@ -1,8 +1,8 @@
 import { color, mix, normalWorld } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { MeshDefaultMaterial } from '../materials/meshDefaultMaterial';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 import {
   addCabin,
   addFenders,
@@ -11,7 +11,7 @@ import {
   createPartsBuilder,
   shadedMaterial,
   wheelAssembly,
-} from './boxyVehicleParts';
+} from '@views/drive/lib/engine/game/world/boxyVehicleParts';
 
 type Triple = readonly [number, number, number];
 export type PartName =

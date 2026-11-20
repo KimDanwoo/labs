@@ -1,7 +1,7 @@
 import { color, float, Fn, frontFacing, If, max, mix, normalWorld, positionWorld, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 
 type ColorNode = THREE.Node<'vec3'>;
 type FloatNode = THREE.Node<'float'>;

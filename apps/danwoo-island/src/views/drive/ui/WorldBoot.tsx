@@ -1,7 +1,7 @@
 'use client';
 
-import { reloadPage } from '../lib/reloadPage';
-import { useWorldBoot } from '../model/hooks/useWorldBoot';
+import { reloadPage } from '@views/drive/lib/reloadPage';
+import { useWorldBoot } from '@views/drive/model/hooks/useWorldBoot';
 
 export function WorldBoot() {
   const { hasFailed } = useWorldBoot();

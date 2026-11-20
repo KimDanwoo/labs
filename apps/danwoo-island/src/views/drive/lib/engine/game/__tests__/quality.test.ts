@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { initialLevel, QUALITY, Quality } from '../quality';
+import { initialLevel, QUALITY, Quality } from '@views/drive/lib/engine/game/quality';
 
 const DESKTOP = { userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/130', maxTouchPoints: 0 };
 const IPAD = { userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605', maxTouchPoints: 5 };

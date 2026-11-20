@@ -1,4 +1,4 @@
-import type { Game } from './game';
+import type { Game } from '@views/drive/lib/engine/game/game';
 
 const PROBE_KEY = '__islandProbe';
 const YEAR_PROGRESS = 0.5;

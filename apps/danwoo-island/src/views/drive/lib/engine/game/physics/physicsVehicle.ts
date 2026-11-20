@@ -1,11 +1,10 @@
 import type { DynamicRayCastVehicleController, Vector } from '@dimforge/rapier3d-compat';
 import * as THREE from 'three/webgpu';
 
-import { Events } from '../events';
-import { getGame } from '../gameContext';
-import { TICK_ORDER } from '../tickOrder';
-import type { Physical } from './physicsTypes';
-import { createChassis, createWheels } from './vehicleChassis';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { Physical } from '@views/drive/lib/engine/game/physics/physicsTypes';
+import { createChassis, createWheels } from '@views/drive/lib/engine/game/physics/vehicleChassis';
 import {
   DOWN,
   DRIVE,
@@ -18,9 +17,14 @@ import {
   type VehicleEvents,
   type VehicleWheel,
   type WheelSettings,
-} from './vehicleConfig';
-import { FlipDetector, StuckDetector } from './vehicleDetectors';
-import { driveController, readWheelContacts, updateKinematics } from './vehicleDrive';
+} from '@views/drive/lib/engine/game/physics/vehicleConfig';
+import { FlipDetector, StuckDetector } from '@views/drive/lib/engine/game/physics/vehicleDetectors';
+import {
+  driveController,
+  readWheelContacts,
+  updateKinematics,
+} from '@views/drive/lib/engine/game/physics/vehicleDrive';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
 export class PhysicsVehicle {
   readonly events = new Events<VehicleEvents>();

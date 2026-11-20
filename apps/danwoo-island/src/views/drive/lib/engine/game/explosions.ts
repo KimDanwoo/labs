@@ -1,8 +1,8 @@
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import type { Physical } from './physics/physicsTypes';
-import { remapClamp } from './utilities/maths';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { Physical } from '@views/drive/lib/engine/game/physics/physicsTypes';
+import { remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
 
 interface ExplosionOptions {
   radius?: number;

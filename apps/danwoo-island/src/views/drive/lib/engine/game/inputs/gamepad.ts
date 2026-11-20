@@ -1,4 +1,4 @@
-import { Events } from '../events';
+import { Events } from '@views/drive/lib/engine/game/events';
 import {
   type ButtonName,
   type ButtonState,
@@ -13,7 +13,7 @@ import {
   lastConnected,
   mappingFor,
   typeOf,
-} from './gamepadMapping';
+} from '@views/drive/lib/engine/game/inputs/gamepadMapping';
 
 export class Gamepad {
   readonly events = new Events<{

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { bootWorld } from '../../lib/bootWorld';
+import { bootWorld } from '@views/drive/lib/bootWorld';
 
 export function useWorldBoot() {
   const [hasFailed, setHasFailed] = useState(false);

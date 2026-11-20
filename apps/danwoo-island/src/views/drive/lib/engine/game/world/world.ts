@@ -1,27 +1,31 @@
-import { getGame } from '../gameContext';
-import { type Areas, createAreas } from './areas/areas';
-import { Bushes } from './bushes';
-import { buildCircuitJumps } from './circuitJumps';
-import { CircuitTrack } from './circuitTrack';
-import { Confetti } from './confetti';
-import { ExplosiveCrates } from './explosiveCrates';
-import { Fireballs } from './fireballs';
-import { Floor } from './floor';
-import { Flowers } from './flowers';
-import { Grass } from './grass';
-import { Grid } from './grid';
-import { Intro } from './intro';
-import { placeIslandBridges } from './islandBridges';
-import type { IslandTrees } from './islandTrees';
-import { Lanterns } from './lanterns';
-import { Lightnings } from './lightnings';
-import { PoleLights } from './poleLights';
-import { RainLines } from './rainLines';
-import { placeShoreRocks, plantScatteredTrees, replantScatteredModels } from './scatterPlanting';
-import { pruneShadowCasters } from './shadowCasters';
-import { VisualVehicle } from './visualVehicle';
-import { WaterSurface } from './waterSurface';
-import { WindLines } from './windLines';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { type Areas, createAreas } from '@views/drive/lib/engine/game/world/areas/areas';
+import { Bushes } from '@views/drive/lib/engine/game/world/bushes';
+import { buildCircuitJumps } from '@views/drive/lib/engine/game/world/circuitJumps';
+import { CircuitTrack } from '@views/drive/lib/engine/game/world/circuitTrack';
+import { Confetti } from '@views/drive/lib/engine/game/world/confetti';
+import { ExplosiveCrates } from '@views/drive/lib/engine/game/world/explosiveCrates';
+import { Fireballs } from '@views/drive/lib/engine/game/world/fireballs';
+import { Floor } from '@views/drive/lib/engine/game/world/floor';
+import { Flowers } from '@views/drive/lib/engine/game/world/flowers';
+import { Grass } from '@views/drive/lib/engine/game/world/grass';
+import { Grid } from '@views/drive/lib/engine/game/world/grid';
+import { Intro } from '@views/drive/lib/engine/game/world/intro';
+import { placeIslandBridges } from '@views/drive/lib/engine/game/world/islandBridges';
+import type { IslandTrees } from '@views/drive/lib/engine/game/world/islandTrees';
+import { Lanterns } from '@views/drive/lib/engine/game/world/lanterns';
+import { Lightnings } from '@views/drive/lib/engine/game/world/lightnings';
+import { PoleLights } from '@views/drive/lib/engine/game/world/poleLights';
+import { RainLines } from '@views/drive/lib/engine/game/world/rainLines';
+import {
+  placeShoreRocks,
+  plantScatteredTrees,
+  replantScatteredModels,
+} from '@views/drive/lib/engine/game/world/scatterPlanting';
+import { pruneShadowCasters } from '@views/drive/lib/engine/game/world/shadowCasters';
+import { VisualVehicle } from '@views/drive/lib/engine/game/world/visualVehicle';
+import { WaterSurface } from '@views/drive/lib/engine/game/world/waterSurface';
+import { WindLines } from '@views/drive/lib/engine/game/world/windLines';
 
 export class World {
   readonly grid = new Grid();

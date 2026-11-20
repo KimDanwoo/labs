@@ -1,8 +1,23 @@
-import { WORLD_CONFIG } from '../worldConfig';
-import { modelResource, type ResourceSpec, type TextureFormat, textureResource } from './resourcesLoader';
-import { clamp, halfWidth, linear, nearest, repeat, repeatX, srgb, unflipped, withSetups } from './textureSetups';
-import { islandModelResources } from './world/islandModels';
-import { islandTextureResources } from './world/islandTextures';
+import {
+  modelResource,
+  type ResourceSpec,
+  type TextureFormat,
+  textureResource,
+} from '@views/drive/lib/engine/game/resourcesLoader';
+import {
+  clamp,
+  halfWidth,
+  linear,
+  nearest,
+  repeat,
+  repeatX,
+  srgb,
+  unflipped,
+  withSetups,
+} from '@views/drive/lib/engine/game/textureSetups';
+import { islandModelResources } from '@views/drive/lib/engine/game/world/islandModels';
+import { islandTextureResources } from '@views/drive/lib/engine/game/world/islandTextures';
+import { WORLD_CONFIG } from '@views/drive/lib/engine/worldConfig';
 
 interface AssetNames {
   modelSuffix: string;

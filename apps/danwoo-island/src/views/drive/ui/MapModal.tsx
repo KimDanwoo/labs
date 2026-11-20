@@ -1,8 +1,8 @@
-import { ISLAND_MARK_ASSET } from '../config/menu';
-import { worldAsset } from '../config/worldAsset';
-import { CloseButton } from './CloseButton';
-import { MapCard } from './MapCard';
-import { MapPlaces } from './MapPlaces';
+import { ISLAND_MARK_ASSET } from '@views/drive/config/menu';
+import { worldAsset } from '@views/drive/config/worldAsset';
+import { CloseButton } from '@views/drive/ui/CloseButton';
+import { MapCard } from '@views/drive/ui/MapCard';
+import { MapPlaces } from '@views/drive/ui/MapPlaces';
 
 export function MapModal() {
   return (

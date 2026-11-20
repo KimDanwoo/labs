@@ -1,9 +1,13 @@
 import * as THREE from 'three/webgpu';
 
-import type { WorldObject } from '../../objectColliders';
-import { islandModelGeometry, islandModelMesh, islandPaletteMaterial } from '../islandModels';
-import { canvasMaterial, texturedMesh } from '../islandTextured';
-import { removeComponents, type MeshComponent } from '../meshComponents';
+import type { WorldObject } from '@views/drive/lib/engine/game/objectColliders';
+import {
+  islandModelGeometry,
+  islandModelMesh,
+  islandPaletteMaterial,
+} from '@views/drive/lib/engine/game/world/islandModels';
+import { canvasMaterial, texturedMesh } from '@views/drive/lib/engine/game/world/islandTextured';
+import { removeComponents, type MeshComponent } from '@views/drive/lib/engine/game/world/meshComponents';
 
 interface SteleFrame {
   size: THREE.Vector3;

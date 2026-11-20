@@ -1,7 +1,7 @@
+import { prefersReducedMotion } from '@views/drive/lib/engine/game/utilities/reducedMotion';
 import { alea } from 'seedrandom';
 import { attribute, Fn, mix, positionGeometry, uniform, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import { prefersReducedMotion } from '../utilities/reducedMotion';
 
 const LINES = 30;
 const VERTICES_PER_LINE = 3;

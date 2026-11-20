@@ -1,9 +1,9 @@
 import { Fn, texture, uv, vec2, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import { INPUT_MODE } from './inputs/inputTypes';
-import type { SharedParts } from './interactivePointShared';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { INPUT_MODE } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import type { SharedParts } from '@views/drive/lib/engine/game/interactivePointShared';
 
 const KEY_ICON_RENDER_ORDER = 8;
 export const KEY_ICON_SCALE = 0.25;

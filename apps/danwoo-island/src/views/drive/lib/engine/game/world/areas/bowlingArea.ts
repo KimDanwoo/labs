@@ -1,15 +1,12 @@
 import type { RigidBody } from '@dimforge/rapier3d-compat';
 import * as THREE from 'three/webgpu';
 
-import { type AudioItem } from '../../audioItem';
-import { InstancedGroup } from '../../instancedGroup';
-import type { InteractivePoint } from '../../interactivePoint';
-import { JukeboxStation } from '../../jukebox/jukeboxStation';
-import { clamp } from '../../utilities/maths';
-import { rebuildTikiScoreboard } from '../islandReskins';
-import { rebuildBowlingSign, rebuildJukebox } from '../islandStructures';
-import { rebuildVillageProps } from '../islandVillage';
-import { Area } from './area';
+import { type AudioItem } from '@views/drive/lib/engine/game/audioItem';
+import { InstancedGroup } from '@views/drive/lib/engine/game/instancedGroup';
+import type { InteractivePoint } from '@views/drive/lib/engine/game/interactivePoint';
+import { JukeboxStation } from '@views/drive/lib/engine/game/jukebox/jukeboxStation';
+import { clamp } from '@views/drive/lib/engine/game/utilities/maths';
+import { Area } from '@views/drive/lib/engine/game/world/areas/area';
 import {
   type Ball,
   BOUNDING_INTERVAL,
@@ -22,9 +19,17 @@ import {
   SLEEP_DELAY_FRAMES,
   STRIKE_BLINK,
   STRIKE_CONFETTI_OFFSETS,
-} from './bowlingConfig';
-import { createBumpers, createScreen } from './bowlingLane';
-import { createBall, createPins, createRestartPoint, registerBowlingSounds } from './bowlingSetup';
+} from '@views/drive/lib/engine/game/world/areas/bowlingConfig';
+import { createBumpers, createScreen } from '@views/drive/lib/engine/game/world/areas/bowlingLane';
+import {
+  createBall,
+  createPins,
+  createRestartPoint,
+  registerBowlingSounds,
+} from '@views/drive/lib/engine/game/world/areas/bowlingSetup';
+import { rebuildTikiScoreboard } from '@views/drive/lib/engine/game/world/islandReskins';
+import { rebuildBowlingSign, rebuildJukebox } from '@views/drive/lib/engine/game/world/islandStructures';
+import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
 
 export class BowlingArea extends Area {
   readonly #sounds: { strike: AudioItem; pin: AudioItem };

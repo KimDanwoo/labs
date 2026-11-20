@@ -1,9 +1,9 @@
-import { Events } from './events';
-import { getGame } from './gameContext';
-import { INPUT_MODE } from './inputs/inputTypes';
-import { isShown, type PanelState } from './panelState';
-import { Tabs } from './tabs';
-import { requireElement } from './utilities/requireElement';
+import { Events } from '@views/drive/lib/engine/game/events';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { INPUT_MODE } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import { isShown, type PanelState } from '@views/drive/lib/engine/game/panelState';
+import { Tabs } from '@views/drive/lib/engine/game/tabs';
+import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
 
 type PanelEvents = { open: []; close: []; opened: []; closed: [] };
 

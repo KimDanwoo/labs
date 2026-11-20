@@ -1,7 +1,12 @@
-import type { JukeboxTrack } from '../../data/worldContent';
-import { JukeboxStateStore, createAnnouncer, isRequestedSound, offsetIndex } from './jukeboxState';
-import type { JukeboxPlayerOptions, JukeboxState, MusicHost } from './jukeboxTypes';
-import { bindJukeboxWidget } from './jukeboxWidget';
+import type { JukeboxTrack } from '@views/drive/lib/engine/data/worldContent';
+import {
+  JukeboxStateStore,
+  createAnnouncer,
+  isRequestedSound,
+  offsetIndex,
+} from '@views/drive/lib/engine/game/jukebox/jukeboxState';
+import type { JukeboxPlayerOptions, JukeboxState, MusicHost } from '@views/drive/lib/engine/game/jukebox/jukeboxTypes';
+import { bindJukeboxWidget } from '@views/drive/lib/engine/game/jukebox/jukeboxWidget';
 import {
   loadWidgetApi,
   mountWidgetFrame,
@@ -9,7 +14,7 @@ import {
   type SoundCloudGlobal,
   type SoundCloudWidget,
   type WidgetFrame,
-} from './soundcloudWidget';
+} from '@views/drive/lib/engine/game/jukebox/soundcloudWidget';
 
 const VOLUME = 70;
 

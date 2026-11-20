@@ -1,8 +1,15 @@
 import * as THREE from 'three/webgpu';
 
-import { getGame } from './gameContext';
-import type { ActionTrigger } from './inputs/inputTypes';
-import { focusTarget, isClickTravel, nearestHit, pressTarget, type RayTarget, releaseTargets } from './rayTargets';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { ActionTrigger } from '@views/drive/lib/engine/game/inputs/inputTypes';
+import {
+  focusTarget,
+  isClickTravel,
+  nearestHit,
+  pressTarget,
+  type RayTarget,
+  releaseTargets,
+} from '@views/drive/lib/engine/game/rayTargets';
 
 type IntersectShape = THREE.Sphere | THREE.Box3 | THREE.Plane | THREE.Mesh;
 

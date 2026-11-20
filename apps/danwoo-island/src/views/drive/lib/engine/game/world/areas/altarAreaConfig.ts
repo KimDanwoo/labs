@@ -1,6 +1,6 @@
-import { worldAsset } from '../../../../../config/worldAsset';
-import type { IslandPlace } from '../../islandPlaces';
-import { createElement } from '../../utilities/createElement';
+import { worldAsset } from '@views/drive/config/worldAsset';
+import type { IslandPlace } from '@views/drive/lib/engine/game/islandPlaces';
+import { createElement } from '@views/drive/lib/engine/game/utilities/createElement';
 
 export const FUNNEL = { height: 9, bottomRadius: 0.7, topRadius: 3.4, segments: 48, rows: 24, sway: 0.35 } as const;
 export const DEBRIS = { count: 140, size: 0.18 } as const;

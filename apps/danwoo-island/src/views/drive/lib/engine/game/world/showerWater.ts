@@ -1,7 +1,7 @@
 import { color, Fn, hash, instanceIndex, mix, smoothstep, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
 
 const HEAD_HEIGHT = 2.45;
 const SHOWER = { topRadius: 0.24, bottomRadius: 0.62, segments: 20, flow: 2.4, streaks: 9 } as const;

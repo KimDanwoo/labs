@@ -1,4 +1,4 @@
-import type { GameSystems } from './gameSystems';
+import type { GameSystems } from '@views/drive/lib/engine/game/gameSystems';
 
 export class GameRegistry {
   readonly #systems: Partial<GameSystems> = {};

@@ -1,10 +1,9 @@
 import { uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { setStartupStage, STARTUP } from '../../islandStartup';
-import { getGame } from '../gameContext';
-import { introCenter } from '../introCenter';
-import { TICK_ORDER } from '../tickOrder';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { introCenter } from '@views/drive/lib/engine/game/introCenter';
+import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 import {
   glowRingMaterial,
   LABEL_DISTANCE,
@@ -14,8 +13,9 @@ import {
   RING,
   SoundButton,
   tweenScale,
-} from './introPrompt';
-import { isTideLoading, tideRingGeometry, tideRingMaterial } from './tideLoading';
+} from '@views/drive/lib/engine/game/world/introPrompt';
+import { isTideLoading, tideRingGeometry, tideRingMaterial } from '@views/drive/lib/engine/game/world/tideLoading';
+import { setStartupStage, STARTUP } from '@views/drive/lib/engine/islandStartup';
 
 export class Intro {
   readonly center: THREE.Vector3;

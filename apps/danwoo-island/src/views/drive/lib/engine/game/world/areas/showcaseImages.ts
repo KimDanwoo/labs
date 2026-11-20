@@ -2,8 +2,12 @@ import gsap from 'gsap';
 import { color, Fn, If, mix, step, texture, uniform, uv, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { MeshDefaultMaterial } from '../../materials/meshDefaultMaterial';
-import { configureImageTexture, type Direction, type Shades } from './showcaseVisuals';
+import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
+import {
+  configureImageTexture,
+  type Direction,
+  type Shades,
+} from '@views/drive/lib/engine/game/world/areas/showcaseVisuals';
 
 type ImageResource = { status: 'loading' } | { status: 'loaded'; texture: THREE.Texture };
 

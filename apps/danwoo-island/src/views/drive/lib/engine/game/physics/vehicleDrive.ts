@@ -1,10 +1,8 @@
 import type { DynamicRayCastVehicleController, RigidBody } from '@dimforge/rapier3d-compat';
 import * as THREE from 'three/webgpu';
 
-import { getGame } from '../gameContext';
-import { QUALITY } from '../quality';
-import { lerp } from '../utilities/maths';
-import type { PhysicsStep } from './physicsTypes';
+import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { PhysicsStep } from '@views/drive/lib/engine/game/physics/physicsTypes';
 import {
   DRIVE,
   FIXED_STEP,
@@ -18,9 +16,11 @@ import {
   WHEEL_COUNT,
   WHEEL_SETTINGS,
   type VehicleWheel,
-} from './vehicleConfig';
+} from '@views/drive/lib/engine/game/physics/vehicleConfig';
+import { QUALITY } from '@views/drive/lib/engine/game/quality';
+import { lerp } from '@views/drive/lib/engine/game/utilities/maths';
 
-import type { PhysicsVehicle } from './physicsVehicle';
+import type { PhysicsVehicle } from '@views/drive/lib/engine/game/physics/physicsVehicle';
 
 function engineAndBrake(
   speed: number,
