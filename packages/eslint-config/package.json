@@ -9,6 +9,7 @@
     "next.eslint.config.mjs",
     "fsd.config.mjs",
     "naming.config.mjs",
+    "quality.config.mjs",
     "library.eslint.config.mjs",
     "rules/"
   ],

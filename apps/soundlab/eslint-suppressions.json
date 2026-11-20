@@ -1,0 +1,88 @@
+{
+  "app/t/[id]/opengraph-image.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 3
+    }
+  },
+  "src/views/player/lib/signals.ts": {
+    "complexity": {
+      "count": 2
+    }
+  },
+  "src/views/player/lib/stage/renderPasses.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/player/lib/stage/renderer.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/player/model/hooks/useAutoAdvance.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/player/model/hooks/useKeyboard.ts": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 3
+    },
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/player/model/hooks/useListeningLog.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/player/model/hooks/useMediaSession.ts": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 2
+    }
+  },
+  "src/views/player/model/hooks/useStageFrame.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/player/model/hooks/useWaveform.ts": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 4
+    },
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/player/model/lastPlayed.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/player/ui/archive/ArchiveRecord.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 4
+    }
+  },
+  "src/views/player/ui/library/CollectionCard.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 1
+    }
+  },
+  "src/views/player/ui/library/ListeningHistory.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 2
+    }
+  },
+  "src/views/player/ui/stage/PlaybackStatus.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 3
+    }
+  },
+  "src/views/player/ui/stage/TrackDetails.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 3
+    }
+  }
+}

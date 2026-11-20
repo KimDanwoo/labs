@@ -1,0 +1,229 @@
+{
+  "src/views/ride/lib/flora/placeFlora.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    }
+  },
+  "src/views/ride/lib/runner/makeWingGeometry.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "max-depth": {
+      "count": 2
+    }
+  },
+  "src/views/ride/model/flora/constants.ts": {
+    "max-depth": {
+      "count": 1
+    }
+  },
+  "src/views/ride/model/flora/useFloraResources.ts": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 1
+    }
+  },
+  "src/views/ride/model/runner-control/services/flightDynamics.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/ride/model/runner-control/services/runnerMotion.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/exploration/Branch.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 3
+    }
+  },
+  "src/views/ride/ui/exploration/ElderTree.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 38
+    }
+  },
+  "src/views/ride/ui/exploration/ExplorationScene.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 10
+    },
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/exploration/FlowerGarden.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 12
+    }
+  },
+  "src/views/ride/ui/exploration/GardenColumn.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 24
+    }
+  },
+  "src/views/ride/ui/exploration/LivingLandmarks.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/exploration/SilverLeaves.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 19
+    }
+  },
+  "src/views/ride/ui/exploration/StarlightGate.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 8
+    }
+  },
+  "src/views/ride/ui/exploration/SunsetArch.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 63
+    }
+  },
+  "src/views/ride/ui/flora/FloraField.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/flora/MeadowFlowers.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 26
+    },
+    "complexity": {
+      "count": 1
+    },
+    "max-depth": {
+      "count": 3
+    }
+  },
+  "src/views/ride/ui/grass/GrassChunk.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 12
+    }
+  },
+  "src/views/ride/ui/hud/RiverGuide.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/river/River.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 22
+    }
+  },
+  "src/views/ride/ui/river/RiverBanks.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 33
+    },
+    "complexity": {
+      "count": 1
+    },
+    "max-depth": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/runner/FeatherWing.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 15
+    }
+  },
+  "src/views/ride/ui/runner/FlowingHair.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 31
+    },
+    "max-lines-per-function": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/runner/Horn.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 18
+    }
+  },
+  "src/views/ride/ui/runner/MagicWings.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 18
+    }
+  },
+  "src/views/ride/ui/runner/Runner.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 33
+    },
+    "complexity": {
+      "count": 2
+    },
+    "max-lines-per-function": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/runner/SpinStardust.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 18
+    }
+  },
+  "src/views/ride/ui/runner/SprintTrail.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 15
+    }
+  },
+  "src/views/ride/ui/runner/WadeSplash.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 15
+    },
+    "complexity": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/scene/RideSun.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 2
+    }
+  },
+  "src/views/ride/ui/scene/SceneCanvas.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 4
+    }
+  },
+  "src/views/ride/ui/scene/SceneLoader.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/scenery/Ground.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/scenery/Haze.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 3
+    }
+  },
+  "src/views/ride/ui/scenery/MeadowMotes.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 12
+    }
+  },
+  "src/views/ride/ui/wildlife/Grazers.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 78
+    },
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/views/ride/ui/wildlife/WingedLife.tsx": {
+    "@typescript-eslint/no-magic-numbers": {
+      "count": 60
+    },
+    "complexity": {
+      "count": 1
+    }
+  }
+}
