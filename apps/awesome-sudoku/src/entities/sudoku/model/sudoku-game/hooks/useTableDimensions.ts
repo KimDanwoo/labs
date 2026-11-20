@@ -1,4 +1,4 @@
-import { measureTable } from '@entities/sudoku/lib/tableLayout';
+import { measureTable, sizeOverlayToTable } from '@entities/sudoku/lib/tableLayout';
 import type { TableDimensions } from '@entities/sudoku/model/types/board';
 import { useEffect, useEffectEvent, useRef, type RefObject } from 'react';
 
@@ -17,11 +17,7 @@ export function useTableDimensions(
     const measure = () => {
       frame = null;
       const dimensions = measureTable(table);
-      const overlay = overlayRef.current;
-      if (overlay && dimensions.tableRect) {
-        overlay.style.width = `${dimensions.tableRect.width}px`;
-        overlay.style.height = `${dimensions.tableRect.height}px`;
-      }
+      sizeOverlayToTable(overlayRef.current, dimensions.tableRect);
       notifyDimensions(dimensions);
     };
     const scheduleMeasure = () => {

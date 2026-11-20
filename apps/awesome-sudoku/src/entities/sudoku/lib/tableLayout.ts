@@ -20,3 +20,10 @@ export function measureTable(table: HTMLTableElement): TableDimensions {
   });
   return { tableRect, cellPositions };
 }
+
+export function sizeOverlayToTable(overlay: HTMLElement | null, tableRect: DOMRect | null): void {
+  if (!overlay) return;
+  if (!tableRect) return;
+  overlay.style.width = `${tableRect.width}px`;
+  overlay.style.height = `${tableRect.height}px`;
+}
