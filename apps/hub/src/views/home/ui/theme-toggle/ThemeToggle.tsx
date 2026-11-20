@@ -3,8 +3,8 @@
 import { cn } from '@shared/lib/cn';
 import { Moon, Sun } from 'lucide-react';
 
-import { THEME_ICON_SIZE } from '../../config/theme';
-import { useTheme } from '../../model/hooks/useTheme';
+import { THEME_ICON_SIZE } from '@views/home/config/theme';
+import { useTheme } from '@views/home/model/hooks/useTheme';
 
 export function ThemeToggle() {
   const { isDark, toggleTheme } = useTheme();

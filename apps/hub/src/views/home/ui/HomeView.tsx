@@ -1,8 +1,8 @@
-import { MAIN_ID } from '../config/page';
-import { LabFooter } from './LabFooter';
-import { ProfileHeader } from './profile-header/ProfileHeader';
-import { ProjectGrid } from './project-grid/ProjectGrid';
-import { SiteHeader } from './SiteHeader';
+import { MAIN_ID } from '@views/home/config/page';
+import { LabFooter } from '@views/home/ui/LabFooter';
+import { ProfileHeader } from '@views/home/ui/profile-header/ProfileHeader';
+import { ProjectGrid } from '@views/home/ui/project-grid/ProjectGrid';
+import { SiteHeader } from '@views/home/ui/SiteHeader';
 
 export function HomeView() {
   return (

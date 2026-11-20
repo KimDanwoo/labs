@@ -1,11 +1,11 @@
 import { Fragment } from 'react';
 
-import { REVEAL_DELAY_MS } from '../../config/motion';
-import { revealDelay } from '../../lib/revealDelay';
-import { HEADLINE_KEYWORDS, PROFILE_PARAGRAPHS } from '../../model/constants/profileContent';
-import { isProfileLink } from '../../model/types/profile';
-import { RevealWord } from './RevealWord';
-import { ScrambleKeyword } from './ScrambleKeyword';
+import { REVEAL_DELAY_MS } from '@views/home/config/motion';
+import { revealDelay } from '@views/home/lib/revealDelay';
+import { HEADLINE_KEYWORDS, PROFILE_PARAGRAPHS } from '@views/home/model/constants/profileContent';
+import { isProfileLink } from '@views/home/model/types/profile';
+import { RevealWord } from '@views/home/ui/profile-header/RevealWord';
+import { ScrambleKeyword } from '@views/home/ui/profile-header/ScrambleKeyword';
 
 export function ProfileHeader() {
   return (

@@ -1,5 +1,5 @@
-import { COVER_WIDTH, MEDIA_MIN_WIDTH } from '../config/projectGrid';
-import { planCardRowSizes, type RowSize } from './gridRows';
+import { COVER_WIDTH, MEDIA_MIN_WIDTH } from '@views/home/config/projectGrid';
+import { planCardRowSizes, type RowSize } from '@views/home/lib/gridRows';
 
 interface ProjectCardLayout {
   rowSize: RowSize;

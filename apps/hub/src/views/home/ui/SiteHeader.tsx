@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
-import { SITE_NAME } from '../config/page';
-import { ThemeToggle } from './theme-toggle/ThemeToggle';
+import { SITE_NAME } from '@views/home/config/page';
+import { ThemeToggle } from '@views/home/ui/theme-toggle/ThemeToggle';
 
 export function SiteHeader() {
   return (

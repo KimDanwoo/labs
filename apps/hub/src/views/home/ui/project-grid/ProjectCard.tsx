@@ -1,12 +1,12 @@
 import { cn } from '@shared/lib/cn';
 import Image from 'next/image';
 
-import { CARD_STAGGER_MS, REVEAL_DELAY_MS } from '../../config/motion';
-import { SCOPE_SEPARATOR } from '../../config/page';
-import { DEFAULT_IMAGE_POSITION } from '../../config/projectGrid';
-import { revealDelay } from '../../lib/revealDelay';
-import type { Project } from '../../model/types/project';
-import { ArrowUpRightIcon } from './ArrowUpRightIcon';
+import { CARD_STAGGER_MS, REVEAL_DELAY_MS } from '@views/home/config/motion';
+import { SCOPE_SEPARATOR } from '@views/home/config/page';
+import { DEFAULT_IMAGE_POSITION } from '@views/home/config/projectGrid';
+import { revealDelay } from '@views/home/lib/revealDelay';
+import type { Project } from '@views/home/model/types/project';
+import { ArrowUpRightIcon } from '@views/home/ui/project-grid/ArrowUpRightIcon';
 
 interface ProjectCardProps {
   project: Project;
