@@ -20,7 +20,8 @@ export function useAquariumSwim(fish: KeptFish[], isFeeding: boolean) {
       previous = now;
       fish.forEach((item, index) => {
         const node = swimmers[index];
-        if (!node || node.matches(':hover, :focus-visible')) return;
+        if (!node) return;
+        if (node.matches(':hover, :focus-visible')) return;
         swimTimes[index] = (swimTimes[index] ?? start / MS_PER_SECOND) + delta;
         const feedTime = isFeeding ? elapsed : AQUARIUM_MOTION.restingFeedSeconds;
         const pose = aquariumPose(item, swimTimes[index], feedTime, motion.matches);
@@ -29,7 +30,8 @@ export function useAquariumSwim(fish: KeptFish[], isFeeding: boolean) {
         node.style.width = `${pose.width * 100}%`;
         node.style.transform = `translate(-50%, -50%) scaleX(${pose.facing}) rotate(${pose.tilt}rad)`;
       });
-      if (!motion.matches && fish.length) frame = requestAnimationFrame(update);
+      const shouldSwim = !motion.matches && fish.length;
+      if (shouldSwim) frame = requestAnimationFrame(update);
     };
     const restart = () => {
       cancelAnimationFrame(frame);

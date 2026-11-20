@@ -15,7 +15,8 @@ export function bindSceneInput(
 ) {
   const { renderer, camera, markers, portalVisuals, jump, keys, portalInput } = parts;
   const keyDown = (event: KeyboardEvent) => {
-    if (state.paused || (event.target instanceof HTMLElement && isControlTarget(event.target))) return;
+    const isIgnoredKey = state.paused || (event.target instanceof HTMLElement && isControlTarget(event.target));
+    if (isIgnoredKey) return;
     if (hasShortcutModifier(event)) {
       keys.clear();
       return;
@@ -23,7 +24,8 @@ export function bindSceneInput(
     const key = gameKey(event);
     if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) event.preventDefault();
     if (portalInput.isBlocked(key)) return;
-    if (key === ' ' && !event.repeat) startJump(jump);
+    const isJumpPress = key === ' ' && !event.repeat;
+    if (isJumpPress) startJump(jump);
     keys.add(key);
     if (MOVE_KEYS.includes(key)) {
       state.route = [];
@@ -45,18 +47,21 @@ export function bindSceneInput(
   const visibility = () => {
     clear();
     cancelAnimationFrame(state.animation);
-    if (!document.hidden && !state.disposed) state.animation = requestAnimationFrame(tick);
+    const shouldContinue = !document.hidden && !state.disposed;
+    if (shouldContinue) state.animation = requestAnimationFrame(tick);
   };
   const pick = createPointerPick({ canvas: renderer.domElement, camera, portals: portalVisuals, markers });
   const hover = (event: PointerEvent) => {
-    if (event.pointerType !== 'mouse' || state.paused) return;
+    if (event.pointerType !== 'mouse') return;
+    if (state.paused) return;
     const target = pick(event, state.region);
     let cursor = 'default';
     if (target) cursor = target.interactive ? 'pointer' : 'crosshair';
     renderer.domElement.style.cursor = cursor;
   };
   const click = (event: PointerEvent) => {
-    if (state.paused || event.button !== 0) return;
+    if (state.paused) return;
+    if (event.button !== 0) return;
     renderer.domElement.focus({ preventScroll: true });
     const target = pick(event, state.region);
     if (!target) return;

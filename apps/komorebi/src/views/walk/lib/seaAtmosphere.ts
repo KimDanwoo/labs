@@ -1,4 +1,4 @@
-export const SEA_ATMOSPHERE_GLSL = /* glsl */ `
+export const SEA_ATMOSPHERE_GLSL = `
   float seaHash(vec2 p) {
     vec3 q = fract(vec3(p.xyx) * .1031);
     q += dot(q, q.yzx + 33.33);

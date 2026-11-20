@@ -9,7 +9,8 @@ const inside = (outline: [number, number][], x: number, z: number) => {
   for (let i = 0, j = outline.length - 1; i < outline.length; j = i++) {
     const [ax, az] = outline[i]!;
     const [bx, bz] = outline[j]!;
-    if (az > z !== bz > z && x < ((bx - ax) * (z - az)) / (bz - az) + ax) isInside = !isInside;
+    const isCrossingRay = az > z !== bz > z && x < ((bx - ax) * (z - az)) / (bz - az) + ax;
+    if (isCrossingRay) isInside = !isInside;
   }
   return isInside;
 };

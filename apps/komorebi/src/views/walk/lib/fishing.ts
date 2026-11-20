@@ -31,17 +31,24 @@ export function addCatch(collection: FishCollection, caught: Catch): FishCollect
   };
 }
 function parseRecord(entry: unknown, min: number, max: number) {
-  if (!entry || typeof entry !== 'object') return null;
+  if (!entry) return null;
+  if (typeof entry !== 'object') return null;
   const { count, best } = entry as Record<string, unknown>;
-  if (typeof count !== 'number' || !Number.isSafeInteger(count) || count <= 0) return null;
-  if (typeof best !== 'number' || !Number.isFinite(best) || best < min || best > max) return null;
+  if (typeof count !== 'number') return null;
+  if (!Number.isSafeInteger(count)) return null;
+  if (count <= 0) return null;
+  if (typeof best !== 'number') return null;
+  if (!Number.isFinite(best)) return null;
+  if (best < min) return null;
+  if (best > max) return null;
   return { count, best };
 }
 
 export function parseCollection(raw: string | null): FishCollection {
   try {
     const data: unknown = JSON.parse(raw ?? '{}');
-    if (!data || typeof data !== 'object') return {};
+    if (!data) return {};
+    if (typeof data !== 'object') return {};
     const result: FishCollection = {};
     for (const fish of FISH) {
       const record = parseRecord((data as Record<string, unknown>)[fish.id], fish.min, fish.max);

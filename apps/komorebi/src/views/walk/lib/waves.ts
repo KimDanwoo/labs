@@ -28,7 +28,6 @@ type WaveType = ReturnType<typeof createWave>;
 function createWave(scene: THREE.Scene, spec: (typeof WAVES)[number]) {
   const sheet = SHEETS[spec.kind];
   const material = new THREE.SpriteMaterial({ transparent: true, depthTest: false, depthWrite: false });
-  // Blend adjacent atlas cells on the GPU instead of stepping at 3–8 fps.
   const blend = { value: 0 };
   const nextOffset = { value: new THREE.Vector2() };
   material.onBeforeCompile = (shader) => {
@@ -95,7 +94,8 @@ function placeWave(entry: WaveType, progress: number) {
 function updateWave(entry: WaveType, { region, dt, darkness, isStill, rain }: Scene) {
   const { spec, sprite, material } = entry;
   const map = material.map;
-  if (region !== SEA || !map) {
+  const isOffSea = region !== SEA || !map;
+  if (isOffSea) {
     sprite.visible = false;
     return;
   }
@@ -125,7 +125,6 @@ export function createWaves(scene: THREE.Scene, loader: THREE.TextureLoader) {
           return;
         }
         texture.colorSpace = THREE.SRGBColorSpace;
-        // Neighbouring cells must not bleed into each other when sampled small.
         texture.generateMipmaps = false;
         texture.minFilter = THREE.LinearFilter;
         sheets.push(texture);

@@ -1,4 +1,3 @@
-/** Physical keys stay stable when Korean IME changes event.key to ㅈ/ㅁ/ㄴ/ㅇ. */
 export function gameKey(event: { code: string; key: string }) {
   const physical: Record<string, string> = {
     KeyW: 'w',
@@ -38,12 +37,10 @@ export function keyboardDirection(keys: ReadonlySet<string>) {
 
 const CONTROL_TAGS = new Set(['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'A']);
 
-/** Keys pressed on a focused control (Space on a button, typing in a field) belong to that control, not the walk. */
 export function isControlTarget(target: { tagName: string; isContentEditable: boolean }): boolean {
   return CONTROL_TAGS.has(target.tagName) || target.isContentEditable;
 }
 
-/** ⌘·Ctrl·Alt 조합은 브라우저·OS 단축키다. 맥은 ⌘를 누른 동안 다른 키의 keyup을 보내지 않는다. */
 export function hasShortcutModifier(event: { metaKey: boolean; ctrlKey: boolean; altKey: boolean }): boolean {
   return event.metaKey || event.ctrlKey || event.altKey;
 }

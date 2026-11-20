@@ -17,33 +17,41 @@ const CHALK_REGION: Region = REGION.classroom;
 
 export type SceneTravel = ReturnType<typeof createSceneTravel>;
 
+const isSleepAllowed = (state: SceneContext['state'], jump: SceneContext['parts']['jump']): boolean =>
+  !state.disposed && !state.paused && state.region === REGION.home && !isAirborne(jump) && isAtHomeBed(state.position);
+
+function planRouteToDestination(state: SceneContext['state']): WorldPortal | null {
+  if (!state.destination) return null;
+  const point = DESTINATIONS.find((p) => p.id === state.destination);
+  if (!point) return null;
+  if (point.region === state.region) {
+    state.route = findRoute(state.position, point, state.region);
+    return null;
+  }
+  const portal = getWorldPortals(state.region).find((p) => p.to === nextRegionStep(state.region, point.region))!;
+  state.route = findRoute(state.position, portal.center, state.region);
+  return portal;
+}
+
 export function createSceneTravel({ container, state, wake, parts, options: { onNotice, onSleep } }: SceneContext) {
   const { plates, waterMaps, background, bedRest, placeEffects, jump, slide, keys, portalInput } = parts;
-  const plan = (): WorldPortal | null => {
-    if (!state.destination) return null;
-    const point = DESTINATIONS.find((p) => p.id === state.destination);
-    if (!point) return null;
-    if (point.region === state.region) {
-      state.route = findRoute(state.position, point, state.region);
-      return null;
-    }
-    const portal = getWorldPortals(state.region).find((p) => p.to === nextRegionStep(state.region, point.region))!;
-    state.route = findRoute(state.position, portal.center, state.region);
-    return portal;
-  };
+  const plan = (): WorldPortal | null => planRouteToDestination(state);
   const redirect = (exit: WorldPortal | null) => {
-    if (exit && exit === state.cancelledPortal) {
+    const isCancelledExit = exit && exit === state.cancelledPortal;
+    if (isCancelledExit) {
       state.blockedPortal = null;
       state.cancelledPortal = null;
       return;
     }
-    if (!state.waitingPortal || state.waitingPortal === exit) return;
+    if (!state.waitingPortal) return;
+    if (state.waitingPortal === exit) return;
     state.blockedPortal = state.waitingPortal;
     state.cancelledPortal = state.waitingPortal;
     state.waitingPortal = null;
   };
   const switchRegion = (next: Region, spawn: Point, plate: THREE.Texture) => {
-    if (isIndoors(state.region) || isIndoors(next)) {
+    const isIndoorTrip = isIndoors(state.region) || isIndoors(next);
+    if (isIndoorTrip) {
       portalInput.arrive(keys);
       keys.clear();
       state.moveSpeed = 0;
@@ -89,7 +97,8 @@ export function createSceneTravel({ container, state, wake, parts, options: { on
     state.waitingPortal = portal;
     onNotice(`${WORLDS[portal.to].name} 풍경을 펼치고 있어요…`);
     plates.ensure(portal.to).catch(() => {
-      if (state.disposed || state.waitingPortal !== portal) return;
+      if (state.disposed) return;
+      if (state.waitingPortal !== portal) return;
       state.waitingPortal = null;
       state.blockedPortal = portal;
       state.cancelledPortal = null;
@@ -97,18 +106,16 @@ export function createSceneTravel({ container, state, wake, parts, options: { on
     });
   };
   async function startSleep() {
-    const canSleep = () =>
-      !state.disposed &&
-      !state.paused &&
-      state.region === REGION.home &&
-      !isAirborne(jump) &&
-      isAtHomeBed(state.position);
-    if (state.preparingSleep || state.sleepBlocked || !canSleep()) return;
+    const canSleep = () => isSleepAllowed(state, jump);
+    if (state.preparingSleep) return;
+    if (state.sleepBlocked) return;
+    if (!canSleep()) return;
     state.preparingSleep = true;
     const template = state.currentAppearance.character;
     const ready = await bedRest.prepare(template);
     state.preparingSleep = false;
-    if (!canSleep() || template !== state.currentAppearance.character) return;
+    if (!canSleep()) return;
+    if (template !== state.currentAppearance.character) return;
     state.sleepBlocked = true;
     if (!ready) {
       onNotice('잠자리를 준비하지 못했어요. 잠시 벗어났다가 다시 와 주세요.');
@@ -124,9 +131,12 @@ export function createSceneTravel({ container, state, wake, parts, options: { on
     wake();
   }
   function arriveAt() {
-    if (state.region !== REGION.home || !isNearHomeBed(state.position)) state.sleepBlocked = false;
-    if (state.region === REGION.home && isAtHomeBed(state.position)) void startSleep();
-    if (state.blockedPortal && !isInsidePortal(state.position, state.blockedPortal)) {
+    const isAwayFromBed = state.region !== REGION.home || !isNearHomeBed(state.position);
+    if (isAwayFromBed) state.sleepBlocked = false;
+    const isAtBed = state.region === REGION.home && isAtHomeBed(state.position);
+    if (isAtBed) void startSleep();
+    const hasLeftBlockedPortal = state.blockedPortal && !isInsidePortal(state.position, state.blockedPortal);
+    if (hasLeftBlockedPortal) {
       state.blockedPortal = null;
       state.cancelledPortal = null;
     }

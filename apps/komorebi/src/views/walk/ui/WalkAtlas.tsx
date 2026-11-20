@@ -22,7 +22,6 @@ export function WalkAtlas() {
       aria-labelledby={titleId}
       onCancel={onClose}
       onClose={(event) => {
-        // A late close event from an earlier dismissal must not shut a dialog that was opened again.
         if (!event.currentTarget.open) onClose();
       }}
       onClick={(event) => {

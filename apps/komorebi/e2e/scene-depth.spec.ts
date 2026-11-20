@@ -7,8 +7,10 @@ async function guideTo(page: Page, name: string): Promise<void> {
 async function position(page: Page): Promise<{ x: number; z: number }> {
   const raw = await page.locator('.landscape').getAttribute('data-position');
   const [x, z] = (raw ?? '').split(',').map(Number);
-  if (x === undefined || z === undefined || !Number.isFinite(x) || !Number.isFinite(z))
-    throw new Error('Position unavailable');
+  if (x === undefined) throw new Error('Position unavailable');
+  if (z === undefined) throw new Error('Position unavailable');
+  if (!Number.isFinite(x)) throw new Error('Position unavailable');
+  if (!Number.isFinite(z)) throw new Error('Position unavailable');
   return { x, z };
 }
 async function walkUntil(

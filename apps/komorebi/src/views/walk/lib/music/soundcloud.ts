@@ -67,7 +67,13 @@ type MusicCallbacks = {
   progress: (position: number) => void;
   error: () => void;
 };
-/** Own exactly one widget. Late postMessage callbacks cannot update a disposed player. */
+function unlessFrameDetached(release: () => void): void {
+  try {
+    release();
+  } catch {
+    return;
+  }
+}
 export function bindMusicWidget(
   widget: MusicWidget,
   events: Record<string, string>,
@@ -88,7 +94,8 @@ export function bindMusicWidget(
   const current = () => {
     const request = ++revision;
     widget.getCurrentSoundIndex((index) => {
-      if (active && request === revision && Number.isInteger(index)) callbacks.track(index);
+      const isCurrentTrack = active && request === revision && Number.isInteger(index);
+      if (isCurrentTrack) callbacks.track(index);
     });
   };
   bind('READY', () => {
@@ -110,10 +117,9 @@ export function bindMusicWidget(
   });
   bind('PAUSE', () => callbacks.playing(false));
   bind('PLAY_PROGRESS', ({ currentPosition }) => {
-    if (typeof currentPosition === 'number' && Number.isFinite(currentPosition))
-      callbacks.progress(Math.max(0, currentPosition));
+    const hasPosition = typeof currentPosition === 'number' && Number.isFinite(currentPosition);
+    if (hasPosition) callbacks.progress(Math.max(0, currentPosition));
   });
-  // Multi-track SoundCloud widgets advance themselves; calling next here would skip a song.
   bind('FINISH', () => {
     callbacks.playing(false);
   });
@@ -124,18 +130,7 @@ export function bindMusicWidget(
   return () => {
     active = false;
     revision++;
-    // React may already have detached the iframe; the SDK then throws on postMessage.
-    try {
-      widget.pause();
-    } catch {
-      /* Detached frames have already stopped playback. */
-    }
-    bound.forEach((event) => {
-      try {
-        widget.unbind(event);
-      } catch {
-        /* Continue releasing the remaining subscriptions. */
-      }
-    });
+    unlessFrameDetached(() => widget.pause());
+    bound.forEach((event) => unlessFrameDetached(() => widget.unbind(event)));
   };
 }

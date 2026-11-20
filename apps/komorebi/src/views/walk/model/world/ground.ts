@@ -51,7 +51,8 @@ function contains(outline: readonly PixelPoint[], x: number, y: number) {
   for (let i = 0, j = outline.length - 1; i < outline.length; j = i++) {
     const [ax, ay] = outline[i]!;
     const [bx, by] = outline[j]!;
-    if (ay > y !== by > y && x < ((bx - ax) * (y - ay)) / (by - ay) + ax) inside = !inside;
+    const isCrossingRay = ay > y !== by > y && x < ((bx - ax) * (y - ay)) / (by - ay) + ax;
+    if (isCrossingRay) inside = !inside;
   }
   return inside;
 }
@@ -112,7 +113,8 @@ const depthCuts = (from: Point, to: Point): number[] => {
   if (to.z === from.z) return cuts;
   for (const depth of DEPTH_CUTS) {
     const t = (depth - from.z) / (to.z - from.z);
-    if (t > 0 && t < 1) cuts.push(t);
+    const isInsideSegment = t > 0 && t < 1;
+    if (isInsideSegment) cuts.push(t);
   }
   return cuts.sort((a, b) => a - b);
 };

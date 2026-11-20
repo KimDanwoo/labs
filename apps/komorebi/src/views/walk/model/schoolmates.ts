@@ -30,7 +30,8 @@ const BALL_PLAY_DISTANCE = 14;
 
 export function schoolmatePlayPosition({ player, friend }: { player: Point; friend: Point }): Point | null {
   const distance = Math.abs(player.x - friend.x);
-  if (distance >= 12 && distance <= 18 && Math.abs(player.z - friend.z) < 2) return player;
+  const isPassingDistance = distance >= 12 && distance <= 18 && Math.abs(player.z - friend.z) < 2;
+  if (isPassingDistance) return player;
   const side = player.x < friend.x ? -1 : 1;
   return (
     [side, -side]
@@ -108,7 +109,8 @@ export function advanceSchoolmate(
   const { spec, region, isStill, player } = options;
   const dt = Math.max(0, Math.min(MAX_STEP_SECONDS, options.dt));
   const resting = { ...state, travel: 0, speed: 0 };
-  if (!dt || isStill) return resting;
+  if (!dt) return resting;
+  if (isStill) return resting;
   if (state.wait > 0) return { ...resting, wait: Math.max(0, state.wait - dt) };
   const path = state.path.filter(
     (point, index) =>
@@ -138,6 +140,7 @@ export function advanceSchoolmate(
   const position = { x: state.position.x + (dx / distance) * travel, z: state.position.z + (dz / distance) * travel };
   const playerDistance = Math.hypot(position.x - player.x, position.z - player.z);
   const isApproachingPlayer = playerDistance < Math.hypot(state.position.x - player.x, state.position.z - player.z);
-  if (playerDistance < PERSONAL_SPACE && isApproachingPlayer) return resting;
+  const shouldKeepDistance = playerDistance < PERSONAL_SPACE && isApproachingPlayer;
+  if (shouldKeepDistance) return resting;
   return { ...state, path, position, heading: Math.atan2(dx, dz), travel: travel / perspective, speed };
 }

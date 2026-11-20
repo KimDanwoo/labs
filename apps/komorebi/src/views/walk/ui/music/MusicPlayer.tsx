@@ -21,7 +21,8 @@ export function MusicPlayer({ source, initialVolume, profile }: MusicPlayerProps
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     event.stopPropagation();
-    if (event.key !== 'Escape' || !panel.isExpanded) return;
+    if (event.key !== 'Escape') return;
+    if (!panel.isExpanded) return;
     event.preventDefault();
     panel.collapse();
   };

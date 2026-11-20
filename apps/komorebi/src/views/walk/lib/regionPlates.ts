@@ -6,10 +6,6 @@ type TextureSource = { loadAsync: (url: string) => Promise<THREE.Texture> };
 
 export type RegionPlates = {
   get: (region: Region) => THREE.Texture | undefined;
-  /**
-   * One shared request per region. A failed request is forgotten so a later visit can retry; a painting that is
-   * no longer wanted when it arrives is disposed and the request rejects instead of returning a freed texture.
-   */
   ensure: (region: Region) => Promise<THREE.Texture>;
   focus: (regions: Region[]) => void;
   dispose: () => void;
@@ -36,7 +32,8 @@ export function createRegionPlates(loader: TextureSource, initial: Region[]): Re
   let isDisposed = false;
 
   function ensure(region: Region) {
-    if (isDisposed || !wanted.has(region)) return Promise.reject(abandoned());
+    if (isDisposed) return Promise.reject(abandoned());
+    if (!wanted.has(region)) return Promise.reject(abandoned());
     const ready = textures.get(region);
     if (ready) return Promise.resolve(ready);
     const pending = requests.get(region);
@@ -44,7 +41,8 @@ export function createRegionPlates(loader: TextureSource, initial: Region[]): Re
     const request = loader.loadAsync(WORLDS[region].image).then(
       (texture) => {
         requests.delete(region);
-        if (isDisposed || !wanted.has(region)) {
+        const shouldAbandon = isDisposed || !wanted.has(region);
+        if (shouldAbandon) {
           texture.dispose();
           throw abandoned();
         }

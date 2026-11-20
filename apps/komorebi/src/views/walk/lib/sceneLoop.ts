@@ -31,7 +31,8 @@ interface ChildFrame {
 }
 
 function isBallInPlay({ ballFrame }: WalkState) {
-  if (ballFrame === null || ballFrame.phase === BALL_PHASE.complete) return false;
+  if (ballFrame === null) return false;
+  if (ballFrame.phase === BALL_PHASE.complete) return false;
   return !(ballFrame.phase === BALL_PHASE.missed && ballFrame.elapsed >= BALL_TIMING.miss);
 }
 
@@ -146,7 +147,8 @@ function reportIfDue({ state }: SceneContext, steps: SceneLoopSteps, frame: Chil
 export function createSceneLoop(ctx: SceneContext, steps: SceneLoopSteps): FrameRequestCallback {
   const { state, parts } = ctx;
   function tick(time: number) {
-    if (state.disposed || document.hidden) return;
+    if (state.disposed) return;
+    if (document.hidden) return;
     const wasAirborne = isAirborne(parts.jump);
     const rate = frameRate(ctx, wasAirborne);
     if (!shouldRenderFrame(time, state.nextFrame, rate)) {

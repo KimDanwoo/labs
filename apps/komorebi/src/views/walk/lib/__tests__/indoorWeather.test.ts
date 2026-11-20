@@ -7,7 +7,8 @@ import test from 'node:test';
 test('every sheltered map has its own outdoor rain mask', () => {
   for (const world of Object.keys(WORLDS)) {
     const room = INDOOR_RAIN_ROOMS.find((room) => room.region === world);
-    if (world in WORLDS && (world === 'home' || world === 'hallway' || world === 'classroom')) {
+    const isIndoorWorld = world in WORLDS && (world === 'home' || world === 'hallway' || world === 'classroom');
+    if (isIndoorWorld) {
       assert.ok(isIndoors(world));
       assert.ok(room && room.panes.length > 0, `${world} has no window rain`);
     } else assert.equal(room, undefined, `${world} should use the outdoor rain layer`);

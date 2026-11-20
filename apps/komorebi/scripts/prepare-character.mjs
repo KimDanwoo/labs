@@ -5,7 +5,6 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import ts from 'typescript';
 
-// Requires Chrome (CHROME_BIN outside macOS) and cwebp. No server or GPU needed.
 const root = new URL('../', import.meta.url);
 const temporary = await mkdtemp(join(tmpdir(), 'komorebi-character-'));
 const sourcePath = process.argv[2] ? resolve(process.argv[2]) : new URL('public/art/child-motion-v2-atlas.webp', root);

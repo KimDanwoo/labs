@@ -23,16 +23,17 @@ const SPRINT_SPEED = 36;
 export type Stride = { walking: boolean; sprinting: boolean; frameTravel: number };
 export type BedRestFrame = NonNullable<ReturnType<ReturnType<typeof createBedRest>['update']>>;
 
+const isNextWaypointReached = (state: WalkState): boolean =>
+  state.route.length > 0 &&
+  Math.hypot(state.route[0]!.x - state.position.x, state.route[0]!.z - state.position.z) < 0.02;
+
 function dropReachedWaypoints(state: WalkState) {
-  while (
-    state.route.length &&
-    Math.hypot(state.route[0]!.x - state.position.x, state.route[0]!.z - state.position.z) < 0.02
-  )
-    state.route.shift();
+  while (isNextWaypointReached(state)) state.route.shift();
 }
 function clearArrivedDestination(state: WalkState) {
-  if (state.destination && DESTINATIONS.find((p) => p.id === state.destination)?.region === state.region)
-    state.destination = null;
+  const isDestinationHere =
+    state.destination && DESTINATIONS.find((p) => p.id === state.destination)?.region === state.region;
+  if (isDestinationHere) state.destination = null;
 }
 function steerAlongRoute(state: WalkState) {
   dropReachedWaypoints(state);
@@ -74,7 +75,6 @@ function followCameraFor(
     );
   const keepY = (y: number) =>
     constrainCameraAxis(y, state.halfHeight, 40, child.position.y - 1, child.position.y + characterHeight);
-  // Damp toward a target that already respects the painting edges, so the camera can actually arrive.
   const targetX = keepX(cameraX);
   const targetY = keepY(cameraY);
   const cameraLag = state.reducedMotion ? 100 : 3;
@@ -104,7 +104,8 @@ export function createPlayerMotion({ container, state, parts, options: { onStep 
     const isMoving = moved > 0.0001;
     if (isMoving) state.heading = Math.atan2(next.x - state.position.x, next.z - state.position.z);
     state.position = next;
-    if (moved < 0.0001 && state.route.length && dt > 0) {
+    const isStuckOnRoute = moved < 0.0001 && state.route.length && dt > 0;
+    if (isStuckOnRoute) {
       state.route = [];
       state.destination = null;
     }
@@ -114,12 +115,14 @@ export function createPlayerMotion({ container, state, parts, options: { onStep 
     const canMove = canPlayerMove();
     let { dx, dz } = keyboardDirection(keys);
     const keyboardWalking = Math.hypot(dx, dz) > 0;
-    if (!keyboardWalking || !canMove) {
+    const shouldStopRoute = !keyboardWalking || !canMove;
+    if (shouldStopRoute) {
       slide.direction = null;
       slide.input = null;
     }
     let routeDistance = Infinity;
-    const steer = canMove && !keyboardWalking ? steerAlongRoute(state) : null;
+    const shouldSteer = canMove && !keyboardWalking;
+    const steer = shouldSteer ? steerAlongRoute(state) : null;
     if (steer) ({ dx, dz, routeDistance } = steer);
     const sprinting = isSprinting();
     const magnitude = Math.hypot(dx, dz);
@@ -131,7 +134,8 @@ export function createPlayerMotion({ container, state, parts, options: { onStep 
     return { walking: isMoving, sprinting, frameTravel };
   }
   function fishingHeading() {
-    if (state.fishingFrame?.phase === FISHING_PHASE.caught && state.fishingAge > 0.8) return 0;
+    const isShowingCatch = state.fishingFrame?.phase === FISHING_PHASE.caught && state.fishingAge > 0.8;
+    if (isShowingCatch) return 0;
     return Math.PI / 2;
   }
   function characterTiming(rest: BedRestFrame | null, walking: boolean, frameTravel: number, dt: number) {
@@ -162,8 +166,8 @@ export function createPlayerMotion({ container, state, parts, options: { onStep 
       landing: jump.landing,
     });
     character.setFishingPose({ frame: state.fishingFrame, elapsed: state.fishingAge, isStill: state.reducedMotion });
-    if (!state.fishingFrame && state.paused && !walking)
-      character.setCompanionPose({ age: state.companionAge, isStill: state.reducedMotion });
+    const isIdleRest = !state.fishingFrame && state.paused && !walking;
+    if (isIdleRest) character.setCompanionPose({ age: state.companionAge, isStill: state.reducedMotion });
     character.setBallPose({
       game: walking ? null : state.ballFrame,
       role: BALL_ROLE.player,

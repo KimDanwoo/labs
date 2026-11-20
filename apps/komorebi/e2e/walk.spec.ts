@@ -4,7 +4,6 @@ import { interactPrompt, WALK_TO_PROMPT } from './prompts';
 const landscape = (page: Page) => page.locator('.landscape');
 
 test.beforeEach(async ({ page }) => {
-  // 산책 검증의 가상 시계를 외부 음악 플레이어의 타이머와 분리한다.
   await page.route('https://w.soundcloud.com/**', (route) => route.abort());
 });
 
@@ -93,7 +92,6 @@ async function walkToBed(page: Page) {
   await expect.poll(() => coordinate(2), { intervals: [50] }).toBeGreaterThanOrEqual(73);
   await page.keyboard.up('ArrowDown');
   await page.keyboard.down('ArrowRight');
-  // Keep walking until the quilt is actually reached; rounded map coordinates can stop short.
   await expect(landscape(page)).toHaveAttribute('data-motion', 'sleeping', { timeout: 10_000 });
   await page.keyboard.up('ArrowRight');
   await expect(landscape(page)).toHaveAttribute('data-rest', 'tucked');
@@ -468,13 +466,16 @@ test('footsteps play recorded takes for the ground underfoot, never the same tak
     Object.assign(window, { played });
     const start = AudioBufferSourceNode.prototype.start;
     AudioBufferSourceNode.prototype.start = function (...args) {
-      if (this.buffer && this.buffer.duration < 1.5) played.push(this.buffer.duration.toFixed(4));
+      const { buffer } = this;
+      const isShortBuffer = buffer !== null && buffer.duration < 1.5;
+      if (isShortBuffer) played.push(buffer.duration.toFixed(4));
       return start.apply(this, args);
     };
   });
   const fetched: string[] = [];
   page.on('response', (response) => {
-    if (response.url().includes('/sounds/steps/') && response.ok()) fetched.push(response.url());
+    const isFetchedStep = response.url().includes('/sounds/steps/') && response.ok();
+    if (isFetchedStep) fetched.push(response.url());
   });
   await openWalk(page);
   await page.getByRole('button', { name: '자연 소리 켜기' }).click();

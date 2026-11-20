@@ -6,7 +6,6 @@ export function useWalkDialog(isBusy: boolean, onFocusScene: () => void) {
   const [dialog, setDialog] = useState<Dialog>(DIALOG.none);
 
   function closeDialog(which: Dialog) {
-    // Commit now: window-level shortcuts read this state and must not see a dialog the browser already closed.
     flushSync(() => setDialog((current) => (current === which ? DIALOG.none : current)));
     onFocusScene();
   }

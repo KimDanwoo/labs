@@ -46,7 +46,6 @@ export function createPortals(scene: THREE.Scene) {
       return { region, portal, texture, material, label };
     }),
   );
-  // 처음 그릴 때 마루부리 조각이 아직 없으면 대체 서체로 그려지므로, 글리프를 받은 뒤 다시 그린다
   void document.fonts.load(SIGN_FONT, entries.map(({ portal }) => portal.label).join('')).then(() => {
     for (const { portal, texture } of entries) {
       const { image } = texture;

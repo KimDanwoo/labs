@@ -31,7 +31,8 @@ export function SchoolmateDialog({ friend, region }: SchoolmateDialogProps): JSX
         if (event.target === event.currentTarget) onClose();
       }}
       onKeyDown={(event) => {
-        if (gameKey(event) === 'e' && !event.repeat) {
+        const isPlayKey = gameKey(event) === 'e' && !event.repeat;
+        if (isPlayKey) {
           event.preventDefault();
           event.stopPropagation();
           onClose();

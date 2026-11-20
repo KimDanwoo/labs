@@ -148,7 +148,6 @@ test('painted ground is walkable even outside the old guide lanes in all six map
 });
 
 test('painted shrubs, fences, playground equipment and verges reject entry', () => {
-  // Pixel samples from the original artwork, independent of the navigation data.
   const obstacles: [Region, number, number][] = [
     ['shops', 370, 710],
     ['shops', 540, 720],
@@ -233,7 +232,6 @@ test('road shoulders, plazas and upper paths work beyond the old narrow guide ro
     ['forest', 50, 42],
     ['school', 68, 42],
     ['shops', 65, 80],
-    // Independent points on the painting: pavements, side gate, stairs and harbour.
     ...(
       [
         ['shops', 800, 265],

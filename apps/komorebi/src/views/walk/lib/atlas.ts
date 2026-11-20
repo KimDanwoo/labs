@@ -59,7 +59,8 @@ function bestPreviousColumn(costs: Float64Array, span: number, y: number, x: num
   let previous = x;
   for (let dx = -1; dx <= 1; dx++) {
     const candidate = x + dx;
-    if (candidate < 0 || candidate >= span) continue;
+    if (candidate < 0) continue;
+    if (candidate >= span) continue;
     if (costs[(y - 1) * span + candidate]! < costs[(y - 1) * span + previous]!) previous = candidate;
   }
   return previous;
@@ -140,7 +141,8 @@ function floodExterior(body: Uint8Array, w: number, h: number) {
   let read = 0,
     write = 0;
   const seed = (i: number) => {
-    if (!body[i] && !exterior[i]) {
+    const isInteriorHole = !body[i] && !exterior[i];
+    if (isInteriorHole) {
       exterior[i] = 1;
       queue[write++] = i;
     }
@@ -189,13 +191,11 @@ function extractFrame(
     right = Math.max(...seams.rightSeam),
     w = right - left;
   const body = buildBody(foreground, width, top, seams, left, w, h);
-  // Keep the connected character before measuring its bounds and anchor;
-  // otherwise a detached sliver survives and shifts the entire pose.
   keepLargestComponent(body, w);
   const bounds = measureBounds(body, seams, left, w, h);
   const { minX, maxX, minY, maxY } = bounds;
-  if (minX > maxX || minY > maxY) throw new Error(`Empty character frame ${label}`);
-  // Flood only the exterior matte: enclosed cream highlights remain opaque.
+  const isEmptyFrame = minX > maxX || minY > maxY;
+  if (isEmptyFrame) throw new Error(`Empty character frame ${label}`);
   const exterior = floodExterior(body, w, h);
   const frameWidth = maxX - minX + 1,
     frameHeight = maxY - minY + 1;
@@ -206,17 +206,11 @@ function extractFrame(
       const source = ((top + y) * width + left + x) * 4;
       pixels.set(data.subarray(source, source + 4), ((y - minY) * frameWidth + x - minX) * 4);
     }
-  // Anchor the hood, not the changing reach of a swinging foot or hand.
   return { pixels, width: frameWidth, height: frameHeight, anchorX: hoodAnchor(body, bounds, w, frameHeight) };
 }
 
-/** Split the authored, unevenly spaced sheet at background seams before resizing.
- * A fixed grid (or resizing into a narrow canvas first) clips the wide hoods.
- */
 export function extractChildFrames(data: Uint8ClampedArray, width: number, height: number) {
   const foreground = buildForeground(data, width, height);
-  // Authored soles can extend below the nominal row boundary. Split in the
-  // empty gutter instead of cutting every row at exactly one quarter height.
   const rowEdges = findRowEdges(foreground, width, height);
   const frames: ChildFrame[] = [];
   for (let row = 0; row < FRAME_ROWS; row++) {
@@ -239,7 +233,8 @@ function neighborIndices(index: number, width: number, height: number) {
     for (let dx = -1; dx <= 1; dx++) {
       const nx = x + dx,
         ny = y + dy;
-      if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+      const isOutOfBounds = nx < 0 || nx >= width || ny < 0 || ny >= height;
+      if (isOutOfBounds) continue;
       result.push(ny * width + nx);
     }
   return result;
@@ -260,7 +255,8 @@ function floodComponent(
   labels[start] = label;
   while (read < write) {
     for (const next of neighborIndices(queue[read++]!, width, height)) {
-      if (!mask[next] || labels[next]) continue;
+      if (!mask[next]) continue;
+      if (labels[next]) continue;
       labels[next] = label;
       queue[write++] = next;
     }
@@ -275,7 +271,8 @@ function keepLargestComponent(mask: Uint8Array, width: number) {
     largestLabel = 0,
     largestSize = 0;
   for (let start = 0; start < mask.length; start++) {
-    if (!mask[start] || labels[start]) continue;
+    if (!mask[start]) continue;
+    if (labels[start]) continue;
     label++;
     const size = floodComponent(mask, labels, queue, start, label, width);
     if (size > largestSize) {
@@ -286,7 +283,6 @@ function keepLargestComponent(mask: Uint8Array, width: number) {
   for (let i = 0; i < mask.length; i++) mask[i] = Number(largestLabel > 0 && labels[i] === largestLabel);
 }
 
-/** Screen-down is front, screen-right is right, screen-up is back. */
 export function childFacing(previous: number, heading: number) {
   const previousAngle = (previous * Math.PI) / 2;
   const delta = Math.atan2(Math.sin(heading - previousAngle), Math.cos(heading - previousAngle));

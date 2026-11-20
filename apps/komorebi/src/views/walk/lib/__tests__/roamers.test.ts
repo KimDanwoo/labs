@@ -43,7 +43,8 @@ test('with reduced motion an animal holds its pose, even if it was pausing to lo
     const before = roamers.standing;
     roamers.update({ ...VILLAGE, dt: STEP });
     const after = roamers.standing;
-    if (before && after && before.x === after.x && before.z === after.z) pausedAt = i;
+    const isPaused = before && after && before.x === after.x && before.z === after.z;
+    if (isPaused) pausedAt = i;
   }
   for (let i = 0; i < 20; i++) roamers.update({ ...VILLAGE, dt: STEP });
   assert.ok(pausedAt >= 0, 'it paused');

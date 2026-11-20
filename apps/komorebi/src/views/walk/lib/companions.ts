@@ -23,7 +23,8 @@ export function catBond(friendship: number) {
   return { level: 0, name: '조심스러운 첫 만남', hint: '조금 떨어져 구경 중이에요. 물고기를 나눠 줘 볼까요?' };
 }
 function isCatch(value: unknown): value is Catch {
-  if (!value || typeof value !== 'object') return false;
+  if (!value) return false;
+  if (typeof value !== 'object') return false;
   const { id, size } = value as Record<string, unknown>;
   const species = FISH.find((fish) => fish.id === id);
   return Boolean(
@@ -49,9 +50,11 @@ function parseKeptFish(entry: unknown, fish: readonly KeptFish[], ids: ReadonlyS
   if (!isCatch(entry)) return null;
   const item = entry as Catch & Record<string, unknown>;
   if (!isFreshUid(item.uid, ids)) return null;
-  if (item.home !== FISH_HOME.bag && item.home !== FISH_HOME.tank) return null;
-  if (countAt(fish, item.home) >= homeCapacity(item.home)) return null;
-  return { id: item.id, size: item.size, uid: item.uid, home: item.home };
+  const { home } = item;
+  const hasUnknownHome = home !== FISH_HOME.bag && home !== FISH_HOME.tank;
+  if (hasUnknownHome) return null;
+  if (countAt(fish, home) >= homeCapacity(home)) return null;
+  return { id: item.id, size: item.size, uid: item.uid, home };
 }
 
 function parseKeptFishList(raw: unknown): KeptFish[] {
@@ -68,14 +71,16 @@ function parseKeptFishList(raw: unknown): KeptFish[] {
 }
 
 function parseFriendship(value: unknown) {
-  if (typeof value !== 'number' || !Number.isSafeInteger(value)) return 0;
+  if (typeof value !== 'number') return 0;
+  if (!Number.isSafeInteger(value)) return 0;
   return Math.max(0, Math.min(FRIENDSHIP_MAX, value));
 }
 
 export function parseCompanions(raw: string | null): Companions {
   try {
     const value: unknown = JSON.parse(raw ?? 'null');
-    if (!value || typeof value !== 'object') return EMPTY_COMPANIONS;
+    if (!value) return EMPTY_COMPANIONS;
+    if (typeof value !== 'object') return EMPTY_COMPANIONS;
     const data = value as Record<string, unknown>;
     return { fish: parseKeptFishList(data.fish), friendship: parseFriendship(data.friendship) };
   } catch {
@@ -84,7 +89,9 @@ export function parseCompanions(raw: string | null): Companions {
 }
 
 function keepCatch(state: Companions, caught: Catch, uid: string): Companions {
-  if (!isCatch(caught) || !uid || state.fish.some((fish) => fish.uid === uid)) return state;
+  if (!isCatch(caught)) return state;
+  if (!uid) return state;
+  if (state.fish.some((fish) => fish.uid === uid)) return state;
   if (countAt(state.fish, FISH_HOME.bag) >= BAG_CAPACITY) return state;
   return { ...state, fish: [...state.fish, { ...caught, uid, home: FISH_HOME.bag }] };
 }
@@ -103,13 +110,12 @@ function moveFish(state: Companions, fish: KeptFish, home: FishHome): Companions
   return { ...state, fish: state.fish.map((item) => (item.uid === fish.uid ? { ...item, home } : item)) };
 }
 
-/** Moving or sharing consumes the exact catch, never the permanent fishing journal. */
 export function changeCompanions(state: Companions, action: CompanionAction): Companions {
   if (action.kind === COMPANION_ACTION.keep) return keepCatch(state, action.fish, action.uid);
   const fish = state.fish.find((item) => item.uid === action.uid);
   if (!fish) return state;
-  if (action.kind === COMPANION_ACTION.share || action.kind === COMPANION_ACTION.release)
-    return consumeFish(state, fish, action.kind === COMPANION_ACTION.share);
+  const isLeavingCompanion = action.kind === COMPANION_ACTION.share || action.kind === COMPANION_ACTION.release;
+  if (isLeavingCompanion) return consumeFish(state, fish, action.kind === COMPANION_ACTION.share);
   return moveFish(state, fish, action.kind === COMPANION_ACTION.tank ? FISH_HOME.tank : FISH_HOME.bag);
 }
 

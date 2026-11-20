@@ -83,10 +83,9 @@ function closestExitNode(target: Point, region: Region, costs: Map<string, numbe
 
 export function findRoute(start: Point, target: Point, region: Region): Point[] {
   const world = WORLDS[region];
-  if (!canWalk(start.x, start.z, region) || !canWalk(target.x, target.z, region)) return [];
+  if (!canWalk(start.x, start.z, region)) return [];
+  if (!canWalk(target.x, target.z, region)) return [];
   if (clearSegment(start, target, region)) return [{ ...target }];
-  // Evaluate every visible connection: the nearest node may lead backwards
-  // through the return portal even when the destination is in the other direction.
   const { costs, previous } = searchNodes(start, region);
   const to = closestExitNode(target, region, costs);
   if (!to) return findGroundRoute(start, target, region);
@@ -99,7 +98,6 @@ export function findRoute(start: Point, target: Point, region: Region): Point[] 
   if (canWalk(target.x, target.z, region)) result.push(target);
   return result;
 }
-// A painted side path may contain no authored guide nodes. Search its actual floor.
 const GROUND_STEP = 0.5;
 const GROUND_SIZE = 201;
 const SEED_RANGE = 2;
@@ -120,8 +118,10 @@ const groundPoint = (id: number): Point => ({
   z: Math.floor(id / GROUND_SIZE) * GROUND_STEP,
 });
 
-const gridIdAt = (x: number, z: number): number | null =>
-  x < 0 || x >= GROUND_SIZE || z < 0 || z >= GROUND_SIZE ? null : z * GROUND_SIZE + x;
+const gridIdAt = (x: number, z: number): number | null => {
+  const isOffGrid = x < 0 || x >= GROUND_SIZE || z < 0 || z >= GROUND_SIZE;
+  return isOffGrid ? null : z * GROUND_SIZE + x;
+};
 
 const isFreeCell = (search: GroundSearch, id: number | null): id is number =>
   id !== null && !!search.grid[id] && !search.closed.has(id);
@@ -143,7 +143,8 @@ function seedGroundSearch(search: GroundSearch, start: Point, region: Region) {
   for (let dz = -SEED_RANGE; dz <= SEED_RANGE; dz++)
     for (let dx = -SEED_RANGE; dx <= SEED_RANGE; dx++) {
       const id = gridIdAt(sx + dx, sz + dz);
-      if (!isFreeCell(search, id) || !clearSegment(start, groundPoint(id), region)) continue;
+      if (!isFreeCell(search, id)) continue;
+      if (!clearSegment(start, groundPoint(id), region)) continue;
       const cell = groundPoint(id);
       search.costs.set(id, Math.hypot(cell.x - start.x, cell.z - start.z));
       search.open.add(id);
@@ -168,7 +169,8 @@ function smoothPath(path: Point[], start: Point, region: Region): Point[] {
   const result: Point[] = [];
   let anchor = start;
   for (let i = 0; i < path.length; i++) {
-    if (i + 1 < path.length && clearSegment(anchor, path[i + 1]!, region)) continue;
+    const canSkipNext = i + 1 < path.length && clearSegment(anchor, path[i + 1]!, region);
+    if (canSkipNext) continue;
     anchor = path[i]!;
     result.push(anchor);
   }
@@ -189,11 +191,13 @@ function expandGroundSearch(search: GroundSearch, current: number, region: Regio
   const from = groundPoint(current);
   for (let dz = -NEIGHBOUR_RANGE; dz <= NEIGHBOUR_RANGE; dz++)
     for (let dx = -NEIGHBOUR_RANGE; dx <= NEIGHBOUR_RANGE; dx++) {
-      if (!dx && !dz) continue;
+      const isSameCell = !dx && !dz;
+      if (isSameCell) continue;
       const id = gridIdAt((current % GROUND_SIZE) + dx, Math.floor(current / GROUND_SIZE) + dz);
       if (!isFreeCell(search, id)) continue;
       const cost = search.costs.get(current)! + Math.hypot(dx, dz) * GROUND_STEP;
-      if (cost >= (search.costs.get(id) ?? Infinity) || !clearSegment(from, groundPoint(id), region)) continue;
+      if (cost >= (search.costs.get(id) ?? Infinity)) continue;
+      if (!clearSegment(from, groundPoint(id), region)) continue;
       search.costs.set(id, cost);
       search.previous.set(id, current);
       search.open.add(id);
@@ -212,7 +216,9 @@ function findGroundRoute(start: Point, target: Point, region: Region): Point[] {
   while (search.open.size) {
     const current = bestOpenCell(search, target);
     const from = groundPoint(current);
-    if (Math.hypot(from.x - target.x, from.z - target.z) <= GOAL_RADIUS && clearSegment(from, target, region)) {
+    const hasReachedGoal =
+      Math.hypot(from.x - target.x, from.z - target.z) <= GOAL_RADIUS && clearSegment(from, target, region);
+    if (hasReachedGoal) {
       return smoothPath(tracePath(search, current, target), start, region);
     }
     search.open.delete(current);

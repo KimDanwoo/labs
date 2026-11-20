@@ -31,7 +31,6 @@ function paintWater(region: Region) {
       c.fill();
     }
   });
-  // Data, not colour: the shader must read the channels exactly as painted.
   texture.colorSpace = THREE.NoColorSpace;
   return texture;
 }
@@ -50,7 +49,6 @@ export function createWaterMaps(loader: THREE.TextureLoader) {
         texture.dispose();
         return;
       }
-      // Grayscale glint shapes, black where there is none; cells must not blur into each other.
       texture.colorSpace = THREE.NoColorSpace;
       texture.generateMipmaps = false;
       texture.minFilter = THREE.LinearFilter;

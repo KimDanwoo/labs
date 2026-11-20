@@ -44,7 +44,8 @@ export function createStatusReporter({ container, state, parts, options: { onSta
       .join(' ');
     container.dataset.motion = state.sleeping ? 'sleeping' : motionLabel(jump.height > 0, walking, sprinting);
     let restLabel = state.sleeping ? 'settling' : '';
-    if (rest && rest.tucked > 0.99) restLabel = 'tucked';
+    const isTucked = rest && rest.tucked > 0.99;
+    if (isTucked) restLabel = 'tucked';
     container.dataset.rest = restLabel;
     const nextStatus: SceneStatus = {
       ...state.position,
@@ -54,7 +55,8 @@ export function createStatusReporter({ container, state, parts, options: { onSta
       steps: Math.floor(state.distance * 5),
       schoolmateId: nearestSchoolmate(schoolmates.standing, state.position),
     };
-    if (state.previousStatus && !hasStatusChanged(state.previousStatus, nextStatus)) return;
+    const isUnchangedStatus = state.previousStatus && !hasStatusChanged(state.previousStatus, nextStatus);
+    if (isUnchangedStatus) return;
     state.previousStatus = nextStatus;
     onStatus(nextStatus);
   }

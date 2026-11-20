@@ -61,11 +61,12 @@ const LATERAL_STEP = 0.25;
 const LATERAL_MAX = 100;
 
 const boundaryProbe = (exit: Portal, lateral: number) => {
-  const horizontal = exit.edge === 'left' || exit.edge === 'right';
-  const direction = exit.edge === 'left' || exit.edge === 'top' ? -1 : 1;
+  const isHorizontal = exit.edge === 'left' || exit.edge === 'right';
+  const isNegativeEdge = exit.edge === 'left' || exit.edge === 'top';
+  const direction = isNegativeEdge ? -1 : 1;
   const outsideAt = exit.boundary + direction * BOUNDARY_MARGIN;
   const insideAt = exit.boundary - direction * BOUNDARY_MARGIN;
-  return horizontal
+  return isHorizontal
     ? { outside: { x: outsideAt, z: lateral }, inside: { x: insideAt, z: lateral } }
     : { outside: { x: lateral, z: outsideAt }, inside: { x: lateral, z: insideAt } };
 };
@@ -74,7 +75,8 @@ const countBoundaryCrossings = (region: Region, exit: Portal) => {
   let crossings = 0;
   for (let lateral = 0; lateral <= LATERAL_MAX; lateral += LATERAL_STEP) {
     const { outside, inside } = boundaryProbe(exit, lateral);
-    if (!canWalk(outside.x, outside.z, region) || !canWalk(inside.x, inside.z, region)) continue;
+    if (!canWalk(outside.x, outside.z, region)) continue;
+    if (!canWalk(inside.x, inside.z, region)) continue;
     assert.equal(isInsidePortal(inside, exit), false);
     const covered = lateral >= exit.lateralRange[0] && lateral <= exit.lateralRange[1];
     assert.equal(isInsidePortal(outside, exit), covered);

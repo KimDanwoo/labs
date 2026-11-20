@@ -55,7 +55,8 @@ function rodAngle({ age, casting, fighting, caught }: Pose) {
 
 function rodBend({ fighting, frame, reducedMotion, age }: Pose) {
   if (!fighting) return 0.3;
-  const surge = frame.isSurging && !reducedMotion ? Math.sin(age * 22) * 0.35 : 0;
+  const isSurgingFrame = frame.isSurging && !reducedMotion;
+  const surge = isSurgingFrame ? Math.sin(age * 22) * 0.35 : 0;
   return (frame.tension / 100) * 3.5 + surge;
 }
 
@@ -84,7 +85,8 @@ function poseRod(pose: Pose, grip: THREE.Vector3) {
 }
 
 function surgeSway({ frame, age, fighting, reducedMotion }: Pose) {
-  if (!fighting || reducedMotion) return 0;
+  if (!fighting) return 0;
+  if (reducedMotion) return 0;
   return Math.sin(age * (frame.isSurging ? 12 : 6)) * (frame.isSurging ? 1.2 : 0.4);
 }
 
@@ -110,7 +112,8 @@ function fishProportions(shape: Species['shape'] | undefined) {
 }
 
 function fishSizeScale({ species, frame }: Pose) {
-  if (!species || !frame.caught) return 1.2;
+  if (!species) return 1.2;
+  if (!frame.caught) return 1.2;
   return 1.2 + ((frame.caught.size - species.min) / (species.max - species.min)) * 0.5;
 }
 

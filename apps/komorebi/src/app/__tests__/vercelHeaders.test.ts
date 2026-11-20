@@ -4,8 +4,6 @@ import { describe, it } from 'node:test';
 
 import { createSecurityHeaders } from '@repo/security-headers';
 
-// output: 'export'라 next.config의 headers()가 적용되지 않아 vercel.json에 같은 값을 적어 둔다.
-// 이 검사가 komorebi 테스트에 있어야 komorebi나 공유 헤더 어느 쪽이 바뀐 PR에서도 돈다.
 const FRAME_ANCESTORS = 'none';
 const HARDENING_DIRECTIVES = ["object-src 'none'", "base-uri 'self'", "form-action 'self'", "script-src-attr 'none'"];
 const SHARED_KEYS = [

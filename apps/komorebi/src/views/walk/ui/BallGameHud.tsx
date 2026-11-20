@@ -28,6 +28,7 @@ export function BallGameHud({ name, onFrame, onClose }: BallGameHudProps): JSX.E
     handleRetry();
     ref.current?.focus({ preventScroll: true });
   }
+  const isRoundOver = hasMissed || isFinished;
   return (
     <dialog
       ref={ref}
@@ -42,7 +43,8 @@ export function BallGameHud({ name, onFrame, onClose }: BallGameHudProps): JSX.E
         onClose();
       }}
       onKeyDown={(event) => {
-        if (gameKey(event) === 'e' && !event.repeat) {
+        const isPlayKey = gameKey(event) === 'e' && !event.repeat;
+        if (isPlayKey) {
           event.preventDefault();
           event.stopPropagation();
           handleCatch();
@@ -65,7 +67,7 @@ export function BallGameHud({ name, onFrame, onClose }: BallGameHudProps): JSX.E
         </span>
       </div>
       <div className="schoolmate-actions">
-        {hasMissed || isFinished ? (
+        {isRoundOver ? (
           <button className="wardrobe-done" onClick={handleRestart}>
             다시 놀기
           </button>

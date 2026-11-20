@@ -147,7 +147,8 @@ export function createSchoolmates(
     const urls = characterLayers(spec);
     void Promise.allSettled([loader.loadAsync(urls.body), loader.loadAsync(urls.outfit)])
       .then(([body, outfit]) => {
-        if (isDisposed || body.status === 'rejected' || outfit.status === 'rejected') {
+        const hasFailedLoad = isDisposed || body.status === 'rejected' || outfit.status === 'rejected';
+        if (hasFailedLoad) {
           for (const layer of [body, outfit]) {
             if (layer.status === 'fulfilled') layer.value.dispose();
           }
@@ -168,7 +169,8 @@ export function createSchoolmates(
 
   function ensureActors() {
     for (const spec of SCHOOLMATES) {
-      if (pending.has(spec.id) || actors.some((actor) => actor.spec.id === spec.id)) continue;
+      if (pending.has(spec.id)) continue;
+      if (actors.some((actor) => actor.spec.id === spec.id)) continue;
       pending.add(spec.id);
       loadActor(spec);
     }
@@ -208,7 +210,8 @@ export function createSchoolmates(
       actors.forEach((actor) => {
         actor.character.group.visible = isVisible;
         actor.shadow.visible = isVisible;
-        if (!isVisible || !region) return;
+        if (!isVisible) return;
+        if (!region) return;
         const entry = updateActor(actor, region, frame, { isGreeted: greetingId === actor.spec.id, ballFrame });
         if (entry) standing.push(entry);
       });

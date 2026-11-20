@@ -70,14 +70,11 @@ export const sleepingPortrait = (character: CharacterTemplate) =>
 export function parseAppearance(raw: string | null): Appearance {
   try {
     const value: unknown = JSON.parse(raw ?? 'null');
-    if (
-      typeof value !== 'object' ||
-      value === null ||
-      !('character' in value) ||
-      !Object.values(CHARACTER).some((character) => character === value.character) ||
-      !('outfit' in value)
-    )
-      return DEFAULT_APPEARANCE;
+    if (typeof value !== 'object') return DEFAULT_APPEARANCE;
+    if (value === null) return DEFAULT_APPEARANCE;
+    if (!('character' in value)) return DEFAULT_APPEARANCE;
+    if (!Object.values(CHARACTER).some((character) => character === value.character)) return DEFAULT_APPEARANCE;
+    if (!('outfit' in value)) return DEFAULT_APPEARANCE;
     const outfit = Object.values(OUTFIT).find((outfit) => outfit === value.outfit);
     return outfit ? { character: CHARACTER.child, outfit } : DEFAULT_APPEARANCE;
   } catch {

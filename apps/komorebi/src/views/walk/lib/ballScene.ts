@@ -55,7 +55,8 @@ export function createBallScene(scene: THREE.Scene): BallScene {
     update({ game, player, friend, isStill }) {
       sprite.visible = !!game && !!friend && game.phase !== BALL_PHASE.complete;
       shadow.visible = sprite.visible;
-      if (!game || !friend) return;
+      if (!game) return;
+      if (!friend) return;
       const motion = ballFlight({ game, isStill });
       const t = motion.progress;
       const x = THREE.MathUtils.lerp(friend.x, player.x, t);

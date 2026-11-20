@@ -11,10 +11,14 @@ export const DEFAULT_MUSIC: MusicPreferences = { volume: 35, source: DANWOO_PROF
 export function musicSource(raw: string): string | null {
   try {
     const url = new URL(raw.trim());
-    if (url.protocol !== 'https:' || url.hostname !== 'soundcloud.com' || url.port || url.username || url.password)
-      return null;
+    if (url.protocol !== 'https:') return null;
+    if (url.hostname !== 'soundcloud.com') return null;
+    if (url.port) return null;
+    if (url.username) return null;
+    if (url.password) return null;
     const path = url.pathname.replace(/\/$/, '');
-    if (path !== '/danwooking' && !/^\/danwooking\/sets\/[a-zA-Z0-9_-]+$/.test(path)) return null;
+    const isUnknownPath = path !== '/danwooking' && !/^\/danwooking\/sets\/[a-zA-Z0-9_-]+$/.test(path);
+    if (isUnknownPath) return null;
     return `${url.origin}${path}`;
   } catch {
     return null;
@@ -23,12 +27,12 @@ export function musicSource(raw: string): string | null {
 export function parseMusicPreferences(raw: string | null): MusicPreferences {
   try {
     const value: unknown = JSON.parse(raw ?? 'null');
-    if (!value || typeof value !== 'object') return DEFAULT_MUSIC;
+    if (!value) return DEFAULT_MUSIC;
+    if (typeof value !== 'object') return DEFAULT_MUSIC;
     const data = value as Record<string, unknown>;
-    const volume =
-      typeof data.volume === 'number' && Number.isFinite(data.volume)
-        ? Math.round(Math.max(0, Math.min(100, data.volume)))
-        : DEFAULT_MUSIC.volume;
+    const { volume: storedVolume } = data;
+    const hasValidVolume = typeof storedVolume === 'number' && Number.isFinite(storedVolume);
+    const volume = hasValidVolume ? Math.round(Math.max(0, Math.min(100, storedVolume))) : DEFAULT_MUSIC.volume;
     return {
       volume,
       source: typeof data.source === 'string' ? (musicSource(data.source) ?? DANWOO_PROFILE) : DANWOO_PROFILE,
@@ -57,18 +61,22 @@ function isTrackId(value: unknown): value is number {
 }
 
 function trackUrl(value: unknown) {
-  return typeof value === 'string' && SOUNDCLOUD_TRACK_URL.test(value) ? value : DANWOO_PROFILE;
+  const isTrackUrl = typeof value === 'string' && SOUNDCLOUD_TRACK_URL.test(value);
+  return isTrackUrl ? value : DANWOO_PROFILE;
 }
 
 function trackDuration(value: unknown) {
-  return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, value) : 0;
+  const isFiniteNumber = typeof value === 'number' && Number.isFinite(value);
+  return isFiniteNumber ? Math.max(0, value) : 0;
 }
 
 export function parseMusicTracks(sounds: unknown[]): MusicTrack[] {
   return sounds.flatMap((sound, index) => {
-    if (!sound || typeof sound !== 'object') return [];
+    if (!sound) return [];
+    if (typeof sound !== 'object') return [];
     const item = sound as Record<string, unknown>;
-    if (!isTrackId(item.id) || typeof item.title !== 'string') return [];
+    if (!isTrackId(item.id)) return [];
+    if (typeof item.title !== 'string') return [];
     return [
       {
         id: item.id,

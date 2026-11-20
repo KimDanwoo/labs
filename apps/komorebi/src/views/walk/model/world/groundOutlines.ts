@@ -1,7 +1,6 @@
 import type { PixelPoint } from '@views/walk/model/world/ground';
 import type { Region } from '@views/walk/model/world/world';
 
-/** Ground boundaries traced on the 1536 × 1024 paintings, separate from navigation routes. */
 export const GROUND: Record<Region, readonly PixelPoint[][]> = {
   home: [
     [

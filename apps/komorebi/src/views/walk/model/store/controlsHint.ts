@@ -2,7 +2,6 @@ import { CONTROLS_SEEN_STORAGE_KEY } from '@views/walk/config/walk';
 
 let seenBeforeThisVisit: boolean | null = null;
 
-/** Read once per visit so marking the hint as seen does not hide it mid-visit. */
 export function wasControlsHintSeen(): boolean {
   if (seenBeforeThisVisit !== null) return seenBeforeThisVisit;
   try {

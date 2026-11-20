@@ -33,7 +33,8 @@ function catJump(isSuccess: boolean, fishingAge: number, reducedMotion: boolean)
 }
 
 function catWobble(isAffectionate: boolean, reducedMotion: boolean, reactionAge: number) {
-  return isAffectionate && !reducedMotion ? Math.sin(reactionAge * 5) * 0.09 : 0;
+  const shouldWiggle = isAffectionate && !reducedMotion;
+  return shouldWiggle ? Math.sin(reactionAge * 5) * 0.09 : 0;
 }
 
 function setCatWalkFrame(texture: THREE.Texture, isLeft: boolean, frame: number) {
@@ -112,7 +113,8 @@ export function createCatScene(
     cat.scale.setScalar(scale);
     if (texture) {
       const left = moving && position.x < before;
-      const frame = moving && !reducedMotion ? Math.floor(elapsed * 8) % 4 : 0;
+      const isWalkingAnimated = moving && !reducedMotion;
+      const frame = isWalkingAnimated ? Math.floor(elapsed * 8) % 4 : 0;
       setCatWalkFrame(texture, left, frame);
     }
     const affection = reaction !== COMPANION_REACTION.feed && reactionAge < 2.4;

@@ -52,7 +52,6 @@ const TWINKLES: Partial<Record<Region, Twinkle[]>> = {
   ],
 };
 
-/** Uniform values for the painting shader: xy in UV (y up), z the reach. */
 export function lampUniforms(region: Region) {
   const lamps = LAMPS[region].slice(0, MAX_LAMPS);
   const values = Array.from({ length: MAX_LAMPS }, (_, i) => {

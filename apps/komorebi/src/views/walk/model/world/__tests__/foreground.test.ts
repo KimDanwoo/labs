@@ -14,7 +14,8 @@ function covered(region: Region, x: number, y: number, feetDepth: number) {
       for (let i = 0, j = outline.length - 1; i < outline.length; j = i++) {
         const [ax, ay] = outline[i]!;
         const [bx, by] = outline[j]!;
-        if (ay > y !== by > y && x < ((bx - ax) * (y - ay)) / (by - ay) + ax) inside = !inside;
+        const isCrossingRay = ay > y !== by > y && x < ((bx - ax) * (y - ay)) / (by - ay) + ax;
+        if (isCrossingRay) inside = !inside;
       }
       return inside;
     });
@@ -137,7 +138,6 @@ test('no reachable pair of child and animal needs a foreground both above and be
       const isNear = ({ x }: { x: number }) => x >= Math.min(...xs) - 4 && x <= Math.max(...xs) + 4;
       const isBehind = (point: { x: number; z: number }) => isForegroundInFront(layer, point, region);
       const children = walkable.filter(isNear);
-      // Nearer walkers carry the higher render order, so whoever the layer hides must also be the farther one.
       for (const animal of lanes.filter(isNear)) {
         const clash = children.find(
           (child) => isBehind(animal) !== isBehind(child) && isBehind(animal) === animal.z > child.z,

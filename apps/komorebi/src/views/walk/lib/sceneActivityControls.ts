@@ -30,8 +30,8 @@ export function createActivityControls({
   };
   const applyBallFrame = (frame: BallGame | null) => {
     const hasPhaseChanged = frame?.phase !== state.ballFrame?.phase;
-    if (frame?.phase === BALL_PHASE.returning && state.ballFrame?.phase !== BALL_PHASE.returning)
-      state.companionAge = 0;
+    const isBallReturning = frame?.phase === BALL_PHASE.returning && state.ballFrame?.phase !== BALL_PHASE.returning;
+    if (isBallReturning) state.companionAge = 0;
     state.ballFrame = frame;
     schoolmates.setBallGame(frame);
     if (hasPhaseChanged) wake();
@@ -74,15 +74,18 @@ export function createActivityControls({
       wake();
     },
     setBallGame(frame) {
-      if (frame && isBallBlocked()) return false;
-      if (frame && !state.ballFrame && !approachPlaySpot()) return false;
+      const isBlockedBall = frame && isBallBlocked();
+      if (isBlockedBall) return false;
+      const isAwayFromPlaySpot = frame && !state.ballFrame && !approachPlaySpot();
+      if (isAwayFromPlaySpot) return false;
       if (frame === state.ballFrame) return state.route.length === 0;
       applyBallFrame(frame);
       if (state.route.length === 0) faceGreeting();
       return state.route.length === 0;
     },
     setFishing(frame) {
-      if (frame && !state.fishingFrame) {
+      const shouldStartFishing = frame && !state.fishingFrame;
+      if (shouldStartFishing) {
         if (!isNearSpot('pier', state.position, state.region)) return;
         state.route = [];
         state.destination = null;

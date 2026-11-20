@@ -42,7 +42,6 @@ function boardPoint(event: PointerEvent<HTMLCanvasElement>) {
 
 export function useChalkPad(canvasRef: RefObject<HTMLCanvasElement | null>, { strokes, brush, onNotice }: Options) {
   const draft = useRef<ChalkStroke | null>(null);
-  // Only the pointer that started the stroke may extend or end it; a second finger is ignored.
   const activePointer = useRef<number | null>(null);
   const committed = useRef<HTMLCanvasElement | null>(null);
 
@@ -53,7 +52,8 @@ export function useChalkPad(canvasRef: RefObject<HTMLCanvasElement | null>, { st
 
   function redrawDraft(canvas: HTMLCanvasElement, stroke: ChalkStroke) {
     const ctx = canvas.getContext('2d');
-    if (!ctx || !committed.current) return;
+    if (!ctx) return;
+    if (!committed.current) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(committed.current, 0, 0);
     paintStroke(ctx, stroke);
@@ -84,8 +84,10 @@ export function useChalkPad(canvasRef: RefObject<HTMLCanvasElement | null>, { st
 
   return {
     onPointerDown(event: PointerEvent<HTMLCanvasElement>) {
-      if (event.button !== 0 || draft.current) return;
-      if (!canAddStroke(strokes) || !canAddPoint(strokes, [])) {
+      if (event.button !== 0) return;
+      if (draft.current) return;
+      const isBoardFull = !canAddStroke(strokes) || !canAddPoint(strokes, []);
+      if (isBoardFull) {
         onNotice(CHALK_NOTICE.full);
         return;
       }
@@ -98,7 +100,8 @@ export function useChalkPad(canvasRef: RefObject<HTMLCanvasElement | null>, { st
     },
     onPointerMove(event: PointerEvent<HTMLCanvasElement>) {
       const stroke = draft.current;
-      if (!stroke || !isActive(event)) return;
+      if (!stroke) return;
+      if (!isActive(event)) return;
       const { x, y } = boardPoint(event);
       if (!isFarEnough(stroke.points, x, y)) return;
       if (!canAddPoint(strokes, stroke.points)) {

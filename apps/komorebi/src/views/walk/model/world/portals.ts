@@ -88,10 +88,13 @@ const BEYOND_BOUNDARY = {
 } satisfies Record<Edge, (position: Point, boundary: number) => boolean>;
 
 export function isInsidePortal(position: Point, portal: WorldPortal) {
-  const lateral = portal.edge === 'left' || portal.edge === 'right' ? position.z : position.x;
-  if (lateral < portal.lateralRange[0] || lateral > portal.lateralRange[1]) return false;
-  const axial = portal.edge === 'left' || portal.edge === 'right' ? position.x : position.z;
-  if (portal.extent !== undefined && Math.abs(axial - portal.boundary) > portal.extent) return false;
+  const isSideEdge = portal.edge === 'left' || portal.edge === 'right';
+  const lateral = isSideEdge ? position.z : position.x;
+  const isOutsideLateral = lateral < portal.lateralRange[0] || lateral > portal.lateralRange[1];
+  if (isOutsideLateral) return false;
+  const axial = isSideEdge ? position.x : position.z;
+  const isBeyondExtent = portal.extent !== undefined && Math.abs(axial - portal.boundary) > portal.extent;
+  if (isBeyondExtent) return false;
   return BEYOND_BOUNDARY[portal.edge](position, portal.boundary);
 }
 

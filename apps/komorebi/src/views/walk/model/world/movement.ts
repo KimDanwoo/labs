@@ -1,8 +1,6 @@
 import { hasGroundBetween, isOnGround } from '@views/walk/model/world/ground';
 import { REGION, type Point, type Region } from '@views/walk/model/world/world';
 
-/** Ground outlines define movement; guide routes never restrict where the player can stand. */
-
 export function canWalk(x: number, z: number, region: Region = REGION.village) {
   return (
     Number.isFinite(x) && Number.isFinite(z) && x >= 0 && x <= 100 && z >= 0 && z <= 100 && isOnGround(x, z, region)
@@ -46,7 +44,8 @@ function slideCandidate(
   if (!clearSegment(position, point, region)) return null;
   const ahead = { x: position.x + sx / length, z: position.z + sz / length };
   const continuity = slideContinuity(sx, sz, length, slide);
-  if (slide?.direction && continuity < SLIDE_REVERSAL_LIMIT) return null;
+  const isReversingSlide = slide?.direction && continuity < SLIDE_REVERSAL_LIMIT;
+  if (isReversingSlide) return null;
   const forwardBonus = clearSegment(position, ahead, region) ? SLIDE_FORWARD_BONUS : 0;
   return { point, score: Math.cos(angle) + forwardBonus + continuity * SLIDE_CONTINUITY_WEIGHT };
 }
@@ -59,13 +58,14 @@ function slideStep(position: Point, dx: number, dz: number, region: Region, slid
   for (const degrees of SLIDE_DEGREES) {
     for (const side of [-1, 1]) {
       const candidate = slideCandidate(position, dx, dz, (side * degrees * Math.PI) / 180, region, slide);
-      if (!candidate || !(candidate.score > bestScore + SLIDE_SCORE_MARGIN)) continue;
+      if (!candidate) continue;
+      if (!(candidate.score > bestScore + SLIDE_SCORE_MARGIN)) continue;
       best = candidate.point;
       bestScore = candidate.score;
     }
   }
-  if (slide && best !== position)
-    slide.direction = { x: (best.x - position.x) / length, z: (best.z - position.z) / length };
+  const hasSlidAway = slide && best !== position;
+  if (hasSlidAway) slide.direction = { x: (best.x - position.x) / length, z: (best.z - position.z) / length };
   return best;
 }
 
@@ -76,7 +76,8 @@ function trackSlideInput(slide: SlideMotion, dx: number, dz: number, distance: n
     return false;
   }
   const input = { x: dx / distance, z: dz / distance };
-  if (slide.input && input.x * slide.input.x + input.z * slide.input.z < INPUT_TURN_LIMIT) slide.direction = null;
+  const isTurningAway = slide.input && input.x * slide.input.x + input.z * slide.input.z < INPUT_TURN_LIMIT;
+  if (isTurningAway) slide.direction = null;
   slide.input = input;
   return true;
 }
@@ -108,9 +109,11 @@ export function movePlayer(
   region: Region = REGION.village,
   slide?: SlideMotion,
 ) {
-  if (!Number.isFinite(dx) || !Number.isFinite(dz)) return { ...position };
+  if (!Number.isFinite(dx)) return { ...position };
+  if (!Number.isFinite(dz)) return { ...position };
   const distance = Math.hypot(dx, dz);
-  if (slide && !trackSlideInput(slide, dx, dz, distance)) return { ...position };
+  const isSlideRejected = slide && !trackSlideInput(slide, dx, dz, distance);
+  if (isSlideRejected) return { ...position };
   const steps = Math.max(1, Math.ceil(distance / MAX_SUBSTEP));
   let next = { ...position };
   for (let i = 0; i < steps; i++) next = advanceSubstep(next, { x: dx, z: dz }, distance, steps, region, slide);

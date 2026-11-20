@@ -1,7 +1,6 @@
 const LAYER_VOLUME = { water: 0.5, waves: 0.65, cicadas: 0.012, rain: 0.7 } as const;
 
 export function createBeds(context: AudioContext, master: AudioNode, noise: AudioBuffer) {
-  // A broad surf hiss has no sub-bass rumble; a longer bed avoids an obvious short repeat.
   const surfNoise = context.createBuffer(1, context.sampleRate * 12, context.sampleRate);
   const surfSamples = surfNoise.getChannelData(0);
   for (let i = 0; i < surfSamples.length; i++) surfSamples[i] = (Math.random() * 2 - 1) * 0.35;

@@ -18,12 +18,14 @@ export function useBallGame({ onFrame }: Options): GameControls {
     let isPositioned = false;
     function tick(now: number) {
       const canAdvance = isPositioned || current.current.phase !== BALL_PHASE.ready;
-      const dt = previous && !document.hidden && canAdvance ? (now - previous) / MS_PER_SECOND : 0;
+      const canTick = previous && !document.hidden && canAdvance;
+      const dt = canTick ? (now - previous) / MS_PER_SECOND : 0;
       previous = now;
       const before = current.current;
       current.current = advanceBallGame(before, dt);
       isPositioned = sendFrame(current.current);
-      if (now - published > PUBLISH_INTERVAL_MS || before.phase !== current.current.phase) {
+      const shouldPublish = now - published > PUBLISH_INTERVAL_MS || before.phase !== current.current.phase;
+      if (shouldPublish) {
         setGame(current.current);
         published = now;
       }

@@ -52,7 +52,8 @@ export function useMusicPlayer(source: string, initialVolume: number): MusicPlay
     }, MUSIC_LOAD_TIMEOUT_MS);
     void loadMusicApi()
       .then((api) => {
-        if (cancelled || !iframe.current) return;
+        if (cancelled) return;
+        if (!iframe.current) return;
         const savedVolume = readMusicPreferences().volume;
         volumeRef.current = savedVolume;
         setVolume(savedVolume);
@@ -152,10 +153,13 @@ export function readMusicPreferences(): MusicPreferences {
     return DEFAULT_MUSIC;
   }
 }
-export function saveMusicPreferences(next: MusicPreferences) {
+function saveUnlessStorageBlocked(key: string, value: string): void {
   try {
-    localStorage.setItem(MUSIC_STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(key, value);
   } catch {
-    /* Playback still works without preferences. */
+    return;
   }
+}
+export function saveMusicPreferences(next: MusicPreferences) {
+  saveUnlessStorageBlocked(MUSIC_STORAGE_KEY, JSON.stringify(next));
 }

@@ -77,7 +77,8 @@ export function createTankScene(
       const pose = aquariumPose(keptFish, elapsed, feed ? reactionAge : 10, reducedMotion);
       const art = aquariumFishArt(keptFish.id);
       const map = tankTextures.get(art.src);
-      if (map && body.material.map !== map) {
+      const hasNewMap = map && body.material.map !== map;
+      if (hasNewMap) {
         body.material.map = map;
         body.material.needsUpdate = true;
         body.visible = true;
