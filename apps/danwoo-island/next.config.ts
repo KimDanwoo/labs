@@ -43,6 +43,7 @@ const worldAssetHeaders = isDevelopment
     ];
 
 const nextConfig: NextConfig = {
+  agentRules: false,
   env: { NEXT_PUBLIC_WORLD_VERSION: worldVersion },
   async headers() {
     return [{ source: '/(.*)', headers: SECURITY_HEADERS }, ...worldAssetHeaders];
