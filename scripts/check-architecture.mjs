@@ -16,6 +16,9 @@ const UNSUPPORTED_WEIGHT = /\bfont-(?:thin|extralight|light|medium|extrabold|bla
 const DEPLOYMENT_ENABLED = { '**': false, main: true };
 const BUILD_FILTER = /--filter=(\S+)/;
 const COMPONENT_WRAPPER = /^(?:memo|forwardRef|dynamic|lazy|Object\.assign)$/;
+const NEXT_CONFIG_NAMES = ['next.config.ts', 'next.config.mjs', 'next.config.js'];
+const AGENT_RULES_OFF = /\bagentRules:\s*false\b/;
+const MANAGED_AGENT_RULES = '<!-- BEGIN:nextjs-agent-rules -->';
 const STYLE_HOME =
   /^src\/app\/(?:globals\.css|styles\/[^/]+\.css)$|^src\/(?:views|features|entities)\/[^/]+\/styles\/[^/]+\.css$|^src\/(?:.*\/)?ui\/(?:.*\/)?[A-Z][A-Za-z0-9]*\.module\.css$/;
 
@@ -60,6 +63,17 @@ function ignoreCommandProblem(ignoreCommand, appName) {
   if (ignoreCommand.includes('turbo-ignore') && ignoreCommand !== `npx turbo-ignore ${appName}`)
     return `ignoreCommand는 이 앱을 가리킨다: npx turbo-ignore ${appName}`;
   return null;
+}
+
+export function validateAgentRules(nextConfig, agentsMd) {
+  const problems = [];
+  if (!AGENT_RULES_OFF.test(nextConfig))
+    problems.push(
+      'next.config: agentRules: false를 둔다. 켜 두면 next dev가 Next 버전마다 AGENTS.md를 다시 써서 커밋 안 된 변경이 생긴다.',
+    );
+  if (agentsMd.includes(MANAGED_AGENT_RULES))
+    problems.push('AGENTS.md: Next 관리 블록(nextjs-agent-rules) 대신 일반 문단으로 둔다.');
+  return problems;
 }
 
 export function validateVercelConfig(config, appName) {
@@ -265,9 +279,17 @@ function tsconfigProblems({ dir, relative, manifest }) {
   return { problems, compilerOptions };
 }
 
+function agentRulesProblems(dir, relative) {
+  const configName = NEXT_CONFIG_NAMES.find((name) => existsSync(path.join(dir, name)));
+  const nextConfig = configName ? readFileSync(path.join(dir, configName), 'utf8') : '';
+  const agentsPath = path.join(dir, 'AGENTS.md');
+  const agentsMd = existsSync(agentsPath) ? readFileSync(agentsPath, 'utf8') : '';
+  return validateAgentRules(nextConfig, agentsMd).map((problem) => `${relative}/${problem}`);
+}
+
 function nextAppProblems({ dir, relative, manifest }) {
   if (!manifest.dependencies?.next) return [];
-  const problems = [];
+  const problems = agentRulesProblems(dir, relative);
   if (!existsSync(path.join(dir, 'app/layout.tsx'))) problems.push(`${relative}: 루트 app/layout.tsx가 필요하다.`);
   const eslint = readFileSync(path.join(dir, 'eslint.config.mjs'), 'utf8');
   for (const preset of ['next.eslint.config.mjs', 'fsd.config.mjs']) {
