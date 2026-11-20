@@ -4,11 +4,9 @@ const KEBAB_CASE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const HOOK_NAME = /^use[A-Z]/;
 const COMPONENT_STYLES = /\.styles\.ts$/;
 
-// Next가 이름을 소유하는 라우팅·메타데이터 파일.
 const ROUTE_FILE =
   /^(page|layout|route|error|loading|not-found|global-error|template|default|icon|apple-icon|opengraph-image|twitter-image|sitemap|robots|manifest)$/;
 
-// 라우트 그룹 `(main)`, 동적 세그먼트 `[id]`, 프라이빗 `_ui`, `__tests__`, `@types`는 케이스 규약 밖이다.
 const EXEMPT_DIR = /^[[(_@]|^__/;
 
 const filenameCase = {
@@ -18,9 +16,9 @@ const filenameCase = {
       Program(node) {
         const segments = context.filename.split('/');
         const base = segments.pop().split('.')[0];
-        if (base === 'index' || ROUTE_FILE.test(base)) return;
+        const isFrameworkName = base === 'index' || ROUTE_FILE.test(base);
+        if (isFrameworkName) return;
 
-        // 훅은 JSX를 담아 .tsx여도 camelCase다. 컴포넌트 짝인 `<컴포넌트>.styles.ts`는 PascalCase다.
         const isComponent =
           (context.filename.endsWith('.tsx') && !HOOK_NAME.test(base)) || COMPONENT_STYLES.test(context.filename);
         if (!(isComponent ? PASCAL_CASE : CAMEL_CASE).test(base)) {
@@ -38,7 +36,6 @@ const filenameCase = {
 
 const eslintConfig = [
   {
-    // src 밖(루트 app/ 라우팅, scripts/, 설정 파일)은 대상이 아니다.
     files: ['src/**/*.{ts,tsx}'],
     plugins: { naming: { rules: { 'filename-case': filenameCase } } },
     rules: {
@@ -46,12 +43,9 @@ const eslintConfig = [
       '@typescript-eslint/naming-convention': [
         'error',
         { selector: 'typeLike', format: ['PascalCase'] },
-        // 컴포넌트도 함수라 PascalCase를 함께 허용한다.
         { selector: 'function', format: ['camelCase', 'PascalCase'] },
         { selector: 'variable', format: ['camelCase', 'PascalCase', 'UPPER_CASE'], leadingUnderscore: 'allow' },
-        // 컴포넌트를 값으로 받는 파라미터(`{ Icon }`)가 있어 PascalCase를 함께 허용한다.
         { selector: 'parameter', format: ['camelCase', 'PascalCase'], leadingUnderscore: 'allow' },
-        // API 응답·서드파티 옵션 키는 통제 밖이다.
         { selector: 'objectLiteralProperty', format: null },
       ],
     },
