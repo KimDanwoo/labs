@@ -95,25 +95,33 @@ export interface Parts {
   build: (matrix?: THREE.Matrix4) => THREE.Group;
 }
 
+function transformGeometry(
+  geometry: THREE.BufferGeometry,
+  { position = [0, 0, 0], rotation = [0, 0, 0], scale = [1, 1, 1], matrix = null }: PartTransform,
+): THREE.BufferGeometry {
+  geometry.scale(...scale);
+  geometry.rotateX(rotation[0]);
+  geometry.rotateY(rotation[1]);
+  geometry.rotateZ(rotation[2]);
+  geometry.translate(...position);
+  if (matrix) geometry.applyMatrix4(matrix);
+  return geometry;
+}
+
+function finishGeometry(name: PartName, geometry: THREE.BufferGeometry): THREE.BufferGeometry {
+  const flat = geometry.index ? geometry.toNonIndexed() : geometry;
+  if (flat !== geometry) geometry.dispose();
+  if (!isGlow(name) && flat.hasAttribute('uv')) flat.deleteAttribute('uv');
+  flat.computeVertexNormals();
+  if (isVertexColored(name)) paintVertices(flat, name);
+  return flat;
+}
+
 export function createParts(): Parts {
   const batches = new Map<string, THREE.BufferGeometry[]>();
 
-  const add = (
-    name: PartName,
-    geometry: THREE.BufferGeometry,
-    { position = [0, 0, 0], rotation = [0, 0, 0], scale = [1, 1, 1], matrix = null }: PartTransform = {},
-  ): void => {
-    geometry.scale(...scale);
-    geometry.rotateX(rotation[0]);
-    geometry.rotateY(rotation[1]);
-    geometry.rotateZ(rotation[2]);
-    geometry.translate(...position);
-    if (matrix) geometry.applyMatrix4(matrix);
-    const flat = geometry.index ? geometry.toNonIndexed() : geometry;
-    if (flat !== geometry) geometry.dispose();
-    if (!isGlow(name) && flat.hasAttribute('uv')) flat.deleteAttribute('uv');
-    flat.computeVertexNormals();
-    if (isVertexColored(name)) paintVertices(flat, name);
+  const add = (name: PartName, geometry: THREE.BufferGeometry, transform: PartTransform = {}): void => {
+    const flat = finishGeometry(name, transformGeometry(geometry, transform));
     const batchName = isVertexColored(name) ? VERTEX_COLOR_KEY : name;
     const key = `${batchName}${castsShadow(flat) ? '' : SHADOWLESS_SUFFIX}`;
     const batch = batches.get(key) ?? [];

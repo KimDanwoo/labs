@@ -21,6 +21,33 @@ import {
   UNIT_INERTIA,
 } from './physicsTypes';
 
+function configureBodyDesc(
+  desc: ReturnType<typeof bodyDesc>,
+  description: PhysicalDescription,
+  linearDamping: number,
+  angularDamping: number,
+): ReturnType<typeof bodyDesc> {
+  if (description.position) desc.setTranslation(description.position.x, description.position.y, description.position.z);
+  if (description.rotation) desc.setRotation(description.rotation);
+  if (description.canSleep !== undefined) desc.setCanSleep(description.canSleep);
+  desc.setLinearDamping(linearDamping);
+  desc.setAngularDamping(angularDamping);
+  if (description.sleeping !== undefined) desc.setSleeping(description.sleeping);
+  if (description.enabled !== undefined) desc.setEnabled(description.enabled);
+  return desc;
+}
+
+function applyMass(desc: ColliderDesc, collider: ColliderDescription, description: PhysicalDescription): ColliderDesc {
+  let next = desc;
+  if (collider.mass !== undefined) {
+    next = collider.centerOfMass
+      ? next.setMassProperties(collider.mass, collider.centerOfMass, UNIT_INERTIA, IDENTITY_ROTATION)
+      : next.setMass(collider.mass);
+  }
+  if (description.mass !== undefined) next = next.setMass(description.mass / description.colliders.length);
+  return next;
+}
+
 export class Physics {
   readonly events = new Events<{ step: [PhysicsStep] }>();
   readonly world: World;
@@ -41,15 +68,7 @@ export class Physics {
     const linearDamping = description.linearDamping ?? DEFAULTS.damping;
     const angularDamping = description.angularDamping ?? DEFAULTS.damping;
 
-    const desc = bodyDesc(type);
-    if (description.position)
-      desc.setTranslation(description.position.x, description.position.y, description.position.z);
-    if (description.rotation) desc.setRotation(description.rotation);
-    if (description.canSleep !== undefined) desc.setCanSleep(description.canSleep);
-    desc.setLinearDamping(linearDamping);
-    desc.setAngularDamping(angularDamping);
-    if (description.sleeping !== undefined) desc.setSleeping(description.sleeping);
-    if (description.enabled !== undefined) desc.setEnabled(description.enabled);
+    const desc = configureBodyDesc(bodyDesc(type), description, linearDamping, angularDamping);
 
     const body = this.world.createRigidBody(desc);
     const colliders = description.colliders.map((collider) =>
@@ -79,19 +98,9 @@ export class Physics {
     let desc = shapeDesc(collider);
     if (collider.position) desc = desc.setTranslation(collider.position.x, collider.position.y, collider.position.z);
     if (collider.quaternion) desc = desc.setRotation(collider.quaternion);
-    desc = desc.setDensity(DEFAULTS.density);
+    desc = applyMass(desc.setDensity(DEFAULTS.density), collider, description);
 
-    if (collider.mass !== undefined) {
-      desc = collider.centerOfMass
-        ? desc.setMassProperties(collider.mass, collider.centerOfMass, UNIT_INERTIA, IDENTITY_ROTATION)
-        : desc.setMass(collider.mass);
-    }
-    if (description.mass !== undefined) desc = desc.setMass(description.mass / description.colliders.length);
-
-    desc = desc.setFriction(description.friction ?? collider.friction ?? DEFAULTS.friction);
-    if (description.frictionRule) desc = desc.setFrictionCombineRule(this.#frictionRule(description.frictionRule));
-    desc = desc.setRestitution(description.restitution ?? collider.restitution ?? DEFAULTS.restitution);
-    desc = desc.setCollisionGroups(CATEGORIES[description.category ?? collider.category ?? DEFAULTS.category]);
+    desc = this.#applySurface(desc, collider, description);
 
     const hasContactEvents = description.onCollision !== undefined || description.contactThreshold !== undefined;
     if (hasContactEvents) {
@@ -100,6 +109,13 @@ export class Physics {
         .setContactForceEventThreshold(description.contactThreshold ?? DEFAULTS.contactThreshold);
     }
     return desc;
+  }
+
+  #applySurface(desc: ColliderDesc, collider: ColliderDescription, description: PhysicalDescription): ColliderDesc {
+    let next = desc.setFriction(description.friction ?? collider.friction ?? DEFAULTS.friction);
+    if (description.frictionRule) next = next.setFrictionCombineRule(this.#frictionRule(description.frictionRule));
+    next = next.setRestitution(description.restitution ?? collider.restitution ?? DEFAULTS.restitution);
+    return next.setCollisionGroups(CATEGORIES[description.category ?? collider.category ?? DEFAULTS.category]);
   }
 
   #frictionRule(rule: FrictionRule): number {

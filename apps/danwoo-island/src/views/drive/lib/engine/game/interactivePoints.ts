@@ -130,17 +130,25 @@ export class InteractivePoints implements PointRegistry {
     playerPosition.value.copy(player.position2);
 
     const nearby = nearbyPoints(this.#items, player.position2);
-    for (const item of this.#items) {
-      if (nearby.includes(item) || !item.isIn) continue;
-      item.isIn = false;
-      if (item.state !== 'hidden') item.conceal();
-    }
+    this.#concealLeftItems(nearby);
 
     const nextActive = lastVisiblePoint(nearby);
     if (!nextActive) {
       this.#activeItem = null;
       return;
     }
+    this.#activate(nextActive);
+  }
+
+  #concealLeftItems(nearby: InteractivePoint[]): void {
+    for (const item of this.#items) {
+      if (nearby.includes(item) || !item.isIn) continue;
+      item.isIn = false;
+      if (item.state !== 'hidden') item.conceal();
+    }
+  }
+
+  #activate(nextActive: InteractivePoint): void {
     if (this.#activeItem && nextActive !== this.#activeItem) {
       this.#activeItem.isIn = false;
       this.#activeItem.conceal();

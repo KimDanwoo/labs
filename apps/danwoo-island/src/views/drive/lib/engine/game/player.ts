@@ -166,6 +166,13 @@ export class Player {
     this.braking = 0;
     if (this.state !== Player.STATE_DEFAULT) return;
 
+    this.#readThrottleInputs();
+    this.#readSteeringInputs();
+    const nipple = readNipple();
+    if (nipple) ({ accelerating: this.accelerating, steering: this.steering } = nipple);
+  }
+
+  #readThrottleInputs(): void {
     const { inputs } = getGame();
     const forward = inputs.actions.get('forward');
     const backward = inputs.actions.get('backward');
@@ -176,12 +183,13 @@ export class Player {
       this.accelerating = 0;
       this.braking = 1;
     }
+  }
+
+  #readSteeringInputs(): void {
     if (this.#isActive('right')) this.steering -= 1;
     if (this.#isActive('left')) this.steering += 1;
 
-    const leftStick = inputs.gamepad.joysticks.left;
+    const leftStick = getGame().inputs.gamepad.joysticks.left;
     if (this.steering === 0 && leftStick.active) this.steering = -leftStick.safeX;
-    const nipple = readNipple();
-    if (nipple) ({ accelerating: this.accelerating, steering: this.steering } = nipple);
   }
 }

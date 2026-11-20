@@ -139,34 +139,48 @@ export function registerWeather(audio: Audio): void {
   });
 }
 
+interface ReferencedArea {
+  references: { items: Map<string, Array<{ position: unknown } | undefined>> };
+}
+
+function firstReferencePosition(area: ReferencedArea | undefined, name: string): THREE.Vector3 | undefined {
+  const position = area?.references.items.get(name)?.[0]?.position;
+  return position instanceof THREE.Vector3 ? position : undefined;
+}
+
+function registerOvenFires(audio: Audio, areas: ReturnType<typeof getGame>['world']['areas']): void {
+  const ovens = [
+    firstReferencePosition(areas?.cookie, 'spawner'),
+    firstReferencePosition(areas?.projects, 'oven'),
+  ].filter((position): position is THREE.Vector3 => position !== undefined);
+  if (ovens.length === 0) return;
+  audio.register({
+    group: 'ovenFire',
+    path: 'sounds/fire/Mountain Audio - Fire Burning in a Wood Stove 1.mp3',
+    autoplay: true,
+    loop: true,
+    volume: 0.8,
+    positions: ovens,
+    distanceFade: FIRE_FADE_DISTANCE,
+  });
+}
+
+function registerCampfire(audio: Audio, areas: ReturnType<typeof getGame>['world']['areas']): void {
+  const campfire = firstReferencePosition(areas?.lab, 'fire');
+  if (!campfire) return;
+  audio.register({
+    group: 'campfire',
+    path: 'sounds/fire/Fire Burning.mp3',
+    autoplay: true,
+    loop: true,
+    volume: 1,
+    positions: [campfire],
+    distanceFade: FIRE_FADE_DISTANCE,
+  });
+}
+
 export function registerFires(audio: Audio): void {
   const areas = getGame().world.areas;
-  const ovens = [
-    areas?.cookie?.references.items.get('spawner')?.[0]?.position,
-    areas?.projects?.references.items.get('oven')?.[0]?.position,
-  ].filter((position): position is THREE.Vector3 => position instanceof THREE.Vector3);
-  if (ovens.length > 0) {
-    audio.register({
-      group: 'ovenFire',
-      path: 'sounds/fire/Mountain Audio - Fire Burning in a Wood Stove 1.mp3',
-      autoplay: true,
-      loop: true,
-      volume: 0.8,
-      positions: ovens,
-      distanceFade: FIRE_FADE_DISTANCE,
-    });
-  }
-
-  const campfire = areas?.lab?.references.items.get('fire')?.[0]?.position;
-  if (campfire instanceof THREE.Vector3) {
-    audio.register({
-      group: 'campfire',
-      path: 'sounds/fire/Fire Burning.mp3',
-      autoplay: true,
-      loop: true,
-      volume: 1,
-      positions: [campfire],
-      distanceFade: FIRE_FADE_DISTANCE,
-    });
-  }
+  registerOvenFires(audio, areas);
+  registerCampfire(audio, areas);
 }

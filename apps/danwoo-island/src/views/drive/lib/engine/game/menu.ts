@@ -143,6 +143,27 @@ export class Menu {
     if (isShown(this.state) && item === this.#current) return;
 
     game.audio.groups.get('click')?.play(true);
+    this.#switchItem(item);
+
+    this.#announceOpen(item);
+
+    if (isShown(this.state)) return;
+    this.state = 'opening';
+    this.#element.classList.add('is-displayed');
+    onNextFrame(() => this.#element.classList.add('is-visible'));
+  }
+
+  #announceOpen(item: MenuItem): void {
+    const game = getGame();
+    const { mainFocus } = item;
+    if (mainFocus && game.inputs.mode !== INPUT_MODE.touch) requestAnimationFrame(() => mainFocus.focus());
+    game.inputs.filters.clear();
+    game.inputs.filters.add('menu');
+    this.events.trigger('open');
+    item.events.trigger('open');
+  }
+
+  #switchItem(item: MenuItem): void {
     if (this.#current) {
       this.#current.navigationElement.classList.remove('is-active');
       this.#current.contentElement.classList.remove('is-visible');
@@ -152,18 +173,6 @@ export class Menu {
     item.contentElement.classList.add('is-visible');
     item.isOpen = true;
     this.#current = item;
-
-    const { mainFocus } = item;
-    if (mainFocus && game.inputs.mode !== INPUT_MODE.touch) requestAnimationFrame(() => mainFocus.focus());
-    game.inputs.filters.clear();
-    game.inputs.filters.add('menu');
-    this.events.trigger('open');
-    item.events.trigger('open');
-
-    if (isShown(this.state)) return;
-    this.state = 'opening';
-    this.#element.classList.add('is-displayed');
-    onNextFrame(() => this.#element.classList.add('is-visible'));
   }
 
   close(): void {

@@ -75,6 +75,17 @@ export class AudioGroup {
   }
 }
 
+function resolveSoundOptions(options: SoundOptions) {
+  return {
+    volume: options.volume ?? DEFAULT_VOLUME,
+    loop: options.loop ?? false,
+    autoplay: options.autoplay ?? false,
+    rate: options.rate ?? 1,
+    antiSpam: options.antiSpam ?? DEFAULT_ANTI_SPAM,
+    isEager: options.preload ?? true,
+  };
+}
+
 export class AudioItem {
   readonly howl: SoundPlayer;
   readonly positions: THREE.Vector3[] | null;
@@ -97,8 +108,8 @@ export class AudioItem {
 
   constructor(options: SoundOptions, group: AudioGroup, host: SoundHost) {
     const isInitiated = host.isInitiated();
-    const volume = options.volume ?? DEFAULT_VOLUME;
-    const isPlaying = isInitiated && (options.autoplay ?? false);
+    const { volume, loop, autoplay, rate, antiSpam, isEager } = resolveSoundOptions(options);
+    const isPlaying = isInitiated && autoplay;
     this.#group = group;
     this.#host = host;
     this.id = group.items.length;
@@ -106,7 +117,7 @@ export class AudioItem {
       src: [worldAsset(options.path)],
       pool: SOUND_POOL,
       autoplay: isPlaying,
-      loop: options.loop ?? false,
+      loop,
       volume,
       preload: false,
       onloaderror: () => reportError(new Error(`Audio load error: ${options.path}`)),
@@ -116,13 +127,13 @@ export class AudioItem {
     });
     this.positions = toPositions(options.positions);
     this.distanceFade = options.distanceFade ?? null;
-    this.rate = options.rate ?? 1;
+    this.rate = rate;
     this.volume = volume;
-    this.#antiSpam = options.antiSpam ?? DEFAULT_ANTI_SPAM;
+    this.#antiSpam = antiSpam;
     this.onPlaying = options.onPlaying ?? null;
     this.#onPlay = options.onPlay ?? null;
-    this.isEager = options.preload ?? true;
-    this.autoplay = options.autoplay ?? false;
+    this.isEager = isEager;
+    this.autoplay = autoplay;
     this.playing = isPlaying;
     if (isPlaying) void this.load();
   }
