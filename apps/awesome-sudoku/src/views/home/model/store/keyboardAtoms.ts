@@ -6,10 +6,19 @@ import { isNoteModeAtom, selectedCellAtom } from './primitives';
 import { selectCellAtom } from './selectionAtoms';
 import { gamePhaseAtom } from './statusAtoms';
 
+const ARROW_STEP: Record<string, { row: number; col: number }> = {
+  ArrowUp: { row: -1, col: 0 },
+  ArrowDown: { row: 1, col: 0 },
+  ArrowLeft: { row: 0, col: -1 },
+  ArrowRight: { row: 0, col: 1 },
+};
+
+function clampIndex(index: number): number {
+  return Math.min(BOARD_MAX_INDEX, Math.max(0, index));
+}
+
 export const handleKeyInputAtom = atom(null, (get, set, key: string) => {
   if (get(gamePhaseAtom) !== GAME_PHASE.PLAYING) return;
-
-  const isNoteMode = get(isNoteModeAtom);
 
   if (key === 'Backspace' || key === 'Delete') {
     set(fillCellAtom, null);
@@ -17,31 +26,13 @@ export const handleKeyInputAtom = atom(null, (get, set, key: string) => {
   }
 
   if (/^[1-9]$/.test(key)) {
-    const value = parseInt(key, 10);
-    if (isNoteMode) {
-      set(toggleNoteAtom, value);
-    } else {
-      set(fillCellAtom, value);
-    }
+    set(get(isNoteModeAtom) ? toggleNoteAtom : fillCellAtom, parseInt(key, 10));
     return;
   }
 
-  if (!key.startsWith('Arrow')) return;
-
+  const step = Object.hasOwn(ARROW_STEP, key) ? ARROW_STEP[key] : undefined;
   const selectedCell = get(selectedCellAtom);
-  if (!selectedCell) return;
+  if (!step || !selectedCell) return;
 
-  let { row, col } = selectedCell;
-
-  if (key === 'ArrowUp') {
-    row = Math.max(0, row - 1);
-  } else if (key === 'ArrowDown') {
-    row = Math.min(BOARD_MAX_INDEX, row + 1);
-  } else if (key === 'ArrowLeft') {
-    col = Math.max(0, col - 1);
-  } else if (key === 'ArrowRight') {
-    col = Math.min(BOARD_MAX_INDEX, col + 1);
-  }
-
-  set(selectCellAtom, { row, col });
+  set(selectCellAtom, { row: clampIndex(selectedCell.row + step.row), col: clampIndex(selectedCell.col + step.col) });
 });

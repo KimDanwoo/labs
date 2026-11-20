@@ -76,46 +76,53 @@ export function resetUserInputs(board: SudokuBoard): SudokuBoard {
   );
 }
 
+interface HighlightSelection {
+  row: number;
+  col: number;
+  value: number | null;
+}
+
+function isRelatedCell(r: number, c: number, { row, col }: HighlightSelection): boolean {
+  if (r === row || c === col) return true;
+  return (
+    Math.floor(r / BLOCK_SIZE) === Math.floor(row / BLOCK_SIZE) &&
+    Math.floor(c / BLOCK_SIZE) === Math.floor(col / BLOCK_SIZE)
+  );
+}
+
+function highlightOf(board: SudokuBoard, r: number, c: number, selection: HighlightSelection): CellHighlight {
+  const isSelected = r === selection.row && c === selection.col;
+  return {
+    selected: isSelected,
+    related: !isSelected && isRelatedCell(r, c, selection),
+    sameValue: !isSelected && selection.value !== null && cellAt(board, r, c).value === selection.value,
+  };
+}
+
+function isSameHighlight(previous: CellHighlight | undefined, next: CellHighlight): previous is CellHighlight {
+  return (
+    previous !== undefined &&
+    previous.selected === next.selected &&
+    previous.related === next.related &&
+    previous.sameValue === next.sameValue
+  );
+}
+
 export function calculateHighlights(
   board: SudokuBoard,
   row: number,
   col: number,
   previousHighlights?: Record<string, CellHighlight>,
 ): Record<string, CellHighlight> {
-  const selectedKey = `${row}-${col}`;
-  const selectedValue = cellAt(board, row, col).value;
-  const blockRow = Math.floor(row / BLOCK_SIZE);
-  const blockCol = Math.floor(col / BLOCK_SIZE);
-
+  const selection: HighlightSelection = { row, col, value: cellAt(board, row, col).value };
   const nextHighlights: Record<string, CellHighlight> = {};
 
   for (let r = 0; r < BOARD_SIZE; r++) {
-    const currentBlockRow = Math.floor(r / BLOCK_SIZE);
-
     for (let c = 0; c < BOARD_SIZE; c++) {
       const key = `${r}-${c}`;
-      const prevHighlight = previousHighlights?.[key];
-
-      const isSelected = key === selectedKey;
-      const isRelated =
-        !isSelected &&
-        (r === row || c === col || (currentBlockRow === blockRow && Math.floor(c / BLOCK_SIZE) === blockCol));
-      const hasSameValue = !isSelected && selectedValue !== null && cellAt(board, r, c).value === selectedValue;
-
-      if (
-        prevHighlight &&
-        prevHighlight.selected === isSelected &&
-        prevHighlight.related === isRelated &&
-        prevHighlight.sameValue === hasSameValue
-      ) {
-        nextHighlights[key] = prevHighlight;
-      } else {
-        nextHighlights[key] = {
-          selected: isSelected,
-          related: isRelated,
-          sameValue: hasSameValue,
-        };
-      }
+      const previous = previousHighlights?.[key];
+      const next = highlightOf(board, r, c, selection);
+      nextHighlights[key] = isSameHighlight(previous, next) ? previous : next;
     }
   }
 

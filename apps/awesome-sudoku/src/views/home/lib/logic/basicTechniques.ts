@@ -64,18 +64,35 @@ export function createBasicTechniques({ cells, cands, place, openSpots, eliminat
     return progressed;
   };
 
+  const nakedSubsetsInSize = (empty: number[], size: number): boolean => {
+    let progressed = false;
+    for (const subset of combinations(empty, size)) {
+      const union = subset.reduce((m, i) => m | cands[i]!, 0);
+      if (popcount(union) !== size) continue;
+      const others = empty.filter((i) => !subset.includes(i));
+      progressed = eliminate(others, union) || progressed;
+    }
+    return progressed;
+  };
+
   const nakedSubsets = (): boolean => {
     let progressed = false;
     for (const unit of UNITS) {
       const empty = unit.filter((i) => cells[i] === EMPTY);
       for (let size = 2; size <= MAX_SUBSET_SIZE && size < empty.length; size++) {
-        for (const subset of combinations(empty, size)) {
-          const union = subset.reduce((m, i) => m | cands[i]!, 0);
-          if (popcount(union) !== size) continue;
-          const others = empty.filter((i) => !subset.includes(i));
-          progressed = eliminate(others, union) || progressed;
-        }
+        progressed = nakedSubsetsInSize(empty, size) || progressed;
       }
+    }
+    return progressed;
+  };
+
+  const hiddenSubsetsInSize = (empty: number[], missing: number[], size: number): boolean => {
+    let progressed = false;
+    for (const digits of combinations(missing, size)) {
+      const mask = digits.reduce((m, d) => m | bit(d), 0);
+      const spots = empty.filter((i) => cands[i]! & mask);
+      if (spots.length !== size) continue;
+      progressed = eliminate(spots, ALL_DIGITS & ~mask) || progressed;
     }
     return progressed;
   };
@@ -86,12 +103,7 @@ export function createBasicTechniques({ cells, cands, place, openSpots, eliminat
       const empty = unit.filter((i) => cells[i] === EMPTY);
       const missing = digitsOf(empty.reduce((m, i) => m | cands[i]!, 0));
       for (let size = 2; size <= MAX_HIDDEN_SUBSET_SIZE && size < missing.length; size++) {
-        for (const digits of combinations(missing, size)) {
-          const mask = digits.reduce((m, d) => m | bit(d), 0);
-          const spots = empty.filter((i) => cands[i]! & mask);
-          if (spots.length !== size) continue;
-          progressed = eliminate(spots, ALL_DIGITS & ~mask) || progressed;
-        }
+        progressed = hiddenSubsetsInSize(empty, missing, size) || progressed;
       }
     }
     return progressed;
