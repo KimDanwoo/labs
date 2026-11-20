@@ -33,7 +33,6 @@
     "overrides": {
       "next": "catalog:",
       "eslint-config-next": "catalog:",
-      "devalue@<5.9.3": "catalog:",
       "sharp@<0.35.5": "catalog:",
       "undici@>=8 <8.12.2": "^8.12.2",
       "zod@>=4 <4.6.6": "^4.6.6",
