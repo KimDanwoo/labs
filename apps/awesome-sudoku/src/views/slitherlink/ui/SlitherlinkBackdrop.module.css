@@ -1,0 +1,6 @@
+.lattice {
+  background-image: radial-gradient(rgb(var(--rgb-border-medium)) 1.2px, transparent 1.6px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 75%);
+  opacity: 0.55;
+}
