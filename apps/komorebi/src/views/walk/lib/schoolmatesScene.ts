@@ -39,6 +39,72 @@ const DEPTH_ORDER_SCALE = 0.01;
 const NIGHT_THRESHOLD = 0.5;
 const NPC_STRIDE_DISTANCE = 2.5;
 
+function paintShadow(ctx: CanvasRenderingContext2D) {
+  const gradient = ctx.createRadialGradient(32, 16, 1, 32, 16, 30);
+  gradient.addColorStop(0, '#17332b66');
+  gradient.addColorStop(1, '#17332b00');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 64, 32);
+}
+
+function isCrowdVisible(region: SchoolRegion | null, frame: Frame) {
+  return region !== null && frame.darkness < NIGHT_THRESHOLD && !(region === SCHOOL_REGION.yard && frame.isRaining);
+}
+
+function placeActor(actor: SchoolmateActor, next: Schoolmate, frame: Frame, ballGame: BallGame | null) {
+  const { character, shadow } = actor;
+  const size = characterScale(next.position.z) * CHILD_SIZE;
+  const order = CHILD_ORDER + (next.position.z - frame.player.z) * DEPTH_ORDER_SCALE;
+  character.group.position.set(sceneX(next.position.x), sceneY(next.position.z), 2);
+  character.group.scale.setScalar(size);
+  character.group.children.forEach((part) => {
+    part.renderOrder = order;
+  });
+  character.update({
+    dt: frame.dt,
+    travel: next.travel * (WALK_CYCLE_DISTANCE / NPC_STRIDE_DISTANCE),
+    heading: next.heading,
+    isWalking: next.travel > 0,
+    isRunning: false,
+    isStill: frame.isStill,
+  });
+  character.setBallPose({ game: ballGame, role: BALL_ROLE.friend, heading: next.heading, isStill: frame.isStill });
+  shadow.position.set(character.group.position.x, character.group.position.y - 0.08, 1);
+  shadow.scale.set(3.8 * size, 1.1 * size, 1);
+  return order;
+}
+
+function updateActor(
+  actor: SchoolmateActor,
+  region: SchoolRegion,
+  frame: Frame,
+  { isGreeted, ballFrame }: { isGreeted: boolean; ballFrame: BallGame | null },
+): Standing | null {
+  if (!actor.state) return null;
+  const next = advanceSchoolmate(actor.state, {
+    spec: actor.spec,
+    region,
+    dt: frame.dt,
+    isStill: frame.isStill || isGreeted,
+    player: frame.player,
+  });
+  if (isGreeted) next.heading = Math.atan2(frame.player.x - next.position.x, frame.player.z - next.position.z);
+  actor.state = next;
+  const order = placeActor(actor, next, frame, isGreeted ? ballFrame : null);
+  actor.character.setLight(frame.darkness, lampGlowAt(region, next.position));
+  return { ...next.position, order, id: actor.spec.id };
+}
+
+function disposeActors(scene: THREE.Scene, actors: SchoolmateActor[]) {
+  actors.forEach(({ character, textures, shadow }) => {
+    scene.remove(character.group, shadow);
+    character.dispose();
+    textures.body.dispose();
+    textures.outfit.dispose();
+    shadow.material.dispose();
+  });
+}
+
 export function createSchoolmates(
   scene: THREE.Scene,
   loader: THREE.TextureLoader,
@@ -53,54 +119,69 @@ export function createSchoolmates(
   let greetingId: SchoolmateId | null = null;
   let ballFrame: BallGame | null = null;
 
+  function createShadowSprite() {
+    shadowTexture ??= canvasTexture(64, 32, paintShadow);
+    const shadow = new THREE.Sprite(
+      new THREE.SpriteMaterial({ map: shadowTexture, transparent: true, depthTest: false }),
+    );
+    shadow.renderOrder = 3;
+    shadow.visible = false;
+    return shadow;
+  }
+
+  function addActor(spec: SchoolmateActor['spec'], textures: ChildLayers) {
+    const character = createChild(textures);
+    character.group.visible = false;
+    const shadow = createShadowSprite();
+    scene.add(character.group, shadow);
+    actors.push({
+      spec,
+      character,
+      textures,
+      shadow,
+      state: currentRegion ? createSchoolmate(spec, currentRegion) : null,
+    });
+  }
+
+  function loadActor(spec: SchoolmateActor['spec']) {
+    const urls = characterLayers(spec);
+    void Promise.allSettled([loader.loadAsync(urls.body), loader.loadAsync(urls.outfit)])
+      .then(([body, outfit]) => {
+        if (isDisposed || body.status === 'rejected' || outfit.status === 'rejected') {
+          for (const layer of [body, outfit]) {
+            if (layer.status === 'fulfilled') layer.value.dispose();
+          }
+          if (!isDisposed) throw new Error('Schoolmate artwork unavailable');
+          return;
+        }
+        addActor(spec, {
+          body: preparePaintingTexture(body.value),
+          outfit: preparePaintingTexture(outfit.value),
+          bodyPoseOffsets: urls.bodyPoseOffsets,
+        });
+      })
+      .catch(() => {
+        if (!isDisposed) onNotice('친구들 모습을 불러오지 못했어요. 학교에 다시 오면 다시 시도할게요.');
+      })
+      .finally(() => pending.delete(spec.id));
+  }
+
   function ensureActors() {
     for (const spec of SCHOOLMATES) {
       if (pending.has(spec.id) || actors.some((actor) => actor.spec.id === spec.id)) continue;
       pending.add(spec.id);
-      const urls = characterLayers(spec);
-      void Promise.allSettled([loader.loadAsync(urls.body), loader.loadAsync(urls.outfit)])
-        .then(([body, outfit]) => {
-          if (isDisposed || body.status === 'rejected' || outfit.status === 'rejected') {
-            for (const layer of [body, outfit]) {
-              if (layer.status === 'fulfilled') layer.value.dispose();
-            }
-            if (!isDisposed) throw new Error('Schoolmate artwork unavailable');
-            return;
-          }
-          const textures = {
-            body: preparePaintingTexture(body.value),
-            outfit: preparePaintingTexture(outfit.value),
-            bodyPoseOffsets: urls.bodyPoseOffsets,
-          };
-          const character = createChild(textures);
-          character.group.visible = false;
-          if (!shadowTexture)
-            shadowTexture = canvasTexture(64, 32, (ctx) => {
-              const gradient = ctx.createRadialGradient(32, 16, 1, 32, 16, 30);
-              gradient.addColorStop(0, '#17332b66');
-              gradient.addColorStop(1, '#17332b00');
-              ctx.fillStyle = gradient;
-              ctx.fillRect(0, 0, 64, 32);
-            });
-          const shadow = new THREE.Sprite(
-            new THREE.SpriteMaterial({ map: shadowTexture, transparent: true, depthTest: false }),
-          );
-          shadow.renderOrder = 3;
-          shadow.visible = false;
-          scene.add(character.group, shadow);
-          actors.push({
-            spec,
-            character,
-            textures,
-            shadow,
-            state: currentRegion ? createSchoolmate(spec, currentRegion) : null,
-          });
-        })
-        .catch(() => {
-          if (!isDisposed) onNotice('친구들 모습을 불러오지 못했어요. 학교에 다시 오면 다시 시도할게요.');
-        })
-        .finally(() => pending.delete(spec.id));
+      loadActor(spec);
     }
+  }
+
+  function enterRegion(region: SchoolRegion | null) {
+    greetingId = null;
+    ballFrame = null;
+    currentRegion = region;
+    actors.forEach((actor) => {
+      actor.state = region ? createSchoolmate(actor.spec, region) : null;
+    });
+    if (region) ensureActors();
   }
 
   return {
@@ -121,69 +202,20 @@ export function createSchoolmates(
     },
     update(frame: Frame): void {
       const region = schoolRegion(frame.region);
-      if (region !== currentRegion) {
-        greetingId = null;
-        ballFrame = null;
-        currentRegion = region;
-        actors.forEach((actor) => {
-          actor.state = region ? createSchoolmate(actor.spec, region) : null;
-        });
-        if (region) ensureActors();
-      }
+      if (region !== currentRegion) enterRegion(region);
       standing = [];
-      const isVisible =
-        region !== null && frame.darkness < NIGHT_THRESHOLD && !(region === SCHOOL_REGION.yard && frame.isRaining);
+      const isVisible = isCrowdVisible(region, frame);
       actors.forEach((actor) => {
-        const { character, shadow, state } = actor;
-        character.group.visible = isVisible;
-        shadow.visible = isVisible;
-        if (!isVisible || !region || !state) return;
-        const next = advanceSchoolmate(state, {
-          spec: actor.spec,
-          region,
-          dt: frame.dt,
-          isStill: frame.isStill || greetingId === actor.spec.id,
-          player: frame.player,
-        });
-        if (greetingId === actor.spec.id)
-          next.heading = Math.atan2(frame.player.x - next.position.x, frame.player.z - next.position.z);
-        actor.state = next;
-        const size = characterScale(next.position.z) * CHILD_SIZE;
-        const order = CHILD_ORDER + (next.position.z - frame.player.z) * DEPTH_ORDER_SCALE;
-        character.group.position.set(sceneX(next.position.x), sceneY(next.position.z), 2);
-        character.group.scale.setScalar(size);
-        character.group.children.forEach((part) => {
-          part.renderOrder = order;
-        });
-        character.update({
-          dt: frame.dt,
-          travel: next.travel * (WALK_CYCLE_DISTANCE / NPC_STRIDE_DISTANCE),
-          heading: next.heading,
-          isWalking: next.travel > 0,
-          isRunning: false,
-          isStill: frame.isStill,
-        });
-        character.setBallPose({
-          game: greetingId === actor.spec.id ? ballFrame : null,
-          role: BALL_ROLE.friend,
-          heading: next.heading,
-          isStill: frame.isStill,
-        });
-        character.setLight(frame.darkness, lampGlowAt(region, next.position));
-        shadow.position.set(character.group.position.x, character.group.position.y - 0.08, 1);
-        shadow.scale.set(3.8 * size, 1.1 * size, 1);
-        standing.push({ ...next.position, order, id: actor.spec.id });
+        actor.character.group.visible = isVisible;
+        actor.shadow.visible = isVisible;
+        if (!isVisible || !region) return;
+        const entry = updateActor(actor, region, frame, { isGreeted: greetingId === actor.spec.id, ballFrame });
+        if (entry) standing.push(entry);
       });
     },
     dispose(): void {
       isDisposed = true;
-      actors.forEach(({ character, textures, shadow }) => {
-        scene.remove(character.group, shadow);
-        character.dispose();
-        textures.body.dispose();
-        textures.outfit.dispose();
-        shadow.material.dispose();
-      });
+      disposeActors(scene, actors);
       shadowTexture?.dispose();
       standing = [];
     },

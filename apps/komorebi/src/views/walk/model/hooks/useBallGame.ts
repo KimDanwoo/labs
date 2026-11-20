@@ -2,6 +2,8 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { MS_PER_SECOND } from '../../config/time';
 import { advanceBallGame, BALL_PHASE, createBallGame, returnBall, type BallGame } from '../ballGame';
 
+const PUBLISH_INTERVAL_MS = 80;
+
 type Options = { onFrame: (frame: BallGame | null) => boolean };
 type GameControls = { game: BallGame; handleReturn: () => void; handleRetry: () => void };
 
@@ -21,7 +23,7 @@ export function useBallGame({ onFrame }: Options): GameControls {
       const before = current.current;
       current.current = advanceBallGame(before, dt);
       isPositioned = sendFrame(current.current);
-      if (now - published > 80 || before.phase !== current.current.phase) {
+      if (now - published > PUBLISH_INTERVAL_MS || before.phase !== current.current.phase) {
         setGame(current.current);
         published = now;
       }

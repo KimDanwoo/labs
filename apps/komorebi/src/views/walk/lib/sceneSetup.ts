@@ -37,18 +37,16 @@ import { createWaves } from './waves';
 
 export const CHILD_ORDER = 4;
 
-export async function createSceneParts(
-  container: HTMLElement,
-  { appearance = DEFAULT_APPEARANCE, signal, onNotice }: SceneOptions,
-) {
-  const loader = new THREE.TextureLoader();
-  const plates = createRegionPlates(loader, [START_REGION]);
-  const loaded: THREE.Texture[] = [];
-  const releaseTextures = () => {
-    plates.dispose();
-    loaded.forEach((texture) => texture.dispose());
-  };
-  const layerUrls = characterLayers(appearance);
+interface StartTextureRequest {
+  loader: THREE.TextureLoader;
+  plates: ReturnType<typeof createRegionPlates>;
+  loaded: THREE.Texture[];
+  layerUrls: ReturnType<typeof characterLayers>;
+  signal: AbortSignal | undefined;
+  releaseTextures: () => void;
+}
+
+async function loadStartTextures({ loader, plates, loaded, layerUrls, signal, releaseTextures }: StartTextureRequest) {
   const [startPlate, bodyAtlas, outfitAtlas] = await Promise.allSettled([
     plates.ensure(START_REGION),
     loader.loadAsync(layerUrls.body),
@@ -67,18 +65,10 @@ export async function createSceneParts(
     const failure = [startPlate, bodyAtlas, outfitAtlas].find((result) => result.status === 'rejected');
     throw failure?.reason ?? new DOMException('Scene cancelled', 'AbortError');
   }
-  const outfits = new Map<string, THREE.Texture>([[layerUrls.outfit, outfitAtlas.value]]);
-  let character: ReturnType<typeof createChild>;
-  try {
-    character = createChild({
-      body: bodyAtlas.value,
-      outfit: outfitAtlas.value,
-      bodyPoseOffsets: layerUrls.bodyPoseOffsets,
-    });
-  } catch (error) {
-    releaseTextures();
-    throw error;
-  }
+  return { startPlate: startPlate.value, bodyAtlas: bodyAtlas.value, outfitAtlas: outfitAtlas.value };
+}
+
+function createRenderer(container: HTMLElement, character: { dispose: () => void }, releaseTextures: () => void) {
   let renderer: THREE.WebGLRenderer;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: false });
@@ -92,13 +82,43 @@ export async function createSceneParts(
   renderer.setClearColor('#1b352b');
   renderer.domElement.setAttribute('aria-label', '햇빛이 비치는 시골길. 길을 클릭하거나 방향키를 눌러 걸어 보세요.');
   container.appendChild(renderer.domElement);
+  return { renderer, touchDevice };
+}
+
+export async function createSceneParts(
+  container: HTMLElement,
+  { appearance = DEFAULT_APPEARANCE, signal, onNotice }: SceneOptions,
+) {
+  const loader = new THREE.TextureLoader();
+  const plates = createRegionPlates(loader, [START_REGION]);
+  const loaded: THREE.Texture[] = [];
+  const releaseTextures = () => {
+    plates.dispose();
+    loaded.forEach((texture) => texture.dispose());
+  };
+  const layerUrls = characterLayers(appearance);
+  const textures = await loadStartTextures({ loader, plates, loaded, layerUrls, signal, releaseTextures });
+  const { startPlate, bodyAtlas, outfitAtlas } = textures;
+  const outfits = new Map<string, THREE.Texture>([[layerUrls.outfit, outfitAtlas]]);
+  let character: ReturnType<typeof createChild>;
+  try {
+    character = createChild({
+      body: bodyAtlas,
+      outfit: outfitAtlas,
+      bodyPoseOffsets: layerUrls.bodyPoseOffsets,
+    });
+  } catch (error) {
+    releaseTextures();
+    throw error;
+  }
+  const { renderer, touchDevice } = createRenderer(container, character, releaseTextures);
   const scene = new THREE.Scene();
   // Every layer shares the painted map coordinates; depth must not shift feet off the path.
   const camera = new THREE.OrthographicCamera(-60, 60, 40, -40, 0.1, 200);
   camera.position.set(0, 0, 100);
   const geo = new THREE.PlaneGeometry(120, 80, 1, 1);
   const waterMaps = createWaterMaps(loader);
-  const background = createBackgroundMaterial(startPlate.value, START_REGION, waterMaps);
+  const background = createBackgroundMaterial(startPlate, START_REGION, waterMaps);
   scene.add(new THREE.Mesh(geo, background));
   const child = character.group;
   scene.add(child);
@@ -181,6 +201,6 @@ export async function createSceneParts(
     slide,
     keys,
     portalInput,
-    startPlate: startPlate.value,
+    startPlate,
   };
 }

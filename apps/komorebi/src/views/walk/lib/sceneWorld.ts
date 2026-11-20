@@ -8,6 +8,7 @@ import { sceneX, sceneY } from './perspective';
 import { settle } from './renderBudget';
 import type { SceneContext } from './sceneContext';
 import { CHILD_ORDER } from './sceneSetup';
+import type { WalkState } from './walkState';
 
 const WARMTH_EPSILON = 0.002;
 const WARMTH_BY_TIME = { day: 0, evening: 1, night: 0.35 } satisfies Record<TimeOfDay, number>;
@@ -15,13 +16,33 @@ const WARMTH_BY_TIME = { day: 0, evening: 1, night: 0.35 } satisfies Record<Time
 const easeLight = (current: number, target: number, lambda: number, dt: number) =>
   settle(THREE.MathUtils.damp(current, target, lambda, dt), target, WARMTH_EPSILON);
 
+function updateForegrounds(
+  state: WalkState,
+  container: HTMLElement,
+  { foregrounds, roamers, schoolmates }: SceneContext['parts'],
+  isResting: boolean,
+) {
+  const walkers = [
+    isResting ? null : { ...state.position, order: CHILD_ORDER },
+    roamers.standing,
+    ...schoolmates.standing,
+  ].filter((walker) => walker !== null);
+  foregrounds.forEach((layer) => {
+    const order = foregroundOrder(layer, walkers, state.region);
+    layer.mesh.visible = order !== null;
+    layer.mesh.renderOrder = order ?? 0;
+  });
+  container.dataset.playerOccluders = String(
+    foregrounds.filter((layer) => layer.mesh.visible && layer.mesh.renderOrder > CHILD_ORDER).length,
+  );
+}
+
 export function createWorldMotion({ container, state, parts }: SceneContext) {
   const {
     character,
     camera,
     background,
     child,
-    foregrounds,
     markers,
     portalVisuals,
     fireflies,
@@ -125,19 +146,7 @@ export function createWorldMotion({ container, state, parts }: SceneContext) {
       player: state.position,
     });
     container.dataset.schoolmates = String(schoolmates.standing.length);
-    const walkers = [
-      isResting ? null : { ...state.position, order: CHILD_ORDER },
-      roamers.standing,
-      ...schoolmates.standing,
-    ].filter((walker) => walker !== null);
-    foregrounds.forEach((layer) => {
-      const order = foregroundOrder(layer, walkers, state.region);
-      layer.mesh.visible = order !== null;
-      layer.mesh.renderOrder = order ?? 0;
-    });
-    container.dataset.playerOccluders = String(
-      foregrounds.filter((layer) => layer.mesh.visible && layer.mesh.renderOrder > CHILD_ORDER).length,
-    );
+    updateForegrounds(state, container, parts, isResting);
     character.setLight(state.darkness, lampGlowAt(state.region, state.position));
   }
   return { placeMarkers, easeAtmosphere, paintBackground, animateLife };

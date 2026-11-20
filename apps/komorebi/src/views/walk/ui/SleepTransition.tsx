@@ -1,5 +1,5 @@
-import { useEffect, useEffectEvent } from 'react';
 import { SLEEP_TIMING } from '../lib/bedRest';
+import { useSleepTimers } from '../model/hooks/useSleepTimers';
 
 interface SleepTransitionProps {
   onWake: () => void;
@@ -7,16 +7,7 @@ interface SleepTransitionProps {
 }
 
 export function SleepTransition({ onWake, onDone }: SleepTransitionProps) {
-  const wake = useEffectEvent(onWake);
-  const done = useEffectEvent(onDone);
-  useEffect(() => {
-    const morning = setTimeout(wake, SLEEP_TIMING.wake);
-    const finish = setTimeout(done, SLEEP_TIMING.finish);
-    return () => {
-      clearTimeout(morning);
-      clearTimeout(finish);
-    };
-  }, []);
+  useSleepTimers(onWake, onDone);
   return (
     <div className="sleep-transition" role="status" style={{ animationDuration: `${SLEEP_TIMING.finish}ms` }}>
       <span>새근새근</span>

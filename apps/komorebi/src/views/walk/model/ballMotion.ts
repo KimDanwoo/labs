@@ -22,6 +22,10 @@ export function ballFlight({ game, isStill }: { game: BallGame; isStill: boolean
   };
 }
 
+const isThrowingPose = (game: BallGame, role: BallRole) =>
+  (game.phase === BALL_PHASE.incoming && role === BALL_ROLE.friend) ||
+  (game.phase === BALL_PHASE.returning && role === BALL_ROLE.player);
+
 export function ballPose({ game, role, isStill }: { game: BallGame | null; role: BallRole; isStill: boolean }): Pose {
   if (!game || isStill) return { lean: 0, compression: 1 };
   if (game.phase === BALL_PHASE.ready && role === BALL_ROLE.friend) {
@@ -32,9 +36,6 @@ export function ballPose({ game, role, isStill }: { game: BallGame | null; role:
     const catchWeight = Math.sin(Math.min(1, game.elapsed / BALL_TIMING.hold) * Math.PI);
     return { lean: -catchWeight * 0.06, compression: 1 - catchWeight * 0.08 };
   }
-  const isThrowing =
-    (game.phase === BALL_PHASE.incoming && role === BALL_ROLE.friend) ||
-    (game.phase === BALL_PHASE.returning && role === BALL_ROLE.player);
-  if (isThrowing) return { lean: Math.exp(-game.elapsed * 12) * 0.13, compression: 1 };
+  if (isThrowingPose(game, role)) return { lean: Math.exp(-game.elapsed * 12) * 0.13, compression: 1 };
   return { lean: 0, compression: 1 };
 }

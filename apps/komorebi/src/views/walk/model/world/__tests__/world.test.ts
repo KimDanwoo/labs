@@ -7,6 +7,47 @@ import { findRoute, nextRegionStep } from '../routing';
 import { SPAWN, isIndoors, type Region } from '../world';
 import { WORLDS } from '../worlds';
 
+interface Point {
+  x: number;
+  z: number;
+}
+
+interface WalkOptions {
+  maxStep: number;
+  tolerance: number;
+  maxIterations: number;
+  onMove?: (from: Point, to: Point) => void;
+}
+
+const distanceBetween = (a: Point, b: Point) => Math.hypot(b.x - a.x, b.z - a.z);
+
+const walkToward = (start: Point, target: Point, region: Region, options: WalkOptions): Point => {
+  let position = start;
+  for (let i = 0; i < options.maxIterations; i++) {
+    const distance = distanceBetween(position, target);
+    if (distance < options.tolerance) break;
+    const step = Math.min(options.maxStep, distance);
+    const next = movePlayer(
+      position,
+      ((target.x - position.x) / distance) * step,
+      ((target.z - position.z) / distance) * step,
+      region,
+    );
+    options.onMove?.(position, next);
+    position = next;
+  }
+  return position;
+};
+
+const walkRoute = (start: Point, route: Point[], region: Region, options: WalkOptions, stuckMessage: string): Point => {
+  let position = start;
+  for (const target of route) {
+    position = walkToward(position, target, region, options);
+    assert.ok(distanceBetween(position, target) < options.tolerance, stuckMessage);
+  }
+  return position;
+};
+
 test('spawn, every landmark and every portal arrival are on walkable lanes', () => {
   assert.ok(canWalk(SPAWN.x, SPAWN.z));
   for (const point of LANDMARKS) assert.ok(canWalk(point.x, point.z, point.region), point.id);
@@ -33,31 +74,31 @@ test('large movements cannot tunnel from the bridge through the river to the for
   const next = movePlayer({ x: 50, z: 47 }, 0, 35, 'river');
   assert.ok(next.z < 51);
 });
+const assertLaneRoutesFollowable = (region: Region) => {
+  const world = WORLDS[region];
+  for (const from of world.nodes)
+    for (const to of world.nodes) {
+      const route = findRoute(from, to, region);
+      assert.ok(route.length, `${region}: ${from.id} -> ${to.id}`);
+      walkRoute(
+        { x: from.x, z: from.z },
+        route,
+        region,
+        {
+          maxStep: 0.2,
+          tolerance: 0.05,
+          maxIterations: 1200,
+          onMove: (_, next) => assert.ok(canWalk(next.x, next.z, region)),
+        },
+        `${region}: ${from.id} -> ${to.id} stuck`,
+      );
+    }
+};
+
 test('all lane graph routes can actually be followed without leaving walkable ground', () => {
-  for (const region of Object.keys(WORLDS) as Region[]) {
-    const world = WORLDS[region];
-    for (const from of world.nodes)
-      for (const to of world.nodes) {
-        const route = findRoute(from, to, region);
-        assert.ok(route.length, `${region}: ${from.id} -> ${to.id}`);
-        let position = { x: from.x, z: from.z };
-        for (const target of route) {
-          for (let i = 0; i < 1200 && Math.hypot(target.x - position.x, target.z - position.z) > 0.05; i++) {
-            const dx = target.x - position.x,
-              dz = target.z - position.z,
-              d = Math.hypot(dx, dz),
-              step = Math.min(d, 0.2);
-            position = movePlayer(position, (dx / d) * step, (dz / d) * step, region);
-            assert.ok(canWalk(position.x, position.z, region));
-          }
-          assert.ok(
-            Math.hypot(target.x - position.x, target.z - position.z) <= 0.05,
-            `${region}: ${from.id} -> ${to.id} stuck`,
-          );
-        }
-      }
-  }
+  for (const region of Object.keys(WORLDS) as Region[]) assertLaneRoutesFollowable(region);
 });
+
 test('discoveries require the correct region and proximity', () => {
   for (const point of LANDMARKS) assert.equal(closestLandmark(point.x, point.z, point.region)?.id, point.id);
   assert.equal(closestLandmark(SPAWN.x, SPAWN.z), null);
@@ -143,31 +184,45 @@ test('holding movement toward the pictured shop hedge stops on the road even at 
   assert.deepEqual(findRoute({ x: 24, z: 57 }, { x: 24, z: 71 }, 'shops'), []);
 });
 
-test('click routes from lane edges do not cut through the new ground boundaries', () => {
-  for (const region of Object.keys(WORLDS) as Region[]) {
-    const destination = WORLDS[region].nodes[0]!;
-    for (let x = 1; x < 100; x += 3) {
-      for (let z = 22; z < 100; z += 3) {
-        if (!canWalk(x, z, region)) continue;
-        const route = findRoute({ x, z }, destination, region);
-        assert.ok(route.length, `${region}: no route from ${x},${z}`);
-        let position = { x, z };
-        for (const target of route) {
-          const length = Math.hypot(target.x - position.x, target.z - position.z);
-          const steps = Math.max(1, Math.ceil(length / 0.2));
-          for (let i = 0; i <= steps; i++) {
-            const t = i / steps;
-            assert.ok(
-              canWalk(position.x + (target.x - position.x) * t, position.z + (target.z - position.z) * t, region),
-              `${region}: route from ${x},${z} crosses obstacle at ${position.x + (target.x - position.x) * t},${position.z + (target.z - position.z) * t}; segment ${JSON.stringify(position)} -> ${JSON.stringify(target)}`,
-            );
-          }
-          position = target;
-        }
-      }
+const ROUTE_SAMPLE_SPACING = 0.2;
+
+const assertSegmentWalkable = (from: Point, target: Point, region: Region, origin: Point) => {
+  const steps = Math.max(1, Math.ceil(distanceBetween(from, target) / ROUTE_SAMPLE_SPACING));
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const x = from.x + (target.x - from.x) * t;
+    const z = from.z + (target.z - from.z) * t;
+    assert.ok(
+      canWalk(x, z, region),
+      `${region}: route from ${origin.x},${origin.z} crosses obstacle at ${x},${z}; segment ${JSON.stringify(from)} -> ${JSON.stringify(target)}`,
+    );
+  }
+};
+
+const assertClickRouteWalkable = (origin: Point, destination: Point, region: Region) => {
+  const route = findRoute(origin, destination, region);
+  assert.ok(route.length, `${region}: no route from ${origin.x},${origin.z}`);
+  let position = origin;
+  for (const target of route) {
+    assertSegmentWalkable(position, target, region, origin);
+    position = target;
+  }
+};
+
+const assertClickRoutesFrom = (region: Region) => {
+  const destination = WORLDS[region].nodes[0]!;
+  for (let x = 1; x < 100; x += 3) {
+    for (let z = 22; z < 100; z += 3) {
+      if (canWalk(x, z, region)) assertClickRouteWalkable({ x, z }, destination, region);
     }
   }
+};
+
+test('click routes from lane edges do not cut through the new ground boundaries', () => {
+  for (const region of Object.keys(WORLDS) as Region[]) assertClickRoutesFrom(region);
 });
+
+const SHOULDER_WALK: WalkOptions = { maxStep: 0.5, tolerance: 0.05, maxIterations: 1000 };
 
 test('road shoulders, plazas and upper paths work beyond the old narrow guide routes', () => {
   const destinations: [Region, number, number][] = [
@@ -209,45 +264,37 @@ test('road shoulders, plazas and upper paths work beyond the old narrow guide ro
   for (const [region, x, z] of destinations) {
     assert.ok(canWalk(x, z, region), `${region}: ${x},${z}`);
     const landmark = LANDMARKS.find((point) => point.region === region)!;
+    const spot = { x, z };
     for (const [start, end] of [
-      [landmark, { x, z }],
-      [{ x, z }, landmark],
-    ]) {
-      const route = findRoute(start!, end!, region);
+      [landmark, spot],
+      [spot, landmark],
+    ] as [Point, Point][]) {
+      const route = findRoute(start, end, region);
       assert.ok(route.length, `${region}: no click route`);
-      let position = { x: start!.x, z: start!.z };
-      for (const target of route) {
-        for (let i = 0; i < 1000; i++) {
-          const distance = Math.hypot(target.x - position.x, target.z - position.z);
-          if (distance < 0.05) break;
-          const step = Math.min(0.5, distance);
-          position = movePlayer(
-            position,
-            ((target.x - position.x) / distance) * step,
-            ((target.z - position.z) / distance) * step,
-            region,
-          );
-        }
-        assert.ok(Math.hypot(target.x - position.x, target.z - position.z) < 0.05, `${region}: stuck`);
-      }
+      walkRoute({ x: start.x, z: start.z }, route, region, SHOULDER_WALK, `${region}: stuck`);
     }
   }
 });
 
+const SCHOOL_EAST_X = 43;
+const SCHOOL_WEST_X = 3.5;
+
+const assertCrossesSchoolApproach = (z: number, direction: number) => {
+  let position = { x: direction < 0 ? SCHOOL_EAST_X : SCHOOL_WEST_X, z };
+  const targetX = direction < 0 ? SCHOOL_WEST_X : SCHOOL_EAST_X;
+  for (let i = 0; i < 160; i++) {
+    const dx = direction * Math.min(0.4, Math.abs(targetX - position.x));
+    if (Math.abs(dx) < 0.0001) break;
+    const next = movePlayer(position, dx, 0, 'shops');
+    assert.ok(Math.abs(next.x - position.x) > 0.001, `school road stuck at ${JSON.stringify(position)}`);
+    position = next;
+  }
+  assert.ok(Math.abs(position.x - targetX) < 0.01);
+};
+
 test('the cleared school approach can be crossed at every depth without stopping', () => {
   for (let z = 55; z <= 62; z += 0.5) {
-    for (const direction of [-1, 1]) {
-      let position = { x: direction < 0 ? 43 : 3.5, z };
-      const targetX = direction < 0 ? 3.5 : 43;
-      for (let i = 0; i < 160; i++) {
-        const dx = direction * Math.min(0.4, Math.abs(targetX - position.x));
-        if (Math.abs(dx) < 0.0001) break;
-        const next = movePlayer(position, dx, 0, 'shops');
-        assert.ok(Math.abs(next.x - position.x) > 0.001, `school road stuck at ${JSON.stringify(position)}`);
-        position = next;
-      }
-      assert.ok(Math.abs(position.x - targetX) < 0.01);
-    }
+    for (const direction of [-1, 1]) assertCrossesSchoolApproach(z, direction);
   }
 });
 
@@ -271,6 +318,13 @@ test('holding into a verge slides along connected ground without stopping or cro
   }
 });
 
+const HARBOUR_WALK: WalkOptions = {
+  maxStep: 0.3,
+  tolerance: 0.02,
+  maxIterations: 1000,
+  onMove: (from, next) => assert.ok(hasGroundBetween(from, next, 'coast')),
+};
+
 test('the open coast junction leads from the road to the boat quay and back', () => {
   const quay = { x: 850 / 15.36, z: 345 / 10.24 };
   for (const [px, py] of [
@@ -285,26 +339,10 @@ test('the open coast junction leads from the road to the boat quay and back', ()
     for (const [from, to] of [
       [entrance, quay],
       [quay, entrance],
-    ]) {
-      const route = findRoute(from!, to!, 'coast');
+    ] as [Point, Point][]) {
+      const route = findRoute(from, to, 'coast');
       assert.ok(route.length);
-      let position = from!;
-      for (const target of route) {
-        for (let i = 0; i < 1000; i++) {
-          const distance = Math.hypot(target.x - position.x, target.z - position.z);
-          if (distance < 0.02) break;
-          const step = Math.min(0.3, distance);
-          const next = movePlayer(
-            position,
-            ((target.x - position.x) / distance) * step,
-            ((target.z - position.z) / distance) * step,
-            'coast',
-          );
-          assert.ok(hasGroundBetween(position, next, 'coast'));
-          position = next;
-        }
-        assert.ok(Math.hypot(target.x - position.x, target.z - position.z) < 0.02, 'harbour route stuck');
-      }
+      walkRoute(from, route, 'coast', HARBOUR_WALK, 'harbour route stuck');
     }
   }
   for (const [px, py] of [

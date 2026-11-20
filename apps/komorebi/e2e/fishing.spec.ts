@@ -17,8 +17,11 @@ test('walk to the pier, fish in the world, save a catch and return to walking', 
   await hud.getByRole('button', { name: /챔질하기!/ }).click();
   await expect(hud.getByRole('button', { name: '꾹 눌러 릴 감기' })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('komorebi-fish-v1'))).toBeNull();
-  for (let i = 0; i < 350 && (await hud.locator('meter').count()); i++) {
-    const tension = await hud.locator('meter').evaluate((element: HTMLMeterElement) => element.value);
+  for (let i = 0; i < 350; i++) {
+    const tension = await hud
+      .locator('meter')
+      .evaluateAll((elements) => (elements[0] as HTMLMeterElement | undefined)?.value ?? null);
+    if (tension === null) break;
     if (tension < 60) await page.keyboard.down('e');
     else await page.keyboard.up('e');
     await page.clock.runFor(100);

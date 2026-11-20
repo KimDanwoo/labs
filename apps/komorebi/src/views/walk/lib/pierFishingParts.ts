@@ -1,5 +1,83 @@
 import * as THREE from 'three';
 
+function createCelebration(group: THREE.Group) {
+  const heartShape = new THREE.Shape();
+  heartShape.moveTo(0, -0.75);
+  heartShape.bezierCurveTo(-0.25, -0.4, -1, 0.05, -0.85, 0.55);
+  heartShape.bezierCurveTo(-0.7, 1, -0.15, 0.95, 0, 0.5);
+  heartShape.bezierCurveTo(0.15, 0.95, 0.7, 1, 0.85, 0.55);
+  heartShape.bezierCurveTo(1, 0.05, 0.25, -0.4, 0, -0.75);
+  const heartGeometry = new THREE.ShapeGeometry(heartShape);
+  const starGeometry = new THREE.CircleGeometry(0.35, 4);
+  const heartMaterials = Array.from(
+    { length: 7 },
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: 0xf197ad,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      }),
+  );
+  const hearts = heartMaterials.map((material, index) => {
+    const heart = new THREE.Mesh(heartGeometry, material);
+    heart.name = `catch-heart-${index}`;
+    heart.renderOrder = 9;
+    group.add(heart);
+    return heart;
+  });
+  const starMaterials = Array.from(
+    { length: 6 },
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: 0xffd878,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      }),
+  );
+  const stars = starMaterials.map((material) => {
+    const star = new THREE.Mesh(starGeometry, material);
+    star.renderOrder = 9;
+    group.add(star);
+    return star;
+  });
+  return { heartGeometry, starGeometry, heartMaterials, hearts, starMaterials, stars };
+}
+
+function createCaughtFish(
+  group: THREE.Group,
+  floatGeometry: THREE.SphereGeometry,
+  fishMaterial: THREE.MeshBasicMaterial,
+  paleMaterial: THREE.MeshBasicMaterial,
+) {
+  const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x30464b, depthTest: false });
+  const fishGeometry = new THREE.CircleGeometry(0.6, 24);
+  const fish = new THREE.Mesh(fishGeometry, fishMaterial);
+  fish.name = 'caught-fish';
+  fish.scale.set(0.65, 1.4, 1);
+  fish.renderOrder = 7;
+  const tailGeometry = new THREE.CircleGeometry(0.45, 3);
+  const tail = new THREE.Mesh(tailGeometry, fishMaterial);
+  tail.position.y = -0.9;
+  fish.add(tail);
+  const eye = new THREE.Mesh(floatGeometry, eyeMaterial);
+  eye.position.set(0.22, 0.3, 0.1);
+  eye.scale.setScalar(0.35);
+  eye.renderOrder = 8;
+  fish.add(eye);
+  const fin = new THREE.Mesh(tailGeometry, paleMaterial);
+  fin.position.set(-0.1, 0, 0.05);
+  fin.scale.setScalar(0.6);
+  fin.rotation.z = -Math.PI / 2;
+  fin.renderOrder = 8;
+  fish.add(fin);
+  group.add(fish);
+  return { eyeMaterial, fishGeometry, tailGeometry, fish };
+}
+
 export function createPierFishingParts(scene: THREE.Scene) {
   const group = new THREE.Group();
   group.name = 'pier-fishing';
@@ -48,71 +126,13 @@ export function createPierFishingParts(scene: THREE.Scene) {
   const ripple = new THREE.Mesh(ringGeometry, ringMaterial);
   ripple.renderOrder = 6;
   group.add(ripple);
-  const heartShape = new THREE.Shape();
-  heartShape.moveTo(0, -0.75);
-  heartShape.bezierCurveTo(-0.25, -0.4, -1, 0.05, -0.85, 0.55);
-  heartShape.bezierCurveTo(-0.7, 1, -0.15, 0.95, 0, 0.5);
-  heartShape.bezierCurveTo(0.15, 0.95, 0.7, 1, 0.85, 0.55);
-  heartShape.bezierCurveTo(1, 0.05, 0.25, -0.4, 0, -0.75);
-  const heartGeometry = new THREE.ShapeGeometry(heartShape);
-  const starGeometry = new THREE.CircleGeometry(0.35, 4);
-  const heartMaterials = Array.from(
-    { length: 7 },
-    () =>
-      new THREE.MeshBasicMaterial({
-        color: 0xf197ad,
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-      }),
+  const { heartGeometry, starGeometry, heartMaterials, hearts, starMaterials, stars } = createCelebration(group);
+  const { eyeMaterial, fishGeometry, tailGeometry, fish } = createCaughtFish(
+    group,
+    floatGeometry,
+    fishMaterial,
+    paleMaterial,
   );
-  const hearts = heartMaterials.map((material, index) => {
-    const heart = new THREE.Mesh(heartGeometry, material);
-    heart.name = `catch-heart-${index}`;
-    heart.renderOrder = 9;
-    group.add(heart);
-    return heart;
-  });
-  const starMaterials = Array.from(
-    { length: 6 },
-    () =>
-      new THREE.MeshBasicMaterial({
-        color: 0xffd878,
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-      }),
-  );
-  const stars = starMaterials.map((material) => {
-    const star = new THREE.Mesh(starGeometry, material);
-    star.renderOrder = 9;
-    group.add(star);
-    return star;
-  });
-  const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x30464b, depthTest: false });
-  const fishGeometry = new THREE.CircleGeometry(0.6, 24);
-  const fish = new THREE.Mesh(fishGeometry, fishMaterial);
-  fish.name = 'caught-fish';
-  fish.scale.set(0.65, 1.4, 1);
-  fish.renderOrder = 7;
-  const tailGeometry = new THREE.CircleGeometry(0.45, 3);
-  const tail = new THREE.Mesh(tailGeometry, fishMaterial);
-  tail.position.y = -0.9;
-  fish.add(tail);
-  const eye = new THREE.Mesh(floatGeometry, eyeMaterial);
-  eye.position.set(0.22, 0.3, 0.1);
-  eye.scale.setScalar(0.35);
-  eye.renderOrder = 8;
-  fish.add(eye);
-  const fin = new THREE.Mesh(tailGeometry, paleMaterial);
-  fin.position.set(-0.1, 0, 0.05);
-  fin.scale.setScalar(0.6);
-  fin.rotation.z = -Math.PI / 2;
-  fin.renderOrder = 8;
-  fish.add(fin);
-  group.add(fish);
   const reel = new THREE.Mesh(floatGeometry, rodMaterial);
   reel.scale.setScalar(1.2);
   reel.renderOrder = 7;

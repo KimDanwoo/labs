@@ -30,25 +30,22 @@ export function addCatch(collection: FishCollection, caught: Catch): FishCollect
     [caught.id]: { count: (previous?.count ?? 0) + 1, best: Math.max(previous?.best ?? 0, caught.size) },
   };
 }
+function parseRecord(entry: unknown, min: number, max: number) {
+  if (!entry || typeof entry !== 'object') return null;
+  const { count, best } = entry as Record<string, unknown>;
+  if (typeof count !== 'number' || !Number.isSafeInteger(count) || count <= 0) return null;
+  if (typeof best !== 'number' || !Number.isFinite(best) || best < min || best > max) return null;
+  return { count, best };
+}
+
 export function parseCollection(raw: string | null): FishCollection {
   try {
     const data: unknown = JSON.parse(raw ?? '{}');
     if (!data || typeof data !== 'object') return {};
     const result: FishCollection = {};
     for (const fish of FISH) {
-      const entry: unknown = (data as Record<string, unknown>)[fish.id];
-      if (!entry || typeof entry !== 'object') continue;
-      const { count, best } = entry as Record<string, unknown>;
-      if (
-        typeof count === 'number' &&
-        Number.isSafeInteger(count) &&
-        count > 0 &&
-        typeof best === 'number' &&
-        Number.isFinite(best) &&
-        best >= fish.min &&
-        best <= fish.max
-      )
-        result[fish.id] = { count, best };
+      const record = parseRecord((data as Record<string, unknown>)[fish.id], fish.min, fish.max);
+      if (record) result[fish.id] = record;
     }
     return result;
   } catch {

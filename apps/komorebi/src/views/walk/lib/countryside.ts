@@ -6,9 +6,19 @@ import { lightSprite } from './nightLights';
 import { characterScale, sceneX, sceneY } from './perspective';
 import { BIRD_STATE, startSparrow, stepSparrow } from './sparrows';
 
-export function createCountryside(scene: THREE.Scene) {
-  const time = { value: 0 };
-  const clothGeometry = new THREE.PlaneGeometry(1, 1, 10, 12);
+type Time = { value: number };
+type Bird = ReturnType<typeof createBirds>[number];
+
+interface CountrysideFrame {
+  region: Region;
+  dt: number;
+  darkness: number;
+  isStill: boolean;
+  isRaining: boolean;
+  player: Point;
+}
+
+function createRope(scene: THREE.Scene) {
   const ropeTexture = canvasTexture(512, 256, (c) => {
     c.strokeStyle = '#6e6650';
     c.lineWidth = 5;
@@ -36,7 +46,11 @@ export function createCountryside(scene: THREE.Scene) {
   rope.scale.set(8.6, 4.3, 1);
   rope.renderOrder = 2;
   scene.add(rope);
-  const cloths = ['#f0edda', '#9cb6be', '#e3bd9e'].map((colour, i) => {
+  return { rope, ropeMaterial, ropeTexture };
+}
+
+function createCloths(scene: THREE.Scene, rope: THREE.Sprite, time: Time, clothGeometry: THREE.PlaneGeometry) {
+  return ['#f0edda', '#9cb6be', '#e3bd9e'].map((colour, i) => {
     const map = laundryTexture(colour, i === 1);
     const material = new THREE.MeshBasicMaterial({
       map,
@@ -52,12 +66,12 @@ export function createCountryside(scene: THREE.Scene) {
         .replace(
           '#include <begin_vertex>',
           `
-          #include <begin_vertex>
-          float freeEdge = 1. - uv.y;
-          float gust = .55 + .45 * sin(clothTime * .43 + ${i.toFixed(1)});
-          transformed.x += sin(clothTime * 1.6 + uv.y * 3. + ${i.toFixed(1)}) * freeEdge * freeEdge * .10 * gust;
-          transformed.y += sin(clothTime * 2.1 + uv.x * 5. + ${i.toFixed(1)}) * freeEdge * .025;
-        `,
+        #include <begin_vertex>
+        float freeEdge = 1. - uv.y;
+        float gust = .55 + .45 * sin(clothTime * .43 + ${i.toFixed(1)});
+        transformed.x += sin(clothTime * 1.6 + uv.y * 3. + ${i.toFixed(1)}) * freeEdge * freeEdge * .10 * gust;
+        transformed.y += sin(clothTime * 2.1 + uv.x * 5. + ${i.toFixed(1)}) * freeEdge * .025;
+      `,
         );
     };
     material.customProgramCacheKey = () => `village-cloth-${i}`;
@@ -68,6 +82,22 @@ export function createCountryside(scene: THREE.Scene) {
     scene.add(mesh);
     return { mesh, material, map };
   });
+}
+
+const BIRD_HOMES: { region: Region; ground: Point; perch: Point }[] = [
+  { region: 'village', ground: { x: 30.5, z: 47 }, perch: { x: 22, z: 31 } },
+  { region: 'village', ground: { x: 33, z: 47.7 }, perch: { x: 24, z: 29 } },
+  { region: 'village', ground: { x: 49.5, z: 60 }, perch: { x: 40.7, z: 48 } },
+  { region: 'school', ground: { x: 37, z: 49 }, perch: { x: 25, z: 28 } },
+  { region: 'school', ground: { x: 40, z: 51 }, perch: { x: 28, z: 26 } },
+  { region: 'shops', ground: { x: 48, z: 59 }, perch: { x: 34, z: 42 } },
+  { region: 'shops', ground: { x: 51, z: 58 }, perch: { x: 64, z: 31 } },
+  { region: 'river', ground: { x: 21, z: 49 }, perch: { x: 31, z: 30 } },
+  { region: 'forest', ground: { x: 42, z: 70 }, perch: { x: 25, z: 50 } },
+  { region: 'forest', ground: { x: 46, z: 72 }, perch: { x: 76, z: 44 } },
+];
+
+function createBirdMaps() {
   const birdMaps = [sparrowTexture(0), sparrowTexture(1), sparrowTexture(-1)];
   const leftBirdMaps = birdMaps.map((map) => {
     const mirrored = map.clone();
@@ -75,19 +105,11 @@ export function createCountryside(scene: THREE.Scene) {
     mirrored.offset.x = 1;
     return mirrored;
   });
-  const birdHomes: { region: Region; ground: Point; perch: Point }[] = [
-    { region: 'village', ground: { x: 30.5, z: 47 }, perch: { x: 22, z: 31 } },
-    { region: 'village', ground: { x: 33, z: 47.7 }, perch: { x: 24, z: 29 } },
-    { region: 'village', ground: { x: 49.5, z: 60 }, perch: { x: 40.7, z: 48 } },
-    { region: 'school', ground: { x: 37, z: 49 }, perch: { x: 25, z: 28 } },
-    { region: 'school', ground: { x: 40, z: 51 }, perch: { x: 28, z: 26 } },
-    { region: 'shops', ground: { x: 48, z: 59 }, perch: { x: 34, z: 42 } },
-    { region: 'shops', ground: { x: 51, z: 58 }, perch: { x: 64, z: 31 } },
-    { region: 'river', ground: { x: 21, z: 49 }, perch: { x: 31, z: 30 } },
-    { region: 'forest', ground: { x: 42, z: 70 }, perch: { x: 25, z: 50 } },
-    { region: 'forest', ground: { x: 46, z: 72 }, perch: { x: 76, z: 44 } },
-  ];
-  const birds = birdHomes.map(({ region, ground, perch }, i) => {
+  return { birdMaps, leftBirdMaps };
+}
+
+function createBirds(scene: THREE.Scene, birdMaps: THREE.Texture[]) {
+  return BIRD_HOMES.map(({ region, ground, perch }, i) => {
     const bird = startSparrow(ground, perch, i * 1.3 + 0.2);
     const material = new THREE.SpriteMaterial({
       map: birdMaps[0],
@@ -101,22 +123,57 @@ export function createCountryside(scene: THREE.Scene) {
     scene.add(sprite);
     return { region, bird, sprite, material, facingLeft: false, opacity: 0 };
   });
+}
+
+function birdTargetOpacity(isRaining: boolean, darkness: number) {
+  return isRaining ? 0 : 1 - THREE.MathUtils.smoothstep(darkness, 0.3, 0.65);
+}
+
+function birdPose(bird: Bird['bird'], facingLeft: boolean) {
+  const flying = bird.state === BIRD_STATE.flying || bird.state === BIRD_STATE.returning;
+  const peck = !flying && (bird.age + bird.seed) % 3.7 > 3.3;
+  const frame = flying ? 1 + (Math.floor(bird.age * 12) % 2) : 0;
+  return { frame, rotation: Number(peck) * (facingLeft ? 0.22 : -0.22) };
+}
+
+function updateBird(
+  entry: Bird,
+  { region, dt, darkness, isStill, isRaining, player }: CountrysideFrame,
+  maps: { birdMaps: THREE.Texture[]; leftBirdMaps: THREE.Texture[] },
+) {
+  const { region: birdRegion, bird, sprite, material } = entry;
+  if (birdRegion !== region) {
+    sprite.visible = false;
+    entry.opacity = 0;
+    return;
+  }
+  const targetOpacity = birdTargetOpacity(isRaining, darkness);
+  entry.opacity = isStill ? targetOpacity : THREE.MathUtils.damp(entry.opacity, targetOpacity, 3, dt);
+  sprite.visible = entry.opacity > 0.005;
+  if (!sprite.visible) return;
+  const previousX = bird.at.x;
+  if (!isStill && dt > 0) stepSparrow(bird, player, dt);
+  if (Math.abs(bird.at.x - previousX) > 0.0005) entry.facingLeft = bird.at.x < previousX;
+  const pose = birdPose(bird, entry.facingLeft);
+  material.map = (entry.facingLeft ? maps.leftBirdMaps : maps.birdMaps)[pose.frame]!;
+  const height = characterScale(bird.at.z) * 2.7;
+  material.rotation = pose.rotation;
+  sprite.scale.set(height * 1.33, height, 1);
+  sprite.position.set(sceneX(bird.at.x), sceneY(bird.at.z) + bird.lift, 0.7);
+  material.opacity = entry.opacity;
+  lightSprite(material.color, darkness, 0);
+}
+
+export function createCountryside(scene: THREE.Scene) {
+  const time = { value: 0 };
+  const clothGeometry = new THREE.PlaneGeometry(1, 1, 10, 12);
+  const { rope, ropeMaterial, ropeTexture } = createRope(scene);
+  const cloths = createCloths(scene, rope, time, clothGeometry);
+  const maps = createBirdMaps();
+  const birds = createBirds(scene, maps.birdMaps);
   return {
-    update({
-      region,
-      dt,
-      darkness,
-      isStill,
-      isRaining,
-      player,
-    }: {
-      region: Region;
-      dt: number;
-      darkness: number;
-      isStill: boolean;
-      isRaining: boolean;
-      player: Point;
-    }) {
+    update(frame: CountrysideFrame) {
+      const { region, dt, darkness, isStill } = frame;
       const visible = region === REGION.village;
       if (visible && !isStill) time.value += dt;
       rope.visible = visible;
@@ -125,30 +182,7 @@ export function createCountryside(scene: THREE.Scene) {
         mesh.visible = visible;
         lightSprite(material.color, darkness, 0.08);
       }
-      for (const entry of birds) {
-        const { region: birdRegion, bird, sprite, material } = entry;
-        if (birdRegion !== region) {
-          sprite.visible = false;
-          entry.opacity = 0;
-          continue;
-        }
-        const targetOpacity = isRaining ? 0 : 1 - THREE.MathUtils.smoothstep(darkness, 0.3, 0.65);
-        entry.opacity = isStill ? targetOpacity : THREE.MathUtils.damp(entry.opacity, targetOpacity, 3, dt);
-        sprite.visible = entry.opacity > 0.005;
-        if (!sprite.visible) continue;
-        const previousX = bird.at.x;
-        if (!isStill && dt > 0) stepSparrow(bird, player, dt);
-        if (Math.abs(bird.at.x - previousX) > 0.0005) entry.facingLeft = bird.at.x < previousX;
-        const flying = bird.state === BIRD_STATE.flying || bird.state === BIRD_STATE.returning;
-        material.map = (entry.facingLeft ? leftBirdMaps : birdMaps)[flying ? 1 + (Math.floor(bird.age * 12) % 2) : 0]!;
-        const height = characterScale(bird.at.z) * 2.7;
-        const peck = !flying && (bird.age + bird.seed) % 3.7 > 3.3;
-        material.rotation = Number(peck) * (entry.facingLeft ? 0.22 : -0.22);
-        sprite.scale.set(height * 1.33, height, 1);
-        sprite.position.set(sceneX(bird.at.x), sceneY(bird.at.z) + bird.lift, 0.7);
-        material.opacity = entry.opacity;
-        lightSprite(material.color, darkness, 0);
-      }
+      for (const entry of birds) updateBird(entry, frame, maps);
     },
     dispose() {
       scene.remove(rope);
@@ -164,7 +198,7 @@ export function createCountryside(scene: THREE.Scene) {
         scene.remove(sprite);
         material.dispose();
       }
-      [...birdMaps, ...leftBirdMaps].forEach((map) => map.dispose());
+      [...maps.birdMaps, ...maps.leftBirdMaps].forEach((map) => map.dispose());
     },
   };
 }

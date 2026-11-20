@@ -10,6 +10,22 @@ test('every painting has lane ends for animals to come and go', () => {
   for (const region of REGIONS) assert.ok(laneEnds(region).length >= 2, region);
 });
 
+const walkToEnd = (region: Region, path: NonNullable<ReturnType<typeof passingRoute>>) => {
+  let stroll = { path, leg: 0, along: 0 };
+  let steps = 0;
+  for (;;) {
+    const moved = strollOn(stroll, 0.5);
+    if (!moved) return;
+    stroll = moved.stroll;
+    assert.ok(
+      canWalk(moved.at.x, moved.at.z, region),
+      `${region} off lane at ${moved.at.x.toFixed(1)},${moved.at.z.toFixed(1)}`,
+    );
+    steps += 1;
+    assert.ok(steps < 2_000, 'it leaves eventually');
+  }
+};
+
 test('a passing animal walks on the lanes from one end to another and then leaves', () => {
   let seed = 5;
   const random = () => {
@@ -20,19 +36,7 @@ test('a passing animal walks on the lanes from one end to another and then leave
     for (let i = 0; i < 6; i++) {
       const path = passingRoute(region, random);
       assert.ok(path && path.length >= 2, region);
-      let stroll = { path, leg: 0, along: 0 };
-      let steps = 0;
-      for (;;) {
-        const moved = strollOn(stroll, 0.5);
-        if (!moved) break;
-        stroll = moved.stroll;
-        assert.ok(
-          canWalk(moved.at.x, moved.at.z, region),
-          `${region} off lane at ${moved.at.x.toFixed(1)},${moved.at.z.toFixed(1)}`,
-        );
-        steps += 1;
-        assert.ok(steps < 2_000, 'it leaves eventually');
-      }
+      walkToEnd(region, path);
     }
   }
 });

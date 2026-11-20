@@ -1,5 +1,5 @@
 import { WEATHER } from '../config/walk';
-import { BALL_PHASE } from '../model/ballGame';
+import { BALL_PHASE, type BallGame } from '../model/ballGame';
 import { schoolmateGreetingPosition, schoolmatePlayPosition } from '../model/schoolmates';
 import { isNearSpot } from '../model/world/interactions';
 import { findRoute } from '../model/world/routing';
@@ -16,6 +16,31 @@ export function createActivityControls({
   'reactToCompanion' | 'greetSchoolmate' | 'endSchoolmateGreeting' | 'setBallGame' | 'setFishing' | 'finishSleep'
 > {
   const { character, companions, bedRest, schoolmates, jump, keys } = parts;
+  const isBallBlocked = () => !state.greetingId || state.region !== REGION.school || state.weather === WEATHER.rain;
+  const greetedFriend = () => schoolmates.standing.find((friend) => friend.id === state.greetingId);
+  const approachPlaySpot = () => {
+    const friend = greetedFriend();
+    const spot = friend ? schoolmatePlayPosition({ player: state.position, friend }) : null;
+    if (!spot) return false;
+    state.route = findRoute(state.position, spot, state.region);
+    state.destination = null;
+    jump.height = 0;
+    jump.velocity = 0;
+    return true;
+  };
+  const applyBallFrame = (frame: BallGame | null) => {
+    const hasPhaseChanged = frame?.phase !== state.ballFrame?.phase;
+    if (frame?.phase === BALL_PHASE.returning && state.ballFrame?.phase !== BALL_PHASE.returning)
+      state.companionAge = 0;
+    state.ballFrame = frame;
+    schoolmates.setBallGame(frame);
+    if (hasPhaseChanged) wake();
+  };
+  const faceGreeting = () => {
+    if (!state.greetingId) return;
+    const friend = greetedFriend();
+    if (friend) state.heading = Math.atan2(friend.x - state.position.x, friend.z - state.position.z);
+  };
   return {
     reactToCompanion(reaction) {
       state.companionAge = 0;
@@ -49,28 +74,11 @@ export function createActivityControls({
       wake();
     },
     setBallGame(frame) {
-      if (frame && (!state.greetingId || state.region !== REGION.school || state.weather === WEATHER.rain))
-        return false;
-      if (frame && !state.ballFrame) {
-        const friend = schoolmates.standing.find((friend) => friend.id === state.greetingId);
-        const spot = friend ? schoolmatePlayPosition({ player: state.position, friend }) : null;
-        if (!spot) return false;
-        state.route = findRoute(state.position, spot, state.region);
-        state.destination = null;
-        jump.height = 0;
-        jump.velocity = 0;
-      }
+      if (frame && isBallBlocked()) return false;
+      if (frame && !state.ballFrame && !approachPlaySpot()) return false;
       if (frame === state.ballFrame) return state.route.length === 0;
-      const hasPhaseChanged = frame?.phase !== state.ballFrame?.phase;
-      if (frame?.phase === BALL_PHASE.returning && state.ballFrame?.phase !== BALL_PHASE.returning)
-        state.companionAge = 0;
-      state.ballFrame = frame;
-      schoolmates.setBallGame(frame);
-      if (hasPhaseChanged) wake();
-      if (state.route.length === 0 && state.greetingId) {
-        const friend = schoolmates.standing.find((friend) => friend.id === state.greetingId);
-        if (friend) state.heading = Math.atan2(friend.x - state.position.x, friend.z - state.position.z);
-      }
+      applyBallFrame(frame);
+      if (state.route.length === 0) faceGreeting();
       return state.route.length === 0;
     },
     setFishing(frame) {

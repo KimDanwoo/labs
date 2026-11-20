@@ -12,11 +12,10 @@ test('body atlases keep every pose on the shared foot anchor and leave the costu
   const sources = Object.values(CHARACTER).map((character) => characterLayers({ character, outfit: OUTFIT.summer }));
   const reports = await page.evaluate(
     async ({ sources, rig }) => {
-      const results: { source: string; width: number; height: number; bottoms: number[]; costumeAlpha: number }[] = [];
+      const OPAQUE_ALPHA = 128;
       const frameWidth = rig.width / rig.columns;
       const frameHeight = rig.height / rig.rows;
-      const OPAQUE_ALPHA = 128;
-      for (const { body: source, bodyPoseOffsets } of sources) {
+      const loadPixels = async (source: string) => {
         const image = new Image();
         image.src = source;
         await image.decode();
@@ -27,28 +26,40 @@ test('body atlases keep every pose on the shared foot anchor and leave the costu
         if (!context) throw new Error('Canvas unavailable');
         context.drawImage(image, 0, 0);
         const { data } = context.getImageData(0, 0, image.width, image.height);
-        const bottoms: number[] = [];
-        for (let row = 0; row < rig.rows; row++) {
-          for (let column = 0; column < rig.columns; column++) {
-            let bottom = -1;
-            for (let y = 0; y < frameHeight; y++) {
-              for (let x = 0; x < frameWidth; x++) {
-                const alpha = data[((row * frameHeight + y) * image.width + column * frameWidth + x) * 4 + 3];
-                if (alpha !== undefined && alpha > OPAQUE_ALPHA) bottom = y;
-              }
-            }
-            const pose = row * rig.columns + column;
-            bottoms.push(bottom + (bodyPoseOffsets[pose] ?? 0));
+        return { data, width: image.width, height: image.height };
+      };
+      const frameBottom = (data: Uint8ClampedArray, width: number, row: number, column: number) => {
+        let bottom = -1;
+        for (let y = 0; y < frameHeight; y++) {
+          for (let x = 0; x < frameWidth; x++) {
+            const alpha = data[((row * frameHeight + y) * width + column * frameWidth + x) * 4 + 3];
+            if (alpha !== undefined && alpha > OPAQUE_ALPHA) bottom = y;
           }
         }
+        return bottom;
+      };
+      const costumeRegionAlpha = (data: Uint8ClampedArray, width: number) => {
         let costumeAlpha = 0;
         for (let y = 198; y < 206; y++) {
           for (let x = 72; x < 121; x++) {
-            costumeAlpha = Math.max(costumeAlpha, data[(y * image.width + x) * 4 + 3] ?? 0);
+            costumeAlpha = Math.max(costumeAlpha, data[(y * width + x) * 4 + 3] ?? 0);
           }
         }
-        results.push({ source, width: image.width, height: image.height, bottoms, costumeAlpha });
-      }
+        return costumeAlpha;
+      };
+      const measure = async ({ body: source, bodyPoseOffsets }: (typeof sources)[number]) => {
+        const { data, width, height } = await loadPixels(source);
+        const bottoms: number[] = [];
+        for (let row = 0; row < rig.rows; row++) {
+          for (let column = 0; column < rig.columns; column++) {
+            const pose = row * rig.columns + column;
+            bottoms.push(frameBottom(data, width, row, column) + (bodyPoseOffsets[pose] ?? 0));
+          }
+        }
+        return { source, width, height, bottoms, costumeAlpha: costumeRegionAlpha(data, width) };
+      };
+      const results = [];
+      for (const entry of sources) results.push(await measure(entry));
       return results;
     },
     { sources, rig: CHARACTER_RIG },
@@ -73,8 +84,12 @@ test('the shared PE uniform retains all 32 garment poses and transparent space a
   await page.goto('/404.html');
   const reports = await page.evaluate(
     async ({ sources, rig }) => {
-      const reports: { width: number; height: number; bounds: number[][]; outsideAlpha: number }[] = [];
-      for (const source of sources) {
+      const OPAQUE_ALPHA = 128;
+      const OUTSIDE_TOP = 120;
+      const OUTSIDE_BOTTOM = 240;
+      const width = rig.width / rig.columns;
+      const height = rig.height / rig.rows;
+      const loadPixels = async (source: string) => {
         const image = new Image();
         image.src = source;
         await image.decode();
@@ -85,33 +100,43 @@ test('the shared PE uniform retains all 32 garment poses and transparent space a
         if (!context) throw new Error('Canvas unavailable');
         context.drawImage(image, 0, 0);
         const { data } = context.getImageData(0, 0, image.width, image.height);
-        const width = rig.width / rig.columns;
-        const height = rig.height / rig.rows;
+        return { data, width: image.width, height: image.height };
+      };
+      const frameBounds = (data: Uint8ClampedArray, imageWidth: number, row: number, column: number) => {
+        let left = width,
+          top = height,
+          right = -1,
+          bottom = -1,
+          outsideAlpha = 0;
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const alpha = data[((row * height + y) * imageWidth + column * width + x) * 4 + 3] ?? 0;
+            if (alpha > OPAQUE_ALPHA) {
+              left = Math.min(left, x);
+              top = Math.min(top, y);
+              right = Math.max(right, x);
+              bottom = Math.max(bottom, y);
+            }
+            if (y < OUTSIDE_TOP || y > OUTSIDE_BOTTOM) outsideAlpha = Math.max(outsideAlpha, alpha);
+          }
+        }
+        return { bounds: [left, top, right, bottom], outsideAlpha };
+      };
+      const measure = async (source: string) => {
+        const pixels = await loadPixels(source);
         const bounds: number[][] = [];
         let outsideAlpha = 0;
         for (let row = 0; row < rig.rows; row++) {
           for (let column = 0; column < rig.columns; column++) {
-            let left = width,
-              top = height,
-              right = -1,
-              bottom = -1;
-            for (let y = 0; y < height; y++) {
-              for (let x = 0; x < width; x++) {
-                const alpha = data[((row * height + y) * image.width + column * width + x) * 4 + 3] ?? 0;
-                if (alpha > 128) {
-                  left = Math.min(left, x);
-                  top = Math.min(top, y);
-                  right = Math.max(right, x);
-                  bottom = Math.max(bottom, y);
-                }
-                if (y < 120 || y > 240) outsideAlpha = Math.max(outsideAlpha, alpha);
-              }
-            }
-            bounds.push([left, top, right, bottom]);
+            const frame = frameBounds(pixels.data, pixels.width, row, column);
+            bounds.push(frame.bounds);
+            outsideAlpha = Math.max(outsideAlpha, frame.outsideAlpha);
           }
         }
-        reports.push({ width: image.width, height: image.height, bounds, outsideAlpha });
-      }
+        return { width: pixels.width, height: pixels.height, bounds, outsideAlpha };
+      };
+      const reports = [];
+      for (const source of sources) reports.push(await measure(source));
       return reports;
     },
     { sources: [OUTFIT_DEFINITIONS[OUTFIT.summer].atlas, OUTFIT_DEFINITIONS[OUTFIT.pe].atlas], rig: CHARACTER_RIG },
@@ -140,8 +165,8 @@ test('side-facing idle feet point toward the face instead of keeping two front-f
     (character) => characterLayers({ character, outfit: OUTFIT.summer }).body,
   );
   const reports = await page.evaluate(async (sources) => {
-    const results: { source: string; direction: number; toeOffset: number }[] = [];
-    for (const source of sources) {
+    const FRAME_HEIGHT = 256;
+    const loadPixels = async (source: string) => {
       const image = new Image();
       image.src = source;
       await image.decode();
@@ -152,30 +177,39 @@ test('side-facing idle feet point toward the face instead of keeping two front-f
       if (!ctx) throw new Error('Canvas unavailable');
       ctx.drawImage(image, 0, 0);
       const { data } = ctx.getImageData(0, 0, image.width, image.height);
+      return { data, width: image.width };
+    };
+    const isShoe = (r: number, g: number, b: number) => r > 150 && g > 100 && b < 110;
+    const isSock = (r: number, g: number, b: number) => r > 180 && g > 180 && b > 170;
+    const centroidX = (
+      data: Uint8ClampedArray,
+      width: number,
+      row: number,
+      matches: (r: number, g: number, b: number) => boolean,
+    ) => {
+      let count = 0,
+        sum = 0;
+      for (let y = 210; y < 253; y++)
+        for (let x = 45; x < 145; x++) {
+          const index = ((row * FRAME_HEIGHT + y) * width + x) * 4;
+          if ((data[index + 3] ?? 0) < 180) continue;
+          if (!matches(data[index] ?? 0, data[index + 1] ?? 0, data[index + 2] ?? 0)) continue;
+          count++;
+          sum += x;
+        }
+      return { count, mean: sum / count };
+    };
+    const profileToeOffset = (data: Uint8ClampedArray, width: number, row: number, source: string) => {
+      const shoes = centroidX(data, width, row, isShoe);
+      const socks = centroidX(data, width, row, isSock);
+      if (!shoes.count || !socks.count) throw new Error(`Missing profile shoes in ${source}`);
+      return shoes.mean - socks.mean;
+    };
+    const results: { source: string; direction: number; toeOffset: number }[] = [];
+    for (const source of sources) {
+      const { data, width } = await loadPixels(source);
       for (const row of [1, 3]) {
-        let shoes = 0,
-          shoeX = 0,
-          socks = 0,
-          sockX = 0;
-        for (let y = 210; y < 253; y++)
-          for (let x = 45; x < 145; x++) {
-            const index = ((row * 256 + y) * image.width + x) * 4;
-            const r = data[index] ?? 0,
-              g = data[index + 1] ?? 0,
-              b = data[index + 2] ?? 0,
-              alpha = data[index + 3] ?? 0;
-            if (alpha < 180) continue;
-            if (r > 150 && g > 100 && b < 110) {
-              shoes++;
-              shoeX += x;
-            }
-            if (r > 180 && g > 180 && b > 170) {
-              socks++;
-              sockX += x;
-            }
-          }
-        if (!shoes || !socks) throw new Error(`Missing profile shoes in ${source}`);
-        results.push({ source, direction: row === 1 ? 1 : -1, toeOffset: shoeX / shoes - sockX / socks });
+        results.push({ source, direction: row === 1 ? 1 : -1, toeOffset: profileToeOffset(data, width, row, source) });
       }
     }
     return results;

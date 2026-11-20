@@ -51,34 +51,18 @@ export function useWalkInteraction(options: WalkInteractionOptions) {
     onNotice(landmark.action.caption);
   }
 
-  function interact() {
-    if (isPaused) return;
-    if (spots.isNearAquarium || spots.isNearCat) {
-      onCompanion(spots.isNearAquarium ? COMPANION_PANEL.aquarium : COMPANION_PANEL.cat);
-      return;
-    }
-    if (spots.isAtPier) {
-      onFishing();
-      return;
-    }
-    if (spots.isNearWardrobe) {
-      onDialog(DIALOG.wardrobe);
-      return;
-    }
-    if (spots.isNearDesk) {
-      onDialog(DIALOG.journal);
-      return;
-    }
-    if (spots.isNearBoard) {
-      onDialog(DIALOG.chalkboard);
-      return;
-    }
-    if (nearbyFriend && engineRef.current?.greetSchoolmate(nearbyFriend.id)) {
-      onFriend({ kind: FRIEND_ACTIVITY.greeting, id: nearbyFriend.id });
-      return;
-    }
-    const landmark = status.nearby;
-    if (!landmark) return;
+  const spotActions: { isNear: boolean; run: () => void }[] = [
+    {
+      isNear: spots.isNearAquarium || spots.isNearCat,
+      run: () => onCompanion(spots.isNearAquarium ? COMPANION_PANEL.aquarium : COMPANION_PANEL.cat),
+    },
+    { isNear: spots.isAtPier, run: () => onFishing() },
+    { isNear: spots.isNearWardrobe, run: () => onDialog(DIALOG.wardrobe) },
+    { isNear: spots.isNearDesk, run: () => onDialog(DIALOG.journal) },
+    { isNear: spots.isNearBoard, run: () => onDialog(DIALOG.chalkboard) },
+  ];
+
+  function interactWithLandmark(landmark: Landmark) {
     if (pages[timeOfDay].includes(landmark.id)) {
       playAction(landmark);
       return;
@@ -86,6 +70,20 @@ export function useWalkInteraction(options: WalkInteractionOptions) {
     onMemory(liveMemory(landmark, timeOfDay));
     pageStores[timeOfDay].add(landmark.id);
     onDialog(DIALOG.memory);
+  }
+
+  function interact() {
+    if (isPaused) return;
+    const spotAction = spotActions.find((action) => action.isNear);
+    if (spotAction) {
+      spotAction.run();
+      return;
+    }
+    if (nearbyFriend && engineRef.current?.greetSchoolmate(nearbyFriend.id)) {
+      onFriend({ kind: FRIEND_ACTIVITY.greeting, id: nearbyFriend.id });
+      return;
+    }
+    if (status.nearby) interactWithLandmark(status.nearby);
   }
 
   function readMemory(id: string) {

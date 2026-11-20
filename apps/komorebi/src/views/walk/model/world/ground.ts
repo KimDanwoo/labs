@@ -92,53 +92,83 @@ export function isOnGround(x: number, z: number, region: Region) {
   });
 }
 
-export function hasGroundBetween(from: Point, to: Point, region: Region): boolean {
+type Edge = ReturnType<typeof prepareGeometry>[number]['edges'][number];
+
+const DEPTH_CUTS = [46.5, 85];
+const PARALLEL_EPSILON = 1e-10;
+
+const pointAlong = (from: Point, to: Point, t: number): Point => ({
+  x: from.x + (to.x - from.x) * t,
+  z: from.z + (to.z - from.z) * t,
+});
+
+const footPoint = (p: Point, dx: number, dy: number): PixelPoint => {
+  const scale = Math.max(0.45, Math.min(1, (p.z - 15) / 70));
+  return [p.x * 15.36 + dx * scale, p.z * 10.24 + dy * scale];
+};
+
+const depthCuts = (from: Point, to: Point): number[] => {
   const cuts = [0, 1];
-  if (to.z !== from.z)
-    for (const depth of [46.5, 85]) {
-      const t = (depth - from.z) / (to.z - from.z);
-      if (t > 0 && t < 1) cuts.push(t);
+  if (to.z === from.z) return cuts;
+  for (const depth of DEPTH_CUTS) {
+    const t = (depth - from.z) / (to.z - from.z);
+    if (t > 0 && t < 1) cuts.push(t);
+  }
+  return cuts.sort((a, b) => a - b);
+};
+
+const isBoundsApart = (a: PixelPoint, b: PixelPoint, edge: Edge) =>
+  Math.max(a[0], b[0]) < edge.minX ||
+  Math.min(a[0], b[0]) > edge.maxX ||
+  Math.max(a[1], b[1]) < edge.minY ||
+  Math.min(a[1], b[1]) > edge.maxY;
+
+const isProperCrossing = (t: number, u: number) => t > 0 && t < 1 && u >= 0 && u <= 1;
+
+function edgeCrossing(a: PixelPoint, b: PixelPoint, edge: Edge): number | null {
+  if (isBoundsApart(a, b, edge)) return null;
+  const vx = b[0] - a[0],
+    vy = b[1] - a[1];
+  const c = edge.a,
+    d = edge.b;
+  const wx = d[0] - c[0],
+    wy = d[1] - c[1];
+  const denominator = vx * wy - vy * wx;
+  if (Math.abs(denominator) < PARALLEL_EPSILON) return null;
+  const cx = c[0] - a[0],
+    cy = c[1] - a[1];
+  const t = (cx * wy - cy * wx) / denominator;
+  const u = (cx * vy - cy * vx) / denominator;
+  return isProperCrossing(t, u) ? t : null;
+}
+
+function spanCrossings(from: Point, to: Point, lo: number, hi: number, region: Region): number[] {
+  const crossings: number[] = [];
+  const edges = COLLISION_GEOMETRY[region]!.flatMap((shape) => shape.edges);
+  for (const [dx, dy] of FOOT_SAMPLES) {
+    const a = footPoint(pointAlong(from, to, lo), dx, dy),
+      b = footPoint(pointAlong(from, to, hi), dx, dy);
+    for (const edge of edges) {
+      const t = edgeCrossing(a, b, edge);
+      if (t !== null) crossings.push(lo + t * (hi - lo));
     }
-  cuts.sort((a, b) => a - b);
-  const at = (t: number): Point => ({ x: from.x + (to.x - from.x) * t, z: from.z + (to.z - from.z) * t });
-  const foot = (p: Point, dx: number, dy: number): PixelPoint => {
-    const scale = Math.max(0.45, Math.min(1, (p.z - 15) / 70));
-    return [p.x * 15.36 + dx * scale, p.z * 10.24 + dy * scale];
-  };
+  }
+  return crossings;
+}
+
+function isSpanOnGround(from: Point, to: Point, lo: number, hi: number, region: Region): boolean {
+  const crossings = [lo, hi, ...spanCrossings(from, to, lo, hi, region)].sort((a, b) => a - b);
+  for (let i = 1; i < crossings.length; i++) {
+    const p = pointAlong(from, to, (crossings[i - 1]! + crossings[i]!) / 2);
+    if (!isOnGround(p.x, p.z, region)) return false;
+  }
+  return true;
+}
+
+export function hasGroundBetween(from: Point, to: Point, region: Region): boolean {
+  const cuts = depthCuts(from, to);
   for (let k = 1; k < cuts.length; k++) {
-    const lo = cuts[k - 1]!,
-      hi = cuts[k]!;
-    const crossings = [lo, hi];
-    for (const [dx, dy] of FOOT_SAMPLES) {
-      const a = foot(at(lo), dx, dy),
-        b = foot(at(hi), dx, dy);
-      const vx = b[0] - a[0],
-        vy = b[1] - a[1];
-      const minX = Math.min(a[0], b[0]),
-        maxX = Math.max(a[0], b[0]);
-      const minY = Math.min(a[1], b[1]),
-        maxY = Math.max(a[1], b[1]);
-      for (const shape of COLLISION_GEOMETRY[region]!)
-        for (const edge of shape.edges) {
-          if (maxX < edge.minX || minX > edge.maxX || maxY < edge.minY || minY > edge.maxY) continue;
-          const c = edge.a,
-            d = edge.b;
-          const wx = d[0] - c[0],
-            wy = d[1] - c[1];
-          const denominator = vx * wy - vy * wx;
-          if (Math.abs(denominator) < 1e-10) continue;
-          const cx = c[0] - a[0],
-            cy = c[1] - a[1];
-          const t = (cx * wy - cy * wx) / denominator;
-          const u = (cx * vy - cy * vx) / denominator;
-          if (t > 0 && t < 1 && u >= 0 && u <= 1) crossings.push(lo + t * (hi - lo));
-        }
-    }
-    crossings.sort((a, b) => a - b);
-    for (let i = 1; i < crossings.length; i++) {
-      const p = at((crossings[i - 1]! + crossings[i]!) / 2);
-      if (!isOnGround(p.x, p.z, region)) return false;
-    }
+    if (!isSpanOnGround(from, to, cuts[k - 1]!, cuts[k]!, region)) return false;
   }
   return isOnGround(from.x, from.z, region) && isOnGround(to.x, to.z, region);
 }

@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
 
 import { BITE_WAIT_MS, FISHING_FAILURE, PERFECT_HOOK_WINDOW_MS, VIBRATION } from '../../config/fishing';
 import { MS_PER_SECOND } from '../../config/time';
@@ -29,27 +29,17 @@ interface FishingSessionInput {
   onFrame: (frame: FishingFrame | null) => void;
 }
 
-export function useFishingSession({ onClose, onSound, onFrame }: FishingSessionInput) {
-  const [keptUid, setKeptUid] = useState<string | null>(null);
-  const hasFinished = useRef(false);
-  const [phase, setPhase] = useState<FishingPhase>(FISHING_PHASE.casting);
-  const [caught, setCaught] = useState<Catch | null>(null);
-  const [collection, setCollection] = useState<FishCollection>(() => {
-    try {
-      return parseCollection(localStorage.getItem(FISHING_STORAGE_KEY));
-    } catch {
-      return {};
-    }
-  });
-  const [isNew, setIsNew] = useState(false);
-  const [isRecord, setIsRecord] = useState(false);
-  const [isCelebrating, setIsCelebrating] = useState(false);
-  const [hasSaveError, setHasSaveError] = useState(false);
-  const [isPerfect, setIsPerfect] = useState(false);
-  const [failure, setFailure] = useState<string>(FISHING_FAILURE.default);
-  const deadline = useRef(0);
-  const hasReeled = useRef(false);
-  const publish = useEffectEvent(onFrame);
+type SetPhase = (phase: FishingPhase) => void;
+
+function readCollection(): FishCollection {
+  try {
+    return parseCollection(localStorage.getItem(FISHING_STORAGE_KEY));
+  } catch {
+    return {};
+  }
+}
+
+function useFishingCue(phase: FishingPhase, caught: Catch | null, onSound: FishingSessionInput['onSound']) {
   const playSound = useEffectEvent(() => {
     if (phase === FISHING_PHASE.casting) onSound('cast');
     else if (phase === FISHING_PHASE.waiting) onSound('waiting');
@@ -63,11 +53,14 @@ export function useFishingSession({ onClose, onSound, onFrame }: FishingSessionI
   useEffect(() => {
     playSound();
   }, [phase]);
-  useEffect(() => {
-    if (phase !== FISHING_PHASE.fighting)
-      publish({ phase, elapsed: 0, tension: 0, progress: 0, isReeling: false, caught });
-  }, [phase, caught]);
-  useEffect(() => () => publish(null), []);
+}
+
+function usePhaseTimers(
+  phase: FishingPhase,
+  deadline: RefObject<number>,
+  setPhase: SetPhase,
+  setIsCelebrating: (isCelebrating: boolean) => void,
+) {
   useEffect(() => {
     if (phase === FISHING_PHASE.caught) {
       const timer = window.setTimeout(() => setIsCelebrating(false), CATCH_CELEBRATION_SECONDS * MS_PER_SECOND);
@@ -92,7 +85,51 @@ export function useFishingSession({ onClose, onSound, onFrame }: FishingSessionI
       return () => window.clearTimeout(timer);
     }
     return undefined;
-  }, [phase]);
+  }, [phase, deadline, setPhase, setIsCelebrating]);
+}
+
+function useFishingKeys(onAct: () => void, onClose: () => void) {
+  const handleAct = useEffectEvent(onAct);
+  const handleClose = useEffectEvent(onClose);
+  useEffect(() => {
+    const key = (event: KeyboardEvent) => {
+      if (event.code === 'Escape') {
+        event.preventDefault();
+        handleClose();
+        return;
+      }
+      if (event.code === 'KeyE' && !event.repeat) {
+        event.preventDefault();
+        handleAct();
+      }
+    };
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  }, []);
+}
+
+export function useFishingSession({ onClose, onSound, onFrame }: FishingSessionInput) {
+  const [keptUid, setKeptUid] = useState<string | null>(null);
+  const hasFinished = useRef(false);
+  const [phase, setPhase] = useState<FishingPhase>(FISHING_PHASE.casting);
+  const [caught, setCaught] = useState<Catch | null>(null);
+  const [collection, setCollection] = useState<FishCollection>(readCollection);
+  const [isNew, setIsNew] = useState(false);
+  const [isRecord, setIsRecord] = useState(false);
+  const [isCelebrating, setIsCelebrating] = useState(false);
+  const [hasSaveError, setHasSaveError] = useState(false);
+  const [isPerfect, setIsPerfect] = useState(false);
+  const [failure, setFailure] = useState<string>(FISHING_FAILURE.default);
+  const deadline = useRef(0);
+  const hasReeled = useRef(false);
+  const publish = useEffectEvent(onFrame);
+  useFishingCue(phase, caught, onSound);
+  useEffect(() => {
+    if (phase !== FISHING_PHASE.fighting)
+      publish({ phase, elapsed: 0, tension: 0, progress: 0, isReeling: false, caught });
+  }, [phase, caught]);
+  useEffect(() => () => publish(null), []);
+  usePhaseTimers(phase, deadline, setPhase, setIsCelebrating);
 
   function finishFight(outcome: Fight['outcome']) {
     if (hasFinished.current) return;
@@ -142,23 +179,7 @@ export function useFishingSession({ onClose, onSound, onFrame }: FishingSessionI
     setPhase(FISHING_PHASE.casting);
   }
 
-  const handleAct = useEffectEvent(act);
-  const handleClose = useEffectEvent(onClose);
-  useEffect(() => {
-    const key = (event: KeyboardEvent) => {
-      if (event.code === 'Escape') {
-        event.preventDefault();
-        handleClose();
-        return;
-      }
-      if (event.code === 'KeyE' && !event.repeat) {
-        event.preventDefault();
-        handleAct();
-      }
-    };
-    window.addEventListener('keydown', key);
-    return () => window.removeEventListener('keydown', key);
-  }, []);
+  useFishingKeys(act, onClose);
 
   return {
     phase,
@@ -175,3 +196,5 @@ export function useFishingSession({ onClose, onSound, onFrame }: FishingSessionI
     finishFight,
   };
 }
+
+export type FishingSession = ReturnType<typeof useFishingSession>;
