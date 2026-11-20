@@ -1,4 +1,4 @@
-import { OUTLINE } from '../../model/constants/icons';
+import { OUTLINE } from '@views/player/model/constants/icons';
 
 export function ShuffleIcon() {
   return (

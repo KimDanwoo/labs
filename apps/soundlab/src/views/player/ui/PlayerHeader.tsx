@@ -1,11 +1,11 @@
 import { PLAYER_SCREEN, TRACKS, type PlayerScreen } from '@entities/track';
+import { playerPath } from '@views/player/lib/playerUrl';
+import { currentIndexAtom, isPlayingAtom, playerScreenAtom } from '@views/player/model/store/playback';
+import { QueueToggle } from '@views/player/ui/playlist/QueueToggle';
+import { ShareButton } from '@views/player/ui/transport/ShareButton';
 import { useAtom, useAtomValue } from 'jotai';
 import Link from 'next/link';
 import type { JSX, MouseEvent } from 'react';
-import { playerPath } from '../lib/playerUrl';
-import { currentIndexAtom, isPlayingAtom, playerScreenAtom } from '../model/store/playback';
-import { QueueToggle } from './playlist/QueueToggle';
-import { ShareButton } from './transport/ShareButton';
 
 export function PlayerHeader(): JSX.Element {
   const [screen, setScreen] = useAtom(playerScreenAtom);

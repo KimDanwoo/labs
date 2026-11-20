@@ -1,4 +1,4 @@
-import { SOLID } from '../../model/constants/icons';
+import { SOLID } from '@views/player/model/constants/icons';
 
 export function PauseIcon() {
   return (

@@ -1,12 +1,12 @@
 'use client';
 
+import type { ScWidget } from '@views/player/api/widget';
+import { REWIND_ATTEMPT_LIMIT, WIDGET_EVENT } from '@views/player/config/playback';
+import { hasLostRewind, isRewindWatched } from '@views/player/lib/rewindGuard';
+import { isValidPosition } from '@views/player/lib/widgetPayload';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import { writeBuffered } from '@views/player/model/store/playback';
 import { useCallback } from 'react';
-import type { ScWidget } from '../../api/widget';
-import { REWIND_ATTEMPT_LIMIT, WIDGET_EVENT } from '../../config/playback';
-import { hasLostRewind, isRewindWatched } from '../../lib/rewindGuard';
-import { isValidPosition } from '../../lib/widgetPayload';
-import { writeBuffered } from '../store/playback';
-import type { PlaybackEngine } from './useEngineRefs';
 
 export function useProgressEvents({ tracks, refs, clock, listening, lastPlayed }: PlaybackEngine) {
   const { playingRef, heldIndexRef, pendingRewindRef } = refs;

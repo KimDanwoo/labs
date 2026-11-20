@@ -1,13 +1,13 @@
 import { TRACKS } from '@entities/track';
 import { Button } from '@shared/ui/Button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@shared/ui/Sheet';
+import { collectionsForTrack } from '@views/player/config/collections';
+import { formatDurationMs } from '@views/player/lib/formatTrack';
+import { HIGHLIGHTS } from '@views/player/model/constants/highlights';
+import { usePlaybackControls } from '@views/player/model/hooks/usePlaybackControls';
+import { currentIndexAtom } from '@views/player/model/store/playback';
 import { useAtomValue } from 'jotai';
 import type { JSX } from 'react';
-import { collectionsForTrack } from '../../config/collections';
-import { formatDurationMs } from '../../lib/formatTrack';
-import { HIGHLIGHTS } from '../../model/constants/highlights';
-import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
-import { currentIndexAtom } from '../../model/store/playback';
 
 export function TrackDetails(): JSX.Element | null {
   const index = useAtomValue(currentIndexAtom);

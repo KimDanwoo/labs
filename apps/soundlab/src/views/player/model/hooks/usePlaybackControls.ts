@@ -1,8 +1,8 @@
 'use client';
 
+import type { Playback } from '@views/player/model/hooks/usePlayback';
+import { PlaybackContext } from '@views/player/model/store/playbackContext';
 import { useContext } from 'react';
-import { PlaybackContext } from '../store/playbackContext';
-import type { Playback } from './usePlayback';
 
 export function usePlaybackControls(): Playback {
   const controls = useContext(PlaybackContext);

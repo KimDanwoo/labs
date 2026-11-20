@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { loadArtwork, warmNeighbors } from '../../lib/stage/artworkCache';
+import { loadArtwork, warmNeighbors } from '@views/player/lib/stage/artworkCache';
 
 export function useArtworkSwap(index: number) {
   const pendingRef = useRef<number | null>(null);

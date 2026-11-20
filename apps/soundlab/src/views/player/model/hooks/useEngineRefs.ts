@@ -1,14 +1,14 @@
 'use client';
 
 import type { Track } from '@entities/track';
+import type { ScWidget } from '@views/player/api/widget';
+import type { PendingRewind } from '@views/player/lib/rewindGuard';
+import type { useLastPlayed } from '@views/player/model/hooks/useLastPlayed';
+import type { useListeningLog } from '@views/player/model/hooks/useListeningLog';
+import type { usePlaybackClock } from '@views/player/model/hooks/usePlaybackClock';
+import type { useVolumeFade } from '@views/player/model/hooks/useVolumeFade';
+import type { PlaybackQueue } from '@views/player/model/queue';
 import { type RefObject, useRef } from 'react';
-import type { ScWidget } from '../../api/widget';
-import type { PendingRewind } from '../../lib/rewindGuard';
-import type { PlaybackQueue } from '../queue';
-import type { useLastPlayed } from './useLastPlayed';
-import type { useListeningLog } from './useListeningLog';
-import type { usePlaybackClock } from './usePlaybackClock';
-import type { useVolumeFade } from './useVolumeFade';
 
 export interface EngineRefs {
   widgetRef: RefObject<ScWidget | null>;

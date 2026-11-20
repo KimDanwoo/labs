@@ -1,7 +1,7 @@
 import { type PlayerScreen, PLAYER_SCREEN } from '@entities/track';
+import { type RepeatMode, REPEAT_MODE } from '@views/player/model/constants/repeatMode';
+import type { PlaybackQueue } from '@views/player/model/queue';
 import { atom } from 'jotai/vanilla';
-import { type RepeatMode, REPEAT_MODE } from '../constants/repeatMode';
-import type { PlaybackQueue } from '../queue';
 
 export const playbackQueueAtom = atom<PlaybackQueue | null>(null);
 export const recoveryNoticeAtom = atom(false);

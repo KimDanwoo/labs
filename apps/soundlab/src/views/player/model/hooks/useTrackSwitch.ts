@@ -1,12 +1,12 @@
 'use client';
 
 import type { Track } from '@entities/track';
+import { readSoundIds, setUrl, trackUrl } from '@views/player/api/widget';
+import { validDuration } from '@views/player/lib/widgetPayload';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import { engineErrorAtom, engineModeAtom, frameState } from '@views/player/model/store/playback';
 import { useSetAtom } from 'jotai';
 import { useCallback } from 'react';
-import { readSoundIds, setUrl, trackUrl } from '../../api/widget';
-import { validDuration } from '../../lib/widgetPayload';
-import { engineErrorAtom, engineModeAtom, frameState } from '../store/playback';
-import type { PlaybackEngine } from './useEngineRefs';
 
 export type GoTo = (next: number, track: Track) => void;
 

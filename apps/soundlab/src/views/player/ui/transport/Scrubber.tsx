@@ -2,8 +2,8 @@
 
 import { cn } from '@shared/lib/cn';
 
-import { useScrubber } from '../../model/hooks/useScrubber';
-import styles from './Scrubber.module.css';
+import { useScrubber } from '@views/player/model/hooks/useScrubber';
+import styles from '@views/player/ui/transport/Scrubber.module.css';
 
 export function Scrubber() {
   const { barRef, handlePointerDown, handleMouseDown, handleKeyDown } = useScrubber();

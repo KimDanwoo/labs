@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
 
-import { CLICK_RIPPLE_AMP, REDUCED_MOTION_QUERY, RIPPLE_MS } from '../../config/stage';
-import type { Renderer } from '../../lib/stage/renderer';
-import { createRendererOrFallback } from '../../lib/stage/rendererFallback';
-import { claimRipple } from '../../lib/stage/ripplePool';
+import { CLICK_RIPPLE_AMP, REDUCED_MOTION_QUERY, RIPPLE_MS } from '@views/player/config/stage';
+import type { Renderer } from '@views/player/lib/stage/renderer';
+import { createRendererOrFallback } from '@views/player/lib/stage/rendererFallback';
+import { claimRipple } from '@views/player/lib/stage/ripplePool';
 
 export interface StageLayout {
   x: number;

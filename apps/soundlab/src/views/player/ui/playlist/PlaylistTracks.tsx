@@ -1,7 +1,7 @@
 import { Button } from '@shared/ui/Button';
+import { searchAtom, visibleTracksAtom } from '@views/player/model/browse';
+import { LibraryTrack } from '@views/player/ui/library/LibraryTrack';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { searchAtom, visibleTracksAtom } from '../../model/browse';
-import { LibraryTrack } from '../library/LibraryTrack';
 
 export function PlaylistTracks() {
   const tracks = useAtomValue(visibleTracksAtom);

@@ -1,4 +1,4 @@
-import { RIPPLE_SLOTS } from '../../config/renderer';
+import { RIPPLE_SLOTS } from '@views/player/config/renderer';
 
 const LUM = 'vec3(0.2126, 0.7152, 0.0722)';
 /**

@@ -2,14 +2,14 @@
 
 import { PLAYER_SCREEN, type PlayerScreen } from '@entities/track';
 import { cn } from '@shared/lib/cn';
-import { PlaybackProvider } from './PlaybackProvider';
+import { PlaybackProvider } from '@views/player/ui/PlaybackProvider';
 
-import { usePlayerEngine } from '../model/hooks/usePlayerEngine';
-import { Archive } from './archive/Archive';
-import { PlayerHeader } from './PlayerHeader';
-import { Playlist } from './playlist/Playlist';
-import { Stage } from './stage/Stage';
-import { Transport } from './transport/Transport';
+import { usePlayerEngine } from '@views/player/model/hooks/usePlayerEngine';
+import { Archive } from '@views/player/ui/archive/Archive';
+import { PlayerHeader } from '@views/player/ui/PlayerHeader';
+import { Playlist } from '@views/player/ui/playlist/Playlist';
+import { Stage } from '@views/player/ui/stage/Stage';
+import { Transport } from '@views/player/ui/transport/Transport';
 
 interface PlayerViewProps {
   initialTrackId?: number;

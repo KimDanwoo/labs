@@ -1,6 +1,6 @@
+import { isVisualMode, VISUAL_LABEL, VISUAL_MODE, visualModeAtom } from '@views/player/model/visual';
 import { useAtom } from 'jotai';
 import type { JSX } from 'react';
-import { isVisualMode, VISUAL_LABEL, VISUAL_MODE, visualModeAtom } from '../../model/visual';
 
 export function VisualSettings(): JSX.Element {
   const [mode, setMode] = useAtom(visualModeAtom);

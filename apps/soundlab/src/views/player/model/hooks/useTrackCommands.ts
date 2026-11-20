@@ -1,13 +1,13 @@
 'use client';
 
+import { useAutoAdvance } from '@views/player/model/hooks/useAutoAdvance';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import { usePlayPause } from '@views/player/model/hooks/usePlayPause';
+import { useQueueSteps } from '@views/player/model/hooks/useQueueSteps';
+import type { GoTo } from '@views/player/model/hooks/useTrackSwitch';
+import { currentIndexAtom, playbackQueueAtom, resumeNoticeAtom } from '@views/player/model/store/playback';
 import { useAtom, useSetAtom } from 'jotai';
 import { useCallback, useEffect } from 'react';
-import { currentIndexAtom, playbackQueueAtom, resumeNoticeAtom } from '../store/playback';
-import { useAutoAdvance } from './useAutoAdvance';
-import type { PlaybackEngine } from './useEngineRefs';
-import { usePlayPause } from './usePlayPause';
-import { useQueueSteps } from './useQueueSteps';
-import type { GoTo } from './useTrackSwitch';
 
 const PLAY_CURRENT = -1;
 

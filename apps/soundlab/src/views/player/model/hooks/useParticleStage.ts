@@ -1,12 +1,12 @@
 import { useAtomValue } from 'jotai';
 import type { RefObject } from 'react';
 
-import { currentIndexAtom } from '../store/playback';
+import { currentIndexAtom } from '@views/player/model/store/playback';
 
-import { VISUAL_MODE, visualModeAtom } from '../visual';
-import { useArtworkSwap } from './useArtworkSwap';
-import { useStageFrame } from './useStageFrame';
-import { useStageRenderer } from './useStageRenderer';
+import { useArtworkSwap } from '@views/player/model/hooks/useArtworkSwap';
+import { useStageFrame } from '@views/player/model/hooks/useStageFrame';
+import { useStageRenderer } from '@views/player/model/hooks/useStageRenderer';
+import { VISUAL_MODE, visualModeAtom } from '@views/player/model/visual';
 
 interface ParticleStageInput {
   slotRef: RefObject<HTMLDivElement | null>;

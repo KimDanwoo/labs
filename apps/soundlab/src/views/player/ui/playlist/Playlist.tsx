@@ -1,17 +1,17 @@
 'use client';
 
 import { ScrollArea } from '@shared/ui/ScrollArea';
+import { PLAYLIST_ID } from '@views/player/config/layout';
+import { useScrollCurrentIntoView } from '@views/player/model/hooks/useScrollCurrentIntoView';
+import { currentIndexAtom } from '@views/player/model/store/playback';
+import { BrowseControls } from '@views/player/ui/library/BrowseControls';
+import { ListeningHistory } from '@views/player/ui/library/ListeningHistory';
+import { PlaylistCollections } from '@views/player/ui/playlist/PlaylistCollections';
+import { PlaylistHeader } from '@views/player/ui/playlist/PlaylistHeader';
+import { PlaylistSummary } from '@views/player/ui/playlist/PlaylistSummary';
+import { PlaylistTracks } from '@views/player/ui/playlist/PlaylistTracks';
+import { QueueStatus } from '@views/player/ui/playlist/QueueStatus';
 import { useAtomValue } from 'jotai';
-import { PLAYLIST_ID } from '../../config/layout';
-import { useScrollCurrentIntoView } from '../../model/hooks/useScrollCurrentIntoView';
-import { currentIndexAtom } from '../../model/store/playback';
-import { BrowseControls } from '../library/BrowseControls';
-import { ListeningHistory } from '../library/ListeningHistory';
-import { PlaylistCollections } from './PlaylistCollections';
-import { PlaylistHeader } from './PlaylistHeader';
-import { PlaylistSummary } from './PlaylistSummary';
-import { PlaylistTracks } from './PlaylistTracks';
-import { QueueStatus } from './QueueStatus';
 
 export function Playlist() {
   const index = useAtomValue(currentIndexAtom);

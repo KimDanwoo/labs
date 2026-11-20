@@ -1,1 +1,1 @@
-export { PlayerView } from './ui/PlayerView';
+export { PlayerView } from '@views/player/ui/PlayerView';

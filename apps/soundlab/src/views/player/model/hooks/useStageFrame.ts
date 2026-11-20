@@ -1,13 +1,13 @@
 import { useRef, type RefObject } from 'react';
 
 import { useFrame } from '@shared/lib/frame';
-import { frameState } from '../store/playback';
+import { frameState } from '@views/player/model/store/playback';
 
-import { BEAT_RIPPLE, DECAY, FRAME, MORPH, TRAIL } from '../../config/stage';
-import type { Renderer } from '../../lib/stage/renderer';
-import { advanceRipples, claimRipple, rippleBuffer, seedBuffer } from '../../lib/stage/ripplePool';
-import type { useArtworkSwap } from './useArtworkSwap';
-import type { StageLayout } from './useStageRenderer';
+import { BEAT_RIPPLE, DECAY, FRAME, MORPH, TRAIL } from '@views/player/config/stage';
+import type { Renderer } from '@views/player/lib/stage/renderer';
+import { advanceRipples, claimRipple, rippleBuffer, seedBuffer } from '@views/player/lib/stage/ripplePool';
+import type { useArtworkSwap } from '@views/player/model/hooks/useArtworkSwap';
+import type { StageLayout } from '@views/player/model/hooks/useStageRenderer';
 
 const STILL_SIGNALS = { level: 0, swell: 0, pre: 0, hit: 0, air: 0 } as const;
 

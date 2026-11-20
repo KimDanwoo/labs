@@ -1,11 +1,11 @@
 'use client';
 
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import type { GoTo } from '@views/player/model/hooks/useTrackSwitch';
+import { type PlaybackQueue, adjacentTrack, playableIds, resolveQueue } from '@views/player/model/queue';
+import { currentIndexAtom, playbackQueueAtom, resumeNoticeAtom, shuffleAtom } from '@views/player/model/store/playback';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
-import { type PlaybackQueue, adjacentTrack, playableIds, resolveQueue } from '../queue';
-import { currentIndexAtom, playbackQueueAtom, resumeNoticeAtom, shuffleAtom } from '../store/playback';
-import type { PlaybackEngine } from './useEngineRefs';
-import type { GoTo } from './useTrackSwitch';
 
 export function useQueueSteps({ tracks, refs, queueRef, listening }: PlaybackEngine, goTo: GoTo) {
   const { resumeRef } = refs;

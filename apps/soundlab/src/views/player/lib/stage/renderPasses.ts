@@ -6,9 +6,9 @@ import {
   IDLE_SEEDS,
   STATIC_DECAY,
   THRESHOLD_PER_HIT,
-} from '../../config/renderer';
-import { bindTexture, type Program, type Target } from './glKit';
-import type { RendererResources } from './rendererResources';
+} from '@views/player/config/renderer';
+import { bindTexture, type Program, type Target } from '@views/player/lib/stage/glKit';
+import type { RendererResources } from '@views/player/lib/stage/rendererResources';
 
 export type ParticleUniforms = {
   width: number;

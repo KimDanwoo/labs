@@ -1,13 +1,18 @@
 'use client';
 
+import type { ScWidget } from '@views/player/api/widget';
+import { PLAYBACK_MESSAGE, WIDGET_EVENT } from '@views/player/config/playback';
+import type { PlaybackEngine } from '@views/player/model/hooks/useEngineRefs';
+import { useHeldSoundSync } from '@views/player/model/hooks/useHeldSoundSync';
+import { useSwitchRewind } from '@views/player/model/hooks/useSwitchRewind';
+import {
+  engineErrorAtom,
+  isPlayingAtom,
+  recoveryNoticeAtom,
+  resumeNoticeAtom,
+} from '@views/player/model/store/playback';
 import { useSetAtom } from 'jotai';
 import { useCallback } from 'react';
-import type { ScWidget } from '../../api/widget';
-import { PLAYBACK_MESSAGE, WIDGET_EVENT } from '../../config/playback';
-import { engineErrorAtom, isPlayingAtom, recoveryNoticeAtom, resumeNoticeAtom } from '../store/playback';
-import type { PlaybackEngine } from './useEngineRefs';
-import { useHeldSoundSync } from './useHeldSoundSync';
-import { useSwitchRewind } from './useSwitchRewind';
 
 export function usePlaybackEvents(engine: PlaybackEngine) {
   const { refs, clock, listening, volume, lastPlayed } = engine;

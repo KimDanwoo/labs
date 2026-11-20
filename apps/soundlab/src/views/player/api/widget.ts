@@ -1,5 +1,5 @@
 import type { Track } from '@entities/track';
-import { REQUEST_TIMEOUT_MS } from '../config/network';
+import { REQUEST_TIMEOUT_MS } from '@views/player/config/network';
 
 const WIDGET_API_SRC = 'https://w.soundcloud.com/player/api.js';
 

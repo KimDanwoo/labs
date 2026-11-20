@@ -1,6 +1,6 @@
+import { formatDurationMs, formatSeconds } from '@views/player/lib/formatTrack';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { formatDurationMs, formatSeconds } from '../formatTrack';
 
 test('track length and the playback bar show the same truncated seconds', () => {
   const durationMs = 200_600;

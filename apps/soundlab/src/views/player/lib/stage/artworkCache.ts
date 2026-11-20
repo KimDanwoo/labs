@@ -1,6 +1,6 @@
 import { artworkUrl, TRACKS } from '@entities/track';
 
-import { ARTWORK_TEXTURE_SIZE } from '../../config/stage';
+import { ARTWORK_TEXTURE_SIZE } from '@views/player/config/stage';
 
 /**
  * 아트워크는 다른 오리진이므로 crossOrigin 없이는 텍스처 업로드가 보안 오류로 막힌다.

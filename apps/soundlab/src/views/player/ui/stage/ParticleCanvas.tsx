@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 
-import { useParticleStage } from '../../model/hooks/useParticleStage';
+import { useParticleStage } from '@views/player/model/hooks/useParticleStage';
 
 interface ParticleCanvasProps {
   slotRef: RefObject<HTMLDivElement | null>;

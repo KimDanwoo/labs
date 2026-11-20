@@ -1,8 +1,8 @@
 import { Button } from '@shared/ui/Button';
+import { MS_PER_MINUTE } from '@views/player/config/time';
+import { clearHistoryAtom, libraryAtom, storageNoticeAtom } from '@views/player/model/library';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX } from 'react';
-import { MS_PER_MINUTE } from '../../config/time';
-import { clearHistoryAtom, libraryAtom, storageNoticeAtom } from '../../model/library';
 
 export function ListeningHistory(): JSX.Element {
   const library = useAtomValue(libraryAtom);

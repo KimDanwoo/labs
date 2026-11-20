@@ -1,5 +1,5 @@
+import { playbackQueueAtom } from '@views/player/model/store/playback';
 import { useAtomValue } from 'jotai';
-import { playbackQueueAtom } from '../../model/store/playback';
 
 export function QueueStatus() {
   const queue = useAtomValue(playbackQueueAtom);

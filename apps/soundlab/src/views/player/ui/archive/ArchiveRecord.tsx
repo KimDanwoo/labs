@@ -1,11 +1,11 @@
 import { artworkUrl, PLAYER_SCREEN, TRACKS, type Track } from '@entities/track';
+import { EAGER_ARTWORK_COUNT } from '@views/player/config/display';
+import { formatDurationMs } from '@views/player/lib/formatTrack';
+import { playerPath } from '@views/player/lib/playerUrl';
+import { usePlaybackControls } from '@views/player/model/hooks/usePlaybackControls';
+import { currentIndexAtom, isPlayingAtom, playerScreenAtom } from '@views/player/model/store/playback';
 import { useAtomValue, useSetAtom } from 'jotai';
 import type { JSX, MouseEvent } from 'react';
-import { EAGER_ARTWORK_COUNT } from '../../config/display';
-import { formatDurationMs } from '../../lib/formatTrack';
-import { playerPath } from '../../lib/playerUrl';
-import { usePlaybackControls } from '../../model/hooks/usePlaybackControls';
-import { currentIndexAtom, isPlayingAtom, playerScreenAtom } from '../../model/store/playback';
 
 type Props = { track: Track; position: number };
 

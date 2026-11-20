@@ -1,7 +1,7 @@
 'use client';
 
+import type { Playback } from '@views/player/model/hooks/usePlayback';
 import { useEffect } from 'react';
-import type { Playback } from './usePlayback';
 
 /** 방향키만 10초다. YouTube 원본은 5초이고 10초는 J/L. */
 const SEEK_SEC = 10;
