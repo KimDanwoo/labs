@@ -12,6 +12,8 @@ export const ISLAND_MARK_ASSET = 'ui/islandMark.webp';
 
 export const BLOG_URL = 'https://danwoo.dev/';
 
+export const ORIGIN_URL = 'https://github.com/brunosimon/folio-2025';
+
 export const PAINT_OPTIONS = [
   { value: 'black', label: '검정' },
   { value: 'orange', label: '오렌지' },
