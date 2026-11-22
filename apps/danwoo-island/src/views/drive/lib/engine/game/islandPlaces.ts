@@ -10,7 +10,6 @@ export type PlaceIcon =
   | 'shower'
   | 'bonfire'
   | 'controls'
-  | 'name'
   | 'cookie'
   | 'tornado'
   | 'blog'
@@ -47,6 +46,5 @@ export const ISLAND_PLACES: readonly IslandPlace[] = [
   { name: '샤워장', respawnName: 'toilet', icon: 'shower', description: '차를 씻어 내요' },
   { name: '모닥불', respawnName: 'bonfire', icon: 'bonfire', description: '해변 모닥불' },
   { name: '조작법', respawnName: 'controls', icon: 'controls', description: '조작법 안내판' },
-  { name: '이름 간판', respawnName: 'landing', icon: 'name', description: '김단우 이름 간판', labelSide: 'left' },
   { name: '출발점', respawnName: 'beachStart', icon: 'start', description: '처음 출발한 해변' },
 ];
