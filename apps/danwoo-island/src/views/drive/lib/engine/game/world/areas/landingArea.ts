@@ -3,14 +3,11 @@ import { float, Fn, instancedArray, step, uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { INPUT_MODE, type InputMode } from '@views/drive/lib/engine/game/inputs/inputTypes';
-import { objectOf } from '@views/drive/lib/engine/game/objectColliders';
 import { Area } from '@views/drive/lib/engine/game/world/areas/area';
-import { replaceLandingName } from '@views/drive/lib/engine/game/world/areas/landingName';
 import { replaceBonfireBase } from '@views/drive/lib/engine/game/world/islandStructures';
 import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
 import { rebuildKeyboardDeck, rebuildKiosk } from '@views/drive/lib/engine/game/world/villageStructures';
 
-const LETTER_CONTACT_THRESHOLD = 5;
 const EMBERS = { count: 30, elevation: 5, size: 0.5, segments: 8, hideAt: 0.8, hideLift: 100 } as const;
 const BURN_DELAY = 2;
 const EMBER_BOUNDS = { centerY: 2, radius: 2, delayFrames: 2 } as const;
@@ -33,12 +30,17 @@ function emberData(): { positions: Float32Array; scales: Float32Array } {
   return { positions, scales };
 }
 
+const NAME_LETTERS = /^refLettersPhysicalDynamic/;
+
+function removeNameLetters(model: THREE.Object3D): void {
+  for (const letter of model.children.filter(({ name }) => NAME_LETTERS.test(name))) model.remove(letter);
+}
+
 export class LandingArea extends Area {
   readonly #localTime = uniform(0);
 
   constructor(model: THREE.Object3D) {
     super(model);
-    this.#makeLettersAudible();
     this.#createKioskPoint();
     this.#createControlsPoint();
     this.#createBonfire();
@@ -47,7 +49,7 @@ export class LandingArea extends Area {
   override setObjects(): void {
     replaceBonfireBase(this.model);
     rebuildVillageProps(this.model);
-    replaceLandingName(this.model);
+    removeNameLetters(this.model);
     rebuildKiosk(this.model, this.game.texture('islandMapTexture'));
     rebuildKeyboardDeck(this.model);
     super.setObjects();
@@ -60,19 +62,6 @@ export class LandingArea extends Area {
       onConceal: () => interactiveButtons.removeItems(['interact']),
       onHide: () => interactiveButtons.removeItems(['interact']),
     };
-  }
-
-  #makeLettersAudible(): void {
-    const { RAPIER, audio } = this.game;
-    for (const letter of this.references.items.get('letters') ?? []) {
-      const physical = objectOf(letter).physical;
-      const collider = physical?.colliders[0];
-      if (!physical) continue;
-      if (!collider) continue;
-      collider.setActiveEvents(RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS);
-      collider.setContactForceEventThreshold(LETTER_CONTACT_THRESHOLD);
-      physical.onCollision = (force, position) => audio.groups.get('hitBrick')?.playRandomNext(force, position);
-    }
   }
 
   #createKioskPoint(): void {
