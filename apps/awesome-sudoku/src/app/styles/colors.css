@@ -11,6 +11,8 @@
   --color-cell-selected: rgb(var(--rgb-cell-selected));
   --color-error-text: rgb(var(--rgb-error-text));
   --color-glass: rgb(var(--rgb-glass));
+  --color-goban: rgb(var(--rgb-goban));
+  --color-goban-line: rgb(var(--rgb-goban-line));
   --color-gradient-from: rgb(var(--rgb-gradient-from));
   --color-gradient-to: rgb(var(--rgb-gradient-to));
   --color-hint-text: rgb(var(--rgb-hint-text));
@@ -73,6 +75,9 @@
   --rgb-hint-text: 16, 185, 129;
 
   --rgb-divider: 241, 245, 249;
+
+  --rgb-goban: 233, 198, 140;
+  --rgb-goban-line: 96, 66, 28;
 }
 
 .dark {
@@ -123,4 +128,7 @@
   --rgb-hint-text: 52, 211, 153;
 
   --rgb-divider: 44, 44, 46;
+
+  --rgb-goban: 178, 140, 88;
+  --rgb-goban-line: 62, 42, 16;
 }
