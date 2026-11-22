@@ -43,6 +43,7 @@ function ropeMaterial(alphaNode: THREE.Node<'float'>): MeshDefaultMaterial {
     alphaNode,
     hasWater: false,
     hasLightBounce: false,
+    hasSeeThrough: true,
   });
 }
 
@@ -65,6 +66,7 @@ function miniImageMaterial(loaded: THREE.Texture, shades: Shades): MeshDefaultMa
     colorNode: textureColor,
     hasWater: false,
     hasLightBounce: false,
+    hasSeeThrough: true,
     transparent: true,
   });
   const base = material.shadedOutput;

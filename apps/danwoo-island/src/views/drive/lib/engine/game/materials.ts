@@ -63,7 +63,12 @@ function convert(base: ConvertibleMaterial): MeshDefaultMaterial {
   const isLabel = LABEL_MATERIALS.has(base.name) && map !== null;
   const colorNode = map ? texture(map).rgb : uniform(base.color.clone()).rgb;
   const alphaNode = isLabel ? texture(map).r : baseAlpha(base);
-  const material = new MeshDefaultMaterial({ colorNode, alphaNode, transparent: isLabel || base.transparent });
+  const material = new MeshDefaultMaterial({
+    colorNode,
+    alphaNode,
+    transparent: isLabel || base.transparent,
+    hasSeeThrough: true,
+  });
   material.name = base.name;
   material.premultipliedAlpha = isLabel;
   material.map = map;
@@ -103,7 +108,10 @@ export class Materials {
   readonly #emissiveOutputs = new Map<string, THREE.Node<'vec4'>>();
 
   constructor() {
-    const palette = new MeshDefaultMaterial({ colorNode: texture(getGame().texture('paletteTexture')).rgb });
+    const palette = new MeshDefaultMaterial({
+      colorNode: texture(getGame().texture('paletteTexture')).rgb,
+      hasSeeThrough: true,
+    });
     palette.name = PALETTE;
     this.#named.set(PALETTE, palette);
     for (const [name, options] of Object.entries(EMISSIVE_GRADIENTS)) this.emissiveGradient(name, options);

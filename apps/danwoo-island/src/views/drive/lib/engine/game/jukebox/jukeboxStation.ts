@@ -88,7 +88,7 @@ export class JukeboxStation {
       const pulse = sin(time.mul(GLOW.speed)).mul(0.5).add(0.5).mul(this.#presence).mul(GLOW.strength);
       return texture(game.texture('paletteTexture'), uv()).rgb.mul(arch.mul(pulse).add(1));
     })();
-    mesh.material = new MeshDefaultMaterial({ colorNode });
+    mesh.material = new MeshDefaultMaterial({ colorNode, hasSeeThrough: true });
   }
 
   #fadePresence(isPlaying: boolean): void {

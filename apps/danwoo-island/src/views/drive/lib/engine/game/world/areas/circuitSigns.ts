@@ -62,7 +62,7 @@ function signTexture({ size, lines }: { size: readonly [number, number]; lines: 
 }
 
 function inkedMaterial(map: THREE.Texture): MeshDefaultMaterial {
-  const material = new MeshDefaultMaterial({ colorNode: color(BOARD_COLOR).rgb, hasWater: false });
+  const material = new MeshDefaultMaterial({ colorNode: color(BOARD_COLOR).rgb, hasWater: false, hasSeeThrough: true });
   const base = material.shadedOutput;
   const ink = texture(map, uv(1));
   material.outputNode = vec4(mix(base.rgb, ink.rgb, ink.a), base.a);

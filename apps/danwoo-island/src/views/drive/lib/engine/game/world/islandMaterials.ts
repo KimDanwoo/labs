@@ -53,7 +53,7 @@ export const VERTEX_COLOR_KEY = 'shaded';
 let vertexColorMaterial: MeshDefaultMaterial | null = null;
 function sharedVertexColorMaterial(): MeshDefaultMaterial {
   if (vertexColorMaterial) return vertexColorMaterial;
-  vertexColorMaterial = new MeshDefaultMaterial({ colorNode: attribute('color', 'vec3') });
+  vertexColorMaterial = new MeshDefaultMaterial({ colorNode: attribute('color', 'vec3'), hasSeeThrough: true });
   vertexColorMaterial.userData.prevent = true;
   return vertexColorMaterial;
 }
@@ -78,6 +78,7 @@ function shadedMaterial(name: ShadeName): MeshDefaultMaterial {
     colorNode: uniform(new THREE.Color(SHADES[name])).rgb,
     hasCoreShadows: isLit,
     hasDropShadows: isLit,
+    hasSeeThrough: true,
   });
   material.userData.prevent = true;
   shadedMaterials.set(name, material);

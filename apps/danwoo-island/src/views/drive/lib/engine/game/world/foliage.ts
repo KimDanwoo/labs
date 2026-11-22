@@ -1,28 +1,13 @@
 import { alea } from 'seedrandom';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import {
-  Fn,
-  float,
-  mix,
-  normalWorld,
-  positionLocal,
-  positionView,
-  rotateUV,
-  screenSize,
-  screenUV,
-  smoothstep,
-  step,
-  texture,
-  uniform,
-  uv,
-  vec2,
-} from 'three/tsl';
+import { Fn, mix, normalWorld, positionLocal, rotateUV, smoothstep, texture, uniform, uv, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 import { applyInstanceMatrix } from '@views/drive/lib/engine/game/utilities/instanceMatrix';
+import { distanceToVehicleOnScreen, isInFrontOfVehicle } from '@views/drive/lib/engine/game/world/vehicleSeeThrough';
 
 type ColorUniform = THREE.UniformNode<'color', THREE.Color>;
 
@@ -30,7 +15,6 @@ interface FoliageOptions {
   references: readonly THREE.Object3D[];
   colorA: ColorUniform;
   colorB: ColorUniform;
-  isSeeThrough?: boolean;
 }
 
 const rng = alea('foliage');
@@ -39,7 +23,7 @@ const PLANE_SIZE = 1.2;
 const LEAF_CLUSTER = { seed: 'leafCluster', size: 128, count: 8, length: 0.2, width: 0.12, margin: 0.24 } as const;
 const NORMAL_BLEND = 0.85;
 const WIND_ROTATION = 2.2;
-const SEE_THROUGH_EDGE = { min: 3, max: 15 } as const;
+const SEE_THROUGH_EDGE = { min: 5, max: 15 } as const;
 const SEE_THROUGH_DEPTH_MARGIN = 1;
 
 function leafClusterTexture(): THREE.CanvasTexture {
@@ -108,18 +92,14 @@ function facingMatrices(references: readonly THREE.Object3D[]): THREE.Matrix4[] 
 
 export class Foliage {
   seeThroughMultiplier = 1;
-  readonly #isSeeThrough: boolean;
   readonly #threshold = uniform(0.3);
-  readonly #seeThroughPosition = uniform(vec2());
   readonly #seeThroughEdgeMin = uniform(0.11);
   readonly #seeThroughEdgeMax = uniform(0.57);
-  readonly #vehicleDepth = uniform(0);
   readonly #shadowOffset = uniform(1);
   readonly #instanceMatrix: THREE.InstancedBufferAttribute;
 
-  constructor({ references, colorA, colorB, isSeeThrough = false }: FoliageOptions) {
+  constructor({ references, colorA, colorB }: FoliageOptions) {
     const game = getGame();
-    this.#isSeeThrough = isSeeThrough;
     const geometry = mergeGeometries(Array.from({ length: PLANE_COUNT }, leafPlane));
     const material = this.#material(colorA, colorB);
     const matrices = facingMatrices(references);
@@ -146,17 +126,10 @@ export class Foliage {
       return texture(foliageTexture, rotatedUv).r;
     });
     const alphaNode = Fn(() => {
-      const alpha = float(1);
-      if (this.#isSeeThrough) {
-        const toVehicle = screenUV.sub(this.#seeThroughPosition);
-        toVehicle.mulAssign(vec2(screenSize.x.div(screenSize.y), 1));
-        const isInFront = step(positionView.z.negate(), this.#vehicleDepth.add(SEE_THROUGH_DEPTH_MARGIN));
-        const edgeFade = smoothstep(this.#seeThroughEdgeMin, this.#seeThroughEdgeMax, toVehicle.length());
-        const distanceFade = mix(1, edgeFade, isInFront);
-        alpha.assign(foliageAlpha().mul(distanceFade.mul(this.#threshold.oneMinus()).add(this.#threshold)));
-      } else {
-        alpha.assign(foliageAlpha());
-      }
+      const isInFront = isInFrontOfVehicle(SEE_THROUGH_DEPTH_MARGIN);
+      const edgeFade = smoothstep(this.#seeThroughEdgeMin, this.#seeThroughEdgeMax, distanceToVehicleOnScreen());
+      const distanceFade = mix(1, edgeFade, isInFront);
+      const alpha = foliageAlpha().mul(distanceFade.mul(this.#threshold.oneMinus()).add(this.#threshold)).toVar();
       alpha.subAssign(this.#threshold);
       return alpha;
     })();
@@ -176,10 +149,7 @@ export class Foliage {
   }
 
   update(): void {
-    const { world, view, player } = getGame();
-    const screenPosition = world.visualVehicle?.screenPosition;
-    if (screenPosition) this.#seeThroughPosition.value.copy(screenPosition);
-    this.#vehicleDepth.value = view.depthOf(player.position);
+    const { view } = getGame();
     const radius = view.spherical.radius.current;
     this.#seeThroughEdgeMin.value = (SEE_THROUGH_EDGE.min / radius) * this.seeThroughMultiplier;
     this.#seeThroughEdgeMax.value = (SEE_THROUGH_EDGE.max / radius) * this.seeThroughMultiplier;

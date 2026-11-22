@@ -11,7 +11,12 @@ interface TexturedMeshOptions {
 
 export function canvasMaterial(canvasTexture: THREE.Texture): MeshDefaultMaterial {
   const sample = texture(canvasTexture, uv());
-  const material = new MeshDefaultMaterial({ colorNode: sample.rgb, alphaNode: sample.a, hasDropShadows: false });
+  const material = new MeshDefaultMaterial({
+    colorNode: sample.rgb,
+    alphaNode: sample.a,
+    hasDropShadows: false,
+    hasSeeThrough: true,
+  });
   material.userData.prevent = true;
   return material;
 }

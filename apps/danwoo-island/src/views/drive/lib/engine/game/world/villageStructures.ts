@@ -67,6 +67,7 @@ function boardScreen(board: Frame, screen: THREE.Texture, segments: number): Not
     colorNode: texture(screen).rgb,
     hasCoreShadows: false,
     hasDropShadows: false,
+    hasSeeThrough: true,
   });
   material.userData.prevent = true;
   const mesh = new THREE.Mesh(geometry, material);

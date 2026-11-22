@@ -2,6 +2,7 @@ import * as THREE from 'three/webgpu';
 
 import { TextCanvas } from '@views/drive/lib/engine/game/textCanvas';
 import { Area } from '@views/drive/lib/engine/game/world/areas/area';
+import { isClearOfVehicleSight } from '@views/drive/lib/engine/game/world/vehicleSeeThrough';
 
 const SCORE = {
   font: { family: 'MaruBuri', weight: '700', size: 88 },
@@ -50,6 +51,7 @@ export function createScoreboard(area: Area): Scoreboard {
     alphaMap: text.texture,
     alphaTest: SCORE.alphaTest,
   });
+  material.maskNode = isClearOfVehicleSight();
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(plane.width, plane.height), material);
   mesh.position.set(...SCORE.position);
   group.add(mesh);

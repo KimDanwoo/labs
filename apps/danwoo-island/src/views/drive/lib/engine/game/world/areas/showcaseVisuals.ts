@@ -1,3 +1,4 @@
+import { isClearOfVehicleSight } from '@views/drive/lib/engine/game/world/vehicleSeeThrough';
 import gsap from 'gsap';
 import { color, float, Fn, mix, texture, uniform, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
@@ -85,7 +86,12 @@ export function firstChild(parent: THREE.Object3D): THREE.Object3D {
 }
 
 export function applyTextMaterial(mesh: THREE.Object3D, map: THREE.Texture, shades: Shades): void {
-  const material = new MeshDefaultMaterial({ hasWater: false, alphaNode: texture(map).r, transparent: true });
+  const material = new MeshDefaultMaterial({
+    hasWater: false,
+    alphaNode: texture(map).r,
+    transparent: true,
+    hasSeeThrough: true,
+  });
   const base = material.shadedOutput;
   material.outputNode = Fn(() => vec4(mix(base.rgb, textColor(), shades.texts.uniform), base.a))();
   mesh.castShadow = false;
@@ -106,6 +112,7 @@ export function highlightTextMaterial(
     hasLightBounce,
     alphaNode: texture(map).r,
     transparent: true,
+    hasSeeThrough: true,
   });
   const base = material.shadedOutput;
   material.outputNode = Fn(() =>
@@ -116,11 +123,12 @@ export function highlightTextMaterial(
 
 export function createHoverMaterials(shades: Shades): HoverMaterials {
   const white = textColor();
-  const inactive = new MeshDefaultMaterial({ colorNode: white, hasWater: false });
+  const inactive = new MeshDefaultMaterial({ colorNode: white, hasWater: false, hasSeeThrough: true });
   const base = inactive.shadedOutput;
   inactive.outputNode = Fn(() => vec4(mix(base.rgb, textColor(), shades.texts.uniform), 1))();
   const active = new THREE.MeshBasicNodeMaterial({ transparent: true });
   active.outputNode = vec4(white.mul(HIGHLIGHT_STRENGTH), float(1));
+  active.maskNode = isClearOfVehicleSight();
   return { inactive, active };
 }
 

@@ -1,3 +1,4 @@
+import { discardOverVehicle } from '@views/drive/lib/engine/game/world/vehicleSeeThrough';
 import { Fn, texture, uv, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
@@ -27,6 +28,7 @@ function neonMaterial(neonTexture: THREE.Texture): THREE.MeshBasicNodeMaterial {
   const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false });
   material.outputNode = Fn(() => {
     const sample = texture(neonTexture, uv());
+    discardOverVehicle();
     return vec4(revealNode(sample.rgb.mul(NEON_GAIN)), 1);
   })();
   material.fog = false;
