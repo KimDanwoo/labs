@@ -3,4 +3,5 @@ export const GAME_NAV_ITEMS = [
   { href: '/killer', label: '킬러' },
   { href: '/slitherlink', label: '슬리더링크' },
   { href: '/gomoku', label: '오목' },
+  { href: '/walls', label: '담쌓기' },
 ] as const;
