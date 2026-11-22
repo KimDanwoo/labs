@@ -9,8 +9,8 @@ export class Bushes {
   constructor() {
     this.foliage = new Foliage({
       references: getGame().model('bushesReferences').scene.children,
-      colorA: uniform(color('#438a50')),
-      colorB: uniform(color('#91c85c')),
+      colorA: uniform(color('#2f7d5c')),
+      colorB: uniform(color('#b2d862')),
     });
   }
 }

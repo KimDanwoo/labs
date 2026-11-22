@@ -3,12 +3,20 @@ import {
   type Point,
   WORLD_SIZE,
 } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
-import { bridgeDistance, landDistance, objectDistance, padDistance, respawnDistance, trackClearance } from './fields';
+import {
+  bridgeDistance,
+  landDistance,
+  objectDistance,
+  padDistance,
+  respawnDistance,
+  trackClearance,
+  trailDistance,
+} from './fields';
 import { random } from './random';
 
 const SEED = 20261118;
 const HALF_WORLD = WORLD_SIZE / 2;
-const GROVE = { spacing: 11, jitter: 0.8, inland: 4, track: 5, pad: 4, respawn: 8, bridge: 8 } as const;
+const GROVE = { spacing: 11, jitter: 0.8, inland: 4, track: 5, pad: 4, respawn: 8, bridge: 8, trail: 7 } as const;
 export const GROVE_RADIUS = 6;
 
 const hasRoom = (point: Point): boolean =>
@@ -16,7 +24,8 @@ const hasRoom = (point: Point): boolean =>
   trackClearance(point) > GROVE.track &&
   padDistance(point) > GROVE.pad &&
   respawnDistance(point) > GROVE.respawn &&
-  bridgeDistance(point) > GROVE.bridge;
+  bridgeDistance(point) > GROVE.bridge &&
+  trailDistance(point) > GROVE.trail;
 
 function plantGroves(): Point[] {
   const next = random(SEED);
@@ -39,13 +48,14 @@ export function groveDistance(point: Point): number {
   return Math.min(...GROVES.map(([x, z]) => Math.hypot(point[0] - x, point[1] - z)));
 }
 
-const GLADE = { spacing: 5, apart: 11, inland: 2.5, track: 2.5, object: 3, respawn: 3 } as const;
+const GLADE = { spacing: 5, apart: 11, inland: 2.5, track: 2.5, object: 3, respawn: 3, trail: 5 } as const;
 export const GLADE_RADIUS = 2.5;
 
 const canGrow = (point: Point): boolean =>
   landDistance(point) > GLADE.inland &&
   trackClearance(point) > GLADE.track &&
   objectDistance(point) > GLADE.object &&
+  trailDistance(point) > GLADE.trail &&
   respawnDistance(point) > GLADE.respawn;
 
 const isBare = (point: Point, greens: readonly Point[]): boolean =>

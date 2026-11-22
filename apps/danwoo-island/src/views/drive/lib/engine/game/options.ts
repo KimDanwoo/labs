@@ -3,9 +3,9 @@ import { QUALITY } from '@views/drive/lib/engine/game/quality';
 import { createElement } from '@views/drive/lib/engine/game/utilities/createElement';
 import { requireElement } from '@views/drive/lib/engine/game/utilities/requireElement';
 
-const PAINTS = ['black', 'orange', 'white', 'red', 'flames', 'abyssal'] as const;
+const PAINTS = ['coral', 'black', 'orange', 'white', 'red', 'flames', 'abyssal'] as const;
 type PaintName = (typeof PAINTS)[number];
-const DEFAULT_PAINT: PaintName = 'black';
+const DEFAULT_PAINT: PaintName = 'coral';
 const PAINT_STORAGE_KEY = 'danwoo-island-paint';
 const QUALITY_LABEL = { [QUALITY.high]: '높음', [QUALITY.low]: '낮음' } as const;
 

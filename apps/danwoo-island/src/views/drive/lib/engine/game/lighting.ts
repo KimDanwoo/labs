@@ -5,7 +5,7 @@ import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import { QUALITY, type QualityLevel } from '@views/drive/lib/engine/game/quality';
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
-const SUN = { phi: 0.63, theta: 0.72, phiAmplitude: 0.62, thetaAmplitude: 1.25, cycleOffset: 9 / 16 } as const;
+const SUN = { phi: 0.63, theta: 0.72, phiAmplitude: 0.62, thetaAmplitude: 1.25, cycleOffset: 0.35 } as const;
 const SHADOW = { near: 1, bias: -0.001, normalBias: 0.1 } as const;
 const SHADOW_MAP_SIZE = { [QUALITY.high]: 2048, [QUALITY.low]: 512 } satisfies Record<QualityLevel, number>;
 const SHADOW_RADIUS = { [QUALITY.high]: 3, [QUALITY.low]: 2 } satisfies Record<QualityLevel, number>;

@@ -32,6 +32,10 @@ export class InteractiveButtons {
     this.#render();
   }
 
+  has(name: string): boolean {
+    return this.#shown.has(name);
+  }
+
   clearItems(): void {
     this.#shown.clear();
     this.#render();

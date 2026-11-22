@@ -18,6 +18,7 @@ import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 import type { WorldObject } from '@views/drive/lib/engine/game/objectColliders';
 import type { Physical } from '@views/drive/lib/engine/game/physics/physicsTypes';
+import { READS_FRAMEBUFFER } from '@views/drive/lib/engine/game/preRenderer';
 import { QUALITY, type QualityLevel } from '@views/drive/lib/engine/game/quality';
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 import { lerp, remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
@@ -54,6 +55,7 @@ export class WaterSurface {
     this.#mesh.position.y = game.water.surfaceElevation;
     this.#mesh.castShadow = true;
     this.#mesh.receiveShadow = true;
+    this.#mesh.userData[READS_FRAMEBUFFER] = true;
     game.scene.children.unshift(this.#mesh);
     game.viewport.events.on(
       'throttleChange',

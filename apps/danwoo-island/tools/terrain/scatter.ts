@@ -29,7 +29,7 @@ import {
 import {
   asPlacement,
   asPlant,
-  BRIDGE_CLEARANCE,
+  bridgeLanternSpots,
   CRATE_RING,
   hasRoom,
   isApart,
@@ -44,10 +44,13 @@ import {
   RESPAWN_CLEARANCE,
   ringAround,
 } from './scatterRules';
+import { sampleTerrain } from './surface';
 
 const OUTPUT = path.resolve(import.meta.dirname, '../../src/views/drive/lib/engine/game/world/layout/islandScatter.ts');
 const SEED = 20261117;
 
+const GRASSY = 0.5;
+const isOnGrass = (point: Point): boolean => sampleTerrain(point).grass > GRASSY;
 export function writeScatter(): void {
   const next = random(SEED);
   const solid: Point[] = [];
@@ -88,12 +91,11 @@ export function writeScatter(): void {
     jungle: trees.filter((point) => landDistance(point) >= PALM_COAST).map(plant),
     rocks: [...rocks, ...inStartGarden('rocks')].map(plant),
     bushes: [...bushes, ...inStartGarden('bushes')].map(plant),
-    flowers: [...flowers, ...inStartGarden('flowers')].map(plant),
+    flowers: [...flowers, ...inStartGarden('flowers')].filter(isOnGrass).map(plant),
     lights: padCorners()
       .filter((point) => hasRoom(point, { inland: 1, track: 3, pad: -0.5 }))
       .map(asPlacement),
-    lanterns: BRIDGES.flatMap(({ from, to }) => [from, to])
-      .flatMap((end) => ringAround(end, BRIDGE_CLEARANCE - 2, 2))
+    lanterns: BRIDGES.flatMap(bridgeLanternSpots)
       .filter((point) => onLand(point, 0.5) && trackClearance(point) > 3 && respawnDistance(point) > RESPAWN_CLEARANCE)
       .map(asPlacement),
     crates: TRACK.kickers

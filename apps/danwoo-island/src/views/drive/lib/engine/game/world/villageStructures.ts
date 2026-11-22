@@ -1,10 +1,11 @@
 import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
-import { createParts } from '@views/drive/lib/engine/game/world/islandGeometry';
+import { createParts, type Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
 import {
   islandModelGeometry,
   islandModelMesh,
   islandPaletteMaterial,
 } from '@views/drive/lib/engine/game/world/islandModels';
+import { meshComponents } from '@views/drive/lib/engine/game/world/meshComponents';
 import {
   cuboidFrame,
   findChild,
@@ -88,7 +89,34 @@ export function noticeBoard(
   return { group, screen: screenMesh };
 }
 const KEYBOARD_DECK = 'Plane002';
+const GLOWING_KEYS = 'Plane004';
+const KEY_TILE = { footprint: 0.86, height: 0.16, inset: 0.78, face: 0.03, wideRatio: 1.8 } as const;
 const OLD_MAP_PLAQUE = 'stylizedMap';
+
+function keyTile(parts: Parts, box: THREE.Box3): void {
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const { footprint, height, inset, face, wideRatio } = KEY_TILE;
+  const isWide = Math.max(size.x, size.z) > Math.min(size.x, size.z) * wideRatio;
+  const base = box.min.y;
+  parts.box('timber', [size.x * footprint, height, size.z * footprint], {
+    position: [center.x, base + height / 2, center.z],
+  });
+  parts.box(isWide ? 'bunting2' : 'bunting4', [size.x * inset, face, size.z * inset], {
+    position: [center.x, base + height + face / 2, center.z],
+  });
+}
+
+function carveKeyTiles(model: THREE.Object3D): void {
+  const keys = model.getObjectByName(GLOWING_KEYS);
+  if (!(keys instanceof THREE.Mesh)) return;
+  const parts = createParts();
+  for (const { box } of meshComponents(keys.geometry).components) keyTile(parts, box);
+  keys.updateMatrix();
+  const tiles = parts.build(keys.matrix);
+  keys.parent?.add(tiles);
+  keys.removeFromParent();
+}
 
 export function rebuildKeyboardDeck(model: THREE.Object3D): void {
   const deck = model.getObjectByName(KEYBOARD_DECK);
@@ -96,12 +124,16 @@ export function rebuildKeyboardDeck(model: THREE.Object3D): void {
   deck.geometry.dispose();
   deck.geometry = islandModelGeometry('driftKeyboard');
   deck.material = islandPaletteMaterial('driftKeyboard');
+  carveKeyTiles(model);
 }
 function hideOldMapPlaque(model: THREE.Object3D): void {
   model.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
     if (Array.isArray(child.material)) return;
-    if (child.material.name === OLD_MAP_PLAQUE) child.geometry.setDrawRange(0, 0);
+    if (child.material.name !== OLD_MAP_PLAQUE) return;
+    child.geometry.setDrawRange(0, 0);
+    child.material.visible = false;
+    child.material.userData.prevent = true;
   });
 }
 

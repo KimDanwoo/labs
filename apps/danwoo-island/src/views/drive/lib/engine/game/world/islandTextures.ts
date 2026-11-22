@@ -18,7 +18,6 @@ const ISLAND_TEXTURES = new Map<string, string>(
     labCarpet: 'areas/island/labCarpet.webp',
     blackboardLabels: 'areas/island/blackboardLabels.webp',
     projectsLabels: 'areas/island/projectsLabels.webp',
-    bowlingLabelStrike: 'areas/island/bowlingLabelStrike.webp',
   }),
 );
 

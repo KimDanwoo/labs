@@ -16,6 +16,7 @@ export function createPinElement(place: IslandPlace, onSelect: () => void): HTML
     createElement('span', 'map-pin-ring'),
   ]);
   element.type = 'button';
+  element.dataset.labelSide = place.labelSide ?? '';
   element.setAttribute('aria-label', place.name);
   element.addEventListener('pointerenter', onSelect);
   element.addEventListener('focus', onSelect);

@@ -2,7 +2,7 @@ import { hash, positionWorld, texture, uniform } from 'three/tsl';
 import type * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
-import { RIPPLES, type Vec4Node } from '@views/drive/lib/engine/game/world/waterSurfaceConfig';
+import { FOAM_BEADS, RIPPLES, type Vec4Node } from '@views/drive/lib/engine/game/world/waterSurfaceConfig';
 
 type RatioNode = THREE.UniformNode<'float', number>;
 
@@ -19,7 +19,8 @@ export function ripplesNode(terrainData: Vec4Node, ripplesRatio: RatioNode): THR
     .mod(1)
     .sub(terrainData.b.remap(0, 1, -0.3, 1).oneMinus())
     .add(ripplesNoise);
-  ripples.assign(ripplesRatio.remap(0, 1, -1, -0.4).step(ripples).mul(RIPPLES.opacity));
+  const beads = texture(noises.voronoi, positionWorld.xz.mul(FOAM_BEADS.frequency)).r.step(FOAM_BEADS.radius);
+  ripples.assign(ripplesRatio.remap(0, 1, -1, RIPPLES.widest).step(ripples).mul(beads).mul(RIPPLES.opacity));
   return ripples;
 }
 

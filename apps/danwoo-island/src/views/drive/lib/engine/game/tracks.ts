@@ -9,6 +9,7 @@ import {
   sign,
   sin,
   texture,
+  uniform,
   uv,
   varying,
   vec2,
@@ -69,6 +70,8 @@ export class Track {
     });
     const dataTexture = this.#dataTexture;
     const trackData = varying(vec4());
+    const thicknessUniform = uniform(thickness);
+    const channelColor = uniform(new THREE.Vector3(...CHANNEL_COLOR[channel]));
     material.positionNode = Fn(() => {
       const fragmentSize = float(1).div(SUBDIVISIONS);
       const ratio = uv().x.sub(fragmentSize.mul(0.5));
@@ -78,7 +81,7 @@ export class Track {
       const side = sign(positionGeometry.y)
         .mul(-1)
         .mul(Math.PI * 0.5);
-      const offset = vec2(cos(angle.add(side)), sin(angle.add(side))).mul(thickness);
+      const offset = vec2(cos(angle.add(side)), sin(angle.add(side))).mul(thicknessUniform);
       return vec3(trackData.x.add(offset.x), trackData.y, trackData.z.add(offset.y));
     })();
     material.outputNode = Fn(() => {
@@ -92,7 +95,7 @@ export class Track {
       );
       const trackEdgeAlpha = uv().y.sub(0.5).abs().mul(2).oneMinus();
       const alpha = endAlpha.mul(startAlpha).mul(trackData.a).mul(trackEdgeAlpha).mul(screenEdgeAlpha);
-      return vec4(vec3(...CHANNEL_COLOR[channel]), alpha);
+      return vec4(channelColor, alpha);
     })();
     return material;
   }

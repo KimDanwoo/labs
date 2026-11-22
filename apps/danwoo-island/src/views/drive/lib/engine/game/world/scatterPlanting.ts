@@ -16,9 +16,16 @@ const SCATTERED_MODELS = {
   explosiveCratesModel: ISLAND_SCATTER.crates,
 } as const satisfies Record<string, readonly ScatterPlacement[]>;
 
-function placedObject(template: THREE.Object3D, [x, z, rotation, scale]: ScatterPlacement): THREE.Object3D {
+const LANTERN_REST_HEIGHT = 0.5;
+const REST_HEIGHTS: Partial<Record<string, number>> = { lanternsModel: LANTERN_REST_HEIGHT };
+
+function placedObject(
+  template: THREE.Object3D,
+  [x, z, rotation, scale]: ScatterPlacement,
+  height: number = template.position.y,
+): THREE.Object3D {
   const object = template.clone();
-  object.position.set(x, template.position.y, z);
+  object.position.set(x, height, z);
   object.rotation.set(0, rotation, 0);
   object.scale.copy(template.scale).multiplyScalar(scale);
   object.updateMatrixWorld(true);
@@ -36,7 +43,7 @@ export function replantScatteredModels(): void {
     const template = scene.children[0];
     if (!template) throw new Error(`${name}에 복제할 원본이 없어요.`);
     for (const child of [...scene.children]) child.removeFromParent();
-    scene.add(...placements.map((placement) => placedObject(template, placement)));
+    scene.add(...placements.map((placement) => placedObject(template, placement, REST_HEIGHTS[name])));
   }
 }
 

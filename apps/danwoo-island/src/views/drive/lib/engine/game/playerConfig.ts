@@ -13,6 +13,7 @@ export const LANDING_SOUND_WHEELS = 1;
 export const WHEELS_ON_FLOOR_ELEVATION = 1.08;
 const DRIVE_CATEGORIES = ['wandering', 'racing', 'cinematic'];
 const RACE_CATEGORIES = ['wandering', 'racing'];
+export const FLY_CATEGORY = 'wandering';
 export const SUSPENSION_ACTIONS = [
   'suspensions',
   'suspensionsFront',
@@ -66,7 +67,9 @@ export const ACTIONS = [
     keys: ['Keyboard.Enter', 'Keyboard.KeyE', 'Keyboard.KeyF', 'Gamepad.cross'],
   },
   { name: 'honk', categories: DRIVE_CATEGORIES, keys: ['Keyboard.KeyH', 'Gamepad.l3'] },
+  { name: 'fly', categories: [FLY_CATEGORY], keys: ['Keyboard.KeyG', 'Gamepad.r3'] },
 ];
+export const FLY_BUTTON = 'fly';
 export interface PlayerSounds {
   suspensions: AudioItem;
   honk: AudioItem;

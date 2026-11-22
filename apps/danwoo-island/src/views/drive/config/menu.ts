@@ -15,6 +15,7 @@ export const BLOG_URL = 'https://danwoo.dev/';
 export const ORIGIN_URL = 'https://github.com/brunosimon/folio-2025';
 
 export const PAINT_OPTIONS = [
+  { value: 'coral', label: '코랄' },
   { value: 'black', label: '검정' },
   { value: 'orange', label: '오렌지' },
   { value: 'white', label: '아이보리' },
@@ -26,6 +27,7 @@ export const PAINT_OPTIONS = [
 export const TOUCH_BUTTONS = [
   { name: 'interact', label: '확인' },
   { name: 'unstuck', label: '빼내기' },
+  { name: 'fly', label: '비행' },
   { name: 'previous', label: '' },
   { name: 'next', label: '' },
   { name: 'open', label: '' },

@@ -1,3 +1,4 @@
+import gsap from 'gsap';
 import { uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
@@ -5,23 +6,23 @@ import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import { introCenter } from '@views/drive/lib/engine/game/introCenter';
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 import {
-  glowRingMaterial,
   LABEL_DISTANCE,
   LABEL_HEIGHT,
   LABEL_HIDDEN_SCALE,
+  LOADER,
   PromptText,
-  RING,
   SoundButton,
   tweenScale,
 } from '@views/drive/lib/engine/game/world/introPrompt';
-import { isTideLoading, tideRingGeometry, tideRingMaterial } from '@views/drive/lib/engine/game/world/tideLoading';
+import { tideWaveGeometry, tideWaveMaterial } from '@views/drive/lib/engine/game/world/tideLoading';
 import { setStartupStage, STARTUP } from '@views/drive/lib/engine/islandStartup';
 
 export class Intro {
   readonly center: THREE.Vector3;
   readonly label = new THREE.Group();
-  readonly #ring: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicNodeMaterial>;
+  readonly #loader: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicNodeMaterial>;
   readonly #smoothedProgress = uniform(0);
+  readonly #loaderOpacity = uniform(1);
   #progress = 0;
   #text: PromptText | null = null;
   #soundButton: SoundButton | null = null;
@@ -30,26 +31,21 @@ export class Intro {
   constructor() {
     const game = getGame();
     this.center = introCenter(game.respawns);
-    this.#ring = this.#createRing();
+    this.#loader = this.#createLoader();
     this.#placeLabel();
     game.ticker.events.on('tick', this.#update, TICK_ORDER.intro);
   }
 
-  #createRing(): THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicNodeMaterial> {
-    const { radius, thickness, segments } = RING;
-    const geometry = isTideLoading
-      ? tideRingGeometry(radius)
-      : new THREE.RingGeometry(radius - thickness, radius, segments, 1);
-    const material = isTideLoading
-      ? tideRingMaterial(this.#smoothedProgress, radius)
-      : glowRingMaterial(this.#smoothedProgress);
-    const ring = new THREE.Mesh(geometry, material);
-    ring.position.copy(this.center);
-    ring.position.y = RING.elevation;
-    ring.rotation.x = -Math.PI * 0.5;
-    ring.rotation.z = Math.PI * 0.5;
-    getGame().scene.add(ring);
-    return ring;
+  #createLoader(): THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicNodeMaterial> {
+    const game = getGame();
+    const loader = new THREE.Mesh(tideWaveGeometry(), tideWaveMaterial(this.#smoothedProgress, this.#loaderOpacity));
+    loader.position.copy(this.center);
+    loader.position.y = LOADER.elevation;
+    loader.rotation.reorder('YXZ');
+    loader.rotation.y = game.view.spherical.theta;
+    loader.rotation.x = -Math.PI * 0.5;
+    game.scene.add(loader);
+    return loader;
   }
 
   #placeLabel(): void {
@@ -65,16 +61,16 @@ export class Intro {
     game.scene.add(this.label);
   }
 
-  hideRing(onHidden: () => void): void {
-    const ring = this.#ring;
-    tweenScale(ring, {
-      from: 1,
-      to: 0,
-      duration: 1.5,
-      ease: 'power4.in',
+  hideLoader(onHidden: () => void): void {
+    const loader = this.#loader;
+    gsap.to(this.#loaderOpacity, {
+      value: 0,
+      duration: LOADER.hideDuration,
+      ease: 'power2.in',
+      overwrite: true,
       onComplete: () => {
         onHidden();
-        ring.removeFromParent();
+        loader.removeFromParent();
       },
     });
   }
@@ -114,14 +110,14 @@ export class Intro {
 
   #tick(): void {
     const smoothed = this.#smoothedProgress;
-    smoothed.value += (this.#progress - smoothed.value) * getGame().ticker.delta * RING.smoothing;
+    smoothed.value += (this.#progress - smoothed.value) * getGame().ticker.delta * LOADER.smoothing;
   }
 
   destroy(): void {
     const game = getGame();
     this.label.removeFromParent();
-    this.#ring.geometry.dispose();
-    this.#ring.material.dispose();
+    this.#loader.geometry.dispose();
+    this.#loader.material.dispose();
     this.#text?.dispose();
     this.#soundButton?.dispose();
     game.ticker.events.off('tick', this.#update);

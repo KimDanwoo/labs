@@ -4,7 +4,7 @@ import type { InteractivePoint } from '@views/drive/lib/engine/game/interactiveP
 import type { PointAlign } from '@views/drive/lib/engine/game/interactivePointArt';
 import type { PointState } from '@views/drive/lib/engine/game/pointProximity';
 import gsap from 'gsap';
-import { Fn, max, mix, step, uv, vec3, vec4 } from 'three/tsl';
+import { Fn, mix, step, uv, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 export interface InteractivePointOptions {
@@ -39,12 +39,12 @@ export interface PointRegistry {
 }
 export const CENTER_BIAS_NDC = 0.15;
 const GROUP = { pitch: -Math.PI * 0.15, yaw: Math.PI * 0.25, scale: 0.85 } as const;
-export const RENDER_ORDER = { label: 6, diamond: 7 } as const;
+export const RENDER_ORDER = { label: 6, disc: 7 } as const;
 export const HIT_RADIUS = 0.75;
-export const DIAMOND = {
-  hidden: { threshold: 0, thickness: 0.15, offset: 0.175 },
-  open: { threshold: 0.5, thickness: 0.075, offset: 0.15 },
-  concealed: { threshold: 0.25, thickness: 0.15, offset: 0.175 },
+export const DISC = {
+  hidden: { threshold: 0, thickness: 0.1, offset: 0.05 },
+  open: { threshold: 0.5, thickness: 0.1, offset: 0.05 },
+  concealed: { threshold: 0.25, thickness: 0.1, offset: 0.05 },
 } as const;
 function foggedBackColor(shared: SharedParts): THREE.Node<'vec3'> {
   const { fog } = getGame();
@@ -67,7 +67,7 @@ export function labelMaterial(
   return material;
 }
 
-export function diamondMaterial(
+export function discMaterial(
   shared: SharedParts,
   {
     threshold,
@@ -78,7 +78,7 @@ export function diamondMaterial(
   const material = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: true });
   material.outputNode = Fn(() => {
     const pointUv = uv();
-    const distance = max(pointUv.x.sub(0.5).abs(), pointUv.y.sub(0.5).abs()).mul(2);
+    const distance = pointUv.sub(0.5).length().mul(2);
     const lineDistance = threshold.sub(distance).sub(lineOffset).abs();
     const line = step(lineDistance, lineThickness.mul(0.5));
     distance.greaterThan(threshold).discard();
@@ -95,7 +95,7 @@ export function pulseThreshold(threshold: FloatUniform): void {
     overwrite: true,
     onComplete: () => {
       gsap.to(threshold, {
-        value: DIAMOND.open.threshold,
+        value: DISC.open.threshold,
         ease: 'elastic.out(1.3,0.6)',
         duration: 1.5,
         overwrite: true,
@@ -119,13 +119,13 @@ export function setDepthTest(materials: readonly THREE.Material[], isDepthTested
   }
 }
 
-export function tweenDiamond(
+export function tweenDisc(
   {
     threshold,
     lineThickness,
     lineOffset,
   }: { threshold: FloatUniform; lineThickness: FloatUniform; lineOffset: FloatUniform },
-  target: (typeof DIAMOND)[PointState],
+  target: (typeof DISC)[PointState],
   vars: gsap.TweenVars,
   onComplete?: () => void,
 ): void {

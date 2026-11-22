@@ -1,4 +1,5 @@
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { FLIGHT_ALTITUDE } from '@views/drive/lib/engine/game/physics/flightControl';
 import type { Player } from '@views/drive/lib/engine/game/player';
 import {
   LANDING_SOUND_WHEELS,
@@ -35,6 +36,7 @@ export function syncAfterPhysics(player: Player): void {
   player.position.copy(vehicle.position);
   player.position2.set(player.position.x, player.position.z);
   view.focusPoint.trackedPosition.copy(player.position);
+  view.flightLift = vehicle.flight.isActive ? Math.max(0, player.position.y - FLIGHT_ALTITUDE.rest) : 0;
 
   const isSpeeding = Boolean(player.boosting && player.accelerating) && vehicle.speed > SPEED_LINES_SPEED;
   view.speedLines.strength = isSpeeding ? 1 : 0;

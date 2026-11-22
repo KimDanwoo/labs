@@ -9,7 +9,7 @@ export const AREA_FOOTPRINTS: Partial<Record<AreaKey, readonly Bounds[]>> = {
     [0.3, -5.3, 1.5, -4.1],
     [1.3, 4.8, 2.3, 5.8],
   ],
-  bowling: [
+  beachGoal: [
     [-3.3, 9, 1.7, 11],
     [-21.5, -1.7, 7.3, 5.2],
     [16.1, -12.7, 19.1, -10.4],

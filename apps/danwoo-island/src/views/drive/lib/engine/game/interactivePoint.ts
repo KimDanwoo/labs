@@ -14,8 +14,8 @@ import {
 } from '@views/drive/lib/engine/game/interactivePointArt';
 import {
   CENTER_BIAS_NDC,
-  DIAMOND,
-  diamondMaterial,
+  DISC,
+  discMaterial,
   HIT_RADIUS,
   type InteractivePointOptions,
   labelMaterial,
@@ -25,7 +25,7 @@ import {
   RENDER_ORDER,
   setDepthTest,
   type SharedParts,
-  tweenDiamond,
+  tweenDisc,
 } from '@views/drive/lib/engine/game/interactivePointShared';
 import type { PointState } from '@views/drive/lib/engine/game/pointProximity';
 import type { Intersect } from '@views/drive/lib/engine/game/rayCursor';
@@ -45,13 +45,13 @@ export class InteractivePoint {
   #labelMap: ReturnType<typeof texture> | null = null;
   readonly #group = new THREE.Group();
   readonly #label: THREE.Mesh;
-  readonly #diamond: THREE.Mesh;
+  readonly #disc: THREE.Mesh;
   readonly #materials: THREE.Material[] = [];
   readonly #labelOffset = uniform(1);
   readonly #threshold = uniform(0);
-  readonly #lineThickness = uniform(0.15);
-  readonly #lineOffset = uniform(0.175);
-  readonly #diamondLines = {
+  readonly #lineThickness = uniform(DISC.hidden.thickness);
+  readonly #lineOffset = uniform(DISC.hidden.offset);
+  readonly #discLines = {
     threshold: this.#threshold,
     lineThickness: this.#lineThickness,
     lineOffset: this.#lineOffset,
@@ -73,7 +73,7 @@ export class InteractivePoint {
     game.scene.add(this.#group);
 
     this.#label = this.#createLabel(options.text ?? '');
-    this.#diamond = this.#createDiamond();
+    this.#disc = this.#createDisc();
     this.intersect = game.rayCursor.addIntersect({
       active: false,
       shape: new THREE.Sphere(options.position.clone(), HIT_RADIUS),
@@ -117,28 +117,27 @@ export class InteractivePoint {
     layoutLabel(this.#label, art, this.#align);
   }
 
-  #createDiamond(): THREE.Mesh {
-    const material = diamondMaterial(this.#shared, {
+  #createDisc(): THREE.Mesh {
+    const material = discMaterial(this.#shared, {
       threshold: this.#threshold,
       lineOffset: this.#lineOffset,
       lineThickness: this.#lineThickness,
     });
     this.#materials.push(material);
 
-    const diamond = new THREE.Mesh(this.#shared.plane, material);
-    diamond.renderOrder = RENDER_ORDER.diamond;
-    diamond.rotation.z = Math.PI * 0.25;
-    diamond.visible = false;
-    this.#group.add(diamond);
-    return diamond;
+    const disc = new THREE.Mesh(this.#shared.plane, material);
+    disc.renderOrder = RENDER_ORDER.disc;
+    disc.visible = false;
+    this.#group.add(disc);
+    return disc;
   }
 
   hide(): void {
     if (this.state === 'hidden') return;
     this.state = 'hidden';
     this.intersect.active = false;
-    tweenDiamond(this.#diamondLines, DIAMOND.hidden, { ease: 'back.in(4.5)', duration: 0.6 }, () => {
-      this.#diamond.visible = false;
+    tweenDisc(this.#discLines, DISC.hidden, { ease: 'back.in(4.5)', duration: 0.6 }, () => {
+      this.#disc.visible = false;
       this.#label.visible = false;
     });
     this.#points.shrinkKeyIcon();
@@ -151,11 +150,11 @@ export class InteractivePoint {
     if (this.state === 'open') return;
     this.state = 'open';
     this.intersect.active = true;
-    this.#diamond.visible = true;
+    this.#disc.visible = true;
     this.#alignTowardScreenCenter();
     this.#label.visible = true;
     this.#group.add(this.#shared.keyIcon);
-    tweenDiamond(this.#diamondLines, DIAMOND.open, { ease: 'elastic.out(1.3,0.4)', duration: 1.5 });
+    tweenDisc(this.#discLines, DISC.open, { ease: 'elastic.out(1.3,0.4)', duration: 1.5 });
     if (getGame().inputs.mode !== INPUT_MODE.touch) this.#points.growKeyIcon();
     gsap.to(this.#labelOffset, { value: 0, ease: 'power2.out', duration: 0.6, delay: 0.2, overwrite: true });
     setDepthTest(this.#materials, false);
@@ -168,8 +167,8 @@ export class InteractivePoint {
     const ease = this.state === 'hidden' ? 'power2.out' : 'back.in(4.5)';
     this.state = 'concealed';
     this.intersect.active = true;
-    this.#diamond.visible = true;
-    tweenDiamond(this.#diamondLines, DIAMOND.concealed, { ease, duration: 0.6, delay: 0.2 }, () => {
+    this.#disc.visible = true;
+    tweenDisc(this.#discLines, DISC.concealed, { ease, duration: 0.6, delay: 0.2 }, () => {
       this.#label.visible = false;
       setDepthTest(this.#materials, true);
     });

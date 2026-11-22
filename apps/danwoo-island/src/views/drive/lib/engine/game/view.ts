@@ -4,7 +4,7 @@ import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import { introCenter } from '@views/drive/lib/engine/game/introCenter';
 import { QUALITY } from '@views/drive/lib/engine/game/quality';
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
-import { lerp, smoothstep } from '@views/drive/lib/engine/game/utilities/maths';
+import { clamp, lerp, smoothstep } from '@views/drive/lib/engine/game/utilities/maths';
 import { prefersReducedMotion } from '@views/drive/lib/engine/game/utilities/reducedMotion';
 import { CameraRoll } from '@views/drive/lib/engine/game/view/cameraRoll';
 import { Cinematic } from '@views/drive/lib/engine/game/view/cinematic';
@@ -41,6 +41,8 @@ export class View {
   ratioOverflow = 0;
   readonly focusPoint: FocusPoint;
   readonly zoom: Zoom = { baseRatio: ZOOM.base, ratio: ZOOM.base, smoothedRatio: ZOOM.base, toggle: 0, toggleLast: -1 };
+  flightLift = 0;
+  readonly #depthProbe = new THREE.Vector3();
   readonly spherical: Spherical;
   readonly roll = new CameraRoll();
   readonly camera: THREE.PerspectiveCamera;
@@ -97,6 +99,7 @@ export class View {
     const { delta } = this.game.ticker;
     panWithGamepad(this, delta);
     followTarget(this.focusPoint, delta);
+    this.focusPoint.position.y = this.flightLift;
     const focusSpeed = smoothFocus(this.focusPoint, delta);
     this.#updateZoom(focusSpeed, delta);
     this.#placeCamera();
@@ -148,8 +151,14 @@ export class View {
     const speedRatio = smoothstep(focusSpeed, ZOOM.speedEdge.min, ZOOM.speedEdge.max);
     const isSpeedZoom =
       this.focusPoint.isTracking && this.game.quality.level === QUALITY.high && !prefersReducedMotion();
-    this.zoom.ratio = this.zoom.baseRatio + (isSpeedZoom ? ZOOM.speedAmplitude * speedRatio : 0);
+    const speedPull = isSpeedZoom ? ZOOM.speedAmplitude * speedRatio : 0;
+    const altitudePull = ZOOM.altitudeAmplitude * clamp(this.flightLift / ZOOM.altitudeRange, 0, 1);
+    this.zoom.ratio = this.zoom.baseRatio + speedPull + altitudePull;
     this.zoom.smoothedRatio = lerp(this.zoom.smoothedRatio, this.zoom.ratio, delta * ZOOM.smoothing);
+  }
+
+  depthOf(position: THREE.Vector3): number {
+    return -this.#depthProbe.copy(position).applyMatrix4(this.camera.matrixWorldInverse).z;
   }
 
   #placeCamera(): void {

@@ -8,6 +8,7 @@ import { Track } from '@views/drive/lib/engine/game/tracks';
 import { Trails } from '@views/drive/lib/engine/game/trails';
 import { clamp, remapClamp } from '@views/drive/lib/engine/game/utilities/maths';
 import { createBoxyVehicle } from '@views/drive/lib/engine/game/world/boxyVehicle';
+import { FlightRotors } from '@views/drive/lib/engine/game/world/flightRotors';
 import { bindBlinkers, createPaints } from '@views/drive/lib/engine/game/world/vehiclePaints';
 import {
   createAntenna,
@@ -28,6 +29,7 @@ import {
   trailAnchor,
   type VisualWheel,
 } from '@views/drive/lib/engine/game/world/visualVehicleParts';
+import { WheelFloats } from '@views/drive/lib/engine/game/world/wheelFloats';
 
 export class VisualVehicle {
   readonly screenPosition = new THREE.Vector2(0, 0);
@@ -35,6 +37,8 @@ export class VisualVehicle {
   readonly #dispose: (() => void) | null;
   readonly #parts: Map<string, THREE.Object3D>;
   readonly #chassis: THREE.Object3D;
+  readonly #floats: WheelFloats;
+  readonly #rotors: FlightRotors;
   readonly #wheels: VisualWheel[];
   readonly #mainGroundTrack: Track;
   readonly #paints: Partial<Record<PaintName, THREE.Material>>;
@@ -70,6 +74,8 @@ export class VisualVehicle {
 
     this.#mainGroundTrack = game.tracks.add(new Track(1.5, 'g'));
     this.#wheels = createWheels(this.#requirePart('wheelContainer'), this.#chassis);
+    this.#floats = new WheelFloats(this.#wheels, this.#chassis);
+    this.#rotors = new FlightRotors(this.#wheels, this.#chassis);
     this.#blinkerCallbacks = bindBlinkers(this.#part('blinkerLeft'), this.#part('blinkerRight'));
     this.#antenna = createAntenna(this.#part('antenna'));
     this.#trails = this.#createTrails();
@@ -99,6 +105,8 @@ export class VisualVehicle {
     }
     for (const part of this.#parts.values()) part.removeFromParent();
     this.#dispose?.();
+    this.#floats.dispose();
+    this.#rotors.dispose();
     game.tracks.remove(this.#mainGroundTrack);
     for (const wheel of this.#wheels) game.tracks.remove(wheel.groundTrack);
   }
@@ -140,14 +148,17 @@ export class VisualVehicle {
     const { physicalVehicle: vehicle, player, ticker } = game;
     this.#chassis.position.copy(vehicle.position);
     this.#chassis.quaternion.copy(vehicle.quaternion);
-    this.#steering +=
-      (player.steering * vehicle.steeringAmplitude - this.#steering) * ticker.deltaScaled * STEERING_EASING;
+    const steering = vehicle.flight.isActive ? 0 : player.steering * vehicle.steeringAmplitude;
+    this.#steering += (steering - this.#steering) * ticker.deltaScaled * STEERING_EASING;
     updateWheels(this.#wheels, this.#steering);
+    this.#floats.update();
+    this.#rotors.update();
     this.#mainGroundTrack.update(vehicle.position, vehicle.position.y < MAIN_TRACK_MAX_ELEVATION);
     updateAntenna(this.#antenna, this.#chassis);
     this.#updateLights();
 
-    const isBoostTrailing = vehicle.isGoingForward && player.boosting && player.accelerating > 0;
+    const isDrivingForward = vehicle.isGoingForward && !vehicle.flight.isActive;
+    const isBoostTrailing = isDrivingForward && player.boosting && player.accelerating > 0;
     const trailAlpha = isBoostTrailing ? 1 : 0;
     this.#trails.leftAnchor.getWorldPosition(this.#trails.left.position);
     this.#trails.left.alpha = trailAlpha;

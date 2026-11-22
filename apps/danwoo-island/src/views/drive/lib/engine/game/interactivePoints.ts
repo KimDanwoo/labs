@@ -25,12 +25,12 @@ export class InteractivePoints implements PointRegistry {
     const plane = new THREE.PlaneGeometry(2, 2);
     const label = new THREE.PlaneGeometry(1, 1, 1, 1);
     label.translate(0.5, 0, 0);
-    const frontColor = uniform(color('#ffffff'));
+    const frontColor = uniform(color('#177f8b'));
     this.#shared = {
       plane,
       label,
       frontColor,
-      backColor: uniform(color('#251f2b')),
+      backColor: uniform(color('#ffffff')),
       playerPosition: uniform(vec2()),
       keyIcon: createKeyIcon(plane, frontColor),
       sounds: {

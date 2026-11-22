@@ -27,6 +27,8 @@ export const FOCUS_ACTIONS = new Set([
 export const ZOOM = {
   base: 0.6,
   speedAmplitude: -0.4,
+  altitudeAmplitude: -0.45,
+  altitudeRange: 24,
   speedEdge: { min: 5, max: 40 },
   wheelSensitivity: 0.05,
   pinchSensitivity: 0.005,

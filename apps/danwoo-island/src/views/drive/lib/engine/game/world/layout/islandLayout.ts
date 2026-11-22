@@ -3,8 +3,8 @@ export type Point = readonly [x: number, z: number];
 export type AreaKey =
   | 'achievements'
   | 'altar'
+  | 'beachGoal'
   | 'behindTheScene'
-  | 'bowling'
   | 'career'
   | 'circuit'
   | 'cookie'
@@ -240,7 +240,7 @@ export const ISLANDS: readonly IslandShape[] = [
     ],
   },
   {
-    name: 'bowling',
+    name: 'beachGoal',
     outline: [
       [-83.8, -58.2],
       [-79.2, -58.2],
@@ -378,10 +378,87 @@ export const ISLANDS: readonly IslandShape[] = [
 ];
 
 export const BRIDGES: readonly BridgeSpan[] = [
-  { from: [-66, 2], to: [-60, 6], width: 5 },
-  { from: [-80.5, 8], to: [-80.5, 18], width: 5 },
-  { from: [-65, 35], to: [-57, 29], width: 5 },
-  { from: [-57, 68], to: [-48, 75], width: 5 },
+  { from: [-80.5, 7], to: [-80.5, 17], width: 5 },
+  { from: [-65.5, 25], to: [-55.5, 25], width: 5 },
+  { from: [-54.8, 68.5], to: [-46.2, 73.5], width: 5 },
+];
+
+interface Waterway {
+  readonly course: readonly Point[];
+  readonly width: number;
+}
+
+export const RIVERS: readonly Waterway[] = [
+  {
+    width: 8,
+    course: [
+      [-98, 14],
+      [-88, 12.5],
+      [-80.5, 12],
+      [-72, 12],
+      [-64.5, 14.5],
+      [-60.5, 21],
+      [-60.5, 28],
+      [-60, 34],
+      [-57, 38.5],
+      [-52, 39.5],
+      [-47, 41.5],
+    ],
+  },
+  {
+    width: 4,
+    course: [
+      [-44, 53],
+      [-46.5, 57],
+      [-47, 63],
+      [-48.5, 68],
+    ],
+  },
+  {
+    width: 6,
+    course: [
+      [-48.5, 68],
+      [-50.5, 71],
+      [-54, 77.5],
+      [-56, 86],
+      [-57, 98],
+    ],
+  },
+];
+
+export const TRAILS: readonly (readonly Point[])[] = [
+  [
+    [-75, -6],
+    [-79, -1],
+    [-80.5, 4],
+  ],
+  [
+    [-80.5, 20],
+    [-78.5, 24],
+  ],
+  [
+    [-72, 27],
+    [-68.5, 25],
+  ],
+  [
+    [-52.5, 25],
+    [-49.8, 22.5],
+  ],
+  [
+    [-68.5, 25],
+    [-66.5, 32],
+    [-63, 43],
+    [-59.5, 50],
+  ],
+  [
+    [-59, 60],
+    [-58.5, 64],
+    [-57.4, 67],
+  ],
+  [
+    [-43.6, 75],
+    [-39, 74.5],
+  ],
 ];
 
 interface Pond {
@@ -416,11 +493,12 @@ export const RESPAWN_POINTS = {
   beachStart: { area: 'landing', offset: [-0.5, 2.5], rotation: -1.15 },
   behindTheScene: { area: 'behindTheScene', offset: [-1.8, -0.2], rotation: -0.19 },
   bonfire: { area: 'landing', offset: [4.9, 5.7], rotation: -2.2 },
-  bowling: { area: 'bowling', offset: [15, -3.8], rotation: -2.59 },
+  beachGoal: { area: 'beachGoal', offset: [9.5, 1.75], rotation: 3.14 },
   career: { area: 'career', offset: [0, 11.4], rotation: 1.57 },
   circuit: { area: 'circuit', offset: [0.7, 15.4], rotation: 0.04 },
   controls: { area: 'landing', offset: [-1, -6.5], rotation: 0 },
   cookie: { area: 'cookie', offset: [2.8, 1.6], rotation: 2.92 },
+  jukebox: { area: 'beachGoal', offset: [23.5, -12], rotation: 3.14 },
   lab: { area: 'lab', offset: [-7, 7], rotation: 1.57 },
   landing: { area: 'landing', offset: [-10.7, -0.5], rotation: -0.23 },
   projects: { area: 'projects', offset: [1, 7.7], rotation: 1.16 },
@@ -430,7 +508,7 @@ export const RESPAWN_POINTS = {
 } as const satisfies Record<string, RespawnPoint>;
 
 export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
-  bowling: {
+  beachGoal: {
     original: [6.3, 66],
     placed: [-62, -19],
     bounds: [-21.5, -12.7, 20.2, 12.7],
@@ -440,9 +518,9 @@ export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {
   social: { original: [29, -25.2], placed: [-41, 18], bounds: [-8.8, -8.6, 11.6, 8.8] },
   projects: { original: [34.8, 9.9], placed: [53, -63], bounds: [-4.6, -3.6, 5.6, 4.1] },
   lab: { original: [12.3, 15.55], placed: [-9.5, -3], bounds: [-4.5, -4.8, 4.5, 2.9] },
-  cookie: { original: [12.8, 34.75], placed: [-58, 55], bounds: [-4.0, -4.8, 4.0, 4.8] },
+  cookie: { original: [12.8, 34.75], placed: [-59, 55], bounds: [-4.0, -4.8, 4.0, 4.8] },
   career: { original: [26.3, -1.75], placed: [-76.5, 29], bounds: [-4.3, -4.9, 4.3, 8.8] },
-  behindTheScene: { original: [50.65, -11.3], placed: [-76.5, 77], bounds: [-4.3, -5.8, 4.2, 5.8] },
+  behindTheScene: { original: [50.65, -11.3], placed: [-77.5, 77.5], bounds: [-4.3, -5.8, 4.2, 5.8] },
   timeMachine: { original: [-55.15, -67.3], placed: [2, -62], bounds: [-0.6, -2.3, 2.1, 2.5] },
   landing: { original: [50.2, 38.3], placed: [-28.5, 73], bounds: [-10.6, -10.1, 10.7, 9.8] },
   toilet: { original: [65.75, 63.7], placed: [7, 77], bounds: [-4.5, -3.7, 3.9, 5.7] },

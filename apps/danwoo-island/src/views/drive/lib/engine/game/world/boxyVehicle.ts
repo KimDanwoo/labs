@@ -1,13 +1,14 @@
-import { color, mix, normalWorld } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { normalGradientColor } from '@views/drive/lib/engine/game/materials';
 import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 import {
   addCabin,
   addFenders,
   addFront,
   addRear,
+  addSurfRack,
   createPartsBuilder,
   shadedMaterial,
   wheelAssembly,
@@ -17,6 +18,8 @@ type Triple = readonly [number, number, number];
 export type PartName =
   | 'bodyPainted'
   | 'trim'
+  | 'cream'
+  | 'board'
   | 'metal'
   | 'glass'
   | 'headlights'
@@ -56,9 +59,10 @@ export function createBoxyVehicle(original: THREE.Object3D): BoxyVehicle {
   addFenders(parts);
   addFront(parts);
   addRear(parts);
+  addSurfRack(parts);
 
   const glass = new MeshDefaultMaterial({
-    colorNode: mix(color('#152b3d'), color('#4b7182'), normalWorld.y.abs().mul(0.4)).rgb,
+    colorNode: normalGradientColor('#152b3d', '#4b7182'),
   });
   glass.userData.prevent = true;
   const headlight = game.materials.emissiveGradient('islandHeadlight', {
@@ -71,7 +75,9 @@ export function createBoxyVehicle(original: THREE.Object3D): BoxyVehicle {
   const blink = new THREE.MeshBasicMaterial({ name: 'emissiveOrangeRadialGradient' });
   const chassis = parts.build({
     bodyPainted: new THREE.MeshBasicMaterial({ name: 'redGradient' }),
-    trim: shadedMaterial('#262b31'),
+    trim: shadedMaterial('#2c3438'),
+    cream: shadedMaterial('#fff1d6'),
+    board: shadedMaterial('#27b6cc'),
     metal: shadedMaterial('#9aa8ae'),
     glass,
     headlights: headlight,

@@ -1,8 +1,7 @@
-import { atan, color, float, Fn, fwidth, mix, positionGeometry, positionWorld, TWO_PI, vec2, vec4 } from 'three/tsl';
+import { color, float, Fn, fwidth, mix, PI, positionGeometry, positionWorld, TWO_PI, uv, vec2, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
-import { WORLD_CONFIG } from '@views/drive/lib/engine/worldConfig';
 
 type FloatNode = THREE.Node<'float'>;
 type Vec2Node = THREE.Node<'vec2'>;
@@ -33,30 +32,32 @@ const SEA = {
   sunriseIntensity: 0.1,
 } as const;
 
-const RING = {
-  thickness: 0.38,
-  thetaSegments: 192,
+const WAVE = {
+  width: 7.5,
+  height: 1.4,
+  crests: 2.5,
+  amplitude: 0.32,
+  speed: 2.2,
+  stroke: 0.06,
+  endFade: 0.3,
   coral: '#FF7A59',
   gold: '#FFD27A',
   teal: '#4FE3D6',
   head: '#FFF4DC',
   trackIntensity: 0.55,
-  trackOpacity: 0.12,
-  activeIntensity: 4.2,
+  trackOpacity: 0.16,
+  activeIntensity: 3.2,
   activeOpacity: 0.96,
   minimumAntialias: 0.002,
-  headLength: 0.42,
-  headWidth: 0.4,
-  headFalloff: 2.5,
-  headIntensity: 5,
+  headLength: 0.35,
+  headWidth: 0.25,
+  headIntensity: 4,
   headFadeIn: 0.006,
-  pulseSpeed: 1.6,
-  pulseAmplitude: 0.06,
-  pulseBase: 0.94,
 } as const;
 
-export const isTideLoading = WORLD_CONFIG.loadingStyle === 'tide';
-export const TIDE_REVEAL = { color: '#FFC46B', intensity: 4.5 } as const;
+const FOAM = { color: '#F4FFFB', width: 0.35, minimumWidth: 0.001 } as const;
+
+export const TIDE_REVEAL = { color: FOAM.color, intensity: 1.3 } as const;
 export const TIDE_LABEL = '#F5FCFF';
 
 function causticPattern(offset: Vec2Node, time: FloatNode): FloatNode {
@@ -94,64 +95,60 @@ export function tideSeaMaterial(): THREE.MeshBasicNodeMaterial {
   const material = new THREE.MeshBasicNodeMaterial({ side: THREE.DoubleSide });
   material.outputNode = Fn(() => {
     const offset = positionWorld.xz.sub(reveal.position2Uniform).toVar();
-    offset.length().lessThan(reveal.distance).discard();
-    return vec4(seaColor(offset, ticker.elapsedUniform), 1);
+    const tide = reveal.distanceFrom(positionWorld.xz).toVar();
+    tide.lessThan(reveal.distance).discard();
+    const foamWidth = reveal.distance.clamp(0, 1).mul(FOAM.width).max(FOAM.minimumWidth);
+    const foam = tide.sub(reveal.distance).div(foamWidth).oneMinus().clamp(0, 1);
+    return vec4(mix(seaColor(offset, ticker.elapsedUniform), color(FOAM.color), foam), 1);
   })();
   return material;
 }
 
-export function tideRingGeometry(radius: number): THREE.RingGeometry {
-  return new THREE.RingGeometry(radius - RING.thickness, radius, RING.thetaSegments, 1);
+export function tideWaveGeometry(): THREE.PlaneGeometry {
+  return new THREE.PlaneGeometry(WAVE.width, WAVE.height);
 }
 
-function ringGradient(angleProgress: FloatNode): ColorNode {
-  const warm = mix(color(RING.coral), color(RING.gold), angleProgress.mul(2).clamp(0, 1));
-  return mix(warm, color(RING.teal), angleProgress.sub(0.5).mul(2).clamp(0, 1));
+function waveGradient(along: FloatNode): ColorNode {
+  const warm = mix(color(WAVE.coral), color(WAVE.gold), along.mul(2).clamp(0, 1));
+  return mix(warm, color(WAVE.teal), along.sub(0.5).mul(2).clamp(0, 1));
 }
 
-function ringEdge(across: FloatNode): FloatNode {
-  const antialias = fwidth(across).max(RING.minimumAntialias);
-  return across.smoothstep(0, antialias).mul(across.smoothstep(antialias.oneMinus(), 1).oneMinus());
-}
-
-interface RingHeadParams {
-  angleProgress: FloatNode;
-  completion: FloatNode;
-  across: FloatNode;
-  radius: number;
-}
-
-function ringHead({ angleProgress, completion, across, radius }: RingHeadParams): FloatNode {
-  const separation = angleProgress.sub(completion).abs();
-  const along = separation
-    .min(separation.oneMinus())
-    .mul(TWO_PI)
-    .mul(radius - RING.thickness * 0.5)
-    .div(RING.headLength);
-  const radial = across.sub(0.5).div(RING.headWidth);
-  const glow = along.mul(along).add(radial.mul(radial)).mul(-RING.headFalloff).exp();
-  return glow.mul(completion.smoothstep(0, RING.headFadeIn));
-}
-
-export function tideRingMaterial(progress: FloatNode, radius: number): THREE.MeshBasicNodeMaterial {
+export function tideWaveMaterial(progress: FloatNode, opacity: FloatNode): THREE.MeshBasicNodeMaterial {
   const { ticker } = getGame();
   const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide });
   material.outputNode = Fn(() => {
     const completion = progress.clamp(0, 1).toVar();
-    const angleProgress = atan(positionGeometry.y, positionGeometry.x).div(TWO_PI).add(0.5).oneMinus().toVar();
-    const across = positionGeometry.xy
-      .length()
-      .sub(radius - RING.thickness)
-      .div(RING.thickness)
+    const along = uv().x.toVar();
+    const taper = along.mul(PI).sin().toVar();
+    const crest = along
+      .mul(TWO_PI)
+      .mul(WAVE.crests)
+      .sub(ticker.elapsedUniform.mul(WAVE.speed))
+      .sin()
+      .mul(WAVE.amplitude)
+      .mul(taper);
+    const gap = positionGeometry.y.sub(crest).toVar();
+    const antialias = fwidth(gap).max(WAVE.minimumAntialias);
+    const stroke = gap
+      .abs()
+      .smoothstep(WAVE.stroke, antialias.add(WAVE.stroke))
+      .oneMinus()
+      .mul(taper.smoothstep(0, WAVE.endFade));
+    const filled = along.lessThan(completion).select(1, 0).toVar();
+    const headAlong = along.sub(completion).mul(WAVE.width).div(WAVE.headLength);
+    const headAcross = gap.div(WAVE.headWidth);
+    const head = headAlong
+      .mul(headAlong)
+      .add(headAcross.mul(headAcross))
+      .negate()
+      .exp()
+      .mul(completion.smoothstep(0, WAVE.headFadeIn))
       .toVar();
-    const filled = angleProgress.lessThan(completion).select(1, 0).toVar();
-    const head = ringHead({ angleProgress, completion, across, radius }).toVar();
-    const pulse = ticker.elapsedUniform.mul(RING.pulseSpeed).sin().mul(RING.pulseAmplitude).add(RING.pulseBase);
-    const track = color(RING.teal).mul(RING.trackIntensity);
-    const active = ringGradient(angleProgress).mul(RING.activeIntensity).mul(pulse);
-    const light = mix(track, active, filled).add(color(RING.head).mul(head).mul(RING.headIntensity));
-    const opacity = mix(float(RING.trackOpacity), float(RING.activeOpacity), filled).max(head).mul(ringEdge(across));
-    return vec4(light, opacity);
+    const track = color(WAVE.teal).mul(WAVE.trackIntensity);
+    const active = waveGradient(along).mul(WAVE.activeIntensity);
+    const light = mix(track, active, filled).add(color(WAVE.head).mul(head).mul(WAVE.headIntensity));
+    const alpha = mix(float(WAVE.trackOpacity), float(WAVE.activeOpacity), filled).mul(stroke).max(head);
+    return vec4(light, alpha.mul(opacity));
   })();
   return material;
 }

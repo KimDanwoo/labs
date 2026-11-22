@@ -1,10 +1,24 @@
-import { type Point, AREA_ANCHORS, WORLD_SIZE } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
-import { bridgeDistance, landDistance, objectDistance, padDistance, respawnDistance, trackClearance } from './fields';
+import {
+  type BridgeSpan,
+  type Point,
+  AREA_ANCHORS,
+  WORLD_SIZE,
+} from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
+import {
+  bridgeDistance,
+  landDistance,
+  objectDistance,
+  padDistance,
+  respawnDistance,
+  trackClearance,
+  trailDistance,
+} from './fields';
 import { type Planting, type Room, BEACH_PALMS, CAMERA_SIDE, SHORE_ROCKS, TREE_COVER } from './scatterPlan';
 
 const HALF_WORLD = WORLD_SIZE / 2;
-export const BRIDGE_CLEARANCE = 6;
+const BRIDGE_CLEARANCE = 6;
 export const RESPAWN_CLEARANCE = 5;
+export const TRAIL_CLEARANCE = 2.5;
 export const PALM_COAST = 12;
 export const CRATE_RING = 3;
 const PAD_LIGHT_GAP = 2;
@@ -18,6 +32,7 @@ export const hasRoom = (point: Point, { isLow, inland, track, pad }: Room): bool
   trackClearance(point) > track &&
   (isLow ? objectDistance(point) : padDistance(point)) > pad &&
   bridgeDistance(point) > BRIDGE_CLEARANCE &&
+  trailDistance(point) > TRAIL_CLEARANCE &&
   respawnDistance(point) > RESPAWN_CLEARANCE;
 export const isApart = (point: Point, others: readonly Point[], gap: number): boolean =>
   others.every(([x, z]) => Math.hypot(point[0] - x, point[1] - z) >= gap);
@@ -62,6 +77,24 @@ export function padCorners(): Point[] {
     [placed[0] + bounds[0] - PAD_LIGHT_GAP, placed[1] + bounds[1] - PAD_LIGHT_GAP] satisfies Point,
     [placed[0] + bounds[2] + PAD_LIGHT_GAP, placed[1] + bounds[3] + PAD_LIGHT_GAP] satisfies Point,
   ]);
+}
+const LANTERN = { beyond: 2, aside: 1.2 } as const;
+export function bridgeLanternSpots({ from, to, width }: BridgeSpan): Point[] {
+  const length = Math.hypot(to[0] - from[0], to[1] - from[1]);
+  const forward: Point = [(to[0] - from[0]) / length, (to[1] - from[1]) / length];
+  const aside = width / 2 + LANTERN.aside;
+  const ends: readonly (readonly [Point, number])[] = [
+    [from, -LANTERN.beyond],
+    [to, LANTERN.beyond],
+  ];
+  return ends.flatMap(([end, beyond]) =>
+    [-aside, aside].map(
+      (side): Point => [
+        end[0] + forward[0] * beyond - forward[1] * side,
+        end[1] + forward[1] * beyond + forward[0] * side,
+      ],
+    ),
+  );
 }
 export function ringAround(center: Point, radius: number, count: number): Point[] {
   return Array.from({ length: count }, (_, index): Point => {

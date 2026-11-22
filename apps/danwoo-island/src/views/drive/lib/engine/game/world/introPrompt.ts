@@ -2,12 +2,10 @@ import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import { INPUT_MODE } from '@views/drive/lib/engine/game/inputs/inputTypes';
 import type { Intersect } from '@views/drive/lib/engine/game/rayCursor';
 import { UI_FONT_FAMILY } from '@views/drive/lib/engine/game/utilities/canvasFont';
-import { isTideLoading, TIDE_LABEL } from '@views/drive/lib/engine/game/world/tideLoading';
+import { TIDE_LABEL } from '@views/drive/lib/engine/game/world/tideLoading';
 import gsap from 'gsap';
-import { atan, color, Fn, positionGeometry, texture, TWO_PI, uniform, uv, vec3, vec4 } from 'three/tsl';
+import { color, Fn, texture, uniform, uv, vec3, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-
-const LABEL_TINT = isTideLoading ? TIDE_LABEL : '#ffffff';
 
 export const LABEL_HEIGHT = 1;
 
@@ -17,7 +15,7 @@ const PROMPT_RENDER_ORDER = 10;
 
 export const LABEL_HIDDEN_SCALE = 0.01;
 
-export const RING = { radius: 3.5, thickness: 0.04, segments: 128, elevation: 0.001, smoothing: 10 } as const;
+export const LOADER = { elevation: 0.001, smoothing: 10, hideDuration: 0.5 } as const;
 
 const TEXT_SCALE = 0.9;
 
@@ -69,17 +67,6 @@ export function tweenScale(object: THREE.Object3D, { from, to, ...vars }: ScaleT
   });
 }
 
-export function glowRingMaterial(progress: THREE.Node<'float'>): THREE.MeshBasicNodeMaterial {
-  const { reveal } = getGame();
-  const material = new THREE.MeshBasicNodeMaterial();
-  material.outputNode = Fn(() => {
-    const angleProgress = atan(positionGeometry.y, positionGeometry.x).div(TWO_PI).add(0.5).oneMinus();
-    progress.lessThan(angleProgress).discard();
-    return vec4(reveal.color.mul(reveal.intensity), 1);
-  })();
-  return material;
-}
-
 export class PromptText {
   readonly mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicNodeMaterial>;
   readonly #textures = new Map<string, THREE.CanvasTexture>();
@@ -99,7 +86,7 @@ export class PromptText {
     const prompt = startPrompt();
     const labelTexture = this.#textures.get(prompt) ?? drawPrompt(prompt);
     this.#textures.set(prompt, labelTexture);
-    this.mesh.material.outputNode = Fn(() => vec4(color(LABEL_TINT), texture(labelTexture, uv()).r))();
+    this.mesh.material.outputNode = Fn(() => vec4(color(TIDE_LABEL), texture(labelTexture, uv()).r))();
     this.mesh.material.needsUpdate = true;
   }
 

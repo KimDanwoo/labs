@@ -17,8 +17,8 @@ import {
 } from '@views/drive/lib/engine/game/world/areas/socialAreaConfig';
 import { createSocialLinks } from '@views/drive/lib/engine/game/world/areas/socialLinks';
 import {
+  arrangeSocialSigns,
   personalizeSocialSigns,
-  recordSteleFrames,
   reshapeSocialPlaza,
 } from '@views/drive/lib/engine/game/world/areas/socialSigns';
 import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
@@ -51,8 +51,8 @@ export class SocialArea extends Area {
   override setObjects(): void {
     for (const sign of this.model.children.filter((child) => UNLINKED_SIGNS.test(child.name))) sign.removeFromParent();
     rebuildVillageProps(this.model);
+    arrangeSocialSigns(this.model);
     reshapeSocialPlaza(this.model);
-    recordSteleFrames(this.model);
     super.setObjects();
   }
 
